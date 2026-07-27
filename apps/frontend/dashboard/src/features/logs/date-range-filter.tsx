@@ -1,5 +1,6 @@
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import * as Popover from "@reloop/ui/popover";
 import { useEffect, useRef, useState } from "react";
@@ -297,28 +298,22 @@ export const DateRangeFilter = ({
 							disabled={getDisabledDays()}
 						/>
 						<div className="flex justify-end gap-2 border-stroke-soft-100 border-t pt-2">
-							{(hasActiveFilter ||
-								!!calendarRange?.from ||
-								!!calendarRange?.to) && (
-								<Button.Root
-									size="xsmall"
-									variant="neutral"
-									mode="stroke"
-									className="rounded-xl"
-									onClick={handleClear}
-								>
-									Reset
-								</Button.Root>
-							)}
 							<Button.Root
+								variant="neutral"
+								size="xsmall"
+								mode="stroke"
+								onClick={handleClear}
+							>
+								Reset
+							</Button.Root>
+							<FancyButton.Root
 								size="xsmall"
 								variant="neutral"
-								className="rounded-xl"
 								onClick={handleApply}
 								disabled={!calendarRange?.from || !calendarRange?.to}
 							>
 								Apply
-							</Button.Root>
+							</FancyButton.Root>
 						</div>
 					</div>
 				</div>

@@ -206,11 +206,7 @@ export function ApiKeyHeader({
 								size="xsmall"
 								onClick={() => void setRotateId(apiKey.id)}
 							>
-								<FancyButton.Icon
-									as={Icon}
-									name="rotate-cw"
-									className="ml-0.5 h-3.5 w-3.5"
-								/>
+								<Icon name="rotate-cw" className="h-3.5 w-3.5" />
 								Rotate key
 							</FancyButton.Root>
 							<ApiKeyHeaderMenu

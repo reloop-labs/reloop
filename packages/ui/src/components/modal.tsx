@@ -3,7 +3,6 @@
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { cn } from "@reloop/ui/cn";
 import * as React from "react";
-import * as CompactButton from "./compact-button";
 import { Icon } from "./icon";
 
 const ModalRoot = DialogPrimitive.Root;
@@ -64,17 +63,13 @@ const ModalContent = React.forwardRef<
 						{children}
 						{showClose && (
 							<ModalClose asChild>
-								<CompactButton.Root
-									variant="ghost"
-									size="large"
-									className="absolute top-4 right-4"
+								<button
+									type="button"
+									aria-label="Close"
+									className="absolute top-4 right-4 z-20 flex h-7 w-7 items-center justify-center rounded-lg border border-stroke-soft-200 bg-bg-white-0 text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 active:scale-[0.95]"
 								>
-									<CompactButton.Icon
-										as={() => (
-											<Icon name="plus" className="h-4 w-4 rotate-45" />
-										)}
-									/>
-								</CompactButton.Root>
+									<Icon name="cross" className="h-3.5 w-3.5" />
+								</button>
 							</ModalClose>
 						)}
 					</DialogPrimitive.Content>

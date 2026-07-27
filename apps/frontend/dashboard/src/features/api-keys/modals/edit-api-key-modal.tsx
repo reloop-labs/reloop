@@ -35,7 +35,7 @@ export function EditApiKeyModal({
 				showClose={true}
 			>
 				<div className="p-6">
-					<div className="relative pr-6">
+					<div className="relative pr-10">
 						<Modal.Title className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
 							Edit API key
 						</Modal.Title>

@@ -38,7 +38,8 @@ export function ModalHeader({
 					<button
 						type="button"
 						onClick={onClose}
-						className="flex h-7 w-7 items-center justify-center rounded-lg border border-stroke-soft-200 bg-bg-white-0 text-text-sub-600 transition-colors hover:bg-bg-weak-50"
+						aria-label="Close"
+						className="flex h-7 w-7 items-center justify-center rounded-lg border border-stroke-soft-200 bg-bg-white-0 text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 active:scale-[0.95]"
 					>
 						<Icon name="cross" className="h-3.5 w-3.5" />
 					</button>

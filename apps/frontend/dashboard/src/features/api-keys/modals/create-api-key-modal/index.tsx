@@ -128,7 +128,7 @@ export function CreateApiKeyModal({
 				>
 					<div className="p-6">
 						{/* Header — title & description cross-fade with blur independently */}
-						<div className="relative pr-6">
+						<div className="relative pr-10">
 							<AnimatePresence mode="wait" initial={false}>
 								<motion.div
 									key={step}
