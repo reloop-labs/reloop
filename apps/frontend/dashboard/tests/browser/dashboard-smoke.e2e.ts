@@ -331,7 +331,7 @@ test.describe("production shell", () => {
 		await expect(
 			page.getByRole("heading", { name: "Page not found" }),
 		).toBeVisible();
-		expect(await page.title()).toBe("Page not found");
+		expect(await page.title()).toBe("Page not found | Reloop Dashboard");
 		expect(
 			await page
 				.locator('meta[name="description"]')
