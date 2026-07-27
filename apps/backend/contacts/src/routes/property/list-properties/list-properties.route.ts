@@ -3,7 +3,7 @@ import { rateLimitPlugin } from "@be/contacts/middleware/rate-limit";
 import { PropertyModel } from "@be/contacts/model/property.model";
 import { Elysia } from "elysia";
 import { listPropertiesController } from "./list-properties.controllers";
-import { listPropertiesXCodeSamples } from "./list-properties.x-codeSamples";
+import { listPropertiesXCodeSamples } from "@reloop/code-samples/contacts";
 
 export const listPropertiesRoute = new Elysia()
 	.use(authMiddleware)

@@ -3,7 +3,7 @@ import { authMiddleware } from "@be/template/middleware/auth";
 import { templateVersionResponseSchema } from "@be/template/model/template.model";
 import { Elysia, t } from "elysia";
 import { listVersions } from "./list-versions.controllers";
-import { listVersionsXCodeSamples } from "./list-versions.x-codeSamples";
+import { listVersionsXCodeSamples } from "@reloop/code-samples/template";
 
 export const listVersionsRoute = new Elysia().use(authMiddleware).get(
 	"/:id/versions",

@@ -2,15 +2,36 @@ import fs from "node:fs";
 import path from "node:path";
 
 export const REPO_ROOT = path.resolve(__dirname, "../../../../..");
-export const BACKEND_ROOT = path.join(REPO_ROOT, "apps/backend");
+export const CODE_SAMPLES_ROOT = path.join(
+	REPO_ROOT,
+	"packages/code-samples/src",
+);
+/** @deprecated Use CODE_SAMPLES_ROOT — samples live in @reloop/code-samples */
+export const BACKEND_ROOT = CODE_SAMPLES_ROOT;
 
 export const SERVICE_DIRS = [
-	{ name: "contacts", dir: path.join(BACKEND_ROOT, "contacts/src/routes") },
-	{ name: "api-key", dir: path.join(BACKEND_ROOT, "api-key/src/routes") },
+	{ name: "contacts", dir: path.join(CODE_SAMPLES_ROOT, "contacts") },
+	{ name: "api-key", dir: path.join(CODE_SAMPLES_ROOT, "api-key") },
+	{ name: "domain", dir: path.join(CODE_SAMPLES_ROOT, "domain") },
+	{ name: "webhook", dir: path.join(CODE_SAMPLES_ROOT, "webhook") },
+	{ name: "mail", dir: path.join(CODE_SAMPLES_ROOT, "mail") },
+	{ name: "logs", dir: path.join(CODE_SAMPLES_ROOT, "logs") },
+	{ name: "template", dir: path.join(CODE_SAMPLES_ROOT, "template") },
+	{ name: "inbox", dir: path.join(CODE_SAMPLES_ROOT, "inbox") },
 ];
+
+const SKIP_FILES = new Set([
+	"index.ts",
+	"types.ts",
+	"helpers.ts",
+	"languages.ts",
+]);
 
 export function findSampleFiles(dir: string): string[] {
 	const files: string[] = [];
+	if (!fs.existsSync(dir)) {
+		return files;
+	}
 
 	for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
 		const fullPath = path.join(dir, entry.name);
@@ -18,7 +39,18 @@ export function findSampleFiles(dir: string): string[] {
 			files.push(...findSampleFiles(fullPath));
 			continue;
 		}
-		if (entry.name.endsWith(".x-codeSamples.ts")) {
+		if (
+			!entry.name.endsWith(".ts") ||
+			SKIP_FILES.has(entry.name) ||
+			entry.name.endsWith(".test.ts")
+		) {
+			continue;
+		}
+		const content = fs.readFileSync(fullPath, "utf8");
+		if (
+			content.includes("XCodeSamples") ||
+			content.includes("CodeSample[]")
+		) {
 			files.push(fullPath);
 		}
 	}

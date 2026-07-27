@@ -2,7 +2,7 @@ import { authMiddleware } from "@reloop/be-inbox/middleware/auth";
 import { MailModel } from "@reloop/be-inbox/model/mail.model";
 import { Elysia, t } from "elysia";
 import { batchThreadsController } from "./batch-threads.controllers";
-import { batchThreadsXCodeSamples } from "./batch-threads.x-codeSamples";
+import { batchThreadsXCodeSamples } from "@reloop/code-samples/inbox";
 
 const batchAction = t.Union([
 	t.Literal("archive"),

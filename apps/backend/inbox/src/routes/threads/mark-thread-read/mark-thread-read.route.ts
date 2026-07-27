@@ -2,7 +2,7 @@ import { authMiddleware } from "@reloop/be-inbox/middleware/auth";
 import { MailModel } from "@reloop/be-inbox/model/mail.model";
 import { Elysia, t } from "elysia";
 import { markThreadReadController } from "./mark-thread-read.controllers";
-import { markThreadReadXCodeSamples } from "./mark-thread-read.x-codeSamples";
+import { markThreadReadXCodeSamples } from "@reloop/code-samples/inbox";
 
 export const markThreadReadRoute = new Elysia().use(authMiddleware).patch(
 	"/:id/read",

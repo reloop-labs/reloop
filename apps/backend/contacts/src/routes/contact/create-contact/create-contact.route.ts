@@ -4,7 +4,7 @@ import { ContactModel } from "@be/contacts/model/contact.model";
 import { auditLogHook } from "@be/contacts/utils/audit-log";
 import { Elysia } from "elysia";
 import { createContactController } from "./create-contact.controllers";
-import { createContactXCodeSamples } from "./create-contact.x-codeSamples";
+import { createContactXCodeSamples } from "@reloop/code-samples/contacts";
 
 export const createContactRoute = new Elysia()
 	.use(authMiddleware)

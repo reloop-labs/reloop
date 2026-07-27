@@ -4,7 +4,7 @@ import { ChannelModel } from "@be/contacts/model/channel.model";
 import { auditLogHook } from "@be/contacts/utils/audit-log";
 import { Elysia } from "elysia";
 import { createChannelController } from "./create-channel.controllers";
-import { createChannelXCodeSamples } from "./create-channel.x-codeSamples";
+import { createChannelXCodeSamples } from "@reloop/code-samples/contacts";
 
 export const createChannelRoute = new Elysia()
 	.use(authMiddleware)

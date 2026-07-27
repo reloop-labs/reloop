@@ -2,7 +2,7 @@ import { authMiddleware } from "@reloop/be-inbox/middleware/auth";
 import { MailModel } from "@reloop/be-inbox/model/mail.model";
 import { Elysia, t } from "elysia";
 import { getMessageAttachmentController } from "./get-message-attachment.controllers";
-import { getMessageAttachmentXCodeSamples } from "./get-message-attachment.x-codeSamples";
+import { getMessageAttachmentXCodeSamples } from "@reloop/code-samples/inbox";
 
 export const getMessageAttachmentRoute = new Elysia().use(authMiddleware).get(
 	"/:id/attachments/:attachmentId",

@@ -44,7 +44,8 @@
 		"@elysiajs/openapi": "catalog:backend",
 		"mailparser": "catalog:backend",
 		"ai": "catalog:backend",
-		"@openrouter/ai-sdk-provider": "catalog:backend"
+		"@openrouter/ai-sdk-provider": "catalog:backend",
+		"@reloop/code-samples": "workspace:*"
 	},
 	"devDependencies": {
 		"@reloop/tsconfig": "workspace:*",

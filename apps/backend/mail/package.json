@@ -42,7 +42,8 @@
 		"@reloop/bus": "workspace:*",
 		"@elysiajs/openapi": "catalog:backend",
 		"nodemailer": "catalog:backend",
-		"@types/nodemailer": "catalog:backend"
+		"@types/nodemailer": "catalog:backend",
+		"@reloop/code-samples": "workspace:*"
 	},
 	"devDependencies": {
 		"@reloop/tsconfig": "workspace:*",

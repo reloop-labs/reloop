@@ -41,7 +41,8 @@
 		"@reloop/auth": "workspace:*",
 		"@reloop/bus": "workspace:*",
 		"@paralleldrive/cuid2": "catalog:backend",
-		"evlog": "catalog:backend"
+		"evlog": "catalog:backend",
+		"@reloop/code-samples": "workspace:*"
 	},
 	"devDependencies": {
 		"@reloop/tsconfig": "workspace:*",

@@ -3,7 +3,7 @@ import { WebhookModel } from "@reloop/webhook/routes/webhook/webhook.model";
 import { auditLogHook } from "@reloop/webhook/utils/audit-log";
 import { Elysia, t } from "elysia";
 import { updateWebhookController } from "./update-webhook.controllers";
-import { updateWebhookXCodeSamples } from "./update-webhook.x-codeSamples";
+import { updateWebhookXCodeSamples } from "@reloop/code-samples/webhook";
 
 export const updateWebhookRoute = new Elysia().use(authMiddleware).patch(
 	"/:webhook_id",

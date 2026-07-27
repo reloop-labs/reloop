@@ -3,7 +3,7 @@ import { rateLimitPlugin } from "@be/contacts/middleware/rate-limit";
 import { GroupModel } from "@be/contacts/model/group.model";
 import { listGroupsController } from "@be/contacts/routes/group/list-groups/list-groups.controllers";
 import { Elysia } from "elysia";
-import { listGroupsXCodeSamples } from "./list-groups.x-codeSamples";
+import { listGroupsXCodeSamples } from "@reloop/code-samples/contacts";
 
 export const listGroupsRoute = new Elysia()
 	.use(authMiddleware)

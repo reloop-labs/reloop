@@ -6,7 +6,7 @@ import { auditLogHook } from "@reloop/be-mail/utils/audit-log";
 import { Elysia } from "elysia";
 import { evlog } from "evlog/elysia";
 import { sendEmailController } from "./send-email.controllers";
-import { sendEmailXCodeSamples } from "./send-email.x-codeSamples";
+import { sendEmailXCodeSamples } from "@reloop/code-samples/mail";
 
 export const sendEmailRoute = new Elysia()
 	.use(evlog())

@@ -1,13 +1,13 @@
 #!/usr/bin/env bun
 /**
- * Syncs code samples from backend x-codeSamples.ts into generated MDX frontmatter.
+ * Syncs code samples from @reloop/code-samples into generated MDX frontmatter.
  */
 
 import fs from "node:fs";
 import path from "node:path";
 
 const REPO_ROOT = path.resolve(__dirname, "../../../..");
-const BACKEND_ROOT = path.join(REPO_ROOT, "apps/backend");
+const CODE_SAMPLES_ROOT = path.join(REPO_ROOT, "packages/code-samples/src");
 const DOCS_API_DIR = path.join(
 	REPO_ROOT,
 	"apps/frontend/docs/content/docs/api",
@@ -33,15 +33,36 @@ interface SampleSource {
 	samples: CodeSample[];
 }
 
+const SKIP_FILES = new Set([
+	"index.ts",
+	"types.ts",
+	"helpers.ts",
+	"languages.ts",
+]);
+
 function findSampleFiles(dir: string): string[] {
 	const files: string[] = [];
+	if (!fs.existsSync(dir)) {
+		return files;
+	}
 	for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
 		const fullPath = path.join(dir, entry.name);
 		if (entry.isDirectory()) {
 			files.push(...findSampleFiles(fullPath));
 			continue;
 		}
-		if (entry.name.endsWith(".x-codeSamples.ts")) {
+		if (
+			!entry.name.endsWith(".ts") ||
+			SKIP_FILES.has(entry.name) ||
+			entry.name.endsWith(".test.ts")
+		) {
+			continue;
+		}
+		const content = fs.readFileSync(fullPath, "utf8");
+		if (
+			content.includes("XCodeSamples") ||
+			content.includes("CodeSample[]")
+		) {
 			files.push(fullPath);
 		}
 	}
@@ -206,13 +227,14 @@ function bumpWatcherTrigger(): void {
 }
 
 const services = [
-	{ name: "contacts", dir: path.join(BACKEND_ROOT, "contacts/src/routes") },
-	{ name: "api-key", dir: path.join(BACKEND_ROOT, "api-key/src/routes") },
-	{ name: "domain", dir: path.join(BACKEND_ROOT, "domain/src/routes") },
-	{ name: "mail", dir: path.join(BACKEND_ROOT, "mail/src/routes") },
-	{ name: "template", dir: path.join(BACKEND_ROOT, "template/src/routes") },
-	{ name: "webhook", dir: path.join(BACKEND_ROOT, "webhook/src/routes") },
-	{ name: "inbox", dir: path.join(BACKEND_ROOT, "inbox/src/routes") },
+	{ name: "contacts", dir: path.join(CODE_SAMPLES_ROOT, "contacts") },
+	{ name: "api-key", dir: path.join(CODE_SAMPLES_ROOT, "api-key") },
+	{ name: "domain", dir: path.join(CODE_SAMPLES_ROOT, "domain") },
+	{ name: "mail", dir: path.join(CODE_SAMPLES_ROOT, "mail") },
+	{ name: "template", dir: path.join(CODE_SAMPLES_ROOT, "template") },
+	{ name: "webhook", dir: path.join(CODE_SAMPLES_ROOT, "webhook") },
+	{ name: "inbox", dir: path.join(CODE_SAMPLES_ROOT, "inbox") },
+	{ name: "logs", dir: path.join(CODE_SAMPLES_ROOT, "logs") },
 ];
 
 const sampleIndex = new Map<string, SampleSource>();
@@ -271,7 +293,7 @@ if (CHECK) {
 		);
 		process.exit(1);
 	}
-	console.log("OK: docs code samples match backend x-codeSamples.");
+	console.log("OK: docs code samples match @reloop/code-samples.");
 	process.exit(0);
 }
 

@@ -2,7 +2,7 @@ import { authMiddleware } from "@reloop/be-inbox/middleware/auth";
 import { MailModel } from "@reloop/be-inbox/model/mail.model";
 import { Elysia, t } from "elysia";
 import { createMailboxController } from "./create-mailbox.controllers";
-import { createMailboxXCodeSamples } from "./create-mailbox.x-codeSamples";
+import { createMailboxXCodeSamples } from "@reloop/code-samples/inbox";
 
 export const createMailboxRoute = new Elysia().use(authMiddleware).post(
 	"/create",

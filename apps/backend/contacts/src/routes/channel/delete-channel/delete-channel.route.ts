@@ -4,7 +4,7 @@ import { ChannelModel } from "@be/contacts/model/channel.model";
 import { auditLogHook } from "@be/contacts/utils/audit-log";
 import { Elysia, t } from "elysia";
 import { deleteChannelController } from "./delete-channel.controllers";
-import { deleteChannelXCodeSamples } from "./delete-channel.x-codeSamples";
+import { deleteChannelXCodeSamples } from "@reloop/code-samples/contacts";
 
 export const deleteChannelRoute = new Elysia()
 	.use(authMiddleware)

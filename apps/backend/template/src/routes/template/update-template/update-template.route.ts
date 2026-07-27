@@ -4,7 +4,7 @@ import { templateResponseSchema } from "@be/template/model/template.model";
 import { auditLogHook } from "@be/template/utils/audit-log";
 import { Elysia, t } from "elysia";
 import { updateTemplate } from "./update-template.controllers";
-import { updateTemplateXCodeSamples } from "./update-template.x-codeSamples";
+import { updateTemplateXCodeSamples } from "@reloop/code-samples/template";
 
 export const updateTemplateRoute = new Elysia().use(authMiddleware).put(
 	"/:id",

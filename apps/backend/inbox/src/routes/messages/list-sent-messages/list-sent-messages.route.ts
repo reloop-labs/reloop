@@ -2,7 +2,7 @@ import { authMiddleware } from "@reloop/be-inbox/middleware/auth";
 import { MailModel } from "@reloop/be-inbox/model/mail.model";
 import { Elysia, t } from "elysia";
 import { getSentMessagesController } from "./list-sent-messages.controllers";
-import { listSentMessagesXCodeSamples } from "./list-sent-messages.x-codeSamples";
+import { listSentMessagesXCodeSamples } from "@reloop/code-samples/inbox";
 
 export const listSentMessagesRoute = new Elysia().use(authMiddleware).get(
 	"/sent",

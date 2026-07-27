@@ -2,7 +2,7 @@ import { authMiddleware } from "@reloop/domain/middleware/auth";
 import { DomainModel } from "@reloop/domain/model/domain.model";
 import { Elysia } from "elysia";
 import { listDomainsController } from "./list-domains.controllers";
-import { listDomainsXCodeSamples } from "./list-domains.x-codeSamples";
+import { listDomainsXCodeSamples } from "@reloop/code-samples/domain";
 
 export const listDomainsRoute = new Elysia().use(authMiddleware).get(
 	"/list",

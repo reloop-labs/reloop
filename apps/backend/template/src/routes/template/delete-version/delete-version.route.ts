@@ -4,7 +4,7 @@ import { templateVersionResponseSchema } from "@be/template/model/template.model
 import { auditLogHook } from "@be/template/utils/audit-log";
 import { Elysia, t } from "elysia";
 import { deleteVersion } from "./delete-version.controllers";
-import { deleteVersionXCodeSamples } from "./delete-version.x-codeSamples";
+import { deleteVersionXCodeSamples } from "@reloop/code-samples/template";
 
 export const deleteVersionRoute = new Elysia().use(authMiddleware).delete(
 	"/:id/versions/:versionId",

@@ -46,7 +46,8 @@
 		"evlog": "catalog:backend",
 		"ai": "catalog:backend",
 		"@ai-sdk/openai": "catalog:backend",
-		"@ai-sdk/google": "catalog:backend"
+		"@ai-sdk/google": "catalog:backend",
+		"@reloop/code-samples": "workspace:*"
 	},
 	"devDependencies": {
 		"@reloop/tsconfig": "workspace:*",

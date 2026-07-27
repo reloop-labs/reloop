@@ -41,7 +41,8 @@
 		"@reloop/cache": "workspace:*",
 		"@reloop/auth": "workspace:*",
 		"@reloop/bus": "workspace:*",
-		"@elysiajs/openapi": "catalog:backend"
+		"@elysiajs/openapi": "catalog:backend",
+		"@reloop/code-samples": "workspace:*"
 	},
 	"devDependencies": {
 		"@reloop/tsconfig": "workspace:*",

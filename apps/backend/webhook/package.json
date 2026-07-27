@@ -43,7 +43,8 @@
 		"@reloop/webhook-events": "workspace:*",
 		"@reloop/webhook-delivery": "workspace:*",
 		"@elysiajs/openapi": "catalog:backend",
-		"evlog": "catalog:backend"
+		"evlog": "catalog:backend",
+		"@reloop/code-samples": "workspace:*"
 	},
 	"devDependencies": {
 		"@reloop/tsconfig": "workspace:*",

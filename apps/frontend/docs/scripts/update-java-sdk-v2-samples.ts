@@ -17,7 +17,7 @@ const REPO_ROOT = path.resolve(
 	path.dirname(fileURLToPath(import.meta.url)),
 	"../../../..",
 );
-const BACKEND_ROOT = path.join(REPO_ROOT, "apps/backend");
+const BACKEND_ROOT = path.join(REPO_ROOT, "packages/code-samples/src");
 
 function findSampleFiles(dir: string): string[] {
 	const files: string[] = [];
@@ -27,8 +27,9 @@ function findSampleFiles(dir: string): string[] {
 			files.push(...findSampleFiles(fullPath));
 			continue;
 		}
-		if (entry.name.endsWith(".x-codeSamples.ts")) {
-			files.push(fullPath);
+		if (entry.name.endsWith(".ts") && !["index.ts","types.ts","helpers.ts","languages.ts"].includes(entry.name) && !entry.name.endsWith(".test.ts")) {
+			const content = fs.readFileSync(fullPath, "utf8");
+			if (content.includes("XCodeSamples") || content.includes("CodeSample[]")) files.push(fullPath);
 		}
 	}
 	return files;

@@ -4,7 +4,7 @@ import { ContactModel } from "@be/contacts/model/contact.model";
 import { auditLogHook } from "@be/contacts/utils/audit-log";
 import { Elysia, t } from "elysia";
 import { removeContactFromGroupController } from "./remove-contact-from-group.controllers";
-import { removeContactFromGroupXCodeSamples } from "./remove-contact-from-group.x-codeSamples";
+import { removeContactFromGroupXCodeSamples } from "@reloop/code-samples/contacts";
 
 export const removeContactFromGroupRoute = new Elysia()
 	.use(authMiddleware)

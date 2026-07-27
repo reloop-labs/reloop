@@ -2,7 +2,7 @@ import { authMiddleware } from "@reloop/be-inbox/middleware/auth";
 import { MailModel } from "@reloop/be-inbox/model/mail.model";
 import { Elysia, t } from "elysia";
 import { trashThreadController } from "./trash-thread.controllers";
-import { trashThreadXCodeSamples } from "./trash-thread.x-codeSamples";
+import { trashThreadXCodeSamples } from "@reloop/code-samples/inbox";
 
 export const trashThreadRoute = new Elysia().use(authMiddleware).post(
 	"/:id/trash",

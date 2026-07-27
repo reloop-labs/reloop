@@ -4,7 +4,7 @@ import { templateVersionResponseSchema } from "@be/template/model/template.model
 import { auditLogHook } from "@be/template/utils/audit-log";
 import { Elysia, t } from "elysia";
 import { createVersion } from "./create-version.controllers";
-import { createVersionXCodeSamples } from "./create-version.x-codeSamples";
+import { createVersionXCodeSamples } from "@reloop/code-samples/template";
 
 export const createVersionRoute = new Elysia().use(authMiddleware).post(
 	"/:id/versions",

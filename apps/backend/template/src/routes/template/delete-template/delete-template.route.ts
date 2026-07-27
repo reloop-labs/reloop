@@ -3,7 +3,7 @@ import { authMiddleware } from "@be/template/middleware/auth";
 import { auditLogHook } from "@be/template/utils/audit-log";
 import { Elysia, t } from "elysia";
 import { deleteTemplate } from "./delete-template.controllers";
-import { deleteTemplateXCodeSamples } from "./delete-template.x-codeSamples";
+import { deleteTemplateXCodeSamples } from "@reloop/code-samples/template";
 
 export const deleteTemplateRoute = new Elysia().use(authMiddleware).delete(
 	"/:id",

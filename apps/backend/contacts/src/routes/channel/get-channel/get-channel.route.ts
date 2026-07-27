@@ -3,7 +3,7 @@ import { rateLimitPlugin } from "@be/contacts/middleware/rate-limit";
 import { ChannelModel } from "@be/contacts/model/channel.model";
 import { Elysia, t } from "elysia";
 import { getChannelController } from "./get-channel.controllers";
-import { getChannelXCodeSamples } from "./get-channel.x-codeSamples";
+import { getChannelXCodeSamples } from "@reloop/code-samples/contacts";
 
 export const getChannelRoute = new Elysia()
 	.use(authMiddleware)

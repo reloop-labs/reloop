@@ -1,10 +1,10 @@
 #!/usr/bin/env bun
 /**
- * Keep SDK code samples in sync across backend, dashboard, and docs.
+ * Keep SDK code samples in sync across dashboard and docs.
  *
- * 1. Canonical: apps/backend route x-codeSamples.ts files
+ * 1. Canonical: packages/code-samples (@reloop/code-samples)
  * 2. Dashboard: generate api-keys-code-examples.ts
- * 3. Docs: sync MDX codeSamples from x-codeSamples (api-key + contacts + domain + mail)
+ * 3. Docs: sync MDX codeSamples from the package (api-key + contacts + domain + mail + inbox)
  *
  * From monorepo root:
  *   bun run sync:sdk-samples

@@ -4,7 +4,7 @@ import { PropertyModel } from "@be/contacts/model/property.model";
 import { auditLogHook } from "@be/contacts/utils/audit-log";
 import { Elysia } from "elysia";
 import { createPropertyController } from "./create-property.controllers";
-import { createPropertyXCodeSamples } from "./create-property.x-codeSamples";
+import { createPropertyXCodeSamples } from "@reloop/code-samples/contacts";
 
 export const createPropertyRoute = new Elysia()
 	.use(authMiddleware)

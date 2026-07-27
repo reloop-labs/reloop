@@ -2,7 +2,7 @@ import { authMiddleware } from "@reloop/be-inbox/middleware/auth";
 import { MailModel } from "@reloop/be-inbox/model/mail.model";
 import { Elysia, t } from "elysia";
 import { updateMailboxController } from "./update-mailbox.controllers";
-import { updateMailboxXCodeSamples } from "./update-mailbox.x-codeSamples";
+import { updateMailboxXCodeSamples } from "@reloop/code-samples/inbox";
 
 export const updateMailboxRoute = new Elysia().use(authMiddleware).patch(
 	"/:id",

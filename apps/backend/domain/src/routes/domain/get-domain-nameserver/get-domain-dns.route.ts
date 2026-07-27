@@ -2,7 +2,7 @@ import { authMiddleware } from "@reloop/domain/middleware/auth";
 import { DNSModel } from "@reloop/domain/model/dns.model";
 import { Elysia, t } from "elysia";
 import { getDomainDNSController } from "./get-domain-nameserver.controllers";
-import { getDomainNameserversXCodeSamples } from "./get-domain-nameserver.x-codeSamples";
+import { getDomainNameserversXCodeSamples } from "@reloop/code-samples/domain";
 
 export const getDomainNameserversRoute = new Elysia().use(authMiddleware).get(
 	"/nameservers/:domain_id",

@@ -5,7 +5,7 @@ import { auditLogHook } from "@be/template/utils/audit-log";
 import { persistencePlugin } from "@be/template/utils/persistence";
 import { Elysia, t } from "elysia";
 import { duplicateTemplate } from "./duplicate-template.controllers";
-import { duplicateTemplateXCodeSamples } from "./duplicate-template.x-codeSamples";
+import { duplicateTemplateXCodeSamples } from "@reloop/code-samples/template";
 
 export const duplicateTemplateRoute = new Elysia()
 	.use(authMiddleware)

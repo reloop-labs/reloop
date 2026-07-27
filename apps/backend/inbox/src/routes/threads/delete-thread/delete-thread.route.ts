@@ -2,7 +2,7 @@ import { authMiddleware } from "@reloop/be-inbox/middleware/auth";
 import { MailModel } from "@reloop/be-inbox/model/mail.model";
 import { Elysia, t } from "elysia";
 import { deleteThreadController } from "./delete-thread.controllers";
-import { deleteThreadXCodeSamples } from "./delete-thread.x-codeSamples";
+import { deleteThreadXCodeSamples } from "@reloop/code-samples/inbox";
 
 export const deleteThreadRoute = new Elysia().use(authMiddleware).delete(
 	"/:id",

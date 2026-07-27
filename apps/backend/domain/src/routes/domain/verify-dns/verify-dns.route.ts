@@ -8,7 +8,7 @@ import {
 	forwardDNSController,
 	verifyDNSRecordController,
 } from "./verify-dns.controllers";
-import { verifyDNSXCodeSamples } from "./verify-dns.x-codeSamples";
+import { verifyDNSXCodeSamples } from "@reloop/code-samples/domain";
 
 export const verifyDNSRecordRoute = new Elysia()
 	.use(authMiddleware)

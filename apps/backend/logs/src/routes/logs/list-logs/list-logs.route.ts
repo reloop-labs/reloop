@@ -2,7 +2,7 @@ import { authMiddleware } from "@reloop/logs/middleware/auth";
 import { LogsModel } from "@reloop/logs/model/logs.model";
 import { Elysia } from "elysia";
 import { listLogsController } from "./list-logs.controllers";
-import { listLogsXCodeSamples } from "./list-logs.x-codeSamples";
+import { listLogsXCodeSamples } from "@reloop/code-samples/logs";
 
 export const listLogsRoute = new Elysia().use(authMiddleware).get(
 	"/list",

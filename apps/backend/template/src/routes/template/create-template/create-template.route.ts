@@ -4,7 +4,7 @@ import { templateResponseSchema } from "@be/template/model/template.model";
 import { auditLogHook } from "@be/template/utils/audit-log";
 import { Elysia, t } from "elysia";
 import { createTemplate } from "./create-template.controllers";
-import { createTemplateXCodeSamples } from "./create-template.x-codeSamples";
+import { createTemplateXCodeSamples } from "@reloop/code-samples/template";
 
 export const createTemplateRoute = new Elysia().use(authMiddleware).post(
 	"/create",

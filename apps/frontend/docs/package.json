@@ -42,7 +42,8 @@
 		"remark-gfm": "^4.0.1",
 		"simple-icons": "catalog:ui",
 		"tailwind-merge": "catalog:ui",
-		"zod": "catalog:ui"
+		"zod": "catalog:ui",
+		"@reloop/code-samples": "workspace:*"
 	},
 	"devDependencies": {
 		"@types/node": "catalog:",

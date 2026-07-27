@@ -4,7 +4,7 @@ import { ApiKeyModel } from "@reloop/api-key/model/api-key.model";
 import { auditLogHook } from "@reloop/api-key/utils/audit-log";
 import { Elysia, t } from "elysia";
 import { deleteApiKeyController } from "./delete-api-key.controllers";
-import { deleteApiKeyXCodeSamples } from "./delete-api-key.x-codeSamples";
+import { deleteApiKeyXCodeSamples } from "@reloop/code-samples/api-key";
 
 export const deleteApiKeyRoute = new Elysia()
 	.use(authMiddleware)

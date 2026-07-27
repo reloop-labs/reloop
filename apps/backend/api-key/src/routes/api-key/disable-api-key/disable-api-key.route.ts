@@ -4,7 +4,7 @@ import { ApiKeyModel } from "@reloop/api-key/model/api-key.model";
 import { auditLogHook } from "@reloop/api-key/utils/audit-log";
 import { Elysia, t } from "elysia";
 import { disableApiKeyController } from "./disable-api-key.controllers";
-import { disableApiKeyXCodeSamples } from "./disable-api-key.x-codeSamples";
+import { disableApiKeyXCodeSamples } from "@reloop/code-samples/api-key";
 
 export const disableApiKeyRoute = new Elysia()
 	.use(authMiddleware)

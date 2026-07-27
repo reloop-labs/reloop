@@ -2,7 +2,7 @@ import { authMiddleware } from "@reloop/be-inbox/middleware/auth";
 import { MailModel } from "@reloop/be-inbox/model/mail.model";
 import { Elysia, t } from "elysia";
 import { forwardMessageController } from "./forward-message.controllers";
-import { forwardMessageXCodeSamples } from "./forward-message.x-codeSamples";
+import { forwardMessageXCodeSamples } from "@reloop/code-samples/inbox";
 
 export const forwardMessageRoute = new Elysia().use(authMiddleware).post(
 	"/:id/forward",

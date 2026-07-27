@@ -2,7 +2,7 @@ import { authMiddleware } from "@reloop/logs/middleware/auth";
 import { LogsModel } from "@reloop/logs/model/logs.model";
 import { Elysia } from "elysia";
 import { getLogController } from "./get-log.controllers";
-import { getLogXCodeSamples } from "./get-log.x-codeSamples";
+import { getLogXCodeSamples } from "@reloop/code-samples/logs";
 
 export const getLogRoute = new Elysia().use(authMiddleware).get(
 	"/:log_id",

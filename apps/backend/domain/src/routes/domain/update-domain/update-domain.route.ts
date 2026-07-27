@@ -4,7 +4,7 @@ import { DomainModel } from "@reloop/domain/model/domain.model";
 import { auditLogHook } from "@reloop/domain/utils/audit-log";
 import { Elysia, t } from "elysia";
 import { updateDomainController } from "./update-domain.controllers";
-import { updateDomainXCodeSamples } from "./update-domain.x-codeSamples";
+import { updateDomainXCodeSamples } from "@reloop/code-samples/domain";
 
 export const updateDomainRoute = new Elysia()
 	.use(authMiddleware)

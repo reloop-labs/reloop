@@ -2,7 +2,7 @@ import { authMiddleware } from "@reloop/api-key/middleware/auth";
 import { ApiKeyModel } from "@reloop/api-key/model/api-key.model";
 import { Elysia, t } from "elysia";
 import { getApiKeyController } from "./get-api-key.controllers";
-import { getApiKeyXCodeSamples } from "./get-api-key.x-codeSamples";
+import { getApiKeyXCodeSamples } from "@reloop/code-samples/api-key";
 
 export const getApiKeyRoute = new Elysia().use(authMiddleware).get(
 	"/:api_key_id",

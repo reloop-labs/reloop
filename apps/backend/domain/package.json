@@ -44,7 +44,8 @@
 		"@reloop/bus": "workspace:*",
 		"@reloop/webhook-events": "workspace:*",
 		"@elysiajs/openapi": "catalog:backend",
-		"mailparser": "catalog:backend"
+		"mailparser": "catalog:backend",
+		"@reloop/code-samples": "workspace:*"
 	},
 	"devDependencies": {
 		"@reloop/tsconfig": "workspace:*",

@@ -2,7 +2,7 @@ import { authMiddleware } from "@reloop/be-inbox/middleware/auth";
 import { MailModel } from "@reloop/be-inbox/model/mail.model";
 import { Elysia, t } from "elysia";
 import { toggleStarController } from "./toggle-message-star.controllers";
-import { toggleMessageStarXCodeSamples } from "./toggle-message-star.x-codeSamples";
+import { toggleMessageStarXCodeSamples } from "@reloop/code-samples/inbox";
 
 export const toggleMessageStarRoute = new Elysia().use(authMiddleware).patch(
 	"/:id/star",

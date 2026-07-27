@@ -4,7 +4,7 @@ import { PropertyModel } from "@be/contacts/model/property.model";
 import { auditLogHook } from "@be/contacts/utils/audit-log";
 import { Elysia, t } from "elysia";
 import { deletePropertyController } from "./delete-property.controllers";
-import { deletePropertyXCodeSamples } from "./delete-property.x-codeSamples";
+import { deletePropertyXCodeSamples } from "@reloop/code-samples/contacts";
 
 export const deletePropertyRoute = new Elysia()
 	.use(authMiddleware)

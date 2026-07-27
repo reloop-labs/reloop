@@ -2,7 +2,7 @@ import { authMiddleware } from "@reloop/be-inbox/middleware/auth";
 import { MailModel } from "@reloop/be-inbox/model/mail.model";
 import { Elysia, t } from "elysia";
 import { getMessagesController } from "./list-messages.controllers";
-import { listMessagesXCodeSamples } from "./list-messages.x-codeSamples";
+import { listMessagesXCodeSamples } from "@reloop/code-samples/inbox";
 
 export const listMessagesRoute = new Elysia().use(authMiddleware).get(
 	"/",

@@ -8,6 +8,14 @@ export interface CodeSample {
 	source: string;
 }
 
+const SKIP_FILES = new Set([
+	"index.ts",
+	"types.ts",
+	"helpers.ts",
+	"languages.ts",
+]);
+
+/** Recursively find sample modules (package or legacy co-located files). */
 export function findSampleFiles(dir: string): string[] {
 	const files: string[] = [];
 	if (!fs.existsSync(dir)) {
@@ -19,8 +27,22 @@ export function findSampleFiles(dir: string): string[] {
 			files.push(...findSampleFiles(fullPath));
 			continue;
 		}
-		if (entry.name.endsWith(".x-codeSamples.ts")) {
-			files.push(fullPath);
+		if (
+			entry.name.endsWith(".x-codeSamples.ts") ||
+			(entry.name.endsWith(".ts") &&
+				!SKIP_FILES.has(entry.name) &&
+				!entry.name.endsWith(".test.ts") &&
+				!entry.name.endsWith(".d.ts"))
+		) {
+			// Only keep files that look like sample modules
+			const content = fs.readFileSync(fullPath, "utf8");
+			if (
+				content.includes("XCodeSamples") ||
+				content.includes("CodeSample[]") ||
+				entry.name.endsWith(".x-codeSamples.ts")
+			) {
+				files.push(fullPath);
+			}
 		}
 	}
 	return files;
@@ -104,7 +126,6 @@ export function loadDocSlugIndex(docsDir: string): Map<string, string> {
 		const method = jsonMatch[2]!.toLowerCase();
 		const slug = entry.name.replace(/\.mdx$/, "");
 		index.set(`${method}:${routePath}`, slug);
-		// also index with :id normalized
 		const normalized = routePath.replace(/\{[^}]+\}/g, ":id");
 		index.set(`${method}:${normalized}`, slug);
 	}
@@ -126,7 +147,6 @@ export function resolveDocSlug(
 		const hit = index.get(key);
 		if (hit) return hit;
 	}
-	// fallback: path without trailing slash
 	const noSlash = endpoint.replace(/\/$/, "") || endpoint;
 	return index.get(`${m}:${noSlash}`) ?? index.get(`${m}:${noSlash}/`);
 }

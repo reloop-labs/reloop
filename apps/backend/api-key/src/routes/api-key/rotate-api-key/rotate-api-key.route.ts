@@ -4,7 +4,7 @@ import { ApiKeyModel } from "@reloop/api-key/model/api-key.model";
 import { auditLogHook } from "@reloop/api-key/utils/audit-log";
 import { Elysia, t } from "elysia";
 import { rotateApiKeyController } from "./rotate-api-key.controllers";
-import { rotateApiKeyXCodeSamples } from "./rotate-api-key.x-codeSamples";
+import { rotateApiKeyXCodeSamples } from "@reloop/code-samples/api-key";
 
 export const rotateApiKeyRoute = new Elysia()
 	.use(authMiddleware)

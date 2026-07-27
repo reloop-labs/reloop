@@ -5,7 +5,7 @@ import { DomainModel } from "@reloop/domain/model/domain.model";
 import { auditLogHook } from "@reloop/domain/utils/audit-log";
 import { Elysia, t } from "elysia";
 import { deleteDomainController } from "./delete-domain.controllers";
-import { deleteDomainXCodeSamples } from "./delete-domain.x-codeSamples";
+import { deleteDomainXCodeSamples } from "@reloop/code-samples/domain";
 
 export const deleteDomainRoute = new Elysia()
 	.use(authMiddleware)

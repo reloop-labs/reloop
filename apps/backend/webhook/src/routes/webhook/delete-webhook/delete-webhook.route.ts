@@ -3,7 +3,7 @@ import { WebhookModel } from "@reloop/webhook/routes/webhook/webhook.model";
 import { auditLogHook } from "@reloop/webhook/utils/audit-log";
 import { Elysia, t } from "elysia";
 import { deleteWebhookController } from "./delete-webhook.controllers";
-import { deleteWebhookXCodeSamples } from "./delete-webhook.x-codeSamples";
+import { deleteWebhookXCodeSamples } from "@reloop/code-samples/webhook";
 
 export const deleteWebhookRoute = new Elysia().use(authMiddleware).delete(
 	"/:id",

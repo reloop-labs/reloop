@@ -2,7 +2,7 @@ import { authMiddleware } from "@reloop/be-inbox/middleware/auth";
 import { MailModel } from "@reloop/be-inbox/model/mail.model";
 import { Elysia, t } from "elysia";
 import { getThreadsController } from "./list-threads.controllers";
-import { listThreadsXCodeSamples } from "./list-threads.x-codeSamples";
+import { listThreadsXCodeSamples } from "@reloop/code-samples/inbox";
 
 export const listThreadsRoute = new Elysia().use(authMiddleware).get(
 	"/",
