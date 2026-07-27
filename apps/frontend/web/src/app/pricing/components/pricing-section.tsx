@@ -147,11 +147,13 @@ function getFeatureIcon(feature: string, customClassName?: string) {
 	if (key.includes("smtp")) {
 		return <Icon name="smtp" className={className} />;
 	}
-	if (
-		key.includes("analytics") ||
-		key.includes("tracking") ||
-		key.includes("reputation")
-	) {
+	if (key.includes("reputation")) {
+		return <Icon name="monitor" className={className} />;
+	}
+	if (key.includes("delivery")) {
+		return <Icon name="delivery-analytics" className={className} />;
+	}
+	if (key.includes("analytics") || key.includes("tracking")) {
 		return <Icon name="graph-up" className={className} />;
 	}
 	if (key.includes("attachment")) {
@@ -162,7 +164,7 @@ function getFeatureIcon(feature: string, customClassName?: string) {
 		key.includes("sla") ||
 		key.includes("uptime")
 	) {
-		return <Icon name="headset" className={className} />;
+		return <Icon name="support-level" className={className} />;
 	}
 	if (
 		key.includes("overage") ||
@@ -187,18 +189,23 @@ function getFeatureIcon(feature: string, customClassName?: string) {
 	) {
 		return <Icon name="shield" className={className} />;
 	}
-	if (key.includes("ip") || key.includes("relay") || key.includes("server")) {
+	if (key.includes("pristine") || key.includes("shared ip")) {
+		return <Icon name="share" className={className} />;
+	}
+	if (key.includes("dedicated ip") || key.includes("ip")) {
+		return <Icon name="dedicated-ip" className={className} />;
+	}
+	if (key.includes("relay") || key.includes("server")) {
 		return <Icon name="mail-server" className={className} />;
 	}
-	if (
-		key.includes("security") ||
-		key.includes("lock") ||
-		key.includes("audit")
-	) {
+	if (key.includes("audit")) {
+		return <Icon name="audit-logs" className={className} />;
+	}
+	if (key.includes("security") || key.includes("lock")) {
 		return <Icon name="lock" className={className} />;
 	}
 	if (key.includes("rest api") || key.includes("api") || key.includes("cli")) {
-		return <Icon name="command" className={className} />;
+		return <Icon name="api" className={className} />;
 	}
 	if (key.includes("scheduled") || key.includes("calendar")) {
 		return <Icon name="calendar" className={className} />;
@@ -208,6 +215,9 @@ function getFeatureIcon(feature: string, customClassName?: string) {
 	}
 	if (key.includes("sdk") || key.includes("workflow")) {
 		return <Icon name="workflow" className={className} />;
+	}
+	if (key.includes("hosted")) {
+		return <Icon name="reloop" className={className} />;
 	}
 	if (key.includes("self-host")) {
 		return <Icon name="home" className={className} />;

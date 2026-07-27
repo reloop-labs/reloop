@@ -78,6 +78,34 @@ export const IconsSprite = () => (
 				/>
 			</symbol>
 			<symbol
+				id="support-level"
+				viewBox="0 0 24 24"
+				fill="none"
+				xmlns="http://www.w3.org/2000/svg"
+			>
+				<path
+					d="M15 16C18.866 16 22 12.866 22 9C22 8.30503 21.8987 7.63371 21.7101 7L19.2627 9.44738L19.2627 9.4474C18.4707 10.2394 18.0747 10.6354 17.618 10.7838C17.2163 10.9143 16.7837 10.9143 16.382 10.7838C15.9253 10.6354 15.5293 10.2394 14.7373 9.44738L14.5526 9.26274C13.7606 8.47071 13.3646 8.07469 13.2162 7.61803C13.0857 7.21635 13.0857 6.78365 13.2162 6.38197C13.3646 5.92531 13.7606 5.52929 14.5526 4.73726L17 2.28988C16.3663 2.10128 15.695 2 15 2C11.134 2 8 5.13401 8 9C8 10.0736 8.06806 11.5907 8.5 12.5L2.5 18.5L2.49986 18.5001C2.4203 18.5797 2.3805 18.6195 2.34847 18.6547C1.65508 19.4176 1.65508 20.5824 2.34847 21.3453C2.3805 21.3805 2.4203 21.4203 2.49987 21.4999L2.5 21.5C2.57965 21.5797 2.61948 21.6195 2.65474 21.6515C3.41756 22.3449 4.58244 22.3449 5.34526 21.6515C5.38052 21.6195 5.42035 21.5797 5.5 21.5L11.5 15.5C12.4093 15.9319 13.9264 16 15 16Z"
+					stroke="currentColor"
+					strokeWidth="1.5"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				/>
+			</symbol>
+			<symbol
+				id="support"
+				viewBox="0 0 24 24"
+				fill="none"
+				xmlns="http://www.w3.org/2000/svg"
+			>
+				<path
+					d="M15 16C18.866 16 22 12.866 22 9C22 8.30503 21.8987 7.63371 21.7101 7L19.2627 9.44738L19.2627 9.4474C18.4707 10.2394 18.0747 10.6354 17.618 10.7838C17.2163 10.9143 16.7837 10.9143 16.382 10.7838C15.9253 10.6354 15.5293 10.2394 14.7373 9.44738L14.5526 9.26274C13.7606 8.47071 13.3646 8.07469 13.2162 7.61803C13.0857 7.21635 13.0857 6.78365 13.2162 6.38197C13.3646 5.92531 13.7606 5.52929 14.5526 4.73726L17 2.28988C16.3663 2.10128 15.695 2 15 2C11.134 2 8 5.13401 8 9C8 10.0736 8.06806 11.5907 8.5 12.5L2.5 18.5L2.49986 18.5001C2.4203 18.5797 2.3805 18.6195 2.34847 18.6547C1.65508 19.4176 1.65508 20.5824 2.34847 21.3453C2.3805 21.3805 2.4203 21.4203 2.49987 21.4999L2.5 21.5C2.57965 21.5797 2.61948 21.6195 2.65474 21.6515C3.41756 22.3449 4.58244 22.3449 5.34526 21.6515C5.38052 21.6195 5.42035 21.5797 5.5 21.5L11.5 15.5C12.4093 15.9319 13.9264 16 15 16Z"
+					stroke="currentColor"
+					strokeWidth="1.5"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				/>
+			</symbol>
+			<symbol
 				id="send-test"
 				viewBox="0 0 24 24"
 				fill="none"
@@ -629,6 +657,300 @@ export const IconsSprite = () => (
 				</g>
 				<path
 					d="M17.5 6C17.5 6.27614 17.2761 6.5 17 6.5C16.7239 6.5 16.5 6.27614 16.5 6M17.5 6C17.5 5.72386 17.2761 5.5 17 5.5C16.7239 5.5 16.5 5.72386 16.5 6M17.5 6H16.5M17.5 17C17.5 17.2761 17.2761 17.5 17 17.5C16.7239 17.5 16.5 17.2761 16.5 17M17.5 17C17.5 16.7239 17.2761 16.5 17 16.5C16.7239 16.5 16.5 16.7239 16.5 17M17.5 17H16.5M7 21H17C17.93 21 18.395 21 18.7765 20.8978C19.8117 20.6204 20.6204 19.8117 20.8978 18.7765C21 18.395 21 17.93 21 17C21 16.07 21 15.605 20.8978 15.2235C20.6204 14.1883 19.8117 13.3796 18.7765 13.1022C18.395 13 17.93 13 17 13H7C6.07003 13 5.60504 13 5.22354 13.1022C4.18827 13.3796 3.37962 14.1883 3.10222 15.2235C3 15.605 3 16.07 3 17C3 17.93 3 18.395 3.10222 18.7765C3.37962 19.8117 4.18827 20.6204 5.22354 20.8978C5.60504 21 6.07003 21 7 21ZM7 10H17C17.93 10 18.395 10 18.7765 9.89778C19.8117 9.62038 20.6204 8.81173 20.8978 7.77646C21 7.39496 21 6.92997 21 6C21 5.07003 21 4.60504 20.8978 4.22354C20.6204 3.18827 19.8117 2.37962 18.7765 2.10222C18.395 2 17.93 2 17 2H7C6.07003 2 5.60504 2 5.22354 2.10222C4.18827 2.37962 3.37962 3.18827 3.10222 4.22354C3 4.60504 3 5.07003 3 6C3 6.92997 3 7.39496 3.10222 7.77646C3.37962 8.81173 4.18827 9.62038 5.22354 9.89778C5.60504 10 6.07003 10 7 10Z"
+					stroke="currentColor"
+					strokeWidth="1.5"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				/>
+			</symbol>
+			<symbol id="dedicated-ip" viewBox="0 0 24 24" fill="none">
+				<path
+					d="M12 21.5C12 21.5 20 14.5 20 9.5C20 5.08172 16.4183 1.5 12 1.5C7.58172 1.5 4 5.08172 4 9.5C4 14.5 12 21.5 12 21.5Z"
+					fill="currentColor"
+					fillOpacity="0.12"
+					stroke="currentColor"
+					strokeWidth="1.5"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				/>
+				<path
+					d="M9.2 7.5V11.5"
+					stroke="currentColor"
+					strokeWidth="1.6"
+					strokeLinecap="round"
+				/>
+				<path
+					d="M12.2 7.5V11.5M12.2 7.5H13.8C14.5 7.5 15 8 15 8.7C15 9.4 14.5 9.9 13.8 9.9H12.2"
+					stroke="currentColor"
+					strokeWidth="1.6"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				/>
+			</symbol>
+			<symbol id="ip" viewBox="0 0 24 24" fill="none">
+				<path
+					d="M12 21.5C12 21.5 20 14.5 20 9.5C20 5.08172 16.4183 1.5 12 1.5C7.58172 1.5 4 5.08172 4 9.5C4 14.5 12 21.5 12 21.5Z"
+					fill="currentColor"
+					fillOpacity="0.12"
+					stroke="currentColor"
+					strokeWidth="1.5"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				/>
+				<path
+					d="M9.2 7.5V11.5"
+					stroke="currentColor"
+					strokeWidth="1.6"
+					strokeLinecap="round"
+				/>
+				<path
+					d="M12.2 7.5V11.5M12.2 7.5H13.8C14.5 7.5 15 8 15 8.7C15 9.4 14.5 9.9 13.8 9.9H12.2"
+					stroke="currentColor"
+					strokeWidth="1.6"
+					strokeLinejoin="round"
+				/>
+			</symbol>
+			<symbol id="audit-logs" viewBox="0 0 24 24" fill="none">
+				<path
+					d="M11 20H22M11 12H22M11 4H22M2 4L3 5L6 2M2 12L3 13L6 10M2 20L3 21L6 18"
+					stroke="currentColor"
+					strokeWidth="1.5"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				/>
+			</symbol>
+			<symbol id="audit" viewBox="0 0 24 24" fill="none">
+				<path
+					d="M11 20H22M11 12H22M11 4H22M2 4L3 5L6 2M2 12L3 13L6 10M2 20L3 21L6 18"
+					stroke="currentColor"
+					strokeWidth="1.5"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				/>
+			</symbol>
+			<symbol id="reloop" viewBox="0 0 200 200">
+				<rect x={55} y={51} width={83} height={8} fill="currentColor" />
+				<rect
+					x={55}
+					y={59}
+					width={75}
+					height={8}
+					transform="rotate(90 55 59)"
+					fill="currentColor"
+				/>
+				<rect
+					x={146}
+					y={59}
+					width={46}
+					height={8}
+					transform="rotate(90 146 59)"
+					fill="currentColor"
+				/>
+				<rect
+					x={154}
+					y={69}
+					width={44}
+					height={8}
+					transform="rotate(90 154 69)"
+					fill="currentColor"
+				/>
+				<rect
+					x={138}
+					y={59}
+					width={46}
+					height={8}
+					transform="rotate(90 138 59)"
+					fill="currentColor"
+					opacity="0.6"
+				/>
+				<rect
+					x={130}
+					y={59}
+					width={46}
+					height={8}
+					transform="rotate(90 130 59)"
+					fill="currentColor"
+					opacity="0.6"
+				/>
+				<rect
+					x={90}
+					y={105}
+					width={29}
+					height={8}
+					transform="rotate(90 90 105)"
+					fill="currentColor"
+					opacity="0.6"
+				/>
+				<rect
+					x={82}
+					y={105}
+					width={29}
+					height={8}
+					transform="rotate(90 82 105)"
+					fill="currentColor"
+					opacity="0.6"
+				/>
+				<rect
+					x={138}
+					y={105}
+					width={8}
+					height={8}
+					transform="rotate(90 138 105)"
+					fill="currentColor"
+				/>
+				<rect
+					x={146}
+					y={105}
+					width={8}
+					height={8}
+					transform="rotate(90 146 105)"
+					fill="currentColor"
+				/>
+				<rect
+					x={146}
+					y={134}
+					width={8}
+					height={8}
+					transform="rotate(90 146 134)"
+					fill="currentColor"
+				/>
+				<rect
+					x={130}
+					y={105}
+					width={8}
+					height={8}
+					transform="rotate(90 130 105)"
+					fill="currentColor"
+					opacity="0.6"
+				/>
+				<rect
+					x={122}
+					y={105}
+					width={8}
+					height={8}
+					transform="rotate(90 122 105)"
+					fill="currentColor"
+					opacity="0.6"
+				/>
+				<rect
+					x={98}
+					y={77}
+					width={10}
+					height={8}
+					transform="rotate(90 98 77)"
+					fill="currentColor"
+				/>
+				<rect
+					x={90}
+					y={77}
+					width={10}
+					height={8}
+					transform="rotate(90 90 77)"
+					fill="currentColor"
+					opacity="0.6"
+				/>
+				<rect
+					x={82}
+					y={77}
+					width={10}
+					height={8}
+					transform="rotate(90 82 77)"
+					fill="currentColor"
+					opacity="0.6"
+				/>
+				<rect
+					x={146}
+					y={113}
+					width={21}
+					height={8}
+					transform="rotate(90 146 113)"
+					fill="currentColor"
+				/>
+				<rect
+					x={154}
+					y={122}
+					width={20}
+					height={8}
+					transform="rotate(90 154 122)"
+					fill="currentColor"
+				/>
+				<rect
+					x={138}
+					y={113}
+					width={21}
+					height={8}
+					transform="rotate(90 138 113)"
+					fill="currentColor"
+					opacity="0.6"
+				/>
+				<rect
+					x={130}
+					y={113}
+					width={21}
+					height={8}
+					transform="rotate(90 130 113)"
+					fill="currentColor"
+					opacity="0.6"
+				/>
+				<rect
+					x={98}
+					y={113}
+					width={21}
+					height={8}
+					transform="rotate(90 98 113)"
+					fill="currentColor"
+				/>
+				<rect x={55} y={134} width={83} height={8} fill="currentColor" />
+				<rect x={63} y={142} width={83} height={8} fill="currentColor" />
+			</symbol>
+			<symbol id="delivery-analytics" viewBox="0 0 24 24" fill="none">
+				<path
+					opacity="0.12"
+					d="M18.2 2H15.8C14.1198 2 13.2798 2 12.638 2.32698C12.0735 2.6146 11.6146 3.07354 11.327 3.63803C11 4.27976 11 5.11984 11 6.8V7.8C11 8.9201 11 9.48016 10.782 9.90798C10.5903 10.2843 10.2843 10.5903 9.90798 10.782C9.48016 11 8.9201 11 7.8 11H4.2C3.0799 11 2.51984 11 2.09202 11.218C1.71569 11.4097 1.40973 11.7157 1.21799 12.092C1 12.5198 1 13.0799 1 14.2V16C1 16.9319 1 17.3978 1.15224 17.7654C1.35523 18.2554 1.74458 18.6448 2.23463 18.8478C2.60218 19 3.06812 19 4 19C4 17.3431 5.34315 16 7 16C8.65685 16 10 17.3431 10 19H14C14 17.3431 15.3431 16 17 16C18.6569 16 20 17.3431 20 19C21.6569 19 23 17.6569 23 16V6.8C23 5.11984 23 4.27976 22.673 3.63803C22.3854 3.07354 21.9265 2.6146 21.362 2.32698C20.7202 2 19.8802 2 18.2 2Z"
+					fill="currentColor"
+				/>
+				<path
+					d="M10 19H14M10 19C10 20.6569 8.65685 22 7 22C5.34315 22 4 20.6569 4 19M10 19C10 17.3431 8.65685 16 7 16C5.34315 16 4 17.3431 4 19M14 19C14 20.6569 15.3431 22 17 22C18.6569 22 20 20.6569 20 19M14 19C14 17.3431 15.3431 16 17 16C18.6569 16 20 17.3431 20 19M20 19C21.6569 19 23 17.6569 23 16V6.8C23 5.11984 23 4.27976 22.673 3.63803C22.3854 3.07354 21.9265 2.6146 21.362 2.32698C20.7202 2 19.8802 2 18.2 2H15.8C14.1198 2 13.2798 2 12.638 2.32698C12.0735 2.6146 11.6146 3.07354 11.327 3.63803C11 4.27976 11 5.11984 11 6.8V7.8C11 8.9201 11 9.48016 10.782 9.90798C10.5903 10.2843 10.2843 10.5903 9.90798 10.782C9.48016 11 8.92011 11 7.8 11H1.5M4 19C3.06812 19 2.60218 19 2.23463 18.8478C1.74458 18.6448 1.35523 18.2554 1.15224 17.7654C1 17.3978 1 16.9319 1 16V12.7727C1 12.1129 1 11.783 1.05245 11.4623C1.09902 11.1775 1.17626 10.8987 1.28282 10.6306C1.40284 10.3286 1.57257 10.0457 1.91205 9.47992L2.13566 9.10723C2.8155 7.97416 3.15542 7.40763 3.62342 6.99611C4.03758 6.63195 4.52256 6.35736 5.04791 6.18958C5.64157 6 6.30225 6 7.62362 6H11"
+					stroke="currentColor"
+					strokeWidth="1.5"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				/>
+			</symbol>
+			<symbol id="api" viewBox="0 0 24 24" fill="none">
+				<rect
+					x="2"
+					y="4"
+					width="15"
+					height="12"
+					rx="3"
+					fill="currentColor"
+					fillOpacity="0.12"
+					stroke="currentColor"
+					strokeWidth="1.5"
+				/>
+				<path
+					d="M4.8 13L6.8 7L8.8 13M5.4 11.2H8.2"
+					stroke="currentColor"
+					strokeWidth="1.4"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				/>
+				<path
+					d="M10.8 7V13M10.8 7H12.6C13.4 7 14 7.6 14 8.4C14 9.2 13.4 9.8 12.6 9.8H10.8"
+					stroke="currentColor"
+					strokeWidth="1.4"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				/>
+				<path
+					d="M15.5 7V13"
+					stroke="currentColor"
+					strokeWidth="1.4"
+					strokeLinecap="round"
+				/>
+				<path
+					d="M14.5 21.5L17.2 18.8M18.8 14.5C17.4193 14.5 16.3 15.6193 16.3 17C16.3 17.5858 16.5015 18.1246 16.8396 18.5502L17.75 17.6398L19.3602 19.25L18.4498 20.1604C18.8754 20.4985 19.4142 20.7 20 20.7C21.3807 20.7 22.5 19.5807 22.5 18.2C22.5 17.4858 22.2 16.8417 21.7197 16.3803L20.2 17.9L18.6 16.3L20.1197 14.7803C19.6583 14.3 19 14 18.3 14"
 					stroke="currentColor"
 					strokeWidth="1.5"
 					strokeLinecap="round"
