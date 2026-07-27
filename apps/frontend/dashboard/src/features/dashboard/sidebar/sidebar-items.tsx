@@ -1,6 +1,6 @@
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import { Link, useRouterState } from "#/lib/navigation";
+import { Link, useRouterPathname } from "#/lib/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
@@ -18,7 +18,7 @@ export function SidebarItems({
 	const [rect, setRect] = useState<DOMRect | undefined>(undefined);
 	const mainNavRefs = useRef<HTMLAnchorElement[]>([]);
 	const subNavRefs = useRef<Record<string, HTMLAnchorElement[]>>({});
-	const pathname = useRouterState({ select: (s) => s.location.pathname });
+	const pathname = useRouterPathname();
 
 	// Router basepath is /dashboard — compare paths without it for active state.
 	const pathWithoutSlug = pathname.replace(/^\/dashboard/, "") || "/";

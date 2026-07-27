@@ -1,6 +1,6 @@
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import { Link, useRouterState } from "#/lib/navigation";
+import { Link, useAppSearch, useRouterPathname } from "#/lib/navigation";
 import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import { settingsNavigation } from "../navigation";
@@ -19,8 +19,8 @@ export function SettingsSidebarItems({
 	const backNavRef = useRef<HTMLAnchorElement>(null);
 	const itemRefs = useRef<HTMLAnchorElement[]>([]);
 
-	const pathname = useRouterState({ select: (s) => s.location.pathname });
-	const search = useRouterState({ select: (s) => s.location.search });
+	const pathname = useRouterPathname();
+	const search = useAppSearch();
 	const pathWithoutSlug = pathname.replace(/^\/dashboard/, "") || "/";
 
 	// `from` is preserved when opening settings from the main app.

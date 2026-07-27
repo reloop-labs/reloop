@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { useRouterState } from "#/lib/navigation";
+import { useRouterPathname } from "#/lib/navigation";
 import { AnimatePresence } from "framer-motion";
 import { CommandMenuGlobal } from "#/features/dashboard/command-menu";
 import { AiPanel } from "#/features/dashboard/layout/ai-panel";
@@ -12,7 +12,7 @@ import { MainSidebar } from "./sidebar/main-sidebar";
  * (matches Next: outside the main layout chrome).
  */
 function useIsTemplateEditor() {
-	const pathname = useRouterState({ select: (s) => s.location.pathname });
+	const pathname = useRouterPathname();
 	// /templates or /templates/ → list; /templates/<id> → editor
 	return Boolean(pathname.match(/\/templates\/[^/]+/));
 }
@@ -22,7 +22,7 @@ function useIsTemplateEditor() {
  * (matches Next: fixed overlay outside the main layout chrome).
  */
 function useIsAgentMailbox() {
-	const pathname = useRouterState({ select: (s) => s.location.pathname });
+	const pathname = useRouterPathname();
 	return Boolean(pathname.match(/\/inbox\/[^/]+/));
 }
 

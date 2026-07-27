@@ -2,8 +2,8 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { AuthSessionLoader } from "#/features/auth/auth-session-loader";
 import { useSessionQuery } from "#/features/auth/session-query";
+import { DashboardLoadingChrome } from "#/features/dashboard/dashboard-loading-chrome";
 import { ActiveOrganizationProvider } from "#/features/dashboard/page-header/use-active-organization";
 
 export function ProtectedLayoutClient({
@@ -21,8 +21,10 @@ export function ProtectedLayoutClient({
 		}
 	}, [isFetched, isPending, router, session]);
 
+	// Confirmed signed-out: keep dashboard chrome while redirecting to login
+	// (never swap to a full-viewport spinner after the shell has been shown).
 	if (isFetched && !session) {
-		return <AuthSessionLoader />;
+		return <DashboardLoadingChrome />;
 	}
 
 	// Keep this provider mounted while the session settles and while navigating

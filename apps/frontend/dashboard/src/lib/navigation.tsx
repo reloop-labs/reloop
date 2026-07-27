@@ -150,6 +150,15 @@ type AppRouterState = {
 	};
 };
 
+/**
+ * Prefer this when only the pathname is needed. `useRouterState` also reads
+ * search params (via `useSearchParams`), which can suspend under Next.js and
+ * blank the tree to the nearest Suspense fallback on hard refresh.
+ */
+export function useRouterPathname(): string {
+	return useAppPathname();
+}
+
 export function useRouterState<T>({
 	select,
 }: {

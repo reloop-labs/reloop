@@ -41,6 +41,20 @@ describe("App Router provider lifetimes", () => {
 		expect(providers.match(/<NuqsAdapter>/g)).toHaveLength(1);
 	});
 
+	it("uses shell-matching suspense/loading fallbacks for protected routes", () => {
+		const providers = read("./providers.tsx");
+		const rootLoading = read("./loading.tsx");
+		const protectedLoading = read("./(protected)/loading.tsx");
+		const suspenseFallback = read("./providers-suspense-fallback.tsx");
+
+		expect(providers).toContain("<ProvidersSuspenseFallback />");
+		expect(providers).not.toContain("<AuthSessionLoader />");
+		expect(rootLoading).toContain("DashboardLoadingChrome");
+		expect(protectedLoading).toContain("DashboardLoadingChrome");
+		expect(suspenseFallback).toContain("DashboardLoadingChrome");
+		expect(suspenseFallback).toContain("AuthSessionLoader");
+	});
+
 	it("mounts analytics through the base-path rewrite", () => {
 		const providers = read("./providers.tsx");
 		const config = read("../../next.config.ts");

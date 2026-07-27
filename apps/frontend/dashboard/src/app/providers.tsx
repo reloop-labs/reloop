@@ -8,9 +8,9 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { Suspense, useState } from "react";
 import { LazyIconsSprite } from "#/components/lazy-icons-sprite";
-import { AuthSessionLoader } from "#/features/auth/auth-session-loader";
 import { createQueryClient } from "#/lib/query-client";
 import { ThemeProvider } from "#/providers/theme-provider";
+import { ProvidersSuspenseFallback } from "./providers-suspense-fallback";
 
 export function Providers({ children }: { children: React.ReactNode }) {
 	const [queryClient] = useState(createQueryClient);
@@ -25,7 +25,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
 				storageKey="theme"
 			>
 				<Tooltip.Provider>
-					<Suspense fallback={<AuthSessionLoader />}>
+					{/* Fallback must match dashboard chrome — AuthSessionLoader caused a
+					    hard-refresh flash when Nuqs/useSearchParams suspended. */}
+					<Suspense fallback={<ProvidersSuspenseFallback />}>
 						<NuqsAdapter>{children}</NuqsAdapter>
 					</Suspense>
 					<LazyIconsSprite />
