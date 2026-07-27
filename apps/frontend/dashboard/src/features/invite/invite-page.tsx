@@ -1,7 +1,8 @@
 "use client";
 
 import { authClient } from "@reloop/auth/client";
-import * as Button from "@reloop/ui/button";
+import { cn } from "@reloop/ui/cn";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { Logo } from "@reloop/ui/logo";
 import { Skeleton } from "@reloop/ui/skeleton";
 import Spinner from "@reloop/ui/spinner";
@@ -118,12 +119,20 @@ export function InvitePage() {
 		return (
 			<div className="flex h-dvh flex-col items-center justify-center">
 				<div className="w-full max-w-sm p-5 md:p-8">
-					<div className="mb-4 flex justify-center">
+					<div className="mb-4 flex items-center justify-center">
 						<Logo className="h-16" />
 					</div>
-					<Skeleton className="mx-auto mb-6 h-6 w-3/4 rounded-2xl!" />
-					<Skeleton className="h-11 w-full rounded-2xl!" />
-					<Skeleton className="mx-auto mt-5 h-3 w-2/3 rounded-2xl!" />
+					<div className="space-y-1 pb-6 text-center">
+						<Skeleton className="mx-auto h-5 w-48 rounded-lg" />
+						<div className="space-y-1.5 pt-2">
+							<Skeleton className="mx-auto h-3.5 w-5/6 rounded-md" />
+							<Skeleton className="mx-auto h-3.5 w-2/3 rounded-md" />
+						</div>
+					</div>
+					<div className="space-y-4">
+						<Skeleton className="h-9 w-full rounded-xl" />
+						<Skeleton className="mx-auto h-3 w-4/5 rounded-md" />
+					</div>
 				</div>
 			</div>
 		);
@@ -148,24 +157,26 @@ export function InvitePage() {
 						</p>
 					</div>
 					<div className="space-y-3">
-						<Button.Root
-							variant="neutral"
-							mode="filled"
-							className="h-11 w-full rounded-2xl!"
+						<FancyButton.Root
+							variant="blue"
+							size="small"
+							className="w-full justify-center overflow-hidden transition-all duration-200"
 							onClick={() =>
 								navigation.push({ to: session ? "/onboarding" : "/login" })
 							}
 						>
 							{session ? "Create your organization" : "Go to Login"}
-						</Button.Root>
+						</FancyButton.Root>
 						{session ? (
-							<button
+							<FancyButton.Root
 								type="button"
-								className="w-full cursor-pointer text-center text-[13px] text-text-sub-600 hover:text-text-strong-950 hover:underline"
+								variant="ghost"
+								size="small"
+								className="w-full justify-center"
 								onClick={() => navigation.push({ to: "/" })}
 							>
 								Go to dashboard
-							</button>
+							</FancyButton.Root>
 						) : null}
 					</div>
 				</div>
@@ -204,21 +215,51 @@ export function InvitePage() {
 							</p>
 						</div>
 						<div className="space-y-4">
-							<Button.Root
-								variant="neutral"
-								mode="filled"
-								className="h-11 w-full rounded-2xl!"
+							<FancyButton.Root
+								variant="blue"
+								size="small"
+								className={cn(
+									"w-full justify-center overflow-hidden transition-all duration-200",
+									isAccepting && "pointer-events-none opacity-90",
+								)}
 								onClick={handleJoin}
 								disabled={isAccepting}
 							>
-								{isAccepting ? (
-									<Spinner size={16} color="white" />
-								) : session ? (
-									"Accept Invitation"
-								) : (
-									"Login to Accept"
-								)}
-							</Button.Root>
+								<AnimatePresence mode="popLayout" initial={false}>
+									<motion.span
+										key={isAccepting ? "accepting" : "idle"}
+										transition={{
+											type: "spring",
+											duration: 0.25,
+											bounce: 0,
+										}}
+										initial={{
+											opacity: 0,
+											y: -14,
+										}}
+										animate={{
+											opacity: 1,
+											y: 0,
+										}}
+										exit={{
+											opacity: 0,
+											y: 14,
+										}}
+										className="flex items-center justify-center gap-1.5"
+									>
+										{isAccepting ? (
+											<>
+												<Spinner size={14} color="currentColor" />
+												<span>Accepting...</span>
+											</>
+										) : session ? (
+											"Accept Invitation"
+										) : (
+											"Login to Accept"
+										)}
+									</motion.span>
+								</AnimatePresence>
+							</FancyButton.Root>
 							<p className="px-4 text-center text-[12px] text-text-sub-600 leading-relaxed">
 								By joining, you agree to Reloop's{" "}
 								<a href="/terms" className="hover:underline">
