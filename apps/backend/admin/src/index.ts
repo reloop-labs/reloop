@@ -9,6 +9,7 @@ import { agentCardRoute } from "@reloop/admin/routes/landing/agent-card.route";
 import { healthRoute } from "@reloop/admin/routes/landing/health.route";
 import { landingRoute } from "@reloop/admin/routes/landing/landing.route";
 import { loader } from "@reloop/admin/utils/loader";
+import { secureHeadersPlugin } from "@reloop/auth/middleware";
 import { Elysia } from "elysia";
 import { initLogger, log, parseError } from "evlog";
 import { evlog } from "evlog/elysia";
@@ -44,6 +45,7 @@ initLogger({
 const port = adminConfig.port;
 
 const app = new Elysia({ prefix: "/api/admin", name: "Admin Service" })
+	.use(secureHeadersPlugin({ profile: "api" }))
 	.use(opentelemetry())
 	.use(cors({ origin: "*", credentials: true }))
 	.use(

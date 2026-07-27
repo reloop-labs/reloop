@@ -1,3 +1,4 @@
+import { sanitizeInternalSecret } from "@reloop/auth/middleware/internal-secret";
 import { resolveAuthRedis } from "@reloop/auth/middleware/redis/resolve-auth-redis";
 import { resolveApiKeyAuth } from "@reloop/auth/middleware/resolve/resolve-api-key-auth";
 import { resolveApiKeyOrInternal } from "@reloop/auth/middleware/resolve/resolve-api-key-or-internal";
@@ -19,7 +20,8 @@ export function createAuthPlugin(config: AuthMiddlewareConfig) {
 	const baseUrl = config.baseUrl;
 	const redis = resolveAuthRedis(config);
 	const ttl = config.ttl ?? DEFAULT_SESSION_CACHE_TTL_SECONDS;
-	const internalSecret = config.internalSecret;
+	// Drop known-insecure defaults in production so internal auth cannot be spoofed.
+	const internalSecret = sanitizeInternalSecret(config.internalSecret);
 	const deps = { baseUrl, redis, ttl, internalSecret };
 
 	return new Elysia({ name: "reloop-auth-middleware" }).macro({

@@ -29,6 +29,15 @@ Secrets are stored **hashed** (SHA-256). Plaintext is returned only on create/ro
 
 **Better Auth `apiKey` plugin:** loaded on the auth server for schema compatibility (`defaultPrefix: "rl"`). Product create/rotate/validate go through Reloop modules (`rl_prod` prefix + custom lifecycle). Do not use BA endpoints as a second writer of credential material.
 
+### Request hardening
+
+- API key headers are **length-bounded** (`API_KEY_MAX_LENGTH`) and shape-checked before hashing.
+- Internal service auth uses **timing-safe** secret compare; known default secrets are **disabled in production** via `sanitizeInternalSecret`.
+
+### Response security headers
+
+Use `secureHeadersPlugin({ profile: "api" | "docs" })` on each public Elysia service (Helmet-style): `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`, CSP, and HSTS in production. Edge (Cloudflare) still owns volumetric DDoS and coarse bot filtering.
+
 **AuthContext**:
 The lean identity resolved by shared request-auth middleware for a request: `userId`, `organizationId` (when required), `platformRole`, and `authType` (`session` | `apikey` | `internal`). Optional `apiKeyId` when authenticated via API Key. Profile fields (`userEmail` / `userName` / `userImage`) appear only on profile-capable macros (`authSupport`, `authCollab`).
 

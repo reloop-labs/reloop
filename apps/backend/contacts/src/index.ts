@@ -12,6 +12,7 @@ import { loader } from "@be/contacts/utils/loader";
 import { opentelemetry } from "@elysia/opentelemetry";
 import { openapi } from "@elysiajs/openapi";
 import { serverTiming } from "@elysiajs/server-timing";
+import { secureHeadersPlugin } from "@reloop/auth/middleware";
 import { Elysia } from "elysia";
 import { initLogger, log, parseError } from "evlog";
 import { evlog } from "evlog/elysia";
@@ -63,6 +64,7 @@ const contactsService = new Elysia({
 	prefix: "/api/contacts",
 	name: "Contacts Service",
 })
+	.use(secureHeadersPlugin({ profile: "api" }))
 	.use(opentelemetry())
 	.use(
 		openapi({

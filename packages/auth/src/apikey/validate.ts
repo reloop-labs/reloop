@@ -5,7 +5,10 @@ import {
 	type ApiKeyCredentialStore,
 	createApiKeyCredentialCache,
 } from "@reloop/auth/apikey/credential-cache";
-import { hashApiKey } from "@reloop/auth/apikey/helpers";
+import {
+	hashApiKey,
+	isPlausibleApiKeyShape,
+} from "@reloop/auth/apikey/helpers";
 import { db as defaultDb } from "@reloop/db/client";
 import { apikey } from "@reloop/db/schema";
 import { and, eq, sql } from "drizzle-orm";
@@ -90,7 +93,8 @@ export async function validateApiKey(
 ): Promise<ApiKeyValidationResult | null> {
 	if (!apiKey || typeof apiKey !== "string") return null;
 
-	if (!apiKey.includes("_") || !/^[a-zA-Z0-9_-]+$/.test(apiKey)) {
+	// Length + charset gate before SHA-256 / Redis / DB (header DoS + junk).
+	if (!isPlausibleApiKeyShape(apiKey)) {
 		return null;
 	}
 

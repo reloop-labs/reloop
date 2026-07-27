@@ -10,7 +10,7 @@ import { loader } from "@be/template/utils/loader";
 import { persistencePlugin } from "@be/template/utils/persistence";
 import { openapi } from "@elysiajs/openapi";
 import { serverTiming } from "@elysiajs/server-timing";
-
+import { secureHeadersPlugin } from "@reloop/auth/middleware";
 import { Elysia } from "elysia";
 import { initLogger, log, parseError } from "evlog";
 import { evlog } from "evlog/elysia";
@@ -48,6 +48,7 @@ const templateService = new Elysia({
 	prefix: "/api/template",
 	name: "Template Service",
 })
+	.use(secureHeadersPlugin({ profile: "api" }))
 	.use(evlog({ exclude: ["/", "/api/*", "/api/*/", "**/health"] }))
 	.use(
 		openapi({

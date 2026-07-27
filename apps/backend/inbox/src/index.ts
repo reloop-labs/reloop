@@ -2,6 +2,7 @@ import "dotenv/config";
 import { opentelemetry } from "@elysia/opentelemetry";
 import { openapi } from "@elysiajs/openapi";
 import { serverTiming } from "@elysiajs/server-timing";
+import { secureHeadersPlugin } from "@reloop/auth/middleware";
 import { Elysia } from "elysia";
 import { initLogger, log, parseError } from "evlog";
 import { evlog } from "evlog/elysia";
@@ -51,6 +52,7 @@ const inboxService = new Elysia({
 	prefix: "/api/inbox",
 	name: "Inbox Service",
 })
+	.use(secureHeadersPlugin({ profile: "api" }))
 	.use(evlog({ exclude: ["/", "/api/*", "/api/*/", "**/health"] }))
 	.use(opentelemetry())
 	.use(

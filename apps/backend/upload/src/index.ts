@@ -7,6 +7,7 @@ import { uploadConfig } from "@be/upload/upload.config";
 import { loader } from "@be/upload/utils/loader";
 import { openapi } from "@elysiajs/openapi";
 import { serverTiming } from "@elysiajs/server-timing";
+import { secureHeadersPlugin } from "@reloop/auth/middleware";
 import { Elysia } from "elysia";
 import { initLogger, log, parseError } from "evlog";
 import { evlog } from "evlog/elysia";
@@ -44,6 +45,7 @@ const uploadService = new Elysia({
 	prefix: "/api/upload",
 	name: "Upload Service",
 })
+	.use(secureHeadersPlugin({ profile: "api" }))
 	.use(evlog({ exclude: ["/", "/api/*", "/api/*/", "**/health"] }))
 	.use(
 		openapi({
