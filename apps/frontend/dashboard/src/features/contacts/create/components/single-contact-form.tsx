@@ -4,7 +4,7 @@ import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import * as Label from "@reloop/ui/label";
 import Spinner from "@reloop/ui/spinner";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "#/lib/navigation";
 import { type KeyboardEvent, useCallback, useRef, useState } from "react";
 import { toast } from "sonner";
 import { GroupSelect } from "#/features/contacts/components/groups/group-select";

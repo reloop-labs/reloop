@@ -1,6 +1,6 @@
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import { Link, useRouterState } from "@tanstack/react-router";
+import { Link, useRouterState } from "#/lib/navigation";
 import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import { settingsNavigation } from "../navigation";

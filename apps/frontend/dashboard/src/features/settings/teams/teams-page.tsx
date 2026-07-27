@@ -1,7 +1,7 @@
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "#/lib/navigation";
 import { useQueryState } from "nuqs";
 import { useEffect, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";

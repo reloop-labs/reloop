@@ -1,6 +1,6 @@
 import * as Drawer from "@reloop/ui/drawer";
 import { Icon } from "@reloop/ui/icon";
-import { Link } from "@tanstack/react-router";
+import { Link } from "#/lib/navigation";
 import { LogDetailPanel } from "./log-detail-panel";
 
 export function LogDrawer({

@@ -17,7 +17,7 @@ import {
 	Trigger as PopoverTrigger,
 } from "@reloop/ui/popover";
 import { Skeleton } from "@reloop/ui/skeleton";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate } from "#/lib/navigation";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { DeleteContactModal } from "../components/contacts/delete-contact-modal";

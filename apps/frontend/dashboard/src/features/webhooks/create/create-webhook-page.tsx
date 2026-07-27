@@ -2,9 +2,8 @@ import * as Button from "@reloop/ui/button";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import Spinner from "@reloop/ui/spinner";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "#/lib/navigation";
 import { useHotkeys } from "react-hotkeys-hook";
-import { AnimatedBackButton } from "#/features/dashboard/animated-back-button";
 import { CreateWebhookFormFields } from "./components/create-webhook-form-fields";
 import { useCreateWebhookForm } from "./components/use-create-webhook-form";
 

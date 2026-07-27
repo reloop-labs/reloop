@@ -1,6 +1,6 @@
 import { Icon } from "@reloop/ui/icon";
 import { KbdEsc } from "@reloop/ui/kbd-esc";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "#/lib/navigation";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";

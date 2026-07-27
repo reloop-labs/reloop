@@ -11,8 +11,8 @@ import {
 	MoreHorizontal,
 	Plus,
 } from "lucide-react";
-import { Link } from "@tanstack/react-router";
-import { useNavigate } from "@tanstack/react-router";
+import { Link } from "#/lib/navigation";
+import { useNavigate } from "#/lib/navigation";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { useSWR } from "#/features/home/lib/use-swr-compat";

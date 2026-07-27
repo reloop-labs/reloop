@@ -2,7 +2,7 @@ import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import { useQuery } from "@tanstack/react-query";
-import { Link } from "@tanstack/react-router";
+import { Link } from "#/lib/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { useQueryState } from "nuqs";
 import { useState } from "react";

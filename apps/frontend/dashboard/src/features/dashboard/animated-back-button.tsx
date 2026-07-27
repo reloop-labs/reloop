@@ -1,6 +1,6 @@
 import { cn } from "@reloop/ui/cn";
 import { KbdEsc } from "@reloop/ui/kbd-esc";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "#/lib/navigation";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";

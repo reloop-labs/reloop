@@ -1,18 +1,18 @@
-import * as Button from "@reloop/ui/button";
-import { cn } from "@reloop/ui/cn";
-import * as FancyButton from "@reloop/ui/fancy-button";
-import { Icon } from "@reloop/ui/icon";
-import { Skeleton } from "@reloop/ui/skeleton";
-import { useNavigate } from "@tanstack/react-router";
-import axios from "axios";
-import { useState } from "react";
-import { toast } from "sonner";
 import { AnimatedBackButton } from "#/features/dashboard/animated-back-button";
 import { WebhookAvatar } from "#/features/webhooks/components/webhook-avatar";
 import {
 	useInvalidateWebhooks,
 	type WebhookDetailData,
 } from "#/features/webhooks/hooks/use-webhooks-query";
+import { useNavigate } from "#/lib/navigation";
+import * as Button from "@reloop/ui/button";
+import { cn } from "@reloop/ui/cn";
+import * as FancyButton from "@reloop/ui/fancy-button";
+import { Icon } from "@reloop/ui/icon";
+import { Skeleton } from "@reloop/ui/skeleton";
+import axios from "axios";
+import { useState } from "react";
+import { toast } from "sonner";
 import {
 	WebhookHeaderMenu,
 	type WebhookHeaderMenuAction,

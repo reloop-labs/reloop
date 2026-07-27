@@ -33,7 +33,7 @@ function UserAvatar({
 							getAvatarGradient(safeEmail),
 						)}
 					>
-						{getAvatarInitial(name, safeEmail)}
+						{getAvatarInitial(name ?? null, safeEmail)}
 					</div>
 				</Avatar.Image>
 			)}

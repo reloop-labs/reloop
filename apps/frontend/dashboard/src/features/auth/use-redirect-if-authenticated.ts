@@ -1,5 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "#/lib/navigation";
 import { useEffect } from "react";
 import { useSessionQuery } from "#/features/auth/session-query";
 import { navigatePostAuth } from "#/utils/navigate-post-auth";

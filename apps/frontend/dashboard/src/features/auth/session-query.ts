@@ -5,7 +5,7 @@ import {
 	useQuery,
 	useQueryClient,
 } from "@tanstack/react-query";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "#/lib/navigation";
 import { useCallback } from "react";
 import { queryKeys } from "#/lib/query-keys";
 
@@ -38,7 +38,7 @@ export function sessionQueryOptions() {
 export function useSessionQuery() {
 	return useQuery({
 		...sessionQueryOptions(),
-		// Skip on the server — no absolute auth baseURL without VITE_PUBLIC_URL.
+		// Skip on the server — no absolute auth baseURL without NEXT_PUBLIC_URL.
 		enabled: typeof window !== "undefined",
 	});
 }

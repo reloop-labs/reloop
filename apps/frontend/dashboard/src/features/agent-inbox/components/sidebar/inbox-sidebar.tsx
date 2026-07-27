@@ -4,7 +4,7 @@ import { Icon } from "@reloop/ui/icon";
 import { KbdKeyOutline } from "@reloop/ui/kbd-key-outline";
 import { Logo } from "@reloop/ui/logo";
 import { Skeleton } from "@reloop/ui/skeleton";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate } from "#/lib/navigation";
 import { Plus } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";

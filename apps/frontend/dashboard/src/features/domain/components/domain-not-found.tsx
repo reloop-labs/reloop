@@ -1,6 +1,6 @@
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate } from "#/lib/navigation";
 import { useHotkeys } from "react-hotkeys-hook";
 
 export function DomainNotFound() {

@@ -1,5 +1,5 @@
 import { AnimatedBackButton } from "#/features/dashboard/animated-back-button";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "#/lib/navigation";
 
 export function CreateWebhookHeader() {
 	const navigate = useNavigate();

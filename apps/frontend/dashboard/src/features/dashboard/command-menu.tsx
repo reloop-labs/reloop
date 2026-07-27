@@ -7,7 +7,7 @@ import { cn } from "@reloop/ui/cn";
 import * as CommandMenu from "@reloop/ui/command";
 import { Icon } from "@reloop/ui/icon";
 import { KbdKeyOutline } from "@reloop/ui/kbd-key-outline";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "#/lib/navigation";
 import {
 	ArrowDown,
 	ArrowUp,

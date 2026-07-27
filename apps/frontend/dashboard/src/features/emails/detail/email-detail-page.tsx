@@ -1,6 +1,6 @@
 import { AnimatedBackButton } from "#/features/dashboard/animated-back-button";
 import { useEmailDetailQuery } from "#/features/emails/hooks/use-emails-query";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "#/lib/navigation";
 import { EmailDetail } from "./email-detail";
 import { EmailNotFound } from "./email-not-found";
 

@@ -68,7 +68,9 @@ export const VariablesDropdown = forwardRef(
 		const selectItem = (index: number) => {
 			if (index < filtered.length) {
 				const name = filtered[index];
-				props.command({ name });
+				if (name !== undefined) {
+					props.command({ name });
+				}
 			} else {
 				// "+ Create new variable" option
 				// Clear query trigger from editor first

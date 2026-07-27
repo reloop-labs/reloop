@@ -7,6 +7,7 @@ import * as React from "react";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import { DomainErrorState } from "../components/domain-error-state";
 import { DomainNotFound } from "../components/domain-not-found";
+import { useDomainConnectCallback } from "../hooks/use-domain-connect-callback";
 import { useDomainDetailQuery } from "../hooks/use-domains-query";
 import { isDomainRecordId } from "../utils";
 import { DNSRecordsSection } from "./components/dns-records-section";
@@ -20,6 +21,8 @@ export function DomainDetailPage({
 }: {
 	domainId: string;
 }) {
+	useDomainConnectCallback();
+
 	const domainId = isDomainRecordId(rawDomainId) ? rawDomainId : null;
 	const { hasInitialized, isPending: orgPending } = useActiveOrganization();
 	const [activeTab, setActiveTab] = useQueryState(

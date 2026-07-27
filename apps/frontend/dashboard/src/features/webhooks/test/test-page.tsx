@@ -2,9 +2,9 @@ import { AnimatedBackButton } from "#/features/dashboard/animated-back-button";
 import { TriggerWebhookTester } from "#/features/webhooks/components/trigger-webhook-tester";
 import { WebhookAvatar } from "#/features/webhooks/components/webhook-avatar";
 import { useWebhookDetailQuery } from "#/features/webhooks/hooks/use-webhooks-query";
+import { useNavigate } from "#/lib/navigation";
 import { cn } from "@reloop/ui/cn";
 import { Skeleton } from "@reloop/ui/skeleton";
-import { useNavigate } from "@tanstack/react-router";
 
 function statusBadgeLabel(status: string) {
 	switch (status) {

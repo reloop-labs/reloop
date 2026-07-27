@@ -108,7 +108,9 @@ export function useUpdateContactStatusInCache() {
 			const index = old.contacts.findIndex((c) => c.id === contactId);
 			if (index === -1) continue;
 
-			const previousStatus = old.contacts[index].status;
+			const previousContact = old.contacts[index];
+			if (!previousContact) continue;
+			const previousStatus = previousContact.status;
 			if (previousStatus === newStatus) continue;
 
 			// Query key shape: ["contacts", "list", { page, limit, search, status }]
@@ -144,7 +146,7 @@ export function useUpdateContactStatusInCache() {
 
 			const contacts = [...old.contacts];
 			contacts[index] = {
-				...contacts[index],
+				...previousContact,
 				status: newStatus,
 				updatedAt,
 			};

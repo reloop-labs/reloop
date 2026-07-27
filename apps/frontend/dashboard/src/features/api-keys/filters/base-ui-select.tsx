@@ -288,9 +288,9 @@ export function SelectGroup(
 export function SelectLabel({
 	className,
 	...props
-}: SelectPrimitive.Label.Props): React.ReactElement {
+}: SelectPrimitive.GroupLabel.Props): React.ReactElement {
 	return (
-		<SelectPrimitive.Label
+		<SelectPrimitive.GroupLabel
 			className={cn(
 				"not-in-data-[slot=field]:mb-2 inline-flex cursor-default items-center gap-2 font-medium text-sm text-text-strong-950",
 				className,

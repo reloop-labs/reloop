@@ -1,7 +1,7 @@
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "#/lib/navigation";
 import axios from "axios";
 import { useQueryState } from "nuqs";
 import { useState } from "react";

@@ -1,5 +1,5 @@
 import { Icon } from "@reloop/ui/icon";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "#/lib/navigation";
 import { useQueryState } from "nuqs";
 import { useApiKeyDetailQuery } from "../hooks/use-api-key-detail-query";
 import { DeleteApiKeyModal } from "../modals/delete-api-key-modal";

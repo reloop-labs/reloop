@@ -9,7 +9,7 @@ import {
 	Root as PopoverRoot,
 	Trigger as PopoverTrigger,
 } from "@reloop/ui/popover";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "#/lib/navigation";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { useUpdateContactStatusInCache } from "#/features/contacts/hooks/use-contacts-query";

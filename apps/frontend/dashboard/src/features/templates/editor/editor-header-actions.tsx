@@ -6,7 +6,7 @@ import { KbdEsc } from "@reloop/ui/kbd-esc";
 import * as Modal from "@reloop/ui/modal";
 import * as Popover from "@reloop/ui/popover";
 import * as Textarea from "@reloop/ui/textarea";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "#/lib/navigation";
 import { useCurrentEditor } from "@tiptap/react";
 import { parseAsStringLiteral, useQueryState } from "nuqs";
 import { useRef, useState } from "react";

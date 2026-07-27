@@ -4,7 +4,7 @@ import { GroupsApiDetails } from "#/components/api-details/groups";
 import { PropertiesApiDetails } from "#/components/api-details/properties";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import { useRouterState } from "@tanstack/react-router";
+import { useRouterState } from "#/lib/navigation";
 import { siGo, siNodedotjs, siPhp, siPython } from "simple-icons";
 
 const cardClassName = cn(

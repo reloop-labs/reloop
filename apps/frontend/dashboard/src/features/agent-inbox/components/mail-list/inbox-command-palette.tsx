@@ -4,7 +4,7 @@ import { Icon } from "@reloop/ui/icon";
 import { KbdCommand } from "@reloop/ui/kbd-command";
 import { KbdKey } from "@reloop/ui/kbd-key";
 import { Logo } from "@reloop/ui/logo";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "#/lib/navigation";
 import dayjs from "dayjs";
 import { useTheme } from "next-themes";
 import { parseAsString, useQueryState } from "nuqs";

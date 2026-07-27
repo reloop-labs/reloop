@@ -1,6 +1,6 @@
 import { Icon } from "@reloop/ui/icon";
 import { NotFoundIllustration } from "@reloop/ui/not-found-illustration";
-import { Link } from "@tanstack/react-router";
+import { Link } from "#/lib/navigation";
 
 export const AgentMailboxNotFound = () => (
 	<div className="flex min-h-[calc(100dvh-8rem)] flex-col items-center justify-center px-4 py-16 text-center">

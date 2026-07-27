@@ -11,7 +11,7 @@ import { Icon } from "@reloop/ui/icon";
 import * as TabMenuHorizontal from "@reloop/ui/tab-menu-horizontal";
 import { ArrowRight, Plus } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
-import { Link } from "@tanstack/react-router";
+import { Link } from "#/lib/navigation";
 import { useRef, useState } from "react";
 import { useSWR } from "#/features/home/lib/use-swr-compat";
 

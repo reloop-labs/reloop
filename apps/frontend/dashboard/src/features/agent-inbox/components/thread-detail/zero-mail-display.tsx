@@ -105,7 +105,7 @@ export const ZeroMailDisplay = ({
 			? rawFromName.replace(/["<>]/g, "").trim()
 			: "") ||
 		extractDisplayName(rawFrom) ||
-		(senderEmail ? senderEmail.split("@")[0] : "Unknown");
+		(senderEmail ? (senderEmail.split("@")[0] ?? "Unknown") : "Unknown");
 	// Outbound: show the address you sent from; "You" is a badge, not the title.
 	const senderName = isOutbound ? senderEmail || realFromName : realFromName;
 	const fromDetails = formatRecipient(rawFromName || realFromName, rawFrom);

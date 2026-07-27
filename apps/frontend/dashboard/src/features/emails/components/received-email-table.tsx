@@ -16,7 +16,7 @@ import {
 	Trigger as PopoverTrigger,
 } from "@reloop/ui/popover";
 import { Skeleton } from "@reloop/ui/skeleton";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "#/lib/navigation";
 import { useRef, useState } from "react";
 import { EmailsEmptyState } from "./emails-empty-state";
 

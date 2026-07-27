@@ -11,7 +11,11 @@ declare global {
 	}
 }
 
-export function RybbitLoader() {
+export function RybbitLoader({
+	scriptSrc = "/api/analytics/script.js",
+}: {
+	scriptSrc?: string;
+} = {}) {
 	if (process.env.NODE_ENV === "development") {
 		return null;
 	}
@@ -19,7 +23,7 @@ export function RybbitLoader() {
 	return (
 		<Script
 			id="rybbit-sdk"
-			src="/api/analytics/script.js"
+			src={scriptSrc}
 			data-site-id="9af96c42b437"
 			strategy="lazyOnload"
 		/>

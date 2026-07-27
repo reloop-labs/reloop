@@ -3,7 +3,7 @@
 import { formatRelativeTime } from "#/utils/format-relative-time";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import { Link } from "@tanstack/react-router";
+import { Link } from "#/lib/navigation";
 import type { Workflow } from "../workflow-types";
 import { getWorkflowSummary } from "../workflow-validation";
 import { WorkflowEmptyState } from "./workflow-empty-state";

@@ -6,7 +6,7 @@ import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import Spinner from "@reloop/ui/spinner";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "#/lib/navigation";
 import { useHotkeys } from "react-hotkeys-hook";
 import { EditWebhookFormFields } from "./components/edit-webhook-form-fields";
 import { useEditWebhookForm } from "./components/use-edit-webhook-form";

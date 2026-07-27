@@ -3,7 +3,7 @@ import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import * as Tooltip from "@reloop/ui/tooltip";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "#/lib/navigation";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
 import { AnimatedBackButton } from "#/features/dashboard/animated-back-button";

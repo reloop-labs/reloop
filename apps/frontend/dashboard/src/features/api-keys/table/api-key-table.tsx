@@ -1,5 +1,5 @@
 import { cn } from "@reloop/ui/cn";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "#/lib/navigation";
 import {
 	flexRender,
 	getCoreRowModel,

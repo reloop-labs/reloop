@@ -5,7 +5,7 @@ import {
 } from "#/features/webhooks/hooks/use-webhooks-query";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { useLoading } from "@reloop/ui/use-loading";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "#/lib/navigation";
 import axios from "axios";
 import { useEffect } from "react";
 import type { Resolver } from "react-hook-form";

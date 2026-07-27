@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { useRouterState } from "@tanstack/react-router";
+import { useRouterState } from "#/lib/navigation";
 
 /**
  * Most settings pages read best in a narrow column, but a few (e.g. plans

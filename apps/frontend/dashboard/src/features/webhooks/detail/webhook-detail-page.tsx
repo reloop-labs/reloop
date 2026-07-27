@@ -1,9 +1,9 @@
 import { DeleteWebhookModal } from "#/features/webhooks/components/delete-webhook-modal";
 import { useWebhookDetailQuery } from "#/features/webhooks/hooks/use-webhooks-query";
+import { useNavigate } from "#/lib/navigation";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as TabMenu from "@reloop/ui/tab-menu-horizontal";
-import { useNavigate } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "motion/react";
 import { parseAsString, useQueryState } from "nuqs";
 import { useRef, useState } from "react";

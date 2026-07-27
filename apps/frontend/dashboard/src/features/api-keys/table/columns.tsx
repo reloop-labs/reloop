@@ -1,6 +1,6 @@
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import { Link } from "@tanstack/react-router";
+import { Link } from "#/lib/navigation";
 import type { ColumnDef } from "@tanstack/react-table";
 import { AnimatePresence, motion } from "framer-motion";
 import { formatRelativeTime } from "#/utils/format-relative-time";

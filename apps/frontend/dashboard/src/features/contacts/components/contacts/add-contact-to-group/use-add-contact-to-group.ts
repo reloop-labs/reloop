@@ -1,6 +1,6 @@
 import { useInvalidateContacts } from "#/features/contacts/hooks/use-contacts-query";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { useParams } from "@tanstack/react-router";
+import { useParams } from "#/lib/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import type { Contact } from "./types";

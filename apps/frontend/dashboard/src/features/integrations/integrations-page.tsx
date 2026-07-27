@@ -2,7 +2,7 @@ import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
-import { Link } from "@tanstack/react-router";
+import { Link } from "#/lib/navigation";
 import { useMemo, useState } from "react";
 import * as SimpleIcons from "simple-icons";
 import { toast } from "sonner";

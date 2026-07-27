@@ -1,4 +1,3 @@
-import { getRouteApi } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { parseAsBoolean, parseAsString, useQueryState } from "nuqs";
 import { AuthSessionLoader } from "#/features/auth/auth-session-loader";
@@ -9,10 +8,7 @@ import { useAuthStepDirection } from "#/features/auth/use-auth-step-direction";
 import { useRedirectIfAuthenticated } from "#/features/auth/use-redirect-if-authenticated";
 import { VerifyOTP } from "#/features/auth/verify-otp";
 
-const signupRouteApi = getRouteApi("/signup");
-
 export function SignupPage() {
-	const { inviteId: inviteIdFromRoute } = signupRouteApi.useSearch();
 	const [showEmail, setShowEmail] = useQueryState(
 		"email",
 		parseAsBoolean.withDefault(false),
@@ -30,7 +26,7 @@ export function SignupPage() {
 		"inviteId",
 		parseAsString.withDefault(""),
 	);
-	const inviteId = inviteIdFromRoute || inviteIdQuery || undefined;
+	const inviteId = inviteIdQuery || undefined;
 
 	const currentLevel = otpSentEmail ? 2 : showEmail ? 1 : 0;
 	const direction = useAuthStepDirection(currentLevel);

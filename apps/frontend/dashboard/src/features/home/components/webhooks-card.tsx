@@ -3,7 +3,7 @@ import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { ArrowRight, Plus } from "lucide-react";
-import { Link } from "@tanstack/react-router";
+import { Link } from "#/lib/navigation";
 import { useWebhooks } from "#/features/webhooks/components/use-webhooks";
 
 export function WebhooksCard() {

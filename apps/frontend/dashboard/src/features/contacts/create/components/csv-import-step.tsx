@@ -5,7 +5,7 @@ import * as FileFormatIcon from "@reloop/ui/file-format-icon";
 import * as FileUpload from "@reloop/ui/file-upload";
 import { Icon } from "@reloop/ui/icon";
 import Spinner from "@reloop/ui/spinner";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "#/lib/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { toast } from "sonner";
@@ -154,8 +154,8 @@ export function CsvImportStep({ onBack }: CsvImportStepProps) {
 		maxFiles: 1,
 		maxSize: MAX_FILE_SIZE_BYTES,
 		onDrop: (acceptedFiles, fileRejections) => {
-			if (fileRejections.length > 0) {
-				const rejection = fileRejections[0];
+			const rejection = fileRejections[0];
+			if (rejection) {
 				if (rejection.errors.some((err) => err.code === "file-too-large")) {
 					toast.error("File size exceeds the 5 MB limit.");
 				} else {

@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@reloop/ui/cn";
-import { type CSSProperties, useMemo } from "react";
+import { type CSSProperties, useEffect, useState } from "react";
 import { DotmSquare1 } from "#/components/ui/dotm-square-1";
 import { DotmSquare3 } from "#/components/ui/dotm-square-3";
 import { DotmSquare11 } from "#/components/ui/dotm-square-11";
@@ -23,9 +23,11 @@ export function LoadingDot({
 	dotSize?: number;
 	style?: CSSProperties;
 }) {
-	const SelectedLoader = useMemo(() => {
+	const [SelectedLoader, setSelectedLoader] = useState(() => DotmSquare1);
+
+	useEffect(() => {
 		const randomIndex = Math.floor(Math.random() * LOADERS.length);
-		return LOADERS[randomIndex];
+		setSelectedLoader(() => LOADERS[randomIndex] ?? DotmSquare1);
 	}, []);
 
 	return (

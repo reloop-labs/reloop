@@ -6,7 +6,7 @@ import * as Modal from "@reloop/ui/modal";
 import { Skeleton } from "@reloop/ui/skeleton";
 import Spinner from "@reloop/ui/spinner";
 import { useQuery } from "@tanstack/react-query";
-import { useNavigate, useRouterState } from "@tanstack/react-router";
+import { useNavigate, useRouterState } from "#/lib/navigation";
 import axios from "axios";
 import {
 	AnimatePresence,

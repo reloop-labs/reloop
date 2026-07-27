@@ -5,7 +5,7 @@ import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
 import * as Modal from "@reloop/ui/modal";
 import * as Textarea from "@reloop/ui/textarea";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "#/lib/navigation";
 import { useState } from "react";
 import { useWorkflows } from "./workflows-provider";
 

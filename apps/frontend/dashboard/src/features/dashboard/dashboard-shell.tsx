@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { useRouterState } from "@tanstack/react-router";
+import { useRouterState } from "#/lib/navigation";
 import { AnimatePresence } from "framer-motion";
 import { CommandMenuGlobal } from "#/features/dashboard/command-menu";
 import { AiPanel } from "#/features/dashboard/layout/ai-panel";
