@@ -156,15 +156,14 @@ function getFeatureIcon(feature: string, customClassName?: string) {
 	if (key.includes("analytics") || key.includes("tracking")) {
 		return <Icon name="graph-up" className={className} />;
 	}
+	if (key.includes("uptime") || key.includes("sla guarantee")) {
+		return <Icon name="headset" className={className} />;
+	}
+	if (key.includes("support") || key.includes("sla")) {
+		return <Icon name="support-level" className={className} />;
+	}
 	if (key.includes("attachment")) {
 		return <Icon name="paperclip" className={className} />;
-	}
-	if (
-		key.includes("support") ||
-		key.includes("sla") ||
-		key.includes("uptime")
-	) {
-		return <Icon name="support-level" className={className} />;
 	}
 	if (
 		key.includes("overage") ||
