@@ -7,10 +7,12 @@ import { SendFirstEmailButton } from "./send-first-email-button";
 const DOCS_URL = "https://reloop.sh/docs";
 
 export function OverviewHeader({
+	userEmail,
 	organizationName,
 	canSendFirstEmail,
 	readyDomainName,
 }: {
+	userEmail?: string | null;
 	organizationName?: string | null;
 	/** True when the workspace has at least one active domain. */
 	canSendFirstEmail?: boolean;
@@ -28,15 +30,9 @@ export function OverviewHeader({
 	return (
 		<div className="flex flex-col gap-4 pt-2 pb-2 sm:flex-row sm:items-start sm:justify-between">
 			<div>
-				<div className="flex items-center gap-2.5">
-					<Icon
-						name="home"
-						className="h-6 w-6 shrink-0 text-text-strong-950"
-					/>
-					<h1 className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
-						Overview
-					</h1>
-				</div>
+				<h1 className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
+					{userEmail ?? "Overview"}
+				</h1>
 				<p className="mt-1 text-sm text-text-sub-600">{subtitle}</p>
 			</div>
 

@@ -13,7 +13,6 @@ import {
 	AttentionAlerts,
 	buildAttentionItems,
 } from "./components/attention-alerts";
-import { DomainReadyBanner } from "./components/domain-ready-banner";
 import { DomainsSummaryCard } from "./components/domains-summary-card";
 import { InboxSummaryCard } from "./components/inbox-summary-card";
 import { OverviewHeader } from "./components/overview-header";
@@ -131,17 +130,13 @@ export function HomePage() {
 	return (
 		<div className="mx-auto max-w-6xl space-y-6 p-6 lg:p-8">
 			<OverviewHeader
+				userEmail={session?.user?.email}
 				organizationName={activeOrganization?.name}
 				canSendFirstEmail={hasActiveDomain}
 				readyDomainName={readyDomainName}
 			/>
 
 			<AttentionAlerts items={attentionItems} />
-
-			<DomainReadyBanner
-				domains={readyDomains}
-				hasSentEmail={hasSent}
-			/>
 
 			<SetupChecklist
 				steps={setupSteps}
