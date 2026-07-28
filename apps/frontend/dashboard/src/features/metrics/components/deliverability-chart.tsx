@@ -241,11 +241,13 @@ export function DeliverabilityChart({
 								<Tooltip content={<CustomTooltip />} />
 								{(isAllSelected || selectedEvents.includes("delivered")) && (
 									<Area
-										type="monotone"
+										type="linear"
 										dataKey="delivered"
 										name="Delivered"
 										stroke="#10B981"
 										strokeWidth={2}
+										strokeLinejoin="miter"
+										strokeLinecap="butt"
 										fillOpacity={1}
 										fill="url(#colorDelivered)"
 										isAnimationActive={false}
@@ -253,11 +255,13 @@ export function DeliverabilityChart({
 								)}
 								{(isAllSelected || selectedEvents.includes("bounced")) && (
 									<Line
-										type="monotone"
+										type="linear"
 										dataKey="bounced"
 										name="Bounces"
 										stroke="#EF4444"
 										strokeWidth={2}
+										strokeLinejoin="miter"
+										strokeLinecap="butt"
 										dot={false}
 										activeDot={{ r: 5 }}
 										isAnimationActive={false}
@@ -265,11 +269,13 @@ export function DeliverabilityChart({
 								)}
 								{(isAllSelected || selectedEvents.includes("complained")) && (
 									<Line
-										type="monotone"
+										type="linear"
 										dataKey="complaint"
 										name="Complained"
 										stroke="#D97706"
 										strokeWidth={2}
+										strokeLinejoin="miter"
+										strokeLinecap="butt"
 										dot={false}
 										activeDot={{ r: 5 }}
 										isAnimationActive={false}
@@ -291,11 +297,13 @@ export function DeliverabilityChart({
 											return (
 												<Line
 													key={event.id}
-													type="monotone"
+													type="linear"
 													dataKey={key}
 													name={event.label}
 													stroke={event.color}
 													strokeWidth={2}
+													strokeLinejoin="miter"
+													strokeLinecap="butt"
 													dot={false}
 													activeDot={{ r: 5 }}
 													isAnimationActive={false}

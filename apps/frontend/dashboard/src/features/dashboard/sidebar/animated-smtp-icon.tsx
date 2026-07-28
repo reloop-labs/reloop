@@ -19,7 +19,7 @@ export function AnimatedSmtpIcon({ className }: AnimatedSmtpIconProps) {
 		>
 			{/* Top rack — races first */}
 			<g
-				className="motion-safe:group-hover:animate-smtp-race-top"
+				className="motion-safe:group-data-[animating=true]:animate-smtp-race-top"
 				style={{ transformBox: "fill-box" }}
 			>
 				<path
@@ -45,7 +45,7 @@ export function AnimatedSmtpIcon({ className }: AnimatedSmtpIconProps) {
 
 			{/* Bottom rack — races after top */}
 			<g
-				className="motion-safe:group-hover:animate-smtp-race-bottom"
+				className="motion-safe:group-data-[animating=true]:animate-smtp-race-bottom"
 				style={{ transformBox: "fill-box" }}
 			>
 				<path

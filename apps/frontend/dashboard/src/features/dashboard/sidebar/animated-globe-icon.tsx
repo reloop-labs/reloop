@@ -34,7 +34,7 @@ export function AnimatedGlobeIcon({ className }: AnimatedGlobeIconProps) {
 				strokeWidth="1.5"
 				strokeLinecap="round"
 				strokeLinejoin="round"
-				className="[stroke-dasharray:1] [stroke-dashoffset:0] motion-safe:group-hover:animate-globe-v-1"
+				className="[stroke-dasharray:1] [stroke-dashoffset:0] motion-safe:group-data-[animating=true]:animate-globe-v-1"
 			/>
 			<path
 				d="M12 2C9.79086 2 8 6.47715 8 12C8 17.5228 9.79086 22 12 22"
@@ -43,7 +43,7 @@ export function AnimatedGlobeIcon({ className }: AnimatedGlobeIconProps) {
 				strokeWidth="1.5"
 				strokeLinecap="round"
 				strokeLinejoin="round"
-				className="[stroke-dasharray:1] [stroke-dashoffset:0] motion-safe:group-hover:animate-globe-v-2"
+				className="[stroke-dasharray:1] [stroke-dashoffset:0] motion-safe:group-data-[animating=true]:animate-globe-v-2"
 			/>
 
 			{/* Latitudes — original curves, left → right */}
@@ -54,7 +54,7 @@ export function AnimatedGlobeIcon({ className }: AnimatedGlobeIconProps) {
 				strokeWidth="1.5"
 				strokeLinecap="round"
 				strokeLinejoin="round"
-				className="[stroke-dasharray:1] [stroke-dashoffset:0] motion-safe:group-hover:animate-globe-h-1"
+				className="[stroke-dasharray:1] [stroke-dashoffset:0] motion-safe:group-data-[animating=true]:animate-globe-h-1"
 			/>
 			<path
 				d="M2 12C2 14.2091 6.47715 16 12 16C17.5228 16 22 14.2091 22 12"
@@ -63,7 +63,7 @@ export function AnimatedGlobeIcon({ className }: AnimatedGlobeIconProps) {
 				strokeWidth="1.5"
 				strokeLinecap="round"
 				strokeLinejoin="round"
-				className="[stroke-dasharray:1] [stroke-dashoffset:0] motion-safe:group-hover:animate-globe-h-2"
+				className="[stroke-dasharray:1] [stroke-dashoffset:0] motion-safe:group-data-[animating=true]:animate-globe-h-2"
 			/>
 		</svg>
 	);

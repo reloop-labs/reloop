@@ -34,7 +34,7 @@ export function AnimatedChannelsIcon({ className }: AnimatedChannelsIconProps) {
 				strokeWidth="2"
 				strokeLinecap="round"
 				strokeLinejoin="round"
-				className="[stroke-dasharray:1] [stroke-dashoffset:0] motion-safe:group-hover:animate-channels-draw-ring"
+				className="[stroke-dasharray:1] [stroke-dashoffset:0] motion-safe:group-data-[animating=true]:animate-channels-draw-ring"
 			/>
 
 			{/* Solid dot appears after the ring */}
@@ -43,7 +43,7 @@ export function AnimatedChannelsIcon({ className }: AnimatedChannelsIconProps) {
 				cy={5}
 				r={3}
 				fill="currentColor"
-				className="motion-safe:group-hover:animate-channels-fill-in"
+				className="motion-safe:group-data-[animating=true]:animate-channels-fill-in"
 			/>
 		</svg>
 	);

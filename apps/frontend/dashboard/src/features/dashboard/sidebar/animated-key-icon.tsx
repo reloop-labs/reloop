@@ -18,7 +18,7 @@ export function AnimatedKeyIcon({ className }: AnimatedKeyIconProps) {
 			className={cn("h-4 w-4 shrink-0 overflow-visible", className)}
 		>
 			<g
-				className="motion-safe:group-hover:animate-key-bit-bob"
+				className="motion-safe:group-data-[animating=true]:animate-key-bit-bob"
 				style={{
 					transformOrigin: "16.5px 7.5px",
 					transformBox: "view-box",

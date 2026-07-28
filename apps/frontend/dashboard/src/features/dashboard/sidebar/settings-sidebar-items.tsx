@@ -1,11 +1,11 @@
 import { usePathname, useSearchParams } from "next/navigation";
-import Link from "next/link";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import { settingsNavigation } from "../navigation";
 import { SidebarNavIcon } from "./sidebar-nav-icon";
+import { SidebarNavLink } from "./sidebar-nav-link";
 
 export function SettingsSidebarItems({
 	isCollapsed = false,
@@ -68,9 +68,9 @@ export function SettingsSidebarItems({
 			onPointerLeave={() => setHoveredEl(undefined)}
 		>
 			{/* Back to app */}
-			<Link href={backHref} ref={backNavRef} onPointerEnter={() => setHoveredEl(backNavRef.current ?? undefined)}
+			<SidebarNavLink href={backHref} ref={backNavRef} onPointerEnter={() => setHoveredEl(backNavRef.current ?? undefined)}
 				className={cn(
-					"group relative z-10 mb-4 flex h-8 items-center rounded-lg transition-all",
+					"relative z-10 mb-4 flex h-8 items-center rounded-lg transition-all",
 					isCollapsed
 						? "h-8 w-8 justify-center px-0"
 						: "w-full justify-start gap-2.5 px-2.5",
@@ -93,7 +93,7 @@ export function SettingsSidebarItems({
 						</span>
 					)}
 				</span>
-			</Link>
+			</SidebarNavLink>
 
 			{filteredSettingsNavigation.map((section, sectionIdx) => (
 				<div key={section.section} className="flex flex-col">
@@ -120,14 +120,14 @@ export function SettingsSidebarItems({
 								: pathWithoutSlug.startsWith(item.path);
 
 						return (
-							<Link href={item.path} key={item.path} ref={(el) => {
+							<SidebarNavLink href={item.path} key={item.path} ref={(el) => {
 									if (el) itemRefs.current[currentIdx] = el;
 								}}
 								onPointerEnter={() =>
 									setHoveredEl(itemRefs.current[currentIdx])
 								}
 								className={cn(
-									"group relative z-10 flex h-8 items-center rounded-lg transition-all",
+									"relative z-10 flex h-8 items-center rounded-lg transition-all",
 									isCollapsed
 										? "h-8 w-8 justify-center px-0"
 										: "w-full justify-start gap-2.5 px-2.5",
@@ -157,7 +157,7 @@ export function SettingsSidebarItems({
 										</span>
 									)}
 								</span>
-							</Link>
+							</SidebarNavLink>
 						);
 					})}
 				</div>

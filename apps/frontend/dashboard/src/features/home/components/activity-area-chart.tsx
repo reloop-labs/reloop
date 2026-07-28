@@ -54,11 +54,13 @@ export function ActivityAreaChart({ data }: { data: ActivityChartPoint[] }) {
 					}}
 				/>
 				<Area
-					type="monotone"
+					type="linear"
 					dataKey="count"
 					name="Emails Sent"
 					stroke="#F97316"
 					strokeWidth={2}
+					strokeLinejoin="miter"
+					strokeLinecap="butt"
 					fillOpacity={1}
 					fill="url(#activityGradient)"
 					isAnimationActive={true}

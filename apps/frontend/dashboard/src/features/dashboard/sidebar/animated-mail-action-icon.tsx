@@ -50,7 +50,7 @@ export function AnimatedMailActionIcon({
 				strokeWidth="1.5"
 				strokeLinecap="round"
 				strokeLinejoin="round"
-				className="[stroke-dasharray:1] [stroke-dashoffset:0] motion-safe:group-hover:animate-mail-arrow-shaft"
+				className="[stroke-dasharray:1] [stroke-dashoffset:0] motion-safe:group-data-[animating=true]:animate-mail-arrow-shaft"
 			/>
 			<path
 				d={isSend ? "M18 13.5L14.5 17" : "M18 20.5L14.5 17"}
@@ -59,7 +59,7 @@ export function AnimatedMailActionIcon({
 				strokeWidth="1.5"
 				strokeLinecap="round"
 				strokeLinejoin="round"
-				className="[stroke-dasharray:1] [stroke-dashoffset:0] motion-safe:group-hover:animate-mail-arrow-tip-left"
+				className="[stroke-dasharray:1] [stroke-dashoffset:0] motion-safe:group-data-[animating=true]:animate-mail-arrow-tip-left"
 			/>
 			<path
 				d={isSend ? "M18 13.5L21.5 17" : "M18 20.5L21.5 17"}
@@ -68,7 +68,7 @@ export function AnimatedMailActionIcon({
 				strokeWidth="1.5"
 				strokeLinecap="round"
 				strokeLinejoin="round"
-				className="[stroke-dasharray:1] [stroke-dashoffset:0] motion-safe:group-hover:animate-mail-arrow-tip-right"
+				className="[stroke-dasharray:1] [stroke-dashoffset:0] motion-safe:group-data-[animating=true]:animate-mail-arrow-tip-right"
 			/>
 		</svg>
 	);

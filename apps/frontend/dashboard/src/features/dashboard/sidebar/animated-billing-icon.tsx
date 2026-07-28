@@ -38,7 +38,7 @@ export function AnimatedBillingIcon({ className }: AnimatedBillingIconProps) {
 				strokeWidth="1.5"
 				strokeLinecap="round"
 				strokeLinejoin="round"
-				className="[stroke-dasharray:1] [stroke-dashoffset:0] motion-safe:group-hover:animate-billing-stripe"
+				className="[stroke-dasharray:1] [stroke-dashoffset:0] motion-safe:group-data-[animating=true]:animate-billing-stripe"
 			/>
 			{/* Chip dash — after stripe */}
 			<path
@@ -48,7 +48,7 @@ export function AnimatedBillingIcon({ className }: AnimatedBillingIconProps) {
 				strokeWidth="1.5"
 				strokeLinecap="round"
 				strokeLinejoin="round"
-				className="[stroke-dasharray:1] [stroke-dashoffset:0] motion-safe:group-hover:animate-billing-chip"
+				className="[stroke-dasharray:1] [stroke-dashoffset:0] motion-safe:group-data-[animating=true]:animate-billing-chip"
 			/>
 		</svg>
 	);

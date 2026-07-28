@@ -24,7 +24,7 @@ export function AnimatedMetricsIcon({ className }: AnimatedMetricsIconProps) {
 				strokeWidth="1.5"
 				strokeLinecap="round"
 				strokeLinejoin="round"
-				className="origin-bottom motion-safe:group-hover:animate-metrics-bar-tall"
+				className="origin-bottom motion-safe:group-data-[animating=true]:animate-metrics-bar-tall"
 				style={{ transformBox: "fill-box" }}
 			/>
 			{/* Short bar */}
@@ -34,7 +34,7 @@ export function AnimatedMetricsIcon({ className }: AnimatedMetricsIconProps) {
 				strokeWidth="1.5"
 				strokeLinecap="round"
 				strokeLinejoin="round"
-				className="origin-bottom motion-safe:group-hover:animate-metrics-bar-short"
+				className="origin-bottom motion-safe:group-data-[animating=true]:animate-metrics-bar-short"
 				style={{ transformBox: "fill-box" }}
 			/>
 		</svg>

@@ -38,7 +38,7 @@ export function AnimatedSecurityIcon({ className }: AnimatedSecurityIconProps) {
 				strokeWidth="1.5"
 				strokeLinecap="round"
 				strokeLinejoin="round"
-				className="[stroke-dasharray:1] [stroke-dashoffset:0] motion-safe:group-hover:animate-security-check"
+				className="[stroke-dasharray:1] [stroke-dashoffset:0] motion-safe:group-data-[animating=true]:animate-security-check"
 			/>
 		</svg>
 	);

@@ -12,7 +12,7 @@ export function AnimatedTeamsIcon({ className }: AnimatedTeamsIconProps) {
 	return (
 		<span
 			className={cn(
-				"inline-flex h-4 w-4 shrink-0 origin-top motion-safe:group-hover:animate-teams-hang",
+				"inline-flex h-4 w-4 shrink-0 origin-top motion-safe:group-data-[animating=true]:animate-teams-hang",
 				className,
 			)}
 		>

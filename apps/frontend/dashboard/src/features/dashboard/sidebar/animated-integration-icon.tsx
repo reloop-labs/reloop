@@ -47,7 +47,7 @@ export function AnimatedIntegrationIcon({
 				strokeWidth="1.5"
 				strokeLinecap="round"
 				strokeLinejoin="round"
-				className="origin-center motion-safe:group-hover:animate-integration-square-1"
+				className="origin-center motion-safe:group-data-[animating=true]:animate-integration-square-1"
 				style={{ transformBox: "fill-box" }}
 			/>
 			<path
@@ -56,7 +56,7 @@ export function AnimatedIntegrationIcon({
 				strokeWidth="1.5"
 				strokeLinecap="round"
 				strokeLinejoin="round"
-				className="origin-center motion-safe:group-hover:animate-integration-square-2"
+				className="origin-center motion-safe:group-data-[animating=true]:animate-integration-square-2"
 				style={{ transformBox: "fill-box" }}
 			/>
 			<path
@@ -65,7 +65,7 @@ export function AnimatedIntegrationIcon({
 				strokeWidth="1.5"
 				strokeLinecap="round"
 				strokeLinejoin="round"
-				className="origin-center motion-safe:group-hover:animate-integration-square-3"
+				className="origin-center motion-safe:group-data-[animating=true]:animate-integration-square-3"
 				style={{ transformBox: "fill-box" }}
 			/>
 		</svg>

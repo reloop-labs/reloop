@@ -6,7 +6,42 @@ import { useHotkeys } from "react-hotkeys-hook";
 import { AnimatedSidebarToggleIcon } from "./animated-sidebar-toggle-icon";
 import { SettingsSidebarItems } from "./settings-sidebar-items";
 import { SidebarItems } from "./sidebar-items";
+import { usePlayAnimationOnHover } from "./use-play-animation-on-hover";
 import { useSidebarCollapse } from "./use-sidebar-collapse";
+
+function SidebarToggleButton({
+	onClick,
+	className,
+	iconClassName,
+}: {
+	onClick: () => void;
+	className?: string;
+	iconClassName?: string;
+}) {
+	const {
+		isAnimating,
+		onPointerEnter,
+		onPointerLeave,
+		onAnimationStart,
+		onAnimationEnd,
+	} = usePlayAnimationOnHover(500);
+
+	return (
+		<button
+			type="button"
+			onClick={onClick}
+			title="Toggle Sidebar (Cmd+B)"
+			data-animating={isAnimating || undefined}
+			onPointerEnter={onPointerEnter}
+			onPointerLeave={onPointerLeave}
+			onAnimationStart={onAnimationStart}
+			onAnimationEnd={onAnimationEnd}
+			className={cn("group", className)}
+		>
+			<AnimatedSidebarToggleIcon className={iconClassName} />
+		</button>
+	);
+}
 
 export function MainSidebar() {
 	const { isCollapsed, toggle } = useSidebarCollapse();
@@ -38,16 +73,11 @@ export function MainSidebar() {
 				{isCollapsed ? (
 					<div className="relative flex h-full w-full items-center justify-center">
 						<Logo className="h-8 w-8 shrink-0" />
-						<button
-							type="button"
+						<SidebarToggleButton
 							onClick={toggle}
-							title="Toggle Sidebar (Cmd+B)"
-							className="group -translate-y-1/2 -right-2.5 absolute top-1/2 z-20 flex h-5 w-5 shrink-0 items-center justify-center text-text-sub-600 transition-colors hover:text-text-strong-950"
-						>
-							<AnimatedSidebarToggleIcon
-								className="h-3 w-3 rotate-180"
-							/>
-						</button>
+							className="-translate-y-1/2 -right-2.5 absolute top-1/2 z-20 flex h-5 w-5 shrink-0 items-center justify-center text-text-sub-600 transition-colors hover:text-text-strong-950"
+							iconClassName="h-3 w-3 rotate-180"
+						/>
 					</div>
 				) : (
 					<>
@@ -58,14 +88,11 @@ export function MainSidebar() {
 								Beta
 							</span>
 						</div>
-						<button
-							type="button"
+						<SidebarToggleButton
 							onClick={toggle}
-							title="Toggle Sidebar (Cmd+B)"
-							className="group flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:hover:bg-white/5"
-						>
-							<AnimatedSidebarToggleIcon className="h-4 w-4" />
-						</button>
+							className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:hover:bg-white/5"
+							iconClassName="h-4 w-4"
+						/>
 					</>
 				)}
 			</div>

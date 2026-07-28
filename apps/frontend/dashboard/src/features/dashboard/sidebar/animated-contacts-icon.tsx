@@ -62,7 +62,7 @@ export function AnimatedContactsIcon({ className }: AnimatedContactsIconProps) {
 				strokeWidth="1.5"
 				strokeLinecap="round"
 				strokeLinejoin="round"
-				className="[stroke-dasharray:1] [stroke-dashoffset:0] motion-safe:group-hover:animate-contacts-draw-top"
+				className="[stroke-dasharray:1] [stroke-dashoffset:0] motion-safe:group-data-[animating=true]:animate-contacts-draw-top"
 			/>
 			<path
 				d="M14 12h5"
@@ -71,7 +71,7 @@ export function AnimatedContactsIcon({ className }: AnimatedContactsIconProps) {
 				strokeWidth="1.5"
 				strokeLinecap="round"
 				strokeLinejoin="round"
-				className="[stroke-dasharray:1] [stroke-dashoffset:0] motion-safe:group-hover:animate-contacts-draw-bottom"
+				className="[stroke-dasharray:1] [stroke-dashoffset:0] motion-safe:group-data-[animating=true]:animate-contacts-draw-bottom"
 			/>
 		</svg>
 	);

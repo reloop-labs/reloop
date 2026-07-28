@@ -32,7 +32,7 @@ export function AnimatedMailIcon({ className }: AnimatedMailIconProps) {
 				stroke="currentColor"
 				strokeWidth="1.5"
 				strokeLinecap="round"
-				className="[stroke-dasharray:1] [stroke-dashoffset:0] motion-safe:group-hover:animate-mail-flap-draw"
+				className="[stroke-dasharray:1] [stroke-dashoffset:0] motion-safe:group-data-[animating=true]:animate-mail-flap-draw"
 			/>
 		</svg>
 	);

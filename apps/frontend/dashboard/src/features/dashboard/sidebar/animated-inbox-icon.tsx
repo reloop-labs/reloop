@@ -39,7 +39,7 @@ export function AnimatedInboxIcon({ className }: AnimatedInboxIconProps) {
 				stroke="currentColor"
 				strokeWidth="1.5"
 				strokeLinecap="round"
-				className="[stroke-dasharray:1] [stroke-dashoffset:0] motion-safe:group-hover:animate-inbox-draw-top"
+				className="[stroke-dasharray:1] [stroke-dashoffset:0] motion-safe:group-data-[animating=true]:animate-inbox-draw-top"
 			/>
 			<path
 				d="M10 11H14"
@@ -47,7 +47,7 @@ export function AnimatedInboxIcon({ className }: AnimatedInboxIconProps) {
 				stroke="currentColor"
 				strokeWidth="1.5"
 				strokeLinecap="round"
-				className="[stroke-dasharray:1] [stroke-dashoffset:0] motion-safe:group-hover:animate-inbox-draw-bottom"
+				className="[stroke-dasharray:1] [stroke-dashoffset:0] motion-safe:group-data-[animating=true]:animate-inbox-draw-bottom"
 			/>
 		</svg>
 	);

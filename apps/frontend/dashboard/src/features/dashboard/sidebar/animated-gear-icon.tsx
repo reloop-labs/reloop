@@ -12,7 +12,7 @@ export function AnimatedGearIcon({ className }: AnimatedGearIconProps) {
 	return (
 		<span
 			className={cn(
-				"inline-flex h-4 w-4 shrink-0 origin-center motion-safe:group-hover:animate-gear-turn",
+				"inline-flex h-4 w-4 shrink-0 origin-center motion-safe:group-data-[animating=true]:animate-gear-turn",
 				className,
 			)}
 		>
@@ -40,7 +40,7 @@ export function AnimatedGearIcon({ className }: AnimatedGearIconProps) {
 					strokeLinecap="round"
 					strokeLinejoin="round"
 					fill="none"
-					className="[stroke-dasharray:1] [stroke-dashoffset:0] motion-safe:group-hover:animate-gear-hole-draw"
+					className="[stroke-dasharray:1] [stroke-dashoffset:0] motion-safe:group-data-[animating=true]:animate-gear-hole-draw"
 				/>
 			</svg>
 		</span>

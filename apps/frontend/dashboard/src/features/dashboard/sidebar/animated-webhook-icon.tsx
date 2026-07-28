@@ -12,7 +12,7 @@ export function AnimatedWebhookIcon({ className }: AnimatedWebhookIconProps) {
 	return (
 		<span
 			className={cn(
-				"inline-flex h-4 w-4 shrink-0 origin-center motion-safe:group-hover:animate-webhook-burst",
+				"inline-flex h-4 w-4 shrink-0 origin-center motion-safe:group-data-[animating=true]:animate-webhook-burst",
 				className,
 			)}
 		>

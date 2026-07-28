@@ -22,7 +22,7 @@ export function AnimatedLogsIcon({ className }: AnimatedLogsIconProps) {
 		>
 			{/* Document + side brackets — flip */}
 			<g
-				className="origin-center motion-safe:group-hover:animate-logs-flip"
+				className="origin-center motion-safe:group-data-[animating=true]:animate-logs-flip"
 				style={{ transformBox: "fill-box", transformStyle: "preserve-3d" }}
 			>
 				<path
@@ -56,7 +56,7 @@ export function AnimatedLogsIcon({ className }: AnimatedLogsIconProps) {
 				strokeWidth="1.5"
 				strokeLinecap="round"
 				strokeLinejoin="round"
-				className="[stroke-dasharray:1] [stroke-dashoffset:0] motion-safe:group-hover:animate-logs-draw-1"
+				className="[stroke-dasharray:1] [stroke-dashoffset:0] motion-safe:group-data-[animating=true]:animate-logs-draw-1"
 			/>
 			<path
 				d="M9 11H15"
@@ -65,7 +65,7 @@ export function AnimatedLogsIcon({ className }: AnimatedLogsIconProps) {
 				strokeWidth="1.5"
 				strokeLinecap="round"
 				strokeLinejoin="round"
-				className="[stroke-dasharray:1] [stroke-dashoffset:0] motion-safe:group-hover:animate-logs-draw-2"
+				className="[stroke-dasharray:1] [stroke-dashoffset:0] motion-safe:group-data-[animating=true]:animate-logs-draw-2"
 			/>
 			<path
 				d="M9 15H11"
@@ -74,7 +74,7 @@ export function AnimatedLogsIcon({ className }: AnimatedLogsIconProps) {
 				strokeWidth="1.5"
 				strokeLinecap="round"
 				strokeLinejoin="round"
-				className="[stroke-dasharray:1] [stroke-dashoffset:0] motion-safe:group-hover:animate-logs-draw-3"
+				className="[stroke-dasharray:1] [stroke-dashoffset:0] motion-safe:group-data-[animating=true]:animate-logs-draw-3"
 			/>
 		</svg>
 	);

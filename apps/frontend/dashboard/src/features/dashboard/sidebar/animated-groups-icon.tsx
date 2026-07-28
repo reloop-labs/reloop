@@ -41,7 +41,7 @@ export function AnimatedGroupsIcon({ className }: AnimatedGroupsIconProps) {
 				strokeWidth="1.5"
 				strokeLinecap="round"
 				strokeLinejoin="round"
-				className="[stroke-dasharray:1] [stroke-dashoffset:0] motion-safe:group-hover:animate-groups-draw-front"
+				className="[stroke-dasharray:1] [stroke-dashoffset:0] motion-safe:group-data-[animating=true]:animate-groups-draw-front"
 			/>
 			<path
 				d="M4.2 22H11.8C13.5673 22 15 20.5673 15 18.8C15 16.149 12.851 14 10.2 14H5.8C3.14903 14 1 16.149 1 18.8C1 20.5673 2.43269 22 4.2 22Z"
@@ -50,7 +50,7 @@ export function AnimatedGroupsIcon({ className }: AnimatedGroupsIconProps) {
 				strokeWidth="1.5"
 				strokeLinecap="round"
 				strokeLinejoin="round"
-				className="[stroke-dasharray:1] [stroke-dashoffset:0] motion-safe:group-hover:animate-groups-draw-back"
+				className="[stroke-dasharray:1] [stroke-dashoffset:0] motion-safe:group-data-[animating=true]:animate-groups-draw-back"
 			/>
 		</svg>
 	);

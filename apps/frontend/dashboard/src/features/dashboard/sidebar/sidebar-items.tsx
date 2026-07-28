@@ -1,5 +1,4 @@
 import { usePathname } from "next/navigation";
-import Link from "next/link";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { AnimatePresence, motion } from "framer-motion";
@@ -7,6 +6,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import { mainNavigation } from "../navigation";
 import { SidebarNavIcon } from "./sidebar-nav-icon";
+import { SidebarNavLink } from "./sidebar-nav-link";
 
 export function SidebarItems({
 	isCollapsed = false,
@@ -108,12 +108,12 @@ export function SidebarItems({
 									{section}
 								</div>
 							))}
-						<Link href={path} ref={(el) => {
+						<SidebarNavLink href={path} ref={(el) => {
 								if (el) mainNavRefs.current[index] = el;
 							}}
 							onPointerEnter={() => setHoveredEl(mainNavRefs.current[index])}
 							className={cn(
-								"group relative z-10 flex h-8 items-center rounded-lg transition-all",
+								"relative z-10 flex h-8 items-center rounded-lg transition-all",
 								isCollapsed
 									? "h-8 w-8 justify-center px-0"
 									: cn(
@@ -173,7 +173,7 @@ export function SidebarItems({
 									/>
 								</button>
 							)}
-						</Link>
+						</SidebarNavLink>
 
 						{hasSubNav && !isCollapsed && (
 							<AnimatePresence initial={false}>
@@ -197,7 +197,7 @@ export function SidebarItems({
 															? pathWithoutSlug === "/settings"
 															: pathWithoutSlug.startsWith(subPath);
 													return (
-														<Link href={subPath} key={subPath} ref={(el) => {
+														<SidebarNavLink href={subPath} key={subPath} ref={(el) => {
 																if (el) {
 																	if (!subNavRefs.current[path]) {
 																		subNavRefs.current[path] = [];
@@ -211,7 +211,7 @@ export function SidebarItems({
 																)
 															}
 															className={cn(
-																"group relative z-10 flex h-7 items-center gap-1.5 rounded-md px-2 font-medium text-[12px] transition-colors",
+																"relative z-10 flex h-7 items-center gap-1.5 rounded-md px-2 font-medium text-[12px] transition-colors",
 																isSubActive
 																	? "text-text-strong-950"
 																	: "text-text-sub-600 hover:text-text-strong-950",
@@ -223,7 +223,7 @@ export function SidebarItems({
 																className="h-3.5 w-3.5"
 															/>
 															{subLabel}
-														</Link>
+														</SidebarNavLink>
 													);
 												},
 											)}

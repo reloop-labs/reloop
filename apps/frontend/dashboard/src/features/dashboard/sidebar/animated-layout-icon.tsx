@@ -25,7 +25,7 @@ export function AnimatedLayoutIcon({ className }: AnimatedLayoutIconProps) {
 				strokeWidth="1.5"
 				strokeLinecap="round"
 				strokeLinejoin="round"
-				className="[stroke-dasharray:1] [stroke-dashoffset:0] motion-safe:group-hover:animate-layout-draw-1"
+				className="[stroke-dasharray:1] [stroke-dashoffset:0] motion-safe:group-data-[animating=true]:animate-layout-draw-1"
 			/>
 			<path
 				d="M19 2V22"
@@ -34,7 +34,7 @@ export function AnimatedLayoutIcon({ className }: AnimatedLayoutIconProps) {
 				strokeWidth="1.5"
 				strokeLinecap="round"
 				strokeLinejoin="round"
-				className="[stroke-dasharray:1] [stroke-dashoffset:0] motion-safe:group-hover:animate-layout-draw-2"
+				className="[stroke-dasharray:1] [stroke-dashoffset:0] motion-safe:group-data-[animating=true]:animate-layout-draw-2"
 			/>
 			<path
 				d="M22 19H2"
@@ -43,7 +43,7 @@ export function AnimatedLayoutIcon({ className }: AnimatedLayoutIconProps) {
 				strokeWidth="1.5"
 				strokeLinecap="round"
 				strokeLinejoin="round"
-				className="[stroke-dasharray:1] [stroke-dashoffset:0] motion-safe:group-hover:animate-layout-draw-3"
+				className="[stroke-dasharray:1] [stroke-dashoffset:0] motion-safe:group-data-[animating=true]:animate-layout-draw-3"
 			/>
 			<path
 				d="M5 22V2"
@@ -52,7 +52,7 @@ export function AnimatedLayoutIcon({ className }: AnimatedLayoutIconProps) {
 				strokeWidth="1.5"
 				strokeLinecap="round"
 				strokeLinejoin="round"
-				className="[stroke-dasharray:1] [stroke-dashoffset:0] motion-safe:group-hover:animate-layout-draw-4"
+				className="[stroke-dasharray:1] [stroke-dashoffset:0] motion-safe:group-data-[animating=true]:animate-layout-draw-4"
 			/>
 		</svg>
 	);

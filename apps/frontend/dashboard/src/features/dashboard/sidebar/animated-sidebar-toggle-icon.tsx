@@ -5,8 +5,9 @@ type AnimatedSidebarToggleIconProps = {
 };
 
 /**
- * Sidebar toggle: frame stays; left bar slides once on group hover.
- * Place inside an element with the `group` class.
+ * Sidebar toggle: frame stays; left bar slides once when the parent
+ * `group` has `data-animating` (see usePlayAnimationOnHover).
+ * Animation runs to completion even if the pointer leaves mid-play.
  */
 export function AnimatedSidebarToggleIcon({
 	className,
@@ -32,7 +33,7 @@ export function AnimatedSidebarToggleIcon({
 				width="1.5"
 				height={6}
 				rx="0.75"
-				className="motion-safe:group-hover:animate-sidebar-bar-slide"
+				className="motion-safe:group-data-[animating=true]:animate-sidebar-bar-slide"
 			/>
 		</svg>
 	);

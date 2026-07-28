@@ -33,7 +33,7 @@ export function AnimatedProfileIcon({ className }: AnimatedProfileIconProps) {
 				strokeWidth="2"
 				strokeLinecap="round"
 				strokeLinejoin="round"
-				className="[stroke-dasharray:1] [stroke-dashoffset:0] motion-safe:group-hover:animate-profile-shoulders"
+				className="[stroke-dasharray:1] [stroke-dashoffset:0] motion-safe:group-data-[animating=true]:animate-profile-shoulders"
 			/>
 		</svg>
 	);

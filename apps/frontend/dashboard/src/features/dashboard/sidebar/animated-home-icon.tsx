@@ -34,7 +34,7 @@ export function AnimatedHomeIcon({ className }: AnimatedHomeIconProps) {
 				strokeWidth="1.5"
 				strokeLinecap="round"
 				strokeLinejoin="round"
-				className="[stroke-dasharray:1] [stroke-dashoffset:0] motion-safe:group-hover:animate-door-draw-left"
+				className="[stroke-dasharray:1] [stroke-dashoffset:0] motion-safe:group-data-[animating=true]:animate-door-draw-left"
 			/>
 			<path
 				d="M9 15C9 14.0679 9 13.602 9.15224 13.2344C9.35523 12.7444 9.74458 12.355 10.2346 12.152C10.6022 11.9998 11.0681 11.9998 12 11.9998C12.9319 11.9998 13.3978 11.9998 13.7654 12.152C14.2554 12.355 14.6448 12.7444 14.8478 13.2344C15 13.602 15 14.0679 15 15"
@@ -43,7 +43,7 @@ export function AnimatedHomeIcon({ className }: AnimatedHomeIconProps) {
 				strokeWidth="1.5"
 				strokeLinecap="round"
 				strokeLinejoin="round"
-				className="[stroke-dasharray:1] [stroke-dashoffset:0] motion-safe:group-hover:animate-door-draw-top"
+				className="[stroke-dasharray:1] [stroke-dashoffset:0] motion-safe:group-data-[animating=true]:animate-door-draw-top"
 			/>
 			<path
 				d="M15 15V22"
@@ -52,7 +52,7 @@ export function AnimatedHomeIcon({ className }: AnimatedHomeIconProps) {
 				strokeWidth="1.5"
 				strokeLinecap="round"
 				strokeLinejoin="round"
-				className="[stroke-dasharray:1] [stroke-dashoffset:0] motion-safe:group-hover:animate-door-draw-right"
+				className="[stroke-dasharray:1] [stroke-dashoffset:0] motion-safe:group-data-[animating=true]:animate-door-draw-right"
 			/>
 		</svg>
 	);
