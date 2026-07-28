@@ -11,7 +11,7 @@ export function FormActions({
 	onSkip: () => void;
 }) {
 	return (
-		<div className="mt-3 flex w-full items-center gap-3">
+		<div className="sticky bottom-0 z-30 mt-6 flex w-full items-center gap-3 bg-bg-white-0/90 py-4 backdrop-blur-md dark:bg-bg-white-0/80">
 			<Button.Root
 				type="button"
 				variant="neutral"

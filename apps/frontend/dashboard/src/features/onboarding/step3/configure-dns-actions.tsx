@@ -13,7 +13,7 @@ export function ConfigureDnsActions({
 	onVerify: () => void;
 }) {
 	return (
-		<div className="mt-8 flex w-full items-center gap-3">
+		<div className="sticky bottom-0 z-30 mt-8 flex w-full items-center gap-3 bg-bg-white-0/90 py-4 backdrop-blur-md dark:bg-bg-white-0/80">
 			<Button.Root
 				variant="neutral"
 				mode="lighter"

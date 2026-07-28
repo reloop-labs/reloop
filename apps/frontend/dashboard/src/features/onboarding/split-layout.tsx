@@ -182,39 +182,27 @@ export function SplitLayout({
 
 	return (
 		<div className="relative flex h-screen max-h-screen w-full flex-col overflow-hidden bg-bg-white-0 lg:flex-row">
-			{/* Logo */}
-			<div className="absolute top-6 left-6 z-50 flex items-center space-x-2 lg:left-10">
-				<Logo className="h-9 w-9 lg:h-10 lg:w-10" />
-				<span className="-ml-3 font-semibold text-text-strong-950 text-xl">
-					Reloop
-				</span>
-			</div>
-
 			{/* Left Column: Content / Form (Scrollable) */}
 			<div
 				className={cn(
-					"relative flex h-full w-full flex-col overflow-y-auto px-6 py-20 sm:px-12 lg:px-16 xl:px-24",
-					verticalAlign === "center"
-						? "justify-center"
-						: "justify-start pt-28 pb-20",
+					"relative flex h-full w-full flex-col overflow-y-auto",
 					hasPreview
 						? "w-full border-stroke-soft-100 lg:w-1/2 lg:border-r dark:border-stroke-soft-100/40"
-						: "w-full items-center justify-center",
+						: "w-full items-center",
 				)}
 			>
-				<div
-					className={cn(
-						"w-full",
-						hasPreview
-							? "mx-auto max-w-md"
-							: maxWidth === "3xl"
-								? "mx-auto max-w-3xl"
-								: maxWidth === "4xl"
-									? "mx-auto max-w-4xl"
-									: "mx-auto max-w-2xl",
-					)}
-				>
-					<div className="mb-6 flex items-center gap-4">
+				{/* Sticky Top Bar: Logo + Step Indicator + Back Button */}
+				<div className="sticky top-0 z-40 flex w-full items-center justify-between border-stroke-soft-100/60 border-b bg-bg-white-0/90 px-6 py-4 backdrop-blur-md dark:border-stroke-soft-100/40 dark:bg-bg-white-0/80 sm:px-12 lg:px-16 xl:px-24">
+					{/* Logo */}
+					<div className="flex items-center space-x-2">
+						<Logo className="h-8 w-8 lg:h-9 lg:w-9" />
+						<span className="-ml-2.5 font-semibold text-text-strong-950 text-lg">
+							Reloop
+						</span>
+					</div>
+
+					{/* Step Indicator & Back Button */}
+					<div className="flex items-center gap-4">
 						{currentStep !== null && currentStep > 1 && (
 							<button
 								type="button"
@@ -238,7 +226,7 @@ export function SplitLayout({
 										<div
 											key={stepNum}
 											className={cn(
-												"h-1 w-10 rounded-full transition-all duration-300",
+												"h-1 w-8 rounded-full transition-all duration-300 sm:w-10",
 												isActive
 													? "bg-primary-base"
 													: "bg-stroke-soft-200 dark:bg-stroke-soft-100/40",
@@ -253,8 +241,29 @@ export function SplitLayout({
 							</span>
 						)}
 					</div>
+				</div>
 
-					<div className="flex flex-col gap-4">{children}</div>
+				{/* Main Content Area */}
+				<div
+					className={cn(
+						"flex flex-1 flex-col px-6 py-12 sm:px-12 lg:px-16 xl:px-24",
+						verticalAlign === "center" ? "justify-center" : "justify-start",
+					)}
+				>
+					<div
+						className={cn(
+							"w-full",
+							hasPreview
+								? "mx-auto max-w-md"
+								: maxWidth === "3xl"
+									? "mx-auto max-w-3xl"
+									: maxWidth === "4xl"
+										? "mx-auto max-w-4xl"
+										: "mx-auto max-w-2xl",
+						)}
+					>
+						<div className="flex flex-col gap-4">{children}</div>
+					</div>
 				</div>
 			</div>
 

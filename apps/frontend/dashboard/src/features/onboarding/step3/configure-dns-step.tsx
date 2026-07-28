@@ -40,6 +40,11 @@ export function ConfigureDnsStep() {
 	const { handleUpdateDomain } = useUpdateDomain(domainId, domainData);
 	const { isVerifying, verifyDns, skip } = useVerifyDns(domainId);
 
+	const [queryDomain] = useQueryState(
+		"domain",
+		parseAsString.withDefault(""),
+	);
+
 	useDomainConnectCallback({
 		onSuccess: () => {
 			void setStep(4);
@@ -69,15 +74,7 @@ export function ConfigureDnsStep() {
 		skip();
 	});
 
-	if (!domainId && !isLoading) {
-		return (
-			<div>
-				<p className="text-text-sub-600 outline-none">
-					Please add a domain in the previous step.
-				</p>
-			</div>
-		);
-	}
+	const displayDomainName = domainData?.domain || queryDomain;
 
 	return (
 		<div className="pb-10">
@@ -85,17 +82,14 @@ export function ConfigureDnsStep() {
 				<div className="space-y-1">
 					<div className="flex items-center gap-2">
 						<h1 className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
-							{domainData?.domain || (
-								<Skeleton className="h-8 w-48 rounded-lg" />
-							)}
+							{displayDomainName ? displayDomainName : "Configure DNS"}
 						</h1>
-						{domainData?.domain && (
+						{displayDomainName && (
 							<TwitterVerifiedIcon className="size-[18px] shrink-0 text-text-sub-600" />
 						)}
 					</div>
 					<p className="text-paragraph-md text-text-sub-600 leading-relaxed">
-						Domain added · Copy the records below and add them to your DNS
-						provider to start sending emails.
+						Copy the records below and add them to your DNS provider to start sending emails.
 					</p>
 				</div>
 				<div className="mt-6">
