@@ -4,6 +4,11 @@ import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import { useEmailStatsQuery } from "#/features/metrics/hooks/use-email-stats-query";
+import {
+	HomeCardBody,
+	HomeCardHeader,
+	HomeCardShell,
+} from "./home-card-shell";
 
 const ActivityAreaChart = lazy(() =>
 	import("./activity-area-chart").then((m) => ({
@@ -148,27 +153,29 @@ export function SendHealthCard({ enabled }: { enabled: boolean }) {
 				: "default";
 
 	return (
-		<section className="overflow-hidden rounded-2xl border border-stroke-soft-100 dark:border-stroke-soft-100/40">
-			<div className="flex items-center justify-between border-stroke-soft-100 border-b bg-bg-weak-50/30 px-5 py-3.5 dark:border-stroke-soft-100/40 dark:bg-white/[0.02]">
-				<div className="flex items-center gap-2">
-					<Icon name="fat-row" className="h-4 w-4 text-text-sub-600" />
-					<h2 className="font-medium text-label-md text-text-strong-950">
-						Send health
-					</h2>
-					<span className="rounded-full bg-bg-weak-50 px-2 py-0.5 font-medium text-label-xs text-text-sub-600 dark:bg-white/[0.06]">
-						Last 7 days
-					</span>
-				</div>
-				<Link
-					href="/metrics"
-					className="inline-flex items-center gap-1 font-medium text-paragraph-sm text-text-sub-600 transition-colors hover:text-text-strong-950"
-				>
-					View metrics
-					<Icon name="arrow-right" className="h-3.5 w-3.5" />
-				</Link>
-			</div>
-
-			<div className="bg-bg-white-0 p-5 dark:bg-transparent">
+		<HomeCardShell
+			header={
+				<HomeCardHeader>
+					<div className="flex items-center gap-2">
+						<Icon name="fat-row" className="h-4 w-4 text-text-sub-600" />
+						<h2 className="font-medium text-label-md text-text-strong-950">
+							Send health
+						</h2>
+						<span className="rounded-full bg-bg-white-0 px-2 py-0.5 font-medium text-label-xs text-text-sub-600 dark:bg-white/[0.06]">
+							Last 7 days
+						</span>
+					</div>
+					<Link
+						href="/metrics"
+						className="inline-flex items-center gap-1 font-medium text-paragraph-sm text-text-sub-600 transition-colors hover:text-text-strong-950"
+					>
+						View metrics
+						<Icon name="arrow-right" className="h-3.5 w-3.5" />
+					</Link>
+				</HomeCardHeader>
+			}
+		>
+			<HomeCardBody className="p-5">
 				{isPending ? (
 					<div className="space-y-6">
 						<div className="grid grid-cols-2 gap-6 sm:grid-cols-4">
@@ -249,8 +256,8 @@ export function SendHealthCard({ enabled }: { enabled: boolean }) {
 						</div>
 					</div>
 				)}
-			</div>
-		</section>
+			</HomeCardBody>
+		</HomeCardShell>
 	);
 }
 

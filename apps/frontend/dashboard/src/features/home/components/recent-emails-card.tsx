@@ -5,6 +5,11 @@ import * as Button from "@reloop/ui/button";
 import { Skeleton } from "@reloop/ui/skeleton";
 import { useSentEmailsQuery } from "#/features/emails/hooks/use-emails-query";
 import { formatRelativeTime } from "#/utils/format-relative-time";
+import {
+	HomeCardBody,
+	HomeCardHeader,
+	HomeCardShell,
+} from "./home-card-shell";
 import { SendFirstEmailButton } from "./send-first-email-button";
 
 const getEmailIcon = (status: string) => {
@@ -73,24 +78,27 @@ export function RecentEmailsCard({
 	const hasEmails = emails.length > 0;
 
 	return (
-		<section className="flex h-full flex-col overflow-hidden rounded-2xl border border-stroke-soft-100 dark:border-stroke-soft-100/40">
-			<div className="flex items-center justify-between border-stroke-soft-100 border-b bg-bg-weak-50/30 px-5 py-3.5 dark:border-stroke-soft-100/40 dark:bg-white/[0.02]">
-				<div className="flex items-center gap-2">
-					<Icon name="mail-single" className="h-4 w-4 text-text-sub-600" />
-					<h2 className="font-medium text-label-md text-text-strong-950">
-						Recent emails
-					</h2>
-				</div>
-				<Link
-					href="/emails"
-					className="inline-flex items-center gap-1 font-medium text-paragraph-sm text-text-sub-600 transition-colors hover:text-text-strong-950"
-				>
-					View all
-					<Icon name="arrow-right" className="h-3.5 w-3.5" />
-				</Link>
-			</div>
-
-			<div className="min-h-[280px] flex-1 bg-bg-white-0 dark:bg-transparent">
+		<HomeCardShell
+			className="h-full"
+			header={
+				<HomeCardHeader>
+					<div className="flex items-center gap-2">
+						<Icon name="mail-single" className="h-4 w-4 text-text-sub-600" />
+						<h2 className="font-medium text-label-md text-text-strong-950">
+							Recent emails
+						</h2>
+					</div>
+					<Link
+						href="/emails"
+						className="inline-flex items-center gap-1 font-medium text-paragraph-sm text-text-sub-600 transition-colors hover:text-text-strong-950"
+					>
+						View all
+						<Icon name="arrow-right" className="h-3.5 w-3.5" />
+					</Link>
+				</HomeCardHeader>
+			}
+		>
+			<HomeCardBody className="min-h-[280px]">
 				{isPending ? (
 					<div className="space-y-0 px-5 py-2">
 						{Array.from({ length: 6 }).map((_, i) => (
@@ -173,7 +181,7 @@ export function RecentEmailsCard({
 						)}
 					</div>
 				)}
-			</div>
-		</section>
+			</HomeCardBody>
+		</HomeCardShell>
 	);
 }

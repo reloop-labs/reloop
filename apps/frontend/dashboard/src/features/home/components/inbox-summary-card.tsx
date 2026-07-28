@@ -3,6 +3,11 @@ import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import { useMailboxesQuery } from "#/features/emails/hooks/use-emails-query";
+import {
+	HomeCardBody,
+	HomeCardHeader,
+	HomeCardShell,
+} from "./home-card-shell";
 
 export function InboxSummaryCard({ enabled }: { enabled: boolean }) {
 	const { data, isPending } = useMailboxesQuery(enabled);
@@ -10,27 +15,30 @@ export function InboxSummaryCard({ enabled }: { enabled: boolean }) {
 	const count = mailboxes.length;
 
 	return (
-		<section className="flex h-full flex-col overflow-hidden rounded-2xl border border-stroke-soft-100 dark:border-stroke-soft-100/40">
-			<div className="flex items-center justify-between border-stroke-soft-100 border-b bg-bg-weak-50/30 px-5 py-3.5 dark:border-stroke-soft-100/40 dark:bg-white/[0.02]">
-				<div className="flex items-center gap-2">
-					<Icon name="inbox" className="h-4 w-4 text-text-sub-600" />
-					<h2 className="font-medium text-label-md text-text-strong-950">
-						Agent inboxes
-					</h2>
-					<span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-bg-weak-50 px-1.5 font-medium text-label-xs text-text-sub-600 dark:bg-white/[0.06]">
-						{count}
-					</span>
-				</div>
-				<Link
-					href="/agent-inbox"
-					className="inline-flex items-center gap-1 font-medium text-paragraph-sm text-text-sub-600 transition-colors hover:text-text-strong-950"
-				>
-					Open
-					<Icon name="arrow-right" className="h-3.5 w-3.5" />
-				</Link>
-			</div>
-
-			<div className="min-h-[220px] flex-1 bg-bg-white-0 dark:bg-transparent">
+		<HomeCardShell
+			className="h-full"
+			header={
+				<HomeCardHeader>
+					<div className="flex items-center gap-2">
+						<Icon name="inbox" className="h-4 w-4 text-text-sub-600" />
+						<h2 className="font-medium text-label-md text-text-strong-950">
+							Agent inboxes
+						</h2>
+						<span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-bg-white-0 px-1.5 font-medium text-label-xs text-text-sub-600 dark:bg-white/[0.06]">
+							{count}
+						</span>
+					</div>
+					<Link
+						href="/agent-inbox"
+						className="inline-flex items-center gap-1 font-medium text-paragraph-sm text-text-sub-600 transition-colors hover:text-text-strong-950"
+					>
+						Open
+						<Icon name="arrow-right" className="h-3.5 w-3.5" />
+					</Link>
+				</HomeCardHeader>
+			}
+		>
+			<HomeCardBody className="min-h-[220px]">
 				{isPending ? (
 					<div className="space-y-0 px-5 py-2">
 						{Array.from({ length: 4 }).map((_, i) => (
@@ -88,7 +96,7 @@ export function InboxSummaryCard({ enabled }: { enabled: boolean }) {
 						</Button.Root>
 					</div>
 				)}
-			</div>
-		</section>
+			</HomeCardBody>
+		</HomeCardShell>
 	);
 }

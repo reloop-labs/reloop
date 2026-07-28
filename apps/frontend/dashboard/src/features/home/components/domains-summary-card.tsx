@@ -11,6 +11,11 @@ import {
 } from "#/features/domain/utils";
 import type { DomainStatus } from "#/features/domain/types";
 import { useDomainsQuery } from "#/features/domain/hooks/use-domains-query";
+import {
+	HomeCardBody,
+	HomeCardHeader,
+	HomeCardShell,
+} from "./home-card-shell";
 
 function statusBadgeStatus(
 	status: DomainStatus,
@@ -42,36 +47,39 @@ export function DomainsSummaryCard({ enabled }: { enabled: boolean }) {
 	const total = data?.total ?? 0;
 
 	return (
-		<section className="flex h-full flex-col overflow-hidden rounded-2xl border border-stroke-soft-100 dark:border-stroke-soft-100/40">
-			<div className="flex items-center justify-between border-stroke-soft-100 border-b bg-bg-weak-50/30 px-5 py-3.5 dark:border-stroke-soft-100/40 dark:bg-white/[0.02]">
-				<div className="flex items-center gap-2">
-					<Icon name="globe" className="h-4 w-4 text-text-sub-600" />
-					<h2 className="font-medium text-label-md text-text-strong-950">
-						Domains
-					</h2>
-					<span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-bg-weak-50 px-1.5 font-medium text-label-xs text-text-sub-600 dark:bg-white/[0.06]">
-						{total}
-					</span>
-				</div>
-				<div className="flex items-center gap-2">
-					<Link
-						href="/domain/add"
-						className="inline-flex h-7 w-7 items-center justify-center rounded-lg border border-stroke-soft-100 text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-stroke-soft-100/40"
-						aria-label="Add domain"
-					>
-						<Icon name="plus" className="h-3.5 w-3.5" />
-					</Link>
-					<Link
-						href="/domain"
-						className="inline-flex items-center gap-1 font-medium text-paragraph-sm text-text-sub-600 transition-colors hover:text-text-strong-950"
-					>
-						View all
-						<Icon name="arrow-right" className="h-3.5 w-3.5" />
-					</Link>
-				</div>
-			</div>
-
-			<div className="min-h-[220px] flex-1 bg-bg-white-0 dark:bg-transparent">
+		<HomeCardShell
+			className="h-full"
+			header={
+				<HomeCardHeader>
+					<div className="flex items-center gap-2">
+						<Icon name="globe" className="h-4 w-4 text-text-sub-600" />
+						<h2 className="font-medium text-label-md text-text-strong-950">
+							Domains
+						</h2>
+						<span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-bg-white-0 px-1.5 font-medium text-label-xs text-text-sub-600 dark:bg-white/[0.06]">
+							{total}
+						</span>
+					</div>
+					<div className="flex items-center gap-2">
+						<Link
+							href="/domain/add"
+							className="inline-flex h-7 w-7 items-center justify-center rounded-lg border border-stroke-soft-200 bg-bg-white-0 text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-stroke-soft-100/40"
+							aria-label="Add domain"
+						>
+							<Icon name="plus" className="h-3.5 w-3.5" />
+						</Link>
+						<Link
+							href="/domain"
+							className="inline-flex items-center gap-1 font-medium text-paragraph-sm text-text-sub-600 transition-colors hover:text-text-strong-950"
+						>
+							View all
+							<Icon name="arrow-right" className="h-3.5 w-3.5" />
+						</Link>
+					</div>
+				</HomeCardHeader>
+			}
+		>
+			<HomeCardBody className="min-h-[220px]">
 				{isPending ? (
 					<div className="space-y-0 px-5 py-2">
 						{Array.from({ length: 4 }).map((_, i) => (
@@ -138,7 +146,7 @@ export function DomainsSummaryCard({ enabled }: { enabled: boolean }) {
 						</Button.Root>
 					</div>
 				)}
-			</div>
-		</section>
+			</HomeCardBody>
+		</HomeCardShell>
 	);
 }
