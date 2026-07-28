@@ -1,6 +1,5 @@
-import { resolveMx } from "node:dns";
-import { promisify } from "node:util";
 import { isLocal } from "./is-local";
+import { resolver } from "./dns-resolver";
 
 /** Normalize stored FQDN / name for DNS lookup (apex may be stored as `@`). */
 export function normalizeMxLookupName(name: string): string {
@@ -27,10 +26,8 @@ export async function verifyMxRecord(
 	}
 	if (isLocal(lookupName)) return true;
 	try {
-		const resolveMxPromise = promisify(resolveMx);
-
 		const records = await Promise.race([
-			resolveMxPromise(lookupName),
+			resolver.resolveMx(lookupName),
 			new Promise<never>((_, reject) =>
 				setTimeout(() => reject(new Error("DNS query timeout")), 10000),
 			),

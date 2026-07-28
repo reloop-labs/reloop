@@ -1,6 +1,5 @@
-import { resolveTxt } from "node:dns";
-import { promisify } from "node:util";
 import { isLocal } from "./is-local";
+import { resolver } from "./dns-resolver";
 
 export async function verifySpfRecord(
 	name: string,
@@ -8,10 +7,8 @@ export async function verifySpfRecord(
 ): Promise<boolean> {
 	if (isLocal(name)) return true;
 	try {
-		const resolveTxtPromise = promisify(resolveTxt);
-
 		const records = await Promise.race([
-			resolveTxtPromise(name),
+			resolver.resolveTxt(name),
 			new Promise<never>((_, reject) =>
 				setTimeout(() => reject(new Error("DNS query timeout")), 10000),
 			),

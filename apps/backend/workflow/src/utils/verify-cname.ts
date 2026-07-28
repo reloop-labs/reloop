@@ -1,6 +1,5 @@
-import { resolve4, resolve6, resolveCname } from "node:dns";
-import { promisify } from "node:util";
 import { isLocal } from "./is-local";
+import { resolver } from "./dns-resolver";
 
 export async function verifyCnameRecord(
 	name: string,
@@ -13,7 +12,6 @@ export async function verifyCnameRecord(
 
 	// 1. Try resolving CNAME records directly (following the chain if needed)
 	try {
-		const resolveCnamePromise = promisify(resolveCname);
 		let currentName = cleanName;
 		const visited = new Set<string>();
 
@@ -25,7 +23,7 @@ export async function verifyCnameRecord(
 			visited.add(currentCleanName);
 
 			const records = await Promise.race([
-				resolveCnamePromise(currentCleanName),
+				resolver.resolveCname(currentCleanName),
 				new Promise<string[]>((_, reject) =>
 					setTimeout(() => reject(new Error("DNS query timeout")), 10000),
 				),
@@ -66,14 +64,11 @@ export async function verifyCnameRecord(
 
 	// 2. Fallback: Compare resolved IP addresses (handles CNAME flattening, e.g. Cloudflare)
 	try {
-		const resolve4Promise = promisify(resolve4);
-		const resolve6Promise = promisify(resolve6);
-
 		const resolveIps = async (hostname: string): Promise<string[]> => {
 			const ips: string[] = [];
 			try {
 				const ipv4s = await Promise.race([
-					resolve4Promise(hostname),
+					resolver.resolve4(hostname),
 					new Promise<string[]>((_, reject) =>
 						setTimeout(() => reject(new Error("DNS query timeout")), 5000),
 					),
@@ -84,7 +79,7 @@ export async function verifyCnameRecord(
 			}
 			try {
 				const ipv6s = await Promise.race([
-					resolve6Promise(hostname),
+					resolver.resolve6(hostname),
 					new Promise<string[]>((_, reject) =>
 						setTimeout(() => reject(new Error("DNS query timeout")), 5000),
 					),
