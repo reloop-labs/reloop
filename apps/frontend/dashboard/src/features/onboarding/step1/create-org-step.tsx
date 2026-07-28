@@ -93,7 +93,7 @@ export function CreateOrgStep() {
 						) : orgId ? (
 							<span>Continue</span>
 						) : (
-							<span>Create workspace</span>
+							<span>Create organization</span>
 						)}
 					</motion.span>
 				</AnimatePresence>

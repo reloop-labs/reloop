@@ -96,44 +96,46 @@ export const DomainInputField = ({
 						Domain Recommendations:
 					</div>
 					<div className="space-y-1.5">
-						<div className="flex items-center gap-2 text-text-sub-600 text-xs">
+						<div className="flex items-start gap-2 text-text-sub-600 text-xs">
 							<Icon
 								name="check-circle"
 								className={
 									criteria.isSubdomain
-										? "h-4 w-4 text-green-500"
-										: "h-4 w-4 text-text-soft-400"
+										? "mt-0.5 h-3.5 w-3.5 shrink-0 text-green-500"
+										: "mt-0.5 h-3.5 w-3.5 shrink-0 text-text-soft-400"
 								}
 							/>
-							Use a subdomain
-							{!criteria.isSubdomain && (
-								<>
-									{" "}
-									(e.g., mail.{rootDomain}, send.{rootDomain}, m.{rootDomain})
-								</>
-							)}
+							<span>
+								Use a subdomain
+								{!criteria.isSubdomain && (
+									<>
+										{" "}
+										(e.g., mail.{rootDomain}, send.{rootDomain}, m.{rootDomain})
+									</>
+								)}
+							</span>
 						</div>
-						<div className="flex items-center gap-2 text-text-sub-600 text-xs">
+						<div className="flex items-start gap-2 text-text-sub-600 text-xs">
 							<Icon
 								name="check-circle"
 								className={
 									criteria.isNotRoot
-										? "h-4 w-4 text-green-500"
-										: "h-4 w-4 text-text-soft-400"
+										? "mt-0.5 h-3.5 w-3.5 shrink-0 text-green-500"
+										: "mt-0.5 h-3.5 w-3.5 shrink-0 text-text-soft-400"
 								}
 							/>
-							Avoid using your root domain
+							<span>Avoid using your root domain</span>
 						</div>
-						<div className="flex items-center gap-2 text-text-sub-600 text-xs">
+						<div className="flex items-start gap-2 text-text-sub-600 text-xs">
 							<Icon
 								name="check-circle"
 								className={
 									criteria.isValid
-										? "h-4 w-4 text-green-500"
-										: "h-4 w-4 text-text-soft-400"
+										? "mt-0.5 h-3.5 w-3.5 shrink-0 text-green-500"
+										: "mt-0.5 h-3.5 w-3.5 shrink-0 text-text-soft-400"
 								}
 							/>
-							Valid domain format
+							<span>Valid domain format</span>
 						</div>
 					</div>
 				</div>
