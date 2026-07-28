@@ -33,7 +33,7 @@ export function DomainPreview({
 				className={
 					isDomainVariant
 						? "w-[920px] transform overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 transition-all dark:border-stroke-soft-100/40"
-						: "relative flex h-[520px] w-full max-w-[600px] flex-col overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40"
+						: "relative flex h-[520px] w-full max-w-[600px] scale-110 translate-x-32 translate-y-16 flex-col overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40"
 				}
 				style={isDomainVariant ? { maxHeight: "calc(100% + 16px)" } : undefined}
 			>

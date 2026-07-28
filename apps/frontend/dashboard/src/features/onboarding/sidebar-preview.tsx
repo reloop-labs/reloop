@@ -14,8 +14,8 @@ export function SidebarPreview({ name, logo }: SidebarPreviewProps) {
 	const skeletonBg = "bg-bg-weak-50 dark:bg-bg-soft-200/30";
 
 	return (
-		<div className="flex items-center justify-center w-full p-2">
-			<div className="relative flex h-[460px] sm:h-[480px] w-full max-w-[640px] flex-col overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40">
+		<div className="flex w-full items-center justify-center p-2">
+			<div className="relative flex h-[460px] w-full max-w-[640px] translate-x-32 translate-y-16 scale-110 flex-col overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 sm:h-[480px] dark:border-stroke-soft-100/40">
 				{/* Top Window Bar */}
 				<div className="flex shrink-0 items-center gap-2 border-stroke-soft-100 border-b bg-bg-white-0 px-4 py-2.5 dark:border-stroke-soft-100/40">
 					<div className="flex gap-1.5">
@@ -42,7 +42,7 @@ export function SidebarPreview({ name, logo }: SidebarPreviewProps) {
 									Reloop
 								</span>
 								<span
-									className={`rounded ${skeletonBg} px-1.5 py-0.5 font-mono font-medium text-[9px] leading-none text-text-soft-400`}
+									className={`rounded ${skeletonBg} px-1.5 py-0.5 font-medium font-mono text-[9px] text-text-soft-400 leading-none`}
 								>
 									BETA
 								</span>
