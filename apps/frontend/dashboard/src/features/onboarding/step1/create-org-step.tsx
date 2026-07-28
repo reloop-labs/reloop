@@ -34,9 +34,14 @@ export function CreateOrgStep() {
 
 	return (
 		<div>
-			<h1 className="mb-4 font-semibold text-[26px] text-text-strong-950 tracking-tight">
-				Create your organization
-			</h1>
+			<div className="mb-6 space-y-1">
+				<h1 className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
+					Let's setup your organization
+				</h1>
+				<p className="text-paragraph-sm text-text-sub-600 leading-relaxed">
+					Enter your organization details to start sending emails
+				</p>
+			</div>
 			<LogoUpload
 				fileInputRef={fileInputRef}
 				isUploading={isUploading}

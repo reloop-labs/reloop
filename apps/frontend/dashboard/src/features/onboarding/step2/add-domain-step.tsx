@@ -14,7 +14,7 @@ export function AddDomainStep() {
 		parseAsString.withDefault(""),
 	);
 
-	const { register, handleSubmit, formState, setError, watch, control } =
+	const { register, handleSubmit, formState, setError, watch } =
 		useForm<DomainFormValues>({
 			resolver: valibotResolver(domainSchema) as Resolver<DomainFormValues>,
 			mode: "onChange",
@@ -56,9 +56,14 @@ export function AddDomainStep() {
 
 	return (
 		<div className="space-y-6">
-			<h1 className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
-				Add Domain
-			</h1>
+			<div className="space-y-1">
+				<h1 className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
+					Add Domain
+				</h1>
+				<p className="text-paragraph-sm text-text-sub-600 leading-relaxed">
+					Enter the domain name you want to send and receive emails from.
+				</p>
+			</div>
 			<form
 				onSubmit={handleSubmit(submitDomain)}
 				className="flex w-full flex-col gap-6"
