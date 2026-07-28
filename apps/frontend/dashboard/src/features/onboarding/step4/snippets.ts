@@ -43,7 +43,7 @@ export function getSendEmailCode(
 const reloop = new Reloop({ apiKey: process.env.RELOOP_API_KEY! });
 
 const { response, emailError } = await reloop.mail.send({
-  from: "onboarding@reloop.email",
+  from: "Reloop <onboarding@reloop.email>",
   to: "${to}",
   subject: "Hello World!",
   text: "Congrats on sending your first email!",
@@ -60,7 +60,7 @@ from reloop_email import Reloop
 reloop = Reloop(api_key=os.environ["RELOOP_API_KEY"])
 
 result = reloop.mail.send({
-    "from": "onboarding@reloop.email",
+    "from": "Reloop <onboarding@reloop.email>",
     "to": "${to}",
     "subject": "Hello World!",
     "text": "Congrats on sending your first email!",
@@ -91,7 +91,7 @@ func main() {
   }
 
   result, err := client.Mail.Send(reloop.SendMailParams{
-    From:    "onboarding@reloop.email",
+    From:    "Reloop <onboarding@reloop.email>",
     To:      "${to}",
     Subject: "Hello World!",
     Text:    reloop.String("Congrats on sending your first email!"),
@@ -108,7 +108,7 @@ func main() {
 			code: `$reloop = Reloop::client(getenv('RELOOP_API_KEY'));
 
 $result = $reloop->mail->send([
-  'from' => 'onboarding@reloop.email',
+  'from' => 'Reloop <onboarding@reloop.email>',
   'to' => '${to}',
   'subject' => 'Hello World!',
   'text' => 'Congrats on sending your first email!',
@@ -133,7 +133,7 @@ My API key: ${apiKey}
 Requirements:
 1. Detect this project's language/framework and install the correct Reloop SDK
 2. Add RELOOP_API_KEY=${apiKey} to my .env file
-3. Send a transactional email from onboarding@reloop.email to ${to} with subject "Hello World!" and plain-text body "Congrats on sending your first email!"
+3. Send a transactional email from Reloop <onboarding@reloop.email> to ${to} with subject "Hello World!" and plain-text body "Congrats on sending your first email!"
 4. Follow this project's existing conventions and handle errors properly
 
 Supported SDKs:

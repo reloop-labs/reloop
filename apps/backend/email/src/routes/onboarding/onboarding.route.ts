@@ -98,8 +98,9 @@ export const onboardingRoute = new Elysia({
 				};
 			}
 
-			// Plain address — matches onboarding SDK snippets (onboarding@…).
-			const from = `${ONBOARDING_TEST_LOCAL_PART}@${onboardingTestDomain}`;
+			// Display name + address — matches product expectation:
+			// Reloop <onboarding@{ONBOARDING_TEST_DOMAIN}>
+			const from = `Reloop <${ONBOARDING_TEST_LOCAL_PART}@${onboardingTestDomain}>`;
 			try {
 				// Platform RELOOP_API_KEY owns ONBOARDING_TEST_DOMAIN; the user's
 				// key was validated above so the button still proves their key works.
@@ -108,6 +109,7 @@ export const onboardingRoute = new Elysia({
 					to,
 					subject: ONBOARDING_TEST_SUBJECT,
 					text: ONBOARDING_TEST_TEXT,
+					html: ONBOARDING_TEST_TEXT,
 				});
 
 				return {
