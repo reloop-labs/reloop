@@ -26,7 +26,7 @@ export function DomainPreview({
 			className={
 				isDomainVariant
 					? "absolute top-[176px] left-4"
-					: "absolute top-32 left-28"
+					: "flex items-center justify-center"
 			}
 		>
 			<div
@@ -35,9 +35,7 @@ export function DomainPreview({
 						? "w-[920px] transform overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 transition-all dark:border-stroke-soft-100/40"
 						: "relative flex h-[520px] w-[480px] flex-col overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 shadow-2xl dark:border-stroke-soft-100/40"
 				}
-				style={
-					isDomainVariant ? { maxHeight: "calc(100% + 16px)" } : undefined
-				}
+				style={isDomainVariant ? { maxHeight: "calc(100% + 16px)" } : undefined}
 			>
 				<div className="flex items-center gap-2 border-stroke-soft-100 border-b px-4 py-3 dark:border-stroke-soft-100/40">
 					<div className="flex gap-1.5">

@@ -71,7 +71,6 @@ export function SplitLayout({
 	children,
 	previewContent,
 	fullWidth = false,
-	previewSize = "medium",
 	maxWidth = "5xl",
 	onBack: onBackCleanup,
 	backStep,
@@ -188,171 +187,154 @@ export function SplitLayout({
 		}),
 	};
 
+	const hasPreview = !fullWidth && Boolean(previewContent);
+
 	return (
-		<div className="flex min-h-screen w-full flex-col items-center">
+		<div className="relative flex min-h-screen w-full flex-col lg:flex-row bg-bg-white-0 overflow-hidden">
+			{/* Logo */}
+			<div className="absolute top-6 left-6 lg:left-10 z-50 flex items-center space-x-2">
+				<Logo className="h-9 w-9 lg:h-10 lg:w-10" />
+				<span className="-ml-3 font-semibold text-text-strong-950 text-xl">
+					Reloop
+				</span>
+			</div>
+
+			{/* Left Column: Content / Form */}
 			<div
-				className="relative flex min-h-screen w-full flex-col border-stroke-soft-100 border-r border-l dark:border-stroke-soft-100/40"
-				style={{
-					maxWidth:
-						maxWidth === "3xl"
-							? "48rem"
-							: maxWidth === "4xl"
-								? "56rem"
-								: "64rem",
-					transition: "max-width 0.28s cubic-bezier(0.23, 1, 0.32, 1)",
-				}}
+				className={cn(
+					"relative flex min-h-screen flex-col px-6 py-20 sm:px-12 lg:px-16 xl:px-24",
+					verticalAlign === "center"
+						? "justify-center"
+						: "justify-start pt-28 pb-20",
+					hasPreview
+						? "w-full lg:w-1/2 border-stroke-soft-100 lg:border-r dark:border-stroke-soft-100/40"
+						: "w-full items-center justify-center",
+				)}
 			>
-				<div className="-translate-x-1/2 absolute top-5 left-1/2 z-50 flex items-center space-x-2">
-					<Logo className="h-10 w-10 lg:h-11 lg:w-11" />
-					<span className="-ml-3 font-semibold text-text-strong-950 text-xl">
-						Reloop
-					</span>
-				</div>
 				<div
 					className={cn(
-						"flex w-full flex-1 flex-col",
-						verticalAlign === "center"
-							? "justify-center"
-							: "justify-start pt-24 pb-20",
+						"w-full",
+						hasPreview
+							? "mx-auto max-w-md"
+							: maxWidth === "3xl"
+								? "mx-auto max-w-3xl"
+								: maxWidth === "4xl"
+									? "mx-auto max-w-4xl"
+									: "mx-auto max-w-2xl",
 					)}
 				>
-					<div className="w-full border-stroke-soft-100 border-t border-b dark:border-stroke-soft-100/40">
-						<div
-							className="mx-auto grid w-full"
-							style={{
-								gridTemplateColumns: fullWidth
-									? "1fr 0px"
-									: previewSize === "small"
-										? "1.2fr 0.8fr"
-										: "1fr 1fr",
-								transition:
-									"grid-template-columns 0.28s cubic-bezier(0.23, 1, 0.32, 1)",
-							}}
-						>
-							<div className="flex flex-col gap-4 px-12 pt-10 pb-10">
-								<motion.button
-									type="button"
-									onClick={onBack}
-									disabled={!onBack}
-									onHoverStart={() => onBack && setHovered(true)}
-									onHoverEnd={() => setHovered(false)}
-									className={cn("group text-left", onBack && "cursor-pointer")}
-								>
-									<div className="flex items-center font-medium text-text-soft-400 text-xs transition-colors group-hover:text-text-strong-950">
-										<AnimatePresence>
-											{onBack && (
-												<motion.span
-													initial={{ opacity: 0, width: 0 }}
-													animate={{ opacity: 1, width: "auto" }}
-													exit={{ opacity: 0, width: 0 }}
-													transition={transition}
-													className="mb-px flex items-center overflow-hidden"
-												>
-													<div className="relative flex h-3.5 w-3.5 items-center">
-														<motion.div
-															className="-translate-y-1/2 absolute top-1/2 left-[1.5px] h-[1.5px] rounded-full bg-current"
-															initial={{ width: 0, opacity: 0 }}
-															animate={{
-																width: hovered ? 10 : 0,
-																opacity: hovered ? 1 : 0,
-															}}
-															transition={transition}
-														/>
-														<svg
-															width={6}
-															height={10}
-															viewBox="0 0 6 10"
-															fill="none"
-															className="absolute left-0"
-															aria-hidden="true"
-														>
-															<path
-																d="M5 1L1.5 5L5 9"
-																stroke="currentColor"
-																strokeWidth={1.5}
-																strokeLinecap="round"
-																strokeLinejoin="round"
-															/>
-														</svg>
-													</div>
-												</motion.span>
-											)}
-										</AnimatePresence>
-										{currentStep !== null && totalSteps !== null ? (
-											<span className="mr-2 ml-px inline-flex items-center gap-1">
-												Step
-												<NumberFlow
-													value={currentStep}
-													className="tabular-nums"
-													transformTiming={{
-														duration: shouldSkipMotion ? 0 : 400,
-														easing: "ease-out",
-													}}
-												/>
-												of
-												<NumberFlow
-													value={totalSteps}
-													className="tabular-nums"
-													transformTiming={{
-														duration: shouldSkipMotion ? 0 : 400,
-														easing: "ease-out",
-													}}
-												/>
-											</span>
-										) : (
-											stepIndicator
-										)}
-										{onBack && <KbdEsc />}
-									</div>
-								</motion.button>
-
-								<AnimatedHeight skipAnimation={shouldSkipMotion}>
-									<AnimatePresence
-										mode="wait"
-										initial={true}
-										custom={direction}
+					<motion.button
+						type="button"
+						onClick={onBack}
+						disabled={!onBack}
+						onHoverStart={() => onBack && setHovered(true)}
+						onHoverEnd={() => setHovered(false)}
+						className={cn("group text-left mb-6", onBack && "cursor-pointer")}
+					>
+						<div className="flex items-center font-medium text-text-soft-400 text-xs transition-colors group-hover:text-text-strong-950">
+							<AnimatePresence>
+								{onBack && (
+									<motion.span
+										initial={{ opacity: 0, width: 0 }}
+										animate={{ opacity: 1, width: "auto" }}
+										exit={{ opacity: 0, width: 0 }}
+										transition={transition}
+										className="mb-px flex items-center overflow-hidden"
 									>
-										<motion.div
-											key={step}
-											custom={direction}
-											variants={contentVariants}
-											initial="initial"
-											animate="animate"
-											exit="exit"
-											className="flex flex-col gap-4"
-										>
-											{children}
-										</motion.div>
-									</AnimatePresence>
-								</AnimatedHeight>
-							</div>
-
-							<div
-								className="relative hidden overflow-hidden border-stroke-soft-100 border-l lg:flex dark:border-stroke-soft-100/40"
-								style={{
-									opacity: fullWidth || !previewContent ? 0 : 1,
-									pointerEvents: fullWidth || !previewContent ? "none" : "auto",
-									transition: "opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
-								}}
-							>
-								<AnimatePresence mode="wait" initial={true} custom={direction}>
-									<motion.div
-										key={step}
-										custom={direction}
-										variants={previewVariants}
-										initial="initial"
-										animate="animate"
-										exit="exit"
-										className="relative z-10 w-full"
-									>
-										{previewContent}
-									</motion.div>
-								</AnimatePresence>
-							</div>
+										<div className="relative flex h-3.5 w-3.5 items-center">
+											<motion.div
+												className="-translate-y-1/2 absolute top-1/2 left-[1.5px] h-[1.5px] rounded-full bg-current"
+												initial={{ width: 0, opacity: 0 }}
+												animate={{
+													width: hovered ? 10 : 0,
+													opacity: hovered ? 1 : 0,
+												}}
+												transition={transition}
+											/>
+											<svg
+												width={6}
+												height={10}
+												viewBox="0 0 6 10"
+												fill="none"
+												className="absolute left-0"
+												aria-hidden="true"
+											>
+												<path
+													d="M5 1L1.5 5L5 9"
+													stroke="currentColor"
+													strokeWidth={1.5}
+													strokeLinecap="round"
+													strokeLinejoin="round"
+												/>
+											</svg>
+										</div>
+									</motion.span>
+								)}
+							</AnimatePresence>
+							{currentStep !== null && totalSteps !== null ? (
+								<span className="mr-2 ml-px inline-flex items-center gap-1">
+									Step
+									<NumberFlow
+										value={currentStep}
+										className="tabular-nums"
+										transformTiming={{
+											duration: shouldSkipMotion ? 0 : 400,
+											easing: "ease-out",
+										}}
+									/>
+									of
+									<NumberFlow
+										value={totalSteps}
+										className="tabular-nums"
+										transformTiming={{
+											duration: shouldSkipMotion ? 0 : 400,
+											easing: "ease-out",
+										}}
+									/>
+								</span>
+							) : (
+								stepIndicator
+							)}
+							{onBack && <KbdEsc />}
 						</div>
-					</div>
+					</motion.button>
+
+					<AnimatedHeight skipAnimation={shouldSkipMotion}>
+						<AnimatePresence mode="wait" initial={true} custom={direction}>
+							<motion.div
+								key={step}
+								custom={direction}
+								variants={contentVariants}
+								initial="initial"
+								animate="animate"
+								exit="exit"
+								className="flex flex-col gap-4"
+							>
+								{children}
+							</motion.div>
+						</AnimatePresence>
+					</AnimatedHeight>
 				</div>
 			</div>
+
+			{/* Right Column: Animation / Preview */}
+			{hasPreview && (
+				<div className="relative hidden min-h-screen items-center justify-center overflow-hidden bg-bg-weak-50/40 p-8 lg:flex lg:w-1/2 dark:bg-bg-weak-50/10">
+					<AnimatePresence mode="wait" initial={true} custom={direction}>
+						<motion.div
+							key={step}
+							custom={direction}
+							variants={previewVariants}
+							initial="initial"
+							animate="animate"
+							exit="exit"
+							className="relative z-10 flex h-full w-full items-center justify-center"
+						>
+							{previewContent}
+						</motion.div>
+					</AnimatePresence>
+				</div>
+			)}
 		</div>
 	);
 }

@@ -59,7 +59,7 @@ export function LogoUpload({
 				)}
 			</FileUpload.Root>
 			<div>
-				<Label.Root htmlFor="company-name">Workspace logo</Label.Root>
+				<Label.Root htmlFor="company-name">Organization logo</Label.Root>
 				<p className="-mt-0.5 pb-2 text-paragraph-xs text-text-sub-600">
 					Recommended size 1:1, up to 10MB.
 				</p>

@@ -1,8 +1,7 @@
-import { useRouter } from "next/navigation";
 import { authClient } from "@reloop/auth/client";
 import { useQueryClient } from "@tanstack/react-query";
-
 import axios from "axios";
+import { useRouter } from "next/navigation";
 import { parseAsString, useQueryState } from "nuqs";
 import { useCallback, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -15,7 +14,8 @@ const languageCodes: LanguageCode[] = ["nodejs", "python", "go", "php"];
 
 function parseChoice(value: string): IntegrationChoice {
 	if (value === "ai") return "ai";
-	if (languageCodes.includes(value as LanguageCode)) return value as LanguageCode;
+	if (languageCodes.includes(value as LanguageCode))
+		return value as LanguageCode;
 	return "ai";
 }
 
@@ -98,7 +98,7 @@ export function useGenerateApiKey() {
 
 			if (!organizations?.length) {
 				toast.error(
-					"Your workspace is still setting up. Please try again in a moment.",
+					"Your organization is still setting up. Please try again in a moment.",
 				);
 				finishingRef.current = false;
 				setFinishing(false);

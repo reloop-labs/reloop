@@ -35,7 +35,7 @@ export function CreateOrgStep() {
 	return (
 		<div>
 			<h1 className="mb-4 font-semibold text-[26px] text-text-strong-950 tracking-tight">
-				Create your workspace
+				Create your organization
 			</h1>
 			<LogoUpload
 				fileInputRef={fileInputRef}
@@ -88,7 +88,7 @@ export function CreateOrgStep() {
 						) : orgId ? (
 							<span>Continue</span>
 						) : (
-							<span>Create workspace</span>
+							<span>Create organization</span>
 						)}
 					</motion.span>
 				</AnimatePresence>
