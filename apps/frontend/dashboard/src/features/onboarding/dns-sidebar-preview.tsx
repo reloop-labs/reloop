@@ -42,9 +42,9 @@ export function DnsSidebarPreview({ domain }: DnsSidebarPreviewProps) {
 									<div className={`h-2.5 w-16 rounded ${skeletonBg}`} />
 								</div>
 								{/* Active DNS Settings Navigation Item */}
-								<div className="flex items-center gap-2 rounded-lg bg-bg-weak-50 px-1.5 py-1 text-text-strong-950 dark:bg-bg-soft-200/40">
-									<Icon name="shield-check" className="h-3 w-3 shrink-0 text-primary-base" />
-									<div className="font-medium text-xs">DNS Records</div>
+								<div className="flex items-center gap-2 px-1.5 py-1 text-text-soft-400">
+									<Icon name="shield-check" className="h-3 w-3 shrink-0 text-text-sub-600" />
+									<div className={`h-2.5 w-16 rounded ${skeletonBg}`} />
 								</div>
 							</div>
 

@@ -191,18 +191,10 @@ export function SplitLayout({
 						: "w-full items-center",
 				)}
 			>
-				{/* Sticky Top Bar: Logo + Step Indicator + Back Button */}
-				<div className="sticky top-0 z-40 flex w-full items-center justify-between border-stroke-soft-100/60 border-b bg-bg-white-0/90 px-6 py-4 backdrop-blur-md dark:border-stroke-soft-100/40 dark:bg-bg-white-0/80 sm:px-12 lg:px-16 xl:px-24">
-					{/* Logo */}
-					<div className="flex items-center space-x-2">
-						<Logo className="h-8 w-8 lg:h-9 lg:w-9" />
-						<span className="-ml-2.5 font-semibold text-text-strong-950 text-lg">
-							Reloop
-						</span>
-					</div>
-
-					{/* Step Indicator & Back Button */}
-					<div className="flex items-center gap-4">
+				{/* Sticky Top Bar: Back Button (Left) + Step Indicator (Right) */}
+				<div className="sticky top-0 z-40 flex w-full items-center justify-between border-stroke-soft-100/60 border-b bg-bg-white-0/90 px-6 py-4 backdrop-blur-md sm:px-12 lg:px-16 xl:px-24 dark:border-stroke-soft-100/40 dark:bg-bg-white-0/80">
+					{/* Left: Back Button */}
+					<div className="flex min-h-[24px] items-center">
 						{currentStep !== null && currentStep > 1 && (
 							<button
 								type="button"
@@ -214,11 +206,12 @@ export function SplitLayout({
 								<span>Back</span>
 							</button>
 						)}
+					</div>
+
+					{/* Right: Step Indicator */}
+					<div className="flex items-center gap-4">
 						{currentStep !== null && totalSteps !== null ? (
-							<div
-								className="flex items-center gap-1.5"
-								aria-label={`Step ${currentStep} of ${totalSteps}`}
-							>
+							<div className="flex items-center gap-1.5">
 								{Array.from({ length: totalSteps }, (_, i) => {
 									const stepNum = i + 1;
 									const isActive = stepNum <= currentStep;

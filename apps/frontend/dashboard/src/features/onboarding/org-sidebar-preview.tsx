@@ -1,3 +1,4 @@
+import { Icon } from "@reloop/ui/icon";
 import { Logo } from "@reloop/ui/logo";
 import { ensureAbsoluteUrl } from "#/utils/absolute-url";
 
@@ -39,9 +40,9 @@ export function OrgSidebarPreview({ name, logo }: OrgSidebarPreviewProps) {
 								<div className="px-0.5 py-0.5">
 									<div className={`h-2 w-8 rounded ${skeletonBg}`} />
 								</div>
-								<div className="flex items-center gap-2 rounded-lg bg-bg-weak-50 px-1.5 py-1 text-text-strong-950 dark:bg-bg-soft-200/40">
-									<div className="h-3 w-3 shrink-0 rounded-sm bg-primary-base" />
-									<div className="font-medium text-xs">Overview</div>
+								<div className="flex items-center gap-2 px-1.5 py-1 text-text-soft-400">
+									<Icon name="home" className="h-3 w-3 shrink-0 text-text-sub-600" />
+									<div className={`h-2.5 w-16 rounded ${skeletonBg}`} />
 								</div>
 								<div className="flex items-center gap-2 px-1.5 py-1 text-text-soft-400">
 									<div
