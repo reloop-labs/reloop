@@ -86,6 +86,10 @@ export function useGenerateApiKey() {
 
 	const sendPlatformTestEmail = useCallback(async () => {
 		if (testStatus === "sending" || testStatus === "sent") return;
+		if (!apiKey.trim()) {
+			toast.error("Generate an API key before sending a test email");
+			return;
+		}
 
 		setTestStatus("sending");
 		setTestError(null);
@@ -93,7 +97,7 @@ export function useGenerateApiKey() {
 		try {
 			const response = await axios.post(
 				"/api/email/v1/onboarding/send-test-email",
-				{},
+				{ apiKey },
 				{ withCredentials: true },
 			);
 
@@ -120,7 +124,7 @@ export function useGenerateApiKey() {
 			setTestError(errorMessage);
 			toast.error(errorMessage);
 		}
-	}, [testStatus]);
+	}, [apiKey, testStatus]);
 
 	const finishOnboarding = useCallback(async () => {
 		// Guard double-clicks (button + mod+enter) before React re-renders.

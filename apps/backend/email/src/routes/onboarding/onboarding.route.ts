@@ -1,37 +1,20 @@
+import { validateApiKey } from "@reloop/auth/apikey/validate";
 import {
 	createAuthPlugin,
 	createSessionCacheRedis,
 	resolveSessionAuthWithProfile,
 } from "@reloop/auth/middleware";
-import { db } from "@reloop/db/client";
-import { organization } from "@reloop/db/schema";
 import { emailConfig } from "@reloop/email/email.config";
-import OnboardingTestEmail from "@reloop/email/emails/onboarding-test";
-import { render } from "@reloop/email/render";
 import { sendEmail } from "@reloop/email/utils/email";
-import { eq } from "drizzle-orm";
 import { Elysia, t } from "elysia";
-import React from "react";
 
 const sessionRedis = createSessionCacheRedis(emailConfig.REDIS_URL, 5);
 
 const ONBOARDING_TEST_LOCAL_PART = "onboarding";
 
-function buildFromAddress({
-	localPart,
-	domainName,
-	fromName,
-}: {
-	localPart: string;
-	domainName: string;
-	fromName?: string | null;
-}): string {
-	const address = `${localPart}@${domainName}`;
-	const name = fromName?.trim();
-	if (!name) return address;
-	const safeName = name.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
-	return `"${safeName}" <${address}>`;
-}
+/** Matches dashboard onboarding SDK snippets. */
+const ONBOARDING_TEST_SUBJECT = "Hello World!";
+const ONBOARDING_TEST_TEXT = "Congrats on sending your first email!";
 
 export const onboardingRoute = new Elysia({
 	prefix: "/v1",
@@ -46,11 +29,12 @@ export const onboardingRoute = new Elysia({
 	)
 	/**
 	 * One-click onboarding email after API key generation.
-	 * Session auth. From: onboarding@{ONBOARDING_TEST_DOMAIN} → user inbox.
+	 * Session auth + the plaintext API key from the dashboard.
+	 * From: onboarding@{ONBOARDING_TEST_DOMAIN} → signed-in user inbox.
 	 */
 	.post(
 		"/onboarding/send-test-email",
-		async ({ request, set }) => {
+		async ({ request, body, set }) => {
 			const session = await resolveSessionAuthWithProfile(
 				request.headers,
 				{
@@ -69,6 +53,30 @@ export const onboardingRoute = new Elysia({
 				};
 			}
 
+			// Onboarding always sends the generated key so we can prove it is valid.
+			// Home "send first email" may omit it (no plaintext key available).
+			const apiKey = body?.apiKey?.trim() ?? "";
+			if (apiKey) {
+				const keyAuth = await validateApiKey(apiKey, sessionRedis);
+				if (!keyAuth) {
+					set.status = 401;
+					return {
+						message: "Invalid API key",
+						why: "That API key is missing, disabled, expired, or malformed.",
+						fix: "Copy the key shown on this page (or generate a new one) and try again.",
+					};
+				}
+
+				if (keyAuth.organizationId !== session.organizationId) {
+					set.status = 403;
+					return {
+						message: "API key does not belong to this workspace",
+						why: "The key must belong to your active organization.",
+						fix: "Use the API key generated for this workspace.",
+					};
+				}
+			}
+
 			const onboardingTestDomain =
 				emailConfig.ONBOARDING_TEST_DOMAIN.trim();
 			if (!onboardingTestDomain) {
@@ -76,7 +84,7 @@ export const onboardingRoute = new Elysia({
 				return {
 					message: "Onboarding test domain not configured",
 					why: "ONBOARDING_TEST_DOMAIN is not set on this deployment.",
-					fix: "Set ONBOARDING_TEST_DOMAIN (e.g. reloop.dev) and restart the email service.",
+					fix: "Set ONBOARDING_TEST_DOMAIN (e.g. reloop.email) and restart the email service.",
 				};
 			}
 
@@ -90,41 +98,16 @@ export const onboardingRoute = new Elysia({
 				};
 			}
 
-			const [orgRow] = await db
-				.select({ name: organization.name })
-				.from(organization)
-				.where(eq(organization.id, session.organizationId))
-				.limit(1);
-
-			const fromName =
-				orgRow?.name?.trim() || session.userName?.trim() || "Reloop";
-
-			const from = buildFromAddress({
-				localPart: ONBOARDING_TEST_LOCAL_PART,
-				domainName: onboardingTestDomain,
-				fromName,
-			});
-
-			const subject = "Your Reloop API key works";
-			const text = `Your Reloop API key works. This message was sent from ${from} to ${to} using Reloop's onboarding test domain (${onboardingTestDomain}). Add and verify your own domain for production From addresses.`;
-
-			const html = await render(
-				React.createElement(OnboardingTestEmail, {
-					baseUrl: emailConfig.BASE_URL,
-					recipientEmail: to,
-					fromAddress: from,
-					domainName: onboardingTestDomain,
-					mode: "platform",
-				}),
-			);
-
+			// Plain address — matches onboarding SDK snippets (onboarding@…).
+			const from = `${ONBOARDING_TEST_LOCAL_PART}@${onboardingTestDomain}`;
 			try {
+				// Platform RELOOP_API_KEY owns ONBOARDING_TEST_DOMAIN; the user's
+				// key was validated above so the button still proves their key works.
 				const result = await sendEmail({
 					from,
 					to,
-					subject,
-					html,
-					text,
+					subject: ONBOARDING_TEST_SUBJECT,
+					text: ONBOARDING_TEST_TEXT,
 				});
 
 				return {
@@ -147,11 +130,13 @@ export const onboardingRoute = new Elysia({
 		},
 		{
 			authSession: true,
-			body: t.Optional(t.Object({})),
+			body: t.Object({
+				apiKey: t.Optional(t.String({ minLength: 1 })),
+			}),
 			detail: {
 				summary: "Onboarding test email to signed-in user",
 				description:
-					"Session-authenticated. Sends from onboarding@{ONBOARDING_TEST_DOMAIN} to the signed-in user only.",
+					"Session-authenticated. Optional body { apiKey } — when provided, the key is validated against the active workspace. Sends from onboarding@{ONBOARDING_TEST_DOMAIN} to the signed-in user with the same subject/body as the onboarding SDK snippets.",
 				tags: ["Onboarding"],
 			},
 		},
