@@ -15,7 +15,7 @@ export function SidebarPreview({ name, logo }: SidebarPreviewProps) {
 
 	return (
 		<div className="flex items-center justify-center w-full p-2">
-			<div className="relative flex h-[460px] sm:h-[480px] w-full max-w-[540px] flex-col overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 shadow-2xl dark:border-stroke-soft-100/40">
+			<div className="relative flex h-[460px] sm:h-[480px] w-full max-w-[540px] flex-col overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40">
 				{/* Top Window Bar */}
 				<div className="flex shrink-0 items-center gap-2 border-stroke-soft-100 border-b bg-bg-white-0 px-4 py-2.5 dark:border-stroke-soft-100/40">
 					<div className="flex gap-1.5">
@@ -165,7 +165,7 @@ export function SidebarPreview({ name, logo }: SidebarPreviewProps) {
 							{/* Row 1: Activity Card + Emails Card Skeleton */}
 							<div className="grid grid-cols-5 gap-3">
 								{/* Activity Card Skeleton */}
-								<div className="col-span-3 space-y-2.5 rounded-xl border border-stroke-soft-100 bg-bg-white-0 p-3 shadow-xs dark:border-stroke-soft-100/40">
+								<div className="col-span-3 space-y-2.5 rounded-xl border border-stroke-soft-100 bg-bg-white-0 p-3 dark:border-stroke-soft-100/40">
 									<div className="flex items-center justify-between">
 										<div className={`h-2.5 w-16 rounded ${skeletonBg}`} />
 										<div className={`h-2.5 w-2.5 rounded ${skeletonBg}`} />
@@ -180,7 +180,7 @@ export function SidebarPreview({ name, logo }: SidebarPreviewProps) {
 								</div>
 
 								{/* Emails Card Skeleton */}
-								<div className="col-span-2 flex flex-col justify-between rounded-xl border border-stroke-soft-100 bg-bg-white-0 p-3 shadow-xs dark:border-stroke-soft-100/40">
+								<div className="col-span-2 flex flex-col justify-between rounded-xl border border-stroke-soft-100 bg-bg-white-0 p-3 dark:border-stroke-soft-100/40">
 									<div className="flex items-center justify-between">
 										<div className={`h-2.5 w-14 rounded ${skeletonBg}`} />
 										<div className={`h-2.5 w-2.5 rounded ${skeletonBg}`} />
@@ -196,7 +196,7 @@ export function SidebarPreview({ name, logo }: SidebarPreviewProps) {
 							{/* Row 2: Inboxes, Domains, Audit Logs Cards Skeleton */}
 							<div className="grid grid-cols-3 gap-3">
 								{/* Inboxes Card Skeleton */}
-								<div className="space-y-2.5 rounded-xl border border-stroke-soft-100 bg-bg-white-0 p-3 text-center shadow-xs dark:border-stroke-soft-100/40">
+								<div className="space-y-2.5 rounded-xl border border-stroke-soft-100 bg-bg-white-0 p-3 text-center dark:border-stroke-soft-100/40">
 									<div className="flex items-center justify-between">
 										<div className={`h-2 w-16 rounded ${skeletonBg}`} />
 										<div className={`h-2 w-2 rounded ${skeletonBg}`} />
@@ -208,7 +208,7 @@ export function SidebarPreview({ name, logo }: SidebarPreviewProps) {
 								</div>
 
 								{/* Domains Card Skeleton */}
-								<div className="space-y-2.5 rounded-xl border border-stroke-soft-100 bg-bg-white-0 p-3 text-center shadow-xs dark:border-stroke-soft-100/40">
+								<div className="space-y-2.5 rounded-xl border border-stroke-soft-100 bg-bg-white-0 p-3 text-center dark:border-stroke-soft-100/40">
 									<div className="flex items-center justify-between">
 										<div className={`h-2 w-14 rounded ${skeletonBg}`} />
 										<div className={`h-2 w-2 rounded ${skeletonBg}`} />
@@ -220,7 +220,7 @@ export function SidebarPreview({ name, logo }: SidebarPreviewProps) {
 								</div>
 
 								{/* Audit Logs Card Skeleton */}
-								<div className="space-y-2.5 rounded-xl border border-stroke-soft-100 bg-bg-white-0 p-3 text-center shadow-xs dark:border-stroke-soft-100/40">
+								<div className="space-y-2.5 rounded-xl border border-stroke-soft-100 bg-bg-white-0 p-3 text-center dark:border-stroke-soft-100/40">
 									<div className="flex items-center justify-between">
 										<div className={`h-2 w-14 rounded ${skeletonBg}`} />
 										<div className={`h-2.5 w-2.5 rounded ${skeletonBg}`} />

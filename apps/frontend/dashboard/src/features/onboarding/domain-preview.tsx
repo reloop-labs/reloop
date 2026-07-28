@@ -33,7 +33,7 @@ export function DomainPreview({
 				className={
 					isDomainVariant
 						? "w-[920px] transform overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 transition-all dark:border-stroke-soft-100/40"
-						: "relative flex h-[520px] w-[480px] flex-col overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 shadow-2xl dark:border-stroke-soft-100/40"
+						: "relative flex h-[520px] w-[480px] flex-col overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40"
 				}
 				style={isDomainVariant ? { maxHeight: "calc(100% + 16px)" } : undefined}
 			>
@@ -97,8 +97,8 @@ export function DomainPreview({
 								<div
 									className={
 										isDomainVariant
-											? "relative rounded-lg border border-stroke-soft-100 bg-bg-white-0 p-3 text-text-sub-600 text-xs leading-relaxed shadow-stroke-soft-200/50 dark:border-stroke-soft-100/40"
-											: "relative rounded-lg border border-stroke-soft-100 bg-bg-white-0 p-4 text-text-sub-600 text-xs leading-relaxed shadow-stroke-soft-200/50 dark:border-stroke-soft-100/40"
+											? "relative rounded-lg border border-stroke-soft-100 bg-bg-white-0 p-3 text-text-sub-600 text-xs leading-relaxed dark:border-stroke-soft-100/40"
+											: "relative rounded-lg border border-stroke-soft-100 bg-bg-white-0 p-4 text-text-sub-600 text-xs leading-relaxed dark:border-stroke-soft-100/40"
 									}
 								>
 									<div className="-top-1.5 absolute left-3 h-3 w-3 rotate-45 transform border-stroke-soft-100 border-t border-l bg-bg-white-0 dark:border-stroke-soft-100/40" />
