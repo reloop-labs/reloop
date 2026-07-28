@@ -17,7 +17,7 @@ export function ApiKeySidebarPreview({ apiKey, lang }: ApiKeySidebarPreviewProps
 	const activeApiKey = apiKey && apiKey.trim().length > 0 ? apiKey : "re_live_9a8b7c6d5e4f3a2b1c0d";
 
 	return (
-		<div className="flex h-full w-full items-center justify-center p-4 sm:p-6 overflow-y-auto">
+		<div className="flex h-full w-full items-center justify-center p-4 sm:p-6 overflow-hidden">
 			<div className="w-full max-w-xl space-y-6">
 				{/* Interactive Developer Playground: Language pills, SDK install tabs, .env & code snippets */}
 				<DeveloperPlayground

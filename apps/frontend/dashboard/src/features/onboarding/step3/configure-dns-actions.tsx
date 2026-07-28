@@ -13,12 +13,21 @@ export function ConfigureDnsActions({
 	onVerify: () => void;
 }) {
 	return (
-		<div className="mt-8 flex w-full flex-col gap-3">
+		<div className="mt-8 flex w-full items-center gap-3">
+			<Button.Root
+				variant="neutral"
+				mode="lighter"
+				size="medium"
+				onClick={onSkip}
+				className="h-10 shrink-0 justify-center rounded-xl px-4 font-medium text-sm"
+			>
+				Skip
+			</Button.Root>
 			<FancyButton.Root
 				onClick={onVerify}
 				size="medium"
 				variant="blue"
-				className="h-10 w-full justify-center overflow-hidden rounded-xl whitespace-nowrap font-medium text-sm"
+				className="h-10 flex-1 justify-center overflow-hidden rounded-xl whitespace-nowrap font-medium text-sm"
 				disabled={isVerifying}
 			>
 				<AnimatePresence mode="popLayout" initial={false}>
@@ -54,15 +63,6 @@ export function ConfigureDnsActions({
 					</motion.span>
 				</AnimatePresence>
 			</FancyButton.Root>
-			<Button.Root
-				variant="neutral"
-				mode="ghost"
-				size="small"
-				onClick={onSkip}
-				className="w-full justify-center gap-1.5 rounded-xl text-text-soft-400 hover:text-text-strong-950"
-			>
-				Skip
-			</Button.Root>
 		</div>
 	);
 }

@@ -11,12 +11,23 @@ export function FormActions({
 	onSkip: () => void;
 }) {
 	return (
-		<div className="mt-3 flex w-full flex-col gap-3">
+		<div className="mt-3 flex w-full items-center gap-3">
+			<Button.Root
+				type="button"
+				variant="neutral"
+				mode="lighter"
+				size="medium"
+				className="h-10 shrink-0 justify-center rounded-xl px-4 font-medium text-sm"
+				onClick={onSkip}
+				disabled={isLoading}
+			>
+				Skip
+			</Button.Root>
 			<FancyButton.Root
 				type="submit"
 				variant="blue"
 				size="medium"
-				className="h-10 w-full justify-center overflow-hidden rounded-xl whitespace-nowrap font-medium text-sm"
+				className="h-10 flex-1 justify-center overflow-hidden rounded-xl whitespace-nowrap font-medium text-sm"
 				disabled={isLoading}
 			>
 				<AnimatePresence mode="popLayout" initial={false}>
@@ -52,17 +63,6 @@ export function FormActions({
 					</motion.span>
 				</AnimatePresence>
 			</FancyButton.Root>
-			<Button.Root
-				type="button"
-				variant="neutral"
-				mode="ghost"
-				size="small"
-				className="w-full justify-center rounded-xl text-text-soft-400 hover:text-text-strong-950"
-				onClick={onSkip}
-				disabled={isLoading}
-			>
-				Skip
-			</Button.Root>
 		</div>
 	);
 }

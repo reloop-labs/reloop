@@ -1,4 +1,5 @@
 import { cn } from "@reloop/ui/cn";
+import { Icon } from "@reloop/ui/icon";
 import { Logo } from "@reloop/ui/logo";
 
 import type { Variants } from "framer-motion";
@@ -74,7 +75,7 @@ export function SplitLayout({
 	backStep,
 	verticalAlign = "center",
 }: SplitLayoutProps) {
-	const [step] = useQueryState("step", parseAsInteger.withDefault(1));
+	const [step, setStep] = useQueryState("step", parseAsInteger.withDefault(1));
 	const prefersReducedMotion = useReducedMotion();
 	const isKeyboardRef = useRef(false);
 
@@ -116,7 +117,11 @@ export function SplitLayout({
 	}
 	const direction = directionRef.current;
 
-	const onBack = undefined;
+	const handleBack = () => {
+		if (onBackCleanup) onBackCleanup();
+		const targetStep = backStep ?? Math.max(1, step - 1);
+		void setStep(targetStep);
+	};
 
 	const stepMatch = stepIndicator.match(/Step (\d+) of (\d+)/);
 	const currentStep = stepMatch ? Number(stepMatch[1]) : null;
@@ -176,7 +181,7 @@ export function SplitLayout({
 	const hasPreview = !fullWidth && Boolean(previewContent);
 
 	return (
-		<div className="relative flex min-h-screen w-full flex-col overflow-hidden bg-bg-white-0 lg:flex-row">
+		<div className="relative flex h-screen max-h-screen w-full flex-col overflow-hidden bg-bg-white-0 lg:flex-row">
 			{/* Logo */}
 			<div className="absolute top-6 left-6 z-50 flex items-center space-x-2 lg:left-10">
 				<Logo className="h-9 w-9 lg:h-10 lg:w-10" />
@@ -185,10 +190,10 @@ export function SplitLayout({
 				</span>
 			</div>
 
-			{/* Left Column: Content / Form */}
+			{/* Left Column: Content / Form (Scrollable) */}
 			<div
 				className={cn(
-					"relative flex min-h-screen flex-col px-6 py-20 sm:px-12 lg:px-16 xl:px-24",
+					"relative flex h-full w-full flex-col overflow-y-auto px-6 py-20 sm:px-12 lg:px-16 xl:px-24",
 					verticalAlign === "center"
 						? "justify-center"
 						: "justify-start pt-28 pb-20",
@@ -209,7 +214,18 @@ export function SplitLayout({
 									: "mx-auto max-w-2xl",
 					)}
 				>
-					<div className="mb-6">
+					<div className="mb-6 flex items-center gap-4">
+						{currentStep !== null && currentStep > 1 && (
+							<button
+								type="button"
+								onClick={handleBack}
+								aria-label="Go back to previous step"
+								className="flex cursor-pointer items-center gap-1 font-medium text-text-sub-600 text-xs transition-colors hover:text-text-strong-950"
+							>
+								<Icon name="arrow-left" className="h-3.5 w-3.5" />
+								<span>Back</span>
+							</button>
+						)}
 						{currentStep !== null && totalSteps !== null ? (
 							<div
 								className="flex items-center gap-1.5"
@@ -242,9 +258,9 @@ export function SplitLayout({
 				</div>
 			</div>
 
-			{/* Right Column: Animation / Preview */}
+			{/* Right Column: Animation / Preview (Fixed, Non-scrollable) */}
 			{hasPreview && (
-				<div className="relative hidden min-h-screen items-center justify-center overflow-hidden bg-bg-weak-50/40 p-8 lg:flex lg:w-1/2 dark:bg-bg-weak-50/10">
+				<div className="relative hidden h-full w-1/2 items-center justify-center overflow-hidden bg-bg-weak-50/40 p-8 lg:flex dark:bg-bg-weak-50/10">
 					<AnimatePresence mode="wait" initial={true} custom={direction}>
 						<motion.div
 							key={step}
@@ -253,7 +269,7 @@ export function SplitLayout({
 							initial="initial"
 							animate="animate"
 							exit="exit"
-							className="relative z-10 flex h-full w-full items-center justify-center"
+							className="relative z-10 flex h-full w-full items-center justify-center overflow-hidden"
 						>
 							{previewContent}
 						</motion.div>

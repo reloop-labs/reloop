@@ -134,7 +134,6 @@ export function OnboardingPage() {
 			component: <GenerateApiKeyStep />,
 			preview: <ApiKeySidebarPreview apiKey={apiKey} lang={lang} />,
 			fullWidth: false,
-			verticalAlign: "start",
 		},
 	};
 
