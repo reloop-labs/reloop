@@ -3,7 +3,7 @@ export const getDomainSubString = (domain: string) => {
 		const subDomain = domain.split(".").slice(0, -2).join(".");
 		return `${subDomain}`;
 	}
-	return "send";
+	return "@";
 };
 
 export const getCustomReturnPathSubString = (

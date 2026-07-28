@@ -18,12 +18,15 @@ export async function generateDKIMRecord(
 		.replace(/\s/g, "");
 
 	const dkimValue = `v=DKIM1; k=rsa; p=${cleanPublicKey}`;
-	const name = `${domainConfig.DKIM_SELECTOR}._domainkey.${domain}`;
+	const isApex = domain === "@";
+	const name = isApex
+		? `${domainConfig.DKIM_SELECTOR}._domainkey`
+		: `${domainConfig.DKIM_SELECTOR}._domainkey.${domain}`;
 
 	return {
 		type: DNSTypes.DNSRecordType.TXT,
 		name,
-		fqdn: `${name}.${rootDomain}`,
+		fqdn: isApex ? `${name}.${rootDomain}` : `${name}.${rootDomain}`,
 		value: dkimValue,
 		ttl: "Auto",
 		privateKey: dkimKeyPair.privateKey,
@@ -36,10 +39,12 @@ export function generateSPFRecord(
 ): DNSTypes.DNSRecord {
 	const spfValue = `v=spf1 include:${domainConfig.HOST_DOMAIN} -all`;
 
+	const isApex = domain === "@";
+
 	return {
 		type: DNSTypes.DNSRecordType.TXT,
-		name: domain,
-		fqdn: `${domain}.${rootDomain}`,
+		name: isApex ? "@" : domain,
+		fqdn: isApex ? rootDomain : `${domain}.${rootDomain}`,
 		value: spfValue,
 		ttl: "Auto",
 	};
@@ -50,7 +55,8 @@ export function generateDMARCRecord(
 	rootDomain: string,
 ): DNSTypes.DNSRecord {
 	const dmarcValue = "v=DMARC1; p=reject;";
-	const name = `_dmarc.${domain}`;
+	const isApex = domain === "@";
+	const name = isApex ? "_dmarc" : `_dmarc.${domain}`;
 
 	return {
 		type: DNSTypes.DNSRecordType.TXT,

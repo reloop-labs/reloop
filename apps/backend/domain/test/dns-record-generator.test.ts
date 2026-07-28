@@ -46,7 +46,7 @@ describe("generateReceivingMXRecordForDomain", () => {
 		expect(record.fqdn).toBe("example.com");
 		expect(record.value).toBe("inbound.reloop.sh");
 		expect(getDomainHost("example.com")).toBe("example.com");
-		expect(getDomainSubString("example.com")).toBe("send");
+		expect(getDomainSubString("example.com")).toBe("@");
 	});
 
 	test("subdomain receiving MX is on that host", () => {
