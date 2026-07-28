@@ -6,6 +6,7 @@ import WelcomeEmail from "@reloop/email/emails/welcome";
 import { redis } from "@reloop/email/lib/redis";
 import { render, toPlainText } from "@reloop/email/render";
 import { sendEmail } from "@reloop/email/utils/email";
+import { requireReloopSenderDomain } from "@reloop/email/utils/sender-domain";
 import { log } from "evlog";
 import React from "react";
 import { UAParser } from "ua-parser-js";
@@ -38,7 +39,7 @@ export async function initAuthSubscribers() {
 				const text = toPlainText(html);
 
 				await sendEmail({
-					from: `Reloop <onboarding@${emailConfig.RELOOP_SENDER_DOMAIN || "reloop.dev"}>`,
+					from: `Reloop <onboarding@${requireReloopSenderDomain()}>`,
 					to: payload.email,
 					subject: "Welcome to Reloop!",
 					html,
@@ -90,7 +91,7 @@ export async function initAuthSubscribers() {
 							: "Your Reloop verification code";
 
 				await sendEmail({
-					from: `Reloop <auth@${emailConfig.RELOOP_SENDER_DOMAIN || "reloop.dev"}>`,
+					from: `Reloop <auth@${requireReloopSenderDomain()}>`,
 					to: payload.email,
 					subject,
 					html,
@@ -152,7 +153,7 @@ export async function initAuthSubscribers() {
 				const text = toPlainText(html);
 
 				await sendEmail({
-					from: `Security Alert <security@${emailConfig.RELOOP_SENDER_DOMAIN || "reloop.dev"}>`,
+					from: `Security Alert <security@${requireReloopSenderDomain()}>`,
 					to: payload.email,
 					subject: "New sign-in detected on your account",
 					html,

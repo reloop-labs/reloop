@@ -37,12 +37,17 @@ export async function createDomainController({
 			);
 		}
 
-		const platformDomain =
-			domainConfig.PLATFORM_TEST_FROM_DOMAIN.toLowerCase().trim();
-		if (domain.toLowerCase().trim() === platformDomain) {
+		const reservedDomains = [
+			domainConfig.ONBOARDING_TEST_DOMAIN,
+			domainConfig.RELOOP_SENDER_DOMAIN,
+		]
+			.map((d) => d.toLowerCase().trim())
+			.filter(Boolean);
+		const requested = domain.toLowerCase().trim();
+		if (reservedDomains.includes(requested)) {
 			throw DomainErrors.invalidDomain(
 				domain,
-				`"${platformDomain}" is reserved for Reloop platform test emails and cannot be added as a customer domain.`,
+				`"${domain}" is reserved for Reloop platform mail and cannot be added as a customer domain.`,
 			);
 		}
 

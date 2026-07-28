@@ -1,7 +1,6 @@
 import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import { domainConfig } from "@reloop/domain/domain.config";
 import { DomainErrors } from "@reloop/domain/error/domain.error-response";
 import type { DomainTypes } from "@reloop/domain/types/domain.type";
 import { DOMAIN_DELETE_WEBHOOK_EVENT } from "@reloop/webhook-events";
@@ -35,15 +34,6 @@ export async function deleteDomainController({
 		if (!domainWithDnsRecords) {
 			log.warn("Domain not found for deletion");
 			throw DomainErrors.domainNotFound(domainId);
-		}
-
-		const platformDomain =
-			domainConfig.PLATFORM_TEST_FROM_DOMAIN.toLowerCase().trim();
-		if (domainWithDnsRecords.domain.toLowerCase() === platformDomain) {
-			throw DomainErrors.invalidDomain(
-				domainWithDnsRecords.domain,
-				"The platform test domain cannot be deleted.",
-			);
 		}
 
 		const now = new Date();

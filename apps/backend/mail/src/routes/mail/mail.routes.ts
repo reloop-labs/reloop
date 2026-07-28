@@ -1,6 +1,5 @@
 import { Elysia } from "elysia";
 import { trackRoute } from "../track/track.route";
-import { platformTestRoute } from "./platform-test/platform-test.route";
 import { sendEmailRoute } from "./send-email/send-email.route";
 
 export const mailRoutes = new Elysia({
@@ -8,5 +7,4 @@ export const mailRoutes = new Elysia({
 	name: "MailRoutes",
 })
 	.use(trackRoute)
-	.use(sendEmailRoute)
-	.use(platformTestRoute);
+	.use(sendEmailRoute);

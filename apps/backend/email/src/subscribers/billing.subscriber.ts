@@ -5,6 +5,7 @@ import QuotaWarningEmail from "@reloop/email/emails/quota-warning";
 import TrialEndingEmail from "@reloop/email/emails/trial-ending";
 import { render, toPlainText } from "@reloop/email/render";
 import { sendEmail } from "@reloop/email/utils/email";
+import { requireReloopSenderDomain } from "@reloop/email/utils/sender-domain";
 import { log } from "evlog";
 import React from "react";
 
@@ -30,7 +31,7 @@ export async function initBillingSubscribers() {
 				const text = toPlainText(html);
 
 				await sendEmail({
-					from: `Reloop Billing <billing@${emailConfig.RELOOP_SENDER_DOMAIN || "reloop.dev"}>`,
+					from: `Reloop Billing <billing@${requireReloopSenderDomain()}>`,
 					to: payload.email,
 					subject: "Payment Failed - Action Required",
 					html,
@@ -66,7 +67,7 @@ export async function initBillingSubscribers() {
 				const text = toPlainText(html);
 
 				await sendEmail({
-					from: `Reloop Support <support@${emailConfig.RELOOP_SENDER_DOMAIN || "reloop.dev"}>`,
+					from: `Reloop Support <support@${requireReloopSenderDomain()}>`,
 					to: payload.email,
 					subject: `Usage Alert: ${payload.percentage}% of your ${payload.resourceType} quota used`,
 					html,
@@ -102,7 +103,7 @@ export async function initBillingSubscribers() {
 				const text = toPlainText(html);
 
 				await sendEmail({
-					from: `Reloop <hello@${emailConfig.RELOOP_SENDER_DOMAIN || "reloop.dev"}>`,
+					from: `Reloop <hello@${requireReloopSenderDomain()}>`,
 					to: payload.email,
 					subject: `Your Reloop trial ends in ${payload.daysLeft} days`,
 					html,

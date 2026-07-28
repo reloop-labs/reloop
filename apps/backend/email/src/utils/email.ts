@@ -3,13 +3,9 @@ import { log } from "evlog";
 import nodemailer from "nodemailer";
 import { Reloop } from "reloop-email";
 
-const isProduction =
-	emailConfig.RELOOP_API_KEY && emailConfig.RELOOP_SENDER_DOMAIN;
-
-let reloop: Reloop | null = null;
-if (isProduction) {
-	reloop = new Reloop({
-		apiKey: emailConfig.RELOOP_API_KEY,
+function createReloopClient(apiKey: string): Reloop {
+	return new Reloop({
+		apiKey,
 		baseUrl: emailConfig.BASE_URL,
 	});
 }
@@ -25,28 +21,36 @@ export interface SendEmailOptions {
 	subject: string;
 	html: string;
 	text?: string;
+	/**
+	 * Optional API key override.
+	 * Defaults to `RELOOP_API_KEY` (platform org that owns the sender domains).
+	 */
+	apiKey?: string;
 }
 
+/**
+ * Send via reloop-email when RELOOP_API_KEY is set;
+ * otherwise fall back to local SMTP (Mailpit) for development.
+ */
 export async function sendEmail(options: SendEmailOptions) {
+	const apiKey =
+		options.apiKey?.trim() || emailConfig.RELOOP_API_KEY?.trim() || "";
+	const client = apiKey ? createReloopClient(apiKey) : null;
+
 	try {
-		if (isProduction && reloop) {
+		if (client) {
 			log.info({
 				...{ to: options.to, subject: options.subject },
 				message: "Sending email via Reloop SDK",
 			});
-			const { response, emailError } = await reloop.mail.send({
+			// reloop-email throws on non-OK responses; success returns the API JSON body.
+			return await client.mail.send({
 				from: options.from,
 				to: Array.isArray(options.to) ? options.to : [options.to],
 				subject: options.subject,
 				html: options.html,
 				text: options.text,
 			});
-
-			if (emailError) {
-				throw emailError;
-			}
-
-			return response;
 		}
 
 		log.info({

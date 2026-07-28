@@ -8,13 +8,16 @@ import { organization } from "@reloop/db/schema";
 import { emailConfig } from "@reloop/email/email.config";
 import OnboardingTestEmail from "@reloop/email/emails/onboarding-test";
 import { render } from "@reloop/email/render";
+import { sendEmail } from "@reloop/email/utils/email";
 import { eq } from "drizzle-orm";
 import { Elysia, t } from "elysia";
 import React from "react";
 
 const sessionRedis = createSessionCacheRedis(emailConfig.REDIS_URL, 5);
 
-function buildPlatformFromAddress({
+const ONBOARDING_TEST_LOCAL_PART = "onboarding";
+
+function buildFromAddress({
 	localPart,
 	domainName,
 	fromName,
@@ -42,13 +45,8 @@ export const onboardingRoute = new Elysia({
 		}),
 	)
 	/**
-	 * One-click platform test email after API key generation.
-	 * Session auth required. Prefer the just-generated API key via `x-api-key`
-	 * so inject + logs attribute the Onboarding Key.
-	 *
-	 * - From: onboarding@<PLATFORM_TEST_FROM_DOMAIN> (display name = workspace)
-	 * - To: signed-in user email only
-	 * - Body: onboarding-test template (platform mode)
+	 * One-click onboarding email after API key generation.
+	 * Session auth. From: onboarding@{ONBOARDING_TEST_DOMAIN} → user inbox.
 	 */
 	.post(
 		"/onboarding/send-test-email",
@@ -71,12 +69,14 @@ export const onboardingRoute = new Elysia({
 				};
 			}
 
-			if (!emailConfig.PLATFORM_TEST_ENABLED) {
-				set.status = 403;
+			const onboardingTestDomain =
+				emailConfig.ONBOARDING_TEST_DOMAIN.trim();
+			if (!onboardingTestDomain) {
+				set.status = 503;
 				return {
-					message: "Platform test email disabled",
-					why: "Sending via the platform test domain is disabled on this deployment.",
-					fix: "Verify your own domain, or enable PLATFORM_TEST_ENABLED.",
+					message: "Onboarding test domain not configured",
+					why: "ONBOARDING_TEST_DOMAIN is not set on this deployment.",
+					fix: "Set ONBOARDING_TEST_DOMAIN (e.g. reloop.dev) and restart the email service.",
 				};
 			}
 
@@ -90,9 +90,6 @@ export const onboardingRoute = new Elysia({
 				};
 			}
 
-			const platformDomain = emailConfig.PLATFORM_TEST_FROM_DOMAIN;
-			const localPart = emailConfig.PLATFORM_TEST_FROM_LOCAL_PART;
-
 			const [orgRow] = await db
 				.select({ name: organization.name })
 				.from(organization)
@@ -100,81 +97,51 @@ export const onboardingRoute = new Elysia({
 				.limit(1);
 
 			const fromName =
-				orgRow?.name?.trim() ||
-				session.userName?.trim() ||
-				"Reloop";
+				orgRow?.name?.trim() || session.userName?.trim() || "Reloop";
 
-			const from = buildPlatformFromAddress({
-				localPart,
-				domainName: platformDomain,
+			const from = buildFromAddress({
+				localPart: ONBOARDING_TEST_LOCAL_PART,
+				domainName: onboardingTestDomain,
 				fromName,
 			});
+
+			const subject = "Your Reloop API key works";
+			const text = `Your Reloop API key works. This message was sent from ${from} to ${to} using Reloop's onboarding test domain (${onboardingTestDomain}). Add and verify your own domain for production From addresses.`;
 
 			const html = await render(
 				React.createElement(OnboardingTestEmail, {
 					baseUrl: emailConfig.BASE_URL,
 					recipientEmail: to,
 					fromAddress: from,
-					domainName: platformDomain,
+					domainName: onboardingTestDomain,
 					mode: "platform",
 				}),
 			);
 
-			const mailPlatformTestUrl = `${emailConfig.BASE_URL}/api/mail/v1/platform-test`;
-			const apiKeyHeader = request.headers.get("x-api-key");
-
-			const forwardHeaders: Record<string, string> = {
-				"Content-Type": "application/json",
-			};
-			// Prefer the user's just-generated API key so the real key path is exercised.
-			if (apiKeyHeader) {
-				forwardHeaders["x-api-key"] = apiKeyHeader;
-			} else {
-				const cookie = request.headers.get("cookie");
-				if (cookie) forwardHeaders.Cookie = cookie;
-			}
-
 			try {
-				const response = await fetch(mailPlatformTestUrl, {
-					method: "POST",
-					headers: forwardHeaders,
-					body: JSON.stringify({
-						html,
-						subject: "Your Reloop API key works",
-						from_name: fromName,
-						recipient_email: to,
-						text: `Your Reloop API key works. This message was sent from ${from} to ${to} using Reloop's platform test domain (${platformDomain}). Add and verify your own domain for production From addresses.`,
-					}),
+				const result = await sendEmail({
+					from,
+					to,
+					subject,
+					html,
+					text,
 				});
-
-				const payload = await response.json().catch(() => ({}));
-
-				if (!response.ok) {
-					set.status = response.status;
-					return {
-						message:
-							(payload as { message?: string }).message ||
-							(payload as { why?: string }).why ||
-							"Failed to send platform test email",
-						why: (payload as { why?: string }).why,
-						fix: (payload as { fix?: string }).fix,
-					};
-				}
 
 				return {
 					object: "email",
 					event: "email.sent",
-					mode: "platform",
+					mode: "onboarding_test",
 					to,
 					from,
-					domain: platformDomain,
-					...(payload as Record<string, unknown>),
+					domain: onboardingTestDomain,
+					...(result && typeof result === "object" ? result : {}),
 				};
 			} catch (error) {
 				set.status = 500;
 				return {
-					message: "Internal server error during email dispatch",
+					message: "Failed to send email",
 					why: error instanceof Error ? error.message : String(error),
+					fix: "Check ONBOARDING_TEST_DOMAIN and mail delivery, then try again.",
 				};
 			}
 		},
@@ -182,9 +149,9 @@ export const onboardingRoute = new Elysia({
 			authSession: true,
 			body: t.Optional(t.Object({})),
 			detail: {
-				summary: "Platform test email to signed-in user",
+				summary: "Onboarding test email to signed-in user",
 				description:
-					"Session-authenticated. Sends a real email from the Reloop-owned platform domain to the signed-in user only. Pass the just-generated API key as x-api-key so inject attributes the Onboarding Key. No request body required.",
+					"Session-authenticated. Sends from onboarding@{ONBOARDING_TEST_DOMAIN} to the signed-in user only.",
 				tags: ["Onboarding"],
 			},
 		},

@@ -5,6 +5,7 @@ import { emailConfig } from "@reloop/email/email.config";
 import ApiKeyCreatedEmail from "@reloop/email/emails/api-key-created";
 import { render, toPlainText } from "@reloop/email/render";
 import { sendEmail } from "@reloop/email/utils/email";
+import { requireReloopSenderDomain } from "@reloop/email/utils/sender-domain";
 import { eq } from "drizzle-orm";
 import { log } from "evlog";
 import React from "react";
@@ -53,7 +54,7 @@ export async function initApiKeySubscribers() {
 				const text = toPlainText(html);
 
 				await sendEmail({
-					from: `Reloop <security@${emailConfig.RELOOP_SENDER_DOMAIN || "reloop.dev"}>`,
+					from: `Reloop <security@${requireReloopSenderDomain()}>`,
 					to: apiKey.user.email,
 					subject: `A new API key "${apiKey.name}" was created`,
 					html,

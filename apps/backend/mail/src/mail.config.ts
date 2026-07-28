@@ -14,25 +14,6 @@ export const mailConfig = {
 	OTEL_EXPORTER_OTLP_ENDPOINT: process.env.OTEL_EXPORTER_OTLP_ENDPOINT || "",
 	OTEL_EXPORTER_OTLP_HEADERS: process.env.OTEL_EXPORTER_OTLP_HEADERS || "",
 
-	/**
-	 * Platform-owned domain used for onboarding “send test to me” emails.
-	 * Not for free-form API sends — only the dedicated platform-test path.
-	 */
-	PLATFORM_TEST_ENABLED: process.env.PLATFORM_TEST_ENABLED !== "false",
-	PLATFORM_TEST_FROM_DOMAIN:
-		process.env.PLATFORM_TEST_FROM_DOMAIN ||
-		process.env.RELOOP_SENDER_DOMAIN ||
-		"reloop.dev",
-	PLATFORM_TEST_FROM_LOCAL_PART:
-		process.env.PLATFORM_TEST_FROM_LOCAL_PART || "onboarding",
-	/** Max platform-test sends per user per rolling window. */
-	PLATFORM_TEST_RATE_LIMIT_MAX: Number(
-		process.env.PLATFORM_TEST_RATE_LIMIT_MAX || "5",
-	),
-	PLATFORM_TEST_RATE_LIMIT_WINDOW_SECONDS: Number(
-		process.env.PLATFORM_TEST_RATE_LIMIT_WINDOW_SECONDS || "3600",
-	),
-
 	// ── Rate Limiting ──────────────────────────────────────────────
 	// Per-IP: stops brute-force from a single source
 	RATE_LIMIT_IP_MAX: Number(process.env.RATE_LIMIT_IP_MAX || "20"),

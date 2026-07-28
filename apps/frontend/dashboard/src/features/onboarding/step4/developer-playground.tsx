@@ -2,7 +2,6 @@ import { useState } from "react";
 import {
 	siBun,
 	siComposer,
-	siDotenv,
 	siGnubash,
 	siGo,
 	siNodedotjs,
@@ -12,8 +11,8 @@ import {
 	siPython,
 	siYarn,
 } from "simple-icons";
-import { AiPromptBlock } from "./ai-prompt-block";
 import { CopyCodeBlock } from "./copy-code-block";
+import { CopyForAiButton } from "./copy-for-ai-button";
 import { IntegrationLanguagePills } from "./integration-language-pills";
 import {
 	buildAiPrompt,
@@ -23,7 +22,7 @@ import {
 	nodeInstallCommands,
 	sendEmailCode,
 } from "./snippets";
-import type { IntegrationChoice, LanguageCode, PackageManager } from "./types";
+import type { LanguageCode, PackageManager } from "./types";
 
 const langIcons = {
 	nodejs: siNodedotjs,
@@ -57,13 +56,12 @@ export function DeveloperPlayground({
 	onChoiceChange,
 }: {
 	apiKey: string;
-	choice: IntegrationChoice;
-	onChoiceChange: (choice: IntegrationChoice) => void;
+	choice: LanguageCode;
+	onChoiceChange: (choice: LanguageCode) => void;
 }) {
 	const [pkgManager, setPkgManager] = useState<PackageManager>("npm");
 
-	const isAi = choice === "ai";
-	const lang = isAi ? "nodejs" : (choice as LanguageCode);
+	const lang = choice;
 	const isNode = lang === "nodejs";
 	const installCode = isNode
 		? nodeInstallCommands[pkgManager]
@@ -78,55 +76,41 @@ export function DeveloperPlayground({
 		<div className="space-y-6">
 			<div className="space-y-2">
 				<SectionLabel>Choose your language</SectionLabel>
-				<IntegrationLanguagePills value={choice} onChange={onChoiceChange} />
+				<div className="flex flex-wrap items-center justify-between gap-2 pt-1">
+					<IntegrationLanguagePills
+						value={choice}
+						onChange={onChoiceChange}
+					/>
+					<CopyForAiButton prompt={aiPrompt} />
+				</div>
 			</div>
 
-			{isAi ? (
-				<AiPromptBlock prompt={aiPrompt} />
-			) : (
-				<>
-					<div className="space-y-2">
-						<SectionLabel>Install the Reloop SDK</SectionLabel>
-						<CopyCodeBlock
-							code={installCode}
-							lang="bash"
-							label={installLabel}
-							si={installIcon}
-							tabs={isNode ? pkgManagerTabs : undefined}
-							activeTab={isNode ? pkgManager : undefined}
-							onTabChange={
-								isNode
-									? (id) => setPkgManager(id as PackageManager)
-									: undefined
-							}
-							minHeight="auto"
-						/>
-					</div>
+			<div className="space-y-2">
+				<SectionLabel>Install the Reloop SDK</SectionLabel>
+				<CopyCodeBlock
+					code={installCode}
+					lang="bash"
+					label={installLabel}
+					si={installIcon}
+					tabs={isNode ? pkgManagerTabs : undefined}
+					activeTab={isNode ? pkgManager : undefined}
+					onTabChange={
+						isNode ? (id) => setPkgManager(id as PackageManager) : undefined
+					}
+					minHeight="auto"
+				/>
+			</div>
 
-					<div className="space-y-2">
-						<SectionLabel>Add your API key to .env</SectionLabel>
-						<CopyCodeBlock
-							code={`RELOOP_API_KEY=${apiKey}`}
-							lang="bash"
-							copyValue={`RELOOP_API_KEY=${apiKey}`}
-							label=".env"
-							si={siDotenv}
-							minHeight="auto"
-						/>
-					</div>
-
-					<div className="space-y-2">
-						<SectionLabel>Send your first request</SectionLabel>
-						<CopyCodeBlock
-							code={sendEmailCode[lang].code}
-							lang={sendEmailCode[lang].lang}
-							label={langFileLabels[lang]}
-							si={langIcons[lang]}
-							minHeight="auto"
-						/>
-					</div>
-				</>
-			)}
+			<div className="space-y-2">
+				<SectionLabel>Send your first request</SectionLabel>
+				<CopyCodeBlock
+					code={sendEmailCode[lang].code}
+					lang={sendEmailCode[lang].lang}
+					label={langFileLabels[lang]}
+					si={langIcons[lang]}
+					minHeight="auto"
+				/>
+			</div>
 		</div>
 	);
 }

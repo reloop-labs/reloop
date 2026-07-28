@@ -1,47 +1,9 @@
 import * as Button from "@reloop/ui/button";
 import * as FancyButton from "@reloop/ui/fancy-button";
-import type React from "react";
 import { siGo, siNodedotjs, siPhp, siPython } from "simple-icons";
-import type { IntegrationChoice } from "./types";
+import type { LanguageCode } from "./types";
 
-const SparkleIcon = ({ className }: { className?: string }) => (
-	<svg
-		viewBox="0 0 16 16"
-		className={className ?? "size-3.5 shrink-0"}
-		fill="currentColor"
-		xmlns="http://www.w3.org/2000/svg"
-		aria-hidden="true"
-	>
-		<path d="M8 1s-.75 3.25-2.5 4.5S1 8 1 8s3.25.75 4.5 2.5S8 15 8 15s.75-3.25 2.5-4.5S15 8 15 8s-3.25-.75-4.5-2.5S8 1 8 1Z" />
-	</svg>
-);
-
-type PillItem =
-	| {
-			id: "ai";
-			label: string;
-			iconSvg: (isSelected: boolean) => React.ReactNode;
-	  }
-	| {
-			id: Exclude<IntegrationChoice, "ai">;
-			label: string;
-			iconPath: string;
-	  };
-
-const pills: PillItem[] = [
-	{
-		id: "ai",
-		label: "AI",
-		iconSvg: (isSelected: boolean) => (
-			<SparkleIcon
-				className={`size-3.5 shrink-0 ${
-					isSelected
-						? "text-white fill-white"
-						: "text-text-strong-950 dark:text-white"
-				}`}
-			/>
-		),
-	},
+const pills: { id: LanguageCode; label: string; iconPath: string }[] = [
 	{
 		id: "nodejs",
 		label: "Node.js",
@@ -68,11 +30,11 @@ export function IntegrationLanguagePills({
 	value,
 	onChange,
 }: {
-	value: IntegrationChoice;
-	onChange: (choice: IntegrationChoice) => void;
+	value: LanguageCode;
+	onChange: (choice: LanguageCode) => void;
 }) {
 	return (
-		<div className="flex flex-wrap gap-2 pt-1">
+		<div className="flex flex-wrap gap-2">
 			{pills.map((pill) => {
 				const isSelected = value === pill.id;
 				return isSelected ? (
@@ -84,21 +46,17 @@ export function IntegrationLanguagePills({
 						onClick={() => onChange(pill.id)}
 						className="gap-1.5 rounded-xl"
 					>
-						{"iconSvg" in pill ? (
-							pill.iconSvg(true)
-						) : (
-							<svg
-								role="img"
-								viewBox="0 0 24 24"
-								width={13}
-								height={13}
-								aria-hidden
-								className="shrink-0 text-white"
-								fill="currentColor"
-							>
-								<path d={pill.iconPath} />
-							</svg>
-						)}
+						<svg
+							role="img"
+							viewBox="0 0 24 24"
+							width={13}
+							height={13}
+							aria-hidden
+							className="shrink-0 text-white"
+							fill="currentColor"
+						>
+							<path d={pill.iconPath} />
+						</svg>
 						{pill.label}
 					</FancyButton.Root>
 				) : (
@@ -111,21 +69,17 @@ export function IntegrationLanguagePills({
 						onClick={() => onChange(pill.id)}
 						className="gap-1.5 rounded-xl"
 					>
-						{"iconSvg" in pill ? (
-							pill.iconSvg(false)
-						) : (
-							<svg
-								role="img"
-								viewBox="0 0 24 24"
-								width={13}
-								height={13}
-								aria-hidden
-								className="shrink-0 text-text-strong-950 dark:text-white"
-								fill="currentColor"
-							>
-								<path d={pill.iconPath} />
-							</svg>
-						)}
+						<svg
+							role="img"
+							viewBox="0 0 24 24"
+							width={13}
+							height={13}
+							aria-hidden
+							className="shrink-0 text-text-strong-950 dark:text-white"
+							fill="currentColor"
+						>
+							<path d={pill.iconPath} />
+						</svg>
 						{pill.label}
 					</Button.Root>
 				);
@@ -133,4 +87,3 @@ export function IntegrationLanguagePills({
 		</div>
 	);
 }
-

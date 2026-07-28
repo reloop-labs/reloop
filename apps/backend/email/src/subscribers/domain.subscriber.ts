@@ -7,6 +7,7 @@ import DnsConfigEmail from "@reloop/email/emails/dns-config";
 import DomainVerifiedEmail from "@reloop/email/emails/domain-verified";
 import { render, toPlainText } from "@reloop/email/render";
 import { sendEmail } from "@reloop/email/utils/email";
+import { requireReloopSenderDomain } from "@reloop/email/utils/sender-domain";
 import { and, eq, isNull } from "drizzle-orm";
 import { log } from "evlog";
 import React from "react";
@@ -141,7 +142,7 @@ export async function initDomainSubscribers() {
 				const text = toPlainText(html);
 
 				await sendEmail({
-					from: `Reloop <support@${emailConfig.RELOOP_SENDER_DOMAIN || "reloop.dev"}>`,
+					from: `Reloop <support@${requireReloopSenderDomain()}>`,
 					to: domain.user.email,
 					subject: `Domain ${payload.domain} has been verified`,
 					html,
@@ -186,7 +187,7 @@ export async function initDomainSubscribers() {
 				const text = toPlainText(html);
 
 				await sendEmail({
-					from: `Reloop <support@${emailConfig.RELOOP_SENDER_DOMAIN || "reloop.dev"}>`,
+					from: `Reloop <support@${requireReloopSenderDomain()}>`,
 					to: payload.email,
 					subject: `DNS Configuration for ${payload.domain}`,
 					html,

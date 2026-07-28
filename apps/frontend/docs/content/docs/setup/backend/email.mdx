@@ -32,7 +32,7 @@ Run [`bun setup`](/docs/setup) once from the monorepo root. Env files come from 
 bun be:email:dev
 ```
 
-Or `bun backend:dev` / `bun dev`. Locally, when `RELOOP_API_KEY` / `RELOOP_SENDER_DOMAIN` are unset, platform mail can fall back to Mailpit SMTP.
+Or `bun backend:dev` / `bun dev`. Locally, when `RELOOP_API_KEY` is unset, mail falls back to Mailpit SMTP (`localhost:1025`).
 
 
 ## Environment
@@ -46,6 +46,7 @@ BASE_URL="https://local.reloop.sh"
 NATS_URL=nats://localhost:4222
 RELOOP_API_KEY=
 RELOOP_SENDER_DOMAIN=
+ONBOARDING_TEST_DOMAIN=
 NODE_ENV=development
 ```
 
@@ -54,8 +55,9 @@ NODE_ENV=development
 | `EMAIL_PORT` / `PORT` | **YES** | `8022` | Listening port |
 | `BASE_URL` | **YES** | `https://local.reloop.sh` | Platform base URL |
 | `NATS_URL` | **YES** | `nats://localhost:4222` | Event subscriptions |
-| `RELOOP_API_KEY` | Prod | — | Internal key for send authorization |
-| `RELOOP_SENDER_DOMAIN` | Prod | — | From-address domain |
+| `RELOOP_API_KEY` | Prod | — | API key for the org that owns the sender domain(s); used by `reloop-email` |
+| `RELOOP_SENDER_DOMAIN` | Prod | — | System product mail From domain (auth, billing, invites) |
+| `ONBOARDING_TEST_DOMAIN` | Prod | — | Onboarding “Send email” From domain only (can differ) |
 
 
 ## Commands

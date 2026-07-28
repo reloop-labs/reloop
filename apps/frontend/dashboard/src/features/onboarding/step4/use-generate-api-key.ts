@@ -9,14 +9,15 @@ import { toast } from "sonner";
 import { organizationsQueryOptions } from "#/features/auth/organizations-query";
 import { sessionQueryOptions } from "#/features/auth/session-query";
 import { queryKeys } from "#/lib/query-keys";
-import type { IntegrationChoice, LanguageCode } from "./types";
+import type { LanguageCode } from "./types";
 
 const languageCodes: LanguageCode[] = ["nodejs", "python", "go", "php"];
 
-function parseChoice(value: string): IntegrationChoice {
-	if (value === "ai") return "ai";
+function parseChoice(value: string): LanguageCode {
+	// Legacy ?lang=ai URLs map to Node.js (AI is no longer a tab).
+	if (value === "ai") return "nodejs";
 	if (languageCodes.includes(value as LanguageCode)) return value as LanguageCode;
-	return "ai";
+	return "nodejs";
 }
 
 async function wait(ms: number) {
@@ -47,7 +48,7 @@ export function useGenerateApiKey() {
 	);
 	const [choiceParam, setChoiceParam] = useQueryState(
 		"lang",
-		parseAsString.withDefault("ai"),
+		parseAsString.withDefault("nodejs"),
 	);
 	const [loading, setLoading] = useState(false);
 	/** True from "Go to Dashboard" until navigation (or error). */
@@ -84,7 +85,7 @@ export function useGenerateApiKey() {
 	};
 
 	const sendPlatformTestEmail = useCallback(async () => {
-		if (!apiKey || testStatus === "sending" || testStatus === "sent") return;
+		if (testStatus === "sending" || testStatus === "sent") return;
 
 		setTestStatus("sending");
 		setTestError(null);
@@ -93,12 +94,7 @@ export function useGenerateApiKey() {
 			const response = await axios.post(
 				"/api/email/v1/onboarding/send-test-email",
 				{},
-				{
-					withCredentials: true,
-					headers: {
-						"x-api-key": apiKey,
-					},
-				},
+				{ withCredentials: true },
 			);
 
 			const data = response.data as {
@@ -111,20 +107,20 @@ export function useGenerateApiKey() {
 			setTestStatus("sent");
 			toast.success(
 				data.to
-					? `Test email sent to ${data.to}`
-					: "Test email sent — check your inbox",
+					? `Email sent to ${data.to}`
+					: "Email sent — check your inbox",
 			);
 		} catch (error) {
 			const errorMessage = axios.isAxiosError(error)
 				? error.response?.data?.message ||
 					error.response?.data?.why ||
-					"Failed to send test email"
-				: "Failed to send test email";
+					"Failed to send email"
+				: "Failed to send email";
 			setTestStatus("error");
 			setTestError(errorMessage);
 			toast.error(errorMessage);
 		}
-	}, [apiKey, testStatus]);
+	}, [testStatus]);
 
 	const finishOnboarding = useCallback(async () => {
 		// Guard double-clicks (button + mod+enter) before React re-renders.
@@ -173,12 +169,19 @@ export function useGenerateApiKey() {
 		}
 	}, [queryClient, router]);
 
+	const setChoice = useCallback(
+		(next: LanguageCode) => {
+			void setChoiceParam(next);
+		},
+		[setChoiceParam],
+	);
+
 	return {
 		apiKey,
 		loading,
 		finishing,
 		choice,
-		setChoice: setChoiceParam,
+		setChoice,
 		generateKey,
 		finishOnboarding,
 		sendPlatformTestEmail,

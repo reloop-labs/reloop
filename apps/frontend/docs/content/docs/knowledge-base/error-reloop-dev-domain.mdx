@@ -1,36 +1,38 @@
 ---
 title: "reloop.dev Domain Error"
-description: "Why you cannot send from the reloop.dev domain."
+description: "Why you cannot send from the reloop.dev domain via the public API."
 ---
 
-Why you cannot send from the reloop.dev domain.
+Why you cannot send from the `reloop.dev` domain via the public send API.
 
 ## Overview
 
-This article covers common causes and solutions for this issue when using Reloop.
+`reloop.dev` (or your deployment's `ONBOARDING_TEST_DOMAIN`) is a **Reloop-owned onboarding test domain**. It is reserved for the onboarding **Send email** button — not for arbitrary customer domain setup.
+
+If you call `POST /api/mail/v1/send` with a From address on that domain, Reloop returns an error directing you to use your own verified domain.
 
 ## Common Causes
 
-- Misconfigured DNS records
-- API key permissions not matching the domain
-- Rate limiting or account restrictions
+- Using `onboarding@reloop.dev` (or similar) in a public `/send` request
+- Trying to add `reloop.dev` as a customer domain in the dashboard
+- Expecting open sandbox sends to any recipient from the platform domain
 
-## Resolution Steps
+## What works instead
 
 <Steps>
-  <Step title="Check your configuration">
-    Review your domain settings in the [Reloop dashboard](https://app.reloop.dev/domains) and ensure all DNS records are correctly configured.
+  <Step title="Onboarding test">
+    After generating an API key, click **Send test email to me**. That path sends only to your account email from the platform domain.
   </Step>
-  <Step title="Verify API key permissions">
-    Ensure your API key has the correct permissions for the operation you're performing. Go to [API Keys](https://app.reloop.dev/api-keys) to review.
+  <Step title="Production sending">
+    Add your domain in the [dashboard](https://app.reloop.dev/domains), finish DNS verification, then send with a From address on that domain.
   </Step>
   <Step title="Contact support">
-    If the issue persists, reach out to [Reloop support](https://reloop.dev/help) with your error details and domain information.
+    If a legitimate platform test fails, contact [Reloop support](https://reloop.dev/help) with the error payload and approximate time.
   </Step>
 </Steps>
 
 ## Learn More
 
+- [Email Addresses for Testing](/docs/knowledge-base/testing-email-addresses)
 - [Domain Not Verifying](/docs/knowledge-base/domain-not-verifying)
-- [Avoid MX Conflicts](/docs/knowledge-base/avoid-mx-conflicts)
-- [Emails Going to Spam](/docs/knowledge-base/emails-going-to-spam)
+- [Account Quotas and Limits](/docs/knowledge-base/account-quotas-limits)

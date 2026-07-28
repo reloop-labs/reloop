@@ -160,41 +160,6 @@ export const MailErrors = {
 			why: "Neither 'html' nor 'text' body was provided, and the referenced template has no rendered content",
 			fix: "Provide at least one of 'html' or 'text' in the request body, or ensure the template has rendered HTML",
 		}),
-	platformDomainReserved: (domainName: string) =>
-		createError({
-			status: 400,
-			message: "Platform domain not allowed",
-			why: `You cannot send from ${domainName} via the public send API. That domain is reserved for Reloop platform test emails.`,
-			fix: "Add and verify your own domain, then send from an address on that domain.",
-		}),
-	platformTestDisabled: () =>
-		createError({
-			status: 403,
-			message: "Platform test email disabled",
-			why: "Sending via the platform test domain is disabled on this deployment.",
-			fix: "Configure PLATFORM_TEST_ENABLED and a verified platform sender domain, or use your own domain.",
-		}),
-	platformTestRecipientRequired: () =>
-		createError({
-			status: 400,
-			message: "Recipient required",
-			why: "Platform test emails can only be delivered to your account email, which is missing.",
-			fix: "Update your profile email, then try again.",
-		}),
-	platformTestRecipientLocked: (allowedEmail: string) =>
-		createError({
-			status: 400,
-			message: "Recipient not allowed",
-			why: `Platform test emails can only be sent to your account email (${allowedEmail}).`,
-			fix: "Send the test to your own inbox, or verify your own domain for production sends.",
-		}),
-	platformTestRateLimited: (retryAfter: number) =>
-		createError({
-			status: 429,
-			message: "Too many test emails",
-			why: "You have sent too many platform test emails in a short period.",
-			fix: `Wait ${retryAfter} seconds before trying again.`,
-		}),
 };
 
 export const RateLimitErrors = {

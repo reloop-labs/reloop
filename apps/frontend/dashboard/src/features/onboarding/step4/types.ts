@@ -1,4 +1,6 @@
 export type LanguageCode = "nodejs" | "go" | "php" | "python";
-export type IntegrationMode = "ai" | "manual";
 export type PackageManager = "npm" | "pnpm" | "yarn" | "bun";
-export type IntegrationChoice = "ai" | LanguageCode;
+/** Selected SDK language in the onboarding playground. */
+export type IntegrationChoice = LanguageCode;
+/** @deprecated Mode tabs removed; kept for unused integration-mode-tabs. */
+export type IntegrationMode = "ai" | "manual";
