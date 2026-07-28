@@ -36,6 +36,8 @@ async function fetchOrganizationsFresh(
 	});
 }
 
+export type PlatformTestStatus = "idle" | "sending" | "sent" | "error";
+
 export function useGenerateApiKey() {
 	const queryClient = useQueryClient();
 	const router = useRouter();
@@ -51,6 +53,10 @@ export function useGenerateApiKey() {
 	/** True from "Go to Dashboard" until navigation (or error). */
 	const [finishing, setFinishing] = useState(false);
 	const finishingRef = useRef(false);
+	const [testStatus, setTestStatus] = useState<PlatformTestStatus>("idle");
+	const [testError, setTestError] = useState<string | null>(null);
+	const [testTo, setTestTo] = useState<string | null>(null);
+	const [testFrom, setTestFrom] = useState<string | null>(null);
 
 	const choice = parseChoice(choiceParam);
 
@@ -63,6 +69,10 @@ export function useGenerateApiKey() {
 				{ withCredentials: true },
 			);
 			setApiKey(response.data.key);
+			setTestStatus("idle");
+			setTestError(null);
+			setTestTo(null);
+			setTestFrom(null);
 		} catch (error) {
 			const errorMessage = axios.isAxiosError(error)
 				? error.response?.data?.message || "Failed to generate API key"
@@ -72,6 +82,49 @@ export function useGenerateApiKey() {
 			setLoading(false);
 		}
 	};
+
+	const sendPlatformTestEmail = useCallback(async () => {
+		if (!apiKey || testStatus === "sending" || testStatus === "sent") return;
+
+		setTestStatus("sending");
+		setTestError(null);
+
+		try {
+			const response = await axios.post(
+				"/api/email/v1/onboarding/send-test-email",
+				{},
+				{
+					withCredentials: true,
+					headers: {
+						"x-api-key": apiKey,
+					},
+				},
+			);
+
+			const data = response.data as {
+				to?: string;
+				from?: string;
+				message?: string;
+			};
+			setTestTo(data.to ?? null);
+			setTestFrom(data.from ?? null);
+			setTestStatus("sent");
+			toast.success(
+				data.to
+					? `Test email sent to ${data.to}`
+					: "Test email sent — check your inbox",
+			);
+		} catch (error) {
+			const errorMessage = axios.isAxiosError(error)
+				? error.response?.data?.message ||
+					error.response?.data?.why ||
+					"Failed to send test email"
+				: "Failed to send test email";
+			setTestStatus("error");
+			setTestError(errorMessage);
+			toast.error(errorMessage);
+		}
+	}, [apiKey, testStatus]);
 
 	const finishOnboarding = useCallback(async () => {
 		// Guard double-clicks (button + mod+enter) before React re-renders.
@@ -128,5 +181,10 @@ export function useGenerateApiKey() {
 		setChoice: setChoiceParam,
 		generateKey,
 		finishOnboarding,
+		sendPlatformTestEmail,
+		testStatus,
+		testError,
+		testTo,
+		testFrom,
 	};
 }

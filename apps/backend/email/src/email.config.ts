@@ -12,4 +12,13 @@ export const emailConfig = {
 	REDIS_URL: process.env.REDIS_URL || "redis://:reloop123@localhost:6379",
 	OTEL_EXPORTER_OTLP_ENDPOINT: process.env.OTEL_EXPORTER_OTLP_ENDPOINT || "",
 	OTEL_EXPORTER_OTLP_HEADERS: process.env.OTEL_EXPORTER_OTLP_HEADERS || "",
+
+	/** Platform domain for onboarding API-key test sends (must match mail service). */
+	PLATFORM_TEST_ENABLED: process.env.PLATFORM_TEST_ENABLED !== "false",
+	PLATFORM_TEST_FROM_DOMAIN:
+		process.env.PLATFORM_TEST_FROM_DOMAIN ||
+		process.env.RELOOP_SENDER_DOMAIN ||
+		"reloop.dev",
+	PLATFORM_TEST_FROM_LOCAL_PART:
+		process.env.PLATFORM_TEST_FROM_LOCAL_PART || "onboarding",
 };

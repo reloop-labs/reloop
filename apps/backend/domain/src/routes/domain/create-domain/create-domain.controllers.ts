@@ -37,6 +37,15 @@ export async function createDomainController({
 			);
 		}
 
+		const platformDomain =
+			domainConfig.PLATFORM_TEST_FROM_DOMAIN.toLowerCase().trim();
+		if (domain.toLowerCase().trim() === platformDomain) {
+			throw DomainErrors.invalidDomain(
+				domain,
+				`"${platformDomain}" is reserved for Reloop platform test emails and cannot be added as a customer domain.`,
+			);
+		}
+
 		// Step 1: Check if domain already exists
 		const { deletedDomain } = await checkExistingDomain_step1({
 			domain,

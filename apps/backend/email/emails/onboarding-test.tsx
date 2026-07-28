@@ -20,8 +20,13 @@ interface OnboardingTestEmailProps {
 	recipientEmail?: string;
 	/** Full From header used for this send */
 	fromAddress?: string;
-	/** Verified sending domain — shown prominently as ready to send */
+	/** Domain shown in the email (customer domain or platform test domain) */
 	domainName?: string;
+	/**
+	 * `platform` — post–API-key test via Reloop-owned domain.
+	 * `domain` — proof send after the customer verified their own domain.
+	 */
+	mode?: "platform" | "domain";
 }
 
 const defaultBaseUrl = process.env.NEXT_PUBLIC_BASE_URL
@@ -34,9 +39,11 @@ export const OnboardingTestEmail = ({
 	recipientEmail,
 	fromAddress,
 	domainName = "your-domain.com",
+	mode = "domain",
 }: OnboardingTestEmailProps) => {
 	const isDark = theme === "dark";
 	const domain = domainName;
+	const isPlatform = mode === "platform";
 
 	const cls = {
 		body: isDark
@@ -83,7 +90,9 @@ export const OnboardingTestEmail = ({
 	};
 
 	const tdBorder = isDark ? "1px solid #222222" : "1px solid #e0e0e0";
-	const previewLine = `${domain} is ready to send emails through Reloop.`;
+	const previewLine = isPlatform
+		? "Your Reloop API key works — this message was delivered to your inbox."
+		: `${domain} is ready to send emails through Reloop.`;
 
 	return (
 		<Html>
@@ -92,14 +101,27 @@ export const OnboardingTestEmail = ({
 			<Tailwind>
 				<Body className={cls.body}>
 					<Wrapper baseUrl={baseUrl} theme={theme}>
-						<Text className={cls.label}>Domain ready</Text>
+						<Text className={cls.label}>
+							{isPlatform ? "API key test" : "Domain ready"}
+						</Text>
 
 						<Heading
 							className={cls.heading}
 							style={{ fontFamily: "Georgia, serif" }}
 						>
-							{domain}{" "}
-							<span className={cls.headingMuted}>is ready to send emails.</span>
+							{isPlatform ? (
+								<>
+									Your API key{" "}
+									<span className={cls.headingMuted}>works.</span>
+								</>
+							) : (
+								<>
+									{domain}{" "}
+									<span className={cls.headingMuted}>
+										is ready to send emails.
+									</span>
+								</>
+							)}
 						</Heading>
 
 						<Hr className={cls.hr} />
@@ -107,18 +129,29 @@ export const OnboardingTestEmail = ({
 						<Text className={cls.salutation}>Hello there,</Text>
 
 						<Text className={cls.bodyText}>
-							You added <strong>{domain}</strong> to Reloop and finished DNS
-							verification. This message is the proof: it was delivered from
-							your own domain, so outbound sending works.
+							{isPlatform ? (
+								<>
+									You generated an API key and asked Reloop to send a real test
+									message. This email is the proof: delivery works. It was sent
+									from Reloop&apos;s platform test domain (
+									<strong>{domain}</strong>), not from a domain you verified
+									yourself.
+								</>
+							) : (
+								<>
+									You added <strong>{domain}</strong> to Reloop and finished DNS
+									verification. This message is the proof: it was delivered from
+									your own domain, so outbound sending works.
+								</>
+							)}
 						</Text>
 
-						{/* Domain callout — same visual language as domain-verified */}
 						<Section className={cls.domainBox}>
 							<Text className={cls.domainText}>{domain}</Text>
 							<Text
 								className={isDark ? cls.domainBadgeDark : cls.domainBadge}
 							>
-								✓ Ready to send
+								{isPlatform ? "✓ Platform test domain" : "✓ Ready to send"}
 							</Text>
 							{fromAddress ? (
 								<Text className={cls.metaRow}>From {fromAddress}</Text>
@@ -129,12 +162,21 @@ export const OnboardingTestEmail = ({
 						</Section>
 
 						<Text className={cls.bodyText}>
-							You can now send transactional and product emails from addresses
-							on <strong>{domain}</strong> via the API or SMTP — SPF, DKIM, and
-							DMARC are authenticated for this domain.
+							{isPlatform ? (
+								<>
+									For production From addresses (your brand, SPF/DKIM on your
+									zone), add and verify your own domain in the dashboard. The
+									platform domain is only for this first inbox check.
+								</>
+							) : (
+								<>
+									You can now send transactional and product emails from
+									addresses on <strong>{domain}</strong> via the API or SMTP —
+									SPF, DKIM, and DMARC are authenticated for this domain.
+								</>
+							)}
 						</Text>
 
-						{/* Next steps */}
 						<Section className={cls.capBox}>
 							<Text className={cls.label}>What you can do next</Text>
 
@@ -155,10 +197,13 @@ export const OnboardingTestEmail = ({
 											verticalAlign: "top",
 										}}
 									>
-										<Text className={cls.rowTitle}>Send from the API</Text>
+										<Text className={cls.rowTitle}>
+											{isPlatform ? "Add your domain" : "Send from the API"}
+										</Text>
 										<Text className={cls.rowDesc}>
-											Use an API key or SMTP with a From address on {domain} to
-											send from your app.
+											{isPlatform
+												? "Verify SPF, DKIM, and DMARC on your domain so production mail is branded as you."
+												: `Use an API key or SMTP with a From address on ${domain} to send from your app.`}
 										</Text>
 									</td>
 								</tr>
@@ -180,10 +225,13 @@ export const OnboardingTestEmail = ({
 											verticalAlign: "top",
 										}}
 									>
-										<Text className={cls.rowTitle}>Add templates</Text>
+										<Text className={cls.rowTitle}>
+											{isPlatform ? "Send from the API" : "Add templates"}
+										</Text>
 										<Text className={cls.rowDesc}>
-											Build reusable layouts in the template designer for
-											consistent branded mail.
+											{isPlatform
+												? "Use your API key with a From address on your verified domain."
+												: "Build reusable layouts in the template designer for consistent branded mail."}
 										</Text>
 									</td>
 								</tr>
@@ -200,8 +248,7 @@ export const OnboardingTestEmail = ({
 									<td style={{ paddingTop: "20px", verticalAlign: "top" }}>
 										<Text className={cls.rowTitle}>Watch deliverability</Text>
 										<Text className={cls.rowDesc}>
-											Track delivery, bounces, and reputation for {domain} in
-											Metrics.
+											Track delivery, bounces, and reputation in Metrics.
 										</Text>
 									</td>
 								</tr>
@@ -211,9 +258,13 @@ export const OnboardingTestEmail = ({
 						<Section className="mt-10">
 							<Button
 								className={cls.btn}
-								href={`${baseUrl}/dashboard/domain`}
+								href={
+									isPlatform
+										? `${baseUrl}/dashboard/domain`
+										: `${baseUrl}/dashboard/domain`
+								}
 							>
-								View domain →
+								{isPlatform ? "Add a domain →" : "View domain →"}
 							</Button>
 						</Section>
 

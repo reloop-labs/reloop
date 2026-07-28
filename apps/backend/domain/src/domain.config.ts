@@ -11,6 +11,24 @@ export const domainConfig = {
 		process.env.TRACKING_DOMAIN ||
 		`link.${process.env.HOST_DOMAIN || "reloop.sh"}`,
 	DKIM_SELECTOR: process.env.DKIM_SELECTOR || "reloop",
+	/**
+	 * Platform-owned send domain (onboarding test + system mail).
+	 * DKIM for this name can be resolved without org ownership (shared keys).
+	 */
+	PLATFORM_TEST_FROM_DOMAIN:
+		process.env.PLATFORM_TEST_FROM_DOMAIN ||
+		process.env.RELOOP_SENDER_DOMAIN ||
+		"reloop.dev",
+	/** Optional env override for platform-domain DKIM (PEM). Literal `\n` normalized. */
+	PLATFORM_DKIM_PRIVATE_KEY: (
+		process.env.PLATFORM_DKIM_PRIVATE_KEY || ""
+	)
+		.replace(/\\n/g, "\n")
+		.trim(),
+	PLATFORM_DKIM_SELECTOR:
+		process.env.PLATFORM_DKIM_SELECTOR ||
+		process.env.DKIM_SELECTOR ||
+		"reloop",
 	NATS_URL: process.env.NATS_URL || "nats://localhost:4222",
 	RELOOP_INTERNAL_SECRET:
 		process.env.RELOOP_INTERNAL_SECRET || "reloop_internal_secret_default_123",

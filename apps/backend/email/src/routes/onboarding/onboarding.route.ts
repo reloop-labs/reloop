@@ -4,20 +4,17 @@ import {
 	resolveSessionAuthWithProfile,
 } from "@reloop/auth/middleware";
 import { db } from "@reloop/db/client";
-import { domain, organization } from "@reloop/db/schema";
+import { organization } from "@reloop/db/schema";
 import { emailConfig } from "@reloop/email/email.config";
 import OnboardingTestEmail from "@reloop/email/emails/onboarding-test";
 import { render } from "@reloop/email/render";
-import { and, desc, eq } from "drizzle-orm";
-import { Elysia } from "elysia";
+import { eq } from "drizzle-orm";
+import { Elysia, t } from "elysia";
 import React from "react";
 
 const sessionRedis = createSessionCacheRedis(emailConfig.REDIS_URL, 5);
 
-/** Default local-part for one-click first sends. */
-const DEFAULT_LOCAL_PART = "hello";
-
-function buildFromAddress({
+function buildPlatformFromAddress({
 	localPart,
 	domainName,
 	fromName,
@@ -45,16 +42,17 @@ export const onboardingRoute = new Elysia({
 		}),
 	)
 	/**
-	 * One-click first/test email.
-	 * Session auth only. No body required.
-	 * - To: signed-in user email
-	 * - From: hello@<first active org domain> (display name = workspace name)
-	 * - Body: onboarding-test React email template
+	 * One-click platform test email after API key generation.
+	 * Session auth required. Prefer the just-generated API key via `x-api-key`
+	 * so inject + logs attribute the Onboarding Key.
+	 *
+	 * - From: onboarding@<PLATFORM_TEST_FROM_DOMAIN> (display name = workspace)
+	 * - To: signed-in user email only
+	 * - Body: onboarding-test template (platform mode)
 	 */
 	.post(
 		"/onboarding/send-test-email",
 		async ({ request, set }) => {
-			const cookie = request.headers.get("cookie");
 			const session = await resolveSessionAuthWithProfile(
 				request.headers,
 				{
@@ -73,6 +71,15 @@ export const onboardingRoute = new Elysia({
 				};
 			}
 
+			if (!emailConfig.PLATFORM_TEST_ENABLED) {
+				set.status = 403;
+				return {
+					message: "Platform test email disabled",
+					why: "Sending via the platform test domain is disabled on this deployment.",
+					fix: "Verify your own domain, or enable PLATFORM_TEST_ENABLED.",
+				};
+			}
+
 			const to = session.userEmail?.trim();
 			if (!to) {
 				set.status = 400;
@@ -83,40 +90,8 @@ export const onboardingRoute = new Elysia({
 				};
 			}
 
-			const [domainRow] = await db
-				.select({
-					id: domain.id,
-					domain: domain.domain,
-					status: domain.status,
-					isSendingEmailEnabled: domain.isSendingEmailEnabled,
-				})
-				.from(domain)
-				.where(
-					and(
-						eq(domain.organizationId, session.organizationId),
-						eq(domain.status, "active"),
-					),
-				)
-				.orderBy(desc(domain.createdAt))
-				.limit(1);
-
-			if (!domainRow) {
-				set.status = 400;
-				return {
-					message: "No active domain",
-					why: "You need a verified domain before sending a test email.",
-					fix: "Add a domain and finish DNS verification, then try again.",
-				};
-			}
-
-			if (domainRow.isSendingEmailEnabled === false) {
-				set.status = 400;
-				return {
-					message: "Sending is disabled for this domain",
-					why: `"${domainRow.domain}" has outbound sending turned off.`,
-					fix: "Enable sending for this domain, then try again.",
-				};
-			}
+			const platformDomain = emailConfig.PLATFORM_TEST_FROM_DOMAIN;
+			const localPart = emailConfig.PLATFORM_TEST_FROM_LOCAL_PART;
 
 			const [orgRow] = await db
 				.select({ name: organization.name })
@@ -127,11 +102,11 @@ export const onboardingRoute = new Elysia({
 			const fromName =
 				orgRow?.name?.trim() ||
 				session.userName?.trim() ||
-				undefined;
+				"Reloop";
 
-			const from = buildFromAddress({
-				localPart: DEFAULT_LOCAL_PART,
-				domainName: domainRow.domain,
+			const from = buildPlatformFromAddress({
+				localPart,
+				domainName: platformDomain,
 				fromName,
 			});
 
@@ -140,24 +115,35 @@ export const onboardingRoute = new Elysia({
 					baseUrl: emailConfig.BASE_URL,
 					recipientEmail: to,
 					fromAddress: from,
-					domainName: domainRow.domain,
+					domainName: platformDomain,
+					mode: "platform",
 				}),
 			);
 
-			const mailSendUrl = `${emailConfig.BASE_URL}/api/mail/v1/send`;
+			const mailPlatformTestUrl = `${emailConfig.BASE_URL}/api/mail/v1/platform-test`;
+			const apiKeyHeader = request.headers.get("x-api-key");
+
+			const forwardHeaders: Record<string, string> = {
+				"Content-Type": "application/json",
+			};
+			// Prefer the user's just-generated API key so the real key path is exercised.
+			if (apiKeyHeader) {
+				forwardHeaders["x-api-key"] = apiKeyHeader;
+			} else {
+				const cookie = request.headers.get("cookie");
+				if (cookie) forwardHeaders.Cookie = cookie;
+			}
 
 			try {
-				const response = await fetch(mailSendUrl, {
+				const response = await fetch(mailPlatformTestUrl, {
 					method: "POST",
-					headers: {
-						"Content-Type": "application/json",
-						...(cookie ? { Cookie: cookie } : {}),
-					},
+					headers: forwardHeaders,
 					body: JSON.stringify({
-						from,
-						to,
-						subject: `${domainRow.domain} is ready to send emails`,
 						html,
+						subject: "Your Reloop API key works",
+						from_name: fromName,
+						recipient_email: to,
+						text: `Your Reloop API key works. This message was sent from ${from} to ${to} using Reloop's platform test domain (${platformDomain}). Add and verify your own domain for production From addresses.`,
 					}),
 				});
 
@@ -169,7 +155,7 @@ export const onboardingRoute = new Elysia({
 						message:
 							(payload as { message?: string }).message ||
 							(payload as { why?: string }).why ||
-							"Failed to send email via mail service",
+							"Failed to send platform test email",
 						why: (payload as { why?: string }).why,
 						fix: (payload as { fix?: string }).fix,
 					};
@@ -178,10 +164,10 @@ export const onboardingRoute = new Elysia({
 				return {
 					object: "email",
 					event: "email.sent",
+					mode: "platform",
 					to,
 					from,
-					domainId: domainRow.id,
-					domain: domainRow.domain,
+					domain: platformDomain,
 					...(payload as Record<string, unknown>),
 				};
 			} catch (error) {
@@ -194,10 +180,11 @@ export const onboardingRoute = new Elysia({
 		},
 		{
 			authSession: true,
+			body: t.Optional(t.Object({})),
 			detail: {
-				summary: "One-click first email to signed-in user",
+				summary: "Platform test email to signed-in user",
 				description:
-					"Session-authenticated. Picks the first active org domain, sends the onboarding-test template to the signed-in user. No request body.",
+					"Session-authenticated. Sends a real email from the Reloop-owned platform domain to the signed-in user only. Pass the just-generated API key as x-api-key so inject attributes the Onboarding Key. No request body required.",
 				tags: ["Onboarding"],
 			},
 		},

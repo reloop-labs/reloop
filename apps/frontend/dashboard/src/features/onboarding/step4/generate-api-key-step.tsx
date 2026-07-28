@@ -11,6 +11,11 @@ export function GenerateApiKeyStep() {
 		setChoice,
 		generateKey,
 		finishOnboarding,
+		sendPlatformTestEmail,
+		testStatus,
+		testError,
+		testTo,
+		testFrom,
 	} = useGenerateApiKey();
 
 	if (!apiKey) {
@@ -33,6 +38,13 @@ export function GenerateApiKeyStep() {
 			onDone={() => {
 				void finishOnboarding();
 			}}
+			onSendTest={() => {
+				void sendPlatformTestEmail();
+			}}
+			testStatus={testStatus}
+			testError={testError}
+			testTo={testTo}
+			testFrom={testFrom}
 		/>
 	);
 }

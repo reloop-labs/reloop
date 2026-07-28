@@ -1,8 +1,9 @@
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
+import { domainConfig } from "@reloop/domain/domain.config";
 import type { DomainTypes } from "@reloop/domain/types/domain.type";
 import { DOMAIN_LIST_WEBHOOK_EVENT } from "@reloop/webhook-events";
-import { and, count, desc, eq, ilike, isNull } from "drizzle-orm";
+import { and, count, desc, eq, ilike, isNull, ne } from "drizzle-orm";
 
 import { useLogger } from "evlog/elysia";
 
@@ -18,9 +19,13 @@ export async function listDomainsController({
 	const offset = (page - 1) * limit;
 
 	try {
+		const platformDomain =
+			domainConfig.PLATFORM_TEST_FROM_DOMAIN.toLowerCase().trim();
+		// Phantom platform-test rows exist for email_log FK only — hide from UI/API list.
 		const conditions = [
 			isNull(schema.domain.deletedAt),
 			eq(schema.domain.organizationId, organizationId),
+			ne(schema.domain.domain, platformDomain),
 		];
 		if (status) {
 			conditions.push(eq(schema.domain.status, status));
