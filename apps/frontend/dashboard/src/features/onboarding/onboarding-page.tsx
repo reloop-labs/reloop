@@ -6,6 +6,8 @@ import type React from "react";
 import { useEffect } from "react";
 import { AuthSessionLoader } from "#/features/auth/auth-session-loader";
 import { useSessionQuery } from "#/features/auth/session-query";
+import { ApiKeySidebarPreview } from "./api-key-sidebar-preview";
+import { DnsSidebarPreview } from "./dns-sidebar-preview";
 import { DomainPreview } from "./domain-preview";
 import { OrgSidebarPreview } from "./org-sidebar-preview";
 import { SplitLayout } from "./split-layout";
@@ -28,8 +30,8 @@ export function OnboardingPage() {
 		"domainId",
 		parseAsString.withDefault(""),
 	);
-	const [, setApiKey] = useQueryState("apiKey", parseAsString.withDefault(""));
-	const [, setLang] = useQueryState("lang", parseAsString.withDefault(""));
+	const [apiKey, setApiKey] = useQueryState("apiKey", parseAsString.withDefault(""));
+	const [lang, setLang] = useQueryState("lang", parseAsString.withDefault(""));
 	const [skippedDns, setSkippedDns] = useQueryState(
 		"skippedDns",
 		parseAsString.withDefault(""),
@@ -124,16 +126,14 @@ export function OnboardingPage() {
 		3: {
 			stepIndicator: "Step 3 of 4",
 			component: <ConfigureDnsStep />,
-			preview: null,
-			fullWidth: true,
-			maxWidth: "3xl",
+			preview: <DnsSidebarPreview domain={domain} />,
+			fullWidth: false,
 		},
 		4: {
 			stepIndicator: "Step 4 of 4",
 			component: <GenerateApiKeyStep />,
-			preview: null,
-			fullWidth: true,
-			maxWidth: "3xl",
+			preview: <ApiKeySidebarPreview apiKey={apiKey} lang={lang} />,
+			fullWidth: false,
 			verticalAlign: "start",
 		},
 	};

@@ -16,7 +16,7 @@ export function DomainSidebarPreview({ domain, logo }: DomainSidebarPreviewProps
 	const skeletonBg = "bg-bg-weak-50 dark:bg-bg-soft-200/30";
 
 	return (
-		<div className="flex w-full items-center justify-center p-2">
+		<div className="flex h-full w-full items-center justify-center p-4 sm:p-6">
 			<div className="relative flex h-[460px] w-full max-w-[640px] scale-110 flex-col overflow-hidden rounded-2xl [mask-image:linear-gradient(135deg,black_40%,transparent_92%)] sm:h-[480px]">
 				{/* Main Body */}
 				<div className="flex flex-1 overflow-hidden">

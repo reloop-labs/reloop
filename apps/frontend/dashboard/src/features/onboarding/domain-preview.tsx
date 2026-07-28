@@ -26,14 +26,14 @@ export function DomainPreview({
 			className={
 				isDomainVariant
 					? "absolute top-[176px] left-4"
-					: "flex items-center justify-center"
+					: "flex h-full w-full items-center justify-center p-4 sm:p-8"
 			}
 		>
 			<div
 				className={
 					isDomainVariant
 						? "w-[920px] transform overflow-hidden rounded-2xl transition-all"
-						: "relative flex h-[520px] w-full max-w-[600px] scale-110 flex-col overflow-hidden rounded-2xl [mask-image:linear-gradient(135deg,black_40%,transparent_92%)]"
+						: "relative flex w-full max-w-[540px] flex-col overflow-hidden rounded-2xl"
 				}
 				style={isDomainVariant ? { maxHeight: "calc(100% + 16px)" } : undefined}
 			>
