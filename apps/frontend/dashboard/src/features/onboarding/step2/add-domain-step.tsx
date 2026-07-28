@@ -56,11 +56,11 @@ export function AddDomainStep() {
 
 	return (
 		<div className="space-y-6">
-			<div className="space-y-1">
+			<div>
 				<h1 className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
 					Add Domain
 				</h1>
-				<p className="text-text-sub-600 text-sm">
+				<p className="text-sm text-text-sub-600">
 					Send emails from a domain you control
 				</p>
 			</div>

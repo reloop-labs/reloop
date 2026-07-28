@@ -98,15 +98,12 @@ export function DomainInputField({
 										: "mt-0.5 h-3.5 w-3.5 shrink-0 text-text-soft-400"
 								}
 							/>
-							<span>
-								Use a subdomain
-								{!criteria.isSubdomain && (
-									<>
-										{" "}
-										(e.g., mail.{rootDomain}, send.{rootDomain}, m.{rootDomain})
-									</>
-								)}
-							</span>
+							<div>
+								<div>Use a subdomain</div>
+								<div className="text-text-soft-400 text-xs">
+									(e.g., mail.{rootDomain}, send.{rootDomain}, m.{rootDomain})
+								</div>
+							</div>
 						</div>
 						<div className="flex items-start gap-2 text-text-sub-600 text-xs">
 							<Icon
