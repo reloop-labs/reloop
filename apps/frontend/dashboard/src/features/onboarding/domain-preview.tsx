@@ -26,27 +26,17 @@ export function DomainPreview({
 			className={
 				isDomainVariant
 					? "absolute top-[176px] left-4"
-					: "absolute top-32 left-28"
+					: "absolute top-24 left-8"
 			}
 		>
 			<div
 				className={
 					isDomainVariant
-						? "w-[920px] transform overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 transition-all dark:border-stroke-soft-100/40"
-						: "relative flex h-[520px] w-[480px] flex-col overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 shadow-2xl dark:border-stroke-soft-100/40"
+						? "w-[920px] transform overflow-hidden bg-bg-white-0 transition-all"
+						: "relative flex h-[520px] w-[480px] flex-col overflow-hidden rounded-2xl bg-bg-white-0 shadow-2xl"
 				}
-				style={
-					isDomainVariant ? { maxHeight: "calc(100% + 16px)" } : undefined
-				}
+				style={isDomainVariant ? { maxHeight: "calc(100% + 16px)" } : undefined}
 			>
-				<div className="flex items-center gap-2 border-stroke-soft-100 border-b px-4 py-3 dark:border-stroke-soft-100/40">
-					<div className="flex gap-1.5">
-						<div className="h-3 w-3 rounded-full bg-error-base/80" />
-						<div className="h-3 w-3 rounded-full bg-warning-base/80" />
-						<div className="h-3 w-3 rounded-full bg-success-base/80" />
-					</div>
-				</div>
-
 				<div
 					className={
 						isDomainVariant
@@ -191,22 +181,6 @@ export function DomainPreview({
 							</div>
 						</div>
 					</div>
-
-					{!isDomainVariant && (
-						<div className="mt-8 space-y-4 opacity-40 blur-[0.5px]">
-							<div className="h-4 w-full rounded bg-bg-soft-200" />
-							<div className="h-4 w-11/12 rounded bg-bg-soft-200" />
-							<div className="h-4 w-4/5 rounded bg-bg-soft-200" />
-
-							<div className="mt-8 flex h-40 w-full items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-weak-50 text-text-soft-400">
-								<Icon name="info" />
-							</div>
-
-							<div className="mt-6 flex justify-center">
-								<div className="h-10 w-32 rounded-lg bg-primary-lighter" />
-							</div>
-						</div>
-					)}
 				</div>
 			</div>
 		</div>

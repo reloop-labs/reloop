@@ -36,6 +36,11 @@ export function DomainInputField({
 		};
 	}, [domain, domainParts]);
 
+	const displayDomain = React.useMemo(() => {
+		if (!domain || domain.trim().length === 0) return "example.com";
+		return domain;
+	}, [domain]);
+
 	return (
 		<section className="space-y-2">
 			<div>
@@ -63,7 +68,7 @@ export function DomainInputField({
 
 						{criteria.isSubdomain && (
 							<Input.Icon>
-								<Icon name="check-circle" className="h-4 w-4 text-green-500" />
+								<Icon name="check" className="h-4 w-4 text-green-500" />
 							</Input.Icon>
 						)}
 
@@ -78,58 +83,38 @@ export function DomainInputField({
 					</Input.Wrapper>
 				</Input.Root>
 
-				{domainParts.length === 2 && (
-					<div className="mt-2 space-y-2">
-						<div className="font-medium text-text-sub-600 text-xs">
-							Domain Recommendations:
+				<div className="mt-2 space-y-2">
+					<div className="font-medium text-text-sub-600 text-xs">
+						Domain Recommendations:
+					</div>
+					<div className="space-y-1.5">
+						<div className="flex items-center gap-2 text-text-sub-600 text-xs">
+							{criteria.isSubdomain ? (
+								<Icon name="check" className="h-4 w-4 text-green-500" />
+							) : (
+								<Icon name="cross" className="h-4 w-4 text-text-soft-400" />
+							)}
+							Use a subdomain (e.g., mail.{displayDomain}, send.
+							{displayDomain}, m.{displayDomain})
 						</div>
-						<div className="space-y-1.5">
-							<div className="flex items-center gap-2 text-text-sub-600 text-xs">
-								{criteria.isSubdomain ? (
-									<Icon
-										name="check-circle"
-										className="h-4 w-4 text-green-500"
-									/>
-								) : (
-									<Icon
-										name="cross-circle"
-										className="h-4 w-4 text-text-soft-400"
-									/>
-								)}
-								Use a subdomain (e.g., mail.{domain}, send.{domain}, m.
-								{domain})
-							</div>
-							<div className="flex items-center gap-2 text-text-sub-600 text-xs">
-								{criteria.isNotRoot ? (
-									<Icon
-										name="check-circle"
-										className="h-4 w-4 text-green-500"
-									/>
-								) : (
-									<Icon
-										name="cross-circle"
-										className="h-4 w-4 text-text-soft-400"
-									/>
-								)}
-								Avoid using your root domain
-							</div>
-							<div className="flex items-center gap-2 text-text-sub-600 text-xs">
-								{criteria.isValid ? (
-									<Icon
-										name="check-circle"
-										className="h-4 w-4 text-green-500"
-									/>
-								) : (
-									<Icon
-										name="cross-circle"
-										className="h-4 w-4 text-text-soft-400"
-									/>
-								)}
-								Valid domain format
-							</div>
+						<div className="flex items-center gap-2 text-text-sub-600 text-xs">
+							{criteria.isNotRoot ? (
+								<Icon name="check" className="h-4 w-4 text-green-500" />
+							) : (
+								<Icon name="cross" className="h-4 w-4 text-text-soft-400" />
+							)}
+							Avoid using your root domain
+						</div>
+						<div className="flex items-center gap-2 text-text-sub-600 text-xs">
+							{criteria.isValid ? (
+								<Icon name="check" className="h-4 w-4 text-green-500" />
+							) : (
+								<Icon name="cross" className="h-4 w-4 text-text-soft-400" />
+							)}
+							Valid domain format
 						</div>
 					</div>
-				)}
+				</div>
 
 				{errors.domain && (
 					<div className="mt-2 flex items-center gap-2">
