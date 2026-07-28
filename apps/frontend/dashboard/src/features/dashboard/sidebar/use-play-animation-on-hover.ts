@@ -6,7 +6,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 const FALLBACK_MS = 1700;
 
 /** How long the pointer must stay before the icon animation starts. */
-const HOVER_DELAY_MS = 700;
+const HOVER_DELAY_MS = 300;
 
 /**
  * After a sustained hover, plays CSS animations to completion —
