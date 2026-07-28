@@ -8,7 +8,6 @@ import {
 	pgTable,
 	text,
 	timestamp,
-	unique,
 	varchar,
 } from "drizzle-orm/pg-core";
 import { organization, user } from "./auth";
@@ -112,7 +111,9 @@ export const domain = pgTable(
 			table.status,
 			table.userVerifiedDomain,
 		),
-		unique("domain_unique_org_domain").on(table.organizationId, table.domain),
+		// Uniqueness for active domains is enforced in application code
+		// (create-domain step-1), not a DB unique constraint — so soft-deleted
+		// rows and platform/onboarding domain sharing stay flexible.
 	],
 );
 
@@ -158,12 +159,6 @@ export const domainDnsRecord = pgTable(
 		index("domain_dns_record_idx_domain_type").on(
 			table.domainId,
 			table.recordType,
-		),
-		unique("domain_dns_record_unique_record").on(
-			table.domainId,
-			table.recordType,
-			table.name,
-			table.value,
 		),
 	],
 );

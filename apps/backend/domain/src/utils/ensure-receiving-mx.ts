@@ -11,8 +11,8 @@ import { and, eq, isNull } from "drizzle-orm";
  * Repairs legacy rows that used the custom return-path label as the MX name
  * and/or pointed at bare HOST_DOMAIN instead of inbound.HOST_DOMAIN.
  *
- * Updates in place when possible to avoid unique-constraint clashes with
- * soft-deleted rows (unique is on domainId+type+name+value, ignores deletedAt).
+ * Updates in place when possible so soft-deleted or legacy rows do not leave
+ * duplicate active receiving MX records.
  */
 export async function ensureReceivingMxRecord({
 	domainId,

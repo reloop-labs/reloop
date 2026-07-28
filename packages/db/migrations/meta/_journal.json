@@ -29,6 +29,20 @@
       "when": 1785300000000,
       "tag": "0003_activity_log",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1785400000000,
+      "tag": "0004_drop_domain_unique_org_domain",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1785400000001,
+      "tag": "0005_drop_domain_dns_record_unique",
+      "breakpoints": true
     }
   ]
 }
