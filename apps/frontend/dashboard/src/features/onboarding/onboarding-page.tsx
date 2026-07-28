@@ -7,7 +7,7 @@ import { useEffect } from "react";
 import { AuthSessionLoader } from "#/features/auth/auth-session-loader";
 import { useSessionQuery } from "#/features/auth/session-query";
 import { DomainPreview } from "./domain-preview";
-import { SidebarPreview } from "./sidebar-preview";
+import { OrgSidebarPreview } from "./org-sidebar-preview";
 import { SplitLayout } from "./split-layout";
 import { CreateOrgStep } from "./step1/create-org-step";
 import { AddDomainStep } from "./step2/add-domain-step";
@@ -112,7 +112,7 @@ export function OnboardingPage() {
 		1: {
 			stepIndicator: "Step 1 of 4",
 			component: <CreateOrgStep />,
-			preview: <SidebarPreview name={name} logo={logoUrl || null} />,
+			preview: <OrgSidebarPreview name={name} logo={logoUrl || null} />,
 			fullWidth: false,
 		},
 		2: {

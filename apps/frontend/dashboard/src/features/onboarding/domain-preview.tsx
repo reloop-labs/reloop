@@ -33,11 +33,10 @@ export function DomainPreview({
 				className={
 					isDomainVariant
 						? "w-[920px] transform overflow-hidden rounded-2xl transition-all"
-						: "relative flex h-[520px] w-full max-w-[600px] scale-110 translate-x-12 translate-y-16 flex-col overflow-hidden rounded-2xl [mask-image:linear-gradient(135deg,black_40%,transparent_92%)]"
+						: "relative flex h-[520px] w-full max-w-[600px] scale-110 flex-col overflow-hidden rounded-2xl [mask-image:linear-gradient(135deg,black_40%,transparent_92%)]"
 				}
 				style={isDomainVariant ? { maxHeight: "calc(100% + 16px)" } : undefined}
 			>
-
 				<div
 					className={
 						isDomainVariant
@@ -182,22 +181,6 @@ export function DomainPreview({
 							</div>
 						</div>
 					</div>
-
-					{!isDomainVariant && (
-						<div className="mt-8 space-y-4 opacity-40 blur-[0.5px]">
-							<div className="h-4 w-full rounded bg-bg-soft-200" />
-							<div className="h-4 w-11/12 rounded bg-bg-soft-200" />
-							<div className="h-4 w-4/5 rounded bg-bg-soft-200" />
-
-							<div className="mt-8 flex h-40 w-full items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-weak-50 text-text-soft-400">
-								<Icon name="info" />
-							</div>
-
-							<div className="mt-6 flex justify-center">
-								<div className="h-10 w-32 rounded-lg bg-primary-lighter" />
-							</div>
-						</div>
-					)}
 				</div>
 			</div>
 		</div>
