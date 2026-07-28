@@ -43,10 +43,11 @@ export const DomainInputField = ({
 		};
 	}, [domain, domainParts, domainRegex]);
 
-	const displayDomain = React.useMemo(() => {
-		if (!domain || domain.trim().length === 0) return "example.com";
-		return domain;
-	}, [domain]);
+	const rootDomain = React.useMemo(() => {
+		if (!domainParts.length) return "example.com";
+		if (domainParts.length === 1) return `${domainParts[0]}.com`;
+		return domainParts.slice(-2).join(".");
+	}, [domainParts]);
 
 	return (
 		<section className="space-y-1">
@@ -96,38 +97,55 @@ export const DomainInputField = ({
 					</div>
 					<div className="space-y-1.5">
 						<div className="flex items-center gap-2 text-text-sub-600 text-xs">
-							{criteria.isSubdomain ? (
-								<Icon name="check" className="h-4 w-4 text-green-500" />
-							) : (
-								<Icon name="cross" className="h-4 w-4 text-text-soft-400" />
+							<Icon
+								name="check-circle"
+								className={
+									criteria.isSubdomain
+										? "h-4 w-4 text-green-500"
+										: "h-4 w-4 text-text-soft-400"
+								}
+							/>
+							Use a subdomain
+							{!criteria.isSubdomain && (
+								<>
+									{" "}
+									(e.g., mail.{rootDomain}, send.{rootDomain}, m.{rootDomain})
+								</>
 							)}
-							Use a subdomain (e.g., mail.{displayDomain}, send.{displayDomain}, m.{displayDomain})
 						</div>
 						<div className="flex items-center gap-2 text-text-sub-600 text-xs">
-							{criteria.isNotRoot ? (
-								<Icon name="check" className="h-4 w-4 text-green-500" />
-							) : (
-								<Icon name="cross" className="h-4 w-4 text-text-soft-400" />
-							)}
+							<Icon
+								name="check-circle"
+								className={
+									criteria.isNotRoot
+										? "h-4 w-4 text-green-500"
+										: "h-4 w-4 text-text-soft-400"
+								}
+							/>
 							Avoid using your root domain
 						</div>
 						<div className="flex items-center gap-2 text-text-sub-600 text-xs">
-							{criteria.isValid ? (
-								<Icon name="check" className="h-4 w-4 text-green-500" />
-							) : (
-								<Icon name="cross" className="h-4 w-4 text-text-soft-400" />
-							)}
+							<Icon
+								name="check-circle"
+								className={
+									criteria.isValid
+										? "h-4 w-4 text-green-500"
+										: "h-4 w-4 text-text-soft-400"
+								}
+							/>
 							Valid domain format
 						</div>
 					</div>
 				</div>
 
-				{errors.domain && (
-					<div className="mt-2 flex items-center gap-2">
-						<Icon name="alert-circle" className="h-4 w-4 text-error-base" />
-						<p className="text-error-base text-xs">{errors.domain.message}</p>
-					</div>
-				)}
+				{errors.domain &&
+					errors.domain.message !== "Please enter a valid domain name" &&
+					errors.domain.message !== "Domain is required" && (
+						<div className="mt-2 flex items-center gap-2">
+							<Icon name="alert-circle" className="h-4 w-4 text-error-base" />
+							<p className="text-error-base text-xs">{errors.domain.message}</p>
+						</div>
+					)}
 			</div>
 		</section>
 	);
