@@ -82,6 +82,9 @@ export async function updateDomainController({
 
 		// Re-verify when sending/receiving changes, or when tracking is newly enabled
 		// (needs CNAME). Disabling tracking alone should not kick off a full verify.
+		// Also skip re-verification entirely for domains that are still "pending" —
+		// the user hasn't set up DNS yet, so there's nothing to verify.
+		const isPending = existingDomain.status === "pending";
 		const emailFeaturesChanged =
 			body.sending_email !== undefined || body.receiving_email !== undefined;
 		const trackingEnabled = clickTracking || openTracking;
@@ -90,7 +93,8 @@ export async function updateDomainController({
 				!existingDomain.isClickTrackingEnabled) ||
 			(body.open_tracking === true && !existingDomain.isOpenTrackingEnabled);
 		const shouldReverify =
-			emailFeaturesChanged || (trackingEnabled && trackingTurnedOn);
+			!isPending &&
+			(emailFeaturesChanged || (trackingEnabled && trackingTurnedOn));
 
 		if (!clickTracking && !openTracking) {
 			await db

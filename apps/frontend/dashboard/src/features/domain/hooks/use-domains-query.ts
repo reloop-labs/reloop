@@ -85,6 +85,7 @@ export function useDomainNameserversQuery(
 		queryKey: queryKeys.domain.nameservers(domainId ?? ""),
 		queryFn: () => fetchNameservers(domainId as string),
 		enabled: !!domainId && enabled,
+		staleTime: 0,
 	});
 }
 

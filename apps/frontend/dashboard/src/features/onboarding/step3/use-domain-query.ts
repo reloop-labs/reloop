@@ -30,6 +30,7 @@ export function domainNameserversQueryOptions(domainId: string) {
 			return data;
 		},
 		enabled: Boolean(domainId),
+		staleTime: 0,
 	});
 }
 
