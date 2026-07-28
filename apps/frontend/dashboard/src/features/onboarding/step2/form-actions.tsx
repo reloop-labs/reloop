@@ -11,13 +11,13 @@ export function FormActions({
 	onSkip: () => void;
 }) {
 	return (
-		<div className="mt-3 flex items-center justify-end gap-3">
+		<div className="mt-3 flex items-center gap-3">
 			<Button.Root
 				type="button"
 				variant="neutral"
-				mode="ghost"
-				size="small"
-				className="rounded-xl"
+				mode="lighter"
+				size="medium"
+				className="h-10 shrink-0 rounded-xl px-4"
 				onClick={onSkip}
 				disabled={isLoading}
 			>
@@ -26,8 +26,8 @@ export function FormActions({
 			<FancyButton.Root
 				type="submit"
 				variant="blue"
-				size="small"
-				className="min-w-[130px] justify-center overflow-hidden rounded-xl whitespace-nowrap"
+				size="medium"
+				className="h-10 w-full flex-1 justify-center overflow-hidden whitespace-nowrap rounded-xl"
 				disabled={isLoading}
 			>
 				<AnimatePresence mode="popLayout" initial={false}>
