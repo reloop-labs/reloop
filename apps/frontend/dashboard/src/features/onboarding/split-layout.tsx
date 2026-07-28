@@ -1,6 +1,4 @@
-import NumberFlow from "@number-flow/react";
 import { cn } from "@reloop/ui/cn";
-import { KbdEsc } from "@reloop/ui/kbd-esc";
 import { Logo } from "@reloop/ui/logo";
 
 import type { Variants } from "framer-motion";
@@ -76,8 +74,7 @@ export function SplitLayout({
 	backStep,
 	verticalAlign = "center",
 }: SplitLayoutProps) {
-	const [step, setStep] = useQueryState("step", parseAsInteger.withDefault(1));
-	const [hovered, setHovered] = useState(false);
+	const [step] = useQueryState("step", parseAsInteger.withDefault(1));
 	const prefersReducedMotion = useReducedMotion();
 	const isKeyboardRef = useRef(false);
 
@@ -119,18 +116,7 @@ export function SplitLayout({
 	}
 	const direction = directionRef.current;
 
-	const canGoBack = step > 1;
-	const onBack = canGoBack
-		? () => {
-				onBackCleanup?.();
-				setStep(backStep ?? step - 1);
-			}
-		: undefined;
-
-	const easing = [0.23, 1, 0.32, 1] as const;
-	const transition = { duration: 0.2, ease: easing };
-
-	useHotkeys("escape", () => onBack?.(), { enabled: !!onBack });
+	const onBack = undefined;
 
 	const stepMatch = stepIndicator.match(/Step (\d+) of (\d+)/);
 	const currentStep = stepMatch ? Number(stepMatch[1]) : null;
@@ -190,9 +176,9 @@ export function SplitLayout({
 	const hasPreview = !fullWidth && Boolean(previewContent);
 
 	return (
-		<div className="relative flex min-h-screen w-full flex-col lg:flex-row bg-bg-white-0 overflow-hidden">
+		<div className="relative flex min-h-screen w-full flex-col overflow-hidden bg-bg-white-0 lg:flex-row">
 			{/* Logo */}
-			<div className="absolute top-6 left-6 lg:left-10 z-50 flex items-center space-x-2">
+			<div className="absolute top-6 left-6 z-50 flex items-center space-x-2 lg:left-10">
 				<Logo className="h-9 w-9 lg:h-10 lg:w-10" />
 				<span className="-ml-3 font-semibold text-text-strong-950 text-xl">
 					Reloop
@@ -207,7 +193,7 @@ export function SplitLayout({
 						? "justify-center"
 						: "justify-start pt-28 pb-20",
 					hasPreview
-						? "w-full lg:w-1/2 border-stroke-soft-100 lg:border-r dark:border-stroke-soft-100/40"
+						? "w-full border-stroke-soft-100 lg:w-1/2 lg:border-r dark:border-stroke-soft-100/40"
 						: "w-full items-center justify-center",
 				)}
 			>
@@ -223,97 +209,36 @@ export function SplitLayout({
 									: "mx-auto max-w-2xl",
 					)}
 				>
-					<motion.button
-						type="button"
-						onClick={onBack}
-						disabled={!onBack}
-						onHoverStart={() => onBack && setHovered(true)}
-						onHoverEnd={() => setHovered(false)}
-						className={cn("group text-left mb-6", onBack && "cursor-pointer")}
-					>
-						<div className="flex items-center font-medium text-text-soft-400 text-xs transition-colors group-hover:text-text-strong-950">
-							<AnimatePresence>
-								{onBack && (
-									<motion.span
-										initial={{ opacity: 0, width: 0 }}
-										animate={{ opacity: 1, width: "auto" }}
-										exit={{ opacity: 0, width: 0 }}
-										transition={transition}
-										className="mb-px flex items-center overflow-hidden"
-									>
-										<div className="relative flex h-3.5 w-3.5 items-center">
-											<motion.div
-												className="-translate-y-1/2 absolute top-1/2 left-[1.5px] h-[1.5px] rounded-full bg-current"
-												initial={{ width: 0, opacity: 0 }}
-												animate={{
-													width: hovered ? 10 : 0,
-													opacity: hovered ? 1 : 0,
-												}}
-												transition={transition}
-											/>
-											<svg
-												width={6}
-												height={10}
-												viewBox="0 0 6 10"
-												fill="none"
-												className="absolute left-0"
-												aria-hidden="true"
-											>
-												<path
-													d="M5 1L1.5 5L5 9"
-													stroke="currentColor"
-													strokeWidth={1.5}
-													strokeLinecap="round"
-													strokeLinejoin="round"
-												/>
-											</svg>
-										</div>
-									</motion.span>
-								)}
-							</AnimatePresence>
-							{currentStep !== null && totalSteps !== null ? (
-								<span className="mr-2 ml-px inline-flex items-center gap-1">
-									Step
-									<NumberFlow
-										value={currentStep}
-										className="tabular-nums"
-										transformTiming={{
-											duration: shouldSkipMotion ? 0 : 400,
-											easing: "ease-out",
-										}}
-									/>
-									of
-									<NumberFlow
-										value={totalSteps}
-										className="tabular-nums"
-										transformTiming={{
-											duration: shouldSkipMotion ? 0 : 400,
-											easing: "ease-out",
-										}}
-									/>
-								</span>
-							) : (
-								stepIndicator
-							)}
-							{onBack && <KbdEsc />}
-						</div>
-					</motion.button>
-
-					<AnimatedHeight skipAnimation={shouldSkipMotion}>
-						<AnimatePresence mode="wait" initial={true} custom={direction}>
-							<motion.div
-								key={step}
-								custom={direction}
-								variants={contentVariants}
-								initial="initial"
-								animate="animate"
-								exit="exit"
-								className="flex flex-col gap-4"
+					<div className="mb-6">
+						{currentStep !== null && totalSteps !== null ? (
+							<div
+								className="flex items-center gap-1.5"
+								aria-label={`Step ${currentStep} of ${totalSteps}`}
 							>
-								{children}
-							</motion.div>
-						</AnimatePresence>
-					</AnimatedHeight>
+								{Array.from({ length: totalSteps }, (_, i) => {
+									const stepNum = i + 1;
+									const isActive = stepNum <= currentStep;
+									return (
+										<div
+											key={stepNum}
+											className={cn(
+												"h-1 w-10 rounded-full transition-all duration-300",
+												isActive
+													? "bg-primary-base"
+													: "bg-stroke-soft-200 dark:bg-stroke-soft-100/40",
+											)}
+										/>
+									);
+								})}
+							</div>
+						) : (
+							<span className="font-medium text-text-soft-400 text-xs">
+								{stepIndicator}
+							</span>
+						)}
+					</div>
+
+					<div className="flex flex-col gap-4">{children}</div>
 				</div>
 			</div>
 
