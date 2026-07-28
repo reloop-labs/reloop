@@ -1,73 +1,67 @@
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
+import { useEffect, useMemo, useState } from "react";
 import { useSessionQuery } from "#/features/auth/session-query";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
+import { useApiKeysQuery } from "#/features/api-keys/hooks/use-api-keys-query";
+import { useDomainsQuery } from "#/features/domain/hooks/use-domains-query";
+import { useBillingUsage } from "#/features/settings/billing/use-billing-usage";
+import { useOrgPermissions } from "#/features/settings/use-org-permissions";
 import { navigatePostAuth } from "#/utils/navigate-post-auth";
 import { resolvePostAuthDestinationWithQuery } from "#/utils/post-auth-destination";
-import { useQueryClient } from "@tanstack/react-query";
-
-import { lazy, Suspense, useEffect, type ReactNode } from "react";
-import { ActivityChartCard } from "./components/activity-chart-card";
-import { AgentInboxCard } from "./components/agent-inbox-card";
-import { AuditLogsCard } from "./components/audit-logs-card";
-import { DomainCard } from "./components/domain-card";
-import { EmailsCard } from "./components/emails-card";
-import { WebhooksCard } from "./components/webhooks-card";
-
-/**
- * Below-fold marketing/integration cards pull simple-icons + Bright code blocks
- * (~multi-MB). Lazy-load so they are not on the home critical path.
- */
-const AgentIntegrationsCard = lazy(() =>
-	import("./components/agent-integrations-card").then((m) => ({
-		default: m.AgentIntegrationsCard,
-	})),
-);
-const FrameworkIntegrationsCard = lazy(() =>
-	import("./components/framework-integrations-card").then((m) => ({
-		default: m.FrameworkIntegrationsCard,
-	})),
-);
-
-function CardChunkFallback({ className }: { className?: string }) {
-	return (
-		<div
-			className={
-				className ??
-				"h-[280px] animate-pulse rounded-2xl border border-stroke-soft-100 bg-bg-weak-50/50 dark:border-white/5 dark:bg-white/[0.02]"
-			}
-			aria-hidden
-		/>
-	);
-}
-
-function LazyCard({
-	children,
-	fallbackClassName,
-}: {
-	children: ReactNode;
-	fallbackClassName?: string;
-}) {
-	return (
-		<Suspense fallback={<CardChunkFallback className={fallbackClassName} />}>
-			{children}
-		</Suspense>
-	);
-}
+import {
+	AttentionAlerts,
+	buildAttentionItems,
+} from "./components/attention-alerts";
+import { DomainsSummaryCard } from "./components/domains-summary-card";
+import { InboxSummaryCard } from "./components/inbox-summary-card";
+import { OverviewHeader } from "./components/overview-header";
+import { RecentEmailsCard } from "./components/recent-emails-card";
+import { SendFirstEmailModal } from "./components/send-first-email-modal";
+import {
+	SendHealthCard,
+	useSendHealthTotals,
+} from "./components/send-health-card";
+import {
+	SetupChecklist,
+	buildSetupSteps,
+} from "./components/setup-checklist";
 
 /**
- * Dashboard overview — matches Next home: org greeting + feature cards.
- * Still redirects orgless users to onboarding / invite.
+ * Dashboard overview — health, attention, setup, and recent activity.
+ * Redirects orgless users to onboarding / invite.
  */
 export function HomePage() {
 	const router = useRouter();
 	const queryClient = useQueryClient();
 	const { data: session, isPending } = useSessionQuery();
 	const {
-		user,
 		activeOrganization,
 		organizations,
 		isPending: orgPending,
 	} = useActiveOrganization();
+	const { canManageBilling } = useOrgPermissions();
+	const [sendFirstOpen, setSendFirstOpen] = useState(false);
+
+	const orgReady = Boolean(activeOrganization?.id) && !orgPending;
+
+	const domainsQuery = useDomainsQuery({
+		page: 1,
+		limit: 20,
+		status: "",
+		q: "",
+		enabled: orgReady,
+	});
+	const apiKeysQuery = useApiKeysQuery({
+		page: 1,
+		limit: 1,
+		status: "",
+		creator: "",
+		q: "",
+		enabled: orgReady,
+	});
+	const { bounceRate, hasSent } = useSendHealthTotals(orgReady);
+	const billing = useBillingUsage();
 
 	useEffect(() => {
 		if (isPending || !session || orgPending) return;
@@ -87,49 +81,84 @@ export function HomePage() {
 		return () => {
 			cancelled = true;
 		};
-	}, [
-		session,
-		isPending,
-		orgPending,
-		organizations,
-		router,
-		queryClient,
-	]);
+	}, [session, isPending, orgPending, organizations, router, queryClient]);
+
+	const domains = domainsQuery.data?.domains ?? [];
+	const hasDomain = (domainsQuery.data?.total ?? 0) > 0;
+	const hasActiveDomain = domains.some((d) => d.status === "active");
+	const firstActiveDomainId =
+		domains.find((d) => d.status === "active")?.id ?? null;
+	const hasApiKey = (apiKeysQuery.data?.total ?? 0) > 0;
+
+	const setupSteps = useMemo(
+		() =>
+			buildSetupSteps({
+				hasDomain,
+				hasActiveDomain,
+				hasApiKey,
+				hasSentEmail: hasSent,
+			}),
+		[hasDomain, hasActiveDomain, hasApiKey, hasSent],
+	);
+
+	const usageRatio = useMemo(() => {
+		if (!canManageBilling || !billing.data) return null;
+		const monthly = billing.data.plan.monthlyCredits;
+		if (!monthly || monthly <= 0) return null;
+		return billing.data.subscription.creditsUsed / monthly;
+	}, [billing.data, canManageBilling]);
+
+	const attentionItems = useMemo(
+		() =>
+			buildAttentionItems({
+				domains: domains.map((d) => ({
+					id: d.id,
+					domain: d.domain,
+					status: d.status,
+				})),
+				bounceRate,
+				usageRatio,
+			}),
+		[domains, bounceRate, usageRatio],
+	);
 
 	return (
-		<div className="mx-auto max-w-7xl space-y-8 p-6 lg:p-8">
-			<div className="space-y-1">
-				<p className="font-medium text-sm text-text-sub-600 dark:text-white/60">
-					{activeOrganization?.name}
-				</p>
-				<h1 className="font-semibold text-3xl text-text-strong-950 tracking-tight dark:text-white">
-					{user?.email ? `${user.email}'s Account` : "Your Account"}
-				</h1>
+		<div className="mx-auto max-w-6xl space-y-6 p-6 lg:p-8">
+			<OverviewHeader
+				organizationName={activeOrganization?.name}
+				canSendFirstEmail={hasActiveDomain}
+				onSendFirstEmail={() => setSendFirstOpen(true)}
+			/>
 
-				<div className="grid gap-6 pt-6 md:grid-cols-2 lg:grid-cols-3">
-					<div className="md:col-span-2 lg:col-span-2">
-						<ActivityChartCard />
-					</div>
-					<EmailsCard />
-					<AgentInboxCard />
-					<DomainCard />
-					<AuditLogsCard />
+			<AttentionAlerts items={attentionItems} />
+
+			<SetupChecklist
+				steps={setupSteps}
+				onSendFirstEmail={
+					hasActiveDomain ? () => setSendFirstOpen(true) : undefined
+				}
+			/>
+
+			<SendHealthCard enabled={orgReady} />
+
+			<div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+				<RecentEmailsCard
+					enabled={orgReady}
+					onSendFirstEmail={
+						hasActiveDomain ? () => setSendFirstOpen(true) : undefined
+					}
+				/>
+				<div className="flex flex-col gap-6">
+					<DomainsSummaryCard enabled={orgReady} />
+					<InboxSummaryCard enabled={orgReady} />
 				</div>
 			</div>
 
-			<div className="grid gap-6 lg:grid-cols-3">
-				<div className="flex flex-col gap-6 lg:col-span-1">
-					<WebhooksCard />
-					<LazyCard>
-						<FrameworkIntegrationsCard />
-					</LazyCard>
-				</div>
-				<div className="h-fit lg:col-span-2">
-					<LazyCard fallbackClassName="h-[360px] animate-pulse rounded-2xl border border-stroke-soft-100 bg-bg-weak-50/50 dark:border-white/5 dark:bg-white/[0.02]">
-						<AgentIntegrationsCard />
-					</LazyCard>
-				</div>
-			</div>
+			<SendFirstEmailModal
+				open={sendFirstOpen}
+				onOpenChange={setSendFirstOpen}
+				preferredDomainId={firstActiveDomainId}
+			/>
 		</div>
 	);
 }

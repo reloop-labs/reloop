@@ -17,6 +17,12 @@ export const mainNavigation: MainNavigationItem[] = [
 		section: "Main",
 	},
 	{
+		label: "Emails",
+		path: "/emails",
+		iconName: "mail-single",
+		section: "Main",
+	},
+	{
 		label: "Agent Inbox",
 		path: "/agent-inbox",
 		iconName: "inbox",
@@ -26,7 +32,7 @@ export const mainNavigation: MainNavigationItem[] = [
 		label: "Contacts",
 		path: "/contacts",
 		iconName: "contacts",
-		section: "Email",
+		section: "Messaging",
 		items: [
 			{ label: "Properties", path: "/contacts/properties", iconName: "tag" },
 			{ label: "Groups", path: "/contacts/groups", iconName: "modules" },
@@ -38,26 +44,16 @@ export const mainNavigation: MainNavigationItem[] = [
 		],
 	},
 	{
-		label: "Emails",
-		path: "/emails",
-		iconName: "mail-single",
-		section: "Email",
-		items: [
-			{ label: "Sent", path: "/emails/sent", iconName: "mail-send" },
-			{ label: "Received", path: "/emails/received", iconName: "mail-receive" },
-		],
-	},
-	{
 		label: "Templates",
 		path: "/templates",
 		iconName: "layout",
-		section: "Email",
+		section: "Messaging",
 	},
 	{
 		label: "Workflows",
 		path: "/workflows",
 		iconName: "workflow",
-		section: "Email",
+		section: "Messaging",
 	},
 	{
 		label: "Metrics",

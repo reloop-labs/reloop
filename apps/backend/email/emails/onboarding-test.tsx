@@ -16,6 +16,12 @@ import { Wrapper } from "../components/wrapper";
 interface OnboardingTestEmailProps {
 	baseUrl?: string;
 	theme?: "light" | "dark";
+	/** Signed-in user who received this test message */
+	recipientEmail?: string;
+	/** Full From header used for this send */
+	fromAddress?: string;
+	/** Verified sending domain */
+	domainName?: string;
 }
 
 const defaultBaseUrl = process.env.NEXT_PUBLIC_BASE_URL
@@ -25,6 +31,9 @@ const defaultBaseUrl = process.env.NEXT_PUBLIC_BASE_URL
 export const OnboardingTestEmail = ({
 	baseUrl = defaultBaseUrl,
 	theme = "light",
+	recipientEmail,
+	fromAddress,
+	domainName,
 }: OnboardingTestEmailProps) => {
 	const isDark = theme === "dark";
 
@@ -86,9 +95,10 @@ export const OnboardingTestEmail = ({
 
 						<Text className={cls.bodyText}>
 							If you are reading this email, congratulations! Your domain
-							integration, DNS settings, and API authentication are working
-							perfectly. This message was sent via your newly configured Reloop
-							API key.
+							{domainName ? ` (${domainName})` : ""}, DNS settings, and
+							workspace session are working. This message was sent from{" "}
+							{fromAddress ?? "your verified domain"}
+							{recipientEmail ? ` to ${recipientEmail}` : " to your account"}.
 						</Text>
 
 						{/* Next steps */}
