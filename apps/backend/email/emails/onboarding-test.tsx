@@ -20,7 +20,7 @@ interface OnboardingTestEmailProps {
 	recipientEmail?: string;
 	/** Full From header used for this send */
 	fromAddress?: string;
-	/** Verified sending domain */
+	/** Verified sending domain — shown prominently as ready to send */
 	domainName?: string;
 }
 
@@ -33,9 +33,10 @@ export const OnboardingTestEmail = ({
 	theme = "light",
 	recipientEmail,
 	fromAddress,
-	domainName,
+	domainName = "your-domain.com",
 }: OnboardingTestEmailProps) => {
 	const isDark = theme === "dark";
+	const domain = domainName;
 
 	const cls = {
 		body: isDark
@@ -54,6 +55,19 @@ export const OnboardingTestEmail = ({
 		bodyText: isDark
 			? "mt-4 text-[#b0b0b0] text-[15px] leading-[1.6]"
 			: "mt-4 text-[#555555] text-[15px] leading-[1.6]",
+		domainBox: isDark
+			? "mt-8 rounded-2xl border border-[#222222] border-solid py-10 text-center"
+			: "mt-8 rounded-2xl border border-[#e0e0e0] border-solid py-10 text-center",
+		domainText: isDark
+			? "m-0 font-medium font-mono text-[22px] text-white tracking-[0.05em]"
+			: "m-0 font-medium font-mono text-[22px] text-[#0e0e0e] tracking-[0.05em]",
+		domainBadge:
+			"mt-3 m-0 font-mono text-[12px] text-[#0a7a3e] uppercase tracking-[0.15em]",
+		domainBadgeDark:
+			"mt-3 m-0 font-mono text-[12px] text-[#4ade80] uppercase tracking-[0.15em]",
+		metaRow: isDark
+			? "mt-2 m-0 font-mono text-[12px] text-[#707070]"
+			: "mt-2 m-0 font-mono text-[12px] text-[#888888]",
 		rowNum: "m-0 font-mono text-[#404040] text-[12px]",
 		rowTitle: isDark
 			? "m-0 font-semibold text-white text-[16px]"
@@ -69,24 +83,23 @@ export const OnboardingTestEmail = ({
 	};
 
 	const tdBorder = isDark ? "1px solid #222222" : "1px solid #e0e0e0";
+	const previewLine = `${domain} is ready to send emails through Reloop.`;
 
 	return (
 		<Html>
 			<Head />
-			<Preview>
-				Your Reloop email channel is live and fully authenticated.
-			</Preview>
+			<Preview>{previewLine}</Preview>
 			<Tailwind>
 				<Body className={cls.body}>
 					<Wrapper baseUrl={baseUrl} theme={theme}>
-						<Text className={cls.label}>Integration Test</Text>
+						<Text className={cls.label}>Domain ready</Text>
 
 						<Heading
 							className={cls.heading}
 							style={{ fontFamily: "Georgia, serif" }}
 						>
-							Your email channel is live{" "}
-							<span className={cls.headingMuted}>and fully authenticated.</span>
+							{domain}{" "}
+							<span className={cls.headingMuted}>is ready to send emails.</span>
 						</Heading>
 
 						<Hr className={cls.hr} />
@@ -94,16 +107,36 @@ export const OnboardingTestEmail = ({
 						<Text className={cls.salutation}>Hello there,</Text>
 
 						<Text className={cls.bodyText}>
-							If you are reading this email, congratulations! Your domain
-							{domainName ? ` (${domainName})` : ""}, DNS settings, and
-							workspace session are working. This message was sent from{" "}
-							{fromAddress ?? "your verified domain"}
-							{recipientEmail ? ` to ${recipientEmail}` : " to your account"}.
+							You added <strong>{domain}</strong> to Reloop and finished DNS
+							verification. This message is the proof: it was delivered from
+							your own domain, so outbound sending works.
+						</Text>
+
+						{/* Domain callout — same visual language as domain-verified */}
+						<Section className={cls.domainBox}>
+							<Text className={cls.domainText}>{domain}</Text>
+							<Text
+								className={isDark ? cls.domainBadgeDark : cls.domainBadge}
+							>
+								✓ Ready to send
+							</Text>
+							{fromAddress ? (
+								<Text className={cls.metaRow}>From {fromAddress}</Text>
+							) : null}
+							{recipientEmail ? (
+								<Text className={cls.metaRow}>To {recipientEmail}</Text>
+							) : null}
+						</Section>
+
+						<Text className={cls.bodyText}>
+							You can now send transactional and product emails from addresses
+							on <strong>{domain}</strong> via the API or SMTP — SPF, DKIM, and
+							DMARC are authenticated for this domain.
 						</Text>
 
 						{/* Next steps */}
 						<Section className={cls.capBox}>
-							<Text className={cls.label}>Next Steps</Text>
+							<Text className={cls.label}>What you can do next</Text>
 
 							<table
 								width="100%"
@@ -122,10 +155,10 @@ export const OnboardingTestEmail = ({
 											verticalAlign: "top",
 										}}
 									>
-										<Text className={cls.rowTitle}>Integrate the SDK</Text>
+										<Text className={cls.rowTitle}>Send from the API</Text>
 										<Text className={cls.rowDesc}>
-											Copy the generated code snippet from your dashboard
-											playground and drop it into your codebase.
+											Use an API key or SMTP with a From address on {domain} to
+											send from your app.
 										</Text>
 									</td>
 								</tr>
@@ -147,10 +180,10 @@ export const OnboardingTestEmail = ({
 											verticalAlign: "top",
 										}}
 									>
-										<Text className={cls.rowTitle}>Add Templates</Text>
+										<Text className={cls.rowTitle}>Add templates</Text>
 										<Text className={cls.rowDesc}>
-											Define reusable layouts in the template designer to format
-											agent outputs dynamically.
+											Build reusable layouts in the template designer for
+											consistent branded mail.
 										</Text>
 									</td>
 								</tr>
@@ -165,20 +198,22 @@ export const OnboardingTestEmail = ({
 										<Text className={cls.rowNum}>03</Text>
 									</td>
 									<td style={{ paddingTop: "20px", verticalAlign: "top" }}>
-										<Text className={cls.rowTitle}>Monitor Analytics</Text>
+										<Text className={cls.rowTitle}>Watch deliverability</Text>
 										<Text className={cls.rowDesc}>
-											Track delivery success, click rates, and reputation health
-											in real-time.
+											Track delivery, bounces, and reputation for {domain} in
+											Metrics.
 										</Text>
 									</td>
 								</tr>
 							</table>
 						</Section>
 
-						{/* CTA */}
 						<Section className="mt-10">
-							<Button className={cls.btn} href={`${baseUrl}/dashboard`}>
-								Go to Dashboard →
+							<Button
+								className={cls.btn}
+								href={`${baseUrl}/dashboard/domain`}
+							>
+								View domain →
 							</Button>
 						</Section>
 

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as FancyButton from "@reloop/ui/fancy-button";
+import { SendFirstEmailButton } from "./send-first-email-button";
 
 export type SetupStep = {
 	id: string;
@@ -17,28 +18,39 @@ export function buildSetupSteps({
 	hasActiveDomain,
 	hasApiKey,
 	hasSentEmail,
+	readyDomainName,
 }: {
 	hasDomain: boolean;
 	hasActiveDomain: boolean;
 	hasApiKey: boolean;
 	hasSentEmail: boolean;
+	/** First active domain hostname, for copy that names it. */
+	readyDomainName?: string | null;
 }): SetupStep[] {
+	const domainLabel = readyDomainName ?? "your domain";
+
 	return [
 		{
 			id: "domain",
 			label: "Add a domain",
-			description: "Send from your own domain with SPF, DKIM, and DMARC.",
+			description: hasDomain
+				? readyDomainName
+					? `${readyDomainName} is on your workspace.`
+					: "A domain is on your workspace."
+				: "Send from your own domain with SPF, DKIM, and DMARC.",
 			done: hasDomain,
-			href: "/domain/add",
-			cta: "Add domain",
+			href: hasDomain ? "/domain" : "/domain/add",
+			cta: hasDomain ? "View domains" : "Add domain",
 		},
 		{
 			id: "verify",
 			label: "Verify DNS",
-			description: "Confirm records so mail is authenticated and deliverable.",
+			description: hasActiveDomain
+				? `${domainLabel} is verified and ready to send.`
+				: "Confirm records so mail is authenticated and deliverable.",
 			done: hasActiveDomain,
 			href: "/domain",
-			cta: "Verify domain",
+			cta: hasActiveDomain ? "View domain" : "Verify domain",
 		},
 		{
 			id: "api-key",
@@ -51,10 +63,11 @@ export function buildSetupSteps({
 		{
 			id: "send",
 			label: "Send your first email",
-			description:
-				"Send a test message to yourself from your verified domain (session auth).",
+			description: hasActiveDomain
+				? `One click — we email you from hello@${domainLabel}.`
+				: "Verify a domain first, then send a test email to yourself.",
 			done: hasSentEmail,
-			href: "/#send-first-email",
+			href: "#",
 			cta: "Send test email",
 		},
 	];
@@ -62,18 +75,20 @@ export function buildSetupSteps({
 
 export function SetupChecklist({
 	steps,
-	onSendFirstEmail,
+	canSendFirstEmail,
+	readyDomainName,
 }: {
 	steps: SetupStep[];
-	/** Opens the session-auth "send first email" flow for the final step. */
-	onSendFirstEmail?: () => void;
+	/** When true, the final step is a one-click send button. */
+	canSendFirstEmail?: boolean;
+	readyDomainName?: string | null;
 }) {
 	const incomplete = steps.filter((s) => !s.done);
 	if (incomplete.length === 0) return null;
 
 	const doneCount = steps.filter((s) => s.done).length;
 	const next = incomplete[0]!;
-	const nextIsSend = next.id === "send" && Boolean(onSendFirstEmail);
+	const nextIsSend = next.id === "send" && canSendFirstEmail;
 
 	return (
 		<section className="overflow-hidden rounded-2xl border border-stroke-soft-100 dark:border-stroke-soft-100/40">
@@ -89,20 +104,13 @@ export function SetupChecklist({
 						</span>
 					</div>
 					<p className="mt-1 text-paragraph-sm text-text-sub-600">
-						Complete these steps to start sending reliably.
+						{canSendFirstEmail && readyDomainName
+							? `${readyDomainName} is ready — finish the remaining steps below.`
+							: "Complete these steps to start sending reliably."}
 					</p>
 				</div>
 				{nextIsSend ? (
-					<FancyButton.Root
-						type="button"
-						variant="blue"
-						size="small"
-						className="shrink-0 gap-1.5 rounded-xl"
-						onClick={onSendFirstEmail}
-					>
-						{next.cta}
-						<Icon name="arrow-right" className="h-3.5 w-3.5" />
-					</FancyButton.Root>
+					<SendFirstEmailButton showArrow label={next.cta} />
 				) : (
 					<FancyButton.Root
 						variant="blue"
@@ -121,7 +129,7 @@ export function SetupChecklist({
 			<ul className="divide-y divide-stroke-soft-100 bg-bg-white-0 dark:divide-stroke-soft-100/40 dark:bg-transparent">
 				{steps.map((step) => {
 					const isSendAction =
-						step.id === "send" && !step.done && Boolean(onSendFirstEmail);
+						step.id === "send" && !step.done && canSendFirstEmail;
 					return (
 						<li
 							key={step.id}
@@ -158,13 +166,14 @@ export function SetupChecklist({
 							</div>
 							{!step.done ? (
 								isSendAction ? (
-									<button
-										type="button"
-										onClick={onSendFirstEmail}
-										className="shrink-0 font-medium text-paragraph-sm text-text-sub-600 transition-colors hover:text-text-strong-950"
-									>
-										{step.cta}
-									</button>
+									<div className="shrink-0">
+										<SendFirstEmailButton
+											variant="stroke"
+											size="xsmall"
+											label={step.cta}
+											className="gap-1.5 rounded-lg"
+										/>
+									</div>
 								) : (
 									<Link
 										href={step.href}

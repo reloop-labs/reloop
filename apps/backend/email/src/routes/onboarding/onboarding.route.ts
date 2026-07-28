@@ -4,18 +4,18 @@ import {
 	resolveSessionAuthWithProfile,
 } from "@reloop/auth/middleware";
 import { db } from "@reloop/db/client";
-import { domain } from "@reloop/db/schema";
+import { domain, organization } from "@reloop/db/schema";
 import { emailConfig } from "@reloop/email/email.config";
 import OnboardingTestEmail from "@reloop/email/emails/onboarding-test";
 import { render } from "@reloop/email/render";
-import { and, eq } from "drizzle-orm";
-import { Elysia, t } from "elysia";
+import { and, desc, eq } from "drizzle-orm";
+import { Elysia } from "elysia";
 import React from "react";
 
 const sessionRedis = createSessionCacheRedis(emailConfig.REDIS_URL, 5);
 
-const LOCAL_PART_PATTERN = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+$/;
-const MAX_LOCAL_PART_LENGTH = 64;
+/** Default local-part for one-click first sends. */
+const DEFAULT_LOCAL_PART = "hello";
 
 function buildFromAddress({
 	localPart,
@@ -24,12 +24,11 @@ function buildFromAddress({
 }: {
 	localPart: string;
 	domainName: string;
-	fromName?: string;
+	fromName?: string | null;
 }): string {
 	const address = `${localPart}@${domainName}`;
 	const name = fromName?.trim();
 	if (!name) return address;
-	// Escape quotes in display names for RFC 5322.
 	const safeName = name.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
 	return `"${safeName}" <${address}>`;
 }
@@ -46,12 +45,15 @@ export const onboardingRoute = new Elysia({
 		}),
 	)
 	/**
-	 * Send a first/test email to the signed-in user from one of their org domains.
-	 * Session auth only — recipient is always the authenticated user (no arbitrary to:).
+	 * One-click first/test email.
+	 * Session auth only. No body required.
+	 * - To: signed-in user email
+	 * - From: hello@<first active org domain> (display name = workspace name)
+	 * - Body: onboarding-test React email template
 	 */
 	.post(
 		"/onboarding/send-test-email",
-		async ({ body, request, set }) => {
+		async ({ request, set }) => {
 			const cookie = request.headers.get("cookie");
 			const session = await resolveSessionAuthWithProfile(
 				request.headers,
@@ -81,20 +83,6 @@ export const onboardingRoute = new Elysia({
 				};
 			}
 
-			const localPart = (body.localPart ?? "hello").trim().toLowerCase();
-			if (
-				!localPart ||
-				localPart.length > MAX_LOCAL_PART_LENGTH ||
-				!LOCAL_PART_PATTERN.test(localPart)
-			) {
-				set.status = 400;
-				return {
-					message: "Invalid sender local part",
-					why: `"${body.localPart ?? ""}" is not a valid email local-part.`,
-					fix: "Use letters, numbers, and common symbols only (e.g. hello, noreply).",
-				};
-			}
-
 			const [domainRow] = await db
 				.select({
 					id: domain.id,
@@ -105,27 +93,19 @@ export const onboardingRoute = new Elysia({
 				.from(domain)
 				.where(
 					and(
-						eq(domain.id, body.domainId),
 						eq(domain.organizationId, session.organizationId),
+						eq(domain.status, "active"),
 					),
 				)
+				.orderBy(desc(domain.createdAt))
 				.limit(1);
 
 			if (!domainRow) {
-				set.status = 404;
-				return {
-					message: "Domain not found",
-					why: "That domain is not in your active workspace.",
-					fix: "Pick a domain you own, or add one under Domains.",
-				};
-			}
-
-			if (domainRow.status !== "active") {
 				set.status = 400;
 				return {
-					message: "Domain is not ready to send",
-					why: `"${domainRow.domain}" is ${domainRow.status}, not active.`,
-					fix: "Finish DNS verification so the domain status is Active.",
+					message: "No active domain",
+					why: "You need a verified domain before sending a test email.",
+					fix: "Add a domain and finish DNS verification, then try again.",
 				};
 			}
 
@@ -138,10 +118,21 @@ export const onboardingRoute = new Elysia({
 				};
 			}
 
+			const [orgRow] = await db
+				.select({ name: organization.name })
+				.from(organization)
+				.where(eq(organization.id, session.organizationId))
+				.limit(1);
+
+			const fromName =
+				orgRow?.name?.trim() ||
+				session.userName?.trim() ||
+				undefined;
+
 			const from = buildFromAddress({
-				localPart,
+				localPart: DEFAULT_LOCAL_PART,
 				domainName: domainRow.domain,
-				fromName: body.fromName,
+				fromName,
 			});
 
 			const html = await render(
@@ -160,14 +151,12 @@ export const onboardingRoute = new Elysia({
 					method: "POST",
 					headers: {
 						"Content-Type": "application/json",
-						// Forward the browser session so mail uses session auth
-						// (no API key required; internal inject for Kumo).
 						...(cookie ? { Cookie: cookie } : {}),
 					},
 					body: JSON.stringify({
 						from,
 						to,
-						subject: "Your Reloop domain is ready to send",
+						subject: `${domainRow.domain} is ready to send emails`,
 						html,
 					}),
 				});
@@ -205,31 +194,10 @@ export const onboardingRoute = new Elysia({
 		},
 		{
 			authSession: true,
-			body: t.Object({
-				domainId: t.String({
-					minLength: 1,
-					description: "Active org domain id to send from",
-				}),
-				localPart: t.Optional(
-					t.String({
-						minLength: 1,
-						maxLength: MAX_LOCAL_PART_LENGTH,
-						description: "Local part of the From address (default: hello)",
-						examples: ["hello", "noreply", "team"],
-					}),
-				),
-				fromName: t.Optional(
-					t.String({
-						maxLength: 80,
-						description: "Optional display name for the From header",
-						examples: ["Acme", "Reloop"],
-					}),
-				),
-			}),
 			detail: {
-				summary: "Send first/test email to signed-in user",
+				summary: "One-click first email to signed-in user",
 				description:
-					"Session-authenticated. Sends a test message from an active org domain to the signed-in user's email. Recipient cannot be overridden.",
+					"Session-authenticated. Picks the first active org domain, sends the onboarding-test template to the signed-in user. No request body.",
 				tags: ["Onboarding"],
 			},
 		},

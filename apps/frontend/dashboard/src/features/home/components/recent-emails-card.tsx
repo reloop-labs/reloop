@@ -5,6 +5,7 @@ import * as Button from "@reloop/ui/button";
 import { Skeleton } from "@reloop/ui/skeleton";
 import { useSentEmailsQuery } from "#/features/emails/hooks/use-emails-query";
 import { formatRelativeTime } from "#/utils/format-relative-time";
+import { SendFirstEmailButton } from "./send-first-email-button";
 
 const getEmailIcon = (status: string) => {
 	switch (status?.toLowerCase()) {
@@ -48,11 +49,13 @@ const getEmailIconColorClass = (status: string) => {
 
 export function RecentEmailsCard({
 	enabled,
-	onSendFirstEmail,
+	canSendFirstEmail,
+	readyDomainName,
 }: {
 	enabled: boolean;
-	/** Opens session-auth test send when the list is empty. */
-	onSendFirstEmail?: () => void;
+	/** Show one-click send when empty and a domain is ready. */
+	canSendFirstEmail?: boolean;
+	readyDomainName?: string | null;
 }) {
 	const { data, isPending } = useSentEmailsQuery({
 		page: 1,
@@ -149,20 +152,14 @@ export function RecentEmailsCard({
 							No emails sent yet
 						</h3>
 						<p className="mt-1.5 max-w-[260px] text-paragraph-sm text-text-sub-600">
-							Send a test message to yourself from a verified domain, or use the
-							API / SMTP.
+							{readyDomainName
+								? `${readyDomainName} is ready — one click sends a test email from hello@${readyDomainName}.`
+								: "One click sends a test email to you from your verified domain."}
 						</p>
-						{onSendFirstEmail ? (
-							<Button.Root
-								type="button"
-								variant="neutral"
-								mode="stroke"
-								size="small"
-								className="mt-5 rounded-xl"
-								onClick={onSendFirstEmail}
-							>
-								Send test email
-							</Button.Root>
+						{canSendFirstEmail ? (
+							<div className="mt-5">
+								<SendFirstEmailButton variant="stroke" />
+							</div>
 						) : (
 							<Button.Root
 								variant="neutral"
@@ -171,7 +168,7 @@ export function RecentEmailsCard({
 								asChild
 								className="mt-5 rounded-xl"
 							>
-								<Link href="/api-keys">View API keys</Link>
+								<Link href="/domain">Add a domain</Link>
 							</Button.Root>
 						)}
 					</div>

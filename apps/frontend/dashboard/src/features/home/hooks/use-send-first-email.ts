@@ -1,11 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { queryKeys } from "#/lib/query-keys";
-
-export type SendFirstEmailInput = {
-	domainId: string;
-	localPart?: string;
-	fromName?: string;
-};
 
 export type SendFirstEmailResult = {
 	object?: string;
@@ -20,20 +15,12 @@ export type SendFirstEmailResult = {
 	fix?: string;
 };
 
-export async function sendFirstEmail(
-	input: SendFirstEmailInput,
-): Promise<SendFirstEmailResult> {
+export async function sendFirstEmail(): Promise<SendFirstEmailResult> {
 	const res = await fetch("/api/email/v1/onboarding/send-test-email", {
 		method: "POST",
 		credentials: "include",
 		headers: { "Content-Type": "application/json" },
-		body: JSON.stringify({
-			domainId: input.domainId,
-			...(input.localPart ? { localPart: input.localPart } : {}),
-			...(input.fromName?.trim()
-				? { fromName: input.fromName.trim() }
-				: {}),
-		}),
+		body: JSON.stringify({}),
 	});
 
 	const payload = (await res.json().catch(() => ({}))) as SendFirstEmailResult & {
@@ -55,15 +42,26 @@ export async function sendFirstEmail(
 	return payload;
 }
 
+/**
+ * One-click send: uses the onboarding-test template, from the first active
+ * domain, to the signed-in user. Server picks all fields.
+ */
 export function useSendFirstEmail() {
 	const queryClient = useQueryClient();
 
 	return useMutation({
 		mutationFn: sendFirstEmail,
-		onSuccess: () => {
-			// Refresh recent emails + metrics so Overview reflects the send.
+		onSuccess: (result) => {
+			toast.success("Test email sent", {
+				description: `Sent to ${result.to} from ${result.from}`,
+			});
 			void queryClient.invalidateQueries({ queryKey: queryKeys.emails.all });
 			void queryClient.invalidateQueries({ queryKey: queryKeys.metrics.all });
+		},
+		onError: (err: Error & { why?: string; fix?: string }) => {
+			toast.error(err.message || "Failed to send test email", {
+				description: err.fix || err.why,
+			});
 		},
 	});
 }

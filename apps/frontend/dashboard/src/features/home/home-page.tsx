@@ -1,6 +1,6 @@
 import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { useSessionQuery } from "#/features/auth/session-query";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import { useApiKeysQuery } from "#/features/api-keys/hooks/use-api-keys-query";
@@ -13,11 +13,11 @@ import {
 	AttentionAlerts,
 	buildAttentionItems,
 } from "./components/attention-alerts";
+import { DomainReadyBanner } from "./components/domain-ready-banner";
 import { DomainsSummaryCard } from "./components/domains-summary-card";
 import { InboxSummaryCard } from "./components/inbox-summary-card";
 import { OverviewHeader } from "./components/overview-header";
 import { RecentEmailsCard } from "./components/recent-emails-card";
-import { SendFirstEmailModal } from "./components/send-first-email-modal";
 import {
 	SendHealthCard,
 	useSendHealthTotals,
@@ -41,7 +41,6 @@ export function HomePage() {
 		isPending: orgPending,
 	} = useActiveOrganization();
 	const { canManageBilling } = useOrgPermissions();
-	const [sendFirstOpen, setSendFirstOpen] = useState(false);
 
 	const orgReady = Boolean(activeOrganization?.id) && !orgPending;
 
@@ -85,9 +84,15 @@ export function HomePage() {
 
 	const domains = domainsQuery.data?.domains ?? [];
 	const hasDomain = (domainsQuery.data?.total ?? 0) > 0;
-	const hasActiveDomain = domains.some((d) => d.status === "active");
-	const firstActiveDomainId =
-		domains.find((d) => d.status === "active")?.id ?? null;
+	const readyDomains = useMemo(
+		() =>
+			domains
+				.filter((d) => d.status === "active")
+				.map((d) => ({ id: d.id, domain: d.domain })),
+		[domains],
+	);
+	const hasActiveDomain = readyDomains.length > 0;
+	const readyDomainName = readyDomains[0]?.domain ?? null;
 	const hasApiKey = (apiKeysQuery.data?.total ?? 0) > 0;
 
 	const setupSteps = useMemo(
@@ -97,8 +102,9 @@ export function HomePage() {
 				hasActiveDomain,
 				hasApiKey,
 				hasSentEmail: hasSent,
+				readyDomainName,
 			}),
-		[hasDomain, hasActiveDomain, hasApiKey, hasSent],
+		[hasDomain, hasActiveDomain, hasApiKey, hasSent, readyDomainName],
 	);
 
 	const usageRatio = useMemo(() => {
@@ -127,16 +133,20 @@ export function HomePage() {
 			<OverviewHeader
 				organizationName={activeOrganization?.name}
 				canSendFirstEmail={hasActiveDomain}
-				onSendFirstEmail={() => setSendFirstOpen(true)}
+				readyDomainName={readyDomainName}
 			/>
 
 			<AttentionAlerts items={attentionItems} />
 
+			<DomainReadyBanner
+				domains={readyDomains}
+				hasSentEmail={hasSent}
+			/>
+
 			<SetupChecklist
 				steps={setupSteps}
-				onSendFirstEmail={
-					hasActiveDomain ? () => setSendFirstOpen(true) : undefined
-				}
+				canSendFirstEmail={hasActiveDomain}
+				readyDomainName={readyDomainName}
 			/>
 
 			<SendHealthCard enabled={orgReady} />
@@ -144,21 +154,14 @@ export function HomePage() {
 			<div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
 				<RecentEmailsCard
 					enabled={orgReady}
-					onSendFirstEmail={
-						hasActiveDomain ? () => setSendFirstOpen(true) : undefined
-					}
+					canSendFirstEmail={hasActiveDomain}
+					readyDomainName={readyDomainName}
 				/>
 				<div className="flex flex-col gap-6">
 					<DomainsSummaryCard enabled={orgReady} />
 					<InboxSummaryCard enabled={orgReady} />
 				</div>
 			</div>
-
-			<SendFirstEmailModal
-				open={sendFirstOpen}
-				onOpenChange={setSendFirstOpen}
-				preferredDomainId={firstActiveDomainId}
-			/>
 		</div>
 	);
 }
