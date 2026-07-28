@@ -28,48 +28,52 @@ export const installCommands: Record<LanguageCode, string> = {
 	php: "composer require reloop/reloop-email",
 };
 
+const DEFAULT_TO_EMAIL = "you@example.com";
+
 /** `lang` values are Bright aliases (via toBrightLang). */
-export const sendEmailCode: Record<
-	LanguageCode,
-	{ code: string; lang: string }
-> = {
-	nodejs: {
-		code: `import { Reloop } from "reloop-email";
+export function getSendEmailCode(
+	toEmail?: string | null,
+): Record<LanguageCode, { code: string; lang: string }> {
+	const to = toEmail?.trim() || DEFAULT_TO_EMAIL;
+
+	return {
+		nodejs: {
+			code: `import { Reloop } from "reloop-email";
 
 const reloop = new Reloop({ apiKey: process.env.RELOOP_API_KEY! });
 
 const { response, emailError } = await reloop.mail.send({
-  from: "sender@example.com",
-  to: "recipient@example.com",
-  subject: "Hello from Reloop!",
-  text: "Hello World!",
+  from: "onboarding@reloop.email",
+  to: "${to}",
+  subject: "Hello World!",
+  text: "Congrats on sending your first email!",
 });
 
 if (emailError) throw emailError;
 console.log(response.messageId, response.id);`,
-		lang: "ts",
-	},
-	python: {
-		code: `import os
+			lang: "ts",
+		},
+		python: {
+			code: `import os
 from reloop_email import Reloop
 
 reloop = Reloop(api_key=os.environ["RELOOP_API_KEY"])
 
 result = reloop.mail.send({
-    "from": "sender@example.com",
-    "to": "recipient@example.com",
-    "subject": "Hello from Reloop!",
-    "text": "Hello World!",
+    "from": "onboarding@reloop.email",
+    "to": "${to}",
+    "subject": "Hello World!",
+    "text": "Congrats on sending your first email!",
 })
 
 if result.email_error:
     raise result.email_error
 
 print(result.response["messageId"], result.response["id"])`,
-		lang: "py",
-	},
-	go: {
-		code: `package main
+			lang: "py",
+		},
+		go: {
+			code: `package main
 
 import (
   "fmt"
@@ -87,10 +91,10 @@ func main() {
   }
 
   result, err := client.Mail.Send(reloop.SendMailParams{
-    From:    "sender@example.com",
-    To:      "recipient@example.com",
-    Subject: "Hello from Reloop!",
-    Text:    reloop.String("Hello World!"),
+    From:    "onboarding@reloop.email",
+    To:      "${to}",
+    Subject: "Hello World!",
+    Text:    reloop.String("Congrats on sending your first email!"),
   })
   if err != nil {
     fmt.Println("Error:", err)
@@ -98,24 +102,30 @@ func main() {
   }
   fmt.Println(result.MessageID, result.ID)
 }`,
-		lang: "go",
-	},
-	php: {
-		code: `$reloop = Reloop::client(getenv('RELOOP_API_KEY'));
+			lang: "go",
+		},
+		php: {
+			code: `$reloop = Reloop::client(getenv('RELOOP_API_KEY'));
 
 $result = $reloop->mail->send([
-  'from' => 'sender@example.com',
-  'to' => 'recipient@example.com',
-  'subject' => 'Hello from Reloop!',
-  'text' => 'Hello World!',
+  'from' => 'onboarding@reloop.email',
+  'to' => '${to}',
+  'subject' => 'Hello World!',
+  'text' => 'Congrats on sending your first email!',
 ]);
 
 echo $result->message_id, $result->id;`,
-		lang: "php",
-	},
-};
+			lang: "php",
+		},
+	};
+}
 
-export function buildAiPrompt(apiKey: string): string {
+export function buildAiPrompt(
+	apiKey: string,
+	toEmail?: string | null,
+): string {
+	const to = toEmail?.trim() || DEFAULT_TO_EMAIL;
+
 	return `Integrate Reloop email sending into this project.
 
 My API key: ${apiKey}
@@ -123,7 +133,7 @@ My API key: ${apiKey}
 Requirements:
 1. Detect this project's language/framework and install the correct Reloop SDK
 2. Add RELOOP_API_KEY=${apiKey} to my .env file
-3. Send a transactional email from sender@example.com to recipient@example.com with subject "Hello from Reloop!" and plain-text body "Hello World!"
+3. Send a transactional email from onboarding@reloop.email to ${to} with subject "Hello World!" and plain-text body "Congrats on sending your first email!"
 4. Follow this project's existing conventions and handle errors properly
 
 Supported SDKs:

@@ -11,16 +11,17 @@ import {
 	siPython,
 	siYarn,
 } from "simple-icons";
+import { useSessionQuery } from "#/features/auth/session-query";
 import { CopyCodeBlock } from "./copy-code-block";
 import { CopyForAiButton } from "./copy-for-ai-button";
 import { IntegrationLanguagePills } from "./integration-language-pills";
 import {
 	buildAiPrompt,
+	getSendEmailCode,
 	installCommands,
 	langFileLabels,
 	languageLabels,
 	nodeInstallCommands,
-	sendEmailCode,
 } from "./snippets";
 import type { LanguageCode, PackageManager } from "./types";
 
@@ -60,6 +61,8 @@ export function DeveloperPlayground({
 	onChoiceChange: (choice: LanguageCode) => void;
 }) {
 	const [pkgManager, setPkgManager] = useState<PackageManager>("npm");
+	const { data: session } = useSessionQuery();
+	const toEmail = session?.user?.email;
 
 	const lang = choice;
 	const isNode = lang === "nodejs";
@@ -70,7 +73,8 @@ export function DeveloperPlayground({
 		? undefined
 		: nonNodeInstallIcons[lang as keyof typeof nonNodeInstallIcons];
 	const installLabel = isNode ? undefined : languageLabels[lang];
-	const aiPrompt = buildAiPrompt(apiKey);
+	const sendEmailCode = getSendEmailCode(toEmail);
+	const aiPrompt = buildAiPrompt(apiKey, toEmail);
 
 	return (
 		<div className="space-y-6">
