@@ -169,7 +169,7 @@ describe("secureHeadersPlugin", () => {
 		);
 	});
 
-	test("docs profile uses looser CSP", async () => {
+	test("docs profile uses looser CSP on every path", async () => {
 		const app = new Elysia()
 			.use(secureHeadersPlugin({ profile: "docs", hsts: false }))
 			.get("/docs", () => "ok");
@@ -178,6 +178,57 @@ describe("secureHeadersPlugin", () => {
 		expect(res.headers.get("Content-Security-Policy")).toBe(
 			SECURE_HEADERS_VALUES.cspDocs,
 		);
+	});
+
+	test("api profile uses docs CSP on OpenAPI HTML paths", async () => {
+		const app = new Elysia({ prefix: "/api/workflow" })
+			.use(secureHeadersPlugin({ profile: "api", nodeEnv: "test" }))
+			.get("/openapi", () => new Response("<html></html>", {
+				headers: { "content-type": "text/html" },
+			}))
+			.get("/openapi/json", () => ({ openapi: "3.0.0" }))
+			.get("/v1/jobs", () => ({ ok: true }));
+
+		const ui = await app.handle(
+			new Request("http://localhost/api/workflow/openapi"),
+		);
+		expect(ui.headers.get("Content-Security-Policy")).toBe(
+			SECURE_HEADERS_VALUES.cspDocs,
+		);
+		expect(ui.headers.get("Content-Security-Policy")).toContain(
+			"cdn.jsdelivr.net",
+		);
+		expect(ui.headers.get("Content-Security-Policy")).toContain(
+			"fonts.googleapis.com",
+		);
+
+		const spec = await app.handle(
+			new Request("http://localhost/api/workflow/openapi/json"),
+		);
+		expect(spec.headers.get("Content-Security-Policy")).toBe(
+			SECURE_HEADERS_VALUES.cspApi,
+		);
+
+		const api = await app.handle(
+			new Request("http://localhost/api/workflow/v1/jobs"),
+		);
+		expect(api.headers.get("Content-Security-Policy")).toBe(
+			SECURE_HEADERS_VALUES.cspApi,
+		);
+	});
+
+	test("sets CSP once (no stacked duplicate policies)", async () => {
+		const app = new Elysia()
+			.use(secureHeadersPlugin({ profile: "api", nodeEnv: "test" }))
+			.get("/openapi", () => "ok");
+
+		const res = await app.handle(new Request("http://localhost/openapi"));
+		const csp = res.headers.get("Content-Security-Policy");
+		expect(csp).toBe(SECURE_HEADERS_VALUES.cspDocs);
+		// getSetCookie-style multi-value: Headers.get joins with ", " if
+		// multiple values were appended — a duplicated policy would contain
+		// "default-src" twice or the full policy string twice.
+		expect(csp?.split("default-src").length).toBe(2); // one directive + split left
 	});
 });
 

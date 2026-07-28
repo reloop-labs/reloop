@@ -38,6 +38,8 @@ Secrets are stored **hashed** (SHA-256). Plaintext is returned only on create/ro
 
 Use `secureHeadersPlugin({ profile: "api" | "docs" })` on each public Elysia service (Helmet-style): `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`, CSP, and HSTS in production. Edge (Cloudflare) still owns volumetric DDoS and coarse bot filtering.
 
+Under `profile: "api"` (default), JSON routes get `default-src 'none'`. OpenAPI/Swagger HTML paths (`/openapi`, `/swagger`) automatically get a docs CSP that allows Scalar (`cdn.jsdelivr.net` + Google Fonts) and Swagger UI (`unpkg.com`). Spec JSON (`/openapi/json`) stays strict. `profile: "docs"` applies the docs CSP to every response.
+
 ### User-Agent
 
 Public APIs require a non-empty `User-Agent` via `requireUserAgentPlugin()` (health / OpenAPI / landing excluded). Clients should identify themselves (e.g. `MyApp/1.0` or the Reloop SDK UA).
