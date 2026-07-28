@@ -2,7 +2,6 @@ import { useState } from "react";
 import {
 	siBun,
 	siComposer,
-	siDotenv,
 	siGnubash,
 	siGo,
 	siNodedotjs,
@@ -99,18 +98,6 @@ export function DeveloperPlayground({
 									? (id) => setPkgManager(id as PackageManager)
 									: undefined
 							}
-							minHeight="auto"
-						/>
-					</div>
-
-					<div className="space-y-2">
-						<SectionLabel>Add your API key to .env</SectionLabel>
-						<CopyCodeBlock
-							code={`RELOOP_API_KEY=${apiKey}`}
-							lang="bash"
-							copyValue={`RELOOP_API_KEY=${apiKey}`}
-							label=".env"
-							si={siDotenv}
 							minHeight="auto"
 						/>
 					</div>

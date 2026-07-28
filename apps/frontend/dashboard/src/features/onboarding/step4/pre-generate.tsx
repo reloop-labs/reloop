@@ -32,12 +32,12 @@ export function PreGenerate({
 				This key lets your app send emails through Reloop. Copy it now — for
 				security, we won&apos;t show it again.
 			</p>
-			<div className="flex items-center gap-3">
+			<div className="w-full">
 				<FancyButton.Root
 					variant="blue"
-					size="small"
+					size="medium"
 					className={cn(
-						"min-w-[140px] justify-center overflow-hidden rounded-xl transition-all duration-200",
+						"h-10 w-full justify-center overflow-hidden rounded-xl transition-all duration-200 font-medium text-sm",
 						loading && "pointer-events-none opacity-90",
 					)}
 					onClick={onGenerate}

@@ -5,7 +5,6 @@ import Spinner from "@reloop/ui/spinner";
 import { AnimatePresence, motion } from "framer-motion";
 import { useHotkeys } from "react-hotkeys-hook";
 import { CopyCodeBlock } from "./copy-code-block";
-import { DeveloperPlayground } from "./developer-playground";
 import type { IntegrationChoice } from "./types";
 
 export function PostGenerate({
@@ -55,18 +54,12 @@ export function PostGenerate({
 				/>
 			</div>
 
-			<DeveloperPlayground
-				apiKey={apiKey}
-				choice={choice}
-				onChoiceChange={onChoiceChange}
-			/>
-
-			<div className="flex items-center justify-end gap-3 pb-4">
+			<div className="w-full pb-4">
 				<FancyButton.Root
 					variant="blue"
-					size="small"
+					size="medium"
 					className={cn(
-						"min-w-[170px] justify-center overflow-hidden rounded-xl whitespace-nowrap transition-all duration-200",
+						"h-10 w-full justify-center overflow-hidden rounded-xl whitespace-nowrap transition-all duration-200 font-medium text-sm",
 						finishing && "pointer-events-none opacity-90",
 					)}
 					onClick={onDone}
