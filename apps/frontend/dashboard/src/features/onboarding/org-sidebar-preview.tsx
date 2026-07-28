@@ -41,7 +41,7 @@ export function OrgSidebarPreview({ name, logo }: OrgSidebarPreviewProps) {
 									<div className={`h-2 w-8 rounded ${skeletonBg}`} />
 								</div>
 								<div className="flex items-center gap-2 px-1.5 py-1 text-text-soft-400">
-									<Icon name="home" className="h-3 w-3 shrink-0 text-text-sub-600" />
+									<div className={`h-3 w-3 shrink-0 rounded-full ${skeletonBg}`} />
 									<div className={`h-2.5 w-16 rounded ${skeletonBg}`} />
 								</div>
 								<div className="flex items-center gap-2 px-1.5 py-1 text-text-soft-400">
