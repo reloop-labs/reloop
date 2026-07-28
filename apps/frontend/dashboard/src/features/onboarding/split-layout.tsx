@@ -333,6 +333,8 @@ export function SplitLayout({
 							{previewContent}
 						</motion.div>
 					</AnimatePresence>
+					{/* Bottom Gradient Fade */}
+					<div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-44 bg-gradient-to-t from-bg-weak-50 via-bg-weak-50/70 to-transparent dark:from-bg-weak-50/60 dark:via-bg-weak-50/20" />
 				</div>
 			)}
 		</div>
