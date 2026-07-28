@@ -32,24 +32,17 @@ export function DomainPreview({
 			<div
 				className={
 					isDomainVariant
-						? "w-[920px] transform overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 transition-all dark:border-stroke-soft-100/40"
-						: "relative flex h-[520px] w-full max-w-[600px] scale-110 translate-x-12 translate-y-16 flex-col overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 [mask-image:linear-gradient(135deg,black_40%,transparent_92%)] dark:border-stroke-soft-100/40"
+						? "w-[920px] transform overflow-hidden rounded-2xl transition-all"
+						: "relative flex h-[520px] w-full max-w-[600px] scale-110 translate-x-12 translate-y-16 flex-col overflow-hidden rounded-2xl [mask-image:linear-gradient(135deg,black_40%,transparent_92%)]"
 				}
 				style={isDomainVariant ? { maxHeight: "calc(100% + 16px)" } : undefined}
 			>
-				<div className="flex items-center gap-2 border-stroke-soft-100 border-b px-4 py-3 dark:border-stroke-soft-100/40">
-					<div className="flex gap-1.5">
-						<div className="h-3 w-3 rounded-full bg-error-base/80" />
-						<div className="h-3 w-3 rounded-full bg-warning-base/80" />
-						<div className="h-3 w-3 rounded-full bg-success-base/80" />
-					</div>
-				</div>
 
 				<div
 					className={
 						isDomainVariant
-							? "relative bg-bg-white-0 px-6 pt-5 pb-0"
-							: "relative bg-bg-white-0 p-6"
+							? "relative px-6 pt-5 pb-0"
+							: "relative p-6"
 					}
 				>
 					<div className="mb-5 flex items-start gap-4">

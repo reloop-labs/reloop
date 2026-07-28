@@ -15,20 +15,7 @@ export function SidebarPreview({ name, logo }: SidebarPreviewProps) {
 
 	return (
 		<div className="flex w-full items-center justify-center p-2">
-			<div className="relative flex h-[460px] w-full max-w-[640px] translate-x-12 translate-y-16 scale-110 flex-col overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 [mask-image:linear-gradient(135deg,black_40%,transparent_92%)] sm:h-[480px] dark:border-stroke-soft-100/40">
-				{/* Top Window Bar */}
-				<div className="flex shrink-0 items-center gap-2 border-stroke-soft-100 border-b bg-bg-white-0 px-4 py-2.5 dark:border-stroke-soft-100/40">
-					<div className="flex gap-1.5">
-						<div className="h-3 w-3 rounded-full bg-[#ff5f56]" />
-						<div className="h-3 w-3 rounded-full bg-[#ffbd2e]" />
-						<div className="h-3 w-3 rounded-full bg-[#27c93f]" />
-					</div>
-					<div
-						className={`ml-4 flex-1 rounded-md ${skeletonBg} px-3 py-0.5 text-center font-mono text-text-soft-400 text-xs`}
-					>
-						reloop.sh/dashboard
-					</div>
-				</div>
+			<div className="relative flex h-[460px] w-full max-w-[640px] translate-x-12 translate-y-16 scale-110 flex-col overflow-hidden rounded-2xl [mask-image:linear-gradient(135deg,black_40%,transparent_92%)] sm:h-[480px]">
 
 				{/* Main Body */}
 				<div className="flex flex-1 overflow-hidden">
