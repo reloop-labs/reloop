@@ -15,7 +15,7 @@ export function SidebarPreview({ name, logo }: SidebarPreviewProps) {
 
 	return (
 		<div className="flex items-center justify-center w-full p-2">
-			<div className="relative flex h-[460px] sm:h-[480px] w-full max-w-[540px] flex-col overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40">
+			<div className="relative flex h-[460px] sm:h-[480px] w-full max-w-[640px] flex-col overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40">
 				{/* Top Window Bar */}
 				<div className="flex shrink-0 items-center gap-2 border-stroke-soft-100 border-b bg-bg-white-0 px-4 py-2.5 dark:border-stroke-soft-100/40">
 					<div className="flex gap-1.5">

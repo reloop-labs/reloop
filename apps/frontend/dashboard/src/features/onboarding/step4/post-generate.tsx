@@ -33,7 +33,7 @@ export function PostGenerate({
 	);
 
 	return (
-		<div className="w-full min-w-0 max-w-2xl space-y-7">
+		<div className="w-full min-w-0 max-w-4xl space-y-7">
 			{/* Header */}
 			<div className="space-y-2">
 				<div>
