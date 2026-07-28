@@ -1,17 +1,17 @@
-import { useRouter } from "next/navigation";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
+import { useRouter } from "next/navigation";
 
 import { useHotkeys } from "react-hotkeys-hook";
 import { AnimatedBackButton } from "#/features/dashboard/animated-back-button";
 import { formatRelativeTime } from "#/utils/format-relative-time";
+import { ForwardDNSRecordsButton } from "../../add/setup/components/forward-dns-records";
 import { AnimatedClock } from "../../animated-clock";
 import { DeleteDomainModal } from "../../components/delete-domain";
 import type { Domain } from "../../types";
 import { getStatusColorClass, getStatusIcon } from "../../utils";
 import { useDomainActions } from "../hooks/use-domain-actions";
-import { ForwardDNSRecordsButton } from "../../add/setup/components/forward-dns-records";
 import { DomainHeaderActions } from "./domain-header-actions";
 
 export function DomainHeader({
@@ -102,7 +102,9 @@ export function DomainHeader({
 						<Skeleton className="h-9 w-32 rounded-lg" />
 					) : (
 						<>
-							{(status === "pending" || status === "verifying" || status === "failed") && (
+							{(status === "pending" ||
+								status === "verifying" ||
+								status === "failed") && (
 								<>
 									{domainRecordId && (
 										<ForwardDNSRecordsButton domainId={domainRecordId} />
@@ -117,8 +119,8 @@ export function DomainHeader({
 										{isVerifying || status === "verifying"
 											? "Verifying..."
 											: status === "failed"
-											? "Verify DNS Again"
-											: "Verify Domain"}
+												? "Try Again"
+												: "Verify Domain"}
 									</FancyButton.Root>
 								</>
 							)}
