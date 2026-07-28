@@ -32,16 +32,16 @@ export function DomainPreview({
 			<div
 				className={
 					isDomainVariant
-						? "w-[920px] transform overflow-hidden bg-bg-white-0 transition-all"
-						: "relative flex h-[520px] w-[480px] flex-col overflow-hidden rounded-2xl bg-bg-white-0 shadow-2xl"
+						? "w-[920px] transform overflow-hidden transition-all"
+						: "relative flex h-[520px] w-[480px] flex-col overflow-hidden"
 				}
 				style={isDomainVariant ? { maxHeight: "calc(100% + 16px)" } : undefined}
 			>
 				<div
 					className={
 						isDomainVariant
-							? "relative bg-bg-white-0 px-6 pt-5 pb-0"
-							: "relative bg-bg-white-0 p-6"
+							? "relative px-6 pt-5 pb-0"
+							: "relative p-6"
 					}
 				>
 					<div className="mb-5 flex items-start gap-4">
