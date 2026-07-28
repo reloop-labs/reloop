@@ -3,7 +3,6 @@ import Spinner from "@reloop/ui/spinner";
 import { AnimatePresence, motion } from "framer-motion";
 import { CompanyNameField } from "./company-name-field";
 import { LogoUpload } from "./logo-upload";
-import { ReferralField } from "./referral-field";
 import { useCreateOrg } from "./use-create-org";
 import { useLogoUpload } from "./use-logo-upload";
 
@@ -17,20 +16,9 @@ export function CreateOrgStep() {
 		onFileChange,
 	} = useLogoUpload();
 
-	const {
-		isCreating,
-		name,
-		orgId,
-		referral,
-		otherReferral,
-		createAndContinue,
-	} = useCreateOrg();
+	const { isCreating, name, orgId, createAndContinue } = useCreateOrg();
 
-	const canSubmit =
-		Boolean(name) &&
-		!isUploading &&
-		!isCreating &&
-		!(referral === "other" && !otherReferral);
+	const canSubmit = Boolean(name) && !isUploading && !isCreating;
 
 	return (
 		<div>
@@ -53,7 +41,6 @@ export function CreateOrgStep() {
 
 			<motion.div layout className="space-y-3.5 pt-6">
 				<CompanyNameField />
-				<ReferralField />
 			</motion.div>
 
 			<FancyButton.Root

@@ -9,7 +9,7 @@ export function CompanyNameField() {
 	return (
 		<motion.div layout className="space-y-2">
 			<Label.Root htmlFor="company-name">
-				Company name
+				Organization name
 				<Label.Asterisk />
 			</Label.Root>
 			<Input.Root size="medium" className="rounded-xl">
