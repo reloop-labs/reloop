@@ -3,7 +3,6 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo } from "react";
 import { useSessionQuery } from "#/features/auth/session-query";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
-import { useApiKeysQuery } from "#/features/api-keys/hooks/use-api-keys-query";
 import { useDomainsQuery } from "#/features/domain/hooks/use-domains-query";
 import { useBillingUsage } from "#/features/settings/billing/use-billing-usage";
 import { useOrgPermissions } from "#/features/settings/use-org-permissions";
@@ -21,13 +20,9 @@ import {
 	SendHealthCard,
 	useSendHealthTotals,
 } from "./components/send-health-card";
-import {
-	SetupChecklist,
-	buildSetupSteps,
-} from "./components/setup-checklist";
 
 /**
- * Dashboard overview — health, attention, setup, and recent activity.
+ * Dashboard overview — health, attention, and recent activity.
  * Redirects orgless users to onboarding / invite.
  */
 export function HomePage() {
@@ -50,15 +45,7 @@ export function HomePage() {
 		q: "",
 		enabled: orgReady,
 	});
-	const apiKeysQuery = useApiKeysQuery({
-		page: 1,
-		limit: 1,
-		status: "",
-		creator: "",
-		q: "",
-		enabled: orgReady,
-	});
-	const { bounceRate, hasSent } = useSendHealthTotals(orgReady);
+	const { bounceRate } = useSendHealthTotals(orgReady);
 	const billing = useBillingUsage();
 
 	useEffect(() => {
@@ -82,7 +69,6 @@ export function HomePage() {
 	}, [session, isPending, orgPending, organizations, router, queryClient]);
 
 	const domains = domainsQuery.data?.domains ?? [];
-	const hasDomain = (domainsQuery.data?.total ?? 0) > 0;
 	const readyDomains = useMemo(
 		() =>
 			domains
@@ -92,19 +78,6 @@ export function HomePage() {
 	);
 	const hasActiveDomain = readyDomains.length > 0;
 	const readyDomainName = readyDomains[0]?.domain ?? null;
-	const hasApiKey = (apiKeysQuery.data?.total ?? 0) > 0;
-
-	const setupSteps = useMemo(
-		() =>
-			buildSetupSteps({
-				hasDomain,
-				hasActiveDomain,
-				hasApiKey,
-				hasSentEmail: hasSent,
-				readyDomainName,
-			}),
-		[hasDomain, hasActiveDomain, hasApiKey, hasSent, readyDomainName],
-	);
 
 	const usageRatio = useMemo(() => {
 		if (!canManageBilling || !billing.data) return null;
@@ -132,12 +105,6 @@ export function HomePage() {
 			<OverviewHeader userEmail={session?.user?.email} />
 
 			<AttentionAlerts items={attentionItems} />
-
-			<SetupChecklist
-				steps={setupSteps}
-				canSendFirstEmail={hasActiveDomain}
-				readyDomainName={readyDomainName}
-			/>
 
 			<SendHealthCard enabled={orgReady} />
 

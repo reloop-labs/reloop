@@ -1,7 +1,7 @@
-import Link from "next/link";
 import * as Alert from "@reloop/ui/alert";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
+import Link from "next/link";
 import type { DomainStatus } from "#/features/domain/types";
 
 export type AttentionItem = {
@@ -107,7 +107,7 @@ export function AttentionAlerts({ items }: { items: AttentionItem[] }) {
 					variant="lighter"
 					status={item.status}
 					size="large"
-					className="rounded-2xl ring-1 ring-inset ring-stroke-soft-200"
+					className="rounded-2xl ring-1 ring-stroke-soft-200 ring-inset"
 				>
 					<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
 						<div className="min-w-0 space-y-0.5">
