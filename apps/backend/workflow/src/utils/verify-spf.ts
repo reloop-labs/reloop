@@ -14,12 +14,23 @@ export async function verifySpfRecord(
 			),
 		]);
 		const flattenedRecords = records.flat();
+
+		// Extract the required include directives from the expected value
+		// e.g. "v=spf1 include:reloop.sh -all" → ["include:reloop.sh"]
+		const requiredIncludes = value
+			.trim()
+			.split(/\s+/)
+			.filter((part) => part.startsWith("include:"));
+
 		return flattenedRecords.some((record) => {
 			const normalizedRecord = record.trim().replace(/\s+/g, " ");
-			const normalizedValue = value.trim().replace(/\s+/g, " ");
-			return (
-				normalizedRecord === normalizedValue ||
-				normalizedRecord.includes(normalizedValue)
+
+			// Must be an SPF record
+			if (!normalizedRecord.startsWith("v=spf1")) return false;
+
+			// Check that every required include is present in the actual record
+			return requiredIncludes.every((inc) =>
+				normalizedRecord.includes(inc),
 			);
 		});
 	} catch (e) {
