@@ -7,8 +7,14 @@ export * from "./api-key";
 export * from "./contact";
 export * from "./domain";
 export * from "./email";
+export * from "./payloads";
 export type {
+	ApiKeyWebhookData,
+	ContactGroupWebhookData,
+	ContactWebhookData,
+	DomainWebhookData,
 	EmailWebhookData,
+	InboundEmailWebhookData,
 	WebhookEnvelope,
 	WebhookEventDefinition,
 } from "./types";

@@ -3,6 +3,7 @@ import {
 	isAppError,
 } from "@be/contacts/error/contacts.error-response";
 import type { ContactTypes } from "@be/contacts/types/contact.type";
+import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
 import { useLogger } from "evlog/elysia";
 import {
@@ -30,7 +31,7 @@ export async function createContactController({
 } & ContactTypes.CreateContactRequest): Promise<ContactTypes.ContactResponse> {
 	const log = useLogger();
 	try {
-		return await db.transaction(async (tx) => {
+		const result = await db.transaction(async (tx) => {
 			const { softDeletedContact } = await checkExistingContact_step1({
 				email,
 				organizationId,
@@ -79,6 +80,24 @@ export async function createContactController({
 				db: tx,
 			});
 		});
+
+		await bus
+			.publish(BusEvent.CONTACT_CREATED, {
+				organizationId,
+				contactId: result.id,
+				email: result.email,
+				firstName: result.firstName,
+				lastName: result.lastName,
+				status: result.status,
+			})
+			.catch((err) => {
+				log.error("Failed to publish CONTACT_CREATED", {
+					contactId: result.id,
+					error: err instanceof Error ? err.message : String(err),
+				});
+			});
+
+		return result;
 	} catch (error) {
 		log.error("Debug creating contact", {
 			email: email,

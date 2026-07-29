@@ -1,5 +1,6 @@
 import { kumomtaClient } from "@reloop/be-mail/lib/kumomta-client";
 import type { MailModel } from "@reloop/be-mail/model/mail.model";
+import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
 import { emailLog } from "@reloop/db/schema";
 import { eq } from "drizzle-orm";
@@ -57,18 +58,32 @@ export async function sendEmail_step6({
 			},
 		});
 	} catch (error) {
+		const errorMessage =
+			error instanceof Error ? error.message : String(error);
+
 		// Mark the log record as failed before re-throwing so it is never
 		// stuck permanently in "pending" status.
 		await db
 			.update(emailLog)
 			.set({
 				status: "failed",
-				errorMessage: error instanceof Error ? error.message : String(error),
+				errorMessage,
 				failedAt: new Date(),
 			})
 			.where(eq(emailLog.id, emailLogId))
 			// Swallow the DB error so the original send error always propagates.
 			.catch(() => {});
+
+		// Fire-and-forget webhook fan-out for permanent send failures.
+		await bus
+			.publish(BusEvent.EMAIL_FAILED, {
+				organizationId,
+				emailLogId,
+				errorMessage,
+				timestamp: new Date().toISOString(),
+			})
+			.catch(() => {});
+
 		throw error;
 	}
 }

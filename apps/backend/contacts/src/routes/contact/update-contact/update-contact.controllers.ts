@@ -4,6 +4,7 @@ import {
 } from "@be/contacts/error/contacts.error-response";
 import { upsertContactProperties } from "@be/contacts/routes/contact/utils/upsert-contact-properties";
 import type { ContactTypes } from "@be/contacts/types/contact.type";
+import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { CONTACT_UPDATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
@@ -26,7 +27,7 @@ export async function updateContactController({
 	log.info("Updating contact", { contactId, organizationId });
 
 	try {
-		return await db.transaction(async (tx) => {
+		const { finalContact, previousStatus } = await db.transaction(async (tx) => {
 			const existingContact = await tx.query.contact.findFirst({
 				where: and(
 					eq(schema.contact.id, contactId),
@@ -136,8 +137,55 @@ export async function updateContactController({
 				event: CONTACT_UPDATE_WEBHOOK_EVENT.id,
 			};
 
-			return finalContact;
+			return {
+				finalContact,
+				previousStatus: existingContact.status,
+			};
 		});
+
+		const lifecyclePayload = {
+			organizationId,
+			contactId: finalContact.id,
+			email: finalContact.email,
+			firstName: finalContact.firstName,
+			lastName: finalContact.lastName,
+			status: finalContact.status,
+		};
+
+		await bus
+			.publish(BusEvent.CONTACT_UPDATED, lifecyclePayload)
+			.catch((err) => {
+				log.error("Failed to publish CONTACT_UPDATED", {
+					contactId,
+					error: err instanceof Error ? err.message : String(err),
+				});
+			});
+
+		if (
+			contactStatus !== undefined &&
+			contactStatus !== previousStatus
+		) {
+			const statusEvent =
+				contactStatus === "subscribed"
+					? BusEvent.CONTACT_SUBSCRIBED
+					: contactStatus === "unsubscribed"
+						? BusEvent.CONTACT_UNSUBSCRIBED
+						: contactStatus === "blocked"
+							? BusEvent.CONTACT_BLOCKED
+							: null;
+
+			if (statusEvent) {
+				await bus.publish(statusEvent, lifecyclePayload).catch((err) => {
+					log.error("Failed to publish contact status event", {
+						contactId,
+						newStatus: contactStatus,
+						error: err instanceof Error ? err.message : String(err),
+					});
+				});
+			}
+		}
+
+		return finalContact;
 	} catch (error) {
 		log.error("Error updating contact", {
 			contactId,

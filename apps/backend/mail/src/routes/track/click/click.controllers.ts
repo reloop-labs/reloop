@@ -4,6 +4,7 @@ import {
 } from "@reloop/be-mail/lib/crypto";
 import { MailErrors } from "@reloop/be-mail/lib/errors";
 import { mailConfig } from "@reloop/be-mail/mail.config";
+import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
 import { emailEvent, emailLog } from "@reloop/db/schema";
 import { eq } from "drizzle-orm";
@@ -54,14 +55,36 @@ export async function handleClickTracking({ token }: { token: string }) {
 				throw MailErrors.invalidTrackingSignature();
 			}
 
-			await db.insert(emailEvent).values({
-				emailLogId,
-				type: "clicked",
-				metadata: {
-					url,
-				},
-			});
+			const [inserted] = await db
+				.insert(emailEvent)
+				.values({
+					emailLogId,
+					type: "clicked",
+					metadata: {
+						url,
+					},
+				})
+				.returning({ id: emailEvent.id });
+
 			log.info({ ...{ emailLogId, url }, message: "Email click tracked" });
+
+			if (inserted && logEntry.organizationId) {
+				await bus
+					.publish(BusEvent.EMAIL_CLICKED, {
+						organizationId: logEntry.organizationId,
+						emailLogId,
+						emailEventId: inserted.id,
+						url,
+						timestamp: new Date().toISOString(),
+					})
+					.catch((err) => {
+						log.error({
+							message: "Failed to publish EMAIL_CLICKED bus event",
+							emailLogId,
+							error: err instanceof Error ? err.message : String(err),
+						});
+					});
+			}
 		} catch (error) {
 			// Re-throw if it's already a structured error
 			if (error && typeof error === "object" && "status" in error) {

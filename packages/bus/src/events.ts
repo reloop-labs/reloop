@@ -17,6 +17,9 @@ export enum BusEvent {
 
 	// Email Events
 	EMAIL_SENT = "email.sent",
+	EMAIL_OPENED = "email.opened",
+	EMAIL_CLICKED = "email.clicked",
+	EMAIL_FAILED = "email.failed",
 	SEND_TEST_EMAIL = "email.send_test",
 	INVITE_CREATED = "invite.created",
 	OTP_REQUESTED = "otp.requested",
@@ -48,6 +51,17 @@ export enum BusEvent {
 	// KumoMTA Events
 	KUMOMTA_EVENT = "kumomta.event",
 	KUMOMTA_INBOUND_RECEIVED = "kumomta.inbound_received",
+
+	// Contact lifecycle (manual CRUD + status)
+	CONTACT_CREATED = "contact.created",
+	CONTACT_UPDATED = "contact.updated",
+	CONTACT_DELETED = "contact.deleted",
+	CONTACT_SUBSCRIBED = "contact.subscribed",
+	CONTACT_UNSUBSCRIBED = "contact.unsubscribed",
+	CONTACT_BLOCKED = "contact.blocked",
+	CONTACT_GROUP_CREATED = "contact.group.created",
+	CONTACT_GROUP_UPDATED = "contact.group.updated",
+	CONTACT_GROUP_DELETED = "contact.group.deleted",
 
 	// Contact Auto-Capture Events
 	CONTACT_AUTO_CREATED = "contact.auto_created",

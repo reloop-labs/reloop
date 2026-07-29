@@ -24,6 +24,7 @@ const EVENT_STATUS_MAP: Partial<
 	Bounce: "bounced",
 	Expiration: "failed",
 	AdminBounce: "bounced",
+	OOB: "bounced",
 	Feedback: "spam",
 };
 
@@ -99,6 +100,7 @@ export async function initKumomtaSubscriber() {
 
 					case "Bounce":
 					case "AdminBounce":
+					case "OOB":
 						updateData.failedAt = new Date();
 						updateData.errorMessage = formatErrorMessage(event);
 						break;

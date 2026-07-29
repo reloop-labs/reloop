@@ -3,6 +3,7 @@ import {
 	isAppError,
 } from "@be/contacts/error/contacts.error-response";
 import type { ContactModel } from "@be/contacts/model/contact.model";
+import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { CONTACT_DELETE_WEBHOOK_EVENT } from "@reloop/webhook-events";
@@ -28,7 +29,13 @@ export async function deleteContactController({
 					eq(schema.contact.organizationId, organizationId),
 				),
 			)
-			.returning({ id: schema.contact.id });
+			.returning({
+				id: schema.contact.id,
+				email: schema.contact.email,
+				firstName: schema.contact.firstName,
+				lastName: schema.contact.lastName,
+				status: schema.contact.status,
+			});
 
 		if (!deleted) {
 			log.warn("Contact not found", { contactId, organizationId });
@@ -36,6 +43,22 @@ export async function deleteContactController({
 		}
 
 		log.info("Contact deleted successfully", { contactId });
+
+		await bus
+			.publish(BusEvent.CONTACT_DELETED, {
+				organizationId,
+				contactId: deleted.id,
+				email: deleted.email,
+				firstName: deleted.firstName,
+				lastName: deleted.lastName,
+				status: deleted.status,
+			})
+			.catch((err) => {
+				log.error("Failed to publish CONTACT_DELETED", {
+					contactId,
+					error: err instanceof Error ? err.message : String(err),
+				});
+			});
 
 		return {
 			success: true,

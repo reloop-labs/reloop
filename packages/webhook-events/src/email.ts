@@ -72,21 +72,23 @@ export const EMAIL_RECEIVED_WEBHOOK_EVENT = {
 	isActive: true,
 } as const satisfies WebhookEventDefinition;
 
+/** Not yet wired through the send pipeline — hidden until scheduled sends emit a distinct event. */
 export const EMAIL_SCHEDULED_WEBHOOK_EVENT = {
 	id: "email.scheduled",
 	name: "email.scheduled",
 	category: "email",
 	description: "Triggered when an email is scheduled for later delivery",
-	isActive: true,
+	isActive: false,
 } as const satisfies WebhookEventDefinition;
 
+/** Not yet wired — hidden until pre-send suppression produces a distinct event. */
 export const EMAIL_SUPPRESSED_WEBHOOK_EVENT = {
 	id: "email.suppressed",
 	name: "email.suppressed",
 	category: "email",
 	description:
 		"Triggered when an email is suppressed (recipient on suppression list)",
-	isActive: true,
+	isActive: false,
 } as const satisfies WebhookEventDefinition;
 
 export const EMAIL_WEBHOOK_EVENTS = [

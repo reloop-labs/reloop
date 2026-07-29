@@ -5,6 +5,7 @@ import {
 } from "@be/contacts/error/contacts.error-response";
 import type { GroupModel } from "@be/contacts/model/group.model";
 import type { GroupResponse } from "@be/contacts/types/group.type";
+import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { GROUP_UPDATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
@@ -71,6 +72,19 @@ export const updateGroupController = async ({
 		}
 
 		log.info("Group updated successfully", { group_id });
+
+		await bus
+			.publish(BusEvent.CONTACT_GROUP_UPDATED, {
+				organizationId,
+				groupId: updatedGroup.id,
+				name: updatedGroup.name,
+			})
+			.catch((err) => {
+				log.error("Failed to publish CONTACT_GROUP_UPDATED", {
+					group_id,
+					error: err instanceof Error ? err.message : String(err),
+				});
+			});
 
 		const result = {
 			id: updatedGroup.id,

@@ -56,6 +56,44 @@ export interface EmailSentPayload {
 	timestamp: string;
 }
 
+export interface EmailOpenedPayload {
+	organizationId: string;
+	emailLogId: string;
+	/** email_event row id for idempotent webhook fan-out */
+	emailEventId: string;
+	timestamp: string;
+}
+
+export interface EmailClickedPayload {
+	organizationId: string;
+	emailLogId: string;
+	emailEventId: string;
+	url: string;
+	timestamp: string;
+}
+
+export interface EmailFailedPayload {
+	organizationId: string;
+	emailLogId: string;
+	errorMessage: string;
+	timestamp: string;
+}
+
+export interface ContactLifecyclePayload {
+	organizationId: string;
+	contactId: string;
+	email: string;
+	firstName?: string | null;
+	lastName?: string | null;
+	status: string;
+}
+
+export interface ContactGroupLifecyclePayload {
+	organizationId: string;
+	groupId: string;
+	name: string;
+}
+
 export interface OrganizationCreatedPayload {
 	id: string;
 	name: string;
@@ -336,6 +374,9 @@ export interface EventPayloads {
 	[BusEvent.DOMAIN_DNS_REVERIFICATION_REQUESTED]: DomainDnsReverificationRequestedPayload;
 	[BusEvent.WEBHOOK_TRIGGERED]: WebhookTriggeredPayload;
 	[BusEvent.EMAIL_SENT]: EmailSentPayload;
+	[BusEvent.EMAIL_OPENED]: EmailOpenedPayload;
+	[BusEvent.EMAIL_CLICKED]: EmailClickedPayload;
+	[BusEvent.EMAIL_FAILED]: EmailFailedPayload;
 	[BusEvent.SEND_TEST_EMAIL]: SendTestEmailPayload;
 	[BusEvent.ORGANIZATION_CREATED]: OrganizationCreatedPayload;
 	[BusEvent.ORGANIZATION_JOINED]: OrganizationJoinedPayload;
@@ -358,6 +399,15 @@ export interface EventPayloads {
 	[BusEvent.QUOTA_EXCEEDED]: QuotaExceededPayload;
 	[BusEvent.KUMOMTA_EVENT]: KumomtaLogRecordPayload;
 	[BusEvent.KUMOMTA_INBOUND_RECEIVED]: KumomtaInboundReceivedPayload;
+	[BusEvent.CONTACT_CREATED]: ContactLifecyclePayload;
+	[BusEvent.CONTACT_UPDATED]: ContactLifecyclePayload;
+	[BusEvent.CONTACT_DELETED]: ContactLifecyclePayload;
+	[BusEvent.CONTACT_SUBSCRIBED]: ContactLifecyclePayload;
+	[BusEvent.CONTACT_UNSUBSCRIBED]: ContactLifecyclePayload;
+	[BusEvent.CONTACT_BLOCKED]: ContactLifecyclePayload;
+	[BusEvent.CONTACT_GROUP_CREATED]: ContactGroupLifecyclePayload;
+	[BusEvent.CONTACT_GROUP_UPDATED]: ContactGroupLifecyclePayload;
+	[BusEvent.CONTACT_GROUP_DELETED]: ContactGroupLifecyclePayload;
 	[BusEvent.CONTACT_AUTO_CREATED]: ContactAutoCreatedPayload;
 	[BusEvent.CONTACT_DELIVERABILITY_UPDATED]: ContactDeliverabilityUpdatedPayload;
 	[BusEvent.INBOUND_EMAIL_RECEIVED]: InboundEmailReceivedPayload;

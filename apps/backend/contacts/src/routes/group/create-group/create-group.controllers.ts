@@ -5,6 +5,7 @@ import {
 } from "@be/contacts/error/contacts.error-response";
 import type { GroupModel } from "@be/contacts/model/group.model";
 import type { GroupResponse } from "@be/contacts/types/group.type";
+import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { createGroupId } from "@reloop/db/schema";
@@ -50,6 +51,19 @@ export const createGroupController = async ({
 			throw ContactErrors.createFailed("Failed to create group");
 		}
 		log.info("Group created successfully", { name, id: newGroup.id });
+
+		await bus
+			.publish(BusEvent.CONTACT_GROUP_CREATED, {
+				organizationId,
+				groupId: newGroup.id,
+				name: newGroup.name,
+			})
+			.catch((err) => {
+				log.error("Failed to publish CONTACT_GROUP_CREATED", {
+					groupId: newGroup.id,
+					error: err instanceof Error ? err.message : String(err),
+				});
+			});
 
 		const result = {
 			id: newGroup.id,

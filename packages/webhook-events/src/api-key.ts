@@ -24,20 +24,22 @@ export const API_KEY_DELETE_WEBHOOK_EVENT = {
 	isActive: true,
 } as const satisfies WebhookEventDefinition;
 
+/** Fired when an API key is disabled (soft revoke). */
 export const API_KEY_REVOKE_WEBHOOK_EVENT = {
 	id: "api-key.revoke",
 	name: "api-key.revoke",
 	category: "api-key",
-	description: "Triggered when an API key is revoked",
+	description: "Triggered when an API key is revoked (disabled)",
 	isActive: true,
 } as const satisfies WebhookEventDefinition;
 
+/** Not yet wired from rate-limit middleware — hidden until a publisher exists. */
 export const API_KEY_RATE_LIMITED_WEBHOOK_EVENT = {
 	id: "api-key.rate_limited",
 	name: "api-key.rate_limited",
 	category: "api-key",
 	description: "Triggered when an API key exceeds its rate limit",
-	isActive: true,
+	isActive: false,
 } as const satisfies WebhookEventDefinition;
 
 export const API_KEY_LIST_WEBHOOK_EVENT = {
