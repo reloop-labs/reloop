@@ -6,12 +6,13 @@ import {
 import { db } from "@reloop/db/client";
 import { emailLog, member } from "@reloop/db/schema";
 import { emailConfig } from "@reloop/email/email.config";
+import { attributeOnboardingActivityLog } from "@reloop/email/routes/onboarding/attribute-activity-log";
 import { ONBOARDING_TEST_SUBJECT } from "@reloop/email/routes/onboarding/onboarding.constants";
 import {
 	onboardingSessionOpts,
 	onboardingSessionRedis,
 } from "@reloop/email/routes/onboarding/onboarding.session";
-import { and, desc, eq, or, sql } from "drizzle-orm";
+import { and, desc, eq, sql } from "drizzle-orm";
 import { Elysia, t } from "elysia";
 import { log } from "evlog";
 
@@ -114,6 +115,7 @@ export const dashboardRoute = new Elysia({
 						id: emailLog.id,
 						organizationId: emailLog.organizationId,
 						apikeyId: emailLog.apikeyId,
+						fromEmail: emailLog.fromEmail,
 					})
 					.from(emailLog)
 					.where(
@@ -163,6 +165,18 @@ export const dashboardRoute = new Elysia({
 							.where(eq(emailLog.id, match.id));
 						updatedCount += 1;
 					}
+
+					// Reassign / insert activity_log so the Logs page shows email.sent.
+					await attributeOnboardingActivityLog({
+						emailLogId: match.id,
+						organizationId,
+						userId: session.userId,
+						apikeyId: keyAuth.apiKeyId,
+						to,
+						from: match.fromEmail,
+						subject: ONBOARDING_TEST_SUBJECT,
+					});
+
 					ids.push(match.id);
 				}
 

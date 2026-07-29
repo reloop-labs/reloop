@@ -1,5 +1,6 @@
 import { db } from "@reloop/db/client";
 import { domain, emailLog, member } from "@reloop/db/schema";
+import { attributeOnboardingActivityLog } from "@reloop/email/routes/onboarding/attribute-activity-log";
 import {
 	ONBOARDING_TEST_SUBJECT,
 	ONBOARDING_TEST_TEXT,
@@ -116,6 +117,8 @@ export async function saveOnboardingCustomerEmailLog({
 			matchId = claimable?.id;
 		}
 
+		let emailLogId: string | null = null;
+
 		if (matchId) {
 			const [updated] = await db
 				.update(emailLog)
@@ -129,52 +132,67 @@ export async function saveOnboardingCustomerEmailLog({
 				})
 				.where(eq(emailLog.id, matchId))
 				.returning({ id: emailLog.id });
-			return updated?.id ?? matchId;
+			emailLogId = updated?.id ?? matchId;
+		} else {
+			// No platform row (e.g. SMTP/Mailpit fallback) — insert customer log.
+			const [domainRow] = await db
+				.select({ id: domain.id })
+				.from(domain)
+				.where(eq(domain.domain, onboardingDomainName))
+				.limit(1);
+
+			if (!domainRow) {
+				log.warn({
+					domain: onboardingDomainName,
+					message:
+						"Onboarding test domain row missing — skip customer email_log insert",
+				});
+				return null;
+			}
+
+			const messageId =
+				providerMessageId?.trim() ||
+				`msg_onboarding_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+
+			const [row] = await db
+				.insert(emailLog)
+				.values({
+					messageId,
+					organizationId,
+					domainId: domainRow.id,
+					userId,
+					apikeyId,
+					fromEmail: parseFromEmail(from),
+					fromName: parseFromName(from) ?? "Reloop",
+					toEmails: [to],
+					subject: ONBOARDING_TEST_SUBJECT,
+					textBody: ONBOARDING_TEST_TEXT,
+					htmlBody: ONBOARDING_TEST_TEXT,
+					status: "sent",
+					provider: "kumomta",
+					providerMessageId: providerMessageId?.trim() || undefined,
+					size: ONBOARDING_TEST_TEXT.length * 2,
+					sentAt: new Date(),
+				})
+				.returning({ id: emailLog.id });
+
+			emailLogId = row?.id ?? null;
 		}
 
-		// No platform row (e.g. SMTP/Mailpit fallback) — insert customer log.
-		const [domainRow] = await db
-			.select({ id: domain.id })
-			.from(domain)
-			.where(eq(domain.domain, onboardingDomainName))
-			.limit(1);
-
-		if (!domainRow) {
-			log.warn({
-				domain: onboardingDomainName,
-				message:
-					"Onboarding test domain row missing — skip customer email_log insert",
-			});
-			return null;
-		}
-
-		const messageId =
-			providerMessageId?.trim() ||
-			`msg_onboarding_${Date.now()}_${Math.random().toString(36).slice(2)}`;
-
-		const [row] = await db
-			.insert(emailLog)
-			.values({
-				messageId,
+		if (emailLogId) {
+			// Also move/create activity_log so /logs shows email.sent for this workspace.
+			await attributeOnboardingActivityLog({
+				emailLogId,
 				organizationId,
-				domainId: domainRow.id,
 				userId,
 				apikeyId,
-				fromEmail: parseFromEmail(from),
-				fromName: parseFromName(from) ?? "Reloop",
-				toEmails: [to],
+				to,
+				from: parseFromEmail(from),
 				subject: ONBOARDING_TEST_SUBJECT,
-				textBody: ONBOARDING_TEST_TEXT,
-				htmlBody: ONBOARDING_TEST_TEXT,
-				status: "sent",
-				provider: "kumomta",
-				providerMessageId: providerMessageId?.trim() || undefined,
-				size: ONBOARDING_TEST_TEXT.length * 2,
-				sentAt: new Date(),
-			})
-			.returning({ id: emailLog.id });
+			});
+		}
 
-		return row?.id ?? null;
+		return emailLogId;
 	} catch (error) {
 		// Send already succeeded — never fail the request because of logging.
 		log.error({
