@@ -9,16 +9,12 @@ import {
 	eq,
 	gte,
 	ilike,
-	inArray,
 	lte,
 	or,
 	type SQL,
 	sql,
 } from "drizzle-orm";
 import { useLogger } from "evlog/elysia";
-
-/** Temporary scope: Logs UI only surfaces email-related activity. */
-const EMAIL_SERVICES = ["email", "mail"] as const;
 
 export async function listLogsController(
 	query: LogsTypes.ListLogsQuery,
@@ -29,11 +25,6 @@ export async function listLogsController(
 	try {
 		const conditions: SQL[] = [
 			eq(schema.activityLog.organizationId, organizationId),
-			// For now: only email/mail activity logs (exclude template, domain, etc.)
-			or(
-				inArray(schema.activityLog.service, [...EMAIL_SERVICES]),
-				eq(schema.activityLog.resourceType, "email"),
-			) as SQL,
 		];
 
 		if (query.level) {
