@@ -1,9 +1,9 @@
-import Link from "next/link";
 import * as Badge from "@reloop/ui/badge";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import * as Tooltip from "@reloop/ui/tooltip";
+import Link from "next/link";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
 import { CopyCodeBlock } from "#/features/onboarding/step4/copy-code-block";
@@ -244,7 +244,7 @@ export function LogDetailPanel({ logId }: LogDetailPanelProps) {
 									>
 										{method}
 									</span>
-									<span className="min-w-0 truncate font-mono text-[13px] font-medium">
+									<span className="min-w-0 truncate font-medium font-mono text-[13px]">
 										{displayEndpoint}
 									</span>
 								</>
@@ -270,7 +270,7 @@ export function LogDetailPanel({ logId }: LogDetailPanelProps) {
 			</div>
 
 			{/* ── Body ── */}
-			<div className="flex-1 space-y-5 overflow-y-auto p-5">
+			<div className="flex-1 overflow-y-auto px-5 pb-5">
 				{/* Diagnostic card — only once we know it's an error */}
 				{!isLoading && log && <DiagnosticCard log={log} />}
 
