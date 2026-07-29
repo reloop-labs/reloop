@@ -396,15 +396,15 @@ export function LogList({
 				</div>
 			) : (
 				<div
-					className="mt-4 flex min-h-0 overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-bg-white-0/5"
-					style={{ height: "calc(100vh - 240px)", minHeight: 480 }}
+					className="mt-3 flex min-h-0 overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-bg-white-0/5"
+					style={{ height: "calc(100vh - 320px)", minHeight: 400 }}
 				>
 					{/* LEFT — Request list */}
 					<div className="flex w-[min(480px,42%)] shrink-0 flex-col border-stroke-soft-100 border-r dark:border-stroke-soft-100/40">
 						<LogTable
 							logs={data?.logs || []}
 							isLoading={isLoading}
-							loadingRows={10}
+							loadingRows={7}
 							selectedLogId={selectedLogId}
 							onRowClick={(logId) => {
 								void setSelectedLogId(logId);
