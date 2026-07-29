@@ -83,7 +83,8 @@ async function ensureActivityLogAttributed({
 			mode: "onboarding_test",
 		},
 		request_details: {
-			endpoint: "/api/logs/v1/onboarding/dashboard",
+			// Display as the public mail send API in the Logs UI.
+			endpoint: "/api/mail/v1/send",
 			method: "POST",
 			statusCode: 200,
 		},
