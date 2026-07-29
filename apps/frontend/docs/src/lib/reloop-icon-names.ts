@@ -22,6 +22,7 @@ export const RELOOP_ICON_NAMES = new Set<string>([
 	"arrow-top-circle",
 	"arrow-top-right",
 	"arrow-up-right",
+	"arrows-expand-diagonal",
 	"at-sign",
 	"award",
 	"bell",

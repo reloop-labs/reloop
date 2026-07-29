@@ -359,33 +359,55 @@ export function LogList({
 				</button>
 			</div>
 
-			{/* Split panel */}
-			<div className="mt-4 flex flex-col gap-4 lg:flex-row lg:items-start">
-				{/* LEFT — Log list */}
+			{/* Unified split pane — Stripe-style list + detail */}
+			{error ? (
+				<div className="mt-4 flex flex-col items-center justify-center gap-2 rounded-xl border border-stroke-soft-100 bg-bg-white-0 p-8 dark:border-stroke-soft-100/40">
+					<Icon name="alert-circle" className="h-8 w-8 text-error-base" />
+					<p className="text-center text-sm text-text-sub-600">
+						Failed to load logs
+					</p>
+				</div>
+			) : isMobile ? (
+				<div className="mt-4">
+					<LogTable
+						logs={data?.logs || []}
+						isLoading={isLoading}
+						loadingRows={8}
+						selectedLogId={selectedLogId}
+						onRowClick={(logId) => {
+							void setSelectedLogId(logId);
+							setDrawerOpen(true);
+						}}
+						hasFilters={!!hasAnyFilter}
+						onClearFilters={handleClearAll}
+						total={totalLogs}
+						currentPage={currentPage ?? 1}
+						pageSize={pageSize ?? 25}
+						totalPages={totalPages}
+						startIndex={startIndex}
+						endIndex={endIndex}
+						onPageChange={(p) => void setCurrentPage(p)}
+						onPageSizeChange={(value) => {
+							void setPageSize(value);
+							void setCurrentPage(1);
+						}}
+						isMobile
+					/>
+				</div>
+			) : (
 				<div
-					className={cn(
-						"w-full text-paragraph-sm",
-						!isMobile && "sticky top-4 w-[480px] shrink-0 self-start",
-					)}
+					className="mt-4 flex min-h-0 overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-bg-white-0/5"
+					style={{ height: "calc(100vh - 240px)", minHeight: 480 }}
 				>
-					{error ? (
-						<div className="flex flex-col items-center justify-center gap-2 rounded-xl border border-stroke-soft-100 bg-bg-white-0 p-8 dark:border-stroke-soft-100/40">
-							<Icon name="alert-circle" className="h-8 w-8 text-error-base" />
-							<p className="text-center text-sm text-text-sub-600">
-								Failed to load logs
-							</p>
-						</div>
-					) : (
+					{/* LEFT — Request list */}
+					<div className="flex w-[min(480px,42%)] shrink-0 flex-col border-stroke-soft-100 border-r dark:border-stroke-soft-100/40">
 						<LogTable
 							logs={data?.logs || []}
 							isLoading={isLoading}
-							loadingRows={8}
+							loadingRows={10}
 							selectedLogId={selectedLogId}
 							onRowClick={(logId) => {
 								void setSelectedLogId(logId);
-								if (isMobile) {
-									setDrawerOpen(true);
-								}
 							}}
 							hasFilters={!!hasAnyFilter}
 							onClearFilters={handleClearAll}
@@ -400,33 +422,31 @@ export function LogList({
 								void setPageSize(value);
 								void setCurrentPage(1);
 							}}
-							isMobile={isMobile}
+							embedded
 						/>
-					)}
-				</div>
+					</div>
 
-				{/* RIGHT — Inline detail panel */}
-				{!isMobile && (
-					<div className="min-w-0 flex-1 rounded-3xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-bg-white-0/5">
+					{/* RIGHT — Detail panel */}
+					<div className="min-w-0 flex-1 overflow-y-auto">
 						{selectedLogId ? (
 							<LogDetailPanel logId={selectedLogId} />
 						) : (
-							<div className="flex min-h-[500px] flex-col items-center justify-center gap-1 p-8 text-center">
-								<div className="mb-4 flex items-center justify-center">
-									<Icon name="logs" className="h-8 w-8 text-text-sub-600" />
+							<div className="flex h-full min-h-[400px] flex-col items-center justify-center gap-1 p-8 text-center">
+								<div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-bg-weak-50 dark:bg-bg-weak-50/40">
+									<Icon name="logs" className="h-6 w-6 text-text-sub-600" />
 								</div>
 								<h3 className="font-semibold text-base text-text-strong-950">
-									Select a log to inspect
+									Select a request
 								</h3>
-								<p className="mx-auto max-w-sm text-balance font-medium text-[12px] text-text-sub-600">
-									Click any row on the left to view its request details, status,
-									and response body.
+								<p className="mx-auto max-w-xs text-balance font-medium text-[12px] text-text-sub-600">
+									Choose a log on the left to inspect status, metadata, and
+									response body.
 								</p>
 							</div>
 						)}
 					</div>
-				)}
-			</div>
+				</div>
+			)}
 
 			{/* Mobile drawer (only visible on narrow screens) */}
 			<LogDrawer

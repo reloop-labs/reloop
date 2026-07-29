@@ -11,6 +11,7 @@ import { AnimatedBackButton } from "#/features/dashboard/animated-back-button";
 import { CopyCodeBlock } from "#/features/onboarding/step4/copy-code-block";
 import { formatRelativeTime } from "#/utils/format-relative-time";
 import { DiagnosticCard } from "./diagnostic-card";
+import { formatDisplayEndpoint } from "./format-endpoint";
 import { useLogDetailQuery } from "./hooks/use-logs-query";
 
 const getMethodColorClass = (method: string) => {
@@ -31,17 +32,7 @@ const getMethodColorClass = (method: string) => {
 	}
 };
 
-const stripBasePath = (url: string) => {
-	try {
-		let path = new URL(url).pathname;
-		if (path.length > 1 && path.endsWith("/")) path = path.slice(0, -1);
-		return path;
-	} catch {
-		let path = url;
-		if (path.length > 1 && path.endsWith("/")) path = path.slice(0, -1);
-		return path;
-	}
-};
+
 
 const getStatusProps = (statusCode: number | null | undefined) => {
 	if (!statusCode) return null;
@@ -201,7 +192,9 @@ export function LogDetailPage({ logId }: { logId: string }) {
 
 	const method = logData.requestDetails?.method as string | undefined;
 	const endpoint = logData.requestDetails?.endpoint as string | undefined;
-	const displayEndpoint = endpoint ? stripBasePath(endpoint) : undefined;
+	const displayEndpoint = endpoint
+		? formatDisplayEndpoint(endpoint)
+		: undefined;
 	const statusProps = getStatusProps(logData.status_code);
 	const metadataEntries = logData.metadata
 		? Object.entries(logData.metadata)

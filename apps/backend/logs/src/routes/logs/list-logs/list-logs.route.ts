@@ -21,7 +21,8 @@ export const listLogsRoute = new Elysia().use(authMiddleware).get(
 		detail: {
 			tags: ["Logs"],
 			summary: "List Logs",
-			description: "Returns log entries with optional filtering.",
+			description:
+				"Returns log entries with optional filtering. Currently limited to email-related activity (service email/mail or resource_type email).",
 			"x-codeSamples": listLogsXCodeSamples,
 		},
 	},
