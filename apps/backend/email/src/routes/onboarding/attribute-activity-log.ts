@@ -2,13 +2,71 @@ import { createId } from "@paralleldrive/cuid2";
 import { db } from "@reloop/db/client";
 import { activityLog } from "@reloop/db/schema";
 import { emailConfig } from "@reloop/email/email.config";
+import {
+	ONBOARDING_TEST_SUBJECT,
+	ONBOARDING_TEST_TEXT,
+} from "@reloop/email/routes/onboarding/onboarding.constants";
 import { or, eq, sql } from "drizzle-orm";
 import { log } from "evlog";
+
+/** Public mail API path shown on the Logs page. */
+const MAIL_SEND_ENDPOINT = "/api/mail/v1/send";
+
+/**
+ * Build the request body customers would send to POST /api/mail/v1/send.
+ * Shown as "Request body" on the Logs detail panel.
+ */
+function buildMailSendRequestBody({
+	from,
+	to,
+	subject,
+	text,
+	html,
+}: {
+	from: string;
+	to: string;
+	subject: string;
+	text: string;
+	html: string;
+}): Record<string, unknown> {
+	return {
+		from,
+		to,
+		subject,
+		text,
+		html,
+	};
+}
+
+/**
+ * Build the success response shape for a mail send.
+ * Shown as "Response body" (activity_log.metadata) on the Logs detail panel.
+ */
+function buildMailSendResponseMetadata({
+	emailLogId,
+	timestamp,
+}: {
+	emailLogId: string;
+	timestamp?: Date;
+}): Record<string, unknown> {
+	const ts = (timestamp ?? new Date()).toISOString();
+	return {
+		id: emailLogId,
+		status: "sent",
+		success: true,
+		messageId: emailLogId,
+		timestamp: ts,
+		email_log_id: emailLogId,
+	};
+}
 
 /**
  * Reassign (or insert) the activity_log row for an onboarding email send
  * so it appears under the customer workspace on the Logs page
  * (GET /api/logs/v1/list filters by activity_log.organization_id).
+ *
+ * request_body  → mail send payload (Request body in UI)
+ * metadata      → mail send response (Response body in UI)
  */
 export async function attributeOnboardingActivityLog({
 	emailLogId,
@@ -17,7 +75,10 @@ export async function attributeOnboardingActivityLog({
 	apikeyId,
 	to,
 	from,
-	subject,
+	subject = ONBOARDING_TEST_SUBJECT,
+	text = ONBOARDING_TEST_TEXT,
+	html = ONBOARDING_TEST_TEXT,
+	sentAt,
 }: {
 	emailLogId: string;
 	organizationId: string;
@@ -25,10 +86,28 @@ export async function attributeOnboardingActivityLog({
 	apikeyId?: string;
 	to: string;
 	from: string;
-	subject: string;
+	subject?: string;
+	text?: string;
+	html?: string;
+	sentAt?: Date;
 }): Promise<{ updated: boolean; inserted: boolean }> {
-	// Show as the public mail send API in the Logs UI (same path customers use).
-	const mailSendEndpoint = "/api/mail/v1/send";
+	const requestBody = buildMailSendRequestBody({
+		from,
+		to,
+		subject,
+		text,
+		html,
+	});
+	const metadata = buildMailSendResponseMetadata({
+		emailLogId,
+		timestamp: sentAt,
+	});
+	const requestDetails = {
+		endpoint: MAIL_SEND_ENDPOINT,
+		method: "POST",
+		statusCode: 200,
+		requestBody,
+	};
 
 	try {
 		const updated = await db
@@ -38,12 +117,9 @@ export async function attributeOnboardingActivityLog({
 				userId,
 				actorType: apikeyId ? "api_key" : "user",
 				actorId: apikeyId ?? userId,
-				// Normalize display path even when reassigning platform rows.
-				requestDetails: {
-					endpoint: mailSendEndpoint,
-					method: "POST",
-					statusCode: 200,
-				},
+				requestDetails,
+				requestBody,
+				metadata,
 				statusCode: 200,
 				service: "mail",
 				action: "sent",
@@ -71,20 +147,9 @@ export async function attributeOnboardingActivityLog({
 			level: "info",
 			userId,
 			organizationId,
-			metadata: {
-				id: emailLogId,
-				email_log_id: emailLogId,
-				to,
-				from,
-				subject,
-				mode: "onboarding_test",
-			},
-			requestDetails: {
-				endpoint: mailSendEndpoint,
-				method: "POST",
-				statusCode: 200,
-			},
-			requestBody: {},
+			metadata,
+			requestDetails,
+			requestBody,
 			statusCode: 200,
 			actorType: apikeyId ? "api_key" : "user",
 			actorId: apikeyId ?? userId,

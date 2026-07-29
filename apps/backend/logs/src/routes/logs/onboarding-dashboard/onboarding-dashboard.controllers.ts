@@ -41,6 +41,28 @@ async function ensureActivityLogAttributed({
 	from: string;
 	subject: string;
 }) {
+	const requestBody = {
+		from,
+		to,
+		subject,
+		text: ONBOARDING_TEST_TEXT,
+		html: ONBOARDING_TEST_TEXT,
+	};
+	const metadata = {
+		id: emailLogId,
+		status: "sent",
+		success: true,
+		messageId: emailLogId,
+		timestamp: new Date().toISOString(),
+		email_log_id: emailLogId,
+	};
+	const requestDetails = {
+		endpoint: "/api/mail/v1/send",
+		method: "POST",
+		statusCode: 200,
+		requestBody,
+	};
+
 	const updated = await db
 		.update(activityLog)
 		.set({
@@ -48,6 +70,14 @@ async function ensureActivityLogAttributed({
 			userId,
 			actorType: "api_key",
 			actorId: apikeyId,
+			requestBody,
+			requestDetails,
+			metadata,
+			statusCode: 200,
+			service: "mail",
+			action: "sent",
+			resourceType: "email",
+			resourceId: emailLogId,
 		})
 		.where(
 			or(
@@ -74,20 +104,11 @@ async function ensureActivityLogAttributed({
 		organization_id: organizationId,
 		user_id: userId,
 		status_code: 200,
-		metadata: {
-			id: emailLogId,
-			email_log_id: emailLogId,
-			to,
-			from,
-			subject,
-			mode: "onboarding_test",
-		},
-		request_details: {
-			// Display as the public mail send API in the Logs UI.
-			endpoint: "/api/mail/v1/send",
-			method: "POST",
-			statusCode: 200,
-		},
+		// Response body in the Logs UI
+		metadata,
+		// Request body in the Logs UI
+		request_body: requestBody,
+		request_details: requestDetails,
 		environment:
 			logsConfig.NODE_ENV === "production" ? "production" : "development",
 	});
