@@ -43,7 +43,7 @@ import {
 import { agentCardRoute } from "@reloop/email/routes/landing/agent-card.route";
 import { healthRoute } from "@reloop/email/routes/landing/health.route";
 import { landingRoute } from "@reloop/email/routes/landing/landing.route";
-import { onboardingRoute } from "@reloop/email/routes/onboarding/onboarding.route";
+import { onboardingRoute } from "@reloop/email/routes/onboarding/onboarding.routes";
 import { loader } from "@reloop/email/utils/loader";
 import { Elysia } from "elysia";
 

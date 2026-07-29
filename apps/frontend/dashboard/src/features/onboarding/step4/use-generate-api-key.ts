@@ -133,6 +133,23 @@ export function useGenerateApiKey() {
 		setFinishing(true);
 
 		try {
+			// Reassign platform onboarding email_log → customer org + API key.
+			// Best-effort: never block navigation if attribution fails.
+			if (apiKey.trim()) {
+				try {
+					await axios.post(
+						"/api/email/v1/onboarding/dashboard",
+						{ apiKey },
+						{ withCredentials: true },
+					);
+				} catch (attrError) {
+					console.warn(
+						"Failed to attribute onboarding email log",
+						attrError,
+					);
+				}
+			}
+
 			// Warm session + org list so ActiveOrganization / Home never treat
 			// this user as orgless on first paint after navigation.
 			await authClient.getSession();
@@ -171,7 +188,7 @@ export function useGenerateApiKey() {
 			finishingRef.current = false;
 			setFinishing(false);
 		}
-	}, [queryClient, router]);
+	}, [apiKey, queryClient, router]);
 
 	const setChoice = useCallback(
 		(next: LanguageCode) => {

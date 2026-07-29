@@ -1,47 +1,42 @@
 import { validateApiKey } from "@reloop/auth/apikey/validate";
 import {
 	createAuthPlugin,
-	createSessionCacheRedis,
 	resolveSessionAuthWithProfile,
 } from "@reloop/auth/middleware";
 import { emailConfig } from "@reloop/email/email.config";
+import {
+	ONBOARDING_TEST_LOCAL_PART,
+	ONBOARDING_TEST_SUBJECT,
+	ONBOARDING_TEST_TEXT,
+} from "@reloop/email/routes/onboarding/onboarding.constants";
+import {
+	onboardingSessionOpts,
+	onboardingSessionRedis,
+} from "@reloop/email/routes/onboarding/onboarding.session";
 import { sendEmail } from "@reloop/email/utils/email";
 import { Elysia, t } from "elysia";
 
-const sessionRedis = createSessionCacheRedis(emailConfig.REDIS_URL, 5);
-
-const ONBOARDING_TEST_LOCAL_PART = "onboarding";
-
-/** Matches dashboard onboarding SDK snippets. */
-const ONBOARDING_TEST_SUBJECT = "Hello World!";
-const ONBOARDING_TEST_TEXT = "Congrats on sending your first email!";
-
-export const onboardingRoute = new Elysia({
-	prefix: "/v1",
-	name: "OnboardingRoute",
+/**
+ * One-click onboarding email after API key generation.
+ * Session auth + the plaintext API key from the dashboard.
+ * From: Reloop <onboarding@{ONBOARDING_TEST_DOMAIN}> → user inbox.
+ */
+export const sendTestEmailRoute = new Elysia({
+	name: "OnboardingSendTestEmailRoute",
 })
 	.use(
 		createAuthPlugin({
 			baseUrl: emailConfig.BASE_URL,
-			redis: sessionRedis,
+			redis: onboardingSessionRedis,
 			ttl: 5,
 		}),
 	)
-	/**
-	 * One-click onboarding email after API key generation.
-	 * Session auth + the plaintext API key from the dashboard.
-	 * From: Reloop <onboarding@{ONBOARDING_TEST_DOMAIN}> → user inbox.
-	 */
 	.post(
 		"/onboarding/send-test-email",
 		async ({ request, body, set }) => {
 			const session = await resolveSessionAuthWithProfile(
 				request.headers,
-				{
-					baseUrl: emailConfig.BASE_URL,
-					redis: sessionRedis,
-					ttl: 5,
-				},
+				onboardingSessionOpts,
 				{ requireOrg: true },
 			);
 
@@ -57,7 +52,7 @@ export const onboardingRoute = new Elysia({
 			// Home "send first email" may omit it (no plaintext key available).
 			const apiKey = body?.apiKey?.trim() ?? "";
 			if (apiKey) {
-				const keyAuth = await validateApiKey(apiKey, sessionRedis);
+				const keyAuth = await validateApiKey(apiKey, onboardingSessionRedis);
 				if (!keyAuth) {
 					set.status = 401;
 					return {
@@ -77,8 +72,7 @@ export const onboardingRoute = new Elysia({
 				}
 			}
 
-			const onboardingTestDomain =
-				emailConfig.ONBOARDING_TEST_DOMAIN.trim();
+			const onboardingTestDomain = emailConfig.ONBOARDING_TEST_DOMAIN.trim();
 			if (!onboardingTestDomain) {
 				set.status = 503;
 				return {
