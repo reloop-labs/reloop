@@ -225,7 +225,7 @@ export function LogDetailPanel({ logId }: LogDetailPanelProps) {
 	return (
 		<div className="flex h-full flex-col">
 			{/* ── Panel Header — METHOD /path ── */}
-			<div className="flex items-start justify-between gap-3 border-stroke-soft-100 border-b px-5 py-4 dark:border-stroke-soft-100/40">
+			<div className="flex items-center justify-between gap-3 border-stroke-soft-100 border-b px-5 py-3 dark:border-stroke-soft-100/40">
 				<div className="min-w-0 flex-1">
 					{isLoading ? (
 						<div className="flex h-5 items-center gap-1.5">
@@ -257,10 +257,10 @@ export function LogDetailPanel({ logId }: LogDetailPanelProps) {
 				{log ? (
 					<Link
 						href={`/logs/${log.uuid}`}
-						className="shrink-0 rounded-lg p-1.5 text-text-soft-400 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950"
+						className="shrink-0 rounded-full p-0.5 text-text-soft-400 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950"
 						title="View full details"
 					>
-						<Icon name="arrows-expand-diagonal" className="h-4 w-4" />
+						<Icon name="arrow-right" className="h-4 w-4" />
 					</Link>
 				) : (
 					<span className="shrink-0 rounded-lg p-1.5 text-text-soft-400">
