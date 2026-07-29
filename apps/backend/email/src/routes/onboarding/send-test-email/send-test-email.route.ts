@@ -13,6 +13,7 @@ import {
 	onboardingSessionOpts,
 	onboardingSessionRedis,
 } from "@reloop/email/routes/onboarding/onboarding.session";
+import { saveOnboardingCustomerEmailLog } from "@reloop/email/routes/onboarding/send-test-email/customer-email-log";
 import { sendEmail } from "@reloop/email/utils/email";
 import { Elysia, t } from "elysia";
 
@@ -20,6 +21,7 @@ import { Elysia, t } from "elysia";
  * One-click onboarding email after API key generation.
  * Session auth + the plaintext API key from the dashboard.
  * From: Reloop <onboarding@{ONBOARDING_TEST_DOMAIN}> → user inbox.
+ * Each successful send attributes (or inserts) one customer email_log.
  */
 export const sendTestEmailRoute = new Elysia({
 	name: "OnboardingSendTestEmailRoute",
@@ -51,6 +53,7 @@ export const sendTestEmailRoute = new Elysia({
 			// Onboarding always sends the generated key so we can prove it is valid.
 			// Home "send first email" may omit it (no plaintext key available).
 			const apiKey = body?.apiKey?.trim() ?? "";
+			let apikeyId: string | undefined;
 			if (apiKey) {
 				const keyAuth = await validateApiKey(apiKey, onboardingSessionRedis);
 				if (!keyAuth) {
@@ -70,6 +73,7 @@ export const sendTestEmailRoute = new Elysia({
 						fix: "Use the API key generated for this workspace.",
 					};
 				}
+				apikeyId = keyAuth.apiKeyId;
 			}
 
 			const onboardingTestDomain = emailConfig.ONBOARDING_TEST_DOMAIN.trim();
@@ -108,6 +112,23 @@ export const sendTestEmailRoute = new Elysia({
 					result && typeof result === "object"
 						? (result as Record<string, unknown>)
 						: null;
+				const providerMessageId =
+					typeof resultObj?.messageId === "string"
+						? resultObj.messageId
+						: typeof resultObj?.id === "string"
+							? resultObj.id
+							: undefined;
+
+				// One customer-facing log per send so multiple sends all appear.
+				const emailLogId = await saveOnboardingCustomerEmailLog({
+					organizationId: session.organizationId,
+					userId: session.userId,
+					apikeyId,
+					from,
+					to,
+					onboardingDomainName: onboardingTestDomain,
+					providerMessageId,
+				});
 
 				return {
 					object: "email",
@@ -116,6 +137,7 @@ export const sendTestEmailRoute = new Elysia({
 					to,
 					from,
 					domain: onboardingTestDomain,
+					...(emailLogId ? { id: emailLogId } : {}),
 					...(resultObj ?? {}),
 				};
 			} catch (error) {
@@ -135,7 +157,7 @@ export const sendTestEmailRoute = new Elysia({
 			detail: {
 				summary: "Onboarding test email to signed-in user",
 				description:
-					"Session-authenticated. Optional body { apiKey } — when provided, the key is validated. Sends from Reloop <onboarding@{ONBOARDING_TEST_DOMAIN}> via the platform key.",
+					"Session-authenticated. Optional body { apiKey } — when provided, the key is validated and stored on a new email_log for this send. Sends from Reloop <onboarding@{ONBOARDING_TEST_DOMAIN}> via the platform key. Each call saves a separate log under the customer workspace.",
 				tags: ["Onboarding"],
 			},
 		},

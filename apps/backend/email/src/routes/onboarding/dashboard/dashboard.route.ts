@@ -18,9 +18,8 @@ import { log } from "evlog";
 /**
  * Called when the user clicks "Go to Dashboard" after the onboarding test send.
  *
- * Platform transport creates email_log under the platform org (RELOOP_API_KEY).
- * This reassigns the matching row (to = signed-in email, onboarding subject)
- * to the customer workspace + their API key so it appears in their logs.
+ * Attributes every onboarding test email_log for the signed-in user
+ * (multiple sends → multiple rows) to the customer workspace + API key.
  */
 export const dashboardRoute = new Elysia({
 	name: "OnboardingDashboardRoute",
@@ -89,9 +88,8 @@ export const dashboardRoute = new Elysia({
 			}
 
 			try {
-				// Most recent onboarding test send delivered to this user.
-				// Platform send owns the row until we reassign it here.
-				const [match] = await db
+				// All onboarding test sends to this user (multiple sends → many rows).
+				const matches = await db
 					.select({
 						id: emailLog.id,
 						organizationId: emailLog.organizationId,
@@ -101,13 +99,38 @@ export const dashboardRoute = new Elysia({
 					.where(
 						and(
 							eq(emailLog.subject, ONBOARDING_TEST_SUBJECT),
-							sql`${emailLog.toEmails} @> ${JSON.stringify([to])}::jsonb`,
+							sql`EXISTS (
+								SELECT 1
+								FROM jsonb_array_elements_text(${emailLog.toEmails}) AS addr(email)
+								WHERE lower(addr.email) = lower(${to})
+							)`,
 						),
 					)
-					.orderBy(desc(emailLog.createdAt))
-					.limit(1);
+					.orderBy(desc(emailLog.createdAt));
 
-				if (!match) {
+				const ids: string[] = [];
+				let updatedCount = 0;
+
+				for (const match of matches) {
+					const alreadyOwned =
+						match.organizationId === session.organizationId &&
+						match.apikeyId === keyAuth.apiKeyId;
+
+					if (!alreadyOwned) {
+						await db
+							.update(emailLog)
+							.set({
+								organizationId: session.organizationId,
+								apikeyId: keyAuth.apiKeyId,
+								userId: session.userId,
+							})
+							.where(eq(emailLog.id, match.id));
+						updatedCount += 1;
+					}
+					ids.push(match.id);
+				}
+
+				if (ids.length === 0) {
 					log.warn({
 						email: to,
 						organizationId: session.organizationId,
@@ -120,49 +143,26 @@ export const dashboardRoute = new Elysia({
 						reason: "email_log_not_found",
 						organizationId: session.organizationId,
 						apikeyId: keyAuth.apiKeyId,
+						count: 0,
+						ids: [],
 					};
 				}
-
-				const alreadyOwned =
-					match.organizationId === session.organizationId &&
-					match.apikeyId === keyAuth.apiKeyId;
-
-				if (alreadyOwned) {
-					return {
-						object: "onboarding.dashboard",
-						updated: false,
-						reason: "already_attributed",
-						id: match.id,
-						organizationId: session.organizationId,
-						apikeyId: keyAuth.apiKeyId,
-					};
-				}
-
-				const [updated] = await db
-					.update(emailLog)
-					.set({
-						organizationId: session.organizationId,
-						apikeyId: keyAuth.apiKeyId,
-						userId: session.userId,
-					})
-					.where(eq(emailLog.id, match.id))
-					.returning({ id: emailLog.id });
 
 				return {
 					object: "onboarding.dashboard",
-					updated: true,
-					id: updated?.id ?? match.id,
+					updated: updatedCount > 0,
 					organizationId: session.organizationId,
 					apikeyId: keyAuth.apiKeyId,
+					count: ids.length,
+					ids,
 				};
 			} catch (error) {
 				log.error({
 					error: error instanceof Error ? error.message : String(error),
 					organizationId: session.organizationId,
 					email: to,
-					message: "Failed to reassign onboarding email_log",
+					message: "Failed to reassign onboarding email_logs",
 				});
-				// Do not block "Go to Dashboard" — attribution is best-effort.
 				set.status = 200;
 				return {
 					object: "onboarding.dashboard",
@@ -170,6 +170,8 @@ export const dashboardRoute = new Elysia({
 					reason: "update_failed",
 					organizationId: session.organizationId,
 					apikeyId: keyAuth.apiKeyId,
+					count: 0,
+					ids: [],
 				};
 			}
 		},
@@ -179,9 +181,9 @@ export const dashboardRoute = new Elysia({
 				apiKey: t.String({ minLength: 1 }),
 			}),
 			detail: {
-				summary: "Attribute onboarding email log on Go to Dashboard",
+				summary: "Attribute onboarding email logs on Go to Dashboard",
 				description:
-					"Session-authenticated. Body { apiKey }. Finds the latest onboarding test email_log for the signed-in email and sets organizationId + apikeyId to the customer workspace.",
+					"Session-authenticated. Body { apiKey }. Attributes every onboarding test email_log for the signed-in email to the customer workspace + API key (supports multiple sends).",
 				tags: ["Onboarding"],
 			},
 		},

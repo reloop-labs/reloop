@@ -110,11 +110,17 @@ export async function listEmailLogsController({
 		});
 
 		log.info("Email logs listed successfully", { count: logs.length, total });
+		// Project only the list-entry shape. Spreading the full row can leave
+		// Date fields that confuse clients and response validation.
 		return {
 			object: "list",
-			data: logs.map((log) => ({
-				...log,
-				createdAt: log.createdAt.toISOString(),
+			data: logs.map((entry) => ({
+				id: entry.id,
+				subject: entry.subject,
+				fromEmail: entry.fromEmail,
+				toEmails: (entry.toEmails ?? []) as string[],
+				status: entry.status,
+				createdAt: entry.createdAt.toISOString(),
 			})),
 			total,
 			page,
