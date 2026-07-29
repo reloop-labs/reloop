@@ -56,6 +56,15 @@ export interface EmailSentPayload {
 	timestamp: string;
 }
 
+export interface EmailScheduledPayload {
+	organizationId: string;
+	emailLogId: string;
+	recipientCount: number;
+	/** ISO timestamp when the message should be sent. */
+	scheduledAt: string;
+	timestamp: string;
+}
+
 export interface EmailOpenedPayload {
 	organizationId: string;
 	emailLogId: string;
@@ -374,6 +383,7 @@ export interface EventPayloads {
 	[BusEvent.DOMAIN_DNS_REVERIFICATION_REQUESTED]: DomainDnsReverificationRequestedPayload;
 	[BusEvent.WEBHOOK_TRIGGERED]: WebhookTriggeredPayload;
 	[BusEvent.EMAIL_SENT]: EmailSentPayload;
+	[BusEvent.EMAIL_SCHEDULED]: EmailScheduledPayload;
 	[BusEvent.EMAIL_OPENED]: EmailOpenedPayload;
 	[BusEvent.EMAIL_CLICKED]: EmailClickedPayload;
 	[BusEvent.EMAIL_FAILED]: EmailFailedPayload;

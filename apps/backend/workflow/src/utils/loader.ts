@@ -7,17 +7,13 @@ import { startWebhookDeliveryWorker } from "@be/workflow/queues/webhook-delivery
 import { workflowQueue } from "@be/workflow/queues/workflow.queue";
 import { startWorkflowWorker } from "@be/workflow/queues/workflow.worker";
 import { initWebhookSubscribers } from "@be/workflow/subscribers/webhook.subscriber";
+import { redis } from "@be/workflow/utils/redis";
 import { workflowConfig } from "@be/workflow/workflow.config";
 import { BusEvent, bus } from "@reloop/bus";
-import { RedisCache } from "@reloop/cache/redis-client";
 import { db } from "@reloop/db/client";
 import { log } from "evlog";
 
-export const redis = new RedisCache(
-	"workflow",
-	86400,
-	workflowConfig.REDIS_URL,
-);
+export { redis };
 
 export const loader = async () => {
 	try {

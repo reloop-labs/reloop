@@ -7,7 +7,7 @@ Reloop delivers webhooks with at-least-once semantics. If your server is down or
 
 ## Automatic Retries
 
-Each delivery is attempted up to **7 times** with a fixed schedule. Delays are measured from the previous failure:
+Each delivery is attempted up to **`maxRetries` times** (default **7**, maximum **7**) with a fixed schedule. `maxRetries` is total attempts including the first try. Delays are measured from the previous failure:
 
 | Attempt | Delay after previous failure |
 | --- | --- |
@@ -19,13 +19,37 @@ Each delivery is attempted up to **7 times** with a fixed schedule. Delays are m
 | 6 | 5 hours |
 | 7 | 10 hours |
 
+If you set a lower `maxRetries` on the endpoint (for example `3`), only the first rows of the schedule apply.
+
 SSRF-blocked or non-HTTPS endpoints are **not** retried (terminal failure).
 
 After many consecutive **terminal** failures on an endpoint, Reloop may disable the webhook (`status: failed`). Re-enable it from the dashboard after fixing your endpoint.
 
+## Outbound rate limiting
+
+When `rateLimitEnabled` is true (default), Reloop caps outbound POSTs per endpoint at `maxRequestsPerMinute` (default **60**). Extra deliveries are delayed into the next minute window rather than dropped.
+
+## Filtering
+
+Optional `filteringOptions` on an endpoint:
+
+- **`matchConditions`** — only deliver when every listed top-level `data` field equals the expected value (shallow equality).
+- **`excludeFields`** — strip listed top-level keys from `data` before POST (and in the stored delivery payload).
+
+Example:
+
+```json
+{
+  "filteringOptions": {
+    "matchConditions": { "status": "bounced" },
+    "excludeFields": ["subject"]
+  }
+}
+```
+
 ## Manual Replays
 
-You can manually replay any delivery from the dashboard or API. Replay creates a **new** delivery row (linked to the original) so history stays intact, then enqueues it on the delivery queue with the full automatic retry schedule.
+You can manually replay any delivery from the dashboard or API. Replay creates a **new** delivery row (linked to the original) so history stays intact, then enqueues it on the delivery queue using the endpoint's current `maxRetries`.
 
 <Steps>
   <Step title="Go to Webhooks">

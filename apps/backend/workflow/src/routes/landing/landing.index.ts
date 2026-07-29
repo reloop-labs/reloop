@@ -1,4 +1,4 @@
-import { redis } from "@be/workflow/utils/loader";
+import { redis } from "@be/workflow/utils/redis";
 import { db } from "@reloop/db/client";
 import { Elysia } from "elysia";
 

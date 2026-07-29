@@ -2,6 +2,7 @@ export * from "./constants";
 export * from "./envelope";
 export * from "./http-client";
 export * from "./retry-schedule";
+export * from "./settings";
 export * from "./signer";
 export * from "./ssrf";
 

@@ -30,5 +30,15 @@ describe("webhookDeliveryJobOptions", () => {
 		expect(opts.jobId).toBe("whde_abc");
 		expect(opts.attempts).toBe(WEBHOOK_MAX_ATTEMPTS);
 		expect(opts.backoff.type).toBe("webhook-retry");
+		expect("delay" in opts).toBe(false);
+	});
+
+	test("accepts per-webhook attempts and delay", () => {
+		const opts = webhookDeliveryJobOptions("whde_abc", {
+			attempts: 3,
+			delayMs: 5_000,
+		});
+		expect(opts.attempts).toBe(3);
+		expect(opts.delay).toBe(5_000);
 	});
 });

@@ -22,11 +22,17 @@ export const webhookDeliveryQueue = new Queue<WebhookDeliveryJobData>(
 	},
 );
 
-export async function enqueueWebhookDelivery(deliveryId: string) {
+export async function enqueueWebhookDelivery(
+	deliveryId: string,
+	options?: {
+		attempts?: number;
+		delayMs?: number;
+	},
+) {
 	return webhookDeliveryQueue.add(
 		WEBHOOK_DELIVERY_JOB,
 		{ deliveryId },
-		webhookDeliveryJobOptions(deliveryId),
+		webhookDeliveryJobOptions(deliveryId, options),
 	);
 }
 

@@ -1,29 +1,51 @@
 ---
 title: "email.scheduled"
 sidebarTitle: "email.scheduled"
-description: "Coming soon — not yet emitted by the pipeline."
+description: "Webhook event triggered when an email is scheduled for later delivery."
 ---
 
-The `email.scheduled` event ID is reserved for when Reloop emits a distinct event for emails scheduled for later delivery.
+<SideBySide>
+  <Side>
 
-**Status:** inactive — not available for new webhook subscriptions until the send pipeline wires it. Use `email.sent` for acceptance today.
+    The `email.scheduled` event is triggered when an email is accepted with a future `scheduled_at` time. It replaces `email.sent` for that message; later lifecycle events (`email.delivered`, `email.bounced`, …) still fire when the message is actually processed.
 
-## Planned `data` shape
+    ## Event Details
+    All webhook payloads follow a consistent top-level structure with event-specific data nested within the `data` object.
 
-```json
-{
-  "id": "whev_01h…",
-  "type": "email.scheduled",
-  "created_at": "2026-07-22T12:00:00.000Z",
-  "data": {
-    "email_id": "em_123456789",
-    "from": "sender@example.com",
-    "to": ["recipient@example.com"],
-    "subject": "Hello World",
-    "status": "scheduled"
-  }
-}
-```
+    ### type `string`
+    The event type that triggered the webhook (`email.scheduled`).
+
+    ### created_at `string`
+    ISO 8601 timestamp when the webhook event was created.
+
+    ### data `object`
+    Standard outbound email fields with `status: "scheduled"` and `scheduled_at` (ISO 8601).
+
+    ## Handling this event
+    When your endpoint receives an `email.scheduled` event, you might want to:
+    - Show the message as queued for a future send in your UI.
+    - Cancel or reschedule downstream automations until delivery.
+  </Side>
+
+  <Side>
+
+    ```json
+    {
+      "id": "whev_01h…",
+      "type": "email.scheduled",
+      "created_at": "2026-07-22T12:00:00.000Z",
+      "data": {
+        "email_id": "em_123456789",
+        "from": "sender@example.com",
+        "to": ["recipient@example.com"],
+        "subject": "Hello World",
+        "status": "scheduled",
+        "scheduled_at": "2026-07-23T09:00:00.000Z"
+      }
+    }
+    ```
+  </Side>
+</SideBySide>
 
 ## Learn More
 

@@ -246,7 +246,7 @@ export namespace WebhookModel {
 					},
 					rateLimitEnabled: true,
 					maxRequestsPerMinute: 60,
-					maxRetries: 3,
+					maxRetries: 7,
 					retryBackoffMultiplier: 2,
 					filteringOptions: null,
 					lastTriggeredAt: "2026-03-29T10:00:00Z",

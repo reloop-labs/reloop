@@ -470,6 +470,47 @@ export async function initWebhookSubscribers() {
 	);
 
 	await bus.subscribe(
+		BusEvent.EMAIL_SCHEDULED,
+		async (payload) => {
+			log.info({
+				message: "Received email.scheduled — dispatching webhooks",
+				emailLogId: payload.emailLogId,
+				organizationId: payload.organizationId,
+				scheduledAt: payload.scheduledAt,
+			});
+
+			const email = await db.query.emailLog.findFirst({
+				where: eq(schema.emailLog.id, payload.emailLogId),
+			});
+
+			if (!email) {
+				log.warn({
+					message: "Email log not found for scheduled webhook dispatch",
+					emailLogId: payload.emailLogId,
+				});
+				return;
+			}
+
+			const data = emailDataFromLog(email, {
+				status: "scheduled",
+			});
+			// scheduled_at is part of the public contract for this event only.
+			const withSchedule = {
+				...data,
+				scheduled_at: payload.scheduledAt,
+			};
+			await dispatchWebhookEvent({
+				type: "email.scheduled",
+				data: withSchedule as unknown as Record<string, unknown>,
+				organizationId: payload.organizationId,
+				source: "email",
+				idempotencyKey: `${payload.organizationId}:email.scheduled:${email.id}`,
+			});
+		},
+		queue,
+	);
+
+	await bus.subscribe(
 		BusEvent.EMAIL_OPENED,
 		async (payload) => {
 			const email = await db.query.emailLog.findFirst({

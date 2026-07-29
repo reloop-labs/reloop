@@ -30,10 +30,21 @@ export function getWebhookRetryDelayMs(attemptsMade: number): number {
 }
 
 /** BullMQ job options for a new delivery. */
-export function webhookDeliveryJobOptions(deliveryId: string) {
+export function webhookDeliveryJobOptions(
+	deliveryId: string,
+	options?: {
+		/** Total attempts including the first (clamped by caller). */
+		attempts?: number;
+		/** Delay before the first attempt (e.g. outbound rate limit). */
+		delayMs?: number;
+	},
+) {
+	const attempts = options?.attempts ?? WEBHOOK_MAX_ATTEMPTS;
+	const delayMs = options?.delayMs ?? 0;
 	return {
 		jobId: deliveryId,
-		attempts: WEBHOOK_MAX_ATTEMPTS,
+		attempts,
+		...(delayMs > 0 ? { delay: delayMs } : {}),
 		backoff: {
 			type: WEBHOOK_RETRY_BACKOFF_TYPE,
 		},

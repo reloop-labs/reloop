@@ -29,6 +29,8 @@ export interface EmailWebhookData {
 	};
 	/** Present on email.clicked. */
 	url?: string;
+	/** Present on email.scheduled (ISO 8601). */
+	scheduled_at?: string;
 }
 
 /** Inbound receive payload under envelope.data. */

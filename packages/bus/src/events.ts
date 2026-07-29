@@ -17,6 +17,7 @@ export enum BusEvent {
 
 	// Email Events
 	EMAIL_SENT = "email.sent",
+	EMAIL_SCHEDULED = "email.scheduled",
 	EMAIL_OPENED = "email.opened",
 	EMAIL_CLICKED = "email.clicked",
 	EMAIL_FAILED = "email.failed",

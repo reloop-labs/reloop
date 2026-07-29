@@ -38,7 +38,8 @@ export async function createWebhookController({
 				customHeaders: null,
 				rateLimitEnabled: true,
 				maxRequestsPerMinute: 60,
-				maxRetries: 3,
+				// Align with documented default of 7 total delivery attempts.
+				maxRetries: 7,
 				retryBackoffMultiplier: 2,
 				filteringOptions: null,
 				createdAt: new Date(),

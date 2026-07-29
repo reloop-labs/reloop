@@ -142,6 +142,8 @@ export function statusForEmailWebhookType(type: string): string | undefined {
 			return "sent";
 		case "email.received":
 			return "received";
+		case "email.scheduled":
+			return "scheduled";
 		default:
 			return undefined;
 	}

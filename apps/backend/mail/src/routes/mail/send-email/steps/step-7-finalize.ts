@@ -4,6 +4,15 @@ import { db } from "@reloop/db/client";
 import { emailLog } from "@reloop/db/schema";
 import { eq } from "drizzle-orm";
 
+/** True when scheduled_at is more than ~5s in the future (avoids flapping near "now"). */
+function isFutureScheduled(scheduledAt: string | undefined): string | null {
+	if (!scheduledAt) return null;
+	const ms = Date.parse(scheduledAt);
+	if (!Number.isFinite(ms)) return null;
+	if (ms <= Date.now() + 5_000) return null;
+	return new Date(ms).toISOString();
+}
+
 export async function finalizeEmail_step7({
 	emailLogId,
 	result,
@@ -29,19 +38,31 @@ export async function finalizeEmail_step7({
 	const cc = body.cc ? (Array.isArray(body.cc) ? body.cc : [body.cc]) : [];
 	const bcc = body.bcc ? (Array.isArray(body.bcc) ? body.bcc : [body.bcc]) : [];
 	const totalRecipients = recipients.length + cc.length + bcc.length;
+	const timestamp = new Date().toISOString();
+	const scheduledAt = isFutureScheduled(body.scheduled_at);
 
-	await bus.publish(BusEvent.EMAIL_SENT, {
-		organizationId,
-		emailLogId,
-		recipientCount: totalRecipients,
-		timestamp: new Date().toISOString(),
-	});
+	if (scheduledAt) {
+		await bus.publish(BusEvent.EMAIL_SCHEDULED, {
+			organizationId,
+			emailLogId,
+			recipientCount: totalRecipients,
+			scheduledAt,
+			timestamp,
+		});
+	} else {
+		await bus.publish(BusEvent.EMAIL_SENT, {
+			organizationId,
+			emailLogId,
+			recipientCount: totalRecipients,
+			timestamp,
+		});
+	}
 
 	return {
 		success: true,
 		messageId: result.messageId || emailLogId,
-		status: "sent",
-		timestamp: new Date().toISOString(),
+		status: scheduledAt ? "scheduled" : "sent",
+		timestamp,
 		id: emailLogId,
 	};
 }

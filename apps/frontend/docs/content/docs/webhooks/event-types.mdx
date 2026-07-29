@@ -9,7 +9,8 @@ Reloop supports the following **active** event types. Each delivery uses a consi
 
 | Event | Description |
 | --- | --- |
-| `email.sent` | Email accepted for delivery |
+| `email.sent` | Email accepted for delivery (immediate send) |
+| `email.scheduled` | Email accepted with a future `scheduled_at` (replaces `email.sent` for that message) |
 | `email.delivered` | Delivered to the recipient MTA |
 | `email.bounced` | Permanent delivery failure |
 | `email.delivery_delayed` | Transient failure / delay |
@@ -38,6 +39,7 @@ Reloop supports the following **active** event types. Each delivery uses a consi
 
 - `error` is present on bounce, delay, complaint, and failure events.
 - `url` is present on `email.clicked`.
+- `scheduled_at` is present on `email.scheduled`.
 
 ### Inbound `email.received` `data` shape
 
@@ -151,7 +153,6 @@ These event IDs exist in the catalog but are **inactive** until the pipeline emi
 
 | Event | Notes |
 | --- | --- |
-| `email.scheduled` | Distinct scheduled-send path not wired yet |
 | `email.suppressed` | Pre-send suppression event not wired yet |
 | `api-key.rate_limited` | Rate-limit publisher not wired yet |
 

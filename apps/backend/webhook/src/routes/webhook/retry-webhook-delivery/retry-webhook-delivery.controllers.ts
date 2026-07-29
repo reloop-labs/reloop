@@ -2,7 +2,7 @@ import { createId } from "@paralleldrive/cuid2";
 import {
 	WEBHOOK_DELIVERY_JOB,
 	WEBHOOK_DELIVERY_QUEUE,
-	WEBHOOK_MAX_ATTEMPTS,
+	resolveWebhookMaxAttempts,
 	webhookDeliveryJobOptions,
 } from "@reloop/webhook-delivery";
 import { db } from "@reloop/db/client";
@@ -59,6 +59,7 @@ export async function retryWebhookDeliveryController({
 	}
 
 	const newDeliveryId = `whde_${createId()}`;
+	const maxAttempts = resolveWebhookMaxAttempts(delivery.webhook.maxRetries);
 
 	await db.insert(schema.webhookDelivery).values({
 		id: newDeliveryId,
@@ -70,16 +71,15 @@ export async function retryWebhookDeliveryController({
 		status: "pending",
 		requestUrl: delivery.webhook.url,
 		attemptNumber: 0,
-		maxAttempts: WEBHOOK_MAX_ATTEMPTS,
+		maxAttempts,
 	});
 
-	const opts = webhookDeliveryJobOptions(newDeliveryId);
+	const opts = webhookDeliveryJobOptions(newDeliveryId, { attempts: maxAttempts });
 	await webhookDeliveryQueue.add(
 		WEBHOOK_DELIVERY_JOB,
 		{ deliveryId: newDeliveryId },
 		{
 			...opts,
-			// Manual replays still get full automatic retry schedule
 		},
 	);
 

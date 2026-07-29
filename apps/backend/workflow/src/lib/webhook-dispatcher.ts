@@ -1,8 +1,16 @@
 import { enqueueWebhookDelivery } from "@be/workflow/queues/webhook-delivery.queue";
+import { redis } from "@be/workflow/utils/redis";
 import { createId } from "@paralleldrive/cuid2";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import { WEBHOOK_MAX_ATTEMPTS } from "@reloop/webhook-delivery";
+import {
+	applyWebhookFilters,
+	isWebhookRateLimited,
+	matchesWebhookFilters,
+	rateLimitDelayMs,
+	resolveWebhookMaxAttempts,
+	type WebhookFilteringOptions,
+} from "@reloop/webhook-delivery";
 import { and, eq, isNull } from "drizzle-orm";
 import { log } from "evlog";
 
@@ -23,8 +31,48 @@ export type DispatchWebhookInput = {
 };
 
 /**
+ * Fixed-window outbound rate limit. Fail-open if Redis is unavailable.
+ * Returns delay before first attempt when the window is already full.
+ */
+async function outboundRateLimitDelayMs(hook: {
+	id: string;
+	rateLimitEnabled: boolean;
+	maxRequestsPerMinute: number;
+}): Promise<number> {
+	if (!hook.rateLimitEnabled) return 0;
+
+	const bucket = Math.floor(Date.now() / 60_000);
+	const key = `reloop:webhook-out:${hook.id}:${bucket}`;
+
+	try {
+		const count = await redis.increment(key);
+		if (count === 1) {
+			await redis.expire(key, 65);
+		}
+		if (!isWebhookRateLimited(count, hook.maxRequestsPerMinute)) {
+			return 0;
+		}
+		const ttl = await redis.ttl(key);
+		return rateLimitDelayMs(ttl);
+	} catch (err) {
+		log.warn({
+			message: "Webhook rate-limit check failed — allowing delivery",
+			webhookId: hook.id,
+			error: err instanceof Error ? err.message : String(err),
+		});
+		return 0;
+	}
+}
+
+/**
  * Match active org webhooks subscribed to `type`, persist event + deliveries,
  * and enqueue HTTP delivery jobs. Org-scoped only (creator userId is ignored).
+ *
+ * Honors per-webhook:
+ * - maxRetries → delivery maxAttempts + BullMQ attempts
+ * - rateLimitEnabled / maxRequestsPerMinute → delayed first attempt when over cap
+ * - filteringOptions.matchConditions → skip delivery when data doesn't match
+ * - filteringOptions.excludeFields → strip keys from stored/sent eventData
  */
 export async function dispatchWebhookEvent(
 	input: DispatchWebhookInput,
@@ -124,24 +172,47 @@ export async function dispatchWebhookEvent(
 		return { eventId: webhookEvent.id, deliveryCount: 0 };
 	}
 
-	// 3. Create deliveries + enqueue
+	// 3. Create deliveries + enqueue (per-webhook settings applied)
 	let deliveryCount = 0;
 	await Promise.all(
 		subscribed.map(async (hook) => {
+			const filtering = hook.filteringOptions as
+				| WebhookFilteringOptions
+				| null
+				| undefined;
+
+			if (!matchesWebhookFilters(data, filtering)) {
+				log.info({
+					message: "Webhook filtered out by matchConditions",
+					webhookId: hook.id,
+					type,
+					eventId: webhookEvent.id,
+				});
+				return;
+			}
+
+			const eventData = applyWebhookFilters(data, filtering);
+			const maxAttempts = resolveWebhookMaxAttempts(hook.maxRetries);
+			const delayMs = await outboundRateLimitDelayMs(hook);
+
 			const deliveryId = `whde_${createId()}`;
 			await db.insert(schema.webhookDelivery).values({
 				id: deliveryId,
 				webhookId: hook.id,
 				webhookEventId: webhookEvent.id,
 				eventType: type,
-				eventData: data,
+				eventData,
 				status: "pending",
 				requestUrl: hook.url,
 				attemptNumber: 0,
-				maxAttempts: WEBHOOK_MAX_ATTEMPTS,
+				maxAttempts,
+				nextRetryAt: delayMs > 0 ? new Date(Date.now() + delayMs) : null,
 			});
 
-			await enqueueWebhookDelivery(deliveryId);
+			await enqueueWebhookDelivery(deliveryId, {
+				attempts: maxAttempts,
+				delayMs,
+			});
 			deliveryCount += 1;
 
 			log.info({
@@ -150,6 +221,8 @@ export async function dispatchWebhookEvent(
 				webhookId: hook.id,
 				type,
 				eventId: webhookEvent.id,
+				maxAttempts,
+				delayMs,
 			});
 		}),
 	);
