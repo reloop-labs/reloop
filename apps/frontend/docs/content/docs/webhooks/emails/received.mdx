@@ -13,18 +13,18 @@ description: "Webhook event triggered when an inbound email is received."
     All webhook payloads follow a consistent top-level structure with event-specific data nested within the `data` object.
 
     ### type `string`
-    The event type that triggered the webhook (e.g., `email.received`).
+    The event type that triggered the webhook (`email.received`).
 
     ### created_at `string`
     ISO 8601 timestamp when the webhook event was created.
 
     ### data `object`
-    Contains the full inbound email content, including headers, body, and attachments.
+    Inbound fields: `email_id`, `mailbox_id`, `from`, `from_name`, `to`, `cc`, `subject`, `thread_id`, `has_attachments`, `is_spam`, `status`, `message_id`.
 
     ## Handling this event
     When your endpoint receives an `email.received` event, you might want to:
     - Process inbound messages for your application.
-    - Extract data from the email body.
+    - Fetch the full body via the inbox API using `email_id`.
     - Store attachments in your cloud storage.
   </Side>
 
@@ -32,15 +32,22 @@ description: "Webhook event triggered when an inbound email is received."
 
     ```json
     {
+      "id": "whev_01h…",
       "type": "email.received",
-      "created_at": "2023-01-01T12:00:00Z",
+      "created_at": "2026-07-22T12:00:00.000Z",
       "data": {
         "email_id": "in_123456789",
+        "mailbox_id": "mb_123456789",
         "from": "sender@example.com",
+        "from_name": "Sender",
         "to": ["inbound@yourdomain.com"],
+        "cc": [],
         "subject": "Inbound Message",
-        "body": "Hello, this is an inbound email.",
-        "timestamp": "2023-01-01T12:00:00Z"
+        "thread_id": "thr_123456789",
+        "has_attachments": false,
+        "is_spam": false,
+        "status": "received",
+        "message_id": "<msg@example.com>"
       }
     }
     ```

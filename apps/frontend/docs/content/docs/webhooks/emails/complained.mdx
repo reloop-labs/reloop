@@ -7,37 +7,42 @@ description: "Webhook event triggered when a recipient marks an email as spam."
 <SideBySide>
   <Side>
 
-    The `email.complained` event is triggered when a recipient marks an email as spam or files a complaint.
+    The `email.complained` event is triggered when a feedback loop reports spam.
 
     ## Event Details
     All webhook payloads follow a consistent top-level structure with event-specific data nested within the `data` object.
 
     ### type `string`
-    The event type that triggered the webhook (e.g., `email.complained`).
+    The event type that triggered the webhook (`email.complained`).
 
     ### created_at `string`
     ISO 8601 timestamp when the webhook event was created.
 
     ### data `object`
-    Contains the event-specific details such as email ID and recipient info.
+    Includes standard email fields; `status` is `spam` and `error` may include FBL details.
 
     ## Handling this event
     When your endpoint receives an `email.complained` event, you might want to:
-    - **Immediately** remove the recipient from your mailing list.
-    - Log the complaint for reputation monitoring.
-    - Investigate the source of the complaint.
+    - Immediately suppress the recipient.
+    - Review content or list hygiene.
   </Side>
 
   <Side>
 
     ```json
     {
+      "id": "whev_01h…",
       "type": "email.complained",
-      "created_at": "2023-01-01T12:00:00Z",
+      "created_at": "2026-07-22T12:00:00.000Z",
       "data": {
         "email_id": "em_123456789",
+        "from": "sender@example.com",
         "to": ["recipient@example.com"],
-        "timestamp": "2023-01-01T12:00:00Z"
+        "subject": "Hello World",
+        "status": "spam",
+        "error": {
+          "message": "Feedback loop: spam complaint"
+        }
       }
     }
     ```

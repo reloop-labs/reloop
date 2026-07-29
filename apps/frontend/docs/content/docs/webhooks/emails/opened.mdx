@@ -1,25 +1,25 @@
 ---
 title: "email.opened"
 sidebarTitle: "email.opened"
-description: "Webhook event triggered when an email is opened."
+description: "Webhook event triggered when a recipient opens an email."
 ---
 
 <SideBySide>
   <Side>
 
-    The `email.opened` event is triggered when a recipient opens an email.
+    The `email.opened` event is triggered when open tracking records a pixel load.
 
     ## Event Details
     All webhook payloads follow a consistent top-level structure with event-specific data nested within the `data` object.
 
     ### type `string`
-    The event type that triggered the webhook (e.g., `email.opened`).
+    The event type that triggered the webhook (`email.opened`).
 
     ### created_at `string`
     ISO 8601 timestamp when the webhook event was created.
 
     ### data `object`
-    Contains the event-specific details such as email ID and recipient info.
+    Standard outbound email fields. `status` reflects the email log status (usually `delivered` or `sent`), not a separate open status.
 
     ## Handling this event
     When your endpoint receives an `email.opened` event, you might want to:
@@ -32,12 +32,15 @@ description: "Webhook event triggered when an email is opened."
 
     ```json
     {
+      "id": "whev_01h…",
       "type": "email.opened",
-      "created_at": "2023-01-01T12:00:00Z",
+      "created_at": "2026-07-22T12:00:00.000Z",
       "data": {
         "email_id": "em_123456789",
+        "from": "sender@example.com",
         "to": ["recipient@example.com"],
-        "timestamp": "2023-01-01T12:00:00Z"
+        "subject": "Hello World",
+        "status": "delivered"
       }
     }
     ```

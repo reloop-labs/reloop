@@ -52,16 +52,18 @@ When you send an email or trigger an event, Reloop will send a payload like this
   "data": {
     "email_id": "em_123456789",
     "from": "Acme <onboarding@reloop.dev>",
-    "to": ["delivered@reloop.dev"],
+    "to": ["bounced@reloop.dev"],
     "subject": "Sending this example",
     "status": "bounced",
     "error": {
       "code": 550,
-      "message": "The recipient's email address is on the suppression list."
+      "message": "User unknown"
     }
   }
 }
 ```
+
+All `data` fields use **snake_case**. See [Event Types](/docs/webhooks/event-types) for the full catalog and per-category shapes.
 
 Headers include `Reloop-Id`, `Reloop-Timestamp`, and `Reloop-Signature` for verification.
 

@@ -1,51 +1,29 @@
 ---
 title: "email.scheduled"
 sidebarTitle: "email.scheduled"
-description: "Webhook event triggered when an email is scheduled."
+description: "Coming soon — not yet emitted by the pipeline."
 ---
 
-<SideBySide>
-  <Side>
+The `email.scheduled` event ID is reserved for when Reloop emits a distinct event for emails scheduled for later delivery.
 
-    The `email.scheduled` event is triggered when an email's status changes to **scheduled**.
+**Status:** inactive — not available for new webhook subscriptions until the send pipeline wires it. Use `email.sent` for acceptance today.
 
-    ## Event Details
-    All webhook payloads follow a consistent top-level structure with event-specific data nested within the `data` object.
+## Planned `data` shape
 
-    ### type `string`
-    The event type that triggered the webhook (e.g., `email.scheduled`).
-
-    ### created_at `string`
-    ISO 8601 timestamp when the webhook event was created.
-
-    ### data `object`
-    Contains the event-specific details such as email ID, recipients, and status.
-
-    ## Handling this event
-    When your endpoint receives an `email.scheduled` event, you might want to:
-    - Update the status in your internal database.
-    - Trigger an automated follow-up workflow.
-    - Log the event for analytics purposes.
-  </Side>
-
-  <Side>
-
-    ```json
-    {
-      "type": "email.scheduled",
-      "created_at": "2023-01-01T12:00:00Z",
-      "data": {
-        "email_id": "em_123456789",
-        "from": "sender@example.com",
-        "to": ["recipient@example.com"],
-        "subject": "Hello World",
-        "status": "scheduled",
-        "timestamp": "2023-01-01T12:00:00Z"
-      }
-    }
-    ```
-  </Side>
-</SideBySide>
+```json
+{
+  "id": "whev_01h…",
+  "type": "email.scheduled",
+  "created_at": "2026-07-22T12:00:00.000Z",
+  "data": {
+    "email_id": "em_123456789",
+    "from": "sender@example.com",
+    "to": ["recipient@example.com"],
+    "subject": "Hello World",
+    "status": "scheduled"
+  }
+}
+```
 
 ## Learn More
 

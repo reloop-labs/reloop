@@ -1,46 +1,49 @@
 ---
 title: "email.bounced"
 sidebarTitle: "email.bounced"
-description: "Webhook event triggered when an email is bounced."
+description: "Webhook event triggered when an email permanently fails delivery."
 ---
 
 <SideBySide>
   <Side>
 
-    The `email.bounced` event is triggered when an email status changes to **bounced**.
+    The `email.bounced` event is triggered when delivery permanently fails (hard bounce, admin bounce, or OOB).
 
     ## Event Details
     All webhook payloads follow a consistent top-level structure with event-specific data nested within the `data` object.
 
     ### type `string`
-    The event type that triggered the webhook (e.g., `email.bounced`).
+    The event type that triggered the webhook (`email.bounced`).
 
     ### created_at `string`
     ISO 8601 timestamp when the webhook event was created.
 
     ### data `object`
-    Contains the event-specific details such as email ID, recipients, and status.
+    Includes standard email fields plus `error` with SMTP details when available.
 
     ## Handling this event
     When your endpoint receives an `email.bounced` event, you might want to:
-    - Update the status in your internal database.
-    - Trigger automated workflows or notifications.
-    - Log the event for analytics purposes.
+    - Suppress the recipient from future sends.
+    - Notify the sender or update CRM status.
   </Side>
 
   <Side>
 
     ```json
     {
+      "id": "whev_01h…",
       "type": "email.bounced",
-      "created_at": "2023-01-01T12:00:00Z",
+      "created_at": "2026-07-22T12:00:00.000Z",
       "data": {
         "email_id": "em_123456789",
         "from": "sender@example.com",
-        "to": ["recipient@example.com"],
+        "to": ["bad@example.com"],
         "subject": "Hello World",
         "status": "bounced",
-        "timestamp": "2023-01-01T12:00:00Z"
+        "error": {
+          "code": 550,
+          "message": "User unknown"
+        }
       }
     }
     ```

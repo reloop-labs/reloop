@@ -7,19 +7,19 @@ description: "Webhook event triggered when an email is delivered."
 <SideBySide>
   <Side>
 
-    The `email.delivered` event is triggered when an email status changes to **delivered**.
+    The `email.delivered` event is triggered when an email is delivered to the recipient MTA.
 
     ## Event Details
     All webhook payloads follow a consistent top-level structure with event-specific data nested within the `data` object.
 
     ### type `string`
-    The event type that triggered the webhook (e.g., `email.delivered`).
+    The event type that triggered the webhook (`email.delivered`).
 
     ### created_at `string`
     ISO 8601 timestamp when the webhook event was created.
 
     ### data `object`
-    Contains the event-specific details such as email ID, recipients, and status.
+    Outbound email fields: `email_id`, `from`, `to`, `subject`, `status`.
 
     ## Handling this event
     When your endpoint receives an `email.delivered` event, you might want to:
@@ -32,15 +32,15 @@ description: "Webhook event triggered when an email is delivered."
 
     ```json
     {
+      "id": "whev_01h…",
       "type": "email.delivered",
-      "created_at": "2023-01-01T12:00:00Z",
+      "created_at": "2026-07-22T12:00:00.000Z",
       "data": {
         "email_id": "em_123456789",
         "from": "sender@example.com",
         "to": ["recipient@example.com"],
         "subject": "Hello World",
-        "status": "delivered",
-        "timestamp": "2023-01-01T12:00:00Z"
+        "status": "delivered"
       }
     }
     ```

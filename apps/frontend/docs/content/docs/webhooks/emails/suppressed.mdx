@@ -1,49 +1,32 @@
 ---
 title: "email.suppressed"
 sidebarTitle: "email.suppressed"
-description: "Webhook event triggered when an email is suppressed."
+description: "Coming soon — not yet emitted by the pipeline."
 ---
 
-<SideBySide>
-  <Side>
+The `email.suppressed` event ID is reserved for when Reloop rejects a send because the recipient is on a suppression list.
 
-    The `email.suppressed` event is triggered when an email is suppressed and not delivered because the recipient is on the suppression list.
+**Status:** inactive — not available for new webhook subscriptions until pre-send suppression publishes this event. Contact suppressions currently surface as `contact.blocked` when auto-capture blocks a recipient.
 
-    ## Event Details
-    All webhook payloads follow a consistent top-level structure with event-specific data nested within the `data` object.
+## Planned `data` shape
 
-    ### type `string`
-    The event type that triggered the webhook (e.g., `email.suppressed`).
-
-    ### created_at `string`
-    ISO 8601 timestamp when the webhook event was created.
-
-    ### data `object`
-    Contains the event-specific details such as email ID and suppression reason.
-
-    ## Handling this event
-    When your endpoint receives an `email.suppressed` event, you might want to:
-    - Update the status in your internal database.
-    - Notify the user why the email wasn't delivered.
-    - Check your suppression list for the recipient.
-  </Side>
-
-  <Side>
-
-    ```json
-    {
-      "type": "email.suppressed",
-      "created_at": "2023-01-01T12:00:00Z",
-      "data": {
-        "email_id": "em_123456789",
-        "to": ["recipient@example.com"],
-        "reason": "Previous hard bounce",
-        "timestamp": "2023-01-01T12:00:00Z"
-      }
+```json
+{
+  "id": "whev_01h…",
+  "type": "email.suppressed",
+  "created_at": "2026-07-22T12:00:00.000Z",
+  "data": {
+    "email_id": "em_123456789",
+    "from": "sender@example.com",
+    "to": ["blocked@example.com"],
+    "subject": "Hello World",
+    "status": "failed",
+    "error": {
+      "message": "Recipient is on the suppression list"
     }
-    ```
-  </Side>
-</SideBySide>
+  }
+}
+```
 
 ## Learn More
 
