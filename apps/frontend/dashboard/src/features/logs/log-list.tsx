@@ -209,7 +209,7 @@ export function LogList({
 					void setCurrentPage(1);
 				}}
 			>
-				<TabMenuHorizontal.List className="relative h-11 gap-0 border-b-0! py-0 [&_[aria-hidden=true]]:hidden">
+				<TabMenuHorizontal.List className="relative h-9 gap-0 border-b-0! py-0 [&_[aria-hidden=true]]:hidden">
 					{OUTCOME_TABS.map((tab, index) => (
 						<TabMenuHorizontal.Trigger
 							key={tab.id}
@@ -242,27 +242,27 @@ export function LogList({
 								initial={{
 									pointerEvents: "none",
 									width: rect.width,
-									height: rect.height - 14,
+									height: rect.height - 8,
 									left:
 										rect.left -
 										(tabEl?.offsetParent?.getBoundingClientRect().left || 0),
 									top:
 										rect.top -
 										(tabEl?.offsetParent?.getBoundingClientRect().top || 0) +
-										7,
+										4,
 									opacity: 0,
 								}}
 								animate={{
 									pointerEvents: "none",
 									width: rect.width,
-									height: rect.height - 14,
+									height: rect.height - 8,
 									left:
 										rect.left -
 										(tabEl?.offsetParent?.getBoundingClientRect().left || 0),
 									top:
 										rect.top -
 										(tabEl?.offsetParent?.getBoundingClientRect().top || 0) +
-										7,
+										4,
 									opacity: 1,
 								}}
 								exit={{ opacity: 0 }}
@@ -274,7 +274,7 @@ export function LogList({
 			</TabMenuHorizontal.Root>
 
 			{/* Filter bar — all controls share h-9 */}
-			<div className="flex flex-wrap items-center gap-2 pt-4">
+			<div className="flex flex-wrap items-center gap-2 pt-2">
 				<div className="min-w-[200px] flex-1">
 					<Input.Root size="small" className="h-9 rounded-xl">
 						<Input.Wrapper>

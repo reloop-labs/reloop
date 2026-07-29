@@ -5,7 +5,7 @@ const DOCS_URL = "https://reloop.sh/docs/learn/logs";
 
 export function LogsListHeader() {
 	return (
-		<div className="flex flex-col gap-4 pt-2 pb-4 sm:flex-row sm:items-start sm:justify-between">
+		<div className="flex flex-col gap-4 pt-2 pb-0 sm:flex-row sm:items-start sm:justify-between">
 			<div>
 				<div className="flex items-center gap-2.5">
 					<Icon

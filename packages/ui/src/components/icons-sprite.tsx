@@ -1794,6 +1794,20 @@ export const IconsSprite = () => (
 				/>
 			</symbol>
 			<symbol
+				id="arrows-expand-diagonal"
+				viewBox="0 0 24 24"
+				fill="none"
+				xmlns="http://www.w3.org/2000/svg"
+			>
+				<path
+					d="M16 4h4v4M20 4l-6 6M8 20H4v-4M4 20l6-6"
+					stroke="currentColor"
+					strokeWidth="1.5"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				/>
+			</symbol>
+			<symbol
 				id="expand"
 				viewBox="0 0 24 24"
 				fill="none"
