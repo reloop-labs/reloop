@@ -4,22 +4,24 @@ import {
 	resolveSessionAuthWithProfile,
 } from "@reloop/auth/middleware";
 import { db } from "@reloop/db/client";
-import { emailLog } from "@reloop/db/schema";
+import { emailLog, member } from "@reloop/db/schema";
 import { emailConfig } from "@reloop/email/email.config";
 import { ONBOARDING_TEST_SUBJECT } from "@reloop/email/routes/onboarding/onboarding.constants";
 import {
 	onboardingSessionOpts,
 	onboardingSessionRedis,
 } from "@reloop/email/routes/onboarding/onboarding.session";
-import { and, desc, eq, sql } from "drizzle-orm";
+import { and, desc, eq, or, sql } from "drizzle-orm";
 import { Elysia, t } from "elysia";
 import { log } from "evlog";
 
 /**
  * Called when the user clicks "Go to Dashboard" after the onboarding test send.
  *
- * Attributes every onboarding test email_log for the signed-in user
- * (multiple sends → multiple rows) to the customer workspace + API key.
+ * Attributes every onboarding test email_log for the signed-in user that
+ * belongs to this API key (or is still unattributed) to the **API key's**
+ * organization — not the session active org — so multi-org users land logs
+ * on the workspace that owns the key.
  */
 export const dashboardRoute = new Elysia({
 	name: "OnboardingDashboardRoute",
@@ -37,14 +39,14 @@ export const dashboardRoute = new Elysia({
 			const session = await resolveSessionAuthWithProfile(
 				request.headers,
 				onboardingSessionOpts,
-				{ requireOrg: true },
+				{ requireOrg: false },
 			);
 
-			if (!session?.organizationId || !session.userId) {
+			if (!session?.userId) {
 				set.status = 401;
 				return {
 					message: "Authentication required",
-					why: "You must be signed in with an active workspace.",
+					why: "You must be signed in.",
 				};
 			}
 
@@ -78,18 +80,36 @@ export const dashboardRoute = new Elysia({
 				};
 			}
 
-			if (keyAuth.organizationId !== session.organizationId) {
+			// Org comes from the key — session active org may still be an older workspace.
+			const organizationId = keyAuth.organizationId;
+
+			const [membership] = await db
+				.select({ id: member.id })
+				.from(member)
+				.where(
+					and(
+						eq(member.userId, session.userId),
+						eq(member.organizationId, organizationId),
+					),
+				)
+				.limit(1);
+
+			if (!membership) {
 				set.status = 403;
 				return {
-					message: "API key does not belong to this workspace",
-					why: "The key must belong to your active organization.",
-					fix: "Use the API key generated for this workspace.",
+					message: "API key does not belong to your account",
+					why: "You are not a member of the workspace that owns this API key.",
+					fix: "Use the API key generated for a workspace you belong to.",
 				};
 			}
 
 			try {
-				// All onboarding test sends to this user (multiple sends → many rows).
-				const matches = await db
+				// Candidate onboarding rows for this user email.
+				// We only claim a row when it is already under this key/org, has no
+				// apikey yet, or lives on an org the user is NOT a member of
+				// (platform transport). That way multi-org users never steal logs
+				// from their other workspaces.
+				const candidates = await db
 					.select({
 						id: emailLog.id,
 						organizationId: emailLog.organizationId,
@@ -108,19 +128,35 @@ export const dashboardRoute = new Elysia({
 					)
 					.orderBy(desc(emailLog.createdAt));
 
+				const userMemberships = await db
+					.select({ organizationId: member.organizationId })
+					.from(member)
+					.where(eq(member.userId, session.userId));
+				const memberOrgIds = new Set(
+					userMemberships.map((m) => m.organizationId),
+				);
+
+				const matches = candidates.filter((row) => {
+					if (row.organizationId === organizationId) return true;
+					if (row.apikeyId === keyAuth.apiKeyId) return true;
+					if (!row.apikeyId) return true;
+					// Platform (or unknown) org — user is not a member there.
+					return !memberOrgIds.has(row.organizationId);
+				});
+
 				const ids: string[] = [];
 				let updatedCount = 0;
 
 				for (const match of matches) {
 					const alreadyOwned =
-						match.organizationId === session.organizationId &&
+						match.organizationId === organizationId &&
 						match.apikeyId === keyAuth.apiKeyId;
 
 					if (!alreadyOwned) {
 						await db
 							.update(emailLog)
 							.set({
-								organizationId: session.organizationId,
+								organizationId,
 								apikeyId: keyAuth.apiKeyId,
 								userId: session.userId,
 							})
@@ -133,7 +169,7 @@ export const dashboardRoute = new Elysia({
 				if (ids.length === 0) {
 					log.warn({
 						email: to,
-						organizationId: session.organizationId,
+						organizationId,
 						message:
 							"No onboarding email_log found to reassign on dashboard handoff",
 					});
@@ -141,7 +177,7 @@ export const dashboardRoute = new Elysia({
 						object: "onboarding.dashboard",
 						updated: false,
 						reason: "email_log_not_found",
-						organizationId: session.organizationId,
+						organizationId,
 						apikeyId: keyAuth.apiKeyId,
 						count: 0,
 						ids: [],
@@ -151,7 +187,7 @@ export const dashboardRoute = new Elysia({
 				return {
 					object: "onboarding.dashboard",
 					updated: updatedCount > 0,
-					organizationId: session.organizationId,
+					organizationId,
 					apikeyId: keyAuth.apiKeyId,
 					count: ids.length,
 					ids,
@@ -159,7 +195,7 @@ export const dashboardRoute = new Elysia({
 			} catch (error) {
 				log.error({
 					error: error instanceof Error ? error.message : String(error),
-					organizationId: session.organizationId,
+					organizationId,
 					email: to,
 					message: "Failed to reassign onboarding email_logs",
 				});
@@ -168,7 +204,7 @@ export const dashboardRoute = new Elysia({
 					object: "onboarding.dashboard",
 					updated: false,
 					reason: "update_failed",
-					organizationId: session.organizationId,
+					organizationId,
 					apikeyId: keyAuth.apiKeyId,
 					count: 0,
 					ids: [],
@@ -183,7 +219,7 @@ export const dashboardRoute = new Elysia({
 			detail: {
 				summary: "Attribute onboarding email logs on Go to Dashboard",
 				description:
-					"Session-authenticated. Body { apiKey }. Attributes every onboarding test email_log for the signed-in email to the customer workspace + API key (supports multiple sends).",
+					"Session-authenticated. Body { apiKey }. Attributes onboarding email_log rows to the API key's organizationId (not the session active org). Supports multi-org users and multiple sends.",
 				tags: ["Onboarding"],
 			},
 		},

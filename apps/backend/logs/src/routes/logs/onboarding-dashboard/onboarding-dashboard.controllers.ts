@@ -1,7 +1,7 @@
 import { validateApiKey } from "@reloop/auth/apikey/validate";
 import type { ApiKeyCache } from "@reloop/auth/apikey/validate";
 import { db } from "@reloop/db/client";
-import { activityLog, domain, emailLog, user } from "@reloop/db/schema";
+import { activityLog, domain, emailLog, member, user } from "@reloop/db/schema";
 import { logsConfig } from "@reloop/logs/logs.config";
 import { insertAuditLog } from "@reloop/logs/utils/insert-audit-log";
 import { and, desc, eq, or, sql } from "drizzle-orm";
@@ -145,16 +145,14 @@ async function insertCustomerEmailLog({
 }
 
 /**
- * Attribute every onboarding test email_log for the signed-in user
- * (multiple sends → multiple rows). Also ensures activity_log rows.
+ * Attribute every onboarding test email_log for this API key's org.
+ * Organization is taken from the API key, not the session active org.
  */
 export async function onboardingDashboardController({
-	organizationId,
 	userId,
 	apiKey,
 	apiKeyCache,
 }: {
-	organizationId: string;
 	userId: string;
 	apiKey: string;
 	apiKeyCache: ApiKeyCache;
@@ -191,13 +189,27 @@ export async function onboardingDashboardController({
 		};
 	}
 
-	if (keyAuth.organizationId !== organizationId) {
+	// Multi-org: attribute to the key's workspace, not session activeOrganizationId.
+	const organizationId = keyAuth.organizationId;
+
+	const [membership] = await db
+		.select({ id: member.id })
+		.from(member)
+		.where(
+			and(
+				eq(member.userId, userId),
+				eq(member.organizationId, organizationId),
+			),
+		)
+		.limit(1);
+
+	if (!membership) {
 		return {
 			status: 403 as const,
 			body: {
-				message: "API key does not belong to this workspace",
-				why: "The key must belong to your active organization.",
-				fix: "Use the API key generated for this workspace.",
+				message: "API key does not belong to your account",
+				why: "You are not a member of the workspace that owns this API key.",
+				fix: "Use the API key generated for a workspace you belong to.",
 			},
 		};
 	}
@@ -210,8 +222,7 @@ export async function onboardingDashboardController({
 		: `Reloop <${ONBOARDING_TEST_LOCAL_PART}@reloop.email>`;
 
 	try {
-		// All onboarding test sends to this user (not just the latest).
-		const matches = await db
+		const candidates = await db
 			.select({
 				id: emailLog.id,
 				organizationId: emailLog.organizationId,
@@ -230,6 +241,22 @@ export async function onboardingDashboardController({
 				),
 			)
 			.orderBy(desc(emailLog.createdAt));
+
+		const userMemberships = await db
+			.select({ organizationId: member.organizationId })
+			.from(member)
+			.where(eq(member.userId, userId));
+		const memberOrgIds = new Set(
+			userMemberships.map((m) => m.organizationId),
+		);
+
+		// Claim only this key/org, unattributed, or non-member (platform) orgs.
+		const matches = candidates.filter((row) => {
+			if (row.organizationId === organizationId) return true;
+			if (row.apikeyId === keyAuth.apiKeyId) return true;
+			if (!row.apikeyId) return true;
+			return !memberOrgIds.has(row.organizationId);
+		});
 
 		const attributedIds: string[] = [];
 		let updatedCount = 0;
@@ -263,7 +290,6 @@ export async function onboardingDashboardController({
 			attributedIds.push(match.id);
 		}
 
-		// No rows at all — insert one so the workspace is not empty.
 		if (matches.length === 0 && onboardingTestDomain) {
 			const emailLogId = await insertCustomerEmailLog({
 				organizationId,

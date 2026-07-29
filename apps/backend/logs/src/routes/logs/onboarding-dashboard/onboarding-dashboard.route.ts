@@ -17,9 +17,10 @@ export const onboardingDashboardRoute = new Elysia()
 	.use(authMiddleware)
 	.post(
 		"/onboarding/dashboard",
-		async ({ body, organizationId, userId, set }) => {
+		async ({ body, userId, set }) => {
+			// Organization is resolved from the API key inside the controller
+			// (session active org may still be an older workspace).
 			const result = await onboardingDashboardController({
-				organizationId,
 				userId,
 				apiKey: body.apiKey.trim(),
 				apiKeyCache,
@@ -36,7 +37,7 @@ export const onboardingDashboardRoute = new Elysia()
 				tags: ["Logs", "Onboarding"],
 				summary: "Attribute onboarding email log on Go to Dashboard",
 				description:
-					"Session-authenticated. Body { apiKey }. Finds the latest onboarding test email_log for the signed-in email, sets organizationId + apikeyId, and attributes the matching activity log so it shows in workspace logs.",
+					"Session-authenticated. Body { apiKey }. Attributes onboarding email_log + activity_log to the API key's organizationId (not the session active org).",
 			},
 		},
 	);

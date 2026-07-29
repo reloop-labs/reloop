@@ -3,6 +3,8 @@ import {
 	createAuthPlugin,
 	resolveSessionAuthWithProfile,
 } from "@reloop/auth/middleware";
+import { db } from "@reloop/db/client";
+import { member } from "@reloop/db/schema";
 import { emailConfig } from "@reloop/email/email.config";
 import {
 	ONBOARDING_TEST_LOCAL_PART,
@@ -15,13 +17,15 @@ import {
 } from "@reloop/email/routes/onboarding/onboarding.session";
 import { saveOnboardingCustomerEmailLog } from "@reloop/email/routes/onboarding/send-test-email/customer-email-log";
 import { sendEmail } from "@reloop/email/utils/email";
+import { and, eq } from "drizzle-orm";
 import { Elysia, t } from "elysia";
 
 /**
  * One-click onboarding email after API key generation.
  * Session auth + the plaintext API key from the dashboard.
  * From: Reloop <onboarding@{ONBOARDING_TEST_DOMAIN}> → user inbox.
- * Each successful send attributes (or inserts) one customer email_log.
+ * Each successful send attributes (or inserts) one customer email_log
+ * under the API key's organization (not the session active org).
  */
 export const sendTestEmailRoute = new Elysia({
 	name: "OnboardingSendTestEmailRoute",
@@ -36,24 +40,29 @@ export const sendTestEmailRoute = new Elysia({
 	.post(
 		"/onboarding/send-test-email",
 		async ({ request, body, set }) => {
+			// Session identifies the user; org for logging comes from the API key
+			// so multi-org users (new workspace while another is still active)
+			// attribute to the key's org, not the session's activeOrganizationId.
 			const session = await resolveSessionAuthWithProfile(
 				request.headers,
 				onboardingSessionOpts,
-				{ requireOrg: true },
+				{ requireOrg: false },
 			);
 
-			if (!session?.organizationId || !session.userId) {
+			if (!session?.userId) {
 				set.status = 401;
 				return {
 					message: "Authentication required",
-					why: "You must be signed in with an active workspace.",
+					why: "You must be signed in.",
 				};
 			}
 
-			// Onboarding always sends the generated key so we can prove it is valid.
-			// Home "send first email" may omit it (no plaintext key available).
+			// Onboarding always sends the generated key so we can prove it is valid
+			// and resolve the correct workspace for the email_log.
 			const apiKey = body?.apiKey?.trim() ?? "";
 			let apikeyId: string | undefined;
+			let organizationId: string | undefined;
+
 			if (apiKey) {
 				const keyAuth = await validateApiKey(apiKey, onboardingSessionRedis);
 				if (!keyAuth) {
@@ -65,15 +74,30 @@ export const sendTestEmailRoute = new Elysia({
 					};
 				}
 
-				if (keyAuth.organizationId !== session.organizationId) {
+				// Key may belong to a newly created org while session still points
+				// at an older active org — do not compare to session.organizationId.
+				const [membership] = await db
+					.select({ id: member.id })
+					.from(member)
+					.where(
+						and(
+							eq(member.userId, session.userId),
+							eq(member.organizationId, keyAuth.organizationId),
+						),
+					)
+					.limit(1);
+
+				if (!membership) {
 					set.status = 403;
 					return {
-						message: "API key does not belong to this workspace",
-						why: "The key must belong to your active organization.",
-						fix: "Use the API key generated for this workspace.",
+						message: "API key does not belong to your account",
+						why: "You are not a member of the workspace that owns this API key.",
+						fix: "Use the API key generated for a workspace you belong to.",
 					};
 				}
+
 				apikeyId = keyAuth.apiKeyId;
+				organizationId = keyAuth.organizationId;
 			}
 
 			const onboardingTestDomain = emailConfig.ONBOARDING_TEST_DOMAIN.trim();
@@ -119,16 +143,19 @@ export const sendTestEmailRoute = new Elysia({
 							? resultObj.id
 							: undefined;
 
-				// One customer-facing log per send so multiple sends all appear.
-				const emailLogId = await saveOnboardingCustomerEmailLog({
-					organizationId: session.organizationId,
-					userId: session.userId,
-					apikeyId,
-					from,
-					to,
-					onboardingDomainName: onboardingTestDomain,
-					providerMessageId,
-				});
+				// Log under the API key's org when present (multi-org safe).
+				let emailLogId: string | null = null;
+				if (organizationId) {
+					emailLogId = await saveOnboardingCustomerEmailLog({
+						organizationId,
+						userId: session.userId,
+						apikeyId,
+						from,
+						to,
+						onboardingDomainName: onboardingTestDomain,
+						providerMessageId,
+					});
+				}
 
 				return {
 					object: "email",
@@ -137,6 +164,7 @@ export const sendTestEmailRoute = new Elysia({
 					to,
 					from,
 					domain: onboardingTestDomain,
+					...(organizationId ? { organizationId } : {}),
 					...(emailLogId ? { id: emailLogId } : {}),
 					...(resultObj ?? {}),
 				};
@@ -157,7 +185,7 @@ export const sendTestEmailRoute = new Elysia({
 			detail: {
 				summary: "Onboarding test email to signed-in user",
 				description:
-					"Session-authenticated. Optional body { apiKey } — when provided, the key is validated and stored on a new email_log for this send. Sends from Reloop <onboarding@{ONBOARDING_TEST_DOMAIN}> via the platform key. Each call saves a separate log under the customer workspace.",
+					"Session-authenticated. Optional body { apiKey } — when provided, the key is validated and the email_log is attributed to the key's organizationId (not the session active org). Sends from Reloop <onboarding@{ONBOARDING_TEST_DOMAIN}> via the platform key.",
 				tags: ["Onboarding"],
 			},
 		},

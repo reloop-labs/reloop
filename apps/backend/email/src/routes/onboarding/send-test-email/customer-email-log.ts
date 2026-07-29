@@ -1,10 +1,10 @@
 import { db } from "@reloop/db/client";
-import { domain, emailLog } from "@reloop/db/schema";
+import { domain, emailLog, member } from "@reloop/db/schema";
 import {
 	ONBOARDING_TEST_SUBJECT,
 	ONBOARDING_TEST_TEXT,
 } from "@reloop/email/routes/onboarding/onboarding.constants";
-import { and, desc, eq, gte, ne, or, sql } from "drizzle-orm";
+import { and, desc, eq, gte, or, sql } from "drizzle-orm";
 import { log } from "evlog";
 
 function parseFromEmail(from: string): string {
@@ -75,27 +75,45 @@ export async function saveOnboardingCustomerEmailLog({
 		}
 
 		if (!matchId) {
-			// Newest onboarding send for this recipient that is still not fully
-			// owned by this workspace + key (or has no key yet).
-			const [recent] = await db
-				.select({ id: emailLog.id })
+			// Newest candidate rows for this recipient in the last 2 minutes.
+			const recentRows = await db
+				.select({
+					id: emailLog.id,
+					organizationId: emailLog.organizationId,
+					apikeyId: emailLog.apikeyId,
+				})
 				.from(emailLog)
 				.where(
 					and(
 						eq(emailLog.subject, ONBOARDING_TEST_SUBJECT),
 						recipientMatch,
 						gte(emailLog.createdAt, recentCutoff),
-						or(
-							ne(emailLog.organizationId, organizationId),
-							apikeyId
-								? sql`(${emailLog.apikeyId} IS DISTINCT FROM ${apikeyId})`
-								: sql`true`,
-						),
 					),
 				)
 				.orderBy(desc(emailLog.createdAt))
-				.limit(1);
-			matchId = recent?.id;
+				.limit(10);
+
+			const userMemberships = await db
+				.select({ organizationId: member.organizationId })
+				.from(member)
+				.where(eq(member.userId, userId));
+			const memberOrgIds = new Set(
+				userMemberships.map((m) => m.organizationId),
+			);
+
+			const claimable = recentRows.find((row) => {
+				const alreadyOwned =
+					row.organizationId === organizationId &&
+					(!apikeyId || row.apikeyId === apikeyId);
+				if (alreadyOwned) return false;
+
+				if (row.organizationId === organizationId) return true;
+				if (apikeyId && row.apikeyId === apikeyId) return true;
+				if (!row.apikeyId) return true;
+				// Platform org: user is not a member — safe to claim.
+				return !memberOrgIds.has(row.organizationId);
+			});
+			matchId = claimable?.id;
 		}
 
 		if (matchId) {
