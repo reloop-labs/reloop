@@ -428,6 +428,7 @@
         "@elysiajs/opentelemetry": "catalog:backend",
         "@elysiajs/server-timing": "catalog:backend",
         "@elysiajs/swagger": "catalog:backend",
+        "@openrouter/ai-sdk-provider": "catalog:backend",
         "@opentelemetry/exporter-trace-otlp-http": "catalog:backend",
         "@opentelemetry/exporter-trace-otlp-proto": "catalog:backend",
         "@opentelemetry/instrumentation-express": "catalog:backend",

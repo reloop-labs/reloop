@@ -79,7 +79,7 @@ export const aiRoute = new Elysia().use(authMiddleware).post(
 			tags: ["Templates", "AI"],
 			summary: "Generate AI email template stream",
 			description:
-				"Streams HTML email templates via Gemma (Ollama gemma2:9b by default), Gemini, or OpenAI for the React Email editor.",
+				"Streams HTML email templates via OpenRouter (inclusionai/ling-3.0-flash:free by default), Gemma/Ollama, Gemini, or OpenAI for the React Email editor.",
 		},
 	},
 );

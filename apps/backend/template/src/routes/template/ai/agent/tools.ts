@@ -203,7 +203,7 @@ export async function toolGenerateEmailHtml(
 			ok: false,
 			data: { html: "", usedVision },
 			summary:
-				"Model returned invalid/leaked content (prompt dump). Check that Ollama/Gemini/OpenAI is running, then retry.",
+				"Model returned invalid/leaked content (prompt dump). Check that OpenRouter/Ollama/Gemini/OpenAI is configured, then retry.",
 		};
 	}
 	return {
@@ -263,7 +263,7 @@ export async function toolReviseEmailHtml(
 			ok: false,
 			data: { html: prior, usedVision },
 			summary:
-				"Revise returned invalid/leaked content; previous HTML kept. Retry after checking the model.",
+				"Revise returned invalid/leaked content; previous HTML kept. Retry after checking OpenRouter/model config.",
 		};
 	}
 	return {

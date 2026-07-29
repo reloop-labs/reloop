@@ -1,5 +1,6 @@
 import { createGoogleGenerativeAI, google } from "@ai-sdk/google";
 import { createOpenAI, openai } from "@ai-sdk/openai";
+import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 import { streamText } from "ai";
 import { templateConfig } from "../../../template.config";
 
@@ -112,6 +113,35 @@ function isGemmaModel(model: string) {
 
 function isGeminiModel(model: string) {
 	return model.toLowerCase().includes("gemini");
+}
+
+/** OpenRouter model ids look like `provider/model:variant` (e.g. inclusionai/ling-3.0-flash:free). */
+function isOpenRouterModel(model: string) {
+	const m = model.toLowerCase();
+	return (
+		m.startsWith("openrouter:") ||
+		m.includes("/") ||
+		m === templateConfig.OPENROUTER_MODEL.toLowerCase()
+	);
+}
+
+function normalizeOpenRouterModelId(model: string) {
+	return model.startsWith("openrouter:")
+		? model.slice("openrouter:".length)
+		: model;
+}
+
+function getOpenRouter() {
+	const key = templateConfig.OPENROUTER_API_KEY;
+	if (!key) return null;
+	return createOpenRouter({
+		apiKey: key,
+		// Optional app attribution for OpenRouter dashboards
+		headers: {
+			"HTTP-Referer": templateConfig.BASE_URL,
+			"X-Title": "Reloop Template Engine",
+		},
+	});
 }
 
 function plainTextStreamResponse(stream: ReadableStream<Uint8Array>) {
@@ -291,7 +321,7 @@ function mockTemplateHtml(prompt: string) {
       <p style="margin:0 0 8px;font-size:12px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:#71717a;">Preview</p>
       <h1 style="color:#09090b;font-size:24px;font-weight:700;margin:0 0 16px;line-height:1.25;">You're all set</h1>
       <p style="color:#52525b;font-size:15px;line-height:1.6;margin:0 0 16px;">Hi {{first_name}} — here's a starter template for <strong>${safe}</strong>.</p>
-      <p style="color:#52525b;font-size:15px;line-height:1.6;margin:0 0 28px;">Connect a model (Ollama/Gemma, Gemini, or OpenAI) for full AI generation. This is a local fallback so the editor never shows raw prompts.</p>
+      <p style="color:#52525b;font-size:15px;line-height:1.6;margin:0 0 28px;">Connect a model (OpenRouter, Ollama/Gemma, Gemini, or OpenAI) for full AI generation. This is a local fallback so the editor never shows raw prompts.</p>
       <a href="https://reloop.dev" style="display:inline-block;background-color:#18181b;color:#ffffff;text-decoration:none;font-weight:600;font-size:14px;padding:12px 24px;border-radius:8px;">Get Started Now &rarr;</a>
     </td>
   </tr>
@@ -300,17 +330,21 @@ function mockTemplateHtml(prompt: string) {
 
 /**
  * Create an AI text stream for email template HTML.
- * Ladder: Gemma/Ollama (default) → Gemini → OpenAI → mock HTML.
+ * Ladder: OpenRouter (default free model) → Gemma/Ollama → Gemini → OpenAI → mock HTML.
  * With images: vision path (Gemini → OpenAI) before text-only fallbacks.
  */
 export async function createAIStream({
 	prompt,
 	system = DEFAULT_TEMPLATE_AI_SYSTEM,
-	model = templateConfig.GEMMA_MODEL,
+	model,
 	apiKey,
 	images,
 }: AIStreamInput): Promise<AIStreamHandle> {
-	const resolvedModel = model || templateConfig.GEMMA_MODEL;
+	const openrouter = getOpenRouter();
+	const defaultModel = openrouter
+		? templateConfig.OPENROUTER_MODEL
+		: templateConfig.GEMMA_MODEL;
+	const resolvedModel = model || defaultModel;
 	const hasImages = Boolean(images?.length);
 	const systemWithVision = hasImages
 		? `${system}${VISION_SYSTEM_SUFFIX}`
@@ -354,7 +388,9 @@ export async function createAIStream({
 
 			if (openaiApiKey) {
 				const visionModel =
-					!isGemmaModel(resolvedModel) && !isGeminiModel(resolvedModel)
+					!isGemmaModel(resolvedModel) &&
+					!isGeminiModel(resolvedModel) &&
+					!isOpenRouterModel(resolvedModel)
 						? resolvedModel
 						: process.env.OPENAI_VISION_MODEL || "gpt-4o-mini";
 				const openaiProvider = apiKey
@@ -376,7 +412,25 @@ export async function createAIStream({
 		// with attachment URLs already in the prompt.
 	}
 
-	// ── Text-only ladder: Gemma → Gemini → OpenAI → mock ────────────
+	// ── Text-only ladder: OpenRouter → Gemma → Gemini → OpenAI → mock ─
+	if (openrouter && isOpenRouterModel(resolvedModel)) {
+		try {
+			const modelId = normalizeOpenRouterModelId(resolvedModel);
+			const result = streamText({
+				model: openrouter(modelId) as never,
+				system: systemWithVision,
+				prompt,
+			});
+			return {
+				textStream: result.textStream,
+				toTextStreamResponse: () => result.toTextStreamResponse(),
+				toUIMessageStreamResponse: () => result.toUIMessageStreamResponse(),
+			};
+		} catch {
+			// fall through to other providers
+		}
+	}
+
 	if (isGemmaModel(resolvedModel)) {
 		const ollamaStream = await streamGemmaOllama(
 			buildOllamaPrompt(systemWithVision, prompt),
@@ -404,6 +458,7 @@ export async function createAIStream({
 	if (
 		!isGemmaModel(resolvedModel) &&
 		!isGeminiModel(resolvedModel) &&
+		!isOpenRouterModel(resolvedModel) &&
 		openaiApiKey
 	) {
 		const openaiProvider = apiKey
@@ -419,6 +474,24 @@ export async function createAIStream({
 			toTextStreamResponse: () => result.toTextStreamResponse(),
 			toUIMessageStreamResponse: () => result.toUIMessageStreamResponse(),
 		};
+	}
+
+	// Prefer OpenRouter free model even when an explicit non-OR model failed
+	if (openrouter) {
+		try {
+			const result = streamText({
+				model: openrouter(templateConfig.OPENROUTER_MODEL) as never,
+				system: systemWithVision,
+				prompt,
+			});
+			return {
+				textStream: result.textStream,
+				toTextStreamResponse: () => result.toTextStreamResponse(),
+				toUIMessageStreamResponse: () => result.toUIMessageStreamResponse(),
+			};
+		} catch {
+			// continue fallbacks
+		}
 	}
 
 	// Fallback Gemma even when default wasn't Gemma (e.g. after failed vision)

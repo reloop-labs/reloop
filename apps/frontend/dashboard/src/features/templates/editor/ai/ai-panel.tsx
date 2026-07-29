@@ -123,7 +123,7 @@ export function AIPanel({ onClose }: { onClose: () => void }) {
 			if (!editor || !html) return;
 			if (!isSafeEmailHtml(html)) {
 				toast.error(
-					"AI returned invalid content (looks like a prompt dump). Retry — ensure Ollama/Gemini/OpenAI is available.",
+					"AI returned invalid content (looks like a prompt dump). Retry — ensure OpenRouter/Ollama/Gemini/OpenAI is available.",
 				);
 				return;
 			}
