@@ -61,7 +61,7 @@
 				"@number-flow/react": "0.5.10",
 				"react-hook-form": "7.62.0",
 				"react-email": "^6.0.0",
-				"@react-email/ui": "^6.5.0",
+				"@react-email/ui": "6.9.1",
 				"@tailwindcss/postcss": "4.1.11",
 				"tailwindcss": "4.1.11",
 				"postcss": "8.5.6",
