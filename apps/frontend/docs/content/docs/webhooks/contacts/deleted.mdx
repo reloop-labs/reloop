@@ -1,27 +1,27 @@
 ---
-title: "contact.deleted"
-sidebarTitle: "contact.deleted"
+title: "contact.delete"
+sidebarTitle: "contact.delete"
 description: "Webhook event triggered when a contact is deleted."
 ---
 
 <SideBySide>
   <Side>
-    The `contact.deleted` event is triggered when a contact is permanently removed from one of your audiences.
+    The `contact.delete` event is triggered when a contact is permanently removed.
 
     ## Event Details
     All webhook payloads follow a consistent top-level structure with event-specific data nested within the `data` object.
 
     ### type `string`
-    The event type that triggered the webhook (e.g., `contact.deleted`).
+    The event type that triggered the webhook (`contact.delete`).
 
     ### created_at `string`
     ISO 8601 timestamp when the webhook event was created.
 
     ### data `object`
-    Contains the ID of the deleted contact.
+    The deleted contact identity and last known fields.
 
     ## Handling this event
-    When your endpoint receives a `contact.deleted` event, you might want to:
+    When your endpoint receives a `contact.delete` event, you might want to:
     - Purge the contact from your local cache or database.
     - Stop any active communication threads.
     - Update your audience metrics.
@@ -30,12 +30,15 @@ description: "Webhook event triggered when a contact is deleted."
   <Side>
     ```json
     {
-      "type": "contact.deleted",
-      "created_at": "2023-01-01T12:00:00Z",
+      "id": "whev_01h…",
+      "type": "contact.delete",
+      "created_at": "2026-07-22T12:00:00.000Z",
       "data": {
         "id": "con_123456789",
         "email": "contact@example.com",
-        "timestamp": "2023-01-01T12:00:00Z"
+        "first_name": null,
+        "last_name": null,
+        "status": "subscribed"
       }
     }
     ```

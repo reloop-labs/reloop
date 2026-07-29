@@ -1,44 +1,43 @@
 ---
-title: "domain.updated"
-sidebarTitle: "domain.updated"
-description: "Webhook event triggered when a domain's status is updated."
+title: "domain.update"
+sidebarTitle: "domain.update"
+description: "Webhook event triggered when a domain is updated."
 ---
 
 <SideBySide>
   <Side>
 
-    The `domain.updated` event is triggered when a domain's verification status changes (e.g., from pending to verified).
+    The `domain.update` event is triggered when a domain's settings change (tracking, TLS, send/receive flags, etc.).
 
     ## Event Details
     All webhook payloads follow a consistent top-level structure with event-specific data nested within the `data` object.
 
     ### type `string`
-    The event type that triggered the webhook (e.g., `domain.updated`).
+    The event type that triggered the webhook (`domain.update`).
 
     ### created_at `string`
     ISO 8601 timestamp when the webhook event was created.
 
     ### data `object`
-    Contains the updated details of the domain.
+    Contains the updated domain identity and status (`id`, `name`, `status`).
 
     ## Handling this event
-    When your endpoint receives a `domain.updated` event, you might want to:
-    - Update the domain status in your application UI.
-    - Notify the user that their domain is now verified.
-    - Enable email sending for the verified domain.
+    When your endpoint receives a `domain.update` event, you might want to:
+    - Refresh cached domain configuration.
+    - Re-run internal validation against the new settings.
   </Side>
 
   <Side>
 
     ```json
     {
-      "type": "domain.updated",
-      "created_at": "2023-01-01T12:00:00Z",
+      "id": "whev_01h…",
+      "type": "domain.update",
+      "created_at": "2026-07-22T12:00:00.000Z",
       "data": {
         "id": "dom_123456789",
         "name": "example.com",
-        "status": "verified",
-        "timestamp": "2023-01-01T12:00:00Z"
+        "status": "active"
       }
     }
     ```

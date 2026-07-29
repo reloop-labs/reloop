@@ -1,28 +1,28 @@
 ---
-title: "contact.updated"
-sidebarTitle: "contact.updated"
-description: "Webhook event triggered when a contact's details are updated."
+title: "contact.update"
+sidebarTitle: "contact.update"
+description: "Webhook event triggered when a contact is updated."
 ---
 
 <SideBySide>
   <Side>
 
-    The `contact.updated` event is triggered when a contact's information or subscription status changes.
+    The `contact.update` event is triggered when a contact's details change. Status-only transitions also emit dedicated events (`contact.subscribed`, `contact.unsubscribed`, `contact.blocked`).
 
     ## Event Details
     All webhook payloads follow a consistent top-level structure with event-specific data nested within the `data` object.
 
     ### type `string`
-    The event type that triggered the webhook (e.g., `contact.updated`).
+    The event type that triggered the webhook (`contact.update`).
 
     ### created_at `string`
     ISO 8601 timestamp when the webhook event was created.
 
     ### data `object`
-    Contains the updated details of the contact.
+    Updated contact fields (`id`, `email`, `first_name`, `last_name`, `status`).
 
     ## Handling this event
-    When your endpoint receives a `contact.updated` event, you might want to:
+    When your endpoint receives a `contact.update` event, you might want to:
     - Update the contact's record in your system.
     - Synchronize subscription preferences.
     - Log the change for audit purposes.
@@ -32,13 +32,15 @@ description: "Webhook event triggered when a contact's details are updated."
 
     ```json
     {
-      "type": "contact.updated",
-      "created_at": "2023-01-01T12:00:00Z",
+      "id": "whev_01h…",
+      "type": "contact.update",
+      "created_at": "2026-07-22T12:00:00.000Z",
       "data": {
         "id": "con_123456789",
         "email": "contact@example.com",
-        "status": "unsubscribed",
-        "timestamp": "2023-01-01T12:00:00Z"
+        "first_name": "Ada",
+        "last_name": "Lovelace",
+        "status": "unsubscribed"
       }
     }
     ```

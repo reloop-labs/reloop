@@ -3,7 +3,7 @@ title: Event Types
 description: List of all events you can subscribe to via webhooks.
 ---
 
-Reloop supports the following **active** event types. Each delivery uses a consistent top-level envelope; event-specific fields live under `data`.
+Reloop supports the following **active** event types. Each delivery uses a consistent top-level envelope; event-specific fields live under `data` and use **snake_case**.
 
 ## Email lifecycle
 
@@ -14,14 +14,12 @@ Reloop supports the following **active** event types. Each delivery uses a consi
 | `email.bounced` | Permanent delivery failure |
 | `email.delivery_delayed` | Transient failure / delay |
 | `email.complained` | Recipient marked as spam (feedback loop) |
-| `email.failed` | Permanent send failure before delivery |
+| `email.failed` | Permanent send failure before delivery (or message expired) |
 | `email.opened` | Recipient opened the email |
 | `email.clicked` | Recipient clicked a link in the email |
 | `email.received` | Inbound email successfully received |
-| `email.scheduled` | Email scheduled for later delivery |
-| `email.suppressed` | Email suppressed (recipient on suppression list) |
 
-### Email `data` shape
+### Email `data` shape (outbound)
 
 ```json
 {
@@ -33,11 +31,32 @@ Reloop supports the following **active** event types. Each delivery uses a consi
   "error": {
     "code": 550,
     "message": "User unknown"
-  }
+  },
+  "url": "https://example.com/path"
 }
 ```
 
-`error` is present on bounce, delay, complaint, and failure events.
+- `error` is present on bounce, delay, complaint, and failure events.
+- `url` is present on `email.clicked`.
+
+### Inbound `email.received` `data` shape
+
+```json
+{
+  "email_id": "in_…",
+  "mailbox_id": "mb_…",
+  "from": "sender@example.com",
+  "from_name": "Sender",
+  "to": ["inbox@yourdomain.com"],
+  "cc": [],
+  "subject": "Inbound Message",
+  "thread_id": "thr_…",
+  "has_attachments": false,
+  "is_spam": false,
+  "status": "received",
+  "message_id": "<rfc822@id>"
+}
+```
 
 ## Domain lifecycle
 
@@ -49,15 +68,36 @@ Reloop supports the following **active** event types. Each delivery uses a consi
 | `domain.undelete` | Domain restored |
 | `domain.verify` | Domain DNS verified |
 
+### Domain `data` shape
+
+```json
+{
+  "id": "dom_…",
+  "name": "example.com",
+  "status": "active"
+}
+```
+
 ## API key lifecycle
 
 | Event | Description |
 | --- | --- |
 | `api-key.create` | API key created |
-| `api-key.update` | API key updated / enabled / disabled / rotated |
+| `api-key.update` | API key updated / enabled / rotated |
 | `api-key.delete` | API key deleted |
-| `api-key.revoke` | API key revoked |
-| `api-key.rate_limited` | API key exceeded its rate limit |
+| `api-key.revoke` | API key revoked (disabled) |
+
+### API key `data` shape
+
+```json
+{
+  "api_key_id": "key_…",
+  "status": "disabled",
+  "action": "revoked"
+}
+```
+
+`status` and `action` are optional and only set for some transitions.
 
 ## Contact lifecycle
 
@@ -66,12 +106,33 @@ Reloop supports the following **active** event types. Each delivery uses a consi
 | `contact.create` | Contact created |
 | `contact.update` | Contact updated |
 | `contact.delete` | Contact deleted |
-| `contact.subscribed` | Contact subscribed |
-| `contact.unsubscribed` | Contact unsubscribed |
-| `contact.blocked` | Contact blocked |
+| `contact.subscribed` | Contact status set to subscribed |
+| `contact.unsubscribed` | Contact status set to unsubscribed |
+| `contact.blocked` | Contact status set to blocked |
 | `contact.group.create` | Contact group created |
 | `contact.group.update` | Contact group updated |
 | `contact.group.delete` | Contact group deleted |
+
+### Contact `data` shape
+
+```json
+{
+  "id": "con_…",
+  "email": "contact@example.com",
+  "first_name": "Ada",
+  "last_name": "Lovelace",
+  "status": "subscribed"
+}
+```
+
+### Contact group `data` shape
+
+```json
+{
+  "id": "grp_…",
+  "name": "VIP"
+}
+```
 
 ## Envelope
 
@@ -83,6 +144,16 @@ Reloop supports the following **active** event types. Each delivery uses a consi
   "data": { }
 }
 ```
+
+## Coming soon (not subscribable yet)
+
+These event IDs exist in the catalog but are **inactive** until the pipeline emits them:
+
+| Event | Notes |
+| --- | --- |
+| `email.scheduled` | Distinct scheduled-send path not wired yet |
+| `email.suppressed` | Pre-send suppression event not wired yet |
+| `api-key.rate_limited` | Rate-limit publisher not wired yet |
 
 ---
 
