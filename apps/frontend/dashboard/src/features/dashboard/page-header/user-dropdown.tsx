@@ -38,14 +38,15 @@ export function UserDropdown({ user }: { user: HeaderUser | null }) {
 			? (search as { from: string }).from
 			: null;
 
-	const { isOrgAdmin, canManageTeam, isPending } = useOrgPermissions();
+	const { isOrgAdmin, canManageTeam } = useOrgPermissions();
+	// Same RBAC as settings sidebar — members only see Account items.
 	const filteredSettings = useMemo(
 		() =>
 			filterSettingsNavigation(settingsNavigation, {
-				isOrgAdmin: !isPending && isOrgAdmin,
-				canManageTeam: !isPending && canManageTeam,
+				isOrgAdmin,
+				canManageTeam,
 			}),
-		[isOrgAdmin, canManageTeam, isPending],
+		[isOrgAdmin, canManageTeam],
 	);
 	const workspaceSection = filteredSettings.find((s) => s.section === "Workspace");
 	const accountSection = filteredSettings.find((s) => s.section === "Account");

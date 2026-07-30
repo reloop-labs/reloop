@@ -19,45 +19,33 @@ function asOrgRole(role: string): OrgRole | null {
 
 /**
  * Active org member role + simple permission flags for UI gating.
- * Until role resolves, treat as admin-capable so settings pages remain usable.
+ *
+ * Fail-closed while role is unknown: admin-only nav/actions stay hidden so
+ * members never flash Usage / Billing / Teams / Workspace links (sidebar,
+ * profile menu, command palette).
  */
 export function useOrgPermissions() {
 	const { data, isPending, error } = authClient.useActiveMemberRole();
 	const role = data?.role ?? null;
 
 	return useMemo(() => {
-		// While role is loading, allow admin surfaces (matches progressive port).
-		if (isPending && !role) {
-			return {
-				role: null as string | null,
-				isPending: true,
-				error,
-				isOwner: false,
-				isAdmin: false,
-				isMember: false,
-				isOrgAdmin: true,
-				canManageTeam: true,
-				canManageBilling: true,
-				canManageWorkspace: true,
-				canInvite: true,
-			};
-		}
-
 		const isOwner = roleIncludes(role, ["owner"]);
 		const isAdmin = roleIncludes(role, ["admin"]);
 		const isMember = roleIncludes(role, ["member"]);
-		const canManageTeam = isOwner || isAdmin;
-		const canManageBilling = isOwner || isAdmin;
-		const canManageWorkspace = isOwner || isAdmin;
-		const isOrgAdmin = isOwner || isAdmin;
+		// Only true once role is known as owner/admin — never while pending/unknown.
+		const isOrgAdmin = !isPending && (isOwner || isAdmin);
+		const canManageTeam = isOrgAdmin;
+		const canManageBilling = isOrgAdmin;
+		const canManageWorkspace = isOrgAdmin;
 
 		const typedRole = role ? asOrgRole(role) : null;
-		const canInvite = typedRole
-			? authClient.organization.checkRolePermission({
-					role: typedRole,
-					permissions: { invitation: ["create"] },
-				})
-			: isOrgAdmin;
+		const canInvite =
+			!isPending && typedRole
+				? authClient.organization.checkRolePermission({
+						role: typedRole,
+						permissions: { invitation: ["create"] },
+					})
+				: false;
 
 		return {
 			role,

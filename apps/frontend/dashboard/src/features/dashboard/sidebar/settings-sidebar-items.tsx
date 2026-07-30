@@ -36,16 +36,16 @@ export function SettingsSidebarItems({
 			: null;
 	const backHref = fromParam || "/";
 
-	const { isOrgAdmin, canManageTeam, isPending } = useOrgPermissions();
+	const { isOrgAdmin, canManageTeam } = useOrgPermissions();
 
-	// Hide admin-only items until role is known so members never flash them.
+	// Members: hide Usage, Billing, Teams, Workspace (profile menu uses the same filter).
 	const filteredSettingsNavigation = useMemo(
 		() =>
 			filterSettingsNavigation(settingsNavigation, {
-				isOrgAdmin: !isPending && isOrgAdmin,
-				canManageTeam: !isPending && canManageTeam,
+				isOrgAdmin,
+				canManageTeam,
 			}),
-		[isOrgAdmin, canManageTeam, isPending],
+		[isOrgAdmin, canManageTeam],
 	);
 	const flatItems = useMemo(() => {
 		const items: (typeof settingsNavigation)[number]["items"][number][] = [];

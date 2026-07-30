@@ -2,9 +2,14 @@ import { usePathname } from "next/navigation";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
-import { mainNavigation } from "../navigation";
+import { useOrgPermissions } from "#/features/settings/use-org-permissions";
+import {
+	mainNavigation,
+	SETTINGS_ADMIN_HOME,
+	SETTINGS_MEMBER_HOME,
+} from "../navigation";
 import { SidebarNavIcon } from "./sidebar-nav-icon";
 import { SidebarNavLink } from "./sidebar-nav-link";
 
@@ -20,12 +25,24 @@ export function SidebarItems({
 	const mainNavRefs = useRef<HTMLAnchorElement[]>([]);
 	const subNavRefs = useRef<Record<string, HTMLAnchorElement[]>>({});
 	const pathname = usePathname();
+	const { isOrgAdmin } = useOrgPermissions();
 
 	// Router basepath is /dashboard — compare paths without it for active state.
 	const pathWithoutSlug = pathname.replace(/^\/dashboard/, "") || "/";
 
-	const navigation = mainNavigation;
-
+	// Members land on profile; admins land on usage (settings home).
+	const navigation = useMemo(
+		() =>
+			mainNavigation.map((item) =>
+				item.path === "/settings"
+					? {
+							...item,
+							path: isOrgAdmin ? SETTINGS_ADMIN_HOME : SETTINGS_MEMBER_HOME,
+						}
+					: item,
+			),
+		[isOrgAdmin],
+	);
 	const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>(
 		{},
 	);
@@ -46,6 +63,11 @@ export function SidebarItems({
 			return false;
 		}
 		if (item.path === "/") return pathWithoutSlug === "/";
+		// Settings href is role-aware (/settings vs /settings/profile) but should
+		// highlight for any settings route.
+		if (item.path.startsWith("/settings")) {
+			return pathWithoutSlug.startsWith("/settings");
+		}
 		return pathWithoutSlug.startsWith(item.path);
 	});
 
