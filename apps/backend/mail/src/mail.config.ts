@@ -4,6 +4,19 @@ export const mailConfig = {
 		process.env.PG_URL || "postgresql://reloop:reloop123@localhost:5432/reloop",
 	REDIS_URL: process.env.REDIS_URL || "redis://:reloop123@localhost:6379",
 	BASE_URL: process.env.BASE_URL || "https://local.reloop.sh",
+	/**
+	 * Public origin for click redirects + open pixels when the customer has no
+	 * custom tracking domain. Must be the links app host (e.g. link.reloop.sh),
+	 * not the marketing/API host — only the links app serves /redirect/*.
+	 * Local: Caddy routes /redirect on BASE_URL to the links app.
+	 */
+	TRACKING_BASE_URL: (
+		process.env.TRACKING_BASE_URL ||
+		process.env.TRACKING_DOMAIN ||
+		(process.env.NODE_ENV === "production"
+			? `https://link.${(process.env.HOST_DOMAIN || "reloop.sh").replace(/^https?:\/\//, "")}`
+			: process.env.BASE_URL || "https://local.reloop.sh")
+	).replace(/\/+$/, ""),
 	KUMOMTA_HTTP_URL: process.env.KUMOMTA_HTTP_URL || "http://localhost:8020",
 	NODE_ENV: process.env.NODE_ENV || "development",
 	NATS_URL: process.env.NATS_URL || "nats://localhost:4222",

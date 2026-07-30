@@ -1,3 +1,4 @@
+import { getMailTrackOpenUrl } from "@reloop/links/lib/mail-api";
 import { NextResponse } from "next/server";
 
 /**
@@ -16,22 +17,6 @@ const PIXEL_HEADERS = {
 	"Cache-Control": "no-cache, no-store, must-revalidate",
 } as const;
 
-function getMailOpenTrackingUrl(token: string): string {
-	// Prefer a direct internal mail API base (same pattern as preferences → contacts).
-	// e.g. http://localhost:8015/api/mail or https://reloop.sh/api/mail
-	const internal = process.env.INTERNAL_MAIL_API_URL?.replace(/\/+$/, "");
-	if (internal) {
-		return `${internal}/v1/track/open/${token}`;
-	}
-
-	// Fall back to the public origin; reverse proxy routes /api/mail → mail service.
-	// Same approach as /redirect/[token] for click tracking.
-	const siteUrl = (
-		process.env.NEXT_PUBLIC_URL || "https://local.reloop.sh"
-	).replace(/\/+$/, "");
-	return `${siteUrl}/api/mail/v1/track/open/${token}`;
-}
-
 function pixelResponse(body: BodyInit = TRANSPARENT_PIXEL) {
 	return new NextResponse(body, { headers: PIXEL_HEADERS });
 }
@@ -41,8 +26,8 @@ function pixelResponse(body: BodyInit = TRANSPARENT_PIXEL) {
  *
  * Customer tracking hosts (e.g. link.example.com) CNAME to link.reloop.sh,
  * so the pixel URL hits this app — not the mail service. We forward to the
- * real open-tracking endpoint and always return a transparent PNG so email
- * clients never see a broken image.
+ * real open-tracking endpoint on reloop.sh and always return a transparent
+ * PNG so email clients never see a broken image.
  */
 export async function GET(
 	_request: Request,
@@ -55,12 +40,12 @@ export async function GET(
 	}
 
 	try {
-		const res = await fetch(getMailOpenTrackingUrl(token), {
+		const res = await fetch(getMailTrackOpenUrl(token), {
 			method: "GET",
 			cache: "no-store",
-			// Email clients often send image requests without cookies; don't forward auth.
 			headers: {
 				Accept: "image/png,image/*;q=0.8,*/*;q=0.5",
+				"User-Agent": "ReloopLinks/1.0",
 			},
 		});
 

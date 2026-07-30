@@ -18,7 +18,10 @@ export function injectTracking_step5b({
 }): string | undefined {
 	if (!html) return html;
 
-	const baseUrl = mailConfig.BASE_URL.replace(/\/$/, "");
+	// Click/open entrypoints live on the links app (link.reloop.sh), which
+	// proxies to the mail API. Do not use BASE_URL (reloop.sh) — it has no
+	// /redirect route.
+	const baseUrl = mailConfig.TRACKING_BASE_URL.replace(/\/$/, "");
 	let result = html;
 
 	// Always rewrite links to use /redirect/, passing clickTracking flag to helper

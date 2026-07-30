@@ -103,11 +103,12 @@ function utils.inject_tracking(data, email_log_id, tracking_domain, click_tracki
 
   local tracking_base_url
   if tracking_domain and tracking_domain ~= "" then
-    -- Detect protocol from constants.base_url or default to https://
+    -- Custom customer host (e.g. link.example.com → CNAME → link.reloop.sh)
     local protocol = constants.base_url:match("^(https?://)") or "https://"
     tracking_base_url = protocol .. tracking_domain
   else
-    tracking_base_url = constants.base_url:gsub("/+$", "")
+    -- Platform links app (link.reloop.sh), not the API/marketing host
+    tracking_base_url = constants.tracking_base_url
   end
 
   -- 1. Inject pixel before </body> (if open tracking enabled)

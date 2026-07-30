@@ -2,6 +2,18 @@ local constants = {}
 
 constants.env = os.getenv("NODE_ENV") or os.getenv("KUMOMTA_ENV") or "production"
 constants.base_url = os.getenv("BASE_URL") or "https://local.reloop.sh"
+-- Click/open entrypoints when no custom tracking domain: links app host, not API host.
+local tracking_base = os.getenv("TRACKING_BASE_URL") or os.getenv("TRACKING_DOMAIN")
+if not tracking_base or tracking_base == "" then
+  if constants.env == "development" or constants.env == "dev" then
+    tracking_base = constants.base_url
+  else
+    local host_domain = os.getenv("HOST_DOMAIN") or "reloop.sh"
+    host_domain = host_domain:gsub("^https?://", ""):gsub("/+$", "")
+    tracking_base = "https://link." .. host_domain
+  end
+end
+constants.tracking_base_url = tracking_base:gsub("/+$", "")
 constants.tracking_secret = os.getenv("TRACKING_SECRET") or "reloop_tracking_secret_default_123"
 constants.internal_secret = os.getenv("RELOOP_INTERNAL_SECRET") or "reloop_internal_secret_default_123"
 
