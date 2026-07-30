@@ -70,9 +70,8 @@ services:
       MP_ENABLE_CHAOS: "true"
     restart: unless-stopped
 
-  # Optional mail edge (bind ports 25/465/587). Started via: bun docker:up:edge
+  # Outbound SMTP (KumoMTA) — binds 465/587 (+ alt ports)
   smtp:
-    profiles: ["edge"]
     build:
       context: ../apps/backend/smtp
       dockerfile: Dockerfile
@@ -105,9 +104,8 @@ services:
         condition: service_started
     restart: unless-stopped
 
-  # Optional inbound MX (binds host port 25). Started via: bun docker:up:edge
+  # Inbound MX (KumoMTA) — binds host port 25
   inbound:
-    profiles: ["edge"]
     build:
       context: ../apps/backend/inbound
       dockerfile: Dockerfile

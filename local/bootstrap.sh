@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # Reloop local one-command setup.
-# Usage: bun setup [--start] [--force] [--skip-docker] [--skip-hosts] [--skip-tls] [--with-edge]
+# Usage: bun setup [--start] [--force] [--skip-docker] [--skip-hosts] [--skip-tls]
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
@@ -17,7 +17,6 @@ FORCE=0
 SKIP_DOCKER=0
 SKIP_HOSTS=0
 SKIP_TLS=0
-WITH_EDGE=0
 
 for arg in "$@"; do
   case "$arg" in
@@ -26,7 +25,6 @@ for arg in "$@"; do
     --skip-docker) SKIP_DOCKER=1 ;;
     --skip-hosts) SKIP_HOSTS=1 ;;
     --skip-tls) SKIP_TLS=1 ;;
-    --with-edge) WITH_EDGE=1 ;;
     -h|--help)
       cat <<'EOF'
 Reloop local setup
@@ -40,7 +38,6 @@ Options:
   --skip-docker   Skip docker compose up and db:push
   --skip-hosts    Skip /etc/hosts entry
   --skip-tls      Skip mkcert TLS generation (certs must already exist)
-  --with-edge     Also start optional smtp/inbound (ports 25/465/587)
   -h, --help      Show this help
 EOF
       exit 0
@@ -210,26 +207,13 @@ next "Start Docker infrastructure"
 if [ "$SKIP_DOCKER" -eq 1 ]; then
   info "Skipped (--skip-docker)"
 else
-  info "Starting core services (Postgres, Redis, Caddy, Mailpit, …)…"
+  info "Starting Docker services (Postgres, Redis, Caddy, Mailpit, SMTP, inbound, …)…"
   if ! bun docker:up; then
-    fail "Core Docker services failed to start.
-    Free conflicting ports (80, 443, 5432, 6379, 9010, 4222) and re-run.
+    fail "Docker services failed to start.
+    Free conflicting ports (80, 443, 25, 465, 587, 5432, 6379, 9010, 4222) and re-run.
     See: https://reloop.sh/docs/setup/port"
   fi
-  ok "Core containers started"
-
-  # Optional KumoMTA edge — ports 25/465/587 often conflict; never abort setup
-  if [ "$WITH_EDGE" -eq 1 ]; then
-    info "Starting optional smtp/inbound edge (--with-edge)…"
-    if bun docker:up:edge; then
-      ok "Edge mail services started (smtp + inbound)"
-    else
-      warn "Edge mail services (smtp/inbound) did not start — local dashboard e2e still works via Mailpit."
-      warn "Common cause: ports 25, 465, or 587 already in use. Retry later with: bun docker:up:edge"
-    fi
-  else
-    info "Skipped smtp/inbound edge (use --with-edge or bun docker:up:edge when needed)"
-  fi
+  ok "Containers started"
 fi
 
 # ---------------------------------------------------------------------------
@@ -281,8 +265,6 @@ echo "  MinIO:      http://localhost:9001  (reloop / reloop123)"
 echo ""
 echo "  Local OTP for signup/login: 888888"
 echo "  Use https://local.reloop.sh (not localhost) so auth cookies work."
-echo ""
-echo "  Optional edge SMTP/MX: bun docker:up:edge   (or: bun setup --with-edge)"
 echo ""
 
 if [ "$START" -eq 1 ]; then

@@ -267,7 +267,6 @@
 		"setup": "bash local/bootstrap.sh",
 		"env:setup": "bash local/setup.sh",
 		"docker:up": "docker compose -f local/docker-compose.yml up -d",
-		"docker:up:edge": "docker compose -f local/docker-compose.yml --profile edge up -d",
 		"docker:down": "docker compose -f local/docker-compose.yml down",
 		"db:push": "bun run --filter=@reloop/db push",
 		"db:studio": "bun run --filter=@reloop/db studio",
