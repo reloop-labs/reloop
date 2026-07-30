@@ -16,11 +16,38 @@ export const socialProfiles = {
 	x: "https://x.com/reloophq",
 } as const;
 
+function isLocalDevOrigin(url: string): boolean {
+	try {
+		const { hostname } = new URL(url);
+		return (
+			hostname === "localhost" ||
+			hostname === "127.0.0.1" ||
+			hostname === "local.reloop.sh" ||
+			hostname.endsWith(".local.reloop.sh")
+		);
+	} catch {
+		return false;
+	}
+}
+
 /**
- * Public origin for this app (and for same-origin `/api/mail/*` tracking routes).
- * Production: https://link.reloop.sh — custom domains CNAME here.
+ * Public origin for this app (metadataBase, tracking same-origin calls).
+ *
+ * Production always resolves to https://link.reloop.sh unless NEXT_PUBLIC_URL
+ * is an explicit non-local production origin. Local .env values must never
+ * leak into production builds (NEXT_PUBLIC_* is inlined at build time).
  */
 export function getSiteUrl() {
-	const url = process.env.NEXT_PUBLIC_URL || siteUrl;
-	return url.replace(/\/+$/, "");
+	const fromEnv = (process.env.NEXT_PUBLIC_URL || "").replace(/\/+$/, "");
+	const isProd = process.env.NODE_ENV === "production";
+
+	if (fromEnv) {
+		// Ignore local.reloop.sh / localhost if somehow present in a prod build.
+		if (isProd && isLocalDevOrigin(fromEnv)) {
+			return siteUrl;
+		}
+		return fromEnv;
+	}
+
+	return isProd ? siteUrl : "https://local.reloop.sh";
 }

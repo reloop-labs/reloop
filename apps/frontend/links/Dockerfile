@@ -13,12 +13,21 @@ ENV NEXT_TELEMETRY_DISABLED=1
 # Use ARG for build-time variables that can be overridden
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
+# NEXT_PUBLIC_* is inlined at build time — default to production links host.
+# Override at build: --build-arg NEXT_PUBLIC_URL=https://link.reloop.sh
+ARG NEXT_PUBLIC_URL=https://link.reloop.sh
+ENV NEXT_PUBLIC_URL=${NEXT_PUBLIC_URL}
 ARG NEXT_PUBLIC_CHATWOOT_BASE_URL
 ENV NEXT_PUBLIC_CHATWOOT_BASE_URL=${NEXT_PUBLIC_CHATWOOT_BASE_URL}
 ARG NEXT_PUBLIC_CHATWOOT_WEBSITE_TOKEN
 ENV NEXT_PUBLIC_CHATWOOT_WEBSITE_TOKEN=${NEXT_PUBLIC_CHATWOOT_WEBSITE_TOKEN}
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+# Guard: never bake local.reloop.sh into a production image if a .env slipped in
+RUN if echo "${NEXT_PUBLIC_URL}" | grep -qE 'local\.reloop\.sh|localhost'; then \
+	echo "ERROR: NEXT_PUBLIC_URL must not be a local origin in production builds: ${NEXT_PUBLIC_URL}" >&2; \
+	exit 1; \
+	fi
 RUN bun run --filter=fe-links build
 
 # Stage 3: Production server
