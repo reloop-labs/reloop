@@ -72,17 +72,16 @@ html.light {
 /* ── Poster card ───────────────────────────────────────────────── */
 
 .links-poster {
-	border: 2.5px solid var(--retro-line);
+	/* Soft outer frame — dashed + muted so it frames without dominating */
+	border: 1.5px dashed color-mix(in srgb, var(--retro-line) 28%, transparent);
 	border-radius: 1.25rem;
 	background: color-mix(in srgb, var(--retro-surface) 94%, transparent);
 	color: var(--retro-ink);
-	box-shadow: 0 0 0 1px color-mix(in srgb, var(--retro-ink) 5%, transparent);
 	/* Smooth theme flip */
 	transition:
 		background-color 180ms ease,
 		border-color 180ms ease,
-		color 180ms ease,
-		box-shadow 180ms ease;
+		color 180ms ease;
 }
 
 .links-poster-mono {
@@ -95,7 +94,7 @@ html.light {
 /* Browser window */
 
 .links-poster-window {
-	border: 2.5px solid var(--retro-line);
+	border: 1.75px dashed var(--retro-line);
 	background: var(--retro-surface);
 	transition:
 		background-color 180ms ease,
@@ -103,7 +102,16 @@ html.light {
 }
 
 .links-poster-window-chrome {
-	border-bottom: 2px solid var(--retro-line);
+	/* Explicit dash pattern so the divider reads as dashed at thin widths */
+	border-bottom: none;
+	background-image: repeating-linear-gradient(
+		to right,
+		var(--retro-line) 0 5px,
+		transparent 5px 10px
+	);
+	background-size: 100% 1.5px;
+	background-position: bottom;
+	background-repeat: repeat-x;
 }
 
 .links-poster-dot {
@@ -123,16 +131,12 @@ html.light {
 	justify-content: center;
 	min-width: 11.5rem;
 	padding: 0.85rem 1.75rem;
-	border: 2.5px solid var(--retro-line);
+	border: 1.75px dashed var(--retro-line);
 	border-radius: 999px;
 	background: var(--retro-surface);
-	box-shadow:
-		0 3px 0 0 var(--retro-line),
-		inset 0 -2px 0 0 color-mix(in srgb, var(--retro-ink) 8%, transparent);
 	transition:
 		background-color 180ms ease,
-		border-color 180ms ease,
-		box-shadow 180ms ease;
+		border-color 180ms ease;
 }
 
 .links-poster-cta-label {
@@ -156,9 +160,16 @@ html.light {
 /* Footer plate */
 
 .links-poster-footer-rule {
-	height: 0;
+	height: 1.5px;
 	border: 0;
-	border-top: 2px solid var(--retro-line);
+	/* Stronger dash gaps than border-style:dashed at 1–2px */
+	background-image: repeating-linear-gradient(
+		to right,
+		var(--retro-line) 0 5px,
+		transparent 5px 10px
+	);
+	background-size: 100% 1.5px;
+	background-repeat: repeat-x;
 }
 
 .links-poster-about {
@@ -185,7 +196,7 @@ html.light {
 	justify-content: center;
 	width: 2.25rem;
 	height: 2.25rem;
-	border: 1.75px solid var(--retro-line);
+	border: 1.5px dashed var(--retro-line);
 	border-radius: 0.35rem;
 	color: var(--retro-ink);
 	transition:
@@ -209,7 +220,7 @@ html.light {
 	align-items: center;
 	gap: 0.4rem;
 	padding: 0.35rem 0.65rem;
-	border: 1.75px solid var(--retro-line);
+	border: 1.5px dashed var(--retro-line);
 	border-radius: 0.35rem;
 	background: transparent;
 	color: var(--retro-ink);
@@ -247,10 +258,6 @@ html.light {
 	.links-poster-social,
 	.links-poster-theme-toggle {
 		transition: none;
-	}
-
-	.links-poster-cta {
-		box-shadow: 0 2px 0 0 var(--retro-line);
 	}
 
 	.links-poster-social:active,

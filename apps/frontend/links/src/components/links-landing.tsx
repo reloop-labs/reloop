@@ -51,7 +51,7 @@ export function LinksLanding() {
 								<li>
 									OPEN{" "}
 									<span className="inline-block align-middle">
-										<span className="inline-block h-1.5 w-2.5 border border-current" />
+										<span className="inline-block h-1.5 w-2.5 border border-current border-dashed" />
 									</span>
 								</li>
 								<li>EMAIL PREFS</li>
@@ -145,7 +145,10 @@ export function LinksLanding() {
 					<div className="links-poster-footer-rule" />
 					<div className="links-poster-mono mt-2.5 flex items-center justify-between gap-3 text-[9px] tracking-[0.12em] uppercase sm:text-[10px]">
 						<span>link.reloop.sh</span>
-						<span className="min-w-[2.5rem] flex-1 border-current border-t opacity-40" />
+						<span
+							className="links-poster-footer-rule min-w-[2.5rem] flex-1 opacity-40"
+							aria-hidden
+						/>
 						<span className="opacity-70">[ preferences ]</span>
 					</div>
 				</footer>
