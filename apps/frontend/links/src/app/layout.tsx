@@ -69,13 +69,15 @@ export default function RootLayout({
 			className={`${openRunde.variable} overscroll-y-none scroll-auto`}
 		>
 			<body
-				className="min-h-full overscroll-y-none bg-bg-white-0 antialiased"
+				className="min-h-full overscroll-y-none bg-bg-white-0 text-text-strong-950 antialiased"
 				style={{ fontFamily: "var(--font-open-runde)" }}
 			>
 				<ThemeProvider
 					attribute="class"
 					defaultTheme="system"
 					enableSystem
+					// Keep .light / .dark on <html> so --retro-* tokens resolve correctly
+					themes={["light", "dark"]}
 					disableTransitionOnChange
 				>
 					{/* Suspense boundary required with cacheComponents for dynamic

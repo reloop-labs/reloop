@@ -2,6 +2,49 @@
 
 :root {
 	--font-sans: var(--font-open-runde) !important;
+
+	/* Retro poster — light (paper / ink) */
+	--retro-paper: #f3efe6;
+	--retro-ink: #111111;
+	--retro-ink-muted: #44403a;
+	--retro-line: #111111;
+	--retro-surface: #faf7f0;
+	color-scheme: light;
+}
+
+/* Class-based dark (next-themes attribute="class" on <html>) */
+html.dark {
+	--retro-paper: #12110f;
+	--retro-ink: #f0ebe3;
+	--retro-ink-muted: #a39e94;
+	--retro-line: #f0ebe3;
+	--retro-surface: #1a1814;
+	color-scheme: dark;
+}
+
+/* Class-based light when system is dark but user forced light */
+html.light {
+	--retro-paper: #f3efe6;
+	--retro-ink: #111111;
+	--retro-ink-muted: #44403a;
+	--retro-line: #111111;
+	--retro-surface: #faf7f0;
+	color-scheme: light;
+}
+
+/*
+ * Fallback before JS hydrates (no .dark / .light yet):
+ * follow the OS so first paint is not always light.
+ */
+@media (prefers-color-scheme: dark) {
+	html:not(.light):not(.dark) {
+		--retro-paper: #12110f;
+		--retro-ink: #f0ebe3;
+		--retro-ink-muted: #a39e94;
+		--retro-line: #f0ebe3;
+		--retro-surface: #1a1814;
+		color-scheme: dark;
+	}
 }
 
 @custom-variant dark (&:where(.dark, .dark *));
@@ -10,4 +53,208 @@
 .text-outline {
 	-webkit-text-stroke: 1.5px var(--color-gray-300);
 	-webkit-text-fill-color: transparent;
+}
+
+/* ── Grain canvas ──────────────────────────────────────────────── */
+
+.links-retro {
+	color: var(--retro-ink);
+	background-color: var(--retro-paper);
+	background-image: radial-gradient(
+		color-mix(in srgb, var(--retro-ink) 9%, transparent) 0.45px,
+		transparent 0.45px
+	);
+	background-size: 3px 3px;
+	/* Cover body tokens so theme switch is visible full-bleed */
+	min-height: 100dvh;
+}
+
+/* ── Poster card ───────────────────────────────────────────────── */
+
+.links-poster {
+	border: 2.5px solid var(--retro-line);
+	border-radius: 1.25rem;
+	background: color-mix(in srgb, var(--retro-surface) 94%, transparent);
+	color: var(--retro-ink);
+	box-shadow: 0 0 0 1px color-mix(in srgb, var(--retro-ink) 5%, transparent);
+	/* Smooth theme flip */
+	transition:
+		background-color 180ms ease,
+		border-color 180ms ease,
+		color 180ms ease,
+		box-shadow 180ms ease;
+}
+
+.links-poster-mono {
+	font-family: ui-monospace, "Cascadia Code", "SF Mono", Menlo, Consolas,
+		"Liberation Mono", monospace;
+	font-weight: 500;
+	color: var(--retro-ink);
+}
+
+/* Browser window */
+
+.links-poster-window {
+	border: 2.5px solid var(--retro-line);
+	background: var(--retro-surface);
+	transition:
+		background-color 180ms ease,
+		border-color 180ms ease;
+}
+
+.links-poster-window-chrome {
+	border-bottom: 2px solid var(--retro-line);
+}
+
+.links-poster-dot {
+	display: block;
+	width: 7px;
+	height: 7px;
+	border-radius: 999px;
+	border: 1.5px solid var(--retro-line);
+	background: transparent;
+}
+
+/* Big pill CTA */
+
+.links-poster-cta {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 11.5rem;
+	padding: 0.85rem 1.75rem;
+	border: 2.5px solid var(--retro-line);
+	border-radius: 999px;
+	background: var(--retro-surface);
+	box-shadow:
+		0 3px 0 0 var(--retro-line),
+		inset 0 -2px 0 0 color-mix(in srgb, var(--retro-ink) 8%, transparent);
+	transition:
+		background-color 180ms ease,
+		border-color 180ms ease,
+		box-shadow 180ms ease;
+}
+
+.links-poster-cta-label {
+	font-family:
+		ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+	font-size: 1.35rem;
+	font-weight: 700;
+	letter-spacing: -0.02em;
+	line-height: 1;
+	color: var(--retro-ink);
+}
+
+.links-poster-grid-dot {
+	display: block;
+	width: 5px;
+	height: 5px;
+	border-radius: 999px;
+	background: var(--retro-ink);
+}
+
+/* Footer plate */
+
+.links-poster-footer-rule {
+	height: 0;
+	border: 0;
+	border-top: 2px solid var(--retro-line);
+}
+
+.links-poster-about {
+	color: var(--retro-ink-muted);
+	font-family:
+		ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+/* Logo → poster ink (overrides hardcoded Logo grays) */
+.links-poster-logo svg rect {
+	fill: var(--retro-ink) !important;
+}
+
+.links-poster-logo svg rect[opacity="0.45"],
+.links-poster-logo svg rect[opacity="0.4"] {
+	opacity: 0.45 !important;
+	fill: var(--retro-ink) !important;
+}
+
+/* Social chips */
+.links-poster-social {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 2.25rem;
+	height: 2.25rem;
+	border: 1.75px solid var(--retro-line);
+	border-radius: 0.35rem;
+	color: var(--retro-ink);
+	transition:
+		opacity 150ms ease,
+		background-color 150ms ease,
+		border-color 180ms ease,
+		color 180ms ease;
+}
+
+.links-poster-social:hover {
+	background: color-mix(in srgb, var(--retro-ink) 8%, transparent);
+}
+
+.links-poster-social:active {
+	transform: scale(0.97);
+}
+
+/* Theme toggle */
+.links-poster-theme-toggle {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.4rem;
+	padding: 0.35rem 0.65rem;
+	border: 1.75px solid var(--retro-line);
+	border-radius: 0.35rem;
+	background: transparent;
+	color: var(--retro-ink);
+	font-size: 9px;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+	cursor: pointer;
+	transition:
+		background-color 150ms ease,
+		border-color 180ms ease,
+		color 180ms ease;
+}
+
+.links-poster-theme-toggle:hover {
+	background: color-mix(in srgb, var(--retro-ink) 8%, transparent);
+}
+
+.links-poster-theme-toggle:active {
+	transform: scale(0.97);
+}
+
+.links-poster-theme-toggle-icon {
+	font-size: 12px;
+	line-height: 1;
+}
+
+.links-poster-theme-toggle-label {
+	opacity: 0.7;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.links-poster,
+	.links-poster-window,
+	.links-poster-cta,
+	.links-poster-social,
+	.links-poster-theme-toggle {
+		transition: none;
+	}
+
+	.links-poster-cta {
+		box-shadow: 0 2px 0 0 var(--retro-line);
+	}
+
+	.links-poster-social:active,
+	.links-poster-theme-toggle:active {
+		transform: none;
+	}
 }
