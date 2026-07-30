@@ -1,11 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import {
-	defaultOgImage,
-	getSiteUrl,
-	siteDescription,
-	siteName,
-} from "@reloop/links/lib/site";
+import { getSiteUrl, siteDescription, siteName } from "@reloop/links/lib/site";
 import { ThemeProvider } from "@reloop/links/providers/theme-provider";
 import { IconsSprite } from "@reloop/ui/icons-sprite";
 import { RybbitLoader } from "@reloop/ui/rybbit-loader";
@@ -46,14 +41,18 @@ export const metadata: Metadata = {
 		template: `%s | ${siteName}`,
 	},
 	description: siteDescription,
+	// Social cards: opengraph-image.tsx + twitter-image.tsx (poster, matches landing).
 	openGraph: {
 		type: "website",
 		siteName,
-		images: [{ url: defaultOgImage, width: 512, height: 512, alt: siteName }],
+		url: getSiteUrl(),
+		title: siteName,
+		description: siteDescription,
 	},
 	twitter: {
 		card: "summary_large_image",
-		images: [defaultOgImage],
+		title: siteName,
+		description: siteDescription,
 	},
 };
 
