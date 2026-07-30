@@ -1,3 +1,4 @@
+import { caddyRoutes } from "@reloop/domain/routes/caddy/caddy.routes";
 import { createDomainRoute } from "@reloop/domain/routes/domain/create-domain/create-domain.route";
 import { deleteDomainRoute } from "@reloop/domain/routes/domain/delete-domain/delete-domain.route";
 import { getDomainRoute } from "@reloop/domain/routes/domain/get-domain/get-domain.route";
@@ -17,7 +18,9 @@ export const domainRoutes = new Elysia({ prefix: "/v1", name: "DomainRoutes" })
 	.use(getDomainNameserversRoute)
 	.use(verifyDNSRecordRoute)
 	.use(domainConnectRoutes)
+	// Internal machine endpoints (Caddy on-demand TLS, KumoMTA) — no path params.
+	.use(caddyRoutes)
+	.use(kumomtaRoutes)
 	.use(getDomainRoute)
 	.use(updateDomainRoute)
-	.use(deleteDomainRoute)
-	.use(kumomtaRoutes);
+	.use(deleteDomainRoute);

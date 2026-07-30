@@ -51,7 +51,19 @@ const domainService = new Elysia({
 	name: "Domain Service",
 })
 	.use(secureHeadersPlugin({ profile: "api" }))
-	.use(requireUserAgentPlugin())
+	.use(
+		requireUserAgentPlugin({
+			// Caddy on-demand TLS ask must work even if the client omits UA.
+			excludePathSuffixes: [
+				"/health",
+				"/openapi",
+				"/openapi/json",
+				"/swagger",
+				"/agent-card.json",
+				"/caddy/ask",
+			],
+		}),
+	)
 	.use(opentelemetry())
 	.use(
 		openapi({
