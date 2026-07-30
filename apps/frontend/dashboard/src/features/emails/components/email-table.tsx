@@ -59,8 +59,9 @@ const getEmailStatusColorClass = (status: string): string => {
 		case "pending":
 			return "text-warning-base";
 		case "opened":
-		case "clicked":
 			return "text-information-base";
+		case "clicked":
+			return "text-feature-base";
 		default:
 			return "text-text-sub-600";
 	}
@@ -78,9 +79,9 @@ const getEmailStatusIcon = (status: string): string => {
 		case "pending":
 			return "clock";
 		case "opened":
-			return "info-outline";
+			return "eye-outline";
 		case "clicked":
-			return "mouse-pointer-outline";
+			return "cursor-click";
 		default:
 			return "mail-single";
 	}

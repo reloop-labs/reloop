@@ -6,6 +6,7 @@ import {
 	count,
 	desc,
 	eq,
+	exists,
 	gte,
 	ilike,
 	lte,
@@ -16,6 +17,39 @@ import {
 import { useLogger } from "evlog/elysia";
 
 type EmailStatus = (typeof schema.emailStatusEnum.enumValues)[number];
+
+/**
+ * Delivery lifecycle status for the list UI.
+ * Open/click live on email_event only — email_log.status stays delivered.
+ * Prefer engagement (clicked > opened) over the stored delivery status.
+ */
+function deriveDisplayStatus(
+	status: string,
+	eventTypes: Iterable<string>,
+): string {
+	// Terminal failure states are never overridden by engagement.
+	if (status === "failed" || status === "bounced" || status === "spam") {
+		return status;
+	}
+	const types = eventTypes instanceof Set ? eventTypes : new Set(eventTypes);
+	if (types.has("clicked")) return "clicked";
+	if (types.has("opened")) return "opened";
+	return status;
+}
+
+function hasEventType(type: "opened" | "clicked"): SQL {
+	return exists(
+		db
+			.select({ id: schema.emailEvent.id })
+			.from(schema.emailEvent)
+			.where(
+				and(
+					eq(schema.emailEvent.emailLogId, schema.emailLog.id),
+					eq(schema.emailEvent.type, type),
+				),
+			),
+	);
+}
 
 export async function listEmailLogsController({
 	query,
@@ -44,7 +78,12 @@ export async function listEmailLogsController({
 			eq(schema.emailLog.organizationId, organizationId),
 		];
 
-		if (status) {
+		// opened/clicked are event types, not email_log.status enum values.
+		if (status === "opened") {
+			conditions.push(hasEventType("opened"));
+		} else if (status === "clicked") {
+			conditions.push(hasEventType("clicked"));
+		} else if (status) {
 			conditions.push(eq(schema.emailLog.status, status as EmailStatus));
 		}
 
@@ -107,11 +146,17 @@ export async function listEmailLogsController({
 			orderBy: desc(schema.emailLog.createdAt),
 			limit: limit,
 			offset: offset,
+			with: {
+				events: {
+					columns: { type: true },
+				},
+			},
 		});
 
 		log.info("Email logs listed successfully", { count: logs.length, total });
 		// Project only the list-entry shape. Spreading the full row can leave
 		// Date fields that confuse clients and response validation.
+		// Status is the lifecycle display status (opened/clicked when tracked).
 		return {
 			object: "list",
 			data: logs.map((entry) => ({
@@ -119,7 +164,10 @@ export async function listEmailLogsController({
 				subject: entry.subject,
 				fromEmail: entry.fromEmail,
 				toEmails: (entry.toEmails ?? []) as string[],
-				status: entry.status,
+				status: deriveDisplayStatus(
+					entry.status,
+					(entry.events ?? []).map((e) => e.type),
+				),
 				createdAt: entry.createdAt.toISOString(),
 			})),
 			total,

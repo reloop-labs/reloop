@@ -45,14 +45,14 @@ const statusOptions: {
 	{
 		id: "opened",
 		label: "Opened",
-		icon: "info-outline",
+		icon: "eye-outline",
 		colorClass: "text-information-base",
 	},
 	{
 		id: "clicked",
 		label: "Clicked",
-		icon: "info-outline",
-		colorClass: "text-information-base",
+		icon: "cursor-click",
+		colorClass: "text-feature-base",
 	},
 	{
 		id: "pending",
