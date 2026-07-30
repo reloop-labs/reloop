@@ -3,7 +3,11 @@ import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
-import { settingsNavigation } from "../navigation";
+import { useOrgPermissions } from "#/features/settings/use-org-permissions";
+import {
+	filterSettingsNavigation,
+	settingsNavigation,
+} from "../navigation";
 import { SidebarNavIcon } from "./sidebar-nav-icon";
 import { SidebarNavLink } from "./sidebar-nav-link";
 
@@ -32,9 +36,17 @@ export function SettingsSidebarItems({
 			: null;
 	const backHref = fromParam || "/";
 
-	// Until org permissions land, show the full settings tree (admin view).
-	const filteredSettingsNavigation = useMemo(() => settingsNavigation, []);
+	const { isOrgAdmin, canManageTeam, isPending } = useOrgPermissions();
 
+	// Hide admin-only items until role is known so members never flash them.
+	const filteredSettingsNavigation = useMemo(
+		() =>
+			filterSettingsNavigation(settingsNavigation, {
+				isOrgAdmin: !isPending && isOrgAdmin,
+				canManageTeam: !isPending && canManageTeam,
+			}),
+		[isOrgAdmin, canManageTeam, isPending],
+	);
 	const flatItems = useMemo(() => {
 		const items: (typeof settingsNavigation)[number]["items"][number][] = [];
 		for (const section of filteredSettingsNavigation) {

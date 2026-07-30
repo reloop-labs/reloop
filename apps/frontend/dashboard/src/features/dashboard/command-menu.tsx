@@ -1,9 +1,11 @@
 import { useRouter } from "next/navigation";
 import { useSignOut } from "#/features/auth/session-query";
 import {
+	filterSettingsNavigation,
 	mainNavigation,
 	settingsNavigation,
 } from "#/features/dashboard/navigation";
+import { useOrgPermissions } from "#/features/settings/use-org-permissions";
 import { cn } from "@reloop/ui/cn";
 import * as CommandMenu from "@reloop/ui/command";
 import { Icon } from "@reloop/ui/icon";
@@ -86,8 +88,6 @@ function KbdBadge({ label }: { label: string }) {
 	);
 }
 
-const settingsItems = settingsNavigation.flatMap((section) => section.items);
-
 export function CommandMenuGlobal() {
 	const [open, setOpen] = React.useState(false);
 	const [search, setSearch] = React.useState("");
@@ -95,7 +95,15 @@ export function CommandMenuGlobal() {
 	const signOut = useSignOut();
 	const { setTheme, resolvedTheme } = useTheme();
 	const inputRef = React.useRef<HTMLInputElement>(null);
-
+	const { isOrgAdmin, canManageTeam, isPending } = useOrgPermissions();
+	const settingsItems = React.useMemo(
+		() =>
+			filterSettingsNavigation(settingsNavigation, {
+				isOrgAdmin: !isPending && isOrgAdmin,
+				canManageTeam: !isPending && canManageTeam,
+			}).flatMap((section) => section.items),
+		[isOrgAdmin, canManageTeam, isPending],
+	);
 	useHotkeys("mod+k", (e) => {
 		e.preventDefault();
 		setOpen((o) => !o);

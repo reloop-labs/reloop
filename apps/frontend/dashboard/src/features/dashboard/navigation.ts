@@ -169,3 +169,20 @@ export const settingsNavigation: SettingsNavigationSection[] = [
 		],
 	},
 ];
+
+/** Filter settings nav by org role. Empty sections are dropped. */
+export function filterSettingsNavigation(
+	sections: SettingsNavigationSection[],
+	perms: { isOrgAdmin: boolean; canManageTeam: boolean },
+): SettingsNavigationSection[] {
+	return sections
+		.map((section) => ({
+			...section,
+			items: section.items.filter((item) => {
+				if (item.requiresOrgAdmin && !perms.isOrgAdmin) return false;
+				if (item.requiresTeamAdmin && !perms.canManageTeam) return false;
+				return true;
+			}),
+		}))
+		.filter((section) => section.items.length > 0);
+}

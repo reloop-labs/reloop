@@ -11,15 +11,18 @@ import { Skeleton } from "@reloop/ui/skeleton";
 import Spinner from "@reloop/ui/spinner";
 import { useQueryClient } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "motion/react";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import * as v from "valibot";
+import { SETTINGS_MEMBER_HOME } from "#/features/dashboard/navigation";
 import {
 	type Organization,
 	useActiveOrganization,
 } from "#/features/dashboard/page-header/use-active-organization";
+import { useOrgPermissions } from "#/features/settings/use-org-permissions";
 import { queryKeys } from "#/lib/query-keys";
 import { WorkspaceDangerZone } from "./workspace-danger-zone";
 import { WorkspaceHeader } from "./workspace-header";
@@ -244,8 +247,20 @@ function WorkspaceForm({
 }
 
 export function WorkspacePage() {
+	const router = useRouter();
 	const { activeOrganization, isPending, hasInitialized } =
 		useActiveOrganization();
+	const { canManageWorkspace, isPending: rolePending } = useOrgPermissions();
+
+	useEffect(() => {
+		if (!rolePending && !canManageWorkspace) {
+			router.push(SETTINGS_MEMBER_HOME);
+		}
+	}, [canManageWorkspace, rolePending, router]);
+
+	if (rolePending || !canManageWorkspace) {
+		return null;
+	}
 
 	if (isPending || !hasInitialized || !activeOrganization) {
 		return <SettingsSkeleton />;
