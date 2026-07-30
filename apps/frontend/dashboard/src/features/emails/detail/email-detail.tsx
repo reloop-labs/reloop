@@ -288,91 +288,6 @@ function pickDeliveredSmtpRow(rows: SmtpDetailRow[]): SmtpDetailRow | null {
 	return success ?? rows[rows.length - 1] ?? null;
 }
 
-function SmtpResponsesSection({
-	rows,
-	onRowClick,
-}: {
-	rows: SmtpDetailRow[];
-	onRowClick: (row: SmtpDetailRow) => void;
-}) {
-	if (rows.length === 0) return null;
-
-	return (
-		<section>
-			<div className="mb-3">
-				<h3 className="font-medium text-paragraph-sm text-text-strong-950">
-					SMTP responses
-				</h3>
-				<p className="mt-0.5 text-[12px] text-text-sub-600">
-					Replies from the receiving server during delivery attempts. Click a
-					row for full details.
-				</p>
-			</div>
-			<div className="overflow-hidden rounded-xl border border-stroke-soft-100 dark:border-stroke-soft-100/50">
-				<ul className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/40">
-					{rows.map((row) => (
-						<li key={row.id}>
-							<button
-								type="button"
-								onClick={() => onRowClick(row)}
-								className="w-full px-4 py-3 text-left transition-colors hover:bg-bg-weak-50/80 focus-visible:bg-bg-weak-50 focus-visible:outline-none dark:hover:bg-bg-weak-50/30"
-							>
-								<div className="flex flex-wrap items-center gap-2">
-									<span className="rounded-md bg-bg-weak-50 px-2 py-0.5 font-semibold text-[11px] text-text-sub-600 capitalize">
-										{row.kumoType}
-									</span>
-									{row.code != null ? (
-										<span
-											className={cn(
-												"font-mono font-semibold text-[12px]",
-												row.code >= 500
-													? "text-error-base"
-													: row.code >= 400
-														? "text-warning-base"
-														: "text-success-base",
-											)}
-										>
-											{row.code}
-										</span>
-									) : null}
-									<span className="text-[11px] text-text-soft-400 tabular-nums">
-										{new Date(row.createdAt).toLocaleString(undefined, {
-											month: "short",
-											day: "numeric",
-											hour: "2-digit",
-											minute: "2-digit",
-											second: "2-digit",
-										})}
-									</span>
-									<Icon
-										name="chevron-right"
-										className="ml-auto h-3.5 w-3.5 shrink-0 text-text-soft-400"
-									/>
-								</div>
-								{row.recipient ? (
-									<p className="mt-1 truncate font-mono text-[11px] text-text-sub-600">
-										{row.recipient}
-									</p>
-								) : null}
-								{row.classification ? (
-									<p className="mt-1 text-[12px] text-text-sub-600">
-										{row.classification}
-									</p>
-								) : null}
-								{row.content ? (
-									<pre className="mt-1.5 line-clamp-2 whitespace-pre-wrap break-words font-mono text-[12px] text-text-strong-950 leading-relaxed">
-										{row.content}
-									</pre>
-								) : null}
-							</button>
-						</li>
-					))}
-				</ul>
-			</div>
-		</section>
-	);
-}
-
 function formatHtml(html: string): string {
 	if (!html) return "";
 	// Clean up by inserting newlines between tags if they aren't there
@@ -783,10 +698,6 @@ export const EmailDetail = ({ email, isLoading }: EmailDetailProps) => {
 					}
 				/>
 			</section>
-
-			{!isLoading && smtpRows.length > 0 ? (
-				<SmtpResponsesSection rows={smtpRows} onRowClick={openSmtpDetail} />
-			) : null}
 
 			<SmtpResponseDrawer
 				row={smtpDetail}
