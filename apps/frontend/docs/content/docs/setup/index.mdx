@@ -102,7 +102,6 @@ Open `https://local.reloop.sh` (not `localhost`) so auth cookies work across ser
 | `--skip-docker` | Skip Docker and `db:push` |
 | `--skip-hosts` | Skip the `/etc/hosts` entry |
 | `--skip-tls` | Skip cert generation (existing PEMs required) |
-| `--with-edge` | Also start smtp/inbound (needs free `25` / `465` / `587`) |
 
 
 ## Manual setup
@@ -149,13 +148,7 @@ mkcert -cert-file local/certs/local.reloop.sh.pem \
 bun docker:up
 ```
 
-Optional real SMTP/MX edge (often blocked by host mail or privileged port `25`):
-
-```bash
-bun docker:up:edge
-```
-
-Free **80**, **443**, **5432**, and **6379** first. Edge mail also needs **25** / **465** / **587**. See [Port](/docs/setup/port).
+Free **80**, **443**, **5432**, **6379**, **25**, **465**, and **587** first. See [Port](/docs/setup/port).
   </Step>
   <Step title="Initialize database">
 Wait for Postgres, then:
@@ -201,8 +194,7 @@ bun backend:dev    # backends only
 | `bun dev` | All frontend and backend dev servers |
 | `bun frontend:dev` | Frontends only |
 | `bun backend:dev` | Backends only |
-| `bun docker:up` | Core Docker infra |
-| `bun docker:up:edge` | Optional smtp/inbound |
+| `bun docker:up` | Start Docker infra (including SMTP/inbound) |
 | `bun docker:down` | Stop containers |
 | `bun env:setup` | Generate `.env` files |
 | `bun db:push` | Apply Drizzle schema |

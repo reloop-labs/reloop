@@ -7,7 +7,7 @@ description: Set up and run the Reloop outbound SMTP engine locally in Docker.
 Outbound KumoMTA engine — accepts mail from [mail](/docs/setup/backend/mail) and delivers via SMTP (Mailpit locally).
 
 <Tip>
-Run [`bun setup`](/docs/setup) for core Docker first. SMTP is on the **edge** profile — start it with `bun docker:up:edge` or `bun setup --with-edge` (needs free ports `465` / `587`).
+Run [`bun setup`](/docs/setup) or `bun docker:up` from the monorepo root. SMTP needs free ports `465` / `587`.
 </Tip>
 
 
@@ -25,16 +25,10 @@ Run [`bun setup`](/docs/setup) for core Docker first. SMTP is on the **edge** pr
 ## Quick start
 
 ```bash
-bun docker:up:edge
+bun docker:up
 ```
 
-Or with bootstrap:
-
-```bash
-bun setup --with-edge
-```
-
-View captured mail at [http://localhost:8025](http://localhost:8025) (Mailpit, core stack).
+View captured mail at [http://localhost:8025](http://localhost:8025) (Mailpit).
 
 
 ## Configuration
@@ -51,8 +45,8 @@ Key variables in `local/docker-compose.yml`:
 
 | Command | Description |
 | :--- | :--- |
-| `bun docker:up:edge` | Start smtp + inbound |
-| `docker compose -f local/docker-compose.yml --profile edge up -d smtp` | Start SMTP only |
+| `bun docker:up` | Start full Docker stack (includes SMTP) |
+| `docker compose -f local/docker-compose.yml up -d smtp` | Start SMTP only |
 | `docker logs -f reloop-smtp` | Stream logs |
 | `docker compose -f local/docker-compose.yml stop smtp` | Stop container |
 

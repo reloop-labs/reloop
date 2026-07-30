@@ -7,7 +7,7 @@ description: Set up and run the Reloop spam scanning backend (Rspamd) locally in
 Rspamd spam scanner — scores inbound mail for the [inbound](/docs/setup/backend/inbound) MX receiver via HTTP `/checkv2`.
 
 <Tip>
-Run [`bun setup`](/docs/setup) for core Docker first. Spam starts with the core Compose stack (not the edge profile) because inbound depends on it.
+Run [`bun setup`](/docs/setup) or `bun docker:up` from the monorepo root. Spam starts with the Compose stack because inbound depends on it.
 </Tip>
 
 

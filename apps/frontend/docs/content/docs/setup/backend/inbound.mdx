@@ -7,7 +7,7 @@ description: Set up and run the Reloop inbound MX receiver locally in Docker.
 Inbound KumoMTA MX receiver — accepts external mail, scans with [spam](/docs/setup/backend/spam) (Rspamd), forwards to [inbox](/docs/setup/backend/inbox) via NATS.
 
 <Tip>
-Run [`bun setup`](/docs/setup) for core Docker first. Inbound is on the **edge** profile — start it with `bun docker:up:edge` or `bun setup --with-edge` (needs free port `25`).
+Run [`bun setup`](/docs/setup) or `bun docker:up` from the monorepo root. Inbound needs free port `25`.
 </Tip>
 
 
@@ -25,13 +25,7 @@ Run [`bun setup`](/docs/setup) for core Docker first. Inbound is on the **edge**
 ## Quick start
 
 ```bash
-bun docker:up:edge
-```
-
-Or with bootstrap:
-
-```bash
-bun setup --with-edge
+bun docker:up
 ```
 
 Health check: [http://localhost:8030/health](http://localhost:8030/health).
@@ -53,8 +47,8 @@ Key variables in `local/docker-compose.yml`:
 
 | Command | Description |
 | :--- | :--- |
-| `bun docker:up:edge` | Start smtp + inbound |
-| `docker compose -f local/docker-compose.yml --profile edge up -d inbound` | Start inbound only |
+| `bun docker:up` | Start full Docker stack (includes inbound) |
+| `docker compose -f local/docker-compose.yml up -d inbound` | Start inbound only |
 | `docker logs -f reloop-inbound` | Stream logs |
 | `curl http://localhost:8030/health` | Health check |
 

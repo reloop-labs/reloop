@@ -12,14 +12,14 @@ Stop anything already bound before `bun docker:up`.
 
 | Required for | Ports | Service |
 | :--- | :--- | :--- |
-| Core (`bun docker:up`) | `80`, `443` | Caddy |
-| Core | `5432` | PostgreSQL |
-| Core | `6379` | Redis |
-| Core | `9010` | MinIO (API) |
-| Edge only (`bun docker:up:edge`) | `25`, `465`, `587` | SMTP / inbound |
+| `bun docker:up` | `80`, `443` | Caddy |
+| | `5432` | PostgreSQL |
+| | `6379` | Redis |
+| | `9010` | MinIO (API) |
+| | `25`, `465`, `587` | SMTP / inbound |
 
 <Tip>
-Core is enough for dashboard + Mailpit. Edge is only needed for real SMTP/MX.
+Free mail ports (`25`, `465`, `587`) if host mail or another MTA is already bound there.
 </Tip>
 
 
@@ -83,10 +83,10 @@ Core is enough for dashboard + Mailpit. Edge is only needed for real SMTP/MX.
 
 | Service | Port | Notes |
 | :--- | :--- | :--- |
-| Caddy | `80`, `443` | Reverse proxy / TLS (core) |
-| Mailpit | `8025` | [http://localhost:8025](http://localhost:8025) — captured outbound mail (core) |
-| [SMTP](/docs/setup/backend/smtp) (outbound) | `465`, `587`, `2025`, `2465`, `2587`, `8020` | KumoMTA edge — `bun docker:up:edge` |
-| [Inbound](/docs/setup/backend/inbound) (MX) | `25`, `8030` | KumoMTA edge — `bun docker:up:edge` |
+| Caddy | `80`, `443` | Reverse proxy / TLS |
+| Mailpit | `8025` | [http://localhost:8025](http://localhost:8025) — captured outbound mail |
+| [SMTP](/docs/setup/backend/smtp) (outbound) | `465`, `587`, `2025`, `2465`, `2587`, `8020` | KumoMTA |
+| [Inbound](/docs/setup/backend/inbound) (MX) | `25`, `8030` | KumoMTA |
 
 
 ## Infrastructure
