@@ -4,8 +4,12 @@ import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import * as TabMenu from "@reloop/ui/tab-menu-horizontal";
 import { AnimatePresence, motion } from "motion/react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
+import {
+	type SmtpDetailRow,
+	SmtpResponseDrawer,
+} from "./smtp-response-drawer";
 import { EmailTimeline } from "./timeline";
 
 // ─── Error classification ──────────────────────────────────────────────────
@@ -239,12 +243,10 @@ const SMTP_EVENT_TYPES = new Set([
 	"failed",
 ]);
 
-function SmtpResponsesSection({
-	events,
-}: {
-	events: NonNullable<EmailDetailProps["email"]>["events"];
-}) {
-	const rows = (events || [])
+function buildSmtpRows(
+	events: NonNullable<EmailDetailProps["email"]>["events"],
+): SmtpDetailRow[] {
+	return (events || [])
 		.filter((e) => SMTP_EVENT_TYPES.has(e.type))
 		.map((e) => {
 			const meta = (e.metadata || {}) as {
@@ -268,19 +270,31 @@ function SmtpResponsesSection({
 				content,
 				classification: meta.bounceClassification,
 				createdAt: e.createdAt,
-			};
+			} satisfies SmtpDetailRow;
 		})
-		.filter(Boolean) as Array<{
-		id: string;
-		type: string;
-		kumoType: string;
-		recipient?: string;
-		code?: number | null;
-		content?: string | null;
-		classification?: string | null;
-		createdAt: string;
-	}>;
+		.filter(Boolean) as SmtpDetailRow[];
+}
 
+/** Prefer Delivery/delivered rows for the timeline Delivered step. */
+function pickDeliveredSmtpRow(rows: SmtpDetailRow[]): SmtpDetailRow | null {
+	const byKumo = rows.find((r) => r.kumoType.toLowerCase() === "delivery");
+	if (byKumo) return byKumo;
+	const byType = rows.find((r) => r.type === "delivered");
+	if (byType) return byType;
+	// Fall back to last successful 2xx response
+	const success = [...rows]
+		.reverse()
+		.find((r) => r.code != null && r.code >= 200 && r.code < 300);
+	return success ?? rows[rows.length - 1] ?? null;
+}
+
+function SmtpResponsesSection({
+	rows,
+	onRowClick,
+}: {
+	rows: SmtpDetailRow[];
+	onRowClick: (row: SmtpDetailRow) => void;
+}) {
 	if (rows.length === 0) return null;
 
 	return (
@@ -290,56 +304,67 @@ function SmtpResponsesSection({
 					SMTP responses
 				</h3>
 				<p className="mt-0.5 text-[12px] text-text-sub-600">
-					Replies from the receiving server during delivery attempts.
+					Replies from the receiving server during delivery attempts. Click a
+					row for full details.
 				</p>
 			</div>
 			<div className="overflow-hidden rounded-xl border border-stroke-soft-100 dark:border-stroke-soft-100/50">
 				<ul className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/40">
 					{rows.map((row) => (
-						<li key={row.id} className="px-4 py-3">
-							<div className="flex flex-wrap items-center gap-2">
-								<span className="rounded-md bg-bg-weak-50 px-2 py-0.5 font-semibold text-[11px] text-text-sub-600 capitalize">
-									{row.kumoType}
-								</span>
-								{row.code != null ? (
-									<span
-										className={cn(
-											"font-mono font-semibold text-[12px]",
-											row.code >= 500
-												? "text-error-base"
-												: row.code >= 400
-													? "text-warning-base"
-													: "text-success-base",
-										)}
-									>
-										{row.code}
+						<li key={row.id}>
+							<button
+								type="button"
+								onClick={() => onRowClick(row)}
+								className="w-full px-4 py-3 text-left transition-colors hover:bg-bg-weak-50/80 focus-visible:bg-bg-weak-50 focus-visible:outline-none dark:hover:bg-bg-weak-50/30"
+							>
+								<div className="flex flex-wrap items-center gap-2">
+									<span className="rounded-md bg-bg-weak-50 px-2 py-0.5 font-semibold text-[11px] text-text-sub-600 capitalize">
+										{row.kumoType}
 									</span>
+									{row.code != null ? (
+										<span
+											className={cn(
+												"font-mono font-semibold text-[12px]",
+												row.code >= 500
+													? "text-error-base"
+													: row.code >= 400
+														? "text-warning-base"
+														: "text-success-base",
+											)}
+										>
+											{row.code}
+										</span>
+									) : null}
+									<span className="text-[11px] text-text-soft-400 tabular-nums">
+										{new Date(row.createdAt).toLocaleString(undefined, {
+											month: "short",
+											day: "numeric",
+											hour: "2-digit",
+											minute: "2-digit",
+											second: "2-digit",
+										})}
+									</span>
+									<Icon
+										name="chevron-right"
+										className="ml-auto h-3.5 w-3.5 shrink-0 text-text-soft-400"
+									/>
+								</div>
+								{row.recipient ? (
+									<p className="mt-1 truncate font-mono text-[11px] text-text-sub-600">
+										{row.recipient}
+									</p>
 								) : null}
-								<span className="text-[11px] text-text-soft-400 tabular-nums">
-									{new Date(row.createdAt).toLocaleString(undefined, {
-										month: "short",
-										day: "numeric",
-										hour: "2-digit",
-										minute: "2-digit",
-										second: "2-digit",
-									})}
-								</span>
-							</div>
-							{row.recipient ? (
-								<p className="mt-1 truncate font-mono text-[11px] text-text-sub-600">
-									{row.recipient}
-								</p>
-							) : null}
-							{row.classification ? (
-								<p className="mt-1 text-[12px] text-text-sub-600">
-									{row.classification}
-								</p>
-							) : null}
-							{row.content ? (
-								<pre className="mt-1.5 whitespace-pre-wrap break-words font-mono text-[12px] text-text-strong-950 leading-relaxed">
-									{row.content}
-								</pre>
-							) : null}
+								{row.classification ? (
+									<p className="mt-1 text-[12px] text-text-sub-600">
+										{row.classification}
+									</p>
+								) : null}
+								{row.content ? (
+									<pre className="mt-1.5 line-clamp-2 whitespace-pre-wrap break-words font-mono text-[12px] text-text-strong-950 leading-relaxed">
+										{row.content}
+									</pre>
+								) : null}
+							</button>
 						</li>
 					))}
 				</ul>
@@ -587,6 +612,37 @@ export const EmailDetail = ({ email, isLoading }: EmailDetailProps) => {
 	const [activeTab, setActiveTab] = useState<string>("preview");
 	const [hoveredIdx, setHoveredIdx] = useState<number | undefined>(undefined);
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
+	const [smtpDetail, setSmtpDetail] = useState<SmtpDetailRow | null>(null);
+	const [smtpDrawerOpen, setSmtpDrawerOpen] = useState(false);
+
+	const smtpRows = useMemo(
+		() => buildSmtpRows(email?.events),
+		[email?.events],
+	);
+
+	const openSmtpDetail = useCallback((row: SmtpDetailRow) => {
+		setSmtpDetail(row);
+		setSmtpDrawerOpen(true);
+	}, []);
+
+	const openDeliveredDetail = useCallback(() => {
+		const row = pickDeliveredSmtpRow(smtpRows);
+		if (row) {
+			openSmtpDetail(row);
+			return;
+		}
+		// No SMTP payload yet — still open a minimal delivered panel
+		if (email?.deliveredAt) {
+			openSmtpDetail({
+				id: "delivered-summary",
+				type: "delivered",
+				kumoType: "Delivery",
+				content: null,
+				code: 250,
+				createdAt: email.deliveredAt,
+			});
+		}
+	}, [email?.deliveredAt, openSmtpDetail, smtpRows]);
 
 	useEffect(() => {
 		if (email) {
@@ -722,12 +778,21 @@ export const EmailDetail = ({ email, isLoading }: EmailDetailProps) => {
 					failedAt={email?.failedAt}
 					errorMessage={email?.errorMessage}
 					isLoading={isLoading}
+					onDeliveredClick={
+						!isLoading && email?.deliveredAt ? openDeliveredDetail : undefined
+					}
 				/>
 			</section>
 
-			{!isLoading && email?.events && email.events.length > 0 ? (
-				<SmtpResponsesSection events={email.events} />
+			{!isLoading && smtpRows.length > 0 ? (
+				<SmtpResponsesSection rows={smtpRows} onRowClick={openSmtpDetail} />
 			) : null}
+
+			<SmtpResponseDrawer
+				row={smtpDetail}
+				open={smtpDrawerOpen}
+				onOpenChange={setSmtpDrawerOpen}
+			/>
 
 			{/* Content Preview Tabs */}
 			<section>

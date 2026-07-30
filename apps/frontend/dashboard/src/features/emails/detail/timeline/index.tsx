@@ -18,6 +18,7 @@ export function EmailTimeline({
 	failedAt,
 	errorMessage,
 	isLoading,
+	onDeliveredClick,
 }: {
 	events: EmailEvent[];
 	sentAt?: string | null;
@@ -25,6 +26,8 @@ export function EmailTimeline({
 	failedAt?: string | null;
 	errorMessage?: string | null;
 	isLoading?: boolean;
+	/** Open delivered details sidebar when the completed Delivered step is clicked */
+	onDeliveredClick?: () => void;
 }) {
 	if (isLoading) {
 		const loadingSteps = [
@@ -122,7 +125,9 @@ export function EmailTimeline({
 					<Fragment key={index}>
 						{type === "sent" && <SentStep event={event} />}
 						{type === "failed" && <FailedStep event={event} />}
-						{type === "delivered" && <DeliveredStep event={event} />}
+						{type === "delivered" && (
+							<DeliveredStep event={event} onClick={onDeliveredClick} />
+						)}
 						{type === "opened" && <OpenedStep event={event} />}
 						{type === "clicked" && <ClickedStep event={event} />}
 						{!type && <div className="w-10 flex-shrink-0" />}
