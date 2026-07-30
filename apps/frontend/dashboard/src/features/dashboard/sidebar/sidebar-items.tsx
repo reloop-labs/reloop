@@ -62,11 +62,18 @@ export function SidebarItems({
 		if (item.items?.some((sub) => pathWithoutSlug.startsWith(sub.path))) {
 			return false;
 		}
-		if (item.path === "/") return pathWithoutSlug === "/";
 		// Settings href is role-aware (/settings vs /settings/profile) but should
 		// highlight for any settings route.
 		if (item.path.startsWith("/settings")) {
 			return pathWithoutSlug.startsWith("/settings");
+		}
+		// Emails is dashboard home + receive + email detail.
+		if (item.path === "/") {
+			return (
+				pathWithoutSlug === "/" ||
+				pathWithoutSlug.startsWith("/receive") ||
+				pathWithoutSlug.startsWith("/emails")
+			);
 		}
 		return pathWithoutSlug.startsWith(item.path);
 	});

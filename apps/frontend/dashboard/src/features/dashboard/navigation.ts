@@ -11,14 +11,8 @@ export type MainNavigationItem = {
 
 export const mainNavigation: MainNavigationItem[] = [
 	{
-		label: "Overview",
-		path: "/",
-		iconName: "home",
-		section: "Main",
-	},
-	{
 		label: "Emails",
-		path: "/emails",
+		path: "/",
 		iconName: "mail-single",
 		section: "Main",
 	},

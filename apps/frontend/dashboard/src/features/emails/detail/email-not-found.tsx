@@ -9,7 +9,7 @@ export const EmailNotFound: React.FC = () => {
 	const router = useRouter();
 
 	useHotkeys("mod+e", () => {
-		router.push("/emails/sent");
+		router.push("/");
 	});
 
 	return (
@@ -28,7 +28,7 @@ export const EmailNotFound: React.FC = () => {
 			</div>
 			<div className="flex items-center justify-center">
 				<Button.Root
-					onClick={() => router.push("/emails/sent")}
+					onClick={() => router.push("/")}
 					variant="neutral"
 					size="xsmall"
 					className="gap-2 rounded-lg"

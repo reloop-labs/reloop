@@ -1,22 +1,12 @@
-import { usePathname } from "next/navigation";
 import { EmailsCommonUseCasesSidebar } from "./common-use-cases-sidebar";
 import { EmailsTabs } from "./components/emails-tabs";
 import { EmailsListHeader } from "./emails-list-header";
 
+/**
+ * List chrome for the mail home routes only (`/` sent + `/receive`).
+ * Mounted exclusively via the `(mail)` route layout — never on email detail.
+ */
 export function EmailsShell({ children }: { children: React.ReactNode }) {
-	const pathname = usePathname();
-
-	const isReceivedPage = pathname.includes("/emails/received");
-	const isSentPage =
-		pathname.includes("/emails/sent") || pathname.endsWith("/emails");
-	const isDetailPage = !isSentPage && !isReceivedPage;
-
-	if (isDetailPage) {
-		return (
-			<div className="mx-auto max-w-6xl space-y-6 p-6 lg:p-8">{children}</div>
-		);
-	}
-
 	return (
 		<div className="mx-auto max-w-6xl space-y-6 p-6 lg:p-8">
 			<EmailsListHeader />

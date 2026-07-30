@@ -11,13 +11,13 @@ const items = [
 		title: "Sent",
 		value: "sent",
 		iconName: "mail-send" as const,
-		path: "/emails/sent",
+		path: "/",
 	},
 	{
 		title: "Received",
 		value: "received",
 		iconName: "mail-receive" as const,
-		path: "/emails/received",
+		path: "/receive",
 	},
 ] as const;
 
@@ -26,7 +26,8 @@ export function EmailsTabs() {
 	const pathname = usePathname();
 	const [hoveredIdx, setHoveredIdx] = useState<number | undefined>(undefined);
 
-	const isReceivedPage = pathname.includes("/emails/received");
+	const isReceivedPage =
+		pathname === "/receive" || pathname.startsWith("/receive/");
 	const effectiveTabValue = isReceivedPage ? "received" : "sent";
 
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);

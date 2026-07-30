@@ -6,7 +6,8 @@ const DOCS_URL = "https://reloop.sh/docs/learn/emails";
 
 export function EmailsListHeader() {
 	const pathname = usePathname();
-	const isReceived = pathname.includes("/emails/received");
+	const isReceived =
+		pathname === "/receive" || pathname.startsWith("/receive/");
 
 	const title = isReceived ? "Email Received" : "Email Sent";
 	const description = isReceived

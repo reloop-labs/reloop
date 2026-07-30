@@ -30,9 +30,7 @@ export function EmailDetailPage({ emailId }: { emailId: string }) {
 	return (
 		<div className="mx-auto max-w-3xl sm:px-8">
 			<div className="pt-10 pb-8">
-				<AnimatedBackButton
-					onClick={() => router.push("/emails/sent")}
-				/>
+				<AnimatedBackButton onClick={() => router.push("/")} />
 			</div>
 			<EmailDetail email={data} isLoading={isLoading} />
 		</div>

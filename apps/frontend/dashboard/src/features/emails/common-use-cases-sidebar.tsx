@@ -12,7 +12,8 @@ const cardClassName = cn(
 
 export function EmailsCommonUseCasesSidebar() {
 	const pathname = usePathname();
-	const isReceived = pathname.includes("/emails/received");
+	const isReceived =
+		pathname === "/receive" || pathname.startsWith("/receive/");
 
 	const useCases = isReceived
 		? [
