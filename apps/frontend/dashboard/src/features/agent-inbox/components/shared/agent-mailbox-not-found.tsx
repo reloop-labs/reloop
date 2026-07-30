@@ -12,7 +12,7 @@ export const AgentMailboxNotFound = () => (
 			This inbox does not exist or may have been removed.
 		</p>
 		<div className="mt-8">
-			<Link href="/agent-inbox" className="inline-flex h-11 items-center justify-center gap-2.5 rounded-full bg-[#0a0d12] pr-8 pl-6 font-semibold text-[15px] text-white transition-colors hover:bg-[#0a0d12]/90 dark:bg-white dark:text-black dark:hover:bg-white/90">
+			<Link href="/inbox" className="inline-flex h-11 items-center justify-center gap-2.5 rounded-full bg-[#0a0d12] pr-8 pl-6 font-semibold text-[15px] text-white transition-colors hover:bg-[#0a0d12]/90 dark:bg-white dark:text-black dark:hover:bg-white/90">
 				<Icon name="arrow-left" className="size-4" aria-hidden />
 				Back to all addresses
 			</Link>

@@ -29,7 +29,7 @@ export function InboxSummaryCard({ enabled }: { enabled: boolean }) {
 						</span>
 					</div>
 					<Link
-						href="/agent-inbox"
+						href="/inbox"
 						className="inline-flex items-center gap-1 font-medium text-paragraph-sm text-text-sub-600 transition-colors hover:text-text-strong-950"
 					>
 						Open
@@ -90,7 +90,7 @@ export function InboxSummaryCard({ enabled }: { enabled: boolean }) {
 							asChild
 							className="mt-5 rounded-xl"
 						>
-							<Link href="/agent-inbox?modal=create-agent-mailbox">
+							<Link href="/inbox?modal=create-agent-mailbox">
 								Create inbox
 							</Link>
 						</Button.Root>

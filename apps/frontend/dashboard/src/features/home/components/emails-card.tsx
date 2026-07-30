@@ -128,7 +128,7 @@ export function EmailsCard() {
 			: null,
 	);
 
-	const headerHref = activeTab === "sent" ? "/emails" : "/agent-inbox";
+	const headerHref = activeTab === "sent" ? "/emails" : "/inbox";
 
 	const hasSentLogs = emailLogsData?.data && emailLogsData.data.length > 0;
 	const hasReceivedMessages = messagesData && messagesData.length > 0;
@@ -144,7 +144,7 @@ export function EmailsCard() {
 
 				<div className="flex items-center gap-1.5">
 					{activeTab === "received" && (
-						<Link href="/agent-inbox?modal=create-agent-mailbox"
+						<Link href="/inbox?modal=create-agent-mailbox"
 							className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-stroke-soft-100 bg-white text-text-sub-600 transition-colors hover:bg-bg-weak-50/50 hover:text-text-strong-950 dark:border-white/5 dark:bg-white/[0.02] dark:text-white/60">
 							<Plus className="h-3.5 w-3.5" />
 						</Link>
@@ -338,7 +338,7 @@ export function EmailsCard() {
 								asChild
 								className="mt-6 shrink-0 gap-2 rounded-lg border-stroke-soft-100 text-text-sub-600 hover:text-text-strong-950 dark:border-stroke-soft-100/50"
 							>
-								<Link href="/agent-inbox?modal=create-agent-mailbox">
+								<Link href="/inbox?modal=create-agent-mailbox">
 									Set up inbox
 								</Link>
 							</Button.Root>

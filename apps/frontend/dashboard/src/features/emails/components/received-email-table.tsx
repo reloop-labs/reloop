@@ -244,7 +244,7 @@ export const ReceivedEmailTable = ({
 
 	const handleRowClick = (log: ReceivedEmailData) => {
 		// Agent inbox not fully ported — keep path for future inbox route
-		router.push("/agent-inbox");
+		router.push("/inbox");
 	};
 
 	return (
@@ -354,7 +354,7 @@ export const ReceivedEmailTable = ({
 									<ReceivedActionsDropdown
 										log={log}
 										onViewDetails={() => {
-											router.push("/agent-inbox");
+											router.push("/inbox");
 										}}
 										onOpenChange={(open) =>
 											setActiveDropdownId(open ? log.id : null)

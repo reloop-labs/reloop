@@ -1,11 +1,6 @@
-import { pageMetadata } from "#/app/_lib/page-metadata";
-import { AgentInboxRouteClient } from "./client";
+import { redirect } from "next/navigation";
 
-export const metadata = pageMetadata(
-	"Inbox · Reloop",
-	"Manage mailbox addresses and open conversations.",
-);
-
-export default function AgentInboxRoute() {
-	return <AgentInboxRouteClient />;
+/** Legacy path — keep bookmarks working. */
+export default function AgentInboxRedirect() {
+	redirect("/inbox");
 }

@@ -1,7 +1,7 @@
-import { usePathname } from "next/navigation";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { AnimatePresence, motion } from "framer-motion";
+import { usePathname } from "next/navigation";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import { useOrgPermissions } from "#/features/settings/use-org-permissions";
@@ -75,6 +75,10 @@ export function SidebarItems({
 				pathWithoutSlug.startsWith("/emails")
 			);
 		}
+		// Inbox list only — /inbox/$mailboxId is the full-screen mailbox UI.
+		if (item.path === "/inbox") {
+			return pathWithoutSlug === "/inbox";
+		}
 		return pathWithoutSlug.startsWith(item.path);
 	});
 
@@ -137,7 +141,9 @@ export function SidebarItems({
 									{section}
 								</div>
 							))}
-						<SidebarNavLink href={path} ref={(el) => {
+						<SidebarNavLink
+							href={path}
+							ref={(el) => {
 								if (el) mainNavRefs.current[index] = el;
 							}}
 							onPointerEnter={() => setHoveredEl(mainNavRefs.current[index])}
@@ -226,7 +232,10 @@ export function SidebarItems({
 															? pathWithoutSlug === "/settings"
 															: pathWithoutSlug.startsWith(subPath);
 													return (
-														<SidebarNavLink href={subPath} key={subPath} ref={(el) => {
+														<SidebarNavLink
+															href={subPath}
+															key={subPath}
+															ref={(el) => {
 																if (el) {
 																	if (!subNavRefs.current[path]) {
 																		subNavRefs.current[path] = [];
