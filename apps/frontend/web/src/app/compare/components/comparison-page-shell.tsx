@@ -37,13 +37,6 @@ export function ComparisonPageShell({
 					secondaryCta={secondaryCta}
 					icon={brand?.icon}
 				/>
-
-				{/* Divider between hero and page body (e.g. Product UI) */}
-				<div
-					aria-hidden
-					className="relative left-1/2 w-screen -translate-x-1/2 border-stroke-soft-200 border-t dark:border-white/10"
-				/>
-
 				{children}
 			</div>
 		</div>

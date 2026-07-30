@@ -24,7 +24,7 @@ export function CompareHero({
 	icon?: Pick<SimpleIcon, "hex" | "path">;
 }) {
 	return (
-		<div className="relative overflow-hidden bg-transparent px-0 pt-20 sm:pt-24">
+		<div className="relative overflow-hidden border-stroke-soft-200 border-b bg-transparent px-0 pt-20 sm:pt-24 dark:border-white/10">
 			{/* Stage fills the frame; text/icons stay readable via their own max-widths */}
 			<CompareStage>
 				{icon ? (
