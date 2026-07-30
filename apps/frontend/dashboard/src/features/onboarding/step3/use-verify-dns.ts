@@ -1,13 +1,14 @@
 import { useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { parseAsInteger, useQueryState } from "nuqs";
+import { useQueryState } from "nuqs";
 import { useState } from "react";
 import { toast } from "sonner";
 import { queryKeys } from "#/lib/query-keys";
+import { onboardingStepParser } from "../onboarding-step";
 
 export function useVerifyDns(domainId: string) {
 	const queryClient = useQueryClient();
-	const [, setStep] = useQueryState("step", parseAsInteger.withDefault(1));
+	const [, setStep] = useQueryState("step", onboardingStepParser);
 	const [isVerifying, setIsVerifying] = useState(false);
 
 	const verifyDns = async () => {

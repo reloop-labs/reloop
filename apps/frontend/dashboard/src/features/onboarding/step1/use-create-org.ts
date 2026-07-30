@@ -1,10 +1,11 @@
 import { authClient } from "@reloop/auth/client";
 import { useQueryClient } from "@tanstack/react-query";
-import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
+import { parseAsString, useQueryState } from "nuqs";
 import { useState } from "react";
 import { toast } from "sonner";
 import { organizationsQueryOptions } from "#/features/auth/organizations-query";
 import { queryKeys } from "#/lib/query-keys";
+import { onboardingStepParser } from "../onboarding-step";
 
 function randomOrgSlug() {
 	if (typeof crypto !== "undefined" && crypto.randomUUID) {
@@ -16,7 +17,7 @@ function randomOrgSlug() {
 export function useCreateOrg() {
 	const queryClient = useQueryClient();
 	const [isCreating, setIsCreating] = useState(false);
-	const [step, setStep] = useQueryState("step", parseAsInteger.withDefault(1));
+	const [step, setStep] = useQueryState("step", onboardingStepParser);
 	const [name] = useQueryState("name", parseAsString.withDefault(""));
 	const [orgId, setOrgId] = useQueryState(
 		"orgId",

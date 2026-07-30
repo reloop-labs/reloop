@@ -1,14 +1,14 @@
 import NumberFlow from "@number-flow/react";
 import { cn } from "@reloop/ui/cn";
-import { KbdEsc } from "@reloop/ui/kbd-esc";
 import { Logo } from "@reloop/ui/logo";
 
 import type { Variants } from "framer-motion";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { parseAsInteger, useQueryState } from "nuqs";
+import { useQueryState } from "nuqs";
 import type React from "react";
 import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
+import { onboardingStepParser } from "./onboarding-step";
 
 const AnimatedHeight = ({
 	children,
@@ -58,10 +58,6 @@ interface SplitLayoutProps {
 	fullWidth?: boolean;
 	previewSize?: "small" | "medium";
 	maxWidth?: "3xl" | "4xl" | "5xl";
-	/** Called before stepping back — use to clear URL params set in the current step */
-	onBack?: () => void;
-	/** Override the target step when going back (defaults to step - 1) */
-	backStep?: number;
 	/** Whether to vertically center the content (default) or align to the top */
 	verticalAlign?: "center" | "start";
 }
@@ -73,12 +69,9 @@ export function SplitLayout({
 	fullWidth = false,
 	previewSize = "medium",
 	maxWidth = "5xl",
-	onBack: onBackCleanup,
-	backStep,
 	verticalAlign = "center",
 }: SplitLayoutProps) {
-	const [step, setStep] = useQueryState("step", parseAsInteger.withDefault(1));
-	const [hovered, setHovered] = useState(false);
+	const [step] = useQueryState("step", onboardingStepParser);
 	const prefersReducedMotion = useReducedMotion();
 	const isKeyboardRef = useRef(false);
 
@@ -120,18 +113,16 @@ export function SplitLayout({
 	}
 	const direction = directionRef.current;
 
-	const canGoBack = step > 1;
-	const onBack = canGoBack
-		? () => {
-				onBackCleanup?.();
-				setStep(backStep ?? step - 1);
+	// Browser back / Esc use history — step advances push entries (see onboardingStepParser).
+	useHotkeys(
+		"escape",
+		() => {
+			if (step > 1) {
+				window.history.back();
 			}
-		: undefined;
-
-	const easing = [0.23, 1, 0.32, 1] as const;
-	const transition = { duration: 0.2, ease: easing };
-
-	useHotkeys("escape", () => onBack?.(), { enabled: !!onBack });
+		},
+		{ enabled: step > 1 },
+	);
 
 	const stepMatch = stepIndicator.match(/Step (\d+) of (\d+)/);
 	const currentStep = stepMatch ? Number(stepMatch[1]) : null;
@@ -229,82 +220,33 @@ export function SplitLayout({
 									"grid-template-columns 0.28s cubic-bezier(0.23, 1, 0.32, 1)",
 							}}
 						>
-							<div className="flex flex-col gap-4 px-12 pt-10 pb-10">
-								<motion.button
-									type="button"
-									onClick={onBack}
-									disabled={!onBack}
-									onHoverStart={() => onBack && setHovered(true)}
-									onHoverEnd={() => setHovered(false)}
-									className={cn("group text-left", onBack && "cursor-pointer")}
-								>
-									<div className="flex items-center font-medium text-text-soft-400 text-xs transition-colors group-hover:text-text-strong-950">
-										<AnimatePresence>
-											{onBack && (
-												<motion.span
-													initial={{ opacity: 0, width: 0 }}
-													animate={{ opacity: 1, width: "auto" }}
-													exit={{ opacity: 0, width: 0 }}
-													transition={transition}
-													className="mb-px flex items-center overflow-hidden"
-												>
-													<div className="relative flex h-3.5 w-3.5 items-center">
-														<motion.div
-															className="-translate-y-1/2 absolute top-1/2 left-[1.5px] h-[1.5px] rounded-full bg-current"
-															initial={{ width: 0, opacity: 0 }}
-															animate={{
-																width: hovered ? 10 : 0,
-																opacity: hovered ? 1 : 0,
-															}}
-															transition={transition}
-														/>
-														<svg
-															width={6}
-															height={10}
-															viewBox="0 0 6 10"
-															fill="none"
-															className="absolute left-0"
-															aria-hidden="true"
-														>
-															<path
-																d="M5 1L1.5 5L5 9"
-																stroke="currentColor"
-																strokeWidth={1.5}
-																strokeLinecap="round"
-																strokeLinejoin="round"
-															/>
-														</svg>
-													</div>
-												</motion.span>
-											)}
-										</AnimatePresence>
-										{currentStep !== null && totalSteps !== null ? (
-											<span className="mr-2 ml-px inline-flex items-center gap-1">
-												Step
-												<NumberFlow
-													value={currentStep}
-													className="tabular-nums"
-													transformTiming={{
-														duration: shouldSkipMotion ? 0 : 400,
-														easing: "ease-out",
-													}}
-												/>
-												of
-												<NumberFlow
-													value={totalSteps}
-													className="tabular-nums"
-													transformTiming={{
-														duration: shouldSkipMotion ? 0 : 400,
-														easing: "ease-out",
-													}}
-												/>
-											</span>
-										) : (
-											stepIndicator
-										)}
-										{onBack && <KbdEsc />}
-									</div>
-								</motion.button>
+							<div className="flex flex-col gap-1 px-12 pt-10 pb-10">
+								<div className="font-medium text-text-soft-400 text-xs">
+									{currentStep !== null && totalSteps !== null ? (
+										<span className="inline-flex items-center gap-1 px-1.5">
+											Step
+											<NumberFlow
+												value={currentStep}
+												className="tabular-nums"
+												transformTiming={{
+													duration: shouldSkipMotion ? 0 : 400,
+													easing: "ease-out",
+												}}
+											/>
+											of
+											<NumberFlow
+												value={totalSteps}
+												className="tabular-nums"
+												transformTiming={{
+													duration: shouldSkipMotion ? 0 : 400,
+													easing: "ease-out",
+												}}
+											/>
+										</span>
+									) : (
+										stepIndicator
+									)}
+								</div>
 
 								<AnimatedHeight skipAnimation={shouldSkipMotion}>
 									<AnimatePresence

@@ -1,8 +1,9 @@
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
-import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
+import { parseAsString, useQueryState } from "nuqs";
 import { useHotkeys } from "react-hotkeys-hook";
 import { useDomainConnectCallback } from "#/features/domain/hooks/use-domain-connect-callback";
+import { onboardingStepParser } from "../onboarding-step";
 import { ConfigureDnsActions } from "./configure-dns-actions";
 import { DnsAutoConnectBanner } from "./dns-auto-connect-banner";
 import { DnsFeatureSection } from "./dns-feature-section";
@@ -35,7 +36,7 @@ function TwitterVerifiedIcon({ className }: { className?: string }) {
 
 export function ConfigureDnsStep() {
 	const [domainId] = useQueryState("domainId", parseAsString.withDefault(""));
-	const [, setStep] = useQueryState("step", parseAsInteger.withDefault(1));
+	const [, setStep] = useQueryState("step", onboardingStepParser);
 	const { data: domainData, isLoading } = useDomainQuery(domainId);
 	const { handleUpdateDomain } = useUpdateDomain(domainId, domainData);
 	const { isVerifying, verifyDns, skip } = useVerifyDns(domainId);

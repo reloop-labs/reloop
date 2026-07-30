@@ -1,12 +1,13 @@
 import { useRouter } from "next/navigation";
 import { Skeleton } from "@reloop/ui/skeleton";
 
-import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
+import { parseAsString, useQueryState } from "nuqs";
 import type React from "react";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { AuthSessionLoader } from "#/features/auth/auth-session-loader";
 import { useSessionQuery } from "#/features/auth/session-query";
 import { DomainPreview } from "./domain-preview";
+import { onboardingStepParser } from "./onboarding-step";
 import { SidebarPreview } from "./sidebar-preview";
 import { SplitLayout } from "./split-layout";
 import { CreateOrgStep } from "./step1/create-org-step";
@@ -17,7 +18,7 @@ import { GenerateApiKeyStep } from "./step4/generate-api-key-step";
 export function OnboardingPage() {
 	const router = useRouter();
 	const { data: session, isPending } = useSessionQuery();
-	const [step] = useQueryState("step", parseAsInteger.withDefault(1));
+	const [step] = useQueryState("step", onboardingStepParser);
 	const [name] = useQueryState("name", parseAsString.withDefault(""));
 	const [logoUrl] = useQueryState("logoUrl", parseAsString.withDefault(""));
 	const [domain, setDomain] = useQueryState(
@@ -30,7 +31,7 @@ export function OnboardingPage() {
 	);
 	const [, setApiKey] = useQueryState("apiKey", parseAsString.withDefault(""));
 	const [, setLang] = useQueryState("lang", parseAsString.withDefault(""));
-	const [skippedDns, setSkippedDns] = useQueryState(
+	const [, setSkippedDns] = useQueryState(
 		"skippedDns",
 		parseAsString.withDefault(""),
 	);
@@ -41,6 +42,25 @@ export function OnboardingPage() {
 			router.push("/login");
 		}
 	}, [session, isPending, router]);
+
+	// Clear step-local URL state when the user navigates back (browser back / Esc).
+	const prevStepRef = useRef(step);
+	useEffect(() => {
+		const prev = prevStepRef.current;
+		if (step < prev) {
+			if (prev === 2) {
+				void setDomain(null);
+				void setDomainId(null);
+			} else if (prev === 3) {
+				void setDomainId(null);
+			} else if (prev === 4) {
+				void setApiKey(null);
+				void setLang(null);
+				void setSkippedDns(null);
+			}
+		}
+		prevStepRef.current = step;
+	}, [step, setDomain, setDomainId, setApiKey, setLang, setSkippedDns]);
 
 	if (isPending) {
 		return (
@@ -80,23 +100,6 @@ export function OnboardingPage() {
 	if (!session) {
 		return <AuthSessionLoader />;
 	}
-
-	const stepCleanup: Record<number, () => void> = {
-		2: () => {
-			setDomain(null);
-			setDomainId(null);
-		},
-		3: () => {
-			setDomainId(null);
-		},
-		4: () => {
-			setApiKey(null);
-			setLang(null);
-			setSkippedDns(null);
-		},
-	};
-
-	const backStep = step === 4 && skippedDns === "true" ? 2 : undefined;
 
 	const stepsConfig: Record<
 		number,
@@ -151,8 +154,6 @@ export function OnboardingPage() {
 			fullWidth={currentConfig.fullWidth}
 			previewSize="medium"
 			maxWidth={currentConfig.maxWidth}
-			onBack={stepCleanup[step]}
-			backStep={backStep}
 			verticalAlign={currentConfig.verticalAlign}
 		>
 			{currentConfig.component}

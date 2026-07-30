@@ -1,14 +1,15 @@
 import axios from "axios";
-import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
+import { parseAsString, useQueryState } from "nuqs";
 import { useState } from "react";
 import type { UseFormSetError } from "react-hook-form";
 import { toast } from "sonner";
+import { onboardingStepParser } from "../onboarding-step";
 import type { DomainListResponse, DomainResponse } from "./domain-types";
 import type { DomainFormValues } from "./schema";
 
 export function useAddDomain(setError: UseFormSetError<DomainFormValues>) {
 	const [status, setStatus] = useState<"idle" | "loading">("idle");
-	const [step, setStep] = useQueryState("step", parseAsInteger.withDefault(1));
+	const [step, setStep] = useQueryState("step", onboardingStepParser);
 	const [, setDomainId] = useQueryState(
 		"domainId",
 		parseAsString.withDefault(""),
