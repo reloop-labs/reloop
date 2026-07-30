@@ -185,9 +185,11 @@ local function apply_reloop_logic(msg, api_key)
       :header("Content-Type", "application/json")
       :header("User-Agent", "ReloopSmtp/1.0")
     if is_internal then
+      -- Internal auth requires x-user-id + x-organization-id (service principal).
       req = req
         :header("x-internal-secret", constants.internal_secret)
         :header("x-organization-id", org_id)
+        :header("x-user-id", "system")
     else
       req = req:header("x-api-key", api_key)
     end
@@ -237,9 +239,11 @@ local function apply_reloop_logic(msg, api_key)
         :header("Content-Type", "application/json")
         :header("User-Agent", "ReloopSmtp/1.0")
       if is_internal then
+        -- Internal auth requires x-user-id + x-organization-id (service principal).
         req = req
           :header("x-internal-secret", constants.internal_secret)
           :header("x-organization-id", org_id)
+          :header("x-user-id", "system")
       else
         req = req:header("x-api-key", api_key)
       end

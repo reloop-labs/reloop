@@ -80,7 +80,8 @@ type AttachmentItem = {
 };
 
 const UNDO_STORAGE_KEY = "reloop-inbox-undo-compose";
-const UNDO_WINDOW_SECONDS = 15;
+/** Brief window to cancel a scheduled send from the toast (not used for immediate send). */
+const SCHEDULE_UNDO_SECONDS = 15;
 
 const formatBytes = (bytes: number, decimals = 1) => {
 	if (!bytes) return "0 Bytes";
@@ -559,7 +560,8 @@ export const ComposeModal = ({
 						content_type: att.content_type,
 					})),
 				scheduledAt: scheduleAt,
-				undoWindowSeconds: scheduleAt ? 0 : UNDO_WINDOW_SECONDS,
+				// Immediate send — no Gmail-style undo delay.
+				undoWindowSeconds: 0,
 			});
 
 			if (currentDraftId.current) {
@@ -570,7 +572,7 @@ export const ComposeModal = ({
 				}
 			}
 
-			if (result?.pending && result.id) {
+			if (scheduleAt && result?.pending && result.id) {
 				const pendingId = result.id;
 				const restorePayload = {
 					to: data.to,
@@ -581,8 +583,8 @@ export const ComposeModal = ({
 					text: exported.text || textBody,
 				};
 				showUndoSendToast({
-					variant: scheduleAt ? "schedule" : "send",
-					seconds: UNDO_WINDOW_SECONDS,
+					variant: "schedule",
+					seconds: SCHEDULE_UNDO_SECONDS,
 					onUndo: async () => {
 						try {
 							const cancelRes = await fetch(
@@ -604,7 +606,9 @@ export const ComposeModal = ({
 					},
 				});
 			} else {
-				toast.success("Email sent successfully!");
+				toast.success(
+					scheduleAt ? "Email scheduled" : "Email sent successfully!",
+				);
 			}
 
 			void setDraftId(null);

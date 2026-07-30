@@ -1133,7 +1133,7 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 
 				const sendAtMs = data.sendAt
 					? new Date(data.sendAt).getTime()
-					: Date.now() + (input.undoWindowSeconds ?? 15) * 1000;
+					: Date.now() + (input.undoWindowSeconds ?? 0) * 1000;
 				const delayMs = Math.max(sendAtMs - Date.now() + 2_000, 2_000);
 
 				const existing = pendingRefreshTimers.current.get(data.id);

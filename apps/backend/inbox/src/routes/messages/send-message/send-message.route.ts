@@ -56,7 +56,7 @@ export const sendMessageRoute = new Elysia().use(authMiddleware).post(
 				t.Number({
 					minimum: 0,
 					description:
-						"Seconds to wait before sending (default 15 when not scheduled; 0 for immediate)",
+						"Seconds to wait before sending (default 0 = immediate; set >0 for an undo window)",
 				}),
 			),
 		}),

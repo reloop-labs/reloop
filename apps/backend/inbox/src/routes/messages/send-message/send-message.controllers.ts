@@ -32,12 +32,9 @@ export async function sendMessageController(
 	const log = useLogger();
 	log.info(`[INBOX] Sending new message from mailbox ${body.mailboxId}`);
 
+	// Default 0: send immediately unless the client opts into an undo window.
 	const undoWindowSeconds =
-		body.undoWindowSeconds === undefined
-			? body.scheduledAt
-				? 0
-				: 15
-			: body.undoWindowSeconds;
+		body.undoWindowSeconds === undefined ? 0 : body.undoWindowSeconds;
 
 	const shouldDefer = Boolean(body.scheduledAt) || undoWindowSeconds > 0;
 
