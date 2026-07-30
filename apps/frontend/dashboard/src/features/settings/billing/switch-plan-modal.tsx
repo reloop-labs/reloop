@@ -243,7 +243,7 @@ export function SwitchPlanModal({
 							disabled={selectedId === currentPlanId}
 							onClick={handleSwitch}
 						>
-							Switch plan
+							{isEnterprise ? "Contact sales" : "Switch plan"}
 						</FancyButton.Root>
 					</div>
 				</Modal.Footer>
