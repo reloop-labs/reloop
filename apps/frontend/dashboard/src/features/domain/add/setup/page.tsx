@@ -84,28 +84,21 @@ export function DomainSetupPage({ domainId }: { domainId: string }) {
 
 	return (
 		<div className="mx-auto max-w-3xl space-y-6 p-6 lg:p-8">
-			<div className="flex items-start justify-between gap-4 pt-6">
-				<div>
-					{showLoading ? (
-						<>
-							<Skeleton className="h-7 w-48" />
-							<Skeleton className="mt-2 h-4 w-64" />
-						</>
-					) : (
-						<>
-							<h1 className="font-semibold text-title-h6 leading-8">
-								Configure DNS for {domainData?.domain}
-							</h1>
-							<p className="mt-1 text-paragraph-sm text-text-sub-600">
-								Add these records at your DNS provider, then verify.
-							</p>
-						</>
-					)}
-				</div>
-				{domainData && (
-					<div className="shrink-0 pt-0.5">
-						<ForwardDNSRecordsButton domainId={domainData.id} />
-					</div>
+			<div className="pt-6">
+				{showLoading ? (
+					<>
+						<Skeleton className="h-7 w-48" />
+						<Skeleton className="mt-2 h-4 w-64" />
+					</>
+				) : (
+					<>
+						<h1 className="font-semibold text-title-h6 leading-8">
+							Configure DNS for {domainData?.domain}
+						</h1>
+						<p className="mt-1 text-paragraph-sm text-text-sub-600">
+							Add these records at your DNS provider, then verify.
+						</p>
+					</>
 				)}
 			</div>
 
@@ -125,7 +118,7 @@ export function DomainSetupPage({ domainId }: { domainId: string }) {
 				/>
 			)}
 
-			<div className="flex items-center justify-end gap-3 pt-6">
+			<div className="flex items-center justify-between gap-3 pt-6">
 				<Button.Root
 					type="button"
 					variant="neutral"
@@ -134,64 +127,69 @@ export function DomainSetupPage({ domainId }: { domainId: string }) {
 					onClick={() => router.push("/domain")}
 					className="rounded-xl"
 				>
-					Cancel
+					Close
 				</Button.Root>
-				<FancyButton.Root
-					type="button"
-					variant="blue"
-					size="small"
-					onClick={() => void handleVerifyAndNavigate()}
-					disabled={isVerifying || showLoading}
-					className={cn(
-						"min-w-[134px] justify-center overflow-hidden rounded-xl transition-all duration-200",
-						(isVerifying || showLoading) && "pointer-events-none opacity-90",
-					)}
-				>
-					<AnimatePresence mode="popLayout" initial={false}>
-						<motion.span
-							key={isVerifying ? "verifying" : "idle"}
-							transition={{
-								type: "spring",
-								duration: 0.25,
-								bounce: 0,
-							}}
-							initial={{
-								opacity: 0,
-								y: -14,
-							}}
-							animate={{
-								opacity: 1,
-								y: 0,
-							}}
-							exit={{
-								opacity: 0,
-								y: 14,
-							}}
-							className="flex items-center justify-center gap-1.5"
-						>
-							{isVerifying ? (
-								<>
-									<Spinner size={14} color="currentColor" />
-									<span>Verifying...</span>
-								</>
-							) : (
-								<>
-									<span>Verify & finish</span>
-									<span className="inline-flex items-center gap-0.5">
-										<Icon
-											name="command"
-											className="h-3.5 w-3.5 rounded-sm border border-white/20 p-px"
-										/>
-										<Icon
-											name="enter"
-											className="h-3.5 w-3.5 rounded-sm border border-white/20 p-px"
-										/>
-									</span>
-								</>
-							)}
-						</motion.span>
-					</AnimatePresence>
-				</FancyButton.Root>
+				<div className="flex items-center gap-3">
+					{domainData ? (
+						<ForwardDNSRecordsButton domainId={domainData.id} />
+					) : null}
+					<FancyButton.Root
+						type="button"
+						variant="blue"
+						size="small"
+						onClick={() => void handleVerifyAndNavigate()}
+						disabled={isVerifying || showLoading}
+						className={cn(
+							"min-w-[134px] justify-center overflow-hidden rounded-xl transition-all duration-200",
+							(isVerifying || showLoading) && "pointer-events-none opacity-90",
+						)}
+					>
+						<AnimatePresence mode="popLayout" initial={false}>
+							<motion.span
+								key={isVerifying ? "verifying" : "idle"}
+								transition={{
+									type: "spring",
+									duration: 0.25,
+									bounce: 0,
+								}}
+								initial={{
+									opacity: 0,
+									y: -14,
+								}}
+								animate={{
+									opacity: 1,
+									y: 0,
+								}}
+								exit={{
+									opacity: 0,
+									y: 14,
+								}}
+								className="flex items-center justify-center gap-1.5"
+							>
+								{isVerifying ? (
+									<>
+										<Spinner size={14} color="currentColor" />
+										<span>Verifying...</span>
+									</>
+								) : (
+									<>
+										<span>Verify & finish</span>
+										<span className="inline-flex items-center gap-0.5">
+											<Icon
+												name="command"
+												className="h-3.5 w-3.5 rounded-sm border border-white/20 p-px"
+											/>
+											<Icon
+												name="enter"
+												className="h-3.5 w-3.5 rounded-sm border border-white/20 p-px"
+											/>
+										</span>
+									</>
+								)}
+							</motion.span>
+						</AnimatePresence>
+					</FancyButton.Root>
+				</div>
 			</div>
 		</div>
 	);

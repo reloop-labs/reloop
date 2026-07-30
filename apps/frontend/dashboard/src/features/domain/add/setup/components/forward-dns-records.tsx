@@ -161,6 +161,7 @@ export const ForwardDNSRecordsButton = ({
 			</Popover.Trigger>
 			<Popover.Content
 				align="end"
+				side="top"
 				sideOffset={8}
 				showArrow={false}
 				className="w-[300px] overflow-hidden p-0"
