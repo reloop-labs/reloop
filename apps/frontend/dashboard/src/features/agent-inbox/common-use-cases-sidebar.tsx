@@ -12,7 +12,7 @@ const cardClassName = cn(
 export function AgentInboxCommonUseCasesSidebar() {
 	const useCases = [
 		{
-			title: "Get started with Agent Inbox",
+			title: "Get started with Inbox",
 			description:
 				"Turn inbound addresses into programmable endpoints with AI routing and structured extraction.",
 			href: "https://reloop.sh/docs/learn/agent-inbox",
@@ -26,7 +26,7 @@ export function AgentInboxCommonUseCasesSidebar() {
 		{
 			title: "OpenClaw setup guide",
 			description:
-				"Step-by-step guide for wiring an agent inbox into OpenClaw workflows.",
+				"Step-by-step guide for wiring an inbox into OpenClaw workflows.",
 			href: "https://reloop.sh/docs/integrations/ai-tools/openclaw-guide",
 		},
 	];
@@ -38,7 +38,7 @@ export function AgentInboxCommonUseCasesSidebar() {
 					Guides & integrations
 				</h2>
 				<p className="mt-1 text-text-sub-600 text-xs leading-relaxed">
-					Connect agent addresses to workflows, skills, and AI tools.
+					Connect inbox addresses to workflows, skills, and AI tools.
 				</p>
 			</div>
 

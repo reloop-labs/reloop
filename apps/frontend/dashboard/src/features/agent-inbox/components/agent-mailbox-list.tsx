@@ -231,7 +231,7 @@ function FilteredEmptyState({
 }) {
 	const statusLabel = statusFilter ? getStatusLabel(statusFilter) : "";
 	let title = "No matching addresses";
-	let description = "No agent addresses match your current filters.";
+	let description = "No addresses match your current filters.";
 
 	if (searchQuery.trim() !== "" && statusFilter !== null) {
 		title = "No matching addresses";
@@ -239,7 +239,7 @@ function FilteredEmptyState({
 	} else if (searchQuery.trim() !== "") {
 		title = `No addresses found for "${searchQuery}"`;
 		description =
-			"We couldn't find any agent addresses matching your search. Try checking for typos.";
+			"We couldn't find any addresses matching your search. Try checking for typos.";
 	} else if (statusFilter !== null) {
 		title = `No ${statusLabel.toLowerCase()} addresses`;
 		description = `We couldn't find any addresses with the status "${statusLabel}".`;
@@ -383,7 +383,7 @@ export const AgentMailboxList = () => {
 					>
 						<div className="flex items-center justify-between rounded-xl border border-[#B7F1D0] bg-[#E8FAF0] px-4 py-3 text-sm text-[#0F5C34] dark:border-emerald-800/40 dark:bg-emerald-950/30 dark:text-emerald-200">
 							<span>
-								Agent address &quot;
+								Address &quot;
 								<span className="font-semibold">{deletedName}</span>&quot; has
 								been successfully deleted.
 							</span>
@@ -412,7 +412,7 @@ export const AgentMailboxList = () => {
 					>
 						<div className="flex items-center gap-1">
 							<Icon name="inbox" className="h-3 w-3" />
-							<span className="text-xs">Agent Address</span>
+							<span className="text-xs">Address</span>
 						</div>
 						<div className="flex items-center gap-1">
 							<Icon name="activity" className="h-3 w-3" />

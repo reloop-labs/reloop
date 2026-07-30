@@ -27,11 +27,11 @@ export function AgentMailboxListHeader() {
 						className="h-6 w-6 shrink-0 text-text-strong-950"
 					/>
 					<h1 className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
-						Agent Inbox
+						Inbox
 					</h1>
 				</div>
 				<p className="mt-1 text-sm text-text-sub-600">
-					Create dedicated addresses for AI agents and open conversations.
+					Create dedicated addresses and open conversations.
 				</p>
 			</div>
 
@@ -65,7 +65,7 @@ export function AgentMailboxListHeader() {
 					className="gap-1.5 rounded-xl"
 				>
 					<Icon name="plus" className="h-4 w-4" />
-					Add agent address
+					Add address
 				</FancyButton.Root>
 			</div>
 		</div>

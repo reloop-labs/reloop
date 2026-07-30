@@ -329,7 +329,7 @@ export function EmailsCard() {
 								No emails received yet
 							</h4>
 							<p className="mt-2 max-w-[240px] text-text-sub-600 text-xs leading-relaxed dark:text-white/50">
-								Configure your agent inboxes to start receiving incoming emails.
+								Configure your inboxes to start receiving incoming emails.
 							</p>
 							<Button.Root
 								variant="neutral"

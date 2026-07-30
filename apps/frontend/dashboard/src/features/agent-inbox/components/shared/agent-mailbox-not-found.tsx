@@ -6,7 +6,7 @@ export const AgentMailboxNotFound = () => (
 	<div className="flex min-h-[calc(100dvh-8rem)] flex-col items-center justify-center px-4 py-16 text-center">
 		<NotFoundIllustration className="mb-6" />
 		<h1 className="mb-2 font-semibold text-lg text-text-strong-950 dark:text-white">
-			Agent address not found
+			Address not found
 		</h1>
 		<p className="text-sm text-text-sub-600 dark:text-white/50">
 			This inbox does not exist or may have been removed.

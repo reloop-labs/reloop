@@ -375,11 +375,11 @@ export function UsageSection() {
 			</CategoryCard>
 
 			<CategoryCard
-				title="AI Agent Inbox"
-				description="Inboxes for AI agents and humans to receive and route email."
+				title="Inbox"
+				description="Inboxes to receive and route email."
 			>
 				<UsageRow
-					label="Agent inboxes"
+					label="Inboxes"
 					used={0}
 					total={parseCount(currentPlan.comparison.agentInbox)}
 					isUnlimited={currentPlan.comparison.agentInbox === "Custom"}

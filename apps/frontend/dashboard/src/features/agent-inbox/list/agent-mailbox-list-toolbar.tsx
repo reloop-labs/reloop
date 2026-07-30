@@ -106,7 +106,7 @@ export function AgentMailboxListToolbar() {
 					<Input.Wrapper>
 						<Input.Icon as={Icon} name="search" size="small" />
 						<Input.Input
-							placeholder="Search agent addresses..."
+							placeholder="Search addresses..."
 							value={searchQuery}
 							onChange={(e) => {
 								void setSearchQuery(e.target.value);
@@ -128,7 +128,7 @@ export function AgentMailboxListToolbar() {
 					type="button"
 					onClick={() => void refresh()}
 					className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-white-0 text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-stroke-soft-100/40"
-					title="Refresh agent addresses"
+					title="Refresh addresses"
 				>
 					<Icon name="rotate-cw" className="h-4 w-4" />
 				</button>

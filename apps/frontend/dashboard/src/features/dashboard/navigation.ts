@@ -17,7 +17,7 @@ export const mainNavigation: MainNavigationItem[] = [
 		section: "Main",
 	},
 	{
-		label: "Agent Inbox",
+		label: "Inbox",
 		path: "/agent-inbox",
 		iconName: "inbox",
 		section: "Main",

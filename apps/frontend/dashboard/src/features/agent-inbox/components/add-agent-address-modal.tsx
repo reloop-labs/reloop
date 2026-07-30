@@ -28,7 +28,7 @@ const EMAIL_LOCAL_PART_REGEX =
 	/^[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*$/;
 
 const agentAddressSchema = v.object({
-	label: v.pipe(v.string(), v.minLength(1, "Agent name is required")),
+	label: v.pipe(v.string(), v.minLength(1, "Name is required")),
 	localPart: v.pipe(
 		v.string(),
 		v.trim(),
@@ -157,7 +157,7 @@ export const AddAgentAddressModal = ({
 		const email = `${data.localPart}@${data.domain}`;
 		if (mailboxes.some((m) => m.email === email)) {
 			form.setError("localPart", {
-				message: "This agent address already exists",
+				message: "This address already exists",
 			});
 			return;
 		}
@@ -186,7 +186,7 @@ export const AddAgentAddressModal = ({
 				domainId: selectedDomainObj.id,
 				securityLevel: 5,
 			});
-			toast.success(`Agent address ${mailbox.email} created`);
+			toast.success(`Address ${mailbox.email} created`);
 			form.reset();
 			onClose();
 			onCreated?.(mailbox);
@@ -195,7 +195,7 @@ export const AddAgentAddressModal = ({
 			const errMsg =
 				error instanceof Error
 					? error.message
-					: "Failed to create agent address";
+					: "Failed to create address";
 			toast.error(errMsg);
 		} finally {
 			setIsSubmitting(false);
@@ -222,12 +222,12 @@ export const AddAgentAddressModal = ({
 				<div className="p-6">
 					<div className="pr-6">
 						<Modal.Title className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
-							{hasNoDomains ? "Connect a domain" : "Add agent address"}
+							{hasNoDomains ? "Connect a domain" : "Add address"}
 						</Modal.Title>
 						<p className="text-sm text-text-sub-600 leading-relaxed">
 							{hasNoDomains
-								? "Set up a verified domain before creating email addresses for your AI agents."
-								: "Create a dedicated inbox address for an AI agent on one of your domains."}
+								? "Set up a verified domain before creating inbox addresses."
+								: "Create a dedicated inbox address on one of your domains."}
 						</p>
 					</div>
 
@@ -240,7 +240,7 @@ export const AddAgentAddressModal = ({
 								No verified domains yet
 							</h3>
 							<p className="mx-auto mb-5 max-w-75 text-balance font-medium text-[12px] text-text-sub-600">
-								Add and verify a domain to create agent inbox addresses.
+								Add and verify a domain to create inbox addresses.
 							</p>
 							<FancyButton.Root
 								type="button"
@@ -263,7 +263,7 @@ export const AddAgentAddressModal = ({
 						>
 							<div className="space-y-2">
 								<Label.Root htmlFor="agent-label">
-									Agent name
+									Name
 									<Label.Asterisk />
 								</Label.Root>
 								<Input.Root
@@ -273,7 +273,7 @@ export const AddAgentAddressModal = ({
 									<Input.Wrapper>
 										<Input.Input
 											id="agent-label"
-											placeholder="e.g. Support Agent"
+											placeholder="e.g. Support"
 											autoFocus
 											{...form.register("label")}
 											disabled={isSubmitting}
@@ -286,7 +286,7 @@ export const AddAgentAddressModal = ({
 									</p>
 								) : (
 									<p className="text-paragraph-xs text-text-sub-600">
-										A display name so you can tell agents apart in the list.
+										A display name so you can tell addresses apart in the list.
 									</p>
 								)}
 							</div>
@@ -305,7 +305,7 @@ export const AddAgentAddressModal = ({
 										<Input.Wrapper>
 											<Input.Input
 												id="agent-email"
-												placeholder="support-agent"
+												placeholder="support"
 												className="min-w-0"
 												autoComplete="off"
 												spellCheck={false}

@@ -22,7 +22,7 @@ export function InboxSummaryCard({ enabled }: { enabled: boolean }) {
 					<div className="flex items-center gap-2">
 						<Icon name="inbox" className="h-4 w-4 text-text-sub-600" />
 						<h2 className="font-medium text-label-md text-text-strong-950">
-							Agent inboxes
+							Inboxes
 						</h2>
 						<span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-bg-white-0 px-1.5 font-medium text-label-xs text-text-sub-600 dark:bg-white/[0.06]">
 							{count}
@@ -78,10 +78,10 @@ export function InboxSummaryCard({ enabled }: { enabled: boolean }) {
 					<div className="flex h-full min-h-[220px] flex-col items-center justify-center px-6 py-8 text-center">
 						<Icon name="inbox" className="h-6 w-6 text-text-soft-400" />
 						<h3 className="mt-4 font-semibold text-label-md text-text-strong-950">
-							No agent inboxes
+							No inboxes
 						</h3>
 						<p className="mt-1.5 max-w-[260px] text-paragraph-sm text-text-sub-600">
-							Create an inbox address your agents can send and receive from.
+							Create an inbox address to send and receive email.
 						</p>
 						<Button.Root
 							variant="neutral"

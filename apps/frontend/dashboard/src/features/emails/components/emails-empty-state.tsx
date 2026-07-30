@@ -25,7 +25,7 @@ export const EmailsEmptyState = ({
 	const defaultDescription = isFiltered
 		? "Try adjusting your search or filters."
 		: variant === "received"
-			? "Inbound mail to your agent addresses will show up here."
+			? "Inbound mail to your inboxes will show up here."
 			: "Send transactional email via the API or SMTP to see delivery activity here.";
 
 	return (

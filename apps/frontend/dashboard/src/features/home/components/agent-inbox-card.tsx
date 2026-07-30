@@ -261,11 +261,10 @@ export function AgentInboxCard() {
 						className="h-6 w-6 text-text-sub-600 dark:text-white/40"
 					/>
 					<h4 className="mt-4 font-semibold text-[15px] text-text-strong-950 tracking-tight dark:text-white">
-						Give your AI agents a real inbox
+						Create your first inbox
 					</h4>
 					<p className="mt-2 max-w-[300px] text-text-sub-600 text-xs leading-relaxed dark:text-white/50">
-						Create dedicated email addresses your agents can send and receive
-						from, just like a human would
+						Create dedicated email addresses you can send and receive from
 					</p>
 					<Button.Root
 						variant="neutral"

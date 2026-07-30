@@ -42,7 +42,7 @@ export function DeleteAgentMailboxModal({
 	const mailboxToDelete = currentMailbox || targetMailboxRef.current;
 
 	const displayLabel =
-		mailboxToDelete?.label || mailboxToDelete?.email || "Agent address";
+		mailboxToDelete?.label || mailboxToDelete?.email || "Address";
 	const displayEmail = mailboxToDelete?.email || "—";
 
 	const handleDelete = async () => {
@@ -63,8 +63,8 @@ export function DeleteAgentMailboxModal({
 			}, 900);
 		} catch (error) {
 			const message = axios.isAxiosError(error)
-				? error.response?.data?.message || "Failed to delete agent address"
-				: "Failed to delete agent address";
+				? error.response?.data?.message || "Failed to delete address"
+				: "Failed to delete address";
 			toast.error(message);
 			setDeleteState("idle");
 		}
@@ -121,7 +121,7 @@ export function DeleteAgentMailboxModal({
 						const name =
 							targetMailboxRef.current?.label ||
 							targetMailboxRef.current?.email ||
-							"Agent address";
+							"Address";
 						onDeleteSuccess?.(name);
 					}
 					void setDeleteId(null);
@@ -138,17 +138,17 @@ export function DeleteAgentMailboxModal({
 			>
 				<div className="pr-6">
 					<Modal.Title className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
-						Delete agent address
+						Delete address
 					</Modal.Title>
 					<p className="text-sm text-text-sub-600 leading-relaxed">
-						Are you sure you want to delete this agent address? This action
-						cannot be undone.
+						Are you sure you want to delete this address? This action cannot be
+						undone.
 					</p>
 				</div>
 
 				<div className="mt-5 space-y-3 rounded-xl border border-stroke-soft-100 bg-bg-weak-50/50 p-4 dark:border-stroke-soft-100/40">
 					<div>
-						<p className="font-normal text-text-sub-600 text-xs">Agent name</p>
+						<p className="font-normal text-text-sub-600 text-xs">Name</p>
 						<p className="mt-0.5 truncate font-medium text-sm text-text-strong-950">
 							{displayLabel}
 						</p>
@@ -168,8 +168,8 @@ export function DeleteAgentMailboxModal({
 						Warning:
 					</span>{" "}
 					Deleting this address permanently removes the inbox and all of its
-					messages, drafts, and labels. Agents and integrations using this
-					address will stop receiving mail immediately.
+					messages, drafts, and labels. Integrations using this address will stop
+					receiving mail immediately.
 				</div>
 
 				<div className="mt-6 flex items-center justify-end gap-3">

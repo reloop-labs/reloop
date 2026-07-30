@@ -5,7 +5,7 @@ export const instant = false;
 
 export const metadata = pageMetadata(
 	"Inbox · Reloop",
-	"Agent email inbox for conversations and drafts.",
+	"Email inbox for conversations and drafts.",
 );
 
 export default function InboxLayout({

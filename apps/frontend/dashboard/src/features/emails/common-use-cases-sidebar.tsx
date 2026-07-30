@@ -18,9 +18,9 @@ export function EmailsCommonUseCasesSidebar() {
 	const useCases = isReceived
 		? [
 				{
-					title: "Agent inbox for inbound mail",
+					title: "Inbox for inbound mail",
 					description:
-						"Route messages from dedicated agent addresses into conversations and workflows.",
+						"Route messages from dedicated inbox addresses into conversations and workflows.",
 					href: "https://reloop.sh/docs/learn/agent-inbox",
 				},
 				{
@@ -53,7 +53,7 @@ export function EmailsCommonUseCasesSidebar() {
 				</h2>
 				<p className="mt-1 text-text-sub-600 text-xs leading-relaxed">
 					{isReceived
-						? "Wire receiving into agent inboxes and automations."
+						? "Wire receiving into inboxes and automations."
 						: "Ship email and monitor delivery from your apps."}
 				</p>
 			</div>

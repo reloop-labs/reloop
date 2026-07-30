@@ -12,11 +12,11 @@ export const AgentInboxEmptyState = ({
 				<Icon name="inbox" className="h-8 w-8 text-text-sub-600" />
 			</div>
 			<h3 className="mb-2 font-semibold text-text-strong-950 text-xl">
-				Create your first agent address
+				Create your first inbox
 			</h3>
 			<p className="mx-auto mb-6 max-w-75 text-balance font-medium text-[12px] text-text-sub-600">
-				Create a dedicated inbox address for each AI agent so inbound mail is
-				easy to find and route.
+				Create a dedicated inbox address so inbound mail is easy to find and
+				route.
 			</p>
 			<FancyButton.Root
 				type="button"
@@ -26,7 +26,7 @@ export const AgentInboxEmptyState = ({
 				className="gap-1.5 rounded-xl"
 			>
 				<Icon name="plus" className="h-4 w-4" />
-				Add agent address
+				Add address
 			</FancyButton.Root>
 		</div>
 	);

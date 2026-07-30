@@ -28,7 +28,7 @@ const NUMERIC_FEATURES: Array<{
 	suffix: string;
 }> = [
 	{ id: "emails", key: "monthlyEmails", suffix: "emails per month" },
-	{ id: "inboxes", key: "agentInbox", suffix: "agent inboxes" },
+	{ id: "inboxes", key: "agentInbox", suffix: "inboxes" },
 	{ id: "webhooks", key: "webhooks", suffix: "webhooks" },
 	{ id: "domains", key: "customDomains", suffix: "custom domains" },
 	{ id: "attachments", key: "attachmentSize", suffix: "MB attachments" },
