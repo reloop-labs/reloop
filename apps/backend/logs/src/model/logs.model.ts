@@ -268,6 +268,7 @@ export namespace LogsModel {
 		subject: t.String(),
 		textBody: t.Union([t.String(), t.Null()]),
 		htmlBody: t.Union([t.String(), t.Null()]),
+		rawMessage: t.Optional(t.Union([t.String(), t.Null()])),
 		status: t.String(),
 		errorMessage: t.Union([t.String(), t.Null()]),
 		provider: t.String(),

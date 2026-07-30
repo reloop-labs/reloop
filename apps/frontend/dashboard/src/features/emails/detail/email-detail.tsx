@@ -210,6 +210,7 @@ interface EmailDetailProps {
 		subject: string;
 		textBody: string | null;
 		htmlBody: string | null;
+		rawMessage?: string | null;
 		errorMessage: string | null;
 		provider: string;
 		size: number;
@@ -222,11 +223,129 @@ interface EmailDetailProps {
 		events?: {
 			id: string;
 			type: string;
-			metadata: Record<string, string>;
+			metadata: Record<string, unknown> | null;
 			createdAt: string;
 		}[];
 	};
 	isLoading: boolean;
+}
+
+const SMTP_EVENT_TYPES = new Set([
+	"sent",
+	"delivered",
+	"bounced",
+	"deferred",
+	"complaint",
+	"failed",
+]);
+
+function SmtpResponsesSection({
+	events,
+}: {
+	events: NonNullable<EmailDetailProps["email"]>["events"];
+}) {
+	const rows = (events || [])
+		.filter((e) => SMTP_EVENT_TYPES.has(e.type))
+		.map((e) => {
+			const meta = (e.metadata || {}) as {
+				kumoType?: string;
+				recipient?: string;
+				response?: {
+					code?: number | null;
+					content?: string | null;
+				} | null;
+				bounceClassification?: string | null;
+			};
+			const code = meta.response?.code;
+			const content = meta.response?.content;
+			if (code == null && !content) return null;
+			return {
+				id: e.id,
+				type: e.type,
+				kumoType: meta.kumoType || e.type,
+				recipient: meta.recipient,
+				code,
+				content,
+				classification: meta.bounceClassification,
+				createdAt: e.createdAt,
+			};
+		})
+		.filter(Boolean) as Array<{
+		id: string;
+		type: string;
+		kumoType: string;
+		recipient?: string;
+		code?: number | null;
+		content?: string | null;
+		classification?: string | null;
+		createdAt: string;
+	}>;
+
+	if (rows.length === 0) return null;
+
+	return (
+		<section>
+			<div className="mb-3">
+				<h3 className="font-medium text-paragraph-sm text-text-strong-950">
+					SMTP responses
+				</h3>
+				<p className="mt-0.5 text-[12px] text-text-sub-600">
+					Replies from the receiving server during delivery attempts.
+				</p>
+			</div>
+			<div className="overflow-hidden rounded-xl border border-stroke-soft-100 dark:border-stroke-soft-100/50">
+				<ul className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/40">
+					{rows.map((row) => (
+						<li key={row.id} className="px-4 py-3">
+							<div className="flex flex-wrap items-center gap-2">
+								<span className="rounded-md bg-bg-weak-50 px-2 py-0.5 font-semibold text-[11px] text-text-sub-600 capitalize">
+									{row.kumoType}
+								</span>
+								{row.code != null ? (
+									<span
+										className={cn(
+											"font-mono font-semibold text-[12px]",
+											row.code >= 500
+												? "text-error-base"
+												: row.code >= 400
+													? "text-warning-base"
+													: "text-success-base",
+										)}
+									>
+										{row.code}
+									</span>
+								) : null}
+								<span className="text-[11px] text-text-soft-400 tabular-nums">
+									{new Date(row.createdAt).toLocaleString(undefined, {
+										month: "short",
+										day: "numeric",
+										hour: "2-digit",
+										minute: "2-digit",
+										second: "2-digit",
+									})}
+								</span>
+							</div>
+							{row.recipient ? (
+								<p className="mt-1 truncate font-mono text-[11px] text-text-sub-600">
+									{row.recipient}
+								</p>
+							) : null}
+							{row.classification ? (
+								<p className="mt-1 text-[12px] text-text-sub-600">
+									{row.classification}
+								</p>
+							) : null}
+							{row.content ? (
+								<pre className="mt-1.5 whitespace-pre-wrap break-words font-mono text-[12px] text-text-strong-950 leading-relaxed">
+									{row.content}
+								</pre>
+							) : null}
+						</li>
+					))}
+				</ul>
+			</div>
+		</section>
+	);
 }
 
 function formatHtml(html: string): string {
@@ -482,6 +601,7 @@ export const EmailDetail = ({ email, isLoading }: EmailDetailProps) => {
 				{ title: "Preview", value: "preview", icon: "mail-single" as const },
 				{ title: "Plain Text", value: "plain", icon: "file-text" as const },
 				{ title: "HTML Source", value: "html", icon: "code" as const },
+				{ title: "Raw", value: "raw", icon: "file-code" as const },
 			]
 		: [
 				...(email?.htmlBody
@@ -497,6 +617,7 @@ export const EmailDetail = ({ email, isLoading }: EmailDetailProps) => {
 								icon: "file-text" as const,
 							},
 							{ title: "HTML Source", value: "html", icon: "code" as const },
+							{ title: "Raw", value: "raw", icon: "file-code" as const },
 						]
 					: [
 							{
@@ -504,6 +625,7 @@ export const EmailDetail = ({ email, isLoading }: EmailDetailProps) => {
 								value: "plain",
 								icon: "file-text" as const,
 							},
+							{ title: "Raw", value: "raw", icon: "file-code" as const },
 						]),
 			];
 
@@ -602,6 +724,10 @@ export const EmailDetail = ({ email, isLoading }: EmailDetailProps) => {
 					isLoading={isLoading}
 				/>
 			</section>
+
+			{!isLoading && email?.events && email.events.length > 0 ? (
+				<SmtpResponsesSection events={email.events} />
+			) : null}
 
 			{/* Content Preview Tabs */}
 			<section>
@@ -727,6 +853,29 @@ export const EmailDetail = ({ email, isLoading }: EmailDetailProps) => {
 												/>
 											)}
 										</div>
+									</div>
+								</TabMenu.Content>
+
+								<TabMenu.Content value="raw">
+									<div className="relative">
+										{email?.rawMessage ? (
+											<>
+												<div className="absolute top-4 right-4 z-10">
+													<CopyButton
+														value={email.rawMessage}
+														label="Raw message"
+													/>
+												</div>
+												<pre className="max-h-[min(70vh,48rem)] overflow-auto whitespace-pre-wrap break-all bg-bg-weak-50/50 p-6 font-mono text-[12px] text-text-strong-950 leading-relaxed">
+													{email.rawMessage}
+												</pre>
+											</>
+										) : (
+											<p className="p-6 text-paragraph-sm text-text-sub-600">
+												Raw message not available for this send. New messages
+												store the full SMTP MIME after delivery preparation.
+											</p>
+										)}
 									</div>
 								</TabMenu.Content>
 							</>

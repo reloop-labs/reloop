@@ -225,6 +225,42 @@ local function apply_reloop_logic(msg, api_key)
   else
     print("[DKIM] [" .. msg_id .. "] fetch error (pcall failed): " .. tostring(dkim_resp))
   end
+
+  -- Persist final on-the-wire MIME (after tracking + headers + DKIM) for the detail Raw tab.
+  local log_id = msg:get_meta('X-Email-Log-ID') or existing_log_id
+  if log_id and log_id ~= "" then
+    local store_url = constants.kumomta_url .. "/v1/store-raw"
+    local final_raw = msg:get_data()
+    local store_ok, store_resp = pcall(function()
+      local req = client:post(store_url)
+      req = req
+        :header("Content-Type", "application/json")
+        :header("User-Agent", "ReloopSmtp/1.0")
+      if is_internal then
+        req = req
+          :header("x-internal-secret", constants.internal_secret)
+          :header("x-organization-id", org_id)
+      else
+        req = req:header("x-api-key", api_key)
+      end
+      return req
+        :body(kumo.serde.json_encode({
+          emailLogId = log_id,
+          rawMessage = final_raw,
+        }))
+        :send()
+    end)
+    if store_ok then
+      local store_code = store_resp:status_code()
+      if store_code == 200 then
+        print("[STORE-RAW] [" .. msg_id .. "] saved raw for " .. tostring(log_id) .. " (" .. tostring(#final_raw) .. " bytes)")
+      else
+        print("[STORE-RAW] [" .. msg_id .. "] failed status=" .. tostring(store_code) .. " body=" .. tostring(store_resp:text()))
+      end
+    else
+      print("[STORE-RAW] [" .. msg_id .. "] request error: " .. tostring(store_resp))
+    end
+  end
 end
 
 -- AUTH

@@ -43,6 +43,13 @@
       "when": 1785400000001,
       "tag": "0005_drop_domain_dns_record_unique",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1785400000002,
+      "tag": "0006_email_log_raw_message",
+      "breakpoints": true
     }
   ]
 }

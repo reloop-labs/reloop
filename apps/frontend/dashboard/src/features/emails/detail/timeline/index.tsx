@@ -72,9 +72,22 @@ export function EmailTimeline({
 	const isFailed =
 		!!errorMessage ||
 		!!failedAt ||
-		events.some((e) => e.type === "bounced" || e.type === "failed");
+		events.some(
+			(e) =>
+				e.type === "bounced" || e.type === "failed" || e.type === "complaint",
+		);
 
-	if (isFailed && !allEvents.find((e) => e.type === "failed")) {
+	// Timeline Failed step uses type "failed"; map real bounce/complaint events onto it.
+	const bounceEvent = allEvents.find(
+		(e) => e.type === "bounced" || e.type === "complaint" || e.type === "failed",
+	);
+	if (isFailed && bounceEvent && bounceEvent.type !== "failed") {
+		allEvents.push({
+			...bounceEvent,
+			id: `${bounceEvent.id}-as-failed`,
+			type: "failed",
+		});
+	} else if (isFailed && !bounceEvent) {
 		allEvents.push({
 			id: "synth-failed",
 			type: "failed",

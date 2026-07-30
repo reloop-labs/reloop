@@ -125,6 +125,7 @@ export async function logIncomingController({
 			subject: subject,
 			textBody: textBody,
 			htmlBody: htmlBody,
+			rawMessage: body.rawMessage || null,
 			status: "pending",
 			size: body.size || 0,
 			provider: "kumomta",

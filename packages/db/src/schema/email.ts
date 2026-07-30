@@ -75,6 +75,8 @@ export const emailLog = pgTable(
 		subject: text("subject").notNull(),
 		textBody: text("text_body"),
 		htmlBody: text("html_body"),
+		/** Full SMTP MIME blob when available (KumoMTA log-incoming). */
+		rawMessage: text("raw_message"),
 		status: emailStatusEnum("status").notNull().default("pending"),
 		priority: emailPriorityEnum("priority").notNull().default("normal"),
 		errorMessage: text("error_message"),

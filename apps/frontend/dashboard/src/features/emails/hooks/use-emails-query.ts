@@ -116,6 +116,7 @@ export type EmailDetailData = {
 	subject: string;
 	textBody: string | null;
 	htmlBody: string | null;
+	rawMessage?: string | null;
 	status: string;
 	errorMessage: string | null;
 	provider: string;
@@ -129,7 +130,7 @@ export type EmailDetailData = {
 	events?: {
 		id: string;
 		type: string;
-		metadata: Record<string, string>;
+		metadata: Record<string, unknown> | null;
 		createdAt: string;
 	}[];
 };
