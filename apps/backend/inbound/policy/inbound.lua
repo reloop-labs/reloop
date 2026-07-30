@@ -55,6 +55,9 @@ kumo.on('smtp_server_rcpt_to', function(recipient, conn_meta)
     local req = client:post(target_url)
     return req
       :header("Content-Type", "application/json")
+      -- Domain (and other APIs) require a non-empty User-Agent; omit and
+      -- check-recipient returns 400, which we treat as "user unknown".
+      :header("User-Agent", "ReloopInbound/1.0")
       :body(payload_str)
       :send()
   end)
@@ -76,6 +79,11 @@ kumo.on('smtp_server_rcpt_to', function(recipient, conn_meta)
       print("[INBOUND RCPT TO] Rejected (not allowed): " .. recipient_str)
       kumo.reject(550, "5.1.1 User unknown")
     end
+  elseif code >= 500 or code == 400 or code == 429 then
+    -- Infrastructure / policy errors (e.g. missing User-Agent was 400) should
+    -- soft-fail so the sender retries rather than permanently bouncing.
+    print("[INBOUND RCPT TO] Temporary failure (status " .. tostring(code) .. "): " .. recipient_str .. " body=" .. tostring(body_text))
+    kumo.reject(451, "4.3.0 Temporary failure validating recipient")
   else
     print("[INBOUND RCPT TO] Rejected (status " .. tostring(code) .. "): " .. recipient_str)
     kumo.reject(550, "5.1.1 User unknown")

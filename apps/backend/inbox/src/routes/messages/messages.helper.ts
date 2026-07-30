@@ -87,6 +87,8 @@ export async function proxySendToMailService(
 
 	const headers: Record<string, string> = {
 		"Content-Type": "application/json",
+		// Mail service requires a non-empty User-Agent (requireUserAgentPlugin).
+		"User-Agent": "ReloopInbox/1.0",
 	};
 
 	if (apiKey) {

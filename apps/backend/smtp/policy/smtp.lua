@@ -97,6 +97,7 @@ local function apply_reloop_logic(msg, api_key)
       return req
         :header("x-api-key", api_key)
         :header("Content-Type", "application/json")
+        :header("User-Agent", "ReloopSmtp/1.0")
         :body(payload_str)
         :send()
     end)
@@ -180,7 +181,9 @@ local function apply_reloop_logic(msg, api_key)
 
   local dkim_ok, dkim_resp = pcall(function()
     local req = client:post(dkim_target)
-    req = req:header("Content-Type", "application/json")
+    req = req
+      :header("Content-Type", "application/json")
+      :header("User-Agent", "ReloopSmtp/1.0")
     if is_internal then
       req = req
         :header("x-internal-secret", constants.internal_secret)
