@@ -9,6 +9,9 @@ export const workflowConfig = {
 	NATS_URL: process.env.NATS_URL || "nats://localhost:4222",
 	OTEL_EXPORTER_OTLP_ENDPOINT: process.env.OTEL_EXPORTER_OTLP_ENDPOINT || "",
 	OTEL_EXPORTER_OTLP_HEADERS: process.env.OTEL_EXPORTER_OTLP_HEADERS || "",
+	/** Shared secret for service-to-service calls (e.g. mail send). */
+	RELOOP_INTERNAL_SECRET:
+		process.env.RELOOP_INTERNAL_SECRET || "reloop_internal_secret_default_123",
 	/** Optional basic-auth for Workbench (`/api/workflow/jobs`). Empty = open (dev only). */
 	WORKBENCH_USER: process.env.WORKBENCH_USER || "",
 	WORKBENCH_PASS: process.env.WORKBENCH_PASS || "",

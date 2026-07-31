@@ -7,6 +7,7 @@ import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as Switch from "@reloop/ui/switch";
 
+import { useState } from "react";
 import { toast } from "sonner";
 import type { Workflow, WorkflowStatus } from "../workflow-types";
 import { validateWorkflow } from "../workflow-validation";
@@ -15,8 +16,8 @@ interface WorkflowEditorToolbarProps {
 	workflow: Workflow;
 	name: string;
 	onNameChange: (name: string) => void;
-	onStatusChange: (status: WorkflowStatus) => void;
-	onSave: () => void;
+	onStatusChange: (status: WorkflowStatus) => Promise<void> | void;
+	onSave: () => Promise<void> | void;
 }
 
 export const WorkflowEditorToolbar = ({
@@ -29,27 +30,54 @@ export const WorkflowEditorToolbar = ({
 	const router = useRouter();
 	const validation = validateWorkflow(workflow);
 	const isActive = workflow.status === "active";
+	const [busy, setBusy] = useState(false);
 
-	const handleToggleActive = (checked: boolean) => {
+	const handleToggleActive = async (checked: boolean) => {
+		if (busy) return;
 		if (checked) {
 			if (!validation.isValid) {
 				toast.error(validation.warnings[0] ?? "Complete the workflow first");
 				return;
 			}
-			onStatusChange("active");
-			toast.success("Workflow activated (mock)");
+			setBusy(true);
+			try {
+				await onStatusChange("active");
+				toast.success("Workflow activated");
+			} catch (e) {
+				toast.error(e instanceof Error ? e.message : "Failed to activate");
+			} finally {
+				setBusy(false);
+			}
 		} else {
-			onStatusChange("paused");
-			toast.success("Workflow paused");
+			setBusy(true);
+			try {
+				await onStatusChange("paused");
+				toast.success("Workflow paused");
+			} catch (e) {
+				toast.error(e instanceof Error ? e.message : "Failed to pause");
+			} finally {
+				setBusy(false);
+			}
+		}
+	};
+
+	const handleSave = async () => {
+		if (busy) return;
+		setBusy(true);
+		try {
+			await onSave();
+			toast.success("Workflow saved");
+		} catch (e) {
+			toast.error(e instanceof Error ? e.message : "Failed to save");
+		} finally {
+			setBusy(false);
 		}
 	};
 
 	return (
 		<div className="flex shrink-0 flex-col border-stroke-soft-100 border-b dark:border-stroke-soft-100/50">
 			<div className="flex items-center gap-3 px-4 py-3">
-				<AnimatedBackButton
-					onClick={() => router.push("/workflows")}
-				/>
+				<AnimatedBackButton onClick={() => router.push("/workflows")} />
 				<input
 					type="text"
 					value={name}
@@ -68,15 +96,16 @@ export const WorkflowEditorToolbar = ({
 						</span>
 						<Switch.Root
 							checked={isActive}
-							onCheckedChange={handleToggleActive}
-							disabled={!validation.isValid && !isActive}
+							onCheckedChange={(v) => void handleToggleActive(v)}
+							disabled={busy || (!validation.isValid && !isActive)}
 						/>
 					</div>
 					<Button.Root
 						variant="neutral"
 						mode="stroke"
 						size="xsmall"
-						onClick={onSave}
+						onClick={() => void handleSave()}
+						disabled={busy}
 					>
 						Save
 					</Button.Root>

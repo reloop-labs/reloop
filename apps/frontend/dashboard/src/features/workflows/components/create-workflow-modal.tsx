@@ -8,6 +8,7 @@ import * as Modal from "@reloop/ui/modal";
 import * as Textarea from "@reloop/ui/textarea";
 
 import { useState } from "react";
+import { toast } from "sonner";
 import { useWorkflows } from "./workflows-provider";
 
 interface CreateWorkflowModalProps {
@@ -23,6 +24,7 @@ export const CreateWorkflowModal = ({
 	const { createWorkflow } = useWorkflows();
 	const [name, setName] = useState("");
 	const [description, setDescription] = useState("");
+	const [busy, setBusy] = useState(false);
 
 	const handleClose = () => {
 		onOpenChange(false);
@@ -30,16 +32,23 @@ export const CreateWorkflowModal = ({
 		setDescription("");
 	};
 
-	const handleCreate = () => {
+	const handleCreate = async () => {
 		const trimmed = name.trim();
-		if (!trimmed) return;
+		if (!trimmed || busy) return;
 
-		const workflow = createWorkflow({
-			name: trimmed,
-			description: description.trim() || undefined,
-		});
-		handleClose();
-		router.push(`/workflows/${workflow.id}`);
+		setBusy(true);
+		try {
+			const workflow = await createWorkflow({
+				name: trimmed,
+				description: description.trim() || undefined,
+			});
+			handleClose();
+			router.push(`/workflows/${workflow.id}`);
+		} catch (e) {
+			toast.error(e instanceof Error ? e.message : "Failed to create workflow");
+		} finally {
+			setBusy(false);
+		}
 	};
 
 	return (
@@ -59,11 +68,11 @@ export const CreateWorkflowModal = ({
 							<Input.Wrapper>
 								<Input.Input
 									id="workflow-name"
-									placeholder="e.g. Welcome on delivery"
+									placeholder="e.g. Welcome sequence"
 									value={name}
 									onChange={(e) => setName(e.target.value)}
 									onKeyDown={(e) => {
-										if (e.key === "Enter") handleCreate();
+										if (e.key === "Enter") void handleCreate();
 									}}
 								/>
 							</Input.Wrapper>
@@ -89,16 +98,17 @@ export const CreateWorkflowModal = ({
 						mode="stroke"
 						size="small"
 						onClick={handleClose}
+						disabled={busy}
 					>
 						Cancel
 					</Button.Root>
 					<Button.Root
 						variant="neutral"
 						size="small"
-						onClick={handleCreate}
-						disabled={!name.trim()}
+						onClick={() => void handleCreate()}
+						disabled={!name.trim() || busy}
 					>
-						Create & open editor
+						{busy ? "Creating…" : "Create & open editor"}
 					</Button.Root>
 				</Modal.Footer>
 			</Modal.Content>

@@ -1,52 +1,106 @@
+"use client";
+
+import { queryKeys } from "#/lib/query-keys";
+import { useQuery } from "@tanstack/react-query";
 import { useCallback, useEffect, useState } from "react";
-import { toast } from "sonner";
 import { WorkflowEditor } from "./components/workflow-editor";
 import { WorkflowNotFound } from "./components/workflow-not-found";
 import { useWorkflows } from "./components/workflows-provider";
-import type { WorkflowEdge, WorkflowNode } from "./workflow-types";
+import {
+	getAutomation,
+	mapAutomationToWorkflow,
+} from "./hooks/use-automations-api";
+import type {
+	Workflow,
+	WorkflowEdge,
+	WorkflowNode,
+	WorkflowStatus,
+} from "./workflow-types";
 
 export function WorkflowEditorPage({ workflowId }: { workflowId: string }) {
-	const { getWorkflow, updateWorkflow, setWorkflowGraph, isHydrated } =
-		useWorkflows();
-	const workflow = getWorkflow(workflowId);
-	const [localName, setLocalName] = useState("");
+	const {
+		getWorkflow,
+		updateWorkflow,
+		setWorkflowGraph,
+		setWorkflowStatus,
+		isHydrated,
+	} = useWorkflows();
+
+	const cached = getWorkflow(workflowId);
+
+	const detailQuery = useQuery({
+		queryKey: queryKeys.workflows.detail(workflowId),
+		queryFn: async () => {
+			const row = await getAutomation(workflowId);
+			return mapAutomationToWorkflow(row);
+		},
+		enabled: !!workflowId,
+		initialData: cached,
+	});
+
+	const workflow = detailQuery.data ?? cached;
+	const [localName, setLocalName] = useState(workflow?.name ?? "");
+	const [localNodes, setLocalNodes] = useState<WorkflowNode[] | null>(null);
+	const [localEdges, setLocalEdges] = useState<WorkflowEdge[] | null>(null);
 
 	useEffect(() => {
 		if (workflow) {
 			setLocalName(workflow.name);
+			setLocalNodes(null);
+			setLocalEdges(null);
 		}
-	}, [workflow]);
+	}, [workflow?.id, workflow?.updatedAt]);
 
-	const handleNameChange = useCallback(
-		(name: string) => {
-			if (!workflow) return;
-			setLocalName(name);
-			updateWorkflow(workflow.id, { name });
-		},
-		[workflow, updateWorkflow],
-	);
+	const handleNameChange = useCallback((name: string) => {
+		setLocalName(name);
+	}, []);
 
 	const handleGraphChange = useCallback(
 		(nodes: WorkflowNode[], edges: WorkflowEdge[]) => {
-			if (!workflow) return;
-			setWorkflowGraph(workflow.id, nodes, edges);
+			setLocalNodes(nodes);
+			setLocalEdges(edges);
 		},
-		[workflow, setWorkflowGraph],
+		[],
 	);
 
 	const handleStatusChange = useCallback(
-		(status: NonNullable<typeof workflow>["status"]) => {
+		async (status: WorkflowStatus) => {
 			if (!workflow) return;
-			updateWorkflow(workflow.id, { status });
+			// Persist latest graph before activate
+			if (status === "active" && localNodes && localEdges) {
+				await setWorkflowGraph(workflow.id, localNodes, localEdges);
+			} else if (localName !== workflow.name) {
+				await updateWorkflow(workflow.id, { name: localName });
+			}
+			await setWorkflowStatus(workflow.id, status);
+			await detailQuery.refetch();
 		},
-		[workflow, updateWorkflow],
+		[
+			workflow,
+			localNodes,
+			localEdges,
+			localName,
+			setWorkflowGraph,
+			setWorkflowStatus,
+			updateWorkflow,
+			detailQuery,
+		],
 	);
 
-	const handleSave = useCallback(() => {
-		toast.success("Workflow saved");
-	}, []);
+	const handleSave = useCallback(
+		async (nodes: WorkflowNode[], edges: WorkflowEdge[]) => {
+			if (!workflow) return;
+			await updateWorkflow(workflow.id, {
+				name: localName,
+				nodes,
+				edges,
+			});
+			await detailQuery.refetch();
+		},
+		[workflow, localName, updateWorkflow, detailQuery],
+	);
 
-	if (!isHydrated) {
+	if (!isHydrated && !workflow && detailQuery.isLoading) {
 		return (
 			<div className="flex h-[calc(100vh-8rem)] items-center justify-center">
 				<div className="h-8 w-8 animate-pulse rounded-lg bg-bg-weak-50" />
@@ -54,14 +108,29 @@ export function WorkflowEditorPage({ workflowId }: { workflowId: string }) {
 		);
 	}
 
-	if (!workflow) {
+	if (detailQuery.isError && !workflow) {
 		return <WorkflowNotFound />;
 	}
+
+	if (!workflow) {
+		return (
+			<div className="flex h-[calc(100vh-8rem)] items-center justify-center">
+				<div className="h-8 w-8 animate-pulse rounded-lg bg-bg-weak-50" />
+			</div>
+		);
+	}
+
+	const editorWorkflow: Workflow = {
+		...workflow,
+		name: localName,
+		nodes: localNodes ?? workflow.nodes,
+		edges: localEdges ?? workflow.edges,
+	};
 
 	return (
 		<div className="-mx-2 sm:-mx-0 flex h-[calc(100vh-7rem)] min-h-[480px] flex-col">
 			<WorkflowEditor
-				workflow={{ ...workflow, name: localName }}
+				workflow={editorWorkflow}
 				onNameChange={handleNameChange}
 				onGraphChange={handleGraphChange}
 				onStatusChange={handleStatusChange}

@@ -29,6 +29,21 @@ Webhook HTTP delivery runs on a dedicated BullMQ queue `webhook-delivery-queue`
 (job name `deliver-webhook`). See `@reloop/webhook-delivery` for signing,
 SSRF-safe HTTP client, and the fixed retry schedule.
 
+## Product automations (drip / lifecycle sequences)
+
+User-defined multi-step email workflows live in this service under
+`/api/workflow/v1/automations`.
+
+| Piece | Role |
+|--------|------|
+| `automation` tables | Definition, published versions, enrollments, step runs |
+| `automation-queue` | Delayed BullMQ jobs for wait / send steps |
+| NATS subscribers | Enroll on `contact.created` (and related) |
+| Mail send | Internal call to `/api/mail/v1/send` |
+
+**Nodes (v1):** `trigger` → `delay` → `send_email` (linear).
+Enrollments stick to the version published at activate time.
+
 ---
 
 ## 🔗 Resources & Community

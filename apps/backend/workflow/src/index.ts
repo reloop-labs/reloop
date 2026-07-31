@@ -1,4 +1,5 @@
 import "dotenv/config";
+import { automationRoutes } from "@be/workflow/routes/automation/automation.routes";
 import { landing } from "@be/workflow/routes/landing/landing.index";
 import {
 	WORKBENCH_PATH,
@@ -94,6 +95,7 @@ const workflowApi = new Elysia({
 		};
 	})
 	.use(landing)
+	.use(automationRoutes)
 	.onStart(async () => {
 		await loader();
 	});

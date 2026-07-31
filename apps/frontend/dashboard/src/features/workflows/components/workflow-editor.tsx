@@ -15,15 +15,18 @@ import {
 import "@xyflow/react/dist/style.css";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
-import { createSendEmailNode } from "../mock-data";
+import { createDelayNode, createSendEmailNode } from "../mock-data";
 import {
+	isDelayNode,
 	isSendEmailNode,
 	TRIGGER_NODE_ID,
 	type Workflow,
 	type WorkflowEdge,
 	type WorkflowNode,
+	type WorkflowStatus,
 } from "../workflow-types";
 import { NodeConfigPanel } from "./node-config-panel";
+import { DelayNode } from "./nodes/delay-node";
 import { FlowEdge } from "./nodes/flow-edge";
 import { GroupNode } from "./nodes/group-node";
 import { SendEmailNode } from "./nodes/send-email-node";
@@ -34,6 +37,7 @@ import { WorkflowNodePalette } from "./workflow-node-palette";
 const nodeTypes = {
 	trigger: TriggerNode,
 	send_email: SendEmailNode,
+	delay: DelayNode,
 	group: GroupNode,
 };
 
@@ -54,8 +58,8 @@ interface WorkflowEditorProps {
 	workflow: Workflow;
 	onNameChange: (name: string) => void;
 	onGraphChange: (nodes: WorkflowNode[], edges: WorkflowEdge[]) => void;
-	onStatusChange: (status: Workflow["status"]) => void;
-	onSave: () => void;
+	onStatusChange: (status: WorkflowStatus) => Promise<void> | void;
+	onSave: (nodes: WorkflowNode[], edges: WorkflowEdge[]) => Promise<void> | void;
 }
 
 const WorkflowEditorInner = ({
@@ -73,24 +77,29 @@ const WorkflowEditorInner = ({
 	);
 	const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
 	const workflowIdRef = useRef(workflow.id);
+	const skipPersistRef = useRef(false);
 
 	useEffect(() => {
 		if (workflowIdRef.current !== workflow.id) {
 			workflowIdRef.current = workflow.id;
+			skipPersistRef.current = true;
 			setNodes(workflow.nodes);
 			setEdges(workflow.edges);
 			setSelectedNodeId(null);
 		}
 	}, [workflow.id, workflow.nodes, workflow.edges, setNodes, setEdges]);
 
-	const persistGraph = useCallback(() => {
-		onGraphChange(nodes, edges);
-	}, [nodes, edges, onGraphChange]);
-
+	// Debounced local notify (parent may persist on save only or auto-save)
 	useEffect(() => {
-		const timer = setTimeout(persistGraph, 400);
+		if (skipPersistRef.current) {
+			skipPersistRef.current = false;
+			return;
+		}
+		const timer = setTimeout(() => {
+			onGraphChange(nodes, edges);
+		}, 400);
 		return () => clearTimeout(timer);
-	}, [persistGraph]);
+	}, [nodes, edges, onGraphChange]);
 
 	useOnSelectionChange({
 		onChange: ({ nodes: selected }) => {
@@ -126,14 +135,25 @@ const WorkflowEditorInner = ({
 		[setNodes],
 	);
 
+	const appendNode = useCallback(
+		(newNode: WorkflowNode) => {
+			const maxY = Math.max(...nodes.map((n) => n.position.y), 0);
+			newNode.position = { x: COLUMN_X, y: maxY + ROW_GAP };
+			setNodes((nds) => [...nds, newNode]);
+			setSelectedNodeId(newNode.id);
+		},
+		[nodes, setNodes],
+	);
+
 	const handleAddSendEmail = useCallback(() => {
 		const sendCount = nodes.filter(isSendEmailNode).length;
-		const maxY = Math.max(...nodes.map((n) => n.position.y), 0);
-		const newNode = createSendEmailNode(sendCount, 0);
-		newNode.position = { x: COLUMN_X, y: maxY + ROW_GAP };
-		setNodes((nds) => [...nds, newNode]);
-		setSelectedNodeId(newNode.id);
-	}, [nodes, setNodes]);
+		appendNode(createSendEmailNode(sendCount, 0));
+	}, [nodes, appendNode]);
+
+	const handleAddDelay = useCallback(() => {
+		const delayCount = nodes.filter(isDelayNode).length;
+		appendNode(createDelayNode(delayCount, 0));
+	}, [nodes, appendNode]);
 
 	const handleDeleteNode = useCallback(
 		(nodeId: string) => {
@@ -147,22 +167,23 @@ const WorkflowEditorInner = ({
 		[setNodes, setEdges, selectedNodeId],
 	);
 
-	useHotkeys("backspace", () => {
-		if (!selectedNodeId || selectedNodeId === TRIGGER_NODE_ID) return;
-		const active = document.activeElement;
-		if (
-			active instanceof HTMLInputElement ||
-			active instanceof HTMLTextAreaElement
-		) {
-			return;
-		}
-		handleDeleteNode(selectedNodeId);
-	}, [selectedNodeId, handleDeleteNode]);
+	useHotkeys(
+		"backspace",
+		() => {
+			if (!selectedNodeId || selectedNodeId === TRIGGER_NODE_ID) return;
+			const active = document.activeElement;
+			if (
+				active instanceof HTMLInputElement ||
+				active instanceof HTMLTextAreaElement
+			) {
+				return;
+			}
+			handleDeleteNode(selectedNodeId);
+		},
+		[selectedNodeId, handleDeleteNode],
+	);
 
-	const handleSave = () => {
-		onGraphChange(nodes, edges);
-		onSave();
-	};
+	const handleSave = () => onSave(nodes, edges);
 
 	return (
 		<div className="flex h-full min-h-0 flex-col">
@@ -175,7 +196,10 @@ const WorkflowEditorInner = ({
 			/>
 			<div className="relative flex min-h-0 flex-1">
 				<div className="relative min-w-0 flex-1">
-					<WorkflowNodePalette onAddSendEmail={handleAddSendEmail} />
+					<WorkflowNodePalette
+						onAddSendEmail={handleAddSendEmail}
+						onAddDelay={handleAddDelay}
+					/>
 					<ReactFlow
 						nodes={nodes}
 						edges={edges}

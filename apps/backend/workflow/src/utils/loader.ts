@@ -3,9 +3,11 @@ import {
 	DOMAIN_VERIFY_BACKOFF_TYPE,
 	DOMAIN_VERIFY_INITIAL_DELAY_MS,
 } from "@be/workflow/queues/domain-verify-schedule";
+import { startAutomationWorker } from "@be/workflow/queues/automation.worker";
 import { startWebhookDeliveryWorker } from "@be/workflow/queues/webhook-delivery.worker";
 import { workflowQueue } from "@be/workflow/queues/workflow.queue";
 import { startWorkflowWorker } from "@be/workflow/queues/workflow.worker";
+import { initAutomationSubscribers } from "@be/workflow/subscribers/automation.subscriber";
 import { initWebhookSubscribers } from "@be/workflow/subscribers/webhook.subscriber";
 import { redis } from "@be/workflow/utils/redis";
 import { workflowConfig } from "@be/workflow/workflow.config";
@@ -70,6 +72,10 @@ export const loader = async () => {
 		// Initialize webhook dispatcher (NATS queue group) + delivery worker
 		await initWebhookSubscribers();
 		startWebhookDeliveryWorker();
+
+		// Product automations (drip / lifecycle sequences)
+		await initAutomationSubscribers();
+		startAutomationWorker();
 
 		startWorkflowWorker();
 	} catch (e) {

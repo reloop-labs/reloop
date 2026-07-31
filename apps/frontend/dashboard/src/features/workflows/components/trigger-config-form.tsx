@@ -4,8 +4,13 @@ import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
-import { EMAIL_WEBHOOK_EVENTS } from "@reloop/webhook-events";
+import { CONTACT_WEBHOOK_EVENTS } from "@reloop/webhook-events";
 import { useMemo, useState } from "react";
+
+/** Events that enroll contacts in Phase 1 (bus → automation.subscriber). */
+const AUTOMATION_TRIGGER_EVENTS = CONTACT_WEBHOOK_EVENTS.filter((e) =>
+	["contact.create", "contact.update", "contact.subscribed"].includes(e.id),
+);
 
 interface TriggerConfigFormProps {
 	value: string | undefined;
@@ -21,8 +26,8 @@ export const TriggerConfigForm = ({
 
 	const filteredEvents = useMemo(() => {
 		const query = searchQuery.toLowerCase().trim();
-		if (!query) return EMAIL_WEBHOOK_EVENTS;
-		return EMAIL_WEBHOOK_EVENTS.filter(
+		if (!query) return AUTOMATION_TRIGGER_EVENTS;
+		return AUTOMATION_TRIGGER_EVENTS.filter(
 			(event) =>
 				event.name.toLowerCase().includes(query) ||
 				event.id.toLowerCase().includes(query) ||
@@ -30,16 +35,16 @@ export const TriggerConfigForm = ({
 		);
 	}, [searchQuery]);
 
-	const selected = EMAIL_WEBHOOK_EVENTS.find((e) => e.id === value);
+	const selected = AUTOMATION_TRIGGER_EVENTS.find((e) => e.id === value);
 
 	return (
 		<div className="flex flex-col gap-4">
 			<div>
 				<p className="mb-1 font-medium text-sm text-text-strong-950">
-					Email event
+					Trigger event
 				</p>
 				<p className="mb-3 text-text-sub-600 text-xs">
-					The workflow runs when this event fires for your organization.
+					The workflow starts when this event fires for your organization.
 				</p>
 				<Dropdown.Root open={isOpen} onOpenChange={setIsOpen}>
 					<Dropdown.Trigger asChild>
@@ -53,7 +58,7 @@ export const TriggerConfigForm = ({
 							)}
 						>
 							<span className="truncate">
-								{selected?.name ?? "Select email event..."}
+								{selected?.name ?? "Select event..."}
 							</span>
 							<Icon
 								name="chevron-down"

@@ -2,13 +2,7 @@
 
 import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
-import * as Select from "@reloop/ui/select";
 import type { SendEmailNodeData } from "../workflow-types";
-
-const MOCK_DOMAINS = [
-	{ value: "hello@yourdomain.com", label: "hello@yourdomain.com" },
-	{ value: "noreply@yourdomain.com", label: "noreply@yourdomain.com" },
-];
 
 interface SendEmailConfigFormProps {
 	value: SendEmailNodeData;
@@ -42,6 +36,23 @@ export const SendEmailConfigForm = ({
 			</div>
 
 			<div className="space-y-1.5">
+				<Label.Root htmlFor="send-from">From</Label.Root>
+				<Input.Root>
+					<Input.Wrapper>
+						<Input.Input
+							id="send-from"
+							placeholder="hello@yourdomain.com"
+							value={value.from ?? ""}
+							onChange={(e) => update({ from: e.target.value })}
+						/>
+					</Input.Wrapper>
+				</Input.Root>
+				<p className="text-text-sub-600 text-xs">
+					Must be a verified sending domain for your organization.
+				</p>
+			</div>
+
+			<div className="space-y-1.5">
 				<Label.Root htmlFor="send-subject">Subject</Label.Root>
 				<Input.Root>
 					<Input.Wrapper>
@@ -56,33 +67,26 @@ export const SendEmailConfigForm = ({
 			</div>
 
 			<div className="space-y-1.5">
-				<Label.Root>From</Label.Root>
-				<Select.Root
-					value={value.from ?? ""}
-					onValueChange={(from) => update({ from })}
-				>
-					<Select.Trigger className="w-full">
-						<Select.Value placeholder="Select sender (mock)" />
-					</Select.Trigger>
-					<Select.Content>
-						{MOCK_DOMAINS.map((d) => (
-							<Select.Item key={d.value} value={d.value}>
-								{d.label}
-							</Select.Item>
-						))}
-					</Select.Content>
-				</Select.Root>
+				<Label.Root htmlFor="send-html">HTML body (optional)</Label.Root>
+				<textarea
+					id="send-html"
+					placeholder="<p>Welcome…</p>"
+					value={value.html ?? ""}
+					onChange={(e) => update({ html: e.target.value })}
+					rows={4}
+					className="w-full rounded-lg border border-stroke-soft-100 bg-bg-white-0 px-3 py-2 text-sm outline-none focus:border-stroke-strong-950 dark:border-stroke-soft-100/50"
+				/>
 			</div>
 
 			<div className="space-y-1.5">
-				<Label.Root htmlFor="send-template">Template</Label.Root>
+				<Label.Root htmlFor="send-template">Template ID (optional)</Label.Root>
 				<Input.Root>
 					<Input.Wrapper>
 						<Input.Input
 							id="send-template"
-							placeholder="Template picker (coming soon)"
+							placeholder="tmpl_..."
 							value={value.templateId ?? ""}
-							disabled
+							onChange={(e) => update({ templateId: e.target.value })}
 						/>
 					</Input.Wrapper>
 				</Input.Root>

@@ -1,5 +1,6 @@
 import { WEBHOOK_EVENTS_BY_ID } from "@reloop/webhook-events";
 import {
+	isDelayNode,
 	isSendEmailNode,
 	isTriggerNode,
 	TRIGGER_NODE_ID,
@@ -51,25 +52,46 @@ export const validateWorkflow = (
 	}
 
 	if (!trigger.data.eventId) {
-		warnings.push("Select an email event for the trigger.");
+		warnings.push("Select a trigger event.");
+	}
+
+	const actionNodes = workflow.nodes.filter(
+		(n) => isSendEmailNode(n) || isDelayNode(n),
+	);
+	if (actionNodes.length === 0) {
+		warnings.push("Add at least one Delay or Send email step.");
 	}
 
 	const sendEmailNodes = workflow.nodes.filter(isSendEmailNode);
-	if (sendEmailNodes.length === 0) {
-		warnings.push("Add at least one Send email step.");
-	}
+	const delayNodes = workflow.nodes.filter(isDelayNode);
 
 	const reachable = getReachableNodeIds(workflow.nodes, workflow.edges);
-	const disconnectedSend = sendEmailNodes.filter((n) => !reachable.has(n.id));
-	if (disconnectedSend.length > 0) {
-		warnings.push("Connect the trigger to every Send email step.");
+	const disconnected = actionNodes.filter((n) => !reachable.has(n.id));
+	if (disconnected.length > 0) {
+		warnings.push("Connect the trigger to every step.");
 	}
 
 	const unconfiguredSend = sendEmailNodes.filter(
-		(n) => !n.data.to?.trim() || !n.data.subject?.trim(),
+		(n) =>
+			!n.data.to?.trim() ||
+			!n.data.subject?.trim() ||
+			!n.data.from?.trim(),
 	);
 	if (unconfiguredSend.length > 0) {
-		warnings.push("Complete To and Subject for each Send email step.");
+		warnings.push("Complete To, From, and Subject for each Send email step.");
+	}
+
+	const badDelays = delayNodes.filter((n) => {
+		const amount = Number(n.data.amount);
+		const unit = n.data.unit;
+		return (
+			!Number.isFinite(amount) ||
+			amount < 0 ||
+			(unit !== "minutes" && unit !== "hours" && unit !== "days")
+		);
+	});
+	if (badDelays.length > 0) {
+		warnings.push("Each Delay step needs a valid amount and unit.");
 	}
 
 	const isValid = warnings.length === 0;
@@ -79,11 +101,15 @@ export const validateWorkflow = (
 export const getWorkflowSummary = (workflow: Workflow) => {
 	const trigger = workflow.nodes.find((n) => n.id === TRIGGER_NODE_ID);
 	const eventId =
-		trigger && isTriggerNode(trigger) ? trigger.data.eventId : undefined;
+		trigger && isTriggerNode(trigger)
+			? trigger.data.eventId
+			: workflow.triggerEvent;
 	const eventLabel = eventId
 		? (WEBHOOK_EVENTS_BY_ID.get(eventId)?.name ?? eventId)
 		: "Not configured";
-	const stepCount = workflow.nodes.filter(isSendEmailNode).length;
+	const stepCount = workflow.nodes.filter(
+		(n) => isSendEmailNode(n) || isDelayNode(n),
+	).length;
 
 	return { eventLabel, stepCount };
 };

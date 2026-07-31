@@ -9,7 +9,7 @@ import { useWorkflows } from "./components/workflows-provider";
 
 export function WorkflowsPage() {
 	const { activeOrganization } = useActiveOrganization();
-	const { workflows, isHydrated } = useWorkflows();
+	const { workflows, isHydrated, isLoading: listLoading } = useWorkflows();
 	const [createOpen, setCreateOpen] = useState(false);
 	const [searchQuery, setSearchQuery] = useState("");
 
@@ -19,12 +19,12 @@ export function WorkflowsPage() {
 		return workflows.filter(
 			(w) =>
 				w.name.toLowerCase().includes(q) ||
-				w.description?.toLowerCase().includes(q),
+				(w.description?.toLowerCase().includes(q) ?? false),
 		);
 	}, [workflows, searchQuery]);
 
-	const isTotalEmpty = isHydrated && workflows.length === 0;
-	const isLoading = !isHydrated;
+	const isTotalEmpty = isHydrated && !listLoading && workflows.length === 0;
+	const isLoading = !isHydrated || listLoading;
 
 	const handleCreate = () => {
 		if (activeOrganization?.slug) setCreateOpen(true);
