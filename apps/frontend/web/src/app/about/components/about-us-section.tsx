@@ -1,3 +1,4 @@
+import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { contactEmail } from "@reloop/web/lib/site";
 import Image from "next/image";
@@ -71,18 +72,18 @@ const founders: Founder[] = [
 
 function StoryBlock({ chapter }: { chapter: StoryChapter }) {
 	return (
-		<article className="border-stroke-soft-200 border-t pt-12 first:border-t-0 first:pt-0 dark:border-white/10">
+		<article className="border-stroke-soft-200 border-t py-10 first:border-t-0 first:pt-0 sm:py-12 dark:border-white/10">
 			<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em]">
 				{chapter.eyebrow}
 			</p>
-			<h3 className="mt-4 font-serif text-[2rem] text-text-strong-950 leading-[1.08] tracking-tighter sm:text-[2.4rem] dark:text-white">
+			<h3 className="mt-3 font-serif text-[1.75rem] text-text-strong-950 leading-[1.08] tracking-tighter sm:text-[2rem] dark:text-white">
 				{chapter.title}
 			</h3>
-			<div className="mt-6 space-y-5">
+			<div className="mt-5 space-y-4">
 				{chapter.paragraphs.map((paragraph) => (
 					<p
 						key={paragraph.slice(0, 40)}
-						className="text-[16px] text-text-sub-600 leading-[1.8] sm:text-[17px] dark:text-white/55"
+						className="text-[15px] text-text-sub-600 leading-[1.75] sm:text-[16px] dark:text-white/55"
 					>
 						{paragraph}
 					</p>
@@ -92,9 +93,22 @@ function StoryBlock({ chapter }: { chapter: StoryChapter }) {
 	);
 }
 
-function FounderCard({ founder }: { founder: Founder }) {
+function FounderCard({
+	founder,
+	index,
+}: {
+	founder: Founder;
+	index: number;
+}) {
 	return (
-		<div className="flex flex-col bg-bg-white-0">
+		<div
+			className={cn(
+				"flex flex-col border-stroke-soft-200 bg-bg-white-0 dark:border-white/10",
+				index === 0
+					? "border-b sm:border-r sm:border-b-0"
+					: "border-b-0 sm:border-b-0",
+			)}
+		>
 			<div className="relative aspect-[5/4] w-full overflow-hidden bg-neutral-100 dark:bg-white/5">
 				<Image
 					src={founder.image}
@@ -104,11 +118,11 @@ function FounderCard({ founder }: { founder: Founder }) {
 					sizes="(max-width: 1024px) 100vw, 50vw"
 				/>
 			</div>
-			<div className="flex flex-1 flex-col p-8 lg:p-10">
+			<div className="flex flex-1 flex-col p-6 sm:p-8">
 				<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em] dark:text-white/55">
 					{founder.role}
 				</p>
-				<h3 className="mt-3 font-semibold text-[18px] text-text-strong-950 leading-snug sm:text-[20px] dark:text-white">
+				<h3 className="mt-2 font-semibold text-[17px] text-text-strong-950 leading-snug sm:text-[18px] dark:text-white">
 					{founder.name}
 				</h3>
 				<p className="mt-2 text-[14px] text-text-sub-600 leading-[1.7] dark:text-white/50">
@@ -118,7 +132,7 @@ function FounderCard({ founder }: { founder: Founder }) {
 					href={founder.github}
 					target="_blank"
 					rel="noopener noreferrer"
-					className="group mt-6 inline-flex items-center gap-2 font-semibold text-[14px] text-text-strong-950 transition-colors hover:text-primary-base dark:text-white"
+					className="group mt-5 inline-flex items-center gap-2 font-semibold text-[14px] text-text-strong-950 transition-colors hover:text-primary-base dark:text-white"
 				>
 					GitHub
 					<Icon
@@ -134,35 +148,44 @@ function FounderCard({ founder }: { founder: Founder }) {
 
 export function AboutUsSection() {
 	return (
-		<div className="mx-auto max-w-2xl">
-			<h2 className="mb-12 font-serif text-[2.6rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[3.4rem] lg:mb-16 dark:text-white">
-				Our story.
-			</h2>
+		<>
+			<div className="text-center">
+				<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em]">
+					Our story
+				</p>
+				<h2 className="mt-3.5 font-serif text-[2rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[2.4rem] lg:text-[2.8rem] dark:text-white">
+					How Reloop started.
+				</h2>
+			</div>
 
-			<div className="space-y-12 lg:space-y-16">
+			<div className="mx-auto mt-10 max-w-3xl sm:mt-12">
 				{story.map((chapter) => (
 					<StoryBlock key={chapter.eyebrow} chapter={chapter} />
 				))}
 			</div>
 
-			<div className="mt-20 border-stroke-soft-200 border-t pt-16 lg:mt-24 lg:pt-20 dark:border-white/10">
-				<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em]">
-					Who we are
-				</p>
-				<h2 className="mt-4 font-serif text-[2rem] text-text-strong-950 leading-[1.08] tracking-tighter sm:text-[2.4rem] dark:text-white">
-					Two founders. Still writing the code.
-				</h2>
-			</div>
+			<div className="mt-20 sm:mt-24">
+				<div className="text-center">
+					<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em]">
+						Who we are
+					</p>
+					<h2 className="mt-3.5 font-serif text-[2rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[2.4rem] lg:text-[2.8rem] dark:text-white">
+						Two founders. Still writing the code.
+					</h2>
+				</div>
 
-			<div className="mx-auto mt-10 max-w-4xl overflow-hidden rounded-4xl border border-stroke-soft-200 bg-stroke-soft-200 dark:border-white/10 dark:bg-white/10">
-				<div className="grid gap-px lg:grid-cols-2">
-					{founders.map((founder) => (
-						<FounderCard key={founder.name} founder={founder} />
+				<div className="-mx-4 mt-10 border-stroke-soft-200 border-y sm:-mx-6 sm:mt-12 sm:grid sm:grid-cols-2 lg:-mx-8 dark:border-white/10">
+					{founders.map((founder, index) => (
+						<FounderCard
+							key={founder.name}
+							founder={founder}
+							index={index}
+						/>
 					))}
 				</div>
 			</div>
 
-			<p className="mt-16 text-center text-[15px] text-text-sub-600 leading-[1.8] dark:text-white/50">
+			<p className="mx-auto mt-14 max-w-2xl text-center text-[15px] text-text-sub-600 leading-[1.8] dark:text-white/50">
 				Want the reasoning behind every decision? Read{" "}
 				<Link
 					href="/philosophy/why-reloop"
@@ -175,7 +198,7 @@ export function AboutUsSection() {
 					href="/philosophy/what-we-stand-for"
 					className="font-semibold text-primary-link underline decoration-primary-link/30 underline-offset-4"
 				>
-					what we won't compromise on
+					what we won&apos;t compromise on
 				</Link>
 				. Questions?{" "}
 				<a
@@ -186,6 +209,6 @@ export function AboutUsSection() {
 				</a>
 				.
 			</p>
-		</div>
+		</>
 	);
 }

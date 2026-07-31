@@ -77,15 +77,18 @@ const AboutUsPage = () => {
 	return (
 		<>
 			<JsonLd data={jsonLd} />
-			<MarketingPageShell
-				titleLines={["We built the email", "infrastructure we couldn't buy."]}
-				description="We started Reloop Labs to build email infrastructure you actually control. Send transactionals, run campaigns, and track analytics from our hosted platform or your own servers."
-				fullViewportHero
-			>
-				<PageSection narrow flushTop>
-					<AboutUsSection />
-				</PageSection>
-			</MarketingPageShell>
+			<div className="mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-200 border-x pt-6 pb-16 md:max-w-7xl dark:border-white/10">
+				<MarketingPageShell
+					titleLines={["We built the email", "infrastructure we couldn't buy."]}
+					description="We started Reloop Labs to build email infrastructure you actually control. Send transactionals, run campaigns, and track analytics from our hosted platform or your own servers."
+					compactHero
+					tightHeroBottom
+				>
+					<PageSection flushTop>
+						<AboutUsSection />
+					</PageSection>
+				</MarketingPageShell>
+			</div>
 		</>
 	);
 };
