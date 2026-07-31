@@ -43,12 +43,13 @@ export const mainNavigation: MainNavigationItem[] = [
 		iconName: "layout",
 		section: "Messaging",
 	},
-	{
-		label: "Workflows",
-		path: "/workflows",
-		iconName: "workflow",
-		section: "Messaging",
-	},
+	// Hidden for now — routes still exist at /workflows
+	// {
+	// 	label: "Workflows",
+	// 	path: "/workflows",
+	// 	iconName: "workflow",
+	// 	section: "Messaging",
+	// },
 	{
 		label: "Metrics",
 		path: "/metrics",
