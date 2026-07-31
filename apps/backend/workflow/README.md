@@ -32,17 +32,22 @@ SSRF-safe HTTP client, and the fixed retry schedule.
 ## Product automations (drip / lifecycle sequences)
 
 User-defined multi-step email workflows live in this service under
-`/api/workflow/v1/automations`.
+`/api/workflow/v1/automations` and workflow-only events under
+`/api/workflow/v1/events`.
 
 | Piece | Role |
 |--------|------|
+| `custom_event` + properties | Org-defined triggers (**workflow-only**, not webhooks) |
 | `automation` tables | Definition, published versions, enrollments, step runs |
 | `automation-queue` | Delayed BullMQ jobs for wait / send steps |
-| NATS subscribers | Enroll on `contact.created` (and related) |
+| `POST .../events/track` | Fire a custom event → enroll matching automations |
 | Mail send | Internal call to `/api/mail/v1/send` |
 
-**Nodes (v1):** `trigger` → `delay` → `send_email` (linear).
+**Nodes (v1):** `trigger` (custom event key) → `delay` → `send_email` (linear).
 Enrollments stick to the version published at activate time.
+
+Platform webhook events (`@reloop/webhook-events`) and outbound webhooks are
+a separate system — workflow events do not fan out to webhooks.
 
 ---
 

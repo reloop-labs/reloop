@@ -35,12 +35,18 @@ export function emptyGraph(): AutomationGraph {
 	};
 }
 
+/**
+ * Resolve the custom event key from the trigger node.
+ * Prefers `eventKey`; falls back to `eventId` for older drafts.
+ */
 export function extractTriggerEvent(
 	graph: AutomationGraph,
 ): string | undefined {
 	const trigger = graph.nodes.find(
 		(n) => n.id === TRIGGER_NODE_ID || n.type === "trigger",
 	);
+	const eventKey = trigger?.data?.eventKey;
+	if (typeof eventKey === "string" && eventKey.length > 0) return eventKey;
 	const eventId = trigger?.data?.eventId;
 	return typeof eventId === "string" && eventId.length > 0
 		? eventId
@@ -109,10 +115,15 @@ export function validateAutomationGraph(
 		return { isValid: false, errors };
 	}
 
+	// Custom event key (org-defined), not a platform webhook-events id
 	const eventId =
-		typeof trigger.data?.eventId === "string" ? trigger.data.eventId : "";
+		typeof trigger.data?.eventKey === "string" && trigger.data.eventKey
+			? trigger.data.eventKey
+			: typeof trigger.data?.eventId === "string"
+				? trigger.data.eventId
+				: "";
 	if (!eventId) {
-		errors.push("Select a trigger event.");
+		errors.push("Select a custom event trigger.");
 	}
 
 	const actionNodes = graph.nodes.filter(

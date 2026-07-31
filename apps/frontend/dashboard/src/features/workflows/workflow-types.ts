@@ -1,4 +1,3 @@
-import type { WebhookEventName } from "@reloop/webhook-events";
 import type { Edge, Node } from "@xyflow/react";
 import type { EdgeTone } from "./components/nodes/flow-edge";
 import type { GroupNodeData } from "./components/nodes/group-node";
@@ -18,7 +17,14 @@ interface NodeCardMeta {
 }
 
 export interface TriggerNodeData extends NodeCardMeta {
-	eventId?: WebhookEventName | string;
+	/**
+	 * Workflow custom event key (preferred).
+	 * Not a platform webhook-events id.
+	 */
+	eventKey?: string;
+	/** Custom event row id (evt_...) when known */
+	eventId?: string;
+	eventName?: string;
 	[key: string]: unknown;
 }
 

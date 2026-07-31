@@ -7,6 +7,7 @@ export * from "./billing";
 export * from "./channel";
 export * from "./compose";
 export * from "./contact";
+export * from "./custom-event";
 export * from "./domain";
 export * from "./email";
 export * from "./group";

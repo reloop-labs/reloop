@@ -1,4 +1,3 @@
-import { WEBHOOK_EVENTS_BY_ID } from "@reloop/webhook-events";
 import {
 	isDelayNode,
 	isSendEmailNode,
@@ -51,8 +50,11 @@ export const validateWorkflow = (
 		return { isValid: false, warnings };
 	}
 
-	if (!trigger.data.eventId) {
-		warnings.push("Select a trigger event.");
+	const eventKey =
+		(typeof trigger.data.eventKey === "string" && trigger.data.eventKey) ||
+		(typeof trigger.data.eventId === "string" ? trigger.data.eventId : "");
+	if (!eventKey) {
+		warnings.push("Select a workflow event as the trigger.");
 	}
 
 	const actionNodes = workflow.nodes.filter(
@@ -100,13 +102,16 @@ export const validateWorkflow = (
 
 export const getWorkflowSummary = (workflow: Workflow) => {
 	const trigger = workflow.nodes.find((n) => n.id === TRIGGER_NODE_ID);
-	const eventId =
+	const eventKey =
 		trigger && isTriggerNode(trigger)
-			? trigger.data.eventId
+			? (trigger.data.eventKey ??
+				trigger.data.eventName ??
+				trigger.data.eventId)
 			: workflow.triggerEvent;
-	const eventLabel = eventId
-		? (WEBHOOK_EVENTS_BY_ID.get(eventId)?.name ?? eventId)
-		: "Not configured";
+	const eventLabel =
+		typeof eventKey === "string" && eventKey
+			? eventKey
+			: "Not configured";
 	const stepCount = workflow.nodes.filter(
 		(n) => isSendEmailNode(n) || isDelayNode(n),
 	).length;

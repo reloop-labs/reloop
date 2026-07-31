@@ -68,7 +68,10 @@ export const automation = pgTable(
 		name: varchar("name", { length: 255 }).notNull(),
 		description: text("description"),
 		status: automationStatusEnum("status").notNull().default("draft"),
-		/** Webhook-style event id, e.g. contact.create */
+		/**
+		 * Custom event key that starts this automation (see `custom_event.key`).
+		 * Not a platform `@reloop/webhook-events` id.
+		 */
 		triggerEvent: varchar("trigger_event", { length: 128 }),
 		/** Editable draft graph */
 		graph: jsonb("graph")

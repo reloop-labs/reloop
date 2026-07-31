@@ -145,5 +145,6 @@ export const queryKeys = {
 			[...queryKeys.workflows.all, "list", orgId] as const,
 		detail: (id: string) =>
 			[...queryKeys.workflows.all, "detail", id] as const,
+		events: () => [...queryKeys.workflows.all, "events"] as const,
 	},
 } as const;

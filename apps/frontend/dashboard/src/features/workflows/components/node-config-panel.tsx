@@ -70,11 +70,20 @@ export const NodeConfigPanel = ({
 			<div className="flex-1 overflow-y-auto p-4">
 				{isTriggerNode(selectedNode) && (
 					<TriggerConfigForm
-						value={selectedNode.data.eventId}
-						onChange={(eventId) =>
+						value={
+							(typeof selectedNode.data.eventKey === "string" &&
+								selectedNode.data.eventKey) ||
+							(typeof selectedNode.data.eventId === "string"
+								? selectedNode.data.eventId
+								: undefined)
+						}
+						onChange={(eventKey, meta) =>
 							onUpdateNode(selectedNode.id, {
 								...selectedNode.data,
-								eventId,
+								eventKey,
+								// Keep eventId as the custom event row id when known
+								eventId: meta?.eventId ?? eventKey,
+								eventName: meta?.name,
 							})
 						}
 					/>

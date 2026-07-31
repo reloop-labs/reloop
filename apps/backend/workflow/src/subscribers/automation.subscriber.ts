@@ -1,56 +1,17 @@
-import {
-	cancelEnrollmentsForContact,
-	enrollContactInMatchingAutomations,
-} from "@be/workflow/handlers/automation/enroll";
+import { cancelEnrollmentsForContact } from "@be/workflow/handlers/automation/enroll";
 import { BusEvent, bus } from "@reloop/bus";
 import { log } from "evlog";
 
 const QUEUE = { queue: "automation-enroll-workers" };
 
+/**
+ * Automations no longer enroll from platform webhook-events (contact.create, etc.).
+ * Enrollment happens when a user-defined custom event is tracked via
+ * POST /api/workflow/v1/events/track.
+ *
+ * We still cancel in-flight enrollments when a contact can no longer receive mail.
+ */
 export async function initAutomationSubscribers(): Promise<void> {
-	await bus.subscribe(
-		BusEvent.CONTACT_CREATED,
-		async (payload) => {
-			log.info({
-				message: "Automation trigger received",
-				triggerEvent: "contact.create",
-				contactId: payload.contactId,
-				organizationId: payload.organizationId,
-			});
-			await enrollContactInMatchingAutomations({
-				organizationId: payload.organizationId,
-				contactId: payload.contactId,
-				triggerEvent: "contact.create",
-			});
-		},
-		QUEUE,
-	);
-
-	await bus.subscribe(
-		BusEvent.CONTACT_UPDATED,
-		async (payload) => {
-			await enrollContactInMatchingAutomations({
-				organizationId: payload.organizationId,
-				contactId: payload.contactId,
-				triggerEvent: "contact.update",
-			});
-		},
-		QUEUE,
-	);
-
-	await bus.subscribe(
-		BusEvent.CONTACT_SUBSCRIBED,
-		async (payload) => {
-			await enrollContactInMatchingAutomations({
-				organizationId: payload.organizationId,
-				contactId: payload.contactId,
-				triggerEvent: "contact.subscribed",
-			});
-		},
-		QUEUE,
-	);
-
-	// Cancel in-flight sequences when contact can no longer receive mail
 	await bus.subscribe(
 		BusEvent.CONTACT_UNSUBSCRIBED,
 		async (payload) => {
@@ -87,5 +48,8 @@ export async function initAutomationSubscribers(): Promise<void> {
 		QUEUE,
 	);
 
-	log.info("subscriber", "Automation subscribers initialized");
+	log.info(
+		"subscriber",
+		"Automation subscribers initialized (cancel-only; enroll via custom events)",
+	);
 }

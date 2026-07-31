@@ -33,7 +33,24 @@ export async function activateAutomationController(params: {
 	const triggerEvent =
 		validation.triggerEvent ?? extractTriggerEvent(graph) ?? existing.triggerEvent;
 	if (!triggerEvent) {
-		throw AutomationErrors.cannotActivate("Select a trigger event.");
+		throw AutomationErrors.cannotActivate(
+			"Select a custom event as the trigger.",
+		);
+	}
+
+	// Ensure the custom event still exists for this org
+	const customEvent = await db.query.customEvent.findFirst({
+		where: and(
+			eq(schema.customEvent.organizationId, params.organizationId),
+			eq(schema.customEvent.key, triggerEvent),
+			isNull(schema.customEvent.deletedAt),
+		),
+		columns: { id: true, key: true },
+	});
+	if (!customEvent) {
+		throw AutomationErrors.cannotActivate(
+			`Custom event "${triggerEvent}" was not found. Create it under Events first.`,
+		);
 	}
 
 	try {
