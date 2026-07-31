@@ -21,24 +21,19 @@ export function ComparisonPageShell({
 	const brand = getCompetitorByHref(pagePath);
 
 	return (
-		<div className="relative px-4 sm:px-6 lg:px-8">
+		<div className="relative mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-200 border-x md:max-w-7xl dark:border-white/10">
 			{/*
 			 * Full-height frame: vertical rails span the entire page.
 			 * Section content is constrained inside each CompareSection / component.
 			 */}
-			<div className="relative mx-auto w-full max-w-[1028px] border-stroke-soft-200 border-x dark:border-white/10">
-				{/*
-				 * Full top fold lives inside the stage card (icons + title + copy + CTAs).
-				 */}
-				<CompareHero
-					titleLines={titleLines}
-					description={description}
-					primaryCta={primaryCta}
-					secondaryCta={secondaryCta}
-					icon={brand?.icon}
-				/>
-				{children}
-			</div>
+			<CompareHero
+				titleLines={titleLines}
+				description={description}
+				primaryCta={primaryCta}
+				secondaryCta={secondaryCta}
+				icon={brand?.icon}
+			/>
+			{children}
 		</div>
 	);
 }
