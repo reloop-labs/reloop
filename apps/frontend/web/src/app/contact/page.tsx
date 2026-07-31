@@ -97,10 +97,9 @@ const ContactPage = () => {
 	return (
 		<>
 			<JsonLd data={contactPageSchema} />
-
-			<section className="min-h-dvh bg-bg-white-0 pt-16 lg:flex lg:items-center dark:bg-black">
-				<div className="mx-auto w-full max-w-4xl px-5 pt-6 pb-10 sm:px-6 sm:pt-8 sm:pb-12 lg:py-12">
-					<div className="grid items-start gap-8 sm:gap-10 lg:grid-cols-2 lg:gap-16 xl:gap-20">
+			<div className="mx-auto flex min-h-dvh w-full max-w-5xl flex-col border-stroke-soft-200 border-x pt-16 pb-16 md:max-w-7xl dark:border-white/10">
+				<section className="flex flex-1 flex-col justify-center px-5 py-10 sm:px-6 sm:py-12 lg:px-8 lg:py-16">
+					<div className="mx-auto grid w-full max-w-4xl items-start gap-8 sm:gap-10 lg:grid-cols-2 lg:gap-16 xl:gap-20">
 						<div className="min-w-0">
 							<h1 className="font-serif text-[1.85rem] text-text-strong-950 leading-[1.1] tracking-tighter sm:text-[2.25rem] lg:text-[2.5rem] dark:text-white">
 								Get help from the engineers who built it
@@ -122,8 +121,8 @@ const ContactPage = () => {
 							<ContactPanel />
 						</div>
 					</div>
-				</div>
-			</section>
+				</section>
+			</div>
 		</>
 	);
 };
