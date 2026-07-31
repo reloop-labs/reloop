@@ -183,7 +183,7 @@ export const Footer = () => {
 	}, []);
 
 	return (
-		<footer className="border-stroke-soft-200 bg-bg-white-0 text-text-strong-950 dark:bg-black dark:text-white">
+		<footer className="w-full border-stroke-soft-200 border-t bg-bg-white-0 text-text-strong-950 dark:border-white/10 dark:bg-black dark:text-white">
 			<div className="mx-auto max-w-[1320px] px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
 				<div className="flex flex-col gap-12 lg:flex-row lg:items-start lg:gap-20">
 					<div className="flex shrink-0 flex-col lg:w-48">
