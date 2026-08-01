@@ -124,79 +124,134 @@ export function GlossaryTermPageView({
 				</div>
 			</section>
 
-			{/* In Reloop */}
+			{/* In Reloop — content band with diagonal hatch gutters left & right */}
 			{term.relatedFeatureHref && (
 				<section className={rail}>
-					<div className="border-stroke-soft-200 border-t px-4 py-8 sm:px-6 sm:py-10 lg:px-8 dark:border-white/10">
-						<div className="flex flex-col gap-5 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-6 sm:flex-row sm:items-center sm:justify-between sm:p-7 dark:border-white/10 dark:bg-[#111]">
-							<div className="min-w-0 max-w-xl">
-								<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em] dark:text-white/55">
+					<div className="grid w-full grid-cols-1 items-stretch border-stroke-soft-200 border-t sm:grid-cols-[minmax(2rem,1fr)_minmax(0,56rem)_minmax(2rem,1fr)] lg:grid-cols-[minmax(2.5rem,1fr)_minmax(0,64rem)_minmax(2.5rem,1fr)] dark:border-white/10">
+						{/* Left hatch */}
+						<div
+							aria-hidden
+							className="hidden min-h-[1px] self-stretch border-stroke-soft-200 border-r text-text-strong-950/15 sm:block dark:border-white/10 dark:text-white/15"
+							style={{
+								backgroundImage:
+									"repeating-linear-gradient(-45deg, transparent 0, transparent 5px, currentColor 5px, currentColor 6.5px)",
+							}}
+						/>
+
+						{/* Center CTA cell */}
+						<div className="flex min-w-0 flex-col justify-between gap-6 px-5 py-8 sm:flex-row sm:items-center sm:gap-8 sm:border-stroke-soft-200 sm:border-x sm:px-7 sm:py-9 lg:px-8 dark:sm:border-white/10">
+							<div className="min-w-0">
+								<p className="font-semibold text-[13px] text-text-strong-950 sm:text-[15px] dark:text-white">
 									In Reloop
 								</p>
-								<p className="mt-2 text-[15px] text-text-sub-600 leading-relaxed dark:text-white/55">
-									See how Reloop helps you put{" "}
-									<span className="font-medium text-text-strong-950 dark:text-white">
+								<p className="mt-1.5 max-w-5xl text-[13px] text-text-sub-600 leading-relaxed sm:text-[14px] dark:text-white/55">
+									Put{" "}
+									<span className="text-text-strong-950 dark:text-white/80">
 										{term.title}
 									</span>{" "}
-									into practice in production.
+									into practice on hosted or self-hosted Reloop.
 								</p>
 							</div>
 							<FeatureLink
 								href={term.relatedFeatureHref}
-								className="inline-flex h-11 shrink-0 items-center justify-center rounded-full bg-[#0a0d12] px-6 font-semibold text-[14px] text-white transition-colors hover:bg-[#0a0d12]/90 dark:bg-white dark:text-black dark:hover:bg-white/90"
+								className="group inline-flex shrink-0 items-center gap-1.5 font-semibold text-[14px] text-text-strong-950 transition-colors hover:text-primary-base dark:text-white"
 							>
 								View feature
+								<span
+									aria-hidden
+									className="transition-transform duration-200 group-hover:translate-x-0.5"
+								>
+									→
+								</span>
 							</FeatureLink>
 						</div>
+
+						{/* Right hatch */}
+						<div
+							aria-hidden
+							className="hidden min-h-[1px] self-stretch border-stroke-soft-200 border-l text-text-strong-950/15 sm:block dark:border-white/10 dark:text-white/15"
+							style={{
+								backgroundImage:
+									"repeating-linear-gradient(-45deg, transparent 0, transparent 5px, currentColor 5px, currentColor 6.5px)",
+							}}
+						/>
 					</div>
 				</section>
 			)}
 
-			{/* Related terms */}
+			{/* Related terms — numbered grid (Attio-style cells) */}
 			<section className={rail}>
-				<div className="border-stroke-soft-200 border-t px-4 py-10 sm:px-6 sm:py-12 lg:px-8 dark:border-white/10">
-					<div className="flex flex-wrap items-end justify-between gap-3">
-						<div>
-							<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em] dark:text-white/55">
-								Keep learning
-							</p>
-							<h2 className="mt-2 font-serif text-[1.75rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[2rem] dark:text-white">
-								Related terms
-							</h2>
-						</div>
-						<Link
-							href="/glossary"
-							className="text-[13px] text-text-sub-600 underline decoration-text-sub-600/30 underline-offset-4 transition-colors hover:text-text-strong-950 dark:text-white/55 dark:hover:text-white"
-						>
-							Browse all terms
-						</Link>
+				<div className="border-stroke-soft-200 border-t dark:border-white/10">
+					<div className="px-4 py-10 text-center sm:px-6 sm:py-12 lg:px-8">
+						<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em] dark:text-white/55">
+							Keep learning
+						</p>
+						<h2 className="mt-2 font-serif text-[1.75rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[2.2rem] dark:text-white">
+							Related terms.
+						</h2>
+						<p className="mx-auto mt-3 max-w-md text-[15px] text-text-sub-600 leading-relaxed dark:text-white/55">
+							More email concepts that connect to {term.title}.
+						</p>
 					</div>
 
 					{term.relatedTerms && term.relatedTerms.length > 0 ? (
-						<ul className="mt-6 grid gap-3 sm:grid-cols-2">
-							{term.relatedTerms.map((related) => (
-								<li key={related.slug}>
-									<Link
-										href={`/glossary/${related.slug}`}
-										className="group flex items-center justify-between gap-4 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 px-5 py-4 transition-colors hover:bg-bg-weak-50 dark:border-white/10 dark:bg-[#111] dark:hover:bg-white/[0.04]"
+						<ul
+							className={[
+								"grid gap-px border-stroke-soft-200 border-t bg-stroke-soft-200 dark:border-white/10 dark:bg-white/10",
+								term.relatedTerms.length === 1 && "grid-cols-1",
+								term.relatedTerms.length === 2 && "grid-cols-1 sm:grid-cols-2",
+								term.relatedTerms.length === 3 && "grid-cols-1 sm:grid-cols-3",
+								term.relatedTerms.length >= 4 &&
+									"grid-cols-1 sm:grid-cols-2 lg:grid-cols-4",
+							]
+								.filter(Boolean)
+								.join(" ")}
+						>
+							{term.relatedTerms.map((related, index) => {
+								const n = String(index + 1).padStart(2, "0");
+								return (
+									<li
+										key={related.slug}
+										className="bg-bg-white-0 dark:bg-black"
 									>
-										<span className="font-semibold text-[15px] text-text-strong-950 dark:text-white">
-											{related.title}
-										</span>
-										<span
-											aria-hidden
-											className="text-text-sub-600 transition-transform duration-200 group-hover:translate-x-0.5 dark:text-white/40"
+										<Link
+											href={`/glossary/${related.slug}`}
+											className="group flex h-full flex-col justify-between gap-4 px-5 py-4 transition-colors hover:bg-bg-weak-50 sm:px-6 sm:py-5 dark:hover:bg-white/[0.03]"
 										>
-											→
-										</span>
-									</Link>
-								</li>
-							))}
+											<span className="font-medium text-[12px] text-text-sub-600 tabular-nums tracking-wide dark:text-white/40">
+												[{n}]
+											</span>
+											<span className="font-medium text-[16px] text-text-strong-950 leading-snug transition-colors group-hover:text-primary-base sm:text-[17px] dark:text-white">
+												{related.title}
+											</span>
+										</Link>
+									</li>
+								);
+							})}
 						</ul>
 					) : (
-						<p className="mt-4 text-[15px] text-text-sub-600 dark:text-white/55">
-							Explore more email infrastructure terms in the glossary.
-						</p>
+						<div className="border-stroke-soft-200 border-t px-4 py-10 text-center sm:px-6 dark:border-white/10">
+							<p className="text-[15px] text-text-sub-600 dark:text-white/55">
+								Explore more email infrastructure terms in the glossary.
+							</p>
+							<Link
+								href="/glossary"
+								className="mt-3 inline-flex text-[13px] text-text-strong-950 underline decoration-text-sub-600/30 underline-offset-4 transition-colors hover:text-primary-base dark:text-white"
+							>
+								Browse all terms
+							</Link>
+						</div>
+					)}
+
+					{term.relatedTerms && term.relatedTerms.length > 0 && (
+						<div className="border-stroke-soft-200 border-t px-4 py-5 text-center sm:px-6 dark:border-white/10">
+							<Link
+								href="/glossary"
+								className="text-[13px] text-text-sub-600 underline decoration-text-sub-600/30 underline-offset-4 transition-colors hover:text-text-strong-950 dark:text-white/55 dark:hover:text-white"
+							>
+								Browse all terms
+							</Link>
+						</div>
 					)}
 				</div>
 			</section>
