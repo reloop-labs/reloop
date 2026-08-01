@@ -4,8 +4,8 @@ import type { MetadataRoute } from "next";
 
 function getRoutePriority(path: string): number {
 	if (path === "/") return 1;
-	if (path === "/glossary") return 0.9;
-	if (path.startsWith("/glossary/")) return 0.75;
+	if (path === "/glossary") return 0.8;
+	if (path.startsWith("/glossary/")) return 0.7;
 	if (path === "/community") return 0.8;
 	if (path.startsWith("/changelog/")) return 0.6;
 	return 0.7;

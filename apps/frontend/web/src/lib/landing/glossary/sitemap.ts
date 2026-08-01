@@ -21,14 +21,14 @@ export function getGlossarySitemapEntries(): GlossarySitemapEntry[] {
 			path: "/glossary",
 			slug: null,
 			title: "Email Glossary",
-			priority: 0.9,
+			priority: 0.8,
 			changeFrequency: "weekly",
 		},
 		...terms.map((term) => ({
 			path: `/glossary/${term.slug}`,
 			slug: term.slug,
 			title: term.title,
-			priority: 0.75,
+			priority: 0.7,
 			changeFrequency: "monthly" as const,
 		})),
 	];

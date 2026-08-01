@@ -8,3 +8,9 @@
 docker-data
 .turbo
 **/tsconfig.tsbuildinfo
+
+# Local Next env (use Docker build-args for NEXT_PUBLIC_*)
+apps/frontend/web/.env
+apps/frontend/web/.env.*
+apps/frontend/web/.env.local
+apps/frontend/web/.env.dev
