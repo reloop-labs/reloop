@@ -2,16 +2,12 @@ import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
+import * as Input from "@reloop/ui/input";
+import * as Label from "@reloop/ui/label";
 import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
 import axios from "axios";
-import {
-	AnimatePresence,
-	type AnimationPlaybackControls,
-	animate,
-	motion,
-	useMotionValue,
-} from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { useQueryState } from "nuqs";
 import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
@@ -29,10 +25,8 @@ export function DeleteApiKeyModal({
 	onDeleteSuccess?: (deletedName: string) => void;
 }) {
 	const [deleteId, setDeleteId] = useQueryState("delete");
+	const [confirmationText, setConfirmationText] = useState("");
 	const [deleteState, setDeleteState] = useState<DeleteState>("idle");
-	const [isHolding, setIsHolding] = useState(false);
-	const holdProgress = useMotionValue(0);
-	const animationRef = useRef<AnimationPlaybackControls | null>(null);
 	const invalidate = useInvalidateApiKeys();
 
 	// Cache the selected API key so details remain stable when query invalidates upon deletion
@@ -49,8 +43,20 @@ export function DeleteApiKeyModal({
 		apiKeyToDelete?.prefix ||
 		"Unnamed key";
 
+	const isConfirmed = confirmationText === displayName;
+	const canDelete = isConfirmed && deleteState === "idle";
+
+	const handleCopyName = async () => {
+		try {
+			await navigator.clipboard.writeText(displayName);
+			toast.success("API key name copied to clipboard");
+		} catch {
+			toast.error("Failed to copy name");
+		}
+	};
+
 	const handleDelete = async () => {
-		if (!apiKeyToDelete || deleteState !== "idle") return;
+		if (!apiKeyToDelete || !canDelete) return;
 		try {
 			setDeleteState("deleting");
 			await axios.delete(`/api/api-key/v1/${apiKeyToDelete.id}`, {
@@ -66,6 +72,7 @@ export function DeleteApiKeyModal({
 				// Reset internal button state after modal exit animation finishes
 				setTimeout(() => {
 					setDeleteState("idle");
+					setConfirmationText("");
 				}, 300);
 			}, 900);
 		} catch (error) {
@@ -77,40 +84,15 @@ export function DeleteApiKeyModal({
 		}
 	};
 
-	const startHold = () => {
-		if (deleteState !== "idle") return;
-		setIsHolding(true);
-		holdProgress.set(0);
-		animationRef.current = animate(holdProgress, 1, {
-			duration: 1.2,
-			ease: "linear",
-			onComplete: () => {
-				setIsHolding(false);
-				holdProgress.set(0);
-				void handleDelete();
-			},
-		});
-	};
-
-	const cancelHold = () => {
-		if (!isHolding && holdProgress.get() === 0) return;
-		setIsHolding(false);
-		animationRef.current?.stop();
-		animate(holdProgress, 0, {
-			duration: 0.2,
-			ease: "easeOut",
-		});
-	};
-
 	useHotkeys(
-		"enter",
+		"mod+enter",
 		(e) => {
 			e.preventDefault();
-			if (apiKeyToDelete && deleteState === "idle") {
+			if (canDelete) {
 				void handleDelete();
 			}
 		},
-		{ enabled: !!deleteId },
+		{ enableOnFormTags: ["INPUT"], enabled: !!deleteId },
 	);
 
 	// Keep a ref so onOpenChange can read the latest deleteState without stale closure
@@ -119,12 +101,18 @@ export function DeleteApiKeyModal({
 		deleteStateRef.current = deleteState;
 	}, [deleteState]);
 
+	useEffect(() => {
+		if (!deleteId) {
+			const t = setTimeout(() => setConfirmationText(""), 300);
+			return () => clearTimeout(t);
+		}
+	}, [deleteId]);
+
 	return (
 		<Modal.Root
 			open={!!deleteId}
 			onOpenChange={(open) => {
 				if (!open) {
-					cancelHold();
 					// If the user closes the modal after a successful delete (via X or
 					// backdrop), still fire the success callback so the banner appears.
 					if (deleteStateRef.current === "success") {
@@ -138,6 +126,7 @@ export function DeleteApiKeyModal({
 					void setDeleteId(null);
 					setTimeout(() => {
 						setDeleteState("idle");
+						setConfirmationText("");
 						targetApiKeyRef.current = null;
 					}, 300);
 				}
@@ -190,6 +179,45 @@ export function DeleteApiKeyModal({
 					immediately.
 				</div>
 
+				{/* Confirmation Input */}
+				<div className="mt-4 space-y-2">
+					<Label.Root
+						htmlFor="delete-api-key-confirmation"
+						className="flex flex-wrap items-center gap-1.5"
+					>
+						<span>Type</span>
+						<span className="inline-flex items-center gap-1 rounded-md bg-bg-weak-50 px-1.5 py-0.5 font-medium text-[12px] text-text-strong-950 dark:bg-bg-weak-50/20">
+							{displayName}
+							<button
+								type="button"
+								onClick={(e) => {
+									e.preventDefault();
+									void handleCopyName();
+								}}
+								className="-mr-0.5 inline-flex h-4 w-4 shrink-0 items-center justify-center rounded text-text-sub-600 transition-colors hover:bg-bg-white-0 hover:text-text-strong-950"
+								aria-label={`Copy ${displayName}`}
+								title="Copy name"
+							>
+								<Icon name="copy" className="h-3 w-3" />
+							</button>
+						</span>
+						<span>to confirm</span>
+					</Label.Root>
+					<Input.Root size="medium">
+						<Input.Wrapper>
+							<Input.Input
+								id="delete-api-key-confirmation"
+								value={confirmationText}
+								onChange={(e) => setConfirmationText(e.target.value)}
+								placeholder={displayName}
+								autoFocus
+								disabled={deleteState !== "idle"}
+								autoComplete="off"
+							/>
+						</Input.Wrapper>
+					</Input.Root>
+				</div>
+
 				{/* Footer Actions */}
 				<div className="mt-6 flex items-center justify-end gap-3">
 					<Button.Root
@@ -199,9 +227,9 @@ export function DeleteApiKeyModal({
 						size="small"
 						onClick={() => {
 							if (deleteState === "idle") {
-								cancelHold();
 								void setDeleteId(null);
 								setDeleteState("idle");
+								setConfirmationText("");
 							}
 						}}
 						className={cn(
@@ -215,21 +243,13 @@ export function DeleteApiKeyModal({
 						type="button"
 						variant="destructive"
 						size="small"
-						onPointerDown={startHold}
-						onPointerUp={cancelHold}
-						onPointerLeave={cancelHold}
-						onPointerCancel={cancelHold}
+						disabled={!canDelete}
+						onClick={() => void handleDelete()}
 						className={cn(
 							"relative min-w-[134px] select-none justify-center overflow-hidden transition-all duration-200",
 							deleteState !== "idle" && "pointer-events-none opacity-90",
 						)}
 					>
-						{/* Hold progress overlay fill */}
-						<motion.div
-							className="pointer-events-none absolute inset-0 origin-left bg-white/25"
-							style={{ scaleX: holdProgress }}
-						/>
-
 						<AnimatePresence mode="popLayout" initial={false}>
 							<motion.span
 								key={deleteState}
@@ -266,7 +286,7 @@ export function DeleteApiKeyModal({
 										<span>Deleted</span>
 									</>
 								) : (
-									<span>Hold to delete</span>
+									<span>Delete key</span>
 								)}
 							</motion.span>
 						</AnimatePresence>

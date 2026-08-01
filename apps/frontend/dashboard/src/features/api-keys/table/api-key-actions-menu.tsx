@@ -41,6 +41,9 @@ function useApiKeyActionsMenu(
 	const router = useRouter();
 	const isToggling = handlers.togglingId === apiKey.id;
 	const [open, setOpen] = useState(false);
+	// Radix ContextMenu.Root is uncontrolled (no `open` prop); bumping this remounts
+	// the root to dismiss the menu after delayed actions that call preventDefault.
+	const [contextMenuKey, setContextMenuKey] = useState(0);
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
 	const [copiedItem, setCopiedItem] = useState<"prefix" | "id" | null>(null);
 	const [isToggleCompleted, setIsToggleCompleted] = useState(false);
@@ -121,6 +124,11 @@ function useApiKeyActionsMenu(
 		[apiKey.id, handlers.onOpenChange],
 	);
 
+	const dismissMenu = useCallback(() => {
+		setContextMenuKey((key) => key + 1);
+		handleOpenChange(false);
+	}, [handleOpenChange]);
+
 	const handleCopyPrefix = async () => {
 		try {
 			await navigator.clipboard.writeText(apiKey.start || apiKey.prefix || "");
@@ -128,11 +136,11 @@ function useApiKeyActionsMenu(
 			setCopiedItem("prefix");
 			setTimeout(() => {
 				setCopiedItem(null);
-				handleOpenChange(false);
+				dismissMenu();
 			}, 900);
 		} catch {
 			toast.error("Failed to copy prefix");
-			handleOpenChange(false);
+			dismissMenu();
 		}
 	};
 
@@ -143,21 +151,21 @@ function useApiKeyActionsMenu(
 			setCopiedItem("id");
 			setTimeout(() => {
 				setCopiedItem(null);
-				handleOpenChange(false);
+				dismissMenu();
 			}, 900);
 		} catch {
 			toast.error("Failed to copy ID");
-			handleOpenChange(false);
+			dismissMenu();
 		}
 	};
 
 	const handleItemClick = async (id: MenuItemId) => {
 		if (id === "view") {
 			router.push(`/api-keys/${apiKey.id}`);
-			handleOpenChange(false);
+			dismissMenu();
 		} else if (id === "edit") {
 			handlers.onEditKey?.(apiKey.id);
-			handleOpenChange(false);
+			dismissMenu();
 		} else if (id === "copy_prefix") {
 			void handleCopyPrefix();
 		} else if (id === "copy_id") {
@@ -169,22 +177,23 @@ function useApiKeyActionsMenu(
 				setIsToggleCompleted(true);
 				setTimeout(() => {
 					setIsToggleCompleted(false);
-					handleOpenChange(false);
+					dismissMenu();
 				}, 750);
 			} catch {
-				handleOpenChange(false);
+				dismissMenu();
 			}
 		} else if (id === "rotate") {
 			handlers.onRotateKey(apiKey);
-			handleOpenChange(false);
+			dismissMenu();
 		} else if (id === "delete") {
 			handlers.onDeleteKey(apiKey.id);
-			handleOpenChange(false);
+			dismissMenu();
 		}
 	};
 
 	return {
 		open,
+		contextMenuKey,
 		handleOpenChange,
 		menuItems,
 		hoverIdx,
@@ -493,7 +502,7 @@ export function ApiKeyRowContextMenu({
 
 	return (
 		<ContextMenu.Root
-			open={menu.open}
+			key={menu.contextMenuKey}
 			onOpenChange={menu.handleOpenChange}
 		>
 			<ContextMenu.Trigger asChild>{children}</ContextMenu.Trigger>
