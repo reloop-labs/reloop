@@ -12,8 +12,13 @@ import { useQueryState } from "nuqs";
 import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
+import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { useInvalidateApiKeys } from "../hooks/use-api-keys-query";
 import type { ApiKeyData } from "../types";
+
+/** Light keycap so it reads on the red/destructive FancyButton fill. */
+const actionKbdOnBlueClassName =
+	"border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]";
 
 type DeleteState = "idle" | "deleting" | "success";
 
@@ -27,6 +32,7 @@ export function DeleteApiKeyModal({
 	const [deleteId, setDeleteId] = useQueryState("delete");
 	const [confirmationText, setConfirmationText] = useState("");
 	const [deleteState, setDeleteState] = useState<DeleteState>("idle");
+	const [nameCopied, setNameCopied] = useState(false);
 	const invalidate = useInvalidateApiKeys();
 
 	// Cache the selected API key so details remain stable when query invalidates upon deletion
@@ -49,9 +55,10 @@ export function DeleteApiKeyModal({
 	const handleCopyName = async () => {
 		try {
 			await navigator.clipboard.writeText(displayName);
-			toast.success("API key name copied to clipboard");
+			setNameCopied(true);
+			setTimeout(() => setNameCopied(false), 1500);
 		} catch {
-			toast.error("Failed to copy name");
+			// silently fail
 		}
 	};
 
@@ -85,11 +92,21 @@ export function DeleteApiKeyModal({
 	};
 
 	useHotkeys(
-		"mod+enter",
+		"enter",
 		(e) => {
 			e.preventDefault();
 			if (canDelete) {
 				void handleDelete();
+			}
+		},
+		{ enableOnFormTags: ["INPUT"], enabled: !!deleteId },
+	);
+
+	useHotkeys(
+		"escape",
+		() => {
+			if (deleteState === "idle") {
+				void setDeleteId(null);
 			}
 		},
 		{ enableOnFormTags: ["INPUT"], enabled: !!deleteId },
@@ -100,13 +117,6 @@ export function DeleteApiKeyModal({
 	useEffect(() => {
 		deleteStateRef.current = deleteState;
 	}, [deleteState]);
-
-	useEffect(() => {
-		if (!deleteId) {
-			const t = setTimeout(() => setConfirmationText(""), 300);
-			return () => clearTimeout(t);
-		}
-	}, [deleteId]);
 
 	return (
 		<Modal.Root
@@ -134,10 +144,10 @@ export function DeleteApiKeyModal({
 		>
 			<Modal.Content
 				className="overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 p-6 sm:max-w-[460px] dark:border-stroke-soft-100/40"
-				showClose={true}
+				showClose={false}
 			>
 				{/* Header */}
-				<div className="pr-6">
+				<div>
 					<Modal.Title className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
 						Delete API key
 					</Modal.Title>
@@ -146,8 +156,8 @@ export function DeleteApiKeyModal({
 						undone.
 					</p>
 				</div>
-				<div className="mt-4 rounded-xl border border-[#FBE3B5] bg-[#FEF6E6] p-4 text-[#8A5300] text-xs leading-relaxed dark:border-amber-800/40 dark:bg-amber-950/30 dark:text-amber-200">
-					<span className="font-bold text-[#6D4000] dark:text-amber-100">
+				<div className="mt-4 rounded-xl border border-red-200 bg-red-50 p-4 text-red-700 text-xs leading-relaxed dark:border-red-800/40 dark:bg-red-950/30 dark:text-red-300">
+					<span className="font-bold text-red-800 dark:text-red-200">
 						Warning:
 					</span>{" "}
 					Deleting this API key will permanently remove it along with all its
@@ -185,11 +195,30 @@ export function DeleteApiKeyModal({
 									e.preventDefault();
 									void handleCopyName();
 								}}
-								className="-mr-0.5 inline-flex h-4 w-4 shrink-0 items-center justify-center rounded text-text-sub-600 transition-colors hover:bg-bg-white-0 hover:text-text-strong-950"
+								className="-mr-0.5 inline-flex h-4 w-4 shrink-0 items-center justify-center rounded transition-colors hover:bg-bg-white-0"
 								aria-label={`Copy ${displayName}`}
 								title="Copy name"
 							>
-								<Icon name="copy" className="h-3 w-3" />
+								<AnimatePresence mode="popLayout" initial={false}>
+									<motion.span
+										key={nameCopied ? "check" : "copy"}
+										initial={{ opacity: 0, scale: 0.6 }}
+										animate={{ opacity: 1, scale: 1 }}
+										exit={{ opacity: 0, scale: 0.6 }}
+										transition={{ type: "spring", duration: 0.2, bounce: 0.3 }}
+										className="flex items-center justify-center"
+									>
+										<Icon
+											name={nameCopied ? "check" : "copy"}
+											className={cn(
+												"h-3 w-3",
+												nameCopied
+													? "text-green-500"
+													: "text-text-sub-600 hover:text-text-strong-950",
+											)}
+										/>
+									</motion.span>
+								</AnimatePresence>
 							</button>
 						</span>
 						<span>to confirm</span>
@@ -214,7 +243,7 @@ export function DeleteApiKeyModal({
 					<Button.Root
 						type="button"
 						variant="neutral"
-						mode="ghost"
+						mode="stroke"
 						size="small"
 						onClick={() => {
 							if (deleteState === "idle") {
@@ -224,11 +253,14 @@ export function DeleteApiKeyModal({
 							}
 						}}
 						className={cn(
-							"transition-opacity duration-200",
+							"gap-1.5 transition-opacity duration-200",
 							deleteState !== "idle" && "pointer-events-none opacity-50",
 						)}
 					>
 						Cancel
+						<ActionKbd className="lowercase! w-auto min-w-0 px-1">
+							esc
+						</ActionKbd>
 					</Button.Root>
 					<FancyButton.Root
 						type="button"
@@ -277,7 +309,12 @@ export function DeleteApiKeyModal({
 										<span>Deleted</span>
 									</>
 								) : (
-									<span>Delete key</span>
+									<>
+										Delete key
+										<ActionKbd className={actionKbdOnBlueClassName}>
+											↵
+										</ActionKbd>
+									</>
 								)}
 							</motion.span>
 						</AnimatePresence>

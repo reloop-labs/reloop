@@ -68,7 +68,6 @@ export function CreateApiKeyModal({
 		try {
 			await navigator.clipboard.writeText(createdApiKey.key);
 			setCopied(true);
-			toast.success("API key copied to clipboard");
 			setTimeout(() => setCopied(false), 2000);
 		} catch {
 			toast.error("Failed to copy API key");

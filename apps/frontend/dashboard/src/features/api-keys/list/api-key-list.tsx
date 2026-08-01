@@ -32,16 +32,8 @@ export function ApiKeyList() {
 	const [modal, setModal] = useQueryState("modal");
 	const [currentPage] = useQueryState("page", parseAsInteger.withDefault(1));
 	const [pageSize] = useQueryState("limit", parseAsInteger.withDefault(10));
-	const [deletedName, setDeletedName] = useState<string | null>(null);
 	const [rotatedName, setRotatedName] = useState<string | null>(null);
 	const { columnVisibility, setColumnVisible } = useApiKeyColumnVisibility();
-
-	useEffect(() => {
-		if (deletedName) {
-			const timer = setTimeout(() => setDeletedName(null), 8000);
-			return () => clearTimeout(timer);
-		}
-	}, [deletedName]);
 
 	useEffect(() => {
 		if (rotatedName) {
@@ -100,34 +92,6 @@ export function ApiKeyList() {
 	return (
 		<div className="pb-8">
 			<AnimatePresence>
-				{deletedName && (
-					<motion.div
-						key="deleted-banner"
-						initial={{ opacity: 0, y: -8, height: 0 }}
-						animate={{ opacity: 1, y: 0, height: "auto" }}
-						exit={{ opacity: 0, y: -8, height: 0 }}
-						transition={{ duration: 0.2 }}
-						className="mb-4 overflow-hidden"
-					>
-						<div className="flex items-center justify-between rounded-xl border border-[#B7F1D0] bg-[#E8FAF0] px-4 py-3 text-sm text-[#0F5C34] dark:border-emerald-800/40 dark:bg-emerald-950/30 dark:text-emerald-200">
-							<span>
-								API key &quot;
-								<span className="font-semibold">{deletedName}</span>&quot; has
-								been successfully deleted.
-							</span>
-							<button
-								type="button"
-								onClick={() => setDeletedName(null)}
-								className="p-1 text-[#0F5C34]/70 transition-colors hover:text-[#0F5C34] dark:text-emerald-200/70 dark:hover:text-emerald-200"
-							>
-								<Icon name="close" className="h-4 w-4" />
-							</button>
-						</div>
-					</motion.div>
-				)}
-			</AnimatePresence>
-
-			<AnimatePresence>
 				{rotatedName && (
 					<motion.div
 						key="rotated-banner"
@@ -177,7 +141,6 @@ export function ApiKeyList() {
 							columnVisibility={columnVisibility}
 							isLoading={isPending || isFetching}
 							loadingRows={4}
-							onDeleteSuccess={(name) => setDeletedName(name)}
 							onRotateSuccess={(name) => setRotatedName(name)}
 						/>
 					</div>
