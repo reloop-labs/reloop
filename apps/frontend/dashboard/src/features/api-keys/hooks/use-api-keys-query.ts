@@ -5,7 +5,8 @@ import type { ApiKeyListResponse } from "../types";
 export type ApiKeysListParams = {
 	page: number;
 	limit: number;
-	status: string;
+	/** Selected status values (`enabled` / `disabled`). Exactly one applies a filter. */
+	status: string[];
 	creator: string;
 	q: string;
 	enabled?: boolean;
@@ -15,8 +16,12 @@ function buildListUrl(params: ApiKeysListParams): string {
 	const search = new URLSearchParams();
 	search.set("limit", String(params.limit));
 	search.set("page", String(params.page));
-	if (params.status === "enabled") search.set("enabled", "true");
-	if (params.status === "disabled") search.set("enabled", "false");
+	if (params.status.length === 1 && params.status[0] === "enabled") {
+		search.set("enabled", "true");
+	}
+	if (params.status.length === 1 && params.status[0] === "disabled") {
+		search.set("enabled", "false");
+	}
 	if (params.creator) search.set("userId", params.creator);
 	if (params.q) search.set("q", params.q);
 	return `/api/api-key/v1/?${search.toString()}`;
@@ -37,7 +42,7 @@ export function useApiKeysQuery(params: ApiKeysListParams) {
 		queryKey: queryKeys.apiKeys.list({
 			page: params.page,
 			limit: params.limit,
-			status: params.status,
+			status: [...params.status].sort().join(","),
 			creator: params.creator,
 			q: params.q,
 		}),

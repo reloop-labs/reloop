@@ -4,9 +4,13 @@ import { PaginationControls } from "./pagination-controls";
 
 export function TableFooter({
 	total,
+	selectedCount = 0,
+	pageRowCount = 0,
 	isLoading,
 }: {
 	total: number;
+	selectedCount?: number;
+	pageRowCount?: number;
 	isLoading?: boolean;
 }) {
 	const [currentPage, setCurrentPage] = useQueryState(
@@ -19,18 +23,14 @@ export function TableFooter({
 	);
 
 	const totalPages = Math.max(1, Math.ceil(total / (pageSize ?? 10)));
-	const startIndex =
-		total === 0 ? 0 : ((currentPage ?? 1) - 1) * (pageSize ?? 10) + 1;
-	const endIndex = Math.min((currentPage ?? 1) * (pageSize ?? 10), total);
 
 	if (total <= 0) return null;
 
 	return (
 		<div className="flex items-center justify-between px-4 py-2 text-label-xs text-text-sub-600">
-			<div className="flex items-center">
+			<div className="flex items-center gap-3">
 				<span>
-					Showing {startIndex}–{endIndex} of {total} API key
-					{total !== 1 ? "s" : ""}
+					{selectedCount} of {pageRowCount} row(s) selected.
 				</span>
 				<PageSizeDropdown
 					value={pageSize ?? 10}

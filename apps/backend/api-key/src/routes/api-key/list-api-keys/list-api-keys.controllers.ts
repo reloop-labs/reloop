@@ -1,10 +1,14 @@
 import { toApiKeyResponse } from "@reloop/api-key/mappers/api-key-response";
 import type { ApiKeyTypes } from "@reloop/api-key/types/api-key.type";
+import {
+	parseApiKeySort,
+	toApiKeyOrderBy,
+} from "@reloop/api-key/utils/api-key-sort";
 import { controllerLog } from "@reloop/api-key/utils/controller-log";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { API_KEY_LIST_WEBHOOK_EVENT } from "@reloop/webhook-events";
-import { and, count, desc, eq, ilike, or } from "drizzle-orm";
+import { and, count, eq, ilike, or } from "drizzle-orm";
 
 export async function listApiKeysController({
 	query,
@@ -13,7 +17,7 @@ export async function listApiKeysController({
 	query: ApiKeyTypes.ApiKeyListQuery;
 	organizationId: string;
 }): Promise<ApiKeyTypes.ApiKeyListResponse> {
-	const { page = 1, limit = 10, enabled, userId, q } = query;
+	const { page = 1, limit = 10, enabled, userId, q, sort } = query;
 	const offset = (page - 1) * limit;
 	const log = controllerLog();
 	log.info("Getting API keys");
@@ -33,13 +37,14 @@ export async function listApiKeysController({
 		}
 	}
 	const whereClause = and(...conditions);
+	const orderBy = toApiKeyOrderBy(parseApiKeySort(sort));
 
 	log.info("Getting API keys and total count in parallel");
 	const [totalResult, result] = await Promise.all([
 		db.select({ count: count() }).from(schema.apikey).where(whereClause),
 		db.query.apikey.findMany({
 			where: whereClause,
-			orderBy: desc(schema.apikey.createdAt),
+			orderBy,
 			limit: limit,
 			offset: offset,
 			with: { user: true },

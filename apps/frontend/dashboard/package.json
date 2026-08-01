@@ -30,8 +30,10 @@
 		"@dicebear/shapes": "9.2.2",
 		"@hookform/resolvers": "catalog:ui",
 		"@number-flow/react": "catalog:ui",
+		"@radix-ui/react-checkbox": "catalog:ui",
 		"@react-email/editor": "catalog:ui",
 		"@reloop/auth": "workspace:*",
+		"@reloop/code-samples": "workspace:*",
 		"@reloop/pricing": "workspace:*",
 		"@reloop/tailwind": "workspace:*",
 		"@reloop/ui": "workspace:*",
@@ -87,8 +89,7 @@
 		"y-protocols": "^1.0.7",
 		"y-websocket": "^3.0.0",
 		"yjs": "^13.6.30",
-		"zustand": "5.0.8",
-		"@reloop/code-samples": "workspace:*"
+		"zustand": "5.0.8"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.4.5",

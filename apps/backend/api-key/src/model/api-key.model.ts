@@ -210,6 +210,14 @@ export namespace ApiKeyModel {
 				description: "Search query to filter keys by name",
 			}),
 		),
+		sort: t.Optional(
+			t.String({
+				description:
+					"Comma-separated sort rules as field:order (e.g. createdAt:desc,name:asc). Fields: name, prefix, lastUsed, status, createdAt. Orders: asc, desc.",
+				pattern:
+					"^(name|prefix|lastUsed|status|createdAt):(asc|desc)(,(name|prefix|lastUsed|status|createdAt):(asc|desc))*$",
+			}),
+		),
 	});
 
 	export type ApiKeyQuery = typeof apiKeyQuery.static;

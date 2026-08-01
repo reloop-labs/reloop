@@ -1,12 +1,17 @@
 import * as Button from "@reloop/ui/button";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
-import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
+import {
+	parseAsArrayOf,
+	parseAsInteger,
+	parseAsString,
+	useQueryState,
+} from "nuqs";
 
 export function EmptyState({ onCreateApiKey }: { onCreateApiKey: () => void }) {
 	const [statusFilter, setStatusFilter] = useQueryState(
 		"status",
-		parseAsString.withDefault(""),
+		parseAsArrayOf(parseAsString).withDefault([]),
 	);
 	const [creatorFilter, setCreatorFilter] = useQueryState(
 		"creator",
@@ -22,10 +27,12 @@ export function EmptyState({ onCreateApiKey }: { onCreateApiKey: () => void }) {
 	);
 
 	const isFiltered =
-		statusFilter !== "" || creatorFilter !== "" || searchQuery.trim() !== "";
+		statusFilter.length > 0 ||
+		creatorFilter !== "" ||
+		searchQuery.trim() !== "";
 
 	const handleClearFilters = () => {
-		void setStatusFilter("");
+		void setStatusFilter([]);
 		void setCreatorFilter("");
 		void setSearchQuery("");
 		void setCurrentPage(1);

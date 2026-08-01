@@ -60,6 +60,7 @@ export namespace ApiKeyTypes {
 		enabled?: boolean;
 		userId?: string;
 		q?: string;
+		sort?: string;
 	}
 
 	export type UsageStatsResponse = typeof ApiKeyModel.usageStatsResponse.static;

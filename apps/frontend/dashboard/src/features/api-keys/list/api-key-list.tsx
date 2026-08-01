@@ -2,10 +2,16 @@ import { authClient } from "@reloop/auth/client";
 import { Icon } from "@reloop/ui/icon";
 import { useQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "framer-motion";
-import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
+import {
+	parseAsArrayOf,
+	parseAsInteger,
+	parseAsString,
+	useQueryState,
+} from "nuqs";
 import { useEffect, useMemo, useState } from "react";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import { queryKeys } from "#/lib/query-keys";
+import { useApiKeyColumnVisibility } from "../hooks/use-api-key-column-visibility";
 import { useApiKeysQuery } from "../hooks/use-api-keys-query";
 import { CreateApiKeyModal } from "../modals/create-api-key-modal";
 import { ApiKeyTable } from "../table/api-key-table";
@@ -14,7 +20,10 @@ import { ApiKeyListToolbar } from "./api-key-list-toolbar";
 
 export function ApiKeyList() {
 	const { activeOrganization } = useActiveOrganization();
-	const [statusFilter] = useQueryState("status", parseAsString.withDefault(""));
+	const [statusFilter] = useQueryState(
+		"status",
+		parseAsArrayOf(parseAsString).withDefault([]),
+	);
 	const [creatorFilter] = useQueryState(
 		"creator",
 		parseAsString.withDefault(""),
@@ -25,6 +34,7 @@ export function ApiKeyList() {
 	const [pageSize] = useQueryState("limit", parseAsInteger.withDefault(10));
 	const [deletedName, setDeletedName] = useState<string | null>(null);
 	const [rotatedName, setRotatedName] = useState<string | null>(null);
+	const { columnVisibility, setColumnVisible } = useApiKeyColumnVisibility();
 
 	useEffect(() => {
 		if (deletedName) {
@@ -43,7 +53,7 @@ export function ApiKeyList() {
 	const listParams = {
 		page: currentPage ?? 1,
 		limit: pageSize ?? 10,
-		status: statusFilter ?? "",
+		status: statusFilter ?? [],
 		creator: creatorFilter ?? "",
 		q: searchQuery ?? "",
 	};
@@ -101,7 +111,9 @@ export function ApiKeyList() {
 					>
 						<div className="flex items-center justify-between rounded-xl border border-[#B7F1D0] bg-[#E8FAF0] px-4 py-3 text-sm text-[#0F5C34] dark:border-emerald-800/40 dark:bg-emerald-950/30 dark:text-emerald-200">
 							<span>
-								API key &quot;<span className="font-semibold">{deletedName}</span>&quot; has been successfully deleted.
+								API key &quot;
+								<span className="font-semibold">{deletedName}</span>&quot; has
+								been successfully deleted.
 							</span>
 							<button
 								type="button"
@@ -127,7 +139,9 @@ export function ApiKeyList() {
 					>
 						<div className="flex items-center justify-between rounded-xl border border-[#B8D9FA] bg-[#EBF4FE] px-4 py-3 text-sm text-[#0C4A8C] dark:border-blue-800/40 dark:bg-blue-950/30 dark:text-blue-200">
 							<span>
-								API key &quot;<span className="font-semibold">{rotatedName}</span>&quot; has been successfully rotated.
+								API key &quot;
+								<span className="font-semibold">{rotatedName}</span>&quot; has
+								been successfully rotated.
 							</span>
 							<button
 								type="button"
@@ -150,12 +164,17 @@ export function ApiKeyList() {
 				</div>
 			) : (
 				<div>
-					<ApiKeyListToolbar availableCreators={availableCreators} />
+					<ApiKeyListToolbar
+						availableCreators={availableCreators}
+						columnVisibility={columnVisibility}
+						onColumnVisibleChange={setColumnVisible}
+					/>
 					<div className="mt-4">
 						<ApiKeyTable
 							apiKeys={data?.apiKeys || []}
 							total={data?.total || 0}
 							listParams={listParams}
+							columnVisibility={columnVisibility}
 							isLoading={isPending || isFetching}
 							loadingRows={4}
 							onDeleteSuccess={(name) => setDeletedName(name)}
