@@ -201,7 +201,7 @@ export function DeleteApiKeyModal({
 									e.preventDefault();
 									void handleCopyName();
 								}}
-								className="-mr-0.5 inline-flex h-4 w-4 shrink-0 items-center justify-center rounded transition-colors hover:bg-bg-white-0"
+								className="-mr-0.5 inline-flex h-4 w-4 shrink-0 items-center justify-center rounded transition-colors"
 								aria-label={`Copy ${displayName}`}
 								title="Copy name"
 							>
@@ -218,9 +218,7 @@ export function DeleteApiKeyModal({
 											name={nameCopied ? "check" : "copy"}
 											className={cn(
 												"h-3 w-3",
-												nameCopied
-													? "text-green-500"
-													: "text-text-sub-600 hover:text-text-strong-950",
+												nameCopied ? "text-green-500" : "text-text-sub-600",
 											)}
 										/>
 									</motion.span>
