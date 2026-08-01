@@ -9,6 +9,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import type { Resolver } from "react-hook-form";
 import { useForm } from "react-hook-form";
+import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import * as v from "valibot";
 import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
@@ -48,6 +49,7 @@ export function CreateApiKeyModal({
 	const [createdApiKey, setCreatedApiKey] = useState<ApiKeyWithSecret | null>(
 		null,
 	);
+	const [copied, setCopied] = useState(false);
 
 	const form = useForm<ApiKeyFormValues>({
 		resolver: valibotResolver(apiKeySchema) as Resolver<ApiKeyFormValues>,
@@ -60,6 +62,27 @@ export function CreateApiKeyModal({
 	const handleClose = () => {
 		onClose();
 	};
+
+	const handleCopyKey = async () => {
+		if (!createdApiKey) return;
+		try {
+			await navigator.clipboard.writeText(createdApiKey.key);
+			setCopied(true);
+			toast.success("API key copied to clipboard");
+			setTimeout(() => setCopied(false), 2000);
+		} catch {
+			toast.error("Failed to copy API key");
+		}
+	};
+
+	useHotkeys(
+		"enter",
+		(e) => {
+			e.preventDefault();
+			void handleCopyKey();
+		},
+		{ enabled: isOpen && step === "success" },
+	);
 
 	const onSubmit = async (data: ApiKeyFormValues) => {
 		if (!activeOrganization?.id || isLoading) return;
@@ -87,6 +110,7 @@ export function CreateApiKeyModal({
 		if (!isOpen) {
 			const timer = setTimeout(() => {
 				setCreatedApiKey(null);
+				setCopied(false);
 				form.reset();
 			}, 300);
 			return () => clearTimeout(timer);
@@ -243,6 +267,39 @@ export function CreateApiKeyModal({
 											esc
 										</ActionKbd>
 									</Button.Root>
+									<FancyButton.Root
+										type="button"
+										variant="blue"
+										size="small"
+										onClick={handleCopyKey}
+										className="min-w-[130px] justify-center overflow-hidden transition-all duration-200"
+									>
+										<AnimatePresence mode="popLayout" initial={false}>
+											<motion.span
+												key={copied ? "copied" : "idle"}
+												transition={{
+													type: "spring",
+													duration: 0.25,
+													bounce: 0,
+												}}
+												initial={{ opacity: 0, y: -14 }}
+												animate={{ opacity: 1, y: 0 }}
+												exit={{ opacity: 0, y: 14 }}
+												className="flex items-center justify-center gap-1.5"
+											>
+												{copied ? (
+													"Copied!"
+												) : (
+													<>
+														Copy API key
+														<ActionKbd className={actionKbdOnBlueClassName}>
+															↵
+														</ActionKbd>
+													</>
+												)}
+											</motion.span>
+										</AnimatePresence>
+									</FancyButton.Root>
 								</div>
 							</>
 						)}
