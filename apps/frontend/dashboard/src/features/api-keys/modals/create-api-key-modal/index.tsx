@@ -146,13 +146,13 @@ export function CreateApiKeyModal({
 						</div>
 
 						{/* Center content only — animates on step change */}
-						<AnimatePresence mode="wait" initial={false}>
+						<AnimatePresence mode="popLayout" initial={false}>
 							{step === "form" ? (
 								<motion.div
 									key="form"
-									initial={{ opacity: 0, filter: "blur(4px)", y: 6 }}
-									animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
-									exit={{ opacity: 0, filter: "blur(4px)", y: -6 }}
+									initial={{ opacity: 0, filter: "blur(4px)" }}
+									animate={{ opacity: 1, filter: "blur(0px)" }}
+									exit={{ opacity: 0, filter: "blur(4px)" }}
 									transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
 								>
 									<form
@@ -168,9 +168,13 @@ export function CreateApiKeyModal({
 							) : (
 								<motion.div
 									key="success"
-									initial={{ opacity: 0, filter: "blur(4px)", y: 6 }}
-									animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
-									exit={{ opacity: 0, filter: "blur(4px)", y: -6 }}
+									initial={{ opacity: 0, filter: "blur(4px)", height: "94px" }}
+									animate={{
+										opacity: 1,
+										filter: "blur(0px)",
+										height: "auto",
+									}}
+									exit={{ opacity: 0, filter: "blur(4px)" }}
 									transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
 								>
 									<SuccessStep secret={createdApiKey!.key} />
@@ -179,7 +183,10 @@ export function CreateApiKeyModal({
 						</AnimatePresence>
 
 						{/* Footer — outside animation, plain conditional */}
-						<div className="mt-6 flex items-center justify-end gap-3">
+						<motion.div
+							layout
+							className="mt-6 flex items-center justify-end gap-3"
+						>
 							<Button.Root
 								type="button"
 								variant="neutral"
@@ -266,7 +273,7 @@ export function CreateApiKeyModal({
 									</AnimatePresence>
 								</FancyButton.Root>
 							)}
-						</div>
+						</motion.div>
 					</div>
 				</motion.div>
 			</Modal.Content>
