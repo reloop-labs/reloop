@@ -151,10 +151,10 @@ export function DeleteApiKeyModal({
 					<Modal.Title className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
 						Delete API key
 					</Modal.Title>
-					<p className="text-sm text-text-sub-600 leading-relaxed">
+					<Modal.Description className="text-sm text-text-sub-600 leading-relaxed">
 						Are you sure you want to delete this API key? This action cannot be
 						undone.
-					</p>
+					</Modal.Description>
 				</div>
 				<div className="mt-4 rounded-xl border border-red-200 bg-red-50 p-4 text-red-700 text-xs leading-relaxed dark:border-red-800/40 dark:bg-red-950/30 dark:text-red-300">
 					<span className="font-bold text-red-800 dark:text-red-200">
