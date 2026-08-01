@@ -21,8 +21,8 @@ const LONG_PRESS_MS = 400;
 const EASE_SMOOTH_OUT = [0.22, 1, 0.36, 1] as const;
 /** Keep under 300ms; quick enough for a reveal, slow enough to read. */
 const HINT_DURATION = 0.2;
-/** Fixed px width of the kbd face (h-3.5 / min-w-3.5) — avoids janky width:"auto". */
-const HINT_WIDTH_PX = 14;
+/** Fixed px width of the kbd face (h-4 / min-w-4) — avoids janky width:"auto". */
+const HINT_WIDTH_PX = 16;
 const HINT_GAP_PX = 4;
 
 function isEditableTarget(target: EventTarget | null): boolean {
@@ -125,7 +125,7 @@ export function useShortcutsRevealed(): boolean {
 }
 
 const shortcutKbdClassName = cn(
-	"h-3.5 w-3.5 min-w-3.5 rounded-[4px] px-0 text-[9px] leading-none",
+	"h-4 w-4 min-w-4 rounded-[5px] px-0 text-[10px] leading-none",
 	"border border-stroke-soft-200 bg-bg-weak-50 text-text-sub-600",
 	// bottom shelf under the key
 	"shadow-[0_1.5px_0_0_var(--color-stroke-soft-200)]",
