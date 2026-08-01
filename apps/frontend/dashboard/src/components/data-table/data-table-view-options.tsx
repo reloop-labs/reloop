@@ -12,9 +12,7 @@ import { Check, Settings2 } from "lucide-react";
 import * as React from "react";
 import {
 	Command,
-	CommandEmpty,
 	CommandGroup,
-	CommandInput,
 	CommandItem,
 	CommandList,
 } from "./data-table-command";
@@ -72,9 +70,7 @@ export function DataTableViewOptions({
 				className={cn("w-44 overflow-hidden p-1.5", className)}
 			>
 				<Command>
-					<CommandInput placeholder="Search columns..." />
 					<CommandList>
-						<CommandEmpty>No columns found.</CommandEmpty>
 						<CommandGroup>
 							{columns.map((column) => {
 								const isVisible = visibility[column.id] !== false;
