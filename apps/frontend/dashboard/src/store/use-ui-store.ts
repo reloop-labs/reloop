@@ -12,6 +12,12 @@ interface UIState {
 	/** A message queued to be auto-sent when the support chat opens. */
 	pendingSupportMessage: string | null;
 	setPendingSupportMessage: (value: string | null) => void;
+	/**
+	 * When true, in-context keyboard shortcut hints (e.g. R on refresh)
+	 * are revealed. Toggled by long-pressing Space.
+	 */
+	isShortcutsRevealed: boolean;
+	setShortcutsRevealed: (value: boolean) => void;
 }
 
 export const useUIStore = create<UIState>((set) => ({
@@ -39,4 +45,6 @@ export const useUIStore = create<UIState>((set) => ({
 	setAiPanelActiveTab: (tab) => set({ aiPanelActiveTab: tab }),
 	pendingSupportMessage: null,
 	setPendingSupportMessage: (value) => set({ pendingSupportMessage: value }),
+	isShortcutsRevealed: false,
+	setShortcutsRevealed: (value) => set({ isShortcutsRevealed: value }),
 }));
