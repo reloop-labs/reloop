@@ -160,8 +160,51 @@ export function ApiKeyListToolbar({
 								<ActionKbd>R</ActionKbd>
 							</button>
 						</Tooltip.Trigger>
-						<Tooltip.Content side="bottom" size="small">
-							{isRefreshing ? "Refreshing…" : "Refresh"}
+						<Tooltip.Content
+							side="bottom"
+							sideOffset={8}
+							size="medium"
+							className="max-w-[240px] p-2.5"
+						>
+							<div className="flex items-start gap-2.5">
+								<div
+									className={cn(
+										"mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-lg",
+										"bg-white/10 ring-1 ring-white/10",
+									)}
+									aria-hidden
+								>
+									<Icon
+										name="rotate-cw"
+										className={cn(
+											"h-3.5 w-3.5 text-text-white-0",
+											isRefreshing && "animate-spin",
+										)}
+									/>
+								</div>
+								<div className="min-w-0 flex-1">
+									<div className="flex items-center justify-between gap-3">
+										<p className="font-medium text-label-sm text-text-white-0">
+											{isRefreshing ? "Refreshing…" : "Refresh"}
+										</p>
+										<span
+											className={cn(
+												"inline-flex h-5 min-w-5 shrink-0 items-center justify-center rounded-md px-1",
+												"border border-white/15 border-b-white/25 bg-white/10",
+												"font-medium text-[10px] text-text-white-0 leading-none",
+												"shadow-[0_1px_0_0_rgba(0,0,0,0.25)]",
+											)}
+										>
+											R
+										</span>
+									</div>
+									<p className="mt-0.5 text-paragraph-xs text-white/65">
+										{isRefreshing
+											? "Fetching the latest API keys."
+											: "Reload API keys from the server."}
+									</p>
+								</div>
+							</div>
 						</Tooltip.Content>
 					</Tooltip.Root>
 				</Tooltip.Provider>
