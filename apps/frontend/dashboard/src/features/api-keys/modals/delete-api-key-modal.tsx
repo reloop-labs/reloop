@@ -81,7 +81,7 @@ export function DeleteApiKeyModal({
 					setDeleteState("idle");
 					setConfirmationText("");
 				}, 300);
-			}, 900);
+			}, 300);
 		} catch (error) {
 			const message = axios.isAxiosError(error)
 				? error.response?.data?.message || "Failed to delete API key"
