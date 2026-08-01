@@ -4,13 +4,13 @@ export const term: GlossaryTermDefinition = {
 	slug: "feedback-loop",
 	title: "Feedback Loop",
 	description:
-		"A program where ISPs tell senders when a recipient marks a message as spam.",
+		"A channel where ISPs tell senders when someone marks a message as spam.",
 	keywords: ["FBL","feedback loop email","spam complaint FBL"],
-	body: `A feedback loop (FBL) sends complaint data from an ISP back to the sender or ESP. When a user hits “Report spam,” you eventually get an event identifying the campaign or address (format varies by provider).
+	body: `A feedback loop (FBL) is how some ISPs report spam complaints back to senders. When a recipient hits “Report spam,” the ISP may send you a notice (often ARF format) so you can suppress that address and investigate the stream.
 
-Not every mailbox provider offers a classic FBL, and signup processes differ. Where FBLs exist, wire them into suppression immediately. Mailing someone who already spam-buttoned you is how complaint rates climb.
+Not every provider offers the same FBL access. Registration and formats vary. Even without a formal FBL, rising spam placement and falling engagement are warnings.
 
-Reloop processes complaint-style events when they are available so those recipients stop receiving mail.`,
+When an FBL event arrives, suppress immediately and ask why that person was on the list. Reloop can pass complaint events into your systems when they are available.`,
 	relatedTerms: [
 		{
 			slug: "complaint-rate",

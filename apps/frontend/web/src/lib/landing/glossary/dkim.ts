@@ -4,11 +4,11 @@ export const term: GlossaryTermDefinition = {
 	slug: "dkim",
 	title: "DKIM",
 	description:
-		"DomainKeys Identified Mail. Cryptographic signatures that prove message content was not altered in transit.",
+		"A digital signature on the message that proves the content was not altered in transit.",
 	keywords: ["DKIM","DKIM signature","DKIM DNS"],
-	body: `DKIM adds a digital signature to message headers. The sending system signs selected headers and the body with a private key. Receivers fetch the matching public key from DNS (a TXT record under a selector) and verify the signature.
+	body: `DKIM (DomainKeys Identified Mail) adds a digital signature to message headers. The sender signs selected headers and the body with a private key. Receivers fetch the matching public key from DNS (a TXT record under a selector) and check the signature.
 
-If verification passes, the message was authorized by someone who controls that domain's key and was not tampered with in ways that break the signed hash. If it fails, something changed the signed content, or the wrong key is published.
+If verification passes, the message was authorized by someone who controls that domain's key and was not changed in ways that break the signed hash. If it fails, something altered signed content, or the wrong key is published.
 
 You can rotate selectors and keys over time. Multiple selectors let you run more than one sending system without sharing private keys.
 

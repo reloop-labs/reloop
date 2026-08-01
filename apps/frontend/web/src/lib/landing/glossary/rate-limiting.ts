@@ -4,13 +4,13 @@ export const term: GlossaryTermDefinition = {
 	slug: "rate-limiting",
 	title: "Rate Limiting",
 	description:
-		"Caps on how fast you may send or call APIs, set by providers or your own infrastructure.",
+		"Caps on how fast you may send mail or call APIs, set by providers or your own stack.",
 	keywords: ["email rate limit","SMTP rate limit","send throttling"],
 	body: `Rate limits protect receivers and shared infrastructure from floods. Your ESP may limit messages per second per account. Remote MTAs may defer you if you open too many connections. APIs return 429 when you exceed quotas.
 
-Design clients with backoff and queues. Bursting an entire day's marketing send in one minute looks abusive even when the content is fine.
+Design clients with backoff and queues. Bursting an entire campaign in one second is a good way to earn deferrals.
 
-Reloop plans include monthly email quotas and fair-use patterns; self-hosted setups need their own outbound rate policy toward remote servers.`,
+Reloop enforces account and plan limits so shared infrastructure stays healthy; your app should handle 429s and deferred SMTP responses gracefully.`,
 	relatedTerms: [
 		{
 			slug: "throttling",

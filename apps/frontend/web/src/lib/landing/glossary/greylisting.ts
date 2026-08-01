@@ -4,13 +4,13 @@ export const term: GlossaryTermDefinition = {
 	slug: "greylisting",
 	title: "Greylisting",
 	description:
-		"A temporary rejection that asks well-behaved senders to retry later, filtering one-shot spam bots.",
+		"A temporary deferral of unknown senders so only real MTAs that retry get through.",
 	keywords: ["greylisting","graylisting","451 greylist"],
-	body: `Greylisting is a receiver policy: the first time it sees a new sender/recipient pair, it responds with a temporary failure (often 4xx). Legitimate MTAs queue and retry. Many cheap spam bots never come back.
+	body: `Greylisting is a receiver policy: the first time it sees a new sender/recipient combination, it returns a temporary failure (4xx) and expects a retry later. Legitimate MTAs retry. Many simple spam bots do not.
 
-As a sender, temporary failures are normal. Your MTA or ESP should retry with backoff. Do not treat every 4xx as a hard bounce.
+For senders, greylisting looks like soft bounces or delayed delivery on first contact. Retries with proper backoff usually succeed. Permanent rejection is a different problem.
 
-As a receiver, greylisting cuts some junk and delays some real mail, especially one-off messages from new servers. Most bulk infrastructure already retries correctly.`,
+If first-send latency matters (password resets), use a reputable ESP or IP with good history so greylisting is less common. Still design for retries; the internet is not zero-latency.`,
 	relatedTerms: [
 		{
 			slug: "soft-bounce",

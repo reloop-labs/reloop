@@ -4,13 +4,13 @@ export const term: GlossaryTermDefinition = {
 	slug: "ip-reputation",
 	title: "IP Reputation",
 	description:
-		"Trust score for the IP address that hands mail to receiving servers.",
+		"How mailbox providers rate a sending IP based on the traffic that leaves it.",
 	keywords: ["IP reputation","sending IP score","SMTP IP reputation"],
-	body: `Receivers track how mail from each IP behaves: volume patterns, spam complaints, trap hits, and whether the IP is a known residential proxy or cloud range. A brand-new cloud IP looks different from a long-running ESP range.
+	body: `IP reputation is the trust score for the IP that connects over SMTP. Providers track complaints, volume patterns, blocklist hits, and whether the IP is shared or dedicated. A brand-new IP starts cold and needs warming.
 
-Shared IPs blend many customers' traffic. Dedicated IPs isolate your behavior. Either way, abrupt spikes from cold IPs cause filtering.
+Bad neighbors on a shared IP can hurt you. On a dedicated IP, your own behavior is the whole story. Reverse DNS and authentication should match the IP's role.
 
-Warm new IPs, keep reverse DNS sensible, and enable authentication. Reloop's deliverability guidance assumes you treat IP reputation as something you build, not something you buy once.`,
+Watch postmaster tools and blocklist checks when delivery dips. Reloop's deliverability focus is on the signals and setup you control.`,
 	relatedTerms: [
 		{
 			slug: "dedicated-ip",

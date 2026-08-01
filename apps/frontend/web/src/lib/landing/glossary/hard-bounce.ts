@@ -4,13 +4,13 @@ export const term: GlossaryTermDefinition = {
 	slug: "hard-bounce",
 	title: "Hard Bounce",
 	description:
-		"A permanent delivery failure. The address should not be mailed again.",
+		"A permanent delivery failure: the address or domain cannot receive the message.",
 	keywords: ["hard bounce","permanent bounce","user unknown"],
-	body: `A hard bounce means the receiver believes the failure is permanent: mailbox does not exist, domain does not accept mail, or the address is blocked in a final way. SMTP codes in the 5xx range often indicate this, though mapping is not always clean across providers.
+	body: `A hard bounce means the receiver says this will not work later either: user unknown, domain does not exist, address rejected as invalid. Soft bounces are temporary; hard bounces are permanent.
 
-Best practice is immediate suppression. Retrying hard bounces wastes volume and signals bad list hygiene. If you re-import an old CRM dump without cleaning, hard bounces spike fast.
+Suppress hard-bounced addresses right away. Mailing them again signals poor list hygiene and hurts reputation. Do not re-import old CSV dumps without cleaning.
 
-Reloop classifies bounce events so you can automate removal from active audiences.`,
+Reloop marks hard bounces in events and analytics so your app can stop mailing those addresses automatically.`,
 	relatedTerms: [
 		{
 			slug: "soft-bounce",

@@ -4,13 +4,13 @@ export const term: GlossaryTermDefinition = {
 	slug: "list-unsubscribe",
 	title: "List-Unsubscribe",
 	description:
-		"Headers (and related mechanisms) that let clients offer a one-click unsubscribe.",
+		"A header (and sometimes a one-click path) that lets clients offer a built-in unsubscribe action.",
 	keywords: ["List-Unsubscribe","one-click unsubscribe","RFC 8058"],
-	body: `List-Unsubscribe headers tell supporting clients how a recipient can opt out without digging through footer HTML. Modern one-click unsubscribe (often paired with List-Unsubscribe-Post) lets the client send a POST that your system must honor quickly.
+	body: `List-Unsubscribe is an email header that points to an unsubscribe URL or mailto. Many clients show a native “Unsubscribe” control when the header is present. One-click List-Unsubscribe (RFC 8058) lets the client post a simple request without opening a browser form.
 
-Mailbox providers increasingly expect working one-click unsubscribe on bulk mail. Broken or slow handlers create spam complaints instead.
+Use it on marketing and bulk mail. Make the endpoint fast, idempotent, and wired to your real suppression store. A header that 404s is worse than no header.
 
-Footer links remain useful as a fallback. The header path should hit the same suppression logic. Reloop and standards-compliant ESP stacks support these headers on campaign traffic.`,
+Transactional mail often omits marketing unsubscribe controls, but product preferences still matter. Reloop supports standard headers when you send bulk or marketing streams.`,
 	relatedTerms: [
 		{
 			slug: "unsubscribe",

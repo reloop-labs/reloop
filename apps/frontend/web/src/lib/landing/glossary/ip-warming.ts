@@ -4,13 +4,13 @@ export const term: GlossaryTermDefinition = {
 	slug: "ip-warming",
 	title: "IP Warming",
 	description:
-		"Gradually increasing send volume on a new IP so providers learn to trust it.",
+		"Gradually raising send volume on a new or cold IP so providers learn to trust it.",
 	keywords: ["IP warming","IP warm up","email warming"],
-	body: `IP warming is a schedule: start with low volume to your most engaged recipients, watch bounces and complaints, then step volume up over days or weeks. Providers expect new IPs to ramp. Blasting full volume on day one looks like a hijacked server.
+	body: `IP warming is a plan to ramp volume on a new or idle sending IP. You start with low volume to your most engaged recipients, then increase over days or weeks while watching bounces and complaints.
 
-There is no universal calendar. Consumer ISPs are stricter than many corporate gateways. Transactional streams warm differently from bulk newsletters.
+Skipping warm-up and blasting full volume from a cold IP often lands you in spam or on blocklists. Warming is not magic; content and consent still matter.
 
-Document the plan, stick to engaged cohorts early, and pause if complaints or blocks appear. Switching domains and IPs at the same time multiplies risk.`,
+Document a schedule, stick to engaged segments early, and pause if complaint or bounce rates spike. Reloop docs cover auth and reputation practices that sit next to any warm-up plan.`,
 	relatedTerms: [
 		{
 			slug: "dedicated-ip",

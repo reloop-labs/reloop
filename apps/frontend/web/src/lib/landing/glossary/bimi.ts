@@ -4,13 +4,13 @@ export const term: GlossaryTermDefinition = {
 	slug: "bimi",
 	title: "BIMI",
 	description:
-		"Brand Indicators for Message Identification. Shows your logo in supporting inboxes when authentication passes.",
+		"Shows your brand logo next to messages in some inboxes when authentication passes.",
 	keywords: ["BIMI","BIMI logo","email brand logo"],
-	body: `BIMI lets supporting mailbox providers display a brand logo next to authenticated mail. Receivers only show the logo when DMARC is solid (typically enforcement with aligned SPF or DKIM) and your BIMI DNS record points at a valid SVG logo.
+	body: `BIMI (Brand Indicators for Message Identification) lets some mailbox providers show your logo next to authenticated mail. The logo only appears when DMARC is in good shape (usually enforcement with aligned SPF or DKIM) and your BIMI DNS record points at a valid SVG logo.
 
-Some providers also want a Verified Mark Certificate (VMC) for full logo display. Requirements differ by inbox. BIMI does not replace SPF, DKIM, or DMARC; it builds on them.
+Some providers also want a Verified Mark Certificate (VMC) before they show the logo. Rules differ by inbox. BIMI does not replace SPF, DKIM, or DMARC; it sits on top of them.
 
-If you care about brand recognition in the inbox, get DMARC to enforcement first, then add BIMI. Skipping authentication work and hoping the logo appears will not work.`,
+If you want the logo, get DMARC to enforcement first, then add BIMI. Skipping the auth work will not make the logo show up.`,
 	relatedTerms: [
 		{
 			slug: "dmarc",

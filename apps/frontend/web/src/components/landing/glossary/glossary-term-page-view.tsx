@@ -148,11 +148,11 @@ export function GlossaryTermPageView({
 									In Reloop
 								</p>
 								<p className="mt-1.5 max-w-5xl text-[13px] text-text-sub-600 leading-relaxed sm:text-[14px] dark:text-white/55">
-									Put{" "}
+									How{" "}
 									<span className="text-text-strong-950 dark:text-white/80">
 										{term.title}
 									</span>{" "}
-									into practice on hosted or self-hosted Reloop.
+									shows up when you use Reloop, hosted or self-hosted.
 								</p>
 							</div>
 							<FeatureLink
@@ -195,13 +195,13 @@ export function GlossaryTermPageView({
 				<div className="border-stroke-soft-200 border-y dark:border-white/10">
 					<div className="px-4 py-10 text-center sm:px-6 sm:py-12 lg:px-8">
 						<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em] dark:text-white/55">
-							Keep learning
+							Related
 						</p>
 						<h2 className="mt-2 font-serif text-[1.75rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[2.2rem] dark:text-white">
-							Related terms.
+							Nearby terms
 						</h2>
 						<p className="mx-auto mt-3 max-w-md text-[15px] text-text-sub-600 leading-relaxed dark:text-white/55">
-							More email concepts that connect to {term.title}.
+							Other words that often show up next to {term.title}.
 						</p>
 					</div>
 
@@ -243,7 +243,7 @@ export function GlossaryTermPageView({
 					) : (
 						<div className="border-stroke-soft-200 border-t px-4 py-10 text-center sm:px-6 dark:border-white/10">
 							<p className="text-[15px] text-text-sub-600 dark:text-white/55">
-								Explore more email infrastructure terms in the glossary.
+								See the full list of email terms in the glossary.
 							</p>
 							<Link
 								href="/glossary"

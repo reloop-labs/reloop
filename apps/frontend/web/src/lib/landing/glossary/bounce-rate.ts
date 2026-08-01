@@ -4,15 +4,15 @@ export const term: GlossaryTermDefinition = {
 	slug: "bounce-rate",
 	title: "Bounce Rate",
 	description:
-		"The share of sends that failed delivery, usually as a percentage of total attempts in a period.",
+		"The percentage of emails that failed to deliver in a given period.",
 	keywords: ["email bounce rate","bounce percentage","delivery failure rate"],
-	body: `Bounce rate is failed deliveries divided by total sends for a window you care about (campaign, day, or month). Providers and blocklists use it as a quality signal. A sudden spike often means a bad list import or a broken form.
+	body: `Bounce rate is failed deliveries divided by total sends for a window you care about (campaign, day, or month). Providers and blocklists treat it as a quality signal. A sudden spike often means a bad list import or a broken signup form.
 
-There is no single “safe” number for every sender, but staying low matters more than chasing a perfect zero. Transactional mail should bounce less than bulk marketing because addresses come from real product usage. Marketing lists age and need hygiene.
+There is no single “safe” number for every sender. Staying low matters more than chasing zero. Transactional mail usually bounces less than bulk marketing because addresses come from real product use. Marketing lists age and need cleanup.
 
-Track hard and soft bounces separately if your stack allows it. Soft bounces may resolve; hard bounces should not keep getting mail.
+If you can, track hard and soft bounces separately. Soft bounces may resolve; hard bounces should not keep getting mail.
 
-Reloop surfaces bounce metrics in analytics so you can catch list problems before reputation does.`,
+Reloop shows bounce metrics in analytics so you can catch list problems before reputation takes the hit.`,
 	relatedTerms: [
 		{
 			slug: "bounce",

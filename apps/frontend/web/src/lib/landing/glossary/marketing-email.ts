@@ -4,13 +4,13 @@ export const term: GlossaryTermDefinition = {
 	slug: "marketing-email",
 	title: "Marketing Email",
 	description:
-		"Bulk or promotional messages sent to a list for news, offers, or product updates.",
+		"Promotional or newsletter mail sent to people who opted in, not triggered by a product action.",
 	keywords: ["marketing email","promotional email","email campaign"],
-	body: `Marketing email is permission-based bulk mail: newsletters, launches, promotions, nurture sequences. It is not the same as transactional mail that a user action triggers (receipts, resets). Laws and provider rules treat them differently; so should your templates and lists.
+	body: `Marketing email is bulk or campaign mail: newsletters, launches, offers, nurture sequences. Recipients should have opted in for that kind of content. Transactional mail is different: it reacts to account or product events.
 
-Good marketing mail has a clear reason to exist, an obvious unsubscribe path, and segments that match interest. Bad marketing mail is purchased lists, vague “updates,” and Friday night blasts to everyone who ever signed up for a whitepaper.
+Marketing streams need clear unsubscribe, list hygiene, and careful frequency. Mixing heavy promo design into password resets confuses users and filters.
 
-Reloop supports campaign-style sending alongside transactional traffic. Keep the streams conceptually separate even when one platform handles both.`,
+Keep marketing and transactional identities and consent separate when you can. Reloop can send both, but your product should treat consent and templates as separate concerns.`,
 	relatedTerms: [
 		{
 			slug: "transactional-email",

@@ -6,11 +6,11 @@ export const term: GlossaryTermDefinition = {
 	description:
 		"The percentage of recipients who completed the action the email was meant to drive.",
 	keywords: ["email conversion rate","email CTA conversion"],
-	body: `Conversion rate ties email to an outcome: purchase, signup, password reset completed, trial started. The formula is conversions divided by a base (delivered or clicked). Without a defined goal, the metric is noise.
+	body: `Conversion rate ties email to an outcome: purchase, signup, finished password reset, trial started. The formula is conversions divided by a base (delivered or clicked). Without a clear goal, the metric is noise.
 
-Transactional mail often has a natural conversion: the user finishes the flow the message started. Marketing mail needs clear offers and tracking (UTM parameters, promo codes, or on-site attribution).
+Transactional mail often has a natural conversion: the user finishes the task the message started. Marketing mail needs tracking (UTMs, deep links, promo codes) so you can attribute results back to the send.
 
-If opens look fine and conversions do not, the problem is usually the landing experience or the offer, not the SMTP path.`,
+Compare conversion across segments and templates, not just absolute numbers. A smaller list that acts is worth more than a huge list that ignores you.`,
 	relatedTerms: [
 		{
 			slug: "click-through-rate",

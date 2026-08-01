@@ -14,7 +14,7 @@ const pageUrl = `${siteUrl}/glossary`;
 export const metadata: Metadata = {
 	title: "Email Glossary | Reloop",
 	description:
-		"Browse email infrastructure terms—deliverability, authentication, analytics, and more. Clear definitions for the concepts that show up when you ship email.",
+		"Plain-language definitions for email terms: deliverability, authentication, analytics, and the rest of what you hit when you ship mail.",
 	keywords: [
 		"email glossary",
 		"email marketing terms",
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
 	openGraph: {
 		title: "Email Glossary | Reloop",
 		description:
-			"Browse email infrastructure terms—deliverability, authentication, analytics, and more.",
+			"Plain-language definitions for email terms: deliverability, authentication, analytics, and more.",
 		type: "website",
 		url: pageUrl,
 		siteName: "Reloop",
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
 		card: "summary_large_image",
 		title: "Email Glossary | Reloop",
 		description:
-			"Browse email infrastructure terms—deliverability, authentication, analytics, and more.",
+			"Plain-language definitions for email terms: deliverability, authentication, analytics, and more.",
 	},
 };
 
@@ -52,7 +52,7 @@ const GlossaryPage = () => {
 		"@type": "DefinedTermSet",
 		name: "Email Glossary",
 		description:
-			"Comprehensive glossary of email marketing and infrastructure terms.",
+			"Plain-language email glossary for marketing and infrastructure terms.",
 		url: pageUrl,
 		hasDefinedTerm: terms.map((term) => ({
 			"@type": "DefinedTerm",
@@ -72,11 +72,11 @@ const GlossaryPage = () => {
 					<div className="px-4 pt-16 pb-12 sm:px-6 sm:pt-20 sm:pb-14 lg:px-8">
 						<div className="mx-auto text-center">
 							<h1 className="font-serif text-[2.4rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[3.6rem] dark:text-white">
-								Explore email terms.
+								Email terms, explained.
 							</h1>
 							<p className="mx-auto mt-3 max-w-2xl text-balance text-[15px] text-text-sub-600 leading-relaxed sm:text-[17px] dark:text-white/50">
-								Browse the terms and definitions that show up when you build,
-								send, and debug email infrastructure.
+								Short definitions for the words you run into when you set up
+								sending, fix deliverability, or dig through docs.
 							</p>
 						</div>
 					</div>
@@ -92,13 +92,13 @@ const GlossaryPage = () => {
 					<div className="px-4 py-14 sm:px-6 sm:py-16 lg:px-8">
 						<div className="mx-auto max-w-[920px] text-center">
 							<h2 className="font-serif text-[2.6rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[3.4rem] lg:text-[4.2rem] dark:text-white">
-								Ready to put it into practice?
+								Done reading?
 								<br />
-								<span className="text-primary-base">Start free today.</span>
+								<span className="text-primary-base">Send for free.</span>
 							</h2>
 							<p className="mx-auto mt-6 max-w-[550px] font-medium text-[15px] text-text-sub-600 leading-7 sm:text-[17px] dark:text-white/60">
-								3,000 emails per month on the Free plan—no credit card. Or read
-								the docs and deploy Reloop yourself.
+								3,000 emails a month on the Free plan, no credit card. Or read
+								the docs and run Reloop on your own servers.
 							</p>
 							<div className="mt-8 flex flex-wrap items-center justify-center gap-4">
 								<a

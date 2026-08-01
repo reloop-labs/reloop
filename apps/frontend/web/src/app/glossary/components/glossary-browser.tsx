@@ -105,7 +105,7 @@ export function GlossaryBrowser({
 			>
 				<div className="mx-auto w-full max-w-md px-4 pb-8 sm:px-6">
 					<label htmlFor="glossary-search" className="sr-only">
-						Search all terms
+						Search terms
 					</label>
 					<div className="relative">
 						<Icon
@@ -118,7 +118,7 @@ export function GlossaryBrowser({
 							type="search"
 							value={query}
 							onChange={(e) => setQuery(e.target.value)}
-							placeholder="Search all terms"
+							placeholder="Search terms"
 							autoComplete="off"
 							className="h-11 w-full rounded-full border border-stroke-soft-200 bg-bg-weak-50 pr-4 pl-10 text-[14px] text-text-strong-950 outline-none transition-colors placeholder:text-text-sub-600 focus:border-text-strong-950 focus:bg-bg-white-0 dark:border-white/10 dark:bg-white/[0.04] dark:text-white dark:focus:border-white/30 dark:focus:bg-white/[0.06] dark:placeholder:text-white/40"
 						/>
@@ -175,7 +175,7 @@ export function GlossaryBrowser({
 			<div className="mx-auto w-full max-w-7xl border-stroke-soft-200 border-x border-b bg-bg-weak-50/80 dark:border-white/10 dark:bg-white/[0.02]">
 				{groups.length === 0 ? (
 					<p className="mx-auto max-w-4xl px-4 py-16 text-center text-[15px] text-text-sub-600 sm:px-6 dark:text-white/50">
-						No terms match &ldquo;{query.trim()}&rdquo;.
+						Nothing matched &ldquo;{query.trim()}&rdquo;.
 					</p>
 				) : (
 					<div className="mx-auto w-full max-w-4xl space-y-14 px-4 py-10 sm:space-y-16 sm:px-6 sm:py-12 lg:px-8">

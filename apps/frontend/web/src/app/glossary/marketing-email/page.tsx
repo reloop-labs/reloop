@@ -17,8 +17,8 @@ export default function MarketingEmailGlossaryPage() {
 		<GlossaryTermPageView
 			term={term}
 			cta={defaultLandingCta(
-				"Put it into practice",
-				"Reloop gives you the tools to improve deliverability and send with confidence.",
+				"Try Reloop free",
+				"3,000 emails a month on the Free plan, no credit card. Or self-host from the docs.",
 			)}
 		/>
 	);

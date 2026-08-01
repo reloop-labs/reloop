@@ -6,11 +6,11 @@ export const term: GlossaryTermDefinition = {
 	description:
 		"Mail your system receives and processes, not only the mail you send out.",
 	keywords: ["inbound email","incoming email parsing","reply handling"],
-	body: `Inbound email is everything that hits your domain's MX path: support replies, plus-addressed tickets, bounce messages, and user-generated mail your product parses. Outbound ESPs sometimes offer inbound routing or parsing webhooks so apps can treat email as an API input.
+	body: `Inbound email is traffic coming into your domain or app: support@, replies, webhooks from partners, or parse-to-API pipelines. Outbound is what you send. Many products need both.
 
-Use cases include helpdesks, bounce processing, and “email a document to your account” features. You will deal with spam, spoofing, and MIME edge cases. Authentication results on inbound mail help you decide what to trust.
+Inbound setup means MX records (or a provider that receives for you), routing rules, and often parsing (attachments, headers, thread IDs). Security matters: spoofed mail, spam, and large attachments.
 
-Reloop's broader platform direction includes product email workflows; check product docs for inbound capabilities as you build.`,
+Reloop includes inbound capabilities so you can receive and process mail in the same platform you use for sending.`,
 	relatedTerms: [
 		{
 			slug: "mx-record",

@@ -8,9 +8,9 @@ export const term: GlossaryTermDefinition = {
 	keywords: ["Return-Path","bounce address","envelope from"],
 	body: `Return-Path is a header that reflects the envelope MAIL FROM after delivery. Bounce messages go there. ESPs often set a unique return path per campaign or recipient (Variable Envelope Return Path) so they can attribute bounces automatically.
 
-If Return-Path is broken or points at an unmonitored mailbox, you fly blind on failures. SPF is evaluated on the envelope domain, so return-path domains need correct SPF too.
+If Return-Path is broken or points at an unmonitored mailbox, you fly blind on delivery failures. Do not set it to a marketing address you never check.
 
-When debugging, look at both the visible From and the Return-Path. They answer different questions.`,
+When you send through Reloop, bounce handling is wired so events reach your webhooks and analytics without you parsing bounce mail by hand.`,
 	relatedTerms: [
 		{
 			slug: "envelope",
