@@ -51,7 +51,10 @@ export function ApiKeyListToolbar({
 			className="flex w-full items-start justify-between gap-2"
 		>
 			<div className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
-				<Input.Root size="small" className="w-40 lg:w-56">
+				<Input.Root
+					size="small"
+					className="w-40 rounded-xl shadow-none! lg:w-56"
+				>
 					<Input.Wrapper>
 						<Input.Icon as={Icon} name="search" size="small" />
 						<Input.Input

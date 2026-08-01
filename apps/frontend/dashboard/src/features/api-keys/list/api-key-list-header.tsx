@@ -1,3 +1,4 @@
+import { ApiKeysApiDetails } from "#/components/api-details/api-keys";
 import * as Button from "@reloop/ui/button";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
@@ -32,6 +33,21 @@ export function ApiKeyListHeader() {
 			</div>
 
 			<div className="flex shrink-0 items-center gap-2">
+				<ApiKeysApiDetails
+					renderTrigger={({ open }) => (
+						<Button.Root
+							type="button"
+							variant="neutral"
+							mode="stroke"
+							size="small"
+							onClick={open}
+							className="gap-1.5 rounded-xl"
+						>
+							<Icon name="code" className="h-4 w-4 text-text-sub-600" />
+							Browse samples
+						</Button.Root>
+					)}
+				/>
 				<Button.Root
 					type="button"
 					variant="neutral"

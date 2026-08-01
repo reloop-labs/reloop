@@ -4,9 +4,9 @@ import { User } from "lucide-react";
 import { DataTableFacetedFilter } from "#/components/data-table/data-table-faceted-filter";
 import type { CreatedByUser } from "../types";
 
-function creatorLabel(creator: CreatedByUser) {
+function creatorLabel(creator: CreatedByUser): string {
 	return (
-		creator.name || (creator.email ? creator.email.split("@")[0] : "Unknown")
+		creator.name || creator.email?.split("@")[0] || "Unknown"
 	);
 }
 
