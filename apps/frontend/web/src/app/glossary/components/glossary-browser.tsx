@@ -68,7 +68,12 @@ function TermCard({ term }: { term: GlossaryBrowserTerm }) {
 	);
 }
 
-export function GlossaryBrowser({ terms }: { terms: GlossaryBrowserTerm[] }) {
+export function GlossaryBrowser({
+	terms,
+}: {
+	terms: GlossaryBrowserTerm[];
+	railClassName?: string;
+}) {
 	const [query, setQuery] = useState("");
 
 	const availableLetters = useMemo(() => {
@@ -91,36 +96,44 @@ export function GlossaryBrowser({ terms }: { terms: GlossaryBrowserTerm[] }) {
 	const isSearching = query.trim().length > 0;
 
 	return (
-		<div>
-			{/* Search — own max-width */}
-			<div className="mx-auto w-full max-w-md px-4 sm:px-6">
-				<label htmlFor="glossary-search" className="sr-only">
-					Search all terms
-				</label>
-				<div className="relative">
-					<Icon
-						name="search"
-						className="pointer-events-none absolute top-1/2 left-4 size-3.5 -translate-y-1/2 text-text-sub-600 dark:text-white/40"
-						aria-hidden
-					/>
-					<input
-						id="glossary-search"
-						type="search"
-						value={query}
-						onChange={(e) => setQuery(e.target.value)}
-						placeholder="Search all terms"
-						autoComplete="off"
-						className="h-11 w-full rounded-full border border-stroke-soft-200 bg-bg-weak-50 pr-4 pl-10 text-[14px] text-text-strong-950 outline-none transition-colors placeholder:text-text-sub-600 focus:border-text-strong-950 focus:bg-bg-white-0 dark:border-white/10 dark:bg-white/[0.04] dark:text-white dark:placeholder:text-white/40 dark:focus:border-white/30 dark:focus:bg-white/[0.06]"
-					/>
+		<>
+			{/* Search — rails max-w-7xl; field max-w-md */}
+			<div
+				className={
+					"mx-auto w-full max-w-7xl border-stroke-soft-200 border-x dark:border-white/10"
+				}
+			>
+				<div className="mx-auto w-full max-w-md px-4 pb-8 sm:px-6">
+					<label htmlFor="glossary-search" className="sr-only">
+						Search all terms
+					</label>
+					<div className="relative">
+						<Icon
+							name="search"
+							className="-translate-y-1/2 pointer-events-none absolute top-1/2 left-4 size-3.5 text-text-sub-600 dark:text-white/40"
+							aria-hidden
+						/>
+						<input
+							id="glossary-search"
+							type="search"
+							value={query}
+							onChange={(e) => setQuery(e.target.value)}
+							placeholder="Search all terms"
+							autoComplete="off"
+							className="h-11 w-full rounded-full border border-stroke-soft-200 bg-bg-weak-50 pr-4 pl-10 text-[14px] text-text-strong-950 outline-none transition-colors placeholder:text-text-sub-600 focus:border-text-strong-950 focus:bg-bg-white-0 dark:border-white/10 dark:bg-white/[0.04] dark:text-white dark:focus:border-white/30 dark:focus:bg-white/[0.06] dark:placeholder:text-white/40"
+						/>
+					</div>
 				</div>
 			</div>
 
-			{/* A–Z — full width, sticky; borders span the screen */}
+			{/* A–Z — rails max-w-7xl; top/bottom borders span rail width; sticky */}
 			<nav
 				aria-label="Jump to letter"
-				className="sticky top-16 z-40 mt-8 w-full border-stroke-soft-200 border-y bg-bg-white-0 dark:border-white/10 dark:bg-black"
+				className={cn(
+					"sticky top-16 z-40 border-stroke-soft-200 border-y bg-bg-white-0 dark:border-white/10 dark:bg-black",
+				)}
 			>
-				<div className="flex w-full flex-wrap items-center justify-center gap-x-1 gap-y-1 px-4 py-3 sm:gap-x-1.5 sm:px-6">
+				<div className="mx-auto flex w-full max-w-7xl flex-wrap items-center justify-center gap-x-1 gap-y-1 border-stroke-soft-200 border-x px-4 py-3 sm:gap-x-1.5 sm:px-6 dark:border-white/10">
 					{(["#", ...ALPHABET] as const).map((letter) => {
 						const hasTerms = availableLetters.has(letter);
 						const letterId =
@@ -158,8 +171,8 @@ export function GlossaryBrowser({ terms }: { terms: GlossaryBrowserTerm[] }) {
 				</div>
 			</nav>
 
-			{/* Results band — full width bg; list content has its own max-width */}
-			<div className="w-full border-stroke-soft-200 border-b bg-bg-weak-50/80 dark:border-white/10 dark:bg-white/[0.02]">
+			{/* Results — rails max-w-7xl; list max-w-4xl */}
+			<div className="mx-auto w-full max-w-7xl border-stroke-soft-200 border-x border-b bg-bg-weak-50/80 dark:border-white/10 dark:bg-white/[0.02]">
 				{groups.length === 0 ? (
 					<p className="mx-auto max-w-4xl px-4 py-16 text-center text-[15px] text-text-sub-600 sm:px-6 dark:text-white/50">
 						No terms match &ldquo;{query.trim()}&rdquo;.
@@ -176,7 +189,6 @@ export function GlossaryBrowser({ terms }: { terms: GlossaryBrowserTerm[] }) {
 								<section
 									key={letter}
 									id={letterId}
-									// Header (4rem) + A–Z bar (~3rem)
 									className="scroll-mt-40"
 									aria-labelledby={`${letterId}-heading`}
 								>
@@ -186,8 +198,7 @@ export function GlossaryBrowser({ terms }: { terms: GlossaryBrowserTerm[] }) {
 												id={`${letterId}-heading`}
 												aria-label={`Terms starting with ${letter}`}
 												className={cn(
-													// Stick below fixed header + sticky A–Z bar
-													"sticky top-32 z-10 select-none pt-1 font-sans font-light text-[3.25rem] leading-none tracking-tight sm:top-36 sm:pt-2 sm:text-[4rem] lg:text-[4.5rem]",
+													"sticky top-32 z-10 select-none pt-1 font-light font-sans text-[3.25rem] leading-none tracking-tight sm:top-36 sm:pt-2 sm:text-[4rem] lg:text-[4.5rem]",
 													"text-transparent",
 													"[-webkit-text-stroke:1.25px_#a3a3a3]",
 													"dark:[-webkit-text-stroke:1.25px_rgba(255,255,255,0.35)]",
@@ -210,6 +221,6 @@ export function GlossaryBrowser({ terms }: { terms: GlossaryBrowserTerm[] }) {
 					</div>
 				)}
 			</div>
-		</div>
+		</>
 	);
 }
