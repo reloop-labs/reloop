@@ -1,6 +1,6 @@
-import { Elysia, t } from "elysia";
 import { rateLimitPlugin } from "@reloop/domain/middleware/rate-limit";
 import { callbackController } from "@reloop/domain/routes/domain-connect/callback/callback.controllers";
+import { Elysia, t } from "elysia";
 
 export const callbackRoute = new Elysia()
 	.use(

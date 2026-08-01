@@ -1,7 +1,3 @@
-
-import { useRouter } from "next/navigation";
-import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
-import type { AudienceStatus } from "#/features/contacts/audience";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
@@ -10,10 +6,12 @@ import {
 	Root as PopoverRoot,
 	Trigger as PopoverTrigger,
 } from "@reloop/ui/popover";
-
+import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
+import type { AudienceStatus } from "#/features/contacts/audience";
 import { useUpdateContactStatusInCache } from "#/features/contacts/hooks/use-contacts-query";
+import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 
 interface Contact {
 	id: string;

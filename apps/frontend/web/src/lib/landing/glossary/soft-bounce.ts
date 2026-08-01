@@ -5,7 +5,7 @@ export const term: GlossaryTermDefinition = {
 	title: "Soft Bounce",
 	description:
 		"A temporary delivery failure that may succeed if you try again later.",
-	keywords: ["soft bounce","temporary bounce","4xx bounce"],
+	keywords: ["soft bounce", "temporary bounce", "4xx bounce"],
 	body: `A soft bounce is a temporary problem: mailbox full, greylisting, rate limiting, or a short outage. The right response is retry with backoff, not immediate suppression.
 
 If the same address soft-bounces for days, escalate: pause, investigate, or treat as undeliverable under your policy. Do not loop forever.

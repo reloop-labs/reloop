@@ -1,13 +1,10 @@
-import { usePathname, useSearchParams } from "next/navigation";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
+import { usePathname, useSearchParams } from "next/navigation";
 import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import { useOrgPermissions } from "#/features/settings/use-org-permissions";
-import {
-	filterSettingsNavigation,
-	settingsNavigation,
-} from "../navigation";
+import { filterSettingsNavigation, settingsNavigation } from "../navigation";
 import { SidebarNavIcon } from "./sidebar-nav-icon";
 import { SidebarNavLink } from "./sidebar-nav-link";
 
@@ -80,7 +77,10 @@ export function SettingsSidebarItems({
 			onPointerLeave={() => setHoveredEl(undefined)}
 		>
 			{/* Back to app */}
-			<SidebarNavLink href={backHref} ref={backNavRef} onPointerEnter={() => setHoveredEl(backNavRef.current ?? undefined)}
+			<SidebarNavLink
+				href={backHref}
+				ref={backNavRef}
+				onPointerEnter={() => setHoveredEl(backNavRef.current ?? undefined)}
 				className={cn(
 					"relative z-10 mb-4 flex h-8 items-center rounded-lg transition-all",
 					isCollapsed
@@ -97,7 +97,7 @@ export function SettingsSidebarItems({
 				>
 					<Icon
 						name="arrow-left"
-						className="h-4 w-4 shrink-0 text-text-sub-600 opacity-70 transition-all duration-200 group-hover:text-text-strong-950 group-hover:opacity-100 group-hover:-translate-x-0.5"
+						className="group-hover:-translate-x-0.5 h-4 w-4 shrink-0 text-text-sub-600 opacity-70 transition-all duration-200 group-hover:text-text-strong-950 group-hover:opacity-100"
 					/>
 					{!isCollapsed && (
 						<span className="font-medium text-[13px] text-text-sub-600 transition-colors group-hover:text-text-strong-950">
@@ -132,7 +132,10 @@ export function SettingsSidebarItems({
 								: pathWithoutSlug.startsWith(item.path);
 
 						return (
-							<SidebarNavLink href={item.path} key={item.path} ref={(el) => {
+							<SidebarNavLink
+								href={item.path}
+								key={item.path}
+								ref={(el) => {
 									if (el) itemRefs.current[currentIdx] = el;
 								}}
 								onPointerEnter={() =>

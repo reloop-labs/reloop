@@ -6,10 +6,10 @@ import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
 import {
 	AnimatePresence,
+	type AnimationPlaybackControls,
 	animate,
 	motion,
 	useMotionValue,
-	type AnimationPlaybackControls,
 } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
@@ -120,7 +120,7 @@ export const DeleteTemplateModal = ({
 					<Modal.Title className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
 						Delete template
 					</Modal.Title>
-					<p className="mt-2 text-sm leading-relaxed text-text-sub-600">
+					<p className="mt-2 text-sm text-text-sub-600 leading-relaxed">
 						Are you sure you want to delete this template? This action cannot be
 						undone.
 					</p>

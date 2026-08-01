@@ -1,5 +1,5 @@
-import { useRouter } from "next/navigation";
 import { Icon } from "@reloop/ui/icon";
+import { useRouter } from "next/navigation";
 import { useQueryState } from "nuqs";
 
 import { useApiKeyDetailQuery } from "../hooks/use-api-key-detail-query";

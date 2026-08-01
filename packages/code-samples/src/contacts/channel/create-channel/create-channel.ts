@@ -29,7 +29,7 @@ console.log(channel.id, channel.name);`,
   -H "Content-Type: application/json" \\
   -d '{"name": "Product Updates","description": "Get the latest news about our products","defaultSubscription": "opt_in","visibility": "public"}'`,
 	},
-				{
+	{
 		id: "python",
 		lang: "python",
 		label: "Python",
@@ -49,7 +49,7 @@ if result.channel_error:
 
 print(result.channel["id"], result.channel["name"])`,
 	},
-			{
+	{
 		id: "php",
 		lang: "php",
 		label: "PHP",
@@ -57,7 +57,7 @@ print(result.channel["id"], result.channel["name"])`,
 
 require 'vendor/autoload.php';
 
-use Reloop\Reloop;
+use ReloopReloop;
 
 $reloop = Reloop::client('rl_123456789');
 
@@ -69,7 +69,7 @@ $channel = $reloop->contacts->channels->create([
 ]);
 echo $channel['id'] . ' ' . $channel['name'] . PHP_EOL;`,
 	},
-			{
+	{
 		id: "java",
 		lang: "java",
 		label: "Java",

@@ -25,7 +25,7 @@ console.log(properties.total, properties.properties);`,
 		source: `curl "https://reloop.sh/api/contacts/v1/properties/list?page=1&limit=10" \\
   -H "x-api-key: rl_123456789"`,
 	},
-				{
+	{
 		id: "python",
 		lang: "python",
 		label: "Python",
@@ -43,7 +43,7 @@ if result.property_error:
 
 print(result.properties["total"], result.properties["properties"])`,
 	},
-			{
+	{
 		id: "php",
 		lang: "php",
 		label: "PHP",
@@ -51,7 +51,7 @@ print(result.properties["total"], result.properties["properties"])`,
 
 require 'vendor/autoload.php';
 
-use Reloop\Reloop;
+use ReloopReloop;
 
 $reloop = Reloop::client('rl_123456789');
 
@@ -61,7 +61,7 @@ $properties = $reloop->contacts->properties->list([
 ]);
 echo $properties['total'] . ' ' . $properties['properties'] . PHP_EOL;`,
 	},
-			{
+	{
 		id: "java",
 		lang: "java",
 		label: "Java",

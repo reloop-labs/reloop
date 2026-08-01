@@ -2,9 +2,9 @@ import { authMiddleware } from "@be/contacts/middleware/auth";
 import { rateLimitPlugin } from "@be/contacts/middleware/rate-limit";
 import { PropertyModel } from "@be/contacts/model/property.model";
 import { auditLogHook } from "@be/contacts/utils/audit-log";
+import { createPropertyXCodeSamples } from "@reloop/code-samples/contacts";
 import { Elysia } from "elysia";
 import { createPropertyController } from "./create-property.controllers";
-import { createPropertyXCodeSamples } from "@reloop/code-samples/contacts";
 
 export const createPropertyRoute = new Elysia()
 	.use(authMiddleware)

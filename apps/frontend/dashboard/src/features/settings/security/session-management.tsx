@@ -1,6 +1,6 @@
 import { authClient } from "@reloop/auth/client";
-import * as FancyButton from "@reloop/ui/fancy-button";
 import { cn } from "@reloop/ui/cn";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import Spinner from "@reloop/ui/spinner";
@@ -36,10 +36,7 @@ export function SessionManagement({ className }: SessionManagementProps) {
 	);
 	const { data: currentSession } = useSessionQuery();
 
-	const {
-		data: sessions = [],
-		isPending: loading,
-	} = useQuery({
+	const { data: sessions = [], isPending: loading } = useQuery({
 		queryKey: queryKeys.auth.sessions(),
 		queryFn: async (): Promise<Session[]> => {
 			const { data, error } = await authClient.listSessions();
@@ -107,7 +104,7 @@ export function SessionManagement({ className }: SessionManagementProps) {
 						variant={statusAll === "success" ? "success" : "destructive"}
 						size="xsmall"
 						className={cn(
-							"min-w-[140px] justify-center overflow-hidden transition-all duration-200 font-medium",
+							"min-w-[140px] justify-center overflow-hidden font-medium transition-all duration-200",
 							statusAll === "revoking" && "opacity-90",
 						)}
 						onClick={handleTerminateAllSessions}
@@ -268,8 +265,7 @@ export function SessionManagement({ className }: SessionManagementProps) {
 												</div>
 											) : (
 												(() => {
-													const itemStatus =
-														statusMap[session.token] ?? "idle";
+													const itemStatus = statusMap[session.token] ?? "idle";
 													return (
 														<FancyButton.Root
 															variant={
@@ -279,7 +275,7 @@ export function SessionManagement({ className }: SessionManagementProps) {
 															}
 															size="xsmall"
 															className={cn(
-																"min-w-[80px] justify-center overflow-hidden transition-all duration-200 font-medium",
+																"min-w-[80px] justify-center overflow-hidden font-medium transition-all duration-200",
 																itemStatus === "revoking" && "opacity-90",
 															)}
 															onClick={() =>

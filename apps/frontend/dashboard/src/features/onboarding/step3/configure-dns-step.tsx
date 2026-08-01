@@ -100,7 +100,11 @@ export function ConfigureDnsStep() {
 					</p>
 				</div>
 				<div className="mt-6">
-					<DnsAutoConnectBanner domain={domainData} domainId={domainId || domainData?.id} forceShow />
+					<DnsAutoConnectBanner
+						domain={domainData}
+						domainId={domainId || domainData?.id}
+						forceShow
+					/>
 				</div>
 
 				<DnsFeatureSection
@@ -130,7 +134,9 @@ export function ConfigureDnsStep() {
 							checked
 								? "Sending enabled successfully"
 								: "Sending disabled successfully",
-							checked ? "Enabling email sending..." : "Disabling email sending...",
+							checked
+								? "Enabling email sending..."
+								: "Disabling email sending...",
 						)
 					}
 				>
@@ -168,7 +174,9 @@ export function ConfigureDnsStep() {
 								checked
 									? "Receiving enabled successfully"
 									: "Receiving disabled successfully",
-								checked ? "Enabling email receiving..." : "Disabling email receiving...",
+								checked
+									? "Enabling email receiving..."
+									: "Disabling email receiving...",
 							)
 						}
 					>

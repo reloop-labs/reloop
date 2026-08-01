@@ -1,8 +1,3 @@
-import { CopyCodeBlock } from "#/features/onboarding/step4/copy-code-block";
-import { PageSizeDropdown } from "#/features/api-keys/table/page-size-dropdown";
-import { PaginationControls } from "#/features/api-keys/table/pagination-controls";
-import { useInvalidateWebhooks } from "#/features/webhooks/hooks/use-webhooks-query";
-import { queryKeys } from "#/lib/query-keys";
 import * as Badge from "@reloop/ui/badge";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
@@ -11,13 +6,18 @@ import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import { Skeleton } from "@reloop/ui/skeleton";
 import * as Tooltip from "@reloop/ui/tooltip";
+import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { parseAsInteger, useQueryState } from "nuqs";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
-import { useQuery } from "@tanstack/react-query";
+import { PageSizeDropdown } from "#/features/api-keys/table/page-size-dropdown";
+import { PaginationControls } from "#/features/api-keys/table/pagination-controls";
+import { CopyCodeBlock } from "#/features/onboarding/step4/copy-code-block";
+import { useInvalidateWebhooks } from "#/features/webhooks/hooks/use-webhooks-query";
+import { queryKeys } from "#/lib/query-keys";
 
 dayjs.extend(relativeTime);
 
@@ -463,7 +463,11 @@ export const DeliveryLogs = ({ webhookId }: DeliveryLogsProps) => {
 	const limit = pageSize ?? 10;
 	const status = statusFilter === "all" ? "" : statusFilter;
 
-	const { data, isPending: isLoading, refetch } = useQuery({
+	const {
+		data,
+		isPending: isLoading,
+		refetch,
+	} = useQuery({
 		queryKey: queryKeys.webhooks.deliveries({
 			webhookId,
 			page,
@@ -674,10 +678,7 @@ export const DeliveryLogs = ({ webhookId }: DeliveryLogsProps) => {
 											<span
 												className={cn(
 													"font-medium font-mono text-[13px] tabular-nums",
-													codeClass(
-														delivery.responseStatus,
-														delivery.status,
-													),
+													codeClass(delivery.responseStatus, delivery.status),
 												)}
 											>
 												{delivery.responseStatus ?? "—"}

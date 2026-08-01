@@ -24,7 +24,9 @@ export function StripeSecret({
 
 	if (!safe) {
 		return (
-			<span className={cn("font-mono text-[13px] text-text-sub-600", className)}>
+			<span
+				className={cn("font-mono text-[13px] text-text-sub-600", className)}
+			>
 				No secret
 			</span>
 		);

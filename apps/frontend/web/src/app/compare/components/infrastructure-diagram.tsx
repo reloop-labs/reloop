@@ -45,7 +45,7 @@ function Node({
 		>
 			{children}
 			<div className="flex flex-col items-center gap-0">
-				<span className="whitespace-nowrap text-[13px] font-medium text-text-strong-950 dark:text-white/85">
+				<span className="whitespace-nowrap font-medium text-[13px] text-text-strong-950 dark:text-white/85">
 					{label}
 				</span>
 				{sublabel ? (
@@ -68,7 +68,7 @@ export function InfrastructureDiagram() {
 		>
 			{/* ── Reloop row ── */}
 			<div className="relative flex flex-col items-center gap-4">
-				<h3 className="text-[14px] font-medium text-text-strong-950 sm:text-[15px] dark:text-white/90">
+				<h3 className="font-medium text-[14px] text-text-strong-950 sm:text-[15px] dark:text-white/90">
 					Reloop: own MTA
 				</h3>
 				<div className="flex items-center gap-1">
@@ -97,7 +97,7 @@ export function InfrastructureDiagram() {
 
 			{/* ── Resend row ── */}
 			<div className="relative flex flex-col items-center gap-4">
-				<h3 className="text-[14px] font-medium text-text-strong-950 sm:text-[15px] dark:text-white/90">
+				<h3 className="font-medium text-[14px] text-text-strong-950 sm:text-[15px] dark:text-white/90">
 					Resend: routed through Amazon SES
 				</h3>
 				<div className="flex items-center gap-1">

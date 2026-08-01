@@ -22,9 +22,7 @@ export function usePlayAnimationOnHover(
 	const [isAnimating, setIsAnimating] = useState(false);
 	const runningRef = useRef(0);
 	const fallbackTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-	const hoverDelayTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
-		null,
-	);
+	const hoverDelayTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 	const isAnimatingRef = useRef(false);
 
 	const clearFallbackTimer = useCallback(() => {

@@ -41,9 +41,9 @@ function run(
 
 console.log(CHECK ? "Checking SDK samples…" : "Syncing SDK samples…");
 run(path.join(SCRIPTS, "sync-dashboard-api-key-samples.ts"));
-	run(
-		path.join(DOCS_SCRIPTS, "sync-code-samples-from-source.ts"),
-		["api-key", "contacts", "domain", "mail", "inbox"],
-		path.join(REPO_ROOT, "apps/frontend/docs"),
-	);
+run(
+	path.join(DOCS_SCRIPTS, "sync-code-samples-from-source.ts"),
+	["api-key", "contacts", "domain", "mail", "inbox"],
+	path.join(REPO_ROOT, "apps/frontend/docs"),
+);
 console.log(CHECK ? "All SDK sample checks passed." : "SDK samples synced.");

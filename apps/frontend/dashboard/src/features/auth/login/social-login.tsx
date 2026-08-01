@@ -1,10 +1,10 @@
-import Link from "next/link";
 import { authClient } from "@reloop/auth/client";
 import * as Button from "@reloop/ui/button";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import * as LinkButton from "@reloop/ui/link-button";
 import Spinner from "@reloop/ui/spinner";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 /** Public path for OAuth return (includes app basepath). */
@@ -141,13 +141,13 @@ export function SocialLogin({
 								disabled={loading.loading}
 								variant="blue"
 								size="medium"
-								className="relative h-10 w-full rounded-xl justify-center font-medium text-sm gap-2.5"
+								className="relative h-10 w-full justify-center gap-2.5 rounded-xl font-medium text-sm"
 								onClick={method.onClick}
 							>
 								{method.icon}
 								<span>{method.label}</span>
 								{isLastUsed && (
-									<span className="absolute -top-2.5 right-3 rounded-full bg-primary-base px-2 py-0.5 font-semibold text-static-white text-[10px] uppercase tracking-wider shadow-sm">
+									<span className="-top-2.5 absolute right-3 rounded-full bg-primary-base px-2 py-0.5 font-semibold text-[10px] text-static-white uppercase tracking-wider shadow-sm">
 										Last used
 									</span>
 								)}
@@ -161,7 +161,7 @@ export function SocialLogin({
 							disabled={loading.loading}
 							variant="neutral"
 							mode="stroke"
-							className="relative h-10 w-full rounded-xl justify-center font-medium text-sm gap-2.5 flex items-center"
+							className="relative flex h-10 w-full items-center justify-center gap-2.5 rounded-xl font-medium text-sm"
 							onClick={method.onClick}
 						>
 							{method.icon}
@@ -172,9 +172,12 @@ export function SocialLogin({
 			</div>
 			<p className="pt-5 text-center font-medium text-[13px] text-text-sub-600">
 				Don&apos;t have an account?{" "}
-				<Link href={"/signup"} className={LinkButton.linkButtonVariants({
+				<Link
+					href={"/signup"}
+					className={LinkButton.linkButtonVariants({
 						variant: "black",
-					}).root({ className: "text-[13px]!" })}>
+					}).root({ className: "text-[13px]!" })}
+				>
 					Sign up
 				</Link>
 			</p>

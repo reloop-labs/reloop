@@ -156,7 +156,12 @@ export default function AuditPage() {
 							</td>
 							<td className="px-4 py-3">
 								{item.organizationId ? (
-									<Button.Root asChild size="xsmall" variant="neutral" mode="ghost">
+									<Button.Root
+										asChild
+										size="xsmall"
+										variant="neutral"
+										mode="ghost"
+									>
 										<Link href={`/organizations/${item.organizationId}`}>
 											Open hub
 										</Link>

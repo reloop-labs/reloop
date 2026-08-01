@@ -1,18 +1,15 @@
-import { useInvalidateWebhooks } from "#/features/webhooks/hooks/use-webhooks-query";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import * as Label from "@reloop/ui/label";
 import Spinner from "@reloop/ui/spinner";
-import {
-	ACTIVE_WEBHOOK_EVENTS,
-	WEBHOOK_EVENTS,
-} from "@reloop/webhook-events";
+import { ACTIVE_WEBHOOK_EVENTS, WEBHOOK_EVENTS } from "@reloop/webhook-events";
 import axios from "axios";
 import { useMemo, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
+import { useInvalidateWebhooks } from "#/features/webhooks/hooks/use-webhooks-query";
 
 interface TriggerWebhookTesterProps {
 	webhookId: string;
@@ -345,9 +342,7 @@ export const TriggerWebhookTester = ({
 											{result.durationMs != null
 												? ` · ${result.durationMs}ms`
 												: ""}
-											{result.status != null
-												? ` · HTTP ${result.status}`
-												: ""}
+											{result.status != null ? ` · HTTP ${result.status}` : ""}
 										</p>
 									</div>
 								</div>

@@ -1,8 +1,8 @@
 "use client";
 
+import { Icon } from "@reloop/ui/icon";
 import { useRouter } from "next/navigation";
 import { AnimatedBackButton } from "#/features/dashboard/animated-back-button";
-import { Icon } from "@reloop/ui/icon";
 
 export const WorkflowNotFound = () => {
 	const router = useRouter();

@@ -32,9 +32,7 @@ export const DelayConfigForm = ({ value, onChange }: DelayConfigFormProps) => {
 							min={0}
 							step={1}
 							value={value.amount ?? 0}
-							onChange={(e) =>
-								update({ amount: Number(e.target.value) || 0 })
-							}
+							onChange={(e) => update({ amount: Number(e.target.value) || 0 })}
 						/>
 					</Input.Wrapper>
 				</Input.Root>

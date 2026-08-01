@@ -39,9 +39,7 @@ export function DomainPreview({
 			>
 				<div
 					className={
-						isDomainVariant
-							? "relative px-6 pt-5 pb-0"
-							: "relative p-6"
+						isDomainVariant ? "relative px-6 pt-5 pb-0" : "relative p-6"
 					}
 				>
 					<div className="mb-5 flex items-start gap-4">

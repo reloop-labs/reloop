@@ -1,12 +1,3 @@
-import { useRouter } from "next/navigation";
-import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
-import { PageSizeDropdown } from "#/features/api-keys/table/page-size-dropdown";
-import { PaginationControls } from "#/features/api-keys/table/pagination-controls";
-import {
-	getAvatarGradient,
-	getAvatarInitial,
-} from "#/utils/avatar";
-import { formatRelativeTime } from "#/utils/format-relative-time";
 import * as Avatar from "@reloop/ui/avatar";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
@@ -17,8 +8,13 @@ import {
 	Trigger as PopoverTrigger,
 } from "@reloop/ui/popover";
 import { Skeleton } from "@reloop/ui/skeleton";
-
+import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
+import { PageSizeDropdown } from "#/features/api-keys/table/page-size-dropdown";
+import { PaginationControls } from "#/features/api-keys/table/pagination-controls";
+import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
+import { getAvatarGradient, getAvatarInitial } from "#/utils/avatar";
+import { formatRelativeTime } from "#/utils/format-relative-time";
 import { EmailsEmptyState } from "./emails-empty-state";
 
 interface EmailLogData {
@@ -366,9 +362,7 @@ export const EmailTable = ({
 								>
 									<EmailActionsDropdown
 										log={log}
-										onViewDetails={(id) =>
-											router.push(`/emails/${id}`)
-										}
+										onViewDetails={(id) => router.push(`/emails/${id}`)}
 										onOpenChange={(open) =>
 											setActiveDropdownId(open ? log.id : null)
 										}

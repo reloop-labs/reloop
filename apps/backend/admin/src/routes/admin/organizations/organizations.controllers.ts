@@ -13,7 +13,17 @@ import {
 	user,
 	webhook,
 } from "@reloop/db/schema";
-import { and, count, desc, eq, gte, ilike, inArray, or, sql } from "drizzle-orm";
+import {
+	and,
+	count,
+	desc,
+	eq,
+	gte,
+	ilike,
+	inArray,
+	or,
+	sql,
+} from "drizzle-orm";
 import { createError } from "evlog";
 
 export async function listOrganizationsController({

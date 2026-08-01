@@ -46,7 +46,9 @@ export function EditPropertyForm({
 	const [fallbackValue, setFallbackValue] = useState(
 		property.defaultValue || "",
 	);
-	const [status, setStatus] = useState<"idle" | "submitting" | "success">("idle");
+	const [status, setStatus] = useState<"idle" | "submitting" | "success">(
+		"idle",
+	);
 	const invalidate = useInvalidateContacts();
 	const isInline = variant === "inline";
 
@@ -238,9 +240,7 @@ export function EditPropertyForm({
 				<div
 					className={cn(
 						"flex items-center justify-end gap-3",
-						isInline
-							? "px-6 pt-3 pb-3.5 dark:bg-bg-weak-50/40"
-							: "mt-6",
+						isInline ? "px-6 pt-3 pb-3.5 dark:bg-bg-weak-50/40" : "mt-6",
 					)}
 				>
 					<Button.Root

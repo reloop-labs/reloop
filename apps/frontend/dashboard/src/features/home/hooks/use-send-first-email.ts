@@ -23,7 +23,9 @@ export async function sendFirstEmail(): Promise<SendFirstEmailResult> {
 		body: JSON.stringify({}),
 	});
 
-	const payload = (await res.json().catch(() => ({}))) as SendFirstEmailResult & {
+	const payload = (await res
+		.json()
+		.catch(() => ({}))) as SendFirstEmailResult & {
 		message?: string;
 		why?: string;
 		fix?: string;

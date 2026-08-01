@@ -1,4 +1,3 @@
-import { useRouter } from "next/navigation";
 import NumberFlow from "@number-flow/react";
 import {
 	defaultPlan,
@@ -12,6 +11,7 @@ import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import * as Modal from "@reloop/ui/modal";
+import { useRouter } from "next/navigation";
 
 import { useEffect, useState } from "react";
 import { requestPlanSupport } from "./request-support";

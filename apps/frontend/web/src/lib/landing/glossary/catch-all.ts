@@ -5,7 +5,7 @@ export const term: GlossaryTermDefinition = {
 	title: "Catch-all",
 	description:
 		"A domain setting that accepts mail for any local address, even ones that are not real users.",
-	keywords: ["catch-all email","catch all domain","accept all"],
+	keywords: ["catch-all email", "catch all domain", "accept all"],
 	body: `A catch-all (or accept-all) domain accepts messages for addresses that are not real mailboxes. Mail to sales@, random strings@, and typos all land somewhere instead of bouncing.
 
 That is handy for small teams and awkward for list quality. You cannot tell from SMTP alone whether an address is a real person. Validators often mark catch-all domains as “unknown” because the server accepts everything.

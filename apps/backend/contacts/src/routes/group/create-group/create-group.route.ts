@@ -3,8 +3,8 @@ import { rateLimitPlugin } from "@be/contacts/middleware/rate-limit";
 import { GroupModel } from "@be/contacts/model/group.model";
 import { createGroupController } from "@be/contacts/routes/group/create-group/create-group.controllers";
 import { auditLogHook } from "@be/contacts/utils/audit-log";
-import { Elysia } from "elysia";
 import { createGroupXCodeSamples } from "@reloop/code-samples/contacts";
+import { Elysia } from "elysia";
 
 export const createGroupRoute = new Elysia()
 	.use(authMiddleware)

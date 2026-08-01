@@ -18,7 +18,7 @@ export function EntityTabs({
 	onChange: (id: string) => void;
 }) {
 	return (
-		<div className="sticky top-0 z-[5] -mx-1 overflow-x-auto border-stroke-soft-100 border-b bg-bg-white-0/90 px-1 backdrop-blur-md dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a]/90">
+		<div className="-mx-1 sticky top-0 z-[5] overflow-x-auto border-stroke-soft-100 border-b bg-bg-white-0/90 px-1 backdrop-blur-md dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a]/90">
 			<div className="flex min-w-max gap-0.5 py-1">
 				{tabs.map((tab) => {
 					const isActive = tab.id === active;

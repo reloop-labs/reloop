@@ -1,8 +1,8 @@
 import { authMiddleware } from "@reloop/be-inbox/middleware/auth";
 import { MailModel } from "@reloop/be-inbox/model/mail.model";
+import { getThreadXCodeSamples } from "@reloop/code-samples/inbox";
 import { Elysia, t } from "elysia";
 import { getThreadController } from "./get-thread.controllers";
-import { getThreadXCodeSamples } from "@reloop/code-samples/inbox";
 
 export const getThreadRoute = new Elysia().use(authMiddleware).get(
 	"/:id",

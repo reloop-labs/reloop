@@ -23,4 +23,3 @@ export function SuccessStep({ secret }: { secret: string }) {
 		</div>
 	);
 }
-

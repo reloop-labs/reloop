@@ -1,7 +1,7 @@
-import { useRouter } from "next/navigation";
 import * as Button from "@reloop/ui/button";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
+import { useRouter } from "next/navigation";
 
 import { useHotkeys } from "react-hotkeys-hook";
 

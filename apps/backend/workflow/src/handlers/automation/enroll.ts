@@ -5,8 +5,8 @@ import {
 	parseDelayData,
 } from "@be/workflow/lib/automation/graph";
 import { enqueueAutomationStep } from "@be/workflow/queues/automation.queue";
-import type { AutomationGraph } from "@reloop/db/schema";
 import { db } from "@reloop/db/client";
+import type { AutomationGraph } from "@reloop/db/schema";
 import * as schema from "@reloop/db/schema";
 import { and, eq, isNull } from "drizzle-orm";
 import { log } from "evlog";

@@ -1,7 +1,6 @@
-import { useRouter, useParams } from "next/navigation";
 import { cn } from "@reloop/ui/cn";
-
 import { FileText, Plus, Trash2 } from "lucide-react";
+import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { useAgentInbox } from "#/features/agent-inbox/components/agent-inbox-provider";

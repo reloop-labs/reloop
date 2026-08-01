@@ -5,10 +5,10 @@ import { KbdKey } from "@reloop/ui/kbd-key";
 import {
 	AnimatePresence,
 	motion,
-	useReducedMotion,
 	type Transition,
+	useReducedMotion,
 } from "framer-motion";
-import { useEffect, type ReactNode } from "react";
+import { type ReactNode, useEffect } from "react";
 import { useUIStore } from "#/store/use-ui-store";
 
 /** Hold Space this long (ms) before shortcut hints appear. */

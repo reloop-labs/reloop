@@ -6,7 +6,7 @@ import {
 	ONBOARDING_TEST_SUBJECT,
 	ONBOARDING_TEST_TEXT,
 } from "@reloop/email/routes/onboarding/onboarding.constants";
-import { or, eq, sql } from "drizzle-orm";
+import { eq, or, sql } from "drizzle-orm";
 import { log } from "evlog";
 
 /** Public mail API path shown on the Logs page. */

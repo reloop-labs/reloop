@@ -1,9 +1,8 @@
-import { useRouter } from "next/navigation";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
-
 import { AnimatePresence, motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 import { parseAsInteger, useQueryState } from "nuqs";
 import { useState } from "react";
 import { PageSizeDropdown } from "#/features/api-keys/table/page-size-dropdown";

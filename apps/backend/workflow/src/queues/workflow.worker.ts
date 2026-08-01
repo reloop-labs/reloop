@@ -3,7 +3,10 @@ import {
 	DOMAIN_VERIFY_BACKOFF_TYPE,
 	getDomainVerifyBackoffDelay,
 } from "@be/workflow/queues/domain-verify-schedule";
-import { isLastAttempt, type WorkflowJob } from "@be/workflow/queues/workflow-job";
+import {
+	isLastAttempt,
+	type WorkflowJob,
+} from "@be/workflow/queues/workflow-job";
 import { workflowConfig } from "@be/workflow/workflow.config";
 import { Worker } from "bullmq";
 import { EvlogError, log } from "evlog";

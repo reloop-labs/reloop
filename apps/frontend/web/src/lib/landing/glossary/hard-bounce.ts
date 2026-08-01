@@ -5,7 +5,7 @@ export const term: GlossaryTermDefinition = {
 	title: "Hard Bounce",
 	description:
 		"A permanent delivery failure: the address or domain cannot receive the message.",
-	keywords: ["hard bounce","permanent bounce","user unknown"],
+	keywords: ["hard bounce", "permanent bounce", "user unknown"],
 	body: `A hard bounce means the receiver says this will not work later either: user unknown, domain does not exist, address rejected as invalid. Soft bounces are temporary; hard bounces are permanent.
 
 Suppress hard-bounced addresses right away. Mailing them again signals poor list hygiene and hurts reputation. Do not re-import old CSV dumps without cleaning.

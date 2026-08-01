@@ -3,12 +3,12 @@
 import { cn } from "@reloop/ui/cn";
 import { Logo } from "@reloop/ui/logo";
 import {
+	type PointerEvent as ReactPointerEvent,
 	useCallback,
 	useEffect,
 	useId,
 	useRef,
 	useState,
-	type PointerEvent as ReactPointerEvent,
 } from "react";
 import type { SimpleIcon } from "simple-icons";
 import { BrandIcon } from "./brand-icon";
@@ -117,12 +117,12 @@ export function CompareFeatureSlide({
 			</div>
 
 			{/* Comparison stage */}
-			<div className="overflow-hidden rounded-[20px] border border-stroke-soft-200 bg-bg-weak-50 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_20px_48px_rgba(0,0,0,0.06)] dark:border-white/10 dark:bg-white/[0.03] dark:shadow-[0_20px_48px_rgba(0,0,0,0.35)] sm:rounded-[24px]">
+			<div className="overflow-hidden rounded-[20px] border border-stroke-soft-200 bg-bg-weak-50 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_20px_48px_rgba(0,0,0,0.06)] sm:rounded-[24px] dark:border-white/10 dark:bg-white/[0.03] dark:shadow-[0_20px_48px_rgba(0,0,0,0.35)]">
 				{/* Brand header row */}
 				<div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 border-stroke-soft-200 border-b px-4 py-3.5 sm:px-6 sm:py-4 dark:border-white/10">
 					<div className="flex items-center gap-2.5 justify-self-start">
 						<div className="flex size-7 items-center justify-center rounded-lg bg-[#0a0d12] sm:size-8">
-							<Logo className="size-[70%] [&_rect]:!fill-white" />
+							<Logo className="[&_rect]:!fill-white size-[70%]" />
 						</div>
 						<span className="font-semibold text-[14px] text-text-strong-950 tracking-tight sm:text-[15px] dark:text-white">
 							Reloop
@@ -154,7 +154,7 @@ export function CompareFeatureSlide({
 				<div
 					ref={frameRef}
 					className={cn(
-						"relative aspect-[16/10] w-full select-none touch-none overflow-hidden bg-bg-white-0 dark:bg-black/40 sm:aspect-[16/9]",
+						"relative aspect-[16/10] w-full touch-none select-none overflow-hidden bg-bg-white-0 sm:aspect-[16/9] dark:bg-black/40",
 						dragging ? "cursor-ew-resize" : "cursor-col-resize",
 					)}
 					onPointerDown={onPointerDown}
@@ -195,7 +195,7 @@ export function CompareFeatureSlide({
 						className="pointer-events-none absolute inset-y-0 z-20 w-px bg-stroke-soft-200 dark:bg-white/20"
 						style={{ left: `${position}%` }}
 					>
-						<div className="absolute top-1/2 left-1/2 z-30 -translate-x-1/2 -translate-y-1/2">
+						<div className="-translate-x-1/2 -translate-y-1/2 absolute top-1/2 left-1/2 z-30">
 							<div className="flex items-center gap-1.5 rounded-full bg-text-strong-950 px-3.5 py-2 font-semibold text-[12px] text-white shadow-[0_8px_24px_rgba(0,0,0,0.25)] sm:px-4 sm:py-2.5 sm:text-[13px] dark:bg-white dark:text-black">
 								<svg
 									width="14"

@@ -25,7 +25,7 @@ if (webhookError) throw webhookError;`,
   -H "Content-Type: application/json" \\
   -d '{"description":"Production webhook","url":"https://example.com/webhooks/reloop","events":["domain.create","domain.delete"]}'`,
 	},
-				{
+	{
 		id: "python",
 		lang: "python",
 		label: "Python",
@@ -41,7 +41,7 @@ result = reloop.webhook.create({
 if result.webhook_error:
     raise result.webhook_error`,
 	},
-			{
+	{
 		id: "php",
 		lang: "php",
 		label: "PHP",
@@ -49,7 +49,7 @@ if result.webhook_error:
 
 require 'vendor/autoload.php';
 
-use Reloop\Reloop;
+use ReloopReloop;
 
 $reloop = Reloop::client('rl_123456789');
 
@@ -59,7 +59,7 @@ $webhook = $reloop->webhook->create([
     'events' => ['domain.create', 'domain.delete'],
 ]);`,
 	},
-			{
+	{
 		id: "java",
 		lang: "java",
 		label: "Java",
@@ -76,30 +76,30 @@ var webhook = reloop.webhook.create(params);`,
 		id: "dotnet",
 		lang: "csharp",
 		label: ".NET",
-		source: `// Webhook SDK support coming soon — use the REST API`,
+		source: "// Webhook SDK support coming soon — use the REST API",
 	},
 	{
 		id: "go",
 		lang: "go",
 		label: "Go",
-		source: `// Webhook SDK support coming soon — use the REST API`,
+		source: "// Webhook SDK support coming soon — use the REST API",
 	},
 	{
 		id: "rust",
 		lang: "rust",
 		label: "Rust",
-		source: `// Webhook SDK support coming soon — use the REST API`,
+		source: "// Webhook SDK support coming soon — use the REST API",
 	},
 	{
 		id: "ruby",
 		lang: "ruby",
 		label: "Ruby",
-		source: `# Webhook SDK support coming soon — use the REST API`,
+		source: "# Webhook SDK support coming soon — use the REST API",
 	},
 	{
 		id: "elixir",
 		lang: "elixir",
 		label: "Elixir",
-		source: `# Webhook SDK support coming soon — use the REST API`,
+		source: "# Webhook SDK support coming soon — use the REST API",
 	},
 ];

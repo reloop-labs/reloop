@@ -137,7 +137,8 @@ export function CopyCodeBlock({
 	const displayLabel = label ?? lang;
 	const isEmpty = !loading && !(code.trim().length > 0);
 	/** Matches ~5 BrightCode lines so loading → content/empty never collapses the card */
-	const codeSurfaceMinClass = minHeight === "auto" ? "" : (minHeight ?? "min-h-[7.5rem]");
+	const codeSurfaceMinClass =
+		minHeight === "auto" ? "" : (minHeight ?? "min-h-[7.5rem]");
 
 	const highlightedTabIndex =
 		hoveredTabIdx !== undefined ? hoveredTabIdx : activeTabIndex;
@@ -261,9 +262,7 @@ export function CopyCodeBlock({
 										viewBox="0 0 24 24"
 										className={cn(
 											"size-3.5 shrink-0 transition-colors",
-											isActive
-												? ""
-												: "text-text-strong-950 dark:text-white",
+											isActive ? "" : "text-text-strong-950 dark:text-white",
 										)}
 										fill="currentColor"
 										xmlns="http://www.w3.org/2000/svg"

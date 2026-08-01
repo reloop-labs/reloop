@@ -22,7 +22,7 @@ console.log(domain.id, domain.status);`,
 		source: `curl -X POST https://reloop.sh/api/domain/v1/verify/dom_123456789 \\
   -H "x-api-key: rl_123456789"`,
 	},
-				{
+	{
 		id: "python",
 		lang: "python",
 		label: "Python",
@@ -37,7 +37,7 @@ if result.domain_error:
 
 print(result.domain["id"], result.domain["status"])`,
 	},
-			{
+	{
 		id: "php",
 		lang: "php",
 		label: "PHP",
@@ -45,14 +45,14 @@ print(result.domain["id"], result.domain["status"])`,
 
 require 'vendor/autoload.php';
 
-use Reloop\Reloop;
+use ReloopReloop;
 
 $reloop = Reloop::client('rl_123456789');
 
 $domain = $reloop->domain->verify('dom_123456789');
 echo $domain['id'] . ' ' . $domain['status'] . PHP_EOL;`,
 	},
-			{
+	{
 		id: "java",
 		lang: "java",
 		label: "Java",

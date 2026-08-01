@@ -15,10 +15,7 @@ export function AnimatedLogsIcon({ className }: AnimatedLogsIconProps) {
 			fill="none"
 			xmlns="http://www.w3.org/2000/svg"
 			aria-hidden
-			className={cn(
-				"h-4 w-4 shrink-0 [perspective:48px]",
-				className,
-			)}
+			className={cn("h-4 w-4 shrink-0 [perspective:48px]", className)}
 		>
 			{/* Document + side brackets — flip */}
 			<g

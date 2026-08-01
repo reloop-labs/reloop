@@ -44,7 +44,7 @@ export function StatusPill({
 	return (
 		<span
 			className={cn(
-				"inline-flex items-center rounded-full px-2 py-0.5 font-medium text-[11px] ring-1 ring-inset capitalize",
+				"inline-flex items-center rounded-full px-2 py-0.5 font-medium text-[11px] capitalize ring-1 ring-inset",
 				TONE[t],
 				className,
 			)}

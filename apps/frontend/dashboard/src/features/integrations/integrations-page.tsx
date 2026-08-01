@@ -1,16 +1,16 @@
-import Link from "next/link";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
+import Link from "next/link";
 import { useMemo, useState } from "react";
 import * as SimpleIcons from "simple-icons";
 import { toast } from "sonner";
 import {
-	type IntegrationCategory,
 	categoryFilters,
-	platformIntegrations,
+	type IntegrationCategory,
 	type PlatformIntegration,
+	platformIntegrations,
 } from "./catalog";
 
 type FilterId = "all" | IntegrationCategory;
@@ -201,11 +201,17 @@ export function IntegrationsPage() {
 
 			<p className="text-center text-paragraph-xs text-text-soft-400">
 				Need something custom? Use{" "}
-				<Link href="/webhooks" className="font-medium text-text-sub-600 underline-offset-2 hover:text-text-strong-950 hover:underline">
+				<Link
+					href="/webhooks"
+					className="font-medium text-text-sub-600 underline-offset-2 hover:text-text-strong-950 hover:underline"
+				>
 					webhooks
 				</Link>{" "}
 				or{" "}
-				<Link href="/smtp" className="font-medium text-text-sub-600 underline-offset-2 hover:text-text-strong-950 hover:underline">
+				<Link
+					href="/smtp"
+					className="font-medium text-text-sub-600 underline-offset-2 hover:text-text-strong-950 hover:underline"
+				>
 					SMTP
 				</Link>{" "}
 				today while we expand the catalog.

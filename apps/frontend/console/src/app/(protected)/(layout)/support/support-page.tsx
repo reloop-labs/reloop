@@ -88,7 +88,11 @@ function SupportPersonAvatar({
 }) {
 	const label = name || email || "User";
 	return (
-		<Avatar.Root size={size === "40" ? "40" : size} color="blue" className="shrink-0">
+		<Avatar.Root
+			size={size === "40" ? "40" : size}
+			color="blue"
+			className="shrink-0"
+		>
 			{image ? (
 				<Avatar.Image src={image} alt={label} />
 			) : (
@@ -96,7 +100,11 @@ function SupportPersonAvatar({
 					<div
 						className={cn(
 							"flex h-full w-full items-center justify-center rounded-full bg-blue-200 font-semibold text-blue-950 uppercase dark:bg-blue-500/25 dark:text-blue-100",
-							size === "24" ? "text-[10px]" : size === "40" ? "text-[13px]" : "text-[11px]",
+							size === "24"
+								? "text-[10px]"
+								: size === "40"
+									? "text-[13px]"
+									: "text-[11px]",
 						)}
 					>
 						{avatarInitial(name, email)}
@@ -175,12 +183,7 @@ export default function SupportPage() {
 		const needle = listSearch.trim().toLowerCase();
 		const filtered = needle
 			? items.filter((c) => {
-					const hay = [
-						c.userName,
-						c.userEmail,
-						c.lastMessagePreview,
-						c.userId,
-					]
+					const hay = [c.userName, c.userEmail, c.lastMessagePreview, c.userId]
 						.filter(Boolean)
 						.join(" ")
 						.toLowerCase();
@@ -434,9 +437,9 @@ export default function SupportPage() {
 	];
 
 	return (
-		<div className="-m-5 flex h-[calc(100%+2.5rem)] min-h-0 flex-col md:-m-7 md:h-[calc(100%+3.5rem)]">
+		<div className="-m-5 md:-m-7 flex h-[calc(100%+2.5rem)] min-h-0 flex-col md:h-[calc(100%+3.5rem)]">
 			{/* Top bar */}
-			<header className="flex flex-wrap items-center justify-between gap-3 border-stroke-soft-100 border-b bg-bg-white-0 px-4 py-3 dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a] md:px-5">
+			<header className="flex flex-wrap items-center justify-between gap-3 border-stroke-soft-100 border-b bg-bg-white-0 px-4 py-3 md:px-5 dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a]">
 				<div className="flex min-w-0 flex-wrap items-center gap-3">
 					<div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400">
 						<Inbox className="h-4 w-4" />
@@ -478,10 +481,10 @@ export default function SupportPage() {
 
 			<div className="flex min-h-0 flex-1">
 				{/* Inbox column */}
-				<aside className="flex w-[300px] shrink-0 flex-col border-stroke-soft-100 border-r bg-bg-weak-50/60 dark:border-stroke-soft-100/40 dark:bg-black/25 lg:w-[320px]">
+				<aside className="flex w-[300px] shrink-0 flex-col border-stroke-soft-100 border-r bg-bg-weak-50/60 lg:w-[320px] dark:border-stroke-soft-100/40 dark:bg-black/25">
 					<div className="space-y-2 border-stroke-soft-100 border-b px-3 py-3 dark:border-stroke-soft-100/40">
 						<div className="relative">
-							<Search className="pointer-events-none absolute top-1/2 left-2.5 h-3.5 w-3.5 -translate-y-1/2 text-text-soft-400" />
+							<Search className="-translate-y-1/2 pointer-events-none absolute top-1/2 left-2.5 h-3.5 w-3.5 text-text-soft-400" />
 							<input
 								value={listSearch}
 								onChange={(e) => setListSearch(e.target.value)}
@@ -591,7 +594,7 @@ export default function SupportPage() {
 														</span>
 													) : null}
 													{unread > 0 ? (
-														<span className="rounded-full bg-bg-white-0 px-1.5 py-0.5 font-semibold text-[10px] text-text-sub-600 ring-1 ring-stroke-soft-100 tabular-nums dark:bg-transparent">
+														<span className="rounded-full bg-bg-white-0 px-1.5 py-0.5 font-semibold text-[10px] text-text-sub-600 tabular-nums ring-1 ring-stroke-soft-100 dark:bg-transparent">
 															{unread > 99 ? "99+" : unread}
 														</span>
 													) : null}
@@ -647,7 +650,8 @@ export default function SupportPage() {
 											{selected.userEmail}
 											<span className="text-text-soft-400">
 												{" "}
-												· last active {formatRelativeTime(selected.lastMessageAt)}
+												· last active{" "}
+												{formatRelativeTime(selected.lastMessageAt)}
 											</span>
 										</p>
 									</div>
@@ -670,17 +674,13 @@ export default function SupportPage() {
 											mode="stroke"
 											size="small"
 										>
-											<Link
-												href={`/organizations/${selected.organizationId}`}
-											>
+											<Link href={`/organizations/${selected.organizationId}`}>
 												Org
 											</Link>
 										</Button.Root>
 									) : null}
 									<Button.Root
-										variant={
-											selected.status === "open" ? "neutral" : "primary"
-										}
+										variant={selected.status === "open" ? "neutral" : "primary"}
 										mode={selected.status === "open" ? "stroke" : "filled"}
 										size="small"
 										onClick={() => void toggleStatus()}

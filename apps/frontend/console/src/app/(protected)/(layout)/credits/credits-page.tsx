@@ -209,7 +209,9 @@ export default function CreditsPage() {
 									className="flex w-full items-center justify-between gap-3 border-stroke-soft-100 border-b px-3 py-2.5 text-left last:border-b-0 hover:bg-bg-weak-50 dark:border-stroke-soft-100/40 dark:hover:bg-white/[0.03]"
 								>
 									<div className="min-w-0">
-										<p className="truncate font-medium text-[13px]">{org.name}</p>
+										<p className="truncate font-medium text-[13px]">
+											{org.name}
+										</p>
 										<p className="truncate text-[12px] text-text-sub-600">
 											{org.slug}
 										</p>
@@ -220,14 +222,18 @@ export default function CreditsPage() {
 						</div>
 					) : null}
 
-					{searchQ.trim() && searchData && searchData.organizations.length === 0 ? (
-						<p className="text-[12px] text-text-sub-600">No organizations match.</p>
+					{searchQ.trim() &&
+					searchData &&
+					searchData.organizations.length === 0 ? (
+						<p className="text-[12px] text-text-sub-600">
+							No organizations match.
+						</p>
 					) : null}
 				</div>
 			</SectionCard>
 
 			{!organizationId ? (
-				<div className="rounded-2xl border border-dashed border-stroke-soft-200 px-4 py-12 text-center">
+				<div className="rounded-2xl border border-stroke-soft-200 border-dashed px-4 py-12 text-center">
 					<p className="font-medium text-[13px] text-text-strong-950">
 						No organization selected
 					</p>

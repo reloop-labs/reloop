@@ -6,10 +6,7 @@ import * as TabMenu from "@reloop/ui/tab-menu-horizontal";
 import { AnimatePresence, motion } from "motion/react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
-import {
-	type SmtpDetailRow,
-	SmtpResponseDrawer,
-} from "./smtp-response-drawer";
+import { type SmtpDetailRow, SmtpResponseDrawer } from "./smtp-response-drawer";
 import { EmailTimeline } from "./timeline";
 
 // ─── Error classification ──────────────────────────────────────────────────
@@ -530,10 +527,7 @@ export const EmailDetail = ({ email, isLoading }: EmailDetailProps) => {
 	const [smtpDetail, setSmtpDetail] = useState<SmtpDetailRow | null>(null);
 	const [smtpDrawerOpen, setSmtpDrawerOpen] = useState(false);
 
-	const smtpRows = useMemo(
-		() => buildSmtpRows(email?.events),
-		[email?.events],
-	);
+	const smtpRows = useMemo(() => buildSmtpRows(email?.events), [email?.events]);
 
 	const openSmtpDetail = useCallback((row: SmtpDetailRow) => {
 		setSmtpDetail(row);

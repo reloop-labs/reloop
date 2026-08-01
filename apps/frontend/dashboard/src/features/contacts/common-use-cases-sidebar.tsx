@@ -1,14 +1,14 @@
+import { cn } from "@reloop/ui/cn";
+import { Icon } from "@reloop/ui/icon";
 import { usePathname } from "next/navigation";
+import { siGo, siNodedotjs, siPhp, siPython } from "simple-icons";
 import { ChannelsApiDetails } from "#/components/api-details/channels";
 import { ContactsApiDetails } from "#/components/api-details/contacts";
 import { GroupsApiDetails } from "#/components/api-details/groups";
 import { PropertiesApiDetails } from "#/components/api-details/properties";
-import { cn } from "@reloop/ui/cn";
-import { Icon } from "@reloop/ui/icon";
-import { siGo, siNodedotjs, siPhp, siPython } from "simple-icons";
 
 const cardClassName = cn(
-	"group flex w-full flex-col rounded-2xl border border-stroke-soft-100 bg-bg-white-0 p-4 text-left cursor-pointer",
+	"group flex w-full cursor-pointer flex-col rounded-2xl border border-stroke-soft-100 bg-bg-white-0 p-4 text-left",
 	"transition-[border-color,background-color,transform] duration-150 ease-out",
 	"hover:border-stroke-soft-200 hover:bg-bg-weak-50/50",
 	"active:scale-[0.99]",
@@ -133,7 +133,13 @@ export function ContactsCommonUseCasesSidebar() {
 			</div>
 
 			<ApiDetailsComponent
-				renderTrigger={({ isOpen, open }: { isOpen: boolean; open: () => void }) => (
+				renderTrigger={({
+					isOpen,
+					open,
+				}: {
+					isOpen: boolean;
+					open: () => void;
+				}) => (
 					<button
 						type="button"
 						onClick={open}

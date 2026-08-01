@@ -3,9 +3,9 @@ import { rateLimitPlugin } from "@be/contacts/middleware/rate-limit";
 import { ChannelSubscriptionModel } from "@be/contacts/model/channel-subscription.model";
 import { ContactModel } from "@be/contacts/model/contact.model";
 import { auditLogHook } from "@be/contacts/utils/audit-log";
+import { addContactToChannelXCodeSamples } from "@reloop/code-samples/contacts";
 import { Elysia, t } from "elysia";
 import { addContactToChannelController } from "./add-contact-to-channel.controllers";
-import { addContactToChannelXCodeSamples } from "@reloop/code-samples/contacts";
 
 export const addContactToChannelRoute = new Elysia()
 	.use(authMiddleware)

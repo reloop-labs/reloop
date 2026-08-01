@@ -1,10 +1,10 @@
+import type { SendEmailNodeData } from "@be/workflow/lib/automation/graph";
 import { workflowConfig } from "@be/workflow/workflow.config";
 import {
 	INTERNAL_ORG_ID_HEADER,
 	INTERNAL_SECRET_HEADER,
 	INTERNAL_USER_ID_HEADER,
 } from "@reloop/auth/middleware/types";
-import type { SendEmailNodeData } from "@be/workflow/lib/automation/graph";
 import { log } from "evlog";
 
 function interpolate(

@@ -58,8 +58,7 @@ export async function sendEmail_step6({
 			},
 		});
 	} catch (error) {
-		const errorMessage =
-			error instanceof Error ? error.message : String(error);
+		const errorMessage = error instanceof Error ? error.message : String(error);
 
 		// Mark the log record as failed before re-throwing so it is never
 		// stuck permanently in "pending" status.

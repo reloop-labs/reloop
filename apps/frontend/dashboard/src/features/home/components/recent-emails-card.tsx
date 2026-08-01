@@ -1,15 +1,11 @@
-import Link from "next/link";
+import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import * as Button from "@reloop/ui/button";
 import { Skeleton } from "@reloop/ui/skeleton";
+import Link from "next/link";
 import { useSentEmailsQuery } from "#/features/emails/hooks/use-emails-query";
 import { formatRelativeTime } from "#/utils/format-relative-time";
-import {
-	HomeCardBody,
-	HomeCardHeader,
-	HomeCardShell,
-} from "./home-card-shell";
+import { HomeCardBody, HomeCardHeader, HomeCardShell } from "./home-card-shell";
 import { SendFirstEmailButton } from "./send-first-email-button";
 
 const getEmailIcon = (status: string) => {
@@ -134,7 +130,9 @@ export function RecentEmailsCard({
 										</span>
 										<div className="min-w-0">
 											<p className="truncate font-medium text-paragraph-sm text-text-strong-950 group-hover:underline">
-												{email.toEmails?.[0] || email.fromEmail || "(No recipient)"}
+												{email.toEmails?.[0] ||
+													email.fromEmail ||
+													"(No recipient)"}
 											</p>
 											{email.subject ? (
 												<p className="truncate text-paragraph-xs text-text-soft-400">
@@ -152,10 +150,7 @@ export function RecentEmailsCard({
 					</ul>
 				) : (
 					<div className="flex h-full min-h-[280px] flex-col items-center justify-center px-6 py-8 text-center">
-						<Icon
-							name="mail-send"
-							className="h-6 w-6 text-text-soft-400"
-						/>
+						<Icon name="mail-send" className="h-6 w-6 text-text-soft-400" />
 						<h3 className="mt-4 font-semibold text-label-md text-text-strong-950">
 							No emails sent yet
 						</h3>

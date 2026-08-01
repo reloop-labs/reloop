@@ -27,7 +27,7 @@ console.log(channel.subscriptionId, channel.contact.id);`,
   -H "Content-Type: application/json" \\
   -d '{"contact_id": "con_123456789","subscription": "opt_in"}'`,
 	},
-				{
+	{
 		id: "python",
 		lang: "python",
 		label: "Python",
@@ -45,7 +45,7 @@ if result.channel_error:
 
 print(result.channel["subscriptionId"], result.channel["contact"].id)`,
 	},
-			{
+	{
 		id: "php",
 		lang: "php",
 		label: "PHP",
@@ -53,7 +53,7 @@ print(result.channel["subscriptionId"], result.channel["contact"].id)`,
 
 require 'vendor/autoload.php';
 
-use Reloop\Reloop;
+use ReloopReloop;
 
 $reloop = Reloop::client('rl_123456789');
 
@@ -63,7 +63,7 @@ $channel = $reloop->contacts->channels->addContact('chn_123456789', [
 ]);
 echo $channel['subscriptionId'] . ' ' . $channel['contact'].id . PHP_EOL;`,
 	},
-			{
+	{
 		id: "java",
 		lang: "java",
 		label: "Java",

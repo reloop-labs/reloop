@@ -25,20 +25,14 @@ const CommandDialog = ({
 	return (
 		<Modal.Root {...rest}>
 			<Modal.Content
-				overlayClassName={cn("justify-start pt-20", overlayClassName)}
+				overlayClassName={cn("justify-center", overlayClassName)}
 				showClose={false}
 				className={cn(
-					"flex max-h-full max-w-[640px] flex-col overflow-hidden rounded-2xl",
+					"flex max-h-full max-w-[640px] flex-col overflow-hidden rounded-2xl border border-stroke-soft-200 shadow-2xl dark:border-white/10",
 					className,
 				)}
 			>
-				<Command
-					className={cn(
-						"divide-y divide-stroke-soft-200",
-						"grid min-h-0 auto-cols-auto grid-flow-row",
-						"[&>[cmdk-label]+*]:!border-t-0",
-					)}
-				>
+				<Command className={cn("grid min-h-0 auto-cols-auto grid-flow-row")}>
 					{children}
 				</Command>
 			</Modal.Content>
@@ -80,9 +74,7 @@ const CommandList = React.forwardRef<
 		<Command.List
 			ref={forwardedRef}
 			className={cn(
-				"flex max-h-min min-h-0 flex-1 flex-col",
-				"[&>[cmdk-list-sizer]]:divide-y [&>[cmdk-list-sizer]]:divide-stroke-soft-200",
-				"[&>[cmdk-list-sizer]]:overflow-auto",
+				"flex max-h-min min-h-0 flex-1 flex-col overflow-auto",
 				className,
 			)}
 			{...rest}
@@ -99,10 +91,10 @@ const CommandGroup = React.forwardRef<
 		<Command.Group
 			ref={forwardedRef}
 			className={cn(
-				"relative px-2 py-3",
-				// heading
-				"[&>[cmdk-group-heading]]:text-label-xs [&>[cmdk-group-heading]]:text-text-sub-600",
-				"[&>[cmdk-group-heading]]:mb-2 [&>[cmdk-group-heading]]:px-3 [&>[cmdk-group-heading]]:pt-1",
+				"relative px-1.5 py-1",
+				// heading typography matching compact design
+				"[&>[cmdk-group-heading]]:font-medium [&>[cmdk-group-heading]]:text-[11px] [&>[cmdk-group-heading]]:text-text-soft-400",
+				"[&>[cmdk-group-heading]]:mb-1 [&>[cmdk-group-heading]]:px-2.5 [&>[cmdk-group-heading]]:pt-1",
 				className,
 			)}
 			{...rest}
@@ -113,16 +105,16 @@ CommandGroup.displayName = "CommandGroup";
 
 const commandItemVariants = tv({
 	base: [
-		"flex items-center gap-3 rounded-10 bg-transparent",
-		"cursor-pointer text-paragraph-sm text-text-strong-950",
+		"flex items-center gap-2.5 rounded-lg bg-transparent",
+		"cursor-pointer text-paragraph-sm font-normal text-text-strong-950",
 		"transition-all duration-150 ease-out",
-		// hover/selected
-		"data-[selected=true]:bg-bg-weak-50",
+		// hover/selected pill background
+		"data-[selected=true]:bg-bg-weak-50 dark:data-[selected=true]:bg-white/[0.08]",
 	],
 	variants: {
 		size: {
-			small: "px-3 py-2.5",
-			medium: "px-3 py-3",
+			small: "px-2.5 py-1.5",
+			medium: "px-2.5 py-2",
 		},
 	},
 	defaultVariants: {
@@ -156,7 +148,7 @@ function CommandItemIcon<T extends React.ElementType>({
 
 	return (
 		<Component
-			className={cn("size-5 shrink-0 text-text-sub-600", className)}
+			className={cn("size-4 shrink-0 text-text-sub-600", className)}
 			{...rest}
 		/>
 	);
@@ -169,7 +161,7 @@ function CommandFooter({
 	return (
 		<div
 			className={cn(
-				"flex h-12 items-center justify-between gap-3 px-5",
+				"flex h-10 items-center justify-between gap-3 border-stroke-soft-200 border-t px-3.5 dark:border-white/10",
 				className,
 			)}
 			{...rest}
@@ -184,7 +176,7 @@ function CommandFooterKeyBox({
 	return (
 		<div
 			className={cn(
-				"flex size-5 shrink-0 items-center justify-center rounded bg-bg-weak-50 text-text-sub-600 ring-1 ring-stroke-soft-200 ring-inset",
+				"flex h-5 w-auto min-w-[20px] shrink-0 items-center justify-center rounded-md border border-stroke-soft-200 bg-bg-weak-50 px-1 font-sans text-[10px] text-text-sub-600 shadow-2xs dark:border-white/10 dark:bg-white/[0.08] dark:text-text-soft-400",
 				className,
 			)}
 			{...rest}

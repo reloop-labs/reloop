@@ -49,7 +49,12 @@ export function DnsAutoConnectBanner({
 
 	const status = domain?.status || "pending";
 
-	if (!forceShow && status !== "pending" && status !== "failed" && status !== "verifying") {
+	if (
+		!forceShow &&
+		status !== "pending" &&
+		status !== "failed" &&
+		status !== "verifying"
+	) {
 		return null;
 	}
 

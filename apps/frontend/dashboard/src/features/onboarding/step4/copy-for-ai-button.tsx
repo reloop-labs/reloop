@@ -82,7 +82,7 @@ export function CopyForAiButton({
 				mode="stroke"
 				size="xsmall"
 				onClick={() => void handleCopy()}
-				className="gap-1.5 rounded-l-xl rounded-r-none border-r-0"
+				className="gap-1.5 rounded-r-none rounded-l-xl border-r-0"
 			>
 				{copied ? (
 					<>
@@ -105,7 +105,7 @@ export function CopyForAiButton({
 						variant="neutral"
 						mode="stroke"
 						size="xsmall"
-						className="rounded-l-none rounded-r-xl px-1.5"
+						className="rounded-r-xl rounded-l-none px-1.5"
 						aria-label="Open AI prompt in editor"
 					>
 						<Icon

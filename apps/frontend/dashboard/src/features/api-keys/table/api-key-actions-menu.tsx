@@ -1,17 +1,11 @@
-import { useRouter } from "next/navigation";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as ContextMenu from "@reloop/ui/context-menu";
 import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
-
 import { AnimatePresence, motion } from "framer-motion";
-import {
-	type ReactNode,
-	useCallback,
-	useRef,
-	useState,
-} from "react";
+import { useRouter } from "next/navigation";
+import { type ReactNode, useCallback, useRef, useState } from "react";
 import { toast } from "sonner";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import type { ApiKeyData } from "../types";
@@ -90,10 +84,7 @@ function useApiKeyActionsMenu(
 				? "loader-2"
 				: apiKey.enabled
 					? "cross-circle"
-					: "check-circle") as
-				| "loader-2"
-				| "cross-circle"
-				| "check-circle",
+					: "check-circle") as "loader-2" | "cross-circle" | "check-circle",
 			isDanger: false,
 		},
 		{
@@ -279,9 +270,7 @@ function MenuItemLabel({
 								name="loader-2"
 								className="h-3.5 w-3.5 shrink-0 animate-spin text-text-sub-600"
 							/>
-							<span>
-								{apiKey.enabled ? "Disabling..." : "Enabling..."}
-							</span>
+							<span>{apiKey.enabled ? "Disabling..." : "Enabling..."}</span>
 						</>
 					) : (
 						<>
@@ -468,10 +457,7 @@ export function ApiKeyActionsMenu({
 			onClick={(e) => e.stopPropagation()}
 			onKeyDown={(e) => e.stopPropagation()}
 		>
-			<Dropdown.Root
-				open={menu.open}
-				onOpenChange={menu.handleOpenChange}
-			>
+			<Dropdown.Root open={menu.open} onOpenChange={menu.handleOpenChange}>
 				<Dropdown.Trigger asChild>
 					<Button.Root
 						type="button"

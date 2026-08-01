@@ -24,7 +24,7 @@ if (webhookError) throw webhookError;`,
   -H "Content-Type: application/json" \\
   -d '{"event":"domain.create","payload":{"domainId":"dom_123456789"}}'`,
 	},
-				{
+	{
 		id: "python",
 		lang: "python",
 		label: "Python",
@@ -41,7 +41,7 @@ result = reloop.webhook.trigger({
 if result.webhook_error:
     raise result.webhook_error`,
 	},
-			{
+	{
 		id: "php",
 		lang: "php",
 		label: "PHP",
@@ -49,7 +49,7 @@ if result.webhook_error:
 
 require 'vendor/autoload.php';
 
-use Reloop\Reloop;
+use ReloopReloop;
 
 $reloop = Reloop::client('rl_123456789');
 
@@ -60,7 +60,7 @@ $webhook = $reloop->webhook->trigger([
     ],
 ]);`,
 	},
-			{
+	{
 		id: "java",
 		lang: "java",
 		label: "Java",
@@ -76,30 +76,30 @@ var webhook = reloop.webhook.trigger(params);`,
 		id: "dotnet",
 		lang: "csharp",
 		label: ".NET",
-		source: `// Webhook SDK support coming soon`,
+		source: "// Webhook SDK support coming soon",
 	},
 	{
 		id: "go",
 		lang: "go",
 		label: "Go",
-		source: `// Webhook SDK support coming soon`,
+		source: "// Webhook SDK support coming soon",
 	},
 	{
 		id: "rust",
 		lang: "rust",
 		label: "Rust",
-		source: `// Webhook SDK support coming soon`,
+		source: "// Webhook SDK support coming soon",
 	},
 	{
 		id: "ruby",
 		lang: "ruby",
 		label: "Ruby",
-		source: `# Webhook SDK support coming soon`,
+		source: "# Webhook SDK support coming soon",
 	},
 	{
 		id: "elixir",
 		lang: "elixir",
 		label: "Elixir",
-		source: `# Webhook SDK support coming soon`,
+		source: "# Webhook SDK support coming soon",
 	},
 ];

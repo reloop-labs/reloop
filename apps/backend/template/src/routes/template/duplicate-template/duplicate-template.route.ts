@@ -3,9 +3,9 @@ import { authMiddleware } from "@be/template/middleware/auth";
 import { templateResponseSchema } from "@be/template/model/template.model";
 import { auditLogHook } from "@be/template/utils/audit-log";
 import { persistencePlugin } from "@be/template/utils/persistence";
+import { duplicateTemplateXCodeSamples } from "@reloop/code-samples/template";
 import { Elysia, t } from "elysia";
 import { duplicateTemplate } from "./duplicate-template.controllers";
-import { duplicateTemplateXCodeSamples } from "@reloop/code-samples/template";
 
 export const duplicateTemplateRoute = new Elysia()
 	.use(authMiddleware)

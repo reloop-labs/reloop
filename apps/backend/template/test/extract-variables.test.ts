@@ -36,9 +36,7 @@ describe("extractVariablesFromContent", () => {
 			},
 		];
 
-		expect(extractVariablesFromContent(content)).toEqual([
-			"{{{first_name}}}",
-		]);
+		expect(extractVariablesFromContent(content)).toEqual(["{{{first_name}}}"]);
 	});
 
 	test("finds triple-brace placeholders in text", () => {
@@ -61,7 +59,9 @@ describe("extractVariablesFromContent", () => {
 		const content = [
 			{
 				type: "paragraph",
-				content: [{ type: "text", text: "Hi {{first_name}}, NS {{ns_record}}" }],
+				content: [
+					{ type: "text", text: "Hi {{first_name}}, NS {{ns_record}}" },
+				],
 			},
 		];
 

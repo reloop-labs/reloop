@@ -1,6 +1,6 @@
 import { authClient } from "@reloop/auth/client";
-import * as FancyButton from "@reloop/ui/fancy-button";
 import { cn } from "@reloop/ui/cn";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import * as FileUpload from "@reloop/ui/file-upload";
 import { Icon } from "@reloop/ui/icon";
 import * as Label from "@reloop/ui/label";
@@ -29,7 +29,9 @@ export function WorkspaceLogoUpload({
 		ensureAbsoluteUrl(initialLogoUrl),
 	);
 	const [logoUrl, setLogoUrl] = useState(ensureAbsoluteUrl(initialLogoUrl));
-	const [status, setStatus] = useState<"idle" | "uploading" | "success">("idle");
+	const [status, setStatus] = useState<"idle" | "uploading" | "success">(
+		"idle",
+	);
 	const isUploading = status === "uploading";
 	const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -171,7 +173,7 @@ export function WorkspaceLogoUpload({
 					onClick={handleFileUploadClick}
 					disabled={status !== "idle"}
 					className={cn(
-						"min-w-[140px] justify-center overflow-hidden transition-all duration-200 font-medium",
+						"min-w-[140px] justify-center overflow-hidden font-medium transition-all duration-200",
 						status === "uploading" && "opacity-90",
 					)}
 				>

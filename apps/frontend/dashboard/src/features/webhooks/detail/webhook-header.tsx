@@ -1,19 +1,18 @@
-import { useRouter } from "next/navigation";
-import { AnimatedBackButton } from "#/features/dashboard/animated-back-button";
-import { WebhookAvatar } from "#/features/webhooks/components/webhook-avatar";
-import {
-	useInvalidateWebhooks,
-	type WebhookDetailData,
-} from "#/features/webhooks/hooks/use-webhooks-query";
-
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import axios from "axios";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import { AnimatedBackButton } from "#/features/dashboard/animated-back-button";
+import { WebhookAvatar } from "#/features/webhooks/components/webhook-avatar";
+import {
+	useInvalidateWebhooks,
+	type WebhookDetailData,
+} from "#/features/webhooks/hooks/use-webhooks-query";
 import {
 	WebhookHeaderMenu,
 	type WebhookHeaderMenuAction,
@@ -136,9 +135,7 @@ export function WebhookHeader({
 	if (!webhook && !isLoading) {
 		return (
 			<div className="pt-10 pb-2">
-				<AnimatedBackButton
-					onClick={() => router.push("/webhooks")}
-				/>
+				<AnimatedBackButton onClick={() => router.push("/webhooks")} />
 				<div className="flex items-center justify-between pt-6">
 					<div>
 						<div className="flex items-center gap-1.5 text-error-base">
@@ -227,9 +224,7 @@ export function WebhookHeader({
 								mode="stroke"
 								size="xsmall"
 								className="font-semibold"
-								onClick={() =>
-									router.push(`/webhooks/${webhook.id}/edit`)
-								}
+								onClick={() => router.push(`/webhooks/${webhook.id}/edit`)}
 							>
 								<Icon name="edit" className="h-3.5 w-3.5" />
 								Edit

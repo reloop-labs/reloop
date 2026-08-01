@@ -18,7 +18,10 @@ export type SmtpDetailRow = {
 	createdAt: string;
 };
 
-function detailCopy(row: SmtpDetailRow): { title: string; description: string } {
+function detailCopy(row: SmtpDetailRow): {
+	title: string;
+	description: string;
+} {
 	const key = (row.kumoType || row.type).toLowerCase();
 	const code = row.code ?? 0;
 	const isSuccess = code > 0 && code < 400;

@@ -92,7 +92,8 @@ export const DeleteGroupModal = ({
 
 			setTimeout(() => {
 				onOpenChange(false);
-				const deletedName = targetGroupRef.current?.name || groupToDelete?.name || "";
+				const deletedName =
+					targetGroupRef.current?.name || groupToDelete?.name || "";
 				onDeleteSuccess?.(deletedName);
 				setTimeout(() => {
 					setDeleteState("idle");

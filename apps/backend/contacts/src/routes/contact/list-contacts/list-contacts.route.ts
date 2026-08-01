@@ -1,9 +1,9 @@
 import { authMiddleware } from "@be/contacts/middleware/auth";
 import { rateLimitPlugin } from "@be/contacts/middleware/rate-limit";
 import { ContactModel } from "@be/contacts/model/contact.model";
+import { listContactsXCodeSamples } from "@reloop/code-samples/contacts";
 import { Elysia } from "elysia";
 import { listContactsController } from "./list-contacts.controllers";
-import { listContactsXCodeSamples } from "@reloop/code-samples/contacts";
 
 export const listContactsRoute = new Elysia()
 	.use(authMiddleware)

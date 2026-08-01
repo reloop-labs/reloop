@@ -3,8 +3,8 @@ import https from "node:https";
 import { URL } from "node:url";
 import { WEBHOOK_HTTP_TIMEOUT_MS } from "./constants";
 import {
-	resolvePublicTarget,
 	type ResolvedTarget,
+	resolvePublicTarget,
 	SsrfBlockedError,
 } from "./ssrf";
 
@@ -48,7 +48,10 @@ export async function postWebhook(input: {
 		});
 	}
 
-	if (parsed.protocol !== "https:" && !(input.allowHttp && parsed.protocol === "http:")) {
+	if (
+		parsed.protocol !== "https:" &&
+		!(input.allowHttp && parsed.protocol === "http:")
+	) {
 		const err: WebhookHttpError = {
 			kind: "ssrf",
 			message: "Only HTTPS webhook URLs are allowed",

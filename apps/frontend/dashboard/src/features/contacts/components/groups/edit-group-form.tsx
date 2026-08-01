@@ -146,9 +146,7 @@ export function EditGroupForm({
 				<div
 					className={cn(
 						"flex items-center justify-end gap-3",
-						isInline
-							? "px-6 pt-3 pb-3.5 dark:bg-bg-weak-50/40"
-							: "mt-6",
+						isInline ? "px-6 pt-3 pb-3.5 dark:bg-bg-weak-50/40" : "mt-6",
 					)}
 				>
 					<Button.Root

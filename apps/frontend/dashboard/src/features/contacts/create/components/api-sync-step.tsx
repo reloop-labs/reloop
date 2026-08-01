@@ -1,7 +1,7 @@
-import { useRouter } from "next/navigation";
 import * as Button from "@reloop/ui/button";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
+import { useRouter } from "next/navigation";
 
 import { useState } from "react";
 import {
@@ -218,7 +218,7 @@ export function ApiSyncStep({ onBack }: ApiSyncStepProps) {
 			{/* Main Card Container */}
 			<div className="overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-soft-50">
 				{/* Top Padded Content Area */}
-				<div className="m-0.5 max-h-[calc(100dvh-320px)] overflow-y-auto space-y-6 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 px-6 pt-4 pb-6">
+				<div className="m-0.5 max-h-[calc(100dvh-320px)] space-y-6 overflow-y-auto rounded-2xl border border-stroke-soft-200 bg-bg-white-0 px-6 pt-4 pb-6">
 					{/* Header */}
 					<div>
 						<h2 className="font-semibold text-base text-text-strong-950 tracking-tight">

@@ -1,4 +1,4 @@
-import { useEffect, useState, type ComponentType } from "react";
+import { type ComponentType, useEffect, useState } from "react";
 
 /**
  * Dynamically loads the shared `@reloop/ui` icon sprite (~300KB of SVG symbols).

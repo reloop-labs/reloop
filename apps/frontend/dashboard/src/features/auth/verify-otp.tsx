@@ -1,14 +1,13 @@
-import { useRouter } from "next/navigation";
 import { authClient } from "@reloop/auth/client";
 import * as Button from "@reloop/ui/button";
-import * as FancyButton from "@reloop/ui/fancy-button";
 import * as DigitInput from "@reloop/ui/digit-input";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import Spinner from "@reloop/ui/spinner";
 import { useLoading } from "@reloop/ui/use-loading";
 import { useQueryClient } from "@tanstack/react-query";
-
 import { AnimatePresence, motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 import { parseAsBoolean, parseAsString, useQueryState } from "nuqs";
 import { useEffect, useRef, useState } from "react";
 import { sessionQueryOptions } from "#/features/auth/session-query";
@@ -150,7 +149,7 @@ export function VerifyOTP({
 					type="button"
 					variant="neutral"
 					mode="stroke"
-					className="h-10 w-full rounded-xl font-medium text-sm gap-2 justify-center flex items-center"
+					className="flex h-10 w-full items-center justify-center gap-2 rounded-xl font-medium text-sm"
 					onClick={() => setEnterCode(true)}
 				>
 					Enter code manually
@@ -160,16 +159,24 @@ export function VerifyOTP({
 					type="button"
 					variant="blue"
 					size="medium"
-					className="h-10 w-full overflow-hidden rounded-xl font-medium text-sm gap-2 justify-center"
+					className="h-10 w-full justify-center gap-2 overflow-hidden rounded-xl font-medium text-sm"
 					onClick={() => {
 						if (isSuccess || status === "loading") return;
 						handleVerify(otpValue);
 					}}
-					disabled={(otpValue.length !== 6 || status === "loading") && !isSuccess}
+					disabled={
+						(otpValue.length !== 6 || status === "loading") && !isSuccess
+					}
 				>
 					<AnimatePresence mode="popLayout" initial={false}>
 						<motion.span
-							key={isSuccess ? "success" : status === "loading" ? "loading" : "idle"}
+							key={
+								isSuccess
+									? "success"
+									: status === "loading"
+										? "loading"
+										: "idle"
+							}
 							transition={{
 								type: "spring",
 								duration: 0.25,
@@ -189,8 +196,12 @@ export function VerifyOTP({
 							}}
 							className="flex items-center justify-center gap-1.5"
 						>
-							{status === "loading" && <Spinner size={14} color="currentColor" />}
-							{isSuccess && <Icon name="check-circle" className="h-4 w-4 shrink-0" />}
+							{status === "loading" && (
+								<Spinner size={14} color="currentColor" />
+							)}
+							{isSuccess && (
+								<Icon name="check-circle" className="h-4 w-4 shrink-0" />
+							)}
 							<span>
 								{isSuccess
 									? "Verified successfully!"

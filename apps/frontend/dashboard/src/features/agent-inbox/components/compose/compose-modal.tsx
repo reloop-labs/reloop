@@ -23,12 +23,14 @@ import { plainToHtml } from "../../lib/plain-to-html";
 import { readAiTextStreamAfterThink } from "../../lib/read-ai-text-stream-after-think";
 import type { AgentMailbox } from "../../types";
 import { useAgentInbox } from "../agent-inbox-provider";
+import { EmailPillsInput, validateEmail } from "../shared/email-pills-input";
+import { LoadingDot } from "../shared/loading-dot";
+import { AiComposerSlot } from "./ai-composer-slot";
 import {
 	type AiDraftPhase,
 	isAiDraftActive,
 	isAiDraftBusy,
 } from "./ai-draft-phase";
-import { AiComposerSlot } from "./ai-composer-slot";
 import { AiSparkleButton } from "./ai-sparkle-button";
 import {
 	ComposeBodyEditor,
@@ -36,8 +38,6 @@ import {
 } from "./compose-body-editor";
 import { ScheduleSendPicker } from "./schedule-send-picker";
 import { showUndoSendToast } from "./undo-send-toast";
-import { EmailPillsInput, validateEmail } from "../shared/email-pills-input";
-import { LoadingDot } from "../shared/loading-dot";
 
 /** Portaled compose UI (recipient suggestions + React Email menus). */
 const isComposeFloatingUi = (target: EventTarget | null) =>
@@ -626,8 +626,7 @@ export const ComposeModal = ({
 	};
 
 	const generateSubject = async (fromText?: string) => {
-		const text =
-			fromText ?? editorRef.current?.editor?.getText() ?? textBody;
+		const text = fromText ?? editorRef.current?.editor?.getText() ?? textBody;
 		if (!text.trim()) {
 			toast.error("Write some content first");
 			return;
@@ -1033,7 +1032,9 @@ export const ComposeModal = ({
 									/>
 									<AiSparkleButton
 										onClick={() => void generateSubject()}
-										disabled={isSending || subjectGenerating || !textBody.trim()}
+										disabled={
+											isSending || subjectGenerating || !textBody.trim()
+										}
 										loading={subjectGenerating}
 										variant="icon"
 										size="sm"

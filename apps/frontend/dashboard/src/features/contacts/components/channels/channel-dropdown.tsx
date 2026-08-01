@@ -1,5 +1,3 @@
-import { useRouter } from "next/navigation";
-import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
@@ -9,9 +7,10 @@ import {
 	Trigger as PopoverTrigger,
 } from "@reloop/ui/popover";
 import Spinner from "@reloop/ui/spinner";
-
 import { AnimatePresence, motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
+import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 
 interface ChannelDropdownProps {
 	channelId: string;
@@ -166,7 +165,7 @@ export const ChannelDropdown = ({
 								(isTogglingVisibility || isVisibilityCompleted)
 							}
 							className={cn(
-								"relative flex w-full cursor-pointer items-center gap-2 overflow-hidden rounded-lg px-2 py-1.5 font-medium text-text-strong-950 text-xs transition-colors min-h-[28px] dark:text-white",
+								"relative flex min-h-[28px] w-full cursor-pointer items-center gap-2 overflow-hidden rounded-lg px-2 py-1.5 font-medium text-text-strong-950 text-xs transition-colors dark:text-white",
 								!currentRect && hoverIdx === idx && "bg-neutral-alpha-10",
 								item.id === "visibility" &&
 									(isTogglingVisibility || isVisibilityCompleted) &&
@@ -220,7 +219,9 @@ export const ChannelDropdown = ({
 													className="h-3.5 w-3.5 shrink-0 text-text-sub-600"
 												/>
 												<span>
-													{visibility === "public" ? "Set Private" : "Set Public"}
+													{visibility === "public"
+														? "Set Private"
+														: "Set Public"}
 												</span>
 											</>
 										)}

@@ -26,7 +26,7 @@ console.log(domains.total, domains.domains);`,
 		source: `curl "https://reloop.sh/api/domain/v1/list?page=1&limit=10&status=active" \\
   -H "x-api-key: rl_123456789"`,
 	},
-				{
+	{
 		id: "python",
 		lang: "python",
 		label: "Python",
@@ -45,7 +45,7 @@ if result.domain_error:
 
 print(result.domains["total"], result.domains["domains"])`,
 	},
-			{
+	{
 		id: "php",
 		lang: "php",
 		label: "PHP",
@@ -53,7 +53,7 @@ print(result.domains["total"], result.domains["domains"])`,
 
 require 'vendor/autoload.php';
 
-use Reloop\Reloop;
+use ReloopReloop;
 
 $reloop = Reloop::client('rl_123456789');
 
@@ -64,7 +64,7 @@ $domains = $reloop->domain->list([
 ]);
 echo $domains['total'] . ' ' . $domains['domains'] . PHP_EOL;`,
 	},
-			{
+	{
 		id: "java",
 		lang: "java",
 		label: "Java",

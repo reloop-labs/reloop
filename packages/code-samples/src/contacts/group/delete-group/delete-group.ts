@@ -22,7 +22,7 @@ console.log(group.id, group.success);`,
 		source: `curl -X DELETE https://reloop.sh/api/contacts/v1/groups/grp_123456789 \\
   -H "x-api-key: rl_123456789"`,
 	},
-				{
+	{
 		id: "python",
 		lang: "python",
 		label: "Python",
@@ -37,7 +37,7 @@ if result.group_error:
 
 print(result.group["id"], result.group["success"])`,
 	},
-			{
+	{
 		id: "php",
 		lang: "php",
 		label: "PHP",
@@ -45,14 +45,14 @@ print(result.group["id"], result.group["success"])`,
 
 require 'vendor/autoload.php';
 
-use Reloop\Reloop;
+use ReloopReloop;
 
 $reloop = Reloop::client('rl_123456789');
 
 $group = $reloop->contacts->groups->delete('grp_123456789');
 echo $group['id'] . ' ' . $group['success'] . PHP_EOL;`,
 	},
-			{
+	{
 		id: "java",
 		lang: "java",
 		label: "Java",

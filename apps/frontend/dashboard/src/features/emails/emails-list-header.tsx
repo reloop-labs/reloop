@@ -1,6 +1,6 @@
-import { usePathname } from "next/navigation";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
+import { usePathname } from "next/navigation";
 
 const DOCS_URL = "https://reloop.sh/docs/learn/emails";
 

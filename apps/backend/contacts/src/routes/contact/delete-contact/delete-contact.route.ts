@@ -2,9 +2,9 @@ import { authMiddleware } from "@be/contacts/middleware/auth";
 import { rateLimitPlugin } from "@be/contacts/middleware/rate-limit";
 import { ContactModel } from "@be/contacts/model/contact.model";
 import { auditLogHook } from "@be/contacts/utils/audit-log";
+import { deleteContactXCodeSamples } from "@reloop/code-samples/contacts";
 import { Elysia, t } from "elysia";
 import { deleteContactController } from "./delete-contact.controllers";
-import { deleteContactXCodeSamples } from "@reloop/code-samples/contacts";
 
 export const deleteContactRoute = new Elysia()
 	.use(authMiddleware)

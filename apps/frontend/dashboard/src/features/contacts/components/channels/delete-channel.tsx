@@ -1,4 +1,3 @@
-import { useRouter, usePathname } from "next/navigation";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
@@ -7,7 +6,6 @@ import * as Modal from "@reloop/ui/modal";
 import { Skeleton } from "@reloop/ui/skeleton";
 import Spinner from "@reloop/ui/spinner";
 import { useQuery } from "@tanstack/react-query";
-
 import axios from "axios";
 import {
 	AnimatePresence,
@@ -16,6 +14,7 @@ import {
 	motion,
 	useMotionValue,
 } from "framer-motion";
+import { usePathname, useRouter } from "next/navigation";
 import { useQueryState } from "nuqs";
 import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";

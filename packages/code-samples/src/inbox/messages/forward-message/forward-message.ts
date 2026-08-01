@@ -24,7 +24,7 @@ if (messageError) throw messageError;`,
   -H "Content-Type: application/json" \
   -d '{"to":"colleague@example.com","html":"<p>See the thread below.</p>"}'`,
 	},
-				{
+	{
 		id: "python",
 		lang: "python",
 		label: "Python",
@@ -39,7 +39,7 @@ result = reloop.inbox.messages.forward("msg_123456789", {
 if result.message_error:
     raise result.message_error`,
 	},
-			{
+	{
 		id: "php",
 		lang: "php",
 		label: "PHP",
@@ -47,7 +47,7 @@ if result.message_error:
 
 require 'vendor/autoload.php';
 
-use Reloop\Reloop;
+use ReloopReloop;
 
 $reloop = Reloop::client('rl_123456789');
 
@@ -56,7 +56,7 @@ $message = $reloop->inbox->messages->forward('msg_123456789', [
     'html' => '<p>See the thread below.</p>',
 ]);`,
 	},
-			{
+	{
 		id: "java",
 		lang: "java",
 		label: "Java",
@@ -72,30 +72,30 @@ var message = reloop.inbox.messages.forward("msg_123456789", params);`,
 		id: "dotnet",
 		lang: "csharp",
 		label: ".NET",
-		source: `// Inbox SDK support coming soon — use the REST API`,
+		source: "// Inbox SDK support coming soon — use the REST API",
 	},
 	{
 		id: "go",
 		lang: "go",
 		label: "Go",
-		source: `// Inbox SDK support coming soon — use the REST API`,
+		source: "// Inbox SDK support coming soon — use the REST API",
 	},
 	{
 		id: "rust",
 		lang: "rust",
 		label: "Rust",
-		source: `// Inbox SDK support coming soon — use the REST API`,
+		source: "// Inbox SDK support coming soon — use the REST API",
 	},
 	{
 		id: "ruby",
 		lang: "ruby",
 		label: "Ruby",
-		source: `# Inbox SDK support coming soon — use the REST API`,
+		source: "# Inbox SDK support coming soon — use the REST API",
 	},
 	{
 		id: "elixir",
 		lang: "elixir",
 		label: "Elixir",
-		source: `# Inbox SDK support coming soon — use the REST API`,
+		source: "# Inbox SDK support coming soon — use the REST API",
 	},
 ];

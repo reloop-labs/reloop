@@ -2,9 +2,9 @@ import { authMiddleware } from "@be/contacts/middleware/auth";
 import { rateLimitPlugin } from "@be/contacts/middleware/rate-limit";
 import { ContactModel } from "@be/contacts/model/contact.model";
 import { auditLogHook } from "@be/contacts/utils/audit-log";
+import { addContactToGroupXCodeSamples } from "@reloop/code-samples/contacts";
 import { Elysia, t } from "elysia";
 import { addContactToGroupController } from "./add-contact-to-group.controllers";
-import { addContactToGroupXCodeSamples } from "@reloop/code-samples/contacts";
 
 export const addContactToGroupRoute = new Elysia()
 	.use(authMiddleware)

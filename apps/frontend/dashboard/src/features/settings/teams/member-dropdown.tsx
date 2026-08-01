@@ -1,10 +1,9 @@
-
-import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
 import { useRef, useState } from "react";
+import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 
 export interface MemberDropdownProps {
 	memberId: string;
@@ -104,7 +103,7 @@ export const MemberDropdown = ({
 								onPointerLeave={() => setHoverIdx(undefined)}
 								onClick={() => handleItemClick(item.id)}
 								className={cn(
-									"relative flex w-full cursor-pointer items-center gap-2 overflow-hidden rounded-lg px-2 py-1.5 font-normal text-xs transition-colors min-h-[28px]",
+									"relative flex min-h-[28px] w-full cursor-pointer items-center gap-2 overflow-hidden rounded-lg px-2 py-1.5 font-normal text-xs transition-colors",
 									item.isDanger ? "text-error-base" : "text-text-strong-950",
 									!currentRect &&
 										hoverIdx === idx &&

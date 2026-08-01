@@ -2,8 +2,8 @@ import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
 import * as Tooltip from "@reloop/ui/tooltip";
-import type { useCreateWebhookForm } from "./use-create-webhook-form";
 import { WebhookEventInlineSelector } from "../../components/webhook-event-inline-selector";
+import type { useCreateWebhookForm } from "./use-create-webhook-form";
 
 type FormFieldsProps = ReturnType<typeof useCreateWebhookForm>;
 

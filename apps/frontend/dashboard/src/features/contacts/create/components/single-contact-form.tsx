@@ -1,10 +1,10 @@
-import { useRouter } from "next/navigation";
 import * as Avatar from "@reloop/ui/avatar";
 import * as Button from "@reloop/ui/button";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import * as Label from "@reloop/ui/label";
 import Spinner from "@reloop/ui/spinner";
+import { useRouter } from "next/navigation";
 
 import { type KeyboardEvent, useCallback, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -155,7 +155,7 @@ export function SingleContactForm({ onBack }: SingleContactFormProps) {
 			<div className="overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-soft-50">
 				<form onSubmit={handleSubmit}>
 					{/* Top Padded Content Area */}
-					<div className="m-0.5 max-h-[calc(100dvh-320px)] overflow-y-auto space-y-6 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 px-6 pt-4 pb-6">
+					<div className="m-0.5 max-h-[calc(100dvh-320px)] space-y-6 overflow-y-auto rounded-2xl border border-stroke-soft-200 bg-bg-white-0 px-6 pt-4 pb-6">
 						{/* Header */}
 						<div>
 							<h2 className="font-semibold text-base text-text-strong-950 tracking-tight">

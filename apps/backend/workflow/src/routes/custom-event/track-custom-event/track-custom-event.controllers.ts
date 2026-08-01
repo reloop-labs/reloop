@@ -1,5 +1,5 @@
-import { enrollContactInMatchingAutomations } from "@be/workflow/handlers/automation/enroll";
 import { CustomEventErrors } from "@be/workflow/error/custom-event.error-response";
+import { enrollContactInMatchingAutomations } from "@be/workflow/handlers/automation/enroll";
 import { validateTrackProperties } from "@be/workflow/lib/custom-event/validate-properties";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";

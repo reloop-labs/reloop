@@ -4,9 +4,9 @@ import {
 	generateReceivingMXRecordForDomain,
 } from "../src/utils/dns-record-generator";
 import {
-	getReceivingMxName,
 	getDomainHost,
 	getDomainSubString,
+	getReceivingMxName,
 } from "../src/utils/domain-formatter";
 
 describe("getReceivingMxName", () => {

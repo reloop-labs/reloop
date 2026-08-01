@@ -1,4 +1,3 @@
-
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
@@ -72,7 +71,7 @@ export const RemoveMemberModal = ({
 						variant={status === "success" ? "success" : "destructive"}
 						size="xsmall"
 						className={cn(
-							"min-w-[140px] justify-center overflow-hidden transition-all duration-200 font-medium",
+							"min-w-[140px] justify-center overflow-hidden font-medium transition-all duration-200",
 							status === "removing" && "opacity-90",
 						)}
 						onClick={handleRemove}

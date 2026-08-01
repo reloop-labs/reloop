@@ -12,8 +12,8 @@ import { deleteContactXCodeSamples } from "./contact/delete-contact/delete-conta
 import { getContactXCodeSamples } from "./contact/get-contact/get-contact";
 import { listContactsXCodeSamples } from "./contact/list-contacts/list-contacts";
 import { removeContactFromGroupXCodeSamples } from "./contact/remove-contact-from-group/remove-contact-from-group";
-import { updateContactChannelXCodeSamples } from "./contact/update-contact-channel/update-contact-channel";
 import { updateContactXCodeSamples } from "./contact/update-contact/update-contact";
+import { updateContactChannelXCodeSamples } from "./contact/update-contact-channel/update-contact-channel";
 import { createGroupXCodeSamples } from "./group/create-group/create-group";
 import { deleteGroupXCodeSamples } from "./group/delete-group/delete-group";
 import { getGroupXCodeSamples } from "./group/get-group/get-group";

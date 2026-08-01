@@ -1,5 +1,5 @@
-import type { CodeSample } from "./types";
 import { LANGUAGE_META } from "./languages";
+import type { CodeSample } from "./types";
 
 export function sampleById(
 	samples: readonly CodeSample[],
@@ -47,8 +47,7 @@ export function toDashboardCodeExamples(
 	const out: Record<string, Record<string, string>> = {};
 	for (const langId of langIds) {
 		const meta = LANGUAGE_META[langId];
-		const langKey =
-			langKeyOverrides?.[langId] ?? meta?.langKey ?? langId;
+		const langKey = langKeyOverrides?.[langId] ?? meta?.langKey ?? langId;
 		out[langKey] = {};
 		for (const op of ops) {
 			const sample = sampleById(op.samples, langId);

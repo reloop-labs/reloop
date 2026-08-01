@@ -1,3 +1,4 @@
+import { sendAutomationEmail } from "@be/workflow/handlers/automation/send-email-step";
 import {
 	delayToMs,
 	findNode,
@@ -6,9 +7,8 @@ import {
 	type SendEmailNodeData,
 } from "@be/workflow/lib/automation/graph";
 import { enqueueAutomationStep } from "@be/workflow/queues/automation.queue";
-import { sendAutomationEmail } from "@be/workflow/handlers/automation/send-email-step";
-import type { AutomationGraph } from "@reloop/db/schema";
 import { db } from "@reloop/db/client";
+import type { AutomationGraph } from "@reloop/db/schema";
 import * as schema from "@reloop/db/schema";
 import { and, eq } from "drizzle-orm";
 import { log } from "evlog";

@@ -25,7 +25,7 @@ console.log(groups.total, groups.groups);`,
 		source: `curl "https://reloop.sh/api/contacts/v1/groups/list?page=1&limit=10" \\
   -H "x-api-key: rl_123456789"`,
 	},
-				{
+	{
 		id: "python",
 		lang: "python",
 		label: "Python",
@@ -43,7 +43,7 @@ if result.group_error:
 
 print(result.groups["total"], result.groups["groups"])`,
 	},
-			{
+	{
 		id: "php",
 		lang: "php",
 		label: "PHP",
@@ -51,7 +51,7 @@ print(result.groups["total"], result.groups["groups"])`,
 
 require 'vendor/autoload.php';
 
-use Reloop\Reloop;
+use ReloopReloop;
 
 $reloop = Reloop::client('rl_123456789');
 
@@ -61,7 +61,7 @@ $groups = $reloop->contacts->groups->list([
 ]);
 echo $groups['total'] . ' ' . $groups['groups'] . PHP_EOL;`,
 	},
-			{
+	{
 		id: "java",
 		lang: "java",
 		label: "Java",

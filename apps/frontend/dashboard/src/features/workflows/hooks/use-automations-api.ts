@@ -28,9 +28,7 @@ export type AutomationListResponse = {
 	limit: number;
 };
 
-export function mapAutomationToWorkflow(
-	row: AutomationApiResponse,
-): Workflow {
+export function mapAutomationToWorkflow(row: AutomationApiResponse): Workflow {
 	return {
 		id: row.id,
 		organizationId: row.organizationId,
@@ -52,8 +50,7 @@ async function parseJson<T>(res: Response): Promise<T> {
 		why?: string;
 	};
 	if (!res.ok) {
-		const msg =
-			data.why || data.message || `Request failed (${res.status})`;
+		const msg = data.why || data.message || `Request failed (${res.status})`;
 		throw new Error(msg);
 	}
 	return data;

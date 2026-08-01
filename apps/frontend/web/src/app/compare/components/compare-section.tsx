@@ -59,7 +59,7 @@ export function CompareSection({
 			{!noDivider && (
 				<div
 					aria-hidden
-					className="pointer-events-none absolute bottom-0 left-1/2 w-screen -translate-x-1/2 border-stroke-soft-200 border-b dark:border-white/10"
+					className="-translate-x-1/2 pointer-events-none absolute bottom-0 left-1/2 w-screen border-stroke-soft-200 border-b dark:border-white/10"
 				/>
 			)}
 			<div

@@ -20,9 +20,7 @@ type SwrOptions<T> = {
 	[key: string]: unknown;
 };
 
-function isFetcher<T>(
-	value: unknown,
-): value is (url: string) => Promise<T> {
+function isFetcher<T>(value: unknown): value is (url: string) => Promise<T> {
 	return typeof value === "function";
 }
 
@@ -37,8 +35,7 @@ export function useSWR<T = unknown>(
 	const fetcher = isFetcher<T>(fetcherOrOptions) ? fetcherOrOptions : null;
 	const options: SwrOptions<T> | undefined = isFetcher<T>(fetcherOrOptions)
 		? maybeOptions
-		: ((fetcherOrOptions as SwrOptions<T> | null | undefined) ??
-			maybeOptions);
+		: ((fetcherOrOptions as SwrOptions<T> | null | undefined) ?? maybeOptions);
 
 	const query = useQuery<T>({
 		queryKey,

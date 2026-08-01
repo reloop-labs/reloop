@@ -59,7 +59,10 @@ interface WorkflowEditorProps {
 	onNameChange: (name: string) => void;
 	onGraphChange: (nodes: WorkflowNode[], edges: WorkflowEdge[]) => void;
 	onStatusChange: (status: WorkflowStatus) => Promise<void> | void;
-	onSave: (nodes: WorkflowNode[], edges: WorkflowEdge[]) => Promise<void> | void;
+	onSave: (
+		nodes: WorkflowNode[],
+		edges: WorkflowEdge[],
+	) => Promise<void> | void;
 }
 
 const WorkflowEditorInner = ({
@@ -167,21 +170,17 @@ const WorkflowEditorInner = ({
 		[setNodes, setEdges, selectedNodeId],
 	);
 
-	useHotkeys(
-		"backspace",
-		() => {
-			if (!selectedNodeId || selectedNodeId === TRIGGER_NODE_ID) return;
-			const active = document.activeElement;
-			if (
-				active instanceof HTMLInputElement ||
-				active instanceof HTMLTextAreaElement
-			) {
-				return;
-			}
-			handleDeleteNode(selectedNodeId);
-		},
-		[selectedNodeId, handleDeleteNode],
-	);
+	useHotkeys("backspace", () => {
+		if (!selectedNodeId || selectedNodeId === TRIGGER_NODE_ID) return;
+		const active = document.activeElement;
+		if (
+			active instanceof HTMLInputElement ||
+			active instanceof HTMLTextAreaElement
+		) {
+			return;
+		}
+		handleDeleteNode(selectedNodeId);
+	}, [selectedNodeId, handleDeleteNode]);
 
 	const handleSave = () => onSave(nodes, edges);
 

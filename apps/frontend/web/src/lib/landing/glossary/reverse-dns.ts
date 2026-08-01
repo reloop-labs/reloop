@@ -5,7 +5,7 @@ export const term: GlossaryTermDefinition = {
 	title: "Reverse DNS",
 	description:
 		"A PTR record that maps an IP back to a hostname; receivers check this on SMTP connections.",
-	keywords: ["reverse DNS","PTR record","rDNS email"],
+	keywords: ["reverse DNS", "PTR record", "rDNS email"],
 	body: `Reverse DNS (a PTR record) says which hostname an IP claims. Many receivers check that connecting SMTP clients have plausible PTR data, and that forward DNS for that hostname points back at the IP (FCrDNS).
 
 Cloud VMs often start with generic PTR names. For dedicated sending IPs, set a sensible hostname (for example mta1.mail.yourdomain.com) that matches your HELO/EHLO.

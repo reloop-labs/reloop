@@ -1,9 +1,9 @@
+import { useEffect, useRef } from "react";
 import { useAgentInbox } from "#/features/agent-inbox/components/agent-inbox-provider";
 import type {
 	ComposeDraftAttachment,
 	ComposeDraftKind,
 } from "#/features/agent-inbox/types";
-import { useEffect, useRef } from "react";
 
 type DraftAutosaveInput = {
 	enabled: boolean;

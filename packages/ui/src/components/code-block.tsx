@@ -5,9 +5,9 @@
 
 import { highlight, type LanguageAlias, type Token } from "@code-hike/lighter";
 import { cn } from "@reloop/ui/cn";
-import { toBrightLang } from "../utils/to-bright-lang";
 import { useTheme } from "next-themes";
 import { useEffect, useMemo, useState } from "react";
+import { toBrightLang } from "../utils/to-bright-lang";
 
 interface Props {
 	code: string;

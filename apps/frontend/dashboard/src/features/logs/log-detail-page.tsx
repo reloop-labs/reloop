@@ -1,9 +1,9 @@
-import { useRouter } from "next/navigation";
 import * as Badge from "@reloop/ui/badge";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import * as Tooltip from "@reloop/ui/tooltip";
+import { useRouter } from "next/navigation";
 
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
@@ -31,8 +31,6 @@ const getMethodColorClass = (method: string) => {
 			return "text-text-sub-600";
 	}
 };
-
-
 
 const getStatusProps = (statusCode: number | null | undefined) => {
 	if (!statusCode) return null;
@@ -149,9 +147,7 @@ export function LogDetailPage({ logId }: { logId: string }) {
 		return (
 			<div className="mx-auto max-w-3xl px-6 pb-12 sm:px-8">
 				<div className="pt-10 pb-4">
-					<AnimatedBackButton
-						onClick={() => router.push("/logs")}
-					/>
+					<AnimatedBackButton onClick={() => router.push("/logs")} />
 				</div>
 				<div className="rounded-xl border border-stroke-soft-100 bg-bg-white-0 shadow-sm dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/10">
 					<div className="flex flex-col gap-4 p-5">
@@ -179,9 +175,7 @@ export function LogDetailPage({ logId }: { logId: string }) {
 		return (
 			<div className="mx-auto max-w-3xl px-6 sm:px-8">
 				<div className="pt-10 pb-4">
-					<AnimatedBackButton
-						onClick={() => router.push("/logs")}
-					/>
+					<AnimatedBackButton onClick={() => router.push("/logs")} />
 				</div>
 				<div className="rounded-xl border border-stroke-soft-100 bg-bg-white-0 p-12 text-center dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/10">
 					<p className="text-sm text-text-sub-600">Log not found</p>

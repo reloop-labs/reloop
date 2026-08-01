@@ -1,7 +1,7 @@
-import { useRouter } from "next/navigation";
 import { cn } from "@reloop/ui/cn";
 import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
+import { useRouter } from "next/navigation";
 
 import { useRef, useState } from "react";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
@@ -170,9 +170,7 @@ export function OrganizationSwitcher({
 						<div className="mx-2 mt-1.5 border-stroke-soft-100 border-t dark:border-stroke-soft-100/40" />
 
 						<button
-							onPointerEnter={() =>
-								setHoverIdx(organizations?.length ?? 0)
-							}
+							onPointerEnter={() => setHoverIdx(organizations?.length ?? 0)}
 							onPointerLeave={() => setHoverIdx(undefined)}
 							ref={(el) => {
 								if (el) {

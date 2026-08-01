@@ -1,10 +1,9 @@
-import Link from "next/link";
-import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
-
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { ArrowRight } from "lucide-react";
+import Link from "next/link";
+import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import { useSWR } from "#/features/home/lib/use-swr-compat";
 
 interface LogData {
@@ -104,7 +103,7 @@ const isError = (log: LogData) =>
 	(log.status_code != null && log.status_code >= 400);
 
 export function AuditLogsCard() {
-		const { activeOrganization } = useActiveOrganization();
+	const { activeOrganization } = useActiveOrganization();
 
 	const { data: auditLogsData } = useSWR<LogListResponse>(
 		activeOrganization?.id ? "/api/logs/v1/list?limit=6" : null,
@@ -114,11 +113,17 @@ export function AuditLogsCard() {
 		<div className="group flex w-full flex-col">
 			{/* Header */}
 			<div className="flex items-center justify-between rounded-t-2xl border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-5 pt-1.5 pb-3 dark:border-white/5 dark:bg-white/[0.02]">
-				<Link href="/logs" className="flex items-center gap-2 font-medium text-sm text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white">
+				<Link
+					href="/logs"
+					className="flex items-center gap-2 font-medium text-sm text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white"
+				>
 					<Icon name="logs" className="h-4 w-4 shrink-0" />
 					Audit Logs
 				</Link>
-				<Link href="/logs" className="flex h-7 w-7 shrink-0 items-center justify-center text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/60">
+				<Link
+					href="/logs"
+					className="flex h-7 w-7 shrink-0 items-center justify-center text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/60"
+				>
 					<ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
 				</Link>
 			</div>
@@ -131,8 +136,11 @@ export function AuditLogsCard() {
 						const error = isError(log);
 						const iconName = getEventIcon(log.event);
 						return (
-							<Link href={`/logs?log=${log.uuid}`}
-								className="group/row flex items-center gap-3 border-stroke-soft-100 border-b py-3 no-underline last:border-b-0 dark:border-white/5" key={log.uuid}>
+							<Link
+								href={`/logs?log=${log.uuid}`}
+								className="group/row flex items-center gap-3 border-stroke-soft-100 border-b py-3 no-underline last:border-b-0 dark:border-white/5"
+								key={log.uuid}
+							>
 								{/* Icon */}
 								<Icon
 									name={iconName as any}

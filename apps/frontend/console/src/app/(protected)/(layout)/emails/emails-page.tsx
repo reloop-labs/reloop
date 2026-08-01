@@ -7,10 +7,7 @@ import {
 } from "@fe/console/components/ui/page-frame";
 import { StatusPill } from "@fe/console/components/ui/status-pill";
 import { adminGet } from "@fe/console/lib/admin-api";
-import {
-	formatRecipients,
-	formatRelativeTime,
-} from "@fe/console/lib/format";
+import { formatRecipients, formatRelativeTime } from "@fe/console/lib/format";
 import * as Button from "@reloop/ui/button";
 import * as Input from "@reloop/ui/input";
 import Link from "next/link";
@@ -102,9 +99,7 @@ export default function EmailsPage() {
 						{organizationId ? (
 							<>
 								<Button.Root asChild variant="neutral" mode="stroke">
-									<Link href={`/organizations/${organizationId}`}>
-										Org hub
-									</Link>
+									<Link href={`/organizations/${organizationId}`}>Org hub</Link>
 								</Button.Root>
 								<Button.Root
 									type="button"
@@ -156,7 +151,12 @@ export default function EmailsPage() {
 								<StatusPill status={email.status} />
 							</td>
 							<td className="px-4 py-3">
-								<Button.Root asChild size="xsmall" variant="neutral" mode="ghost">
+								<Button.Root
+									asChild
+									size="xsmall"
+									variant="neutral"
+									mode="ghost"
+								>
 									<Link href={`/organizations/${email.organizationId}`}>
 										Open hub
 									</Link>

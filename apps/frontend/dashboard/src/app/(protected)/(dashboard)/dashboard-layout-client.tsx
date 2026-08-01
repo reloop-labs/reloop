@@ -15,8 +15,7 @@ export function DashboardLayoutClient({
 
 	// Keep shell (sidebar + header) mounted for the whole reload; only the main
 	// panel shows a loader until session and workspace membership are ready.
-	const showContentSkeleton =
-		isPending || !session || !isMembershipReady;
+	const showContentSkeleton = isPending || !session || !isMembershipReady;
 
 	return (
 		<DashboardShell>

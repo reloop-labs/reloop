@@ -1,9 +1,9 @@
-import { useRouter } from "next/navigation";
 import { authClient } from "@reloop/auth/client";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import Spinner from "@reloop/ui/spinner";
 import { useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 
 import { parseAsString, useQueryState } from "nuqs";
 import { useEffect, useRef, useState } from "react";
@@ -115,7 +115,11 @@ export function AutoLoginPage() {
 									variant="neutral"
 									className="h-11 w-full max-w-sm rounded-2xl!"
 									onClick={() =>
-										router.push(inviteId ? `/login?inviteId=${encodeURIComponent(inviteId)}` : "/login")
+										router.push(
+											inviteId
+												? `/login?inviteId=${encodeURIComponent(inviteId)}`
+												: "/login",
+										)
 									}
 								>
 									Back to Login

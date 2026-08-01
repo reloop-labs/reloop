@@ -24,7 +24,7 @@ if (threadError) throw threadError;`,
   -H "Content-Type: application/json" \
   -d '{"ids":["thr_123456789","thr_987654321"],"action":"archive"}'`,
 	},
-				{
+	{
 		id: "python",
 		lang: "python",
 		label: "Python",
@@ -39,7 +39,7 @@ result = reloop.inbox.threads.batch({
 if result.thread_error:
     raise result.thread_error`,
 	},
-			{
+	{
 		id: "php",
 		lang: "php",
 		label: "PHP",
@@ -47,7 +47,7 @@ if result.thread_error:
 
 require 'vendor/autoload.php';
 
-use Reloop\Reloop;
+use ReloopReloop;
 
 $reloop = Reloop::client('rl_123456789');
 
@@ -56,7 +56,7 @@ $thread = $reloop->inbox->threads->batch([
     'action' => 'archive',
 ]);`,
 	},
-			{
+	{
 		id: "java",
 		lang: "java",
 		label: "Java",
@@ -72,30 +72,30 @@ var thread = reloop.inbox.threads.batch(params);`,
 		id: "dotnet",
 		lang: "csharp",
 		label: ".NET",
-		source: `// Inbox SDK support coming soon — use the REST API`,
+		source: "// Inbox SDK support coming soon — use the REST API",
 	},
 	{
 		id: "go",
 		lang: "go",
 		label: "Go",
-		source: `// Inbox SDK support coming soon — use the REST API`,
+		source: "// Inbox SDK support coming soon — use the REST API",
 	},
 	{
 		id: "rust",
 		lang: "rust",
 		label: "Rust",
-		source: `// Inbox SDK support coming soon — use the REST API`,
+		source: "// Inbox SDK support coming soon — use the REST API",
 	},
 	{
 		id: "ruby",
 		lang: "ruby",
 		label: "Ruby",
-		source: `# Inbox SDK support coming soon — use the REST API`,
+		source: "# Inbox SDK support coming soon — use the REST API",
 	},
 	{
 		id: "elixir",
 		lang: "elixir",
 		label: "Elixir",
-		source: `# Inbox SDK support coming soon — use the REST API`,
+		source: "# Inbox SDK support coming soon — use the REST API",
 	},
 ];

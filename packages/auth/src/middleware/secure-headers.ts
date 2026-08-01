@@ -100,9 +100,7 @@ export function secureHeadersPlugin(opts: SecureHeadersOptions = {}) {
 			set.headers["X-Frame-Options"] = "DENY";
 			set.headers["Referrer-Policy"] = REFERRER;
 			set.headers["Permissions-Policy"] = PERMISSIONS;
-			set.headers["Content-Security-Policy"] = useDocsCsp
-				? CSP_DOCS
-				: CSP_API;
+			set.headers["Content-Security-Policy"] = useDocsCsp ? CSP_DOCS : CSP_API;
 
 			if (hsts) {
 				set.headers["Strict-Transport-Security"] = HSTS_VALUE;

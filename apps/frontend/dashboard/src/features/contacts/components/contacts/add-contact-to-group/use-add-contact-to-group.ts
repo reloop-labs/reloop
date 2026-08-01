@@ -1,8 +1,8 @@
-import { useParams } from "next/navigation";
-import { useInvalidateContacts } from "#/features/contacts/hooks/use-contacts-query";
 import { useInfiniteQuery } from "@tanstack/react-query";
+import { useParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
+import { useInvalidateContacts } from "#/features/contacts/hooks/use-contacts-query";
 import type { Contact } from "./types";
 
 const PAGE_SIZE = 50;
@@ -279,8 +279,7 @@ export const useAddContactToGroup = (
 		totalInOrg,
 		hasMore,
 		setSize,
-		isValidating:
-			contactsQuery.isFetching && !contactsQuery.isPending,
+		isValidating: contactsQuery.isFetching && !contactsQuery.isPending,
 		isSearching: contactsQuery.isPending,
 		isGroupLoading,
 		isAllSelected,

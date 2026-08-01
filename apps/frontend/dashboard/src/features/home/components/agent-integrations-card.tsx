@@ -1,4 +1,3 @@
-import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import { cn } from "@reloop/ui/cn";
 import { CopyCodeBlock } from "@reloop/ui/copy-code-block";
 import { Icon } from "@reloop/ui/icon";
@@ -8,6 +7,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { useRef, useState } from "react";
 import { siGnubash, siJson } from "simple-icons";
 import { toast } from "sonner";
+import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import { useSWR } from "#/features/home/lib/use-swr-compat";
 
 type AgentTab = "skill" | "cli" | "mcp";

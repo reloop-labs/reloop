@@ -5,7 +5,7 @@ export const term: GlossaryTermDefinition = {
 	title: "Feedback Loop",
 	description:
 		"A channel where ISPs tell senders when someone marks a message as spam.",
-	keywords: ["FBL","feedback loop email","spam complaint FBL"],
+	keywords: ["FBL", "feedback loop email", "spam complaint FBL"],
 	body: `A feedback loop (FBL) is how some ISPs report spam complaints back to senders. When a recipient hits “Report spam,” the ISP may send you a notice (often ARF format) so you can suppress that address and investigate the stream.
 
 Not every provider offers the same FBL access. Registration and formats vary. Even without a formal FBL, rising spam placement and falling engagement are warnings.

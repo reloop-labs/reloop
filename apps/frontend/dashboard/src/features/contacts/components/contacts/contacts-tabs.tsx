@@ -1,16 +1,35 @@
-import { useRouter, usePathname } from "next/navigation";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as TabMenuHorizontal from "@reloop/ui/tab-menu-horizontal";
-
 import { AnimatePresence, motion } from "motion/react";
+import { usePathname, useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 
 const items = [
-	{ title: "Contacts", value: "contacts", iconName: "contacts", path: "/contacts" },
-	{ title: "Properties", value: "properties", iconName: "tag", path: "/contacts/properties" },
-	{ title: "Groups", value: "groups", iconName: "modules", path: "/contacts/groups" },
-	{ title: "Channels", value: "channels", iconName: "notification-indicator", path: "/contacts/channels" },
+	{
+		title: "Contacts",
+		value: "contacts",
+		iconName: "contacts",
+		path: "/contacts",
+	},
+	{
+		title: "Properties",
+		value: "properties",
+		iconName: "tag",
+		path: "/contacts/properties",
+	},
+	{
+		title: "Groups",
+		value: "groups",
+		iconName: "modules",
+		path: "/contacts/groups",
+	},
+	{
+		title: "Channels",
+		value: "channels",
+		iconName: "notification-indicator",
+		path: "/contacts/channels",
+	},
 ] as const;
 
 export function ContactsTabs() {
@@ -27,7 +46,9 @@ export function ContactsTabs() {
 				: "contacts";
 
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
-	const activeIndex = items.findIndex((item) => item.value === effectiveTabValue);
+	const activeIndex = items.findIndex(
+		(item) => item.value === effectiveTabValue,
+	);
 	const currentIdx = hoveredIdx !== undefined ? hoveredIdx : activeIndex;
 	const tab = buttonRefs.current[currentIdx];
 	const rect = tab?.getBoundingClientRect();
@@ -44,7 +65,9 @@ export function ContactsTabs() {
 						onPointerLeave={() => setHoveredIdx(undefined)}
 						className={cn(
 							"flex cursor-pointer items-center gap-2 px-3 py-0! font-medium text-sm",
-							hoveredIdx === undefined && activeIndex === index && "text-text-strong-950",
+							hoveredIdx === undefined &&
+								activeIndex === index &&
+								"text-text-strong-950",
 						)}
 						key={value}
 						value={value}
@@ -62,16 +85,26 @@ export function ContactsTabs() {
 								pointerEvents: "none",
 								width: rect.width,
 								height: rect.height - 14,
-								left: rect.left - (tab?.offsetParent?.getBoundingClientRect().left || 0),
-								top: rect.top - (tab?.offsetParent?.getBoundingClientRect().top || 0) + 7,
+								left:
+									rect.left -
+									(tab?.offsetParent?.getBoundingClientRect().left || 0),
+								top:
+									rect.top -
+									(tab?.offsetParent?.getBoundingClientRect().top || 0) +
+									7,
 								opacity: 0,
 							}}
 							animate={{
 								pointerEvents: "none",
 								width: rect.width,
 								height: rect.height - 14,
-								left: rect.left - (tab?.offsetParent?.getBoundingClientRect().left || 0),
-								top: rect.top - (tab?.offsetParent?.getBoundingClientRect().top || 0) + 7,
+								left:
+									rect.left -
+									(tab?.offsetParent?.getBoundingClientRect().left || 0),
+								top:
+									rect.top -
+									(tab?.offsetParent?.getBoundingClientRect().top || 0) +
+									7,
 								opacity: 1,
 							}}
 							exit={{ opacity: 0 }}

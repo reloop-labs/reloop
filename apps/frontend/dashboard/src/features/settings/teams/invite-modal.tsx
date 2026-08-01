@@ -179,8 +179,7 @@ export function InviteModal({ open, onOpenChange }: InviteModalProps) {
 		}
 	};
 
-	const canSubmit =
-		status === "idle" && email.trim().length > 0 && !emailError;
+	const canSubmit = status === "idle" && email.trim().length > 0 && !emailError;
 
 	useHotkeys(
 		"mod+enter",
@@ -268,77 +267,72 @@ export function InviteModal({ open, onOpenChange }: InviteModalProps) {
 								Select role
 							</p>
 							<div className="grid grid-cols-2 gap-2.5">
-								{ROLE_CONFIG.map(
-									({ value, label, description, dotColor }) => {
-										const isSelected = selectedRole === value;
-										const styles = getRoleCardStyles(value);
-										return (
-											<button
-												key={value}
-												type="button"
-												onClick={() => setSelectedRole(value)}
-												disabled={loading}
+								{ROLE_CONFIG.map(({ value, label, description, dotColor }) => {
+									const isSelected = selectedRole === value;
+									const styles = getRoleCardStyles(value);
+									return (
+										<button
+											key={value}
+											type="button"
+											onClick={() => setSelectedRole(value)}
+											disabled={loading}
+											className={cn(
+												"relative flex flex-col items-start gap-1 rounded-xl border p-3.5 text-left transition-all active:scale-[0.98]",
+												isSelected
+													? styles.card
+													: "border-stroke-soft-100 bg-bg-white-0 hover:border-stroke-soft-200 hover:bg-bg-weak-50/50 dark:border-stroke-soft-100/50",
+												loading && "pointer-events-none opacity-70",
+											)}
+										>
+											<div className="flex w-full items-center justify-between">
+												<div className="flex items-center gap-1.5">
+													<span
+														className={cn(
+															"h-2 w-2 flex-shrink-0 rounded-full",
+															dotColor,
+														)}
+													/>
+													<span
+														className={cn(
+															"font-semibold text-label-xs",
+															isSelected
+																? styles.label
+																: "text-text-strong-950",
+														)}
+													>
+														{label}
+													</span>
+												</div>
+												{isSelected && (
+													<span
+														className={cn(
+															"flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full",
+															styles.check,
+														)}
+													>
+														<Icon
+															name="check"
+															className="h-2.5 w-2.5 text-white"
+														/>
+													</span>
+												)}
+											</div>
+											<p
 												className={cn(
-													"relative flex flex-col items-start gap-1 rounded-xl border p-3.5 text-left transition-all active:scale-[0.98]",
-													isSelected
-														? styles.card
-														: "border-stroke-soft-100 bg-bg-white-0 hover:border-stroke-soft-200 hover:bg-bg-weak-50/50 dark:border-stroke-soft-100/50",
-													loading && "pointer-events-none opacity-70",
+													"text-balance font-medium text-[11px] leading-relaxed",
+													isSelected ? styles.desc : "text-text-sub-600",
 												)}
 											>
-												<div className="flex w-full items-center justify-between">
-													<div className="flex items-center gap-1.5">
-														<span
-															className={cn(
-																"h-2 w-2 flex-shrink-0 rounded-full",
-																dotColor,
-															)}
-														/>
-														<span
-															className={cn(
-																"font-semibold text-label-xs",
-																isSelected
-																	? styles.label
-																	: "text-text-strong-950",
-															)}
-														>
-															{label}
-														</span>
-													</div>
-													{isSelected && (
-														<span
-															className={cn(
-																"flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full",
-																styles.check,
-															)}
-														>
-															<Icon
-																name="check"
-																className="h-2.5 w-2.5 text-white"
-															/>
-														</span>
-													)}
-												</div>
-												<p
-													className={cn(
-														"text-balance font-medium text-[11px] leading-relaxed",
-														isSelected ? styles.desc : "text-text-sub-600",
-													)}
-												>
-													{description}
-												</p>
-											</button>
-										);
-									},
-								)}
+												{description}
+											</p>
+										</button>
+									);
+								})}
 							</div>
 						</div>
 
 						<p className="flex items-center gap-1.5 pt-0.5 text-[11px] text-text-sub-600">
-							<Icon
-								name="info-outline"
-								className="h-3.5 w-3.5 flex-shrink-0"
-							/>
+							<Icon name="info-outline" className="h-3.5 w-3.5 flex-shrink-0" />
 							Roles can be changed anytime after the member joins
 						</p>
 					</div>

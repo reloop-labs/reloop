@@ -5,7 +5,7 @@ export const term: GlossaryTermDefinition = {
 	title: "Double Opt-in",
 	description:
 		"A signup that only counts after the person confirms their address via email.",
-	keywords: ["double opt-in","confirmed opt-in","DOI email"],
+	keywords: ["double opt-in", "confirmed opt-in", "DOI email"],
 	body: `Double opt-in (confirmed opt-in) means the user submits an address, then must click a link in a confirmation message before you treat them as subscribed. Single opt-in stops at the form submit.
 
 Confirmed opt-in cuts typos, third-party signups, and “I never asked for this” complaints. It also lowers the number of people who enter someone else's email as a joke. The tradeoff is a smaller list and an extra step some users abandon.

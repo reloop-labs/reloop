@@ -1,7 +1,7 @@
-import { useRouter } from "next/navigation";
 import * as Button from "@reloop/ui/button";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
+import { useRouter } from "next/navigation";
 
 interface ContactsEmptyStateProps {
 	onAddContact?: () => void;
@@ -40,12 +40,15 @@ export function ContactsEmptyState({
 				/>
 			</div>
 			<h3 className="mb-2 font-semibold text-text-strong-950 text-xl">
-				{isFiltered ? "No contacts found" : (title ?? "Create your first contact")}
+				{isFiltered
+					? "No contacts found"
+					: (title ?? "Create your first contact")}
 			</h3>
 			<p className="mx-auto mb-6 max-w-75 text-balance font-medium text-[12px] text-text-sub-600">
 				{isFiltered
 					? "Try adjusting your search query."
-					: (description ?? "Add contacts manually, import a CSV, or let your app sync them automatically.")}
+					: (description ??
+						"Add contacts manually, import a CSV, or let your app sync them automatically.")}
 			</p>
 			{isFiltered ? (
 				<Button.Root
@@ -74,4 +77,3 @@ export function ContactsEmptyState({
 		</div>
 	);
 }
-

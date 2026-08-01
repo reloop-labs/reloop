@@ -19,7 +19,7 @@ if (contactError) throw contactError;`,
 		source: `curl -X DELETE https://reloop.sh/api/contacts/con_123456789 \\
   -H "x-api-key: rl_123456789"`,
 	},
-				{
+	{
 		id: "python",
 		lang: "python",
 		label: "Python",
@@ -31,7 +31,7 @@ result = reloop.contacts.delete("con_123456789")
 if result.contact_error:
     raise result.contact_error`,
 	},
-			{
+	{
 		id: "php",
 		lang: "php",
 		label: "PHP",
@@ -39,13 +39,13 @@ if result.contact_error:
 
 require 'vendor/autoload.php';
 
-use Reloop\Reloop;
+use ReloopReloop;
 
 $reloop = Reloop::client('rl_123456789');
 
 $contact = $reloop->contacts->delete('con_123456789');`,
 	},
-			{
+	{
 		id: "java",
 		lang: "java",
 		label: "Java",

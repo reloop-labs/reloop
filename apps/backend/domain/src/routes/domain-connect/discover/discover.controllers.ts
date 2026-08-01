@@ -1,11 +1,11 @@
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import { and, eq, isNull } from "drizzle-orm";
-import { useLogger } from "evlog/elysia";
 import { domainConfig } from "@reloop/domain/domain.config";
 import { DomainErrors } from "@reloop/domain/error/domain.error-response";
 import { discoverDomainConnect } from "@reloop/domain/utils/domain-connect-discovery";
 import { getDomainConnectParts } from "@reloop/domain/utils/domain-connect-parts";
+import { and, eq, isNull } from "drizzle-orm";
+import { useLogger } from "evlog/elysia";
 
 export async function discoverController({
 	domainId,

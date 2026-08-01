@@ -5,7 +5,7 @@ export const term: GlossaryTermDefinition = {
 	title: "Authentication",
 	description:
 		"Checks (SPF, DKIM, DMARC) that prove a message really came from the domain it claims.",
-	keywords: ["email authentication","SPF DKIM DMARC","sender authentication"],
+	keywords: ["email authentication", "SPF DKIM DMARC", "sender authentication"],
 	body: `Email authentication is a set of DNS checks receiving servers run on inbound mail. The point is simple: make spoofing harder so Gmail, Outlook, and others can trust (or reject) mail that pretends to be from your domain.
 
 Three records do most of the work. SPF lists which servers may send for the domain. DKIM signs the message so headers and body can be checked. DMARC says what to do when those checks fail (monitor, quarantine, or reject).

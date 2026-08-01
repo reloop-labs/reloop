@@ -1,4 +1,3 @@
-import { useRouter } from "next/navigation";
 import {
 	comparisonSections,
 	formatPrice,
@@ -9,6 +8,7 @@ import {
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
+import { useRouter } from "next/navigation";
 
 import { AnimatedBackButton } from "#/features/dashboard/animated-back-button";
 import { requestPlanSupport } from "./request-support";
@@ -118,9 +118,7 @@ export function PlansPage() {
 				<AnimatedBackButton
 					label="Billing"
 					showEscKey={false}
-					onClick={() =>
-						router.push("/settings/billing")
-					}
+					onClick={() => router.push("/settings/billing")}
 				/>
 			</div>
 

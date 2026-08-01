@@ -27,9 +27,16 @@ function findSampleFiles(dir: string): string[] {
 			files.push(...findSampleFiles(fullPath));
 			continue;
 		}
-		if (entry.name.endsWith(".ts") && !["index.ts","types.ts","helpers.ts","languages.ts"].includes(entry.name) && !entry.name.endsWith(".test.ts")) {
+		if (
+			entry.name.endsWith(".ts") &&
+			!["index.ts", "types.ts", "helpers.ts", "languages.ts"].includes(
+				entry.name,
+			) &&
+			!entry.name.endsWith(".test.ts")
+		) {
 			const content = fs.readFileSync(fullPath, "utf8");
-			if (content.includes("XCodeSamples") || content.includes("CodeSample[]")) files.push(fullPath);
+			if (content.includes("XCodeSamples") || content.includes("CodeSample[]"))
+				files.push(fullPath);
 		}
 	}
 	return files;
@@ -107,14 +114,19 @@ function convertScalar(value: string): string {
 	return trimmed;
 }
 
-function parseObjectEntries(literal: string): Array<{ key: string; value: string }> {
+function parseObjectEntries(
+	literal: string,
+): Array<{ key: string; value: string }> {
 	const trimmed = literal.trim();
 	if (!trimmed.startsWith("{")) return [];
 	const inner = trimmed.slice(1, -1).trim();
 	if (!inner) return [];
 	return splitTopLevel(inner, ",").map((entry) => {
 		const colon = indexOfTopLevel(entry, ":");
-		const rawKey = entry.slice(0, colon).trim().replace(/^["']|["']$/g, "");
+		const rawKey = entry
+			.slice(0, colon)
+			.trim()
+			.replace(/^["']|["']$/g, "");
 		const rawVal = entry.slice(colon + 1).trim();
 		return { key: rawKey, value: rawVal };
 	});
@@ -136,9 +148,21 @@ function resolveService(callee: string): {
 
 	const table: Record<string, ServiceMeta> = {
 		mail: { javaPath: "mail", models: "MailModels", paramPrefix: "Mail" },
-		apiKey: { javaPath: "apiKey", models: "ApiKeyModels", paramPrefix: "ApiKey" },
-		domain: { javaPath: "domain", models: "DomainModels", paramPrefix: "Domain" },
-		contacts: { javaPath: "contacts", models: "ContactModels", paramPrefix: "Contact" },
+		apiKey: {
+			javaPath: "apiKey",
+			models: "ApiKeyModels",
+			paramPrefix: "ApiKey",
+		},
+		domain: {
+			javaPath: "domain",
+			models: "DomainModels",
+			paramPrefix: "Domain",
+		},
+		contacts: {
+			javaPath: "contacts",
+			models: "ContactModels",
+			paramPrefix: "Contact",
+		},
 		"contacts.properties": {
 			javaPath: "contacts.properties",
 			models: "ContactModels",
@@ -154,7 +178,11 @@ function resolveService(callee: string): {
 			models: "ContactModels",
 			paramPrefix: "Channel",
 		},
-		webhook: { javaPath: "webhook", models: "WebhookModels", paramPrefix: "Webhook" },
+		webhook: {
+			javaPath: "webhook",
+			models: "WebhookModels",
+			paramPrefix: "Webhook",
+		},
 		"inbox.mailboxes": {
 			javaPath: "inbox.mailboxes",
 			models: "InboxModels",
@@ -181,10 +209,16 @@ function resolveService(callee: string): {
 
 function paramsClassName(method: string, paramPrefix: string): string | null {
 	if (method === "send" && paramPrefix === "Mail") return "SendMailParams";
-	if (method === "send" && paramPrefix === "Message") return "SendMessageParams";
+	if (method === "send" && paramPrefix === "Message")
+		return "SendMessageParams";
 	if (method === "create") return `Create${paramPrefix}Params`;
 	if (method === "update") return `Update${paramPrefix}Params`;
-	if (method === "list" || method === "listSent" || method === "listContacts" || method === "listDeliveries") {
+	if (
+		method === "list" ||
+		method === "listSent" ||
+		method === "listContacts" ||
+		method === "listDeliveries"
+	) {
 		if (method === "listSent") return "ListSentMessagesParams";
 		if (method === "listContacts") return "ListGroupContactsParams";
 		if (method === "listDeliveries") return "ListWebhookDeliveriesParams";
@@ -201,12 +235,18 @@ function paramsClassName(method: string, paramPrefix: string): string | null {
 		return `List${paramPrefix}Params`;
 	}
 	if (method === "trigger") return "TriggerWebhookParams";
-	if (method === "batch") return paramPrefix === "Thread" ? "BatchThreadsParams" : "BatchMessagesParams";
+	if (method === "batch")
+		return paramPrefix === "Thread"
+			? "BatchThreadsParams"
+			: "BatchMessagesParams";
 	if (method === "reply" || method === "replyAll") return "ReplyMessageParams";
 	if (method === "forward") return "ForwardMessageParams";
 	if (method === "setRead") return "SetReadParams";
 	if (method === "setStar") return "SetStarParams";
-	if (method === "addContact") return paramPrefix === "Channel" ? "AddChannelContactParams" : "AddGroupContactParams";
+	if (method === "addContact")
+		return paramPrefix === "Channel"
+			? "AddChannelContactParams"
+			: "AddGroupContactParams";
 	if (method === "removeContact") return "RemoveGroupContactParams";
 	if (method === "updateSubscription") return "UpdateChannelSubscriptionParams";
 	return null;
@@ -235,7 +275,13 @@ function convertValueToJava(value: string, fieldHint?: string): string {
 		// Nested maps rarely needed in samples — stringify as Map.of entries when flat
 		const entries = parseObjectEntries(trimmed);
 		if (entries.length === 0) return "Map.of()";
-		if (entries.length <= 5 && entries.every((e) => !e.value.trim().startsWith("{") && !e.value.trim().startsWith("["))) {
+		if (
+			entries.length <= 5 &&
+			entries.every(
+				(e) =>
+					!e.value.trim().startsWith("{") && !e.value.trim().startsWith("["),
+			)
+		) {
 			const pairs = entries.flatMap((e) => [
 				`"${e.key}"`,
 				convertScalar(e.value),
@@ -268,7 +314,8 @@ function buildParamsAssignments(
 }
 
 function nodeToJava(nodeSource: string): string {
-	const literalKey = nodeSource.match(/apiKey:\s*"([^"]+)"/)?.[1] ?? "rl_123456789";
+	const literalKey =
+		nodeSource.match(/apiKey:\s*"([^"]+)"/)?.[1] ?? "rl_123456789";
 	const envMatch = nodeSource.match(/apiKey:\s*process\.env\.(\w+)!?/);
 
 	let body = nodeSource.replace(
@@ -422,7 +469,11 @@ function main() {
 			const message = error instanceof Error ? error.message : String(error);
 			if (message.startsWith("UNSUPPORTED:")) {
 				skipped++;
-				console.log("skipped", path.relative(REPO_ROOT, file), message.slice(12));
+				console.log(
+					"skipped",
+					path.relative(REPO_ROOT, file),
+					message.slice(12),
+				);
 				continue;
 			}
 			console.error("failed", path.relative(REPO_ROOT, file), error);
@@ -430,7 +481,9 @@ function main() {
 		}
 	}
 
-	console.log(`Done. updated=${updated} skipped=${skipped} total=${files.length}`);
+	console.log(
+		`Done. updated=${updated} skipped=${skipped} total=${files.length}`,
+	);
 }
 
 main();

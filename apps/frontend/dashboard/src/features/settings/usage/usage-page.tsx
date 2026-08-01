@@ -1,4 +1,3 @@
-
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { SETTINGS_MEMBER_HOME } from "#/features/dashboard/navigation";

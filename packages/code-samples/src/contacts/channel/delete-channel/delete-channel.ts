@@ -24,7 +24,7 @@ console.log(channel.id, channel.success);`,
 		source: `curl -X DELETE https://reloop.sh/api/contacts/v1/channels/chn_123456789 \\
   -H "x-api-key: rl_123456789"`,
 	},
-				{
+	{
 		id: "python",
 		lang: "python",
 		label: "Python",
@@ -39,7 +39,7 @@ if result.channel_error:
 
 print(result.channel["id"], result.channel["success"])`,
 	},
-			{
+	{
 		id: "php",
 		lang: "php",
 		label: "PHP",
@@ -47,14 +47,14 @@ print(result.channel["id"], result.channel["success"])`,
 
 require 'vendor/autoload.php';
 
-use Reloop\Reloop;
+use ReloopReloop;
 
 $reloop = Reloop::client('rl_123456789');
 
 $channel = $reloop->contacts->channels->delete('chn_123456789');
 echo $channel['id'] . ' ' . $channel['success'] . PHP_EOL;`,
 	},
-			{
+	{
 		id: "java",
 		lang: "java",
 		label: "Java",

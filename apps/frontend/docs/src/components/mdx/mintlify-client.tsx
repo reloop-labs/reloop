@@ -11,10 +11,10 @@ import {
 	Tip,
 	Warning,
 } from "@mintlify/components";
+import { useApiLanguage } from "@reloop/fe-docs/lib/use-api-language";
 import { CopyCodeBlock } from "@reloop/ui/copy-code-block";
 import { useRouter } from "next/navigation";
 import React from "react";
-import { useApiLanguage } from "@reloop/fe-docs/lib/use-api-language";
 import {
 	siDotnet,
 	siElixir,
@@ -73,17 +73,23 @@ function resolveLanguageId(title: string, lang: string): string {
 	const t = title.toLowerCase().replace(/\s+/g, "");
 	const l = lang.toLowerCase();
 
-	if (t.includes("node") || ["javascript", "js", "typescript", "ts"].includes(l))
+	if (
+		t.includes("node") ||
+		["javascript", "js", "typescript", "ts"].includes(l)
+	)
 		return "node";
-	if (t.includes("curl") || ["bash", "shell", "curl"].includes(l)) return "curl";
+	if (t.includes("curl") || ["bash", "shell", "curl"].includes(l))
+		return "curl";
 	if (t.includes("python") || l === "python") return "python";
 	if (t.includes("php") || l === "php") return "php";
-	if (
-		(t.includes("java") && !t.includes("javascript")) ||
-		l === "java"
-	)
+	if ((t.includes("java") && !t.includes("javascript")) || l === "java")
 		return "java";
-	if (t.includes(".net") || t.includes("dotnet") || t.includes("csharp") || ["csharp", "dotnet", "cs"].includes(l))
+	if (
+		t.includes(".net") ||
+		t.includes("dotnet") ||
+		t.includes("csharp") ||
+		["csharp", "dotnet", "cs"].includes(l)
+	)
 		return "dotnet";
 	if (t === "go" || l === "go") return "go";
 	if (t.includes("rust") || l === "rust") return "rust";
@@ -210,10 +216,7 @@ const CodeGroup = React.forwardRef<
 	const defaultId = availableIds.includes("node")
 		? "node"
 		: (availableIds[0] ?? "0");
-	const [activeTabId, setActiveTabId] = useApiLanguage(
-		availableIds,
-		defaultId,
-	);
+	const [activeTabId, setActiveTabId] = useApiLanguage(availableIds, defaultId);
 
 	if (!mounted || samples.length === 0) {
 		return (

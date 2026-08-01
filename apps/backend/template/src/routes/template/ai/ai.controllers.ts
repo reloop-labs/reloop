@@ -292,7 +292,11 @@ async function streamGemmaOllama(
  */
 function extractUserBriefForMock(prompt: string): string {
 	// Prefer the last "User:" turn from agent conversation prompts
-	const userBlocks = [...prompt.matchAll(/(?:^|\n)User:\s*\n([\s\S]*?)(?=\n(?:User|Assistant|##)\b|$)/gi)];
+	const userBlocks = [
+		...prompt.matchAll(
+			/(?:^|\n)User:\s*\n([\s\S]*?)(?=\n(?:User|Assistant|##)\b|$)/gi,
+		),
+	];
 	const lastUser = userBlocks.at(-1)?.[1]?.trim();
 	const raw = (lastUser || prompt).trim();
 

@@ -8,9 +8,9 @@ import { useEditorStore } from "#/features/templates/editor/use-editor-store";
 import { AiApplyModal } from "./ai-apply-modal";
 import { AiComposer } from "./ai-composer";
 import { AiMessageBubble } from "./ai-message";
+import type { AiPlan, EditorSnapshot } from "./types";
 import { useAiAttachments } from "./use-ai-attachments";
 import { useTemplateAiAgent } from "./use-template-ai-agent";
-import type { AiPlan, EditorSnapshot } from "./types";
 
 function buildSnapshot(
 	editor: ReturnType<typeof useCurrentEditor>["editor"],
@@ -40,7 +40,10 @@ function canvasIsEmpty(
 ): boolean {
 	if (!editor) return true;
 	const text = editor.getText().trim();
-	const html = editor.getHTML().replace(/<[^>]+>/g, "").trim();
+	const html = editor
+		.getHTML()
+		.replace(/<[^>]+>/g, "")
+		.trim();
 	return text.length === 0 && html.length === 0;
 }
 
@@ -388,8 +391,7 @@ export function AIPanel({ onClose }: { onClose: () => void }) {
 					onScroll={() => {
 						const el = scrollRef.current;
 						if (!el) return;
-						const distance =
-							el.scrollHeight - el.scrollTop - el.clientHeight;
+						const distance = el.scrollHeight - el.scrollTop - el.clientHeight;
 						setShowJump(distance > 100);
 					}}
 				>
@@ -424,7 +426,7 @@ export function AIPanel({ onClose }: { onClose: () => void }) {
 					<button
 						type="button"
 						onClick={jumpToLatest}
-						className="-translate-x-1/2 absolute bottom-3 left-1/2 z-10 flex items-center gap-1 rounded-full border border-stroke-soft-100 bg-bg-white-0 px-3 py-1 text-[11px] font-medium text-text-sub-600 shadow-regular-sm hover:text-text-strong-950"
+						className="-translate-x-1/2 absolute bottom-3 left-1/2 z-10 flex items-center gap-1 rounded-full border border-stroke-soft-100 bg-bg-white-0 px-3 py-1 font-medium text-[11px] text-text-sub-600 shadow-regular-sm hover:text-text-strong-950"
 					>
 						<Icon name="arrow-down" className="h-3 w-3" />
 						Latest
@@ -459,7 +461,9 @@ export function AIPanel({ onClose }: { onClose: () => void }) {
 				}}
 				onDismiss={() => {
 					setPendingApplyHtml(null);
-					toast.message("Kept current canvas — use Apply on the message anytime");
+					toast.message(
+						"Kept current canvas — use Apply on the message anytime",
+					);
 				}}
 				onApply={() => {
 					if (pendingApplyHtml) {

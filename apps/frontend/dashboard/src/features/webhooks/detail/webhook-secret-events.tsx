@@ -1,6 +1,3 @@
-import { StripeSecret } from "#/features/webhooks/components/blurred-secret";
-import type { WebhookDetailData } from "#/features/webhooks/hooks/use-webhooks-query";
-import { useInvalidateWebhooks } from "#/features/webhooks/hooks/use-webhooks-query";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
@@ -9,6 +6,9 @@ import { WEBHOOK_EVENTS } from "@reloop/webhook-events";
 import axios from "axios";
 import { useState } from "react";
 import { toast } from "sonner";
+import { StripeSecret } from "#/features/webhooks/components/blurred-secret";
+import type { WebhookDetailData } from "#/features/webhooks/hooks/use-webhooks-query";
+import { useInvalidateWebhooks } from "#/features/webhooks/hooks/use-webhooks-query";
 import { RotateWebhookSecretModal } from "./rotate-webhook-secret-modal";
 
 const CATEGORY_META: Record<

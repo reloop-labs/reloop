@@ -295,7 +295,7 @@ export const EmailPillsInput = ({
 						)}
 					>
 						<div className="border-mail-border/40 border-b px-3 py-2">
-							<p className="font-medium text-[11px] text-mail-muted tracking-wide uppercase">
+							<p className="font-medium text-[11px] text-mail-muted uppercase tracking-wide">
 								Suggestions
 							</p>
 						</div>

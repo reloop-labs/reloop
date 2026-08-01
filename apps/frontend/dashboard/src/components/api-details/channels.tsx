@@ -55,7 +55,12 @@ export const ChannelsApiDetails = ({
 	return (
 		<ApiDetailsDrawer
 			title="Channels API"
-			icon={<Icon name="notification-indicator" className="h-6 w-6 text-text-strong-950 dark:text-white" />}
+			icon={
+				<Icon
+					name="notification-indicator"
+					className="h-6 w-6 text-text-strong-950 dark:text-white"
+				/>
+			}
 			languages={languages}
 			operations={operations}
 			codeExamples={codeExamples}

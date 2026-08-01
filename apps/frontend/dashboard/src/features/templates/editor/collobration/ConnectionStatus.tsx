@@ -13,9 +13,7 @@ export function ConnectionStatus({ status, isSynced }: ConnectionStatusProps) {
 			text: "text-warning-base",
 		},
 		connected: {
-			dot: isSynced
-				? "bg-success-base"
-				: "bg-information-base animate-pulse",
+			dot: isSynced ? "bg-success-base" : "bg-information-base animate-pulse",
 			label: isSynced ? "Live" : "Syncing...",
 			text: isSynced ? "text-success-base" : "text-information-base",
 		},
@@ -34,7 +32,7 @@ export function ConnectionStatus({ status, isSynced }: ConnectionStatusProps) {
 	return (
 		<div
 			className={cn(
-				"flex items-center gap-1.5 text-paragraph-xs font-medium",
+				"flex items-center gap-1.5 font-medium text-paragraph-xs",
 				config.text,
 			)}
 		>

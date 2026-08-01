@@ -1,13 +1,12 @@
-import { useRouter } from "next/navigation";
-import { DeleteWebhookModal } from "#/features/webhooks/components/delete-webhook-modal";
-import { useWebhookDetailQuery } from "#/features/webhooks/hooks/use-webhooks-query";
-
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as TabMenu from "@reloop/ui/tab-menu-horizontal";
 import { AnimatePresence, motion } from "motion/react";
+import { useRouter } from "next/navigation";
 import { parseAsString, useQueryState } from "nuqs";
 import { useRef, useState } from "react";
+import { DeleteWebhookModal } from "#/features/webhooks/components/delete-webhook-modal";
+import { useWebhookDetailQuery } from "#/features/webhooks/hooks/use-webhooks-query";
 import { DeliveryLogs } from "./delivery-logs";
 import { WebhookHeader } from "./webhook-header";
 import { WebhookOverview } from "./webhook-overview";
@@ -87,9 +86,7 @@ export function WebhookDetailPage({ webhookId }: { webhookId: string }) {
 					onDeleteWebhook={() => {
 						if (data) void setDeleteId(data.id);
 					}}
-					onTriggerTest={() =>
-						router.push(`/webhooks/${webhookId}/test`)
-					}
+					onTriggerTest={() => router.push(`/webhooks/${webhookId}/test`)}
 				/>
 
 				{/* Always visible above tabs */}
@@ -158,11 +155,11 @@ export function WebhookDetailPage({ webhookId }: { webhookId: string }) {
 						</AnimatePresence>
 					</TabMenu.List>
 
-					<TabMenu.Content value="deliveries" className="outline-none pt-6">
+					<TabMenu.Content value="deliveries" className="pt-6 outline-none">
 						<DeliveryLogs webhookId={data?.id ?? webhookId} />
 					</TabMenu.Content>
 
-					<TabMenu.Content value="overview" className="outline-none pt-6">
+					<TabMenu.Content value="overview" className="pt-6 outline-none">
 						<WebhookOverview webhook={data} isLoading={isLoading} />
 					</TabMenu.Content>
 				</TabMenu.Root>

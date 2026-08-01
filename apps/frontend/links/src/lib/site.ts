@@ -3,8 +3,7 @@ export const siteName = "Reloop Links";
 /** Canonical production host for the links app. */
 export const siteUrl = "https://link.reloop.sh";
 
-export const siteDescription =
-	"Manage your email subscription preferences.";
+export const siteDescription = "Manage your email subscription preferences.";
 
 export const defaultOgImage = "/web-app-manifest-512x512.png";
 

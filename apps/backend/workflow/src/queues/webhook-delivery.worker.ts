@@ -1,12 +1,15 @@
 import { processWebhookDelivery } from "@be/workflow/handlers/webhook-delivery.handler";
-import { isLastAttempt, type WorkflowJob } from "@be/workflow/queues/workflow-job";
 import {
-	WEBHOOK_DELIVERY_QUEUE,
+	isLastAttempt,
+	type WorkflowJob,
+} from "@be/workflow/queues/workflow-job";
+import { workflowConfig } from "@be/workflow/workflow.config";
+import {
 	getWebhookRetryDelayMs,
+	WEBHOOK_DELIVERY_QUEUE,
 	WEBHOOK_RETRY_BACKOFF_TYPE,
 	type WebhookDeliveryJobData,
 } from "@reloop/webhook-delivery";
-import { workflowConfig } from "@be/workflow/workflow.config";
 import { Worker } from "bullmq";
 import { EvlogError, log } from "evlog";
 

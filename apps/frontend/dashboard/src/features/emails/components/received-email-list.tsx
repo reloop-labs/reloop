@@ -1,12 +1,12 @@
-import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
-import { useReceivedEmailsQuery } from "#/features/emails/hooks/use-emails-query";
-import { queryKeys } from "#/lib/query-keys";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import { useQueryClient } from "@tanstack/react-query";
 import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
 import { useMemo, useState } from "react";
+import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
+import { useReceivedEmailsQuery } from "#/features/emails/hooks/use-emails-query";
+import { queryKeys } from "#/lib/query-keys";
 import { InboundStatusSelector } from "./inbound-status-selector";
 import { MailboxSelector } from "./mailbox-selector";
 import { ReceivedEmailTable } from "./received-email-table";

@@ -1,8 +1,8 @@
 import { authMiddleware } from "@reloop/be-inbox/middleware/auth";
 import { MailModel } from "@reloop/be-inbox/model/mail.model";
+import { markMessageReadXCodeSamples } from "@reloop/code-samples/inbox";
 import { Elysia, t } from "elysia";
 import { markMessageReadController } from "./mark-message-read.controllers";
-import { markMessageReadXCodeSamples } from "@reloop/code-samples/inbox";
 
 export const markMessageReadRoute = new Elysia().use(authMiddleware).patch(
 	"/:id/read",

@@ -11,8 +11,7 @@ type ButtonProps = React.ComponentPropsWithoutRef<typeof Button.Root>;
 export const ApiKeysApiDetails = ({
 	renderTrigger,
 	...buttonProps
-}: ButtonProps &
-	Pick<ApiDetailsDrawerProps, "renderTrigger">) => {
+}: ButtonProps & Pick<ApiDetailsDrawerProps, "renderTrigger">) => {
 	return (
 		<ApiDetailsDrawer
 			title="API Keys API"

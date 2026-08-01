@@ -11,8 +11,8 @@ import {
 import { TemplatesListHeader } from "../templates-list-header";
 import { EmptyState } from "./empty-state";
 import {
-	TemplateStatusFilterDropdown,
 	type TemplateStatusFilter,
+	TemplateStatusFilterDropdown,
 } from "./status-filter-dropdown";
 import { TemplateGrid } from "./template-grid";
 
@@ -53,8 +53,7 @@ export function TemplateList() {
 	}, [data?.templates, searchQuery, statusFilter]);
 
 	const hasAnyTemplates = (data?.templates?.length ?? 0) > 0;
-	const isFiltered =
-		!!statusFilter || (searchQuery ?? "").trim() !== "";
+	const isFiltered = !!statusFilter || (searchQuery ?? "").trim() !== "";
 
 	const clearFilters = () => {
 		void setSearchQuery("");
@@ -75,7 +74,7 @@ export function TemplateList() {
 						transition={{ duration: 0.2 }}
 						className="mb-4 overflow-hidden"
 					>
-						<div className="flex items-center justify-between rounded-xl border border-[#B7F1D0] bg-[#E8FAF0] px-4 py-3 text-sm text-[#0F5C34] dark:border-emerald-800/40 dark:bg-emerald-950/30 dark:text-emerald-200">
+						<div className="flex items-center justify-between rounded-xl border border-[#B7F1D0] bg-[#E8FAF0] px-4 py-3 text-[#0F5C34] text-sm dark:border-emerald-800/40 dark:bg-emerald-950/30 dark:text-emerald-200">
 							<span>
 								Template &quot;
 								<span className="font-semibold">{deletedName}</span>&quot; has

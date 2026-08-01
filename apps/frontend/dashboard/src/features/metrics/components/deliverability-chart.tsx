@@ -1,11 +1,3 @@
-import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
-import { useEmailStatsQuery } from "#/features/metrics/hooks/use-email-stats-query";
-import {
-	formatDateLabel,
-	generateContinuousDateList,
-	getLocalKey,
-	getYearMonthDayKey,
-} from "#/features/metrics/utils";
 import { useEffect, useMemo, useState } from "react";
 import {
 	Area,
@@ -17,6 +9,14 @@ import {
 	XAxis,
 	YAxis,
 } from "recharts";
+import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
+import { useEmailStatsQuery } from "#/features/metrics/hooks/use-email-stats-query";
+import {
+	formatDateLabel,
+	generateContinuousDateList,
+	getLocalKey,
+	getYearMonthDayKey,
+} from "#/features/metrics/utils";
 import { CustomTooltip } from "./custom-tooltip";
 import { EVENTS, EventSelector } from "./event-selector";
 

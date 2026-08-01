@@ -1,6 +1,6 @@
+import { toast } from "@reloop/ui/toast";
 import { useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { toast } from "@reloop/ui/toast";
 import { queryKeys } from "#/lib/query-keys";
 import type { DomainResponse } from "./domain-types";
 
@@ -83,7 +83,8 @@ export function useUpdateDomain(
 				success: successMessage,
 				error: (error) =>
 					axios.isAxiosError(error)
-						? error.response?.data?.message || "Failed to update domain settings"
+						? error.response?.data?.message ||
+							"Failed to update domain settings"
 						: "Failed to update domain settings",
 			},
 		);

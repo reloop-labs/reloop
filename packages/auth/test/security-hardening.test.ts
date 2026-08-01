@@ -183,9 +183,13 @@ describe("secureHeadersPlugin", () => {
 	test("api profile uses docs CSP on OpenAPI HTML paths", async () => {
 		const app = new Elysia({ prefix: "/api/workflow" })
 			.use(secureHeadersPlugin({ profile: "api", nodeEnv: "test" }))
-			.get("/openapi", () => new Response("<html></html>", {
-				headers: { "content-type": "text/html" },
-			}))
+			.get(
+				"/openapi",
+				() =>
+					new Response("<html></html>", {
+						headers: { "content-type": "text/html" },
+					}),
+			)
 			.get("/openapi/json", () => ({ openapi: "3.0.0" }))
 			.get("/v1/jobs", () => ({ ok: true }));
 

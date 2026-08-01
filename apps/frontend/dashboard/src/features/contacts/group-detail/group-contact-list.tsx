@@ -1,9 +1,3 @@
-import {
-	ContactFilterDropdown,
-	type ContactFilterOption,
-} from "#/features/contacts/components/contacts/contact-filter-dropdown";
-import { ContactTable } from "#/features/contacts/components/contacts/contact-table";
-import { useGroupContactsQuery } from "#/features/contacts/hooks/use-contacts-query";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
@@ -11,6 +5,12 @@ import { KbdKeyOutline } from "@reloop/ui/kbd-key-outline";
 import { parseAsInteger, useQueryState } from "nuqs";
 import { useState } from "react";
 import { toast } from "sonner";
+import {
+	ContactFilterDropdown,
+	type ContactFilterOption,
+} from "#/features/contacts/components/contacts/contact-filter-dropdown";
+import { ContactTable } from "#/features/contacts/components/contacts/contact-table";
+import { useGroupContactsQuery } from "#/features/contacts/hooks/use-contacts-query";
 
 export const GroupContactList = ({ groupId }: { groupId: string }) => {
 	const [currentPage, setCurrentPage] = useQueryState(
@@ -22,7 +22,11 @@ export const GroupContactList = ({ groupId }: { groupId: string }) => {
 	const [statusFilter, setStatusFilter] = useState<ContactFilterOption>(null);
 	const [searchQuery, setSearchQuery] = useState<string>("");
 
-	const { data, error, isPending: isLoading } = useGroupContactsQuery({
+	const {
+		data,
+		error,
+		isPending: isLoading,
+	} = useGroupContactsQuery({
 		groupId,
 		page: currentPage ?? 1,
 		limit: pageSize ?? 10,

@@ -242,7 +242,7 @@ export function DeleteApiKeyModal({
 							{bulkKeysToDelete.slice(0, 4).map((k) => (
 								<span
 									key={k.id}
-									className="inline-flex items-center rounded-md bg-bg-white-0 px-2 py-1 font-medium font-mono text-xs text-text-strong-950 shadow-2xs dark:bg-bg-weak-50/40"
+									className="inline-flex items-center rounded-md bg-bg-white-0 px-2 py-1 font-medium font-mono text-text-strong-950 text-xs shadow-2xs dark:bg-bg-weak-50/40"
 								>
 									{k.name || k.start || k.prefix || "Unnamed key"}
 								</span>
@@ -279,34 +279,34 @@ export function DeleteApiKeyModal({
 						<span className="inline-flex items-center gap-1 rounded-md bg-bg-weak-50 px-1.5 py-0.5 font-medium text-[12px] text-text-strong-950 dark:bg-bg-weak-50/20">
 							{displayName}
 							<button
-									type="button"
-									onClick={(e) => {
-										e.preventDefault();
-										void handleCopyName();
-									}}
-									className="-mr-0.5 inline-flex h-4 w-4 shrink-0 items-center justify-center rounded transition-colors"
-									aria-label={`Copy ${displayName}`}
-									title="Copy name"
-								>
-									<AnimatePresence mode="popLayout" initial={false}>
-										<motion.span
-											key={nameCopied ? "check" : "copy"}
-											initial={{ opacity: 0, scale: 0.6 }}
-											animate={{ opacity: 1, scale: 1 }}
-											exit={{ opacity: 0, scale: 0.6 }}
-											transition={{ type: "spring", duration: 0.2, bounce: 0.3 }}
-											className="flex items-center justify-center"
-										>
-											<Icon
-												name={nameCopied ? "check" : "copy"}
-												className={cn(
-													"h-3 w-3",
-													nameCopied ? "text-green-500" : "text-text-sub-600",
-												)}
-											/>
-										</motion.span>
-									</AnimatePresence>
-								</button>
+								type="button"
+								onClick={(e) => {
+									e.preventDefault();
+									void handleCopyName();
+								}}
+								className="-mr-0.5 inline-flex h-4 w-4 shrink-0 items-center justify-center rounded transition-colors"
+								aria-label={`Copy ${displayName}`}
+								title="Copy name"
+							>
+								<AnimatePresence mode="popLayout" initial={false}>
+									<motion.span
+										key={nameCopied ? "check" : "copy"}
+										initial={{ opacity: 0, scale: 0.6 }}
+										animate={{ opacity: 1, scale: 1 }}
+										exit={{ opacity: 0, scale: 0.6 }}
+										transition={{ type: "spring", duration: 0.2, bounce: 0.3 }}
+										className="flex items-center justify-center"
+									>
+										<Icon
+											name={nameCopied ? "check" : "copy"}
+											className={cn(
+												"h-3 w-3",
+												nameCopied ? "text-green-500" : "text-text-sub-600",
+											)}
+										/>
+									</motion.span>
+								</AnimatePresence>
+							</button>
 						</span>
 						<span>to confirm</span>
 					</Label.Root>

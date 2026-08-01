@@ -1,3 +1,6 @@
+import { Icon } from "@reloop/ui/icon";
+import { Skeleton } from "@reloop/ui/skeleton";
+import { useQuery } from "@tanstack/react-query";
 import {
 	Select,
 	SelectContent,
@@ -8,9 +11,6 @@ import {
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import type { DomainListResponse } from "#/features/domain/types";
 import { queryKeys } from "#/lib/query-keys";
-import { Icon } from "@reloop/ui/icon";
-import { Skeleton } from "@reloop/ui/skeleton";
-import { useQuery } from "@tanstack/react-query";
 
 interface DomainSelectorProps {
 	value: string;
@@ -18,10 +18,7 @@ interface DomainSelectorProps {
 	align?: "start" | "end";
 }
 
-export const DomainSelector = ({
-	value,
-	onChange,
-}: DomainSelectorProps) => {
+export const DomainSelector = ({ value, onChange }: DomainSelectorProps) => {
 	const { activeOrganization } = useActiveOrganization();
 
 	const { data, isPending: isLoading } = useQuery({

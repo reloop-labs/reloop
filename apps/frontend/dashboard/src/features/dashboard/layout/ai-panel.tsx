@@ -5,8 +5,9 @@
  * Expandable panel width is no longer supported — fixed width only.
  * Close control lives in SupportChatPanel header (with refresh).
  */
-import { SupportChatPanel } from "#/features/dashboard/layout/support-chat-panel";
+
 import { motion } from "framer-motion";
+import { SupportChatPanel } from "#/features/dashboard/layout/support-chat-panel";
 
 const PANEL_WIDTH = 400;
 

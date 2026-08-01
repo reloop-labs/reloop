@@ -46,9 +46,7 @@ const pkgManagerTabs = [
 ];
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
-	return (
-		<p className="font-medium text-sm text-text-strong-950">{children}</p>
-	);
+	return <p className="font-medium text-sm text-text-strong-950">{children}</p>;
 }
 
 export function DeveloperPlayground({
@@ -81,10 +79,7 @@ export function DeveloperPlayground({
 			<div className="space-y-2">
 				<SectionLabel>Choose your language</SectionLabel>
 				<div className="flex flex-wrap items-center justify-between gap-2 pt-1">
-					<IntegrationLanguagePills
-						value={choice}
-						onChange={onChoiceChange}
-					/>
+					<IntegrationLanguagePills value={choice} onChange={onChoiceChange} />
 					<CopyForAiButton prompt={aiPrompt} />
 				</div>
 			</div>

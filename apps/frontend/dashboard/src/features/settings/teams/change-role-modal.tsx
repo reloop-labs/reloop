@@ -1,10 +1,5 @@
-
-import {
-	getAvatarGradient,
-	getAvatarInitial,
-} from "#/utils/avatar";
-import * as FancyButton from "@reloop/ui/fancy-button";
 import { cn } from "@reloop/ui/cn";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { KbdCommand } from "@reloop/ui/kbd-command";
 import { KbdEnter } from "@reloop/ui/kbd-enter";
@@ -14,6 +9,7 @@ import Spinner from "@reloop/ui/spinner";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
+import { getAvatarGradient, getAvatarInitial } from "#/utils/avatar";
 
 export type AssignableRole = "admin" | "member";
 
@@ -295,7 +291,7 @@ export const ChangeRoleModal = ({
 							variant={status === "success" ? "success" : "blue"}
 							size="xsmall"
 							className={cn(
-								"min-w-[140px] justify-center overflow-hidden transition-all duration-200 font-medium",
+								"min-w-[140px] justify-center overflow-hidden font-medium transition-all duration-200",
 								status === "updating" && "opacity-90",
 							)}
 							onClick={handleSave}

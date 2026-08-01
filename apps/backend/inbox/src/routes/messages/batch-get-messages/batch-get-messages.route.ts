@@ -1,8 +1,8 @@
 import { authMiddleware } from "@reloop/be-inbox/middleware/auth";
 import { MailModel } from "@reloop/be-inbox/model/mail.model";
+import { batchGetMessagesXCodeSamples } from "@reloop/code-samples/inbox";
 import { Elysia, t } from "elysia";
 import { batchGetMessagesController } from "./batch-get-messages.controllers";
-import { batchGetMessagesXCodeSamples } from "@reloop/code-samples/inbox";
 
 export const batchGetMessagesRoute = new Elysia().use(authMiddleware).post(
 	"/batch",

@@ -1,8 +1,8 @@
-import { Elysia, t } from "elysia";
 import { ErrorResponseSchema } from "@reloop/domain/error/domain.error-response";
 import { authMiddleware } from "@reloop/domain/middleware/auth";
 import { rateLimitPlugin } from "@reloop/domain/middleware/rate-limit";
 import { applyUrlController } from "@reloop/domain/routes/domain-connect/apply-url/apply-url.controllers";
+import { Elysia, t } from "elysia";
 
 export const applyUrlRoute = new Elysia()
 	.use(authMiddleware)

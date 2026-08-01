@@ -1,4 +1,3 @@
-import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import * as Button from "@reloop/ui/button";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
@@ -8,6 +7,7 @@ import {
 	parseAsString,
 	useQueryState,
 } from "nuqs";
+import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 
 export function EmptyState({ onCreateApiKey }: { onCreateApiKey: () => void }) {
 	const [statusFilter, setStatusFilter] = useQueryState(

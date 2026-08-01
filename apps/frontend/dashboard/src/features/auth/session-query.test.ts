@@ -11,10 +11,7 @@ vi.mock("@reloop/auth/client", () => ({
 	},
 }));
 
-import {
-	clearClientAuthState,
-	signOutAndClearSession,
-} from "./session-query";
+import { clearClientAuthState, signOutAndClearSession } from "./session-query";
 
 const mockSession = {
 	user: { id: "user_1", email: "dev@reloop.sh", name: "Dev" },

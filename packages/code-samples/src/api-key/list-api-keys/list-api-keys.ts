@@ -26,7 +26,7 @@ console.log(apiKeys.total, apiKeys.apiKeys);`,
 		source: `curl "https://reloop.sh/api/api-key/v1/?page=1&limit=10" \\
   -H "x-api-key: rl_123456789"`,
 	},
-				{
+	{
 		id: "python",
 		lang: "python",
 		label: "Python",
@@ -45,7 +45,7 @@ if result.api_key_error:
 
 print(result.api_keys["total"], result.api_keys["apiKeys"])`,
 	},
-			{
+	{
 		id: "php",
 		lang: "php",
 		label: "PHP",
@@ -53,7 +53,7 @@ print(result.api_keys["total"], result.api_keys["apiKeys"])`,
 
 require 'vendor/autoload.php';
 
-use Reloop\Reloop;
+use ReloopReloop;
 
 $reloop = Reloop::client('rl_123456789');
 
@@ -64,7 +64,7 @@ $apiKeys = $reloop->apiKey->list([
 ]);
 echo $apiKeys['total'] . ' ' . $apiKeys['apiKeys'] . PHP_EOL;`,
 	},
-			{
+	{
 		id: "java",
 		lang: "java",
 		label: "Java",

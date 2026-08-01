@@ -2,9 +2,9 @@ import { ErrorResponseSchema } from "@be/template/error/template.error";
 import { authMiddleware } from "@be/template/middleware/auth";
 import { templateResponseSchema } from "@be/template/model/template.model";
 import { auditLogHook } from "@be/template/utils/audit-log";
+import { updateTemplateXCodeSamples } from "@reloop/code-samples/template";
 import { Elysia, t } from "elysia";
 import { updateTemplate } from "./update-template.controllers";
-import { updateTemplateXCodeSamples } from "@reloop/code-samples/template";
 
 export const updateTemplateRoute = new Elysia().use(authMiddleware).put(
 	"/:id",

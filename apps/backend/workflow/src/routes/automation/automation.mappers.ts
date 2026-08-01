@@ -1,9 +1,7 @@
-import type { AutomationGraph } from "@reloop/db/schema";
 import type * as schema from "@reloop/db/schema";
+import type { AutomationGraph } from "@reloop/db/schema";
 
-export function mapAutomation(
-	row: typeof schema.automation.$inferSelect,
-) {
+export function mapAutomation(row: typeof schema.automation.$inferSelect) {
 	const graph = (row.graph ?? { nodes: [], edges: [] }) as AutomationGraph;
 	return {
 		id: row.id,

@@ -5,7 +5,7 @@ export const term: GlossaryTermDefinition = {
 	title: "SPF",
 	description:
 		"A DNS record that lists which hosts are allowed to send mail for your domain.",
-	keywords: ["SPF","SPF record","TXT SPF"],
+	keywords: ["SPF", "SPF record", "TXT SPF"],
 	body: `SPF (Sender Policy Framework) is a DNS TXT record on your domain that lists authorized sending IPs and includes (other domains' policies). Receivers check the connecting IP against that list for the envelope sender domain.
 
 Common failures: too many DNS lookups (SPF has a 10-lookup limit), missing a vendor after you add a new CRM, or publishing multiple SPF TXT records (invalid). Flatten carefully; naive flattening breaks when vendors change IPs.

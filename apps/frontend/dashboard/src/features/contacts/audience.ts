@@ -13,7 +13,9 @@ export const getStatusLabel = (status: AudienceStatus | string): string => {
 	}
 };
 
-export const getStatusColorClass = (status: AudienceStatus | string): string => {
+export const getStatusColorClass = (
+	status: AudienceStatus | string,
+): string => {
 	switch (status.toLowerCase()) {
 		case "subscribed":
 			return "text-success-base";

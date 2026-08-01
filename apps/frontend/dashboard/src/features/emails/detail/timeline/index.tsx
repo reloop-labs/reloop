@@ -82,7 +82,8 @@ export function EmailTimeline({
 
 	// Timeline Failed step uses type "failed"; map real bounce/complaint events onto it.
 	const bounceEvent = allEvents.find(
-		(e) => e.type === "bounced" || e.type === "complaint" || e.type === "failed",
+		(e) =>
+			e.type === "bounced" || e.type === "complaint" || e.type === "failed",
 	);
 	if (isFailed && bounceEvent && bounceEvent.type !== "failed") {
 		allEvents.push({

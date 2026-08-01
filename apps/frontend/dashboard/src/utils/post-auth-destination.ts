@@ -100,9 +100,7 @@ export async function resolvePostAuthDestinationWithQuery(
 			return { data };
 		},
 		listUserInvitations: async () => {
-			const data = await queryClient.fetchQuery(
-				userInvitationsQueryOptions(),
-			);
+			const data = await queryClient.fetchQuery(userInvitationsQueryOptions());
 			return { data };
 		},
 	});

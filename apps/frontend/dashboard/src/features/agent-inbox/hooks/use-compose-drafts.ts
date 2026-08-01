@@ -1,7 +1,7 @@
-import { useSWR } from "#/features/agent-inbox/lib/use-swr-compat";
-import { parseComposeDraftsList } from "#/features/agent-inbox/utils/parse-compose-drafts";
-import type { ComposeDraft } from "#/features/agent-inbox/types";
 import { useMemo } from "react";
+import { useSWR } from "#/features/agent-inbox/lib/use-swr-compat";
+import type { ComposeDraft } from "#/features/agent-inbox/types";
+import { parseComposeDraftsList } from "#/features/agent-inbox/utils/parse-compose-drafts";
 
 function draftsUrl(mailboxId: string) {
 	return `/api/inbox/v1/drafts?mailboxId=${encodeURIComponent(mailboxId)}`;

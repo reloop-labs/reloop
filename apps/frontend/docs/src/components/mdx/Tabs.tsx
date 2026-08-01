@@ -1,16 +1,16 @@
 "use client";
 
-import { cn } from "@reloop/ui/cn";
-import { Icon } from "@reloop/ui/icon";
-import * as TabMenuHorizontal from "@reloop/ui/tab-menu-horizontal";
-import { AnimatePresence, motion } from "framer-motion";
-import React, { useRef, useState } from "react";
 import {
 	isDocsViewModeTabs,
 	resolveDocsViewModeValue,
 	useDocsViewMode,
 	valueToDocsViewMode,
 } from "@reloop/fe-docs/lib/use-docs-view-mode";
+import { cn } from "@reloop/ui/cn";
+import { Icon } from "@reloop/ui/icon";
+import * as TabMenuHorizontal from "@reloop/ui/tab-menu-horizontal";
+import { AnimatePresence, motion } from "framer-motion";
+import React, { useRef, useState } from "react";
 
 export type TabProps = {
 	title: string;
@@ -78,8 +78,9 @@ function TabsShell({
 	const firstItem = items[0];
 	if (!firstItem) return null;
 
-	const effectiveValue =
-		items.some((item) => item.value === value) ? value : firstItem.value;
+	const effectiveValue = items.some((item) => item.value === value)
+		? value
+		: firstItem.value;
 	const activeIndex = items.findIndex((item) => item.value === effectiveValue);
 	const currentIdx = hoveredIdx !== undefined ? hoveredIdx : activeIndex;
 	const tab = buttonRefs.current[currentIdx];
@@ -108,14 +109,12 @@ function TabsShell({
 						key={itemValue}
 						value={itemValue}
 					>
-						{icon ?
-							<Icon name={icon} className="h-4 w-4" />
-						:	null}
+						{icon ? <Icon name={icon} className="h-4 w-4" /> : null}
 						{title}
 					</TabMenuHorizontal.Trigger>
 				))}
 				<AnimatePresence>
-					{rect && activeIndex !== -1 ?
+					{rect && activeIndex !== -1 ? (
 						<motion.div
 							className="absolute top-0 left-0 rounded-lg bg-neutral-alpha-10"
 							initial={{
@@ -147,7 +146,7 @@ function TabsShell({
 							exit={{ opacity: 0 }}
 							transition={{ duration: 0.14 }}
 						/>
-					:	null}
+					) : null}
 				</AnimatePresence>
 			</TabMenuHorizontal.List>
 

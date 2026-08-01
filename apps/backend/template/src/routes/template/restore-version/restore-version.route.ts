@@ -2,9 +2,9 @@ import { ErrorResponseSchema } from "@be/template/error/template.error";
 import { authMiddleware } from "@be/template/middleware/auth";
 import { templateResponseSchema } from "@be/template/model/template.model";
 import { auditLogHook } from "@be/template/utils/audit-log";
+import { restoreVersionXCodeSamples } from "@reloop/code-samples/template";
 import { Elysia, t } from "elysia";
 import { restoreVersion } from "./restore-version.controllers";
-import { restoreVersionXCodeSamples } from "@reloop/code-samples/template";
 
 export const restoreVersionRoute = new Elysia().use(authMiddleware).post(
 	"/:id/versions/:versionId/restore",

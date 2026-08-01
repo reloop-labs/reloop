@@ -1,7 +1,7 @@
-import { domainConfig } from "@reloop/domain/domain.config";
-import { generateReceivingMXRecordForDomain } from "@reloop/domain/utils/dns-record-generator";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
+import { domainConfig } from "@reloop/domain/domain.config";
+import { generateReceivingMXRecordForDomain } from "@reloop/domain/utils/dns-record-generator";
 import { and, eq, isNull } from "drizzle-orm";
 
 /**

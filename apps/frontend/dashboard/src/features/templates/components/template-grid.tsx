@@ -1,4 +1,3 @@
-import { useRouter } from "next/navigation";
 import { StarterKit } from "@react-email/editor/extensions";
 import { EmailTheming } from "@react-email/editor/plugins";
 import * as Button from "@reloop/ui/button";
@@ -6,8 +5,8 @@ import { cn } from "@reloop/ui/cn";
 import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
-
 import { EditorContent, useEditor } from "@tiptap/react";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
@@ -324,96 +323,94 @@ export const TemplateGrid = ({
 	return (
 		<div className="w-full">
 			<div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 lg:gap-x-8 lg:gap-y-10">
-				{isLoading ? (
-					Array.from({ length: loadingRows }).map((_, i) => (
-						// biome-ignore lint/suspicious/noArrayIndexKey: static skeleton placeholders
-						<TemplateSkeleton key={`skeleton-${i}`} />
-					))
-				) : (
-					templates.map((template) => {
-						const isCardActive = activeDropdownId === template.id;
-						const slug = templateSlug(template.name, template.description);
+				{isLoading
+					? Array.from({ length: loadingRows }).map((_, i) => (
+							// biome-ignore lint/suspicious/noArrayIndexKey: static skeleton placeholders
+							<TemplateSkeleton key={`skeleton-${i}`} />
+						))
+					: templates.map((template) => {
+							const isCardActive = activeDropdownId === template.id;
+							const slug = templateSlug(template.name, template.description);
 
-						return (
-							<div
-								key={template.id}
-								className="group/card relative flex cursor-pointer flex-col gap-3.5"
-							>
-								{/* Preview stage — soft rounded card with ambient glow */}
+							return (
 								<div
-									className={cn(
-										"relative aspect-[5/4] w-full overflow-hidden rounded-[28px] transition-shadow duration-300",
-										// Soft light fill + ambient glow (mockup)
-										"bg-gradient-to-b from-bg-white-0 to-bg-weak-50",
-										"dark:from-neutral-0 dark:to-bg-weak-50",
-										"shadow-[0_0_0_1px_rgba(0,0,0,0.04),0_12px_40px_rgba(0,0,0,0.08)]",
-										"dark:shadow-[0_0_0_1px_rgba(255,255,255,0.06),0_0_48px_rgba(255,255,255,0.06),0_16px_48px_rgba(0,0,0,0.45)]",
-										isCardActive &&
-											"shadow-[0_0_0_1px_rgba(0,0,0,0.06),0_16px_48px_rgba(0,0,0,0.12)] dark:shadow-[0_0_0_1px_rgba(255,255,255,0.1),0_0_56px_rgba(255,255,255,0.1),0_20px_56px_rgba(0,0,0,0.5)]",
-										!isCardActive &&
-											"group-hover/card:shadow-[0_0_0_1px_rgba(0,0,0,0.06),0_16px_48px_rgba(0,0,0,0.1)] dark:group-hover/card:shadow-[0_0_0_1px_rgba(255,255,255,0.08),0_0_56px_rgba(255,255,255,0.08),0_20px_56px_rgba(0,0,0,0.5)]",
-									)}
+									key={template.id}
+									className="group/card relative flex cursor-pointer flex-col gap-3.5"
 								>
-									{/* Soft radial wash so the email floats in the middle */}
+									{/* Preview stage — soft rounded card with ambient glow */}
 									<div
-										aria-hidden
-										className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_40%,rgba(0,0,0,0.03)_100%)] dark:bg-[radial-gradient(ellipse_at_center,transparent_35%,rgba(0,0,0,0.25)_100%)]"
-									/>
-
-									<TemplatePreviewThumbnail template={template} />
-
-									<div
-										className="absolute top-3 right-3 z-10"
-										onClick={(e) => {
-											e.preventDefault();
-											e.stopPropagation();
-										}}
-										onKeyDown={(e) => e.stopPropagation()}
+										className={cn(
+											"relative aspect-[5/4] w-full overflow-hidden rounded-[28px] transition-shadow duration-300",
+											// Soft light fill + ambient glow (mockup)
+											"bg-gradient-to-b from-bg-white-0 to-bg-weak-50",
+											"dark:from-neutral-0 dark:to-bg-weak-50",
+											"shadow-[0_0_0_1px_rgba(0,0,0,0.04),0_12px_40px_rgba(0,0,0,0.08)]",
+											"dark:shadow-[0_0_0_1px_rgba(255,255,255,0.06),0_0_48px_rgba(255,255,255,0.06),0_16px_48px_rgba(0,0,0,0.45)]",
+											isCardActive &&
+												"shadow-[0_0_0_1px_rgba(0,0,0,0.06),0_16px_48px_rgba(0,0,0,0.12)] dark:shadow-[0_0_0_1px_rgba(255,255,255,0.1),0_0_56px_rgba(255,255,255,0.1),0_20px_56px_rgba(0,0,0,0.5)]",
+											!isCardActive &&
+												"group-hover/card:shadow-[0_0_0_1px_rgba(0,0,0,0.06),0_16px_48px_rgba(0,0,0,0.1)] dark:group-hover/card:shadow-[0_0_0_1px_rgba(255,255,255,0.08),0_0_56px_rgba(255,255,255,0.08),0_20px_56px_rgba(0,0,0,0.5)]",
+										)}
 									>
-										<TemplateDropdown
-											templateId={template.id}
-											templateName={template.name}
-											onDuplicate={handleDuplicate}
-											onDelete={handleDeleteClick}
-											onOpenChange={(next) =>
-												setActiveDropdownId(next ? template.id : null)
-											}
+										{/* Soft radial wash so the email floats in the middle */}
+										<div
+											aria-hidden
+											className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_40%,rgba(0,0,0,0.03)_100%)] dark:bg-[radial-gradient(ellipse_at_center,transparent_35%,rgba(0,0,0,0.25)_100%)]"
+										/>
+
+										<TemplatePreviewThumbnail template={template} />
+
+										<div
+											className="absolute top-3 right-3 z-10"
+											onClick={(e) => {
+												e.preventDefault();
+												e.stopPropagation();
+											}}
+											onKeyDown={(e) => e.stopPropagation()}
+										>
+											<TemplateDropdown
+												templateId={template.id}
+												templateName={template.name}
+												onDuplicate={handleDuplicate}
+												onDelete={handleDeleteClick}
+												onOpenChange={(next) =>
+													setActiveDropdownId(next ? template.id : null)
+												}
+											/>
+										</div>
+
+										<button
+											type="button"
+											className="absolute inset-0 z-0"
+											aria-label={`Edit ${template.name}`}
+											onClick={() => openEditor(template.id)}
 										/>
 									</div>
 
-									<button
-										type="button"
-										className="absolute inset-0 z-0"
-										aria-label={`Edit ${template.name}`}
-										onClick={() => openEditor(template.id)}
-									/>
-								</div>
-
-								{/* Meta — title + slug, optional status (mockup) */}
-								<div className="flex items-start justify-between gap-3 px-1">
-									<div className="mr-2 flex min-w-0 flex-1 flex-col gap-0.5">
-										<span
-											className="truncate font-semibold text-label-sm text-text-strong-950"
-											title={template.name}
-										>
-											{template.name}
-										</span>
-										{slug ? (
+									{/* Meta — title + slug, optional status (mockup) */}
+									<div className="flex items-start justify-between gap-3 px-1">
+										<div className="mr-2 flex min-w-0 flex-1 flex-col gap-0.5">
 											<span
-												className="truncate text-paragraph-xs text-text-sub-600"
-												title={slug}
+												className="truncate font-semibold text-label-sm text-text-strong-950"
+												title={template.name}
 											>
-												{slug}
+												{template.name}
 											</span>
-										) : null}
-									</div>
+											{slug ? (
+												<span
+													className="truncate text-paragraph-xs text-text-sub-600"
+													title={slug}
+												>
+													{slug}
+												</span>
+											) : null}
+										</div>
 
-									<TemplateStatusBadge status={template.status} />
+										<TemplateStatusBadge status={template.status} />
+									</div>
 								</div>
-							</div>
-						);
-					})
-				)}
+							);
+						})}
 			</div>
 
 			<DeleteTemplateModal

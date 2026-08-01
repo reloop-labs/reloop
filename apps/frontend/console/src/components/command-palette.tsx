@@ -12,13 +12,7 @@ import { cn } from "@reloop/ui/cn";
 import * as CommandMenu from "@reloop/ui/command";
 import { Icon } from "@reloop/ui/icon";
 import { KbdKeyOutline } from "@reloop/ui/kbd-key-outline";
-import {
-	ArrowDown,
-	ArrowUp,
-	CornerDownLeft,
-	Search,
-	X,
-} from "lucide-react";
+import { ArrowDown, ArrowUp, CornerDownLeft, Search, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
@@ -104,7 +98,8 @@ export function CommandPalette() {
 				if (!cancelled) setResults(data);
 			})
 			.catch(() => {
-				if (!cancelled) setResults({ users: [], organizations: [], domains: [] });
+				if (!cancelled)
+					setResults({ users: [], organizations: [], domains: [] });
 			})
 			.finally(() => {
 				if (!cancelled) setLoading(false);

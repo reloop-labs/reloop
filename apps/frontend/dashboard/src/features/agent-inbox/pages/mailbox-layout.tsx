@@ -1,10 +1,10 @@
-import { AgentInboxLayoutWrapper } from "#/features/agent-inbox/components/layout/agent-inbox-layout-wrapper";
+import { type ReactNode, useMemo } from "react";
 import { useAgentInbox } from "#/features/agent-inbox/components/agent-inbox-provider";
+import { AgentInboxLayoutWrapper } from "#/features/agent-inbox/components/layout/agent-inbox-layout-wrapper";
 import { AgentMailboxNotFound } from "#/features/agent-inbox/components/shared/agent-mailbox-not-found";
-import { useMailboxId } from "#/features/agent-inbox/lib/use-mailbox-id";
-import { useInboxPathname } from "#/features/agent-inbox/lib/use-inbox-path";
 import { stubMailbox } from "#/features/agent-inbox/lib/stub-mailbox";
-import { useMemo, type ReactNode } from "react";
+import { useInboxPathname } from "#/features/agent-inbox/lib/use-inbox-path";
+import { useMailboxId } from "#/features/agent-inbox/lib/use-mailbox-id";
 
 export function MailboxLayout({ children }: { children: ReactNode }) {
 	const mailboxId = useMailboxId();
@@ -37,8 +37,7 @@ export function MailboxLayout({ children }: { children: ReactNode }) {
 
 	// Mailboxes finished loading and this id is unknown — keep rail via stub
 	// only while loading/error; otherwise show not-found inside the shell.
-	const mailboxMissing =
-		!resolved && !isLoadingMailboxes && !mailboxesError;
+	const mailboxMissing = !resolved && !isLoadingMailboxes && !mailboxesError;
 
 	const mailbox = resolved ?? stubMailbox(mailboxId);
 

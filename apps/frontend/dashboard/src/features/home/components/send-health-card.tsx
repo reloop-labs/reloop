@@ -1,14 +1,10 @@
-import Link from "next/link";
-import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
+import Link from "next/link";
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useEmailStatsQuery } from "#/features/metrics/hooks/use-email-stats-query";
-import {
-	HomeCardBody,
-	HomeCardHeader,
-	HomeCardShell,
-} from "./home-card-shell";
+import { HomeCardBody, HomeCardHeader, HomeCardShell } from "./home-card-shell";
 
 const ActivityAreaChart = lazy(() =>
 	import("./activity-area-chart").then((m) => ({
@@ -39,7 +35,7 @@ function MetricStat({
 			</span>
 			<span
 				className={cn(
-					"font-semibold text-title-h6 tracking-tight tabular-nums",
+					"font-semibold text-title-h6 tabular-nums tracking-tight",
 					tone === "success" && "text-success-base",
 					tone === "warning" && "text-warning-base",
 					tone === "error" && "text-error-base",
@@ -132,10 +128,7 @@ export function SendHealthCard({ enabled }: { enabled: boolean }) {
 				const year = date.getUTCFullYear();
 				const monthStr = String(date.getUTCMonth() + 1).padStart(2, "0");
 				const dayStr = String(date.getUTCDate()).padStart(2, "0");
-				statsMap.set(
-					`${year}-${monthStr}-${dayStr}`,
-					data.sent[idx] ?? 0,
-				);
+				statsMap.set(`${year}-${monthStr}-${dayStr}`, data.sent[idx] ?? 0);
 			});
 		}
 
@@ -191,16 +184,11 @@ export function SendHealthCard({ enabled }: { enabled: boolean }) {
 				) : (
 					<div className="space-y-6">
 						<div className="grid grid-cols-2 gap-6 sm:grid-cols-4">
-							<MetricStat
-								label="Sent"
-								value={totals.sent.toLocaleString()}
-							/>
+							<MetricStat label="Sent" value={totals.sent.toLocaleString()} />
 							<MetricStat
 								label="Delivered"
 								value={
-									totals.sent > 0
-										? `${Math.round(totals.deliveryRate)}%`
-										: "—"
+									totals.sent > 0 ? `${Math.round(totals.deliveryRate)}%` : "—"
 								}
 								hint={
 									totals.sent > 0
@@ -216,9 +204,7 @@ export function SendHealthCard({ enabled }: { enabled: boolean }) {
 							<MetricStat
 								label="Bounce rate"
 								value={
-									totals.sent > 0
-										? `${totals.bounceRate.toFixed(1)}%`
-										: "—"
+									totals.sent > 0 ? `${totals.bounceRate.toFixed(1)}%` : "—"
 								}
 								hint={
 									totals.sent > 0
@@ -230,20 +216,14 @@ export function SendHealthCard({ enabled }: { enabled: boolean }) {
 							<MetricStat
 								label="Complaints"
 								value={
-									totals.sent > 0
-										? `${totals.complaintRate.toFixed(2)}%`
-										: "—"
+									totals.sent > 0 ? `${totals.complaintRate.toFixed(2)}%` : "—"
 								}
 								hint={
 									totals.sent > 0
 										? `${totals.complaint.toLocaleString()} complaints`
 										: undefined
 								}
-								tone={
-									totals.complaintRate >= 0.08
-										? "warning"
-										: "default"
-								}
+								tone={totals.complaintRate >= 0.08 ? "warning" : "default"}
 							/>
 						</div>
 

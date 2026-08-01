@@ -64,14 +64,15 @@ export function CodeSamples({ samples }: { samples: LearnCodeSample[] }) {
 	if (!samples || samples.length === 0 || !firstSample) return null;
 
 	const availableIds = samples.map((sample) => sample.id);
-	const defaultId =
-		availableIds.includes("node") ? "node" : (availableIds[0] ?? "node");
+	const defaultId = availableIds.includes("node")
+		? "node"
+		: (availableIds[0] ?? "node");
 	const [activeTab, setActiveTab] = useApiLanguage(availableIds, defaultId);
 
 	const resolvedActiveTab =
-		activeTab && samples.some((sample) => sample.id === activeTab) ?
-			activeTab
-		:	defaultId;
+		activeTab && samples.some((sample) => sample.id === activeTab)
+			? activeTab
+			: defaultId;
 
 	const activeSample =
 		samples.find((sample) => sample.id === resolvedActiveTab) ?? firstSample;

@@ -1,8 +1,8 @@
 import { authMiddleware } from "@reloop/be-inbox/middleware/auth";
 import { MailModel } from "@reloop/be-inbox/model/mail.model";
+import { toggleThreadStarXCodeSamples } from "@reloop/code-samples/inbox";
 import { Elysia, t } from "elysia";
 import { toggleThreadStarController } from "./toggle-thread-star.controllers";
-import { toggleThreadStarXCodeSamples } from "@reloop/code-samples/inbox";
 
 export const toggleThreadStarRoute = new Elysia().use(authMiddleware).patch(
 	"/:id/star",

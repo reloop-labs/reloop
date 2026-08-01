@@ -1,7 +1,6 @@
 import { Skeleton } from "@reloop/ui/skeleton";
 
-const GRID =
-	"grid-cols-[minmax(0,1fr)_100px_110px_120px_minmax(40px,auto)]";
+const GRID = "grid-cols-[minmax(0,1fr)_100px_110px_120px_minmax(40px,auto)]";
 
 interface WebhookTableSkeletonProps {
 	rows?: number;

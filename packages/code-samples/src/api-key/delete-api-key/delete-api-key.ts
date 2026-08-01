@@ -22,7 +22,7 @@ console.log(apiKey.id, apiKey.message);`,
 		source: `curl -X DELETE https://reloop.sh/api/api-key/v1/key_123456789 \\
   -H "x-api-key: rl_123456789"`,
 	},
-				{
+	{
 		id: "python",
 		lang: "python",
 		label: "Python",
@@ -37,7 +37,7 @@ if result.api_key_error:
 
 print(result.api_key["id"], result.api_key["message"])`,
 	},
-			{
+	{
 		id: "php",
 		lang: "php",
 		label: "PHP",
@@ -45,14 +45,14 @@ print(result.api_key["id"], result.api_key["message"])`,
 
 require 'vendor/autoload.php';
 
-use Reloop\Reloop;
+use ReloopReloop;
 
 $reloop = Reloop::client('rl_123456789');
 
 $apiKey = $reloop->apiKey->delete('key_123456789');
 echo $apiKey['id'] . ' ' . $apiKey['message'] . PHP_EOL;`,
 	},
-			{
+	{
 		id: "java",
 		lang: "java",
 		label: "Java",

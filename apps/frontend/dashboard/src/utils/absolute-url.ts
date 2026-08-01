@@ -18,7 +18,7 @@ export function ensureAbsoluteUrl(url: string | null | undefined): string {
 	// Clean nested or prepended app origins (e.g. "https://reloop.sh/s3.reloop.sh/...")
 	// or leading slashes before an S3 host domain (e.g. "/s3.reloop.sh/...")
 	const prependedOriginMatch = trimmed.match(
-		/^(?:https?:\/\/[^\/]+)?\/*((?:s3\.[a-z0-9.-]+\.[a-z]{2,}|[a-z0-9.-]+\.[a-z]{2,}\/uploads\/).*)$/i,
+		/^(?:https?:\/\/[^/]+)?\/*((?:s3\.[a-z0-9.-]+\.[a-z]{2,}|[a-z0-9.-]+\.[a-z]{2,}\/uploads\/).*)$/i,
 	);
 	if (prependedOriginMatch?.[1]) {
 		trimmed = prependedOriginMatch[1];

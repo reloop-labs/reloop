@@ -1,7 +1,7 @@
 import * as Popover from "@reloop/ui/popover";
 import { FileText, Search } from "lucide-react";
-import { LoadingDot } from "../shared/loading-dot";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { LoadingDot } from "../shared/loading-dot";
 
 type TemplateListItem = {
 	id: string;

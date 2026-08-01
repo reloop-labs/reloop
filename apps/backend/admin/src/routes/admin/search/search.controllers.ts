@@ -45,7 +45,10 @@ export async function globalSearchController({
 			})
 			.from(organization)
 			.where(
-				or(ilike(organization.name, pattern), ilike(organization.slug, pattern)),
+				or(
+					ilike(organization.name, pattern),
+					ilike(organization.slug, pattern),
+				),
 			)
 			.orderBy(desc(organization.createdAt))
 			.limit(take),

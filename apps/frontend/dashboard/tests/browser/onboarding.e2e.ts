@@ -22,8 +22,7 @@ test.describe("onboarding — new account", () => {
 		await expect(page).toHaveURL((url) => {
 			return (
 				url.pathname.includes("/onboarding") &&
-				(url.searchParams.get("step") === "1" ||
-					!url.searchParams.has("step"))
+				(url.searchParams.get("step") === "1" || !url.searchParams.has("step"))
 			);
 		});
 		await expect(

@@ -4,13 +4,7 @@ import { Icon } from "@reloop/ui/icon";
 import { KbdKeyOutline } from "@reloop/ui/kbd-key-outline";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Paperclip } from "lucide-react";
-import {
-	forwardRef,
-	useCallback,
-	useEffect,
-	useRef,
-	useState,
-} from "react";
+import { forwardRef, useCallback, useEffect, useRef, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -126,9 +120,7 @@ export const ForwardComposer = forwardRef<HTMLDivElement, ForwardComposerProps>(
 			!attachments.some((a) => a.isUploading);
 
 		const hasDraftContent =
-			toValue.length > 0 ||
-			ccValue.length > 0 ||
-			textBody.trim().length > 0;
+			toValue.length > 0 || ccValue.length > 0 || textBody.trim().length > 0;
 
 		useDraftAutosave({
 			enabled: !!draft,

@@ -1,8 +1,8 @@
+import { listWebhookDeliveriesXCodeSamples } from "@reloop/code-samples/webhook";
 import { authMiddleware } from "@reloop/webhook/middleware/auth";
 import { WebhookModel } from "@reloop/webhook/routes/webhook/webhook.model";
 import { Elysia, t } from "elysia";
 import { listWebhookDeliveriesController } from "./list-webhook-deliveries.controllers";
-import { listWebhookDeliveriesXCodeSamples } from "@reloop/code-samples/webhook";
 
 export const listWebhookDeliveriesRoute = new Elysia().use(authMiddleware).get(
 	"/:webhook_id/deliveries",

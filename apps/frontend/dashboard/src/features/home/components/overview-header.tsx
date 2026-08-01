@@ -2,11 +2,7 @@ import * as Button from "@reloop/ui/button";
 
 const DOCS_URL = "https://reloop.sh/docs";
 
-export function OverviewHeader({
-	userEmail,
-}: {
-	userEmail?: string | null;
-}) {
+export function OverviewHeader({ userEmail }: { userEmail?: string | null }) {
 	return (
 		<div className="flex flex-col gap-4 pt-2 pb-2 sm:flex-row sm:items-center sm:justify-between">
 			<div>
@@ -32,4 +28,3 @@ export function OverviewHeader({
 		</div>
 	);
 }
-

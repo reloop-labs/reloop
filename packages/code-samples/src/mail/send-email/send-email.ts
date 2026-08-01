@@ -29,7 +29,7 @@ if (emailError) throw emailError;`,
   -H "Content-Type: application/json" \\
   -d '{"from":"Reloop <hello@send.example.com>","to":"user@example.com","subject":"Welcome to Reloop","html":"<p>Thanks for signing up.</p>","text":"Thanks for signing up.","reply_to":"support@example.com","tags":[{"name":"campaign","value":"welcome"}]}'`,
 	},
-				{
+	{
 		id: "python",
 		lang: "python",
 		label: "Python",
@@ -54,7 +54,7 @@ result = reloop.mail.send({
 if result.email_error:
     raise result.email_error`,
 	},
-			{
+	{
 		id: "php",
 		lang: "php",
 		label: "PHP",
@@ -62,7 +62,7 @@ if result.email_error:
 
 require 'vendor/autoload.php';
 
-use Reloop\Reloop;
+use ReloopReloop;
 
 $reloop = Reloop::client('rl_123456789');
 
@@ -81,7 +81,7 @@ $response = $reloop->mail->send([
     ],
 ]);`,
 	},
-			{
+	{
 		id: "java",
 		lang: "java",
 		label: "Java",

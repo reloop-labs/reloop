@@ -1,6 +1,7 @@
 import {
-	TOOL_LABELS,
 	shouldRevise,
+	TOOL_LABELS,
+	type ToolContext,
 	toolAnalyzeReferences,
 	toolCreatePlan,
 	toolCritiqueEmail,
@@ -8,7 +9,6 @@ import {
 	toolGenerateEmailHtml,
 	toolGetEditorSnapshot,
 	toolReviseEmailHtml,
-	type ToolContext,
 } from "./tools";
 import type { AgentEvent, AgentRequestBody } from "./types";
 
@@ -25,11 +25,13 @@ type EmitFn = (partial: Omit<AgentEvent, "runId" | "ts">) => void;
 async function runToolStep<T>(
 	emit: EmitFn,
 	toolName: string,
-	fn: () => Promise<{ ok: boolean; data: T; summary: string }> | {
-		ok: boolean;
-		data: T;
-		summary: string;
-	},
+	fn: () =>
+		| Promise<{ ok: boolean; data: T; summary: string }>
+		| {
+				ok: boolean;
+				data: T;
+				summary: string;
+		  },
 ): Promise<{ ok: boolean; data: T; summary: string }> {
 	const label = TOOL_LABELS[toolName] ?? toolName;
 	emit({
@@ -226,8 +228,7 @@ export function createAgentEventStream(body: AgentRequestBody): Response {
 				emit({ type: "run.finished", status: "ok" });
 				controller.close();
 			} catch (err) {
-				const message =
-					err instanceof Error ? err.message : "Agent run failed";
+				const message = err instanceof Error ? err.message : "Agent run failed";
 				controller.enqueue(
 					encodeEvent({
 						type: "error",

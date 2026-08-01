@@ -32,9 +32,7 @@ export async function verifyMxRecord(
 
 		return records.some((mx) => {
 			const exchange = mx.exchange.toLowerCase().replace(/\.$/, "");
-			return (
-				exchange === expected && Number(mx.priority) === expectedPriority
-			);
+			return exchange === expected && Number(mx.priority) === expectedPriority;
 		});
 	} catch (e) {
 		console.error(`Error verifying MX record for ${lookupName}:`, e);
@@ -71,9 +69,7 @@ export async function verifySpfRecord(
 			if (!normalizedRecord.startsWith("v=spf1")) return false;
 
 			// Check that every required include is present in the actual record
-			return requiredIncludes.every((inc) =>
-				normalizedRecord.includes(inc),
-			);
+			return requiredIncludes.every((inc) => normalizedRecord.includes(inc));
 		});
 	} catch (e) {
 		console.error(`Error verifying SPF record for ${name}:`, e);

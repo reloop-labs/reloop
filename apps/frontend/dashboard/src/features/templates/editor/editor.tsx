@@ -1,6 +1,6 @@
+import { Icon } from "@reloop/ui/icon";
 import { DragHandle } from "@tiptap/extension-drag-handle-react";
 import { EditorContent, useCurrentEditor } from "@tiptap/react";
-import { Icon } from "@reloop/ui/icon";
 
 import "@react-email/editor/themes/default.css";
 

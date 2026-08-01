@@ -1,5 +1,5 @@
 import * as Popover from "@reloop/ui/popover";
-import { useRef, useState, type ReactNode } from "react";
+import { type ReactNode, useRef, useState } from "react";
 
 const OPEN_DELAY_MS = 280;
 const CLOSE_DELAY_MS = 160;

@@ -150,7 +150,7 @@ export const ZeroThreadToolbar = ({
 							tone="important"
 							className={cn(
 								isImportant &&
-									"text-orange-500 fill-orange-500 [&_svg]:fill-orange-500",
+									"fill-orange-500 text-orange-500 [&_svg]:fill-orange-500",
 							)}
 						>
 							<Icon name="zap" />
@@ -166,30 +166,18 @@ export const ZeroThreadToolbar = ({
 							<Icon name="inbox" />
 						</ActionButton>
 					) : (
-						<ActionButton
-							label="Archive"
-							onClick={onArchive}
-							tone="archive"
-						>
+						<ActionButton label="Archive" onClick={onArchive} tone="archive">
 							<Icon name="archive" />
 						</ActionButton>
 					)}
 
 					{!inSpam && (
-						<ActionButton
-							label="Move to spam"
-							onClick={onMarkSpam}
-							tone="spam"
-						>
+						<ActionButton label="Move to spam" onClick={onMarkSpam} tone="spam">
 							<Icon name="alert" />
 						</ActionButton>
 					)}
 
-					<ActionButton
-						label="Print thread"
-						onClick={onPrint}
-						tone="print"
-					>
+					<ActionButton label="Print thread" onClick={onPrint} tone="print">
 						<Icon name="printer" />
 					</ActionButton>
 
@@ -203,11 +191,7 @@ export const ZeroThreadToolbar = ({
 						</ActionButton>
 					)}
 
-					<ActionButton
-						label={trashLabel}
-						onClick={onDelete}
-						tone="danger"
-					>
+					<ActionButton label={trashLabel} onClick={onDelete} tone="danger">
 						<Icon name="trash" />
 					</ActionButton>
 				</div>

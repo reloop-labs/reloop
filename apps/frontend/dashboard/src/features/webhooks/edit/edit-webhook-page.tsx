@@ -1,14 +1,11 @@
-import { useRouter } from "next/navigation";
-import {
-	useWebhookDetailQuery,
-} from "#/features/webhooks/hooks/use-webhooks-query";
 import * as Button from "@reloop/ui/button";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import Spinner from "@reloop/ui/spinner";
-
+import { useRouter } from "next/navigation";
 import { useHotkeys } from "react-hotkeys-hook";
+import { useWebhookDetailQuery } from "#/features/webhooks/hooks/use-webhooks-query";
 import { EditWebhookFormFields } from "./components/edit-webhook-form-fields";
 import { useEditWebhookForm } from "./components/use-edit-webhook-form";
 
@@ -18,7 +15,11 @@ interface EditWebhookPageProps {
 
 export function EditWebhookPage({ webhookId }: EditWebhookPageProps) {
 	const router = useRouter();
-	const { data: webhook, isPending, isError } = useWebhookDetailQuery(webhookId);
+	const {
+		data: webhook,
+		isPending,
+		isError,
+	} = useWebhookDetailQuery(webhookId);
 	const { form, isLoading, onSubmit } = useEditWebhookForm(webhook);
 
 	useHotkeys(

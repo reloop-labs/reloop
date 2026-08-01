@@ -5,7 +5,7 @@ export const term: GlossaryTermDefinition = {
 	title: "Inbound Email",
 	description:
 		"Mail your system receives and processes, not only the mail you send out.",
-	keywords: ["inbound email","incoming email parsing","reply handling"],
+	keywords: ["inbound email", "incoming email parsing", "reply handling"],
 	body: `Inbound email is traffic coming into your domain or app: support@, replies, webhooks from partners, or parse-to-API pipelines. Outbound is what you send. Many products need both.
 
 Inbound setup means MX records (or a provider that receives for you), routing rules, and often parsing (attachments, headers, thread IDs). Security matters: spoofed mail, spam, and large attachments.

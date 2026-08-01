@@ -3,10 +3,7 @@ import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
-import {
-	ACTIVE_WEBHOOK_EVENTS,
-	WEBHOOK_EVENTS,
-} from "@reloop/webhook-events";
+import { ACTIVE_WEBHOOK_EVENTS, WEBHOOK_EVENTS } from "@reloop/webhook-events";
 import { useMemo, useState } from "react";
 
 interface WebhookEventSelectorProps {
@@ -245,7 +242,9 @@ export const WebhookEventSelector = ({
 													<div className="min-w-0 flex-1">
 														<div className="flex items-center gap-2">
 															<Icon
-																name={categoryIcons[event.category] ?? "webhook"}
+																name={
+																	categoryIcons[event.category] ?? "webhook"
+																}
 																className="h-3.5 w-3.5 shrink-0 text-text-sub-600"
 															/>
 															<span className="truncate font-medium font-mono text-[13px] text-text-strong-950">

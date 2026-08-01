@@ -1,12 +1,11 @@
-import { useRouter } from "next/navigation";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
-
 import axios from "axios";
 import { AnimatePresence, motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 import {
 	parseAsInteger,
 	parseAsString,
@@ -166,10 +165,7 @@ function AgentMailboxActionsDropdown({
 								>
 									{busy ? (
 										<span className="text-text-sub-600">
-											<LoadingDot
-												label="Working"
-												style={{ fontSize: 12 }}
-											/>
+											<LoadingDot label="Working" style={{ fontSize: 12 }} />
 										</span>
 									) : (
 										<Icon
@@ -381,7 +377,7 @@ export const AgentMailboxList = () => {
 						transition={{ duration: 0.2 }}
 						className="mb-4 overflow-hidden"
 					>
-						<div className="flex items-center justify-between rounded-xl border border-[#B7F1D0] bg-[#E8FAF0] px-4 py-3 text-sm text-[#0F5C34] dark:border-emerald-800/40 dark:bg-emerald-950/30 dark:text-emerald-200">
+						<div className="flex items-center justify-between rounded-xl border border-[#B7F1D0] bg-[#E8FAF0] px-4 py-3 text-[#0F5C34] text-sm dark:border-emerald-800/40 dark:bg-emerald-950/30 dark:text-emerald-200">
 							<span>
 								Address &quot;
 								<span className="font-semibold">{deletedName}</span>&quot; has

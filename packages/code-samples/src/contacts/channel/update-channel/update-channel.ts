@@ -27,7 +27,7 @@ console.log(channel.id, channel.name);`,
   -H "Content-Type: application/json" \\
   -d '{"name": "Marketing News"}'`,
 	},
-				{
+	{
 		id: "python",
 		lang: "python",
 		label: "Python",
@@ -44,7 +44,7 @@ if result.channel_error:
 
 print(result.channel["id"], result.channel["name"])`,
 	},
-			{
+	{
 		id: "php",
 		lang: "php",
 		label: "PHP",
@@ -52,7 +52,7 @@ print(result.channel["id"], result.channel["name"])`,
 
 require 'vendor/autoload.php';
 
-use Reloop\Reloop;
+use ReloopReloop;
 
 $reloop = Reloop::client('rl_123456789');
 
@@ -61,7 +61,7 @@ $channel = $reloop->contacts->channels->update('chn_123456789', [
 ]);
 echo $channel['id'] . ' ' . $channel['name'] . PHP_EOL;`,
 	},
-			{
+	{
 		id: "java",
 		lang: "java",
 		label: "Java",

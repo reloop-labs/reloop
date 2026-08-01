@@ -32,9 +32,7 @@ export function ApiKeySelectionActionBar({
 
 	const clearSelection = () => table.resetRowSelection();
 
-	const runBulk = async (
-		action: "enable" | "disable",
-	): Promise<void> => {
+	const runBulk = async (action: "enable" | "disable"): Promise<void> => {
 		if (selectedCount === 0 || busy) return;
 		setBusy(true);
 		const keys = selectedRows.map((row) => row.original);
@@ -106,7 +104,11 @@ export function ApiKeySelectionActionBar({
 			e.preventDefault();
 			handleDelete();
 		},
-		{ enableOnFormTags: false, enabled: selectedCount > 0, preventDefault: true },
+		{
+			enableOnFormTags: false,
+			enabled: selectedCount > 0,
+			preventDefault: true,
+		},
 	);
 
 	return (
@@ -117,7 +119,9 @@ export function ApiKeySelectionActionBar({
 			}}
 		>
 			<ActionBarSelection>
-				<span className="font-semibold text-text-strong-950 tabular-nums">{selectedCount}</span>
+				<span className="font-semibold text-text-strong-950 tabular-nums">
+					{selectedCount}
+				</span>
 				<span className="text-text-sub-600">selected</span>
 				<ActionBarSeparator />
 				<ActionBarClose>
@@ -128,17 +132,11 @@ export function ApiKeySelectionActionBar({
 			<ActionBarSeparator />
 
 			<ActionBarGroup>
-				<ActionBarItem
-					disabled={busy}
-					onClick={() => void runBulk("enable")}
-				>
+				<ActionBarItem disabled={busy} onClick={() => void runBulk("enable")}>
 					<Icon name="check-circle" className="size-3.5" />
 					Enable
 				</ActionBarItem>
-				<ActionBarItem
-					disabled={busy}
-					onClick={() => void runBulk("disable")}
-				>
+				<ActionBarItem disabled={busy} onClick={() => void runBulk("disable")}>
 					<Icon name="cross-circle" className="size-3.5" />
 					Disable
 				</ActionBarItem>
@@ -147,7 +145,7 @@ export function ApiKeySelectionActionBar({
 					size="xsmall"
 					disabled={busy}
 					onClick={handleDelete}
-					className="h-7 gap-1.5 rounded-full px-3 text-xs font-medium"
+					className="h-7 gap-1.5 rounded-full px-3 font-medium text-xs"
 				>
 					<FancyButton.Icon as={Icon} name="trash" className="size-3.5" />
 					Delete {selectedCount} API key{selectedCount === 1 ? "" : "s"}
@@ -178,4 +176,3 @@ export function ApiKeySelectionActionBar({
 		</ActionBar>
 	);
 }
-

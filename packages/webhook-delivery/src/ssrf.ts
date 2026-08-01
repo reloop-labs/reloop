@@ -13,17 +13,31 @@ export function isPrivateOrBlockedIP(ip: string): boolean {
 		// Private 10.0.0.0/8
 		if (parts[0] === 10) return true;
 		// CGNAT 100.64.0.0/10
-		if (parts[0] === 100 && parts[1] !== undefined && parts[1] >= 64 && parts[1] <= 127)
+		if (
+			parts[0] === 100 &&
+			parts[1] !== undefined &&
+			parts[1] >= 64 &&
+			parts[1] <= 127
+		)
 			return true;
 		// Private 172.16.0.0/12
-		if (parts[0] === 172 && parts[1] !== undefined && parts[1] >= 16 && parts[1] <= 31)
+		if (
+			parts[0] === 172 &&
+			parts[1] !== undefined &&
+			parts[1] >= 16 &&
+			parts[1] <= 31
+		)
 			return true;
 		// Private 192.168.0.0/16
 		if (parts[0] === 192 && parts[1] === 168) return true;
 		// Link-local 169.254.0.0/16 (includes AWS metadata 169.254.169.254)
 		if (parts[0] === 169 && parts[1] === 254) return true;
 		// Benchmarking 198.18.0.0/15
-		if (parts[0] === 198 && parts[1] !== undefined && (parts[1] === 18 || parts[1] === 19))
+		if (
+			parts[0] === 198 &&
+			parts[1] !== undefined &&
+			(parts[1] === 18 || parts[1] === 19)
+		)
 			return true;
 		// Multicast / reserved
 		if (parts[0] !== undefined && parts[0] >= 224) return true;
@@ -91,7 +105,9 @@ export async function resolvePublicTarget(
 
 	const results = await dns.promises.lookup(hostname, { all: true });
 	if (results.length === 0) {
-		throw new SsrfBlockedError(`DNS lookup returned no addresses for ${hostname}`);
+		throw new SsrfBlockedError(
+			`DNS lookup returned no addresses for ${hostname}`,
+		);
 	}
 
 	const ips = results.map((r) => r.address);
@@ -105,7 +121,9 @@ export async function resolvePublicTarget(
 
 	const first = results[0];
 	if (!first) {
-		throw new SsrfBlockedError(`DNS lookup returned no addresses for ${hostname}`);
+		throw new SsrfBlockedError(
+			`DNS lookup returned no addresses for ${hostname}`,
+		);
 	}
 
 	return {

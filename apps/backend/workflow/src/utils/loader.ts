@@ -1,9 +1,9 @@
+import { startAutomationWorker } from "@be/workflow/queues/automation.worker";
 import {
 	DOMAIN_VERIFY_ATTEMPTS,
 	DOMAIN_VERIFY_BACKOFF_TYPE,
 	DOMAIN_VERIFY_INITIAL_DELAY_MS,
 } from "@be/workflow/queues/domain-verify-schedule";
-import { startAutomationWorker } from "@be/workflow/queues/automation.worker";
 import { startWebhookDeliveryWorker } from "@be/workflow/queues/webhook-delivery.worker";
 import { workflowQueue } from "@be/workflow/queues/workflow.queue";
 import { startWorkflowWorker } from "@be/workflow/queues/workflow.worker";

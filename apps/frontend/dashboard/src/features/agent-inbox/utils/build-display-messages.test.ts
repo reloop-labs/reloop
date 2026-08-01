@@ -78,7 +78,11 @@ describe("buildDisplayMessages", () => {
 			threadDataMatches: false,
 			isLoadingThread: true,
 			optimisticReplies: [
-				{ id: "opt-1", direction: "outbound", messageAt: "2026-07-18T10:06:00.000Z" },
+				{
+					id: "opt-1",
+					direction: "outbound",
+					messageAt: "2026-07-18T10:06:00.000Z",
+				},
 			],
 		});
 		expect(messages.map((m) => m.id)).toEqual(["opt-1"]);

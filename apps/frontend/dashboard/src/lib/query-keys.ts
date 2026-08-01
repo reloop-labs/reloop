@@ -52,19 +52,15 @@ export const queryKeys = {
 			search: string;
 			status: string;
 		}) => [...queryKeys.contacts.all, "list", params] as const,
-		detail: (id: string) =>
-			[...queryKeys.contacts.all, "detail", id] as const,
+		detail: (id: string) => [...queryKeys.contacts.all, "detail", id] as const,
 		activity: (email: string) =>
 			[...queryKeys.contacts.all, "activity", email] as const,
 		groups: (params: { page: number; limit: number; search: string }) =>
 			[...queryKeys.contacts.all, "groups", params] as const,
 		groupDetail: (id: string) =>
 			[...queryKeys.contacts.all, "group-detail", id] as const,
-		groupContacts: (params: {
-			groupId: string;
-			page: number;
-			limit: number;
-		}) => [...queryKeys.contacts.all, "group-contacts", params] as const,
+		groupContacts: (params: { groupId: string; page: number; limit: number }) =>
+			[...queryKeys.contacts.all, "group-contacts", params] as const,
 		groupCount: (groupId: string) =>
 			[...queryKeys.contacts.all, "group-count", groupId] as const,
 		properties: (params: {
@@ -84,20 +80,15 @@ export const queryKeys = {
 	templates: {
 		all: ["templates"] as const,
 		list: () => [...queryKeys.templates.all, "list"] as const,
-		detail: (id: string) =>
-			[...queryKeys.templates.all, "detail", id] as const,
+		detail: (id: string) => [...queryKeys.templates.all, "detail", id] as const,
 	},
 	webhooks: {
 		all: ["webhooks"] as const,
 		list: (orgId: string, limit = 100) =>
 			[...queryKeys.webhooks.all, "list", orgId, limit] as const,
-		detail: (id: string) =>
-			[...queryKeys.webhooks.all, "detail", id] as const,
-		deliveries: (params: {
-			webhookId: string;
-			page: number;
-			limit: number;
-		}) => [...queryKeys.webhooks.all, "deliveries", params] as const,
+		detail: (id: string) => [...queryKeys.webhooks.all, "detail", id] as const,
+		deliveries: (params: { webhookId: string; page: number; limit: number }) =>
+			[...queryKeys.webhooks.all, "deliveries", params] as const,
 	},
 	metrics: {
 		all: ["metrics"] as const,
@@ -143,8 +134,7 @@ export const queryKeys = {
 		all: ["workflows"] as const,
 		list: (orgId: string) =>
 			[...queryKeys.workflows.all, "list", orgId] as const,
-		detail: (id: string) =>
-			[...queryKeys.workflows.all, "detail", id] as const,
+		detail: (id: string) => [...queryKeys.workflows.all, "detail", id] as const,
 		events: () => [...queryKeys.workflows.all, "events"] as const,
 	},
 } as const;

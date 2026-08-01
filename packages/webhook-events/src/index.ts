@@ -38,7 +38,8 @@ export type WebhookEventCategory = (typeof WEBHOOK_EVENTS)[number]["category"];
 
 export type WebhookEventName = (typeof WEBHOOK_EVENTS)[number]["id"];
 
-export type ActiveWebhookEventName = (typeof ACTIVE_WEBHOOK_EVENTS)[number]["id"];
+export type ActiveWebhookEventName =
+	(typeof ACTIVE_WEBHOOK_EVENTS)[number]["id"];
 
 export function isActiveWebhookEvent(id: string): boolean {
 	return WEBHOOK_EVENTS_BY_ID.get(id)?.isActive === true;

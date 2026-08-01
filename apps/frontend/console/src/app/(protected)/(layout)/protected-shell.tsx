@@ -24,9 +24,7 @@ function TopChrome() {
 				<CommandPalette />
 				<button
 					type="button"
-					onClick={() =>
-						setTheme(resolvedTheme === "dark" ? "light" : "dark")
-					}
+					onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
 					className="flex h-8 w-8 items-center justify-center rounded-xl border border-stroke-soft-200 text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:hover:bg-white/5"
 					title="Toggle theme"
 				>

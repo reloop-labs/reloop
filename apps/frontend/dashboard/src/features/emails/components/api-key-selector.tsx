@@ -1,3 +1,6 @@
+import { Icon } from "@reloop/ui/icon";
+import { Skeleton } from "@reloop/ui/skeleton";
+import { useQuery } from "@tanstack/react-query";
 import {
 	Select,
 	SelectContent,
@@ -7,9 +10,6 @@ import {
 } from "#/features/api-keys/filters/base-ui-select";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import { queryKeys } from "#/lib/query-keys";
-import { Icon } from "@reloop/ui/icon";
-import { Skeleton } from "@reloop/ui/skeleton";
-import { useQuery } from "@tanstack/react-query";
 
 interface ApiKeyData {
 	id: string;

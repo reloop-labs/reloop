@@ -26,11 +26,11 @@ export function LinksLanding() {
 						<span className="links-poster-logo inline-flex">
 							<Logo className="h-8 w-8" />
 						</span>
-						<span className="links-poster-mono text-[13px] tracking-[0.06em] uppercase">
+						<span className="links-poster-mono text-[13px] uppercase tracking-[0.06em]">
 							Reloop
 						</span>
 					</a>
-					<span className="links-poster-mono text-[9px] tracking-[0.16em] opacity-45 uppercase">
+					<span className="links-poster-mono text-[9px] uppercase tracking-[0.16em] opacity-45">
 						link.reloop.sh
 					</span>
 				</header>
@@ -43,7 +43,7 @@ export function LinksLanding() {
 								<BoltMark />
 								<LinkRingsMark />
 							</div>
-							<ul className="links-poster-mono space-y-0.5 text-[9px] leading-[1.45] tracking-[0.04em] uppercase sm:text-[10px]">
+							<ul className="links-poster-mono space-y-0.5 text-[9px] uppercase leading-[1.45] tracking-[0.04em] sm:text-[10px]">
 								<li>TRACKING</li>
 								<li>
 									CLICK <span className="opacity-50">→</span> REDIRECT
@@ -94,7 +94,7 @@ export function LinksLanding() {
 						</div>
 					</div>
 
-					<p className="links-poster-mono mt-5 max-w-[34ch] text-center text-[10px] leading-relaxed tracking-[0.06em] opacity-55 uppercase sm:text-[11px]">
+					<p className="links-poster-mono mt-5 max-w-[34ch] text-center text-[10px] uppercase leading-relaxed tracking-[0.06em] opacity-55 sm:text-[11px]">
 						Open the link from your email to manage
 						<br className="hidden sm:block" /> topics or unsubscribe.
 					</p>
@@ -104,7 +104,7 @@ export function LinksLanding() {
 				<section className="shrink-0 px-6 pb-3 sm:px-8">
 					<div className="links-poster-footer-rule mb-4" />
 					<div className="text-center">
-						<p className="links-poster-mono text-[9px] tracking-[0.18em] opacity-50 uppercase">
+						<p className="links-poster-mono text-[9px] uppercase tracking-[0.18em] opacity-50">
 							About Reloop
 						</p>
 						<p className="links-poster-about mx-auto mt-2 max-w-[36ch] text-[12px] leading-relaxed sm:text-[13px]">
@@ -114,7 +114,7 @@ export function LinksLanding() {
 						</p>
 						<a
 							href={socialProfiles.main}
-							className="links-poster-mono mt-2.5 inline-block text-[10px] tracking-[0.1em] underline-offset-4 opacity-70 uppercase transition-opacity hover:opacity-100 hover:underline"
+							className="links-poster-mono mt-2.5 inline-block text-[10px] uppercase tracking-[0.1em] underline-offset-4 opacity-70 transition-opacity hover:underline hover:opacity-100"
 						>
 							reloop.sh →
 						</a>
@@ -141,9 +141,9 @@ export function LinksLanding() {
 				</section>
 
 				{/* Footer plate */}
-				<footer className="shrink-0 px-5 pb-5 pt-3 sm:px-7">
+				<footer className="shrink-0 px-5 pt-3 pb-5 sm:px-7">
 					<div className="links-poster-footer-rule" />
-					<div className="links-poster-mono mt-2.5 flex items-center justify-between gap-3 text-[9px] tracking-[0.12em] uppercase sm:text-[10px]">
+					<div className="links-poster-mono mt-2.5 flex items-center justify-between gap-3 text-[9px] uppercase tracking-[0.12em] sm:text-[10px]">
 						<span>link.reloop.sh</span>
 						<span
 							className="links-poster-footer-rule min-w-[2.5rem] flex-1 opacity-40"

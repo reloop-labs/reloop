@@ -1,8 +1,8 @@
+import { retryWebhookDeliveryXCodeSamples } from "@reloop/code-samples/webhook";
 import { authMiddleware } from "@reloop/webhook/middleware/auth";
 import { WebhookModel } from "@reloop/webhook/routes/webhook/webhook.model";
 import { Elysia, t } from "elysia";
 import { retryWebhookDeliveryController } from "./retry-webhook-delivery.controllers";
-import { retryWebhookDeliveryXCodeSamples } from "@reloop/code-samples/webhook";
 
 export const retryWebhookDeliveryRoute = new Elysia().use(authMiddleware).post(
 	"/deliveries/:delivery_id/retry",

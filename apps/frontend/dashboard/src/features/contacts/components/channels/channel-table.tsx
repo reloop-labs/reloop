@@ -1,10 +1,10 @@
-import { PageSizeDropdown } from "#/features/api-keys/table/page-size-dropdown";
-import { PaginationControls } from "#/features/api-keys/table/pagination-controls";
-import { formatRelativeTime } from "#/utils/format-relative-time";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import { useState } from "react";
+import { PageSizeDropdown } from "#/features/api-keys/table/page-size-dropdown";
+import { PaginationControls } from "#/features/api-keys/table/pagination-controls";
+import { formatRelativeTime } from "#/utils/format-relative-time";
 import { EmptyState } from "../shared/empty-state";
 import { ChannelDropdown } from "./channel-dropdown";
 
@@ -90,7 +90,7 @@ export const ChannelTable = ({
 	onDelete,
 	onAddChannel,
 }: ChannelTableProps) => {
-			const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
+	const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
 
 	const handleRowClick = (channelId: string) => {
 		// detail not ported

@@ -1,3 +1,4 @@
+import { createDomainXCodeSamples } from "@reloop/code-samples/domain";
 import { ErrorResponseSchema } from "@reloop/domain/error/domain.error-response";
 import { authMiddleware } from "@reloop/domain/middleware/auth";
 import { rateLimitPlugin } from "@reloop/domain/middleware/rate-limit";
@@ -5,7 +6,6 @@ import { DomainModel } from "@reloop/domain/model/domain.model";
 import { auditLogHook } from "@reloop/domain/utils/audit-log";
 import { Elysia } from "elysia";
 import { createDomainController } from "./create-domain.controllers";
-import { createDomainXCodeSamples } from "@reloop/code-samples/domain";
 
 export const createDomainRoute = new Elysia()
 	.use(authMiddleware)

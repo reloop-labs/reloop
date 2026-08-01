@@ -1,7 +1,6 @@
 import { ImageResponse } from "next/og";
 
-export const alt =
-	"Reloop Links — Manage email preferences on link.reloop.sh";
+export const alt = "Reloop Links — Manage email preferences on link.reloop.sh";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -14,251 +13,249 @@ const SURFACE = "#faf7f0";
 
 export default async function OpenGraphImage() {
 	return new ImageResponse(
-		(
+		<div
+			style={{
+				width: "100%",
+				height: "100%",
+				display: "flex",
+				alignItems: "center",
+				justifyContent: "center",
+				backgroundColor: PAPER,
+				/* Grain: same idea as landing radial dots */
+				backgroundImage:
+					"radial-gradient(rgba(17,17,17,0.08) 0.8px, transparent 0.8px)",
+				backgroundSize: "4px 4px",
+				fontFamily: "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace",
+				position: "relative",
+			}}
+		>
+			{/* Poster plate */}
 			<div
 				style={{
-					width: "100%",
-					height: "100%",
 					display: "flex",
-					alignItems: "center",
-					justifyContent: "center",
-					backgroundColor: PAPER,
-					/* Grain: same idea as landing radial dots */
-					backgroundImage:
-						"radial-gradient(rgba(17,17,17,0.08) 0.8px, transparent 0.8px)",
-					backgroundSize: "4px 4px",
-					fontFamily: "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace",
+					flexDirection: "column",
+					width: 920,
+					height: 520,
+					border: `2px dashed ${LINE}`,
+					borderRadius: 28,
+					backgroundColor: "rgba(250, 247, 240, 0.94)",
+					padding: "40px 48px 32px",
 					position: "relative",
 				}}
 			>
-				{/* Poster plate */}
+				{/* Brand row */}
 				<div
 					style={{
 						display: "flex",
-						flexDirection: "column",
-						width: 920,
-						height: 520,
-						border: `2px dashed ${LINE}`,
-						borderRadius: 28,
-						backgroundColor: "rgba(250, 247, 240, 0.94)",
-						padding: "40px 48px 32px",
-						position: "relative",
+						alignItems: "center",
+						justifyContent: "space-between",
+						width: "100%",
 					}}
 				>
-					{/* Brand row */}
-					<div
-						style={{
-							display: "flex",
-							alignItems: "center",
-							justifyContent: "space-between",
-							width: "100%",
-						}}
-					>
-						<div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-							<LogoMark />
-							<span
-								style={{
-									fontSize: 22,
-									fontWeight: 600,
-									letterSpacing: "0.08em",
-									textTransform: "uppercase",
-									color: INK,
-								}}
-							>
-								Reloop
-							</span>
-						</div>
+					<div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+						<LogoMark />
 						<span
 							style={{
-								fontSize: 16,
-								fontWeight: 500,
-								letterSpacing: "0.16em",
+								fontSize: 22,
+								fontWeight: 600,
+								letterSpacing: "0.08em",
 								textTransform: "uppercase",
-								color: MUTED,
+								color: INK,
 							}}
 						>
-							link.reloop.sh
+							Reloop
 						</span>
 					</div>
+					<span
+						style={{
+							fontSize: 16,
+							fontWeight: 500,
+							letterSpacing: "0.16em",
+							textTransform: "uppercase",
+							color: MUTED,
+						}}
+					>
+						link.reloop.sh
+					</span>
+				</div>
 
-					{/* Center diagram + browser */}
+				{/* Center diagram + browser */}
+				<div
+					style={{
+						display: "flex",
+						flex: 1,
+						alignItems: "center",
+						justifyContent: "center",
+						gap: 48,
+						marginTop: 12,
+					}}
+				>
+					{/* Left legend */}
 					<div
 						style={{
 							display: "flex",
-							flex: 1,
-							alignItems: "center",
-							justifyContent: "center",
-							gap: 48,
-							marginTop: 12,
+							flexDirection: "column",
+							gap: 10,
+							width: 180,
 						}}
 					>
-						{/* Left legend */}
-						<div
-							style={{
-								display: "flex",
-								flexDirection: "column",
-								gap: 10,
-								width: 180,
-							}}
-						>
-							<div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-								<BoltMark />
-								<RingsMark />
-							</div>
-							<div
-								style={{
-									display: "flex",
-									flexDirection: "column",
-									gap: 3,
-									fontSize: 12,
-									letterSpacing: "0.06em",
-									textTransform: "uppercase",
-									color: INK,
-									fontWeight: 500,
-								}}
-							>
-								<span>TRACKING</span>
-								<span>CLICK → REDIRECT</span>
-								<span>OPEN ▢</span>
-								<span>EMAIL PREFS</span>
-							</div>
+						<div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+							<BoltMark />
+							<RingsMark />
 						</div>
-
-						{/* Browser window + Preferences pill */}
 						<div
 							style={{
 								display: "flex",
 								flexDirection: "column",
-								width: 380,
-								border: `2px dashed ${LINE}`,
-								backgroundColor: SURFACE,
+								gap: 3,
+								fontSize: 12,
+								letterSpacing: "0.06em",
+								textTransform: "uppercase",
+								color: INK,
+								fontWeight: 500,
 							}}
 						>
-							{/* Chrome dots */}
-							<div
-								style={{
-									display: "flex",
-									alignItems: "center",
-									gap: 8,
-									padding: "12px 14px",
-									borderBottom: `1.5px dashed ${LINE}`,
-								}}
-							>
-								{[0, 1, 2].map((i) => (
-									<div
-										key={i}
-										style={{
-											width: 10,
-											height: 10,
-											borderRadius: 999,
-											border: `1.5px solid ${LINE}`,
-											display: "flex",
-										}}
-									/>
-								))}
-							</div>
+							<span>TRACKING</span>
+							<span>CLICK → REDIRECT</span>
+							<span>OPEN ▢</span>
+							<span>EMAIL PREFS</span>
+						</div>
+					</div>
+
+					{/* Browser window + Preferences pill */}
+					<div
+						style={{
+							display: "flex",
+							flexDirection: "column",
+							width: 380,
+							border: `2px dashed ${LINE}`,
+							backgroundColor: SURFACE,
+						}}
+					>
+						{/* Chrome dots */}
+						<div
+							style={{
+								display: "flex",
+								alignItems: "center",
+								gap: 8,
+								padding: "12px 14px",
+								borderBottom: `1.5px dashed ${LINE}`,
+							}}
+						>
+							{[0, 1, 2].map((i) => (
+								<div
+									key={i}
+									style={{
+										width: 10,
+										height: 10,
+										borderRadius: 999,
+										border: `1.5px solid ${LINE}`,
+										display: "flex",
+									}}
+								/>
+							))}
+						</div>
+						<div
+							style={{
+								display: "flex",
+								alignItems: "center",
+								justifyContent: "center",
+								padding: "48px 32px",
+							}}
+						>
 							<div
 								style={{
 									display: "flex",
 									alignItems: "center",
 									justifyContent: "center",
-									padding: "48px 32px",
+									padding: "18px 40px",
+									border: `2px dashed ${LINE}`,
+									borderRadius: 999,
+									backgroundColor: SURFACE,
 								}}
 							>
-								<div
+								<span
 									style={{
-										display: "flex",
-										alignItems: "center",
-										justifyContent: "center",
-										padding: "18px 40px",
-										border: `2px dashed ${LINE}`,
-										borderRadius: 999,
-										backgroundColor: SURFACE,
+										fontSize: 32,
+										fontWeight: 700,
+										letterSpacing: "-0.02em",
+										color: INK,
+										fontFamily:
+											"ui-sans-serif, system-ui, -apple-system, sans-serif",
 									}}
 								>
-									<span
-										style={{
-											fontSize: 32,
-											fontWeight: 700,
-											letterSpacing: "-0.02em",
-											color: INK,
-											fontFamily:
-												"ui-sans-serif, system-ui, -apple-system, sans-serif",
-										}}
-									>
-										Preferences
-									</span>
-								</div>
+									Preferences
+								</span>
 							</div>
-						</div>
-
-						{/* Right vertical label */}
-						<div
-							style={{
-								display: "flex",
-								flexDirection: "column",
-								alignItems: "center",
-								justifyContent: "center",
-								gap: 8,
-								fontSize: 13,
-								letterSpacing: "0.22em",
-								color: INK,
-								fontWeight: 500,
-								height: 200,
-							}}
-						>
-							<span>]</span>
-							<span
-								style={{
-									writingMode: "vertical-rl",
-									transform: "rotate(180deg)",
-									letterSpacing: "0.28em",
-								}}
-							>
-								RELOOP
-							</span>
-							<span>[</span>
 						</div>
 					</div>
 
-					{/* Footer plate */}
+					{/* Right vertical label */}
 					<div
 						style={{
 							display: "flex",
 							flexDirection: "column",
-							width: "100%",
-							marginTop: 8,
-							gap: 10,
+							alignItems: "center",
+							justifyContent: "center",
+							gap: 8,
+							fontSize: 13,
+							letterSpacing: "0.22em",
+							color: INK,
+							fontWeight: 500,
+							height: 200,
 						}}
 					>
-						<div
+						<span>]</span>
+						<span
 							style={{
-								width: "100%",
-								height: 1.5,
-								backgroundImage: `repeating-linear-gradient(to right, ${LINE} 0 6px, transparent 6px 12px)`,
-								display: "flex",
-							}}
-						/>
-						<div
-							style={{
-								display: "flex",
-								alignItems: "center",
-								justifyContent: "space-between",
-								fontSize: 13,
-								letterSpacing: "0.14em",
-								textTransform: "uppercase",
-								color: MUTED,
-								fontWeight: 500,
+								writingMode: "vertical-rl",
+								transform: "rotate(180deg)",
+								letterSpacing: "0.28em",
 							}}
 						>
-							<span>link.reloop.sh</span>
-							<span style={{ color: INK, opacity: 0.7 }}>[ preferences ]</span>
-							<span>reloop.sh</span>
-						</div>
+							RELOOP
+						</span>
+						<span>[</span>
+					</div>
+				</div>
+
+				{/* Footer plate */}
+				<div
+					style={{
+						display: "flex",
+						flexDirection: "column",
+						width: "100%",
+						marginTop: 8,
+						gap: 10,
+					}}
+				>
+					<div
+						style={{
+							width: "100%",
+							height: 1.5,
+							backgroundImage: `repeating-linear-gradient(to right, ${LINE} 0 6px, transparent 6px 12px)`,
+							display: "flex",
+						}}
+					/>
+					<div
+						style={{
+							display: "flex",
+							alignItems: "center",
+							justifyContent: "space-between",
+							fontSize: 13,
+							letterSpacing: "0.14em",
+							textTransform: "uppercase",
+							color: MUTED,
+							fontWeight: 500,
+						}}
+					>
+						<span>link.reloop.sh</span>
+						<span style={{ color: INK, opacity: 0.7 }}>[ preferences ]</span>
+						<span>reloop.sh</span>
 					</div>
 				</div>
 			</div>
-		),
+		</div>,
 		{ ...size },
 	);
 }

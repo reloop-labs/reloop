@@ -224,7 +224,7 @@ export function PreviewModal({
 									</Avatar.Image>
 								</Avatar.Root>
 								<div className="flex min-w-0 flex-col">
-									<span className="truncate font-semibold text-xs text-text-strong-950">
+									<span className="truncate font-semibold text-text-strong-950 text-xs">
 										{version.createdBy?.name ||
 											version.createdBy?.email ||
 											"Developer"}
@@ -354,7 +354,10 @@ export function PreviewModal({
 												title="Copy variable syntax"
 											>
 												{copiedVar === variable ? (
-													<Icon name="check" className="h-2.5 w-2.5 text-success-base" />
+													<Icon
+														name="check"
+														className="h-2.5 w-2.5 text-success-base"
+													/>
 												) : (
 													<Icon name="copy" className="h-3.5 w-3.5" />
 												)}
@@ -381,10 +384,17 @@ export function PreviewModal({
 							<div className="flex items-center gap-1 rounded-xl border border-stroke-soft-100 bg-bg-weak-50 p-0.5 shadow-inner dark:border-stroke-soft-100/40 dark:bg-bg-weak-50">
 								{[
 									{ id: "desktop", label: "Desktop", icon: "layout" as const },
-									{ id: "tablet", label: "Tablet", icon: "layout-grid" as const },
-									{ id: "mobile", label: "Mobile", icon: "smartphone" as const },
+									{
+										id: "tablet",
+										label: "Tablet",
+										icon: "layout-grid" as const,
+									},
+									{
+										id: "mobile",
+										label: "Mobile",
+										icon: "smartphone" as const,
+									},
 								].map((device) => {
-									
 									const isSelected = viewport === device.id;
 									return (
 										<button
@@ -403,12 +413,12 @@ export function PreviewModal({
 											)}
 										>
 											<Icon
-										name={device.icon}
-										className={cn(
-											"h-3.5 w-3.5 transition-transform duration-200",
-											isSelected && "scale-110",
-										)}
-									/>
+												name={device.icon}
+												className={cn(
+													"h-3.5 w-3.5 transition-transform duration-200",
+													isSelected && "scale-110",
+												)}
+											/>
 											<span className="hidden sm:inline">{device.label}</span>
 										</button>
 									);
@@ -425,15 +435,15 @@ export function PreviewModal({
 												prev === "portrait" ? "landscape" : "portrait",
 											)
 										}
-										className="flex items-center gap-1.5 rounded-xl border border-stroke-soft-200 bg-bg-white-0 px-3 py-1.5 font-semibold text-xs text-text-sub-600 shadow-sm transition-all duration-150 hover:border-stroke-soft-200 active:scale-95 dark:border-stroke-soft-100/40 dark:bg-bg-weak-50 dark:text-text-sub-600 dark:hover:border-stroke-soft-100/50"
+										className="flex items-center gap-1.5 rounded-xl border border-stroke-soft-200 bg-bg-white-0 px-3 py-1.5 font-semibold text-text-sub-600 text-xs shadow-sm transition-all duration-150 hover:border-stroke-soft-200 active:scale-95 dark:border-stroke-soft-100/40 dark:bg-bg-weak-50 dark:text-text-sub-600 dark:hover:border-stroke-soft-100/50"
 									>
 										<Icon
-										name="refresh-cw"
-										className={cn(
-											"h-3 w-3 transition-transform duration-300",
-											orientation === "landscape" && "rotate-90",
-										)}
-									/>
+											name="refresh-cw"
+											className={cn(
+												"h-3 w-3 transition-transform duration-300",
+												orientation === "landscape" && "rotate-90",
+											)}
+										/>
 										<span>
 											{orientation === "portrait" ? "Portrait" : "Landscape"}
 										</span>
@@ -463,12 +473,12 @@ export function PreviewModal({
 									title="Refresh Iframe"
 								>
 									<Icon
-									name="refresh-cw"
-									className={cn(
-										"h-3.5 w-3.5 transition-all duration-300",
-										isRefreshing && "animate-spin",
-									)}
-								/>
+										name="refresh-cw"
+										className={cn(
+											"h-3.5 w-3.5 transition-all duration-300",
+											isRefreshing && "animate-spin",
+										)}
+									/>
 								</Button.Root>
 
 								{/* Copy HTML */}
@@ -482,7 +492,10 @@ export function PreviewModal({
 									title="Copy Raw HTML"
 								>
 									{copiedHtml ? (
-										<Icon name="check" className="h-3.5 w-3.5 text-success-base" />
+										<Icon
+											name="check"
+											className="h-3.5 w-3.5 text-success-base"
+										/>
 									) : (
 										<Icon name="copy" className="h-3.5 w-3.5" />
 									)}
@@ -555,7 +568,10 @@ export function PreviewModal({
 										</div>
 										{/* address bar */}
 										<div className="mx-auto flex h-6 max-w-lg flex-1 items-center justify-center gap-1.5 rounded-md border border-stroke-soft-200 bg-bg-white-0 px-3 font-medium text-[10px] text-text-soft-400 shadow-inner dark:border-stroke-soft-100/40 dark:bg-bg-white-0 dark:text-text-sub-600">
-											<Icon name="lock" className="h-2.5 w-2.5 text-text-soft-400" />
+											<Icon
+												name="lock"
+												className="h-2.5 w-2.5 text-text-soft-400"
+											/>
 											<span className="truncate">
 												reloop.co/templates/{templateId || "builder"}/preview/
 												{version.id}
@@ -608,8 +624,11 @@ export function PreviewModal({
 											sandbox="allow-popups-to-escape-sandbox allow-same-origin"
 										/>
 									) : (
-										<div className="absolute inset-0 flex select-none flex-col items-center justify-center gap-2 text-xs text-text-soft-400">
-											<Icon name="alert-triangle" className="h-5 w-5 text-text-sub-600" />
+										<div className="absolute inset-0 flex select-none flex-col items-center justify-center gap-2 text-text-soft-400 text-xs">
+											<Icon
+												name="alert-triangle"
+												className="h-5 w-5 text-text-sub-600"
+											/>
 											<span>No rendered HTML available for this version.</span>
 										</div>
 									)}

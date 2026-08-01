@@ -26,7 +26,10 @@ export function normalizeTemplateVariableName(raw: string): string {
 	return trimmed;
 }
 
-export function formatTemplateVariable(name: string, braces: 2 | 3 = 3): string {
+export function formatTemplateVariable(
+	name: string,
+	braces: 2 | 3 = 3,
+): string {
 	const key = normalizeTemplateVariableName(name);
 	return braces === 2 ? `{{${key}}}` : `{{{${key}}}}`;
 }

@@ -1,8 +1,3 @@
-
-import {
-	getAvatarGradient,
-	getAvatarInitial,
-} from "#/utils/avatar";
 import * as Avatar from "@reloop/ui/avatar";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
@@ -12,13 +7,14 @@ import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
 import {
 	AnimatePresence,
+	type AnimationPlaybackControls,
 	animate,
 	motion,
 	useMotionValue,
-	type AnimationPlaybackControls,
 } from "motion/react";
 import { useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
+import { getAvatarGradient, getAvatarInitial } from "#/utils/avatar";
 
 interface RevokeInviteModalProps {
 	open: boolean;
@@ -140,8 +136,8 @@ export const RevokeInviteModal = ({
 						Revoke invite
 					</Modal.Title>
 					<Modal.Description className="mt-1 text-paragraph-sm text-text-sub-600">
-						Are you sure you want to revoke this invitation? This action cannot be
-						undone.
+						Are you sure you want to revoke this invitation? This action cannot
+						be undone.
 					</Modal.Description>
 				</div>
 
@@ -209,7 +205,7 @@ export const RevokeInviteModal = ({
 						onPointerLeave={cancelHold}
 						onPointerCancel={cancelHold}
 						className={cn(
-							"relative min-w-[134px] select-none justify-center overflow-hidden transition-all duration-200 font-medium",
+							"relative min-w-[134px] select-none justify-center overflow-hidden font-medium transition-all duration-200",
 							status === "revoking" && "pointer-events-none opacity-90",
 						)}
 						disabled={status === "revoking"}
@@ -217,7 +213,7 @@ export const RevokeInviteModal = ({
 						{/* Hold progress overlay fill */}
 						{status === "idle" && (
 							<motion.div
-								className="pointer-events-none absolute inset-0 bg-white/25 origin-left"
+								className="pointer-events-none absolute inset-0 origin-left bg-white/25"
 								style={{ scaleX: holdProgress }}
 							/>
 						)}

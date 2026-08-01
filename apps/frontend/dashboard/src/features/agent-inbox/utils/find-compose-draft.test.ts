@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { findComposeDraft } from "./find-compose-draft";
 import type { ComposeDraft } from "../types";
+import { findComposeDraft } from "./find-compose-draft";
 
 const base = {
 	mailboxId: "mb_1",

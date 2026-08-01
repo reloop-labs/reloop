@@ -1,12 +1,11 @@
-import { useRouter } from "next/navigation";
 import { cn } from "@reloop/ui/cn";
 import * as CommandMenu from "@reloop/ui/command";
 import { Icon } from "@reloop/ui/icon";
 import { KbdCommand } from "@reloop/ui/kbd-command";
 import { KbdKey } from "@reloop/ui/kbd-key";
 import { Logo } from "@reloop/ui/logo";
-
 import dayjs from "dayjs";
+import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import { parseAsString, useQueryState } from "nuqs";
 import {
@@ -328,7 +327,9 @@ export const InboxCommandPalette = ({
 	const goToFolder = useCallback(
 		(jump: FolderJump) => {
 			if (!mailboxId) return;
-			router.push(jump.to.replace(/\$mailboxId/g, encodeURIComponent(mailboxId)));
+			router.push(
+				jump.to.replace(/\$mailboxId/g, encodeURIComponent(mailboxId)),
+			);
 			if (jump.filter) {
 				void setFilterParam(jump.filter);
 			} else if (jump.id !== "needs-approval") {
@@ -435,7 +436,7 @@ export const InboxCommandPalette = ({
 		<CommandMenu.Dialog
 			open={open}
 			onOpenChange={onOpenChange}
-			overlayClassName="justify-start bg-black/35 pt-[16vh] backdrop-blur-[3px] dark:bg-black/60"
+			overlayClassName="justify-center bg-black/35 backdrop-blur-[3px] dark:bg-black/60"
 			className={cn(
 				"inbox-zero-theme",
 				isDark && "dark",

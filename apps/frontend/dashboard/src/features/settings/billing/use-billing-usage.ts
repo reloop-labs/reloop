@@ -54,19 +54,22 @@ export function useBillingUsage() {
 	});
 
 	const applyLiveUpdate = (update: UsageLiveUpdate) => {
-		queryClient.setQueryData<BillingUsage>(queryKeys.billing.usage(), (prev) => {
-			if (!prev) return prev;
-			return {
-				...prev,
-				subscription: {
-					...prev.subscription,
-					creditsUsed: update.creditsUsed,
-					creditsRemaining: update.creditsRemaining,
-					currentPeriodStart: update.periodStart,
-					currentPeriodEnd: update.periodEnd,
-				},
-			};
-		});
+		queryClient.setQueryData<BillingUsage>(
+			queryKeys.billing.usage(),
+			(prev) => {
+				if (!prev) return prev;
+				return {
+					...prev,
+					subscription: {
+						...prev.subscription,
+						creditsUsed: update.creditsUsed,
+						creditsRemaining: update.creditsRemaining,
+						currentPeriodStart: update.periodStart,
+						currentPeriodEnd: update.periodEnd,
+					},
+				};
+			},
+		);
 	};
 
 	return {

@@ -6,8 +6,8 @@ import {
 	type PlanId,
 	pricingPlans,
 } from "@reloop/pricing";
-import * as FancyButton from "@reloop/ui/fancy-button";
 import { cn } from "@reloop/ui/cn";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { Circle } from "rc-progress";
 import { useState } from "react";
 import { SwitchPlanModal } from "#/features/settings/billing/switch-plan-modal";

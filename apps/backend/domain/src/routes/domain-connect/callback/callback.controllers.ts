@@ -1,10 +1,10 @@
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import { and, eq, isNull } from "drizzle-orm";
-import { useLogger } from "evlog/elysia";
 import { domainConfig } from "@reloop/domain/domain.config";
 import { redis } from "@reloop/domain/lib/redis";
 import { verifyDNSRecordController } from "@reloop/domain/routes/domain/verify-dns/verify-dns.controllers";
+import { and, eq, isNull } from "drizzle-orm";
+import { useLogger } from "evlog/elysia";
 
 const DC_NONCE_PREFIX = "dc-nonce";
 

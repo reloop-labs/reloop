@@ -90,9 +90,9 @@ function PreferencesInvalid() {
 						Link expired or invalid
 					</h1>
 					<p className="text-[15px] text-white/50 leading-relaxed">
-						This preferences link has expired or is no longer valid. Please check
-						your email for a newer link, or contact the sender for an updated
-						one.
+						This preferences link has expired or is no longer valid. Please
+						check your email for a newer link, or contact the sender for an
+						updated one.
 					</p>
 				</div>
 			</div>

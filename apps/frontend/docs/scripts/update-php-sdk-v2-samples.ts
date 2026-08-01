@@ -27,9 +27,16 @@ function findSampleFiles(dir: string): string[] {
 			files.push(...findSampleFiles(fullPath));
 			continue;
 		}
-		if (entry.name.endsWith(".ts") && !["index.ts","types.ts","helpers.ts","languages.ts"].includes(entry.name) && !entry.name.endsWith(".test.ts")) {
+		if (
+			entry.name.endsWith(".ts") &&
+			!["index.ts", "types.ts", "helpers.ts", "languages.ts"].includes(
+				entry.name,
+			) &&
+			!entry.name.endsWith(".test.ts")
+		) {
 			const content = fs.readFileSync(fullPath, "utf8");
-			if (content.includes("XCodeSamples") || content.includes("CodeSample[]")) files.push(fullPath);
+			if (content.includes("XCodeSamples") || content.includes("CodeSample[]"))
+				files.push(fullPath);
 		}
 	}
 	return files;
@@ -116,7 +123,10 @@ function convertJsLiteralToPhp(literal: string, indent = 0): string {
 		const entries = splitTopLevel(inner, ",").map((entry) => {
 			const colon = indexOfTopLevel(entry, ":");
 			if (colon === -1) return convertScalar(entry);
-			const rawKey = entry.slice(0, colon).trim().replace(/^["']|["']$/g, "");
+			const rawKey = entry
+				.slice(0, colon)
+				.trim()
+				.replace(/^["']|["']$/g, "");
 			const rawVal = entry.slice(colon + 1).trim();
 			return `${innerPad}'${rawKey}' => ${convertJsLiteralToPhp(rawVal, indent + 1)}`;
 		});
@@ -139,9 +149,7 @@ function convertScalar(value: string): string {
 }
 
 function jsCalleeToPhp(callee: string): string {
-	return callee
-		.replace(/^reloop/, "$reloop")
-		.replace(/\./g, "->");
+	return callee.replace(/^reloop/, "$reloop").replace(/\./g, "->");
 }
 
 const SUPPORTED_PHP_PREFIXES = [
@@ -260,8 +268,10 @@ function nodeToPhp(nodeSource: string): string {
 	body = body.replace(
 		/console\.log\(([\s\S]*?)\);?/g,
 		(_full, args: string) => {
-			const rewritten = rewriteEchoArgs(args, successNames)
-				.replace(/,\s*/g, " . ' ' . ");
+			const rewritten = rewriteEchoArgs(args, successNames).replace(
+				/,\s*/g,
+				" . ' ' . ",
+			);
 			return `echo ${rewritten} . PHP_EOL;`;
 		},
 	);
@@ -273,7 +283,11 @@ function nodeToPhp(nodeSource: string): string {
 		.join("\n")
 		.trim();
 
-	if (body.includes("RESULT_ASSIGN") || body.includes("console.log") || /const \{/.test(body)) {
+	if (
+		body.includes("RESULT_ASSIGN") ||
+		body.includes("console.log") ||
+		/const \{/.test(body)
+	) {
 		throw new Error(`Incomplete PHP conversion:\n${body}`);
 	}
 
@@ -318,7 +332,11 @@ function main() {
 			const message = error instanceof Error ? error.message : String(error);
 			if (message.startsWith("UNSUPPORTED:")) {
 				skipped++;
-				console.log("skipped", path.relative(REPO_ROOT, file), message.slice(12));
+				console.log(
+					"skipped",
+					path.relative(REPO_ROOT, file),
+					message.slice(12),
+				);
 				continue;
 			}
 			console.error("failed", path.relative(REPO_ROOT, file), error);
@@ -326,7 +344,9 @@ function main() {
 		}
 	}
 
-	console.log(`Done. updated=${updated} skipped=${skipped} total=${files.length}`);
+	console.log(
+		`Done. updated=${updated} skipped=${skipped} total=${files.length}`,
+	);
 }
 
 main();

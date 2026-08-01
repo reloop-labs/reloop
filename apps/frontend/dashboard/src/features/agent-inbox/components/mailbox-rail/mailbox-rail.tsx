@@ -1,9 +1,8 @@
-import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-
 import { Plus } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useMemo } from "react";
 import { useAgentInbox } from "#/features/agent-inbox/components/agent-inbox-provider";
 import type { AgentMailbox } from "#/features/agent-inbox/types";
@@ -94,12 +93,8 @@ export function MailboxRail({
 	onAddMailbox: () => void;
 }) {
 	const router = useRouter();
-	const {
-		mailboxes,
-		isLoadingMailboxes,
-		mailboxesError,
-		retryMailboxes,
-	} = useAgentInbox();
+	const { mailboxes, isLoadingMailboxes, mailboxesError, retryMailboxes } =
+		useAgentInbox();
 
 	const sortedMailboxes = useMemo(
 		() =>
@@ -117,7 +112,7 @@ export function MailboxRail({
 	return (
 		<nav
 			aria-label="Mailboxes"
-			className="flex h-full w-[52px] shrink-0 flex-col items-center overflow-hidden border-r border-stroke-soft-200/60 bg-sidebar pt-3.5 pb-3 dark:border-white/5"
+			className="flex h-full w-[52px] shrink-0 flex-col items-center overflow-hidden border-stroke-soft-200/60 border-r bg-sidebar pt-3.5 pb-3 dark:border-white/5"
 		>
 			<Link
 				href="/"
@@ -128,7 +123,7 @@ export function MailboxRail({
 				<Icon name="arrow-left" className="h-4 w-4" />
 			</Link>
 
-			<div className="flex min-h-0 w-full flex-1 flex-col items-center gap-2 overflow-x-hidden overflow-y-auto pt-0.5">
+			<div className="flex min-h-0 w-full flex-1 flex-col items-center gap-2 overflow-y-auto overflow-x-hidden pt-0.5">
 				{mailboxesError ? (
 					<SectionError
 						compact

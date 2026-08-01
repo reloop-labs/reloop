@@ -1,3 +1,6 @@
+import { cn } from "@reloop/ui/cn";
+import { Icon } from "@reloop/ui/icon";
+import * as Input from "@reloop/ui/input";
 import {
 	Select,
 	SelectContent,
@@ -6,9 +9,6 @@ import {
 	SelectValue,
 } from "#/features/api-keys/filters/base-ui-select";
 import { useInvalidateWebhooks } from "#/features/webhooks/hooks/use-webhooks-query";
-import { cn } from "@reloop/ui/cn";
-import { Icon } from "@reloop/ui/icon";
-import * as Input from "@reloop/ui/input";
 
 interface WebhookToolbarProps {
 	searchQuery: string;
@@ -97,10 +97,7 @@ export const WebhookToolbar = ({
 							{selectedOption?.icon ? (
 								<Icon
 									name={selectedOption.icon}
-									className={cn(
-										"h-4 w-4 shrink-0",
-										selectedOption.colorClass,
-									)}
+									className={cn("h-4 w-4 shrink-0", selectedOption.colorClass)}
 								/>
 							) : null}
 							<span className="min-w-0 truncate">{selectedOption?.label}</span>

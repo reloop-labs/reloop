@@ -1,3 +1,4 @@
+import { useQueryClient } from "@tanstack/react-query";
 import {
 	createContext,
 	type ReactNode,
@@ -8,15 +9,9 @@ import {
 	useRef,
 	useState,
 } from "react";
-import { useQueryClient } from "@tanstack/react-query";
 import { useMailboxId } from "#/features/agent-inbox/lib/use-mailbox-id";
 import { useSWR } from "#/features/agent-inbox/lib/use-swr-compat";
 import { extractBareEmail, extractDisplayName } from "../lib/email-address";
-import { findComposeDraft } from "../utils/find-compose-draft";
-import {
-	parseComposeDraft,
-	parseComposeDraftsList,
-} from "../utils/parse-compose-drafts";
 import type {
 	AgentMailbox,
 	BatchThreadAction,
@@ -25,6 +20,11 @@ import type {
 	InboundThread,
 	SaveComposeDraftInput,
 } from "../types";
+import { findComposeDraft } from "../utils/find-compose-draft";
+import {
+	parseComposeDraft,
+	parseComposeDraftsList,
+} from "../utils/parse-compose-drafts";
 
 const parseEmailAddress = (emailStr: string) =>
 	extractBareEmail(emailStr).toLowerCase();

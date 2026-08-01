@@ -166,9 +166,7 @@ export async function updateDraftController(
 				? { mailboxId: updates.mailboxId }
 				: {}),
 			...(updates.kind !== undefined ? { kind: updates.kind } : {}),
-			...(updates.threadId !== undefined
-				? { threadId: updates.threadId }
-				: {}),
+			...(updates.threadId !== undefined ? { threadId: updates.threadId } : {}),
 			...(updates.inReplyToMessageId !== undefined
 				? { inReplyToMessageId: updates.inReplyToMessageId }
 				: {}),

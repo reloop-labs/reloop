@@ -1,16 +1,16 @@
 import {
+	type AIImageInput,
 	createAIStream,
 	getVisionCapability,
-	type AIImageInput,
 } from "../ai.controllers";
 import {
 	AGENT_HTML_SYSTEM,
-	PLAN_SYSTEM,
 	buildConversationPrompt,
 	buildPlanPrompt,
 	extractVariablesFromHtml,
 	fallbackPlan,
 	isLeakedOrInvalidEmailHtml,
+	PLAN_SYSTEM,
 	parsePlanJson,
 } from "./prompts";
 import type {
@@ -25,7 +25,10 @@ function toImageInputs(
 ): AIImageInput[] | undefined {
 	if (!attachments?.length) return undefined;
 	return attachments
-		.filter((a) => a.mime?.startsWith("image/") || /\.(png|jpe?g|gif|webp)$/i.test(a.url))
+		.filter(
+			(a) =>
+				a.mime?.startsWith("image/") || /\.(png|jpe?g|gif|webp)$/i.test(a.url),
+		)
 		.map((a) => ({ url: a.url, mime: a.mime }));
 }
 
@@ -113,8 +116,7 @@ export async function toolCreatePlan(
 		};
 	} catch (err) {
 		const plan = fallbackPlan(
-			[...ctx.messages].reverse().find((m) => m.role === "user")?.content ??
-				"",
+			[...ctx.messages].reverse().find((m) => m.role === "user")?.content ?? "",
 		);
 		return {
 			ok: true,
@@ -125,9 +127,7 @@ export async function toolCreatePlan(
 }
 
 /** Tool: check reference images / vision availability. */
-export function toolAnalyzeReferences(
-	ctx: ToolContext,
-): ToolResult<{
+export function toolAnalyzeReferences(ctx: ToolContext): ToolResult<{
 	vision: boolean;
 	imageCount: number;
 	provider?: string;
@@ -220,13 +220,9 @@ export async function toolReviseEmailHtml(
 	ctx: ToolContext,
 	onHtmlChunk?: (chunk: string) => void,
 ): Promise<ToolResult<{ html: string; usedVision: boolean }>> {
-	const prior =
-		ctx.lastHtml ||
-		ctx.editorSnapshot?.renderedHtmlSnippet ||
-		"";
+	const prior = ctx.lastHtml || ctx.editorSnapshot?.renderedHtmlSnippet || "";
 	const lastUser =
-		[...ctx.messages].reverse().find((m) => m.role === "user")?.content ??
-		"";
+		[...ctx.messages].reverse().find((m) => m.role === "user")?.content ?? "";
 
 	const prompt = [
 		"Revise the following email HTML according to the user instruction.",
@@ -296,9 +292,7 @@ export type CritiqueResult = {
 };
 
 /** Tool: lightweight heuristic critique (no extra LLM call). */
-export function toolCritiqueEmail(
-	html: string,
-): ToolResult<CritiqueResult> {
+export function toolCritiqueEmail(html: string): ToolResult<CritiqueResult> {
 	const notes: string[] = [];
 	let score = 100;
 
@@ -342,8 +336,7 @@ export function toolCritiqueEmail(
 /** Whether this turn looks like a revision of existing work. */
 export function shouldRevise(ctx: ToolContext): boolean {
 	const hasExisting = Boolean(
-		ctx.lastHtml?.trim() ||
-			ctx.editorSnapshot?.renderedHtmlSnippet?.trim(),
+		ctx.lastHtml?.trim() || ctx.editorSnapshot?.renderedHtmlSnippet?.trim(),
 	);
 	if (!hasExisting) return false;
 	if (ctx.executePlan) return false;
@@ -353,8 +346,7 @@ export function shouldRevise(ctx: ToolContext): boolean {
 	if (userTurns.length >= 2) return true;
 
 	const last =
-		[...ctx.messages].reverse().find((m) => m.role === "user")?.content ??
-		"";
+		[...ctx.messages].reverse().find((m) => m.role === "user")?.content ?? "";
 	return /\b(make|change|update|revise|fix|tweak|adjust|bigger|smaller|color|green|red|blue|replace|remove|add|move)\b/i.test(
 		last,
 	);

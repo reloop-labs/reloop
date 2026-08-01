@@ -58,7 +58,7 @@ function CountdownRing({
 					className="text-neutral-900 transition-[stroke-dashoffset] duration-200 ease-linear dark:text-white"
 				/>
 			</svg>
-			<span className="absolute inset-0 flex items-center justify-center text-[11px] font-semibold tabular-nums tracking-tight text-neutral-900 dark:text-white">
+			<span className="absolute inset-0 flex items-center justify-center font-semibold text-[11px] text-neutral-900 tabular-nums tracking-tight dark:text-white">
 				{remaining}
 			</span>
 		</div>
@@ -97,10 +97,10 @@ export function UndoSendToast({
 		<div className="flex w-[min(100vw-2rem,22rem)] items-center gap-3 rounded-2xl border border-neutral-200/80 bg-white/95 px-3.5 py-3 text-neutral-900 shadow-[0_8px_30px_rgb(0,0,0,0.08)] backdrop-blur-md dark:border-neutral-700/80 dark:bg-neutral-900/95 dark:text-white dark:shadow-[0_8px_30px_rgb(0,0,0,0.35)]">
 			<CountdownRing remaining={remaining} total={seconds} />
 			<div className="min-w-0 flex-1">
-				<p className="truncate text-sm font-medium leading-5 tracking-tight">
+				<p className="truncate font-medium text-sm leading-5 tracking-tight">
 					{title}
 				</p>
-				<p className="truncate text-xs leading-4 text-neutral-500 dark:text-neutral-400">
+				<p className="truncate text-neutral-500 text-xs leading-4 dark:text-neutral-400">
 					{subtitle}
 				</p>
 			</div>
@@ -108,7 +108,7 @@ export function UndoSendToast({
 				type="button"
 				disabled={busy || remaining <= 0}
 				aria-label={`Undo send, ${remaining} seconds remaining`}
-				className="shrink-0 rounded-lg bg-neutral-100 px-3 py-1.5 text-sm font-medium text-neutral-900 transition-[transform,background-color,opacity] duration-150 ease-out hover:bg-neutral-200 active:scale-[0.97] disabled:pointer-events-none disabled:opacity-40 dark:bg-neutral-800 dark:text-white dark:hover:bg-neutral-700"
+				className="shrink-0 rounded-lg bg-neutral-100 px-3 py-1.5 font-medium text-neutral-900 text-sm transition-[transform,background-color,opacity] duration-150 ease-out hover:bg-neutral-200 active:scale-[0.97] disabled:pointer-events-none disabled:opacity-40 dark:bg-neutral-800 dark:text-white dark:hover:bg-neutral-700"
 				onClick={() => {
 					void (async () => {
 						setBusy(true);

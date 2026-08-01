@@ -1,10 +1,10 @@
 import { expect, test } from "@playwright/test";
+import { DEFAULT_OTP, INVALID_OTP, uniqueTestEmail } from "./auth/fixtures";
 import {
 	completeEmailOtpAndWaitForPostAuth,
 	completeEmailOtpAuth,
 	signOutViaApi,
 } from "./auth/flows";
-import { DEFAULT_OTP, INVALID_OTP, uniqueTestEmail } from "./auth/fixtures";
 import { dashboardURL } from "./runtime";
 
 test.describe("auth UI — unauthenticated", () => {
@@ -107,9 +107,12 @@ test.describe("auth OTP — real backend", () => {
 			otp: DEFAULT_OTP,
 		});
 
-		await expect(page).toHaveURL((url) => url.pathname.includes("/onboarding"), {
-			timeout: 5_000,
-		});
+		await expect(page).toHaveURL(
+			(url) => url.pathname.includes("/onboarding"),
+			{
+				timeout: 5_000,
+			},
+		);
 	});
 
 	test("signup with DEFAULT_OTP lands on onboarding for a new user", async ({
@@ -123,9 +126,12 @@ test.describe("auth OTP — real backend", () => {
 			otp: DEFAULT_OTP,
 		});
 
-		await expect(page).toHaveURL((url) => url.pathname.includes("/onboarding"), {
-			timeout: 5_000,
-		});
+		await expect(page).toHaveURL(
+			(url) => url.pathname.includes("/onboarding"),
+			{
+				timeout: 5_000,
+			},
+		);
 	});
 
 	test("invalid OTP shows an error and stays on verify step", async ({
@@ -166,9 +172,12 @@ test.describe("auth OTP — real backend", () => {
 		await expect(page).toHaveURL((url) => url.pathname.includes("/onboarding"));
 
 		await page.reload({ waitUntil: "domcontentloaded" });
-		await expect(page).toHaveURL((url) => url.pathname.includes("/onboarding"), {
-			timeout: 20_000,
-		});
+		await expect(page).toHaveURL(
+			(url) => url.pathname.includes("/onboarding"),
+			{
+				timeout: 20_000,
+			},
+		);
 
 		await signOutViaApi(page);
 

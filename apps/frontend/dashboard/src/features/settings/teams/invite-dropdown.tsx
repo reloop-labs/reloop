@@ -1,11 +1,10 @@
-
-import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
 import { AnimatePresence, motion } from "motion/react";
 import { useRef, useState } from "react";
+import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 
 export interface InviteDropdownProps {
 	inviteId: string;
@@ -148,11 +147,13 @@ export const InviteDropdown = ({
 										(isCopyItem && isCopied)
 									}
 									className={cn(
-										"relative flex w-full cursor-pointer items-center gap-2 overflow-hidden rounded-lg px-2 py-1.5 font-normal text-xs transition-colors min-h-[28px]",
+										"relative flex min-h-[28px] w-full cursor-pointer items-center gap-2 overflow-hidden rounded-lg px-2 py-1.5 font-normal text-xs transition-colors",
 										item.isDanger ? "text-error-base" : "text-text-strong-950",
 										!currentRect &&
 											hoverIdx === idx &&
-											(item.isDanger ? "bg-red-alpha-10" : "bg-neutral-alpha-10"),
+											(item.isDanger
+												? "bg-red-alpha-10"
+												: "bg-neutral-alpha-10"),
 										isResendItem &&
 											(isResending || isResendCompleted) &&
 											"cursor-not-allowed opacity-90",

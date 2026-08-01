@@ -168,8 +168,8 @@ export function DeleteAgentMailboxModal({
 						Warning:
 					</span>{" "}
 					Deleting this address permanently removes the inbox and all of its
-					messages, drafts, and labels. Integrations using this address will stop
-					receiving mail immediately.
+					messages, drafts, and labels. Integrations using this address will
+					stop receiving mail immediately.
 				</div>
 
 				<div className="mt-6 flex items-center justify-end gap-3">

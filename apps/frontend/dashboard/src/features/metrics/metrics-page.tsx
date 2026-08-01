@@ -1,3 +1,7 @@
+import { Icon } from "@reloop/ui/icon";
+import { useQueryClient } from "@tanstack/react-query";
+import { parseAsString, useQueryState } from "nuqs";
+import { useMemo } from "react";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import { DomainSelector } from "#/features/emails/components/domain-selector";
 import { DateRangeFilter } from "#/features/logs/date-range-filter";
@@ -13,10 +17,6 @@ import {
 	getYearMonthDayKey,
 } from "#/features/metrics/utils";
 import { queryKeys } from "#/lib/query-keys";
-import { Icon } from "@reloop/ui/icon";
-import { useQueryClient } from "@tanstack/react-query";
-import { parseAsString, useQueryState } from "nuqs";
-import { useMemo } from "react";
 import { MetricsListHeader } from "./metrics-list-header";
 
 export function MetricsPage() {

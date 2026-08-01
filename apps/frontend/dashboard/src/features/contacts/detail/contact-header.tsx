@@ -1,15 +1,3 @@
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { AnimatedBackButton } from "#/features/dashboard/animated-back-button";
-import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
-import type { AudienceStatus } from "#/features/contacts/audience";
-import {
-	getStatusIcon as getSharedStatusIcon,
-	getStatusColorClass,
-	getStatusLabel,
-} from "#/features/contacts/audience";
-import type { ContactDetail } from "#/features/contacts/hooks/use-contacts-query";
-import { formatRelativeTime } from "#/utils/format-relative-time";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
@@ -19,9 +7,20 @@ import {
 	Trigger as PopoverTrigger,
 } from "@reloop/ui/popover";
 import { Skeleton } from "@reloop/ui/skeleton";
-
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
+import type { AudienceStatus } from "#/features/contacts/audience";
+import {
+	getStatusIcon as getSharedStatusIcon,
+	getStatusColorClass,
+	getStatusLabel,
+} from "#/features/contacts/audience";
+import type { ContactDetail } from "#/features/contacts/hooks/use-contacts-query";
+import { AnimatedBackButton } from "#/features/dashboard/animated-back-button";
+import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
+import { formatRelativeTime } from "#/utils/format-relative-time";
 import { DeleteContactModal } from "../components/contacts/delete-contact-modal";
 import { EditContactModal } from "../components/contacts/edit-contact-modal";
 import { ContactEmailHistory } from "./contact-email-history";
@@ -327,7 +326,11 @@ export const ContactHeader = ({
 						) : contact?.groups && contact.groups.length > 0 ? (
 							<div className="flex flex-wrap gap-2">
 								{contact.groups.map((group) => (
-									<Link href={`/contacts/groups/${group.id}`} key={group.id} className="font-medium text-paragraph-sm text-text-strong-950 underline decoration-dashed underline-offset-2 transition-colors hover:text-primary-base">
+									<Link
+										href={`/contacts/groups/${group.id}`}
+										key={group.id}
+										className="font-medium text-paragraph-sm text-text-strong-950 underline decoration-dashed underline-offset-2 transition-colors hover:text-primary-base"
+									>
 										{group.name}
 									</Link>
 								))}

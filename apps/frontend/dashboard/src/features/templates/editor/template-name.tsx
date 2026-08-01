@@ -1,6 +1,6 @@
-import Link from "next/link";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useDebounceCallback } from "usehooks-ts";
 import { useSWR } from "#/features/templates/editor/lib/use-swr-compat";
@@ -86,16 +86,17 @@ export const TemplateName = () => {
 	};
 
 	if (isLoading && !name) {
-		return (
-			<div className="h-7 w-48 animate-pulse rounded-md bg-bg-weak-50" />
-		);
+		return <div className="h-7 w-48 animate-pulse rounded-md bg-bg-weak-50" />;
 	}
 
 	return (
 		<div className="flex items-center">
 			<div className="flex items-center gap-1.5">
 				<Icon name="layout" className="size-4 text-text-sub-600" />
-				<Link href="/templates" className="font-medium text-label-sm text-text-sub-600 hover:text-text-strong-950">
+				<Link
+					href="/templates"
+					className="font-medium text-label-sm text-text-sub-600 hover:text-text-strong-950"
+				>
 					Templates
 				</Link>
 			</div>

@@ -1,19 +1,6 @@
-import { useSupportSocket } from "#/features/dashboard/hooks/use-support-socket";
-import { clearSupportUnreadInCache } from "#/features/dashboard/hooks/use-support-unread";
-import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
-import type {
-	SupportConversation,
-	SupportMessage,
-	SupportServerEvent,
-} from "#/lib/support-types";
-import { useUIStore } from "#/store/use-ui-store";
-import {
-	getAvatarGradient,
-	getAvatarInitial,
-} from "#/utils/avatar";
-import { useQueryClient } from "@tanstack/react-query";
 import * as Avatar from "@reloop/ui/avatar";
 import { cn } from "@reloop/ui/cn";
+import { useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import {
 	ArrowDown,
@@ -31,6 +18,16 @@ import {
 	X,
 } from "lucide-react";
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
+import { useSupportSocket } from "#/features/dashboard/hooks/use-support-socket";
+import { clearSupportUnreadInCache } from "#/features/dashboard/hooks/use-support-unread";
+import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
+import type {
+	SupportConversation,
+	SupportMessage,
+	SupportServerEvent,
+} from "#/lib/support-types";
+import { useUIStore } from "#/store/use-ui-store";
+import { getAvatarGradient, getAvatarInitial } from "#/utils/avatar";
 
 type ConversationPayload = {
 	conversation: SupportConversation;

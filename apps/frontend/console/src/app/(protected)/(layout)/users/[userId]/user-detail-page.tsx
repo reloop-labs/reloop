@@ -150,10 +150,7 @@ export default function UserDetailPage() {
 			<PageHeading
 				eyebrow={
 					<Breadcrumb
-						items={[
-							{ label: "Users", href: "/users" },
-							{ label: data.email },
-						]}
+						items={[{ label: "Users", href: "/users" }, { label: data.email }]}
 					/>
 				}
 				title={data.name}
@@ -339,10 +336,9 @@ export default function UserDetailPage() {
 						label: "Support threads",
 						value: data.supportConversations.length,
 						hint: `${data.supportConversations.filter((t) => t.status === "open").length} open`,
-						href:
-							data.supportConversations[0]
-								? `/support?c=${data.supportConversations[0].id}`
-								: "/support",
+						href: data.supportConversations[0]
+							? `/support?c=${data.supportConversations[0].id}`
+							: "/support",
 					},
 					{
 						label: "Credits (primary)",

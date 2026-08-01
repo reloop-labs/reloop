@@ -19,7 +19,7 @@ if (mailboxError) throw mailboxError;`,
 		source: `curl -X DELETE https://reloop.sh/api/inbox/v1/mailboxes/mbx_123456789 \
   -H "x-api-key: rl_123456789"`,
 	},
-				{
+	{
 		id: "python",
 		lang: "python",
 		label: "Python",
@@ -31,7 +31,7 @@ result = reloop.inbox.mailboxes.delete("mbx_123456789")
 if result.mailbox_error:
     raise result.mailbox_error`,
 	},
-			{
+	{
 		id: "php",
 		lang: "php",
 		label: "PHP",
@@ -39,13 +39,13 @@ if result.mailbox_error:
 
 require 'vendor/autoload.php';
 
-use Reloop\Reloop;
+use ReloopReloop;
 
 $reloop = Reloop::client('rl_123456789');
 
 $mailbox = $reloop->inbox->mailboxes->delete('mbx_123456789');`,
 	},
-			{
+	{
 		id: "java",
 		lang: "java",
 		label: "Java",
@@ -59,30 +59,30 @@ var mailbox = reloop.inbox.mailboxes.delete("mbx_123456789");`,
 		id: "dotnet",
 		lang: "csharp",
 		label: ".NET",
-		source: `// Inbox SDK support coming soon — use the REST API`,
+		source: "// Inbox SDK support coming soon — use the REST API",
 	},
 	{
 		id: "go",
 		lang: "go",
 		label: "Go",
-		source: `// Inbox SDK support coming soon — use the REST API`,
+		source: "// Inbox SDK support coming soon — use the REST API",
 	},
 	{
 		id: "rust",
 		lang: "rust",
 		label: "Rust",
-		source: `// Inbox SDK support coming soon — use the REST API`,
+		source: "// Inbox SDK support coming soon — use the REST API",
 	},
 	{
 		id: "ruby",
 		lang: "ruby",
 		label: "Ruby",
-		source: `# Inbox SDK support coming soon — use the REST API`,
+		source: "# Inbox SDK support coming soon — use the REST API",
 	},
 	{
 		id: "elixir",
 		lang: "elixir",
 		label: "Elixir",
-		source: `# Inbox SDK support coming soon — use the REST API`,
+		source: "# Inbox SDK support coming soon — use the REST API",
 	},
 ];

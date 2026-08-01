@@ -1,8 +1,8 @@
 import { describe, expect, test } from "bun:test";
 import {
+	getWebhookRetryDelayMs,
 	WEBHOOK_MAX_ATTEMPTS,
 	WEBHOOK_RETRY_DELAYS_MS,
-	getWebhookRetryDelayMs,
 	webhookDeliveryJobOptions,
 } from "../src/index";
 

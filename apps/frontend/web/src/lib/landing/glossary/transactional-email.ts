@@ -5,7 +5,7 @@ export const term: GlossaryTermDefinition = {
 	title: "Transactional Email",
 	description:
 		"Messages triggered by a user action or account event: receipts, resets, invites, alerts.",
-	keywords: ["transactional email","triggered email","product email"],
+	keywords: ["transactional email", "triggered email", "product email"],
 	body: `Transactional email is mail your product sends because something happened: signup, password reset, invoice, shipping notice, security alert. The user expects it. Marketing newsletters are a different stream with different consent rules.
 
 These messages should be fast, reliable, and boring in the best way. Delay on a password reset is a support ticket. Design plain-text fallbacks and avoid heavy campaign layouts that look promotional.

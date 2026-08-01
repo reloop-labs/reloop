@@ -39,7 +39,10 @@ function readStoredMode(fallback: DocsViewMode = "desktop"): DocsViewMode {
 	return fallback;
 }
 
-export function useDocsViewMode(): [DocsViewMode, (mode: DocsViewMode) => void] {
+export function useDocsViewMode(): [
+	DocsViewMode,
+	(mode: DocsViewMode) => void,
+] {
 	const [mode, setMode] = useState<DocsViewMode>("desktop");
 
 	useEffect(() => {
@@ -57,9 +60,7 @@ export function useDocsViewMode(): [DocsViewMode, (mode: DocsViewMode) => void] 
 		setMode(next);
 		try {
 			localStorage.setItem(STORAGE_KEY, next);
-			window.dispatchEvent(
-				new CustomEvent(CHANGE_EVENT, { detail: next }),
-			);
+			window.dispatchEvent(new CustomEvent(CHANGE_EVENT, { detail: next }));
 		} catch {}
 	}, []);
 

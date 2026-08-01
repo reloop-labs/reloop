@@ -2,9 +2,9 @@ import { authMiddleware } from "@reloop/api-key/middleware/auth";
 import { rateLimitPlugin } from "@reloop/api-key/middleware/rate-limit";
 import { ApiKeyModel } from "@reloop/api-key/model/api-key.model";
 import { auditLogHook } from "@reloop/api-key/utils/audit-log";
+import { createApiKeyXCodeSamples } from "@reloop/code-samples/api-key";
 import { Elysia } from "elysia";
 import { createApiKeyController } from "./create-api-key.controllers";
-import { createApiKeyXCodeSamples } from "@reloop/code-samples/api-key";
 
 export const createApiKeyRoute = new Elysia()
 	.use(authMiddleware)

@@ -8,7 +8,9 @@ type AnimatedWorkspaceIconProps = {
  * Workspace building: outline builds bottom→top, then windows appear.
  * Place inside an element with the `group` class.
  */
-export function AnimatedWorkspaceIcon({ className }: AnimatedWorkspaceIconProps) {
+export function AnimatedWorkspaceIcon({
+	className,
+}: AnimatedWorkspaceIconProps) {
 	return (
 		<svg
 			viewBox="0 0 512 512"

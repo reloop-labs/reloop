@@ -1,16 +1,7 @@
-import { useRouter } from "next/navigation";
-import { useSignOut } from "#/features/auth/session-query";
-import {
-	filterSettingsNavigation,
-	mainNavigation,
-	settingsNavigation,
-} from "#/features/dashboard/navigation";
-import { useOrgPermissions } from "#/features/settings/use-org-permissions";
 import { cn } from "@reloop/ui/cn";
 import * as CommandMenu from "@reloop/ui/command";
 import { Icon } from "@reloop/ui/icon";
 import { KbdKeyOutline } from "@reloop/ui/kbd-key-outline";
-
 import {
 	ArrowDown,
 	ArrowUp,
@@ -19,9 +10,17 @@ import {
 	Search,
 	X,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import * as React from "react";
 import { useHotkeys } from "react-hotkeys-hook";
+import { useSignOut } from "#/features/auth/session-query";
+import {
+	filterSettingsNavigation,
+	mainNavigation,
+	settingsNavigation,
+} from "#/features/dashboard/navigation";
+import { useOrgPermissions } from "#/features/settings/use-org-permissions";
 
 const RECENT_ITEMS_KEY = "reloop-cmd-recents";
 const MAX_RECENTS = 5;
@@ -103,7 +102,8 @@ export function CommandMenuGlobal() {
 				canManageTeam,
 			}).flatMap((section) => section.items),
 		[isOrgAdmin, canManageTeam],
-	);	useHotkeys("mod+k", (e) => {
+	);
+	useHotkeys("mod+k", (e) => {
 		e.preventDefault();
 		setOpen((o) => !o);
 	});
@@ -227,9 +227,9 @@ export function CommandMenuGlobal() {
 		<CommandMenu.Dialog
 			open={open}
 			onOpenChange={setOpen}
-			className="max-h-[min(520px,80vh)]"
+			className="max-h-[min(480px,80vh)]"
 		>
-			<div className="group/cmd-input flex h-12 w-full items-center gap-2.5 bg-bg-white-0 px-4">
+			<div className="group/cmd-input flex h-13 w-full items-center gap-3 border-stroke-soft-200 border-b bg-bg-white-0 px-4 dark:border-white/10">
 				<Search
 					className={cn(
 						"size-4 shrink-0 text-text-soft-400",
@@ -241,7 +241,7 @@ export function CommandMenuGlobal() {
 					ref={inputRef}
 					value={search}
 					onValueChange={setSearch}
-					placeholder="Search pages, commands, actions..."
+					placeholder="Search pages and actions..."
 				/>
 				{search ? (
 					<button
@@ -252,12 +252,9 @@ export function CommandMenuGlobal() {
 						<X className="size-3.5" />
 					</button>
 				) : null}
-				<span className="ml-1 flex shrink-0 items-center gap-0.5">
-					<KbdKeyOutline className="h-5 w-auto px-1 font-sans text-[10px]">
-						<span className="text-[10px]">⌘</span>
-					</KbdKeyOutline>
-					<KbdKeyOutline className="h-5 w-auto px-1 font-sans text-[10px]">
-						K
+				<span className="ml-1 flex shrink-0 items-center gap-1">
+					<KbdKeyOutline className="h-5 w-auto px-1.5 font-sans text-[11px] text-text-soft-400">
+						Esc
 					</KbdKeyOutline>
 				</span>
 			</div>
@@ -384,7 +381,7 @@ export function CommandMenuGlobal() {
 				</CommandMenu.Group>
 			</CommandMenu.List>
 
-			<CommandMenu.Footer className="border-stroke-soft-200 border-t">
+			<CommandMenu.Footer>
 				<div className="flex items-center gap-4">
 					<div className="flex items-center gap-1.5">
 						<CommandMenu.FooterKeyBox>
@@ -403,7 +400,7 @@ export function CommandMenuGlobal() {
 					</div>
 					<div className="flex items-center gap-1.5">
 						<CommandMenu.FooterKeyBox>
-							<span className="font-medium text-[9px]">esc</span>
+							<span className="font-medium font-sans text-[10px]">esc</span>
 						</CommandMenu.FooterKeyBox>
 						<span className="text-[11px] text-text-soft-400">Close</span>
 					</div>

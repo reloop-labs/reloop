@@ -1,5 +1,5 @@
-import { BusEvent, bus } from "@reloop/bus";
 import type { DnsConfigRequestedPayload } from "@reloop/bus";
+import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { emailConfig } from "@reloop/email/email.config";
@@ -78,9 +78,7 @@ function groupDnsConfigRecords(records: DnsConfigRecord[]) {
 		if (purposeOf(r) === "tracking") return true;
 		// Tracking host is a CNAME; never treat DKIM selectors as tracking.
 		if (isDkim(r)) return false;
-		return (
-			kindOf(r) === "CNAME" || r.type.toUpperCase() === "CNAME"
-		);
+		return kindOf(r) === "CNAME" || r.type.toUpperCase() === "CNAME";
 	};
 
 	const dkimRecords = records.filter(isDkim).map(toEmailRecord);

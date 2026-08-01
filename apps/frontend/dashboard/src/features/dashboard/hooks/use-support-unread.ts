@@ -1,10 +1,10 @@
-import { useSupportSocket } from "#/features/dashboard/hooks/use-support-socket";
-import type { SupportServerEvent } from "#/lib/support-types";
-import { queryKeys } from "#/lib/query-keys";
-import { useUIStore } from "#/store/use-ui-store";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { useCallback, useEffect, useState } from "react";
+import { useSupportSocket } from "#/features/dashboard/hooks/use-support-socket";
+import { queryKeys } from "#/lib/query-keys";
+import type { SupportServerEvent } from "#/lib/support-types";
+import { useUIStore } from "#/store/use-ui-store";
 
 async function fetchUnreadCount() {
 	const { data } = await axios.get<{ count: number }>(

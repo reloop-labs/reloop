@@ -166,11 +166,13 @@ export function DomainDropdown({
 										}
 									}}
 									className={cn(
-										"relative flex w-full cursor-pointer items-center gap-2 overflow-hidden rounded-lg px-2 py-1.5 font-normal text-xs transition-colors min-h-[28px]",
+										"relative flex min-h-[28px] w-full cursor-pointer items-center gap-2 overflow-hidden rounded-lg px-2 py-1.5 font-normal text-xs transition-colors",
 										item.isDanger ? "text-error-base" : "text-text-strong-950",
 										!currentRect &&
 											hoverIdx === idx &&
-											(item.isDanger ? "bg-red-alpha-10" : "bg-neutral-alpha-10"),
+											(item.isDanger
+												? "bg-red-alpha-10"
+												: "bg-neutral-alpha-10"),
 									)}
 								>
 									{isCopyName || isCopyId ? (

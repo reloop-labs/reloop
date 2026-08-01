@@ -1,13 +1,13 @@
-import { StripeSecret } from "#/features/webhooks/components/blurred-secret";
-import type { WebhookDetailData } from "#/features/webhooks/hooks/use-webhooks-query";
-import { getAvatarGradient, getAvatarInitial } from "#/utils/avatar";
-import { formatRelativeTime } from "#/utils/format-relative-time";
 import * as Avatar from "@reloop/ui/avatar";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import * as Tooltip from "@reloop/ui/tooltip";
 import { useCallback, useState } from "react";
+import { StripeSecret } from "#/features/webhooks/components/blurred-secret";
+import type { WebhookDetailData } from "#/features/webhooks/hooks/use-webhooks-query";
+import { getAvatarGradient, getAvatarInitial } from "#/utils/avatar";
+import { formatRelativeTime } from "#/utils/format-relative-time";
 
 function CopyButton({
 	value,
@@ -361,7 +361,9 @@ export function WebhookMetaGrid({
 			/>
 			<DetailRow
 				label="Created"
-				value={webhook.createdAt ? new Date(webhook.createdAt).toISOString() : ""}
+				value={
+					webhook.createdAt ? new Date(webhook.createdAt).toISOString() : ""
+				}
 				displayValue={
 					webhook.createdAt ? formatRelativeTime(webhook.createdAt) : "—"
 				}
@@ -401,9 +403,7 @@ export function WebhookMetaGrid({
 								)}
 							</Avatar.Root>
 							<span className="truncate font-medium text-sm text-text-strong-950">
-								{webhook.createdBy.name ||
-									webhook.createdBy.email ||
-									"Unknown"}
+								{webhook.createdBy.name || webhook.createdBy.email || "Unknown"}
 							</span>
 						</>
 					) : (
@@ -415,7 +415,9 @@ export function WebhookMetaGrid({
 			</div>
 			<DetailRow
 				label="Updated"
-				value={webhook.updatedAt ? new Date(webhook.updatedAt).toISOString() : ""}
+				value={
+					webhook.updatedAt ? new Date(webhook.updatedAt).toISOString() : ""
+				}
 				displayValue={
 					webhook.updatedAt ? formatRelativeTime(webhook.updatedAt) : "—"
 				}

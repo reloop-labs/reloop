@@ -9,9 +9,9 @@ import {
 import type { Property } from "#/features/contacts/hooks/use-contacts-query";
 import {
 	isPropertyTarget,
+	type MappingRowTarget,
 	propertyTargetName,
 	toPropertyTarget,
-	type MappingRowTarget,
 } from "../../utils/property-mapping";
 import { EMPTY_VALUE, TABLE_SELECT_TRIGGER_CLASS } from "./constants";
 import { CreatePropertyForm } from "./create-property-form";

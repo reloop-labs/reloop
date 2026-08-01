@@ -61,11 +61,15 @@ export async function getOverviewController() {
 		db
 			.select({ value: count() })
 			.from(domain)
-			.where(and(eq(domain.status, "active"), sql`${domain.deletedAt} IS NULL`)),
+			.where(
+				and(eq(domain.status, "active"), sql`${domain.deletedAt} IS NULL`),
+			),
 		db
 			.select({ value: count() })
 			.from(domain)
-			.where(and(eq(domain.status, "failed"), sql`${domain.deletedAt} IS NULL`)),
+			.where(
+				and(eq(domain.status, "failed"), sql`${domain.deletedAt} IS NULL`),
+			),
 		db
 			.select({ value: count() })
 			.from(domain)
@@ -80,7 +84,10 @@ export async function getOverviewController() {
 			.select({ value: count() })
 			.from(emailLog)
 			.where(
-				and(eq(emailLog.status, "bounced"), gte(emailLog.createdAt, startOfDay)),
+				and(
+					eq(emailLog.status, "bounced"),
+					gte(emailLog.createdAt, startOfDay),
+				),
 			),
 		db
 			.select({ value: count() })

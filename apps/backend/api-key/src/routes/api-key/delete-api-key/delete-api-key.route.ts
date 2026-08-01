@@ -2,9 +2,9 @@ import { authMiddleware } from "@reloop/api-key/middleware/auth";
 import { rateLimitPlugin } from "@reloop/api-key/middleware/rate-limit";
 import { ApiKeyModel } from "@reloop/api-key/model/api-key.model";
 import { auditLogHook } from "@reloop/api-key/utils/audit-log";
+import { deleteApiKeyXCodeSamples } from "@reloop/code-samples/api-key";
 import { Elysia, t } from "elysia";
 import { deleteApiKeyController } from "./delete-api-key.controllers";
-import { deleteApiKeyXCodeSamples } from "@reloop/code-samples/api-key";
 
 export const deleteApiKeyRoute = new Elysia()
 	.use(authMiddleware)

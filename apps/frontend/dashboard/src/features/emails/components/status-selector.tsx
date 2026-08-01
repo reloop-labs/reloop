@@ -1,3 +1,5 @@
+import { cn } from "@reloop/ui/cn";
+import { Icon } from "@reloop/ui/icon";
 import {
 	Select,
 	SelectContent,
@@ -5,8 +7,6 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "#/features/api-keys/filters/base-ui-select";
-import { cn } from "@reloop/ui/cn";
-import { Icon } from "@reloop/ui/icon";
 
 export type EmailStatus =
 	| "delivered"

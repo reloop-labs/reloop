@@ -1,4 +1,3 @@
-import type { Group } from "#/features/contacts/hooks/use-contacts-query";
 import * as Avatar from "@reloop/ui/avatar";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
@@ -6,6 +5,7 @@ import * as Label from "@reloop/ui/label";
 import { useQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "motion/react";
 import { useMemo, useRef, useState } from "react";
+import type { Group } from "#/features/contacts/hooks/use-contacts-query";
 
 interface GroupSelectProps {
 	selectedGroupIds: string[];
@@ -108,7 +108,7 @@ export const GroupSelect = ({
 			<div className="relative">
 				<label
 					className={cn(
-						"group/chips flex min-h-[42px] cursor-text flex-wrap content-start gap-1.5 rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-3 py-2 transition duration-200 ease-out focus-within:border-stroke-strong-950 focus-within:shadow-xs hover:[&:not(:focus-within)]:bg-bg-weak-50/50 dark:border-stroke-soft-100/40",
+						"group/chips flex min-h-[42px] cursor-text flex-wrap content-start gap-1.5 rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-3 py-2 transition duration-200 ease-out focus-within:border-stroke-strong-950 focus-within:shadow-xs dark:border-stroke-soft-100/40 hover:[&:not(:focus-within)]:bg-bg-weak-50/50",
 						disabled && "pointer-events-none opacity-50",
 					)}
 				>

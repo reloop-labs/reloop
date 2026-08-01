@@ -5,7 +5,7 @@ export const term: GlossaryTermDefinition = {
 	title: "Opt-out",
 	description:
 		"The person's choice to stop receiving a class of mail, via unsubscribe or similar controls.",
-	keywords: ["email opt-out","unsubscribe opt out"],
+	keywords: ["email opt-out", "unsubscribe opt out"],
 	body: `Opt-out is the counterpart to opt-in: the person no longer wants that mail stream. Honor it quickly across every system that might send (ESP, CRM, lifecycle tools). Partial opt-out that still sends partner blasts is how trust ends.
 
 Make the action easy. Hidden unsubscribe links raise spam complaints. Confirm the change and apply it to suppressions that every sender path checks.

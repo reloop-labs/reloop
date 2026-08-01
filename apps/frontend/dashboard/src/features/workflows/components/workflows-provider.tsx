@@ -1,7 +1,5 @@
 "use client";
 
-import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
-import { queryKeys } from "#/lib/query-keys";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
 	createContext,
@@ -10,6 +8,8 @@ import {
 	useContext,
 	useMemo,
 } from "react";
+import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
+import { queryKeys } from "#/lib/query-keys";
 import {
 	activateAutomation,
 	createAutomation,
@@ -38,9 +38,7 @@ interface WorkflowsContextValue {
 	) => Promise<Workflow>;
 	updateWorkflow: (
 		id: string,
-		patch: Partial<
-			Pick<Workflow, "name" | "description" | "nodes" | "edges">
-		>,
+		patch: Partial<Pick<Workflow, "name" | "description" | "nodes" | "edges">>,
 	) => Promise<void>;
 	setWorkflowGraph: (
 		id: string,

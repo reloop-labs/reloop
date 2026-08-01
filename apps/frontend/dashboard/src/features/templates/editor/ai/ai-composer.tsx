@@ -113,7 +113,10 @@ export function AiComposer({
 									className="absolute inset-0 flex items-center justify-center bg-bg-strong-950/50 opacity-0 transition-opacity group-hover:opacity-100"
 									aria-label={`Remove ${a.name}`}
 								>
-									<Icon name="cross" className="h-3.5 w-3.5 text-static-white" />
+									<Icon
+										name="cross"
+										className="h-3.5 w-3.5 text-static-white"
+									/>
 								</button>
 							</div>
 						))}

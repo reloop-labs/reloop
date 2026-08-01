@@ -1,21 +1,17 @@
-import Link from "next/link";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import * as StatusBadge from "@reloop/ui/status-badge";
 import { Skeleton } from "@reloop/ui/skeleton";
+import * as StatusBadge from "@reloop/ui/status-badge";
+import Link from "next/link";
+import { useDomainsQuery } from "#/features/domain/hooks/use-domains-query";
+import type { DomainStatus } from "#/features/domain/types";
 import {
 	getStatusColorClass,
 	getStatusIcon,
 	getStatusLabel,
 } from "#/features/domain/utils";
-import type { DomainStatus } from "#/features/domain/types";
-import { useDomainsQuery } from "#/features/domain/hooks/use-domains-query";
-import {
-	HomeCardBody,
-	HomeCardHeader,
-	HomeCardShell,
-} from "./home-card-shell";
+import { HomeCardBody, HomeCardHeader, HomeCardShell } from "./home-card-shell";
 
 function statusBadgeStatus(
 	status: DomainStatus,

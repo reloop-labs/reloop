@@ -33,7 +33,9 @@ async function parseJson<T>(res: Response): Promise<T> {
 		why?: string;
 	};
 	if (!res.ok) {
-		throw new Error(data.why || data.message || `Request failed (${res.status})`);
+		throw new Error(
+			data.why || data.message || `Request failed (${res.status})`,
+		);
 	}
 	return data;
 }

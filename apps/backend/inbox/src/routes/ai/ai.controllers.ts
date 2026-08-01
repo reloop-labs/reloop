@@ -116,9 +116,7 @@ function compactThreadForPrompt(input: {
 
 	const lines: string[] = [
 		writingAs ? `Writing as: ${writingAs}` : null,
-		input.mailbox?.email
-			? `Our mailbox email: ${input.mailbox.email}`
-			: null,
+		input.mailbox?.email ? `Our mailbox email: ${input.mailbox.email}` : null,
 		input.mailbox?.displayName
 			? `Our display name: ${input.mailbox.displayName}`
 			: null,

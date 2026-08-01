@@ -8,14 +8,14 @@ import { decryptSecret } from "@reloop/db";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import {
-	WEBHOOK_DISABLE_AFTER_CONSECUTIVE_FAILURES,
-	WEBHOOK_RESPONSE_BODY_MAX_CHARS,
 	buildDeliveryHeaders,
 	buildWebhookEnvelope,
 	getWebhookRetryDelayMs,
 	postWebhook,
 	serializeWebhookEnvelope,
 	signWebhookBody,
+	WEBHOOK_DISABLE_AFTER_CONSECUTIVE_FAILURES,
+	WEBHOOK_RESPONSE_BODY_MAX_CHARS,
 	type WebhookHttpError,
 } from "@reloop/webhook-delivery";
 import { eq, sql } from "drizzle-orm";
@@ -154,7 +154,11 @@ export async function processWebhookDelivery({
 	} catch (err) {
 		const e = err instanceof Error ? err : new Error(String(err));
 		const durationMs = isHttpError(err) ? err.durationMs : 0;
-		result = { ok: false, error: e as Error & Partial<WebhookHttpError>, durationMs };
+		result = {
+			ok: false,
+			error: e as Error & Partial<WebhookHttpError>,
+			durationMs,
+		};
 	}
 
 	if (!result.ok) {
@@ -257,7 +261,8 @@ export async function processWebhookDelivery({
 			requestHeaders: headers,
 			requestBody: requestBodyJson,
 			durationMs: result.durationMs,
-			completedAt: status === "success" || status === "failed" ? new Date() : null,
+			completedAt:
+				status === "success" || status === "failed" ? new Date() : null,
 			lastAttemptAt: new Date(),
 			nextRetryAt,
 			errorMessage: succeeded
@@ -339,8 +344,7 @@ async function recordTerminalWebhookOutcome({
 		.where(eq(schema.webhook.id, webhookId))
 		.returning({ consecutiveFailures: schema.webhook.consecutiveFailures });
 
-	const consecutive =
-		updatedWebhookResult[0]?.consecutiveFailures ?? 0;
+	const consecutive = updatedWebhookResult[0]?.consecutiveFailures ?? 0;
 
 	if (!succeeded && consecutive >= WEBHOOK_DISABLE_AFTER_CONSECUTIVE_FAILURES) {
 		log.warn({

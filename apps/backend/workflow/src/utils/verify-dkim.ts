@@ -1,5 +1,5 @@
-import { isLocal } from "./is-local";
 import { resolver } from "./dns-resolver";
+import { isLocal } from "./is-local";
 
 export async function verifyDkimRecord(
 	name: string,

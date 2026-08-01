@@ -1,8 +1,8 @@
-import Link from "next/link";
-import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import { Icon } from "@reloop/ui/icon";
 import { ArrowRight } from "lucide-react";
+import Link from "next/link";
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import { useSWR } from "#/features/home/lib/use-swr-compat";
 
 const ActivityAreaChart = lazy(() =>
@@ -105,13 +105,19 @@ export function ActivityChartCard() {
 		<div className="group flex w-full flex-col">
 			{/* Header */}
 			<div className="flex items-center justify-between rounded-t-2xl border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-5 pt-1.5 pb-3 dark:border-white/5 dark:bg-white/[0.02]">
-				<Link href="/emails" className="flex items-center gap-2 font-medium text-sm text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white">
+				<Link
+					href="/emails"
+					className="flex items-center gap-2 font-medium text-sm text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white"
+				>
 					<Icon name="fat-row" className="h-4 w-4 shrink-0" />
 					<span>Activity</span>
 				</Link>
 
 				<div className="flex items-center gap-1.5">
-					<Link href="/emails" className="flex h-7 w-7 shrink-0 items-center justify-center text-text-sub-600 transition-transform hover:translate-x-0.5 hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white">
+					<Link
+						href="/emails"
+						className="flex h-7 w-7 shrink-0 items-center justify-center text-text-sub-600 transition-transform hover:translate-x-0.5 hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white"
+					>
 						<ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
 					</Link>
 				</div>

@@ -39,7 +39,7 @@ export function DiffViewer({
 							<span className="font-bold text-[10px] text-success-base uppercase tracking-wider">
 								Current
 							</span>
-							<p className="mt-1 break-words font-mono text-success-dark text-paragraph-xs">
+							<p className="mt-1 break-words font-mono text-paragraph-xs text-success-dark">
 								{newSubject || "(No subject set)"}
 							</p>
 						</div>

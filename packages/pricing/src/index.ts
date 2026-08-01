@@ -342,7 +342,11 @@ export const comparisonSections: ComparisonSection[] = [
 		title: "Deliverability",
 		rows: [
 			{ label: "SPF / DKIM / DMARC", key: "emailAuth", type: "boolean" },
-			{ label: "Pristine shared IPs", key: "pristineSharedIps", type: "boolean" },
+			{
+				label: "Pristine shared IPs",
+				key: "pristineSharedIps",
+				type: "boolean",
+			},
 			{ label: "Dedicated IP", key: "dedicatedIp", type: "text" },
 			{ label: "Spam testing", key: "spamTesting", type: "boolean" },
 			{
@@ -355,7 +359,11 @@ export const comparisonSections: ComparisonSection[] = [
 	{
 		title: "Analytics",
 		rows: [
-			{ label: "Delivery analytics", key: "deliveryAnalytics", type: "boolean" },
+			{
+				label: "Delivery analytics",
+				key: "deliveryAnalytics",
+				type: "boolean",
+			},
 			{
 				label: "Open & click tracking",
 				key: "openClickTracking",
@@ -380,9 +388,7 @@ export const comparisonSections: ComparisonSection[] = [
 	},
 	{
 		title: "Security & Compliance",
-		rows: [
-			{ label: "Uptime SLA Guarantee", key: "uptimeSla", type: "text" },
-		],
+		rows: [{ label: "Uptime SLA Guarantee", key: "uptimeSla", type: "text" }],
 	},
 ];
 

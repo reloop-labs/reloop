@@ -22,8 +22,6 @@ export function buildWebhookEnvelope(input: {
 }
 
 /** Serialize envelope to the exact JSON body string used for signing and POST. */
-export function serializeWebhookEnvelope(
-	envelope: WebhookEnvelope,
-): string {
+export function serializeWebhookEnvelope(envelope: WebhookEnvelope): string {
 	return JSON.stringify(envelope);
 }

@@ -1,9 +1,9 @@
-import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
 import { useRef, useState } from "react";
+import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 
 export type WebhookHeaderMenuAction =
 	| "edit"

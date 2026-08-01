@@ -1,6 +1,3 @@
-import { useRouter } from "next/navigation";
-import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
-import { formatRelativeTime } from "#/utils/format-relative-time";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
@@ -10,11 +7,13 @@ import {
 	Trigger as PopoverTrigger,
 } from "@reloop/ui/popover";
 import * as Tooltip from "@reloop/ui/tooltip";
-
 import axios from "axios";
+import { useRouter } from "next/navigation";
 import { useQueryState } from "nuqs";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
+import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
+import { formatRelativeTime } from "#/utils/format-relative-time";
 import { DeleteWebhookModal } from "./delete-webhook-modal";
 
 import { EmptyState } from "./empty-state";
@@ -44,8 +43,7 @@ interface WebhookTableProps {
 	onDeleteSuccess?: (deletedName: string) => void;
 }
 
-const GRID =
-	"grid-cols-[minmax(0,1fr)_100px_110px_120px_minmax(40px,auto)]";
+const GRID = "grid-cols-[minmax(0,1fr)_100px_110px_120px_minmax(40px,auto)]";
 
 const getStatusColorClass = (status: string) => {
 	switch (status) {
@@ -128,10 +126,7 @@ interface WebhookActionsDropdownProps {
 	onEdit: (id: string) => void;
 	onCopyUrl: (url: string) => void;
 	onCopyId: (id: string) => void;
-	onSetStatus: (
-		id: string,
-		status: "active" | "paused" | "disabled",
-	) => void;
+	onSetStatus: (id: string, status: "active" | "paused" | "disabled") => void;
 	onDelete: (id: string) => void;
 	onOpenChange?: (open: boolean) => void;
 }
@@ -293,9 +288,7 @@ const WebhookActionsDropdown = ({
 									}
 									className={cn(
 										"flex w-full cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 font-medium text-xs transition-colors",
-										item.isDanger
-											? "text-error-base"
-											: "text-text-strong-950",
+										item.isDanger ? "text-error-base" : "text-text-strong-950",
 										!currentRect &&
 											hoverIdx === idx &&
 											(item.isDanger
@@ -349,8 +342,7 @@ export const WebhookTable = ({
 	const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
 	const [deleteId, setDeleteId] = useQueryState("delete");
 	const [isTogglingStatus, setIsTogglingStatus] = useState<string | null>(null);
-	const isFiltered =
-		searchQuery.trim() !== "" || statusFilter !== "all";
+	const isFiltered = searchQuery.trim() !== "" || statusFilter !== "all";
 
 	const goToDetail = (webhookId: string) => {
 		router.push(`/webhooks/${webhookId}`);
@@ -404,7 +396,7 @@ export const WebhookTable = ({
 			toast.success(`Webhook ${labels[nextStatus]} successfully`);
 			onMutate?.();
 		} catch {
-			toast.error(`Failed to update webhook status`);
+			toast.error("Failed to update webhook status");
 		} finally {
 			setIsTogglingStatus(null);
 		}

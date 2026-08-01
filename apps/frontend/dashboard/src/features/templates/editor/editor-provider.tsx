@@ -4,9 +4,9 @@ import {
 	defaultSlashCommands,
 	SlashCommand,
 } from "@react-email/editor/ui";
+import { Icon } from "@reloop/ui/icon";
 import { generateJSON } from "@tiptap/html";
 import { EditorContext } from "@tiptap/react";
-import { Icon } from "@reloop/ui/icon";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { AnimatedBackButton } from "#/features/dashboard/animated-back-button";

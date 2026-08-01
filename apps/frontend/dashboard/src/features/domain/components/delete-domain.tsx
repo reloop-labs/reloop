@@ -1,19 +1,18 @@
-import { useRouter, usePathname } from "next/navigation";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
-
 import axios from "axios";
 import {
 	AnimatePresence,
+	type AnimationPlaybackControls,
 	animate,
 	motion,
 	useMotionValue,
-	type AnimationPlaybackControls,
 } from "framer-motion";
+import { usePathname, useRouter } from "next/navigation";
 import { useQueryState } from "nuqs";
 import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
@@ -221,7 +220,7 @@ export function DeleteDomainModal({
 					>
 						{/* Hold progress overlay fill */}
 						<motion.div
-							className="pointer-events-none absolute inset-0 bg-white/25 origin-left"
+							className="pointer-events-none absolute inset-0 origin-left bg-white/25"
 							style={{ scaleX: holdProgress }}
 						/>
 

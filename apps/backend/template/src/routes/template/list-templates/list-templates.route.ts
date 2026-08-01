@@ -1,9 +1,9 @@
 import { ErrorResponseSchema } from "@be/template/error/template.error";
 import { authMiddleware } from "@be/template/middleware/auth";
 import { templateResponseSchema } from "@be/template/model/template.model";
+import { listTemplatesXCodeSamples } from "@reloop/code-samples/template";
 import { Elysia, t } from "elysia";
 import { listTemplates } from "./list-templates.controllers";
-import { listTemplatesXCodeSamples } from "@reloop/code-samples/template";
 
 export const listTemplatesRoute = new Elysia().use(authMiddleware).get(
 	"/list",

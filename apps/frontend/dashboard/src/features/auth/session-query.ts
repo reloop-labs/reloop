@@ -1,4 +1,3 @@
-import { useRouter } from "next/navigation";
 import { authClient } from "@reloop/auth/client";
 import {
 	type QueryClient,
@@ -6,6 +5,7 @@ import {
 	useQuery,
 	useQueryClient,
 } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 
 import { useCallback } from "react";
 import { queryKeys } from "#/lib/query-keys";

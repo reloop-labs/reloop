@@ -173,9 +173,7 @@ export async function receiveInboundEmailController(rawMessage: string) {
 				columns: { id: true, threadId: true },
 			});
 			if (existingInbound) {
-				log.info(
-					`[INBOX] Duplicate email skipped for messageId: ${messageId}`,
-				);
+				log.info(`[INBOX] Duplicate email skipped for messageId: ${messageId}`);
 				return { id: existingInbound.id, threadId: existingInbound.threadId };
 			}
 		}

@@ -1,5 +1,5 @@
-import { useRouter } from "next/navigation";
 import { Skeleton } from "@reloop/ui/skeleton";
+import { useRouter } from "next/navigation";
 
 import { parseAsString, useQueryState } from "nuqs";
 import type React from "react";

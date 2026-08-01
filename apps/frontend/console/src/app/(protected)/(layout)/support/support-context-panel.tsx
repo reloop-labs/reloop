@@ -250,7 +250,7 @@ export function SupportContextPanel({
 	};
 
 	return (
-		<aside className="flex w-[300px] shrink-0 flex-col overflow-hidden border-stroke-soft-100 border-l bg-bg-weak-50/50 dark:border-stroke-soft-100/40 dark:bg-black/20 xl:w-[320px]">
+		<aside className="flex w-[300px] shrink-0 flex-col overflow-hidden border-stroke-soft-100 border-l bg-bg-weak-50/50 xl:w-[320px] dark:border-stroke-soft-100/40 dark:bg-black/20">
 			{/* Customer identity */}
 			<div className="border-stroke-soft-100 border-b bg-bg-white-0 px-4 py-4 dark:border-stroke-soft-100/40 dark:bg-[#0c0c0c]">
 				<div className="flex items-start gap-3">
@@ -279,9 +279,7 @@ export function SupportContextPanel({
 							<Copy className="h-3 w-3 shrink-0 opacity-60" />
 						</button>
 						<div className="mt-2 flex flex-wrap gap-1.5">
-							<StatusPill
-								status={user?.banned ? "banned" : "active"}
-							/>
+							<StatusPill status={user?.banned ? "banned" : "active"} />
 							{isPlatformAdmin ? (
 								<StatusPill status="super-admin" />
 							) : (
@@ -330,7 +328,7 @@ export function SupportContextPanel({
 										: formatNumber(balance)}
 							</p>
 							{lowCredits ? (
-								<p className="mt-0.5 text-[10px] font-medium text-orange-700 dark:text-orange-400">
+								<p className="mt-0.5 font-medium text-[10px] text-orange-700 dark:text-orange-400">
 									Low balance
 								</p>
 							) : null}
@@ -555,7 +553,9 @@ export function SupportContextPanel({
 							className="flex h-9 w-full items-center justify-center gap-2 rounded-xl border border-stroke-soft-200 bg-bg-white-0 font-medium text-[12px] text-text-strong-950 transition-colors hover:bg-bg-weak-50 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-transparent"
 						>
 							<Ban className="h-3.5 w-3.5 text-text-sub-600" />
-							{org?.status === "suspended" ? "Org already suspended" : "Suspend org"}
+							{org?.status === "suspended"
+								? "Org already suspended"
+								: "Suspend org"}
 						</button>
 					)}
 				</div>

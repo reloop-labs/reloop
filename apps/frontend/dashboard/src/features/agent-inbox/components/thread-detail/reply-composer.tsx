@@ -12,12 +12,12 @@ import { extractBareEmail, extractDisplayName } from "../../lib/email-address";
 import { plainToHtml } from "../../lib/plain-to-html";
 import { readAiTextStreamAfterThink } from "../../lib/read-ai-text-stream-after-think";
 import type { ComposeDraftKind } from "../../types";
+import { AiComposerSlot } from "../compose/ai-composer-slot";
 import {
 	type AiDraftPhase,
 	isAiDraftActive,
 	isAiDraftBusy,
 } from "../compose/ai-draft-phase";
-import { AiComposerSlot } from "../compose/ai-composer-slot";
 import { AiSparkleButton } from "../compose/ai-sparkle-button";
 import {
 	type ComposeAttachment,
@@ -402,7 +402,7 @@ export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
 						isDragActive &&
 							(variant === "inline"
 								? "ring-2 ring-mail-primary/40"
-								: "ring-2 ring-inset ring-mail-foreground/20"),
+								: "ring-2 ring-mail-foreground/20 ring-inset"),
 					)}
 				>
 					<input {...getInputProps()} />
@@ -461,10 +461,7 @@ export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
 							onUpdate={(html, text) => {
 								setHtmlBody(html);
 								setTextBody(text);
-								if (
-									aiPhaseRef.current === "review" &&
-									reviewArmedRef.current
-								) {
+								if (aiPhaseRef.current === "review" && reviewArmedRef.current) {
 									acceptAiDraft();
 								}
 							}}

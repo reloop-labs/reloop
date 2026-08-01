@@ -169,7 +169,10 @@ export function threadMatchesFilters(
 ): boolean {
 	if (filters.includes("unread") && !thread.unread) return false;
 	if (filters.includes("starred") && !thread.isStarred) return false;
-	if (filters.includes("needs_approval") && thread.status !== "needs_approval") {
+	if (
+		filters.includes("needs_approval") &&
+		thread.status !== "needs_approval"
+	) {
 		return false;
 	}
 	if (
@@ -211,9 +214,7 @@ export function mergeFilterParam(
 	current: string,
 	toggle: InboxFilterChip,
 ): string | null {
-	const set = new Set(
-		current.split(",").filter(Boolean) as InboxFilterChip[],
-	);
+	const set = new Set(current.split(",").filter(Boolean) as InboxFilterChip[]);
 	if (set.has(toggle)) set.delete(toggle);
 	else set.add(toggle);
 	const next = Array.from(set);

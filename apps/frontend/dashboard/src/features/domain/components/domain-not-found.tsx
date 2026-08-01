@@ -1,7 +1,7 @@
-import Link from "next/link";
-import { useRouter } from "next/navigation";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 import { useHotkeys } from "react-hotkeys-hook";
 
@@ -38,7 +38,9 @@ export function DomainNotFound() {
 					<Icon name="arrow-left" className="h-4 w-4" />
 					Back to domains
 				</Button.Root>
-				<Link href="/domain/add" className={`${Button.buttonVariants({ variant: "neutral", mode: "stroke", size: "xsmall" }).root()} gap-2 rounded-lg`}
+				<Link
+					href="/domain/add"
+					className={`${Button.buttonVariants({ variant: "neutral", mode: "stroke", size: "xsmall" }).root()} gap-2 rounded-lg`}
 				>
 					<Icon name="plus" className="h-4 w-4" />
 					Add domain

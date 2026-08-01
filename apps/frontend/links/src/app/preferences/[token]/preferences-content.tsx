@@ -249,7 +249,11 @@ export function PreferencesContent({
 						className="w-full justify-center py-3 font-semibold"
 					>
 						{saveState === "saving" && (
-							<FancyButton.Icon as={Icon} name="spinner" className="animate-spin" />
+							<FancyButton.Icon
+								as={Icon}
+								name="spinner"
+								className="animate-spin"
+							/>
 						)}
 						{saveState === "saved"
 							? "✓ Updated Preferences"
@@ -272,7 +276,9 @@ export function PreferencesContent({
 						type="button"
 						onClick={handleUnsubscribeAll}
 						disabled={unsubscribeAllState === "loading"}
-						variant={unsubscribeAllState === "confirming" ? "destructive" : "basic"}
+						variant={
+							unsubscribeAllState === "confirming" ? "destructive" : "basic"
+						}
 						size="medium"
 						className={cn(
 							"w-full justify-center py-3 font-semibold",

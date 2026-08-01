@@ -1,11 +1,11 @@
+import { AutomationErrors } from "@be/workflow/error/automation.error-response";
 import {
 	extractTriggerEvent,
 	validateAutomationGraph,
 } from "@be/workflow/lib/automation/graph";
-import { AutomationErrors } from "@be/workflow/error/automation.error-response";
 import { mapAutomation } from "@be/workflow/routes/automation/automation.mappers";
-import type { AutomationGraph } from "@reloop/db/schema";
 import { db } from "@reloop/db/client";
+import type { AutomationGraph } from "@reloop/db/schema";
 import * as schema from "@reloop/db/schema";
 import { and, desc, eq, isNull } from "drizzle-orm";
 import { log } from "evlog";
@@ -31,7 +31,9 @@ export async function activateAutomationController(params: {
 	}
 
 	const triggerEvent =
-		validation.triggerEvent ?? extractTriggerEvent(graph) ?? existing.triggerEvent;
+		validation.triggerEvent ??
+		extractTriggerEvent(graph) ??
+		existing.triggerEvent;
 	if (!triggerEvent) {
 		throw AutomationErrors.cannotActivate(
 			"Select a custom event as the trigger.",

@@ -165,8 +165,8 @@ export const DomainVerifiedEmail = ({
 							{capabilitySummary ? ` for ${capabilitySummary}` : ""}.{" "}
 							{isSendingEmailEnabled ? (
 								<>
-									You can start sending emails from{" "}
-									<strong>{domain}</strong> right now.
+									You can start sending emails from <strong>{domain}</strong>{" "}
+									right now.
 								</>
 							) : (
 								<>

@@ -35,9 +35,7 @@ export async function updateCustomEventController(params: {
 	if (params.name !== undefined) patch.name = params.name.trim();
 	if (params.description !== undefined) {
 		patch.description =
-			params.description === null
-				? null
-				: params.description.trim() || null;
+			params.description === null ? null : params.description.trim() || null;
 	}
 
 	try {
@@ -48,10 +46,9 @@ export async function updateCustomEventController(params: {
 			.returning();
 		if (!row) throw CustomEventErrors.updateFailed();
 
-		let propertyRows =
-			await db.query.customEventProperty.findMany({
-				where: eq(schema.customEventProperty.eventId, params.eventId),
-			});
+		let propertyRows = await db.query.customEventProperty.findMany({
+			where: eq(schema.customEventProperty.eventId, params.eventId),
+		});
 
 		if (params.properties !== undefined) {
 			await db

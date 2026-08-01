@@ -1,9 +1,9 @@
 import { term as api } from "./api";
 import { term as authentication } from "./authentication";
+import { term as bimi } from "./bimi";
+import { term as blocklist } from "./blocklist";
 import { term as bounce } from "./bounce";
 import { term as bounce_rate } from "./bounce-rate";
-import { term as blocklist } from "./blocklist";
-import { term as bimi } from "./bimi";
 import { term as catch_all } from "./catch-all";
 import { term as click_through_rate } from "./click-through-rate";
 import { term as complaint_rate } from "./complaint-rate";

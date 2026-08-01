@@ -1,5 +1,5 @@
-import { source } from "@reloop/fe-docs/lib/source";
 import { buildSitemapMarkdown } from "@reloop/fe-docs/lib/sitemap-md";
+import { source } from "@reloop/fe-docs/lib/source";
 import type { PageTreeItem } from "@reloop/fe-docs/lib/types";
 import { type NextRequest, NextResponse } from "next/server";
 

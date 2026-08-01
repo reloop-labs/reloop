@@ -76,9 +76,10 @@ describe("webhook payload builders", () => {
 	});
 
 	test("contact group and api key builders", () => {
-		expect(buildContactGroupWebhookData({ id: "grp_1", name: "VIP" })).toEqual(
-			{ id: "grp_1", name: "VIP" },
-		);
+		expect(buildContactGroupWebhookData({ id: "grp_1", name: "VIP" })).toEqual({
+			id: "grp_1",
+			name: "VIP",
+		});
 		expect(
 			buildApiKeyWebhookData({
 				apiKeyId: "key_1",

@@ -21,8 +21,7 @@ export function getSmtpResponseFromEvent(
 	event: EmailEvent | undefined,
 ): SmtpResponseMeta | null {
 	if (!event?.metadata || typeof event.metadata !== "object") return null;
-	const response = (event.metadata as { response?: SmtpResponseMeta })
-		.response;
+	const response = (event.metadata as { response?: SmtpResponseMeta }).response;
 	if (!response || typeof response !== "object") return null;
 	return response;
 }

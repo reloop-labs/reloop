@@ -10,8 +10,8 @@ import {
 	buildDomainWebhookData,
 	buildEmailWebhookData,
 	buildInboundEmailWebhookData,
-	statusForEmailWebhookType,
 	type EmailWebhookData,
+	statusForEmailWebhookType,
 } from "@reloop/webhook-events";
 import { eq } from "drizzle-orm";
 import { log } from "evlog";

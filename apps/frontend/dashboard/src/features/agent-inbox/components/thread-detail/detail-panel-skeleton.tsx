@@ -30,7 +30,9 @@ export const ThreadMessagesSkeleton = () => (
 		<div className="relative flex-1 pb-2">
 			<div className="mt-3 flex w-full items-start justify-between gap-3 px-4">
 				<div className="flex w-full gap-3">
-					<Skeleton className={cn("mt-0.5 h-8 w-8 shrink-0 rounded-full", sk)} />
+					<Skeleton
+						className={cn("mt-0.5 h-8 w-8 shrink-0 rounded-full", sk)}
+					/>
 					<div className="flex w-full items-center justify-between gap-2">
 						<div className="min-w-0 flex-1">
 							<div className="flex flex-wrap items-center gap-2">

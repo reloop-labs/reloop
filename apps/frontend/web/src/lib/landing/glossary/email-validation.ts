@@ -5,7 +5,7 @@ export const term: GlossaryTermDefinition = {
 	title: "Email Validation",
 	description:
 		"Checking whether an address looks real and is safe to send to, before you mail it.",
-	keywords: ["email validation","email verification","syntax check email"],
+	keywords: ["email validation", "email verification", "syntax check email"],
 	body: `Validation ranges from cheap syntax checks (does it look like an email?) to DNS and SMTP probes that ask whether the domain and mailbox might accept mail. No method is perfect. Catch-all domains accept everything. Some servers block probes.
 
 Use validation at signup and before importing old lists. It will not fix consent problems. An address can be valid and still unwanted.

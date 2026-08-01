@@ -30,7 +30,9 @@ function serializeMessages(messages: AiMessage[]): AiMessage[] {
 	}));
 }
 
-export function loadAiChat(templateId: string | null | undefined): StoredChat | null {
+export function loadAiChat(
+	templateId: string | null | undefined,
+): StoredChat | null {
 	if (!templateId || typeof sessionStorage === "undefined") return null;
 	try {
 		const raw = sessionStorage.getItem(key(templateId));

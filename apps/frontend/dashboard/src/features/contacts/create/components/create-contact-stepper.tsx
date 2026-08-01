@@ -14,7 +14,11 @@ interface CreateContactStepperProps {
 	onStepClick?: (step: CreateContactStep) => void;
 }
 
-function StepBullet({ status }: { status: "active" | "completed" | "upcoming" }) {
+function StepBullet({
+	status,
+}: {
+	status: "active" | "completed" | "upcoming";
+}) {
 	if (status === "active" || status === "completed") {
 		return (
 			<span className="flex h-3.5 w-3.5 shrink-0 items-center justify-center">
@@ -86,10 +90,10 @@ export function CreateContactStepper({
 			{/* Support Section */}
 			<motion.div
 				layout
-				className="space-y-2 border-t border-stroke-soft-200/60 pt-6 text-text-sub-600 text-xs"
+				className="space-y-2 border-stroke-soft-200/60 border-t pt-6 text-text-sub-600 text-xs"
 			>
 				<p className="font-medium text-text-strong-950">Need assistance?</p>
-				<p className="leading-relaxed text-text-soft-400">
+				<p className="text-text-soft-400 leading-relaxed">
 					Reach out to our support team for help with contact imports, custom
 					attributes, or SDK setup.
 				</p>

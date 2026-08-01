@@ -1,4 +1,3 @@
-import { useRouter } from "next/navigation";
 import * as Badge from "@reloop/ui/badge";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
@@ -9,8 +8,8 @@ import {
 	Trigger as PopoverTrigger,
 } from "@reloop/ui/popover";
 import { Skeleton } from "@reloop/ui/skeleton";
-
 import { AnimatePresence, motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 import { useQueryState } from "nuqs";
 import { useRef, useState } from "react";
 import { PageSizeDropdown } from "#/features/api-keys/table/page-size-dropdown";
@@ -161,7 +160,9 @@ const PropertyActionsPopover = ({
 		} else if (itemId === "filter-contacts") {
 			setPopoverOpen(false);
 			{
-				const params = new URLSearchParams(typeof window !== "undefined" ? window.location.search : "");
+				const params = new URLSearchParams(
+					typeof window !== "undefined" ? window.location.search : "",
+				);
 				params.set("search", property.propertyName);
 				router.push(`/contacts?${params}`);
 			}
@@ -201,7 +202,7 @@ const PropertyActionsPopover = ({
 							onPointerLeave={() => setHoverIdx(undefined)}
 							onClick={() => void handleItemClick(item.id)}
 							className={cn(
-								"relative flex w-full cursor-pointer items-center gap-2 overflow-hidden rounded-lg px-2 py-1.5 font-medium text-xs transition-colors min-h-[28px]",
+								"relative flex min-h-[28px] w-full cursor-pointer items-center gap-2 overflow-hidden rounded-lg px-2 py-1.5 font-medium text-xs transition-colors",
 								item.isDanger ? "text-error-base" : "text-text-strong-950",
 								!currentRect &&
 									hoverIdx === idx &&

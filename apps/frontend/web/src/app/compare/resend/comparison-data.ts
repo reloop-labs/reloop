@@ -146,7 +146,7 @@ export const resendComparisonCategories: ComparisonCategory[] = [
 				label: "MTA",
 				icon: "mail-server",
 				reloop: "Yes",
-				competitor: "No"
+				competitor: "No",
 			},
 			{
 				label: "Self-hostable",
@@ -170,7 +170,7 @@ export const resendComparisonCategories: ComparisonCategory[] = [
 				label: "Dedicated IPs",
 				icon: "globe",
 				reloop: "Enterprise",
-				competitor: "Scale+"
+				competitor: "Scale+",
 			},
 		],
 	},

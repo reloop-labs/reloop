@@ -345,7 +345,8 @@ export const CreateChannelModal = ({
 									disabled={
 										status === "creating" ||
 										status === "success" ||
-										(status === "idle" && (!name.trim() || isDescriptionOverLimit))
+										(status === "idle" &&
+											(!name.trim() || isDescriptionOverLimit))
 									}
 									className={cn(
 										"w-[160px] min-w-[160px] justify-center overflow-hidden transition-all duration-200",

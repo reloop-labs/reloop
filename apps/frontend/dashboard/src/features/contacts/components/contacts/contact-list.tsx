@@ -1,8 +1,8 @@
-import { useRouter } from "next/navigation";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
+import { useRouter } from "next/navigation";
 
 import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
 import { useState } from "react";
@@ -164,7 +164,7 @@ export function ContactList() {
 					size="small"
 					onClick={() => void refetch()}
 					disabled={isFetching}
-					className="h-9 w-9 rounded-xl p-0 flex items-center justify-center shrink-0"
+					className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl p-0"
 					title="Refresh contacts"
 					aria-label="Refresh contacts"
 				>
@@ -183,7 +183,7 @@ export function ContactList() {
 					size="small"
 					onClick={() => void handleDownloadCSV()}
 					disabled={!data?.contacts || data.contacts.length === 0}
-					className="h-9 w-9 rounded-xl p-0 flex items-center justify-center shrink-0"
+					className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl p-0"
 					title="Export CSV"
 					aria-label="Export CSV"
 				>

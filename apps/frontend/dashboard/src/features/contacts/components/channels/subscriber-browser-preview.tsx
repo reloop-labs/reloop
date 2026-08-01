@@ -1,4 +1,3 @@
-
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { useEffect, useMemo, useState } from "react";
@@ -214,7 +213,11 @@ export function SubscriberBrowserPreview({
 								stroke="currentColor"
 								strokeWidth={2.5}
 							>
-								<path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+								<path
+									strokeLinecap="round"
+									strokeLinejoin="round"
+									d="M5 13l4 4L19 7"
+								/>
 							</svg>
 							<span>Updated</span>
 						</span>

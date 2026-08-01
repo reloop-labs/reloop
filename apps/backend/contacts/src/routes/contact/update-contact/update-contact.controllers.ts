@@ -27,121 +27,126 @@ export async function updateContactController({
 	log.info("Updating contact", { contactId, organizationId });
 
 	try {
-		const { finalContact, previousStatus } = await db.transaction(async (tx) => {
-			const existingContact = await tx.query.contact.findFirst({
-				where: and(
-					eq(schema.contact.id, contactId),
-					eq(schema.contact.organizationId, organizationId),
-					isNull(schema.contact.deletedAt),
-				),
-			});
-
-			if (!existingContact) {
-				log.warn("Contact not found", { contactId, organizationId });
-				throw ContactErrors.contactNotFound(contactId);
-			}
-
-			const updateData: Partial<typeof schema.contact.$inferInsert> = {
-				updatedAt: new Date(),
-			};
-
-			if (email !== undefined) {
-				updateData.email = email;
-			}
-			if (firstName !== undefined) {
-				updateData.firstName = firstName;
-			}
-			if (lastName !== undefined) {
-				updateData.lastName = lastName;
-			}
-			if (contactStatus !== undefined) {
-				updateData.status = contactStatus;
-			}
-
-			const [updatedContact] = await tx
-				.update(schema.contact)
-				.set(updateData)
-				.where(
-					and(
+		const { finalContact, previousStatus } = await db.transaction(
+			async (tx) => {
+				const existingContact = await tx.query.contact.findFirst({
+					where: and(
 						eq(schema.contact.id, contactId),
 						eq(schema.contact.organizationId, organizationId),
+						isNull(schema.contact.deletedAt),
 					),
-				)
-				.returning();
-
-			if (!updatedContact) {
-				log.error("Failed to update contact - no data returned", {
-					contactId,
 				});
-				throw ContactErrors.databaseError("Failed to update contact");
-			}
 
-			if (properties !== undefined) {
-				await upsertContactProperties({
+				if (!existingContact) {
+					log.warn("Contact not found", { contactId, organizationId });
+					throw ContactErrors.contactNotFound(contactId);
+				}
+
+				const updateData: Partial<typeof schema.contact.$inferInsert> = {
+					updatedAt: new Date(),
+				};
+
+				if (email !== undefined) {
+					updateData.email = email;
+				}
+				if (firstName !== undefined) {
+					updateData.firstName = firstName;
+				}
+				if (lastName !== undefined) {
+					updateData.lastName = lastName;
+				}
+				if (contactStatus !== undefined) {
+					updateData.status = contactStatus;
+				}
+
+				const [updatedContact] = await tx
+					.update(schema.contact)
+					.set(updateData)
+					.where(
+						and(
+							eq(schema.contact.id, contactId),
+							eq(schema.contact.organizationId, organizationId),
+						),
+					)
+					.returning();
+
+				if (!updatedContact) {
+					log.error("Failed to update contact - no data returned", {
+						contactId,
+					});
+					throw ContactErrors.databaseError("Failed to update contact");
+				}
+
+				if (properties !== undefined) {
+					await upsertContactProperties({
+						contactId,
+						organizationId,
+						userId: existingContact.userId,
+						properties: properties,
+						db: tx,
+					});
+				}
+
+				log.info("Contact updated successfully", {
 					contactId,
 					organizationId,
-					userId: existingContact.userId,
-					properties: properties,
-					db: tx,
 				});
-			}
 
-			log.info("Contact updated successfully", {
-				contactId,
-				organizationId,
-			});
+				const updatedProperties = await tx
+					.select({
+						name: schema.contactProperty.propertyName,
+						value: schema.contactPropertyValue.value,
+						type: schema.contactProperty.propertyType,
+					})
+					.from(schema.contactPropertyValue)
+					.innerJoin(
+						schema.contactProperty,
+						eq(
+							schema.contactPropertyValue.propertyId,
+							schema.contactProperty.id,
+						),
+					)
+					.where(
+						and(
+							eq(schema.contactPropertyValue.contactId, contactId),
+							eq(schema.contactPropertyValue.organizationId, organizationId),
+							isNull(schema.contactProperty.deletedAt),
+							isNull(schema.contactPropertyValue.deletedAt),
+						),
+					);
 
-			const updatedProperties = await tx
-				.select({
-					name: schema.contactProperty.propertyName,
-					value: schema.contactPropertyValue.value,
-					type: schema.contactProperty.propertyType,
-				})
-				.from(schema.contactPropertyValue)
-				.innerJoin(
-					schema.contactProperty,
-					eq(schema.contactPropertyValue.propertyId, schema.contactProperty.id),
-				)
-				.where(
-					and(
-						eq(schema.contactPropertyValue.contactId, contactId),
-						eq(schema.contactPropertyValue.organizationId, organizationId),
-						isNull(schema.contactProperty.deletedAt),
-						isNull(schema.contactPropertyValue.deletedAt),
-					),
+				const propertiesRecord = updatedProperties.reduce(
+					(acc, curr) => {
+						acc[curr.name] =
+							curr.type === "number" ? Number(curr.value) : curr.value;
+						return acc;
+					},
+					{} as Record<string, string | number>,
 				);
 
-			const propertiesRecord = updatedProperties.reduce(
-				(acc, curr) => {
-					acc[curr.name] =
-						curr.type === "number" ? Number(curr.value) : curr.value;
-					return acc;
-				},
-				{} as Record<string, string | number>,
-			);
+				const finalContact = {
+					object: "contact" as const,
+					id: updatedContact.id,
+					email: updatedContact.email,
+					firstName: updatedContact.firstName,
+					lastName: updatedContact.lastName,
+					status: updatedContact.status,
+					properties: propertiesRecord ?? {},
+					groups: (updatedContact as ContactTypes.ContactData).groups ?? [],
+					channels: (updatedContact as ContactTypes.ContactData).channels ?? [],
+					suppressionReason: updatedContact.suppressionReason ?? null,
+					suppressedAt: updatedContact.suppressedAt ?? null,
+					createdAt: updatedContact.createdAt,
+					updatedAt: updatedContact.updatedAt,
+					event: CONTACT_UPDATE_WEBHOOK_EVENT.id,
+				};
 
-			const finalContact = {
-				object: "contact" as const,
-				id: updatedContact.id,
-				email: updatedContact.email,
-				firstName: updatedContact.firstName,
-				lastName: updatedContact.lastName,
-				status: updatedContact.status,
-				properties: propertiesRecord ?? {},
-				groups: (updatedContact as ContactTypes.ContactData).groups ?? [],
-				channels: (updatedContact as ContactTypes.ContactData).channels ?? [],
-				suppressionReason: updatedContact.suppressionReason ?? null,
-				suppressedAt: updatedContact.suppressedAt ?? null,
-				createdAt: updatedContact.createdAt,
-				updatedAt: updatedContact.updatedAt,
-				event: CONTACT_UPDATE_WEBHOOK_EVENT.id,
-			};
-
-			return {
-				finalContact,
-				previousStatus: existingContact.status,
-			};
-		});
+				return {
+					finalContact,
+					previousStatus: existingContact.status,
+				};
+			},
+		);
 
 		const lifecyclePayload = {
 			organizationId,
@@ -161,10 +166,7 @@ export async function updateContactController({
 				});
 			});
 
-		if (
-			contactStatus !== undefined &&
-			contactStatus !== previousStatus
-		) {
+		if (contactStatus !== undefined && contactStatus !== previousStatus) {
 			const statusEvent =
 				contactStatus === "subscribed"
 					? BusEvent.CONTACT_SUBSCRIBED

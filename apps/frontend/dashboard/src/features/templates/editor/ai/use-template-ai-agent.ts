@@ -14,9 +14,10 @@ function uid(prefix = "msg") {
 	return `${prefix}_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 7)}`;
 }
 
-function parseSseChunk(
-	buffer: string,
-): { events: AgentSseEvent[]; rest: string } {
+function parseSseChunk(buffer: string): {
+	events: AgentSseEvent[];
+	rest: string;
+} {
 	const parts = buffer.split("\n\n");
 	const rest = parts.pop() ?? "";
 	const events: AgentSseEvent[] = [];
@@ -217,8 +218,7 @@ export function useTemplateAiAgent(templateId?: string | null) {
 					body: JSON.stringify({
 						mode: runMode,
 						messages: history,
-						templateId:
-							input.templateId ?? templateIdRef.current ?? undefined,
+						templateId: input.templateId ?? templateIdRef.current ?? undefined,
 						editorSnapshot: {
 							...input.editorSnapshot,
 							renderedHtmlSnippet:

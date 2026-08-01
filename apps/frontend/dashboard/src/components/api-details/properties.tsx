@@ -50,7 +50,12 @@ export const PropertiesApiDetails = ({
 	return (
 		<ApiDetailsDrawer
 			title="Properties API"
-			icon={<Icon name="tag" className="h-6 w-6 text-text-strong-950 dark:text-white" />}
+			icon={
+				<Icon
+					name="tag"
+					className="h-6 w-6 text-text-strong-950 dark:text-white"
+				/>
+			}
 			languages={languages}
 			operations={operations}
 			codeExamples={codeExamples}

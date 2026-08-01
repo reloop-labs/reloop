@@ -1,13 +1,12 @@
-import { useRouter } from "next/navigation";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import Spinner from "@reloop/ui/spinner";
-
 import axios from "axios";
 import { AnimatePresence, motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 import * as React from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
@@ -113,7 +112,7 @@ export function DomainSetupPage({ domainId }: { domainId: string }) {
 				<DNSRecordsSection
 					domain={domainData}
 					isLoading={false}
-					className="mb-0 mt-0"
+					className="mt-0 mb-0"
 					showAutoConnectBanner={false}
 				/>
 			)}

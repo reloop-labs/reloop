@@ -25,7 +25,7 @@ console.log(channels.total, channels.channels);`,
 		source: `curl "https://reloop.sh/api/contacts/v1/channels/list?page=1&limit=10" \\
   -H "x-api-key: rl_123456789"`,
 	},
-				{
+	{
 		id: "python",
 		lang: "python",
 		label: "Python",
@@ -43,7 +43,7 @@ if result.channel_error:
 
 print(result.channels["total"], result.channels["channels"])`,
 	},
-			{
+	{
 		id: "php",
 		lang: "php",
 		label: "PHP",
@@ -51,7 +51,7 @@ print(result.channels["total"], result.channels["channels"])`,
 
 require 'vendor/autoload.php';
 
-use Reloop\Reloop;
+use ReloopReloop;
 
 $reloop = Reloop::client('rl_123456789');
 
@@ -61,7 +61,7 @@ $channels = $reloop->contacts->channels->list([
 ]);
 echo $channels['total'] . ' ' . $channels['channels'] . PHP_EOL;`,
 	},
-			{
+	{
 		id: "java",
 		lang: "java",
 		label: "Java",

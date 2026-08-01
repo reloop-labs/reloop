@@ -1,10 +1,3 @@
-import Link from "next/link";
-import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
-import {
-	getAvatarGradient,
-	getAvatarInitial,
-} from "#/utils/avatar";
-
 import * as Avatar from "@reloop/ui/avatar";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
@@ -12,8 +5,11 @@ import { Icon } from "@reloop/ui/icon";
 import * as TabMenuHorizontal from "@reloop/ui/tab-menu-horizontal";
 import { ArrowRight, Plus } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
+import Link from "next/link";
 import { useRef, useState } from "react";
+import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import { useSWR } from "#/features/home/lib/use-swr-compat";
+import { getAvatarGradient, getAvatarInitial } from "#/utils/avatar";
 
 interface EmailLogData {
 	id: string;
@@ -100,7 +96,7 @@ const formatShortRelativeTime = (date: string | Date) => {
 };
 
 export function EmailsCard() {
-		const { activeOrganization } = useActiveOrganization();
+	const { activeOrganization } = useActiveOrganization();
 	const [activeTab, setActiveTab] = useState<"sent" | "received">("sent");
 	const [hoveredIdx, setHoveredIdx] = useState<number | undefined>(undefined);
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
@@ -137,19 +133,27 @@ export function EmailsCard() {
 		<div className="group flex w-full flex-col">
 			{/* Header */}
 			<div className="flex items-center justify-between rounded-t-2xl border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-5 pt-1.5 pb-3 dark:border-white/5 dark:bg-white/[0.02]">
-				<Link href={headerHref} className="flex items-center gap-2 font-medium text-sm text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white">
+				<Link
+					href={headerHref}
+					className="flex items-center gap-2 font-medium text-sm text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white"
+				>
 					<Icon name="mail-single" className="h-4 w-4 shrink-0" />
 					<span>Emails</span>
 				</Link>
 
 				<div className="flex items-center gap-1.5">
 					{activeTab === "received" && (
-						<Link href="/inbox?modal=create-agent-mailbox"
-							className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-stroke-soft-100 bg-white text-text-sub-600 transition-colors hover:bg-bg-weak-50/50 hover:text-text-strong-950 dark:border-white/5 dark:bg-white/[0.02] dark:text-white/60">
+						<Link
+							href="/inbox?modal=create-agent-mailbox"
+							className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-stroke-soft-100 bg-white text-text-sub-600 transition-colors hover:bg-bg-weak-50/50 hover:text-text-strong-950 dark:border-white/5 dark:bg-white/[0.02] dark:text-white/60"
+						>
 							<Plus className="h-3.5 w-3.5" />
 						</Link>
 					)}
-					<Link href={headerHref} className="flex h-7 w-7 shrink-0 items-center justify-center text-text-sub-600 transition-transform hover:translate-x-0.5 hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white">
+					<Link
+						href={headerHref}
+						className="flex h-7 w-7 shrink-0 items-center justify-center text-text-sub-600 transition-transform hover:translate-x-0.5 hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white"
+					>
 						<ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
 					</Link>
 				</div>
@@ -245,8 +249,11 @@ export function EmailsCard() {
 						hasSentLogs ? (
 							<div>
 								{emailLogsData.data.slice(0, 6).map((d) => (
-									<Link href={`/emails/${d.id}`}
-										className="group/row flex items-center justify-between border-stroke-soft-100 border-b py-2.5 transition-colors last:border-b-0 hover:bg-bg-weak-50/50 dark:border-white/5 dark:hover:bg-white/[0.01]" key={d.id}>
+									<Link
+										href={`/emails/${d.id}`}
+										className="group/row flex items-center justify-between border-stroke-soft-100 border-b py-2.5 transition-colors last:border-b-0 hover:bg-bg-weak-50/50 dark:border-white/5 dark:hover:bg-white/[0.01]"
+										key={d.id}
+									>
 										<div className="flex min-w-0 flex-1 items-center gap-3">
 											<span title={d.status} className="shrink-0">
 												<Icon
@@ -294,8 +301,11 @@ export function EmailsCard() {
 					) : hasReceivedMessages ? (
 						<div>
 							{messagesData.slice(0, 6).map((d) => (
-								<Link href={`/inbox/${d.mailboxId}`}
-									className="group/row flex items-center justify-between border-stroke-soft-100 border-b py-2.5 transition-colors last:border-b-0 hover:bg-bg-weak-50/50 dark:border-white/5 dark:hover:bg-white/[0.01]" key={d.id}>
+								<Link
+									href={`/inbox/${d.mailboxId}`}
+									className="group/row flex items-center justify-between border-stroke-soft-100 border-b py-2.5 transition-colors last:border-b-0 hover:bg-bg-weak-50/50 dark:border-white/5 dark:hover:bg-white/[0.01]"
+									key={d.id}
+								>
 									<div className="flex min-w-0 flex-1 items-center gap-3">
 										<Avatar.Root size="16" color="gray" className="shrink-0">
 											<Avatar.Image asChild>

@@ -29,7 +29,7 @@ if (contactError) throw contactError;`,
   -H "Content-Type: application/json" \\
   -d '{"email": "john.doe@example.com","firstName": "John","lastName": "Doe","status": "subscribed","properties": {"company": "Reloop","role": "Developer"},"groupIds": ["grp_123456789"],"channels": [{"channelId": "chn_123456789","subscription": "opt_in"}]}'`,
 	},
-				{
+	{
 		id: "python",
 		lang: "python",
 		label: "Python",
@@ -57,7 +57,7 @@ result = reloop.contacts.create({
 if result.contact_error:
     raise result.contact_error`,
 	},
-			{
+	{
 		id: "php",
 		lang: "php",
 		label: "PHP",
@@ -65,7 +65,7 @@ if result.contact_error:
 
 require 'vendor/autoload.php';
 
-use Reloop\Reloop;
+use ReloopReloop;
 
 $reloop = Reloop::client('rl_123456789');
 
@@ -87,7 +87,7 @@ $contact = $reloop->contacts->create([
     ],
 ]);`,
 	},
-			{
+	{
 		id: "java",
 		lang: "java",
 		label: "Java",

@@ -93,13 +93,7 @@ function StoryBlock({ chapter }: { chapter: StoryChapter }) {
 	);
 }
 
-function FounderCard({
-	founder,
-	index,
-}: {
-	founder: Founder;
-	index: number;
-}) {
+function FounderCard({ founder, index }: { founder: Founder; index: number }) {
 	return (
 		<div
 			className={cn(
@@ -174,13 +168,9 @@ export function AboutUsSection() {
 					</h2>
 				</div>
 
-				<div className="-mx-4 mt-10 border-stroke-soft-200 border-y sm:-mx-6 sm:mt-12 sm:grid sm:grid-cols-2 lg:-mx-8 dark:border-white/10">
+				<div className="-mx-4 sm:-mx-6 lg:-mx-8 mt-10 border-stroke-soft-200 border-y sm:mt-12 sm:grid sm:grid-cols-2 dark:border-white/10">
 					{founders.map((founder, index) => (
-						<FounderCard
-							key={founder.name}
-							founder={founder}
-							index={index}
-						/>
+						<FounderCard key={founder.name} founder={founder} index={index} />
 					))}
 				</div>
 			</div>

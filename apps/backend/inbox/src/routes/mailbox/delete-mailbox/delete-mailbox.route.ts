@@ -1,8 +1,8 @@
 import { authMiddleware } from "@reloop/be-inbox/middleware/auth";
 import { MailModel } from "@reloop/be-inbox/model/mail.model";
+import { deleteMailboxXCodeSamples } from "@reloop/code-samples/inbox";
 import { Elysia, t } from "elysia";
 import { deleteMailboxController } from "./delete-mailbox.controllers";
-import { deleteMailboxXCodeSamples } from "@reloop/code-samples/inbox";
 
 export const deleteMailboxRoute = new Elysia().use(authMiddleware).delete(
 	"/:id",

@@ -27,7 +27,7 @@ export function ConfigureDnsActions({
 				onClick={onVerify}
 				size="small"
 				variant="blue"
-				className="min-w-[165px] justify-center overflow-hidden rounded-xl whitespace-nowrap"
+				className="min-w-[165px] justify-center overflow-hidden whitespace-nowrap rounded-xl"
 				disabled={isVerifying}
 			>
 				<AnimatePresence mode="popLayout" initial={false}>

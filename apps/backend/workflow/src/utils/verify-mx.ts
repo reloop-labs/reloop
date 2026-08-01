@@ -1,5 +1,5 @@
-import { isLocal } from "./is-local";
 import { resolver } from "./dns-resolver";
+import { isLocal } from "./is-local";
 
 /** Normalize stored FQDN / name for DNS lookup (apex may be stored as `@`). */
 export function normalizeMxLookupName(name: string): string {
@@ -40,9 +40,7 @@ export async function verifyMxRecord(
 		// `reloop.sh` (and vice versa).
 		return records.some((mx) => {
 			const exchange = mx.exchange.toLowerCase().replace(/\.$/, "");
-			return (
-				exchange === expected && Number(mx.priority) === expectedPriority
-			);
+			return exchange === expected && Number(mx.priority) === expectedPriority;
 		});
 	} catch (e) {
 		console.error(`Error verifying MX record for ${lookupName}:`, e);

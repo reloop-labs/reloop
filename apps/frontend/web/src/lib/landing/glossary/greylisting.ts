@@ -5,7 +5,7 @@ export const term: GlossaryTermDefinition = {
 	title: "Greylisting",
 	description:
 		"A temporary deferral of unknown senders so only real MTAs that retry get through.",
-	keywords: ["greylisting","graylisting","451 greylist"],
+	keywords: ["greylisting", "graylisting", "451 greylist"],
 	body: `Greylisting is a receiver policy: the first time it sees a new sender/recipient combination, it returns a temporary failure (4xx) and expects a retry later. Legitimate MTAs retry. Many simple spam bots do not.
 
 For senders, greylisting looks like soft bounces or delayed delivery on first contact. Retries with proper backoff usually succeed. Permanent rejection is a different problem.

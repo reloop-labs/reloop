@@ -1,6 +1,6 @@
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import React from "react";
+import type React from "react";
 import {
 	Select,
 	SelectContent,
@@ -25,9 +25,7 @@ function OptionIcon({
 }) {
 	if (!icon) return null;
 	if (typeof icon === "string") {
-		return (
-			<Icon name={icon} className={cn("h-4 w-4 shrink-0", colorClass)} />
-		);
+		return <Icon name={icon} className={cn("h-4 w-4 shrink-0", colorClass)} />;
 	}
 	return <>{icon}</>;
 }

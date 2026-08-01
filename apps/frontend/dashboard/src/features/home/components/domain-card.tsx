@@ -1,13 +1,3 @@
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
-import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
-import {
-	getStatusColorClass,
-	getStatusIcon,
-	getVerificationFailedMessage,
-} from "#/features/domain/utils";
-
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
@@ -15,12 +5,20 @@ import * as Popover from "@reloop/ui/popover";
 import * as Tooltip from "@reloop/ui/tooltip";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowRight, MoreHorizontal, Plus } from "lucide-react";
-
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useQueryState } from "nuqs";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
-import { useSWR } from "#/features/home/lib/use-swr-compat";
+import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import { DeleteDomainModal } from "#/features/domain/components/delete-domain";
+import {
+	getStatusColorClass,
+	getStatusIcon,
+	getVerificationFailedMessage,
+} from "#/features/domain/utils";
+import { useSWR } from "#/features/home/lib/use-swr-compat";
+import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 
 interface DomainData {
 	id: string;
@@ -123,7 +121,7 @@ const RowActionsDropdown = ({
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
 	const [popoverOpen, setPopoverOpen] = useState(false);
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
-		const router = useRouter();
+	const router = useRouter();
 
 	const currentTab = buttonRefs.current[hoverIdx ?? -1];
 	const currentRect = currentTab?.getBoundingClientRect();
@@ -239,7 +237,7 @@ const RowActionsDropdown = ({
 };
 
 export function DomainCard() {
-		const { activeOrganization } = useActiveOrganization();
+	const { activeOrganization } = useActiveOrganization();
 	const [statusFilter, setStatusFilter] = useState<DomainData["status"] | null>(
 		null,
 	);
@@ -274,7 +272,10 @@ export function DomainCard() {
 			{/* Header */}
 			<div className="flex items-center justify-between rounded-t-2xl border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-5 pt-1.5 pb-3 dark:border-white/5 dark:bg-white/[0.02]">
 				{/* Title and Count Badge */}
-				<Link href="/domain" className="flex items-center gap-2 font-medium text-sm text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white">
+				<Link
+					href="/domain"
+					className="flex items-center gap-2 font-medium text-sm text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white"
+				>
 					<Icon name="globe" className="h-4 w-4 shrink-0" />
 					Domains
 					<span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-zinc-100 px-1.5 font-semibold text-[11px] text-text-sub-600 dark:bg-white/10 dark:text-white/40">
@@ -284,7 +285,10 @@ export function DomainCard() {
 
 				{/* Header Actions */}
 				<div className="flex items-center gap-1.5">
-					<Link href="/domain/add" className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-stroke-soft-100 bg-white text-text-sub-600 transition-colors hover:bg-bg-weak-50/50 hover:text-text-strong-950 dark:border-white/5 dark:bg-white/[0.02] dark:text-white/60">
+					<Link
+						href="/domain/add"
+						className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-stroke-soft-100 bg-white text-text-sub-600 transition-colors hover:bg-bg-weak-50/50 hover:text-text-strong-950 dark:border-white/5 dark:bg-white/[0.02] dark:text-white/60"
+					>
 						<Plus className="h-3.5 w-3.5" />
 					</Link>
 
@@ -361,7 +365,10 @@ export function DomainCard() {
 						</Popover.Content>
 					</Popover.Root>
 
-					<Link href="/domain" className="flex h-7 w-7 shrink-0 items-center justify-center text-text-sub-600 transition-transform hover:translate-x-0.5 hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white">
+					<Link
+						href="/domain"
+						className="flex h-7 w-7 shrink-0 items-center justify-center text-text-sub-600 transition-transform hover:translate-x-0.5 hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white"
+					>
 						<ArrowRight className="h-4 w-4" />
 					</Link>
 				</div>
@@ -422,8 +429,10 @@ export function DomainCard() {
 												</Tooltip.Root>
 											</Tooltip.Provider>
 
-											<Link href={`/domain/${d.id}`}
-												className="truncate font-semibold text-text-strong-950 text-xs group-hover/row:underline dark:text-white">
+											<Link
+												href={`/domain/${d.id}`}
+												className="truncate font-semibold text-text-strong-950 text-xs group-hover/row:underline dark:text-white"
+											>
 												{d.domain}
 											</Link>
 										</div>

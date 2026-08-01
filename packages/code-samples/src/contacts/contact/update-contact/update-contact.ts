@@ -21,7 +21,7 @@ if (contactError) throw contactError;`,
   -H "Content-Type: application/json" \\
   -d '{"firstName": "Jane"}'`,
 	},
-				{
+	{
 		id: "python",
 		lang: "python",
 		label: "Python",
@@ -35,7 +35,7 @@ result = reloop.contacts.update("con_123456789", {
 if result.contact_error:
     raise result.contact_error`,
 	},
-			{
+	{
 		id: "php",
 		lang: "php",
 		label: "PHP",
@@ -43,7 +43,7 @@ if result.contact_error:
 
 require 'vendor/autoload.php';
 
-use Reloop\Reloop;
+use ReloopReloop;
 
 $reloop = Reloop::client('rl_123456789');
 
@@ -51,7 +51,7 @@ $contact = $reloop->contacts->update('con_123456789', [
     'firstName' => 'Jane',
 ]);`,
 	},
-			{
+	{
 		id: "java",
 		lang: "java",
 		label: "Java",

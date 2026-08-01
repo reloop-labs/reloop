@@ -2,9 +2,9 @@ import { ErrorResponseSchema } from "@be/template/error/template.error";
 import { authMiddleware } from "@be/template/middleware/auth";
 import { templateVersionResponseSchema } from "@be/template/model/template.model";
 import { auditLogHook } from "@be/template/utils/audit-log";
+import { deleteVersionXCodeSamples } from "@reloop/code-samples/template";
 import { Elysia, t } from "elysia";
 import { deleteVersion } from "./delete-version.controllers";
-import { deleteVersionXCodeSamples } from "@reloop/code-samples/template";
 
 export const deleteVersionRoute = new Elysia().use(authMiddleware).delete(
 	"/:id/versions/:versionId",

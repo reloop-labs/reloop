@@ -1,3 +1,5 @@
+import { Icon } from "@reloop/ui/icon";
+import { Skeleton } from "@reloop/ui/skeleton";
 import {
 	Select,
 	SelectContent,
@@ -6,8 +8,6 @@ import {
 	SelectValue,
 } from "#/features/api-keys/filters/base-ui-select";
 import { useMailboxesQuery } from "#/features/emails/hooks/use-emails-query";
-import { Icon } from "@reloop/ui/icon";
-import { Skeleton } from "@reloop/ui/skeleton";
 
 interface MailboxSelectorProps {
 	value: string;

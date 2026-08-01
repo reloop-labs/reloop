@@ -1,20 +1,21 @@
 import { describe, expect, it } from "vitest";
 import {
 	buildContactsFromMapping,
+	type ColumnMapping,
 	detectInitialMappings,
 	parseCsvContent,
-	type ColumnMapping,
 } from "./csv-parser";
 import {
+	type PropertyMappingRow,
 	rowsToColumnMappings,
 	seedRowsFromDetectedMappings,
 	suggestPropertyRows,
-	type PropertyMappingRow,
 } from "./property-mapping";
 
 describe("parseCsvContent", () => {
 	it("parses valid CSV content with standard columns", () => {
-		const csv = `email,first_name,last_name\nalice@example.com,Alice,Smith\nbob@example.com,Bob,Jones`;
+		const csv =
+			"email,first_name,last_name\nalice@example.com,Alice,Smith\nbob@example.com,Bob,Jones";
 		const result = parseCsvContent(csv);
 
 		expect(result.validCount).toBe(2);
@@ -38,7 +39,8 @@ describe("parseCsvContent", () => {
 	});
 
 	it("maps unmatched headers to property targets by default detect", () => {
-		const csv = `Email,First Name,Company,Score\njane@acme.com,Jane,Acme Inc,100`;
+		const csv =
+			"Email,First Name,Company,Score\njane@acme.com,Jane,Acme Inc,100";
 		const result = parseCsvContent(csv);
 
 		expect(result.validCount).toBe(1);
@@ -53,7 +55,8 @@ describe("parseCsvContent", () => {
 	});
 
 	it("deduplicates emails and filters out invalid email formats", () => {
-		const csv = `email,first_name\nalice@example.com,Alice\ninvalid-email,Bad\nalice@example.com,DuplicateAlice\nbob@example.com,Bob`;
+		const csv =
+			"email,first_name\nalice@example.com,Alice\ninvalid-email,Bad\nalice@example.com,DuplicateAlice\nbob@example.com,Bob";
 		const result = parseCsvContent(csv);
 
 		expect(result.totalRows).toBe(4);
@@ -78,7 +81,7 @@ describe("parseCsvContent", () => {
 	});
 
 	it("returns error if no email header is present", () => {
-		const csv = `name,phone\nJohn,123456`;
+		const csv = "name,phone\nJohn,123456";
 		const result = parseCsvContent(csv);
 
 		expect(result.validCount).toBe(0);
@@ -126,9 +129,7 @@ describe("unified mapping rows → contacts", () => {
 	it("skips headers not present in complete rows", () => {
 		const headers = ["email", "company", "role"];
 		const rawRows = [["alice@example.com", "Acme", "Engineer"]];
-		const mappings: ColumnMapping[] = [
-			{ csvHeader: "email", target: "email" },
-		];
+		const mappings: ColumnMapping[] = [{ csvHeader: "email", target: "email" }];
 
 		const built = buildContactsFromMapping(headers, rawRows, mappings);
 		expect(built.contacts[0]?.properties).toBeUndefined();

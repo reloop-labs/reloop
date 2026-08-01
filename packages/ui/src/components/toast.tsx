@@ -9,11 +9,7 @@ import {
 import Spinner from "./spinner";
 
 const CheckIcon = ({ className }: { className?: string }) => (
-	<svg
-		className={className}
-		fill="none"
-		viewBox="0 0 24 24"
-	>
+	<svg className={className} fill="none" viewBox="0 0 24 24">
 		<circle cx="12" cy="12" r="10" className="fill-success-light/20" />
 		<path
 			strokeLinecap="round"

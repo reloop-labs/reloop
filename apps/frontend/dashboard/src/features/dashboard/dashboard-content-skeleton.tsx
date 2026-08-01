@@ -7,7 +7,7 @@ import { LoadingDot } from "../agent-inbox/components/shared/loading-dot";
 export function DashboardContentSkeleton() {
 	return (
 		<div
-			className="flex min-h-[400px] h-full w-full items-center justify-center text-text-strong-950 dark:text-white"
+			className="flex h-full min-h-[400px] w-full items-center justify-center text-text-strong-950 dark:text-white"
 			aria-busy="true"
 			aria-live="polite"
 		>

@@ -72,8 +72,7 @@ export function ApiKeyListToolbar({
 	const focusSearch = useCallback(() => {
 		// Prefer the ref; fall back to id in case AlignUI cloneElement drops the ref.
 		const input =
-			searchInputRef.current ??
-			document.getElementById(SEARCH_INPUT_ID);
+			searchInputRef.current ?? document.getElementById(SEARCH_INPUT_ID);
 		if (!(input instanceof HTMLInputElement)) return;
 		input.focus();
 		input.select();

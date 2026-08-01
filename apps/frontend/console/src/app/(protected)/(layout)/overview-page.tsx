@@ -1,15 +1,16 @@
 "use client";
 
-import { CONSOLE_QUICK_ACTIONS } from "@fe/console/constants/quick-actions";
 import { MetricGrid } from "@fe/console/components/ui/metric-grid";
-import {
-	PageFrame,
-	PageHeading,
-} from "@fe/console/components/ui/page-frame";
+import { PageFrame, PageHeading } from "@fe/console/components/ui/page-frame";
 import { SectionCard } from "@fe/console/components/ui/section-card";
 import { StatusPill } from "@fe/console/components/ui/status-pill";
+import { CONSOLE_QUICK_ACTIONS } from "@fe/console/constants/quick-actions";
 import { adminGet } from "@fe/console/lib/admin-api";
-import { formatNumber, formatRelativeTime, truncateId } from "@fe/console/lib/format";
+import {
+	formatNumber,
+	formatRelativeTime,
+	truncateId,
+} from "@fe/console/lib/format";
 import {
 	readQuickActionUsage,
 	sortByUsage,
@@ -131,7 +132,7 @@ export default function OverviewPage() {
 							) : null}
 						</div>
 						{data.attention.length === 0 ? (
-							<div className="rounded-2xl border border-dashed border-stroke-soft-200 px-4 py-8 text-center text-[13px] text-text-sub-600">
+							<div className="rounded-2xl border border-stroke-soft-200 border-dashed px-4 py-8 text-center text-[13px] text-text-sub-600">
 								No critical queues. Use ⌘K or quick actions when a ticket comes
 								in.
 							</div>
@@ -280,8 +281,7 @@ export default function OverviewPage() {
 									value: formatNumber(data.support.unreadMessages),
 									hint: `${data.support.openConversations} open threads`,
 									href: "/support",
-									tone:
-										data.support.unreadMessages > 0 ? "warning" : "default",
+									tone: data.support.unreadMessages > 0 ? "warning" : "default",
 								},
 								{
 									label: "Failed domains",

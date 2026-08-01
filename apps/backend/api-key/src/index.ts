@@ -76,9 +76,17 @@ const apiKeyService = new Elysia({
 				const json = JSON.parse(message);
 				if (json.summary) {
 					message = json.summary;
-				} else if (json.errors && Array.isArray(json.errors) && json.errors[0]?.summary) {
+				} else if (
+					json.errors &&
+					Array.isArray(json.errors) &&
+					json.errors[0]?.summary
+				) {
 					message = json.errors[0].summary;
-				} else if (json.message && typeof json.message === "string" && !json.message.startsWith("{")) {
+				} else if (
+					json.message &&
+					typeof json.message === "string" &&
+					!json.message.startsWith("{")
+				) {
 					message = json.message;
 				}
 			} catch {

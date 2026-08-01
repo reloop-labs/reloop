@@ -1,4 +1,3 @@
-import { useApiLanguage } from "#/hooks/use-api-language";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { CopyCodeBlock } from "@reloop/ui/copy-code-block";
@@ -31,6 +30,7 @@ import {
 	siRuby,
 	siRust,
 } from "simple-icons";
+import { useApiLanguage } from "#/hooks/use-api-language";
 
 const langIcons: Record<string, { path: string; hex: string }> = {
 	nodejs: siNodedotjs,
@@ -59,33 +59,55 @@ function getDefaultOpIcon(id: string): React.ReactNode {
 	switch (id) {
 		case "create":
 		case "add":
-			return <Plus className="size-4 shrink-0 text-text-sub-500 dark:text-white/60" />;
+			return (
+				<Plus className="size-4 shrink-0 text-text-sub-500 dark:text-white/60" />
+			);
 		case "list":
-			return <List className="size-4 shrink-0 text-text-sub-500 dark:text-white/60" />;
+			return (
+				<List className="size-4 shrink-0 text-text-sub-500 dark:text-white/60" />
+			);
 		case "get":
 		case "retrieve":
 		case "getContacts":
-			return <FileText className="size-4 shrink-0 text-text-sub-500 dark:text-white/60" />;
+			return (
+				<FileText className="size-4 shrink-0 text-text-sub-500 dark:text-white/60" />
+			);
 		case "update":
 		case "updateChannel":
 		case "edit":
-			return <Pencil className="size-4 shrink-0 text-text-sub-500 dark:text-white/60" />;
+			return (
+				<Pencil className="size-4 shrink-0 text-text-sub-500 dark:text-white/60" />
+			);
 		case "delete":
 		case "deleteGroup":
 		case "remove":
-			return <Trash2 className="size-4 shrink-0 text-text-sub-500 dark:text-white/60" />;
+			return (
+				<Trash2 className="size-4 shrink-0 text-text-sub-500 dark:text-white/60" />
+			);
 		case "rotate":
-			return <RefreshCw className="size-4 shrink-0 text-text-sub-500 dark:text-white/60" />;
+			return (
+				<RefreshCw className="size-4 shrink-0 text-text-sub-500 dark:text-white/60" />
+			);
 		case "enable":
-			return <CheckCircle2 className="size-4 shrink-0 text-text-sub-500 dark:text-white/60" />;
+			return (
+				<CheckCircle2 className="size-4 shrink-0 text-text-sub-500 dark:text-white/60" />
+			);
 		case "disable":
-			return <XCircle className="size-4 shrink-0 text-text-sub-500 dark:text-white/60" />;
+			return (
+				<XCircle className="size-4 shrink-0 text-text-sub-500 dark:text-white/60" />
+			);
 		case "addChannel":
-			return <Share2 className="size-4 shrink-0 text-text-sub-500 dark:text-white/60" />;
+			return (
+				<Share2 className="size-4 shrink-0 text-text-sub-500 dark:text-white/60" />
+			);
 		case "addGroup":
-			return <Folder className="size-4 shrink-0 text-text-sub-500 dark:text-white/60" />;
+			return (
+				<Folder className="size-4 shrink-0 text-text-sub-500 dark:text-white/60" />
+			);
 		case "verify":
-			return <CheckCircle2 className="size-4 shrink-0 text-text-sub-500 dark:text-white/60" />;
+			return (
+				<CheckCircle2 className="size-4 shrink-0 text-text-sub-500 dark:text-white/60" />
+			);
 		default:
 			return undefined;
 	}

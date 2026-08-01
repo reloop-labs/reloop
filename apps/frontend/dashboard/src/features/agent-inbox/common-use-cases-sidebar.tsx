@@ -2,7 +2,7 @@ import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 
 const cardClassName = cn(
-	"group flex w-full flex-col rounded-2xl border border-stroke-soft-100 bg-bg-white-0 p-4 text-left cursor-pointer",
+	"group flex w-full cursor-pointer flex-col rounded-2xl border border-stroke-soft-100 bg-bg-white-0 p-4 text-left",
 	"transition-[border-color,background-color,transform] duration-150 ease-out",
 	"hover:border-stroke-soft-200 hover:bg-bg-weak-50/50",
 	"active:scale-[0.99]",

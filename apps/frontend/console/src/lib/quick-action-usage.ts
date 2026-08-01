@@ -60,7 +60,8 @@ export function sortByUsage<T extends { id: string }>(
 	const u = usage ?? readQuickActionUsage();
 	const now = Date.now();
 	return [...items].sort((a, b) => {
-		const diff = scoreQuickAction(b.id, u, now) - scoreQuickAction(a.id, u, now);
+		const diff =
+			scoreQuickAction(b.id, u, now) - scoreQuickAction(a.id, u, now);
 		if (diff !== 0) return diff;
 		return 0;
 	});

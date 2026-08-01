@@ -26,9 +26,16 @@ function findSampleFiles(dir: string): string[] {
 			files.push(...findSampleFiles(fullPath));
 			continue;
 		}
-		if (entry.name.endsWith(".ts") && !["index.ts","types.ts","helpers.ts","languages.ts"].includes(entry.name) && !entry.name.endsWith(".test.ts")) {
+		if (
+			entry.name.endsWith(".ts") &&
+			!["index.ts", "types.ts", "helpers.ts", "languages.ts"].includes(
+				entry.name,
+			) &&
+			!entry.name.endsWith(".test.ts")
+		) {
 			const content = fs.readFileSync(fullPath, "utf8");
-			if (content.includes("XCodeSamples") || content.includes("CodeSample[]")) files.push(fullPath);
+			if (content.includes("XCodeSamples") || content.includes("CodeSample[]"))
+				files.push(fullPath);
 		}
 	}
 	return files;
@@ -102,7 +109,10 @@ function convertJsLiteralToPython(literal: string, indent = 0): string {
 		const entries = splitTopLevel(inner, ",").map((entry) => {
 			const colon = indexOfTopLevel(entry, ":");
 			if (colon === -1) return convertScalar(entry);
-			const rawKey = entry.slice(0, colon).trim().replace(/^["']|["']$/g, "");
+			const rawKey = entry
+				.slice(0, colon)
+				.trim()
+				.replace(/^["']|["']$/g, "");
 			const rawVal = entry.slice(colon + 1).trim();
 			return `${innerPad}"${rawKey}": ${convertJsLiteralToPython(rawVal, indent + 1)}`;
 		});
@@ -226,13 +236,17 @@ function nodeToPython(nodeSource: string): string {
 		.join("\n")
 		.trim();
 
-	if (body.includes("RESULT_ASSIGN") || body.includes("console.log") || /const \{/.test(body)) {
+	if (
+		body.includes("RESULT_ASSIGN") ||
+		body.includes("console.log") ||
+		/const \{/.test(body)
+	) {
 		throw new Error(`Incomplete conversion:\n${body}`);
 	}
 
 	const imports = needsOs
-		? `import os\nfrom reloop_email import Reloop`
-		: `from reloop_email import Reloop`;
+		? "import os\nfrom reloop_email import Reloop"
+		: "from reloop_email import Reloop";
 
 	return `${imports}
 
@@ -291,7 +305,9 @@ function main() {
 		}
 	}
 
-	console.log(`Done. updated=${updated} skipped=${skipped} total=${files.length}`);
+	console.log(
+		`Done. updated=${updated} skipped=${skipped} total=${files.length}`,
+	);
 }
 
 main();

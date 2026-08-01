@@ -1,11 +1,18 @@
 import { Icon } from "@reloop/ui/icon";
+import { toast } from "@reloop/ui/toast";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { AnimatePresence, useReducedMotion } from "framer-motion";
 import { parseAsString, useQueryState } from "nuqs";
-import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+	Fragment,
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from "react";
 import { useHotkeys } from "react-hotkeys-hook";
-import { toast } from "@reloop/ui/toast";
 import { useSWR } from "#/features/agent-inbox/lib/use-swr-compat";
 import { buildDisplayMessages } from "#/features/agent-inbox/utils/build-display-messages";
 import type {
@@ -43,11 +50,16 @@ function forwardSubject(subject: string) {
 }
 
 /** Prefer the inbound/email id the reply API expects; fall back to list id. */
-function resolveReplyMessageId(msg: {
-	id?: string;
-	inboundEmailId?: string;
-	email?: { id?: string };
-} | null | undefined): string | null {
+function resolveReplyMessageId(
+	msg:
+		| {
+				id?: string;
+				inboundEmailId?: string;
+				email?: { id?: string };
+		  }
+		| null
+		| undefined,
+): string | null {
 	if (!msg) return null;
 	return msg.inboundEmailId || msg.email?.id || msg.id || null;
 }
@@ -222,7 +234,7 @@ export const ThreadDetail = ({
 		mutate: mutateThread,
 		isLoading: isLoadingThread,
 	} = useSWR<any>(
-		(thread?.threadId || thread?.id)
+		thread?.threadId || thread?.id
 			? `/api/inbox/v1/threads/${thread.threadId || thread.id}`
 			: null,
 		{
@@ -364,8 +376,7 @@ export const ThreadDetail = ({
 	useEffect(() => {
 		if (!showReplyComposer) return;
 		replyComposerRef.current?.scrollIntoView({
-			behavior:
-				skipReplyEnter || reduceMotion ? "auto" : "smooth",
+			behavior: skipReplyEnter || reduceMotion ? "auto" : "smooth",
 			block: "nearest",
 		});
 	}, [showReplyComposer, replyAnchorMessageId, skipReplyEnter, reduceMotion]);
@@ -373,8 +384,7 @@ export const ThreadDetail = ({
 	useEffect(() => {
 		if (!showForwardComposer) return;
 		forwardComposerRef.current?.scrollIntoView({
-			behavior:
-				skipForwardEnter || reduceMotion ? "auto" : "smooth",
+			behavior: skipForwardEnter || reduceMotion ? "auto" : "smooth",
 			block: "nearest",
 		});
 	}, [
@@ -410,8 +420,7 @@ export const ThreadDetail = ({
 			}),
 		]);
 		const candidates = [reply, replyAll].filter(
-			(d): d is ComposeDraft =>
-				!!d && (!!d.text.trim() || !!d.html.trim()),
+			(d): d is ComposeDraft => !!d && (!!d.text.trim() || !!d.html.trim()),
 		);
 		candidates.sort(
 			(a, b) =>
@@ -688,9 +697,7 @@ export const ThreadDetail = ({
 			email: {
 				id: `optimistic-${Date.now()}`,
 				fromEmail: mailbox?.email || "me",
-				toEmails: [
-					replyTargetPerson?.email || thread.from.email,
-				],
+				toEmails: [replyTargetPerson?.email || thread.from.email],
 				subject: `Re: ${thread.subject}`,
 				textBody: body,
 				htmlBody: payload.html || null,
@@ -732,12 +739,8 @@ export const ThreadDetail = ({
 		});
 	};
 
-	const openForwardComposer = (
-		msg?: any,
-		opts?: { viaKeyboard?: boolean },
-	) => {
-		const anchor =
-			msg ?? displayMessages[displayMessages.length - 1] ?? null;
+	const openForwardComposer = (msg?: any, opts?: { viaKeyboard?: boolean }) => {
+		const anchor = msg ?? displayMessages[displayMessages.length - 1] ?? null;
 		closeReplyComposer();
 		setForwardAnchorMessageId(anchor?.id ?? null);
 		setSkipForwardEnter(!!opts?.viaKeyboard);
@@ -792,8 +795,7 @@ export const ThreadDetail = ({
 			};
 		}
 		const raw = msg.fromEmail || msg.email?.fromEmail || thread.from.email;
-		const name =
-			msg.fromName || msg.email?.fromName || thread.from.name || "";
+		const name = msg.fromName || msg.email?.fromName || thread.from.name || "";
 		return { name, email: raw };
 	};
 
@@ -802,8 +804,7 @@ export const ThreadDetail = ({
 		msg?: any,
 		opts?: { viaKeyboard?: boolean },
 	) => {
-		const anchor =
-			msg ?? displayMessages[displayMessages.length - 1] ?? null;
+		const anchor = msg ?? displayMessages[displayMessages.length - 1] ?? null;
 		const apiId = resolveReplyMessageId(anchor) ?? messageId ?? null;
 		setReplyMode(mode);
 		setReplyTargetPerson(resolveReplyTarget(msg ?? anchor));
@@ -851,9 +852,7 @@ export const ThreadDetail = ({
 	useHotkeys("a", () =>
 		openReplyComposer("replyAll", undefined, { viaKeyboard: true }),
 	);
-	useHotkeys("f", () =>
-		openForwardComposer(undefined, { viaKeyboard: true }),
-	);
+	useHotkeys("f", () => openForwardComposer(undefined, { viaKeyboard: true }));
 	useHotkeys("s", () => {
 		void handleToggleStar();
 	});
@@ -1093,9 +1092,7 @@ export const ThreadDetail = ({
 			forwardSourceMsg.email?.fromEmail ||
 			thread.from.email;
 		const name =
-			forwardSourceMsg.fromName ||
-			forwardSourceMsg.email?.fromName ||
-			"";
+			forwardSourceMsg.fromName || forwardSourceMsg.email?.fromName || "";
 		return name ? `${name} <${email}>` : email;
 	})();
 
@@ -1116,8 +1113,7 @@ export const ThreadDetail = ({
 
 	const continueSavedReplyDraft = () => {
 		if (!savedReplyDraft) return;
-		const mode =
-			savedReplyDraft.kind === "reply_all" ? "replyAll" : "reply";
+		const mode = savedReplyDraft.kind === "reply_all" ? "replyAll" : "reply";
 		openReplyComposer(mode);
 	};
 
@@ -1198,9 +1194,7 @@ export const ThreadDetail = ({
 							threadId: conversationThreadId,
 							kind: "forward",
 							inReplyToMessageId:
-								resolveReplyMessageId(forwardSourceMsg) ||
-								messageId ||
-								"",
+								resolveReplyMessageId(forwardSourceMsg) || messageId || "",
 							subject: forwardSubject(thread.subject),
 							draftId: forwardDraftId,
 							onDraftIdChange: setForwardDraftId,

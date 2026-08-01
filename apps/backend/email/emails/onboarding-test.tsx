@@ -111,8 +111,7 @@ export const OnboardingTestEmail = ({
 						>
 							{isPlatform ? (
 								<>
-									Your API key{" "}
-									<span className={cls.headingMuted}>works.</span>
+									Your API key <span className={cls.headingMuted}>works.</span>
 								</>
 							) : (
 								<>
@@ -148,9 +147,7 @@ export const OnboardingTestEmail = ({
 
 						<Section className={cls.domainBox}>
 							<Text className={cls.domainText}>{domain}</Text>
-							<Text
-								className={isDark ? cls.domainBadgeDark : cls.domainBadge}
-							>
+							<Text className={isDark ? cls.domainBadgeDark : cls.domainBadge}>
 								{isPlatform ? "✓ Platform test domain" : "✓ Ready to send"}
 							</Text>
 							{fromAddress ? (

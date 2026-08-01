@@ -130,7 +130,10 @@ export const VariablesDropdown = forwardRef(
 					type="button"
 					onMouseDown={preventEditorBlur}
 					onClick={() => selectItem(filtered.length)}
-					className={cn(itemClass(selectedIndex === filtered.length), "font-semibold")}
+					className={cn(
+						itemClass(selectedIndex === filtered.length),
+						"font-semibold",
+					)}
 				>
 					<Icon name="plus" className="h-3 w-3 shrink-0" />
 					<span className="truncate">Create new variable...</span>

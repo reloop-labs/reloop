@@ -1,11 +1,11 @@
 "use client";
 
-import { ApiKeysApiDetails } from "#/components/api-details/api-keys";
 import * as Button from "@reloop/ui/button";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { useQueryState } from "nuqs";
 import { useHotkeys } from "react-hotkeys-hook";
+import { ApiKeysApiDetails } from "#/components/api-details/api-keys";
 import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 
 const DOCS_URL = "https://reloop.sh/docs/learn/api-keys";

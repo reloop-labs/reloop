@@ -1,5 +1,5 @@
-import { emptyGraph } from "@be/workflow/lib/automation/graph";
 import { AutomationErrors } from "@be/workflow/error/automation.error-response";
+import { emptyGraph } from "@be/workflow/lib/automation/graph";
 import { mapAutomation } from "@be/workflow/routes/automation/automation.mappers";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";

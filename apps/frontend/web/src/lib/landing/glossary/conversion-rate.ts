@@ -5,7 +5,7 @@ export const term: GlossaryTermDefinition = {
 	title: "Conversion Rate",
 	description:
 		"The percentage of recipients who completed the action the email was meant to drive.",
-	keywords: ["email conversion rate","email CTA conversion"],
+	keywords: ["email conversion rate", "email CTA conversion"],
 	body: `Conversion rate ties email to an outcome: purchase, signup, finished password reset, trial started. The formula is conversions divided by a base (delivered or clicked). Without a clear goal, the metric is noise.
 
 Transactional mail often has a natural conversion: the user finishes the task the message started. Marketing mail needs tracking (UTMs, deep links, promo codes) so you can attribute results back to the send.

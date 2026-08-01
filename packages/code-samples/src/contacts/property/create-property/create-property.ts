@@ -28,7 +28,7 @@ console.log(property.id, property.propertyName);`,
   -H "Content-Type: application/json" \\
   -d '{"name": "company_name","type": "string","fallbackValue": "Unknown"}'`,
 	},
-				{
+	{
 		id: "python",
 		lang: "python",
 		label: "Python",
@@ -47,7 +47,7 @@ if result.property_error:
 
 print(result.property["id"], result.property["propertyName"])`,
 	},
-			{
+	{
 		id: "php",
 		lang: "php",
 		label: "PHP",
@@ -55,7 +55,7 @@ print(result.property["id"], result.property["propertyName"])`,
 
 require 'vendor/autoload.php';
 
-use Reloop\Reloop;
+use ReloopReloop;
 
 $reloop = Reloop::client('rl_123456789');
 
@@ -66,7 +66,7 @@ $property = $reloop->contacts->properties->create([
 ]);
 echo $property['id'] . ' ' . $property['propertyName'] . PHP_EOL;`,
 	},
-			{
+	{
 		id: "java",
 		lang: "java",
 		label: "Java",

@@ -1,14 +1,14 @@
 import { randomUUID } from "node:crypto";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import { and, eq, isNull } from "drizzle-orm";
-import { useLogger } from "evlog/elysia";
 import { domainConfig } from "@reloop/domain/domain.config";
 import { DomainErrors } from "@reloop/domain/error/domain.error-response";
 import { redis } from "@reloop/domain/lib/redis";
 import { discoverDomainConnect } from "@reloop/domain/utils/domain-connect-discovery";
 import { getDomainConnectParts } from "@reloop/domain/utils/domain-connect-parts";
 import { signDomainConnectRequest } from "@reloop/domain/utils/domain-connect-signer";
+import { and, eq, isNull } from "drizzle-orm";
+import { useLogger } from "evlog/elysia";
 
 const DC_NONCE_TTL = 600; // 10 minutes
 const DC_NONCE_PREFIX = "dc-nonce";

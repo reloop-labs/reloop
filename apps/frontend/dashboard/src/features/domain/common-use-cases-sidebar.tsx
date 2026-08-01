@@ -4,7 +4,7 @@ import { siNodedotjs, siPhp, siPython } from "simple-icons";
 import { DomainApiDetails } from "#/components/api-details/domain";
 
 const cardClassName = cn(
-	"group flex w-full flex-col rounded-2xl border border-stroke-soft-100 bg-bg-white-0 p-4 text-left cursor-pointer",
+	"group flex w-full cursor-pointer flex-col rounded-2xl border border-stroke-soft-100 bg-bg-white-0 p-4 text-left",
 	"transition-[border-color,background-color,transform] duration-150 ease-out",
 	"hover:border-stroke-soft-200 hover:bg-bg-weak-50/50",
 	"active:scale-[0.99]",
@@ -45,7 +45,13 @@ export function DomainCommonUseCasesSidebar() {
 			</div>
 
 			<DomainApiDetails
-				renderTrigger={({ isOpen, open }: { isOpen: boolean; open: () => void }) => (
+				renderTrigger={({
+					isOpen,
+					open,
+				}: {
+					isOpen: boolean;
+					open: () => void;
+				}) => (
 					<button
 						type="button"
 						onClick={open}

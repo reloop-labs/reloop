@@ -97,8 +97,7 @@ export function buildPlanPrompt(input: {
 	attachments?: { url: string; name: string; mime: string }[];
 }): string {
 	const lastUser =
-		[...input.messages].reverse().find((m) => m.role === "user")?.content ??
-		"";
+		[...input.messages].reverse().find((m) => m.role === "user")?.content ?? "";
 	const parts = [
 		"## Brief",
 		lastUser,

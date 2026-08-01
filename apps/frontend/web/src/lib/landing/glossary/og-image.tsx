@@ -1,6 +1,6 @@
-import type { GlossaryTermDefinition } from "@reloop/web/lib/landing/types";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
+import type { GlossaryTermDefinition } from "@reloop/web/lib/landing/types";
 import { ImageResponse } from "next/og";
 
 export const glossaryOgSize = { width: 1200, height: 630 } as const;
@@ -180,10 +180,7 @@ export async function createGlossaryTermOgImage(term: GlossaryTermDefinition) {
 	const fonts = await loadFonts();
 	const initial = term.title.trim().charAt(0).toUpperCase() || "#";
 	const description = truncate(term.description, 160);
-	const detail = truncate(
-		term.body.split(/\n\n+/)[0] ?? term.description,
-		200,
-	);
+	const detail = truncate(term.body.split(/\n\n+/)[0] ?? term.description, 200);
 	const titleSize =
 		term.title.length > 24 ? 44 : term.title.length > 16 ? 52 : 60;
 

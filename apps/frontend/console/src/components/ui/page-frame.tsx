@@ -61,10 +61,16 @@ export function Breadcrumb({
 	return (
 		<nav className="flex flex-wrap items-center gap-1.5 text-[12px] text-text-sub-600">
 			{items.map((item, i) => (
-				<span key={`${item.label}-${i}`} className="inline-flex items-center gap-1.5">
+				<span
+					key={`${item.label}-${i}`}
+					className="inline-flex items-center gap-1.5"
+				>
 					{i > 0 ? <span className="text-text-soft-400">/</span> : null}
 					{item.href ? (
-						<Link href={item.href} className="hover:text-text-strong-950 hover:underline">
+						<Link
+							href={item.href}
+							className="hover:text-text-strong-950 hover:underline"
+						>
 							{item.label}
 						</Link>
 					) : (
@@ -124,10 +130,7 @@ export function DataTable({
 				<tbody>
 					{loading ? (
 						<tr>
-							<td
-								className="px-4 py-8 text-text-sub-600"
-								colSpan={colSpan}
-							>
+							<td className="px-4 py-8 text-text-sub-600" colSpan={colSpan}>
 								Loading…
 							</td>
 						</tr>

@@ -5,7 +5,7 @@ export const term: GlossaryTermDefinition = {
 	title: "Throttling",
 	description:
 		"Intentionally slowing send rates to match provider limits or a warm-up plan.",
-	keywords: ["email throttling","send throttling","traffic shaping email"],
+	keywords: ["email throttling", "send throttling", "traffic shaping email"],
 	body: `Throttling is intentional rate control: messages per minute, concurrent connections, or per-domain limits. Receivers throttle senders who connect too hard. You also throttle yourself during IP warming or when an ISP asks for slower delivery.
 
 Good MTAs and ESPs implement per-domain concurrency caps because Gmail and Outlook want different patterns than a small corporate server.

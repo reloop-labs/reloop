@@ -1,8 +1,8 @@
-import Link from "next/link";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as Tooltip from "@reloop/ui/tooltip";
 import { AnimatePresence, motion } from "motion/react";
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import type { DomainListResponse } from "#/features/domain/types";
@@ -71,7 +71,10 @@ const ErrorTooltipContent = ({ error }: ErrorTooltipContentProps) => {
 
 			{error.actionLink && error.actionText && (
 				<div className="border-stroke-soft-200 border-t pt-2">
-					<Link href={error.actionLink} className="inline-flex items-center gap-1 font-semibold text-paragraph-xs text-primary-base transition-colors hover:text-primary-hover hover:underline">
+					<Link
+						href={error.actionLink}
+						className="inline-flex items-center gap-1 font-semibold text-paragraph-xs text-primary-base transition-colors hover:text-primary-hover hover:underline"
+					>
 						{error.actionText}
 						<Icon name="arrow-right" className="h-3 w-3" />
 					</Link>

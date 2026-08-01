@@ -83,9 +83,7 @@ export function isPropertyTarget(
 	return typeof target === "string" && target.startsWith("property:");
 }
 
-export function propertyTargetName(
-	target: `property:${string}`,
-): string {
+export function propertyTargetName(target: `property:${string}`): string {
 	return target.slice("property:".length);
 }
 
@@ -248,7 +246,9 @@ export function hasEmailMapping(rows: PropertyMappingRow[]): boolean {
 }
 
 /** Count complete rows that map to custom properties (not identity). */
-export function countCustomPropertyMappings(rows: PropertyMappingRow[]): number {
+export function countCustomPropertyMappings(
+	rows: PropertyMappingRow[],
+): number {
 	return rows.filter((r) => isRowComplete(r) && isPropertyTarget(r.target))
 		.length;
 }

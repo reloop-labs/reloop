@@ -1,9 +1,9 @@
-import { term } from "@reloop/web/lib/landing/glossary/tracking-pixel";
 import {
 	createGlossaryTermOgImage,
 	glossaryOgContentType,
 	glossaryOgSize,
 } from "@reloop/web/lib/landing/glossary/og-image";
+import { term } from "@reloop/web/lib/landing/glossary/tracking-pixel";
 
 export const alt = `${term.title} | Email Glossary | Reloop`;
 export const size = glossaryOgSize;

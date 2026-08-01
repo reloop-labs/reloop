@@ -10,7 +10,9 @@ function authPath(mode: AuthMode) {
 
 /** input-otp renders a single hidden/visible input that accepts the full code. */
 async function fillOtp(page: Page, otp: string) {
-	const otpInput = page.locator('input[data-input-otp], input[autocomplete="one-time-code"]').first();
+	const otpInput = page
+		.locator('input[data-input-otp], input[autocomplete="one-time-code"]')
+		.first();
 	await expect(otpInput).toBeVisible({ timeout: 10_000 });
 	await otpInput.click();
 	await otpInput.fill(otp);
@@ -47,8 +49,7 @@ export async function completeEmailOtpAuth(
 	const emailInput = page.getByPlaceholder("steve@apple.com");
 	await emailInput.fill(options.email);
 	// Login form: "Continue with email"; signup form: "Continue"
-	const submitName =
-		mode === "signup" ? "Continue" : "Continue with email";
+	const submitName = mode === "signup" ? "Continue" : "Continue with email";
 	const submit = page.getByRole("button", { name: submitName });
 	await expect(submit).toBeEnabled({ timeout: 5_000 });
 	await submit.click();
@@ -101,7 +102,9 @@ export async function completeEmailOtpAndWaitForPostAuth(
 	);
 
 	await Promise.race([
-		verified.waitFor({ state: "visible", timeout: 20_000 }).then(() => postAuth),
+		verified
+			.waitFor({ state: "visible", timeout: 20_000 })
+			.then(() => postAuth),
 		postAuth,
 	]);
 
@@ -128,16 +131,13 @@ export async function completeEmailOtpAndWaitForPostAuth(
  */
 export async function signOutViaApi(page: Page) {
 	const origin = new URL(dashboardURL("/")).origin;
-	const response = await page.request.post(
-		`${origin}/api/auth/v1/sign-out`,
-		{
-			headers: {
-				"Content-Type": "application/json",
-				Origin: origin,
-				Referer: `${origin}/dashboard/onboarding`,
-			},
+	const response = await page.request.post(`${origin}/api/auth/v1/sign-out`, {
+		headers: {
+			"Content-Type": "application/json",
+			Origin: origin,
+			Referer: `${origin}/dashboard/onboarding`,
 		},
-	);
+	});
 	// Better Auth may return 200 with empty body or redirect-like status.
 	expect(
 		response.ok() || response.status() === 204,

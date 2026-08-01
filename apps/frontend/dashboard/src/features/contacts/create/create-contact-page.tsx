@@ -1,8 +1,7 @@
-import { useRouter } from "next/navigation";
 import { Icon } from "@reloop/ui/icon";
 import { KbdEsc } from "@reloop/ui/kbd-esc";
-
 import { AnimatePresence, motion } from "motion/react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { AiPanel } from "#/features/dashboard/layout/ai-panel";

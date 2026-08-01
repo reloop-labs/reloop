@@ -1,8 +1,8 @@
 "use client";
 
-import { useUIStore } from "#/store/use-ui-store";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect } from "react";
+import { useUIStore } from "#/store/use-ui-store";
 
 /**
  * Opens the in-house Support chat panel when the URL includes
@@ -27,13 +27,7 @@ function OpenSupportFromQueryInner() {
 		next.delete("support");
 		const qs = next.toString();
 		router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
-	}, [
-		pathname,
-		router,
-		searchParams,
-		setAiPanelActiveTab,
-		setIsAiPanelOpen,
-	]);
+	}, [pathname, router, searchParams, setAiPanelActiveTab, setIsAiPanelOpen]);
 
 	return null;
 }

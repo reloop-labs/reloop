@@ -66,10 +66,7 @@ export function MetricGrid({
 				}
 
 				return (
-					<div
-						key={item.label}
-						className="bg-bg-white-0 p-4 dark:bg-[#0c0c0c]"
-					>
+					<div key={item.label} className="bg-bg-white-0 p-4 dark:bg-[#0c0c0c]">
 						{inner}
 					</div>
 				);

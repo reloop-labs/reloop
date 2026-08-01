@@ -9,9 +9,7 @@ export function extractBareEmail(value: string): string {
 		}
 		break;
 	}
-	const match = current.match(
-		/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/,
-	);
+	const match = current.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
 	// Never fall back to the raw string — plain names like "Alex Rivers"
 	// are not emails, and treating them as such breaks display-name parsing.
 	return (match?.[0] ?? "").trim();

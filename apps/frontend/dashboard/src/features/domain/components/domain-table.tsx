@@ -1,7 +1,7 @@
-import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 import { parseAsInteger, useQueryState } from "nuqs";
 import { useState } from "react";
@@ -91,7 +91,10 @@ export function DomainTable({
 											getStatusColorClass(domain.status),
 										)}
 									/>
-									<Link href={`/domain/${domain.id}`} className="truncate font-semibold text-label-sm text-text-strong-950 underline decoration-dotted underline-offset-2 transition-colors hover:text-[#1868DF] dark:hover:text-blue-400">
+									<Link
+										href={`/domain/${domain.id}`}
+										className="truncate font-semibold text-label-sm text-text-strong-950 underline decoration-dotted underline-offset-2 transition-colors hover:text-[#1868DF] dark:hover:text-blue-400"
+									>
 										{domain.domain}
 									</Link>
 								</div>

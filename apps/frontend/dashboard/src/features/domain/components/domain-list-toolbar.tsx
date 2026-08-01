@@ -59,7 +59,7 @@ export function DomainListToolbar() {
 				<button
 					type="button"
 					onClick={() => void invalidate()}
-					className="flex h-9 w-9 items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-white-0 text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-stroke-soft-100/40 shrink-0"
+					className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-white-0 text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-stroke-soft-100/40"
 					title="Refresh domains"
 				>
 					<Icon name="rotate-cw" className="h-4 w-4" />

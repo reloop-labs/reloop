@@ -18,14 +18,15 @@ import {
 	useInboxActiveFilterCount,
 } from "#/features/agent-inbox/components/mail-list/inbox-command-palette";
 import { InboxEmptyState } from "#/features/agent-inbox/components/mail-list/inbox-empty-state";
-import { useInboxSidebar } from "#/features/agent-inbox/components/sidebar/inbox-sidebar-context";
-import { InboxSidebarToggle } from "#/features/agent-inbox/components/sidebar/inbox-sidebar-toggle";
 import {
 	ThreadList,
 	useInboxNavigation,
 } from "#/features/agent-inbox/components/mail-list/thread-list";
+import { useInboxMail } from "#/features/agent-inbox/components/mail-list/use-inbox-mail";
 import { LoadingDot } from "#/features/agent-inbox/components/shared/loading-dot";
 import { SectionError } from "#/features/agent-inbox/components/shared/section-error";
+import { useInboxSidebar } from "#/features/agent-inbox/components/sidebar/inbox-sidebar-context";
+import { InboxSidebarToggle } from "#/features/agent-inbox/components/sidebar/inbox-sidebar-toggle";
 import { ThreadDetail } from "#/features/agent-inbox/components/thread-detail";
 import { DetailPanelSkeleton } from "#/features/agent-inbox/components/thread-detail/detail-panel-skeleton";
 import {
@@ -33,7 +34,6 @@ import {
 	ResizablePanel,
 	ResizablePanelGroup,
 } from "#/features/agent-inbox/components/ui/resizable";
-import { useInboxMail } from "#/features/agent-inbox/components/mail-list/use-inbox-mail";
 import { useInboxUndo } from "#/features/agent-inbox/hooks/use-inbox-undo";
 import type {
 	AgentMailbox,

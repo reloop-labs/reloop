@@ -242,7 +242,10 @@ export const ForwardDNSRecordsButton = ({
 										</p>
 									</div>
 
-									<form onSubmit={handleFormSubmit} className="mt-3 flex flex-col">
+									<form
+										onSubmit={handleFormSubmit}
+										className="mt-3 flex flex-col"
+									>
 										<div className="text-left">
 											<Label.Root
 												htmlFor="forward-email"
@@ -316,7 +319,7 @@ export const ForwardDNSRecordsButton = ({
 											>
 												{/* Hold progress overlay fill */}
 												<motion.div
-													className="pointer-events-none absolute inset-0 bg-white/25 origin-left"
+													className="pointer-events-none absolute inset-0 origin-left bg-white/25"
 													style={{ scaleX: holdProgress }}
 												/>
 												<AnimatePresence mode="popLayout" initial={false}>

@@ -1,6 +1,5 @@
 "use client";
 
-import { queryKeys } from "#/lib/query-keys";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as Dropdown from "@reloop/ui/dropdown";
@@ -11,16 +10,20 @@ import * as Modal from "@reloop/ui/modal";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
+import { queryKeys } from "#/lib/query-keys";
 import {
+	type CustomEvent,
 	createCustomEvent,
 	listCustomEvents,
-	type CustomEvent,
 } from "../hooks/use-custom-events-api";
 
 interface TriggerConfigFormProps {
 	/** Custom event key stored on the trigger node */
 	value: string | undefined;
-	onChange: (eventKey: string, meta?: { eventId: string; name: string }) => void;
+	onChange: (
+		eventKey: string,
+		meta?: { eventId: string; name: string },
+	) => void;
 }
 
 export const TriggerConfigForm = ({

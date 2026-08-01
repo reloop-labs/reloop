@@ -1,5 +1,5 @@
-import { isLocal } from "./is-local";
 import { resolver } from "./dns-resolver";
+import { isLocal } from "./is-local";
 
 export async function verifySpfRecord(
 	name: string,
@@ -29,9 +29,7 @@ export async function verifySpfRecord(
 			if (!normalizedRecord.startsWith("v=spf1")) return false;
 
 			// Check that every required include is present in the actual record
-			return requiredIncludes.every((inc) =>
-				normalizedRecord.includes(inc),
-			);
+			return requiredIncludes.every((inc) => normalizedRecord.includes(inc));
 		});
 	} catch (e) {
 		console.error(`Error verifying SPF record for ${name}:`, e);

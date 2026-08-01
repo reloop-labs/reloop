@@ -28,7 +28,7 @@ console.log(domain.id, domain.isClickTrackingEnabled);`,
   -H "Content-Type: application/json" \\
   -d '{"click_tracking": false}'`,
 	},
-				{
+	{
 		id: "python",
 		lang: "python",
 		label: "Python",
@@ -47,7 +47,7 @@ if result.domain_error:
 
 print(result.domain["id"], result.domain["isClickTrackingEnabled"])`,
 	},
-			{
+	{
 		id: "php",
 		lang: "php",
 		label: "PHP",
@@ -55,7 +55,7 @@ print(result.domain["id"], result.domain["isClickTrackingEnabled"])`,
 
 require 'vendor/autoload.php';
 
-use Reloop\Reloop;
+use ReloopReloop;
 
 $reloop = Reloop::client('rl_123456789');
 
@@ -66,7 +66,7 @@ $domain = $reloop->domain->update('dom_123456789', [
 ]);
 echo $domain['id'] . ' ' . $domain['isClickTrackingEnabled'] . PHP_EOL;`,
 	},
-			{
+	{
 		id: "java",
 		lang: "java",
 		label: "Java",

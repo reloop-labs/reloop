@@ -120,10 +120,7 @@ echo $result->message_id, $result->id;`,
 	};
 }
 
-export function buildAiPrompt(
-	apiKey: string,
-	toEmail?: string | null,
-): string {
+export function buildAiPrompt(apiKey: string, toEmail?: string | null): string {
 	const to = toEmail?.trim() || DEFAULT_TO_EMAIL;
 
 	return `Integrate Reloop email sending into this project.

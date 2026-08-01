@@ -7,13 +7,13 @@ import {
 	getAvailableProperties,
 	hasEmailMapping,
 	isRowComplete,
+	type PropertyMappingRow,
 	rowsToColumnMappings,
 	seedRowsFromDetectedMappings,
 	slugifyPropertyName,
 	suggestPropertyRows,
 	toPropertyTarget,
 	validatePropertyName,
-	type PropertyMappingRow,
 } from "./property-mapping";
 
 describe("slugifyPropertyName", () => {
@@ -46,12 +46,12 @@ describe("validatePropertyName", () => {
 
 describe("isRowComplete", () => {
 	it("requires both sides", () => {
-		expect(
-			isRowComplete({ id: "1", csvHeader: null, target: "email" }),
-		).toBe(false);
-		expect(
-			isRowComplete({ id: "1", csvHeader: "email", target: null }),
-		).toBe(false);
+		expect(isRowComplete({ id: "1", csvHeader: null, target: "email" })).toBe(
+			false,
+		);
+		expect(isRowComplete({ id: "1", csvHeader: "email", target: null })).toBe(
+			false,
+		);
 		expect(
 			isRowComplete({ id: "1", csvHeader: "email", target: "email" }),
 		).toBe(true);

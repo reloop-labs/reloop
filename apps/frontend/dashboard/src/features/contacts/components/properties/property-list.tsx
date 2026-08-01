@@ -71,7 +71,7 @@ export function PropertyList() {
 					size="small"
 					onClick={() => void refetch()}
 					disabled={isFetching}
-					className="h-9 w-9 rounded-xl p-0 flex items-center justify-center shrink-0"
+					className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl p-0"
 					title="Refresh properties"
 					aria-label="Refresh properties"
 				>

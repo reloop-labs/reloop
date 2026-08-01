@@ -1,11 +1,11 @@
 import { describe, expect, test } from "bun:test";
 import {
-	WEBHOOK_MAX_ATTEMPTS,
 	applyWebhookFilters,
 	isWebhookRateLimited,
 	matchesWebhookFilters,
 	rateLimitDelayMs,
 	resolveWebhookMaxAttempts,
+	WEBHOOK_MAX_ATTEMPTS,
 } from "../src/index";
 
 describe("resolveWebhookMaxAttempts", () => {
@@ -56,9 +56,10 @@ describe("matchesWebhookFilters", () => {
 describe("applyWebhookFilters", () => {
 	test("strips excludeFields shallowly", () => {
 		const data = { email_id: "em_1", subject: "Hi", status: "sent" };
-		expect(
-			applyWebhookFilters(data, { excludeFields: ["subject"] }),
-		).toEqual({ email_id: "em_1", status: "sent" });
+		expect(applyWebhookFilters(data, { excludeFields: ["subject"] })).toEqual({
+			email_id: "em_1",
+			status: "sent",
+		});
 		// original untouched
 		expect(data.subject).toBe("Hi");
 	});

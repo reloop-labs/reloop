@@ -1,5 +1,5 @@
-import type { ReactNode } from "react";
 import { cn } from "@reloop/ui/cn";
+import type { ReactNode } from "react";
 
 /**
  * Two-layer card matching Create Contact:
@@ -60,12 +60,7 @@ export function HomeCardHeader({
 	className?: string;
 }) {
 	return (
-		<div
-			className={cn(
-				"flex items-center justify-between gap-3",
-				className,
-			)}
-		>
+		<div className={cn("flex items-center justify-between gap-3", className)}>
 			{children}
 		</div>
 	);

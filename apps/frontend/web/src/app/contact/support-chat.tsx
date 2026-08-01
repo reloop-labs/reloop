@@ -2,13 +2,7 @@
 
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import {
-	Fragment,
-	useCallback,
-	useEffect,
-	useRef,
-	useState,
-} from "react";
+import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 
 type SupportConversation = {
 	id: string;
@@ -79,10 +73,7 @@ function supportWsUrl() {
 	return `${proto}//${window.location.host}${API}/ws`;
 }
 
-async function supportFetch<T>(
-	path: string,
-	init?: RequestInit,
-): Promise<T> {
+async function supportFetch<T>(path: string, init?: RequestInit): Promise<T> {
 	const res = await fetch(`${API}${path}`, {
 		credentials: "include",
 		headers: {
@@ -207,11 +198,7 @@ function useSupportSocket({
 	return { ready, join, leave };
 }
 
-export function ContactSupportChat({
-	userName,
-}: {
-	userName?: string | null;
-}) {
+export function ContactSupportChat({ userName }: { userName?: string | null }) {
 	const firstName = userName?.split(" ")[0] || "there";
 
 	const [conversation, setConversation] = useState<SupportConversation | null>(
@@ -248,10 +235,10 @@ export function ContactSupportChat({
 
 			if (data.conversation?.id) {
 				try {
-					await supportFetch(
-						`/conversations/${data.conversation.id}/read`,
-						{ method: "POST", body: "{}" },
-					);
+					await supportFetch(`/conversations/${data.conversation.id}/read`, {
+						method: "POST",
+						body: "{}",
+					});
 				} catch {
 					// non-fatal
 				}

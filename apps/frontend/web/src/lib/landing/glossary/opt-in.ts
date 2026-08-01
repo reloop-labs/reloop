@@ -5,7 +5,7 @@ export const term: GlossaryTermDefinition = {
 	title: "Opt-in",
 	description:
 		"Permission from a person to receive your mail, usually from a form or product action.",
-	keywords: ["email opt-in","subscribe permission","consent email"],
+	keywords: ["email opt-in", "subscribe permission", "consent email"],
 	body: `Opt-in means the recipient agreed to get mail of a given type. That agreement should be clear: they know who you are and roughly what you will send. Pre-checked boxes and buried fine print create legal and reputation risk.
 
 Store when and how someone opted in. You will need that if someone disputes a send or you run a re-permission campaign.

@@ -1,10 +1,10 @@
-import { useRouter } from "next/navigation";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import axios from "axios";
+import { useRouter } from "next/navigation";
 import { useQueryState } from "nuqs";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -101,9 +101,7 @@ export function ApiKeyHeader({
 	if (!apiKey && !isLoading) {
 		return (
 			<div className="pt-10 pb-2">
-				<AnimatedBackButton
-					onClick={() => router.push("/api-keys")}
-				/>
+				<AnimatedBackButton onClick={() => router.push("/api-keys")} />
 				<div className="flex items-center justify-between pt-6">
 					<div>
 						<div className="flex items-center gap-1.5 text-error-base">

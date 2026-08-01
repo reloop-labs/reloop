@@ -1,9 +1,9 @@
 "use client";
 
-import Link from "next/link";
-import { formatRelativeTime } from "#/utils/format-relative-time";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
+import Link from "next/link";
+import { formatRelativeTime } from "#/utils/format-relative-time";
 import type { Workflow } from "../workflow-types";
 import { getWorkflowSummary } from "../workflow-validation";
 import { WorkflowEmptyState } from "./workflow-empty-state";
@@ -65,7 +65,11 @@ export const WorkflowTable = ({
 			{workflows.map((workflow) => {
 				const { eventLabel, stepCount } = getWorkflowSummary(workflow);
 				return (
-					<Link href={`/workflows/${workflow.id}`} key={workflow.id} className="group flex items-center gap-4 border-stroke-soft-100 border-b px-4 py-3 transition-colors hover:bg-bg-weak-50 dark:border-stroke-soft-100/50">
+					<Link
+						href={`/workflows/${workflow.id}`}
+						key={workflow.id}
+						className="group flex items-center gap-4 border-stroke-soft-100 border-b px-4 py-3 transition-colors hover:bg-bg-weak-50 dark:border-stroke-soft-100/50"
+					>
 						<div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-stroke-soft-100 bg-bg-weak-50 dark:border-stroke-soft-100/50">
 							<Icon name="workflow" className="h-4 w-4 text-text-sub-600" />
 						</div>

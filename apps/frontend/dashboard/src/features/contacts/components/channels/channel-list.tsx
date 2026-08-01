@@ -55,7 +55,9 @@ export function ChannelList() {
 	const orgName = activeOrganization?.name ?? "Your Organization";
 
 	return (
-		<div className={cn("flex gap-3", allChannels.length === 0 && "items-center")}>
+		<div
+			className={cn("flex gap-3", allChannels.length === 0 && "items-center")}
+		>
 			{/* Left: Channel list */}
 			<div className="min-w-0 flex-1">
 				<ChannelCards

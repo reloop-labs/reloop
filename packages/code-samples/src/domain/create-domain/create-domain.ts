@@ -31,7 +31,7 @@ console.log(domain.id, domain.domain);`,
   -H "Content-Type: application/json" \\
   -d '{"domain": "send.example.com","click_tracking": true,"open_tracking": true,"tls": "opportunistic","sending_email": true,"receiving_email": false}'`,
 	},
-				{
+	{
 		id: "python",
 		lang: "python",
 		label: "Python",
@@ -53,7 +53,7 @@ if result.domain_error:
 
 print(result.domain["id"], result.domain["domain"])`,
 	},
-			{
+	{
 		id: "php",
 		lang: "php",
 		label: "PHP",
@@ -61,7 +61,7 @@ print(result.domain["id"], result.domain["domain"])`,
 
 require 'vendor/autoload.php';
 
-use Reloop\Reloop;
+use ReloopReloop;
 
 $reloop = Reloop::client('rl_123456789');
 
@@ -75,7 +75,7 @@ $domain = $reloop->domain->create([
 ]);
 echo $domain['id'] . ' ' . $domain['domain'] . PHP_EOL;`,
 	},
-			{
+	{
 		id: "java",
 		lang: "java",
 		label: "Java",

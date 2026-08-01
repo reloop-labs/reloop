@@ -1,8 +1,8 @@
+import { useMemo } from "react";
 import { useAgentInbox } from "#/features/agent-inbox/components/agent-inbox-provider";
 import { useComposeDrafts } from "#/features/agent-inbox/hooks/use-compose-drafts";
 import { groupThreadsByConversation } from "#/features/agent-inbox/utils/group-threads";
 import { filterInboxThreads } from "#/features/agent-inbox/utils/inbox-folder-filters";
-import { useMemo } from "react";
 
 export type InboxFolderStats = {
 	inbox: number;

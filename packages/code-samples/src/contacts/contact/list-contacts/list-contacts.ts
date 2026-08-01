@@ -23,7 +23,7 @@ if (contactError) throw contactError;`,
 		source: `curl "https://reloop.sh/api/contacts/list?page=1&limit=10&status=subscribed" \\
   -H "x-api-key: rl_123456789"`,
 	},
-				{
+	{
 		id: "python",
 		lang: "python",
 		label: "Python",
@@ -39,7 +39,7 @@ result = reloop.contacts.list({
 if result.contact_error:
     raise result.contact_error`,
 	},
-			{
+	{
 		id: "php",
 		lang: "php",
 		label: "PHP",
@@ -47,7 +47,7 @@ if result.contact_error:
 
 require 'vendor/autoload.php';
 
-use Reloop\Reloop;
+use ReloopReloop;
 
 $reloop = Reloop::client('rl_123456789');
 
@@ -57,7 +57,7 @@ $contacts = $reloop->contacts->list([
     'status' => 'subscribed',
 ]);`,
 	},
-			{
+	{
 		id: "java",
 		lang: "java",
 		label: "Java",

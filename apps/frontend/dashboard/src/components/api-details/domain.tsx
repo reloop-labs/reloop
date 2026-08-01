@@ -67,7 +67,12 @@ export const DomainApiDetails = ({
 	return (
 		<ApiDetailsDrawer
 			title="Domain API"
-			icon={<Icon name="globe" className="h-6 w-6 text-text-strong-950 dark:text-white" />}
+			icon={
+				<Icon
+					name="globe"
+					className="h-6 w-6 text-text-strong-950 dark:text-white"
+				/>
+			}
 			languages={languages}
 			operations={operations}
 			codeExamples={codeExamples}

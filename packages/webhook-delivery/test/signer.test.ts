@@ -1,8 +1,8 @@
 import { describe, expect, test } from "bun:test";
 import {
-	HEADER_SIGNATURE,
 	buildDeliveryHeaders,
 	formatSignatureHeader,
+	HEADER_SIGNATURE,
 	signWebhookBody,
 	verifyWebhookSignature,
 } from "../src/index";
@@ -10,7 +10,8 @@ import {
 describe("signWebhookBody", () => {
 	test("produces stable HMAC for known input", () => {
 		const secret = "whsec_test_secret";
-		const body = '{"id":"whev_1","type":"email.sent","created_at":"2026-01-01T00:00:00.000Z","data":{}}';
+		const body =
+			'{"id":"whev_1","type":"email.sent","created_at":"2026-01-01T00:00:00.000Z","data":{}}';
 		const ts = 1_700_000_000;
 		const sig = signWebhookBody(secret, body, ts);
 		expect(sig).toHaveLength(64);

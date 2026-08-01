@@ -1,7 +1,7 @@
-import { usePathname } from "next/navigation";
 import { cn } from "@reloop/ui/cn";
 import { Logo } from "@reloop/ui/logo";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { usePathname } from "next/navigation";
 import { useHotkeys } from "react-hotkeys-hook";
 import { AnimatedSidebarToggleIcon } from "./animated-sidebar-toggle-icon";
 import { SettingsSidebarItems } from "./settings-sidebar-items";

@@ -1,13 +1,9 @@
-import Link from "next/link";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
+import Link from "next/link";
 import { useMailboxesQuery } from "#/features/emails/hooks/use-emails-query";
-import {
-	HomeCardBody,
-	HomeCardHeader,
-	HomeCardShell,
-} from "./home-card-shell";
+import { HomeCardBody, HomeCardHeader, HomeCardShell } from "./home-card-shell";
 
 export function InboxSummaryCard({ enabled }: { enabled: boolean }) {
 	const { data, isPending } = useMailboxesQuery(enabled);
@@ -90,9 +86,7 @@ export function InboxSummaryCard({ enabled }: { enabled: boolean }) {
 							asChild
 							className="mt-5 rounded-xl"
 						>
-							<Link href="/inbox?modal=create-agent-mailbox">
-								Create inbox
-							</Link>
+							<Link href="/inbox?modal=create-agent-mailbox">Create inbox</Link>
 						</Button.Root>
 					</div>
 				)}

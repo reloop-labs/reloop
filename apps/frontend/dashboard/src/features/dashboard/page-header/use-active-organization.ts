@@ -1,6 +1,6 @@
-import { useRouter, usePathname } from "next/navigation";
 import { authClient } from "@reloop/auth/client";
 import { useQueryClient } from "@tanstack/react-query";
+import { usePathname, useRouter } from "next/navigation";
 import {
 	createContext,
 	createElement,

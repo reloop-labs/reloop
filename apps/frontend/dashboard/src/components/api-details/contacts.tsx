@@ -67,7 +67,12 @@ export const ContactsApiDetails = ({
 	return (
 		<ApiDetailsDrawer
 			title="Contacts API"
-			icon={<Icon name="contacts" className="h-6 w-6 text-text-strong-950 dark:text-white" />}
+			icon={
+				<Icon
+					name="contacts"
+					className="h-6 w-6 text-text-strong-950 dark:text-white"
+				/>
+			}
 			hotkey="a"
 			languages={languages}
 			operations={operations}

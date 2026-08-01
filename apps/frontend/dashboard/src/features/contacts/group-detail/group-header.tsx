@@ -1,12 +1,3 @@
-import { useRouter } from "next/navigation";
-import { AnimatedBackButton } from "#/features/dashboard/animated-back-button";
-import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
-import {
-	type GroupDetail,
-	useGroupContactsCountQuery,
-	useInvalidateContacts,
-} from "#/features/contacts/hooks/use-contacts-query";
-import { formatRelativeTime } from "#/utils/format-relative-time";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
@@ -21,11 +12,19 @@ import {
 } from "@reloop/ui/popover";
 import { Skeleton } from "@reloop/ui/skeleton";
 import Spinner from "@reloop/ui/spinner";
-
+import { useRouter } from "next/navigation";
 import { useQueryState } from "nuqs";
 import { useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
+import {
+	type GroupDetail,
+	useGroupContactsCountQuery,
+	useInvalidateContacts,
+} from "#/features/contacts/hooks/use-contacts-query";
+import { AnimatedBackButton } from "#/features/dashboard/animated-back-button";
+import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
+import { formatRelativeTime } from "#/utils/format-relative-time";
 import { DeleteGroupModal } from "../components/groups/delete-group";
 
 interface GroupHeaderProps {
@@ -180,9 +179,7 @@ export const GroupHeader = ({ group, isLoading }: GroupHeaderProps) => {
 	if (!group && !isLoading) {
 		return (
 			<div className="pt-10 pb-8">
-				<AnimatedBackButton
-					onClick={() => router.push("/contacts/groups")}
-				/>
+				<AnimatedBackButton onClick={() => router.push("/contacts/groups")} />
 				<div className="flex items-center justify-between pt-6">
 					<div>
 						<div className="flex items-center gap-1.5">
@@ -209,9 +206,7 @@ export const GroupHeader = ({ group, isLoading }: GroupHeaderProps) => {
 	return (
 		<>
 			<div className="pt-10 pb-8">
-				<AnimatedBackButton
-					onClick={() => router.push("/contacts/groups")}
-				/>
+				<AnimatedBackButton onClick={() => router.push("/contacts/groups")} />
 				<div className="flex items-center justify-between pt-6">
 					<div>
 						{isLoading ? (

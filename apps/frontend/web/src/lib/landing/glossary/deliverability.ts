@@ -5,7 +5,7 @@ export const term: GlossaryTermDefinition = {
 	title: "Deliverability",
 	description:
 		"Whether mail reaches the inbox (or at least the mailbox) instead of spam, quarantine, or rejection.",
-	keywords: ["email deliverability","inbox placement","delivery rate"],
+	keywords: ["email deliverability", "inbox placement", "delivery rate"],
 	body: `Deliverability answers a practical question: did the message get where a human will see it? Acceptance by the receiving server is not enough. Spam folders and silent filtering still count as failure for product and marketing goals.
 
 It depends on authentication, IP and domain reputation, list quality, engagement, content, and sending patterns. Fixing only one piece rarely works. A perfect DKIM signature will not save a purchased list.

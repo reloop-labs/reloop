@@ -58,10 +58,7 @@ export function extractVariablesFromContent(
 		while ((match = DOUBLE_BRACE_REGEX.exec(value)) !== null) {
 			// Skip matches nested inside an already-handled triple-brace placeholder
 			const start = match.index;
-			if (
-				value[start - 1] === "{" ||
-				value[start + match[0].length] === "}"
-			) {
+			if (value[start - 1] === "{" || value[start + match[0].length] === "}") {
 				continue;
 			}
 			addName(match[1]);

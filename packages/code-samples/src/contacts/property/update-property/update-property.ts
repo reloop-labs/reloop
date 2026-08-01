@@ -27,7 +27,7 @@ console.log(property.id, property.defaultValue);`,
   -H "Content-Type: application/json" \\
   -d '{"fallbackValue": "N/A"}'`,
 	},
-				{
+	{
 		id: "python",
 		lang: "python",
 		label: "Python",
@@ -44,7 +44,7 @@ if result.property_error:
 
 print(result.property["id"], result.property["defaultValue"])`,
 	},
-			{
+	{
 		id: "php",
 		lang: "php",
 		label: "PHP",
@@ -52,7 +52,7 @@ print(result.property["id"], result.property["defaultValue"])`,
 
 require 'vendor/autoload.php';
 
-use Reloop\Reloop;
+use ReloopReloop;
 
 $reloop = Reloop::client('rl_123456789');
 
@@ -61,7 +61,7 @@ $property = $reloop->contacts->properties->update('prop_123456789', [
 ]);
 echo $property['id'] . ' ' . $property['defaultValue'] . PHP_EOL;`,
 	},
-			{
+	{
 		id: "java",
 		lang: "java",
 		label: "Java",

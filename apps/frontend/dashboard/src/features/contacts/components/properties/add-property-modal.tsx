@@ -309,9 +309,7 @@ export const AddPropertyModal = ({
 
 								{/* Default Value */}
 								<div className="space-y-2">
-									<Label.Root htmlFor="defaultValue">
-										Default Value
-									</Label.Root>
+									<Label.Root htmlFor="defaultValue">Default Value</Label.Root>
 									<Input.Root
 										size="medium"
 										className="rounded-xl"
@@ -375,7 +373,9 @@ export const AddPropertyModal = ({
 									type="submit"
 									variant={status === "success" ? "success" : "blue"}
 									size="small"
-									disabled={status === "creating" || (status === "idle" && !canSubmit)}
+									disabled={
+										status === "creating" || (status === "idle" && !canSubmit)
+									}
 									className={cn(
 										"w-[156px] min-w-[156px] justify-center overflow-hidden transition-all duration-200",
 										status === "creating" && "opacity-90",

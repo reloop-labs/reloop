@@ -75,9 +75,7 @@ export const validateWorkflow = (
 
 	const unconfiguredSend = sendEmailNodes.filter(
 		(n) =>
-			!n.data.to?.trim() ||
-			!n.data.subject?.trim() ||
-			!n.data.from?.trim(),
+			!n.data.to?.trim() || !n.data.subject?.trim() || !n.data.from?.trim(),
 	);
 	if (unconfiguredSend.length > 0) {
 		warnings.push("Complete To, From, and Subject for each Send email step.");
@@ -109,9 +107,7 @@ export const getWorkflowSummary = (workflow: Workflow) => {
 				trigger.data.eventId)
 			: workflow.triggerEvent;
 	const eventLabel =
-		typeof eventKey === "string" && eventKey
-			? eventKey
-			: "Not configured";
+		typeof eventKey === "string" && eventKey ? eventKey : "Not configured";
 	const stepCount = workflow.nodes.filter(
 		(n) => isSendEmailNode(n) || isDelayNode(n),
 	).length;

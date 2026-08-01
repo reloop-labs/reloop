@@ -1,12 +1,12 @@
-import Link from "next/link";
-import { queryKeys } from "#/lib/query-keys";
 import * as Badge from "@reloop/ui/badge";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import { useInfiniteQuery } from "@tanstack/react-query";
+import Link from "next/link";
 import { useMemo } from "react";
+import { queryKeys } from "#/lib/query-keys";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -268,9 +268,7 @@ function dayLabel(iso: string): string {
 	if (sameCalendarDay(d, yesterday)) return "YESTERDAY";
 
 	const day = d.getDate();
-	const month = d
-		.toLocaleDateString("en-US", { month: "long" })
-		.toUpperCase();
+	const month = d.toLocaleDateString("en-US", { month: "long" }).toUpperCase();
 	const year = d.getFullYear();
 	return `${day} ${month} ${year}`;
 }
@@ -304,8 +302,7 @@ function buildTimelineItems(
 	}
 
 	items.sort(
-		(a, b) =>
-			new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
+		(a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
 	);
 
 	return items;
@@ -447,7 +444,7 @@ function DayHeader({ label, isFirst }: { label: string; isFirst: boolean }) {
 		<p
 			className={cn(
 				"font-medium text-[10px] text-text-sub-600 uppercase tracking-wider",
-				isFirst ? "mb-3" : "mb-3 mt-0.5",
+				isFirst ? "mb-3" : "mt-0.5 mb-3",
 			)}
 		>
 			{label}
@@ -517,18 +514,19 @@ function EmailActivityRow({
 			/>
 
 			<div className={cn("min-w-0 flex-1", isLast ? "pb-1" : "pb-8")}>
-				{showDay && day && (
-					<DayHeader label={day} isFirst={isFirstOverall} />
-				)}
+				{showDay && day && <DayHeader label={day} isFirst={isFirstOverall} />}
 
 				<div className="flex items-start justify-between gap-4">
 					<div className="min-w-0 flex-1">
 						{/* Link style matches Groups/Channels on this page */}
-						<Link href={`/emails/${entry.id}`} className={cn(
+						<Link
+							href={`/emails/${entry.id}`}
+							className={cn(
 								"font-medium text-paragraph-sm text-text-strong-950 leading-snug",
 								"underline decoration-stroke-soft-200 decoration-dashed underline-offset-4",
 								"transition-colors hover:text-primary-base hover:decoration-primary-base/40",
-							)}>
+							)}
+						>
 							{title}
 						</Link>
 						<p className="mt-0.5 truncate text-paragraph-xs text-text-sub-600 leading-snug">
@@ -555,7 +553,7 @@ function EmailActivityRow({
 						)}
 
 						{lifecycle.failedReason && (
-							<p className="mt-1.5 max-w-md truncate text-paragraph-xs text-error-base">
+							<p className="mt-1.5 max-w-md truncate text-error-base text-paragraph-xs">
 								{lifecycle.failedReason}
 							</p>
 						)}
@@ -594,9 +592,7 @@ function ContactCreatedRow({
 				connectFromAbove={showDay && !isFirstOverall}
 			/>
 			<div className={cn("min-w-0 flex-1", isLast ? "pb-1" : "pb-8")}>
-				{showDay && day && (
-					<DayHeader label={day} isFirst={isFirstOverall} />
-				)}
+				{showDay && day && <DayHeader label={day} isFirst={isFirstOverall} />}
 
 				<div className="flex items-start justify-between gap-4">
 					<div className="min-w-0 flex-1">

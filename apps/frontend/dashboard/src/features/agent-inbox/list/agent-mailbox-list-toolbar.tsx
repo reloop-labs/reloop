@@ -2,18 +2,18 @@ import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import {
+	parseAsInteger,
+	parseAsString,
+	parseAsStringLiteral,
+	useQueryState,
+} from "nuqs";
+import {
 	Select,
 	SelectContent,
 	SelectItem,
 	SelectTrigger,
 	SelectValue,
 } from "#/features/api-keys/filters/base-ui-select";
-import {
-	parseAsInteger,
-	parseAsString,
-	parseAsStringLiteral,
-	useQueryState,
-} from "nuqs";
 import { useAgentInbox } from "../components/agent-inbox-provider";
 import type { AgentMailbox } from "../types";
 

@@ -5,8 +5,8 @@ import {
 	getPublishedPosts,
 } from "@reloop/web/lib/landing/blog/source";
 import { glossaryTerms } from "@reloop/web/lib/landing/glossary";
-import { getAllSitemapRoutes } from "@reloop/web/lib/sitemap-routes";
 import { getSiteUrl } from "@reloop/web/lib/site";
+import { getAllSitemapRoutes } from "@reloop/web/lib/sitemap-routes";
 
 export type SitemapEntry = {
 	path: string;

@@ -8,10 +8,7 @@ export function isLastAttempt(job: WorkflowJob): boolean {
 	return job.attemptsMade + 1 >= (job.opts.attempts ?? 1);
 }
 
-export async function logJob(
-	job: WorkflowJob,
-	message: string,
-): Promise<void> {
+export async function logJob(job: WorkflowJob, message: string): Promise<void> {
 	await job.log(message);
 }
 

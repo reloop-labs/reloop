@@ -1,8 +1,8 @@
 import { authMiddleware } from "@reloop/be-inbox/middleware/auth";
 import { MailModel } from "@reloop/be-inbox/model/mail.model";
+import { archiveThreadXCodeSamples } from "@reloop/code-samples/inbox";
 import { Elysia, t } from "elysia";
 import { archiveThreadController } from "./archive-thread.controllers";
-import { archiveThreadXCodeSamples } from "@reloop/code-samples/inbox";
 
 export const archiveThreadRoute = new Elysia().use(authMiddleware).post(
 	"/:id/archive",

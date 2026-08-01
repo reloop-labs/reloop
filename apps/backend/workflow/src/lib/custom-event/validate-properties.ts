@@ -5,13 +5,15 @@ type PropertyDef = typeof schema.customEventProperty.$inferSelect;
 export function validateTrackProperties(params: {
 	defs: PropertyDef[];
 	properties: Record<string, unknown> | undefined;
-}): {
-	ok: true;
-	normalized: Record<string, unknown>;
-} | {
-	ok: false;
-	error: string;
-} {
+}):
+	| {
+			ok: true;
+			normalized: Record<string, unknown>;
+	  }
+	| {
+			ok: false;
+			error: string;
+	  } {
 	const input = params.properties ?? {};
 	const normalized: Record<string, unknown> = { ...input };
 

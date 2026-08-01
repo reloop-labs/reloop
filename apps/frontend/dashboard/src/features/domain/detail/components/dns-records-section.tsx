@@ -32,12 +32,7 @@ export const DNSRecordsSection = ({
 	const { handleUpdateDomain } = useDomainActions(domain?.id, domain);
 
 	return (
-		<div
-			className={cn(
-				"mt-6 mb-24 flex flex-col space-y-6",
-				className,
-			)}
-		>
+		<div className={cn("mt-6 mb-24 flex flex-col space-y-6", className)}>
 			{showAutoConnectBanner && domain?.status && (
 				<DNSAutoConnectBanner domain={domain} />
 			)}

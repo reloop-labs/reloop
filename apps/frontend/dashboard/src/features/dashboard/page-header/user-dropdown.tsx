@@ -1,8 +1,8 @@
-import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import { useTheme } from "next-themes";
 import { useMemo, useRef, useState } from "react";
@@ -48,7 +48,9 @@ export function UserDropdown({ user }: { user: HeaderUser | null }) {
 			}),
 		[isOrgAdmin, canManageTeam],
 	);
-	const workspaceSection = filteredSettings.find((s) => s.section === "Workspace");
+	const workspaceSection = filteredSettings.find(
+		(s) => s.section === "Workspace",
+	);
 	const accountSection = filteredSettings.find((s) => s.section === "Account");
 
 	const getFrom = () => {

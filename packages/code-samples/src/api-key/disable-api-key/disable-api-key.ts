@@ -22,7 +22,7 @@ console.log(apiKey.id, apiKey.enabled);`,
 		source: `curl -X POST https://reloop.sh/api/api-key/v1/disable/key_123456789 \\
   -H "x-api-key: rl_123456789"`,
 	},
-				{
+	{
 		id: "python",
 		lang: "python",
 		label: "Python",
@@ -37,7 +37,7 @@ if result.api_key_error:
 
 print(result.api_key["id"], result.api_key["enabled"])`,
 	},
-			{
+	{
 		id: "php",
 		lang: "php",
 		label: "PHP",
@@ -45,14 +45,14 @@ print(result.api_key["id"], result.api_key["enabled"])`,
 
 require 'vendor/autoload.php';
 
-use Reloop\Reloop;
+use ReloopReloop;
 
 $reloop = Reloop::client('rl_123456789');
 
 $apiKey = $reloop->apiKey->disable('key_123456789');
 echo $apiKey['id'] . ' ' . $apiKey['enabled'] . PHP_EOL;`,
 	},
-			{
+	{
 		id: "java",
 		lang: "java",
 		label: "Java",

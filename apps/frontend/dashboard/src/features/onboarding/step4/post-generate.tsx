@@ -139,14 +139,14 @@ export function PostGenerate({
 										className="mt-0.5 h-4 w-4 shrink-0 text-green-700"
 									/>
 									<div className="min-w-0 space-y-0.5">
-										<p className="font-medium text-sm text-green-950">
+										<p className="font-medium text-green-950 text-sm">
 											Email sent — check your inbox
 										</p>
-										<p className="text-paragraph-sm text-green-900/85 leading-relaxed">
+										<p className="text-green-900/85 text-paragraph-sm leading-relaxed">
 											{testTo ? (
 												<>
 													We sent a message to{" "}
-													<span className="font-mono font-medium">
+													<span className="font-medium font-mono">
 														{testTo}
 													</span>
 													. Open your email provider (and spam, just in case)
@@ -211,7 +211,7 @@ export function PostGenerate({
 									variant="blue"
 									size="small"
 									className={cn(
-										"min-w-[190px] justify-center overflow-hidden rounded-xl whitespace-nowrap",
+										"min-w-[190px] justify-center overflow-hidden whitespace-nowrap rounded-xl",
 										testSending && "pointer-events-none opacity-90",
 									)}
 									onClick={onSendTest}
@@ -243,7 +243,7 @@ export function PostGenerate({
 									variant="blue"
 									size="small"
 									className={cn(
-										"min-w-[170px] justify-center overflow-hidden rounded-xl whitespace-nowrap transition-all duration-200",
+										"min-w-[170px] justify-center overflow-hidden whitespace-nowrap rounded-xl transition-all duration-200",
 										finishing && "pointer-events-none opacity-90",
 									)}
 									onClick={onDone}

@@ -1,11 +1,10 @@
+import { cn } from "@reloop/ui/cn";
+import { Skeleton } from "@reloop/ui/skeleton";
 import { useRouter } from "next/navigation";
 import { AnimatedBackButton } from "#/features/dashboard/animated-back-button";
 import { TriggerWebhookTester } from "#/features/webhooks/components/trigger-webhook-tester";
 import { WebhookAvatar } from "#/features/webhooks/components/webhook-avatar";
 import { useWebhookDetailQuery } from "#/features/webhooks/hooks/use-webhooks-query";
-
-import { cn } from "@reloop/ui/cn";
-import { Skeleton } from "@reloop/ui/skeleton";
 
 function statusBadgeLabel(status: string) {
 	switch (status) {

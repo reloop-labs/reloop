@@ -70,14 +70,14 @@ export async function sendEmail(options: SendEmailOptions) {
 		const detail =
 			error instanceof Error
 				? {
-					message: error.message,
-					cause:
-						error.cause instanceof Error
-							? error.cause.message
-							: error.cause
-								? String(error.cause)
-								: undefined,
-				}
+						message: error.message,
+						cause:
+							error.cause instanceof Error
+								? error.cause.message
+								: error.cause
+									? String(error.cause)
+									: undefined,
+					}
 				: { message: String(error) };
 		log.error({
 			error: detail.message,

@@ -1,9 +1,9 @@
-import { Logo } from "@reloop/ui/logo";
 import { cn } from "@reloop/ui/cn";
+import { Logo } from "@reloop/ui/logo";
+import { HeroCtaLink } from "@reloop/web/components/landing/hero";
 import Link from "next/link";
 import type { SimpleIcon } from "simple-icons";
 import { BrandIcon } from "./brand-icon";
-import { HeroCtaLink } from "@reloop/web/components/landing/hero";
 
 type MigrateStep = {
 	step: number;
@@ -64,9 +64,9 @@ export function CompareMigrate({
 					Migrate in minutes
 				</h2>
 				<p className="mx-auto mt-4 max-w-xl text-balance font-medium text-[15px] text-text-sub-600 leading-relaxed sm:text-[17px] dark:text-white/50">
-					Switching from {competitorName} to Reloop is straightforward. Keep your
-					templates, swap the send path, and re-wire webhooks—without rewriting
-					your product.
+					Switching from {competitorName} to Reloop is straightforward. Keep
+					your templates, swap the send path, and re-wire webhooks—without
+					rewriting your product.
 				</p>
 
 				<div className="mt-8 flex flex-wrap items-center justify-center gap-3">
@@ -175,7 +175,7 @@ function SignInVisual({
 					→
 				</span>
 				<div className="flex size-12 items-center justify-center rounded-[14px] bg-[#0a0d12] shadow-sm ring-1 ring-black/5 dark:ring-white/10">
-					<Logo className="size-[70%] [&_rect]:!fill-white" />
+					<Logo className="[&_rect]:!fill-white size-[70%]" />
 				</div>
 			</div>
 			<div className="w-full max-w-[200px] rounded-xl border border-stroke-soft-200 bg-bg-white-0 px-3 py-2.5 text-center font-medium text-[12px] text-text-strong-950 shadow-sm dark:border-white/10 dark:bg-black/40 dark:text-white">
@@ -211,7 +211,9 @@ function DomainsVisual() {
 					<span
 						className={cn(
 							"relative h-5 w-9 shrink-0 rounded-full transition-colors",
-							row.on ? "bg-primary-base" : "bg-stroke-soft-200 dark:bg-white/15",
+							row.on
+								? "bg-primary-base"
+								: "bg-stroke-soft-200 dark:bg-white/15",
 						)}
 						aria-hidden
 					>
@@ -235,7 +237,7 @@ function SuccessVisual({ competitorName }: { competitorName: string }) {
 	return (
 		<div className="flex flex-col items-center gap-3 text-center">
 			<div className="flex size-12 items-center justify-center rounded-[14px] bg-[#0a0d12] shadow-sm">
-				<Logo className="size-[70%] [&_rect]:!fill-white" />
+				<Logo className="[&_rect]:!fill-white size-[70%]" />
 			</div>
 			<div className="flex items-start gap-2 rounded-xl border border-stroke-soft-200 bg-bg-white-0 px-3 py-2.5 text-left shadow-sm dark:border-white/10 dark:bg-black/40">
 				<span className="mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-white">

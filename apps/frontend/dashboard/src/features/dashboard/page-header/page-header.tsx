@@ -1,8 +1,8 @@
-import { useSupportUnread } from "#/features/dashboard/hooks/use-support-unread";
-import { useUIStore } from "#/store/use-ui-store";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
+import { useSupportUnread } from "#/features/dashboard/hooks/use-support-unread";
+import { useUIStore } from "#/store/use-ui-store";
 import { CopyPromptButton } from "./copy-prompt-button";
 import { OrganizationSwitcher } from "./organization-switcher";
 import { useActiveOrganization } from "./use-active-organization";
@@ -16,12 +16,8 @@ import { UserDropdown } from "./user-dropdown";
  * Copy prompt is always available for Claude / ChatGPT / Cursor / etc.
  */
 export function PageHeader() {
-	const {
-		user,
-		organizations,
-		activeOrganization,
-		onOrganizationChange,
-	} = useActiveOrganization();
+	const { user, organizations, activeOrganization, onOrganizationChange } =
+		useActiveOrganization();
 	const {
 		isAiPanelOpen,
 		setIsAiPanelOpen,

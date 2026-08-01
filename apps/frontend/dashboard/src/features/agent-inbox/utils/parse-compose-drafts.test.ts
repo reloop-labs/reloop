@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { parseComposeDraft, parseComposeDraftsList } from "./parse-compose-drafts";
+import {
+	parseComposeDraft,
+	parseComposeDraftsList,
+} from "./parse-compose-drafts";
 
 const sample = {
 	id: "cdrft_1",

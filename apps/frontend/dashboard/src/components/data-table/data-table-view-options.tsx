@@ -83,7 +83,7 @@ export function DataTableViewOptions({
 				showArrow={false}
 				className={cn("w-48 overflow-hidden rounded-xl p-1.5", className)}
 			>
-				<Command className="bg-transparent overflow-visible">
+				<Command className="overflow-visible bg-transparent">
 					<CommandList className="overflow-visible">
 						<CommandGroup className="p-0">
 							<div className="relative">
@@ -116,7 +116,7 @@ export function DataTableViewOptions({
 														{column.icon}
 													</span>
 												)}
-												<span className="truncate text-text-strong-950 text-xs font-normal">
+												<span className="truncate font-normal text-text-strong-950 text-xs">
 													{column.label}
 												</span>
 											</div>

@@ -8,10 +8,7 @@ export function LogsListHeader() {
 		<div className="flex flex-col gap-4 pt-2 pb-1 sm:flex-row sm:items-start sm:justify-between">
 			<div>
 				<div className="flex items-center gap-2.5">
-					<Icon
-						name="logs"
-						className="h-6 w-6 shrink-0 text-text-strong-950"
-					/>
+					<Icon name="logs" className="h-6 w-6 shrink-0 text-text-strong-950" />
 					<h1 className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
 						Logs
 					</h1>

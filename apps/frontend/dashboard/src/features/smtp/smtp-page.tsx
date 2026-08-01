@@ -1,9 +1,9 @@
-import { useRouter } from "next/navigation";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import * as Tooltip from "@reloop/ui/tooltip";
+import { useRouter } from "next/navigation";
 
 import { useCallback, useState } from "react";
 import { SMTP_HOST, SMTP_USER } from "./smtp-code-examples";

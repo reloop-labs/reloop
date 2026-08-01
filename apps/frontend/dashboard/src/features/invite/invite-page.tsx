@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { authClient } from "@reloop/auth/client";
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
@@ -10,6 +9,7 @@ import Spinner from "@reloop/ui/spinner";
 import { toast } from "@reloop/ui/toast";
 import { useQueryClient } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 import { parseAsString, useQueryState } from "nuqs";
 import { useEffect, useState } from "react";
 import { useSessionQuery } from "#/features/auth/session-query";
@@ -161,9 +161,7 @@ export function InvitePage() {
 							variant="blue"
 							size="small"
 							className="w-full justify-center overflow-hidden transition-all duration-200"
-							onClick={() =>
-								router.push(session ? "/onboarding" : "/login")
-							}
+							onClick={() => router.push(session ? "/onboarding" : "/login")}
 						>
 							{session ? "Create your organization" : "Go to Login"}
 						</FancyButton.Root>

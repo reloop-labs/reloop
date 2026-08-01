@@ -1,24 +1,24 @@
-import { useRouter, usePathname } from "next/navigation";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
+import { WEBHOOK_EVENTS } from "@reloop/webhook-events";
 
 import axios from "axios";
 import {
 	AnimatePresence,
+	type AnimationPlaybackControls,
 	animate,
 	motion,
 	useMotionValue,
-	type AnimationPlaybackControls,
 } from "framer-motion";
+import { usePathname, useRouter } from "next/navigation";
 import { useQueryState } from "nuqs";
 import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
-import { WEBHOOK_EVENTS } from "@reloop/webhook-events";
 import { useInvalidateWebhooks } from "#/features/webhooks/hooks/use-webhooks-query";
 import type { DeleteWebhookModalProps, WebhookData } from "./types";
 
@@ -165,7 +165,7 @@ export const DeleteWebhookModal = ({
 					<Modal.Title className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
 						Delete webhook
 					</Modal.Title>
-					<p className="mt-2 text-sm leading-relaxed text-text-sub-600">
+					<p className="mt-2 text-sm text-text-sub-600 leading-relaxed">
 						Are you sure you want to delete this webhook? This action cannot be
 						undone.
 					</p>
@@ -179,7 +179,9 @@ export const DeleteWebhookModal = ({
 						</p>
 					</div>
 					<div>
-						<p className="font-normal text-text-sub-600 text-xs">Endpoint URL</p>
+						<p className="font-normal text-text-sub-600 text-xs">
+							Endpoint URL
+						</p>
 						<p className="mt-0.5 truncate font-medium font-mono text-sm text-text-strong-950">
 							{displayUrl}
 						</p>
@@ -208,7 +210,7 @@ export const DeleteWebhookModal = ({
 										<span
 											key={eventId}
 											className={cn(
-												"inline-flex items-center gap-1 rounded-full border px-1.5 py-0.5 font-mono text-[10px] font-medium",
+												"inline-flex items-center gap-1 rounded-full border px-1.5 py-0.5 font-medium font-mono text-[10px]",
 												chipClass,
 											)}
 										>

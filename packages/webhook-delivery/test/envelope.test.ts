@@ -1,10 +1,10 @@
 import { describe, expect, test } from "bun:test";
 import {
 	buildWebhookEnvelope,
+	formatSignatureHeader,
 	serializeWebhookEnvelope,
 	signWebhookBody,
 	verifyWebhookSignature,
-	formatSignatureHeader,
 } from "../src/index";
 
 describe("envelope + sign roundtrip", () => {

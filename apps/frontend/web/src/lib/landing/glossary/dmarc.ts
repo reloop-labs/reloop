@@ -5,7 +5,7 @@ export const term: GlossaryTermDefinition = {
 	title: "DMARC",
 	description:
 		"A domain policy (plus reports) that tells receivers what to do when SPF or DKIM fail.",
-	keywords: ["DMARC","DMARC policy","DMARC report"],
+	keywords: ["DMARC", "DMARC policy", "DMARC report"],
 	body: `DMARC sits on top of SPF and DKIM. You publish a DNS TXT record that says what receivers should do when mail claiming your domain fails authentication: do nothing special (none), quarantine, or reject. It also asks for aggregate and optional forensic reports so you can see who sends as you.
 
 Alignment matters. SPF or DKIM must pass and align with the From domain under DMARC's rules. A signature for a parent brand domain may not protect a marketing subdomain you actually send from, depending on setup.

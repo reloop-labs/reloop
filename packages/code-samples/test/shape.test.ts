@@ -3,8 +3,7 @@ import * as all from "../src/index";
 import type { CodeSample } from "../src/types";
 
 const sampleExports = Object.entries(all).filter(
-	([name, value]) =>
-		name.endsWith("XCodeSamples") && Array.isArray(value),
+	([name, value]) => name.endsWith("XCodeSamples") && Array.isArray(value),
 ) as [string, CodeSample[]][];
 
 describe("@reloop/code-samples shape", () => {

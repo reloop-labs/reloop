@@ -9,8 +9,8 @@ import { batchGetMessagesXCodeSamples } from "./messages/batch-get-messages/batc
 import { cancelPendingXCodeSamples } from "./messages/cancel-pending/cancel-pending";
 import { deleteMessageXCodeSamples } from "./messages/delete-message/delete-message";
 import { forwardMessageXCodeSamples } from "./messages/forward-message/forward-message";
-import { getMessageAttachmentXCodeSamples } from "./messages/get-message-attachment/get-message-attachment";
 import { getMessageXCodeSamples } from "./messages/get-message/get-message";
+import { getMessageAttachmentXCodeSamples } from "./messages/get-message-attachment/get-message-attachment";
 import { getRawMessageXCodeSamples } from "./messages/get-raw-message/get-raw-message";
 import { listMessagesXCodeSamples } from "./messages/list-messages/list-messages";
 import { listSentMessagesXCodeSamples } from "./messages/list-sent-messages/list-sent-messages";
@@ -23,8 +23,8 @@ import { updateMessageXCodeSamples } from "./messages/update-message/update-mess
 import { archiveThreadXCodeSamples } from "./threads/archive-thread/archive-thread";
 import { batchThreadsXCodeSamples } from "./threads/batch-threads/batch-threads";
 import { deleteThreadXCodeSamples } from "./threads/delete-thread/delete-thread";
-import { getThreadAttachmentXCodeSamples } from "./threads/get-thread-attachment/get-thread-attachment";
 import { getThreadXCodeSamples } from "./threads/get-thread/get-thread";
+import { getThreadAttachmentXCodeSamples } from "./threads/get-thread-attachment/get-thread-attachment";
 import { listThreadsXCodeSamples } from "./threads/list-threads/list-threads";
 import { markThreadReadXCodeSamples } from "./threads/mark-thread-read/mark-thread-read";
 import { restoreThreadXCodeSamples } from "./threads/restore-thread/restore-thread";

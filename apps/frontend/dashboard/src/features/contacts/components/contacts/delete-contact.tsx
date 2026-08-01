@@ -1,4 +1,3 @@
-import { useInvalidateContacts } from "#/features/contacts/hooks/use-contacts-query";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import { KbdEsc } from "@reloop/ui/kbd-esc";
@@ -6,6 +5,7 @@ import * as Modal from "@reloop/ui/modal";
 import { useQueryState } from "nuqs";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useInvalidateContacts } from "#/features/contacts/hooks/use-contacts-query";
 
 interface Contact {
 	id: string;

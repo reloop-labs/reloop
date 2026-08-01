@@ -59,10 +59,7 @@ function findSampleFiles(dir: string): string[] {
 			continue;
 		}
 		const content = fs.readFileSync(fullPath, "utf8");
-		if (
-			content.includes("XCodeSamples") ||
-			content.includes("CodeSample[]")
-		) {
+		if (content.includes("XCodeSamples") || content.includes("CodeSample[]")) {
 			files.push(fullPath);
 		}
 	}

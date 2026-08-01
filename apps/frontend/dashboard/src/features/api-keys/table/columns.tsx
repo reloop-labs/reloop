@@ -1,9 +1,9 @@
-import Link from "next/link";
 import * as Avatar from "@reloop/ui/avatar";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import type { ColumnDef } from "@tanstack/react-table";
 import { AnimatePresence, motion } from "framer-motion";
+import Link from "next/link";
 import { DataTableCheckbox } from "#/components/data-table/data-table-checkbox";
 import { getAvatarGradient, getAvatarInitial } from "#/utils/avatar";
 import { formatRelativeTime } from "#/utils/format-relative-time";
@@ -13,11 +13,7 @@ export type ApiKeyTableMeta = {
 	editingApiKeyId: string | null;
 };
 
-function CreatedByCell({
-	createdBy,
-}: {
-	createdBy: ApiKeyData["createdBy"];
-}) {
+function CreatedByCell({ createdBy }: { createdBy: ApiKeyData["createdBy"] }) {
 	if (!createdBy) {
 		return (
 			<span className="font-medium text-sm text-text-sub-600">Unknown</span>
@@ -104,7 +100,10 @@ export const apiKeyColumns: ColumnDef<ApiKeyData>[] = [
 			const isEditing = meta?.editingApiKeyId === apiKey.id;
 			return (
 				<div className="flex min-w-0 items-center gap-2">
-					<Link href={`/api-keys/${apiKey.id}`} className="truncate font-semibold text-label-sm text-text-strong-950 underline decoration-dotted underline-offset-2 transition-colors hover:text-[#1868DF] dark:hover:text-blue-400" onClick={(e) => {
+					<Link
+						href={`/api-keys/${apiKey.id}`}
+						className="truncate font-semibold text-label-sm text-text-strong-950 underline decoration-dotted underline-offset-2 transition-colors hover:text-[#1868DF] dark:hover:text-blue-400"
+						onClick={(e) => {
 							if (isEditing) e.preventDefault();
 						}}
 					>
@@ -167,7 +166,7 @@ export const apiKeyColumns: ColumnDef<ApiKeyData>[] = [
 				<div className="flex items-center">
 					<div
 						className={cn(
-							"relative flex items-center overflow-hidden py-0.5 font-medium text-[13px] capitalize transition-colors duration-200 min-h-[22px]",
+							"relative flex min-h-[22px] items-center overflow-hidden py-0.5 font-medium text-[13px] capitalize transition-colors duration-200",
 							enabled ? "text-success-base" : "text-error-base",
 						)}
 					>

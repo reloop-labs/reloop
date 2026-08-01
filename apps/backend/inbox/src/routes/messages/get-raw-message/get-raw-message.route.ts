@@ -1,8 +1,8 @@
 import { authMiddleware } from "@reloop/be-inbox/middleware/auth";
 import { MailModel } from "@reloop/be-inbox/model/mail.model";
+import { getRawMessageXCodeSamples } from "@reloop/code-samples/inbox";
 import { Elysia, t } from "elysia";
 import { getRawMessageController } from "./get-raw-message.controllers";
-import { getRawMessageXCodeSamples } from "@reloop/code-samples/inbox";
 
 export const getRawMessageRoute = new Elysia().use(authMiddleware).get(
 	"/:id/raw",

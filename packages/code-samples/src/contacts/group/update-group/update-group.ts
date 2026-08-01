@@ -27,7 +27,7 @@ console.log(group.id, group.name);`,
   -H "Content-Type: application/json" \\
   -d '{"name": "Loyal Customers"}'`,
 	},
-				{
+	{
 		id: "python",
 		lang: "python",
 		label: "Python",
@@ -44,7 +44,7 @@ if result.group_error:
 
 print(result.group["id"], result.group["name"])`,
 	},
-			{
+	{
 		id: "php",
 		lang: "php",
 		label: "PHP",
@@ -52,7 +52,7 @@ print(result.group["id"], result.group["name"])`,
 
 require 'vendor/autoload.php';
 
-use Reloop\Reloop;
+use ReloopReloop;
 
 $reloop = Reloop::client('rl_123456789');
 
@@ -61,7 +61,7 @@ $group = $reloop->contacts->groups->update('grp_123456789', [
 ]);
 echo $group['id'] . ' ' . $group['name'] . PHP_EOL;`,
 	},
-			{
+	{
 		id: "java",
 		lang: "java",
 		label: "Java",

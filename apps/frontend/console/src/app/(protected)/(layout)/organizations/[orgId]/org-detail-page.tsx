@@ -191,7 +191,9 @@ export default function OrganizationDetailPage() {
 	if (isLoading) {
 		return (
 			<PageFrame>
-				<p className="text-paragraph-sm text-text-sub-600">Loading organization…</p>
+				<p className="text-paragraph-sm text-text-sub-600">
+					Loading organization…
+				</p>
 			</PageFrame>
 		);
 	}
@@ -232,7 +234,9 @@ export default function OrganizationDetailPage() {
 				description={
 					<div className="flex flex-wrap gap-x-4 gap-y-1">
 						<span>Created {formatDateTime(data.createdAt)}</span>
-						{data.billingEmail ? <span>Billing {data.billingEmail}</span> : null}
+						{data.billingEmail ? (
+							<span>Billing {data.billingEmail}</span>
+						) : null}
 						{data.externalCustomerId ? (
 							<span className="font-mono">
 								Customer {truncateId(data.externalCustomerId, 14)}
@@ -621,7 +625,12 @@ export default function OrganizationDetailPage() {
 									{formatRelativeTime(m.createdAt)}
 								</td>
 								<td className="px-4 py-3 text-right">
-									<Button.Root asChild size="xsmall" variant="neutral" mode="ghost">
+									<Button.Root
+										asChild
+										size="xsmall"
+										variant="neutral"
+										mode="ghost"
+									>
 										<Link href={`/users/${m.userId}`}>Open hub</Link>
 									</Button.Root>
 								</td>
@@ -690,10 +699,7 @@ export default function OrganizationDetailPage() {
 									{k.prefix || k.start || truncateId(k.id, 12)}
 								</td>
 								<td className="px-4 py-3">
-									<Link
-										href={`/users/${k.userId}`}
-										className="hover:underline"
-									>
+									<Link href={`/users/${k.userId}`} className="hover:underline">
 										{k.userEmail}
 									</Link>
 								</td>
@@ -721,7 +727,14 @@ export default function OrganizationDetailPage() {
 					description="Email templates in this organization"
 				>
 					<DataTable
-						headers={["Name", "Status", "Subject", "From", "Version", "Updated"]}
+						headers={[
+							"Name",
+							"Status",
+							"Subject",
+							"From",
+							"Version",
+							"Updated",
+						]}
 						colSpan={6}
 						empty={data.templates.length === 0}
 					>
@@ -867,7 +880,10 @@ export default function OrganizationDetailPage() {
 					title="Admin audit for this org"
 					description="Privileged actions that touched this organization"
 					action={
-						<Link href="/audit" className="text-[12px] text-primary-base hover:underline">
+						<Link
+							href="/audit"
+							className="text-[12px] text-primary-base hover:underline"
+						>
 							Full audit log →
 						</Link>
 					}

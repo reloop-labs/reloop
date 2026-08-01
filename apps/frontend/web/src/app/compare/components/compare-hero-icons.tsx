@@ -21,15 +21,13 @@ export function CompareHeroIcons({
 	const strokeR = `${uid}-stroke-r`;
 
 	return (
-		<div
-			className="relative mx-auto h-[148px] w-full max-w-[562px] sm:h-[200px] md:h-[242px] [--chevron-fill:#ffffff] [--chevron-stroke:#d4d4d4] dark:[--chevron-fill:rgba(255,255,255,0.06)] dark:[--chevron-stroke:rgba(255,255,255,0.18)]"
-		>
+		<div className="relative mx-auto h-[148px] w-full max-w-[562px] [--chevron-fill:#ffffff] [--chevron-stroke:#d4d4d4] sm:h-[200px] md:h-[242px] dark:[--chevron-fill:rgba(255,255,255,0.06)] dark:[--chevron-stroke:rgba(255,255,255,0.18)]">
 			{/* Chevron panels */}
 			<svg
 				viewBox="0 0 562 242"
 				fill="none"
 				xmlns="http://www.w3.org/2000/svg"
-				className="absolute inset-0 size-full -translate-x-px"
+				className="-translate-x-px absolute inset-0 size-full"
 				aria-hidden
 			>
 				{/*
@@ -112,7 +110,7 @@ export function CompareHeroIcons({
 						className="relative flex size-[4.25rem] items-center justify-center rounded-[20px] bg-[#0a0d12] shadow-sm sm:size-[5.25rem] sm:rounded-[24px] md:size-24 md:rounded-[26px]"
 						aria-hidden
 					>
-						<Logo className="size-[72%] [&_rect]:!fill-white" />
+						<Logo className="[&_rect]:!fill-white size-[72%]" />
 					</div>
 				</div>
 

@@ -17,28 +17,33 @@ describe("ensureAbsoluteUrl", () => {
 	});
 
 	it("preserves valid absolute http/https URLs", () => {
-		const validS3 = "https://s3.reloop.sh/reloop/uploads/2026/07/kkspseorvxubr8jzgmz6m27f.svg";
-		const validHttp = "http://s3.reloop.sh/reloop/uploads/2026/07/kkspseorvxubr8jzgmz6m27f.svg";
+		const validS3 =
+			"https://s3.reloop.sh/reloop/uploads/2026/07/kkspseorvxubr8jzgmz6m27f.svg";
+		const validHttp =
+			"http://s3.reloop.sh/reloop/uploads/2026/07/kkspseorvxubr8jzgmz6m27f.svg";
 		expect(ensureAbsoluteUrl(validS3)).toBe(validS3);
 		expect(ensureAbsoluteUrl(validHttp)).toBe(validHttp);
 	});
 
 	it("converts scheme-less S3 host URLs to absolute https URLs", () => {
-		const schemeless = "s3.reloop.sh/reloop/uploads/2026/07/kkspseorvxubr8jzgmz6m27f.svg";
+		const schemeless =
+			"s3.reloop.sh/reloop/uploads/2026/07/kkspseorvxubr8jzgmz6m27f.svg";
 		expect(ensureAbsoluteUrl(schemeless)).toBe(
 			"https://s3.reloop.sh/reloop/uploads/2026/07/kkspseorvxubr8jzgmz6m27f.svg",
 		);
 	});
 
 	it("converts protocol-relative URLs to https", () => {
-		const protocolRelative = "//s3.reloop.sh/reloop/uploads/2026/07/kkspseorvxubr8jzgmz6m27f.svg";
+		const protocolRelative =
+			"//s3.reloop.sh/reloop/uploads/2026/07/kkspseorvxubr8jzgmz6m27f.svg";
 		expect(ensureAbsoluteUrl(protocolRelative)).toBe(
 			"https://s3.reloop.sh/reloop/uploads/2026/07/kkspseorvxubr8jzgmz6m27f.svg",
 		);
 	});
 
 	it("fixes URLs with leading slashes before an S3 domain host", () => {
-		const leadingSlash = "/s3.reloop.sh/reloop/uploads/2026/07/kkspseorvxubr8jzgmz6m27f.svg";
+		const leadingSlash =
+			"/s3.reloop.sh/reloop/uploads/2026/07/kkspseorvxubr8jzgmz6m27f.svg";
 		expect(ensureAbsoluteUrl(leadingSlash)).toBe(
 			"https://s3.reloop.sh/reloop/uploads/2026/07/kkspseorvxubr8jzgmz6m27f.svg",
 		);

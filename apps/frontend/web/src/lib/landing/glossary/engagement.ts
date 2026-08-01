@@ -5,7 +5,7 @@ export const term: GlossaryTermDefinition = {
 	title: "Engagement",
 	description:
 		"Signs that people actually interact with your mail: opens, clicks, replies, and more.",
-	keywords: ["email engagement","engaged subscribers","engagement rate"],
+	keywords: ["email engagement", "engaged subscribers", "engagement rate"],
 	body: `Engagement is evidence people want your mail. Providers use it (imperfectly) to decide inbox vs spam. Lists full of never-open addresses drag reputation down even if they do not bounce.
 
 Common practice: segment by recent opens or clicks, run re-permission campaigns, and suppress long-term inactive addresses. Exact windows depend on your cadence. Weekly newsletters age differently from rare product announcements.

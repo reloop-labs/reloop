@@ -1,6 +1,6 @@
 import { expect, type Page } from "@playwright/test";
-import { completeEmailOtpAndWaitForPostAuth } from "../auth/flows";
 import { uniqueTestEmail } from "../auth/fixtures";
+import { completeEmailOtpAndWaitForPostAuth } from "../auth/flows";
 import { dashboardURL } from "../runtime";
 
 export type OnboardingWorkspace = {
@@ -42,19 +42,16 @@ export async function signUpToOnboarding(
 /**
  * Step 1 — create workspace (company name is required; referral is optional).
  */
-export async function completeCreateWorkspace(
-	page: Page,
-	companyName: string,
-) {
+export async function completeCreateWorkspace(page: Page, companyName: string) {
 	await page.getByPlaceholder("e.g. Acme Corp").fill(companyName);
 
 	const create = page.getByRole("button", { name: "Create workspace" });
 	await expect(create).toBeEnabled({ timeout: 5_000 });
 	await create.click({ force: true });
 
-	await expect(
-		page.getByRole("heading", { name: "Add Domain" }),
-	).toBeVisible({ timeout: 30_000 });
+	await expect(page.getByRole("heading", { name: "Add Domain" })).toBeVisible({
+		timeout: 30_000,
+	});
 	await expect(page).toHaveURL((url) => url.searchParams.get("step") === "2", {
 		timeout: 10_000,
 	});

@@ -2,9 +2,9 @@
 
 import { cn } from "@reloop/ui/cn";
 import { Logo } from "@reloop/ui/logo";
+import Link from "next/link";
 import type React from "react";
 import { useState } from "react";
-import Link from "next/link";
 import type { SimpleIcon } from "simple-icons";
 import { BrandIcon } from "./brand-icon";
 import { CompareTitleIcon } from "./compare-title-icon";
@@ -176,7 +176,7 @@ export function CompareSideTable({
 
 	return (
 		<div className="mx-auto w-full max-w-[1100px]">
-			<div className="grid w-full items-stretch grid-cols-1 sm:grid-cols-[36px_1fr_36px]">
+			<div className="grid w-full grid-cols-1 items-stretch sm:grid-cols-[36px_1fr_36px]">
 				{/* Left side hatch gutter */}
 				<div
 					aria-hidden
@@ -187,7 +187,7 @@ export function CompareSideTable({
 					}}
 				/>
 
-				<div className="w-full min-w-0 overflow-x-auto sm:overflow-visible pb-2">
+				<div className="w-full min-w-0 overflow-x-auto pb-2 sm:overflow-visible">
 					<div className="grid min-w-[500px] grid-cols-[1fr_minmax(200px,300px)_minmax(200px,300px)]">
 						{/* Header */}
 						<div className="sticky top-16 z-30 border-stroke-soft-200 border-t border-b bg-bg-white-0/95 backdrop-blur-md dark:border-white/10 dark:bg-black/95">
@@ -195,7 +195,10 @@ export function CompareSideTable({
 								<h3 className="font-bold text-[16px] text-text-strong-950 tracking-tight sm:text-[17px] dark:text-white">
 									{title}
 								</h3>
-								<PlanTogglePill activePlan={activePlan} onChange={setActivePlan} />
+								<PlanTogglePill
+									activePlan={activePlan}
+									onChange={setActivePlan}
+								/>
 							</div>
 						</div>
 						<div className="sticky top-16 z-30 border-stroke-soft-200 border-x border-t border-b bg-bg-weak-50/60 backdrop-blur-md dark:border-white/10 dark:bg-white/[0.03]">

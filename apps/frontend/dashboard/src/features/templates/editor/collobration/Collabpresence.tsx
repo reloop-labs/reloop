@@ -154,7 +154,7 @@ export function CollabPresence({ status, isSynced }: CollabPresenceProps) {
 
 				{/* Connection indicator when no avatars */}
 				{!self && totalOthers === 0 && statusConfig && (
-					<div className="group/avatar relative flex h-8 w-8 items-center justify-center rounded-full border-2 border-dashed border-stroke-soft-200 bg-bg-weak-50 transition-colors hover:border-stroke-soft-200">
+					<div className="group/avatar relative flex h-8 w-8 items-center justify-center rounded-full border-2 border-stroke-soft-200 border-dashed bg-bg-weak-50 transition-colors hover:border-stroke-soft-200">
 						<span
 							className={cn("h-2.5 w-2.5 rounded-full", statusConfig.dot)}
 						/>

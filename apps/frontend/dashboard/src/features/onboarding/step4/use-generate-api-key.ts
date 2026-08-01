@@ -1,8 +1,7 @@
-import { useRouter } from "next/navigation";
 import { authClient } from "@reloop/auth/client";
 import { useQueryClient } from "@tanstack/react-query";
-
 import axios from "axios";
+import { useRouter } from "next/navigation";
 import { parseAsString, useQueryState } from "nuqs";
 import { useCallback, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -16,7 +15,8 @@ const languageCodes: LanguageCode[] = ["nodejs", "python", "go", "php"];
 function parseChoice(value: string): LanguageCode {
 	// Legacy ?lang=ai URLs map to Node.js (AI is no longer a tab).
 	if (value === "ai") return "nodejs";
-	if (languageCodes.includes(value as LanguageCode)) return value as LanguageCode;
+	if (languageCodes.includes(value as LanguageCode))
+		return value as LanguageCode;
 	return "nodejs";
 }
 
@@ -110,9 +110,7 @@ export function useGenerateApiKey() {
 			setTestFrom(data.from ?? null);
 			setTestStatus("sent");
 			toast.success(
-				data.to
-					? `Email sent to ${data.to}`
-					: "Email sent — check your inbox",
+				data.to ? `Email sent to ${data.to}` : "Email sent — check your inbox",
 			);
 		} catch (error) {
 			const errorMessage = axios.isAxiosError(error)
@@ -143,10 +141,7 @@ export function useGenerateApiKey() {
 						{ withCredentials: true },
 					);
 				} catch (attrError) {
-					console.warn(
-						"Failed to attribute onboarding email log",
-						attrError,
-					);
+					console.warn("Failed to attribute onboarding email log", attrError);
 				}
 			}
 

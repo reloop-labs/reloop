@@ -1,7 +1,4 @@
-import {
-	WEBHOOK_MAX_ATTEMPTS,
-	WEBHOOK_RETRY_BACKOFF_TYPE,
-} from "./constants";
+import { WEBHOOK_MAX_ATTEMPTS, WEBHOOK_RETRY_BACKOFF_TYPE } from "./constants";
 
 /**
  * Fixed retry delays (ms) *after* a failed attempt, before the next try.

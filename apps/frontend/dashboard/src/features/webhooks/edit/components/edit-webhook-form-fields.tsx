@@ -7,9 +7,7 @@ import type { useEditWebhookForm } from "./use-edit-webhook-form";
 
 type FormFieldsProps = ReturnType<typeof useEditWebhookForm>;
 
-export function EditWebhookFormFields({
-	form,
-}: Pick<FormFieldsProps, "form">) {
+export function EditWebhookFormFields({ form }: Pick<FormFieldsProps, "form">) {
 	const { register, formState, setValue, watch } = form;
 	const events = watch("events") || [];
 

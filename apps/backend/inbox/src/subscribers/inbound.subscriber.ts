@@ -22,7 +22,9 @@ export async function initInboundSubscriber() {
 			const messageKey = match ? match[1].trim() : raw.substring(0, 300);
 
 			if (processedMessages.has(messageKey)) {
-				log.info(`[INBOX] Deduplicated concurrent NATS event for message: ${messageKey}`);
+				log.info(
+					`[INBOX] Deduplicated concurrent NATS event for message: ${messageKey}`,
+				);
 				return;
 			}
 

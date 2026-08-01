@@ -16,7 +16,7 @@ function ImagePrivacyBanner({
 			className={cn(
 				"mb-3 flex items-center gap-2.5 rounded-xl px-3 py-2",
 				"border border-mail-border/40 bg-[var(--inbox-muted-bg)]",
-				"animate-in fade-in-0 slide-in-from-top-1 duration-200",
+				"fade-in-0 slide-in-from-top-1 animate-in duration-200",
 			)}
 		>
 			<span

@@ -24,7 +24,7 @@ console.log(property.id, property.success);`,
 		source: `curl -X DELETE https://reloop.sh/api/contacts/v1/properties/prop_123456789 \\
   -H "x-api-key: rl_123456789"`,
 	},
-				{
+	{
 		id: "python",
 		lang: "python",
 		label: "Python",
@@ -39,7 +39,7 @@ if result.property_error:
 
 print(result.property["id"], result.property["success"])`,
 	},
-			{
+	{
 		id: "php",
 		lang: "php",
 		label: "PHP",
@@ -47,14 +47,14 @@ print(result.property["id"], result.property["success"])`,
 
 require 'vendor/autoload.php';
 
-use Reloop\Reloop;
+use ReloopReloop;
 
 $reloop = Reloop::client('rl_123456789');
 
 $property = $reloop->contacts->properties->delete('prop_123456789');
 echo $property['id'] . ' ' . $property['success'] . PHP_EOL;`,
 	},
-			{
+	{
 		id: "java",
 		lang: "java",
 		label: "Java",

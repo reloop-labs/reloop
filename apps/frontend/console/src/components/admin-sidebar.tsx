@@ -54,7 +54,9 @@ export function AdminSidebar() {
 	}, []);
 
 	const isActive = (href: string) =>
-		href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(`${href}/`);
+		href === "/"
+			? pathname === "/"
+			: pathname === href || pathname.startsWith(`${href}/`);
 
 	if (!hydrated) {
 		return <aside className="h-full w-[68px] shrink-0" aria-hidden />;
@@ -63,7 +65,7 @@ export function AdminSidebar() {
 	return (
 		<aside
 			className={cn(
-				"sticky top-0 z-10 flex h-full flex-col transition-[width] duration-200 ease-in-out select-none",
+				"sticky top-0 z-10 flex h-full select-none flex-col transition-[width] duration-200 ease-in-out",
 				collapsed ? "w-[68px]" : "w-[240px]",
 			)}
 		>
@@ -134,7 +136,7 @@ export function AdminSidebar() {
 										className={cn(
 											"group relative flex items-center rounded-xl transition-colors",
 											collapsed
-												? "h-10 w-10 justify-center mx-auto"
+												? "mx-auto h-10 w-10 justify-center"
 												: "gap-2.5 px-2.5 py-2",
 											active
 												? "bg-bg-white-0 text-text-strong-950 shadow-sm ring-1 ring-stroke-soft-100 dark:bg-white/[0.06] dark:ring-white/10"

@@ -1,10 +1,10 @@
-import { WebhookError } from "#/features/webhooks/components/webhook-error";
-import { WebhookTable } from "#/features/webhooks/components/webhook-table";
-import { WebhookToolbar } from "#/features/webhooks/components/webhook-toolbar";
-import { useWebhooks } from "#/features/webhooks/components/use-webhooks";
 import { Icon } from "@reloop/ui/icon";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
+import { useWebhooks } from "#/features/webhooks/components/use-webhooks";
+import { WebhookError } from "#/features/webhooks/components/webhook-error";
+import { WebhookTable } from "#/features/webhooks/components/webhook-table";
+import { WebhookToolbar } from "#/features/webhooks/components/webhook-toolbar";
 import { WebhooksCommonUseCasesSidebar } from "./common-use-cases-sidebar";
 import { WebhooksListHeader } from "./webhooks-list-header";
 
@@ -62,7 +62,7 @@ export function WebhooksPage() {
 								transition={{ duration: 0.2 }}
 								className="mb-4 overflow-hidden"
 							>
-								<div className="flex items-center justify-between rounded-xl border border-[#B7F1D0] bg-[#E8FAF0] px-4 py-3 text-sm text-[#0F5C34] dark:border-emerald-800/40 dark:bg-emerald-950/30 dark:text-emerald-200">
+								<div className="flex items-center justify-between rounded-xl border border-[#B7F1D0] bg-[#E8FAF0] px-4 py-3 text-[#0F5C34] text-sm dark:border-emerald-800/40 dark:bg-emerald-950/30 dark:text-emerald-200">
 									<span>
 										Webhook &quot;
 										<span className="font-semibold">{deletedName}</span>&quot;

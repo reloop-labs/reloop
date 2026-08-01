@@ -101,11 +101,7 @@ export type BatchThreadAction =
 	| "pin"
 	| "unpin";
 
-export type ComposeDraftKind =
-	| "compose"
-	| "reply"
-	| "reply_all"
-	| "forward";
+export type ComposeDraftKind = "compose" | "reply" | "reply_all" | "forward";
 
 export type ComposeDraftAttachment = {
 	id?: string;

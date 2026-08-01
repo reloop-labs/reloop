@@ -1,6 +1,6 @@
+import { AnimatePresence } from "framer-motion";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
-import { AnimatePresence } from "framer-motion";
 import { CommandMenuGlobal } from "#/features/dashboard/command-menu";
 import { AiPanel } from "#/features/dashboard/layout/ai-panel";
 import { OpenSupportFromQuery } from "#/features/dashboard/open-support-from-query";

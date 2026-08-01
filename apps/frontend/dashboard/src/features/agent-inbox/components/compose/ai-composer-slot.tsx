@@ -2,8 +2,8 @@ import { cn } from "@reloop/ui/cn";
 import { motion, useReducedMotion } from "framer-motion";
 import { Undo2 } from "lucide-react";
 import { useEffect } from "react";
-import { AiThinkingStatus } from "./ai-thinking-status";
 import { AiStopButton } from "./ai-stop-button";
+import { AiThinkingStatus } from "./ai-thinking-status";
 
 const MICRO_SCALE_EASE = [0.32, 0.72, 0, 1] as const;
 
@@ -45,10 +45,7 @@ export const AiComposerSlot = ({
 					className,
 				)}
 			>
-				<AiThinkingStatus
-					hasStreamText={hasStreamText}
-					className="min-w-0"
-				/>
+				<AiThinkingStatus hasStreamText={hasStreamText} className="min-w-0" />
 				<AiStopButton onClick={onUndo} />
 			</div>
 		);
@@ -58,11 +55,7 @@ export const AiComposerSlot = ({
 		<motion.button
 			type="button"
 			onClick={onUndo}
-			initial={
-				reduceMotion
-					? { opacity: 0 }
-					: { opacity: 0, scale: 0.96 }
-			}
+			initial={reduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.96 }}
 			animate={{ opacity: 1, scale: 1 }}
 			transition={
 				reduceMotion

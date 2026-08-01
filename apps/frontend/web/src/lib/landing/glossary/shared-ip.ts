@@ -5,7 +5,7 @@ export const term: GlossaryTermDefinition = {
 	title: "Shared IP",
 	description:
 		"A sending IP used by many customers of an ESP or platform at once.",
-	keywords: ["shared IP email","pooled sending IP"],
+	keywords: ["shared IP email", "pooled sending IP"],
 	body: `Shared IPs carry traffic from many senders. The ESP polices the pool and absorbs some individual spikes. You get simpler onboarding and less warming work at low volume. You also share fate with neighbors if the pool is poorly managed.
 
 Most startups begin on shared IPs. Move to dedicated when volume, compliance needs, or isolation justify the cost and warm-up work.

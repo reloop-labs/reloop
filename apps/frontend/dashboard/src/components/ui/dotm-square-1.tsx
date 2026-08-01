@@ -2,67 +2,78 @@
 
 import type { CSSProperties } from "react";
 import {
-  DotMatrixBase,
-  trBlPathNormFromIndex,
-  type DotAnimationResolver,
-  type DotMatrixCommonProps
+	type DotAnimationResolver,
+	DotMatrixBase,
+	type DotMatrixCommonProps,
+	trBlPathNormFromIndex,
 } from "./dotmatrix-core";
 import { useDotMatrixPhases, usePrefersReducedMotion } from "./dotmatrix-hooks";
 
 export type DotmSquare1Props = DotMatrixCommonProps;
 
-const animationResolver: DotAnimationResolver = ({ isActive, index, row, col, reducedMotion, phase }) => {
-  if (!isActive) {
-    return { className: "dmx-inactive" };
-  }
+const animationResolver: DotAnimationResolver = ({
+	isActive,
+	index,
+	row,
+	col,
+	reducedMotion,
+	phase,
+}) => {
+	if (!isActive) {
+		return { className: "dmx-inactive" };
+	}
 
-  const path = trBlPathNormFromIndex(index);
-  const slice = row + (4 - col);
-  const parity = slice % 2;
-  const style = {
-    "--dmx-path": path,
-    "--dmx-diagonal-parity": parity
-  } as CSSProperties;
+	const path = trBlPathNormFromIndex(index);
+	const slice = row + (4 - col);
+	const parity = slice % 2;
+	const style = {
+		"--dmx-path": path,
+		"--dmx-diagonal-parity": parity,
+	} as CSSProperties;
 
-  if (reducedMotion || phase === "idle") {
-    return {
-      style: {
-        ...style,
-        opacity: parity === 0 ? 0.88 : 0.14
-      }
-    };
-  }
+	if (reducedMotion || phase === "idle") {
+		return {
+			style: {
+				...style,
+				opacity: parity === 0 ? 0.88 : 0.14,
+			},
+		};
+	}
 
-  return { className: "dmx-diagonal-alt-sweep", style };
+	return { className: "dmx-diagonal-alt-sweep", style };
 };
 
 export function DotmSquare1({
-  speed = 1.1,
-  pattern = "full",
-  animated = true,
-  hoverAnimated = false,
-  ...rest
+	speed = 1.1,
+	pattern = "full",
+	animated = true,
+	hoverAnimated = false,
+	...rest
 }: DotmSquare1Props) {
-  const reducedMotion = usePrefersReducedMotion();
-  const { phase: matrixPhase, onMouseEnter, onMouseLeave } = useDotMatrixPhases({
-    animated: Boolean(animated && !reducedMotion),
-    hoverAnimated: Boolean(hoverAnimated && !reducedMotion),
-    speed
-  });
+	const reducedMotion = usePrefersReducedMotion();
+	const {
+		phase: matrixPhase,
+		onMouseEnter,
+		onMouseLeave,
+	} = useDotMatrixPhases({
+		animated: Boolean(animated && !reducedMotion),
+		hoverAnimated: Boolean(hoverAnimated && !reducedMotion),
+		speed,
+	});
 
-  return (
-    <DotMatrixBase
-      {...rest}
-      size={rest.size ?? 18}
-      dotSize={rest.dotSize ?? 2.5}
-      speed={speed}
-      pattern={pattern}
-      animated={animated}
-      phase={matrixPhase}
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
-      reducedMotion={reducedMotion}
-      animationResolver={animationResolver}
-    />
-  );
+	return (
+		<DotMatrixBase
+			{...rest}
+			size={rest.size ?? 18}
+			dotSize={rest.dotSize ?? 2.5}
+			speed={speed}
+			pattern={pattern}
+			animated={animated}
+			phase={matrixPhase}
+			onMouseEnter={onMouseEnter}
+			onMouseLeave={onMouseLeave}
+			reducedMotion={reducedMotion}
+			animationResolver={animationResolver}
+		/>
+	);
 }

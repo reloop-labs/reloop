@@ -3,7 +3,16 @@ import { Skeleton } from "@reloop/ui/skeleton";
 
 const sk = "bg-[var(--inbox-skeleton)]";
 
-const NAME_WIDTHS = ["w-28", "w-36", "w-24", "w-32", "w-40", "w-28", "w-20", "w-36"];
+const NAME_WIDTHS = [
+	"w-28",
+	"w-36",
+	"w-24",
+	"w-32",
+	"w-40",
+	"w-28",
+	"w-20",
+	"w-36",
+];
 const SNIPPET_WIDTHS = [
 	"w-[88%]",
 	"w-[72%]",

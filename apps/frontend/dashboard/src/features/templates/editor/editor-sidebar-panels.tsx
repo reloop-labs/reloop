@@ -241,7 +241,7 @@ export function VariablesPanel({ onClose }: PanelProps) {
 							return (
 								<div
 									key={v.name}
-									className="group relative flex flex-col gap-1.5 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-3 transition-all hover:border-stroke-soft-200 hover:bg-bg-weak-50 dark:border-stroke-soft-100/40 "
+									className="group relative flex flex-col gap-1.5 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-3 transition-all hover:border-stroke-soft-200 hover:bg-bg-weak-50 dark:border-stroke-soft-100/40"
 								>
 									{/* Top Row: Name and Type Badge */}
 									<div className="flex items-center justify-between">
@@ -271,7 +271,7 @@ export function VariablesPanel({ onClose }: PanelProps) {
 												</code>
 											</p>
 										) : (
-											<p className="text-[10px] text-text-soft-400 italic text-text-strong-950">
+											<p className="text-[10px] text-text-soft-400 text-text-strong-950 italic">
 												No default value set
 											</p>
 										)}
@@ -285,7 +285,7 @@ export function VariablesPanel({ onClose }: PanelProps) {
 												size="xxsmall"
 												onClick={() => setEditingVar(v)}
 												title="Configure variable"
-												className="size-8 rounded-lg text-text-sub-600 transition-all duration-200 hover:bg-bg-soft-200  dark:hover:bg-bg-soft-200"
+												className="size-8 rounded-lg text-text-sub-600 transition-all duration-200 hover:bg-bg-soft-200 dark:hover:bg-bg-soft-200"
 											>
 												<Icon name="pencil" className="h-3.5 w-3.5" />
 											</Button.Root>
@@ -296,7 +296,7 @@ export function VariablesPanel({ onClose }: PanelProps) {
 												size="xxsmall"
 												onClick={() => setDeletingVar(v)}
 												title="Delete variable"
-												className="size-8 rounded-lg text-text-sub-600 transition-all duration-200 hover:bg-error-lighter hover:text-error-base  dark:hover:bg-error-base/10 dark:hover:text-error-base"
+												className="size-8 rounded-lg text-text-sub-600 transition-all duration-200 hover:bg-error-lighter hover:text-error-base dark:hover:bg-error-base/10 dark:hover:text-error-base"
 											>
 												<Icon name="trash" className="h-3.5 w-3.5" />
 											</Button.Root>
@@ -307,10 +307,13 @@ export function VariablesPanel({ onClose }: PanelProps) {
 												size="xxsmall"
 												onClick={() => handleCopy(key)}
 												title="Copy placeholder"
-												className="size-8 rounded-lg text-text-sub-600 transition-all duration-200 hover:bg-bg-soft-200  dark:hover:bg-bg-soft-200"
+												className="size-8 rounded-lg text-text-sub-600 transition-all duration-200 hover:bg-bg-soft-200 dark:hover:bg-bg-soft-200"
 											>
 												{copiedKey === key ? (
-													<Icon name="check" className="h-3.5 w-3.5 fade-in zoom-in-50 animate-in text-success-base duration-200" />
+													<Icon
+														name="check"
+														className="fade-in zoom-in-50 h-3.5 w-3.5 animate-in text-success-base duration-200"
+													/>
 												) : (
 													<Icon name="copy" className="h-3.5 w-3.5" />
 												)}
@@ -493,14 +496,15 @@ export function ScorePanel({ onClose }: PanelProps) {
 						<span className="font-extrabold text-2xl text-success-base leading-none">
 							98
 						</span>
-						<span className="mt-0.5 text-[10px] text-text-soft-400">
-							/100
-						</span>
+						<span className="mt-0.5 text-[10px] text-text-soft-400">/100</span>
 					</div>
 				</div>
 
 				<span className="mt-3.5 flex items-center gap-1.5 font-semibold text-sm text-text-strong-950">
-					<Icon name="sparkling" className="h-3.5 w-3.5 animate-pulse text-success-base" />
+					<Icon
+						name="sparkling"
+						className="h-3.5 w-3.5 animate-pulse text-success-base"
+					/>
 					Excellent Deliverability
 				</span>
 				<p className="mt-1 max-w-[220px] text-center text-[11px] text-text-soft-400 leading-normal">
@@ -517,8 +521,8 @@ export function ScorePanel({ onClose }: PanelProps) {
 						className={cn(
 							"flex-grow rounded-lg py-1.5 text-center font-semibold text-[11px] transition-all",
 							activeTab === "all"
-								? "bg-bg-white-0 text-text-strong-950 shadow-regular-xs dark:bg-bg-soft-200 "
-								: "text-text-sub-600 hover:text-text-strong-950  ",
+								? "bg-bg-white-0 text-text-strong-950 shadow-regular-xs dark:bg-bg-soft-200"
+								: "text-text-sub-600 hover:text-text-strong-950",
 						)}
 					>
 						All <span className="ml-0.5 opacity-60">({totalCount})</span>
@@ -529,8 +533,8 @@ export function ScorePanel({ onClose }: PanelProps) {
 						className={cn(
 							"flex-grow rounded-lg py-1.5 text-center font-semibold text-[11px] transition-all",
 							activeTab === "passed"
-								? "bg-bg-white-0 text-success-base shadow-regular-xs dark:bg-bg-soft-200 "
-								: "text-text-sub-600 hover:text-text-strong-950  ",
+								? "bg-bg-white-0 text-success-base shadow-regular-xs dark:bg-bg-soft-200"
+								: "text-text-sub-600 hover:text-text-strong-950",
 						)}
 					>
 						Passed <span className="ml-0.5 opacity-60">({passedCount})</span>
@@ -541,8 +545,8 @@ export function ScorePanel({ onClose }: PanelProps) {
 						className={cn(
 							"flex-grow rounded-lg py-1.5 text-center font-semibold text-[11px] transition-all",
 							activeTab === "warning"
-								? "bg-bg-white-0 text-warning-base shadow-regular-xs dark:bg-bg-soft-200 "
-								: "text-text-sub-600 hover:text-text-strong-950  ",
+								? "bg-bg-white-0 text-warning-base shadow-regular-xs dark:bg-bg-soft-200"
+								: "text-text-sub-600 hover:text-text-strong-950",
 						)}
 					>
 						Warnings <span className="ml-0.5 opacity-60">({warningCount})</span>
@@ -556,12 +560,18 @@ export function ScorePanel({ onClose }: PanelProps) {
 					{filteredAudits.map((audit) => (
 						<div
 							key={audit.id}
-							className="group flex items-start gap-3 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-3.5 transition-all hover:border-stroke-soft-200 hover:shadow-regular-xs dark:border-stroke-soft-100/40 "
+							className="group flex items-start gap-3 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-3.5 transition-all hover:border-stroke-soft-200 hover:shadow-regular-xs dark:border-stroke-soft-100/40"
 						>
 							{audit.status === "passed" ? (
-								<Icon name="check-circle" className="mt-0.5 h-4 w-4 shrink-0 text-success-base" />
+								<Icon
+									name="check-circle"
+									className="mt-0.5 h-4 w-4 shrink-0 text-success-base"
+								/>
 							) : (
-								<Icon name="alert-triangle" className="mt-0.5 h-4 w-4 shrink-0 text-warning-base" />
+								<Icon
+									name="alert-triangle"
+									className="mt-0.5 h-4 w-4 shrink-0 text-warning-base"
+								/>
 							)}
 							<div className="min-w-0 flex-1">
 								<div className="flex items-center justify-between gap-2">
@@ -779,7 +789,10 @@ export function TestPanel({ onClose }: PanelProps) {
 						{!fromEmail ? (
 							<div className="flex flex-col gap-2.5 rounded-2xl border border-error-base/20 bg-error-lighter p-3.5">
 								<div className="flex items-start gap-2.5">
-									<Icon name="alert-circle" className="mt-0.5 h-4 w-4 shrink-0 text-error-base" />
+									<Icon
+										name="alert-circle"
+										className="mt-0.5 h-4 w-4 shrink-0 text-error-base"
+									/>
 									<div className="flex flex-col gap-1">
 										<span className="font-semibold text-error-base text-xs">
 											Missing From Address
@@ -823,7 +836,7 @@ export function TestPanel({ onClose }: PanelProps) {
 											<div className="flex items-center justify-between">
 												<Label.Root
 													htmlFor={v.name}
-													className="font-semibold text-text-strong-950 text-xs "
+													className="font-semibold text-text-strong-950 text-xs"
 												>
 													{v.name}
 												</Label.Root>
@@ -891,7 +904,7 @@ export function TestPanel({ onClose }: PanelProps) {
 							{recentSends.map((send, idx) => (
 								<div
 									key={idx}
-									className="flex items-center justify-between rounded-xl border border-stroke-soft-100 bg-bg-weak-50/50 p-2.5 dark:border-stroke-soft-100/40 "
+									className="flex items-center justify-between rounded-xl border border-stroke-soft-100 bg-bg-weak-50/50 p-2.5 dark:border-stroke-soft-100/40"
 								>
 									<div className="flex min-w-0 flex-col">
 										<span className="truncate font-medium text-text-strong-950 text-xs">
@@ -907,12 +920,18 @@ export function TestPanel({ onClose }: PanelProps) {
 										>
 											{send.status === "success" ? (
 												<>
-													<Icon name="check-circle" className="h-2.5 w-2.5 shrink-0" />
+													<Icon
+														name="check-circle"
+														className="h-2.5 w-2.5 shrink-0"
+													/>
 													Delivered successfully
 												</>
 											) : (
 												<>
-													<Icon name="alert-circle" className="h-2.5 w-2.5 shrink-0" />
+													<Icon
+														name="alert-circle"
+														className="h-2.5 w-2.5 shrink-0"
+													/>
 													{send.error || "Failed to send"}
 												</>
 											)}

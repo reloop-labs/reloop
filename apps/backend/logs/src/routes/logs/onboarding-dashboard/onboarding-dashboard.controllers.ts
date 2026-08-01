@@ -1,5 +1,5 @@
-import { validateApiKey } from "@reloop/auth/apikey/validate";
 import type { ApiKeyCache } from "@reloop/auth/apikey/validate";
+import { validateApiKey } from "@reloop/auth/apikey/validate";
 import { db } from "@reloop/db/client";
 import { activityLog, domain, emailLog, member, user } from "@reloop/db/schema";
 import { logsConfig } from "@reloop/logs/logs.config";
@@ -218,10 +218,7 @@ export async function onboardingDashboardController({
 		.select({ id: member.id })
 		.from(member)
 		.where(
-			and(
-				eq(member.userId, userId),
-				eq(member.organizationId, organizationId),
-			),
+			and(eq(member.userId, userId), eq(member.organizationId, organizationId)),
 		)
 		.limit(1);
 
@@ -268,9 +265,7 @@ export async function onboardingDashboardController({
 			.select({ organizationId: member.organizationId })
 			.from(member)
 			.where(eq(member.userId, userId));
-		const memberOrgIds = new Set(
-			userMemberships.map((m) => m.organizationId),
-		);
+		const memberOrgIds = new Set(userMemberships.map((m) => m.organizationId));
 
 		// Claim only this key/org, unattributed, or non-member (platform) orgs.
 		const matches = candidates.filter((row) => {

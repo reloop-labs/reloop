@@ -26,7 +26,7 @@ console.log(apiKey.id, apiKey.key);`,
   -H "Content-Type: application/json" \\
   -d '{"name": "Production Key"}'`,
 	},
-				{
+	{
 		id: "python",
 		lang: "python",
 		label: "Python",
@@ -43,7 +43,7 @@ if result.api_key_error:
 
 print(result.api_key["id"], result.api_key["key"])`,
 	},
-			{
+	{
 		id: "php",
 		lang: "php",
 		label: "PHP",
@@ -51,7 +51,7 @@ print(result.api_key["id"], result.api_key["key"])`,
 
 require 'vendor/autoload.php';
 
-use Reloop\Reloop;
+use ReloopReloop;
 
 $reloop = Reloop::client('rl_123456789');
 
@@ -60,7 +60,7 @@ $apiKey = $reloop->apiKey->create([
 ]);
 echo $apiKey['id'] . ' ' . $apiKey['key'] . PHP_EOL;`,
 	},
-			{
+	{
 		id: "java",
 		lang: "java",
 		label: "Java",

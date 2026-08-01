@@ -1,13 +1,12 @@
-import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { KbdKeyOutline } from "@reloop/ui/kbd-key-outline";
 import { Logo } from "@reloop/ui/logo";
 import { Skeleton } from "@reloop/ui/skeleton";
-
 import { Plus } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
@@ -224,8 +223,7 @@ export const InboxSidebar = ({
 		refreshLabels,
 	} = useInboxLabels(mailboxReady ? mailbox.id : "");
 	/** Counts depend on thread data — skeleton until mailbox + threads settle. */
-	const countsLoading =
-		!mailboxReady || isLoadingMailboxes || isLoadingThreads;
+	const countsLoading = !mailboxReady || isLoadingMailboxes || isLoadingThreads;
 	const labelsLoading = !mailboxReady || isLoadingLabels;
 
 	const [isComposeOpen, setIsComposeOpen] = useState(false);
@@ -396,7 +394,7 @@ export const InboxSidebar = ({
 							className={cn(
 								// Avoid FancyButton's default `transition` animating opacity when
 								// the button mounts / leaves a loading-disabled state.
-								"mt-3 mb-1.5 w-full !transition-none after:!transition-none",
+								"!transition-none after:!transition-none mt-3 mb-1.5 w-full",
 								collapsed && "px-0",
 							)}
 						>
@@ -507,7 +505,10 @@ export const InboxSidebar = ({
 											const active = activeLabelId === label.id;
 											const swatch = resolveLabelColor(label.color);
 											return (
-												<Link href={`/inbox/${mailboxId}/label/${label.id}`} key={label.id} ref={(el) => {
+												<Link
+													href={`/inbox/${mailboxId}/label/${label.id}`}
+													key={label.id}
+													ref={(el) => {
 														if (el) navRefs.current[labelKey] = el;
 													}}
 													onPointerEnter={() =>
@@ -515,9 +516,7 @@ export const InboxSidebar = ({
 													}
 													className={cn(
 														"group relative z-10 flex h-8 w-full items-center gap-2.5 rounded-lg px-2.5 font-medium text-[13px]",
-														active
-															? "text-mail-foreground"
-															: "text-mail-muted",
+														active ? "text-mail-foreground" : "text-mail-muted",
 													)}
 												>
 													<span

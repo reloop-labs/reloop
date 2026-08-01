@@ -1,8 +1,5 @@
-import {
-	type SupportServerEvent,
-	supportWsUrl,
-} from "#/lib/support-types";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { type SupportServerEvent, supportWsUrl } from "#/lib/support-types";
 
 type Options = {
 	enabled?: boolean;

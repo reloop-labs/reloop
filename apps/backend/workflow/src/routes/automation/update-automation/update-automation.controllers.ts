@@ -1,11 +1,11 @@
+import { AutomationErrors } from "@be/workflow/error/automation.error-response";
 import {
 	extractTriggerEvent,
 	validateAutomationGraph,
 } from "@be/workflow/lib/automation/graph";
-import { AutomationErrors } from "@be/workflow/error/automation.error-response";
 import { mapAutomation } from "@be/workflow/routes/automation/automation.mappers";
-import type { AutomationGraph } from "@reloop/db/schema";
 import { db } from "@reloop/db/client";
+import type { AutomationGraph } from "@reloop/db/schema";
 import * as schema from "@reloop/db/schema";
 import { and, eq, isNull } from "drizzle-orm";
 import { log } from "evlog";
@@ -41,7 +41,9 @@ export async function updateAutomationController(params: {
 		// Soft-validate structure; full validation required only on activate
 		const graph = params.graph;
 		if (!Array.isArray(graph.nodes) || !Array.isArray(graph.edges)) {
-			throw AutomationErrors.invalidGraph(["Graph must include nodes and edges."]);
+			throw AutomationErrors.invalidGraph([
+				"Graph must include nodes and edges.",
+			]);
 		}
 		patch.graph = graph;
 		const triggerEvent = extractTriggerEvent(graph);

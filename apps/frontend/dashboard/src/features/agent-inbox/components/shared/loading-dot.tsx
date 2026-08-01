@@ -34,7 +34,10 @@ export function LoadingDot({
 		<span
 			role="status"
 			aria-label={label}
-			className={cn("inline-flex items-center justify-center shrink-0 text-current", className)}
+			className={cn(
+				"inline-flex shrink-0 items-center justify-center text-current",
+				className,
+			)}
 			style={style}
 		>
 			<SelectedLoader size={size} dotSize={dotSize} speed={1.35} />

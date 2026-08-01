@@ -8,8 +8,8 @@ import Spinner from "@reloop/ui/spinner";
 import { useEffect, useId, useRef, useState } from "react";
 import { toast } from "sonner";
 import {
-	useInvalidateContacts,
 	type Property,
+	useInvalidateContacts,
 } from "#/features/contacts/hooks/use-contacts-query";
 import {
 	slugifyPropertyName,

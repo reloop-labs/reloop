@@ -1,4 +1,3 @@
-import { useRouter } from "next/navigation";
 import {
 	defaultPlan,
 	formatPrice,
@@ -10,6 +9,7 @@ import {
 import * as Badge from "@reloop/ui/badge";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
+import { useRouter } from "next/navigation";
 
 import { useEffect, useState } from "react";
 import { AnimatedForwardButton } from "#/features/dashboard/animated-forward-button";
@@ -94,9 +94,7 @@ export function BillingPage() {
 				</div>
 				<AnimatedForwardButton
 					label="All plans"
-					onClick={() =>
-						router.push("/settings/billing/plans")
-					}
+					onClick={() => router.push("/settings/billing/plans")}
 				/>
 			</div>
 
@@ -162,9 +160,7 @@ export function BillingPage() {
 								variant="ghost"
 								size="small"
 								className="rounded-full font-medium"
-								onClick={() =>
-									router.push("/settings/billing/plans")
-								}
+								onClick={() => router.push("/settings/billing/plans")}
 							>
 								View all plans
 							</FancyButton.Root>

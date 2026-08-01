@@ -2,9 +2,9 @@ import { authMiddleware } from "@be/contacts/middleware/auth";
 import { rateLimitPlugin } from "@be/contacts/middleware/rate-limit";
 import { ChannelModel } from "@be/contacts/model/channel.model";
 import { auditLogHook } from "@be/contacts/utils/audit-log";
+import { createChannelXCodeSamples } from "@reloop/code-samples/contacts";
 import { Elysia } from "elysia";
 import { createChannelController } from "./create-channel.controllers";
-import { createChannelXCodeSamples } from "@reloop/code-samples/contacts";
 
 export const createChannelRoute = new Elysia()
 	.use(authMiddleware)

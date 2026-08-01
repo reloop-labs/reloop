@@ -1,4 +1,3 @@
-
 import * as Button from "@reloop/ui/button";
 import * as Checkbox from "@reloop/ui/checkbox";
 import { cn } from "@reloop/ui/cn";
@@ -45,8 +44,12 @@ export const EditChannelModal = ({
 	onUpdateSuccess,
 }: EditChannelModalProps) => {
 	const invalidate = useInvalidateContacts();
-	const {data: channelsData} = useQuery({
-		queryKey: ["contacts", "legacy", open ? "/api/contacts/v1/channels/list?limit=10" : null],
+	const { data: channelsData } = useQuery({
+		queryKey: [
+			"contacts",
+			"legacy",
+			open ? "/api/contacts/v1/channels/list?limit=10" : null,
+		],
 		queryFn: async () => {
 			const url = open ? "/api/contacts/v1/channels/list?limit=10" : null;
 			if (!url) throw new Error("missing url");
@@ -353,7 +356,8 @@ export const EditChannelModal = ({
 									disabled={
 										status === "saving" ||
 										status === "success" ||
-										(status === "idle" && (!name.trim() || isDescriptionOverLimit))
+										(status === "idle" &&
+											(!name.trim() || isDescriptionOverLimit))
 									}
 									className={cn(
 										"w-[160px] min-w-[160px] justify-center overflow-hidden transition-all duration-200",

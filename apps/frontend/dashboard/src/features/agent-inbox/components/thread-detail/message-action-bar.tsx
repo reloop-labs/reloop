@@ -72,7 +72,7 @@ export function MessageActionBar({
 			<AnimatedHoverBackground
 				rect={currentRect}
 				tabElement={currentTab}
-				className="rounded-full !bg-[var(--inbox-hover)]"
+				className="!bg-[var(--inbox-hover)] rounded-full"
 			/>
 		</div>
 	);

@@ -45,7 +45,13 @@ export function DocsCard() {
 					asChild
 					className="mt-6 gap-2 rounded-lg border-stroke-soft-100 text-text-sub-600 hover:text-text-strong-950 dark:border-stroke-soft-100/50"
 				>
-					<a href="https://reloop.sh/docs" target="_blank" rel="noopener noreferrer">Read documentation</a>
+					<a
+						href="https://reloop.sh/docs"
+						target="_blank"
+						rel="noopener noreferrer"
+					>
+						Read documentation
+					</a>
 				</Button.Root>
 			</div>
 		</div>

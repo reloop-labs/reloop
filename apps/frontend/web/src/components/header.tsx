@@ -288,7 +288,9 @@ export const Header = () => {
 											<Icon
 												name="chevron-down"
 												className={`size-3 transition-transform duration-200 ${
-													activeMega === item.title ? "rotate-180" : "opacity-50"
+													activeMega === item.title
+														? "rotate-180"
+														: "opacity-50"
 												}`}
 											/>
 										</span>

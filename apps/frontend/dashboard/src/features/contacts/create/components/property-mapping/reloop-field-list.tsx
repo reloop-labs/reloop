@@ -2,8 +2,8 @@ import { Icon } from "@reloop/ui/icon";
 import { SelectItem } from "#/features/api-keys/filters/base-ui-select";
 import {
 	IDENTITY_TARGETS,
-	toPropertyTarget,
 	type MappingRowTarget,
+	toPropertyTarget,
 } from "../../utils/property-mapping";
 import { EMPTY_VALUE } from "./constants";
 
@@ -26,13 +26,17 @@ export function ReloopFieldList({
 }: ReloopFieldListProps) {
 	return (
 		<>
-			<SelectItem value={EMPTY_VALUE} className="text-xs font-medium">
+			<SelectItem value={EMPTY_VALUE} className="font-medium text-xs">
 				<span className="text-text-sub-600">Select field…</span>
 			</SelectItem>
 			{IDENTITY_TARGETS.filter(
 				(t) => identityOptions.includes(t.value) || value === t.value,
 			).map((t) => (
-				<SelectItem key={t.value} value={t.value} className="text-xs font-medium">
+				<SelectItem
+					key={t.value}
+					value={t.value}
+					className="font-medium text-xs"
+				>
 					<span className="min-w-0 truncate">{t.label}</span>
 				</SelectItem>
 			))}
@@ -40,7 +44,7 @@ export function ReloopFieldList({
 				<SelectItem
 					key={p.propertyName}
 					value={toPropertyTarget(p.propertyName)}
-					className="text-xs font-medium"
+					className="font-medium text-xs"
 				>
 					<span className="min-w-0 truncate">
 						{p.propertyName}
@@ -61,7 +65,7 @@ export function ReloopFieldList({
 					e.stopPropagation();
 					onAddProperty();
 				}}
-				className="relative z-10 flex min-h-8 w-full cursor-pointer items-center gap-2 rounded-lg px-2.5 py-1.5 text-left text-xs text-text-strong-950 outline-none transition-colors hover:bg-bg-weak-50"
+				className="relative z-10 flex min-h-8 w-full cursor-pointer items-center gap-2 rounded-lg px-2.5 py-1.5 text-left text-text-strong-950 text-xs outline-none transition-colors hover:bg-bg-weak-50"
 			>
 				<Icon name="plus" className="h-4 w-4 shrink-0 text-text-sub-600" />
 				<span className="font-medium">Add property</span>

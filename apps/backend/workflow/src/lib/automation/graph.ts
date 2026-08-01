@@ -57,9 +57,7 @@ export function getOutgoingTargets(
 	graph: AutomationGraph,
 	nodeId: string,
 ): string[] {
-	return graph.edges
-		.filter((e) => e.source === nodeId)
-		.map((e) => e.target);
+	return graph.edges.filter((e) => e.source === nodeId).map((e) => e.target);
 }
 
 export function findNode(

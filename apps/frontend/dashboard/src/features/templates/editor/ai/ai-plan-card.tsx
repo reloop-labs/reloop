@@ -21,7 +21,9 @@ export function AiPlanCard({
 						Plan
 					</span>
 				</div>
-				<p className="mt-1 text-paragraph-xs text-text-sub-600">{plan.summary}</p>
+				<p className="mt-1 text-paragraph-xs text-text-sub-600">
+					{plan.summary}
+				</p>
 			</div>
 			<ul className="space-y-0.5 p-2">
 				{plan.steps.map((step, i) => (

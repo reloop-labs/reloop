@@ -1,12 +1,12 @@
 import { createId } from "@paralleldrive/cuid2";
-import {
-	WEBHOOK_DELIVERY_JOB,
-	WEBHOOK_DELIVERY_QUEUE,
-	resolveWebhookMaxAttempts,
-	webhookDeliveryJobOptions,
-} from "@reloop/webhook-delivery";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
+import {
+	resolveWebhookMaxAttempts,
+	WEBHOOK_DELIVERY_JOB,
+	WEBHOOK_DELIVERY_QUEUE,
+	webhookDeliveryJobOptions,
+} from "@reloop/webhook-delivery";
 import { Queue } from "bullmq";
 import { eq } from "drizzle-orm";
 import { createError } from "evlog";
@@ -74,7 +74,9 @@ export async function retryWebhookDeliveryController({
 		maxAttempts,
 	});
 
-	const opts = webhookDeliveryJobOptions(newDeliveryId, { attempts: maxAttempts });
+	const opts = webhookDeliveryJobOptions(newDeliveryId, {
+		attempts: maxAttempts,
+	});
 	await webhookDeliveryQueue.add(
 		WEBHOOK_DELIVERY_JOB,
 		{ deliveryId: newDeliveryId },

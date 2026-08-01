@@ -18,9 +18,7 @@ export function normalizeHostname(host: string): string {
  * (e.g. `link.example.com`). Only active domains with verified tracking CNAME
  * are allowed — prevents open certificate issuance for arbitrary SNI names.
  */
-export async function isActiveTrackingHostname(
-	host: string,
-): Promise<boolean> {
+export async function isActiveTrackingHostname(host: string): Promise<boolean> {
 	const hostname = normalizeHostname(host);
 	if (!hostname || hostname.includes("/") || hostname.includes(" ")) {
 		return false;
@@ -45,9 +43,7 @@ export async function isActiveTrackingHostname(
 			.limit(1);
 
 		const active = rows.length > 0;
-		log.info(
-			`[CADDY-ASK] hostname=${hostname} active=${active}`,
-		);
+		log.info(`[CADDY-ASK] hostname=${hostname} active=${active}`);
 		return active;
 	} catch (error) {
 		log.error(

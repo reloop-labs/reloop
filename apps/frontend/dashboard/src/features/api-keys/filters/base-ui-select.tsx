@@ -190,7 +190,7 @@ export function SelectPopup({
 					 */}
 					<div
 						className={cn(
-							"relative h-full w-max min-w-(--anchor-width) max-h-(--available-height) space-y-0.5 overflow-y-auto rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-1 shadow-none dark:border-stroke-soft-100/50 dark:bg-bg-weak-50",
+							"relative h-full max-h-(--available-height) w-max min-w-(--anchor-width) space-y-0.5 overflow-y-auto rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-1 shadow-none dark:border-stroke-soft-100/50 dark:bg-bg-weak-50",
 							className,
 						)}
 						data-slot="select-list"
