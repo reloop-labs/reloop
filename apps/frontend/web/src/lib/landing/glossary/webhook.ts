@@ -3,8 +3,27 @@ import type { GlossaryTermDefinition } from "../types";
 export const term: GlossaryTermDefinition = {
 	slug: "webhook",
 	title: "Webhook",
-	description: "HTTP callbacks that notify your app when email events occur.",
-	keywords: ["email webhook", "webhook definition"],
-	body: "Reloop webhooks fire on delivered, opened, clicked, bounced, and complained events—wire them into your app for real-time list hygiene.",
+	description:
+		"An HTTP callback your app receives when an email event happens (delivered, bounced, clicked).",
+	keywords: ["email webhook","delivery webhook","event webhook"],
+	body: `Webhooks push events to your HTTPS endpoint as JSON (or similar) when something changes: delivered, bounced, complained, opened, clicked. You avoid polling and can update users or suppressions in near real time.
+
+Secure webhooks with secrets, signature checks, and idempotency. Providers retry on failure; your handler should tolerate duplicates. Respond quickly and process heavy work asynchronously.
+
+Reloop emits webhooks for delivery lifecycle events so your application stays the source of truth for user-visible state.`,
+	relatedTerms: [
+		{
+			slug: "api",
+			title: "API",
+		},
+		{
+			slug: "bounce",
+			title: "Bounce",
+		},
+		{
+			slug: "engagement",
+			title: "Engagement",
+		},
+	],
 	relatedFeatureHref: "/features/webhooks",
 };

@@ -4,7 +4,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 
 const rail =
-	"mx-auto w-full max-w-5xl border-stroke-soft-200 border-x dark:border-white/10";
+	"mx-auto w-full max-w-7xl border-stroke-soft-200 border-x dark:border-white/10";
 
 function isCrossDomain(href: string) {
 	return href.startsWith("/docs") || href.startsWith("/dashboard");
@@ -43,7 +43,7 @@ export function GlossaryTermPageView({
 	const initial = term.title.trim().charAt(0).toUpperCase() || "#";
 
 	return (
-		<div className="pb-16 pt-6">
+		<div>
 			{/* Breadcrumb */}
 			<div className={rail}>
 				<nav
@@ -71,7 +71,7 @@ export function GlossaryTermPageView({
 					{/* Outline initial — matches index letter style */}
 					<span
 						aria-hidden
-						className="mt-1 select-none font-sans font-light text-[3.5rem] leading-none tracking-tight text-transparent sm:text-[4.5rem] lg:text-[5rem] [-webkit-text-stroke:1.25px_#a3a3a3] dark:[-webkit-text-stroke:1.25px_rgba(255,255,255,0.35)]"
+						className="mt-1 select-none font-light font-sans text-[3.5rem] text-transparent leading-none tracking-tight [-webkit-text-stroke:1.25px_#a3a3a3] sm:text-[4.5rem] lg:text-[5rem] dark:[-webkit-text-stroke:1.25px_rgba(255,255,255,0.35)]"
 					>
 						{initial}
 					</span>
@@ -96,9 +96,20 @@ export function GlossaryTermPageView({
 						<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em] dark:text-white/55">
 							In detail
 						</p>
-						<p className="mt-4 text-[16px] text-text-strong-950 leading-[1.8] sm:text-[17px] dark:text-white/80">
-							{term.body}
-						</p>
+						<div className="mt-4 space-y-4">
+							{term.body
+								.split(/\n\n+/)
+								.map((paragraph) => paragraph.trim())
+								.filter(Boolean)
+								.map((paragraph) => (
+									<p
+										key={paragraph.slice(0, 48)}
+										className="text-[16px] text-text-strong-950 leading-[1.8] sm:text-[17px] dark:text-white/80"
+									>
+										{paragraph}
+									</p>
+								))}
+						</div>
 					</div>
 				</div>
 			</section>

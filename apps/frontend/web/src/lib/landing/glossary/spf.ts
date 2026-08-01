@@ -4,9 +4,13 @@ export const term: GlossaryTermDefinition = {
 	slug: "spf",
 	title: "SPF",
 	description:
-		"Sender Policy Framework—DNS records listing authorized sending servers for a domain.",
-	keywords: ["SPF", "SPF record", "what is SPF"],
-	body: "SPF prevents spoofing by publishing which IPs and services can send for your domain. Reloop provides the exact TXT record to add when you verify a domain.",
+		"Sender Policy Framework. DNS policy listing hosts allowed to send mail for a domain.",
+	keywords: ["SPF","SPF record","TXT SPF"],
+	body: `SPF is a DNS TXT record on your domain that lists authorized sending IPs and includes (other domains' policies). Receivers check the connecting IP against that list for the envelope sender domain.
+
+Common failures: too many DNS lookups (SPF has a 10-lookup limit), missing a vendor after you add a new CRM, or publishing multiple SPF TXT records (invalid). Flatten carefully; naive flattening breaks when vendors change IPs.
+
+SPF alone does not protect the visible From header. That is why DMARC exists. Reloop gives you the SPF record to add during domain verification and tools to check it afterward.`,
 	relatedTerms: [
 		{
 			slug: "dkim",
@@ -15,6 +19,10 @@ export const term: GlossaryTermDefinition = {
 		{
 			slug: "dmarc",
 			title: "DMARC",
+		},
+		{
+			slug: "envelope",
+			title: "Envelope",
 		},
 	],
 	relatedFeatureHref: "/tools/auth-checker",
