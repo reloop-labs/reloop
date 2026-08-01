@@ -1,14 +1,14 @@
-import { glossaryTerms } from "@reloop/web/lib/landing/glossary";
+import { term } from "@reloop/web/lib/landing/glossary/esp";
 import {
-	createGlossaryIndexOgImage,
+	createGlossaryTermOgImage,
 	glossaryOgContentType,
 	glossaryOgSize,
 } from "@reloop/web/lib/landing/glossary/og-image";
 
-export const alt = "Email Glossary | Reloop";
+export const alt = `${term.title} | Email Glossary | Reloop`;
 export const size = glossaryOgSize;
 export const contentType = glossaryOgContentType;
 
 export default async function OpenGraphImage() {
-	return createGlossaryIndexOgImage(glossaryTerms.length);
+	return createGlossaryTermOgImage(term);
 }
