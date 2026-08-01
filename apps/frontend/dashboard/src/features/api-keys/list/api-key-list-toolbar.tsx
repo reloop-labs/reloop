@@ -24,6 +24,7 @@ import type { CreatedByUser } from "../types";
 
 /** How long the rotate icon spins after a refresh is triggered. */
 const REFRESH_SPIN_MS = 2000;
+const SEARCH_INPUT_ID = "api-key-list-search";
 
 export function ApiKeyListToolbar({
 	availableCreators,
@@ -51,6 +52,7 @@ export function ApiKeyListToolbar({
 		parseAsInteger.withDefault(1),
 	);
 
+	const searchInputRef = useRef<HTMLInputElement>(null);
 	const invalidate = useInvalidateApiKeys();
 	const [isRefreshing, setIsRefreshing] = useState(false);
 	const spinTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -66,6 +68,16 @@ export function ApiKeyListToolbar({
 			spinTimeoutRef.current = null;
 		}, REFRESH_SPIN_MS);
 	}, [invalidate]);
+
+	const focusSearch = useCallback(() => {
+		// Prefer the ref; fall back to id in case AlignUI cloneElement drops the ref.
+		const input =
+			searchInputRef.current ??
+			document.getElementById(SEARCH_INPUT_ID);
+		if (!(input instanceof HTMLInputElement)) return;
+		input.focus();
+		input.select();
+	}, []);
 
 	useEffect(() => {
 		return () => {
@@ -88,6 +100,19 @@ export function ApiKeyListToolbar({
 		},
 	);
 
+	// "slash" matches e.code (Slash). "/" alone never fires under react-hotkeys-hook.
+	useHotkeys(
+		"slash",
+		(e) => {
+			e.preventDefault();
+			focusSearch();
+		},
+		{
+			enableOnFormTags: false,
+			preventDefault: true,
+		},
+	);
+
 	return (
 		<div
 			role="toolbar"
@@ -102,13 +127,30 @@ export function ApiKeyListToolbar({
 					<Input.Wrapper>
 						<Input.Icon as={Icon} name="search" size="small" />
 						<Input.Input
+							id={SEARCH_INPUT_ID}
+							ref={searchInputRef}
 							placeholder="Search API keys..."
 							value={searchQuery}
+							aria-keyshortcuts="/"
+							aria-label="Search API keys"
 							onChange={(e) => {
 								void setSearchQuery(e.target.value);
 								void setCurrentPage(1);
 							}}
 						/>
+						<button
+							type="button"
+							tabIndex={-1}
+							aria-label="Focus search"
+							onMouseDown={(e) => {
+								// Keep focus move on the input; prevent button from stealing it.
+								e.preventDefault();
+								focusSearch();
+							}}
+							className="shrink-0 cursor-pointer rounded-[5px] outline-none focus-visible:ring-2 focus-visible:ring-stroke-strong-950"
+						>
+							<ActionKbd>/</ActionKbd>
+						</button>
 					</Input.Wrapper>
 				</Input.Root>
 
@@ -143,8 +185,8 @@ export function ApiKeyListToolbar({
 								disabled={isRefreshing}
 								className={cn(
 									dataTableToolbarControlClassName,
-									"gap-1 px-1.5",
-									isRefreshing && "pointer-events-none",
+									"gap-2 px-1.5",
+									isRefreshing ? "pointer-events-none" : "cursor-pointer",
 								)}
 								aria-label="Refresh API keys"
 								aria-keyshortcuts="r"
@@ -161,44 +203,36 @@ export function ApiKeyListToolbar({
 							</button>
 						</Tooltip.Trigger>
 						<Tooltip.Content
-							side="bottom"
-							sideOffset={8}
+							side="top"
+							sideOffset={-1}
 							size="medium"
-							className="max-w-[240px] p-2.5"
+							variant="light"
+							className="max-w-63 p-2.5"
 						>
 							<div className="flex items-start gap-2.5">
 								<div
 									className={cn(
 										"mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-lg",
-										"bg-white/10 ring-1 ring-white/10",
+										"bg-bg-weak-50 ring-1 ring-stroke-soft-200",
 									)}
 									aria-hidden
 								>
 									<Icon
 										name="rotate-cw"
 										className={cn(
-											"h-3.5 w-3.5 text-text-white-0",
+											"h-3.5 w-3.5 text-text-sub-600",
 											isRefreshing && "animate-spin",
 										)}
 									/>
 								</div>
 								<div className="min-w-0 flex-1">
 									<div className="flex items-center justify-between gap-3">
-										<p className="font-medium text-label-sm text-text-white-0">
+										<p className="font-medium text-label-sm text-text-strong-950">
 											{isRefreshing ? "Refreshing…" : "Refresh"}
 										</p>
-										<span
-											className={cn(
-												"inline-flex h-5 min-w-5 shrink-0 items-center justify-center rounded-md px-1",
-												"border border-white/15 border-b-white/25 bg-white/10",
-												"font-medium text-[10px] text-text-white-0 leading-none",
-												"shadow-[0_1px_0_0_rgba(0,0,0,0.25)]",
-											)}
-										>
-											R
-										</span>
+										<ActionKbd>R</ActionKbd>
 									</div>
-									<p className="mt-0.5 text-paragraph-xs text-white/65">
+									<p className="mt-0.5 text-paragraph-xs text-text-sub-600">
 										{isRefreshing
 											? "Fetching the latest API keys."
 											: "Reload API keys from the server."}
