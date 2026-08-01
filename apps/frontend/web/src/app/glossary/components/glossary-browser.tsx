@@ -48,6 +48,7 @@ function TermCard({ term }: { term: GlossaryBrowserTerm }) {
 	return (
 		<Link
 			href={`/glossary/${term.slug}`}
+			title={`${term.title} definition  -  email glossary`}
 			className="group flex items-start gap-4 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 px-4 py-4 transition-colors duration-200 hover:bg-bg-weak-50 sm:gap-5 sm:px-5 sm:py-5 dark:border-white/10 dark:bg-[#111] dark:hover:border-white/20 dark:hover:bg-white/[0.04]"
 		>
 			<div className="min-w-0 flex-1">
@@ -97,7 +98,7 @@ export function GlossaryBrowser({
 
 	return (
 		<>
-			{/* Search — rails max-w-7xl; field max-w-md */}
+			{/* Search  -  rails max-w-7xl; field max-w-md */}
 			<div
 				className={
 					"mx-auto w-full max-w-7xl border-stroke-soft-200 border-x dark:border-white/10"
@@ -126,7 +127,7 @@ export function GlossaryBrowser({
 				</div>
 			</div>
 
-			{/* A–Z — rails max-w-7xl; top/bottom borders span rail width; sticky */}
+			{/* A–Z  -  rails max-w-7xl; top/bottom borders span rail width; sticky */}
 			<nav
 				aria-label="Jump to letter"
 				className={cn(
@@ -171,7 +172,7 @@ export function GlossaryBrowser({
 				</div>
 			</nav>
 
-			{/* Results — rails max-w-7xl; list max-w-4xl */}
+			{/* Results  -  rails max-w-7xl; list max-w-4xl */}
 			<div className="mx-auto w-full max-w-7xl border-stroke-soft-200 border-x border-b bg-bg-weak-50/80 dark:border-white/10 dark:bg-white/[0.02]">
 				{groups.length === 0 ? (
 					<p className="mx-auto max-w-4xl px-4 py-16 text-center text-[15px] text-text-sub-600 sm:px-6 dark:text-white/50">

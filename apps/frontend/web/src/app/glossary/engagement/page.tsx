@@ -1,16 +1,11 @@
 import { GlossaryTermPageView } from "@reloop/web/components/landing/glossary/glossary-term-page-view";
 import { defaultLandingCta } from "@reloop/web/lib/landing/constants";
 import { term } from "@reloop/web/lib/landing/glossary/engagement";
-import { createLandingMetadata } from "@reloop/web/lib/landing/metadata";
+import { createGlossaryTermMetadata } from "@reloop/web/lib/landing/glossary/seo";
 
 export const instant = false;
 
-export const metadata = createLandingMetadata(
-	term.title,
-	term.description,
-	`/glossary/${term.slug}`,
-	term.keywords,
-);
+export const metadata = createGlossaryTermMetadata(term);
 
 export default function EngagementGlossaryPage() {
 	return (

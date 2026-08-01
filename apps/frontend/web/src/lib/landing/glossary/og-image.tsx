@@ -24,7 +24,7 @@ async function loadFonts() {
 	];
 
 	const { access } = await import("node:fs/promises");
-	let fontDir = candidates[0];
+	let fontDir: string | null = null;
 	for (const dir of candidates) {
 		try {
 			await access(join(dir, "OpenRunde-Regular.woff"));
@@ -33,6 +33,11 @@ async function loadFonts() {
 		} catch {
 			// try next
 		}
+	}
+	if (!fontDir) {
+		throw new Error(
+			"OpenRunde fonts not found (checked public/font/openRunde)",
+		);
 	}
 
 	const [regular, medium, semibold, bold] = await Promise.all([
