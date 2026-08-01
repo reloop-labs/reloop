@@ -4,6 +4,7 @@ import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import { KbdKey } from "@reloop/ui/kbd-key";
+import * as Tooltip from "@reloop/ui/tooltip";
 import type { VisibilityState } from "@tanstack/react-table";
 import {
 	parseAsArrayOf,
@@ -107,32 +108,40 @@ export function ApiKeyListToolbar({
 					columnVisibility={columnVisibility}
 					onColumnVisibleChange={onColumnVisibleChange}
 				/>
-				<button
-					type="button"
-					onClick={() => void invalidate()}
-					className={cn(
-						dataTableToolbarControlClassName,
-						"gap-1.5 px-2",
-					)}
-					aria-label="Refresh API keys"
-					aria-keyshortcuts="r"
-					title="Refresh API keys"
-				>
-					<Icon name="rotate-cw" className="h-3.5 w-3.5" />
-					{/* Physical keycap: face + bottom lip (matches Linear/macOS kbd) */}
-					<KbdKey
-						className={cn(
-							"h-5 min-w-5 rounded-[6px] px-1",
-							"border border-stroke-soft-200 bg-bg-weak-50 text-[10px] text-text-sub-600",
-							// bottom shelf + soft pad under the key
-							"shadow-[0_2px_0_0_var(--color-stroke-soft-200)]",
-							"dark:border-white/[0.14] dark:bg-white/[0.07] dark:text-white",
-							"dark:shadow-[0_2px_0_0_rgba(0,0,0,0.55),0_0_0_0.5px_rgba(255,255,255,0.06),inset_0_0.5px_0_0_rgba(255,255,255,0.08)]",
-						)}
-					>
-						R
-					</KbdKey>
-				</button>
+				<Tooltip.Provider delayDuration={200}>
+					<Tooltip.Root>
+						<Tooltip.Trigger asChild>
+							<button
+								type="button"
+								onClick={() => void invalidate()}
+								className={cn(
+									dataTableToolbarControlClassName,
+									"gap-1 px-1.5",
+								)}
+								aria-label="Refresh API keys"
+								aria-keyshortcuts="r"
+							>
+								<Icon name="rotate-cw" className="h-3.5 w-3.5" />
+								{/* Physical keycap: face + bottom lip (matches Linear/macOS kbd) */}
+								<KbdKey
+									className={cn(
+										"h-3.5 min-w-3.5 rounded-[4px] px-0.5 text-[9px] leading-none",
+										"border border-stroke-soft-200 bg-bg-weak-50 text-text-sub-600",
+										// bottom shelf under the key
+										"shadow-[0_1.5px_0_0_var(--color-stroke-soft-200)]",
+										"dark:border-white/[0.14] dark:bg-white/[0.07] dark:text-white",
+										"dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.55),0_0_0_0.5px_rgba(255,255,255,0.06),inset_0_0.5px_0_0_rgba(255,255,255,0.08)]",
+									)}
+								>
+									R
+								</KbdKey>
+							</button>
+						</Tooltip.Trigger>
+						<Tooltip.Content side="bottom" size="small">
+							Refresh
+						</Tooltip.Content>
+					</Tooltip.Root>
+				</Tooltip.Provider>
 			</div>
 		</div>
 	);
