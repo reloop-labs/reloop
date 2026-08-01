@@ -9,16 +9,16 @@ export function SuccessStep({ secret }: { secret: string }) {
 					code={secret}
 					lang="bash"
 					copyValue={secret}
-					label="secret key"
+					label="Secret key"
 					minHeight="auto"
 				/>
 			</div>
 
 			{/* Warning Banner */}
 			<div className="mt-4 rounded-xl border border-[#FBE3B5] bg-[#FEF6E6] p-4 text-[#8A5300] text-xs leading-relaxed dark:border-amber-800/40 dark:bg-amber-950/30 dark:text-amber-200">
-				<span className="font-semibold">Warning:</span> The old API key is
-				invalid now. Make sure to copy your new secret key — it won&apos;t
-				be shown again.
+				<span className="font-semibold">Action required:</span> Update your
+				application environments with this new secret key immediately to prevent
+				service disruptions.
 			</div>
 		</div>
 	);

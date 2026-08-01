@@ -58,8 +58,7 @@ export function ConfirmStep({
 
 			{/* Warning Banner */}
 			<div className="mt-4 rounded-xl border border-[#FBE3B5] bg-[#FEF6E6] p-4 text-[#8A5300] text-xs leading-relaxed dark:border-amber-800/40 dark:bg-amber-950/30 dark:text-amber-200">
-				All existing replicas will need to be updated with the new token.
-				Replicas using the old token will lose connectivity.
+				<span className="font-semibold">Warning:</span> Services using this key will experience downtime until they are updated with the new secret.
 			</div>
 
 			{/* Confirmation Input */}

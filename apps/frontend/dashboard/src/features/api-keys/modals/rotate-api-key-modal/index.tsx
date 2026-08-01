@@ -29,12 +29,12 @@ const HEADER_CONTENT = {
 	confirm: {
 		title: "Rotate API key",
 		description:
-			"Refresh the API key to invalidate the current token and generate a new one. This will require updating all replica instances with the new token.",
+			"Generating a new secret key will instantly revoke the existing key. Any applications using the old key will lose access until updated.",
 	},
 	success: {
 		title: "API key rotated",
 		description:
-			"Your new API key has been generated. Save this secret key now — for security, you won't be able to see it again.",
+			"Your new secret key has been generated. Copy and store it securely now — for security reasons, it cannot be displayed again.",
 	},
 } as const;
 
@@ -221,7 +221,7 @@ export function RotateApiKeyModal({
 									isRotating && "pointer-events-none opacity-50",
 								)}
 							>
-								Cancel
+								{step === "confirm" ? "Cancel" : "Close"}
 								<ActionKbd className="lowercase! w-auto min-w-0 px-1">
 									esc
 								</ActionKbd>
