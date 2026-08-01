@@ -49,6 +49,8 @@ function useApiKeyActionsMenu(
 	const [isToggleCompleted, setIsToggleCompleted] = useState(false);
 	const [wasEnabledOnToggle, setWasEnabledOnToggle] = useState(apiKey.enabled);
 	const buttonRefs = useRef<HTMLElement[]>([]);
+	// Blocks Radix's automatic close while a copy/toggle animation is running.
+	const keepOpenRef = useRef(false);
 
 	const menuItems = [
 		{
@@ -114,6 +116,8 @@ function useApiKeyActionsMenu(
 
 	const handleOpenChange = useCallback(
 		(next: boolean) => {
+			// While a copy/toggle animation is in flight, ignore Radix's auto-close.
+			if (!next && keepOpenRef.current) return;
 			setOpen(next);
 			if (!next) {
 				setHoverIdx(undefined);
@@ -130,31 +134,37 @@ function useApiKeyActionsMenu(
 	}, [handleOpenChange]);
 
 	const handleCopyPrefix = async () => {
+		keepOpenRef.current = true;
 		try {
 			await navigator.clipboard.writeText(apiKey.start || apiKey.prefix || "");
 			toast.success("API key prefix copied to clipboard");
 			setCopiedItem("prefix");
 			setTimeout(() => {
 				setCopiedItem(null);
+				keepOpenRef.current = false;
 				dismissMenu();
 			}, 900);
 		} catch {
 			toast.error("Failed to copy prefix");
+			keepOpenRef.current = false;
 			dismissMenu();
 		}
 	};
 
 	const handleCopyId = async () => {
+		keepOpenRef.current = true;
 		try {
 			await navigator.clipboard.writeText(apiKey.id);
 			toast.success("API key ID copied to clipboard");
 			setCopiedItem("id");
 			setTimeout(() => {
 				setCopiedItem(null);
+				keepOpenRef.current = false;
 				dismissMenu();
 			}, 900);
 		} catch {
 			toast.error("Failed to copy ID");
+			keepOpenRef.current = false;
 			dismissMenu();
 		}
 	};

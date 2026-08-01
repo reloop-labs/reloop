@@ -146,17 +146,16 @@ export function DeleteApiKeyModal({
 						undone.
 					</p>
 				</div>
-
+				<div className="mt-4 rounded-xl border border-[#FBE3B5] bg-[#FEF6E6] p-4 text-[#8A5300] text-xs leading-relaxed dark:border-amber-800/40 dark:bg-amber-950/30 dark:text-amber-200">
+					<span className="font-bold text-[#6D4000] dark:text-amber-100">
+						Warning:
+					</span>{" "}
+					Deleting this API key will permanently remove it along with all its
+					permissions. Any services using this API key will stop working
+					immediately.
+				</div>
 				{/* Key Details Card */}
 				<div className="mt-5 space-y-3 rounded-xl border border-stroke-soft-100 bg-bg-weak-50/50 p-4 dark:border-stroke-soft-100/40">
-					<div>
-						<p className="font-normal text-text-sub-600 text-xs">
-							API key name
-						</p>
-						<p className="mt-0.5 truncate font-medium text-sm text-text-strong-950">
-							{displayName}
-						</p>
-					</div>
 					<div>
 						<p className="font-normal text-text-sub-600 text-xs">
 							API key prefix
@@ -170,14 +169,6 @@ export function DeleteApiKeyModal({
 				</div>
 
 				{/* Warning Banner */}
-				<div className="mt-4 rounded-xl border border-[#FBE3B5] bg-[#FEF6E6] p-4 text-[#8A5300] text-xs leading-relaxed dark:border-amber-800/40 dark:bg-amber-950/30 dark:text-amber-200">
-					<span className="font-bold text-[#6D4000] dark:text-amber-100">
-						Warning:
-					</span>{" "}
-					Deleting this API key will permanently remove it along with all its
-					permissions. Any services using this API key will stop working
-					immediately.
-				</div>
 
 				{/* Confirmation Input */}
 				<div className="mt-4 space-y-2">
