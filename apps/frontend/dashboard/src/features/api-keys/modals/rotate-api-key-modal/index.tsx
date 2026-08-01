@@ -161,9 +161,9 @@ export function RotateApiKeyModal({
 							<Modal.Title className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
 								{header.title}
 							</Modal.Title>
-							<p className="mt-2 text-sm text-text-sub-600 leading-relaxed">
+							<Modal.Description className="mt-2 text-sm text-text-sub-600 leading-relaxed">
 								{header.description}
-							</p>
+							</Modal.Description>
 						</div>
 
 						{/* Center content only — animates on step change */}
@@ -174,7 +174,7 @@ export function RotateApiKeyModal({
 									initial={{ opacity: 0, filter: "blur(4px)" }}
 									animate={{ opacity: 1, filter: "blur(0px)" }}
 									exit={{ opacity: 0, filter: "blur(4px)" }}
-									transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+									transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
 								>
 									<ConfirmStep
 										displayName={displayName}
@@ -187,6 +187,7 @@ export function RotateApiKeyModal({
 								</motion.div>
 							) : (
 								<motion.div
+									layout
 									key="success"
 									initial={{ opacity: 0, filter: "blur(4px)", height: "315px" }}
 									animate={{
@@ -203,7 +204,10 @@ export function RotateApiKeyModal({
 						</AnimatePresence>
 
 						{/* Footer — outside animation, plain conditional */}
-						<div className="mt-6 flex items-center justify-end gap-3">
+						<motion.div
+							layout
+							className="mt-6 flex items-center justify-end gap-3"
+						>
 							<Button.Root
 								type="button"
 								variant="neutral"
@@ -292,7 +296,7 @@ export function RotateApiKeyModal({
 									</AnimatePresence>
 								</FancyButton.Root>
 							)}
-						</div>
+						</motion.div>
 					</div>
 				</motion.div>
 			</Modal.Content>
