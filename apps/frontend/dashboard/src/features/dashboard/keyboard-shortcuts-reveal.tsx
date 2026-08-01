@@ -134,6 +134,22 @@ const shortcutKbdClassName = cn(
 );
 
 /**
+ * Always-visible keycap for action buttons (Create, Docs, Refresh, …).
+ * Same physical key style as `ShortcutHint`, without the Space-reveal gate.
+ */
+export function ActionKbd({
+	children,
+	className,
+}: {
+	children: ReactNode;
+	className?: string;
+}) {
+	return (
+		<KbdKey className={cn(shortcutKbdClassName, className)}>{children}</KbdKey>
+	);
+}
+
+/**
  * Renders a keycap hint only while shortcuts are revealed (long-press Space).
  *
  * Single-layer tween (no spring, no nested layout):

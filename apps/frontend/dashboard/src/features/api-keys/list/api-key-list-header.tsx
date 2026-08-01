@@ -1,19 +1,41 @@
+"use client";
+
 import { ApiKeysApiDetails } from "#/components/api-details/api-keys";
 import * as Button from "@reloop/ui/button";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { useQueryState } from "nuqs";
 import { useHotkeys } from "react-hotkeys-hook";
+import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
+
+const DOCS_URL = "https://reloop.sh/docs/learn/api-keys";
 
 export function ApiKeyListHeader() {
 	const [, setModal] = useQueryState("modal");
 
 	const openCreateModal = () => void setModal("create-api-key");
+	const openDocs = () => window.open(DOCS_URL, "_blank");
 
-	useHotkeys("mod+a", (e) => {
-		e.preventDefault();
-		openCreateModal();
-	});
+	// A — Browse samples (wired inside ApiKeysApiDetails / ApiDetailsDrawer)
+	// D — Documentation
+	// C — Create API key
+	useHotkeys(
+		"d",
+		(e) => {
+			e.preventDefault();
+			openDocs();
+		},
+		{ enableOnFormTags: false, preventDefault: true },
+	);
+
+	useHotkeys(
+		"c",
+		(e) => {
+			e.preventDefault();
+			openCreateModal();
+		},
+		{ enableOnFormTags: false, preventDefault: true },
+	);
 
 	return (
 		<div className="flex flex-col gap-4 pt-2 pb-4 sm:flex-row sm:items-start sm:justify-between">
@@ -42,9 +64,11 @@ export function ApiKeyListHeader() {
 							size="small"
 							onClick={open}
 							className="gap-1.5 rounded-xl"
+							aria-keyshortcuts="a"
 						>
 							<Icon name="code" className="h-4 w-4 text-text-sub-600" />
 							Browse samples
+							<ActionKbd>A</ActionKbd>
 						</Button.Root>
 					)}
 				/>
@@ -53,12 +77,12 @@ export function ApiKeyListHeader() {
 					variant="neutral"
 					mode="stroke"
 					size="small"
-					onClick={() =>
-						window.open("https://reloop.sh/docs/learn/api-keys", "_blank")
-					}
-					className="rounded-xl"
+					onClick={openDocs}
+					className="gap-1.5 rounded-xl"
+					aria-keyshortcuts="d"
 				>
 					Documentation
+					<ActionKbd>D</ActionKbd>
 				</Button.Root>
 				<FancyButton.Root
 					type="button"
@@ -66,9 +90,14 @@ export function ApiKeyListHeader() {
 					size="small"
 					onClick={openCreateModal}
 					className="gap-1.5 rounded-xl"
+					aria-keyshortcuts="c"
 				>
 					<Icon name="plus" className="h-4 w-4" />
 					Create API key
+					{/* Light keycap so it reads on the blue fill */}
+					<ActionKbd className="border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]">
+						C
+					</ActionKbd>
 				</FancyButton.Root>
 			</div>
 		</div>

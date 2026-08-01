@@ -11,15 +11,19 @@ import {
 	parseAsString,
 	useQueryState,
 } from "nuqs";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { dataTableToolbarControlClassName } from "#/components/data-table/toolbar-control";
-import { ShortcutHint } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { ApiKeyStatusFilterChip } from "../filters/status-filter-chip";
 import { ApiKeyUserFilterChip } from "../filters/user-filter-chip";
 import type { ApiKeyViewColumnId } from "../hooks/use-api-key-column-visibility";
 import { useInvalidateApiKeys } from "../hooks/use-api-keys-query";
 import { ApiKeyViewPopover } from "../table/api-key-view-popover";
 import type { CreatedByUser } from "../types";
+
+/** How long the rotate icon spins after a refresh is triggered. */
+const REFRESH_SPIN_MS = 2000;
 
 export function ApiKeyListToolbar({
 	availableCreators,
@@ -48,12 +52,34 @@ export function ApiKeyListToolbar({
 	);
 
 	const invalidate = useInvalidateApiKeys();
+	const [isRefreshing, setIsRefreshing] = useState(false);
+	const spinTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+	const refresh = useCallback(() => {
+		void invalidate();
+		setIsRefreshing(true);
+		if (spinTimeoutRef.current != null) {
+			clearTimeout(spinTimeoutRef.current);
+		}
+		spinTimeoutRef.current = setTimeout(() => {
+			setIsRefreshing(false);
+			spinTimeoutRef.current = null;
+		}, REFRESH_SPIN_MS);
+	}, [invalidate]);
+
+	useEffect(() => {
+		return () => {
+			if (spinTimeoutRef.current != null) {
+				clearTimeout(spinTimeoutRef.current);
+			}
+		};
+	}, []);
 
 	useHotkeys(
 		"r",
 		(e) => {
 			e.preventDefault();
-			void invalidate();
+			refresh();
 		},
 		{
 			// Don't fire while typing in search/filters.
@@ -111,28 +137,31 @@ export function ApiKeyListToolbar({
 				<Tooltip.Provider delayDuration={200}>
 					<Tooltip.Root>
 						<Tooltip.Trigger asChild>
-							{/*
-							  Plain button — no layout/spring. Width growth is driven only by
-							  ShortcutHint's width tween so nothing fights the expand.
-							*/}
 							<button
 								type="button"
-								onClick={() => void invalidate()}
+								onClick={refresh}
+								disabled={isRefreshing}
 								className={cn(
 									dataTableToolbarControlClassName,
-									// Stable padding; min-w keeps square when kbd is collapsed
-									"min-w-8 justify-center overflow-hidden px-1.5",
+									"gap-1 px-1.5",
+									isRefreshing && "pointer-events-none",
 								)}
 								aria-label="Refresh API keys"
 								aria-keyshortcuts="r"
+								aria-busy={isRefreshing}
 							>
-								<Icon name="rotate-cw" className="h-3.5 w-3.5 shrink-0" />
-								{/* Single ease-out width + opacity tween (no spring) */}
-								<ShortcutHint>R</ShortcutHint>
+								<Icon
+									name="rotate-cw"
+									className={cn(
+										"h-3.5 w-3.5 shrink-0",
+										isRefreshing && "animate-spin",
+									)}
+								/>
+								<ActionKbd>R</ActionKbd>
 							</button>
 						</Tooltip.Trigger>
 						<Tooltip.Content side="bottom" size="small">
-							Refresh
+							{isRefreshing ? "Refreshing…" : "Refresh"}
 						</Tooltip.Content>
 					</Tooltip.Root>
 				</Tooltip.Provider>
