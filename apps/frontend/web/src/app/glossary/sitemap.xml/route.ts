@@ -1,7 +1,5 @@
 import { buildGlossarySitemapXml } from "@reloop/web/lib/landing/glossary/sitemap";
 
-export const dynamic = "force-static";
-
 export function GET() {
 	const xml = buildGlossarySitemapXml();
 
