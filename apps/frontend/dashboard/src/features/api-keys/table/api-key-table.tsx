@@ -122,7 +122,15 @@ export function ApiKeyTable({
 	const headerGroup = table.getHeaderGroups()[0];
 	const rows = table.getRowModel().rows;
 	const gridStyle = getApiKeyTableGridStyle(columnVisibility);
-	const selectedCount = table.getFilteredSelectedRowModel().rows.length;
+	const selectedRows = table.getFilteredSelectedRowModel().rows;
+	const selectedCount = selectedRows.length;
+	const selectedKeys = useMemo(
+		() => selectedRows.map((row) => row.original),
+		[selectedRows],
+	);
+	const handleClearSelection = useCallback(() => {
+		table.resetRowSelection();
+	}, [table]);
 
 	return (
 		<>
@@ -236,7 +244,12 @@ export function ApiKeyTable({
 				</div>
 			</div>
 			<ApiKeySelectionActionBar table={table} />
-			<DeleteApiKeyModal apiKeys={apiKeys} onDeleteSuccess={onDeleteSuccess} />
+			<DeleteApiKeyModal
+				apiKeys={apiKeys}
+				selectedKeys={selectedKeys}
+				onClearSelection={handleClearSelection}
+				onDeleteSuccess={onDeleteSuccess}
+			/>
 			<RotateApiKeyModal apiKeys={apiKeys} onRotateSuccess={onRotateSuccess} />
 		</>
 	);
