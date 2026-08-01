@@ -1,13 +1,11 @@
 "use client";
 
-import { User } from "lucide-react";
 import { DataTableFacetedFilter } from "#/components/data-table/data-table-faceted-filter";
+import { UserAvatar } from "#/features/dashboard/page-header/user-avatar";
 import type { CreatedByUser } from "../types";
 
 function creatorLabel(creator: CreatedByUser): string {
-	return (
-		creator.name || creator.email?.split("@")[0] || "Unknown"
-	);
+	return creator.name || creator.email?.split("@")[0] || "Unknown";
 }
 
 export function ApiKeyUserFilterChip({
@@ -22,7 +20,15 @@ export function ApiKeyUserFilterChip({
 	const options = availableCreators.map((creator) => ({
 		label: creatorLabel(creator),
 		value: creator.id,
-		icon: User,
+		icon: (
+			<UserAvatar
+				name={creator.name}
+				email={creator.email || "unknown@reloop.sh"}
+				image={creator.image}
+				size="16"
+				initialsClassName="text-[7px]"
+			/>
+		),
 	}));
 
 	return (

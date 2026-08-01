@@ -10,6 +10,7 @@ import { cn } from "@reloop/ui/cn";
 import * as Popover from "@reloop/ui/popover";
 import { Check, PlusCircle, XCircle } from "lucide-react";
 import * as React from "react";
+import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import {
 	Command,
 	CommandEmpty,
@@ -24,7 +25,7 @@ import { dataTableToolbarControlClassName } from "./toolbar-control";
 export type DataTableFacetedFilterOption = {
 	label: string;
 	value: string;
-	icon?: React.ComponentType<{ className?: string }>;
+	icon?: React.ComponentType<{ className?: string }> | React.ReactNode;
 	count?: number;
 };
 
@@ -34,6 +35,7 @@ type DataTableFacetedFilterProps = {
 	selectedValues: string[];
 	onSelectedValuesChange: (values: string[]) => void;
 	multiple?: boolean;
+	showSearch?: boolean;
 };
 
 export function DataTableFacetedFilter({
@@ -42,8 +44,22 @@ export function DataTableFacetedFilter({
 	selectedValues: selectedValuesProp,
 	onSelectedValuesChange,
 	multiple = true,
+	showSearch = false,
 }: DataTableFacetedFilterProps) {
 	const [open, setOpen] = React.useState(false);
+	const [hoverIdx, setHoverIdx] = React.useState<number | undefined>(undefined);
+	const itemRefs = React.useRef<HTMLElement[]>([]);
+
+	const currentTab = itemRefs.current[hoverIdx ?? -1];
+	const currentRect = currentTab?.getBoundingClientRect();
+
+	const handleOpenChange = (next: boolean) => {
+		setOpen(next);
+		if (!next) {
+			setHoverIdx(undefined);
+		}
+	};
+
 	const selectedValues = new Set(selectedValuesProp);
 
 	const onItemSelect = React.useCallback(
@@ -71,12 +87,9 @@ export function DataTableFacetedFilter({
 	);
 
 	return (
-		<Popover.Root open={open} onOpenChange={setOpen}>
+		<Popover.Root open={open} onOpenChange={handleOpenChange}>
 			<Popover.Trigger asChild>
-				<button
-					type="button"
-					className={dataTableToolbarControlClassName}
-				>
+				<button type="button" className={dataTableToolbarControlClassName}>
 					{selectedValues.size > 0 ? (
 						<span
 							aria-hidden
@@ -130,56 +143,90 @@ export function DataTableFacetedFilter({
 				showArrow={false}
 				className="w-50 overflow-hidden p-1.5"
 			>
-				<Command>
-					<CommandInput placeholder={title} />
-					<CommandList className="max-h-full">
+				<Command className="overflow-visible bg-transparent">
+					{showSearch ? <CommandInput placeholder={title} /> : null}
+					<CommandList className="max-h-full overflow-visible">
 						<CommandEmpty>No results found.</CommandEmpty>
-						<CommandGroup className="max-h-[300px] scroll-py-1 overflow-y-auto overflow-x-hidden">
-							{options.map((option) => {
-								const isSelected = selectedValues.has(option.value);
-								const OptionIcon = option.icon;
+						<CommandGroup className="max-h-75 scroll-py-1 overflow-y-auto overflow-x-hidden p-0">
+							<div className="relative">
+								{options.map((option, idx) => {
+									const isSelected = selectedValues.has(option.value);
 
-								return (
-									<CommandItem
-										key={option.value}
-										onSelect={() => onItemSelect(option, isSelected)}
-									>
-										<div
+									return (
+										<CommandItem
+											key={option.value}
+											ref={(el) => {
+												if (el) itemRefs.current[idx] = el;
+											}}
+											onPointerEnter={() => setHoverIdx(idx)}
+											onPointerLeave={() => setHoverIdx(undefined)}
+											onSelect={() => onItemSelect(option, isSelected)}
 											className={cn(
-												"flex size-4 items-center justify-center rounded-sm border border-text-strong-950",
-												isSelected
-													? "bg-text-strong-950 text-bg-white-0"
-													: "opacity-50 [&_svg]:invisible",
+												"relative z-10 data-[selected=true]:bg-transparent",
+												!currentRect &&
+													hoverIdx === idx &&
+													"bg-neutral-alpha-10",
 											)}
 										>
-											<Check className="size-3" />
-										</div>
-										{OptionIcon ? (
-											<OptionIcon className="size-4 text-text-sub-600" />
-										) : null}
-										<span className="truncate">{option.label}</span>
-										{option.count != null ? (
-											<span className="ml-auto font-mono text-text-sub-600 text-xs">
-												{option.count}
-											</span>
-										) : null}
-									</CommandItem>
-								);
-							})}
+											<div
+												className={cn(
+													"flex size-4 items-center justify-center rounded-sm border border-text-strong-950",
+													isSelected
+														? "bg-text-strong-950 text-bg-white-0"
+														: "opacity-50 [&_svg]:invisible",
+												)}
+											>
+												<Check className="size-3" />
+											</div>
+											{option.icon
+												? React.isValidElement(option.icon)
+													? option.icon
+													: (() => {
+															const OptionIcon =
+																option.icon as React.ComponentType<{
+																	className?: string;
+																}>;
+															return (
+																<OptionIcon className="size-4 shrink-0 text-text-sub-600" />
+															);
+														})()
+												: null}
+											<span className="truncate">{option.label}</span>
+											{option.count != null ? (
+												<span className="ml-auto font-mono text-text-sub-600 text-xs">
+													{option.count}
+												</span>
+											) : null}
+										</CommandItem>
+									);
+								})}
+								{selectedValues.size > 0 ? (
+									<>
+										<CommandSeparator />
+										<CommandItem
+											ref={(el) => {
+												if (el) itemRefs.current[options.length] = el;
+											}}
+											onPointerEnter={() => setHoverIdx(options.length)}
+											onPointerLeave={() => setHoverIdx(undefined)}
+											onSelect={() => onSelectedValuesChange([])}
+											className={cn(
+												"relative z-10 justify-center text-center data-[selected=true]:bg-transparent",
+												!currentRect &&
+													hoverIdx === options.length &&
+													"bg-neutral-alpha-10",
+											)}
+										>
+											Clear filters
+										</CommandItem>
+									</>
+								) : null}
+								<AnimatedHoverBackground
+									rect={currentRect}
+									tabElement={currentTab}
+								/>
+							</div>
 						</CommandGroup>
-						{selectedValues.size > 0 ? (
-							<>
-								<CommandSeparator />
-								<CommandGroup>
-									<CommandItem
-										onSelect={() => onSelectedValuesChange([])}
-										className="justify-center text-center"
-									>
-										Clear filters
-									</CommandItem>
-								</CommandGroup>
-							</>
-						) : null}
 					</CommandList>
 				</Command>
 			</Popover.Content>
