@@ -96,7 +96,7 @@ export function GlossaryTermPageView({
 
 			{/* Body — same letter gutter as definition so copy lines up */}
 			<section className={rail}>
-				<div className="border-stroke-soft-200 border-t bg-bg-weak-50/60 py-10 sm:py-12 lg:py-14 dark:border-white/10 dark:bg-white/[0.02]">
+				<div className="border-stroke-soft-200 border-y bg-bg-weak-50/60 py-10 sm:py-12 lg:py-14 dark:border-white/10 dark:bg-white/[0.02]">
 					<div className={contentRow}>
 						<span aria-hidden className={`${letterGutter} invisible`}>
 							{initial}
@@ -124,14 +124,17 @@ export function GlossaryTermPageView({
 				</div>
 			</section>
 
-			{/* In Reloop — content band with diagonal hatch gutters left & right */}
+			{/* In Reloop — clear gap after detail border (no gray bg), then hatch band */}
 			{term.relatedFeatureHref && (
 				<section className={rail}>
-					<div className="grid w-full grid-cols-1 items-stretch border-stroke-soft-200 border-t sm:grid-cols-[minmax(2rem,1fr)_minmax(0,56rem)_minmax(2rem,1fr)] lg:grid-cols-[minmax(2.5rem,1fr)_minmax(0,64rem)_minmax(2.5rem,1fr)] dark:border-white/10">
+					{/* Empty space: page bg only, no fill */}
+					<div className="h-10 bg-transparent sm:h-12" aria-hidden />
+
+					<div className="grid w-full grid-cols-1 items-stretch border-stroke-soft-200 border-y bg-bg-white-0 sm:grid-cols-[minmax(2rem,1fr)_minmax(0,56rem)_minmax(2rem,1fr)] lg:grid-cols-[minmax(2.5rem,1fr)_minmax(0,64rem)_minmax(2.5rem,1fr)] dark:border-white/10 dark:bg-black">
 						{/* Left hatch */}
 						<div
 							aria-hidden
-							className="hidden min-h-[1px] self-stretch border-stroke-soft-200 border-r text-text-strong-950/15 sm:block dark:border-white/10 dark:text-white/15"
+							className="hidden min-h-[1px] self-stretch border-stroke-soft-200 border-r bg-transparent text-text-strong-950/15 sm:block dark:border-white/10 dark:text-white/15"
 							style={{
 								backgroundImage:
 									"repeating-linear-gradient(-45deg, transparent 0, transparent 5px, currentColor 5px, currentColor 6.5px)",
@@ -139,7 +142,7 @@ export function GlossaryTermPageView({
 						/>
 
 						{/* Center CTA cell */}
-						<div className="flex min-w-0 flex-col justify-between gap-6 px-5 py-8 sm:flex-row sm:items-center sm:gap-8 sm:border-stroke-soft-200 sm:border-x sm:px-7 sm:py-9 lg:px-8 dark:sm:border-white/10">
+						<div className="flex min-w-0 flex-col justify-between gap-6 bg-bg-white-0 px-5 py-8 sm:flex-row sm:items-center sm:gap-8 sm:border-stroke-soft-200 sm:border-x sm:px-7 sm:py-9 lg:px-8 dark:bg-black dark:sm:border-white/10">
 							<div className="min-w-0">
 								<p className="font-semibold text-[13px] text-text-strong-950 sm:text-[15px] dark:text-white">
 									In Reloop
@@ -169,19 +172,27 @@ export function GlossaryTermPageView({
 						{/* Right hatch */}
 						<div
 							aria-hidden
-							className="hidden min-h-[1px] self-stretch border-stroke-soft-200 border-l text-text-strong-950/15 sm:block dark:border-white/10 dark:text-white/15"
+							className="hidden min-h-[1px] self-stretch border-stroke-soft-200 border-l bg-transparent text-text-strong-950/15 sm:block dark:border-white/10 dark:text-white/15"
 							style={{
 								backgroundImage:
 									"repeating-linear-gradient(-45deg, transparent 0, transparent 5px, currentColor 5px, currentColor 6.5px)",
 							}}
 						/>
 					</div>
+
+					{/* Empty space below In Reloop (no fill) */}
+					<div className="h-10 bg-transparent sm:h-12" aria-hidden />
 				</section>
 			)}
 
 			{/* Related terms — numbered grid (Attio-style cells) */}
 			<section className={rail}>
-				<div className="border-stroke-soft-200 border-t dark:border-white/10">
+				{/* When In Reloop is missing, still clear the detail band */}
+				{!term.relatedFeatureHref && (
+					<div className="h-10 bg-transparent sm:h-12" aria-hidden />
+				)}
+
+				<div className="border-stroke-soft-200 border-y dark:border-white/10">
 					<div className="px-4 py-10 text-center sm:px-6 sm:py-12 lg:px-8">
 						<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em] dark:text-white/55">
 							Keep learning
@@ -254,11 +265,14 @@ export function GlossaryTermPageView({
 						</div>
 					)}
 				</div>
+
+				{/* Empty space below related terms before CTA */}
+				<div className="h-10 bg-transparent sm:h-12" aria-hidden />
 			</section>
 
 			{/* CTA */}
 			<section id="cta" className={rail}>
-				<div className="border-stroke-soft-200 border-t px-4 py-14 sm:px-6 sm:py-16 lg:px-8 dark:border-white/10">
+				<div className="border-stroke-soft-200 border-y px-4 py-14 sm:px-6 sm:py-16 lg:px-8 dark:border-white/10">
 					<div className="mx-auto max-w-[920px] text-center">
 						<h2 className="font-serif text-[2.2rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[2.8rem] lg:text-[3.2rem] dark:text-white">
 							{cta.title}
