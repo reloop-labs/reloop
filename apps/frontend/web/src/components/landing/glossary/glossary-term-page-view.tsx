@@ -272,7 +272,7 @@ export function GlossaryTermPageView({
 
 			{/* CTA */}
 			<section id="cta" className={rail}>
-				<div className="border-stroke-soft-200 border-y px-4 py-14 sm:px-6 sm:py-16 lg:px-8 dark:border-white/10">
+				<div className="border-stroke-soft-200 border-t px-4 py-14 sm:px-6 sm:py-16 lg:px-8 dark:border-white/10">
 					<div className="mx-auto max-w-[920px] text-center">
 						<h2 className="font-serif text-[2.2rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[2.8rem] lg:text-[3.2rem] dark:text-white">
 							{cta.title}
