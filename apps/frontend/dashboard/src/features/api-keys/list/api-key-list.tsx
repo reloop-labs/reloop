@@ -1,14 +1,13 @@
 import { authClient } from "@reloop/auth/client";
 import { Icon } from "@reloop/ui/icon";
 import { useQuery } from "@tanstack/react-query";
-import { AnimatePresence, motion } from "framer-motion";
 import {
 	parseAsArrayOf,
 	parseAsInteger,
 	parseAsString,
 	useQueryState,
 } from "nuqs";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import { queryKeys } from "#/lib/query-keys";
 import { useApiKeyColumnVisibility } from "../hooks/use-api-key-column-visibility";
@@ -32,15 +31,7 @@ export function ApiKeyList() {
 	const [modal, setModal] = useQueryState("modal");
 	const [currentPage] = useQueryState("page", parseAsInteger.withDefault(1));
 	const [pageSize] = useQueryState("limit", parseAsInteger.withDefault(10));
-	const [rotatedName, setRotatedName] = useState<string | null>(null);
 	const { columnVisibility, setColumnVisible } = useApiKeyColumnVisibility();
-
-	useEffect(() => {
-		if (rotatedName) {
-			const timer = setTimeout(() => setRotatedName(null), 8000);
-			return () => clearTimeout(timer);
-		}
-	}, [rotatedName]);
 
 	const listParams = {
 		page: currentPage ?? 1,
@@ -91,34 +82,6 @@ export function ApiKeyList() {
 
 	return (
 		<div className="pb-8">
-			<AnimatePresence>
-				{rotatedName && (
-					<motion.div
-						key="rotated-banner"
-						initial={{ opacity: 0, y: -8, height: 0 }}
-						animate={{ opacity: 1, y: 0, height: "auto" }}
-						exit={{ opacity: 0, y: -8, height: 0 }}
-						transition={{ duration: 0.2 }}
-						className="mb-4 overflow-hidden"
-					>
-						<div className="flex items-center justify-between rounded-xl border border-[#B8D9FA] bg-[#EBF4FE] px-4 py-3 text-sm text-[#0C4A8C] dark:border-blue-800/40 dark:bg-blue-950/30 dark:text-blue-200">
-							<span>
-								API key &quot;
-								<span className="font-semibold">{rotatedName}</span>&quot; has
-								been successfully rotated.
-							</span>
-							<button
-								type="button"
-								onClick={() => setRotatedName(null)}
-								className="p-1 text-[#0C4A8C]/70 transition-colors hover:text-[#0C4A8C] dark:text-blue-200/70 dark:hover:text-blue-200"
-							>
-								<Icon name="close" className="h-4 w-4" />
-							</button>
-						</div>
-					</motion.div>
-				)}
-			</AnimatePresence>
-
 			{error ? (
 				<div className="flex flex-col items-center justify-center gap-2 p-4">
 					<Icon name="alert-circle" className="h-8 w-8 text-error-base" />
@@ -141,7 +104,6 @@ export function ApiKeyList() {
 							columnVisibility={columnVisibility}
 							isLoading={isPending || isFetching}
 							loadingRows={4}
-							onRotateSuccess={(name) => setRotatedName(name)}
 						/>
 					</div>
 				</div>
