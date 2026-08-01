@@ -116,8 +116,8 @@ export function ApiKeySelectionActionBar({
 			}}
 		>
 			<ActionBarSelection>
-				<span className="font-medium">{selectedCount}</span>
-				<span>selected</span>
+				<span className="font-semibold text-text-strong-950 tabular-nums">{selectedCount}</span>
+				<span className="text-text-sub-600">selected</span>
 				<ActionBarSeparator />
 				<ActionBarClose>
 					<X />
