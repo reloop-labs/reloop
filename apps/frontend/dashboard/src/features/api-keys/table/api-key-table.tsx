@@ -17,6 +17,7 @@ import type { ApiKeyData } from "../types";
 import {
 	type ApiKeyActionsHandlers,
 	ApiKeyActionsMenu,
+	ApiKeyRowContextMenu,
 } from "./api-key-actions-menu";
 import { type ApiKeyTableMeta, apiKeyColumns } from "./columns";
 import { API_KEY_TABLE_GRID } from "./constants";
@@ -148,32 +149,38 @@ export function ApiKeyTable({
 								activeDropdownId === apiKey.id || isEditing;
 							return (
 								<div key={row.id}>
-									<div
-										className={cn(
-											`group/row grid w-full ${API_KEY_TABLE_GRID} items-center px-4 py-2 text-left transition-colors`,
-											isRowActive && "bg-bg-weak-50/50",
-											isEditing && "bg-bg-weak-50/70",
-										)}
+									<ApiKeyRowContextMenu
+										apiKey={apiKey}
+										handlers={actionsHandlers}
 									>
-										{row.getVisibleCells().map((cell) => (
-											<div key={cell.id}>
-												{flexRender(
-													cell.column.columnDef.cell,
-													cell.getContext(),
-												)}
-											</div>
-										))}
-										{/* Actions outside column defs so open state never remounts with columns */}
 										<div
-											onClick={(e) => e.stopPropagation()}
-											onKeyDown={(e) => e.stopPropagation()}
+											className={cn(
+												`group/row grid w-full ${API_KEY_TABLE_GRID} items-center px-4 py-2 text-left transition-colors`,
+												"hover:bg-bg-weak-50/50",
+												isRowActive && "bg-bg-weak-50/50",
+												isEditing && "bg-bg-weak-50/70",
+											)}
 										>
-											<ApiKeyActionsMenu
-												apiKey={apiKey}
-												handlers={actionsHandlers}
-											/>
+											{row.getVisibleCells().map((cell) => (
+												<div key={cell.id}>
+													{flexRender(
+														cell.column.columnDef.cell,
+														cell.getContext(),
+													)}
+												</div>
+											))}
+											{/* Actions outside column defs so open state never remounts with columns */}
+											<div
+												onClick={(e) => e.stopPropagation()}
+												onKeyDown={(e) => e.stopPropagation()}
+											>
+												<ApiKeyActionsMenu
+													apiKey={apiKey}
+													handlers={actionsHandlers}
+												/>
+											</div>
 										</div>
-									</div>
+									</ApiKeyRowContextMenu>
 
 									<AnimatePresence initial={false}>
 										{isEditing ? (

@@ -1,11 +1,17 @@
 import { useRouter } from "next/navigation";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
+import * as ContextMenu from "@reloop/ui/context-menu";
 import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { useRef, useState } from "react";
+import {
+	type ReactNode,
+	useCallback,
+	useRef,
+	useState,
+} from "react";
 import { toast } from "sonner";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import type { ApiKeyData } from "../types";
@@ -19,13 +25,19 @@ export type ApiKeyActionsHandlers = {
 	onOpenChange: (open: boolean, id: string) => void;
 };
 
-export function ApiKeyActionsMenu({
-	apiKey,
-	handlers,
-}: {
-	apiKey: ApiKeyData;
-	handlers: ApiKeyActionsHandlers;
-}) {
+type MenuItemId =
+	| "view"
+	| "edit"
+	| "copy_prefix"
+	| "copy_id"
+	| "toggle"
+	| "rotate"
+	| "delete";
+
+function useApiKeyActionsMenu(
+	apiKey: ApiKeyData,
+	handlers: ApiKeyActionsHandlers,
+) {
 	const router = useRouter();
 	const isToggling = handlers.togglingId === apiKey.id;
 	const [open, setOpen] = useState(false);
@@ -33,7 +45,7 @@ export function ApiKeyActionsMenu({
 	const [copiedItem, setCopiedItem] = useState<"prefix" | "id" | null>(null);
 	const [isToggleCompleted, setIsToggleCompleted] = useState(false);
 	const [wasEnabledOnToggle, setWasEnabledOnToggle] = useState(apiKey.enabled);
-	const buttonRefs = useRef<HTMLButtonElement[]>([]);
+	const buttonRefs = useRef<HTMLElement[]>([]);
 
 	const menuItems = [
 		{
@@ -97,14 +109,17 @@ export function ApiKeyActionsMenu({
 	const currentRect = currentTab?.getBoundingClientRect();
 	const isDanger = menuItems[hoverIdx ?? -1]?.isDanger ?? false;
 
-	const handleOpenChange = (next: boolean) => {
-		setOpen(next);
-		if (!next) {
-			setHoverIdx(undefined);
-			setIsToggleCompleted(false);
-		}
-		handlers.onOpenChange(next, apiKey.id);
-	};
+	const handleOpenChange = useCallback(
+		(next: boolean) => {
+			setOpen(next);
+			if (!next) {
+				setHoverIdx(undefined);
+				setIsToggleCompleted(false);
+			}
+			handlers.onOpenChange(next, apiKey.id);
+		},
+		[apiKey.id, handlers.onOpenChange],
+	);
 
 	const handleCopyPrefix = async () => {
 		try {
@@ -136,7 +151,7 @@ export function ApiKeyActionsMenu({
 		}
 	};
 
-	const handleItemClick = async (id: (typeof menuItems)[number]["id"]) => {
+	const handleItemClick = async (id: MenuItemId) => {
 		if (id === "view") {
 			router.push(`/api-keys/${apiKey.id}`);
 			handleOpenChange(false);
@@ -168,13 +183,276 @@ export function ApiKeyActionsMenu({
 		}
 	};
 
+	return {
+		open,
+		handleOpenChange,
+		menuItems,
+		hoverIdx,
+		setHoverIdx,
+		buttonRefs,
+		currentTab,
+		currentRect,
+		isDanger,
+		copiedItem,
+		isToggleCompleted,
+		wasEnabledOnToggle,
+		isToggling,
+		apiKey,
+		handleItemClick,
+	};
+}
+
+function MenuItemLabel({
+	item,
+	copiedItem,
+	isToggleCompleted,
+	wasEnabledOnToggle,
+	isToggling,
+	apiKey,
+}: {
+	item: ReturnType<typeof useApiKeyActionsMenu>["menuItems"][number];
+	copiedItem: "prefix" | "id" | null;
+	isToggleCompleted: boolean;
+	wasEnabledOnToggle: boolean;
+	isToggling: boolean;
+	apiKey: ApiKeyData;
+}) {
+	const isCopyPrefix = item.id === "copy_prefix";
+	const isCopyId = item.id === "copy_id";
+	const isThisCopied =
+		(isCopyPrefix && copiedItem === "prefix") ||
+		(isCopyId && copiedItem === "id");
+	const isToggleItem = item.id === "toggle";
+	const toggleStateKey = isToggleCompleted
+		? "completed"
+		: isToggling
+			? "loading"
+			: "idle";
+
+	if (isToggleItem) {
+		return (
+			<AnimatePresence mode="popLayout" initial={false}>
+				<motion.div
+					key={toggleStateKey}
+					transition={{
+						type: "spring",
+						duration: 0.25,
+						bounce: 0,
+					}}
+					initial={{ opacity: 0, y: -14 }}
+					animate={{ opacity: 1, y: 0 }}
+					exit={{ opacity: 0, y: 14 }}
+					className="flex items-center gap-2"
+				>
+					{isToggleCompleted ? (
+						<>
+							<Icon
+								name="check-circle"
+								className="h-3.5 w-3.5 shrink-0 text-success-base"
+							/>
+							<span className="text-success-base">
+								{wasEnabledOnToggle ? "Disabled!" : "Enabled!"}
+							</span>
+						</>
+					) : isToggling ? (
+						<>
+							<Icon
+								name="loader-2"
+								className="h-3.5 w-3.5 shrink-0 animate-spin text-text-sub-600"
+							/>
+							<span>
+								{apiKey.enabled ? "Disabling..." : "Enabling..."}
+							</span>
+						</>
+					) : (
+						<>
+							<Icon
+								name={apiKey.enabled ? "cross-circle" : "check-circle"}
+								className="h-3.5 w-3.5 shrink-0 text-text-sub-600"
+							/>
+							<span>{apiKey.enabled ? "Disable" : "Enable"}</span>
+						</>
+					)}
+				</motion.div>
+			</AnimatePresence>
+		);
+	}
+
+	if (isCopyPrefix || isCopyId) {
+		return (
+			<AnimatePresence mode="popLayout" initial={false}>
+				<motion.div
+					key={isThisCopied ? "copied" : "idle"}
+					transition={{
+						type: "spring",
+						duration: 0.25,
+						bounce: 0,
+					}}
+					initial={{ opacity: 0, y: -14 }}
+					animate={{ opacity: 1, y: 0 }}
+					exit={{ opacity: 0, y: 14 }}
+					className="flex items-center gap-2"
+				>
+					<Icon
+						name={isThisCopied ? "check-circle" : "copy"}
+						className={cn(
+							"h-3.5 w-3.5 shrink-0",
+							isThisCopied ? "text-success-base" : "text-text-sub-600",
+						)}
+					/>
+					<span>
+						{isThisCopied
+							? isCopyPrefix
+								? "Copied prefix!"
+								: "Copied ID!"
+							: item.label}
+					</span>
+				</motion.div>
+			</AnimatePresence>
+		);
+	}
+
+	return (
+		<>
+			<Icon
+				name={item.icon}
+				className={cn(
+					"h-3.5 w-3.5 shrink-0",
+					item.isDanger ? "" : "text-text-sub-600",
+				)}
+			/>
+			<span>{item.label}</span>
+		</>
+	);
+}
+
+function ApiKeyActionsMenuItems({
+	menu,
+	variant = "dropdown",
+}: {
+	menu: ReturnType<typeof useApiKeyActionsMenu>;
+	variant?: "dropdown" | "context";
+}) {
+	const {
+		menuItems,
+		hoverIdx,
+		setHoverIdx,
+		buttonRefs,
+		currentTab,
+		currentRect,
+		isDanger,
+		copiedItem,
+		isToggleCompleted,
+		wasEnabledOnToggle,
+		isToggling,
+		apiKey,
+		handleItemClick,
+	} = menu;
+
+	const itemClassName = (item: (typeof menuItems)[number], idx: number) =>
+		cn(
+			"relative flex min-h-[28px] w-full cursor-pointer items-center gap-2 overflow-hidden rounded-lg px-2 py-1.5 font-normal text-xs transition-colors",
+			item.isDanger ? "text-error-base" : "text-text-strong-950",
+			!currentRect &&
+				hoverIdx === idx &&
+				(item.isDanger ? "bg-red-alpha-10" : "bg-neutral-alpha-10"),
+			item.id === "toggle" &&
+				(isToggling || isToggleCompleted) &&
+				"cursor-not-allowed opacity-90",
+			variant === "context" &&
+				"data-[disabled]:pointer-events-none data-[highlighted]:bg-transparent",
+		);
+
+	const keepsMenuOpen = (id: MenuItemId) =>
+		id === "copy_prefix" || id === "copy_id" || id === "toggle";
+
+	return (
+		<div className="relative">
+			{menuItems.map((item, idx) => {
+				const label = (
+					<MenuItemLabel
+						item={item}
+						copiedItem={copiedItem}
+						isToggleCompleted={isToggleCompleted}
+						wasEnabledOnToggle={wasEnabledOnToggle}
+						isToggling={isToggling}
+						apiKey={apiKey}
+					/>
+				);
+				const disabled =
+					item.id === "toggle" && (isToggling || isToggleCompleted);
+
+				if (variant === "context") {
+					return (
+						<ContextMenu.Item
+							key={item.id}
+							ref={(el) => {
+								if (el) buttonRefs.current[idx] = el;
+							}}
+							onPointerEnter={() => setHoverIdx(idx)}
+							onPointerLeave={() => setHoverIdx(undefined)}
+							onSelect={(event) => {
+								// Keep open for copy/toggle success animations.
+								if (keepsMenuOpen(item.id)) {
+									event.preventDefault();
+								}
+								void handleItemClick(item.id);
+							}}
+							disabled={disabled}
+							className={itemClassName(item, idx)}
+						>
+							{label}
+						</ContextMenu.Item>
+					);
+				}
+
+				return (
+					<button
+						key={item.id}
+						ref={(el) => {
+							if (el) buttonRefs.current[idx] = el;
+						}}
+						type="button"
+						onPointerEnter={() => setHoverIdx(idx)}
+						onPointerLeave={() => setHoverIdx(undefined)}
+						onClick={() => handleItemClick(item.id)}
+						disabled={disabled}
+						className={itemClassName(item, idx)}
+					>
+						{label}
+					</button>
+				);
+			})}
+			<AnimatedHoverBackground
+				rect={currentRect}
+				tabElement={currentTab}
+				isDanger={isDanger}
+			/>
+		</div>
+	);
+}
+
+const menuContentClassName = "w-48 gap-0 rounded-xl p-1.5";
+
+export function ApiKeyActionsMenu({
+	apiKey,
+	handlers,
+}: {
+	apiKey: ApiKeyData;
+	handlers: ApiKeyActionsHandlers;
+}) {
+	const menu = useApiKeyActionsMenu(apiKey, handlers);
+
 	return (
 		<div
 			className="flex items-center justify-end"
 			onClick={(e) => e.stopPropagation()}
 			onKeyDown={(e) => e.stopPropagation()}
 		>
-			<Dropdown.Root open={open} onOpenChange={handleOpenChange}>
+			<Dropdown.Root
+				open={menu.open}
+				onOpenChange={menu.handleOpenChange}
+			>
 				<Dropdown.Trigger asChild>
 					<Button.Root
 						type="button"
@@ -193,144 +471,35 @@ export function ApiKeyActionsMenu({
 				<Dropdown.Content
 					align="end"
 					sideOffset={6}
-					className="w-48 gap-0 rounded-xl p-1.5"
+					className={menuContentClassName}
 				>
-					<div className="relative">
-						{menuItems.map((item, idx) => {
-							const isCopyPrefix = item.id === "copy_prefix";
-							const isCopyId = item.id === "copy_id";
-							const isThisCopied =
-								(isCopyPrefix && copiedItem === "prefix") ||
-								(isCopyId && copiedItem === "id");
-							const isToggleItem = item.id === "toggle";
-							const toggleStateKey = isToggleCompleted
-								? "completed"
-								: isToggling
-									? "loading"
-									: "idle";
-
-							return (
-								<button
-									key={item.id}
-									ref={(el) => {
-										if (el) buttonRefs.current[idx] = el;
-									}}
-									type="button"
-									onPointerEnter={() => setHoverIdx(idx)}
-									onPointerLeave={() => setHoverIdx(undefined)}
-									onClick={() => handleItemClick(item.id)}
-									disabled={item.id === "toggle" && (isToggling || isToggleCompleted)}
-									className={cn(
-										"relative flex w-full cursor-pointer items-center gap-2 overflow-hidden rounded-lg px-2 py-1.5 font-normal text-xs transition-colors min-h-[28px]",
-										item.isDanger ? "text-error-base" : "text-text-strong-950",
-										!currentRect &&
-											hoverIdx === idx &&
-											(item.isDanger ? "bg-red-alpha-10" : "bg-neutral-alpha-10"),
-										item.id === "toggle" &&
-											(isToggling || isToggleCompleted) &&
-											"cursor-not-allowed opacity-90",
-									)}
-								>
-									{isToggleItem ? (
-										<AnimatePresence mode="popLayout" initial={false}>
-											<motion.div
-												key={toggleStateKey}
-												transition={{
-													type: "spring",
-													duration: 0.25,
-													bounce: 0,
-												}}
-												initial={{ opacity: 0, y: -14 }}
-												animate={{ opacity: 1, y: 0 }}
-												exit={{ opacity: 0, y: 14 }}
-												className="flex items-center gap-2"
-											>
-												{isToggleCompleted ? (
-													<>
-														<Icon
-															name="check-circle"
-															className="h-3.5 w-3.5 shrink-0 text-success-base"
-														/>
-														<span className="text-success-base">
-															{wasEnabledOnToggle ? "Disabled!" : "Enabled!"}
-														</span>
-													</>
-												) : isToggling ? (
-													<>
-														<Icon
-															name="loader-2"
-															className="h-3.5 w-3.5 shrink-0 animate-spin text-text-sub-600"
-														/>
-														<span>
-															{apiKey.enabled ? "Disabling..." : "Enabling..."}
-														</span>
-													</>
-												) : (
-													<>
-														<Icon
-															name={apiKey.enabled ? "cross-circle" : "check-circle"}
-															className="h-3.5 w-3.5 shrink-0 text-text-sub-600"
-														/>
-														<span>{apiKey.enabled ? "Disable" : "Enable"}</span>
-													</>
-												)}
-											</motion.div>
-										</AnimatePresence>
-									) : isCopyPrefix || isCopyId ? (
-										<AnimatePresence mode="popLayout" initial={false}>
-											<motion.div
-												key={isThisCopied ? "copied" : "idle"}
-												transition={{
-													type: "spring",
-													duration: 0.25,
-													bounce: 0,
-												}}
-												initial={{ opacity: 0, y: -14 }}
-												animate={{ opacity: 1, y: 0 }}
-												exit={{ opacity: 0, y: 14 }}
-												className="flex items-center gap-2"
-											>
-												<Icon
-													name={isThisCopied ? "check-circle" : "copy"}
-													className={cn(
-														"h-3.5 w-3.5 shrink-0",
-														isThisCopied
-															? "text-success-base"
-															: "text-text-sub-600",
-													)}
-												/>
-												<span>
-													{isThisCopied
-														? isCopyPrefix
-															? "Copied prefix!"
-															: "Copied ID!"
-														: item.label}
-												</span>
-											</motion.div>
-										</AnimatePresence>
-									) : (
-										<>
-											<Icon
-												name={item.icon}
-												className={cn(
-													"h-3.5 w-3.5 shrink-0",
-													item.isDanger ? "" : "text-text-sub-600",
-												)}
-											/>
-											<span>{item.label}</span>
-										</>
-									)}
-								</button>
-							);
-						})}
-						<AnimatedHoverBackground
-							rect={currentRect}
-							tabElement={currentTab}
-							isDanger={isDanger}
-						/>
-					</div>
+					<ApiKeyActionsMenuItems menu={menu} />
 				</Dropdown.Content>
 			</Dropdown.Root>
 		</div>
+	);
+}
+
+export function ApiKeyRowContextMenu({
+	apiKey,
+	handlers,
+	children,
+}: {
+	apiKey: ApiKeyData;
+	handlers: ApiKeyActionsHandlers;
+	children: ReactNode;
+}) {
+	const menu = useApiKeyActionsMenu(apiKey, handlers);
+
+	return (
+		<ContextMenu.Root
+			open={menu.open}
+			onOpenChange={menu.handleOpenChange}
+		>
+			<ContextMenu.Trigger asChild>{children}</ContextMenu.Trigger>
+			<ContextMenu.Content className={menuContentClassName}>
+				<ApiKeyActionsMenuItems menu={menu} variant="context" />
+			</ContextMenu.Content>
+		</ContextMenu.Root>
 	);
 }
