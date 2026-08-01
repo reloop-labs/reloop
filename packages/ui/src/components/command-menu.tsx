@@ -74,7 +74,7 @@ const CommandList = React.forwardRef<
 		<Command.List
 			ref={forwardedRef}
 			className={cn(
-				"flex max-h-min min-h-0 flex-1 flex-col overflow-auto",
+				"flex max-h-min min-h-0 flex-1 flex-col overflow-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden [&_[cmdk-list-sizer]]:[-ms-overflow-style:none] [&_[cmdk-list-sizer]]:[scrollbar-width:none] [&_[cmdk-list-sizer]]:[&::-webkit-scrollbar]:hidden",
 				className,
 			)}
 			{...rest}

@@ -1,7 +1,6 @@
 import { cn } from "@reloop/ui/cn";
 import * as CommandMenu from "@reloop/ui/command";
 import { Icon } from "@reloop/ui/icon";
-import { KbdKeyOutline } from "@reloop/ui/kbd-key-outline";
 import {
 	ArrowDown,
 	ArrowUp,
@@ -14,7 +13,6 @@ import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import * as React from "react";
 import { useHotkeys } from "react-hotkeys-hook";
-import { useSignOut } from "#/features/auth/session-query";
 import {
 	filterSettingsNavigation,
 	mainNavigation,
@@ -74,14 +72,11 @@ function addRecent(item: Omit<RecentItem, "timestamp">) {
 function KbdBadge({ label }: { label: string }) {
 	const parts = label.match(/([⌘⇧⌃⌥]+|[A-Z0-9↵⎋⇥])/g) ?? [label];
 	return (
-		<span className="ml-auto flex shrink-0 items-center gap-0.5">
+		<span className="ml-auto flex shrink-0 items-center gap-1">
 			{parts.map((part, i) => (
-				<KbdKeyOutline
-					key={`${part}-${i}`}
-					className="h-[18px] w-auto min-w-[18px] px-1 font-sans text-[10px] text-text-soft-400"
-				>
+				<CommandMenu.FooterKeyBox key={`${part}-${i}`}>
 					{part}
-				</KbdKeyOutline>
+				</CommandMenu.FooterKeyBox>
 			))}
 		</span>
 	);
@@ -91,7 +86,6 @@ export function CommandMenuGlobal() {
 	const [open, setOpen] = React.useState(false);
 	const [search, setSearch] = React.useState("");
 	const router = useRouter();
-	const signOut = useSignOut();
 	const { setTheme, resolvedTheme } = useTheme();
 	const inputRef = React.useRef<HTMLInputElement>(null);
 	const { isOrgAdmin, canManageTeam } = useOrgPermissions();
@@ -168,11 +162,6 @@ export function CommandMenuGlobal() {
 		[setTheme, resolvedTheme],
 	);
 
-	const handleSignOut = React.useCallback(async () => {
-		setOpen(false);
-		await signOut();
-	}, [signOut]);
-
 	const recents = React.useMemo(() => (open ? getRecents() : []), [open]);
 
 	const appearanceActions: CommandAction[] = React.useMemo(
@@ -206,21 +195,6 @@ export function CommandMenuGlobal() {
 		[resolvedTheme, handleThemeSelect],
 	);
 
-	const quickActions: CommandAction[] = React.useMemo(
-		() => [
-			{
-				id: "sign-out",
-				label: "Sign Out",
-				icon: "arrow-right-rec",
-				variant: "danger" as const,
-				onSelect: () => {
-					void handleSignOut();
-				},
-			},
-		],
-		[handleSignOut],
-	);
-
 	const hasSearch = search.trim().length > 0;
 
 	return (
@@ -252,11 +226,6 @@ export function CommandMenuGlobal() {
 						<X className="size-3.5" />
 					</button>
 				) : null}
-				<span className="ml-1 flex shrink-0 items-center gap-1">
-					<KbdKeyOutline className="h-5 w-auto px-1.5 font-sans text-[11px] text-text-soft-400">
-						Esc
-					</KbdKeyOutline>
-				</span>
 			</div>
 
 			<CommandMenu.List>
@@ -355,34 +324,10 @@ export function CommandMenuGlobal() {
 						</CommandMenu.Item>
 					))}
 				</CommandMenu.Group>
-
-				<CommandMenu.Group heading="Actions">
-					{quickActions.map((action) => (
-						<CommandMenu.Item
-							key={action.id}
-							value={`Action ${action.label}`}
-							onSelect={action.onSelect}
-							className={cn(
-								action.variant === "danger" &&
-									"text-error-base data-[selected=true]:bg-red-alpha-10",
-							)}
-						>
-							<CommandMenu.ItemIcon
-								as={Icon}
-								name={action.icon}
-								className={cn(
-									"size-4",
-									action.variant === "danger" && "text-error-base",
-								)}
-							/>
-							<span className="flex-1 truncate">{action.label}</span>
-						</CommandMenu.Item>
-					))}
-				</CommandMenu.Group>
 			</CommandMenu.List>
 
 			<CommandMenu.Footer>
-				<div className="flex items-center gap-4">
+				<div className="flex items-center justify-end gap-4">
 					<div className="flex items-center gap-1.5">
 						<CommandMenu.FooterKeyBox>
 							<ArrowUp className="size-3" />
@@ -405,7 +350,6 @@ export function CommandMenuGlobal() {
 						<span className="text-[11px] text-text-soft-400">Close</span>
 					</div>
 				</div>
-				<div className="text-[11px] text-text-disabled-300">Reloop Command</div>
 			</CommandMenu.Footer>
 		</CommandMenu.Dialog>
 	);
