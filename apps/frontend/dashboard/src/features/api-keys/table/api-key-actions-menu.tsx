@@ -491,6 +491,7 @@ export function ApiKeyActionsMenu({
 					align="end"
 					sideOffset={6}
 					className={menuContentClassName}
+					onCloseAutoFocus={(e) => e.preventDefault()}
 				>
 					<ApiKeyActionsMenuItems menu={menu} />
 				</Dropdown.Content>
@@ -516,7 +517,10 @@ export function ApiKeyRowContextMenu({
 			onOpenChange={menu.handleOpenChange}
 		>
 			<ContextMenu.Trigger asChild>{children}</ContextMenu.Trigger>
-			<ContextMenu.Content className={menuContentClassName}>
+			<ContextMenu.Content
+				className={menuContentClassName}
+				onCloseAutoFocus={(e) => e.preventDefault()}
+			>
 				<ApiKeyActionsMenuItems menu={menu} variant="context" />
 			</ContextMenu.Content>
 		</ContextMenu.Root>

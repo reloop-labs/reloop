@@ -33,8 +33,8 @@ export function DeleteApiKeyModal({
 	const [confirmationText, setConfirmationText] = useState("");
 	const [deleteState, setDeleteState] = useState<DeleteState>("idle");
 	const [nameCopied, setNameCopied] = useState(false);
+	const inputRef = useRef<HTMLInputElement | null>(null);
 	const invalidate = useInvalidateApiKeys();
-
 	// Cache the selected API key so details remain stable when query invalidates upon deletion
 	const targetApiKeyRef = useRef<ApiKeyData | null>(null);
 	const currentApiKey = apiKeys.find((k) => k.id === deleteId);
@@ -145,6 +145,12 @@ export function DeleteApiKeyModal({
 			<Modal.Content
 				className="overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 p-6 sm:max-w-[460px] dark:border-stroke-soft-100/40"
 				showClose={false}
+				onOpenAutoFocus={(e) => {
+					e.preventDefault();
+					setTimeout(() => {
+						inputRef.current?.focus();
+					}, 0);
+				}}
 			>
 				{/* Header */}
 				<div>
@@ -226,11 +232,11 @@ export function DeleteApiKeyModal({
 					<Input.Root size="medium">
 						<Input.Wrapper>
 							<Input.Input
+								ref={inputRef}
 								id="delete-api-key-confirmation"
 								value={confirmationText}
 								onChange={(e) => setConfirmationText(e.target.value)}
 								placeholder={displayName}
-								autoFocus
 								disabled={deleteState !== "idle"}
 								autoComplete="off"
 							/>
