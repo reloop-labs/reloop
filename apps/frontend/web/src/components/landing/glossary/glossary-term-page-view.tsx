@@ -33,6 +33,12 @@ function FeatureLink({
 	);
 }
 
+/** Letter column + content row so definition and detail share one left edge. */
+const contentRow =
+	"flex items-start gap-5 px-4 sm:gap-8 sm:px-6 lg:gap-10 lg:px-8";
+const letterGutter =
+	"mt-1 w-[1.15em] shrink-0 select-none text-center font-light font-sans text-[3.5rem] leading-none tracking-tight sm:w-[1.1em] sm:text-[4.5rem] lg:text-[5rem]";
+
 export function GlossaryTermPageView({
 	term,
 	cta,
@@ -67,11 +73,10 @@ export function GlossaryTermPageView({
 
 			{/* Term header */}
 			<header className={rail}>
-				<div className="flex items-start gap-5 px-4 py-10 sm:gap-8 sm:px-6 sm:py-12 lg:gap-10 lg:px-8 lg:py-14">
-					{/* Outline initial — matches index letter style */}
+				<div className={`${contentRow} py-10 sm:py-12 lg:py-14`}>
 					<span
 						aria-hidden
-						className="mt-1 select-none font-light font-sans text-[3.5rem] text-transparent leading-none tracking-tight [-webkit-text-stroke:1.25px_#a3a3a3] sm:text-[4.5rem] lg:text-[5rem] dark:[-webkit-text-stroke:1.25px_rgba(255,255,255,0.35)]"
+						className={`${letterGutter} text-transparent [-webkit-text-stroke:1.25px_#a3a3a3] dark:[-webkit-text-stroke:1.25px_rgba(255,255,255,0.35)]`}
 					>
 						{initial}
 					</span>
@@ -89,26 +94,31 @@ export function GlossaryTermPageView({
 				</div>
 			</header>
 
-			{/* Body */}
+			{/* Body — same letter gutter as definition so copy lines up */}
 			<section className={rail}>
-				<div className="border-stroke-soft-200 border-t bg-bg-weak-50/60 px-4 py-10 sm:px-6 sm:py-12 lg:px-8 lg:py-14 dark:border-white/10 dark:bg-white/[0.02]">
-					<div className="mx-auto max-w-2xl">
-						<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em] dark:text-white/55">
-							In detail
-						</p>
-						<div className="mt-4 space-y-4">
-							{term.body
-								.split(/\n\n+/)
-								.map((paragraph) => paragraph.trim())
-								.filter(Boolean)
-								.map((paragraph) => (
-									<p
-										key={paragraph.slice(0, 48)}
-										className="text-[16px] text-text-strong-950 leading-[1.8] sm:text-[17px] dark:text-white/80"
-									>
-										{paragraph}
-									</p>
-								))}
+				<div className="border-stroke-soft-200 border-t bg-bg-weak-50/60 py-10 sm:py-12 lg:py-14 dark:border-white/10 dark:bg-white/[0.02]">
+					<div className={contentRow}>
+						<span aria-hidden className={`${letterGutter} invisible`}>
+							{initial}
+						</span>
+						<div className="min-w-0 max-w-2xl flex-1 pt-1 sm:pt-2">
+							<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em] dark:text-white/55">
+								In detail
+							</p>
+							<div className="mt-4 space-y-4">
+								{term.body
+									.split(/\n\n+/)
+									.map((paragraph) => paragraph.trim())
+									.filter(Boolean)
+									.map((paragraph) => (
+										<p
+											key={paragraph.slice(0, 48)}
+											className="text-[16px] text-text-strong-950 leading-[1.8] sm:text-[17px] dark:text-white/80"
+										>
+											{paragraph}
+										</p>
+									))}
+							</div>
 						</div>
 					</div>
 				</div>
