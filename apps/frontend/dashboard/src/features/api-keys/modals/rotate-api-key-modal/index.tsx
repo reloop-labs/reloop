@@ -174,7 +174,7 @@ export function RotateApiKeyModal({
 									initial={{ opacity: 0, filter: "blur(4px)" }}
 									animate={{ opacity: 1, filter: "blur(0px)" }}
 									exit={{ opacity: 0, filter: "blur(4px)" }}
-									transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+									transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
 								>
 									<ConfirmStep
 										displayName={displayName}
@@ -188,14 +188,14 @@ export function RotateApiKeyModal({
 							) : (
 								<motion.div
 									key="success"
-									initial={{ opacity: 0, filter: "blur(4px)", height: "94px" }}
+									initial={{ opacity: 0, filter: "blur(4px)", height: "315px" }}
 									animate={{
 										opacity: 1,
 										filter: "blur(0px)",
 										height: "auto",
 									}}
 									exit={{ opacity: 0, filter: "blur(4px)" }}
-									transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+									transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
 								>
 									<SuccessStep secret={rotatedApiKey!.key} />
 								</motion.div>
@@ -203,10 +203,7 @@ export function RotateApiKeyModal({
 						</AnimatePresence>
 
 						{/* Footer — outside animation, plain conditional */}
-						<motion.div
-							layout
-							className="mt-6 flex items-center justify-end gap-3"
-						>
+						<div className="mt-6 flex items-center justify-end gap-3">
 							<Button.Root
 								type="button"
 								variant="neutral"
@@ -234,7 +231,8 @@ export function RotateApiKeyModal({
 									disabled={!canRotate}
 									className={cn(
 										"min-w-35 justify-center overflow-hidden transition-all duration-200",
-										(!canRotate || isRotating) && "pointer-events-none opacity-50",
+										(!canRotate || isRotating) &&
+											"pointer-events-none opacity-50",
 										isRotating && "opacity-90",
 									)}
 								>
@@ -294,12 +292,10 @@ export function RotateApiKeyModal({
 									</AnimatePresence>
 								</FancyButton.Root>
 							)}
-						</motion.div>
+						</div>
 					</div>
 				</motion.div>
 			</Modal.Content>
 		</Modal.Root>
 	);
 }
-
-
