@@ -170,8 +170,8 @@ export function ApiKeyTable({
 											style={gridStyle}
 											data-state={row.getIsSelected() ? "selected" : undefined}
 											className={cn(
-												"group/row grid w-full items-center px-4 py-2 text-left transition-colors",
-												"hover:bg-bg-weak-50/50",
+												"group/row grid w-full items-center px-4 py-2 text-left",
+												"hover:bg-bg-weak-50",
 												(isRowActive || row.getIsSelected()) &&
 													"bg-bg-weak-50/50",
 												isEditing && "bg-bg-weak-50/70",
