@@ -10,6 +10,7 @@ import { cn } from "@reloop/ui/cn";
 import * as Popover from "@reloop/ui/popover";
 import { Check, Settings2 } from "lucide-react";
 import * as React from "react";
+import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import {
 	Command,
 	CommandGroup,
@@ -23,6 +24,7 @@ export type DataTableViewColumn = {
 	label: string;
 	/** When true, column cannot be hidden. */
 	locked?: boolean;
+	icon?: React.ReactNode;
 };
 
 type DataTableViewOptionsProps = {
@@ -43,9 +45,21 @@ export function DataTableViewOptions({
 	className,
 }: DataTableViewOptionsProps) {
 	const [open, setOpen] = React.useState(false);
+	const [hoverIdx, setHoverIdx] = React.useState<number | undefined>(undefined);
+	const itemRefs = React.useRef<HTMLElement[]>([]);
+
+	const currentTab = itemRefs.current[hoverIdx ?? -1];
+	const currentRect = currentTab?.getBoundingClientRect();
+
+	const handleOpenChange = (next: boolean) => {
+		setOpen(next);
+		if (!next) {
+			setHoverIdx(undefined);
+		}
+	};
 
 	return (
-		<Popover.Root open={open} onOpenChange={setOpen}>
+		<Popover.Root open={open} onOpenChange={handleOpenChange}>
 			<Popover.Trigger asChild>
 				<button
 					type="button"
@@ -67,34 +81,59 @@ export function DataTableViewOptions({
 				align={align}
 				sideOffset={8}
 				showArrow={false}
-				className={cn("w-44 overflow-hidden p-1.5", className)}
+				className={cn("w-48 overflow-hidden rounded-xl p-1.5", className)}
 			>
-				<Command>
-					<CommandList>
-						<CommandGroup>
-							{columns.map((column) => {
-								const isVisible = visibility[column.id] !== false;
-								return (
-									<CommandItem
-										key={column.id}
-										disabled={column.locked}
-										data-checked={isVisible}
-										onSelect={() => {
-											if (column.locked) return;
-											onVisibilityChange(column.id, !isVisible);
-										}}
-										className="justify-between"
-									>
-										<span className="truncate">{column.label}</span>
-										<Check
+				<Command className="bg-transparent overflow-visible">
+					<CommandList className="overflow-visible">
+						<CommandGroup className="p-0">
+							<div className="relative">
+								{columns.map((column, idx) => {
+									const isVisible = visibility[column.id] !== false;
+									return (
+										<CommandItem
+											key={column.id}
+											ref={(el) => {
+												if (el) itemRefs.current[idx] = el;
+											}}
+											disabled={column.locked}
+											data-checked={isVisible}
+											onPointerEnter={() => setHoverIdx(idx)}
+											onPointerLeave={() => setHoverIdx(undefined)}
+											onSelect={() => {
+												if (column.locked) return;
+												onVisibilityChange(column.id, !isVisible);
+											}}
 											className={cn(
-												"ml-auto size-4",
-												isVisible ? "opacity-100" : "opacity-0",
+												"relative z-10 justify-between data-[selected=true]:bg-transparent",
+												!currentRect &&
+													hoverIdx === idx &&
+													"bg-neutral-alpha-10",
 											)}
-										/>
-									</CommandItem>
-								);
-							})}
+										>
+											<div className="flex min-w-0 items-center gap-2">
+												{column.icon && (
+													<span className="shrink-0 text-text-sub-600 [&_svg]:size-3.5">
+														{column.icon}
+													</span>
+												)}
+												<span className="truncate text-text-strong-950 text-xs font-normal">
+													{column.label}
+												</span>
+											</div>
+											<Check
+												className={cn(
+													"ml-auto size-3.5 shrink-0 text-text-strong-950 transition-opacity",
+													isVisible ? "opacity-100" : "opacity-0",
+												)}
+											/>
+										</CommandItem>
+									);
+								})}
+								<AnimatedHoverBackground
+									rect={currentRect}
+									tabElement={currentTab}
+								/>
+							</div>
 						</CommandGroup>
 					</CommandList>
 				</Command>

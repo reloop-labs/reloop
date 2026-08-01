@@ -3,7 +3,7 @@
 import { cn } from "@reloop/ui/cn";
 import { Command as CommandPrimitive } from "cmdk";
 import { Search } from "lucide-react";
-import type * as React from "react";
+import * as React from "react";
 
 function Command({
 	className,
@@ -98,20 +98,20 @@ function CommandSeparator({
 	);
 }
 
-function CommandItem({
-	className,
-	...props
-}: React.ComponentProps<typeof CommandPrimitive.Item>) {
-	return (
-		<CommandPrimitive.Item
-			className={cn(
-				"relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none data-[disabled=true]:pointer-events-none data-[selected=true]:bg-bg-weak-50 data-[selected=true]:text-text-strong-950 data-[disabled=true]:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
-				className,
-			)}
-			{...props}
-		/>
-	);
-}
+const CommandItem = React.forwardRef<
+	React.ComponentRef<typeof CommandPrimitive.Item>,
+	React.ComponentPropsWithoutRef<typeof CommandPrimitive.Item>
+>(({ className, ...props }, ref) => (
+	<CommandPrimitive.Item
+		ref={ref}
+		className={cn(
+			"relative flex min-h-[28px] cursor-default select-none items-center gap-2 rounded-lg px-2 py-1.5 font-normal text-xs outline-none data-[disabled=true]:pointer-events-none data-[selected=true]:bg-bg-weak-50 data-[selected=true]:text-text-strong-950 data-[disabled=true]:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-3.5 [&_svg]:shrink-0",
+			className,
+		)}
+		{...props}
+	/>
+));
+CommandItem.displayName = CommandPrimitive.Item.displayName;
 
 export {
 	Command,
