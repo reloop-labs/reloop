@@ -2,7 +2,6 @@ import { valibotResolver } from "@hookform/resolvers/valibot";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
-import { Icon } from "@reloop/ui/icon";
 import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
 import axios from "axios";
@@ -10,14 +9,18 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import type { Resolver } from "react-hook-form";
 import { useForm } from "react-hook-form";
-import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import * as v from "valibot";
+import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import { useInvalidateApiKeys } from "../../hooks/use-api-keys-query";
 import type { ApiKeyWithSecret } from "../../types";
 import { type ApiKeyFormValues, FormStep } from "./form-step";
 import { SuccessStep } from "./success-step";
+
+/** Light keycap so it reads on the blue FancyButton fill. */
+const actionKbdOnBlueClassName =
+	"border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]";
 
 const apiKeySchema = v.object({
 	name: v.pipe(v.string(), v.minLength(1, "Name must be at least 1 character")),
@@ -80,19 +83,6 @@ export function CreateApiKeyModal({
 		}
 	};
 
-	useHotkeys(
-		"enter",
-		(e) => {
-			e.preventDefault();
-			if (!createdApiKey) {
-				void form.handleSubmit(onSubmit)();
-			} else {
-				handleClose();
-			}
-		},
-		{ enableOnFormTags: ["INPUT"], enabled: isOpen },
-	);
-
 	useEffect(() => {
 		if (!isOpen) {
 			const timer = setTimeout(() => {
@@ -145,112 +135,111 @@ export function CreateApiKeyModal({
 						</div>
 
 						{/* Body — center content animates as step key changes */}
-						<AnimatePresence mode="wait" initial={false}>
-							<motion.div
-								key={step}
-								initial={{ opacity: 0, y: 10 }}
-								animate={{ opacity: 1, y: 0 }}
-								exit={{ opacity: 0, y: -10 }}
-								transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-							>
-								{step === "form" ? (
-									<FormStep form={form} isLoading={isLoading} />
-								) : (
-									<SuccessStep secret={createdApiKey!.key} />
-								)}
-							</motion.div>
-						</AnimatePresence>
-
-						{/* Footer — single shared button row, outside the animated body */}
-						<div className="mt-6 flex items-center justify-end gap-3">
-							{step === "form" && (
-								<Button.Root
-									type="button"
-									variant="neutral"
-									mode="ghost"
-									size="small"
-									onClick={() => {
-										if (!isLoading) handleClose();
-									}}
-									className={cn(
-										"transition-opacity duration-200",
-										isLoading && "pointer-events-none opacity-50",
-									)}
-								>
-									Cancel
-								</Button.Root>
-							)}
-							<FancyButton.Root
-								type="button"
-								variant="blue"
-								size="small"
-								onClick={() => {
-									if (step === "success") {
-										handleClose();
-									} else if (!isLoading) {
-										void form.handleSubmit(onSubmit)();
-									}
+						{step === "form" ? (
+							<form
+								onSubmit={(e) => {
+									e.preventDefault();
+									if (!isLoading) void form.handleSubmit(onSubmit)();
 								}}
-								className={cn(
-									"justify-center overflow-hidden transition-all duration-200",
-									step === "form" && "min-w-[130px]",
-									step === "success" && "min-w-[100px] gap-2",
-									isLoading && "pointer-events-none opacity-90",
-								)}
 							>
-								<AnimatePresence mode="popLayout" initial={false}>
-									<motion.span
-										key={
-											step === "success"
-												? "done"
-												: isLoading
-													? "creating"
-													: "idle"
-										}
-										transition={{ type: "spring", duration: 0.25, bounce: 0 }}
-										initial={{ opacity: 0, y: -14 }}
+								<AnimatePresence mode="wait" initial={false}>
+									<motion.div
+										key="form"
+										initial={{ opacity: 0, y: 10 }}
 										animate={{ opacity: 1, y: 0 }}
-										exit={{ opacity: 0, y: 14 }}
-										className="flex items-center justify-center gap-1.5"
+										exit={{ opacity: 0, y: -10 }}
+										transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
 									>
-										{step === "success" ? (
-											<>
-												Close{" "}
-												<span className="inline-flex items-center gap-0.5 opacity-80">
-													<Icon
-														name="command"
-														className="h-3.5 w-3.5 rounded-sm border border-white/20 p-px"
-													/>
-													<Icon
-														name="enter"
-														className="h-3.5 w-3.5 rounded-sm border border-white/20 p-px"
-													/>
-												</span>
-											</>
-										) : isLoading ? (
-											<>
-												<Spinner size={14} color="currentColor" />
-												<span>Creating...</span>
-											</>
-										) : (
-											<>
-												Create API key
-												<span className="inline-flex items-center gap-0.5 opacity-80">
-													<Icon
-														name="command"
-														className="h-3.5 w-3.5 rounded-sm border border-white/20 p-px"
-													/>
-													<Icon
-														name="enter"
-														className="h-3.5 w-3.5 rounded-sm border border-white/20 p-px"
-													/>
-												</span>
-											</>
-										)}
-									</motion.span>
+										<FormStep form={form} isLoading={isLoading} />
+									</motion.div>
 								</AnimatePresence>
-							</FancyButton.Root>
-						</div>
+
+								{/* Footer — Enter submits natively via the form */}
+								<div className="mt-6 flex items-center justify-end gap-3">
+									<Button.Root
+										type="button"
+										variant="neutral"
+										mode="ghost"
+										size="small"
+										onClick={() => {
+											if (!isLoading) handleClose();
+										}}
+										className={cn(
+											"gap-1.5 transition-opacity duration-200",
+											isLoading && "pointer-events-none opacity-50",
+										)}
+									>
+										Cancel
+										<ActionKbd className="w-auto min-w-0 px-1">esc</ActionKbd>
+									</Button.Root>
+									<FancyButton.Root
+										type="submit"
+										variant="blue"
+										size="small"
+										disabled={isLoading}
+										className={cn(
+											"justify-center overflow-hidden transition-all duration-200 min-w-[130px]",
+											isLoading && "pointer-events-none opacity-90",
+										)}
+									>
+										<AnimatePresence mode="popLayout" initial={false}>
+											<motion.span
+												key={isLoading ? "creating" : "idle"}
+												transition={{
+													type: "spring",
+													duration: 0.25,
+													bounce: 0,
+												}}
+												initial={{ opacity: 0, y: -14 }}
+												animate={{ opacity: 1, y: 0 }}
+												exit={{ opacity: 0, y: 14 }}
+												className="flex items-center justify-center gap-1.5"
+											>
+												{isLoading ? (
+													<>
+														<Spinner size={14} color="currentColor" />
+														<span>Creating...</span>
+													</>
+												) : (
+													<>
+														Create API key
+														<ActionKbd className={actionKbdOnBlueClassName}>
+															↵
+														</ActionKbd>
+													</>
+												)}
+											</motion.span>
+										</AnimatePresence>
+									</FancyButton.Root>
+								</div>
+							</form>
+						) : (
+							<>
+								<AnimatePresence mode="wait" initial={false}>
+									<motion.div
+										key="success"
+										initial={{ opacity: 0, y: 10 }}
+										animate={{ opacity: 1, y: 0 }}
+										exit={{ opacity: 0, y: -10 }}
+										transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+									>
+										<SuccessStep secret={createdApiKey!.key} />
+									</motion.div>
+								</AnimatePresence>
+
+								<div className="mt-6 flex items-center justify-end gap-3">
+									<FancyButton.Root
+										type="button"
+										variant="blue"
+										size="small"
+										onClick={handleClose}
+										className="min-w-[100px] justify-center gap-2 overflow-hidden transition-all duration-200"
+									>
+										Close
+									</FancyButton.Root>
+								</div>
+							</>
+						)}
 					</div>
 				</motion.div>
 			</Modal.Content>
