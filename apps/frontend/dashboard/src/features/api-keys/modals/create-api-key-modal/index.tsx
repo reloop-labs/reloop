@@ -213,7 +213,7 @@ export function CreateApiKeyModal({
 									size="small"
 									disabled={isLoading}
 									className={cn(
-										"min-w-[130px] justify-center overflow-hidden transition-all duration-200",
+										"min-w-35 justify-center overflow-hidden transition-all duration-200",
 										isLoading && "pointer-events-none opacity-90",
 									)}
 								>
@@ -248,7 +248,7 @@ export function CreateApiKeyModal({
 									variant="blue"
 									size="small"
 									onClick={handleCopyKey}
-									className="min-w-[130px] justify-center overflow-hidden transition-all duration-200"
+									className="min-w-35 justify-center overflow-hidden transition-all duration-200"
 								>
 									<AnimatePresence mode="popLayout" initial={false}>
 										<motion.span
