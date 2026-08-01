@@ -55,8 +55,11 @@ export function parseApiKeySort(sort: string | undefined): ApiKeySortRule[] {
 }
 
 export function toApiKeyOrderBy(rules: ApiKeySortRule[]): SQL[] {
-	return rules.map((rule) => {
+	const sqls = rules.map((rule) => {
 		const column = COLUMN_MAP[rule.field];
 		return rule.order === "asc" ? asc(column) : desc(column);
 	});
+	// Always append id as a secondary tie-breaker for stable, deterministic ordering across row updates/rotations
+	sqls.push(desc(schema.apikey.id));
+	return sqls;
 }

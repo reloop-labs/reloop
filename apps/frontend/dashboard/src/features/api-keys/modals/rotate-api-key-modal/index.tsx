@@ -1,25 +1,23 @@
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
-import { Icon } from "@reloop/ui/icon";
 import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
 import axios from "axios";
-import {
-	AnimatePresence,
-	animate,
-	motion,
-	useMotionValue,
-	type AnimationPlaybackControls,
-} from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { useQueryState } from "nuqs";
 import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
+import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { useInvalidateApiKeys } from "../../hooks/use-api-keys-query";
 import type { ApiKeyData } from "../../types";
 import { ConfirmStep } from "./confirm-step";
 import { SuccessStep } from "./success-step";
+
+/** Light keycap so it reads on the blue FancyButton fill. */
+const actionKbdOnBlueClassName =
+	"border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]";
 
 type RotatedKey = {
 	id: string;
@@ -48,11 +46,11 @@ export function RotateApiKeyModal({
 	onRotateSuccess?: (rotatedName: string) => void;
 }) {
 	const [rotateId, setRotateId] = useQueryState("rotate");
+	const [confirmationText, setConfirmationText] = useState("");
 	const [isRotating, setIsRotating] = useState(false);
 	const [rotatedApiKey, setRotatedApiKey] = useState<RotatedKey | null>(null);
-	const [isHolding, setIsHolding] = useState(false);
-	const holdProgress = useMotionValue(0);
-	const animationRef = useRef<AnimationPlaybackControls | null>(null);
+	const [copied, setCopied] = useState(false);
+	const inputRef = useRef<HTMLInputElement | null>(null);
 	const invalidate = useInvalidateApiKeys();
 
 	const apiKeyToRotate = apiKeys.find((k) => k.id === rotateId);
@@ -63,18 +61,21 @@ export function RotateApiKeyModal({
 		"Unnamed key";
 	const keyPrefix = apiKeyToRotate?.start || apiKeyToRotate?.prefix || "rl_...";
 
+	const isConfirmed = confirmationText === displayName;
+	const canRotate = isConfirmed && !isRotating;
+
 	const step = rotatedApiKey ? "success" : "confirm";
 	const header = HEADER_CONTENT[step];
 
-	const handleClose = (fromSuccessStep?: boolean) => {
-		if (fromSuccessStep && rotatedApiKey) {
+	const handleClose = () => {
+		if (rotatedApiKey) {
 			onRotateSuccess?.(displayName);
 		}
 		void setRotateId(null);
 	};
 
 	const handleRotate = async () => {
-		if (!apiKeyToRotate || isRotating) return;
+		if (!apiKeyToRotate || !canRotate) return;
 		try {
 			setIsRotating(true);
 			const response = await axios.post<RotatedKey>(
@@ -94,46 +95,36 @@ export function RotateApiKeyModal({
 		}
 	};
 
-	const startHold = () => {
-		if (step !== "confirm" || isRotating) return;
-		setIsHolding(true);
-		holdProgress.set(0);
-		animationRef.current = animate(holdProgress, 1, {
-			duration: 1.2,
-			ease: "linear",
-			onComplete: () => {
-				setIsHolding(false);
-				holdProgress.set(0);
-				void handleRotate();
-			},
-		});
-	};
-
-	const cancelHold = () => {
-		if (!isHolding && holdProgress.get() === 0) return;
-		setIsHolding(false);
-		animationRef.current?.stop();
-		animate(holdProgress, 0, {
-			duration: 0.2,
-			ease: "easeOut",
-		});
+	const handleCopyKey = async () => {
+		if (!rotatedApiKey) return;
+		try {
+			await navigator.clipboard.writeText(rotatedApiKey.key);
+			setCopied(true);
+			setTimeout(() => setCopied(false), 2000);
+		} catch {
+			toast.error("Failed to copy API key");
+		}
 	};
 
 	useHotkeys(
 		"enter",
 		(e) => {
 			e.preventDefault();
-			if (!rotatedApiKey) void handleRotate();
-			else handleClose(true);
+			if (step === "confirm" && canRotate) {
+				void handleRotate();
+			} else if (step === "success") {
+				void handleCopyKey();
+			}
 		},
-		{ enabled: !!rotateId },
+		{ enableOnFormTags: ["INPUT"], enabled: !!rotateId },
 	);
 
 	useEffect(() => {
 		if (!rotateId) {
-			cancelHold();
 			const t = setTimeout(() => {
 				setRotatedApiKey(null);
+				setConfirmationText("");
+				setCopied(false);
 			}, 300);
 			return () => clearTimeout(t);
 		}
@@ -143,23 +134,17 @@ export function RotateApiKeyModal({
 		<Modal.Root
 			open={!!rotateId}
 			onOpenChange={(open) => {
-				if (!open) cancelHold();
-				// After rotation, require Done — don't dismiss by backdrop/escape
-				// and lose a secret the user hasn't saved.
-				if (!open && !rotatedApiKey) handleClose();
-				// Allow close via backdrop/X after rotation (fires success callback)
-				if (!open && rotatedApiKey) handleClose(true);
+				if (!open) handleClose();
 			}}
 		>
 			<Modal.Content
 				className="overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 sm:max-w-[460px] dark:border-stroke-soft-100/40"
-				showClose={true}
-				onEscapeKeyDown={(e) => {
-					// Block Escape only on success step if key hasn't been copied yet
-					// but still fire the success callback so banner appears
-					if (rotatedApiKey) {
-						e.preventDefault();
-					}
+				showClose={false}
+				onOpenAutoFocus={(e) => {
+					e.preventDefault();
+					setTimeout(() => {
+						inputRef.current?.focus();
+					}, 0);
 				}}
 				onPointerDownOutside={(e) => {
 					if (rotatedApiKey) e.preventDefault();
@@ -167,144 +152,154 @@ export function RotateApiKeyModal({
 			>
 				{/* Outer motion wrapper — animates height as content changes */}
 				<motion.div
-					layout
-					transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
+					layout="size"
+					transition={{ duration: 0.32, ease: [0.25, 0.46, 0.45, 0.94] }}
 				>
 					<div className="p-6">
-						{/* Header — title & description cross-fade with blur independently */}
+						{/* Header — title & description update with step */}
 						<div className="relative pr-10">
-							<AnimatePresence mode="wait" initial={false}>
-								<motion.div
-									key={step}
-									initial={{ opacity: 0, filter: "blur(6px)", y: -4 }}
-									animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
-									exit={{ opacity: 0, filter: "blur(6px)", y: 4 }}
-									transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-								>
-									<Modal.Title className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
-										{header.title}
-									</Modal.Title>
-									<p className="mt-2 text-sm text-text-sub-600 leading-relaxed">
-										{header.description}
-									</p>
-								</motion.div>
-							</AnimatePresence>
+							<Modal.Title className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
+								{header.title}
+							</Modal.Title>
+							<p className="mt-2 text-sm text-text-sub-600 leading-relaxed">
+								{header.description}
+							</p>
 						</div>
 
-						{/* Body — center content animates as step key changes */}
-						<AnimatePresence mode="wait" initial={false}>
-							<motion.div
-								key={step}
-								initial={{ opacity: 0, y: 10 }}
-								animate={{ opacity: 1, y: 0 }}
-								exit={{ opacity: 0, y: -10 }}
-								transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-							>
-								{step === "confirm" ? (
+						{/* Center content only — animates on step change */}
+						<AnimatePresence mode="popLayout" initial={false}>
+							{step === "confirm" ? (
+								<motion.div
+									key="confirm"
+									initial={{ opacity: 0, filter: "blur(4px)" }}
+									animate={{ opacity: 1, filter: "blur(0px)" }}
+									exit={{ opacity: 0, filter: "blur(4px)" }}
+									transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+								>
 									<ConfirmStep
 										displayName={displayName}
 										keyPrefix={keyPrefix}
+										confirmationText={confirmationText}
+										onConfirmationTextChange={setConfirmationText}
+										isRotating={isRotating}
+										inputRef={inputRef}
 									/>
-								) : (
+								</motion.div>
+							) : (
+								<motion.div
+									key="success"
+									initial={{ opacity: 0, filter: "blur(4px)", height: "94px" }}
+									animate={{
+										opacity: 1,
+										filter: "blur(0px)",
+										height: "auto",
+									}}
+									exit={{ opacity: 0, filter: "blur(4px)" }}
+									transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+								>
 									<SuccessStep secret={rotatedApiKey!.key} />
-								)}
-							</motion.div>
+								</motion.div>
+							)}
 						</AnimatePresence>
 
-						{/* Footer — single shared button row, outside the animated body */}
-						<div className="mt-6 flex items-center justify-end gap-3">
-							{step === "confirm" && (
-								<Button.Root
-									type="button"
-									variant="neutral"
-									mode="ghost"
-									size="small"
-									onClick={() => {
-										if (!isRotating) {
-											cancelHold();
-											handleClose();
-										}
-									}}
-									className={cn(
-										"transition-opacity duration-200",
-										isRotating && "pointer-events-none opacity-50",
-									)}
-								>
-									Cancel
-								</Button.Root>
-							)}
-							<FancyButton.Root
+						{/* Footer — outside animation, plain conditional */}
+						<motion.div
+							layout
+							className="mt-6 flex items-center justify-end gap-3"
+						>
+							<Button.Root
 								type="button"
-								variant="blue"
+								variant="neutral"
+								mode="stroke"
 								size="small"
-								onPointerDown={step === "confirm" ? startHold : undefined}
-								onPointerUp={step === "confirm" ? cancelHold : undefined}
-								onPointerLeave={step === "confirm" ? cancelHold : undefined}
-								onPointerCancel={step === "confirm" ? cancelHold : undefined}
 								onClick={() => {
-									if (step === "success") {
-										handleClose(true);
-									}
+									if (!isRotating) handleClose();
 								}}
 								className={cn(
-									"relative select-none justify-center overflow-hidden transition-all duration-200",
-									step === "confirm" && "min-w-[134px]",
-									step === "success" && "min-w-[100px] gap-2",
-									isRotating && "pointer-events-none opacity-90",
+									"gap-1.5 transition-opacity duration-200",
+									isRotating && "pointer-events-none opacity-50",
 								)}
 							>
-								{/* Hold progress overlay fill */}
-								{step === "confirm" && (
-									<motion.div
-										className="pointer-events-none absolute inset-0 bg-white/25 origin-left"
-										style={{ scaleX: holdProgress }}
-									/>
-								)}
-
-								<AnimatePresence mode="popLayout" initial={false}>
-									<motion.span
-										key={
-											step === "success"
-												? "done"
-												: isRotating
-													? "rotating"
-													: "idle"
-										}
-										transition={{ type: "spring", duration: 0.25, bounce: 0 }}
-										initial={{ opacity: 0, y: -14 }}
-										animate={{ opacity: 1, y: 0 }}
-										exit={{ opacity: 0, y: 14 }}
-										className="relative z-10 flex items-center justify-center gap-1.5"
-									>
-										{step === "success" ? (
-											<>
-												Close{" "}
-												<span className="inline-flex items-center gap-0.5 opacity-80">
-													<Icon
-														name="command"
-														className="h-3.5 w-3.5 rounded-sm border border-white/20 p-px"
-													/>
-													<Icon
-														name="enter"
-														className="h-3.5 w-3.5 rounded-sm border border-white/20 p-px"
-													/>
-												</span>
-											</>
-										) : isRotating ? (
-											<>
-												<Spinner size={14} color="currentColor" />
-												<span>Rotating...</span>
-											</>
-										) : (
-											<span>Hold to rotate</span>
-										)}
-									</motion.span>
-								</AnimatePresence>
-							</FancyButton.Root>
-						</div>
+								Cancel
+								<ActionKbd className="lowercase! w-auto min-w-0 px-1">
+									esc
+								</ActionKbd>
+							</Button.Root>
+							{step === "confirm" ? (
+								<FancyButton.Root
+									type="button"
+									variant="blue"
+									size="small"
+									onClick={handleRotate}
+									disabled={!canRotate}
+									className={cn(
+										"min-w-35 justify-center overflow-hidden transition-all duration-200",
+										(!canRotate || isRotating) && "pointer-events-none opacity-50",
+										isRotating && "opacity-90",
+									)}
+								>
+									<AnimatePresence mode="popLayout" initial={false}>
+										<motion.span
+											key={isRotating ? "rotating" : "idle"}
+											transition={{ type: "spring", duration: 0.25, bounce: 0 }}
+											initial={{ opacity: 0, y: -14 }}
+											animate={{ opacity: 1, y: 0 }}
+											exit={{ opacity: 0, y: 14 }}
+											className="flex items-center justify-center gap-1.5"
+										>
+											{isRotating ? (
+												<>
+													<Spinner size={14} color="currentColor" />
+													<span>Rotating...</span>
+												</>
+											) : (
+												<>
+													Rotate API key
+													<ActionKbd className={actionKbdOnBlueClassName}>
+														↵
+													</ActionKbd>
+												</>
+											)}
+										</motion.span>
+									</AnimatePresence>
+								</FancyButton.Root>
+							) : (
+								<FancyButton.Root
+									type="button"
+									variant="blue"
+									size="small"
+									onClick={handleCopyKey}
+									className="min-w-35 justify-center overflow-hidden transition-all duration-200"
+								>
+									<AnimatePresence mode="popLayout" initial={false}>
+										<motion.span
+											key={copied ? "copied" : "idle"}
+											transition={{ type: "spring", duration: 0.25, bounce: 0 }}
+											initial={{ opacity: 0, y: -14 }}
+											animate={{ opacity: 1, y: 0 }}
+											exit={{ opacity: 0, y: 14 }}
+											className="flex items-center justify-center gap-1.5"
+										>
+											{copied ? (
+												"Copied!"
+											) : (
+												<>
+													Copy API key
+													<ActionKbd className={actionKbdOnBlueClassName}>
+														↵
+													</ActionKbd>
+												</>
+											)}
+										</motion.span>
+									</AnimatePresence>
+								</FancyButton.Root>
+							)}
+						</motion.div>
 					</div>
 				</motion.div>
 			</Modal.Content>
 		</Modal.Root>
 	);
 }
+
+

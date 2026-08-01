@@ -1,10 +1,37 @@
+import { cn } from "@reloop/ui/cn";
+import { Icon } from "@reloop/ui/icon";
+import * as Input from "@reloop/ui/input";
+import * as Label from "@reloop/ui/label";
+import { AnimatePresence, motion } from "framer-motion";
+import { useState } from "react";
+
 export function ConfirmStep({
 	displayName,
 	keyPrefix,
+	confirmationText,
+	onConfirmationTextChange,
+	isRotating,
+	inputRef,
 }: {
 	displayName: string;
 	keyPrefix: string;
+	confirmationText: string;
+	onConfirmationTextChange: (val: string) => void;
+	isRotating: boolean;
+	inputRef: React.RefObject<HTMLInputElement | null>;
 }) {
+	const [nameCopied, setNameCopied] = useState(false);
+
+	const handleCopyName = async () => {
+		try {
+			await navigator.clipboard.writeText(displayName);
+			setNameCopied(true);
+			setTimeout(() => setNameCopied(false), 1500);
+		} catch {
+			// silently fail
+		}
+	};
+
 	return (
 		<div>
 			{/* Key Details Card */}
@@ -34,6 +61,63 @@ export function ConfirmStep({
 				All existing replicas will need to be updated with the new token.
 				Replicas using the old token will lose connectivity.
 			</div>
+
+			{/* Confirmation Input */}
+			<div className="mt-4 space-y-2">
+				<Label.Root
+					htmlFor="rotate-api-key-confirmation"
+					className="flex flex-wrap items-center gap-1.5"
+				>
+					<span>Type</span>
+					<span className="inline-flex items-center gap-1 rounded-md bg-bg-weak-50 px-1.5 py-0.5 font-medium text-[12px] text-text-strong-950 dark:bg-bg-weak-50/20">
+						{displayName}
+						<button
+							type="button"
+							onClick={(e) => {
+								e.preventDefault();
+								void handleCopyName();
+							}}
+							className="-mr-0.5 inline-flex h-4 w-4 shrink-0 items-center justify-center rounded transition-colors"
+							aria-label={`Copy ${displayName}`}
+							title="Copy name"
+						>
+							<AnimatePresence mode="popLayout" initial={false}>
+								<motion.span
+									key={nameCopied ? "check" : "copy"}
+									initial={{ opacity: 0, scale: 0.6 }}
+									animate={{ opacity: 1, scale: 1 }}
+									exit={{ opacity: 0, scale: 0.6 }}
+									transition={{ type: "spring", duration: 0.2, bounce: 0.3 }}
+									className="flex items-center justify-center"
+								>
+									<Icon
+										name={nameCopied ? "check" : "copy"}
+										className={cn(
+											"h-3 w-3",
+											nameCopied ? "text-green-500" : "text-text-sub-600",
+										)}
+									/>
+								</motion.span>
+							</AnimatePresence>
+						</button>
+					</span>
+					<span>to confirm</span>
+				</Label.Root>
+				<Input.Root size="medium">
+					<Input.Wrapper>
+						<Input.Input
+							ref={inputRef}
+							id="rotate-api-key-confirmation"
+							value={confirmationText}
+							onChange={(e) => onConfirmationTextChange(e.target.value)}
+							placeholder={displayName}
+							disabled={isRotating}
+							autoComplete="off"
+						/>
+					</Input.Wrapper>
+				</Input.Root>
+			</div>
 		</div>
 	);
 }
+
