@@ -11,6 +11,8 @@ import { useRouter } from "next/navigation";
 import { parseAsInteger, useQueryState } from "nuqs";
 import { useCallback, useMemo, useState } from "react";
 
+import { useHotkeys } from "react-hotkeys-hook";
+
 import type { ApiKeysListParams } from "../hooks/use-api-keys-query";
 import { useToggleApiKey } from "../hooks/use-toggle-api-key";
 import { DeleteApiKeyModal } from "../modals/delete-api-key-modal";
@@ -118,6 +120,17 @@ export function ApiKeyTable({
 			editingApiKeyId,
 		} satisfies ApiKeyTableMeta,
 	});
+
+	useHotkeys(
+		"mod+a",
+		(e) => {
+			e.preventDefault();
+			if (apiKeys.length === 0) return;
+			const allSelected = table.getIsAllPageRowsSelected();
+			table.toggleAllPageRowsSelected(!allSelected);
+		},
+		{ enableOnFormTags: false, preventDefault: true },
+	);
 
 	const headerGroup = table.getHeaderGroups()[0];
 	const rows = table.getRowModel().rows;
