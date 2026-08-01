@@ -1,6 +1,9 @@
+"use client";
+
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
+import { KbdKey } from "@reloop/ui/kbd-key";
 import type { VisibilityState } from "@tanstack/react-table";
 import {
 	parseAsArrayOf,
@@ -8,6 +11,7 @@ import {
 	parseAsString,
 	useQueryState,
 } from "nuqs";
+import { useHotkeys } from "react-hotkeys-hook";
 import { dataTableToolbarControlClassName } from "#/components/data-table/toolbar-control";
 import { ApiKeyStatusFilterChip } from "../filters/status-filter-chip";
 import { ApiKeyUserFilterChip } from "../filters/user-filter-chip";
@@ -43,6 +47,19 @@ export function ApiKeyListToolbar({
 	);
 
 	const invalidate = useInvalidateApiKeys();
+
+	useHotkeys(
+		"r",
+		(e) => {
+			e.preventDefault();
+			void invalidate();
+		},
+		{
+			// Don't fire while typing in search/filters.
+			enableOnFormTags: false,
+			preventDefault: true,
+		},
+	);
 
 	return (
 		<div
@@ -95,11 +112,26 @@ export function ApiKeyListToolbar({
 					onClick={() => void invalidate()}
 					className={cn(
 						dataTableToolbarControlClassName,
-						"w-8 justify-center px-0",
+						"gap-1.5 px-2",
 					)}
+					aria-label="Refresh API keys"
+					aria-keyshortcuts="r"
 					title="Refresh API keys"
 				>
 					<Icon name="rotate-cw" className="h-3.5 w-3.5" />
+					{/* Physical keycap: face + bottom lip (matches Linear/macOS kbd) */}
+					<KbdKey
+						className={cn(
+							"h-5 min-w-5 rounded-[6px] px-1",
+							"border border-stroke-soft-200 bg-bg-weak-50 text-[10px] text-text-sub-600",
+							// bottom shelf + soft pad under the key
+							"shadow-[0_2px_0_0_var(--color-stroke-soft-200)]",
+							"dark:border-white/[0.14] dark:bg-white/[0.07] dark:text-white",
+							"dark:shadow-[0_2px_0_0_rgba(0,0,0,0.55),0_0_0_0.5px_rgba(255,255,255,0.06),inset_0_0.5px_0_0_rgba(255,255,255,0.08)]",
+						)}
+					>
+						R
+					</KbdKey>
 				</button>
 			</div>
 		</div>
