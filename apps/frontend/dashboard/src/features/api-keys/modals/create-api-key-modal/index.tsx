@@ -103,10 +103,7 @@ export function CreateApiKeyModal({
 		>
 			<Modal.Content
 				className="overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 sm:max-w-[460px] dark:border-stroke-soft-100/40"
-				showClose={true}
-				onEscapeKeyDown={(e) => {
-					if (createdApiKey) e.preventDefault();
-				}}
+				showClose={false}
 				onPointerDownOutside={(e) => {
 					if (createdApiKey) e.preventDefault();
 				}}
@@ -159,7 +156,7 @@ export function CreateApiKeyModal({
 									<Button.Root
 										type="button"
 										variant="neutral"
-										mode="ghost"
+										mode="stroke"
 										size="small"
 										onClick={() => {
 											if (!isLoading) handleClose();
@@ -170,7 +167,9 @@ export function CreateApiKeyModal({
 										)}
 									>
 										Cancel
-										<ActionKbd className="w-auto min-w-0 px-1">esc</ActionKbd>
+										<ActionKbd className="lowercase! w-auto min-w-0 px-1">
+											esc
+										</ActionKbd>
 									</Button.Root>
 									<FancyButton.Root
 										type="submit"
@@ -178,7 +177,7 @@ export function CreateApiKeyModal({
 										size="small"
 										disabled={isLoading}
 										className={cn(
-											"justify-center overflow-hidden transition-all duration-200 min-w-[130px]",
+											"min-w-[130px] justify-center overflow-hidden transition-all duration-200",
 											isLoading && "pointer-events-none opacity-90",
 										)}
 									>
@@ -228,15 +227,22 @@ export function CreateApiKeyModal({
 								</AnimatePresence>
 
 								<div className="mt-6 flex items-center justify-end gap-3">
-									<FancyButton.Root
+									<Button.Root
 										type="button"
-										variant="blue"
+										variant="neutral"
+										mode="stroke"
 										size="small"
 										onClick={handleClose}
-										className="min-w-[100px] justify-center gap-2 overflow-hidden transition-all duration-200"
+										className={cn(
+											"gap-1.5 transition-opacity duration-200",
+											isLoading && "pointer-events-none opacity-50",
+										)}
 									>
-										Close
-									</FancyButton.Root>
+										Cancel
+										<ActionKbd className="lowercase! w-auto min-w-0 px-1">
+											esc
+										</ActionKbd>
+									</Button.Root>
 								</div>
 							</>
 						)}
