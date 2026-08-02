@@ -1,7 +1,10 @@
 import { Icon } from "@reloop/ui/icon";
 import { AnimatePresence, motion } from "framer-motion";
 import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useHotkeys } from "react-hotkeys-hook";
+import type { CommandAction } from "#/features/dashboard/command-menu";
+import { useRegisterCommandActions } from "#/features/dashboard/command-menu-context";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import { DomainCommonUseCasesSidebar } from "./common-use-cases-sidebar";
 import { DeleteDomainModal } from "./components/delete-domain";
@@ -13,6 +16,7 @@ import { useDomainsQuery } from "./hooks/use-domains-query";
 
 export function DomainPage() {
 	const { hasInitialized, isPending: orgPending } = useActiveOrganization();
+	const [, setNewDomainModal] = useQueryState("new");
 	const [statusFilters] = useQueryState(
 		"status",
 		parseAsString.withDefault(""),
@@ -21,6 +25,72 @@ export function DomainPage() {
 	const [currentPage] = useQueryState("page", parseAsInteger.withDefault(1));
 	const [pageSize] = useQueryState("limit", parseAsInteger.withDefault(10));
 	const [deletedName, setDeletedName] = useState<string | null>(null);
+
+	const actions = useMemo<CommandAction[]>(
+		() => [
+			{
+				id: "add-domain",
+				label: "Add Domain",
+				icon: "plus",
+				shortcut: { label: "C", keys: ["c"] },
+				onSelect: () => void setNewDomainModal("true"),
+			},
+			{
+				id: "open-api-reference",
+				label: "Open API Reference",
+				icon: "code",
+				shortcut: { label: "S", keys: ["s"] },
+				onSelect: () =>
+					window.dispatchEvent(
+						new CustomEvent("api-details:open", {
+							detail: { docSection: "domains" },
+						}),
+					),
+			},
+			{
+				id: "go-to-docs",
+				label: "Go to Docs",
+				icon: "file-text",
+				shortcut: { label: "D", keys: ["d"] },
+				onSelect: () =>
+					window.open("https://reloop.sh/docs/learn/domains", "_blank"),
+			},
+		],
+		[setNewDomainModal],
+	);
+
+	useRegisterCommandActions("domains", "Domains", actions);
+
+	useHotkeys(
+		"c",
+		(e) => {
+			e.preventDefault();
+			void setNewDomainModal("true");
+		},
+		{ enableOnFormTags: false, preventDefault: true },
+	);
+
+	useHotkeys(
+		"s",
+		(e) => {
+			e.preventDefault();
+			window.dispatchEvent(
+				new CustomEvent("api-details:open", {
+					detail: { docSection: "domains" },
+				}),
+			);
+		},
+		{ enableOnFormTags: false, preventDefault: true },
+	);
+
+	useHotkeys(
+		"d",
+		(e) => {
+			e.preventDefault();
+			window.open("https://reloop.sh/docs/learn/domains", "_blank");
+		},
+		{ enableOnFormTags: false, preventDefault: true },
+	);
 
 	useEffect(() => {
 		if (deletedName) {

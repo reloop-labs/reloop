@@ -5,8 +5,11 @@ import * as Input from "@reloop/ui/input";
 import { useRouter } from "next/navigation";
 
 import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
+import type { CommandAction } from "#/features/dashboard/command-menu";
+import { useRegisterCommandActions } from "#/features/dashboard/command-menu-context";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import { useContactsQuery } from "../../hooks/use-contacts-query";
 import {
@@ -99,6 +102,88 @@ export function ContactList() {
 			toast.error("Failed to export contacts");
 		}
 	};
+
+	const actions = useMemo<CommandAction[]>(
+		() => [
+			{
+				id: "add-contact",
+				label: "Add Contact",
+				icon: "plus",
+				shortcut: { label: "C", keys: ["c"] },
+				onSelect: () => router.push("/contacts/add"),
+			},
+			{
+				id: "export-contacts",
+				label: "Export Contacts CSV",
+				icon: "download",
+				shortcut: { label: "E", keys: ["e"] },
+				onSelect: () => void handleDownloadCSV(),
+			},
+			{
+				id: "open-api-reference",
+				label: "Open API Reference",
+				icon: "code",
+				shortcut: { label: "S", keys: ["s"] },
+				onSelect: () =>
+					window.dispatchEvent(
+						new CustomEvent("api-details:open", {
+							detail: { docSection: "contacts" },
+						}),
+					),
+			},
+			{
+				id: "go-to-docs",
+				label: "Go to Docs",
+				icon: "file-text",
+				shortcut: { label: "D", keys: ["d"] },
+				onSelect: () =>
+					window.open("https://reloop.sh/docs/learn/contacts", "_blank"),
+			},
+		],
+		[router],
+	);
+
+	useRegisterCommandActions("contacts", "Contacts", actions);
+
+	useHotkeys(
+		"c",
+		(e) => {
+			e.preventDefault();
+			router.push("/contacts/add");
+		},
+		{ enableOnFormTags: false, preventDefault: true },
+	);
+
+	useHotkeys(
+		"e",
+		(e) => {
+			e.preventDefault();
+			void handleDownloadCSV();
+		},
+		{ enableOnFormTags: false, preventDefault: true },
+	);
+
+	useHotkeys(
+		"s",
+		(e) => {
+			e.preventDefault();
+			window.dispatchEvent(
+				new CustomEvent("api-details:open", {
+					detail: { docSection: "contacts" },
+				}),
+			);
+		},
+		{ enableOnFormTags: false, preventDefault: true },
+	);
+
+	useHotkeys(
+		"d",
+		(e) => {
+			e.preventDefault();
+			window.open("https://reloop.sh/docs/learn/contacts", "_blank");
+		},
+		{ enableOnFormTags: false, preventDefault: true },
+	);
 
 	if (error) {
 		return (

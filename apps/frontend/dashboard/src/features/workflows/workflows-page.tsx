@@ -2,6 +2,8 @@ import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import { useMemo, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
+import type { CommandAction } from "#/features/dashboard/command-menu";
+import { useRegisterCommandActions } from "#/features/dashboard/command-menu-context";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import { CreateWorkflowModal } from "./components/create-workflow-modal";
 import { WorkflowTable } from "./components/workflow-table";
@@ -30,13 +32,45 @@ export function WorkflowsPage() {
 		if (activeOrganization?.slug) setCreateOpen(true);
 	};
 
+	const actions = useMemo<CommandAction[]>(
+		() => [
+			{
+				id: "create-workflow",
+				label: "Create Workflow",
+				icon: "plus",
+				shortcut: { label: "C", keys: ["c"] },
+				onSelect: () => handleCreate(),
+			},
+			{
+				id: "go-to-docs",
+				label: "Go to Docs",
+				icon: "file-text",
+				shortcut: { label: "D", keys: ["d"] },
+				onSelect: () =>
+					window.open("https://reloop.sh/docs/learn/automations", "_blank"),
+			},
+		],
+		[activeOrganization?.slug],
+	);
+
+	useRegisterCommandActions("workflows", "Workflows", actions);
+
 	useHotkeys(
-		"mod+a",
-		(event) => {
-			event.preventDefault();
+		"c",
+		(e) => {
+			e.preventDefault();
 			handleCreate();
 		},
-		{ enabled: Boolean(activeOrganization?.slug) },
+		{ enableOnFormTags: false, preventDefault: true },
+	);
+
+	useHotkeys(
+		"d",
+		(e) => {
+			e.preventDefault();
+			window.open("https://reloop.sh/docs/learn/automations", "_blank");
+		},
+		{ enableOnFormTags: false, preventDefault: true },
 	);
 
 	return (

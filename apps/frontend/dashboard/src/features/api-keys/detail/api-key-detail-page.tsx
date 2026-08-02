@@ -1,7 +1,14 @@
 import { Icon } from "@reloop/ui/icon";
+import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useQueryState } from "nuqs";
+import { useMemo } from "react";
+import { useHotkeys } from "react-hotkeys-hook";
+import { toast } from "sonner";
+import type { CommandAction } from "#/features/dashboard/command-menu";
+import { useRegisterCommandActions } from "#/features/dashboard/command-menu-context";
 
+import { useInvalidateApiKeys } from "../hooks/use-api-keys-query";
 import { useApiKeyDetailQuery } from "../hooks/use-api-key-detail-query";
 import { DeleteApiKeyModal } from "../modals/delete-api-key-modal";
 import { EditApiKeyModal } from "../modals/edit-api-key-modal";
@@ -33,12 +40,202 @@ function toModalKey(apiKey: ApiKeyData | undefined): ApiKeyData[] {
 export function ApiKeyDetailPage({ apiKeyId }: { apiKeyId: string }) {
 	const router = useRouter();
 	const [, setDeleteId] = useQueryState("delete");
+	const [, setRotateId] = useQueryState("rotate");
+	const [, setEditId] = useQueryState("edit");
+	const invalidate = useInvalidateApiKeys();
 
 	const { data, error, isPending, isFetching, refetch } =
 		useApiKeyDetailQuery(apiKeyId);
 
 	const isLoading = isPending || (isFetching && !data);
 	const apiKeysForModal = toModalKey(data);
+
+	const handleToggleEnabled = async () => {
+		if (!data) return;
+		try {
+			const endpoint = data.enabled
+				? `/api/api-key/v1/disable/${data.id}`
+				: `/api/api-key/v1/enable/${data.id}`;
+			await axios.post(endpoint, {}, { withCredentials: true });
+			await invalidate();
+			toast.success(
+				data.enabled
+					? "API key disabled successfully"
+					: "API key enabled successfully",
+			);
+		} catch (error) {
+			const message = axios.isAxiosError(error)
+				? error.response?.data?.message || "Failed to toggle API key"
+				: "Failed to toggle API key";
+			toast.error(message);
+		}
+	};
+
+	const handleCopy = async (value: string, successMessage: string) => {
+		try {
+			await navigator.clipboard.writeText(value);
+			toast.success(successMessage);
+		} catch {
+			toast.error("Failed to copy");
+		}
+	};
+
+	useHotkeys(
+		"e",
+		(e) => {
+			if (!data?.id) return;
+			e.preventDefault();
+			void setEditId(data.id);
+		},
+		{ enableOnFormTags: false, preventDefault: true },
+	);
+
+	useHotkeys(
+		"r",
+		(e) => {
+			if (!data?.id) return;
+			e.preventDefault();
+			void setRotateId(data.id);
+		},
+		{ enableOnFormTags: false, preventDefault: true },
+	);
+
+	useHotkeys(
+		"s",
+		(e) => {
+			e.preventDefault();
+			window.dispatchEvent(
+				new CustomEvent("api-details:open", {
+					detail: { docSection: "api-key" },
+				}),
+			);
+		},
+		{ enableOnFormTags: false, preventDefault: true },
+	);
+
+	useHotkeys(
+		"d",
+		(e) => {
+			e.preventDefault();
+			window.open("https://reloop.sh/docs/learn/api-keys", "_blank");
+		},
+		{ enableOnFormTags: false, preventDefault: true },
+	);
+
+	useHotkeys(
+		"p",
+		(e) => {
+			if (!data) return;
+			e.preventDefault();
+			const prefix = data.start || data.prefix || "";
+			if (prefix) void handleCopy(prefix, "API key prefix copied");
+		},
+		{ enableOnFormTags: false, preventDefault: true },
+	);
+
+	useHotkeys(
+		"i",
+		(e) => {
+			if (!data?.id) return;
+			e.preventDefault();
+			void handleCopy(data.id, "API key ID copied");
+		},
+		{ enableOnFormTags: false, preventDefault: true },
+	);
+
+	useHotkeys(
+		"t",
+		(e) => {
+			if (!data) return;
+			e.preventDefault();
+			void handleToggleEnabled();
+		},
+		{ enableOnFormTags: false, preventDefault: true },
+	);
+
+	useHotkeys(
+		"x",
+		(e) => {
+			if (!data?.id) return;
+			e.preventDefault();
+			void setDeleteId(data.id);
+		},
+		{ enableOnFormTags: false, preventDefault: true },
+	);
+
+	const actions = useMemo<CommandAction[]>(() => {
+		if (!data) return [];
+		return [
+			{
+				id: "edit-api-key",
+				label: "Edit API Key",
+				icon: "edit",
+				shortcut: { label: "E", keys: ["e"] },
+				onSelect: () => void setEditId(data.id),
+			},
+			{
+				id: "rotate-api-key",
+				label: "Rotate Key",
+				icon: "rotate-cw",
+				shortcut: { label: "R", keys: ["r"] },
+				onSelect: () => void setRotateId(data.id),
+			},
+			{
+				id: "open-api-reference",
+				label: "Open API Reference",
+				icon: "code",
+				shortcut: { label: "S", keys: ["s"] },
+				onSelect: () =>
+					window.dispatchEvent(
+						new CustomEvent("api-details:open", {
+							detail: { docSection: "api-key" },
+						}),
+					),
+			},
+			{
+				id: "go-to-docs",
+				label: "Go to Docs",
+				icon: "file-text",
+				shortcut: { label: "D", keys: ["d"] },
+				onSelect: () =>
+					window.open("https://reloop.sh/docs/learn/api-keys", "_blank"),
+			},
+			{
+				id: "copy-prefix",
+				label: "Copy Key Prefix",
+				icon: "copy",
+				shortcut: { label: "P", keys: ["p"] },
+				onSelect: () => {
+					const prefix = data.start || data.prefix || "";
+					if (prefix) void handleCopy(prefix, "API key prefix copied");
+				},
+			},
+			{
+				id: "copy-id",
+				label: "Copy Key ID",
+				icon: "copy",
+				shortcut: { label: "I", keys: ["i"] },
+				onSelect: () => void handleCopy(data.id, "API key ID copied"),
+			},
+			{
+				id: "toggle-enabled",
+				label: data.enabled ? "Disable API Key" : "Enable API Key",
+				icon: data.enabled ? "cross-circle" : "check-circle",
+				shortcut: { label: "T", keys: ["t"] },
+				onSelect: () => void handleToggleEnabled(),
+			},
+			{
+				id: "delete-api-key",
+				label: "Delete API Key",
+				icon: "trash",
+				shortcut: { label: "X", keys: ["x"] },
+				variant: "danger",
+				onSelect: () => void setDeleteId(data.id),
+			},
+		];
+	}, [data, setEditId, setRotateId, setDeleteId, invalidate]);
+
+	useRegisterCommandActions(`api-key-detail-${apiKeyId}`, "API Key", actions);
 
 	if (error && !data) {
 		return (

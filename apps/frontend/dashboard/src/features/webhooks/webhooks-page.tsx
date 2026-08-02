@@ -1,6 +1,10 @@
 import { Icon } from "@reloop/ui/icon";
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
+import { useHotkeys } from "react-hotkeys-hook";
+import type { CommandAction } from "#/features/dashboard/command-menu";
+import { useRegisterCommandActions } from "#/features/dashboard/command-menu-context";
 import { useWebhooks } from "#/features/webhooks/components/use-webhooks";
 import { WebhookError } from "#/features/webhooks/components/webhook-error";
 import { WebhookTable } from "#/features/webhooks/components/webhook-table";
@@ -9,6 +13,7 @@ import { WebhooksCommonUseCasesSidebar } from "./common-use-cases-sidebar";
 import { WebhooksListHeader } from "./webhooks-list-header";
 
 export function WebhooksPage() {
+	const router = useRouter();
 	const {
 		statusFilter,
 		setStatusFilter,
@@ -22,6 +27,72 @@ export function WebhooksPage() {
 	} = useWebhooks();
 
 	const [deletedName, setDeletedName] = useState<string | null>(null);
+
+	const actions = useMemo<CommandAction[]>(
+		() => [
+			{
+				id: "create-webhook",
+				label: "Create Webhook",
+				icon: "plus",
+				shortcut: { label: "C", keys: ["c"] },
+				onSelect: () => router.push("/webhooks/create"),
+			},
+			{
+				id: "open-api-reference",
+				label: "Open API Reference",
+				icon: "code",
+				shortcut: { label: "S", keys: ["s"] },
+				onSelect: () =>
+					window.dispatchEvent(
+						new CustomEvent("api-details:open", {
+							detail: { docSection: "webhooks" },
+						}),
+					),
+			},
+			{
+				id: "go-to-docs",
+				label: "Go to Docs",
+				icon: "file-text",
+				shortcut: { label: "D", keys: ["d"] },
+				onSelect: () =>
+					window.open("https://reloop.sh/docs/learn/webhook", "_blank"),
+			},
+		],
+		[router],
+	);
+
+	useRegisterCommandActions("webhooks", "Webhooks", actions);
+
+	useHotkeys(
+		"c",
+		(e) => {
+			e.preventDefault();
+			router.push("/webhooks/create");
+		},
+		{ enableOnFormTags: false, preventDefault: true },
+	);
+
+	useHotkeys(
+		"s",
+		(e) => {
+			e.preventDefault();
+			window.dispatchEvent(
+				new CustomEvent("api-details:open", {
+					detail: { docSection: "webhooks" },
+				}),
+			);
+		},
+		{ enableOnFormTags: false, preventDefault: true },
+	);
+
+	useHotkeys(
+		"d",
+		(e) => {
+			e.preventDefault();
+			window.open("https://reloop.sh/docs/learn/webhook", "_blank");
+		},
+		{ enableOnFormTags: false, preventDefault: true },
+	);
 
 	useEffect(() => {
 		if (deletedName) {

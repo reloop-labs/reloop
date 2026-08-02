@@ -2,8 +2,12 @@ import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import { AnimatePresence, motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 import { parseAsString, parseAsStringLiteral, useQueryState } from "nuqs";
 import { useEffect, useMemo, useState } from "react";
+import { useHotkeys } from "react-hotkeys-hook";
+import type { CommandAction } from "#/features/dashboard/command-menu";
+import { useRegisterCommandActions } from "#/features/dashboard/command-menu-context";
 import {
 	useInvalidateTemplates,
 	useTemplatesQuery,
@@ -17,6 +21,7 @@ import {
 import { TemplateGrid } from "./template-grid";
 
 export function TemplateList() {
+	const router = useRouter();
 	const invalidate = useInvalidateTemplates();
 	const [searchQuery, setSearchQuery] = useQueryState(
 		"q",
@@ -30,6 +35,47 @@ export function TemplateList() {
 
 	const { data, error, isPending, isFetching, refetch } = useTemplatesQuery();
 	const isLoading = isPending || (isFetching && !data);
+
+	const actions = useMemo<CommandAction[]>(
+		() => [
+			{
+				id: "create-template",
+				label: "Create Template",
+				icon: "plus",
+				shortcut: { label: "C", keys: ["c"] },
+				onSelect: () => router.push("/templates/new"),
+			},
+			{
+				id: "go-to-docs",
+				label: "Go to Docs",
+				icon: "file-text",
+				shortcut: { label: "D", keys: ["d"] },
+				onSelect: () =>
+					window.open("https://reloop.sh/docs/learn/templates", "_blank"),
+			},
+		],
+		[router],
+	);
+
+	useRegisterCommandActions("templates", "Templates", actions);
+
+	useHotkeys(
+		"c",
+		(e) => {
+			e.preventDefault();
+			router.push("/templates/new");
+		},
+		{ enableOnFormTags: false, preventDefault: true },
+	);
+
+	useHotkeys(
+		"d",
+		(e) => {
+			e.preventDefault();
+			window.open("https://reloop.sh/docs/learn/templates", "_blank");
+		},
+		{ enableOnFormTags: false, preventDefault: true },
+	);
 
 	useEffect(() => {
 		if (deletedName) {

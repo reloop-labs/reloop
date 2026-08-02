@@ -4,6 +4,10 @@ import * as TabMenu from "@reloop/ui/tab-menu-horizontal";
 import { AnimatePresence, motion } from "motion/react";
 import { parseAsString, useQueryState } from "nuqs";
 import * as React from "react";
+import { useHotkeys } from "react-hotkeys-hook";
+import { toast } from "sonner";
+import type { CommandAction } from "#/features/dashboard/command-menu";
+import { useRegisterCommandActions } from "#/features/dashboard/command-menu-context";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import { DomainErrorState } from "../components/domain-error-state";
 import { DomainNotFound } from "../components/domain-not-found";
@@ -51,6 +55,83 @@ export function DomainDetailPage({
 	} = useDomainDetailQuery(domainId, canFetch);
 
 	const showLoading = !canFetch || isPending || (isFetching && !domainData);
+
+	const actions = React.useMemo<CommandAction[]>(
+		() => [
+			{
+				id: "copy-domain",
+				label: "Copy Domain Name",
+				icon: "copy",
+				shortcut: { label: "C", keys: ["c"] },
+				onSelect: () => {
+					if (domainData?.domain) {
+						void navigator.clipboard.writeText(domainData.domain);
+						toast.success("Domain name copied");
+					}
+				},
+			},
+			{
+				id: "open-api-reference",
+				label: "Open API Reference",
+				icon: "code",
+				shortcut: { label: "S", keys: ["s"] },
+				onSelect: () =>
+					window.dispatchEvent(
+						new CustomEvent("api-details:open", {
+							detail: { docSection: "domains" },
+						}),
+					),
+			},
+			{
+				id: "go-to-docs",
+				label: "Go to Docs",
+				icon: "file-text",
+				shortcut: { label: "D", keys: ["d"] },
+				onSelect: () =>
+					window.open("https://reloop.sh/docs/learn/domains", "_blank"),
+			},
+		],
+		[domainData?.domain],
+	);
+
+	useRegisterCommandActions(
+		`domain-detail-${rawDomainId}`,
+		"Domain",
+		actions,
+	);
+
+	useHotkeys(
+		"c",
+		(e) => {
+			if (!domainData?.domain) return;
+			e.preventDefault();
+			void navigator.clipboard.writeText(domainData.domain);
+			toast.success("Domain name copied");
+		},
+		{ enableOnFormTags: false, preventDefault: true },
+	);
+
+	useHotkeys(
+		"s",
+		(e) => {
+			e.preventDefault();
+			window.dispatchEvent(
+				new CustomEvent("api-details:open", {
+					detail: { docSection: "domains" },
+				}),
+			);
+		},
+		{ enableOnFormTags: false, preventDefault: true },
+	);
+
+	useHotkeys(
+		"d",
+		(e) => {
+			e.preventDefault();
+			window.open("https://reloop.sh/docs/learn/domains", "_blank");
+		},
+		{ enableOnFormTags: false, preventDefault: true },
+	);
 
 	if (rawDomainId && !domainId) {
 		return (
