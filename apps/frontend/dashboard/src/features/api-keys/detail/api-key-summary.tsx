@@ -4,6 +4,7 @@ import { Skeleton } from "@reloop/ui/skeleton";
 import * as Tooltip from "@reloop/ui/tooltip";
 import { useState } from "react";
 import { toast } from "sonner";
+import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { formatRelativeTime } from "#/utils/format-relative-time";
 import type { ApiKeyDetail } from "../types";
 
@@ -134,9 +135,12 @@ export function ApiKeySummary({
 			<div className="overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-bg-white-0/5">
 				<div className="space-y-3 p-4">
 					<div>
-						<p className="font-medium text-sm text-text-strong-950">
-							Key prefix
-						</p>
+						<div className="flex items-center gap-2">
+							<p className="font-medium text-sm text-text-strong-950">
+								Key prefix
+							</p>
+							<ActionKbd className="w-auto min-w-4 px-1">P</ActionKbd>
+						</div>
 						<p className="mt-0.5 text-[12px] text-text-sub-600 leading-relaxed">
 							Visible identifier for this key. The full secret is only shown
 							once at creation.
