@@ -34,9 +34,25 @@ Important notes:
 - [Contact Channels](https://docs.reloop.dev/docs/learn/contacts/channels): Per-topic subscription preferences and opt-in defaults
 - [Domains](https://docs.reloop.dev/docs/learn/domains): Configure and verify sending domains with DNS records
 - [Logs](https://docs.reloop.dev/docs/learn/logs): View email activity and delivery logs
-- [API Keys](https://docs.reloop.dev/docs/learn/api-keys): Create and manage API keys for authentication
+- [API Keys (agent)](https://docs.reloop.dev/docs/learn/ai/api-keys.md): Programmatic API key management — prefer this over the dashboard page
+- [API Keys (dashboard / human UI)](https://docs.reloop.dev/docs/learn/api-keys): Dashboard walkthrough with GIFs and UI steps
 - [Webhooks](https://docs.reloop.dev/docs/learn/webhooks): Set up webhook endpoints for real-time event notifications
 - [Settings](https://docs.reloop.dev/docs/learn/settings): Configure your Reloop account settings
+
+## Agent guides
+
+Prefer these markdown guides for coding agents. They contain SDK samples for every supported language and omit dashboard UI content.
+
+- [API Keys](https://docs.reloop.dev/docs/learn/ai/api-keys.md): Auth rules, endpoints, and language index
+- [API Keys — Node](https://docs.reloop.dev/docs/learn/ai/api-keys.node.md)
+- [API Keys — cURL](https://docs.reloop.dev/docs/learn/ai/api-keys.curl.md)
+- [API Keys — Python](https://docs.reloop.dev/docs/learn/ai/api-keys.python.md)
+- [API Keys — PHP](https://docs.reloop.dev/docs/learn/ai/api-keys.php.md)
+- [API Keys — Java](https://docs.reloop.dev/docs/learn/ai/api-keys.java.md)
+- [API Keys — .NET](https://docs.reloop.dev/docs/learn/ai/api-keys.dotnet.md)
+- [API Keys — Go](https://docs.reloop.dev/docs/learn/ai/api-keys.go.md)
+- [API Keys — Rust](https://docs.reloop.dev/docs/learn/ai/api-keys.rust.md)
+- [API Keys — Ruby](https://docs.reloop.dev/docs/learn/ai/api-keys.ruby.md)
 
 ## API Reference
 

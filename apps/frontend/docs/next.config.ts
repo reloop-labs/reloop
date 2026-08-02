@@ -69,6 +69,27 @@ const config = {
 					},
 				],
 			},
+			// Steer agents that land on the human API Keys page to the agent corpus
+			{
+				source: "/learn/api-keys",
+				headers: [
+					{
+						key: "Link",
+						value:
+							'</docs/learn/ai/api-keys.md>; rel="alternate"; type="text/markdown", </docs/llms.txt>; rel="llms-txt", </docs/sitemap.md>; rel="sitemap"',
+					},
+				],
+			},
+			{
+				source: "/learn/api-keys.md",
+				headers: [
+					{
+						key: "Link",
+						value:
+							'</docs/learn/ai/api-keys.md>; rel="alternate"; type="text/markdown", </docs/llms.txt>; rel="llms-txt", </docs/sitemap.md>; rel="sitemap"',
+					},
+				],
+			},
 		];
 
 		if (!isDev) {

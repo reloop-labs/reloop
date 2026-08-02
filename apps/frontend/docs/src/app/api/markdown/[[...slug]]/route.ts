@@ -24,14 +24,21 @@ export async function GET(
 		};
 
 		const docsDir = getDocsDir();
-		let filePath = join(docsDir, `${relativePath}.mdx`);
+		const candidates = [
+			join(docsDir, `${relativePath}.mdx`),
+			join(docsDir, relativePath, "index.mdx"),
+			// Agent-only plain markdown (e.g. learn/ai/api-keys.md)
+			join(docsDir, `${relativePath}.md`),
+			join(docsDir, relativePath, "index.md"),
+		];
 
-		if (!existsSync(filePath)) {
-			filePath = join(docsDir, relativePath, "index.mdx");
-		}
+		const filePath = candidates.find((candidate) => existsSync(candidate));
 
-		if (!existsSync(filePath)) {
-			return new NextResponse(`File not found: ${filePath}`, { status: 404 });
+		if (!filePath) {
+			return new NextResponse(
+				`File not found: ${join(docsDir, `${relativePath}.mdx`)}`,
+				{ status: 404 },
+			);
 		}
 
 		const rawContent = readFileSync(filePath, "utf-8");
