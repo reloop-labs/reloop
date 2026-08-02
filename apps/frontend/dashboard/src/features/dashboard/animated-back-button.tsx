@@ -1,9 +1,9 @@
 import { cn } from "@reloop/ui/cn";
-import { KbdEsc } from "@reloop/ui/kbd-esc";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
+import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 
 interface AnimatedBackButtonProps {
 	showEscKey?: boolean;
@@ -98,7 +98,11 @@ export function AnimatedBackButton({
 					</motion.span>
 				)}
 
-				{showEscKey && <KbdEsc />}
+				{showEscKey && (
+					<ActionKbd className="lowercase! w-auto min-w-0 px-1 font-sans text-[10px]">
+						esc
+					</ActionKbd>
+				)}
 			</motion.div>
 		</motion.button>
 	);

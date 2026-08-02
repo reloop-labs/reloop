@@ -9,7 +9,6 @@ import { useQueryState } from "nuqs";
 import { useState } from "react";
 import { toast } from "sonner";
 import { ApiKeyAvatar } from "#/features/api-keys/components/api-key-avatar";
-import { AnimatedBackButton } from "#/features/dashboard/animated-back-button";
 import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 
 import { useInvalidateApiKeys } from "../hooks/use-api-keys-query";
@@ -101,9 +100,8 @@ export function ApiKeyHeader({
 
 	if (!apiKey && !isLoading) {
 		return (
-			<div className="pt-10 pb-2">
-				<AnimatedBackButton onClick={() => router.push("/api-keys")} />
-				<div className="flex items-center justify-between pt-6">
+			<div className="pt-8 pb-2">
+				<div className="flex items-center justify-between">
 					<div>
 						<div className="flex items-center gap-1.5 text-error-base">
 							<Icon name="alert-circle" className="h-3.5 w-3.5" />
@@ -123,10 +121,8 @@ export function ApiKeyHeader({
 	const displayPrefix = apiKey?.start || apiKey?.prefix || "—";
 
 	return (
-		<div className="pt-10 pb-2">
-			<AnimatedBackButton onClick={() => router.push("/api-keys")} />
-
-			<div className="flex items-start justify-between gap-4 pt-6">
+		<div className="pt-8 pb-2">
+			<div className="flex items-start justify-between gap-4">
 				<div className="min-w-0">
 					{isLoading ? (
 						<div className="flex items-center gap-3">

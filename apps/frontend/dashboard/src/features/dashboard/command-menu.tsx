@@ -51,7 +51,7 @@ export interface CommandAction {
 }
 
 function KbdBadge({ label }: { label: string }) {
-	const parts = label.match(/([⌘⇧⌃⌥]+|[A-Z0-9↵⎋⇥])/g) ?? [label];
+	const parts = label.match(/([⌘⇧⌃⌥]|[^\s⌘⇧⌃⌥]+)/g) ?? [label];
 	return (
 		<span className="ml-auto flex shrink-0 items-center gap-1">
 			{parts.map((part, i) => (

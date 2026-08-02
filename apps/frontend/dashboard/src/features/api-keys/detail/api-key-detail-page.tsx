@@ -163,9 +163,25 @@ export function ApiKeyDetailPage({ apiKeyId }: { apiKeyId: string }) {
 		{ enableOnFormTags: false, preventDefault: true },
 	);
 
+	useHotkeys(
+		"mod+backspace",
+		(e) => {
+			e.preventDefault();
+			router.push("/api-keys");
+		},
+		{ enableOnFormTags: false, preventDefault: true },
+	);
+
 	const actions = useMemo<CommandAction[]>(() => {
 		if (!data) return [];
 		return [
+			{
+				id: "back-to-api-keys",
+				label: "Back to API Keys",
+				icon: "arrow-left",
+				shortcut: { label: "⌘⌫", keys: ["mod", "backspace"] },
+				onSelect: () => router.push("/api-keys"),
+			},
 			{
 				id: "edit-api-key",
 				label: "Edit API Key",
