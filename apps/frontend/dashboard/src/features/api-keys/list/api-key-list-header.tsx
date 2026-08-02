@@ -67,8 +67,8 @@ export function ApiKeyListHeader() {
 							aria-keyshortcuts="a"
 						>
 							<Icon name="code" className="h-4 w-4 text-text-sub-600" />
-							Browse samples
-							<ActionKbd>A</ActionKbd>
+							SDK
+							<ActionKbd>S</ActionKbd>
 						</Button.Root>
 					)}
 				/>

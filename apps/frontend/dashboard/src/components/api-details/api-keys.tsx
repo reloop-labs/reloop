@@ -21,7 +21,7 @@ export const ApiKeysApiDetails = ({
 					className="h-6 w-6 text-text-strong-950 dark:text-white"
 				/>
 			}
-			hotkey="a"
+			hotkey="s"
 			languages={languages}
 			operations={operations}
 			codeExamples={codeExamples}
