@@ -249,7 +249,10 @@ export function CommandMenuGlobal() {
 							<CommandMenu.Item
 								key={action.id}
 								value={`${group.heading} ${action.label}`}
-								onSelect={action.onSelect}
+								onSelect={() => {
+									setOpen(false);
+									action.onSelect();
+								}}
 							>
 								<CommandMenu.ItemIcon
 									as={Icon}
