@@ -155,7 +155,7 @@ function CommandItemIcon<T extends React.ElementType>({
 
 	return (
 		<Component
-			className={cn("size-4 shrink-0 text-text-sub-600", className)}
+			className={cn("size-3.5 shrink-0 text-text-sub-600", className)}
 			{...rest}
 		/>
 	);

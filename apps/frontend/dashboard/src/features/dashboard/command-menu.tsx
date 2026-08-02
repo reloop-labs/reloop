@@ -209,7 +209,7 @@ export function CommandMenuGlobal() {
 			<div className="group/cmd-input flex h-13 w-full items-center gap-3 border-stroke-soft-200 border-b bg-bg-white-0 px-4 dark:border-white/10">
 				<Search
 					className={cn(
-						"size-4 shrink-0 text-text-soft-400",
+						"size-3.5 shrink-0 text-text-soft-400",
 						"transition duration-150 ease-out",
 						"group-focus-within/cmd-input:text-text-sub-600",
 					)}
@@ -254,7 +254,7 @@ export function CommandMenuGlobal() {
 								<CommandMenu.ItemIcon
 									as={Icon}
 									name={action.icon}
-									className="size-4"
+									className="size-3.5"
 								/>
 								<span className="flex-1 truncate">{action.label}</span>
 								{action.shortcut ? (
@@ -283,7 +283,7 @@ export function CommandMenuGlobal() {
 								>
 									<CommandMenu.ItemIcon
 										as={Clock}
-										className="size-4 text-text-soft-400"
+										className="size-3.5 text-text-soft-400"
 									/>
 									<span className="flex-1 truncate">{item.label}</span>
 									{shortcut ? <KbdBadge label={shortcut.label} /> : null}
@@ -305,7 +305,7 @@ export function CommandMenuGlobal() {
 								<CommandMenu.ItemIcon
 									as={Icon}
 									name={item.iconName}
-									className="size-4"
+									className="size-3.5"
 								/>
 								<span className="flex-1 truncate">{item.label}</span>
 								{shortcut ? <KbdBadge label={shortcut.label} /> : null}
@@ -324,7 +324,7 @@ export function CommandMenuGlobal() {
 							<CommandMenu.ItemIcon
 								as={Icon}
 								name={item.iconName}
-								className="size-4"
+								className="size-3.5"
 							/>
 							<span className="flex-1 truncate">{item.label}</span>
 						</CommandMenu.Item>
@@ -341,7 +341,7 @@ export function CommandMenuGlobal() {
 							<CommandMenu.ItemIcon
 								as={Icon}
 								name={action.icon}
-								className="size-4"
+								className="size-3.5"
 							/>
 							<span className="flex-1 truncate">{action.label}</span>
 							{action.shortcut ? (
