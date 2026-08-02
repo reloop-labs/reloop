@@ -10,6 +10,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { ApiKeyAvatar } from "#/features/api-keys/components/api-key-avatar";
 import { AnimatedBackButton } from "#/features/dashboard/animated-back-button";
+import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 
 import { useInvalidateApiKeys } from "../hooks/use-api-keys-query";
 import type { ApiKeyDetail } from "../types";
@@ -194,19 +195,24 @@ export function ApiKeyHeader({
 								variant="neutral"
 								mode="stroke"
 								size="xsmall"
-								className="font-semibold"
+								className="gap-1.5 font-semibold"
 								onClick={() => void setEditId(apiKey.id)}
 							>
 								<Icon name="edit" className="h-3.5 w-3.5" />
-								Edit
+								<span>Edit</span>
+								<ActionKbd className="ml-0.5 w-auto min-w-4 px-1">E</ActionKbd>
 							</Button.Root>
 							<FancyButton.Root
 								variant="blue"
 								size="xsmall"
+								className="gap-1.5"
 								onClick={() => void setRotateId(apiKey.id)}
 							>
 								<Icon name="rotate-cw" className="h-3.5 w-3.5" />
-								Rotate key
+								<span>Rotate key</span>
+								<ActionKbd className="ml-0.5 w-auto min-w-4 border-white/25 bg-white/15 px-1 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]">
+									R
+								</ActionKbd>
 							</FancyButton.Root>
 							<ApiKeyHeaderMenu
 								enabled={apiKey.enabled}

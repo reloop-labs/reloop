@@ -7,6 +7,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "motion/react";
 import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
 import { useEffect, useRef, useState } from "react";
+import { useHotkeys } from "react-hotkeys-hook";
+import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import { queryKeys } from "#/lib/query-keys";
 import { DateRangeFilter } from "./date-range-filter";
@@ -67,6 +69,7 @@ export function LogList({
 	const queryClient = useQueryClient();
 	const [hoveredIdx, setHoveredIdx] = useState<number | undefined>(undefined);
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
+	const searchInputRef = useRef<HTMLInputElement>(null);
 
 	const [searchQuery, setSearchQuery] = useQueryState(
 		"search",
@@ -174,6 +177,24 @@ export function LogList({
 		});
 	};
 
+	useHotkeys(
+		"f, /",
+		(e) => {
+			e.preventDefault();
+			searchInputRef.current?.focus();
+		},
+		{ enableOnFormTags: false, preventDefault: true },
+	);
+
+	useHotkeys(
+		"r",
+		(e) => {
+			e.preventDefault();
+			handleRefresh();
+		},
+		{ enableOnFormTags: false, preventDefault: true },
+	);
+
 	const handleDownloadCSV = async () => {
 		if (!data?.logs || data.logs.length === 0) return;
 		try {
@@ -280,6 +301,7 @@ export function LogList({
 						<Input.Wrapper>
 							<Input.Icon as={Icon} name="search" size="small" />
 							<Input.Input
+								ref={searchInputRef}
 								placeholder="Filter by resource ID..."
 								value={searchQuery}
 								onChange={(e) => {
@@ -287,7 +309,7 @@ export function LogList({
 									void setCurrentPage(1);
 								}}
 							/>
-							{(searchQuery ?? "") && (
+							{searchQuery ? (
 								<button
 									type="button"
 									onMouseDown={(e) => e.preventDefault()}
@@ -299,6 +321,10 @@ export function LogList({
 								>
 									<Icon name="cross" className="h-3 w-3" />
 								</button>
+							) : (
+								<ActionKbd className="mr-1.5 w-auto min-w-4 px-1 font-sans text-[10px]">
+									/
+								</ActionKbd>
 							)}
 						</Input.Wrapper>
 					</Input.Root>
@@ -349,13 +375,14 @@ export function LogList({
 				<button
 					type="button"
 					onClick={handleRefresh}
-					className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-white-0 text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-stroke-soft-100/40"
-					title="Refresh logs"
+					className="flex h-9 shrink-0 items-center gap-1.5 rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-2.5 text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-stroke-soft-100/40"
+					title="Refresh logs (R)"
 				>
 					<Icon
 						name="rotate-cw"
 						className={cn("h-4 w-4", isFetching && "animate-spin")}
 					/>
+					<ActionKbd className="w-auto min-w-4 px-1">R</ActionKbd>
 				</button>
 			</div>
 
