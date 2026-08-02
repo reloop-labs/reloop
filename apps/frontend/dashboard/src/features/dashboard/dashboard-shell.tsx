@@ -2,6 +2,7 @@ import { AnimatePresence } from "framer-motion";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 import { CommandMenuGlobal } from "#/features/dashboard/command-menu";
+import { CommandMenuProvider } from "#/features/dashboard/command-menu-context";
 import { AiPanel } from "#/features/dashboard/layout/ai-panel";
 import { OpenSupportFromQuery } from "#/features/dashboard/open-support-from-query";
 import { useUIStore } from "#/store/use-ui-store";
@@ -41,10 +42,12 @@ export function DashboardShell({ children }: { children: ReactNode }) {
 
 	if (isTemplateEditor) {
 		return (
-			<div className="flex h-screen flex-col overflow-hidden bg-bg-weak-50 dark:bg-black">
-				{children}
-				<CommandMenuGlobal />
-			</div>
+			<CommandMenuProvider>
+				<div className="flex h-screen flex-col overflow-hidden bg-bg-weak-50 dark:bg-black">
+					{children}
+					<CommandMenuGlobal />
+				</div>
+			</CommandMenuProvider>
 		);
 	}
 
@@ -58,17 +61,19 @@ export function DashboardShell({ children }: { children: ReactNode }) {
 	}
 
 	return (
-		<div className="flex h-screen overflow-hidden bg-bg-weak-50 dark:bg-black">
-			<OpenSupportFromQuery />
-			<MainSidebar />
-			<main className="relative m-2 flex flex-1 overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a]">
-				<div className="flex min-w-0 flex-1 flex-col overflow-hidden">
-					<PageHeader />
-					<div className="flex-1 overflow-y-auto">{children}</div>
-				</div>
-				<AnimatePresence>{isAiPanelOpen ? <AiPanel /> : null}</AnimatePresence>
-			</main>
-			<CommandMenuGlobal />
-		</div>
+		<CommandMenuProvider>
+			<div className="flex h-screen overflow-hidden bg-bg-weak-50 dark:bg-black">
+				<OpenSupportFromQuery />
+				<MainSidebar />
+				<main className="relative m-2 flex flex-1 overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a]">
+					<div className="flex min-w-0 flex-1 flex-col overflow-hidden">
+						<PageHeader />
+						<div className="flex-1 overflow-y-auto">{children}</div>
+					</div>
+					<AnimatePresence>{isAiPanelOpen ? <AiPanel /> : null}</AnimatePresence>
+				</main>
+				<CommandMenuGlobal />
+			</div>
+		</CommandMenuProvider>
 	);
 }

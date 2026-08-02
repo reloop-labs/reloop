@@ -9,7 +9,7 @@ import {
 import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { parseAsInteger, useQueryState } from "nuqs";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { useHotkeys } from "react-hotkeys-hook";
 
@@ -131,6 +131,18 @@ export function ApiKeyTable({
 		},
 		{ enableOnFormTags: false, preventDefault: true },
 	);
+
+	// Allow the command menu to trigger "Select All" via a custom DOM event,
+	// keeping the command menu decoupled from the table's React state.
+	useEffect(() => {
+		const handler = () => {
+			if (apiKeys.length === 0) return;
+			const allSelected = table.getIsAllPageRowsSelected();
+			table.toggleAllPageRowsSelected(!allSelected);
+		};
+		window.addEventListener("api-keys:select-all", handler);
+		return () => window.removeEventListener("api-keys:select-all", handler);
+	}, [apiKeys.length, table]);
 
 	const headerGroup = table.getHeaderGroups()[0];
 	const rows = table.getRowModel().rows;

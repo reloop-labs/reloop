@@ -13,6 +13,7 @@ import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import * as React from "react";
 import { useHotkeys } from "react-hotkeys-hook";
+import { useCommandMenuActions } from "#/features/dashboard/command-menu-context";
 import {
 	filterSettingsNavigation,
 	mainNavigation,
@@ -38,7 +39,7 @@ interface RecentItem {
 	timestamp: number;
 }
 
-interface CommandAction {
+export interface CommandAction {
 	id: string;
 	label: string;
 	icon: string;
@@ -195,6 +196,7 @@ export function CommandMenuGlobal() {
 		[resolvedTheme, handleThemeSelect],
 	);
 
+	const pageActionGroups = useCommandMenuActions();
 	const hasSearch = search.trim().length > 0;
 
 	return (
@@ -238,6 +240,29 @@ export function CommandMenuGlobal() {
 						</p>
 					</div>
 				</CommandMenu.Empty>
+
+				{/* Page-specific actions — only shown when on the relevant page */}
+				{pageActionGroups.map((group) => (
+					<CommandMenu.Group key={group.heading} heading={group.heading}>
+						{group.actions.map((action) => (
+							<CommandMenu.Item
+								key={action.id}
+								value={`${group.heading} ${action.label}`}
+								onSelect={action.onSelect}
+							>
+								<CommandMenu.ItemIcon
+									as={Icon}
+									name={action.icon}
+									className="size-4"
+								/>
+								<span className="flex-1 truncate">{action.label}</span>
+								{action.shortcut ? (
+									<KbdBadge label={action.shortcut.label} />
+								) : null}
+							</CommandMenu.Item>
+						))}
+					</CommandMenu.Group>
+				))}
 
 				{!hasSearch && recents.length > 0 ? (
 					<CommandMenu.Group heading="Recent">

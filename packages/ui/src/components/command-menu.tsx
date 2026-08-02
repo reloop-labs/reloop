@@ -17,10 +17,14 @@ const CommandDialog = ({
 	children,
 	className,
 	overlayClassName,
+	title = "Command menu",
+	description = "Search pages and actions",
 	...rest
 }: DialogProps & {
 	className?: string;
 	overlayClassName?: string;
+	title?: string;
+	description?: string;
 }) => {
 	return (
 		<Modal.Root {...rest}>
@@ -32,6 +36,8 @@ const CommandDialog = ({
 					className,
 				)}
 			>
+				<Modal.Title className="sr-only">{title}</Modal.Title>
+				<Modal.Description className="sr-only">{description}</Modal.Description>
 				<Command className={cn("grid min-h-0 auto-cols-auto grid-flow-row")}>
 					{children}
 				</Command>
@@ -91,10 +97,11 @@ const CommandGroup = React.forwardRef<
 		<Command.Group
 			ref={forwardedRef}
 			className={cn(
-				"relative px-1.5 py-1",
+				"relative px-2.5 py-1.5",
 				// heading typography matching compact design
 				"[&>[cmdk-group-heading]]:font-medium [&>[cmdk-group-heading]]:text-[11px] [&>[cmdk-group-heading]]:text-text-soft-400",
-				"[&>[cmdk-group-heading]]:mb-1 [&>[cmdk-group-heading]]:px-2.5 [&>[cmdk-group-heading]]:pt-1",
+				"[&>[cmdk-group-heading]]:mb-1.5 [&>[cmdk-group-heading]]:px-3 [&>[cmdk-group-heading]]:pt-1",
+				"[&_[cmdk-group-items]]:flex [&_[cmdk-group-items]]:flex-col [&_[cmdk-group-items]]:gap-1",
 				className,
 			)}
 			{...rest}
@@ -105,16 +112,16 @@ CommandGroup.displayName = "CommandGroup";
 
 const commandItemVariants = tv({
 	base: [
-		"flex items-center gap-2.5 rounded-xl bg-transparent",
-		"cursor-pointer text-paragraph-sm font-normal text-text-strong-950",
+		"flex items-center gap-3 rounded-xl bg-transparent",
+		"cursor-pointer text-[14px] font-normal text-text-strong-950",
 		"transition-all duration-150 ease-out",
 		// hover/selected pill background
 		"data-[selected=true]:bg-bg-weak-50 dark:data-[selected=true]:bg-white/[0.08]",
 	],
 	variants: {
 		size: {
-			small: "px-2.5 py-1.5",
-			medium: "px-2.5 py-2",
+			small: "px-3 py-1.5",
+			medium: "px-3 py-1.5",
 		},
 	},
 	defaultVariants: {
