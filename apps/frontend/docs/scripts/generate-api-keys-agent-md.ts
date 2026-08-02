@@ -136,7 +136,7 @@ ${CODE_SAMPLE_LANGUAGE_ORDER.map(
 
 ## Dashboard (humans)
 
-Dashboard UI walkthrough (GIFs, tabs): [/docs/learn/api-keys](https://docs.reloop.dev/docs/learn/api-keys)
+Dashboard UI walkthrough (GIFs, tabs): [/docs/learn/api-keys](https://reloop.sh/docs/learn/api-keys)
 `;
 
 writeFileSync(join(outDir, "api-keys.md"), index);

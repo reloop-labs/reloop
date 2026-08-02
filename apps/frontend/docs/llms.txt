@@ -12,209 +12,209 @@ Important notes:
 
 ## Documentation
 
-- [Full documentation](https://docs.reloop.dev/docs/llms-full.txt): Complete Reloop documentation in a single file
+- [Full documentation](https://reloop.sh/docs/llms-full.txt): Complete Reloop documentation in a single file
 - [Sitemap](https://reloop.sh/docs/sitemap.md): Semantic markdown map of all documentation pages
-- [Introduction](https://docs.reloop.dev/docs/introduction): Welcome to Reloop documentation
-- [API Reference](https://docs.reloop.dev/docs/api): REST API reference with authentication, response codes, and rate limits
+- [Introduction](https://reloop.sh/docs/introduction): Welcome to Reloop documentation
+- [API Reference](https://reloop.sh/docs/api): REST API reference with authentication, response codes, and rate limits
 
 ## Quickstart Guides
 
-- [Node.js](https://docs.reloop.dev/docs/quickstart/nodejs): Get started with Reloop using Node.js
+- [Node.js](https://reloop.sh/docs/quickstart/nodejs): Get started with Reloop using Node.js
 
 ## Learn
 
-- [Sending Emails](https://docs.reloop.dev/docs/learn/sending): Learn how to send transactional emails with Reloop
-- [Receiving Emails](https://docs.reloop.dev/docs/learn/receiving): Handle inbound emails with Reloop
-- [Broadcasts](https://docs.reloop.dev/docs/learn/broadcasts): Send marketing and bulk emails
-- [Automations](https://docs.reloop.dev/docs/learn/automations): Set up automated email workflows
-- [Templates](https://docs.reloop.dev/docs/learn/templates): Create and manage email templates
-- [Contacts](https://docs.reloop.dev/docs/learn/contacts): What Reloop contacts are and how to add, search, edit, and delete them
-- [Contact Properties](https://docs.reloop.dev/docs/learn/contacts/properties): Custom string and number fields for personalization
-- [Contact Groups](https://docs.reloop.dev/docs/learn/contacts/groups): Segment contacts into lists for targeted sends
-- [Contact Channels](https://docs.reloop.dev/docs/learn/contacts/channels): Per-topic subscription preferences and opt-in defaults
-- [Domains](https://docs.reloop.dev/docs/learn/domains): Configure and verify sending domains with DNS records
-- [Logs](https://docs.reloop.dev/docs/learn/logs): View email activity and delivery logs
-- [API Keys (agent)](https://docs.reloop.dev/docs/learn/ai/api-keys.md): Programmatic API key management — prefer this over the dashboard page
-- [API Keys (dashboard / human UI)](https://docs.reloop.dev/docs/learn/api-keys): Dashboard walkthrough with GIFs and UI steps
-- [Webhooks](https://docs.reloop.dev/docs/learn/webhooks): Set up webhook endpoints for real-time event notifications
-- [Settings](https://docs.reloop.dev/docs/learn/settings): Configure your Reloop account settings
+- [Sending Emails](https://reloop.sh/docs/learn/sending): Learn how to send transactional emails with Reloop
+- [Receiving Emails](https://reloop.sh/docs/learn/receiving): Handle inbound emails with Reloop
+- [Broadcasts](https://reloop.sh/docs/learn/broadcasts): Send marketing and bulk emails
+- [Automations](https://reloop.sh/docs/learn/automations): Set up automated email workflows
+- [Templates](https://reloop.sh/docs/learn/templates): Create and manage email templates
+- [Contacts](https://reloop.sh/docs/learn/contacts): What Reloop contacts are and how to add, search, edit, and delete them
+- [Contact Properties](https://reloop.sh/docs/learn/contacts/properties): Custom string and number fields for personalization
+- [Contact Groups](https://reloop.sh/docs/learn/contacts/groups): Segment contacts into lists for targeted sends
+- [Contact Channels](https://reloop.sh/docs/learn/contacts/channels): Per-topic subscription preferences and opt-in defaults
+- [Domains](https://reloop.sh/docs/learn/domains): Configure and verify sending domains with DNS records
+- [Logs](https://reloop.sh/docs/learn/logs): View email activity and delivery logs
+- [API Keys (agent)](https://reloop.sh/docs/learn/ai/api-keys.md): Programmatic API key management — prefer this over the dashboard page
+- [API Keys (dashboard / human UI)](https://reloop.sh/docs/learn/api-keys): Dashboard walkthrough with GIFs and UI steps
+- [Webhooks](https://reloop.sh/docs/learn/webhooks): Set up webhook endpoints for real-time event notifications
+- [Settings](https://reloop.sh/docs/learn/settings): Configure your Reloop account settings
 
 ## Agent guides
 
 Prefer these markdown guides for coding agents. They contain SDK samples for every supported language and omit dashboard UI content.
 
-- [API Keys](https://docs.reloop.dev/docs/learn/ai/api-keys.md): Auth rules, endpoints, and language index
-- [API Keys — Node](https://docs.reloop.dev/docs/learn/ai/api-keys.node.md)
-- [API Keys — cURL](https://docs.reloop.dev/docs/learn/ai/api-keys.curl.md)
-- [API Keys — Python](https://docs.reloop.dev/docs/learn/ai/api-keys.python.md)
-- [API Keys — PHP](https://docs.reloop.dev/docs/learn/ai/api-keys.php.md)
-- [API Keys — Java](https://docs.reloop.dev/docs/learn/ai/api-keys.java.md)
-- [API Keys — .NET](https://docs.reloop.dev/docs/learn/ai/api-keys.dotnet.md)
-- [API Keys — Go](https://docs.reloop.dev/docs/learn/ai/api-keys.go.md)
-- [API Keys — Rust](https://docs.reloop.dev/docs/learn/ai/api-keys.rust.md)
-- [API Keys — Ruby](https://docs.reloop.dev/docs/learn/ai/api-keys.ruby.md)
+- [API Keys](https://reloop.sh/docs/learn/ai/api-keys.md): Auth rules, endpoints, and language index
+- [API Keys — Node](https://reloop.sh/docs/learn/ai/api-keys.node.md)
+- [API Keys — cURL](https://reloop.sh/docs/learn/ai/api-keys.curl.md)
+- [API Keys — Python](https://reloop.sh/docs/learn/ai/api-keys.python.md)
+- [API Keys — PHP](https://reloop.sh/docs/learn/ai/api-keys.php.md)
+- [API Keys — Java](https://reloop.sh/docs/learn/ai/api-keys.java.md)
+- [API Keys — .NET](https://reloop.sh/docs/learn/ai/api-keys.dotnet.md)
+- [API Keys — Go](https://reloop.sh/docs/learn/ai/api-keys.go.md)
+- [API Keys — Rust](https://reloop.sh/docs/learn/ai/api-keys.rust.md)
+- [API Keys — Ruby](https://reloop.sh/docs/learn/ai/api-keys.ruby.md)
 
 ## API Reference
 
-- [Introduction](https://docs.reloop.dev/docs/api): API overview, authentication, and response codes
-- [Pagination](https://docs.reloop.dev/docs/api/pagination): How pagination works in the API
-- [Usage Limits](https://docs.reloop.dev/docs/api/usage-limits): API rate limits and usage quotas
-- [Errors](https://docs.reloop.dev/docs/api/errors): Error response format and common error codes
+- [Introduction](https://reloop.sh/docs/api): API overview, authentication, and response codes
+- [Pagination](https://reloop.sh/docs/api/pagination): How pagination works in the API
+- [Usage Limits](https://reloop.sh/docs/api/usage-limits): API rate limits and usage quotas
+- [Errors](https://reloop.sh/docs/api/errors): Error response format and common error codes
 
 ### Domain API
-- [Create Domain](https://docs.reloop.dev/docs/api/domain/post-api-domain-v1create): POST /api/domain/v1/create
-- [List Domains](https://docs.reloop.dev/docs/api/domain/get-api-domain-v1list): GET /api/domain/v1/list
-- [Get Domain](https://docs.reloop.dev/docs/api/domain/get-api-domain-v1by-domain_id): GET /api/domain/v1/:domain_id
-- [Update Domain](https://docs.reloop.dev/docs/api/domain/patch-api-domain-v1by-domain_id): PATCH /api/domain/v1/:domain_id
-- [Delete Domain](https://docs.reloop.dev/docs/api/domain/delete-api-domain-v1by-domain_id): DELETE /api/domain/v1/:domain_id
-- [Verify Domain](https://docs.reloop.dev/docs/api/domain/post-api-domain-v1verify-by-domain_id): POST /api/domain/v1/verify/:domain_id
-- [Get Nameservers](https://docs.reloop.dev/docs/api/domain/get-api-domain-v1nameservers-by-domain_id): GET /api/domain/v1/nameservers/:domain_id
+- [Create Domain](https://reloop.sh/docs/api/domain/post-api-domain-v1create): POST /api/domain/v1/create
+- [List Domains](https://reloop.sh/docs/api/domain/get-api-domain-v1list): GET /api/domain/v1/list
+- [Get Domain](https://reloop.sh/docs/api/domain/get-api-domain-v1by-domain_id): GET /api/domain/v1/:domain_id
+- [Update Domain](https://reloop.sh/docs/api/domain/patch-api-domain-v1by-domain_id): PATCH /api/domain/v1/:domain_id
+- [Delete Domain](https://reloop.sh/docs/api/domain/delete-api-domain-v1by-domain_id): DELETE /api/domain/v1/:domain_id
+- [Verify Domain](https://reloop.sh/docs/api/domain/post-api-domain-v1verify-by-domain_id): POST /api/domain/v1/verify/:domain_id
+- [Get Nameservers](https://reloop.sh/docs/api/domain/get-api-domain-v1nameservers-by-domain_id): GET /api/domain/v1/nameservers/:domain_id
 
 ### API Key API
-- [Create API Key](https://docs.reloop.dev/docs/api/api-key/post-api-api-key-v1): POST /api/api-key/v1
-- [List API Keys](https://docs.reloop.dev/docs/api/api-key/get-api-api-key-v1): GET /api/api-key/v1
-- [Get API Key](https://docs.reloop.dev/docs/api/api-key/get-api-api-key-v1by-api_key_id): GET /api/api-key/v1/:api_key_id
-- [Update API Key](https://docs.reloop.dev/docs/api/api-key/patch-api-api-key-v1by-api_key_id): PATCH /api/api-key/v1/:api_key_id
-- [Delete API Key](https://docs.reloop.dev/docs/api/api-key/delete-api-api-key-v1by-api_key_id): DELETE /api/api-key/v1/:api_key_id
-- [Disable API Key](https://docs.reloop.dev/docs/api/api-key/post-api-api-key-v1disable-by-api_key_id): POST /api/api-key/v1/disable/:api_key_id
-- [Enable API Key](https://docs.reloop.dev/docs/api/api-key/post-api-api-key-v1enable-by-api_key_id): POST /api/api-key/v1/enable/:api_key_id
-- [Rotate API Key](https://docs.reloop.dev/docs/api/api-key/post-api-api-key-v1rotate-by-api_key_id): POST /api/api-key/v1/rotate/:api_key_id
+- [Create API Key](https://reloop.sh/docs/api/api-key/post-api-api-key-v1): POST /api/api-key/v1
+- [List API Keys](https://reloop.sh/docs/api/api-key/get-api-api-key-v1): GET /api/api-key/v1
+- [Get API Key](https://reloop.sh/docs/api/api-key/get-api-api-key-v1by-api_key_id): GET /api/api-key/v1/:api_key_id
+- [Update API Key](https://reloop.sh/docs/api/api-key/patch-api-api-key-v1by-api_key_id): PATCH /api/api-key/v1/:api_key_id
+- [Delete API Key](https://reloop.sh/docs/api/api-key/delete-api-api-key-v1by-api_key_id): DELETE /api/api-key/v1/:api_key_id
+- [Disable API Key](https://reloop.sh/docs/api/api-key/post-api-api-key-v1disable-by-api_key_id): POST /api/api-key/v1/disable/:api_key_id
+- [Enable API Key](https://reloop.sh/docs/api/api-key/post-api-api-key-v1enable-by-api_key_id): POST /api/api-key/v1/enable/:api_key_id
+- [Rotate API Key](https://reloop.sh/docs/api/api-key/post-api-api-key-v1rotate-by-api_key_id): POST /api/api-key/v1/rotate/:api_key_id
 
 ### Webhook API
-- [Create Webhook](https://docs.reloop.dev/docs/api/webhook/post-api-webhook-v1): POST /api/webhook/v1
-- [List Webhooks](https://docs.reloop.dev/docs/api/webhook/get-api-webhook-v1): GET /api/webhook/v1
-- [Get Webhook](https://docs.reloop.dev/docs/api/webhook/get-api-webhook-v1by-webhook_id): GET /api/webhook/v1/:webhook_id
-- [Update Webhook](https://docs.reloop.dev/docs/api/webhook/patch-api-webhook-v1by-webhook_id): PATCH /api/webhook/v1/:webhook_id
-- [Delete Webhook](https://docs.reloop.dev/docs/api/webhook/delete-api-webhook-v1by-id): DELETE /api/webhook/v1/:id
-- [Get Webhook Deliveries](https://docs.reloop.dev/docs/api/webhook/get-api-webhook-v1by-webhook_id-deliveries): GET /api/webhook/v1/:webhook_id/deliveries
-- [Trigger Test Webhook](https://docs.reloop.dev/docs/api/webhook/post-api-webhook-v1trigger): POST /api/webhook/v1/trigger
+- [Create Webhook](https://reloop.sh/docs/api/webhook/post-api-webhook-v1): POST /api/webhook/v1
+- [List Webhooks](https://reloop.sh/docs/api/webhook/get-api-webhook-v1): GET /api/webhook/v1
+- [Get Webhook](https://reloop.sh/docs/api/webhook/get-api-webhook-v1by-webhook_id): GET /api/webhook/v1/:webhook_id
+- [Update Webhook](https://reloop.sh/docs/api/webhook/patch-api-webhook-v1by-webhook_id): PATCH /api/webhook/v1/:webhook_id
+- [Delete Webhook](https://reloop.sh/docs/api/webhook/delete-api-webhook-v1by-id): DELETE /api/webhook/v1/:id
+- [Get Webhook Deliveries](https://reloop.sh/docs/api/webhook/get-api-webhook-v1by-webhook_id-deliveries): GET /api/webhook/v1/:webhook_id/deliveries
+- [Trigger Test Webhook](https://reloop.sh/docs/api/webhook/post-api-webhook-v1trigger): POST /api/webhook/v1/trigger
 
 ### Contacts API
-- [Create Contact](https://docs.reloop.dev/docs/api/contacts/post-api-contacts-create): POST /api/contacts/create
-- [List Contacts](https://docs.reloop.dev/docs/api/contacts/get-api-contacts-list): GET /api/contacts/list
-- [Get Contact](https://docs.reloop.dev/docs/api/contacts/get-api-contacts-retrieve-by-contact_id): GET /api/contacts/retrieve/:contact_id
-- [Update Contact](https://docs.reloop.dev/docs/api/contacts/patch-api-contacts-by-contact_id): PATCH /api/contacts/:contact_id
-- [Delete Contact](https://docs.reloop.dev/docs/api/contacts/delete-api-contacts-by-contact_id): DELETE /api/contacts/:contact_id
-- [Create Contact Group](https://docs.reloop.dev/docs/api/contacts/post-api-contacts-v1groups-create): POST /api/contacts/v1/groups/create
-- [List Contact Groups](https://docs.reloop.dev/docs/api/contacts/get-api-contacts-v1groups-list): GET /api/contacts/v1/groups/list
-- [Get Contact Group](https://docs.reloop.dev/docs/api/contacts/get-api-contacts-v1groups-by-group_id): GET /api/contacts/v1/groups/:group_id
-- [Update Contact Group](https://docs.reloop.dev/docs/api/contacts/patch-api-contacts-v1groups-by-group_id): PATCH /api/contacts/v1/groups/:group_id
-- [Delete Contact Group](https://docs.reloop.dev/docs/api/contacts/delete-api-contacts-group-by-group_id): DELETE /api/contacts/group/:group_id
-- [List Contacts in Group](https://docs.reloop.dev/docs/api/contacts/get-api-contacts-v1groups-by-group_id-contacts): GET /api/contacts/v1/groups/:group_id/contacts
-- [Create Contact Property](https://docs.reloop.dev/docs/api/contacts/post-api-contacts-v1properties-create): POST /api/contacts/v1/properties/create
-- [List Contact Properties](https://docs.reloop.dev/docs/api/contacts/get-api-contacts-v1properties-list): GET /api/contacts/v1/properties/list
-- [Update Contact Property](https://docs.reloop.dev/docs/api/contacts/patch-api-contacts-v1properties-by-contact_property_id): PATCH /api/contacts/v1/properties/:contact_property_id
-- [Delete Contact Property](https://docs.reloop.dev/docs/api/contacts/delete-api-contacts-v1properties-by-contact_property_id): DELETE /api/contacts/v1/properties/:contact_property_id
-- [Create Contact Channel](https://docs.reloop.dev/docs/api/contacts/post-api-contacts-v1channels-create): POST /api/contacts/v1/channels/create
-- [List Contact Channels](https://docs.reloop.dev/docs/api/contacts/get-api-contacts-v1channels-list): GET /api/contacts/v1/channels/list
-- [Get Contact Channel](https://docs.reloop.dev/docs/api/contacts/get-api-contacts-v1channels-by-channel_id): GET /api/contacts/v1/channels/:channel_id
-- [Update Contact Channel](https://docs.reloop.dev/docs/api/contacts/patch-api-contacts-v1channels-by-channel_id): PATCH /api/contacts/v1/channels/:channel_id
-- [Delete Contact Channel](https://docs.reloop.dev/docs/api/contacts/delete-api-contacts-v1channels-by-channel_id): DELETE /api/contacts/v1/channels/:channel_id
+- [Create Contact](https://reloop.sh/docs/api/contacts/post-api-contacts-create): POST /api/contacts/create
+- [List Contacts](https://reloop.sh/docs/api/contacts/get-api-contacts-list): GET /api/contacts/list
+- [Get Contact](https://reloop.sh/docs/api/contacts/get-api-contacts-retrieve-by-contact_id): GET /api/contacts/retrieve/:contact_id
+- [Update Contact](https://reloop.sh/docs/api/contacts/patch-api-contacts-by-contact_id): PATCH /api/contacts/:contact_id
+- [Delete Contact](https://reloop.sh/docs/api/contacts/delete-api-contacts-by-contact_id): DELETE /api/contacts/:contact_id
+- [Create Contact Group](https://reloop.sh/docs/api/contacts/post-api-contacts-v1groups-create): POST /api/contacts/v1/groups/create
+- [List Contact Groups](https://reloop.sh/docs/api/contacts/get-api-contacts-v1groups-list): GET /api/contacts/v1/groups/list
+- [Get Contact Group](https://reloop.sh/docs/api/contacts/get-api-contacts-v1groups-by-group_id): GET /api/contacts/v1/groups/:group_id
+- [Update Contact Group](https://reloop.sh/docs/api/contacts/patch-api-contacts-v1groups-by-group_id): PATCH /api/contacts/v1/groups/:group_id
+- [Delete Contact Group](https://reloop.sh/docs/api/contacts/delete-api-contacts-group-by-group_id): DELETE /api/contacts/group/:group_id
+- [List Contacts in Group](https://reloop.sh/docs/api/contacts/get-api-contacts-v1groups-by-group_id-contacts): GET /api/contacts/v1/groups/:group_id/contacts
+- [Create Contact Property](https://reloop.sh/docs/api/contacts/post-api-contacts-v1properties-create): POST /api/contacts/v1/properties/create
+- [List Contact Properties](https://reloop.sh/docs/api/contacts/get-api-contacts-v1properties-list): GET /api/contacts/v1/properties/list
+- [Update Contact Property](https://reloop.sh/docs/api/contacts/patch-api-contacts-v1properties-by-contact_property_id): PATCH /api/contacts/v1/properties/:contact_property_id
+- [Delete Contact Property](https://reloop.sh/docs/api/contacts/delete-api-contacts-v1properties-by-contact_property_id): DELETE /api/contacts/v1/properties/:contact_property_id
+- [Create Contact Channel](https://reloop.sh/docs/api/contacts/post-api-contacts-v1channels-create): POST /api/contacts/v1/channels/create
+- [List Contact Channels](https://reloop.sh/docs/api/contacts/get-api-contacts-v1channels-list): GET /api/contacts/v1/channels/list
+- [Get Contact Channel](https://reloop.sh/docs/api/contacts/get-api-contacts-v1channels-by-channel_id): GET /api/contacts/v1/channels/:channel_id
+- [Update Contact Channel](https://reloop.sh/docs/api/contacts/patch-api-contacts-v1channels-by-channel_id): PATCH /api/contacts/v1/channels/:channel_id
+- [Delete Contact Channel](https://reloop.sh/docs/api/contacts/delete-api-contacts-v1channels-by-channel_id): DELETE /api/contacts/v1/channels/:channel_id
 
 ### Mail API
-- [Send Email](https://docs.reloop.dev/docs/api/mail/post-api-mail-v1send): POST /api/mail/v1/send
-- [Get Attachment](https://docs.reloop.dev/docs/api/mail/get-api-mail-v1by-email-id-attachments-by-id): GET /api/mail/v1/:email_id/attachments/:id
-- [Track Click](https://docs.reloop.dev/docs/api/mail/get-api-mail-v1track-click-by-email-log-id): GET /api/mail/v1/track/click/:email_log_id
-- [Track Open](https://docs.reloop.dev/docs/api/mail/get-api-mail-v1track-open-by-email-log-id): GET /api/mail/v1/track/open/:email_log_id
+- [Send Email](https://reloop.sh/docs/api/mail/post-api-mail-v1send): POST /api/mail/v1/send
+- [Get Attachment](https://reloop.sh/docs/api/mail/get-api-mail-v1by-email-id-attachments-by-id): GET /api/mail/v1/:email_id/attachments/:id
+- [Track Click](https://reloop.sh/docs/api/mail/get-api-mail-v1track-click-by-email-log-id): GET /api/mail/v1/track/click/:email_log_id
+- [Track Open](https://reloop.sh/docs/api/mail/get-api-mail-v1track-open-by-email-log-id): GET /api/mail/v1/track/open/:email_log_id
 
 ### Logs API
-- [List Logs](https://docs.reloop.dev/docs/api/logs/get-api-logs-v1list): GET /api/logs/v1/list
-- [Get Log](https://docs.reloop.dev/docs/api/logs/get-api-logs-v1by-log_id): GET /api/logs/v1/:log_id
-- [List Email Logs](https://docs.reloop.dev/docs/api/logs/get-api-logs-v1emails): GET /api/logs/v1/emails
-- [Get Email Log](https://docs.reloop.dev/docs/api/logs/get-api-logs-v1emails-by-id): GET /api/logs/v1/emails/:id
-- [Get Email Stats](https://docs.reloop.dev/docs/api/logs/get-api-logs-v1emails-stats): GET /api/logs/v1/emails/stats
-- [Create Log](https://docs.reloop.dev/docs/api/logs/post-api-logs-v1create): POST /api/logs/v1/create
+- [List Logs](https://reloop.sh/docs/api/logs/get-api-logs-v1list): GET /api/logs/v1/list
+- [Get Log](https://reloop.sh/docs/api/logs/get-api-logs-v1by-log_id): GET /api/logs/v1/:log_id
+- [List Email Logs](https://reloop.sh/docs/api/logs/get-api-logs-v1emails): GET /api/logs/v1/emails
+- [Get Email Log](https://reloop.sh/docs/api/logs/get-api-logs-v1emails-by-id): GET /api/logs/v1/emails/:id
+- [Get Email Stats](https://reloop.sh/docs/api/logs/get-api-logs-v1emails-stats): GET /api/logs/v1/emails/stats
+- [Create Log](https://reloop.sh/docs/api/logs/post-api-logs-v1create): POST /api/logs/v1/create
 
 ### Upload API
-- [Upload File](https://docs.reloop.dev/docs/api/upload/post-api-upload-v1upload): POST /api/upload/v1/upload
-- [Delete File](https://docs.reloop.dev/docs/api/upload/delete-api-upload-v1files-by-file-id): DELETE /api/upload/v1/files/:file_id
+- [Upload File](https://reloop.sh/docs/api/upload/post-api-upload-v1upload): POST /api/upload/v1/upload
+- [Delete File](https://reloop.sh/docs/api/upload/delete-api-upload-v1files-by-file-id): DELETE /api/upload/v1/files/:file_id
 
 ### Template API
-- [Create Template](https://docs.reloop.dev/docs/api/template/post-api-template-v1create): POST /api/template/v1/create
-- [List Templates](https://docs.reloop.dev/docs/api/template/get-api-template-v1list): GET /api/template/v1/list
-- [Get Template](https://docs.reloop.dev/docs/api/template/get-api-template-v1by-id): GET /api/template/v1/:id
-- [Update Template](https://docs.reloop.dev/docs/api/template/put-api-template-v1by-id): PUT /api/template/v1/:id
-- [Delete Template](https://docs.reloop.dev/docs/api/template/delete-api-template-v1by-id): DELETE /api/template/v1/:id
-- [Duplicate Template](https://docs.reloop.dev/docs/api/template/post-api-template-v1by-id-duplicate): POST /api/template/v1/:id/duplicate
+- [Create Template](https://reloop.sh/docs/api/template/post-api-template-v1create): POST /api/template/v1/create
+- [List Templates](https://reloop.sh/docs/api/template/get-api-template-v1list): GET /api/template/v1/list
+- [Get Template](https://reloop.sh/docs/api/template/get-api-template-v1by-id): GET /api/template/v1/:id
+- [Update Template](https://reloop.sh/docs/api/template/put-api-template-v1by-id): PUT /api/template/v1/:id
+- [Delete Template](https://reloop.sh/docs/api/template/delete-api-template-v1by-id): DELETE /api/template/v1/:id
+- [Duplicate Template](https://reloop.sh/docs/api/template/post-api-template-v1by-id-duplicate): POST /api/template/v1/:id/duplicate
 
 ## Webhooks
 
-- [Introduction](https://docs.reloop.dev/docs/webhooks): How webhooks work, setup guide, retry schedule, and IP addresses
-- [Event Types](https://docs.reloop.dev/docs/webhooks/event-types): All supported webhook event types
-- [Retries and Replays](https://docs.reloop.dev/docs/webhooks/retries-and-replays): Retry schedule and manual replay
-- [Verify Webhook Requests](https://docs.reloop.dev/docs/webhooks/verify-webhooks-requests): Signature verification for webhook security
-- [Inbound Email Ingester](https://docs.reloop.dev/docs/webhooks/ingester): Receive incoming emails via webhooks
+- [Introduction](https://reloop.sh/docs/webhooks): How webhooks work, setup guide, retry schedule, and IP addresses
+- [Event Types](https://reloop.sh/docs/webhooks/event-types): All supported webhook event types
+- [Retries and Replays](https://reloop.sh/docs/webhooks/retries-and-replays): Retry schedule and manual replay
+- [Verify Webhook Requests](https://reloop.sh/docs/webhooks/verify-webhooks-requests): Signature verification for webhook security
+- [Inbound Email Ingester](https://reloop.sh/docs/webhooks/ingester): Receive incoming emails via webhooks
 
 ### Email Events
-- [email.bounced](https://docs.reloop.dev/docs/webhooks/emails/bounced): Triggered when an email bounces
-- [email.clicked](https://docs.reloop.dev/docs/webhooks/emails/clicked): Triggered when a link in an email is clicked
-- [email.complained](https://docs.reloop.dev/docs/webhooks/emails/complained): Triggered when a recipient marks email as spam
-- [email.delivered](https://docs.reloop.dev/docs/webhooks/emails/delivered): Triggered when email is delivered
-- [email.delivery_delayed](https://docs.reloop.dev/docs/webhooks/emails/delivery-delayed): Triggered when delivery is delayed
-- [email.failed](https://docs.reloop.dev/docs/webhooks/emails/failed): Triggered when email delivery fails
-- [email.opened](https://docs.reloop.dev/docs/webhooks/emails/opened): Triggered when an email is opened
-- [email.received](https://docs.reloop.dev/docs/webhooks/emails/received): Triggered when an inbound email is received
-- [email.scheduled](https://docs.reloop.dev/docs/webhooks/emails/scheduled): Triggered when an email is scheduled
-- [email.sent](https://docs.reloop.dev/docs/webhooks/emails/sent): Triggered when an email is sent
-- [email.suppressed](https://docs.reloop.dev/docs/webhooks/emails/suppressed): Triggered when email is suppressed
+- [email.bounced](https://reloop.sh/docs/webhooks/emails/bounced): Triggered when an email bounces
+- [email.clicked](https://reloop.sh/docs/webhooks/emails/clicked): Triggered when a link in an email is clicked
+- [email.complained](https://reloop.sh/docs/webhooks/emails/complained): Triggered when a recipient marks email as spam
+- [email.delivered](https://reloop.sh/docs/webhooks/emails/delivered): Triggered when email is delivered
+- [email.delivery_delayed](https://reloop.sh/docs/webhooks/emails/delivery-delayed): Triggered when delivery is delayed
+- [email.failed](https://reloop.sh/docs/webhooks/emails/failed): Triggered when email delivery fails
+- [email.opened](https://reloop.sh/docs/webhooks/emails/opened): Triggered when an email is opened
+- [email.received](https://reloop.sh/docs/webhooks/emails/received): Triggered when an inbound email is received
+- [email.scheduled](https://reloop.sh/docs/webhooks/emails/scheduled): Triggered when an email is scheduled
+- [email.sent](https://reloop.sh/docs/webhooks/emails/sent): Triggered when an email is sent
+- [email.suppressed](https://reloop.sh/docs/webhooks/emails/suppressed): Triggered when email is suppressed
 
 ### Domain Events
-- [domain.created](https://docs.reloop.dev/docs/webhooks/domains/created): Triggered when a domain is created
-- [domain.updated](https://docs.reloop.dev/docs/webhooks/domains/updated): Triggered when a domain is updated
-- [domain.deleted](https://docs.reloop.dev/docs/webhooks/domains/deleted): Triggered when a domain is deleted
+- [domain.created](https://reloop.sh/docs/webhooks/domains/created): Triggered when a domain is created
+- [domain.updated](https://reloop.sh/docs/webhooks/domains/updated): Triggered when a domain is updated
+- [domain.deleted](https://reloop.sh/docs/webhooks/domains/deleted): Triggered when a domain is deleted
 
 ### Contact Events
-- [contact.created](https://docs.reloop.dev/docs/webhooks/contacts/created): Triggered when a contact is created
-- [contact.updated](https://docs.reloop.dev/docs/webhooks/contacts/updated): Triggered when a contact is updated
-- [contact.deleted](https://docs.reloop.dev/docs/webhooks/contacts/deleted): Triggered when a contact is deleted
+- [contact.created](https://reloop.sh/docs/webhooks/contacts/created): Triggered when a contact is created
+- [contact.updated](https://reloop.sh/docs/webhooks/contacts/updated): Triggered when a contact is updated
+- [contact.deleted](https://reloop.sh/docs/webhooks/contacts/deleted): Triggered when a contact is deleted
 
 ## Build with AI
 
-- [AI Onboarding](https://docs.reloop.dev/docs/integrations): Everything you need to onboard your AI agent to Reloop
-- [MCP Server](https://docs.reloop.dev/docs/integrations/mcp-server): Give AI agents access to Reloop via Model Context Protocol
-- [CLI for Agents](https://docs.reloop.dev/docs/integrations/cli-agents): Command-line tool optimized for AI agent workflows
-- [OpenClaw Guide](https://docs.reloop.dev/docs/integrations/openclaw-guide): Build autonomous email agents with OpenClaw
-- [Reloop Skill](https://docs.reloop.dev/docs/integrations/reloop-skill): Agent skill for sending emails through Reloop
-- [Email Best Practices Skill](https://docs.reloop.dev/docs/integrations/email-best-practices): Agent skill for production-ready email guidelines
-- [Agent Email Inbox](https://docs.reloop.dev/docs/integrations/agent-email-inbox): Give your AI agent its own email inbox
+- [AI Onboarding](https://reloop.sh/docs/integrations): Everything you need to onboard your AI agent to Reloop
+- [MCP Server](https://reloop.sh/docs/integrations/mcp-server): Give AI agents access to Reloop via Model Context Protocol
+- [CLI for Agents](https://reloop.sh/docs/integrations/cli-agents): Command-line tool optimized for AI agent workflows
+- [OpenClaw Guide](https://reloop.sh/docs/integrations/openclaw-guide): Build autonomous email agents with OpenClaw
+- [Reloop Skill](https://reloop.sh/docs/integrations/reloop-skill): Agent skill for sending emails through Reloop
+- [Email Best Practices Skill](https://reloop.sh/docs/integrations/email-best-practices): Agent skill for production-ready email guidelines
+- [Agent Email Inbox](https://reloop.sh/docs/integrations/agent-email-inbox): Give your AI agent its own email inbox
 
 ## No-Code & Automation
 
-- [n8n Integration](https://docs.reloop.dev/docs/integrations/n8n): Guide on connecting n8n workflows with Reloop SMTP or API
-- [Make.com Integration](https://docs.reloop.dev/docs/integrations/make): Integrate Reloop email sending into Make scenarios
-- [Zapier Integration](https://docs.reloop.dev/docs/integrations/zapier): Connect Reloop with thousands of apps via Zapier Zaps
-- [WordPress Integration](https://docs.reloop.dev/docs/integrations/wordpress): Route WordPress site emails through Reloop SMTP
-- [Ghost CMS Integration](https://docs.reloop.dev/docs/integrations/ghost): Configure Ghost CMS to send newsletter signups and transactional emails
-- [Strapi Integration](https://docs.reloop.dev/docs/integrations/strapi): Configure the Strapi headless CMS to send emails via Reloop SMTP
-- [Directus Integration](https://docs.reloop.dev/docs/integrations/directus): Configure Directus CMS via environment variables to send system emails
-- [Supabase Integration](https://docs.reloop.dev/docs/knowledge-base/supabase-quickstart): Configure Supabase authentication and database emails via Reloop SMTP
+- [n8n Integration](https://reloop.sh/docs/integrations/n8n): Guide on connecting n8n workflows with Reloop SMTP or API
+- [Make.com Integration](https://reloop.sh/docs/integrations/make): Integrate Reloop email sending into Make scenarios
+- [Zapier Integration](https://reloop.sh/docs/integrations/zapier): Connect Reloop with thousands of apps via Zapier Zaps
+- [WordPress Integration](https://reloop.sh/docs/integrations/wordpress): Route WordPress site emails through Reloop SMTP
+- [Ghost CMS Integration](https://reloop.sh/docs/integrations/ghost): Configure Ghost CMS to send newsletter signups and transactional emails
+- [Strapi Integration](https://reloop.sh/docs/integrations/strapi): Configure the Strapi headless CMS to send emails via Reloop SMTP
+- [Directus Integration](https://reloop.sh/docs/integrations/directus): Configure Directus CMS via environment variables to send system emails
+- [Supabase Integration](https://reloop.sh/docs/knowledge-base/supabase-quickstart): Configure Supabase authentication and database emails via Reloop SMTP
 
 ## Cloud & Hosting Platforms
 
-- [Vercel Integration](https://docs.reloop.dev/docs/integrations/vercel): Deploy frontend applications and route transactional emails
-- [Railway Integration](https://docs.reloop.dev/docs/integrations/railway): Host your Reloop instance or run your backends
-- [Cloudflare Integration](https://docs.reloop.dev/docs/integrations/cloudflare): Deliver emails globally using Cloudflare Workers and Pages
-- [Netlify Integration](https://docs.reloop.dev/docs/integrations/netlify): Connect your Netlify builds and serverless functions
-- [Docker Integration](https://docs.reloop.dev/docs/integrations/docker): Run Reloop services locally or in production containers
-- [Coolify Integration](https://docs.reloop.dev/docs/integrations/coolify): Self-host Reloop with simple open-source PaaS integrations
+- [Vercel Integration](https://reloop.sh/docs/integrations/vercel): Deploy frontend applications and route transactional emails
+- [Railway Integration](https://reloop.sh/docs/integrations/railway): Host your Reloop instance or run your backends
+- [Cloudflare Integration](https://reloop.sh/docs/integrations/cloudflare): Deliver emails globally using Cloudflare Workers and Pages
+- [Netlify Integration](https://reloop.sh/docs/integrations/netlify): Connect your Netlify builds and serverless functions
+- [Docker Integration](https://reloop.sh/docs/integrations/docker): Run Reloop services locally or in production containers
+- [Coolify Integration](https://reloop.sh/docs/integrations/coolify): Self-host Reloop with simple open-source PaaS integrations
 
 ## AI App Builders & Tools
 
-- [Lovable Integration](https://docs.reloop.dev/docs/integrations/lovable): Build full-stack apps with natural language using Reloop SMTP or REST APIs
-- [Bolt.new Integration](https://docs.reloop.dev/docs/integrations/bolt): Integrate Reloop into full-stack web applications generated in the browser
-- [v0 Integration](https://docs.reloop.dev/docs/integrations/v0): Integrate Reloop email templates and APIs into AI-generated React/Next.js components
-- [Replit Integration](https://docs.reloop.dev/docs/integrations/replit): Deploy Reloop-integrated apps and agent inboxes instantly on Replit Repls
-- [Cursor Integration](https://docs.reloop.dev/docs/integrations/cursor): Use Cursor composer or chat with Reloop's MCP server and agent-ready docs
-- [Windsurf Integration](https://docs.reloop.dev/docs/integrations/windsurf): Code alongside the Windsurf agent with full monorepo and API context
+- [Lovable Integration](https://reloop.sh/docs/integrations/lovable): Build full-stack apps with natural language using Reloop SMTP or REST APIs
+- [Bolt.new Integration](https://reloop.sh/docs/integrations/bolt): Integrate Reloop into full-stack web applications generated in the browser
+- [v0 Integration](https://reloop.sh/docs/integrations/v0): Integrate Reloop email templates and APIs into AI-generated React/Next.js components
+- [Replit Integration](https://reloop.sh/docs/integrations/replit): Deploy Reloop-integrated apps and agent inboxes instantly on Replit Repls
+- [Cursor Integration](https://reloop.sh/docs/integrations/cursor): Use Cursor composer or chat with Reloop's MCP server and agent-ready docs
+- [Windsurf Integration](https://reloop.sh/docs/integrations/windsurf): Code alongside the Windsurf agent with full monorepo and API context
 
 ## Resources
 
-- [Examples](https://docs.reloop.dev/docs/resources/examples): Code examples and sample projects
-- [MCP Server](https://docs.reloop.dev/docs/resources/mcp-server): Model Context Protocol server for Reloop
-- [Security](https://docs.reloop.dev/docs/resources/security): Security best practices and guidelines
-- [Storing Webhooks Data](https://docs.reloop.dev/docs/resources/storing-webhooks-data): Best practices for storing webhook event data
+- [Examples](https://reloop.sh/docs/resources/examples): Code examples and sample projects
+- [MCP Server](https://reloop.sh/docs/resources/mcp-server): Model Context Protocol server for Reloop
+- [Security](https://reloop.sh/docs/resources/security): Security best practices and guidelines
+- [Storing Webhooks Data](https://reloop.sh/docs/resources/storing-webhooks-data): Best practices for storing webhook event data
 
 ## Optional
 
-- [Knowledge Base](https://docs.reloop.dev/docs/knowledge-base): FAQs, troubleshooting guides, and how-to articles
+- [Knowledge Base](https://reloop.sh/docs/knowledge-base): FAQs, troubleshooting guides, and how-to articles
 - [Dashboard](https://app.reloop.dev): Reloop Dashboard for managing your account
