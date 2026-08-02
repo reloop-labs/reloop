@@ -42,12 +42,12 @@ faq:
     ---
     ## Edit an API key
 
-    Currently, only the **name** of an API key can be edited. The API key secret itself cannot be changed — if you need a new secret, [rotate the key](#rotate-an-api-key) instead.
+    Currently, only the **name** of an API key can be edited. The API key secret itself cannot be changed. If you need a new secret, [rotate the key](#rotate-an-api-key) instead.
 
     1. Go to [API Keys](https://reloop.sh/dashboard/api-keys)
     2. Click the row menu (**···**) next to the key you want to rename
-    3. Select **Edit**
-    4. Update the key name and click **Save**
+    3. Select **Edit Api Key**
+    4. Update the key name and click **Save changes** (or press `Enter`)
     <Video src="/docs/images/docs/api-keys/edit-api-key.mp4" autoPlay loop muted playsInline />
 
     ---
@@ -75,23 +75,16 @@ faq:
 
     ## Delete an API key
 
-    <Video src="/docs/images/docs/api-keys/delete-api-key.mp4" autoPlay loop muted playsInline />
+    <Info>
+    If an API Key hasn't been used in the last 30 days, consider deleting it to keep your account secure.
+    </Info>
 
     1. Open [API Keys](https://reloop.sh/dashboard/api-keys)
     2. Click the row menu (**···**) → **Delete API Key**
     3. Enter the key name to confirm permanent removal
-    4. Click **Delete API Key**
+    4. Click **Delete API Key** (or press `Enter`)
 
-    ---
-
-    ## Search, filter, and audit API keys
-
-    ![Search and filter API keys in the Reloop dashboard](/docs/images/docs/api-keys/search-filter-api-key.gif)
-
-    - **Search by prefix or name**: Quickly find keys using the search bar (e.g. `rl_prod_` or `Production`).
-    - **Filter by Status**: Filter by **All Status**, **Active**, or **Disabled** to identify inactive or paused keys.
-    - **Filter by Creator**: Filter by **All Users** or specific team members to inspect who created each key.
-    - **Audit Activity**: Check the **Last Used** column to track recent API or SMTP activity per key.
+    <Video src="/docs/images/docs/api-keys/delete-api-key.mp4" autoPlay loop muted playsInline />
   </Tab>
   <Tab title="Code" icon="code">
     ## Create an API key
