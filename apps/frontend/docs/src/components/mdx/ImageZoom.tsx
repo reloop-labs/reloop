@@ -102,7 +102,7 @@ export function MDXVideo({ src, children, className, ...props }: any) {
 		<Dialog.Root open={isOpen} onOpenChange={setIsOpen}>
 			<span
 				onClick={() => setIsOpen(true)}
-				className="group relative my-6 inline-block w-full cursor-zoom-in overflow-hidden rounded-xl border border-stroke-soft-100 dark:border-stroke-soft-100/50"
+				className="group relative my-6 inline-block w-full cursor-zoom-in overflow-hidden rounded-2xl border border-stroke-soft-100 dark:border-stroke-soft-100/50"
 			>
 				<video
 					src={videoSrc}
