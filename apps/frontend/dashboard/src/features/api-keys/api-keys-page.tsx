@@ -24,7 +24,13 @@ export function ApiKeysPage() {
 				id: "open-api-reference",
 				label: "Open API Reference",
 				icon: "code",
-				onSelect: () => window.open(API_REFERENCE_URL, "_blank"),
+				shortcut: { label: "S", keys: ["s"] },
+				onSelect: () =>
+					window.dispatchEvent(
+						new CustomEvent("api-details:open", {
+							detail: { docSection: "api-key" },
+						}),
+					),
 			},
 			{
 				id: "go-to-docs",

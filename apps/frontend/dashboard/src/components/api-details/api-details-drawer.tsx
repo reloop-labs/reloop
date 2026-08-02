@@ -232,6 +232,19 @@ export const ApiDetailsDrawer = ({
 		});
 	}
 
+	useEffect(() => {
+		const handleOpenEvent = (e: Event) => {
+			const customEvent = e as CustomEvent<{ docSection?: string }>;
+			if (!customEvent.detail?.docSection || customEvent.detail.docSection === docSection) {
+				setIsOpen(true);
+			}
+		};
+		window.addEventListener("api-details:open", handleOpenEvent);
+		return () => {
+			window.removeEventListener("api-details:open", handleOpenEvent);
+		};
+	}, [docSection]);
+
 	const highlightedTabIndex =
 		hoveredTabIdx !== undefined ? hoveredTabIdx : activeTabIndex;
 	const highlightedBrandColor =
