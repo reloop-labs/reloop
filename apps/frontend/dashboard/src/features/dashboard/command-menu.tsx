@@ -326,8 +326,8 @@ export function CommandMenuGlobal() {
 				</CommandMenu.Group>
 			</CommandMenu.List>
 
-			<CommandMenu.Footer>
-				<div className="flex items-center justify-end gap-4">
+			<CommandMenu.Footer className="justify-end">
+				<div className="ml-auto flex items-center gap-4">
 					<div className="flex items-center gap-1.5">
 						<CommandMenu.FooterKeyBox>
 							<ArrowUp className="size-3" />

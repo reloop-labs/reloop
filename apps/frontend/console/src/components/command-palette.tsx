@@ -333,7 +333,15 @@ export function CommandPalette() {
 				</CommandMenu.List>
 
 				<CommandMenu.Footer>
-					<div className="flex items-center gap-3 text-[11px] text-text-soft-400">
+					<span
+						className={cn(
+							"text-[11px] text-text-soft-400",
+							loading && "animate-pulse",
+						)}
+					>
+						{showEntitySearch ? "Platform search" : "Jump anywhere"}
+					</span>
+					<div className="ml-auto flex items-center gap-3 text-[11px] text-text-soft-400">
 						<span className="inline-flex items-center gap-1">
 							<CommandMenu.FooterKeyBox>
 								<ArrowUp className="h-3 w-3" />
@@ -356,14 +364,6 @@ export function CommandPalette() {
 							close
 						</span>
 					</div>
-					<span
-						className={cn(
-							"text-[11px] text-text-soft-400",
-							loading && "animate-pulse",
-						)}
-					>
-						{showEntitySearch ? "Platform search" : "Jump anywhere"}
-					</span>
 				</CommandMenu.Footer>
 			</CommandMenu.Dialog>
 		</>

@@ -105,7 +105,7 @@ CommandGroup.displayName = "CommandGroup";
 
 const commandItemVariants = tv({
 	base: [
-		"flex items-center gap-2.5 rounded-lg bg-transparent",
+		"flex items-center gap-2.5 rounded-xl bg-transparent",
 		"cursor-pointer text-paragraph-sm font-normal text-text-strong-950",
 		"transition-all duration-150 ease-out",
 		// hover/selected pill background
