@@ -19,46 +19,36 @@ faq:
 
 <Tabs>
   <Tab title="Desktop" icon="monitor">
-    ## API keys List view
+    ## View all API Keys
 
-    Open the UI any time: [API Keys](https://reloop.sh/dashboard/api-keys)
+    The [API Keys Dashboard](https://reloop.sh/dashboard/api-keys) shows you all the API Keys you have created along with their details, including the last time you used an API Key.
 
     ![API Keys list in the Reloop dashboard](/docs/images/docs/api-keys/list-api-key.png)
 
+    ---
 
     ## Create an API key
-
-    <Video src="/docs/images/docs/api-keys/create-api-key.mp4" autoPlay loop muted playsInline />
-
     1. Go to [API Keys](https://reloop.sh/dashboard/api-keys)
-    2. Click **Create API key** (or press `⌘/Ctrl+A`)
+    2. Click **Create API key** (or press `C`)
     3. Enter a descriptive name (e.g., `Production Server` or `Staging Worker`)
     4. Click **Create API Key**
-    5. Copy the secret key (or switch to the **.env** tab for a ready-to-paste snippet), then click **Done**
+    5. Copy the secret key, then click **Cancel**
 
     <Warning>
     Copy the secret key immediately upon creation. Reloop stores a secure hash, so the full secret can never be retrieved again after closing the dialog.
     </Warning>
+    <Video src="/docs/images/docs/api-keys/create-api-key.mp4" autoPlay loop muted playsInline />
 
     ---
+    ## Edit an API key
 
-    ## Use an API key
+    Currently, only the **name** of an API key can be edited. The API key secret itself cannot be changed — if you need a new secret, [rotate the key](#rotate-an-api-key) instead.
 
-    Inspect key details, prefix, request count, status, and request activity logs:
-
-    ![API key details and usage in the Reloop dashboard](/docs/images/docs/api-keys/key-details.png)
-
-    Store your secret in your environment file (`.env` or secret manager) and reference it in your application code.
-
-    ---
-
-    ## Edit or rename an API key
-
-    <Video src="/docs/images/docs/api-keys/edit-api-key.mp4" autoPlay loop muted playsInline />
     1. Go to [API Keys](https://reloop.sh/dashboard/api-keys)
     2. Click the row menu (**···**) next to the key you want to rename
     3. Select **Edit**
-    4. Update the key name and save changes
+    4. Update the key name and click **Save**
+    <Video src="/docs/images/docs/api-keys/edit-api-key.mp4" autoPlay loop muted playsInline />
 
     ---
 
