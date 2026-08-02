@@ -17,28 +17,18 @@ faq:
     answer: Disable or delete the key immediately from the dashboard or API. Create a replacement key, update your application secrets, and delete the compromised key.
 ---
 
-API keys connect your applications to Reloop. You can create, inspect, edit, rotate, disable, and delete them in the **dashboard** or with **code** — both provide full control over your organization's credentials.
-
-Open the UI any time: [API Keys](https://reloop.sh/dashboard/api-keys)
-
-![API Keys list in the Reloop dashboard](/docs/images/docs/api-keys/list.png)
-
-## Two ways, same keys
-
-| Task | Dashboard | Code |
-|------|-----------|------|
-| **Create** | Click **Create API key** | `reloop.apiKey.create` / cURL |
-| **Edit / Rename** | Row menu → **Edit** | `reloop.apiKey.update` / cURL |
-| **Rotate** | Row menu → **Rotate Key** | `reloop.apiKey.rotate` / cURL |
-| **Disable / Enable** | Row menu → **Disable** / **Enable** | `reloop.apiKey.disable` / cURL |
-| **Delete** | Row menu → **Delete API Key** | `reloop.apiKey.delete` / cURL |
-
----
-
-## How do I create an API key?
-
 <Tabs>
   <Tab title="Desktop" icon="monitor">
+    ## API keys overview
+
+    Open the UI any time: [API Keys](https://reloop.sh/dashboard/api-keys)
+
+    ![API Keys list in the Reloop dashboard](/docs/images/docs/api-keys/list.png)
+
+    ---
+
+    ## Create an API key
+
     ![Create an API key in the Reloop dashboard](/docs/images/docs/api-keys/create-api-key.gif)
 
     1. Go to [API Keys](https://reloop.sh/dashboard/api-keys)
@@ -46,8 +36,78 @@ Open the UI any time: [API Keys](https://reloop.sh/dashboard/api-keys)
     3. Enter a descriptive name (e.g., `Production Server` or `Staging Worker`)
     4. Click **Create API Key**
     5. Copy the secret key (or switch to the **.env** tab for a ready-to-paste snippet), then click **Done**
+
+    <Warning>
+    Copy the secret key immediately upon creation. Reloop stores a secure hash, so the full secret can never be retrieved again after closing the dialog.
+    </Warning>
+
+    ---
+
+    ## Use an API key
+
+    Inspect key details, prefix, request count, status, and request activity logs:
+
+    ![API key details and usage in the Reloop dashboard](/docs/images/docs/api-keys/key-details.png)
+
+    Store your secret in your environment file (`.env` or secret manager) and reference it in your application code.
+
+    ---
+
+    ## Edit or rename an API key
+
+    ![Edit an API key in the Reloop dashboard](/docs/images/docs/api-keys/edit-api-key.gif)
+
+    1. Go to [API Keys](https://reloop.sh/dashboard/api-keys)
+    2. Click the row menu (**···**) next to the key you want to rename
+    3. Select **Edit**
+    4. Update the key name and save changes
+
+    ---
+
+    ## Rotate an API key
+
+    ![Rotate an API key in the Reloop dashboard](/docs/images/docs/api-keys/rotate-api-key.gif)
+
+    1. Open [API Keys](https://reloop.sh/dashboard/api-keys)
+    2. Click the row menu (**···**) → **Rotate Key**
+    3. Confirm rotation — the previous secret stops working immediately
+    4. Copy the new secret string and deploy it to your servers
+
+    ---
+
+    ## Disable or enable an API key
+
+    ![Disable or enable an API key in the Reloop dashboard](/docs/images/docs/api-keys/disable-api-key.gif)
+
+    1. Open [API Keys](https://reloop.sh/dashboard/api-keys)
+    2. Click the row menu (**···**) → **Disable** (or **Enable** if already paused)
+    3. The key status updates instantly to **Disabled**
+
+    ---
+
+    ## Delete an API key
+
+    ![Delete an API key in the Reloop dashboard](/docs/images/docs/api-keys/delete-api-key.gif)
+
+    1. Open [API Keys](https://reloop.sh/dashboard/api-keys)
+    2. Click the row menu (**···**) → **Delete API Key**
+    3. Enter the key name to confirm permanent removal
+    4. Click **Delete API Key**
+
+    ---
+
+    ## Search, filter, and audit API keys
+
+    ![Search and filter API keys in the Reloop dashboard](/docs/images/docs/api-keys/search-filter-api-key.gif)
+
+    - **Search by prefix or name**: Quickly find keys using the search bar (e.g. `rl_prod_` or `Production`).
+    - **Filter by Status**: Filter by **All Status**, **Active**, or **Disabled** to identify inactive or paused keys.
+    - **Filter by Creator**: Filter by **All Users** or specific team members to inspect who created each key.
+    - **Audit Activity**: Check the **Last Used** column to track recent API or SMTP activity per key.
   </Tab>
   <Tab title="Code" icon="code">
+    ## Create an API key
+
     Use an existing API key to programmatically create new keys for services or team members.
 
     ```javascript
@@ -69,28 +129,17 @@ Open the UI any time: [API Keys](https://reloop.sh/dashboard/api-keys)
       -H "Content-Type: application/json" \
       -d '{"name": "Production Server"}'
     ```
-  </Tab>
-</Tabs>
 
-<Warning>
-Copy the secret key immediately upon creation. Reloop stores a secure hash, so the full secret can never be retrieved again after closing the dialog.
-</Warning>
+    <Warning>
+    Copy the secret key immediately upon creation. Reloop stores a secure hash, so the full secret can never be retrieved again.
+    </Warning>
 
----
+    ---
 
-## How do I use an API key?
+    ## Use an API key
 
-Store the secret key in your environment variables or secret manager, then pass it on every HTTP request as the `x-api-key` header, or initialize the Reloop SDK.
+    Store the secret key in your environment variables or secret manager, then pass it on every HTTP request as the `x-api-key` header, or initialize the Reloop SDK.
 
-<Tabs>
-  <Tab title="Desktop" icon="monitor">
-    Inspect key details, prefix, request count, status, and request activity logs:
-
-    ![API key details and usage in the Reloop dashboard](/docs/images/docs/api-keys/key-details.png)
-
-    Store your secret in your environment file (`.env` or secret manager) and reference it in your application code.
-  </Tab>
-  <Tab title="Code" icon="code">
     ```env
     RELOOP_API_KEY=rl_prod_YOUR_API_KEY
     ```
@@ -105,25 +154,11 @@ Store the secret key in your environment variables or secret manager, then pass 
 
     const reloop = new Reloop({ apiKey: process.env.RELOOP_API_KEY });
     ```
-  </Tab>
-</Tabs>
 
----
+    ---
 
-## How do I edit or rename an API key?
+    ## Edit or rename an API key
 
-Rename API keys to reflect changing usage, new microservices, or owner changes without invalidating the secret or interrupting service.
-
-<Tabs>
-  <Tab title="Desktop" icon="monitor">
-    ![Edit an API key in the Reloop dashboard](/docs/images/docs/api-keys/edit-api-key.gif)
-
-    1. Go to [API Keys](https://reloop.sh/dashboard/api-keys)
-    2. Click the row menu (**···**) next to the key you want to rename
-    3. Select **Edit**
-    4. Update the key name and save changes
-  </Tab>
-  <Tab title="Code" icon="code">
     ```javascript
     import { Reloop } from "reloop-email";
 
@@ -141,31 +176,11 @@ Rename API keys to reflect changing usage, new microservices, or owner changes w
       -H "Content-Type: application/json" \
       -d '{"name": "Updated Background Worker"}'
     ```
-  </Tab>
-</Tabs>
 
----
+    ---
 
-## How do I rotate an API key?
+    ## Rotate an API key
 
-Key rotation revokes the active secret string immediately and generates a fresh secret string for the exact same key record. Use rotation for scheduled security maintenance or routine credential updates.
-
-| Step | Action |
-|------|--------|
-| **1. Trigger Rotation** | Select **Rotate Key** from the row menu (or API) |
-| **2. Copy New Secret** | Immediately copy the new secret string from the modal |
-| **3. Update Applications** | Update your server `.env` files or secret manager |
-
-<Tabs>
-  <Tab title="Desktop" icon="monitor">
-    ![Rotate an API key in the Reloop dashboard](/docs/images/docs/api-keys/rotate-api-key.gif)
-
-    1. Open [API Keys](https://reloop.sh/dashboard/api-keys)
-    2. Click the row menu (**···**) → **Rotate Key**
-    3. Confirm rotation — the previous secret stops working immediately
-    4. Copy the new secret string and deploy it to your servers
-  </Tab>
-  <Tab title="Code" icon="code">
     ```javascript
     import { Reloop } from "reloop-email";
 
@@ -180,24 +195,11 @@ Key rotation revokes the active secret string immediately and generates a fresh 
     curl -X POST https://reloop.sh/api/api-key/v1/rotate/key_123456789 \
       -H "x-api-key: $RELOOP_API_KEY"
     ```
-  </Tab>
-</Tabs>
 
----
+    ---
 
-## How do I disable or enable an API key?
+    ## Disable or enable an API key
 
-Disable a key to temporarily block API and SMTP requests without deleting the key record. Re-enable it whenever you are ready to restore access.
-
-<Tabs>
-  <Tab title="Desktop" icon="monitor">
-    ![Disable or enable an API key in the Reloop dashboard](/docs/images/docs/api-keys/disable-api-key.gif)
-
-    1. Open [API Keys](https://reloop.sh/dashboard/api-keys)
-    2. Click the row menu (**···**) → **Disable** (or **Enable** if already paused)
-    3. The key status updates instantly to **Disabled**
-  </Tab>
-  <Tab title="Code" icon="code">
     ```javascript
     import { Reloop } from "reloop-email";
 
@@ -220,25 +222,11 @@ Disable a key to temporarily block API and SMTP requests without deleting the ke
     curl -X POST https://reloop.sh/api/api-key/v1/enable/key_123456789 \
       -H "x-api-key: $RELOOP_API_KEY"
     ```
-  </Tab>
-</Tabs>
 
----
+    ---
 
-## How do I delete an API key?
+    ## Delete an API key
 
-Deleting an API key permanently revokes authentication. Any application using the deleted key will fail with a `401 Unauthorized` response.
-
-<Tabs>
-  <Tab title="Desktop" icon="monitor">
-    ![Delete an API key in the Reloop dashboard](/docs/images/docs/api-keys/delete-api-key.gif)
-
-    1. Open [API Keys](https://reloop.sh/dashboard/api-keys)
-    2. Click the row menu (**···**) → **Delete API Key**
-    3. Enter the key name to confirm permanent removal
-    4. Click **Delete API Key**
-  </Tab>
-  <Tab title="Code" icon="code">
     ```javascript
     import { Reloop } from "reloop-email";
 
@@ -257,50 +245,11 @@ Deleting an API key permanently revokes authentication. Any application using th
 
 ---
 
-## How do I search, filter, and audit API keys?
-
-The API Keys table provides real-time audit visibility for all organization credentials.
-
-<Tabs>
-  <Tab title="Desktop" icon="monitor">
-    ![Search and filter API keys in the Reloop dashboard](/docs/images/docs/api-keys/search-filter-api-key.gif)
-
-    - **Search by prefix or name**: Quickly find keys using the search bar (e.g. `rl_prod_` or `Production`).
-    - **Filter by Status**: Filter by **All Status**, **Active**, or **Disabled** to identify inactive or paused keys.
-    - **Filter by Creator**: Filter by **All Users** or specific team members to inspect who created each key.
-    - **Audit Activity**: Check the **Last Used** column to track recent API or SMTP activity per key.
-  </Tab>
-</Tabs>
-
----
-
-## Security & Best Practices
-
-### Key Hygiene
-
-| Do | Don’t |
-|----|--------|
-| Store `RELOOP_API_KEY` in environment variables | Hardcode API key secrets in source code |
-| Create unique keys for each application/environment | Reuse one API key across staging and production |
-| Use descriptive names (`Prod-Mailer`, `CI-Tester`) | Use ambiguous names (`Key 1`, `Test`) |
-| Periodically rotate long-lived secrets | Keep unrotated production keys indefinitely |
-
-### Leaked Key Incident Response
-
-If a secret key is exposed in a public repository or client log:
-
-1. **Disable the key immediately** from the dashboard or API to halt unauthorized requests.
-2. **Create a new replacement key** (or rotate the secret).
-3. **Update your production applications** with the new secret key.
-4. **Delete the leaked key** once confirmed no legitimate traffic is using it.
-
----
-
 ## FAQ
 
 ### Can I view a full API key secret again after closing the modal?
 
-No. Reloop displays the full secret key string only once when created or rotated. After closing the modal, only the prefix (e.g. `rl_prod_17aQUCC-e`) is visible. Reloop stores a secure hash, so if a secret is lost, you must [rotate](#how-do-i-rotate-an-api-key) the key or create a new one.
+No. Reloop displays the full secret key string only once when created or rotated. After closing the modal, only the prefix (e.g. `rl_prod_17aQUCC-e`) is visible. Reloop stores a secure hash, so if a secret is lost, you must rotate the key or create a new one.
 
 ### What is the difference between disabling and deleting an API key?
 
@@ -359,4 +308,3 @@ Reloop does not enforce a hard limit on total API keys per organization. However
 </CardGroup>
 
 [Full API Key Endpoints Reference](/docs/api/api-key)
-

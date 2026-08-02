@@ -8,9 +8,11 @@ import {
 } from "@reloop/fe-docs/lib/use-docs-view-mode";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
+import { KbdKey } from "@reloop/ui/kbd-key";
 import * as TabMenuHorizontal from "@reloop/ui/tab-menu-horizontal";
 import { AnimatePresence, motion } from "framer-motion";
 import React, { useRef, useState } from "react";
+import { useHotkeys } from "react-hotkeys-hook";
 
 export type TabProps = {
 	title: string;
@@ -30,10 +32,25 @@ function slugify(title: string): string {
 		.replace(/\s+/g, "-");
 }
 
+const TAB_SHORTCUTS: Record<string, string> = {
+	desktop: "d",
+	dashboard: "d",
+	code: "c",
+};
+
+const shortcutKbdClassName = cn(
+	"h-4 w-4 min-w-4 rounded-[5px] px-0 text-[10px] leading-none",
+	"border border-stroke-soft-200 bg-bg-weak-50 text-text-sub-600",
+	"shadow-[0_1.5px_0_0_var(--color-stroke-soft-200)]",
+	"dark:border-white/[0.14] dark:bg-white/[0.07] dark:text-white",
+	"dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.55),0_0_0_0.5px_rgba(255,255,255,0.06),inset_0_0.5px_0_0_rgba(255,255,255,0.08)]",
+);
+
 type TabItem = {
 	value: string;
 	title: string;
 	icon?: string;
+	shortcut?: string;
 	content: React.ReactNode;
 };
 
@@ -56,6 +73,7 @@ function collectTabItems(children: React.ReactNode): TabItem[] {
 			value,
 			title: props.title,
 			icon: props.icon,
+			shortcut: TAB_SHORTCUTS[value],
 			content: props.children,
 		});
 	});
@@ -75,6 +93,27 @@ function TabsShell({
 	const [hoveredIdx, setHoveredIdx] = useState<number | undefined>(undefined);
 	const buttonRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
+	// Keyboard shortcuts: press D for Desktop, C for Code
+	const shortcutKeys = items
+		.filter((item) => item.shortcut)
+		.map((item) => item.shortcut)
+		.join(",");
+
+	useHotkeys(
+		shortcutKeys || "!",
+		(e, handler) => {
+			const pressed = (handler.keys ?? []).join("");
+			const match = items.find(
+				(item) => item.shortcut?.toLowerCase() === pressed,
+			);
+			if (match) {
+				e.preventDefault();
+				onValueChange(match.value);
+			}
+		},
+		{ enabled: shortcutKeys.length > 0, enableOnFormTags: false, preventDefault: true },
+	);
+
 	const firstItem = items[0];
 	if (!firstItem) return null;
 
@@ -92,8 +131,8 @@ function TabsShell({
 			onValueChange={onValueChange}
 			className="my-6"
 		>
-			<TabMenuHorizontal.List className="relative h-10 gap-0 border-b! py-0">
-				{items.map(({ value: itemValue, title, icon }, index) => (
+			<TabMenuHorizontal.List className="relative h-12 gap-0 border-b! py-0">
+				{items.map(({ value: itemValue, title, icon, shortcut }, index) => (
 					<TabMenuHorizontal.Trigger
 						ref={(el) => {
 							buttonRefs.current[index] = el;
@@ -111,36 +150,41 @@ function TabsShell({
 					>
 						{icon ? <Icon name={icon} className="h-4 w-4" /> : null}
 						{title}
+						{shortcut ? (
+							<KbdKey className={cn(shortcutKbdClassName, "ml-1 hidden sm:flex")}>
+								{shortcut.toUpperCase()}
+							</KbdKey>
+						) : null}
 					</TabMenuHorizontal.Trigger>
 				))}
 				<AnimatePresence>
 					{rect && activeIndex !== -1 ? (
 						<motion.div
-							className="absolute top-0 left-0 rounded-lg bg-neutral-alpha-10"
+							className="absolute top-0 left-0 rounded-xl bg-neutral-alpha-10"
 							initial={{
 								pointerEvents: "none",
 								width: rect.width,
-								height: rect.height - 20,
+								height: rect.height - 12,
 								left:
 									rect.left -
 									(tab?.offsetParent?.getBoundingClientRect().left || 0),
 								top:
 									rect.top -
 									(tab?.offsetParent?.getBoundingClientRect().top || 0) +
-									10,
+									6,
 								opacity: 0,
 							}}
 							animate={{
 								pointerEvents: "none",
 								width: rect.width,
-								height: rect.height - 20,
+								height: rect.height - 12,
 								left:
 									rect.left -
 									(tab?.offsetParent?.getBoundingClientRect().left || 0),
 								top:
 									rect.top -
 									(tab?.offsetParent?.getBoundingClientRect().top || 0) +
-									10,
+									6,
 								opacity: 1,
 							}}
 							exit={{ opacity: 0 }}

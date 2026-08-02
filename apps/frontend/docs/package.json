@@ -39,6 +39,7 @@
 		"nuqs": "catalog:ui",
 		"react": "catalog:ui",
 		"react-dom": "catalog:ui",
+		"react-hotkeys-hook": "catalog:ui",
 		"remark-gfm": "^4.0.1",
 		"simple-icons": "catalog:ui",
 		"tailwind-merge": "catalog:ui",
