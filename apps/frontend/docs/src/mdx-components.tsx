@@ -85,7 +85,7 @@ export function getMDXComponents(
 			</h3>
 		),
 		img: MDXImage,
-		video: MDXVideo,
+		Video: MDXVideo,
 		...restComponents,
 		Card: ({ icon, href, children, ...props }: any) => {
 			const finalHref =
