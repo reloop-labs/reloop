@@ -52,7 +52,7 @@ print(result.channel["id"], result.channel["name"])`,
 
 require 'vendor/autoload.php';
 
-use ReloopReloop;
+use Reloop\\Reloop;
 
 $reloop = Reloop::client('rl_123456789');
 

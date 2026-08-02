@@ -38,9 +38,9 @@ _apiData:
       lang: bash
       label: cURL
       source: |-
-        curl -X POST https://reloop.sh/api/domain/v1/create \\
-          -H "x-api-key: rl_123456789" \\
-          -H "Content-Type: application/json" \\
+        curl -X POST https://reloop.sh/api/domain/v1/create \
+          -H "x-api-key: rl_123456789" \
+          -H "Content-Type: application/json" \
           -d '{"domain": "send.example.com","click_tracking": true,"open_tracking": true,"tls": "opportunistic","sending_email": true,"receiving_email": false}'
     - id: python
       lang: python

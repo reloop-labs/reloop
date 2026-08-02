@@ -39,7 +39,7 @@ if result.contact_error:
 
 require 'vendor/autoload.php';
 
-use ReloopReloop;
+use Reloop\\Reloop;
 
 $reloop = Reloop::client('rl_123456789');
 

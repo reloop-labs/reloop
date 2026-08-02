@@ -51,7 +51,7 @@ print(result.contacts["total"], result.contacts["contacts"])`,
 
 require 'vendor/autoload.php';
 
-use ReloopReloop;
+use Reloop\\Reloop;
 
 $reloop = Reloop::client('rl_123456789');
 

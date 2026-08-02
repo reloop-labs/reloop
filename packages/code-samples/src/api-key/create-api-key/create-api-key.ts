@@ -51,7 +51,7 @@ print(result.api_key["id"], result.api_key["key"])`,
 
 require 'vendor/autoload.php';
 
-use ReloopReloop;
+use Reloop\\Reloop;
 
 $reloop = Reloop::client('rl_123456789');
 

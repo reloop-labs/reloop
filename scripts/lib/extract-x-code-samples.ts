@@ -48,6 +48,14 @@ export function findSampleFiles(dir: string): string[] {
 	return files;
 }
 
+/** Decode JS template-literal escapes from a raw `` `...` `` body match. */
+export function unescapeTemplateLiteralBody(raw: string): string {
+	return raw
+		.replace(/\\`/g, "`")
+		.replace(/\\\$\{/g, "${")
+		.replace(/\\\\/g, "\\");
+}
+
 export function extractSamples(filePath: string): CodeSample[] {
 	const content = fs.readFileSync(filePath, "utf8");
 	const samples: CodeSample[] = [];
@@ -59,7 +67,7 @@ export function extractSamples(filePath: string): CodeSample[] {
 			id: match[1]!,
 			lang: match[2]!,
 			label: match[3]!,
-			source: match[4]!,
+			source: unescapeTemplateLiteralBody(match[4]!),
 		});
 	}
 	return samples;

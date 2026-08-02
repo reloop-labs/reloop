@@ -34,9 +34,9 @@ _apiData:
       lang: bash
       label: cURL
       source: |-
-        curl -X PATCH https://reloop.sh/api/contacts/channel/chn_123456789 \\
-          -H "x-api-key: rl_123456789" \\
-          -H "Content-Type: application/json" \\
+        curl -X PATCH https://reloop.sh/api/contacts/channel/chn_123456789 \
+          -H "x-api-key: rl_123456789" \
+          -H "Content-Type: application/json" \
           -d '{"contact_id": "con_123456789","subscription": "opt_out"}'
     - id: python
       lang: python

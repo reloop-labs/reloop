@@ -53,7 +53,7 @@ print(result.domains["total"], result.domains["domains"])`,
 
 require 'vendor/autoload.php';
 
-use ReloopReloop;
+use Reloop\\Reloop;
 
 $reloop = Reloop::client('rl_123456789');
 

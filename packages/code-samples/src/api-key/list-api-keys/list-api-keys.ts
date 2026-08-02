@@ -53,7 +53,7 @@ print(result.api_keys["total"], result.api_keys["apiKeys"])`,
 
 require 'vendor/autoload.php';
 
-use ReloopReloop;
+use Reloop\\Reloop;
 
 $reloop = Reloop::client('rl_123456789');
 

@@ -51,7 +51,7 @@ print(result.properties["total"], result.properties["properties"])`,
 
 require 'vendor/autoload.php';
 
-use ReloopReloop;
+use Reloop\\Reloop;
 
 $reloop = Reloop::client('rl_123456789');
 

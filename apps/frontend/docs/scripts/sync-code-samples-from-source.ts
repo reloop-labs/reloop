@@ -116,7 +116,11 @@ function extractSamples(filePath: string): SampleSource | null {
 			id: match[1]!,
 			lang: match[2]!,
 			label: match[3]!,
-			source: match[4]!,
+			// Decode JS template escapes so PHP `use Reloop\Reloop` stays correct
+			source: match[4]!
+				.replace(/\\`/g, "`")
+				.replace(/\\\$\{/g, "${")
+				.replace(/\\\\/g, "\\"),
 		});
 	}
 

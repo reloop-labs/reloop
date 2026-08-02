@@ -36,9 +36,9 @@ _apiData:
       lang: bash
       label: cURL
       source: |-
-        curl -X POST https://reloop.sh/api/contacts/v1/channels/create \\
-          -H "x-api-key: rl_123456789" \\
-          -H "Content-Type: application/json" \\
+        curl -X POST https://reloop.sh/api/contacts/v1/channels/create \
+          -H "x-api-key: rl_123456789" \
+          -H "Content-Type: application/json" \
           -d '{"name": "Product Updates","description": "Get the latest news about our products","defaultSubscription": "opt_in","visibility": "public"}'
     - id: python
       lang: python

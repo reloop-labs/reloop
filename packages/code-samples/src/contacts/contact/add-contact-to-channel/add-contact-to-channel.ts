@@ -53,7 +53,7 @@ print(result.channel["subscriptionId"], result.channel["contact"].id)`,
 
 require 'vendor/autoload.php';
 
-use ReloopReloop;
+use Reloop\\Reloop;
 
 $reloop = Reloop::client('rl_123456789');
 

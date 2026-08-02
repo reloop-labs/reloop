@@ -16,7 +16,7 @@
 
 require 'vendor/autoload.php';
 
-use ReloopReloop;
+use Reloop\Reloop;
 
 $reloop = Reloop::client('rl_123456789');
 
@@ -35,7 +35,7 @@ echo $apiKey['id'] . ' ' . $apiKey['key'] . PHP_EOL;
 
 require 'vendor/autoload.php';
 
-use ReloopReloop;
+use Reloop\Reloop;
 
 $reloop = Reloop::client('rl_123456789');
 
@@ -56,7 +56,7 @@ echo $apiKeys['total'] . ' ' . $apiKeys['apiKeys'] . PHP_EOL;
 
 require 'vendor/autoload.php';
 
-use ReloopReloop;
+use Reloop\Reloop;
 
 $reloop = Reloop::client('rl_123456789');
 
@@ -73,7 +73,7 @@ echo $apiKey['id'] . ' ' . $apiKey['name'] . ' ' . $apiKey['enabled'] . PHP_EOL;
 
 require 'vendor/autoload.php';
 
-use ReloopReloop;
+use Reloop\Reloop;
 
 $reloop = Reloop::client('rl_123456789');
 
@@ -92,7 +92,7 @@ echo $apiKey['id'] . ' ' . $apiKey['name'] . PHP_EOL;
 
 require 'vendor/autoload.php';
 
-use ReloopReloop;
+use Reloop\Reloop;
 
 $reloop = Reloop::client('rl_123456789');
 
@@ -109,7 +109,7 @@ echo $apiKey['id'] . ' ' . $apiKey['key'] . PHP_EOL;
 
 require 'vendor/autoload.php';
 
-use ReloopReloop;
+use Reloop\Reloop;
 
 $reloop = Reloop::client('rl_123456789');
 
@@ -126,7 +126,7 @@ echo $apiKey['id'] . ' ' . $apiKey['enabled'] . PHP_EOL;
 
 require 'vendor/autoload.php';
 
-use ReloopReloop;
+use Reloop\Reloop;
 
 $reloop = Reloop::client('rl_123456789');
 
@@ -143,7 +143,7 @@ echo $apiKey['id'] . ' ' . $apiKey['enabled'] . PHP_EOL;
 
 require 'vendor/autoload.php';
 
-use ReloopReloop;
+use Reloop\Reloop;
 
 $reloop = Reloop::client('rl_123456789');
 
