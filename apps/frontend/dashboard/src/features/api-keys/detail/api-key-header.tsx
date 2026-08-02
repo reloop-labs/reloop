@@ -211,7 +211,7 @@ export function ApiKeyHeader({
 								<Icon name="rotate-cw" className="h-3.5 w-3.5" />
 								<span>Rotate key</span>
 								<ActionKbd className="ml-0.5 w-auto min-w-4 border-white/25 bg-white/15 px-1 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]">
-									R
+									C
 								</ActionKbd>
 							</FancyButton.Root>
 							<ApiKeyHeaderMenu

@@ -45,7 +45,7 @@ export function ApiKeyHeaderMenu({
 			id: "rotate",
 			label: "Rotate key",
 			icon: "rotate-cw",
-			shortcut: "R",
+			shortcut: "C",
 			isDanger: false,
 		},
 		{

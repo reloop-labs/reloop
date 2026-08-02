@@ -91,7 +91,7 @@ export function ApiKeyDetailPage({ apiKeyId }: { apiKeyId: string }) {
 	);
 
 	useHotkeys(
-		"r",
+		"c",
 		(e) => {
 			if (!data?.id) return;
 			e.preventDefault();
@@ -177,7 +177,7 @@ export function ApiKeyDetailPage({ apiKeyId }: { apiKeyId: string }) {
 				id: "rotate-api-key",
 				label: "Rotate Key",
 				icon: "rotate-cw",
-				shortcut: { label: "R", keys: ["r"] },
+				shortcut: { label: "C", keys: ["c"] },
 				onSelect: () => void setRotateId(data.id),
 			},
 			{
