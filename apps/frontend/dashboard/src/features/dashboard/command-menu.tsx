@@ -203,7 +203,7 @@ export function CommandMenuGlobal() {
 		<CommandMenu.Dialog
 			open={open}
 			onOpenChange={setOpen}
-			className="max-h-[min(480px,80vh)]"
+			className="max-h-[min(400px,54vh)]"
 		>
 			<div className="group/cmd-input flex h-13 w-full items-center gap-3 border-stroke-soft-200 border-b bg-bg-white-0 px-4 dark:border-white/10">
 				<Search
