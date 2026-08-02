@@ -14,6 +14,7 @@ import { useTheme } from "next-themes";
 import * as React from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { useCommandMenuActions } from "#/features/dashboard/command-menu-context";
+import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import {
 	filterSettingsNavigation,
 	mainNavigation,
@@ -75,9 +76,9 @@ function KbdBadge({ label }: { label: string }) {
 	return (
 		<span className="ml-auto flex shrink-0 items-center gap-1">
 			{parts.map((part, i) => (
-				<CommandMenu.FooterKeyBox key={`${part}-${i}`}>
+				<ActionKbd key={`${part}-${i}`} className="w-auto min-w-4 px-1">
 					{part}
-				</CommandMenu.FooterKeyBox>
+				</ActionKbd>
 			))}
 		</span>
 	);
@@ -354,24 +355,24 @@ export function CommandMenuGlobal() {
 			<CommandMenu.Footer className="justify-end">
 				<div className="ml-auto flex items-center gap-4">
 					<div className="flex items-center gap-1.5">
-						<CommandMenu.FooterKeyBox>
+						<ActionKbd className="w-auto min-w-4 px-1">
 							<ArrowUp className="size-3" />
-						</CommandMenu.FooterKeyBox>
-						<CommandMenu.FooterKeyBox>
+						</ActionKbd>
+						<ActionKbd className="w-auto min-w-4 px-1">
 							<ArrowDown className="size-3" />
-						</CommandMenu.FooterKeyBox>
+						</ActionKbd>
 						<span className="text-[11px] text-text-soft-400">Navigate</span>
 					</div>
 					<div className="flex items-center gap-1.5">
-						<CommandMenu.FooterKeyBox>
+						<ActionKbd className="w-auto min-w-4 px-1">
 							<CornerDownLeft className="size-3" />
-						</CommandMenu.FooterKeyBox>
+						</ActionKbd>
 						<span className="text-[11px] text-text-soft-400">Open</span>
 					</div>
 					<div className="flex items-center gap-1.5">
-						<CommandMenu.FooterKeyBox>
-							<span className="font-medium font-sans text-[10px]">esc</span>
-						</CommandMenu.FooterKeyBox>
+						<ActionKbd className="lowercase! w-auto min-w-0 px-1 font-sans text-[10px]">
+							esc
+						</ActionKbd>
 						<span className="text-[11px] text-text-soft-400">Close</span>
 					</div>
 				</div>
