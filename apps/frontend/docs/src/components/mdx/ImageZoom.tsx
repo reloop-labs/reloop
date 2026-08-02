@@ -2,7 +2,6 @@
 
 import * as Dialog from "@radix-ui/react-dialog";
 import { AnimatePresence, motion } from "framer-motion";
-import { X, ZoomIn } from "lucide-react";
 import React, { useState } from "react";
 import { cn } from "../../lib/cn";
 
@@ -13,25 +12,15 @@ export function MDXImage({ src, alt, className, ...props }: any) {
 
 	return (
 		<Dialog.Root open={isOpen} onOpenChange={setIsOpen}>
-			<span
+			<motion.img
+				src={src}
+				layoutId={src}
+				alt={alt || ""}
 				onClick={() => setIsOpen(true)}
-				className="group relative my-6 inline-block w-full cursor-zoom-in overflow-hidden rounded-xl border border-stroke-soft-100 dark:border-stroke-soft-100/50"
-			>
-				<img
-					src={src}
-					alt={alt || ""}
-					className={cn(
-						"block w-full rounded-xl transition-transform duration-200 group-hover:scale-[1.008]",
-						className,
-					)}
-					{...props}
-				/>
-				<span className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/0 transition-colors group-hover:bg-black/10 dark:group-hover:bg-white/5">
-					<span className="rounded-full bg-black/60 p-2.5 text-white opacity-0 shadow-lg backdrop-blur-xs transition-opacity group-hover:opacity-100 dark:bg-white/80 dark:text-black">
-						<ZoomIn className="size-5" />
-					</span>
-				</span>
-			</span>
+				className={cn("block w-full rounded-xl", className)}
+				{...props}
+			/>
+
 			<AnimatePresence>
 				{isOpen && (
 					<Dialog.Portal forceMount>
@@ -54,25 +43,12 @@ export function MDXImage({ src, alt, className, ...props }: any) {
 										<Dialog.Title className="sr-only">
 											{alt || "Full screen image view"}
 										</Dialog.Title>
-										<img
+										<motion.img
+											layoutId={src}
 											src={src}
 											alt={alt || ""}
-											className="max-h-[85vh] max-w-full rounded-xl border border-white/10 object-contain shadow-2xl"
+											className="max-h-[85vh]"
 										/>
-										{alt && (
-											<p className="mt-3 text-center font-medium text-sm text-white/70">
-												{alt}
-											</p>
-										)}
-										<Dialog.Close asChild>
-											<button
-												type="button"
-												className="-top-12 absolute right-0 cursor-pointer rounded-full bg-white/10 p-2 text-white/80 backdrop-blur-xs transition-colors hover:bg-white/20 hover:text-white focus:outline-none"
-												aria-label="Close full screen view"
-											>
-												<X className="size-5" />
-											</button>
-										</Dialog.Close>
 									</motion.div>
 								</Dialog.Content>
 							</motion.div>
