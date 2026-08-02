@@ -3,8 +3,10 @@ import * as CommandMenu from "@reloop/ui/command";
 import { Icon } from "@reloop/ui/icon";
 import {
 	ArrowDown,
+	ArrowLeft,
 	ArrowUp,
-	Clock,
+	Check,
+	ChevronRight,
 	CornerDownLeft,
 	Search,
 	X,
@@ -13,6 +15,7 @@ import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import * as React from "react";
 import { useHotkeys } from "react-hotkeys-hook";
+import { toast } from "sonner";
 import { useCommandMenuActions } from "#/features/dashboard/command-menu-context";
 import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import {
@@ -20,10 +23,8 @@ import {
 	mainNavigation,
 	settingsNavigation,
 } from "#/features/dashboard/navigation";
+import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import { useOrgPermissions } from "#/features/settings/use-org-permissions";
-
-const RECENT_ITEMS_KEY = "reloop-cmd-recents";
-const MAX_RECENTS = 5;
 
 const PAGE_SHORTCUTS: Record<string, { label: string; keys: string[] }> = {};
 mainNavigation.slice(0, 9).forEach((item, i) => {
@@ -33,13 +34,6 @@ mainNavigation.slice(0, 9).forEach((item, i) => {
 	};
 });
 
-interface RecentItem {
-	path: string;
-	label: string;
-	iconName: string;
-	timestamp: number;
-}
-
 export interface CommandAction {
 	id: string;
 	label: string;
@@ -47,28 +41,6 @@ export interface CommandAction {
 	shortcut?: { label: string; keys: string[] };
 	onSelect: () => void;
 	variant?: "default" | "danger";
-}
-
-function getRecents(): RecentItem[] {
-	try {
-		const raw = localStorage.getItem(RECENT_ITEMS_KEY);
-		return raw ? JSON.parse(raw) : [];
-	} catch {
-		return [];
-	}
-}
-
-function addRecent(item: Omit<RecentItem, "timestamp">) {
-	try {
-		const recents = getRecents().filter((r) => r.path !== item.path);
-		recents.unshift({ ...item, timestamp: Date.now() });
-		localStorage.setItem(
-			RECENT_ITEMS_KEY,
-			JSON.stringify(recents.slice(0, MAX_RECENTS)),
-		);
-	} catch {
-		// ignore
-	}
 }
 
 function KbdBadge({ label }: { label: string }) {
@@ -87,10 +59,14 @@ function KbdBadge({ label }: { label: string }) {
 export function CommandMenuGlobal() {
 	const [open, setOpen] = React.useState(false);
 	const [search, setSearch] = React.useState("");
+	const [view, setView] = React.useState<"root" | "organizations">("root");
 	const router = useRouter();
 	const { setTheme, resolvedTheme } = useTheme();
 	const inputRef = React.useRef<HTMLInputElement>(null);
 	const { isOrgAdmin, canManageTeam } = useOrgPermissions();
+	const { activeOrganization, organizations, onOrganizationChange } =
+		useActiveOrganization();
+
 	const settingsItems = React.useMemo(
 		() =>
 			filterSettingsNavigation(settingsNavigation, {
@@ -109,14 +85,43 @@ export function CommandMenuGlobal() {
 		setTheme(resolvedTheme === "light" ? "dark" : "light");
 	});
 
+	const handleCopyUrl = React.useCallback(() => {
+		if (typeof window !== "undefined") {
+			void navigator.clipboard.writeText(window.location.href);
+			toast.success("URL copied to clipboard");
+		}
+		setOpen(false);
+	}, []);
+
+	useHotkeys("mod+shift+c", (e) => {
+		e.preventDefault();
+		handleCopyUrl();
+	});
+
+	const handleCopyOrgId = React.useCallback(() => {
+		if (activeOrganization?.id) {
+			void navigator.clipboard.writeText(activeOrganization.id);
+			toast.success("Organization ID copied to clipboard");
+		}
+		setOpen(false);
+	}, [activeOrganization?.id]);
+
+	const handleCreateOrg = React.useCallback(() => {
+		setOpen(false);
+		router.push("/onboarding");
+	}, [router]);
+
+	const handleSwitchOrg = React.useCallback(
+		(org: NonNullable<typeof organizations>[number]) => {
+			setOpen(false);
+			void onOrganizationChange(org);
+		},
+		[onOrganizationChange],
+	);
+
 	const navigateTo = React.useCallback(
 		(item: { path: string; label: string; iconName: string }) => {
 			if (!item.path) return;
-			addRecent({
-				path: item.path,
-				label: item.label,
-				iconName: item.iconName,
-			});
 			// Paths come from mainNavigation / settingsNavigation route table.
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			router.push(item.path as any);
@@ -148,9 +153,17 @@ export function CommandMenuGlobal() {
 	React.useEffect(() => {
 		if (open) {
 			setSearch("");
+			setView("root");
 			requestAnimationFrame(() => inputRef.current?.focus());
 		}
 	}, [open]);
+
+	const handleKeyDown = (e: React.KeyboardEvent) => {
+		if (view !== "root" && e.key === "Backspace" && search === "") {
+			e.preventDefault();
+			setView("root");
+		}
+	};
 
 	const handleThemeSelect = React.useCallback(
 		(themeValue: string) => {
@@ -163,8 +176,6 @@ export function CommandMenuGlobal() {
 		},
 		[setTheme, resolvedTheme],
 	);
-
-	const recents = React.useMemo(() => (open ? getRecents() : []), [open]);
 
 	const appearanceActions: CommandAction[] = React.useMemo(
 		() => [
@@ -198,7 +209,6 @@ export function CommandMenuGlobal() {
 	);
 
 	const pageActionGroups = useCommandMenuActions();
-	const hasSearch = search.trim().length > 0;
 
 	return (
 		<CommandMenu.Dialog
@@ -207,18 +217,39 @@ export function CommandMenuGlobal() {
 			className="max-h-[min(400px,54vh)]"
 		>
 			<div className="group/cmd-input flex h-13 w-full items-center gap-3 border-stroke-soft-200 border-b bg-bg-white-0 px-4 dark:border-white/10">
-				<Search
-					className={cn(
-						"size-3.5 shrink-0 text-text-soft-400",
-						"transition duration-150 ease-out",
-						"group-focus-within/cmd-input:text-text-sub-600",
-					)}
-				/>
+				{view === "root" ? (
+					<Search
+						className={cn(
+							"size-3.5 shrink-0 text-text-soft-400",
+							"transition duration-150 ease-out",
+							"group-focus-within/cmd-input:text-text-sub-600",
+						)}
+					/>
+				) : (
+					<button
+						type="button"
+						onClick={() => {
+							setView("root");
+							setSearch("");
+						}}
+						className="cursor-pointer shrink-0"
+						aria-label="Back to main menu"
+					>
+						<ActionKbd className="w-auto min-w-4 px-1">
+							<ArrowLeft className="size-3" />
+						</ActionKbd>
+					</button>
+				)}
 				<CommandMenu.Input
 					ref={inputRef}
 					value={search}
 					onValueChange={setSearch}
-					placeholder="Search pages and actions..."
+					onKeyDown={handleKeyDown}
+					placeholder={
+						view === "organizations"
+							? "Search organizations..."
+							: "Search pages and actions..."
+					}
 				/>
 				{search ? (
 					<button
@@ -242,142 +273,219 @@ export function CommandMenuGlobal() {
 					</div>
 				</CommandMenu.Empty>
 
-				{/* Page-specific actions — only shown when on the relevant page */}
-				{pageActionGroups.map((group) => (
-					<CommandMenu.Group key={group.heading} heading={group.heading}>
-						{group.actions.map((action) => (
-							<CommandMenu.Item
-								key={action.id}
-								value={`${group.heading} ${action.label}`}
-								onSelect={() => {
-									setOpen(false);
-									action.onSelect();
-								}}
-							>
-								<CommandMenu.ItemIcon
-									as={Icon}
-									name={action.icon}
-									className="size-3.5"
-								/>
-								<span className="flex-1 truncate">{action.label}</span>
-								{action.shortcut ? (
-									<KbdBadge label={action.shortcut.label} />
-								) : null}
-							</CommandMenu.Item>
-						))}
-					</CommandMenu.Group>
-				))}
-
-				{!hasSearch && recents.length > 0 ? (
-					<CommandMenu.Group heading="Recent">
-						{recents.map((item) => {
-							const shortcut = PAGE_SHORTCUTS[item.path];
+				{view === "organizations" ? (
+					<CommandMenu.Group heading="Organizations">
+						{(organizations ?? []).map((org) => {
+							const isActive = org.id === activeOrganization?.id;
 							return (
 								<CommandMenu.Item
-									key={`recent-${item.path}`}
-									value={`recent ${item.label}`}
-									onSelect={() =>
-										navigateTo({
-											path: item.path,
-											label: item.label,
-											iconName: item.iconName,
-										})
-									}
+									key={`org-sub-${org.id}`}
+									value={`Organization ${org.name}`}
+									onSelect={() => handleSwitchOrg(org)}
 								>
 									<CommandMenu.ItemIcon
-										as={Clock}
-										className="size-3.5 text-text-soft-400"
+										as={Icon}
+										name="workspace-custom"
+										className="size-3.5"
 									/>
-									<span className="flex-1 truncate">{item.label}</span>
-									{shortcut ? <KbdBadge label={shortcut.label} /> : null}
+									<span className="flex-1 truncate font-medium">
+										{org.name}
+									</span>
+									{isActive ? (
+										<Check className="size-3.5 shrink-0 text-text-strong-950 dark:text-white" />
+									) : null}
 								</CommandMenu.Item>
 							);
 						})}
 					</CommandMenu.Group>
-				) : null}
+				) : (
+					<>
+						{/* Page-specific actions — only shown when on the relevant page */}
+						{pageActionGroups.map((group) => (
+							<CommandMenu.Group key={group.heading} heading={group.heading}>
+								{group.actions.map((action) => (
+									<CommandMenu.Item
+										key={action.id}
+										value={`${group.heading} ${action.label}`}
+										onSelect={() => {
+											setOpen(false);
+											action.onSelect();
+										}}
+									>
+										<CommandMenu.ItemIcon
+											as={Icon}
+											name={action.icon}
+											className="size-3.5"
+										/>
+										<span className="flex-1 truncate">{action.label}</span>
+										{action.shortcut ? (
+											<KbdBadge label={action.shortcut.label} />
+										) : null}
+									</CommandMenu.Item>
+								))}
+							</CommandMenu.Group>
+						))}
 
-				<CommandMenu.Group heading="Pages">
-					{mainNavigation.map((item) => {
-						const shortcut = PAGE_SHORTCUTS[item.path];
-						return (
+						<CommandMenu.Group heading="Pages">
+							{mainNavigation.map((item) => {
+								const shortcut = PAGE_SHORTCUTS[item.path];
+								return (
+									<CommandMenu.Item
+										key={item.path}
+										value={item.label}
+										onSelect={() => navigateTo(item)}
+									>
+										<CommandMenu.ItemIcon
+											as={Icon}
+											name={item.iconName}
+											className="size-3.5"
+										/>
+										<span className="flex-1 truncate">{item.label}</span>
+										{shortcut ? <KbdBadge label={shortcut.label} /> : null}
+									</CommandMenu.Item>
+								);
+							})}
+						</CommandMenu.Group>
+
+						<CommandMenu.Group heading="Organization">
 							<CommandMenu.Item
-								key={item.path}
-								value={item.label}
-								onSelect={() => navigateTo(item)}
+								value="Organization Switch Organization Team Workspace"
+								onSelect={() => {
+									setView("organizations");
+									setSearch("");
+								}}
 							>
 								<CommandMenu.ItemIcon
 									as={Icon}
-									name={item.iconName}
+									name="arrow-swap"
 									className="size-3.5"
 								/>
-								<span className="flex-1 truncate">{item.label}</span>
-								{shortcut ? <KbdBadge label={shortcut.label} /> : null}
+								<span className="flex-1 truncate">Switch Organization</span>
+								<ChevronRight className="size-3.5 text-text-soft-400" />
 							</CommandMenu.Item>
-						);
-					})}
-				</CommandMenu.Group>
 
-				<CommandMenu.Group heading="Settings">
-					{settingsItems.map((item) => (
-						<CommandMenu.Item
-							key={`settings-${item.path}`}
-							value={`Settings ${item.label}`}
-							onSelect={() => navigateTo(item)}
-						>
-							<CommandMenu.ItemIcon
-								as={Icon}
-								name={item.iconName}
-								className="size-3.5"
-							/>
-							<span className="flex-1 truncate">{item.label}</span>
-						</CommandMenu.Item>
-					))}
-				</CommandMenu.Group>
-
-				<CommandMenu.Group heading="Appearance">
-					{appearanceActions.map((action) => (
-						<CommandMenu.Item
-							key={action.id}
-							value={`Appearance ${action.label}`}
-							onSelect={action.onSelect}
-						>
-							<CommandMenu.ItemIcon
-								as={Icon}
-								name={action.icon}
-								className="size-3.5"
-							/>
-							<span className="flex-1 truncate">{action.label}</span>
-							{action.shortcut ? (
-								<KbdBadge label={action.shortcut.label} />
+							{activeOrganization?.id ? (
+								<CommandMenu.Item
+									value="Organization Copy Organization ID"
+									onSelect={handleCopyOrgId}
+								>
+									<CommandMenu.ItemIcon
+										as={Icon}
+										name="copy"
+										className="size-3.5"
+									/>
+									<span className="flex-1 truncate">Copy Organization ID</span>
+								</CommandMenu.Item>
 							) : null}
-						</CommandMenu.Item>
-					))}
-				</CommandMenu.Group>
+
+							<CommandMenu.Item
+								value="Organization Create New Organization Workspace"
+								onSelect={handleCreateOrg}
+							>
+								<CommandMenu.ItemIcon
+									as={Icon}
+									name="plus"
+									className="size-3.5"
+								/>
+								<span className="flex-1 truncate">Create New Organization</span>
+							</CommandMenu.Item>
+						</CommandMenu.Group>
+
+						<CommandMenu.Group heading="Settings">
+							{settingsItems.map((item) => (
+								<CommandMenu.Item
+									key={`settings-${item.path}`}
+									value={`Settings ${item.label}`}
+									onSelect={() => navigateTo(item)}
+								>
+									<CommandMenu.ItemIcon
+										as={Icon}
+										name={item.iconName}
+										className="size-3.5"
+									/>
+									<span className="flex-1 truncate">{item.label}</span>
+								</CommandMenu.Item>
+							))}
+						</CommandMenu.Group>
+
+						<CommandMenu.Group heading="Appearance">
+							{appearanceActions.map((action) => (
+								<CommandMenu.Item
+									key={action.id}
+									value={`Appearance ${action.label}`}
+									onSelect={action.onSelect}
+								>
+									<CommandMenu.ItemIcon
+										as={Icon}
+										name={action.icon}
+										className="size-3.5"
+									/>
+									<span className="flex-1 truncate">{action.label}</span>
+									{action.shortcut ? (
+										<KbdBadge label={action.shortcut.label} />
+									) : null}
+								</CommandMenu.Item>
+							))}
+						</CommandMenu.Group>
+
+						<CommandMenu.Group heading="Actions">
+							<CommandMenu.Item
+								value="Actions Copy Current URL"
+								onSelect={handleCopyUrl}
+							>
+								<CommandMenu.ItemIcon
+									as={Icon}
+									name="link"
+									className="size-3.5"
+								/>
+								<span className="flex-1 truncate">Copy Current URL</span>
+								<KbdBadge label="⌘⇧C" />
+							</CommandMenu.Item>
+						</CommandMenu.Group>
+					</>
+				)}
 			</CommandMenu.List>
 
-			<CommandMenu.Footer className="justify-end">
-				<div className="ml-auto flex items-center gap-4">
-					<div className="flex items-center gap-1.5">
-						<ActionKbd className="w-auto min-w-4 px-1">
-							<ArrowUp className="size-3" />
-						</ActionKbd>
-						<ActionKbd className="w-auto min-w-4 px-1">
-							<ArrowDown className="size-3" />
-						</ActionKbd>
-						<span className="text-[11px] text-text-soft-400">Navigate</span>
+			<CommandMenu.Footer className="justify-between">
+				{view === "root" ? (
+					<div className="flex items-center gap-4">
+						<div className="flex items-center gap-1.5">
+							<ActionKbd className="w-auto min-w-4 px-1">
+								<ArrowUp className="size-3" />
+							</ActionKbd>
+							<ActionKbd className="w-auto min-w-4 px-1">
+								<ArrowDown className="size-3" />
+							</ActionKbd>
+							<span className="text-[11px] text-text-soft-400">Navigate</span>
+						</div>
+						<div className="flex items-center gap-1.5">
+							<ActionKbd className="w-auto min-w-4 px-1">
+								<CornerDownLeft className="size-3" />
+							</ActionKbd>
+							<span className="text-[11px] text-text-soft-400">Open</span>
+						</div>
 					</div>
-					<div className="flex items-center gap-1.5">
-						<ActionKbd className="w-auto min-w-4 px-1">
-							<CornerDownLeft className="size-3" />
-						</ActionKbd>
-						<span className="text-[11px] text-text-soft-400">Open</span>
+				) : (
+					<div className="flex items-center gap-4">
+						<div className="flex items-center gap-1.5">
+							<ActionKbd className="w-auto min-w-4 px-1">
+								<ArrowLeft className="size-3" />
+							</ActionKbd>
+							<span className="text-[11px] text-text-soft-400">Back</span>
+						</div>
+						<div className="flex items-center gap-1.5">
+							<ActionKbd className="w-auto min-w-4 px-1">
+								<CornerDownLeft className="size-3" />
+							</ActionKbd>
+							<span className="text-[11px] text-text-soft-400">Select</span>
+						</div>
 					</div>
-					<div className="flex items-center gap-1.5">
-						<ActionKbd className="lowercase! w-auto min-w-0 px-1 font-sans text-[10px]">
-							esc
-						</ActionKbd>
-						<span className="text-[11px] text-text-soft-400">Close</span>
-					</div>
+				)}
+				<div className="flex items-center gap-1.5">
+					<ActionKbd className="lowercase! w-auto min-w-0 px-1 font-sans text-[10px]">
+						esc
+					</ActionKbd>
+					<span className="text-[11px] text-text-soft-400">Close</span>
 				</div>
 			</CommandMenu.Footer>
 		</CommandMenu.Dialog>
