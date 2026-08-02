@@ -1,5 +1,6 @@
 import { APIPage } from "@reloop/fe-docs/components/mdx/APIPage";
 import { CardGroup } from "@reloop/fe-docs/components/mdx/CardGroup";
+import { MDXImage, MDXVideo } from "@reloop/fe-docs/components/mdx/ImageZoom";
 import {
 	Accordion,
 	AccordionGroup,
@@ -83,20 +84,8 @@ export function getMDXComponents(
 				{children}
 			</h3>
 		),
-		video: ({ className, ...props }: any) => (
-			<div className="my-6 overflow-hidden rounded-xl border border-stroke-soft-100 dark:border-stroke-soft-100/50">
-				<video
-					className={
-						className || "m-0 block w-full border-none p-0 outline-none"
-					}
-					autoPlay
-					loop
-					muted
-					playsInline
-					{...props}
-				/>
-			</div>
-		),
+		img: MDXImage,
+		video: MDXVideo,
 		...restComponents,
 		Card: ({ icon, href, children, ...props }: any) => {
 			const finalHref =
