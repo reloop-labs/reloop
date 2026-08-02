@@ -27,11 +27,18 @@ import { useActiveOrganization } from "#/features/dashboard/page-header/use-acti
 import { useOrgPermissions } from "#/features/settings/use-org-permissions";
 
 const PAGE_SHORTCUTS: Record<string, { label: string; keys: string[] }> = {};
-mainNavigation.slice(0, 9).forEach((item, i) => {
-	PAGE_SHORTCUTS[item.path] = {
-		label: `⌘${i + 1}`,
-		keys: [`mod+${i + 1}`],
-	};
+mainNavigation.forEach((item, i) => {
+	if (i < 9) {
+		PAGE_SHORTCUTS[item.path] = {
+			label: `⌘${i + 1}`,
+			keys: [`mod+${i + 1}`],
+		};
+	} else if (item.path === "/settings") {
+		PAGE_SHORTCUTS[item.path] = {
+			label: "⌘,",
+			keys: ["mod+,"],
+		};
+	}
 });
 
 export interface CommandAction {
@@ -129,6 +136,12 @@ export function CommandMenuGlobal() {
 		},
 		[router],
 	);
+
+	useHotkeys("mod+,", (e) => {
+		e.preventDefault();
+		router.push("/settings");
+		setOpen(false);
+	});
 
 	useHotkeys(
 		"mod+1,mod+2,mod+3,mod+4,mod+5,mod+6,mod+7,mod+8,mod+9",
@@ -392,20 +405,24 @@ export function CommandMenuGlobal() {
 						</CommandMenu.Group>
 
 						<CommandMenu.Group heading="Settings">
-							{settingsItems.map((item) => (
-								<CommandMenu.Item
-									key={`settings-${item.path}`}
-									value={`Settings ${item.label}`}
-									onSelect={() => navigateTo(item)}
-								>
-									<CommandMenu.ItemIcon
-										as={Icon}
-										name={item.iconName}
-										className="size-3.5"
-									/>
-									<span className="flex-1 truncate">{item.label}</span>
-								</CommandMenu.Item>
-							))}
+							{settingsItems.map((item) => {
+								const shortcut = PAGE_SHORTCUTS[item.path];
+								return (
+									<CommandMenu.Item
+										key={`settings-${item.path}`}
+										value={`Settings ${item.label}`}
+										onSelect={() => navigateTo(item)}
+									>
+										<CommandMenu.ItemIcon
+											as={Icon}
+											name={item.iconName}
+											className="size-3.5"
+										/>
+										<span className="flex-1 truncate">{item.label}</span>
+										{shortcut ? <KbdBadge label={shortcut.label} /> : null}
+									</CommandMenu.Item>
+								);
+							})}
 						</CommandMenu.Group>
 
 						<CommandMenu.Group heading="Appearance">
