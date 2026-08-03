@@ -8,14 +8,7 @@ import {
 	type Transition,
 	useReducedMotion,
 } from "framer-motion";
-import {
-	type ReactNode,
-	useEffect,
-	useLayoutEffect,
-	useMemo,
-	useRef,
-	useState,
-} from "react";
+import { type ReactNode, useEffect, useMemo } from "react";
 import { useUIStore } from "#/store/use-ui-store";
 
 /** Hold Space this long (ms) before shortcut hints appear. */
@@ -243,11 +236,30 @@ function ShortcutKeycaps({
 	);
 }
 
+/** Estimate keycap row width so we can animate without a permanent measure node. */
+function estimateStepsWidth(steps: string[][]): number {
+	const KEY = HINT_WIDTH_PX;
+	const KEY_GAP = 2; // gap-0.5
+	const STEP_GAP = 4; // gap-1
+	let width = 0;
+	for (let gi = 0; gi < steps.length; gi++) {
+		const group = steps[gi] ?? [];
+		if (gi > 0) width += STEP_GAP;
+		for (let ki = 0; ki < group.length; ki++) {
+			const key = group[ki] ?? "";
+			if (ki > 0) width += KEY_GAP;
+			// Single glyphs use the fixed face; longer labels get horizontal padding.
+			width += key.length > 1 ? Math.max(KEY, key.length * 6 + 10) : KEY;
+		}
+	}
+	return Math.max(KEY, width);
+}
+
 /**
  * Renders a keycap hint only while shortcuts are revealed (long-press Space).
  *
  * Supports multi-key labels (e.g. "G E", "G Shift+T") as separate keycaps.
- * Width is measured from content so sequences are not clipped to a single face.
+ * Renders nothing when hidden so sidebar layout / hit targets stay clean.
  *
  * Place next to the control that owns the shortcut.
  */
@@ -260,8 +272,6 @@ export function ShortcutHint({
 }) {
 	const revealed = useShortcutsRevealed();
 	const reduceMotion = useReducedMotion();
-	const measureRef = useRef<HTMLSpanElement>(null);
-	const [contentWidth, setContentWidth] = useState(HINT_WIDTH_PX);
 
 	const steps = useMemo(() => {
 		if (typeof children === "string" || typeof children === "number") {
@@ -270,69 +280,54 @@ export function ShortcutHint({
 		return null;
 	}, [children]);
 
-	const renderKeycaps = () =>
+	const contentWidth = useMemo(() => {
+		if (steps && steps.length > 0) return estimateStepsWidth(steps);
+		return HINT_WIDTH_PX;
+	}, [steps]);
+
+	const transition: Transition = reduceMotion
+		? { duration: 0 }
+		: { duration: HINT_DURATION, ease: EASE_SMOOTH_OUT };
+
+	const keycaps =
 		steps && steps.length > 0 ? (
 			<ShortcutKeycaps steps={steps} className={className} />
 		) : (
 			<KbdKey className={cn(shortcutKbdClassName, className)}>{children}</KbdKey>
 		);
 
-	// Keep a hidden measure node mounted so multi-key labels get a real width
-	// before the reveal animation runs (avoids clipping to 16px).
-	useLayoutEffect(() => {
-		const el = measureRef.current;
-		if (!el) return;
-		const next = Math.ceil(el.scrollWidth);
-		if (next > 0) setContentWidth(next);
-	}, [children, steps, className]);
-
-	const transition: Transition = reduceMotion
-		? { duration: 0 }
-		: { duration: HINT_DURATION, ease: EASE_SMOOTH_OUT };
-
 	return (
-		<span className="relative inline-flex shrink-0 items-center self-center">
-			{/* Invisible measure — always in DOM so width is ready on reveal */}
-			<span
-				ref={measureRef}
-				aria-hidden
-				className="pointer-events-none absolute top-0 left-0 whitespace-nowrap opacity-0"
-			>
-				{renderKeycaps()}
-			</span>
-
-			<AnimatePresence initial={false}>
-				{revealed ? (
-					<motion.span
-						key="shortcut-hint"
-						initial={
-							reduceMotion
-								? false
-								: {
-										opacity: 0,
-										width: 0,
-										marginLeft: 0,
-									}
-						}
-						animate={{
-							opacity: 1,
-							width: contentWidth,
-							marginLeft: HINT_GAP_PX,
-						}}
-						exit={{
-							opacity: 0,
-							width: 0,
-							marginLeft: 0,
-						}}
-						transition={transition}
-						// Extra py so the keycap bottom shelf isn't clipped by overflow;
-						// -my keeps the nav row height unchanged. Nudge up for optical align.
-						className="-my-0.5 inline-flex -translate-y-px items-center justify-end overflow-hidden py-0.5"
-					>
-						{renderKeycaps()}
-					</motion.span>
-				) : null}
-			</AnimatePresence>
-		</span>
+		<AnimatePresence initial={false}>
+			{revealed ? (
+				<motion.span
+					key="shortcut-hint"
+					initial={
+						reduceMotion
+							? false
+							: {
+									opacity: 0,
+									width: 0,
+									marginLeft: 0,
+								}
+					}
+					animate={{
+						opacity: 1,
+						width: contentWidth,
+						marginLeft: HINT_GAP_PX,
+					}}
+					exit={{
+						opacity: 0,
+						width: 0,
+						marginLeft: 0,
+					}}
+					transition={transition}
+					// Extra py so the keycap bottom shelf isn't clipped by overflow;
+					// -my keeps the nav row height unchanged. Nudge up for optical align.
+					className="-my-0.5 inline-flex shrink-0 -translate-y-px items-center justify-end overflow-hidden py-0.5"
+				>
+					{keycaps}
+				</motion.span>
+			) : null}
+		</AnimatePresence>
 	);
 }

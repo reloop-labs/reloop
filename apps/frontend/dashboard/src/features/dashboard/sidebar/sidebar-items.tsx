@@ -2,7 +2,7 @@ import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { AnimatePresence, motion } from "framer-motion";
 import { usePathname } from "next/navigation";
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import { useOrgPermissions } from "#/features/settings/use-org-permissions";
 import { ShortcutHint } from "#/features/dashboard/keyboard-shortcuts-reveal";
@@ -13,9 +13,7 @@ import {
 } from "../navigation";
 import { SidebarNavIcon } from "./sidebar-nav-icon";
 import { SidebarNavLink } from "./sidebar-nav-link";
-
-/** Sidebar width transition is 200ms — remeasure after it settles. */
-const COLLAPSE_SETTLE_MS = 220;
+import { useSidebarHoverBox } from "./use-sidebar-hover-box";
 
 export function SidebarItems({
 	isCollapsed = false,
@@ -25,7 +23,6 @@ export function SidebarItems({
 	const [hoveredEl, setHoveredEl] = useState<HTMLAnchorElement | undefined>(
 		undefined,
 	);
-	const [rect, setRect] = useState<DOMRect | undefined>(undefined);
 	const [containerEl, setContainerEl] = useState<HTMLDivElement | null>(null);
 	const mainNavRefs = useRef<HTMLAnchorElement[]>([]);
 	const subNavRefs = useRef<Record<string, HTMLAnchorElement[]>>({});
@@ -105,30 +102,24 @@ export function SidebarItems({
 		? subNavRefs.current[activeSubInfo.mainPath]?.[activeSubInfo.subIndex]
 		: mainNavRefs.current[activeMainIndex];
 	const currentEl = hoveredEl ?? activeEl;
-
-	// Remeasure on active/hover change AND when collapse layout changes —
-	// otherwise the highlight keeps the expanded width/position.
-	useLayoutEffect(() => {
-		if (currentEl) {
-			setRect(currentEl.getBoundingClientRect());
-		} else {
-			setRect(undefined);
-		}
-	}, [currentEl, isCollapsed, containerEl]);
-
-	// Sidebar width animates over 200ms; catch the settled layout too.
-	useLayoutEffect(() => {
-		if (!currentEl) return;
-		const id = window.setTimeout(() => {
-			setRect(currentEl.getBoundingClientRect());
-		}, COLLAPSE_SETTLE_MS);
-		return () => window.clearTimeout(id);
-	}, [isCollapsed, currentEl]);
+	// expandedItems shifts rows below without resizing them — include in layout key.
+	const expandedKey = Object.entries(expandedItems)
+		.filter(([, open]) => open)
+		.map(([path]) => path)
+		.join(",");
+	const hoverBox = useSidebarHoverBox(
+		currentEl,
+		containerEl,
+		`${isCollapsed}:${expandedKey}`,
+	);
 
 	return (
 		<div
 			ref={setContainerEl}
-			className={cn("relative flex flex-col", isCollapsed && "items-center")}
+			className={cn(
+				"relative flex w-full flex-col",
+				isCollapsed && "items-center",
+			)}
 			onPointerLeave={() => setHoveredEl(undefined)}
 		>
 			{navigation.map((item, index) => {
@@ -144,7 +135,10 @@ export function SidebarItems({
 				return (
 					<div
 						key={path + index}
-						className={cn("flex flex-col", isCollapsed && "items-center")}
+						className={cn(
+							"flex flex-col",
+							isCollapsed ? "items-center" : "w-full",
+						)}
 					>
 						{showSectionHeader &&
 							(isCollapsed ? (
@@ -312,12 +306,7 @@ export function SidebarItems({
 				);
 			})}
 
-			<AnimatedHoverBackground
-				rect={rect}
-				tabElement={currentEl}
-				containerElement={containerEl}
-				className="!bg-neutral-alpha-10"
-			/>
+			<AnimatedHoverBackground box={hoverBox} className="!bg-neutral-alpha-10" />
 		</div>
 	);
 }

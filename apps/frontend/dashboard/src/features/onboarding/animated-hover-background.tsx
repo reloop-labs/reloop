@@ -1,68 +1,82 @@
 import { cn } from "@reloop/ui/cn";
 import { AnimatePresence, motion } from "framer-motion";
 
+export type HoverBox = {
+	left: number;
+	top: number;
+	width: number;
+	height: number;
+};
+
 interface AnimatedHoverBackgroundProps {
-	/** Viewport rect of the hovered item — used for width/height (fallback). */
-	rect: DOMRect | undefined;
-	/** The hovered DOM node — used for positioning. */
-	tabElement: HTMLElement | undefined;
 	/**
-	 * The `position: relative` container that hosts this absolute highlight.
-	 * When set, position/size are measured with getBoundingClientRect relative
-	 * to this element (correct under nested flex, transforms, and collapse).
-	 * Falls back to offsetLeft/offsetTop when omitted.
+	 * Pre-measured box in the coordinate space of the relative parent.
+	 * Prefer this when the parent tracks layout (collapse, resize, scroll).
 	 */
+	box?: HoverBox | null;
+	/** @deprecated Prefer `box` — kept for flat dropdown lists. */
+	rect?: DOMRect | undefined;
+	/** @deprecated Prefer `box` — kept for flat dropdown lists. */
+	tabElement?: HTMLElement | undefined;
+	/** @deprecated Prefer `box` — kept for flat dropdown lists. */
 	containerElement?: HTMLElement | null;
 	className?: string;
 	isDanger?: boolean;
 }
 
-function measureInContainer(
-	tab: HTMLElement,
-	container: HTMLElement,
-): { left: number; top: number; width: number; height: number } {
-	const tabRect = tab.getBoundingClientRect();
-	const containerRect = container.getBoundingClientRect();
-	return {
-		left: tabRect.left - containerRect.left + container.scrollLeft,
-		top: tabRect.top - containerRect.top + container.scrollTop,
-		width: tabRect.width,
-		height: tabRect.height,
-	};
+function resolveBox({
+	box,
+	rect,
+	tabElement,
+	containerElement,
+}: Pick<
+	AnimatedHoverBackgroundProps,
+	"box" | "rect" | "tabElement" | "containerElement"
+>): HoverBox | null {
+	if (box && box.width > 0 && box.height > 0) return box;
+
+	if (tabElement && containerElement) {
+		const tabRect = tabElement.getBoundingClientRect();
+		const containerRect = containerElement.getBoundingClientRect();
+		return {
+			left: tabRect.left - containerRect.left + containerElement.scrollLeft,
+			top: tabRect.top - containerRect.top + containerElement.scrollTop,
+			width: tabRect.width,
+			height: tabRect.height,
+		};
+	}
+
+	if (tabElement && rect) {
+		return {
+			left: tabElement.offsetLeft,
+			top: tabElement.offsetTop,
+			width: rect.width,
+			height: rect.height,
+		};
+	}
+
+	return null;
 }
 
 /**
  * Sliding hover highlight.
  *
- * Prefer passing `containerElement` (the relative parent) so position is
- * measured in that coordinate space. Without it, falls back to offsetLeft /
- * offsetTop (works for flat lists where offsetParent is the relative parent).
+ * For sidebars (nested items, collapse, transforms), pass a pre-measured `box`
+ * from the parent. Flat dropdown lists can keep using rect + tabElement.
  */
 export function AnimatedHoverBackground({
+	box,
 	rect,
 	tabElement,
 	containerElement,
 	className,
 	isDanger = false,
 }: AnimatedHoverBackgroundProps) {
-	let left = tabElement?.offsetLeft ?? 0;
-	let top = tabElement?.offsetTop ?? 0;
-	let width = rect?.width ?? 0;
-	let height = rect?.height ?? 0;
-
-	if (tabElement && containerElement) {
-		const m = measureInContainer(tabElement, containerElement);
-		left = m.left;
-		top = m.top;
-		width = m.width;
-		height = m.height;
-	}
-
-	const ready = Boolean(rect && tabElement && width > 0 && height > 0);
+	const resolved = resolveBox({ box, rect, tabElement, containerElement });
 
 	return (
 		<AnimatePresence>
-			{ready ? (
+			{resolved ? (
 				<motion.div
 					className={cn(
 						"pointer-events-none absolute top-0 left-0 z-0 rounded-lg",
@@ -73,18 +87,18 @@ export function AnimatedHoverBackground({
 					// showed up as sidebar text flicker when inbox data refreshed.
 					initial={false}
 					animate={{
-						width,
-						height,
-						left,
-						top,
+						width: resolved.width,
+						height: resolved.height,
+						left: resolved.left,
+						top: resolved.top,
 						opacity: 1,
 					}}
 					exit={{
 						opacity: 0,
-						width,
-						height,
-						left,
-						top,
+						width: resolved.width,
+						height: resolved.height,
+						left: resolved.left,
+						top: resolved.top,
 					}}
 					transition={{
 						type: "spring",
