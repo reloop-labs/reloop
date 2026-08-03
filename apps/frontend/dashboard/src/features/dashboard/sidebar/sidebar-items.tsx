@@ -14,6 +14,9 @@ import {
 import { SidebarNavIcon } from "./sidebar-nav-icon";
 import { SidebarNavLink } from "./sidebar-nav-link";
 
+/** Sidebar width transition is 200ms — remeasure after it settles. */
+const COLLAPSE_SETTLE_MS = 220;
+
 export function SidebarItems({
 	isCollapsed = false,
 }: {
@@ -23,6 +26,7 @@ export function SidebarItems({
 		undefined,
 	);
 	const [rect, setRect] = useState<DOMRect | undefined>(undefined);
+	const [containerEl, setContainerEl] = useState<HTMLDivElement | null>(null);
 	const mainNavRefs = useRef<HTMLAnchorElement[]>([]);
 	const subNavRefs = useRef<Record<string, HTMLAnchorElement[]>>({});
 	const pathname = usePathname();
@@ -102,16 +106,28 @@ export function SidebarItems({
 		: mainNavRefs.current[activeMainIndex];
 	const currentEl = hoveredEl ?? activeEl;
 
+	// Remeasure on active/hover change AND when collapse layout changes —
+	// otherwise the highlight keeps the expanded width/position.
 	useLayoutEffect(() => {
 		if (currentEl) {
 			setRect(currentEl.getBoundingClientRect());
 		} else {
 			setRect(undefined);
 		}
-	}, [currentEl]);
+	}, [currentEl, isCollapsed, containerEl]);
+
+	// Sidebar width animates over 200ms; catch the settled layout too.
+	useLayoutEffect(() => {
+		if (!currentEl) return;
+		const id = window.setTimeout(() => {
+			setRect(currentEl.getBoundingClientRect());
+		}, COLLAPSE_SETTLE_MS);
+		return () => window.clearTimeout(id);
+	}, [isCollapsed, currentEl]);
 
 	return (
 		<div
+			ref={setContainerEl}
 			className={cn("relative flex flex-col", isCollapsed && "items-center")}
 			onPointerLeave={() => setHoveredEl(undefined)}
 		>
@@ -126,7 +142,10 @@ export function SidebarItems({
 					section && (!prevItem || prevItem.section !== section);
 
 				return (
-					<div key={path + index} className="flex flex-col">
+					<div
+						key={path + index}
+						className={cn("flex flex-col", isCollapsed && "items-center")}
+					>
 						{showSectionHeader &&
 							(isCollapsed ? (
 								index > 0 && (
@@ -296,6 +315,7 @@ export function SidebarItems({
 			<AnimatedHoverBackground
 				rect={rect}
 				tabElement={currentEl}
+				containerElement={containerEl}
 				className="!bg-neutral-alpha-10"
 			/>
 		</div>

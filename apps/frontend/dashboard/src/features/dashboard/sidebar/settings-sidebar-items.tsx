@@ -9,6 +9,9 @@ import { filterSettingsNavigation, settingsNavigation } from "../navigation";
 import { SidebarNavIcon } from "./sidebar-nav-icon";
 import { SidebarNavLink } from "./sidebar-nav-link";
 
+/** Sidebar width transition is 200ms — remeasure after it settles. */
+const COLLAPSE_SETTLE_MS = 220;
+
 export function SettingsSidebarItems({
 	isCollapsed = false,
 }: {
@@ -18,6 +21,7 @@ export function SettingsSidebarItems({
 		undefined,
 	);
 	const [rect, setRect] = useState<DOMRect | undefined>(undefined);
+	const [containerEl, setContainerEl] = useState<HTMLDivElement | null>(null);
 
 	const backNavRef = useRef<HTMLAnchorElement>(null);
 	const itemRefs = useRef<HTMLAnchorElement[]>([]);
@@ -62,18 +66,30 @@ export function SettingsSidebarItems({
 		activeIndex !== -1 ? itemRefs.current[activeIndex] : undefined;
 	const currentEl = hoveredEl ?? activeEl;
 
+	// Remeasure on active/hover change AND when collapse layout changes —
+	// otherwise the highlight keeps the expanded width/position.
 	useLayoutEffect(() => {
 		if (currentEl) {
 			setRect(currentEl.getBoundingClientRect());
 		} else {
 			setRect(undefined);
 		}
-	}, [currentEl]);
+	}, [currentEl, isCollapsed, containerEl]);
+
+	// Sidebar width animates over 200ms; catch the settled layout too.
+	useLayoutEffect(() => {
+		if (!currentEl) return;
+		const id = window.setTimeout(() => {
+			setRect(currentEl.getBoundingClientRect());
+		}, COLLAPSE_SETTLE_MS);
+		return () => window.clearTimeout(id);
+	}, [isCollapsed, currentEl]);
 
 	let globalIndex = 0;
 
 	return (
 		<div
+			ref={setContainerEl}
 			className={cn("relative flex flex-col", isCollapsed && "items-center")}
 			onPointerLeave={() => setHoveredEl(undefined)}
 		>
@@ -109,7 +125,10 @@ export function SettingsSidebarItems({
 			</SidebarNavLink>
 
 			{filteredSettingsNavigation.map((section, sectionIdx) => (
-				<div key={section.section} className="flex flex-col">
+				<div
+					key={section.section}
+					className={cn("flex flex-col", isCollapsed && "items-center")}
+				>
 					{isCollapsed ? (
 						sectionIdx > 0 && (
 							<div className="my-2 h-[1px] w-6 self-center bg-stroke-soft-200" />
@@ -194,6 +213,7 @@ export function SettingsSidebarItems({
 			<AnimatedHoverBackground
 				rect={rect}
 				tabElement={currentEl}
+				containerElement={containerEl}
 				className="!bg-neutral-alpha-10"
 			/>
 		</div>
