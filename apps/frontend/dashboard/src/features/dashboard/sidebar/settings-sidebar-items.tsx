@@ -4,6 +4,7 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import { useOrgPermissions } from "#/features/settings/use-org-permissions";
+import { ShortcutHint } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { filterSettingsNavigation, settingsNavigation } from "../navigation";
 import { SidebarNavIcon } from "./sidebar-nav-icon";
 import { SidebarNavLink } from "./sidebar-nav-link";
@@ -147,29 +148,43 @@ export function SettingsSidebarItems({
 										? "h-8 w-8 justify-center px-0"
 										: "w-full justify-start gap-2.5 px-2.5",
 								)}
-								title={isCollapsed ? item.label : undefined}
+								title={isCollapsed ? (item.shortcut ? `${item.label} (${item.shortcut.label})` : item.label) : undefined}
 							>
 								<span
 									className={cn(
 										"flex min-w-0 items-center",
-										isCollapsed ? "" : "gap-2.5",
+										isCollapsed
+											? "justify-center"
+											: "flex-1 justify-between gap-2.5",
 									)}
 								>
-									<SidebarNavIcon
-										name={item.iconName}
-										isActive={isItemActive}
-									/>
-									{!isCollapsed && (
-										<span
-											className={cn(
-												"font-medium text-[13px] transition-colors",
-												isItemActive
-													? "text-text-strong-950"
-													: "text-text-sub-600 group-hover:text-text-strong-950",
-											)}
-										>
-											{item.label}
-										</span>
+									<span
+										className={cn(
+											"flex min-w-0 items-center",
+											!isCollapsed && "gap-2.5",
+										)}
+									>
+										<SidebarNavIcon
+											name={item.iconName}
+											isActive={isItemActive}
+										/>
+										{!isCollapsed && (
+											<span
+												className={cn(
+													"truncate font-medium text-[13px] transition-colors",
+													isItemActive
+														? "text-text-strong-950"
+														: "text-text-sub-600 group-hover:text-text-strong-950",
+												)}
+											>
+												{item.label}
+											</span>
+										)}
+									</span>
+									{!isCollapsed && item.shortcut && (
+										<ShortcutHint className="w-auto min-w-0 px-1 font-mono text-[9px]">
+											{item.shortcut.label}
+										</ShortcutHint>
 									)}
 								</span>
 							</SidebarNavLink>

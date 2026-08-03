@@ -27,19 +27,108 @@ import { useActiveOrganization } from "#/features/dashboard/page-header/use-acti
 import { useOrgPermissions } from "#/features/settings/use-org-permissions";
 
 const PAGE_SHORTCUTS: Record<string, { label: string; keys: string[] }> = {};
-mainNavigation.forEach((item, i) => {
-	if (i < 9) {
-		PAGE_SHORTCUTS[item.path] = {
-			label: `⌘${i + 1}`,
-			keys: [`mod+${i + 1}`],
-		};
-	} else if (item.path === "/settings") {
-		PAGE_SHORTCUTS[item.path] = {
-			label: "⌘,",
-			keys: ["mod+,"],
-		};
+mainNavigation.forEach((item) => {
+	if (item.shortcut) {
+		PAGE_SHORTCUTS[item.path] = item.shortcut;
 	}
+	item.items?.forEach((sub) => {
+		if (sub.shortcut) {
+			PAGE_SHORTCUTS[sub.path] = sub.shortcut;
+		}
+	});
 });
+settingsNavigation.forEach((section) => {
+	section.items.forEach((item) => {
+		if (item.shortcut) {
+			PAGE_SHORTCUTS[item.path] = item.shortcut;
+		}
+	});
+});
+
+function useNavigationShortcuts(router: ReturnType<typeof useRouter>) {
+	React.useEffect(() => {
+		let gTimeout: ReturnType<typeof setTimeout> | null = null;
+		let gPressed = false;
+
+		const clearG = () => {
+			gPressed = false;
+			if (gTimeout) {
+				clearTimeout(gTimeout);
+				gTimeout = null;
+			}
+		};
+
+		const isEditable = (target: EventTarget | null) => {
+			if (!(target instanceof HTMLElement)) return false;
+			if (target.isContentEditable) return true;
+			const tag = target.tagName;
+			if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return true;
+			if (target.closest('[contenteditable="true"], [role="textbox"]')) {
+				return true;
+			}
+			return false;
+		};
+
+		const routeMap: Record<string, string> = {
+			e: "/",
+			i: "/inbox",
+			c: "/contacts",
+			p: "/contacts/properties",
+			g: "/contacts/groups",
+			h: "/contacts/channels",
+			t: "/templates",
+			m: "/metrics",
+			l: "/logs",
+			k: "/api-keys",
+			a: "/api-keys",
+			d: "/domain",
+			w: "/webhooks",
+			n: "/integrations",
+			s: "/smtp",
+			",": "/settings",
+			u: "/settings",
+			b: "/settings/billing",
+			T: "/settings/teams",
+			W: "/settings/workspace",
+			P: "/settings/profile",
+			S: "/settings/security",
+			K: "/settings/shortcuts",
+			H: "/settings/theme",
+		};
+
+		const onKeyDown = (e: KeyboardEvent) => {
+			if (e.metaKey || e.ctrlKey || e.altKey) return;
+			if (isEditable(e.target)) return;
+
+			const key = e.key;
+
+			if (gPressed) {
+				const path = routeMap[key] || routeMap[key.toLowerCase()];
+				if (path) {
+					e.preventDefault();
+					e.stopPropagation();
+					// eslint-disable-next-line @typescript-eslint/no-explicit-any
+					router.push(path as any);
+					clearG();
+					return;
+				}
+				clearG();
+			}
+
+			if (key === "g" || key === "G") {
+				gPressed = true;
+				if (gTimeout) clearTimeout(gTimeout);
+				gTimeout = setTimeout(clearG, 1000);
+			}
+		};
+
+		window.addEventListener("keydown", onKeyDown, true);
+		return () => {
+			clearG();
+			window.removeEventListener("keydown", onKeyDown, true);
+		};
+	}, [router]);
+}
 
 export interface CommandAction {
 	id: string;
@@ -99,6 +188,8 @@ export function CommandMenuGlobal() {
 	const { activeOrganization, organizations, onOrganizationChange } =
 		useActiveOrganization();
 
+	useNavigationShortcuts(router);
+
 	const settingsItems = React.useMemo(
 		() =>
 			filterSettingsNavigation(settingsNavigation, {
@@ -112,7 +203,7 @@ export function CommandMenuGlobal() {
 		setOpen((o) => !o);
 	});
 
-	useHotkeys("mod+shift+l", (e) => {
+	useHotkeys("t", (e) => {
 		e.preventDefault();
 		setTheme(resolvedTheme === "light" ? "dark" : "light");
 	});
@@ -168,26 +259,6 @@ export function CommandMenuGlobal() {
 		setOpen(false);
 	});
 
-	useHotkeys(
-		"mod+1,mod+2,mod+3,mod+4,mod+5,mod+6,mod+7,mod+8,mod+9",
-		(e, handler) => {
-			if (!open) return;
-			e.preventDefault();
-			const keyStr =
-				typeof handler.keys === "string"
-					? handler.keys
-					: Array.isArray(handler.keys)
-						? handler.keys.join("")
-						: "";
-			const num = Number.parseInt(keyStr.replace(/[^0-9]/g, ""), 10);
-			if (num >= 1 && num <= mainNavigation.length) {
-				const item = mainNavigation[num - 1];
-				if (item) navigateTo(item);
-			}
-		},
-		{ enabled: open, enableOnFormTags: true },
-	);
-
 	React.useEffect(() => {
 		if (open) {
 			setSearch("");
@@ -221,7 +292,7 @@ export function CommandMenuGlobal() {
 				id: "toggle-theme",
 				label: "Toggle Theme",
 				icon: resolvedTheme === "dark" ? "sun" : "moon",
-				shortcut: { label: "⌘⇧L", keys: ["mod+shift+l"] },
+				shortcut: { label: "T", keys: ["t"] },
 				onSelect: () => handleThemeSelect("toggle"),
 			},
 			{

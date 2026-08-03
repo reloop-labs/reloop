@@ -10,6 +10,7 @@ import { AnimatedHomeIcon } from "./animated-home-icon";
 import { AnimatedInboxIcon } from "./animated-inbox-icon";
 import { AnimatedIntegrationIcon } from "./animated-integration-icon";
 import { AnimatedKeyIcon } from "./animated-key-icon";
+import { AnimatedKeyboardIcon } from "./animated-keyboard-icon";
 import { AnimatedLayoutIcon } from "./animated-layout-icon";
 import { AnimatedLogsIcon } from "./animated-logs-icon";
 import { AnimatedMailActionIcon } from "./animated-mail-action-icon";
@@ -100,6 +101,8 @@ export function SidebarNavIcon({
 			return <AnimatedProfileIcon className={tone} />;
 		case "shield-check":
 			return <AnimatedSecurityIcon className={tone} />;
+		case "keyboard":
+			return <AnimatedKeyboardIcon className={tone} />;
 		case "swatch-book":
 			return <AnimatedThemeIcon className={tone} />;
 		default:

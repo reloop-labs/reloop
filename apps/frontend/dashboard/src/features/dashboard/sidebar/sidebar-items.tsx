@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import { useOrgPermissions } from "#/features/settings/use-org-permissions";
+import { ShortcutHint } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import {
 	mainNavigation,
 	SETTINGS_ADMIN_HOME,
@@ -115,7 +116,7 @@ export function SidebarItems({
 			onPointerLeave={() => setHoveredEl(undefined)}
 		>
 			{navigation.map((item, index) => {
-				const { path, label, iconName, isSpecial, items, section } = item;
+				const { path, label, iconName, isSpecial, items, section, shortcut } = item;
 				if (path === "/ai") return null;
 				const hasSubNav = items && items.length > 0;
 				const isExpanded = expandedItems[path] && !isCollapsed;
@@ -156,32 +157,46 @@ export function SidebarItems({
 											hasSubNav ? "justify-between" : "justify-start",
 										),
 							)}
-							title={isCollapsed ? label : undefined}
+							title={isCollapsed ? (shortcut ? `${label} (${shortcut.label})` : label) : undefined}
 						>
 							<span
 								className={cn(
 									"flex min-w-0 items-center",
-									isCollapsed ? "" : "gap-2.5",
+									isCollapsed
+										? "justify-center"
+										: "flex-1 justify-between gap-2.5",
 								)}
 							>
-								<SidebarNavIcon
-									name={iconName}
-									isSpecial={isSpecial}
-									isActive={activeMainIndex === index}
-								/>
-								{!isCollapsed && (
-									<span
-										className={cn(
-											"font-medium text-[13px] transition-colors",
-											isSpecial
-												? "bg-gradient-to-r from-[#A855F7] to-[#EC4899] bg-clip-text text-transparent"
-												: activeMainIndex === index
-													? "text-text-strong-950"
-													: "text-text-sub-600 group-hover:text-text-strong-950",
-										)}
-									>
-										{label}
-									</span>
+								<span
+									className={cn(
+										"flex min-w-0 items-center",
+										!isCollapsed && "gap-2.5",
+									)}
+								>
+									<SidebarNavIcon
+										name={iconName}
+										isSpecial={isSpecial}
+										isActive={activeMainIndex === index}
+									/>
+									{!isCollapsed && (
+										<span
+											className={cn(
+												"truncate font-medium text-[13px] transition-colors",
+												isSpecial
+													? "bg-gradient-to-r from-[#A855F7] to-[#EC4899] bg-clip-text text-transparent"
+													: activeMainIndex === index
+														? "text-text-strong-950"
+														: "text-text-sub-600 group-hover:text-text-strong-950",
+											)}
+										>
+											{label}
+										</span>
+									)}
+								</span>
+								{!isCollapsed && shortcut && (
+									<ShortcutHint className="w-auto min-w-0 px-1 font-mono text-[9px]">
+										{shortcut.label}
+									</ShortcutHint>
 								)}
 							</span>
 
@@ -224,9 +239,10 @@ export function SidebarItems({
 										<div className="my-0.5 ml-[14px] flex flex-col border-stroke-soft-200 border-l pb-0.5 pl-2">
 											{items.map(
 												(
-													{ label: subLabel, path: subPath, iconName: subIcon },
+													subItem,
 													subIndex,
 												) => {
+													const { label: subLabel, path: subPath, iconName: subIcon, shortcut: subShortcut } = subItem;
 													const isSubActive =
 														subPath === "/settings"
 															? pathWithoutSlug === "/settings"
@@ -249,18 +265,25 @@ export function SidebarItems({
 																)
 															}
 															className={cn(
-																"relative z-10 flex h-7 items-center gap-1.5 rounded-md px-2 font-medium text-[12px] transition-colors",
+																"relative z-10 flex h-7 items-center justify-between gap-1.5 rounded-md px-2 font-medium text-[12px] transition-colors",
 																isSubActive
 																	? "text-text-strong-950"
 																	: "text-text-sub-600 hover:text-text-strong-950",
 															)}
 														>
-															<SidebarNavIcon
-																name={subIcon}
-																isActive={isSubActive}
-																className="h-3.5 w-3.5"
-															/>
-															{subLabel}
+															<span className="flex min-w-0 items-center gap-1.5">
+																<SidebarNavIcon
+																	name={subIcon}
+																	isActive={isSubActive}
+																	className="h-3.5 w-3.5"
+																/>
+																{subLabel}
+															</span>
+															{subShortcut && (
+																<ShortcutHint className="w-auto min-w-0 px-1 font-mono text-[9px]">
+																	{subShortcut.label}
+																</ShortcutHint>
+															)}
 														</SidebarNavLink>
 													);
 												},
