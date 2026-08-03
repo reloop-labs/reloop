@@ -250,7 +250,7 @@ export const source = {
 			const fileContent = fs.readFileSync(filePath, "utf-8");
 			const { data: frontmatter, content } = matter(fileContent);
 			const toc: TOCItem[] = [];
-			const headingRegex = /^(##|###)\s+(.*)$/gm;
+			const headingRegex = /^\s*(##|###)\s+(.*)$/gm;
 			const seenSlugs = new Map<string, number>();
 			for (const match of content.matchAll(headingRegex)) {
 				if (!match[1] || !match[2]) continue;

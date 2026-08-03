@@ -12,20 +12,21 @@ interface TOCProps {
 
 export function TableOfContents({ items }: TOCProps) {
 	const [activeId, setActiveId] = useState<string | null>(null);
+	const [visibleItems, setVisibleItems] = useState<TOCItem[]>(items);
 
 	const activeIds = useMemo(() => {
 		const ids = new Set<string>();
 		if (!activeId) return ids;
 
-		const activeIndex = items.findIndex(
+		const activeIndex = visibleItems.findIndex(
 			(item) => item.url.slice(1) === activeId,
 		);
 		if (activeIndex !== -1) {
 			ids.add(activeId);
-			const activeItem = items[activeIndex];
+			const activeItem = visibleItems[activeIndex];
 			if (activeItem && activeItem.depth > 2) {
 				for (let i = activeIndex - 1; i >= 0; i--) {
-					const item = items[i];
+					const item = visibleItems[i];
 					if (item && item.depth === 2) {
 						ids.add(item.url.slice(1));
 						break;
@@ -34,13 +35,32 @@ export function TableOfContents({ items }: TOCProps) {
 			}
 		}
 		return ids;
-	}, [activeId, items]);
+	}, [activeId, visibleItems]);
 
 	useEffect(() => {
+		const updateVisibleItems = () => {
+			const nextVisible = items.filter((item) => {
+				const id = item.url.slice(1);
+				const el = document.getElementById(id);
+				return !!el && el.offsetParent !== null && el.getClientRects().length > 0;
+			});
+
+			setVisibleItems((prev) => {
+				const prevUrls = prev.map((p) => p.url).join(",");
+				const nextUrls = nextVisible.map((n) => n.url).join(",");
+				return prevUrls === nextUrls ? prev : nextVisible;
+			});
+		};
+
 		const handleScroll = () => {
+			updateVisibleItems();
+
 			const headingElements = items
 				.map((item) => document.getElementById(item.url.slice(1)))
-				.filter(Boolean) as HTMLElement[];
+				.filter(
+					(el): el is HTMLElement =>
+						!!el && el.offsetParent !== null && el.getClientRects().length > 0,
+				);
 
 			if (headingElements.length === 0) return;
 
@@ -70,18 +90,33 @@ export function TableOfContents({ items }: TOCProps) {
 		const pageEl = document.getElementById("nd-page");
 		if (pageEl) {
 			pageEl.addEventListener("scroll", handleScroll, { passive: true });
-			// Give the DOM a tiny bit to render first
 			setTimeout(handleScroll, 100);
+		}
+
+		window.addEventListener("resize", handleScroll);
+
+		const observer = new MutationObserver(() => {
+			handleScroll();
+		});
+
+		if (pageEl) {
+			observer.observe(pageEl, {
+				childList: true,
+				subtree: true,
+				attributes: true,
+			});
 		}
 
 		return () => {
 			if (pageEl) {
 				pageEl.removeEventListener("scroll", handleScroll);
 			}
+			window.removeEventListener("resize", handleScroll);
+			observer.disconnect();
 		};
 	}, [items]);
 
-	if (items.length === 0) return null;
+	if (visibleItems.length === 0) return null;
 
 	return (
 		<div
@@ -98,7 +133,7 @@ export function TableOfContents({ items }: TOCProps) {
 				</div>
 
 				<ul className="m-0 flex list-none flex-col gap-0.5 border-stroke-soft-100 border-l pl-0">
-					{items.map((item) => {
+					{visibleItems.map((item) => {
 						const isPrimaryActive = item.url.slice(1) === activeId;
 						const isActive = activeIds.has(item.url.slice(1));
 						const isSubItem = item.depth > 2;

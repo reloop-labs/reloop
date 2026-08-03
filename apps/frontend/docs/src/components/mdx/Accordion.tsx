@@ -16,7 +16,7 @@ export function AccordionGroup({
 		<AccordionGroupContext.Provider value={true}>
 			<div
 				className={cn(
-					"my-6 overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-white-0 divide-y divide-stroke-soft-200 dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a] dark:divide-stroke-soft-100/40",
+					"my-6 overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 divide-y divide-stroke-soft-200 dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a] dark:divide-stroke-soft-100/40",
 					className,
 				)}
 			>
@@ -69,7 +69,7 @@ export function Accordion({
 
 	if (!isInGroup) {
 		return (
-			<div className="my-4 overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a]">
+			<div className="my-4 overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a]">
 				{itemContent}
 			</div>
 		);
