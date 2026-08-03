@@ -1,9 +1,7 @@
-import { useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { useCallback, useRef, useState } from "react";
 import { toast } from "sonner";
-import { queryKeys } from "#/lib/query-keys";
-import type { ApiKeyData, ApiKeyListResponse } from "../types";
+import type { ApiKeyData } from "../types";
 import {
 	type ApiKeysListParams,
 	useInvalidateApiKeys,
@@ -29,15 +27,15 @@ export function useToggleApiKey(listParams: ApiKeysListParams) {
 						? "API key disabled successfully"
 						: "API key enabled successfully",
 				);
+				await invalidate();
+				setTogglingId(null);
 			} catch (error) {
+				setTogglingId(null);
 				const message = axios.isAxiosError(error)
 					? error.response?.data?.message || "Failed to toggle API key"
 					: "Failed to toggle API key";
 				toast.error(message);
 				throw error;
-			} finally {
-				setTogglingId(null);
-				await invalidate();
 			}
 		},
 		[invalidate],

@@ -3,6 +3,7 @@ import { cn } from "@reloop/ui/cn";
 import * as ContextMenu from "@reloop/ui/context-menu";
 import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
+import Spinner from "@reloop/ui/spinner";
 import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { type ReactNode, useCallback, useRef, useState } from "react";
@@ -74,7 +75,7 @@ function useApiKeyActionsMenu(
 		{
 			id: "toggle" as const,
 			label: isToggling
-				? apiKey.enabled
+				? wasEnabledOnToggle
 					? "Disabling..."
 					: "Enabling..."
 				: apiKey.enabled
@@ -172,15 +173,18 @@ function useApiKeyActionsMenu(
 		} else if (id === "copy_id") {
 			void handleCopyId();
 		} else if (id === "toggle") {
+			keepOpenRef.current = true;
 			setWasEnabledOnToggle(apiKey.enabled);
 			try {
 				await handlers.onToggleEnabled(apiKey);
 				setIsToggleCompleted(true);
 				setTimeout(() => {
 					setIsToggleCompleted(false);
+					keepOpenRef.current = false;
 					dismissMenu();
 				}, 750);
 			} catch {
+				keepOpenRef.current = false;
 				dismissMenu();
 			}
 		} else if (id === "rotate") {
@@ -266,11 +270,8 @@ function MenuItemLabel({
 						</>
 					) : isToggling ? (
 						<>
-							<Icon
-								name="loader-2"
-								className="h-3.5 w-3.5 shrink-0 animate-spin text-text-sub-600"
-							/>
-							<span>{apiKey.enabled ? "Disabling..." : "Enabling..."}</span>
+							<Spinner size={14} color="currentColor" />
+							<span>{wasEnabledOnToggle ? "Disabling..." : "Enabling..."}</span>
 						</>
 					) : (
 						<>
