@@ -54,18 +54,32 @@ faq:
 
     ## Rotate an API key
 
-    ![Rotate an API key in the Reloop dashboard](/docs/images/docs/api-keys/rotate-api-key.gif)
+    <Info>
+    Rotate a key when you suspect it may have been exposed, when a team member with access leaves, or as part of regular security hygiene. Rotating issues a new secret and immediately revokes the old one. All previous request logs and usage history stay intact.
+    </Info>
 
     1. Open [API Keys](https://reloop.sh/dashboard/api-keys)
     2. Click the row menu (**···**) → **Rotate Key**
-    3. Confirm rotation — the previous secret stops working immediately
-    4. Copy the new secret string and deploy it to your servers
+    3. Enter the key name to confirm rotation
+    4. Click **Rotate Key** (or press `Enter`)
+    <Warning>
+    Copy the new secret key immediately upon rotation. Reloop stores a secure hash, so the full secret can never be retrieved again after closing the dialog.
+    </Warning>
 
+    <Video src="/docs/images/docs/api-keys/rotate-api-key.mp4" autoPlay loop muted playsInline />
     ---
 
     ## Disable or enable an API key
 
-    ![Disable or enable an API key in the Reloop dashboard](/docs/images/docs/api-keys/disable-api-key.gif)
+    <Info>
+    Disable a key to temporarily block access without deleting it. You can re-enable it at any time. Common reasons:
+
+    - **Security breach** — key was exposed in a public repo or logs.
+    - **System maintenance** — block requests during upgrades to prevent data corruption.
+    - **Testing transitions** — verify your system works with a new key before removing the old one.
+    - **Cost control** — stop billable consumption from a runaway app or loop.
+    - **Suspicious activity** — pause access while you investigate unusual request patterns.
+    </Info>
 
     1. Open [API Keys](https://reloop.sh/dashboard/api-keys)
     2. Click the row menu (**···**) → **Disable** (or **Enable** if already paused)
