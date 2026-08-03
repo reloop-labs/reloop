@@ -55,7 +55,7 @@ export function ApiSidebarFolder({
 				data-sidebar-active={isDirectlyActive || undefined}
 				className={cn(
 					"group relative z-10 flex w-full items-center justify-between rounded-lg px-2 font-medium transition-all",
-					depth === 0 ? "h-7 text-[13px]" : "h-7 text-[13px]",
+					depth === 0 ? "h-8 text-[14px]" : "h-7 text-[14px]",
 					isDirectlyActive
 						? "text-[#171717] dark:text-white"
 						: isParentActive
@@ -168,7 +168,7 @@ export function ApiSidebarLink({
 			data-sidebar-active={isActive || undefined}
 			className={cn(
 				"group relative z-10 flex items-center gap-2 rounded-lg px-2 transition-colors",
-				depth === 0 ? "h-7 text-[13px]" : "h-7 text-[13px]",
+				depth === 0 ? "h-8 text-[14px]" : "h-7 text-[14px]",
 				// Row-level text color: method-tinted when active, muted otherwise
 				node.method
 					? isActive
@@ -183,14 +183,14 @@ export function ApiSidebarLink({
 				className={cn(
 					"relative z-10 w-full items-center text-left",
 					node.method || node.icon
-						? "grid grid-cols-[38px_1fr] gap-2.5"
+						? "grid grid-cols-[32px_1fr] gap-3"
 						: "flex gap-2",
 				)}
 			>
 				{node.method ? (
 					<p
 						className={cn(
-							"inline-flex w-fit shrink-0 items-center justify-self-start rounded-lg px-1.5 py-[3.5px] font-semibold text-[10px] uppercase leading-tight tracking-wide transition-all",
+							"inline-flex w-fit shrink-0 items-center justify-center rounded-md px-1 py-[1.5px] font-semibold text-[9px] uppercase leading-none tracking-wide transition-all",
 							node.method === "GET" &&
 								(isActive
 									? "bg-green-500 text-white dark:bg-green-500 dark:text-white"
