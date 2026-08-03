@@ -96,140 +96,37 @@ faq:
     <Video src="/docs/images/docs/api-keys/delete-api-key.mp4" autoPlay loop muted playsInline />
   </Tab>
   <Tab title="Code" icon="code">
+    ## View all API Keys
+
+    Fetch a paginated list of API keys in your organization.
+
+    <ApiKeyCodeSamples id="apiKey.list" />
+
     ## Create an API key
 
     Use an existing API key to programmatically create new keys for services or team members.
 
-    ```javascript
-    import { Reloop } from "reloop-email";
-
-    const reloop = new Reloop({ apiKey: process.env.RELOOP_API_KEY });
-
-    const { apiKey, apiKeyError } = await reloop.apiKey.create({
-      name: "Production Server",
-    });
-    if (apiKeyError) throw apiKeyError;
-
-    console.log(apiKey.key); // secret string returned ONCE here
-    ```
-
-    ```bash
-    curl -X POST https://reloop.sh/api/api-key/v1/ \
-      -H "x-api-key: $RELOOP_API_KEY" \
-      -H "Content-Type: application/json" \
-      -d '{"name": "Production Server"}'
-    ```
+    <ApiKeyCodeSamples id="apiKey.create" />
 
     <Warning>
     Copy the secret key immediately upon creation. Reloop stores a secure hash, so the full secret can never be retrieved again.
     </Warning>
 
-    ---
+    ## Edit an API key
 
-    ## Use an API key
-
-    Store the secret key in your environment variables or secret manager, then pass it on every HTTP request as the `x-api-key` header, or initialize the Reloop SDK.
-
-    ```env
-    RELOOP_API_KEY=rl_prod_YOUR_API_KEY
-    ```
-
-    ```bash
-    curl https://reloop.sh/api/domain/v1/list \
-      -H "x-api-key: $RELOOP_API_KEY"
-    ```
-
-    ```javascript
-    import { Reloop } from "reloop-email";
-
-    const reloop = new Reloop({ apiKey: process.env.RELOOP_API_KEY });
-    ```
-
-    ---
-
-    ## Edit or rename an API key
-
-    ```javascript
-    import { Reloop } from "reloop-email";
-
-    const reloop = new Reloop({ apiKey: process.env.RELOOP_API_KEY });
-    const keyId = "key_123456789";
-
-    const { apiKey } = await reloop.apiKey.update(keyId, {
-      name: "Updated Background Worker",
-    });
-    ```
-
-    ```bash
-    curl -X PATCH https://reloop.sh/api/api-key/v1/key_123456789 \
-      -H "x-api-key: $RELOOP_API_KEY" \
-      -H "Content-Type: application/json" \
-      -d '{"name": "Updated Background Worker"}'
-    ```
-
-    ---
+    <ApiKeyCodeSamples id="apiKey.update" />
 
     ## Rotate an API key
 
-    ```javascript
-    import { Reloop } from "reloop-email";
-
-    const reloop = new Reloop({ apiKey: process.env.RELOOP_API_KEY });
-    const keyId = "key_123456789";
-
-    const { apiKey } = await reloop.apiKey.rotate(keyId);
-    console.log(apiKey.key); // new secret string returned ONCE
-    ```
-
-    ```bash
-    curl -X POST https://reloop.sh/api/api-key/v1/rotate/key_123456789 \
-      -H "x-api-key: $RELOOP_API_KEY"
-    ```
-
-    ---
+    <ApiKeyCodeSamples id="apiKey.rotate" />
 
     ## Disable or enable an API key
 
-    ```javascript
-    import { Reloop } from "reloop-email";
-
-    const reloop = new Reloop({ apiKey: process.env.RELOOP_API_KEY });
-    const keyId = "key_123456789";
-
-    // Pause access
-    await reloop.apiKey.disable(keyId);
-
-    // Restore access
-    await reloop.apiKey.enable(keyId);
-    ```
-
-    ```bash
-    # Disable
-    curl -X POST https://reloop.sh/api/api-key/v1/disable/key_123456789 \
-      -H "x-api-key: $RELOOP_API_KEY"
-
-    # Enable
-    curl -X POST https://reloop.sh/api/api-key/v1/enable/key_123456789 \
-      -H "x-api-key: $RELOOP_API_KEY"
-    ```
-
-    ---
+    <ApiKeyCodeSamples id="apiKey.disable" />
 
     ## Delete an API key
 
-    ```javascript
-    import { Reloop } from "reloop-email";
-
-    const reloop = new Reloop({ apiKey: process.env.RELOOP_API_KEY });
-    const keyId = "key_123456789";
-
-    await reloop.apiKey.delete(keyId);
-    ```
-
-    ```bash
-    curl -X DELETE https://reloop.sh/api/api-key/v1/key_123456789 \
-      -H "x-api-key: $RELOOP_API_KEY"
-    ```
+    <ApiKeyCodeSamples id="apiKey.delete" />
   </Tab>
 </Tabs>
 
