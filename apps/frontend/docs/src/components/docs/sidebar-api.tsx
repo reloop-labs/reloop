@@ -55,7 +55,7 @@ export function ApiSidebarFolder({
 				data-sidebar-active={isDirectlyActive || undefined}
 				className={cn(
 					"group relative z-10 flex w-full items-center justify-between rounded-lg px-2 font-medium transition-all",
-					depth === 0 ? "h-9 text-[15px]" : "h-8 text-[14px]",
+					depth === 0 ? "h-7 text-[13px]" : "h-7 text-[13px]",
 					isDirectlyActive
 						? "text-[#171717] dark:text-white"
 						: isParentActive
@@ -168,7 +168,7 @@ export function ApiSidebarLink({
 			data-sidebar-active={isActive || undefined}
 			className={cn(
 				"group relative z-10 flex items-center gap-2 rounded-lg px-2 transition-colors",
-				depth === 0 ? "h-9 text-[15px]" : "h-8 text-[14px]",
+				depth === 0 ? "h-7 text-[13px]" : "h-7 text-[13px]",
 				// Row-level text color: method-tinted when active, muted otherwise
 				node.method
 					? isActive
@@ -183,7 +183,7 @@ export function ApiSidebarLink({
 				className={cn(
 					"relative z-10 w-full items-center text-left",
 					node.method || node.icon
-						? "grid grid-cols-[40px_1fr] gap-4"
+						? "grid grid-cols-[38px_1fr] gap-2.5"
 						: "flex gap-2",
 				)}
 			>
@@ -257,8 +257,8 @@ export function ApiSidebarSection({
 		const name = node.name as string;
 		const id = name.toLowerCase().replace(/\s+/g, "-");
 		return (
-			<div id={id} className="mt-4 mb-1.5 scroll-mt-8 px-2">
-				<h4 className="font-semibold text-sm uppercase">{name}</h4>
+			<div id={id} className="mt-3 mb-1 scroll-mt-8 px-2">
+				<h4 className="font-semibold text-xs uppercase">{name}</h4>
 			</div>
 		);
 	}
