@@ -1,7 +1,6 @@
 "use client";
 
 import {
-	Accordion,
 	Callout,
 	Icon,
 	Info,
@@ -306,7 +305,7 @@ CodeBlock.displayName = "CodeBlock";
 
 // Custom docs tabs (dashboard contacts-style UI with optional icons)
 export { Tab, Tabs } from "./Tabs";
-export const AccordionGroup = (Accordion as any).Group;
+export { Accordion, AccordionGroup } from "./Accordion";
 const Steps = React.forwardRef<
 	HTMLDivElement,
 	React.ComponentProps<typeof MintlifySteps>
@@ -370,7 +369,6 @@ const Card = React.forwardRef<
 Card.displayName = "Card";
 
 export {
-	Accordion,
 	Callout,
 	Card,
 	CodeBlock,

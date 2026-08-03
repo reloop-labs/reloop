@@ -89,29 +89,36 @@ Update your webhook URL in the [Reloop Dashboard](https://app.reloop.dev/webhook
 
 ## FAQ
 
-### What is the retry schedule?
-If your server returns a non-2xx response, we retry up to 7 attempts:
-- Immediate
-- 5 seconds
-- 5 minutes
-- 30 minutes
-- 2 hours
-- 5 hours
-- 10 hours
+<AccordionGroup>
+  <Accordion title="What is the retry schedule?">
+    If your server returns a non-2xx response, we retry up to 7 attempts:
+    - Immediate
+    - 5 seconds
+    - 5 minutes
+    - 30 minutes
+    - 2 hours
+    - 5 hours
+    - 10 hours
+  </Accordion>
 
-### How do I verify authenticity?
-Use your endpoint secret (`whsec_…`) to verify `Reloop-Signature`. See [Verify Webhooks Requests](/docs/webhooks/verify-webhooks-requests).
-- `54.148.139.208`
-- `2600:1f24:64:8000::/52`
+  <Accordion title="How do I verify authenticity?">
+    Use your endpoint secret (`whsec_…`) to verify `Reloop-Signature`. See [Verify Webhooks Requests](/docs/webhooks/verify-webhooks-requests).
+    - `54.148.139.208`
+    - `2600:1f24:64:8000::/52`
+  </Accordion>
 
-### What are the delivery guarantees?
-Reloop guarantees "at-least-once" delivery of webhooks. Each webhook has a unique `reloop-id` (or Svix ID) header that you can use for idempotency to ensure you don't process the same event twice.
+  <Accordion title="What are the delivery guarantees?">
+    Reloop guarantees "at-least-once" delivery of webhooks. Each webhook has a unique `reloop-id` (or Svix ID) header that you can use for idempotency to ensure you don't process the same event twice.
+  </Accordion>
 
-### Do events arrive in order?
-We do not guarantee that events will arrive in the order they occurred. For example, an `email.opened` event might arrive before an `email.delivered` event due to network latency or retries. You should use the `created_at` timestamp in the payload to order them.
+  <Accordion title="Do events arrive in order?">
+    We do not guarantee that events will arrive in the order they occurred. For example, an `email.opened` event might arrive before an `email.delivered` event due to network latency or retries. You should use the `created_at` timestamp in the payload to order them.
+  </Accordion>
 
-### Can I retry webhook events manually?
-Yes, you can manually replay any failed or successful webhook event from the [Reloop Dashboard](https://app.reloop.dev/webhooks).
+  <Accordion title="Can I retry webhook events manually?">
+    Yes, you can manually replay any failed or successful webhook event from the [Reloop Dashboard](https://app.reloop.dev/webhooks).
+  </Accordion>
+</AccordionGroup>
 
 ---
 

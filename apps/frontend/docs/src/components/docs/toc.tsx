@@ -86,7 +86,7 @@ export function TableOfContents({ items }: TOCProps) {
 	return (
 		<div
 			id="docs-toc"
-			className="ml-auto hidden w-fit max-w-[240px] text-sm xl:block"
+			className="ml-auto hidden w-full text-sm xl:block"
 		>
 			<div className="sticky top-0">
 				<div
@@ -116,7 +116,7 @@ export function TableOfContents({ items }: TOCProps) {
 								<a
 									href={item.url}
 									className={cn(
-										"block truncate py-1 font-medium text-[13px] no-underline transition-colors",
+										"block py-1 font-medium text-[13px] leading-snug no-underline transition-colors break-words",
 										isSubItem ? "pl-6" : "pl-3",
 										isActive
 											? "text-[#171717] dark:text-white"

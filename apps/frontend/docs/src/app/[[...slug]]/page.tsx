@@ -301,12 +301,12 @@ export default async function Page(props: {
 				pathname={pathname}
 			>
 				<div
-					className={`mx-auto flex w-full flex-col ${
+					className={`w-full flex-col ${
 						hideToc
 							? isApiPage
-								? "max-w-6xl"
+								? "mx-auto max-w-6xl"
 								: "max-w-none"
-							: "max-w-[1040px] xl:grid xl:grid-cols-[1fr_240px] xl:gap-8"
+							: "w-full xl:grid xl:grid-cols-[1fr_260px] xl:gap-8"
 					}`}
 				>
 					{/* Main content area */}
@@ -319,7 +319,7 @@ export default async function Page(props: {
 									? isApiPage
 										? "min-w-0"
 										: ""
-									: "mx-auto max-w-[680px] xl:mx-0"
+									: "mx-auto max-w-[680px]"
 							}
 						>
 							{/* Title row */}
@@ -379,7 +379,7 @@ export default async function Page(props: {
 					{/* Right sidebar - Table of Contents (hidden on full-width API pages) */}
 					{!hideToc && (
 						<aside className="hidden xl:block">
-							<div className="sticky top-0 h-[calc(100vh-3rem)] overflow-y-auto pt-8 pr-4">
+							<div className="sticky top-0 h-[calc(100vh-3rem)] overflow-y-auto pt-8 pr-6 md:pr-10">
 								<TableOfContents items={page.data.toc as TOCItem[]} />
 							</div>
 						</aside>

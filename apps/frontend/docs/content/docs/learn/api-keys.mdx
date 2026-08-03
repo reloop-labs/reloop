@@ -242,21 +242,23 @@ faq:
 
 ## FAQ
 
-### Can I view a full API key secret again after closing the modal?
+<AccordionGroup>
+  <Accordion title="Can I view a full API key secret again after closing the modal?">
+    No. Reloop displays the full secret key string only once when created or rotated. After closing the modal, only the prefix (e.g. `rl_prod_17aQUCC-e`) is visible. Reloop stores a secure hash, so if a secret is lost, you must rotate the key or create a new one.
+  </Accordion>
 
-No. Reloop displays the full secret key string only once when created or rotated. After closing the modal, only the prefix (e.g. `rl_prod_17aQUCC-e`) is visible. Reloop stores a secure hash, so if a secret is lost, you must rotate the key or create a new one.
+  <Accordion title="What is the difference between disabling and deleting an API key?">
+    **Disabling** pauses access temporarily — requests using the key fail with `401 Unauthorized`, but you can re-enable it later. **Deleting** permanently removes the key record and cannot be undone.
+  </Accordion>
 
-### What is the difference between disabling and deleting an API key?
+  <Accordion title="Can I use the same API key for both REST API and SMTP relay?">
+    Yes. Reloop API keys work across both REST API endpoints (as the `x-api-key` header) and SMTP authentication (using the API key prefix/secret as SMTP credentials).
+  </Accordion>
 
-**Disabling** pauses access temporarily — requests using the key fail with `401 Unauthorized`, but you can re-enable it later. **Deleting** permanently removes the key record and cannot be undone.
-
-### Can I use the same API key for both REST API and SMTP relay?
-
-Yes. Reloop API keys work across both REST API endpoints (as the `x-api-key` header) and SMTP authentication (using the API key prefix/secret as SMTP credentials).
-
-### How many API keys can an organization create?
-
-Reloop does not enforce a hard limit on total API keys per organization. However, we recommend maintaining clean key hygiene by deleting stale or unused keys.
+  <Accordion title="How many API keys can an organization create?">
+    Reloop does not enforce a hard limit on total API keys per organization. However, we recommend maintaining clean key hygiene by deleting stale or unused keys.
+  </Accordion>
+</AccordionGroup>
 
 ---
 
