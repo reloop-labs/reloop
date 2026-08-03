@@ -33,7 +33,7 @@ export function GroupsEmptyState({
 	};
 
 	return (
-		<div className="flex flex-col items-center px-6 py-12 text-center dark:bg-[#101010]">
+		<div className="flex flex-col items-center px-6 py-12 text-center dark:bg-bg-weak-50/30">
 			<div className="mb-4 flex items-center justify-center">
 				<Icon
 					name={isFiltered ? "search" : "modules"}
