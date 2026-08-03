@@ -8,7 +8,14 @@ import {
 	type Transition,
 	useReducedMotion,
 } from "framer-motion";
-import { type ReactNode, useEffect } from "react";
+import {
+	type ReactNode,
+	useEffect,
+	useLayoutEffect,
+	useMemo,
+	useRef,
+	useState,
+} from "react";
 import { useUIStore } from "#/store/use-ui-store";
 
 /** Hold Space this long (ms) before shortcut hints appear. */
@@ -21,9 +28,66 @@ const LONG_PRESS_MS = 400;
 const EASE_SMOOTH_OUT = [0.22, 1, 0.36, 1] as const;
 /** Keep under 300ms; quick enough for a reveal, slow enough to read. */
 const HINT_DURATION = 0.2;
-/** Fixed px width of the kbd face (h-4 / min-w-4) — avoids janky width:"auto". */
+/** Fallback single-key face width when content has not been measured yet. */
 const HINT_WIDTH_PX = 16;
 const HINT_GAP_PX = 4;
+
+const MODIFIER_MAP: Record<string, string> = {
+	cmd: "⌘",
+	command: "⌘",
+	meta: "⌘",
+	mod: "⌘",
+	ctrl: "⌃",
+	control: "⌃",
+	alt: "⌥",
+	option: "⌥",
+	opt: "⌥",
+	shift: "⇧",
+	"⇧": "⇧",
+	"⌘": "⌘",
+	"⌃": "⌃",
+	"⌥": "⌥",
+};
+
+/** Normalize one token (e.g. "Shift", "shift+t", "G") into display keys. */
+function normalizeKeyToken(token: string): string[] {
+	const trimmed = token.trim();
+	if (!trimmed) return [];
+	if (/^[⌘⇧⌃⌥]$/.test(trimmed)) return [trimmed];
+	if (trimmed.includes("+")) {
+		return trimmed
+			.split("+")
+			.flatMap((part) => normalizeKeyToken(part))
+			.filter(Boolean);
+	}
+	const lower = trimmed.toLowerCase();
+	if (MODIFIER_MAP[lower]) return [MODIFIER_MAP[lower]];
+	if (trimmed.length === 1) return [trimmed.toUpperCase()];
+	return [trimmed.charAt(0).toUpperCase() + trimmed.slice(1).toLowerCase()];
+}
+
+/**
+ * Parse a shortcut label into sequence steps of keycaps.
+ * - "G E" → [["G"], ["E"]]
+ * - "G Shift+T" → [["G"], ["⇧", "T"]]
+ * - "⌘⇧L" / "T" → [["⌘", "⇧", "L"]] / [["T"]]
+ */
+function parseShortcutSteps(label: string): string[][] {
+	const parts = label.trim().split(/\s+/).filter(Boolean);
+	if (parts.length === 0) return [];
+
+	// Multi-word labels are g-sequences (G E, G Shift+T, G ,)
+	if (parts.length > 1) {
+		return parts.map((part) => normalizeKeyToken(part));
+	}
+
+	const part = parts[0] ?? "";
+	const compact = part.match(/([⌘⇧⌃⌥]|[^\s⌘⇧⌃⌥]+)/g);
+	if (compact && compact.length > 1) {
+		return [compact.flatMap((t) => normalizeKeyToken(t))];
+	}
+	return [normalizeKeyToken(part)];
+}
 
 function isEditableTarget(target: EventTarget | null): boolean {
 	if (!(target instanceof HTMLElement)) return false;
@@ -149,12 +213,41 @@ export function ActionKbd({
 	);
 }
 
+function ShortcutKeycaps({
+	steps,
+	className,
+}: {
+	steps: string[][];
+	className?: string;
+}) {
+	return (
+		<span className="inline-flex items-center gap-1">
+			{steps.map((group, gi) => (
+				<span key={`step-${gi}`} className="inline-flex items-center gap-0.5">
+					{group.map((key, ki) => (
+						<KbdKey
+							key={`${key}-${ki}`}
+							className={cn(
+								shortcutKbdClassName,
+								"w-auto min-w-4 px-1 font-mono text-[10px]",
+								key.length > 1 && "px-1.5",
+								className,
+							)}
+						>
+							{key}
+						</KbdKey>
+					))}
+				</span>
+			))}
+		</span>
+	);
+}
+
 /**
  * Renders a keycap hint only while shortcuts are revealed (long-press Space).
  *
- * Single-layer tween (no spring, no nested layout):
- * - width 0 → fixed px (not "auto") so the parent button grows smoothly
- * - opacity fade only — no scale/x that fights the width clip
+ * Supports multi-key labels (e.g. "G E", "G Shift+T") as separate keycaps.
+ * Width is measured from content so sequences are not clipped to a single face.
  *
  * Place next to the control that owns the shortcut.
  */
@@ -167,43 +260,79 @@ export function ShortcutHint({
 }) {
 	const revealed = useShortcutsRevealed();
 	const reduceMotion = useReducedMotion();
+	const measureRef = useRef<HTMLSpanElement>(null);
+	const [contentWidth, setContentWidth] = useState(HINT_WIDTH_PX);
+
+	const steps = useMemo(() => {
+		if (typeof children === "string" || typeof children === "number") {
+			return parseShortcutSteps(String(children));
+		}
+		return null;
+	}, [children]);
+
+	const renderKeycaps = () =>
+		steps && steps.length > 0 ? (
+			<ShortcutKeycaps steps={steps} className={className} />
+		) : (
+			<KbdKey className={cn(shortcutKbdClassName, className)}>{children}</KbdKey>
+		);
+
+	// Keep a hidden measure node mounted so multi-key labels get a real width
+	// before the reveal animation runs (avoids clipping to 16px).
+	useLayoutEffect(() => {
+		const el = measureRef.current;
+		if (!el) return;
+		const next = Math.ceil(el.scrollWidth);
+		if (next > 0) setContentWidth(next);
+	}, [children, steps, className]);
 
 	const transition: Transition = reduceMotion
 		? { duration: 0 }
 		: { duration: HINT_DURATION, ease: EASE_SMOOTH_OUT };
 
 	return (
-		<AnimatePresence initial={false}>
-			{revealed ? (
-				<motion.span
-					key="shortcut-hint"
-					initial={
-						reduceMotion
-							? false
-							: {
-									opacity: 0,
-									width: 0,
-									marginLeft: 0,
-								}
-					}
-					animate={{
-						opacity: 1,
-						width: HINT_WIDTH_PX,
-						marginLeft: HINT_GAP_PX,
-					}}
-					exit={{
-						opacity: 0,
-						width: 0,
-						marginLeft: 0,
-					}}
-					transition={transition}
-					className="inline-flex shrink-0 items-center justify-center overflow-hidden"
-				>
-					<KbdKey className={cn(shortcutKbdClassName, className)}>
-						{children}
-					</KbdKey>
-				</motion.span>
-			) : null}
-		</AnimatePresence>
+		<span className="relative inline-flex shrink-0 items-center self-center">
+			{/* Invisible measure — always in DOM so width is ready on reveal */}
+			<span
+				ref={measureRef}
+				aria-hidden
+				className="pointer-events-none absolute top-0 left-0 whitespace-nowrap opacity-0"
+			>
+				{renderKeycaps()}
+			</span>
+
+			<AnimatePresence initial={false}>
+				{revealed ? (
+					<motion.span
+						key="shortcut-hint"
+						initial={
+							reduceMotion
+								? false
+								: {
+										opacity: 0,
+										width: 0,
+										marginLeft: 0,
+									}
+						}
+						animate={{
+							opacity: 1,
+							width: contentWidth,
+							marginLeft: HINT_GAP_PX,
+						}}
+						exit={{
+							opacity: 0,
+							width: 0,
+							marginLeft: 0,
+						}}
+						transition={transition}
+						// Extra py so the keycap bottom shelf isn't clipped by overflow;
+						// -my keeps the nav row height unchanged. Nudge up for optical align.
+						className="-my-0.5 inline-flex -translate-y-px items-center justify-end overflow-hidden py-0.5"
+					>
+						{renderKeycaps()}
+					</motion.span>
+				) : null}
+			</AnimatePresence>
+		</span>
 	);
 }

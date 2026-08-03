@@ -182,9 +182,7 @@ export function SettingsSidebarItems({
 										)}
 									</span>
 									{!isCollapsed && item.shortcut && (
-										<ShortcutHint className="w-auto min-w-0 px-1 font-mono text-[9px]">
-											{item.shortcut.label}
-										</ShortcutHint>
+										<ShortcutHint>{item.shortcut.label}</ShortcutHint>
 									)}
 								</span>
 							</SidebarNavLink>

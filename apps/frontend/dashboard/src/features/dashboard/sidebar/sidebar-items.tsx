@@ -194,9 +194,7 @@ export function SidebarItems({
 									)}
 								</span>
 								{!isCollapsed && shortcut && (
-									<ShortcutHint className="w-auto min-w-0 px-1 font-mono text-[9px]">
-										{shortcut.label}
-									</ShortcutHint>
+									<ShortcutHint>{shortcut.label}</ShortcutHint>
 								)}
 							</span>
 
@@ -280,9 +278,7 @@ export function SidebarItems({
 																{subLabel}
 															</span>
 															{subShortcut && (
-																<ShortcutHint className="w-auto min-w-0 px-1 font-mono text-[9px]">
-																	{subShortcut.label}
-																</ShortcutHint>
+																<ShortcutHint>{subShortcut.label}</ShortcutHint>
 															)}
 														</SidebarNavLink>
 													);
