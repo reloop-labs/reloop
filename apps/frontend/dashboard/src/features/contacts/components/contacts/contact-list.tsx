@@ -83,7 +83,7 @@ export function ContactList() {
 				toast.error("No contacts to export");
 				return;
 			}
-			const headers = ["Email", "Name", "Status", "Updated At", "Created At"];
+			const headers = ["Email", "Name", "Status", "Last Updated", "Created At"];
 			const csvRows = allData.contacts.map((contact) => [
 				contact.email,
 				[contact.firstName, contact.lastName].filter(Boolean).join(" "),

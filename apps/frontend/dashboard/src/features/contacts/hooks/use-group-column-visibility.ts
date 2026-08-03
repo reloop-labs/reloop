@@ -6,7 +6,7 @@ const STORAGE_KEY = "reloop:groups:column-visibility";
 export const GROUP_VIEW_COLUMNS = [
 	{ id: "name", label: "Name" },
 	{ id: "contacts", label: "Contacts" },
-	{ id: "updatedAt", label: "Updated At" },
+	{ id: "updatedAt", label: "Last Updated" },
 	{ id: "createdAt", label: "Created At" },
 ] as const;
 

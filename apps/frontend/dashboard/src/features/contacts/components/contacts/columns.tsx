@@ -157,7 +157,7 @@ export const contactColumns: ColumnDef<Contact>[] = [
 		header: () => (
 			<div className="flex items-center gap-1">
 				<Icon name="history" className="h-3 w-3" />
-				<span className="text-xs">Updated At</span>
+				<span className="text-xs">Last Updated</span>
 			</div>
 		),
 		cell: ({ row }) => (

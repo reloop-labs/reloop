@@ -7,7 +7,7 @@ export const CONTACT_VIEW_COLUMNS = [
 	{ id: "email", label: "Email" },
 	{ id: "name", label: "Name" },
 	{ id: "status", label: "Status" },
-	{ id: "updatedAt", label: "Updated At" },
+	{ id: "updatedAt", label: "Last Updated" },
 	{ id: "createdAt", label: "Created At" },
 ] as const;
 

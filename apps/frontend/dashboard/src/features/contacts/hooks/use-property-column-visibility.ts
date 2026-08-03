@@ -7,7 +7,7 @@ export const PROPERTY_VIEW_COLUMNS = [
 	{ id: "name", label: "Name" },
 	{ id: "type", label: "Type" },
 	{ id: "default", label: "Default" },
-	{ id: "updatedAt", label: "Updated At" },
+	{ id: "updatedAt", label: "Last Updated" },
 	{ id: "createdAt", label: "Created At" },
 ] as const;
 

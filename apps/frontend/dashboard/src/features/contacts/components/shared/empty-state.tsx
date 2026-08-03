@@ -1,4 +1,5 @@
 import * as Button from "@reloop/ui/button";
+import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 
@@ -6,17 +7,24 @@ interface EmptyStateProps {
 	onCreateClick?: () => void;
 	searchQuery?: string;
 	onClearSearch?: () => void;
+	className?: string;
 }
 
 export function EmptyState({
 	onCreateClick,
 	searchQuery = "",
 	onClearSearch,
+	className,
 }: EmptyStateProps) {
 	const isFiltered = searchQuery.trim() !== "";
 
 	return (
-		<div className="flex w-full flex-col items-center px-6 py-12 text-center dark:bg-bg-weak-50/30">
+		<div
+			className={cn(
+				"flex h-full w-full flex-col items-center justify-center rounded-2xl border border-stroke-soft-100 bg-bg-white-0 px-6 py-12 text-center dark:border-stroke-soft-100/10 dark:bg-[#101010]",
+				className,
+			)}
+		>
 			<div className="mb-4 flex items-center justify-center">
 				<Icon
 					name={isFiltered ? "search" : "notification-indicator"}

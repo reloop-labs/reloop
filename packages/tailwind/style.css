@@ -531,6 +531,35 @@
 			opacity: 0;
 		}
 	}
+	@keyframes slide-from-top {
+		from {
+			opacity: 0;
+			transform: translateY(-8px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+	@keyframes slide-from-bottom {
+		from {
+			opacity: 0;
+			transform: translateY(8px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+}
+
+.tooltip {
+	animation: slide-from-bottom 0.15s ease-out;
+}
+
+[data-side="bottom"] .tooltip,
+[data-side="bottom"].tooltip {
+	animation-name: slide-from-top;
 }
 
 @layer components {

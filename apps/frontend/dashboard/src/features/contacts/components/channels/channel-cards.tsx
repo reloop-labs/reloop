@@ -77,7 +77,12 @@ export const ChannelCards = ({
 	}
 
 	if (channels.length === 0) {
-		return <EmptyState onCreateClick={onAddChannel} />;
+		return (
+			<EmptyState
+				onCreateClick={onAddChannel}
+				className="h-full justify-center"
+			/>
+		);
 	}
 
 	return (
