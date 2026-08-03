@@ -1,33 +1,27 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect } from "react";
+import { useUIStore } from "#/store/use-ui-store";
 
 const STORAGE_KEY = "isSidebarCollapsed";
 
+/**
+ * Shared sidebar collapse state (Zustand). Hydrates from localStorage once
+ * so the page-header toggle and main sidebar stay in sync.
+ */
 export function useSidebarCollapse() {
-	const [isCollapsed, setIsCollapsed] = useState(false);
+	const isCollapsed = useUIStore((s) => s.isSidebarCollapsed);
+	const setCollapsed = useUIStore((s) => s.setIsSidebarCollapsed);
+	const toggle = useUIStore((s) => s.toggleSidebarCollapse);
 
 	useEffect(() => {
 		try {
 			const saved = localStorage.getItem(STORAGE_KEY);
 			if (saved !== null) {
-				setIsCollapsed(saved === "true");
+				setCollapsed(saved === "true");
 			}
 		} catch {
 			// ignore
 		}
-	}, []);
-
-	const setCollapsed = useCallback((next: boolean) => {
-		setIsCollapsed(next);
-		try {
-			localStorage.setItem(STORAGE_KEY, String(next));
-		} catch {
-			// ignore
-		}
-	}, []);
-
-	const toggle = useCallback(() => {
-		setCollapsed(!isCollapsed);
-	}, [isCollapsed, setCollapsed]);
+	}, [setCollapsed]);
 
 	return {
 		isCollapsed,
