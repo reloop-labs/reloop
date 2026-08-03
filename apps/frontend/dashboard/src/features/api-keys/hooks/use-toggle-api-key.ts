@@ -22,11 +22,6 @@ export function useToggleApiKey(listParams: ApiKeysListParams) {
 					? `/api/api-key/v1/disable/${apiKey.id}`
 					: `/api/api-key/v1/enable/${apiKey.id}`;
 				await axios.post(endpoint, {}, { withCredentials: true });
-				toast.success(
-					apiKey.enabled
-						? "API key disabled successfully"
-						: "API key enabled successfully",
-				);
 				await invalidate();
 				setTogglingId(null);
 			} catch (error) {

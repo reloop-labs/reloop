@@ -58,11 +58,6 @@ export function ApiKeyDetailPage({ apiKeyId }: { apiKeyId: string }) {
 				: `/api/api-key/v1/enable/${data.id}`;
 			await axios.post(endpoint, {}, { withCredentials: true });
 			await invalidate();
-			toast.success(
-				data.enabled
-					? "API key disabled successfully"
-					: "API key enabled successfully",
-			);
 		} catch (error) {
 			const message = axios.isAxiosError(error)
 				? error.response?.data?.message || "Failed to toggle API key"
