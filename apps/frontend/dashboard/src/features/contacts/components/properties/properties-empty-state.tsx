@@ -1,32 +1,50 @@
 import * as Button from "@reloop/ui/button";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
+import {
+	parseAsArrayOf,
+	parseAsInteger,
+	parseAsString,
+	useQueryState,
+} from "nuqs";
+import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 
 interface PropertiesEmptyStateProps {
 	onAddProperty?: () => void;
 	searchQuery?: string;
-	typeFilter?: string;
+	typeFilter?: string[];
 	onClearFilters?: () => void;
 }
 
 export function PropertiesEmptyState({
 	onAddProperty,
 	searchQuery = "",
-	typeFilter = "",
+	typeFilter = [],
 	onClearFilters,
 }: PropertiesEmptyStateProps) {
+	const [, setSearchQuery] = useQueryState(
+		"search",
+		parseAsString.withDefault(""),
+	);
+	const [, setTypeFilter] = useQueryState(
+		"type",
+		parseAsArrayOf(parseAsString).withDefault([]),
+	);
+	const [, setCurrentPage] = useQueryState(
+		"propertyPage",
+		parseAsInteger.withDefault(1),
+	);
+
 	const hasSearch = searchQuery.trim() !== "";
-	const hasTypeFilter = Boolean(typeFilter && typeFilter !== "");
+	const hasTypeFilter = typeFilter.length > 0;
 	const isFiltered = hasSearch || hasTypeFilter;
 
-	let emptyMessage = "Try adjusting your search or filters.";
-	if (hasSearch && hasTypeFilter) {
-		emptyMessage = `No ${typeFilter} properties found matching "${searchQuery}".`;
-	} else if (hasSearch) {
-		emptyMessage = `No properties found matching "${searchQuery}".`;
-	} else if (hasTypeFilter) {
-		emptyMessage = `No ${typeFilter} properties found.`;
-	}
+	const handleClearFilters = () => {
+		void setSearchQuery("");
+		void setTypeFilter([]);
+		void setCurrentPage(1);
+		onClearFilters?.();
+	};
 
 	return (
 		<div className="flex flex-col items-center px-6 py-12 text-center dark:bg-bg-weak-50/30">
@@ -41,7 +59,7 @@ export function PropertiesEmptyState({
 			</h3>
 			<p className="mx-auto mb-6 max-w-80 text-balance font-medium text-[12px] text-text-sub-600">
 				{isFiltered
-					? emptyMessage
+					? "Try adjusting your search or filters."
 					: "Store custom attributes per contact — like plans, regions, or any data your app tracks."}
 			</p>
 			{isFiltered ? (
@@ -50,11 +68,11 @@ export function PropertiesEmptyState({
 					variant="neutral"
 					mode="stroke"
 					size="small"
-					onClick={onClearFilters}
+					onClick={handleClearFilters}
 					className="gap-1.5 rounded-xl"
 				>
 					<Icon name="cross-circle" className="h-4 w-4 text-text-sub-600" />
-					Clear search & filters
+					Clear filters
 				</Button.Root>
 			) : (
 				<FancyButton.Root
@@ -66,6 +84,9 @@ export function PropertiesEmptyState({
 				>
 					<Icon name="plus" className="h-4 w-4" />
 					Create property
+					<ActionKbd className="border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]">
+						C
+					</ActionKbd>
 				</FancyButton.Root>
 			)}
 		</div>

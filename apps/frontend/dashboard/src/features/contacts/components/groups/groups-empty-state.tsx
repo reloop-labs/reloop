@@ -1,6 +1,8 @@
 import * as Button from "@reloop/ui/button";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
+import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
+import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 
 interface GroupsEmptyStateProps {
 	onAddGroup?: () => void;
@@ -13,7 +15,22 @@ export function GroupsEmptyState({
 	searchQuery = "",
 	onClearSearch,
 }: GroupsEmptyStateProps) {
+	const [, setSearchQuery] = useQueryState(
+		"search",
+		parseAsString.withDefault(""),
+	);
+	const [, setCurrentPage] = useQueryState(
+		"page",
+		parseAsInteger.withDefault(1),
+	);
+
 	const isFiltered = searchQuery.trim() !== "";
+
+	const handleClearFilters = () => {
+		void setSearchQuery("");
+		void setCurrentPage(1);
+		onClearSearch?.();
+	};
 
 	return (
 		<div className="flex flex-col items-center px-6 py-12 text-center dark:bg-bg-weak-50/30">
@@ -37,11 +54,11 @@ export function GroupsEmptyState({
 					variant="neutral"
 					mode="stroke"
 					size="small"
-					onClick={onClearSearch}
+					onClick={handleClearFilters}
 					className="gap-1.5 rounded-xl"
 				>
 					<Icon name="cross-circle" className="h-4 w-4 text-text-sub-600" />
-					Clear search
+					Clear filters
 				</Button.Root>
 			) : (
 				<FancyButton.Root
@@ -53,6 +70,9 @@ export function GroupsEmptyState({
 				>
 					<Icon name="plus" className="h-4 w-4" />
 					Create group
+					<ActionKbd className="border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]">
+						C
+					</ActionKbd>
 				</FancyButton.Root>
 			)}
 		</div>

@@ -9,72 +9,67 @@ import {
 } from "@reloop/ui/popover";
 import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { useQueryState } from "nuqs";
 import { type ReactNode, useCallback, useRef, useState } from "react";
-import type { Group } from "#/features/contacts/hooks/use-contacts-query";
+import type { Property } from "#/features/contacts/hooks/use-contacts-query";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 
-export type GroupActionsHandlers = {
-	onEdit?: (group: Group) => void;
-	onDelete: (group: Group) => void;
-	isDeleting?: boolean;
+export type PropertyActionsHandlers = {
+	onEdit: (property: Property) => void;
+	onDelete: (property: Property) => void;
 	onOpenChange?: (open: boolean) => void;
 };
 
 type MenuItemId =
-	| "view"
 	| "edit"
+	| "copy-name"
 	| "copy-id"
-	| "add-contacts"
-	| "export"
+	| "filter-contacts"
 	| "delete";
 
-function useGroupActionsMenu(group: Group, handlers: GroupActionsHandlers) {
+function usePropertyActionsMenu(
+	property: Property,
+	handlers: PropertyActionsHandlers,
+) {
 	const router = useRouter();
-	const [, setModal] = useQueryState("modal");
-	const [, setId] = useQueryState("id");
 	const [open, setOpen] = useState(false);
 	const [contextMenuKey, setContextMenuKey] = useState(0);
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
-	const [isCopied, setIsCopied] = useState(false);
+	const [copiedKey, setCopiedKey] = useState<"name" | "id" | null>(null);
 	const buttonRefs = useRef<HTMLElement[]>([]);
 	const keepOpenRef = useRef(false);
-	const isDeleting = handlers.isDeleting ?? false;
 
 	const menuItems = [
 		{
-			id: "view" as const,
-			label: "View Details",
-			icon: "info-outline" as const,
-			isDanger: false,
-		},
-		{
 			id: "edit" as const,
-			label: "Edit group",
+			label: "Edit property",
 			icon: "edit" as const,
 			isDanger: false,
 		},
 		{
+			id: "copy-name" as const,
+			label: copiedKey === "name" ? "Copied name!" : "Copy name",
+			icon: (copiedKey === "name" ? "check-circle" : "copy") as
+				| "check-circle"
+				| "copy",
+			isDanger: false,
+		},
+		{
 			id: "copy-id" as const,
-			label: isCopied ? "Copied ID!" : "Copy group ID",
-			icon: (isCopied ? "check-circle" : "copy") as "check-circle" | "copy",
+			label: copiedKey === "id" ? "Copied ID!" : "Copy property ID",
+			icon: (copiedKey === "id" ? "check-circle" : "copy") as
+				| "check-circle"
+				| "copy",
 			isDanger: false,
 		},
 		{
-			id: "add-contacts" as const,
-			label: "Add contacts",
-			icon: "user-plus" as const,
-			isDanger: false,
-		},
-		{
-			id: "export" as const,
-			label: "Export contacts",
-			icon: "file-download" as const,
+			id: "filter-contacts" as const,
+			label: "Filter contacts",
+			icon: "filter" as const,
 			isDanger: false,
 		},
 		{
 			id: "delete" as const,
-			label: "Delete group",
+			label: "Delete property",
 			icon: "trash" as const,
 			isDanger: true,
 		},
@@ -99,72 +94,47 @@ function useGroupActionsMenu(group: Group, handlers: GroupActionsHandlers) {
 		handleOpenChange(false);
 	}, [handleOpenChange]);
 
-	const handleExport = async () => {
-		try {
-			const res = await fetch(
-				`/api/contacts/v1/groups/${group.id}/contacts?limit=1000`,
-				{ credentials: "include" },
-			);
-			if (!res.ok) throw new Error("Failed to fetch contacts");
-			const data = (await res.json()) as {
-				contacts: Array<{ id: string; email: string; createdAt: string }>;
-			};
-			const contacts = data.contacts || [];
-			const csvLines = [
-				"ID,Email,Created At",
-				...contacts.map((c) => `"${c.id}","${c.email}","${c.createdAt}"`),
-			];
-			const blob = new Blob([csvLines.join("\n")], {
-				type: "text/csv;charset=utf-8;",
-			});
-			const url = URL.createObjectURL(blob);
-			const link = document.createElement("a");
-			link.href = url;
-			link.download = `group-${group.name.toLowerCase().replace(/\s+/g, "-")}-contacts.csv`;
-			document.body.appendChild(link);
-			link.click();
-			document.body.removeChild(link);
-			URL.revokeObjectURL(url);
-		} catch (e) {
-			console.error(e);
-		}
-	};
-
 	const handleItemClick = async (itemId: MenuItemId) => {
-		if (itemId === "view") {
-			router.push(`/contacts/groups/${group.id}`);
+		if (itemId === "edit") {
+			handlers.onEdit(property);
 			dismissMenu();
-		} else if (itemId === "edit") {
-			if (handlers.onEdit) {
-				handlers.onEdit(group);
-			} else {
-				void setId(group.id);
-				void setModal("edit-group");
-			}
-			dismissMenu();
-		} else if (itemId === "copy-id") {
+		} else if (itemId === "copy-name") {
 			keepOpenRef.current = true;
 			try {
-				await navigator.clipboard.writeText(group.id);
-				setIsCopied(true);
+				await navigator.clipboard.writeText(property.propertyName);
+				setCopiedKey("name");
 				setTimeout(() => {
-					setIsCopied(false);
+					setCopiedKey(null);
 					keepOpenRef.current = false;
 					dismissMenu();
-				}, 900);
+				}, 800);
 			} catch {
 				keepOpenRef.current = false;
 				dismissMenu();
 			}
-		} else if (itemId === "add-contacts") {
-			void setId(group.id);
-			void setModal("add-contact-to-group");
+		} else if (itemId === "copy-id") {
+			keepOpenRef.current = true;
+			try {
+				await navigator.clipboard.writeText(property.id);
+				setCopiedKey("id");
+				setTimeout(() => {
+					setCopiedKey(null);
+					keepOpenRef.current = false;
+					dismissMenu();
+				}, 800);
+			} catch {
+				keepOpenRef.current = false;
+				dismissMenu();
+			}
+		} else if (itemId === "filter-contacts") {
+			const params = new URLSearchParams(
+				typeof window !== "undefined" ? window.location.search : "",
+			);
+			params.set("search", property.propertyName);
+			router.push(`/contacts?${params}`);
 			dismissMenu();
-		} else if (itemId === "export") {
-			dismissMenu();
-			void handleExport();
 		} else if (itemId === "delete") {
-			handlers.onDelete(group);
+			handlers.onDelete(property);
 			dismissMenu();
 		}
 	};
@@ -180,17 +150,16 @@ function useGroupActionsMenu(group: Group, handlers: GroupActionsHandlers) {
 		currentTab,
 		currentRect,
 		isDanger,
-		isCopied,
-		isDeleting,
+		copiedKey,
 		handleItemClick,
 	};
 }
 
-function GroupActionsMenuItems({
+function PropertyActionsMenuItems({
 	menu,
 	variant = "dropdown",
 }: {
-	menu: ReturnType<typeof useGroupActionsMenu>;
+	menu: ReturnType<typeof usePropertyActionsMenu>;
 	variant?: "dropdown" | "context";
 }) {
 	const {
@@ -201,8 +170,7 @@ function GroupActionsMenuItems({
 		currentTab,
 		currentRect,
 		isDanger,
-		isCopied,
-		isDeleting,
+		copiedKey,
 		handleItemClick,
 	} = menu;
 
@@ -213,48 +181,55 @@ function GroupActionsMenuItems({
 			!currentRect &&
 				hoverIdx === idx &&
 				(item.isDanger ? "bg-red-alpha-10" : "bg-neutral-alpha-10"),
-			isDeleting && item.id === "delete" && "cursor-not-allowed opacity-50",
 			variant === "context" &&
 				"data-[disabled]:pointer-events-none data-[highlighted]:bg-transparent",
 		);
 
+	const keepsMenuOpen = (id: MenuItemId) =>
+		id === "copy-name" || id === "copy-id";
+
 	return (
 		<div className="relative">
 			{menuItems.map((item, idx) => {
-				const disabled = item.id === "delete" && isDeleting;
-				const label =
-					item.id === "copy-id" ? (
-						<AnimatePresence mode="popLayout" initial={false}>
-							<motion.div
-								key={isCopied ? "copied" : "idle"}
-								transition={{ type: "spring", duration: 0.25, bounce: 0 }}
-								initial={{ opacity: 0, y: -14 }}
-								animate={{ opacity: 1, y: 0 }}
-								exit={{ opacity: 0, y: 14 }}
-								className="flex items-center gap-2"
-							>
-								<Icon
-									name={isCopied ? "check-circle" : "copy"}
-									className={cn(
-										"h-3.5 w-3.5 shrink-0",
-										isCopied ? "text-success-base" : "text-text-sub-600",
-									)}
-								/>
-								<span>{isCopied ? "Copied ID!" : "Copy group ID"}</span>
-							</motion.div>
-						</AnimatePresence>
-					) : (
-						<>
+				const isCopyItem = item.id === "copy-name" || item.id === "copy-id";
+				const label = isCopyItem ? (
+					<AnimatePresence mode="popLayout" initial={false}>
+						<motion.div
+							key={
+								copiedKey === (item.id === "copy-name" ? "name" : "id")
+									? "copied"
+									: "idle"
+							}
+							transition={{ type: "spring", duration: 0.25, bounce: 0 }}
+							initial={{ opacity: 0, y: -14 }}
+							animate={{ opacity: 1, y: 0 }}
+							exit={{ opacity: 0, y: 14 }}
+							className="flex items-center gap-2"
+						>
 							<Icon
 								name={item.icon}
 								className={cn(
 									"h-3.5 w-3.5 shrink-0",
-									item.isDanger ? "" : "text-text-sub-600",
+									copiedKey === (item.id === "copy-name" ? "name" : "id")
+										? "text-success-base"
+										: "text-text-sub-600",
 								)}
 							/>
 							<span>{item.label}</span>
-						</>
-					);
+						</motion.div>
+					</AnimatePresence>
+				) : (
+					<>
+						<Icon
+							name={item.icon}
+							className={cn(
+								"h-3.5 w-3.5 shrink-0",
+								item.isDanger ? "" : "text-text-sub-600",
+							)}
+						/>
+						<span>{item.label}</span>
+					</>
+				);
 
 				if (variant === "context") {
 					return (
@@ -266,10 +241,9 @@ function GroupActionsMenuItems({
 							onPointerEnter={() => setHoverIdx(idx)}
 							onPointerLeave={() => setHoverIdx(undefined)}
 							onSelect={(event) => {
-								if (item.id === "copy-id") event.preventDefault();
+								if (keepsMenuOpen(item.id)) event.preventDefault();
 								void handleItemClick(item.id);
 							}}
-							disabled={disabled}
 							className={itemClassName(item, idx)}
 						>
 							{label}
@@ -287,7 +261,6 @@ function GroupActionsMenuItems({
 						onPointerEnter={() => setHoverIdx(idx)}
 						onPointerLeave={() => setHoverIdx(undefined)}
 						onClick={() => void handleItemClick(item.id)}
-						disabled={disabled}
 						className={itemClassName(item, idx)}
 					>
 						{label}
@@ -305,37 +278,22 @@ function GroupActionsMenuItems({
 
 const menuContentClassName = "w-48 rounded-xl p-1.5";
 
-export interface GroupDropdownProps {
-	group: Group;
-	onEdit?: (group: Group) => void;
-	onDelete: (group: Group) => void;
-	isDeleting?: boolean;
-	onOpenChange?: (open: boolean) => void;
-}
-
-export const GroupDropdown = ({
-	group,
+export function PropertyActionsMenu({
+	property,
 	onEdit,
 	onDelete,
-	isDeleting = false,
 	onOpenChange,
-}: GroupDropdownProps) => {
-	const menu = useGroupActionsMenu(group, {
+}: PropertyActionsHandlers & { property: Property }) {
+	const menu = usePropertyActionsMenu(property, {
 		onEdit,
 		onDelete,
-		isDeleting,
 		onOpenChange,
 	});
 
 	return (
 		<PopoverRoot open={menu.open} onOpenChange={menu.handleOpenChange}>
 			<PopoverTrigger asChild>
-				<Button.Root
-					variant="neutral"
-					mode="ghost"
-					size="xxsmall"
-					disabled={isDeleting}
-				>
+				<Button.Root variant="neutral" mode="ghost" size="xxsmall">
 					<Icon name="more-horizontal" className="h-3 w-3" />
 				</Button.Root>
 			</PopoverTrigger>
@@ -344,24 +302,22 @@ export const GroupDropdown = ({
 				sideOffset={-10}
 				className={menuContentClassName}
 			>
-				<GroupActionsMenuItems menu={menu} />
+				<PropertyActionsMenuItems menu={menu} />
 			</PopoverContent>
 		</PopoverRoot>
 	);
-};
+}
 
-export function GroupRowContextMenu({
-	group,
+export function PropertyRowContextMenu({
+	property,
 	onEdit,
 	onDelete,
-	isDeleting = false,
 	onOpenChange,
 	children,
-}: GroupDropdownProps & { children: ReactNode }) {
-	const menu = useGroupActionsMenu(group, {
+}: PropertyActionsHandlers & { property: Property; children: ReactNode }) {
+	const menu = usePropertyActionsMenu(property, {
 		onEdit,
 		onDelete,
-		isDeleting,
 		onOpenChange,
 	});
 
@@ -375,7 +331,7 @@ export function GroupRowContextMenu({
 				className={menuContentClassName}
 				onCloseAutoFocus={(e) => e.preventDefault()}
 			>
-				<GroupActionsMenuItems menu={menu} variant="context" />
+				<PropertyActionsMenuItems menu={menu} variant="context" />
 			</ContextMenu.Content>
 		</ContextMenu.Root>
 	);

@@ -1,21 +1,19 @@
-import * as Button from "@reloop/ui/button";
-import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import * as Input from "@reloop/ui/input";
 import { useRouter } from "next/navigation";
-
-import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
-import { useMemo, useState } from "react";
-import { useHotkeys } from "react-hotkeys-hook";
+import {
+	parseAsArrayOf,
+	parseAsInteger,
+	parseAsString,
+	useQueryState,
+} from "nuqs";
+import { useCallback, useMemo } from "react";
 import { toast } from "sonner";
 import type { CommandAction } from "#/features/dashboard/command-menu";
 import { useRegisterCommandActions } from "#/features/dashboard/command-menu-context";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
+import { useContactColumnVisibility } from "../../hooks/use-contact-column-visibility";
 import { useContactsQuery } from "../../hooks/use-contacts-query";
-import {
-	ContactFilterDropdown,
-	type ContactFilterOption,
-} from "./contact-filter-dropdown";
+import { ContactListToolbar } from "./contact-list-toolbar";
 import { ContactTable } from "./contact-table";
 
 function SummaryCard({
@@ -55,23 +53,27 @@ export function ContactList() {
 		"search",
 		parseAsString.withDefault(""),
 	);
-	const [filter, setFilter] = useState<ContactFilterOption>(null);
-	const [currentPage, setCurrentPage] = useQueryState(
-		"page",
-		parseAsInteger.withDefault(1),
+	const [statusFilter] = useQueryState(
+		"status",
+		parseAsArrayOf(parseAsString).withDefault([]),
 	);
+	const [currentPage] = useQueryState("page", parseAsInteger.withDefault(1));
 	const [pageSize] = useQueryState("limit", parseAsInteger.withDefault(10));
+	const { columnVisibility, setColumnVisible } = useContactColumnVisibility();
 
-	const { data, error, isPending, isFetching, refetch } = useContactsQuery({
+	/** Exactly one status applies a filter (same pattern as API keys). */
+	const statusParam = statusFilter.length === 1 ? (statusFilter[0] ?? "") : "";
+
+	const { data, error, isPending, isFetching } = useContactsQuery({
 		page: currentPage ?? 1,
 		limit: pageSize ?? 10,
 		search: searchQuery ?? "",
-		status: filter ?? "",
+		status: statusParam,
 		enabled: !!activeOrganization?.id,
 	});
 	const isLoading = isPending || (isFetching && !data);
 
-	const handleDownloadCSV = async () => {
+	const handleDownloadCSV = useCallback(async () => {
 		try {
 			const response = await fetch("/api/contacts/list?limit=10000", {
 				credentials: "include",
@@ -81,10 +83,12 @@ export function ContactList() {
 				toast.error("No contacts to export");
 				return;
 			}
-			const headers = ["Email", "Status", "Created At"];
+			const headers = ["Email", "Name", "Status", "Updated At", "Created At"];
 			const csvRows = allData.contacts.map((contact) => [
 				contact.email,
+				[contact.firstName, contact.lastName].filter(Boolean).join(" "),
 				contact.status,
+				new Date(contact.updatedAt).toISOString(),
 				new Date(contact.createdAt).toISOString(),
 			]);
 			const csvContent = [
@@ -101,7 +105,7 @@ export function ContactList() {
 		} catch {
 			toast.error("Failed to export contacts");
 		}
-	};
+	}, [data]);
 
 	const actions = useMemo<CommandAction[]>(
 		() => [
@@ -110,7 +114,7 @@ export function ContactList() {
 				label: "Add Contact",
 				icon: "plus",
 				shortcut: { label: "C", keys: ["c"] },
-				onSelect: () => router.push("/contacts/add"),
+				onSelect: () => router.push("/contacts/create"),
 			},
 			{
 				id: "export-contacts",
@@ -139,51 +143,19 @@ export function ContactList() {
 				onSelect: () =>
 					window.open("https://reloop.sh/docs/learn/contacts", "_blank"),
 			},
+			{
+				id: "select-all",
+				label: "Select All",
+				icon: "check-square",
+				shortcut: { label: "⌘A", keys: ["mod+a"] },
+				onSelect: () =>
+					window.dispatchEvent(new CustomEvent("contacts:select-all")),
+			},
 		],
-		[router],
+		[router, handleDownloadCSV],
 	);
 
 	useRegisterCommandActions("contacts", "Contacts", actions);
-
-	useHotkeys(
-		"c",
-		(e) => {
-			e.preventDefault();
-			router.push("/contacts/add");
-		},
-		{ enableOnFormTags: false, preventDefault: true },
-	);
-
-	useHotkeys(
-		"e",
-		(e) => {
-			e.preventDefault();
-			void handleDownloadCSV();
-		},
-		{ enableOnFormTags: false, preventDefault: true },
-	);
-
-	useHotkeys(
-		"s",
-		(e) => {
-			e.preventDefault();
-			window.dispatchEvent(
-				new CustomEvent("api-details:open", {
-					detail: { docSection: "contacts" },
-				}),
-			);
-		},
-		{ enableOnFormTags: false, preventDefault: true },
-	);
-
-	useHotkeys(
-		"d",
-		(e) => {
-			e.preventDefault();
-			window.open("https://reloop.sh/docs/learn/contacts", "_blank");
-		},
-		{ enableOnFormTags: false, preventDefault: true },
-	);
 
 	if (error) {
 		return (
@@ -219,67 +191,18 @@ export function ContactList() {
 				/>
 			</div>
 
-			<div className="flex items-center gap-2">
-				<div className="flex-1">
-					<Input.Root size="small" className="rounded-xl">
-						<Input.Wrapper>
-							<Input.Icon as={Icon} name="search" size="small" />
-							<Input.Input
-								placeholder="Search by email"
-								value={searchQuery ?? ""}
-								onChange={(e) => {
-									void setSearchQuery(e.target.value || null);
-									void setCurrentPage(1);
-								}}
-							/>
-						</Input.Wrapper>
-					</Input.Root>
-				</div>
-
-				<ContactFilterDropdown
-					value={filter}
-					onChange={(newFilter) => {
-						setFilter(newFilter);
-						void setCurrentPage(1);
-					}}
-				/>
-				<Button.Root
-					variant="neutral"
-					mode="stroke"
-					size="small"
-					onClick={() => void refetch()}
-					disabled={isFetching}
-					className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl p-0"
-					title="Refresh contacts"
-					aria-label="Refresh contacts"
-				>
-					<Button.Icon
-						as={Icon}
-						name="refresh-cw"
-						className={cn(
-							"h-4 w-4 text-text-sub-600 transition-transform",
-							isFetching && "animate-spin",
-						)}
-					/>
-				</Button.Root>
-				<Button.Root
-					variant="neutral"
-					mode="stroke"
-					size="small"
-					onClick={() => void handleDownloadCSV()}
-					disabled={!data?.contacts || data.contacts.length === 0}
-					className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl p-0"
-					title="Export CSV"
-					aria-label="Export CSV"
-				>
-					<Icon name="file-download" className="h-4 w-4" />
-				</Button.Root>
-			</div>
+			<ContactListToolbar
+				columnVisibility={columnVisibility}
+				onColumnVisibleChange={setColumnVisible}
+				onExport={() => void handleDownloadCSV()}
+				canExport={!!data?.contacts && data.contacts.length > 0}
+			/>
 
 			<div className="mt-4">
 				<ContactTable
 					contacts={data?.contacts || []}
 					total={data?.total || 0}
+					columnVisibility={columnVisibility}
 					isLoading={isLoading}
 					loadingRows={6}
 					onAddContact={() => router.push("/contacts/create")}

@@ -56,6 +56,7 @@ export const PropertiesApiDetails = ({
 					className="h-6 w-6 text-text-strong-950 dark:text-white"
 				/>
 			}
+			hotkey="s"
 			languages={languages}
 			operations={operations}
 			codeExamples={codeExamples}

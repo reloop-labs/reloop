@@ -1,5 +1,6 @@
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
+import * as ContextMenu from "@reloop/ui/context-menu";
 import { Icon } from "@reloop/ui/icon";
 import {
 	Content as PopoverContent,
@@ -7,92 +8,94 @@ import {
 	Trigger as PopoverTrigger,
 } from "@reloop/ui/popover";
 import { useRouter } from "next/navigation";
-import { useRef, useState } from "react";
+import { type ReactNode, useCallback, useRef, useState } from "react";
 import { toast } from "sonner";
 import type { AudienceStatus } from "#/features/contacts/audience";
-import { useUpdateContactStatusInCache } from "#/features/contacts/hooks/use-contacts-query";
+import {
+	type Contact,
+	useUpdateContactStatusInCache,
+} from "#/features/contacts/hooks/use-contacts-query";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 
-interface Contact {
-	id: string;
-	email: string;
-	status: AudienceStatus;
-	firstName: string | null;
-	lastName: string | null;
-	organizationId: string;
-	properties: Record<string, string | number>;
-	createdAt: string;
-	updatedAt: string;
-	deletedAt: string | null;
-}
-
-export interface ContactDropdownProps {
-	contact: Contact;
+export type ContactActionsHandlers = {
 	onEdit: (contact: Contact) => void;
 	onDelete: (contact: Contact) => void;
-	isDeleting: boolean;
+	isDeleting?: boolean;
 	onOpenChange?: (open: boolean) => void;
-}
+};
 
-export const ContactDropdown = ({
-	contact,
-	onEdit,
-	onDelete,
-	isDeleting,
-	onOpenChange,
-}: ContactDropdownProps) => {
+type MenuItemId = "view" | "toggle-status" | "edit" | "delete";
+
+function useContactActionsMenu(
+	contact: Contact,
+	handlers: ContactActionsHandlers,
+) {
 	const updateContactStatusInCache = useUpdateContactStatusInCache();
 	const router = useRouter();
+	const [open, setOpen] = useState(false);
+	const [contextMenuKey, setContextMenuKey] = useState(0);
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
-	const [popoverOpen, setPopoverOpen] = useState(false);
 	const [isTogglingStatus, setIsTogglingStatus] = useState(false);
-	const buttonRefs = useRef<HTMLButtonElement[]>([]);
+	const buttonRefs = useRef<HTMLElement[]>([]);
+	const keepOpenRef = useRef(false);
 
 	const isSubscribed = contact.status.toLowerCase() === "subscribed";
+	const isDeleting = handlers.isDeleting ?? false;
 
-	// Dynamic menu items based on contact status
 	const menuItems = [
 		{
-			id: "view",
+			id: "view" as const,
 			label: "View Details",
 			icon: "info-outline" as const,
 			isDanger: false,
 		},
 		{
-			id: "toggle-status",
+			id: "toggle-status" as const,
 			label: isSubscribed ? "Unsubscribe" : "Subscribe",
-			icon: isSubscribed ? "cross-circle" : ("check-circle" as const),
-			color: isSubscribed ? "text-red-base" : "text-success-base",
+			icon: (isSubscribed ? "cross-circle" : "check-circle") as
+				| "cross-circle"
+				| "check-circle",
 			isDanger: false,
 		},
 		{
-			id: "edit",
+			id: "edit" as const,
 			label: "Edit contact",
 			icon: "edit" as const,
 			isDanger: false,
 		},
 		{
-			id: "delete",
+			id: "delete" as const,
 			label: "Delete contact",
 			icon: "trash" as const,
 			isDanger: true,
 		},
 	];
 
-	const handlePopoverOpenChange = (open: boolean) => {
-		setPopoverOpen(open);
-		onOpenChange?.(open);
-	};
-
 	const currentTab = buttonRefs.current[hoverIdx ?? -1];
 	const currentRect = currentTab?.getBoundingClientRect();
-	const hoveredItem = menuItems[hoverIdx ?? -1];
-	const isDanger = hoveredItem?.isDanger ?? false;
+	const isDanger = menuItems[hoverIdx ?? -1]?.isDanger ?? false;
+
+	const handleOpenChange = useCallback(
+		(next: boolean) => {
+			if (!next && keepOpenRef.current) return;
+			setOpen(next);
+			if (!next) setHoverIdx(undefined);
+			handlers.onOpenChange?.(next);
+		},
+		[handlers.onOpenChange],
+	);
+
+	const dismissMenu = useCallback(() => {
+		setContextMenuKey((key) => key + 1);
+		handleOpenChange(false);
+	}, [handleOpenChange]);
 
 	const handleToggleStatus = async () => {
 		setIsTogglingStatus(true);
 		try {
-			const newStatus = isSubscribed ? "unsubscribed" : "subscribed";
+			const newStatus: AudienceStatus = isSubscribed
+				? "unsubscribed"
+				: "subscribed";
 			const response = await fetch(`/api/contacts/${contact.id}`, {
 				method: "PATCH",
 				headers: { "Content-Type": "application/json" },
@@ -113,30 +116,170 @@ export const ContactDropdown = ({
 		}
 	};
 
-	const handleItemClick = async (itemId: string) => {
+	const handleItemClick = async (itemId: MenuItemId) => {
 		if (itemId === "view") {
-			setPopoverOpen(false);
 			router.push(`/contacts/detail/${contact.id}`);
+			dismissMenu();
 		} else if (itemId === "toggle-status") {
-			setPopoverOpen(false);
+			dismissMenu();
 			await handleToggleStatus();
 		} else if (itemId === "edit") {
-			setPopoverOpen(false);
-			onEdit(contact);
+			handlers.onEdit(contact);
+			dismissMenu();
 		} else if (itemId === "delete") {
-			setPopoverOpen(false);
-			onDelete(contact);
+			handlers.onDelete(contact);
+			dismissMenu();
 		}
 	};
 
+	return {
+		open,
+		contextMenuKey,
+		handleOpenChange,
+		menuItems,
+		hoverIdx,
+		setHoverIdx,
+		buttonRefs,
+		currentTab,
+		currentRect,
+		isDanger,
+		isTogglingStatus,
+		isDeleting,
+		handleItemClick,
+	};
+}
+
+function ContactActionsMenuItems({
+	menu,
+	variant = "dropdown",
+}: {
+	menu: ReturnType<typeof useContactActionsMenu>;
+	variant?: "dropdown" | "context";
+}) {
+	const {
+		menuItems,
+		hoverIdx,
+		setHoverIdx,
+		buttonRefs,
+		currentTab,
+		currentRect,
+		isDanger,
+		isTogglingStatus,
+		isDeleting,
+		handleItemClick,
+	} = menu;
+
+	const itemClassName = (item: (typeof menuItems)[number], idx: number) =>
+		cn(
+			"relative flex min-h-[28px] w-full cursor-pointer items-center gap-2 overflow-hidden rounded-lg px-2 py-1.5 font-medium text-xs transition-colors",
+			item.isDanger ? "text-error-base" : "text-text-strong-950",
+			!currentRect &&
+				hoverIdx === idx &&
+				(item.isDanger ? "bg-red-alpha-10" : "bg-neutral-alpha-10"),
+			((isDeleting && item.id === "delete") ||
+				(isTogglingStatus && item.id === "toggle-status")) &&
+				"cursor-not-allowed opacity-50",
+			variant === "context" &&
+				"data-[disabled]:pointer-events-none data-[highlighted]:bg-transparent",
+		);
+
 	return (
-		<PopoverRoot open={popoverOpen} onOpenChange={handlePopoverOpenChange}>
+		<div className="relative">
+			{menuItems.map((item, idx) => {
+				const disabled =
+					(item.id === "delete" && isDeleting) ||
+					(item.id === "toggle-status" && isTogglingStatus);
+				const label = (
+					<>
+						<Icon
+							name={item.icon}
+							className={cn(
+								"h-3.5 w-3.5 shrink-0",
+								item.isDanger ? "" : "text-text-sub-600",
+							)}
+						/>
+						<span>{item.label}</span>
+					</>
+				);
+
+				if (variant === "context") {
+					return (
+						<ContextMenu.Item
+							key={item.id}
+							ref={(el) => {
+								if (el) buttonRefs.current[idx] = el;
+							}}
+							onPointerEnter={() => setHoverIdx(idx)}
+							onPointerLeave={() => setHoverIdx(undefined)}
+							onSelect={() => {
+								void handleItemClick(item.id);
+							}}
+							disabled={disabled}
+							className={itemClassName(item, idx)}
+						>
+							{label}
+						</ContextMenu.Item>
+					);
+				}
+
+				return (
+					<button
+						key={item.id}
+						ref={(el) => {
+							if (el) buttonRefs.current[idx] = el;
+						}}
+						type="button"
+						onPointerEnter={() => setHoverIdx(idx)}
+						onPointerLeave={() => setHoverIdx(undefined)}
+						onClick={() => void handleItemClick(item.id)}
+						disabled={disabled}
+						className={itemClassName(item, idx)}
+					>
+						{label}
+					</button>
+				);
+			})}
+			<AnimatedHoverBackground
+				rect={currentRect}
+				tabElement={currentTab}
+				isDanger={isDanger}
+			/>
+		</div>
+	);
+}
+
+const menuContentClassName = "w-40 rounded-xl p-1.5";
+
+export interface ContactDropdownProps {
+	contact: Contact;
+	onEdit: (contact: Contact) => void;
+	onDelete: (contact: Contact) => void;
+	isDeleting: boolean;
+	onOpenChange?: (open: boolean) => void;
+}
+
+export const ContactDropdown = ({
+	contact,
+	onEdit,
+	onDelete,
+	isDeleting,
+	onOpenChange,
+}: ContactDropdownProps) => {
+	const menu = useContactActionsMenu(contact, {
+		onEdit,
+		onDelete,
+		isDeleting,
+		onOpenChange,
+	});
+
+	return (
+		<PopoverRoot open={menu.open} onOpenChange={menu.handleOpenChange}>
 			<PopoverTrigger asChild>
 				<Button.Root
 					variant="neutral"
 					mode="ghost"
 					size="xxsmall"
-					disabled={isDeleting || isTogglingStatus}
+					disabled={isDeleting || menu.isTogglingStatus}
 				>
 					<Icon name="more-horizontal" className="h-3 w-3" />
 				</Button.Root>
@@ -144,51 +287,41 @@ export const ContactDropdown = ({
 			<PopoverContent
 				align="end"
 				sideOffset={-10}
-				className="w-40 rounded-xl p-1.5"
+				className={menuContentClassName}
 			>
-				<div className="relative">
-					{menuItems.map((item, idx) => (
-						<button
-							key={item.id}
-							ref={(el) => {
-								if (el) buttonRefs.current[idx] = el;
-							}}
-							type="button"
-							onPointerEnter={() => setHoverIdx(idx)}
-							onPointerLeave={() => setHoverIdx(undefined)}
-							onClick={() => handleItemClick(item.id)}
-							disabled={
-								(item.id === "delete" && isDeleting) ||
-								(item.id === "toggle-status" && isTogglingStatus)
-							}
-							className={cn(
-								"flex w-full cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 font-medium text-xs transition-colors",
-								item.isDanger ? "text-error-base" : "text-text-strong-950",
-								!currentRect &&
-									hoverIdx === idx &&
-									(item.isDanger ? "bg-red-alpha-10" : "bg-neutral-alpha-10"),
-								((isDeleting && item.id === "delete") ||
-									(isTogglingStatus && item.id === "toggle-status")) &&
-									"cursor-not-allowed opacity-50",
-							)}
-						>
-							<Icon
-								name={item.icon}
-								className={cn(
-									"h-3.5 w-3.5",
-									item.isDanger ? "" : "text-text-sub-600",
-								)}
-							/>
-							<span>{item.label}</span>
-						</button>
-					))}
-					<AnimatedHoverBackground
-						rect={currentRect}
-						tabElement={currentTab}
-						isDanger={isDanger}
-					/>
-				</div>
+				<ContactActionsMenuItems menu={menu} />
 			</PopoverContent>
 		</PopoverRoot>
 	);
 };
+
+export function ContactRowContextMenu({
+	contact,
+	onEdit,
+	onDelete,
+	isDeleting = false,
+	onOpenChange,
+	children,
+}: ContactDropdownProps & { children: ReactNode }) {
+	const menu = useContactActionsMenu(contact, {
+		onEdit,
+		onDelete,
+		isDeleting,
+		onOpenChange,
+	});
+
+	return (
+		<ContextMenu.Root
+			key={menu.contextMenuKey}
+			onOpenChange={menu.handleOpenChange}
+		>
+			<ContextMenu.Trigger asChild>{children}</ContextMenu.Trigger>
+			<ContextMenu.Content
+				className={menuContentClassName}
+				onCloseAutoFocus={(e) => e.preventDefault()}
+			>
+				<ContactActionsMenuItems menu={menu} variant="context" />
+			</ContextMenu.Content>
+		</ContextMenu.Root>
+	);
+}

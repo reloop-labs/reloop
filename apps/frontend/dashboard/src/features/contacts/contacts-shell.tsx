@@ -6,9 +6,15 @@ import { usePathname, useRouter } from "next/navigation";
 import { useQueryState } from "nuqs";
 import { useEffect, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
-import { ContactsCommonUseCasesSidebar } from "./common-use-cases-sidebar";
+import { ChannelsApiDetails } from "#/components/api-details/channels";
+import { ContactsApiDetails } from "#/components/api-details/contacts";
+import { GroupsApiDetails } from "#/components/api-details/groups";
+import { PropertiesApiDetails } from "#/components/api-details/properties";
+import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { ContactsTabs } from "./components/contacts/contacts-tabs";
 import { ContactsModals } from "./contacts-modals";
+
+const DOCS_URL = "https://reloop.sh/docs/learn/contacts";
 
 export function ContactsShell({ children }: { children: React.ReactNode }) {
 	const pathname = usePathname();
@@ -39,13 +45,33 @@ export function ContactsShell({ children }: { children: React.ReactNode }) {
 		else router.push("/contacts/create");
 	};
 
+	const openDocs = () => window.open(DOCS_URL, "_blank");
+
+	// C — Add / create. Select-all lives on the contacts table (⌘A).
 	useHotkeys(
-		"mod+a",
+		"c",
 		(e) => {
 			e.preventDefault();
-			if (!isGroupsPage) handleAction();
+			handleAction();
 		},
-		{ enabled: !isBulkImportPage && !isDetailPage },
+		{
+			enableOnFormTags: false,
+			preventDefault: true,
+			enabled: !isBulkImportPage && !isDetailPage,
+		},
+	);
+
+	useHotkeys(
+		"d",
+		(e) => {
+			e.preventDefault();
+			openDocs();
+		},
+		{
+			enableOnFormTags: false,
+			preventDefault: true,
+			enabled: !isBulkImportPage && !isDetailPage,
+		},
 	);
 
 	useHotkeys(
@@ -95,6 +121,14 @@ export function ContactsShell({ children }: { children: React.ReactNode }) {
 				? "Create group"
 				: "Add contact";
 
+	const ApiDetailsComponent = isPropertiesPage
+		? PropertiesApiDetails
+		: isChannelsPage
+			? ChannelsApiDetails
+			: isGroupsPage
+				? GroupsApiDetails
+				: ContactsApiDetails;
+
 	return (
 		<>
 			<div className="mx-auto max-w-6xl space-y-6 p-6 lg:p-8">
@@ -129,39 +163,37 @@ export function ContactsShell({ children }: { children: React.ReactNode }) {
 
 						{!isBulkImportPage && (
 							<div className="flex shrink-0 items-center gap-2">
+								<ApiDetailsComponent
+									renderTrigger={({ open }) => (
+										<Button.Root
+											type="button"
+											variant="neutral"
+											mode="stroke"
+											size="small"
+											onClick={open}
+											className="gap-1.5 rounded-xl"
+											aria-keyshortcuts="s"
+										>
+											<Icon
+												name="code"
+												className="h-4 w-4 text-text-sub-600"
+											/>
+											SDK
+											<ActionKbd>S</ActionKbd>
+										</Button.Root>
+									)}
+								/>
 								<Button.Root
 									type="button"
 									variant="neutral"
 									mode="stroke"
 									size="small"
-									onClick={() =>
-										window.open(
-											"https://reloop.sh/docs/features/contacts",
-											"_blank",
-										)
-									}
+									onClick={openDocs}
 									className="gap-1.5 rounded-xl"
-								>
-									<Icon
-										name="video-guide"
-										className="h-4 w-4 text-text-sub-600"
-									/>
-									Video guide
-								</Button.Root>
-								<Button.Root
-									type="button"
-									variant="neutral"
-									mode="stroke"
-									size="small"
-									onClick={() =>
-										window.open(
-											"https://reloop.sh/docs/features/contacts",
-											"_blank",
-										)
-									}
-									className="rounded-xl"
+									aria-keyshortcuts="d"
 								>
 									Documentation
+									<ActionKbd>D</ActionKbd>
 								</Button.Root>
 								<FancyButton.Root
 									type="button"
@@ -169,9 +201,13 @@ export function ContactsShell({ children }: { children: React.ReactNode }) {
 									size="small"
 									onClick={handleAction}
 									className="gap-1.5 rounded-xl"
+									aria-keyshortcuts="c"
 								>
 									<Icon name="plus" className="h-4 w-4" />
 									{actionLabel}
+									<ActionKbd className="border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]">
+										C
+									</ActionKbd>
 								</FancyButton.Root>
 							</div>
 						)}
@@ -208,14 +244,9 @@ export function ContactsShell({ children }: { children: React.ReactNode }) {
 				{isDetailPage || isBulkImportPage ? (
 					<div>{children}</div>
 				) : (
-					<div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
-						<div className="space-y-4 lg:col-span-8 xl:col-span-8">
-							<ContactsTabs />
-							{children}
-						</div>
-						<div className="lg:col-span-4 xl:col-span-4">
-							<ContactsCommonUseCasesSidebar />
-						</div>
+					<div className="space-y-4">
+						<ContactsTabs />
+						{children}
 					</div>
 				)}
 			</div>

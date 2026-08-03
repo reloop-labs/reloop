@@ -2,6 +2,13 @@ import * as Button from "@reloop/ui/button";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { useRouter } from "next/navigation";
+import {
+	parseAsArrayOf,
+	parseAsInteger,
+	parseAsString,
+	useQueryState,
+} from "nuqs";
+import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 
 interface ContactsEmptyStateProps {
 	onAddContact?: () => void;
@@ -21,7 +28,27 @@ export function ContactsEmptyState({
 	buttonText,
 }: ContactsEmptyStateProps) {
 	const router = useRouter();
-	const isFiltered = searchQuery.trim() !== "";
+	const [statusFilter, setStatusFilter] = useQueryState(
+		"status",
+		parseAsArrayOf(parseAsString).withDefault([]),
+	);
+	const [, setCurrentPage] = useQueryState(
+		"page",
+		parseAsInteger.withDefault(1),
+	);
+	const [, setSearchQuery] = useQueryState(
+		"search",
+		parseAsString.withDefault(""),
+	);
+
+	const isFiltered = searchQuery.trim() !== "" || statusFilter.length > 0;
+
+	const handleClearFilters = () => {
+		void setStatusFilter([]);
+		void setSearchQuery("");
+		void setCurrentPage(1);
+		onClearSearch?.();
+	};
 
 	const handleAddContact = () => {
 		if (onAddContact) {
@@ -46,7 +73,7 @@ export function ContactsEmptyState({
 			</h3>
 			<p className="mx-auto mb-6 max-w-75 text-balance font-medium text-[12px] text-text-sub-600">
 				{isFiltered
-					? "Try adjusting your search query."
+					? "Try adjusting your search or filters."
 					: (description ??
 						"Add contacts manually, import a CSV, or let your app sync them automatically.")}
 			</p>
@@ -56,11 +83,11 @@ export function ContactsEmptyState({
 					variant="neutral"
 					mode="stroke"
 					size="small"
-					onClick={onClearSearch}
+					onClick={handleClearFilters}
 					className="gap-1.5 rounded-xl"
 				>
 					<Icon name="cross-circle" className="h-4 w-4 text-text-sub-600" />
-					Clear search
+					Clear filters
 				</Button.Root>
 			) : (
 				<FancyButton.Root
@@ -72,6 +99,9 @@ export function ContactsEmptyState({
 				>
 					<Icon name="plus" className="h-4 w-4" />
 					{buttonText ?? "Add contact"}
+					<ActionKbd className="border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]">
+						C
+					</ActionKbd>
 				</FancyButton.Root>
 			)}
 		</div>
