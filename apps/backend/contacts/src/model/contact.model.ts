@@ -324,6 +324,12 @@ export namespace ContactModel {
 			contacts: t.Array(groupContactItem),
 		}),
 		total: t.Number(),
+		subscribedContacts: t.Number({
+			description: "Members with subscribed status",
+		}),
+		unsubscribedContacts: t.Number({
+			description: "Members with unsubscribed status",
+		}),
 		page: t.Number(),
 		limit: t.Number(),
 		event: t.String({ description: "Event ID for the list request" }),

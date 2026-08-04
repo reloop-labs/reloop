@@ -37,6 +37,13 @@ export namespace GroupModel {
 
 	export type UpdateGroupBody = typeof updateGroupBody.static;
 
+	export const createdByUser = t.Object({
+		id: t.String({ description: "User ID" }),
+		name: t.String({ description: "User display name" }),
+		email: t.String({ description: "User email" }),
+		image: t.Nullable(t.String({ description: "User avatar URL" })),
+	});
+
 	// Group Response
 	export const groupBaseResponse = t.Object(
 		{
@@ -45,6 +52,7 @@ export namespace GroupModel {
 			name: t.String({ description: "Group name" }),
 			createdAt: t.Date(),
 			updatedAt: t.Date(),
+			createdBy: t.Optional(createdByUser),
 		},
 		{
 			examples: [
@@ -54,6 +62,12 @@ export namespace GroupModel {
 					name: "Beta Testers",
 					createdAt: "2026-03-27T10:00:00Z",
 					updatedAt: "2026-03-27T10:00:00Z",
+					createdBy: {
+						id: "usr_123",
+						name: "Jane Doe",
+						email: "jane@example.com",
+						image: null,
+					},
 				},
 			],
 		},

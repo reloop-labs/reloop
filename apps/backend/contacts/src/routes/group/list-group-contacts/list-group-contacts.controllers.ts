@@ -41,8 +41,8 @@ export const listGroupContactsController = async ({
 			isNull(schema.contactGroup.deletedAt),
 		);
 
-		// Run group fetch and count in parallel
-		const [group, countResult] = await Promise.all([
+		// Run group fetch and member status counts in parallel
+		const [group, statusCountRows] = await Promise.all([
 			db.query.group.findFirst({
 				where: and(
 					eq(schema.group.id, group_id),
@@ -51,9 +51,17 @@ export const listGroupContactsController = async ({
 				),
 			}),
 			db
-				.select({ count: sql<number>`COUNT(*)` })
+				.select({
+					status: schema.contact.status,
+					count: sql<number>`COUNT(*)`,
+				})
 				.from(schema.contactGroup)
-				.where(memberWhere),
+				.innerJoin(
+					schema.contact,
+					eq(schema.contactGroup.contactId, schema.contact.id),
+				)
+				.where(and(memberWhere, isNull(schema.contact.deletedAt)))
+				.groupBy(schema.contact.status),
 		]);
 
 		if (!group) {
@@ -61,7 +69,15 @@ export const listGroupContactsController = async ({
 			throw GroupErrors.notFound(group_id);
 		}
 
-		const total = Number(countResult[0]?.count ?? 0);
+		let subscribedContacts = 0;
+		let unsubscribedContacts = 0;
+		let total = 0;
+		for (const row of statusCountRows) {
+			const count = Number(row.count ?? 0);
+			total += count;
+			if (row.status === "subscribed") subscribedContacts = count;
+			else if (row.status === "unsubscribed") unsubscribedContacts = count;
+		}
 
 		// Fetch paginated contacts with properties via contactGroup relation
 		const rows = await db.query.contactGroup.findMany({
@@ -122,6 +138,8 @@ export const listGroupContactsController = async ({
 				contacts: contactList,
 			},
 			total,
+			subscribedContacts,
+			unsubscribedContacts,
 			page,
 			limit,
 			event: GROUP_LIST_WEBHOOK_EVENT.id,

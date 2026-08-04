@@ -1,6 +1,7 @@
 import { useGroupQuery } from "#/features/contacts/hooks/use-contacts-query";
 import { GroupContactList } from "./group-contact-list";
 import { GroupHeader } from "./group-header";
+import { GroupSummary } from "./group-summary";
 
 export function GroupDetailContent({ groupId }: { groupId: string }) {
 	const {
@@ -37,6 +38,7 @@ export function GroupDetailContent({ groupId }: { groupId: string }) {
 	return (
 		<>
 			<GroupHeader group={groupData} isLoading={isLoading} />
+			<GroupSummary group={groupData} isLoading={isLoading} />
 			<GroupContactList groupId={groupId} />
 		</>
 	);

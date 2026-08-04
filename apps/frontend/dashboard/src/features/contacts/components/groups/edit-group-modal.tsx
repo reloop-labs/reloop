@@ -32,7 +32,7 @@ export const EditGroupModal = ({
 				>
 					<div className="p-6">
 						<Modal.Title className="mb-5 font-semibold text-[26px] text-text-strong-950 tracking-tight">
-							Edit group
+							Rename group
 						</Modal.Title>
 
 						<EditGroupForm

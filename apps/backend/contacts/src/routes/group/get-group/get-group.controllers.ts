@@ -29,16 +29,36 @@ export const getGroupController = async ({
 				eq(schema.group.organizationId, organizationId),
 				isNull(schema.group.deletedAt),
 			),
+			with: {
+				user: {
+					columns: {
+						id: true,
+						name: true,
+						email: true,
+						image: true,
+					},
+				},
+			},
 		});
 		if (!group) {
 			log.warn("Group not found", { group_id });
 			throw GroupErrors.notFound(group_id);
 		}
 		log.info("Group retrieved successfully", { group_id });
+		const { user, userId: _userId, organizationId: _orgId, deletedAt: _deletedAt, ...rest } =
+			group;
 		return {
-			...group,
+			...rest,
 			object: "contact_group",
 			event: GROUP_GET_WEBHOOK_EVENT.id,
+			createdBy: user
+				? {
+						id: user.id,
+						name: user.name,
+						email: user.email,
+						image: user.image,
+					}
+				: undefined,
 		} as GroupResponse;
 	} catch (error) {
 		log.error("Debug getting group", {

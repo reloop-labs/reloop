@@ -179,13 +179,21 @@ export function useUpdateContactStatusInCache() {
 	};
 }
 
+export type GroupCreatedBy = {
+	id: string;
+	name: string;
+	email: string;
+	image: string | null;
+};
+
 export type GroupDetail = {
 	id: string;
 	name: string;
-	organizationId: string;
+	organizationId?: string;
 	createdAt: string;
 	updatedAt: string;
-	deletedAt: string | null;
+	deletedAt?: string | null;
+	createdBy?: GroupCreatedBy;
 };
 
 export async function fetchGroup(id: string): Promise<GroupDetail> {
@@ -210,6 +218,8 @@ export type GroupContactsResponse = {
 		contacts: Contact[];
 	};
 	total: number;
+	subscribedContacts?: number;
+	unsubscribedContacts?: number;
 	page: number;
 	limit: number;
 };
@@ -235,6 +245,12 @@ export function useGroupContactsQuery(params: {
 	});
 }
 
+export type GroupContactStats = {
+	total: number;
+	subscribedContacts: number;
+	unsubscribedContacts: number;
+};
+
 export function useGroupContactsCountQuery(groupId: string | null | undefined) {
 	return useQuery({
 		queryKey: queryKeys.contacts.groupCount(groupId ?? ""),
@@ -244,7 +260,14 @@ export function useGroupContactsCountQuery(groupId: string | null | undefined) {
 				{ credentials: "include" },
 			);
 			if (!res.ok) throw new Error("Failed to load group contact count");
-			return res.json() as Promise<{ total: number }>;
+			const data = (await res.json()) as Partial<GroupContactStats> & {
+				total?: number;
+			};
+			return {
+				total: data.total ?? 0,
+				subscribedContacts: data.subscribedContacts ?? 0,
+				unsubscribedContacts: data.unsubscribedContacts ?? 0,
+			} satisfies GroupContactStats;
 		},
 		enabled: !!groupId,
 	});

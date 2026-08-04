@@ -9,10 +9,18 @@ export namespace GroupTypes {
 	export type GroupListItem = typeof GroupModel.groupListItem.static;
 }
 
+export interface GroupCreatedBy {
+	id: string;
+	name: string;
+	email: string;
+	image: string | null;
+}
+
 export interface GroupResponse
 	extends Omit<Group, "organizationId" | "userId" | "deletedAt"> {
 	object: "contact_group";
 	event: string;
+	createdBy?: GroupCreatedBy;
 }
 
 export interface GroupListItem
