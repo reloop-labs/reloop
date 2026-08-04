@@ -1,7 +1,7 @@
 ---
 title: Contact Properties
 sidebarTitle: Properties
-description: Learn how Reloop contact properties (string or number fields) power email personalization and targeting — create, update, and delete them from the dashboard or API.
+description: Learn how to create, edit, and delete Reloop contact properties, and set values on contacts from the dashboard or API.
 faq:
   - question: What are contact properties in Reloop?
     answer: Properties are small details you add to a contact — custom String or Number fields with an optional default. Use them for personalization and targeting (for example company or plan_tier).
@@ -23,140 +23,144 @@ faq:
     answer: Reloop does not enforce a fixed maximum number of properties per organization. Creating properties is rate-limited (30 create requests per 60 seconds per organization). See Usage Limits in the API docs.
 ---
 
-## What are contact properties?
-
-**Properties** are custom fields you add to a contact — a bit of context that helps you know who they are and what they need. Types: String or Number, with an optional default used in templates when a contact has no value.
-
-Open the UI: [Contacts → Properties](https://reloop.sh/dashboard/contacts/properties)
-
-![Contact properties in the Reloop dashboard](/docs/images/docs/contacts/properties-list.png)
-
-## Why use properties?
-
-Say you run a SaaS product. You store `company` and `plan_tier` on every contact.
-
-Now your welcome email can say:
-
-> Hi from Acme, thanks for trying our Pro plan!
-
-— automatically, for every contact, using their own company name and plan. And when you want to email only people on a free trial, you can target just the contacts where `plan_tier` is `"Trial"`. No manual list-building, no spreadsheet — the data lives right on the contact.
-
----
-
-## How do I create a contact property?
-
 <Tabs>
   <Tab title="Desktop" icon="monitor">
-    ![Create a contact property](/docs/images/docs/contacts/add-property.gif)
+    ## View all contact properties
+
+    The [Properties Dashboard](https://reloop.sh/dashboard/contacts/properties) shows every custom field in your organization — name, type, default, and when it was last updated.
+
+    Properties are custom **String** or **Number** fields you attach to a [contact](/docs/learn/contacts). Use them for personalization and targeting (for example `company` or `plan_tier`). An optional default is used when a contact has no value set.
+
+    ![Contact properties in the Reloop dashboard](/docs/images/docs/contacts/properties/properties-list.png)
+
+    ## Create a property
 
     1. Go to [Contacts → Properties](https://reloop.sh/dashboard/contacts/properties)
-    2. **Add Property**
-    3. Name (letters, numbers, underscores), type **String** or **Number**, optional default
-    4. Save
-  </Tab>
-  <Tab title="Code" icon="code">
-    <ContactsCodeSamples id="contacts.properties.create" />
-  </Tab>
-</Tabs>
+    2. Click **Add property** (or press `C`)
+    3. Enter a name (e.g. `plan_tier` or `company_size`) — letters, numbers, and underscores only
+    4. Choose type **String** or **Number**, and optionally set a default
+    5. Click **Add property** (or press `Enter`)
 
----
+    <Video src="/docs/images/docs/contacts/properties/create-property.mp4" autoPlay loop muted playsInline />
 
-## How do I list or update a property?
+    ## Edit a property
 
-Browse the schema or change a property’s optional default — row menu or API. Name and type are fixed after create.
+    After create, only the **default (fallback)** value can be changed. Name and type are fixed. To use a different name, create a new property and set values on contacts under that name.
 
-<Tabs>
-  <Tab title="Desktop" icon="monitor">
-    ![List and update contact properties](/docs/images/docs/contacts/properties-list.png)
+    1. Go to [Contacts → Properties](https://reloop.sh/dashboard/contacts/properties)
+    2. Click the row menu (**···**) next to the property you want to edit
+    3. Select **Edit**
+    4. Update the default value and click **Save** (or press `Enter`)
+
+    <Video src="/docs/images/docs/contacts/properties/edit-property.mp4" autoPlay loop muted playsInline />
+
+    ## Set values on a contact
+
+    <Info>
+    The Properties page defines the **schema**. Values live on each contact — set them when you edit a contact in the dashboard or via the Contacts update API.
+    </Info>
+
+    1. Open [Contacts](https://reloop.sh/dashboard/contacts)
+    2. Click the row menu (**···**) → **Edit** (or open the contact)
+    3. Fill the custom property fields (e.g. `plan_tier`, `timezone`, `company_size`)
+    4. Click **Update** (or press `Enter`)
+
+    <Video src="/docs/images/docs/contacts/properties/update-property-in-contact.mp4" autoPlay loop muted playsInline />
+
+    ## Delete a property
+
+    <Info>
+    Deleting removes the schema definition. Existing contacts keep raw key-value data, but the field is no longer managed globally.
+    </Info>
 
     1. Open [Contacts → Properties](https://reloop.sh/dashboard/contacts/properties)
-    2. Review the list — or row **···** → **Edit** to change the default value
-    3. Save
+    2. Click the row menu (**···**) → **Delete**
+    3. Confirm permanent removal
+
+    <Video src="/docs/images/docs/contacts/properties/delete-property.mp4" autoPlay loop muted playsInline />
   </Tab>
   <Tab title="Code" icon="code">
+    ## View all contact properties
+
+    Fetch a paginated list of property definitions in your organization.
+
     <ContactsCodeSamples id="contacts.properties.list" />
 
+    ## Create a property
+
+    Create a new String or Number property schema for your contacts.
+
+    <ContactsCodeSamples id="contacts.properties.create" />
+
+    ## Edit a property
+
     <ContactsCodeSamples id="contacts.properties.update" />
-  </Tab>
-</Tabs>
 
----
+    ## Set values on a contact
 
-## How do I set values on a contact?
+    Set custom property values when you update a contact.
 
-The Properties page defines the **schema**. Values live on each [contact](/docs/learn/contacts) — set them when you edit a contact in the dashboard or via the update contact API.
-
-<Tabs>
-  <Tab title="Desktop" icon="monitor">
-    1. Open [Contacts](https://reloop.sh/dashboard/contacts)
-    2. Row **···** → **Edit** (or open the contact)
-    3. Fill custom property fields → Save
-  </Tab>
-  <Tab title="Code" icon="code">
     <ContactsCodeSamples id="contacts.update" />
-  </Tab>
-</Tabs>
 
----
+    ## Delete a property
 
-## How do I delete a contact property?
-
-Deleting removes the schema. Contacts keep raw values, but the field is no longer managed globally.
-
-<Tabs>
-  <Tab title="Desktop" icon="monitor">
-    ![Delete a contact property](/docs/images/docs/contacts/delete-property.gif)
-
-    1. Open [Contacts → Properties](https://reloop.sh/dashboard/contacts/properties)
-    2. Row **···** → **Delete**
-    3. Confirm
-  </Tab>
-  <Tab title="Code" icon="code">
     <ContactsCodeSamples id="contacts.properties.delete" />
   </Tab>
 </Tabs>
 
----
-
 ## FAQ
 
-### What are contact properties in Reloop?
+<AccordionGroup>
+  <Accordion title="What are contact properties in Reloop?">
+    Properties are small details you add to a contact — custom **String** or **Number** fields with an optional default. Use them for personalization and targeting (for example `company` or `plan_tier`).
+  </Accordion>
 
-Properties are small details you add to a contact — custom **String** or **Number** fields with an optional default. Use them for personalization and targeting (for example `company` or `plan_tier`).
+  <Accordion title="What property types does Reloop support?">
+    **String** (free-form text) and **Number** (integer or decimal), plus an optional fallback when a contact has no value.
+  </Accordion>
 
-### What property types does Reloop support?
+  <Accordion title="What happens when I delete a contact property?">
+    Deleting removes the schema definition. Existing contacts keep raw key-value data, but the field is no longer managed globally.
+  </Accordion>
 
-**String** (free-form text) and **Number** (integer or decimal), plus an optional fallback when a contact has no value.
+  <Accordion title="How do I name a contact property?">
+    Use letters, numbers, and underscores only. Names must start with a letter or underscore. Spaces become underscores. When setting values on a contact, names must be lowercase (`a-z`, `0-9`, underscores).
+  </Accordion>
 
-### What happens when I delete a contact property?
+  <Accordion title="Can I rename a property without losing data?">
+    No. After you create a property, you can only change its **default (fallback)** value — name and type stay fixed. To use a different name, create a new property and set values on contacts under that name.
+  </Accordion>
 
-Deleting removes the schema definition. Existing contacts keep raw key-value data, but the field is no longer managed globally.
+  <Accordion title="Can two properties have the same name but different casing (for example Company vs company)?">
+    No. Names are unique per organization by exact name. When setting values on a contact, names must be lowercase (`a-z`, `0-9`, underscores) — don’t rely on casing variants as separate fields.
+  </Accordion>
 
-### How do I name a contact property?
+  <Accordion title="Can a property have different values for different contacts?">
+    Yes. The Properties page defines the shared field (schema). Each contact stores its own value. The optional default is only a fallback when a contact has no value set.
+  </Accordion>
 
-Use letters, numbers, and underscores only. Names must start with a letter or underscore. Spaces become underscores. When setting values on a contact, names must be lowercase (`a-z`, `0-9`, underscores).
+  <Accordion title="Can I set a property via CSV import?">
+    No. There is no CSV import for custom property values today. Set values when you [edit a contact](/docs/learn/contacts) in the dashboard or via the Contacts update API. **Export CSV** from the contacts list includes email, status, and created-at only.
+  </Accordion>
 
-### Can I rename a property without losing data?
+  <Accordion title="Is there a limit to how many properties I can create?">
+    Reloop does not enforce a fixed maximum per organization. Create is rate-limited (**30** requests per **60** seconds per organization). See [Usage Limits](/docs/api/usage-limits).
+  </Accordion>
+</AccordionGroup>
 
-No. After you create a property, you can only change its **default (fallback)** value — name and type stay fixed. To use a different name, create a new property and set values on contacts under that name.
+## Related
 
-### Can two properties have the same name but different casing (for example `Company` vs `company`)?
-
-No. Names are unique per organization by exact name. When setting values on a contact, names must be lowercase (`a-z`, `0-9`, underscores) — don’t rely on casing variants as separate fields.
-
-### Can a property have different values for different contacts?
-
-Yes. The Properties page defines the shared field (schema). Each contact stores its own value. The optional default is only a fallback when a contact has no value set.
-
-### Can I set a property via CSV import?
-
-No. There is no CSV import for custom property values today. Set values when you [edit a contact](/docs/learn/contacts#how-do-i-edit-or-unsubscribe-a-contact) in the dashboard or via the Contacts update API. **Export CSV** from the contacts list includes email, status, and created-at only.
-
-### Is there a limit to how many properties I can create?
-
-No fixed maximum per organization. Create is rate-limited (**30** requests per **60** seconds per organization). See [Usage Limits](/docs/api/usage-limits).
-
----
+<CardGroup cols={3}>
+  <Card icon="users" title="Contacts" href="/docs/learn/contacts">
+    Add, search, and manage people in your organization.
+  </Card>
+  <Card icon="users" title="Groups" href="/docs/learn/contacts/groups">
+    Segment contacts for targeted sends.
+  </Card>
+  <Card icon="tower-broadcast" title="Channels" href="/docs/learn/contacts/channels">
+    Subscription topics and channel preferences.
+  </Card>
+</CardGroup>
 
 ## API reference
 
@@ -168,7 +172,7 @@ No fixed maximum per organization. Create is rate-limited (**30** requests per *
     All properties.
   </Card>
   <Card icon="pen" title="Update" href="/api/contacts/contact-properties/patch-api-contacts-v1properties-by-contact_property_id#contact-properties">
-    Change definition.
+    Change default value.
   </Card>
   <Card icon="trash" title="Delete" href="/api/contacts/contact-properties/delete-api-contacts-v1properties-by-contact_property_id#contact-properties">
     Remove schema.
