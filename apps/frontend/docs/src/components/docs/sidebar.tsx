@@ -159,12 +159,15 @@ export function Sidebar({
 		return result;
 	}, []);
 
-	// Folder open state lives here — only ever grows, never shrinks automatically
+	// Folder open state. Active folders auto-open, but a user close is sticky
+	// until they leave that folder (or re-open it) so navigation doesn't
+	// immediately re-expand a folder they just collapsed.
 	// Initialize with only active folders open — must match on server and client to avoid hydration mismatch.
 	// sessionStorage restoration happens in the useEffect below, after hydration.
 	const [openFolders, setOpenFolders] = useState<Set<string>>(
 		() => new Set(getActiveFolderUrls(filteredTree)),
 	);
+	const userCollapsedRef = useRef<Set<string>>(new Set());
 
 	// Restore persisted open-folder state from sessionStorage after mount (client-only)
 	useEffect(() => {
@@ -217,35 +220,59 @@ export function Sidebar({
 
 	const prevTabUrl = useRef(activeTab?.url);
 
-	// On tab/section change: make sure active folders in the new section are open by default
+	// On tab/section change: open active folders in the new section (fresh section, clear collapse prefs)
 	useEffect(() => {
 		if (prevTabUrl.current !== activeTab?.url) {
 			prevTabUrl.current = activeTab?.url;
+			userCollapsedRef.current.clear();
 			const urls = getActiveFolderUrls(filteredTree);
-			setOpenFolders((prev) => {
-				return new Set([...prev, ...urls]);
-			});
+			setOpenFolders((prev) => new Set([...prev, ...urls]));
 		}
 	}, [activeTab?.url, filteredTree, getActiveFolderUrls]);
 
-	// On navigation: add newly-active folders but never remove any
+	// On navigation: auto-open newly-active folders unless the user collapsed them
 	useEffect(() => {
 		const urls = getActiveFolderUrls(filteredTree);
+		const activeSet = new Set(urls);
+
+		// Leaving a folder clears the manual-collapse sticky so the next visit can auto-open
+		for (const url of Array.from(userCollapsedRef.current)) {
+			if (!activeSet.has(url)) {
+				userCollapsedRef.current.delete(url);
+			}
+		}
+
 		if (urls.length === 0) return;
 		setOpenFolders((prev) => {
-			if (urls.every((u) => prev.has(u))) return prev;
-			return new Set([...prev, ...urls]);
+			const toAdd = urls.filter(
+				(u) => !prev.has(u) && !userCollapsedRef.current.has(u),
+			);
+			if (toAdd.length === 0) return prev;
+			return new Set([...prev, ...toAdd]);
 		});
 	}, [filteredTree, getActiveFolderUrls]);
 
-	const toggleFolder = useCallback((url: string) => {
-		setOpenFolders((prev) => {
-			const next = new Set(prev);
-			if (next.has(url)) next.delete(url);
-			else next.add(url);
-			return next;
-		});
-	}, []);
+	const toggleFolder = useCallback(
+		(url: string) => {
+			const activeUrls = new Set(getActiveFolderUrls(filteredTree));
+			setOpenFolders((prev) => {
+				const next = new Set(prev);
+				if (next.has(url)) {
+					next.delete(url);
+					// Sticky-collapse only for folders that contain the active page —
+					// otherwise auto-open still works the next time you navigate in.
+					if (activeUrls.has(url)) {
+						userCollapsedRef.current.add(url);
+					}
+				} else {
+					next.add(url);
+					userCollapsedRef.current.delete(url);
+				}
+				return next;
+			});
+		},
+		[filteredTree, getActiveFolderUrls],
+	);
 
 	// Find the active element by DOM query after each navigation.
 	// Re-runs on pathname changes so activeEl always reflects the current page.

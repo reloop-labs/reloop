@@ -48,16 +48,39 @@ export function SidebarItems({
 	const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>(
 		{},
 	);
+	// User-closed sections stay closed until they leave that section or re-open it.
+	// Without this, the active-path effect re-opens the dropdown after every close.
+	const userCollapsedRef = useRef<Set<string>>(new Set());
 
 	useEffect(() => {
-		for (const item of navigation) {
-			const hasActiveSubItem = item.items?.some((sub) =>
-				pathWithoutSlug.startsWith(sub.path),
-			);
-			if (hasActiveSubItem) {
-				setExpandedItems((prev) => ({ ...prev, [item.path]: true }));
+		setExpandedItems((prev) => {
+			let changed = false;
+			const next = { ...prev };
+
+			for (const item of navigation) {
+				if (!item.items?.length) continue;
+
+				const hasActiveSubItem = item.items.some((sub) =>
+					pathWithoutSlug.startsWith(sub.path),
+				);
+
+				if (hasActiveSubItem) {
+					// Auto-open only if the user hasn't explicitly collapsed it.
+					if (
+						!userCollapsedRef.current.has(item.path) &&
+						!next[item.path]
+					) {
+						next[item.path] = true;
+						changed = true;
+					}
+				} else {
+					// Left the section — clear the manual collapse so the next visit auto-opens.
+					userCollapsedRef.current.delete(item.path);
+				}
 			}
-		}
+
+			return changed ? next : prev;
+		});
 	}, [pathWithoutSlug, navigation]);
 
 	const activeMainIndex = navigation.findIndex((item) => {
@@ -215,13 +238,30 @@ export function SidebarItems({
 								<button
 									type="button"
 									tabIndex={0}
+									aria-expanded={isExpanded}
+									aria-label={
+										isExpanded ? `Collapse ${label}` : `Expand ${label}`
+									}
 									onClick={(e) => {
 										e.preventDefault();
 										e.stopPropagation();
-										setExpandedItems((prev) => ({
-											...prev,
-											[path]: !prev[path],
-										}));
+										setExpandedItems((prev) => {
+											const willOpen = !prev[path];
+											if (willOpen) {
+												userCollapsedRef.current.delete(path);
+											} else {
+												// Only sticky-collapse when this section is active.
+												// Closing an inactive expand should not block auto-open
+												// the next time the user navigates into it.
+												const isActiveSection = items?.some((sub) =>
+													pathWithoutSlug.startsWith(sub.path),
+												);
+												if (isActiveSection) {
+													userCollapsedRef.current.add(path);
+												}
+											}
+											return { ...prev, [path]: willOpen };
+										});
 									}}
 									className="flex h-5 w-5 items-center justify-center rounded-md transition-colors hover:bg-bg-weak-50"
 								>
