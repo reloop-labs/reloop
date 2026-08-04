@@ -48,12 +48,15 @@ export async function upsertContactProperties({
 	});
 
 	try {
+		// Include soft-deleted values so a later restore UPDATEs + clears
+		// deletedAt instead of INSERTing and hitting cpv_unique_contact_property_value.
 		const [currentValues, existingProperties] = await Promise.all([
 			db
 				.select({
 					id: schema.contactPropertyValue.id,
 					propertyName: schema.contactProperty.propertyName,
 					propertyId: schema.contactPropertyValue.propertyId,
+					deletedAt: schema.contactPropertyValue.deletedAt,
 				})
 				.from(schema.contactPropertyValue)
 				.innerJoin(
@@ -64,7 +67,6 @@ export async function upsertContactProperties({
 					and(
 						eq(schema.contactPropertyValue.contactId, contactId),
 						eq(schema.contactPropertyValue.organizationId, organizationId),
-						isNull(schema.contactPropertyValue.deletedAt),
 					),
 				),
 
@@ -93,7 +95,8 @@ export async function upsertContactProperties({
 		]);
 
 		const propertiesToDelete = currentValues.filter(
-			(cv) => !propertyNames.includes(cv.propertyName),
+			(cv) =>
+				cv.deletedAt === null && !propertyNames.includes(cv.propertyName),
 		);
 
 		if (propertiesToDelete.length > 0) {
