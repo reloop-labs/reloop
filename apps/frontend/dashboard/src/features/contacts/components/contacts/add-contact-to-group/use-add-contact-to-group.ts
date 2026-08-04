@@ -1,6 +1,6 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { useInvalidateContacts } from "#/features/contacts/hooks/use-contacts-query";
 import type { Contact } from "./types";
@@ -34,7 +34,7 @@ export const useAddContactToGroup = (
 	useEffect(() => {
 		const timer = setTimeout(() => {
 			setDebouncedSearch(searchInput);
-		}, 300);
+		}, 250);
 		return () => clearTimeout(timer);
 	}, [searchInput]);
 
@@ -84,7 +84,7 @@ export const useAddContactToGroup = (
 		enabled: open && !!groupId,
 	});
 
-	// Auto-fetch remaining group member pages
+	// Background-fetch remaining member pages so we can mark "In group"
 	useEffect(() => {
 		if (
 			groupQuery.hasNextPage &&
@@ -107,52 +107,42 @@ export const useAddContactToGroup = (
 	}, [contactsQuery.data]);
 
 	const totalMatching = contactsQuery.data?.pages[0]?.total || 0;
-	const totalInOrg = contactsQuery.data?.pages[0]?.totalContacts || 0;
 	const hasMore = contactsQuery.hasNextPage ?? false;
 
-	const existingContacts = useMemo(() => {
-		if (!groupQuery.data) return [];
-		return groupQuery.data.pages.flatMap((page) => page.group?.contacts ?? []);
+	const existingContactIds = useMemo(() => {
+		if (!groupQuery.data) return new Set<string>();
+		return new Set(
+			groupQuery.data.pages.flatMap((page) =>
+				(page.group?.contacts ?? []).map((c) => c.id),
+			),
+		);
 	}, [groupQuery.data]);
 
-	const existingContactIds = useMemo(() => {
-		return new Set(existingContacts.map((c) => c.id));
-	}, [existingContacts]);
-
 	const groupName = groupQuery.data?.pages[0]?.group?.name ?? "";
+	const memberCount = groupQuery.data?.pages[0]?.total ?? existingContactIds.size;
 
 	const selectedContactIds = useMemo(
 		() => new Set(selectedContacts.map((c) => c.id)),
 		[selectedContacts],
 	);
 
-	const isGroupLoading = groupQuery.isPending || groupQuery.hasNextPage;
-
-	const availableContacts = useMemo(() => {
-		if (isGroupLoading) return [];
-		return fetchedContacts.filter(
-			(c) => !existingContactIds.has(c.id) && !selectedContactIds.has(c.id),
-		);
-	}, [fetchedContacts, existingContactIds, selectedContactIds, isGroupLoading]);
+	/** Contacts shown in the list (selected stay visible; already-in-group stay visible). */
+	const listContacts = useMemo(() => fetchedContacts, [fetchedContacts]);
 
 	const pickableContacts = useMemo(() => {
-		if (isGroupLoading) return [];
-		return fetchedContacts.filter((c) => !existingContactIds.has(c.id));
-	}, [fetchedContacts, existingContactIds, isGroupLoading]);
+		return listContacts.filter((c) => !existingContactIds.has(c.id));
+	}, [listContacts, existingContactIds]);
 
-	const isAllSelected = useMemo(() => {
+	const isAllVisibleSelected = useMemo(() => {
 		if (pickableContacts.length === 0) return false;
-		return pickableContacts.every((contact) =>
-			selectedContactIds.has(contact.id),
-		);
+		return pickableContacts.every((c) => selectedContactIds.has(c.id));
 	}, [pickableContacts, selectedContactIds]);
 
 	const toggleContact = (contact: Contact) => {
+		if (existingContactIds.has(contact.id)) return;
 		setSelectedContacts((prev) => {
 			const isSelected = prev.some((c) => c.id === contact.id);
-			if (isSelected) {
-				return prev.filter((c) => c.id !== contact.id);
-			}
+			if (isSelected) return prev.filter((c) => c.id !== contact.id);
 			return [...prev, contact];
 		});
 	};
@@ -161,12 +151,21 @@ export const useAddContactToGroup = (
 		setSelectedContacts((prev) => prev.filter((c) => c.id !== contactId));
 	};
 
-	const toggleSelectAll = () => {
-		if (isAllSelected) {
+	const clearSelection = () => setSelectedContacts([]);
+
+	const toggleSelectAllVisible = () => {
+		if (isAllVisibleSelected) {
 			const pickableIds = new Set(pickableContacts.map((c) => c.id));
 			setSelectedContacts((prev) => prev.filter((c) => !pickableIds.has(c.id)));
 		} else {
-			setSelectedContacts((prev) => [...prev, ...availableContacts]);
+			setSelectedContacts((prev) => {
+				const next = [...prev];
+				const existing = new Set(prev.map((c) => c.id));
+				for (const c of pickableContacts) {
+					if (!existing.has(c.id)) next.push(c);
+				}
+				return next;
+			});
 		}
 	};
 
@@ -175,6 +174,7 @@ export const useAddContactToGroup = (
 			setTimeout(() => {
 				setSelectedContacts([]);
 				setSearchInput("");
+				setDebouncedSearch("");
 			}, 300);
 		}
 		onOpenChange(isOpen);
@@ -185,7 +185,6 @@ export const useAddContactToGroup = (
 			toast.error("Group ID not found");
 			return;
 		}
-
 		if (selectedContacts.length === 0) {
 			toast.error("Please select at least one contact");
 			return;
@@ -194,17 +193,18 @@ export const useAddContactToGroup = (
 		setIsSubmitting(true);
 		try {
 			let added = 0;
-			const promises = selectedContacts.map(async (contact) => {
-				const response = await fetch(`/api/contacts/group/${groupId}`, {
-					method: "POST",
-					headers: { "Content-Type": "application/json" },
-					credentials: "include",
-					body: JSON.stringify({ email: contact.email }),
-				});
-				if (response.ok) added++;
-			});
-
-			await Promise.all(promises);
+			const results = await Promise.all(
+				selectedContacts.map(async (contact) => {
+					const response = await fetch(`/api/contacts/group/${groupId}`, {
+						method: "POST",
+						headers: { "Content-Type": "application/json" },
+						credentials: "include",
+						body: JSON.stringify({ contact_id: contact.id }),
+					});
+					return response.ok;
+				}),
+			);
+			added = results.filter(Boolean).length;
 
 			if (added > 0) {
 				toast.success(
@@ -216,9 +216,10 @@ export const useAddContactToGroup = (
 					contactsQuery.refetch(),
 					invalidate(),
 				]);
+				onOpenChange(false);
 			} else {
 				toast.error(
-					"No new contacts were added (they might already be in the group)",
+					"No contacts were added — they may already be in this group",
 				);
 			}
 		} catch (error) {
@@ -229,66 +230,42 @@ export const useAddContactToGroup = (
 		}
 	};
 
-	const removeFromGroup = async (contact: Contact) => {
-		if (!groupId) return;
-
-		try {
-			const response = await fetch(`/api/contacts/group/${groupId}`, {
-				method: "DELETE",
-				headers: { "Content-Type": "application/json" },
-				credentials: "include",
-				body: JSON.stringify({ email: contact.email }),
-			});
-
-			if (response.ok) {
-				toast.success("Contact removed from group");
-				await Promise.all([
-					groupQuery.refetch(),
-					contactsQuery.refetch(),
-					invalidate(),
-				]);
-			} else {
-				toast.error("Failed to remove contact");
-			}
-		} catch (error) {
-			console.error("Failed to remove contact:", error);
-			toast.error("Failed to remove contact");
-		}
-	};
-
-	const setSize = (updater: number | ((s: number) => number)) => {
-		if (typeof updater === "function") {
-			// Infinite query uses fetchNextPage rather than size
-			void contactsQuery.fetchNextPage();
-		} else if (updater > (contactsQuery.data?.pages.length ?? 1)) {
+	const loadMore = useCallback(() => {
+		if (contactsQuery.hasNextPage && !contactsQuery.isFetchingNextPage) {
 			void contactsQuery.fetchNextPage();
 		}
-	};
+	}, [
+		contactsQuery.hasNextPage,
+		contactsQuery.isFetchingNextPage,
+		contactsQuery.fetchNextPage,
+	]);
 
 	return {
 		groupName,
+		memberCount,
 		isSubmitting,
 		searchInput,
 		setSearchInput,
 		debouncedSearch,
 		selectedContacts,
-		setSelectedContacts,
-		availableContacts,
-		existingContacts,
+		selectedContactIds,
+		existingContactIds,
+		listContacts,
+		pickableCount: pickableContacts.length,
 		totalMatching,
-		totalInOrg,
 		hasMore,
-		setSize,
-		isValidating: contactsQuery.isFetching && !contactsQuery.isPending,
+		loadMore,
+		isValidating:
+			(contactsQuery.isFetching && !contactsQuery.isPending) ||
+			contactsQuery.isFetchingNextPage,
 		isSearching: contactsQuery.isPending,
-		isGroupLoading,
-		isAllSelected,
+		isAllVisibleSelected,
 		toggleContact,
 		removeContact,
-		toggleSelectAll,
+		clearSelection,
+		toggleSelectAllVisible,
 		handleOpenChange,
 		handleSubmit,
-		removeFromGroup,
 		fetchedCount: fetchedContacts.length,
 	};
 };

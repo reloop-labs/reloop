@@ -6,7 +6,6 @@ import { useIntersectionObserver } from "usehooks-ts";
 import { DiscoveryPane } from "./components/discovery-pane";
 import { ModalFooter } from "./components/modal-footer";
 import { ModalHeader } from "./components/modal-header";
-import { SelectionBasket } from "./components/selection-basket";
 import type { AddContactToGroupModalProps } from "./types";
 import { useAddContactToGroup } from "./use-add-contact-to-group";
 
@@ -16,28 +15,28 @@ export const AddContactToGroupModal = ({
 }: AddContactToGroupModalProps) => {
 	const {
 		groupName,
+		memberCount,
 		isSubmitting,
 		searchInput,
 		setSearchInput,
 		debouncedSearch,
 		selectedContacts,
-		setSelectedContacts,
-		availableContacts,
-		existingContacts,
+		selectedContactIds,
+		existingContactIds,
+		listContacts,
+		pickableCount,
 		totalMatching,
-		totalInOrg,
 		hasMore,
-		setSize,
+		loadMore,
 		isValidating,
 		isSearching,
-		isGroupLoading,
-		isAllSelected,
+		isAllVisibleSelected,
 		toggleContact,
 		removeContact,
-		toggleSelectAll,
+		clearSelection,
+		toggleSelectAllVisible,
 		handleOpenChange,
 		handleSubmit,
-		removeFromGroup,
 		fetchedCount,
 	} = useAddContactToGroup(open, onOpenChange);
 
@@ -46,73 +45,73 @@ export const AddContactToGroupModal = ({
 		threshold: 0.1,
 	});
 
-	// Load more when the sentinel comes into view — must be in an effect,
-	// not in the render body, to avoid setState-during-render warnings.
 	useEffect(() => {
 		if (isIntersecting && hasMore && !isValidating) {
-			setSize((s) => s + 1);
+			loadMore();
 		}
-	}, [isIntersecting, hasMore, isValidating, setSize]);
+	}, [isIntersecting, hasMore, isValidating, loadMore]);
 
 	useHotkeys(
-		"mod+enter",
+		"enter",
 		(e) => {
 			e.preventDefault();
 			if (open && selectedContacts.length > 0 && !isSubmitting) {
-				handleSubmit();
+				void handleSubmit();
 			}
 		},
 		{ enableOnFormTags: ["INPUT"], enabled: open },
 		[open, selectedContacts, isSubmitting, handleSubmit],
 	);
 
+	useHotkeys(
+		"escape",
+		() => {
+			if (open && !isSubmitting) {
+				handleOpenChange(false);
+			}
+		},
+		{ enableOnFormTags: ["INPUT"], enabled: open },
+		[open, isSubmitting, handleOpenChange],
+	);
+
 	return (
 		<Modal.Root open={open} onOpenChange={handleOpenChange}>
 			<Modal.Content
-				className="rounded-20 border-none p-0 sm:max-w-[860px]"
-				showClose={true}
+				className="overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 p-0 sm:max-w-[520px] dark:border-stroke-soft-100/40"
+				showClose={false}
 			>
-				<div className="flex flex-col rounded-20 border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40">
-					<ModalHeader groupName={groupName} />
+				<div className="flex max-h-[min(720px,85vh)] flex-col">
+					<ModalHeader groupName={groupName} memberCount={memberCount} />
 
-					<div className="flex flex-col divide-x divide-stroke-soft-100 sm:flex-row dark:divide-stroke-soft-100/40">
-						{/* ── Left Column: Discovery ────────────────────────── */}
-						<DiscoveryPane
-							searchInput={searchInput}
-							onSearchChange={setSearchInput}
-							isSearching={isSearching || isGroupLoading}
-							isValidating={isValidating}
-							isSubmitting={isSubmitting}
-							isAllSelected={isAllSelected}
-							onToggleSelectAll={toggleSelectAll}
-							totalMatching={totalMatching}
-							debouncedSearch={debouncedSearch}
-							availableContacts={availableContacts}
-							onToggleContact={toggleContact}
-							hasMore={hasMore}
-							loadMoreRef={loadMoreRef}
-							inputRef={inputRef}
-						/>
-
-						{/* ── Right Column: Selection ────────────────────────── */}
-						<SelectionBasket
-							selectedContacts={selectedContacts}
-							existingContacts={existingContacts}
-							onRemove={removeContact}
-							onRemoveFromGroup={removeFromGroup}
-							onClearAll={() => setSelectedContacts([])}
-							isSubmitting={isSubmitting}
-						/>
-					</div>
+					<DiscoveryPane
+						searchInput={searchInput}
+						onSearchChange={setSearchInput}
+						isSearching={isSearching}
+						isValidating={isValidating}
+						isSubmitting={isSubmitting}
+						isAllVisibleSelected={isAllVisibleSelected}
+						onToggleSelectAllVisible={toggleSelectAllVisible}
+						pickableCount={pickableCount}
+						selectedContacts={selectedContacts}
+						selectedContactIds={selectedContactIds}
+						existingContactIds={existingContactIds}
+						onRemoveSelected={removeContact}
+						onClearSelection={clearSelection}
+						debouncedSearch={debouncedSearch}
+						listContacts={listContacts}
+						onToggleContact={toggleContact}
+						hasMore={hasMore}
+						loadMoreRef={loadMoreRef}
+						inputRef={inputRef}
+						fetchedCount={fetchedCount}
+						totalMatching={totalMatching}
+					/>
 
 					<ModalFooter
 						isSubmitting={isSubmitting}
 						selectedCount={selectedContacts.length}
-						fetchedCount={fetchedCount}
-						totalMatching={totalMatching}
-						totalInOrg={totalInOrg}
 						onCancel={() => handleOpenChange(false)}
-						onSubmit={handleSubmit}
+						onSubmit={() => void handleSubmit()}
 					/>
 				</div>
 			</Modal.Content>

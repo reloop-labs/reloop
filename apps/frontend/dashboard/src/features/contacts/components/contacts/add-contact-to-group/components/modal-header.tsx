@@ -1,17 +1,32 @@
 import * as Modal from "@reloop/ui/modal";
 
-export const ModalHeader = ({ groupName }: { groupName: string }) => (
-	<div className="border-stroke-soft-100 border-b px-5 pt-3.5 pb-2 dark:border-stroke-soft-100/40">
-		<div className="flex items-center gap-4">
-			<div>
-				<Modal.Title className="font-medium text-text-strong-950 text-title-h5 dark:text-white">
-					Manage contacts in{" "}
-					<span className="text-primary-base">{groupName || "group"}</span>
-				</Modal.Title>
-				<Modal.Description className="hidden">
-					Manage contacts in this group.
-				</Modal.Description>
-			</div>
-		</div>
+export const ModalHeader = ({
+	groupName,
+	memberCount,
+}: {
+	groupName: string;
+	memberCount: number;
+}) => (
+	<div className="border-stroke-soft-100 border-b px-6 pt-5 pb-4 dark:border-stroke-soft-100/40">
+		<Modal.Title className="font-semibold text-[22px] text-text-strong-950 tracking-tight">
+			Add contacts to group
+		</Modal.Title>
+		<Modal.Description className="mt-1 text-sm text-text-sub-600 leading-relaxed">
+			{groupName ? (
+				<>
+					Select contacts to add to{" "}
+					<span className="font-medium text-text-strong-950">{groupName}</span>
+					{memberCount > 0 ? (
+						<>
+							{" "}
+							· {memberCount.toLocaleString()} already in group
+						</>
+					) : null}
+					.
+				</>
+			) : (
+				"Select contacts to add to this group."
+			)}
+		</Modal.Description>
 	</div>
 );

@@ -5,6 +5,7 @@ import Spinner from "@reloop/ui/spinner";
 import type { Ref } from "react";
 import type { Contact } from "../types";
 import { ContactRow } from "./contact-row";
+import { getDisplayName } from "./utils";
 
 interface DiscoveryPaneProps {
 	searchInput: string;
@@ -12,15 +13,22 @@ interface DiscoveryPaneProps {
 	isSearching: boolean;
 	isValidating: boolean;
 	isSubmitting: boolean;
-	isAllSelected: boolean;
-	onToggleSelectAll: () => void;
-	totalMatching: number;
+	isAllVisibleSelected: boolean;
+	onToggleSelectAllVisible: () => void;
+	pickableCount: number;
+	selectedContacts: Contact[];
+	selectedContactIds: Set<string>;
+	existingContactIds: Set<string>;
+	onRemoveSelected: (id: string) => void;
+	onClearSelection: () => void;
 	debouncedSearch: string;
-	availableContacts: Contact[];
+	listContacts: Contact[];
 	onToggleContact: (contact: Contact) => void;
 	hasMore: boolean;
 	loadMoreRef: Ref<HTMLDivElement>;
 	inputRef: Ref<HTMLInputElement>;
+	fetchedCount: number;
+	totalMatching: number;
 }
 
 export const DiscoveryPane = ({
@@ -29,111 +37,180 @@ export const DiscoveryPane = ({
 	isSearching,
 	isValidating,
 	isSubmitting,
-	isAllSelected,
-	onToggleSelectAll,
-	totalMatching,
+	isAllVisibleSelected,
+	onToggleSelectAllVisible,
+	pickableCount,
+	selectedContacts,
+	selectedContactIds,
+	existingContactIds,
+	onRemoveSelected,
+	onClearSelection,
 	debouncedSearch,
-	availableContacts,
+	listContacts,
 	onToggleContact,
 	hasMore,
 	loadMoreRef,
 	inputRef,
+	fetchedCount,
+	totalMatching,
 }: DiscoveryPaneProps) => {
 	return (
-		<div className="flex flex-1 flex-col overflow-hidden">
-			<div className="p-3">
-				<Input.Root size="small" className="rounded-lg">
-					<Input.Wrapper className="pl-9 dark:bg-bg-strong-300/50">
-						<div className="-translate-y-1/2 absolute top-1/2 left-3">
-							{isSearching || isValidating ? (
-								<Spinner size={14} />
-							) : (
-								<Icon name="search" className="h-4 w-4 text-text-soft-400" />
-							)}
-						</div>
+		<div className="flex min-h-0 flex-1 flex-col">
+			{/* Search */}
+			<div className="px-6 pt-4 pb-3">
+				<Input.Root size="medium">
+					<Input.Wrapper>
+						<Input.Icon as={Icon} name="search" />
 						<Input.Input
 							ref={inputRef}
 							type="text"
 							value={searchInput}
 							onChange={(e) => onSearchChange(e.target.value)}
-							placeholder="Search by email..."
+							placeholder="Search by name or email…"
 							autoFocus
 							disabled={isSubmitting}
-							className="dark:text-white"
 						/>
+						{(isSearching || isValidating) && (
+							<div className="pr-1">
+								<Spinner size={14} />
+							</div>
+						)}
 					</Input.Wrapper>
 				</Input.Root>
 			</div>
 
-			{/* Select All Bar */}
-			<div className="border-stroke-soft-100 border-t border-b px-5 py-2.5 dark:border-stroke-soft-100/40">
+			{/* Selected chips */}
+			{selectedContacts.length > 0 ? (
+				<div className="border-stroke-soft-100 border-b px-6 pb-3 dark:border-stroke-soft-100/40">
+					<div className="mb-2 flex items-center justify-between">
+						<p className="font-medium text-[11px] text-text-sub-600 uppercase tracking-wider">
+							Selected ({selectedContacts.length})
+						</p>
+						<button
+							type="button"
+							onClick={onClearSelection}
+							disabled={isSubmitting}
+							className="font-medium text-[11px] text-text-sub-600 transition-colors hover:text-error-base"
+						>
+							Clear
+						</button>
+					</div>
+					<div className="flex max-h-[72px] flex-wrap gap-1.5 overflow-y-auto">
+						{selectedContacts.map((contact) => (
+							<span
+								key={contact.id}
+								className="inline-flex max-w-full items-center gap-1 rounded-lg border border-stroke-soft-100 bg-bg-weak-50 py-1 pr-1 pl-2 text-[12px] text-text-strong-950 dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/30"
+							>
+								<span className="truncate">{getDisplayName(contact)}</span>
+								<button
+									type="button"
+									onClick={() => onRemoveSelected(contact.id)}
+									disabled={isSubmitting}
+									className="flex h-4 w-4 shrink-0 items-center justify-center rounded-md text-text-sub-600 transition-colors hover:bg-bg-white-0 hover:text-error-base"
+									aria-label={`Remove ${getDisplayName(contact)}`}
+								>
+									<Icon name="cross" className="h-3 w-3" />
+								</button>
+							</span>
+						))}
+					</div>
+				</div>
+			) : null}
+
+			{/* Select all + count */}
+			<div className="flex items-center justify-between border-stroke-soft-100 border-b px-6 py-2 dark:border-stroke-soft-100/40">
 				<button
 					type="button"
-					onClick={onToggleSelectAll}
-					className="flex items-center gap-3 transition-colors hover:opacity-80"
+					onClick={onToggleSelectAllVisible}
+					disabled={isSubmitting || pickableCount === 0}
+					className={cn(
+						"flex items-center gap-2 font-medium text-[12px] text-text-sub-600 transition-colors",
+						pickableCount > 0 && "hover:text-text-strong-950",
+						pickableCount === 0 && "cursor-not-allowed opacity-50",
+					)}
 				>
 					<div
 						className={cn(
-							"flex h-4 w-4 items-center justify-center rounded border transition-all",
-							isAllSelected
+							"flex h-4 w-4 items-center justify-center rounded border transition-colors",
+							isAllVisibleSelected && pickableCount > 0
 								? "border-primary-base bg-primary-base text-white"
-								: "border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-bg-strong-200",
+								: "border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/40",
 						)}
 					>
-						{isAllSelected && <Icon name="check" className="h-3 w-3" />}
+						{isAllVisibleSelected && pickableCount > 0 ? (
+							<svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+								<path
+									d="M2 5.2L4.1 7.2L8 2.8"
+									stroke="currentColor"
+									strokeWidth="1.5"
+									strokeLinecap="round"
+									strokeLinejoin="round"
+								/>
+							</svg>
+						) : null}
 					</div>
-					<span className="font-medium text-[13px] text-text-strong-950 dark:text-white">
-						Select all visible ({availableContacts.length.toLocaleString()})
-					</span>
+					Select all loaded
+					{pickableCount > 0 ? ` (${pickableCount})` : ""}
 				</button>
+				{totalMatching > 0 ? (
+					<p className="text-[11px] text-text-soft-400">
+						{fetchedCount.toLocaleString()} of {totalMatching.toLocaleString()}
+					</p>
+				) : null}
 			</div>
 
-			<div className="max-h-[380px] min-h-[300px] overflow-y-auto">
+			{/* List */}
+			<div className="max-h-[360px] min-h-[280px] flex-1 overflow-y-auto">
 				{isSearching ? (
-					// Initial loading skeleton
-					<div className="flex h-64 flex-col items-center justify-center">
+					<div className="flex h-64 flex-col items-center justify-center gap-2">
 						<Spinner size={20} />
+						<p className="text-[12px] text-text-sub-600">Loading contacts…</p>
 					</div>
-				) : availableContacts.length === 0 && debouncedSearch ? (
-					// Search returned no results
-					<div className="flex h-64 flex-col items-center justify-center text-center">
-						<Icon name="search" className="mb-3 h-8 w-8 text-text-soft-400" />
-						<p className="font-medium text-sm text-text-strong-950 dark:text-white">
-							No results found
+				) : listContacts.length === 0 && debouncedSearch ? (
+					<div className="flex h-64 flex-col items-center justify-center px-6 text-center">
+						<div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-bg-weak-50 dark:bg-bg-weak-50/30">
+							<Icon name="search" className="h-5 w-5 text-text-soft-400" />
+						</div>
+						<p className="font-medium text-sm text-text-strong-950">
+							No matches
 						</p>
-						<p className="mt-1 text-text-sub-600 text-xs dark:text-text-soft-400">
-							No contacts match &ldquo;{debouncedSearch}&rdquo;.
+						<p className="mt-1 max-w-[240px] text-[12px] text-text-sub-600">
+							Nothing matched &ldquo;{debouncedSearch}&rdquo;. Try a different
+							email or name.
 						</p>
 					</div>
-				) : availableContacts.length === 0 && !debouncedSearch ? (
-					// Org has no contacts at all
-					<div className="flex h-64 flex-col items-center justify-center text-center">
-						<Icon name="users" className="mb-3 h-8 w-8 text-text-soft-400" />
-						<p className="font-medium text-sm text-text-strong-950 dark:text-white">
-							No contacts available
+				) : listContacts.length === 0 ? (
+					<div className="flex h-64 flex-col items-center justify-center px-6 text-center">
+						<div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-bg-weak-50 dark:bg-bg-weak-50/30">
+							<Icon name="users" className="h-5 w-5 text-text-soft-400" />
+						</div>
+						<p className="font-medium text-sm text-text-strong-950">
+							No contacts yet
 						</p>
-						<p className="mt-1 text-text-sub-600 text-xs dark:text-text-soft-400">
-							All contacts in your organization are already in this group.
+						<p className="mt-1 max-w-[240px] text-[12px] text-text-sub-600">
+							Create contacts first, then add them to this group.
 						</p>
 					</div>
 				) : (
 					<div className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/40">
-						{availableContacts.map((contact) => (
+						{listContacts.map((contact) => (
 							<ContactRow
 								key={contact.id}
 								contact={contact}
+								selected={selectedContactIds.has(contact.id)}
+								inGroup={existingContactIds.has(contact.id)}
 								onToggle={() => onToggleContact(contact)}
 								disabled={isSubmitting}
 							/>
 						))}
-						{hasMore && (
+						{hasMore ? (
 							<div
 								ref={loadMoreRef}
 								className="flex items-center justify-center py-4"
 							>
 								<Spinner size={16} />
 							</div>
-						)}
+						) : null}
 					</div>
 				)}
 			</div>
