@@ -20,11 +20,19 @@ import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-ba
 export type ContactActionsHandlers = {
 	onEdit: (contact: Contact) => void;
 	onDelete: (contact: Contact) => void;
+	/** When set, shows "Remove from group" (group detail context). */
+	onRemoveFromGroup?: (contact: Contact) => void | Promise<void>;
 	isDeleting?: boolean;
+	isRemovingFromGroup?: boolean;
 	onOpenChange?: (open: boolean) => void;
 };
 
-type MenuItemId = "view" | "toggle-status" | "edit" | "delete";
+type MenuItemId =
+	| "view"
+	| "toggle-status"
+	| "edit"
+	| "remove-from-group"
+	| "delete";
 
 function useContactActionsMenu(
 	contact: Contact,
@@ -41,6 +49,8 @@ function useContactActionsMenu(
 
 	const isSubscribed = contact.status.toLowerCase() === "subscribed";
 	const isDeleting = handlers.isDeleting ?? false;
+	const isRemovingFromGroup = handlers.isRemovingFromGroup ?? false;
+	const canRemoveFromGroup = Boolean(handlers.onRemoveFromGroup);
 
 	const menuItems = [
 		{
@@ -63,6 +73,16 @@ function useContactActionsMenu(
 			icon: "edit" as const,
 			isDanger: false,
 		},
+		...(canRemoveFromGroup
+			? [
+					{
+						id: "remove-from-group" as const,
+						label: "Remove from group",
+						icon: "user-minus" as const,
+						isDanger: true,
+					},
+				]
+			: []),
 		{
 			id: "delete" as const,
 			label: "Delete contact",
@@ -126,6 +146,9 @@ function useContactActionsMenu(
 		} else if (itemId === "edit") {
 			handlers.onEdit(contact);
 			dismissMenu();
+		} else if (itemId === "remove-from-group") {
+			dismissMenu();
+			await handlers.onRemoveFromGroup?.(contact);
 		} else if (itemId === "delete") {
 			handlers.onDelete(contact);
 			dismissMenu();
@@ -145,6 +168,7 @@ function useContactActionsMenu(
 		isDanger,
 		isTogglingStatus,
 		isDeleting,
+		isRemovingFromGroup,
 		handleItemClick,
 	};
 }
@@ -166,6 +190,7 @@ function ContactActionsMenuItems({
 		isDanger,
 		isTogglingStatus,
 		isDeleting,
+		isRemovingFromGroup,
 		handleItemClick,
 	} = menu;
 
@@ -177,6 +202,7 @@ function ContactActionsMenuItems({
 				hoverIdx === idx &&
 				(item.isDanger ? "bg-red-alpha-10" : "bg-neutral-alpha-10"),
 			((isDeleting && item.id === "delete") ||
+				(isRemovingFromGroup && item.id === "remove-from-group") ||
 				(isTogglingStatus && item.id === "toggle-status")) &&
 				"cursor-not-allowed opacity-50",
 			variant === "context" &&
@@ -188,6 +214,7 @@ function ContactActionsMenuItems({
 			{menuItems.map((item, idx) => {
 				const disabled =
 					(item.id === "delete" && isDeleting) ||
+					(item.id === "remove-from-group" && isRemovingFromGroup) ||
 					(item.id === "toggle-status" && isTogglingStatus);
 				const label = (
 					<>
@@ -248,13 +275,15 @@ function ContactActionsMenuItems({
 	);
 }
 
-const menuContentClassName = "w-40 rounded-xl p-1.5";
+const menuContentClassName = "w-48 rounded-xl p-1.5";
 
 export interface ContactDropdownProps {
 	contact: Contact;
 	onEdit: (contact: Contact) => void;
 	onDelete: (contact: Contact) => void;
+	onRemoveFromGroup?: (contact: Contact) => void | Promise<void>;
 	isDeleting: boolean;
+	isRemovingFromGroup?: boolean;
 	onOpenChange?: (open: boolean) => void;
 }
 
@@ -262,13 +291,17 @@ export const ContactDropdown = ({
 	contact,
 	onEdit,
 	onDelete,
+	onRemoveFromGroup,
 	isDeleting,
+	isRemovingFromGroup = false,
 	onOpenChange,
 }: ContactDropdownProps) => {
 	const menu = useContactActionsMenu(contact, {
 		onEdit,
 		onDelete,
+		onRemoveFromGroup,
 		isDeleting,
+		isRemovingFromGroup,
 		onOpenChange,
 	});
 
@@ -279,7 +312,9 @@ export const ContactDropdown = ({
 					variant="neutral"
 					mode="ghost"
 					size="xxsmall"
-					disabled={isDeleting || menu.isTogglingStatus}
+					disabled={
+						isDeleting || isRemovingFromGroup || menu.isTogglingStatus
+					}
 				>
 					<Icon name="more-horizontal" className="h-3 w-3" />
 				</Button.Root>
@@ -299,14 +334,18 @@ export function ContactRowContextMenu({
 	contact,
 	onEdit,
 	onDelete,
+	onRemoveFromGroup,
 	isDeleting = false,
+	isRemovingFromGroup = false,
 	onOpenChange,
 	children,
 }: ContactDropdownProps & { children: ReactNode }) {
 	const menu = useContactActionsMenu(contact, {
 		onEdit,
 		onDelete,
+		onRemoveFromGroup,
 		isDeleting,
+		isRemovingFromGroup,
 		onOpenChange,
 	});
 

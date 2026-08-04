@@ -18,6 +18,7 @@ import { ContactSelectionActionBar } from "./contact-selection-action-bar";
 import { ContactsEmptyState } from "./contacts-empty-state";
 import { DeleteContactConfirmModal } from "./delete-contact-confirm-modal";
 import { EditContactRowPanel } from "./edit-contact-row-panel";
+import { RemoveContactFromGroupModal } from "./remove-contact-from-group-modal";
 import { ContactTableFooter } from "./table-footer";
 import { ContactTableSkeleton } from "./table-skeleton";
 
@@ -27,6 +28,9 @@ interface ContactTableProps {
 	columnVisibility?: VisibilityState;
 	isLoading?: boolean;
 	loadingRows?: number;
+	/** When set, row menus show "Remove from group" for this group. */
+	groupId?: string;
+	groupName?: string;
 	onAddContact?: () => void;
 	searchQuery?: string;
 	onClearSearch?: () => void;
@@ -44,6 +48,8 @@ export const ContactTable = ({
 	columnVisibility = {},
 	isLoading,
 	loadingRows = 6,
+	groupId,
+	groupName,
 	onAddContact,
 	searchQuery,
 	onClearSearch,
@@ -55,6 +61,7 @@ export const ContactTable = ({
 	const [pageSize] = useQueryState("limit", parseAsInteger.withDefault(10));
 	const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
 	const [editingContactId, setEditingContactId] = useState<string | null>(null);
+	const [contactToRemove, setContactToRemove] = useState<Contact | null>(null);
 	const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
 	const totalPages = Math.max(1, Math.ceil(total / (pageSize ?? 10)));
@@ -69,6 +76,10 @@ export const ContactTable = ({
 		},
 		[setDeleteId],
 	);
+
+	const handleRemoveFromGroup = useCallback((contact: Contact) => {
+		setContactToRemove(contact);
+	}, []);
 
 	const handleOpenChange = useCallback((open: boolean, id: string) => {
 		setActiveDropdownId(open ? id : null);
@@ -168,6 +179,9 @@ export const ContactTable = ({
 										contact={contact}
 										onEdit={handleEdit}
 										onDelete={handleDelete}
+										onRemoveFromGroup={
+											groupId ? handleRemoveFromGroup : undefined
+										}
 										isDeleting={false}
 										onOpenChange={(open) => handleOpenChange(open, contact.id)}
 									>
@@ -198,6 +212,9 @@ export const ContactTable = ({
 													contact={contact}
 													onEdit={handleEdit}
 													onDelete={handleDelete}
+													onRemoveFromGroup={
+														groupId ? handleRemoveFromGroup : undefined
+													}
 													isDeleting={false}
 													onOpenChange={(open) =>
 														handleOpenChange(open, contact.id)
@@ -249,6 +266,17 @@ export const ContactTable = ({
 				selectedContacts={selectedContacts}
 				onClearSelection={handleClearSelection}
 			/>
+			{groupId ? (
+				<RemoveContactFromGroupModal
+					open={!!contactToRemove}
+					onOpenChange={(open) => {
+						if (!open) setContactToRemove(null);
+					}}
+					contact={contactToRemove}
+					groupId={groupId}
+					groupName={groupName}
+				/>
+			) : null}
 		</>
 	);
 };

@@ -21,13 +21,8 @@ export type GroupActionsHandlers = {
 	onOpenChange?: (open: boolean) => void;
 };
 
-type MenuItemId =
-	| "view"
-	| "edit"
-	| "copy-id"
-	| "add-contacts"
-	| "export"
-	| "delete";
+type MenuItemId = "view" | "edit" | "copy-name" | "copy-id" | "delete";
+type CopiedField = "name" | "id" | null;
 
 function useGroupActionsMenu(group: Group, handlers: GroupActionsHandlers) {
 	const router = useRouter();
@@ -36,7 +31,7 @@ function useGroupActionsMenu(group: Group, handlers: GroupActionsHandlers) {
 	const [open, setOpen] = useState(false);
 	const [contextMenuKey, setContextMenuKey] = useState(0);
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
-	const [isCopied, setIsCopied] = useState(false);
+	const [copiedField, setCopiedField] = useState<CopiedField>(null);
 	const buttonRefs = useRef<HTMLElement[]>([]);
 	const keepOpenRef = useRef(false);
 	const isDeleting = handlers.isDeleting ?? false;
@@ -50,26 +45,24 @@ function useGroupActionsMenu(group: Group, handlers: GroupActionsHandlers) {
 		},
 		{
 			id: "edit" as const,
-			label: "Edit group",
+			label: "Rename group",
 			icon: "edit" as const,
 			isDanger: false,
 		},
 		{
+			id: "copy-name" as const,
+			label: copiedField === "name" ? "Copied name!" : "Copy group name",
+			icon: (copiedField === "name" ? "check-circle" : "copy") as
+				| "check-circle"
+				| "copy",
+			isDanger: false,
+		},
+		{
 			id: "copy-id" as const,
-			label: isCopied ? "Copied ID!" : "Copy group ID",
-			icon: (isCopied ? "check-circle" : "copy") as "check-circle" | "copy",
-			isDanger: false,
-		},
-		{
-			id: "add-contacts" as const,
-			label: "Add contacts",
-			icon: "user-plus" as const,
-			isDanger: false,
-		},
-		{
-			id: "export" as const,
-			label: "Export contacts",
-			icon: "file-download" as const,
+			label: copiedField === "id" ? "Copied ID!" : "Copy group ID",
+			icon: (copiedField === "id" ? "check-circle" : "copy") as
+				| "check-circle"
+				| "copy",
 			isDanger: false,
 		},
 		{
@@ -88,7 +81,10 @@ function useGroupActionsMenu(group: Group, handlers: GroupActionsHandlers) {
 		(next: boolean) => {
 			if (!next && keepOpenRef.current) return;
 			setOpen(next);
-			if (!next) setHoverIdx(undefined);
+			if (!next) {
+				setHoverIdx(undefined);
+				setCopiedField(null);
+			}
 			handlers.onOpenChange?.(next);
 		},
 		[handlers.onOpenChange],
@@ -99,34 +95,19 @@ function useGroupActionsMenu(group: Group, handlers: GroupActionsHandlers) {
 		handleOpenChange(false);
 	}, [handleOpenChange]);
 
-	const handleExport = async () => {
+	const copyAndFlash = async (field: "name" | "id", value: string) => {
+		keepOpenRef.current = true;
 		try {
-			const res = await fetch(
-				`/api/contacts/v1/groups/${group.id}/contacts?limit=1000`,
-				{ credentials: "include" },
-			);
-			if (!res.ok) throw new Error("Failed to fetch contacts");
-			const data = (await res.json()) as {
-				contacts: Array<{ id: string; email: string; createdAt: string }>;
-			};
-			const contacts = data.contacts || [];
-			const csvLines = [
-				"ID,Email,Created At",
-				...contacts.map((c) => `"${c.id}","${c.email}","${c.createdAt}"`),
-			];
-			const blob = new Blob([csvLines.join("\n")], {
-				type: "text/csv;charset=utf-8;",
-			});
-			const url = URL.createObjectURL(blob);
-			const link = document.createElement("a");
-			link.href = url;
-			link.download = `group-${group.name.toLowerCase().replace(/\s+/g, "-")}-contacts.csv`;
-			document.body.appendChild(link);
-			link.click();
-			document.body.removeChild(link);
-			URL.revokeObjectURL(url);
-		} catch (e) {
-			console.error(e);
+			await navigator.clipboard.writeText(value);
+			setCopiedField(field);
+			setTimeout(() => {
+				setCopiedField(null);
+				keepOpenRef.current = false;
+				dismissMenu();
+			}, 900);
+		} catch {
+			keepOpenRef.current = false;
+			dismissMenu();
 		}
 	};
 
@@ -142,27 +123,10 @@ function useGroupActionsMenu(group: Group, handlers: GroupActionsHandlers) {
 				void setModal("edit-group");
 			}
 			dismissMenu();
+		} else if (itemId === "copy-name") {
+			await copyAndFlash("name", group.name || "");
 		} else if (itemId === "copy-id") {
-			keepOpenRef.current = true;
-			try {
-				await navigator.clipboard.writeText(group.id);
-				setIsCopied(true);
-				setTimeout(() => {
-					setIsCopied(false);
-					keepOpenRef.current = false;
-					dismissMenu();
-				}, 900);
-			} catch {
-				keepOpenRef.current = false;
-				dismissMenu();
-			}
-		} else if (itemId === "add-contacts") {
-			void setId(group.id);
-			void setModal("add-contact-to-group");
-			dismissMenu();
-		} else if (itemId === "export") {
-			dismissMenu();
-			void handleExport();
+			await copyAndFlash("id", group.id);
 		} else if (itemId === "delete") {
 			handlers.onDelete(group);
 			dismissMenu();
@@ -180,7 +144,7 @@ function useGroupActionsMenu(group: Group, handlers: GroupActionsHandlers) {
 		currentTab,
 		currentRect,
 		isDanger,
-		isCopied,
+		copiedField,
 		isDeleting,
 		handleItemClick,
 	};
@@ -201,7 +165,7 @@ function GroupActionsMenuItems({
 		currentTab,
 		currentRect,
 		isDanger,
-		isCopied,
+		copiedField,
 		isDeleting,
 		handleItemClick,
 	} = menu;
@@ -218,43 +182,53 @@ function GroupActionsMenuItems({
 				"data-[disabled]:pointer-events-none data-[highlighted]:bg-transparent",
 		);
 
+	const isCopyItem = (id: string) => id === "copy-name" || id === "copy-id";
+
+	const renderCopyLabel = (field: "name" | "id") => {
+		const isCopied = copiedField === field;
+		const idleLabel = field === "name" ? "Copy group name" : "Copy group ID";
+		const doneLabel = field === "name" ? "Copied name!" : "Copied ID!";
+		return (
+			<AnimatePresence mode="popLayout" initial={false}>
+				<motion.div
+					key={isCopied ? "copied" : "idle"}
+					transition={{ type: "spring", duration: 0.25, bounce: 0 }}
+					initial={{ opacity: 0, y: -14 }}
+					animate={{ opacity: 1, y: 0 }}
+					exit={{ opacity: 0, y: 14 }}
+					className="flex items-center gap-2"
+				>
+					<Icon
+						name={isCopied ? "check-circle" : "copy"}
+						className={cn(
+							"h-3.5 w-3.5 shrink-0",
+							isCopied ? "text-success-base" : "text-text-sub-600",
+						)}
+					/>
+					<span>{isCopied ? doneLabel : idleLabel}</span>
+				</motion.div>
+			</AnimatePresence>
+		);
+	};
+
 	return (
 		<div className="relative">
 			{menuItems.map((item, idx) => {
 				const disabled = item.id === "delete" && isDeleting;
-				const label =
-					item.id === "copy-id" ? (
-						<AnimatePresence mode="popLayout" initial={false}>
-							<motion.div
-								key={isCopied ? "copied" : "idle"}
-								transition={{ type: "spring", duration: 0.25, bounce: 0 }}
-								initial={{ opacity: 0, y: -14 }}
-								animate={{ opacity: 1, y: 0 }}
-								exit={{ opacity: 0, y: 14 }}
-								className="flex items-center gap-2"
-							>
-								<Icon
-									name={isCopied ? "check-circle" : "copy"}
-									className={cn(
-										"h-3.5 w-3.5 shrink-0",
-										isCopied ? "text-success-base" : "text-text-sub-600",
-									)}
-								/>
-								<span>{isCopied ? "Copied ID!" : "Copy group ID"}</span>
-							</motion.div>
-						</AnimatePresence>
-					) : (
-						<>
-							<Icon
-								name={item.icon}
-								className={cn(
-									"h-3.5 w-3.5 shrink-0",
-									item.isDanger ? "" : "text-text-sub-600",
-								)}
-							/>
-							<span>{item.label}</span>
-						</>
-					);
+				const label = isCopyItem(item.id) ? (
+					renderCopyLabel(item.id === "copy-name" ? "name" : "id")
+				) : (
+					<>
+						<Icon
+							name={item.icon}
+							className={cn(
+								"h-3.5 w-3.5 shrink-0",
+								item.isDanger ? "" : "text-text-sub-600",
+							)}
+						/>
+						<span>{item.label}</span>
+					</>
+				);
 
 				if (variant === "context") {
 					return (
@@ -266,7 +240,7 @@ function GroupActionsMenuItems({
 							onPointerEnter={() => setHoverIdx(idx)}
 							onPointerLeave={() => setHoverIdx(undefined)}
 							onSelect={(event) => {
-								if (item.id === "copy-id") event.preventDefault();
+								if (isCopyItem(item.id)) event.preventDefault();
 								void handleItemClick(item.id);
 							}}
 							disabled={disabled}

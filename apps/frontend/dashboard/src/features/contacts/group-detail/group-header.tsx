@@ -1,10 +1,7 @@
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
-import { KbdCommand } from "@reloop/ui/kbd-command";
-import { KbdEnter } from "@reloop/ui/kbd-enter";
-import { KbdEsc } from "@reloop/ui/kbd-esc";
-import { KbdKey } from "@reloop/ui/kbd-key";
 import {
 	Content as PopoverContent,
 	Root as PopoverRoot,
@@ -22,10 +19,14 @@ import {
 	useGroupContactsCountQuery,
 	useInvalidateContacts,
 } from "#/features/contacts/hooks/use-contacts-query";
-import { AnimatedBackButton } from "#/features/dashboard/animated-back-button";
+import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import { formatRelativeTime } from "#/utils/format-relative-time";
 import { DeleteGroupModal } from "../components/groups/delete-group";
+
+/** Light keycap so it reads on filled primary buttons. */
+const actionKbdOnSolidClassName =
+	"border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]";
 
 interface GroupHeaderProps {
 	group: GroupDetail | undefined;
@@ -139,16 +140,19 @@ export const GroupHeader = ({ group, isLoading }: GroupHeaderProps) => {
 	};
 
 	useHotkeys(
-		"m+c",
+		"m c",
 		(e) => {
 			e.preventDefault();
-			void setModal("add-contact-to-group");
+			if (!isEditing) {
+				void setModal("add-contact-to-group");
+			}
 		},
-		{ enabled: !!group },
+		{ enabled: !!group && !isEditing },
+		[group, isEditing],
 	);
 
 	useHotkeys(
-		"mod+enter",
+		"enter",
 		(e) => {
 			e.preventDefault();
 			if (
@@ -160,27 +164,25 @@ export const GroupHeader = ({ group, isLoading }: GroupHeaderProps) => {
 				void handleEditSubmit();
 			}
 		},
-		{ enableOnFormTags: true, enabled: isEditing },
+		{ enableOnFormTags: ["INPUT"], enabled: isEditing },
 		[isEditing, isSubmitting, editName, group],
 	);
 
 	useHotkeys(
-		"esc",
-		(e) => {
-			e.preventDefault();
-			if (isEditing) {
+		"escape",
+		() => {
+			if (isEditing && !isSubmitting) {
 				handleEditCancel();
 			}
 		},
-		{ enableOnFormTags: true, enabled: isEditing },
-		[isEditing],
+		{ enableOnFormTags: ["INPUT"], enabled: isEditing },
+		[isEditing, isSubmitting],
 	);
 
 	if (!group && !isLoading) {
 		return (
 			<div className="pt-10 pb-8">
-				<AnimatedBackButton onClick={() => router.push("/contacts/groups")} />
-				<div className="flex items-center justify-between pt-6">
+				<div className="flex items-center justify-between">
 					<div>
 						<div className="flex items-center gap-1.5">
 							<p className="font-medium text-paragraph-xs text-text-sub-600">
@@ -206,8 +208,7 @@ export const GroupHeader = ({ group, isLoading }: GroupHeaderProps) => {
 	return (
 		<>
 			<div className="pt-10 pb-8">
-				<AnimatedBackButton onClick={() => router.push("/contacts/groups")} />
-				<div className="flex items-center justify-between pt-6">
+				<div className="flex items-center justify-between">
 					<div>
 						{isLoading ? (
 							<Skeleton className="h-7 w-48 rounded-lg" />
@@ -228,38 +229,42 @@ export const GroupHeader = ({ group, isLoading }: GroupHeaderProps) => {
 									className="ml-2 w-[160px] border-0 bg-transparent px-0 py-0 font-medium text-text-strong-950 text-title-h6 leading-8 focus:border-text-strong-950 focus:outline-none focus:ring-0"
 								/>
 								<Button.Root
-									type="submit"
-									variant="neutral"
-									size="xxsmall"
-									disabled={
-										isSubmitting || !editName.trim() || editName === group?.name
-									}
-									className="ml-3 gap-2"
-								>
-									{isSubmitting ? (
-										<Spinner size={14} color="currentColor" />
-									) : (
-										<>
-											Save
-											<span className="inline-flex items-center gap-0.5">
-												<KbdCommand />
-												<KbdEnter />
-											</span>
-										</>
-									)}
-								</Button.Root>
-								<Button.Root
 									type="button"
 									variant="neutral"
 									mode="stroke"
-									size="xxsmall"
+									size="xsmall"
 									onClick={handleEditCancel}
 									disabled={isSubmitting}
-									className="ml-2 gap-2"
+									className="ml-3 gap-1.5"
 								>
 									Cancel
-									<KbdEsc />
+									<ActionKbd className="lowercase! w-auto min-w-0 px-1">
+										esc
+									</ActionKbd>
 								</Button.Root>
+								<FancyButton.Root
+									type="submit"
+									variant="blue"
+									size="xsmall"
+									disabled={
+										isSubmitting || !editName.trim() || editName === group?.name
+									}
+									className="ml-2 gap-1.5"
+								>
+									{isSubmitting ? (
+										<>
+											<Spinner size={14} color="currentColor" />
+											<span>Saving...</span>
+										</>
+									) : (
+										<>
+											Save
+											<ActionKbd className={actionKbdOnSolidClassName}>
+												↵
+											</ActionKbd>
+										</>
+									)}
+								</FancyButton.Root>
 							</form>
 						) : (
 							<div className="flex items-center">
@@ -292,18 +297,23 @@ export const GroupHeader = ({ group, isLoading }: GroupHeaderProps) => {
 							</>
 						) : group ? (
 							<>
-								<Button.Root
-									variant="neutral"
+								<FancyButton.Root
+									variant="blue"
 									size="xsmall"
 									onClick={() => void setModal("add-contact-to-group")}
-									className="gap-2"
+									className="gap-1.5"
+									aria-keyshortcuts="M C"
 								>
-									Manage Contacts
+									Manage contacts
 									<span className="inline-flex items-center gap-0.5">
-										<KbdKey>M</KbdKey>
-										<KbdKey>C</KbdKey>
+										<ActionKbd className={actionKbdOnSolidClassName}>
+											M
+										</ActionKbd>
+										<ActionKbd className={actionKbdOnSolidClassName}>
+											C
+										</ActionKbd>
 									</span>
-								</Button.Root>
+								</FancyButton.Root>
 								<PopoverRoot>
 									<PopoverTrigger asChild>
 										<Button.Root variant="neutral" mode="stroke" size="xsmall">

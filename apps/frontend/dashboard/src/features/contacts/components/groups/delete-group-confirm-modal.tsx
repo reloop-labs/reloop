@@ -65,13 +65,8 @@ export function DeleteGroupConfirmModal({
 		? `delete ${bulkGroupsToDelete.length} group${bulkGroupsToDelete.length === 1 ? "" : "s"}`
 		: groupToDelete?.name || "Unnamed group";
 
-	const normalizedInput = confirmationText.trim().toLowerCase();
-	const isConfirmed = isBulk
-		? normalizedInput === displayName.toLowerCase() ||
-			normalizedInput ===
-				`delete ${bulkGroupsToDelete.length} group${bulkGroupsToDelete.length === 1 ? "" : "s"}` ||
-			normalizedInput === "delete"
-		: confirmationText === displayName;
+	// Exact match only — no partial / substring acceptance (e.g. typing just "delete").
+	const isConfirmed = confirmationText === displayName;
 
 	const canDelete =
 		isConfirmed &&

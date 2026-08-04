@@ -134,6 +134,8 @@ export const GroupContactList = ({ groupId }: { groupId: string }) => {
 				total={data?.total || 0}
 				isLoading={isLoading}
 				loadingRows={5}
+				groupId={groupId}
+				groupName={data?.group?.name}
 				onAddContact={() => void setModal("add-contact-to-group")}
 				searchQuery={searchQuery}
 				onClearSearch={() => setSearchQuery("")}
