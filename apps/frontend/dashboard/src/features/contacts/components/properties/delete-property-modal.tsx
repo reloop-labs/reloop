@@ -1,17 +1,5 @@
 import * as Badge from "@reloop/ui/badge";
 import * as Button from "@reloop/ui/button";
-
-const getBadgeColor = (type: string) => {
-	switch (type?.toLowerCase()) {
-		case "string":
-			return "blue";
-		case "number":
-			return "purple";
-		default:
-			return "gray";
-	}
-};
-
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
@@ -28,6 +16,18 @@ import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import { useInvalidateContacts } from "#/features/contacts/hooks/use-contacts-query";
+import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
+
+const getBadgeColor = (type: string) => {
+	switch (type?.toLowerCase()) {
+		case "string":
+			return "blue";
+		case "number":
+			return "purple";
+		default:
+			return "gray";
+	}
+};
 
 interface Property {
 	id: string;
@@ -232,15 +232,20 @@ export const DeletePropertyModal = ({
 						<Button.Root
 							type="button"
 							variant="neutral"
-							mode="ghost"
+							mode="stroke"
 							size="small"
-							onClick={handleCancel}
+							onClick={() => {
+								if (deleteState === "idle") handleCancel();
+							}}
 							className={cn(
-								"transition-opacity duration-200",
+								"gap-1.5 transition-opacity duration-200",
 								deleteState !== "idle" && "pointer-events-none opacity-50",
 							)}
 						>
 							Cancel
+							<ActionKbd className="lowercase! w-auto min-w-0 px-1">
+								esc
+							</ActionKbd>
 						</Button.Root>
 
 						<FancyButton.Root
