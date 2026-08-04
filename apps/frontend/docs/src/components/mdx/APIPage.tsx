@@ -6,7 +6,7 @@ import { cn } from "@reloop/ui/cn";
 import { CodeBlock } from "@reloop/ui/code-block";
 import { CopyCodeBlock } from "@reloop/ui/copy-code-block";
 import { Check, ChevronDown, Copy } from "lucide-react";
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
 	siDotnet,
 	siGnubash,
@@ -167,10 +167,6 @@ function shortenPath(fullPath: string): string {
 	return clean.replace(/^\/api/, "");
 }
 
-function getTypeBadgeStyles(_type: string): string {
-	return "bg-neutral-100 text-neutral-500 dark:bg-zinc-800 dark:text-zinc-400";
-}
-
 const METHOD_STYLES: Record<string, string> = {
 	GET: "bg-green-500 text-white dark:bg-green-500 dark:text-white",
 	POST: "bg-blue-500 text-white dark:bg-blue-500 dark:text-white",
@@ -208,11 +204,42 @@ export function APIPage(props: APIPageProps) {
 	const method = (operation?.method || "GET").toUpperCase();
 
 	const [copiedEndpoint, setCopiedEndpoint] = useState(false);
+	// Display path only — host is implied; copy still uses the full absolute URL
+	const displayPath = path.replace(/\{([^}]+)\}/g, ":$1");
+	const endpointUrl = `https://reloop.sh${displayPath}`;
+	const urlScrollRef = useRef<HTMLDivElement>(null);
+	const [urlScrollEdges, setUrlScrollEdges] = useState({
+		left: false,
+		right: false,
+	});
+
+	const updateUrlScrollEdges = useCallback(() => {
+		const el = urlScrollRef.current;
+		if (!el) return;
+		const { scrollLeft, scrollWidth, clientWidth } = el;
+		// 1px slack avoids subpixel flicker
+		setUrlScrollEdges({
+			left: scrollLeft > 1,
+			right: scrollLeft + clientWidth < scrollWidth - 1,
+		});
+	}, []);
+
+	useEffect(() => {
+		updateUrlScrollEdges();
+		const el = urlScrollRef.current;
+		if (!el) return;
+		const ro = new ResizeObserver(updateUrlScrollEdges);
+		ro.observe(el);
+		window.addEventListener("resize", updateUrlScrollEdges);
+		return () => {
+			ro.disconnect();
+			window.removeEventListener("resize", updateUrlScrollEdges);
+		};
+	}, [updateUrlScrollEdges, displayPath]);
 
 	const handleCopyEndpoint = async () => {
-		const fullUrl = `https://reloop.sh${path.replace(/\{([^}]+)\}/g, ":$1")}`;
 		try {
-			await navigator.clipboard.writeText(fullUrl);
+			await navigator.clipboard.writeText(endpointUrl);
 			setCopiedEndpoint(true);
 			setTimeout(() => setCopiedEndpoint(false), 2000);
 		} catch {
@@ -238,23 +265,39 @@ export function APIPage(props: APIPageProps) {
 
 	return (
 		<>
-			{/* ─── Left: endpoint + parameters ─── */}
 			<div className="min-w-0">
-				{/* Method + Path */}
+				{/* 1. Method + Path */}
 				<div className="api-endpoint-bar mb-8 flex items-center rounded-[18px] border border-stroke-soft-100 bg-[#fafafa] p-0.5 dark:border-stroke-soft-100/40 dark:bg-[#0c0c0e]">
-					<div className="flex w-full items-center justify-between gap-3 rounded-[16px] border border-stroke-soft-100/70 bg-white px-3 py-2.5 dark:border-stroke-soft-100/15 dark:bg-zinc-950">
-						<div className="flex min-w-0 items-center gap-3">
-							<span
+					<div className="flex w-full min-w-0 items-center gap-3 rounded-[16px] border border-stroke-soft-100/70 bg-white px-3 py-2.5 dark:border-stroke-soft-100/15 dark:bg-zinc-950">
+						<span
+							className={cn(
+								"shrink-0 rounded-[10px] px-2 py-0.5 font-bold text-[11px] uppercase tracking-wider",
+								METHOD_STYLES[method] || METHOD_STYLES.GET,
+							)}
+						>
+							{method}
+						</span>
+						{/* URL: single-line scroll + edge fades (same idea as sidebar list) */}
+						<div className="relative min-w-0 flex-1">
+							<div
 								className={cn(
-									"shrink-0 rounded-[10px] px-2 py-0.5 font-bold text-[11px] uppercase tracking-wider",
-									METHOD_STYLES[method] || METHOD_STYLES.GET,
+									"pointer-events-none absolute inset-y-0 left-0 z-10 w-6 bg-gradient-to-r from-white to-transparent transition-opacity dark:from-zinc-950",
+									urlScrollEdges.left ? "opacity-100" : "opacity-0",
 								)}
+							/>
+							<div
+								ref={urlScrollRef}
+								onScroll={updateUrlScrollEdges}
+								className="min-w-0 overflow-x-auto whitespace-nowrap font-medium [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
 							>
-								{method}
-							</span>
-							<div className="min-w-0 font-medium">
-								https://reloop.sh{path.replace(/\{([^}]+)\}/g, ":$1")}
+								{displayPath}
 							</div>
+							<div
+								className={cn(
+									"pointer-events-none absolute inset-y-0 right-0 z-10 w-6 bg-gradient-to-l from-white to-transparent transition-opacity dark:from-zinc-950",
+									urlScrollEdges.right ? "opacity-100" : "opacity-0",
+								)}
+							/>
 						</div>
 						<button
 							type="button"
@@ -271,7 +314,13 @@ export function APIPage(props: APIPageProps) {
 					</div>
 				</div>
 
-				{/* Parameter sections */}
+				{/*
+				  2. Code (phone + tablet / iPad only)
+				  Desktop: teleports into the sticky right column via CodePortal.
+				*/}
+				<div className="mb-10 xl:hidden">{codeColumn}</div>
+
+				{/* 3. Parameter sections */}
 				{pathParams.length > 0 && (
 					<ParameterSection title="Path Parameters" params={pathParams} />
 				)}
@@ -283,11 +332,8 @@ export function APIPage(props: APIPageProps) {
 				)}
 			</div>
 
-			{/* ─── Desktop: teleport to page-level sticky column ─── */}
+			{/* Desktop: teleport to page-level sticky column */}
 			<CodePortal>{codeColumn}</CodePortal>
-
-			{/* ─── Mobile: code + response below content ─── */}
-			<div className="mt-10 lg:hidden">{codeColumn}</div>
 		</>
 	);
 }
@@ -333,39 +379,16 @@ function ParameterRow({
 				<span className="font-semibold text-sm text-text-strong-950 dark:text-white">
 					{param.name}
 				</span>
-				{param.type.includes("|") ? (
-					param.type
-						.split("|")
-						.map((t) => t.trim())
-						.filter(Boolean)
-						.map((t, idx) => (
-							<span
-								key={idx}
-								className={cn(
-									"rounded px-1.5 py-0.5 font-medium text-[11px] tracking-tight",
-									getTypeBadgeStyles(t),
-								)}
-							>
-								{t}
-							</span>
-						))
-				) : (
-					<span
-						className={cn(
-							"rounded px-1.5 py-0.5 font-medium text-[11px] tracking-tight",
-							getTypeBadgeStyles(param.type),
-						)}
-					>
-						{param.type}
-					</span>
-				)}
+				<span className="inline-flex items-center rounded-[6px] bg-bg-weak-50 px-2 font-mono font-semibold text-[12px] text-text-sub-600 dark:bg-white/[0.07] dark:text-white/55">
+					{param.type}
+				</span>
 				{param.defaultValue !== undefined && (
-					<span className="rounded border border-primary-base/20 bg-primary-alpha-10 px-1.5 py-0.5 font-medium text-[11px] text-primary-base tracking-tight">
+					<span className="inline-flex items-center rounded-[6px] bg-primary-alpha-10 px-2 font-mono font-semibold text-[12px] text-primary-base">
 						default: {JSON.stringify(param.defaultValue)}
 					</span>
 				)}
 				{param.required && (
-					<span className="rounded bg-red-500/10 px-1.5 py-0.5 font-bold text-[10px] text-red-500 uppercase tracking-wider dark:bg-red-500/20 dark:text-red-400">
+					<span className="inline-flex items-center rounded-[6px] bg-error-lighter px-2 font-semibold text-[11px] text-error-base uppercase tracking-wide dark:bg-red-500/15 dark:text-red-400">
 						Required
 					</span>
 				)}

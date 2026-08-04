@@ -316,9 +316,17 @@ export default async function Page(props: {
 				>
 					{/* Agent discovery — top of main content, outside nav */}
 					<AgentDirective markdownPath={markdownPath} />
-					{/* Main content area */}
+					{/*
+					  Split layout breakpoints (API + webhooks):
+					  - < xl (phone + tablet / iPad): single column — code stacks above docs
+					  - xl+ (desktop): two columns — docs left, sticky code right
+					*/}
 					<div
-						className={`min-w-0 px-6 py-8 md:px-10 ${useSplitLayout ? "lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(380px,480px)] lg:gap-x-10 xl:gap-x-12" : ""}`}
+						className={`min-w-0 px-6 py-8 md:px-10 ${
+							useSplitLayout
+								? "xl:grid xl:grid-cols-[minmax(0,1fr)_minmax(380px,480px)] xl:gap-x-10 2xl:gap-x-12"
+								: ""
+						}`}
 					>
 						<div
 							className={
@@ -329,13 +337,13 @@ export default async function Page(props: {
 									: "mx-auto max-w-[680px]"
 							}
 						>
-							{/* Title row */}
+							{/* Title row — stack on phone so title isn't crushed by Copy page */}
 							<div className="mb-8">
-								<div className="flex items-start justify-between gap-4">
-									<h1 className="flex-1 font-semibold text-3xl text-fd-foreground tracking-[-0.03em]">
+								<div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+									<h1 className="min-w-0 font-semibold text-2xl leading-snug text-fd-foreground tracking-[-0.03em] sm:text-3xl sm:leading-tight">
 										{page.data.title}
 									</h1>
-									<div className="mt-2 shrink-0">
+									<div className="relative z-20 w-fit shrink-0 self-start sm:mt-1">
 										<PageActions rawContent={(page.data as any).raw} />
 									</div>
 								</div>
@@ -366,16 +374,17 @@ export default async function Page(props: {
 								previous={previous}
 								next={next}
 								editUrl={
-									page.filePath
+									// API reference pages are generated — no useful source to edit
+									!isApiPage && page.filePath
 										? `https://github.com/reloop-labs/reloop/edit/main/${page.filePath}`
 										: undefined
 								}
 							/>
 						</div>
 
-						{/* Right column: sticky code + response (API reference & webhook events) */}
+						{/* Right column: sticky code + response (desktop only) */}
 						{useSplitLayout && (
-							<div className="hidden lg:block">
+							<div className="hidden xl:block">
 								<div className="sticky top-10 space-y-6 pb-12 pl-2">
 									<CodeDisplay />
 								</div>

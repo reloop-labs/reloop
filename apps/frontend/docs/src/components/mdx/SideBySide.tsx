@@ -19,16 +19,16 @@ export function SideBySide({ children, className }: SideBySideProps) {
 
 	return (
 		<div className={cn("relative", className)}>
-			{/* Render left column in-place */}
+			{/* Phone + tablet / iPad: code first, docs second */}
+			<div className="mb-8 xl:hidden">{right}</div>
+
+			{/* Docs column (always in-flow) */}
 			<div className="min-w-0">{left}</div>
 
-			{/* Teleport right column to the global sticky column */}
+			{/* Desktop: teleport right column to sticky sidebar */}
 			<CodePortal>
 				<div>{right}</div>
 			</CodePortal>
-
-			{/* Mobile: Still show code below documentation */}
-			<div className="mt-8 lg:hidden">{right}</div>
 		</div>
 	);
 }
