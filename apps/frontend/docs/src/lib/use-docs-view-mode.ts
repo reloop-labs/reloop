@@ -1,4 +1,3 @@
-import { useQueryState } from "nuqs";
 import { useCallback, useEffect, useState } from "react";
 
 export type DocsViewMode = "desktop" | "code";
@@ -44,34 +43,13 @@ export function useDocsViewMode(): [
 	DocsViewMode,
 	(mode: DocsViewMode) => void,
 ] {
-	const [queryTab, setQueryTab] = useQueryState("tab", {
-		history: "replace",
-		shallow: true,
-	});
-
 	const [mode, setMode] = useState<DocsViewMode>(() => {
-		if (queryTab === "desktop" || queryTab === "code") {
-			return queryTab;
-		}
 		return readStoredMode("desktop");
 	});
 
 	useEffect(() => {
-		if (queryTab === "desktop" || queryTab === "code") {
-			setMode(queryTab);
-			try {
-				localStorage.setItem(STORAGE_KEY, queryTab);
-			} catch {}
-		} else {
-			setMode(readStoredMode("desktop"));
-		}
-	}, [queryTab]);
-
-	useEffect(() => {
 		const sync = () => {
-			if (!queryTab) {
-				setMode(readStoredMode("desktop"));
-			}
+			setMode(readStoredMode("desktop"));
 		};
 		window.addEventListener(CHANGE_EVENT, sync);
 		window.addEventListener("storage", sync);
@@ -79,19 +57,15 @@ export function useDocsViewMode(): [
 			window.removeEventListener(CHANGE_EVENT, sync);
 			window.removeEventListener("storage", sync);
 		};
-	}, [queryTab]);
+	}, []);
 
-	const setViewMode = useCallback(
-		(next: DocsViewMode) => {
-			setMode(next);
-			void setQueryTab(next);
-			try {
-				localStorage.setItem(STORAGE_KEY, next);
-				window.dispatchEvent(new CustomEvent(CHANGE_EVENT, { detail: next }));
-			} catch {}
-		},
-		[setQueryTab],
-	);
+	const setViewMode = useCallback((next: DocsViewMode) => {
+		setMode(next);
+		try {
+			localStorage.setItem(STORAGE_KEY, next);
+			window.dispatchEvent(new CustomEvent(CHANGE_EVENT, { detail: next }));
+		} catch {}
+	}, []);
 
 	return [mode, setViewMode];
 }

@@ -4,7 +4,6 @@ import * as Dialog from "@radix-ui/react-dialog";
 import { AnimatePresence, motion } from "framer-motion";
 import { FileText, Search } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useQueryState } from "nuqs";
 import * as React from "react";
 import { cn } from "../../lib/cn";
 import type { PageTreeItem } from "../../lib/types";
@@ -23,7 +22,7 @@ interface SearchResult {
 }
 
 export function SearchDialog({ open, onOpenChange, tree }: SearchDialogProps) {
-	const [query, setQuery] = useQueryState("q", { defaultValue: "" });
+	const [query, setQuery] = React.useState("");
 	const [results, setResults] = React.useState<SearchResult[]>([]);
 	const [selectedIndex, setSelectedIndex] = React.useState(0);
 	const router = useRouter();

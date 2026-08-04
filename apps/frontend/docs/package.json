@@ -36,7 +36,6 @@
 		"@reloop/tailwind": "workspace:*",
 		"next-mdx-remote": "catalog:ui",
 		"next-themes": "catalog:ui",
-		"nuqs": "catalog:ui",
 		"react": "catalog:ui",
 		"react-dom": "catalog:ui",
 		"react-hotkeys-hook": "catalog:ui",

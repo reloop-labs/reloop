@@ -4,7 +4,6 @@ import { cn } from "@reloop/fe-docs/lib/cn";
 import { IconsSprite } from "@reloop/ui/icons-sprite";
 import { RybbitLoader } from "@reloop/ui/rybbit-loader";
 import localFont from "next/font/local";
-import { NuqsAdapter } from "nuqs/adapters/next/app";
 import type { ReactNode } from "react";
 
 // TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
@@ -54,9 +53,7 @@ export default function Layout({ children }: { children: ReactNode }) {
 				className="flex min-h-screen flex-col overflow-x-hidden bg-bg-weak-50 text-fd-foreground dark:bg-black"
 				suppressHydrationWarning
 			>
-				<ThemeProvider>
-					<NuqsAdapter>{children}</NuqsAdapter>
-				</ThemeProvider>
+				<ThemeProvider>{children}</ThemeProvider>
 				<IconsSprite />
 				<RybbitLoader />
 			</body>
