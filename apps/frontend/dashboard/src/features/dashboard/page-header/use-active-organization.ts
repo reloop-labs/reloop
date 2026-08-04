@@ -220,6 +220,11 @@ function useActiveOrganizationState(): Omit<
 				await queryClient.invalidateQueries({
 					queryKey: queryKeys.auth.session(),
 				});
+				// Drop org-scoped contact caches so history/activity never flash
+				// data from the previous organization while the next fetch is pending.
+				await queryClient.removeQueries({
+					queryKey: queryKeys.contacts.all,
+				});
 				await refetchOrganizations();
 			} catch (error) {
 				console.error("Error switching organization", error);

@@ -538,6 +538,8 @@ export namespace ContactModel {
 			success: t.Boolean({ default: true }),
 			object: t.Literal("contact", { default: "contact" }),
 			id: t.String({ description: "ID of the contact added to the group" }),
+			groupId: t.Optional(t.String()),
+			groupName: t.Optional(t.Union([t.String(), t.Null()])),
 			event: t.String({ description: "Event ID for the mutation" }),
 		},
 		{
@@ -545,7 +547,7 @@ export namespace ContactModel {
 				{
 					success: true,
 					object: "contact",
-					id: "cont_123456789",
+					id: "con_123456789",
 					event: "contact.update",
 				},
 			],
@@ -573,6 +575,8 @@ export namespace ContactModel {
 			success: t.Boolean({ default: true }),
 			object: t.Literal("contact", { default: "contact" }),
 			id: t.String({ description: "ID of the contact removed from the group" }),
+			groupId: t.Optional(t.String()),
+			groupName: t.Optional(t.Union([t.String(), t.Null()])),
 			event: t.String({ description: "Event ID for the mutation" }),
 		},
 		{
@@ -580,7 +584,7 @@ export namespace ContactModel {
 				{
 					success: true,
 					object: "contact",
-					id: "cont_123456789",
+					id: "con_123456789",
 					event: "contact.update",
 				},
 			],
@@ -609,15 +613,24 @@ export namespace ContactModel {
 	export const updateContactChannelResponse = t.Object(
 		{
 			success: t.Boolean({ default: true }),
+			id: t.Optional(
+				t.String({ description: "Contact ID (for audit / history)" }),
+			),
 			status: t.Union([t.Literal("enrolled"), t.Literal("unenrolled")], {
 				description: "Updated channel enrollment status",
 			}),
+			channelId: t.Optional(t.String()),
+			channelName: t.Optional(t.Union([t.String(), t.Null()])),
+			subscription: t.Optional(
+				t.Union([t.Literal("opt_in"), t.Literal("opt_out")]),
+			),
 			event: t.String({ description: "Event ID for the mutation" }),
 		},
 		{
 			examples: [
 				{
 					success: true,
+					id: "con_123456789",
 					status: "enrolled",
 					event: "contact.update",
 				},

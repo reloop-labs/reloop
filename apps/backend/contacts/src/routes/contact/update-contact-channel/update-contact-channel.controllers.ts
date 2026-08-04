@@ -1,8 +1,13 @@
 import {
+	ChannelErrors,
 	ContactErrors,
 	isAppError,
 } from "@be/contacts/error/contacts.error-response";
 import type { ContactModel } from "@be/contacts/model/contact.model";
+import {
+	attachAuditChanges,
+	type ContactFieldChange,
+} from "@be/contacts/utils/contact-field-changes";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { CONTACT_UPDATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
@@ -61,6 +66,17 @@ export async function updateContactChannelController({
 			throw ContactErrors.contactNotFound(contact_id || email || "");
 		}
 
+		const channel = await db.query.channel.findFirst({
+			where: and(
+				eq(schema.channel.id, channelId),
+				eq(schema.channel.organizationId, organizationId),
+			),
+		});
+
+		if (!channel) {
+			throw ChannelErrors.notFound(channelId);
+		}
+
 		const targetStatus = (
 			subscription === "opt_out" ? "unenrolled" : "enrolled"
 		) as "enrolled" | "unenrolled";
@@ -78,6 +94,10 @@ export async function updateContactChannelController({
 			),
 		});
 
+		const changes: ContactFieldChange[] = [];
+		const channelLabel = channel.name;
+		const subscriptionLabel = subscription ?? targetStatus;
+
 		if (existing) {
 			if (existing.status !== targetStatus) {
 				await db
@@ -87,9 +107,26 @@ export async function updateContactChannelController({
 
 				log.info("Updated contact subscription status", {
 					subscriptionId: existing.id,
-					currentStatus: targetStatus,
+					from: existing.status,
+					to: targetStatus,
+				});
+
+				// Keep channel name available for history copy via response metadata
+				changes.push({
+					field: "channel",
+					from: channelLabel,
+					to: channelLabel,
+					label: "Channel",
+				});
+				// Real transition — previous status, not null
+				changes.push({
+					field: "channel_subscription",
+					from: existing.status,
+					to: subscriptionLabel,
+					label: "Subscription",
 				});
 			}
+			// Idempotent no-op when status already matches — no audit changes
 		} else {
 			await db.insert(schema.channelSubscription).values({
 				contactId: contact.id,
@@ -103,13 +140,33 @@ export async function updateContactChannelController({
 				channelId,
 				currentStatus: targetStatus,
 			});
+
+			changes.push({
+				field: "channel",
+				from: null,
+				to: channelLabel,
+				label: "Channel",
+			});
+			changes.push({
+				field: "channel_subscription",
+				from: null,
+				to: subscriptionLabel,
+				label: "Subscription",
+			});
 		}
 
 		const result = {
 			success: true,
+			id: contact.id,
 			status: targetStatus,
+			channelId,
+			channelName: channel.name,
+			subscription,
 			event: CONTACT_UPDATE_WEBHOOK_EVENT.id,
 		};
+		if (changes.length > 0) {
+			attachAuditChanges(result, changes);
+		}
 
 		return result;
 	} catch (error) {

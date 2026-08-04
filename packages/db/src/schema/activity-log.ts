@@ -53,5 +53,11 @@ export const activityLog = pgTable(
 			table.createdAt,
 		),
 		index("activity_log_idx_org_level").on(table.organizationId, table.level),
+		index("activity_log_idx_org_resource").on(
+			table.organizationId,
+			table.resourceType,
+			table.resourceId,
+			table.createdAt,
+		),
 	],
 );

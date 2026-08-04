@@ -3,6 +3,7 @@ import {
 	isAppError,
 } from "@be/contacts/error/contacts.error-response";
 import type { ContactModel } from "@be/contacts/model/contact.model";
+import { attachAuditChanges } from "@be/contacts/utils/contact-field-changes";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { CONTACT_UPDATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
@@ -53,7 +54,14 @@ export async function removeContactFromGroupController({
 			throw ContactErrors.contactNotFound(contact_id || email || "");
 		}
 
-		await db
+		const group = await db.query.group.findFirst({
+			where: and(
+				eq(schema.group.id, groupId),
+				eq(schema.group.organizationId, organizationId),
+			),
+		});
+
+		const removed = await db
 			.update(schema.contactGroup)
 			.set({ deletedAt: new Date(), updatedAt: new Date() })
 			.where(
@@ -63,19 +71,37 @@ export async function removeContactFromGroupController({
 					eq(schema.contactGroup.organizationId, organizationId),
 					isNull(schema.contactGroup.deletedAt),
 				),
-			);
+			)
+			.returning({ id: schema.contactGroup.id });
+
+		const didRemove = removed.length > 0;
 
 		log.info("Contact removed from group", {
 			contactId: contact.id,
 			groupId,
+			didRemove,
 		});
 
+		const groupLabel = group?.name ?? groupId;
 		const result = {
 			success: true,
 			object: "contact" as const,
 			id: contact.id,
+			groupId,
+			groupName: group?.name ?? null,
 			event: CONTACT_UPDATE_WEBHOOK_EVENT.id,
 		};
+		// Only record history when an active membership was actually removed
+		if (didRemove) {
+			attachAuditChanges(result, [
+				{
+					field: "group",
+					from: groupLabel,
+					to: null,
+					label: "Group",
+				},
+			]);
+		}
 
 		return result;
 	} catch (error) {

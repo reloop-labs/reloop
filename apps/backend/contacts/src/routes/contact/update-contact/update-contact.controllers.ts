@@ -4,6 +4,10 @@ import {
 } from "@be/contacts/error/contacts.error-response";
 import { upsertContactProperties } from "@be/contacts/routes/contact/utils/upsert-contact-properties";
 import type { ContactTypes } from "@be/contacts/types/contact.type";
+import {
+	attachAuditChanges,
+	computeContactFieldChanges,
+} from "@be/contacts/utils/contact-field-changes";
 import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
@@ -41,6 +45,56 @@ export async function updateContactController({
 					log.warn("Contact not found", { contactId, organizationId });
 					throw ContactErrors.contactNotFound(contactId);
 				}
+
+				// Snapshot current properties for field-level audit diffs
+				const existingPropertyRows = await tx
+					.select({
+						name: schema.contactProperty.propertyName,
+						value: schema.contactPropertyValue.value,
+						type: schema.contactProperty.propertyType,
+					})
+					.from(schema.contactPropertyValue)
+					.innerJoin(
+						schema.contactProperty,
+						eq(
+							schema.contactPropertyValue.propertyId,
+							schema.contactProperty.id,
+						),
+					)
+					.where(
+						and(
+							eq(schema.contactPropertyValue.contactId, contactId),
+							eq(schema.contactPropertyValue.organizationId, organizationId),
+							isNull(schema.contactProperty.deletedAt),
+							isNull(schema.contactPropertyValue.deletedAt),
+						),
+					);
+
+				const existingProperties = existingPropertyRows.reduce(
+					(acc, curr) => {
+						acc[curr.name] =
+							curr.type === "number" ? Number(curr.value) : curr.value;
+						return acc;
+					},
+					{} as Record<string, string | number>,
+				);
+
+				const fieldChanges = computeContactFieldChanges(
+					{
+						email: existingContact.email,
+						firstName: existingContact.firstName,
+						lastName: existingContact.lastName,
+						status: existingContact.status,
+						properties: existingProperties,
+					},
+					{
+						email,
+						firstName,
+						lastName,
+						status: contactStatus,
+						properties,
+					},
+				);
 
 				const updateData: Partial<typeof schema.contact.$inferInsert> = {
 					updatedAt: new Date(),
@@ -140,6 +194,9 @@ export async function updateContactController({
 					updatedAt: updatedContact.updatedAt,
 					event: CONTACT_UPDATE_WEBHOOK_EVENT.id,
 				};
+
+				// Attach for auditLogHook (WeakMap; not serialized in response)
+				attachAuditChanges(finalContact, fieldChanges);
 
 				return {
 					finalContact,

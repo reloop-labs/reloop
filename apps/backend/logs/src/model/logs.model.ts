@@ -361,4 +361,60 @@ export namespace LogsModel {
 		limit: t.Number(),
 	});
 	export type ContactActivityResponse = typeof contactActivityResponse.static;
+
+	// ─── Contact History (profile / membership actions) ─────────────────
+	// GET /contacts/:contact_id/history
+	// Returns audit log rows for a single contact (name updates, status,
+	// groups, channels, etc.) — used on the contact detail Activity timeline.
+
+	export const contactHistoryParams = t.Object({
+		contact_id: t.String({
+			minLength: 1,
+			description: "Contact ID",
+		}),
+	});
+	export type ContactHistoryParams = typeof contactHistoryParams.static;
+
+	export const contactHistoryQuery = t.Object({
+		page: t.Optional(t.Numeric({ default: 1, minimum: 1 })),
+		limit: t.Optional(t.Numeric({ default: 20, minimum: 1, maximum: 50 })),
+	});
+	export type ContactHistoryQuery = typeof contactHistoryQuery.static;
+
+	export const contactHistoryChange = t.Object({
+		field: t.String(),
+		from: t.Union([t.String(), t.Number(), t.Null()]),
+		to: t.Union([t.String(), t.Number(), t.Null()]),
+		label: t.Optional(t.String()),
+	});
+	export type ContactHistoryChange = typeof contactHistoryChange.static;
+
+	export const contactHistoryEntry = t.Object({
+		id: t.String(),
+		event: t.String(),
+		action: t.String(),
+		createdAt: t.String({ format: "date-time" }),
+		actorType: t.Union([t.String(), t.Null()]),
+		actorId: t.Union([t.String(), t.Null()]),
+		/** Resolved display name for the actor (user name or API key name). */
+		actorName: t.Union([t.String(), t.Null()]),
+		/** Optional avatar URL when the actor is a user. */
+		actorImage: t.Union([t.String(), t.Null()]),
+		title: t.String(),
+		summary: t.Union([t.String(), t.Null()]),
+		changes: t.Union([t.Array(contactHistoryChange), t.Null()]),
+		requestBody: t.Union([t.Any(), t.Null()]),
+		metadata: t.Any(),
+	});
+	export type ContactHistoryEntry = typeof contactHistoryEntry.static;
+
+	export const contactHistoryResponse = t.Object({
+		object: t.Literal("contact_history"),
+		contactId: t.String(),
+		data: t.Array(contactHistoryEntry),
+		total: t.Number(),
+		page: t.Number(),
+		limit: t.Number(),
+	});
+	export type ContactHistoryResponse = typeof contactHistoryResponse.static;
 }

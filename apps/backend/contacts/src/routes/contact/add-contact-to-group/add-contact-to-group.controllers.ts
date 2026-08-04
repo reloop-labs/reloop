@@ -4,6 +4,7 @@ import {
 	isAppError,
 } from "@be/contacts/error/contacts.error-response";
 import type { ContactModel } from "@be/contacts/model/contact.model";
+import { attachAuditChanges } from "@be/contacts/utils/contact-field-changes";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { CONTACT_UPDATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
@@ -87,13 +88,36 @@ export async function addContactToGroupController({
 			),
 		});
 
+		const withGroupMeta = <T extends object>(
+			payload: T,
+			opts?: { audit?: boolean },
+		) => {
+			const result = {
+				...payload,
+				groupId,
+				groupName: group.name,
+			};
+			// Only record history when membership actually changed (not idempotent re-adds)
+			if (opts?.audit) {
+				attachAuditChanges(result, [
+					{
+						field: "group",
+						from: null,
+						to: group.name,
+						label: "Group",
+					},
+				]);
+			}
+			return result;
+		};
+
 		if (existing) {
-			return {
+			return withGroupMeta({
 				success: true,
 				object: "contact" as const,
 				id: contact.id,
 				event: CONTACT_UPDATE_WEBHOOK_EVENT.id,
-			};
+			});
 		}
 
 		log.info("Adding contact to group", { contactId: contact.id, groupId });
@@ -115,14 +139,15 @@ export async function addContactToGroupController({
 
 		log.info("Contact added to group", { contactId: contact.id, groupId });
 
-		const result = {
-			success: true,
-			object: "contact" as const,
-			id: contact.id,
-			event: CONTACT_UPDATE_WEBHOOK_EVENT.id,
-		};
-
-		return result;
+		return withGroupMeta(
+			{
+				success: true,
+				object: "contact" as const,
+				id: contact.id,
+				event: CONTACT_UPDATE_WEBHOOK_EVENT.id,
+			},
+			{ audit: true },
+		);
 	} catch (error) {
 		log.error("Error adding contact to group", {
 			contactId: contact_id,

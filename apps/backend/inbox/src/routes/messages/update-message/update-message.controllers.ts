@@ -1,6 +1,6 @@
 import { db } from "@reloop/db/client";
-import { inboundEmail } from "@reloop/db/schema";
-import { and, eq } from "drizzle-orm";
+import { emailThread, inboundEmail, threadMessage } from "@reloop/db/schema";
+import { and, eq, inArray } from "drizzle-orm";
 import { createError } from "evlog";
 import { useLogger } from "evlog/elysia";
 
@@ -43,7 +43,71 @@ export async function updateMessageController(
 		return { success: true, id, message: "No changes" };
 	}
 
-	await db.update(inboundEmail).set(updateData).where(eq(inboundEmail.id, id));
+	// Resolve the canonical conversation id (email_thread.id), not the legacy
+	// inbound_email.thread_id header field (In-Reply-To / References).
+	const threadLink = await db.query.threadMessage.findFirst({
+		where: eq(threadMessage.inboundEmailId, id),
+		columns: { threadId: true },
+	});
+	const canonicalThreadId = threadLink?.threadId ?? null;
+
+	// Read/unread: sync the whole conversation so list + thread flags stay consistent.
+	if (updates.isRead !== undefined && canonicalThreadId) {
+		await db.transaction(async (tx) => {
+			const linked = await tx.query.threadMessage.findMany({
+				where: eq(threadMessage.threadId, canonicalThreadId),
+				columns: { inboundEmailId: true },
+			});
+			const inboundIds = [
+				...new Set(
+					linked
+						.map((l) => l.inboundEmailId)
+						.filter((v): v is string => !!v)
+						.concat(id),
+				),
+			];
+
+			await tx
+				.update(inboundEmail)
+				.set({ isRead: updates.isRead })
+				.where(
+					and(
+						inArray(inboundEmail.id, inboundIds),
+						eq(inboundEmail.organizationId, organizationId),
+					),
+				);
+
+			await tx
+				.update(emailThread)
+				.set({ isRead: updates.isRead })
+				.where(
+					and(
+						eq(emailThread.id, canonicalThreadId),
+						eq(emailThread.organizationId, organizationId),
+					),
+				);
+
+			// Apply non-read fields only on the targeted message
+			const otherFields: Partial<typeof inboundEmail.$inferInsert> = {};
+			if (updates.isStarred !== undefined)
+				otherFields.isStarred = updates.isStarred;
+			if (updates.isSpam !== undefined) {
+				otherFields.isSpam = updates.isSpam;
+				otherFields.status = updates.isSpam ? "spam" : "received";
+			}
+			if (Object.keys(otherFields).length > 0) {
+				await tx
+					.update(inboundEmail)
+					.set(otherFields)
+					.where(eq(inboundEmail.id, id));
+			}
+		});
+	} else {
+		await db
+			.update(inboundEmail)
+			.set(updateData)
+			.where(eq(inboundEmail.id, id));
+	}
 
 	log.info(`[INBOX] Updated message ${id}: ${JSON.stringify(updateData)}`);
 	return { success: true, id, ...updateData };
