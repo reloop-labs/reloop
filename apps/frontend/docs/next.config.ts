@@ -7,6 +7,9 @@ const config = {
 	allowedDevOrigins: ["local.reloop.sh", "*.local.reloop.sh"],
 	serverExternalPackages: ["next-mdx-remote", "next-mdx-remote/rsc"],
 	cacheComponents: true,
+	// Contact learn pages (many Videos + code samples + accordions) exceed the
+	// default 60s under CI parallel static generation.
+	staticPageGenerationTimeout: 180,
 	experimental: {
 		optimizePackageImports: [
 			"lucide-react",
