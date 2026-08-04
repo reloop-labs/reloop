@@ -1,3 +1,4 @@
+import { DocsHome } from "@reloop/fe-docs/components/docs/docs-home";
 import { APIPage } from "@reloop/fe-docs/components/mdx/APIPage";
 import { CardGroup } from "@reloop/fe-docs/components/mdx/CardGroup";
 import { MDXImage, MDXVideo } from "@reloop/fe-docs/components/mdx/ImageZoom";
@@ -149,6 +150,7 @@ export function getMDXComponents(
 		Info,
 		CardGroup,
 		Cards: CardGroup,
+		DocsHome,
 		SimpleIcon,
 		PromptActions,
 		SideBySide,

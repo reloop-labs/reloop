@@ -268,6 +268,11 @@ export default async function Page(props: {
 	const MDXContent = page.data.body;
 	const isFullWidth = page.data.full === true;
 	const isApiPage = !!page.data._apiData;
+	const isDocsHome =
+		!params.slug?.length ||
+		params.slug[0] === "introduction" ||
+		page.url === "/introduction" ||
+		page.url === "/";
 
 	const _slugPath = params.slug?.join("/") || "index";
 
@@ -277,7 +282,7 @@ export default async function Page(props: {
 	const isWebhookEvent =
 		params.slug?.[0] === "webhooks" && params.slug?.length > 2;
 
-	const hideToc = isFullWidth || isWebhookEvent;
+	const hideToc = isFullWidth || isWebhookEvent || isDocsHome;
 	const useSplitLayout = isWebhookEvent || isApiPage;
 
 	const { previous, next } = source.findNeighbor(page.url);
@@ -315,51 +320,61 @@ export default async function Page(props: {
 					}`}
 				>
 					{/* Agent discovery — top of main content, outside nav */}
-					<AgentDirective markdownPath={markdownPath} />
+					{!isDocsHome && <AgentDirective markdownPath={markdownPath} />}
 					{/*
 					  Split layout breakpoints (API + webhooks):
 					  - < xl (phone + tablet / iPad): single column — code stacks above docs
 					  - xl+ (desktop): two columns — docs left, sticky code right
 					*/}
 					<div
-						className={`min-w-0 px-6 py-8 md:px-10 ${
-							useSplitLayout
-								? "xl:grid xl:grid-cols-[minmax(0,1fr)_minmax(380px,480px)] xl:gap-x-10 2xl:gap-x-12"
-								: ""
+						className={`min-w-0 ${
+							isDocsHome
+								? "px-0 py-0"
+								: `px-6 py-8 md:px-10 ${
+										useSplitLayout
+											? "xl:grid xl:grid-cols-[minmax(0,1fr)_minmax(380px,480px)] xl:gap-x-10 2xl:gap-x-12"
+											: ""
+									}`
 						}`}
 					>
 						<div
 							className={
-								hideToc
-									? isApiPage
-										? "min-w-0"
-										: ""
-									: "mx-auto max-w-[680px]"
+								isDocsHome
+									? "min-w-0"
+									: hideToc
+										? isApiPage
+											? "min-w-0"
+											: ""
+										: "mx-auto max-w-[680px]"
 							}
 						>
-							{/* Title row — stack on phone so title isn't crushed by Copy page */}
-							<div className="mb-8">
-								<div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
-									<h1 className="min-w-0 font-semibold text-2xl leading-snug text-fd-foreground tracking-[-0.03em] sm:text-3xl sm:leading-tight">
-										{page.data.title}
-									</h1>
-									<div className="relative z-20 w-fit shrink-0 self-start sm:mt-1">
-										<PageActions rawContent={(page.data as any).raw} />
+							{/* Title row — hidden on docs home (custom hero owns the H1) */}
+							{!isDocsHome && (
+								<div className="mb-8">
+									<div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+										<h1 className="min-w-0 font-semibold text-2xl leading-snug text-fd-foreground tracking-[-0.03em] sm:text-3xl sm:leading-tight">
+											{page.data.title}
+										</h1>
+										<div className="relative z-20 w-fit shrink-0 self-start sm:mt-1">
+											<PageActions rawContent={(page.data as any).raw} />
+										</div>
 									</div>
+									{page.data.description && !isApiPage && (
+										<p className="mt-3.5 text-[16px] text-text-sub-600 leading-relaxed tracking-[-0.01em]">
+											{page.data.description}
+										</p>
+									)}
 								</div>
-								{page.data.description && !isApiPage && (
-									<p className="mt-3.5 text-[16px] text-text-sub-600 leading-relaxed tracking-[-0.01em]">
-										{page.data.description}
-									</p>
-								)}
-							</div>
+							)}
 
 							{/* Content */}
 							<DocsBody
 								className={
-									isApiPage
-										? "[&>p:first-child]:m-0 [&>p:first-child]:hidden"
-										: ""
+									isDocsHome
+										? "max-w-none prose-p:my-0"
+										: isApiPage
+											? "[&>p:first-child]:m-0 [&>p:first-child]:hidden"
+											: ""
 								}
 							>
 								<MDXContent
@@ -370,16 +385,18 @@ export default async function Page(props: {
 								/>
 							</DocsBody>
 
-							<PageFooter
-								previous={previous}
-								next={next}
-								editUrl={
-									// API reference pages are generated — no useful source to edit
-									!isApiPage && page.filePath
-										? `https://github.com/reloop-labs/reloop/edit/main/${page.filePath}`
-										: undefined
-								}
-							/>
+							{!isDocsHome && (
+								<PageFooter
+									previous={previous}
+									next={next}
+									editUrl={
+										// API reference pages are generated — no useful source to edit
+										!isApiPage && page.filePath
+											? `https://github.com/reloop-labs/reloop/edit/main/${page.filePath}`
+											: undefined
+									}
+								/>
+							)}
 						</div>
 
 						{/* Right column: sticky code + response (desktop only) */}
