@@ -168,7 +168,7 @@ type ActivityTarget = {
 	href?: string;
 };
 
-type ActivityMarker = "arrow" | "circle" | "plus" | "minus";
+type ActivityMarker = "arrow" | "circle" | "plus" | "minus" | "contact";
 
 type ActivityDescription = {
 	phrase: string;
@@ -223,7 +223,7 @@ function describeHistory(entry: HistoryEntry): ActivityDescription {
 
 	switch (entry.action) {
 		case "created":
-			return { phrase: "Contact created", targets: [], marker: "plus" };
+			return { phrase: "Contact created", targets: [], marker: "contact" };
 		case "deleted":
 			return { phrase: "Contact deleted", targets: [], marker: "minus" };
 		case "added_to_group":
@@ -248,9 +248,7 @@ function describeHistory(entry: HistoryEntry): ActivityDescription {
 			const to = String(sub?.to ?? "").toLowerCase();
 			const label = channelLabel(entry);
 			const isOut =
-				to === "opt_out" ||
-				to === "unenrolled" ||
-				to === "unsubscribed";
+				to === "opt_out" || to === "unenrolled" || to === "unsubscribed";
 			return {
 				phrase: isOut ? "Opted out of" : "Opted in to",
 				targets: [{ label, resource: "channel" }],
@@ -370,9 +368,7 @@ function describeHistory(entry: HistoryEntry): ActivityDescription {
 				return {
 					phrase: `${c.label ?? "Field"} updated`,
 					targets:
-						c.to !== null
-							? [{ label: formatChangeValue(c.to), resource }]
-							: [],
+						c.to !== null ? [{ label: formatChangeValue(c.to), resource }] : [],
 					marker: "arrow",
 				};
 			}
@@ -508,19 +504,25 @@ function SpineMarker({
 }) {
 	return (
 		<div className="relative flex w-5 shrink-0 flex-col items-center self-stretch">
-			<div className="relative z-10 flex h-5 w-5 items-center justify-center text-text-soft-400">
+			<div className="relative z-10 flex h-5 w-5 items-center justify-center">
 				{marker === "circle" ? (
 					<span className="block h-2 w-2 rounded-full border border-text-soft-400 dark:border-white/35" />
+				) : marker === "contact" ? (
+					<span className="flex size-5 items-center justify-center rounded-full bg-gradient-to-b from-green-alpha-16 to-green-alpha-10 text-success-base ring-1 ring-green-alpha-16 ring-inset">
+						<User className="size-3" aria-hidden strokeWidth={2} />
+					</span>
 				) : marker === "plus" ? (
-					<span className="flex size-5 items-center justify-center rounded-full bg-bg-weak-50 text-text-sub-600 dark:bg-white/10">
+					<span className="flex size-5 items-center justify-center rounded-full bg-gradient-to-b from-green-alpha-16 to-green-alpha-10 text-success-base ring-1 ring-green-alpha-16 ring-inset">
 						<Plus className="size-3" aria-hidden strokeWidth={2} />
 					</span>
 				) : marker === "minus" ? (
-					<span className="flex size-5 items-center justify-center rounded-full bg-bg-weak-50 text-text-sub-600 dark:bg-white/10">
+					<span className="flex size-5 items-center justify-center rounded-full bg-gradient-to-b from-red-alpha-16 to-red-alpha-10 text-error-base ring-1 ring-red-alpha-16 ring-inset">
 						<Minus className="size-3" aria-hidden strokeWidth={2} />
 					</span>
 				) : (
-					<Icon name="arrow-up-right" className="h-3.5 w-3.5" />
+					<span className="flex size-5 items-center justify-center rounded-full bg-gradient-to-b from-primary-alpha-16 to-primary-alpha-10 text-primary-base ring-1 ring-primary-alpha-16 ring-inset">
+						<Icon name="arrow-up-right" className="size-3" />
+					</span>
 				)}
 			</div>
 			{!isLast && (
@@ -600,7 +602,7 @@ function ActivityLine({
 			<div
 				className={cn(
 					"flex min-w-0 flex-1 items-baseline justify-between gap-3",
-					isLast ? "pb-0.5" : "pb-3.5",
+					isLast ? "pb-0.5" : "pb-4",
 				)}
 			>
 				<div className="flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-0.5 pt-px text-paragraph-sm leading-snug">
@@ -668,7 +670,7 @@ function ContactCreatedRow({
 		<ActivityLine
 			isLast={isLast}
 			phrase="Contact created"
-			marker="plus"
+			marker="contact"
 			timestamp={timestamp}
 		/>
 	);
@@ -816,11 +818,7 @@ export function ContactEmailHistory({
 		(filter === "changes" && !!historyQuery.hasNextPage);
 
 	const visibleCount =
-		filter === "all"
-			? total
-			: filter === "emails"
-				? emailTotal
-				: changesTotal;
+		filter === "all" ? total : filter === "emails" ? emailTotal : changesTotal;
 
 	return (
 		<div className="mt-12 pb-12">
