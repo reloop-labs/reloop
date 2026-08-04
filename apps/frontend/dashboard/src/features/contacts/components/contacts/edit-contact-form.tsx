@@ -15,6 +15,11 @@ import { toast } from "sonner";
 import type { AudienceStatus } from "#/features/contacts/audience";
 import { GroupSelect } from "#/features/contacts/components/groups/group-select";
 import { useInvalidateContacts } from "#/features/contacts/hooks/use-contacts-query";
+import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
+
+/** Light keycap so it reads on the blue FancyButton fill. */
+const actionKbdOnBlueClassName =
+	"border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]";
 
 export interface EditContactFormContact {
 	id: string;
@@ -753,12 +758,19 @@ export function EditContactForm({
 					<Button.Root
 						type="button"
 						variant="neutral"
-						mode="ghost"
+						mode="stroke"
 						size="small"
 						onClick={onCancel}
 						disabled={isSaving}
+						className={cn(
+							"gap-1.5 transition-opacity duration-200",
+							isSaving && "pointer-events-none opacity-50",
+						)}
 					>
 						Cancel
+						<ActionKbd className="lowercase! w-auto min-w-0 px-1">
+							esc
+						</ActionKbd>
 					</Button.Root>
 
 					<FancyButton.Root
@@ -789,9 +801,9 @@ export function EditContactForm({
 								) : (
 									<>
 										<span>Update</span>
-										<span className="inline-flex items-center justify-center rounded bg-white/20 px-1 py-0.5 font-mono text-[10px] leading-none">
+										<ActionKbd className={actionKbdOnBlueClassName}>
 											↵
-										</span>
+										</ActionKbd>
 									</>
 								)}
 							</motion.span>
