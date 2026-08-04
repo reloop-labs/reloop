@@ -3,7 +3,6 @@
 import {
 	Area,
 	AreaChart,
-	CartesianGrid,
 	ResponsiveContainer,
 	Tooltip,
 	XAxis,
@@ -24,10 +23,7 @@ export function SubscriptionActivityChart({
 }) {
 	return (
 		<ResponsiveContainer width="100%" height="100%">
-			<AreaChart
-				data={data}
-				margin={{ top: 4, right: 4, left: -28, bottom: 0 }}
-			>
+			<AreaChart data={data} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
 				<defs>
 					<linearGradient id="subscribedGradient" x1="0" y1="0" x2="0" y2="1">
 						<stop offset="5%" stopColor="#1868DF" stopOpacity={0.28} />
@@ -38,26 +34,9 @@ export function SubscriptionActivityChart({
 						<stop offset="95%" stopColor="#A1A1AA" stopOpacity={0} />
 					</linearGradient>
 				</defs>
-				<CartesianGrid
-					strokeDasharray="3 3"
-					stroke="currentColor"
-					strokeOpacity={0.04}
-					vertical={false}
-				/>
-				<XAxis
-					dataKey="date"
-					axisLine={false}
-					tickLine={false}
-					tick={{ fill: "#888888", opacity: 0.65, fontSize: 10 }}
-					interval="preserveStartEnd"
-				/>
-				<YAxis
-					axisLine={false}
-					tickLine={false}
-					allowDecimals={false}
-					tick={{ fill: "#888888", opacity: 0.65, fontSize: 10 }}
-					width={36}
-				/>
+				{/* Compact sparkline — axes hidden; details via tooltip */}
+				<XAxis dataKey="date" hide />
+				<YAxis hide domain={[0, "auto"]} />
 				<Tooltip
 					contentStyle={{
 						background: "#18181b",

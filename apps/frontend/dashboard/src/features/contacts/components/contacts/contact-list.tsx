@@ -228,9 +228,9 @@ export function ContactList() {
 	return (
 		<div>
 			{/* Audience snapshot + 7-day trend — matches API key detail two-box layout */}
-			<div className="mb-4 grid gap-4 lg:grid-cols-2">
+			<div className="mb-4 grid items-stretch gap-4 lg:grid-cols-2">
 				<div className="overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-bg-white-0/5">
-					<div className="space-y-3 p-4">
+					<div className="flex h-full flex-col justify-between gap-3 p-4">
 						<div>
 							<p className="font-medium text-sm text-text-strong-950">
 								Audience
@@ -260,13 +260,11 @@ export function ContactList() {
 				</div>
 
 				<div className="overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-bg-white-0/5">
-					<div className="flex h-full flex-col space-y-3 p-4">
-						<div className="flex items-start justify-between gap-3">
-							<div className="min-w-0">
-								<p className="font-medium text-sm text-text-strong-950">
-									Last 7 days
-								</p>
-							</div>
+					<div className="flex h-full flex-col justify-between gap-2 p-4">
+						<div className="flex items-center justify-between gap-3">
+							<p className="shrink-0 font-medium text-sm text-text-strong-950">
+								Last 7 days
+							</p>
 							<div className="flex shrink-0 items-center gap-3">
 								<div className="flex items-center gap-1.5">
 									<span className="h-1.5 w-1.5 rounded-full bg-[#1868DF]" />
@@ -285,7 +283,7 @@ export function ContactList() {
 							</div>
 						</div>
 
-						<div ref={chartContainerRef} className="h-[108px] w-full">
+						<div ref={chartContainerRef} className="h-[52px] w-full">
 							{activityPending ? (
 								<Skeleton className="h-full w-full rounded-xl" />
 							) : hasChartSize && chartData.length > 0 ? (
