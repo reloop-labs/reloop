@@ -7,7 +7,15 @@ import {
 	parseAsString,
 	useQueryState,
 } from "nuqs";
-import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+	lazy,
+	Suspense,
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from "react";
 import { toast } from "sonner";
 import type { CommandAction } from "#/features/dashboard/command-menu";
 import { useRegisterCommandActions } from "#/features/dashboard/command-menu-context";
@@ -258,24 +266,20 @@ export function ContactList() {
 								<p className="font-medium text-sm text-text-strong-950">
 									Last 7 days
 								</p>
-								<p className="mt-0.5 text-[12px] text-text-sub-600 leading-relaxed">
-									New subscribers and unsubscribes over the past week.
-								</p>
 							</div>
 							<div className="flex shrink-0 items-center gap-3">
 								<div className="flex items-center gap-1.5">
 									<span className="h-1.5 w-1.5 rounded-full bg-[#1868DF]" />
 									<span className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
-										{activityPending ? "—" : weekSubscribed.toLocaleString()} in
+										{activityPending ? "—" : weekSubscribed.toLocaleString()}{" "}
+										subscribed
 									</span>
 								</div>
 								<div className="flex items-center gap-1.5">
 									<span className="h-1.5 w-1.5 rounded-full bg-zinc-400" />
 									<span className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
-										{activityPending
-											? "—"
-											: weekUnsubscribed.toLocaleString()}{" "}
-										out
+										{activityPending ? "—" : weekUnsubscribed.toLocaleString()}{" "}
+										unsubscribed
 									</span>
 								</div>
 							</div>
