@@ -2,6 +2,8 @@ import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
+import Spinner from "@reloop/ui/spinner";
+import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import { EmptyState } from "../shared/empty-state";
 import { ChannelDropdown } from "./channel-dropdown";
@@ -35,6 +37,12 @@ interface ChannelCardsProps {
 	onAddChannel?: () => void;
 }
 
+const SPRING = {
+	type: "spring" as const,
+	duration: 0.28,
+	bounce: 0,
+};
+
 const CardSkeleton = () => (
 	<div className="rounded-2xl border border-stroke-soft-100 bg-bg-white-0 px-5 pt-3 pb-2 dark:border-stroke-soft-100/10 dark:bg-[#101010]">
 		<div className="flex items-start justify-between">
@@ -62,6 +70,88 @@ const CardSkeleton = () => (
 		</div>
 	</div>
 );
+
+type ToggleBadgeProps = {
+	active: boolean;
+	pending: boolean;
+	activeLabel: string;
+	inactiveLabel: string;
+	activeIcon: "globe" | "check-circle";
+	inactiveIcon: "lock" | "cross-circle";
+	pendingLabel: string;
+	ariaLabel: string;
+	title: string;
+	disabled?: boolean;
+	onClick: () => void;
+};
+
+function ChannelToggleBadge({
+	active,
+	pending,
+	activeLabel,
+	inactiveLabel,
+	activeIcon,
+	inactiveIcon,
+	pendingLabel,
+	ariaLabel,
+	title,
+	disabled,
+	onClick,
+}: ToggleBadgeProps) {
+	const stateKey = pending ? "pending" : active ? "active" : "inactive";
+
+	return (
+		<motion.button
+			type="button"
+			layout
+			disabled={disabled || pending}
+			onClick={onClick}
+			aria-label={ariaLabel}
+			title={title}
+			whileTap={disabled || pending ? undefined : { scale: 0.96 }}
+			transition={SPRING}
+			className={cn(
+				"relative flex items-center overflow-hidden rounded-full px-2.5 py-1",
+				"focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-base/40",
+				"disabled:cursor-not-allowed",
+				active
+					? "bg-primary-base/10 text-primary-base hover:bg-primary-base/15"
+					: "bg-bg-weak-50 text-text-sub-600 hover:bg-bg-weak-50/80 dark:bg-white/5 dark:hover:bg-white/10",
+			)}
+		>
+			<AnimatePresence mode="popLayout" initial={false}>
+				<motion.span
+					key={stateKey}
+					layout
+					initial={{ opacity: 0, y: -10, filter: "blur(2px)" }}
+					animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+					exit={{ opacity: 0, y: 10, filter: "blur(2px)" }}
+					transition={SPRING}
+					className="flex items-center gap-1.5"
+				>
+					{pending ? (
+						<>
+							<Spinner size={12} color="currentColor" />
+							<span className="font-medium text-[10px] uppercase tracking-wider">
+								{pendingLabel}
+							</span>
+						</>
+					) : (
+						<>
+							<Icon
+								name={active ? activeIcon : inactiveIcon}
+								className="h-3 w-3 shrink-0"
+							/>
+							<span className="font-medium text-[10px] uppercase tracking-wider">
+								{active ? activeLabel : inactiveLabel}
+							</span>
+						</>
+					)}
+				</motion.span>
+			</AnimatePresence>
+		</motion.button>
+	);
+}
 
 export const ChannelCards = ({
 	channels,
@@ -190,61 +280,39 @@ export const ChannelCards = ({
 									className="flex items-center gap-2"
 									onClick={(e) => e.stopPropagation()}
 								>
-									<button
-										type="button"
-										disabled={!onToggleVisibility || isVisibilityPending}
-										onClick={() =>
-											void handleVisibilityClick(
-												channel.id,
-												isPublic ? "public" : "private",
-											)
-										}
-										aria-label={
-											isPublic
-												? "Make channel hidden"
-												: "Make channel public"
+									<ChannelToggleBadge
+										active={isPublic}
+										pending={isVisibilityPending}
+										activeLabel="Public"
+										inactiveLabel="Hidden"
+										activeIcon="globe"
+										inactiveIcon="lock"
+										pendingLabel="Updating..."
+										ariaLabel={
+											isPublic ? "Make channel hidden" : "Make channel public"
 										}
 										title={
 											isPublic
 												? "Click to hide channel"
 												: "Click to make public"
 										}
-										className={cn(
-											"flex items-center gap-1.5 rounded-full px-2.5 py-1 transition-all",
-											"hover:ring-1 hover:ring-stroke-soft-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-base/40",
-											"disabled:cursor-not-allowed disabled:opacity-60",
-											isPublic
-												? "bg-primary-base/10 text-primary-base hover:bg-primary-base/15"
-												: "bg-bg-weak-50 text-text-sub-600 hover:bg-bg-weak-50/80 dark:bg-white/5 dark:hover:bg-white/10",
-										)}
-									>
-										<Icon
-											name={isPublic ? "globe" : "lock"}
-											className={cn(
-												"h-3 w-3",
-												isVisibilityPending && "animate-pulse",
-											)}
-										/>
-										<span className="font-medium text-[10px] uppercase tracking-wider">
-											{isVisibilityPending
-												? "Updating..."
-												: isPublic
-													? "Public"
-													: "Hidden"}
-										</span>
-									</button>
-									<button
-										type="button"
-										disabled={
-											!onToggleDefaultSubscription || isSubscriptionPending
-										}
+										disabled={!onToggleVisibility}
 										onClick={() =>
-											void handleSubscriptionClick(
+											void handleVisibilityClick(
 												channel.id,
-												isOptIn ? "opt_in" : "opt_out",
+												isPublic ? "public" : "private",
 											)
 										}
-										aria-label={
+									/>
+									<ChannelToggleBadge
+										active={isOptIn}
+										pending={isSubscriptionPending}
+										activeLabel="Subscribed"
+										inactiveLabel="Unsubscribed"
+										activeIcon="check-circle"
+										inactiveIcon="cross-circle"
+										pendingLabel="Updating..."
+										ariaLabel={
 											isOptIn
 												? "Set default to unsubscribed"
 												: "Set default to subscribed"
@@ -254,30 +322,14 @@ export const ChannelCards = ({
 												? "Click to set default unsubscribed"
 												: "Click to set default subscribed"
 										}
-										className={cn(
-											"flex items-center gap-1.5 rounded-full px-2.5 py-1 transition-all",
-											"hover:ring-1 hover:ring-stroke-soft-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-base/40",
-											"disabled:cursor-not-allowed disabled:opacity-60",
-											isOptIn
-												? "bg-primary-base/10 text-primary-base hover:bg-primary-base/15"
-												: "bg-bg-weak-50 text-text-sub-600 hover:bg-bg-weak-50/80 dark:bg-white/5 dark:hover:bg-white/10",
-										)}
-									>
-										<Icon
-											name={isOptIn ? "check-circle" : "cross-circle"}
-											className={cn(
-												"h-3 w-3",
-												isSubscriptionPending && "animate-pulse",
-											)}
-										/>
-										<span className="font-medium text-[10px] uppercase tracking-wider">
-											{isSubscriptionPending
-												? "Updating..."
-												: isOptIn
-													? "Subscribed"
-													: "Unsubscribed"}
-										</span>
-									</button>
+										disabled={!onToggleDefaultSubscription}
+										onClick={() =>
+											void handleSubscriptionClick(
+												channel.id,
+												isOptIn ? "opt_in" : "opt_out",
+											)
+										}
+									/>
 								</div>
 							</div>
 						</div>
