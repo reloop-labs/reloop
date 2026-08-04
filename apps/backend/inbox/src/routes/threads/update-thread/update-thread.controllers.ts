@@ -1,5 +1,5 @@
 import { db } from "@reloop/db/client";
-import { emailThread } from "@reloop/db/schema";
+import { emailThread, inboundEmail } from "@reloop/db/schema";
 import { and, eq } from "drizzle-orm";
 import { createError } from "evlog";
 import { useLogger } from "evlog/elysia";
@@ -56,6 +56,19 @@ export async function updateThreadController(
 	}
 
 	await db.update(emailThread).set(updateData).where(eq(emailThread.id, id));
+
+	// Keep inbound messages aligned when read state changes via thread update
+	if (updates.isRead !== undefined) {
+		await db
+			.update(inboundEmail)
+			.set({ isRead: updates.isRead })
+			.where(
+				and(
+					eq(inboundEmail.threadId, id),
+					eq(inboundEmail.organizationId, organizationId),
+				),
+			);
+	}
 
 	log.info(`[THREAD] Updated thread ${id}: ${JSON.stringify(updateData)}`);
 	return {

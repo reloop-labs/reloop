@@ -169,8 +169,13 @@ export const AgentInboxContent = ({
 			setSelectedThreadId(id || null);
 			if (!id) return;
 			const thread = findThreadByListId(filteredThreads, id);
-			if (thread?.unread && thread.messageId) {
-				markMessageRead(thread.messageId, true).catch(() => {});
+			if (thread?.unread) {
+				const messageId = thread.messageId || thread.id;
+				if (messageId) {
+					markMessageRead(messageId, true, {
+						threadId: thread.threadId ?? null,
+					}).catch(() => {});
+				}
 			}
 		},
 		[setSelectedThreadId, filteredThreads, markMessageRead],
@@ -187,8 +192,11 @@ export const AgentInboxContent = ({
 			onNavigate: handleSelectThread,
 			onMarkRead: (id) => {
 				const thread = findThreadByListId(filteredThreads, id);
-				if (thread?.messageId) {
-					markMessageRead(thread.messageId, true).catch(() => {});
+				const messageId = thread?.messageId || thread?.id;
+				if (messageId) {
+					markMessageRead(messageId, true, {
+						threadId: thread?.threadId ?? null,
+					}).catch(() => {});
 				}
 			},
 			isCommandPaletteOpen: paletteOpen,
@@ -327,7 +335,9 @@ export const AgentInboxContent = ({
 			}
 			if (!selectedThread?.messageId && !selectedThread?.id) return;
 			const msgId = selectedThread.messageId ?? selectedThread.id;
-			void markMessageRead(msgId, false)
+			void markMessageRead(msgId, false, {
+				threadId: selectedThread.threadId ?? null,
+			})
 				.then(() => toast.success("Marked unread"))
 				.catch((err: unknown) =>
 					toast.error(err instanceof Error ? err.message : "Failed"),

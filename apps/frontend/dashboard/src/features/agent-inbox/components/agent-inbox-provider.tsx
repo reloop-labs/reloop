@@ -203,7 +203,11 @@ interface AgentInboxContextValue {
 	addMailbox: (input: NewAgentAddressInput) => Promise<AgentMailbox>;
 	updateMailboxDisplayName: (id: string, displayName: string) => Promise<void>;
 	refresh: () => Promise<void>;
-	markMessageRead: (id: string, isRead: boolean) => Promise<void>;
+	markMessageRead: (
+		id: string,
+		isRead: boolean,
+		options?: { threadId?: string | null },
+	) => Promise<void>;
 	deleteMessage: (id: string) => Promise<void>;
 	markMessageSpam: (id: string, isSpam: boolean) => Promise<void>;
 	toggleMessageStar: (id: string, isStarred: boolean) => Promise<void>;
@@ -576,6 +580,9 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 							return {
 								...base,
 								isStarred: base.isStarred || meta.isStarred,
+								// Message read state is source of truth for list rows; thread
+								// flag is also OR'd so bulk/thread-only updates still show unread.
+								// Both are kept in sync by the mark-read API.
 								unread: base.unread || !meta.isRead,
 								isImportant: meta.isImportant ?? base.isImportant,
 								isPinned: meta.isPinned ?? base.isPinned,
@@ -775,23 +782,65 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 	);
 
 	const markMessageRead = useCallback(
-		async (id: string, isRead: boolean) => {
-			const res = await fetch(`/api/inbox/v1/messages/${id}/read`, {
+		async (
+			id: string,
+			isRead: boolean,
+			options?: { threadId?: string | null },
+		) => {
+			const threadId = options?.threadId;
+
+			// Optimistic list update so the unread badge clears immediately on open
+			await mutateMessages(
+				(current) =>
+					current?.map((msg) => {
+						const sameMessage = msg.id === id;
+						const sameThread = threadId
+							? msg.threadId === threadId
+							: msg.threadId && msg.threadId === id;
+						if (sameMessage || sameThread) {
+							return { ...msg, isRead };
+						}
+						return msg;
+					}),
+				{ revalidate: false },
+			);
+			await mutateThreads(
+				(current) =>
+					current?.map((t) => {
+						if (t.id === threadId || t.id === id) {
+							return { ...t, isRead };
+						}
+						return t;
+					}),
+				{ revalidate: false },
+			);
+
+			// Prefer thread endpoint when we have a conversation id (marks whole thread).
+			// Fall back to message endpoint for unthreaded messages.
+			const endpoint =
+				threadId && threadId.startsWith("thr_")
+					? `/api/inbox/v1/threads/${encodeURIComponent(threadId)}/read`
+					: `/api/inbox/v1/messages/${encodeURIComponent(id)}/read`;
+
+			const res = await fetch(endpoint, {
 				method: "PATCH",
+				credentials: "include",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({ isRead }),
 			});
 
 			if (!res.ok) {
+				// Revalidate to roll back optimistic state
+				await Promise.all([mutateMessages(), mutateThreads()]);
 				const body = await res.text();
 				throw new Error(
 					body || `Failed to mark message as ${isRead ? "read" : "unread"}`,
 				);
 			}
 
-			await mutateMessages();
+			await Promise.all([mutateMessages(), mutateThreads()]);
 		},
-		[mutateMessages],
+		[mutateMessages, mutateThreads],
 	);
 
 	const deleteMessage = useCallback(

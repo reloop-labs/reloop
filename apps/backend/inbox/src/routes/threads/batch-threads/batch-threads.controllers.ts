@@ -122,12 +122,30 @@ export async function batchThreadsController(
 				.update(emailThread)
 				.set({ isRead: true })
 				.where(inArray(emailThread.id, foundIds));
+			await db
+				.update(inboundEmail)
+				.set({ isRead: true })
+				.where(
+					and(
+						inArray(inboundEmail.threadId, foundIds),
+						eq(inboundEmail.organizationId, organizationId),
+					),
+				);
 			break;
 		case "unread":
 			await db
 				.update(emailThread)
 				.set({ isRead: false })
 				.where(inArray(emailThread.id, foundIds));
+			await db
+				.update(inboundEmail)
+				.set({ isRead: false })
+				.where(
+					and(
+						inArray(inboundEmail.threadId, foundIds),
+						eq(inboundEmail.organizationId, organizationId),
+					),
+				);
 			break;
 		case "important":
 			await db

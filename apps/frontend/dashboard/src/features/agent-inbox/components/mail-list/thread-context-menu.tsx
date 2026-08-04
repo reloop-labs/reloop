@@ -198,7 +198,10 @@ export const ThreadContextMenu = ({
 					className={itemClass}
 					onSelect={() =>
 						void run(
-							() => markMessageRead(messageId, thread.unread),
+							() =>
+								markMessageRead(messageId, thread.unread, {
+									threadId: thread.threadId ?? null,
+								}),
 							thread.unread ? "Marked as read" : "Marked as unread",
 						)
 					}

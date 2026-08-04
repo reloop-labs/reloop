@@ -282,6 +282,19 @@ export const ThreadDetail = ({
 		setReplyTargetPerson(null);
 	}, [thread?.id]);
 
+	// Mark conversation read when the detail pane opens an unread thread.
+	// List selection also triggers this; this covers any path that mounts detail.
+	useEffect(() => {
+		if (!thread?.unread) return;
+		const id = thread.messageId || thread.id;
+		if (!id) return;
+		void markMessageRead(id, true, {
+			threadId: thread.threadId ?? null,
+		}).catch(() => {
+			// Non-blocking — list row may already have requested mark-read
+		});
+	}, [thread?.id, thread?.unread, thread?.messageId, thread?.threadId, markMessageRead]);
+
 	/** True while we have a threadId but not the full conversation yet. */
 	const awaitingFullThread =
 		!!thread?.threadId && isLoadingThread && !threadDataMatches;
@@ -660,7 +673,9 @@ export const ThreadDetail = ({
 	const handleToggleRead = async (isRead: boolean) => {
 		if (!thread || !messageId) return;
 		try {
-			await markMessageRead(messageId, isRead);
+			await markMessageRead(messageId, isRead, {
+				threadId: thread.threadId ?? null,
+			});
 			toast.success(isRead ? "Marked as Handled" : "Marked as Active");
 		} catch (err: any) {
 			toast.error(err.message || "Failed to update status");
