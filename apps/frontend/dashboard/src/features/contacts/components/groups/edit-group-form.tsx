@@ -13,6 +13,11 @@ import {
 	type Group,
 	useInvalidateContacts,
 } from "#/features/contacts/hooks/use-contacts-query";
+import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
+
+/** Light keycap so it reads on the blue FancyButton fill. */
+const actionKbdOnBlueClassName =
+	"border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]";
 
 interface EditGroupFormProps {
 	group: Group;
@@ -56,11 +61,11 @@ export function EditGroupForm({
 
 	useHotkeys(
 		"escape",
-		(e) => {
-			e.preventDefault();
+		() => {
 			if (status === "idle") onCancel();
 		},
-		{ enableOnFormTags: true },
+		{ enableOnFormTags: ["INPUT"] },
+		[status, onCancel],
 	);
 
 	const handleSubmit = async (e?: React.FormEvent) => {
@@ -152,16 +157,19 @@ export function EditGroupForm({
 					<Button.Root
 						type="button"
 						variant="neutral"
-						mode="ghost"
+						mode="stroke"
 						size="small"
 						onClick={onCancel}
 						disabled={status !== "idle"}
 						className={cn(
-							"transition-opacity duration-200",
+							"gap-1.5 transition-opacity duration-200",
 							status !== "idle" && "pointer-events-none opacity-50",
 						)}
 					>
 						Cancel
+						<ActionKbd className="lowercase! w-auto min-w-0 px-1">
+							esc
+						</ActionKbd>
 					</Button.Root>
 
 					<FancyButton.Root
@@ -200,16 +208,9 @@ export function EditGroupForm({
 								) : (
 									<>
 										Save changes
-										<span className="inline-flex items-center gap-0.5 opacity-80">
-											<Icon
-												name="command"
-												className="h-3.5 w-3.5 rounded-sm border border-white/20 p-px"
-											/>
-											<Icon
-												name="enter"
-												className="h-3.5 w-3.5 rounded-sm border border-white/20 p-px"
-											/>
-										</span>
+										<ActionKbd className={actionKbdOnBlueClassName}>
+											↵
+										</ActionKbd>
 									</>
 								)}
 							</motion.span>

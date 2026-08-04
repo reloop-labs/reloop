@@ -154,7 +154,7 @@ export function DeleteGroupConfirmModal({
 	};
 
 	useHotkeys(
-		["enter", "mod+enter"],
+		"enter",
 		(e) => {
 			e.preventDefault();
 			if (canDelete) void handleDelete();
@@ -302,15 +302,20 @@ export function DeleteGroupConfirmModal({
 					<Button.Root
 						type="button"
 						variant="neutral"
-						mode="ghost"
+						mode="stroke"
 						size="small"
-						onClick={() => void setDeleteId(null)}
+						onClick={() => {
+							if (deleteState === "idle") void setDeleteId(null);
+						}}
 						className={cn(
-							"transition-opacity duration-200",
+							"gap-1.5 transition-opacity duration-200",
 							deleteState !== "idle" && "pointer-events-none opacity-50",
 						)}
 					>
 						Cancel
+						<ActionKbd className="lowercase! w-auto min-w-0 px-1">
+							esc
+						</ActionKbd>
 					</Button.Root>
 
 					<FancyButton.Root

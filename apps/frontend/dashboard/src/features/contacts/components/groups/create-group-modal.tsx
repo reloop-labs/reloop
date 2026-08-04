@@ -10,6 +10,11 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { useInvalidateContacts } from "#/features/contacts/hooks/use-contacts-query";
+import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
+
+/** Light keycap so it reads on the blue FancyButton fill. */
+const actionKbdOnBlueClassName =
+	"border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]";
 
 interface CreateGroupModalProps {
 	open: boolean;
@@ -26,6 +31,7 @@ export const CreateGroupModal = ({
 	const [status, setStatus] = useState<"idle" | "creating" | "success">("idle");
 
 	const handleClose = () => {
+		if (status !== "idle") return;
 		setName("");
 		setError(null);
 		setStatus("idle");
@@ -53,7 +59,10 @@ export const CreateGroupModal = ({
 			setStatus("success");
 			setTimeout(() => {
 				void invalidate();
-				handleClose();
+				setName("");
+				setError(null);
+				setStatus("idle");
+				onOpenChange(false);
 			}, 750);
 		} catch (err) {
 			setError(err instanceof Error ? err.message : "Failed to create group");
@@ -73,6 +82,17 @@ export const CreateGroupModal = ({
 		[open, status, name],
 	);
 
+	useHotkeys(
+		"escape",
+		() => {
+			if (open && status === "idle") {
+				handleClose();
+			}
+		},
+		{ enableOnFormTags: ["INPUT"], enabled: open },
+		[open, status],
+	);
+
 	useEffect(() => {
 		if (!open) {
 			const timer = setTimeout(() => {
@@ -88,18 +108,16 @@ export const CreateGroupModal = ({
 		<Modal.Root open={open} onOpenChange={(o) => !o && handleClose()}>
 			<Modal.Content
 				className="overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 sm:max-w-[460px] dark:border-stroke-soft-100/40"
-				showClose={true}
+				showClose={false}
 			>
 				<motion.div
 					layout
 					transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
 				>
 					<div className="p-6">
-						<div className="relative pr-6">
-							<Modal.Title className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
-								Create group
-							</Modal.Title>
-						</div>
+						<Modal.Title className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
+							Create group
+						</Modal.Title>
 
 						<form onSubmit={handleSubmit} className="mt-5">
 							<div className="space-y-2">
@@ -136,15 +154,18 @@ export const CreateGroupModal = ({
 								<Button.Root
 									type="button"
 									variant="neutral"
-									mode="ghost"
+									mode="stroke"
 									size="small"
 									onClick={handleClose}
 									className={cn(
-										"transition-opacity duration-200",
+										"gap-1.5 transition-opacity duration-200",
 										status !== "idle" && "pointer-events-none opacity-50",
 									)}
 								>
 									Cancel
+									<ActionKbd className="lowercase! w-auto min-w-0 px-1">
+										esc
+									</ActionKbd>
 								</Button.Root>
 
 								<FancyButton.Root
@@ -186,16 +207,9 @@ export const CreateGroupModal = ({
 											) : (
 												<>
 													Create group
-													<span className="inline-flex items-center gap-0.5 opacity-80">
-														<Icon
-															name="command"
-															className="h-3.5 w-3.5 rounded-sm border border-white/20 p-px"
-														/>
-														<Icon
-															name="enter"
-															className="h-3.5 w-3.5 rounded-sm border border-white/20 p-px"
-														/>
-													</span>
+													<ActionKbd className={actionKbdOnBlueClassName}>
+														↵
+													</ActionKbd>
 												</>
 											)}
 										</motion.span>

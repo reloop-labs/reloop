@@ -24,18 +24,16 @@ export const EditGroupModal = ({
 		<Modal.Root open={open} onOpenChange={(o) => !o && handleClose()}>
 			<Modal.Content
 				className="overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 sm:max-w-[460px] dark:border-stroke-soft-100/40"
-				showClose={true}
+				showClose={false}
 			>
 				<motion.div
 					layout
 					transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
 				>
 					<div className="p-6">
-						<div className="relative mb-5 pr-6">
-							<Modal.Title className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
-								Edit group
-							</Modal.Title>
-						</div>
+						<Modal.Title className="mb-5 font-semibold text-[26px] text-text-strong-950 tracking-tight">
+							Edit group
+						</Modal.Title>
 
 						<EditGroupForm
 							group={group}

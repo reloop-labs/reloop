@@ -6,19 +6,18 @@ import * as Modal from "@reloop/ui/modal";
 import { Skeleton } from "@reloop/ui/skeleton";
 import Spinner from "@reloop/ui/spinner";
 import { useQuery } from "@tanstack/react-query";
-import {
-	AnimatePresence,
-	type AnimationPlaybackControls,
-	animate,
-	motion,
-	useMotionValue,
-} from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import {
 	type Group,
 	useInvalidateContacts,
 } from "#/features/contacts/hooks/use-contacts-query";
+import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
+
+/** Light keycap so it reads on the destructive FancyButton fill. */
+const actionKbdOnBlueClassName =
+	"border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]";
 
 interface DeleteGroupModalProps {
 	open: boolean;
@@ -36,9 +35,6 @@ export const DeleteGroupModal = ({
 	onDeleteSuccess,
 }: DeleteGroupModalProps) => {
 	const [deleteState, setDeleteState] = useState<DeleteState>("idle");
-	const [isHolding, setIsHolding] = useState(false);
-	const holdProgress = useMotionValue(0);
-	const animationRef = useRef<AnimationPlaybackControls | null>(null);
 	const invalidate = useInvalidateContacts();
 
 	// Cache the target group so details remain stable during deletion animations
@@ -100,34 +96,9 @@ export const DeleteGroupModal = ({
 					targetGroupRef.current = null;
 				}, 300);
 			}, 900);
-		} catch (error) {
+		} catch {
 			setDeleteState("idle");
 		}
-	};
-
-	const startHold = () => {
-		if (deleteState !== "idle") return;
-		setIsHolding(true);
-		holdProgress.set(0);
-		animationRef.current = animate(holdProgress, 1, {
-			duration: 1.2,
-			ease: "linear",
-			onComplete: () => {
-				setIsHolding(false);
-				holdProgress.set(0);
-				void handleDelete();
-			},
-		});
-	};
-
-	const cancelHold = () => {
-		if (!isHolding && holdProgress.get() === 0) return;
-		setIsHolding(false);
-		animationRef.current?.stop();
-		animate(holdProgress, 0, {
-			duration: 0.2,
-			ease: "easeOut",
-		});
 	};
 
 	useHotkeys(
@@ -142,9 +113,19 @@ export const DeleteGroupModal = ({
 		[open, groupToDelete, deleteState],
 	);
 
+	useHotkeys(
+		"escape",
+		() => {
+			if (open && deleteState === "idle") {
+				onOpenChange(false);
+			}
+		},
+		{ enabled: open },
+		[open, deleteState],
+	);
+
 	useEffect(() => {
 		if (!open) {
-			cancelHold();
 			const timer = setTimeout(() => {
 				setDeleteState("idle");
 				targetGroupRef.current = null;
@@ -154,7 +135,7 @@ export const DeleteGroupModal = ({
 	}, [open]);
 
 	const handleCancel = () => {
-		cancelHold();
+		if (deleteState !== "idle") return;
 		onOpenChange(false);
 	};
 
@@ -162,14 +143,14 @@ export const DeleteGroupModal = ({
 		<Modal.Root open={open} onOpenChange={(o) => !o && handleCancel()}>
 			<Modal.Content
 				className="overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 p-6 sm:max-w-[460px] dark:border-stroke-soft-100/40"
-				showClose={true}
+				showClose={false}
 			>
 				<motion.div
 					layout
 					transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
 				>
 					{/* Header */}
-					<div className="pr-6">
+					<div>
 						<Modal.Title className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
 							Delete group
 						</Modal.Title>
@@ -219,36 +200,31 @@ export const DeleteGroupModal = ({
 						<Button.Root
 							type="button"
 							variant="neutral"
-							mode="ghost"
+							mode="stroke"
 							size="small"
 							onClick={handleCancel}
 							className={cn(
-								"transition-opacity duration-200",
+								"gap-1.5 transition-opacity duration-200",
 								deleteState !== "idle" && "pointer-events-none opacity-50",
 							)}
 						>
 							Cancel
+							<ActionKbd className="lowercase! w-auto min-w-0 px-1">
+								esc
+							</ActionKbd>
 						</Button.Root>
 
 						<FancyButton.Root
 							type="button"
 							variant="destructive"
 							size="small"
-							onPointerDown={startHold}
-							onPointerUp={cancelHold}
-							onPointerLeave={cancelHold}
-							onPointerCancel={cancelHold}
+							onClick={() => void handleDelete()}
+							disabled={deleteState !== "idle"}
 							className={cn(
 								"relative min-w-[134px] select-none justify-center overflow-hidden transition-all duration-200",
 								deleteState !== "idle" && "pointer-events-none opacity-90",
 							)}
 						>
-							{/* Hold progress overlay fill */}
-							<motion.div
-								className="pointer-events-none absolute inset-0 origin-left bg-white/25"
-								style={{ scaleX: holdProgress }}
-							/>
-
 							<AnimatePresence mode="popLayout" initial={false}>
 								<motion.span
 									key={deleteState}
@@ -276,7 +252,12 @@ export const DeleteGroupModal = ({
 											<span>Deleted</span>
 										</>
 									) : (
-										<span>Hold to delete</span>
+										<>
+											<span>Delete</span>
+											<ActionKbd className={actionKbdOnBlueClassName}>
+												↵
+											</ActionKbd>
+										</>
 									)}
 								</motion.span>
 							</AnimatePresence>
