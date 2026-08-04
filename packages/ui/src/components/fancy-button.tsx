@@ -46,8 +46,8 @@ export const fancyButtonVariants = tv({
 				root: [
 					// base
 					"bg-bg-white-0 text-text-sub-600 shadow-fancy-buttons-stroke",
-					// hover
-					"hover:bg-bg-weak-50 hover:text-text-strong-950 hover:shadow-none",
+					// hover — match Button neutral/stroke (keep stroke, soft fill)
+					"hover:bg-bg-weak-50/60 hover:text-text-strong-950",
 				],
 			},
 			ghost: {

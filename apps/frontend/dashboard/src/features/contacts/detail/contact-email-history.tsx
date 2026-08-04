@@ -2,9 +2,24 @@
 
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import { useInfiniteQuery } from "@tanstack/react-query";
+import type { LucideIcon } from "lucide-react";
+import {
+	Activity,
+	Bell,
+	Boxes,
+	History,
+	Layers,
+	Mail,
+	Minus,
+	Pencil,
+	Plus,
+	User,
+	Users,
+} from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { queryKeys } from "#/lib/query-keys";
@@ -80,10 +95,14 @@ type TimelineItem =
 
 type ActivityFilter = "all" | "changes" | "emails";
 
-const ACTIVITY_FILTERS: { id: ActivityFilter; label: string }[] = [
-	{ id: "all", label: "All" },
-	{ id: "changes", label: "Changes" },
-	{ id: "emails", label: "Emails" },
+const ACTIVITY_FILTERS: {
+	id: ActivityFilter;
+	label: string;
+	icon: LucideIcon;
+}[] = [
+	{ id: "all", label: "All", icon: Layers },
+	{ id: "changes", label: "Changes", icon: History },
+	{ id: "emails", label: "Emails", icon: Mail },
 ];
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -117,29 +136,45 @@ function formatCompactTime(date: string | Date): string {
 	return `${Math.floor(diffMonth / 12)}y ago`;
 }
 
-/** Resource type → icon used next to the target name */
-const RESOURCE_ICON = {
-	group: "users",
-	channel: "notification-indicator",
-	property: "modules",
-	name: "user",
-	email: "mail-single",
-	status: "activity",
-	profile: "edit",
-	mail: "mail-single",
-} as const;
+/**
+ * Resource type → Lucide icon (sprite `users` is a calendar-user glyph,
+ * not a multi-person group icon — use lucide Users like the groups UI).
+ */
+type ResourceKind =
+	| "group"
+	| "channel"
+	| "property"
+	| "name"
+	| "email"
+	| "status"
+	| "profile"
+	| "mail";
+
+const RESOURCE_ICON: Record<ResourceKind, LucideIcon> = {
+	group: Users,
+	channel: Bell,
+	property: Boxes,
+	name: User,
+	email: Mail,
+	status: Activity,
+	profile: Pencil,
+	mail: Mail,
+};
 
 type ActivityTarget = {
 	label: string;
-	icon?: string;
+	/** What kind of resource this target is — drives the icon */
+	resource: ResourceKind;
 	href?: string;
 };
+
+type ActivityMarker = "arrow" | "circle" | "plus" | "minus";
 
 type ActivityDescription = {
 	phrase: string;
 	/** One or more targets (group, property value, etc.) each with the right icon */
 	targets: ActivityTarget[];
-	marker: "arrow" | "circle";
+	marker: ActivityMarker;
 };
 
 /** Resolve group display name from changes or raw metadata. */
@@ -188,32 +223,26 @@ function describeHistory(entry: HistoryEntry): ActivityDescription {
 
 	switch (entry.action) {
 		case "created":
-			return { phrase: "Contact created", targets: [], marker: "circle" };
+			return { phrase: "Contact created", targets: [], marker: "plus" };
 		case "deleted":
-			return { phrase: "Contact deleted", targets: [], marker: "circle" };
+			return { phrase: "Contact deleted", targets: [], marker: "minus" };
 		case "added_to_group":
 			return {
 				phrase: "Added to",
-				targets: [
-					{ label: groupLabel(entry), icon: RESOURCE_ICON.group },
-				],
-				marker: "arrow",
+				targets: [{ label: groupLabel(entry), resource: "group" }],
+				marker: "plus",
 			};
 		case "removed_from_group":
 			return {
 				phrase: "Removed from",
-				targets: [
-					{ label: groupLabel(entry), icon: RESOURCE_ICON.group },
-				],
-				marker: "arrow",
+				targets: [{ label: groupLabel(entry), resource: "group" }],
+				marker: "minus",
 			};
 		case "added_to_channel":
 			return {
 				phrase: "Opted in to",
-				targets: [
-					{ label: channelLabel(entry), icon: RESOURCE_ICON.channel },
-				],
-				marker: "arrow",
+				targets: [{ label: channelLabel(entry), resource: "channel" }],
+				marker: "plus",
 			};
 		case "updated_channel": {
 			const to = String(sub?.to ?? "").toLowerCase();
@@ -224,8 +253,8 @@ function describeHistory(entry: HistoryEntry): ActivityDescription {
 				to === "unsubscribed";
 			return {
 				phrase: isOut ? "Opted out of" : "Opted in to",
-				targets: [{ label, icon: RESOURCE_ICON.channel }],
-				marker: "arrow",
+				targets: [{ label, resource: "channel" }],
+				marker: isOut ? "minus" : "plus",
 			};
 		}
 		case "updated": {
@@ -251,7 +280,7 @@ function describeHistory(entry: HistoryEntry): ActivityDescription {
 					phrase: "Name updated",
 					targets:
 						parts.length > 0
-							? [{ label: parts.join(" "), icon: RESOURCE_ICON.name }]
+							? [{ label: parts.join(" "), resource: "name" }]
 							: [],
 					marker: "arrow",
 				};
@@ -266,7 +295,7 @@ function describeHistory(entry: HistoryEntry): ActivityDescription {
 						? [
 								{
 									label: formatChangeValue(email.to),
-									icon: RESOURCE_ICON.email,
+									resource: "email",
 								},
 							]
 						: [],
@@ -283,7 +312,7 @@ function describeHistory(entry: HistoryEntry): ActivityDescription {
 						? [
 								{
 									label: formatChangeValue(status.to),
-									icon: RESOURCE_ICON.status,
+									resource: "status",
 								},
 							]
 						: [],
@@ -291,7 +320,7 @@ function describeHistory(entry: HistoryEntry): ActivityDescription {
 				};
 			}
 
-			// Custom properties — show each property with modules icon
+			// Custom properties — each with property icon
 			const propertyChanges = changes.filter((c) =>
 				c.field.startsWith("properties."),
 			);
@@ -308,7 +337,7 @@ function describeHistory(entry: HistoryEntry): ActivityDescription {
 						targets: [
 							{
 								label: value !== "—" ? `${propName}: ${value}` : propName,
-								icon: RESOURCE_ICON.property,
+								resource: "property",
 							},
 						],
 						marker: "arrow",
@@ -318,77 +347,77 @@ function describeHistory(entry: HistoryEntry): ActivityDescription {
 					phrase: "Properties updated",
 					targets: propertyChanges.slice(0, 3).map((c) => ({
 						label: c.label ?? c.field.replace("properties.", ""),
-						icon: RESOURCE_ICON.property,
+						resource: "property",
 					})),
 					marker: "arrow",
 				};
 			}
 
-			// Mixed / generic field update — pick icon from field type
+			// Single field — pick resource from field type
 			if (fields.size === 1) {
 				const c = changes[0]!;
-				const icon = c.field.startsWith("properties.")
-					? RESOURCE_ICON.property
+				const resource: ResourceKind = c.field.startsWith("properties.")
+					? "property"
 					: c.field === "email"
-						? RESOURCE_ICON.email
+						? "email"
 						: c.field === "status"
-							? RESOURCE_ICON.status
+							? "status"
 							: c.field === "group"
-								? RESOURCE_ICON.group
+								? "group"
 								: c.field === "channel"
-									? RESOURCE_ICON.channel
-									: RESOURCE_ICON.profile;
+									? "channel"
+									: "profile";
 				return {
 					phrase: `${c.label ?? "Field"} updated`,
 					targets:
 						c.to !== null
-							? [{ label: formatChangeValue(c.to), icon }]
+							? [{ label: formatChangeValue(c.to), resource }]
 							: [],
 					marker: "arrow",
 				};
 			}
 
-			// Mixed update: render a target per change type
+			// Mixed update: one target per change with matching resource icon
 			const targets: ActivityTarget[] = changes.slice(0, 4).map((c) => {
 				if (c.field.startsWith("properties.")) {
 					return {
 						label: c.label ?? c.field.replace("properties.", ""),
-						icon: RESOURCE_ICON.property,
+						resource: "property" as const,
 					};
 				}
 				if (c.field === "email") {
 					return {
 						label: formatChangeValue(c.to),
-						icon: RESOURCE_ICON.email,
+						resource: "email" as const,
 					};
 				}
 				if (c.field === "status") {
 					return {
 						label: formatChangeValue(c.to),
-						icon: RESOURCE_ICON.status,
+						resource: "status" as const,
 					};
 				}
 				if (c.field === "firstName" || c.field === "lastName") {
 					return {
 						label: formatChangeValue(c.to),
-						icon: RESOURCE_ICON.name,
+						resource: "name" as const,
 					};
 				}
 				if (c.field === "group") {
 					return {
 						label: formatChangeValue(c.to ?? c.from),
-						icon: RESOURCE_ICON.group,
+						resource: "group" as const,
 					};
 				}
 				if (c.field === "channel") {
 					return {
 						label: formatChangeValue(c.to ?? c.from),
-						icon: RESOURCE_ICON.channel,
+						resource: "channel" as const,
 					};
 				}
 				return {
 					label: formatChangeValue(c.to ?? c.label ?? c.field),
-					icon: RESOURCE_ICON.profile,
+					resource: "profile" as const,
 				};
 			});
 
@@ -424,7 +453,7 @@ function describeEmail(entry: ActivityEntry): ActivityDescription {
 		targets: [
 			{
 				label: subject,
-				icon: RESOURCE_ICON.mail,
+				resource: "mail",
 				href: `/emails/${entry.id}`,
 			},
 		],
@@ -474,7 +503,7 @@ function SpineMarker({
 	marker,
 	isLast,
 }: {
-	marker: "arrow" | "circle";
+	marker: ActivityMarker;
 	isLast: boolean;
 }) {
 	return (
@@ -482,6 +511,14 @@ function SpineMarker({
 			<div className="relative z-10 flex h-5 w-5 items-center justify-center text-text-soft-400">
 				{marker === "circle" ? (
 					<span className="block h-2 w-2 rounded-full border border-text-soft-400 dark:border-white/35" />
+				) : marker === "plus" ? (
+					<span className="flex size-5 items-center justify-center rounded-full bg-bg-weak-50 text-text-sub-600 dark:bg-white/10">
+						<Plus className="size-3" aria-hidden strokeWidth={2} />
+					</span>
+				) : marker === "minus" ? (
+					<span className="flex size-5 items-center justify-center rounded-full bg-bg-weak-50 text-text-sub-600 dark:bg-white/10">
+						<Minus className="size-3" aria-hidden strokeWidth={2} />
+					</span>
 				) : (
 					<Icon name="arrow-up-right" className="h-3.5 w-3.5" />
 				)}
@@ -497,6 +534,7 @@ function SpineMarker({
 }
 
 function TargetLink({ target }: { target: ActivityTarget }) {
+	const LucideIcon = RESOURCE_ICON[target.resource];
 	// Icon sits outside the underline so group/channel icons stay clear
 	const label = (
 		<span className="truncate font-medium text-text-strong-950 underline decoration-stroke-soft-200 decoration-dashed underline-offset-[5px] transition-colors group-hover:text-primary-base group-hover:decoration-primary-base/50 dark:decoration-white/25">
@@ -506,13 +544,10 @@ function TargetLink({ target }: { target: ActivityTarget }) {
 
 	const inner = (
 		<span className="group inline-flex max-w-[260px] items-center gap-1.5">
-			{target.icon ? (
-				<Icon
-					name={target.icon as Parameters<typeof Icon>[0]["name"]}
-					className="h-3.5 w-3.5 shrink-0 text-text-sub-600"
-					aria-hidden
-				/>
-			) : null}
+			<LucideIcon
+				className="h-3.5 w-3.5 shrink-0 text-text-sub-600"
+				aria-hidden
+			/>
 			{label}
 		</span>
 	);
@@ -529,8 +564,9 @@ function TargetLink({ target }: { target: ActivityTarget }) {
 
 /**
  * Reference row:
- * ↗  Added to  👥 General          4h ago
- * ○  Contact created               4h ago
+ * +  Added to  👥 General          4h ago
+ * −  Removed from  👥 General      4h ago
+ * ↗  Profile updated               4h ago
  */
 function ActivityLine({
 	isLast,
@@ -543,7 +579,7 @@ function ActivityLine({
 	isLast: boolean;
 	phrase: string;
 	targets?: ActivityTarget[];
-	marker: "arrow" | "circle";
+	marker: ActivityMarker;
 	timestamp: string;
 	href?: string;
 }) {
@@ -632,7 +668,7 @@ function ContactCreatedRow({
 		<ActivityLine
 			isLast={isLast}
 			phrase="Contact created"
-			marker="circle"
+			marker="plus"
 			timestamp={timestamp}
 		/>
 	);
@@ -788,7 +824,7 @@ export function ContactEmailHistory({
 
 	return (
 		<div className="mt-12 pb-12">
-			{/* Section header */}
+			{/* Section header + fancy filter buttons */}
 			<div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
 				<div className="flex items-center gap-2">
 					<h3 className="font-semibold text-[15px] text-text-strong-950 tracking-tight">
@@ -802,7 +838,7 @@ export function ContactEmailHistory({
 				</div>
 
 				<div
-					className="flex flex-wrap gap-1"
+					className="flex flex-wrap items-center gap-2"
 					role="tablist"
 					aria-label="Activity filters"
 				>
@@ -814,39 +850,43 @@ export function ContactEmailHistory({
 								: chip.id === "emails"
 									? emailTotal
 									: changesTotal;
+						const FilterIcon = chip.icon;
 						return (
-							<button
+							<FancyButton.Root
 								key={chip.id}
 								type="button"
 								role="tab"
 								aria-selected={active}
 								onClick={() => setFilter(chip.id)}
-								className={cn(
-									"rounded-full px-2.5 py-1 font-medium text-[12px] transition-colors",
-									active
-										? "bg-text-strong-950 text-bg-white-0 dark:bg-white dark:text-black"
-										: "bg-bg-weak-50 text-text-sub-600 hover:bg-bg-soft-200 hover:text-text-strong-950 dark:bg-white/[0.05] dark:hover:bg-white/[0.08]",
-								)}
+								variant={active ? "neutral" : "basic"}
+								size="xsmall"
+								className="gap-1.5"
 							>
-								{chip.label}
+								<FancyButton.Icon
+									as={FilterIcon}
+									className="size-3.5"
+									aria-hidden
+								/>
+								<span className="relative z-10">{chip.label}</span>
 								{!isLoading && count > 0 ? (
 									<span
 										className={cn(
-											"ml-1.5 tabular-nums",
-											active ? "opacity-70" : "text-text-soft-400",
+											"relative z-10 ml-0.5 inline-flex min-w-[1.1rem] items-center justify-center rounded-full px-1.5 py-px text-[11px] tabular-nums leading-4",
+											active
+												? "bg-white/15 text-white/85 dark:bg-black/10 dark:text-black/70"
+												: "bg-bg-weak-50 text-text-soft-400 dark:bg-white/[0.06]",
 										)}
 									>
 										{count}
 									</span>
 								) : null}
-							</button>
+							</FancyButton.Root>
 						);
 					})}
 				</div>
 			</div>
 
-			{/* Card shell matching reference */}
-			<div className="rounded-2xl border border-stroke-soft-100 bg-bg-white-0 px-4 py-4 dark:border-white/10 dark:bg-white/[0.02]">
+			<div>
 				{isLoading ? (
 					<ActivitySkeleton />
 				) : isError ? (

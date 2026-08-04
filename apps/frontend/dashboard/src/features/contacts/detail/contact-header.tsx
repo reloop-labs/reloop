@@ -18,7 +18,6 @@ import {
 	getStatusLabel,
 } from "#/features/contacts/audience";
 import type { ContactDetail } from "#/features/contacts/hooks/use-contacts-query";
-import { AnimatedBackButton } from "#/features/dashboard/animated-back-button";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import { formatRelativeTime } from "#/utils/format-relative-time";
 import { DeleteContactModal } from "../components/contacts/delete-contact-modal";
@@ -106,8 +105,7 @@ export const ContactHeader = ({
 	if (!contact && !isLoading) {
 		return (
 			<div className="pt-10 pb-8">
-				<AnimatedBackButton onClick={() => router.push("/contacts")} />
-				<div className="flex items-center justify-between pt-6">
+				<div className="flex items-center justify-between">
 					<div>
 						<div className="flex items-center gap-1.5">
 							<p className="font-medium text-paragraph-xs text-text-sub-600">
@@ -139,8 +137,7 @@ export const ContactHeader = ({
 	return (
 		<>
 			<div className="pt-10 pb-8">
-				<AnimatedBackButton onClick={() => router.push("/contacts")} />
-				<div className="flex items-center justify-between pt-6">
+				<div className="flex items-center justify-between">
 					<div>
 						{isLoading ? (
 							<Skeleton className="mt-2 h-7 w-48 rounded-lg" />
