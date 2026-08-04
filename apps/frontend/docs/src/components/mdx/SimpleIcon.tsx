@@ -1,5 +1,6 @@
 "use client";
 
+import { JAVA_ICON } from "@reloop/ui/icons/java";
 import type { SVGProps } from "react";
 import type { SimpleIcon as SimpleIconType } from "simple-icons";
 import {
@@ -127,9 +128,32 @@ export function SimpleIcon({
 			);
 		}
 
+		// Multi-color Java mark (cup + steam)
+		if (
+			iconKey === "siOpenjdk" ||
+			iconKey === "siJava" ||
+			name.toLowerCase() === "java"
+		) {
+			return (
+				<svg
+					role="img"
+					viewBox={JAVA_ICON.viewBox}
+					width={size}
+					height={size}
+					xmlns="http://www.w3.org/2000/svg"
+					className="size-6 shrink-0"
+					{...props}
+				>
+					<title>Java</title>
+					{JAVA_ICON.layers.map((layer) => (
+						<path key={layer.d.slice(0, 24)} d={layer.d} fill={layer.fill} />
+					))}
+				</svg>
+			);
+		}
+
 		// Rust brand hex is #000000 — use red so the gear is visible on dark UI
-		const resolvedHex =
-			iconKey === "siRust" ? "e24d2b" : icon.hex;
+		const resolvedHex = iconKey === "siRust" ? "e24d2b" : icon.hex;
 
 		return (
 			<svg

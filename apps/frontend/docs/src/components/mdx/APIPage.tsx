@@ -5,6 +5,7 @@ import { useApiLanguage } from "@reloop/fe-docs/lib/use-api-language";
 import { cn } from "@reloop/ui/cn";
 import { CodeBlock } from "@reloop/ui/code-block";
 import { CopyCodeBlock } from "@reloop/ui/copy-code-block";
+import { JAVA_ICON } from "@reloop/ui/icons/java";
 import { Check, ChevronDown, Copy } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
@@ -13,7 +14,6 @@ import {
 	siGo,
 	siJson,
 	siNodedotjs,
-	siOpenjdk,
 	siPhp,
 	siPython,
 	siRuby,
@@ -533,7 +533,7 @@ const LANGUAGE_ICONS: Record<string, any> = {
 	go: siGo,
 	// Brand hex is #000000 — override so the gear stays visible on dark UI
 	rust: { path: siRust.path, hex: "e24d2b" },
-	java: siOpenjdk,
+	java: JAVA_ICON,
 	dotnet: siDotnet,
 	csharp: siDotnet,
 	curl: siGnubash,
@@ -557,10 +557,8 @@ function getIconForSample(sampleId: string, lang: string) {
 		hex = "e24d2b"; // red — brand black is invisible on dark UI
 	}
 
-	return {
-		path: icon.path,
-		hex: hex,
-	};
+	// Spread so multi-color marks keep viewBox + layers (Java is 512-space paths)
+	return { ...icon, path: icon.path, hex };
 }
 
 const STATUS_LABELS: Record<string, string> = {

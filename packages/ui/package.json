@@ -23,6 +23,7 @@
 		"./use-tab-observer": "./src/hooks/use-tab-observer.ts",
 		"./code-block": "./src/components/code-block.tsx",
 		"./copy-code-block": "./src/components/copy-code-block.tsx",
+		"./icons/java": "./src/icons/java-icon.ts",
 		"./utils/to-bright-lang": "./src/utils/to-bright-lang.ts",
 		"./button": "./src/components/button.tsx",
 		"./button-group": "./src/components/button-group.tsx",

@@ -2,6 +2,7 @@
 
 import { useApiLanguage } from "@reloop/fe-docs/lib/use-api-language";
 import { CopyCodeBlock } from "@reloop/ui/copy-code-block";
+import { JAVA_ICON } from "@reloop/ui/icons/java";
 import {
 	siDotnet,
 	siElixir,
@@ -9,7 +10,6 @@ import {
 	siGo,
 	siJson,
 	siNodedotjs,
-	siOpenjdk,
 	siPhp,
 	siPython,
 	siRuby,
@@ -37,7 +37,7 @@ const LANGUAGE_ICONS: Record<string, { path: string; hex: string }> = {
 	go: siGo,
 	// Brand hex is #000000 — override so the gear stays visible on dark UI
 	rust: { path: siRust.path, hex: "e24d2b" },
-	java: siOpenjdk,
+	java: JAVA_ICON,
 	dotnet: siDotnet,
 	csharp: siDotnet,
 	curl: siGnubash,
@@ -62,7 +62,7 @@ function getIconForSample(sampleId: string, lang: string) {
 		hex = "e24d2b";
 	}
 
-	return { path: icon.path, hex };
+	return { ...icon, path: icon.path, hex };
 }
 
 export function CodeSamples({ samples }: { samples: LearnCodeSample[] }) {

@@ -2,12 +2,12 @@ import fs from "node:fs";
 import path from "node:path";
 import { ImageResponse } from "next/og";
 import type { NextRequest } from "next/server";
+import { JAVA_ICON } from "@reloop/ui/icons/java";
 import {
 	siCurl,
 	siDotnet,
 	siGo,
 	siNodedotjs,
-	siOpenjdk,
 	siPhp,
 	siPython,
 	siRuby,
@@ -733,15 +733,16 @@ export async function GET(request: NextRequest) {
 						>
 							<path d={siRust.path} />
 						</svg>
-						{/* Java */}
+						{/* Java — multi-color cup + steam */}
 						<svg
 							width="34"
 							height="34"
-							viewBox="0 0 24 24"
-							fill="#ED8B00"
+							viewBox={JAVA_ICON.viewBox}
 							xmlns="http://www.w3.org/2000/svg"
 						>
-							<path d={siOpenjdk.path} />
+							{JAVA_ICON.layers.map((layer) => (
+								<path key={layer.d.slice(0, 24)} d={layer.d} fill={layer.fill} />
+							))}
 						</svg>
 						{/* .NET */}
 						<svg

@@ -12,6 +12,7 @@ import {
 } from "@mintlify/components";
 import { useApiLanguage } from "@reloop/fe-docs/lib/use-api-language";
 import { CopyCodeBlock } from "@reloop/ui/copy-code-block";
+import { JAVA_ICON } from "@reloop/ui/icons/java";
 import { useRouter } from "next/navigation";
 import React from "react";
 import {
@@ -21,7 +22,6 @@ import {
 	siGo,
 	siJson,
 	siNodedotjs,
-	siOpenjdk,
 	siPhp,
 	siPython,
 	siRuby,
@@ -42,7 +42,7 @@ const LANGUAGE_ICONS: Record<string, any> = {
 	go: siGo,
 	// Brand hex is #000000 — override so the gear stays visible on dark UI
 	rust: { path: siRust.path, hex: "e24d2b" },
-	java: siOpenjdk,
+	java: JAVA_ICON,
 	dotnet: siDotnet,
 	csharp: siDotnet,
 	curl: siGnubash,
@@ -67,10 +67,7 @@ function getIconForSample(label: string, lang: string) {
 		hex = "e24d2b"; // red — brand black is invisible on dark UI
 	}
 
-	return {
-		path: icon.path,
-		hex: hex,
-	};
+	return { ...icon, path: icon.path, hex };
 }
 
 /** Map title/lang to the same language ids used by API reference (`reloop-api-lang`). */

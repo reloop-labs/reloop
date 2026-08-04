@@ -11,7 +11,47 @@ import { BrightCode } from "./bright-code";
 export type CopyCodeBlockIcon = {
 	path: string;
 	hex: string;
+	viewBox?: string;
+	layers?: ReadonlyArray<{ d: string; fill: string }>;
 };
+
+function BrandLanguageIcon({
+	icon,
+	className,
+}: {
+	icon: CopyCodeBlockIcon;
+	className?: string;
+}) {
+	const viewBox = icon.viewBox ?? "0 0 24 24";
+	if (icon.layers && icon.layers.length > 0) {
+		return (
+			<svg
+				role="img"
+				viewBox={viewBox}
+				className={className}
+				xmlns="http://www.w3.org/2000/svg"
+				aria-hidden
+			>
+				{icon.layers.map((layer) => (
+					<path key={layer.d.slice(0, 24)} d={layer.d} fill={layer.fill} />
+				))}
+			</svg>
+		);
+	}
+	return (
+		<svg
+			role="img"
+			viewBox={viewBox}
+			className={className}
+			fill="currentColor"
+			xmlns="http://www.w3.org/2000/svg"
+			style={{ color: `#${icon.hex}` }}
+			aria-hidden
+		>
+			<path d={icon.path} />
+		</svg>
+	);
+}
 
 export type CopyCodeBlockTab = {
 	id: string;
@@ -258,19 +298,10 @@ export function CopyCodeBlock({
 											: "text-text-sub-600 dark:text-white/70",
 									)}
 								>
-									<svg
-										viewBox="0 0 24 24"
-										className={cn(
-											"size-3.5 shrink-0 transition-colors",
-											isActive ? "" : "text-text-strong-950 dark:text-white",
-										)}
-										fill="currentColor"
-										xmlns="http://www.w3.org/2000/svg"
-										style={{ color: isActive ? brandColor : undefined }}
-										aria-hidden="true"
-									>
-										<path d={tab.si.path} />
-									</svg>
+									<BrandLanguageIcon
+										icon={tab.si}
+										className="size-3.5 shrink-0"
+									/>
 									{tab.label}
 								</button>
 							);
@@ -333,15 +364,10 @@ export function CopyCodeBlock({
 							<>
 								{icon ||
 									(si && (
-										<svg
-											viewBox="0 0 24 24"
-											className="size-3.5 shrink-0 text-text-strong-950 dark:text-white"
-											fill="currentColor"
-											xmlns="http://www.w3.org/2000/svg"
-											aria-hidden="true"
-										>
-											<path d={si.path} />
-										</svg>
+										<BrandLanguageIcon
+											icon={si}
+											className="size-3.5 shrink-0"
+										/>
 									))}
 								<span className="font-mono text-[11px] text-text-sub-500 dark:text-white/55">
 									{displayLabel}

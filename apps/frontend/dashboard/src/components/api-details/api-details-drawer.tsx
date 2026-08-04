@@ -20,11 +20,15 @@ import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import {
+	BrandLanguageIcon,
+	type CopyCodeBlockIcon,
+} from "@reloop/ui/copy-code-block";
+import { JAVA_ICON } from "@reloop/ui/icons/java";
+import {
 	siCurl,
 	siDotnet,
 	siGo,
 	siNodedotjs,
-	siOpenjdk,
 	siPhp,
 	siPython,
 	siRuby,
@@ -32,7 +36,7 @@ import {
 } from "simple-icons";
 import { useApiLanguage } from "#/hooks/use-api-language";
 
-const langIcons: Record<string, { path: string; hex: string }> = {
+const langIcons: Record<string, CopyCodeBlockIcon> = {
 	nodejs: siNodedotjs,
 	javascript: siNodedotjs,
 	python: siPython,
@@ -41,7 +45,7 @@ const langIcons: Record<string, { path: string; hex: string }> = {
 	ruby: siRuby,
 	// Brand hex is #000000 — override so the gear stays visible on dark UI
 	rust: { path: siRust.path, hex: "e24d2b" },
-	java: siOpenjdk,
+	java: JAVA_ICON,
 	dotnet: siDotnet,
 	curl: siCurl,
 };
@@ -438,22 +442,10 @@ export const ApiDetailsDrawer = ({
 									style={textColorStyle}
 								>
 									{icon && (
-										<svg
-											role="img"
-											viewBox="0 0 24 24"
+										<BrandLanguageIcon
+											icon={icon}
 											className="size-3.5 shrink-0 transition-colors duration-150"
-											fill="currentColor"
-											xmlns="http://www.w3.org/2000/svg"
-											style={{
-												color:
-													isHighlighted && highlightedPillPosition
-														? "#ffffff"
-														: brandColor,
-											}}
-											aria-hidden
-										>
-											<path d={icon.path} />
-										</svg>
+										/>
 									)}
 									{lang.label}
 								</button>

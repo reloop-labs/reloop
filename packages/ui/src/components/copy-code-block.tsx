@@ -9,7 +9,49 @@ import { useEffect, useId, useRef, useState } from "react"; // (Not used here bu
 export type CopyCodeBlockIcon = {
 	path: string;
 	hex: string;
+	/** Optional viewBox when path data is not 0 0 24 24 (e.g. multi-color brand marks). */
+	viewBox?: string;
+	/** Multi-color layers; when set, each path uses its own fill instead of monochrome hex. */
+	layers?: ReadonlyArray<{ d: string; fill: string }>;
 };
+
+export function BrandLanguageIcon({
+	icon,
+	className,
+}: {
+	icon: CopyCodeBlockIcon;
+	className?: string;
+}) {
+	const viewBox = icon.viewBox ?? "0 0 24 24";
+	if (icon.layers && icon.layers.length > 0) {
+		return (
+			<svg
+				role="img"
+				viewBox={viewBox}
+				className={className}
+				xmlns="http://www.w3.org/2000/svg"
+				aria-hidden
+			>
+				{icon.layers.map((layer) => (
+					<path key={layer.d.slice(0, 24)} d={layer.d} fill={layer.fill} />
+				))}
+			</svg>
+		);
+	}
+	return (
+		<svg
+			role="img"
+			viewBox={viewBox}
+			className={className}
+			fill="currentColor"
+			xmlns="http://www.w3.org/2000/svg"
+			style={{ color: `#${icon.hex}` }}
+			aria-hidden
+		>
+			<path d={icon.path} />
+		</svg>
+	);
+}
 
 export type CopyCodeBlockTab = {
 	id: string;
@@ -252,17 +294,10 @@ export function CopyCodeBlock({
 											: "text-text-sub-600 dark:text-white/70",
 									)}
 								>
-									<svg
-										role="img"
-										viewBox="0 0 24 24"
+									<BrandLanguageIcon
+										icon={tab.si}
 										className="size-3.5 shrink-0"
-										fill="currentColor"
-										xmlns="http://www.w3.org/2000/svg"
-										style={{ color: brandColor }}
-										aria-hidden
-									>
-										<path d={tab.si.path} />
-									</svg>
+									/>
 									{tab.label}
 								</button>
 							);
@@ -337,17 +372,10 @@ export function CopyCodeBlock({
 							<>
 								{icon ||
 									(si && (
-										<svg
-											role="img"
-											viewBox="0 0 24 24"
+										<BrandLanguageIcon
+											icon={si}
 											className="size-3.5 shrink-0"
-											fill="currentColor"
-											xmlns="http://www.w3.org/2000/svg"
-											style={{ color: `#${si.hex}` }}
-											aria-hidden
-										>
-											<path d={si.path} />
-										</svg>
+										/>
 									))}
 								<span className="font-mono text-[11px] text-text-sub-500 dark:text-white/55">
 									{displayLabel}
