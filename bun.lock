@@ -1,5 +1,6 @@
 {
   "lockfileVersion": 1,
+  "configVersion": 0,
   "workspaces": {
     "": {
       "name": "reloop",
@@ -747,7 +748,6 @@
         "next": "catalog:ui",
         "next-mdx-remote": "catalog:ui",
         "next-themes": "catalog:ui",
-        "nuqs": "catalog:ui",
         "react": "catalog:ui",
         "react-dom": "catalog:ui",
         "react-hotkeys-hook": "catalog:ui",
