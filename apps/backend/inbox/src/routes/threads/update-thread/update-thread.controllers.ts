@@ -1,6 +1,6 @@
 import { db } from "@reloop/db/client";
-import { emailThread, inboundEmail } from "@reloop/db/schema";
-import { and, eq } from "drizzle-orm";
+import { emailThread, inboundEmail, threadMessage } from "@reloop/db/schema";
+import { and, eq, inArray } from "drizzle-orm";
 import { createError } from "evlog";
 import { useLogger } from "evlog/elysia";
 
@@ -55,19 +55,46 @@ export async function updateThreadController(
 		return { success: true, id, message: "No changes" };
 	}
 
-	await db.update(emailThread).set(updateData).where(eq(emailThread.id, id));
-
-	// Keep inbound messages aligned when read state changes via thread update
+	// Keep thread + inbound messages aligned in one transaction when read changes
 	if (updates.isRead !== undefined) {
-		await db
-			.update(inboundEmail)
-			.set({ isRead: updates.isRead })
-			.where(
-				and(
-					eq(inboundEmail.threadId, id),
-					eq(inboundEmail.organizationId, organizationId),
-				),
-			);
+		await db.transaction(async (tx) => {
+			await tx
+				.update(emailThread)
+				.set(updateData)
+				.where(eq(emailThread.id, id));
+
+			const linked = await tx.query.threadMessage.findMany({
+				where: eq(threadMessage.threadId, id),
+				columns: { inboundEmailId: true },
+			});
+			const inboundIds = linked
+				.map((l) => l.inboundEmailId)
+				.filter((v): v is string => !!v);
+
+			if (inboundIds.length > 0) {
+				await tx
+					.update(inboundEmail)
+					.set({ isRead: updates.isRead })
+					.where(
+						and(
+							inArray(inboundEmail.id, inboundIds),
+							eq(inboundEmail.organizationId, organizationId),
+						),
+					);
+			} else {
+				await tx
+					.update(inboundEmail)
+					.set({ isRead: updates.isRead })
+					.where(
+						and(
+							eq(inboundEmail.threadId, id),
+							eq(inboundEmail.organizationId, organizationId),
+						),
+					);
+			}
+		});
+	} else {
+		await db.update(emailThread).set(updateData).where(eq(emailThread.id, id));
 	}
 
 	log.info(`[THREAD] Updated thread ${id}: ${JSON.stringify(updateData)}`);

@@ -1,6 +1,6 @@
 import { db } from "@reloop/db/client";
-import { emailThread, inboundEmail } from "@reloop/db/schema";
-import { and, eq } from "drizzle-orm";
+import { emailThread, inboundEmail, threadMessage } from "@reloop/db/schema";
+import { and, eq, inArray } from "drizzle-orm";
 import { createError } from "evlog";
 import { useLogger } from "evlog/elysia";
 
@@ -26,13 +26,20 @@ export async function markThreadReadController(
 				eq(inboundEmail.organizationId, organizationId),
 			),
 		});
-		if (msg?.threadId) {
-			thread = await db.query.emailThread.findFirst({
-				where: and(
-					eq(emailThread.id, msg.threadId),
-					eq(emailThread.organizationId, organizationId),
-				),
+		if (msg) {
+			const link = await db.query.threadMessage.findFirst({
+				where: eq(threadMessage.inboundEmailId, msg.id),
+				columns: { threadId: true },
 			});
+			const threadId = link?.threadId ?? msg.threadId;
+			if (threadId) {
+				thread = await db.query.emailThread.findFirst({
+					where: and(
+						eq(emailThread.id, threadId),
+						eq(emailThread.organizationId, organizationId),
+					),
+				});
+			}
 		}
 	}
 
@@ -47,21 +54,44 @@ export async function markThreadReadController(
 
 	const threadId = thread.id;
 
-	await db
-		.update(emailThread)
-		.set({ isRead })
-		.where(eq(emailThread.id, threadId));
+	// Keep thread + inbound messages consistent in one transaction.
+	await db.transaction(async (tx) => {
+		await tx
+			.update(emailThread)
+			.set({ isRead })
+			.where(eq(emailThread.id, threadId));
 
-	// Keep inbound messages in sync so list rows (mapped from messages) update
-	await db
-		.update(inboundEmail)
-		.set({ isRead })
-		.where(
-			and(
-				eq(inboundEmail.threadId, threadId),
-				eq(inboundEmail.organizationId, organizationId),
-			),
-		);
+		const linked = await tx.query.threadMessage.findMany({
+			where: eq(threadMessage.threadId, threadId),
+			columns: { inboundEmailId: true },
+		});
+		const inboundIds = linked
+			.map((l) => l.inboundEmailId)
+			.filter((v): v is string => !!v);
+
+		if (inboundIds.length > 0) {
+			await tx
+				.update(inboundEmail)
+				.set({ isRead })
+				.where(
+					and(
+						inArray(inboundEmail.id, inboundIds),
+						eq(inboundEmail.organizationId, organizationId),
+					),
+				);
+		} else {
+			// Legacy path for messages only keyed by inbound_email.thread_id
+			await tx
+				.update(inboundEmail)
+				.set({ isRead })
+				.where(
+					and(
+						eq(inboundEmail.threadId, threadId),
+						eq(inboundEmail.organizationId, organizationId),
+					),
+				);
+		}
+	});
 
 	log.info(
 		`[THREAD] Marked thread ${threadId} as ${isRead ? "read" : "unread"}`,

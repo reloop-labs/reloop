@@ -61,7 +61,7 @@ export async function removeContactFromGroupController({
 			),
 		});
 
-		await db
+		const removed = await db
 			.update(schema.contactGroup)
 			.set({ deletedAt: new Date(), updatedAt: new Date() })
 			.where(
@@ -71,11 +71,15 @@ export async function removeContactFromGroupController({
 					eq(schema.contactGroup.organizationId, organizationId),
 					isNull(schema.contactGroup.deletedAt),
 				),
-			);
+			)
+			.returning({ id: schema.contactGroup.id });
+
+		const didRemove = removed.length > 0;
 
 		log.info("Contact removed from group", {
 			contactId: contact.id,
 			groupId,
+			didRemove,
 		});
 
 		const groupLabel = group?.name ?? groupId;
@@ -87,14 +91,17 @@ export async function removeContactFromGroupController({
 			groupName: group?.name ?? null,
 			event: CONTACT_UPDATE_WEBHOOK_EVENT.id,
 		};
-		attachAuditChanges(result, [
-			{
-				field: "group",
-				from: groupLabel,
-				to: null,
-				label: "Group",
-			},
-		]);
+		// Only record history when an active membership was actually removed
+		if (didRemove) {
+			attachAuditChanges(result, [
+				{
+					field: "group",
+					from: groupLabel,
+					to: null,
+					label: "Group",
+				},
+			]);
+		}
 
 		return result;
 	} catch (error) {

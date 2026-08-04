@@ -88,20 +88,26 @@ export async function addContactToGroupController({
 			),
 		});
 
-		const withGroupMeta = <T extends object>(payload: T) => {
+		const withGroupMeta = <T extends object>(
+			payload: T,
+			opts?: { audit?: boolean },
+		) => {
 			const result = {
 				...payload,
 				groupId,
 				groupName: group.name,
 			};
-			attachAuditChanges(result, [
-				{
-					field: "group",
-					from: null,
-					to: group.name,
-					label: "Group",
-				},
-			]);
+			// Only record history when membership actually changed (not idempotent re-adds)
+			if (opts?.audit) {
+				attachAuditChanges(result, [
+					{
+						field: "group",
+						from: null,
+						to: group.name,
+						label: "Group",
+					},
+				]);
+			}
 			return result;
 		};
 
@@ -133,12 +139,15 @@ export async function addContactToGroupController({
 
 		log.info("Contact added to group", { contactId: contact.id, groupId });
 
-		return withGroupMeta({
-			success: true,
-			object: "contact" as const,
-			id: contact.id,
-			event: CONTACT_UPDATE_WEBHOOK_EVENT.id,
-		});
+		return withGroupMeta(
+			{
+				success: true,
+				object: "contact" as const,
+				id: contact.id,
+				event: CONTACT_UPDATE_WEBHOOK_EVENT.id,
+			},
+			{ audit: true },
+		);
 	} catch (error) {
 		log.error("Error adding contact to group", {
 			contactId: contact_id,

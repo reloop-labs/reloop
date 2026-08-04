@@ -49,7 +49,11 @@ export async function contactHistoryController({
 				.select()
 				.from(schema.activityLog)
 				.where(whereClause)
-				.orderBy(desc(schema.activityLog.createdAt))
+				// Tie-break equal timestamps so offset pages never skip/duplicate rows
+				.orderBy(
+					desc(schema.activityLog.createdAt),
+					desc(schema.activityLog.id),
+				)
 				.limit(limit)
 				.offset(offset),
 		]);

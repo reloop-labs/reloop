@@ -752,7 +752,10 @@ export function ContactEmailHistory({
 	});
 
 	const isLoading = emailQuery.isPending || historyQuery.isPending;
+	// Only treat as full failure when both sources fail (and nothing loaded)
 	const isError = emailQuery.isError && historyQuery.isError;
+	const partialEmailError = emailQuery.isError && !historyQuery.isError;
+	const partialHistoryError = historyQuery.isError && !emailQuery.isError;
 	const isFetchingNextPage =
 		emailQuery.isFetchingNextPage || historyQuery.isFetchingNextPage;
 
@@ -771,6 +774,10 @@ export function ContactEmailHistory({
 	const createdFallback = contactCreatedAt && !hasCreatedAudit ? 1 : 0;
 	const changesTotal = historyTotal + createdFallback;
 	const total = emailTotal + changesTotal;
+	// Server-backed row count for pagination labels (excludes synthetic contact_created)
+	const loadedServerCount =
+		(filter === "changes" ? 0 : entries.length) +
+		(filter === "emails" ? 0 : historyEntries.length);
 
 	const items = useMemo(() => {
 		const emailItems = filter === "changes" ? [] : entries;
@@ -779,7 +786,13 @@ export function ContactEmailHistory({
 		return buildTimelineItems(emailItems, actionItems, createdAt);
 	}, [entries, historyEntries, contactCreatedAt, filter]);
 
-	const showEmpty = !isLoading && !isError && items.length === 0;
+	// Empty only when both sources settled successfully with no rows
+	const showEmpty =
+		!isLoading &&
+		!isError &&
+		!partialEmailError &&
+		!partialHistoryError &&
+		items.length === 0;
 
 	const emptyCopy = (() => {
 		if (filter === "changes") {
@@ -815,8 +828,16 @@ export function ContactEmailHistory({
 		(filter === "emails" && !!emailQuery.hasNextPage) ||
 		(filter === "changes" && !!historyQuery.hasNextPage);
 
+	// Header badge can include the synthetic created row; pagination labels must
+	// match server-backed totals only so the fraction never “completes” early.
 	const visibleCount =
 		filter === "all" ? total : filter === "emails" ? emailTotal : changesTotal;
+	const serverVisibleCount =
+		filter === "all"
+			? emailTotal + historyTotal
+			: filter === "emails"
+				? emailTotal
+				: historyTotal;
 
 	return (
 		<div className="mt-12 pb-12">
@@ -896,6 +917,20 @@ export function ContactEmailHistory({
 						<p className="max-w-xs text-paragraph-xs text-text-soft-400">
 							Something went wrong fetching activity for this contact.
 						</p>
+						<div className="mt-1 flex items-center gap-2">
+							<Button.Root
+								type="button"
+								variant="neutral"
+								mode="stroke"
+								size="xsmall"
+								onClick={() => {
+									void emailQuery.refetch();
+									void historyQuery.refetch();
+								}}
+							>
+								Retry
+							</Button.Root>
+						</div>
 					</div>
 				) : showEmpty ? (
 					<div className="flex flex-col items-center gap-2 py-8 text-center">
@@ -914,6 +949,30 @@ export function ContactEmailHistory({
 					</div>
 				) : (
 					<div>
+						{(partialEmailError || partialHistoryError) && (
+							<div className="mb-3 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-error-light bg-error-lighter/50 px-3 py-2 dark:border-error-base/30 dark:bg-error-base/10">
+								<p className="text-paragraph-xs text-error-base">
+									{partialEmailError && partialHistoryError
+										? "Couldn't load some activity."
+										: partialEmailError
+											? "Couldn't load email activity."
+											: "Couldn't load profile changes."}
+								</p>
+								<Button.Root
+									type="button"
+									variant="error"
+									mode="stroke"
+									size="xxsmall"
+									onClick={() => {
+										if (partialEmailError) void emailQuery.refetch();
+										if (partialHistoryError) void historyQuery.refetch();
+									}}
+								>
+									Retry
+								</Button.Root>
+							</div>
+						)}
+
 						{items.map((item, index) => {
 							const isLast = index === items.length - 1;
 
@@ -962,7 +1021,7 @@ export function ContactEmailHistory({
 										<>
 											Load more
 											<span className="text-text-soft-400 tabular-nums">
-												{items.length}/{visibleCount}
+												{loadedServerCount}/{serverVisibleCount}
 											</span>
 										</>
 									)}

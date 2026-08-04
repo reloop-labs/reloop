@@ -74,4 +74,67 @@ describe("attachAuditChanges", () => {
 		attachAuditChanges(response, changes);
 		expect(getAuditChanges(response)).toEqual(changes);
 	});
+
+	test("skips empty change lists (idempotent no-ops)", () => {
+		const response = { id: "con_1" };
+		attachAuditChanges(response, []);
+		expect(getAuditChanges(response)).toBeNull();
+	});
+});
+
+describe("relationship audit transitions", () => {
+	test("group membership: only real add attaches audit", () => {
+		const existingMembership = { id: "cg_1" };
+		const added = existingMembership ? null : { group: "General" };
+		// Simulate controller: no changes when membership already exists
+		const response = { id: "con_1", groupName: "General" };
+		if (added) {
+			attachAuditChanges(response, [
+				{ field: "group", from: null, to: "General", label: "Group" },
+			]);
+		}
+		expect(getAuditChanges(response)).toBeNull();
+	});
+
+	test("group membership: real add attaches audit", () => {
+		const response = { id: "con_1", groupName: "General" };
+		attachAuditChanges(response, [
+			{ field: "group", from: null, to: "General", label: "Group" },
+		]);
+		expect(getAuditChanges(response)).toEqual([
+			{ field: "group", from: null, to: "General", label: "Group" },
+		]);
+	});
+
+	test("channel subscription: status change records previous status", () => {
+		const response = { id: "con_1", channelName: "Marketing" };
+		attachAuditChanges(response, [
+			{
+				field: "channel_subscription",
+				from: "enrolled",
+				to: "opt_out",
+				label: "Subscription",
+			},
+		]);
+		const changes = getAuditChanges(response);
+		expect(changes?.[0]?.from).toBe("enrolled");
+		expect(changes?.[0]?.to).toBe("opt_out");
+	});
+
+	test("channel subscription: no-op attaches nothing", () => {
+		const existingStatus = "enrolled";
+		const targetStatus = "enrolled";
+		const response = { id: "con_1" };
+		if (existingStatus !== targetStatus) {
+			attachAuditChanges(response, [
+				{
+					field: "channel_subscription",
+					from: existingStatus,
+					to: targetStatus,
+					label: "Subscription",
+				},
+			]);
+		}
+		expect(getAuditChanges(response)).toBeNull();
+	});
 });

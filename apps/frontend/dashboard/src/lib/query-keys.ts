@@ -53,10 +53,15 @@ export const queryKeys = {
 			status: string;
 		}) => [...queryKeys.contacts.all, "list", params] as const,
 		detail: (id: string) => [...queryKeys.contacts.all, "detail", id] as const,
-		activity: (email: string) =>
-			[...queryKeys.contacts.all, "activity", email] as const,
-		history: (contactId: string) =>
-			[...queryKeys.contacts.all, "history", contactId] as const,
+		activity: (email: string, orgId?: string) =>
+			[...queryKeys.contacts.all, "activity", orgId ?? "org", email] as const,
+		history: (contactId: string, orgId?: string) =>
+			[
+				...queryKeys.contacts.all,
+				"history",
+				orgId ?? "org",
+				contactId,
+			] as const,
 		groups: (params: { page: number; limit: number; search: string }) =>
 			[...queryKeys.contacts.all, "groups", params] as const,
 		groupDetail: (id: string) =>

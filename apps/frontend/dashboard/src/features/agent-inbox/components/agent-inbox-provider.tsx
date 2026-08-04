@@ -815,19 +815,27 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 				{ revalidate: false },
 			);
 
-			// Prefer thread endpoint when we have a conversation id (marks whole thread).
-			// Fall back to message endpoint for unthreaded messages.
+			// Prefer thread endpoint when we have a canonical conversation id.
+			// List APIs return email_thread.id via thread_message (thr_…); message
+			// endpoint also resolves via thread_message when only a message id is known.
 			const endpoint =
 				threadId && threadId.startsWith("thr_")
 					? `/api/inbox/v1/threads/${encodeURIComponent(threadId)}/read`
 					: `/api/inbox/v1/messages/${encodeURIComponent(id)}/read`;
 
-			const res = await fetch(endpoint, {
-				method: "PATCH",
-				credentials: "include",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ isRead }),
-			});
+			let res: Response;
+			try {
+				res = await fetch(endpoint, {
+					method: "PATCH",
+					credentials: "include",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({ isRead }),
+				});
+			} catch (error) {
+				// Network / abort failures — roll back optimistic state
+				await Promise.all([mutateMessages(), mutateThreads()]);
+				throw error;
+			}
 
 			if (!res.ok) {
 				// Revalidate to roll back optimistic state

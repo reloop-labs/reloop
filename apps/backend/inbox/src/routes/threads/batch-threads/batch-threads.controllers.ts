@@ -118,35 +118,47 @@ export async function batchThreadsController(
 				.where(inArray(emailThread.id, foundIds));
 			break;
 		case "read":
-			await db
-				.update(emailThread)
-				.set({ isRead: true })
-				.where(inArray(emailThread.id, foundIds));
-			await db
-				.update(inboundEmail)
-				.set({ isRead: true })
-				.where(
-					and(
-						inArray(inboundEmail.threadId, foundIds),
-						eq(inboundEmail.organizationId, organizationId),
-					),
-				);
+		case "unread": {
+			const isRead = action === "read";
+			await db.transaction(async (tx) => {
+				await tx
+					.update(emailThread)
+					.set({ isRead })
+					.where(inArray(emailThread.id, foundIds));
+
+				const links = await tx.query.threadMessage.findMany({
+					where: inArray(threadMessage.threadId, foundIds),
+					columns: { inboundEmailId: true },
+				});
+				const inboundIds = links
+					.map((l) => l.inboundEmailId)
+					.filter((v): v is string => Boolean(v));
+
+				if (inboundIds.length > 0) {
+					await tx
+						.update(inboundEmail)
+						.set({ isRead })
+						.where(
+							and(
+								inArray(inboundEmail.id, inboundIds),
+								eq(inboundEmail.organizationId, organizationId),
+							),
+						);
+				} else {
+					// Legacy fallback
+					await tx
+						.update(inboundEmail)
+						.set({ isRead })
+						.where(
+							and(
+								inArray(inboundEmail.threadId, foundIds),
+								eq(inboundEmail.organizationId, organizationId),
+							),
+						);
+				}
+			});
 			break;
-		case "unread":
-			await db
-				.update(emailThread)
-				.set({ isRead: false })
-				.where(inArray(emailThread.id, foundIds));
-			await db
-				.update(inboundEmail)
-				.set({ isRead: false })
-				.where(
-					and(
-						inArray(inboundEmail.threadId, foundIds),
-						eq(inboundEmail.organizationId, organizationId),
-					),
-				);
-			break;
+		}
 		case "important":
 			await db
 				.update(emailThread)
