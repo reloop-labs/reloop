@@ -304,6 +304,7 @@ export const GroupHeader = ({ group, isLoading }: GroupHeaderProps) => {
 									className="gap-1.5"
 									aria-keyshortcuts="A C"
 								>
+									<Icon name="plus" className="h-3.5 w-3.5" />
 									Add contact to group
 									<span className="inline-flex items-center gap-0.5">
 										<ActionKbd className={actionKbdOnSolidClassName}>

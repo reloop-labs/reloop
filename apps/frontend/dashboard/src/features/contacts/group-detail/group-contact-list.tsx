@@ -1,7 +1,6 @@
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
-import { KbdKeyOutline } from "@reloop/ui/kbd-key-outline";
 import { parseAsInteger, useQueryState } from "nuqs";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -11,6 +10,10 @@ import {
 } from "#/features/contacts/components/contacts/contact-filter-dropdown";
 import { ContactTable } from "#/features/contacts/components/contacts/contact-table";
 import { useGroupContactsQuery } from "#/features/contacts/hooks/use-contacts-query";
+import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
+
+const actionKbdOnSolidClassName =
+	"border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]";
 
 export const GroupContactList = ({ groupId }: { groupId: string }) => {
 	const [currentPage, setCurrentPage] = useQueryState(
@@ -141,7 +144,13 @@ export const GroupContactList = ({ groupId }: { groupId: string }) => {
 				onClearSearch={() => setSearchQuery("")}
 				emptyStateTitle="No contacts in this group"
 				emptyStateDescription="This group doesn't have any contacts yet. Add contacts to start segmenting your audience."
-				emptyStateButtonText="Add Contact to Group"
+				emptyStateButtonText="Add contact to group"
+				emptyStateShortcut={
+					<span className="inline-flex items-center gap-0.5">
+						<ActionKbd className={actionKbdOnSolidClassName}>A</ActionKbd>
+						<ActionKbd className={actionKbdOnSolidClassName}>C</ActionKbd>
+					</span>
+				}
 			/>
 		</div>
 	);

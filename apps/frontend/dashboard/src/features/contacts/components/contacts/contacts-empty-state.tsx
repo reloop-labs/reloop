@@ -8,7 +8,11 @@ import {
 	parseAsString,
 	useQueryState,
 } from "nuqs";
+import type { ReactNode } from "react";
 import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
+
+const actionKbdOnSolidClassName =
+	"border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]";
 
 interface ContactsEmptyStateProps {
 	onAddContact?: () => void;
@@ -17,6 +21,8 @@ interface ContactsEmptyStateProps {
 	title?: string;
 	description?: string;
 	buttonText?: string;
+	/** Override the default single-key ActionKbd (e.g. sequence "A" "C"). */
+	shortcut?: ReactNode;
 }
 
 export function ContactsEmptyState({
@@ -26,6 +32,7 @@ export function ContactsEmptyState({
 	title,
 	description,
 	buttonText,
+	shortcut,
 }: ContactsEmptyStateProps) {
 	const router = useRouter();
 	const [statusFilter, setStatusFilter] = useQueryState(
@@ -99,9 +106,9 @@ export function ContactsEmptyState({
 				>
 					<Icon name="plus" className="h-4 w-4" />
 					{buttonText ?? "Add contact"}
-					<ActionKbd className="border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]">
-						C
-					</ActionKbd>
+					{shortcut ?? (
+						<ActionKbd className={actionKbdOnSolidClassName}>C</ActionKbd>
+					)}
 				</FancyButton.Root>
 			)}
 		</div>

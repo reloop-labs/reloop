@@ -56,6 +56,7 @@ export const ContactTable = ({
 	emptyStateTitle,
 	emptyStateDescription,
 	emptyStateButtonText,
+	emptyStateShortcut,
 }: ContactTableProps) => {
 	const [, setDeleteId] = useQueryState("delete");
 	const [pageSize] = useQueryState("limit", parseAsInteger.withDefault(10));
@@ -167,6 +168,7 @@ export const ContactTable = ({
 							title={emptyStateTitle}
 							description={emptyStateDescription}
 							buttonText={emptyStateButtonText}
+							shortcut={emptyStateShortcut}
 						/>
 					) : (
 						rows.map((row) => {
