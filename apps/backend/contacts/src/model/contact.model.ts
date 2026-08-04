@@ -269,6 +269,30 @@ export namespace ContactModel {
 
 	export type ContactListResponse = typeof contactListResponse.static;
 
+	/** 7-day audience activity (new subscribed / unsubscribed signals per day). */
+	export const subscriptionActivityResponse = t.Object({
+		object: t.Literal("contact_subscription_activity", {
+			default: "contact_subscription_activity",
+		}),
+		days: t.Number({ description: "Number of days included" }),
+		dates: t.Array(t.String({ description: "ISO date YYYY-MM-DD (UTC)" })),
+		subscribed: t.Array(
+			t.Number({
+				description: "New subscribed contacts created that day",
+			}),
+		),
+		unsubscribed: t.Array(
+			t.Number({
+				description:
+					"Contacts currently unsubscribed whose status was last updated that day",
+			}),
+		),
+		event: t.String({ description: "Event ID for the stats request" }),
+	});
+
+	export type SubscriptionActivityResponse =
+		typeof subscriptionActivityResponse.static;
+
 	// Lean contact item for group contact list (no groups/channels)
 	export const groupContactItem = t.Object(
 		{

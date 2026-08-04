@@ -74,6 +74,36 @@ export function useContactsQuery(params: ContactsListParams) {
 	});
 }
 
+export type SubscriptionActivityResponse = {
+	object: "contact_subscription_activity";
+	days: number;
+	dates: string[];
+	subscribed: number[];
+	unsubscribed: number[];
+	event: string;
+};
+
+export function useSubscriptionActivityQuery(
+	days = 7,
+	enabled = true,
+) {
+	return useQuery({
+		queryKey: queryKeys.contacts.subscriptionActivity(days),
+		queryFn: async () => {
+			const res = await fetch(
+				`/api/contacts/stats/subscription-activity?days=${days}`,
+				{ credentials: "include" },
+			);
+			if (!res.ok) {
+				throw new Error(`Failed to load subscription activity (${res.status})`);
+			}
+			return res.json() as Promise<SubscriptionActivityResponse>;
+		},
+		enabled,
+		staleTime: 60_000,
+	});
+}
+
 export function useContactQuery(id: string | null | undefined) {
 	return useQuery({
 		queryKey: queryKeys.contacts.detail(id ?? ""),

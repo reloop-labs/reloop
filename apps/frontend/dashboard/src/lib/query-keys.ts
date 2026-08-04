@@ -72,6 +72,8 @@ export const queryKeys = {
 		propertiesAll: () =>
 			[...queryKeys.contacts.all, "properties", "all"] as const,
 		channels: () => [...queryKeys.contacts.all, "channels"] as const,
+		subscriptionActivity: (days: number) =>
+			[...queryKeys.contacts.all, "subscription-activity", days] as const,
 	},
 	support: {
 		all: ["support"] as const,

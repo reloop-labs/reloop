@@ -1,4 +1,5 @@
 import { Icon } from "@reloop/ui/icon";
+import { Skeleton } from "@reloop/ui/skeleton";
 import { useRouter } from "next/navigation";
 import {
 	parseAsArrayOf,
@@ -6,44 +7,55 @@ import {
 	parseAsString,
 	useQueryState,
 } from "nuqs";
-import { useCallback, useMemo } from "react";
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import type { CommandAction } from "#/features/dashboard/command-menu";
 import { useRegisterCommandActions } from "#/features/dashboard/command-menu-context";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import { useContactColumnVisibility } from "../../hooks/use-contact-column-visibility";
-import { useContactsQuery } from "../../hooks/use-contacts-query";
+import {
+	useContactsQuery,
+	useSubscriptionActivityQuery,
+} from "../../hooks/use-contacts-query";
 import { ContactListToolbar } from "./contact-list-toolbar";
 import { ContactTable } from "./contact-table";
 
-function SummaryCard({
+const SubscriptionActivityChart = lazy(() =>
+	import("./subscription-activity-chart").then((m) => ({
+		default: m.SubscriptionActivityChart,
+	})),
+);
+
+/** Compact stat matching API key / group summary layout. */
+function StatItem({
 	label,
-	count,
-	icon,
+	value,
 	isLoading,
 }: {
 	label: string;
-	count?: number;
-	icon: string;
-	isLoading: boolean;
+	value: string;
+	isLoading?: boolean;
 }) {
 	return (
-		<div className="flex items-center gap-3 rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-4 py-3 dark:border-stroke-soft-100/50">
-			<div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-bg-weak-50">
-				<Icon name={icon} className="h-4 w-4 text-text-sub-600" />
-			</div>
-			<div className="flex flex-col">
-				<p className="text-text-sub-600 text-xs">{label}</p>
-				{isLoading ? (
-					<div className="mt-0.5 h-5 w-12 animate-pulse rounded bg-bg-weak-50" />
-				) : (
-					<p className="font-semibold text-sm text-text-strong-950">
-						{count?.toLocaleString() || 0}
-					</p>
-				)}
-			</div>
+		<div className="min-w-0">
+			<p className="font-medium text-[11px] text-text-sub-600 uppercase tracking-wider">
+				{label}
+			</p>
+			{isLoading ? (
+				<Skeleton className="mt-1 h-5 w-16 rounded-lg" />
+			) : (
+				<p className="mt-1 truncate font-medium text-sm text-text-strong-950 tabular-nums">
+					{value}
+				</p>
+			)}
 		</div>
 	);
+}
+
+function formatChartDayLabel(isoDate: string): string {
+	const [, month, day] = isoDate.split("-");
+	if (!month || !day) return isoDate;
+	return `${month}/${day}`;
 }
 
 export function ContactList() {
@@ -72,6 +84,43 @@ export function ContactList() {
 		enabled: !!activeOrganization?.id,
 	});
 	const isLoading = isPending || (isFetching && !data);
+
+	const { data: activityData, isPending: activityPending } =
+		useSubscriptionActivityQuery(7, !!activeOrganization?.id);
+
+	const chartContainerRef = useRef<HTMLDivElement>(null);
+	const [hasChartSize, setHasChartSize] = useState(false);
+
+	useEffect(() => {
+		const el = chartContainerRef.current;
+		if (!el) return;
+		const observer = new ResizeObserver((entries) => {
+			for (const entry of entries) {
+				const { width, height } = entry.contentRect;
+				setHasChartSize(width > 0 && height > 0);
+			}
+		});
+		observer.observe(el);
+		return () => observer.disconnect();
+	}, []);
+
+	const chartData = useMemo(() => {
+		if (!activityData?.dates?.length) return [];
+		return activityData.dates.map((date, i) => ({
+			date: formatChartDayLabel(date),
+			subscribed: activityData.subscribed[i] ?? 0,
+			unsubscribed: activityData.unsubscribed[i] ?? 0,
+		}));
+	}, [activityData]);
+
+	const weekSubscribed = useMemo(
+		() => chartData.reduce((sum, d) => sum + d.subscribed, 0),
+		[chartData],
+	);
+	const weekUnsubscribed = useMemo(
+		() => chartData.reduce((sum, d) => sum + d.unsubscribed, 0),
+		[chartData],
+	);
 
 	const handleDownloadCSV = useCallback(async () => {
 		try {
@@ -170,25 +219,79 @@ export function ContactList() {
 
 	return (
 		<div>
-			<div className="mb-4 grid grid-cols-3 gap-3">
-				<SummaryCard
-					label="Total Contacts"
-					icon="users"
-					count={data?.totalContacts}
-					isLoading={isLoading}
-				/>
-				<SummaryCard
-					label="Subscribed"
-					icon="check-circle"
-					count={data?.subscribedContacts}
-					isLoading={isLoading}
-				/>
-				<SummaryCard
-					label="Unsubscribed"
-					icon="minus-circle"
-					count={data?.unsubscribedContacts}
-					isLoading={isLoading}
-				/>
+			{/* Audience snapshot + 7-day trend — matches API key detail two-box layout */}
+			<div className="mb-4 grid gap-4 lg:grid-cols-2">
+				<div className="overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-bg-white-0/5">
+					<div className="space-y-3 p-4">
+						<div>
+							<p className="font-medium text-sm text-text-strong-950">
+								Audience
+							</p>
+							<p className="mt-0.5 text-[12px] text-text-sub-600 leading-relaxed">
+								Contact volume and subscription status across your organization.
+							</p>
+						</div>
+						<div className="grid grid-cols-3 gap-4">
+							<StatItem
+								label="Total"
+								value={(data?.totalContacts ?? 0).toLocaleString()}
+								isLoading={isLoading}
+							/>
+							<StatItem
+								label="Subscribed"
+								value={(data?.subscribedContacts ?? 0).toLocaleString()}
+								isLoading={isLoading}
+							/>
+							<StatItem
+								label="Unsubscribed"
+								value={(data?.unsubscribedContacts ?? 0).toLocaleString()}
+								isLoading={isLoading}
+							/>
+						</div>
+					</div>
+				</div>
+
+				<div className="overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-bg-white-0/5">
+					<div className="flex h-full flex-col space-y-3 p-4">
+						<div className="flex items-start justify-between gap-3">
+							<div className="min-w-0">
+								<p className="font-medium text-sm text-text-strong-950">
+									Last 7 days
+								</p>
+								<p className="mt-0.5 text-[12px] text-text-sub-600 leading-relaxed">
+									New subscribers and unsubscribes over the past week.
+								</p>
+							</div>
+							<div className="flex shrink-0 items-center gap-3">
+								<div className="flex items-center gap-1.5">
+									<span className="h-1.5 w-1.5 rounded-full bg-[#1868DF]" />
+									<span className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
+										{activityPending ? "—" : weekSubscribed.toLocaleString()} in
+									</span>
+								</div>
+								<div className="flex items-center gap-1.5">
+									<span className="h-1.5 w-1.5 rounded-full bg-zinc-400" />
+									<span className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
+										{activityPending
+											? "—"
+											: weekUnsubscribed.toLocaleString()}{" "}
+										out
+									</span>
+								</div>
+							</div>
+						</div>
+
+						<div ref={chartContainerRef} className="h-[108px] w-full">
+							{activityPending ? (
+								<Skeleton className="h-full w-full rounded-xl" />
+							) : hasChartSize && chartData.length > 0 ? (
+								<Suspense fallback={null}>
+									<SubscriptionActivityChart data={chartData} />
+								</Suspense>
+							) : null}
+						</div>
+					</div>
+				</div>
 			</div>
 
 			<ContactListToolbar
