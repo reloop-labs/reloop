@@ -158,7 +158,7 @@ export function resolveMarketingMarkdown(path: string): string | null {
 			"",
 			`URL: ${origin}${normalized === "/" ? "" : normalized}`,
 			`Prefer the HTML page or the curated index at ${origin}/llms.txt.`,
-			`Product docs: ${origin}/docs/llms.txt`,
+			`Product docs index: ${origin}/llms-docs.txt`,
 			"",
 		].join("\n"),
 	);
@@ -180,7 +180,7 @@ function buildHomeMarkdown(): string {
 		"## Links",
 		"",
 		"- Pricing: https://reloop.sh/pricing (markdown: /pricing.md)",
-		"- Docs: https://reloop.sh/docs/llms.txt",
+		"- Docs index: https://reloop.sh/llms-docs.txt",
 		"- Blog: https://reloop.sh/blog",
 		"- Signup: https://reloop.sh/dashboard/signup",
 		"- GitHub: https://github.com/reloop-labs/reloop",

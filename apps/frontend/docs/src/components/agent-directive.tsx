@@ -28,9 +28,10 @@ export function AgentDirective({
 		>
 			<p>
 				For the complete documentation index, see{" "}
-				<a href="/docs/llms.txt">llms.txt</a>. Full corpus:{" "}
-				<a href="/docs/llms-full.txt">llms-full.txt</a>. Prefer the markdown
-				version of this page
+				<a href="/llms-docs.txt">llms-docs.txt</a> or the site index{" "}
+				<a href="/llms.txt">llms.txt</a>. Full docs corpus:{" "}
+				<a href="/llms-full-docs.txt">llms-full-docs.txt</a>. Prefer the
+				markdown version of this page
 				{mdHref ? (
 					<>
 						{" "}
@@ -39,8 +40,8 @@ export function AgentDirective({
 				) : (
 					<> by appending .md to the URL</>
 				)}
-				. Product capabilities: <a href="/docs/skill.md">skill.md</a>. Docs MCP:{" "}
-				<a href="/docs/mcp">/docs/mcp</a>.
+				. Product capabilities: <a href="/skill.md">skill.md</a>. Docs MCP:{" "}
+				<a href="/docs/mcp">/docs/mcp</a>. Site MCP: <a href="/mcp">/mcp</a>.
 			</p>
 		</div>
 	);

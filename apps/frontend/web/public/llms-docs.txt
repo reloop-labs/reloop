@@ -13,11 +13,11 @@ Important notes:
 
 ## Documentation
 
-- [Full documentation](https://reloop.sh/docs/llms-full.txt): Complete Reloop documentation in a single file
+- [Full documentation](https://reloop.sh/llms-full-docs.txt): Complete Reloop documentation in a single file (web-hosted agent corpus)
 - [Sitemap](https://reloop.sh/docs/sitemap.md): Semantic markdown map of all documentation pages
-- [Product skill](https://reloop.sh/docs/skill.md): Agent skill — capabilities, auth, and constraints
+- [Product skill](https://reloop.sh/skill.md): Agent skill — capabilities, auth, and constraints
 - [Docs MCP](https://reloop.sh/docs/mcp): Search and retrieve documentation via Model Context Protocol
-- [MCP discovery](https://reloop.sh/docs/.well-known/mcp.json): Machine-readable MCP server discovery
+- [MCP discovery](https://reloop.sh/.well-known/mcp.json): Machine-readable MCP server discovery
 - [Introduction](https://reloop.sh/docs/introduction.md): Welcome to Reloop documentation
 - [API Reference](https://reloop.sh/docs/api.md): REST API reference with authentication, response codes, and rate limits
 

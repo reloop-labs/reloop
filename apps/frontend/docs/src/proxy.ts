@@ -1,12 +1,6 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
-/** Agent endpoints with dedicated App Router routes (not content markdown). */
-const RESERVED_MARKDOWN_PATHS = new Set([
-	"/skill.md",
-	"/docs/skill.md",
-]);
-
 export function proxy(request: NextRequest) {
 	// Exclude our internal API routes and static assets from being intercepted again
 	if (
@@ -18,15 +12,6 @@ export function proxy(request: NextRequest) {
 	}
 
 	const pathname = request.nextUrl.pathname;
-	// basePath is /docs; pathname may be /skill.md or /docs/skill.md depending on matcher
-	if (
-		pathname.endsWith("/skill.md") ||
-		pathname === "/skill.md" ||
-		RESERVED_MARKDOWN_PATHS.has(pathname)
-	) {
-		return NextResponse.next();
-	}
-
 	const acceptHeader = request.headers.get("accept") || "";
 	const isMarkdownAccept = acceptHeader.includes("text/markdown");
 	const isMarkdownExtension = pathname.endsWith(".md");
@@ -45,14 +30,9 @@ export function proxy(request: NextRequest) {
 	return NextResponse.next();
 }
 
-// Ensure the middleware only runs for page routes, not static files / agent indexes
+// Agent discovery files live on the marketing web app, not this docs app.
 export const config = {
 	matcher: [
-		/*
-		 * Match all request paths except:
-		 * - api, _next/static, _next/image, favicon
-		 * - agent index / discovery files (dedicated routes)
-		 */
-		"/((?!api|_next/static|_next/image|favicon.ico|llms\\.txt|llms-full\\.txt|sitemap\\.md|skill\\.md|mcp|\\.well-known).*)",
+		"/((?!api|_next/static|_next/image|favicon.ico|sitemap\\.md).*)",
 	],
 };

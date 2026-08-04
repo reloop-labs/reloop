@@ -11,8 +11,8 @@ metadata:
   docs: https://reloop.sh/docs
   llms: https://reloop.sh/llms.txt
   llms-full: https://reloop.sh/llms-full.txt
-  docs-llms: https://reloop.sh/docs/llms.txt
-  docs-llms-full: https://reloop.sh/docs/llms-full.txt
+  llms-docs: https://reloop.sh/llms-docs.txt
+  llms-full-docs: https://reloop.sh/llms-full-docs.txt
 ---
 
 # Reloop
@@ -21,12 +21,15 @@ Reloop is email infrastructure for developers: transactional and marketing email
 
 ## Documentation index
 
+Agent discovery files are hosted on the **marketing web app** (source of truth):
+
 - Site index: https://reloop.sh/llms.txt
-- Site full corpus: https://reloop.sh/llms-full.txt
-- Docs index: https://reloop.sh/docs/llms.txt
-- Full corpus: https://reloop.sh/docs/llms-full.txt
-- Semantic sitemap: https://reloop.sh/docs/sitemap.md
-- Prefer markdown: append `.md` to any docs URL (e.g. https://reloop.sh/docs/learn/api-keys.md)
+- Marketing corpus: https://reloop.sh/llms-full.txt
+- Docs index: https://reloop.sh/llms-docs.txt
+- Docs full corpus: https://reloop.sh/llms-full-docs.txt
+- Semantic marketing sitemap: https://reloop.sh/sitemap.md
+- Docs page sitemap: https://reloop.sh/docs/sitemap.md
+- Prefer markdown: append `.md` to docs URLs (e.g. https://reloop.sh/docs/learn/api-keys.md)
 
 ## Authentication
 
@@ -78,7 +81,7 @@ Base URL: `https://reloop.sh`
 - Webhooks for delivery and engagement events
 - Templates for reusable content
 
-See the API reference and learn sections in llms.txt.
+See the API reference and learn sections in llms-docs.txt.
 
 ### Product MCP (API actions)
 
@@ -93,10 +96,12 @@ Docs: https://reloop.sh/docs/integrations/ai-tools/mcp-server
 
 ### Docs MCP (documentation search)
 
-Search and retrieve Reloop documentation:
-
 - Endpoint: https://reloop.sh/docs/mcp
-- Discovery: https://reloop.sh/docs/.well-known/mcp.json
+- Discovery: https://reloop.sh/.well-known/mcp.json
+
+### Site MCP (marketing search)
+
+- Endpoint: https://reloop.sh/mcp
 
 ## Related installable skills
 
@@ -113,6 +118,6 @@ Includes:
 ## Constraints
 
 - Do not invent endpoints or fields not in the API reference
-- Prefer markdown docs (`.md`), llms.txt, and llms-full.txt over scraping HTML
+- Prefer markdown docs (`.md`), llms.txt / llms-docs.txt, and full corpora over scraping HTML
 - Never log or commit full API key secrets
 - Copy secrets immediately on create/rotate; they cannot be retrieved again

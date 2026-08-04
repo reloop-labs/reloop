@@ -39,7 +39,7 @@ export function buildSitemapMarkdown(
 	const lines: string[] = [
 		"# Sitemap",
 		"",
-		"> Semantic map of Reloop documentation. Prefer markdown URLs (append `.md`) for agent consumption. Full curated index: [llms.txt](/docs/llms.txt).",
+		"> Semantic map of Reloop documentation. Prefer markdown URLs (append `.md`) for agent consumption. Curated index (web source of truth): [llms-docs.txt](/llms-docs.txt). Site index: [llms.txt](/llms.txt).",
 		"",
 	];
 

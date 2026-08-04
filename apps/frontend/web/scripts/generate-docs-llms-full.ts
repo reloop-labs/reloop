@@ -1,6 +1,7 @@
 /**
- * Build public/llms-full.txt: single-file docs snapshot for long-context agents.
- * Run: bun apps/frontend/docs/scripts/generate-llms-full.ts
+ * Build web/public/llms-full-docs.txt from docs MDX sources.
+ * Source of truth for agent discovery lives on the marketing web app only.
+ * Run: bun apps/frontend/web/scripts/generate-docs-llms-full.ts
  */
 import {
 	existsSync,
@@ -12,9 +13,16 @@ import {
 } from "node:fs";
 import { join, relative } from "node:path";
 
-const docsRoot = join(import.meta.dirname, "../content/docs");
-const publicDir = join(import.meta.dirname, "../public");
-const outPath = join(publicDir, "llms-full.txt");
+const webRoot = join(import.meta.dirname, "..");
+const docsRootCandidates = [
+	join(webRoot, "../docs/content/docs"),
+	join(webRoot, "../../docs/content/docs"),
+	join(process.cwd(), "apps/frontend/docs/content/docs"),
+	join(process.cwd(), "content/docs"),
+];
+const docsRoot = docsRootCandidates.find((p) => existsSync(p));
+const publicDir = join(webRoot, "public");
+const outPath = join(publicDir, "llms-full-docs.txt");
 
 const PRIORITY_PREFIXES = [
 	"introduction.mdx",
@@ -61,8 +69,8 @@ function priority(rel: string): number {
 }
 
 function main() {
-	if (!existsSync(docsRoot)) {
-		console.error("content/docs not found:", docsRoot);
+	if (!docsRoot) {
+		console.error("docs content not found; tried:", docsRootCandidates);
 		process.exit(1);
 	}
 
@@ -81,9 +89,11 @@ function main() {
 		"# Reloop Documentation (full)",
 		"",
 		"> Full-document snapshot of Reloop docs for long-context agents.",
-		"> Curated index: https://reloop.sh/docs/llms.txt",
-		"> Prefer per-page markdown: append `.md` to any docs URL under https://reloop.sh/docs/",
-		"> Product skill: https://reloop.sh/docs/skill.md",
+		"> Hosted on the marketing web app (source of truth for agent files).",
+		"> Curated docs index: https://reloop.sh/llms-docs.txt",
+		"> Site index: https://reloop.sh/llms.txt",
+		"> Product skill: https://reloop.sh/skill.md",
+		"> Prefer per-page markdown: append `.md` under https://reloop.sh/docs/",
 		"",
 		`Generated from ${files.length} source files.`,
 		"",
@@ -106,7 +116,17 @@ function main() {
 				: `https://reloop.sh/docs/${urlPath}`;
 		const mdUrl = `${pageUrl === "https://reloop.sh/docs" ? "https://reloop.sh/docs/introduction" : pageUrl}.md`;
 
-		chunks.push("---", "", `# ${rel}`, "", `Source: ${pageUrl}`, `Markdown: ${mdUrl}`, "", body, "");
+		chunks.push(
+			"---",
+			"",
+			`# ${rel}`,
+			"",
+			`Source: ${pageUrl}`,
+			`Markdown: ${mdUrl}`,
+			"",
+			body,
+			"",
+		);
 	}
 
 	const output = chunks.join("\n");
@@ -114,19 +134,6 @@ function main() {
 	console.log(
 		`Wrote ${outPath} (${output.length.toLocaleString()} chars, ${files.length} files)`,
 	);
-
-	// Mirror skill into well-known if present
-	const skill = join(publicDir, "skill.md");
-	if (existsSync(skill)) {
-		const destDir = join(publicDir, ".well-known/agent-skills/reloop");
-		mkdirSync(destDir, { recursive: true });
-		writeFileSync(
-			join(destDir, "SKILL.md"),
-			readFileSync(skill, "utf-8"),
-			"utf-8",
-		);
-		console.log("Mirrored skill.md → public/.well-known/agent-skills/reloop/SKILL.md");
-	}
 }
 
 main();

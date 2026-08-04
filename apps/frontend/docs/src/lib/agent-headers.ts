@@ -2,8 +2,11 @@
 export const AGENT_CACHE_CONTROL =
 	"public, max-age=300, s-maxage=3600, must-revalidate";
 
-/** Link header advertising agent discovery endpoints (paths include basePath). */
+/**
+ * Agent discovery lives on the marketing web app (source of truth).
+ * Absolute origin paths so docs basePath does not prefix them.
+ */
 export const AGENT_LINK_HEADER =
-	'</docs/llms.txt>; rel="llms-txt", </docs/llms-full.txt>; rel="llms-full-txt", </docs/sitemap.md>; rel="sitemap", </docs/skill.md>; rel="skill-md"';
+	'</llms.txt>; rel="llms-txt", </llms-docs.txt>; rel="docs-llms-txt", </llms-full-docs.txt>; rel="llms-full-txt", </skill.md>; rel="skill-md", </docs/sitemap.md>; rel="sitemap"';
 
 export const AGENT_CONTENT_SIGNAL = "ai-train=yes, search=yes, ai-input=yes";

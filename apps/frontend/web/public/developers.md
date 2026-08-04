@@ -1,4 +1,4 @@
-> For the site documentation index, see [llms.txt](/llms.txt). Full marketing + blog corpus: [llms-full.txt](/llms-full.txt). Product docs index: [docs/llms.txt](/docs/llms.txt). Product skill: [skill.md](/skill.md). Prefer markdown URLs (append `.md`) when available.
+> For the site documentation index, see [llms.txt](/llms.txt). Docs index: [llms-docs.txt](/llms-docs.txt). Marketing corpus: [llms-full.txt](/llms-full.txt). Docs corpus: [llms-full-docs.txt](/llms-full-docs.txt). Product skill: [skill.md](/skill.md). Prefer markdown URLs (append `.md`) when available.
 
 # Developers
 
@@ -6,7 +6,7 @@ Reloop is built for developers who need reliable transactional email, webhooks, 
 
 ## Quick links
 
-- Docs index: https://reloop.sh/docs/llms.txt
+- Docs index: https://reloop.sh/llms-docs.txt
 - API reference: https://reloop.sh/docs/api
 - SDKs: https://reloop.sh/docs/resources/sdks
 - Languages: https://reloop.sh/languages

@@ -2,7 +2,8 @@
 
 > Full-document snapshot of Reloop marketing site content for long-context agents.
 > Site index: https://reloop.sh/llms.txt
-> Product docs corpus: https://reloop.sh/docs/llms-full.txt
+> Product docs corpus: https://reloop.sh/llms-full-docs.txt
+> Docs index: https://reloop.sh/llms-docs.txt
 > Product skill: https://reloop.sh/skill.md
 
 Generated from 10 pages.
@@ -100,7 +101,7 @@ See https://reloop.sh/docs/self-host
 ## Related
 
 - Signup: https://reloop.sh/dashboard/signup
-- Docs: https://reloop.sh/docs/llms.txt
+- Docs index: https://reloop.sh/llms-docs.txt
 - Contact sales: https://reloop.sh/contact
 
 
@@ -128,7 +129,7 @@ Reloop is email infrastructure for developers: transactional and marketing email
 
 - Hosted signup: https://reloop.sh/dashboard/signup
 - Pricing: https://reloop.sh/pricing.md
-- Documentation: https://reloop.sh/docs/llms.txt
+- Documentation index: https://reloop.sh/llms-docs.txt
 - API keys guide: https://reloop.sh/docs/learn/ai/api-keys.md
 - GitHub: https://github.com/reloop-labs/reloop
 
@@ -158,7 +159,7 @@ Reloop is built for developers who need reliable transactional email, webhooks, 
 
 ## Quick links
 
-- Docs index: https://reloop.sh/docs/llms.txt
+- Docs index: https://reloop.sh/llms-docs.txt
 - API reference: https://reloop.sh/docs/api
 - SDKs: https://reloop.sh/docs/resources/sdks
 - Languages: https://reloop.sh/languages
@@ -200,7 +201,7 @@ Reloop Labs builds open-source email infrastructure for developers and AI agents
 ## Links
 
 - Site: https://reloop.sh
-- Docs: https://reloop.sh/docs/llms.txt
+- Docs index: https://reloop.sh/llms-docs.txt
 - Careers: https://reloop.sh/careers
 - Contact: https://reloop.sh/contact
 - GitHub: https://github.com/reloop-labs/reloop

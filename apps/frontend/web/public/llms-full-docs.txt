@@ -1,9 +1,11 @@
 # Reloop Documentation (full)
 
 > Full-document snapshot of Reloop docs for long-context agents.
-> Curated index: https://reloop.sh/docs/llms.txt
-> Prefer per-page markdown: append `.md` to any docs URL under https://reloop.sh/docs/
-> Product skill: https://reloop.sh/docs/skill.md
+> Hosted on the marketing web app (source of truth for agent files).
+> Curated docs index: https://reloop.sh/llms-docs.txt
+> Site index: https://reloop.sh/llms.txt
+> Product skill: https://reloop.sh/skill.md
+> Prefer per-page markdown: append `.md` under https://reloop.sh/docs/
 
 Generated from 293 source files.
 

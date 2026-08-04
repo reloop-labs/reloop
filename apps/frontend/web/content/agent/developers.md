@@ -4,7 +4,7 @@ Reloop is built for developers who need reliable transactional email, webhooks, 
 
 ## Quick links
 
-- Docs index: https://reloop.sh/docs/llms.txt
+- Docs index: https://reloop.sh/llms-docs.txt
 - API reference: https://reloop.sh/docs/api
 - SDKs: https://reloop.sh/docs/resources/sdks
 - Languages: https://reloop.sh/languages

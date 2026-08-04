@@ -24,9 +24,10 @@ export function AgentDirective({
 			}}
 		>
 			<p>
-				For the complete site index, see <a href="/llms.txt">llms.txt</a>. Full
-				corpus: <a href="/llms-full.txt">llms-full.txt</a>. Product
-				documentation: <a href="/docs/llms.txt">docs/llms.txt</a>
+				For the complete site index, see <a href="/llms.txt">llms.txt</a>. Docs
+				index: <a href="/llms-docs.txt">llms-docs.txt</a>. Marketing corpus:{" "}
+				<a href="/llms-full.txt">llms-full.txt</a>. Docs corpus:{" "}
+				<a href="/llms-full-docs.txt">llms-full-docs.txt</a>
 				{markdownPath ? (
 					<>
 						. Markdown for this page:{" "}

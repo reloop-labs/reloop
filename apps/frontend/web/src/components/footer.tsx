@@ -70,11 +70,12 @@ const columns: FooterColumn[] = [
 		group: "Agents",
 		items: [
 			{ title: "llms.txt", href: "/llms.txt" },
+			{ title: "llms-docs.txt", href: "/llms-docs.txt" },
 			{ title: "llms-full.txt", href: "/llms-full.txt" },
+			{ title: "llms-full-docs.txt", href: "/llms-full-docs.txt" },
 			{ title: "skill.md", href: "/skill.md" },
 			{ title: "pricing.md", href: "/pricing.md" },
 			{ title: "sitemap.md", href: "/sitemap.md" },
-			{ title: "docs llms.txt", href: "/docs/llms.txt" },
 			{ title: "rss.xml", href: "/blog/feed.xml" },
 		],
 	},

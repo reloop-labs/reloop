@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const agentLink =
-	'</llms.txt>; rel="llms-txt", </llms-full.txt>; rel="llms-full-txt", </sitemap.md>; rel="sitemap", </skill.md>; rel="skill-md", </docs/llms.txt>; rel="docs-llms-txt"';
+	'</llms.txt>; rel="llms-txt", </llms-docs.txt>; rel="docs-llms-txt", </llms-full.txt>; rel="llms-full-txt", </llms-full-docs.txt>; rel="docs-llms-full-txt", </sitemap.md>; rel="sitemap", </skill.md>; rel="skill-md"';
 const agentCache = "public, max-age=300, s-maxage=3600, must-revalidate";
 
 const nextConfig: NextConfig = {

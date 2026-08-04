@@ -7,8 +7,9 @@
 		"build": "bun run generate:agent-public && next build",
 		"start": "next start",
 		"lint": "next lint",
-		"generate:agent-public": "bun run scripts/generate-agent-public.ts",
-		"generate:llms-full": "bun run scripts/generate-agent-public.ts"
+		"generate:agent-public": "bun run scripts/generate-agent-public.ts && bun run scripts/generate-docs-llms-full.ts",
+		"generate:llms-full": "bun run scripts/generate-agent-public.ts",
+		"generate:docs-llms-full": "bun run scripts/generate-docs-llms-full.ts"
 	},
 	"dependencies": {
 		"@hookform/resolvers": "catalog:ui",

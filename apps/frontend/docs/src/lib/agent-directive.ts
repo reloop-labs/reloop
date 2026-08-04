@@ -1,5 +1,6 @@
 /** Markdown blockquote injected into every `.md` twin for AFDocs llms-txt-directive-md. */
-export const LLMS_MD_DIRECTIVE = `> For the complete documentation index, see [llms.txt](/docs/llms.txt). Full corpus: [llms-full.txt](/docs/llms-full.txt). Prefer markdown URLs (append \`.md\`) for agent consumption. Product skill: [skill.md](/docs/skill.md).
+/** Agent indexes are served by the marketing web app (source of truth). */
+export const LLMS_MD_DIRECTIVE = `> For the complete documentation index, see [llms-docs.txt](/llms-docs.txt) or the site index [llms.txt](/llms.txt). Full docs corpus: [llms-full-docs.txt](/llms-full-docs.txt). Prefer markdown URLs (append \`.md\`) for agent consumption. Product skill: [skill.md](/skill.md).
 `;
 
 /**

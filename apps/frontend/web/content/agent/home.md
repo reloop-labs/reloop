@@ -14,7 +14,7 @@ Reloop is email infrastructure for developers: transactional and marketing email
 
 - Hosted signup: https://reloop.sh/dashboard/signup
 - Pricing: https://reloop.sh/pricing.md
-- Documentation: https://reloop.sh/docs/llms.txt
+- Documentation index: https://reloop.sh/llms-docs.txt
 - API keys guide: https://reloop.sh/docs/learn/ai/api-keys.md
 - GitHub: https://github.com/reloop-labs/reloop
 

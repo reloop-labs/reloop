@@ -11,7 +11,7 @@ Reloop Labs builds open-source email infrastructure for developers and AI agents
 ## Links
 
 - Site: https://reloop.sh
-- Docs: https://reloop.sh/docs/llms.txt
+- Docs index: https://reloop.sh/llms-docs.txt
 - Careers: https://reloop.sh/careers
 - Contact: https://reloop.sh/contact
 - GitHub: https://github.com/reloop-labs/reloop

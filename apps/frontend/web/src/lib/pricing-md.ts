@@ -46,7 +46,7 @@ export function buildPricingMarkdown(): string {
 		"## Related",
 		"",
 		"- Signup: https://reloop.sh/dashboard/signup",
-		"- Docs: https://reloop.sh/docs/llms.txt",
+		"- Docs index: https://reloop.sh/llms-docs.txt",
 		"- Contact sales: https://reloop.sh/contact",
 		"",
 	);

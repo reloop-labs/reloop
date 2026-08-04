@@ -9,6 +9,7 @@ import {
 	readFileSync,
 	writeFileSync,
 } from "node:fs";
+// copyFileSync still used for skill → well-known
 import { join } from "node:path";
 import { loadMarketingCorpus } from "../src/lib/agent-content";
 import { injectMarkdownAgentDirective } from "../src/lib/agent-directive";
@@ -36,7 +37,8 @@ const fullChunks: string[] = [
 	"",
 	"> Full-document snapshot of Reloop marketing site content for long-context agents.",
 	`> Site index: ${origin}/llms.txt`,
-	`> Product docs corpus: ${origin}/docs/llms-full.txt`,
+	`> Product docs corpus: ${origin}/llms-full-docs.txt`,
+	`> Docs index: ${origin}/llms-docs.txt`,
 	`> Product skill: ${origin}/skill.md`,
 	"",
 	`Generated from ${pages.length} pages.`,
@@ -75,39 +77,13 @@ for (const [src, dest] of mirrors) {
 	}
 }
 
-// --- skill.md (source of truth can live next to script or already in public) ---
-const skillCandidates = [
-	join(pub, "skill.md"),
-	join(root, "skill.md"),
-	join(root, "../docs/public/skill.md"),
-	join(root, "../docs/skill.md"),
-];
-let skill: string | null = null;
-for (const p of skillCandidates) {
-	if (existsSync(p)) {
-		skill = readFileSync(p, "utf-8");
-		break;
+// --- skill.md / llms.txt / llms-docs.txt are hand-maintained in public/ ---
+for (const name of ["skill.md", "llms.txt", "llms-docs.txt"] as const) {
+	if (!existsSync(join(pub, name))) {
+		console.warn(`  missing public/${name} (expected hand-maintained source of truth)`);
+	} else {
+		console.log(`  kept public/${name}`);
 	}
-}
-if (skill) {
-	// Prefer origin-level discovery links
-	const normalized = skill
-		.replaceAll("https://reloop.sh/docs/llms.txt", "https://reloop.sh/llms.txt")
-		.replace(
-			"llms: https://reloop.sh/docs/llms.txt",
-			"llms: https://reloop.sh/llms.txt",
-		);
-	// If still missing site index section, leave as-is when already adapted
-	write("skill.md", skill.includes("Site index:") ? skill : normalized);
-}
-
-// --- llms.txt must already exist in public or repo ---
-const llmsSrc = existsSync(join(pub, "llms.txt"))
-	? join(pub, "llms.txt")
-	: join(root, "llms.txt");
-if (existsSync(llmsSrc) && llmsSrc !== join(pub, "llms.txt")) {
-	copyFileSync(llmsSrc, join(pub, "llms.txt"));
-	console.log("  copied llms.txt → public/");
 }
 
 // --- .well-known discovery ---

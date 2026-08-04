@@ -59,8 +59,9 @@ const config = {
 	async headers() {
 		const isDev = process.env.NODE_ENV === "development";
 
+		// Agent discovery is on the marketing web origin (not this docs app)
 		const agentLink =
-			'</docs/llms.txt>; rel="llms-txt", </docs/llms-full.txt>; rel="llms-full-txt", </docs/sitemap.md>; rel="sitemap", </docs/skill.md>; rel="skill-md"';
+			'</llms.txt>; rel="llms-txt", </llms-docs.txt>; rel="docs-llms-txt", </llms-full-docs.txt>; rel="llms-full-txt", </skill.md>; rel="skill-md", </docs/sitemap.md>; rel="sitemap"';
 		const agentCache =
 			"public, max-age=300, s-maxage=3600, must-revalidate";
 

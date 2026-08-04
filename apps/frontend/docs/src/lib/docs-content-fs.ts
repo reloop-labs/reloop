@@ -14,31 +14,6 @@ export function getDocsContentDir(): string {
 	return paths[1]!;
 }
 
-/** Resolve agent static files from public/ (llms.txt, skill.md, …). */
-export function getDocsAppFile(filename: string): string {
-	const paths = [
-		join(process.cwd(), "public", filename),
-		join(process.cwd(), "apps/frontend/docs/public", filename),
-		join("/app/public", filename),
-		// legacy fallbacks (repo root next to app)
-		join(process.cwd(), filename),
-		join(process.cwd(), "apps/frontend/docs", filename),
-	];
-	for (const p of paths) {
-		if (existsSync(p)) return p;
-	}
-	return paths[0]!;
-}
-
-export function readDocsAppFile(filename: string): string | null {
-	const path = getDocsAppFile(filename);
-	try {
-		return readFileSync(path, "utf-8");
-	} catch {
-		return null;
-	}
-}
-
 export type DocsTextFile = {
 	/** URL path without /docs prefix, e.g. /learn/api-keys */
 	urlPath: string;
