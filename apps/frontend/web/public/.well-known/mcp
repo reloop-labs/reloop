@@ -1,0 +1,19 @@
+{
+  "version": "1.0.0",
+  "transport": "http",
+  "url": "https://reloop.sh/mcp",
+  "servers": [
+    {
+      "name": "site",
+      "url": "https://reloop.sh/mcp",
+      "transport": "http",
+      "authentication": "none"
+    },
+    {
+      "name": "docs",
+      "url": "https://reloop.sh/docs/mcp",
+      "transport": "http",
+      "authentication": "none"
+    }
+  ]
+}

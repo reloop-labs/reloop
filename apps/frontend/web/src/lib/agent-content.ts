@@ -10,13 +10,15 @@ function getWebRootCandidates(): string[] {
 }
 
 export function readWebAppFile(filename: string): string | null {
+	// Prefer public/ (static agent discovery files live there)
 	for (const root of getWebRootCandidates()) {
-		const p = join(root, filename);
-		if (existsSync(p)) {
-			try {
-				return readFileSync(p, "utf-8");
-			} catch {
-				/* continue */
+		for (const p of [join(root, "public", filename), join(root, filename)]) {
+			if (existsSync(p)) {
+				try {
+					return readFileSync(p, "utf-8");
+				} catch {
+					/* continue */
+				}
 			}
 		}
 	}

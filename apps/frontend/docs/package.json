@@ -3,9 +3,10 @@
 	"version": "0.0.0",
 	"private": true,
 	"scripts": {
-		"build": "bun run generate:llms-full && next build",
+		"build": "bun run generate:agent-public && next build",
 		"dev": "next dev --turbo --port=3003",
 		"start": "next start",
+		"generate:agent-public": "bun run scripts/generate-llms-full.ts && bun run scripts/write-agent-well-known.ts",
 		"generate:llms-full": "bun run scripts/generate-llms-full.ts",
 		"generate:api-docs": "bun run scripts/generate-api-docs.ts",
 		"sync:code-samples": "bun run scripts/sync-code-samples-from-source.ts",

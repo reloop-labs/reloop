@@ -1,12 +1,20 @@
 /**
- * Build llms-full.txt: a single-file snapshot of docs content for long-context agents.
+ * Build public/llms-full.txt: single-file docs snapshot for long-context agents.
  * Run: bun apps/frontend/docs/scripts/generate-llms-full.ts
  */
-import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import {
+	existsSync,
+	mkdirSync,
+	readdirSync,
+	readFileSync,
+	statSync,
+	writeFileSync,
+} from "node:fs";
 import { join, relative } from "node:path";
 
 const docsRoot = join(import.meta.dirname, "../content/docs");
-const outPath = join(import.meta.dirname, "../llms-full.txt");
+const publicDir = join(import.meta.dirname, "../public");
+const outPath = join(publicDir, "llms-full.txt");
 
 const PRIORITY_PREFIXES = [
 	"introduction.mdx",
@@ -24,11 +32,8 @@ function walk(dir: string, files: string[] = []): string[] {
 		if (name === "meta.json" || name.startsWith(".")) continue;
 		const full = join(dir, name);
 		const st = statSync(full);
-		if (st.isDirectory()) {
-			walk(full, files);
-		} else if (name.endsWith(".md") || name.endsWith(".mdx")) {
-			files.push(full);
-		}
+		if (st.isDirectory()) walk(full, files);
+		else if (name.endsWith(".md") || name.endsWith(".mdx")) files.push(full);
 	}
 	return files;
 }
@@ -39,7 +44,6 @@ function stripFrontmatter(content: string): string {
 	return match ? content.slice(match[0].length) : content;
 }
 
-/** Light cleanup: drop pure-JSX wrapper lines agents cannot use. */
 function mdxToAgentMarkdown(content: string): string {
 	return stripFrontmatter(content)
 		.replace(/^\s*import\s+.*$/gm, "")
@@ -61,6 +65,8 @@ function main() {
 		console.error("content/docs not found:", docsRoot);
 		process.exit(1);
 	}
+
+	mkdirSync(publicDir, { recursive: true });
 
 	const files = walk(docsRoot).sort((a, b) => {
 		const ra = relative(docsRoot, a);
@@ -100,15 +106,7 @@ function main() {
 				: `https://reloop.sh/docs/${urlPath}`;
 		const mdUrl = `${pageUrl === "https://reloop.sh/docs" ? "https://reloop.sh/docs/introduction" : pageUrl}.md`;
 
-		chunks.push("---");
-		chunks.push("");
-		chunks.push(`# ${rel}`);
-		chunks.push("");
-		chunks.push(`Source: ${pageUrl}`);
-		chunks.push(`Markdown: ${mdUrl}`);
-		chunks.push("");
-		chunks.push(body);
-		chunks.push("");
+		chunks.push("---", "", `# ${rel}`, "", `Source: ${pageUrl}`, `Markdown: ${mdUrl}`, "", body, "");
 	}
 
 	const output = chunks.join("\n");
@@ -116,6 +114,19 @@ function main() {
 	console.log(
 		`Wrote ${outPath} (${output.length.toLocaleString()} chars, ${files.length} files)`,
 	);
+
+	// Mirror skill into well-known if present
+	const skill = join(publicDir, "skill.md");
+	if (existsSync(skill)) {
+		const destDir = join(publicDir, ".well-known/agent-skills/reloop");
+		mkdirSync(destDir, { recursive: true });
+		writeFileSync(
+			join(destDir, "SKILL.md"),
+			readFileSync(skill, "utf-8"),
+			"utf-8",
+		);
+		console.log("Mirrored skill.md → public/.well-known/agent-skills/reloop/SKILL.md");
+	}
 }
 
 main();

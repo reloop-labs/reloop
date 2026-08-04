@@ -14,12 +14,15 @@ export function getDocsContentDir(): string {
 	return paths[1]!;
 }
 
-/** Resolve a repo-root file next to the docs app (llms.txt, skill.md, …). */
+/** Resolve agent static files from public/ (llms.txt, skill.md, …). */
 export function getDocsAppFile(filename: string): string {
 	const paths = [
+		join(process.cwd(), "public", filename),
+		join(process.cwd(), "apps/frontend/docs/public", filename),
+		join("/app/public", filename),
+		// legacy fallbacks (repo root next to app)
 		join(process.cwd(), filename),
 		join(process.cwd(), "apps/frontend/docs", filename),
-		join("/app", filename),
 	];
 	for (const p of paths) {
 		if (existsSync(p)) return p;

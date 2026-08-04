@@ -4,10 +4,11 @@
 	"private": true,
 	"scripts": {
 		"dev": "next dev --turbopack --port=3000",
-		"build": "bun run generate:llms-full && next build",
+		"build": "bun run generate:agent-public && next build",
 		"start": "next start",
 		"lint": "next lint",
-		"generate:llms-full": "bun run scripts/generate-llms-full.ts"
+		"generate:agent-public": "bun run scripts/generate-agent-public.ts",
+		"generate:llms-full": "bun run scripts/generate-agent-public.ts"
 	},
 	"dependencies": {
 		"@hookform/resolvers": "catalog:ui",
