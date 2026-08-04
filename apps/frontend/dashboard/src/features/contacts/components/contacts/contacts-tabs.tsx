@@ -4,6 +4,7 @@ import * as TabMenuHorizontal from "@reloop/ui/tab-menu-horizontal";
 import { AnimatePresence, motion } from "motion/react";
 import { usePathname, useRouter } from "next/navigation";
 import { useRef, useState } from "react";
+import { ShortcutHint } from "#/features/dashboard/keyboard-shortcuts-reveal";
 
 const items = [
 	{
@@ -11,24 +12,28 @@ const items = [
 		value: "contacts",
 		iconName: "contacts",
 		path: "/contacts",
+		shortcut: "G C",
 	},
 	{
 		title: "Properties",
 		value: "properties",
 		iconName: "tag",
 		path: "/contacts/properties",
+		shortcut: "G P",
 	},
 	{
 		title: "Groups",
 		value: "groups",
 		iconName: "modules",
 		path: "/contacts/groups",
+		shortcut: "G G",
 	},
 	{
 		title: "Channels",
 		value: "channels",
 		iconName: "notification-indicator",
 		path: "/contacts/channels",
+		shortcut: "G H",
 	},
 ] as const;
 
@@ -56,7 +61,7 @@ export function ContactsTabs() {
 	return (
 		<TabMenuHorizontal.Root value={effectiveTabValue}>
 			<TabMenuHorizontal.List className="relative h-11 gap-0 border-b! py-0">
-				{items.map(({ value, title, iconName, path }, index) => (
+				{items.map(({ value, title, iconName, path, shortcut }, index) => (
 					<TabMenuHorizontal.Trigger
 						ref={(el) => {
 							if (el) buttonRefs.current[index] = el;
@@ -75,6 +80,7 @@ export function ContactsTabs() {
 					>
 						<Icon name={iconName} className="h-4 w-4" />
 						{title}
+						<ShortcutHint>{shortcut}</ShortcutHint>
 					</TabMenuHorizontal.Trigger>
 				))}
 				<AnimatePresence>

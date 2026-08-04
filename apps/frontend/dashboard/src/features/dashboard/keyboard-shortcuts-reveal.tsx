@@ -8,7 +8,14 @@ import {
 	type Transition,
 	useReducedMotion,
 } from "framer-motion";
-import { type ReactNode, useEffect, useMemo } from "react";
+import {
+	type ReactNode,
+	useEffect,
+	useLayoutEffect,
+	useMemo,
+	useRef,
+	useState,
+} from "react";
 import { useUIStore } from "#/store/use-ui-store";
 
 /** Hold Space this long (ms) before shortcut hints appear. */
@@ -236,30 +243,12 @@ function ShortcutKeycaps({
 	);
 }
 
-/** Estimate keycap row width so we can animate without a permanent measure node. */
-function estimateStepsWidth(steps: string[][]): number {
-	const KEY = HINT_WIDTH_PX;
-	const KEY_GAP = 2; // gap-0.5
-	const STEP_GAP = 4; // gap-1
-	let width = 0;
-	for (let gi = 0; gi < steps.length; gi++) {
-		const group = steps[gi] ?? [];
-		if (gi > 0) width += STEP_GAP;
-		for (let ki = 0; ki < group.length; ki++) {
-			const key = group[ki] ?? "";
-			if (ki > 0) width += KEY_GAP;
-			// Single glyphs use the fixed face; longer labels get horizontal padding.
-			width += key.length > 1 ? Math.max(KEY, key.length * 6 + 10) : KEY;
-		}
-	}
-	return Math.max(KEY, width);
-}
-
 /**
  * Renders a keycap hint only while shortcuts are revealed (long-press Space).
  *
  * Supports multi-key labels (e.g. "G E", "G Shift+T") as separate keycaps.
  * Renders nothing when hidden so sidebar layout / hit targets stay clean.
+ * Width is measured from the real keycap row so the leading key is never clipped.
  *
  * Place next to the control that owns the shortcut.
  */
@@ -272,6 +261,8 @@ export function ShortcutHint({
 }) {
 	const revealed = useShortcutsRevealed();
 	const reduceMotion = useReducedMotion();
+	const innerRef = useRef<HTMLSpanElement>(null);
+	const [contentWidth, setContentWidth] = useState(HINT_WIDTH_PX);
 
 	const steps = useMemo(() => {
 		if (typeof children === "string" || typeof children === "number") {
@@ -280,14 +271,18 @@ export function ShortcutHint({
 		return null;
 	}, [children]);
 
-	const contentWidth = useMemo(() => {
-		if (steps && steps.length > 0) return estimateStepsWidth(steps);
-		return HINT_WIDTH_PX;
+	// Generous pre-estimate so the first animated frame is wide enough for "G C"
+	// (avoids one-frame clip of the leading key before measure runs).
+	const estimatedWidth = useMemo(() => {
+		if (!steps || steps.length === 0) return HINT_WIDTH_PX;
+		const keys = steps.flat();
+		// ~20px face+padding per key, 4px between sequence steps, 2px within chords
+		return (
+			keys.length * 20 +
+			Math.max(0, steps.length - 1) * 4 +
+			Math.max(0, keys.length - steps.length) * 2
+		);
 	}, [steps]);
-
-	const transition: Transition = reduceMotion
-		? { duration: 0 }
-		: { duration: HINT_DURATION, ease: EASE_SMOOTH_OUT };
 
 	const keycaps =
 		steps && steps.length > 0 ? (
@@ -295,6 +290,25 @@ export function ShortcutHint({
 		) : (
 			<KbdKey className={cn(shortcutKbdClassName, className)}>{children}</KbdKey>
 		);
+
+	// Measure the real keycap row once mounted so multi-key labels aren't clipped.
+	useLayoutEffect(() => {
+		if (!revealed) {
+			setContentWidth(estimatedWidth);
+			return;
+		}
+		const el = innerRef.current;
+		if (!el) {
+			setContentWidth(estimatedWidth);
+			return;
+		}
+		const next = Math.ceil(el.scrollWidth);
+		setContentWidth(next > 0 ? next : estimatedWidth);
+	}, [revealed, children, steps, className, estimatedWidth]);
+
+	const transition: Transition = reduceMotion
+		? { duration: 0 }
+		: { duration: HINT_DURATION, ease: EASE_SMOOTH_OUT };
 
 	return (
 		<AnimatePresence initial={false}>
@@ -323,9 +337,16 @@ export function ShortcutHint({
 					transition={transition}
 					// Extra py so the keycap bottom shelf isn't clipped by overflow;
 					// -my keeps the nav row height unchanged. Nudge up for optical align.
-					className="-my-0.5 inline-flex shrink-0 -translate-y-px items-center justify-end overflow-hidden py-0.5"
+					// justify-start so if width is briefly short we clip the trailing key,
+					// never the leading "G" of a sequence.
+					className="-my-0.5 inline-flex shrink-0 -translate-y-px items-center justify-start overflow-hidden py-0.5"
 				>
-					{keycaps}
+					<span
+						ref={innerRef}
+						className="inline-flex shrink-0 items-center whitespace-nowrap"
+					>
+						{keycaps}
+					</span>
 				</motion.span>
 			) : null}
 		</AnimatePresence>
