@@ -182,6 +182,9 @@ export const ThreadDetail = ({
 	);
 	const [showForwardComposer, setShowForwardComposer] = useState(false);
 	const [isForwarding, setIsForwarding] = useState(false);
+	const [isReplying, setIsReplying] = useState(false);
+	/** Sync lock so Approve & Send / double-fire cannot start two reply requests. */
+	const isReplyingRef = useRef(false);
 	/** List message id the forward composer is anchored under. */
 	const [forwardAnchorMessageId, setForwardAnchorMessageId] = useState<
 		string | null
@@ -267,6 +270,9 @@ export const ThreadDetail = ({
 		setSkipForwardEnter(false);
 		setOptimisticReplies([]);
 		setShowForwardComposer(false);
+		setIsReplying(false);
+		isReplyingRef.current = false;
+		setIsForwarding(false);
 		setForwardAnchorMessageId(null);
 		setForwardDraftId(null);
 		setForwardSeed("");
@@ -683,9 +689,14 @@ export const ThreadDetail = ({
 		/** Optional override when sending without opening the composer (e.g. approve). */
 		replyToId?: string;
 	}) => {
+		if (isReplyingRef.current) return;
+
 		const body = payload.text.trim();
 		const sendId = payload.replyToId || replyApiMessageId || messageId;
 		if (!thread || !sendId || !body) return;
+
+		isReplyingRef.current = true;
+		setIsReplying(true);
 
 		const optimisticMsg = {
 			id: `optimistic-${Date.now()}`,
@@ -728,12 +739,16 @@ export const ThreadDetail = ({
 				}
 				await Promise.all([mutateThread(), refresh()]);
 				setOptimisticReplies([]);
+				isReplyingRef.current = false;
+				setIsReplying(false);
 				return `Reply sent to ${thread.from.email} successfully`;
 			},
 			error: (err) => {
 				setOptimisticReplies((prev) =>
 					prev.filter((r) => r.id !== optimisticMsg.id),
 				);
+				isReplyingRef.current = false;
+				setIsReplying(false);
 				return err instanceof Error ? err.message : "Failed to send reply";
 			},
 		});
@@ -1160,6 +1175,7 @@ export const ThreadDetail = ({
 			}
 			onSend={handleSendReply}
 			onClose={closeReplyComposer}
+			isSending={isReplying}
 		/>
 	);
 
@@ -1302,6 +1318,7 @@ export const ThreadDetail = ({
 									onDelete={handleDelete}
 									onPrint={handlePrint}
 									onApproveSend={() => {
+										if (isReplyingRef.current) return;
 										const suggested = msg.parsed?.suggestedReply || "";
 										if (!suggested.trim()) return;
 										void handleSendReply({

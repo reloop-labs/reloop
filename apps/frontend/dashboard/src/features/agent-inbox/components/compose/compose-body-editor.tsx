@@ -97,6 +97,8 @@ function ComposeEditorBridge({
 	onModEnterRef.current = onModEnter;
 	const onUpdateRef = useRef(onUpdate);
 	onUpdateRef.current = onUpdate;
+	/** Drop accidental double Mod-Enter (stacked listeners / key-repeat). */
+	const lastModEnterAtRef = useRef(0);
 
 	useEffect(() => {
 		editorRef.current = buildHandle(editor);
@@ -112,6 +114,10 @@ function ComposeEditorBridge({
 		const onKeyDown = (event: KeyboardEvent) => {
 			if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
 				event.preventDefault();
+				event.stopPropagation();
+				const now = Date.now();
+				if (now - lastModEnterAtRef.current < 800) return;
+				lastModEnterAtRef.current = now;
 				onModEnterRef.current?.();
 			}
 		};

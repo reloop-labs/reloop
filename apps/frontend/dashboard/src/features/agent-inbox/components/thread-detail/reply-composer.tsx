@@ -73,6 +73,8 @@ interface ReplyComposerProps {
 		}>;
 	}) => void;
 	onClose: () => void;
+	/** Parent-owned lock while the reply request is in flight. */
+	isSending?: boolean;
 }
 
 const modKey =
@@ -98,6 +100,7 @@ export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
 			draft,
 			onSend,
 			onClose,
+			isSending = false,
 		},
 		ref,
 	) {
@@ -113,6 +116,8 @@ export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
 
 		const fileInputRef = useRef<HTMLInputElement>(null);
 		const editorRef = useRef<ComposeBodyEditorHandle>(null);
+		/** Sync lock covering the async getEmail() window before parent isSending flips. */
+		const sendingRef = useRef(false);
 		const seedHtml =
 			initialHtml || (initialContent ? plainToHtml(initialContent) : "");
 		const [editorKey, setEditorKey] = useState(0);
@@ -132,6 +137,10 @@ export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
 		aiPhaseRef.current = aiPhase;
 		const aiBusy = isAiDraftBusy(aiPhase);
 		const aiActive = isAiDraftActive(aiPhase);
+
+		useEffect(() => {
+			if (!isSending) sendingRef.current = false;
+		}, [isSending]);
 
 		const remountEditor = useCallback((html = "") => {
 			setEditorContent(html);
@@ -198,21 +207,28 @@ export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
 		}, []);
 
 		const send = useCallback(async () => {
+			// Prevent double-submit from rapid clicks / Cmd+Enter while getEmail() awaits.
+			if (isSending || sendingRef.current) return;
 			if (!textRef.current.trim()) return;
 			if (attachments.some((a) => a.isUploading)) {
 				toast.error("Please wait for attachments to finish uploading.");
 				return;
 			}
-			const exported = (await editorRef.current?.getEmail()) ?? {
-				html: htmlRef.current,
-				text: textRef.current,
-			};
-			onSend({
-				text: (exported.text || textRef.current).trim(),
-				html: exported.html || htmlRef.current,
-				attachments: toSendAttachments(attachments),
-			});
-		}, [attachments, onSend]);
+			sendingRef.current = true;
+			try {
+				const exported = (await editorRef.current?.getEmail()) ?? {
+					html: htmlRef.current,
+					text: textRef.current,
+				};
+				onSend({
+					text: (exported.text || textRef.current).trim(),
+					html: exported.html || htmlRef.current,
+					attachments: toSendAttachments(attachments),
+				});
+			} catch {
+				sendingRef.current = false;
+			}
+		}, [attachments, isSending, onSend]);
 
 		const generateReply = useCallback(async () => {
 			if (!resolvedThreadId) {
@@ -362,7 +378,9 @@ export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
 		});
 
 		const canSend =
-			textBody.trim().length > 0 && !attachments.some((a) => a.isUploading);
+			textBody.trim().length > 0 &&
+			!isSending &&
+			!attachments.some((a) => a.isUploading);
 
 		// Linear-like panel: scale from the trigger edge. Close = exact reverse of open.
 		const duration = reduceMotion ? 0.1 : 0.16;
@@ -455,7 +473,7 @@ export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
 							ref={editorRef}
 							editorKey={editorKey}
 							content={editorContent}
-							editable={!aiBusy}
+							editable={!aiBusy && !isSending}
 							placeholder="Start writing…"
 							className="compose-email-editor__content max-h-[280px] min-h-[160px] flex-1 overflow-y-auto px-4 pb-3"
 							onUpdate={(html, text) => {
@@ -465,7 +483,9 @@ export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
 									acceptAiDraft();
 								}
 							}}
-							onModEnter={() => void send()}
+							onModEnter={() => {
+								if (!isSending && !sendingRef.current) void send();
+							}}
 						/>
 						<div className="mt-auto flex items-center justify-between gap-3 px-4 pb-2">
 							<p className="min-w-0 truncate text-[11px] text-mail-muted">
@@ -605,7 +625,8 @@ export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
 									if (draft?.onDiscardDraft) draft.onDiscardDraft();
 									else onClose();
 								}}
-								className="inline-flex h-8 items-center rounded-lg px-2.5 font-medium text-[12px] text-mail-muted transition-colors duration-150 hover:bg-[var(--inbox-danger-bg)] hover:text-[var(--inbox-danger-fg)] active:scale-[0.97]"
+								disabled={isSending}
+								className="inline-flex h-8 items-center rounded-lg px-2.5 font-medium text-[12px] text-mail-muted transition-colors duration-150 hover:bg-[var(--inbox-danger-bg)] hover:text-[var(--inbox-danger-fg)] active:scale-[0.97] disabled:opacity-50"
 							>
 								Discard
 							</button>
@@ -617,15 +638,19 @@ export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
 								onClick={() => void send()}
 								className="min-w-[132px] justify-between pr-2 pl-3"
 							>
-								<span className="text-sm leading-none">Send</span>
-								<div className="flex items-center gap-0.5 opacity-70">
-									<KbdKeyOutline className="h-4 w-4 border-white/30 font-sans text-[9px] text-white">
-										{modKey}
-									</KbdKeyOutline>
-									<KbdKeyOutline className="h-4 w-4 border-white/30 font-sans text-[9px] text-white">
-										↵
-									</KbdKeyOutline>
-								</div>
+								<span className="text-sm leading-none">
+									{isSending ? "Sending…" : "Send"}
+								</span>
+								{!isSending && (
+									<div className="flex items-center gap-0.5 opacity-70">
+										<KbdKeyOutline className="h-4 w-4 border-white/30 font-sans text-[9px] text-white">
+											{modKey}
+										</KbdKeyOutline>
+										<KbdKeyOutline className="h-4 w-4 border-white/30 font-sans text-[9px] text-white">
+											↵
+										</KbdKeyOutline>
+									</div>
+								)}
 							</FancyButton.Root>
 						</div>
 					</div>
