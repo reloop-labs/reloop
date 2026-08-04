@@ -1,7 +1,7 @@
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import type { LogsModel } from "@reloop/logs/model/logs.model";
-import { and, count, desc, eq, type SQL } from "drizzle-orm";
+import { and, count, desc, eq, inArray, type SQL } from "drizzle-orm";
 import { useLogger } from "evlog/elysia";
 import {
 	resolveContactHistoryChanges,
@@ -56,6 +56,55 @@ export async function contactHistoryController({
 
 		const total = Number(totalResult?.count || 0);
 
+		// Resolve actor display names in bulk (user ids + api key ids)
+		const userIds = [
+			...new Set(
+				rows
+					.filter((r) => r.actorType === "user" && r.actorId)
+					.map((r) => r.actorId as string),
+			),
+		];
+		const apiKeyIds = [
+			...new Set(
+				rows
+					.filter((r) => r.actorType === "api_key" && r.actorId)
+					.map((r) => r.actorId as string),
+			),
+		];
+
+		const [users, apiKeys] = await Promise.all([
+			userIds.length > 0
+				? db
+						.select({
+							id: schema.user.id,
+							name: schema.user.name,
+							email: schema.user.email,
+							image: schema.user.image,
+						})
+						.from(schema.user)
+						.where(inArray(schema.user.id, userIds))
+				: Promise.resolve(
+						[] as {
+							id: string;
+							name: string;
+							email: string;
+							image: string | null;
+						}[],
+					),
+			apiKeyIds.length > 0
+				? db
+						.select({
+							id: schema.apikey.id,
+							name: schema.apikey.name,
+						})
+						.from(schema.apikey)
+						.where(inArray(schema.apikey.id, apiKeyIds))
+				: Promise.resolve([] as { id: string; name: string | null }[]),
+		]);
+
+		const userById = new Map(users.map((u) => [u.id, u]));
+		const apiKeyById = new Map(apiKeys.map((k) => [k.id, k]));
+
 		const data = rows.map((row) => {
 			const action = row.action || row.event.split(".").pop() || "updated";
 			const metadata =
@@ -72,6 +121,22 @@ export async function contactHistoryController({
 				requestDetails,
 			);
 
+			let actorName: string | null = null;
+			let actorImage: string | null = null;
+
+			if (row.actorType === "user" && row.actorId) {
+				const u = userById.get(row.actorId);
+				if (u) {
+					actorName = u.name?.trim() || u.email || null;
+					actorImage = u.image ?? null;
+				}
+			} else if (row.actorType === "api_key" && row.actorId) {
+				const k = apiKeyById.get(row.actorId);
+				actorName = k?.name?.trim() || "API key";
+			} else if (row.actorType === "system") {
+				actorName = "System";
+			}
+
 			return {
 				id: row.id,
 				event: row.event,
@@ -79,6 +144,8 @@ export async function contactHistoryController({
 				createdAt: row.createdAt.toISOString(),
 				actorType: row.actorType || null,
 				actorId: row.actorId ?? null,
+				actorName,
+				actorImage,
 				title: titleForContactAction(action),
 				summary: summaryFromChanges(changes),
 				changes,

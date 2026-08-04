@@ -396,6 +396,10 @@ export namespace LogsModel {
 		createdAt: t.String({ format: "date-time" }),
 		actorType: t.Union([t.String(), t.Null()]),
 		actorId: t.Union([t.String(), t.Null()]),
+		/** Resolved display name for the actor (user name or API key name). */
+		actorName: t.Union([t.String(), t.Null()]),
+		/** Optional avatar URL when the actor is a user. */
+		actorImage: t.Union([t.String(), t.Null()]),
 		title: t.String(),
 		summary: t.Union([t.String(), t.Null()]),
 		changes: t.Union([t.Array(contactHistoryChange), t.Null()]),
