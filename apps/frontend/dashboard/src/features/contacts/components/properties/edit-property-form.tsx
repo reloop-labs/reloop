@@ -11,6 +11,11 @@ import { useEffect, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import { useInvalidateContacts } from "#/features/contacts/hooks/use-contacts-query";
+import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
+
+/** Light keycap so it reads on the blue FancyButton fill. */
+const actionKbdOnBlueClassName =
+	"border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]";
 
 export interface EditPropertyFormProperty {
 	id: string;
@@ -64,28 +69,10 @@ export function EditPropertyForm({
 			? "Must be a valid number"
 			: "";
 
-	const canSubmit = !fallbackValueError && status !== "submitting";
-
-	useHotkeys(
-		"enter",
-		(e) => {
-			e.preventDefault();
-			if (canSubmit && status === "idle") {
-				void handleSubmit();
-			}
-		},
-		{ enableOnFormTags: ["INPUT"] },
-		[canSubmit, status, fallbackValue, fallbackValueError],
-	);
-
-	useHotkeys(
-		"escape",
-		(e) => {
-			e.preventDefault();
-			if (status === "idle") onCancel();
-		},
-		{ enableOnFormTags: true },
-	);
+	const canSubmit =
+		!fallbackValueError &&
+		status === "idle" &&
+		fallbackValue !== (property.defaultValue || "");
 
 	const handleSubmit = async (e?: React.FormEvent) => {
 		e?.preventDefault();
@@ -121,6 +108,27 @@ export function EditPropertyForm({
 			setStatus("idle");
 		}
 	};
+
+	useHotkeys(
+		"enter",
+		(e) => {
+			e.preventDefault();
+			if (canSubmit) {
+				void handleSubmit();
+			}
+		},
+		{ enableOnFormTags: ["INPUT"] },
+		[canSubmit, fallbackValue, property],
+	);
+
+	useHotkeys(
+		"escape",
+		() => {
+			if (status === "idle") onCancel();
+		},
+		{ enableOnFormTags: ["INPUT"] },
+		[status, onCancel],
+	);
 
 	const handleFallbackChange = (val: string) => {
 		if (property.propertyType?.toLowerCase() === "number") {
@@ -246,24 +254,28 @@ export function EditPropertyForm({
 					<Button.Root
 						type="button"
 						variant="neutral"
-						mode="ghost"
+						mode="stroke"
 						size="small"
 						onClick={onCancel}
 						disabled={status !== "idle"}
 						className={cn(
-							"transition-opacity duration-200",
+							"gap-1.5 transition-opacity duration-200",
 							status !== "idle" && "pointer-events-none opacity-50",
 						)}
 					>
 						Cancel
+						<ActionKbd className="lowercase! w-auto min-w-0 px-1">
+							esc
+						</ActionKbd>
 					</Button.Root>
 					<FancyButton.Root
 						type="submit"
 						variant={status === "success" ? "success" : "blue"}
 						size="small"
-						disabled={status === "submitting" || !!fallbackValueError}
+						disabled={!canSubmit}
 						className={cn(
-							"w-[172px] min-w-[172px] justify-center overflow-hidden transition-all duration-200",
+							"min-w-[172px] justify-center overflow-hidden transition-all duration-200",
+							status !== "idle" && "pointer-events-none",
 							status === "submitting" && "opacity-90",
 						)}
 					>
@@ -288,21 +300,14 @@ export function EditPropertyForm({
 								) : status === "success" ? (
 									<>
 										<Icon name="check-circle" className="h-4 w-4" />
-										<span>Property Updated</span>
+										<span>Property updated</span>
 									</>
 								) : (
 									<>
-										Update property
-										<span className="inline-flex items-center gap-0.5 opacity-80">
-											<Icon
-												name="command"
-												className="h-3.5 w-3.5 rounded-sm border border-white/20 p-px"
-											/>
-											<Icon
-												name="enter"
-												className="h-3.5 w-3.5 rounded-sm border border-white/20 p-px"
-											/>
-										</span>
+										Save changes
+										<ActionKbd className={actionKbdOnBlueClassName}>
+											↵
+										</ActionKbd>
 									</>
 								)}
 							</motion.span>
