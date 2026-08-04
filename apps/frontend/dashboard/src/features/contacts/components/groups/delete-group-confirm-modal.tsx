@@ -223,8 +223,8 @@ export function DeleteGroupConfirmModal({
 						Warning:
 					</span>{" "}
 					{isBulk
-						? "Deleting these groups will permanently remove them. Contacts in the groups will not be deleted."
-						: "Deleting this group will permanently remove it. Contacts in the group will not be deleted."}
+						? "This will permanently remove these groups. Contacts in them will be unlinked, not deleted."
+						: "This will permanently remove this group. Contacts in it will be unlinked, not deleted."}
 				</div>
 
 				{isBulk ? (
