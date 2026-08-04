@@ -17,11 +17,15 @@ kumo.on('init', function()
   kumo.define_spool {
     name = 'data',
     path = '/var/spool/kumomta/data',
+    min_free_space = os.getenv("KUMOMTA_MIN_FREE_SPACE") or '1%',
+    min_free_inodes = tonumber(os.getenv("KUMOMTA_MIN_FREE_INODES")) or 0,
   }
 
   kumo.define_spool {
     name = 'meta',
     path = '/var/spool/kumomta/meta',
+    min_free_space = os.getenv("KUMOMTA_MIN_FREE_SPACE") or '1%',
+    min_free_inodes = tonumber(os.getenv("KUMOMTA_MIN_FREE_INODES")) or 0,
   }
 
   for _, port in ipairs(SUBMISSION_PORTS) do

@@ -93,6 +93,8 @@ services:
       - NATS_URL=${NATS_URL:-reloop-nats:4222}
       - NODE_ENV=development
       - KUMOMTA_TRUSTED_HOSTS=${KUMOMTA_TRUSTED_HOSTS:-127.0.0.1,::1,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16}
+      - KUMOMTA_MIN_FREE_SPACE=${KUMOMTA_MIN_FREE_SPACE:-1%}
+      - KUMOMTA_MIN_FREE_INODES=${KUMOMTA_MIN_FREE_INODES:-0}
       - TRACKING_SECRET=${TRACKING_SECRET:-reloop_tracking_secret_default_123}
       - RELOOP_INTERNAL_SECRET=${RELOOP_INTERNAL_SECRET:-reloop_internal_secret_default_123}
     extra_hosts:
@@ -122,6 +124,8 @@ services:
       - INBOUND_HOSTNAME=${INBOUND_HOSTNAME:-inbound.reloop.sh}
       - NATS_URL=${NATS_URL:-reloop-nats:4222}
       - NODE_ENV=development
+      - KUMOMTA_MIN_FREE_SPACE=${KUMOMTA_MIN_FREE_SPACE:-1%}
+      - KUMOMTA_MIN_FREE_INODES=${KUMOMTA_MIN_FREE_INODES:-0}
       - KUMOMTA_RSPAMD_URL=${KUMOMTA_RSPAMD_URL:-http://reloop-spam:11333/checkv2}
       - KUMOMTA_CHECK_RECIPIENT_URL=${KUMOMTA_CHECK_RECIPIENT_URL:-http://host.docker.internal:8011/api/domain}
     extra_hosts:
