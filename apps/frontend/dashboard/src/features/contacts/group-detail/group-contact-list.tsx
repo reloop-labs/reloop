@@ -98,7 +98,7 @@ export const GroupContactList = ({ groupId }: { groupId: string }) => {
 	}
 
 	return (
-		<div>
+		<div className="mt-4">
 			<div className="mb-4 flex items-center gap-3">
 				<div className="flex-1">
 					<Input.Root size="xsmall">
