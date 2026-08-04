@@ -4,9 +4,6 @@ import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
-import { KbdCommand } from "@reloop/ui/kbd-command";
-import { KbdEnter } from "@reloop/ui/kbd-enter";
-import { KbdEsc } from "@reloop/ui/kbd-esc";
 import * as Label from "@reloop/ui/label";
 import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
@@ -18,7 +15,12 @@ import { useCallback, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import { useInvalidateContacts } from "#/features/contacts/hooks/use-contacts-query";
+import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { CreateChannelPreview } from "./create-channel-preview";
+
+/** Light keycap so it reads on the blue FancyButton fill. */
+const actionKbdOnBlueClassName =
+	"border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]";
 
 interface Channel {
 	id: string;
@@ -157,17 +159,27 @@ export const CreateChannelModal = ({
 		],
 	);
 
-	// Command/Ctrl + Enter to submit
 	useHotkeys(
-		"mod+enter",
+		"enter",
 		(e) => {
 			e.preventDefault();
 			if (open && status === "idle" && name.trim() && !isDescriptionOverLimit) {
-				handleSubmit();
+				void handleSubmit();
 			}
 		},
-		{ enableOnFormTags: true, enabled: open },
+		{ enableOnFormTags: ["INPUT"], enabled: open },
 		[open, status, name, isDescriptionOverLimit, handleSubmit],
+	);
+
+	useHotkeys(
+		"escape",
+		() => {
+			if (open && status === "idle") {
+				handleOpenChange(false);
+			}
+		},
+		{ enableOnFormTags: ["INPUT", "TEXTAREA"], enabled: open },
+		[open, status, handleOpenChange],
 	);
 
 	const previewChannel = {
@@ -334,9 +346,15 @@ export const CreateChannelModal = ({
 									size="small"
 									onClick={() => handleOpenChange(false)}
 									disabled={status !== "idle"}
+									className={cn(
+										"gap-1.5 transition-opacity duration-200",
+										status !== "idle" && "pointer-events-none opacity-50",
+									)}
 								>
 									Cancel
-									<KbdEsc />
+									<ActionKbd className="lowercase! w-auto min-w-0 px-1">
+										esc
+									</ActionKbd>
 								</Button.Root>
 								<FancyButton.Root
 									type="submit"
@@ -350,6 +368,7 @@ export const CreateChannelModal = ({
 									}
 									className={cn(
 										"w-[160px] min-w-[160px] justify-center overflow-hidden transition-all duration-200",
+										status !== "idle" && "pointer-events-none",
 										status === "creating" && "opacity-90",
 									)}
 								>
@@ -379,10 +398,9 @@ export const CreateChannelModal = ({
 											) : (
 												<>
 													<span>Create Channel</span>
-													<span className="inline-flex items-center gap-0.5 opacity-80">
-														<KbdCommand />
-														<KbdEnter />
-													</span>
+													<ActionKbd className={actionKbdOnBlueClassName}>
+														↵
+													</ActionKbd>
 												</>
 											)}
 										</motion.span>

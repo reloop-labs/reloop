@@ -2,6 +2,10 @@ import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
+import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
+
+const actionKbdOnSolidClassName =
+	"border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]";
 
 interface EmptyStateProps {
 	onCreateClick?: () => void;
@@ -58,9 +62,11 @@ export function EmptyState({
 					size="small"
 					onClick={onCreateClick}
 					className="gap-1.5 rounded-xl"
+					aria-keyshortcuts="c"
 				>
 					<Icon name="plus" className="h-4 w-4" />
 					Create channel
+					<ActionKbd className={actionKbdOnSolidClassName}>C</ActionKbd>
 				</FancyButton.Root>
 			)}
 		</div>

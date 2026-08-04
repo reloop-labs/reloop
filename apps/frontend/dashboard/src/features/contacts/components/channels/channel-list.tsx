@@ -1,7 +1,10 @@
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { useQueryState } from "nuqs";
+import { useMemo } from "react";
 import { toast } from "sonner";
+import type { CommandAction } from "#/features/dashboard/command-menu";
+import { useRegisterCommandActions } from "#/features/dashboard/command-menu-context";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import {
 	useChannelsQuery,
@@ -20,6 +23,41 @@ export function ChannelList() {
 		!!activeOrganization?.id,
 	);
 	const isLoading = isPending || (isFetching && !data);
+
+	const actions = useMemo<CommandAction[]>(
+		() => [
+			{
+				id: "create-channel",
+				label: "Create Channel",
+				icon: "plus",
+				shortcut: { label: "C", keys: ["c"] },
+				onSelect: () => void setModal("create-channel"),
+			},
+			{
+				id: "open-api-reference",
+				label: "Open API Reference",
+				icon: "code",
+				shortcut: { label: "S", keys: ["s"] },
+				onSelect: () =>
+					window.dispatchEvent(
+						new CustomEvent("api-details:open", {
+							detail: { docSection: "contacts/channels" },
+						}),
+					),
+			},
+			{
+				id: "go-to-docs",
+				label: "Go to Docs",
+				icon: "file-text",
+				shortcut: { label: "D", keys: ["d"] },
+				onSelect: () =>
+					window.open("https://reloop.sh/docs/learn/contacts", "_blank"),
+			},
+		],
+		[setModal],
+	);
+
+	useRegisterCommandActions("channels", "Channels", actions);
 
 	const handleToggleVisibility = async (
 		channelId: string,
