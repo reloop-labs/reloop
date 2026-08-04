@@ -40,6 +40,36 @@ interface ContactActivityResponse {
 	limit: number;
 }
 
+interface HistoryChange {
+	field: string;
+	from: string | number | null;
+	to: string | number | null;
+	label?: string;
+}
+
+interface HistoryEntry {
+	id: string;
+	event: string;
+	action: string;
+	createdAt: string;
+	actorType: string | null;
+	actorId: string | null;
+	title: string;
+	summary: string | null;
+	changes: HistoryChange[] | null;
+	requestBody: Record<string, unknown> | null;
+	metadata: Record<string, unknown>;
+}
+
+interface ContactHistoryResponse {
+	object: "contact_history";
+	contactId: string;
+	data: HistoryEntry[];
+	total: number;
+	page: number;
+	limit: number;
+}
+
 type DisplayStatus =
 	| "clicked"
 	| "opened"
@@ -64,6 +94,7 @@ interface ParsedLifecycle {
 
 type TimelineItem =
 	| { kind: "email"; id: string; entry: ActivityEntry; timestamp: string }
+	| { kind: "action"; id: string; entry: HistoryEntry; timestamp: string }
 	| { kind: "contact_created"; id: string; timestamp: string };
 
 interface DayGroup {
@@ -153,7 +184,45 @@ const NODE_STYLE = {
 		box: "border-stroke-soft-200 bg-bg-weak-50 text-text-sub-600",
 		icon: "user-plus" as const,
 	},
+	action: {
+		box: "border-primary-base/20 bg-primary-alpha-10 text-primary-base",
+		icon: "edit" as const,
+	},
+	"action-group": {
+		box: "border-stroke-soft-200 bg-bg-weak-50 text-text-sub-600",
+		icon: "users" as const,
+	},
+	"action-channel": {
+		box: "border-stroke-soft-200 bg-bg-weak-50 text-text-sub-600",
+		icon: "notification-indicator" as const,
+	},
+	"action-status": {
+		box: "border-warning-base/20 bg-warning-lighter/50 text-warning-base",
+		icon: "activity" as const,
+	},
 } as const;
+
+type NodeVariant = keyof typeof NODE_STYLE;
+
+function actionNodeVariant(action: string): NodeVariant {
+	if (action === "created" || action === "deleted") return "contact";
+	if (action.includes("group")) return "action-group";
+	if (action.includes("channel")) return "action-channel";
+	if (action === "updated") return "action";
+	return "action";
+}
+
+function formatChangeValue(value: string | number | null): string {
+	if (value === null || value === "") return "—";
+	return String(value);
+}
+
+function actorLabel(entry: HistoryEntry): string | null {
+	if (entry.actorType === "api_key") return "via API key";
+	if (entry.actorType === "user" && entry.actorId) return "by team member";
+	if (entry.actorType === "user") return "by user";
+	return null;
+}
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -284,16 +353,27 @@ function formatClockTime(iso: string): string {
 
 function buildTimelineItems(
 	entries: ActivityEntry[],
+	historyEntries: HistoryEntry[],
 	contactCreatedAt?: string,
 ): TimelineItem[] {
-	const items: TimelineItem[] = entries.map((entry) => ({
-		kind: "email" as const,
-		id: `email-${entry.id}`,
-		entry,
-		timestamp: entry.createdAt,
-	}));
+	const items: TimelineItem[] = [
+		...entries.map((entry) => ({
+			kind: "email" as const,
+			id: `email-${entry.id}`,
+			entry,
+			timestamp: entry.createdAt,
+		})),
+		...historyEntries.map((entry) => ({
+			kind: "action" as const,
+			id: `action-${entry.id}`,
+			entry,
+			timestamp: entry.createdAt,
+		})),
+	];
 
-	if (contactCreatedAt) {
+	// Prefer audit "contact.created" over synthetic createdAt row
+	const hasCreatedAction = historyEntries.some((e) => e.action === "created");
+	if (contactCreatedAt && !hasCreatedAction) {
 		items.push({
 			kind: "contact_created",
 			id: "contact-created",
@@ -370,7 +450,7 @@ function TimelineNode({
 	/** Draw a connector through the day-header spacer (not used on the very first item) */
 	connectFromAbove = false,
 }: {
-	variant: "email" | "email-error" | "contact";
+	variant: NodeVariant;
 	isLast: boolean;
 	topOffset?: boolean;
 	connectFromAbove?: boolean;
@@ -612,28 +692,123 @@ function ContactCreatedRow({
 	);
 }
 
+function ActionActivityRow({
+	entry,
+	isLast,
+	dayLabel: day,
+	isFirstOfDay,
+	isFirstOverall,
+}: {
+	entry: HistoryEntry;
+	isLast: boolean;
+	dayLabel?: string;
+	isFirstOfDay: boolean;
+	isFirstOverall: boolean;
+}) {
+	const showDay = isFirstOfDay && !!day;
+	const actor = actorLabel(entry);
+	const changes = entry.changes ?? [];
+	const onlyStatus =
+		changes.length === 1 && changes[0]?.field === "status"
+			? "action-status"
+			: actionNodeVariant(entry.action);
+
+	return (
+		<div className="flex gap-3">
+			<TimelineNode
+				variant={onlyStatus}
+				isLast={isLast}
+				topOffset={showDay}
+				connectFromAbove={showDay && !isFirstOverall}
+			/>
+
+			<div className={cn("min-w-0 flex-1", isLast ? "pb-1" : "pb-8")}>
+				{showDay && day && <DayHeader label={day} isFirst={isFirstOverall} />}
+
+				<div className="flex items-start justify-between gap-4">
+					<div className="min-w-0 flex-1">
+						<Link
+							href={`/logs?log=${entry.id}`}
+							className={cn(
+								"font-medium text-paragraph-sm text-text-strong-950 leading-snug",
+								"underline decoration-stroke-soft-200 decoration-dashed underline-offset-4",
+								"transition-colors hover:text-primary-base hover:decoration-primary-base/40",
+							)}
+						>
+							{entry.title}
+						</Link>
+
+						{changes.length > 0 ? (
+							<ul className="mt-1.5 space-y-0.5">
+								{changes.map((change) => {
+									const label = change.label ?? change.field;
+									const from = formatChangeValue(change.from);
+									const to = formatChangeValue(change.to);
+									const detail =
+										change.from === null
+											? to === "—"
+												? null
+												: `set to ${to}`
+											: change.to === null
+												? `cleared (was ${from})`
+												: `${from} → ${to}`;
+									return (
+										<li
+											key={`${entry.id}-${change.field}`}
+											className="text-paragraph-xs text-text-sub-600 leading-snug"
+										>
+											<span className="font-medium text-text-strong-950">
+												{label}
+											</span>
+											{detail ? (
+												<span className="text-text-soft-400">
+													{" · "}
+													{detail}
+												</span>
+											) : null}
+										</li>
+									);
+								})}
+							</ul>
+						) : entry.summary ? (
+							<p className="mt-0.5 text-paragraph-xs text-text-sub-600 leading-snug">
+								{entry.summary}
+							</p>
+						) : null}
+
+						{actor && (
+							<p className="mt-1 text-paragraph-xs text-text-soft-400">
+								{actor}
+							</p>
+						)}
+					</div>
+
+					<span className="shrink-0 pt-0.5 text-paragraph-xs text-text-soft-400 tabular-nums">
+						{formatClockTime(entry.createdAt)}
+					</span>
+				</div>
+			</div>
+		</div>
+	);
+}
+
 // ─── Main ────────────────────────────────────────────────────────────────────
 
 const PAGE_SIZE = 20;
 
 interface ContactEmailHistoryProps {
+	contactId: string;
 	email: string;
 	/** ISO timestamp of when the contact was created */
 	contactCreatedAt?: string;
 }
 
 export function ContactEmailHistory({
+	contactId,
 	email,
 	contactCreatedAt,
 }: ContactEmailHistoryProps) {
-	const {
-		data,
-		isPending: isLoading,
-		fetchNextPage,
-		hasNextPage,
-		isFetchingNextPage,
-		isError,
-	} = useInfiniteQuery({
+	const emailQuery = useInfiniteQuery({
 		queryKey: queryKeys.contacts.activity(email),
 		queryFn: async ({ pageParam }) => {
 			const res = await fetch(
@@ -652,16 +827,51 @@ export function ContactEmailHistory({
 		enabled: !!email,
 	});
 
+	const historyQuery = useInfiniteQuery({
+		queryKey: queryKeys.contacts.history(contactId),
+		queryFn: async ({ pageParam }) => {
+			const res = await fetch(
+				`/api/logs/v1/contacts/${encodeURIComponent(contactId)}/history?limit=${PAGE_SIZE}&page=${pageParam}`,
+				{ credentials: "include" },
+			);
+			if (!res.ok) throw new Error("Failed to load contact history");
+			return res.json() as Promise<ContactHistoryResponse>;
+		},
+		initialPageParam: 1,
+		getNextPageParam: (lastPage) => {
+			const loaded = lastPage.page * lastPage.limit;
+			if (loaded >= lastPage.total) return undefined;
+			return lastPage.page + 1;
+		},
+		enabled: !!contactId,
+	});
+
+	const isLoading = emailQuery.isPending || historyQuery.isPending;
+	const isError = emailQuery.isError && historyQuery.isError;
+	const isFetchingNextPage =
+		emailQuery.isFetchingNextPage || historyQuery.isFetchingNextPage;
+	const hasNextPage = !!(emailQuery.hasNextPage || historyQuery.hasNextPage);
+
 	const entries = useMemo(
-		() => data?.pages.flatMap((page) => page.data) ?? [],
-		[data],
+		() => emailQuery.data?.pages.flatMap((page) => page.data) ?? [],
+		[emailQuery.data],
 	);
-	const total = data?.pages[0]?.total ?? 0;
+	const historyEntries = useMemo(
+		() => historyQuery.data?.pages.flatMap((page) => page.data) ?? [],
+		[historyQuery.data],
+	);
+	const emailTotal = emailQuery.data?.pages[0]?.total ?? 0;
+	const historyTotal = historyQuery.data?.pages[0]?.total ?? 0;
+	const total = emailTotal + historyTotal;
 
 	const dayGroups = useMemo(() => {
-		const items = buildTimelineItems(entries, contactCreatedAt);
+		const items = buildTimelineItems(
+			entries,
+			historyEntries,
+			contactCreatedAt,
+		);
 		return groupByDay(items);
-	}, [entries, contactCreatedAt]);
+	}, [entries, historyEntries, contactCreatedAt]);
 
 	/** Flatten for continuous spine across day groups */
 	const flatItems = useMemo(
@@ -670,6 +880,11 @@ export function ContactEmailHistory({
 	);
 
 	const showEmpty = !isLoading && !isError && flatItems.length === 0;
+
+	const handleLoadMore = () => {
+		if (emailQuery.hasNextPage) void emailQuery.fetchNextPage();
+		if (historyQuery.hasNextPage) void historyQuery.fetchNextPage();
+	};
 
 	return (
 		<div className="mt-12 pb-12">
@@ -696,19 +911,19 @@ export function ContactEmailHistory({
 						Couldn&apos;t load activity
 					</p>
 					<p className="max-w-xs text-paragraph-xs text-text-soft-400">
-						Something went wrong fetching email history for this contact.
+						Something went wrong fetching activity for this contact.
 					</p>
 				</div>
 			) : showEmpty ? (
 				<div className="flex flex-col items-center gap-2 rounded-2xl border border-stroke-soft-100 border-dashed py-10 text-center dark:border-stroke-soft-100/40">
 					<div className="flex h-9 w-9 items-center justify-center rounded-[10px] border border-stroke-soft-200 bg-bg-weak-50">
-						<Icon name="mail-single" className="h-4 w-4 text-text-sub-600" />
+						<Icon name="activity" className="h-4 w-4 text-text-sub-600" />
 					</div>
 					<p className="font-medium text-paragraph-sm text-text-sub-600">
 						No activity yet
 					</p>
 					<p className="max-w-xs text-paragraph-xs text-text-soft-400">
-						Emails sent to{" "}
+						Profile changes and emails for{" "}
 						<span className="font-medium text-text-sub-600">{email}</span> will
 						appear here.
 					</p>
@@ -741,6 +956,19 @@ export function ContactEmailHistory({
 										);
 									}
 
+									if (item.kind === "action") {
+										return (
+											<ActionActivityRow
+												key={item.id}
+												entry={item.entry}
+												isLast={isLast}
+												dayLabel={group.label}
+												isFirstOfDay={isFirstOfDay}
+												isFirstOverall={isFirstOverall}
+											/>
+										);
+									}
+
 									return (
 										<ContactCreatedRow
 											key={item.id}
@@ -762,7 +990,7 @@ export function ContactEmailHistory({
 								variant="neutral"
 								mode="stroke"
 								size="xsmall"
-								onClick={() => void fetchNextPage()}
+								onClick={handleLoadMore}
 								disabled={isFetchingNextPage}
 								className="gap-1.5"
 							>
@@ -772,7 +1000,7 @@ export function ContactEmailHistory({
 									<>
 										Load more
 										<span className="text-text-soft-400 tabular-nums">
-											{entries.length}/{total}
+											{flatItems.length}/{total}
 										</span>
 									</>
 								)}

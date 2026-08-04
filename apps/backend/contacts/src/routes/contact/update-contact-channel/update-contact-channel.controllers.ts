@@ -3,6 +3,7 @@ import {
 	isAppError,
 } from "@be/contacts/error/contacts.error-response";
 import type { ContactModel } from "@be/contacts/model/contact.model";
+import { attachAuditChanges } from "@be/contacts/utils/contact-field-changes";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { CONTACT_UPDATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
@@ -61,6 +62,13 @@ export async function updateContactChannelController({
 			throw ContactErrors.contactNotFound(contact_id || email || "");
 		}
 
+		const channel = await db.query.channel.findFirst({
+			where: and(
+				eq(schema.channel.id, channelId),
+				eq(schema.channel.organizationId, organizationId),
+			),
+		});
+
 		const targetStatus = (
 			subscription === "opt_out" ? "unenrolled" : "enrolled"
 		) as "enrolled" | "unenrolled";
@@ -105,11 +113,30 @@ export async function updateContactChannelController({
 			});
 		}
 
+		const channelLabel = channel?.name ?? channelId;
 		const result = {
 			success: true,
+			id: contact.id,
 			status: targetStatus,
+			channelId,
+			channelName: channel?.name ?? null,
+			subscription,
 			event: CONTACT_UPDATE_WEBHOOK_EVENT.id,
 		};
+		attachAuditChanges(result, [
+			{
+				field: "channel",
+				from: null,
+				to: channelLabel,
+				label: "Channel",
+			},
+			{
+				field: "channel_subscription",
+				from: null,
+				to: subscription ?? targetStatus,
+				label: "Subscription",
+			},
+		]);
 
 		return result;
 	} catch (error) {

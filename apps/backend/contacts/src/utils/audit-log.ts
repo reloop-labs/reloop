@@ -1,3 +1,4 @@
+import { getAuditChanges } from "@be/contacts/utils/contact-field-changes";
 import { BusEvent, bus } from "@reloop/bus";
 
 interface AuditLogHookOptions {
@@ -72,6 +73,11 @@ export function auditLogHook(opts: AuditLogHookOptions) {
 				metadata = {
 					...result,
 				};
+				// Field-level changes attached by controllers via WeakMap
+				const changes = getAuditChanges(result);
+				if (changes) {
+					metadata.changes = changes;
+				}
 			} else {
 				metadata = {
 					status,
@@ -97,10 +103,11 @@ export function auditLogHook(opts: AuditLogHookOptions) {
 			};
 		}
 
-		// Try to parse resourceId from URL parameter if not in response body
+		// Try to parse resourceId from URL if not in response body.
+		// Contact IDs use con_; properties prop_; groups grp_; channels channel_.
 		if (!resourceId) {
 			const idMatch = request.url.match(
-				/\/(cont|prop|grp|channel)_[a-zA-Z0-9]+/,
+				/\/(con|cont|prop|grp|channel)_[a-zA-Z0-9]+/,
 			);
 			if (idMatch) {
 				resourceId = idMatch[0].replace("/", "");

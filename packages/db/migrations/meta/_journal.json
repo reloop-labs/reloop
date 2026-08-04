@@ -64,6 +64,13 @@
 			"when": 1785700000000,
 			"tag": "0008_custom_events",
 			"breakpoints": true
+		},
+		{
+			"idx": 9,
+			"version": "7",
+			"when": 1785800000000,
+			"tag": "0009_activity_log_resource_idx",
+			"breakpoints": true
 		}
 	]
 }

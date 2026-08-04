@@ -426,6 +426,7 @@ export const ContactHeader = ({
 
 				{contact?.email && (
 					<ContactEmailHistory
+						contactId={contact.id}
 						email={contact.email}
 						contactCreatedAt={contact.createdAt}
 					/>

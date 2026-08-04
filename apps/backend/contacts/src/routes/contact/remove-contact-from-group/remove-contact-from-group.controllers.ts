@@ -3,6 +3,7 @@ import {
 	isAppError,
 } from "@be/contacts/error/contacts.error-response";
 import type { ContactModel } from "@be/contacts/model/contact.model";
+import { attachAuditChanges } from "@be/contacts/utils/contact-field-changes";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { CONTACT_UPDATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
@@ -53,6 +54,13 @@ export async function removeContactFromGroupController({
 			throw ContactErrors.contactNotFound(contact_id || email || "");
 		}
 
+		const group = await db.query.group.findFirst({
+			where: and(
+				eq(schema.group.id, groupId),
+				eq(schema.group.organizationId, organizationId),
+			),
+		});
+
 		await db
 			.update(schema.contactGroup)
 			.set({ deletedAt: new Date(), updatedAt: new Date() })
@@ -70,12 +78,23 @@ export async function removeContactFromGroupController({
 			groupId,
 		});
 
+		const groupLabel = group?.name ?? groupId;
 		const result = {
 			success: true,
 			object: "contact" as const,
 			id: contact.id,
+			groupId,
+			groupName: group?.name ?? null,
 			event: CONTACT_UPDATE_WEBHOOK_EVENT.id,
 		};
+		attachAuditChanges(result, [
+			{
+				field: "group",
+				from: groupLabel,
+				to: null,
+				label: "Group",
+			},
+		]);
 
 		return result;
 	} catch (error) {

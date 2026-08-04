@@ -55,6 +55,8 @@ export const queryKeys = {
 		detail: (id: string) => [...queryKeys.contacts.all, "detail", id] as const,
 		activity: (email: string) =>
 			[...queryKeys.contacts.all, "activity", email] as const,
+		history: (contactId: string) =>
+			[...queryKeys.contacts.all, "history", contactId] as const,
 		groups: (params: { page: number; limit: number; search: string }) =>
 			[...queryKeys.contacts.all, "groups", params] as const,
 		groupDetail: (id: string) =>
