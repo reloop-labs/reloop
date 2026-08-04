@@ -7,90 +7,52 @@ import { Check, Copy } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 
-/* ─── Shared chrome ─────────────────────────────────────── */
-
-function Eyebrow({
-	items,
-}: {
-	items: { label: string; href?: string }[];
-}) {
-	return (
-		<p className="mb-4 font-medium text-[11px] text-text-sub-600 uppercase tracking-[0.14em]">
-			{items.map((item, i) => (
-				<span key={item.label}>
-					{i > 0 && (
-						<span className="mx-1.5 text-text-soft-400" aria-hidden>
-							·
-						</span>
-					)}
-					{item.href ? (
-						<Link
-							href={item.href}
-							className="text-primary-base transition-colors hover:text-primary-dark"
-						>
-							[{item.label}]
-						</Link>
-					) : (
-						<span>[{item.label}]</span>
-					)}
-				</span>
-			))}
-		</p>
-	);
-}
-
-/** Diagonal stripe block — Medusa-style accent, Reloop muted surface */
-function StripeAccent({ className }: { className?: string }) {
-	return (
-		<div
-			aria-hidden
-			className={cn(
-				"h-8 w-full max-w-[220px] rounded-md border border-stroke-soft-100 bg-[repeating-linear-gradient(-45deg,transparent,transparent_3px,var(--stroke-soft-100)_3px,var(--stroke-soft-100)_4px)] dark:border-stroke-soft-100/40 dark:bg-[repeating-linear-gradient(-45deg,transparent,transparent_3px,rgba(255,255,255,0.06)_3px,rgba(255,255,255,0.06)_4px)]",
-				className,
-			)}
-		/>
-	);
-}
+/* ─── Design-system primitives (match docs + dashboard chrome) ─── */
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
 	return (
-		<p className="mb-6 font-medium text-[11px] text-text-sub-600 uppercase tracking-[0.14em]">
-			[{children}]
+		<p className="mb-4 font-semibold text-[12px] text-text-sub-600 uppercase tracking-wider">
+			{children}
 		</p>
 	);
 }
 
-function HomeLink({
-	href,
-	children,
-	icon,
+function SectionHeading({
+	title,
+	description,
+	action,
 }: {
-	href: string;
-	children: React.ReactNode;
-	icon?: string;
+	title: string;
+	description?: string;
+	action?: { label: string; href: string };
 }) {
 	return (
-		<Link
-			href={href}
-			className="group flex items-center gap-3 rounded-lg py-1.5 text-[15px] text-text-strong-950 transition-colors hover:text-primary-base dark:text-white dark:hover:text-primary-base"
-		>
-			<span
-				aria-hidden
-				className="flex size-8 shrink-0 items-center justify-center rounded-md border border-stroke-soft-100 bg-[repeating-linear-gradient(-45deg,transparent,transparent_2px,var(--stroke-soft-100)_2px,var(--stroke-soft-100)_3px)] dark:border-stroke-soft-100/40 dark:bg-[repeating-linear-gradient(-45deg,transparent,transparent_2px,rgba(255,255,255,0.06)_2px,rgba(255,255,255,0.06)_3px)]"
-			>
-				{icon ? (
-					<Icon
-						name={icon}
-						className="size-3.5 text-text-sub-600 transition-colors group-hover:text-primary-base"
-					/>
+		<div className="mb-6 flex flex-wrap items-end justify-between gap-3">
+			<div className="min-w-0 max-w-2xl">
+				<h2 className="font-semibold text-xl text-text-strong-950 tracking-tight dark:text-white">
+					{title}
+				</h2>
+				{description ? (
+					<p className="mt-2 text-[15px] text-text-sub-600 leading-relaxed">
+						{description}
+					</p>
 				) : null}
-			</span>
-			<span className="font-medium leading-snug">{children}</span>
-		</Link>
+			</div>
+			{action ? (
+				<Link
+					href={action.href}
+					className="inline-flex shrink-0 items-center gap-1.5 font-medium text-[13.5px] text-primary-base transition-colors hover:text-primary-dark"
+				>
+					{action.label}
+					<Icon name="arrow-right" className="size-3.5" />
+				</Link>
+			) : null}
+		</div>
 	);
 }
 
-function Cell({
+/** Outer soft well — same language as api-endpoint-bar */
+function SoftWell({
 	children,
 	className,
 }: {
@@ -100,7 +62,7 @@ function Cell({
 	return (
 		<div
 			className={cn(
-				"border-stroke-soft-100 border-b border-r p-6 md:p-8 dark:border-stroke-soft-100/40",
+				"rounded-[18px] border border-stroke-soft-100 bg-[#fafafa] p-0.5 dark:border-stroke-soft-100/40 dark:bg-[#0c0c0e]",
 				className,
 			)}
 		>
@@ -109,7 +71,88 @@ function Cell({
 	);
 }
 
-/* ─── AI prompt card ────────────────────────────────────── */
+function SoftPanel({
+	children,
+	className,
+}: {
+	children: React.ReactNode;
+	className?: string;
+}) {
+	return (
+		<div
+			className={cn(
+				"rounded-[16px] border border-stroke-soft-100/70 bg-bg-white-0 dark:border-stroke-soft-100/15 dark:bg-zinc-950",
+				className,
+			)}
+		>
+			{children}
+		</div>
+	);
+}
+
+function NavCard({
+	href,
+	title,
+	description,
+	icon,
+}: {
+	href: string;
+	title: string;
+	description: string;
+	icon: string;
+}) {
+	return (
+		<Link
+			href={href}
+			className="group flex h-full flex-col gap-3 rounded-2xl border border-stroke-soft-100 bg-bg-white-0 p-5 transition-all hover:border-black/40 hover:bg-black/[0.02] dark:border-stroke-soft-100/40 dark:bg-zinc-950 dark:hover:border-white/40 dark:hover:bg-white/[0.02]"
+		>
+			<span className="flex size-9 items-center justify-center rounded-lg border border-stroke-soft-100 text-text-sub-600 transition-colors group-hover:text-text-strong-950 dark:border-stroke-soft-100/40 dark:group-hover:text-white">
+				<Icon name={icon} className="size-4" />
+			</span>
+			<div className="min-w-0">
+				<p className="font-semibold text-[15px] text-text-strong-950 tracking-tight dark:text-white">
+					{title}
+				</p>
+				<p className="mt-1.5 text-[13.5px] text-text-sub-600 leading-relaxed">
+					{description}
+				</p>
+			</div>
+		</Link>
+	);
+}
+
+function CompactLink({
+	href,
+	title,
+	description,
+	icon,
+}: {
+	href: string;
+	title: string;
+	description: string;
+	icon: string;
+}) {
+	return (
+		<Link
+			href={href}
+			className="group flex items-start gap-3 rounded-xl px-2 py-2.5 transition-colors hover:bg-bg-weak-50 dark:hover:bg-white/[0.03]"
+		>
+			<span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-lg border border-stroke-soft-100 text-text-sub-600 transition-colors group-hover:text-text-strong-950 dark:border-stroke-soft-100/40 dark:group-hover:text-white">
+				<Icon name={icon} className="size-3.5" />
+			</span>
+			<span className="min-w-0">
+				<span className="block font-semibold text-[14px] text-text-strong-950 tracking-tight dark:text-white">
+					{title}
+				</span>
+				<span className="mt-0.5 block text-[13px] text-text-sub-600 leading-snug">
+					{description}
+				</span>
+			</span>
+		</Link>
+	);
+}
+
+/* ─── AI prompt ─────────────────────────────────────────── */
 
 const AI_PROMPT =
 	"Fetch https://reloop.sh/docs and help me send my first email with the Reloop API. Create an API key, verify a domain, and send a test message.";
@@ -135,8 +178,8 @@ function PromptCard() {
 	};
 
 	return (
-		<div className="flex h-full flex-col justify-center gap-5">
-			<div className="relative rounded-xl border border-stroke-soft-100 bg-bg-white-0 p-4 shadow-sm dark:border-stroke-soft-100/40 dark:bg-zinc-950">
+		<div className="flex h-full flex-col gap-4">
+			<div className="relative min-h-[120px] flex-1 rounded-xl border border-stroke-soft-100/70 bg-bg-white-0 p-4 dark:border-stroke-soft-100/15 dark:bg-zinc-950">
 				<p className="pr-10 font-mono text-[13px] text-text-sub-600 leading-relaxed">
 					{AI_PROMPT}
 				</p>
@@ -144,7 +187,7 @@ function PromptCard() {
 					type="button"
 					onClick={onCopy}
 					aria-label={copied ? "Copied" : "Copy prompt"}
-					className="absolute top-3 right-3 rounded-md p-1.5 text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:hover:bg-white/5 dark:hover:text-white"
+					className="absolute top-3 right-3 cursor-pointer rounded-md p-1.5 text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:hover:bg-white/5 dark:hover:text-white"
 				>
 					{copied ? (
 						<Check className="size-4 text-emerald-500" />
@@ -153,7 +196,7 @@ function PromptCard() {
 					)}
 				</button>
 			</div>
-			<div className="flex flex-wrap items-center gap-2.5">
+			<div className="flex flex-wrap items-center gap-2">
 				{AI_TOOLS.map((tool) => (
 					<a
 						key={tool.name}
@@ -171,367 +214,313 @@ function PromptCard() {
 	);
 }
 
-/* ─── Recipe card ───────────────────────────────────────── */
-
-function RecipeCard({
-	href,
-	title,
-	description,
-	icon,
-}: {
-	href: string;
-	title: string;
-	description: string;
-	icon: string;
-}) {
-	return (
-		<Link
-			href={href}
-			className="group flex flex-col gap-3 rounded-xl border border-stroke-soft-100 bg-bg-white-0 p-5 transition-all hover:border-primary-base/40 hover:shadow-sm dark:border-stroke-soft-100/40 dark:bg-zinc-950 dark:hover:border-primary-base/40"
-		>
-			<span className="flex size-10 items-center justify-center rounded-lg border border-stroke-soft-100 bg-bg-weak-50 text-text-sub-600 transition-colors group-hover:border-primary-base/30 group-hover:text-primary-base dark:border-stroke-soft-100/40 dark:bg-white/5">
-				<Icon name={icon} className="size-5" />
-			</span>
-			<div>
-				<p className="font-semibold text-[15px] text-text-strong-950 dark:text-white">
-					{title}
-				</p>
-				<p className="mt-1 text-[13.5px] text-text-sub-600 leading-relaxed">
-					{description}
-				</p>
-			</div>
-		</Link>
-	);
-}
-
-/* ─── Module row ────────────────────────────────────────── */
-
-function ModuleItem({
-	href,
-	title,
-	description,
-	icon,
-}: {
-	href: string;
-	title: string;
-	description: string;
-	icon: string;
-}) {
-	return (
-		<Link
-			href={href}
-			className="group flex items-start gap-3 rounded-lg py-1.5 transition-colors"
-		>
-			<span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-md text-text-sub-600 transition-colors group-hover:text-primary-base">
-				<Icon name={icon} className="size-4" />
-			</span>
-			<span className="min-w-0">
-				<span className="block font-medium text-[14.5px] text-text-strong-950 transition-colors group-hover:text-primary-base dark:text-white">
-					{title}
-				</span>
-				<span className="mt-0.5 block text-[13px] text-text-sub-600 leading-snug">
-					{description}
-				</span>
-			</span>
-		</Link>
-	);
-}
-
 /* ─── Page ──────────────────────────────────────────────── */
 
 export function DocsHome() {
 	return (
-		<div className="not-prose w-full border-stroke-soft-100 border-t dark:border-stroke-soft-100/40">
+		<div className="not-prose mx-auto w-full max-w-6xl space-y-12 px-6 py-8 md:px-10 md:py-10">
 			{/* ── Hero ── */}
-			<section className="border-stroke-soft-100 border-b px-6 py-14 text-center md:px-10 md:py-20 dark:border-stroke-soft-100/40">
-				<Eyebrow
-					items={[
-						{ label: "RELOOP DOCS" },
-						{ label: "INTRODUCTION", href: "/docs" },
-					]}
-				/>
-				<h1 className="mx-auto max-w-3xl font-semibold text-[2rem] text-text-strong-950 leading-[1.15] tracking-[-0.03em] md:text-[2.75rem] dark:text-white">
-					Learn how to send with Reloop.
+			<header className="max-w-2xl">
+				<p className="mb-3 font-semibold text-[12px] text-text-sub-600 uppercase tracking-wider">
+					Documentation
+				</p>
+				<h1 className="font-semibold text-[1.75rem] text-text-strong-950 leading-tight tracking-[-0.03em] sm:text-3xl dark:text-white">
+					Learn how to send with Reloop
 				</h1>
-				<div className="mx-auto mt-5 flex max-w-2xl flex-col items-center justify-center gap-3 sm:flex-row sm:gap-5">
-					<StripeAccent className="hidden sm:block sm:max-w-[180px]" />
-					<p className="font-semibold text-[1.75rem] text-text-strong-950 tracking-[-0.03em] md:text-[2.25rem] dark:text-white">
-						Explore our guides.
-					</p>
+				<p className="mt-3.5 text-[16px] text-text-sub-600 leading-relaxed tracking-[-0.01em]">
+					Guides, API reference, SDKs, and agent tooling — everything you need to
+					send, receive, and automate email.
+				</p>
+				<div className="mt-6 flex flex-wrap gap-2.5">
+					<Link
+						href="/api/mail/post-api-mail-v1send"
+						className="inline-flex h-9 items-center gap-2 rounded-xl bg-text-strong-950 px-4 font-medium text-[13.5px] text-white transition-opacity hover:opacity-90 dark:bg-white dark:text-black"
+					>
+						Send your first email
+						<Icon name="arrow-right" className="size-3.5" />
+					</Link>
+					<Link
+						href="/api"
+						className="inline-flex h-9 items-center gap-2 rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-4 font-medium text-[13.5px] text-text-strong-950 transition-colors hover:bg-bg-weak-50 dark:border-stroke-soft-100/40 dark:bg-zinc-950 dark:text-white dark:hover:bg-white/5"
+					>
+						API Reference
+					</Link>
 				</div>
-			</section>
+			</header>
 
 			{/* ── AI agents ── */}
-			<section className="grid border-stroke-soft-100 border-b md:grid-cols-2 dark:border-stroke-soft-100/40">
-				<div className="border-stroke-soft-100 border-b p-6 md:border-r md:border-b-0 md:p-10 dark:border-stroke-soft-100/40">
-					<Eyebrow
-						items={[
-							{ label: "AI AGENTS" },
-							{ label: "LEARN MORE", href: "/docs/integrations/ai-tools/mcp-server" },
-						]}
-					/>
-					<h2 className="font-semibold text-[1.5rem] text-text-strong-950 tracking-[-0.02em] md:text-[1.75rem] dark:text-white">
-						Get started with your AI agent.
-					</h2>
-					<p className="mt-3 max-w-md text-[15px] text-text-sub-600 leading-relaxed">
-						Use this prompt with any AI agent to install Reloop, verify a domain,
-						and send your first email.
-					</p>
-				</div>
-				<div className="bg-bg-weak-50/60 p-6 md:p-10 dark:bg-white/[0.02]">
-					<PromptCard />
-				</div>
-			</section>
-
-			{/* ── Explore by area ── */}
-			<section className="grid sm:grid-cols-2 lg:grid-cols-3">
-				<Cell>
-					<SectionLabel>GET STARTED</SectionLabel>
-					<div className="flex flex-col gap-1">
-						<HomeLink href="/docs/api/mail/post-api-mail-v1send" icon="mail-send">
-							Send your first email
-						</HomeLink>
-						<HomeLink href="/docs/learn/domain" icon="globe">
-							Verify a domain
-						</HomeLink>
-						<HomeLink href="/docs/learn/api-keys" icon="key-new">
-							Create an API key
-						</HomeLink>
-						<HomeLink href="/docs/resources/sdks" icon="code">
-							Install an SDK
-						</HomeLink>
-					</div>
-				</Cell>
-				<Cell>
-					<SectionLabel>PRODUCT</SectionLabel>
-					<div className="flex flex-col gap-1">
-						<HomeLink href="/docs/learn/emails" icon="mail-single">
-							Emails
-						</HomeLink>
-						<HomeLink href="/docs/learn/templates" icon="file-code">
-							Templates
-						</HomeLink>
-						<HomeLink href="/docs/learn/contacts" icon="contacts">
-							Contacts
-						</HomeLink>
-						<HomeLink href="/docs/learn/webhooks" icon="webhook">
-							Webhooks
-						</HomeLink>
-					</div>
-				</Cell>
-				<Cell className="sm:col-span-2 lg:col-span-1">
-					<SectionLabel>PLATFORM</SectionLabel>
-					<div className="flex flex-col gap-1">
-						<HomeLink href="/docs/learn/agent-inbox" icon="inbox">
-							Agent Inbox
-						</HomeLink>
-						<HomeLink href="/docs/learn/workflows" icon="workflow">
-							Workflows
-						</HomeLink>
-						<HomeLink href="/docs/self-host" icon="server">
-							Self-host Reloop
-						</HomeLink>
-						<HomeLink href="/docs/integrations" icon="connector">
-							Integrations
-						</HomeLink>
-					</div>
-				</Cell>
-			</section>
-
-			{/* ── Guides / recipes ── */}
-			<section className="border-stroke-soft-100 border-t dark:border-stroke-soft-100/40">
-				<div className="grid lg:grid-cols-2">
-					<div className="flex items-center justify-center border-stroke-soft-100 border-b bg-bg-weak-50/50 p-10 lg:border-r lg:border-b-0 dark:border-stroke-soft-100/40 dark:bg-white/[0.02]">
-						<div className="relative flex size-40 items-center justify-center">
-							<div className="absolute inset-0 rounded-3xl border border-stroke-soft-100 bg-[repeating-linear-gradient(-45deg,transparent,transparent_4px,var(--stroke-soft-100)_4px,var(--stroke-soft-100)_5px)] opacity-60 dark:border-stroke-soft-100/40" />
-							<Icon
-								name="mail-send"
-								className="relative size-14 text-text-sub-600"
-							/>
+			<section>
+				<SoftWell>
+					<div className="grid overflow-hidden rounded-[16px] md:grid-cols-2">
+						<div className="border-stroke-soft-100/70 border-b p-6 md:border-r md:border-b-0 md:p-8 dark:border-stroke-soft-100/15">
+							<SectionLabel>AI Agents</SectionLabel>
+							<h2 className="font-semibold text-lg text-text-strong-950 tracking-tight dark:text-white">
+								Get started with your AI agent
+							</h2>
+							<p className="mt-2 max-w-md text-[14.5px] text-text-sub-600 leading-relaxed">
+								Copy this prompt into Cursor, Claude, or any agent to install
+								Reloop, verify a domain, and send a test email.
+							</p>
+							<Link
+								href="/integrations/ai-tools/mcp-server"
+								className="mt-5 inline-flex items-center gap-1.5 font-medium text-[13.5px] text-primary-base transition-colors hover:text-primary-dark"
+							>
+								MCP server guide
+								<Icon name="arrow-right" className="size-3.5" />
+							</Link>
+						</div>
+						<div className="bg-bg-white-0 p-6 md:p-8 dark:bg-zinc-950">
+							<PromptCard />
 						</div>
 					</div>
-					<div className="p-6 md:p-10">
-						<Eyebrow
-							items={[
-								{ label: "GUIDES" },
-								{ label: "VIEW ALL", href: "/docs/learn" },
-							]}
-						/>
-						<h2 className="font-semibold text-[1.5rem] text-text-strong-950 tracking-[-0.02em] md:text-[1.75rem] dark:text-white">
-							Reloop supports every email use case.
-						</h2>
-						<p className="mt-3 max-w-lg text-[15px] text-text-sub-600 leading-relaxed">
-							These guides show how to send transactional mail, build audiences,
-							handle inbound, and automate with workflows.
-						</p>
-					</div>
-				</div>
-				<div className="grid gap-4 border-stroke-soft-100 border-t p-6 sm:grid-cols-2 lg:grid-cols-3 md:p-8 dark:border-stroke-soft-100/40">
-					<RecipeCard
-						href="/docs/learn/emails"
+				</SoftWell>
+			</section>
+
+			{/* ── Get started ── */}
+			<section>
+				<SectionHeading
+					title="Get started"
+					description="Pick a path and ship your first message in minutes."
+				/>
+				<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+					<NavCard
+						href="/api/mail/post-api-mail-v1send"
 						icon="mail-send"
-						title="Transactional email"
-						description="Password resets, receipts, and product notifications via API or SMTP."
+						title="Send email"
+						description="POST /mail and deliver your first message."
 					/>
-					<RecipeCard
-						href="/docs/learn/contacts"
-						icon="contacts"
-						title="Audiences & contacts"
-						description="Manage contacts, groups, channels, and custom properties."
+					<NavCard
+						href="/learn/domain"
+						icon="globe"
+						title="Verify a domain"
+						description="SPF, DKIM, and DMARC setup for deliverability."
 					/>
-					<RecipeCard
-						href="/docs/learn/templates"
+					<NavCard
+						href="/learn/api-keys"
+						icon="key-new"
+						title="API keys"
+						description="Create, rotate, and scope credentials."
+					/>
+					<NavCard
+						href="/resources/sdks"
+						icon="code"
+						title="Install an SDK"
+						description="Node, Python, Go, Rust, PHP, and more."
+					/>
+				</div>
+			</section>
+
+			{/* ── Product guides ── */}
+			<section>
+				<SectionHeading
+					title="Product guides"
+					description="Deep dives into Reloop’s core features."
+					action={{ label: "View all", href: "/docs/learn" }}
+				/>
+				<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+					<NavCard
+						href="/learn/emails"
+						icon="mail-single"
+						title="Emails"
+						description="Transactional sending, SMTP, and delivery."
+					/>
+					<NavCard
+						href="/learn/templates"
 						icon="file-code"
 						title="Templates"
-						description="Design, version, and send dynamic HTML templates."
+						description="Design, version, and send dynamic HTML."
 					/>
-					<RecipeCard
-						href="/docs/learn/agent-inbox"
+					<NavCard
+						href="/learn/contacts"
+						icon="contacts"
+						title="Contacts"
+						description="Audiences, groups, channels, and properties."
+					/>
+					<NavCard
+						href="/learn/agent-inbox"
 						icon="inbox"
 						title="Agent Inbox"
-						description="Receive and reply to inbound email from your product or agent."
+						description="Receive and reply to inbound mail."
 					/>
-					<RecipeCard
-						href="/docs/learn/webhooks"
+					<NavCard
+						href="/learn/webhooks"
 						icon="webhook"
-						title="Event-driven apps"
-						description="Subscribe to delivery, open, click, and bounce events."
+						title="Webhooks"
+						description="Delivery, open, click, and bounce events."
 					/>
-					<RecipeCard
-						href="/docs/learn/workflows"
+					<NavCard
+						href="/learn/workflows"
 						icon="workflow"
 						title="Workflows"
-						description="Automate multi-step email sequences and custom events."
+						description="Automate multi-step email sequences."
 					/>
 				</div>
 			</section>
 
 			{/* ── API modules ── */}
-			<section className="border-stroke-soft-100 border-t dark:border-stroke-soft-100/40">
-				<div className="flex flex-wrap items-center gap-4 border-stroke-soft-100 border-b px-6 py-8 md:px-10 dark:border-stroke-soft-100/40">
-					<h2 className="font-semibold text-[1.5rem] text-text-strong-950 tracking-[-0.02em] md:text-[1.75rem] dark:text-white">
-						API modules
-					</h2>
-					<StripeAccent className="hidden max-w-none flex-1 sm:block" />
-				</div>
-				<div className="grid sm:grid-cols-2 lg:grid-cols-3">
-					<Cell>
-						<SectionLabel>SENDING</SectionLabel>
-						<div className="flex flex-col gap-3">
-							<ModuleItem
-								href="/docs/api/mail/post-api-mail-v1send"
-								icon="mail-send"
-								title="Mail"
-								description="Send transactional and marketing email"
-							/>
-							<ModuleItem
-								href="/docs/api/template"
-								icon="file-code"
-								title="Templates"
-								description="Create, version, and test templates"
-							/>
-							<ModuleItem
-								href="/docs/api/domain"
-								icon="globe"
-								title="Domains"
-								description="Verify DNS and manage sending domains"
-							/>
-						</div>
-					</Cell>
-					<Cell>
-						<SectionLabel>AUDIENCE</SectionLabel>
-						<div className="flex flex-col gap-3">
-							<ModuleItem
-								href="/docs/api/contacts"
-								icon="contacts"
-								title="Contacts"
-								description="Contacts, groups, and properties"
-							/>
-							<ModuleItem
-								href="/docs/api/api-key"
-								icon="key-new"
-								title="API Keys"
-								description="Create, rotate, and scope keys"
-							/>
-							<ModuleItem
-								href="/docs/api/webhook"
-								icon="webhook"
-								title="Webhooks"
-								description="Endpoints, deliveries, and retries"
-							/>
-						</div>
-					</Cell>
-					<Cell className="bg-bg-weak-50/40 sm:col-span-2 lg:col-span-1 dark:bg-white/[0.02]">
-						<SectionLabel>OBSERVABILITY</SectionLabel>
-						<div className="flex flex-col gap-3">
-							<ModuleItem
-								href="/docs/api/logs"
-								icon="file-text"
-								title="Logs"
-								description="Email logs, stats, and contact activity"
-							/>
-							<ModuleItem
-								href="/docs/api/inbox"
-								icon="inbox"
-								title="Inbox"
-								description="Mailboxes, threads, and messages"
-							/>
-							<ModuleItem
-								href="/docs/api/upload"
-								icon="file-upload"
-								title="Upload"
-								description="Attach files to outbound email"
-							/>
-						</div>
-					</Cell>
+			<section>
+				<SectionHeading
+					title="API modules"
+					description="Full reference for every resource."
+					action={{ label: "Open API Reference", href: "/docs/api" }}
+				/>
+				<div className="grid gap-4 lg:grid-cols-3">
+					<SoftWell>
+						<SoftPanel className="h-full p-5">
+							<SectionLabel>Sending</SectionLabel>
+							<div className="flex flex-col gap-0.5">
+								<CompactLink
+									href="/api/mail/post-api-mail-v1send"
+									icon="mail-send"
+									title="Mail"
+									description="Send transactional and marketing email"
+								/>
+								<CompactLink
+									href="/api/template"
+									icon="file-code"
+									title="Templates"
+									description="Create, version, and test templates"
+								/>
+								<CompactLink
+									href="/api/domain"
+									icon="globe"
+									title="Domains"
+									description="Verify DNS and manage sending domains"
+								/>
+							</div>
+						</SoftPanel>
+					</SoftWell>
+					<SoftWell>
+						<SoftPanel className="h-full p-5">
+							<SectionLabel>Audience</SectionLabel>
+							<div className="flex flex-col gap-0.5">
+								<CompactLink
+									href="/api/contacts"
+									icon="contacts"
+									title="Contacts"
+									description="Contacts, groups, and properties"
+								/>
+								<CompactLink
+									href="/api/api-key"
+									icon="key-new"
+									title="API Keys"
+									description="Create, rotate, and scope keys"
+								/>
+								<CompactLink
+									href="/api/webhook"
+									icon="webhook"
+									title="Webhooks"
+									description="Endpoints, deliveries, and retries"
+								/>
+							</div>
+						</SoftPanel>
+					</SoftWell>
+					<SoftWell>
+						<SoftPanel className="h-full p-5">
+							<SectionLabel>Observability</SectionLabel>
+							<div className="flex flex-col gap-0.5">
+								<CompactLink
+									href="/api/logs"
+									icon="file-text"
+									title="Logs"
+									description="Email logs, stats, and activity"
+								/>
+								<CompactLink
+									href="/api/inbox"
+									icon="inbox"
+									title="Inbox"
+									description="Mailboxes, threads, and messages"
+								/>
+								<CompactLink
+									href="/api/upload"
+									icon="file-upload"
+									title="Upload"
+									description="Attach files to outbound email"
+								/>
+							</div>
+						</SoftPanel>
+					</SoftWell>
 				</div>
 			</section>
 
-			{/* ── Bottom CTA strip ── */}
-			<section className="grid border-stroke-soft-100 border-t md:grid-cols-3 dark:border-stroke-soft-100/40">
-				<div className="border-stroke-soft-100 border-b p-6 md:border-r md:border-b-0 md:p-8 dark:border-stroke-soft-100/40">
-					<SectionLabel>EXAMPLES</SectionLabel>
-					<div className="flex flex-col gap-1">
-						<HomeLink href="/docs/examples/nodejs/nextjs" icon="code">
-							Next.js
-						</HomeLink>
-						<HomeLink href="/docs/examples/python/fastapi" icon="code">
-							FastAPI
-						</HomeLink>
-						<HomeLink href="/docs/examples/smtp/introduction" icon="server">
-							SMTP
-						</HomeLink>
-					</div>
-				</div>
-				<div className="border-stroke-soft-100 border-b p-6 md:border-r md:border-b-0 md:p-8 dark:border-stroke-soft-100/40">
-					<SectionLabel>RESOURCES</SectionLabel>
-					<div className="flex flex-col gap-1">
-						<HomeLink href="/docs/resources/sdks" icon="box">
-							SDKs
-						</HomeLink>
-						<HomeLink href="/docs/resources/cli" icon="terminal">
-							CLI
-						</HomeLink>
-						<HomeLink href="/docs/resources/security" icon="shield-check">
-							Security
-						</HomeLink>
-					</div>
-				</div>
-				<div className="bg-bg-weak-50/50 p-6 md:p-8 dark:bg-white/[0.02]">
-					<p className="font-semibold text-[15px] text-text-strong-950 dark:text-white">
-						Need the full reference?
-					</p>
-					<p className="mt-2 text-[13.5px] text-text-sub-600 leading-relaxed">
-						Browse every endpoint, schema, and webhook event in the API reference.
-					</p>
-					<Link
-						href="/docs/api"
-						className="mt-4 inline-flex items-center gap-1.5 font-medium text-[14px] text-primary-base transition-colors hover:text-primary-dark"
-					>
-						Open API Reference
-						<Icon name="arrow-right" className="size-3.5" />
-					</Link>
-				</div>
+			{/* ── Bottom row ── */}
+			<section className="grid gap-4 lg:grid-cols-3">
+				<SoftWell>
+					<SoftPanel className="h-full p-5">
+						<SectionLabel>Examples</SectionLabel>
+						<div className="flex flex-col gap-0.5">
+							<CompactLink
+								href="/examples/nodejs/nextjs"
+								icon="code"
+								title="Next.js"
+								description="App Router + Reloop SDK"
+							/>
+							<CompactLink
+								href="/examples/python/fastapi"
+								icon="code"
+								title="FastAPI"
+								description="Python SDK integration"
+							/>
+							<CompactLink
+								href="/examples/smtp/introduction"
+								icon="server"
+								title="SMTP"
+								description="Relay via any SMTP client"
+							/>
+						</div>
+					</SoftPanel>
+				</SoftWell>
+				<SoftWell>
+					<SoftPanel className="h-full p-5">
+						<SectionLabel>Resources</SectionLabel>
+						<div className="flex flex-col gap-0.5">
+							<CompactLink
+								href="/resources/sdks"
+								icon="box"
+								title="SDKs"
+								description="Official client libraries"
+							/>
+							<CompactLink
+								href="/resources/cli"
+								icon="terminal"
+								title="CLI"
+								description="Command-line tooling"
+							/>
+							<CompactLink
+								href="/resources/security"
+								icon="shield-check"
+								title="Security"
+								description="Auth, secrets, and best practices"
+							/>
+						</div>
+					</SoftPanel>
+				</SoftWell>
+				<SoftWell>
+					<SoftPanel className="flex h-full flex-col justify-between gap-4 p-5">
+						<div>
+							<p className="font-semibold text-[15px] text-text-strong-950 tracking-tight dark:text-white">
+								Self-host Reloop
+							</p>
+							<p className="mt-2 text-[13.5px] text-text-sub-600 leading-relaxed">
+								Run the full stack on Vercel, Railway, Docker, or your own VPS.
+							</p>
+						</div>
+						<div className="flex flex-wrap gap-2">
+							<Link
+								href="/self-host"
+								className="inline-flex h-8 items-center rounded-lg border border-stroke-soft-100 bg-bg-white-0 px-3 font-medium text-[13px] text-text-strong-950 transition-colors hover:bg-bg-weak-50 dark:border-stroke-soft-100/40 dark:bg-zinc-950 dark:text-white dark:hover:bg-white/5"
+							>
+								Self-host guide
+							</Link>
+							<Link
+								href="/integrations"
+								className="inline-flex h-8 items-center rounded-lg border border-stroke-soft-100 bg-bg-white-0 px-3 font-medium text-[13px] text-text-strong-950 transition-colors hover:bg-bg-weak-50 dark:border-stroke-soft-100/40 dark:bg-zinc-950 dark:text-white dark:hover:bg-white/5"
+							>
+								Integrations
+							</Link>
+						</div>
+					</SoftPanel>
+				</SoftWell>
 			</section>
 		</div>
 	);

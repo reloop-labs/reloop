@@ -329,7 +329,7 @@ export default async function Page(props: {
 					<div
 						className={`min-w-0 ${
 							isDocsHome
-								? "px-0 py-0"
+								? ""
 								: `px-6 py-8 md:px-10 ${
 										useSplitLayout
 											? "xl:grid xl:grid-cols-[minmax(0,1fr)_minmax(380px,480px)] xl:gap-x-10 2xl:gap-x-12"
