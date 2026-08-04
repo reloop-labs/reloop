@@ -1,17 +1,15 @@
-import { type NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import {
 	AGENT_CACHE_CONTROL,
 	AGENT_CONTENT_SIGNAL,
-} from "../../lib/agent-headers";
-import { readDocsAppFile } from "../../lib/docs-content-fs";
+} from "@reloop/web/lib/agent-headers";
+import { readWebAppFile } from "@reloop/web/lib/agent-content";
 
-export async function GET(_request: NextRequest) {
-	// Kept outside `public/` so it doesn't conflict with this App Router route.
-	const content = readDocsAppFile("llms.txt");
+export async function GET() {
+	const content = readWebAppFile("llms.txt");
 	if (!content) {
 		return new NextResponse("llms.txt not found", { status: 404 });
 	}
-
 	return new NextResponse(content, {
 		status: 200,
 		headers: {

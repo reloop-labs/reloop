@@ -6,10 +6,9 @@ import {
 import { readDocsAppFile } from "../../lib/docs-content-fs";
 
 export async function GET(_request: NextRequest) {
-	// Kept outside `public/` so it doesn't conflict with this App Router route.
-	const content = readDocsAppFile("llms.txt");
+	const content = readDocsAppFile("llms-full.txt");
 	if (!content) {
-		return new NextResponse("llms.txt not found", { status: 404 });
+		return new NextResponse("llms-full.txt not found", { status: 404 });
 	}
 
 	return new NextResponse(content, {

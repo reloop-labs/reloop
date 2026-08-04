@@ -37,6 +37,7 @@ const config = {
 	},
 	async rewrites() {
 		return [
+			// Markdown twins for doc pages (afterFiles: App Router skill.md route wins)
 			{
 				source: "/:path*.md",
 				destination: "/api/markdown/:path*",
@@ -58,14 +59,47 @@ const config = {
 	async headers() {
 		const isDev = process.env.NODE_ENV === "development";
 
+		const agentLink =
+			'</docs/llms.txt>; rel="llms-txt", </docs/llms-full.txt>; rel="llms-full-txt", </docs/sitemap.md>; rel="sitemap", </docs/skill.md>; rel="skill-md"';
+		const agentCache =
+			"public, max-age=300, s-maxage=3600, must-revalidate";
+
 		const list = [
+			// Hashed static assets — long cache (must be listed before the catch-all)
+			...(isDev
+				? []
+				: [
+						{
+							source: "/_next/static/:path*",
+							headers: [
+								{
+									key: "Cache-Control",
+									value: "public, max-age=31536000, immutable",
+								},
+							],
+						},
+						{
+							source: "/font/:path*",
+							headers: [
+								{
+									key: "Cache-Control",
+									value: "public, max-age=31536000, immutable",
+								},
+							],
+						},
+					]),
 			{
-				source: "/:path*",
+				// Docs HTML/API/agent content — short cache so agents see updates promptly.
+				// Exclude hashed static assets.
+				source: "/:path((?!_next/static|_next/image|font/).*)",
 				headers: [
 					{
 						key: "Link",
-						value:
-							'</docs/llms.txt>; rel="llms-txt", </docs/sitemap.md>; rel="sitemap"',
+						value: agentLink,
+					},
+					{
+						key: "Cache-Control",
+						value: agentCache,
 					},
 				],
 			},
@@ -75,8 +109,11 @@ const config = {
 				headers: [
 					{
 						key: "Link",
-						value:
-							'</docs/learn/ai/api-keys.md>; rel="alternate"; type="text/markdown", </docs/llms.txt>; rel="llms-txt", </docs/sitemap.md>; rel="sitemap"',
+						value: `</docs/learn/ai/api-keys.md>; rel="alternate"; type="text/markdown", ${agentLink}`,
+					},
+					{
+						key: "Cache-Control",
+						value: agentCache,
 					},
 				],
 			},
@@ -85,37 +122,15 @@ const config = {
 				headers: [
 					{
 						key: "Link",
-						value:
-							'</docs/learn/ai/api-keys.md>; rel="alternate"; type="text/markdown", </docs/llms.txt>; rel="llms-txt", </docs/sitemap.md>; rel="sitemap"',
+						value: `</docs/learn/ai/api-keys.md>; rel="alternate"; type="text/markdown", ${agentLink}`,
+					},
+					{
+						key: "Cache-Control",
+						value: agentCache,
 					},
 				],
 			},
 		];
-
-		if (!isDev) {
-			list.push(
-				// Cache static assets aggressively (JS/CSS chunks are content-hashed)
-				{
-					source: "/_next/static/:path*",
-					headers: [
-						{
-							key: "Cache-Control",
-							value: "public, max-age=31536000, immutable",
-						},
-					],
-				},
-				// Cache font files
-				{
-					source: "/docs/font/:path*",
-					headers: [
-						{
-							key: "Cache-Control",
-							value: "public, max-age=31536000, immutable",
-						},
-					],
-				},
-			);
-		}
 
 		return list;
 	},

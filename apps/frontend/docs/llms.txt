@@ -8,14 +8,18 @@ Important notes:
 - All request and response bodies are JSON encoded
 - Reloop supports both transactional and marketing (broadcast) emails
 - Inbound email receiving is supported via webhook ingester
-- The MCP server package is `reloop-mcp` and can be installed via `npx -y reloop-mcp`
+- The product MCP server package is `reloop-mcp` and can be installed via `npx -y reloop-mcp`
+- Prefer markdown: append `.md` to any docs URL (e.g. https://reloop.sh/docs/learn/api-keys.md)
 
 ## Documentation
 
 - [Full documentation](https://reloop.sh/docs/llms-full.txt): Complete Reloop documentation in a single file
 - [Sitemap](https://reloop.sh/docs/sitemap.md): Semantic markdown map of all documentation pages
-- [Introduction](https://reloop.sh/docs/introduction): Welcome to Reloop documentation
-- [API Reference](https://reloop.sh/docs/api): REST API reference with authentication, response codes, and rate limits
+- [Product skill](https://reloop.sh/docs/skill.md): Agent skill — capabilities, auth, and constraints
+- [Docs MCP](https://reloop.sh/docs/mcp): Search and retrieve documentation via Model Context Protocol
+- [MCP discovery](https://reloop.sh/docs/.well-known/mcp.json): Machine-readable MCP server discovery
+- [Introduction](https://reloop.sh/docs/introduction.md): Welcome to Reloop documentation
+- [API Reference](https://reloop.sh/docs/api.md): REST API reference with authentication, response codes, and rate limits
 
 ## Quickstart Guides
 

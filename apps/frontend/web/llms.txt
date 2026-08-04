@@ -1,0 +1,64 @@
+# Reloop
+
+> Reloop is high-performance, open-source email infrastructure for developers—transactional and marketing email, SMTP, webhooks, analytics, and agent-ready APIs. Use Reloop hosted or self-host.
+
+Important notes:
+
+- Authentication uses the `x-api-key` header with API keys prefixed with `rl_`
+- Prefer markdown: append `.md` where available (blog, pricing, docs)
+- Product documentation lives under `/docs` with its own [docs/llms.txt](https://reloop.sh/docs/llms.txt)
+
+## Agent discovery
+
+- [Full marketing corpus](https://reloop.sh/llms-full.txt): Home, pricing, agent pages, and blog in one file
+- [Product docs full corpus](https://reloop.sh/docs/llms-full.txt): Complete documentation snapshot
+- [Sitemap (markdown)](https://reloop.sh/sitemap.md): All public marketing URLs
+- [Product skill](https://reloop.sh/skill.md): Capabilities, auth, constraints for agents
+- [Pricing (markdown)](https://reloop.sh/pricing.md): Structured plan and price data
+- [Site MCP](https://reloop.sh/mcp): Search marketing content
+- [Docs MCP](https://reloop.sh/docs/mcp): Search product documentation
+- [MCP discovery](https://reloop.sh/.well-known/mcp.json): Machine-readable MCP location
+
+## Product documentation
+
+- [Docs index (llms.txt)](https://reloop.sh/docs/llms.txt): Curated API, learn, and integration pages
+- [API Keys (agent)](https://reloop.sh/docs/learn/ai/api-keys.md): Programmatic key management
+- [Introduction](https://reloop.sh/docs/introduction.md): Docs home
+- [API reference](https://reloop.sh/docs/api.md): REST API overview
+
+## Marketing
+
+- [Home](https://reloop.sh/): Open-source email infrastructure
+- [Home (markdown)](https://reloop.sh/index.md): Agent-readable home summary
+- [Pricing](https://reloop.sh/pricing): Plans and limits
+- [Pricing (markdown)](https://reloop.sh/pricing.md): Structured pricing for agents
+- [Developers](https://reloop.sh/developers): Developer overview
+- [Developers (markdown)](https://reloop.sh/developers.md)
+- [About](https://reloop.sh/about): About Reloop Labs
+- [About (markdown)](https://reloop.sh/about.md)
+- [Features](https://reloop.sh/features): Product features
+- [Blog](https://reloop.sh/blog): Engineering and product writing
+- [Changelog](https://reloop.sh/changelog): Release notes
+- [Compare](https://reloop.sh/compare): Reloop vs other email providers
+- [Alternatives](https://reloop.sh/alternatives): Alternative landing pages
+- [Glossary](https://reloop.sh/glossary): Email infrastructure terms
+- [Contact](https://reloop.sh/contact): Contact sales and support
+- [Community](https://reloop.sh/community): Community links
+
+## Blog (recent / high-signal)
+
+Prefer `/blog/<slug>.md` for full post text.
+
+- [Email infrastructure for AI agents](https://reloop.sh/blog/email-infrastructure-for-ai-agents.md)
+- [Build an AI agent that sends emails](https://reloop.sh/blog/build-ai-agent-sends-emails.md)
+- [Transactional email best practices](https://reloop.sh/blog/transactional-email-best-practices.md)
+- [SPF, DKIM, DMARC setup](https://reloop.sh/blog/spf-dkim-dmarc-setup-guide.md)
+- [Self-hosted email infrastructure](https://reloop.sh/blog/self-hosted-email-infrastructure.md)
+- [Migrating from SendGrid](https://reloop.sh/blog/migrating-from-sendgrid.md)
+
+## Optional
+
+- [License](https://reloop.sh/license)
+- [Privacy](https://reloop.sh/privacy)
+- [Terms](https://reloop.sh/terms-and-conditions)
+- [GitHub](https://github.com/reloop-labs/reloop)

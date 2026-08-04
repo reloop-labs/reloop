@@ -6,16 +6,15 @@ import {
 import { readDocsAppFile } from "../../lib/docs-content-fs";
 
 export async function GET(_request: NextRequest) {
-	// Kept outside `public/` so it doesn't conflict with this App Router route.
-	const content = readDocsAppFile("llms.txt");
+	const content = readDocsAppFile("skill.md");
 	if (!content) {
-		return new NextResponse("llms.txt not found", { status: 404 });
+		return new NextResponse("skill.md not found", { status: 404 });
 	}
 
 	return new NextResponse(content, {
 		status: 200,
 		headers: {
-			"Content-Type": "text/plain; charset=utf-8",
+			"Content-Type": "text/markdown; charset=utf-8",
 			"Cache-Control": AGENT_CACHE_CONTROL,
 			"Content-Signal": AGENT_CONTENT_SIGNAL,
 		},

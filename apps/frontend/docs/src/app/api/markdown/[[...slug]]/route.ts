@@ -1,6 +1,15 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { type NextRequest, NextResponse } from "next/server";
+import { injectMarkdownAgentDirective } from "../../../../lib/agent-directive";
+import {
+	AGENT_CACHE_CONTROL,
+	AGENT_CONTENT_SIGNAL,
+} from "../../../../lib/agent-headers";
+import { getDocsContentDir } from "../../../../lib/docs-content-fs";
+
+/** Paths that have dedicated routes and must not be served as doc pages. */
+const RESERVED_MD_SLUGS = new Set(["skill", "llms", "llms-full", "sitemap"]);
 
 export async function GET(
 	_request: NextRequest,
@@ -11,19 +20,13 @@ export async function GET(
 		const slug = params.slug?.length ? params.slug : ["introduction"];
 		const relativePath = slug.join("/");
 
-		const getDocsDir = (): string => {
-			const paths = [
-				"/app/content/docs", // Verified production path
-				join(process.cwd(), "content/docs"),
-				join(process.cwd(), "apps/frontend/docs/content/docs"),
-			];
-			for (const p of paths) {
-				if (existsSync(p)) return p;
-			}
-			return paths[0]!;
-		};
+		if (slug.length === 1 && RESERVED_MD_SLUGS.has(slug[0]!)) {
+			return new NextResponse(`Reserved path: ${relativePath}`, {
+				status: 404,
+			});
+		}
 
-		const docsDir = getDocsDir();
+		const docsDir = getDocsContentDir();
 		const candidates = [
 			join(docsDir, `${relativePath}.mdx`),
 			join(docsDir, relativePath, "index.mdx"),
@@ -42,15 +45,16 @@ export async function GET(
 		}
 
 		const rawContent = readFileSync(filePath, "utf-8");
-		const estimatedTokens = Math.ceil(rawContent.length / 4);
+		const content = injectMarkdownAgentDirective(rawContent);
+		const estimatedTokens = Math.ceil(content.length / 4);
 
-		return new NextResponse(rawContent, {
+		return new NextResponse(content, {
 			status: 200,
 			headers: {
 				"Content-Type": "text/markdown; charset=utf-8",
 				"x-markdown-tokens": estimatedTokens.toString(),
-				"Content-Signal": "ai-train=yes, search=yes, ai-input=yes",
-				"Cache-Control": "public, max-age=3600, s-maxage=86400",
+				"Content-Signal": AGENT_CONTENT_SIGNAL,
+				"Cache-Control": AGENT_CACHE_CONTROL,
 			},
 		});
 	} catch (error: any) {

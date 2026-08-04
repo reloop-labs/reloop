@@ -207,17 +207,27 @@ export function buildPublicDiscoveryMarkdown(
 	const lines: string[] = [
 		"# Reloop Public Discovery",
 		"",
-		"Version: 1",
+		"Version: 2",
 		"",
-		`Reloop exposes public marketing content in HTML by default. Documentation under \`/docs\` also provides explicit \`.md\` twins, \`Accept: text/markdown\` negotiation, and [\`llms.txt\`](${origin}/docs/llms.txt) for agents.`,
+		`> For the complete documentation index, see [llms.txt](${origin}/llms.txt). Full corpus: [llms-full.txt](${origin}/llms-full.txt). Product docs: [docs/llms.txt](${origin}/docs/llms.txt).`,
+		"",
+		`Reloop exposes public marketing content in HTML and markdown. Documentation under \`/docs\` provides \`.md\` twins, \`Accept: text/markdown\` negotiation, and [\`llms.txt\`](${origin}/docs/llms.txt).`,
 		"",
 		"## Discovery surfaces",
 		"",
+		`- [\`/llms.txt\`](${origin}/llms.txt) — curated site + docs entry index for agents`,
+		`- [\`/llms-full.txt\`](${origin}/llms-full.txt) — marketing + blog full corpus`,
+		`- [\`/skill.md\`](${origin}/skill.md) — product skill for agents`,
+		`- [\`/pricing.md\`](${origin}/pricing.md) — structured pricing`,
+		`- [\`/mcp\`](${origin}/mcp) — site search MCP`,
+		`- [\`/.well-known/mcp.json\`](${origin}/.well-known/mcp.json) — MCP discovery`,
 		`- [\`/sitemap.md\`](${origin}/sitemap.md) — markdown discovery index`,
 		`- [\`/sitemap.xml\`](${origin}/sitemap.xml) — XML sitemap for crawlers`,
 		`- [\`/glossary/sitemap.xml\`](${origin}/glossary/sitemap.xml) — email glossary terms only`,
 		`- [\`/docs/llms.txt\`](${origin}/docs/llms.txt) — curated docs index for agents`,
+		`- [\`/docs/llms-full.txt\`](${origin}/docs/llms-full.txt) — full docs corpus`,
 		`- [\`/docs/sitemap.md\`](${origin}/docs/sitemap.md) — full docs page tree`,
+		`- [\`/docs/mcp\`](${origin}/docs/mcp) — docs search MCP`,
 		`- [\`/blog/feed.xml\`](${origin}/blog/feed.xml) — blog RSS feed`,
 		"",
 		"## Human URLs",
@@ -243,27 +253,33 @@ export function buildPublicDiscoveryMarkdown(
 
 	for (const entry of entries) {
 		const href = entry.path === "/" ? origin : `${origin}${entry.path}`;
-		lines.push(`- [${entry.title}](${href}) (${entry.type})`);
+		const mdPath =
+			entry.path === "/"
+				? `${origin}/index.md`
+				: `${origin}${entry.path}.md`;
+		lines.push(`- [${entry.title}](${href}) (${entry.type}) — [md](${mdPath})`);
 	}
 
 	lines.push(
 		"",
 		"## Markdown twins",
 		"",
+		`- Site index pages: \`${origin}/index.md\`, \`${origin}/about.md\`, \`${origin}/developers.md\`, \`${origin}/pricing.md\``,
+		`- Blog posts: \`${origin}/blog/<slug>.md\``,
 		`- Docs pages: \`${origin}/docs/<path>.md\``,
 		"- Docs content negotiation: `Accept: text/markdown` on `/docs/*` HTML routes",
-		"- Marketing HTML routes do not currently expose `.md` twins",
 		"",
 		"## Usage",
 		"",
 		"```bash",
+		`curl ${origin}/llms.txt`,
+		`curl ${origin}/llms-full.txt`,
+		`curl ${origin}/skill.md`,
+		`curl ${origin}/pricing.md`,
 		`curl ${origin}/sitemap.md`,
-		`curl ${origin}/sitemap.xml`,
+		`curl ${origin}/blog/email-infrastructure-for-ai-agents.md`,
 		`curl ${origin}/docs/llms.txt`,
-		`curl ${origin}/docs/sitemap.md`,
-		`curl ${origin}/blog/feed.xml`,
-		`curl ${origin}/docs/api/contacts/post-api-contacts-create.md`,
-		`curl -H 'Accept: text/markdown' ${origin}/docs/api/contacts/post-api-contacts-create`,
+		`curl ${origin}/docs/learn/ai/api-keys.md`,
 		"```",
 		"",
 	);

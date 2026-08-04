@@ -1,3 +1,4 @@
+import { AgentDirective } from "@reloop/fe-docs/components/agent-directive";
 import { DocsBody } from "@reloop/fe-docs/components/docs/body";
 import {
 	CodeColumnProvider,
@@ -6,7 +7,6 @@ import {
 import { DocsLayout } from "@reloop/fe-docs/components/docs/layout";
 import { PageFooter } from "@reloop/fe-docs/components/docs/page-footer";
 import { TableOfContents } from "@reloop/fe-docs/components/docs/toc";
-import { Footer } from "@reloop/fe-docs/components/footer";
 import { PageActions } from "@reloop/fe-docs/components/page-actions";
 import { source } from "@reloop/fe-docs/lib/source";
 import type { PageTreeItem, TOCItem } from "@reloop/fe-docs/lib/types";
@@ -288,6 +288,11 @@ export default async function Page(props: {
 	const appUrl = process.env.NEXT_PUBLIC_URL || "https://reloop.sh";
 	const canonicalUrl = `${appUrl}/docs${page.url === "/introduction" ? "" : page.url}`;
 	const jsonLdData = getJsonLd(page, canonicalUrl);
+	const pagePathForMd =
+		page.url === "/introduction" || page.url === "/"
+			? "/introduction"
+			: page.url;
+	const markdownPath = `/docs${pagePathForMd}.md`;
 
 	return (
 		<CodeColumnProvider>
@@ -301,7 +306,7 @@ export default async function Page(props: {
 				pathname={pathname}
 			>
 				<div
-					className={`w-full flex-col ${
+					className={`relative w-full flex-col ${
 						hideToc
 							? isApiPage
 								? "mx-auto max-w-6xl"
@@ -309,6 +314,8 @@ export default async function Page(props: {
 							: "w-full xl:grid xl:grid-cols-[1fr_260px] xl:gap-8"
 					}`}
 				>
+					{/* Agent discovery — top of main content, outside nav */}
+					<AgentDirective markdownPath={markdownPath} />
 					{/* Main content area */}
 					<div
 						className={`min-w-0 px-6 py-8 md:px-10 ${useSplitLayout ? "lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(380px,480px)] lg:gap-x-10 xl:gap-x-12" : ""}`}
@@ -384,10 +391,6 @@ export default async function Page(props: {
 							</div>
 						</aside>
 					)}
-
-					<div className="col-span-full px-6 md:px-10">
-						<Footer />
-					</div>
 				</div>
 			</DocsLayout>
 		</CodeColumnProvider>

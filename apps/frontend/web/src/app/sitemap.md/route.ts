@@ -8,7 +8,7 @@ export async function GET() {
 		status: 200,
 		headers: {
 			"Content-Type": "text/markdown; charset=utf-8",
-			"Cache-Control": "public, max-age=3600, s-maxage=86400",
+			"Cache-Control": "public, max-age=300, s-maxage=3600, must-revalidate",
 			"Content-Signal": "ai-train=yes, search=yes, ai-input=yes",
 		},
 	});

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { IconsSprite } from "@reloop/ui/icons-sprite";
 import { RybbitLoader } from "@reloop/ui/rybbit-loader";
+import { AgentDirective } from "@reloop/web/components/agent-directive";
 import { Footer } from "@reloop/web/components/footer";
 import { Header } from "@reloop/web/components/header";
 import {
@@ -104,11 +105,22 @@ export default function RootLayout({
 					enableSystem
 					disableTransitionOnChange
 				>
-					<div>
-						<Header />
-						<main>{children}</main>
-						<Footer />
-						<AsciiWordmarkLazy />
+					{/*
+					  Main before header in DOM for earlier content-start in agent HTML→text
+					  conversion; CSS order keeps header on top visually.
+					*/}
+					<div className="flex min-h-full flex-col">
+						<main className="relative order-2 flex-1">
+							<AgentDirective />
+							{children}
+						</main>
+						<div className="order-1">
+							<Header />
+						</div>
+						<div className="order-3">
+							<Footer />
+							<AsciiWordmarkLazy />
+						</div>
 					</div>
 					<IconsSprite />
 					<RybbitLoader />

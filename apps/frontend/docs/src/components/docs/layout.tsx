@@ -63,7 +63,28 @@ export function DocsLayout({ children, tree, pathname }: DocsLayoutProps) {
 				</div>
 			</header>
 
+			{/*
+			  Main first in DOM so HTML→text conversion reaches page content earlier
+			  (AFDocs content-start-position). Visual order: sidebar left via order-*.
+			*/}
 			<div className="flex flex-1 flex-row overflow-hidden bg-bg-weak-50 dark:bg-black">
+				{/* Main Content Area - Seamless Card Layout (DOM first) */}
+				<main className="relative order-2 mr-2 mb-2 flex min-h-0 flex-1 flex-col overflow-hidden rounded-3xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a]">
+					<div
+						id="nd-page"
+						className="flex-1 overflow-y-auto overflow-x-hidden"
+					>
+						<div className="mx-auto min-h-full w-full transition-all duration-300">
+							{children}
+						</div>
+					</div>
+				</main>
+
+				{/* Desktop Sidebar - visually left, after main in DOM */}
+				<div className="order-1 hidden shrink-0 lg:flex lg:w-[270px]">
+					<Sidebar tree={tree} pathname={pathname} />
+				</div>
+
 				{/* Mobile Drawer — CSS transitions only, no framer-motion */}
 				{/* Overlay */}
 				<div
@@ -102,23 +123,6 @@ export function DocsLayout({ children, tree, pathname }: DocsLayoutProps) {
 						/>
 					</div>
 				</div>
-
-				{/* Desktop Sidebar - Only visible on LG+ */}
-				<div className="hidden shrink-0 lg:flex lg:w-[270px]">
-					<Sidebar tree={tree} pathname={pathname} />
-				</div>
-
-				{/* Main Content Area - Seamless Card Layout */}
-				<main className="relative mr-2 mb-2 flex min-h-0 flex-1 flex-col overflow-hidden rounded-3xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a]">
-					<div
-						id="nd-page"
-						className="flex-1 overflow-y-auto overflow-x-hidden"
-					>
-						<div className="mx-auto min-h-full w-full transition-all duration-300">
-							{children}
-						</div>
-					</div>
-				</main>
 			</div>
 
 			{isSearchOpen && (

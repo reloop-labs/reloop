@@ -4,9 +4,10 @@
 	"private": true,
 	"scripts": {
 		"dev": "next dev --turbopack --port=3000",
-		"build": "next build",
+		"build": "bun run generate:llms-full && next build",
 		"start": "next start",
-		"lint": "next lint"
+		"lint": "next lint",
+		"generate:llms-full": "bun run scripts/generate-llms-full.ts"
 	},
 	"dependencies": {
 		"@hookform/resolvers": "catalog:ui",
