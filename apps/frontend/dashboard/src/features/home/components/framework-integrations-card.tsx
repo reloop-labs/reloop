@@ -29,7 +29,8 @@ const languages = [
 	{ id: "nodejs" as const, title: "Node.js", icon: siNodedotjs },
 	{ id: "python" as const, title: "Python", icon: siPython },
 	{ id: "go" as const, title: "Go", icon: siGo },
-	{ id: "rust" as const, title: "Rust", icon: siRust },
+	// Brand hex is #000000 — override so the gear stays visible on dark UI
+	{ id: "rust" as const, title: "Rust", icon: { path: siRust.path, hex: "e24d2b" } },
 	{ id: "ruby" as const, title: "Ruby", icon: siRuby },
 	{ id: "php" as const, title: "PHP", icon: siPhp },
 ];
@@ -52,8 +53,11 @@ const frameworkIntegrations: Record<LanguageId, { name: string; icon: any }[]> =
 			{ name: "Go Fiber", icon: siGo },
 		],
 		rust: [
-			{ name: "Axum Web Framework", icon: siRust },
-			{ name: "Actix Web", icon: siRust },
+			{
+				name: "Axum Web Framework",
+				icon: { path: siRust.path, hex: "e24d2b" },
+			},
+			{ name: "Actix Web", icon: { path: siRust.path, hex: "e24d2b" } },
 		],
 		ruby: [
 			{ name: "Ruby on Rails", icon: siRubyonrails },

@@ -531,7 +531,8 @@ const LANGUAGE_ICONS: Record<string, any> = {
 	python: siPython,
 	ruby: siRuby,
 	go: siGo,
-	rust: siRust,
+	// Brand hex is #000000 — override so the gear stays visible on dark UI
+	rust: { path: siRust.path, hex: "e24d2b" },
 	java: siOpenjdk,
 	dotnet: siDotnet,
 	csharp: siDotnet,
@@ -547,8 +548,13 @@ function getIconForSample(sampleId: string, lang: string) {
 		siGnubash;
 
 	let hex = icon.hex;
-	if (sampleId.toLowerCase() === "json" || lang.toLowerCase() === "json") {
-		hex = "f59e0b"; // Use amber gold for JSON for readability
+	const id = sampleId.toLowerCase();
+	const l = lang.toLowerCase();
+	if (id === "json" || l === "json") {
+		hex = "f59e0b"; // amber gold for JSON readability
+	}
+	if (id === "rust" || l === "rust") {
+		hex = "e24d2b"; // red — brand black is invisible on dark UI
 	}
 
 	return {

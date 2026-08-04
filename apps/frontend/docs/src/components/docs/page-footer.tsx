@@ -70,14 +70,14 @@ export function PageFooter({ previous, next, editUrl }: PageFooterProps) {
 				{previous ? (
 					<Link
 						href={previous.url}
-						className="group relative flex flex-col items-start gap-2 rounded-2xl border border-stroke-soft-100 p-6 transition-all hover:border-black/50 hover:bg-black/[0.02] dark:hover:border-white/50 dark:hover:bg-white/[0.02]"
+						className="group relative flex flex-col items-start gap-1.5 rounded-2xl border border-stroke-soft-100 p-5 transition-all hover:border-black/50 hover:bg-black/[0.02] dark:hover:border-white/50 dark:hover:bg-white/[0.02]"
 					>
+						<span className="font-semibold text-[#171717] text-[14px] leading-snug tracking-tight dark:text-white">
+							{previous.name}
+						</span>
 						<span className="flex items-center gap-1.5 font-semibold text-[12px] text-text-sub-600 uppercase tracking-wider">
 							<ChevronLeft className="group-hover:-translate-x-0.5 h-3 w-3 transition-transform" />
 							Previous
-						</span>
-						<span className="font-bold text-[#171717] text-[17px] tracking-tight dark:text-white">
-							{previous.name}
 						</span>
 					</Link>
 				) : (
@@ -87,14 +87,14 @@ export function PageFooter({ previous, next, editUrl }: PageFooterProps) {
 				{next ? (
 					<Link
 						href={next.url}
-						className="group relative flex flex-col items-end gap-2 rounded-2xl border border-stroke-soft-100 p-6 text-right transition-all hover:border-black/50 hover:bg-black/[0.02] dark:hover:border-white/50 dark:hover:bg-white/[0.02]"
+						className="group relative flex flex-col items-end gap-1.5 rounded-2xl border border-stroke-soft-100 p-5 text-right transition-all hover:border-black/50 hover:bg-black/[0.02] dark:hover:border-white/50 dark:hover:bg-white/[0.02]"
 					>
+						<span className="font-semibold text-[#171717] text-[14px] leading-snug tracking-tight dark:text-white">
+							{next.name}
+						</span>
 						<span className="flex items-center gap-1.5 font-semibold text-[12px] text-text-sub-600 uppercase tracking-wider">
 							Next
 							<ChevronRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
-						</span>
-						<span className="font-bold text-[#171717] text-[17px] tracking-tight dark:text-white">
-							{next.name}
 						</span>
 					</Link>
 				) : (

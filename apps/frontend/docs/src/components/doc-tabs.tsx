@@ -38,11 +38,6 @@ export function DocTabs() {
 			url: "/self-host",
 			icon: "server",
 		},
-		{
-			title: "Local Setup",
-			url: "/setup",
-			icon: "terminal",
-		},
 	];
 
 	return (

@@ -42,6 +42,8 @@ export function SimpleIcon({
 	}
 
 	const isMonochrome = MONOCHROME_SLUGS.includes(slug);
+	// Rust brand hex is #000000 — use red so the gear is visible on dark UI
+	const hex = slug === "siRust" ? "e24d2b" : icon.hex;
 
 	return (
 		<svg
@@ -50,7 +52,7 @@ export function SimpleIcon({
 			className={cn(className, isMonochrome ? "text-text-sub-600" : "")}
 			fill="currentColor"
 			xmlns="http://www.w3.org/2000/svg"
-			style={!isMonochrome ? { color: `#${icon.hex}` } : undefined}
+			style={!isMonochrome ? { color: `#${hex}` } : undefined}
 			aria-hidden="true"
 		>
 			<path d={icon.path} />

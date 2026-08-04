@@ -39,7 +39,8 @@ const langIcons: Record<string, { path: string; hex: string }> = {
 	php: siPhp,
 	go: siGo,
 	ruby: siRuby,
-	rust: siRust,
+	// Brand hex is #000000 — override so the gear stays visible on dark UI
+	rust: { path: siRust.path, hex: "e24d2b" },
 	java: siOpenjdk,
 	dotnet: siDotnet,
 	curl: siCurl,

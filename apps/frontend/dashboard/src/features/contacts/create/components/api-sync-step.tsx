@@ -84,7 +84,8 @@ const API_LANGUAGES: ApiLanguage[] = [
 		label: "Rust",
 		shikiLang: "rust",
 		filename: "main.rs",
-		si: siRust,
+		// Brand hex is #000000 — override so the gear stays visible on dark UI
+		si: { path: siRust.path, hex: "e24d2b" },
 	},
 ];
 

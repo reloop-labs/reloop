@@ -44,7 +44,12 @@ const LANGUAGES = [
 	{ id: "nodejs" as const, label: "Node.js", simpleIcon: siNodedotjs },
 	{ id: "python" as const, label: "Python", simpleIcon: siPython },
 	{ id: "go" as const, label: "Go", simpleIcon: siGo },
-	{ id: "rust" as const, label: "Rust", simpleIcon: siRust },
+	{
+		id: "rust" as const,
+		label: "Rust",
+		// Brand hex is #000000 — override so the gear stays visible on dark UI
+		simpleIcon: { path: siRust.path, hex: "e24d2b", title: siRust.title },
+	},
 	{ id: "curl" as const, label: "cURL / REST", iconName: "terminal" },
 ];
 
@@ -80,7 +85,8 @@ const LANG_ICONS = {
 	nodejs: siNodedotjs,
 	python: siPython,
 	go: siGo,
-	rust: siRust,
+	// Brand hex is #000000 — override so the gear stays visible on dark UI
+	rust: { path: siRust.path, hex: "e24d2b" },
 	curl: undefined,
 };
 

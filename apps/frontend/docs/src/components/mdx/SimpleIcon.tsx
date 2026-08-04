@@ -127,13 +127,17 @@ export function SimpleIcon({
 			);
 		}
 
+		// Rust brand hex is #000000 — use red so the gear is visible on dark UI
+		const resolvedHex =
+			iconKey === "siRust" ? "e24d2b" : icon.hex;
+
 		return (
 			<svg
 				role="img"
 				viewBox="0 0 24 24"
 				width={size}
 				height={size}
-				fill={color || `#${icon.hex}`}
+				fill={color || `#${resolvedHex}`}
 				xmlns="http://www.w3.org/2000/svg"
 				className="size-6 shrink-0"
 				{...props}

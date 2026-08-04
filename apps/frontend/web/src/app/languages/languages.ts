@@ -135,7 +135,8 @@ func main() {
 			"Send email from Rust with an async-first crate built for performance-critical applications.",
 		installCommand: "cargo add reloop-email",
 		docsPath: "/docs/quickstart/rust",
-		icon: siRust,
+		// Brand hex is #000000 — override so the gear stays visible on dark UI
+		icon: { ...siRust, hex: "e24d2b" },
 		highlights: ["Tokio", "Axum", "Type-safe"],
 		sendCode: `use reloop_email::ReloopEmail;
 

@@ -16,7 +16,6 @@ const tabColors: Record<string, string> = {
 	"API Reference": "#8b5cf6",
 	Webhooks: "#ec4899",
 	"Self-Hosted": "#0ea5e9",
-	Setup: "#10b981",
 };
 
 export function Navbar({
