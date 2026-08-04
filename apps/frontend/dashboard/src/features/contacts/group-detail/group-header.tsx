@@ -140,7 +140,7 @@ export const GroupHeader = ({ group, isLoading }: GroupHeaderProps) => {
 	};
 
 	useHotkeys(
-		"m c",
+		"a c",
 		(e) => {
 			e.preventDefault();
 			if (!isEditing) {
@@ -302,12 +302,12 @@ export const GroupHeader = ({ group, isLoading }: GroupHeaderProps) => {
 									size="xsmall"
 									onClick={() => void setModal("add-contact-to-group")}
 									className="gap-1.5"
-									aria-keyshortcuts="M C"
+									aria-keyshortcuts="A C"
 								>
-									Manage contacts
+									Add contact to group
 									<span className="inline-flex items-center gap-0.5">
 										<ActionKbd className={actionKbdOnSolidClassName}>
-											M
+											A
 										</ActionKbd>
 										<ActionKbd className={actionKbdOnSolidClassName}>
 											C
