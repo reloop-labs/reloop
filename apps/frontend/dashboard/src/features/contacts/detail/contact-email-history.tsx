@@ -503,31 +503,31 @@ function SpineMarker({
 	isLast: boolean;
 }) {
 	return (
-		<div className="relative flex w-5 shrink-0 flex-col items-center self-stretch">
-			<div className="relative z-10 flex h-5 w-5 items-center justify-center">
+		<div className="relative flex w-4 shrink-0 flex-col items-center self-stretch">
+			<div className="relative z-10 flex h-4 w-4 items-center justify-center">
 				{marker === "circle" ? (
-					<span className="block h-2 w-2 rounded-full border border-text-soft-400 dark:border-white/35" />
+					<span className="block h-1.5 w-1.5 rounded-full border border-text-soft-400 dark:border-white/35" />
 				) : marker === "contact" ? (
-					<span className="flex size-5 items-center justify-center rounded-full bg-gradient-to-b from-green-alpha-16 to-green-alpha-10 text-success-base ring-1 ring-green-alpha-16 ring-inset">
-						<User className="size-3" aria-hidden strokeWidth={2} />
+					<span className="flex size-4 items-center justify-center rounded-full bg-gradient-to-b from-green-alpha-16 to-green-alpha-10 text-success-base ring-1 ring-green-alpha-16 ring-inset">
+						<User className="size-2.5" aria-hidden strokeWidth={2.25} />
 					</span>
 				) : marker === "plus" ? (
-					<span className="flex size-5 items-center justify-center rounded-full bg-gradient-to-b from-green-alpha-16 to-green-alpha-10 text-success-base ring-1 ring-green-alpha-16 ring-inset">
-						<Plus className="size-3" aria-hidden strokeWidth={2} />
+					<span className="flex size-4 items-center justify-center rounded-full bg-gradient-to-b from-green-alpha-16 to-green-alpha-10 text-success-base ring-1 ring-green-alpha-16 ring-inset">
+						<Plus className="size-2.5" aria-hidden strokeWidth={2.25} />
 					</span>
 				) : marker === "minus" ? (
-					<span className="flex size-5 items-center justify-center rounded-full bg-gradient-to-b from-red-alpha-16 to-red-alpha-10 text-error-base ring-1 ring-red-alpha-16 ring-inset">
-						<Minus className="size-3" aria-hidden strokeWidth={2} />
+					<span className="flex size-4 items-center justify-center rounded-full bg-gradient-to-b from-red-alpha-16 to-red-alpha-10 text-error-base ring-1 ring-red-alpha-16 ring-inset">
+						<Minus className="size-2.5" aria-hidden strokeWidth={2.25} />
 					</span>
 				) : (
-					<span className="flex size-5 items-center justify-center rounded-full bg-gradient-to-b from-primary-alpha-16 to-primary-alpha-10 text-primary-base ring-1 ring-primary-alpha-16 ring-inset">
-						<Icon name="arrow-up-right" className="size-3" />
+					<span className="flex size-4 items-center justify-center rounded-full bg-gradient-to-b from-primary-alpha-16 to-primary-alpha-10 text-primary-base ring-1 ring-primary-alpha-16 ring-inset">
+						<Icon name="arrow-up-right" className="size-2.5" />
 					</span>
 				)}
 			</div>
 			{!isLast && (
 				<div
-					className="absolute top-5 bottom-0 w-px bg-stroke-soft-200 dark:bg-white/15"
+					className="absolute top-[20px] bottom-[4px] w-px rounded-full bg-stroke-soft-200 dark:bg-white/15"
 					aria-hidden
 				/>
 			)}
@@ -601,8 +601,8 @@ function ActivityLine({
 			<SpineMarker marker={marker} isLast={isLast} />
 			<div
 				className={cn(
-					"flex min-w-0 flex-1 items-baseline justify-between gap-3",
-					isLast ? "pb-0.5" : "pb-4",
+					"flex min-w-0 flex-1 items-baseline",
+					isLast ? "pb-0.5" : "pb-5",
 				)}
 			>
 				<div className="flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-0.5 pt-px text-paragraph-sm leading-snug">
@@ -610,10 +610,10 @@ function ActivityLine({
 					{targets?.map((t, i) => (
 						<TargetLink key={`${t.label}-${i}`} target={t} />
 					))}
+					<span className="shrink-0 text-paragraph-xs text-text-soft-400 tabular-nums">
+						{formatCompactTime(timestamp)}
+					</span>
 				</div>
-				<span className="shrink-0 text-paragraph-xs text-text-soft-400 tabular-nums">
-					{formatCompactTime(timestamp)}
-				</span>
 			</div>
 		</div>
 	);
@@ -682,14 +682,12 @@ function ActivitySkeleton() {
 			{Array.from({ length: 4 }).map((_, i) => (
 				// biome-ignore lint/suspicious/noArrayIndexKey: skeleton
 				<div key={i} className="flex gap-2.5">
-					<div className="flex h-5 w-5 shrink-0 items-center justify-center">
-						<Skeleton className="h-3 w-3 rounded-sm" />
+					<div className="flex h-4 w-4 shrink-0 items-center justify-center">
+						<Skeleton className="h-2.5 w-2.5 rounded-sm" />
 					</div>
-					<div className="flex flex-1 items-center justify-between gap-3">
-						<div className="flex items-center gap-2">
-							<Skeleton className="h-3.5 w-20 rounded" />
-							<Skeleton className="h-3.5 w-24 rounded" />
-						</div>
+					<div className="flex flex-1 items-center gap-2">
+						<Skeleton className="h-3.5 w-20 rounded" />
+						<Skeleton className="h-3.5 w-24 rounded" />
 						<Skeleton className="h-3 w-12 rounded" />
 					</div>
 				</div>
