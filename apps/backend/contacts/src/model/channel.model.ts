@@ -68,6 +68,11 @@ export namespace ChannelModel {
 						"Visibility setting - whether the channel is visible to everyone or just the team",
 				}),
 			),
+			defaultSubscription: t.Optional(
+				t.Union([t.Literal("opt_in"), t.Literal("opt_out")], {
+					description: "Default subscription setting for new contacts",
+				}),
+			),
 		},
 		{
 			examples: [
@@ -75,6 +80,7 @@ export namespace ChannelModel {
 					name: "Marketing News",
 					description: "Internal marketing updates",
 					visibility: "private",
+					defaultSubscription: "opt_in",
 				},
 			],
 		},

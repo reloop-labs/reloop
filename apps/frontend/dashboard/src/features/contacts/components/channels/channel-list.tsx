@@ -1,4 +1,3 @@
-import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { useQueryState } from "nuqs";
 import { useMemo } from "react";
@@ -59,22 +58,58 @@ export function ChannelList() {
 
 	useRegisterCommandActions("channels", "Channels", actions);
 
+	const patchChannel = async (
+		channelId: string,
+		body: {
+			visibility?: "private" | "public";
+			defaultSubscription?: "opt_in" | "opt_out";
+		},
+	) => {
+		const response = await fetch(`/api/contacts/v1/channels/${channelId}`, {
+			method: "PATCH",
+			headers: { "Content-Type": "application/json" },
+			credentials: "include",
+			body: JSON.stringify(body),
+		});
+		if (!response.ok) {
+			const data = (await response.json().catch(() => ({}))) as {
+				message?: string;
+			};
+			throw new Error(data.message || "Failed to update channel");
+		}
+	};
+
 	const handleToggleVisibility = async (
 		channelId: string,
 		currentValue: "private" | "public",
 	) => {
 		const newValue = currentValue === "public" ? "private" : "public";
 		try {
-			const response = await fetch(`/api/contacts/v1/channels/${channelId}`, {
-				method: "PATCH",
-				headers: { "Content-Type": "application/json" },
-				credentials: "include",
-				body: JSON.stringify({ visibility: newValue }),
-			});
-			if (!response.ok) throw new Error("Failed to update visibility");
+			await patchChannel(channelId, { visibility: newValue });
 			await invalidate();
+			toast.success(
+				newValue === "public" ? "Channel is now public" : "Channel is now hidden",
+			);
 		} catch {
 			toast.error("Failed to update visibility");
+		}
+	};
+
+	const handleToggleDefaultSubscription = async (
+		channelId: string,
+		currentValue: "opt_in" | "opt_out",
+	) => {
+		const newValue = currentValue === "opt_in" ? "opt_out" : "opt_in";
+		try {
+			await patchChannel(channelId, { defaultSubscription: newValue });
+			await invalidate();
+			toast.success(
+				newValue === "opt_in"
+					? "New contacts will be subscribed by default"
+					: "New contacts will not be subscribed by default",
+			);
+		} catch {
+			toast.error("Failed to update default subscription");
 		}
 	};
 
@@ -109,6 +144,7 @@ export function ChannelList() {
 						void setId(id);
 					}}
 					onToggleVisibility={handleToggleVisibility}
+					onToggleDefaultSubscription={handleToggleDefaultSubscription}
 				/>
 			</div>
 

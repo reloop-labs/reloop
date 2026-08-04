@@ -16,12 +16,14 @@ export const updateChannelController = async ({
 	name,
 	description,
 	visibility,
+	defaultSubscription,
 }: {
 	organizationId: string;
 	channel_id: string;
 	name?: string;
 	description?: string;
 	visibility?: "private" | "public";
+	defaultSubscription?: "opt_in" | "opt_out";
 }): Promise<ChannelTypes.ChannelResponse> => {
 	const log = useLogger();
 	log.info("Updating channel", { channel_id, name });
@@ -64,6 +66,7 @@ export const updateChannelController = async ({
 				...(name && { name }),
 				...(description !== undefined && { description }),
 				...(visibility && { visibility }),
+				...(defaultSubscription && { defaultSubscription }),
 				updatedAt: new Date(),
 			})
 			.where(eq(schema.channel.id, channel_id))

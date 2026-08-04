@@ -18,13 +18,14 @@ export const updateChannelRoute = new Elysia()
 	.patch(
 		"/:channel_id",
 		async ({ params, body, organizationId }) => {
-			const { name, description, visibility } = body;
+			const { name, description, visibility, defaultSubscription } = body;
 			return await updateChannelController({
 				organizationId,
 				channel_id: params.channel_id,
 				name,
 				description: description ?? undefined,
 				visibility,
+				defaultSubscription,
 			});
 		},
 		{
