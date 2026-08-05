@@ -88,7 +88,7 @@ Routing rule under test:
 Coverage:
 
 - New signup always lands on onboarding step 1
-- Create workspace → step 2 (Add Domain)
+- Create organization → step 2 (Add Domain)
 - Skip domain → step 4 (API key) — does not require domain service
 - Full skip-domain path → dashboard home (`{email}'s Account` + org name)
 - After onboarding, re-login goes to **dashboard**, not onboarding

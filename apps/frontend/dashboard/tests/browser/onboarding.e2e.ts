@@ -29,11 +29,11 @@ test.describe("onboarding — new account", () => {
 			page.getByRole("heading", { name: "Create your workspace" }),
 		).toBeVisible();
 		await expect(
-			page.getByRole("button", { name: "Create workspace" }),
+			page.getByRole("button", { name: "Create organization" }),
 		).toBeDisabled();
 	});
 
-	test("create workspace advances to add-domain step", async ({ page }) => {
+	test("Create organization advances to add-domain step", async ({ page }) => {
 		const { companyName } = await signUpToOnboarding(page);
 		await completeCreateWorkspace(page, companyName);
 

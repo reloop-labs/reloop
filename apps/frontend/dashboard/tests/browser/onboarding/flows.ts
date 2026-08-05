@@ -33,19 +33,19 @@ export async function signUpToOnboarding(
 	).toBeVisible({ timeout: 15_000 });
 	await expect(page.getByPlaceholder("e.g. Acme Corp")).toBeVisible();
 	await expect(
-		page.getByRole("button", { name: "Create workspace" }),
+		page.getByRole("button", { name: "Create organization" }),
 	).toBeVisible();
 
 	return { email, companyName };
 }
 
 /**
- * Step 1 — create workspace (company name is required; referral is optional).
+ * Step 1 — Create organization (company name is required; referral is optional).
  */
 export async function completeCreateWorkspace(page: Page, companyName: string) {
 	await page.getByPlaceholder("e.g. Acme Corp").fill(companyName);
 
-	const create = page.getByRole("button", { name: "Create workspace" });
+	const create = page.getByRole("button", { name: "Create organization" });
 	await expect(create).toBeEnabled({ timeout: 5_000 });
 	await create.click({ force: true });
 

@@ -191,7 +191,7 @@ export function OrganizationSwitcher({
 								<Icon name="plus" className="h-3.5 w-3.5 text-text-sub-600" />
 							</div>
 							<span className="font-medium text-sm text-text-strong-950">
-								Create workspace
+								Create organization
 							</span>
 						</button>
 						<AnimatedHoverBackground
