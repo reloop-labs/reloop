@@ -13,7 +13,6 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import {
-	siBun,
 	siDotenv,
 	siGo,
 	siNodedotjs,
@@ -26,6 +25,7 @@ import {
 import { toast } from "sonner";
 import * as v from "valibot";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
+import { bunIcon } from "#/features/onboarding/step4/bun-icon";
 import { CopyCodeBlock } from "#/features/onboarding/step4/copy-code-block";
 import { useInvalidateApiKeys } from "../hooks/use-api-keys-query";
 import type { ApiKeyWithSecret } from "../types";
@@ -57,7 +57,7 @@ const NODE_PKG_TABS = [
 	{ id: "npm", label: "npm", si: siNpm },
 	{ id: "pnpm", label: "pnpm", si: siPnpm },
 	{ id: "yarn", label: "yarn", si: siYarn },
-	{ id: "bun", label: "bun", si: siBun },
+	{ id: "bun", label: "bun", si: bunIcon },
 ];
 
 const INSTALL_COMMANDS: Record<LanguageId, Record<string, string>> = {

@@ -8,6 +8,7 @@ import { useQueryState } from "nuqs";
 import type React from "react";
 import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
+import { ThemeToggle } from "#/features/dashboard/page-header/theme-toggle";
 import { onboardingStepParser } from "./onboarding-step";
 
 const AnimatedHeight = ({ children }: { children: React.ReactNode }) => {
@@ -140,7 +141,11 @@ export function SplitLayout({
 	const totalSteps = stepMatch ? Number(stepMatch[2]) : null;
 
 	return (
-		<div className="flex min-h-screen w-full flex-col items-center">
+		<div className="relative flex min-h-screen w-full flex-col items-center">
+			{/* Quiet corner control so users can switch theme without hunting settings. */}
+			<div className="fixed right-5 bottom-5 z-50 sm:right-6 sm:bottom-6">
+				<ThemeToggle />
+			</div>
 			<div
 				className="relative flex min-h-screen w-full flex-col border-stroke-soft-100 border-r border-l dark:border-stroke-soft-100/40"
 				style={{

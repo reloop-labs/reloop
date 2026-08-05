@@ -12,7 +12,11 @@ export type CopyCodeBlockIcon = {
 	path: string;
 	hex: string;
 	viewBox?: string;
-	layers?: ReadonlyArray<{ d: string; fill: string }>;
+	layers?: ReadonlyArray<{
+		d: string;
+		fill: string;
+		fillRule?: "nonzero" | "evenodd";
+	}>;
 };
 
 function BrandLanguageIcon({
@@ -32,8 +36,14 @@ function BrandLanguageIcon({
 				xmlns="http://www.w3.org/2000/svg"
 				aria-hidden
 			>
-				{icon.layers.map((layer) => (
-					<path key={layer.d.slice(0, 24)} d={layer.d} fill={layer.fill} />
+				{icon.layers.map((layer, index) => (
+					<path
+						key={`${layer.fill}-${index}`}
+						d={layer.d}
+						fill={layer.fill}
+						fillRule={layer.fillRule}
+						clipRule={layer.fillRule}
+					/>
 				))}
 			</svg>
 		);

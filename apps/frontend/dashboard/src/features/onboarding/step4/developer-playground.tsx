@@ -1,6 +1,5 @@
 import { useState } from "react";
 import {
-	siBun,
 	siComposer,
 	siGnubash,
 	siGo,
@@ -12,6 +11,7 @@ import {
 	siYarn,
 } from "simple-icons";
 import { useSessionQuery } from "#/features/auth/session-query";
+import { bunIcon } from "./bun-icon";
 import { CopyCodeBlock } from "./copy-code-block";
 import { CopyForAiButton } from "./copy-for-ai-button";
 import { IntegrationLanguagePills } from "./integration-language-pills";
@@ -42,7 +42,7 @@ const pkgManagerTabs = [
 	{ id: "npm" as PackageManager, label: "npm", si: siNpm },
 	{ id: "pnpm" as PackageManager, label: "pnpm", si: siPnpm },
 	{ id: "yarn" as PackageManager, label: "yarn", si: siYarn },
-	{ id: "bun" as PackageManager, label: "bun", si: siBun },
+	{ id: "bun" as PackageManager, label: "bun", si: bunIcon },
 ];
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
