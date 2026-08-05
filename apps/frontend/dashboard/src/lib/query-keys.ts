@@ -51,6 +51,7 @@ export const queryKeys = {
 			limit: number;
 			search: string;
 			status: string;
+			channelId?: string;
 		}) => [...queryKeys.contacts.all, "list", params] as const,
 		detail: (id: string) => [...queryKeys.contacts.all, "detail", id] as const,
 		activity: (email: string, orgId?: string) =>

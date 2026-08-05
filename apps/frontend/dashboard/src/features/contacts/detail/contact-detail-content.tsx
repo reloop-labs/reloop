@@ -1,6 +1,5 @@
 import {
 	useAllPropertiesQuery,
-	useChannelsQuery,
 	useContactQuery,
 } from "#/features/contacts/hooks/use-contacts-query";
 import { ContactHeader } from "./contact-header";
@@ -14,7 +13,6 @@ export function ContactDetailContent({ contactId }: { contactId: string }) {
 	} = useContactQuery(contactId);
 
 	const { data: allPropertiesData } = useAllPropertiesQuery();
-	const { data: allChannelsData } = useChannelsQuery();
 
 	const allPropertiesWithValues =
 		allPropertiesData?.properties?.map((prop) => {
@@ -33,23 +31,10 @@ export function ContactDetailContent({ contactId }: { contactId: string }) {
 		}) || [];
 
 	const enrolledChannels = (() => {
-		if (!allChannelsData?.channels) return [];
-
-		const subscriptionMap = new Map<string, "opt_in" | "opt_out">();
-		if (contactData?.channels) {
-			for (const t of contactData.channels) {
-				subscriptionMap.set(t.id, t.subscription);
-			}
-		}
-
-		return allChannelsData.channels
-			.filter((channel) => {
-				const explicitStatus = subscriptionMap.get(channel.id);
-				if (explicitStatus) {
-					return explicitStatus === "opt_in";
-				}
-				return channel.defaultSubscription === "opt_in";
-			})
+		// Only show channels with an explicit enrollment on the contact.
+		// Channel defaultSubscription (opt-in/opt-out) is not membership.
+		return (contactData?.channels ?? [])
+			.filter((channel) => channel.subscription === "opt_in")
 			.map((channel) => ({ id: channel.id, name: channel.name }));
 	})();
 

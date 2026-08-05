@@ -30,7 +30,7 @@ export const listContactsRoute = new Elysia()
 				tags: ["Contact"],
 				summary: "List Contacts",
 				description:
-					"Retrieves a paginated list of contacts with optional filtering and search",
+					"Retrieves a paginated list of contacts with optional filtering and search. Pass channelId to return only contacts enrolled in that channel.",
 				"x-codeSamples": listContactsXCodeSamples,
 			},
 		},

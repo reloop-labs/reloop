@@ -75,6 +75,7 @@ export namespace ContactTypes {
 		limit?: number;
 		search?: string;
 		status?: "subscribed" | "unsubscribed" | "blocked";
+		channelId?: string;
 		organizationId?: string;
 	}
 }

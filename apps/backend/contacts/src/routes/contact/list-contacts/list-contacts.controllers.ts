@@ -10,6 +10,7 @@ import {
 	and,
 	desc,
 	eq,
+	exists,
 	ilike,
 	inArray,
 	isNull,
@@ -53,11 +54,54 @@ export async function listContactsController({
 			whereConditions.push(condition);
 			matchFilters.push(condition);
 		}
+		if (query.channelId) {
+			const enrolledInChannel = exists(
+				db
+					.select({ id: schema.channelSubscription.id })
+					.from(schema.channelSubscription)
+					.where(
+						and(
+							eq(schema.channelSubscription.contactId, schema.contact.id),
+							eq(schema.channelSubscription.channelId, query.channelId),
+							eq(schema.channelSubscription.organizationId, organizationId),
+							eq(schema.channelSubscription.status, "enrolled"),
+							isNull(schema.channelSubscription.deletedAt),
+						),
+					),
+			);
+			// Scope the base audience to enrolled contacts; keep matchFilters for
+			// search/status only so totalMatching stays correct on that scoped set.
+			whereConditions.push(enrolledInChannel);
+		}
 
 		const totalMatchingSql =
 			matchFilters.length > 0
 				? sql<number>`count(*) filter (where ${and(...matchFilters)})`
 				: sql<number>`count(*)`;
+
+		const countsWhere = and(
+			eq(schema.contact.organizationId, organizationId),
+			isNull(schema.contact.deletedAt),
+			query.channelId
+				? exists(
+						db
+							.select({ id: schema.channelSubscription.id })
+							.from(schema.channelSubscription)
+							.where(
+								and(
+									eq(schema.channelSubscription.contactId, schema.contact.id),
+									eq(schema.channelSubscription.channelId, query.channelId),
+									eq(
+										schema.channelSubscription.organizationId,
+										organizationId,
+									),
+									eq(schema.channelSubscription.status, "enrolled"),
+									isNull(schema.channelSubscription.deletedAt),
+								),
+							),
+					)
+				: undefined,
+		);
 
 		const [countsResult, contacts] = await Promise.all([
 			db
@@ -68,12 +112,7 @@ export async function listContactsController({
 					unsubscribed: sql<number>`count(*) filter (where ${schema.contact.status} = 'unsubscribed')`,
 				})
 				.from(schema.contact)
-				.where(
-					and(
-						eq(schema.contact.organizationId, organizationId),
-						isNull(schema.contact.deletedAt),
-					),
-				),
+				.where(countsWhere),
 			db.query.contact.findMany({
 				where: and(...whereConditions),
 				orderBy: [desc(schema.contact.createdAt), desc(schema.contact.id)],
@@ -183,18 +222,20 @@ export async function listContactsController({
 			status: contact.status,
 			properties: propertyMap[contact.id] || {},
 			groups: (contact as ContactTypes.ContactData).groups ?? [],
-			channels: allOrgChannels.map((t) => {
-				const explicitStatus = enrollmentMap[contact.id]?.[t.id];
-				return {
-					id: t.id,
-					name: t.name,
-					subscription: (explicitStatus
-						? explicitStatus === "enrolled"
+			// Only explicit enrollments — do not treat channel defaultSubscription
+			// as membership (that made every contact look enrolled in opt-in channels).
+			channels: allOrgChannels
+				.filter((t) => enrollmentMap[contact.id]?.[t.id] !== undefined)
+				.map((t) => {
+					const explicitStatus = enrollmentMap[contact.id]?.[t.id];
+					return {
+						id: t.id,
+						name: t.name,
+						subscription: (explicitStatus === "enrolled"
 							? "opt_in"
-							: "opt_out"
-						: t.defaultSubscription) as "opt_in" | "opt_out",
-				};
-			}),
+							: "opt_out") as "opt_in" | "opt_out",
+					};
+				}),
 
 			suppressionReason: contact.suppressionReason ?? null,
 			suppressedAt: contact.suppressedAt ?? null,

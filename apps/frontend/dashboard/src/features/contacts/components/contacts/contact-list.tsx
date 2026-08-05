@@ -22,6 +22,7 @@ import { useRegisterCommandActions } from "#/features/dashboard/command-menu-con
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import { useContactColumnVisibility } from "../../hooks/use-contact-column-visibility";
 import {
+	useChannelsQuery,
 	useContactsQuery,
 	useSubscriptionActivityQuery,
 } from "../../hooks/use-contacts-query";
@@ -77,18 +78,30 @@ export function ContactList() {
 		"status",
 		parseAsArrayOf(parseAsString).withDefault([]),
 	);
+	const [channelId, setChannelId] = useQueryState(
+		"channelId",
+		parseAsString.withDefault(""),
+	);
 	const [currentPage] = useQueryState("page", parseAsInteger.withDefault(1));
 	const [pageSize] = useQueryState("limit", parseAsInteger.withDefault(10));
 	const { columnVisibility, setColumnVisible } = useContactColumnVisibility();
 
 	/** Exactly one status applies a filter (same pattern as API keys). */
 	const statusParam = statusFilter.length === 1 ? (statusFilter[0] ?? "") : "";
+	const channelFilter = channelId?.trim() || undefined;
+
+	const { data: channelsData } = useChannelsQuery(!!channelFilter);
+	const channelName = useMemo(() => {
+		if (!channelFilter) return undefined;
+		return channelsData?.channels?.find((c) => c.id === channelFilter)?.name;
+	}, [channelFilter, channelsData?.channels]);
 
 	const { data, error, isPending, isFetching } = useContactsQuery({
 		page: currentPage ?? 1,
 		limit: pageSize ?? 10,
 		search: searchQuery ?? "",
 		status: statusParam,
+		channelId: channelFilter,
 		enabled: !!activeOrganization?.id,
 	});
 	const isLoading = isPending || (isFetching && !data);
@@ -132,7 +145,9 @@ export function ContactList() {
 
 	const handleDownloadCSV = useCallback(async () => {
 		try {
-			const response = await fetch("/api/contacts/list?limit=10000", {
+			const params = new URLSearchParams({ limit: "10000" });
+			if (channelFilter) params.set("channelId", channelFilter);
+			const response = await fetch(`/api/contacts/list?${params.toString()}`, {
 				credentials: "include",
 			});
 			const allData = (await response.json()) as typeof data;
@@ -162,7 +177,7 @@ export function ContactList() {
 		} catch {
 			toast.error("Failed to export contacts");
 		}
-	}, [data]);
+	}, [channelFilter, data]);
 
 	const actions = useMemo<CommandAction[]>(
 		() => [
@@ -236,7 +251,9 @@ export function ContactList() {
 								Audience
 							</p>
 							<p className="mt-0.5 text-[12px] text-text-sub-600 leading-relaxed">
-								Contact volume and subscription status across your organization.
+								{channelFilter
+									? `Contacts enrolled in ${channelName ?? "this channel"}.`
+									: "Contact volume and subscription status across your organization."}
 							</p>
 						</div>
 						<div className="grid grid-cols-3 gap-4">
@@ -301,6 +318,15 @@ export function ContactList() {
 				onColumnVisibleChange={setColumnVisible}
 				onExport={() => void handleDownloadCSV()}
 				canExport={!!data?.contacts && data.contacts.length > 0}
+				channelFilter={
+					channelFilter
+						? {
+								id: channelFilter,
+								name: channelName ?? "Channel",
+								onClear: () => void setChannelId(null),
+							}
+						: undefined
+				}
 			/>
 
 			<div className="mt-4">
@@ -313,6 +339,14 @@ export function ContactList() {
 					onAddContact={() => router.push("/contacts/create")}
 					searchQuery={searchQuery ?? ""}
 					onClearSearch={() => void setSearchQuery(null)}
+					emptyStateTitle={
+						channelFilter ? "No subscribers in this channel" : undefined
+					}
+					emptyStateDescription={
+						channelFilter
+							? "Enroll contacts in this channel to see them here. Existing contacts are not added automatically."
+							: undefined
+					}
 				/>
 			</div>
 		</div>

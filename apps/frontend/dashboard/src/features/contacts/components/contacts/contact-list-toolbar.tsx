@@ -15,6 +15,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { dataTableToolbarControlClassName } from "#/components/data-table/toolbar-control";
 import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import { ChannelFilterChip } from "../../filters/channel-filter-chip";
 import { ContactStatusFilterChip } from "../../filters/status-filter-chip";
 import type { ContactViewColumnId } from "../../hooks/use-contact-column-visibility";
 import { useInvalidateContacts } from "../../hooks/use-contacts-query";
@@ -29,11 +30,17 @@ export function ContactListToolbar({
 	onColumnVisibleChange,
 	onExport,
 	canExport,
+	channelFilter,
 }: {
 	columnVisibility: VisibilityState;
 	onColumnVisibleChange: (id: ContactViewColumnId, visible: boolean) => void;
 	onExport?: () => void;
 	canExport?: boolean;
+	channelFilter?: {
+		id: string;
+		name: string;
+		onClear: () => void;
+	};
 }) {
 	const [searchQuery, setSearchQuery] = useQueryState(
 		"search",
@@ -165,6 +172,16 @@ export function ContactListToolbar({
 						void setCurrentPage(1);
 					}}
 				/>
+
+				{channelFilter ? (
+					<ChannelFilterChip
+						channelName={channelFilter.name}
+						onClear={() => {
+							channelFilter.onClear();
+							void setCurrentPage(1);
+						}}
+					/>
+				) : null}
 			</div>
 
 			<div className="flex shrink-0 items-center gap-2">

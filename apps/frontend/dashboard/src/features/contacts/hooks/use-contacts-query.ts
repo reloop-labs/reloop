@@ -39,6 +39,7 @@ export type ContactsListParams = {
 	limit: number;
 	search: string;
 	status: string;
+	channelId?: string;
 	enabled?: boolean;
 };
 
@@ -50,6 +51,7 @@ async function fetchContacts(
 	search.set("page", String(params.page));
 	if (params.search) search.set("search", params.search);
 	if (params.status) search.set("status", params.status);
+	if (params.channelId) search.set("channelId", params.channelId);
 	const res = await fetch(`/api/contacts/list?${search.toString()}`, {
 		credentials: "include",
 	});

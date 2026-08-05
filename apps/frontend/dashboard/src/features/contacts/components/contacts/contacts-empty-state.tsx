@@ -39,6 +39,10 @@ export function ContactsEmptyState({
 		"status",
 		parseAsArrayOf(parseAsString).withDefault([]),
 	);
+	const [channelId, setChannelId] = useQueryState(
+		"channelId",
+		parseAsString.withDefault(""),
+	);
 	const [, setCurrentPage] = useQueryState(
 		"page",
 		parseAsInteger.withDefault(1),
@@ -48,11 +52,15 @@ export function ContactsEmptyState({
 		parseAsString.withDefault(""),
 	);
 
-	const isFiltered = searchQuery.trim() !== "" || statusFilter.length > 0;
+	const isFiltered =
+		searchQuery.trim() !== "" ||
+		statusFilter.length > 0 ||
+		channelId.trim() !== "";
 
 	const handleClearFilters = () => {
 		void setStatusFilter([]);
 		void setSearchQuery("");
+		void setChannelId(null);
 		void setCurrentPage(1);
 		onClearSearch?.();
 	};
@@ -74,15 +82,13 @@ export function ContactsEmptyState({
 				/>
 			</div>
 			<h3 className="mb-2 font-semibold text-text-strong-950 text-xl">
-				{isFiltered
-					? "No contacts found"
-					: (title ?? "Create your first contact")}
+				{title ?? (isFiltered ? "No contacts found" : "Create your first contact")}
 			</h3>
 			<p className="mx-auto mb-6 max-w-75 text-balance font-medium text-[12px] text-text-sub-600">
-				{isFiltered
-					? "Try adjusting your search or filters."
-					: (description ??
-						"Add contacts manually, import a CSV, or let your app sync them automatically.")}
+				{description ??
+					(isFiltered
+						? "Try adjusting your search or filters."
+						: "Add contacts manually, import a CSV, or let your app sync them automatically.")}
 			</p>
 			{isFiltered ? (
 				<Button.Root

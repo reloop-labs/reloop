@@ -6,7 +6,7 @@ import type { ChannelTypes } from "@be/contacts/types/channel.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { CHANNEL_LIST_WEBHOOK_EVENT } from "@reloop/webhook-events";
-import { and, desc, eq, isNull, sql } from "drizzle-orm";
+import { and, desc, eq, inArray, isNull, sql } from "drizzle-orm";
 import { useLogger } from "evlog/elysia";
 
 export const listChannelsController = async ({
@@ -34,20 +34,37 @@ export const listChannelsController = async ({
 		const rows = await db
 			.select({
 				channel: schema.channel,
-				subscriberCount: sql<number>`(
-          SELECT count(*)::int 
-          FROM ${schema.channelSubscription} 
-          WHERE ${schema.channelSubscription.channelId} = ${schema.channel.id} 
-          AND ${schema.channelSubscription.status} = 'enrolled'
-          AND ${schema.channelSubscription.deletedAt} IS NULL
-        )`,
-				total: sql<number>`COUNT(*) OVER()`,
+				total: sql<number>`COUNT(*) OVER()`.mapWith(Number),
 			})
 			.from(schema.channel)
 			.where(whereClause)
 			.orderBy(desc(schema.channel.createdAt))
 			.limit(limit)
 			.offset(offset);
+
+		const channelIds = rows.map(({ channel }) => channel.id);
+		const countByChannelId = new Map<string, number>();
+
+		if (channelIds.length > 0) {
+			const counts = await db
+				.select({
+					channelId: schema.channelSubscription.channelId,
+					count: sql<number>`count(*)::int`.mapWith(Number),
+				})
+				.from(schema.channelSubscription)
+				.where(
+					and(
+						inArray(schema.channelSubscription.channelId, channelIds),
+						eq(schema.channelSubscription.status, "enrolled"),
+						isNull(schema.channelSubscription.deletedAt),
+					),
+				)
+				.groupBy(schema.channelSubscription.channelId);
+
+			for (const row of counts) {
+				countByChannelId.set(row.channelId, row.count);
+			}
+		}
 
 		log.info("Channels listed successfully", {
 			total: rows[0]?.total ?? 0,
@@ -56,7 +73,7 @@ export const listChannelsController = async ({
 		});
 		return {
 			object: "channel",
-			channels: rows.map(({ channel, subscriberCount }) => ({
+			channels: rows.map(({ channel }) => ({
 				id: channel.id,
 				name: channel.name,
 				description: channel.description,
@@ -64,7 +81,7 @@ export const listChannelsController = async ({
 				visibility: channel.visibility,
 				createdAt: channel.createdAt,
 				updatedAt: channel.updatedAt,
-				subscriberCount,
+				subscriberCount: countByChannelId.get(channel.id) ?? 0,
 			})),
 			total: Number(rows[0]?.total ?? 0),
 			page,

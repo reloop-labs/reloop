@@ -1,7 +1,12 @@
 import type { DatabaseInstance } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import { and, eq, inArray, isNull } from "drizzle-orm";
+import { and, eq, inArray, isNull, sql } from "drizzle-orm";
 import { useLogger } from "evlog/elysia";
+
+type ChannelEnrollmentInput = {
+	channelId: string;
+	subscription: "opt_in" | "opt_out";
+};
 
 export async function enrollChannels_step5({
 	contactId,
@@ -10,51 +15,90 @@ export async function enrollChannels_step5({
 	db,
 }: {
 	contactId: string;
-	channels?: { channelId: string; subscription: "opt_in" | "opt_out" }[];
+	channels?: ChannelEnrollmentInput[];
 	organizationId: string;
 	db: DatabaseInstance;
 }) {
 	const log = useLogger();
-	if (!channels || channels.length === 0) return;
 
-	const requestedChannelIds = channels.map((c) => c.channelId);
-
-	const validChannels = await db
+	// Channels with defaultSubscription = opt_in auto-enroll new contacts.
+	const optInChannels = await db
 		.select({ id: schema.channel.id })
 		.from(schema.channel)
 		.where(
 			and(
-				inArray(schema.channel.id, requestedChannelIds),
 				eq(schema.channel.organizationId, organizationId),
+				eq(schema.channel.defaultSubscription, "opt_in"),
 				isNull(schema.channel.deletedAt),
 			),
 		);
 
-	const validChannelIdSet = new Set(validChannels.map((c) => c.id));
-
-	const dropped = requestedChannelIds.length - validChannelIdSet.size;
-	if (dropped > 0) {
-		log.warn("Dropped channel IDs that do not belong to the organization", {
-			organizationId,
-			dropped,
-		});
+	const enrollmentByChannelId = new Map<string, "opt_in" | "opt_out">();
+	for (const channel of optInChannels) {
+		enrollmentByChannelId.set(channel.id, "opt_in");
 	}
 
-	const validEntries = channels.filter((c) =>
-		validChannelIdSet.has(c.channelId),
-	);
+	// Explicit request body wins over channel defaults.
+	const explicitChannels = channels ?? [];
+	if (explicitChannels.length > 0) {
+		const requestedChannelIds = explicitChannels.map((c) => c.channelId);
+		const validChannels = await db
+			.select({ id: schema.channel.id })
+			.from(schema.channel)
+			.where(
+				and(
+					inArray(schema.channel.id, requestedChannelIds),
+					eq(schema.channel.organizationId, organizationId),
+					isNull(schema.channel.deletedAt),
+				),
+			);
 
-	if (validEntries.length > 0) {
-		log.info("Enrolling contact in channels");
-		await db.insert(schema.channelSubscription).values(
-			validEntries.map((channel) => ({
-				contactId,
-				channelId: channel.channelId,
+		const validChannelIdSet = new Set(validChannels.map((c) => c.id));
+		const dropped = requestedChannelIds.length - validChannelIdSet.size;
+		if (dropped > 0) {
+			log.warn("Dropped channel IDs that do not belong to the organization", {
 				organizationId,
-				status: (channel.subscription === "opt_in"
-					? "enrolled"
-					: "unenrolled") as "enrolled" | "unenrolled",
-			})),
-		);
+				dropped,
+			});
+		}
+
+		for (const channel of explicitChannels) {
+			if (!validChannelIdSet.has(channel.channelId)) continue;
+			enrollmentByChannelId.set(channel.channelId, channel.subscription);
+		}
 	}
+
+	const entries = [...enrollmentByChannelId.entries()];
+	if (entries.length === 0) return;
+
+	log.info("Enrolling contact in channels", {
+		contactId,
+		channelCount: entries.length,
+		autoOptInCount: optInChannels.length,
+		explicitCount: explicitChannels.length,
+	});
+
+	await db
+		.insert(schema.channelSubscription)
+		.values(
+			entries.map(([channelId, subscription]) => ({
+				contactId,
+				channelId,
+				organizationId,
+				status: (subscription === "opt_in" ? "enrolled" : "unenrolled") as
+					| "enrolled"
+					| "unenrolled",
+			})),
+		)
+		.onConflictDoUpdate({
+			target: [
+				schema.channelSubscription.contactId,
+				schema.channelSubscription.channelId,
+			],
+			set: {
+				status: sql`excluded.status`,
+				deletedAt: null,
+				updatedAt: new Date(),
+			},
+		});
 }

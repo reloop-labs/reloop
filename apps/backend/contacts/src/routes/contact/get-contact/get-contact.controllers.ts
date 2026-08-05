@@ -19,35 +19,27 @@ export async function getContactController({
 	log.info("Getting contact", { contactId, organizationId });
 
 	try {
-		const [contact, allChannels] = await Promise.all([
-			db.query.contact.findFirst({
-				where: and(
-					eq(schema.contact.id, contactId),
-					eq(schema.contact.organizationId, organizationId),
-					isNull(schema.contact.deletedAt),
-				),
-				with: {
-					propertyValues: {
-						with: { property: true },
-						where: isNull(schema.contactPropertyValue.deletedAt),
-					},
-					contactGroups: {
-						with: { group: true },
-						where: isNull(schema.contactGroup.deletedAt),
-					},
-					contactChannels: {
-						with: { channel: true },
-						where: isNull(schema.channelSubscription.deletedAt),
-					},
+		const contact = await db.query.contact.findFirst({
+			where: and(
+				eq(schema.contact.id, contactId),
+				eq(schema.contact.organizationId, organizationId),
+				isNull(schema.contact.deletedAt),
+			),
+			with: {
+				propertyValues: {
+					with: { property: true },
+					where: isNull(schema.contactPropertyValue.deletedAt),
 				},
-			}),
-			db.query.channel.findMany({
-				where: and(
-					eq(schema.channel.organizationId, organizationId),
-					isNull(schema.channel.deletedAt),
-				),
-			}),
-		]);
+				contactGroups: {
+					with: { group: true },
+					where: isNull(schema.contactGroup.deletedAt),
+				},
+				contactChannels: {
+					with: { channel: true },
+					where: isNull(schema.channelSubscription.deletedAt),
+				},
+			},
+		});
 
 		if (!contact) {
 			log.warn("Contact not found", { contactId, organizationId });
@@ -66,24 +58,21 @@ export async function getContactController({
 			.filter((cg) => cg.group !== null)
 			.map((cg) => ({ id: cg.group.id, name: cg.group.name }));
 
-		const enrollmentByChannelId = new Map(
-			contact.contactChannels
-				.filter((en) => en.deletedAt === null)
-				.map((en) => [en.channelId, en.status]),
-		);
-
-		const channels = allChannels.map((t) => {
-			const explicitStatus = enrollmentByChannelId.get(t.id);
-			return {
-				id: t.id,
-				name: t.name,
-				subscription: (explicitStatus !== undefined
-					? explicitStatus === "enrolled"
-						? "opt_in"
-						: "opt_out"
-					: t.defaultSubscription) as "opt_in" | "opt_out",
-			};
-		});
+		// Only explicit enrollments — channel defaultSubscription is not membership.
+		const channels = contact.contactChannels
+			.filter(
+				(en) =>
+					en.deletedAt === null &&
+					en.channel !== null &&
+					en.channel.deletedAt === null,
+			)
+			.map((en) => ({
+				id: en.channel.id,
+				name: en.channel.name,
+				subscription: (en.status === "enrolled" ? "opt_in" : "opt_out") as
+					| "opt_in"
+					| "opt_out",
+			}));
 
 		const suppressionReason = contact.suppressionReason ?? null;
 		const suppressedAt = contact.suppressedAt ?? null;

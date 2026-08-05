@@ -377,6 +377,12 @@ export namespace ContactModel {
 				},
 			),
 		),
+		channelId: t.Optional(
+			t.String({
+				description:
+					"Filter to contacts enrolled in this channel (status = enrolled)",
+			}),
+		),
 	});
 
 	export type ContactQuery = typeof contactQuery.static;

@@ -41,6 +41,34 @@ export async function finalizeContactCreation_step6({
 		{} as Record<string, string | number>,
 	);
 
+	const channelRows = await db
+		.select({
+			id: schema.channel.id,
+			name: schema.channel.name,
+			status: schema.channelSubscription.status,
+		})
+		.from(schema.channelSubscription)
+		.innerJoin(
+			schema.channel,
+			eq(schema.channelSubscription.channelId, schema.channel.id),
+		)
+		.where(
+			and(
+				eq(schema.channelSubscription.contactId, newContact.id),
+				eq(schema.channelSubscription.organizationId, organizationId),
+				isNull(schema.channelSubscription.deletedAt),
+				isNull(schema.channel.deletedAt),
+			),
+		);
+
+	const channels = channelRows.map((row) => ({
+		id: row.id,
+		name: row.name,
+		subscription: (row.status === "enrolled" ? "opt_in" : "opt_out") as
+			| "opt_in"
+			| "opt_out",
+	}));
+
 	const result = {
 		object: "contact" as const,
 		id: newContact.id,
@@ -50,7 +78,7 @@ export async function finalizeContactCreation_step6({
 		status: newContact.status,
 		properties: propertiesRecord ?? {},
 		groups: (newContact as ContactTypes.ContactData).groups ?? [],
-		channels: (newContact as ContactTypes.ContactData).channels ?? [],
+		channels,
 		suppressionReason: newContact.suppressionReason ?? null,
 		suppressedAt: newContact.suppressedAt ?? null,
 		createdAt: newContact.createdAt,
