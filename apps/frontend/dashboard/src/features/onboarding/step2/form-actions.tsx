@@ -2,6 +2,11 @@ import * as Button from "@reloop/ui/button";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import Spinner from "@reloop/ui/spinner";
 import { AnimatePresence, motion } from "framer-motion";
+import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
+
+/** Light keycap so it reads on the blue FancyButton fill. */
+const actionKbdOnBlueClassName =
+	"border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]";
 
 export function FormActions({
 	isLoading,
@@ -17,11 +22,12 @@ export function FormActions({
 				variant="neutral"
 				mode="lighter"
 				size="medium"
-				className="h-10 shrink-0 rounded-xl px-4"
+				className="h-10 shrink-0 gap-1.5 rounded-xl px-4"
 				onClick={onSkip}
 				disabled={isLoading}
 			>
 				Skip
+				<ActionKbd className="w-auto min-w-0 px-1">⌥S</ActionKbd>
 			</Button.Root>
 			<FancyButton.Root
 				type="submit"
@@ -58,7 +64,10 @@ export function FormActions({
 								<span>Adding Domain...</span>
 							</>
 						) : (
-							<span>Add Domain</span>
+							<>
+								<span>Add Domain</span>
+								<ActionKbd className={actionKbdOnBlueClassName}>↵</ActionKbd>
+							</>
 						)}
 					</motion.span>
 				</AnimatePresence>

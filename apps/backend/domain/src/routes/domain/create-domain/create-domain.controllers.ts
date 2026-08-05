@@ -15,11 +15,11 @@ export async function createDomainController({
 	organizationId,
 	userId,
 	domain,
-	click_tracking: clickTracking,
-	open_tracking: openTracking,
+	click_tracking: clickTracking = true,
+	open_tracking: openTracking = true,
 	tls,
-	sending_email: sendingEmail,
-	receiving_email: receivingEmail,
+	sending_email: sendingEmail = true,
+	receiving_email: receivingEmail = true,
 }: {
 	organizationId: string;
 	userId: string;

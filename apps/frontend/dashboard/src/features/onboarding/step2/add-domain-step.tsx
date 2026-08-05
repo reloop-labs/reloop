@@ -14,14 +14,14 @@ export function AddDomainStep() {
 		parseAsString.withDefault(""),
 	);
 
-	const { register, handleSubmit, formState, setError, watch, control } =
+	const { register, handleSubmit, formState, setError, watch } =
 		useForm<DomainFormValues>({
 			resolver: valibotResolver(domainSchema) as Resolver<DomainFormValues>,
 			mode: "onChange",
 			defaultValues: {
 				domain: domain || "",
-				clickTracking: false,
-				openTracking: false,
+				clickTracking: true,
+				openTracking: true,
 			},
 		});
 
@@ -33,16 +33,23 @@ export function AddDomainStep() {
 		setDomain(watchedDomain || null);
 	}, [watchedDomain, setDomain]);
 
+	const onSubmit = handleSubmit(submitDomain);
+
+	// Enter must work while focus is in the domain <input>. Native form submit is
+	// unreliable here (FancyButton + RHF), so bind Enter explicitly like other modals.
 	useHotkeys(
-		"mod+enter",
-		() => {
+		"enter",
+		(e) => {
+			e.preventDefault();
 			if (!isLoading) {
-				handleSubmit(submitDomain)();
+				void onSubmit();
 			}
 		},
-		{ enableOnFormTags: true },
+		{ enableOnFormTags: true, preventDefault: true },
+		[isLoading, onSubmit],
 	);
 
+	// ⌥S skips domain setup — enable on inputs so it works without leaving the field.
 	useHotkeys(
 		"alt+s",
 		(e) => {
@@ -52,6 +59,7 @@ export function AddDomainStep() {
 			}
 		},
 		{ enableOnFormTags: true },
+		[isLoading, skipDns],
 	);
 
 	return (
@@ -61,11 +69,15 @@ export function AddDomainStep() {
 					Add Domain
 				</h1>
 				<p className="text-sm text-text-sub-600">
-					Send emails from a domain you control
+					Connect your website&apos;s domain (like yourcompany.com) so emails come
+					from your business — not a generic address
 				</p>
 			</div>
 			<form
-				onSubmit={handleSubmit(submitDomain)}
+				onSubmit={(e) => {
+					e.preventDefault();
+					if (!isLoading) void onSubmit();
+				}}
 				className="flex w-full flex-col gap-6"
 			>
 				<DomainInputField

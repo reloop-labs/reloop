@@ -151,7 +151,7 @@ export const ForwardDNSRecordsButton = ({
 					mode="stroke"
 					size="small"
 					className={cn(
-						"gap-1.5 rounded-xl transition-transform duration-150 ease-out active:scale-[0.98]",
+						"h-10 gap-1.5 rounded-xl transition-transform duration-150 ease-out active:scale-[0.98]",
 						isOpen && "bg-bg-weak-50",
 					)}
 				>

@@ -55,20 +55,40 @@ export function ConfigureDnsStep() {
 		trackingRecords,
 	} = groupDomainDnsRecords(domainData?.dnsRecords);
 
+	// Enter verifies DNS; ⌥S skips — same pattern as Add Domain.
 	useHotkeys(
-		"mod+enter",
-		() => {
+		"enter",
+		(e) => {
+			// Don't steal Enter from the forward-records email field.
+			const target = e.target;
+			if (
+				target instanceof HTMLElement &&
+				(target.closest("[data-radix-popper-content-wrapper]") ||
+					target.tagName === "INPUT" ||
+					target.tagName === "TEXTAREA")
+			) {
+				return;
+			}
+			e.preventDefault();
 			if (!isVerifying) {
 				void verifyDns();
 			}
 		},
-		{ enableOnFormTags: true },
+		{ enableOnFormTags: false, preventDefault: true },
+		[isVerifying, verifyDns],
 	);
 
-	useHotkeys("alt+s", (e) => {
-		e.preventDefault();
-		skip();
-	});
+	useHotkeys(
+		"alt+s",
+		(e) => {
+			e.preventDefault();
+			if (!isVerifying) {
+				skip();
+			}
+		},
+		{ enableOnFormTags: true },
+		[isVerifying, skip],
+	);
 
 	if (!domainId && !isLoading) {
 		return (
@@ -223,6 +243,7 @@ export function ConfigureDnsStep() {
 				)}
 
 				<ConfigureDnsActions
+					domainId={domainId || domainData?.id}
 					isVerifying={isVerifying}
 					onSkip={skip}
 					onVerify={() => {

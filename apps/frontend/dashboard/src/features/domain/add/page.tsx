@@ -34,8 +34,8 @@ export function AddDomainPage() {
 			mode: "onChange",
 			defaultValues: {
 				domain: "",
-				clickTracking: false,
-				openTracking: false,
+				clickTracking: true,
+				openTracking: true,
 			},
 		});
 
@@ -58,6 +58,8 @@ export function AddDomainPage() {
 					domain,
 					click_tracking: clickTracking,
 					open_tracking: openTracking,
+					// Receiving + tracking on by default for new domains.
+					receiving_email: true,
 					// Return path + tracking host labels are fixed server-side.
 					tls: "opportunistic",
 				},

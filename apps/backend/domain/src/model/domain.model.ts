@@ -16,13 +16,13 @@ export namespace DomainModel {
 			// (inbound / link) — not accepted from clients.
 			click_tracking: t.Optional(
 				t.Boolean({
-					default: false,
+					default: true,
 					description: "Whether click tracking is enabled",
 				}),
 			),
 			open_tracking: t.Optional(
 				t.Boolean({
-					default: false,
+					default: true,
 					description: "Whether open tracking is enabled",
 				}),
 			),
@@ -40,7 +40,7 @@ export namespace DomainModel {
 			),
 			receiving_email: t.Optional(
 				t.Boolean({
-					default: false,
+					default: true,
 					description: "Whether receiving email is enabled",
 				}),
 			),
@@ -53,7 +53,7 @@ export namespace DomainModel {
 					open_tracking: true,
 					tls: "opportunistic",
 					sending_email: true,
-					receiving_email: false,
+					receiving_email: true,
 				},
 			],
 		},
