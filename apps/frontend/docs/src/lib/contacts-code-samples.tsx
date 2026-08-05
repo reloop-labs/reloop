@@ -1,6 +1,7 @@
 "use client";
 
 import {
+	addContactToChannelXCodeSamples,
 	addContactToGroupXCodeSamples,
 	createChannelXCodeSamples,
 	createContactXCodeSamples,
@@ -10,13 +11,16 @@ import {
 	deleteContactXCodeSamples,
 	deleteGroupXCodeSamples,
 	deletePropertyXCodeSamples,
+	getChannelXCodeSamples,
 	getContactXCodeSamples,
 	getGroupXCodeSamples,
+	listChannelsXCodeSamples,
 	listContactsXCodeSamples,
 	listGroupsXCodeSamples,
 	listPropertiesXCodeSamples,
 	removeContactFromGroupXCodeSamples,
 	updateChannelXCodeSamples,
+	updateContactChannelXCodeSamples,
 	updateContactXCodeSamples,
 	updateGroupXCodeSamples,
 	updatePropertyXCodeSamples,
@@ -42,8 +46,12 @@ const registry = {
 	"contacts.groups.addMember": addContactToGroupXCodeSamples,
 	"contacts.groups.removeMember": removeContactFromGroupXCodeSamples,
 	"contacts.channels.create": createChannelXCodeSamples,
+	"contacts.channels.list": listChannelsXCodeSamples,
+	"contacts.channels.get": getChannelXCodeSamples,
 	"contacts.channels.update": updateChannelXCodeSamples,
 	"contacts.channels.delete": deleteChannelXCodeSamples,
+	"contacts.channels.addContact": addContactToChannelXCodeSamples,
+	"contacts.channels.updateSubscription": updateContactChannelXCodeSamples,
 } as const satisfies Record<string, LearnCodeSample[]>;
 
 export type ContactsCodeSampleId = keyof typeof registry;

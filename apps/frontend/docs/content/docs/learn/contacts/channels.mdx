@@ -1,7 +1,8 @@
 ---
 title: Contact Channels
 sidebarTitle: Channels
-description: Manage Reloop subscription channels for per-topic email preferences. Create public or private channels and control opt-in defaults from the dashboard or API.
+description: Learn how to create, edit, and delete Reloop subscription channels, enroll contacts, and view subscribers from the dashboard or API.
+icon: tower-broadcast
 faq:
   - question: What are contact channels in Reloop?
     answer: Channels are subscription topics such as Product Updates or Newsletter. Contacts opt in or out per channel instead of a single global unsubscribe.
@@ -13,61 +14,113 @@ faq:
     answer: No. Channel opt-out only affects that topic. The contact can remain subscribed overall and stay enrolled in other channels.
   - question: What happens when I delete a channel?
     answer: Deleting a channel removes the channel and its enrollment records. Contact profiles themselves remain.
+  - question: How do I see who is enrolled in a channel?
+    answer: From the Channels page, open the row menu (···) and select View Subscribers to open Contacts filtered to that channel’s enrolled contacts.
 ---
-
-## What are contact channels?
-
-**Channels** are subscription topics (Product Updates, Newsletter, Alerts). Contacts opt in or out per channel instead of a global unsubscribe.
-
-Open the UI: [Contacts → Channels](https://reloop.sh/dashboard/contacts/channels)
-
-## Channel settings
-
-| Setting | Options |
-|---------|---------|
-| **Default** | `opt_in` — enroll new contacts · `opt_out` — enroll manually |
-| **Visibility** | `public` — preference center · `private` — dashboard only |
-
----
-
-## How do I create a channel?
 
 <Tabs>
   <Tab title="Desktop" icon="monitor">
-    ![Create a subscription channel](/docs/images/docs/contacts/channels/channels-list.png)
+    ## View all channels
+
+    The [Channels Dashboard](https://reloop.sh/dashboard/contacts/channels) shows every subscription channel in your organization, including subscriber count, visibility, and default enrollment.
+
+    Channels are topics contacts can opt in or out of — for example **Product Updates** or **Newsletter** — instead of a single global unsubscribe. Visibility and default subscription stay on the channel; enrollments live on each [contact](/docs/learn/contacts).
+
+    ![Contact channels in the Reloop dashboard](/docs/images/docs/contacts/channels/channels-list.png)
+
+    ## Create a channel
 
     1. Go to [Contacts → Channels](https://reloop.sh/dashboard/contacts/channels)
-    2. **Create Channel**
-    3. Name, optional description, default subscription, public/private
-    4. Save
-  </Tab>
-  <Tab title="Code" icon="code">
-    <ContactsCodeSamples id="contacts.channels.create" />
-  </Tab>
-</Tabs>
+    2. Click **Create channel** (or press `C`)
+    3. Enter a descriptive name (e.g. `Product Updates` or `Newsletter`)
+    4. Optionally add a description, set **Default Subscription**, and choose **Public Channel**
+    5. Click **Create Channel** (or press `Enter`)
 
----
+    <Info>
+    **Default Subscription** controls whether new contacts are enrolled automatically (**opt-in**) or must be enrolled manually (**opt-out**). **Public** channels appear on the preference center; **private** channels stay hidden from subscribers.
+    </Info>
 
-## How do I edit or delete a channel?
+    <Video src="/docs/images/docs/contacts/channels/create-channel.mp4" autoPlay loop muted playsInline />
 
-Deleting a channel removes its enrollment records.
+    ## Edit a channel
 
-<Tabs>
-  <Tab title="Desktop" icon="monitor">
-    ![Edit or delete a channel](/docs/images/docs/contacts/channels/channels-list.png)
+    You can update a channel’s name, description, default subscription, and public/private visibility. Editing does not remove existing enrollments.
+
+    1. Go to [Contacts → Channels](https://reloop.sh/dashboard/contacts/channels)
+    2. Click the edit icon (or row menu **···** → **Edit Channel**)
+    3. Update the fields you need
+    4. Click **Update Channel** (or press `Enter`)
+
+    <Video src="/docs/images/docs/contacts/channels/edit-channel.mp4" autoPlay loop muted playsInline />
+
+    ## View channel subscribers
+
+    <Info>
+    **View Subscribers** opens Contacts filtered to contacts enrolled in that channel. The subscriber count on the channel card matches this enrolled list — not every contact in your organization.
+    </Info>
 
     1. Open [Contacts → Channels](https://reloop.sh/dashboard/contacts/channels)
-    2. Row **···** → **Edit** or **Delete**
-    3. Confirm if deleting
+    2. Click the row menu (**···**) → **View Subscribers**
+    3. Review the filtered contacts list (clear the channel filter chip to see everyone again)
+
+    <Video src="/docs/images/docs/contacts/channels/view-channel-subscribers.mp4" autoPlay loop muted playsInline />
+
+    ## Remove a contact from a channel
+
+    <Info>
+    Removing a contact from a channel only updates that topic preference. The contact stays in your organization and can remain enrolled in other channels.
+    </Info>
+
+    1. Open [Contacts](https://reloop.sh/dashboard/contacts) (or open a contact detail)
+    2. Edit the contact and remove the channel (e.g. **Product Updates**)
+    3. Save the contact
+
+    <Video src="/docs/images/docs/contacts/channels/remove-contact-from-channel.mp4" autoPlay loop muted playsInline />
+
+    ## Delete a channel
+
+    <Info>
+    Deleting removes the channel and its enrollment records. Contact profiles themselves remain in your organization.
+    </Info>
+
+    1. Open [Contacts → Channels](https://reloop.sh/dashboard/contacts/channels)
+    2. Click the row menu (**···**) → **Delete Channel**
+    3. Confirm permanent removal
+
+    <Video src="/docs/images/docs/contacts/channels/delete-channel.mp4" autoPlay loop muted playsInline />
   </Tab>
   <Tab title="Code" icon="code">
+    ## View all channels
+
+    Fetch a paginated list of channels in your organization, or get a single channel by ID.
+
+    <ContactsCodeSamples id="contacts.channels.list" />
+
+    <ContactsCodeSamples id="contacts.channels.get" />
+
+    ## Create a channel
+
+    Create a subscription channel with optional description, default subscription, and visibility.
+
+    <ContactsCodeSamples id="contacts.channels.create" />
+
+    ## Edit a channel
+
     <ContactsCodeSamples id="contacts.channels.update" />
+
+    ## Enroll a contact in a channel
+
+    <ContactsCodeSamples id="contacts.channels.addContact" />
+
+    ## Remove a contact from a channel
+
+    <ContactsCodeSamples id="contacts.channels.updateSubscription" />
+
+    ## Delete a channel
 
     <ContactsCodeSamples id="contacts.channels.delete" />
   </Tab>
 </Tabs>
-
----
 
 ## FAQ
 
@@ -85,15 +138,31 @@ Deleting a channel removes its enrollment records.
   </Accordion>
 
   <Accordion title="Does opting out of a channel unsubscribe the contact globally?">
-    No. Channel opt-out only affects that topic. The contact can remain subscribed overall and stay enrolled in other channels.
+    No. Channel opt-out only affects that topic. The contact can remain subscribed overall and stay enrolled in other [channels](/docs/learn/contacts/channels).
   </Accordion>
 
   <Accordion title="What happens when I delete a channel?">
     Deleting removes the channel and its enrollment records. [Contact](/docs/learn/contacts) profiles themselves remain.
   </Accordion>
+
+  <Accordion title="How do I see who is enrolled in a channel?">
+    From the Channels page, open the row menu (**···**) and select **View Subscribers** to open Contacts filtered to that channel’s enrolled contacts.
+  </Accordion>
 </AccordionGroup>
 
----
+## Related
+
+<CardGroup cols={3}>
+  <Card icon="users" title="Contacts" href="/docs/learn/contacts">
+    Add, search, and manage people in your organization.
+  </Card>
+  <Card icon="users" title="Groups" href="/docs/learn/contacts/groups">
+    Lists you send to without changing subscription status.
+  </Card>
+  <Card icon="sliders" title="Properties" href="/docs/learn/contacts/properties">
+    Custom traits on each contact record.
+  </Card>
+</CardGroup>
 
 ## API reference
 
@@ -109,6 +178,12 @@ Deleting a channel removes its enrollment records.
   </Card>
   <Card icon="pen" title="Update" href="/api/contacts/channels/patch-api-contacts-v1channels-by-channel_id#channels">
     Change settings.
+  </Card>
+  <Card icon="user-plus" title="Enroll contact" href="/api/contacts/post-api-contacts-channel-by-channel_id#channels">
+    Add a contact to a channel.
+  </Card>
+  <Card icon="pen" title="Update subscription" href="/api/contacts/patch-api-contacts-channel-by-channel_id#channels">
+    Change channel enrollment.
   </Card>
   <Card icon="trash" title="Delete" href="/api/contacts/channels/delete-api-contacts-v1channels-by-channel_id#channels">
     Remove channel.
