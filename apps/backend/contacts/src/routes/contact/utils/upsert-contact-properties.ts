@@ -5,7 +5,7 @@ import {
 } from "@be/contacts/error/contacts.error-response";
 import { type DatabaseInstance, db as defaultDb } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import { and, eq, inArray, isNull } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { useLogger } from "evlog/elysia";
 
 function sanitizeText(val: string): string {
@@ -76,13 +76,13 @@ export async function upsertContactProperties({
 							id: schema.contactProperty.id,
 							propertyName: schema.contactProperty.propertyName,
 							propertyType: schema.contactProperty.propertyType,
+							deletedAt: schema.contactProperty.deletedAt,
 						})
 						.from(schema.contactProperty)
 						.where(
 							and(
 								inArray(schema.contactProperty.propertyName, propertyNames),
 								eq(schema.contactProperty.organizationId, organizationId),
-								isNull(schema.contactProperty.deletedAt),
 							),
 						)
 				: Promise.resolve(
@@ -90,6 +90,7 @@ export async function upsertContactProperties({
 							id: string;
 							propertyName: string;
 							propertyType: string;
+							deletedAt: Date | null;
 						}[],
 					),
 		]);
@@ -119,12 +120,24 @@ export async function upsertContactProperties({
 		const propertyInfo = new Map<
 			string,
 			{ id: string; type: "string" | "number" }
-		>(
-			existingProperties.map((p) => [
-				p.propertyName,
-				{ id: p.id, type: p.propertyType as "string" | "number" },
-			]),
-		);
+		>();
+
+		for (const p of existingProperties) {
+			if (p.deletedAt !== null) {
+				// Soft-deleted definition: restore instead of INSERT → unique conflict.
+				log.info("Restoring soft-deleted property definition", {
+					name: p.propertyName,
+				});
+				await db
+					.update(schema.contactProperty)
+					.set({ deletedAt: null, updatedAt: new Date() })
+					.where(eq(schema.contactProperty.id, p.id));
+			}
+			propertyInfo.set(p.propertyName, {
+				id: p.id,
+				type: p.propertyType as "string" | "number",
+			});
+		}
 
 		const existingValueByPropertyId = new Map(
 			currentValues.map((cv) => [cv.propertyId, cv]),
@@ -144,6 +157,16 @@ export async function upsertContactProperties({
 						userId,
 						createdAt: new Date(),
 						updatedAt: new Date(),
+					})
+					.onConflictDoUpdate({
+						target: [
+							schema.contactProperty.organizationId,
+							schema.contactProperty.propertyName,
+						],
+						set: {
+							deletedAt: null,
+							updatedAt: new Date(),
+						},
 					})
 					.returning();
 

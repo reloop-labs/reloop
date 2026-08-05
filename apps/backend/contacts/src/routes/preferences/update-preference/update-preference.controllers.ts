@@ -43,27 +43,26 @@ export async function updatePreferenceController({
 
 	const targetStatus = subscribe ? "enrolled" : "unenrolled";
 
-	const existing = await db.query.channelSubscription.findFirst({
-		where: and(
-			eq(schema.channelSubscription.contactId, contactId),
-			eq(schema.channelSubscription.channelId, channelId),
-			isNull(schema.channelSubscription.deletedAt),
-		),
-	});
-
-	if (existing) {
-		await db
-			.update(schema.channelSubscription)
-			.set({ status: targetStatus, updatedAt: new Date() })
-			.where(eq(schema.channelSubscription.id, existing.id));
-	} else {
-		await db.insert(schema.channelSubscription).values({
+	// Upsert restores soft-deleted subscriptions instead of INSERT → unique conflict.
+	await db
+		.insert(schema.channelSubscription)
+		.values({
 			contactId,
 			channelId,
 			organizationId,
 			status: targetStatus,
+		})
+		.onConflictDoUpdate({
+			target: [
+				schema.channelSubscription.contactId,
+				schema.channelSubscription.channelId,
+			],
+			set: {
+				status: targetStatus,
+				deletedAt: null,
+				updatedAt: new Date(),
+			},
 		});
-	}
 
 	log.info("Preference updated", {
 		contactId,

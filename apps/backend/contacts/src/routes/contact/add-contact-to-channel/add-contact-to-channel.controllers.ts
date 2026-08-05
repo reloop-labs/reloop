@@ -87,11 +87,11 @@ export async function addContactToChannelController({
 			contactId: contact.id,
 			channelId,
 		});
+		// Include soft-deleted rows so we restore instead of INSERT → unique conflict.
 		const existingSubscription = await db.query.channelSubscription.findFirst({
 			where: and(
 				eq(schema.channelSubscription.contactId, contact.id),
 				eq(schema.channelSubscription.channelId, channelId),
-				isNull(schema.channelSubscription.deletedAt),
 			),
 		});
 
@@ -100,27 +100,35 @@ export async function addContactToChannelController({
 		) as "enrolled" | "unenrolled";
 
 		if (existingSubscription) {
-			if (existingSubscription.status !== targetStatus) {
-				await db
-					.update(schema.channelSubscription)
-					.set({ status: targetStatus, updatedAt: new Date() })
-					.where(eq(schema.channelSubscription.id, existingSubscription.id));
-
-				log.info("Updated contact subscription status", {
-					subscriptionId: existingSubscription.id,
-					currentStatus: targetStatus,
-				});
-
-				const result = {
-					contact,
-					subscriptionId: existingSubscription.id,
-					event: CONTACT_UPDATE_WEBHOOK_EVENT.id,
-				};
-
-				return result;
+			const isActive = existingSubscription.deletedAt === null;
+			if (isActive && existingSubscription.status === targetStatus) {
+				throw SubscriptionErrors.alreadyExists();
 			}
 
-			throw SubscriptionErrors.alreadyExists();
+			await db
+				.update(schema.channelSubscription)
+				.set({
+					status: targetStatus,
+					deletedAt: null,
+					updatedAt: new Date(),
+				})
+				.where(eq(schema.channelSubscription.id, existingSubscription.id));
+
+			log.info(
+				isActive
+					? "Updated contact subscription status"
+					: "Restored soft-deleted contact subscription",
+				{
+					subscriptionId: existingSubscription.id,
+					currentStatus: targetStatus,
+				},
+			);
+
+			return {
+				contact,
+				subscriptionId: existingSubscription.id,
+				event: CONTACT_UPDATE_WEBHOOK_EVENT.id,
+			};
 		}
 
 		const [newSubscription] = await db
@@ -130,6 +138,17 @@ export async function addContactToChannelController({
 				channelId,
 				organizationId,
 				status: targetStatus,
+			})
+			.onConflictDoUpdate({
+				target: [
+					schema.channelSubscription.contactId,
+					schema.channelSubscription.channelId,
+				],
+				set: {
+					status: targetStatus,
+					deletedAt: null,
+					updatedAt: new Date(),
+				},
 			})
 			.returning();
 
@@ -143,13 +162,11 @@ export async function addContactToChannelController({
 			currentStatus: targetStatus,
 		});
 
-		const result = {
+		return {
 			contact,
 			subscriptionId: newSubscription.id,
 			event: CONTACT_UPDATE_WEBHOOK_EVENT.id,
 		};
-
-		return result;
 	} catch (error) {
 		log.error("Error adding contact to channel", {
 			contactId: contact_id,

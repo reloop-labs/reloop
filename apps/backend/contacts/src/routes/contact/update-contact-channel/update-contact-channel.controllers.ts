@@ -85,12 +85,12 @@ export async function updateContactChannelController({
 			contactId: contact.id,
 			channelId,
 		});
+		// Include soft-deleted rows so we restore instead of INSERT → unique conflict.
 		const existing = await db.query.channelSubscription.findFirst({
 			where: and(
 				eq(schema.channelSubscription.contactId, contact.id),
 				eq(schema.channelSubscription.channelId, channelId),
 				eq(schema.channelSubscription.organizationId, organizationId),
-				isNull(schema.channelSubscription.deletedAt),
 			),
 		});
 
@@ -99,41 +99,63 @@ export async function updateContactChannelController({
 		const subscriptionLabel = subscription ?? targetStatus;
 
 		if (existing) {
-			if (existing.status !== targetStatus) {
+			const isActive = existing.deletedAt === null;
+			if (isActive && existing.status === targetStatus) {
+				// Idempotent no-op — no audit changes
+			} else {
 				await db
 					.update(schema.channelSubscription)
-					.set({ status: targetStatus, updatedAt: new Date() })
+					.set({
+						status: targetStatus,
+						deletedAt: null,
+						updatedAt: new Date(),
+					})
 					.where(eq(schema.channelSubscription.id, existing.id));
 
-				log.info("Updated contact subscription status", {
-					subscriptionId: existing.id,
-					from: existing.status,
-					to: targetStatus,
-				});
+				log.info(
+					isActive
+						? "Updated contact subscription status"
+						: "Restored soft-deleted contact subscription",
+					{
+						subscriptionId: existing.id,
+						from: isActive ? existing.status : null,
+						to: targetStatus,
+					},
+				);
 
-				// Keep channel name available for history copy via response metadata
 				changes.push({
 					field: "channel",
-					from: channelLabel,
+					from: isActive ? channelLabel : null,
 					to: channelLabel,
 					label: "Channel",
 				});
-				// Real transition — previous status, not null
 				changes.push({
 					field: "channel_subscription",
-					from: existing.status,
+					from: isActive ? existing.status : null,
 					to: subscriptionLabel,
 					label: "Subscription",
 				});
 			}
-			// Idempotent no-op when status already matches — no audit changes
 		} else {
-			await db.insert(schema.channelSubscription).values({
-				contactId: contact.id,
-				channelId,
-				organizationId,
-				status: targetStatus,
-			});
+			await db
+				.insert(schema.channelSubscription)
+				.values({
+					contactId: contact.id,
+					channelId,
+					organizationId,
+					status: targetStatus,
+				})
+				.onConflictDoUpdate({
+					target: [
+						schema.channelSubscription.contactId,
+						schema.channelSubscription.channelId,
+					],
+					set: {
+						status: targetStatus,
+						deletedAt: null,
+						updatedAt: new Date(),
+					},
+				});
 
 			log.info("Created new contact subscription", {
 				contactId: contact.id,
