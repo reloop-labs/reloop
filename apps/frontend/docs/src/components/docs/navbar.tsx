@@ -104,8 +104,8 @@ export function Navbar({
 								href={tab.url}
 								title={tab.title}
 								className={cn(
-									"relative flex h-full shrink-0 items-center gap-1 whitespace-nowrap font-semibold",
-									"px-2 text-[12px] xl:gap-1.5 xl:px-3 xl:text-[13px] 2xl:px-4",
+									"relative isolate flex h-full shrink-0 items-center gap-1.5 whitespace-nowrap font-semibold no-underline",
+									"px-2 text-[12px] xl:gap-2 xl:px-3 xl:text-[13px] 2xl:px-4",
 									active ? "" : "text-text-sub-600 dark:text-white/60",
 								)}
 								style={{
@@ -113,24 +113,32 @@ export function Navbar({
 								}}
 							>
 								{active && (
-									<div
-										className="-z-10 absolute inset-x-0.5 inset-y-2 rounded-full xl:inset-x-1"
+									<span
+										aria-hidden
+										className="pointer-events-none absolute inset-x-0.5 inset-y-2 z-0 rounded-full xl:inset-x-1"
 										style={{
 											backgroundColor: `color-mix(in srgb, ${color} 12%, transparent)`,
 										}}
 									/>
 								)}
 
-								<Icon
-									name={tab.iconName}
+								{/* Clip icon paths so rack lines never bleed into the label */}
+								<span
 									className={cn(
-										"h-3.5 w-3.5 shrink-0 xl:h-4 xl:w-4",
+										"relative z-10 inline-flex size-3.5 shrink-0 items-center justify-center overflow-hidden xl:size-4",
 										active ? "opacity-100" : "opacity-60",
 									)}
 									style={{
 										color: active ? color : undefined,
 									}}
-								/>
+								>
+									<Icon
+										name={tab.iconName}
+										viewBox="0 0 24 24"
+										className="size-full overflow-hidden"
+										aria-hidden
+									/>
+								</span>
 								{/* Full title from xl; short label between lg and xl */}
 								<span className="relative z-10 hidden xl:inline">
 									{tab.title}

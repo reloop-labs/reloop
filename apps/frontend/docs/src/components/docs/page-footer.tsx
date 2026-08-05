@@ -75,8 +75,8 @@ export function PageFooter({ previous, next, editUrl }: PageFooterProps) {
 						<span className="font-semibold text-[#171717] text-[14px] leading-snug tracking-tight dark:text-white">
 							{previous.name}
 						</span>
-						<span className="flex items-center gap-1.5 font-semibold text-[12px] text-text-sub-600 uppercase tracking-wider">
-							<ChevronLeft className="group-hover:-translate-x-0.5 h-3 w-3 transition-transform" />
+						<span className="flex items-center gap-1 font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
+							<ChevronLeft className="group-hover:-translate-x-0.5 h-2.5 w-2.5 transition-transform" />
 							Previous
 						</span>
 					</Link>
@@ -92,9 +92,9 @@ export function PageFooter({ previous, next, editUrl }: PageFooterProps) {
 						<span className="font-semibold text-[#171717] text-[14px] leading-snug tracking-tight dark:text-white">
 							{next.name}
 						</span>
-						<span className="flex items-center gap-1.5 font-semibold text-[12px] text-text-sub-600 uppercase tracking-wider">
+						<span className="flex items-center gap-1 font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
 							Next
-							<ChevronRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
+							<ChevronRight className="h-2.5 w-2.5 transition-transform group-hover:translate-x-0.5" />
 						</span>
 					</Link>
 				) : (
