@@ -1,6 +1,8 @@
 ---
 title: Contacts
-description: Learn what Reloop contacts are and how to add, search, edit, unsubscribe, and delete contacts from the dashboard or API.
+sidebarTitle: Contacts
+description: Learn how to add, search, edit, unsubscribe, and delete Reloop contacts from the dashboard or API.
+icon: contacts
 faq:
   - question: Is each email its own contact?
     answer: Yes. A Reloop contact is one person record keyed by a unique email address in your organization. Subscription status, custom properties, groups, and channel preferences all live on that same record.
@@ -22,105 +24,104 @@ faq:
     answer: Reloop does not enforce a fixed total-contact cap per plan. Storage is unbounded by a hard contact quota; API rate limits still apply when you create or update contacts in bulk.
 ---
 
-## What is a Reloop contact?
-
-A **contact** is one person in your organization, identified by a unique email (`con_…`). Subscription status, [properties](/docs/learn/contacts/properties), [groups](/docs/learn/contacts/groups), and [channels](/docs/learn/contacts/channels) stay on that record — so consent and traits stay consistent wherever you send.
-
-Open the UI: [Contacts](https://reloop.sh/dashboard/contacts)
-
-![Contacts list in the Reloop dashboard](/docs/images/docs/contacts/overview/list-view.png)
-
-## Why use contacts instead of raw email lists?
-
-- One email → one identity (no duplicate profiles across campaigns)
-- Status and suppression travel with the person, not a single send
-- Attach traits, segments, and per-topic preferences without juggling spreadsheets
-- Same record from the **dashboard** or with **code**
-
----
-
-## How do I add a contact?
-
 <Tabs>
   <Tab title="Desktop" icon="monitor">
-    ![Add a contact in the Reloop dashboard](/docs/images/docs/contacts/overview/add-contact.gif)
+    ## View all contacts
+
+    The [Contacts Dashboard](https://reloop.sh/dashboard/contacts) shows you all the contacts in your organization along with their status, audience totals, and recent activity.
+
+    ![Contacts list in the Reloop dashboard](/docs/images/docs/contacts/overview/list-view.png)
+
+    ## Add a contact
 
     1. Go to [Contacts](https://reloop.sh/dashboard/contacts)
-    2. **Add Contact** (or `⌘/Ctrl+A`)
-    3. Enter one or more emails — optional groups
-    4. Save
-  </Tab>
-  <Tab title="Code" icon="code">
-    <ContactsCodeSamples id="contacts.create" />
-  </Tab>
-</Tabs>
+    2. Click **Add contact** (or press `C`)
+    3. Choose **Import CSV file**, **Copy paste**, or **Sync via SDK**
+    4. Finish that flow — map CSV columns, paste emails, or follow the SDK snippets
+    5. Confirm to add the contacts
 
----
+    <Info>
+    Email is unique per organization. If the address already exists, Reloop returns an error — update that contact instead of creating another one.
+    </Info>
+    <Video src="/docs/images/docs/contacts/overview/create-contact.mp4" autoPlay loop muted playsInline />
 
-## How do I find or search contacts?
-
-Search by email, filter by status, export CSV. Click a row for detail — properties, groups, channels, and activity.
-
-<Tabs>
-  <Tab title="Desktop" icon="monitor">
-    ![Search and filter contacts](/docs/images/docs/contacts/overview/search-filter.gif)
+    ## Search and filter contacts
 
     1. Open [Contacts](https://reloop.sh/dashboard/contacts)
-    2. Use **Search by email** or filter **All / Subscribed / Unsubscribed**
-    3. Click a row to open detail — or **Export CSV** for an offline copy
+    2. Use **Search contacts…** (or press `/`) to find by email
+    3. Optionally filter by **Status** (Subscribed, Unsubscribed, or Blocked)
+    4. Click a row to open detail — or use **Export CSV** (`E`) for an offline copy
+
+    <Video src="/docs/images/docs/contacts/overview/search-filter-contact.mp4" autoPlay loop muted playsInline />
+
+    ## Edit a contact
+
+    You can update a contact’s name or [properties](/docs/learn/contacts/properties). Subscription status is changed separately with [Subscribe or unsubscribe](#subscribe-or-unsubscribe-a-contact).
+
+    1. Go to [Contacts](https://reloop.sh/dashboard/contacts)
+    2. Click the row menu (**···**) next to the contact you want to edit
+    3. Select **Edit**
+    4. Update the fields and click **Update** (or press `Enter`)
+    <Video src="/docs/images/docs/contacts/overview/edit-contact.mp4" autoPlay loop muted playsInline />
+
+
+    ## Subscribe or unsubscribe a contact
+
+    <Info>
+    Unsubscribing opts the contact out of your list without deleting them. Status can be `subscribed`, `unsubscribed`, or `blocked` (often from deliverability).
+    </Info>
+
+    1. Open [Contacts](https://reloop.sh/dashboard/contacts)
+    2. Click the row menu (**···**) → **Subscribe** or **Unsubscribe**
+    3. The contact status updates on the row
+
+    <Video src="/docs/images/docs/contacts/overview/subscribe-unsubscribe-contact.mp4" autoPlay loop muted playsInline />
+
+    ## Delete a contact
+
+    <Info>
+    Deleting permanently removes the contact record. Recreate the contact if you need them again.
+    </Info>
+
+    1. Open [Contacts](https://reloop.sh/dashboard/contacts)
+    2. Click the row menu (**···**) → **Delete**
+    3. Confirm permanent removal
+
+    <Video src="/docs/images/docs/contacts/overview/delete-contact.mp4" autoPlay loop muted playsInline />
   </Tab>
   <Tab title="Code" icon="code">
+    ## View all contacts
+
+    Fetch a paginated list of contacts in your organization.
+
     <ContactsCodeSamples id="contacts.list" />
 
     <ContactsCodeSamples id="contacts.get" />
-  </Tab>
-</Tabs>
 
----
+    ## Add a contact
 
-## How do I edit or unsubscribe a contact?
+    Create a contact with email and optional name, status, properties, groups, or channels.
 
-Change name, status, or properties — row menu or API.
+    <ContactsCodeSamples id="contacts.create" />
 
-| Action | What happens |
-|--------|----------------|
-| **Edit** | Update name or properties |
-| **Subscribe / Unsubscribe** | Toggle list status |
-| **View Details** | Full profile, groups, channels, activity |
+    <Info>
+    Email is unique per organization. A duplicate email returns an error — update the existing contact instead.
+    </Info>
 
-Status is `subscribed`, `unsubscribed`, or `blocked` (often from deliverability).
+    ## Edit a contact
 
-<Tabs>
-  <Tab title="Desktop" icon="monitor">
-    ![Contact row actions](/docs/images/docs/contacts/overview/list-view.png)
-
-    1. Open [Contacts](https://reloop.sh/dashboard/contacts)
-    2. Row **···** menu (or open the contact)
-    3. Choose **Edit**, **Subscribe**, or **Unsubscribe**
-  </Tab>
-  <Tab title="Code" icon="code">
     <ContactsCodeSamples id="contacts.update" />
-  </Tab>
-</Tabs>
 
----
+    ## Subscribe or unsubscribe a contact
 
-## How do I delete a contact?
+    <ContactsCodeSamples id="contacts.update" />
 
-<Tabs>
-  <Tab title="Desktop" icon="monitor">
-    ![Delete a contact from the list](/docs/images/docs/contacts/overview/delete-contact.gif)
+    ## Delete a contact
 
-    1. Open [Contacts](https://reloop.sh/dashboard/contacts)
-    2. Row **···** → **Delete**
-    3. Confirm
-  </Tab>
-  <Tab title="Code" icon="code">
     <ContactsCodeSamples id="contacts.delete" />
   </Tab>
 </Tabs>
 
----
 
 ## FAQ
 
@@ -130,7 +131,7 @@ Status is `subscribed`, `unsubscribed`, or `blocked` (often from deliverability)
   </Accordion>
 
   <Accordion title="What happens if I add a duplicate email?">
-    Email is unique per organization. Creating a contact with an email that already exists returns an error — [update](#how-do-i-edit-or-unsubscribe-a-contact) the existing contact instead of creating another one.
+    Email is unique per organization. Creating a contact with an email that already exists returns an error — [update](#edit-a-contact) the existing contact instead of creating another one.
   </Accordion>
 
   <Accordion title="What is the difference between unsubscribed and blocked?">
@@ -142,11 +143,11 @@ Status is `subscribed`, `unsubscribed`, or `blocked` (often from deliverability)
   </Accordion>
 
   <Accordion title="How do I manage contacts with code?">
-    Use the Reloop SDK or REST API to create, list, get, update, and delete contacts — same operations as the dashboard. Jump to the [API reference](#api-reference) below.
+    Use the Reloop SDK or REST API to create, list, get, update, and delete contacts — same operations as the dashboard.
   </Accordion>
 
   <Accordion title="Does Reloop sync contacts with external CRMs (Salesforce, HubSpot, etc.)?">
-    No built-in two-way CRM sync. Use the [Contacts API](#api-reference) and [webhooks](/docs/webhooks) to sync yourself, or connect [Zapier](/docs/integrations/zapier) / [n8n](/docs/integrations/n8n) between Reloop and your CRM.
+    No built-in two-way CRM sync. Use the Contacts API and [webhooks](/docs/webhooks) to sync yourself, or connect [Zapier](/docs/integrations/zapier) / [n8n](/docs/integrations/n8n) between Reloop and your CRM.
   </Accordion>
 
   <Accordion title="Are there webhooks for contact events (created, updated, unsubscribed, deleted)?">
@@ -162,8 +163,6 @@ Status is `subscribed`, `unsubscribed`, or `blocked` (often from deliverability)
   </Accordion>
 </AccordionGroup>
 
----
-
 ## Related
 
 <CardGroup cols={3}>
@@ -178,26 +177,23 @@ Status is `subscribed`, `unsubscribed`, or `blocked` (often from deliverability)
   </Card>
 </CardGroup>
 
----
 
 ## API reference
 
 <CardGroup cols={2}>
-  <Card icon="plus" title="Create" href="/api/contacts/post-api-contacts-create#contacts">
-    New contact.
+  <Card icon="plus" title="Create Contact" href="/api/contacts/post-api-contacts-create#contacts">
+    Add a new contact.
   </Card>
-  <Card icon="list" title="List" href="/api/contacts/get-api-contacts-list#contacts">
-    Paginated list.
+  <Card icon="list" title="List Contacts" href="/api/contacts/get-api-contacts-list#contacts">
+    Paginated list of organization contacts.
   </Card>
-  <Card icon="eye" title="Retrieve" href="/api/contacts/get-api-contacts-retrieve-by-contact_id#contacts">
-    By ID.
+  <Card icon="eye" title="Retrieve Contact" href="/api/contacts/get-api-contacts-retrieve-by-contact_id#contacts">
+    Get a contact by ID.
   </Card>
-  <Card icon="pen" title="Update" href="/api/contacts/patch-api-contacts-by-contact_id#contacts">
-    Name, status, properties.
+  <Card icon="pen" title="Update Contact" href="/api/contacts/patch-api-contacts-by-contact_id#contacts">
+    Change name, status, or properties.
   </Card>
-  <Card icon="trash" title="Delete" href="/api/contacts/delete-api-contacts-by-contact_id#contacts">
-    Remove contact.
+  <Card icon="trash" title="Delete Contact" href="/api/contacts/delete-api-contacts-by-contact_id#contacts">
+    Permanently delete a contact.
   </Card>
 </CardGroup>
-
-[Full Contacts API](/docs/api/contacts)
