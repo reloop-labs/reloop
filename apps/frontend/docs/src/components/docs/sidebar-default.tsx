@@ -54,8 +54,7 @@ export function DefaultSidebarFolder({
 				}}
 				data-sidebar-active={isDirectlyActive || undefined}
 				className={cn(
-					"group relative z-10 flex w-full items-center justify-between rounded-lg px-2 font-medium transition-all",
-					depth === 0 ? "h-9 text-[15px]" : "h-8 text-[14px]",
+					"group relative z-10 flex h-8 w-full items-center justify-between rounded-lg px-2 font-medium text-[14px] transition-all",
 					isActive
 						? "text-text-strong-950"
 						: "text-text-sub-600 hover:text-text-strong-950",
@@ -65,7 +64,7 @@ export function DefaultSidebarFolder({
 					{node.icon && (
 						<span
 							className={cn(
-								"flex h-4 w-4 shrink-0 items-center justify-center transition-colors",
+								"flex h-3.5 w-3.5 shrink-0 items-center justify-center transition-colors",
 								isActive
 									? "text-text-strong-950"
 									: "text-text-sub-600 opacity-70 group-hover:text-text-strong-950 group-hover:opacity-100",
@@ -120,6 +119,7 @@ export function DefaultSidebarLink({
 }: {
 	node: PageTreeItem;
 	onLinkClick?: () => void;
+	/** Kept for folder nesting; page links use a single size across depths. */
 	depth?: number;
 }) {
 	const ref = useRef<HTMLAnchorElement>(null);
@@ -151,8 +151,7 @@ export function DefaultSidebarLink({
 			}}
 			data-sidebar-active={isActive || undefined}
 			className={cn(
-				"group relative z-10 flex items-center gap-2 rounded-lg px-2 transition-colors",
-				depth === 0 ? "h-9 text-[15px]" : "h-8 text-[14px]",
+				"group relative z-10 flex h-8 items-center gap-2 rounded-lg px-2 text-[14px] transition-colors",
 				isActive
 					? "text-text-strong-950"
 					: "text-text-sub-600 hover:text-text-strong-950",
@@ -162,7 +161,7 @@ export function DefaultSidebarLink({
 				{node.icon && (
 					<span
 						className={cn(
-							"flex h-4 w-4 shrink-0 items-center justify-center transition-colors",
+							"flex h-3.5 w-3.5 shrink-0 items-center justify-center transition-colors",
 							isActive
 								? "text-text-strong-950"
 								: "text-text-sub-600 opacity-70 group-hover:text-text-strong-950 group-hover:opacity-100",

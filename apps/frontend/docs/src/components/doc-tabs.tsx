@@ -36,7 +36,7 @@ export function DocTabs() {
 		{
 			title: "Self-Hosted",
 			url: "/self-host",
-			icon: "server",
+			icon: "database",
 		},
 		{
 			title: "Local Setup",

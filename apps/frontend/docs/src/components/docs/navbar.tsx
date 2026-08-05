@@ -20,16 +20,6 @@ const tabColors: Record<string, string> = {
 	Setup: "#10b981",
 };
 
-/** Short labels for mid-width desktops where full titles overflow. */
-const tabShortTitles: Record<string, string> = {
-	Documentation: "Docs",
-	"API Reference": "API",
-	Guides: "Guides",
-	Webhooks: "Webhooks",
-	"Self-Hosted": "Self-host",
-	Setup: "Setup",
-};
-
 export function Navbar({
 	onMobileMenuClick,
 	onSearchClick,
@@ -64,7 +54,7 @@ export function Navbar({
 
 	return (
 		<div className="flex h-full min-w-0 w-full items-center justify-between gap-2 pr-2 sm:pr-3">
-			{/* Mobile Menu Placeholder / Logo on Mobile */}
+			{/* Mobile */}
 			<div className="flex shrink-0 items-center gap-2 lg:hidden">
 				<button
 					type="button"
@@ -74,18 +64,15 @@ export function Navbar({
 				>
 					<Icon name="menu-2" className="h-5 w-5" />
 				</button>
-				<a href="/" className="flex items-center lg:hidden">
+				<a href="/" className="flex items-center">
 					<Logo className="size-10 sm:size-11" />
 				</a>
 			</div>
 
-			{/* Nav tabs — scrollable if still tight; compact until xl */}
+			{/* Desktop tabs */}
 			<div className="hidden min-w-0 flex-1 items-center lg:flex">
 				<nav
-					className={cn(
-						"flex h-full min-w-0 max-w-full items-center",
-						"overflow-x-auto overscroll-x-contain [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
-					)}
+					className="flex h-full min-w-0 max-w-full items-center gap-0.5 overflow-x-auto overscroll-x-contain [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
 					aria-label="Documentation sections"
 				>
 					{tabs.map((tab) => {
@@ -96,54 +83,45 @@ export function Navbar({
 										.some((t) => pathname.startsWith(t.url))
 								: pathname.startsWith(tab.url);
 						const color = tabColors[tab.title] || "#d97757";
-						const shortTitle = tabShortTitles[tab.title] ?? tab.title;
 
 						return (
 							<Link
 								key={tab.title}
 								href={tab.url}
-								title={tab.title}
 								className={cn(
-									"relative isolate flex h-full shrink-0 items-center gap-1.5 whitespace-nowrap font-semibold no-underline",
-									"px-2 text-[12px] xl:gap-2 xl:px-3 xl:text-[13px] 2xl:px-4",
-									active ? "" : "text-text-sub-600 dark:text-white/60",
+									"relative flex h-9 shrink-0 items-center gap-1.5 rounded-full px-2.5 font-semibold text-[13px] whitespace-nowrap no-underline transition-colors",
+									"xl:px-3",
+									active
+										? ""
+										: "text-text-sub-600 hover:text-[#171717] dark:text-white/60 dark:hover:text-white",
 								)}
-								style={{
-									color: active ? color : undefined,
-								}}
+								style={active ? { color } : undefined}
 							>
 								{active && (
 									<span
 										aria-hidden
-										className="pointer-events-none absolute inset-x-0.5 inset-y-2 z-0 rounded-full xl:inset-x-1"
+										className="pointer-events-none absolute inset-0 rounded-full"
 										style={{
 											backgroundColor: `color-mix(in srgb, ${color} 12%, transparent)`,
 										}}
 									/>
 								)}
-
-								{/* Clip icon paths so rack lines never bleed into the label */}
 								<span
 									className={cn(
-										"relative z-10 inline-flex size-3.5 shrink-0 items-center justify-center overflow-hidden xl:size-4",
-										active ? "opacity-100" : "opacity-60",
+										"relative inline-flex size-4 shrink-0 items-center justify-center",
+										!active && "opacity-60",
 									)}
-									style={{
-										color: active ? color : undefined,
-									}}
 								>
-									<Icon
-										name={tab.iconName}
+									<svg
 										viewBox="0 0 24 24"
-										className="size-full overflow-hidden"
+										className="size-4 fill-current"
 										aria-hidden
-									/>
+									>
+										<title>{tab.title}</title>
+										<use href={`#${tab.iconName}`} />
+									</svg>
 								</span>
-								{/* Full title from xl; short label between lg and xl */}
-								<span className="relative z-10 hidden xl:inline">
-									{tab.title}
-								</span>
-								<span className="relative z-10 xl:hidden">{shortTitle}</span>
+								<span className="relative">{tab.title}</span>
 							</Link>
 						);
 					})}
@@ -156,10 +134,9 @@ export function Navbar({
 						type="button"
 						onClick={onSearchClick}
 						className={cn(
-							"flex h-9 items-center justify-center rounded-full border border-stroke-soft-100 bg-bg-white-0 text-text-sub-600 text-xs transition-all",
-							"w-9 hover:scale-[1.02] hover:border-black/15 hover:text-[#171717] active:scale-[0.98]",
+							"flex h-9 w-9 items-center justify-center rounded-full border border-stroke-soft-100 bg-bg-white-0 text-text-sub-600 text-xs transition-all",
+							"hover:scale-[1.02] hover:border-black/15 hover:text-[#171717] active:scale-[0.98]",
 							"dark:hover:border-white/15 dark:hover:text-white",
-							// Expand search field only when there is room
 							"xl:w-44 xl:justify-between xl:px-3 2xl:w-52",
 						)}
 						title="Search (⌘K)"
@@ -179,37 +156,35 @@ export function Navbar({
 					href="https://github.com/reloop-labs/reloop"
 					target="_blank"
 					rel="noreferrer"
-					className="hidden items-center gap-1.5 font-medium text-sm text-text-sub-600 transition-colors hover:text-[#171717] 2xl:flex dark:hover:text-white"
-					title="GitHub"
-				>
-					<Icon name="social-github" className="h-4 w-4 shrink-0" />
-					<span className="max-w-[6.5rem] truncate">{stars}</span>
-				</Link>
-				{/* Icon-only GitHub between sm and 2xl so the repo stays reachable */}
-				<Link
-					href="https://github.com/reloop-labs/reloop"
-					target="_blank"
-					rel="noreferrer"
-					className="hidden h-9 w-9 items-center justify-center rounded-full border border-stroke-soft-100 text-text-sub-600 transition-colors hover:text-[#171717] sm:flex 2xl:hidden dark:hover:text-white"
+					className="hidden h-9 w-9 items-center justify-center rounded-full border border-stroke-soft-100 text-text-sub-600 transition-colors hover:text-[#171717] sm:inline-flex 2xl:hidden dark:hover:text-white"
 					title="GitHub"
 					aria-label="GitHub"
 				>
 					<Icon name="social-github" className="h-4 w-4 shrink-0" />
 				</Link>
+				<Link
+					href="https://github.com/reloop-labs/reloop"
+					target="_blank"
+					rel="noreferrer"
+					className="hidden items-center gap-1.5 font-medium text-sm text-text-sub-600 transition-colors hover:text-[#171717] 2xl:inline-flex dark:hover:text-white"
+					title="GitHub"
+				>
+					<Icon name="social-github" className="h-4 w-4 shrink-0" />
+					<span className="max-w-[6.5rem] truncate">{stars}</span>
+				</Link>
 				{mounted && !isPending && session ? (
 					<a
 						href="/dashboard"
-						className="inline-flex h-9 items-center justify-center rounded-full bg-[#171717] px-3 font-semibold text-xs text-white transition-all hover:opacity-90 active:scale-[0.98] sm:px-4 sm:text-sm dark:bg-white dark:text-black xl:px-5"
+						className="inline-flex h-9 items-center justify-center rounded-full bg-[#171717] px-3.5 font-semibold text-sm text-white transition-all hover:opacity-90 active:scale-[0.98] dark:bg-white dark:text-black"
 					>
 						Dashboard
 					</a>
 				) : (
 					<a
 						href="/dashboard"
-						className="inline-flex h-9 items-center justify-center rounded-full bg-[#171717] px-3 font-semibold text-xs text-white transition-all hover:opacity-90 active:scale-[0.98] sm:px-4 sm:text-sm dark:bg-white dark:text-black xl:px-5"
+						className="inline-flex h-9 items-center justify-center rounded-full bg-[#171717] px-3.5 font-semibold text-sm text-white transition-all hover:opacity-90 active:scale-[0.98] dark:bg-white dark:text-black"
 					>
-						<span className="sm:hidden">Start</span>
-						<span className="hidden sm:inline">Get Started</span>
+						Get Started
 					</a>
 				)}
 				<ThemeToggle />
