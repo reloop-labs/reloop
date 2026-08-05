@@ -2,6 +2,7 @@ import { Icon } from "@reloop/ui/icon";
 import * as Switch from "@reloop/ui/switch";
 import { AnimatePresence, motion } from "framer-motion";
 import type { ReactNode } from "react";
+import { ShortcutHint } from "#/features/dashboard/keyboard-shortcuts-reveal";
 
 export function DnsFeatureSection({
 	icon,
@@ -10,6 +11,8 @@ export function DnsFeatureSection({
 	onCheckedChange,
 	children,
 	showToggle = true,
+	/** Keycap shown only while Space is long-pressed. */
+	shortcut,
 }: {
 	icon: string;
 	title: string;
@@ -18,6 +21,7 @@ export function DnsFeatureSection({
 	children?: ReactNode;
 	/** When false, section is always expanded (e.g. Domain Verification). */
 	showToggle?: boolean;
+	shortcut?: string;
 }) {
 	const isOpen = showToggle ? Boolean(checked) : true;
 
@@ -29,17 +33,24 @@ export function DnsFeatureSection({
 					<h3 className="font-semibold">{title}</h3>
 				</div>
 				{showToggle && onCheckedChange !== undefined && (
-					<Switch.Root checked={checked} onCheckedChange={onCheckedChange} />
+					<div className="flex items-center gap-2">
+						{shortcut ? <ShortcutHint>{shortcut}</ShortcutHint> : null}
+						<Switch.Root
+							checked={checked}
+							onCheckedChange={onCheckedChange}
+							aria-keyshortcuts={shortcut?.toLowerCase()}
+						/>
+					</div>
 				)}
 			</div>
 			{showToggle ? (
 				<AnimatePresence initial={false}>
 					{isOpen && (
 						<motion.div
-							initial={{ height: 0, opacity: 0 }}
-							animate={{ height: "auto", opacity: 1 }}
-							exit={{ height: 0, opacity: 0 }}
-							transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
+							initial={{ height: 0, opacity: 0, filter: "blur(8px)" }}
+							animate={{ height: "auto", opacity: 1, filter: "blur(0px)" }}
+							exit={{ height: 0, opacity: 0, filter: "blur(8px)" }}
+							transition={{ duration: 0.28, ease: [0.23, 1, 0.32, 1] }}
 							className="mt-4 overflow-hidden"
 						>
 							{children}

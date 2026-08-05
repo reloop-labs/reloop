@@ -16,10 +16,18 @@ import {
 	useReducedMotion,
 } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
+import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
+import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import {
+	isForwardRecordsSequence,
+	noteForwardFKey,
+} from "./forward-records-shortcut";
 
 interface ForwardDNSRecordsButtonProps {
 	domainId: string;
+	/** Show F R keycaps on the trigger (default true). */
+	showShortcut?: boolean;
 }
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -32,6 +40,7 @@ const layoutSpringConfig = {
 
 export const ForwardDNSRecordsButton = ({
 	domainId,
+	showShortcut = true,
 }: ForwardDNSRecordsButtonProps) => {
 	const shouldReduceMotion = !!useReducedMotion();
 	const [isOpen, setIsOpen] = useState(false);
@@ -40,9 +49,33 @@ export const ForwardDNSRecordsButton = ({
 	const [isSending, setIsSending] = useState(false);
 	const [isSent, setIsSent] = useState(false);
 	const [isHolding, setIsHolding] = useState(false);
+	const openedBySequenceRef = useRef(false);
 
 	const holdProgress = useMotionValue(0);
 	const animationRef = useRef<AnimationPlaybackControls | null>(null);
+
+	// F → R opens the forward-records popover (R alone still toggles receiving).
+	useHotkeys(
+		"f",
+		() => {
+			noteForwardFKey();
+			openedBySequenceRef.current = false;
+		},
+		{ enableOnFormTags: false, enabled: !isOpen },
+		[isOpen],
+	);
+
+	useHotkeys(
+		"r",
+		(e) => {
+			if (!isForwardRecordsSequence() || openedBySequenceRef.current) return;
+			e.preventDefault();
+			openedBySequenceRef.current = true;
+			setIsOpen(true);
+		},
+		{ enableOnFormTags: false, preventDefault: false, enabled: !isOpen },
+		[isOpen],
+	);
 
 	const cancelHold = () => {
 		if (!isHolding && holdProgress.get() === 0) return;
@@ -150,6 +183,7 @@ export const ForwardDNSRecordsButton = ({
 					variant="neutral"
 					mode="stroke"
 					size="small"
+					aria-keyshortcuts="f r"
 					className={cn(
 						"h-10 gap-1.5 rounded-xl transition-transform duration-150 ease-out active:scale-[0.98]",
 						isOpen && "bg-bg-weak-50",
@@ -157,6 +191,12 @@ export const ForwardDNSRecordsButton = ({
 				>
 					<Icon name="mail-single" className="h-4 w-4" />
 					Forward records
+					{showShortcut ? (
+						<span className="inline-flex items-center gap-0.5">
+							<ActionKbd className="w-auto min-w-0 px-1">F</ActionKbd>
+							<ActionKbd className="w-auto min-w-0 px-1">R</ActionKbd>
+						</span>
+					) : null}
 				</Button.Root>
 			</Popover.Trigger>
 			<Popover.Content

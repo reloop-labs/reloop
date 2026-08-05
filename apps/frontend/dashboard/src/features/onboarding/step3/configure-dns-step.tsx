@@ -2,6 +2,7 @@ import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import { parseAsString, useQueryState } from "nuqs";
 import { useHotkeys } from "react-hotkeys-hook";
+import { isForwardRecordsSequence } from "#/features/domain/add/setup/components/forward-records-shortcut";
 import { useDomainConnectCallback } from "#/features/domain/hooks/use-domain-connect-callback";
 import { onboardingStepParser } from "../onboarding-step";
 import { ConfigureDnsActions } from "./configure-dns-actions";
@@ -90,6 +91,84 @@ export function ConfigureDnsStep() {
 		[isVerifying, skip],
 	);
 
+	const hasReceiving = receivingRecords.length > 0;
+	const hasTracking = trackingRecords.length > 0;
+	const sendingEnabled = Boolean(domainData?.isSendingEmailEnabled);
+	const receivingEnabled = Boolean(domainData?.isReceivingEmailEnabled);
+	const trackingEnabled = Boolean(
+		domainData?.isClickTrackingEnabled || domainData?.isOpenTrackingEnabled,
+	);
+
+	// S / R / T — toggle sending, receiving, tracking (hints via long-press Space).
+	useHotkeys(
+		"s",
+		(e) => {
+			e.preventDefault();
+			if (!domainData) return;
+			const next = !sendingEnabled;
+			void handleUpdateDomain(
+				{ isSendingEmailEnabled: next },
+				next
+					? "Sending enabled successfully"
+					: "Sending disabled successfully",
+				next ? "Enabling email sending..." : "Disabling email sending...",
+			);
+		},
+		{ enableOnFormTags: false, preventDefault: true, enabled: !!domainData },
+		[domainData, sendingEnabled, handleUpdateDomain],
+	);
+
+	useHotkeys(
+		"r",
+		(e) => {
+			// F→R is reserved for "Forward records" — don't toggle receiving mid-sequence.
+			if (isForwardRecordsSequence()) return;
+
+			e.preventDefault();
+			if (!domainData || !hasReceiving) return;
+			const next = !receivingEnabled;
+			void handleUpdateDomain(
+				{ isReceivingEmailEnabled: next },
+				next
+					? "Receiving enabled successfully"
+					: "Receiving disabled successfully",
+				next
+					? "Enabling email receiving..."
+					: "Disabling email receiving...",
+			);
+		},
+		{
+			enableOnFormTags: false,
+			preventDefault: true,
+			enabled: !!domainData && hasReceiving,
+		},
+		[domainData, hasReceiving, receivingEnabled, handleUpdateDomain],
+	);
+
+	useHotkeys(
+		"t",
+		(e) => {
+			e.preventDefault();
+			if (!domainData || !hasTracking) return;
+			const next = !trackingEnabled;
+			void handleUpdateDomain(
+				{
+					isClickTrackingEnabled: next,
+					isOpenTrackingEnabled: next,
+				},
+				next
+					? "Tracking enabled successfully"
+					: "Tracking disabled successfully",
+			);
+		},
+		{
+			enableOnFormTags: false,
+			preventDefault: true,
+			enabled: !!domainData && hasTracking,
+		},
+		[domainData, hasTracking, trackingEnabled, handleUpdateDomain],
+	);
+
 	if (!domainId && !isLoading) {
 		return (
 			<div>
@@ -147,6 +226,7 @@ export function ConfigureDnsStep() {
 				<DnsFeatureSection
 					icon="mail-send"
 					title="Email Sending"
+					shortcut="S"
 					checked={domainData?.isSendingEmailEnabled}
 					onCheckedChange={(checked) =>
 						handleUpdateDomain(
@@ -183,10 +263,11 @@ export function ConfigureDnsStep() {
 					</div>
 				</DnsFeatureSection>
 
-				{receivingRecords.length > 0 && (
+				{hasReceiving && (
 					<DnsFeatureSection
 						icon="mail-receive"
 						title="Email Receiving"
+						shortcut="R"
 						checked={domainData?.isReceivingEmailEnabled}
 						onCheckedChange={(checked) =>
 							handleUpdateDomain(
@@ -211,10 +292,11 @@ export function ConfigureDnsStep() {
 					</DnsFeatureSection>
 				)}
 
-				{trackingRecords.length > 0 && (
+				{hasTracking && (
 					<DnsFeatureSection
 						icon="graph-up"
 						title="Tracking"
+						shortcut="T"
 						checked={
 							domainData?.isClickTrackingEnabled ||
 							domainData?.isOpenTrackingEnabled

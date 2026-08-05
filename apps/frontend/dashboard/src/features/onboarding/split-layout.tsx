@@ -60,21 +60,24 @@ interface SplitLayoutProps {
 const contentVariants: Variants = {
 	initial: (dir: number) => ({
 		opacity: 0,
+		filter: "blur(8px)",
 		transform: `translateX(${dir * 14}px)`,
 	}),
 	animate: {
 		opacity: 1,
+		filter: "blur(0px)",
 		transform: "translateX(0px)",
 		transition: {
-			duration: 0.25,
+			duration: 0.28,
 			ease: [0.23, 1, 0.32, 1] as const,
 		},
 	},
 	exit: (dir: number) => ({
 		opacity: 0,
+		filter: "blur(6px)",
 		transform: `translateX(${dir * -14}px)`,
 		transition: {
-			duration: 0.15,
+			duration: 0.18,
 			ease: [0.23, 1, 0.32, 1] as const,
 		},
 	}),
@@ -83,22 +86,25 @@ const contentVariants: Variants = {
 const previewVariants: Variants = {
 	initial: (dir: number) => ({
 		opacity: 0,
+		filter: "blur(8px)",
 		transform: `translateY(${dir * 12}px)`,
 	}),
 	animate: {
 		opacity: 1,
+		filter: "blur(0px)",
 		transform: "translateY(0px)",
 		transition: {
-			duration: 0.28,
+			duration: 0.3,
 			ease: [0.23, 1, 0.32, 1] as const,
 			delay: 0.05,
 		},
 	},
 	exit: (dir: number) => ({
 		opacity: 0,
+		filter: "blur(6px)",
 		transform: `translateY(${dir * -12}px)`,
 		transition: {
-			duration: 0.15,
+			duration: 0.18,
 			ease: [0.23, 1, 0.32, 1] as const,
 		},
 	}),

@@ -322,17 +322,20 @@ export function ShortcutHint({
 									opacity: 0,
 									width: 0,
 									marginLeft: 0,
+									filter: "blur(5px)",
 								}
 					}
 					animate={{
 						opacity: 1,
 						width: contentWidth,
 						marginLeft: HINT_GAP_PX,
+						filter: "blur(0px)",
 					}}
 					exit={{
 						opacity: 0,
 						width: 0,
 						marginLeft: 0,
+						filter: "blur(5px)",
 					}}
 					transition={transition}
 					// Extra py so the keycap bottom shelf isn't clipped by overflow;
