@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import { type ReactNode, Suspense, useEffect, useState } from "react";
 import type { PageTreeItem } from "../../lib/types";
 import { Navbar } from "./navbar";
+import { NavigationProgress } from "./navigation-progress";
 import { Sidebar } from "./sidebar";
 
 const SearchDialog = dynamic(
@@ -46,6 +47,11 @@ export function DocsLayout({ children, tree, pathname }: DocsLayoutProps) {
 
 	return (
 		<div className="flex h-[100dvh] w-full flex-col overflow-hidden bg-bg-weak-50 dark:bg-black">
+			{/* Top progress bar — completes to 100% when the route settles */}
+			<Suspense fallback={null}>
+				<NavigationProgress />
+			</Suspense>
+
 			{/* Unified Header - Borderless */}
 			<header className="z-50 flex h-12 w-full min-w-0 shrink-0 bg-bg-weak-50/80 dark:bg-black/80">
 				{/* Desktop Logo Area — match dashboard brand lockup */}
