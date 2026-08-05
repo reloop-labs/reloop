@@ -47,7 +47,7 @@ export function DocsLayout({ children, tree, pathname }: DocsLayoutProps) {
 	return (
 		<div className="flex h-[100dvh] w-full flex-col overflow-hidden bg-bg-weak-50 dark:bg-black">
 			{/* Unified Header - Borderless */}
-			<header className="z-50 flex h-12 w-full shrink-0 bg-bg-weak-50/80 dark:bg-black/80">
+			<header className="z-50 flex h-12 w-full min-w-0 shrink-0 bg-bg-weak-50/80 dark:bg-black/80">
 				{/* Desktop Logo Area - Only visible on LG+ */}
 				<div className="hidden shrink-0 items-center px-4 pt-1 lg:flex lg:w-[270px]">
 					<a href="/" className="flex items-center">
@@ -55,7 +55,7 @@ export function DocsLayout({ children, tree, pathname }: DocsLayoutProps) {
 					</a>
 				</div>
 				{/* Navigation Row - Fluid on all screens */}
-				<div className="h-full flex-1">
+				<div className="h-full min-w-0 flex-1">
 					<Navbar
 						onMobileMenuClick={() => setOpen(true)}
 						onSearchClick={() => setIsSearchOpen(true)}
