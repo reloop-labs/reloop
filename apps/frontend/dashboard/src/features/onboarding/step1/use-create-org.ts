@@ -1,7 +1,7 @@
 import { authClient } from "@reloop/auth/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { parseAsString, useQueryState } from "nuqs";
-import { useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { toast } from "sonner";
 import { organizationsQueryOptions } from "#/features/auth/organizations-query";
 import { queryKeys } from "#/lib/query-keys";
@@ -17,7 +17,8 @@ function randomOrgSlug() {
 export function useCreateOrg() {
 	const queryClient = useQueryClient();
 	const [isCreating, setIsCreating] = useState(false);
-	const [step, setStep] = useQueryState("step", onboardingStepParser);
+	const inFlightRef = useRef(false);
+	const [, setStep] = useQueryState("step", onboardingStepParser);
 	const [name] = useQueryState("name", parseAsString.withDefault(""));
 	const [orgId, setOrgId] = useQueryState(
 		"orgId",
@@ -30,12 +31,20 @@ export function useCreateOrg() {
 		parseAsString.withDefault(""),
 	);
 
-	const createAndContinue = async () => {
+	const advanceStep = useCallback(async () => {
+		// Functional update avoids a stale closed-over step after async work.
+		await setStep((current) => (current ?? 1) + 1);
+	}, [setStep]);
+
+	const createAndContinue = useCallback(async () => {
+		if (inFlightRef.current) return;
+
 		if (orgId) {
-			setStep(step + 1);
+			await advanceStep();
 			return;
 		}
 
+		inFlightRef.current = true;
 		setIsCreating(true);
 		try {
 			const { error, data: organization } =
@@ -55,7 +64,8 @@ export function useCreateOrg() {
 			}
 
 			if (organization) {
-				setOrgId(organization.id);
+				// Await so a later setStep push cannot race a replace that drops step.
+				await setOrgId(organization.id);
 				try {
 					await authClient.organization.setActive({
 						organizationId: organization.id,
@@ -86,11 +96,21 @@ export function useCreateOrg() {
 				});
 			}
 
-			setStep(step + 1);
+			await advanceStep();
 		} finally {
+			inFlightRef.current = false;
 			setIsCreating(false);
 		}
-	};
+	}, [
+		advanceStep,
+		logoUrl,
+		name,
+		orgId,
+		otherReferral,
+		queryClient,
+		referral,
+		setOrgId,
+	]);
 
 	return {
 		isCreating,

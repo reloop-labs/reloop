@@ -3,20 +3,14 @@ import { cn } from "@reloop/ui/cn";
 import { Logo } from "@reloop/ui/logo";
 
 import type { Variants } from "framer-motion";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { useQueryState } from "nuqs";
 import type React from "react";
 import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { onboardingStepParser } from "./onboarding-step";
 
-const AnimatedHeight = ({
-	children,
-	skipAnimation,
-}: {
-	children: React.ReactNode;
-	skipAnimation: boolean;
-}) => {
+const AnimatedHeight = ({ children }: { children: React.ReactNode }) => {
 	const innerRef = useRef<HTMLDivElement>(null);
 	const [height, setHeight] = useState<number | "auto">("auto");
 
@@ -38,7 +32,7 @@ const AnimatedHeight = ({
 		<motion.div
 			animate={{ height }}
 			transition={
-				skipAnimation || height === "auto"
+				height === "auto"
 					? { duration: 0 }
 					: { duration: 0.32, ease: [0.23, 1, 0.32, 1] }
 			}
@@ -62,6 +56,53 @@ interface SplitLayoutProps {
 	verticalAlign?: "center" | "start";
 }
 
+const contentVariants: Variants = {
+	initial: (dir: number) => ({
+		opacity: 0,
+		transform: `translateX(${dir * 14}px)`,
+	}),
+	animate: {
+		opacity: 1,
+		transform: "translateX(0px)",
+		transition: {
+			duration: 0.25,
+			ease: [0.23, 1, 0.32, 1] as const,
+		},
+	},
+	exit: (dir: number) => ({
+		opacity: 0,
+		transform: `translateX(${dir * -14}px)`,
+		transition: {
+			duration: 0.15,
+			ease: [0.23, 1, 0.32, 1] as const,
+		},
+	}),
+};
+
+const previewVariants: Variants = {
+	initial: (dir: number) => ({
+		opacity: 0,
+		transform: `translateY(${dir * 12}px)`,
+	}),
+	animate: {
+		opacity: 1,
+		transform: "translateY(0px)",
+		transition: {
+			duration: 0.28,
+			ease: [0.23, 1, 0.32, 1] as const,
+			delay: 0.05,
+		},
+	},
+	exit: (dir: number) => ({
+		opacity: 0,
+		transform: `translateY(${dir * -12}px)`,
+		transition: {
+			duration: 0.15,
+			ease: [0.23, 1, 0.32, 1] as const,
+		},
+	}),
+};
+
 export function SplitLayout({
 	stepIndicator,
 	children,
@@ -72,36 +113,6 @@ export function SplitLayout({
 	verticalAlign = "center",
 }: SplitLayoutProps) {
 	const [step] = useQueryState("step", onboardingStepParser);
-	const prefersReducedMotion = useReducedMotion();
-	const isKeyboardRef = useRef(false);
-
-	useEffect(() => {
-		const handleKeyDown = (e: KeyboardEvent) => {
-			if (
-				e.key === "Escape" ||
-				(e.key === "Enter" && (e.metaKey || e.ctrlKey)) ||
-				(e.key === "s" && e.altKey) ||
-				e.key === "Enter"
-			) {
-				isKeyboardRef.current = true;
-			}
-		};
-		const handlePointerDown = () => {
-			isKeyboardRef.current = false;
-		};
-
-		window.addEventListener("keydown", handleKeyDown, { capture: true });
-		window.addEventListener("pointerdown", handlePointerDown, {
-			capture: true,
-		});
-
-		return () => {
-			window.removeEventListener("keydown", handleKeyDown, { capture: true });
-			window.removeEventListener("pointerdown", handlePointerDown, {
-				capture: true,
-			});
-		};
-	}, []);
 
 	const prevStepRef = useRef(0);
 	const directionRef = useRef<1 | -1>(1);
@@ -127,57 +138,6 @@ export function SplitLayout({
 	const stepMatch = stepIndicator.match(/Step (\d+) of (\d+)/);
 	const currentStep = stepMatch ? Number(stepMatch[1]) : null;
 	const totalSteps = stepMatch ? Number(stepMatch[2]) : null;
-
-	const isKeyboard = isKeyboardRef.current;
-	const shouldSkipMotion = !!prefersReducedMotion || isKeyboard;
-
-	const slideDistance = shouldSkipMotion ? 0 : 14;
-	const contentVariants: Variants = {
-		initial: (dir: number) => ({
-			opacity: 0,
-			transform: `translateX(${dir * slideDistance}px)`,
-		}),
-		animate: {
-			opacity: 1,
-			transform: "translateX(0px)",
-			transition: {
-				duration: shouldSkipMotion ? 0 : 0.25,
-				ease: [0.23, 1, 0.32, 1] as const,
-			},
-		},
-		exit: (dir: number) => ({
-			opacity: 0,
-			transform: `translateX(${dir * -slideDistance}px)`,
-			transition: {
-				duration: shouldSkipMotion ? 0 : 0.15,
-				ease: [0.23, 1, 0.32, 1] as const,
-			},
-		}),
-	};
-
-	const previewVariants: Variants = {
-		initial: (dir: number) => ({
-			opacity: 0,
-			transform: `translateY(${dir * (shouldSkipMotion ? 0 : 12)}px)`,
-		}),
-		animate: {
-			opacity: 1,
-			transform: "translateY(0px)",
-			transition: {
-				duration: shouldSkipMotion ? 0 : 0.28,
-				ease: [0.23, 1, 0.32, 1] as const,
-				delay: shouldSkipMotion ? 0 : 0.05,
-			},
-		},
-		exit: (dir: number) => ({
-			opacity: 0,
-			transform: `translateY(${dir * -(shouldSkipMotion ? 0 : 12)}px)`,
-			transition: {
-				duration: shouldSkipMotion ? 0 : 0.15,
-				ease: [0.23, 1, 0.32, 1] as const,
-			},
-		}),
-	};
 
 	return (
 		<div className="flex min-h-screen w-full flex-col items-center">
@@ -229,7 +189,7 @@ export function SplitLayout({
 												value={currentStep}
 												className="tabular-nums"
 												transformTiming={{
-													duration: shouldSkipMotion ? 0 : 400,
+													duration: 400,
 													easing: "ease-out",
 												}}
 											/>
@@ -238,7 +198,7 @@ export function SplitLayout({
 												value={totalSteps}
 												className="tabular-nums"
 												transformTiming={{
-													duration: shouldSkipMotion ? 0 : 400,
+													duration: 400,
 													easing: "ease-out",
 												}}
 											/>
@@ -248,7 +208,7 @@ export function SplitLayout({
 									)}
 								</div>
 
-								<AnimatedHeight skipAnimation={shouldSkipMotion}>
+								<AnimatedHeight>
 									<AnimatePresence
 										mode="wait"
 										initial={true}
