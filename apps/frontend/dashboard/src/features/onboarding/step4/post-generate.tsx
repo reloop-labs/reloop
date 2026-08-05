@@ -108,6 +108,18 @@ export function PostGenerate({
 		[onDone, finishing, testSending, testSent],
 	);
 
+	// O — open Gmail / Outlook / etc. after a successful test send.
+	useHotkeys(
+		"o",
+		(e) => {
+			if (!testSent || !provider) return;
+			e.preventDefault();
+			window.open(provider.href, "_blank", "noopener,noreferrer");
+		},
+		{ enableOnFormTags: false, preventDefault: true, enabled: testSent && !!provider },
+		[testSent, provider],
+	);
+
 	return (
 		<div className="w-full min-w-0 max-w-2xl space-y-7">
 			{/* Header */}
@@ -192,6 +204,7 @@ export function PostGenerate({
 										href={provider.href}
 										target="_blank"
 										rel="noopener noreferrer"
+										aria-keyshortcuts="o"
 										className={cn(
 											"inline-flex shrink-0 items-center justify-center gap-1.5 self-start rounded-xl",
 											"border border-green-300 bg-white px-3 py-2",
@@ -199,6 +212,9 @@ export function PostGenerate({
 											"transition-colors hover:bg-green-100/80",
 										)}
 									>
+										<ActionKbd className="w-auto min-w-0 border-green-300/80 bg-green-50 px-1 text-green-900 shadow-[0_1.5px_0_0_rgba(21,128,61,0.2)]">
+											O
+										</ActionKbd>
 										<span>{provider.label}</span>
 										<Icon name="arrow-up-right" className="h-3.5 w-3.5" />
 									</a>
