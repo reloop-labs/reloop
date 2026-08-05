@@ -48,10 +48,16 @@ export function DocsLayout({ children, tree, pathname }: DocsLayoutProps) {
 		<div className="flex h-[100dvh] w-full flex-col overflow-hidden bg-bg-weak-50 dark:bg-black">
 			{/* Unified Header - Borderless */}
 			<header className="z-50 flex h-12 w-full min-w-0 shrink-0 bg-bg-weak-50/80 dark:bg-black/80">
-				{/* Desktop Logo Area - Only visible on LG+ */}
-				<div className="hidden shrink-0 items-center px-4 pt-1 lg:flex lg:w-[270px]">
-					<a href="/" className="flex items-center">
-						<Logo className="ml-2 h-12 w-12" />
+				{/* Desktop Logo Area — match dashboard brand lockup */}
+				<div className="hidden shrink-0 items-center px-3 lg:flex lg:w-[270px]">
+					<a href="/" className="flex items-center gap-2">
+						<Logo className="-ml-1 w-10 shrink-0" />
+						<p className="-ml-2 font-semibold text-text-strong-950 dark:text-white">
+							Reloop
+						</p>
+						<span className="inline-flex items-center rounded-full bg-bg-weak-50 px-2 py-0.5 font-bold text-[8px] text-text-sub-600 uppercase tracking-wide dark:bg-white/[0.06]">
+							Beta
+						</span>
 					</a>
 				</div>
 				{/* Navigation Row - Fluid on all screens */}
@@ -105,13 +111,19 @@ export function DocsLayout({ children, tree, pathname }: DocsLayoutProps) {
 						open ? "translate-x-0" : "-translate-x-full"
 					}`}
 				>
-					<div className="flex h-12 items-center border-stroke-soft-100 border-b px-4 dark:border-stroke-soft-100/40">
+					<div className="flex h-12 items-center border-stroke-soft-100 border-b px-3 dark:border-stroke-soft-100/40">
 						<a
 							href="/"
-							className="flex items-center"
+							className="flex items-center gap-2"
 							onClick={() => setOpen(false)}
 						>
-							<Logo className="h-10 w-10" />
+							<Logo className="-ml-1 w-10 shrink-0" />
+							<p className="-ml-2 font-semibold text-text-strong-950 dark:text-white">
+								Reloop
+							</p>
+							<span className="inline-flex items-center rounded-full bg-bg-weak-50 px-2 py-0.5 font-bold text-[8px] text-text-sub-600 uppercase tracking-wide dark:bg-white/[0.06]">
+								Beta
+							</span>
 						</a>
 					</div>
 					<div className="h-[calc(100vh-3rem)] overflow-y-auto">

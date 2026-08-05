@@ -54,7 +54,7 @@ export function Navbar({
 
 	return (
 		<div className="flex h-full min-w-0 w-full items-center justify-between gap-2 pr-2 sm:pr-3">
-			{/* Mobile */}
+			{/* Mobile — match dashboard brand lockup */}
 			<div className="flex shrink-0 items-center gap-2 lg:hidden">
 				<button
 					type="button"
@@ -64,8 +64,14 @@ export function Navbar({
 				>
 					<Icon name="menu-2" className="h-5 w-5" />
 				</button>
-				<a href="/" className="flex items-center">
-					<Logo className="size-10 sm:size-11" />
+				<a href="/" className="flex items-center gap-2">
+					<Logo className="-ml-1 w-10 shrink-0" />
+					<p className="-ml-2 font-semibold text-text-strong-950 dark:text-white">
+						Reloop
+					</p>
+					<span className="inline-flex items-center rounded-full bg-bg-weak-50 px-2 py-0.5 font-bold text-[8px] text-text-sub-600 uppercase tracking-wide dark:bg-white/[0.06]">
+						Beta
+					</span>
 				</a>
 			</div>
 
