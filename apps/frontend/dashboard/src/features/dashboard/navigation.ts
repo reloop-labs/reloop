@@ -172,8 +172,8 @@ export const settingsNavigation: SettingsNavigationSection[] = [
 				shortcut: { label: "G Shift+T", keys: ["g shift+t", "g+shift+t"] },
 			},
 			{
-				label: "Workspace",
-				path: "/settings/workspace",
+				label: "Organization",
+				path: "/settings/organization",
 				iconName: "workspace-custom",
 				requiresOrgAdmin: true,
 				shortcut: { label: "G Shift+W", keys: ["g shift+w", "g+shift+w"] },

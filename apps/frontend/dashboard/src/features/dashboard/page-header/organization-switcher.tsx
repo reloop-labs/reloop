@@ -131,7 +131,7 @@ export function OrganizationSwitcher({
 				<div className="relative flex flex-col p-1.5">
 					<div className="px-2 pt-1 pb-1.5">
 						<span className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-wider">
-							Workspaces
+							Organizations
 						</span>
 					</div>
 					<div className="relative">

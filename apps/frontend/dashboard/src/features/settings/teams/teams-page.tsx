@@ -48,7 +48,7 @@ export function TeamsPage() {
 					Teams
 				</h1>
 				<p className="mt-1 text-paragraph-sm text-text-sub-600 dark:text-white/60">
-					Manage workspace members, set access levels, and invite new users.
+					Manage organization members, set access levels, and invite new users.
 				</p>
 			</div>
 

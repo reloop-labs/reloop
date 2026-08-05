@@ -279,16 +279,11 @@ export function ShortcutsPage() {
 			{
 				id: "settings",
 				title: "Settings",
-				description: "Jump into account and workspace settings.",
+				description: "Jump into account and organization settings.",
 				shortcuts: settingsShortcuts,
 			},
 		],
-		[
-			appShortcuts,
-			navigationShortcuts,
-			developerShortcuts,
-			settingsShortcuts,
-		],
+		[appShortcuts, navigationShortcuts, developerShortcuts, settingsShortcuts],
 	);
 
 	const filteredGroups = useMemo(() => {

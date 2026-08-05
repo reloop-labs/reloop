@@ -24,16 +24,16 @@ import {
 } from "#/features/dashboard/page-header/use-active-organization";
 import { useOrgPermissions } from "#/features/settings/use-org-permissions";
 import { queryKeys } from "#/lib/query-keys";
-import { WorkspaceDangerZone } from "./workspace-danger-zone";
-import { WorkspaceHeader } from "./workspace-header";
-import { WorkspaceLogoUpload } from "./workspace-logo-upload";
+import { OrganizationDangerZone } from "./organization-danger-zone";
+import { OrganizationHeader } from "./organization-header";
+import { OrganizationLogoUpload } from "./organization-logo-upload";
 
-const workspaceSchema = v.object({
+const organizationSchema = v.object({
 	name: v.pipe(v.string(), v.minLength(1, "Name is required")),
 	logo: v.string(),
 });
 
-type WorkspaceFormValues = v.InferOutput<typeof workspaceSchema>;
+type OrganizationFormValues = v.InferOutput<typeof organizationSchema>;
 
 function SettingsSkeleton() {
 	return (
@@ -82,7 +82,7 @@ function SettingsSkeleton() {
 	);
 }
 
-function WorkspaceForm({
+function OrganizationForm({
 	activeOrganization,
 }: {
 	activeOrganization: Organization;
@@ -96,8 +96,8 @@ function WorkspaceForm({
 		setValue,
 		watch,
 		formState: { errors },
-	} = useForm<WorkspaceFormValues>({
-		resolver: valibotResolver(workspaceSchema),
+	} = useForm<OrganizationFormValues>({
+		resolver: valibotResolver(organizationSchema),
 		values: {
 			name: activeOrganization.name,
 			logo: activeOrganization.logo || "",
@@ -111,7 +111,7 @@ function WorkspaceForm({
 		nameValue !== activeOrganization.name ||
 		logoValue !== (activeOrganization.logo || "");
 
-	const handleSaveChanges = async (data: WorkspaceFormValues) => {
+	const handleSaveChanges = async (data: OrganizationFormValues) => {
 		setStatus("saving");
 		try {
 			const { error } = await authClient.organization.update({
@@ -123,7 +123,7 @@ function WorkspaceForm({
 			});
 
 			if (error) {
-				toast.error(error.message || "Failed to update workspace");
+				toast.error(error.message || "Failed to update organization");
 				setStatus("idle");
 				return;
 			}
@@ -136,7 +136,7 @@ function WorkspaceForm({
 			}, 1500);
 		} catch (error) {
 			console.error("Update error:", error);
-			toast.error("Failed to update workspace");
+			toast.error("Failed to update organization");
 			setStatus("idle");
 		}
 	};
@@ -156,18 +156,18 @@ function WorkspaceForm({
 	return (
 		<div className="w-full space-y-8 pt-5">
 			<div>
-				<WorkspaceHeader />
+				<OrganizationHeader />
 				<form
 					onSubmit={handleSubmit(handleSaveChanges)}
 					className="w-full space-y-5"
 				>
-					<WorkspaceLogoUpload
+					<OrganizationLogoUpload
 						organizationId={activeOrganization.id}
 						initialLogoUrl={activeOrganization.logo || ""}
 						onLogoChange={(url) => setValue("logo", url, { shouldDirty: true })}
 					/>
 					<div>
-						<Label.Root htmlFor="name">Workspace Name</Label.Root>
+						<Label.Root htmlFor="name">Organization Name</Label.Root>
 						<Input.Root
 							className="mt-1 w-full"
 							size="medium"
@@ -188,7 +188,7 @@ function WorkspaceForm({
 							</p>
 						) : (
 							<p className="mt-1 font-medium text-paragraph-xs text-text-sub-600">
-								This is the display name shown across your workspace
+								This is the display name shown across your organization
 							</p>
 						)}
 					</div>
@@ -239,14 +239,14 @@ function WorkspaceForm({
 							</AnimatePresence>
 						</FancyButton.Root>
 					</div>
-					<WorkspaceDangerZone />
+					<OrganizationDangerZone />
 				</form>
 			</div>
 		</div>
 	);
 }
 
-export function WorkspacePage() {
+export function OrganizationPage() {
 	const router = useRouter();
 	const { activeOrganization, isPending, hasInitialized } =
 		useActiveOrganization();
@@ -266,5 +266,5 @@ export function WorkspacePage() {
 		return <SettingsSkeleton />;
 	}
 
-	return <WorkspaceForm activeOrganization={activeOrganization} />;
+	return <OrganizationForm activeOrganization={activeOrganization} />;
 }

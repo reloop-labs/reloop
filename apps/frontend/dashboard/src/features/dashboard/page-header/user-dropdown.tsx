@@ -119,7 +119,7 @@ export function UserDropdown({ user }: { user: HeaderUser | null }) {
 					{workspaceItems.length > 0 ? (
 						<>
 							<Dropdown.Label className="px-2.5 pt-2 pb-1 font-semibold text-[10px] text-text-soft-400 uppercase tracking-wider">
-								Workspace
+								Organization
 							</Dropdown.Label>
 							<Dropdown.Group className="gap-0">
 								{workspaceItems.map((item, index) => (

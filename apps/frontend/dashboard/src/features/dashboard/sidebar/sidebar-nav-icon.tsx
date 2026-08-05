@@ -25,7 +25,7 @@ import { AnimatedThemeIcon } from "./animated-theme-icon";
 import { AnimatedUsageIcon } from "./animated-usage-icon";
 import { AnimatedWebhookIcon } from "./animated-webhook-icon";
 import { AnimatedWorkflowIcon } from "./animated-workflow-icon";
-import { AnimatedWorkspaceIcon } from "./animated-workspace-icon";
+import { AnimatedOrganizationIcon } from "./animated-organization-icon";
 
 type SidebarNavIconProps = {
 	name: string;
@@ -96,7 +96,7 @@ export function SidebarNavIcon({
 		case "users":
 			return <AnimatedTeamsIcon className={tone} />;
 		case "workspace-custom":
-			return <AnimatedWorkspaceIcon className={tone} />;
+			return <AnimatedOrganizationIcon className={tone} />;
 		case "user":
 			return <AnimatedProfileIcon className={tone} />;
 		case "shield-check":

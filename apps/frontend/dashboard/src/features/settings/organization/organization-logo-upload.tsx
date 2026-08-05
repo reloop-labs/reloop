@@ -13,17 +13,17 @@ import { toast } from "sonner";
 import { queryKeys } from "#/lib/query-keys";
 import { ensureAbsoluteUrl } from "#/utils/absolute-url";
 
-interface WorkspaceLogoUploadProps {
+interface OrganizationLogoUploadProps {
 	organizationId: string;
 	initialLogoUrl?: string;
 	onLogoChange: (url: string) => void;
 }
 
-export function WorkspaceLogoUpload({
+export function OrganizationLogoUpload({
 	organizationId,
 	initialLogoUrl,
 	onLogoChange,
-}: WorkspaceLogoUploadProps) {
+}: OrganizationLogoUploadProps) {
 	const queryClient = useQueryClient();
 	const [logoPreview, setLogoPreview] = useState(
 		ensureAbsoluteUrl(initialLogoUrl),

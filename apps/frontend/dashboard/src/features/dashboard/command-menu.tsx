@@ -62,7 +62,8 @@ function useNavigationShortcuts(router: ReturnType<typeof useRouter>) {
 			if (!(target instanceof HTMLElement)) return false;
 			if (target.isContentEditable) return true;
 			const tag = target.tagName;
-			if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return true;
+			if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT")
+				return true;
 			if (target.closest('[contenteditable="true"], [role="textbox"]')) {
 				return true;
 			}
@@ -88,8 +89,8 @@ function useNavigationShortcuts(router: ReturnType<typeof useRouter>) {
 			",": "/settings",
 			u: "/settings",
 			b: "/settings/billing",
-			T: "/settings/teams",
-			W: "/settings/workspace",
+			W: "/settings/organization",
+			O: "/settings/organization",
 			P: "/settings/profile",
 			S: "/settings/security",
 			K: "/settings/shortcuts",

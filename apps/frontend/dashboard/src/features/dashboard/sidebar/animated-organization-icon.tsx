@@ -1,16 +1,16 @@
 import { cn } from "@reloop/ui/cn";
 
-type AnimatedWorkspaceIconProps = {
+type AnimatedOrganizationIconProps = {
 	className?: string;
 };
 
 /**
- * Workspace building: outline builds bottom→top, then windows appear.
+ * Organization building: outline builds bottom→top, then windows appear.
  * Place inside an element with the `group` class.
  */
-export function AnimatedWorkspaceIcon({
+export function AnimatedOrganizationIcon({
 	className,
-}: AnimatedWorkspaceIconProps) {
+}: AnimatedOrganizationIconProps) {
 	return (
 		<svg
 			viewBox="0 0 512 512"
