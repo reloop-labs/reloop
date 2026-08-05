@@ -14,6 +14,7 @@ import { normalizeDocsPathname } from "../../lib/is-active";
 const tabColors: Record<string, string> = {
 	Documentation: "#3b82f6",
 	"API Reference": "#8b5cf6",
+	Guides: "#f59e0b",
 	Webhooks: "#ec4899",
 	"Self-Hosted": "#0ea5e9",
 	Setup: "#10b981",

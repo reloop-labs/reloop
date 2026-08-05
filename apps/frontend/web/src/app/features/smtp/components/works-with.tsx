@@ -65,7 +65,7 @@ const columns: Integration[][] = [
 	[
 		{
 			label: "Supabase",
-			href: "/docs/knowledge-base/supabase-quickstart",
+			href: "/docs/guides/supabase-quickstart",
 			icon: siSupabase,
 		},
 		{ label: "Zapier", href: "/docs/integrations/zapier", icon: siZapier },

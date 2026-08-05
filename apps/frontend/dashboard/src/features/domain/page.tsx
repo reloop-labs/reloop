@@ -12,6 +12,7 @@ import { DomainErrorState } from "./components/domain-error-state";
 import { DomainListHeader } from "./components/domain-list-header";
 import { DomainListToolbar } from "./components/domain-list-toolbar";
 import { DomainTable } from "./components/domain-table";
+import { DOMAIN_LEARN_DOCS_URL } from "./dns-provider";
 import { useDomainsQuery } from "./hooks/use-domains-query";
 
 export function DomainPage() {
@@ -52,8 +53,7 @@ export function DomainPage() {
 				label: "Go to Docs",
 				icon: "file-text",
 				shortcut: { label: "D", keys: ["d"] },
-				onSelect: () =>
-					window.open("https://reloop.sh/docs/learn/domains", "_blank"),
+				onSelect: () => window.open(DOMAIN_LEARN_DOCS_URL, "_blank"),
 			},
 		],
 		[setNewDomainModal],
@@ -87,7 +87,7 @@ export function DomainPage() {
 		"d",
 		(e) => {
 			e.preventDefault();
-			window.open("https://reloop.sh/docs/learn/domains", "_blank");
+			window.open(DOMAIN_LEARN_DOCS_URL, "_blank");
 		},
 		{ enableOnFormTags: false, preventDefault: true },
 	);

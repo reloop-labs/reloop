@@ -343,12 +343,6 @@ export function DocsHome() {
 						description="Receive and reply to inbound mail."
 					/>
 					<NavCard
-						href="/learn/webhooks"
-						icon="webhook"
-						title="Webhooks"
-						description="Delivery, open, click, and bounce events."
-					/>
-					<NavCard
 						href="/learn/workflows"
 						icon="workflow"
 						title="Workflows"

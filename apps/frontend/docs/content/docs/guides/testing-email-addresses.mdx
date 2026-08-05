@@ -1,0 +1,42 @@
+---
+title: Email Addresses for Testing
+sidebarTitle: Testing Addresses
+description: Which email addresses to use when testing with Reloop.
+---
+
+When testing your Reloop integration, use these special email addresses to simulate different scenarios without sending real emails.
+
+## First test after API key (onboarding domain)
+
+During onboarding, after you generate an API key, use **Send email**. Reloop sends a message from the onboarding test domain:
+
+| Field | Value |
+|-------|--------|
+| From | `onboarding@{ONBOARDING_TEST_DOMAIN}` (not `RELOOP_SENDER_DOMAIN`) |
+| To | Your account email only |
+
+You do **not** need a verified customer domain for this path. For production From addresses, add and verify your own domain.
+
+## Simulated recipient addresses
+
+| Address | Behavior |
+|---------|----------|
+| `delivered@reloop.dev` | Simulates a successful delivery |
+| `bounced@reloop.dev` | Simulates a hard bounce |
+| `complained@reloop.dev` | Simulates a spam complaint |
+
+## Development tips
+
+- Use the onboarding button or your own addresses for real inbox checks
+- Use the simulated addresses above for automated tests that should not hit real inboxes
+- Check the [Reloop dashboard](https://app.reloop.dev/emails) for send status
+
+<Warning>
+Never use real customer email addresses for automated load or bounce testing. Prefer the simulated addresses above, or a dedicated inbox you control.
+</Warning>
+
+## Learn More
+
+- [E2E Testing with Playwright](/docs/guides/e2e-testing-playwright)
+- [Account Quotas and Limits](/docs/guides/account-quotas-limits)
+- [reloop.dev Domain Error](/docs/guides/error-reloop-dev-domain)

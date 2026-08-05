@@ -1,5 +1,0 @@
-{
-	"title": "Settings",
-	"icon": "gear",
-	"pages": ["index", "details"]
-}

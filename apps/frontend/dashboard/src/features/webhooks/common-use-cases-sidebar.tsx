@@ -23,13 +23,13 @@ export function WebhooksCommonUseCasesSidebar() {
 			title: "Verify signed payloads",
 			description:
 				"Validate HMAC-SHA256 signatures so you only process events from Reloop.",
-			href: "https://reloop.sh/docs/learn/webhook",
+			href: "https://reloop.sh/docs/webhooks",
 		},
 		{
 			title: "Handle delivery retries",
 			description:
 				"Failed deliveries retry with backoff — design handlers to be idempotent.",
-			href: "https://reloop.sh/docs/learn/webhook",
+			href: "https://reloop.sh/docs/webhooks",
 		},
 	];
 

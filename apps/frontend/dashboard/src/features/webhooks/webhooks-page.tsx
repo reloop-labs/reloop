@@ -55,7 +55,7 @@ export function WebhooksPage() {
 				icon: "file-text",
 				shortcut: { label: "D", keys: ["d"] },
 				onSelect: () =>
-					window.open("https://reloop.sh/docs/learn/webhook", "_blank"),
+					window.open("https://reloop.sh/docs/webhooks", "_blank"),
 			},
 		],
 		[router],
@@ -89,7 +89,7 @@ export function WebhooksPage() {
 		"d",
 		(e) => {
 			e.preventDefault();
-			window.open("https://reloop.sh/docs/learn/webhook", "_blank");
+			window.open("https://reloop.sh/docs/webhooks", "_blank");
 		},
 		{ enableOnFormTags: false, preventDefault: true },
 	);

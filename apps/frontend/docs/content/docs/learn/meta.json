@@ -12,8 +12,6 @@
 		"api-keys",
 		"logs",
 		"domain",
-		"webhooks",
-		"workflows",
-		"settings"
+		"workflows"
 	]
 }

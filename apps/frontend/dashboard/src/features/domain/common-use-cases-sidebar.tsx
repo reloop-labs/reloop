@@ -2,6 +2,7 @@ import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { siNodedotjs, siPhp, siPython } from "simple-icons";
 import { DomainApiDetails } from "#/components/api-details/domain";
+import { DNS_SETUP_HUB_URL, DOMAIN_LEARN_DOCS_URL } from "./dns-provider";
 
 const cardClassName = cn(
 	"group flex w-full cursor-pointer flex-col rounded-2xl border border-stroke-soft-100 bg-bg-white-0 p-4 text-left",
@@ -20,16 +21,16 @@ const sdkLanguages = [
 export function DomainCommonUseCasesSidebar() {
 	const useCases = [
 		{
-			title: "Configure DNS records",
+			title: "Configure DNS by provider",
 			description:
-				"Set up DKIM, SPF, and DMARC records for optimal inbox deliverability.",
-			href: "https://reloop.sh/docs/domains",
+				"Step-by-step guides for Cloudflare, GoDaddy, Route 53, Namecheap, and more.",
+			href: DNS_SETUP_HUB_URL,
 		},
 		{
-			title: "Automatic DNS verification",
+			title: "Domain verification guide",
 			description:
-				"Connect Cloudflare, Route53, or GoDaddy for 1-click domain setup.",
-			href: "https://reloop.sh/docs/domains",
+				"Add a sending domain and verify SPF, DKIM, and DMARC for deliverability.",
+			href: DOMAIN_LEARN_DOCS_URL,
 		},
 	];
 

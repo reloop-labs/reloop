@@ -24,9 +24,9 @@ export function DocTabs() {
 			icon: "bulb",
 		},
 		{
-			title: "Knowledge Base",
-			url: "/knowledge-base",
-			icon: "swatch-book",
+			title: "Guides",
+			url: "/guides",
+			icon: "book-open",
 		},
 		{
 			title: "Webhooks",

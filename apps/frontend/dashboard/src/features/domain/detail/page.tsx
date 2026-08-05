@@ -11,6 +11,7 @@ import { useRegisterCommandActions } from "#/features/dashboard/command-menu-con
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import { DomainErrorState } from "../components/domain-error-state";
 import { DomainNotFound } from "../components/domain-not-found";
+import { DOMAIN_LEARN_DOCS_URL } from "../dns-provider";
 import { useDomainConnectCallback } from "../hooks/use-domain-connect-callback";
 import { useDomainDetailQuery } from "../hooks/use-domains-query";
 import { isDomainRecordId } from "../utils";
@@ -87,8 +88,7 @@ export function DomainDetailPage({
 				label: "Go to Docs",
 				icon: "file-text",
 				shortcut: { label: "D", keys: ["d"] },
-				onSelect: () =>
-					window.open("https://reloop.sh/docs/learn/domains", "_blank"),
+				onSelect: () => window.open(DOMAIN_LEARN_DOCS_URL, "_blank"),
 			},
 		],
 		[domainData?.domain],
@@ -128,7 +128,7 @@ export function DomainDetailPage({
 		"d",
 		(e) => {
 			e.preventDefault();
-			window.open("https://reloop.sh/docs/learn/domains", "_blank");
+			window.open(DOMAIN_LEARN_DOCS_URL, "_blank");
 		},
 		{ enableOnFormTags: false, preventDefault: true },
 	);

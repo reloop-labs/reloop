@@ -1,0 +1,21 @@
+---
+title: Agent Inbox
+description: Handle inbound emails dynamically using AI-powered classification and routing.
+icon: inbox
+---
+
+The Reloop **Agent Inbox** turns static inbound email addresses into active, programmable endpoints. Instead of simply forwarding raw emails, Reloop routes inbound messages through our AI processing engine to extract structured data, classify intent, and trigger downstream handlers.
+
+## Key capabilities
+
+* **AI classification**: Automatically categorize inbound messages (e.g. Support, Billing, Sales, Spam) and extract sentiment.
+* **Structured data extraction**: Parse variables out of the email body (like invoice numbers, customer names, or tracking codes) using JSON schemas.
+* **Automated routing**: Forward parsed payloads directly to custom webhooks or enqueue them in NATS messaging topics.
+* **Inline conversational replies**: Send automated AI-drafted replies or route them to human agents in the dashboard.
+
+## How it works
+
+1. **Inbound gateway**: Email is received via your verified sending domain (e.g. `support@yourdomain.com`).
+2. **Parsing & normalization**: The HTML content, attachments, headers, and metadata are parsed.
+3. **AI evaluation**: The inbox's custom prompt evaluates the content against defined rules.
+4. **Action dispatch**: Webhooks are fired, database state is updated, or an automated reply is queued.

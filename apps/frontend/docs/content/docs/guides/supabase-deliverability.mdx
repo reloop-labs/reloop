@@ -1,0 +1,22 @@
+---
+title: Supabase Go-Live Checklist
+sidebarTitle: Supabase Deliverability
+description: Maximize deliverability for Supabase auth emails sent through Reloop.
+---
+
+Before going live with Supabase + Reloop, follow this checklist to ensure your auth emails reach every inbox.
+
+## Checklist
+
+- [ ] **Verify your domain** — Complete DNS verification in the [Reloop dashboard](https://app.reloop.dev/domains).
+- [ ] **Use a subdomain** — Send auth emails from a subdomain like `auth.example.com` to protect your root domain reputation.
+- [ ] **Set up DMARC** — Add a DMARC record to monitor and protect against spoofing.
+- [ ] **Test deliverability** — Send test emails to Gmail, Outlook, and Yahoo to confirm inbox placement.
+- [ ] **Warm up your domain** — If you're sending to a large audience, gradually increase volume. See our [Warm-up Guide](/docs/guides/warmup-guide).
+- [ ] **Set appropriate rate limits** — Don't send more than your plan allows. See [Account Quotas](/docs/guides/account-quotas-limits).
+
+## Learn More
+
+- [Supabase Quickstart](/docs/guides/supabase-quickstart)
+- [Emails Going to Spam](/docs/guides/emails-going-to-spam)
+- [Warm-up Guide](/docs/guides/warmup-guide)

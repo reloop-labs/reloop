@@ -7,6 +7,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import * as React from "react";
 import * as simpleIcons from "simple-icons";
 import type { DomainResponse } from "#/features/domain/types";
+import { DNS_SETUP_HUB_URL } from "../../dns-provider";
 import { useDomainNameserversQuery } from "../../hooks/use-domains-query";
 import { useDomainConnect } from "../hooks/use-domain-connect";
 import { inferDnsProvider } from "../utils";
@@ -105,6 +106,20 @@ export const DNSAutoConnectBanner: React.FC<DNSAutoConnectBannerProps> = ({
 								We've detected your domain is managed by {provider.label}. We
 								can automatically configure all required DNS records for you.
 							</p>
+							<a
+								href={provider.docsUrl}
+								target="_blank"
+								rel="noopener noreferrer"
+								className="inline-flex items-center gap-1 text-paragraph-xs text-text-sub-600 underline decoration-stroke-soft-200 decoration-dashed underline-offset-4 transition-colors hover:text-text-strong-950"
+							>
+								{provider.docsSlug
+									? `Manual ${provider.label} setup guide`
+									: "Browse all DNS setup guides"}
+								<Icon
+									name="link-external"
+									className="h-3 w-3 text-text-soft-400"
+								/>
+							</a>
 						</div>
 					</div>
 
@@ -172,7 +187,16 @@ export const DNSAutoConnectBanner: React.FC<DNSAutoConnectBannerProps> = ({
 							<span className="font-medium text-text-strong-950">
 								Domain Registrar &rarr; DNS Settings &rarr; Add Records
 							</span>{" "}
-							using the values below.
+							using the values below. Or pick your host from the{" "}
+							<a
+								href={DNS_SETUP_HUB_URL}
+								target="_blank"
+								rel="noopener noreferrer"
+								className="font-medium text-text-strong-950 underline decoration-stroke-soft-200 decoration-dashed underline-offset-4 transition-colors hover:opacity-80"
+							>
+								DNS setup guides
+							</a>
+							.
 						</p>
 					</div>
 				</div>

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 
 import { useHotkeys } from "react-hotkeys-hook";
 
-const DOCS_URL = "https://reloop.sh/docs/learn/webhook";
+const DOCS_URL = "https://reloop.sh/docs/webhooks";
 
 export function WebhooksListHeader() {
 	const router = useRouter();

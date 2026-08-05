@@ -5,7 +5,7 @@ import { KbdKeyOutline } from "@reloop/ui/kbd-key-outline";
 import { useHotkeys } from "react-hotkeys-hook";
 
 const openDocs = () =>
-	window.open("https://reloop.sh/docs/learn/webhook", "_blank");
+	window.open("https://reloop.sh/docs/webhooks", "_blank");
 
 type ButtonProps = React.ComponentPropsWithoutRef<typeof Button.Root>;
 
