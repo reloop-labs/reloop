@@ -9,9 +9,10 @@ import { useRef } from "react";
 import { isActive as checkIsActive } from "../../lib/is-active";
 import { useSidebarContext } from "./sidebar";
 
-/**
- * Webhooks sidebar — typography matches DefaultSidebarSection (docs home).
- */
+/** Event-style titles look like `email.delivered` (dotted resource names). */
+function isEventName(name: string): boolean {
+	return name.includes(".");
+}
 
 export function WebhookSidebarFolder({
 	node,
@@ -58,20 +59,22 @@ export function WebhookSidebarFolder({
 				data-sidebar-active={isDirectlyActive || undefined}
 				className={cn(
 					"group relative z-10 flex w-full items-center justify-between rounded-lg px-2 font-medium transition-all",
-					depth === 0 ? "h-9 text-[15px]" : "h-8 text-[14px]",
-					isActive
-						? "text-text-strong-950"
-						: "text-text-sub-600 hover:text-text-strong-950",
+					depth === 0 ? "h-8 text-[14px]" : "h-7 text-[14px]",
+					isDirectlyActive
+						? "text-[#171717] dark:text-white"
+						: isParentActive
+							? "text-[#171717] dark:text-white"
+							: "text-text-sub-600 hover:text-[#171717] dark:hover:text-white",
 				)}
 			>
-				<div className="relative z-10 flex w-full min-w-0 items-center gap-2 text-left">
+				<div className="relative z-10 flex w-full items-center gap-2 text-left">
 					{node.icon && (
 						<span
 							className={cn(
 								"flex h-4 w-4 shrink-0 items-center justify-center transition-colors",
 								isActive
-									? "text-text-strong-950"
-									: "text-text-sub-600 opacity-70 group-hover:text-text-strong-950 group-hover:opacity-100",
+									? "text-[#171717] dark:text-white"
+									: "text-text-sub-600 opacity-70 group-hover:text-[#171717] group-hover:opacity-100 dark:group-hover:text-white",
 							)}
 						>
 							{node.icon}
@@ -83,8 +86,8 @@ export function WebhookSidebarFolder({
 					className={cn(
 						"relative z-10 h-3.5 w-3.5 transition-transform duration-200",
 						isActive
-							? "text-text-sub-600 opacity-60"
-							: "text-text-sub-600 opacity-50 group-hover:opacity-60",
+							? "text-[#171717] dark:text-white"
+							: "text-text-sub-600 opacity-50 group-hover:text-[#171717] dark:group-hover:text-white",
 						isOpen && "rotate-90",
 					)}
 				/>
@@ -141,7 +144,11 @@ export function WebhookSidebarLink({
 
 	const linkId = node.url;
 	const isActive = checkIsActive(linkId, pathname, false);
+	const name = String(node.name ?? "");
+	const showDot = isEventName(name);
 
+	// Match API Reference link row: same height, weight, and active colors.
+	// Event rows get a green status dot (like a GET method chip, simplified).
 	return (
 		<Link
 			ref={ref}
@@ -155,39 +162,52 @@ export function WebhookSidebarLink({
 			data-sidebar-active={isActive || undefined}
 			className={cn(
 				"group relative z-10 flex items-center gap-2 rounded-lg px-2 transition-colors",
-				depth === 0 ? "h-9 text-[15px]" : "h-8 text-[14px]",
-				isActive
-					? "text-text-strong-950"
-					: "text-text-sub-600 hover:text-text-strong-950",
+				depth === 0 ? "h-8 text-[14px]" : "h-7 text-[14px]",
+				showDot
+					? isActive
+						? "text-green-700 dark:text-green-300"
+						: "text-text-sub-600"
+					: isActive
+						? "text-[#171717] dark:text-white"
+						: "text-text-sub-600 hover:text-[#171717] dark:hover:text-white",
 			)}
 		>
-			<div className="relative z-10 flex w-full min-w-0 items-center gap-2 text-left">
-				{node.icon && (
+			<div className="relative z-10 flex w-full min-w-0 items-center gap-1.5 text-left">
+				{showDot ? (
 					<span
 						className={cn(
-							"flex h-4 w-4 shrink-0 items-center justify-center transition-colors",
+							"size-1.5 shrink-0 rounded-full transition-all",
 							isActive
-								? "text-text-strong-950"
-								: "text-text-sub-600 opacity-70 group-hover:text-text-strong-950 group-hover:opacity-100",
+								? "bg-green-500 shadow-[0_0_0_3px_rgba(34,197,94,0.18)]"
+								: "bg-green-500/70 group-hover:bg-green-500 group-hover:shadow-[0_0_0_3px_rgba(34,197,94,0.12)]",
+						)}
+						aria-hidden
+					/>
+				) : node.icon ? (
+					<span
+						className={cn(
+							"flex h-3.5 w-3.5 shrink-0 items-center justify-center transition-colors",
+							isActive
+								? "text-[#171717] dark:text-white"
+								: "text-text-sub-600 opacity-70 group-hover:text-[#171717] group-hover:opacity-100 dark:group-hover:text-white",
 						)}
 					>
 						{node.icon}
 					</span>
-				)}
-				<span className="truncate font-medium">{node.name as string}</span>
+				) : null}
+				<span
+					className={cn(
+						"min-w-0 truncate font-medium transition-colors",
+						showDot &&
+							(isActive
+								? "text-green-700 dark:text-green-300"
+								: "group-hover:text-green-700 dark:group-hover:text-green-300"),
+					)}
+				>
+					{name}
+				</span>
 			</div>
 		</Link>
-	);
-}
-
-function SectionHeader({ name }: { name: string }) {
-	const id = name.toLowerCase().replace(/\s+/g, "-");
-	return (
-		<div id={id} className="scroll-mt-8 px-2.5 pt-4 pb-1.5">
-			<h4 className="font-semibold text-[10px] text-text-soft-400 uppercase tracking-[0.06em]">
-				{name}
-			</h4>
-		</div>
 	);
 }
 
@@ -200,39 +220,40 @@ export function WebhookSidebarSection({
 	onLinkClick?: () => void;
 	depth?: number;
 }) {
+	// Section titles match API resource folders (e.g. "API KEY") — text-sm uppercase
 	if (node.type === "separator") {
+		const name = node.name as string;
+		const id = name.toLowerCase().replace(/\s+/g, "-");
 		return (
-			<div data-sidebar-section>
-				<SectionHeader name={node.name as string} />
+			<div id={id} className="mt-4 mb-1.5 scroll-mt-8 px-2">
+				<h4 className="font-semibold text-sm uppercase">{name}</h4>
 			</div>
 		);
 	}
 
 	if (node.type === "folder") {
-		if (depth === 0) {
-			return (
-				<div className="flex flex-col" data-sidebar-section>
-					<SectionHeader name={node.name as string} />
-					<div className="flex flex-col gap-px">
-						{node.children.map((child: PageTreeItem, index: number) => (
-							<WebhookSidebarSection
-								key={index}
-								node={child}
-								onLinkClick={onLinkClick}
-								depth={depth + 1}
-							/>
-						))}
-					</div>
-				</div>
-			);
-		}
-
+		// Flat like API: section label + children
+		const hasDirectPages = node.children.some(
+			(child) => child.type !== "folder",
+		);
+		const name = node.name as string;
+		const id = name.toLowerCase().replace(/\s+/g, "-");
 		return (
-			<WebhookSidebarFolder
-				node={node}
-				onLinkClick={onLinkClick}
-				depth={depth}
-			/>
+			<>
+				{hasDirectPages && (
+					<div id={id} className="mt-4 mb-1.5 scroll-mt-8 px-2">
+						<h4 className="font-semibold text-sm uppercase">{name}</h4>
+					</div>
+				)}
+				{node.children.map((child: PageTreeItem, index: number) => (
+					<WebhookSidebarSection
+						key={index}
+						node={child}
+						onLinkClick={onLinkClick}
+						depth={0}
+					/>
+				))}
+			</>
 		);
 	}
 

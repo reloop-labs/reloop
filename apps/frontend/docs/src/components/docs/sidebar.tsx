@@ -25,6 +25,7 @@ import {
 import { AnimatedHoverBackground } from "./animated-hover-background";
 import { ApiSidebarSection } from "./sidebar-api";
 import { DefaultSidebarSection } from "./sidebar-default";
+import { WebhookSidebarSection } from "./sidebar-webhook";
 
 export interface SidebarContextType {
 	hoveredEl: HTMLElement | null;
@@ -363,11 +364,18 @@ export function Sidebar({
 
 					<div className="z-10 flex flex-col gap-px pt-3">
 						{filteredTree.map((node, index) => {
-							// API keeps method badges; everything else (docs home, guides,
-							// webhooks, setup, self-host) shares the same typography.
 							if (activeTab?.url === "/api") {
 								return (
 									<ApiSidebarSection
+										key={index}
+										node={node}
+										onLinkClick={onLinkClick}
+									/>
+								);
+							}
+							if (activeTab?.url === "/webhooks") {
+								return (
+									<WebhookSidebarSection
 										key={index}
 										node={node}
 										onLinkClick={onLinkClick}
