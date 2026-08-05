@@ -101,9 +101,10 @@ export async function completeApiKeyAndGoToDashboard(
 		page.getByText("Your API key — copy it now, you won't see it again."),
 	).toBeVisible();
 
-	const goDashboard = page.getByRole("button", { name: "Go to Dashboard" });
-	await expect(goDashboard).toBeVisible();
-	await goDashboard.click({ force: true });
+	// Skip the optional test send and open the dashboard.
+	const skip = page.getByRole("button", { name: "Skip" });
+	await expect(skip).toBeVisible();
+	await skip.click({ force: true });
 
 	// Loading state lives inside the CTA while session/org cache warms.
 	await expect(

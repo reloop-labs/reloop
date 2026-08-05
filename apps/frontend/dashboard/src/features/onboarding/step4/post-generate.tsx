@@ -1,13 +1,19 @@
+import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import Spinner from "@reloop/ui/spinner";
 import { AnimatePresence, motion } from "framer-motion";
 import { useHotkeys } from "react-hotkeys-hook";
+import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { CopyCodeBlock } from "./copy-code-block";
 import { DeveloperPlayground } from "./developer-playground";
 import type { LanguageCode } from "./types";
 import type { PlatformTestStatus } from "./use-generate-api-key";
+
+/** Light keycap so it reads on the blue FancyButton fill. */
+const actionKbdOnBlueClassName =
+	"border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]";
 
 function inboxProvider(email: string | null): {
 	label: string;
@@ -79,16 +85,27 @@ export function PostGenerate({
 	const testSent = testStatus === "sent";
 	const provider = inboxProvider(testTo);
 
-	// Only allow dashboard after a successful test send.
+	// Enter — send test email, or go to dashboard after a successful send.
 	useHotkeys(
-		"mod+enter",
+		"enter",
 		(e) => {
 			e.preventDefault();
 			if (testSent && !finishing) onDone();
 			else if (!testSent && !testSending && onSendTest) onSendTest();
 		},
-		{ enableOnFormTags: true },
+		{ enableOnFormTags: true, preventDefault: true },
 		[onDone, onSendTest, finishing, testSent, testSending],
+	);
+
+	// ⌥S — skip the test send and open the dashboard.
+	useHotkeys(
+		"alt+s",
+		(e) => {
+			e.preventDefault();
+			if (!finishing && !testSending && !testSent) onDone();
+		},
+		{ enableOnFormTags: true },
+		[onDone, finishing, testSending, testSent],
 	);
 
 	return (
@@ -197,7 +214,23 @@ export function PostGenerate({
 					</p>
 				) : null}
 
-				<div className="flex items-center justify-end gap-3">
+				<div className="flex w-full min-w-0 flex-wrap items-center justify-between gap-3">
+					{!testSent ? (
+						<Button.Root
+							type="button"
+							variant="neutral"
+							mode="lighter"
+							size="small"
+							onClick={onDone}
+							disabled={finishing || testSending}
+							className="shrink-0 gap-1.5 rounded-xl"
+						>
+							Skip
+							<ActionKbd className="w-auto min-w-0 px-1">⌥S</ActionKbd>
+						</Button.Root>
+					) : (
+						<div />
+					)}
 					<AnimatePresence mode="wait" initial={false}>
 						{!testSent ? (
 							<motion.div
@@ -206,12 +239,13 @@ export function PostGenerate({
 								animate={{ opacity: 1, y: 0 }}
 								exit={{ opacity: 0, y: -8 }}
 								transition={{ type: "spring", duration: 0.25, bounce: 0 }}
+								className="ml-auto"
 							>
 								<FancyButton.Root
 									variant="blue"
 									size="small"
 									className={cn(
-										"min-w-[190px] justify-center overflow-hidden whitespace-nowrap rounded-xl",
+										"min-w-[190px] justify-center overflow-visible whitespace-nowrap rounded-xl",
 										testSending && "pointer-events-none opacity-90",
 									)}
 									onClick={onSendTest}
@@ -227,6 +261,9 @@ export function PostGenerate({
 										<span className="flex items-center justify-center gap-1.5">
 											<Icon name="confetti" className="h-3.5 w-3.5 shrink-0" />
 											<span>Send email</span>
+											<ActionKbd className={actionKbdOnBlueClassName}>
+												↵
+											</ActionKbd>
 										</span>
 									)}
 								</FancyButton.Root>
@@ -238,12 +275,13 @@ export function PostGenerate({
 								animate={{ opacity: 1, y: 0 }}
 								exit={{ opacity: 0, y: -8 }}
 								transition={{ type: "spring", duration: 0.25, bounce: 0 }}
+								className="ml-auto"
 							>
 								<FancyButton.Root
 									variant="blue"
 									size="small"
 									className={cn(
-										"min-w-[170px] justify-center overflow-hidden whitespace-nowrap rounded-xl transition-all duration-200",
+										"min-w-[170px] justify-center overflow-visible whitespace-nowrap rounded-xl transition-all duration-200",
 										finishing && "pointer-events-none opacity-90",
 									)}
 									onClick={onDone}
@@ -275,6 +313,9 @@ export function PostGenerate({
 														className="h-3.5 w-3.5 shrink-0"
 													/>
 													<span>Go to Dashboard</span>
+													<ActionKbd className={actionKbdOnBlueClassName}>
+														↵
+													</ActionKbd>
 												</>
 											)}
 										</motion.span>
