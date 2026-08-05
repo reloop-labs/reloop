@@ -180,8 +180,9 @@ export function ConfigureDnsStep() {
 	}
 
 	return (
-		<div className="pb-10">
-			<div className="relative mx-auto mb-8 flex flex-col">
+		// Extra bottom pad so the fixed theme toggle doesn't cover the action row.
+		<div className="pb-20">
+			<div className="relative mx-auto mb-8 flex min-w-0 flex-col">
 				<div className="space-y-1">
 					<div className="flex items-center gap-2">
 						<h1 className="font-semibold text-[26px] text-text-strong-950 tracking-tight">

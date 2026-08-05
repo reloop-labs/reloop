@@ -21,25 +21,25 @@ export function ConfigureDnsActions({
 	onVerify: () => void;
 }) {
 	return (
-		<div className="mt-8 flex items-center justify-between gap-3">
+		<div className="mt-8 flex w-full min-w-0 flex-wrap items-center justify-between gap-3">
 			<Button.Root
 				variant="neutral"
 				mode="lighter"
 				size="small"
 				onClick={onSkip}
 				disabled={isVerifying}
-				className="gap-1.5 rounded-xl"
+				className="shrink-0 gap-1.5 rounded-xl"
 			>
 				Skip
 				<ActionKbd className="w-auto min-w-0 px-1">⌥S</ActionKbd>
 			</Button.Root>
-			<div className="flex items-center gap-3">
+			<div className="flex min-w-0 flex-wrap items-center justify-end gap-2 sm:gap-3">
 				{domainId ? <ForwardDNSRecordsButton domainId={domainId} /> : null}
 				<FancyButton.Root
 					onClick={onVerify}
 					size="small"
 					variant="blue"
-					className="min-w-[165px] justify-center overflow-hidden whitespace-nowrap rounded-xl"
+					className="shrink-0 justify-center overflow-visible whitespace-nowrap rounded-xl px-3"
 					disabled={isVerifying}
 				>
 					<AnimatePresence mode="popLayout" initial={false}>

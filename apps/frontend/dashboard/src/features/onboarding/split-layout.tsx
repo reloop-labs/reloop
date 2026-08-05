@@ -37,9 +37,10 @@ const AnimatedHeight = ({ children }: { children: React.ReactNode }) => {
 					? { duration: 0 }
 					: { duration: 0.32, ease: [0.23, 1, 0.32, 1] }
 			}
-			style={{ overflow: "hidden" }}
+			// Clip vertical overflow for height animation only — keep action rows visible.
+			className="min-w-0 overflow-x-visible overflow-y-hidden"
 		>
-			<div ref={innerRef} className="p-1.5">
+			<div ref={innerRef} className="min-w-0 p-1.5">
 				{children}
 			</div>
 		</motion.div>
@@ -191,7 +192,7 @@ export function SplitLayout({
 									"grid-template-columns 0.28s cubic-bezier(0.23, 1, 0.32, 1)",
 							}}
 						>
-							<div className="flex flex-col gap-1 px-12 pt-10 pb-10">
+							<div className="flex min-w-0 flex-col gap-1 px-6 pt-10 pb-10 sm:px-10 md:px-12">
 								<div className="font-medium text-text-soft-400 text-xs">
 									{currentStep !== null && totalSteps !== null ? (
 										<span className="inline-flex items-center gap-1 px-1.5">

@@ -185,14 +185,14 @@ export const ForwardDNSRecordsButton = ({
 					size="small"
 					aria-keyshortcuts="f r"
 					className={cn(
-						"h-10 gap-1.5 rounded-xl transition-transform duration-150 ease-out active:scale-[0.98]",
+						"max-w-full shrink gap-1.5 rounded-xl transition-transform duration-150 ease-out active:scale-[0.98]",
 						isOpen && "bg-bg-weak-50",
 					)}
 				>
-					<Icon name="mail-single" className="h-4 w-4" />
-					Forward records
+					<Icon name="mail-single" className="h-4 w-4 shrink-0" />
+					<span className="truncate">Forward records</span>
 					{showShortcut ? (
-						<span className="inline-flex items-center gap-0.5">
+						<span className="inline-flex shrink-0 items-center gap-0.5">
 							<ActionKbd className="w-auto min-w-0 px-1">F</ActionKbd>
 							<ActionKbd className="w-auto min-w-0 px-1">R</ActionKbd>
 						</span>
