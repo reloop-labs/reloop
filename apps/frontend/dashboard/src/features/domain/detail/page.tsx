@@ -79,7 +79,7 @@ export function DomainDetailPage({
 				onSelect: () =>
 					window.dispatchEvent(
 						new CustomEvent("api-details:open", {
-							detail: { docSection: "domains" },
+							detail: { docSection: "domain" },
 						}),
 					),
 			},
@@ -117,7 +117,7 @@ export function DomainDetailPage({
 			e.preventDefault();
 			window.dispatchEvent(
 				new CustomEvent("api-details:open", {
-					detail: { docSection: "domains" },
+					detail: { docSection: "domain" },
 				}),
 			);
 		},

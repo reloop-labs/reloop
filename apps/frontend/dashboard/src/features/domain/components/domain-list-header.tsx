@@ -3,6 +3,7 @@ import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { useRouter } from "next/navigation";
 import { useHotkeys } from "react-hotkeys-hook";
+import { DomainApiDetails } from "#/components/api-details/domain";
 import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { DOMAIN_LEARN_DOCS_URL } from "../dns-provider";
 
@@ -49,6 +50,26 @@ export function DomainListHeader() {
 			</div>
 
 			<div className="flex shrink-0 items-center gap-2">
+				<DomainApiDetails
+					renderTrigger={({ open }) => (
+						<Button.Root
+							type="button"
+							variant="neutral"
+							mode="stroke"
+							size="small"
+							onClick={open}
+							className="gap-1.5 rounded-xl"
+							aria-keyshortcuts="s"
+						>
+							<Icon
+								name="code"
+								className="h-4 w-4 text-text-sub-600"
+							/>
+							SDK
+							<ActionKbd>S</ActionKbd>
+						</Button.Root>
+					)}
+				/>
 				<Button.Root
 					type="button"
 					variant="neutral"
