@@ -42,8 +42,8 @@ function CopyButton({
 			type="button"
 			onClick={handleCopy}
 			className={cn(
-				"flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-stroke-soft-100 bg-bg-white-0 text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-stroke-soft-100/40",
-				copied && "border-success-base/30 text-success-base",
+				"flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950",
+				copied && "text-success-base",
 				className,
 			)}
 			title={copied ? "Copied" : "Copy"}
@@ -145,7 +145,7 @@ export function SmtpPage() {
 				<div>
 					<div className="flex items-center gap-2.5">
 						<Icon
-							name="mail-send"
+							name="smtp"
 							className="h-6 w-6 shrink-0 text-text-strong-950"
 						/>
 						<h1 className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
@@ -158,17 +158,6 @@ export function SmtpPage() {
 				</div>
 
 				<div className="flex shrink-0 items-center gap-2">
-					<Button.Root
-						type="button"
-						variant="neutral"
-						mode="stroke"
-						size="small"
-						onClick={() => window.open(DOCS_URL, "_blank")}
-						className="gap-1.5 rounded-xl"
-					>
-						<Icon name="video-guide" className="h-4 w-4 text-text-sub-600" />
-						Video guide
-					</Button.Root>
 					<Button.Root
 						type="button"
 						variant="neutral"
