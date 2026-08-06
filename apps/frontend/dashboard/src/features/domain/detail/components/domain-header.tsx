@@ -1,14 +1,11 @@
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
-
 import { useHotkeys } from "react-hotkeys-hook";
-import { formatRelativeTime } from "#/utils/format-relative-time";
 import { ForwardDNSRecordsButton } from "../../add/setup/components/forward-dns-records";
-import { AnimatedClock } from "../../animated-clock";
 import { DeleteDomainModal } from "../../components/delete-domain";
+import { DomainAvatar } from "../../components/domain-avatar";
 import type { Domain } from "../../types";
-import { getStatusColorClass, getStatusIcon } from "../../utils";
 import { useDomainActions } from "../hooks/use-domain-actions";
 import { DomainHeaderActions } from "./domain-header-actions";
 
@@ -24,7 +21,6 @@ export function DomainHeader({
 	const domainName = domain?.domain || domainId || "Domain";
 	const domainRecordId = domain?.id || domainId || "";
 	const status = domain?.status || "pending";
-	const lastUpdated = domain?.createdAt;
 
 	const { handleVerifyDNS, isVerifying } = useDomainActions(
 		domainRecordId,
@@ -57,40 +53,30 @@ export function DomainHeader({
 			<div className="flex items-center justify-between">
 				<div>
 					{isLoading ? (
-						<div className="flex items-center gap-1.5">
-							<Skeleton className="h-4 w-12 rounded-full" />
-							<Skeleton className="h-1 w-1 rounded-full" />
-							<Skeleton className="h-4 w-20 rounded-full" />
+						<div className="flex items-center gap-3">
+							<Skeleton className="h-12 w-12 shrink-0 rounded-[14px]" />
+							<div className="flex min-w-0 flex-col gap-1.5">
+								<Skeleton className="h-4 w-14 rounded-full" />
+								<Skeleton className="h-6 w-48 rounded-lg" />
+							</div>
 						</div>
 					) : (
-						<div className="flex items-center gap-1.5">
-							<p className="font-medium text-paragraph-xs text-text-sub-600">
-								Domain
-							</p>
-							<p className="font-semibold text-paragraph-xs text-text-sub-600">
-								•
-							</p>
-							<p className="font-medium text-paragraph-xs text-text-sub-600">
-								{lastUpdated ? formatRelativeTime(lastUpdated) : "---"}
-							</p>
-							<p className="font-semibold text-paragraph-xs text-text-sub-600">
-								•
-							</p>
-							<div
-								className={`flex items-center gap-1 ${getStatusColorClass(status)}`}
-							>
-								{status === "verifying" ? (
-									<AnimatedClock className="h-3.5 w-3.5" />
-								) : (
-									<Icon name={getStatusIcon(status)} className="h-3.5 w-3.5" />
-								)}
-								<p className="font-medium text-paragraph-xs capitalize">
-									{status}
+						<div className="flex min-w-0 items-center gap-3">
+							<DomainAvatar
+								seed={domainRecordId || domainName}
+								size="lg"
+								alt={`${domainName} avatar`}
+							/>
+							<div className="min-w-0">
+								<p className="font-medium text-paragraph-xs text-text-sub-600">
+									Domain
 								</p>
+								<h1 className="mb-0.5 font-semibold text-title-h6 leading-5">
+									{domainName}
+								</h1>
 							</div>
 						</div>
 					)}
-					<h1 className="font-medium text-title-h6 leading-8">{domainName}</h1>
 				</div>
 
 				<div className="flex items-center gap-2">
