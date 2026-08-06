@@ -157,6 +157,12 @@ export function ShortcutsPage() {
 				category: "app",
 			},
 			{
+				name: "Go back",
+				keyGroups: parseKeyGroups("⌘⌫"),
+				iconName: "arrow-left",
+				category: "app",
+			},
+			{
 				name: "Toggle left sidebar",
 				keyGroups: parseKeyGroups("⌘B"),
 				iconName: "sidebar-left",

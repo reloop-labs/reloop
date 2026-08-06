@@ -191,6 +191,24 @@ export function CommandMenuGlobal() {
 
 	useNavigationShortcuts(router);
 
+	// Global back: ⌘⌫ / Ctrl+Backspace. Skips form fields (native word/line delete)
+	// and open dialogs so they keep owning Escape/dismiss.
+	useHotkeys(
+		"mod+backspace",
+		(e) => {
+			if (
+				document.querySelector(
+					'[role="dialog"], [role="alertdialog"], [data-radix-popper-content-wrapper]',
+				)
+			) {
+				return;
+			}
+			e.preventDefault();
+			router.back();
+		},
+		{ enableOnFormTags: false, preventDefault: true },
+	);
+
 	const settingsItems = React.useMemo(
 		() =>
 			filterSettingsNavigation(settingsNavigation, {
