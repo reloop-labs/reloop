@@ -4,8 +4,11 @@ import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import * as Tooltip from "@reloop/ui/tooltip";
 import { useRouter } from "next/navigation";
-
 import { useCallback, useState } from "react";
+import { useHotkeys } from "react-hotkeys-hook";
+
+import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import { buildReloopAiPrompt } from "#/features/dashboard/page-header/copy-prompt-button";
 import { SMTP_HOST, SMTP_USER } from "./smtp-code-examples";
 import { SmtpCodePanel } from "./smtp-code-panel";
 
@@ -13,6 +16,43 @@ const DOCS_URL = "https://reloop.sh/docs/examples/smtp/introduction";
 
 /** All supported SMTP ports, shown slash-separated in the credentials table. */
 const SMTP_PORTS = "465 / 587 / 2587 / 2465";
+
+function CopySkillPromptButton({ className }: { className?: string }) {
+	const [copied, setCopied] = useState(false);
+
+	const handleCopy = async () => {
+		try {
+			await navigator.clipboard.writeText(buildReloopAiPrompt());
+			setCopied(true);
+			setTimeout(() => setCopied(false), 2000);
+		} catch {
+			// ignore
+		}
+	};
+
+	return (
+		<button
+			type="button"
+			onClick={handleCopy}
+			className={cn(
+				"inline-flex h-9 cursor-pointer items-center gap-2 rounded-full border border-stroke-soft-100 bg-bg-white-0 px-3.5 font-medium text-text-strong-950 text-xs hover:bg-bg-weak-50 dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/50 dark:text-white dark:hover:bg-bg-weak-50",
+				className,
+			)}
+		>
+			<svg
+				viewBox="0 0 16 16"
+				className="h-4 w-4 shrink-0 text-text-sub-600 dark:text-white/80"
+				aria-hidden
+			>
+				<path
+					fill="currentColor"
+					d="M6.75 14a.75.75 0 1 1 0 1.5.75.75 0 0 1 0-1.5m3.75 0a.75.75 0 1 1 0 1.5.75.75 0 0 1 0-1.5m3.75 0a.75.75 0 1 1 0 1.5.75.75 0 0 1 0-1.5m-7.5-3.25a.75.75 0 1 1 0 1.5.75.75 0 0 1 0-1.5m7.5 0a.75.75 0 1 1 0 1.5.75.75 0 0 1 0-1.5M8.25.5C9.22.5 10 1.28 10 2.25V3H8.5v-.75A.25.25 0 0 0 8.25 2h-5.5a.25.25 0 0 0-.25.25v7.5c0 .14.11.25.25.25H4.5v1.5H2.75C1.78 11.5 1 10.72 1 9.75v-7.5C1 1.28 1.78.5 2.75.5zm-1.5 7.25a.75.75 0 1 1 0 1.5.75.75 0 0 1 0-1.5m7.5 0a.75.75 0 1 1 0 1.5.75.75 0 0 1 0-1.5M6.75 4.5a.75.75 0 1 1 0 1.5.75.75 0 0 1 0-1.5m3.75 0a.75.75 0 1 1 0 1.5.75.75 0 0 1 0-1.5m3.75 0a.75.75 0 1 1 0 1.5.75.75 0 0 1 0-1.5"
+				/>
+			</svg>
+			<span>{copied ? "Copied!" : "Copy prompt"}</span>
+		</button>
+	);
+}
 
 function CopyButton({
 	value,
@@ -138,6 +178,24 @@ function CredentialRow({
 export function SmtpPage() {
 	const router = useRouter();
 
+	useHotkeys(
+		"d",
+		(e) => {
+			e.preventDefault();
+			window.open(DOCS_URL, "_blank");
+		},
+		{ enableOnFormTags: true },
+	);
+
+	useHotkeys(
+		"k",
+		(e) => {
+			e.preventDefault();
+			router.push("/api-keys/create");
+		},
+		{ enableOnFormTags: true },
+	);
+
 	return (
 		<div className="mx-auto max-w-6xl space-y-6 p-6 lg:p-8">
 			{/* Header — same family as API keys / webhooks */}
@@ -157,16 +215,17 @@ export function SmtpPage() {
 					</p>
 				</div>
 
-				<div className="flex shrink-0 items-center gap-2">
+				<div className="flex shrink-0 flex-wrap items-center gap-2">
 					<Button.Root
 						type="button"
 						variant="neutral"
 						mode="stroke"
 						size="small"
 						onClick={() => window.open(DOCS_URL, "_blank")}
-						className="rounded-xl"
+						className="gap-1.5 rounded-xl"
 					>
-						Documentation
+						<span>Documentation</span>
+						<ActionKbd className="ml-0.5 w-auto min-w-4 px-1">D</ActionKbd>
 					</Button.Root>
 					<FancyButton.Root
 						type="button"
@@ -176,8 +235,27 @@ export function SmtpPage() {
 						className="gap-1.5 rounded-xl"
 					>
 						<Icon name="key-new" className="h-4 w-4" />
-						Get API key
+						<span>Get API key</span>
+						<ActionKbd className="ml-0.5 w-auto min-w-4 border-white/25 bg-white/15 px-1 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]">
+							K
+						</ActionKbd>
 					</FancyButton.Root>
+				</div>
+			</div>
+
+			{/* Agent Skill Integration Banner */}
+			<div className="rounded-2xl border border-[#B8D9FA] bg-[#F0F7FF] p-5 sm:p-6 dark:border-blue-900/60 dark:bg-[#04162E]">
+				<div className="flex items-center gap-2 font-bold text-[#1868DF] text-xs uppercase tracking-wider dark:text-blue-400">
+					<Icon name="robot" className="h-4 w-4" />
+					<span>Agent Skill</span>
+				</div>
+				<p className="mt-2.5 max-w-3xl font-medium text-paragraph-sm text-text-strong-950 leading-relaxed dark:text-blue-50/90">
+					If you're looking to adopt Reloop SMTP for the first time in an
+					existing app, we've put together a Skill you can use to have your
+					agent walk you through the process.
+				</p>
+				<div className="mt-4">
+					<CopySkillPromptButton />
 				</div>
 			</div>
 
