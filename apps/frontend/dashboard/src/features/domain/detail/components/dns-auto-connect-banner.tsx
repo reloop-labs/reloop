@@ -1,4 +1,3 @@
-import * as Button from "@reloop/ui/button";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
@@ -7,7 +6,10 @@ import { AnimatePresence, motion } from "framer-motion";
 import * as React from "react";
 import * as simpleIcons from "simple-icons";
 import type { DomainResponse } from "#/features/domain/types";
-import { DNS_SETUP_HUB_URL } from "../../dns-provider";
+import {
+	DNS_SETUP_HUB_URL,
+	type InferredDnsProvider,
+} from "../../dns-provider";
 import { useDomainNameserversQuery } from "../../hooks/use-domains-query";
 import { useDomainConnect } from "../hooks/use-domain-connect";
 import { inferDnsProvider } from "../utils";
@@ -33,6 +35,34 @@ const DNSAutoConnectBannerSkeleton = () => (
 		</div>
 	</div>
 );
+
+function ProviderIcon({ provider }: { provider: InferredDnsProvider }) {
+	const dnsIcon = provider.iconKey
+		? ((simpleIcons as Record<string, { svg: string; hex: string }>)[
+				provider.iconKey
+			] ?? null)
+		: null;
+
+	return (
+		<div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-bg-white-0 shadow-sm ring-1 ring-stroke-soft-100 dark:bg-bg-weak-50/50 dark:ring-stroke-soft-100/40">
+			{dnsIcon ? (
+				<div
+					className="flex h-10 w-10 items-center justify-center rounded-lg"
+					style={{ backgroundColor: `#${dnsIcon.hex}15` }}
+				>
+					<span
+						className="flex h-6 w-6 items-center justify-center [&>svg]:h-full [&>svg]:w-full"
+						style={{ fill: `#${dnsIcon.hex}` }}
+						// biome-ignore lint/security/noDangerouslySetInnerHtml: Trusted SVG from simple-icons
+						dangerouslySetInnerHTML={{ __html: dnsIcon.svg }}
+					/>
+				</div>
+			) : (
+				<Icon name="globe" className="h-6 w-6 text-text-sub-600" />
+			)}
+		</div>
+	);
+}
 
 export const DNSAutoConnectBanner: React.FC<DNSAutoConnectBannerProps> = ({
 	domain,
@@ -69,35 +99,13 @@ export const DNSAutoConnectBanner: React.FC<DNSAutoConnectBannerProps> = ({
 		return <DNSAutoConnectBannerSkeleton />;
 	}
 
-	// State: DNS Provider Found (Supported for Auto-connect)
-	if (provider?.url) {
-		const dnsIcon = provider.iconKey
-			? ((simpleIcons as Record<string, { svg: string; hex: string }>)[
-					provider.iconKey
-				] ?? null)
-			: null;
-
+	// Auto-populate: provider has onboarded Reloop's Domain Connect template
+	if (provider?.supportsAutoConnect) {
 		return (
 			<div className="overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-weak-50/30 p-4 dark:border-stroke-soft-100/40">
 				<div className="flex items-center justify-between gap-6">
 					<div className="flex items-center gap-4">
-						<div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-bg-white-0 shadow-sm ring-1 ring-stroke-soft-100 dark:bg-bg-weak-50/50 dark:ring-stroke-soft-100/40">
-							{dnsIcon ? (
-								<div
-									className="flex h-10 w-10 items-center justify-center rounded-lg"
-									style={{ backgroundColor: `#${dnsIcon.hex}15` }}
-								>
-									<span
-										className="flex h-6 w-6 items-center justify-center [&>svg]:h-full [&>svg]:w-full"
-										style={{ fill: `#${dnsIcon.hex}` }}
-										// biome-ignore lint/security/noDangerouslySetInnerHtml: Trusted SVG from simple-icons
-										dangerouslySetInnerHTML={{ __html: dnsIcon.svg }}
-									/>
-								</div>
-							) : (
-								<Icon name="globe" className="h-6 w-6 text-text-sub-600" />
-							)}
-						</div>
+						<ProviderIcon provider={provider} />
 						<div className="space-y-1">
 							<h3 className="font-semibold text-paragraph-base text-text-strong-950">
 								{provider.label}
@@ -169,7 +177,56 @@ export const DNSAutoConnectBanner: React.FC<DNSAutoConnectBannerProps> = ({
 		);
 	}
 
-	// State: DNS Provider NOT Found (Manual Setup Required)
+	// Detected provider without Reloop template onboarding → manual
+	if (provider) {
+		const manualHref = provider.url || provider.docsUrl;
+		return (
+			<div className="overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-weak-50/30 p-4 dark:border-stroke-soft-100/40">
+				<div className="flex items-center justify-between gap-6">
+					<div className="flex items-center gap-4">
+						<ProviderIcon provider={provider} />
+						<div className="space-y-1">
+							<h3 className="font-semibold text-paragraph-base text-text-strong-950">
+								{provider.label}
+							</h3>
+							<p className="text-paragraph-xs text-text-sub-600 leading-relaxed">
+								We've detected your domain is managed by {provider.label}. Add
+								the DNS records below in your provider panel.
+							</p>
+							<a
+								href={provider.docsUrl}
+								target="_blank"
+								rel="noopener noreferrer"
+								className="inline-flex items-center gap-1 text-paragraph-xs text-text-sub-600 underline decoration-stroke-soft-200 decoration-dashed underline-offset-4 transition-colors hover:text-text-strong-950"
+							>
+								{provider.docsSlug
+									? `${provider.label} setup guide`
+									: "Browse all DNS setup guides"}
+								<Icon
+									name="link-external"
+									className="h-3 w-3 text-text-soft-400"
+								/>
+							</a>
+						</div>
+					</div>
+
+					<FancyButton.Root
+						type="button"
+						variant="basic"
+						size="small"
+						className="min-w-[170px] justify-center overflow-hidden rounded-xl px-4"
+						onClick={() =>
+							window.open(manualHref, "_blank", "noopener,noreferrer")
+						}
+					>
+						{provider.url ? "Open DNS settings" : "View setup guide"}
+					</FancyButton.Root>
+				</div>
+			</div>
+		);
+	}
+
+	// Provider not detected
 	return (
 		<div className="overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-weak-50/30 p-4 dark:border-stroke-soft-100/40">
 			<div className="flex flex-col gap-6">

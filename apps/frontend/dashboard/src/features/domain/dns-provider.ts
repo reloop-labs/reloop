@@ -19,6 +19,14 @@ export type InferredDnsProvider = {
 	docsUrl: string;
 	/** Guides slug without prefix, e.g. `dns-cloudflare`. */
 	docsSlug: string | null;
+	/**
+	 * True when this DNS host has onboarded Reloop's Domain Connect
+	 * template (`reloop.sh` / `email-setup`). Currently: Cloudflare,
+	 * Vercel, Domain Chief, NameSilo. Click still re-checks via live
+	 * discovery as a safety net.
+	 * @see https://www.domainconnect.org/dns-providers/
+	 */
+	supportsAutoConnect: boolean;
 };
 
 function guideUrl(slug: string): string {
@@ -26,8 +34,9 @@ function guideUrl(slug: string): string {
 }
 
 function provider(
-	partial: Omit<InferredDnsProvider, "docsUrl"> & {
+	partial: Omit<InferredDnsProvider, "docsUrl" | "supportsAutoConnect"> & {
 		docsSlug: string | null;
+		supportsAutoConnect?: boolean;
 	},
 ): InferredDnsProvider {
 	return {
@@ -35,6 +44,7 @@ function provider(
 		docsUrl: partial.docsSlug
 			? guideUrl(partial.docsSlug)
 			: DNS_SETUP_HUB_URL,
+		supportsAutoConnect: partial.supportsAutoConnect ?? false,
 	};
 }
 
@@ -55,6 +65,7 @@ export function inferDnsProvider(
 			iconKey: "siCloudflare",
 			url: "https://dash.cloudflare.com",
 			docsSlug: "dns-cloudflare",
+			supportsAutoConnect: true,
 		});
 	}
 	if (normalized.some((server) => server.includes("awsdns-"))) {
@@ -71,6 +82,32 @@ export function inferDnsProvider(
 			iconKey: "siVercel",
 			url: "https://vercel.com/dashboard/domains",
 			docsSlug: "dns-vercel",
+			supportsAutoConnect: true,
+		});
+	}
+	// Domain Chief (Chief Tools)
+	if (normalized.some((server) => server.includes("domainchief."))) {
+		return provider({
+			label: "Domain Chief",
+			iconKey: null,
+			url: "https://domain.chief.app",
+			docsSlug: null,
+			supportsAutoConnect: true,
+		});
+	}
+	// NameSilo (dnsowl) + NameSilo hosting (hostsilo)
+	if (
+		normalized.some(
+			(server) =>
+				server.includes("dnsowl.com") || server.includes("hostsilo.com"),
+		)
+	) {
+		return provider({
+			label: "NameSilo",
+			iconKey: null,
+			url: "https://www.namesilo.com/account_domain.php",
+			docsSlug: null,
+			supportsAutoConnect: true,
 		});
 	}
 	if (normalized.some((server) => server.includes("digitalocean.com"))) {
