@@ -24,9 +24,13 @@ type DeleteState = "idle" | "deleting" | "success";
 
 export function DeleteDomainModal({
 	domains,
+	selectedDomains = [],
+	onClearSelection,
 	onDeleteSuccess,
 }: {
 	domains: Domain[];
+	selectedDomains?: Domain[];
+	onClearSelection?: () => void;
 	onDeleteSuccess?: (deletedName: string) => void;
 }) {
 	const [deleteId, setDeleteId] = useQueryState("delete");
@@ -39,6 +43,8 @@ export function DeleteDomainModal({
 	const router = useRouter();
 	const invalidate = useInvalidateDomains();
 
+	const isBulk = deleteId === "bulk" || deleteId === "selected";
+
 	// Cache the selected domain so details remain stable when query invalidates upon deletion
 	const targetDomainRef = useRef<Domain | null>(null);
 	const currentDomain = domains.find((domain) => domain.id === deleteId);
@@ -47,6 +53,16 @@ export function DeleteDomainModal({
 	}
 	const domainToDelete = currentDomain || targetDomainRef.current;
 
+	const targetBulkDomainsRef = useRef<Domain[]>([]);
+	if (isBulk && selectedDomains.length > 0) {
+		targetBulkDomainsRef.current = selectedDomains;
+	}
+	const bulkDomainsToDelete = isBulk
+		? selectedDomains.length > 0
+			? selectedDomains
+			: targetBulkDomainsRef.current
+		: [];
+
 	const isOnDetailPage =
 		pathname.includes("/domain/") &&
 		!pathname.includes("/domain/add") &&
@@ -54,7 +70,50 @@ export function DeleteDomainModal({
 		!pathname.endsWith("/domain/");
 
 	const handleDelete = async () => {
-		if (!domainToDelete || deleteState !== "idle") return;
+		if (deleteState !== "idle") return;
+
+		if (isBulk) {
+			if (bulkDomainsToDelete.length === 0) return;
+			try {
+				setDeleteState("deleting");
+				let ok = 0;
+				let failed = 0;
+				for (const domain of bulkDomainsToDelete) {
+					try {
+						await axios.delete(`/api/domain/v1/${domain.id}`, {
+							withCredentials: true,
+						});
+						ok += 1;
+					} catch {
+						failed += 1;
+					}
+				}
+				setDeleteState("success");
+				await invalidate();
+
+				setTimeout(() => {
+					const summary = `${ok} domain${ok === 1 ? "" : "s"}`;
+					onDeleteSuccess?.(summary);
+					onClearSelection?.();
+					void setDeleteId(null);
+					if (failed > 0) {
+						toast.error(
+							`${failed} domain${failed === 1 ? "" : "s"} failed to delete`,
+						);
+					}
+					setTimeout(() => {
+						setDeleteState("idle");
+						targetBulkDomainsRef.current = [];
+					}, 300);
+				}, 900);
+			} catch {
+				toast.error("Failed to delete domains");
+				setDeleteState("idle");
+			}
+			return;
+		}
+
+		if (!domainToDelete) return;
 		try {
 			setDeleteState("deleting");
 			const deletedName = domainToDelete.domain;
@@ -116,7 +175,10 @@ export function DeleteDomainModal({
 		"enter",
 		(e) => {
 			e.preventDefault();
-			if (domainToDelete && deleteState === "idle") {
+			if (
+				deleteState === "idle" &&
+				(isBulk ? bulkDomainsToDelete.length > 0 : !!domainToDelete)
+			) {
 				void handleDelete();
 			}
 		},
@@ -129,6 +191,28 @@ export function DeleteDomainModal({
 		deleteStateRef.current = deleteState;
 	}, [deleteState]);
 
+	const title = isBulk
+		? `Delete ${bulkDomainsToDelete.length || "selected"} domains`
+		: "Delete domain";
+
+	const description = isBulk ? (
+		<>
+			Deleting{" "}
+			<span className="font-semibold">
+				{bulkDomainsToDelete.length} domain
+				{bulkDomainsToDelete.length === 1 ? "" : "s"}
+			</span>{" "}
+			will stop email sending and receiving immediately. This action cannot be
+			undone.
+		</>
+	) : (
+		<>
+			Deleting{" "}
+			<span className="font-semibold">{domainToDelete?.domain}</span> will stop
+			email sending and receiving immediately. This action cannot be undone.
+		</>
+	);
+
 	return (
 		<Modal.Root
 			open={!!deleteId}
@@ -136,13 +220,22 @@ export function DeleteDomainModal({
 				if (!open) {
 					cancelHold();
 					if (deleteStateRef.current === "success") {
-						const name = targetDomainRef.current?.domain;
-						if (name) onDeleteSuccess?.(name);
+						if (isBulk) {
+							const count =
+								targetBulkDomainsRef.current.length ||
+								bulkDomainsToDelete.length;
+							onDeleteSuccess?.(`${count} domain${count === 1 ? "" : "s"}`);
+							onClearSelection?.();
+						} else {
+							const name = targetDomainRef.current?.domain;
+							if (name) onDeleteSuccess?.(name);
+						}
 					}
 					void setDeleteId(null);
 					setTimeout(() => {
 						setDeleteState("idle");
 						targetDomainRef.current = null;
+						targetBulkDomainsRef.current = [];
 					}, 300);
 				}
 			}}
@@ -154,34 +247,56 @@ export function DeleteDomainModal({
 				{/* Header */}
 				<div className="pr-6">
 					<Modal.Title className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
-						Delete domain
+						{title}
 					</Modal.Title>
 					<p className="mt-2 text-sm text-text-sub-600 leading-relaxed">
-						Deleting{" "}
-						<span className="font-semibold">{domainToDelete?.domain}</span> will
-						stop email sending and receiving immediately. This action cannot be
-						undone.
+						{description}
 					</p>
 				</div>
 
 				{/* Domain Details Card */}
-				<div className="mt-5 rounded-xl border border-stroke-soft-100 bg-bg-weak-50/50 p-4 dark:border-stroke-soft-100/40">
-					<div>
-						<p className="font-normal text-text-sub-600 text-xs">Domain name</p>
-						<p className="mt-0.5 truncate font-medium text-sm text-text-strong-950">
-							{domainToDelete?.domain}
+				{isBulk ? (
+					<div className="mt-5 space-y-2 rounded-xl border border-stroke-soft-100 bg-bg-weak-50/50 p-4 dark:border-stroke-soft-100/40">
+						<p className="font-normal text-text-sub-600 text-xs">
+							Selected domains ({bulkDomainsToDelete.length})
 						</p>
+						<div className="flex flex-wrap gap-1.5 pt-1">
+							{bulkDomainsToDelete.slice(0, 4).map((d) => (
+								<span
+									key={d.id}
+									className="inline-flex items-center rounded-md bg-bg-white-0 px-2 py-1 font-medium text-text-strong-950 text-xs shadow-2xs dark:bg-bg-weak-50/40"
+								>
+									{d.domain}
+								</span>
+							))}
+							{bulkDomainsToDelete.length > 4 ? (
+								<span className="inline-flex items-center rounded-md bg-bg-weak-50 px-2 py-1 font-medium text-text-sub-600 text-xs dark:bg-bg-weak-50/30">
+									+{bulkDomainsToDelete.length - 4} more
+								</span>
+							) : null}
+						</div>
 					</div>
-				</div>
+				) : (
+					<div className="mt-5 rounded-xl border border-stroke-soft-100 bg-bg-weak-50/50 p-4 dark:border-stroke-soft-100/40">
+						<div>
+							<p className="font-normal text-text-sub-600 text-xs">
+								Domain name
+							</p>
+							<p className="mt-0.5 truncate font-medium text-sm text-text-strong-950">
+								{domainToDelete?.domain}
+							</p>
+						</div>
+					</div>
+				)}
 
 				{/* Warning Banner */}
 				<div className="mt-4 rounded-xl border border-[#FBE3B5] bg-[#FEF6E6] p-4 text-[#8A5300] text-xs leading-relaxed dark:border-amber-800/40 dark:bg-amber-950/30 dark:text-amber-200">
 					<span className="font-bold text-[#6D4000] dark:text-amber-100">
 						Important Note:
 					</span>{" "}
-					DNS records for this domain won't be deleted automatically — you'll
-					need to remove them manually from your DNS provider, or email may
-					continue to be routed incorrectly.
+					DNS records for {isBulk ? "these domains" : "this domain"} won't be
+					deleted automatically — you'll need to remove them manually from your
+					DNS provider, or email may continue to be routed incorrectly.
 				</div>
 
 				{/* Footer Actions */}

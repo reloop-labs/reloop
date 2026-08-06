@@ -34,7 +34,7 @@ export function DomainsSummaryCard({ enabled }: { enabled: boolean }) {
 	const { data, isPending } = useDomainsQuery({
 		page: 1,
 		limit: 5,
-		status: "",
+		status: [],
 		q: "",
 		enabled,
 	});

@@ -9,7 +9,8 @@ import type {
 export type DomainsListParams = {
 	page: number;
 	limit: number;
-	status: string;
+	/** Selected status values. Exactly one applies a filter (matches API keys). */
+	status: string[];
 	q: string;
 	enabled?: boolean;
 };
@@ -20,7 +21,10 @@ async function fetchDomainList(
 	const search = new URLSearchParams();
 	search.set("limit", String(params.limit));
 	search.set("page", String(params.page));
-	if (params.status) search.set("status", params.status);
+	// Backend accepts a single status; only apply when exactly one is selected.
+	if (params.status.length === 1 && params.status[0]) {
+		search.set("status", params.status[0]);
+	}
 	if (params.q) search.set("q", params.q);
 	const res = await fetch(`/api/domain/v1/list?${search.toString()}`, {
 		credentials: "include",
@@ -53,7 +57,12 @@ async function fetchNameservers(
 
 export function useDomainsQuery(params: DomainsListParams) {
 	return useQuery({
-		queryKey: queryKeys.domain.list(params),
+		queryKey: queryKeys.domain.list({
+			page: params.page,
+			limit: params.limit,
+			status: [...params.status].sort().join(","),
+			q: params.q,
+		}),
 		queryFn: () => fetchDomainList(params),
 		enabled: params.enabled !== false,
 		placeholderData: (prev) => prev,

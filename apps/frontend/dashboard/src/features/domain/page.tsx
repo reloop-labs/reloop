@@ -1,31 +1,38 @@
 import { Icon } from "@reloop/ui/icon";
 import { AnimatePresence, motion } from "framer-motion";
-import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
+import { useRouter } from "next/navigation";
+import {
+	parseAsArrayOf,
+	parseAsInteger,
+	parseAsString,
+	useQueryState,
+} from "nuqs";
 import { useEffect, useMemo, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import type { CommandAction } from "#/features/dashboard/command-menu";
 import { useRegisterCommandActions } from "#/features/dashboard/command-menu-context";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import { DomainCommonUseCasesSidebar } from "./common-use-cases-sidebar";
-import { DeleteDomainModal } from "./components/delete-domain";
 import { DomainErrorState } from "./components/domain-error-state";
 import { DomainListHeader } from "./components/domain-list-header";
 import { DomainListToolbar } from "./components/domain-list-toolbar";
 import { DomainTable } from "./components/domain-table";
 import { DOMAIN_LEARN_DOCS_URL } from "./dns-provider";
+import { useDomainColumnVisibility } from "./hooks/use-domain-column-visibility";
 import { useDomainsQuery } from "./hooks/use-domains-query";
 
 export function DomainPage() {
+	const router = useRouter();
 	const { hasInitialized, isPending: orgPending } = useActiveOrganization();
-	const [, setNewDomainModal] = useQueryState("new");
 	const [statusFilters] = useQueryState(
 		"status",
-		parseAsString.withDefault(""),
+		parseAsArrayOf(parseAsString).withDefault([]),
 	);
 	const [searchQuery] = useQueryState("q", parseAsString.withDefault(""));
 	const [currentPage] = useQueryState("page", parseAsInteger.withDefault(1));
 	const [pageSize] = useQueryState("limit", parseAsInteger.withDefault(10));
 	const [deletedName, setDeletedName] = useState<string | null>(null);
+	const { columnVisibility, setColumnVisible } = useDomainColumnVisibility();
 
 	const actions = useMemo<CommandAction[]>(
 		() => [
@@ -34,7 +41,7 @@ export function DomainPage() {
 				label: "Add Domain",
 				icon: "plus",
 				shortcut: { label: "C", keys: ["c"] },
-				onSelect: () => void setNewDomainModal("true"),
+				onSelect: () => router.push("/domain/add"),
 			},
 			{
 				id: "open-api-reference",
@@ -55,20 +62,19 @@ export function DomainPage() {
 				shortcut: { label: "D", keys: ["d"] },
 				onSelect: () => window.open(DOMAIN_LEARN_DOCS_URL, "_blank"),
 			},
+			{
+				id: "select-all",
+				label: "Select All",
+				icon: "check-square",
+				shortcut: { label: "⌘A", keys: ["mod+a"] },
+				onSelect: () =>
+					window.dispatchEvent(new CustomEvent("domains:select-all")),
+			},
 		],
-		[setNewDomainModal],
+		[router],
 	);
 
 	useRegisterCommandActions("domains", "Domains", actions);
-
-	useHotkeys(
-		"c",
-		(e) => {
-			e.preventDefault();
-			void setNewDomainModal("true");
-		},
-		{ enableOnFormTags: false, preventDefault: true },
-	);
 
 	useHotkeys(
 		"s",
@@ -79,15 +85,6 @@ export function DomainPage() {
 					detail: { docSection: "domains" },
 				}),
 			);
-		},
-		{ enableOnFormTags: false, preventDefault: true },
-	);
-
-	useHotkeys(
-		"d",
-		(e) => {
-			e.preventDefault();
-			window.open(DOMAIN_LEARN_DOCS_URL, "_blank");
 		},
 		{ enableOnFormTags: false, preventDefault: true },
 	);
@@ -103,7 +100,7 @@ export function DomainPage() {
 	const { data, error, isPending, isFetching } = useDomainsQuery({
 		page: currentPage ?? 1,
 		limit: pageSize ?? 10,
-		status: statusFilters ?? "",
+		status: statusFilters ?? [],
 		q: searchQuery ?? "",
 		enabled: canFetch,
 	});
@@ -113,8 +110,8 @@ export function DomainPage() {
 		<div className="mx-auto max-w-6xl space-y-6 p-6 lg:p-8">
 			<DomainListHeader />
 
-			<div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
-				<div className="lg:col-span-8 xl:col-span-8">
+			<div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
+				<div className="lg:col-span-9 xl:col-span-9">
 					<AnimatePresence>
 						{deletedName && (
 							<motion.div
@@ -127,9 +124,18 @@ export function DomainPage() {
 							>
 								<div className="flex items-center justify-between rounded-xl border border-[#B7F1D0] bg-[#E8FAF0] px-4 py-3 text-[#0F5C34] text-sm dark:border-emerald-800/40 dark:bg-emerald-950/30 dark:text-emerald-200">
 									<span>
-										Domain &quot;
-										<span className="font-semibold">{deletedName}</span>&quot;
-										has been successfully deleted.
+										{deletedName.includes(" domain") ? (
+											<>
+												<span className="font-semibold">{deletedName}</span>{" "}
+												deleted successfully.
+											</>
+										) : (
+											<>
+												Domain &quot;
+												<span className="font-semibold">{deletedName}</span>
+												&quot; has been successfully deleted.
+											</>
+										)}
 									</span>
 									<button
 										type="button"
@@ -147,25 +153,25 @@ export function DomainPage() {
 						<DomainErrorState />
 					) : (
 						<div className="space-y-4">
-							<DomainListToolbar />
+							<DomainListToolbar
+								columnVisibility={columnVisibility}
+								onColumnVisibleChange={setColumnVisible}
+							/>
 							<DomainTable
 								domains={data?.domains || []}
 								total={data?.total || 0}
+								columnVisibility={columnVisibility}
 								isLoading={showLoading}
+								onDeleteSuccess={(name) => setDeletedName(name)}
 							/>
 						</div>
 					)}
 				</div>
 
-				<div className="lg:col-span-4 xl:col-span-4">
+				<div className="lg:col-span-3 xl:col-span-3">
 					<DomainCommonUseCasesSidebar />
 				</div>
 			</div>
-
-			<DeleteDomainModal
-				domains={data?.domains || []}
-				onDeleteSuccess={(name) => setDeletedName(name)}
-			/>
 		</div>
 	);
 }

@@ -41,7 +41,7 @@ export function HomePage() {
 	const domainsQuery = useDomainsQuery({
 		page: 1,
 		limit: 20,
-		status: "",
+		status: [],
 		q: "",
 		enabled: orgReady,
 	});

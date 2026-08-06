@@ -1,162 +1,202 @@
 import { cn } from "@reloop/ui/cn";
-import { Icon } from "@reloop/ui/icon";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-
+import {
+	flexRender,
+	getCoreRowModel,
+	type RowSelectionState,
+	useReactTable,
+	type VisibilityState,
+} from "@tanstack/react-table";
 import { parseAsInteger, useQueryState } from "nuqs";
-import { useState } from "react";
-import { PageSizeDropdown } from "#/features/api-keys/table/page-size-dropdown";
-import { PaginationControls } from "#/features/api-keys/table/pagination-controls";
-import { formatRelativeTime } from "#/utils/format-relative-time";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useHotkeys } from "react-hotkeys-hook";
 import type { Domain } from "../types";
-import { getStatusColorClass, getStatusIcon, getStatusLabel } from "../utils";
-import { DomainDropdown } from "./domain-dropdown";
+import { domainColumns } from "./columns";
+import { getDomainTableGridStyle } from "./constants";
+import { DeleteDomainModal } from "./delete-domain";
+import {
+	type DomainActionsHandlers,
+	DomainDropdown,
+	DomainRowContextMenu,
+} from "./domain-dropdown";
+import { DomainSelectionActionBar } from "./domain-selection-action-bar";
 import { DomainSkeleton } from "./domain-skeleton";
 import { EmptyState } from "./empty-state";
+import { DomainTableFooter } from "./table-footer";
 
 export function DomainTable({
 	domains,
 	total,
+	columnVisibility,
 	isLoading,
 	loadingRows = 4,
+	onDeleteSuccess,
 }: {
 	domains: Domain[];
 	total: number;
+	columnVisibility: VisibilityState;
 	isLoading?: boolean;
 	loadingRows?: number;
+	onDeleteSuccess?: (deletedName: string) => void;
 }) {
-	const router = useRouter();
-	const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
 	const [, setDeleteId] = useQueryState("delete");
-	const [currentPage, setCurrentPage] = useQueryState(
-		"page",
-		parseAsInteger.withDefault(1),
-	);
-	const [pageSize, setPageSize] = useQueryState(
-		"limit",
-		parseAsInteger.withDefault(10),
-	);
+	const [pageSize] = useQueryState("limit", parseAsInteger.withDefault(10));
+	const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
+	const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
 	const totalPages = Math.max(1, Math.ceil(total / (pageSize ?? 10)));
-	const startIndex =
-		total === 0 ? 0 : ((currentPage ?? 1) - 1) * (pageSize ?? 10) + 1;
-	const endIndex = Math.min((currentPage ?? 1) * (pageSize ?? 10), total);
 
-	const goToDomain = (id: string) => {
-		router.push(`/domain/${id}`);
-	};
+	const handleDelete = useCallback(
+		(id: string) => {
+			void setDeleteId(id);
+		},
+		[setDeleteId],
+	);
+
+	const handleOpenChange = useCallback((open: boolean, id: string) => {
+		setActiveDropdownId(open ? id : null);
+	}, []);
+
+	const actionsHandlers = useMemo<DomainActionsHandlers>(
+		() => ({
+			onDelete: handleDelete,
+			onOpenChange: handleOpenChange,
+		}),
+		[handleDelete, handleOpenChange],
+	);
+
+	const table = useReactTable({
+		data: domains,
+		columns: domainColumns,
+		state: { columnVisibility, rowSelection },
+		onColumnVisibilityChange: () => {},
+		onRowSelectionChange: setRowSelection,
+		enableRowSelection: true,
+		getCoreRowModel: getCoreRowModel(),
+		getRowId: (row) => row.id,
+		manualPagination: true,
+		pageCount: totalPages,
+	});
+
+	useHotkeys(
+		"mod+a",
+		(e) => {
+			e.preventDefault();
+			if (domains.length === 0) return;
+			const allSelected = table.getIsAllPageRowsSelected();
+			table.toggleAllPageRowsSelected(!allSelected);
+		},
+		{ enableOnFormTags: false, preventDefault: true },
+	);
+
+	useEffect(() => {
+		const handler = () => {
+			if (domains.length === 0) return;
+			const allSelected = table.getIsAllPageRowsSelected();
+			table.toggleAllPageRowsSelected(!allSelected);
+		};
+		window.addEventListener("domains:select-all", handler);
+		return () => window.removeEventListener("domains:select-all", handler);
+	}, [domains.length, table]);
+
+	const headerGroup = table.getHeaderGroups()[0];
+	const rows = table.getRowModel().rows;
+	const gridStyle = getDomainTableGridStyle(columnVisibility);
+	const selectedRows = table.getFilteredSelectedRowModel().rows;
+	const selectedCount = selectedRows.length;
+	const selectedDomains = useMemo(
+		() => selectedRows.map((row) => row.original),
+		[selectedRows],
+	);
+	const handleClearSelection = useCallback(() => {
+		table.resetRowSelection();
+	}, [table]);
 
 	return (
-		<div className="w-full text-paragraph-sm">
-			<div className="grid grid-cols-[minmax(0,1fr)_120px_140px_32px] items-center rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-4 pt-2.5 pb-5 font-medium text-text-sub-600 dark:border-[#101010] dark:bg-white/[0.03]">
-				<div className="flex items-center gap-1">
-					<Icon name="globe" className="h-3 w-3" />
-					<span className="text-xs">Domain</span>
-				</div>
-				<div className="flex items-center gap-1">
-					<Icon name="activity" className="h-3 w-3" />
-					<span className="text-xs">Status</span>
-				</div>
-				<div className="flex items-center gap-1">
-					<Icon name="clock" className="h-3 w-3" />
-					<span className="text-xs">Created At</span>
-				</div>
-				<div />
-			</div>
-
-			<div className="-mt-2.5 divide-y divide-stroke-soft-100 overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:divide-stroke-soft-100/50 dark:border-stroke-soft-100/40">
-				{isLoading ? (
-					Array.from({ length: loadingRows }).map((_, i) => (
-						// biome-ignore lint/suspicious/noArrayIndexKey: skeleton
-						<DomainSkeleton key={`skeleton-${i}`} />
-					))
-				) : domains.length === 0 ? (
-					<EmptyState />
-				) : (
-					domains.map((domain) => {
-						const isRowActive = activeDropdownId === domain.id;
-						return (
-							<div
-								key={domain.id}
-								className={cn(
-									"grid grid-cols-[minmax(0,1fr)_120px_140px_32px] items-center px-4 py-2 text-left transition-colors",
-									isRowActive && "bg-bg-weak-50/50",
-								)}
-							>
-								<div className="flex min-w-0 items-center gap-2">
-									<Icon
-										name="globe"
-										className={cn(
-											"h-4 w-4 shrink-0",
-											getStatusColorClass(domain.status),
-										)}
-									/>
-									<Link
-										href={`/domain/${domain.id}`}
-										className="truncate font-semibold text-label-sm text-text-strong-950 underline decoration-dotted underline-offset-2 transition-colors hover:text-[#1868DF] dark:hover:text-blue-400"
-									>
-										{domain.domain}
-									</Link>
-								</div>
-								<div className="flex items-center">
-									<div
-										className={cn(
-											"flex items-center gap-2 rounded-lg py-0.5 font-medium text-[13px] capitalize",
-											getStatusColorClass(domain.status),
-										)}
-									>
-										<Icon
-											name={getStatusIcon(domain.status)}
-											className="h-3.5 w-3.5"
-										/>
-										{getStatusLabel(domain.status)}
-									</div>
-								</div>
-								<div>
-									<span className="whitespace-nowrap font-medium text-[13px]">
-										{formatRelativeTime(domain.createdAt)}
-									</span>
-								</div>
-								<div className="flex items-center justify-center text-text-soft-400">
-									<DomainDropdown
-										domainId={domain.id}
-										domainName={domain.domain}
-										onViewDetails={() => goToDomain(domain.id)}
-										onDelete={(id) => void setDeleteId(id)}
-										onOpenChange={(open) =>
-											setActiveDropdownId(open ? domain.id : null)
-										}
-									/>
-								</div>
-							</div>
-						);
-					})
-				)}
-
-				{total > 0 && (
-					<div className="flex items-center justify-between px-4 py-2 text-label-xs text-text-sub-600">
-						<div className="flex items-center">
-							<span>
-								Showing {startIndex}–{endIndex} of {total} domain
-								{total !== 1 ? "s" : ""}
-							</span>
-							<PageSizeDropdown
-								value={pageSize ?? 10}
-								onValueChange={(value) => {
-									void setPageSize(value);
-									void setCurrentPage(1);
-								}}
-							/>
+		<>
+			<div className="w-full text-paragraph-sm">
+				<div
+					style={gridStyle}
+					className="grid items-center rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-4 pt-2.5 pb-5 font-medium text-text-sub-600 text-xs dark:border-[#101010] dark:bg-bg-weak-50/40"
+				>
+					{headerGroup?.headers.map((header) => (
+						<div key={header.id} className="flex items-center gap-1">
+							{header.isPlaceholder
+								? null
+								: flexRender(
+										header.column.columnDef.header,
+										header.getContext(),
+									)}
 						</div>
-						<PaginationControls
-							currentPage={currentPage ?? 1}
-							totalPages={totalPages}
-							onPageChange={(p) => void setCurrentPage(p)}
-							isLoading={isLoading}
+					))}
+					<div />
+				</div>
+
+				<div className="-mt-2.5 divide-y divide-stroke-soft-100 overflow-visible rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:divide-stroke-soft-100/50 dark:border-stroke-soft-100/40">
+					{isLoading && domains.length === 0 ? (
+						<DomainSkeleton
+							rows={loadingRows}
+							columnVisibility={columnVisibility}
 						/>
-					</div>
-				)}
+					) : rows.length === 0 ? (
+						<EmptyState />
+					) : (
+						rows.map((row) => {
+							const domain = row.original;
+							const isRowActive = activeDropdownId === domain.id;
+							return (
+								<DomainRowContextMenu
+									key={row.id}
+									domain={domain}
+									handlers={actionsHandlers}
+								>
+									<div
+										style={gridStyle}
+										data-state={row.getIsSelected() ? "selected" : undefined}
+										className={cn(
+											"group/row grid w-full items-center px-4 py-2 text-left",
+											"hover:bg-bg-weak-50",
+											(isRowActive || row.getIsSelected()) &&
+												"bg-bg-weak-50/50",
+										)}
+									>
+										{row.getVisibleCells().map((cell) => (
+											<div key={cell.id}>
+												{flexRender(
+													cell.column.columnDef.cell,
+													cell.getContext(),
+												)}
+											</div>
+										))}
+										<div
+											onClick={(e) => e.stopPropagation()}
+											onKeyDown={(e) => e.stopPropagation()}
+										>
+											<DomainDropdown
+												domain={domain}
+												handlers={actionsHandlers}
+											/>
+										</div>
+									</div>
+								</DomainRowContextMenu>
+							);
+						})
+					)}
+
+					<DomainTableFooter
+						total={total}
+						selectedCount={selectedCount}
+						pageRowCount={rows.length}
+						isLoading={isLoading}
+					/>
+				</div>
 			</div>
-		</div>
+			<DomainSelectionActionBar table={table} />
+			<DeleteDomainModal
+				domains={domains}
+				selectedDomains={selectedDomains}
+				onClearSelection={handleClearSelection}
+				onDeleteSuccess={onDeleteSuccess}
+			/>
+		</>
 	);
 }
