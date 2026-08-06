@@ -1,5 +1,6 @@
 import { BusEvent, bus } from "@reloop/bus";
 import { ensureReceivingMxRecord } from "@reloop/domain/utils/ensure-receiving-mx";
+import { ensureTrackingCnameRecord } from "@reloop/domain/utils/ensure-tracking-cname";
 import { DOMAIN_VERIFY_WEBHOOK_EVENT } from "@reloop/webhook-events";
 
 import { useLogger } from "evlog/elysia";
@@ -23,6 +24,8 @@ export async function verifyDNSRecordController({
 			organizationId,
 		});
 
+		let repaired = false;
+
 		// Repair legacy receiving MX (wrong name/value) so verification and the
 		// dashboard show the apex/@ → inbound.{HOST_DOMAIN} record users must add.
 		if (domainWithRecords.isReceivingEmailEnabled) {
@@ -32,6 +35,25 @@ export async function verifyDNSRecordController({
 				userId: domainWithRecords.userId,
 				domain: domainWithRecords.domain,
 			});
+			repaired = true;
+		}
+
+		// Repair / create tracking CNAME for click + open tracking.
+		if (
+			domainWithRecords.isClickTrackingEnabled ||
+			domainWithRecords.isOpenTrackingEnabled
+		) {
+			await ensureTrackingCnameRecord({
+				domainId,
+				organizationId,
+				userId: domainWithRecords.userId,
+				domain: domainWithRecords.domain,
+				trackingSubdomain: domainWithRecords.trackingSubdomain,
+			});
+			repaired = true;
+		}
+
+		if (repaired) {
 			({ domainWithRecords } = await fetchDomain_step1({
 				domainId,
 				organizationId,

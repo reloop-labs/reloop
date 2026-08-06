@@ -70,7 +70,7 @@ export const domain = pgTable(
 			.default("inbound"),
 		trackingSubdomain: varchar("tracking_subdomain", { length: 255 })
 			.notNull()
-			.default("tracking"),
+			.default("link"),
 		isClickTrackingEnabled: boolean("is_click_tracking_enabled")
 			.notNull()
 			.default(false),

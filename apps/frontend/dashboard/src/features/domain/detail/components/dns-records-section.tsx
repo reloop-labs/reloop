@@ -153,55 +153,54 @@ export const DNSRecordsSection = ({
 				</div>
 			)}
 
-			{/* Tracking Group */}
-			{trackingRecords.length > 0 && (
-				<div className="rounded-2xl border border-stroke-soft-100 p-4 dark:border-stroke-soft-100/10">
-					<div className="flex items-center justify-between">
-						<div className="flex items-center gap-2 text-base text-text-strong-950">
-							<Icon name="graph-up" className="h-4 w-4 text-text-sub-600" />
-							<h3 className="font-semibold">Tracking</h3>
-						</div>
-						<Switch.Root
-							checked={
-								domain?.isClickTrackingEnabled || domain?.isOpenTrackingEnabled
-							}
-							onCheckedChange={(checked) =>
-								handleUpdateDomain(
-									{
-										isClickTrackingEnabled: checked,
-										isOpenTrackingEnabled: checked,
-									},
-									checked
-										? "Tracking enabled successfully"
-										: "Tracking disabled successfully",
-								)
-							}
-						/>
+			{/* Tracking Group — always show so users can enable click/open tracking
+			    and see the CNAME they need to add (mirrors Email Sending). */}
+			<div className="rounded-2xl border border-stroke-soft-100 p-4 dark:border-stroke-soft-100/10">
+				<div className="flex items-center justify-between">
+					<div className="flex items-center gap-2 text-base text-text-strong-950">
+						<Icon name="graph-up" className="h-4 w-4 text-text-sub-600" />
+						<h3 className="font-semibold">Tracking</h3>
 					</div>
-					<AnimatePresence initial={false}>
-						{(domain?.isClickTrackingEnabled ||
-							domain?.isOpenTrackingEnabled) && (
-							<motion.div
-								initial={{ height: 0, opacity: 0 }}
-								animate={{ height: "auto", opacity: 1 }}
-								exit={{ height: 0, opacity: 0 }}
-								transition={{ duration: 0.2, ease: "easeInOut" }}
-								className="mt-4 overflow-hidden"
-							>
-								<div>
-									<DNSRecordSectionGroup
-										title="CNAME"
-										docsUrl="https://reloop.sh/docs/dns/cname"
-										records={trackingRecords}
-										isLoading={!!isLoading}
-										tableId="cname-"
-									/>
-								</div>
-							</motion.div>
-						)}
-					</AnimatePresence>
+					<Switch.Root
+						checked={
+							domain?.isClickTrackingEnabled || domain?.isOpenTrackingEnabled
+						}
+						onCheckedChange={(checked) =>
+							handleUpdateDomain(
+								{
+									isClickTrackingEnabled: checked,
+									isOpenTrackingEnabled: checked,
+								},
+								checked
+									? "Tracking enabled successfully"
+									: "Tracking disabled successfully",
+							)
+						}
+					/>
 				</div>
-			)}
+				<AnimatePresence initial={false}>
+					{(domain?.isClickTrackingEnabled ||
+						domain?.isOpenTrackingEnabled) && (
+						<motion.div
+							initial={{ height: 0, opacity: 0 }}
+							animate={{ height: "auto", opacity: 1 }}
+							exit={{ height: 0, opacity: 0 }}
+							transition={{ duration: 0.2, ease: "easeInOut" }}
+							className="mt-4 overflow-hidden"
+						>
+							<div>
+								<DNSRecordSectionGroup
+									title="CNAME"
+									docsUrl="https://reloop.sh/docs/dns/cname"
+									records={trackingRecords}
+									isLoading={!!isLoading}
+									tableId="cname-"
+								/>
+							</div>
+						</motion.div>
+					)}
+				</AnimatePresence>
+			</div>
 		</div>
 	);
 };

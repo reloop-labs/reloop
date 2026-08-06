@@ -3,11 +3,14 @@ import { cn } from "@reloop/ui/cn";
 import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
 import * as Switch from "@reloop/ui/switch";
-import { useRef, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { useMemo, useRef, useState } from "react";
 import type { DomainResponse } from "#/features/domain/types";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import { useClipboard } from "../hooks/use-clipboard";
 import { useDomainActions } from "../hooks/use-domain-actions";
+import { groupDomainDnsRecords } from "./dns-record-groups";
+import { DNSRecordTable } from "./dns-record-table";
 
 interface DomainConfigurationSectionProps {
 	domain?: DomainResponse;
@@ -22,6 +25,10 @@ export const DomainConfigurationSection = ({
 	const domainId = domainIdProp || domain?.id;
 	const { handleUpdateDomain } = useDomainActions(domainId, domain);
 	const { copiedItems, copyToClipboard } = useClipboard();
+	const { trackingRecords } = useMemo(
+		() => groupDomainDnsRecords(domain?.dnsRecords),
+		[domain?.dnsRecords],
+	);
 
 	const [isTLSOpen, setIsTLSOpen] = useState(false);
 	const [tlsHoverIdx, setTlsHoverIdx] = useState<number | undefined>(undefined);
@@ -85,6 +92,7 @@ export const DomainConfigurationSection = ({
 
 	const isClickTrackingEnabled = domain?.isClickTrackingEnabled ?? false;
 	const isOpenTrackingEnabled = domain?.isOpenTrackingEnabled ?? false;
+	const trackingEnabled = isClickTrackingEnabled || isOpenTrackingEnabled;
 
 	return (
 		<div className="mt-6 mb-24 space-y-6">
@@ -130,70 +138,120 @@ export const DomainConfigurationSection = ({
 				</div>
 			</div>
 
-			{/* Click Tracking Card */}
-			<div
-				onClick={() =>
-					!isLoading &&
-					!isClickTrackingPending &&
-					onToggleClickTracking(!isClickTrackingEnabled)
-				}
-				className={cn(
-					"cursor-pointer select-none rounded-2xl border border-stroke-soft-100 bg-bg-white-0 p-4 transition-colors duration-300 hover:bg-bg-weak-50/10 dark:border-stroke-soft-100/10 dark:hover:bg-bg-weak-50/5",
-					clickTrackingFlash && "bg-success-base/10 dark:bg-success-base/20",
-				)}
-			>
-				<div className="flex items-center justify-between">
-					<div className="flex items-center gap-2 text-base text-text-strong-950">
-						<Icon name="link" className="h-4 w-4 text-text-sub-600" />
-						<h3 className="font-semibold text-sm">Click Tracking</h3>
-					</div>
-					<div onClick={(e) => e.stopPropagation()}>
-						<Switch.Root
-							checked={isClickTrackingEnabled}
-							onCheckedChange={onToggleClickTracking}
-							disabled={isLoading || isClickTrackingPending}
-							isPending={isClickTrackingPending}
-						/>
-					</div>
+			{/* Combined Click + Open Tracking Card */}
+			<div className="rounded-2xl border border-stroke-soft-100 bg-bg-white-0 p-4 dark:border-stroke-soft-100/10">
+				<div className="mb-3 flex items-center gap-2 text-base text-text-strong-950">
+					<Icon name="graph-up" className="h-4 w-4 text-text-sub-600" />
+					<h3 className="font-semibold text-sm">Click & Open Tracking</h3>
 				</div>
-				<p className="mt-3 max-w-2xl text-paragraph-xs text-text-sub-600 leading-relaxed">
-					To track clicks, Reloop rewrites each link in your email to pass
-					through our servers. When a recipient clicks a link, they are
-					immediately redirected to the original destination URL.
+				<p className="mb-4 max-w-2xl text-paragraph-xs text-text-sub-600 leading-relaxed">
+					Click and open tracking share one CNAME record. Enable either feature,
+					then add the record below at your DNS provider.
 				</p>
-			</div>
 
-			{/* Open Tracking Card */}
-			<div
-				onClick={() =>
-					!isLoading &&
-					!isOpenTrackingPending &&
-					onToggleOpenTracking(!isOpenTrackingEnabled)
-				}
-				className={cn(
-					"cursor-pointer select-none rounded-2xl border border-stroke-soft-100 bg-bg-white-0 p-4 transition-colors duration-300 hover:bg-bg-weak-50/10 dark:border-stroke-soft-100/10 dark:hover:bg-bg-weak-50/5",
-					openTrackingFlash && "bg-success-base/10 dark:bg-success-base/20",
-				)}
-			>
-				<div className="flex items-center justify-between">
-					<div className="flex items-center gap-2 text-base text-text-strong-950">
-						<Icon name="mail-single" className="h-4 w-4 text-text-sub-600" />
-						<h3 className="font-semibold text-sm">Open Tracking</h3>
+				<div className="space-y-3">
+					{/* Click Tracking toggle row */}
+					<div
+						onClick={() =>
+							!isLoading &&
+							!isClickTrackingPending &&
+							onToggleClickTracking(!isClickTrackingEnabled)
+						}
+						className={cn(
+							"cursor-pointer select-none rounded-xl border border-stroke-soft-100 p-3 transition-colors duration-300 hover:bg-bg-weak-50/10 dark:border-stroke-soft-100/10 dark:hover:bg-bg-weak-50/5",
+							clickTrackingFlash && "bg-success-base/10 dark:bg-success-base/20",
+						)}
+					>
+						<div className="flex items-center justify-between">
+							<div className="flex items-center gap-2 text-base text-text-strong-950">
+								<Icon name="link" className="h-4 w-4 text-text-sub-600" />
+								<span className="font-semibold text-sm">Click Tracking</span>
+							</div>
+							<div onClick={(e) => e.stopPropagation()}>
+								<Switch.Root
+									checked={isClickTrackingEnabled}
+									onCheckedChange={onToggleClickTracking}
+									disabled={isLoading || isClickTrackingPending}
+									isPending={isClickTrackingPending}
+								/>
+							</div>
+						</div>
+						<p className="mt-2 max-w-2xl text-paragraph-xs text-text-sub-600 leading-relaxed">
+							Rewrites links in your email so clicks pass through Reloop, then
+							redirect to the original URL.
+						</p>
 					</div>
-					<div onClick={(e) => e.stopPropagation()}>
-						<Switch.Root
-							checked={isOpenTrackingEnabled}
-							onCheckedChange={onToggleOpenTracking}
-							disabled={isLoading || isOpenTrackingPending}
-							isPending={isOpenTrackingPending}
-						/>
+
+					{/* Open Tracking toggle row */}
+					<div
+						onClick={() =>
+							!isLoading &&
+							!isOpenTrackingPending &&
+							onToggleOpenTracking(!isOpenTrackingEnabled)
+						}
+						className={cn(
+							"cursor-pointer select-none rounded-xl border border-stroke-soft-100 p-3 transition-colors duration-300 hover:bg-bg-weak-50/10 dark:border-stroke-soft-100/10 dark:hover:bg-bg-weak-50/5",
+							openTrackingFlash && "bg-success-base/10 dark:bg-success-base/20",
+						)}
+					>
+						<div className="flex items-center justify-between">
+							<div className="flex items-center gap-2 text-base text-text-strong-950">
+								<Icon
+									name="mail-single"
+									className="h-4 w-4 text-text-sub-600"
+								/>
+								<span className="font-semibold text-sm">Open Tracking</span>
+							</div>
+							<div onClick={(e) => e.stopPropagation()}>
+								<Switch.Root
+									checked={isOpenTrackingEnabled}
+									onCheckedChange={onToggleOpenTracking}
+									disabled={isLoading || isOpenTrackingPending}
+									isPending={isOpenTrackingPending}
+								/>
+							</div>
+						</div>
+						<p className="mt-2 max-w-2xl text-paragraph-xs text-text-sub-600 leading-relaxed">
+							Inserts a 1×1 transparent pixel with a unique reference. Results
+							can be inaccurate.
+						</p>
 					</div>
 				</div>
-				<p className="mt-3 max-w-2xl text-paragraph-xs text-text-sub-600 leading-relaxed">
-					A 1x1 pixel transparent GIF image is inserted in each email and
-					includes a unique reference. Open tracking can produce inaccurate
-					results.
-				</p>
+
+				<AnimatePresence initial={false}>
+					{(trackingEnabled || trackingRecords.length > 0) && (
+						<motion.div
+							initial={{ height: 0, opacity: 0 }}
+							animate={{ height: "auto", opacity: 1 }}
+							exit={{ height: 0, opacity: 0 }}
+							transition={{ duration: 0.2, ease: "easeInOut" }}
+							className="mt-4 overflow-hidden"
+						>
+							<div className="mb-3 flex items-start justify-between gap-4">
+								<a
+									href="https://reloop.sh/docs/dns/cname"
+									target="_blank"
+									rel="noreferrer"
+									className="group flex items-center gap-1 hover:underline"
+								>
+									<span className="font-medium text-sm text-text-strong-950">
+										CNAME
+									</span>
+									<Icon
+										name="arrow-up-right"
+										className="h-2.5 w-2.5 stroke-[2.5] text-text-sub-600"
+									/>
+								</a>
+							</div>
+							<DNSRecordTable
+								records={trackingRecords}
+								isLoading={!!isLoading}
+								loadingRows={trackingRecords.length || 1}
+								tableId="config-cname-"
+							/>
+						</motion.div>
+					)}
+				</AnimatePresence>
 			</div>
 
 			{/* TLS Mode Card */}

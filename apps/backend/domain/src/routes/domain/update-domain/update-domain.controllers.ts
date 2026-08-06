@@ -3,6 +3,7 @@ import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { DomainErrors } from "@reloop/domain/error/domain.error-response";
 import type { DomainTypes } from "@reloop/domain/types/domain.type";
+import { ensureTrackingCnameRecord } from "@reloop/domain/utils/ensure-tracking-cname";
 import { DOMAIN_UPDATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
 
@@ -104,18 +105,31 @@ export async function updateDomainController({
 					and(
 						eq(schema.domainDnsRecord.domainId, domainId),
 						eq(schema.domainDnsRecord.recordType, "CNAME"),
+						eq(schema.domainDnsRecord.purpose, "tracking"),
 					),
 				);
-		} else if (shouldReverify && trackingEnabled) {
-			await db
-				.update(schema.domainDnsRecord)
-				.set({ status: "verifying" })
-				.where(
-					and(
-						eq(schema.domainDnsRecord.domainId, domainId),
-						eq(schema.domainDnsRecord.recordType, "CNAME"),
-					),
-				);
+		} else if (trackingEnabled) {
+			// Ensure the click/open tracking CNAME exists before verify or UI load.
+			await ensureTrackingCnameRecord({
+				domainId,
+				organizationId,
+				userId: existingDomain.userId,
+				domain: existingDomain.domain,
+				trackingSubdomain: existingDomain.trackingSubdomain,
+			});
+
+			if (shouldReverify) {
+				await db
+					.update(schema.domainDnsRecord)
+					.set({ status: "verifying" })
+					.where(
+						and(
+							eq(schema.domainDnsRecord.domainId, domainId),
+							eq(schema.domainDnsRecord.recordType, "CNAME"),
+							eq(schema.domainDnsRecord.purpose, "tracking"),
+						),
+					);
+			}
 		}
 
 		if (shouldReverify) {
