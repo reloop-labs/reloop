@@ -137,7 +137,7 @@ export function WebhookSecretEvents({
 
 	return (
 		<>
-			<div className="mt-8 grid gap-4 lg:grid-cols-2">
+			<div className="grid gap-4 lg:grid-cols-2">
 				{/* Signing secret */}
 				<div className="overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-bg-white-0/5">
 					<div className="space-y-3 p-4">

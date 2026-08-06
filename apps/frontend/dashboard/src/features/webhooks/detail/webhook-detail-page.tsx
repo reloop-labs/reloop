@@ -77,7 +77,7 @@ export function WebhookDetailPage({ webhookId }: { webhookId: string }) {
 
 	return (
 		<>
-			<div className="mx-auto max-w-5xl px-6 pb-12 sm:px-8">
+			<div className="mx-auto max-w-5xl space-y-8 px-6 pb-12 sm:px-8 pt-8">
 				<WebhookHeader
 					webhook={data}
 					isLoading={isLoading}
@@ -95,7 +95,6 @@ export function WebhookDetailPage({ webhookId }: { webhookId: string }) {
 				<TabMenu.Root
 					value={tabValue}
 					onValueChange={(v) => void setActiveTab(v)}
-					className="mt-8"
 				>
 					<TabMenu.List className="relative h-12 gap-0 border-b! py-0">
 						{TABS.map((tab, index) => (

@@ -1,10 +1,8 @@
 import * as Button from "@reloop/ui/button";
-import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import axios from "axios";
-import { useRouter } from "next/navigation";
 import { useQueryState } from "nuqs";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -28,7 +26,6 @@ export function ApiKeyHeader({
 	onRetry?: () => void;
 	onDeleteApiKey?: () => void;
 }) {
-	const router = useRouter();
 	const invalidate = useInvalidateApiKeys();
 	const [, setRotateId] = useQueryState("rotate");
 	const [, setEditId] = useQueryState("edit");
@@ -100,7 +97,7 @@ export function ApiKeyHeader({
 
 	if (!apiKey && !isLoading) {
 		return (
-			<div className="pt-8 pb-2">
+			<div>
 				<div className="flex items-center justify-between">
 					<div>
 						<div className="flex items-center gap-1.5 text-error-base">
@@ -118,52 +115,33 @@ export function ApiKeyHeader({
 
 	const displayName =
 		apiKey?.name || apiKey?.start || apiKey?.prefix || "Unnamed";
-	const displayPrefix = apiKey?.start || apiKey?.prefix || "—";
 
 	return (
-		<div className="pt-8 pb-2">
-			<div className="flex items-start justify-between gap-4">
-				<div className="min-w-0">
+		<div>
+			<div className="flex items-center justify-between">
+				<div>
 					{isLoading ? (
 						<div className="flex items-center gap-3">
-							<Skeleton className="h-10 w-10 shrink-0 rounded-[12px]" />
+							<Skeleton className="h-12 w-12 shrink-0 rounded-[14px]" />
 							<div className="flex min-w-0 flex-col gap-1.5">
-								<div className="flex items-center gap-2">
-									<Skeleton className="h-6 w-40 rounded-lg" />
-									<Skeleton className="h-5 w-16 rounded-full" />
-								</div>
-								<Skeleton className="h-4 w-48 rounded-lg" />
+								<Skeleton className="h-4 w-14 rounded-full" />
+								<Skeleton className="h-6 w-48 rounded-lg" />
 							</div>
 						</div>
 					) : (
 						<div className="flex min-w-0 items-center gap-3">
 							<ApiKeyAvatar
 								seed={apiKey?.id || displayName}
-								size="md"
+								size="lg"
 								alt={`${displayName} avatar`}
 							/>
 							<div className="min-w-0">
-								<div className="flex min-w-0 flex-wrap items-center gap-2">
-									<h1 className="truncate font-semibold text-text-strong-950 text-title-h6 leading-8 tracking-tight">
-										{displayName}
-									</h1>
-									{apiKey ? (
-										<span
-											className={cn(
-												"inline-flex shrink-0 items-center rounded-full px-2 py-0.5 font-medium text-[11px]",
-												apiKey.enabled
-													? "bg-success-lighter text-success-base"
-													: "bg-error-lighter text-error-base",
-											)}
-										>
-											{apiKey.enabled ? "Active" : "Disabled"}
-										</span>
-									) : null}
-								</div>
-								<p className="truncate font-medium font-mono text-[13px] text-text-sub-600 leading-snug">
-									{displayPrefix}
-									{displayPrefix !== "—" ? "…" : ""}
+								<p className="font-medium text-paragraph-xs text-text-sub-600">
+									API Key
 								</p>
+								<h1 className="mb-0.5 truncate font-semibold text-title-h6 leading-5">
+									{displayName}
+								</h1>
 							</div>
 						</div>
 					)}

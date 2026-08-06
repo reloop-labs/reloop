@@ -284,7 +284,7 @@ export function ApiKeyDetailPage({ apiKeyId }: { apiKeyId: string }) {
 
 	return (
 		<>
-			<div className="mx-auto max-w-5xl px-6 pb-12 sm:px-8">
+			<div className="mx-auto max-w-5xl space-y-8 px-6 pb-12 sm:px-8 pt-8">
 				<ApiKeyHeader
 					apiKey={data}
 					isLoading={isLoading}
@@ -297,7 +297,7 @@ export function ApiKeyDetailPage({ apiKeyId }: { apiKeyId: string }) {
 
 				<ApiKeySummary apiKey={data} isLoading={isLoading} />
 
-				<section className="mt-8">
+				<section>
 					<ActivitySection actorId={data?.id} />
 				</section>
 			</div>

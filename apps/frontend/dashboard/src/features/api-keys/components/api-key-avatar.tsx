@@ -1,57 +1,56 @@
-import { createAvatar } from "@dicebear/core";
-import * as shapes from "@dicebear/shapes";
 import { cn } from "@reloop/ui/cn";
-import { useMemo } from "react";
+import { Icon } from "@reloop/ui/icon";
 
-type ApiKeyAvatarSize = "sm" | "md" | "lg";
+type ApiKeyAvatarSize = "sm" | "md" | "lg" | "xl";
 
-const SIZE_PX: Record<ApiKeyAvatarSize, number> = {
-	sm: 28,
-	md: 40,
-	lg: 48,
-};
-
-const SIZE_CLASS: Record<ApiKeyAvatarSize, string> = {
-	sm: "h-7 w-7 rounded-lg",
-	md: "h-10 w-10 rounded-[12px]",
-	lg: "h-12 w-12 rounded-[14px]",
+const SIZE_CLASS: Record<
+	ApiKeyAvatarSize,
+	{ container: string; icon: string }
+> = {
+	sm: {
+		container: "h-8 w-8 rounded-lg",
+		icon: "h-4 w-4",
+	},
+	md: {
+		container: "h-10 w-10 rounded-[12px]",
+		icon: "h-5 w-5",
+	},
+	lg: {
+		container: "h-12 w-12 rounded-[14px]",
+		icon: "h-6 w-6",
+	},
+	xl: {
+		container: "h-14 w-14 rounded-[16px]",
+		icon: "h-7 w-7",
+	},
 };
 
 /**
- * Deterministic DiceBear "shapes" avatar for an API key seed (id preferred).
+ * Key icon inside a bordered card container (matches DomainAvatar).
  */
 export function ApiKeyAvatar({
-	seed,
-	size = "md",
+	size = "lg",
 	className,
-	alt = "API key avatar",
 }: {
-	seed: string;
+	seed?: string;
 	size?: ApiKeyAvatarSize;
 	className?: string;
 	alt?: string;
 }) {
-	const src = useMemo(() => {
-		const px = SIZE_PX[size];
-		return createAvatar(shapes, {
-			seed: seed || "api-key",
-			size: px,
-			radius: 20,
-		}).toDataUri();
-	}, [seed, size]);
+	const sizeConfig = SIZE_CLASS[size];
 
 	return (
-		<img
-			src={src}
-			alt={alt}
-			width={SIZE_PX[size]}
-			height={SIZE_PX[size]}
-			draggable={false}
+		<div
 			className={cn(
-				"shrink-0 select-none bg-bg-weak-50 ring-1 ring-stroke-soft-100/80 dark:ring-stroke-soft-100/40",
-				SIZE_CLASS[size],
+				"flex shrink-0 items-center justify-center border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/20",
+				sizeConfig.container,
 				className,
 			)}
-		/>
+		>
+			<Icon
+				name="key-new"
+				className={cn("text-text-sub-600 dark:text-white/80", sizeConfig.icon)}
+			/>
+		</div>
 	);
 }

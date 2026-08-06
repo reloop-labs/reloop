@@ -94,7 +94,7 @@ export function ApiKeySummary({
 	};
 
 	return (
-		<div className="mt-8 grid gap-4 lg:grid-cols-2">
+		<div className="grid gap-4 lg:grid-cols-2">
 			{/* Usage snapshot */}
 			<div className="overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-bg-white-0/5">
 				<div className="space-y-3 p-4">
@@ -105,25 +105,18 @@ export function ApiKeySummary({
 						</p>
 					</div>
 
-					<div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+					<div className="grid grid-cols-2 gap-4">
 						<StatItem
 							label="Requests"
 							value={(apiKey?.requestCount || 0).toLocaleString()}
 							isLoading={isLoading}
 						/>
 						<StatItem
-							label="Last used"
+							label="Expires"
 							value={
-								apiKey?.lastRequest
-									? formatRelativeTime(apiKey.lastRequest)
-									: "No activity"
-							}
-							isLoading={isLoading}
-						/>
-						<StatItem
-							label="Created"
-							value={
-								apiKey?.createdAt ? formatRelativeTime(apiKey.createdAt) : "—"
+								apiKey?.expiresAt
+									? formatRelativeTime(apiKey.expiresAt)
+									: "Never"
 							}
 							isLoading={isLoading}
 						/>
