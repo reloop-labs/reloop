@@ -9,26 +9,26 @@ const SIZE_CLASS: Record<
 > = {
 	sm: {
 		container: "h-8 w-8 rounded-lg",
-		pad: "p-0.5",
+		pad: "p-px",
 		inner: "rounded-[5px]",
 		icon: "h-3.5 w-3.5",
 	},
 	md: {
 		container: "h-10 w-10 rounded-[12px]",
-		pad: "p-[3px]",
+		pad: "p-0.5",
 		inner: "rounded-[9px]",
 		icon: "h-4 w-4",
 	},
 	lg: {
 		container: "h-12 w-12 rounded-[14px]",
-		pad: "p-1",
-		inner: "rounded-[10px]",
+		pad: "p-0.5",
+		inner: "rounded-[11px]",
 		icon: "h-5 w-5",
 	},
 	xl: {
 		container: "h-14 w-14 rounded-[16px]",
-		pad: "p-1",
-		inner: "rounded-[12px]",
+		pad: "p-0.5",
+		inner: "rounded-[13px]",
 		icon: "h-6 w-6",
 	},
 };
