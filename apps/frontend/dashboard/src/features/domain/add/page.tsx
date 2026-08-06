@@ -13,6 +13,7 @@ import { useState } from "react";
 import type { Resolver } from "react-hook-form";
 import { useForm } from "react-hook-form";
 import { useHotkeys } from "react-hotkeys-hook";
+import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { DomainPreview } from "#/features/onboarding/domain-preview";
 import { useInvalidateDomains } from "../hooks/use-domains-query";
 import type { DomainListResponse, DomainResponse } from "../types";
@@ -21,6 +22,10 @@ import { AdvancedOptions } from "./components/advanced-options";
 import { DomainInputField } from "./components/domain-input-field";
 import type { DomainFormValues } from "./schema";
 import { domainSchema } from "./schema";
+
+/** Light keycap so it reads on the blue FancyButton fill. */
+const actionKbdOnBlueClassName =
+	"border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]";
 
 export function AddDomainPage() {
 	const router = useRouter();
@@ -103,19 +108,8 @@ export function AddDomainPage() {
 	};
 
 	useHotkeys(
-		"mod+enter",
+		"mod+backspace",
 		(e) => {
-			e.preventDefault();
-			if (status !== "loading") {
-				void handleSubmit(onSubmit)();
-			}
-		},
-		{ enableOnFormTags: true },
-	);
-
-	useHotkeys(
-		"esc",
-		() => {
 			if (
 				document.querySelector(
 					'[role="dialog"], [role="alertdialog"], [data-radix-popper-content-wrapper]',
@@ -123,9 +117,11 @@ export function AddDomainPage() {
 			) {
 				return;
 			}
+			e.preventDefault();
 			router.push("/domain");
 		},
-		{ enableOnFormTags: true },
+		// Allow cancel while the domain field is focused (overrides native ⌘⌫).
+		{ enableOnFormTags: true, preventDefault: true },
 	);
 
 	return (
@@ -225,16 +221,9 @@ export function AddDomainPage() {
 									) : (
 										<>
 											<span>Add Domain</span>
-											<span className="inline-flex items-center gap-0.5">
-												<Icon
-													name="command"
-													className="h-3.5 w-3.5 rounded-sm border border-white/20 p-px"
-												/>
-												<Icon
-													name="enter"
-													className="h-3.5 w-3.5 rounded-sm border border-white/20 p-px"
-												/>
-											</span>
+											<ActionKbd className={actionKbdOnBlueClassName}>
+												↵
+											</ActionKbd>
 										</>
 									)}
 								</motion.span>
@@ -246,12 +235,13 @@ export function AddDomainPage() {
 							size="small"
 							asChild
 							disabled={status === "loading"}
-							className="rounded-xl"
+							className="gap-1.5 rounded-xl"
 						>
 							<Link href="/domain">
 								Cancel
-								<span className="flex h-[19px] w-7 items-center justify-center rounded-[5px] border border-stroke-soft-100 bg-bg-weak-50/50 p-px font-medium text-[10px]">
-									Esc
+								<span className="inline-flex items-center gap-0.5">
+									<ActionKbd className="w-auto min-w-0 px-1">⌘</ActionKbd>
+									<ActionKbd className="w-auto min-w-0 px-1">⌫</ActionKbd>
 								</span>
 							</Link>
 						</Button.Root>
