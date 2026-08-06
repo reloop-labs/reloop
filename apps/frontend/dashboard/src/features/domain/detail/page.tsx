@@ -8,6 +8,7 @@ import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import type { CommandAction } from "#/features/dashboard/command-menu";
 import { useRegisterCommandActions } from "#/features/dashboard/command-menu-context";
+import { ShortcutHint } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import { DomainErrorState } from "../components/domain-error-state";
 import { DomainNotFound } from "../components/domain-not-found";
@@ -38,8 +39,13 @@ export function DomainDetailPage({
 	const buttonRefs = React.useRef<HTMLButtonElement[]>([]);
 
 	const tabs = [
-		{ id: "dns", label: "DNS Records", icon: "file-text" },
-		{ id: "configuration", label: "Configuration", icon: "sliders-horiz-2" },
+		{ id: "dns", label: "DNS Records", icon: "file-text", shortcut: "1" },
+		{
+			id: "configuration",
+			label: "Configuration",
+			icon: "sliders-horiz-2",
+			shortcut: "2",
+		},
 	];
 
 	const activeIndex = tabs.findIndex((t) => t.id === activeTab);
@@ -133,6 +139,24 @@ export function DomainDetailPage({
 		{ enableOnFormTags: false, preventDefault: true },
 	);
 
+	useHotkeys(
+		"1",
+		(e) => {
+			e.preventDefault();
+			void setActiveTab("dns");
+		},
+		{ enableOnFormTags: false, preventDefault: true },
+	);
+
+	useHotkeys(
+		"2",
+		(e) => {
+			e.preventDefault();
+			void setActiveTab("configuration");
+		},
+		{ enableOnFormTags: false, preventDefault: true },
+	);
+
 	if (rawDomainId && !domainId) {
 		return (
 			<div className="mx-auto flex min-h-[calc(100vh-200px)] max-w-3xl flex-col items-center justify-center sm:px-8">
@@ -187,6 +211,7 @@ export function DomainDetailPage({
 						>
 							<Icon name={t.icon} className="h-4 w-4" />
 							{t.label}
+							<ShortcutHint>{t.shortcut}</ShortcutHint>
 						</TabMenu.Trigger>
 					))}
 					<AnimatePresence>

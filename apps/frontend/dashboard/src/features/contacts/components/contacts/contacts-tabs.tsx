@@ -4,6 +4,7 @@ import * as TabMenuHorizontal from "@reloop/ui/tab-menu-horizontal";
 import { AnimatePresence, motion } from "motion/react";
 import { usePathname, useRouter } from "next/navigation";
 import { useRef, useState } from "react";
+import { useHotkeys } from "react-hotkeys-hook";
 import { ShortcutHint } from "#/features/dashboard/keyboard-shortcuts-reveal";
 
 const items = [
@@ -12,28 +13,28 @@ const items = [
 		value: "contacts",
 		iconName: "contacts",
 		path: "/contacts",
-		shortcut: "G C",
+		shortcut: "1",
 	},
 	{
 		title: "Properties",
 		value: "properties",
 		iconName: "tag",
 		path: "/contacts/properties",
-		shortcut: "G P",
+		shortcut: "2",
 	},
 	{
 		title: "Groups",
 		value: "groups",
 		iconName: "modules",
 		path: "/contacts/groups",
-		shortcut: "G G",
+		shortcut: "3",
 	},
 	{
 		title: "Channels",
 		value: "channels",
 		iconName: "notification-indicator",
 		path: "/contacts/channels",
-		shortcut: "G H",
+		shortcut: "4",
 	},
 ] as const;
 
@@ -41,6 +42,42 @@ export function ContactsTabs() {
 	const router = useRouter();
 	const pathname = usePathname();
 	const [hoveredIdx, setHoveredIdx] = useState<number | undefined>(undefined);
+
+	useHotkeys(
+		"1",
+		(e) => {
+			e.preventDefault();
+			router.push("/contacts");
+		},
+		{ enableOnFormTags: false, preventDefault: true },
+	);
+
+	useHotkeys(
+		"2",
+		(e) => {
+			e.preventDefault();
+			router.push("/contacts/properties");
+		},
+		{ enableOnFormTags: false, preventDefault: true },
+	);
+
+	useHotkeys(
+		"3",
+		(e) => {
+			e.preventDefault();
+			router.push("/contacts/groups");
+		},
+		{ enableOnFormTags: false, preventDefault: true },
+	);
+
+	useHotkeys(
+		"4",
+		(e) => {
+			e.preventDefault();
+			router.push("/contacts/channels");
+		},
+		{ enableOnFormTags: false, preventDefault: true },
+	);
 
 	const effectiveTabValue = pathname.includes("/contacts/properties")
 		? "properties"

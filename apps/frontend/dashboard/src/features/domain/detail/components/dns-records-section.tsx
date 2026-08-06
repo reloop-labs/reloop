@@ -2,6 +2,9 @@ import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as Switch from "@reloop/ui/switch";
 import { AnimatePresence, motion } from "framer-motion";
+import { useHotkeys } from "react-hotkeys-hook";
+import { ShortcutHint } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import { isForwardRecordsSequence } from "#/features/domain/add/setup/components/forward-records-shortcut";
 import type { DNSRecord, DomainResponse } from "#/features/domain/types";
 import { useDomainActions } from "../hooks/use-domain-actions";
 import { DNSAutoConnectBanner } from "./dns-auto-connect-banner";
@@ -31,6 +34,83 @@ export const DNSRecordsSection = ({
 
 	const { handleUpdateDomain } = useDomainActions(domain?.id, domain);
 
+	const sendingEnabled = Boolean(domain?.isSendingEmailEnabled);
+	const receivingEnabled = Boolean(domain?.isReceivingEmailEnabled);
+	const trackingEnabled = Boolean(
+		domain?.isClickTrackingEnabled || domain?.isOpenTrackingEnabled,
+	);
+	const hasReceiving = receivingRecords.length > 0;
+
+	// S / R / T — toggle sending, receiving, tracking (hints via long-press Space).
+	useHotkeys(
+		"s",
+		(e) => {
+			e.preventDefault();
+			if (!domain) return;
+			const next = !sendingEnabled;
+			void handleUpdateDomain(
+				{ isSendingEmailEnabled: next },
+				next
+					? "Sending enabled successfully"
+					: "Sending disabled successfully",
+				next ? "Enabling email sending..." : "Disabling email sending...",
+			);
+		},
+		{ enableOnFormTags: false, preventDefault: true, enabled: !!domain },
+		[domain, sendingEnabled, handleUpdateDomain],
+	);
+
+	useHotkeys(
+		"r",
+		(e) => {
+			// F→R is reserved for "Forward records" — don't toggle receiving mid-sequence.
+			if (isForwardRecordsSequence()) return;
+
+			e.preventDefault();
+			if (!domain || !hasReceiving) return;
+			const next = !receivingEnabled;
+			void handleUpdateDomain(
+				{ isReceivingEmailEnabled: next },
+				next
+					? "Receiving enabled successfully"
+					: "Receiving disabled successfully",
+				next
+					? "Enabling email receiving..."
+					: "Disabling email receiving...",
+			);
+		},
+		{
+			enableOnFormTags: false,
+			preventDefault: true,
+			enabled: !!domain && hasReceiving,
+		},
+		[domain, hasReceiving, receivingEnabled, handleUpdateDomain],
+	);
+
+	useHotkeys(
+		"t",
+		(e) => {
+			e.preventDefault();
+			if (!domain) return;
+			const next = !trackingEnabled;
+			void handleUpdateDomain(
+				{
+					isClickTrackingEnabled: next,
+					isOpenTrackingEnabled: next,
+				},
+				next
+					? "Tracking enabled successfully"
+					: "Tracking disabled successfully",
+			);
+		},
+		{
+			enableOnFormTags: false,
+			preventDefault: true,
+			enabled: !!domain,
+		},
+		[domain, trackingEnabled, handleUpdateDomain],
+	);
+
 	return (
 		<div className={cn("mt-6 mb-24 flex flex-col space-y-6", className)}>
 			{showAutoConnectBanner && domain?.status && (
@@ -59,20 +139,24 @@ export const DNSRecordsSection = ({
 						<Icon name="mail-send" className="h-4 w-4 text-text-sub-600" />
 						<h3 className="font-semibold">Email Sending</h3>
 					</div>
-					<Switch.Root
-						checked={domain?.isSendingEmailEnabled}
-						onCheckedChange={(checked) =>
-							handleUpdateDomain(
-								{ isSendingEmailEnabled: checked },
-								checked
-									? "Sending enabled successfully"
-									: "Sending disabled successfully",
-								checked
-									? "Enabling email sending..."
-									: "Disabling email sending...",
-							)
-						}
-					/>
+					<div className="flex items-center gap-2">
+						<ShortcutHint>S</ShortcutHint>
+						<Switch.Root
+							checked={domain?.isSendingEmailEnabled}
+							onCheckedChange={(checked) =>
+								handleUpdateDomain(
+									{ isSendingEmailEnabled: checked },
+									checked
+										? "Sending enabled successfully"
+										: "Sending disabled successfully",
+									checked
+										? "Enabling email sending..."
+										: "Disabling email sending...",
+								)
+							}
+							aria-keyshortcuts="s"
+						/>
+					</div>
 				</div>
 				<AnimatePresence initial={false}>
 					{domain?.isSendingEmailEnabled && (
@@ -114,20 +198,24 @@ export const DNSRecordsSection = ({
 							<Icon name="mail-receive" className="h-4 w-4 text-text-sub-600" />
 							<h3 className="font-semibold">Email Receiving</h3>
 						</div>
-						<Switch.Root
-							checked={domain?.isReceivingEmailEnabled}
-							onCheckedChange={(checked) =>
-								handleUpdateDomain(
-									{ isReceivingEmailEnabled: checked },
-									checked
-										? "Receiving enabled successfully"
-										: "Receiving disabled successfully",
-									checked
-										? "Enabling email receiving..."
-										: "Disabling email receiving...",
-								)
-							}
-						/>
+						<div className="flex items-center gap-2">
+							<ShortcutHint>R</ShortcutHint>
+							<Switch.Root
+								checked={domain?.isReceivingEmailEnabled}
+								onCheckedChange={(checked) =>
+									handleUpdateDomain(
+										{ isReceivingEmailEnabled: checked },
+										checked
+											? "Receiving enabled successfully"
+											: "Receiving disabled successfully",
+										checked
+											? "Enabling email receiving..."
+											: "Disabling email receiving...",
+									)
+								}
+								aria-keyshortcuts="r"
+							/>
+						</div>
 					</div>
 					<AnimatePresence initial={false}>
 						{domain?.isReceivingEmailEnabled && (
@@ -161,22 +249,26 @@ export const DNSRecordsSection = ({
 						<Icon name="graph-up" className="h-4 w-4 text-text-sub-600" />
 						<h3 className="font-semibold">Tracking</h3>
 					</div>
-					<Switch.Root
-						checked={
-							domain?.isClickTrackingEnabled || domain?.isOpenTrackingEnabled
-						}
-						onCheckedChange={(checked) =>
-							handleUpdateDomain(
-								{
-									isClickTrackingEnabled: checked,
-									isOpenTrackingEnabled: checked,
-								},
-								checked
-									? "Tracking enabled successfully"
-									: "Tracking disabled successfully",
-							)
-						}
-					/>
+					<div className="flex items-center gap-2">
+						<ShortcutHint>T</ShortcutHint>
+						<Switch.Root
+							checked={
+								domain?.isClickTrackingEnabled || domain?.isOpenTrackingEnabled
+							}
+							onCheckedChange={(checked) =>
+								handleUpdateDomain(
+									{
+										isClickTrackingEnabled: checked,
+										isOpenTrackingEnabled: checked,
+									},
+									checked
+										? "Tracking enabled successfully"
+										: "Tracking disabled successfully",
+								)
+							}
+							aria-keyshortcuts="t"
+						/>
+					</div>
 				</div>
 				<AnimatePresence initial={false}>
 					{(domain?.isClickTrackingEnabled ||
