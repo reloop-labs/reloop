@@ -76,10 +76,10 @@ function SmtpLanguagePills({
 				return;
 			}
 
-			const pillInset = { x: 6, y: 3 };
+			const pillInset = { x: 6, y: 4 };
 			setPillPosition({
 				width: button.offsetWidth - pillInset.x * 2,
-				height: button.offsetHeight - pillInset.y * 2 - 2,
+				height: button.offsetHeight - pillInset.y * 2,
 				left: button.offsetLeft + pillInset.x,
 				top: button.offsetTop + pillInset.y,
 			});

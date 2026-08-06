@@ -287,7 +287,7 @@ export const ApiDetailsDrawer = ({
 			const pillInset = { x: 6, y: 6 };
 			setPillPosition({
 				width: position.width - pillInset.x * 2,
-				height: position.height - pillInset.y * 2 - 2,
+				height: position.height - pillInset.y * 2,
 				left: position.left + pillInset.x,
 				top: position.top + pillInset.y,
 			});

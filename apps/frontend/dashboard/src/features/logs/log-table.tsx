@@ -149,20 +149,9 @@ const getMethodAndEndpoint = (log: LogData) => {
 
 function TruncatedPath({ path }: { path: string }) {
 	return (
-		<Tooltip.Root>
-			<Tooltip.Trigger asChild>
-				<span className="min-w-0 truncate font-mono text-[13px] text-text-strong-950">
-					{path}
-				</span>
-			</Tooltip.Trigger>
-			<Tooltip.Content
-				side="top"
-				variant="light"
-				className="max-w-sm break-all font-mono text-xs"
-			>
-				{path}
-			</Tooltip.Content>
-		</Tooltip.Root>
+		<span className="min-w-0 truncate font-mono text-[13px] text-text-strong-950">
+			{path}
+		</span>
 	);
 }
 
