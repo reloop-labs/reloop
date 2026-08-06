@@ -24,9 +24,7 @@ export function DomainPreview({
 	return (
 		<div
 			className={
-				isDomainVariant
-					? "absolute top-[176px] left-4"
-					: "absolute top-24 left-8"
+				isDomainVariant ? "absolute top-24 left-4" : "absolute top-24 left-8"
 			}
 		>
 			<div
