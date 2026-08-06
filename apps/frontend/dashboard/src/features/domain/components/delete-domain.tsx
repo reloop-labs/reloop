@@ -2,23 +2,24 @@ import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
+import * as Input from "@reloop/ui/input";
+import * as Label from "@reloop/ui/label";
 import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
 import axios from "axios";
-import {
-	AnimatePresence,
-	type AnimationPlaybackControls,
-	animate,
-	motion,
-	useMotionValue,
-} from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { usePathname, useRouter } from "next/navigation";
 import { useQueryState } from "nuqs";
 import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
+import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { useInvalidateDomains } from "../hooks/use-domains-query";
 import type { Domain } from "../types";
+
+/** Light keycap so it reads on the red/destructive FancyButton fill. */
+const actionKbdOnBlueClassName =
+	"border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]";
 
 type DeleteState = "idle" | "deleting" | "success";
 
@@ -34,10 +35,10 @@ export function DeleteDomainModal({
 	onDeleteSuccess?: (deletedName: string) => void;
 }) {
 	const [deleteId, setDeleteId] = useQueryState("delete");
+	const [confirmationText, setConfirmationText] = useState("");
 	const [deleteState, setDeleteState] = useState<DeleteState>("idle");
-	const [isHolding, setIsHolding] = useState(false);
-	const holdProgress = useMotionValue(0);
-	const animationRef = useRef<AnimationPlaybackControls | null>(null);
+	const [nameCopied, setNameCopied] = useState(false);
+	const inputRef = useRef<HTMLInputElement | null>(null);
 
 	const pathname = usePathname();
 	const router = useRouter();
@@ -69,11 +70,36 @@ export function DeleteDomainModal({
 		!pathname.endsWith("/domain") &&
 		!pathname.endsWith("/domain/");
 
+	const displayName = isBulk
+		? `delete ${bulkDomainsToDelete.length} domain${bulkDomainsToDelete.length === 1 ? "" : "s"}`
+		: domainToDelete?.domain || "domain";
+
+	const normalizedInput = confirmationText.trim().toLowerCase();
+	const isConfirmed = isBulk
+		? normalizedInput === displayName.toLowerCase() ||
+			normalizedInput === `delete ${bulkDomainsToDelete.length} domain` ||
+			normalizedInput === "delete"
+		: confirmationText === displayName;
+
+	const canDelete =
+		isConfirmed &&
+		deleteState === "idle" &&
+		(isBulk ? bulkDomainsToDelete.length > 0 : !!domainToDelete);
+
+	const handleCopyName = async () => {
+		try {
+			await navigator.clipboard.writeText(displayName);
+			setNameCopied(true);
+			setTimeout(() => setNameCopied(false), 1500);
+		} catch {
+			// silently fail
+		}
+	};
+
 	const handleDelete = async () => {
-		if (deleteState !== "idle") return;
+		if (!canDelete) return;
 
 		if (isBulk) {
-			if (bulkDomainsToDelete.length === 0) return;
 			try {
 				setDeleteState("deleting");
 				let ok = 0;
@@ -103,9 +129,10 @@ export function DeleteDomainModal({
 					}
 					setTimeout(() => {
 						setDeleteState("idle");
+						setConfirmationText("");
 						targetBulkDomainsRef.current = [];
 					}, 300);
-				}, 900);
+				}, 300);
 			} catch {
 				toast.error("Failed to delete domains");
 				setDeleteState("idle");
@@ -123,7 +150,6 @@ export function DeleteDomainModal({
 			setDeleteState("success");
 			await invalidate();
 
-			// Show checkmark 'Deleted' state for 900ms before closing modal
 			setTimeout(() => {
 				onDeleteSuccess?.(deletedName);
 				void setDeleteId(null);
@@ -132,11 +158,12 @@ export function DeleteDomainModal({
 						router.push("/domain");
 					}, 100);
 				}
-				// Reset internal button state after modal exit animation finishes
 				setTimeout(() => {
 					setDeleteState("idle");
+					setConfirmationText("");
+					targetDomainRef.current = null;
 				}, 300);
-			}, 900);
+			}, 300);
 		} catch (error) {
 			const message = axios.isAxiosError(error)
 				? error.response?.data?.message || "Failed to delete domain"
@@ -146,43 +173,25 @@ export function DeleteDomainModal({
 		}
 	};
 
-	const startHold = () => {
-		if (deleteState !== "idle") return;
-		setIsHolding(true);
-		holdProgress.set(0);
-		animationRef.current = animate(holdProgress, 1, {
-			duration: 1.2,
-			ease: "linear",
-			onComplete: () => {
-				setIsHolding(false);
-				holdProgress.set(0);
-				void handleDelete();
-			},
-		});
-	};
-
-	const cancelHold = () => {
-		if (!isHolding && holdProgress.get() === 0) return;
-		setIsHolding(false);
-		animationRef.current?.stop();
-		animate(holdProgress, 0, {
-			duration: 0.2,
-			ease: "easeOut",
-		});
-	};
-
 	useHotkeys(
-		"enter",
+		["enter", "mod+enter"],
 		(e) => {
 			e.preventDefault();
-			if (
-				deleteState === "idle" &&
-				(isBulk ? bulkDomainsToDelete.length > 0 : !!domainToDelete)
-			) {
+			if (canDelete) {
 				void handleDelete();
 			}
 		},
-		{ enabled: !!deleteId },
+		{ enableOnFormTags: ["INPUT"], enabled: !!deleteId },
+	);
+
+	useHotkeys(
+		"escape",
+		() => {
+			if (deleteState === "idle") {
+				void setDeleteId(null);
+			}
+		},
+		{ enableOnFormTags: ["INPUT"], enabled: !!deleteId },
 	);
 
 	// Keep a ref so onOpenChange can read the latest deleteState without stale closure
@@ -191,34 +200,11 @@ export function DeleteDomainModal({
 		deleteStateRef.current = deleteState;
 	}, [deleteState]);
 
-	const title = isBulk
-		? `Delete ${bulkDomainsToDelete.length || "selected"} domains`
-		: "Delete domain";
-
-	const description = isBulk ? (
-		<>
-			Deleting{" "}
-			<span className="font-semibold">
-				{bulkDomainsToDelete.length} domain
-				{bulkDomainsToDelete.length === 1 ? "" : "s"}
-			</span>{" "}
-			will stop email sending and receiving immediately. This action cannot be
-			undone.
-		</>
-	) : (
-		<>
-			Deleting{" "}
-			<span className="font-semibold">{domainToDelete?.domain}</span> will stop
-			email sending and receiving immediately. This action cannot be undone.
-		</>
-	);
-
 	return (
 		<Modal.Root
 			open={!!deleteId}
 			onOpenChange={(open) => {
 				if (!open) {
-					cancelHold();
 					if (deleteStateRef.current === "success") {
 						if (isBulk) {
 							const count =
@@ -234,6 +220,7 @@ export function DeleteDomainModal({
 					void setDeleteId(null);
 					setTimeout(() => {
 						setDeleteState("idle");
+						setConfirmationText("");
 						targetDomainRef.current = null;
 						targetBulkDomainsRef.current = [];
 					}, 300);
@@ -242,16 +229,35 @@ export function DeleteDomainModal({
 		>
 			<Modal.Content
 				className="overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 p-6 sm:max-w-[460px] dark:border-stroke-soft-100/40"
-				showClose={true}
+				showClose={false}
+				onOpenAutoFocus={(e) => {
+					e.preventDefault();
+					setTimeout(() => {
+						inputRef.current?.focus();
+					}, 0);
+				}}
 			>
 				{/* Header */}
-				<div className="pr-6">
+				<div>
 					<Modal.Title className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
-						{title}
+						{isBulk
+							? `Delete ${bulkDomainsToDelete.length || "selected"} domains`
+							: "Delete domain"}
 					</Modal.Title>
-					<p className="mt-2 text-sm text-text-sub-600 leading-relaxed">
-						{description}
-					</p>
+					<Modal.Description className="text-sm text-text-sub-600 leading-relaxed">
+						{isBulk
+							? `Are you sure you want to delete ${bulkDomainsToDelete.length > 1 ? `these ${bulkDomainsToDelete.length} domains` : "this domain"}? This action cannot be undone.`
+							: "Are you sure you want to delete this domain? This action cannot be undone."}
+					</Modal.Description>
+				</div>
+
+				<div className="mt-4 rounded-xl border border-red-200 bg-red-50 p-4 text-red-700 text-xs leading-relaxed dark:border-red-800/40 dark:bg-red-950/30 dark:text-red-300">
+					<span className="font-bold text-red-800 dark:text-red-200">
+						Warning:
+					</span>{" "}
+					{isBulk
+						? `Deleting ${bulkDomainsToDelete.length > 1 ? `these ${bulkDomainsToDelete.length} domains` : "this domain"} will stop email sending and receiving immediately. DNS records won't be removed automatically — you'll need to delete them from your DNS provider.`
+						: "Deleting this domain will stop email sending and receiving immediately. DNS records won't be removed automatically — you'll need to delete them from your DNS provider."}
 				</div>
 
 				{/* Domain Details Card */}
@@ -277,26 +283,74 @@ export function DeleteDomainModal({
 						</div>
 					</div>
 				) : (
-					<div className="mt-5 rounded-xl border border-stroke-soft-100 bg-bg-weak-50/50 p-4 dark:border-stroke-soft-100/40">
+					<div className="mt-5 space-y-3 rounded-xl border border-stroke-soft-100 bg-bg-weak-50/50 p-4 dark:border-stroke-soft-100/40">
 						<div>
 							<p className="font-normal text-text-sub-600 text-xs">
 								Domain name
 							</p>
-							<p className="mt-0.5 truncate font-medium text-sm text-text-strong-950">
-								{domainToDelete?.domain}
-							</p>
+							<div className="mt-1 flex items-center">
+								<span className="font-medium text-sm text-text-strong-950">
+									{domainToDelete?.domain || "—"}
+								</span>
+							</div>
 						</div>
 					</div>
 				)}
 
-				{/* Warning Banner */}
-				<div className="mt-4 rounded-xl border border-[#FBE3B5] bg-[#FEF6E6] p-4 text-[#8A5300] text-xs leading-relaxed dark:border-amber-800/40 dark:bg-amber-950/30 dark:text-amber-200">
-					<span className="font-bold text-[#6D4000] dark:text-amber-100">
-						Important Note:
-					</span>{" "}
-					DNS records for {isBulk ? "these domains" : "this domain"} won't be
-					deleted automatically — you'll need to remove them manually from your
-					DNS provider, or email may continue to be routed incorrectly.
+				{/* Confirmation Input */}
+				<div className="mt-4 space-y-2">
+					<Label.Root
+						htmlFor="delete-domain-confirmation"
+						className="flex flex-wrap items-center gap-1.5"
+					>
+						<span>Type</span>
+						<span className="inline-flex items-center gap-1 rounded-md bg-bg-weak-50 px-1.5 py-0.5 font-medium text-[12px] text-text-strong-950 dark:bg-bg-weak-50/20">
+							{displayName}
+							<button
+								type="button"
+								onClick={(e) => {
+									e.preventDefault();
+									void handleCopyName();
+								}}
+								className="-mr-0.5 inline-flex h-4 w-4 shrink-0 items-center justify-center rounded transition-colors"
+								aria-label={`Copy ${displayName}`}
+								title="Copy name"
+							>
+								<AnimatePresence mode="popLayout" initial={false}>
+									<motion.span
+										key={nameCopied ? "check" : "copy"}
+										initial={{ opacity: 0, scale: 0.6 }}
+										animate={{ opacity: 1, scale: 1 }}
+										exit={{ opacity: 0, scale: 0.6 }}
+										transition={{ type: "spring", duration: 0.2, bounce: 0.3 }}
+										className="flex items-center justify-center"
+									>
+										<Icon
+											name={nameCopied ? "check" : "copy"}
+											className={cn(
+												"h-3 w-3",
+												nameCopied ? "text-green-500" : "text-text-sub-600",
+											)}
+										/>
+									</motion.span>
+								</AnimatePresence>
+							</button>
+						</span>
+						<span>to confirm</span>
+					</Label.Root>
+					<Input.Root size="medium">
+						<Input.Wrapper>
+							<Input.Input
+								ref={inputRef}
+								id="delete-domain-confirmation"
+								value={confirmationText}
+								onChange={(e) => setConfirmationText(e.target.value)}
+								placeholder={displayName}
+								disabled={deleteState !== "idle"}
+								autoComplete="off"
+							/>
+						</Input.Wrapper>
+					</Input.Root>
 				</div>
 
 				{/* Footer Actions */}
@@ -304,41 +358,36 @@ export function DeleteDomainModal({
 					<Button.Root
 						type="button"
 						variant="neutral"
-						mode="ghost"
+						mode="stroke"
 						size="small"
 						onClick={() => {
 							if (deleteState === "idle") {
-								cancelHold();
 								void setDeleteId(null);
 								setDeleteState("idle");
+								setConfirmationText("");
 							}
 						}}
 						className={cn(
-							"transition-opacity duration-200",
+							"gap-1.5 transition-opacity duration-200",
 							deleteState !== "idle" && "pointer-events-none opacity-50",
 						)}
 					>
 						Cancel
+						<ActionKbd className="lowercase! w-auto min-w-0 px-1">
+							esc
+						</ActionKbd>
 					</Button.Root>
 					<FancyButton.Root
 						type="button"
 						variant="destructive"
 						size="small"
-						onPointerDown={startHold}
-						onPointerUp={cancelHold}
-						onPointerLeave={cancelHold}
-						onPointerCancel={cancelHold}
+						disabled={!canDelete}
+						onClick={() => void handleDelete()}
 						className={cn(
 							"relative min-w-[134px] select-none justify-center overflow-hidden transition-all duration-200",
 							deleteState !== "idle" && "pointer-events-none opacity-90",
 						)}
 					>
-						{/* Hold progress overlay fill */}
-						<motion.div
-							className="pointer-events-none absolute inset-0 origin-left bg-white/25"
-							style={{ scaleX: holdProgress }}
-						/>
-
 						<AnimatePresence mode="popLayout" initial={false}>
 							<motion.span
 								key={deleteState}
@@ -369,13 +418,20 @@ export function DeleteDomainModal({
 								) : deleteState === "success" ? (
 									<>
 										<Icon
-											name="check-circle"
+											name="check"
 											className="h-4 w-4 shrink-0 text-white"
 										/>
 										<span>Deleted</span>
 									</>
 								) : (
-									<span>Hold to delete</span>
+									<>
+										{isBulk
+											? `Delete ${bulkDomainsToDelete.length || ""} domain${bulkDomainsToDelete.length === 1 ? "" : "s"}`
+											: "Delete domain"}
+										<ActionKbd className={actionKbdOnBlueClassName}>
+											↵
+										</ActionKbd>
+									</>
 								)}
 							</motion.span>
 						</AnimatePresence>

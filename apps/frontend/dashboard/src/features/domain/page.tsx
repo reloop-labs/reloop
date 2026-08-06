@@ -1,5 +1,3 @@
-import { Icon } from "@reloop/ui/icon";
-import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import {
 	parseAsArrayOf,
@@ -7,7 +5,7 @@ import {
 	parseAsString,
 	useQueryState,
 } from "nuqs";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import type { CommandAction } from "#/features/dashboard/command-menu";
 import { useRegisterCommandActions } from "#/features/dashboard/command-menu-context";
@@ -31,7 +29,6 @@ export function DomainPage() {
 	const [searchQuery] = useQueryState("q", parseAsString.withDefault(""));
 	const [currentPage] = useQueryState("page", parseAsInteger.withDefault(1));
 	const [pageSize] = useQueryState("limit", parseAsInteger.withDefault(10));
-	const [deletedName, setDeletedName] = useState<string | null>(null);
 	const { columnVisibility, setColumnVisible } = useDomainColumnVisibility();
 
 	const actions = useMemo<CommandAction[]>(
@@ -89,13 +86,6 @@ export function DomainPage() {
 		{ enableOnFormTags: false, preventDefault: true },
 	);
 
-	useEffect(() => {
-		if (deletedName) {
-			const timer = setTimeout(() => setDeletedName(null), 8000);
-			return () => clearTimeout(timer);
-		}
-	}, [deletedName]);
-
 	const canFetch = hasInitialized && !orgPending;
 	const { data, error, isPending, isFetching } = useDomainsQuery({
 		page: currentPage ?? 1,
@@ -112,43 +102,6 @@ export function DomainPage() {
 
 			<div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
 				<div className="lg:col-span-9 xl:col-span-9">
-					<AnimatePresence>
-						{deletedName && (
-							<motion.div
-								key="deleted-banner"
-								initial={{ opacity: 0, y: -8, height: 0 }}
-								animate={{ opacity: 1, y: 0, height: "auto" }}
-								exit={{ opacity: 0, y: -8, height: 0 }}
-								transition={{ duration: 0.2 }}
-								className="mb-4 overflow-hidden"
-							>
-								<div className="flex items-center justify-between rounded-xl border border-[#B7F1D0] bg-[#E8FAF0] px-4 py-3 text-[#0F5C34] text-sm dark:border-emerald-800/40 dark:bg-emerald-950/30 dark:text-emerald-200">
-									<span>
-										{deletedName.includes(" domain") ? (
-											<>
-												<span className="font-semibold">{deletedName}</span>{" "}
-												deleted successfully.
-											</>
-										) : (
-											<>
-												Domain &quot;
-												<span className="font-semibold">{deletedName}</span>
-												&quot; has been successfully deleted.
-											</>
-										)}
-									</span>
-									<button
-										type="button"
-										onClick={() => setDeletedName(null)}
-										className="p-1 text-[#0F5C34]/70 transition-colors hover:text-[#0F5C34] dark:text-emerald-200/70 dark:hover:text-emerald-200"
-									>
-										<Icon name="close" className="h-4 w-4" />
-									</button>
-								</div>
-							</motion.div>
-						)}
-					</AnimatePresence>
-
 					{error ? (
 						<DomainErrorState />
 					) : (
@@ -162,7 +115,6 @@ export function DomainPage() {
 								total={data?.total || 0}
 								columnVisibility={columnVisibility}
 								isLoading={showLoading}
-								onDeleteSuccess={(name) => setDeletedName(name)}
 							/>
 						</div>
 					)}

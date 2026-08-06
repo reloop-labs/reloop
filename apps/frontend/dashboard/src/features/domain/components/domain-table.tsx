@@ -29,14 +29,12 @@ export function DomainTable({
 	columnVisibility,
 	isLoading,
 	loadingRows = 4,
-	onDeleteSuccess,
 }: {
 	domains: Domain[];
 	total: number;
 	columnVisibility: VisibilityState;
 	isLoading?: boolean;
 	loadingRows?: number;
-	onDeleteSuccess?: (deletedName: string) => void;
 }) {
 	const [, setDeleteId] = useQueryState("delete");
 	const [pageSize] = useQueryState("limit", parseAsInteger.withDefault(10));
@@ -195,7 +193,6 @@ export function DomainTable({
 				domains={domains}
 				selectedDomains={selectedDomains}
 				onClearSelection={handleClearSelection}
-				onDeleteSuccess={onDeleteSuccess}
 			/>
 		</>
 	);
