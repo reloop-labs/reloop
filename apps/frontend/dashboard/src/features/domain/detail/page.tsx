@@ -2,6 +2,7 @@ import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as TabMenu from "@reloop/ui/tab-menu-horizontal";
 import { AnimatePresence, motion } from "motion/react";
+import { useRouter } from "next/navigation";
 import { parseAsString, useQueryState } from "nuqs";
 import * as React from "react";
 import { useHotkeys } from "react-hotkeys-hook";
@@ -21,6 +22,7 @@ import { DomainConfigurationSection } from "./components/domain-configuration-se
 import { DomainEvents } from "./components/domain-events";
 import { DomainHeader } from "./components/domain-header";
 import { DomainStats } from "./components/domain-stats";
+import { useDomainActions } from "./hooks/use-domain-actions";
 
 export function DomainDetailPage({
 	domainId: rawDomainId,
@@ -29,14 +31,17 @@ export function DomainDetailPage({
 }) {
 	useDomainConnectCallback();
 
+	const router = useRouter();
 	const domainId = isDomainRecordId(rawDomainId) ? rawDomainId : null;
 	const { hasInitialized, isPending: orgPending } = useActiveOrganization();
 	const [activeTab, setActiveTab] = useQueryState(
 		"tab",
 		parseAsString.withDefault("dns"),
 	);
+	const [, setDeleteId] = useQueryState("delete");
 	const [hoveredIdx, setHoveredIdx] = React.useState<number | undefined>();
 	const buttonRefs = React.useRef<HTMLButtonElement[]>([]);
+	const { handleVerifyDNS } = useDomainActions(domainId ?? "");
 
 	const tabs = [
 		{ id: "dns", label: "DNS Records", icon: "file-text", shortcut: "1" },
@@ -63,19 +68,66 @@ export function DomainDetailPage({
 
 	const showLoading = !canFetch || isPending || (isFetching && !domainData);
 
-	const actions = React.useMemo<CommandAction[]>(
-		() => [
+	const actions = React.useMemo<CommandAction[]>(() => {
+		if (!domainData || !domainId) return [];
+		return [
+			{
+				id: "back-to-domains",
+				label: "Back to Domains",
+				icon: "arrow-left",
+				shortcut: { label: "⌘⌫", keys: ["mod", "backspace"] },
+				onSelect: () => router.back(),
+			},
 			{
 				id: "copy-domain",
 				label: "Copy Domain Name",
 				icon: "copy",
 				shortcut: { label: "C", keys: ["c"] },
 				onSelect: () => {
-					if (domainData?.domain) {
-						void navigator.clipboard.writeText(domainData.domain);
-						toast.success("Domain name copied");
-					}
+					void navigator.clipboard.writeText(domainData.domain);
+					toast.success("Domain name copied");
 				},
+			},
+			{
+				id: "copy-domain-id",
+				label: "Copy Domain ID",
+				icon: "copy",
+				shortcut: { label: "I", keys: ["i"] },
+				onSelect: () => {
+					void navigator.clipboard.writeText(domainId);
+					toast.success("Domain ID copied to clipboard");
+				},
+			},
+			{
+				id: "reverify-dns",
+				label: "Re-verify DNS",
+				icon: "refresh-cw",
+				shortcut: { label: "V", keys: ["v"] },
+				onSelect: () => void handleVerifyDNS(),
+			},
+			{
+				id: "forward-records",
+				label: "Forward Records",
+				icon: "mail-single",
+				shortcut: { label: "F R", keys: ["f", "r"] },
+				onSelect: () =>
+					window.dispatchEvent(
+						new CustomEvent("domain:open-forward-records"),
+					),
+			},
+			{
+				id: "dns-records-tab",
+				label: "Go to DNS Records",
+				icon: "file-text",
+				shortcut: { label: "1", keys: ["1"] },
+				onSelect: () => void setActiveTab("dns"),
+			},
+			{
+				id: "configuration-tab",
+				label: "Go to Configuration",
+				icon: "sliders-horiz-2",
+				shortcut: { label: "2", keys: ["2"] },
+				onSelect: () => void setActiveTab("configuration"),
 			},
 			{
 				id: "open-api-reference",
@@ -96,9 +148,23 @@ export function DomainDetailPage({
 				shortcut: { label: "D", keys: ["d"] },
 				onSelect: () => window.open(DOMAIN_LEARN_DOCS_URL, "_blank"),
 			},
-		],
-		[domainData?.domain],
-	);
+			{
+				id: "delete-domain",
+				label: "Delete Domain",
+				icon: "trash",
+				shortcut: { label: "X", keys: ["x"] },
+				variant: "danger",
+				onSelect: () => void setDeleteId(domainId),
+			},
+		];
+	}, [
+		domainData,
+		domainId,
+		handleVerifyDNS,
+		router,
+		setActiveTab,
+		setDeleteId,
+	]);
 
 	useRegisterCommandActions(
 		`domain-detail-${rawDomainId}`,

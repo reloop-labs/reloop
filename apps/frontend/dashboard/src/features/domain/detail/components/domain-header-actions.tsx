@@ -7,7 +7,7 @@ import {
 	Trigger as PopoverTrigger,
 } from "@reloop/ui/popover";
 import { useQueryState } from "nuqs";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
@@ -180,6 +180,14 @@ export const DomainHeaderActions = ({
 		{ enableOnFormTags: false, preventDefault: true },
 		[runAction],
 	);
+
+	// Cmd+K and other surfaces can open the forward-records modal.
+	useEffect(() => {
+		const onOpenForward = () => setForwardOpen(true);
+		window.addEventListener("domain:open-forward-records", onOpenForward);
+		return () =>
+			window.removeEventListener("domain:open-forward-records", onOpenForward);
+	}, []);
 
 	return (
 		<>
