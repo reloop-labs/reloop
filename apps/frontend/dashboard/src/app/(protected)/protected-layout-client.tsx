@@ -21,9 +21,13 @@ export function ProtectedLayoutClient({
 		}
 	}, [isFetched, isPending, router, session]);
 
+	if (isPending || !isFetched) {
+		return <DashboardLoadingChrome />;
+	}
+
 	// Confirmed signed-out: keep dashboard chrome while redirecting to login
 	// (never swap to a full-viewport spinner after the shell has been shown).
-	if (isFetched && !session) {
+	if (!session) {
 		return <DashboardLoadingChrome />;
 	}
 

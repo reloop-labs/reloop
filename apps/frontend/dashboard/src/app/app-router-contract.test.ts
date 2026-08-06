@@ -16,6 +16,10 @@ describe("App Router provider lifetimes", () => {
 			"./(protected)/(dashboard)/dashboard-layout-client.tsx",
 		);
 
+		expect(protectedLayout).toContain("if (isPending || !isFetched)");
+		expect(
+			protectedLayout.indexOf("if (isPending || !isFetched)"),
+		).toBeLessThan(protectedLayout.indexOf("<ActiveOrganizationProvider>"));
 		expect(protectedLayout).toContain("<ActiveOrganizationProvider>");
 		expect(protectedLayout).toContain("{children}");
 		expect(dashboardLayout).not.toContain("ActiveOrganizationProvider");
