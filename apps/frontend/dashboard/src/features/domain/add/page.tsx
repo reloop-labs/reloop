@@ -129,7 +129,7 @@ export function AddDomainPage() {
 	);
 
 	return (
-		<div className="mx-auto grid min-h-[calc(100vh-64px)] w-full max-w-5xl lg:grid-cols-2">
+		<div className="mx-auto grid w-full max-w-5xl pt-24 lg:grid-cols-2 lg:pt-32">
 			{/* Left: form column */}
 			<div className="mx-auto w-full max-w-md px-6 py-12 lg:px-8">
 				<AddDomainHeader />
