@@ -4,7 +4,9 @@ import { Skeleton } from "@reloop/ui/skeleton";
 import Spinner from "@reloop/ui/spinner";
 import { AnimatePresence, motion } from "framer-motion";
 import * as React from "react";
+import { useHotkeys } from "react-hotkeys-hook";
 import * as simpleIcons from "simple-icons";
+import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import type { DomainResponse } from "#/features/domain/types";
 import {
 	DNS_SETUP_HUB_URL,
@@ -13,6 +15,10 @@ import {
 import { useDomainNameserversQuery } from "../../hooks/use-domains-query";
 import { useDomainConnect } from "../hooks/use-domain-connect";
 import { inferDnsProvider } from "../utils";
+
+/** Light keycap so it reads on the blue FancyButton fill. */
+const actionKbdOnBlueClassName =
+	"border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]";
 
 interface DNSAutoConnectBannerProps {
 	domain?: DomainResponse;
@@ -44,7 +50,7 @@ function ProviderIcon({ provider }: { provider: InferredDnsProvider }) {
 		: null;
 
 	return (
-		<div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-bg-white-0 shadow-sm ring-1 ring-stroke-soft-100 dark:bg-bg-weak-50/50 dark:ring-stroke-soft-100/40">
+		<div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-bg-white-0 ring-1 ring-stroke-soft-100 dark:bg-bg-weak-50/50 dark:ring-stroke-soft-100/40">
 			{dnsIcon ? (
 				<div
 					className="flex h-10 w-10 items-center justify-center rounded-lg"
@@ -60,6 +66,105 @@ function ProviderIcon({ provider }: { provider: InferredDnsProvider }) {
 			) : (
 				<Icon name="globe" className="h-6 w-6 text-text-sub-600" />
 			)}
+		</div>
+	);
+}
+
+function AutoPopulateBanner({
+	provider,
+	isConnecting,
+	onAutoPopulate,
+}: {
+	provider: InferredDnsProvider;
+	isConnecting: boolean;
+	onAutoPopulate: () => void;
+}) {
+	useHotkeys(
+		"a",
+		(e) => {
+			if (isConnecting) return;
+			e.preventDefault();
+			onAutoPopulate();
+		},
+		{ enableOnFormTags: false, preventDefault: true, enabled: !isConnecting },
+	);
+
+	return (
+		<div className="overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-weak-50/30 p-4 dark:border-stroke-soft-100/40">
+			<div className="flex items-center justify-between gap-6">
+				<div className="flex gap-4">
+					<ProviderIcon provider={provider} />
+					<div className="space-y-1">
+						<h3 className="font-semibold text-paragraph-base text-text-strong-950">
+							{provider.label}
+						</h3>
+						<p className="text-paragraph-xs text-text-sub-600 leading-relaxed">
+							We've detected your domain is managed by {provider.label}. We can
+							automatically configure all required DNS records for you.
+						</p>
+						<a
+							href={provider.docsUrl}
+							target="_blank"
+							rel="noopener noreferrer"
+							className="inline-flex items-center gap-1 text-paragraph-xs text-text-sub-600 underline decoration-stroke-soft-200 decoration-dashed underline-offset-4 transition-colors hover:text-text-strong-950"
+						>
+							{provider.docsSlug
+								? `Manual ${provider.label} setup guide`
+								: "Browse all DNS setup guides"}
+							<Icon
+								name="link-external"
+								className="h-3 w-3 text-text-soft-400"
+							/>
+						</a>
+					</div>
+				</div>
+
+				<FancyButton.Root
+					type="button"
+					variant="blue"
+					size="small"
+					onClick={onAutoPopulate}
+					className="min-w-[170px] justify-center overflow-hidden rounded-xl px-4 transition-all duration-200"
+					disabled={isConnecting}
+					aria-keyshortcuts="a"
+				>
+					<AnimatePresence mode="popLayout" initial={false}>
+						<motion.span
+							key={isConnecting ? "connecting" : "idle"}
+							transition={{
+								type: "spring",
+								duration: 0.25,
+								bounce: 0,
+							}}
+							initial={{
+								opacity: 0,
+								y: -14,
+							}}
+							animate={{
+								opacity: 1,
+								y: 0,
+							}}
+							exit={{
+								opacity: 0,
+								y: 14,
+							}}
+							className="flex items-center justify-center gap-1.5"
+						>
+							{isConnecting ? (
+								<>
+									<Spinner size={14} color="currentColor" />
+									<span>Connecting...</span>
+								</>
+							) : (
+								<>
+									<span>Auto populate</span>
+									<ActionKbd className={actionKbdOnBlueClassName}>A</ActionKbd>
+								</>
+							)}
+						</motion.span>
+					</AnimatePresence>
+				</FancyButton.Root>
+			</div>
 		</div>
 	);
 }
@@ -102,78 +207,11 @@ export const DNSAutoConnectBanner: React.FC<DNSAutoConnectBannerProps> = ({
 	// Auto-populate: provider has onboarded Reloop's Domain Connect template
 	if (provider?.supportsAutoConnect) {
 		return (
-			<div className="overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-weak-50/30 p-4 dark:border-stroke-soft-100/40">
-				<div className="flex items-center justify-between gap-6">
-					<div className="flex items-center gap-4">
-						<ProviderIcon provider={provider} />
-						<div className="space-y-1">
-							<h3 className="font-semibold text-paragraph-base text-text-strong-950">
-								{provider.label}
-							</h3>
-							<p className="text-paragraph-xs text-text-sub-600 leading-relaxed">
-								We've detected your domain is managed by {provider.label}. We
-								can automatically configure all required DNS records for you.
-							</p>
-							<a
-								href={provider.docsUrl}
-								target="_blank"
-								rel="noopener noreferrer"
-								className="inline-flex items-center gap-1 text-paragraph-xs text-text-sub-600 underline decoration-stroke-soft-200 decoration-dashed underline-offset-4 transition-colors hover:text-text-strong-950"
-							>
-								{provider.docsSlug
-									? `Manual ${provider.label} setup guide`
-									: "Browse all DNS setup guides"}
-								<Icon
-									name="link-external"
-									className="h-3 w-3 text-text-soft-400"
-								/>
-							</a>
-						</div>
-					</div>
-
-					<FancyButton.Root
-						type="button"
-						variant="blue"
-						size="small"
-						onClick={() => void startAutoConnect()}
-						className="min-w-[170px] justify-center overflow-hidden rounded-xl px-4 transition-all duration-200"
-						disabled={isConnecting}
-					>
-						<AnimatePresence mode="popLayout" initial={false}>
-							<motion.span
-								key={isConnecting ? "connecting" : "idle"}
-								transition={{
-									type: "spring",
-									duration: 0.25,
-									bounce: 0,
-								}}
-								initial={{
-									opacity: 0,
-									y: -14,
-								}}
-								animate={{
-									opacity: 1,
-									y: 0,
-								}}
-								exit={{
-									opacity: 0,
-									y: 14,
-								}}
-								className="flex items-center justify-center gap-1.5"
-							>
-								{isConnecting ? (
-									<>
-										<Spinner size={14} color="currentColor" />
-										<span>Connecting...</span>
-									</>
-								) : (
-									"Auto-populate records"
-								)}
-							</motion.span>
-						</AnimatePresence>
-					</FancyButton.Root>
-				</div>
-			</div>
+			<AutoPopulateBanner
+				provider={provider}
+				isConnecting={isConnecting}
+				onAutoPopulate={() => void startAutoConnect()}
+			/>
 		);
 	}
 
