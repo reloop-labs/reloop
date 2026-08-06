@@ -1,5 +1,8 @@
+"use client";
+
 import { cn } from "@reloop/ui/cn";
-import { Icon } from "@reloop/ui/icon";
+import { AnimatedKeyIcon } from "#/features/dashboard/sidebar/animated-key-icon";
+import { usePlayAnimationOnHover } from "#/features/dashboard/sidebar/use-play-animation-on-hover";
 
 type ApiKeyAvatarSize = "sm" | "md" | "lg" | "xl";
 
@@ -34,8 +37,7 @@ const SIZE_CLASS: Record<
 };
 
 /**
- * Key icon inside a two-layer card (soft outer frame + inset white panel),
- * matching the Create Contact / HomeCardShell surface at icon scale.
+ * Key icon inside a two-layer card with the sidebar hover bob animation.
  */
 export function ApiKeyAvatar({
 	size = "lg",
@@ -47,11 +49,13 @@ export function ApiKeyAvatar({
 	alt?: string;
 }) {
 	const sizeConfig = SIZE_CLASS[size];
+	const { groupProps } = usePlayAnimationOnHover();
 
 	return (
 		<div
+			{...groupProps}
 			className={cn(
-				"flex shrink-0 items-center justify-center border border-stroke-soft-200 bg-bg-soft-50 dark:border-stroke-soft-100/40 dark:bg-white/[0.03]",
+				"group flex shrink-0 items-center justify-center border border-stroke-soft-200 bg-bg-soft-50 dark:border-stroke-soft-100/40 dark:bg-white/[0.03]",
 				sizeConfig.container,
 				sizeConfig.pad,
 				className,
@@ -63,8 +67,7 @@ export function ApiKeyAvatar({
 					sizeConfig.inner,
 				)}
 			>
-				<Icon
-					name="key-new"
+				<AnimatedKeyIcon
 					className={cn(
 						"text-text-sub-600 dark:text-white/80",
 						sizeConfig.icon,
