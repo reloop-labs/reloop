@@ -133,6 +133,7 @@ export function ApiKeyHeader({
 							<ApiKeyAvatar
 								seed={apiKey?.id || displayName}
 								size="lg"
+								enabled={apiKey?.enabled}
 								alt={`${displayName} avatar`}
 							/>
 							<div className="min-w-0">

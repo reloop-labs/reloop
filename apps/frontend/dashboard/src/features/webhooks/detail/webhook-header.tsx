@@ -139,6 +139,7 @@ export function WebhookHeader({
 							<WebhookAvatar
 								seed={webhook?.id || displayName}
 								size="lg"
+								status={webhook?.status}
 								alt={`${displayName} avatar`}
 							/>
 							<div className="min-w-0">

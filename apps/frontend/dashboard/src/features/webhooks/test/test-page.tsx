@@ -80,6 +80,7 @@ export function WebhookTestPage({ webhookId }: { webhookId: string }) {
 							<WebhookAvatar
 								seed={webhook.id || displayName}
 								size="md"
+								status={webhook.status}
 								alt={`${displayName} avatar`}
 							/>
 							<div className="min-w-0">

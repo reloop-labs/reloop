@@ -36,28 +36,57 @@ const SIZE_CLASS: Record<
 	},
 };
 
+const ENABLED_TONE = {
+	outer:
+		"border-success-base/25 bg-success-lighter dark:border-success-base/30 dark:bg-success-base/10",
+	icon: "text-success-base",
+} as const;
+
+const DISABLED_TONE = {
+	outer:
+		"border-error-base/25 bg-error-lighter dark:border-error-base/30 dark:bg-error-base/10",
+	icon: "text-error-base",
+} as const;
+
+const NEUTRAL_TONE = {
+	outer:
+		"border-stroke-soft-200 bg-bg-soft-50 dark:border-stroke-soft-100/40 dark:bg-white/[0.03]",
+	icon: "text-text-sub-600 dark:text-white/80",
+} as const;
+
 /**
- * Key icon inside a two-layer card with the sidebar hover bob animation.
+ * Key icon inside a two-layer card with sidebar hover animation.
+ * Color follows enabled / disabled status.
  */
 export function ApiKeyAvatar({
 	size = "lg",
+	enabled,
 	className,
 }: {
 	seed?: string;
 	size?: ApiKeyAvatarSize;
+	/** When set, tints the avatar green (active) or red (disabled). */
+	enabled?: boolean;
 	className?: string;
 	alt?: string;
 }) {
 	const sizeConfig = SIZE_CLASS[size];
+	const tone =
+		enabled === true
+			? ENABLED_TONE
+			: enabled === false
+				? DISABLED_TONE
+				: NEUTRAL_TONE;
 	const { groupProps } = usePlayAnimationOnHover();
 
 	return (
 		<div
 			{...groupProps}
 			className={cn(
-				"group flex shrink-0 items-center justify-center border border-stroke-soft-200 bg-bg-soft-50 dark:border-stroke-soft-100/40 dark:bg-white/[0.03]",
+				"group flex shrink-0 items-center justify-center border",
 				sizeConfig.container,
 				sizeConfig.pad,
+				tone.outer,
 				className,
 			)}
 		>
@@ -67,12 +96,7 @@ export function ApiKeyAvatar({
 					sizeConfig.inner,
 				)}
 			>
-				<AnimatedKeyIcon
-					className={cn(
-						"text-text-sub-600 dark:text-white/80",
-						sizeConfig.icon,
-					)}
-				/>
+				<AnimatedKeyIcon className={cn(tone.icon, sizeConfig.icon)} />
 			</div>
 		</div>
 	);

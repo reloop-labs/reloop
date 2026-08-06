@@ -65,6 +65,7 @@ export function DomainHeader({
 							<DomainAvatar
 								seed={domainRecordId || domainName}
 								size="lg"
+								status={status}
 								alt={`${domainName} avatar`}
 							/>
 							<div className="min-w-0">

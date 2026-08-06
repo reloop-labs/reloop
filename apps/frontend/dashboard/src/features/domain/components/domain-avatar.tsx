@@ -3,6 +3,7 @@
 import { cn } from "@reloop/ui/cn";
 import { AnimatedGlobeIcon } from "#/features/dashboard/sidebar/animated-globe-icon";
 import { usePlayAnimationOnHover } from "#/features/dashboard/sidebar/use-play-animation-on-hover";
+import type { DomainStatus } from "../types";
 
 type DomainAvatarSize = "sm" | "md" | "lg" | "xl";
 
@@ -36,28 +37,60 @@ const SIZE_CLASS: Record<
 	},
 };
 
+const STATUS_TONE: Record<
+	DomainStatus,
+	{ outer: string; icon: string }
+> = {
+	active: {
+		outer: "border-success-base/25 bg-success-lighter dark:border-success-base/30 dark:bg-success-base/10",
+		icon: "text-success-base",
+	},
+	verifying: {
+		outer: "border-warning-base/25 bg-warning-lighter dark:border-warning-base/30 dark:bg-warning-base/10",
+		icon: "text-warning-base",
+	},
+	pending: {
+		outer:
+			"border-stroke-soft-200 bg-bg-soft-50 dark:border-stroke-soft-100/40 dark:bg-white/[0.03]",
+		icon: "text-text-sub-600 dark:text-white/80",
+	},
+	failed: {
+		outer: "border-error-base/25 bg-error-lighter dark:border-error-base/30 dark:bg-error-base/10",
+		icon: "text-error-base",
+	},
+	suspended: {
+		outer: "border-error-base/25 bg-error-lighter dark:border-error-base/30 dark:bg-error-base/10",
+		icon: "text-error-base",
+	},
+};
+
 /**
- * Domain globe inside a two-layer card with the sidebar hover draw animation.
+ * Domain globe inside a two-layer card with sidebar hover animation.
+ * Outer frame + icon color follow domain status.
  */
 export function DomainAvatar({
 	size = "lg",
+	status = "pending",
 	className,
 }: {
 	seed?: string;
 	size?: DomainAvatarSize;
+	status?: DomainStatus;
 	className?: string;
 	alt?: string;
 }) {
 	const sizeConfig = SIZE_CLASS[size];
+	const tone = STATUS_TONE[status] ?? STATUS_TONE.pending;
 	const { groupProps } = usePlayAnimationOnHover();
 
 	return (
 		<div
 			{...groupProps}
 			className={cn(
-				"group flex shrink-0 items-center justify-center border border-stroke-soft-200 bg-bg-soft-50 dark:border-stroke-soft-100/40 dark:bg-white/[0.03]",
+				"group flex shrink-0 items-center justify-center border",
 				sizeConfig.container,
 				sizeConfig.pad,
+				tone.outer,
 				className,
 			)}
 		>
@@ -67,12 +100,7 @@ export function DomainAvatar({
 					sizeConfig.inner,
 				)}
 			>
-				<AnimatedGlobeIcon
-					className={cn(
-						"text-text-sub-600 dark:text-white/80",
-						sizeConfig.icon,
-					)}
-				/>
+				<AnimatedGlobeIcon className={cn(tone.icon, sizeConfig.icon)} />
 			</div>
 		</div>
 	);
