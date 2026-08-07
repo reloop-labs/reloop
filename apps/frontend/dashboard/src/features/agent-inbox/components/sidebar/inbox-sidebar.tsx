@@ -1,3 +1,4 @@
+import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
@@ -278,33 +279,30 @@ export const InboxSidebar = ({
 		<>
 			<aside
 				className={cn(
-					"flex h-full shrink-0 select-none flex-col border-mail-border border-r bg-sidebar pb-2 transition-[width] duration-200 ease-in-out",
-					collapsed ? "w-[52px] px-1.5 pt-2.5" : "w-[220px] px-2 pt-2.5",
+					"flex h-full shrink-0 select-none flex-col border-mail-border border-r bg-sidebar pt-2.5 pb-2 transition-[width] duration-200 ease-in-out",
+					collapsed ? "w-[52px] px-1.5" : "w-[220px] px-2",
 				)}
 			>
 				{/* Compose — outline / light */}
-				<div className={cn("mt-1", collapsed ? "flex justify-center" : "")}>
-					<button
+				<div className={cn("", collapsed ? "flex justify-center" : "")}>
+					<Button.Root
 						type="button"
+						mode="lighter"
 						onClick={() => {
 							if (!mailboxReady) return;
 							setIsComposeOpen(true);
 						}}
+						size="medium"
 						disabled={!mailboxReady}
 						title="Compose"
-						className={cn(
-							"flex items-center gap-2.5 font-medium text-[14px] leading-5 transition-colors disabled:opacity-40",
-							collapsed
-								? "size-9 justify-center rounded-full border border-mail-border/80 text-mail-muted hover:bg-[var(--inbox-control)] hover:text-mail-foreground"
-								: "w-full rounded-full border border-mail-border/80 bg-transparent px-3 py-2 text-mail-muted hover:bg-[var(--inbox-control)] hover:text-mail-foreground",
-						)}
+						className="w-full"
 					>
 						<Pencil
 							className="h-4 w-4 shrink-0 opacity-80"
 							strokeWidth={1.75}
 						/>
 						{!collapsed && <span>Compose</span>}
-					</button>
+					</Button.Root>
 				</div>
 
 				<div
