@@ -9,7 +9,6 @@ import { useWebhooks } from "#/features/webhooks/components/use-webhooks";
 import { WebhookError } from "#/features/webhooks/components/webhook-error";
 import { WebhookTable } from "#/features/webhooks/components/webhook-table";
 import { WebhookToolbar } from "#/features/webhooks/components/webhook-toolbar";
-import { WebhooksCommonUseCasesSidebar } from "./common-use-cases-sidebar";
 import { WebhooksListHeader } from "./webhooks-list-header";
 
 export function WebhooksPage() {
@@ -105,14 +104,7 @@ export function WebhooksPage() {
 		return (
 			<div className="mx-auto max-w-6xl space-y-6 p-6 lg:p-8">
 				<WebhooksListHeader />
-				<div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
-					<div className="lg:col-span-8 xl:col-span-8">
-						<WebhookError />
-					</div>
-					<div className="lg:col-span-4 xl:col-span-4">
-						<WebhooksCommonUseCasesSidebar />
-					</div>
-				</div>
+				<WebhookError />
 			</div>
 		);
 	}
@@ -121,65 +113,59 @@ export function WebhooksPage() {
 		<div className="mx-auto max-w-6xl space-y-6 p-6 lg:p-8">
 			<WebhooksListHeader />
 
-			<div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
-				<div className="pb-8 lg:col-span-8 xl:col-span-8">
-					<AnimatePresence>
-						{deletedName && (
-							<motion.div
-								key="deleted-banner"
-								initial={{ opacity: 0, y: -8, height: 0 }}
-								animate={{ opacity: 1, y: 0, height: "auto" }}
-								exit={{ opacity: 0, y: -8, height: 0 }}
-								transition={{ duration: 0.2 }}
-								className="mb-4 overflow-hidden"
-							>
-								<div className="flex items-center justify-between rounded-xl border border-[#B7F1D0] bg-[#E8FAF0] px-4 py-3 text-[#0F5C34] text-sm dark:border-emerald-800/40 dark:bg-emerald-950/30 dark:text-emerald-200">
-									<span>
-										Webhook &quot;
-										<span className="font-semibold">{deletedName}</span>&quot;
-										has been successfully deleted.
-									</span>
-									<button
-										type="button"
-										onClick={() => setDeletedName(null)}
-										className="p-1 text-[#0F5C34]/70 transition-colors hover:text-[#0F5C34] dark:text-emerald-200/70 dark:hover:text-emerald-200"
-									>
-										<Icon name="close" className="h-4 w-4" />
-									</button>
-								</div>
-							</motion.div>
-						)}
-					</AnimatePresence>
-
-					{!isTotalEmpty && (
-						<WebhookToolbar
-							searchQuery={searchQuery}
-							onSearchChange={setSearchQuery}
-							statusFilter={statusFilter}
-							onStatusFilterChange={setStatusFilter}
-						/>
+			<div className="pb-8">
+				<AnimatePresence>
+					{deletedName && (
+						<motion.div
+							key="deleted-banner"
+							initial={{ opacity: 0, y: -8, height: 0 }}
+							animate={{ opacity: 1, y: 0, height: "auto" }}
+							exit={{ opacity: 0, y: -8, height: 0 }}
+							transition={{ duration: 0.2 }}
+							className="mb-4 overflow-hidden"
+						>
+							<div className="flex items-center justify-between rounded-xl border border-[#B7F1D0] bg-[#E8FAF0] px-4 py-3 text-[#0F5C34] text-sm dark:border-emerald-800/40 dark:bg-emerald-950/30 dark:text-emerald-200">
+								<span>
+									Webhook &quot;
+									<span className="font-semibold">{deletedName}</span>&quot; has
+									been successfully deleted.
+								</span>
+								<button
+									type="button"
+									onClick={() => setDeletedName(null)}
+									className="p-1 text-[#0F5C34]/70 transition-colors hover:text-[#0F5C34] dark:text-emerald-200/70 dark:hover:text-emerald-200"
+								>
+									<Icon name="close" className="h-4 w-4" />
+								</button>
+							</div>
+						</motion.div>
 					)}
+				</AnimatePresence>
 
-					<div className={isTotalEmpty ? "" : "mt-4"}>
-						<WebhookTable
-							webhooks={webhooks}
-							isLoading={isLoading}
-							loadingRows={4}
-							isTotalEmpty={isTotalEmpty}
-							searchQuery={searchQuery}
-							statusFilter={statusFilter}
-							onClearFilters={() => {
-								setSearchQuery("");
-								setStatusFilter("all");
-							}}
-							onMutate={mutate}
-							onDeleteSuccess={(name) => setDeletedName(name)}
-						/>
-					</div>
-				</div>
+				{!isTotalEmpty && (
+					<WebhookToolbar
+						searchQuery={searchQuery}
+						onSearchChange={setSearchQuery}
+						statusFilter={statusFilter}
+						onStatusFilterChange={setStatusFilter}
+					/>
+				)}
 
-				<div className="lg:col-span-4 xl:col-span-4">
-					<WebhooksCommonUseCasesSidebar />
+				<div className={isTotalEmpty ? "" : "mt-4"}>
+					<WebhookTable
+						webhooks={webhooks}
+						isLoading={isLoading}
+						loadingRows={4}
+						isTotalEmpty={isTotalEmpty}
+						searchQuery={searchQuery}
+						statusFilter={statusFilter}
+						onClearFilters={() => {
+							setSearchQuery("");
+							setStatusFilter("all");
+						}}
+						onMutate={mutate}
+						onDeleteSuccess={(name) => setDeletedName(name)}
+					/>
 				</div>
 			</div>
 		</div>

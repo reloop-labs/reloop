@@ -11,18 +11,30 @@ interface WebhookEventInlineSelectorProps {
 }
 
 const CATEGORY_META: Record<string, { label: string; icon: string }> = {
-	email: { label: "Email", icon: "mail-send" },
-	domain: { label: "Domains", icon: "globe" },
-	"api-key": { label: "API Keys", icon: "key-new" },
+	"email-send": { label: "Send Email", icon: "mail-send" },
+	"email-receive": { label: "Receive Email", icon: "inbox" },
 	contact: { label: "Contacts", icon: "contacts" },
 };
 
 type CategoryFilter = "all" | string;
 
-const SUPPORTED_CATEGORIES = new Set(["email", "contact"]);
-const SUPPORTED_WEBHOOK_EVENTS = ACTIVE_WEBHOOK_EVENTS.filter((e) =>
-	SUPPORTED_CATEGORIES.has(e.category),
-);
+const getEventCategory = (event: { id: string; category: string }) => {
+	if (event.category === "email") {
+		return event.id === "email.received" ? "email-receive" : "email-send";
+	}
+	return event.category;
+};
+
+const SUPPORTED_CATEGORIES = new Set([
+	"email-send",
+	"email-receive",
+	"contact",
+]);
+
+const SUPPORTED_WEBHOOK_EVENTS = ACTIVE_WEBHOOK_EVENTS.map((e) => ({
+	...e,
+	effectiveCategory: getEventCategory(e),
+})).filter((e) => SUPPORTED_CATEGORIES.has(e.effectiveCategory));
 
 export const WebhookEventInlineSelector = ({
 	value,
@@ -37,9 +49,9 @@ export const WebhookEventInlineSelector = ({
 		const seen = new Set<string>();
 		const list: string[] = [];
 		for (const event of SUPPORTED_WEBHOOK_EVENTS) {
-			if (!seen.has(event.category)) {
-				seen.add(event.category);
-				list.push(event.category);
+			if (!seen.has(event.effectiveCategory)) {
+				seen.add(event.effectiveCategory);
+				list.push(event.effectiveCategory);
 			}
 		}
 		return list;
@@ -47,7 +59,8 @@ export const WebhookEventInlineSelector = ({
 
 	const filteredEvents = useMemo(() => {
 		return SUPPORTED_WEBHOOK_EVENTS.filter((event) => {
-			if (category !== "all" && event.category !== category) return false;
+			if (category !== "all" && event.effectiveCategory !== category)
+				return false;
 			return true;
 		});
 	}, [category]);
@@ -126,7 +139,7 @@ export const WebhookEventInlineSelector = ({
 					) : (
 						filteredEvents.map((event) => {
 							const isChecked = selected.has(event.id);
-							const meta = CATEGORY_META[event.category];
+							const meta = CATEGORY_META[event.effectiveCategory];
 							return (
 								<button
 									key={event.id}

@@ -13,33 +13,43 @@ interface WebhookEventSelectorProps {
 }
 
 const categoryIcons: Record<string, string> = {
-	domain: "globe",
-	"api-key": "key",
+	"email-send": "mail",
+	"email-receive": "inbox",
 	contact: "users",
-	email: "mail",
 };
 
 const categoryColors: Record<
 	string,
 	"blue" | "orange" | "green" | "gray" | "purple"
 > = {
-	domain: "blue",
-	"api-key": "orange",
+	"email-send": "purple",
+	"email-receive": "blue",
 	contact: "green",
-	email: "purple",
 };
 
 const categoryLabels: Record<string, string> = {
-	domain: "Domains",
-	"api-key": "API Keys",
+	"email-send": "Send Email",
+	"email-receive": "Receive Email",
 	contact: "Contacts",
-	email: "Email",
 };
 
-const SUPPORTED_CATEGORIES = new Set(["email", "contact"]);
-const SUPPORTED_WEBHOOK_EVENTS = ACTIVE_WEBHOOK_EVENTS.filter((e) =>
-	SUPPORTED_CATEGORIES.has(e.category),
-);
+const getEventCategory = (event: { id: string; category: string }) => {
+	if (event.category === "email") {
+		return event.id === "email.received" ? "email-receive" : "email-send";
+	}
+	return event.category;
+};
+
+const SUPPORTED_CATEGORIES = new Set([
+	"email-send",
+	"email-receive",
+	"contact",
+]);
+
+const SUPPORTED_WEBHOOK_EVENTS = ACTIVE_WEBHOOK_EVENTS.map((e) => ({
+	...e,
+	effectiveCategory: getEventCategory(e),
+})).filter((e) => SUPPORTED_CATEGORIES.has(e.effectiveCategory));
 
 export const WebhookEventSelector = ({
 	value,
@@ -57,7 +67,7 @@ export const WebhookEventSelector = ({
 				event.name.toLowerCase().includes(query) ||
 				event.id.toLowerCase().includes(query) ||
 				event.description.toLowerCase().includes(query) ||
-				event.category.toLowerCase().includes(query),
+				event.effectiveCategory.toLowerCase().includes(query),
 		);
 	}, [searchQuery]);
 
@@ -65,14 +75,14 @@ export const WebhookEventSelector = ({
 		const groups: Record<string, (typeof SUPPORTED_WEBHOOK_EVENTS)[number][]> =
 			{};
 		// Stable category order matching product priority
-		const order = ["email", "contact"];
+		const order = ["email-send", "email-receive", "contact"];
 		for (const key of order) {
 			groups[key] = [];
 		}
 		for (const event of filteredEvents) {
-			const group = groups[event.category] ?? [];
+			const group = groups[event.effectiveCategory] ?? [];
 			group.push(event);
-			groups[event.category] = group;
+			groups[event.effectiveCategory] = group;
 		}
 		// Drop empty categories
 		for (const key of Object.keys(groups)) {

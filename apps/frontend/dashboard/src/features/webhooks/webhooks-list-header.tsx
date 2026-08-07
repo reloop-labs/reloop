@@ -4,6 +4,8 @@ import { Icon } from "@reloop/ui/icon";
 import { useRouter } from "next/navigation";
 
 import { useHotkeys } from "react-hotkeys-hook";
+import { WebhooksApiDetails } from "#/components/api-details/webhooks";
+import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 
 const DOCS_URL = "https://reloop.sh/docs/webhooks";
 
@@ -14,10 +16,27 @@ export function WebhooksListHeader() {
 		router.push("/webhooks/create");
 	};
 
-	useHotkeys("mod+a", (e) => {
-		e.preventDefault();
-		openCreate();
-	});
+	const openDocs = () => {
+		window.open(DOCS_URL, "_blank");
+	};
+
+	useHotkeys(
+		"d",
+		(e) => {
+			e.preventDefault();
+			openDocs();
+		},
+		{ enableOnFormTags: false, preventDefault: true },
+	);
+
+	useHotkeys(
+		"c",
+		(e) => {
+			e.preventDefault();
+			openCreate();
+		},
+		{ enableOnFormTags: false, preventDefault: true },
+	);
 
 	return (
 		<div className="flex flex-col gap-4 pt-2 pb-4 sm:flex-row sm:items-start sm:justify-between">
@@ -37,15 +56,33 @@ export function WebhooksListHeader() {
 			</div>
 
 			<div className="flex shrink-0 items-center gap-2">
+				<WebhooksApiDetails
+					renderTrigger={({ open }: { open: () => void }) => (
+						<Button.Root
+							type="button"
+							variant="neutral"
+							mode="stroke"
+							size="small"
+							onClick={open}
+							className="gap-1.5 rounded-xl"
+							aria-keyshortcuts="s"
+						>
+							SDK samples
+							<ActionKbd>S</ActionKbd>
+						</Button.Root>
+					)}
+				/>
 				<Button.Root
 					type="button"
 					variant="neutral"
 					mode="stroke"
 					size="small"
-					onClick={() => window.open(DOCS_URL, "_blank")}
-					className="rounded-xl"
+					onClick={openDocs}
+					className="gap-1.5 rounded-xl"
+					aria-keyshortcuts="d"
 				>
 					Documentation
+					<ActionKbd>D</ActionKbd>
 				</Button.Root>
 				<FancyButton.Root
 					type="button"
@@ -53,9 +90,13 @@ export function WebhooksListHeader() {
 					size="small"
 					onClick={openCreate}
 					className="gap-1.5 rounded-xl"
+					aria-keyshortcuts="c"
 				>
 					<Icon name="plus" className="h-4 w-4" />
 					Create webhook
+					<ActionKbd className="border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]">
+						C
+					</ActionKbd>
 				</FancyButton.Root>
 			</div>
 		</div>
