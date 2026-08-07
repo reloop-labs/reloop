@@ -17,10 +17,14 @@ import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import * as v from "valibot";
 import { useSWR } from "#/features/agent-inbox/lib/use-swr-compat";
+import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import type { Domain, DomainListResponse } from "#/features/domain/types";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import type { AgentMailbox } from "../types";
 import { useAgentInbox } from "./agent-inbox-provider";
+
+const actionKbdOnBlueClassName =
+	"w-auto min-w-4 border-white/25 bg-white/15 px-1 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]";
 
 /** RFC 5321/5322 unquoted local-part (dot-atom), max 64 chars */
 const EMAIL_LOCAL_PART_REGEX =
@@ -117,7 +121,7 @@ export const AddAgentAddressModal = ({
 	}, [selectedDomain]);
 
 	useHotkeys(
-		"mod+enter",
+		"enter",
 		(e) => {
 			e.preventDefault();
 			if (hasNoDomains || !canCreate || isSubmitting) return;
@@ -208,7 +212,7 @@ export const AddAgentAddressModal = ({
 		>
 			<Modal.Content
 				className="overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 sm:max-w-[460px] dark:border-stroke-soft-100/40"
-				showClose={true}
+				showClose={false}
 				onEscapeKeyDown={(e) => {
 					if (isSubmitting) e.preventDefault();
 				}}
@@ -217,7 +221,7 @@ export const AddAgentAddressModal = ({
 				}}
 			>
 				<div className="p-6">
-					<div className="pr-6">
+					<div>
 						<Modal.Title className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
 							{hasNoDomains ? "Connect a domain" : "Add address"}
 						</Modal.Title>
@@ -453,17 +457,18 @@ export const AddAgentAddressModal = ({
 							<Button.Root
 								type="button"
 								variant="neutral"
-								mode="ghost"
+								mode="stroke"
 								size="small"
 								onClick={() => {
 									if (!isSubmitting) onClose();
 								}}
 								className={cn(
-									"transition-opacity duration-200",
+									"gap-1.5 transition-opacity duration-200",
 									isSubmitting && "pointer-events-none opacity-50",
 								)}
 							>
 								Cancel
+								<ActionKbd className="w-auto min-w-4 px-1">esc</ActionKbd>
 							</Button.Root>
 							<FancyButton.Root
 								type="button"
@@ -497,16 +502,9 @@ export const AddAgentAddressModal = ({
 										) : (
 											<>
 												Add address
-												<span className="inline-flex items-center gap-0.5 opacity-80">
-													<Icon
-														name="command"
-														className="h-3.5 w-3.5 rounded-sm border border-white/20 p-px"
-													/>
-													<Icon
-														name="enter"
-														className="h-3.5 w-3.5 rounded-sm border border-white/20 p-px"
-													/>
-												</span>
+												<ActionKbd className={actionKbdOnBlueClassName}>
+													↵
+												</ActionKbd>
 											</>
 										)}
 									</motion.span>

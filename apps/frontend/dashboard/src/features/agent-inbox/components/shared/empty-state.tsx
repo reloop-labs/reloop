@@ -1,5 +1,9 @@
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
+import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
+
+const actionKbdOnBlueClassName =
+	"border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]";
 
 export const AgentInboxEmptyState = ({
 	onAddClick,
@@ -24,9 +28,11 @@ export const AgentInboxEmptyState = ({
 				size="small"
 				onClick={onAddClick}
 				className="gap-1.5 rounded-xl"
+				aria-keyshortcuts="a"
 			>
 				<Icon name="plus" className="h-4 w-4" />
 				Add address
+				<ActionKbd className={actionKbdOnBlueClassName}>A</ActionKbd>
 			</FancyButton.Root>
 		</div>
 	);
