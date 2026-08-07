@@ -274,8 +274,11 @@ function HealthCell({
 			</Tooltip.Trigger>
 			<Tooltip.Content sideOffset={4} className="rounded-lg px-2.5 py-1.5">
 				<p className="text-xs">
-					{rate}% success over 7 days ({success.toLocaleString()} delivered ·{" "}
-					{failure.toLocaleString()} failed)
+					{rate}% success over 7 days ({success.toLocaleString()} 2xx ·{" "}
+					{failure.toLocaleString()} errors)
+				</p>
+				<p className="mt-0.5 text-[10px] text-text-soft-400">
+					Teal = HTTP 200–299 · Red = non-2xx / failed attempts
 				</p>
 			</Tooltip.Content>
 		</Tooltip.Root>

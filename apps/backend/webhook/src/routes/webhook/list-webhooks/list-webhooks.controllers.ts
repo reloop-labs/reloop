@@ -58,12 +58,15 @@ async function loadHealthByWebhook(webhookIds: string[]): Promise<
 	const dayKeys = lastNDayKeys(HEALTH_DAYS);
 	const since = new Date(`${dayKeys[0]}T00:00:00.000Z`);
 
+	// Delivery pipeline marks success only when HTTP status is 2xx (200–299).
+	// Everything else (non-2xx, network/SSRF errors) lands as `failed` or
+	// `retrying`. Pending (never attempted) is excluded from both series.
 	const rows = await db
 		.select({
 			webhookId: schema.webhookDelivery.webhookId,
 			day: sql<string>`to_char(date_trunc('day', ${schema.webhookDelivery.createdAt} AT TIME ZONE 'UTC'), 'YYYY-MM-DD')`,
 			successes: sql<number>`count(*) filter (where ${schema.webhookDelivery.status} = 'success')::int`,
-			failures: sql<number>`count(*) filter (where ${schema.webhookDelivery.status} = 'failed')::int`,
+			failures: sql<number>`count(*) filter (where ${schema.webhookDelivery.status} in ('failed', 'retrying'))::int`,
 		})
 		.from(schema.webhookDelivery)
 		.where(
