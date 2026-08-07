@@ -214,6 +214,21 @@ export namespace WebhookModel {
 			consecutiveFailures: t.Number({
 				description: "Consecutive failure count",
 			}),
+			/** Daily successful deliveries for the last 7 days (oldest → newest). List only. */
+			healthSeries: t.Optional(
+				t.Array(t.Number(), {
+					description:
+						"Daily successful delivery counts for the last 7 days (oldest first)",
+				}),
+			),
+			/** Successful deliveries in the last 7 days. List only. */
+			healthSuccessCount7d: t.Optional(
+				t.Number({ description: "Successful deliveries in the last 7 days" }),
+			),
+			/** Failed deliveries in the last 7 days. List only. */
+			healthFailureCount7d: t.Optional(
+				t.Number({ description: "Failed deliveries in the last 7 days" }),
+			),
 			// Do NOT restrict to active-only — existing rows may hold inactive/legacy IDs.
 			events: t.Array(t.String({ minLength: 1 }), {
 				description:
@@ -253,6 +268,9 @@ export namespace WebhookModel {
 					successCount: 10,
 					failureCount: 1,
 					consecutiveFailures: 0,
+					healthSeries: [2, 1, 4, 3, 5, 2, 6],
+					healthSuccessCount7d: 23,
+					healthFailureCount7d: 1,
 					events: ["email.sent", "domain.create"],
 					createdAt: "2026-03-29T10:00:00Z",
 					updatedAt: "2026-03-29T10:00:00Z",

@@ -17,6 +17,10 @@ export type WebhookData = {
 	status: "active" | "paused" | "disabled" | "failed";
 	successCount: number;
 	failureCount: number;
+	/** Daily successful deliveries for last 7 days (oldest → newest). */
+	healthSeries?: number[];
+	healthSuccessCount7d?: number;
+	healthFailureCount7d?: number;
 	lastTriggeredAt: string | null;
 	createdAt: string;
 	events?: string[];
@@ -118,14 +122,24 @@ export function useWebhooks(options?: { limit?: number }) {
 	}, [data?.webhooks, statusFilter, searchQuery]);
 
 	const metrics = useMemo(() => {
+		// Prefer last-7-day stats from the list API when present.
 		const totalDeliveries =
-			data?.webhooks?.reduce(
-				(acc, curr) => acc + curr.successCount + curr.failureCount,
-				0,
-			) || 0;
+			data?.webhooks?.reduce((acc, curr) => {
+				const s = curr.healthSuccessCount7d;
+				const f = curr.healthFailureCount7d;
+				if (typeof s === "number" && typeof f === "number") {
+					return acc + s + f;
+				}
+				return acc + curr.successCount + curr.failureCount;
+			}, 0) || 0;
 
 		const totalFailures =
-			data?.webhooks?.reduce((acc, curr) => acc + curr.failureCount, 0) || 0;
+			data?.webhooks?.reduce((acc, curr) => {
+				if (typeof curr.healthFailureCount7d === "number") {
+					return acc + curr.healthFailureCount7d;
+				}
+				return acc + curr.failureCount;
+			}, 0) || 0;
 
 		const failureRate =
 			totalDeliveries > 0

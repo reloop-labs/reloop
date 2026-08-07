@@ -10,7 +10,7 @@ import * as Tooltip from "@reloop/ui/tooltip";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useQueryState } from "nuqs";
-import { useRef, useState } from "react";
+import { useId, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import { formatRelativeTime } from "#/utils/format-relative-time";
@@ -26,6 +26,10 @@ interface WebhookData {
 	status: "active" | "paused" | "disabled" | "failed";
 	successCount: number;
 	failureCount: number;
+	/** Daily successful deliveries for last 7 days (oldest → newest). */
+	healthSeries?: number[];
+	healthSuccessCount7d?: number;
+	healthFailureCount7d?: number;
 	lastTriggeredAt: string | null;
 	createdAt: string;
 	events?: string[];
@@ -43,7 +47,7 @@ interface WebhookTableProps {
 	onDeleteSuccess?: (deletedName: string) => void;
 }
 
-const GRID = "grid-cols-[minmax(0,1fr)_100px_110px_120px_minmax(40px,auto)]";
+const GRID = "grid-cols-[minmax(0,1fr)_100px_130px_120px_minmax(40px,auto)]";
 
 const getStatusColorClass = (status: string) => {
 	switch (status) {
@@ -73,45 +77,160 @@ const getStatusIcon = (status: string) => {
 	}
 };
 
+const SAMPLES = 16;
+const WIDTH = 120;
+const HEIGHT = 32;
+const PADDING = 2;
+
+const ease = (t: number) => (t < 0.5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2);
+
+function buildPaths(data: number[]) {
+	const values = data.length < 2 ? [0, 0] : data;
+	const min = Math.min(...values);
+	const max = Math.max(...values);
+	const flat = max === min;
+	// Constant series: draw mid-line (or bottom if all zeros).
+	const range = flat ? 1 : max - min;
+	const yFor = (v: number) => {
+		if (flat) {
+			return v === 0
+				? PADDING + (HEIGHT - PADDING * 2)
+				: PADDING + (HEIGHT - PADDING * 2) * 0.45;
+		}
+		return PADDING + (HEIGHT - PADDING * 2) - ((v - min) / range) * (HEIGHT - PADDING * 2);
+	};
+	const innerW = WIDTH - PADDING * 2;
+	const last = values.length - 1;
+	const points: { x: number; y: number }[] = [];
+
+	for (let i = 0; i < last; i++) {
+		const x0 = PADDING + (i / last) * innerW;
+		const x1 = PADDING + ((i + 1) / last) * innerW;
+		const y0 = yFor(values[i]);
+		const y1 = yFor(values[i + 1]);
+		for (let s = 0; s < SAMPLES; s++) {
+			const t = s / SAMPLES;
+			const et = ease(t);
+			points.push({ x: x0 + (x1 - x0) * t, y: y0 + (y1 - y0) * et });
+		}
+	}
+	points.push({
+		x: PADDING + innerW,
+		y: yFor(values[last]),
+	});
+
+	const linePath = points
+		.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x.toFixed(2)} ${p.y.toFixed(2)}`)
+		.join(" ");
+	const bottom = HEIGHT - PADDING;
+	const lastPt = points[points.length - 1];
+	const areaPath = `${linePath} L ${lastPt.x.toFixed(2)} ${bottom.toFixed(2)} L ${points[0].x.toFixed(2)} ${bottom.toFixed(2)} Z`;
+	return { linePath, areaPath };
+}
+
+type ChartLineChartProps = {
+	/** Swap this array for your real series — numbers only. */
+	data?: number[];
+	className?: string;
+	style?: React.CSSProperties;
+};
+
+/**
+ * Tiny SVG line chart. Tint via CSS: --chart-color: #0c8a7a;
+ * Edges fade out over 8px on each side.
+ */
+export function ChartLineChart({
+	data = [7, 11, 4, 14, 9, 18, 6, 16, 12, 20, 8, 15],
+	className,
+	style,
+}: ChartLineChartProps) {
+	const gradientId = useId();
+	const { linePath, areaPath } = useMemo(() => buildPaths(data), [data]);
+
+	return (
+		<svg
+			width={WIDTH}
+			height={HEIGHT}
+			viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
+			className={className}
+			style={{
+				maskImage:
+					"linear-gradient(to right, transparent, black 8px, black calc(100% - 8px), transparent)",
+				WebkitMaskImage:
+					"linear-gradient(to right, transparent, black 8px, black calc(100% - 8px), transparent)",
+				...style,
+			}}
+			role="img"
+			aria-label="Line chart"
+		>
+			<defs>
+				<linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+					<stop
+						offset="0%"
+						stopColor="var(--chart-color, #0c8a7a)"
+						stopOpacity="0.28"
+					/>
+					<stop
+						offset="100%"
+						stopColor="var(--chart-color, #0c8a7a)"
+						stopOpacity="0"
+					/>
+				</linearGradient>
+			</defs>
+			<path d={areaPath} fill={`url(#${gradientId})`} />
+			<path
+				d={linePath}
+				fill="none"
+				stroke="var(--chart-color, #0c8a7a)"
+				strokeWidth="2"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+		</svg>
+	);
+}
+
 function HealthCell({
-	successCount,
-	failureCount,
+	healthSeries,
+	successCount7d,
+	failureCount7d,
 }: {
-	successCount: number;
-	failureCount: number;
+	/** Daily successful deliveries, oldest → newest (last 7 days). */
+	healthSeries?: number[];
+	successCount7d?: number;
+	failureCount7d?: number;
 }) {
-	const total = successCount + failureCount;
-	if (total === 0) {
+	const series = healthSeries?.length === 7 ? healthSeries : null;
+	const success = successCount7d ?? 0;
+	const failure = failureCount7d ?? 0;
+	const total = success + failure;
+	const hasActivity =
+		total > 0 || (series !== null && series.some((v) => v > 0));
+
+	if (!hasActivity || !series) {
 		return (
 			<span className="font-medium text-[13px] text-text-soft-400">—</span>
 		);
 	}
-	const rate = Math.round((successCount / total) * 100);
-	const tone =
-		rate >= 95
-			? "text-success-base"
-			: rate >= 80
-				? "text-warning-base"
-				: "text-error-base";
+
+	const rate = total > 0 ? Math.round((success / total) * 100) : 0;
+	const chartColor =
+		rate >= 95 ? "#0c8a7a" : rate >= 80 ? "#d97706" : "#dc2626";
 
 	return (
 		<Tooltip.Root delayDuration={200}>
 			<Tooltip.Trigger asChild>
-				<div className="flex flex-col gap-0.5">
-					<span className={cn("font-medium text-[13px] tabular-nums", tone)}>
-						{rate}%
-					</span>
-					<span className="font-medium text-[10px] text-text-soft-400 tabular-nums">
-						{successCount.toLocaleString()}
-						<span className="text-text-disabled-300"> / </span>
-						{failureCount.toLocaleString()}
-					</span>
+				<div className="flex cursor-help items-center">
+					<ChartLineChart
+						data={series}
+						style={{ "--chart-color": chartColor } as React.CSSProperties}
+					/>
 				</div>
 			</Tooltip.Trigger>
 			<Tooltip.Content sideOffset={4} className="rounded-lg px-2.5 py-1.5">
 				<p className="text-xs">
-					{successCount.toLocaleString()} delivered ·{" "}
-					{failureCount.toLocaleString()} failed
+					{rate}% success over 7 days ({success.toLocaleString()} delivered ·{" "}
+					{failure.toLocaleString()} failed)
 				</p>
 			</Tooltip.Content>
 		</Tooltip.Root>
@@ -445,6 +564,7 @@ export const WebhookTable = ({
 							const isToggling = isTogglingStatus === webhook.id;
 
 							return (
+								// biome-ignore lint/a11y/useSemanticElements: interactive table row
 								<div
 									key={webhook.id}
 									role="link"
@@ -485,11 +605,12 @@ export const WebhookTable = ({
 										</div>
 									</div>
 
-									{/* Health */}
+									{/* Health — last 7 days of real delivery data */}
 									<div className="flex items-center">
 										<HealthCell
-											successCount={webhook.successCount}
-											failureCount={webhook.failureCount}
+											healthSeries={webhook.healthSeries}
+											successCount7d={webhook.healthSuccessCount7d}
+											failureCount7d={webhook.healthFailureCount7d}
 										/>
 									</div>
 
