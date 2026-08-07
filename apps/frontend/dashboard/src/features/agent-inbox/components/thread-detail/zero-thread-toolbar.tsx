@@ -17,22 +17,12 @@ const iconBtnBase = cn(
 	"active:scale-[0.97]",
 );
 
-type ActionTone =
-	| "neutral"
-	| "important"
-	| "archive"
-	| "spam"
-	| "print"
-	| "unsubscribe"
-	| "danger";
+type ActionTone = "neutral" | "archive" | "spam" | "danger";
 
 const toneClass: Record<ActionTone, string> = {
 	neutral: "text-mail-muted hover:text-mail-foreground",
-	important: "text-mail-muted hover:text-orange-600 dark:hover:text-orange-300",
 	archive: "text-mail-muted hover:text-sky-600 dark:hover:text-sky-300",
 	spam: "text-mail-muted hover:text-rose-600 dark:hover:text-rose-300",
-	print: "text-mail-muted hover:text-slate-700 dark:hover:text-slate-200",
-	unsubscribe: "text-mail-muted hover:text-teal-600 dark:hover:text-teal-300",
 	danger:
 		"text-[var(--inbox-danger-fg)] hover:text-red-600 dark:hover:text-red-300",
 };
@@ -94,39 +84,46 @@ const ActionButton = ({
 	</button>
 );
 
+const ToolbarDivider = () => (
+	<span
+		className="mx-0.5 h-4 w-px shrink-0 bg-mail-border/60"
+		aria-hidden
+	/>
+);
+
 export const ZeroThreadToolbar = ({
-	isImportant,
+	isUnread,
 	folder,
 	onClose,
-	onToggleImportant,
 	onArchive,
 	onUnarchive,
 	onRestore,
 	onDelete,
-	onPrint,
 	onMarkSpam,
-	onUnsubscribe,
+	onMarkUnread,
+	onMarkRead,
+	onLabels,
 	showBack,
 }: {
-	isImportant?: boolean;
+	isUnread?: boolean;
 	folder?: string;
 	onClose?: () => void;
-	onToggleImportant?: () => void;
 	onArchive: () => void;
 	onUnarchive?: () => void;
 	onRestore?: () => void;
 	onDelete: () => void;
-	onPrint: () => void;
 	onMarkSpam: () => void;
-	onUnsubscribe?: () => void;
+	onMarkUnread?: () => void;
+	onMarkRead?: () => void;
+	onLabels?: () => void;
 	showBack?: boolean;
 }) => {
 	const inArchive = folder === "archive" || folder === "archived";
 	const inTrash = folder === "trash";
 	const inSpam = folder === "spam";
 	const showRestore = inArchive || inTrash || inSpam;
-	const importantLabel = isImportant ? "Unmark important" : "Mark important";
 	const trashLabel = inTrash ? "Delete forever" : "Move to trash";
+	const readLabel = isUnread ? "Mark as read" : "Mark as unread";
 
 	const [tip, setTip] = useState<TipState | null>(null);
 	const hideTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -161,41 +158,22 @@ export const ZeroThreadToolbar = ({
 	return (
 		<div className="flex shrink-0 items-center gap-1 px-1 pb-[10px] md:px-3 md:pt-3 md:pb-[11px]">
 			{(showBack || onClose) && (
-				<ActionButton
-					label={showBack ? "Back to list" : "Close"}
-					onClick={onClose}
-					tone="neutral"
-					className="inline-flex"
-					onShowTip={showTip}
-					onHideTip={hideTip}
-				>
-					<Icon name={showBack ? "arrow-left" : "cross"} />
-				</ActionButton>
+				<>
+					<ActionButton
+						label={showBack ? "Back to list" : "Close"}
+						onClick={onClose}
+						tone="neutral"
+						className="inline-flex"
+						onShowTip={showTip}
+						onHideTip={hideTip}
+					>
+						<Icon name={showBack ? "arrow-left" : "cross"} />
+					</ActionButton>
+					<ToolbarDivider />
+				</>
 			)}
 
-			{(showBack || onClose) && (
-				<span
-					className="mx-0.5 h-4 w-px shrink-0 bg-mail-border/60"
-					aria-hidden
-				/>
-			)}
-
-			{onToggleImportant && (
-				<ActionButton
-					label={importantLabel}
-					onClick={onToggleImportant}
-					tone="important"
-					className={cn(
-						isImportant &&
-							"fill-orange-500 text-orange-500 [&_svg]:fill-orange-500",
-					)}
-					onShowTip={showTip}
-					onHideTip={hideTip}
-				>
-					<Icon name="zap" />
-				</ActionButton>
-			)}
-
+			{/* Gmail primary actions: archive · spam · trash */}
 			{showRestore ? (
 				<ActionButton
 					label="Move to inbox"
@@ -220,35 +198,13 @@ export const ZeroThreadToolbar = ({
 
 			{!inSpam && (
 				<ActionButton
-					label="Move to spam"
+					label="Report spam"
 					onClick={onMarkSpam}
 					tone="spam"
 					onShowTip={showTip}
 					onHideTip={hideTip}
 				>
-					<Icon name="alert" />
-				</ActionButton>
-			)}
-
-			<ActionButton
-				label="Print thread"
-				onClick={onPrint}
-				tone="print"
-				onShowTip={showTip}
-				onHideTip={hideTip}
-			>
-				<Icon name="printer" />
-			</ActionButton>
-
-			{onUnsubscribe && (
-				<ActionButton
-					label="Unsubscribe"
-					onClick={onUnsubscribe}
-					tone="unsubscribe"
-					onShowTip={showTip}
-					onHideTip={hideTip}
-				>
-					<Icon name="link" />
+					<Icon name="alert-octagon" />
 				</ActionButton>
 			)}
 
@@ -260,6 +216,31 @@ export const ZeroThreadToolbar = ({
 				onHideTip={hideTip}
 			>
 				<Icon name="trash" />
+			</ActionButton>
+
+			{/* Secondary: mark read/unread · move (Gmail order) */}
+			<ToolbarDivider />
+
+			{(onMarkUnread || onMarkRead) && (
+				<ActionButton
+					label={readLabel}
+					onClick={isUnread ? onMarkRead : onMarkUnread}
+					tone="neutral"
+					onShowTip={showTip}
+					onHideTip={hideTip}
+				>
+					<Icon name="mail" />
+				</ActionButton>
+			)}
+
+			<ActionButton
+				label="Move to"
+				onClick={onLabels}
+				tone="neutral"
+				onShowTip={showTip}
+				onHideTip={hideTip}
+			>
+				<Icon name="folder-move" />
 			</ActionButton>
 
 			<ToolbarTip tip={tip} />

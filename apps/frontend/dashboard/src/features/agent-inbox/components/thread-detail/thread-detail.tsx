@@ -150,7 +150,6 @@ export const ThreadDetail = ({
 		trashThread,
 		restoreThread,
 		unarchiveThread,
-		toggleThreadImportant,
 		sendReply,
 		sendReplyAll,
 		sendForward,
@@ -640,49 +639,13 @@ export const ThreadDetail = ({
 		}
 	};
 
-	const handleToggleImportant = async () => {
-		if (!threadKey) return;
-		try {
-			await toggleThreadImportant(threadKey, !thread?.isImportant);
-			toast.success(
-				thread?.isImportant ? "Unmarked important" : "Marked important",
-			);
-		} catch (err: unknown) {
-			toast.error(
-				err instanceof Error ? err.message : "Failed to update important",
-			);
-		}
-	};
-
-	const listUnsubscribeUrl = useMemo(() => {
-		const headers =
-			displayMessages.find((m) => m.direction !== "outbound")?.email?.headers ||
-			displayMessages.find((m) => m.direction !== "outbound")?.headers ||
-			null;
-		if (!headers || typeof headers !== "object") return null;
-		const raw =
-			headers["List-Unsubscribe"] ||
-			headers["list-unsubscribe"] ||
-			headers["LIST-UNSUBSCRIBE"];
-		if (!raw || typeof raw !== "string") return null;
-		const match =
-			raw.match(/<(https?:\/\/[^>]+)>/i) || raw.match(/(https?:\/\/\S+)/i);
-		return match?.[1] ?? null;
-	}, [displayMessages]);
-
-	const handleUnsubscribe = () => {
-		if (!listUnsubscribeUrl) return;
-		window.open(listUnsubscribeUrl, "_blank", "noopener,noreferrer");
-		toast.success("Opened unsubscribe link");
-	};
-
 	const handleToggleRead = async (isRead: boolean) => {
 		if (!thread || !messageId) return;
 		try {
 			await markMessageRead(messageId, isRead, {
 				threadId: thread.threadId ?? null,
 			});
-			toast.success(isRead ? "Marked as Handled" : "Marked as Active");
+			toast.success(isRead ? "Marked as read" : "Marked as unread");
 		} catch (err: any) {
 			toast.error(err.message || "Failed to update status");
 		}
@@ -1248,18 +1211,17 @@ export const ThreadDetail = ({
 	return (
 		<div className="relative flex h-full min-h-0 flex-col rounded-2xl bg-panel-light dark:bg-panel-dark">
 			<ZeroThreadToolbar
-				isImportant={!!thread.isImportant}
+				isUnread={!!thread.unread}
 				folder={folder}
 				showBack={showBack}
 				onClose={onBack}
-				onToggleImportant={() => void handleToggleImportant()}
 				onArchive={() => void handleArchive()}
 				onUnarchive={() => void handleUnarchive()}
 				onRestore={() => void handleRestore()}
 				onDelete={() => void handleDelete()}
-				onPrint={handlePrint}
 				onMarkSpam={() => void handleMarkSpam(true)}
-				onUnsubscribe={listUnsubscribeUrl ? handleUnsubscribe : undefined}
+				onMarkUnread={() => void handleToggleRead(false)}
+				onMarkRead={() => void handleToggleRead(true)}
 			/>
 
 			<div className="min-h-0 flex-1 overflow-y-auto">

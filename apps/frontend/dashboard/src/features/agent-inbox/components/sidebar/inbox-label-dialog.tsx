@@ -2,6 +2,7 @@ import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
+import * as Input from "@reloop/ui/input";
 import * as Modal from "@reloop/ui/modal";
 import { useEffect, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
@@ -70,12 +71,6 @@ export const InboxLabelDialog = ({
 		[open, isSubmitting, trimmed, color],
 	);
 
-	const modKey =
-		typeof navigator !== "undefined" &&
-		/Mac|iPhone|iPod|iPad/i.test(navigator.platform)
-			? "⌘"
-			: "Ctrl";
-
 	return (
 		<Modal.Root open={open} onOpenChange={onOpenChange}>
 			<Modal.Content
@@ -123,37 +118,30 @@ export const InboxLabelDialog = ({
 							>
 								Label preview
 							</label>
-							<div
-								className={cn(
-									"flex items-center gap-2.5 rounded-2xl border bg-[var(--inbox-hover)] px-3.5 py-2.5 focus-within:ring-2",
-									error
-										? "border-error-base focus-within:ring-error-base/20"
-										: "border-mail-border/40 focus-within:border-mail-primary/40 focus-within:ring-mail-primary/15",
-								)}
-							>
-								<span
-									className="size-2.5 shrink-0 rounded-full"
-									style={{ backgroundColor: previewColor }}
-									aria-hidden
-								/>
-								<input
-									id="inbox-label-name"
-									value={name}
-									onChange={(e) => {
-										setName(e.target.value);
-										if (error) setError(null);
-									}}
-									placeholder="Type a name…"
-									autoFocus
-									maxLength={40}
-									disabled={isSubmitting}
-									aria-invalid={!!error}
-									aria-describedby={
-										error ? "inbox-label-name-error" : undefined
-									}
-									className="min-w-0 flex-1 border-0 bg-transparent p-0 font-medium text-[13px] text-mail-foreground outline-none placeholder:text-mail-muted disabled:opacity-50"
-								/>
-							</div>
+							<Input.Root hasError={!!error}>
+								<Input.Wrapper>
+									<span
+										className="size-2.5 shrink-0 rounded-full"
+										style={{ backgroundColor: previewColor }}
+										aria-hidden
+									/>
+									<Input.Input
+										id="inbox-label-name"
+										value={name}
+										onChange={(e) => {
+											setName(e.target.value);
+											if (error) setError(null);
+										}}
+										placeholder="Type a name…"
+										maxLength={40}
+										disabled={isSubmitting}
+										aria-invalid={!!error}
+										aria-describedby={
+											error ? "inbox-label-name-error" : undefined
+										}
+									/>
+								</Input.Wrapper>
+							</Input.Root>
 							{error && (
 								<p
 									id="inbox-label-name-error"
@@ -180,9 +168,6 @@ export const InboxLabelDialog = ({
 										<button
 											key={option.id}
 											type="button"
-											role="radio"
-											aria-checked={selected}
-											aria-label={option.label}
 											title={option.label}
 											disabled={isSubmitting}
 											onClick={() => setColor(option.hex)}
@@ -213,27 +198,20 @@ export const InboxLabelDialog = ({
 							onClick={() => onOpenChange(false)}
 						>
 							Cancel
-							<span className="flex h-[19px] w-7 items-center justify-center rounded-[5px] border border-mail-border bg-offset-light/50 p-px font-medium text-[10px]">
-								Esc
-							</span>
+							<ActionKbd className="w-auto min-w-4 px-1">esc</ActionKbd>
 						</Button.Root>
 						<FancyButton.Root
 							type="submit"
 							variant="neutral"
 							size="xsmall"
 							disabled={isSubmitting}
-							className="min-w-[148px] pr-14"
+							className="gap-1.5"
 						>
-							<span className="text-sm leading-none">
-								{isSubmitting ? "Creating…" : "Create label"}
-							</span>
+							{isSubmitting ? "Creating…" : "Create label"}
 							{!isSubmitting && (
-								<div className="absolute top-1/2 right-2.5 z-20 flex -translate-y-1/2 items-center gap-0.5 opacity-90">
-									<ActionKbd className={actionKbdOnBlueClassName}>
-										{modKey}
-									</ActionKbd>
+								<span className="inline-flex items-center gap-0.5">
 									<ActionKbd className={actionKbdOnBlueClassName}>↵</ActionKbd>
-								</div>
+								</span>
 							)}
 						</FancyButton.Root>
 					</div>
