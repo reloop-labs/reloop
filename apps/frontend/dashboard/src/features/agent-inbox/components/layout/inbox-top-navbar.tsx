@@ -2,7 +2,7 @@
 
 import { cn } from "@reloop/ui/cn";
 import { Logo } from "@reloop/ui/logo";
-import { Menu, Search, Settings } from "lucide-react";
+import { Search, Settings } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -10,18 +10,16 @@ import { toast } from "sonner";
 import { AddAgentAddressModal } from "#/features/agent-inbox/components/add-agent-address-modal";
 import { useAgentInbox } from "#/features/agent-inbox/components/agent-inbox-provider";
 import { InboxNavUser } from "#/features/agent-inbox/components/sidebar/inbox-nav-user";
-import { useInboxSidebar } from "#/features/agent-inbox/components/sidebar/inbox-sidebar-context";
 import type { AgentMailbox } from "#/features/agent-inbox/types";
 import { useSessionQuery } from "#/features/auth/session-query";
 import { UserDropdown } from "#/features/dashboard/page-header/user-dropdown";
 
 /**
- * Gmail-style top chrome for the fullscreen inbox:
- * left = menu + logo, center = search, right = settings + profile + mailbox.
+ * Top chrome for the fullscreen inbox:
+ * left = dashboard logo lockup, center = search, right = settings + profile + mailbox.
  */
 export function InboxTopNavbar({ mailbox }: { mailbox: AgentMailbox }) {
 	const router = useRouter();
-	const { toggleSidebar, collapsed } = useInboxSidebar();
 	const { getMailbox, isLoadingMailboxes, mailboxesError, retryMailboxes } =
 		useAgentInbox();
 	const mailboxReady = !!getMailbox(mailbox.id) && !!mailbox.email;
@@ -43,28 +41,20 @@ export function InboxTopNavbar({ mailbox }: { mailbox: AgentMailbox }) {
 	return (
 		<>
 			<header className="flex h-14 shrink-0 items-center gap-3 border-mail-border/60 border-b bg-sidebar px-2 sm:px-3">
-				{/* Left: menu + logo */}
-				<div className="flex min-w-0 shrink-0 items-center gap-1 sm:gap-2">
-					<button
-						type="button"
-						onClick={toggleSidebar}
-						title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-						aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-						className="flex size-10 shrink-0 items-center justify-center rounded-full text-mail-muted transition-colors hover:bg-[var(--inbox-row-hover)] hover:text-mail-foreground"
-					>
-						<Menu className="h-5 w-5" strokeWidth={1.75} />
-					</button>
-					<Link
-						href="/"
-						className="flex min-w-0 items-center gap-1.5 rounded-lg pr-2 transition-opacity hover:opacity-90"
-						title="Back to dashboard"
-					>
-						<Logo className="h-8 w-8 shrink-0" />
-						<span className="hidden truncate font-normal text-[22px] text-mail-foreground tracking-tight sm:inline">
-							Reloop
+				{/* Left: same logo lockup as the main dashboard sidebar */}
+				<Link
+					href="/"
+					className="flex h-12 min-w-0 shrink-0 items-center justify-start pr-3 transition-opacity hover:opacity-90"
+					title="Back to dashboard"
+				>
+					<div className="flex items-center gap-2">
+						<Logo className="-ml-1 w-10 shrink-0" />
+						<p className="-ml-2 font-semibold text-mail-foreground">Reloop</p>
+						<span className="inline-flex items-center rounded-full bg-[var(--inbox-control)] px-2 py-0.5 font-bold text-[8px] text-mail-muted uppercase tracking-wide dark:bg-white/[0.06]">
+							Beta
 						</span>
-					</Link>
-				</div>
+					</div>
+				</Link>
 
 				{/* Center: search */}
 				<div className="flex min-w-0 flex-1 justify-center px-1 sm:px-4">
