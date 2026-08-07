@@ -28,17 +28,6 @@ export function MetricsListHeader() {
 					mode="stroke"
 					size="small"
 					onClick={() => window.open(DOCS_URL, "_blank")}
-					className="gap-1.5 rounded-xl"
-				>
-					<Icon name="video-guide" className="h-4 w-4 text-text-sub-600" />
-					Video guide
-				</Button.Root>
-				<Button.Root
-					type="button"
-					variant="neutral"
-					mode="stroke"
-					size="small"
-					onClick={() => window.open(DOCS_URL, "_blank")}
 					className="rounded-xl"
 				>
 					Documentation
