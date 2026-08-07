@@ -36,7 +36,7 @@ function ProviderIcon({ provider }: { provider: InferredDnsProvider }) {
 		: null;
 
 	return (
-		<div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-bg-white-0 shadow-sm ring-1 ring-stroke-soft-100 dark:bg-bg-weak-50/50 dark:ring-stroke-soft-100/40">
+		<div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-bg-white-0 ring-1 ring-stroke-soft-100 dark:bg-bg-weak-50/50 dark:ring-stroke-soft-100/40">
 			{dnsIcon ? (
 				<div
 					className="flex h-10 w-10 items-center justify-center rounded-lg"
@@ -94,7 +94,7 @@ export function DnsAutoConnectBanner({
 		return (
 			<div className="overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-weak-50/30 p-4 dark:border-stroke-soft-100/40">
 				<div className="flex items-center justify-between gap-6">
-					<div className="flex items-center gap-4">
+					<div className="flex gap-4">
 						<ProviderIcon provider={provider} />
 						<div className="space-y-1">
 							<h3 className="font-semibold text-paragraph-base text-text-strong-950">
@@ -172,7 +172,7 @@ export function DnsAutoConnectBanner({
 		return (
 			<div className="overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-weak-50/30 p-4 dark:border-stroke-soft-100/40">
 				<div className="flex items-center justify-between gap-6">
-					<div className="flex items-center gap-4">
+					<div className="flex gap-4">
 						<ProviderIcon provider={provider} />
 						<div className="space-y-1">
 							<h3 className="font-semibold text-paragraph-base text-text-strong-950">
@@ -182,20 +182,6 @@ export function DnsAutoConnectBanner({
 								We&apos;ve detected your domain is managed by {provider.label}.
 								Add the DNS records below in your provider panel.
 							</p>
-							<a
-								href={provider.docsUrl}
-								target="_blank"
-								rel="noopener noreferrer"
-								className="inline-flex items-center gap-1 text-paragraph-xs text-text-sub-600 underline decoration-stroke-soft-200 decoration-dashed underline-offset-4 transition-colors hover:text-text-strong-950"
-							>
-								{provider.docsSlug
-									? `${provider.label} setup guide`
-									: "Browse all DNS setup guides"}
-								<Icon
-									name="link-external"
-									className="h-3 w-3 text-text-soft-400"
-								/>
-							</a>
 						</div>
 					</div>
 

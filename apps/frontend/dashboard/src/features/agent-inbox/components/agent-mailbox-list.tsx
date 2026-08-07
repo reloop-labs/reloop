@@ -298,14 +298,6 @@ export const AgentMailboxList = () => {
 
 	const [togglingId, setTogglingId] = useState<string | null>(null);
 	const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
-	const [deletedName, setDeletedName] = useState<string | null>(null);
-
-	useEffect(() => {
-		if (deletedName) {
-			const timer = setTimeout(() => setDeletedName(null), 8000);
-			return () => clearTimeout(timer);
-		}
-	}, [deletedName]);
 
 	const filteredMailboxes = useMemo(() => {
 		const q = (searchQuery ?? "").trim().toLowerCase();
@@ -367,34 +359,6 @@ export const AgentMailboxList = () => {
 
 	return (
 		<div className="pb-8">
-			<AnimatePresence>
-				{deletedName && (
-					<motion.div
-						key="deleted-banner"
-						initial={{ opacity: 0, y: -8, height: 0 }}
-						animate={{ opacity: 1, y: 0, height: "auto" }}
-						exit={{ opacity: 0, y: -8, height: 0 }}
-						transition={{ duration: 0.2 }}
-						className="mb-4 overflow-hidden"
-					>
-						<div className="flex items-center justify-between rounded-xl border border-[#B7F1D0] bg-[#E8FAF0] px-4 py-3 text-[#0F5C34] text-sm dark:border-emerald-800/40 dark:bg-emerald-950/30 dark:text-emerald-200">
-							<span>
-								Address &quot;
-								<span className="font-semibold">{deletedName}</span>&quot; has
-								been successfully deleted.
-							</span>
-							<button
-								type="button"
-								onClick={() => setDeletedName(null)}
-								className="p-1 text-[#0F5C34]/70 transition-colors hover:text-[#0F5C34] dark:text-emerald-200/70 dark:hover:text-emerald-200"
-							>
-								<Icon name="close" className="h-4 w-4" />
-							</button>
-						</div>
-					</motion.div>
-				)}
-			</AnimatePresence>
-
 			<div className="space-y-4">
 				<AgentMailboxListToolbar />
 
@@ -442,8 +406,6 @@ export const AgentMailboxList = () => {
 								return (
 									<div
 										key={mailbox.id}
-										role="link"
-										tabIndex={0}
 										onClick={() => goToMailbox(mailbox.id)}
 										onKeyDown={(e) => {
 											if (e.key === "Enter" || e.key === " ") {
@@ -547,7 +509,7 @@ export const AgentMailboxList = () => {
 			<DeleteAgentMailboxModal
 				mailboxes={mailboxes}
 				onDeleteSuccess={(name) => {
-					setDeletedName(name);
+					toast.success(`Address "${name}" has been successfully deleted.`);
 					void refresh();
 				}}
 			/>

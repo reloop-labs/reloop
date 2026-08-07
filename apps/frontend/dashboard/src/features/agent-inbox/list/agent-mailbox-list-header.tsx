@@ -3,8 +3,12 @@ import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { useQueryState } from "nuqs";
 import { useHotkeys } from "react-hotkeys-hook";
+import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 
 const DOCS_URL = "https://reloop.sh/docs/learn/agent-inbox";
+
+const actionKbdOnBlueClassName =
+	"border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]";
 
 export function AgentMailboxListHeader() {
 	const [, setModal] = useQueryState("modal");
@@ -12,6 +16,28 @@ export function AgentMailboxListHeader() {
 	const openAdd = () => {
 		void setModal("create-agent-mailbox");
 	};
+
+	const openDocs = () => {
+		window.open(DOCS_URL, "_blank");
+	};
+
+	useHotkeys(
+		"d",
+		(e) => {
+			e.preventDefault();
+			openDocs();
+		},
+		{ enableOnFormTags: false, preventDefault: true },
+	);
+
+	useHotkeys(
+		"a",
+		(e) => {
+			e.preventDefault();
+			openAdd();
+		},
+		{ enableOnFormTags: false, preventDefault: true },
+	);
 
 	useHotkeys("mod+a", (e) => {
 		e.preventDefault();
@@ -41,10 +67,12 @@ export function AgentMailboxListHeader() {
 					variant="neutral"
 					mode="stroke"
 					size="small"
-					onClick={() => window.open(DOCS_URL, "_blank")}
-					className="rounded-xl"
+					onClick={openDocs}
+					className="gap-1.5 rounded-xl"
+					aria-keyshortcuts="d"
 				>
 					Documentation
+					<ActionKbd>D</ActionKbd>
 				</Button.Root>
 				<FancyButton.Root
 					type="button"
@@ -52,11 +80,14 @@ export function AgentMailboxListHeader() {
 					size="small"
 					onClick={openAdd}
 					className="gap-1.5 rounded-xl"
+					aria-keyshortcuts="a"
 				>
 					<Icon name="plus" className="h-4 w-4" />
 					Add address
+					<ActionKbd className={actionKbdOnBlueClassName}>A</ActionKbd>
 				</FancyButton.Root>
 			</div>
 		</div>
 	);
 }
+

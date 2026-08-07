@@ -231,20 +231,6 @@ export const DNSAutoConnectBanner: React.FC<DNSAutoConnectBannerProps> = ({
 								We've detected your domain is managed by {provider.label}. Add
 								the DNS records below in your provider panel.
 							</p>
-							<a
-								href={provider.docsUrl}
-								target="_blank"
-								rel="noopener noreferrer"
-								className="inline-flex items-center gap-1 text-paragraph-xs text-text-sub-600 underline decoration-stroke-soft-200 decoration-dashed underline-offset-4 transition-colors hover:text-text-strong-950"
-							>
-								{provider.docsSlug
-									? `${provider.label} setup guide`
-									: "Browse all DNS setup guides"}
-								<Icon
-									name="link-external"
-									className="h-3 w-3 text-text-soft-400"
-								/>
-							</a>
 						</div>
 					</div>
 
