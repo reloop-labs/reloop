@@ -113,12 +113,10 @@ export function EditWebhookPage({ webhookId }: EditWebhookPageProps) {
 						size="small"
 						onClick={goBack}
 						disabled={isLoading}
-						className="rounded-xl"
+						className="gap-1.5 rounded-xl"
 					>
 						Cancel
-						<ActionKbd className="uppercase! w-auto min-w-4 px-1">
-							ESC
-						</ActionKbd>
+						<ActionKbd className="w-auto min-w-4 px-1">esc</ActionKbd>
 					</Button.Root>
 					<FancyButton.Root
 						type="submit"

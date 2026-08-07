@@ -23,13 +23,11 @@ export function CreateWebhookActions({ isLoading }: CreateWebhookActionsProps) {
 				size="small"
 				asChild
 				disabled={isLoading}
-				className="rounded-xl"
+				className="gap-1.5 rounded-xl"
 			>
 				<Link href="/webhooks">
 					Cancel
-					<ActionKbd className="w-auto min-w-4 px-1 uppercase!">
-						ESC
-					</ActionKbd>
+					<ActionKbd className="w-auto min-w-4 px-1">esc</ActionKbd>
 				</Link>
 			</Button.Root>
 			<FancyButton.Root

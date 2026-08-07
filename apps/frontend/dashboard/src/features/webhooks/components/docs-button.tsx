@@ -1,8 +1,8 @@
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import { KbdKeyOutline } from "@reloop/ui/kbd-key-outline";
 import { useHotkeys } from "react-hotkeys-hook";
+import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 
 const openDocs = () =>
 	window.open("https://reloop.sh/docs/webhooks", "_blank");
@@ -27,11 +27,12 @@ export const DocsButton = (props: ButtonProps) => {
 			size={size}
 			onClick={openDocs}
 			className={cn("gap-1.5", className)}
+			aria-keyshortcuts="d"
 			{...rest}
 		>
 			<Icon name="book-closed" className="h-4 w-4" />
 			Docs
-			<KbdKeyOutline>D</KbdKeyOutline>
+			<ActionKbd className="w-auto min-w-4 px-1">D</ActionKbd>
 		</Button.Root>
 	);
 };

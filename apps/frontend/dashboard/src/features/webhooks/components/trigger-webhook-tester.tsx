@@ -9,7 +9,11 @@ import axios from "axios";
 import { useMemo, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
+import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { useInvalidateWebhooks } from "#/features/webhooks/hooks/use-webhooks-query";
+
+const actionKbdOnBlueClassName =
+	"w-auto min-w-4 border-white/25 bg-white/15 px-1 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]";
 
 interface TriggerWebhookTesterProps {
 	webhookId: string;
@@ -110,6 +114,12 @@ export const TriggerWebhookTester = ({
 		},
 		{ enableOnFormTags: true },
 	);
+
+	const modKey =
+		typeof navigator !== "undefined" &&
+		/Mac|iPhone|iPod|iPad/i.test(navigator.platform)
+			? "⌘"
+			: "Ctrl";
 
 	const handleSelectEvent = (eventId: string) => {
 		setSelectedEventId(eventId);
@@ -267,9 +277,10 @@ export const TriggerWebhookTester = ({
 							size="xsmall"
 							onClick={onCancel}
 							disabled={isTriggering}
-							className="rounded-xl"
+							className="gap-1.5 rounded-xl"
 						>
 							Cancel
+							<ActionKbd className="w-auto min-w-4 px-1">esc</ActionKbd>
 						</Button.Root>
 						<FancyButton.Root
 							type="button"
@@ -287,15 +298,13 @@ export const TriggerWebhookTester = ({
 							) : (
 								<>
 									Send test event
-									<span className="inline-flex items-center gap-0.5 opacity-80">
-										<Icon
-											name="command"
-											className="h-3 w-3 rounded-sm border border-white/20 p-px"
-										/>
-										<Icon
-											name="enter"
-											className="h-3 w-3 rounded-sm border border-white/20 p-px"
-										/>
+									<span className="inline-flex items-center gap-0.5">
+										<ActionKbd className={actionKbdOnBlueClassName}>
+											{modKey}
+										</ActionKbd>
+										<ActionKbd className={actionKbdOnBlueClassName}>
+											↵
+										</ActionKbd>
 									</span>
 								</>
 							)}

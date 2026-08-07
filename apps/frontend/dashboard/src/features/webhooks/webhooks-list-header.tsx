@@ -38,6 +38,8 @@ export function WebhooksListHeader() {
 		{ enableOnFormTags: false, preventDefault: true },
 	);
 
+	// S is handled by WebhooksApiDetails trigger (opens SDK samples).
+
 	return (
 		<div className="flex flex-col gap-4 pt-2 pb-4 sm:flex-row sm:items-start sm:justify-between">
 			<div>
@@ -68,7 +70,7 @@ export function WebhooksListHeader() {
 							aria-keyshortcuts="s"
 						>
 							SDK samples
-							<ActionKbd>S</ActionKbd>
+							<ActionKbd className="w-auto min-w-4 px-1">S</ActionKbd>
 						</Button.Root>
 					)}
 				/>
@@ -82,7 +84,7 @@ export function WebhooksListHeader() {
 					aria-keyshortcuts="d"
 				>
 					Documentation
-					<ActionKbd>D</ActionKbd>
+					<ActionKbd className="w-auto min-w-4 px-1">D</ActionKbd>
 				</Button.Root>
 				<FancyButton.Root
 					type="button"
@@ -94,7 +96,7 @@ export function WebhooksListHeader() {
 				>
 					<Icon name="plus" className="h-4 w-4" />
 					Create webhook
-					<ActionKbd className="border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]">
+					<ActionKbd className="w-auto min-w-4 border-white/25 bg-white/15 px-1 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]">
 						C
 					</ActionKbd>
 				</FancyButton.Root>
