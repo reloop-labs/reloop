@@ -2,6 +2,7 @@ import * as Button from "@reloop/ui/button";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { useRouter } from "next/navigation";
+import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 
 export const EmptyState = ({
 	isFiltered = false,
@@ -47,9 +48,13 @@ export const EmptyState = ({
 					size="small"
 					onClick={() => router.push("/webhooks/create")}
 					className="gap-1.5 rounded-xl"
+					aria-keyshortcuts="c"
 				>
 					<Icon name="plus" className="h-4 w-4" />
 					Create webhook
+					<ActionKbd className="border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]">
+						C
+					</ActionKbd>
 				</FancyButton.Root>
 			)}
 		</div>
