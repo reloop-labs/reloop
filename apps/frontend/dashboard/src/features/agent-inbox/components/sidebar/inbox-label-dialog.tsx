@@ -85,7 +85,7 @@ export const InboxLabelDialog = ({
 				}}
 			>
 				<form onSubmit={(e) => void handleSubmit(e)}>
-					<div className="flex items-start justify-between border-mail-border/40 border-b px-5 pt-5 pb-4">
+					<div className="border-mail-border/40 border-b px-5 pt-5 pb-4">
 						<div className="flex flex-col gap-1">
 							<div className="flex items-center gap-2.5">
 								<Icon name="tag" className="h-4 w-4 text-mail-foreground" />
@@ -99,15 +99,6 @@ export const InboxLabelDialog = ({
 								Tag and filter messages in this mailbox.
 							</p>
 						</div>
-						<button
-							type="button"
-							onClick={() => onOpenChange(false)}
-							disabled={isSubmitting}
-							className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-transparent text-mail-muted transition-transform duration-150 ease-out hover:bg-[var(--inbox-hover)] hover:text-mail-foreground active:scale-[0.95] disabled:opacity-50"
-							aria-label="Close"
-						>
-							<Icon name="cross" className="h-3.5 w-3.5" />
-						</button>
 					</div>
 
 					<Modal.Body className="space-y-5 px-5 py-5">
