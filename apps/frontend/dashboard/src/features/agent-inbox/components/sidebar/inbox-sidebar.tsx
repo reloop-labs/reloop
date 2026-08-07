@@ -2,7 +2,7 @@ import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
-import { ChevronDown, Pencil, Plus, Star } from "lucide-react";
+import { Pencil, Plus, Star } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
@@ -131,17 +131,9 @@ const SectionHeader = ({
 		return <div className="mx-2 mt-1 mb-2 h-px bg-[var(--inbox-muted-bg)]" />;
 	}
 	return (
-		<div
-			className={cn(
-				"flex items-center justify-between px-2 py-2",
-				isFirst ? "pt-1" : "pt-3.5",
-			)}
-		>
+		<div className={cn("px-2 py-2", isFirst ? "pt-1" : "pt-3.5")}>
 			<span className="font-semibold text-[12px] text-mail-foreground opacity-40">
 				{title}
-			</span>
-			<span className="text-mail-foreground opacity-40">
-				<ChevronDown className="h-3.5 w-3.5" />
 			</span>
 		</div>
 	);
@@ -309,40 +301,26 @@ export const InboxSidebar = ({
 					onPointerLeave={() => setHoveredEl(undefined)}
 					className="relative mt-3.5 min-h-0 flex-1 overflow-y-auto overflow-x-hidden"
 				>
-					{/* Mail section first */}
-					<SectionHeader title="Mail" collapsed={collapsed} isFirst />
+					{/* Mail folders — no section header */}
 					<div className="flex flex-col">
-						{/* All (inbox) */}
-						<Link
-							href={`/inbox/${mailboxId}`}
-							ref={(el) => {
+						{/* All (inbox) with inbox icon */}
+						<NavLink
+							item={{
+								id: "inbox",
+								label: "Inbox",
+								href: `/inbox/${mailboxId}`,
+								icon: (props) => <Icon name="inbox" {...props} />,
+								showCount: true,
+							}}
+							active={folder === "inbox"}
+							count={stats.inbox}
+							countLoading={countsLoading}
+							collapsed={collapsed}
+							refCallback={(el) => {
 								if (el) navRefs.current.inbox = el;
 							}}
 							onPointerEnter={() => setHoveredEl(navRefs.current.inbox)}
-							className={cn(
-								"relative z-10 flex items-center justify-between rounded-lg px-2 py-1 font-medium text-[14px] leading-5",
-								folder === "inbox"
-									? "bg-[var(--inbox-selected)] text-mail-foreground"
-									: "text-[var(--inbox-sidebar-text-inactive)] hover:text-mail-foreground",
-								collapsed && "justify-center",
-							)}
-							title={collapsed ? "All" : undefined}
-						>
-							{collapsed ? (
-								<Icon name="inbox" className="h-4 w-4" />
-							) : (
-								<>
-									<span className="truncate">All</span>
-									{countsLoading ? (
-										<Skeleton className="h-3 w-5 shrink-0 rounded-sm bg-[var(--inbox-skeleton)]" />
-									) : stats.inbox > 0 ? (
-										<span className="ml-auto shrink-0 font-medium text-[12px] text-[var(--inbox-sidebar-text-inactive)] tabular-nums">
-											{stats.inbox.toLocaleString()}
-										</span>
-									) : null}
-								</>
-							)}
-						</Link>
+						/>
 						{mailItems.map((item) => (
 							<NavLink
 								key={item.id}
