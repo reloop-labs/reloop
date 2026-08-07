@@ -327,8 +327,8 @@ export const DeleteWebhookModal = ({
 						)}
 					>
 						Cancel
-						<ActionKbd className="lowercase! w-auto min-w-0 px-1">
-							esc
+						<ActionKbd className="uppercase! w-auto min-w-0 px-1">
+							ESC
 						</ActionKbd>
 					</Button.Root>
 					<FancyButton.Root

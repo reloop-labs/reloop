@@ -5,7 +5,9 @@ import { Skeleton } from "@reloop/ui/skeleton";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
+import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { WebhookAvatar } from "#/features/webhooks/components/webhook-avatar";
 import {
 	useInvalidateWebhooks,
@@ -15,6 +17,9 @@ import {
 	WebhookHeaderMenu,
 	type WebhookHeaderMenuAction,
 } from "./webhook-header-menu";
+
+const actionKbdOnBlueClassName =
+	"w-auto min-w-4 border-white/25 bg-white/15 px-1 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]";
 
 interface WebhookHeaderProps {
 	webhook: WebhookDetailData | null | undefined;
@@ -102,6 +107,90 @@ export function WebhookHeader({
 		if (id === "delete") onDeleteWebhook?.();
 	};
 
+	const hotkeyOpts = {
+		enableOnFormTags: false as const,
+		preventDefault: true,
+		enabled: !!webhook && !isLoading && !isFailed,
+	};
+
+	// Match keycaps shown on primary actions + overflow menu
+	useHotkeys(
+		"e",
+		(e) => {
+			e.preventDefault();
+			void handleMenuAction("edit");
+		},
+		hotkeyOpts,
+		[webhook],
+	);
+	useHotkeys(
+		"t",
+		(e) => {
+			e.preventDefault();
+			onTriggerTest?.();
+		},
+		hotkeyOpts,
+		[webhook, onTriggerTest],
+	);
+	useHotkeys(
+		"d",
+		(e) => {
+			e.preventDefault();
+			void handleMenuAction("docs");
+		},
+		hotkeyOpts,
+		[webhook],
+	);
+	useHotkeys(
+		"u",
+		(e) => {
+			e.preventDefault();
+			void handleMenuAction("copy-url");
+		},
+		hotkeyOpts,
+		[webhook],
+	);
+	useHotkeys(
+		"i",
+		(e) => {
+			e.preventDefault();
+			void handleMenuAction("copy-id");
+		},
+		hotkeyOpts,
+		[webhook],
+	);
+	useHotkeys(
+		"p",
+		(e) => {
+			e.preventDefault();
+			if (!webhook) return;
+			if (webhook.status === "paused") void handleMenuAction("resume");
+			else if (webhook.status === "active" || webhook.status === "failed") {
+				void handleMenuAction("pause");
+			}
+		},
+		hotkeyOpts,
+		[webhook],
+	);
+	useHotkeys(
+		"x",
+		(e) => {
+			e.preventDefault();
+			void handleMenuAction("toggle");
+		},
+		hotkeyOpts,
+		[webhook],
+	);
+	useHotkeys(
+		"backspace",
+		(e) => {
+			e.preventDefault();
+			void handleMenuAction("delete");
+		},
+		hotkeyOpts,
+		[webhook, onDeleteWebhook],
+	);
+
 	if (!webhook && !isLoading) {
 		return (
 			<div>
@@ -176,16 +265,20 @@ export function WebhookHeader({
 								variant="neutral"
 								mode="stroke"
 								size="xsmall"
-								className="font-semibold"
+								className="gap-1.5 font-semibold"
 								onClick={() => router.push(`/webhooks/${webhook.id}/edit`)}
+								aria-keyshortcuts="e"
 							>
 								<Icon name="edit" className="h-3.5 w-3.5" />
 								Edit
+								<ActionKbd className="w-auto min-w-4 px-1">E</ActionKbd>
 							</Button.Root>
 							<FancyButton.Root
 								variant="blue"
 								size="xsmall"
 								onClick={() => onTriggerTest?.()}
+								className="gap-1.5"
+								aria-keyshortcuts="t"
 							>
 								<FancyButton.Icon
 									as={Icon}
@@ -193,6 +286,7 @@ export function WebhookHeader({
 									className="ml-0.5 h-3.5 w-3.5"
 								/>
 								Send test event
+								<ActionKbd className={actionKbdOnBlueClassName}>T</ActionKbd>
 							</FancyButton.Root>
 							<WebhookHeaderMenu
 								status={webhook.status}

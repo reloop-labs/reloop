@@ -3,6 +3,7 @@ import { cn } from "@reloop/ui/cn";
 import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
 import { useRef, useState } from "react";
+import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 
 export type WebhookHeaderMenuAction =
@@ -34,6 +35,7 @@ export function WebhookHeaderMenu({
 		id: WebhookHeaderMenuAction;
 		label: string;
 		icon: string;
+		shortcut?: string;
 		isDanger: boolean;
 		dividerAfter?: boolean;
 	}[] = [
@@ -41,12 +43,14 @@ export function WebhookHeaderMenu({
 			id: "edit",
 			label: "Edit webhook",
 			icon: "edit",
+			shortcut: "E",
 			isDanger: false,
 		},
 		{
 			id: "docs",
 			label: "Go to docs",
 			icon: "file-text",
+			shortcut: "D",
 			isDanger: false,
 			dividerAfter: true,
 		},
@@ -54,12 +58,14 @@ export function WebhookHeaderMenu({
 			id: "copy-url",
 			label: "Copy URL",
 			icon: "copy",
+			shortcut: "U",
 			isDanger: false,
 		},
 		{
 			id: "copy-id",
 			label: "Copy ID",
 			icon: "copy",
+			shortcut: "I",
 			isDanger: false,
 			dividerAfter: true,
 		},
@@ -69,6 +75,7 @@ export function WebhookHeaderMenu({
 						id: "resume" as const,
 						label: "Resume",
 						icon: "play",
+						shortcut: "P",
 						isDanger: false,
 					},
 				]
@@ -78,6 +85,7 @@ export function WebhookHeaderMenu({
 							id: "pause" as const,
 							label: "Pause",
 							icon: "pause",
+							shortcut: "P",
 							isDanger: false,
 						},
 					]
@@ -86,6 +94,7 @@ export function WebhookHeaderMenu({
 			id: "toggle",
 			label: isDisabled ? "Enable webhook" : "Disable webhook",
 			icon: isDisabled ? "check-circle" : "minus-circle",
+			shortcut: "X",
 			isDanger: false,
 			dividerAfter: true,
 		},
@@ -93,6 +102,7 @@ export function WebhookHeaderMenu({
 			id: "delete",
 			label: "Delete webhook",
 			icon: "trash",
+			shortcut: "⌫",
 			isDanger: true,
 		},
 	];
@@ -120,7 +130,7 @@ export function WebhookHeaderMenu({
 			<Dropdown.Content
 				align="end"
 				sideOffset={6}
-				className="w-48 gap-0 rounded-xl p-1.5"
+				className="w-52 gap-0 rounded-xl p-1.5"
 			>
 				<div className="relative">
 					{menuItems.map((item, idx) => (
@@ -137,21 +147,39 @@ export function WebhookHeaderMenu({
 									setOpen(false);
 								}}
 								className={cn(
-									"flex w-full cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 font-medium text-xs",
+									"flex w-full cursor-pointer items-center justify-between gap-2 rounded-lg px-2 py-1.5 font-medium text-xs",
 									item.isDanger ? "text-error-base" : "text-text-strong-950",
 									!currentRect &&
 										hoverIdx === idx &&
 										(item.isDanger ? "bg-red-alpha-10" : "bg-neutral-alpha-10"),
 								)}
 							>
-								<Icon
-									name={item.icon}
-									className={cn(
-										"h-4 w-4",
-										item.isDanger ? "" : "text-text-sub-600",
-									)}
-								/>
-								<span>{item.label}</span>
+								<div className="flex items-center gap-2">
+									<Icon
+										name={item.icon}
+										className={cn(
+											"h-4 w-4",
+											item.isDanger ? "" : "text-text-sub-600",
+										)}
+									/>
+									<span>{item.label}</span>
+								</div>
+								{item.shortcut ? (
+									<span className="ml-auto inline-flex shrink-0 items-center gap-0.5">
+										{item.shortcut.split(" ").map((key) => (
+											<ActionKbd
+												key={key}
+												className={cn(
+													"w-auto min-w-4 px-1",
+													item.isDanger &&
+														"border-red-200 text-error-base dark:border-red-800/40 dark:text-red-400",
+												)}
+											>
+												{key}
+											</ActionKbd>
+										))}
+									</span>
+								) : null}
 							</button>
 							{item.dividerAfter ? (
 								<div className="my-1 h-px bg-stroke-soft-100 dark:bg-stroke-soft-100/40" />

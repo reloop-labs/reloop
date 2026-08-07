@@ -116,7 +116,9 @@ export function EditWebhookPage({ webhookId }: EditWebhookPageProps) {
 						className="rounded-xl"
 					>
 						Cancel
-						<ActionKbd className="w-auto min-w-4 px-1">esc</ActionKbd>
+						<ActionKbd className="uppercase! w-auto min-w-4 px-1">
+							ESC
+						</ActionKbd>
 					</Button.Root>
 					<FancyButton.Root
 						type="submit"

@@ -27,7 +27,9 @@ export function CreateWebhookActions({ isLoading }: CreateWebhookActionsProps) {
 			>
 				<Link href="/webhooks">
 					Cancel
-					<ActionKbd className="w-auto min-w-4 px-1">esc</ActionKbd>
+					<ActionKbd className="w-auto min-w-4 px-1 uppercase!">
+						ESC
+					</ActionKbd>
 				</Link>
 			</Button.Root>
 			<FancyButton.Root
