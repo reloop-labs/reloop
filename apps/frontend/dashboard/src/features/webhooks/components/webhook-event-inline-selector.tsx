@@ -19,6 +19,11 @@ const CATEGORY_META: Record<string, { label: string; icon: string }> = {
 
 type CategoryFilter = "all" | string;
 
+const SUPPORTED_CATEGORIES = new Set(["email", "contact"]);
+const SUPPORTED_WEBHOOK_EVENTS = ACTIVE_WEBHOOK_EVENTS.filter((e) =>
+	SUPPORTED_CATEGORIES.has(e.category),
+);
+
 export const WebhookEventInlineSelector = ({
 	value,
 	onChange,
@@ -31,7 +36,7 @@ export const WebhookEventInlineSelector = ({
 	const categories = useMemo(() => {
 		const seen = new Set<string>();
 		const list: string[] = [];
-		for (const event of ACTIVE_WEBHOOK_EVENTS) {
+		for (const event of SUPPORTED_WEBHOOK_EVENTS) {
 			if (!seen.has(event.category)) {
 				seen.add(event.category);
 				list.push(event.category);
@@ -41,7 +46,7 @@ export const WebhookEventInlineSelector = ({
 	}, []);
 
 	const filteredEvents = useMemo(() => {
-		return ACTIVE_WEBHOOK_EVENTS.filter((event) => {
+		return SUPPORTED_WEBHOOK_EVENTS.filter((event) => {
 			if (category !== "all" && event.category !== category) return false;
 			return true;
 		});

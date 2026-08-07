@@ -36,6 +36,11 @@ const categoryLabels: Record<string, string> = {
 	email: "Email",
 };
 
+const SUPPORTED_CATEGORIES = new Set(["email", "contact"]);
+const SUPPORTED_WEBHOOK_EVENTS = ACTIVE_WEBHOOK_EVENTS.filter((e) =>
+	SUPPORTED_CATEGORIES.has(e.category),
+);
+
 export const WebhookEventSelector = ({
 	value,
 	onChange,
@@ -46,8 +51,8 @@ export const WebhookEventSelector = ({
 
 	const filteredEvents = useMemo(() => {
 		const query = searchQuery.toLowerCase().trim();
-		if (!query) return ACTIVE_WEBHOOK_EVENTS;
-		return ACTIVE_WEBHOOK_EVENTS.filter(
+		if (!query) return SUPPORTED_WEBHOOK_EVENTS;
+		return SUPPORTED_WEBHOOK_EVENTS.filter(
 			(event) =>
 				event.name.toLowerCase().includes(query) ||
 				event.id.toLowerCase().includes(query) ||
@@ -57,9 +62,10 @@ export const WebhookEventSelector = ({
 	}, [searchQuery]);
 
 	const groupedEvents = useMemo(() => {
-		const groups: Record<string, (typeof ACTIVE_WEBHOOK_EVENTS)[number][]> = {};
+		const groups: Record<string, (typeof SUPPORTED_WEBHOOK_EVENTS)[number][]> =
+			{};
 		// Stable category order matching product priority
-		const order = ["email", "contact", "domain", "api-key"];
+		const order = ["email", "contact"];
 		for (const key of order) {
 			groups[key] = [];
 		}
