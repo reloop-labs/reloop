@@ -21,28 +21,53 @@ import type { InboundThread } from "../types";
 
 const AI_OPEN_KEY = "reloop-inbox-ai-open";
 
+type AiOpenListener = (open: boolean) => void;
+const aiOpenListeners = new Set<AiOpenListener>();
+let sharedAiOpen: boolean | null = null;
+
+function readStoredAiOpen(defaultOpen?: boolean): boolean {
+	if (typeof window === "undefined") return defaultOpen ?? false;
+	const stored = window.localStorage.getItem(AI_OPEN_KEY);
+	if (stored === "1") return true;
+	if (stored === "0") return false;
+	return defaultOpen ?? false;
+}
+
+function getSharedAiOpen(defaultOpen?: boolean): boolean {
+	if (sharedAiOpen !== null) return sharedAiOpen;
+	sharedAiOpen = readStoredAiOpen(defaultOpen);
+	return sharedAiOpen;
+}
+
+/** Shared AI panel open state so top navbar + list shell stay in sync. */
 export const useAiSidebar = (opts?: { defaultOpen?: boolean }) => {
-	const [open, setOpenState] = useState(() => {
-		if (typeof window === "undefined") return opts?.defaultOpen ?? false;
-		const stored = window.localStorage.getItem(AI_OPEN_KEY);
-		if (stored === "1") return true;
-		if (stored === "0") return false;
-		return opts?.defaultOpen ?? false;
-	});
+	const [open, setOpenState] = useState(() =>
+		getSharedAiOpen(opts?.defaultOpen),
+	);
+
+	useEffect(() => {
+		const onChange: AiOpenListener = (next) => setOpenState(next);
+		aiOpenListeners.add(onChange);
+		return () => {
+			aiOpenListeners.delete(onChange);
+		};
+	}, []);
 
 	const setOpen = useCallback(
 		(value: boolean | ((prev: boolean) => boolean)) => {
-			setOpenState((prev) => {
-				const next = typeof value === "function" ? value(prev) : value;
-				try {
-					window.localStorage.setItem(AI_OPEN_KEY, next ? "1" : "0");
-				} catch {
-					/* ignore */
-				}
-				return next;
-			});
+			const prev = sharedAiOpen ?? readStoredAiOpen(opts?.defaultOpen);
+			const next = typeof value === "function" ? value(prev) : value;
+			sharedAiOpen = next;
+			try {
+				window.localStorage.setItem(AI_OPEN_KEY, next ? "1" : "0");
+			} catch {
+				/* ignore */
+			}
+			for (const listener of aiOpenListeners) {
+				listener(next);
+			}
 		},
-		[],
+		[opts?.defaultOpen],
 	);
 
 	return {

@@ -1,4 +1,3 @@
-import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { parseAsString, useQueryState } from "nuqs";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -460,24 +459,6 @@ export const AgentInboxContent = ({
 							)}
 							<button
 								type="button"
-								onClick={() => setPaletteOpen(true)}
-								title="Filter"
-								aria-label="Filter"
-								className="inline-flex size-8 items-center justify-center rounded-lg transition-colors hover:bg-[var(--inbox-row-hover)]"
-							>
-								<Icon name="filter" className="h-4 w-4 text-mail-muted" />
-							</button>
-							<button
-								type="button"
-								onClick={() => setPaletteOpen(true)}
-								title="Search"
-								aria-label="Search"
-								className="inline-flex size-8 items-center justify-center rounded-lg transition-colors hover:bg-[var(--inbox-row-hover)]"
-							>
-								<Icon name="search" className="h-4 w-4 text-mail-muted" />
-							</button>
-							<button
-								type="button"
 								onClick={handleRefresh}
 								disabled={isRefreshing}
 								title="Refresh"
@@ -493,18 +474,6 @@ export const AgentInboxContent = ({
 								) : (
 									<Icon name="refresh-cw" className="h-4 w-4 text-mail-muted" />
 								)}
-							</button>
-							<button
-								type="button"
-								onClick={toggleAi}
-								title="Agent chat"
-								aria-label="Agent chat"
-								className={cn(
-									"inline-flex size-8 items-center justify-center rounded-lg transition-colors hover:bg-[var(--inbox-row-hover)]",
-									aiOpen && "bg-[var(--inbox-selected)]",
-								)}
-							>
-								<Icon name="agent" className="h-4 w-4 text-mail-muted" />
 							</button>
 						</div>
 					) : (

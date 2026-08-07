@@ -10,6 +10,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { AddAgentAddressModal } from "#/features/agent-inbox/components/add-agent-address-modal";
 import { useAgentInbox } from "#/features/agent-inbox/components/agent-inbox-provider";
+import { useAiSidebar } from "#/features/agent-inbox/components/ai-sidebar";
 import { InboxNavUser } from "#/features/agent-inbox/components/sidebar/inbox-nav-user";
 import { useInboxSidebar } from "#/features/agent-inbox/components/sidebar/inbox-sidebar-context";
 import type { AgentMailbox } from "#/features/agent-inbox/types";
@@ -37,6 +38,9 @@ export function InboxTopNavbar({ mailbox }: { mailbox: AgentMailbox }) {
 	} = useUIStore();
 	const { unreadCount } = useSupportUnread();
 	const supportOpen = isAiPanelOpen && aiPanelActiveTab === "support";
+	const { open: aiOpen, toggle: toggleAi } = useAiSidebar({
+		defaultOpen: true,
+	});
 
 	const openSearch = () => {
 		window.dispatchEvent(new CustomEvent("inbox:open-search"));
@@ -115,7 +119,7 @@ export function InboxTopNavbar({ mailbox }: { mailbox: AgentMailbox }) {
 						</span>
 					</button>
 
-					{/* Support + mailbox — right side of content column */}
+					{/* Support + agent bot + mailbox — right side of content column */}
 					<div className="ml-auto flex shrink-0 items-center gap-1 sm:gap-1.5">
 						<button
 							type="button"
@@ -139,6 +143,22 @@ export function InboxTopNavbar({ mailbox }: { mailbox: AgentMailbox }) {
 									{unreadCount > 99 ? "99+" : unreadCount}
 								</span>
 							) : null}
+						</button>
+
+						<button
+							type="button"
+							onClick={toggleAi}
+							title="Agent chat"
+							aria-label="Agent chat"
+							aria-pressed={aiOpen}
+							className={cn(
+								"flex size-10 items-center justify-center rounded-full transition-colors",
+								"text-mail-muted hover:bg-[var(--inbox-row-hover)] hover:text-mail-foreground",
+								aiOpen &&
+									"bg-[var(--inbox-selected)] text-mail-foreground ring-1 ring-zero-blue/30",
+							)}
+						>
+							<Icon name="agent" className="h-5 w-5" />
 						</button>
 
 						<div className="min-w-0">
