@@ -38,7 +38,7 @@ import {
 import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 
 const FOLDER_TITLES: Record<string, string> = {
-	inbox: "All Mail",
+	inbox: "Inbox",
 	agent: "Agent",
 	sent: "Sent",
 	archive: "Archive",

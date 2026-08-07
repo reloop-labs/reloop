@@ -1287,31 +1287,32 @@ export const ComposeModal = ({
 									size="xsmall"
 									disabled={isSending}
 									onClick={requestClose}
+									className="gap-1.5"
 								>
 									Cancel
-									<span className="flex h-[19px] w-7 items-center justify-center rounded-[5px] border border-mail-border bg-offset-light/50 p-px font-medium text-[10px]">
-										Esc
-									</span>
+									<ActionKbd className="w-auto min-w-4 px-1">esc</ActionKbd>
 								</Button.Root>
 								<FancyButton.Root
 									type="submit"
 									variant="neutral"
 									size="xsmall"
 									disabled={isSending || attachments.some((a) => a.isUploading)}
-									className="min-w-[132px] justify-between pr-2 pl-3"
+									className="gap-1.5"
 								>
-									<span className="text-sm leading-none">
-										{isSending ? "Sending…" : scheduleAt ? "Schedule" : "Send"}
-									</span>
+									{isSending
+										? "Sending…"
+										: scheduleAt
+											? "Schedule"
+											: "Send"}
 									{!isSending && (
-										<div className="flex items-center gap-0.5 opacity-90">
+										<span className="inline-flex items-center gap-0.5">
 											<ActionKbd className={actionKbdOnBlueClassName}>
 												{modKey}
 											</ActionKbd>
 											<ActionKbd className={actionKbdOnBlueClassName}>
 												↵
 											</ActionKbd>
-										</div>
+										</span>
 									)}
 								</FancyButton.Root>
 							</div>
