@@ -1,8 +1,6 @@
 import { cn } from "@reloop/ui/cn";
 import * as CommandMenu from "@reloop/ui/command";
 import { Icon } from "@reloop/ui/icon";
-import { KbdCommand } from "@reloop/ui/kbd-command";
-import { KbdKey } from "@reloop/ui/kbd-key";
 import { Logo } from "@reloop/ui/logo";
 import dayjs from "dayjs";
 import { useRouter } from "next/navigation";
@@ -28,6 +26,7 @@ import {
 	threadMatchesQuery,
 } from "#/features/agent-inbox/lib/inbox-search-query";
 import { useMailboxId } from "#/features/agent-inbox/lib/use-mailbox-id";
+import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { getAvatarGradient, getAvatarInitial } from "#/utils/avatar";
 import type { InboundThread } from "../../types";
 import { useInboxSidebar } from "../sidebar/inbox-sidebar-context";
@@ -62,26 +61,6 @@ function AppIcon({ name }: { name: UiIconName }) {
 		<div className="flex size-6 shrink-0 items-center justify-center text-mail-foreground">
 			<Icon name={name} className="h-3.5 w-3.5" />
 		</div>
-	);
-}
-
-function Keycap({
-	children,
-	className,
-}: {
-	children: ReactNode;
-	className?: string;
-}) {
-	return (
-		<span
-			className={cn(
-				"inline-flex h-[22px] min-w-[22px] shrink-0 items-center justify-center rounded-[5px] border border-black/[0.08] bg-black/[0.03] px-1.5 font-medium text-[11px] text-mail-muted",
-				"dark:border-white/[0.1] dark:bg-white/[0.06]",
-				className,
-			)}
-		>
-			{children}
-		</span>
 	);
 }
 
@@ -683,14 +662,14 @@ export const InboxCommandPalette = ({
 				<div className="ml-auto flex items-center gap-2.5">
 					<span className="inline-flex items-center gap-1.5">
 						<span>Open</span>
-						<Keycap>↵</Keycap>
+						<ActionKbd className="w-auto min-w-4 px-1">↵</ActionKbd>
 					</span>
 					<span aria-hidden className="h-3 w-px bg-black/10 dark:bg-white/15" />
 					<span className="inline-flex items-center gap-1.5">
 						<span>Actions</span>
 						<span className="inline-flex items-center gap-0.5">
-							<Keycap>⌘</Keycap>
-							<Keycap>K</Keycap>
+							<ActionKbd className="w-auto min-w-4 px-1">⌘</ActionKbd>
+							<ActionKbd>K</ActionKbd>
 						</span>
 					</span>
 				</div>
@@ -776,10 +755,8 @@ export const InboxSearchTrigger = ({
 					</button>
 				)}
 				<span className="pointer-events-none hidden items-center gap-0.5 sm:inline-flex">
-					<KbdCommand className="h-3.5 w-3.5 border-mail-border/50 bg-transparent p-0 text-mail-muted" />
-					<KbdKey className="h-3.5 w-3.5 border-mail-border/50 bg-transparent p-0 text-[9px] text-mail-muted">
-						K
-					</KbdKey>
+					<ActionKbd className="w-auto min-w-4 px-1">⌘</ActionKbd>
+					<ActionKbd>K</ActionKbd>
 				</span>
 			</div>
 		</button>

@@ -2,7 +2,6 @@ import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
-import { KbdKeyOutline } from "@reloop/ui/kbd-key-outline";
 import * as Modal from "@reloop/ui/modal";
 import * as Popover from "@reloop/ui/popover";
 import { toast } from "@reloop/ui/toast";
@@ -18,6 +17,7 @@ import { parseAsString, useQueryState } from "nuqs";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { Controller, useForm } from "react-hook-form";
+import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { extractBareEmail, formatRecipient } from "../../lib/email-address";
 import { plainToHtml } from "../../lib/plain-to-html";
 import { readAiTextStreamAfterThink } from "../../lib/read-ai-text-stream-after-think";
@@ -38,6 +38,9 @@ import {
 } from "./compose-body-editor";
 import { ScheduleSendPicker } from "./schedule-send-picker";
 import { showUndoSendToast } from "./undo-send-toast";
+
+const actionKbdOnBlueClassName =
+	"w-auto min-w-4 border-white/25 bg-white/15 px-1 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]";
 
 /** Portaled compose UI (recipient suggestions + React Email menus). */
 const isComposeFloatingUi = (target: EventTarget | null) =>
@@ -1076,9 +1079,7 @@ export const ComposeModal = ({
 									<div className="mt-auto flex items-center justify-between gap-3 px-5 py-2">
 										<p className="min-w-0 truncate text-[11px] text-mail-muted">
 											Type{" "}
-											<kbd className="rounded border border-mail-border/50 px-1 font-sans text-[10px]">
-												/
-											</kbd>{" "}
+											<ActionKbd className="w-auto min-w-4 px-1">/</ActionKbd>{" "}
 											for formatting commands
 										</p>
 										{aiActive ? (
@@ -1303,13 +1304,13 @@ export const ComposeModal = ({
 										{isSending ? "Sending…" : scheduleAt ? "Schedule" : "Send"}
 									</span>
 									{!isSending && (
-										<div className="flex items-center gap-0.5 opacity-70">
-											<KbdKeyOutline className="h-4 w-4 border-white/30 font-sans text-[9px] text-white">
+										<div className="flex items-center gap-0.5 opacity-90">
+											<ActionKbd className={actionKbdOnBlueClassName}>
 												{modKey}
-											</KbdKeyOutline>
-											<KbdKeyOutline className="h-4 w-4 border-white/30 font-sans text-[9px] text-white">
+											</ActionKbd>
+											<ActionKbd className={actionKbdOnBlueClassName}>
 												↵
-											</KbdKeyOutline>
+											</ActionKbd>
 										</div>
 									)}
 								</FancyButton.Root>

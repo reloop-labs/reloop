@@ -36,6 +36,7 @@ import {
 	findThreadByListId,
 	groupThreadsByConversation,
 } from "#/features/agent-inbox/utils/group-threads";
+import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 
 const FOLDER_TITLES: Record<string, string> = {
 	inbox: "All Mail",
@@ -570,10 +571,10 @@ export const AgentInboxContent = ({
 							<button
 								type="button"
 								onClick={handleExitBulkSelection}
-								className="inline-flex h-8 items-center gap-2 rounded-lg bg-mail-accent px-2 text-xs"
+								className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-mail-accent px-2 text-xs"
 							>
 								<Icon name="cross" className="h-3 w-3" />
-								<span>ESC</span>
+								<ActionKbd className="w-auto min-w-4 px-1">esc</ActionKbd>
 							</button>
 						</div>
 					)}
@@ -629,8 +630,8 @@ export const AgentInboxContent = ({
 				onSelectThread={handleSelectThread}
 			/>
 			{/* Gmail-style: list OR detail fills the main pane (not side-by-side). */}
-			<div className="relative flex min-h-0 min-w-0 flex-1 gap-1 rounded-inherit p-0 lg:h-[calc(100dvh-8px)]">
-				<div className="mb-1 flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-panel-light md:rounded-2xl lg:h-[calc(100dvh-8px)] dark:bg-panel-dark">
+			<div className="relative flex min-h-0 min-w-0 flex-1 gap-1 rounded-inherit p-0 lg:h-[calc(100dvh-65px)]">
+				<div className="mb-1 flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-panel-light md:rounded-2xl lg:h-[calc(100dvh-66px)] dark:bg-panel-dark">
 					{isThreadOpen ? detailPane : listPane}
 				</div>
 

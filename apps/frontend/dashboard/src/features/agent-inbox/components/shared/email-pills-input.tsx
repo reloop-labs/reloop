@@ -17,6 +17,7 @@ import {
 	parseEmail,
 	validateEmail,
 } from "#/features/agent-inbox/lib/email-address";
+import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { getAvatarGradient, getAvatarInitial } from "#/utils/avatar";
 
 export {
@@ -359,23 +360,17 @@ export const EmailPillsInput = ({
 						</div>
 						<div className="flex items-center gap-2 border-mail-border/40 border-t px-3 py-1.5 text-[10px] text-mail-muted">
 							<span className="inline-flex items-center gap-1">
-								<kbd className="rounded border border-mail-border/50 px-1 font-sans">
-									↑↓
-								</kbd>
+								<ActionKbd className="w-auto min-w-4 px-1">↑↓</ActionKbd>
 								navigate
 							</span>
 							<span className="text-mail-border">·</span>
 							<span className="inline-flex items-center gap-1">
-								<kbd className="rounded border border-mail-border/50 px-1 font-sans">
-									↵
-								</kbd>
+								<ActionKbd className="w-auto min-w-4 px-1">↵</ActionKbd>
 								select
 							</span>
 							<span className="text-mail-border">·</span>
 							<span className="inline-flex items-center gap-1">
-								<kbd className="rounded border border-mail-border/50 px-1 font-sans">
-									esc
-								</kbd>
+								<ActionKbd className="w-auto min-w-4 px-1">esc</ActionKbd>
 								close
 							</span>
 						</div>

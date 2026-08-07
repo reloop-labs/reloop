@@ -14,6 +14,7 @@ import { InboxNavUser } from "#/features/agent-inbox/components/sidebar/inbox-na
 import { useInboxSidebar } from "#/features/agent-inbox/components/sidebar/inbox-sidebar-context";
 import type { AgentMailbox } from "#/features/agent-inbox/types";
 import { useSupportUnread } from "#/features/dashboard/hooks/use-support-unread";
+import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { useUIStore } from "#/store/use-ui-store";
 
 /**
@@ -108,13 +109,9 @@ export function InboxTopNavbar({ mailbox }: { mailbox: AgentMailbox }) {
 						<span className="min-w-0 flex-1 truncate text-[14px] sm:text-[15px]">
 							Search mail
 						</span>
-						<span className="hidden shrink-0 items-center gap-0.5 sm:flex">
-							<kbd className="rounded border border-mail-border/60 bg-[var(--inbox-control)] px-1.5 py-0.5 font-sans text-[10px] text-mail-muted">
-								⌘
-							</kbd>
-							<kbd className="rounded border border-mail-border/60 bg-[var(--inbox-control)] px-1.5 py-0.5 font-sans text-[10px] text-mail-muted">
-								K
-							</kbd>
+						<span className="hidden shrink-0 items-center gap-0.5 sm:inline-flex">
+							<ActionKbd className="w-auto min-w-4 px-1">⌘</ActionKbd>
+							<ActionKbd>K</ActionKbd>
 						</span>
 					</button>
 
@@ -138,7 +135,7 @@ export function InboxTopNavbar({ mailbox }: { mailbox: AgentMailbox }) {
 								Support
 							</span>
 							{unreadCount > 0 ? (
-								<span className="-top-0.5 -right-0.5 absolute flex h-4 min-w-4 items-center justify-center rounded-full bg-orange-500 px-1 font-semibold text-[10px] text-white tabular-nums">
+								<span className="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-orange-500 px-1 font-semibold text-[10px] text-white tabular-nums">
 									{unreadCount > 99 ? "99+" : unreadCount}
 								</span>
 							) : null}

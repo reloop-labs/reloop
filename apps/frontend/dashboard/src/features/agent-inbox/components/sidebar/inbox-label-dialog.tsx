@@ -2,7 +2,6 @@ import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
-import { KbdKeyOutline } from "@reloop/ui/kbd-key-outline";
 import * as Modal from "@reloop/ui/modal";
 import { useEffect, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
@@ -10,6 +9,10 @@ import {
 	LABEL_COLORS,
 	resolveLabelColor,
 } from "#/features/agent-inbox/lib/label-colors";
+import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
+
+const actionKbdOnBlueClassName =
+	"w-auto min-w-4 border-white/25 bg-white/15 px-1 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]";
 
 export const InboxLabelDialog = ({
 	open,
@@ -225,13 +228,11 @@ export const InboxLabelDialog = ({
 								{isSubmitting ? "Creating…" : "Create label"}
 							</span>
 							{!isSubmitting && (
-								<div className="-translate-y-1/2 absolute top-1/2 right-2.5 z-20 flex items-center gap-0.5 opacity-70">
-									<KbdKeyOutline className="h-4 w-4 border-white/30 font-sans text-[9px] text-white">
+								<div className="absolute top-1/2 right-2.5 z-20 flex -translate-y-1/2 items-center gap-0.5 opacity-90">
+									<ActionKbd className={actionKbdOnBlueClassName}>
 										{modKey}
-									</KbdKeyOutline>
-									<KbdKeyOutline className="h-4 w-4 border-white/30 font-sans text-[9px] text-white">
-										↵
-									</KbdKeyOutline>
+									</ActionKbd>
+									<ActionKbd className={actionKbdOnBlueClassName}>↵</ActionKbd>
 								</div>
 							)}
 						</FancyButton.Root>

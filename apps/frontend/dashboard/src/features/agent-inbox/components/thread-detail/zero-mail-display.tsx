@@ -168,7 +168,7 @@ export const ZeroMailDisplay = ({
 			toRecipients.length > 0 && toRecipients.every((r) => r.isYou);
 		const first = toRecipients[0];
 		if (onlyYou || (first?.isYou && toRecipients.length === 1)) return "to me";
-		if (toRecipients.length === 0) return "to —";
+		if (!first || toRecipients.length === 0) return "to —";
 		if (toRecipients.length === 1) {
 			const label =
 				first.display && !first.display.includes("@")

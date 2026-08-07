@@ -1,13 +1,13 @@
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
-import { KbdKeyOutline } from "@reloop/ui/kbd-key-outline";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Paperclip } from "lucide-react";
 import { forwardRef, useCallback, useEffect, useRef, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { useDraftAutosave } from "../../hooks/use-draft-autosave";
 import type { ComposeDraftKind } from "../../types";
 import {
@@ -69,6 +69,9 @@ const modKey =
 	/Mac|iPhone|iPad|iPod/.test(navigator.platform)
 		? "⌘"
 		: "Ctrl";
+
+const actionKbdOnBlueClassName =
+	"w-auto min-w-4 border-white/25 bg-white/15 px-1 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]";
 
 const easeOut = [0.16, 1, 0.3, 1] as const;
 
@@ -538,13 +541,13 @@ export const ForwardComposer = forwardRef<HTMLDivElement, ForwardComposerProps>(
 									{isSending ? "Sending…" : "Forward"}
 								</span>
 								{!isSending && (
-									<div className="flex items-center gap-0.5 opacity-70">
-										<KbdKeyOutline className="h-4 w-4 border-white/30 font-sans text-[9px] text-white">
+									<div className="flex items-center gap-0.5 opacity-90">
+										<ActionKbd className={actionKbdOnBlueClassName}>
 											{modKey}
-										</KbdKeyOutline>
-										<KbdKeyOutline className="h-4 w-4 border-white/30 font-sans text-[9px] text-white">
+										</ActionKbd>
+										<ActionKbd className={actionKbdOnBlueClassName}>
 											↵
-										</KbdKeyOutline>
+										</ActionKbd>
 									</div>
 								)}
 							</FancyButton.Root>
