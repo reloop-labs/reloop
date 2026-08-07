@@ -1,3 +1,4 @@
+import { InboxTopNavbar } from "#/features/agent-inbox/components/layout/inbox-top-navbar";
 import { InboxSidebar } from "#/features/agent-inbox/components/sidebar/inbox-sidebar";
 import type { AgentMailbox } from "#/features/agent-inbox/types";
 
@@ -11,10 +12,13 @@ export const AgentInboxLayoutWrapper = ({
 	children: React.ReactNode;
 }) => {
 	return (
-		<div className="flex h-full min-h-0 w-full overflow-hidden bg-sidebar text-mail-foreground">
-			<InboxSidebar mailbox={mailbox} folder={folder} />
-			<div className="relative z-[5] flex min-h-0 min-w-0 flex-1 bg-sidebar p-0 md:mt-1 md:mr-1">
-				{children}
+		<div className="flex h-full min-h-0 w-full flex-col overflow-hidden bg-sidebar text-mail-foreground">
+			<InboxTopNavbar mailbox={mailbox} />
+			<div className="flex min-h-0 min-w-0 flex-1 overflow-hidden">
+				<InboxSidebar mailbox={mailbox} folder={folder} />
+				<div className="relative z-[5] flex min-h-0 min-w-0 flex-1 bg-sidebar p-0 md:mt-0 md:mr-1 md:mb-1">
+					{children}
+				</div>
 			</div>
 		</div>
 	);

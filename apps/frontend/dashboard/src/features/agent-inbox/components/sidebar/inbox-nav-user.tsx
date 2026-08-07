@@ -14,12 +14,15 @@ export const InboxNavUser = ({
 	collapsed,
 	loading = false,
 	onAddMailbox,
+	/** When true, lays out for the top navbar (right-aligned dropdown). */
+	compact = false,
 }: {
 	mailbox: AgentMailbox;
 	collapsed: boolean;
 	/** True while mailbox metadata is still resolving. */
 	loading?: boolean;
 	onAddMailbox?: () => void;
+	compact?: boolean;
 }) => {
 	const router = useRouter();
 	const { updateMailboxDisplayName, mailboxes } = useAgentInbox();
@@ -146,7 +149,10 @@ export const InboxNavUser = ({
 	if (loading) {
 		return (
 			<div
-				className="flex items-center gap-2.5 rounded-lg px-2 py-1.5"
+				className={cn(
+					"flex items-center gap-2.5 rounded-lg px-2 py-1.5",
+					compact && "max-w-[200px]",
+				)}
 				aria-busy="true"
 			>
 				<span className="sr-only">Loading mailbox</span>
@@ -159,11 +165,17 @@ export const InboxNavUser = ({
 	}
 
 	return (
-		<div ref={switcherRef} className="relative">
+		<div
+			ref={switcherRef}
+			className={cn("relative", compact && "max-w-[220px]")}
+		>
 			<button
 				type="button"
 				onClick={() => setSwitcherOpen((v) => !v)}
-				className="flex w-full items-center gap-2.5 rounded-lg px-2 py-1.5 text-left transition-colors hover:bg-[var(--inbox-row-hover)]"
+				className={cn(
+					"flex items-center gap-2.5 rounded-lg px-2 py-1.5 text-left transition-colors hover:bg-[var(--inbox-row-hover)]",
+					compact ? "w-auto max-w-full" : "w-full",
+				)}
 			>
 				<span
 					className={cn(
@@ -173,7 +185,7 @@ export const InboxNavUser = ({
 				>
 					{initial}
 				</span>
-				<span className="min-w-0 flex-1 truncate font-medium text-[14px] text-mail-foreground leading-5">
+				<span className="min-w-0 truncate font-medium text-[14px] text-mail-foreground leading-5">
 					{displayName}
 				</span>
 				{(isSavingName || showNameSaved) && (
@@ -193,7 +205,12 @@ export const InboxNavUser = ({
 			</button>
 
 			{switcherOpen && (
-				<div className="absolute top-full right-0 left-0 z-50 mt-1 overflow-hidden rounded-xl border border-mail-border bg-panel-light shadow-lg dark:bg-panel-dark">
+				<div
+					className={cn(
+						"absolute top-full z-50 mt-1 w-[min(280px,calc(100vw-1.5rem))] overflow-hidden rounded-xl border border-mail-border bg-panel-light shadow-lg dark:bg-panel-dark",
+						compact ? "right-0 left-auto" : "right-0 left-0 w-auto",
+					)}
+				>
 					<div className="border-mail-border border-b px-3 py-2">
 						{isEditingName ? (
 							<input

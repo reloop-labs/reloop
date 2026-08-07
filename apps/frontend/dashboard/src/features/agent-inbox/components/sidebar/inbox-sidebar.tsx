@@ -15,12 +15,10 @@ import { useTheme } from "next-themes";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
-import { AddAgentAddressModal } from "#/features/agent-inbox/components/add-agent-address-modal";
 import { useAgentInbox } from "#/features/agent-inbox/components/agent-inbox-provider";
 import { ComposeModal } from "#/features/agent-inbox/components/compose/compose-modal";
 import { SectionError } from "#/features/agent-inbox/components/shared/section-error";
 import { InboxLabelDialog } from "#/features/agent-inbox/components/sidebar/inbox-label-dialog";
-import { InboxNavUser } from "#/features/agent-inbox/components/sidebar/inbox-nav-user";
 import { useInboxSidebar } from "#/features/agent-inbox/components/sidebar/inbox-sidebar-context";
 import { useInboxFolderStats } from "#/features/agent-inbox/hooks/use-inbox-folder-stats";
 import { useInboxLabels } from "#/features/agent-inbox/hooks/use-inbox-labels";
@@ -164,13 +162,7 @@ export const InboxSidebar = ({
 }) => {
 	const router = useRouter();
 	const { collapsed, registerOpenCompose } = useInboxSidebar();
-	const {
-		isLoadingMailboxes,
-		isLoadingThreads,
-		mailboxesError,
-		retryMailboxes,
-		getMailbox,
-	} = useAgentInbox();
+	const { isLoadingMailboxes, isLoadingThreads, getMailbox } = useAgentInbox();
 	const mailboxReady = !!getMailbox(mailbox.id) && !!mailbox.email;
 	const stats = useInboxFolderStats(mailbox.id);
 	const {
@@ -184,7 +176,6 @@ export const InboxSidebar = ({
 	const labelsLoading = !mailboxReady || isLoadingLabels;
 
 	const [isComposeOpen, setIsComposeOpen] = useState(false);
-	const [isAddMailboxOpen, setIsAddMailboxOpen] = useState(false);
 	const [isLabelDialogOpen, setIsLabelDialogOpen] = useState(false);
 
 	const [hoveredEl, setHoveredEl] = useState<HTMLAnchorElement | undefined>(
@@ -328,24 +319,6 @@ export const InboxSidebar = ({
 					collapsed ? "w-[52px] px-1.5 pt-2.5" : "w-[220px] px-2 pt-2.5",
 				)}
 			>
-				{/* Account switcher */}
-				<div className={cn("mb-1", collapsed && "flex justify-center")}>
-					{mailboxesError && !mailboxReady ? (
-						<SectionError
-							compact
-							message="Couldn't load mailbox"
-							onRetry={() => void retryMailboxes()}
-						/>
-					) : (
-						<InboxNavUser
-							mailbox={mailbox}
-							collapsed={collapsed}
-							loading={!mailboxReady}
-							onAddMailbox={() => setIsAddMailboxOpen(true)}
-						/>
-					)}
-				</div>
-
 				{/* Quick actions */}
 				<div className="mt-1 flex flex-col">
 					{quickActions.map((action) => (
@@ -525,14 +498,6 @@ export const InboxSidebar = ({
 				isOpen={isComposeOpen}
 				onClose={() => setIsComposeOpen(false)}
 				mailbox={mailbox}
-			/>
-			<AddAgentAddressModal
-				isOpen={isAddMailboxOpen}
-				onClose={() => setIsAddMailboxOpen(false)}
-				onCreated={(created) => {
-					toast.success("Mailbox added");
-					router.push(`/inbox/${created.id}`);
-				}}
 			/>
 			<InboxLabelDialog
 				open={isLabelDialogOpen}
