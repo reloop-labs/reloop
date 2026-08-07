@@ -1,8 +1,9 @@
 "use client";
 
 import { cn } from "@reloop/ui/cn";
+import { Icon } from "@reloop/ui/icon";
 import { Logo } from "@reloop/ui/logo";
-import { Search, Settings } from "lucide-react";
+import { Search } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -11,12 +12,12 @@ import { AddAgentAddressModal } from "#/features/agent-inbox/components/add-agen
 import { useAgentInbox } from "#/features/agent-inbox/components/agent-inbox-provider";
 import { InboxNavUser } from "#/features/agent-inbox/components/sidebar/inbox-nav-user";
 import type { AgentMailbox } from "#/features/agent-inbox/types";
-import { useSessionQuery } from "#/features/auth/session-query";
-import { UserDropdown } from "#/features/dashboard/page-header/user-dropdown";
+import { useSupportUnread } from "#/features/dashboard/hooks/use-support-unread";
+import { useUIStore } from "#/store/use-ui-store";
 
 /**
  * Top chrome for the fullscreen inbox:
- * left = dashboard logo lockup, center = search, right = settings + profile + mailbox.
+ * left = dashboard logo lockup, center = search, right = support + mailbox.
  */
 export function InboxTopNavbar({ mailbox }: { mailbox: AgentMailbox }) {
 	const router = useRouter();
@@ -25,17 +26,29 @@ export function InboxTopNavbar({ mailbox }: { mailbox: AgentMailbox }) {
 	const mailboxReady = !!getMailbox(mailbox.id) && !!mailbox.email;
 	const [isAddMailboxOpen, setIsAddMailboxOpen] = useState(false);
 
-	const { data: session } = useSessionQuery();
-	const user = session?.user
-		? {
-				name: session.user.name || session.user.email || "User",
-				email: session.user.email || "",
-				image: session.user.image,
-			}
-		: null;
+	const {
+		isAiPanelOpen,
+		setIsAiPanelOpen,
+		aiPanelActiveTab,
+		setAiPanelActiveTab,
+	} = useUIStore();
+	const { unreadCount } = useSupportUnread();
+	const supportOpen = isAiPanelOpen && aiPanelActiveTab === "support";
 
 	const openSearch = () => {
 		window.dispatchEvent(new CustomEvent("inbox:open-search"));
+	};
+
+	const toggleSupport = () => {
+		if (!isAiPanelOpen) {
+			setAiPanelActiveTab("support");
+			setIsAiPanelOpen(true);
+		} else if (aiPanelActiveTab === "support") {
+			setIsAiPanelOpen(false);
+		} else {
+			setAiPanelActiveTab("support");
+			setIsAiPanelOpen(true);
+		}
 	};
 
 	return (
@@ -86,20 +99,32 @@ export function InboxTopNavbar({ mailbox }: { mailbox: AgentMailbox }) {
 					</button>
 				</div>
 
-				{/* Right: settings · user · mailbox switcher (far right) */}
+				{/* Right: support + mailbox switcher */}
 				<div className="flex shrink-0 items-center gap-1 sm:gap-1.5">
-					<Link
-						href="/settings?from=/inbox"
-						title="Settings"
-						aria-label="Settings"
-						className="flex size-10 items-center justify-center rounded-full text-mail-muted transition-colors hover:bg-[var(--inbox-row-hover)] hover:text-mail-foreground"
+					<button
+						type="button"
+						onClick={toggleSupport}
+						title="Support"
+						aria-label="Support"
+						aria-pressed={supportOpen}
+						className={cn(
+							"relative flex h-9 items-center gap-1.5 rounded-full px-2.5 text-mail-muted transition-colors",
+							"hover:bg-[var(--inbox-row-hover)] hover:text-mail-foreground",
+							supportOpen && "bg-[var(--inbox-selected)] text-mail-foreground",
+						)}
 					>
-						<Settings className="h-5 w-5" strokeWidth={1.6} />
-					</Link>
-					<div className="flex size-10 items-center justify-center">
-						<UserDropdown user={user} />
-					</div>
-					<div className="ml-0.5 min-w-0 border-mail-border/50 border-l pl-1.5 sm:pl-2">
+						<Icon name="question" className="h-4 w-4" />
+						<span className="hidden font-medium text-[13px] sm:inline">
+							Support
+						</span>
+						{unreadCount > 0 ? (
+							<span className="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-orange-500 px-1 font-semibold text-[10px] text-white tabular-nums">
+								{unreadCount > 99 ? "99+" : unreadCount}
+							</span>
+						) : null}
+					</button>
+
+					<div className="min-w-0">
 						{mailboxesError && !mailboxReady ? (
 							<button
 								type="button"
