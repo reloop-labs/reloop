@@ -1,14 +1,7 @@
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
-import {
-	ChevronDown,
-	Pencil,
-	Plus,
-	Search,
-	Settings,
-	Star,
-} from "lucide-react";
+import { ChevronDown, Pencil, Plus, Star } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
@@ -281,36 +274,6 @@ export const InboxSidebar = ({
 
 	const activeLabelId = folder.startsWith("label:") ? folder.slice(6) : null;
 
-	const openSearch = () => {
-		window.dispatchEvent(new CustomEvent("inbox:open-search"));
-	};
-
-	const quickActions = [
-		{
-			id: "compose",
-			label: "Compose",
-			icon: Pencil,
-			onClick: () => {
-				if (!mailboxReady) return;
-				setIsComposeOpen(true);
-			},
-		},
-		{
-			id: "search",
-			label: "Search",
-			icon: Search,
-			onClick: openSearch,
-		},
-		{
-			id: "settings",
-			label: "Settings",
-			icon: Settings,
-			onClick: () => {
-				toast.message("Mailbox settings coming soon");
-			},
-		},
-	];
-
 	return (
 		<>
 			<aside
@@ -319,32 +282,37 @@ export const InboxSidebar = ({
 					collapsed ? "w-[52px] px-1.5 pt-2.5" : "w-[220px] px-2 pt-2.5",
 				)}
 			>
-				{/* Quick actions */}
-				<div className="mt-1 flex flex-col">
-					{quickActions.map((action) => (
-						<button
-							key={action.id}
-							type="button"
-							onClick={action.onClick}
-							disabled={action.id === "compose" && !mailboxReady}
-							className={cn(
-								"flex items-center gap-2.5 rounded-lg px-2 py-1 font-medium text-[14px] text-[var(--inbox-sidebar-text-inactive)] leading-5 transition-colors hover:bg-[var(--inbox-row-hover)] hover:text-mail-foreground disabled:opacity-40",
-								collapsed && "justify-center",
-							)}
-							title={collapsed ? action.label : undefined}
-						>
-							<action.icon className="h-[17px] w-[17px] shrink-0 text-[var(--inbox-sidebar-icon)]" />
-							{!collapsed && <span>{action.label}</span>}
-						</button>
-					))}
+				{/* Compose — outline / light */}
+				<div className={cn("mt-1", collapsed ? "flex justify-center" : "")}>
+					<button
+						type="button"
+						onClick={() => {
+							if (!mailboxReady) return;
+							setIsComposeOpen(true);
+						}}
+						disabled={!mailboxReady}
+						title="Compose"
+						className={cn(
+							"flex items-center gap-2.5 font-medium text-[14px] leading-5 transition-colors disabled:opacity-40",
+							collapsed
+								? "size-9 justify-center rounded-full border border-mail-border/80 text-mail-muted hover:bg-[var(--inbox-control)] hover:text-mail-foreground"
+								: "w-full rounded-full border border-mail-border/80 bg-transparent px-3 py-2 text-mail-muted hover:bg-[var(--inbox-control)] hover:text-mail-foreground",
+						)}
+					>
+						<Pencil
+							className="h-4 w-4 shrink-0 opacity-80"
+							strokeWidth={1.75}
+						/>
+						{!collapsed && <span>Compose</span>}
+					</button>
 				</div>
 
 				<div
 					onPointerLeave={() => setHoveredEl(undefined)}
 					className="relative mt-3.5 min-h-0 flex-1 overflow-y-auto overflow-x-hidden"
 				>
-					{/* Labels section first */}
-					<SectionHeader title="Labels" collapsed={collapsed} isFirst />
+					{/* Mail section first */}
+					<SectionHeader title="Mail" collapsed={collapsed} isFirst />
 					<div className="flex flex-col">
 						{/* All (inbox) */}
 						<Link
@@ -377,7 +345,27 @@ export const InboxSidebar = ({
 								</>
 							)}
 						</Link>
+						{mailItems.map((item) => (
+							<NavLink
+								key={item.id}
+								item={item}
+								active={folder === item.id}
+								count={
+									stats[item.id as keyof typeof stats] as number | undefined
+								}
+								countLoading={countsLoading}
+								collapsed={collapsed}
+								refCallback={(el) => {
+									if (el) navRefs.current[item.id] = el;
+								}}
+								onPointerEnter={() => setHoveredEl(navRefs.current[item.id])}
+							/>
+						))}
+					</div>
 
+					{/* Labels below Mail */}
+					<SectionHeader title="Labels" collapsed={collapsed} />
+					<div className="flex flex-col">
 						{!collapsed &&
 							(labelsError ? (
 								<SectionError
@@ -459,27 +447,6 @@ export const InboxSidebar = ({
 								New label
 							</button>
 						)}
-					</div>
-
-					{/* Mail section */}
-					<SectionHeader title="Mail" collapsed={collapsed} />
-					<div className="flex flex-col">
-						{mailItems.map((item) => (
-							<NavLink
-								key={item.id}
-								item={item}
-								active={folder === item.id}
-								count={
-									stats[item.id as keyof typeof stats] as number | undefined
-								}
-								countLoading={countsLoading}
-								collapsed={collapsed}
-								refCallback={(el) => {
-									if (el) navRefs.current[item.id] = el;
-								}}
-								onPointerEnter={() => setHoveredEl(navRefs.current[item.id])}
-							/>
-						))}
 					</div>
 
 					<AnimatedHoverBackground
