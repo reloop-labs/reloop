@@ -136,21 +136,23 @@ export const InboxNavUser = ({
 					role="dialog"
 					aria-label="Account menu"
 					className={cn(
-						"absolute top-full z-[100] mt-2 overflow-hidden rounded-[28px] border border-mail-border/60 bg-[#f0f4f9] shadow-[0_4px_24px_rgba(0,0,0,0.12)] dark:border-white/10 dark:bg-[#1e1f20] dark:shadow-[0_4px_24px_rgba(0,0,0,0.45)]",
+						"absolute top-full z-[100] mt-2 overflow-hidden rounded-2xl",
+						"bg-bg-white-0 p-2 shadow-regular-md ring-1 ring-stroke-soft-100 ring-inset",
+						"dark:bg-panel-dark dark:ring-stroke-soft-100/50",
 						compact
-							? "right-0 left-auto w-[min(360px,calc(100vw-1rem))]"
+							? "right-0 left-auto w-[min(320px,calc(100vw-1rem))]"
 							: "right-0 left-0 w-full min-w-[280px]",
 					)}
 				>
 					{/* Top: email + close */}
-					<div className="relative flex items-center justify-center px-10 pt-4 pb-1">
+					<div className="relative flex items-center justify-center px-9 pt-2 pb-1">
 						<button
 							type="button"
 							onClick={() => {
 								void navigator.clipboard.writeText(mailbox.email);
 								toast.success("Email copied");
 							}}
-							className="max-w-full truncate text-center text-[13px] text-mail-foreground hover:underline"
+							className="max-w-full truncate text-center font-medium text-[12px] text-mail-muted hover:text-mail-foreground hover:underline"
 							title="Copy email"
 						>
 							{mailbox.email}
@@ -159,40 +161,31 @@ export const InboxNavUser = ({
 							type="button"
 							onClick={() => setSwitcherOpen(false)}
 							aria-label="Close"
-							className="absolute top-3 right-3 flex size-8 items-center justify-center rounded-full text-mail-muted transition-colors hover:bg-black/5 hover:text-mail-foreground dark:hover:bg-white/10"
+							className="absolute top-1 right-1 flex size-7 items-center justify-center rounded-lg text-mail-muted transition-colors hover:bg-[var(--inbox-control-hover)] hover:text-mail-foreground"
 						>
-							<X className="size-4" strokeWidth={2} />
+							<X className="size-3.5" strokeWidth={2} />
 						</button>
 					</div>
 
 					{/* Large avatar + greeting */}
-					<div className="flex flex-col items-center px-6 pt-3 pb-4">
-						<div className="relative mb-3">
-							<div
-								className="rounded-full p-[3px]"
-								style={{
-									background:
-										"conic-gradient(from 180deg, #4285f4, #9b72cb, #d96570, #f2a60c, #34a853, #4285f4)",
-								}}
-							>
-								<div
-									className={cn(
-										"grid size-[72px] place-items-center rounded-full font-semibold text-[28px] text-white ring-2 ring-white dark:ring-[#1e1f20]",
-										getAvatarGradient(mailbox.email || displayName),
-									)}
-								>
-									{initial}
-								</div>
-							</div>
+					<div className="flex flex-col items-center px-4 pt-2 pb-3">
+						<div
+							className={cn(
+								"mb-2.5 grid size-16 place-items-center rounded-full font-semibold text-[22px] text-white",
+								"ring-2 ring-zero-blue/25 ring-offset-2 ring-offset-bg-white-0 dark:ring-offset-panel-dark",
+								getAvatarGradient(mailbox.email || displayName),
+							)}
+						>
+							{initial}
 						</div>
-						<p className="text-center font-normal text-[22px] text-mail-foreground tracking-tight">
+						<p className="text-center font-semibold text-[18px] text-mail-foreground tracking-tight">
 							Hi, {firstName}!
 						</p>
 					</div>
 
 					{/* Other mailboxes */}
 					{otherMailboxes.length > 0 && (
-						<div className="mx-3 mb-2 max-h-36 overflow-y-auto rounded-2xl bg-white py-1 dark:bg-white/[0.06]">
+						<div className="mb-1 max-h-36 overflow-y-auto rounded-xl bg-[var(--inbox-muted-bg)] py-1">
 							{otherMailboxes.map((m) => {
 								const name = m.label || m.email.split("@")[0] || m.email;
 								return (
@@ -203,7 +196,7 @@ export const InboxNavUser = ({
 											setSwitcherOpen(false);
 											router.push(`/inbox/${m.id}`);
 										}}
-										className="flex w-full items-center gap-3 px-3 py-2.5 text-left transition-colors hover:bg-black/[0.04] dark:hover:bg-white/[0.06]"
+										className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left transition-colors hover:bg-[var(--inbox-control-hover)]"
 									>
 										<span
 											className={cn(
@@ -214,10 +207,10 @@ export const InboxNavUser = ({
 											{getAvatarInitial(m.label, m.email)}
 										</span>
 										<span className="min-w-0 flex-1">
-											<span className="block truncate font-medium text-[14px] text-mail-foreground">
+											<span className="block truncate font-medium text-[13px] text-mail-foreground">
 												{name}
 											</span>
-											<span className="block truncate text-[12px] text-mail-muted">
+											<span className="block truncate text-[11px] text-mail-muted">
 												{m.email}
 											</span>
 										</span>
@@ -229,43 +222,20 @@ export const InboxNavUser = ({
 
 					{/* Add account */}
 					{onAddMailbox && (
-						<div className="mx-3 mb-3">
-							<button
-								type="button"
-								onClick={() => {
-									setSwitcherOpen(false);
-									onAddMailbox();
-								}}
-								className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-white font-medium text-[14px] text-mail-foreground shadow-sm transition-colors hover:bg-black/[0.03] dark:bg-white/[0.08] dark:hover:bg-white/[0.12]"
-							>
-								<span className="grid size-6 place-items-center rounded-full bg-[#e8f0fe] text-[#0b57d0] dark:bg-[#8ab4f8]/20 dark:text-[#8ab4f8]">
-									<Plus className="size-3.5" strokeWidth={2.5} />
-								</span>
-								Add account
-							</button>
-						</div>
+						<button
+							type="button"
+							onClick={() => {
+								setSwitcherOpen(false);
+								onAddMailbox();
+							}}
+							className="mt-4 mb-2 flex h-10 w-full items-center justify-center gap-2 rounded-full bg-[var(--inbox-control)] font-medium text-[13px] text-mail-foreground transition-colors hover:bg-[var(--inbox-control-hover)]"
+						>
+							<span className="grid size-6 place-items-center rounded-full bg-zero-blue/10 text-zero-blue">
+								<Plus className="size-3.5" strokeWidth={2.5} />
+							</span>
+							Add account
+						</button>
 					)}
-
-					{/* Footer */}
-					<div className="flex items-center justify-center gap-1.5 pb-3 text-[11px] text-mail-muted">
-						<a
-							href="https://reloop.sh/privacy"
-							target="_blank"
-							rel="noopener noreferrer"
-							className="hover:underline"
-						>
-							Privacy Policy
-						</a>
-						<span aria-hidden>·</span>
-						<a
-							href="https://reloop.sh/terms-and-conditions"
-							target="_blank"
-							rel="noopener noreferrer"
-							className="hover:underline"
-						>
-							Terms of Service
-						</a>
-					</div>
 				</div>
 			)}
 		</div>
