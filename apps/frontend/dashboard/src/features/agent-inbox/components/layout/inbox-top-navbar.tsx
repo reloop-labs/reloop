@@ -11,16 +11,18 @@ import { toast } from "sonner";
 import { AddAgentAddressModal } from "#/features/agent-inbox/components/add-agent-address-modal";
 import { useAgentInbox } from "#/features/agent-inbox/components/agent-inbox-provider";
 import { InboxNavUser } from "#/features/agent-inbox/components/sidebar/inbox-nav-user";
+import { useInboxSidebar } from "#/features/agent-inbox/components/sidebar/inbox-sidebar-context";
 import type { AgentMailbox } from "#/features/agent-inbox/types";
 import { useSupportUnread } from "#/features/dashboard/hooks/use-support-unread";
 import { useUIStore } from "#/store/use-ui-store";
 
 /**
  * Top chrome for the fullscreen inbox:
- * left = dashboard logo lockup, center = search, right = support + mailbox.
+ * logo sits over the sidebar column; search aligns with the mail content pane.
  */
 export function InboxTopNavbar({ mailbox }: { mailbox: AgentMailbox }) {
 	const router = useRouter();
+	const { collapsed } = useInboxSidebar();
 	const { getMailbox, isLoadingMailboxes, mailboxesError, retryMailboxes } =
 		useAgentInbox();
 	const mailboxReady = !!getMailbox(mailbox.id) && !!mailbox.email;
@@ -53,95 +55,114 @@ export function InboxTopNavbar({ mailbox }: { mailbox: AgentMailbox }) {
 
 	return (
 		<>
-			<header className="flex h-14 shrink-0 items-center gap-3 border-mail-border/60 border-b bg-sidebar px-2 sm:px-3">
-				{/* Left: same logo lockup as the main dashboard sidebar */}
-				<Link
-					href="/"
-					className="flex h-12 min-w-0 shrink-0 items-center justify-start pr-3 transition-opacity hover:opacity-90"
-					title="Back to dashboard"
+			<header className="flex h-14 shrink-0 items-center border-mail-border/60 border-b bg-sidebar">
+				{/* Logo column — same width as sidebar so search lines up with content */}
+				<div
+					className={cn(
+						"flex h-full shrink-0 items-center transition-[width] duration-200 ease-in-out",
+						collapsed ? "w-[52px] justify-center px-1.5" : "w-[220px] px-2",
+					)}
 				>
-					<div className="flex items-center gap-2">
-						<Logo className="-ml-1 w-10 shrink-0" />
-						<p className="-ml-2 font-semibold text-mail-foreground">Reloop</p>
-						<span className="inline-flex items-center rounded-full bg-[var(--inbox-control)] px-2 py-0.5 font-bold text-[8px] text-mail-muted uppercase tracking-wide dark:bg-white/[0.06]">
-							Beta
-						</span>
-					</div>
-				</Link>
+					<Link
+						href="/"
+						className={cn(
+							"flex min-w-0 items-center transition-opacity hover:opacity-90",
+							collapsed ? "justify-center" : "gap-2 pl-1",
+						)}
+						title="Back to dashboard"
+					>
+						{collapsed ? (
+							<Logo className="h-8 w-8 shrink-0" />
+						) : (
+							<div className="flex min-w-0 items-center gap-2">
+								<Logo className="-ml-1 w-10 shrink-0" />
+								<p className="-ml-2 font-semibold text-mail-foreground">
+									Reloop
+								</p>
+								<span className="inline-flex items-center rounded-full bg-[var(--inbox-control)] px-2 py-0.5 font-bold text-[8px] text-mail-muted uppercase tracking-wide dark:bg-white/[0.06]">
+									Beta
+								</span>
+							</div>
+						)}
+					</Link>
+				</div>
 
-				{/* Center: search */}
-				<div className="flex min-w-0 flex-1 justify-center px-1 sm:px-4">
+				{/* Content column: search left-aligned with mail pane + actions right */}
+				<div className="flex min-w-0 flex-1 items-center gap-3 pr-3">
 					<button
 						type="button"
 						onClick={openSearch}
 						className={cn(
-							"flex h-11 w-full max-w-[720px] items-center gap-3 rounded-full px-4 text-left",
-							"bg-[var(--inbox-control)] text-mail-muted",
-							"transition-colors hover:bg-[var(--inbox-control-hover)]",
-							"focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zero-blue/30",
+							"flex h-10 min-w-0 max-w-2xl flex-1 items-center gap-2.5 rounded-full px-3.5 text-left sm:h-11 sm:px-4",
+							"bg-bg-white-0 text-mail-muted",
+							"ring-1 ring-stroke-soft-100",
+							"transition-colors hover:bg-bg-weak-50 hover:ring-stroke-soft-200",
+							"dark:bg-white/[0.08] dark:ring-white/10 dark:hover:bg-white/[0.12]",
+							"focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zero-blue/35",
 						)}
 					>
 						<Search
 							className="h-4 w-4 shrink-0 opacity-70"
 							strokeWidth={1.75}
 						/>
-						<span className="min-w-0 flex-1 truncate text-[15px]">
+						<span className="min-w-0 flex-1 truncate text-[14px] sm:text-[15px]">
 							Search mail
 						</span>
 						<span className="hidden shrink-0 items-center gap-0.5 sm:flex">
-							<kbd className="rounded border border-mail-border/50 bg-panel-light px-1.5 py-0.5 font-sans text-[10px] text-mail-muted dark:bg-panel-dark">
+							<kbd className="rounded border border-mail-border/60 bg-[var(--inbox-control)] px-1.5 py-0.5 font-sans text-[10px] text-mail-muted">
 								⌘
 							</kbd>
-							<kbd className="rounded border border-mail-border/50 bg-panel-light px-1.5 py-0.5 font-sans text-[10px] text-mail-muted dark:bg-panel-dark">
+							<kbd className="rounded border border-mail-border/60 bg-[var(--inbox-control)] px-1.5 py-0.5 font-sans text-[10px] text-mail-muted">
 								K
 							</kbd>
 						</span>
 					</button>
-				</div>
 
-				{/* Right: support + mailbox switcher */}
-				<div className="flex shrink-0 items-center gap-1 sm:gap-1.5">
-					<button
-						type="button"
-						onClick={toggleSupport}
-						title="Support"
-						aria-label="Support"
-						aria-pressed={supportOpen}
-						className={cn(
-							"relative flex h-9 items-center gap-1.5 rounded-full px-2.5 text-mail-muted transition-colors",
-							"hover:bg-[var(--inbox-row-hover)] hover:text-mail-foreground",
-							supportOpen && "bg-[var(--inbox-selected)] text-mail-foreground",
-						)}
-					>
-						<Icon name="question" className="h-4 w-4" />
-						<span className="hidden font-medium text-[13px] sm:inline">
-							Support
-						</span>
-						{unreadCount > 0 ? (
-							<span className="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-orange-500 px-1 font-semibold text-[10px] text-white tabular-nums">
-								{unreadCount > 99 ? "99+" : unreadCount}
+					{/* Support + mailbox — right side of content column */}
+					<div className="ml-auto flex shrink-0 items-center gap-1 sm:gap-1.5">
+						<button
+							type="button"
+							onClick={toggleSupport}
+							title="Support"
+							aria-label="Support"
+							aria-pressed={supportOpen}
+							className={cn(
+								"relative flex h-9 items-center gap-1.5 rounded-full px-2.5 text-mail-muted transition-colors",
+								"hover:bg-[var(--inbox-row-hover)] hover:text-mail-foreground",
+								supportOpen &&
+									"bg-[var(--inbox-selected)] text-mail-foreground",
+							)}
+						>
+							<Icon name="question" className="h-4 w-4" />
+							<span className="hidden font-medium text-[13px] sm:inline">
+								Support
 							</span>
-						) : null}
-					</button>
+							{unreadCount > 0 ? (
+								<span className="-top-0.5 -right-0.5 absolute flex h-4 min-w-4 items-center justify-center rounded-full bg-orange-500 px-1 font-semibold text-[10px] text-white tabular-nums">
+									{unreadCount > 99 ? "99+" : unreadCount}
+								</span>
+							) : null}
+						</button>
 
-					<div className="min-w-0">
-						{mailboxesError && !mailboxReady ? (
-							<button
-								type="button"
-								onClick={() => void retryMailboxes()}
-								className="rounded-lg px-2 py-1.5 text-[12px] text-mail-muted hover:bg-[var(--inbox-row-hover)]"
-							>
-								Retry mailbox
-							</button>
-						) : (
-							<InboxNavUser
-								mailbox={mailbox}
-								collapsed={false}
-								loading={!mailboxReady || isLoadingMailboxes}
-								compact
-								onAddMailbox={() => setIsAddMailboxOpen(true)}
-							/>
-						)}
+						<div className="min-w-0">
+							{mailboxesError && !mailboxReady ? (
+								<button
+									type="button"
+									onClick={() => void retryMailboxes()}
+									className="rounded-lg px-2 py-1.5 text-[12px] text-mail-muted hover:bg-[var(--inbox-row-hover)]"
+								>
+									Retry mailbox
+								</button>
+							) : (
+								<InboxNavUser
+									mailbox={mailbox}
+									collapsed={false}
+									loading={!mailboxReady || isLoadingMailboxes}
+									compact
+									onAddMailbox={() => setIsAddMailboxOpen(true)}
+								/>
+							)}
+						</div>
 					</div>
 				</div>
 			</header>
