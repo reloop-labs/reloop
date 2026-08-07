@@ -1,6 +1,5 @@
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import { AnimatePresence, motion } from "framer-motion";
 import { type ReactNode, useState } from "react";
 import { getAvatarGradient, getAvatarInitial } from "#/utils/avatar";
 import {
@@ -10,9 +9,8 @@ import {
 } from "../../lib/email-address";
 import type { AgentMailbox } from "../../types";
 import { ContactHoverCard } from "./contact-hover-card";
-import { formatMessageTimestamp, formatZeroMessageTime } from "./date-utils";
+import { formatMessageHeaderTime, formatMessageTimestamp } from "./date-utils";
 import { HoverPopover } from "./hover-popover";
-import { MessageActionBar } from "./message-action-bar";
 import { MessageActionsDropdown } from "./message-actions-dropdown";
 import { MessageAttachments } from "./message-attachments";
 import { MessageBody } from "./message-body";
@@ -66,6 +64,8 @@ export const ZeroMailDisplay = ({
 	onPrint,
 	onApproveSend,
 	onEditReply,
+	isStarred = false,
+	onToggleStar,
 	forceExpanded = false,
 }: {
 	msg: any;
@@ -85,6 +85,8 @@ export const ZeroMailDisplay = ({
 	onPrint: () => void;
 	onApproveSend?: () => void;
 	onEditReply?: () => void;
+	isStarred?: boolean;
+	onToggleStar?: () => void;
 	/** Keep the message open while an inline reply is anchored to it. */
 	forceExpanded?: boolean;
 }) => {
@@ -161,8 +163,32 @@ export const ZeroMailDisplay = ({
 		setIsCollapsed((v) => !v);
 	};
 
-	/** Any expanded message can reply / forward — not only the last one. */
-	const actionsVisible = !collapsed;
+	const toLineLabel = (() => {
+		const onlyYou =
+			toRecipients.length > 0 && toRecipients.every((r) => r.isYou);
+		const first = toRecipients[0];
+		if (onlyYou || (first?.isYou && toRecipients.length === 1)) return "to me";
+		if (toRecipients.length === 0) return "to —";
+		if (toRecipients.length === 1) {
+			const label =
+				first.display && !first.display.includes("@")
+					? first.display
+					: first.email.split("@")[0] || first.email;
+			return `to ${first.isYou ? "me" : label}`;
+		}
+		const names = toRecipients
+			.slice(0, 2)
+			.map((r) =>
+				r.isYou
+					? "me"
+					: r.display && !r.display.includes("@")
+						? r.display.split(/\s+/)[0]
+						: r.email.split("@")[0],
+			)
+			.join(", ");
+		const extra = toRecipients.length > 2 ? ` +${toRecipients.length - 2}` : "";
+		return `to ${names}${extra}`;
+	})();
 
 	return (
 		<div
@@ -187,7 +213,7 @@ export const ZeroMailDisplay = ({
 				tabIndex={isLast ? undefined : 0}
 			>
 				<div className="mt-3 flex w-full items-start justify-between gap-3 px-4">
-					<div className="flex w-full gap-3">
+					<div className="flex w-full min-w-0 gap-3">
 						<ContactHoverCard
 							name={realFromName}
 							email={senderEmail}
@@ -195,7 +221,7 @@ export const ZeroMailDisplay = ({
 						>
 							<div
 								className={cn(
-									"mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full font-semibold text-white text-xs uppercase transition-opacity hover:opacity-90",
+									"mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-full font-semibold text-sm text-white uppercase transition-opacity hover:opacity-90",
 									getAvatarGradient(senderEmail || senderName),
 								)}
 							>
@@ -206,25 +232,55 @@ export const ZeroMailDisplay = ({
 							</div>
 						</ContactHoverCard>
 
-						<div className="flex w-full items-center justify-between gap-2">
+						<div className="flex min-w-0 flex-1 items-start justify-between gap-2">
 							<div className="min-w-0 flex-1">
-								<div className="flex flex-wrap items-center gap-2">
-									<span className="truncate font-semibold text-mail-foreground text-sm">
-										{senderName}
+								{/* Name + email on one line (Gmail-style) */}
+								<div className="flex min-w-0 flex-wrap items-baseline gap-x-1.5 gap-y-0.5">
+									<span className="truncate font-semibold text-[15px] text-mail-foreground leading-5">
+										{isOutbound ? "me" : realFromName || senderName}
 									</span>
 									{isOutbound && <YouBadge />}
-									{!collapsed && (
+									{senderEmail && !isOutbound && (
+										<span className="truncate text-[13px] text-mail-muted leading-5">
+											&lt;{senderEmail}&gt;
+										</span>
+									)}
+									{isOutbound && senderEmail && (
+										<span className="truncate text-[13px] text-mail-muted leading-5">
+											&lt;{senderEmail}&gt;
+										</span>
+									)}
+								</div>
+
+								{/* to me ▾ / preview when collapsed */}
+								{!collapsed ? (
+									<div className="mt-0.5 flex min-w-0 items-center">
 										<HoverPopover
 											align="start"
 											side="bottom"
-											sideOffset={-3}
+											sideOffset={4}
 											contentClassName="w-max max-w-[min(520px,calc(100vw-2rem))] overflow-x-auto p-3"
 											trigger={
 												<button
 													type="button"
-													className="text-mail-muted text-xs underline decoration-mail-border underline-offset-2 hover:text-mail-foreground"
+													onClick={(e) => e.stopPropagation()}
+													className="inline-flex max-w-full items-center gap-0.5 rounded-md py-0.5 text-[13px] text-mail-muted leading-5 transition-colors hover:text-mail-foreground"
 												>
-													Details
+													<span className="truncate">{toLineLabel}</span>
+													<svg
+														width="12"
+														height="12"
+														viewBox="0 0 24 24"
+														fill="none"
+														stroke="currentColor"
+														strokeWidth="2"
+														strokeLinecap="round"
+														strokeLinejoin="round"
+														className="shrink-0 opacity-70"
+														aria-hidden
+													>
+														<path d="M6 9l6 6 6-6" />
+													</svg>
 												</button>
 											}
 										>
@@ -263,27 +319,9 @@ export const ZeroMailDisplay = ({
 												) : null}
 											</div>
 										</HoverPopover>
-									)}
-								</div>
-								{!collapsed && (
-									<p className="mt-0.5 flex flex-wrap items-center gap-1.5 text-mail-muted text-sm">
-										<span>To:</span>
-										{toRecipients.map((recipient, i) => (
-											<span
-												key={`${recipient.email}-${i}`}
-												className="inline-flex items-center gap-1.5"
-											>
-												{i > 0 && <span className="text-mail-muted/60">,</span>}
-												<span className="text-mail-muted">
-													{recipient.email}
-												</span>
-												{recipient.isYou && <YouBadge />}
-											</span>
-										))}
-									</p>
-								)}
-								{collapsed && (
-									<p className="mt-0.5 line-clamp-1 text-mail-muted text-sm">
+									</div>
+								) : (
+									<p className="mt-0.5 line-clamp-1 text-[13px] text-mail-muted">
 										{bodyText?.slice(0, 120) ||
 											(typeof bodyHtml === "string"
 												? bodyHtml.replace(/<[^>]+>/g, " ").slice(0, 120)
@@ -292,10 +330,49 @@ export const ZeroMailDisplay = ({
 								)}
 							</div>
 
-							<div className="flex shrink-0 items-center gap-1">
-								<time className="whitespace-nowrap text-[11px] text-mail-muted tabular-nums">
-									{formatZeroMessageTime(msg.messageAt)}
+							{/* Superhuman-style meta: date · star · reply · more (no emoji) — always visible */}
+							<div
+								className="flex shrink-0 items-center gap-0.5 pt-0.5"
+								onClick={(e) => e.stopPropagation()}
+								onKeyDown={(e) => e.stopPropagation()}
+							>
+								<time className="mr-1.5 whitespace-nowrap text-[12px] text-mail-muted tabular-nums">
+									{formatMessageHeaderTime(msg.messageAt)}
 								</time>
+								{onToggleStar && (
+									<button
+										type="button"
+										title={isStarred ? "Unstar" : "Star"}
+										aria-label={isStarred ? "Unstar" : "Star"}
+										onClick={(e) => {
+											e.stopPropagation();
+											onToggleStar();
+										}}
+										className={cn(
+											"inline-flex size-7 items-center justify-center rounded-md transition-colors hover:bg-[var(--inbox-row-hover)]",
+											isStarred
+												? "text-[var(--inbox-star)]"
+												: "text-mail-muted hover:text-amber-500",
+										)}
+									>
+										<Icon
+											name={isStarred ? "star-filled" : "star"}
+											className="h-4 w-4"
+										/>
+									</button>
+								)}
+								<button
+									type="button"
+									title="Reply"
+									aria-label="Reply"
+									onClick={(e) => {
+										e.stopPropagation();
+										onReply();
+									}}
+									className="inline-flex size-7 items-center justify-center rounded-md text-mail-muted transition-colors hover:bg-[var(--inbox-row-hover)] hover:text-mail-foreground"
+								>
+									<Icon name="reply" className="h-4 w-4" />
+								</button>
 								<MessageActionsDropdown
 									onReply={onReply}
 									onReplyAll={onReplyAll}
@@ -365,35 +442,6 @@ export const ZeroMailDisplay = ({
 									/>
 								</div>
 							)}
-
-							<div className="relative">
-								<AnimatePresence initial={false}>
-									{actionsVisible && !forceExpanded && (
-										<motion.div
-											key="message-action-bar"
-											initial={false}
-											animate={{ opacity: 1, position: "relative" }}
-											exit={{
-												opacity: 0,
-												position: "absolute",
-												left: 0,
-												right: 0,
-												top: 0,
-											}}
-											transition={{
-												duration: 0.12,
-												ease: [0.23, 1, 0.32, 1],
-											}}
-										>
-											<MessageActionBar
-												onReply={onReply}
-												onReplyAll={onReplyAll}
-												onForward={onForward}
-											/>
-										</motion.div>
-									)}
-								</AnimatePresence>
-							</div>
 						</div>
 					</div>
 				</div>

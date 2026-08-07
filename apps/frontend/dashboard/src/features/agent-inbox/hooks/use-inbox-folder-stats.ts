@@ -12,6 +12,7 @@ export type InboxFolderStats = {
 	archive: number;
 	spam: number;
 	trash: number;
+	starred: number;
 };
 
 export const useInboxFolderStats = (mailboxId: string): InboxFolderStats => {
@@ -40,6 +41,9 @@ export const useInboxFolderStats = (mailboxId: string): InboxFolderStats => {
 				(t) => t.direction === "inbound" && t.status === "blocked",
 			).length,
 			trash: 0,
+			starred: groupThreadsByConversation(
+				mailboxThreads.filter((t) => t.isStarred),
+			).length,
 		};
 	}, [threads, archivedThreads, mailboxId, draftsCount]);
 };

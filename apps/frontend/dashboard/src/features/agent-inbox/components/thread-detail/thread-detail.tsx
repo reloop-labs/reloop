@@ -13,6 +13,7 @@ import {
 	useState,
 } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
+import { LoadingDot } from "#/features/agent-inbox/components/shared/loading-dot";
 import { useSWR } from "#/features/agent-inbox/lib/use-swr-compat";
 import { buildDisplayMessages } from "#/features/agent-inbox/utils/build-display-messages";
 import type {
@@ -22,7 +23,6 @@ import type {
 	InboundThread,
 } from "../../types";
 import { useAgentInbox } from "../agent-inbox-provider";
-import { ThreadMessagesSkeleton } from "./detail-panel-skeleton";
 import { ForwardComposer } from "./forward-composer";
 import type { AttachmentItem } from "./message-attachments";
 import { RawHeadersModal } from "./raw-headers-modal";
@@ -293,7 +293,13 @@ export const ThreadDetail = ({
 		}).catch(() => {
 			// Non-blocking — list row may already have requested mark-read
 		});
-	}, [thread?.id, thread?.unread, thread?.messageId, thread?.threadId, markMessageRead]);
+	}, [
+		thread?.id,
+		thread?.unread,
+		thread?.messageId,
+		thread?.threadId,
+		markMessageRead,
+	]);
 
 	/** True while we have a threadId but not the full conversation yet. */
 	const awaitingFullThread =
@@ -1242,12 +1248,10 @@ export const ThreadDetail = ({
 	return (
 		<div className="relative flex h-full min-h-0 flex-col rounded-2xl bg-panel-light dark:bg-panel-dark">
 			<ZeroThreadToolbar
-				isStarred={!!thread.isStarred}
 				isImportant={!!thread.isImportant}
 				folder={folder}
 				showBack={showBack}
 				onClose={onBack}
-				onToggleStar={() => void handleToggleStar()}
 				onToggleImportant={() => void handleToggleImportant()}
 				onArchive={() => void handleArchive()}
 				onUnarchive={() => void handleUnarchive()}
@@ -1307,7 +1311,14 @@ export const ThreadDetail = ({
 				)}
 
 				{awaitingFullThread ? (
-					<ThreadMessagesSkeleton />
+					<div className="flex min-h-[200px] flex-1 flex-col items-center justify-center py-16">
+						<LoadingDot
+							label="Loading conversation"
+							className="text-mail-muted"
+							size={28}
+							dotSize={3}
+						/>
+					</div>
 				) : (
 					<>
 						{displayMessages.map((msg, index) => (
@@ -1327,6 +1338,8 @@ export const ThreadDetail = ({
 										(showReplyComposer && replyAnchorMessageId === msg.id) ||
 										(showForwardComposer && forwardAnchorMessageId === msg.id)
 									}
+									isStarred={!!thread.isStarred}
+									onToggleStar={() => void handleToggleStar()}
 									onReply={() => openReplyComposer("reply", msg)}
 									onReplyAll={() => openReplyComposer("replyAll", msg)}
 									onForward={() => openForwardComposer(msg)}

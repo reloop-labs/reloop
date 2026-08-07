@@ -13,7 +13,7 @@ export const AgentInboxLayoutWrapper = ({
 	return (
 		<div className="flex h-full min-h-0 w-full overflow-hidden bg-sidebar text-mail-foreground">
 			<InboxSidebar mailbox={mailbox} folder={folder} />
-			<div className="relative z-[5] flex min-h-0 min-w-0 flex-1 bg-sidebar p-0 md:mt-1 md:mr-0.5">
+			<div className="relative z-[5] flex min-h-0 min-w-0 flex-1 bg-sidebar p-0 md:mt-1 md:mr-1">
 				{children}
 			</div>
 		</div>

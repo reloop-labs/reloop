@@ -9,6 +9,7 @@ export {
 	NeedsApprovalFolderPage,
 	SentFolderPage,
 	SpamFolderPage,
+	StarredFolderPage,
 	TrashFolderPage,
 	YouFolderPage,
 } from "#/features/agent-inbox/pages/mailbox-folder-pages";

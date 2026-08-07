@@ -41,6 +41,19 @@
 	--inbox-danger-fg: #e11d48;
 	--inbox-compose-bar: var(--bg-weak-50);
 
+	/* Superhuman-style list / nav density */
+	--inbox-row-hover: var(--bg-weak-50);
+	--inbox-row-focused: var(--bg-soft-200);
+	--inbox-selected: var(--bg-soft-200);
+	--inbox-divider: var(--stroke-soft-100);
+	--inbox-unread: var(--zero-blue);
+	--inbox-chip-bg: var(--bg-weak-50);
+	--inbox-chip-fg: var(--text-sub-600);
+	--inbox-chip-border: var(--stroke-soft-100);
+	--inbox-star: #f5b400;
+	--inbox-sidebar-icon: var(--text-sub-600);
+	--inbox-sidebar-text-inactive: var(--text-sub-600);
+
 	background-color: var(--sidebar-background);
 	color: var(--mail-foreground);
 	color-scheme: light;
@@ -73,6 +86,19 @@
 	--inbox-danger-border: #6e2532;
 	--inbox-danger-fg: #f43f5e;
 	--inbox-compose-bar: rgba(255, 255, 255, 0.02);
+
+	/* Superhuman-style list / nav density */
+	--inbox-row-hover: rgba(255, 255, 255, 0.04);
+	--inbox-row-focused: rgba(255, 255, 255, 0.08);
+	--inbox-selected: rgba(255, 255, 255, 0.08);
+	--inbox-divider: rgba(255, 255, 255, 0.06);
+	--inbox-unread: var(--zero-blue);
+	--inbox-chip-bg: rgba(255, 255, 255, 0.06);
+	--inbox-chip-fg: rgba(255, 255, 255, 0.75);
+	--inbox-chip-border: rgba(255, 255, 255, 0.1);
+	--inbox-star: #f5b400;
+	--inbox-sidebar-icon: rgba(255, 255, 255, 0.45);
+	--inbox-sidebar-text-inactive: rgba(255, 255, 255, 0.5);
 
 	color-scheme: dark;
 }

@@ -44,10 +44,10 @@ export const ThreadHeader = ({
 
 	return (
 		<div className="border-mail-border/40 border-b px-4 py-4">
-			<h1 className="font-medium text-base text-mail-foreground leading-snug">
+			<h1 className="font-semibold text-[22px] text-mail-foreground leading-snug tracking-tight">
 				{subject}
 				{messageCount > 1 && (
-					<span className="text-mail-muted"> [{messageCount}]</span>
+					<span className="font-medium text-mail-muted"> [{messageCount}]</span>
 				)}
 			</h1>
 

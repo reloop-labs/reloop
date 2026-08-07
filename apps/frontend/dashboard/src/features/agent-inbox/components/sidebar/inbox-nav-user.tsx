@@ -1,28 +1,36 @@
+import { cn } from "@reloop/ui/cn";
 import { Skeleton } from "@reloop/ui/skeleton";
-import { Check, Copy } from "lucide-react";
+import { Check, ChevronDown, Copy, Plus } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useAgentInbox } from "#/features/agent-inbox/components/agent-inbox-provider";
 import type { AgentMailbox } from "#/features/agent-inbox/types";
+import { getAvatarGradient, getAvatarInitial } from "#/utils/avatar";
 import { LoadingDot } from "../shared/loading-dot";
 
 export const InboxNavUser = ({
 	mailbox,
 	collapsed,
 	loading = false,
+	onAddMailbox,
 }: {
 	mailbox: AgentMailbox;
 	collapsed: boolean;
 	/** True while mailbox metadata is still resolving. */
 	loading?: boolean;
+	onAddMailbox?: () => void;
 }) => {
-	const { updateMailboxDisplayName } = useAgentInbox();
+	const router = useRouter();
+	const { updateMailboxDisplayName, mailboxes } = useAgentInbox();
 	const [copied, setCopied] = useState(false);
 	const [isEditingName, setIsEditingName] = useState(false);
 	const [nameDraft, setNameDraft] = useState("");
 	const [isSavingName, setIsSavingName] = useState(false);
 	const [showNameSaved, setShowNameSaved] = useState(false);
+	const [switcherOpen, setSwitcherOpen] = useState(false);
 	const nameInputRef = useRef<HTMLInputElement>(null);
+	const switcherRef = useRef<HTMLDivElement>(null);
 	const skipNameSaveRef = useRef(false);
 	const nameSavedTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
 		null,
@@ -36,7 +44,22 @@ export const InboxNavUser = ({
 		};
 	}, []);
 
+	useEffect(() => {
+		if (!switcherOpen) return;
+		const onPointerDown = (e: PointerEvent) => {
+			if (
+				switcherRef.current &&
+				!switcherRef.current.contains(e.target as Node)
+			) {
+				setSwitcherOpen(false);
+			}
+		};
+		document.addEventListener("pointerdown", onPointerDown);
+		return () => document.removeEventListener("pointerdown", onPointerDown);
+	}, [switcherOpen]);
+
 	const displayName = mailbox.label || mailbox.email?.split("@")[0] || "";
+	const initial = getAvatarInitial(mailbox.label, mailbox.email);
 
 	useEffect(() => {
 		if (isEditingName) {
@@ -105,63 +128,56 @@ export const InboxNavUser = ({
 	};
 
 	if (collapsed) {
-		return null;
+		return (
+			<button
+				type="button"
+				onClick={() => setSwitcherOpen((v) => !v)}
+				title={displayName}
+				className={cn(
+					"relative mx-auto flex size-8 items-center justify-center rounded-full font-medium text-[11px] text-white",
+					getAvatarGradient(mailbox.email || displayName),
+				)}
+			>
+				{initial}
+			</button>
+		);
 	}
 
 	if (loading) {
 		return (
 			<div
-				className="flex min-h-[2.5rem] flex-col justify-center gap-1.5 overflow-visible text-left"
+				className="flex items-center gap-2.5 rounded-lg px-2 py-1.5"
 				aria-busy="true"
 			>
 				<span className="sr-only">Loading mailbox</span>
-				<Skeleton className="h-4 w-28 bg-[var(--inbox-skeleton)]" />
-				<Skeleton className="h-3.5 w-40 bg-[var(--inbox-skeleton)]" />
+				<Skeleton className="size-5 shrink-0 rounded-full bg-[var(--inbox-skeleton)]" />
+				<div className="flex min-w-0 flex-1 flex-col gap-1">
+					<Skeleton className="h-3.5 w-28 bg-[var(--inbox-skeleton)]" />
+				</div>
 			</div>
 		);
 	}
 
 	return (
-		<div className="flex flex-col overflow-visible text-left">
-			<div className="flex min-h-[1.25rem] items-center gap-1.5 font-medium text-[14px] text-mail-foreground leading-snug">
-				{isEditingName ? (
-					<input
-						ref={nameInputRef}
-						value={nameDraft}
-						onChange={(e) => setNameDraft(e.target.value)}
-						onBlur={() => {
-							void saveDisplayName();
-						}}
-						onKeyDown={(e) => {
-							if (e.key === "Enter") {
-								e.preventDefault();
-								void saveDisplayName();
-							} else if (e.key === "Escape") {
-								e.preventDefault();
-								cancelEditingName();
-							}
-						}}
-						disabled={isSavingName}
-						maxLength={255}
-						aria-label="Mailbox display name"
-						className="min-w-0 max-w-[14.5ch] flex-1 rounded-sm border-0 bg-transparent p-0 font-medium text-[14px] text-mail-foreground leading-snug outline-none ring-1 ring-[#006ffe]/60 focus:ring-[#006ffe] disabled:opacity-70"
-					/>
-				) : (
-					<button
-						type="button"
-						onClick={startEditingName}
-						title="Click to rename"
-						className="max-w-[14.5ch] cursor-text truncate text-left focus:outline-none"
-					>
-						{displayName}
-					</button>
-				)}
+		<div ref={switcherRef} className="relative">
+			<button
+				type="button"
+				onClick={() => setSwitcherOpen((v) => !v)}
+				className="flex w-full items-center gap-2.5 rounded-lg px-2 py-1.5 text-left transition-colors hover:bg-[var(--inbox-row-hover)]"
+			>
+				<span
+					className={cn(
+						"grid size-5 shrink-0 place-items-center rounded-full font-medium text-[11px] text-white",
+						getAvatarGradient(mailbox.email || displayName),
+					)}
+				>
+					{initial}
+				</span>
+				<span className="min-w-0 flex-1 truncate font-medium text-[14px] text-mail-foreground leading-5">
+					{displayName}
+				</span>
 				{(isSavingName || showNameSaved) && (
-					<span
-						className="flex size-3.5 shrink-0 items-center justify-center"
-						aria-live="polite"
-					>
-						<span className="sr-only">{isSavingName ? "Saving" : "Saved"}</span>
+					<span className="flex size-3.5 shrink-0 items-center justify-center">
 						{isSavingName ? (
 							<LoadingDot
 								label="Saving"
@@ -173,35 +189,110 @@ export const InboxNavUser = ({
 						)}
 					</span>
 				)}
-			</div>
-			<div className="flex w-full items-center gap-1.5">
-				<button
-					type="button"
-					onClick={(e) => {
-						e.stopPropagation();
-						handleCopy();
-					}}
-					className="h-5 max-w-[170px] cursor-pointer truncate text-left font-medium text-[13px] text-mail-muted leading-snug transition-colors hover:text-mail-foreground focus:outline-none"
-					title="Copy email address"
-				>
-					{mailbox.email}
-				</button>
-				<button
-					type="button"
-					onClick={(e) => {
-						e.stopPropagation();
-						handleCopy();
-					}}
-					className="flex shrink-0 cursor-pointer items-center justify-center text-mail-muted transition-colors hover:text-mail-foreground focus:outline-none"
-					title="Copy email address"
-				>
-					{copied ? (
-						<Check className="size-3 text-green-500" />
-					) : (
-						<Copy className="size-2.5" />
+				<ChevronDown className="size-3.5 shrink-0 text-mail-muted" />
+			</button>
+
+			{switcherOpen && (
+				<div className="absolute top-full right-0 left-0 z-50 mt-1 overflow-hidden rounded-xl border border-mail-border bg-panel-light shadow-lg dark:bg-panel-dark">
+					<div className="border-mail-border border-b px-3 py-2">
+						{isEditingName ? (
+							<input
+								ref={nameInputRef}
+								value={nameDraft}
+								onChange={(e) => setNameDraft(e.target.value)}
+								onBlur={() => {
+									void saveDisplayName();
+								}}
+								onKeyDown={(e) => {
+									if (e.key === "Enter") {
+										e.preventDefault();
+										void saveDisplayName();
+									} else if (e.key === "Escape") {
+										e.preventDefault();
+										cancelEditingName();
+									}
+								}}
+								disabled={isSavingName}
+								maxLength={255}
+								aria-label="Mailbox display name"
+								className="w-full rounded-sm border-0 bg-transparent p-0 font-medium text-[13px] text-mail-foreground outline-none ring-1 ring-zero-blue/60 focus:ring-zero-blue"
+							/>
+						) : (
+							<button
+								type="button"
+								onClick={startEditingName}
+								className="w-full truncate text-left font-medium text-[13px] text-mail-foreground hover:underline"
+								title="Click to rename"
+							>
+								{displayName}
+							</button>
+						)}
+						<button
+							type="button"
+							onClick={handleCopy}
+							className="mt-0.5 flex max-w-full items-center gap-1 truncate text-[12px] text-mail-muted hover:text-mail-foreground"
+							title="Copy email address"
+						>
+							<span className="truncate">{mailbox.email}</span>
+							{copied ? (
+								<Check className="size-3 shrink-0 text-green-500" />
+							) : (
+								<Copy className="size-2.5 shrink-0" />
+							)}
+						</button>
+					</div>
+					<div className="max-h-48 overflow-y-auto py-1">
+						{mailboxes.map((m) => {
+							const active = m.id === mailbox.id;
+							const name = m.label || m.email.split("@")[0] || m.email;
+							return (
+								<button
+									key={m.id}
+									type="button"
+									onClick={() => {
+										setSwitcherOpen(false);
+										if (m.id !== mailbox.id) {
+											router.push(`/inbox/${m.id}`);
+										}
+									}}
+									className={cn(
+										"flex w-full items-center gap-2.5 px-3 py-1.5 text-left text-[13px] transition-colors hover:bg-[var(--inbox-row-hover)]",
+										active
+											? "font-medium text-mail-foreground"
+											: "text-mail-muted",
+									)}
+								>
+									<span
+										className={cn(
+											"grid size-5 shrink-0 place-items-center rounded-full font-medium text-[10px] text-white",
+											getAvatarGradient(m.email || name),
+										)}
+									>
+										{getAvatarInitial(m.label, m.email)}
+									</span>
+									<span className="min-w-0 flex-1 truncate">{name}</span>
+									{active && (
+										<Check className="size-3.5 shrink-0 text-zero-blue" />
+									)}
+								</button>
+							);
+						})}
+					</div>
+					{onAddMailbox && (
+						<button
+							type="button"
+							onClick={() => {
+								setSwitcherOpen(false);
+								onAddMailbox();
+							}}
+							className="flex w-full items-center gap-2 border-mail-border border-t px-3 py-2 text-left text-[13px] text-mail-muted transition-colors hover:bg-[var(--inbox-row-hover)] hover:text-mail-foreground"
+						>
+							<Plus className="size-3.5" />
+							Add mailbox
+						</button>
 					)}
-				</button>
-			</div>
+				</div>
+			)}
 		</div>
 	);
 };

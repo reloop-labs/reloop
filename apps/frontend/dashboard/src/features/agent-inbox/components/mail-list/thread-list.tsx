@@ -22,7 +22,6 @@ interface ThreadListProps {
 	threads: InboundThread[];
 	mailboxId: string;
 	folder?: string;
-	sectionLabel?: string;
 	selectedId: string | null;
 	onSelect: (id: string) => void;
 	emptyMessage?: string;
@@ -41,10 +40,8 @@ export const ThreadList = ({
 	threads,
 	mailboxId,
 	folder,
-	sectionLabel = "Primary",
 	selectedId,
 	onSelect,
-	emptyMessage = "No messages in this filter",
 	hasFilters = false,
 	onClearFilters,
 	focusedIndex = null,
@@ -105,25 +102,19 @@ export const ThreadList = ({
 			}
 		}
 
-		if (visibleRest.length > 0 || (pinned.length === 0 && rest.length > 0)) {
+		// No folder/category section header — title lives in the list chrome.
+		// Only "Pinned" keeps a subheader when present.
+		for (const thread of visibleRest) {
 			items.push({
-				type: "header",
-				key: `header-${sectionLabel}`,
-				label: sectionLabel,
-				count: rest.length,
+				type: "thread",
+				key: thread.id,
+				thread,
+				flatIndex: flatIndex++,
 			});
-			for (const thread of visibleRest) {
-				items.push({
-					type: "thread",
-					key: thread.id,
-					thread,
-					flatIndex: flatIndex++,
-				});
-			}
 		}
 
 		return items;
-	}, [visibleThreads, pinned.length, rest.length, sectionLabel]);
+	}, [visibleThreads, pinned.length]);
 
 	const handleToggleBulk = useCallback(
 		(id: string, event?: React.MouseEvent) => {
@@ -230,7 +221,7 @@ export const ThreadList = ({
 					data={listItems}
 					className="absolute inset-0 overflow-x-hidden"
 					overscan={200}
-					defaultItemHeight={72}
+					defaultItemHeight={44}
 					endReached={handleLoadMore}
 					computeItemKey={(_index, item) => item.key}
 					itemContent={(_index, item) => {

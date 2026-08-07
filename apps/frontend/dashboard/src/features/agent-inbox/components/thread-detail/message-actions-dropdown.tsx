@@ -85,7 +85,7 @@ export function MessageActionsDropdown({
 				<Dropdown.Trigger asChild>
 					<button
 						type="button"
-						className="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--inbox-control)] transition-colors duration-150 ease-out hover:bg-[var(--inbox-control-hover)]"
+						className="inline-flex h-7 w-7 items-center justify-center rounded-md bg-transparent transition-colors duration-150 ease-out hover:bg-[var(--inbox-row-hover)]"
 						aria-label="Message actions"
 					>
 						<Icon name="more-horizontal" className="h-4 w-4 text-mail-muted" />

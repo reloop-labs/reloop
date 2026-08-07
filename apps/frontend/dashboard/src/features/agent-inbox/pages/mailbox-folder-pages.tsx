@@ -1,7 +1,7 @@
 import { cn } from "@reloop/ui/cn";
-import { FileText, Plus, Trash2 } from "lucide-react";
+import { FileText, Trash2 } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { toast } from "sonner";
 import { useAgentInbox } from "#/features/agent-inbox/components/agent-inbox-provider";
 import { AgentInboxContent } from "#/features/agent-inbox/components/mail-list/agent-inbox-content";
@@ -53,6 +53,26 @@ export function AgentFolderPage() {
 		<AgentInboxContent
 			mailbox={mailbox}
 			folder="agent"
+			threads={filteredThreads}
+		/>
+	);
+}
+
+export function StarredFolderPage() {
+	const { mailbox, mailboxId } = useFolderMailbox();
+	const { threads } = useAgentInbox();
+
+	const filteredThreads = useMemo(
+		() => threads.filter((t) => t.mailboxId === mailboxId && !!t.isStarred),
+		[threads, mailboxId],
+	);
+
+	if (!mailbox) return null;
+
+	return (
+		<AgentInboxContent
+			mailbox={mailbox}
+			folder="starred"
 			threads={filteredThreads}
 		/>
 	);

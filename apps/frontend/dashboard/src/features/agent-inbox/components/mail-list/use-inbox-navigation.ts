@@ -61,59 +61,82 @@ export function useInboxNavigation({
 		[containerRef, getThreadElement],
 	);
 
-	const navigateToThread = useCallback(
+	const openThreadAt = useCallback(
 		(index: number) => {
-			if (index === null || !itemsRef.current[index]) return;
 			const message = itemsRef.current[index];
-			if (message.id) {
-				onNavigateRef.current(message.id);
-				onMarkRead?.(message.id);
-			}
+			if (!message?.id) return;
+			onNavigateRef.current(message.id);
+			onMarkRead?.(message.id);
 			setMail((prev) => ({ ...prev, bulkSelected: [] }));
 		},
 		[setMail, onMarkRead],
 	);
 
+	/** List mode: move focus highlight only (Gmail-style). Detail mode: open next/prev. */
 	const moveFocus = useCallback(
-		(direction: "up" | "down") => {
+		(direction: "up" | "down", { open }: { open: boolean }) => {
 			keyboardActiveRef.current = true;
 
 			setFocusedIndex((prevIndex) => {
-				let newIndex: number;
-				if (prevIndex === null) {
-					newIndex = direction === "up" ? itemsRef.current.length - 1 : 0;
-				} else {
-					newIndex =
-						direction === "up"
-							? Math.max(0, prevIndex - 1)
-							: Math.min(itemsRef.current.length - 1, prevIndex + 1);
+				let base = prevIndex;
+				if (base === null && open && threadId) {
+					const openIdx = itemsRef.current.findIndex((t) => t.id === threadId);
+					if (openIdx >= 0) base = openIdx;
 				}
 
-				if (newIndex === prevIndex && prevIndex !== null) return prevIndex;
+				const newIndex =
+					base === null
+						? direction === "up"
+							? itemsRef.current.length - 1
+							: 0
+						: direction === "up"
+							? Math.max(0, base - 1)
+							: Math.min(itemsRef.current.length - 1, base + 1);
 
-				scrollIntoView(newIndex, "smooth");
-				navigateToThread(newIndex);
+				if (newIndex === base && base !== null) {
+					if (open) openThreadAt(newIndex);
+					return base;
+				}
+
+				if (!open) scrollIntoView(newIndex, "smooth");
+				if (open) openThreadAt(newIndex);
 				return newIndex;
 			});
 		},
-		[setFocusedIndex, scrollIntoView, navigateToThread],
+		[setFocusedIndex, scrollIntoView, openThreadAt, threadId],
 	);
 
-	const handleArrowUp = useCallback(() => moveFocus("up"), [moveFocus]);
-	const handleArrowDown = useCallback(() => moveFocus("down"), [moveFocus]);
+	const handleArrowUp = useCallback(
+		() => moveFocus("up", { open: false }),
+		[moveFocus],
+	);
+	const handleArrowDown = useCallback(
+		() => moveFocus("down", { open: false }),
+		[moveFocus],
+	);
+	const handleNextOpen = useCallback(
+		() => moveFocus("down", { open: true }),
+		[moveFocus],
+	);
+	const handlePrevOpen = useCallback(
+		() => moveFocus("up", { open: true }),
+		[moveFocus],
+	);
 
 	const handleEnter = useCallback(() => {
 		if (focusedIndex === null) return;
-		const message = itemsRef.current[focusedIndex];
-		if (message) onNavigateRef.current(message.id);
-	}, [focusedIndex]);
+		openThreadAt(focusedIndex);
+	}, [focusedIndex, openThreadAt]);
 
 	const handleEscape = useCallback(() => {
+		if (threadId) {
+			onNavigateRef.current(null);
+			return;
+		}
 		setFocusedIndex(null);
-		onNavigateRef.current(null);
 		keyboardActiveRef.current = false;
 		setMail((prev) => ({ ...prev, bulkSelected: [] }));
-	}, [setFocusedIndex, setMail]);
+	}, [setFocusedIndex, setMail, threadId]);
 
 	const handleToggleBulk = useCallback(() => {
 		if (focusedIndex === null) return;
@@ -130,15 +153,39 @@ export function useInboxNavigation({
 		});
 	}, [focusedIndex, setMail]);
 
-	const enabled = !isCommandPaletteOpen && !threadId;
+	const listEnabled = !isCommandPaletteOpen && !threadId;
+	const detailEnabled = !isCommandPaletteOpen && !!threadId;
 
-	useHotkeys("ArrowUp", handleArrowUp, { preventDefault: true, enabled });
-	useHotkeys("ArrowDown", handleArrowDown, { preventDefault: true, enabled });
-	useHotkeys("j", handleArrowDown, { enabled });
-	useHotkeys("k", handleArrowUp, { enabled });
-	useHotkeys("Enter", handleEnter, { preventDefault: true, enabled });
+	// List: j/k focus only; Enter opens detail (replaces list).
+	useHotkeys("ArrowUp", handleArrowUp, {
+		preventDefault: true,
+		enabled: listEnabled,
+	});
+	useHotkeys("ArrowDown", handleArrowDown, {
+		preventDefault: true,
+		enabled: listEnabled,
+	});
+	useHotkeys("j", handleArrowDown, { enabled: listEnabled });
+	useHotkeys("k", handleArrowUp, { enabled: listEnabled });
+	useHotkeys("Enter", handleEnter, {
+		preventDefault: true,
+		enabled: listEnabled,
+	});
+	useHotkeys("x", handleToggleBulk, { enabled: listEnabled });
+
+	// Detail: j/k open next/prev conversation (list stays replaced).
+	useHotkeys("j", handleNextOpen, { enabled: detailEnabled });
+	useHotkeys("k", handlePrevOpen, { enabled: detailEnabled });
+	useHotkeys("ArrowDown", handleNextOpen, {
+		preventDefault: true,
+		enabled: detailEnabled,
+	});
+	useHotkeys("ArrowUp", handlePrevOpen, {
+		preventDefault: true,
+		enabled: detailEnabled,
+	});
+
 	useHotkeys("Escape", handleEscape, { preventDefault: true });
-	useHotkeys("x", handleToggleBulk, { enabled });
 
 	const handleMouseEnter = useCallback((id: string) => {
 		hoveredMailRef.current = id;
