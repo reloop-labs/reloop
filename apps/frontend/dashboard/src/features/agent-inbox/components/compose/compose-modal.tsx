@@ -148,7 +148,6 @@ export const ComposeModal = ({
 	const [textBody, setTextBody] = useState("");
 	const [editorContent, setEditorContent] = useState("");
 	const [editorKey, setEditorKey] = useState(0);
-	const [showDiscard, setShowDiscard] = useState(false);
 	const [aiPhase, setAiPhase] = useState<AiDraftPhase>("idle");
 	const aiAbortRef = useRef<AbortController | null>(null);
 	const aiRestoreRef = useRef<{ html: string; text: string } | null>(null);
@@ -458,32 +457,7 @@ export const ComposeModal = ({
 		noKeyboard: true,
 	});
 
-	const requestClose = () => {
-		if (isSending) return;
-		if (hasContent) {
-			setShowDiscard(true);
-			return;
-		}
-		void setDraftId(null);
-		onClose();
-	};
-
-	const confirmDiscard = async () => {
-		setShowDiscard(false);
-		if (currentDraftId.current) {
-			try {
-				await deleteDraft(currentDraftId.current);
-			} catch {
-				/* ignore */
-			}
-		}
-		void setDraftId(null);
-		resetComposer();
-		onClose();
-	};
-
 	const saveDraftAndClose = async () => {
-		setShowDiscard(false);
 		if (draftTimer.current) {
 			window.clearTimeout(draftTimer.current);
 			draftTimer.current = null;
@@ -518,6 +492,17 @@ export const ComposeModal = ({
 		}
 		void setDraftId(null);
 		resetComposer();
+		onClose();
+	};
+
+	/** Close: auto-save draft when there is content; never prompt. */
+	const requestClose = () => {
+		if (isSending) return;
+		if (hasContent) {
+			void saveDraftAndClose();
+			return;
+		}
+		void setDraftId(null);
 		onClose();
 	};
 
@@ -759,13 +744,12 @@ export const ComposeModal = ({
 		"inline-flex h-8 items-center gap-1.5 rounded-lg border border-mail-border/50 bg-transparent px-2.5 font-medium text-[12px] text-mail-muted transition-[transform,background-color,color] duration-150 ease-out hover:bg-[var(--inbox-hover)] hover:text-mail-foreground active:scale-[0.97] disabled:opacity-40";
 
 	return (
-		<>
-			<Modal.Root
-				open={isOpen}
-				onOpenChange={(open) => {
-					if (!open) requestClose();
-				}}
-			>
+		<Modal.Root
+			open={isOpen}
+			onOpenChange={(open) => {
+				if (!open) requestClose();
+			}}
+		>
 				<Modal.Content
 					showClose={false}
 					className="flex max-h-[min(720px,90dvh)] w-full flex-col overflow-hidden rounded-3xl border border-mail-border/40 p-0 sm:max-w-[680px]"
@@ -830,27 +814,13 @@ export const ComposeModal = ({
 
 						{/* Header */}
 						<div className="shrink-0 border-mail-border/40 border-b px-5 pt-5 pb-3">
-							<div className="mb-3 flex items-center justify-between gap-3">
-								<div className="flex items-center gap-2.5">
-									<Icon
-										name="pencil"
-										className="h-4 w-4 text-mail-foreground"
-									/>
-									<Modal.Title asChild>
-										<h2 className="font-semibold text-label-md text-mail-foreground">
-											New email
-										</h2>
-									</Modal.Title>
-								</div>
-								<button
-									type="button"
-									onClick={requestClose}
-									disabled={isSending}
-									className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-mail-muted transition-transform duration-150 ease-out hover:bg-[var(--inbox-hover)] hover:text-mail-foreground active:scale-[0.95] disabled:opacity-50"
-									aria-label="Close"
-								>
-									<Icon name="cross" className="h-3.5 w-3.5" />
-								</button>
+							<div className="mb-3 flex items-center gap-2.5">
+								<Icon name="pencil" className="h-4 w-4 text-mail-foreground" />
+								<Modal.Title asChild>
+									<h2 className="font-semibold text-label-md text-mail-foreground">
+										New email
+									</h2>
+								</Modal.Title>
 							</div>
 						</div>
 
@@ -1318,54 +1288,7 @@ export const ComposeModal = ({
 							</div>
 						</div>
 					</form>
-				</Modal.Content>
-			</Modal.Root>
-
-			<Modal.Root open={showDiscard} onOpenChange={setShowDiscard}>
-				<Modal.Content className="max-w-sm overflow-hidden rounded-3xl border border-mail-border/40 p-0">
-					<div className="px-5 pt-5 pb-2">
-						<Modal.Title asChild>
-							<h3 className="font-semibold text-label-md text-mail-foreground">
-								Save draft?
-							</h3>
-						</Modal.Title>
-						<Modal.Description asChild>
-							<p className="mt-1.5 text-[13px] text-mail-muted leading-snug">
-								Save this message to Drafts, or discard it permanently.
-							</p>
-						</Modal.Description>
-					</div>
-					<div className="flex flex-wrap justify-end gap-2 px-5 py-4">
-						<Button.Root
-							type="button"
-							variant="neutral"
-							mode="stroke"
-							size="xsmall"
-							onClick={() => setShowDiscard(false)}
-						>
-							Keep editing
-						</Button.Root>
-						<Button.Root
-							type="button"
-							variant="neutral"
-							mode="filled"
-							size="xsmall"
-							onClick={() => void saveDraftAndClose()}
-						>
-							Save draft
-						</Button.Root>
-						<Button.Root
-							type="button"
-							variant="error"
-							mode="filled"
-							size="xsmall"
-							onClick={() => void confirmDiscard()}
-						>
-							Discard
-						</Button.Root>
-					</div>
-				</Modal.Content>
-			</Modal.Root>
-		</>
+			</Modal.Content>
+		</Modal.Root>
 	);
 };
