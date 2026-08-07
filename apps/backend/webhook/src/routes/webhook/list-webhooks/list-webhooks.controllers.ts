@@ -31,19 +31,27 @@ type DayBucket = { success: number; failure: number };
 
 /**
  * Build per-webhook 7-day health series from delivery rows.
- * Series values = successful deliveries that day (oldest → newest).
+ * Success + failure counts per day (oldest → newest).
  */
-async function loadHealthByWebhook(
-	webhookIds: string[],
-): Promise<
+async function loadHealthByWebhook(webhookIds: string[]): Promise<
 	Map<
 		string,
-		{ series: number[]; successCount7d: number; failureCount7d: number }
+		{
+			successSeries: number[];
+			failureSeries: number[];
+			successCount7d: number;
+			failureCount7d: number;
+		}
 	>
 > {
 	const empty = new Map<
 		string,
-		{ series: number[]; successCount7d: number; failureCount7d: number }
+		{
+			successSeries: number[];
+			failureSeries: number[];
+			successCount7d: number;
+			failureCount7d: number;
+		}
 	>();
 	if (webhookIds.length === 0) return empty;
 
@@ -85,22 +93,35 @@ async function loadHealthByWebhook(
 
 	const result = new Map<
 		string,
-		{ series: number[]; successCount7d: number; failureCount7d: number }
+		{
+			successSeries: number[];
+			failureSeries: number[];
+			successCount7d: number;
+			failureCount7d: number;
+		}
 	>();
 
 	for (const id of webhookIds) {
 		const dayMap = byWebhook.get(id) ?? new Map();
 		let successCount7d = 0;
 		let failureCount7d = 0;
-		const series = dayKeys.map((key) => {
+		const successSeries: number[] = [];
+		const failureSeries: number[] = [];
+		for (const key of dayKeys) {
 			const bucket = dayMap.get(key);
 			const s = bucket?.success ?? 0;
 			const f = bucket?.failure ?? 0;
 			successCount7d += s;
 			failureCount7d += f;
-			return s;
+			successSeries.push(s);
+			failureSeries.push(f);
+		}
+		result.set(id, {
+			successSeries,
+			failureSeries,
+			successCount7d,
+			failureCount7d,
 		});
-		result.set(id, { series, successCount7d, failureCount7d });
 	}
 
 	return result;
@@ -148,6 +169,7 @@ export async function listWebhooksController({
 		});
 
 		const healthById = await loadHealthByWebhook(webhooks.map((w) => w.id));
+		const emptySeries = () => Array.from({ length: HEALTH_DAYS }, () => 0);
 
 		return {
 			webhooks: webhooks.map((webhook) => {
@@ -168,7 +190,8 @@ export async function listWebhooksController({
 					successCount: webhook.successCount,
 					failureCount: webhook.failureCount,
 					consecutiveFailures: webhook.consecutiveFailures,
-					healthSeries: health?.series ?? Array(HEALTH_DAYS).fill(0),
+					healthSeries: health?.successSeries ?? emptySeries(),
+					healthFailureSeries: health?.failureSeries ?? emptySeries(),
 					healthSuccessCount7d: health?.successCount7d ?? 0,
 					healthFailureCount7d: health?.failureCount7d ?? 0,
 					events: webhook.subscriptions.map(

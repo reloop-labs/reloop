@@ -221,6 +221,13 @@ export namespace WebhookModel {
 						"Daily successful delivery counts for the last 7 days (oldest first)",
 				}),
 			),
+			/** Daily failed deliveries for the last 7 days (oldest → newest). List only. */
+			healthFailureSeries: t.Optional(
+				t.Array(t.Number(), {
+					description:
+						"Daily failed delivery counts for the last 7 days (oldest first)",
+				}),
+			),
 			/** Successful deliveries in the last 7 days. List only. */
 			healthSuccessCount7d: t.Optional(
 				t.Number({ description: "Successful deliveries in the last 7 days" }),
@@ -269,8 +276,9 @@ export namespace WebhookModel {
 					failureCount: 1,
 					consecutiveFailures: 0,
 					healthSeries: [2, 1, 4, 3, 5, 2, 6],
+					healthFailureSeries: [0, 1, 0, 0, 2, 0, 1],
 					healthSuccessCount7d: 23,
-					healthFailureCount7d: 1,
+					healthFailureCount7d: 4,
 					events: ["email.sent", "domain.create"],
 					createdAt: "2026-03-29T10:00:00Z",
 					updatedAt: "2026-03-29T10:00:00Z",

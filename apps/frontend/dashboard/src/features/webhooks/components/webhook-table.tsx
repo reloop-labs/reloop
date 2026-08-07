@@ -28,6 +28,8 @@ interface WebhookData {
 	failureCount: number;
 	/** Daily successful deliveries for last 7 days (oldest → newest). */
 	healthSeries?: number[];
+	/** Daily failed deliveries for last 7 days (oldest → newest). */
+	healthFailureSeries?: number[];
 	healthSuccessCount7d?: number;
 	healthFailureCount7d?: number;
 	lastTriggeredAt: string | null;
@@ -81,24 +83,41 @@ const SAMPLES = 16;
 const WIDTH = 120;
 const HEIGHT = 32;
 const PADDING = 2;
+const HEALTH_DAYS = 7;
+
+const SUCCESS_COLOR = "#0c8a7a";
+const FAILURE_COLOR = "#dc2626";
 
 const ease = (t: number) => (t < 0.5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2);
 
-function buildPaths(data: number[]) {
-	const values = data.length < 2 ? [0, 0] : data;
-	const min = Math.min(...values);
-	const max = Math.max(...values);
-	const flat = max === min;
-	// Constant series: draw mid-line (or bottom if all zeros).
+function padSeries(series: number[] | undefined, length = HEALTH_DAYS): number[] {
+	if (!series || series.length === 0) {
+		return Array.from({ length }, () => 0);
+	}
+	if (series.length === length) return series;
+	if (series.length > length) return series.slice(-length);
+	return [...Array.from({ length: length - series.length }, () => 0), ...series];
+}
+
+/** Shared y-scale so success + failure lines are comparable. */
+function buildYScale(seriesList: number[][]) {
+	const all = seriesList.flat();
+	const max = Math.max(...all, 0);
+	const min = 0;
+	const flat = max === 0;
 	const range = flat ? 1 : max - min;
-	const yFor = (v: number) => {
-		if (flat) {
-			return v === 0
-				? PADDING + (HEIGHT - PADDING * 2)
-				: PADDING + (HEIGHT - PADDING * 2) * 0.45;
-		}
-		return PADDING + (HEIGHT - PADDING * 2) - ((v - min) / range) * (HEIGHT - PADDING * 2);
+	const innerH = HEIGHT - PADDING * 2;
+	// Leave a little headroom so peak strokes aren't clipped.
+	const usable = innerH * 0.92;
+
+	return (v: number) => {
+		if (flat) return PADDING + innerH * 0.55;
+		return PADDING + (innerH - usable) + usable - ((v - min) / range) * usable;
 	};
+}
+
+function buildPaths(data: number[], yFor: (v: number) => number) {
+	const values = data.length < 2 ? [0, 0] : data;
 	const innerW = WIDTH - PADDING * 2;
 	const last = values.length - 1;
 	const points: { x: number; y: number }[] = [];
@@ -106,8 +125,8 @@ function buildPaths(data: number[]) {
 	for (let i = 0; i < last; i++) {
 		const x0 = PADDING + (i / last) * innerW;
 		const x1 = PADDING + ((i + 1) / last) * innerW;
-		const y0 = yFor(values[i]);
-		const y1 = yFor(values[i + 1]);
+		const y0 = yFor(values[i] ?? 0);
+		const y1 = yFor(values[i + 1] ?? 0);
 		for (let s = 0; s < SAMPLES; s++) {
 			const t = s / SAMPLES;
 			const et = ease(t);
@@ -116,7 +135,7 @@ function buildPaths(data: number[]) {
 	}
 	points.push({
 		x: PADDING + innerW,
-		y: yFor(values[last]),
+		y: yFor(values[last] ?? 0),
 	});
 
 	const linePath = points
@@ -128,24 +147,35 @@ function buildPaths(data: number[]) {
 	return { linePath, areaPath };
 }
 
-type ChartLineChartProps = {
-	/** Swap this array for your real series — numbers only. */
-	data?: number[];
+type DualHealthChartProps = {
+	success: number[];
+	failure: number[];
 	className?: string;
-	style?: React.CSSProperties;
 };
 
 /**
- * Tiny SVG line chart. Tint via CSS: --chart-color: #0c8a7a;
- * Edges fade out over 8px on each side.
+ * Tiny dual-line chart: teal = successful deliveries, red = failures.
+ * Shared y-scale; edges fade out over 8px on each side.
+ * Either series alone (failure-only or success-only) still draws clearly.
  */
-export function ChartLineChart({
-	data = [7, 11, 4, 14, 9, 18, 6, 16, 12, 20, 8, 15],
+export function DualHealthChart({
+	success,
+	failure,
 	className,
-	style,
-}: ChartLineChartProps) {
-	const gradientId = useId();
-	const { linePath, areaPath } = useMemo(() => buildPaths(data), [data]);
+}: DualHealthChartProps) {
+	const successGradId = useId();
+	const failureGradId = useId();
+
+	const hasSuccess = success.some((v) => v > 0);
+	const hasFailures = failure.some((v) => v > 0);
+
+	const { successPaths, failurePaths } = useMemo(() => {
+		const yFor = buildYScale([success, failure]);
+		return {
+			successPaths: buildPaths(success, yFor),
+			failurePaths: buildPaths(failure, yFor),
+		};
+	}, [success, failure]);
 
 	return (
 		<svg
@@ -158,73 +188,88 @@ export function ChartLineChart({
 					"linear-gradient(to right, transparent, black 8px, black calc(100% - 8px), transparent)",
 				WebkitMaskImage:
 					"linear-gradient(to right, transparent, black 8px, black calc(100% - 8px), transparent)",
-				...style,
 			}}
 			role="img"
-			aria-label="Line chart"
+			aria-label="Delivery health: successes and failures over 7 days"
 		>
 			<defs>
-				<linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-					<stop
-						offset="0%"
-						stopColor="var(--chart-color, #0c8a7a)"
-						stopOpacity="0.28"
-					/>
-					<stop
-						offset="100%"
-						stopColor="var(--chart-color, #0c8a7a)"
-						stopOpacity="0"
-					/>
+				<linearGradient id={successGradId} x1="0" y1="0" x2="0" y2="1">
+					<stop offset="0%" stopColor={SUCCESS_COLOR} stopOpacity="0.22" />
+					<stop offset="100%" stopColor={SUCCESS_COLOR} stopOpacity="0" />
+				</linearGradient>
+				<linearGradient id={failureGradId} x1="0" y1="0" x2="0" y2="1">
+					<stop offset="0%" stopColor={FAILURE_COLOR} stopOpacity="0.22" />
+					<stop offset="100%" stopColor={FAILURE_COLOR} stopOpacity="0" />
 				</linearGradient>
 			</defs>
-			<path d={areaPath} fill={`url(#${gradientId})`} />
-			<path
-				d={linePath}
-				fill="none"
-				stroke="var(--chart-color, #0c8a7a)"
-				strokeWidth="2"
-				strokeLinecap="round"
-				strokeLinejoin="round"
-			/>
+			{/* Success — only when there were successful deliveries */}
+			{hasSuccess && (
+				<>
+					<path d={successPaths.areaPath} fill={`url(#${successGradId})`} />
+					<path
+						d={successPaths.linePath}
+						fill="none"
+						stroke={SUCCESS_COLOR}
+						strokeWidth="2"
+						strokeLinecap="round"
+						strokeLinejoin="round"
+					/>
+				</>
+			)}
+			{/* Failures — always when any failed (including failure-only webhooks) */}
+			{hasFailures && (
+				<>
+					<path d={failurePaths.areaPath} fill={`url(#${failureGradId})`} />
+					<path
+						d={failurePaths.linePath}
+						fill="none"
+						stroke={FAILURE_COLOR}
+						strokeWidth="2"
+						strokeLinecap="round"
+						strokeLinejoin="round"
+					/>
+				</>
+			)}
 		</svg>
 	);
 }
 
 function HealthCell({
 	healthSeries,
+	healthFailureSeries,
 	successCount7d,
 	failureCount7d,
 }: {
 	/** Daily successful deliveries, oldest → newest (last 7 days). */
 	healthSeries?: number[];
+	/** Daily failed deliveries, oldest → newest (last 7 days). */
+	healthFailureSeries?: number[];
 	successCount7d?: number;
 	failureCount7d?: number;
 }) {
-	const series = healthSeries?.length === 7 ? healthSeries : null;
-	const success = successCount7d ?? 0;
-	const failure = failureCount7d ?? 0;
+	const successSeries = padSeries(healthSeries);
+	const failureSeries = padSeries(healthFailureSeries);
+	const success = successCount7d ?? successSeries.reduce((a, b) => a + b, 0);
+	const failure = failureCount7d ?? failureSeries.reduce((a, b) => a + b, 0);
 	const total = success + failure;
 	const hasActivity =
-		total > 0 || (series !== null && series.some((v) => v > 0));
+		total > 0 ||
+		successSeries.some((v) => v > 0) ||
+		failureSeries.some((v) => v > 0);
 
-	if (!hasActivity || !series) {
+	if (!hasActivity) {
 		return (
 			<span className="font-medium text-[13px] text-text-soft-400">—</span>
 		);
 	}
 
 	const rate = total > 0 ? Math.round((success / total) * 100) : 0;
-	const chartColor =
-		rate >= 95 ? "#0c8a7a" : rate >= 80 ? "#d97706" : "#dc2626";
 
 	return (
 		<Tooltip.Root delayDuration={200}>
 			<Tooltip.Trigger asChild>
 				<div className="flex cursor-help items-center">
-					<ChartLineChart
-						data={series}
-						style={{ "--chart-color": chartColor } as React.CSSProperties}
-					/>
+					<DualHealthChart success={successSeries} failure={failureSeries} />
 				</div>
 			</Tooltip.Trigger>
 			<Tooltip.Content sideOffset={4} className="rounded-lg px-2.5 py-1.5">
@@ -605,10 +650,11 @@ export const WebhookTable = ({
 										</div>
 									</div>
 
-									{/* Health — last 7 days of real delivery data */}
+									{/* Health — last 7 days success + failure lines */}
 									<div className="flex items-center">
 										<HealthCell
 											healthSeries={webhook.healthSeries}
+											healthFailureSeries={webhook.healthFailureSeries}
 											successCount7d={webhook.healthSuccessCount7d}
 											failureCount7d={webhook.healthFailureCount7d}
 										/>

@@ -19,6 +19,8 @@ export type WebhookData = {
 	failureCount: number;
 	/** Daily successful deliveries for last 7 days (oldest → newest). */
 	healthSeries?: number[];
+	/** Daily failed deliveries for last 7 days (oldest → newest). */
+	healthFailureSeries?: number[];
 	healthSuccessCount7d?: number;
 	healthFailureCount7d?: number;
 	lastTriggeredAt: string | null;
