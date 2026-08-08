@@ -2,6 +2,7 @@ import { DocsHome } from "@reloop/fe-docs/components/docs/docs-home";
 import { APIPage } from "@reloop/fe-docs/components/mdx/APIPage";
 import { CardGroup } from "@reloop/fe-docs/components/mdx/CardGroup";
 import { MDXImage, MDXVideo } from "@reloop/fe-docs/components/mdx/ImageZoom";
+import { RelatedTopic, RelatedTopics } from "@reloop/fe-docs/components/mdx/RelatedTopics";
 import {
 	Accordion,
 	AccordionGroup,
@@ -153,6 +154,8 @@ export function getMDXComponents(
 		DocsHome,
 		SimpleIcon,
 		PromptActions,
+		RelatedTopics,
+		RelatedTopic,
 		SideBySide,
 		Side,
 		pre: (props: any) => {

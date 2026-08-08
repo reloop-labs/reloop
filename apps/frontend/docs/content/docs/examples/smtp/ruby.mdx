@@ -7,16 +7,19 @@ description: Send emails via Reloop SMTP using net/smtp in Ruby.
 
 You can send emails through Reloop using Ruby's standard `net/smtp` library.
 
+[View complete runnable example on GitHub ↗](https://github.com/reloop-labs/reloop/tree/main/examples/smtp-ruby)
+
 ## Code Example
 
 ```ruby
 require 'net/smtp'
+require 'openssl'
 
 api_key = ENV['RELOOP_API_KEY']
 
-message = <<MESSAGE_END
-From: onboarding@reloop.dev
-To: delivered@resend.dev
+message = <<~MESSAGE_END
+From: onboarding@yourdomain.com
+To: recipient@example.com
 MIME-Version: 1.0
 Content-type: text/html
 Subject: Hello from Ruby net/smtp
@@ -25,11 +28,19 @@ Subject: Hello from Ruby net/smtp
 MESSAGE_END
 
 begin
-  Net::SMTP.start('smtp.reloop.dev', 587, 'localhost', api_key, api_key, :plain) do |smtp|
-    smtp.send_message message, 'onboarding@reloop.dev', 'delivered@resend.dev'
+  smtp = Net::SMTP.new('smtp.reloop.sh', 465)
+  smtp.enable_tls(OpenSSL::SSL::SSLContext.new)
+  smtp.start('smtp.reloop.sh', 'reloop', api_key, :plain) do |s|
+    s.send_message message, 'onboarding@yourdomain.com', 'recipient@example.com'
   end
   puts "Email sent successfully!"
 rescue => e
   puts "Error: #{e.message}"
 end
 ```
+
+<RelatedTopics>
+  <RelatedTopic icon="smtp" title="SMTP Integration Overview" href="/docs/examples/smtp/introduction" />
+  <RelatedTopic icon="siRubyonrails" title="Ruby on Rails Guide" href="/docs/examples/ruby/rails" />
+  <RelatedTopic icon="siPython" title="Python SMTP Guide" href="/docs/examples/smtp/python" />
+</RelatedTopics>

@@ -7,6 +7,8 @@ description: Send emails via Reloop SMTP using PHPMailer in PHP.
 
 Use the popular **PHPMailer** library to send transactional emails via Reloop.
 
+[View complete runnable example on GitHub ↗](https://github.com/reloop-labs/reloop/tree/main/examples/smtp-php)
+
 ## Installation
 
 Install PHPMailer via Composer:
@@ -29,16 +31,16 @@ $mail = new PHPMailer(true);
 try {
     // Server settings
     $mail->isSMTP();
-    $mail->Host       = 'smtp.reloop.dev';
+    $mail->Host       = 'smtp.reloop.sh';
     $mail->SMTPAuth   = true;
-    $mail->Username   = getenv('RELOOP_API_KEY');
+    $mail->Username   = 'reloop';
     $mail->Password   = getenv('RELOOP_API_KEY');
-    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-    $mail->Port       = 587;
+    $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+    $mail->Port       = 465;
 
     // Recipients
-    $mail->setFrom('onboarding@reloop.dev', 'Onboarding');
-    $mail->addAddress('delivered@resend.dev');
+    $mail->setFrom('onboarding@yourdomain.com', 'Onboarding');
+    $mail->addAddress('recipient@example.com');
 
     // Content
     $mail->isHTML(true);
@@ -51,3 +53,9 @@ try {
     echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
 }
 ```
+
+<RelatedTopics>
+  <RelatedTopic icon="smtp" title="SMTP Integration Overview" href="/docs/examples/smtp/introduction" />
+  <RelatedTopic icon="siLaravel" title="Laravel Integration Guide" href="/docs/examples/php/laravel" />
+  <RelatedTopic icon="siWordpress" title="WordPress SMTP Guide" href="/docs/integrations/wordpress" />
+</RelatedTopics>

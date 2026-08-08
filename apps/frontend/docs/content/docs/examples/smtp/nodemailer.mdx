@@ -7,6 +7,8 @@ description: Send emails via Reloop SMTP using Nodemailer in Node.js.
 
 You can send emails through Reloop using **Nodemailer** in a Node.js environment.
 
+[View complete runnable example on GitHub ↗](https://github.com/reloop-labs/reloop/tree/main/examples/smtp-nodemailer)
+
 ## Installation
 
 Install Nodemailer:
@@ -21,19 +23,19 @@ npm install nodemailer
 const nodemailer = require('nodemailer');
 
 const transporter = nodemailer.createTransport({
-  host: 'smtp.reloop.dev',
-  port: 587,
-  secure: false, // true for port 465, false for other ports
+  host: 'smtp.reloop.sh',
+  port: 465,
+  secure: true, // port 465
   auth: {
-    user: process.env.RELOOP_API_KEY,
+    user: 'reloop',
     pass: process.env.RELOOP_API_KEY,
   },
 });
 
 async function main() {
   const info = await transporter.sendMail({
-    from: '"Onboarding" <onboarding@reloop.dev>',
-    to: 'delivered@resend.dev',
+    from: '"Onboarding" <onboarding@yourdomain.com>',
+    to: 'recipient@example.com',
     subject: 'Hello from Nodemailer',
     html: '<p>Congrats on sending your first email via Reloop SMTP using Nodemailer!</p>',
   });
@@ -43,3 +45,9 @@ async function main() {
 
 main().catch(console.error);
 ```
+
+<RelatedTopics>
+  <RelatedTopic icon="smtp" title="SMTP Integration Overview" href="/docs/examples/smtp/introduction" />
+  <RelatedTopic icon="siPython" title="Python SMTP Guide" href="/docs/examples/smtp/python" />
+  <RelatedTopic icon="siNextdotjs" title="Next.js Integration Guide" href="/docs/examples/nodejs/nextjs" />
+</RelatedTopics>

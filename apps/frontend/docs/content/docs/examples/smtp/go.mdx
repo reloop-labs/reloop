@@ -7,12 +7,15 @@ description: Send emails via Reloop SMTP using net/smtp in Go.
 
 Use Go's standard library `net/smtp` package to send emails.
 
+[View complete runnable example on GitHub ↗](https://github.com/reloop-labs/reloop/tree/main/examples/smtp-go)
+
 ## Code Example
 
 ```go
 package main
 
 import (
+	"crypto/tls"
 	"fmt"
 	"net/smtp"
 	"os"
@@ -20,26 +23,71 @@ import (
 
 func main() {
 	apiKey := os.Getenv("RELOOP_API_KEY")
-	
-	// SMTP server configuration
-	smtpHost := "smtp.reloop.dev"
-	smtpPort := "587"
-	
-	auth := smtp.PlainAuth("", apiKey, apiKey, smtpHost)
-	
-	to := []string{"delivered@resend.dev"}
-	msg := []byte("To: delivered@resend.dev\r\n" +
+
+	host := "smtp.reloop.sh"
+	port := "465"
+	from := "onboarding@yourdomain.com"
+	to := []string{"recipient@example.com"}
+
+	msg := []byte("To: recipient@example.com\r\n" +
+		"From: " + from + "\r\n" +
 		"Subject: Hello from Go net/smtp\r\n" +
 		"Content-Type: text/html; charset=UTF-8\r\n" +
 		"\r\n" +
 		"<p>Congrats on sending your first email via Reloop SMTP using net/smtp!</p>\r\n")
-		
-	err := smtp.SendMail(smtpHost+":"+smtpPort, auth, "onboarding@reloop.dev", to, msg)
+
+	auth := smtp.PlainAuth("", "reloop", apiKey, host)
+	tlsConfig := &tls.Config{ServerName: host}
+
+	conn, err := tls.Dial("tcp", host+":"+port, tlsConfig)
 	if err != nil {
-		fmt.Println("Error sending email:", err)
+		fmt.Println("Error connecting:", err)
 		return
 	}
-	
+	defer conn.Close()
+
+	client, err := smtp.NewClient(conn, host)
+	if err != nil {
+		fmt.Println("Error creating client:", err)
+		return
+	}
+	defer client.Close()
+
+	if err = client.Auth(auth); err != nil {
+		fmt.Println("Auth failed:", err)
+		return
+	}
+	if err = client.Mail(from); err != nil {
+		fmt.Println("MAIL FROM failed:", err)
+		return
+	}
+	for _, addr := range to {
+		if err = client.Rcpt(addr); err != nil {
+			fmt.Println("RCPT TO failed:", err)
+			return
+		}
+	}
+	w, err := client.Data()
+	if err != nil {
+		fmt.Println("DATA failed:", err)
+		return
+	}
+	if _, err = w.Write(msg); err != nil {
+		fmt.Println("Write failed:", err)
+		return
+	}
+	if err = w.Close(); err != nil {
+		fmt.Println("Close failed:", err)
+		return
+	}
+	_ = client.Quit()
+
 	fmt.Println("Email sent successfully!")
 }
 ```
+
+<RelatedTopics>
+  <RelatedTopic icon="smtp" title="SMTP Integration Overview" href="/docs/examples/smtp/introduction" />
+  <RelatedTopic icon="siGo" title="Go Gin Integration Guide" href="/docs/examples/go/gin" />
+  <RelatedTopic icon="siRust" title="Rust SMTP Guide" href="/docs/examples/smtp/rust" />
+</RelatedTopics>

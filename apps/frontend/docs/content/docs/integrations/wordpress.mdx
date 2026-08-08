@@ -44,7 +44,7 @@ To route WordPress emails through Reloop, you need to install an SMTP plugin. We
 
 | Setting | Value |
 | :--- | :--- |
-| **SMTP Host** | `smtp.reloop.dev` |
+| **SMTP Host** | `smtp.reloop.sh` |
 | **Encryption** | `TLS` (or `STARTTLS` depending on the plugin) |
 | **SMTP Port** | `587` |
 | **Auto TLS** | **ON** |
@@ -75,4 +75,4 @@ Verify that the **From Email** configured in WP Mail SMTP belongs to a domain yo
 ### Connection Timeout (Port 587 Blocked)
 Some shared hosting providers block outgoing port `587` to prevent spam. If the connection fails or times out:
 1. Try changing the port to `2525` or `25` with `TLS` / `STARTTLS` encryption enabled.
-2. If those are blocked, contact your hosting provider's support team to request that they open outbound connections on port `587` for `smtp.reloop.dev`.
+2. If those are blocked, contact your hosting provider's support team to request that they open outbound connections on port `587` for `smtp.reloop.sh`.

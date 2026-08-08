@@ -676,7 +676,7 @@ const TransactionEmailsPage = () => {
 										SMTP HOST
 									</div>
 									<div className="font-mono font-semibold text-[#0a0d12] text-[13px]">
-										smtp.reloop.dev
+										smtp.reloop.sh
 									</div>
 									<div className="mt-1 font-mono text-[#0a0d12]/30 text-[11px]">
 										Ports: 587 (TLS), 465 (SSL)

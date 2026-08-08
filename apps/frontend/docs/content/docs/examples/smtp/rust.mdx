@@ -7,6 +7,8 @@ description: Send emails via Reloop SMTP using Lettre in Rust.
 
 Send emails in Rust using the high-performance **Lettre** crate.
 
+[View complete runnable example on GitHub ↗](https://github.com/reloop-labs/reloop/tree/main/examples/smtp-rust)
+
 ## Installation
 
 Add `lettre` to your `Cargo.toml`:
@@ -27,16 +29,16 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let api_key = env::var("RELOOP_API_KEY")?;
 
     let email = Message::builder()
-        .from("onboarding@reloop.dev".parse()?)
-        .to("delivered@resend.dev".parse()?)
+        .from("onboarding@yourdomain.com".parse()?)
+        .to("recipient@example.com".parse()?)
         .subject("Hello from Lettre")
         .header(lettre::message::header::ContentType::TEXT_HTML)
         .body(String::from("<p>Congrats on sending your first email via Reloop SMTP using Lettre!</p>"))?;
 
-    let creds = Credentials::new(api_key.clone(), api_key);
+    let creds = Credentials::new("reloop".to_string(), api_key);
 
-    // Open a local connection on port 587
-    let mailer = SmtpTransport::starttls_relay("smtp.reloop.dev")?
+    let mailer = SmtpTransport::relay("smtp.reloop.sh")?
+        .port(465)
         .credentials(creds)
         .build();
 
@@ -49,3 +51,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 ```
+
+<RelatedTopics>
+  <RelatedTopic icon="smtp" title="SMTP Integration Overview" href="/docs/examples/smtp/introduction" />
+  <RelatedTopic icon="siRust" title="Rust Axum Integration Guide" href="/docs/examples/rust/axum" />
+  <RelatedTopic icon="siGo" title="Go SMTP Guide" href="/docs/examples/smtp/go" />
+</RelatedTopics>

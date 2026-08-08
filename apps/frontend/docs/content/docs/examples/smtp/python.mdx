@@ -7,6 +7,8 @@ description: Send emails via Reloop SMTP using smtplib in Python.
 
 Python's built-in `smtplib` and `email` packages can be used to send emails through Reloop SMTP.
 
+[View complete runnable example on GitHub ↗](https://github.com/reloop-labs/reloop/tree/main/examples/smtp-python)
+
 ## Code Example
 
 ```python
@@ -19,23 +21,25 @@ api_key = os.environ.get("RELOOP_API_KEY")
 
 # Create message
 msg = MIMEMultipart()
-msg['From'] = 'onboarding@reloop.dev'
-msg['To'] = 'delivered@resend.dev'
+msg['From'] = 'onboarding@yourdomain.com'
+msg['To'] = 'recipient@example.com'
 msg['Subject'] = 'Hello from Python smtplib'
 
 body = '<p>Congrats on sending your first email via Reloop SMTP using smtplib!</p>'
 msg.attach(MIMEText(body, 'html'))
 
 try:
-    # Connect to the server
-    server = smtplib.SMTP('smtp.reloop.dev', 587)
-    server.starttls()  # Upgrade connection to secure
-    server.login(api_key, api_key)
-    
-    # Send email
-    server.sendmail(msg['From'], msg['To'], msg.as_string())
-    server.quit()
+    with smtplib.SMTP_SSL('smtp.reloop.sh', 465) as server:
+        server.login('reloop', api_key)
+        server.sendmail(msg['From'], [msg['To']], msg.as_string())
+
     print("Email sent successfully!")
 except Exception as e:
     print(f"Error: {e}")
 ```
+
+<RelatedTopics>
+  <RelatedTopic icon="smtp" title="SMTP Integration Overview" href="/docs/examples/smtp/introduction" />
+  <RelatedTopic icon="siFastapi" title="FastAPI Integration Guide" href="/docs/examples/python/fastapi" />
+  <RelatedTopic icon="siNodedotjs" title="Nodemailer SMTP Guide" href="/docs/examples/smtp/nodemailer" />
+</RelatedTopics>
