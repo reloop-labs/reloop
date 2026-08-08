@@ -1,0 +1,46 @@
+---
+title: Wrong nameservers
+sidebarTitle: Wrong nameservers
+description: You added Reloop DNS records but verification fails because the domain uses different nameservers.
+---
+
+## Symptom
+
+- Reloop Verify fails
+- `dig` does not show the records you added
+- Or `dig` shows an old zone
+
+## Cause
+
+DNS records only count at the host named by your domain’s **NS** records. Editing the registrar’s “DNS” tab while NS point to Cloudflare (or vice versa) publishes into a zone nobody queries.
+
+## Fix
+
+<Steps>
+  <Step title="Read live nameservers">
+    ```bash
+    dig NS yourdomain.com +short
+    ```
+  </Step>
+  <Step title="Open that host’s DNS UI">
+    Use [Find your DNS provider](/docs/connect-domain/find-dns-provider) to map NS → company.
+  </Step>
+  <Step title="Add Reloop records there">
+    Copy from the Reloop dashboard again into the correct panel.
+  </Step>
+  <Step title="Optional cleanup">
+    Remove mistaken duplicate records from the unused panel so you are not confused later.
+  </Step>
+</Steps>
+
+## Changing nameservers on purpose
+
+If you intentionally move DNS (e.g. Namecheap → Cloudflare):
+
+1. Copy existing important records to the new host first
+2. Change NS at the registrar
+3. Wait for NS propagation
+4. Re-add Reloop records at the new host
+5. Verify again
+
+See also [Change DNS later](/docs/connect-domain/after/change-dns).

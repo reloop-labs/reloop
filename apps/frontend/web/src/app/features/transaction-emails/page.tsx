@@ -62,7 +62,7 @@ func main() {
 	sent, _ := client.Emails.Send(params)
 	fmt.Println(sent.Id)
 }`,
-		curl: `curl -X POST https://api.reloop.dev/v1/emails \
+		curl: `curl -X POST https://api.reloop.sh/v1/emails \
   -H "Authorization: Bearer rl_live_7x893k02j" \
   -H "Content-Type: application/json" \
   -d '{
@@ -115,7 +115,7 @@ func main() {
 	sent, _ := client.Emails.Send(params)
 	fmt.Println(sent.Id)
 }`,
-		curl: `curl -X POST https://api.reloop.dev/v1/emails \
+		curl: `curl -X POST https://api.reloop.sh/v1/emails \
   -H "Authorization: Bearer rl_live_7x893k02j" \
   -H "Content-Type: application/json" \
   -d '{
@@ -166,7 +166,7 @@ func main() {
 	sent, _ := client.Emails.Send(params)
 	fmt.Println(sent.Id)
 }`,
-		curl: `curl -X POST https://api.reloop.dev/v1/emails \
+		curl: `curl -X POST https://api.reloop.sh/v1/emails \
   -H "Authorization: Bearer rl_live_7x893k02j" \
   -H "Content-Type: application/json" \
   -d '{
@@ -282,7 +282,7 @@ const TransactionEmailsPage = () => {
 
 		const logs = [
 			"Initializing transaction request...",
-			"Resolving endpoint api.reloop.dev...",
+			"Resolving endpoint api.reloop.sh...",
 			"API authentication successful: Key verified.",
 			"Applying auto-DKIM & SPF signature (d=yourdomain.com)...",
 			"Suppression list checked. Recipient status: Active.",
@@ -687,7 +687,7 @@ const TransactionEmailsPage = () => {
 										HTTP ENDPOINT
 									</div>
 									<div className="font-mono font-semibold text-[#0a0d12] text-[13px]">
-										api.reloop.dev/v1
+										api.reloop.sh/v1
 									</div>
 									<div className="mt-1 font-mono text-[#0a0d12]/30 text-[11px]">
 										HTTPS POST /send

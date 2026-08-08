@@ -1,0 +1,17 @@
+{
+	"title": "Troubleshoot domains",
+	"icon": "alert-circle",
+	"pages": [
+		"index",
+		"not-verifying",
+		"wrong-nameservers",
+		"spf-conflicts",
+		"cname-conflicts",
+		"mx-conflicts",
+		"dkim-dmarc-typos",
+		"tracking-cname",
+		"auto-populate-failed",
+		"domain-already-registered",
+		"domain-mismatch"
+	]
+}

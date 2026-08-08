@@ -28,7 +28,7 @@ reloop = Reloop(api_key=os.environ.get("RELOOP_API_KEY"))
 def send_email():
     try:
         result = reloop.mail.send({
-            "from": "onboarding@reloop.dev",
+            "from": "onboarding@reloop.sh",
             "to": "delivered@resend.dev",
             "subject": "Hello from Flask",
             "html": "<p>Congrats on sending your first email via Reloop from Flask!</p>",

@@ -21,18 +21,22 @@ api_key = os.environ.get("RELOOP_API_KEY")
 
 # Create message
 msg = MIMEMultipart()
-msg['From'] = 'onboarding@yourdomain.com'
-msg['To'] = 'recipient@example.com'
+msg['From'] = 'onboarding@reloop.sh'
+msg['To'] = 'delivered@resend.dev'
 msg['Subject'] = 'Hello from Python smtplib'
 
 body = '<p>Congrats on sending your first email via Reloop SMTP using smtplib!</p>'
 msg.attach(MIMEText(body, 'html'))
 
 try:
-    with smtplib.SMTP_SSL('smtp.reloop.sh', 465) as server:
-        server.login('reloop', api_key)
-        server.sendmail(msg['From'], [msg['To']], msg.as_string())
-
+    # Connect to the server
+    server = smtplib.SMTP('smtp.reloop.sh', 587)
+    server.starttls()  # Upgrade connection to secure
+    server.login(api_key, api_key)
+    
+    # Send email
+    server.sendmail(msg['From'], msg['To'], msg.as_string())
+    server.quit()
     print("Email sent successfully!")
 except Exception as e:
     print(f"Error: {e}")

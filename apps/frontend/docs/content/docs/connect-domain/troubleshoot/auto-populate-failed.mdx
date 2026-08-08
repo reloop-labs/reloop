@@ -1,0 +1,23 @@
+---
+title: Auto-populate failed
+sidebarTitle: Auto-populate failed
+description: What to do when Reloop Domain Connect Auto-populate errors, popups are blocked, or the provider has not onboarded the template.
+---
+
+## Messages you might see
+
+| Message (paraphrased) | Meaning | Action |
+| --- | --- | --- |
+| Provider doesn’t support automatic configuration | No Domain Connect / no sync UX | [Manual setup](/docs/connect-domain/manual-setup) |
+| Supports Domain Connect but hasn’t onboarded Reloop’s template | Protocol yes, Reloop template no | [Manual setup](/docs/connect-domain/manual-setup) |
+| Failed to start auto-configuration / signing key | Reloop server-side apply URL issue | Retry later or manual; contact support if persistent |
+| Popup blocked / nothing opened | Browser blocked the provider tab | Allow popups for Reloop, click again |
+| You cancelled at the provider | Consent denied | Retry Auto-populate or configure manually |
+
+## When Auto-populate is offered
+
+Reloop discovers Domain Connect support live for your domain. If **Auto populate** appears, your host can apply Reloop’s template — see [Auto-populate DNS](/docs/connect-domain/auto-populate). There is no fixed provider list in the docs.
+
+## Fallback
+
+Every domain can be configured manually with the same records. Auto-populate is convenience, not a hard requirement.

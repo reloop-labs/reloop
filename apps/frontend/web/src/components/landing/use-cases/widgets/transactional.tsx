@@ -65,7 +65,7 @@ export default function TransactionalWidget() {
 					<div>
 						<div className="font-mono text-white/40 text-xs">ENDPOINT</div>
 						<div className="mt-0.5 font-mono text-white/70 text-xs">
-							https://api.reloop.dev/v1/emails
+							https://api.reloop.sh/v1/emails
 						</div>
 					</div>
 					<button

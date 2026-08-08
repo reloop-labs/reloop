@@ -41,7 +41,7 @@ class EmailsController < ApplicationController
     
     begin
       response = reloop.mail.send(
-        from: 'onboarding@reloop.dev',
+        from: 'onboarding@reloop.sh',
         to: 'delivered@resend.dev',
         subject: 'Hello from Rails',
         html: '<p>Congrats on sending your first email via Reloop from Ruby on Rails!</p>'

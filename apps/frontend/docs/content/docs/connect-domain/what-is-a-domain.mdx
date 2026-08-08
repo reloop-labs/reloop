@@ -1,0 +1,54 @@
+---
+title: What is a domain?
+sidebarTitle: What is a domain?
+description: Plain-language explanation of domains, ownership, and how they relate to email with Reloop.
+---
+
+A **domain** is the human-readable name for your brand on the internet — for example `acme.com` or `shop.acme.com`.
+
+## Domain vs website vs email
+
+| Concept | Example | Meaning |
+| --- | --- | --- |
+| **Domain** | `acme.com` | The name you registered |
+| **Website** | `https://acme.com` | Pages hosted somewhere (Vercel, Netlify, WordPress, …) |
+| **Email address** | `hello@acme.com` | Mail identity that uses the domain after the `@` |
+
+Reloop is email infrastructure, not a website host. Your site can stay on Vercel, Netlify, WordPress, or anywhere else — Reloop only needs permission (via DNS) to **authenticate and deliver** mail for that domain.
+
+## Who “owns” a domain?
+
+Ownership is recorded at a **registrar** (GoDaddy, Namecheap, NameSilo, Cloudflare Registrar, Squarespace, etc.). You renew it yearly (or longer). Owning the domain means you can:
+
+- Change **nameservers** (who answers DNS questions)
+- Create **DNS records** (or point NS to another DNS host that does)
+- Prove control to services like Reloop
+
+## Root domain vs subdomain
+
+- **Root (apex):** `acme.com`
+- **Subdomain:** `mail.acme.com`, `news.acme.com`, `send.acme.com`
+
+You can connect the **root**, a **subdomain**, or **both** to Reloop.
+
+### Pros of a subdomain
+
+- Existing MX on the root stays untouched
+- Easier SPF story if the root already has a long SPF
+- Separate sending reputation from corporate mail
+- Clearer mental model: “product mail lives on `mail.`”
+
+From addresses look like `hello@mail.acme.com` unless you also configure other identities — plan branding accordingly.
+
+### Pros of the root domain
+
+- Addresses look like `hello@acme.com`
+- Fewer labels to manage
+- Fine when Reloop is the primary mail platform for that domain
+
+## What Reloop needs from you
+
+1. A domain (or subdomain) you control
+2. Ability to publish DNS records at the host that serves that domain’s nameservers
+3. Verification in the Reloop dashboard
+

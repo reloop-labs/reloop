@@ -35,20 +35,20 @@ SPF is a DNS TXT record that declares which mail servers are authorized to send 
 ### What an SPF record looks like
 
 ```
-v=spf1 include:_spf.reloop.dev ~all
+v=spf1 include:_spf.reloop.sh ~all
 ```
 
 Breaking this down:
 
 - `v=spf1` — declares this is an SPF record
-- `include:_spf.reloop.dev` — authorizes all IPs in Reloop's published SPF range
+- `include:_spf.reloop.sh` — authorizes all IPs in Reloop's published SPF range
 - `~all` — soft fail for everything else (use `-all` to hard fail once confident)
 
 ### How to add your SPF record
 
 1. Go to your DNS provider (Cloudflare, Route 53, Namecheap, etc.)
 2. Create a new **TXT record** on your root domain (`@` or `yourdomain.com`)
-3. Set the value to `v=spf1 include:_spf.reloop.dev ~all`
+3. Set the value to `v=spf1 include:_spf.reloop.sh ~all`
 4. TTL: 300 seconds (low during setup; increase to 3600+ after confirming it works)
 
 ### The most common SPF mistake
@@ -56,7 +56,7 @@ Breaking this down:
 **Never create two SPF records for the same domain.** DNS only permits one SPF TXT record per hostname. If you have multiple sending services (Reloop + G Suite, for example), combine them into a single record:
 
 ```
-v=spf1 include:_spf.reloop.dev include:_spf.google.com ~all
+v=spf1 include:_spf.reloop.sh include:_spf.google.com ~all
 ```
 
 ### Verifying your SPF record
@@ -84,8 +84,8 @@ Reloop uses selector-based DKIM. When you add a sending domain in the Reloop das
 You'll be given two CNAME records:
 
 ```
-reloop1._domainkey.yourdomain.com → reloop1._domainkey.reloop.dev
-reloop2._domainkey.yourdomain.com → reloop2._domainkey.reloop.dev
+reloop1._domainkey.yourdomain.com → reloop1._domainkey.reloop.sh
+reloop2._domainkey.yourdomain.com → reloop2._domainkey.reloop.sh
 ```
 
 Add both exactly as shown. The selector (`reloop1`, `reloop2`) is what the email header references so receivers know which DNS record to look up.
@@ -178,7 +178,7 @@ This graduated rollout is the industry standard. Rushing to `p=reject` on day on
 Run through this before going to production:
 
 - [ ] **Single SPF record** — `dig TXT yourdomain.com` returns exactly one SPF record
-- [ ] **SPF includes Reloop** — the record includes `include:_spf.reloop.dev`
+- [ ] **SPF includes Reloop** — the record includes `include:_spf.reloop.sh`
 - [ ] **Both DKIM CNAME records resolve** — test each selector with `dig TXT selector._domainkey.yourdomain.com`
 - [ ] **DMARC record at `_dmarc.yourdomain.com`** — starts with `p=none`
 - [ ] **Test email passes all three** — send to [mail-tester.com](https://mail-tester.com) and confirm SPF: pass, DKIM: pass, DMARC: pass

@@ -1,0 +1,5 @@
+{
+	"title": "Verification",
+	"icon": "check-circle",
+	"pages": ["index", "statuses", "how-verification-works", "propagation"]
+}

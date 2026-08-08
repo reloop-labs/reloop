@@ -24,7 +24,7 @@ export default function InboundWidget() {
 					name: (sender.split("@")[0] || "user").replace(".", " "),
 					email: sender,
 				},
-				to: "support@reloop.dev",
+				to: "support@reloop.sh",
 				subject: subject,
 				body: {
 					text: body,
@@ -36,7 +36,7 @@ export default function InboundWidget() {
 								filename: "screenshot.png",
 								contentType: "image/png",
 								sizeBytes: 104857,
-								url: "https://cdn.reloop.dev/attachments/scr_1.png",
+								url: "https://cdn.reloop.sh/attachments/scr_1.png",
 							},
 						]
 					: [],

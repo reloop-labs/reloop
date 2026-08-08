@@ -1,0 +1,53 @@
+---
+title: DNS propagation
+sidebarTitle: DNS propagation
+description: Why DNS changes take time, typical wait times, and how to check if Reloop records are visible publicly.
+---
+
+**Propagation** means “how long until DNS resolvers worldwide see your new records.” It is normal for Reloop verification to fail for a few minutes after you save.
+
+## Typical times
+
+| Provider class | Often visible within |
+| --- | --- |
+| Cloudflare, Vercel, many modern APIs | Seconds to a few minutes |
+| Traditional registrars | Minutes to a few hours |
+| Worst case (high TTL / stubborn caches) | Up to 48–72 hours |
+
+Lower TTLs help future changes propagate faster; the first publish still depends on old cache entries.
+
+## Check yourself
+
+Replace `acme.com` with your domain:
+
+```bash
+# SPF / apex TXT
+dig TXT acme.com +short
+
+# DKIM
+dig TXT reloop._domainkey.acme.com +short
+
+# DMARC
+dig TXT _dmarc.acme.com +short
+
+# Tracking
+dig CNAME link.acme.com +short
+
+# MX
+dig MX acme.com +short
+```
+
+If `dig` does not show the Reloop values yet, Reloop cannot verify either. Wait and retry.
+
+Online “DNS checker” sites that query multiple regions are also fine.
+
+## Tips
+
+- After Domain Connect approve, wait 1–2 minutes before the first Verify.
+- Do not delete and recreate records repeatedly — that resets TTL clocks.
+- Confirm you edited the live nameserver host ([wrong nameservers](/docs/connect-domain/troubleshoot/wrong-nameservers)).
+
+## Related
+
+- [How verification works](/docs/connect-domain/verification/how-verification-works)
+- [Domain not verifying](/docs/connect-domain/troubleshoot/not-verifying)

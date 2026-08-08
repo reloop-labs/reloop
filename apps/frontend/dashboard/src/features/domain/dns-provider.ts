@@ -1,8 +1,8 @@
 /** Public docs base for domain / DNS help. */
-export const DNS_DOCS_BASE = "https://reloop.sh/docs/guides";
+export const DNS_DOCS_BASE = "https://reloop.sh/docs/connect-domain/providers";
 
 /** Hub listing every provider-specific DNS guide. */
-export const DNS_SETUP_HUB_URL = `${DNS_DOCS_BASE}/dns-setup`;
+export const DNS_SETUP_HUB_URL = DNS_DOCS_BASE;
 
 /** Product overview for domains (not provider-specific). */
 export const DOMAIN_LEARN_DOCS_URL = "https://reloop.sh/docs/learn/domain";
@@ -17,7 +17,7 @@ export type InferredDnsProvider = {
 	 * Falls back to the DNS setup hub for unknown providers.
 	 */
 	docsUrl: string;
-	/** Guides slug without prefix, e.g. `dns-cloudflare`. */
+	/** Provider guide slug under /docs/connect-domain/providers, e.g. `cloudflare`. */
 	docsSlug: string | null;
 	/**
 	 * True when this DNS host has onboarded Reloop's Domain Connect
@@ -50,6 +50,8 @@ function provider(
 
 /**
  * Match nameservers to a known registrar / DNS host.
+ * Includes popular hosts Reloop documents plus Domain Connect providers
+ * (@see https://www.domainconnect.org/dns-providers/).
  * Used for auto-connect banners, provider chips, and docs deep-links.
  */
 export function inferDnsProvider(
@@ -64,7 +66,7 @@ export function inferDnsProvider(
 			label: "Cloudflare",
 			iconKey: "siCloudflare",
 			url: "https://dash.cloudflare.com",
-			docsSlug: "dns-cloudflare",
+			docsSlug: "cloudflare",
 			supportsAutoConnect: true,
 		});
 	}
@@ -73,7 +75,7 @@ export function inferDnsProvider(
 			label: "AWS Route 53",
 			iconKey: "siAmazonwebservices",
 			url: "https://console.aws.amazon.com/route53",
-			docsSlug: "dns-route53",
+			docsSlug: "route53",
 		});
 	}
 	if (normalized.some((server) => server.includes("vercel-dns.com"))) {
@@ -81,21 +83,21 @@ export function inferDnsProvider(
 			label: "Vercel",
 			iconKey: "siVercel",
 			url: "https://vercel.com/dashboard/domains",
-			docsSlug: "dns-vercel",
+			docsSlug: "vercel",
 			supportsAutoConnect: true,
 		});
 	}
-	// Domain Chief (Chief Tools)
+	// Domain Chief (Chief Tools) — Domain Connect
 	if (normalized.some((server) => server.includes("domainchief."))) {
 		return provider({
 			label: "Domain Chief",
 			iconKey: null,
 			url: "https://domain.chief.app",
-			docsSlug: null,
+			docsSlug: "domain-chief",
 			supportsAutoConnect: true,
 		});
 	}
-	// NameSilo (dnsowl) + NameSilo hosting (hostsilo)
+	// NameSilo (dnsowl) + NameSilo hosting (hostsilo) — Domain Connect
 	if (
 		normalized.some(
 			(server) =>
@@ -106,16 +108,8 @@ export function inferDnsProvider(
 			label: "NameSilo",
 			iconKey: null,
 			url: "https://www.namesilo.com/account_domain.php",
-			docsSlug: null,
+			docsSlug: "namesilo",
 			supportsAutoConnect: true,
-		});
-	}
-	if (normalized.some((server) => server.includes("digitalocean.com"))) {
-		return provider({
-			label: "DigitalOcean",
-			iconKey: "siDigitalocean",
-			url: "https://cloud.digitalocean.com/networking/domains",
-			docsSlug: null,
 		});
 	}
 	if (normalized.some((server) => server.includes("domaincontrol.com"))) {
@@ -123,7 +117,7 @@ export function inferDnsProvider(
 			label: "GoDaddy",
 			iconKey: "siGodaddy",
 			url: "https://dcc.godaddy.com/dns",
-			docsSlug: "dns-godaddy",
+			docsSlug: "godaddy",
 		});
 	}
 	if (normalized.some((server) => server.includes("registrar-servers.com"))) {
@@ -131,7 +125,7 @@ export function inferDnsProvider(
 			label: "Namecheap",
 			iconKey: "siNamecheap",
 			url: "https://ap.www.namecheap.com/domains/list",
-			docsSlug: "dns-namecheap",
+			docsSlug: "namecheap",
 		});
 	}
 	// Google Domains (legacy) / Squarespace-managed Google transfers often still use googledomains NS
@@ -143,60 +137,11 @@ export function inferDnsProvider(
 				server.includes("sqsp.net"),
 		)
 	) {
-		// Prefer Squarespace guide — Google Domains was migrated there
-		if (
-			normalized.some(
-				(server) =>
-					server.includes("squarespace.com") || server.includes("sqsp.net"),
-			)
-		) {
-			return provider({
-				label: "Squarespace",
-				iconKey: "siSquarespace",
-				url: "https://account.squarespace.com/domains",
-				docsSlug: "dns-squarespace",
-			});
-		}
 		return provider({
-			label: "Google Domains",
-			iconKey: "siGoogle",
-			url: "https://domains.google.com",
-			docsSlug: "dns-squarespace",
-		});
-	}
-	// Google Cloud DNS
-	if (normalized.some((server) => server.endsWith(".dns.goog"))) {
-		return provider({
-			label: "Google Cloud DNS",
-			iconKey: "siGooglecloud",
-			url: "https://console.cloud.google.com/net-services/dns",
-			docsSlug: null,
-		});
-	}
-	// Azure
-	if (
-		normalized.some(
-			(server) =>
-				server.includes("azure-dns.com") ||
-				server.includes("azure-dns.net") ||
-				server.includes("azure-dns.org") ||
-				server.includes("azure-dns.info"),
-		)
-	) {
-		return provider({
-			label: "Azure DNS",
-			iconKey: "siMicrosoftazure",
-			url: "https://portal.azure.com/#view/HubsExtension/BrowseResource/resourceType/Microsoft.Network%2FdnsZones",
-			docsSlug: null,
-		});
-	}
-	// Netlify
-	if (normalized.some((server) => server.includes("netlify.com"))) {
-		return provider({
-			label: "Netlify",
-			iconKey: "siNetlify",
-			url: "https://app.netlify.com/domains",
-			docsSlug: null,
+			label: "Squarespace",
+			iconKey: "siSquarespace",
+			url: "https://account.squarespace.com/domains",
+			docsSlug: "squarespace",
 		});
 	}
 	// Hetzner
@@ -210,29 +155,7 @@ export function inferDnsProvider(
 			label: "Hetzner",
 			iconKey: "siHetzner",
 			url: "https://dns.hetzner.com",
-			docsSlug: "dns-hetzner",
-		});
-	}
-	// OVH
-	if (
-		normalized.some(
-			(server) => server.includes("ovh.net") || server.includes("ovh.com"),
-		)
-	) {
-		return provider({
-			label: "OVH",
-			iconKey: "siOvh",
-			url: "https://www.ovh.com/manager",
-			docsSlug: null,
-		});
-	}
-	// Linode / Akamai
-	if (normalized.some((server) => server.includes("linode.com"))) {
-		return provider({
-			label: "Linode",
-			iconKey: "siLinode",
-			url: "https://cloud.linode.com/domains",
-			docsSlug: null,
+			docsSlug: "hetzner",
 		});
 	}
 	// Hostinger
@@ -246,25 +169,7 @@ export function inferDnsProvider(
 			label: "Hostinger",
 			iconKey: null,
 			url: "https://hpanel.hostinger.com/domains",
-			docsSlug: "dns-hostinger",
-		});
-	}
-	// Bluehost
-	if (normalized.some((server) => server.includes("bluehost.com"))) {
-		return provider({
-			label: "Bluehost",
-			iconKey: null,
-			url: "https://my.bluehost.com/cgi/dm",
-			docsSlug: null,
-		});
-	}
-	// Hover
-	if (normalized.some((server) => server.includes("hover.com"))) {
-		return provider({
-			label: "Hover",
-			iconKey: null,
-			url: "https://www.hover.com/control_panel",
-			docsSlug: null,
+			docsSlug: "hostinger",
 		});
 	}
 	// Gandi
@@ -273,16 +178,7 @@ export function inferDnsProvider(
 			label: "Gandi",
 			iconKey: null,
 			url: "https://admin.gandi.net/domain",
-			docsSlug: "dns-gandi",
-		});
-	}
-	// Name.com
-	if (normalized.some((server) => server.includes("name.com"))) {
-		return provider({
-			label: "Name.com",
-			iconKey: null,
-			url: "https://www.name.com/account/domain",
-			docsSlug: null,
+			docsSlug: "gandi",
 		});
 	}
 	// Porkbun
@@ -291,55 +187,10 @@ export function inferDnsProvider(
 			label: "Porkbun",
 			iconKey: null,
 			url: "https://porkbun.com/account/domains",
-			docsSlug: "dns-porkbun",
+			docsSlug: "porkbun",
 		});
 	}
-	// DynaDot
-	if (normalized.some((server) => server.includes("dynadot.com"))) {
-		return provider({
-			label: "Dynadot",
-			iconKey: null,
-			url: "https://www.dynadot.com/account/domain/name/server.html",
-			docsSlug: null,
-		});
-	}
-	// Vultr
-	if (normalized.some((server) => server.includes("vultr.com"))) {
-		return provider({
-			label: "Vultr",
-			iconKey: "siVultr",
-			url: "https://my.vultr.com/dns",
-			docsSlug: null,
-		});
-	}
-	// DNSimple
-	if (normalized.some((server) => server.includes("dnsimple.com"))) {
-		return provider({
-			label: "DNSimple",
-			iconKey: null,
-			url: "https://dnsimple.com/dashboard",
-			docsSlug: null,
-		});
-	}
-	// NS1 / IBM
-	if (normalized.some((server) => server.includes("nsone.net"))) {
-		return provider({
-			label: "NS1",
-			iconKey: null,
-			url: "https://my.nsone.net",
-			docsSlug: null,
-		});
-	}
-	// Dyn / Oracle
-	if (normalized.some((server) => server.includes("dynect.net"))) {
-		return provider({
-			label: "Dyn (Oracle)",
-			iconKey: "siOracle",
-			url: "https://portal.dynect.net",
-			docsSlug: null,
-		});
-	}
-	// Ionos (1&1)
+	// Ionos (1&1) — Domain Connect
 	if (
 		normalized.some(
 			(server) =>
@@ -353,50 +204,7 @@ export function inferDnsProvider(
 			label: "IONOS",
 			iconKey: null,
 			url: "https://my.ionos.com/domains",
-			docsSlug: "dns-ionos",
-		});
-	}
-	// Alibaba Cloud
-	if (
-		normalized.some(
-			(server) =>
-				server.includes("alidns.com") || server.includes("hichina.com"),
-		)
-	) {
-		return provider({
-			label: "Alibaba Cloud",
-			iconKey: "siAlibabacloud",
-			url: "https://dns.console.aliyun.com",
-			docsSlug: null,
-		});
-	}
-	// Tencent Cloud / DNSPod
-	if (
-		normalized.some(
-			(server) =>
-				server.includes("dnspod.net") || server.includes("tencentdns.com"),
-		)
-	) {
-		return provider({
-			label: "Tencent Cloud",
-			iconKey: "siTencentqq",
-			url: "https://console.dnspod.cn",
-			docsSlug: null,
-		});
-	}
-	// Huawei Cloud
-	if (
-		normalized.some(
-			(server) =>
-				server.includes("huaweicloud-dns.com") ||
-				server.includes("huaweicloud-dns.cn"),
-		)
-	) {
-		return provider({
-			label: "Huawei Cloud",
-			iconKey: "siHuawei",
-			url: "https://console.huaweicloud.com/dns",
-			docsSlug: null,
+			docsSlug: "ionos",
 		});
 	}
 	// Strato
@@ -410,61 +218,7 @@ export function inferDnsProvider(
 			label: "Strato",
 			iconKey: null,
 			url: "https://www.strato.de/apps/CustomerService",
-			docsSlug: "dns-strato",
-		});
-	}
-	// Fasthosts
-	if (normalized.some((server) => server.includes("fasthosts.co.uk"))) {
-		return provider({
-			label: "Fasthosts",
-			iconKey: null,
-			url: "https://www.fasthosts.co.uk/panel",
-			docsSlug: null,
-		});
-	}
-	// Wix
-	if (normalized.some((server) => server.includes("wixdns.net"))) {
-		return provider({
-			label: "Wix",
-			iconKey: "siWix",
-			url: "https://www.wix.com/my-account/domains",
-			docsSlug: null,
-		});
-	}
-	// Shopify
-	if (normalized.some((server) => server.includes("shopify.com"))) {
-		return provider({
-			label: "Shopify",
-			iconKey: "siShopify",
-			url: "https://admin.shopify.com/settings/domains",
-			docsSlug: null,
-		});
-	}
-	// Render
-	if (normalized.some((server) => server.includes("render.com"))) {
-		return provider({
-			label: "Render",
-			iconKey: "siRender",
-			url: "https://dashboard.render.com",
-			docsSlug: null,
-		});
-	}
-	// Railway
-	if (normalized.some((server) => server.includes("railway.app"))) {
-		return provider({
-			label: "Railway",
-			iconKey: "siRailway",
-			url: "https://railway.app/dashboard",
-			docsSlug: null,
-		});
-	}
-	// Fly.io
-	if (normalized.some((server) => server.includes("fly.io"))) {
-		return provider({
-			label: "Fly.io",
-			iconKey: null,
-			url: "https://fly.io/dashboard",
-			docsSlug: null,
+			docsSlug: "strato",
 		});
 	}
 	// DreamHost
@@ -478,7 +232,44 @@ export function inferDnsProvider(
 			label: "DreamHost",
 			iconKey: null,
 			url: "https://panel.dreamhost.com",
-			docsSlug: "dns-dreamhost",
+			docsSlug: "dreamhost",
+		});
+	}
+	// Glauca Digital / HexDNS — Domain Connect
+	if (
+		normalized.some(
+			(server) =>
+				server.includes("as207960.net") || server.includes("glauca.digital"),
+		)
+	) {
+		return provider({
+			label: "Glauca Digital",
+			iconKey: null,
+			url: "https://domains.glauca.digital",
+			docsSlug: "glauca-digital",
+		});
+	}
+	// WordPress.com — Domain Connect
+	if (
+		normalized.some(
+			(server) =>
+				server.includes("wordpress.com") || server.includes(".wp.com"),
+		)
+	) {
+		return provider({
+			label: "WordPress.com",
+			iconKey: "siWordpress",
+			url: "https://wordpress.com/domains/manage",
+			docsSlug: "wordpress-com",
+		});
+	}
+	// Plesk — Domain Connect (hosted panels often use custom NS)
+	if (normalized.some((server) => server.includes("plesk"))) {
+		return provider({
+			label: "Plesk",
+			iconKey: null,
+			url: null,
+			docsSlug: "plesk",
 		});
 	}
 

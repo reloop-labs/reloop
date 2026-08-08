@@ -4,30 +4,6 @@ sidebarTitle: Avoid MX Conflicts
 description: How to configure DNS records without conflicting with your existing MX records.
 ---
 
-When adding Reloop's DNS records to your domain, you may already have MX records for an existing email provider (e.g., Google Workspace, Microsoft 365). Here's how to avoid conflicts.
+This guide moved to **[MX conflicts](/docs/connect-domain/troubleshoot/mx-conflicts)** under Connect a domain.
 
-## Understanding MX Records
-
-MX (Mail Exchange) records determine where incoming emails are delivered. Reloop's sending capabilities use SPF, DKIM, and DMARC records — **not** MX records — so they won't conflict with your existing mail delivery.
-
-## When Conflicts Can Occur
-
-Conflicts only arise when you enable **receiving** on Reloop. In that case, Reloop needs to add its own MX records, which would replace your existing provider's MX records.
-
-## How to Avoid Conflicts
-
-<Steps>
-  <Step title="Use a subdomain for Reloop">
-    Instead of adding Reloop to your root domain (`example.com`), use a subdomain like `mail.example.com` or `notifications.example.com`. This keeps your existing MX records on the root domain intact.
-  </Step>
-  <Step title="Only enable sending (not receiving)">
-    If you only need to send emails through Reloop, you don't need MX records at all. SPF, DKIM, and DMARC records won't conflict with your existing setup.
-  </Step>
-  <Step title="Prioritize MX records correctly">
-    If you must use MX records on the same domain, ensure your primary email provider has a higher priority (lower number) than Reloop's MX records.
-  </Step>
-</Steps>
-
-<Tip>
-We strongly recommend using a subdomain for Reloop to keep your sending reputation separate from your primary domain.
-</Tip>
+Also see [Sending vs receiving](/docs/connect-domain/sending-vs-receiving) and [Root vs subdomain](/docs/connect-domain/what-is-a-domain).

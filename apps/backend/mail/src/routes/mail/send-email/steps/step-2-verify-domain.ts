@@ -10,7 +10,7 @@ export async function verifyDomainAuth_step2({
 	organizationId: string;
 	domainName: string;
 }) {
-	// Platform domain (e.g. reloop.dev) is owned by the system/platform org and
+	// Platform domain (e.g. reloop.sh) is owned by the system/platform org and
 	// sent via reloop-email + RELOOP_API_KEY. Customer orgs cannot register it
 	// (create-domain reserved). Normal ownership check is sufficient.
 	const domainRecord = await db

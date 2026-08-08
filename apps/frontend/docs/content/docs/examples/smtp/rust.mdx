@@ -29,16 +29,16 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let api_key = env::var("RELOOP_API_KEY")?;
 
     let email = Message::builder()
-        .from("onboarding@yourdomain.com".parse()?)
-        .to("recipient@example.com".parse()?)
+        .from("onboarding@reloop.sh".parse()?)
+        .to("delivered@resend.dev".parse()?)
         .subject("Hello from Lettre")
         .header(lettre::message::header::ContentType::TEXT_HTML)
         .body(String::from("<p>Congrats on sending your first email via Reloop SMTP using Lettre!</p>"))?;
 
     let creds = Credentials::new("reloop".to_string(), api_key);
 
-    let mailer = SmtpTransport::relay("smtp.reloop.sh")?
-        .port(465)
+    // Open a local connection on port 587
+    let mailer = SmtpTransport::starttls_relay("smtp.reloop.sh")?
         .credentials(creds)
         .build();
 

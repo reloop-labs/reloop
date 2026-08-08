@@ -5,6 +5,28 @@ import { AnimatePresence, motion } from "framer-motion";
 import React, { useState } from "react";
 import { cn } from "../../lib/cn";
 
+/** Small label + image, flush together (for Reloop/Cloudflare screenshot pairs). */
+export function DocImage({
+	label,
+	src,
+	alt,
+	className,
+}: {
+	label: string;
+	src: string;
+	alt?: string;
+	className?: string;
+}) {
+	return (
+		<figure className={cn("not-prose my-5", className)}>
+			<figcaption className="mb-1 text-[11px] font-medium leading-none text-text-sub-600 dark:text-white/50">
+				{label}
+			</figcaption>
+			<MDXImage src={src} alt={alt || label} className="my-0!" />
+		</figure>
+	);
+}
+
 export function MDXImage({ src, alt, className, ...props }: any) {
 	const [isOpen, setIsOpen] = useState(false);
 

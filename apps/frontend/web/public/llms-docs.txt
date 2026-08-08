@@ -221,4 +221,4 @@ Prefer these markdown guides for coding agents. They contain SDK samples for eve
 ## Optional
 
 - [Knowledge Base](https://reloop.sh/docs/knowledge-base): FAQs, troubleshooting guides, and how-to articles
-- [Dashboard](https://app.reloop.dev): Reloop Dashboard for managing your account
+- [Dashboard](https://app.reloop.sh): Reloop Dashboard for managing your account

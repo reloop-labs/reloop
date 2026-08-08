@@ -21,15 +21,15 @@ You do **not** need a verified customer domain for this path. For production Fro
 
 | Address | Behavior |
 |---------|----------|
-| `delivered@reloop.dev` | Simulates a successful delivery |
-| `bounced@reloop.dev` | Simulates a hard bounce |
-| `complained@reloop.dev` | Simulates a spam complaint |
+| `delivered@reloop.sh` | Simulates a successful delivery |
+| `bounced@reloop.sh` | Simulates a hard bounce |
+| `complained@reloop.sh` | Simulates a spam complaint |
 
 ## Development tips
 
 - Use the onboarding button or your own addresses for real inbox checks
 - Use the simulated addresses above for automated tests that should not hit real inboxes
-- Check the [Reloop dashboard](https://app.reloop.dev/emails) for send status
+- Check the [Reloop dashboard](https://app.reloop.sh/emails) for send status
 
 <Warning>
 Never use real customer email addresses for automated load or bounce testing. Prefer the simulated addresses above, or a dedicated inbox you control.
@@ -39,4 +39,4 @@ Never use real customer email addresses for automated load or bounce testing. Pr
 
 - [E2E Testing with Playwright](/docs/guides/e2e-testing-playwright)
 - [Account Quotas and Limits](/docs/guides/account-quotas-limits)
-- [reloop.dev Domain Error](/docs/guides/error-reloop-dev-domain)
+- [reloop.sh Domain Error](/docs/guides/error-reloop-dev-domain)

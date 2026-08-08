@@ -1,0 +1,5 @@
+{
+	"title": "After you connect",
+	"icon": "rocket",
+	"pages": ["index", "test-domain", "change-dns", "remove-domain"]
+}

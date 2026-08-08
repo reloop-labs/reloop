@@ -1,0 +1,28 @@
+{
+	"title": "Connect a domain",
+	"description": "Add any domain to Reloop, understand DNS, auto-populate or configure records manually, and fix common verification issues.",
+	"root": true,
+	"icon": "globe",
+	"pages": [
+		"index",
+		"---Foundations---",
+		"what-is-a-domain",
+		"what-is-dns",
+		"registrar-vs-dns-host",
+		"find-dns-provider",
+		"dns-records-explained",
+		"---Setup---",
+		"add-domain",
+		"auto-populate",
+		"manual-setup",
+		"sending-vs-receiving",
+		"---DNS guides---",
+		"providers",
+		"---Verification---",
+		"verification",
+		"---Troubleshoot---",
+		"troubleshoot",
+		"---After you connect---",
+		"after"
+	]
+}

@@ -1,0 +1,47 @@
+---
+title: Registrar vs DNS host
+sidebarTitle: Registrar vs DNS host
+description: Why buying a domain at one company and managing DNS at another is common — and where to add Reloop records.
+---
+
+Two different jobs are easy to confuse:
+
+| Role | What they do | Examples |
+| --- | --- | --- |
+| **Registrar** | Sells/renews the domain name; stores who owns it | Namecheap, GoDaddy, NameSilo, Cloudflare Registrar |
+| **DNS host** | Answers DNS queries for the domain (hosts the zone) | Cloudflare DNS, Route 53, Vercel DNS, the registrar’s own DNS |
+
+Reloop records must be added at the **DNS host** — the place your **nameservers** point to — not necessarily the place you paid for the domain.
+
+## Common setups
+
+### Same company for both
+
+You bought the domain at Namecheap and left default Namecheap nameservers (`registrar-servers.com`). Add Reloop records in Namecheap Advanced DNS.
+
+### Split (very common)
+
+You bought the domain at GoDaddy, but pointed nameservers to Cloudflare:
+
+```
+ada.ns.cloudflare.com
+bob.ns.cloudflare.com
+```
+
+Add Reloop records in **Cloudflare**, not GoDaddy’s DNS UI. Changes in GoDaddy’s zone editor will be ignored while NS point elsewhere.
+
+### Website host as DNS
+
+Domains on Vercel, Netlify, or Squarespace often use that product’s nameservers. Manage Reloop records in that product’s domain/DNS settings.
+
+## How to tell which you have
+
+1. In Reloop, open the domain — we show the detected provider when nameservers match a known host.
+2. Or look up nameservers — see [Find your DNS provider](/docs/connect-domain/find-dns-provider).
+3. Or check your registrar’s “Nameservers” page: if it lists Cloudflare/AWS/Vercel hosts, use that host’s panel.
+
+## Rule of thumb
+
+> Edit DNS where the **nameservers** live.
+
+If Auto-populate or verification fails after you “added records,” you almost always edited the wrong panel. See [Wrong nameservers](/docs/connect-domain/troubleshoot/wrong-nameservers).

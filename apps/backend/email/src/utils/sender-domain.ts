@@ -8,7 +8,7 @@ export function requireReloopSenderDomain(): string {
 	const domain = emailConfig.RELOOP_SENDER_DOMAIN.trim();
 	if (!domain) {
 		throw new Error(
-			"RELOOP_SENDER_DOMAIN is not configured. Set it in the email service environment (e.g. reloop.dev).",
+			"RELOOP_SENDER_DOMAIN is not configured. Set it in the email service environment (e.g. reloop.sh).",
 		);
 	}
 	return domain;

@@ -1,0 +1,61 @@
+---
+title: Manual DNS setup
+sidebarTitle: Manual DNS setup
+description: Use manual setup for any DNS host — including every provider where Reloop does not offer Auto populate.
+
+---
+
+
+## Prerequisites
+
+- Domain added in [Reloop](https://reloop.sh/dashboard/domain)
+- Access to the DNS panel for the **nameserver** host ([find your provider](/docs/connect-domain/find-dns-provider))
+
+## Steps
+
+<Steps>
+  <Step title="Open your domain in Reloop">
+    Go to [Domains](https://reloop.sh/dashboard/domain) → select the domain. Keep this tab open — you will copy each row.
+  </Step>
+  <Step title="Open your DNS provider">
+    Use **Open DNS settings** in Reloop if shown, or jump to the matching [provider guide](/docs/connect-domain/providers).
+  </Step>
+  <Step title="Add each record">
+    For every required row in Reloop:
+
+    1. Choose the same **type** (TXT, MX, CNAME)
+    2. Set **name/host** as shown (`@`, `reloop._domainkey`, `_dmarc`, `link`, …)
+    3. Paste **value** exactly
+    4. For MX, set **priority** (often `10`)
+    5. Save
+
+    Provider UIs differ:
+
+    - Some want blank host instead of `@`
+    - Some auto-append your domain — do not enter `reloop._domainkey.acme.com` if the UI already adds `acme.com`
+    - Cloudflare: keep records **DNS only** (grey cloud) unless you know you need a proxy (almost never for mail TXT/MX)
+  </Step>
+  <Step title="Merge SPF if needed">
+    If an SPF TXT already exists, merge `include:reloop.sh` into it. Do not create a second SPF. See [SPF conflicts](/docs/connect-domain/troubleshoot/spf-conflicts).
+  </Step>
+  <Step title="Verify in Reloop">
+    Return to Reloop → **Verify**. Allow time for [propagation](/docs/connect-domain/verification/propagation) if checks fail immediately.
+  </Step>
+</Steps>
+
+## Checklist before you verify
+
+- [ ] Edited the DNS host that matches your **NS** records (not only the registrar invoice)
+- [ ] DKIM TXT is complete (long `p=` value not cut off)
+- [ ] Only one SPF record on that host
+- [ ] MX only changed if you intend to ([sending vs receiving](/docs/connect-domain/sending-vs-receiving))
+- [ ] Tracking CNAME host is free or intentionally replaced
+
+## Provider-specific guides
+
+See the full list: [Provider guides](/docs/connect-domain/providers).
+
+## Related
+
+- [DNS records explained](/docs/connect-domain/dns-records-explained)
+- [Domain not verifying](/docs/connect-domain/troubleshoot/not-verifying)

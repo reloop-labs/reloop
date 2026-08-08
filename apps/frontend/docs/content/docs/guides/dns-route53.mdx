@@ -1,59 +1,9 @@
 ---
 title: "AWS Route 53 DNS Setup"
 sidebarTitle: "AWS Route 53"
-description: "How to add Reloop DNS records in AWS Route 53."
+description: "This guide moved to Connect a domain."
 ---
 
-Learn how to configure Reloop DNS records with AWS Route 53.
+This page moved to **[AWS Route 53 DNS setup](/docs/connect-domain/providers/route53)**.
 
-## Prerequisites
-
-- A [verified domain](https://app.reloop.dev/domains) in Reloop
-- Access to your AWS Route 53 DNS management panel
-
-## Adding DNS Records
-
-<Steps>
-  <Step title="Log in to AWS Route 53">
-    Go to your AWS Route 53 dashboard and navigate to the DNS management section for your domain.
-  </Step>
-  <Step title="Add the SPF record">
-    Add a TXT record with the following value:
-
-    ```
-    v=spf1 include:_spf.reloop.dev ~all
-    ```
-
-    If you already have an SPF record, merge the `include:_spf.reloop.dev` into your existing record.
-  </Step>
-  <Step title="Add the DKIM records">
-    Add the CNAME records provided in your [Reloop dashboard](https://app.reloop.dev/domains). These are unique to your domain.
-  </Step>
-  <Step title="Add the DMARC record (optional)">
-    If you don't already have a DMARC record, add:
-
-    ```
-    v=DMARC1; p=none;
-    ```
-  </Step>
-  <Step title="Verify in Reloop">
-    Return to the [Reloop dashboard](https://app.reloop.dev/domains) and click **Verify**. DNS propagation may take up to 72 hours, but typically completes within minutes.
-  </Step>
-</Steps>
-
-<Note>
-DNS changes can take up to 72 hours to propagate, though most providers update within a few minutes. If verification fails, wait and try again.
-</Note>
-
-## Troubleshooting
-
-- **Record not found**: Double-check that you've added the records to the correct domain/subdomain.
-- **Existing SPF record**: You must merge Reloop's SPF include into your existing SPF record rather than creating a duplicate.
-- **CNAME conflicts**: Some providers don't allow CNAME records on the root domain. Use a subdomain instead.
-
-## Learn More
-
-- [DNS Configuration (all providers)](/docs/guides/dns-setup)
-- [Domain Not Verifying](/docs/guides/domain-not-verifying)
-- [Avoid MX Conflicts](/docs/guides/avoid-mx-conflicts)
-- [Domains Guide](/docs/learn/domain)
+See also the [provider guides hub](/docs/connect-domain/providers) and [Connect a domain](/docs/connect-domain).

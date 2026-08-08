@@ -1,0 +1,49 @@
+---
+title: "Unknown or other DNS provider"
+sidebarTitle: "Other / unknown"
+description: "Verify your domain on any DNS host that Reloop does not list by name."
+---
+
+You can connect **any** domain. If Reloop shows **Auto populate** for your host, use that; otherwise use the same manual path below.
+
+## Add a domain in Reloop
+
+1. Log in to [Reloop](https://reloop.sh/dashboard/domain) and [add a domain](/docs/connect-domain/add-domain).
+2. Keep the DNS records table open for copy/paste.
+
+<Tip>
+Reloop works with the [root domain, a subdomain, or both](/docs/connect-domain/what-is-a-domain).
+</Tip>
+
+## Find the live DNS host
+
+```bash
+dig NS yourdomain.com +short
+```
+
+Or follow [Find your DNS provider](/docs/connect-domain/find-dns-provider). Edit DNS **only** where those nameservers point.
+
+## Add records
+
+For each Reloop row, create a matching Type / Name / Value (and MX Priority) in that provider’s zone editor.
+
+<Info>
+Omit your domain from the Name/Host field when the UI appends it automatically.
+</Info>
+
+<Warning>
+Merge `include:reloop.sh` into an existing SPF TXT — do not create two SPF records. See [SPF conflicts](/docs/connect-domain/troubleshoot/spf-conflicts).
+</Warning>
+
+## Receiving emails
+
+Enable receiving in Reloop only if you want MX for that hostname to point at Reloop (`inbound.reloop.sh`). That can replace another inbox on the same name — see [MX conflicts](/docs/connect-domain/troubleshoot/mx-conflicts).
+
+## Complete verification
+
+Return to Reloop → **Verify**. See [propagation](/docs/connect-domain/verification/propagation) if checks lag.
+
+## Troubleshooting
+
+- [Domain not verifying](/docs/connect-domain/troubleshoot/not-verifying)
+- [Wrong nameservers](/docs/connect-domain/troubleshoot/wrong-nameservers)

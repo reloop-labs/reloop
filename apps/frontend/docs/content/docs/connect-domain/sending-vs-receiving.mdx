@@ -1,0 +1,53 @@
+---
+title: Sending vs receiving
+sidebarTitle: Sending vs receiving
+description: Which Reloop DNS records matter for outbound mail only versus inbound mail to Reloop.
+---
+
+Reloop can **send** mail as your domain, **receive** mail into Reloop, or both. DNS requirements differ.
+
+## Sending (outbound)
+
+Goal: Gmail/Outlook/others accept mail from `you@yourdomain.com` as authenticated.
+
+Typically involves:
+
+- **SPF** — authorize Reloop (`include:reloop.sh`)
+- **DKIM** — sign messages (`reloop._domainkey`)
+- **DMARC** — policy for failures
+- **Tracking CNAME** — optional but used for click/open tracking (`link`)
+
+You can keep another provider as the inbox on the same domain **if** you do not point MX at Reloop for that hostname.
+
+## Receiving (inbound)
+
+Goal: Mail addressed to your domain is delivered into Reloop (Agent Inbox / inbound pipelines).
+
+Requires **MX** records pointing at Reloop’s inbound host, typically:
+
+```
+inbound.reloop.sh
+```
+
+(with the priority shown in the dashboard).
+
+<Warning>
+MX is winner-take-most for delivery. Pointing apex MX at Reloop **replaces** any existing inbox on that hostname. Use a [separate hostname](/docs/connect-domain/what-is-a-domain) if you need Reloop receiving alongside another inbox.
+</Warning>
+
+## Dashboard toggles
+
+On the domain configuration screen you may enable or disable sending/receiving features. When you change them, Reloop shows which DNS rows are required. Publish only what the dashboard marks as needed, then verify again.
+
+## Practical recipes
+
+| Goal | Approach |
+| --- | --- |
+| Transactional send only; keep existing inbox | Root or subdomain + SPF/DKIM/DMARC (+ tracking); **do not** move your current MX to Reloop |
+| Full Reloop inbox + send | Subdomain or dedicated domain; MX → `inbound.reloop.sh` |
+| Send from `news.acme.com`, inbox stays on `acme.com` | Add `news.acme.com` in Reloop; leave root MX alone |
+
+## Related
+
+- [DNS records explained](/docs/connect-domain/dns-records-explained)
+- [MX conflicts](/docs/connect-domain/troubleshoot/mx-conflicts)

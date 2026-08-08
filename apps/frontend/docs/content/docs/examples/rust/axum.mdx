@@ -43,7 +43,7 @@ async fn send_email() -> Result<Json<serde_json::Value>, (axum::http::StatusCode
     let client = ReloopClient::new(api_key, None);
 
     match client.mail().send(json!({
-        "from": "onboarding@reloop.dev",
+        "from": "onboarding@reloop.sh",
         "to": "delivered@resend.dev",
         "subject": "Hello from Axum",
         "html": "<p>Congrats on sending your first email via Reloop from Rust Axum!</p>",

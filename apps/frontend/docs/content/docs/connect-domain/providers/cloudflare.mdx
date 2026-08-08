@@ -1,0 +1,243 @@
+---
+title: "Cloudflare"
+sidebarTitle: "Cloudflare"
+description: "Verify your domain on Cloudflare with Reloop."
+---
+
+## Add domain to Reloop
+
+First, log in to [Reloop](https://reloop.sh/dashboard/domain) and [add a domain](/docs/connect-domain/add-domain).
+
+<DocImage
+	label="Reloop — Add domain"
+	src="/docs/images/docs/connect-domain/providers/cloudflare/add-domain.png"
+	alt="Add Domain dialog in Reloop"
+/>
+
+<Tip>
+It is [best practice to use a subdomain](/docs/connect-domain/what-is-a-domain) (for example `mail.example.com` or `team.example.com`) instead of the root domain (`example.com`). A subdomain keeps sending reputation separate and is especially important if you enable receiving with Reloop.
+</Tip>
+
+## Automatic setup (recommended)
+
+The fastest way to verify your domain on Cloudflare is **Auto populate** in Reloop. This uses [Domain Connect](https://www.domainconnect.org/) to configure your DNS records.
+
+1. Go to your [Domains](https://reloop.sh/dashboard/domain) page in Reloop and open the domain.
+2. (Optional) If you want to receive emails, turn **Receiving** on before Auto-populate so the inbound MX is included. [Learn more below](#receiving-emails).
+3. Click **Auto populate**.
+4. Authorize Reloop in Cloudflare and approve the records.
+5. Return to Reloop — records are written automatically.
+
+<Video src="/docs/images/docs/connect-domain/providers/cloudflare/auto-populate.mp4" autoPlay loop muted playsInline />
+
+That’s it. Your domain will usually verify within a few minutes.
+
+If Auto-populate fails, use **Manual setup** below. See also [Auto-populate DNS](/docs/connect-domain/auto-populate) and [Auto-populate failed](/docs/connect-domain/troubleshoot/auto-populate-failed).
+
+## Manual setup
+
+If you prefer to add DNS records manually, follow these steps. Always copy Type / Name / Value from your domain page in Reloop — examples below use placeholders.
+
+### Log in to Cloudflare
+
+Log in to your [Cloudflare account](https://dash.cloudflare.com) and open **DNS → Records** for the domain whose nameservers match `*.ns.cloudflare.com`.
+
+<DocImage
+	label="Cloudflare — DNS records"
+	src="/docs/images/docs/connect-domain/providers/cloudflare/cloudflare-dashboard.png"
+	alt="Cloudflare DNS records page"
+/>
+
+If Reloop or `dig NS yourdomain.com` shows a different host, stop and edit that host instead — see [Wrong nameservers](/docs/connect-domain/troubleshoot/wrong-nameservers).
+
+### Add MX SPF record
+
+Click **Add record** on Cloudflare:
+
+1. Set the Type to `MX`.
+2. Set the **Name** to the host Reloop shows (for a subdomain like `team.example.com`, Cloudflare often wants `team`).
+3. Copy the MX value from Reloop into the **Mail server** field (typically `reloop.sh`).
+4. Use `Auto` for **TTL**.
+5. Set **Priority** to the value Reloop shows (often `10`).
+6. Select **Save**.
+
+<DocImage
+	label="Reloop — Sending MX"
+	src="/docs/images/docs/connect-domain/providers/cloudflare/spf-mx-reloop.png"
+	alt="Reloop sending MX (SPF) record"
+/>
+
+<DocImage
+	label="Cloudflare — Sending MX"
+	src="/docs/images/docs/connect-domain/providers/cloudflare/spf-mx-cloudflare.png"
+	alt="Add sending MX record in Cloudflare"
+/>
+
+Below is a mapping of the record fields from Reloop to Cloudflare:
+
+| Cloudflare | Reloop | Example value |
+| --- | --- | --- |
+| Type | Type | `MX` |
+| Name | Name | `team` (or `@` for the root) |
+| Mail server | Value | `reloop.sh` |
+| Priority | Priority | `10` |
+| TTL | TTL | `Auto` |
+
+<Info>
+Omit your domain from the Name field when Cloudflare appends it. Paste `team`, not `team.example.com`.
+</Info>
+
+<Info>
+Do not reuse the same priority for conflicting MX records you must keep. If Priority `10` is already in use on that host, follow Reloop’s UI or use a [separate subdomain](/docs/connect-domain/what-is-a-domain).
+</Info>
+
+### Add TXT SPF record
+
+Click **Add record** on Cloudflare:
+
+1. Set the Type to `TXT`.
+2. Set the **Name** to the host Reloop shows (same host as the sending MX, e.g. `team` or `@`).
+3. Copy the TXT value from Reloop into **Content** (typically `v=spf1 include:reloop.sh -all`).
+4. Use `Auto` for **TTL**.
+5. Select **Save**.
+
+<DocImage
+	label="Reloop — SPF TXT"
+	src="/docs/images/docs/connect-domain/providers/cloudflare/txt-spf-reloop.png"
+	alt="Reloop SPF TXT record"
+/>
+
+<DocImage
+	label="Cloudflare — SPF TXT"
+	src="/docs/images/docs/connect-domain/providers/cloudflare/txt-spf-cloudflare.png"
+	alt="Add SPF TXT record in Cloudflare"
+/>
+
+| Cloudflare | Reloop | Example value |
+| --- | --- | --- |
+| Type | Type | `TXT` |
+| Name | Name | `team` (or `@` for the root) |
+| Content | Value | `v=spf1 include:reloop.sh -all` |
+| TTL | TTL | `Auto` |
+
+<Info>
+Omit your domain from the Name field when Cloudflare appends it. Paste `team`, not `team.example.com`.
+</Info>
+
+<Warning>
+Never create a second SPF TXT on the same host. If SPF already exists, merge `include:reloop.sh` into that record. See [SPF conflicts](/docs/connect-domain/troubleshoot/spf-conflicts).
+</Warning>
+
+### Add TXT DKIM record
+
+Click **Add record** on Cloudflare:
+
+1. Set the Type to `TXT`.
+2. Set the **Name** from Reloop (selector is usually `reloop._domainkey`). For a subdomain zone at the apex, Cloudflare often needs `reloop._domainkey.team`.
+3. Copy the full TXT value from Reloop into **Content** (`v=DKIM1; k=rsa; p=…`).
+4. Use `Auto` for **TTL**.
+5. Select **Save**.
+
+<DocImage
+	label="Reloop — DKIM TXT"
+	src="/docs/images/docs/connect-domain/providers/cloudflare/txt-dkim-reloop.png"
+	alt="Reloop DKIM TXT record"
+/>
+
+<DocImage
+	label="Cloudflare — DKIM TXT"
+	src="/docs/images/docs/connect-domain/providers/cloudflare/txt-dkim-cloudflare.png"
+	alt="Add DKIM TXT record in Cloudflare"
+/>
+
+| Cloudflare | Reloop | Example value |
+| --- | --- | --- |
+| Type | Type | `TXT` |
+| Name | Name | `reloop._domainkey` (or `reloop._domainkey.team` under the apex zone) |
+| Content | Value | `v=DKIM1; k=rsa; p=…` (unique per domain) |
+| TTL | TTL | `Auto` |
+
+<Info>
+Omit your domain from the Name field when Cloudflare appends it. Paste `reloop._domainkey` or `reloop._domainkey.team`, not the full FQDN ending in `.example.com`.
+</Info>
+
+### Receiving emails
+
+If you want Reloop to **receive** mail on this hostname, turn **Receiving** on in the domain settings in Reloop, then click **Add record** on Cloudflare:
+
+1. Set the Type to `MX`.
+2. Set the **Name** to the host Reloop shows (e.g. `team` or `@`).
+3. Copy the MX value from Reloop into **Mail server** (typically `inbound.reloop.sh`).
+4. Use `Auto` for **TTL**.
+5. Set **Priority** as shown in Reloop (often `10`).
+6. Select **Save**.
+
+<DocImage
+	label="Reloop — Receiving MX"
+	src="/docs/images/docs/connect-domain/providers/cloudflare/mx-receive-reloop.png"
+	alt="Reloop receiving MX record"
+/>
+
+<DocImage
+	label="Cloudflare — Receiving MX"
+	src="/docs/images/docs/connect-domain/providers/cloudflare/mx-receive-cloudflare.png"
+	alt="Add receiving MX record in Cloudflare"
+/>
+
+| Cloudflare | Reloop | Example value |
+| --- | --- | --- |
+| Type | Type | `MX` |
+| Name | Name | `team` (or `@` for the root) |
+| Mail server | Value | `inbound.reloop.sh` |
+| Priority | Priority | `10` |
+| TTL | TTL | `Auto` |
+
+<Warning>
+When Reloop’s inbound MX is active on a hostname, Reloop receives mail for that hostname according to MX priority. That can conflict with another inbox already using MX on the same name — prefer a [subdomain](/docs/connect-domain/what-is-a-domain). See [MX conflicts](/docs/connect-domain/troubleshoot/mx-conflicts) and [Sending vs receiving](/docs/connect-domain/sending-vs-receiving).
+</Warning>
+
+### Complete verification
+
+Return to [Domains](https://reloop.sh/dashboard/domain) in Reloop, open the domain, and click **Verify & finish**. It may take a few minutes (rarely up to 48–72 hours) — see [propagation](/docs/connect-domain/verification/propagation).
+
+<DocImage
+	label="Reloop — Verify & finish"
+	src="/docs/images/docs/connect-domain/providers/cloudflare/verify-and-finish.png"
+	alt="Verify and finish domain setup in Reloop"
+/>
+
+When verification succeeds, Reloop shows **You're all set!** — Domain added → Verified → Ready to send. Your domain is verified and you are good to go.
+
+<DocImage
+	label="Reloop — You're all set"
+	src="/docs/images/docs/connect-domain/providers/cloudflare/verified-domain.png"
+	alt="Verified domain ready to send in Reloop"
+/>
+
+## Cloudflare-specific notes
+
+- Keep Reloop mail/auth records on **DNS only** (grey cloud). Orange-cloud proxy often breaks verification.
+- Optional **DMARC** and **tracking** (`link` CNAME) rows also appear in Reloop when enabled — add them the same way from the dashboard values.
+
+## Troubleshooting
+
+If your domain is not successfully verified, try these common fixes.
+
+<AccordionGroup>
+  <Accordion title="Cloudflare proxy / grey cloud">
+    Confirm Reloop records use **DNS only** (grey cloud), not Proxied (orange cloud).
+  </Accordion>
+  <Accordion title="Verification failed after I added records">
+    Re-open the Reloop domain page and compare every Type / Name / Value to Cloudflare. Fix typos, truncated DKIM keys, and duplicate SPF records. Then click **Verify** again.
+  </Accordion>
+  <Accordion title="It has been hours and status is still pending">
+    Follow [Domain not verifying](/docs/connect-domain/troubleshoot/not-verifying) and [DNS propagation](/docs/connect-domain/verification/propagation).
+  </Accordion>
+</AccordionGroup>
+
+## Related
+
+- [DNS records explained](/docs/connect-domain/dns-records-explained)
+- [Manual DNS setup](/docs/connect-domain/manual-setup)
+- [Auto-populate DNS](/docs/connect-domain/auto-populate)
+- [All provider guides](/docs/connect-domain/providers)

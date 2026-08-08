@@ -1,0 +1,80 @@
+---
+title: Find your DNS provider
+sidebarTitle: Find your DNS provider
+description: How to discover which company manages DNS for your domain — in Reloop, at your registrar, or with a quick lookup.
+---
+
+You need to know **who hosts your nameservers** before you can publish Reloop records (or before Auto-populate can work).
+
+## Method 1 — Reloop dashboard (easiest)
+
+1. Add the domain at [Domains](https://reloop.sh/dashboard/domain) if you have not already.
+2. Open the domain detail page.
+3. Reloop reads public nameservers and shows a **Provider** chip when it recognizes the host (Cloudflare, GoDaddy, Vercel, Namecheap, …).
+
+If Reloop shows a provider:
+
+- **Auto populate** on the domain page → use [Auto-populate](/docs/connect-domain/auto-populate)
+- **Otherwise** → open that host’s guide under [Provider guides](/docs/connect-domain/providers) and add records manually
+
+If Reloop cannot detect a provider, use Method 2 or 3.
+
+## Method 2 — Registrar control panel
+
+1. Log in where you **bought / renew** the domain.
+2. Open the domain → **Nameservers** / **DNS** / **Manage DNS**.
+3. Note the nameserver hostnames, for example:
+
+| Nameserver contains | Likely DNS host |
+| --- | --- |
+| `cloudflare.com` | Cloudflare |
+| `vercel-dns.com` | Vercel |
+| `domaincontrol.com` | GoDaddy |
+| `registrar-servers.com` | Namecheap |
+| `awsdns-` | AWS Route 53 |
+| `domainchief.` | Domain Chief |
+| `dnsowl.com` / `hostsilo.com` | NameSilo |
+| `ui-dns.` | IONOS |
+| `squarespace.com` / `googledomains.com` | Squarespace |
+| `hetzner.com` / `hetzner.de` | Hetzner |
+| `hostinger.` / `dns-parking.com` | Hostinger |
+| `gandi.net` | Gandi |
+| `porkbun.com` | Porkbun |
+| `strato.de` / `strato-hosting.eu` | Strato |
+| `dreamhost.com` / `dreamhosters.com` | DreamHost |
+| `as207960.net` / `glauca.digital` | Glauca Digital |
+| `wordpress.com` / `wp.com` | WordPress.com |
+| `plesk` | Plesk (or your host’s Plesk panel) |
+
+Then open the matching [provider guide](/docs/connect-domain/providers).
+
+## Method 3 — Public lookup
+
+### In the browser
+
+Use any “DNS lookup” / “whois” tool and query **NS** records for your domain (e.g. `acme.com`).
+
+### On your computer
+
+```bash
+dig NS acme.com +short
+# or
+nslookup -type=NS acme.com
+```
+
+Example output:
+
+```
+ada.ns.cloudflare.com.
+bob.ns.cloudflare.com.
+```
+
+→ DNS is on **Cloudflare**.
+
+## Bought at A, DNS at B
+
+If the registrar is GoDaddy but NS are Cloudflare, **ignore GoDaddy’s DNS record editor** for Reloop. Edit Cloudflare. Full explanation: [Registrar vs DNS host](/docs/connect-domain/registrar-vs-dns-host).
+
+## Still stuck?
+
+Use the [Unknown provider](/docs/connect-domain/providers/unknown-provider) guide: open whatever panel controls the NS hosts you found, and paste the records from Reloop.

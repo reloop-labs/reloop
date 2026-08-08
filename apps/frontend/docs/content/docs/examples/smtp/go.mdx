@@ -23,23 +23,21 @@ import (
 
 func main() {
 	apiKey := os.Getenv("RELOOP_API_KEY")
-
-	host := "smtp.reloop.sh"
-	port := "465"
-	from := "onboarding@yourdomain.com"
-	to := []string{"recipient@example.com"}
-
-	msg := []byte("To: recipient@example.com\r\n" +
-		"From: " + from + "\r\n" +
+	
+	// SMTP server configuration
+	smtpHost := "smtp.reloop.sh"
+	smtpPort := "587"
+	
+	auth := smtp.PlainAuth("", apiKey, apiKey, smtpHost)
+	
+	to := []string{"delivered@resend.dev"}
+	msg := []byte("To: delivered@resend.dev\r\n" +
 		"Subject: Hello from Go net/smtp\r\n" +
 		"Content-Type: text/html; charset=UTF-8\r\n" +
 		"\r\n" +
 		"<p>Congrats on sending your first email via Reloop SMTP using net/smtp!</p>\r\n")
-
-	auth := smtp.PlainAuth("", "reloop", apiKey, host)
-	tlsConfig := &tls.Config{ServerName: host}
-
-	conn, err := tls.Dial("tcp", host+":"+port, tlsConfig)
+		
+	err := smtp.SendMail(smtpHost+":"+smtpPort, auth, "onboarding@reloop.sh", to, msg)
 	if err != nil {
 		fmt.Println("Error connecting:", err)
 		return

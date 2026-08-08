@@ -40,7 +40,7 @@ def send_email_view(request):
     if request.method == 'POST':
         try:
             result = reloop.mail.send({
-                "from": "onboarding@reloop.dev",
+                "from": "onboarding@reloop.sh",
                 "to": "delivered@resend.dev",
                 "subject": "Hello from Django",
                 "html": "<p>Congrats on sending your first email via Reloop from Django!</p>",

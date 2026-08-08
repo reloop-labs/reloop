@@ -1,0 +1,36 @@
+---
+title: DKIM and DMARC typos
+sidebarTitle: DKIM / DMARC typos
+description: Fix truncated DKIM keys, wrong hosts, and DMARC paste mistakes that block Reloop verification.
+---
+
+## DKIM checklist
+
+| Check | Details |
+| --- | --- |
+| Host | Usually `reloop._domainkey` — not `reloop._domainkey.yourdomain.com` if the UI adds the domain |
+| Type | TXT |
+| Value | Starts with `v=DKIM1; k=rsa; p=` and a long base64 key |
+| Length | If the panel truncates, use “split TXT” / multi-string support or a provider that accepts long TXT |
+
+### Verify
+
+```bash
+dig TXT reloop._domainkey.yourdomain.com +short
+```
+
+The `p=` material should match Reloop’s dashboard (ignoring quotes/spaces some dig output adds).
+
+## DMARC checklist
+
+| Check | Details |
+| --- | --- |
+| Host | `_dmarc` |
+| Type | TXT |
+| Value | Starts with `v=DMARC1;` |
+
+Reloop may suggest `p=reject`. If you already run a careful DMARC program with Google/Microsoft, do not blindly overwrite without reviewing `rua` / policy impact.
+
+## Quotes and spaces
+
+Some UIs wrap TXT values in quotes automatically. Prefer pasting the raw value Reloop shows. Avoid inserting line breaks in the middle of the DKIM key unless the provider’s docs say to split properly.

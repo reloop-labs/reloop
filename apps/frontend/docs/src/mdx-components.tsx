@@ -1,9 +1,11 @@
 import { DocsHome } from "@reloop/fe-docs/components/docs/docs-home";
 import { APIPage } from "@reloop/fe-docs/components/mdx/APIPage";
 import { CardGroup } from "@reloop/fe-docs/components/mdx/CardGroup";
-import { MDXImage, MDXVideo } from "@reloop/fe-docs/components/mdx/ImageZoom";
-import { HelpFooterLinks } from "@reloop/fe-docs/components/mdx/HelpFooterLinks";
-import { RelatedTopic, RelatedTopics } from "@reloop/fe-docs/components/mdx/RelatedTopics";
+import {
+	DocImage,
+	MDXImage,
+	MDXVideo,
+} from "@reloop/fe-docs/components/mdx/ImageZoom";
 import {
 	Accordion,
 	AccordionGroup,
@@ -89,6 +91,7 @@ export function getMDXComponents(
 			</h3>
 		),
 		img: MDXImage,
+		DocImage,
 		Video: MDXVideo,
 		...restComponents,
 		Card: ({ icon, href, children, ...props }: any) => {

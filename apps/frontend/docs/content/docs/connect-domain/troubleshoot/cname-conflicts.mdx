@@ -1,0 +1,28 @@
+---
+title: CNAME conflicts
+sidebarTitle: CNAME conflicts
+description: Fix CNAME issues with Reloop tracking hosts, Cloudflare proxy, and apex restrictions.
+---
+
+## Common cases
+
+### Cloudflare orange cloud
+
+Mail and auth records should usually be **DNS only** (grey cloud). Proxying MX/TXT/CNAME for mail often breaks verification or delivery. Set Reloop-related records to DNS only.
+
+### Apex CNAME
+
+Some providers forbid CNAME on `@`. Reloop’s tracking record uses a **subdomain** (`link`), which is allowed almost everywhere. If your provider rejects a CNAME, confirm you did not place it on `@` by mistake.
+
+### Existing record on the same host
+
+If `link.yourdomain.com` already has an A/AAAA/CNAME for another product, Reloop’s tracking CNAME cannot coexist on that exact name. Either:
+
+- Change Reloop’s tracking subdomain in domain settings (if available), or
+- Repoint `link` to Reloop and move the old service elsewhere
+
+See [Tracking CNAME](/docs/connect-domain/troubleshoot/tracking-cname).
+
+### CNAME + other types on same name
+
+DNS forbids mixing CNAME with other record types on the same owner name. Remove conflicting A/TXT on `link` before adding the Reloop CNAME.

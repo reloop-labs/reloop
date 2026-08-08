@@ -326,7 +326,7 @@ function mockTemplateHtml(prompt: string) {
       <h1 style="color:#09090b;font-size:24px;font-weight:700;margin:0 0 16px;line-height:1.25;">You're all set</h1>
       <p style="color:#52525b;font-size:15px;line-height:1.6;margin:0 0 16px;">Hi {{first_name}} — here's a starter template for <strong>${safe}</strong>.</p>
       <p style="color:#52525b;font-size:15px;line-height:1.6;margin:0 0 28px;">Connect a model (OpenRouter, Ollama/Gemma, Gemini, or OpenAI) for full AI generation. This is a local fallback so the editor never shows raw prompts.</p>
-      <a href="https://reloop.dev" style="display:inline-block;background-color:#18181b;color:#ffffff;text-decoration:none;font-weight:600;font-size:14px;padding:12px 24px;border-radius:8px;">Get Started Now &rarr;</a>
+      <a href="https://reloop.sh" style="display:inline-block;background-color:#18181b;color:#ffffff;text-decoration:none;font-weight:600;font-size:14px;padding:12px 24px;border-radius:8px;">Get Started Now &rarr;</a>
     </td>
   </tr>
 </table>`;
@@ -393,8 +393,8 @@ export async function createAIStream({
 			if (openaiApiKey) {
 				const visionModel =
 					!isGemmaModel(resolvedModel) &&
-					!isGeminiModel(resolvedModel) &&
-					!isOpenRouterModel(resolvedModel)
+						!isGeminiModel(resolvedModel) &&
+						!isOpenRouterModel(resolvedModel)
 						? resolvedModel
 						: process.env.OPENAI_VISION_MODEL || "gpt-4o-mini";
 				const openaiProvider = apiKey

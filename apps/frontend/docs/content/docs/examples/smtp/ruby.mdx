@@ -17,9 +17,9 @@ require 'openssl'
 
 api_key = ENV['RELOOP_API_KEY']
 
-message = <<~MESSAGE_END
-From: onboarding@yourdomain.com
-To: recipient@example.com
+message = <<MESSAGE_END
+From: onboarding@reloop.sh
+To: delivered@resend.dev
 MIME-Version: 1.0
 Content-type: text/html
 Subject: Hello from Ruby net/smtp
@@ -28,10 +28,8 @@ Subject: Hello from Ruby net/smtp
 MESSAGE_END
 
 begin
-  smtp = Net::SMTP.new('smtp.reloop.sh', 465)
-  smtp.enable_tls(OpenSSL::SSL::SSLContext.new)
-  smtp.start('smtp.reloop.sh', 'reloop', api_key, :plain) do |s|
-    s.send_message message, 'onboarding@yourdomain.com', 'recipient@example.com'
+  Net::SMTP.start('smtp.reloop.sh', 587, 'localhost', api_key, api_key, :plain) do |smtp|
+    smtp.send_message message, 'onboarding@reloop.sh', 'delivered@resend.dev'
   end
   puts "Email sent successfully!"
 rescue => e

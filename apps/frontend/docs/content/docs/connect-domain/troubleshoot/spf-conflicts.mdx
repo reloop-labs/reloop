@@ -1,0 +1,39 @@
+---
+title: SPF conflicts
+sidebarTitle: SPF conflicts
+description: How to merge Reloop into an existing SPF record and avoid multiple SPF TXT records.
+---
+
+## Rule
+
+A hostname should have **one** SPF policy — one TXT that starts with `v=spf1`. Multiple SPF TXT records cause unpredictable failures.
+
+## Reloop’s include
+
+```
+include:reloop.sh
+```
+
+Example merged record (illustrative):
+
+```
+v=spf1 include:_spf.google.com include:reloop.sh -all
+```
+
+Keep your existing includes; add Reloop’s; keep a single ending mechanism (`-all` or `~all` as you prefer — Reloop’s generated record uses `-all` when it creates a fresh SPF).
+
+## What not to do
+
+- Do not add a second TXT `v=spf1 include:reloop.sh -all` beside Google’s SPF
+- Do not put SPF inside a DMARC or DKIM record
+- Do not use outdated includes like `_spf.reloop.sh` unless your dashboard explicitly shows them — hosted Reloop uses `include:reloop.sh`
+
+## After merging
+
+Save DNS → wait briefly → Verify in Reloop. Check:
+
+```bash
+dig TXT yourdomain.com +short
+```
+
+You should see one SPF string containing `include:reloop.sh`.

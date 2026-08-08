@@ -36,7 +36,7 @@ You can use tools like [ngrok](https://ngrok.com) or [VS Code Port Forwarding](h
 
 ### 2. Add a webhook in Reloop.
 
-Go to the [Webhooks page](https://app.reloop.dev/webhooks) in your dashboard.
+Go to the [Webhooks page](https://app.reloop.sh/webhooks) in your dashboard.
 1. Add your publicly accessible HTTPS URL.
 2. Select all events you want to observe.
 
@@ -51,8 +51,8 @@ When you send an email or trigger an event, Reloop will send a payload like this
   "created_at": "2026-07-22T23:41:12.126Z",
   "data": {
     "email_id": "em_123456789",
-    "from": "Acme <onboarding@reloop.dev>",
-    "to": ["bounced@reloop.dev"],
+    "from": "Acme <onboarding@reloop.sh>",
+    "to": ["bounced@reloop.sh"],
     "subject": "Sending this example",
     "status": "bounced",
     "error": {
@@ -85,7 +85,7 @@ export default (req, res) => {
 
 ### 5. Register your production webhook endpoint
 
-Update your webhook URL in the [Reloop Dashboard](https://app.reloop.dev/webhooks) with your production URL.
+Update your webhook URL in the [Reloop Dashboard](https://app.reloop.sh/webhooks) with your production URL.
 
 ## FAQ
 
@@ -116,7 +116,7 @@ Update your webhook URL in the [Reloop Dashboard](https://app.reloop.dev/webhook
   </Accordion>
 
   <Accordion title="Can I retry webhook events manually?">
-    Yes, you can manually replay any failed or successful webhook event from the [Reloop Dashboard](https://app.reloop.dev/webhooks).
+    Yes, you can manually replay any failed or successful webhook event from the [Reloop Dashboard](https://app.reloop.sh/webhooks).
   </Accordion>
 </AccordionGroup>
 

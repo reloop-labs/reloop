@@ -42,7 +42,7 @@ const presets: Record<
   "product": {
     "name": "Reloop Pro",
     "tagline": "Email infrastructure without lock-in.",
-    "url": "https://reloop.dev"
+    "url": "https://reloop.sh"
   }
 }`,
 	},

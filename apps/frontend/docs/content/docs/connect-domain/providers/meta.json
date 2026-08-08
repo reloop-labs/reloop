@@ -1,0 +1,26 @@
+{
+	"title": "DNS guides",
+	"icon": "server",
+	"pages": [
+		"index",
+		"cloudflare",
+		"domain-chief",
+		"dreamhost",
+		"gandi",
+		"glauca-digital",
+		"godaddy",
+		"hetzner",
+		"hostinger",
+		"ionos",
+		"namecheap",
+		"namesilo",
+		"plesk",
+		"porkbun",
+		"route53",
+		"squarespace",
+		"strato",
+		"vercel",
+		"wordpress-com",
+		"unknown-provider"
+	]
+}

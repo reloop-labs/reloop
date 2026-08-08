@@ -1,0 +1,114 @@
+---
+title: "GoDaddy"
+sidebarTitle: "GoDaddy"
+description: "Verify your domain on GoDaddy with Reloop."
+---
+
+Add Reloop’s DNS records in GoDaddy using the values from your domain page in Reloop.
+
+## Add a domain in Reloop
+
+1. Log in to [Reloop](https://reloop.sh/dashboard/domain) and [add a domain](/docs/connect-domain/add-domain).
+2. Keep that tab open — every host and value you paste must match Reloop exactly (especially the DKIM key).
+
+<Tip>
+Reloop works with the [root domain, a subdomain, or both](/docs/connect-domain/what-is-a-domain) — for example `example.com`, `mail.example.com`, or `updates.example.com`.
+</Tip>
+
+## Manual setup
+
+### Log in to GoDaddy
+
+Open [GoDaddy](https://dcc.godaddy.com/dns) and go to DNS for the domain whose **nameservers** match `domaincontrol.com`.
+
+GoDaddy Domain Control Center → DNS.
+
+If Reloop or `dig NS yourdomain.com` shows a different host, stop and edit that host instead — see [Wrong nameservers](/docs/connect-domain/troubleshoot/wrong-nameservers).
+
+### Field mapping
+
+| Reloop | GoDaddy field | Example |
+| --- | --- | --- |
+| Type | Type | `TXT` / `MX` / `CNAME` |
+| Name / Host | Name | `@`, `reloop._domainkey`, `_dmarc`, `link`, … |
+| Value / Content | Value | Exact value from Reloop |
+| TTL | TTL | `Auto` or provider default |
+| Priority (MX only) | Priority | As shown in Reloop (often `10`) |
+
+<Info>
+Omit your domain from the Name/Host field when the provider appends it automatically. Paste `reloop._domainkey` or `link`, not `reloop._domainkey.example.com`.
+</Info>
+
+### Add the records from Reloop
+
+For **each required row** on the Reloop domain page:
+
+<Steps>
+  <Step title="Choose the type">
+    Match Reloop’s type: `TXT`, `MX`, or `CNAME`.
+  </Step>
+  <Step title="Set the name / host">
+    Copy the host from Reloop (`@`, `reloop._domainkey`, `_dmarc`, `link`, …).
+  </Step>
+  <Step title="Paste the value">
+    Copy the value exactly. For MX, also set **Priority** as shown (often `10`). If priority `10` is already used by another MX you must keep, use the next free value only when Reloop’s UI allows it — otherwise use a [subdomain](/docs/connect-domain/what-is-a-domain).
+  </Step>
+  <Step title="Save">
+    Save the record, then continue with the next Reloop row.
+  </Step>
+</Steps>
+
+Typical Reloop rows (always confirm in the dashboard):
+
+| Purpose | Type | Host (typical) | Value (typical) |
+| --- | --- | --- | --- |
+| SPF | TXT | `@` | `v=spf1 include:reloop.sh -all` (or merge into existing SPF) |
+| DKIM | TXT | `reloop._domainkey` | `v=DKIM1; k=rsa; p=…` (unique per domain) |
+| DMARC | TXT | `_dmarc` | `v=DMARC1; p=reject;` (or your existing policy) |
+| Tracking | CNAME | `link` | `link.reloop.sh` |
+| Receiving MX | MX | `@` or subdomain host | `inbound.reloop.sh` (when receiving is enabled) |
+
+<Warning>
+Never create a second SPF TXT on the same host. Merge `include:reloop.sh` into the existing SPF. See [SPF conflicts](/docs/connect-domain/troubleshoot/spf-conflicts).
+</Warning>
+
+## GoDaddy-specific notes
+
+- GoDaddy supports Domain Connect for some products, but Reloop’s template is **not** onboarded there yet — use manual setup.
+- If nameservers point to Cloudflare (or another host), edit that host instead of GoDaddy DNS.
+- For apex hosts GoDaddy uses `@`.
+
+## Receiving emails
+
+If you enable **Receiving** on the domain in Reloop, you must publish the inbound **MX** Reloop shows (typically `inbound.reloop.sh`).
+
+<Warning>
+When Reloop’s MX is active on a hostname, Reloop receives mail for that hostname according to MX priority. That can conflict with another inbox already using MX on the same name — use a separate hostname for Reloop receiving if needed. See [MX conflicts](/docs/connect-domain/troubleshoot/mx-conflicts) and [Sending vs receiving](/docs/connect-domain/sending-vs-receiving).
+</Warning>
+
+## Complete verification
+
+1. Return to [Domains](https://reloop.sh/dashboard/domain) in Reloop.
+2. Open the domain and click **Verify**.
+3. Wait until status is **active**. Most providers update within minutes; allow up to 48–72 hours in rare cases ([propagation](/docs/connect-domain/verification/propagation)).
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Verification failed after I added records">
+    Re-open the Reloop domain page and compare every Type / Host / Value to GoDaddy. Fix typos, truncated DKIM keys, and duplicate SPF records. Then click **Verify** again.
+  </Accordion>
+  <Accordion title="I added records but dig does not show them">
+    Confirm you edited the DNS host that matches public nameservers (`dig NS yourdomain.com`). See [Wrong nameservers](/docs/connect-domain/troubleshoot/wrong-nameservers).
+  </Accordion>
+  <Accordion title="It has been hours and status is still pending">
+    Follow [Domain not verifying](/docs/connect-domain/troubleshoot/not-verifying) and [DNS propagation](/docs/connect-domain/verification/propagation).
+  </Accordion>
+</AccordionGroup>
+
+## Related
+
+- [DNS records explained](/docs/connect-domain/dns-records-explained)
+- [Manual DNS setup](/docs/connect-domain/manual-setup)
+- [Auto-populate DNS](/docs/connect-domain/auto-populate)
+- [All provider guides](/docs/connect-domain/providers)

@@ -1,0 +1,63 @@
+---
+title: Auto-populate DNS
+sidebarTitle: Auto-populate DNS
+description: Use Domain Connect to apply Reloop DNS records in one click when your DNS host supports Reloop’s template.
+---
+
+**Auto-populate** uses the open [Domain Connect](https://www.domainconnect.org/) standard. Reloop opens your DNS provider, you approve a template, and the provider writes SPF, DKIM, DMARC, MX, and tracking records for you.
+
+Which hosts can do this **changes over time**. Reloop does not rely on a fixed allowlist in the docs — it checks live whether your domain’s DNS host supports Reloop’s Domain Connect template (`reloop.sh` / `email-setup` in the [Domain Connect Templates](https://github.com/Domain-Connect/Templates) registry).
+
+## When you see the button
+
+On the domain page (and during onboarding DNS step):
+
+- **Auto populate** → your host can apply Reloop’s template; use this flow
+- **Open DNS settings** (or no Auto populate) → use [manual setup](/docs/connect-domain/manual-setup)
+
+Trust the dashboard for your domain. A host that supports Domain Connect in general may still lack Reloop’s template until they onboard it.
+
+## How the flow works
+
+<Steps>
+  <Step title="Click Auto populate">
+    Reloop runs Domain Connect **discovery** against your domain (`_domainconnect` DNS + provider API) and confirms the Reloop template is available.
+  </Step>
+  <Step title="Approve at your provider">
+    A new tab opens on your DNS host. Sign in if needed, review the records, and confirm.
+  </Step>
+  <Step title="Return to Reloop">
+    After success you are redirected back (or you can return manually). Click **Verify** if status is still pending.
+  </Step>
+</Steps>
+
+Reloop re-checks live discovery when you click Auto populate. If the provider dropped the template or discovery fails, you get an error toast and should continue manually.
+
+## What gets applied
+
+The Reloop Domain Connect template typically applies:
+
+- DKIM TXT on `reloop._domainkey`
+- SPF via SPFM / merge (`include:reloop.sh`)
+- DMARC on `_dmarc`
+- MX for sending/receiving as defined in the template
+- Tracking CNAME `link` → `link.reloop.sh`
+
+Exact groups can depend on template version; the consent screen lists what will change.
+
+## If Auto-populate fails
+
+See [Auto-populate failed](/docs/connect-domain/troubleshoot/auto-populate-failed) for:
+
+- Popup blocked
+- User cancelled consent
+- Template not found at provider
+- Domain Connect not supported on that zone
+
+You can always fall back to [manual setup](/docs/connect-domain/manual-setup) using the same dashboard records.
+
+## Security notes
+
+- Only approve the flow while logged into **your** DNS account for that domain.
+- Reloop signs Domain Connect apply URLs; do not reuse apply links from untrusted sources.
+- After you approve, check the records in your DNS panel, then click **Verify** in Reloop.

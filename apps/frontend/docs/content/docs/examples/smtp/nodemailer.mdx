@@ -24,8 +24,8 @@ const nodemailer = require('nodemailer');
 
 const transporter = nodemailer.createTransport({
   host: 'smtp.reloop.sh',
-  port: 465,
-  secure: true, // port 465
+  port: 587,
+  secure: false, // true for port 465, false for other ports
   auth: {
     user: 'reloop',
     pass: process.env.RELOOP_API_KEY,
@@ -34,8 +34,8 @@ const transporter = nodemailer.createTransport({
 
 async function main() {
   const info = await transporter.sendMail({
-    from: '"Onboarding" <onboarding@yourdomain.com>',
-    to: 'recipient@example.com',
+    from: '"Onboarding" <onboarding@reloop.sh>',
+    to: 'delivered@resend.dev',
     subject: 'Hello from Nodemailer',
     html: '<p>Congrats on sending your first email via Reloop SMTP using Nodemailer!</p>',
   });

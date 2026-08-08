@@ -36,7 +36,7 @@ func main() {
 
 	r.POST("/send-email", func(c *gin.Context) {
 		params := &reloop.SendEmailParams{
-			From:    "onboarding@reloop.dev",
+			From:    "onboarding@reloop.sh",
 			To:      []string{"delivered@resend.dev"},
 			Subject: "Hello from Gin",
 			HTML:    "<p>Congrats on sending your first email via Reloop from Go Gin!</p>",
