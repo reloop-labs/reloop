@@ -6,6 +6,7 @@ import { BlogCta } from "@reloop/web/components/landing/blog/blog-cta";
 import { BlogPostCoverImage } from "@reloop/web/components/landing/blog/blog-post-cover-image";
 import { BlogTableOfContents } from "@reloop/web/components/landing/blog/blog-table-of-contents";
 import {
+	formatBlogDate,
 	formatBlogDateUpper,
 	formatReadTimeUpper,
 	getCategoryPath,
@@ -88,10 +89,12 @@ export function BlogPostPageView({
 	post,
 	body,
 	toc,
+	relatedPosts = [],
 }: {
 	post: BlogPostDefinition;
 	body: ReactNode;
 	toc: BlogTocItem[];
+	relatedPosts?: BlogPostDefinition[];
 }) {
 	const [copied, setCopied] = useState(false);
 
@@ -116,14 +119,7 @@ export function BlogPostPageView({
 				{/* Top Header Section */}
 				<header className="-mx-4 sm:-mx-6 lg:-mx-8 border-stroke-soft-200 border-b px-4 pb-10 text-left sm:px-6 lg:px-8 dark:border-white/10">
 					<div className="flex w-full max-w-[680px] flex-col gap-4">
-						<Link
-							href="/blog"
-							className="mr-auto flex items-center gap-2.5 font-medium text-base/[150%] text-text-sub-600 tracking-[-0.24px] transition-colors hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white"
-						>
-							<ArrowLeftIcon className="size-4.5 shrink-0 select-none text-text-strong-950 dark:text-white" />
-							<span>All articles</span>
-						</Link>
-						<div className="mt-6 flex flex-wrap items-center gap-2 font-medium font-mono text-xs/[150%] uppercase tracking-[0.6px]">
+						<div className="flex flex-wrap items-center gap-2 font-medium font-mono text-xs/[150%] uppercase tracking-[0.6px]">
 							<Link
 								href={getCategoryPath(post.category)}
 								className="text-primary-base transition-opacity hover:opacity-80"
@@ -137,10 +133,6 @@ export function BlogPostPageView({
 							>
 								{formatBlogDateUpper(post.publishedAt)}
 							</time>
-							<span className="text-text-soft-400 dark:text-white/30">/</span>
-							<span className="text-text-sub-600 dark:text-white/60">
-								BY {post.author.name.toUpperCase()}
-							</span>
 						</div>
 						<h1 className="font-semibold text-3xl text-text-strong-950 leading-[110%] tracking-[-0.8px] sm:text-[40px] dark:text-white">
 							{post.title}
@@ -156,6 +148,13 @@ export function BlogPostPageView({
 					{/* Left Column: Table of Contents */}
 					<aside className="lg:col-span-3 lg:border-stroke-soft-200 lg:border-r lg:pt-10 lg:pr-8 lg:pb-16 dark:lg:border-white/10">
 						<div className="space-y-8 lg:sticky lg:top-28">
+							<Link
+								href="/blog"
+								className="inline-flex items-center gap-2.5 font-medium text-base text-text-sub-600 tracking-[-0.24px] transition-colors hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white"
+							>
+								<ArrowLeftIcon className="size-4.5 shrink-0 select-none text-text-strong-950 dark:text-white" />
+								<span>Blog</span>
+							</Link>
 							{toc.length > 0 ? <BlogTableOfContents items={toc} /> : null}
 						</div>
 					</aside>
@@ -190,6 +189,46 @@ export function BlogPostPageView({
 
 						{/* Blog Article Body */}
 						<BlogBody>{body}</BlogBody>
+
+						{/* Read More Section */}
+						{relatedPosts.length > 0 ? (
+							<div className="-mx-4 sm:-mx-6 lg:-mx-10 border-stroke-soft-200 border-t px-4 pt-5 sm:px-6 lg:px-10 dark:border-white/10">
+								<h2 className="mb-6 font-semibold text-text-strong-950 tracking-tight dark:text-white">
+									Read more
+								</h2>
+								<div className="flex flex-col gap-6 sm:gap-7">
+									{relatedPosts.map((relatedPost) => (
+										<Link
+											key={relatedPost.slug}
+											href={`/blog/${relatedPost.slug}`}
+											className="group flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:gap-5"
+										>
+											<div className="relative aspect-[16/10] w-full shrink-0 overflow-hidden rounded-xl border border-stroke-soft-200/80 bg-bg-weak-50/50 sm:w-44 md:w-48 dark:border-white/10 dark:bg-white/[0.04]">
+												<BlogPostCoverImage
+													slug={relatedPost.slug}
+													image={relatedPost.image}
+													alt={relatedPost.title}
+												/>
+											</div>
+											<div className="flex flex-col justify-center space-y-1">
+												<h3 className="font-semibold text-base text-text-strong-950 decoration-text-strong-950/40 underline-offset-4 transition-colors group-hover:underline dark:text-white dark:group-hover:decoration-white/40">
+													{relatedPost.title}
+												</h3>
+												<p className="line-clamp-2 text-text-sub-600 text-xs leading-relaxed sm:text-sm dark:text-white/70">
+													{relatedPost.description}
+												</p>
+												<time
+													dateTime={relatedPost.publishedAt}
+													className="text-text-sub-600 text-xs dark:text-white/50"
+												>
+													{formatBlogDate(relatedPost.publishedAt)}
+												</time>
+											</div>
+										</Link>
+									))}
+								</div>
+							</div>
+						) : null}
 					</main>
 
 					{/* Right Column: Author Info, Share & Conversion Card */}

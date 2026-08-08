@@ -339,6 +339,10 @@ export function getRelatedPosts(slug: string, limit = 3): BlogPostDefinition[] {
 		);
 	}
 
+	if (related.length < limit) {
+		addPosts(published);
+	}
+
 	return related.slice(0, limit);
 }
 
