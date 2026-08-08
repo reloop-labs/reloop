@@ -289,7 +289,7 @@ export function BlogPostPageView({
 							{/* Dub-style Product CTA Card */}
 							<a
 								href="/dashboard/signup"
-								className="group relative block overflow-hidden rounded-2xl border border-stroke-soft-200 bg-white p-3.5 transition-all duration-200 hover:border-stroke-strong-950 hover:shadow-md dark:border-white/10 dark:bg-white/[0.03] dark:hover:border-white/30"
+								className="group relative block overflow-hidden rounded-2xl border border-stroke-soft-200/60 bg-white p-3.5 transition-all duration-200 dark:border-white/10 dark:bg-white/[0.03]"
 							>
 								{/* Top Product Preview SVG */}
 								<div className="relative mb-3.5 flex aspect-[16/10] w-full items-center justify-center overflow-hidden rounded-xl bg-bg-weak-50/40 p-3.5 text-text-strong-950 dark:bg-neutral-900/30 dark:text-white">
@@ -310,9 +310,27 @@ export function BlogPostPageView({
 										xmlns="http://www.w3.org/2000/svg"
 										aria-hidden="true"
 									>
-										<circle cx="100" cy="60" r="28" stroke="currentColor" strokeDasharray="3 3" />
-										<circle cx="100" cy="60" r="54" stroke="currentColor" strokeWidth="0.75" />
-										<circle cx="100" cy="60" r="82" stroke="currentColor" strokeDasharray="4 4" />
+										<circle
+											cx="100"
+											cy="60"
+											r="28"
+											stroke="currentColor"
+											strokeDasharray="3 3"
+										/>
+										<circle
+											cx="100"
+											cy="60"
+											r="54"
+											stroke="currentColor"
+											strokeWidth="0.75"
+										/>
+										<circle
+											cx="100"
+											cy="60"
+											r="82"
+											stroke="currentColor"
+											strokeDasharray="4 4"
+										/>
 									</svg>
 
 									{/* Ultra subtle blue glow */}
@@ -363,11 +381,10 @@ export function BlogPostPageView({
 								{/* Text content below preview */}
 								<div className="space-y-1 px-0.5">
 									<h4 className="flex items-center justify-between font-bold text-base text-text-strong-950 tracking-tight dark:text-white">
-										<span>Get started</span>
+										Get started
 									</h4>
-									<p className="text-[13px] text-text-sub-600 leading-snug dark:text-white/60">
-										Supercharge your application with Reloop's developer-first
-										email infrastructure platform
+									<p className="font-medium text-[13px] text-text-sub-600 leading-snug dark:text-white/60">
+										Email API for developers. With agent inboxes built in.
 									</p>
 								</div>
 							</a>
