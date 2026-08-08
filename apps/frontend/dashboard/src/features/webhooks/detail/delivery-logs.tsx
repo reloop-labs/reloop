@@ -1,4 +1,3 @@
-import * as Badge from "@reloop/ui/badge";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as Drawer from "@reloop/ui/drawer";
@@ -48,35 +47,51 @@ const DeliverySkeleton = () => (
 	</div>
 );
 
-function statusIcon(status: string): { name: string; className: string } {
+/**
+ * User-facing delivery outcome — never raw HTTP codes.
+ * success → Delivered · pending/retrying → Pending · failed → Error
+ */
+function deliveryOutcomeLabel(
+	status: string,
+): "Delivered" | "Pending" | "Error" {
 	switch (status) {
 		case "success":
-			return { name: "check-circle", className: "text-success-base" };
-		case "failed":
-			return { name: "alert-circle", className: "text-error-base" };
+			return "Delivered";
 		case "pending":
-			return { name: "clock", className: "text-warning-base" };
 		case "retrying":
 		case "retried":
-			return { name: "rotate-cw", className: "text-warning-base" };
+			return "Pending";
+		default:
+			return "Error";
+	}
+}
+
+function statusIcon(status: string): { name: string; className: string } {
+	switch (deliveryOutcomeLabel(status)) {
+		case "Delivered":
+			return { name: "check-circle", className: "text-success-base" };
+		case "Error":
+			return { name: "alert-circle", className: "text-error-base" };
+		case "Pending":
+			return status === "retrying" || status === "retried"
+				? { name: "rotate-cw", className: "text-warning-base" }
+				: { name: "clock", className: "text-warning-base" };
 		default:
 			return { name: "circle", className: "text-text-soft-400" };
 	}
 }
 
-function codeClass(status: number | null, deliveryStatus: string) {
-	if (status != null && status >= 200 && status < 300) {
-		return "text-success-base";
+function outcomeLabelClass(status: string) {
+	switch (deliveryOutcomeLabel(status)) {
+		case "Delivered":
+			return "text-success-base";
+		case "Error":
+			return "text-error-base";
+		case "Pending":
+			return "text-warning-base";
+		default:
+			return "text-text-sub-600";
 	}
-	if (status != null) {
-		return "text-error-base";
-	}
-	if (deliveryStatus === "success") return "text-success-base";
-	if (deliveryStatus === "failed") return "text-error-base";
-	if (deliveryStatus === "retrying" || deliveryStatus === "pending") {
-		return "text-warning-base";
-	}
-	return "text-text-sub-600";
 }
 
 interface DeliveryAttempt {
@@ -138,40 +153,6 @@ interface DeliveryDetailProps {
 	onClose?: () => void;
 }
 
-const getStatusProps = (
-	statusCode: number | null,
-	deliveryStatus: string,
-): { label: string; color: "gray" | "blue" | "orange" | "red" | "green" } => {
-	if (statusCode != null) {
-		if (statusCode >= 200 && statusCode < 300) {
-			return { label: `${statusCode}`, color: "green" };
-		}
-		if (statusCode >= 300 && statusCode < 400) {
-			return { label: `${statusCode}`, color: "blue" };
-		}
-		if (statusCode >= 400 && statusCode < 500) {
-			return { label: `${statusCode}`, color: "orange" };
-		}
-		if (statusCode >= 500) {
-			return { label: `${statusCode}`, color: "red" };
-		}
-	}
-
-	switch (deliveryStatus) {
-		case "success":
-			return { label: "Succeeded", color: "green" };
-		case "failed":
-			return { label: "Failed", color: "red" };
-		case "pending":
-			return { label: "Pending", color: "orange" };
-		case "retrying":
-		case "retried":
-			return { label: "Pending", color: "orange" };
-		default:
-			return { label: deliveryStatus, color: "gray" };
-	}
-};
-
 function CopyButton({ value, label }: { value: string; label?: string }) {
 	const [copied, setCopied] = useState(false);
 
@@ -209,92 +190,189 @@ function PropertyRow({
 	children: React.ReactNode;
 }) {
 	return (
-		<div className="grid grid-cols-[140px_1fr] items-start gap-4 py-2.5">
-			<span className="text-text-sub-600 text-xs">{label}</span>
-			<div className="flex min-w-0 flex-1 items-center gap-1.5 text-left">
+		<div className="grid grid-cols-[148px_1fr] items-start gap-6 py-2">
+			<span className="pt-px text-[13px] text-text-sub-600">{label}</span>
+			<div className="min-w-0 text-left text-[13px] text-text-strong-950">
 				{children}
 			</div>
 		</div>
 	);
 }
 
-function PropertyValue({
-	value,
-	mono,
-	copyable,
-	maxLength,
-}: {
-	value: string | null | undefined;
-	mono?: boolean;
-	copyable?: boolean;
-	maxLength?: number;
-}) {
-	if (!value) return <span className="text-text-soft-400 text-xs">—</span>;
-
-	const isTruncated = maxLength && value.length > maxLength;
-	const display = isTruncated ? `${value.slice(0, maxLength)}…` : value;
-
-	const content = (
-		<span className={cn("text-text-strong-950 text-xs", mono && "font-mono")}>
-			{display}
-		</span>
-	);
-
-	return (
-		<>
-			{isTruncated ? (
-				<Tooltip.Provider delayDuration={300}>
-					<Tooltip.Root>
-						<Tooltip.Trigger asChild>{content}</Tooltip.Trigger>
-						<Tooltip.Content
-							side="top"
-							variant="light"
-							className="max-w-sm break-all font-mono text-xs"
-						>
-							{value}
-						</Tooltip.Content>
-					</Tooltip.Root>
-				</Tooltip.Provider>
-			) : (
-				content
-			)}
-			{copyable && <CopyButton value={value} label={mono ? "ID" : undefined} />}
-		</>
-	);
+/** Short human summary for the event data, Stripe-style "Description". */
+function describeEvent(
+	eventType: string,
+	data: Record<string, unknown> | null | undefined,
+	errorMessage: string | null,
+): string | null {
+	if (!data || typeof data !== "object") {
+		return errorMessage;
+	}
+	if (eventType.startsWith("domain.")) {
+		const name =
+			(typeof data.name === "string" && data.name) ||
+			(typeof data.domain === "string" && data.domain) ||
+			null;
+		if (name) {
+			const status = typeof data.status === "string" ? data.status : null;
+			return status ? `${name} (${status})` : name;
+		}
+	}
+	if (eventType.startsWith("email.")) {
+		const subject = typeof data.subject === "string" ? data.subject : null;
+		const to = Array.isArray(data.to)
+			? data.to.filter((t): t is string => typeof t === "string").join(", ")
+			: typeof data.to === "string"
+				? data.to
+				: null;
+		if (subject && to) return `${subject} → ${to}`;
+		if (subject) return subject;
+		if (to) return to;
+	}
+	if (eventType.startsWith("contact.")) {
+		const email = typeof data.email === "string" ? data.email : null;
+		const name = [data.first_name, data.last_name]
+			.filter((p): p is string => typeof p === "string" && p.length > 0)
+			.join(" ");
+		if (email && name) return `${name} <${email}>`;
+		if (email) return email;
+	}
+	if (eventType.startsWith("api-key.") && typeof data.api_key_id === "string") {
+		return data.api_key_id;
+	}
+	return errorMessage;
 }
 
-function formatAttemptBadge(attempt: DeliveryAttempt): {
+function statusBadgePresentation(delivery: Delivery): {
 	label: string;
-	color: "gray" | "blue" | "orange" | "red" | "green";
+	icon: string | null;
+	className: string;
+	/** Optional HTTP detail for tooltip only — never the primary label. */
+	httpHint: string | null;
 } {
-	if (attempt.status === "pending" || attempt.status === "retrying") {
-		return { label: "Pending", color: "orange" };
+	const label = deliveryOutcomeLabel(delivery.status);
+	const httpHint =
+		delivery.responseStatus != null ? `HTTP ${delivery.responseStatus}` : null;
+
+	if (label === "Pending") {
+		return {
+			label: "Pending",
+			icon: delivery.status === "retrying" ? "rotate-cw" : "clock",
+			className: "bg-warning-lighter text-warning-base",
+			httpHint,
+		};
 	}
-	if (attempt.responseStatus != null) {
-		const s = attempt.responseStatus;
-		if (s >= 200 && s < 300) return { label: String(s), color: "green" };
-		if (s >= 400 && s < 500) return { label: String(s), color: "orange" };
-		if (s >= 500) return { label: String(s), color: "red" };
-		return { label: String(s), color: "blue" };
+	if (label === "Delivered") {
+		return {
+			label: "Delivered",
+			icon: "check-circle",
+			className: "bg-success-lighter text-success-base",
+			httpHint,
+		};
 	}
-	if (attempt.status === "success") return { label: "OK", color: "green" };
-	if (attempt.status === "failed") return { label: "Failed", color: "red" };
-	return { label: attempt.status, color: "gray" };
+	return {
+		label: "Error",
+		icon: "alert-circle",
+		className: "bg-error-lighter text-error-base",
+		httpHint,
+	};
+}
+
+/**
+ * Parse an HTTP status code from attempt fields or error text (e.g. "HTTP 405: …").
+ */
+function resolveAttemptStatusCode(attempt: DeliveryAttempt): number | null {
+	if (
+		attempt.responseStatus != null &&
+		Number.isFinite(attempt.responseStatus)
+	) {
+		return attempt.responseStatus;
+	}
+	const msg = attempt.errorMessage ?? "";
+	const match =
+		msg.match(/\bHTTP\s+(\d{3})\b/i) ?? msg.match(/\b([1-5]\d{2})\b/);
+	if (match?.[1]) {
+		const n = Number(match[1]);
+		if (n >= 100 && n <= 599) return n;
+	}
+	return null;
+}
+
+/**
+ * Compact attempt chip (Stripe-style).
+ * Always show the HTTP status code when known.
+ * Failed → red "✕ 403" · Success → green "✓ 200" · Pending → clock
+ */
+function AttemptStatusChip({
+	attempt,
+	fallbackCode,
+}: {
+	attempt: DeliveryAttempt;
+	/** Parent delivery.responseStatus when the attempt row omitted it. */
+	fallbackCode?: number | null;
+}) {
+	const code = resolveAttemptStatusCode(attempt) ?? fallbackCode ?? null;
+	const outcome = deliveryOutcomeLabel(attempt.status);
+	const isSuccess =
+		outcome === "Delivered" ||
+		attempt.status === "success" ||
+		(code != null && code >= 200 && code < 300);
+	const isPending =
+		attempt.status === "pending" || attempt.status === "retrying";
+
+	if (isPending) {
+		return (
+			<span className="inline-flex h-6 w-8 shrink-0 items-center justify-center rounded-md bg-warning-lighter text-warning-base">
+				<Icon
+					name={attempt.status === "retrying" ? "rotate-cw" : "clock"}
+					className="h-3.5 w-3.5"
+				/>
+			</span>
+		);
+	}
+
+	if (isSuccess) {
+		return (
+			<span className="inline-flex h-6 min-w-10 shrink-0 items-center justify-center gap-0.5 rounded-md bg-success-lighter px-1.5 font-medium font-mono text-[11px] text-success-base tabular-nums">
+				{code != null ? (
+					code
+				) : (
+					<>
+						<Icon name="check" className="h-3 w-3" />
+						OK
+					</>
+				)}
+			</span>
+		);
+	}
+
+	// Failed / error — always show the status code (parsed from body when needed)
+	return (
+		<span
+			className="inline-flex h-6 min-w-10 shrink-0 items-center justify-center gap-0.5 rounded-md bg-error-lighter px-1.5 font-medium font-mono text-[11px] text-error-base tabular-nums"
+			title={attempt.errorMessage ?? undefined}
+		>
+			<span className="text-[10px] leading-none" aria-hidden>
+				✕
+			</span>
+			{code != null ? code : "ERR"}
+		</span>
+	);
 }
 
 function AttemptNote({ attempt }: { attempt: DeliveryAttempt }) {
 	if (attempt.source === "manual") {
 		return (
-			<span className="inline-flex items-center gap-1 text-[12px] text-text-sub-600">
-				<Icon name="rotate-cw" className="h-3 w-3" />
+			<span className="inline-flex items-center gap-1.5 text-[13px] text-text-sub-600">
+				<Icon name="rotate-cw" className="h-3.5 w-3.5 shrink-0" />
 				Resent manually
 			</span>
 		);
 	}
 	if (attempt.retriedAutomatically) {
 		return (
-			<span className="inline-flex items-center gap-1 text-[12px] text-text-sub-600">
-				<Icon name="rotate-cw" className="h-3 w-3" />
+			<span className="inline-flex items-center gap-1.5 text-[13px] text-text-sub-600">
+				<Icon name="rotate-cw" className="h-3.5 w-3.5 shrink-0" />
 				Retried automatically
 			</span>
 		);
@@ -303,8 +381,8 @@ function AttemptNote({ attempt }: { attempt: DeliveryAttempt }) {
 }
 
 /**
- * Stripe-style delivery attempts: scheduled next (if any) on top,
- * then past HTTP attempts newest-first. Retries stay out of the left list.
+ * Stripe-style delivery attempts list:
+ * next retry on top → past attempts with ✕ code + timestamp + auto-retry note.
  */
 function DeliveryAttemptsSection({
 	delivery,
@@ -321,11 +399,13 @@ function DeliveryAttemptsSection({
 		dayjs(delivery.nextRetryAt).isAfter(dayjs());
 
 	const attempts = delivery.attempts ?? [];
+	const hasRows = showScheduledNext || attempts.length > 0;
 
 	return (
 		<div>
-			<div className="mb-2 flex items-center justify-between gap-2">
-				<h3 className="font-semibold text-sm text-text-strong-950">
+			{/* Title row — Resend sits on the right like Stripe */}
+			<div className="mb-3 flex items-center justify-between gap-3">
+				<h3 className="font-medium text-[13px] text-text-sub-600">
 					Delivery attempts
 				</h3>
 				<Button.Root
@@ -334,102 +414,55 @@ function DeliveryAttemptsSection({
 					mode="stroke"
 					disabled={isRetrying}
 					onClick={() => void onRetry(delivery.id)}
-					className="gap-1.5 rounded-lg"
+					className="h-7 shrink-0 rounded-lg px-2.5 font-medium text-[12px]"
 				>
-					<Icon name="rotate-cw" className="h-3.5 w-3.5" />
 					{isRetrying ? "Resending…" : "Resend"}
 				</Button.Root>
 			</div>
 
-			<div className="overflow-hidden rounded-xl border border-stroke-soft-100 dark:border-stroke-soft-100/40">
-				{showScheduledNext ? (
-					<div className="flex items-center justify-between gap-3 border-stroke-soft-100 border-b px-3 py-2.5 dark:border-stroke-soft-100/40">
-						<div className="flex min-w-0 items-center gap-2.5">
-							<span className="inline-flex h-6 min-w-10 items-center justify-center rounded-md bg-warning-lighter px-1.5 font-semibold text-[11px] text-warning-base">
-								<span className="inline-flex items-center gap-1">
-									<Icon name="rotate-cw" className="h-3 w-3" />
-								</span>
+			{!hasRows ? (
+				<p className="py-4 text-center text-[12px] text-text-sub-600">
+					{delivery.status === "pending"
+						? "Delivery is queued. Attempts will appear here once the worker runs."
+						: "No delivery attempts recorded."}
+				</p>
+			) : (
+				<ul className="flex flex-col gap-3">
+					{/* Next scheduled retry */}
+					{showScheduledNext && delivery.nextRetryAt ? (
+						<li className="flex items-center gap-3">
+							<span className="inline-flex h-6 w-8 shrink-0 items-center justify-center rounded-md bg-warning-lighter text-warning-base">
+								<Icon name="clock" className="h-3.5 w-3.5" />
 							</span>
 							<span className="text-[13px] text-text-strong-950">
 								in {dayjs(delivery.nextRetryAt).fromNow(true)}
 							</span>
-						</div>
-						<span className="shrink-0 text-[12px] text-text-sub-600">
-							Next automatic retry
-						</span>
-					</div>
-				) : null}
+						</li>
+					) : null}
 
-				{attempts.length === 0 && !showScheduledNext ? (
-					<div className="px-3 py-6 text-center text-[12px] text-text-sub-600">
-						{delivery.status === "pending"
-							? "Delivery is queued. Attempts will appear here once the worker runs."
-							: "No delivery attempts recorded."}
-					</div>
-				) : (
-					<ul className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/40">
-						{attempts.map((attempt) => {
-							const badge = formatAttemptBadge(attempt);
-							return (
-								<li
-									key={attempt.id}
-									className="flex items-center justify-between gap-3 px-3 py-2.5"
-								>
-									<div className="flex min-w-0 items-center gap-2.5">
-										<span
-											className={cn(
-												"inline-flex h-6 min-w-10 items-center justify-center rounded-md px-1.5 font-mono font-semibold text-[11px] tabular-nums",
-												badge.color === "green" &&
-													"bg-success-lighter text-success-base",
-												badge.color === "red" &&
-													"bg-error-lighter text-error-base",
-												badge.color === "orange" &&
-													"bg-warning-lighter text-warning-base",
-												badge.color === "blue" &&
-													"bg-bg-weak-50 text-text-sub-600",
-												badge.color === "gray" &&
-													"bg-bg-weak-50 text-text-sub-600",
-											)}
-										>
-											{attempt.status === "retrying" ? (
-												<Icon name="rotate-cw" className="h-3 w-3" />
-											) : badge.color === "orange" &&
-												attempt.status === "pending" ? (
-												<Icon name="clock" className="h-3 w-3" />
-											) : badge.color === "red" ||
-												attempt.status === "failed" ? (
-												<span className="inline-flex items-center gap-0.5">
-													<span className="text-[10px]">✕</span>
-													{badge.label}
-												</span>
-											) : (
-												badge.label
-											)}
-										</span>
-										<span className="truncate text-[13px] text-text-sub-600 tabular-nums">
-											{dayjs(attempt.createdAt).format(
-												"MMM D, YYYY, h:mm:ss A",
-											)}
-										</span>
-									</div>
-									<div className="shrink-0">
-										<AttemptNote attempt={attempt} />
-									</div>
-								</li>
-							);
-						})}
-					</ul>
-				)}
-			</div>
-
-			{delivery.attemptNumber > 0 ? (
-				<p className="mt-2 text-[11px] text-text-soft-400">
-					Attempt {delivery.attemptNumber} of {delivery.maxAttempts}
-					{delivery.durationMs != null
-						? ` · last ${delivery.durationMs}ms`
-						: ""}
-				</p>
-			) : null}
+					{/* Past attempts — newest first */}
+					{attempts.map((attempt, index) => (
+						<li
+							key={attempt.id}
+							className="flex items-center justify-between gap-3"
+						>
+							<div className="flex min-w-0 items-center gap-3">
+								<AttemptStatusChip
+									attempt={attempt}
+									// Newest attempt often mirrors the delivery's last response
+									fallbackCode={index === 0 ? delivery.responseStatus : null}
+								/>
+								<span className="truncate text-[13px] text-text-sub-600 tabular-nums">
+									{dayjs(attempt.createdAt).format("MMM D, YYYY, h:mm:ss A")}
+								</span>
+							</div>
+							<div className="shrink-0">
+								<AttemptNote attempt={attempt} />
+							</div>
+						</li>
+					))}
+				</ul>
+			)}
 		</div>
 	);
 }
@@ -441,8 +474,6 @@ const DeliveryDetail = ({
 	showCloseButton,
 	onClose,
 }: DeliveryDetailProps) => {
-	const statusProps = getStatusProps(delivery.responseStatus, delivery.status);
-
 	const eventPayload = useMemo(() => {
 		const body = delivery.requestBody ?? {
 			id: delivery.webhookEventId,
@@ -472,114 +503,91 @@ const DeliveryDetail = ({
 		// keep raw
 	}
 
-	const badgeColor =
-		statusProps.color === "green"
-			? "green"
-			: statusProps.color === "red"
-				? "red"
-				: statusProps.color === "orange"
-					? "orange"
-					: statusProps.color === "blue"
-						? "blue"
-						: "gray";
+	const eventId = delivery.webhookEventId || delivery.id;
+	const badge = statusBadgePresentation(delivery);
+	const description = describeEvent(
+		delivery.eventType,
+		delivery.eventData,
+		delivery.errorMessage,
+	);
+	const showNextAttempt =
+		Boolean(delivery.nextRetryAt) &&
+		(delivery.status === "retrying" || delivery.status === "pending");
 
 	return (
 		<div className="flex h-full flex-col">
-			{/* ── Panel Header ── */}
-			<div className="flex items-start justify-between gap-3 border-stroke-soft-200 border-b p-6">
-				<div className="min-w-0 flex-1">
-					<div className="flex flex-wrap items-center gap-2">
-						<h2 className="truncate font-mono font-semibold text-sm text-text-strong-950">
-							{delivery.eventType}
-						</h2>
-						<Badge.Root
-							variant="lighter"
-							color={badgeColor}
-							className="h-[18px] rounded-md px-1.5 font-semibold text-[10px] tracking-normal"
-						>
-							{delivery.status === "retrying" || delivery.status === "pending"
-								? "Pending"
-								: statusProps.label}
-						</Badge.Root>
+			{/* ── Top fold (Stripe-style event details) ── */}
+			<div className="border-stroke-soft-200 border-b px-6 pt-5 pb-5">
+				{/* Section title + event id */}
+				<div className="flex items-start justify-between gap-3">
+					<p className="font-medium text-[13px] text-text-sub-600">
+						Event details
+					</p>
+					<div className="flex min-w-0 items-center gap-1.5">
+						<span className="truncate font-mono text-[12px] text-text-sub-600">
+							{eventId}
+						</span>
+						<CopyButton value={eventId} label="Event ID" />
+						{showCloseButton ? (
+							<button
+								type="button"
+								onClick={onClose}
+								className="ml-0.5 rounded p-0.5 text-text-soft-400 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950"
+								aria-label="Close"
+							>
+								<Icon name="cross" className="h-3.5 w-3.5" />
+							</button>
+						) : null}
 					</div>
-					{delivery.webhookEventId ? (
-						<div className="mt-1 flex items-center gap-1.5 text-text-sub-600 text-xs">
-							<span className="font-mono">{delivery.webhookEventId}</span>
-							<CopyButton value={delivery.webhookEventId} label="Event ID" />
-						</div>
-					) : (
-						<div className="mt-1 flex items-center gap-1.5 text-text-sub-600 text-xs">
-							<span className="font-mono">{delivery.id}</span>
-							<CopyButton value={delivery.id} label="Delivery ID" />
-						</div>
-					)}
 				</div>
-				{showCloseButton ? (
-					<Button.Root
-						size="small"
-						variant="neutral"
-						mode="stroke"
-						className="px-2"
-						onClick={onClose}
+
+				{/* Event type + status badge */}
+				<div className="mt-2 flex flex-wrap items-center gap-2">
+					<h2 className="font-mono font-semibold text-[18px] text-text-strong-950 leading-tight tracking-tight">
+						{delivery.eventType}
+					</h2>
+					<span
+						title={badge.httpHint ?? undefined}
+						className={cn(
+							"inline-flex h-[22px] items-center gap-1 rounded-full px-2 font-medium text-[11px]",
+							badge.className,
+						)}
 					>
-						<Icon name="cross" className="h-4 w-4" />
-					</Button.Root>
-				) : null}
+						{badge.icon ? (
+							<Icon name={badge.icon} className="h-3 w-3 shrink-0" />
+						) : null}
+						{badge.label}
+					</span>
+				</div>
+
+				{/* Flat meta rows */}
+				<div className="mt-4 space-y-0.5">
+					<PropertyRow label="Origin date">
+						{dayjs(delivery.createdAt).format("MMM D, YYYY, h:mm:ss A")}
+					</PropertyRow>
+					<PropertyRow label="Source">
+						<span className="font-medium text-primary-base">Dashboard</span>
+					</PropertyRow>
+					<PropertyRow label="API version">
+						<span className="font-mono text-text-sub-600">2026-04-03</span>
+					</PropertyRow>
+					{description ? (
+						<PropertyRow label="Description">
+							<span className="whitespace-pre-wrap break-words text-text-sub-600">
+								{description}
+							</span>
+						</PropertyRow>
+					) : null}
+					{showNextAttempt && delivery.nextRetryAt ? (
+						<PropertyRow label="Next delivery attempt">
+							{dayjs(delivery.nextRetryAt).format("MMM D, YYYY, h:mm:ss A")}
+						</PropertyRow>
+					) : null}
+				</div>
 			</div>
 
 			{/* ── Body ── */}
 			<div className="flex-1 space-y-5 overflow-y-auto p-6">
-				{/* Event details */}
-				<div>
-					<h3 className="mb-1 font-semibold text-sm text-text-strong-950">
-						Event details
-					</h3>
-					<div className="rounded-xl border border-stroke-soft-100 dark:border-stroke-soft-100/40">
-						<div className="divide-y divide-stroke-soft-100 px-4 dark:divide-stroke-soft-100/40">
-							<PropertyRow label="Origin date">
-								<PropertyValue
-									value={dayjs(delivery.createdAt).format(
-										"MMM D, YYYY, h:mm:ss A",
-									)}
-								/>
-							</PropertyRow>
-							<PropertyRow label="Endpoint">
-								<PropertyValue
-									value={delivery.requestUrl}
-									mono
-									maxLength={42}
-								/>
-							</PropertyRow>
-							<PropertyRow label="Delivery ID">
-								<PropertyValue
-									value={delivery.id}
-									mono
-									copyable
-									maxLength={26}
-								/>
-							</PropertyRow>
-							{delivery.nextRetryAt &&
-							(delivery.status === "retrying" ||
-								delivery.status === "pending") ? (
-								<PropertyRow label="Next delivery attempt">
-									<PropertyValue
-										value={dayjs(delivery.nextRetryAt).format(
-											"MMM D, YYYY, h:mm:ss A",
-										)}
-									/>
-								</PropertyRow>
-							) : null}
-							{delivery.errorMessage ? (
-								<PropertyRow label="Last error">
-									<span className="text-error-base text-xs">
-										{delivery.errorMessage}
-									</span>
-								</PropertyRow>
-							) : null}
-						</div>
-					</div>
-				</div>
-
 				{/* Combined attempts (Stripe-style) */}
 				<DeliveryAttemptsSection
 					delivery={delivery}
@@ -718,13 +726,6 @@ export const DeliveryLogs = ({ webhookId }: DeliveryLogsProps) => {
 	const startIndex = (currentPage - 1) * pageSize + 1;
 	const endIndex = Math.min(currentPage * pageSize, data?.total || 0);
 
-	const listCode = (delivery: Delivery) => {
-		if (delivery.status === "retrying" || delivery.status === "pending") {
-			return "—";
-		}
-		return delivery.responseStatus ?? "—";
-	};
-
 	return (
 		<div className="flex flex-col space-y-4">
 			{/* Filters */}
@@ -766,9 +767,9 @@ export const DeliveryLogs = ({ webhookId }: DeliveryLogsProps) => {
 							{s === "all"
 								? "All"
 								: s === "success"
-									? "Succeeded"
+									? "Delivered"
 									: s === "failed"
-										? "Failed"
+										? "Error"
 										: "Pending"}
 						</button>
 					))}
@@ -793,8 +794,8 @@ export const DeliveryLogs = ({ webhookId }: DeliveryLogsProps) => {
 					>
 						<div aria-hidden className="w-5" />
 						<div className="flex items-center gap-1">
-							<Icon name="code" className="h-3 w-3" />
-							<span className="text-xs">Code</span>
+							<Icon name="activity" className="h-3 w-3" />
+							<span className="text-xs">Status</span>
 						</div>
 						<div className="flex items-center gap-1">
 							<Icon name="activity-2" className="h-3 w-3" />
@@ -859,10 +860,11 @@ export const DeliveryLogs = ({ webhookId }: DeliveryLogsProps) => {
 														</span>
 													</Tooltip.Trigger>
 													<Tooltip.Content side="top" size="small">
-														<span className="capitalize">
-															{delivery.status === "retrying"
-																? "pending retry"
-																: delivery.status}
+														<span>
+															{deliveryOutcomeLabel(delivery.status)}
+															{delivery.responseStatus != null
+																? ` · HTTP ${delivery.responseStatus}`
+																: ""}
 														</span>
 													</Tooltip.Content>
 												</Tooltip.Root>
@@ -870,11 +872,16 @@ export const DeliveryLogs = ({ webhookId }: DeliveryLogsProps) => {
 
 											<span
 												className={cn(
-													"font-medium font-mono text-[13px] tabular-nums",
-													codeClass(delivery.responseStatus, delivery.status),
+													"font-medium text-[13px]",
+													outcomeLabelClass(delivery.status),
 												)}
+												title={
+													delivery.responseStatus != null
+														? `HTTP ${delivery.responseStatus}`
+														: undefined
+												}
 											>
-												{listCode(delivery)}
+												{deliveryOutcomeLabel(delivery.status)}
 											</span>
 
 											<div className="min-w-0 truncate font-medium font-mono text-label-sm text-text-strong-950">
