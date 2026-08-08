@@ -65,16 +65,66 @@ const CATEGORY_VARIANTS: Record<string, CategoryVariant> = {
 	},
 };
 
+export type CtaAccentColor =
+	| "blue"
+	| "indigo"
+	| "emerald"
+	| "violet"
+	| "amber"
+	| "primary";
+
+const ACCENT_STYLES: Record<CtaAccentColor, { bg: string; pattern: string }> = {
+	blue: {
+		bg: "from-transparent via-sky-100/75 to-blue-100/90 dark:via-sky-950/40 dark:to-blue-950/50",
+		pattern: "text-sky-500/35 dark:text-sky-400/40",
+	},
+	indigo: {
+		bg: "from-transparent via-indigo-100/75 to-purple-100/90 dark:via-indigo-950/40 dark:to-purple-950/50",
+		pattern: "text-indigo-500/35 dark:text-indigo-400/40",
+	},
+	emerald: {
+		bg: "from-transparent via-emerald-100/75 to-teal-100/90 dark:via-emerald-950/40 dark:to-teal-950/50",
+		pattern: "text-emerald-500/35 dark:text-emerald-400/40",
+	},
+	violet: {
+		bg: "from-transparent via-violet-100/75 to-fuchsia-100/90 dark:via-violet-950/40 dark:to-fuchsia-950/50",
+		pattern: "text-violet-500/35 dark:text-violet-400/40",
+	},
+	amber: {
+		bg: "from-transparent via-amber-100/75 to-orange-100/90 dark:via-amber-950/40 dark:to-orange-950/50",
+		pattern: "text-amber-500/35 dark:text-amber-400/40",
+	},
+	primary: {
+		bg: "from-transparent via-primary-base/15 to-primary-base/25 dark:via-primary-base/20 dark:to-primary-base/30",
+		pattern: "text-primary-base/35 dark:text-primary-base/40",
+	},
+};
+
+const CATEGORY_ACCENTS: Record<string, CtaAccentColor> = {
+	Engineering: "indigo",
+	"AI & Automation": "blue",
+	Growth: "emerald",
+	"Self-Hosting": "violet",
+	Deliverability: "amber",
+	Tutorials: "blue",
+	"Open Source": "indigo",
+	Migration: "emerald",
+	Comparison: "blue",
+	Glossary: "amber",
+};
+
 export function BlogCta({
 	category,
 	headline,
 	sub,
 	primaryLabel,
+	accentColor,
 }: {
 	category?: string;
 	headline?: string;
 	sub?: string;
 	primaryLabel?: string;
+	accentColor?: CtaAccentColor;
 }) {
 	const categoryVariant = category ? CATEGORY_VARIANTS[category] : undefined;
 	const variant = {
@@ -86,25 +136,46 @@ export function BlogCta({
 			DEFAULT_VARIANT.primaryLabel,
 	};
 
+	const resolvedAccent =
+		accentColor ??
+		(category ? CATEGORY_ACCENTS[category] : undefined) ??
+		"blue";
+	const colorStyle = ACCENT_STYLES[resolvedAccent] ?? ACCENT_STYLES.blue;
+
 	return (
 		<section className="w-full">
 			<div className="relative overflow-hidden border-stroke-soft-200 border-t bg-bg-white-0 dark:border-white/10 dark:bg-black">
-				{/* Diagonal hatch line graphic using primary color */}
-
 				<div className="relative z-10 mx-auto flex w-full max-w-5xl flex-col gap-6 border-stroke-soft-200 border-x px-4 py-10 sm:px-6 sm:py-12 md:max-w-7xl lg:flex-row lg:items-center lg:justify-between lg:px-8 dark:border-white/10">
-					<div className="max-w-2xl">
+					{/* Background color gradient fill & diagonal hatch pattern */}
+					<div
+						aria-hidden
+						className="pointer-events-none absolute top-0 right-0 bottom-0 z-0 w-full sm:w-7/12"
+					>
+						{/* Soft background color tint gradient */}
 						<div
-							aria-hidden
-							className="pointer-events-none absolute top-0 right-0 bottom-0 w-full text-primary-base/30 sm:w-1/2 dark:text-primary-base/40"
+							className={`absolute inset-0 bg-gradient-to-r ${colorStyle.bg}`}
+							style={{
+								maskImage:
+									"linear-gradient(to right, transparent 0%, black 35%, black 100%)",
+								WebkitMaskImage:
+									"linear-gradient(to right, transparent 0%, black 35%, black 100%)",
+							}}
+						/>
+						{/* Diagonal hatch lines */}
+						<div
+							className={`absolute inset-0 ${colorStyle.pattern}`}
 							style={{
 								backgroundImage:
 									"repeating-linear-gradient(-45deg, transparent 0, transparent 2px, currentColor 2px, currentColor 2.8px)",
 								maskImage:
-									"linear-gradient(to right, transparent 0%, black 40%, black 100%)",
+									"linear-gradient(to right, transparent 0%, black 30%, black 100%)",
 								WebkitMaskImage:
-									"linear-gradient(to right, transparent 0%, black 40%, black 100%)",
+									"linear-gradient(to right, transparent 0%, black 30%, black 100%)",
 							}}
 						/>
+					</div>
+
+					<div className="relative z-10 max-w-2xl">
 						<h2 className="font-sans text-2xl text-text-strong-950 leading-tight tracking-tight sm:text-3xl lg:text-[2.1rem] dark:text-white">
 							{variant.headline}
 						</h2>
@@ -113,7 +184,7 @@ export function BlogCta({
 						</p>
 					</div>
 
-					<div className="flex shrink-0 flex-wrap items-center gap-3">
+					<div className="relative z-10 flex shrink-0 flex-wrap items-center gap-3">
 						<CtaLink
 							label="Documentation"
 							href="/docs"
