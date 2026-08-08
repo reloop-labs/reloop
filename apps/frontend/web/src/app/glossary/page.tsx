@@ -1,5 +1,5 @@
 import { JsonLd } from "@reloop/web/components/json-ld";
-import { FeatureCta } from "@reloop/web/components/landing/cta";
+import { BlogCta } from "@reloop/web/components/landing/blog/blog-cta";
 import { glossaryTerms } from "@reloop/web/lib/landing/glossary";
 import {
 	buildGlossaryIndexJsonLd,
@@ -68,19 +68,7 @@ const GlossaryPage = () => {
 				<GlossaryBrowser terms={terms} />
 
 				{/* CTA */}
-				<FeatureCta
-					title="Email infrastructure"
-					titleMuted="for developers"
-					primary={{
-						label: "Start for free",
-						href: "/dashboard/signup",
-					}}
-					secondary={{
-						label: "Documentation",
-						href: "/docs",
-					}}
-					compact
-				/>
+				<BlogCta category="Glossary" />
 			</div>
 		</>
 	);

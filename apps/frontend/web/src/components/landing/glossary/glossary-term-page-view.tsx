@@ -1,5 +1,5 @@
 import { JsonLd } from "@reloop/web/components/json-ld";
-import { FeatureCta } from "@reloop/web/components/landing/cta";
+import { BlogCta } from "@reloop/web/components/landing/blog/blog-cta";
 import type { FeatureCtaBand } from "@reloop/web/components/landing/types";
 import { buildGlossaryTermJsonLd } from "@reloop/web/lib/landing/glossary/seo";
 import type { GlossaryTermDefinition } from "@reloop/web/lib/landing/types";
@@ -295,7 +295,7 @@ export function GlossaryTermPageView({
 			</section>
 
 			{/* CTA */}
-			<FeatureCta {...cta} compact />
+			<BlogCta category="Glossary" />
 		</article>
 	);
 }

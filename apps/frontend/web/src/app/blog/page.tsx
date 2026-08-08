@@ -1,10 +1,10 @@
+import { BlogCta } from "@reloop/web/components/landing/blog/blog-cta";
 import { BlogIndex } from "@reloop/web/components/landing/blog/blog-index";
-import { FeatureCta } from "@reloop/web/components/page-shell";
 import {
 	getCategories,
 	getPublishedPosts,
 } from "@reloop/web/lib/landing/blog/source";
-import { getSiteUrl, hostedSignupHref } from "@reloop/web/lib/site";
+import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 
 export const instant = false;
@@ -40,19 +40,7 @@ export const metadata: Metadata = {
 const BlogPage = () => {
 	return (
 		<BlogIndex posts={getPublishedPosts()} categories={getCategories()}>
-			<FeatureCta
-				title="Email infrastructure"
-				titleMuted="for developers"
-				primary={{
-					label: "Start for free",
-					href: hostedSignupHref,
-				}}
-				secondary={{
-					label: "Documentation",
-					href: "/docs",
-				}}
-				compact
-			/>
+			<BlogCta />
 		</BlogIndex>
 	);
 };

@@ -58,10 +58,30 @@ const CATEGORY_VARIANTS: Record<string, CategoryVariant> = {
 		sub: "Reloop is open source, self-hostable, and priced for builders — compare plans and features before you commit.",
 		primaryLabel: "Get started free",
 	},
+	Glossary: {
+		headline: "Ready to reach the inbox?",
+		sub: "Built-in SPF/DKIM/DMARC setup, IP warming guidance, and real-time deliverability signals.",
+		primaryLabel: "Get started free",
+	},
 };
 
-export function BlogCta({ category }: { category: string }) {
-	const variant = CATEGORY_VARIANTS[category] ?? DEFAULT_VARIANT;
+export function BlogCta({
+	category,
+	headline,
+	sub,
+	primaryLabel,
+}: {
+	category?: string;
+	headline?: string;
+	sub?: string;
+	primaryLabel?: string;
+}) {
+	const categoryVariant = category ? CATEGORY_VARIANTS[category] : undefined;
+	const variant = {
+		headline: headline ?? categoryVariant?.headline ?? DEFAULT_VARIANT.headline,
+		sub: sub ?? categoryVariant?.sub ?? DEFAULT_VARIANT.sub,
+		primaryLabel: primaryLabel ?? categoryVariant?.primaryLabel ?? DEFAULT_VARIANT.primaryLabel,
+	};
 
 	return (
 		<section className="w-full">
