@@ -209,7 +209,7 @@ export function WebhookHeader({
 		);
 	}
 
-	const displayName = webhook?.name || webhook?.url || "Unnamed webhook";
+	const displayUrl = webhook?.url || "Unnamed webhook";
 
 	return (
 		<div>
@@ -226,17 +226,17 @@ export function WebhookHeader({
 					) : (
 						<div className="flex min-w-0 items-center gap-3">
 							<WebhookAvatar
-								seed={webhook?.id || displayName}
+								seed={webhook?.id || displayUrl}
 								size="lg"
 								status={webhook?.status}
-								alt={`${displayName} avatar`}
+								alt={`${displayUrl} avatar`}
 							/>
 							<div className="min-w-0">
 								<p className="font-medium text-paragraph-xs text-text-sub-600">
 									Webhook
 								</p>
-								<h1 className="mb-0.5 truncate font-semibold text-title-h6 leading-5">
-									{displayName}
+								<h1 className="mb-0.5 truncate font-semibold font-mono text-title-h6 leading-5">
+									{displayUrl}
 								</h1>
 							</div>
 						</div>

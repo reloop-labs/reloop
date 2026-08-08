@@ -58,7 +58,7 @@ function statusIcon(status: string): { name: string; className: string } {
 			return { name: "clock", className: "text-warning-base" };
 		case "retrying":
 		case "retried":
-			return { name: "clock", className: "text-warning-base" };
+			return { name: "rotate-cw", className: "text-warning-base" };
 		default:
 			return { name: "circle", className: "text-text-soft-400" };
 	}
@@ -286,7 +286,7 @@ function AttemptNote({ attempt }: { attempt: DeliveryAttempt }) {
 	if (attempt.source === "manual") {
 		return (
 			<span className="inline-flex items-center gap-1 text-[12px] text-text-sub-600">
-				<Icon name="refresh-cw" className="h-3 w-3" />
+				<Icon name="rotate-cw" className="h-3 w-3" />
 				Resent manually
 			</span>
 		);
@@ -294,7 +294,7 @@ function AttemptNote({ attempt }: { attempt: DeliveryAttempt }) {
 	if (attempt.retriedAutomatically) {
 		return (
 			<span className="inline-flex items-center gap-1 text-[12px] text-text-sub-600">
-				<Icon name="refresh-cw" className="h-3 w-3" />
+				<Icon name="rotate-cw" className="h-3 w-3" />
 				Retried automatically
 			</span>
 		);
@@ -336,7 +336,7 @@ function DeliveryAttemptsSection({
 					onClick={() => void onRetry(delivery.id)}
 					className="gap-1.5 rounded-lg"
 				>
-					<Icon name="refresh-cw" className="h-3.5 w-3.5" />
+					<Icon name="rotate-cw" className="h-3.5 w-3.5" />
 					{isRetrying ? "Resending…" : "Resend"}
 				</Button.Root>
 			</div>
@@ -347,7 +347,7 @@ function DeliveryAttemptsSection({
 						<div className="flex min-w-0 items-center gap-2.5">
 							<span className="inline-flex h-6 min-w-10 items-center justify-center rounded-md bg-warning-lighter px-1.5 font-semibold text-[11px] text-warning-base">
 								<span className="inline-flex items-center gap-1">
-									<Icon name="clock" className="h-3 w-3" />
+									<Icon name="rotate-cw" className="h-3 w-3" />
 								</span>
 							</span>
 							<span className="text-[13px] text-text-strong-950">
@@ -391,9 +391,10 @@ function DeliveryAttemptsSection({
 													"bg-bg-weak-50 text-text-sub-600",
 											)}
 										>
-											{badge.color === "orange" &&
-											(attempt.status === "pending" ||
-												attempt.status === "retrying") ? (
+											{attempt.status === "retrying" ? (
+												<Icon name="rotate-cw" className="h-3 w-3" />
+											) : badge.color === "orange" &&
+												attempt.status === "pending" ? (
 												<Icon name="clock" className="h-3 w-3" />
 											) : badge.color === "red" ||
 												attempt.status === "failed" ? (
