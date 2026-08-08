@@ -1,0 +1,90 @@
+---
+title: "Introducing Reloop: High-Performance Open Source Email Infrastructure"
+description: "Today we're excited to introduce Reloop — a high-performance, open-source email platform designed from the ground up for modern developers and AI agents."
+keywords:
+  - introducing reloop
+  - open source email infrastructure
+  - email api for developers
+  - ai agent email inboxes
+  - sendgrid alternative open source
+publishedAt: 2026-08-09
+category: Open Source
+tags: [open-source, announcement, email-infrastructure, ai-agents, release]
+readTime: 6 min read
+author:
+  name: Pranav Patel
+  role: Co-founder
+  avatar: /company/team/pranav-patel.jpg
+draft: false
+image: /blog/images/introducing-reloop.png
+relatedSlugs:
+  - why-we-open-sourced-email-infrastructure
+  - self-hosted-email-infrastructure
+  - email-infrastructure-for-ai-agents
+---
+
+Email is the backbone of modern applications—from account verification and password resets to transactional notifications, billing updates, and marketing campaigns. Yet, for over a decade, developer email infrastructure has been locked behind proprietary, expensive vendor black boxes or fragmented across legacy SMTP tools.
+
+Today, we're introducing **Reloop**: the high-performance, open-source email infrastructure platform built for developers, engineering teams, and autonomous AI agents.
+
+## Why We Built Reloop
+
+Every growing engineering team eventually runs into the same frustrating trade-offs with email providers:
+
+1. **Extractive SaaS Pricing:** As your application grows from 10,000 to 1,000,000 monthly emails, costs skyrocket exponentially. What starts at $20/month quickly turns into thousands per month for basic delivery and logging.
+2. **Vendor Lock-in:** Proprietary APIs make switching providers painful and time-consuming. You are bound to their ecosystem, rate limits, and outages.
+3. **The Rise of Autonomous AI Agents:** Traditional email infrastructure was designed solely for humans. Modern AI agents require programmatic inbound email ingestion, dedicated agent inboxes, webhooks, and structured tool definitions (MCP servers).
+
+Reloop solves this by offering a unified, high-performance platform that you can either deploy on your own infrastructure or run seamlessly on our managed cloud.
+
+## Key Features & Capabilities
+
+Reloop brings together everything you need to send, receive, and analyze emails at scale:
+
+### 1. Developer-First REST API & Resend Parity
+Reloop provides a modern, clean REST API that mirrors intuitive developer standards. Upgrading or migrating from existing APIs requires minimal code changes.
+
+```typescript
+import { Reloop } from '@reloop/sdk';
+
+const reloop = new Reloop({ apiKey: process.env.RELOOP_API_KEY });
+
+await reloop.emails.send({
+  from: 'hello@yourdomain.com',
+  to: 'user@example.com',
+  subject: 'Welcome to Reloop!',
+  html: '<p>Your open-source email journey begins here.</p>',
+});
+```
+
+### 2. Built for AI Agents & Autonomous Workflows
+Reloop is built from day one for the agentic web. We provide:
+- **Agent Inboxes:** Receive and parse inbound emails asynchronously with structured webhooks.
+- **Model Context Protocol (MCP) Support:** Connect LLMs directly to Reloop to allow agents to send emails, manage drafts, and inspect delivery logs safely.
+- **Agent Discovery (llms.txt):** Machine-readable documentation and endpoints for AI coding assistants.
+
+### 3. Open Source & Self-Hostable
+We believe foundational developer infrastructure should be open source. With Reloop:
+- **Deploy Anywhere:** Run on Fly.io, Coolify, Docker, or Kubernetes with zero vendor lock-in.
+- **Complete Data Ownership:** Keep user emails, logs, and analytics under your control and compliance boundary.
+- **Transparent Delivery Engine:** Powered by high-speed queues and robust bounce-classification engines.
+
+### 4. Real-Time Analytics & Webhook Engine
+Gain instant visibility into your email performance with live events for deliveries, opens, link clicks, bounces, and spam complaints—delivered to your endpoints via signed webhooks.
+
+## Hosted vs. Self-Hosted: You Choose
+
+Whether you want zero-config serverless delivery or full sovereignty over your infrastructure, Reloop supports both:
+
+- **Reloop Cloud:** Production-ready managed infrastructure with high-reputation IP pools, automatic DKIM/SPF warming, and SLA guarantees.
+- **Reloop Open Source:** Deploy the entire Reloop stack on your own servers with a single `docker compose up` command.
+
+## Get Started Today
+
+We are building Reloop in public with an open community roadmap.
+
+- **GitHub Repository:** Star us on [GitHub](https://github.com/reloop-labs/reloop) and contribute to the core repo.
+- **Sign Up:** Create your account on [Reloop Cloud](https://reloop.sh/dashboard/signup) to send your first email in under 2 minutes.
+- **Documentation:** Explore our full guide at [reloop.sh/docs](https://reloop.sh/docs/introduction).
+
+Welcome to the future of open-source email infrastructure!

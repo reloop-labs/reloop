@@ -125,35 +125,39 @@ export function BlogPostPageView({
 
 	return (
 		<div className="min-h-dvh bg-white dark:bg-black">
-			{/* Main Article Container */}
-			<div className="mx-auto w-full max-w-5xl border-stroke-soft-200 border-x px-4 pt-32 sm:px-6 md:max-w-7xl lg:px-8 dark:border-white/10">
-				{/* Top Header Section */}
-				<header className="-mx-4 sm:-mx-6 lg:-mx-8 border-stroke-soft-200 border-b px-4 pb-14 text-left sm:px-6 lg:px-8 dark:border-white/10">
-					<div className="flex w-full max-w-[680px] flex-col gap-4">
-						<div className="flex flex-wrap items-center gap-2 font-medium font-mono text-xs/[150%] uppercase tracking-[0.6px]">
-							<Link
-								href={getCategoryPath(post.category)}
-								className="text-primary-base transition-opacity hover:opacity-80"
-							>
-								{post.category}
-							</Link>
-							<span className="text-text-soft-400 dark:text-white/30">/</span>
-							<time
-								dateTime={post.publishedAt}
-								className="text-text-sub-600 dark:text-white/60"
-							>
-								{formatBlogDateUpper(post.publishedAt)}
-							</time>
+			{/* Top Header Section with Full-Width Horizontal Border */}
+			<div className="w-full border-stroke-soft-200 border-b dark:border-white/10">
+				<div className="mx-auto w-full max-w-5xl border-stroke-soft-200 border-x px-4 pt-32 pb-14 sm:px-6 md:max-w-7xl lg:px-8 dark:border-white/10">
+					<header className="text-left">
+						<div className="flex w-full max-w-[680px] flex-col gap-4">
+							<div className="flex flex-wrap items-center gap-2 font-medium font-mono text-xs/[150%] uppercase tracking-[0.6px]">
+								<Link
+									href={getCategoryPath(post.category)}
+									className="text-primary-base transition-opacity hover:opacity-80"
+								>
+									{post.category}
+								</Link>
+								<span className="text-text-soft-400 dark:text-white/30">/</span>
+								<time
+									dateTime={post.publishedAt}
+									className="text-text-sub-600 dark:text-white/60"
+								>
+									{formatBlogDateUpper(post.publishedAt)}
+								</time>
+							</div>
+							<h1 className="font-semibold text-3xl text-text-strong-950 leading-[110%] tracking-[-0.8px] sm:text-[40px] dark:text-white">
+								{post.title}
+							</h1>
+							<p className="font-medium font-mono text-text-sub-600 text-xs/[150%] uppercase tracking-[0.6px] dark:text-white/60">
+								{formatReadTimeUpper(post.readTime)}
+							</p>
 						</div>
-						<h1 className="font-semibold text-3xl text-text-strong-950 leading-[110%] tracking-[-0.8px] sm:text-[40px] dark:text-white">
-							{post.title}
-						</h1>
-						<p className="font-medium font-mono text-text-sub-600 text-xs/[150%] uppercase tracking-[0.6px] dark:text-white/60">
-							{formatReadTimeUpper(post.readTime)}
-						</p>
-					</div>
-				</header>
+					</header>
+				</div>
+			</div>
 
+			{/* Main Article Container */}
+			<div className="mx-auto w-full max-w-5xl border-stroke-soft-200 border-x px-4 sm:px-6 md:max-w-7xl lg:px-8 dark:border-white/10">
 				{/* 3-Column Content Grid */}
 				<div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-0">
 					{/* Left Column: Table of Contents */}
