@@ -128,7 +128,7 @@ export function BlogPostPageView({
 			{/* Main Article Container */}
 			<div className="mx-auto w-full max-w-5xl border-stroke-soft-200 border-x px-4 pt-32 sm:px-6 md:max-w-7xl lg:px-8 dark:border-white/10">
 				{/* Top Header Section */}
-				<header className="-mx-4 sm:-mx-6 lg:-mx-8 border-stroke-soft-200 border-b px-4 pb-10 text-left sm:px-6 lg:px-8 dark:border-white/10">
+				<header className="-mx-4 sm:-mx-6 lg:-mx-8 border-stroke-soft-200 border-b px-4 pb-14 text-left sm:px-6 lg:px-8 dark:border-white/10">
 					<div className="flex w-full max-w-[680px] flex-col gap-4">
 						<div className="flex flex-wrap items-center gap-2 font-medium font-mono text-xs/[150%] uppercase tracking-[0.6px]">
 							<Link
