@@ -195,7 +195,7 @@ export const Footer = () => {
 						<div className="flex shrink-0 flex-col">
 							<Link
 								href="/"
-								className="-ml-2 inline-flex shrink-0 items-center gap-[11px]"
+								className="-ml-[11px] inline-flex shrink-0 items-center gap-2.5"
 								aria-label="Reloop home"
 							>
 								<Logo className="size-11 text-text-strong-950 dark:text-white" />
