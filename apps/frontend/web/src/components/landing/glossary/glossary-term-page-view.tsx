@@ -1,4 +1,5 @@
 import { JsonLd } from "@reloop/web/components/json-ld";
+import { FeatureCta } from "@reloop/web/components/landing/cta";
 import type { FeatureCtaBand } from "@reloop/web/components/landing/types";
 import { buildGlossaryTermJsonLd } from "@reloop/web/lib/landing/glossary/seo";
 import type { GlossaryTermDefinition } from "@reloop/web/lib/landing/types";
@@ -100,7 +101,7 @@ export function GlossaryTermPageView({
 						<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em] dark:text-white/55">
 							Definition
 						</p>
-						<h1 className="mt-2 font-serif text-[2.2rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[2.8rem] lg:text-[3.2rem] dark:text-white">
+						<h1 className="mt-2 font-sans font-semibold text-[2.2rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[2.8rem] lg:text-[3.2rem] dark:text-white">
 							{term.title}
 						</h1>
 						<p
@@ -219,7 +220,7 @@ export function GlossaryTermPageView({
 						<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em] dark:text-white/55">
 							Related
 						</p>
-						<h2 className="mt-2 font-serif text-[1.75rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[2.2rem] dark:text-white">
+						<h2 className="mt-2 font-sans font-semibold text-[1.75rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[2.2rem] dark:text-white">
 							Nearby terms
 						</h2>
 						<p className="mx-auto mt-3 max-w-md text-[15px] text-text-sub-600 leading-relaxed dark:text-white/55">
@@ -294,40 +295,7 @@ export function GlossaryTermPageView({
 			</section>
 
 			{/* CTA */}
-			<section id="cta" className={rail}>
-				<div className="border-stroke-soft-200 border-t px-4 py-14 sm:px-6 sm:py-16 lg:px-8 dark:border-white/10">
-					<div className="mx-auto max-w-[920px] text-center">
-						<h2 className="font-serif text-[2.2rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[2.8rem] lg:text-[3.2rem] dark:text-white">
-							{cta.title}
-							{cta.titleMuted && (
-								<>
-									<br />
-									<span className="text-primary-base">{cta.titleMuted}</span>
-								</>
-							)}
-						</h2>
-						<p className="mx-auto mt-5 max-w-[550px] font-medium text-[15px] text-text-sub-600 leading-7 sm:text-[16px] dark:text-white/60">
-							{cta.description}
-						</p>
-						<div className="mt-8 flex flex-wrap items-center justify-center gap-4">
-							<FeatureLink
-								href={cta.primary.href}
-								className="inline-flex h-12 items-center justify-center rounded-full bg-[#0a0d12] px-8 font-semibold text-[15px] text-white transition-colors hover:bg-[#0a0d12]/90 dark:bg-white dark:text-black dark:hover:bg-white/90"
-							>
-								{cta.primary.label}
-							</FeatureLink>
-							{cta.secondary && (
-								<FeatureLink
-									href={cta.secondary.href}
-									className="inline-flex h-12 items-center justify-center rounded-full border border-[#0a0d12]/10 px-8 font-semibold text-[#0a0d12] text-[15px] transition-colors hover:bg-[#0a0d12]/10 dark:border-white/10 dark:text-white dark:hover:bg-white/10"
-								>
-									{cta.secondary.label}
-								</FeatureLink>
-							)}
-						</div>
-					</div>
-				</div>
-			</section>
+			<FeatureCta {...cta} />
 		</article>
 	);
 }

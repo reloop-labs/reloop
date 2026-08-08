@@ -1,4 +1,5 @@
 import { JsonLd } from "@reloop/web/components/json-ld";
+import { FeatureCta } from "@reloop/web/components/landing/cta";
 import { glossaryTerms } from "@reloop/web/lib/landing/glossary";
 import {
 	buildGlossaryIndexJsonLd,
@@ -52,7 +53,7 @@ const GlossaryPage = () => {
 							<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em] dark:text-white/55">
 								Email glossary
 							</p>
-							<h1 className="mt-3 font-serif text-[2.4rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[3.6rem] dark:text-white">
+							<h1 className="mt-3 font-sans font-semibold text-[2.4rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[3.6rem] dark:text-white">
 								Email terms, explained.
 							</h1>
 							<p className="mx-auto mt-3 max-w-2xl text-balance text-[15px] text-text-sub-600 leading-relaxed sm:text-[17px] dark:text-white/50">
@@ -67,38 +68,19 @@ const GlossaryPage = () => {
 				<GlossaryBrowser terms={terms} />
 
 				{/* CTA */}
-				<section
-					id="cta"
-					className="mx-auto w-full max-w-7xl border-stroke-soft-200 border-x dark:border-white/10"
-				>
-					<div className="px-4 py-14 sm:px-6 sm:py-16 lg:px-8">
-						<div className="mx-auto max-w-[920px] text-center">
-							<h2 className="font-serif text-[2.6rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[3.4rem] lg:text-[4.2rem] dark:text-white">
-								Done reading?
-								<br />
-								<span className="text-primary-base">Send for free.</span>
-							</h2>
-							<p className="mx-auto mt-6 max-w-[550px] font-medium text-[15px] text-text-sub-600 leading-7 sm:text-[17px] dark:text-white/60">
-								3,000 emails a month on the Free plan, no credit card. Or read
-								the docs and run Reloop on your own servers.
-							</p>
-							<div className="mt-8 flex flex-wrap items-center justify-center gap-4">
-								<a
-									href="/dashboard/signup"
-									className="inline-flex h-12 items-center justify-center rounded-full bg-[#0a0d12] px-8 font-semibold text-[15px] text-white transition-colors hover:bg-[#0a0d12]/90 dark:bg-white dark:text-black dark:hover:bg-white/90"
-								>
-									Get started free
-								</a>
-								<a
-									href="/docs"
-									className="inline-flex h-12 items-center justify-center gap-2.5 rounded-full border border-[#0a0d12]/10 px-8 font-semibold text-[#0a0d12] text-[15px] transition-colors hover:bg-[#0a0d12]/10 dark:border-white/10 dark:text-white dark:hover:bg-white/10"
-								>
-									Read documentation
-								</a>
-							</div>
-						</div>
-					</div>
-				</section>
+				<FeatureCta
+					title="Email infrastructure"
+					titleMuted="for developers"
+					primary={{
+						label: "Start for free",
+						href: "/dashboard/signup",
+					}}
+					secondary={{
+						label: "Documentation",
+						href: "/docs",
+					}}
+					compact
+				/>
 			</div>
 		</>
 	);

@@ -1,5 +1,6 @@
 "use client";
 
+import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import Link from "next/link";
 import type { FeatureCtaBand } from "./types";
@@ -14,31 +15,34 @@ export function FeatureCta({
 	return (
 		<section id="cta" className="w-full">
 			<div className="relative overflow-hidden border-stroke-soft-200 border-t bg-bg-white-0 dark:border-white/10 dark:bg-black">
-				<div className="relative z-10 mx-auto flex w-full max-w-5xl flex-col gap-6 border-stroke-soft-200 border-x px-4 py-10 sm:px-6 sm:py-14 md:max-w-7xl lg:flex-row lg:items-center lg:justify-between lg:px-8 dark:border-white/10">
-					<div className="max-w-2xl">
-						<div
-							aria-hidden
-							className="pointer-events-none absolute inset-0 z-0 text-text-strong-950/[0.03] dark:text-white/[0.04]"
-							style={{
-								backgroundImage:
-									"repeating-linear-gradient(-45deg, transparent 0, transparent 6px, currentColor 6px, currentColor 7px)",
-							}}
-						/>
-						<h2 className="font-semibold text-2xl text-text-strong-950 leading-tight tracking-tight sm:text-3xl lg:text-[2.1rem] dark:text-white">
+				<div className="relative z-10 mx-auto flex w-full max-w-5xl flex-col items-center justify-center gap-7 border-stroke-soft-200 border-x px-4 py-12 sm:px-6 sm:py-16 md:max-w-7xl lg:px-8 dark:border-white/10">
+					<div
+						aria-hidden
+						className="pointer-events-none absolute inset-0 z-0 text-text-strong-950/[0.03] dark:text-white/[0.04]"
+						style={{
+							backgroundImage:
+								"repeating-linear-gradient(-45deg, transparent 0, transparent 3.5px, currentColor 3.5px, currentColor 4.5px)",
+						}}
+					/>
+					<div className="mx-auto flex max-w-3xl flex-col items-center text-center">
+						<h2 className="font-semibold text-2xl text-text-strong-950 leading-tight tracking-tight sm:text-4xl lg:text-5xl dark:text-white">
 							{title}
 							{titleMuted && (
-								<span className="ml-2.5 text-primary-base">{titleMuted}</span>
+								<>
+									<br />
+									<span className="text-primary-base">{titleMuted}</span>
+								</>
 							)}
 						</h2>
 						{description && (
-							<p className="mt-2 text-[15px] text-text-sub-600 leading-relaxed dark:text-white/60">
+							<p className="mt-3 max-w-xl text-[15px] text-text-sub-600 leading-relaxed dark:text-white/60">
 								{description}
 							</p>
 						)}
 					</div>
 
-					<div className="flex shrink-0 flex-wrap items-center gap-3">
-						{secondary && <CtaLink {...secondary} filled={false} />}
+					<div className="flex flex-wrap items-center justify-center gap-3">
+						{secondary && <CtaLink {...secondary} filled={false} isSecondery />}
 						<CtaLink {...primary} filled />
 					</div>
 				</div>
@@ -52,11 +56,13 @@ export function CtaLink({
 	href,
 	external,
 	filled = true,
+	isSecondery,
 }: {
 	label: string;
 	href: string;
 	external?: boolean;
 	filled?: boolean;
+	isSecondery?: boolean;
 }) {
 	const isCrossDomain =
 		href.startsWith("/docs") || href.startsWith("/dashboard");
@@ -69,7 +75,7 @@ export function CtaLink({
 				asChild
 				variant={variant}
 				size="medium"
-				className="rounded-full! px-10!"
+				className={cn("rounded-full!", !isSecondery && "px-10!")}
 			>
 				<a
 					href={href}

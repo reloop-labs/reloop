@@ -173,7 +173,7 @@ export function GlossaryBrowser({
 			</nav>
 
 			{/* Results  -  rails max-w-7xl; list max-w-4xl */}
-			<div className="mx-auto w-full max-w-7xl border-stroke-soft-200 border-x border-b bg-bg-weak-50/80 dark:border-white/10 dark:bg-white/[0.02]">
+			<div className="mx-auto w-full max-w-7xl border-stroke-soft-200 border-x bg-bg-weak-50/80 dark:border-white/10 dark:bg-white/[0.02]">
 				{groups.length === 0 ? (
 					<p className="mx-auto max-w-4xl px-4 py-16 text-center text-[15px] text-text-sub-600 sm:px-6 dark:text-white/50">
 						Nothing matched &ldquo;{query.trim()}&rdquo;.

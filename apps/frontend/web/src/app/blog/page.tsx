@@ -41,7 +41,8 @@ const BlogPage = () => {
 	return (
 		<BlogIndex posts={getPublishedPosts()} categories={getCategories()}>
 			<FeatureCta
-				title="Email infrastructure for developers"
+				title="Email infrastructure"
+				titleMuted="For Developers"
 				primary={{
 					label: "Start for free",
 					href: hostedSignupHref,
