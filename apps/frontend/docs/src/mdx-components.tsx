@@ -1,6 +1,7 @@
 import { DocsHome } from "@reloop/fe-docs/components/docs/docs-home";
 import { APIPage } from "@reloop/fe-docs/components/mdx/APIPage";
 import { CardGroup } from "@reloop/fe-docs/components/mdx/CardGroup";
+import { HelpFooterLinks } from "@reloop/fe-docs/components/mdx/HelpFooterLinks";
 import {
 	DocImage,
 	MDXImage,
@@ -23,6 +24,10 @@ import {
 	Warning,
 } from "@reloop/fe-docs/components/mdx/mintlify-client";
 import { PromptActions } from "@reloop/fe-docs/components/mdx/PromptActions";
+import {
+	RelatedTopic,
+	RelatedTopics,
+} from "@reloop/fe-docs/components/mdx/RelatedTopics";
 import { Side, SideBySide } from "@reloop/fe-docs/components/mdx/SideBySide";
 import { SimpleIcon } from "@reloop/fe-docs/components/mdx/SimpleIcon";
 import { ApiKeyCodeSamples } from "@reloop/fe-docs/lib/api-key-code-samples";
