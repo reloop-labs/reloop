@@ -15,7 +15,7 @@ export function FeatureCta({
 	return (
 		<section id="cta" className="w-full">
 			<div className="relative overflow-hidden border-stroke-soft-200 border-t bg-bg-white-0 dark:border-white/10 dark:bg-black">
-				<div className="relative z-10 mx-auto flex w-full max-w-5xl flex-col items-center justify-center gap-7 border-stroke-soft-200 border-x px-4 py-12 sm:px-6 sm:py-16 md:max-w-7xl lg:px-8 dark:border-white/10">
+				<div className="relative z-10 mx-auto flex w-full max-w-5xl flex-col items-center justify-center gap-10 border-stroke-soft-200 border-x px-4 py-12 sm:px-6 md:max-w-7xl lg:px-8 dark:border-white/10">
 					<div
 						aria-hidden
 						className="pointer-events-none absolute inset-0 z-0 text-text-strong-950/[0.03] dark:text-white/[0.04]"
@@ -25,7 +25,7 @@ export function FeatureCta({
 						}}
 					/>
 					<div className="mx-auto flex max-w-3xl flex-col items-center text-center">
-						<h2 className="font-semibold text-2xl text-text-strong-950 leading-tight tracking-tight sm:text-4xl lg:text-5xl dark:text-white">
+						<h2 className="font-semibold text-2xl text-text-strong-950 tracking-tight sm:text-4xl lg:text-5xl dark:text-white">
 							{title}
 							{titleMuted && (
 								<>
