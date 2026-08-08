@@ -57,17 +57,19 @@ export function CtaLink({
 	external,
 	filled = true,
 	isSecondery,
+	variant: variantProp,
 }: {
 	label: string;
 	href: string;
 	external?: boolean;
 	filled?: boolean;
 	isSecondery?: boolean;
+	variant?: "neutral" | "primary" | "basic";
 }) {
 	const isCrossDomain =
 		href.startsWith("/docs") || href.startsWith("/dashboard");
 
-	const variant = filled ? "neutral" : "basic";
+	const variant = filled ? (variantProp ?? "primary") : "basic";
 
 	if (external || isCrossDomain) {
 		return (

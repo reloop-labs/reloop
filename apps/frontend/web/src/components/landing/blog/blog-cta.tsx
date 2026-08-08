@@ -64,8 +64,8 @@ export function BlogCta({ category }: { category: string }) {
 	const variant = CATEGORY_VARIANTS[category] ?? DEFAULT_VARIANT;
 
 	return (
-		<section className="mt-12 w-full">
-			<div className="relative overflow-hidden border-stroke-soft-200 border-y bg-bg-white-0 dark:border-white/10 dark:bg-black">
+		<section className="w-full">
+			<div className="relative overflow-hidden border-stroke-soft-200 border-t bg-bg-white-0 dark:border-white/10 dark:bg-black">
 				{/* Diagonal hatch line graphic using primary color */}
 
 				<div className="relative z-10 mx-auto flex w-full max-w-5xl flex-col gap-6 border-stroke-soft-200 border-x px-4 py-10 sm:px-6 sm:py-12 md:max-w-7xl lg:flex-row lg:items-center lg:justify-between lg:px-8 dark:border-white/10">
@@ -101,6 +101,7 @@ export function BlogCta({ category }: { category: string }) {
 							label={variant.primaryLabel}
 							href="/dashboard/signup"
 							filled
+							variant="neutral"
 						/>
 					</div>
 				</div>
