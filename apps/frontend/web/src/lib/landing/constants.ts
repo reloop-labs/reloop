@@ -1,23 +1,22 @@
 import type { FeatureCtaBand } from "@reloop/web/components/landing/types";
 
 const defaultSignupCta = {
-	label: "Get started free",
+	label: "Start for free",
 	href: "/dashboard/signup",
 } as const;
 
 const defaultDocsCta = {
-	label: "Read documentation",
+	label: "Documentation",
 	href: "/docs",
 } as const;
 
 export function defaultLandingCta(
-	title: string,
-	description: string,
+	_title?: string,
+	_description?: string,
 ): FeatureCtaBand {
 	return {
-		title,
-		titleMuted: "Start free today.",
-		description,
+		title: "Email infrastructure",
+		titleMuted: "for developers",
 		primary: defaultSignupCta,
 		secondary: defaultDocsCta,
 	};

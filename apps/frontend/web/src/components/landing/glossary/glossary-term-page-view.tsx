@@ -295,7 +295,7 @@ export function GlossaryTermPageView({
 			</section>
 
 			{/* CTA */}
-			<FeatureCta {...cta} />
+			<FeatureCta {...cta} compact />
 		</article>
 	);
 }
