@@ -82,7 +82,7 @@ export function BlogCta({ category }: { category: string }) {
 
 				<div className="relative z-10 mx-auto flex w-full max-w-5xl flex-col gap-6 border-stroke-soft-200 border-x px-4 py-10 sm:px-6 sm:py-12 md:max-w-7xl lg:flex-row lg:items-center lg:justify-between lg:px-8 dark:border-white/10">
 					<div className="max-w-2xl">
-						<h2 className="font-serif text-2xl text-text-strong-950 leading-tight tracking-tight sm:text-3xl lg:text-[2.1rem] dark:text-white">
+						<h2 className="font-sans text-2xl text-text-strong-950 leading-tight tracking-tight sm:text-3xl lg:text-[2.1rem] dark:text-white">
 							{variant.headline}
 						</h2>
 						<p className="mt-2 text-[15px] text-text-sub-600 leading-relaxed dark:text-white/60">

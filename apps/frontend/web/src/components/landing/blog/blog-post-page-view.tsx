@@ -110,7 +110,7 @@ export function BlogPostPageView({
 	return (
 		<div className="min-h-dvh bg-white dark:bg-black">
 			{/* Main Article Container */}
-			<div className="mx-auto w-full max-w-6xl border-stroke-soft-200 border-x px-4 sm:px-6 md:px-8 lg:px-10 pt-28 pb-16 dark:border-white/10">
+			<div className="mx-auto w-full max-w-5xl border-stroke-soft-200 border-x px-4 sm:px-6 md:max-w-7xl lg:px-8 pt-32 pb-16 dark:border-white/10">
 				{/* Top Header Section */}
 				<header className="mb-12 text-left border-b border-stroke-soft-200 dark:border-white/10 pb-10">
 					{/* Top Navigation Back Button */}

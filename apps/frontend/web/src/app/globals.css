@@ -1,7 +1,13 @@
 @import "@reloop/tailwind/style.css";
 
+@theme {
+	--font-serif: var(--font-inter), sans-serif;
+	--font-sans: var(--font-inter), sans-serif;
+}
+
 :root {
-	--font-sans: var(--font-open-runde);
+	--font-sans: var(--font-inter), sans-serif;
+	--font-serif: var(--font-inter), sans-serif;
 }
 
 @custom-variant dark (&:where(.dark, .dark *));

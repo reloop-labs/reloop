@@ -57,7 +57,7 @@ export function BlogIndex({
 			{/* Header & Filter Section */}
 			<div className="mx-auto w-full max-w-5xl border-stroke-soft-200 border-x px-4 pt-32 pb-0 sm:px-6 md:max-w-7xl lg:px-8 dark:border-white/10">
 				{breadcrumb}
-				<h1 className="font-serif text-[2.8rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[3.6rem] lg:text-[4.2rem] dark:text-white">
+				<h1 className="font-sans text-[2.8rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[3.6rem] lg:text-[4.2rem] dark:text-white">
 					{title}
 				</h1>
 				{description ? (

@@ -12,37 +12,16 @@ import {
 	siteName,
 } from "@reloop/web/lib/site";
 import { ThemeProvider } from "@reloop/web/providers/theme-provider";
-import localFont from "next/font/local";
+import { Inter } from "next/font/google";
 import Script from "next/script";
 
 // TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
 // See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
 export const instant = false;
 
-const openRunde = localFont({
-	src: [
-		{
-			path: "../../public/font/openRunde/OpenRunde-Regular.woff2",
-			weight: "400",
-			style: "normal",
-		},
-		{
-			path: "../../public/font/openRunde/OpenRunde-Medium.woff2",
-			weight: "500",
-			style: "normal",
-		},
-		{
-			path: "../../public/font/openRunde/OpenRunde-Semibold.woff2",
-			weight: "600",
-			style: "normal",
-		},
-		{
-			path: "../../public/font/openRunde/OpenRunde-Bold.woff2",
-			weight: "700",
-			style: "normal",
-		},
-	],
-	variable: "--font-open-runde",
+const inter = Inter({
+	subsets: ["latin"],
+	variable: "--font-inter",
 	display: "swap",
 });
 
@@ -86,7 +65,7 @@ export default function RootLayout({
 		<html
 			lang="en"
 			suppressHydrationWarning
-			className={`${openRunde.variable} overscroll-y-none scroll-auto`}
+			className={`${inter.variable} overscroll-y-none scroll-auto`}
 		>
 			<head>
 				<Script
@@ -96,7 +75,7 @@ export default function RootLayout({
 			</head>
 			<body
 				className="min-h-full overscroll-y-none bg-bg-white-0 antialiased"
-				style={{ fontFamily: "var(--font-open-runde)" }}
+				style={{ fontFamily: "var(--font-inter), sans-serif" }}
 			>
 				<ThemeProvider
 					attribute="class"
