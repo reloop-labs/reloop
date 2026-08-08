@@ -32,7 +32,7 @@ export function BlogPostFeaturedCard({ post }: { post: BlogPostDefinition }) {
 						</span>
 					</div>
 
-					<h1 className="mt-4 font-bold font-sans text-3xl text-text-strong-950 leading-[1.1] tracking-tight sm:text-4xl lg:text-[2.6rem] dark:text-white">
+					<h1 className="mt-4 font-medium font-sans text-3xl text-text-strong-950 leading-[1.1] tracking-tight sm:text-4xl lg:text-[2.6rem] dark:text-white">
 						{post.title}
 					</h1>
 
