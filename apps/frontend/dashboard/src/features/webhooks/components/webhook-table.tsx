@@ -142,8 +142,12 @@ function buildPaths(data: number[], yFor: (v: number) => number) {
 		.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x.toFixed(2)} ${p.y.toFixed(2)}`)
 		.join(" ");
 	const bottom = HEIGHT - PADDING;
+	const firstPt = points[0];
 	const lastPt = points[points.length - 1];
-	const areaPath = `${linePath} L ${lastPt.x.toFixed(2)} ${bottom.toFixed(2)} L ${points[0].x.toFixed(2)} ${bottom.toFixed(2)} Z`;
+	if (!firstPt || !lastPt) {
+		return { linePath: "", areaPath: "" };
+	}
+	const areaPath = `${linePath} L ${lastPt.x.toFixed(2)} ${bottom.toFixed(2)} L ${firstPt.x.toFixed(2)} ${bottom.toFixed(2)} Z`;
 	return { linePath, areaPath };
 }
 
