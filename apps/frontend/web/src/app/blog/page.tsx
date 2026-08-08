@@ -4,7 +4,11 @@ import {
 	getCategories,
 	getPublishedPosts,
 } from "@reloop/web/lib/landing/blog/source";
-import { getSiteUrl, socialProfiles } from "@reloop/web/lib/site";
+import {
+	getSiteUrl,
+	hostedSignupHref,
+	socialProfiles,
+} from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 
 export const instant = false;
@@ -42,15 +46,14 @@ const BlogPage = () => {
 		<BlogIndex posts={getPublishedPosts()} categories={getCategories()}>
 			<FeatureCta
 				title="Stay in the loop"
-				titleMuted="Star us on GitHub."
+				titleMuted="Sign up or star us on GitHub."
 				primary={{
-					label: "Star on GitHub",
-					href: socialProfiles.github,
-					external: true,
+					label: "Sign up",
+					href: hostedSignupHref,
 				}}
 				secondary={{
-					label: "Join Discord",
-					href: socialProfiles.discord,
+					label: "Star on GitHub",
+					href: socialProfiles.github,
 					external: true,
 				}}
 				compact
