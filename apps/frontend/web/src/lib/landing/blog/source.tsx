@@ -9,6 +9,7 @@ import { MDXRemote } from "next-mdx-remote/rsc";
 import remarkGfm from "remark-gfm";
 import type {
 	BlogCategoryDefinition,
+	BlogPostAuthor,
 	BlogPostDefinition,
 	BlogTocItem,
 } from "../types";
@@ -113,11 +114,39 @@ function extractToc(content: string): BlogTocItem[] {
 	return toc;
 }
 
+const DEFAULT_AUTHOR: BlogPostAuthor = {
+	name: "Pranav Patel",
+	role: "Co-founder",
+	avatar: "/company/team/pranav-patel.jpg",
+};
+
+function parseAuthor(raw: unknown): BlogPostAuthor {
+	if (!raw) return DEFAULT_AUTHOR;
+
+	if (typeof raw === "string") {
+		return {
+			name: raw,
+			role: "Engineering",
+		};
+	}
+
+	if (typeof raw === "object" && raw !== null) {
+		const obj = raw as Record<string, unknown>;
+		return {
+			name: (obj.name as string) || DEFAULT_AUTHOR.name,
+			role: (obj.role as string) || DEFAULT_AUTHOR.role,
+			avatar: (obj.avatar as string) || DEFAULT_AUTHOR.avatar,
+		};
+	}
+
+	return DEFAULT_AUTHOR;
+}
+
 function parseFrontmatter(
 	slug: string,
 	data: Record<string, unknown>,
 ): BlogPostDefinition {
-	const author = data.author as BlogPostDefinition["author"] | undefined;
+	const author = parseAuthor(data.author);
 
 	return {
 		slug,
@@ -129,7 +158,7 @@ function parseFrontmatter(
 		category: (data.category as string) || "Guides",
 		tags: (data.tags as string[]) || [],
 		readTime: (data.readTime as string) || "5 min read",
-		author: author ?? { name: "Reloop Labs" },
+		author,
 		image: (data.image as string) || undefined,
 		draft: data.draft === true,
 		relatedSlugs: (data.relatedSlugs as string[]) || [],

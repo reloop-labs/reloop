@@ -139,7 +139,7 @@ export function BlogPostPageView({
 							</time>
 							<span className="text-text-soft-400 dark:text-white/30">/</span>
 							<span className="text-text-sub-600 dark:text-white/60">
-								BY {post.author.name}
+								BY {post.author.name.toUpperCase()}
 							</span>
 						</div>
 						<h1 className="font-semibold text-3xl text-text-strong-950 leading-[110%] tracking-[-0.8px] sm:text-[40px] dark:text-white">
@@ -207,15 +207,11 @@ export function BlogPostPageView({
 											alt={post.author.name}
 											width={40}
 											height={40}
-											className="size-10 shrink-0 rounded-full object-cover"
+											className="size-10 shrink-0 rounded-full border border-stroke-soft-200 object-cover dark:border-white/10"
 										/>
 									) : (
 										<div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-neutral-900 font-medium text-sm text-white dark:bg-white/10 dark:text-white">
-											{post.author.name === "Reloop Labs" ? (
-												<Icon name="reloop" className="size-5 text-white" />
-											) : (
-												post.author.name.charAt(0)
-											)}
+											{post.author.name.charAt(0)}
 										</div>
 									)}
 									<div>
