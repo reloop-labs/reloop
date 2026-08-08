@@ -65,7 +65,7 @@ export function BlogCta({ category }: { category: string }) {
 
 	return (
 		<section className="w-full mt-12">
-			<div className="relative overflow-hidden border-stroke-soft-200 border-y bg-bg-white-0 px-6 py-10 sm:px-10 sm:py-12 dark:border-white/10 dark:bg-black">
+			<div className="relative overflow-hidden border-stroke-soft-200 border-y bg-bg-white-0 dark:border-white/10 dark:bg-black">
 				{/* Diagonal hatch line graphic using primary color */}
 				<div
 					aria-hidden
@@ -80,7 +80,7 @@ export function BlogCta({ category }: { category: string }) {
 					}}
 				/>
 
-				<div className="relative z-10 mx-auto flex w-full max-w-5xl flex-col gap-6 lg:flex-row lg:items-center lg:justify-between md:max-w-7xl">
+				<div className="relative z-10 mx-auto flex w-full max-w-5xl flex-col gap-6 border-stroke-soft-200 border-x px-4 py-10 sm:px-6 sm:py-12 md:max-w-7xl lg:flex-row lg:items-center lg:justify-between lg:px-8 dark:border-white/10">
 					<div className="max-w-2xl">
 						<h2 className="font-serif text-2xl text-text-strong-950 leading-tight tracking-tight sm:text-3xl lg:text-[2.1rem] dark:text-white">
 							{variant.headline}
