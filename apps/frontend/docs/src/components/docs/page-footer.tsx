@@ -1,13 +1,12 @@
 "use client";
 
+import { HelpFooterLinks } from "@reloop/fe-docs/components/mdx/HelpFooterLinks";
 import type { PageNode } from "@reloop/fe-docs/lib/types";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { ChevronLeft, ChevronRight, ThumbsDown, ThumbsUp } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
-
-import { HelpFooterLinks } from "@reloop/fe-docs/components/mdx/HelpFooterLinks";
 
 interface PageFooterProps {
 	previous?: PageNode;
@@ -19,7 +18,7 @@ export function PageFooter({ previous, next, editUrl }: PageFooterProps) {
 	const [feedback, setFeedback] = useState<"yes" | "no" | null>(null);
 
 	return (
-		<section className="mt-6 space-y-12">
+		<section className="mt-6 space-y-6">
 			{/* Feedback & Edit Section */}
 			<div className="flex flex-col gap-4 pt-6 sm:flex-row sm:items-center sm:justify-between">
 				<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
