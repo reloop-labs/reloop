@@ -89,7 +89,7 @@ export function RelatedTopic({ title, href, icon }: RelatedTopicProps) {
 }
 
 export function RelatedTopics({
-	title = "Related topics",
+	title = "See also",
 	children,
 	items,
 }: RelatedTopicsProps) {

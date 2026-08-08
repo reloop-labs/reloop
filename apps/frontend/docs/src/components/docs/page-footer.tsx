@@ -7,6 +7,8 @@ import { ChevronLeft, ChevronRight, ThumbsDown, ThumbsUp } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 
+import { HelpFooterLinks } from "@reloop/fe-docs/components/mdx/HelpFooterLinks";
+
 interface PageFooterProps {
 	previous?: PageNode;
 	next?: PageNode;
@@ -64,6 +66,9 @@ export function PageFooter({ previous, next, editUrl }: PageFooterProps) {
 					</a>
 				)}
 			</div>
+
+			{/* Help & Support Links */}
+			<HelpFooterLinks />
 
 			{/* Navigation Cards */}
 			<div className="grid gap-4 sm:grid-cols-2">
