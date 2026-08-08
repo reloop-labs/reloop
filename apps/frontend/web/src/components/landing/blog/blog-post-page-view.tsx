@@ -292,7 +292,50 @@ export function BlogPostPageView({
 								className="group relative block overflow-hidden rounded-2xl border border-stroke-soft-200 bg-white p-3.5 transition-all duration-200 hover:border-stroke-strong-950 hover:shadow-md dark:border-white/10 dark:bg-white/[0.03] dark:hover:border-white/30"
 							>
 								{/* Top Product Preview SVG */}
-								<div className="mb-3.5 flex aspect-[16/10] w-full items-center justify-center p-3.5">
+								<div className="relative mb-3.5 flex aspect-[16/10] w-full items-center justify-center overflow-hidden rounded-xl border border-stroke-soft-200/80 p-3.5 text-text-strong-950 dark:border-white/10 dark:text-white">
+									{/* Diagonal hatch pattern overlay */}
+									<div
+										className="pointer-events-none absolute inset-0 opacity-[0.06] dark:opacity-[0.12]"
+										style={{
+											backgroundImage:
+												"repeating-linear-gradient(45deg, currentColor 0, currentColor 1px, transparent 0, transparent 10px)",
+										}}
+									/>
+
+									{/* Concentric orbital rings SVG */}
+									<svg
+										className="pointer-events-none absolute inset-0 size-full text-text-strong-950/15 dark:text-white/15"
+										viewBox="0 0 200 120"
+										fill="none"
+										xmlns="http://www.w3.org/2000/svg"
+										aria-hidden="true"
+									>
+										<circle
+											cx="100"
+											cy="60"
+											r="28"
+											stroke="currentColor"
+											strokeDasharray="3 3"
+										/>
+										<circle
+											cx="100"
+											cy="60"
+											r="54"
+											stroke="currentColor"
+											strokeWidth="0.75"
+										/>
+										<circle
+											cx="100"
+											cy="60"
+											r="82"
+											stroke="currentColor"
+											strokeDasharray="4 4"
+										/>
+									</svg>
+
+									{/* Luminous dual-tone aura glow */}
+									<div className="pointer-events-none absolute size-32 rounded-full bg-gradient-to-tr from-emerald-500/20 via-teal-400/15 to-indigo-500/15 blur-2xl transition-transform duration-500 group-hover:scale-125 dark:from-emerald-500/30 dark:via-teal-400/20 dark:to-indigo-500/20" />
+
 									<svg
 										className="relative z-10 size-24 text-text-strong-950 transition-transform duration-200 group-hover:scale-105 dark:text-white"
 										viewBox="0 0 24 24"
