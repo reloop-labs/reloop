@@ -88,7 +88,9 @@ export function ChannelList() {
 			await patchChannel(channelId, { visibility: newValue });
 			await invalidate();
 			toast.success(
-				newValue === "public" ? "Channel is now public" : "Channel is now hidden",
+				newValue === "public"
+					? "Channel is now public"
+					: "Channel is now hidden",
 			);
 		} catch {
 			toast.error("Failed to update visibility");

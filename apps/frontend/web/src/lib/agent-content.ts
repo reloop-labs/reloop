@@ -1,8 +1,8 @@
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
-import matter from "gray-matter";
 import { buildPricingMarkdown } from "@reloop/web/lib/pricing-md";
 import { getSiteUrl, siteDescription, siteName } from "@reloop/web/lib/site";
+import matter from "gray-matter";
 import { injectMarkdownAgentDirective } from "./agent-directive";
 
 function getWebRootCandidates(): string[] {

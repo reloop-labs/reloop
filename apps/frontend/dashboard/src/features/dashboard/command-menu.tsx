@@ -360,7 +360,7 @@ export function CommandMenuGlobal() {
 							setView("root");
 							setSearch("");
 						}}
-						className="cursor-pointer shrink-0"
+						className="shrink-0 cursor-pointer"
 						aria-label="Back to main menu"
 					>
 						<ActionKbd className="w-auto min-w-4 px-1">

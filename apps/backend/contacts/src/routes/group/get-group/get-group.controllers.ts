@@ -45,8 +45,13 @@ export const getGroupController = async ({
 			throw GroupErrors.notFound(group_id);
 		}
 		log.info("Group retrieved successfully", { group_id });
-		const { user, userId: _userId, organizationId: _orgId, deletedAt: _deletedAt, ...rest } =
-			group;
+		const {
+			user,
+			userId: _userId,
+			organizationId: _orgId,
+			deletedAt: _deletedAt,
+			...rest
+		} = group;
 		return {
 			...rest,
 			object: "contact_group",

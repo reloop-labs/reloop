@@ -750,330 +750,154 @@ export const ComposeModal = ({
 				if (!open) requestClose();
 			}}
 		>
-				<Modal.Content
-					showClose={false}
-					className="flex max-h-[min(720px,90dvh)] w-full flex-col overflow-hidden rounded-3xl border border-mail-border/40 p-0 sm:max-w-[680px]"
-					aria-describedby={undefined}
-					onEscapeKeyDown={(e) => {
+			<Modal.Content
+				showClose={false}
+				className="flex max-h-[min(720px,90dvh)] w-full flex-col overflow-hidden rounded-3xl border border-mail-border/40 p-0 sm:max-w-[680px]"
+				aria-describedby={undefined}
+				onEscapeKeyDown={(e) => {
+					e.preventDefault();
+					if (aiActive) {
+						rejectAiDraft();
+						return;
+					}
+					requestClose();
+				}}
+				onPointerDownOutside={(e) => {
+					if (isSending || isComposeFloatingUi(e.target)) {
 						e.preventDefault();
-						if (aiActive) {
-							rejectAiDraft();
-							return;
-						}
-						requestClose();
-					}}
-					onPointerDownOutside={(e) => {
-						if (isSending || isComposeFloatingUi(e.target)) {
-							e.preventDefault();
-						}
-					}}
-					onInteractOutside={(e) => {
-						if (isSending || isComposeFloatingUi(e.target)) {
-							e.preventDefault();
-						}
-					}}
-					onFocusOutside={(e) => {
-						if (isComposeFloatingUi(e.target)) e.preventDefault();
-					}}
+					}
+				}}
+				onInteractOutside={(e) => {
+					if (isSending || isComposeFloatingUi(e.target)) {
+						e.preventDefault();
+					}
+				}}
+				onFocusOutside={(e) => {
+					if (isComposeFloatingUi(e.target)) e.preventDefault();
+				}}
+			>
+				<form
+					onSubmit={handleSubmit(onSubmit)}
+					{...getRootProps()}
+					className="relative flex min-h-0 flex-1 flex-col"
 				>
-					<form
-						onSubmit={handleSubmit(onSubmit)}
-						{...getRootProps()}
-						className="relative flex min-h-0 flex-1 flex-col"
-					>
-						<input {...getInputProps()} />
-						<input
-							ref={fileInputRef}
-							type="file"
-							className="hidden"
-							multiple
-							accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt"
-							onChange={(e) => {
-								const files = e.target.files;
-								if (files) void onDrop(Array.from(files));
-								e.target.value = "";
-							}}
-						/>
+					<input {...getInputProps()} />
+					<input
+						ref={fileInputRef}
+						type="file"
+						className="hidden"
+						multiple
+						accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt"
+						onChange={(e) => {
+							const files = e.target.files;
+							if (files) void onDrop(Array.from(files));
+							e.target.value = "";
+						}}
+					/>
 
-						<AnimatePresence>
-							{isDragActive && (
-								<motion.div
-									initial={{ opacity: 0 }}
-									animate={{ opacity: 1 }}
-									exit={{ opacity: 0 }}
-									className="absolute inset-0 z-50 flex flex-col items-center justify-center gap-3 rounded-3xl bg-panel-light/95 dark:bg-panel-dark/95"
-								>
-									<Paperclip className="h-7 w-7 text-mail-muted" />
-									<p className="font-medium text-mail-foreground text-sm">
-										Drop files to attach
-									</p>
-									<p className="text-[12px] text-mail-muted">Max 10MB each</p>
-								</motion.div>
-							)}
-						</AnimatePresence>
+					<AnimatePresence>
+						{isDragActive && (
+							<motion.div
+								initial={{ opacity: 0 }}
+								animate={{ opacity: 1 }}
+								exit={{ opacity: 0 }}
+								className="absolute inset-0 z-50 flex flex-col items-center justify-center gap-3 rounded-3xl bg-panel-light/95 dark:bg-panel-dark/95"
+							>
+								<Paperclip className="h-7 w-7 text-mail-muted" />
+								<p className="font-medium text-mail-foreground text-sm">
+									Drop files to attach
+								</p>
+								<p className="text-[12px] text-mail-muted">Max 10MB each</p>
+							</motion.div>
+						)}
+					</AnimatePresence>
 
-						{/* Header */}
-						<div className="shrink-0 border-mail-border/40 border-b px-5 pt-5 pb-3">
-							<div className="mb-3 flex items-center gap-2.5">
-								<Icon name="pencil" className="h-4 w-4 text-mail-foreground" />
-								<Modal.Title asChild>
-									<h2 className="font-semibold text-label-md text-mail-foreground">
-										New email
-									</h2>
-								</Modal.Title>
-							</div>
+					{/* Header */}
+					<div className="shrink-0 border-mail-border/40 border-b px-5 pt-5 pb-3">
+						<div className="mb-3 flex items-center gap-2.5">
+							<Icon name="pencil" className="h-4 w-4 text-mail-foreground" />
+							<Modal.Title asChild>
+								<h2 className="font-semibold text-label-md text-mail-foreground">
+									New email
+								</h2>
+							</Modal.Title>
 						</div>
+					</div>
 
-						{/* Fields + editor */}
-						<div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
-							<div className="shrink-0 border-mail-border/40 border-b px-5">
-								{/* From */}
-								<div className="grid grid-cols-[3.75rem_minmax(0,1fr)] items-center gap-x-2 border-mail-border/30 border-b py-2">
-									<span className="font-medium text-[12px] text-mail-muted leading-none">
-										From
-									</span>
-									<div className="flex h-8 min-w-0 items-center">
-										<p className="truncate font-medium text-[13px] text-mail-foreground">
-											{mailbox.email}
-										</p>
-									</div>
-								</div>
-
-								{/* To */}
-								<div className="grid grid-cols-[3.75rem_minmax(0,1fr)_auto] items-center gap-x-2 border-mail-border/30 border-b py-2">
-									<span className="font-medium text-[12px] text-mail-muted leading-none">
-										To
-									</span>
-									<div className="min-w-0">
-										<Controller
-											name="to"
-											control={control}
-											render={({ field }) => (
-												<EmailPillsInput
-													emails={field.value}
-													onChange={(emails) => {
-														field.onChange(emails);
-														if (toError) setToError(null);
-													}}
-													placeholder="Add recipients…"
-													disabled={isSending}
-													suggestions={recipientSuggestions}
-												/>
-											)}
-										/>
-										{toError && (
-											<p
-												className="mt-1 text-[12px] text-error-base leading-snug"
-												role="alert"
-											>
-												{toError}
-											</p>
-										)}
-									</div>
-									<div className="flex shrink-0 items-center gap-0.5 self-center">
-										<button
-											type="button"
-											tabIndex={-1}
-											onClick={() => setShowCc((v) => !v)}
-											className={cn(
-												"rounded-md px-1.5 py-1 font-medium text-[11px] text-mail-muted hover:bg-[var(--inbox-hover)] hover:text-mail-foreground",
-												showCc &&
-													"bg-[var(--inbox-hover)] text-mail-foreground",
-											)}
-										>
-											Cc
-										</button>
-										<button
-											type="button"
-											tabIndex={-1}
-											onClick={() => setShowBcc((v) => !v)}
-											className={cn(
-												"rounded-md px-1.5 py-1 font-medium text-[11px] text-mail-muted hover:bg-[var(--inbox-hover)] hover:text-mail-foreground",
-												showBcc &&
-													"bg-[var(--inbox-hover)] text-mail-foreground",
-											)}
-										>
-											Bcc
-										</button>
-									</div>
-								</div>
-
-								<AnimatePresence initial={false}>
-									{showCc && (
-										<motion.div
-											initial={
-												shouldReduceMotion
-													? { opacity: 0 }
-													: { height: 0, opacity: 0 }
-											}
-											animate={
-												shouldReduceMotion
-													? { opacity: 1 }
-													: { height: "auto", opacity: 1 }
-											}
-											exit={
-												shouldReduceMotion
-													? { opacity: 0 }
-													: { height: 0, opacity: 0 }
-											}
-											transition={
-												shouldReduceMotion
-													? { duration: 0.15 }
-													: { duration: 0.2, ease: [0.32, 0.72, 0, 1] }
-											}
-											className="overflow-hidden"
-										>
-											<div className="grid grid-cols-[3.75rem_minmax(0,1fr)] items-center gap-x-2 border-mail-border/30 border-b py-2">
-												<span className="font-medium text-[12px] text-mail-muted leading-none">
-													Cc
-												</span>
-												<Controller
-													name="cc"
-													control={control}
-													render={({ field }) => (
-														<EmailPillsInput
-															emails={field.value}
-															onChange={field.onChange}
-															placeholder="Add Cc…"
-															disabled={isSending}
-															suggestions={recipientSuggestions}
-														/>
-													)}
-												/>
-											</div>
-										</motion.div>
-									)}
-								</AnimatePresence>
-
-								<AnimatePresence initial={false}>
-									{showBcc && (
-										<motion.div
-											initial={
-												shouldReduceMotion
-													? { opacity: 0 }
-													: { height: 0, opacity: 0 }
-											}
-											animate={
-												shouldReduceMotion
-													? { opacity: 1 }
-													: { height: "auto", opacity: 1 }
-											}
-											exit={
-												shouldReduceMotion
-													? { opacity: 0 }
-													: { height: 0, opacity: 0 }
-											}
-											transition={
-												shouldReduceMotion
-													? { duration: 0.15 }
-													: { duration: 0.2, ease: [0.32, 0.72, 0, 1] }
-											}
-											className="overflow-hidden"
-										>
-											<div className="grid grid-cols-[3.75rem_minmax(0,1fr)] items-center gap-x-2 border-mail-border/30 border-b py-2">
-												<span className="font-medium text-[12px] text-mail-muted leading-none">
-													Bcc
-												</span>
-												<Controller
-													name="bcc"
-													control={control}
-													render={({ field }) => (
-														<EmailPillsInput
-															emails={field.value}
-															onChange={field.onChange}
-															placeholder="Add Bcc…"
-															disabled={isSending}
-															suggestions={recipientSuggestions}
-														/>
-													)}
-												/>
-											</div>
-										</motion.div>
-									)}
-								</AnimatePresence>
-
-								{/* Subject */}
-								<div className="grid grid-cols-[3.75rem_minmax(0,1fr)_auto] items-center gap-x-2 py-2">
-									<span className="font-medium text-[12px] text-mail-muted leading-none">
-										Subject
-									</span>
-									<input
-										className="h-8 w-full min-w-0 bg-transparent font-medium text-[13px] text-mail-foreground outline-none placeholder:text-mail-muted"
-										placeholder="What’s this about?"
-										disabled={isSending}
-										{...register("subject")}
-									/>
-									<AiSparkleButton
-										onClick={() => void generateSubject()}
-										disabled={
-											isSending || subjectGenerating || !textBody.trim()
-										}
-										loading={subjectGenerating}
-										variant="icon"
-										size="sm"
-										title="Suggest subject from body"
-									/>
+					{/* Fields + editor */}
+					<div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
+						<div className="shrink-0 border-mail-border/40 border-b px-5">
+							{/* From */}
+							<div className="grid grid-cols-[3.75rem_minmax(0,1fr)] items-center gap-x-2 border-mail-border/30 border-b py-2">
+								<span className="font-medium text-[12px] text-mail-muted leading-none">
+									From
+								</span>
+								<div className="flex h-8 min-w-0 items-center">
+									<p className="truncate font-medium text-[13px] text-mail-foreground">
+										{mailbox.email}
+									</p>
 								</div>
 							</div>
 
-							{/* Body — editor + inline AI status below */}
-							<div className="flex flex-col">
-								{/* Editor — always fully visible */}
-								<div
-									className={cn(
-										"flex min-h-[200px] flex-1 flex-col",
-										aiPhase === "thinking" &&
-											textBody.trim().length > 0 &&
-											"ai-body-thinking",
-									)}
-								>
-									<ComposeBodyEditor
-										ref={editorRef}
-										editorKey={editorKey}
-										content={editorContent}
-										editable={!isSending && !aiBusy}
-										placeholder="Start writing…"
-										className="compose-email-editor__content min-h-[200px] flex-1 px-5 pb-4"
-										onUpdate={(html, text) => {
-											setHtmlBody(html);
-											setTextBody(text);
-											if (
-												aiPhaseRef.current === "review" &&
-												reviewArmedRef.current
-											) {
-												acceptAiDraft();
-											}
-										}}
-										onModEnter={() => submitRef.current()}
-									/>
-									<div className="mt-auto flex items-center justify-between gap-3 px-5 py-2">
-										<p className="min-w-0 truncate text-[11px] text-mail-muted">
-											Type{" "}
-											<ActionKbd className="w-auto min-w-4 px-1">/</ActionKbd>{" "}
-											for formatting commands
-										</p>
-										{aiActive ? (
-											<AiComposerSlot
-												loading={aiBusy}
-												hasStreamText={aiPhase === "streaming"}
-												onUndo={rejectAiDraft}
-											/>
-										) : (
-											<AiSparkleButton
-												onClick={() => void generateBody()}
-												disabled={isSending || !textBody.trim()}
-												variant="pill"
-												label="Write with AI"
-												title="Write email body with AI"
+							{/* To */}
+							<div className="grid grid-cols-[3.75rem_minmax(0,1fr)_auto] items-center gap-x-2 border-mail-border/30 border-b py-2">
+								<span className="font-medium text-[12px] text-mail-muted leading-none">
+									To
+								</span>
+								<div className="min-w-0">
+									<Controller
+										name="to"
+										control={control}
+										render={({ field }) => (
+											<EmailPillsInput
+												emails={field.value}
+												onChange={(emails) => {
+													field.onChange(emails);
+													if (toError) setToError(null);
+												}}
+												placeholder="Add recipients…"
+												disabled={isSending}
+												suggestions={recipientSuggestions}
 											/>
 										)}
-									</div>
+									/>
+									{toError && (
+										<p
+											className="mt-1 text-[12px] text-error-base leading-snug"
+											role="alert"
+										>
+											{toError}
+										</p>
+									)}
+								</div>
+								<div className="flex shrink-0 items-center gap-0.5 self-center">
+									<button
+										type="button"
+										tabIndex={-1}
+										onClick={() => setShowCc((v) => !v)}
+										className={cn(
+											"rounded-md px-1.5 py-1 font-medium text-[11px] text-mail-muted hover:bg-[var(--inbox-hover)] hover:text-mail-foreground",
+											showCc && "bg-[var(--inbox-hover)] text-mail-foreground",
+										)}
+									>
+										Cc
+									</button>
+									<button
+										type="button"
+										tabIndex={-1}
+										onClick={() => setShowBcc((v) => !v)}
+										className={cn(
+											"rounded-md px-1.5 py-1 font-medium text-[11px] text-mail-muted hover:bg-[var(--inbox-hover)] hover:text-mail-foreground",
+											showBcc && "bg-[var(--inbox-hover)] text-mail-foreground",
+										)}
+									>
+										Bcc
+									</button>
 								</div>
 							</div>
 
-							{/* Attachments strip */}
 							<AnimatePresence initial={false}>
-								{attachments.length > 0 && (
+								{showCc && (
 									<motion.div
 										initial={
 											shouldReduceMotion
@@ -1095,199 +919,367 @@ export const ComposeModal = ({
 												? { duration: 0.15 }
 												: { duration: 0.2, ease: [0.32, 0.72, 0, 1] }
 										}
-										className="shrink-0 overflow-hidden border-mail-border/40 border-t"
+										className="overflow-hidden"
 									>
-										<div className="px-5 py-3">
-											<div className="mb-2 flex items-center justify-between">
-												<span className="font-medium text-[11px] text-mail-muted uppercase tracking-wide">
-													Attachments ({attachments.length})
-												</span>
-												<Popover.Root>
-													<Popover.Trigger asChild>
-														<button
-															type="button"
-															className="text-[11px] text-mail-muted hover:text-mail-foreground"
-														>
-															Manage
-														</button>
-													</Popover.Trigger>
-													<Popover.Content
-														align="end"
-														sideOffset={6}
-														showArrow={false}
-														className="z-[100] w-[320px] rounded-xl border border-mail-border/40 bg-panel-light p-0 shadow-lg dark:bg-panel-dark"
-													>
-														<div className="max-h-[240px] space-y-0.5 overflow-y-auto p-1.5">
-															{attachments.map((file, idx) => (
-																<div
-																	key={file.id}
-																	className={cn(
-																		"flex items-center justify-between gap-3 rounded-lg px-2 py-1.5 hover:bg-[var(--inbox-hover)]",
-																		file.isUploading && "opacity-60",
-																	)}
-																>
-																	<div className="flex min-w-0 flex-1 items-center gap-2.5">
-																		<div className="flex size-7 shrink-0 items-center justify-center rounded-md bg-[var(--inbox-hover)]">
-																			{file.isUploading ? (
-																				<LoadingDot
-																					label="Uploading"
-																					className="text-mail-muted"
-																					style={{ fontSize: 11 }}
-																				/>
-																			) : (
-																				<AttachmentGlyph
-																					contentType={file.content_type}
-																				/>
-																			)}
-																		</div>
-																		<div className="min-w-0 flex-1">
-																			<p className="truncate text-[12px] text-mail-foreground">
-																				{file.name}
-																			</p>
-																			<p className="text-[11px] text-mail-muted">
-																				{file.size}
-																			</p>
-																		</div>
-																	</div>
-																	<button
-																		type="button"
-																		onClick={() => removeAttachment(idx)}
-																		className="flex size-6 items-center justify-center rounded-md hover:bg-[var(--inbox-hover)]"
-																		aria-label={`Remove ${file.name}`}
-																	>
-																		<XIcon className="h-3.5 w-3.5 text-mail-muted" />
-																	</button>
-																</div>
-															))}
-														</div>
-													</Popover.Content>
-												</Popover.Root>
-											</div>
-											<div className="flex flex-wrap gap-1.5">
-												<AnimatePresence initial={false}>
-													{attachments.map((file, idx) => (
-														<motion.span
-															key={file.id}
-															layout={!shouldReduceMotion}
-															initial={
-																shouldReduceMotion
-																	? { opacity: 0 }
-																	: { opacity: 0, scale: 0.95 }
-															}
-															animate={
-																shouldReduceMotion
-																	? { opacity: 1 }
-																	: { opacity: 1, scale: 1 }
-															}
-															exit={
-																shouldReduceMotion
-																	? { opacity: 0 }
-																	: { opacity: 0, scale: 0.95 }
-															}
-															transition={
-																shouldReduceMotion
-																	? { duration: 0.1 }
-																	: { duration: 0.18, ease: [0.16, 1, 0.3, 1] }
-															}
-															className="inline-flex max-w-[180px] items-center gap-1.5 rounded-lg border border-mail-border/40 bg-[var(--inbox-hover)] px-2 py-1 text-[11px] text-mail-foreground"
-														>
-															{file.isUploading ? (
-																<LoadingDot
-																	label="Uploading"
-																	className="shrink-0 text-mail-muted"
-																	style={{ fontSize: 10 }}
-																/>
-															) : (
-																<AttachmentGlyph
-																	contentType={file.content_type}
-																/>
-															)}
-															<span className="truncate">{file.name}</span>
-															<button
-																type="button"
-																onClick={() => removeAttachment(idx)}
-																className="shrink-0 text-mail-muted hover:text-mail-foreground"
-																aria-label={`Remove ${file.name}`}
-															>
-																<XIcon className="h-3 w-3" />
-															</button>
-														</motion.span>
-													))}
-												</AnimatePresence>
-											</div>
+										<div className="grid grid-cols-[3.75rem_minmax(0,1fr)] items-center gap-x-2 border-mail-border/30 border-b py-2">
+											<span className="font-medium text-[12px] text-mail-muted leading-none">
+												Cc
+											</span>
+											<Controller
+												name="cc"
+												control={control}
+												render={({ field }) => (
+													<EmailPillsInput
+														emails={field.value}
+														onChange={field.onChange}
+														placeholder="Add Cc…"
+														disabled={isSending}
+														suggestions={recipientSuggestions}
+													/>
+												)}
+											/>
 										</div>
 									</motion.div>
 								)}
 							</AnimatePresence>
-						</div>
 
-						{/* Footer */}
-						<div className="flex shrink-0 items-center justify-between gap-3 border-mail-border/40 border-t px-5 py-3.5">
-							<div className="flex flex-wrap items-center gap-1.5">
-								<button
-									type="button"
-									onClick={() => fileInputRef.current?.click()}
+							<AnimatePresence initial={false}>
+								{showBcc && (
+									<motion.div
+										initial={
+											shouldReduceMotion
+												? { opacity: 0 }
+												: { height: 0, opacity: 0 }
+										}
+										animate={
+											shouldReduceMotion
+												? { opacity: 1 }
+												: { height: "auto", opacity: 1 }
+										}
+										exit={
+											shouldReduceMotion
+												? { opacity: 0 }
+												: { height: 0, opacity: 0 }
+										}
+										transition={
+											shouldReduceMotion
+												? { duration: 0.15 }
+												: { duration: 0.2, ease: [0.32, 0.72, 0, 1] }
+										}
+										className="overflow-hidden"
+									>
+										<div className="grid grid-cols-[3.75rem_minmax(0,1fr)] items-center gap-x-2 border-mail-border/30 border-b py-2">
+											<span className="font-medium text-[12px] text-mail-muted leading-none">
+												Bcc
+											</span>
+											<Controller
+												name="bcc"
+												control={control}
+												render={({ field }) => (
+													<EmailPillsInput
+														emails={field.value}
+														onChange={field.onChange}
+														placeholder="Add Bcc…"
+														disabled={isSending}
+														suggestions={recipientSuggestions}
+													/>
+												)}
+											/>
+										</div>
+									</motion.div>
+								)}
+							</AnimatePresence>
+
+							{/* Subject */}
+							<div className="grid grid-cols-[3.75rem_minmax(0,1fr)_auto] items-center gap-x-2 py-2">
+								<span className="font-medium text-[12px] text-mail-muted leading-none">
+									Subject
+								</span>
+								<input
+									className="h-8 w-full min-w-0 bg-transparent font-medium text-[13px] text-mail-foreground outline-none placeholder:text-mail-muted"
+									placeholder="What’s this about?"
 									disabled={isSending}
-									className={toolBtnClass}
-								>
-									<Paperclip className="h-3.5 w-3.5" />
-									Attach
-								</button>
-								<ScheduleSendPicker
-									value={scheduleAt}
-									onChange={setScheduleAt}
-									disabled={isSending}
+									{...register("subject")}
+								/>
+								<AiSparkleButton
+									onClick={() => void generateSubject()}
+									disabled={isSending || subjectGenerating || !textBody.trim()}
+									loading={subjectGenerating}
+									variant="icon"
+									size="sm"
+									title="Suggest subject from body"
 								/>
 							</div>
+						</div>
 
-							<div className="flex items-center gap-2">
-								{scheduleAt && (
-									<span className="mr-auto truncate text-[11px] text-mail-muted">
-										Scheduled{" "}
-										{new Date(scheduleAt).toLocaleString(undefined, {
-											dateStyle: "medium",
-											timeStyle: "short",
-										})}
-									</span>
+						{/* Body — editor + inline AI status below */}
+						<div className="flex flex-col">
+							{/* Editor — always fully visible */}
+							<div
+								className={cn(
+									"flex min-h-[200px] flex-1 flex-col",
+									aiPhase === "thinking" &&
+										textBody.trim().length > 0 &&
+										"ai-body-thinking",
 								)}
-								<Button.Root
-									type="button"
-									variant="neutral"
-									mode="stroke"
-									size="xsmall"
-									disabled={isSending}
-									onClick={requestClose}
-									className="gap-1.5"
-								>
-									Cancel
-									<ActionKbd className="w-auto min-w-4 px-1">esc</ActionKbd>
-								</Button.Root>
-								<FancyButton.Root
-									type="submit"
-									variant="neutral"
-									size="xsmall"
-									disabled={isSending || attachments.some((a) => a.isUploading)}
-									className="gap-1.5"
-								>
-									{isSending
-										? "Sending…"
-										: scheduleAt
-											? "Schedule"
-											: "Send"}
-									{!isSending && (
-										<span className="inline-flex items-center gap-0.5">
-											<ActionKbd className={actionKbdOnBlueClassName}>
-												{modKey}
-											</ActionKbd>
-											<ActionKbd className={actionKbdOnBlueClassName}>
-												↵
-											</ActionKbd>
-										</span>
+							>
+								<ComposeBodyEditor
+									ref={editorRef}
+									editorKey={editorKey}
+									content={editorContent}
+									editable={!isSending && !aiBusy}
+									placeholder="Start writing…"
+									className="compose-email-editor__content min-h-[200px] flex-1 px-5 pb-4"
+									onUpdate={(html, text) => {
+										setHtmlBody(html);
+										setTextBody(text);
+										if (
+											aiPhaseRef.current === "review" &&
+											reviewArmedRef.current
+										) {
+											acceptAiDraft();
+										}
+									}}
+									onModEnter={() => submitRef.current()}
+								/>
+								<div className="mt-auto flex items-center justify-between gap-3 px-5 py-2">
+									<p className="min-w-0 truncate text-[11px] text-mail-muted">
+										Type{" "}
+										<ActionKbd className="w-auto min-w-4 px-1">/</ActionKbd> for
+										formatting commands
+									</p>
+									{aiActive ? (
+										<AiComposerSlot
+											loading={aiBusy}
+											hasStreamText={aiPhase === "streaming"}
+											onUndo={rejectAiDraft}
+										/>
+									) : (
+										<AiSparkleButton
+											onClick={() => void generateBody()}
+											disabled={isSending || !textBody.trim()}
+											variant="pill"
+											label="Write with AI"
+											title="Write email body with AI"
+										/>
 									)}
-								</FancyButton.Root>
+								</div>
 							</div>
 						</div>
-					</form>
+
+						{/* Attachments strip */}
+						<AnimatePresence initial={false}>
+							{attachments.length > 0 && (
+								<motion.div
+									initial={
+										shouldReduceMotion
+											? { opacity: 0 }
+											: { height: 0, opacity: 0 }
+									}
+									animate={
+										shouldReduceMotion
+											? { opacity: 1 }
+											: { height: "auto", opacity: 1 }
+									}
+									exit={
+										shouldReduceMotion
+											? { opacity: 0 }
+											: { height: 0, opacity: 0 }
+									}
+									transition={
+										shouldReduceMotion
+											? { duration: 0.15 }
+											: { duration: 0.2, ease: [0.32, 0.72, 0, 1] }
+									}
+									className="shrink-0 overflow-hidden border-mail-border/40 border-t"
+								>
+									<div className="px-5 py-3">
+										<div className="mb-2 flex items-center justify-between">
+											<span className="font-medium text-[11px] text-mail-muted uppercase tracking-wide">
+												Attachments ({attachments.length})
+											</span>
+											<Popover.Root>
+												<Popover.Trigger asChild>
+													<button
+														type="button"
+														className="text-[11px] text-mail-muted hover:text-mail-foreground"
+													>
+														Manage
+													</button>
+												</Popover.Trigger>
+												<Popover.Content
+													align="end"
+													sideOffset={6}
+													showArrow={false}
+													className="z-[100] w-[320px] rounded-xl border border-mail-border/40 bg-panel-light p-0 shadow-lg dark:bg-panel-dark"
+												>
+													<div className="max-h-[240px] space-y-0.5 overflow-y-auto p-1.5">
+														{attachments.map((file, idx) => (
+															<div
+																key={file.id}
+																className={cn(
+																	"flex items-center justify-between gap-3 rounded-lg px-2 py-1.5 hover:bg-[var(--inbox-hover)]",
+																	file.isUploading && "opacity-60",
+																)}
+															>
+																<div className="flex min-w-0 flex-1 items-center gap-2.5">
+																	<div className="flex size-7 shrink-0 items-center justify-center rounded-md bg-[var(--inbox-hover)]">
+																		{file.isUploading ? (
+																			<LoadingDot
+																				label="Uploading"
+																				className="text-mail-muted"
+																				style={{ fontSize: 11 }}
+																			/>
+																		) : (
+																			<AttachmentGlyph
+																				contentType={file.content_type}
+																			/>
+																		)}
+																	</div>
+																	<div className="min-w-0 flex-1">
+																		<p className="truncate text-[12px] text-mail-foreground">
+																			{file.name}
+																		</p>
+																		<p className="text-[11px] text-mail-muted">
+																			{file.size}
+																		</p>
+																	</div>
+																</div>
+																<button
+																	type="button"
+																	onClick={() => removeAttachment(idx)}
+																	className="flex size-6 items-center justify-center rounded-md hover:bg-[var(--inbox-hover)]"
+																	aria-label={`Remove ${file.name}`}
+																>
+																	<XIcon className="h-3.5 w-3.5 text-mail-muted" />
+																</button>
+															</div>
+														))}
+													</div>
+												</Popover.Content>
+											</Popover.Root>
+										</div>
+										<div className="flex flex-wrap gap-1.5">
+											<AnimatePresence initial={false}>
+												{attachments.map((file, idx) => (
+													<motion.span
+														key={file.id}
+														layout={!shouldReduceMotion}
+														initial={
+															shouldReduceMotion
+																? { opacity: 0 }
+																: { opacity: 0, scale: 0.95 }
+														}
+														animate={
+															shouldReduceMotion
+																? { opacity: 1 }
+																: { opacity: 1, scale: 1 }
+														}
+														exit={
+															shouldReduceMotion
+																? { opacity: 0 }
+																: { opacity: 0, scale: 0.95 }
+														}
+														transition={
+															shouldReduceMotion
+																? { duration: 0.1 }
+																: { duration: 0.18, ease: [0.16, 1, 0.3, 1] }
+														}
+														className="inline-flex max-w-[180px] items-center gap-1.5 rounded-lg border border-mail-border/40 bg-[var(--inbox-hover)] px-2 py-1 text-[11px] text-mail-foreground"
+													>
+														{file.isUploading ? (
+															<LoadingDot
+																label="Uploading"
+																className="shrink-0 text-mail-muted"
+																style={{ fontSize: 10 }}
+															/>
+														) : (
+															<AttachmentGlyph
+																contentType={file.content_type}
+															/>
+														)}
+														<span className="truncate">{file.name}</span>
+														<button
+															type="button"
+															onClick={() => removeAttachment(idx)}
+															className="shrink-0 text-mail-muted hover:text-mail-foreground"
+															aria-label={`Remove ${file.name}`}
+														>
+															<XIcon className="h-3 w-3" />
+														</button>
+													</motion.span>
+												))}
+											</AnimatePresence>
+										</div>
+									</div>
+								</motion.div>
+							)}
+						</AnimatePresence>
+					</div>
+
+					{/* Footer */}
+					<div className="flex shrink-0 items-center justify-between gap-3 border-mail-border/40 border-t px-5 py-3.5">
+						<div className="flex flex-wrap items-center gap-1.5">
+							<button
+								type="button"
+								onClick={() => fileInputRef.current?.click()}
+								disabled={isSending}
+								className={toolBtnClass}
+							>
+								<Paperclip className="h-3.5 w-3.5" />
+								Attach
+							</button>
+							<ScheduleSendPicker
+								value={scheduleAt}
+								onChange={setScheduleAt}
+								disabled={isSending}
+							/>
+						</div>
+
+						<div className="flex items-center gap-2">
+							{scheduleAt && (
+								<span className="mr-auto truncate text-[11px] text-mail-muted">
+									Scheduled{" "}
+									{new Date(scheduleAt).toLocaleString(undefined, {
+										dateStyle: "medium",
+										timeStyle: "short",
+									})}
+								</span>
+							)}
+							<Button.Root
+								type="button"
+								variant="neutral"
+								mode="stroke"
+								size="xsmall"
+								disabled={isSending}
+								onClick={requestClose}
+								className="gap-1.5"
+							>
+								Cancel
+								<ActionKbd className="w-auto min-w-4 px-1">esc</ActionKbd>
+							</Button.Root>
+							<FancyButton.Root
+								type="submit"
+								variant="neutral"
+								size="xsmall"
+								disabled={isSending || attachments.some((a) => a.isUploading)}
+								className="gap-1.5"
+							>
+								{isSending ? "Sending…" : scheduleAt ? "Schedule" : "Send"}
+								{!isSending && (
+									<span className="inline-flex items-center gap-0.5">
+										<ActionKbd className={actionKbdOnBlueClassName}>
+											{modKey}
+										</ActionKbd>
+										<ActionKbd className={actionKbdOnBlueClassName}>
+											↵
+										</ActionKbd>
+									</span>
+								)}
+							</FancyButton.Root>
+						</div>
+					</div>
+				</form>
 			</Modal.Content>
 		</Modal.Root>
 	);

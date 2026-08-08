@@ -76,8 +76,7 @@ const config = {
 		// Agent discovery is on the marketing web origin (not this docs app)
 		const agentLink =
 			'</llms.txt>; rel="llms-txt", </llms-docs.txt>; rel="docs-llms-txt", </llms-full-docs.txt>; rel="llms-full-txt", </skill.md>; rel="skill-md", </docs/sitemap.md>; rel="sitemap"';
-		const agentCache =
-			"public, max-age=300, s-maxage=3600, must-revalidate";
+		const agentCache = "public, max-age=300, s-maxage=3600, must-revalidate";
 
 		const list = [
 			// Hashed static assets — long cache (must be listed before the catch-all)

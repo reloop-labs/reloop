@@ -69,8 +69,8 @@ export function AddDomainStep() {
 					Add Domain
 				</h1>
 				<p className="text-sm text-text-sub-600">
-					Connect your website&apos;s domain (like yourcompany.com) so emails come
-					from your business — not a generic address
+					Connect your website&apos;s domain (like yourcompany.com) so emails
+					come from your business — not a generic address
 				</p>
 			</div>
 			<form

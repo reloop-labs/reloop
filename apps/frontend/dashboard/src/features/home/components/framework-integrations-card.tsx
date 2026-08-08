@@ -30,7 +30,11 @@ const languages = [
 	{ id: "python" as const, title: "Python", icon: siPython },
 	{ id: "go" as const, title: "Go", icon: siGo },
 	// Brand hex is #000000 — override so the gear stays visible on dark UI
-	{ id: "rust" as const, title: "Rust", icon: { path: siRust.path, hex: "e24d2b" } },
+	{
+		id: "rust" as const,
+		title: "Rust",
+		icon: { path: siRust.path, hex: "e24d2b" },
+	},
 	{ id: "ruby" as const, title: "Ruby", icon: siRuby },
 	{ id: "php" as const, title: "PHP", icon: siPhp },
 ];

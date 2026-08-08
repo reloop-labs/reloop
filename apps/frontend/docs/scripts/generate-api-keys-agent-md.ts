@@ -20,10 +20,7 @@ import {
 } from "@reloop/code-samples/languages";
 import type { CodeSample } from "@reloop/code-samples/types";
 
-const outDir = join(
-	import.meta.dirname,
-	"../content/docs/learn/ai",
-);
+const outDir = join(import.meta.dirname, "../content/docs/learn/ai");
 
 mkdirSync(outDir, { recursive: true });
 

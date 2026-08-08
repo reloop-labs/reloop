@@ -951,7 +951,7 @@ export function ContactEmailHistory({
 					<div>
 						{(partialEmailError || partialHistoryError) && (
 							<div className="mb-3 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-error-light bg-error-lighter/50 px-3 py-2 dark:border-error-base/30 dark:bg-error-base/10">
-								<p className="text-paragraph-xs text-error-base">
+								<p className="text-error-base text-paragraph-xs">
 									{partialEmailError && partialHistoryError
 										? "Couldn't load some activity."
 										: partialEmailError

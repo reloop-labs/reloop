@@ -96,8 +96,7 @@ export async function upsertContactProperties({
 		]);
 
 		const propertiesToDelete = currentValues.filter(
-			(cv) =>
-				cv.deletedAt === null && !propertyNames.includes(cv.propertyName),
+			(cv) => cv.deletedAt === null && !propertyNames.includes(cv.propertyName),
 		);
 
 		if (propertiesToDelete.length > 0) {

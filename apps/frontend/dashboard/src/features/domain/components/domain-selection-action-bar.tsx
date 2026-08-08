@@ -14,11 +14,7 @@ import {
 import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import type { Domain } from "../types";
 
-export function DomainSelectionActionBar({
-	table,
-}: {
-	table: Table<Domain>;
-}) {
+export function DomainSelectionActionBar({ table }: { table: Table<Domain> }) {
 	const selectedRows = table.getFilteredSelectedRowModel().rows;
 	const selectedCount = selectedRows.length;
 	const [, setDeleteId] = useQueryState("delete");

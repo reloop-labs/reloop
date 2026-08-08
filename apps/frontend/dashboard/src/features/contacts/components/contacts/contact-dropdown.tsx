@@ -312,9 +312,7 @@ export const ContactDropdown = ({
 					variant="neutral"
 					mode="ghost"
 					size="xxsmall"
-					disabled={
-						isDeleting || isRemovingFromGroup || menu.isTogglingStatus
-					}
+					disabled={isDeleting || isRemovingFromGroup || menu.isTogglingStatus}
 				>
 					<Icon name="more-horizontal" className="h-3 w-3" />
 				</Button.Root>

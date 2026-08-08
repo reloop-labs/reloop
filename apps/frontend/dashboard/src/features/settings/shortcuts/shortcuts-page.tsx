@@ -362,7 +362,7 @@ export function ShortcutsPage() {
 
 			{/* Groups */}
 			{filteredGroups.length === 0 ? (
-				<div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-stroke-soft-200 px-6 py-14 text-center dark:border-white/10">
+				<div className="flex flex-col items-center justify-center rounded-2xl border border-stroke-soft-200 border-dashed px-6 py-14 text-center dark:border-white/10">
 					<div className="mb-3 flex size-10 items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-weak-50 dark:border-stroke-soft-100/40 dark:bg-white/[0.04]">
 						<Icon
 							name="search"

@@ -184,7 +184,7 @@ function CommandFooterKeyBox({
 	return (
 		<div
 			className={cn(
-				"flex h-4.5 w-auto min-w-[18px] shrink-0 items-center justify-center rounded-[5px] border border-stroke-soft-200 bg-bg-weak-50 px-1 font-sans text-[10px] leading-none text-text-sub-600 shadow-[0_1.5px_0_0_var(--color-stroke-soft-200)] dark:border-white/[0.14] dark:bg-white/[0.07] dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.55),0_0_0_0.5px_rgba(255,255,255,0.06),inset_0_0.5px_0_0_rgba(255,255,255,0.08)]",
+				"flex h-4.5 w-auto min-w-[18px] shrink-0 items-center justify-center rounded-[5px] border border-stroke-soft-200 bg-bg-weak-50 px-1 font-sans text-[10px] text-text-sub-600 leading-none shadow-[0_1.5px_0_0_var(--color-stroke-soft-200)] dark:border-white/[0.14] dark:bg-white/[0.07] dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.55),0_0_0_0.5px_rgba(255,255,255,0.06),inset_0_0.5px_0_0_rgba(255,255,255,0.08)]",
 				className,
 			)}
 			{...rest}

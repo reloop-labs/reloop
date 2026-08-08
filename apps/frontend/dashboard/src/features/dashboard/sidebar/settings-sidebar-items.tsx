@@ -2,9 +2,9 @@ import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useMemo, useRef, useState } from "react";
+import { ShortcutHint } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import { useOrgPermissions } from "#/features/settings/use-org-permissions";
-import { ShortcutHint } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { filterSettingsNavigation, settingsNavigation } from "../navigation";
 import { SidebarNavIcon } from "./sidebar-nav-icon";
 import { SidebarNavLink } from "./sidebar-nav-link";
@@ -152,7 +152,13 @@ export function SettingsSidebarItems({
 										? "h-8 w-8 justify-center px-0"
 										: "w-full justify-start gap-2.5 px-2.5",
 								)}
-								title={isCollapsed ? (item.shortcut ? `${item.label} (${item.shortcut.label})` : item.label) : undefined}
+								title={
+									isCollapsed
+										? item.shortcut
+											? `${item.label} (${item.shortcut.label})`
+											: item.label
+										: undefined
+								}
 							>
 								<span
 									className={cn(
@@ -195,7 +201,10 @@ export function SettingsSidebarItems({
 				</div>
 			))}
 
-			<AnimatedHoverBackground box={hoverBox} className="!bg-neutral-alpha-10" />
+			<AnimatedHoverBackground
+				box={hoverBox}
+				className="!bg-neutral-alpha-10"
+			/>
 		</div>
 	);
 }

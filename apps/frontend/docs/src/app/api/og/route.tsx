@@ -1,8 +1,8 @@
 import fs from "node:fs";
 import path from "node:path";
+import { JAVA_ICON } from "@reloop/ui/icons/java";
 import { ImageResponse } from "next/og";
 import type { NextRequest } from "next/server";
-import { JAVA_ICON } from "@reloop/ui/icons/java";
 import {
 	siCurl,
 	siDotnet,
@@ -741,7 +741,11 @@ export async function GET(request: NextRequest) {
 							xmlns="http://www.w3.org/2000/svg"
 						>
 							{JAVA_ICON.layers.map((layer) => (
-								<path key={layer.d.slice(0, 24)} d={layer.d} fill={layer.fill} />
+								<path
+									key={layer.d.slice(0, 24)}
+									d={layer.d}
+									fill={layer.fill}
+								/>
 							))}
 						</svg>
 						{/* .NET */}

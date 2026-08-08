@@ -7,9 +7,8 @@ import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import type { CommandAction } from "#/features/dashboard/command-menu";
 import { useRegisterCommandActions } from "#/features/dashboard/command-menu-context";
-
-import { useInvalidateApiKeys } from "../hooks/use-api-keys-query";
 import { useApiKeyDetailQuery } from "../hooks/use-api-key-detail-query";
+import { useInvalidateApiKeys } from "../hooks/use-api-keys-query";
 import { DeleteApiKeyModal } from "../modals/delete-api-key-modal";
 import { EditApiKeyModal } from "../modals/edit-api-key-modal";
 import { RotateApiKeyModal } from "../modals/rotate-api-key-modal";
@@ -275,7 +274,7 @@ export function ApiKeyDetailPage({ apiKeyId }: { apiKeyId: string }) {
 
 	return (
 		<>
-			<div className="mx-auto max-w-5xl space-y-8 px-6 pb-12 sm:px-8 pt-8">
+			<div className="mx-auto max-w-5xl space-y-8 px-6 pt-8 pb-12 sm:px-8">
 				<ApiKeyHeader
 					apiKey={data}
 					isLoading={isLoading}

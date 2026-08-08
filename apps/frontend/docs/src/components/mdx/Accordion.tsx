@@ -16,7 +16,7 @@ export function AccordionGroup({
 		<AccordionGroupContext.Provider value={true}>
 			<div
 				className={cn(
-					"my-6 overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 divide-y divide-stroke-soft-200 dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a] dark:divide-stroke-soft-100/40",
+					"my-6 divide-y divide-stroke-soft-200 overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 dark:divide-stroke-soft-100/40 dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a]",
 					className,
 				)}
 			>
@@ -46,7 +46,7 @@ export function Accordion({
 				type="button"
 				onClick={() => setIsOpen((prev) => !prev)}
 				aria-expanded={isOpen}
-				className="flex w-full items-center gap-3 px-6 py-4 text-left font-medium text-[15px] text-[#171717] transition-colors hover:bg-bg-weak-50/60 dark:text-white dark:hover:bg-white/[0.03]"
+				className="flex w-full items-center gap-3 px-6 py-4 text-left font-medium text-[#171717] text-[15px] transition-colors hover:bg-bg-weak-50/60 dark:text-white dark:hover:bg-white/[0.03]"
 			>
 				<svg
 					className={cn(
@@ -60,7 +60,7 @@ export function Accordion({
 				<span className="flex-1">{title}</span>
 			</button>
 			{isOpen && (
-				<div className="px-6 pt-1 pb-5 text-[15px] text-text-sub-600 leading-relaxed pl-[44px] [&>p]:m-0 [&>p+p]:mt-3">
+				<div className="px-6 pt-1 pb-5 pl-[44px] text-[15px] text-text-sub-600 leading-relaxed [&>p+p]:mt-3 [&>p]:m-0">
 					{children}
 				</div>
 			)}

@@ -306,9 +306,10 @@ const CodeBlock = React.forwardRef<
 });
 CodeBlock.displayName = "CodeBlock";
 
+export { Accordion, AccordionGroup } from "./Accordion";
 // Custom docs tabs (dashboard contacts-style UI with optional icons)
 export { Tab, Tabs } from "./Tabs";
-export { Accordion, AccordionGroup } from "./Accordion";
+
 const Steps = React.forwardRef<
 	HTMLDivElement,
 	React.ComponentProps<typeof MintlifySteps>

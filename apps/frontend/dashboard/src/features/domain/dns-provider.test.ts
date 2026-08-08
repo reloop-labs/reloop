@@ -1,8 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-	DNS_SETUP_HUB_URL,
-	inferDnsProvider,
-} from "./dns-provider";
+import { DNS_SETUP_HUB_URL, inferDnsProvider } from "./dns-provider";
 
 describe("inferDnsProvider", () => {
 	it("returns null for empty nameservers", () => {
@@ -36,16 +33,16 @@ describe("inferDnsProvider", () => {
 	});
 
 	it("enables auto-connect for Cloudflare, Vercel, NameSilo, and Domain Chief", () => {
-		expect(
-			inferDnsProvider(["ns1.vercel-dns.com"])?.supportsAutoConnect,
-		).toBe(true);
+		expect(inferDnsProvider(["ns1.vercel-dns.com"])?.supportsAutoConnect).toBe(
+			true,
+		);
 		expect(inferDnsProvider(["ns1.dnsowl.com"])?.label).toBe("NameSilo");
 		expect(inferDnsProvider(["ns1.dnsowl.com"])?.supportsAutoConnect).toBe(
 			true,
 		);
-		expect(
-			inferDnsProvider(["ns.domainchief.app"])?.supportsAutoConnect,
-		).toBe(true);
+		expect(inferDnsProvider(["ns.domainchief.app"])?.supportsAutoConnect).toBe(
+			true,
+		);
 	});
 
 	it("maps Domain Connect hosts without Reloop auto-connect yet", () => {
@@ -56,9 +53,7 @@ describe("inferDnsProvider", () => {
 		expect(inferDnsProvider(["ns1.wordpress.com"])?.docsSlug).toBe(
 			"wordpress-com",
 		);
-		expect(inferDnsProvider(["ns1.plesk.example.com"])?.docsSlug).toBe(
-			"plesk",
-		);
+		expect(inferDnsProvider(["ns1.plesk.example.com"])?.docsSlug).toBe("plesk");
 	});
 
 	it("falls back to the DNS hub when no guide exists", () => {

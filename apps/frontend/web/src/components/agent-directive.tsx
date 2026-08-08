@@ -30,8 +30,7 @@ export function AgentDirective({
 				<a href="/llms-full-docs.txt">llms-full-docs.txt</a>
 				{markdownPath ? (
 					<>
-						. Markdown for this page:{" "}
-						<a href={markdownPath}>{markdownPath}</a>
+						. Markdown for this page: <a href={markdownPath}>{markdownPath}</a>
 					</>
 				) : (
 					<>

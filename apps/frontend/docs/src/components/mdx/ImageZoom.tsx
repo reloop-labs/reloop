@@ -19,7 +19,7 @@ export function DocImage({
 }) {
 	return (
 		<figure className={cn("not-prose my-5", className)}>
-			<figcaption className="mb-1 text-[11px] font-medium leading-none text-text-sub-600 dark:text-white/50">
+			<figcaption className="mb-1 font-medium text-[11px] text-text-sub-600 leading-none dark:text-white/50">
 				{label}
 			</figcaption>
 			<MDXImage src={src} alt={alt || label} className="my-0!" />

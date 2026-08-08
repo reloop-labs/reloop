@@ -15,10 +15,7 @@ export function ChannelFilterChip({
 		<button
 			type="button"
 			onClick={onClear}
-			className={cn(
-				dataTableToolbarControlClassName,
-				"max-w-56 gap-1.5 px-2",
-			)}
+			className={cn(dataTableToolbarControlClassName, "max-w-56 gap-1.5 px-2")}
 			aria-label={`Clear channel filter: ${channelName}`}
 			title="Clear channel filter"
 		>

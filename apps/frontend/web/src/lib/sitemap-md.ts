@@ -211,7 +211,7 @@ export function buildPublicDiscoveryMarkdown(
 		"",
 		`> For the complete documentation index, see [llms.txt](${origin}/llms.txt). Docs index: [llms-docs.txt](${origin}/llms-docs.txt). Full corpora: [llms-full.txt](${origin}/llms-full.txt), [llms-full-docs.txt](${origin}/llms-full-docs.txt).`,
 		"",
-		`Reloop exposes public marketing content in HTML and markdown. Agent discovery files are hosted on the marketing web app. Documentation under \`/docs\` provides \`.md\` twins and \`Accept: text/markdown\` negotiation.`,
+		"Reloop exposes public marketing content in HTML and markdown. Agent discovery files are hosted on the marketing web app. Documentation under `/docs` provides `.md` twins and `Accept: text/markdown` negotiation.",
 		"",
 		"## Discovery surfaces",
 		"",
@@ -254,9 +254,7 @@ export function buildPublicDiscoveryMarkdown(
 	for (const entry of entries) {
 		const href = entry.path === "/" ? origin : `${origin}${entry.path}`;
 		const mdPath =
-			entry.path === "/"
-				? `${origin}/index.md`
-				: `${origin}${entry.path}.md`;
+			entry.path === "/" ? `${origin}/index.md` : `${origin}${entry.path}.md`;
 		lines.push(`- [${entry.title}](${href}) (${entry.type}) — [md](${mdPath})`);
 	}
 

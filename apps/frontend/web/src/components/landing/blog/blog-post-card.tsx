@@ -24,9 +24,7 @@ export function BlogPostCard({ post }: { post: BlogPostDefinition }) {
 				<span className="font-medium text-text-sub-600 dark:text-white/60">
 					{categoryUpper}
 				</span>
-				<span className="mx-2 text-text-sub-600/60 dark:text-white/30">
-					/
-				</span>
+				<span className="mx-2 text-text-sub-600/60 dark:text-white/30">/</span>
 				<span className="text-text-sub-600 dark:text-white/50">
 					{dateUpper}
 				</span>

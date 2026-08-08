@@ -16,6 +16,7 @@ import { AnimatedLogsIcon } from "./animated-logs-icon";
 import { AnimatedMailActionIcon } from "./animated-mail-action-icon";
 import { AnimatedMailIcon } from "./animated-mail-icon";
 import { AnimatedMetricsIcon } from "./animated-metrics-icon";
+import { AnimatedOrganizationIcon } from "./animated-organization-icon";
 import { AnimatedProfileIcon } from "./animated-profile-icon";
 import { AnimatedSecurityIcon } from "./animated-security-icon";
 import { AnimatedSmtpIcon } from "./animated-smtp-icon";
@@ -25,7 +26,6 @@ import { AnimatedThemeIcon } from "./animated-theme-icon";
 import { AnimatedUsageIcon } from "./animated-usage-icon";
 import { AnimatedWebhookIcon } from "./animated-webhook-icon";
 import { AnimatedWorkflowIcon } from "./animated-workflow-icon";
-import { AnimatedOrganizationIcon } from "./animated-organization-icon";
 
 type SidebarNavIconProps = {
 	name: string;

@@ -235,7 +235,7 @@ export function WebhookHeader({
 								<p className="font-medium text-paragraph-xs text-text-sub-600">
 									Webhook
 								</p>
-								<h1 className="mb-0.5 truncate font-semibold font-mono text-title-h6 leading-5">
+								<h1 className="mb-0.5 truncate font-mono font-semibold text-title-h6 leading-5">
 									{displayUrl}
 								</h1>
 							</div>

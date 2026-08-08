@@ -90,13 +90,19 @@ const FAILURE_COLOR = "#dc2626";
 
 const ease = (t: number) => (t < 0.5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2);
 
-function padSeries(series: number[] | undefined, length = HEALTH_DAYS): number[] {
+function padSeries(
+	series: number[] | undefined,
+	length = HEALTH_DAYS,
+): number[] {
 	if (!series || series.length === 0) {
 		return Array.from({ length }, () => 0);
 	}
 	if (series.length === length) return series;
 	if (series.length > length) return series.slice(-length);
-	return [...Array.from({ length: length - series.length }, () => 0), ...series];
+	return [
+		...Array.from({ length: length - series.length }, () => 0),
+		...series,
+	];
 }
 
 /** Shared y-scale so success + failure lines are comparable. */

@@ -91,10 +91,7 @@ export async function listContactsController({
 								and(
 									eq(schema.channelSubscription.contactId, schema.contact.id),
 									eq(schema.channelSubscription.channelId, query.channelId),
-									eq(
-										schema.channelSubscription.organizationId,
-										organizationId,
-									),
+									eq(schema.channelSubscription.organizationId, organizationId),
 									eq(schema.channelSubscription.status, "enrolled"),
 									isNull(schema.channelSubscription.deletedAt),
 								),

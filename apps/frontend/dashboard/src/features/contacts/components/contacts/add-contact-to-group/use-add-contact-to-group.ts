@@ -119,7 +119,8 @@ export const useAddContactToGroup = (
 	}, [groupQuery.data]);
 
 	const groupName = groupQuery.data?.pages[0]?.group?.name ?? "";
-	const memberCount = groupQuery.data?.pages[0]?.total ?? existingContactIds.size;
+	const memberCount =
+		groupQuery.data?.pages[0]?.total ?? existingContactIds.size;
 
 	const selectedContactIds = useMemo(
 		() => new Set(selectedContacts.map((c) => c.id)),

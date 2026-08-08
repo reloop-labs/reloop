@@ -111,9 +111,7 @@ export function DomainDetailPage({
 				icon: "mail-single",
 				shortcut: { label: "F R", keys: ["f", "r"] },
 				onSelect: () =>
-					window.dispatchEvent(
-						new CustomEvent("domain:open-forward-records"),
-					),
+					window.dispatchEvent(new CustomEvent("domain:open-forward-records")),
 			},
 			{
 				id: "dns-records-tab",
@@ -166,11 +164,7 @@ export function DomainDetailPage({
 		setDeleteId,
 	]);
 
-	useRegisterCommandActions(
-		`domain-detail-${rawDomainId}`,
-		"Domain",
-		actions,
-	);
+	useRegisterCommandActions(`domain-detail-${rawDomainId}`, "Domain", actions);
 
 	useHotkeys(
 		"c",

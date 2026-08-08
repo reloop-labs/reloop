@@ -32,7 +32,5 @@ export function proxy(request: NextRequest) {
 
 // Agent discovery files live on the marketing web app, not this docs app.
 export const config = {
-	matcher: [
-		"/((?!api|_next/static|_next/image|favicon.ico|sitemap\\.md).*)",
-	],
+	matcher: ["/((?!api|_next/static|_next/image|favicon.ico|sitemap\\.md).*)"],
 };

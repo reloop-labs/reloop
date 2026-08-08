@@ -27,7 +27,9 @@ function write(rel: string, content: string) {
 	const path = join(pub, rel);
 	ensureDir(join(path, ".."));
 	writeFileSync(path, content, "utf-8");
-	console.log(`  wrote public/${rel} (${content.length.toLocaleString()} chars)`);
+	console.log(
+		`  wrote public/${rel} (${content.length.toLocaleString()} chars)`,
+	);
 }
 
 // --- llms-full ---
@@ -80,7 +82,9 @@ for (const [src, dest] of mirrors) {
 // --- skill.md / llms.txt / llms-docs.txt are hand-maintained in public/ ---
 for (const name of ["skill.md", "llms.txt", "llms-docs.txt"] as const) {
 	if (!existsSync(join(pub, name))) {
-		console.warn(`  missing public/${name} (expected hand-maintained source of truth)`);
+		console.warn(
+			`  missing public/${name} (expected hand-maintained source of truth)`,
+		);
 	} else {
 		console.log(`  kept public/${name}`);
 	}
@@ -127,8 +131,18 @@ write(
 			transport: "http",
 			url: siteMcp,
 			servers: [
-				{ name: "site", url: siteMcp, transport: "http", authentication: "none" },
-				{ name: "docs", url: docsMcp, transport: "http", authentication: "none" },
+				{
+					name: "site",
+					url: siteMcp,
+					transport: "http",
+					authentication: "none",
+				},
+				{
+					name: "docs",
+					url: docsMcp,
+					transport: "http",
+					authentication: "none",
+				},
 			],
 		},
 		null,

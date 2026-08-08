@@ -70,7 +70,9 @@ export function DashboardShell({ children }: { children: ReactNode }) {
 						<PageHeader />
 						<div className="flex-1 overflow-y-auto">{children}</div>
 					</div>
-					<AnimatePresence>{isAiPanelOpen ? <AiPanel /> : null}</AnimatePresence>
+					<AnimatePresence>
+						{isAiPanelOpen ? <AiPanel /> : null}
+					</AnimatePresence>
 				</main>
 				<CommandMenuGlobal />
 			</div>

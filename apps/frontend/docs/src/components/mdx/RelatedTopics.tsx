@@ -2,7 +2,7 @@ import { SimpleIcon } from "@reloop/fe-docs/components/mdx/SimpleIcon";
 import { RELOOP_ICON_NAMES } from "@reloop/fe-docs/lib/reloop-icon-names";
 import { Icon as ReloopIcon } from "@reloop/ui/icon";
 import Link from "next/link";
-import React from "react";
+import type React from "react";
 
 export interface RelatedTopicProps {
 	title: string;
@@ -20,7 +20,7 @@ function renderTopicIcon(icon?: string | React.ReactNode) {
 	if (!icon) {
 		return (
 			<svg
-				className="size-4 shrink-0 text-gray-400 group-hover:text-primary dark:text-gray-500 dark:group-hover:text-white transition-colors"
+				className="size-4 shrink-0 text-gray-400 transition-colors group-hover:text-primary dark:text-gray-500 dark:group-hover:text-white"
 				fill="none"
 				viewBox="0 0 24 24"
 				stroke="currentColor"
@@ -36,12 +36,16 @@ function renderTopicIcon(icon?: string | React.ReactNode) {
 	}
 
 	if (typeof icon !== "string") {
-		return <span className="size-4 shrink-0 flex items-center justify-center">{icon}</span>;
+		return (
+			<span className="flex size-4 shrink-0 items-center justify-center">
+				{icon}
+			</span>
+		);
 	}
 
 	if (icon.startsWith("si") || icon.startsWith("Si")) {
 		return (
-			<span className="size-4 shrink-0 flex items-center justify-center text-gray-400 group-hover:text-primary dark:text-gray-400 dark:group-hover:text-white transition-colors">
+			<span className="flex size-4 shrink-0 items-center justify-center text-gray-400 transition-colors group-hover:text-primary dark:text-gray-400 dark:group-hover:text-white">
 				<SimpleIcon name={icon} />
 			</span>
 		);
@@ -51,14 +55,14 @@ function renderTopicIcon(icon?: string | React.ReactNode) {
 		return (
 			<ReloopIcon
 				name={icon}
-				className="size-4 shrink-0 text-gray-400 group-hover:text-primary dark:text-gray-400 dark:group-hover:text-white transition-colors"
+				className="size-4 shrink-0 text-gray-400 transition-colors group-hover:text-primary dark:text-gray-400 dark:group-hover:text-white"
 			/>
 		);
 	}
 
 	return (
 		<svg
-			className="size-4 shrink-0 text-gray-400 group-hover:text-primary dark:text-gray-500 dark:group-hover:text-white transition-colors"
+			className="size-4 shrink-0 text-gray-400 transition-colors group-hover:text-primary dark:text-gray-500 dark:group-hover:text-white"
 			fill="none"
 			viewBox="0 0 24 24"
 			stroke="currentColor"
@@ -80,7 +84,7 @@ export function RelatedTopic({ title, href, icon }: RelatedTopicProps) {
 	return (
 		<Link
 			href={finalHref}
-			className="group flex items-center gap-2.5 text-sm font-medium text-gray-700 hover:text-primary dark:text-gray-300 dark:hover:text-white no-underline transition-colors"
+			className="group flex items-center gap-2.5 font-medium text-gray-700 text-sm no-underline transition-colors hover:text-primary dark:text-gray-300 dark:hover:text-white"
 		>
 			{renderTopicIcon(icon)}
 			<span>{title}</span>
@@ -95,7 +99,7 @@ export function RelatedTopics({
 }: RelatedTopicsProps) {
 	return (
 		<div className="my-8">
-			<h2 className="my-0! mb-3! text-base font-semibold text-gray-900 dark:text-white">
+			<h2 className="my-0! mb-3! font-semibold text-base text-gray-900 dark:text-white">
 				{title}
 			</h2>
 			<div className="flex flex-col gap-2.5">

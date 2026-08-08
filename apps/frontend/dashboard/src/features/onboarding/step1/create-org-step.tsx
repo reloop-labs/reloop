@@ -1,7 +1,7 @@
 import * as FancyButton from "@reloop/ui/fancy-button";
 import Spinner from "@reloop/ui/spinner";
 import { AnimatePresence, motion } from "framer-motion";
-import { useCallback, type FormEvent } from "react";
+import { type FormEvent, useCallback } from "react";
 import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { CompanyNameField } from "./company-name-field";
 import { LogoUpload } from "./logo-upload";

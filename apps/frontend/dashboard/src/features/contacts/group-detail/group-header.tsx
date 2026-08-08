@@ -145,7 +145,9 @@ export const GroupHeader = ({ group, isLoading }: GroupHeaderProps) => {
 								>
 									<Icon name="edit" className="h-3.5 w-3.5" />
 									<span>Rename group</span>
-									<ActionKbd className="ml-0.5 w-auto min-w-4 px-1">E</ActionKbd>
+									<ActionKbd className="ml-0.5 w-auto min-w-4 px-1">
+										E
+									</ActionKbd>
 								</Button.Root>
 								<FancyButton.Root
 									variant="blue"

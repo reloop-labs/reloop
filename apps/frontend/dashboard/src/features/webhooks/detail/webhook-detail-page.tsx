@@ -77,7 +77,7 @@ export function WebhookDetailPage({ webhookId }: { webhookId: string }) {
 
 	return (
 		<>
-			<div className="mx-auto max-w-5xl space-y-8 px-6 pb-12 sm:px-8 pt-8">
+			<div className="mx-auto max-w-5xl space-y-8 px-6 pt-8 pb-12 sm:px-8">
 				<WebhookHeader
 					webhook={data}
 					isLoading={isLoading}

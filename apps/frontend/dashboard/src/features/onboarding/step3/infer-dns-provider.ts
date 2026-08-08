@@ -1,5 +1,5 @@
 export {
 	DNS_SETUP_HUB_URL,
-	inferDnsProvider,
 	type InferredDnsProvider,
+	inferDnsProvider,
 } from "#/features/domain/dns-provider";

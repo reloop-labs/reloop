@@ -1,5 +1,6 @@
 /** Public docs base for domain / DNS help. */
-export const DNS_DOCS_BASE = "https://reloop.sh/docs/guides/connect-domain/providers";
+export const DNS_DOCS_BASE =
+	"https://reloop.sh/docs/guides/connect-domain/providers";
 
 /** Hub listing every provider-specific DNS guide. */
 export const DNS_SETUP_HUB_URL = DNS_DOCS_BASE;
@@ -41,9 +42,7 @@ function provider(
 ): InferredDnsProvider {
 	return {
 		...partial,
-		docsUrl: partial.docsSlug
-			? guideUrl(partial.docsSlug)
-			: DNS_SETUP_HUB_URL,
+		docsUrl: partial.docsSlug ? guideUrl(partial.docsSlug) : DNS_SETUP_HUB_URL,
 		supportsAutoConnect: partial.supportsAutoConnect ?? false,
 	};
 }

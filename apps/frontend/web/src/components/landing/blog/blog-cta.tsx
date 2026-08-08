@@ -80,7 +80,10 @@ export function BlogCta({
 	const variant = {
 		headline: headline ?? categoryVariant?.headline ?? DEFAULT_VARIANT.headline,
 		sub: sub ?? categoryVariant?.sub ?? DEFAULT_VARIANT.sub,
-		primaryLabel: primaryLabel ?? categoryVariant?.primaryLabel ?? DEFAULT_VARIANT.primaryLabel,
+		primaryLabel:
+			primaryLabel ??
+			categoryVariant?.primaryLabel ??
+			DEFAULT_VARIANT.primaryLabel,
 	};
 
 	return (

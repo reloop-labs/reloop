@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { AGENT_CACHE_CONTROL } from "../../lib/agent-headers";
-import { loadAllDocsText, type DocsTextFile } from "../../lib/docs-content-fs";
+import { type DocsTextFile, loadAllDocsText } from "../../lib/docs-content-fs";
 
 const ORIGIN = process.env.NEXT_PUBLIC_URL || "https://reloop.sh";
 const SERVER_INFO = {

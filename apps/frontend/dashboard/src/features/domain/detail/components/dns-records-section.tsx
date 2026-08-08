@@ -50,9 +50,7 @@ export const DNSRecordsSection = ({
 			const next = !sendingEnabled;
 			void handleUpdateDomain(
 				{ isSendingEmailEnabled: next },
-				next
-					? "Sending enabled successfully"
-					: "Sending disabled successfully",
+				next ? "Sending enabled successfully" : "Sending disabled successfully",
 				next ? "Enabling email sending..." : "Disabling email sending...",
 			);
 		},
@@ -74,9 +72,7 @@ export const DNSRecordsSection = ({
 				next
 					? "Receiving enabled successfully"
 					: "Receiving disabled successfully",
-				next
-					? "Enabling email receiving..."
-					: "Disabling email receiving...",
+				next ? "Enabling email receiving..." : "Disabling email receiving...",
 			);
 		},
 		{

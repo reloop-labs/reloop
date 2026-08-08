@@ -4,8 +4,7 @@ import { Icon } from "@reloop/ui/icon";
 import { useHotkeys } from "react-hotkeys-hook";
 import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 
-const openDocs = () =>
-	window.open("https://reloop.sh/docs/webhooks", "_blank");
+const openDocs = () => window.open("https://reloop.sh/docs/webhooks", "_blank");
 
 type ButtonProps = React.ComponentPropsWithoutRef<typeof Button.Root>;
 

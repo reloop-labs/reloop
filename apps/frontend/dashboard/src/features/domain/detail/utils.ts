@@ -1,8 +1,8 @@
 export {
 	DNS_SETUP_HUB_URL,
 	DOMAIN_LEARN_DOCS_URL,
-	inferDnsProvider,
 	type InferredDnsProvider,
+	inferDnsProvider,
 } from "../dns-provider";
 
 export const getStatusBadgeStyles = (status: string) => {

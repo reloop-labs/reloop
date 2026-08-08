@@ -37,16 +37,15 @@ const SIZE_CLASS: Record<
 	},
 };
 
-const STATUS_TONE: Record<
-	DomainStatus,
-	{ outer: string; icon: string }
-> = {
+const STATUS_TONE: Record<DomainStatus, { outer: string; icon: string }> = {
 	active: {
-		outer: "border-success-base/25 bg-success-lighter dark:border-success-base/30 dark:bg-success-base/10",
+		outer:
+			"border-success-base/25 bg-success-lighter dark:border-success-base/30 dark:bg-success-base/10",
 		icon: "text-success-base",
 	},
 	verifying: {
-		outer: "border-warning-base/25 bg-warning-lighter dark:border-warning-base/30 dark:bg-warning-base/10",
+		outer:
+			"border-warning-base/25 bg-warning-lighter dark:border-warning-base/30 dark:bg-warning-base/10",
 		icon: "text-warning-base",
 	},
 	pending: {
@@ -55,11 +54,13 @@ const STATUS_TONE: Record<
 		icon: "text-text-sub-600 dark:text-white/80",
 	},
 	failed: {
-		outer: "border-error-base/25 bg-error-lighter dark:border-error-base/30 dark:bg-error-base/10",
+		outer:
+			"border-error-base/25 bg-error-lighter dark:border-error-base/30 dark:bg-error-base/10",
 		icon: "text-error-base",
 	},
 	suspended: {
-		outer: "border-error-base/25 bg-error-lighter dark:border-error-base/30 dark:bg-error-base/10",
+		outer:
+			"border-error-base/25 bg-error-lighter dark:border-error-base/30 dark:bg-error-base/10",
 		icon: "text-error-base",
 	},
 };

@@ -135,7 +135,7 @@ export function ApiKeyHeaderMenu({
 										(item.isDanger ? "bg-red-alpha-10" : "bg-neutral-alpha-10"),
 								)}
 							>
-								<div className="flex items-center gap-2 min-w-0 truncate">
+								<div className="flex min-w-0 items-center gap-2 truncate">
 									<Icon
 										name={item.icon}
 										className={cn(
@@ -146,7 +146,7 @@ export function ApiKeyHeaderMenu({
 									<span className="truncate">{item.label}</span>
 								</div>
 								{item.shortcut ? (
-									<ActionKbd className="w-auto min-w-4 px-1 shrink-0">
+									<ActionKbd className="w-auto min-w-4 shrink-0 px-1">
 										{item.shortcut}
 									</ActionKbd>
 								) : null}

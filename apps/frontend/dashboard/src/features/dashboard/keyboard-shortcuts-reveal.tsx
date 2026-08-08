@@ -288,7 +288,9 @@ export function ShortcutHint({
 		steps && steps.length > 0 ? (
 			<ShortcutKeycaps steps={steps} className={className} />
 		) : (
-			<KbdKey className={cn(shortcutKbdClassName, className)}>{children}</KbdKey>
+			<KbdKey className={cn(shortcutKbdClassName, className)}>
+				{children}
+			</KbdKey>
 		);
 
 	// Measure the real keycap row once mounted so multi-key labels aren't clipped.
@@ -342,7 +344,7 @@ export function ShortcutHint({
 					// -my keeps the nav row height unchanged. Nudge up for optical align.
 					// justify-start so if width is briefly short we clip the trailing key,
 					// never the leading "G" of a sequence.
-					className="-my-0.5 inline-flex shrink-0 -translate-y-px items-center justify-start overflow-hidden py-0.5"
+					className="-my-0.5 -translate-y-px inline-flex shrink-0 items-center justify-start overflow-hidden py-0.5"
 				>
 					<span
 						ref={innerRef}

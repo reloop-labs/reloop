@@ -17,10 +17,7 @@ export const ModalHeader = ({
 					Select contacts to add to{" "}
 					<span className="font-medium text-text-strong-950">{groupName}</span>
 					{memberCount > 0 ? (
-						<>
-							{" "}
-							· {memberCount.toLocaleString()} already in group
-						</>
+						<> · {memberCount.toLocaleString()} already in group</>
 					) : null}
 					.
 				</>

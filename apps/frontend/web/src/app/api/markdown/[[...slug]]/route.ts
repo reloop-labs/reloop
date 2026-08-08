@@ -1,9 +1,9 @@
-import { type NextRequest, NextResponse } from "next/server";
 import { resolveMarketingMarkdown } from "@reloop/web/lib/agent-content";
 import {
 	AGENT_CACHE_CONTROL,
 	AGENT_CONTENT_SIGNAL,
 } from "@reloop/web/lib/agent-headers";
+import { type NextRequest, NextResponse } from "next/server";
 
 const RESERVED = new Set([
 	"skill",

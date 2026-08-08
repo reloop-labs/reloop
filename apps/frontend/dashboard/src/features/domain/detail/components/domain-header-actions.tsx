@@ -237,10 +237,7 @@ export const DomainHeaderActions = ({
 								</div>
 								<span className="inline-flex shrink-0 items-center gap-0.5">
 									{item.shortcut.split(" ").map((key) => (
-										<ActionKbd
-											key={key}
-											className="w-auto min-w-4 px-1"
-										>
+										<ActionKbd key={key} className="w-auto min-w-4 px-1">
 											{key}
 										</ActionKbd>
 									))}

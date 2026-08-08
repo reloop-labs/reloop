@@ -108,9 +108,7 @@ export function ConfigureDnsStep() {
 			const next = !sendingEnabled;
 			void handleUpdateDomain(
 				{ isSendingEmailEnabled: next },
-				next
-					? "Sending enabled successfully"
-					: "Sending disabled successfully",
+				next ? "Sending enabled successfully" : "Sending disabled successfully",
 				next ? "Enabling email sending..." : "Disabling email sending...",
 			);
 		},
@@ -132,9 +130,7 @@ export function ConfigureDnsStep() {
 				next
 					? "Receiving enabled successfully"
 					: "Receiving disabled successfully",
-				next
-					? "Enabling email receiving..."
-					: "Disabling email receiving...",
+				next ? "Enabling email receiving..." : "Disabling email receiving...",
 			);
 		},
 		{

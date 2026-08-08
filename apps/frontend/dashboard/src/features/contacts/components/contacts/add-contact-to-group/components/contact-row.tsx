@@ -70,7 +70,9 @@ export const ContactRow = ({
 				<p className="truncate font-medium text-[13px] text-text-strong-950">
 					{displayName}
 				</p>
-				<p className="truncate text-[12px] text-text-sub-600">{contact.email}</p>
+				<p className="truncate text-[12px] text-text-sub-600">
+					{contact.email}
+				</p>
 			</div>
 
 			{inGroup ? (

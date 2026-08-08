@@ -113,10 +113,7 @@ export function PageActions({
 			{isOpen && (
 				<>
 					{/* Overlay to close on outside click */}
-					<div
-						className="fixed inset-0 z-40"
-						onClick={() => setOpen(false)}
-					/>
+					<div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
 					{/*
 					  Left-align on phone (control sits under title);
 					  right-align on sm+ when control sits at the end of the title row.

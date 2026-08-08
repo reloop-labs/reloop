@@ -111,7 +111,11 @@ function TabsShell({
 				onValueChange(match.value);
 			}
 		},
-		{ enabled: shortcutKeys.length > 0, enableOnFormTags: false, preventDefault: true },
+		{
+			enabled: shortcutKeys.length > 0,
+			enableOnFormTags: false,
+			preventDefault: true,
+		},
 	);
 
 	const firstItem = items[0];
@@ -151,7 +155,9 @@ function TabsShell({
 						{icon ? <Icon name={icon} className="h-4 w-4" /> : null}
 						{title}
 						{shortcut ? (
-							<KbdKey className={cn(shortcutKbdClassName, "ml-1 hidden sm:flex")}>
+							<KbdKey
+								className={cn(shortcutKbdClassName, "ml-1 hidden sm:flex")}
+							>
 								{shortcut.toUpperCase()}
 							</KbdKey>
 						) : null}

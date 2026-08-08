@@ -39,16 +39,13 @@ export function CommandMenuProvider({
 		() => new Map(),
 	);
 
-	const register = React.useCallback(
-		(id: string, group: PageActionGroup) => {
-			setGroups((prev) => {
-				const next = new Map(prev);
-				next.set(id, group);
-				return next;
-			});
-		},
-		[],
-	);
+	const register = React.useCallback((id: string, group: PageActionGroup) => {
+		setGroups((prev) => {
+			const next = new Map(prev);
+			next.set(id, group);
+			return next;
+		});
+	}, []);
 
 	const unregister = React.useCallback((id: string) => {
 		setGroups((prev) => {
@@ -66,9 +63,7 @@ export function CommandMenuProvider({
 
 	return (
 		<DispatchContext.Provider value={dispatch}>
-			<StateContext.Provider value={groups}>
-				{children}
-			</StateContext.Provider>
+			<StateContext.Provider value={groups}>{children}</StateContext.Provider>
 		</DispatchContext.Provider>
 	);
 }

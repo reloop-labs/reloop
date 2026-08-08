@@ -1,8 +1,13 @@
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
-import { CopyCodeBlock } from "@reloop/ui/copy-code-block";
+import {
+	BrandLanguageIcon,
+	CopyCodeBlock,
+	type CopyCodeBlockIcon,
+} from "@reloop/ui/copy-code-block";
 import * as Drawer from "@reloop/ui/drawer";
 import { Icon } from "@reloop/ui/icon";
+import { JAVA_ICON } from "@reloop/ui/icons/java";
 import * as Tooltip from "@reloop/ui/tooltip";
 import {
 	CheckCircle2,
@@ -19,11 +24,6 @@ import {
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
-import {
-	BrandLanguageIcon,
-	type CopyCodeBlockIcon,
-} from "@reloop/ui/copy-code-block";
-import { JAVA_ICON } from "@reloop/ui/icons/java";
 import {
 	siCurl,
 	siDotnet,
@@ -240,7 +240,10 @@ export const ApiDetailsDrawer = ({
 	useEffect(() => {
 		const handleOpenEvent = (e: Event) => {
 			const customEvent = e as CustomEvent<{ docSection?: string }>;
-			if (!customEvent.detail?.docSection || customEvent.detail.docSection === docSection) {
+			if (
+				!customEvent.detail?.docSection ||
+				customEvent.detail.docSection === docSection
+			) {
 				setIsOpen(true);
 			}
 		};

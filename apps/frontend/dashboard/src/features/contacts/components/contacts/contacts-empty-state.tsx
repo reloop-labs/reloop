@@ -82,7 +82,8 @@ export function ContactsEmptyState({
 				/>
 			</div>
 			<h3 className="mb-2 font-semibold text-text-strong-950 text-xl">
-				{title ?? (isFiltered ? "No contacts found" : "Create your first contact")}
+				{title ??
+					(isFiltered ? "No contacts found" : "Create your first contact")}
 			</h3>
 			<p className="mx-auto mb-6 max-w-75 text-balance font-medium text-[12px] text-text-sub-600">
 				{description ??

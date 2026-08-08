@@ -20,4 +20,3 @@ export const webhookRoutes = new Elysia({
 	.use(triggerWebhookRoute)
 	.use(signTestEventRoute)
 	.use(listWebhookDeliveriesRoute);
-

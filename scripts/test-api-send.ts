@@ -1,6 +1,7 @@
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
-const API_KEY = process.env.RELOOP_API_KEY || "rl_prod_Bdaz6xFbe09ObMehYDNTYj7NXc4";
+const API_KEY =
+	process.env.RELOOP_API_KEY || "rl_prod_Bdaz6xFbe09ObMehYDNTYj7NXc4";
 const BASE_URL = process.env.RELOOP_BASE_URL || "https://local.reloop.sh";
 const RECIPIENT = process.argv[2] || "albindar@gamil.com";
 

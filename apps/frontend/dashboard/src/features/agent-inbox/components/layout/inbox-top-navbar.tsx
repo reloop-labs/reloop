@@ -139,7 +139,7 @@ export function InboxTopNavbar({ mailbox }: { mailbox: AgentMailbox }) {
 								Support
 							</span>
 							{unreadCount > 0 ? (
-								<span className="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-orange-500 px-1 font-semibold text-[10px] text-white tabular-nums">
+								<span className="-top-0.5 -right-0.5 absolute flex h-4 min-w-4 items-center justify-center rounded-full bg-orange-500 px-1 font-semibold text-[10px] text-white tabular-nums">
 									{unreadCount > 99 ? "99+" : unreadCount}
 								</span>
 							) : null}

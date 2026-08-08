@@ -85,10 +85,7 @@ export type SubscriptionActivityResponse = {
 	event: string;
 };
 
-export function useSubscriptionActivityQuery(
-	days = 7,
-	enabled = true,
-) {
+export function useSubscriptionActivityQuery(days = 7, enabled = true) {
 	return useQuery({
 		queryKey: queryKeys.contacts.subscriptionActivity(days),
 		queryFn: async () => {

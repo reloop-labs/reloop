@@ -38,7 +38,7 @@ const AnimatedHeight = ({ children }: { children: React.ReactNode }) => {
 					: { duration: 0.32, ease: [0.23, 1, 0.32, 1] }
 			}
 			// Clip vertical overflow for height animation only — keep action rows visible.
-			className="min-w-0 overflow-x-visible overflow-y-hidden"
+			className="min-w-0 overflow-y-hidden overflow-x-visible"
 		>
 			<div ref={innerRef} className="min-w-0 p-1.5">
 				{children}

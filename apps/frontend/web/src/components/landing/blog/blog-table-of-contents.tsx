@@ -84,7 +84,7 @@ export function BlogTableOfContents({
 	return (
 		<nav aria-label="Table of contents" className={cn("w-full", className)}>
 			{showHeader ? (
-				<h2 className="mb-3 font-mono text-[11px] text-text-sub-600 dark:text-white/45 tracking-widest uppercase font-medium">
+				<h2 className="mb-3 font-medium font-mono text-[11px] text-text-sub-600 uppercase tracking-widest dark:text-white/45">
 					On this page
 				</h2>
 			) : null}
@@ -101,7 +101,7 @@ export function BlogTableOfContents({
 								className={cn(
 									"block border-l-2 py-0.5 pl-3.5 text-[13px] leading-snug transition-colors",
 									isActive
-										? "border-text-strong-950 text-text-strong-950 font-medium dark:border-white dark:text-white"
+										? "border-text-strong-950 font-medium text-text-strong-950 dark:border-white dark:text-white"
 										: "border-transparent text-text-sub-600 hover:text-text-strong-950 dark:text-white/45 dark:hover:text-white",
 								)}
 								title={item.title}

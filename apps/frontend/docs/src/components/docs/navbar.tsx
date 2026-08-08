@@ -53,7 +53,7 @@ export function Navbar({
 	}, []);
 
 	return (
-		<div className="flex h-full min-w-0 w-full items-center justify-between gap-2 pr-2 sm:pr-3">
+		<div className="flex h-full w-full min-w-0 items-center justify-between gap-2 pr-2 sm:pr-3">
 			{/* Mobile — match dashboard brand lockup */}
 			<div className="flex shrink-0 items-center gap-2 lg:hidden">
 				<button
@@ -95,7 +95,7 @@ export function Navbar({
 								key={tab.title}
 								href={tab.url}
 								className={cn(
-									"relative flex h-9 shrink-0 items-center gap-1.5 rounded-full px-2.5 font-semibold text-[13px] whitespace-nowrap no-underline transition-colors",
+									"relative flex h-9 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 font-semibold text-[13px] no-underline transition-colors",
 									"xl:px-3",
 									active
 										? ""

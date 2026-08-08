@@ -335,9 +335,10 @@ export const TriggerWebhookTester = ({
 			);
 			signedData = res.data;
 		} catch (err: unknown) {
-			const msg = axios.isAxiosError(err) && err.response?.data?.message
-				? err.response.data.message
-				: "Failed to sign test event";
+			const msg =
+				axios.isAxiosError(err) && err.response?.data?.message
+					? err.response.data.message
+					: "Failed to sign test event";
 			setResult({
 				phase: "sign_error",
 				eventType: selectedEventId,
@@ -605,7 +606,8 @@ export const TriggerWebhookTester = ({
 									Sending test event from client browser…
 								</p>
 								<p className="max-w-[260px] text-[12px] text-text-sub-600 leading-relaxed">
-									Signing payload on backend and invoking endpoint directly from your browser.
+									Signing payload on backend and invoking endpoint directly from
+									your browser.
 								</p>
 							</div>
 						</div>
@@ -643,8 +645,12 @@ export const TriggerWebhookTester = ({
 										</p>
 										<p className="mt-0.5 text-[12px] text-text-sub-600">
 											{new Date(result.triggeredAt).toLocaleString()}
-											{result.durationMs != null ? ` · ${result.durationMs}ms` : ""}
-											{result.responseStatus != null ? ` · HTTP ${result.responseStatus}` : ""}
+											{result.durationMs != null
+												? ` · ${result.durationMs}ms`
+												: ""}
+											{result.responseStatus != null
+												? ` · HTTP ${result.responseStatus}`
+												: ""}
 										</p>
 										{result.url ? (
 											<p className="mt-1 truncate font-mono text-[11px] text-text-sub-600">
@@ -660,7 +666,7 @@ export const TriggerWebhookTester = ({
 										<p className="font-medium text-[11px] text-text-sub-600 uppercase tracking-wide">
 											Details
 										</p>
-										<pre className="max-h-[min(200px,30vh)] overflow-auto rounded-xl bg-bg-weak-50 p-3 font-mono text-[11px] text-text-strong-950 leading-relaxed dark:bg-bg-weak-50/50 whitespace-pre-wrap break-words">
+										<pre className="max-h-[min(200px,30vh)] overflow-auto whitespace-pre-wrap break-words rounded-xl bg-bg-weak-50 p-3 font-mono text-[11px] text-text-strong-950 leading-relaxed dark:bg-bg-weak-50/50">
 											{result.errorMessage}
 										</pre>
 									</div>
@@ -679,7 +685,8 @@ export const TriggerWebhookTester = ({
 								) : null}
 
 								{/* Request headers sent */}
-								{result.headersSent && Object.keys(result.headersSent).length > 0 ? (
+								{result.headersSent &&
+								Object.keys(result.headersSent).length > 0 ? (
 									<div className="space-y-1.5">
 										<p className="font-medium text-[11px] text-text-sub-600 uppercase tracking-wide">
 											Headers sent from client

@@ -3,9 +3,9 @@ import { Icon } from "@reloop/ui/icon";
 import { AnimatePresence, motion } from "framer-motion";
 import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { ShortcutHint } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import { useOrgPermissions } from "#/features/settings/use-org-permissions";
-import { ShortcutHint } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import {
 	mainNavigation,
 	SETTINGS_ADMIN_HOME,
@@ -66,10 +66,7 @@ export function SidebarItems({
 
 				if (hasActiveSubItem) {
 					// Auto-open only if the user hasn't explicitly collapsed it.
-					if (
-						!userCollapsedRef.current.has(item.path) &&
-						!next[item.path]
-					) {
+					if (!userCollapsedRef.current.has(item.path) && !next[item.path]) {
 						next[item.path] = true;
 						changed = true;
 					}
@@ -146,7 +143,8 @@ export function SidebarItems({
 			onPointerLeave={() => setHoveredEl(undefined)}
 		>
 			{navigation.map((item, index) => {
-				const { path, label, iconName, isSpecial, items, section, shortcut } = item;
+				const { path, label, iconName, isSpecial, items, section, shortcut } =
+					item;
 				if (path === "/ai") return null;
 				const hasSubNav = items && items.length > 0;
 				const isExpanded = expandedItems[path] && !isCollapsed;
@@ -193,7 +191,13 @@ export function SidebarItems({
 											hasSubNav ? "justify-between" : "justify-start",
 										),
 							)}
-							title={isCollapsed ? (shortcut ? `${label} (${shortcut.label})` : label) : undefined}
+							title={
+								isCollapsed
+									? shortcut
+										? `${label} (${shortcut.label})`
+										: label
+									: undefined
+							}
 						>
 							<span
 								className={cn(
@@ -288,55 +292,53 @@ export function SidebarItems({
 										style={{ overflow: "hidden" }}
 									>
 										<div className="my-0.5 ml-[14px] flex flex-col border-stroke-soft-200 border-l pb-0.5 pl-2">
-											{items.map(
-												(
-													subItem,
-													subIndex,
-												) => {
-													const { label: subLabel, path: subPath, iconName: subIcon, shortcut: subShortcut } = subItem;
-													const isSubActive =
-														subPath === "/settings"
-															? pathWithoutSlug === "/settings"
-															: pathWithoutSlug.startsWith(subPath);
-													return (
-														<SidebarNavLink
-															href={subPath}
-															key={subPath}
-															ref={(el) => {
-																if (el) {
-																	if (!subNavRefs.current[path]) {
-																		subNavRefs.current[path] = [];
-																	}
-																	subNavRefs.current[path][subIndex] = el;
+											{items.map((subItem, subIndex) => {
+												const {
+													label: subLabel,
+													path: subPath,
+													iconName: subIcon,
+													shortcut: subShortcut,
+												} = subItem;
+												const isSubActive =
+													subPath === "/settings"
+														? pathWithoutSlug === "/settings"
+														: pathWithoutSlug.startsWith(subPath);
+												return (
+													<SidebarNavLink
+														href={subPath}
+														key={subPath}
+														ref={(el) => {
+															if (el) {
+																if (!subNavRefs.current[path]) {
+																	subNavRefs.current[path] = [];
 																}
-															}}
-															onPointerEnter={() =>
-																setHoveredEl(
-																	subNavRefs.current[path]?.[subIndex],
-																)
+																subNavRefs.current[path][subIndex] = el;
 															}
-															className={cn(
-																"relative z-10 flex h-7 items-center justify-between gap-1.5 rounded-md px-2 font-medium text-[12px] transition-colors",
-																isSubActive
-																	? "text-text-strong-950"
-																	: "text-text-sub-600 hover:text-text-strong-950",
-															)}
-														>
-															<span className="flex min-w-0 items-center gap-1.5">
-																<SidebarNavIcon
-																	name={subIcon}
-																	isActive={isSubActive}
-																	className="h-3.5 w-3.5"
-																/>
-																{subLabel}
-															</span>
-															{subShortcut && (
-																<ShortcutHint>{subShortcut.label}</ShortcutHint>
-															)}
-														</SidebarNavLink>
-													);
-												},
-											)}
+														}}
+														onPointerEnter={() =>
+															setHoveredEl(subNavRefs.current[path]?.[subIndex])
+														}
+														className={cn(
+															"relative z-10 flex h-7 items-center justify-between gap-1.5 rounded-md px-2 font-medium text-[12px] transition-colors",
+															isSubActive
+																? "text-text-strong-950"
+																: "text-text-sub-600 hover:text-text-strong-950",
+														)}
+													>
+														<span className="flex min-w-0 items-center gap-1.5">
+															<SidebarNavIcon
+																name={subIcon}
+																isActive={isSubActive}
+																className="h-3.5 w-3.5"
+															/>
+															{subLabel}
+														</span>
+														{subShortcut && (
+															<ShortcutHint>{subShortcut.label}</ShortcutHint>
+														)}
+													</SidebarNavLink>
+												);
+											})}
 										</div>
 									</motion.div>
 								)}
@@ -346,7 +348,10 @@ export function SidebarItems({
 				);
 			})}
 
-			<AnimatedHoverBackground box={hoverBox} className="!bg-neutral-alpha-10" />
+			<AnimatedHoverBackground
+				box={hoverBox}
+				className="!bg-neutral-alpha-10"
+			/>
 		</div>
 	);
 }

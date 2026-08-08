@@ -61,10 +61,7 @@ export function DomainListHeader() {
 							className="gap-1.5 rounded-xl"
 							aria-keyshortcuts="s"
 						>
-							<Icon
-								name="code"
-								className="h-4 w-4 text-text-sub-600"
-							/>
+							<Icon name="code" className="h-4 w-4 text-text-sub-600" />
 							SDK
 							<ActionKbd>S</ActionKbd>
 						</Button.Root>

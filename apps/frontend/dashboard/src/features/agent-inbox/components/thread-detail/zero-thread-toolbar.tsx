@@ -42,7 +42,7 @@ function ToolbarTip({ tip }: { tip: TipState | null }) {
 	return createPortal(
 		<div
 			role="tooltip"
-			className="pointer-events-none fixed z-[9999] -translate-x-1/2 rounded bg-neutral-900 px-2 py-1 font-medium text-[11px] text-white shadow-md dark:bg-neutral-100 dark:text-neutral-900"
+			className="-translate-x-1/2 pointer-events-none fixed z-[9999] rounded bg-neutral-900 px-2 py-1 font-medium text-[11px] text-white shadow-md dark:bg-neutral-100 dark:text-neutral-900"
 			style={{ left: tip.x, top: tip.y }}
 		>
 			{tip.label}
@@ -85,10 +85,7 @@ const ActionButton = ({
 );
 
 const ToolbarDivider = () => (
-	<span
-		className="mx-0.5 h-4 w-px shrink-0 bg-mail-border/60"
-		aria-hidden
-	/>
+	<span className="mx-0.5 h-4 w-px shrink-0 bg-mail-border/60" aria-hidden />
 );
 
 export const ZeroThreadToolbar = ({

@@ -1,6 +1,5 @@
 "use client";
 
-import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { BlogBody } from "@reloop/web/components/landing/blog/blog-body";
 import { BlogCta } from "@reloop/web/components/landing/blog/blog-cta";
@@ -289,10 +288,29 @@ export function BlogPostPageView({
 							{/* Dub-style Product CTA Card */}
 							<a
 								href="/dashboard/signup"
-								className="group relative block overflow-hidden rounded-2xl border border-stroke-soft-200/60 bg-white p-3.5 transition-all duration-200 dark:border-white/10 dark:bg-white/[0.03]"
+								className="group relative block overflow-hidden rounded-2xl border border-stroke-soft-200/80 bg-white p-3.5 transition-all duration-200 hover:border-stroke-soft-300 hover:shadow-black/5 dark:border-white/10 dark:bg-white/[0.03] dark:hover:border-white/20 dark:hover:shadow-black/40"
 							>
 								{/* Top Product Preview SVG */}
-								<div className="relative mb-3.5 flex aspect-[16/10] w-full items-center justify-center overflow-hidden rounded-xl bg-bg-weak-50/40 p-3.5 text-text-strong-950 dark:bg-neutral-900/30 dark:text-white">
+								<div className="relative mb-3.5 flex aspect-[16/10] w-full items-center justify-center overflow-hidden rounded-xl bg-bg-weak-50/40 p-3.5 text-text-strong-950 transition-colors duration-200 dark:bg-neutral-900/30 dark:text-white">
+									{/* Top Right Circular Arrow Badge (visible on hover, stationary, no shadow) */}
+									<div className="pointer-events-none absolute top-1 right-1 z-20 flex size-8 items-center justify-center rounded-full border border-stroke-soft-200/80 bg-white opacity-0 transition-opacity duration-200 group-hover:opacity-100 dark:border-white/15 dark:bg-neutral-900">
+										<svg
+											className="size-4 shrink-0 text-text-strong-950 dark:text-white"
+											viewBox="0 0 16 16"
+											fill="none"
+											xmlns="http://www.w3.org/2000/svg"
+											aria-hidden="true"
+										>
+											<path
+												d="M4.5 11.5L11.5 4.5M11.5 4.5H5.5M11.5 4.5V10.5"
+												stroke="currentColor"
+												strokeWidth="1.5"
+												strokeLinecap="round"
+												strokeLinejoin="round"
+											/>
+										</svg>
+									</div>
+
 									{/* Subtle grey diagonal hatch pattern */}
 									<div
 										className="pointer-events-none absolute inset-0 opacity-[0.03] dark:opacity-[0.05]"
@@ -337,7 +355,7 @@ export function BlogPostPageView({
 									<div className="pointer-events-none absolute size-32 rounded-full bg-gradient-to-tr from-blue-500/[0.06] via-sky-400/[0.04] to-indigo-500/[0.04] blur-2xl transition-transform duration-500 group-hover:scale-125 dark:from-blue-500/[0.08] dark:via-sky-400/[0.06] dark:to-indigo-500/[0.06]" />
 
 									<svg
-										className="relative z-10 size-24 text-text-strong-950 transition-transform duration-200 group-hover:scale-105 dark:text-white"
+										className="relative z-10 size-24 text-text-strong-950 transition-transform duration-200 ease-out group-hover:scale-105 dark:text-white"
 										viewBox="0 0 24 24"
 										fill="none"
 										xmlns="http://www.w3.org/2000/svg"
@@ -379,11 +397,11 @@ export function BlogPostPageView({
 								</div>
 
 								{/* Text content below preview */}
-								<div className="space-y-1 px-0.5">
-									<h4 className="flex items-center justify-between font-bold text-base text-text-strong-950 tracking-tight dark:text-white">
+								<div className="space-y-1.5 px-0.5">
+									<h4 className="font-bold text-base text-text-strong-950 tracking-tight dark:text-white">
 										Get started
 									</h4>
-									<p className="font-medium text-[13px] text-text-sub-600 leading-snug dark:text-white/60">
+									<p className="font-medium text-[13.5px] text-text-sub-600 leading-snug transition-colors duration-200 group-hover:text-text-strong-950 group-hover:underline group-hover:decoration-text-soft-400 group-hover:underline-offset-4 dark:text-white/60 dark:group-hover:text-white/90 dark:group-hover:decoration-white/30">
 										Email API for developers. With agent inboxes built in.
 									</p>
 								</div>

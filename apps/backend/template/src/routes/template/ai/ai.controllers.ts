@@ -393,8 +393,8 @@ export async function createAIStream({
 			if (openaiApiKey) {
 				const visionModel =
 					!isGemmaModel(resolvedModel) &&
-						!isGeminiModel(resolvedModel) &&
-						!isOpenRouterModel(resolvedModel)
+					!isGeminiModel(resolvedModel) &&
+					!isOpenRouterModel(resolvedModel)
 						? resolvedModel
 						: process.env.OPENAI_VISION_MODEL || "gpt-4o-mini";
 				const openaiProvider = apiKey

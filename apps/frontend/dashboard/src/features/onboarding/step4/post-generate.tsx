@@ -116,7 +116,11 @@ export function PostGenerate({
 			e.preventDefault();
 			window.open(provider.href, "_blank", "noopener,noreferrer");
 		},
-		{ enableOnFormTags: false, preventDefault: true, enabled: testSent && !!provider },
+		{
+			enableOnFormTags: false,
+			preventDefault: true,
+			enabled: testSent && !!provider,
+		},
 		[testSent, provider],
 	);
 

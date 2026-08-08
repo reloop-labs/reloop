@@ -64,9 +64,7 @@ function asRecord(value: unknown): Record<string, unknown> | null {
 	return null;
 }
 
-function normalizeChangeValue(
-	value: unknown,
-): string | number | null {
+function normalizeChangeValue(value: unknown): string | number | null {
 	if (value === undefined || value === null || value === "") return null;
 	if (typeof value === "string" || typeof value === "number") return value;
 	return String(value);
@@ -86,8 +84,7 @@ function parseStoredChanges(
 			field: row.field,
 			from: normalizeChangeValue(row.from),
 			to: normalizeChangeValue(row.to),
-			label:
-				typeof row.label === "string" ? row.label : fieldLabel(row.field),
+			label: typeof row.label === "string" ? row.label : fieldLabel(row.field),
 		});
 	}
 	return changes.length > 0 ? changes : null;

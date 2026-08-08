@@ -159,7 +159,8 @@ export const DomainConfigurationSection = ({
 						}
 						className={cn(
 							"cursor-pointer select-none rounded-xl border border-stroke-soft-100 p-3 transition-colors duration-300 hover:bg-bg-weak-50/10 dark:border-stroke-soft-100/10 dark:hover:bg-bg-weak-50/5",
-							clickTrackingFlash && "bg-success-base/10 dark:bg-success-base/20",
+							clickTrackingFlash &&
+								"bg-success-base/10 dark:bg-success-base/20",
 						)}
 					>
 						<div className="flex items-center justify-between">

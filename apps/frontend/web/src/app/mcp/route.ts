@@ -1,7 +1,7 @@
-import { type NextRequest, NextResponse } from "next/server";
 import { loadMarketingCorpus } from "@reloop/web/lib/agent-content";
 import { AGENT_CACHE_CONTROL } from "@reloop/web/lib/agent-headers";
 import { getSiteUrl } from "@reloop/web/lib/site";
+import { type NextRequest, NextResponse } from "next/server";
 
 const SERVER_INFO = { name: "reloop-web", version: "1.0.0" };
 

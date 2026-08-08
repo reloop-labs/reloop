@@ -352,7 +352,7 @@ export default async function Page(props: {
 							{!isDocsHome && (
 								<div className="mb-8">
 									<div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
-										<h1 className="min-w-0 font-semibold text-2xl leading-snug text-fd-foreground tracking-[-0.03em] sm:text-3xl sm:leading-tight">
+										<h1 className="min-w-0 font-semibold text-2xl text-fd-foreground leading-snug tracking-[-0.03em] sm:text-3xl sm:leading-tight">
 											{page.data.title}
 										</h1>
 										<div className="relative z-20 w-fit shrink-0 self-start sm:mt-1">
@@ -371,7 +371,7 @@ export default async function Page(props: {
 							<DocsBody
 								className={
 									isDocsHome
-										? "max-w-none prose-p:my-0"
+										? "prose-p:my-0 max-w-none"
 										: isApiPage
 											? "[&>p:first-child]:m-0 [&>p:first-child]:hidden"
 											: ""

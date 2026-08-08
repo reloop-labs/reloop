@@ -111,8 +111,7 @@ export async function contactHistoryController({
 
 		const data = rows.map((row) => {
 			const action = row.action || row.event.split(".").pop() || "updated";
-			const metadata =
-				(row.metadata as Record<string, unknown> | null) ?? null;
+			const metadata = (row.metadata as Record<string, unknown> | null) ?? null;
 			const requestBody =
 				(row.requestBody as Record<string, unknown> | null) ?? null;
 			const requestDetails =

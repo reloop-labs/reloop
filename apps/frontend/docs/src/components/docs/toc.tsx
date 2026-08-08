@@ -42,7 +42,9 @@ export function TableOfContents({ items }: TOCProps) {
 			const nextVisible = items.filter((item) => {
 				const id = item.url.slice(1);
 				const el = document.getElementById(id);
-				return !!el && el.offsetParent !== null && el.getClientRects().length > 0;
+				return (
+					!!el && el.offsetParent !== null && el.getClientRects().length > 0
+				);
 			});
 
 			setVisibleItems((prev) => {
@@ -119,10 +121,7 @@ export function TableOfContents({ items }: TOCProps) {
 	if (visibleItems.length === 0) return null;
 
 	return (
-		<div
-			id="docs-toc"
-			className="ml-auto hidden w-full text-sm xl:block"
-		>
+		<div id="docs-toc" className="ml-auto hidden w-full text-sm xl:block">
 			<div className="sticky top-0">
 				<div
 					id="docs-toc-title"
@@ -151,7 +150,7 @@ export function TableOfContents({ items }: TOCProps) {
 								<a
 									href={item.url}
 									className={cn(
-										"block py-1 font-medium text-[13px] leading-snug no-underline transition-colors break-words",
+										"block break-words py-1 font-medium text-[13px] leading-snug no-underline transition-colors",
 										isSubItem ? "pl-6" : "pl-3",
 										isActive
 											? "text-[#171717] dark:text-white"

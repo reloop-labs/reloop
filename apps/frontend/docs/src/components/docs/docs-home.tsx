@@ -29,7 +29,7 @@ function SectionHeading({
 	return (
 		<div className="mb-6 flex flex-wrap items-end justify-between gap-3">
 			<div className="min-w-0 max-w-2xl">
-				<h2 className="font-semibold text-xl text-text-strong-950 tracking-tight dark:text-white">
+				<h2 className="font-semibold text-text-strong-950 text-xl tracking-tight dark:text-white">
 					{title}
 				</h2>
 				{description ? (
@@ -228,8 +228,8 @@ export function DocsHome() {
 					Learn how to send with Reloop
 				</h1>
 				<p className="mt-3.5 text-[16px] text-text-sub-600 leading-relaxed tracking-[-0.01em]">
-					Guides, API reference, SDKs, and agent tooling — everything you need to
-					send, receive, and automate email.
+					Guides, API reference, SDKs, and agent tooling — everything you need
+					to send, receive, and automate email.
 				</p>
 				<div className="mt-6 flex flex-wrap gap-2.5">
 					<Link
