@@ -1,5 +1,6 @@
 "use client";
 
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { BlogBody } from "@reloop/web/components/landing/blog/blog-body";
 import { BlogCta } from "@reloop/web/components/landing/blog/blog-cta";
@@ -14,7 +15,6 @@ import type {
 	BlogPostDefinition,
 	BlogTocItem,
 } from "@reloop/web/lib/landing/types";
-import * as FancyButton from "@reloop/ui/fancy-button";
 import Image from "next/image";
 import Link from "next/link";
 import { type ReactNode, useState } from "react";
@@ -115,7 +115,7 @@ export function BlogPostPageView({
 			{/* Main Article Container */}
 			<div className="mx-auto w-full max-w-5xl border-stroke-soft-200 border-x px-4 pt-32 sm:px-6 md:max-w-7xl lg:px-8 dark:border-white/10">
 				{/* Top Header Section */}
-				<header className="-mx-4 border-stroke-soft-200 border-b pb-10 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8 text-left dark:border-white/10">
+				<header className="-mx-4 sm:-mx-6 lg:-mx-8 border-stroke-soft-200 border-b px-4 pb-10 text-left sm:px-6 lg:px-8 dark:border-white/10">
 					<div className="flex w-full max-w-[680px] flex-col gap-4">
 						<Link
 							href="/blog"
@@ -155,7 +155,7 @@ export function BlogPostPageView({
 				{/* 3-Column Content Grid */}
 				<div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-0">
 					{/* Left Column: Table of Contents */}
-					<aside className="lg:col-span-3 lg:border-stroke-soft-200 lg:border-r lg:pt-10 lg:pb-16 lg:pr-8 dark:lg:border-white/10">
+					<aside className="lg:col-span-3 lg:border-stroke-soft-200 lg:border-r lg:pt-10 lg:pr-8 lg:pb-16 dark:lg:border-white/10">
 						<div className="space-y-8 lg:sticky lg:top-28">
 							{toc.length > 0 ? <BlogTableOfContents items={toc} /> : null}
 						</div>
@@ -291,74 +291,58 @@ export function BlogPostPageView({
 								href="/dashboard/signup"
 								className="group relative block overflow-hidden rounded-2xl border border-stroke-soft-200 bg-white p-3.5 transition-all duration-200 hover:border-stroke-strong-950 hover:shadow-md dark:border-white/10 dark:bg-white/[0.03] dark:hover:border-white/30"
 							>
-								{/* Top Product Preview Mockup */}
-								<div className="relative mb-3.5 aspect-[16/10] w-full overflow-hidden rounded-xl border border-stroke-soft-200/80 bg-gradient-to-b from-bg-weak-50 via-white to-bg-weak-50/50 p-3.5 dark:border-white/10 dark:from-neutral-900 dark:via-neutral-900/80 dark:to-neutral-950">
-									{/* Subtle grid pattern background */}
-									<div
-										className="pointer-events-none absolute inset-0 opacity-[0.04] dark:opacity-[0.08]"
-										style={{
-											backgroundImage:
-												"linear-gradient(to right, currentColor 1px, transparent 1px), linear-gradient(to bottom, currentColor 1px, transparent 1px)",
-											backgroundSize: "16px 16px",
-										}}
-									/>
-
-									{/* Top Bar inside preview */}
-									<div className="relative z-10 flex items-center justify-between">
-										<div className="flex items-center gap-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 font-mono font-medium text-[10px] text-emerald-600 dark:text-emerald-400">
-											<span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
-											99.99% Delivered
-										</div>
-										<div className="flex items-center gap-1 rounded-md border border-stroke-soft-200 bg-white/80 px-2 py-0.5 font-mono text-[10px] text-text-sub-600 dark:border-white/10 dark:bg-white/10 dark:text-white/60">
-											<span>SMTP / API</span>
-										</div>
-									</div>
-
-									{/* Center Wordmark & Visual Elements */}
-									<div className="relative z-10 my-auto flex flex-col items-center justify-center py-2">
-										<div className="flex items-center gap-2">
-											<div className="flex size-7 items-center justify-center rounded-lg bg-text-strong-950 text-white shadow-sm transition-transform duration-200 group-hover:scale-105 dark:bg-white dark:text-black">
-												<Icon name="reloop" className="size-4" />
-											</div>
-											<span className="font-bold font-sans text-lg text-text-strong-950 tracking-tight dark:text-white">
-												reloop
-											</span>
-										</div>
-									</div>
-
-									{/* Bottom Mini Code / Card Widget */}
-									<div className="relative z-10 rounded-lg border border-stroke-soft-200 bg-white/90 p-2 shadow-xs transition-transform duration-200 group-hover:translate-y-[-2px] dark:border-white/10 dark:bg-neutral-900/90">
-										<div className="flex items-center justify-between font-mono text-[11px]">
-											<span className="flex items-center gap-1.5 text-text-strong-950 dark:text-white">
-												<span className="text-emerald-500 font-bold">POST</span> /v1/emails/send
-											</span>
-											<span className="rounded bg-emerald-500/10 px-1.5 py-0.5 font-semibold text-[9px] text-emerald-600 dark:text-emerald-400">
-												200 OK
-											</span>
-										</div>
-									</div>
+								{/* Top Product Preview SVG */}
+								<div className="mb-3.5 flex aspect-[16/10] w-full items-center justify-center p-3.5">
+									<svg
+										className="relative z-10 size-24 text-text-strong-950 transition-transform duration-200 group-hover:scale-105 dark:text-white"
+										viewBox="0 0 24 24"
+										fill="none"
+										xmlns="http://www.w3.org/2000/svg"
+										aria-hidden="true"
+									>
+										<g transform="rotate(90, 12, 12)">
+											<g fill="none">
+												<path
+													d="M22 10V6.5L12 11.5V15L22 10Z"
+													fill="currentColor"
+													fillOpacity={0.25}
+												/>
+												<path
+													d="M22 17.5V14L12 19V22.5L22 17.5Z"
+													fill="currentColor"
+													fillOpacity={0.25}
+												/>
+												<path d="M12 19V22.3213" stroke="currentColor" />
+												<path
+													d="M2 14L11.3292 18.6646C11.7515 18.8757 12.2485 18.8757 12.6708 18.6646L22 14"
+													stroke="currentColor"
+												/>
+												<path
+													d="M6 12L2.55279 13.7236C2.214 13.893 2 14.2393 2 14.618V16.882C2 17.2607 2.214 17.607 2.55279 17.7764L11.3292 22.1646C11.7515 22.3757 12.2485 22.3757 12.6708 22.1646L21.4472 17.7764C21.786 17.607 22 17.2607 22 16.882V14.618C22 14.2393 21.786 13.893 21.4472 13.7236L18 12"
+													stroke="currentColor"
+												/>
+												<path d="M12 11.5V14.8229" stroke="currentColor" />
+												<path
+													d="M2 6.5L11.3292 11.1646C11.7515 11.3757 12.2485 11.3757 12.6708 11.1646L22 6.5"
+													stroke="currentColor"
+												/>
+												<path
+													d="M11.3292 14.6646L2.55279 10.2764C2.214 10.107 2 9.76074 2 9.38197V7.11803C2 6.73926 2.214 6.393 2.55279 6.22361L11.3292 1.83541C11.7515 1.62426 12.2485 1.62426 12.6708 1.83541L21.4472 6.22361C21.786 6.393 22 6.73926 22 7.11803V9.38197C22 9.76074 21.786 10.107 21.4472 10.2764L12.6708 14.6646C12.2485 14.8757 11.7515 14.8757 11.3292 14.6646Z"
+													stroke="currentColor"
+												/>
+											</g>
+										</g>
+									</svg>
 								</div>
 
 								{/* Text content below preview */}
 								<div className="space-y-1 px-0.5">
 									<h4 className="flex items-center justify-between font-bold text-base text-text-strong-950 tracking-tight dark:text-white">
-										<span>Try Reloop for free</span>
-										<svg
-											className="size-4 text-text-sub-600 transition-transform duration-200 group-hover:translate-x-0.5 dark:text-white/60"
-											fill="none"
-											viewBox="0 0 24 24"
-											stroke="currentColor"
-											strokeWidth={2}
-										>
-											<path
-												strokeLinecap="round"
-												strokeLinejoin="round"
-												d="M9 5l7 7-7 7"
-											/>
-										</svg>
+										<span>Get started</span>
 									</h4>
 									<p className="text-[13px] text-text-sub-600 leading-snug dark:text-white/60">
-										Supercharge your application with Reloop's developer-first email infrastructure platform
+										Supercharge your application with Reloop's developer-first
+										email infrastructure platform
 									</p>
 								</div>
 							</a>
