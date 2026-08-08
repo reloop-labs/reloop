@@ -24,15 +24,26 @@ function ArrowLeftIcon({ className }: { className?: string }) {
 	return (
 		<svg
 			className={className}
-			viewBox="0 0 16 16"
+			viewBox="0 0 15 15"
 			fill="none"
 			xmlns="http://www.w3.org/2000/svg"
 			aria-hidden="true"
 		>
-			<path
-				d="M8 0C3.589 0 0 3.589 0 8C0 12.411 3.589 16 8 16C12.411 16 16 12.411 16 8C16 3.589 12.411 0 8 0ZM11.25 8.75H6.561L7.781 9.97C8.074 10.263 8.074 10.738 7.781 11.031C7.635 11.177 7.443 11.251 7.251 11.251C7.059 11.251 6.867 11.178 6.721 11.031L4.221 8.531C3.928 8.238 3.928 7.763 4.221 7.47L6.721 4.97C7.014 4.677 7.489 4.677 7.782 4.97C8.075 5.263 8.075 5.738 7.782 6.031L6.562 7.251H11.251C11.665 7.251 12.001 7.587 12.001 8.001C12.001 8.415 11.665 8.751 11.251 8.751L11.25 8.75Z"
-				fill="currentColor"
-			/>
+			<g
+				stroke="currentColor"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+				strokeWidth="1.5"
+				clipPath="url(#blog-back-arrow-clip)"
+			>
+				<path d="M1.5 5.056h8.667a3.333 3.333 0 0 1 0 6.666H6.833" />
+				<path d="M4.611 8.167 1.5 5.056l3.111-3.112" />
+			</g>
+			<defs>
+				<clipPath id="blog-back-arrow-clip">
+					<path fill="#fff" d="M0 0h15v15H0z" />
+				</clipPath>
+			</defs>
 		</svg>
 	);
 }
@@ -147,13 +158,13 @@ export function BlogPostPageView({
 				<div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-0">
 					{/* Left Column: Table of Contents */}
 					<aside className="lg:col-span-3 lg:border-stroke-soft-200 lg:border-r lg:pt-10 lg:pr-8 lg:pb-16 dark:lg:border-white/10">
-						<div className="space-y-8 lg:sticky lg:top-28">
+						<div className="space-y-5 lg:sticky lg:top-28">
 							<Link
 								href="/blog"
-								className="inline-flex items-center gap-2.5 font-medium text-base text-text-sub-600 tracking-[-0.24px] transition-colors hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white"
+								className="inline-flex items-center gap-1.5 font-medium text-text-sub-600 text-xs transition-colors hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white"
 							>
-								<ArrowLeftIcon className="size-4.5 shrink-0 select-none text-text-strong-950 dark:text-white" />
-								<span>Blog</span>
+								<ArrowLeftIcon className="size-3.5 shrink-0 select-none" />
+								<span>All articles</span>
 							</Link>
 							{toc.length > 0 ? <BlogTableOfContents items={toc} /> : null}
 						</div>
