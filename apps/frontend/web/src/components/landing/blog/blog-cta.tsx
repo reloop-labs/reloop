@@ -72,14 +72,14 @@ export function BlogCta({ category }: { category: string }) {
 					<div className="max-w-2xl">
 						<div
 							aria-hidden
-							className="pointer-events-none absolute top-0 right-0 bottom-0 w-full text-primary-base/40 sm:w-1/2 dark:text-primary-base/50"
+							className="pointer-events-none absolute top-0 right-0 bottom-0 w-full text-primary-base/30 sm:w-1/2 dark:text-primary-base/40"
 							style={{
 								backgroundImage:
-									"repeating-linear-gradient(-45deg, transparent 0, transparent 8px, currentColor 8px, currentColor 9.5px)",
+									"repeating-linear-gradient(-45deg, transparent 0, transparent 2px, currentColor 2px, currentColor 2.8px)",
 								maskImage:
-									"linear-gradient(to right, transparent 0%, black 50%, black 100%)",
+									"linear-gradient(to right, transparent 0%, black 40%, black 100%)",
 								WebkitMaskImage:
-									"linear-gradient(to right, transparent 0%, black 50%, black 100%)",
+									"linear-gradient(to right, transparent 0%, black 40%, black 100%)",
 							}}
 						/>
 						<h2 className="font-sans text-2xl text-text-strong-950 leading-tight tracking-tight sm:text-3xl lg:text-[2.1rem] dark:text-white">
@@ -91,6 +91,12 @@ export function BlogCta({ category }: { category: string }) {
 					</div>
 
 					<div className="flex shrink-0 flex-wrap items-center gap-3">
+						<CtaLink
+							label="Documentation"
+							href="/docs"
+							filled={false}
+							isSecondery
+						/>
 						<CtaLink
 							label={variant.primaryLabel}
 							href="/dashboard/signup"

@@ -18,10 +18,10 @@ export function FeatureCta({
 				<div className="relative z-10 mx-auto flex w-full max-w-5xl flex-col items-center justify-center gap-10 border-stroke-soft-200 border-x px-4 pt-12 pb-13 sm:px-6 md:max-w-7xl lg:px-8 dark:border-white/10">
 					<div
 						aria-hidden
-						className="pointer-events-none absolute inset-0 z-0 text-text-strong-950/[0.03] dark:text-white/[0.04]"
+						className="pointer-events-none absolute inset-0 z-0 text-primary-base/20 dark:text-primary-base/30"
 						style={{
 							backgroundImage:
-								"repeating-linear-gradient(-45deg, transparent 0, transparent 3.5px, currentColor 3.5px, currentColor 4.5px)",
+								"repeating-linear-gradient(-45deg, transparent 0, transparent 2px, currentColor 2px, currentColor 2.8px)",
 						}}
 					/>
 					<div className="mx-auto flex max-w-3xl flex-col items-center text-center">
