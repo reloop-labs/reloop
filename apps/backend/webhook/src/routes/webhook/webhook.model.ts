@@ -395,6 +395,42 @@ export namespace WebhookModel {
 	});
 
 	export type TriggerWebhookResponse = typeof triggerWebhookResponse.static;
+
+	export const signTestEventBody = t.Object({
+		webhookId: t.String({
+			description: "Webhook ID to sign test payload for",
+		}),
+		event: t.String({
+			pattern: knownEventRegex.source,
+			error: "Invalid event ID provided",
+		}),
+		payload: t.Record(t.String(), t.Any(), {
+			description: "Event payload (becomes envelope.data)",
+		}),
+		organizationId: t.Optional(
+			t.String({
+				description: "Organization ID to trigger webhooks for",
+			}),
+		),
+	});
+
+	export type SignTestEventBody = typeof signTestEventBody.static;
+
+	export const signTestEventResponse = t.Object({
+		url: t.String({ description: "Target webhook URL" }),
+		headers: t.Record(t.String(), t.String(), {
+			description: "Signed headers to include in client fetch",
+		}),
+		body: t.Record(t.String(), t.Any(), {
+			description: "Webhook envelope payload",
+		}),
+		rawBody: t.String({
+			description: "Exact serialized JSON string for HMAC signature",
+		}),
+	});
+
+	export type SignTestEventResponse = typeof signTestEventResponse.static;
+
 	export const webhookDeliveryAttemptResponse = t.Object({
 		id: t.String({ description: "Attempt identifier" }),
 		attemptNumber: t.Number(),

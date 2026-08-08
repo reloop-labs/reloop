@@ -17,82 +17,45 @@ import {
 } from "@reloop/webhook-events";
 import axios from "axios";
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
-import { useInvalidateWebhooks } from "#/features/webhooks/hooks/use-webhooks-query";
 
 const actionKbdOnBlueClassName =
 	"w-auto min-w-4 border-white/25 bg-white/15 px-1 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]";
 
-/** How long to wait for a delivery row after publish. */
-const POLL_TIMEOUT_MS = 25_000;
-/** Interval between delivery list fetches. */
-const POLL_INTERVAL_MS = 1_000;
-/** Allow small clock skew when matching createdAt. */
-const CREATED_SKEW_MS = 5_000;
+const FORBIDDEN_BROWSER_HEADERS = new Set([
+	"user-agent",
+	"host",
+	"content-length",
+	"connection",
+	"accept-encoding",
+]);
 
 type WebhookStatus = "active" | "paused" | "disabled" | "failed";
 
 interface TriggerWebhookTesterProps {
 	webhookId: string;
 	webhookEvents?: string[];
-	/** When not active, deliveries are skipped server-side. */
 	webhookStatus?: WebhookStatus;
 	onCancel?: () => void;
 	onReenable?: () => void | Promise<void>;
 	isReenabling?: boolean;
 }
 
-type DeliveryStatus = "pending" | "success" | "failed" | "retrying";
-
-interface DeliverySnapshot {
-	id: string;
-	status: DeliveryStatus;
-	eventType: string;
-	responseStatus: number | null;
-	responseBody: string | null;
-	errorMessage: string | null;
-	durationMs: number | null;
-	attemptNumber: number;
-	maxAttempts: number;
-	createdAt: string;
-	completedAt: string | null;
-}
-
-/**
- * Publish is sync to the API; delivery is async via the worker.
- * `phase` tracks where we are in that pipeline.
- */
-interface TriggerResult {
-	phase:
-		| "awaiting_delivery"
-		| "delivering"
-		| "delivered"
-		| "timeout"
-		| "publish_error";
+interface DirectTriggerResult {
+	phase: "completed" | "sign_error";
 	eventType: string;
 	triggeredAt: string;
-	publishMs: number | null;
-	apiStatus: number | null;
-	message: string;
-	errorDetail: string | null;
-	delivery: DeliverySnapshot | null;
-}
-
-interface DeliveryListItem {
-	id: string;
-	eventType: string;
-	status: DeliveryStatus;
-	responseStatus: number | null;
-	responseBody: string | null;
-	errorMessage: string | null;
 	durationMs: number | null;
-	attemptNumber: number;
-	maxAttempts: number;
-	createdAt: string;
-	completedAt: string | null;
+	url?: string;
+	responseStatus?: number | null;
+	responseBody?: string | null;
+	errorMessage?: string | null;
+	headersSent?: Record<string, string>;
+	requestBodySent?: Record<string, unknown>;
+	ok: boolean;
 }
 
 const CATEGORY_META: Record<string, { label: string; icon: string }> = {
@@ -105,7 +68,6 @@ const CATEGORY_META: Record<string, { label: string; icon: string }> = {
 
 /**
  * Canonical sample for envelope.data — must match builders in @reloop/webhook-events
- * (same shapes production dispatches use).
  */
 const getPayloadForEvent = (eventId: string): Record<string, unknown> => {
 	if (eventId === "email.received") {
@@ -213,7 +175,7 @@ const getPayloadForEvent = (eventId: string): Record<string, unknown> => {
 	};
 };
 
-/** Full POST body shape (envelope) the endpoint receives — id/created_at are server-generated. */
+/** Sample payload preview envelope */
 const getEnvelopePreview = (
 	eventId: string,
 	data: Record<string, unknown>,
@@ -257,81 +219,6 @@ function inactiveCopy(status: WebhookStatus): {
 	}
 }
 
-function isTerminalStatus(status: DeliveryStatus) {
-	return status === "success" || status === "failed";
-}
-
-function toSnapshot(d: DeliveryListItem): DeliverySnapshot {
-	return {
-		id: d.id,
-		status: d.status,
-		eventType: d.eventType,
-		responseStatus: d.responseStatus,
-		responseBody: d.responseBody,
-		errorMessage: d.errorMessage,
-		durationMs: d.durationMs,
-		attemptNumber: d.attemptNumber,
-		maxAttempts: d.maxAttempts,
-		createdAt: d.createdAt,
-		completedAt: d.completedAt,
-	};
-}
-
-async function fetchRecentDeliveries(
-	webhookId: string,
-): Promise<DeliveryListItem[]> {
-	const res = await fetch(
-		`/api/webhook/v1/${webhookId}/deliveries?page=1&limit=15&status=`,
-		{ credentials: "include" },
-	);
-	if (!res.ok) {
-		throw new Error(`Failed to load deliveries (${res.status})`);
-	}
-	const data = (await res.json()) as { deliveries?: DeliveryListItem[] };
-	return data.deliveries ?? [];
-}
-
-/**
- * Newest delivery for this event type created at/after the trigger moment.
- * List is expected newest-first.
- */
-function findMatchingDelivery(
-	deliveries: DeliveryListItem[],
-	eventType: string,
-	triggeredAtMs: number,
-): DeliveryListItem | null {
-	const minCreated = triggeredAtMs - CREATED_SKEW_MS;
-	for (const d of deliveries) {
-		if (d.eventType !== eventType) continue;
-		const created = new Date(d.createdAt).getTime();
-		if (Number.isNaN(created) || created < minCreated) continue;
-		return d;
-	}
-	return null;
-}
-
-function sleep(ms: number, signal: AbortSignal) {
-	return new Promise<void>((resolve, reject) => {
-		if (signal.aborted) {
-			reject(new DOMException("Aborted", "AbortError"));
-			return;
-		}
-		const id = window.setTimeout(() => {
-			signal.removeEventListener("abort", onAbort);
-			resolve();
-		}, ms);
-		const onAbort = () => {
-			window.clearTimeout(id);
-			reject(new DOMException("Aborted", "AbortError"));
-		};
-		signal.addEventListener("abort", onAbort, { once: true });
-	});
-}
-
-function isHttpSuccess(status: number | null) {
-	return status != null && status >= 200 && status < 300;
-}
-
 export const TriggerWebhookTester = ({
 	webhookId,
 	webhookEvents,
@@ -340,9 +227,7 @@ export const TriggerWebhookTester = ({
 	onReenable,
 	isReenabling = false,
 }: TriggerWebhookTesterProps) => {
-	const invalidate = useInvalidateWebhooks();
 	const isDeliverable = webhookStatus === "active";
-	const pollAbortRef = useRef<AbortController | null>(null);
 
 	const filteredEvents = useMemo(() => {
 		if (webhookEvents && webhookEvents.length > 0) {
@@ -367,8 +252,8 @@ export const TriggerWebhookTester = ({
 	const [selectedEventId, setSelectedEventId] = useState(
 		filteredEvents[0]?.id || "",
 	);
-	const [isPublishing, setIsPublishing] = useState(false);
-	const [result, setResult] = useState<TriggerResult | null>(null);
+	const [isSending, setIsSending] = useState(false);
+	const [result, setResult] = useState<DirectTriggerResult | null>(null);
 
 	const selectedEvent = useMemo(
 		() => filteredEvents.find((e) => e.id === selectedEventId),
@@ -389,22 +274,12 @@ export const TriggerWebhookTester = ({
 		);
 	}, [selectedEvent, payload]);
 
-	const isPolling =
-		result?.phase === "awaiting_delivery" || result?.phase === "delivering";
-	const isBusy = isPublishing || isPolling;
-
 	const canSend =
 		Boolean(selectedEventId) &&
-		!isBusy &&
+		!isSending &&
 		!isReenabling &&
 		isDeliverable &&
 		filteredEvents.length > 0;
-
-	useEffect(() => {
-		return () => {
-			pollAbortRef.current?.abort();
-		};
-	}, []);
 
 	useHotkeys(
 		"mod+enter",
@@ -418,7 +293,7 @@ export const TriggerWebhookTester = ({
 	useHotkeys(
 		"escape",
 		(e) => {
-			if (isBusy) return;
+			if (isSending) return;
 			e.preventDefault();
 			onCancel?.();
 		},
@@ -431,262 +306,123 @@ export const TriggerWebhookTester = ({
 			? "⌘"
 			: "Ctrl";
 
-	const stopPolling = () => {
-		pollAbortRef.current?.abort();
-		pollAbortRef.current = null;
-	};
-
 	const handleSelectEvent = (eventId: string) => {
-		if (isBusy) return;
+		if (isSending) return;
 		setSelectedEventId(eventId);
 		setResult(null);
 	};
 
-	const pollDeliveryResult = async (
-		eventType: string,
-		triggeredAtMs: number,
-		base: Omit<TriggerResult, "phase" | "delivery" | "message"> & {
-			message?: string;
-		},
-	) => {
-		stopPolling();
-		const controller = new AbortController();
-		pollAbortRef.current = controller;
-		const { signal } = controller;
-
-		setResult({
-			...base,
-			phase: "awaiting_delivery",
-			message: "Waiting for delivery…",
-			delivery: null,
-		});
-		// Publish finished; keep the panel busy via result.phase instead.
-		setIsPublishing(false);
-
-		const deadline = Date.now() + POLL_TIMEOUT_MS;
-		let lastDeliveryId: string | null = null;
-
-		try {
-			while (Date.now() < deadline) {
-				if (signal.aborted) return;
-
-				const deliveries = await fetchRecentDeliveries(webhookId);
-				if (signal.aborted) return;
-
-				const match = findMatchingDelivery(
-					deliveries,
-					eventType,
-					triggeredAtMs,
-				);
-
-				if (match) {
-					const snapshot = toSnapshot(match);
-					lastDeliveryId = snapshot.id;
-
-					if (isTerminalStatus(snapshot.status)) {
-						const deliveredOk =
-							snapshot.status === "success" ||
-							isHttpSuccess(snapshot.responseStatus);
-
-						setResult({
-							...base,
-							phase: "delivered",
-							message: deliveredOk
-								? "Endpoint responded successfully"
-								: (snapshot.errorMessage ?? "Delivery failed"),
-							delivery: snapshot,
-						});
-
-						if (deliveredOk) {
-							const code = snapshot.responseStatus;
-							toast.success(
-								code != null
-									? `Endpoint returned HTTP ${code}`
-									: "Delivery succeeded",
-							);
-						} else {
-							const code = snapshot.responseStatus;
-							toast.error(
-								snapshot.errorMessage ??
-									(code != null
-										? `Endpoint returned HTTP ${code}`
-										: "Delivery failed"),
-							);
-						}
-						await invalidate();
-						return;
-					}
-
-					// In-flight
-					setResult({
-						...base,
-						phase: "delivering",
-						message:
-							snapshot.status === "retrying"
-								? `Retrying delivery (attempt ${snapshot.attemptNumber}/${snapshot.maxAttempts})…`
-								: "Delivering to your endpoint…",
-						delivery: snapshot,
-					});
-				}
-
-				await sleep(POLL_INTERVAL_MS, signal);
-			}
-
-			// Timed out
-			if (lastDeliveryId) {
-				// Still pending/retrying after timeout
-				const deliveries = await fetchRecentDeliveries(webhookId).catch(
-					() => [] as DeliveryListItem[],
-				);
-				const match = deliveries.find((d) => d.id === lastDeliveryId);
-				const snapshot = match ? toSnapshot(match) : null;
-
-				setResult({
-					...base,
-					phase: "timeout",
-					message:
-						"Delivery is still in progress. Check delivery logs for the final result.",
-					delivery: snapshot,
-				});
-				toast.message("Still waiting on delivery", {
-					description: "Open delivery logs to see when it finishes.",
-				});
-			} else {
-				setResult({
-					...base,
-					phase: "timeout",
-					message:
-						"No delivery appeared for this webhook. The event may still be queuing, or this endpoint wasn’t targeted.",
-					delivery: null,
-				});
-				toast.error("No delivery found", {
-					description: "Check delivery logs or try again.",
-				});
-			}
-			await invalidate();
-		} catch (err) {
-			if (err instanceof DOMException && err.name === "AbortError") return;
-			setResult({
-				...base,
-				phase: "timeout",
-				message:
-					err instanceof Error
-						? err.message
-						: "Failed while waiting for delivery",
-				delivery: null,
-			});
-			toast.error("Could not load delivery status");
-		} finally {
-			if (pollAbortRef.current === controller) {
-				pollAbortRef.current = null;
-			}
-		}
-	};
-
 	const handleTrigger = async () => {
-		if (!selectedEventId || !isDeliverable || isBusy) return;
+		if (!selectedEventId || !isDeliverable || isSending) return;
 
-		stopPolling();
-		setIsPublishing(true);
+		setIsSending(true);
 		setResult(null);
-		const startTime = Date.now();
 		const triggeredAt = new Date().toISOString();
 
+		let signedData: {
+			url: string;
+			headers: Record<string, string>;
+			body: Record<string, unknown>;
+			rawBody: string;
+		};
+
+		// 1. Get backend signature & headers without storing any event actions/DB logs
 		try {
-			const response = await axios.post(
-				"/api/webhook/v1/trigger",
+			const res = await axios.post(
+				"/api/webhook/v1/sign-test-event",
 				{ webhookId, event: selectedEventId, payload },
 				{ withCredentials: true },
 			);
-			const data = response.data as {
-				success?: boolean;
-				message?: string;
-				jobId?: string;
-			};
-			const ok = data.success !== false;
-			const publishMs = Date.now() - startTime;
-			const base = {
+			signedData = res.data;
+		} catch (err: unknown) {
+			const msg = axios.isAxiosError(err) && err.response?.data?.message
+				? err.response.data.message
+				: "Failed to sign test event";
+			setResult({
+				phase: "sign_error",
 				eventType: selectedEventId,
 				triggeredAt,
-				publishMs,
-				apiStatus: response.status,
-				errorDetail: null as string | null,
-			};
+				durationMs: null,
+				errorMessage: msg,
+				ok: false,
+			});
+			toast.error(msg);
+			setIsSending(false);
+			return;
+		}
 
-			if (!ok) {
-				setResult({
-					...base,
-					phase: "publish_error",
-					message: data.message ?? "Failed to publish test event",
-					delivery: null,
-				});
-				toast.error(data.message ?? "Failed to publish test event");
-				return;
+		// Prepare headers for browser fetch (filter out restricted browser headers)
+		const browserHeaders: Record<string, string> = {};
+		for (const [k, v] of Object.entries(signedData.headers)) {
+			if (FORBIDDEN_BROWSER_HEADERS.has(k.toLowerCase())) continue;
+			browserHeaders[k] = v;
+		}
+
+		// 2. Direct client call from browser to target webhook URL
+		const startTime = performance.now();
+		try {
+			const response = await fetch(signedData.url, {
+				method: "POST",
+				headers: browserHeaders,
+				body: signedData.rawBody,
+			});
+
+			const durationMs = Math.round(performance.now() - startTime);
+			const status = response.status;
+			const isOk = response.ok;
+			let responseBodyText: string | null = null;
+			try {
+				responseBodyText = await response.text();
+			} catch {
+				responseBodyText = null;
 			}
 
-			// Hand off to delivery polling — keep busy until phase updates.
-			await pollDeliveryResult(selectedEventId, startTime, base);
-		} catch (error: unknown) {
-			const publishMs = Date.now() - startTime;
-			if (axios.isAxiosError(error)) {
-				const message =
-					(typeof error.response?.data?.message === "string"
-						? error.response.data.message
-						: null) ?? "Failed to publish test event";
-				setResult({
-					phase: "publish_error",
-					eventType: selectedEventId,
-					triggeredAt,
-					publishMs,
-					apiStatus: error.response?.status ?? null,
-					message,
-					errorDetail: error.response?.data
-						? typeof error.response.data === "string"
-							? error.response.data
-							: JSON.stringify(error.response.data, null, 2)
-						: null,
-					delivery: null,
-				});
-				toast.error(message);
+			setResult({
+				phase: "completed",
+				eventType: selectedEventId,
+				triggeredAt,
+				durationMs,
+				url: signedData.url,
+				responseStatus: status,
+				responseBody: responseBodyText,
+				errorMessage: isOk ? null : `Endpoint returned HTTP ${status}`,
+				headersSent: browserHeaders,
+				requestBodySent: signedData.body,
+				ok: isOk,
+			});
+
+			if (isOk) {
+				toast.success(`Endpoint returned HTTP ${status}`);
 			} else {
-				setResult({
-					phase: "publish_error",
-					eventType: selectedEventId,
-					triggeredAt,
-					publishMs,
-					apiStatus: null,
-					message: "An unexpected error occurred",
-					errorDetail: null,
-					delivery: null,
-				});
-				toast.error("Failed to publish test event");
+				toast.error(`Endpoint returned HTTP ${status}`);
 			}
+		} catch (err: unknown) {
+			const durationMs = Math.round(performance.now() - startTime);
+			const errorMsg =
+				err instanceof Error
+					? err.message
+					: "Failed to send request directly from browser (Network or CORS error)";
+
+			setResult({
+				phase: "completed",
+				eventType: selectedEventId,
+				triggeredAt,
+				durationMs,
+				url: signedData.url,
+				responseStatus: null,
+				responseBody: null,
+				errorMessage: `${errorMsg}. Ensure target endpoint allows cross-origin requests or is reachable from your browser.`,
+				headersSent: browserHeaders,
+				requestBodySent: signedData.body,
+				ok: false,
+			});
+			toast.error("Failed to reach target endpoint directly from browser");
 		} finally {
-			setIsPublishing(false);
+			setIsSending(false);
 		}
 	};
 
 	const inactive = !isDeliverable ? inactiveCopy(webhookStatus) : null;
-
-	const deliveryOk =
-		result?.phase === "delivered" &&
-		result.delivery != null &&
-		(result.delivery.status === "success" ||
-			isHttpSuccess(result.delivery.responseStatus));
-
-	const resultTone: "success" | "error" | "neutral" | "pending" = (() => {
-		if (!result) return "neutral";
-		if (result.phase === "publish_error") return "error";
-		if (result.phase === "delivered") {
-			return deliveryOk ? "success" : "error";
-		}
-		if (result.phase === "timeout") {
-			return result.delivery ? "pending" : "error";
-		}
-		return "pending";
-	})();
-
-	const showBusyPanel = isPublishing || isPolling;
 
 	return (
 		<div className="space-y-4">
@@ -711,7 +447,7 @@ export const TriggerWebhookTester = ({
 							variant="error"
 							mode="lighter"
 							size="xsmall"
-							disabled={isReenabling || isBusy}
+							disabled={isReenabling || isSending}
 							onClick={() => void onReenable()}
 							className="shrink-0 gap-1.5 rounded-xl"
 						>
@@ -764,11 +500,11 @@ export const TriggerWebhookTester = ({
 											key={event.id}
 											type="button"
 											aria-pressed={isSelected}
-											disabled={isBusy}
+											disabled={isSending}
 											onClick={() => handleSelectEvent(event.id)}
 											className={cn(
 												"flex w-full items-start gap-3 rounded-xl border px-3 py-2.5 text-left transition-[border-color,background-color,box-shadow] duration-150 ease-out",
-												isBusy && "cursor-not-allowed opacity-60",
+												isSending && "cursor-not-allowed opacity-60",
 												isSelected
 													? "border-stroke-soft-200 bg-bg-weak-50 shadow-regular-xs dark:border-stroke-soft-100/50 dark:bg-bg-weak-50/40"
 													: "border-transparent hover:border-stroke-soft-200 hover:bg-bg-weak-50/50 dark:hover:border-stroke-soft-100/40",
@@ -818,7 +554,7 @@ export const TriggerWebhookTester = ({
 							mode="stroke"
 							size="xsmall"
 							onClick={onCancel}
-							disabled={isBusy}
+							disabled={isSending}
 							className="gap-1.5 rounded-xl"
 						>
 							Cancel
@@ -837,10 +573,10 @@ export const TriggerWebhookTester = ({
 									: undefined
 							}
 						>
-							{isBusy ? (
+							{isSending ? (
 								<>
 									<Spinner size={14} color="currentColor" />
-									{isPublishing ? "Sending…" : "Waiting…"}
+									Sending from browser…
 								</>
 							) : (
 								<>
@@ -859,45 +595,17 @@ export const TriggerWebhookTester = ({
 					</div>
 				</div>
 
-				{/* ── Right: Preview / progress / result ── */}
+				{/* ── Right: Preview / result ── */}
 				<div className="min-w-0">
-					{showBusyPanel ? (
+					{isSending ? (
 						<div className="overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/40">
 							<div className="flex flex-col items-center justify-center gap-2 px-4 py-14 text-center">
 								<Spinner size={20} color="currentColor" />
 								<p className="font-medium text-sm text-text-strong-950">
-									{isPublishing
-										? "Publishing test event…"
-										: result?.phase === "delivering"
-											? "Delivering to your endpoint…"
-											: "Waiting for delivery…"}
+									Sending test event from client browser…
 								</p>
 								<p className="max-w-[260px] text-[12px] text-text-sub-600 leading-relaxed">
-									{isPublishing ? (
-										<>
-											Queuing a sample{" "}
-											<span className="font-mono text-text-strong-950">
-												{selectedEventId}
-											</span>{" "}
-											payload.
-										</>
-									) : result?.phase === "delivering" && result.delivery ? (
-										<>
-											Attempt {result.delivery.attemptNumber || 1}
-											{result.delivery.maxAttempts
-												? ` of ${result.delivery.maxAttempts}`
-												: ""}
-											. Polling for the HTTP response.
-										</>
-									) : (
-										<>
-											Event published. Watching delivery logs for{" "}
-											<span className="font-mono text-text-strong-950">
-												{selectedEventId}
-											</span>
-											.
-										</>
-									)}
+									Signing payload on backend and invoking endpoint directly from your browser.
 								</p>
 							</div>
 						</div>
@@ -905,12 +613,9 @@ export const TriggerWebhookTester = ({
 						<div
 							className={cn(
 								"overflow-hidden rounded-[18px] border",
-								resultTone === "success" &&
-									"border-success-base/25 bg-success-lighter/30 dark:bg-success-base/10",
-								resultTone === "error" &&
-									"border-error-base/25 bg-error-lighter/30 dark:bg-error-base/10",
-								(resultTone === "pending" || resultTone === "neutral") &&
-									"border-stroke-soft-200 bg-bg-soft-50/50 dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/20",
+								result.ok
+									? "border-success-base/25 bg-success-lighter/30 dark:bg-success-base/10"
+									: "border-error-base/25 bg-error-lighter/30 dark:bg-error-base/10",
 							)}
 						>
 							<div className="m-0.5 space-y-3 rounded-2xl border border-stroke-soft-200/60 bg-bg-white-0 px-4 py-4 dark:border-stroke-soft-100/40">
@@ -918,144 +623,97 @@ export const TriggerWebhookTester = ({
 									<div
 										className={cn(
 											"flex h-9 w-9 shrink-0 items-center justify-center rounded-xl",
-											resultTone === "success" &&
-												"bg-success-lighter text-success-base",
-											resultTone === "error" &&
-												"bg-error-lighter text-error-base",
-											(resultTone === "pending" || resultTone === "neutral") &&
-												"bg-bg-weak-50 text-text-sub-600",
+											result.ok
+												? "bg-success-lighter text-success-base"
+												: "bg-error-lighter text-error-base",
 										)}
 									>
 										<Icon
-											name={
-												resultTone === "success"
-													? "check-circle"
-													: resultTone === "error"
-														? "alert-circle"
-														: "clock"
-											}
+											name={result.ok ? "check-circle" : "alert-circle"}
 											className="h-4 w-4"
 										/>
 									</div>
 									<div className="min-w-0 flex-1">
 										<p className="font-semibold text-sm text-text-strong-950">
-											{result.phase === "delivered" && deliveryOk
+											{result.ok
 												? "Endpoint responded successfully"
-												: result.phase === "delivered"
-													? "Delivery failed"
-													: result.phase === "timeout"
-														? "Timed out waiting"
-														: result.message}
+												: result.phase === "sign_error"
+													? "Signing failed"
+													: "Delivery failed"}
 										</p>
 										<p className="mt-0.5 text-[12px] text-text-sub-600">
 											{new Date(result.triggeredAt).toLocaleString()}
-											{result.delivery?.durationMs != null
-												? ` · ${result.delivery.durationMs}ms`
-												: result.publishMs != null
-													? ` · publish ${result.publishMs}ms`
-													: ""}
-											{result.delivery?.responseStatus != null
-												? ` · HTTP ${result.delivery.responseStatus}`
-												: result.apiStatus != null &&
-														result.phase === "publish_error"
-													? ` · API ${result.apiStatus}`
-													: ""}
+											{result.durationMs != null ? ` · ${result.durationMs}ms` : ""}
+											{result.responseStatus != null ? ` · HTTP ${result.responseStatus}` : ""}
 										</p>
-										{result.phase === "timeout" ||
-										(result.phase === "delivered" && !deliveryOk) ? (
-											<p className="mt-2 text-[12px] text-text-sub-600 leading-relaxed">
-												{result.message}
+										{result.url ? (
+											<p className="mt-1 truncate font-mono text-[11px] text-text-sub-600">
+												Target: {result.url}
 											</p>
 										) : null}
 									</div>
 								</div>
 
-								{/* Endpoint response / error body */}
-								{result.delivery?.responseBody ? (
+								{/* Error message */}
+								{result.errorMessage ? (
+									<div className="space-y-1.5">
+										<p className="font-medium text-[11px] text-text-sub-600 uppercase tracking-wide">
+											Details
+										</p>
+										<pre className="max-h-[min(200px,30vh)] overflow-auto rounded-xl bg-bg-weak-50 p-3 font-mono text-[11px] text-text-strong-950 leading-relaxed dark:bg-bg-weak-50/50 whitespace-pre-wrap break-words">
+											{result.errorMessage}
+										</pre>
+									</div>
+								) : null}
+
+								{/* Response body */}
+								{result.responseBody ? (
 									<div className="space-y-1.5">
 										<p className="font-medium text-[11px] text-text-sub-600 uppercase tracking-wide">
 											Response body
 										</p>
 										<pre className="max-h-[min(280px,40vh)] overflow-auto rounded-xl bg-bg-weak-50 p-3 font-mono text-[11px] text-text-strong-950 leading-relaxed dark:bg-bg-weak-50/50">
-											{result.delivery.responseBody}
+											{result.responseBody}
 										</pre>
 									</div>
 								) : null}
 
-								{result.delivery?.errorMessage &&
-								!result.delivery.responseBody ? (
+								{/* Request headers sent */}
+								{result.headersSent && Object.keys(result.headersSent).length > 0 ? (
 									<div className="space-y-1.5">
 										<p className="font-medium text-[11px] text-text-sub-600 uppercase tracking-wide">
-											Error
+											Headers sent from client
 										</p>
-										<pre className="max-h-[min(200px,30vh)] overflow-auto rounded-xl bg-bg-weak-50 p-3 font-mono text-[11px] text-text-strong-950 leading-relaxed dark:bg-bg-weak-50/50">
-											{result.delivery.errorMessage}
+										<pre className="max-h-[min(180px,25vh)] overflow-auto rounded-xl bg-bg-weak-50 p-3 font-mono text-[11px] text-text-strong-950 leading-relaxed dark:bg-bg-weak-50/50">
+											{JSON.stringify(result.headersSent, null, 2)}
 										</pre>
 									</div>
-								) : null}
-
-								{result.errorDetail ? (
-									<pre className="max-h-[min(280px,40vh)] overflow-auto rounded-xl bg-bg-weak-50 p-3 font-mono text-[11px] text-text-strong-950 leading-relaxed dark:bg-bg-weak-50/50">
-										{result.errorDetail}
-									</pre>
-								) : null}
-
-								{result.delivery ? (
-									<p className="font-mono text-[11px] text-text-soft-400">
-										{result.delivery.id}
-										{result.delivery.status
-											? ` · ${result.delivery.status}`
-											: ""}
-										{result.delivery.attemptNumber
-											? ` · attempt ${result.delivery.attemptNumber}/${result.delivery.maxAttempts}`
-											: ""}
-									</p>
 								) : null}
 
 								<div className="flex flex-wrap items-center gap-2 pt-0.5">
-									{result.phase !== "publish_error" ? (
-										<>
-											<Button.Root
-												type="button"
-												variant="neutral"
-												mode="stroke"
-												size="xsmall"
-												asChild
-												className="gap-1.5 rounded-xl"
-											>
-												<Link href={`/webhooks/${webhookId}`}>
-													<Icon name="list" className="h-3.5 w-3.5" />
-													View delivery logs
-												</Link>
-											</Button.Root>
-											<Button.Root
-												type="button"
-												variant="neutral"
-												mode="ghost"
-												size="xsmall"
-												onClick={() => {
-													stopPolling();
-													setResult(null);
-												}}
-												className="gap-1.5 rounded-xl"
-											>
-												Send another
-											</Button.Root>
-										</>
-									) : (
-										<Button.Root
-											type="button"
-											variant="neutral"
-											mode="stroke"
-											size="xsmall"
-											disabled={!canSend}
-											onClick={() => void handleTrigger()}
-											className="gap-1.5 rounded-xl"
-										>
-											<Icon name="refresh-cw" className="h-3.5 w-3.5" />
-											Try again
-										</Button.Root>
-									)}
+									<Button.Root
+										type="button"
+										variant="neutral"
+										mode="stroke"
+										size="xsmall"
+										onClick={() => setResult(null)}
+										className="gap-1.5 rounded-xl"
+									>
+										Send another
+									</Button.Root>
+									<Button.Root
+										type="button"
+										variant="neutral"
+										mode="ghost"
+										size="xsmall"
+										asChild
+										className="gap-1.5 rounded-xl"
+									>
+										<Link href={`/webhooks/${webhookId}`}>
+											<Icon name="list" className="h-3.5 w-3.5" />
+											View delivery logs
+										</Link>
+									</Button.Root>
 								</div>
 							</div>
 						</div>
@@ -1069,7 +727,7 @@ export const TriggerWebhookTester = ({
 										</p>
 										<p className="mt-0.5 text-[12px] text-text-sub-600 leading-relaxed">
 											{selectedEvent
-												? "JSON envelope POSTed to your endpoint. id and created_at are set when the event is delivered."
+												? "Signed JSON envelope POSTed directly from browser to your endpoint."
 												: "Select an event to preview the sample payload."}
 										</p>
 									</div>

@@ -76,4 +76,7 @@ export namespace WebhookTypes {
 		typeof WebhookModel.webhookDeliveryListResponse.static;
 	export type WebhookDeliveryQuery =
 		typeof WebhookModel.webhookDeliveryQuery.static;
+	export type SignTestEventBody = typeof WebhookModel.signTestEventBody.static;
+	export type SignTestEventResponse =
+		typeof WebhookModel.signTestEventResponse.static;
 }

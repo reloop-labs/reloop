@@ -6,7 +6,6 @@ import { ACTIVE_WEBHOOK_EVENTS } from "@reloop/webhook-events";
 import axios from "axios";
 import { useState } from "react";
 import { toast } from "sonner";
-import { useInvalidateWebhooks } from "#/features/webhooks/hooks/use-webhooks-query";
 
 interface TriggerWebhookModalProps {
 	isOpen: boolean;
@@ -15,6 +14,14 @@ interface TriggerWebhookModalProps {
 }
 
 const defaultEventId = ACTIVE_WEBHOOK_EVENTS[0]?.id ?? "email.sent";
+
+const FORBIDDEN_BROWSER_HEADERS = new Set([
+	"user-agent",
+	"host",
+	"content-length",
+	"connection",
+	"accept-encoding",
+]);
 
 export const TriggerWebhookModal = ({
 	isOpen,
@@ -33,7 +40,6 @@ export const TriggerWebhookModal = ({
 		),
 	);
 	const [isTriggering, setIsTriggering] = useState(false);
-	const invalidate = useInvalidateWebhooks();
 
 	const handleTrigger = async () => {
 		try {
@@ -47,8 +53,9 @@ export const TriggerWebhookModal = ({
 				return;
 			}
 
-			await axios.post(
-				"/api/webhook/v1/trigger",
+			// 1. Sign test payload on backend without storing event actions or DB delivery logs
+			const signRes = await axios.post(
+				"/api/webhook/v1/sign-test-event",
 				{
 					webhookId,
 					event: eventId,
@@ -59,14 +66,45 @@ export const TriggerWebhookModal = ({
 				},
 			);
 
-			toast.success("Test event triggered successfully");
-			await invalidate();
+			const { url, headers, rawBody } = signRes.data as {
+				url: string;
+				headers: Record<string, string>;
+				rawBody: string;
+			};
+
+			const browserHeaders: Record<string, string> = {};
+			for (const [k, v] of Object.entries(headers)) {
+				if (FORBIDDEN_BROWSER_HEADERS.has(k.toLowerCase())) continue;
+				browserHeaders[k] = v;
+			}
+
+			// 2. Direct client POST request from browser
+			try {
+				const response = await fetch(url, {
+					method: "POST",
+					headers: browserHeaders,
+					body: rawBody,
+				});
+
+				if (response.ok) {
+					toast.success(`Test event sent (HTTP ${response.status})`);
+				} else {
+					toast.error(`Endpoint returned HTTP ${response.status}`);
+				}
+			} catch (fetchErr: unknown) {
+				const msg =
+					fetchErr instanceof Error
+						? fetchErr.message
+						: "Failed to send request directly from browser";
+				toast.error(msg);
+			}
+
 			onClose();
 		} catch (error: unknown) {
 			const message =
 				axios.isAxiosError(error) && error.response?.data?.message
 					? error.response.data.message
-					: "Failed to trigger test event";
+					: "Failed to sign test event";
 			toast.error(message);
 		} finally {
 			setIsTriggering(false);
