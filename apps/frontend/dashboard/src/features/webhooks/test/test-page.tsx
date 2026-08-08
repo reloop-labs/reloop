@@ -1,10 +1,16 @@
 import { cn } from "@reloop/ui/cn";
 import { Skeleton } from "@reloop/ui/skeleton";
+import axios from "axios";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { toast } from "sonner";
 import { AnimatedBackButton } from "#/features/dashboard/animated-back-button";
 import { TriggerWebhookTester } from "#/features/webhooks/components/trigger-webhook-tester";
 import { WebhookAvatar } from "#/features/webhooks/components/webhook-avatar";
-import { useWebhookDetailQuery } from "#/features/webhooks/hooks/use-webhooks-query";
+import {
+	useInvalidateWebhooks,
+	useWebhookDetailQuery,
+} from "#/features/webhooks/hooks/use-webhooks-query";
 
 function statusBadgeLabel(status: string) {
 	switch (status) {
@@ -36,13 +42,39 @@ function statusBadgeClass(status: string) {
 
 export function WebhookTestPage({ webhookId }: { webhookId: string }) {
 	const router = useRouter();
+	const invalidate = useInvalidateWebhooks();
 	const { data: webhook, isPending: isLoading } =
 		useWebhookDetailQuery(webhookId);
+	const [isReenabling, setIsReenabling] = useState(false);
 
 	const displayName = webhook?.name || webhook?.url || "Webhook";
 
 	const goBack = () => {
 		router.push(`/webhooks/${webhookId}`);
+	};
+
+	const handleReenable = async () => {
+		if (!webhook || isReenabling) return;
+		try {
+			setIsReenabling(true);
+			await axios.patch(
+				`/api/webhook/v1/${webhook.id}`,
+				{ status: "active" },
+				{ withCredentials: true },
+			);
+			await invalidate();
+			const label =
+				webhook.status === "paused"
+					? "resumed"
+					: webhook.status === "disabled"
+						? "enabled"
+						: "re-enabled";
+			toast.success(`Webhook ${label} successfully`);
+		} catch {
+			toast.error("Failed to update webhook status");
+		} finally {
+			setIsReenabling(false);
+		}
 	};
 
 	return (
@@ -117,7 +149,10 @@ export function WebhookTestPage({ webhookId }: { webhookId: string }) {
 				<TriggerWebhookTester
 					webhookId={webhook.id}
 					webhookEvents={webhook.events}
+					webhookStatus={webhook.status}
 					onCancel={goBack}
+					onReenable={webhook.status !== "active" ? handleReenable : undefined}
+					isReenabling={isReenabling}
 				/>
 			) : (
 				<p className="text-sm text-text-sub-600">Webhook not found.</p>
