@@ -35,6 +35,7 @@ export function BlogIndex({
 	description,
 	activeCategorySlug,
 	breadcrumb,
+	children,
 }: {
 	posts: BlogPostDefinition[];
 	categories: BlogCategoryDefinition[];
@@ -42,6 +43,7 @@ export function BlogIndex({
 	description?: string;
 	activeCategorySlug?: string;
 	breadcrumb?: ReactNode;
+	children?: ReactNode;
 }) {
 	const [query, setQuery] = useState("");
 
@@ -51,8 +53,8 @@ export function BlogIndex({
 	);
 
 	return (
-		<div className="min-h-screen bg-white dark:bg-black">
-			<div className="mx-auto max-w-[1320px] px-4 pt-40 pb-10 sm:px-6 lg:px-8">
+		<div className="mx-auto flex min-h-dvh w-full max-w-5xl flex-col border-stroke-soft-200 border-x pt-6 pb-16 md:max-w-7xl dark:border-white/10">
+			<div className="px-4 pt-32 pb-0 sm:px-6 lg:px-8">
 				{breadcrumb}
 				<h1 className="font-serif text-[2.8rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[3.6rem] lg:text-[4.2rem] dark:text-white">
 					{title}
@@ -63,66 +65,68 @@ export function BlogIndex({
 					</p>
 				) : null}
 
-				<div className="mt-8 flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
-					<div className="flex flex-wrap gap-1">
-						<Link
-							href="/blog"
-							className={cn(
-								"rounded-full px-3.5 py-1.5 font-medium text-[14px] transition-colors",
-								!activeCategorySlug
-									? "bg-bg-weak-50 text-text-strong-950 dark:bg-white/10 dark:text-white"
-									: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/55 dark:hover:text-white",
-							)}
-						>
-							All
-						</Link>
-						{categories.map((category) => {
-							const isActive = category.slug === activeCategorySlug;
+				<div className="-mx-4 sm:-mx-6 lg:-mx-8 mt-8 border-stroke-soft-200 border-y px-4 py-4 sm:px-6 lg:px-8 dark:border-white/10">
+					<div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+						<div className="flex flex-wrap gap-1">
+							<Link
+								href="/blog"
+								className={cn(
+									"rounded-full px-3.5 py-1.5 font-medium text-[14px] transition-colors",
+									!activeCategorySlug
+										? "bg-bg-weak-50 text-text-strong-950 dark:bg-white/10 dark:text-white"
+										: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/55 dark:hover:text-white",
+								)}
+							>
+								All
+							</Link>
+							{categories.map((category) => {
+								const isActive = category.slug === activeCategorySlug;
 
-							return (
-								<Link
-									key={category.slug}
-									href={`/blog/category/${category.slug}`}
-									className={cn(
-										"rounded-full px-3.5 py-1.5 font-medium text-[14px] transition-colors",
-										isActive
-											? "bg-bg-weak-50 text-text-strong-950 dark:bg-white/10 dark:text-white"
-											: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/55 dark:hover:text-white",
-									)}
-								>
-									{category.name}
-								</Link>
-							);
-						})}
-					</div>
+								return (
+									<Link
+										key={category.slug}
+										href={`/blog/category/${category.slug}`}
+										className={cn(
+											"rounded-full px-3.5 py-1.5 font-medium text-[14px] transition-colors",
+											isActive
+												? "bg-bg-weak-50 text-text-strong-950 dark:bg-white/10 dark:text-white"
+												: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/55 dark:hover:text-white",
+										)}
+									>
+										{category.name}
+									</Link>
+								);
+							})}
+						</div>
 
-					<div className="flex items-center gap-2 self-start lg:self-auto">
-						<label className="relative block w-full min-w-[220px] sm:w-[260px]">
-							<Icon
-								name="search"
-								className="-translate-y-1/2 pointer-events-none absolute top-1/2 left-3.5 size-4 text-text-soft-400"
-								aria-hidden="true"
-							/>
-							<input
-								type="search"
-								value={query}
-								onChange={(event) => setQuery(event.target.value)}
-								placeholder="Search..."
-								className="h-10 w-full rounded-full border border-stroke-soft-200 bg-bg-weak-50 pr-4 pl-10 text-[14px] text-text-strong-950 outline-none transition-colors placeholder:text-text-soft-400 focus:border-stroke-sub-300 focus:bg-bg-white-0 dark:border-white/10 dark:bg-white/[0.04] dark:text-white dark:focus:border-white/20 dark:focus:bg-white/[0.06] dark:placeholder:text-white/35"
-							/>
-						</label>
-						<a
-							href="/blog/feed.xml"
-							className="inline-flex size-10 shrink-0 items-center justify-center rounded-full border border-stroke-soft-200 text-text-sub-600 transition-colors hover:border-stroke-soft-300 hover:text-text-strong-950 dark:border-white/10 dark:text-white/55 dark:hover:border-white/20 dark:hover:text-white"
-							aria-label="RSS feed"
-						>
-							<RssIcon className="size-4" />
-						</a>
+						<div className="flex items-center gap-2 self-start lg:self-auto">
+							<label className="relative block w-full min-w-[220px] sm:w-[260px]">
+								<Icon
+									name="search"
+									className="-translate-y-1/2 pointer-events-none absolute top-1/2 left-3.5 size-4 text-text-soft-400"
+									aria-hidden="true"
+								/>
+								<input
+									type="search"
+									value={query}
+									onChange={(event) => setQuery(event.target.value)}
+									placeholder="Search..."
+									className="h-10 w-full rounded-full border border-stroke-soft-200 bg-bg-weak-50 pr-4 pl-10 text-[14px] text-text-strong-950 outline-none transition-colors placeholder:text-text-soft-400 focus:border-stroke-sub-300 focus:bg-bg-white-0 dark:border-white/10 dark:bg-white/[0.04] dark:text-white dark:focus:border-white/20 dark:focus:bg-white/[0.06] dark:placeholder:text-white/35"
+								/>
+							</label>
+							<a
+								href="/blog/feed.xml"
+								className="inline-flex size-10 shrink-0 items-center justify-center rounded-full border border-stroke-soft-200 text-text-sub-600 transition-colors hover:border-stroke-soft-300 hover:text-text-strong-950 dark:border-white/10 dark:text-white/55 dark:hover:border-white/20 dark:hover:text-white"
+								aria-label="RSS feed"
+							>
+								<RssIcon className="size-4" />
+							</a>
+						</div>
 					</div>
 				</div>
 			</div>
 
-			<div className="mx-auto max-w-[1320px] px-4 pb-20 sm:px-6 lg:px-8">
+			<div className="px-4 pt-10 pb-20 sm:px-6 lg:px-8">
 				{filteredPosts.length === 0 ? (
 					<div className="rounded-2xl border border-stroke-soft-200 border-dashed px-6 py-16 text-center dark:border-white/10">
 						<p className="font-semibold text-[17px] text-text-strong-950 dark:text-white">
@@ -140,6 +144,7 @@ export function BlogIndex({
 					</div>
 				)}
 			</div>
+			{children}
 		</div>
 	);
 }

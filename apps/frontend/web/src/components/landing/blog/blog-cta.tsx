@@ -65,7 +65,7 @@ export function BlogCta({ category }: { category: string }) {
 
 	return (
 		<section>
-			<div className="mx-auto max-w-[1320px] px-4 pt-16 pb-16 sm:px-6 sm:pt-20 sm:pb-20 lg:px-8 lg:pt-24 lg:pb-24">
+			<div className="w-full px-4 pt-16 pb-16 sm:px-6 sm:pt-20 sm:pb-20 lg:px-8 lg:pt-24 lg:pb-24">
 				<div className="rounded-4xl border border-stroke-soft-200 bg-bg-weak-50 px-8 py-12 sm:px-12 sm:py-14 lg:px-14 dark:border-white/[0.08] dark:bg-[#161616]">
 					<div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
 						<div className="max-w-xl">

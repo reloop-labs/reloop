@@ -27,8 +27,8 @@ export function BlogPostPageView({
 	const showToc = toc.length > 0;
 
 	return (
-		<div className="min-h-screen bg-white dark:bg-black">
-			<div className="relative mx-auto w-full max-w-[720px] px-6 py-8 pt-40 md:px-10">
+		<div className="mx-auto flex min-h-dvh w-full max-w-5xl flex-col border-stroke-soft-200 border-x pt-6 pb-16 md:max-w-7xl dark:border-white/10">
+			<div className="relative mx-auto w-full max-w-[720px] px-6 pt-32 pb-8 md:px-10">
 				{showToc ? (
 					<div className="pointer-events-none absolute top-0 right-full bottom-0 mr-10 hidden w-max xl:block">
 						<BlogTableOfContents

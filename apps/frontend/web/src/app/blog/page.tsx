@@ -39,8 +39,7 @@ export const metadata: Metadata = {
 
 const BlogPage = () => {
 	return (
-		<>
-			<BlogIndex posts={getPublishedPosts()} categories={getCategories()} />
+		<BlogIndex posts={getPublishedPosts()} categories={getCategories()}>
 			<FeatureCta
 				title="Stay in the loop"
 				titleMuted="Star us on GitHub."
@@ -57,7 +56,7 @@ const BlogPage = () => {
 				}}
 				compact
 			/>
-		</>
+		</BlogIndex>
 	);
 };
 
