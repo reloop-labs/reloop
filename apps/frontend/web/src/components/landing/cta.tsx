@@ -14,8 +14,16 @@ export function FeatureCta({
 	return (
 		<section id="cta" className="w-full">
 			<div className="relative overflow-hidden border-stroke-soft-200 border-t bg-bg-white-0 dark:border-white/10 dark:bg-black">
-				<div className="relative z-10 mx-auto flex w-full max-w-5xl flex-col gap-6 border-stroke-soft-200 border-x px-4 py-10 sm:px-6 sm:py-20 md:max-w-7xl lg:flex-row lg:items-center lg:justify-between lg:px-8 dark:border-white/10">
+				<div className="relative z-10 mx-auto flex w-full max-w-5xl flex-col gap-6 border-stroke-soft-200 border-x px-4 py-10 sm:px-6 sm:py-14 md:max-w-7xl lg:flex-row lg:items-center lg:justify-between lg:px-8 dark:border-white/10">
 					<div className="max-w-2xl">
+						<div
+							aria-hidden
+							className="pointer-events-none absolute inset-0 z-0 text-text-strong-950/[0.03] dark:text-white/[0.04]"
+							style={{
+								backgroundImage:
+									"repeating-linear-gradient(-45deg, transparent 0, transparent 6px, currentColor 6px, currentColor 7px)",
+							}}
+						/>
 						<h2 className="font-semibold text-2xl text-text-strong-950 leading-tight tracking-tight sm:text-3xl lg:text-[2.1rem] dark:text-white">
 							{title}
 							{titleMuted && (
