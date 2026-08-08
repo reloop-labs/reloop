@@ -395,11 +395,39 @@ export namespace WebhookModel {
 	});
 
 	export type TriggerWebhookResponse = typeof triggerWebhookResponse.static;
+	export const webhookDeliveryAttemptResponse = t.Object({
+		id: t.String({ description: "Attempt identifier" }),
+		attemptNumber: t.Number(),
+		status: t.Union([
+			t.Literal("pending"),
+			t.Literal("success"),
+			t.Literal("failed"),
+			t.Literal("retrying"),
+		]),
+		responseStatus: t.Union([t.Number(), t.Null()]),
+		responseBody: t.Union([t.String(), t.Null()]),
+		responseHeaders: t.Union([t.Record(t.String(), t.String()), t.Null()]),
+		durationMs: t.Union([t.Number(), t.Null()]),
+		errorMessage: t.Union([t.String(), t.Null()]),
+		createdAt: t.String(),
+		/** automatic = worker retry; manual = user Resend (replay delivery). */
+		source: t.Union([t.Literal("automatic"), t.Literal("manual")]),
+		/** True when this is not the first attempt on the original delivery. */
+		retriedAutomatically: t.Boolean(),
+	});
+
+	export type WebhookDeliveryAttemptResponse =
+		typeof webhookDeliveryAttemptResponse.static;
+
 	export const webhookDeliveryResponse = t.Object({
 		id: t.String({ description: "Unique delivery identifier" }),
 		webhookId: t.String({ description: "Webhook identifier" }),
 		webhookEventId: t.Union([t.String(), t.Null()], {
 			description: "Event identifier",
+		}),
+		/** When set, this row is a manual replay of another delivery (hidden from list). */
+		replayOfDeliveryId: t.Union([t.String(), t.Null()], {
+			description: "Original delivery this row replays, if any",
 		}),
 		eventType: t.String({ description: "Event type" }),
 		eventData: t.Record(t.String(), t.Any(), { description: "Event payload" }),
@@ -427,6 +455,11 @@ export namespace WebhookModel {
 		completedAt: t.Union([t.String(), t.Null()]),
 		durationMs: t.Union([t.Number(), t.Null()]),
 		createdAt: t.String(),
+		/**
+		 * Combined HTTP attempts for this delivery (worker retries + manual resends),
+		 * newest first. Scheduled next retries are represented via nextRetryAt.
+		 */
+		attempts: t.Array(webhookDeliveryAttemptResponse),
 	});
 
 	export type WebhookDeliveryResponse = typeof webhookDeliveryResponse.static;
