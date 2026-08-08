@@ -1,5 +1,6 @@
 "use client";
 
+import { Icon } from "@reloop/ui/icon";
 import { BlogBody } from "@reloop/web/components/landing/blog/blog-body";
 import { BlogCta } from "@reloop/web/components/landing/blog/blog-cta";
 import { BlogPostCoverImage } from "@reloop/web/components/landing/blog/blog-post-cover-image";
@@ -13,9 +14,11 @@ import type {
 	BlogPostDefinition,
 	BlogTocItem,
 } from "@reloop/web/lib/landing/types";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import Image from "next/image";
 import Link from "next/link";
 import { type ReactNode, useState } from "react";
+import { siYcombinator } from "simple-icons";
 
 function ArrowLeftIcon({ className }: { className?: string }) {
 	return (
@@ -51,15 +54,16 @@ function LinkIcon({ className }: { className?: string }) {
 	return (
 		<svg
 			className={className}
-			viewBox="0 0 16 16"
+			viewBox="0 0 24 24"
 			fill="none"
 			stroke="currentColor"
-			strokeWidth="1.75"
+			strokeWidth="2"
 			strokeLinecap="round"
 			strokeLinejoin="round"
 			aria-hidden="true"
 		>
-			<path d="M6.5 9.5l3-3m-1.5-2l1.25-1.25a2.121 2.121 0 113 3L11 8.5m-3 1l-1.25 1.25a2.121 2.121 0 11-3-3L5 6.5" />
+			<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+			<path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
 		</svg>
 	);
 }
@@ -91,7 +95,6 @@ export function BlogPostPageView({
 	toc: BlogTocItem[];
 }) {
 	const [copied, setCopied] = useState(false);
-	const [email, setEmail] = useState("");
 
 	const handleCopyLink = () => {
 		if (typeof window !== "undefined") {
@@ -110,21 +113,21 @@ export function BlogPostPageView({
 	return (
 		<div className="min-h-dvh bg-white dark:bg-black">
 			{/* Main Article Container */}
-			<div className="mx-auto w-full max-w-5xl border-stroke-soft-200 border-x px-4 sm:px-6 md:max-w-7xl lg:px-8 pt-32 pb-16 dark:border-white/10">
+			<div className="mx-auto w-full max-w-5xl border-stroke-soft-200 border-x px-4 pt-32 pb-16 sm:px-6 md:max-w-7xl lg:px-8 dark:border-white/10">
 				{/* Top Header Section */}
-				<header className="mb-12 text-left border-b border-stroke-soft-200 dark:border-white/10 pb-10">
-					<div className="flex flex-col gap-4 max-w-[680px] w-full">
+				<header className="mb-12 border-stroke-soft-200 border-b pb-10 text-left dark:border-white/10">
+					<div className="flex w-full max-w-[680px] flex-col gap-4">
 						<Link
 							href="/blog"
-							className="text-text-sub-600 hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white text-base/[150%] flex items-center gap-2.5 tracking-[-0.24px] font-medium mr-auto transition-colors"
+							className="mr-auto flex items-center gap-2.5 font-medium text-base/[150%] text-text-sub-600 tracking-[-0.24px] transition-colors hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white"
 						>
-							<ArrowLeftIcon className="shrink-0 select-none text-text-strong-950 dark:text-white size-4.5" />
+							<ArrowLeftIcon className="size-4.5 shrink-0 select-none text-text-strong-950 dark:text-white" />
 							<span>All articles</span>
 						</Link>
-						<div className="mt-6 flex items-center gap-2 font-mono font-medium text-xs/[150%] tracking-[0.6px] uppercase">
+						<div className="mt-6 flex flex-wrap items-center gap-2 font-medium font-mono text-xs/[150%] uppercase tracking-[0.6px]">
 							<Link
 								href={getCategoryPath(post.category)}
-								className="text-primary-base hover:opacity-80 transition-opacity"
+								className="text-primary-base transition-opacity hover:opacity-80"
 							>
 								{post.category}
 							</Link>
@@ -135,97 +138,29 @@ export function BlogPostPageView({
 							>
 								{formatBlogDateUpper(post.publishedAt)}
 							</time>
+							<span className="text-text-soft-400 dark:text-white/30">/</span>
+							<span className="text-text-sub-600 dark:text-white/60">
+								BY {post.author.name}
+							</span>
 						</div>
-						<h1 className="text-text-strong-950 dark:text-white text-3xl sm:text-[40px] font-semibold leading-[110%] tracking-[-0.8px]">
+						<h1 className="font-semibold text-3xl text-text-strong-950 leading-[110%] tracking-[-0.8px] sm:text-[40px] dark:text-white">
 							{post.title}
 						</h1>
-						<p className="text-text-sub-600 dark:text-white/60 text-xs/[150%] font-mono font-medium tracking-[0.6px] uppercase">
+						<p className="font-medium font-mono text-text-sub-600 text-xs/[150%] uppercase tracking-[0.6px] dark:text-white/60">
 							{formatReadTimeUpper(post.readTime)}
 						</p>
 					</div>
 				</header>
 
 				{/* 3-Column Content Grid */}
-				<div className="grid grid-cols-1 gap-8 lg:grid-cols-12 items-start">
-					{/* Left Column: Author Info & Share */}
-					<aside className="lg:col-span-3 space-y-8">
-						{/* Author Card */}
-						<div className="flex items-center gap-3">
-							{post.author.avatar ? (
-								<Image
-									src={post.author.avatar}
-									alt={post.author.name}
-									width={40}
-									height={40}
-									className="size-10 rounded-full object-cover shrink-0"
-								/>
-							) : (
-								<div className="flex size-10 items-center justify-center rounded-full bg-neutral-900 text-white dark:bg-white/10 dark:text-white font-medium text-sm shrink-0">
-									{post.author.name.charAt(0)}
-								</div>
-							)}
-							<div>
-								<p className="text-sm font-semibold text-text-strong-950 dark:text-white leading-snug">
-									{post.author.name}
-								</p>
-								<p className="text-xs text-text-sub-600 dark:text-white/50">
-									{post.author.role || "Engineering"}
-								</p>
-							</div>
-						</div>
-
-						{/* Share Article Section */}
-						<div>
-							<h3 className="font-mono text-[11px] text-text-sub-600 dark:text-white/45 tracking-widest uppercase font-medium mb-3">
-								Share this article
-							</h3>
-							<div className="flex items-center gap-2">
-								<a
-									href={`https://www.linkedin.com/sharing/share-offsite/?url=${shareUrl}`}
-									target="_blank"
-									rel="noopener noreferrer"
-									className="flex size-8 items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-weak-50 text-[12px] font-bold text-text-sub-600 transition-colors hover:border-stroke-soft-300 hover:text-text-strong-950 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/70 dark:hover:border-white/20 dark:hover:text-white"
-									aria-label="Share on LinkedIn"
-								>
-									in
-								</a>
-								<a
-									href={`https://twitter.com/intent/tweet?url=${shareUrl}&text=${shareTitle}`}
-									target="_blank"
-									rel="noopener noreferrer"
-									className="flex size-8 items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-weak-50 text-[12px] font-bold text-text-sub-600 transition-colors hover:border-stroke-soft-300 hover:text-text-strong-950 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/70 dark:hover:border-white/20 dark:hover:text-white"
-									aria-label="Share on X"
-								>
-									✕
-								</a>
-								<a
-									href={`https://news.ycombinator.com/submitlink?u=${shareUrl}&t=${shareTitle}`}
-									target="_blank"
-									rel="noopener noreferrer"
-									className="flex size-8 items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-weak-50 text-[12px] font-bold text-text-sub-600 transition-colors hover:border-stroke-soft-300 hover:text-text-strong-950 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/70 dark:hover:border-white/20 dark:hover:text-white"
-									aria-label="Share on Hacker News"
-								>
-									Y
-								</a>
-								<button
-									type="button"
-									onClick={handleCopyLink}
-									className="flex size-8 items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-weak-50 text-text-sub-600 transition-colors hover:border-stroke-soft-300 hover:text-text-strong-950 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/70 dark:hover:border-white/20 dark:hover:text-white"
-									aria-label="Copy link"
-									title={copied ? "Copied!" : "Copy link"}
-								>
-									{copied ? (
-										<CheckIcon className="size-3.5 text-primary-base" />
-									) : (
-										<LinkIcon className="size-3.5" />
-									)}
-								</button>
-							</div>
-						</div>
+				<div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-12">
+					{/* Left Column: Table of Contents */}
+					<aside className="space-y-8 lg:sticky lg:top-28 lg:col-span-3">
+						{toc.length > 0 ? <BlogTableOfContents items={toc} /> : null}
 					</aside>
 
 					{/* Center Column: Main Content */}
-					<main className="lg:col-span-6 space-y-8">
+					<main className="space-y-8 lg:col-span-6">
 						{/* Cover / Benchmark Image */}
 						{post.image ? (
 							<div className="overflow-hidden rounded-2xl border border-stroke-soft-200 dark:border-white/10">
@@ -242,11 +177,11 @@ export function BlogPostPageView({
 						{/* Summary Box */}
 						{post.description ? (
 							<div className="rounded-2xl border border-stroke-soft-200 bg-bg-weak-50/70 p-6 dark:border-white/10 dark:bg-white/[0.03]">
-								<div className="flex items-center gap-1.5 font-mono text-[11px] text-primary-base tracking-widest uppercase font-semibold mb-3">
+								<div className="mb-3 flex items-center gap-1.5 font-mono font-semibold text-[11px] text-primary-base uppercase tracking-widest">
 									<SparklesIcon className="size-3" />
 									<span>Summary</span>
 								</div>
-								<p className="text-[14px] sm:text-[15px] text-text-sub-600 leading-relaxed dark:text-white/70">
+								<p className="text-[14px] text-text-sub-600 leading-relaxed sm:text-[15px] dark:text-white/70">
 									{post.description}
 								</p>
 							</div>
@@ -256,41 +191,174 @@ export function BlogPostPageView({
 						<BlogBody>{body}</BlogBody>
 					</main>
 
-					{/* Right Column: Table of Contents & Conversion Card */}
-					<aside className="lg:col-span-3 space-y-8 lg:sticky lg:top-28">
-						{/* Table of Contents */}
-						{toc.length > 0 ? <BlogTableOfContents items={toc} /> : null}
+					{/* Right Column: Author Info, Share & Conversion Card */}
+					<aside className="space-y-8 lg:sticky lg:top-28 lg:col-span-3">
+						{/* Author Card */}
+						<div>
+							<h3 className="mb-3 font-medium font-mono text-[11px] text-text-sub-600 uppercase tracking-widest dark:text-white/45">
+								Written by
+							</h3>
+							<div className="flex items-center gap-3">
+								{post.author.avatar ? (
+									<Image
+										src={post.author.avatar}
+										alt={post.author.name}
+										width={40}
+										height={40}
+										className="size-10 shrink-0 rounded-full object-cover"
+									/>
+								) : (
+									<div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-neutral-900 font-medium text-sm text-white dark:bg-white/10 dark:text-white">
+										{post.author.name === "Reloop Labs" ? (
+											<Icon name="reloop" className="size-5 text-white" />
+										) : (
+											post.author.name.charAt(0)
+										)}
+									</div>
+								)}
+								<div>
+									<p className="font-semibold text-sm text-text-strong-950 leading-snug dark:text-white">
+										{post.author.name}
+									</p>
+									<p className="text-text-sub-600 text-xs dark:text-white/50">
+										{post.author.role || "Engineering"}
+									</p>
+								</div>
+							</div>
+						</div>
 
-						{/* Conversion Card */}
-						<form
-							onSubmit={(e) => {
-								e.preventDefault();
-								if (email) {
-									window.location.href = `/auth/signup?email=${encodeURIComponent(email)}`;
-								}
-							}}
-							className="rounded-xl border border-stroke-soft-200 bg-bg-weak-50/80 p-3.5 space-y-2.5 dark:border-white/10 dark:bg-white/[0.03]"
+						{/* Share Article Section */}
+						<div>
+							<h3 className="mb-3 font-medium font-mono text-[11px] text-text-sub-600 uppercase tracking-widest dark:text-white/45">
+								Share this article
+							</h3>
+							<div className="flex items-center gap-2">
+								<a
+									href={`https://www.linkedin.com/sharing/share-offsite/?url=${shareUrl}`}
+									target="_blank"
+									rel="noopener noreferrer"
+									className="flex size-8 items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-weak-50 text-text-sub-600 transition-colors hover:border-stroke-soft-300 hover:text-text-strong-950 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/70 dark:hover:border-white/20 dark:hover:text-white"
+									aria-label="Share on LinkedIn"
+								>
+									<Icon name="linkedin" className="size-3.5" />
+								</a>
+								<a
+									href={`https://twitter.com/intent/tweet?url=${shareUrl}&text=${shareTitle}`}
+									target="_blank"
+									rel="noopener noreferrer"
+									className="flex size-8 items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-weak-50 text-text-sub-600 transition-colors hover:border-stroke-soft-300 hover:text-text-strong-950 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/70 dark:hover:border-white/20 dark:hover:text-white"
+									aria-label="Share on X"
+								>
+									<Icon name="twitter" className="size-3.5" />
+								</a>
+								{/** biome-ignore lint/a11y/useAnchorContent: <explanation> */}
+								<a
+									href={`https://news.ycombinator.com/submitlink?u=${shareUrl}&t=${shareTitle}`}
+									target="_blank"
+									rel="noopener noreferrer"
+									className="flex size-8 items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-weak-50 text-text-sub-600 transition-colors hover:border-stroke-soft-300 hover:text-text-strong-950 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/70 dark:hover:border-white/20 dark:hover:text-white"
+									aria-label="Share on Hacker News"
+								>
+									<svg
+										className="size-3.5 fill-current"
+										viewBox="0 0 24 24"
+										aria-hidden="true"
+									>
+										<path d={siYcombinator.path} />
+									</svg>
+								</a>
+								<button
+									type="button"
+									onClick={handleCopyLink}
+									className="flex size-8 items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-weak-50 text-text-sub-600 transition-colors hover:border-stroke-soft-300 hover:text-text-strong-950 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/70 dark:hover:border-white/20 dark:hover:text-white"
+									aria-label="Copy link"
+									title={copied ? "Copied!" : "Copy link"}
+								>
+									{copied ? (
+										<CheckIcon className="size-3.5 text-primary-base" />
+									) : (
+										<LinkIcon className="size-3.5" />
+									)}
+								</button>
+							</div>
+						</div>
+
+						{/* Dub-style Product CTA Card */}
+						<a
+							href="/dashboard/signup"
+							className="group relative block overflow-hidden rounded-2xl border border-stroke-soft-200 bg-white p-3.5 transition-all duration-200 hover:border-stroke-strong-950 hover:shadow-md dark:border-white/10 dark:bg-white/[0.03] dark:hover:border-white/30"
 						>
-							<input
-								type="email"
-								value={email}
-								onChange={(e) => setEmail(e.target.value)}
-								placeholder="Email address"
-								className="w-full rounded-lg border border-stroke-soft-200 bg-white px-3 py-2 text-[13px] text-text-strong-950 outline-none transition-colors placeholder:text-text-soft-400 focus:border-stroke-sub-300 dark:border-white/10 dark:bg-neutral-900/90 dark:text-white dark:placeholder:text-white/35 dark:focus:border-white/20"
-							/>
-							<button
-								type="submit"
-								className="w-full rounded-lg bg-text-strong-950 py-2 font-medium text-[13px] text-white transition-colors hover:bg-neutral-800 dark:bg-white dark:text-black dark:hover:bg-neutral-200"
-							>
-								Start for free
-							</button>
-							<Link
-								href="/contact"
-								className="block w-full rounded-lg border border-stroke-soft-200 bg-transparent py-2 text-center font-medium text-[13px] text-text-strong-950 transition-colors hover:bg-bg-weak-50 dark:border-white/10 dark:text-white dark:hover:bg-white/5"
-							>
-								Contact sales
-							</Link>
-						</form>
+							{/* Top Product Preview Mockup */}
+							<div className="relative mb-3.5 aspect-[16/10] w-full overflow-hidden rounded-xl border border-stroke-soft-200/80 bg-gradient-to-b from-bg-weak-50 via-white to-bg-weak-50/50 p-3.5 dark:border-white/10 dark:from-neutral-900 dark:via-neutral-900/80 dark:to-neutral-950">
+								{/* Subtle grid pattern background */}
+								<div
+									className="pointer-events-none absolute inset-0 opacity-[0.04] dark:opacity-[0.08]"
+									style={{
+										backgroundImage:
+											"linear-gradient(to right, currentColor 1px, transparent 1px), linear-gradient(to bottom, currentColor 1px, transparent 1px)",
+										backgroundSize: "16px 16px",
+									}}
+								/>
+
+								{/* Top Bar inside preview */}
+								<div className="relative z-10 flex items-center justify-between">
+									<div className="flex items-center gap-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 font-mono font-medium text-[10px] text-emerald-600 dark:text-emerald-400">
+										<span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
+										99.99% Delivered
+									</div>
+									<div className="flex items-center gap-1 rounded-md border border-stroke-soft-200 bg-white/80 px-2 py-0.5 font-mono text-[10px] text-text-sub-600 dark:border-white/10 dark:bg-white/10 dark:text-white/60">
+										<span>SMTP / API</span>
+									</div>
+								</div>
+
+								{/* Center Wordmark & Visual Elements */}
+								<div className="relative z-10 my-auto flex flex-col items-center justify-center py-2">
+									<div className="flex items-center gap-2">
+										<div className="flex size-7 items-center justify-center rounded-lg bg-text-strong-950 text-white shadow-sm transition-transform duration-200 group-hover:scale-105 dark:bg-white dark:text-black">
+											<Icon name="reloop" className="size-4" />
+										</div>
+										<span className="font-bold font-sans text-lg text-text-strong-950 tracking-tight dark:text-white">
+											reloop
+										</span>
+									</div>
+								</div>
+
+								{/* Bottom Mini Code / Card Widget */}
+								<div className="relative z-10 rounded-lg border border-stroke-soft-200 bg-white/90 p-2 shadow-xs transition-transform duration-200 group-hover:translate-y-[-2px] dark:border-white/10 dark:bg-neutral-900/90">
+									<div className="flex items-center justify-between font-mono text-[11px]">
+										<span className="flex items-center gap-1.5 text-text-strong-950 dark:text-white">
+											<span className="text-emerald-500 font-bold">POST</span> /v1/emails/send
+										</span>
+										<span className="rounded bg-emerald-500/10 px-1.5 py-0.5 font-semibold text-[9px] text-emerald-600 dark:text-emerald-400">
+											200 OK
+										</span>
+									</div>
+								</div>
+							</div>
+
+							{/* Text content below preview */}
+							<div className="space-y-1 px-0.5">
+								<h4 className="flex items-center justify-between font-bold text-base text-text-strong-950 tracking-tight dark:text-white">
+									<span>Try Reloop for free</span>
+									<svg
+										className="size-4 text-text-sub-600 transition-transform duration-200 group-hover:translate-x-0.5 dark:text-white/60"
+										fill="none"
+										viewBox="0 0 24 24"
+										stroke="currentColor"
+										strokeWidth={2}
+									>
+										<path
+											strokeLinecap="round"
+											strokeLinejoin="round"
+											d="M9 5l7 7-7 7"
+										/>
+									</svg>
+								</h4>
+								<p className="text-[13px] text-text-sub-600 leading-snug dark:text-white/60">
+									Supercharge your application with Reloop's developer-first email infrastructure platform
+								</p>
+							</div>
+						</a>
 					</aside>
 				</div>
 			</div>
