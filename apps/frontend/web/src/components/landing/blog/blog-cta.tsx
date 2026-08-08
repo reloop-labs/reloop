@@ -64,19 +64,33 @@ export function BlogCta({ category }: { category: string }) {
 	const variant = CATEGORY_VARIANTS[category] ?? DEFAULT_VARIANT;
 
 	return (
-		<section>
-			<div className="w-full px-4 pt-16 pb-16 sm:px-6 sm:pt-20 sm:pb-20 lg:px-8 lg:pt-24 lg:pb-24">
-				<div className="rounded-4xl border border-stroke-soft-200 bg-bg-weak-50 px-8 py-12 sm:px-12 sm:py-14 lg:px-14 dark:border-white/[0.08] dark:bg-[#161616]">
-					<div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
-						<div className="max-w-xl">
-							<h2 className="font-serif text-2xl text-text-strong-950 leading-tight tracking-tight sm:text-[1.75rem] dark:text-white">
-								{variant.headline}
-							</h2>
-							<p className="mt-3 text-[15px] text-text-sub-600 leading-relaxed dark:text-white/50">
-								{variant.sub}
-							</p>
-						</div>
+		<section className="w-full mt-12">
+			<div className="relative overflow-hidden border-stroke-soft-200 border-y bg-bg-white-0 px-6 py-10 sm:px-10 sm:py-12 dark:border-white/10 dark:bg-black">
+				{/* Diagonal hatch line graphic using primary color */}
+				<div
+					aria-hidden
+					className="pointer-events-none absolute top-0 right-0 bottom-0 w-full text-primary-base/40 sm:w-1/2 dark:text-primary-base/50"
+					style={{
+						backgroundImage:
+							"repeating-linear-gradient(-45deg, transparent 0, transparent 8px, currentColor 8px, currentColor 9.5px)",
+						maskImage:
+							"linear-gradient(to right, transparent 0%, black 50%, black 100%)",
+						WebkitMaskImage:
+							"linear-gradient(to right, transparent 0%, black 50%, black 100%)",
+					}}
+				/>
 
+				<div className="relative z-10 mx-auto flex w-full max-w-5xl flex-col gap-6 lg:flex-row lg:items-center lg:justify-between md:max-w-7xl">
+					<div className="max-w-2xl">
+						<h2 className="font-serif text-2xl text-text-strong-950 leading-tight tracking-tight sm:text-3xl lg:text-[2.1rem] dark:text-white">
+							{variant.headline}
+						</h2>
+						<p className="mt-2 text-[15px] text-text-sub-600 leading-relaxed dark:text-white/60">
+							{variant.sub}
+						</p>
+					</div>
+
+					<div className="flex flex-wrap items-center gap-3 shrink-0">
 						<CtaLink
 							label={variant.primaryLabel}
 							href="/dashboard/signup"

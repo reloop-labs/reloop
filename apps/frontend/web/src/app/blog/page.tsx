@@ -43,7 +43,6 @@ const BlogPage = () => {
 			<FeatureCta
 				title="Stay in the loop"
 				titleMuted="Star us on GitHub."
-				description="Watch the repository for release notifications and follow along as we ship."
 				primary={{
 					label: "Star on GitHub",
 					href: socialProfiles.github,

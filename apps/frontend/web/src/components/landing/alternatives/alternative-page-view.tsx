@@ -120,7 +120,7 @@ export function AlternativePageView({
 
 			<ToolUpsell
 				title={config.cta.title}
-				description={config.cta.description}
+				description={config.cta.description ?? ""}
 				primaryHref={config.cta.primary.href}
 				primaryLabel={config.cta.primary.label}
 				secondaryHref={config.compareHref}

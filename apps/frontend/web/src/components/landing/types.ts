@@ -7,7 +7,7 @@ export type FeatureCtaLink = {
 export type FeatureCtaBand = {
 	title: string;
 	titleMuted?: string;
-	description: string;
+	description?: string;
 	primary: FeatureCtaLink;
 	secondary?: FeatureCtaLink;
 };

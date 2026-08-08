@@ -82,7 +82,7 @@ export function ToolUpsell({
 	secondaryLabel,
 }: {
 	title: string;
-	description: string;
+	description?: string;
 	primaryHref: string;
 	primaryLabel: string;
 	secondaryHref?: string;
