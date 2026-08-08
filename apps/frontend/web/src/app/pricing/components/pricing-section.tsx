@@ -40,7 +40,7 @@ function PlanCtaLink({
 				: "text-[14px]";
 
 	const content = (
-		<span className={cn("font-semibold", textSizeClass)}>{label}</span>
+		<span className={cn("font-medium", textSizeClass)}>{label}</span>
 	);
 
 	if (external) {
@@ -270,16 +270,16 @@ function PlanColumn({
 
 				<div className="mt-6 min-h-[96px]">
 					{isCustom ? (
-						<p className="font-serif text-[2.4rem] text-text-strong-950 leading-none tracking-tighter dark:text-white">
+						<p className="font-semibold text-[2rem] text-text-strong-950 leading-none tracking-tight dark:text-white">
 							Custom
 						</p>
 					) : (
 						<div className="flex items-end gap-1">
-							<span className="font-serif text-[2.4rem] text-text-strong-950 leading-none tracking-tighter dark:text-white">
+							<span className="font-semibold text-[2rem] text-text-strong-950 leading-none tracking-tight dark:text-white">
 								{formatPrice(price)}
 							</span>
 							{price > 0 && (
-								<span className="mb-1 font-sans text-[15px] text-text-sub-600 dark:text-white/50">
+								<span className="mb-1 text-[15px] text-text-sub-600 dark:text-white/50">
 									{plan.priceSubline}
 								</span>
 							)}
