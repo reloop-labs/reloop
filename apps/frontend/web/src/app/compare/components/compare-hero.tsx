@@ -34,7 +34,7 @@ export function CompareHero({
 				) : null}
 
 				<div className="mx-auto w-full max-w-3xl">
-					<h1 className="font-serif text-[2.4rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[3.6rem] dark:text-white">
+					<h1 className="text-3xl sm:text-[40px] font-semibold text-text-strong-950 leading-[110%] tracking-[-0.8px] dark:text-white">
 						{titleLines.map((line, i) => (
 							<span key={line}>
 								{line}

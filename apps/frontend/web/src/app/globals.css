@@ -3,11 +3,15 @@
 @theme {
 	--font-serif: var(--font-inter), sans-serif;
 	--font-sans: var(--font-inter), sans-serif;
+	--font-geist: var(--font-geist-sans), sans-serif;
+	--font-mono: var(--font-geist-mono), monospace;
 }
 
 :root {
 	--font-sans: var(--font-inter), sans-serif;
 	--font-serif: var(--font-inter), sans-serif;
+	--font-geist: var(--font-geist-sans), sans-serif;
+	--font-mono: var(--font-geist-mono), monospace;
 }
 
 @custom-variant dark (&:where(.dark, .dark *));

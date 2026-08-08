@@ -2,56 +2,12 @@ import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { competitorBrands } from "../competitor-brands";
-import {
-	CompareFeatureSlide,
-	type CompareFeatureSlideItem,
-} from "../components/compare-feature-slide";
 import { CompareMigrate } from "../components/compare-migrate";
 import { CompareOtherLinks } from "../components/compare-other-links";
 import { CompareSection } from "../components/compare-section";
 import { ComparisonMatrix } from "../components/comparison-matrix";
 import { ComparisonPageShell } from "../components/comparison-page-shell";
 import { resendComparisonCategories } from "./comparison-data";
-
-/** Important product surfaces — temp mock UIs until real screenshots land. */
-const resendFeatureSlides: CompareFeatureSlideItem[] = [
-	{
-		id: "sending",
-		label: "Sending",
-		reloopCaption: "Reloop · transactional send",
-		competitorCaption: "Resend · transactional send",
-	},
-	{
-		id: "inbox",
-		label: "Agent inbox",
-		reloopCaption: "Reloop · two-way agent inbox",
-		competitorCaption: "Resend · inbound",
-	},
-	{
-		id: "templates",
-		label: "Templates",
-		reloopCaption: "Reloop · template editor",
-		competitorCaption: "Resend · templates",
-	},
-	{
-		id: "webhooks",
-		label: "Webhooks",
-		reloopCaption: "Reloop · delivery events",
-		competitorCaption: "Resend · webhooks",
-	},
-	{
-		id: "self-host",
-		label: "Self-host",
-		reloopCaption: "Reloop · self-hosted stack",
-		competitorCaption: "Resend · hosted only",
-	},
-	{
-		id: "domains",
-		label: "Domains",
-		reloopCaption: "Reloop · domain auth",
-		competitorCaption: "Resend · domains",
-	},
-];
 
 // TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
 // See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
@@ -60,8 +16,6 @@ export const instant = false;
 const pagePath = "/compare/resend";
 const siteUrl = getSiteUrl();
 const pageUrl = `${siteUrl}${pagePath}`;
-
-const resendBrand = competitorBrands.find((b) => b.name === "Resend");
 
 export const metadata: Metadata = {
 	title: "Reloop vs Resend: a detailed comparison",
@@ -93,6 +47,8 @@ export const metadata: Metadata = {
 };
 
 const ResendComparisonPage = () => {
+	const resendBrand = competitorBrands.find((b) => b.name === "Resend");
+
 	return (
 		<ComparisonPageShell
 			pagePath={pagePath}
@@ -107,21 +63,6 @@ const ResendComparisonPage = () => {
 				href: "/compare/resend#migrate",
 			}}
 		>
-			{/* Product UI slide comparison */}
-			<CompareSection maxWidth="full" flushTop hasDotGrid>
-				<h2 className="mx-auto mb-10 max-w-3xl text-balance text-center font-serif text-[2rem] text-text-strong-950 leading-[1.15] tracking-tighter sm:mb-12 sm:text-[2.4rem] lg:text-[2.8rem] dark:text-white">
-					Reloop is the open-source email infrastructure built for the age of AI
-					agents.
-				</h2>
-				{resendBrand ? (
-					<CompareFeatureSlide
-						competitorName="Resend"
-						competitorIcon={resendBrand.icon}
-						features={resendFeatureSlides}
-					/>
-				) : null}
-			</CompareSection>
-
 			{/* Feature matrix */}
 			<CompareSection maxWidth="full" flushX>
 				<div className="mb-10 text-center">

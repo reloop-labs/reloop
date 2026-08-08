@@ -106,9 +106,9 @@ export function FeatureHero({
 						{leading}
 						<h1
 							className={cn(
-								"font-medium text-text-strong-950 leading-[1.05] tracking-tighter dark:text-white",
+								"font-semibold text-text-strong-950 leading-[110%] tracking-[-0.8px] dark:text-white",
 								compact
-									? "text-[2.4rem] sm:text-[3.6rem]"
+									? "text-3xl sm:text-[40px]"
 									: "text-[2.8rem] sm:text-[4.2rem]",
 							)}
 						>

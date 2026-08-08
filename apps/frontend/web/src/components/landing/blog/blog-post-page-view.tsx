@@ -23,13 +23,13 @@ function ArrowLeftIcon({ className }: { className?: string }) {
 			className={className}
 			viewBox="0 0 16 16"
 			fill="none"
-			stroke="currentColor"
-			strokeWidth="2"
-			strokeLinecap="round"
-			strokeLinejoin="round"
+			xmlns="http://www.w3.org/2000/svg"
 			aria-hidden="true"
 		>
-			<path d="M10 12L4 8L10 4" />
+			<path
+				d="M8 0C3.589 0 0 3.589 0 8C0 12.411 3.589 16 8 16C12.411 16 16 12.411 16 8C16 3.589 12.411 0 8 0ZM11.25 8.75H6.561L7.781 9.97C8.074 10.263 8.074 10.738 7.781 11.031C7.635 11.177 7.443 11.251 7.251 11.251C7.059 11.251 6.867 11.178 6.721 11.031L4.221 8.531C3.928 8.238 3.928 7.763 4.221 7.47L6.721 4.97C7.014 4.677 7.489 4.677 7.782 4.97C8.075 5.263 8.075 5.738 7.782 6.031L6.562 7.251H11.251C11.665 7.251 12.001 7.587 12.001 8.001C12.001 8.415 11.665 8.751 11.251 8.751L11.25 8.75Z"
+				fill="currentColor"
+			/>
 		</svg>
 	);
 }
@@ -113,45 +113,36 @@ export function BlogPostPageView({
 			<div className="mx-auto w-full max-w-5xl border-stroke-soft-200 border-x px-4 sm:px-6 md:max-w-7xl lg:px-8 pt-32 pb-16 dark:border-white/10">
 				{/* Top Header Section */}
 				<header className="mb-12 text-left border-b border-stroke-soft-200 dark:border-white/10 pb-10">
-					{/* Top Navigation Back Button */}
-					<nav className="mb-10">
+					<div className="flex flex-col gap-4 max-w-[680px] w-full">
 						<Link
 							href="/blog"
-							className="group inline-flex items-center gap-2.5 text-[14px] font-medium text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/80 dark:hover:text-white"
+							className="text-text-sub-600 hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white text-base/[150%] flex items-center gap-2.5 tracking-[-0.24px] font-medium mr-auto transition-colors"
 						>
-							<span className="flex size-5 sm:size-6 items-center justify-center rounded-full bg-neutral-900 text-white dark:bg-white dark:text-black shrink-0 transition-transform group-hover:-translate-x-0.5">
-								<ArrowLeftIcon className="size-3" />
-							</span>
+							<ArrowLeftIcon className="shrink-0 select-none text-text-strong-950 dark:text-white size-4.5" />
 							<span>All articles</span>
 						</Link>
-					</nav>
-
-					{/* Category / Date Tag */}
-					<div className="flex items-center text-[12px] sm:text-[13px] font-mono tracking-widest uppercase">
-						<Link
-							href={getCategoryPath(post.category)}
-							className="text-emerald-500 dark:text-emerald-400 font-semibold transition-opacity hover:opacity-80"
-						>
-							{post.category.toUpperCase()}
-						</Link>
-						<span className="mx-2 text-text-soft-400 dark:text-white/30">/</span>
-						<time
-							dateTime={post.publishedAt}
-							className="text-text-sub-600 dark:text-white/50"
-						>
-							{formatBlogDateUpper(post.publishedAt)}
-						</time>
+						<div className="mt-6 flex items-center gap-2 font-mono font-medium text-xs/[150%] tracking-[0.6px] uppercase">
+							<Link
+								href={getCategoryPath(post.category)}
+								className="text-primary-base hover:opacity-80 transition-opacity"
+							>
+								{post.category}
+							</Link>
+							<span className="text-text-soft-400 dark:text-white/30">/</span>
+							<time
+								dateTime={post.publishedAt}
+								className="text-text-sub-600 dark:text-white/60"
+							>
+								{formatBlogDateUpper(post.publishedAt)}
+							</time>
+						</div>
+						<h1 className="text-text-strong-950 dark:text-white text-3xl sm:text-[40px] font-semibold leading-[110%] tracking-[-0.8px]">
+							{post.title}
+						</h1>
+						<p className="text-text-sub-600 dark:text-white/60 text-xs/[150%] font-mono font-medium tracking-[0.6px] uppercase">
+							{formatReadTimeUpper(post.readTime)}
+						</p>
 					</div>
-
-					{/* Title */}
-					<h1 className="mt-6 font-sans text-3xl font-bold text-text-strong-950 leading-[1.15] tracking-tight sm:text-4xl md:text-5xl dark:text-white">
-						{post.title}
-					</h1>
-
-					{/* Read Time */}
-					<p className="mt-6 font-mono text-[11px] sm:text-xs text-text-sub-600 dark:text-white/45 tracking-widest uppercase font-medium">
-						{formatReadTimeUpper(post.readTime)}
-					</p>
 				</header>
 
 				{/* 3-Column Content Grid */}
@@ -224,7 +215,7 @@ export function BlogPostPageView({
 									title={copied ? "Copied!" : "Copy link"}
 								>
 									{copied ? (
-										<CheckIcon className="size-3.5 text-emerald-400" />
+										<CheckIcon className="size-3.5 text-primary-base" />
 									) : (
 										<LinkIcon className="size-3.5" />
 									)}
@@ -251,7 +242,7 @@ export function BlogPostPageView({
 						{/* Summary Box */}
 						{post.description ? (
 							<div className="rounded-2xl border border-stroke-soft-200 bg-bg-weak-50/70 p-6 dark:border-white/10 dark:bg-white/[0.03]">
-								<div className="flex items-center gap-1.5 font-mono text-[11px] text-emerald-500 dark:text-emerald-400 tracking-widest uppercase font-semibold mb-3">
+								<div className="flex items-center gap-1.5 font-mono text-[11px] text-primary-base tracking-widest uppercase font-semibold mb-3">
 									<SparklesIcon className="size-3" />
 									<span>Summary</span>
 								</div>

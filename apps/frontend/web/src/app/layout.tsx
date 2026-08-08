@@ -12,7 +12,7 @@ import {
 	siteName,
 } from "@reloop/web/lib/site";
 import { ThemeProvider } from "@reloop/web/providers/theme-provider";
-import { Inter } from "next/font/google";
+import { Geist, Geist_Mono, Inter } from "next/font/google";
 import Script from "next/script";
 
 // TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
@@ -22,6 +22,18 @@ export const instant = false;
 const inter = Inter({
 	subsets: ["latin"],
 	variable: "--font-inter",
+	display: "swap",
+});
+
+const geistSans = Geist({
+	subsets: ["latin"],
+	variable: "--font-geist-sans",
+	display: "swap",
+});
+
+const geistMono = Geist_Mono({
+	subsets: ["latin"],
+	variable: "--font-geist-mono",
 	display: "swap",
 });
 
@@ -74,7 +86,7 @@ export default function RootLayout({
 				>{`var l=document.createElement('link');l.rel='manifest';l.href='/manifest.json';document.head.appendChild(l)`}</Script>
 			</head>
 			<body
-				className="min-h-full overscroll-y-none bg-bg-white-0 antialiased"
+				className={`${geistSans.variable} ${geistMono.variable} min-h-full overscroll-y-none bg-bg-white-0 antialiased`}
 				style={{ fontFamily: "var(--font-inter), sans-serif" }}
 			>
 				<ThemeProvider
