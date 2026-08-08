@@ -33,9 +33,11 @@ function handleScrollTo(
 export function BlogTableOfContents({
 	items,
 	className,
+	showHeader = true,
 }: {
 	items: BlogTocItem[];
 	className?: string;
+	showHeader?: boolean;
 }) {
 	const [activeId, setActiveId] = useState("");
 
@@ -80,8 +82,13 @@ export function BlogTableOfContents({
 	if (items.length === 0) return null;
 
 	return (
-		<nav aria-label="Table of contents" className={cn("w-max", className)}>
-			<ul className="m-0 flex list-none flex-col gap-3 p-0">
+		<nav aria-label="Table of contents" className={cn("w-full", className)}>
+			{showHeader ? (
+				<h2 className="mb-3 font-mono text-[11px] text-text-sub-600 dark:text-white/45 tracking-widest uppercase font-medium">
+					On this page
+				</h2>
+			) : null}
+			<ul className="m-0 flex list-none flex-col gap-2.5 p-0">
 				{items.map((item) => {
 					const id = getHeadingId(item.url);
 					const isActive = activeId === id;
@@ -92,30 +99,14 @@ export function BlogTableOfContents({
 								href={item.url}
 								onClick={(e) => handleScrollTo(e, id, setActiveId)}
 								className={cn(
-									"group flex min-w-0 items-center gap-3 no-underline transition-colors",
+									"block border-l-2 py-0.5 pl-3.5 text-[13px] leading-snug transition-colors",
 									isActive
-										? "text-primary-base"
-										: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/45 dark:hover:text-white",
+										? "border-text-strong-950 text-text-strong-950 font-medium dark:border-white dark:text-white"
+										: "border-transparent text-text-sub-600 hover:text-text-strong-950 dark:text-white/45 dark:hover:text-white",
 								)}
+								title={item.title}
 							>
-								<span
-									className={cn(
-										"h-px w-4 shrink-0 transition-colors",
-										isActive
-											? "bg-primary-base"
-											: "bg-text-sub-600/40 dark:bg-white/25",
-									)}
-									aria-hidden="true"
-								/>
-								<span
-									className={cn(
-										"whitespace-nowrap text-[13px] leading-none",
-										isActive && "font-medium",
-									)}
-									title={item.title}
-								>
-									{item.title}
-								</span>
+								{item.title}
 							</a>
 						</li>
 					);

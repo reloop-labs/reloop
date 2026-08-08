@@ -52,6 +52,7 @@ export type GlossaryTermDefinition = {
 export type BlogPostAuthor = {
 	name: string;
 	avatar?: string;
+	role?: string;
 };
 
 export type BlogCategoryDefinition = {

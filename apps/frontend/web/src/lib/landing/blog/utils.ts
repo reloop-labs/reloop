@@ -8,6 +8,26 @@ export function formatBlogDate(date: string) {
 	});
 }
 
+export function formatBlogDateUpper(date: string) {
+	const d = new Date(date);
+	const month = d.toLocaleDateString("en-US", { month: "long" }).toUpperCase();
+	const day = d.getDate();
+	const year = d.getFullYear();
+	return `${month} ${day}, ${year}`;
+}
+
+export function formatReadTimeUpper(readTime?: string) {
+	if (!readTime) return "5 MINUTES READ";
+	const cleaned = readTime
+		.toUpperCase()
+		.replace(/\bMINS\b/g, "MINUTES")
+		.replace(/\bMIN\b/g, "MINUTES");
+	if (cleaned.includes("MINUTES") && !cleaned.includes("READ")) {
+		return `${cleaned} READ`;
+	}
+	return cleaned;
+}
+
 export function sortBlogPosts(posts: BlogPostDefinition[]) {
 	return [...posts].sort(
 		(a, b) =>
@@ -36,4 +56,16 @@ export function filterBlogPosts(
 
 		return haystack.includes(normalizedQuery);
 	});
+}
+
+export function slugifyCategory(category: string): string {
+	return category
+		.toLowerCase()
+		.replace(/&/g, "")
+		.replace(/[^a-z0-9]+/g, "-")
+		.replace(/^-+|-+$/g, "");
+}
+
+export function getCategoryPath(category: string): string {
+	return `/blog/category/${slugifyCategory(category)}`;
 }
