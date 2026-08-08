@@ -190,8 +190,8 @@ export const Footer = () => {
 	return (
 		<footer className="w-full border-stroke-soft-200 border-t bg-bg-white-0 text-text-strong-950 dark:border-white/10 dark:bg-black dark:text-white">
 			<div className="mx-auto max-w-[1320px] px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
-				<div className="flex h-full flex-col gap-12 lg:flex-row lg:items-start lg:gap-20">
-					<div className="flex h-full flex-col justify-between lg:w-48">
+				<div className="flex h-full flex-col gap-12 lg:flex-row lg:items-stretch lg:gap-20">
+					<div className="flex flex-col justify-between gap-8 lg:w-48 lg:self-stretch">
 						<div className="flex shrink-0 flex-col">
 							<Link
 								href="/"
@@ -208,7 +208,7 @@ export const Footer = () => {
 							href={statusUrl}
 							target="_blank"
 							rel="noreferrer"
-							className="inline-flex items-center gap-2 transition-opacity hover:opacity-80"
+							className="ml-2 inline-flex items-center gap-2 transition-opacity hover:opacity-80"
 						>
 							<span className="size-2 shrink-0 rounded-full bg-[#0070F3]" />
 							<span className="font-mono text-[#0070F3] text-[11px] uppercase tracking-wide">
