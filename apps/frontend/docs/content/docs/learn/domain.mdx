@@ -1,27 +1,221 @@
 ---
 title: Domain
-description: Verify sending domains and manage SPF, DKIM, and DMARC configurations.
+description: Learn how to add, verify, configure, and delete Reloop sending domains from the dashboard or API.
 icon: globe
+faq:
+  - question: Why do I need to verify a domain?
+    answer: Verification proves you control the DNS for that hostname and publishes SPF, DKIM, and related records so mailbox providers can authenticate mail from Reloop. Unverified domains cannot send reliably.
+  - question: What is the difference between Auto-populate and manual DNS setup?
+    answer: Auto-populate uses Domain Connect so your DNS host can apply Reloop’s records after you approve a template. Manual setup means copying each TXT, MX, and CNAME into your DNS panel yourself.
+  - question: Can I use a subdomain instead of my root domain?
+    answer: Yes. Reloop supports root domains (e.g. acme.com) and subdomains (e.g. mail.acme.com or notifications.acme.com). Subdomains are often easier when the root already has other email or DNS services.
+  - question: What happens if I disable sending or receiving?
+    answer: Toggles pause that capability for the domain without deleting it. Disabling sending blocks outbound From addresses on that domain; disabling receiving removes Reloop inbound MX use. You can re-enable either later.
+  - question: How long does DNS verification take?
+    answer: Often minutes after records publish, but propagation can take up to 48 hours depending on TTL and your DNS host. Use Verify (or Re-verify DNS) after changes.
+  - question: What should I do if my domain will not verify?
+    answer: Confirm you edited DNS at the nameserver host (not only the registrar), merge SPF instead of adding a second SPF TXT, check DKIM/DMARC hostnames for typos, and see the Domain not verifying guide.
 ---
 
-Configure your sending identities to ensure the highest possible inbox delivery rates. Reloop **Domain** settings walk you through adding and verifying the required DNS credentials.
+<Tabs>
+  <Tab title="Desktop" icon="monitor">
+    ## View all domains
 
-## Start here
+    The [Domains Dashboard](https://reloop.sh/dashboard/domain) lists every domain in your organization with status, search, and filters.
 
-**[Connect a domain](/docs/guides/connect-domain)** — full guide for beginners and experts: what DNS is, how to find your provider, Auto-populate vs manual setup, every provider guide, verification, and troubleshooting.
+    ![Domains list in the Reloop dashboard](/docs/images/docs/guides/connect-domain/overview/domains-list.png)
 
-## Key capabilities
+    ## Add a domain
 
-* **Custom sending domains**: Send mail from your own branding (e.g. `mg.yourdomain.com` or `mail.yourdomain.com`).
-* **DNS configuration guides**: Automated generation of SPF, DKIM, and DMARC (plus MX/tracking when needed).
-* **Auto-populate**: One-click Domain Connect on Cloudflare, Vercel, Domain Chief, and NameSilo.
-* **Automatic propagation checker**: Verify DNS configuration directly within the dashboard.
+    1. Go to [Domains](https://reloop.sh/dashboard/domain)
+    2. Click **Add domain** (or press `C`)
+    3. Enter the hostname (e.g. `acme.com` or `mail.acme.com`)
+    4. Optionally open **Advanced options** to set click/open tracking defaults
+    5. Click **Add Domain**
 
-## Popular links
+    Reloop creates the domain in `pending` status and opens the DNS setup page with the records you need to publish.
 
-- [Add a domain](/docs/guides/connect-domain/add-domain)
-- [Find your DNS provider](/docs/guides/connect-domain/find-dns-provider)
-- [DNS records explained](/docs/guides/connect-domain/dns-records-explained)
-- [Auto-populate](/docs/guides/connect-domain/auto-populate)
-- [All provider guides](/docs/guides/connect-domain/providers)
-- [Domain not verifying](/docs/guides/connect-domain/troubleshoot/not-verifying)
+    ![Add a domain in the Reloop dashboard](/docs/images/docs/guides/connect-domain/shared/add-domain.png)
+
+    <Info>
+    Prefer a guided path for beginners? See the full [Connect a domain](/docs/guides/connect-domain) guide — DNS basics, provider tutorials, and troubleshooting.
+    </Info>
+
+    ## Configure DNS
+
+    After you add a domain, Reloop shows the required DNS records (SPF, DKIM, DMARC, and MX/tracking when enabled).
+
+    **Auto-populate** (when available):
+
+    1. On the setup or domain page, click **Auto populate**
+    2. Approve Reloop’s Domain Connect template at your DNS host
+    3. Return to Reloop and [verify](#verify-a-domain)
+
+    <Video src="/docs/images/docs/guides/connect-domain/providers/cloudflare/auto-populate.mp4" autoPlay loop muted playsInline />
+
+    **Manual setup:**
+
+    1. Copy each record from the Reloop DNS table
+    2. Add them at the host that manages your [nameservers](/docs/guides/connect-domain/find-dns-provider)
+    3. Merge SPF if you already have an SPF TXT — do not create a second SPF record
+
+    Deep dives: [Auto-populate](/docs/guides/connect-domain/auto-populate) · [Manual setup](/docs/guides/connect-domain/manual-setup) · [DNS records explained](/docs/guides/connect-domain/dns-records-explained) · [Provider guides](/docs/guides/connect-domain/providers)
+
+    ## Verify a domain
+
+    1. Open the domain from [Domains](https://reloop.sh/dashboard/domain) (or stay on the post-add setup page)
+    2. Click **Verify** (or use the row/header menu → **Re-verify DNS**)
+    3. Wait for status to move through `pending` → `verifying` → `active`
+
+    ![Verify DNS and finish in the Reloop dashboard](/docs/images/docs/guides/connect-domain/shared/verify-and-finish.png)
+
+    ![Verified domain in the Reloop dashboard](/docs/images/docs/guides/connect-domain/shared/verified-domain.png)
+
+    <Info>
+    Status meanings and propagation tips: [Domain statuses](/docs/guides/connect-domain/verification/statuses) and [Propagation](/docs/guides/connect-domain/verification/propagation). Stuck? [Domain not verifying](/docs/guides/connect-domain/troubleshoot/not-verifying).
+    </Info>
+
+    ## Configure sending, receiving, and tracking
+
+    On the domain detail page you can toggle capabilities without deleting the domain:
+
+    1. Open [Domains](https://reloop.sh/dashboard/domain) and click a domain
+    2. On the **DNS** tab, toggle **Email Sending**, **Email Receiving**, or **Tracking** as needed
+    3. Open the **Configuration** tab for click tracking, open tracking, and TLS (`opportunistic` or `enforced`)
+
+    <Video src="/docs/images/docs/domain/domain-config.mp4" autoPlay loop muted playsInline />
+
+    <Info>
+    Receiving uses Reloop MX and can conflict with Google Workspace, Microsoft 365, or other inbox hosts. See [Sending vs receiving](/docs/guides/connect-domain/sending-vs-receiving) and [Avoid MX conflicts](/docs/guides/avoid-mx-conflicts).
+    </Info>
+
+    ## Forward DNS records
+
+    Share the Reloop DNS table with a teammate who manages DNS:
+
+    1. Open the domain detail or setup page
+    2. Click **Forward Records** (or use the row/header menu)
+    3. Enter the recipient email and send
+
+    ## Delete a domain
+
+    <Info>
+    Deleting permanently removes the domain from Reloop. You can no longer send with that hostname until you add and verify it again. Optionally remove Reloop DNS rows at your host afterward — see [Remove a domain](/docs/guides/connect-domain/after/remove-domain).
+    </Info>
+
+    1. Open [Domains](https://reloop.sh/dashboard/domain)
+    2. Click the row menu (**···**) → **Delete Domain** (or open the domain and use the header menu)
+    3. Type the confirmation text and confirm permanent removal
+
+    <Video src="/docs/images/docs/domain/delete-domain.mp4" autoPlay loop muted playsInline />
+
+    You can also select multiple domains on the list and delete them in bulk.
+  </Tab>
+  <Tab title="Code" icon="code">
+    ## View all domains
+
+    Fetch a paginated list of domains in your organization.
+
+    <DomainCodeSamples id="domain.list" />
+
+    <DomainCodeSamples id="domain.get" />
+
+    ## Add a domain
+
+    Create a domain and receive the DNS records Reloop expects you to publish.
+
+    <DomainCodeSamples id="domain.create" />
+
+    <Info>
+    Creating a domain does not verify it. Publish DNS (Auto-populate or manual), then call verify.
+    </Info>
+
+    ## Verify a domain
+
+    <DomainCodeSamples id="domain.verify" />
+
+    ## Update domain configuration
+
+    Toggle sending, receiving, click/open tracking, or TLS.
+
+    <DomainCodeSamples id="domain.update" />
+
+    ## Delete a domain
+
+    <DomainCodeSamples id="domain.delete" />
+  </Tab>
+</Tabs>
+
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Why do I need to verify a domain?">
+    Verification proves you control DNS for that hostname and publishes SPF, DKIM, and related records so mailbox providers can authenticate mail from Reloop. Unverified domains cannot send reliably.
+  </Accordion>
+
+  <Accordion title="What is the difference between Auto-populate and manual DNS setup?">
+    **Auto-populate** uses [Domain Connect](/docs/guides/connect-domain/auto-populate) so your DNS host applies Reloop’s records after you approve a template. **Manual setup** means copying each TXT, MX, and CNAME into your DNS panel yourself.
+  </Accordion>
+
+  <Accordion title="Can I use a subdomain instead of my root domain?">
+    Yes. Reloop supports root domains (e.g. `acme.com`) and subdomains (e.g. `mail.acme.com`). Subdomains are often easier when the root already has other email or DNS services. See [What is a domain?](/docs/guides/connect-domain/what-is-a-domain) and [Subdomain vs root](/docs/guides/subdomain-vs-root).
+  </Accordion>
+
+  <Accordion title="What happens if I disable sending or receiving?">
+    Toggles pause that capability without deleting the domain. Disabling **sending** blocks outbound From addresses on that domain; disabling **receiving** turns off Reloop inbound MX for that host. Re-enable either anytime from the domain detail page or the Update Domain API.
+  </Accordion>
+
+  <Accordion title="How long does DNS verification take?">
+    Often minutes after records publish, but propagation can take up to 48 hours depending on TTL and your DNS host. Click **Verify** / **Re-verify DNS** after changes. Details: [Propagation](/docs/guides/connect-domain/verification/propagation).
+  </Accordion>
+
+  <Accordion title="What should I do if my domain will not verify?">
+    Confirm you edited DNS at the **nameserver** host, merge SPF instead of adding a second SPF TXT, check DKIM/DMARC hostnames for typos, then follow [Domain not verifying](/docs/guides/connect-domain/troubleshoot/not-verifying).
+  </Accordion>
+
+  <Accordion title="Are there webhooks for domain events?">
+    Yes — `domain.create`, `domain.updated`, and `domain.deleted`. See [Domain webhooks](/docs/webhooks/domains/created) and [event types](/docs/webhooks/event-types).
+  </Accordion>
+</AccordionGroup>
+
+## Related
+
+<CardGroup cols={3}>
+  <Card icon="globe" title="Connect a domain" href="/docs/guides/connect-domain">
+    Full DNS setup guide for beginners and experts.
+  </Card>
+  <Card icon="mail-single" title="Emails" href="/docs/learn/emails">
+    Send after your domain is active.
+  </Card>
+  <Card icon="key-new" title="API Keys" href="/docs/learn/api-keys">
+    Authenticate REST and SMTP with API keys.
+  </Card>
+</CardGroup>
+
+
+## API reference
+
+<CardGroup cols={2}>
+  <Card icon="plus" title="Create Domain" href="/api/domain/post-api-domain-v1create">
+    Add a domain and get DNS records.
+  </Card>
+  <Card icon="list" title="List Domains" href="/api/domain/get-api-domain-v1list">
+    Paginated list of organization domains.
+  </Card>
+  <Card icon="eye" title="Retrieve Domain" href="/api/domain/get-api-domain-v1by-domain_id">
+    Get a domain by ID.
+  </Card>
+  <Card icon="pen" title="Update Domain" href="/api/domain/patch-api-domain-v1by-domain_id">
+    Toggle sending, receiving, tracking, or TLS.
+  </Card>
+  <Card icon="refresh" title="Verify Domain" href="/api/domain/post-api-domain-v1verify-by-domain_id">
+    Check public DNS against Reloop records.
+  </Card>
+  <Card icon="mail-single" title="Forward DNS Records" href="/api/domain/post-api-domain-v1verify-by-domain_id-forward-dns">
+    Email DNS records to a teammate.
+  </Card>
+  <Card icon="trash" title="Delete Domain" href="/api/domain/delete-api-domain-v1by-domain_id">
+    Permanently remove a domain.
+  </Card>
+</CardGroup>
