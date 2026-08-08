@@ -19,7 +19,7 @@ export function HelpFooterLinks() {
 							href="https://reloop.sh/support"
 							target="_blank"
 							rel="noreferrer"
-							className="font-medium text-[#4f46e5] hover:underline dark:text-[#818cf8]"
+							className="font-medium text-primary-link hover:underline"
 						>
 							Contact Support
 						</a>
@@ -34,7 +34,7 @@ export function HelpFooterLinks() {
 							href="https://discord.gg/bHnkBcp7xR"
 							target="_blank"
 							rel="noreferrer"
-							className="font-medium text-[#4f46e5] hover:underline dark:text-[#818cf8]"
+							className="font-medium text-primary-link hover:underline"
 						>
 							Discord
 						</a>
@@ -49,7 +49,7 @@ export function HelpFooterLinks() {
 							href="https://reloop.sh/changelog"
 							target="_blank"
 							rel="noreferrer"
-							className="font-medium text-[#4f46e5] hover:underline dark:text-[#818cf8]"
+							className="font-medium text-primary-link hover:underline"
 						>
 							changelog
 						</a>
@@ -64,7 +64,7 @@ export function HelpFooterLinks() {
 							href="https://reloop.sh/contact"
 							target="_blank"
 							rel="noreferrer"
-							className="font-medium text-[#4f46e5] hover:underline dark:text-[#818cf8]"
+							className="font-medium text-primary-link hover:underline"
 						>
 							Contact Sales
 						</a>
@@ -79,7 +79,7 @@ export function HelpFooterLinks() {
 							href="/llms.txt"
 							target="_blank"
 							rel="noreferrer"
-							className="font-medium text-[#4f46e5] hover:underline dark:text-[#818cf8]"
+							className="font-medium text-primary-link hover:underline"
 						>
 							Read llms.txt
 						</a>
