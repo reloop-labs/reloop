@@ -36,6 +36,17 @@ const config = {
 				destination: "/learn/api-keys#security",
 				permanent: true,
 			},
+			// Connect a domain moved under Guides
+			{
+				source: "/connect-domain",
+				destination: "/guides/connect-domain",
+				permanent: true,
+			},
+			{
+				source: "/connect-domain/:path*",
+				destination: "/guides/connect-domain/:path*",
+				permanent: true,
+			},
 		];
 	},
 	async rewrites() {

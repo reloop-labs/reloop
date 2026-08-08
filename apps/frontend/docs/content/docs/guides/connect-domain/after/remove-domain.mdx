@@ -1,0 +1,27 @@
+---
+title: Remove a domain
+sidebarTitle: Remove a domain
+description: What happens when you delete a domain from Reloop and how to clean up DNS.
+---
+
+## In Reloop
+
+From [Domains](https://reloop.sh/dashboard/domain), open the domain and use the delete/remove action. After removal:
+
+- You can no longer send with that domain’s identities in Reloop
+- API/SMTP From addresses on that domain will fail authentication checks
+
+## DNS cleanup (optional but recommended)
+
+At your DNS host, remove Reloop-specific rows you no longer need:
+
+- `reloop._domainkey` TXT
+- Reloop SPF include (or whole SPF if unused)
+- Reloop DMARC if you added it only for Reloop
+- Reloop MX / tracking CNAME
+
+Do **not** remove Google/Microsoft records if you still use those services.
+
+## Re-adding later
+
+You can add the same domain again later and re-verify, subject to [already registered](/docs/guides/connect-domain/troubleshoot/domain-already-registered) rules if another org holds it.

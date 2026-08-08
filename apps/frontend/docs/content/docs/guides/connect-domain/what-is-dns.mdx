@@ -1,0 +1,69 @@
+---
+title: What is DNS?
+sidebarTitle: What is DNS?
+description: Nameservers, DNS records, TTL, and propagation — explained for people connecting a domain to Reloop.
+---
+
+**DNS** (Domain Name System) is the internet’s phone book. When someone sends mail to `hello@acme.com` or opens `acme.com`, computers ask DNS: “Where should this go?” and “Is this sender allowed?”
+
+For Reloop, DNS is how you **prove you own the domain** and **authorize Reloop to send mail** on your behalf.
+
+## Nameservers
+
+**Nameservers** are the servers that hold your domain’s DNS zone.
+
+Example:
+
+```
+ada.ns.cloudflare.com
+bob.ns.cloudflare.com
+```
+
+Whoever runs those nameservers is your **DNS host** — that is where you add Reloop’s records. Often that is the same company as your registrar, but not always (see [Registrar vs DNS host](/docs/guides/connect-domain/registrar-vs-dns-host)).
+
+## DNS records
+
+A **record** is one instruction in your zone. Reloop asks for several types:
+
+| Type | Role for Reloop |
+| --- | --- |
+| **TXT** | SPF, DKIM public key, DMARC policy, ownership checks |
+| **MX** | Where inbound mail is delivered (only if you enable receiving) |
+| **CNAME** | Click/open tracking host (e.g. `link.acme.com` → Reloop) |
+
+Each record has roughly:
+
+- **Host / Name** — which name the record applies to (`@`, `reloop._domainkey`, `link`, …)
+- **Type** — TXT, MX, CNAME, …
+- **Value / Points to / Content** — the data Reloop shows in the dashboard
+- **TTL** — how long resolvers may cache the answer (Auto / 300 / 3600 are common)
+
+Copy these **exactly** from Reloop. A missing character in a DKIM key breaks verification.
+
+## How Reloop uses DNS
+
+```
+You add domain in Reloop
+        ↓
+Reloop generates records (SPF, DKIM, DMARC, …)
+        ↓
+You publish them at your DNS host (auto or manual)
+        ↓
+Reloop looks up public DNS worldwide
+        ↓
+If records match → domain becomes active
+```
+
+## Propagation
+
+After you save a record, the internet does not update instantly everywhere. Caches honor **TTL**. Most providers update in minutes; worst case up to ~48–72 hours. Details: [DNS propagation](/docs/guides/connect-domain/verification/propagation).
+
+## You do not need to memorize this
+
+In practice:
+
+1. Open the domain in [Reloop](https://reloop.sh/dashboard/domain)
+2. Use Auto-populate **or** copy each row into your DNS panel
+3. Click **Verify**
+
+For a field-by-field map of Reloop’s records, see [DNS records explained](/docs/guides/connect-domain/dns-records-explained).

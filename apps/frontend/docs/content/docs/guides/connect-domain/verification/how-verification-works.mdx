@@ -1,0 +1,31 @@
+---
+title: How verification works
+sidebarTitle: How verification works
+description: What Reloop looks up in public DNS when you verify a domain.
+---
+
+## High level
+
+1. You (or Domain Connect) publish records in your DNS host.
+2. Reloop queries public DNS for each required name/type.
+3. Values are compared to what Reloop stored for your domain (SPF include, DKIM public key, DMARC, MX, tracking CNAME, …).
+4. If required records match, status becomes **active**.
+
+## What Reloop does *not* do
+
+- Reloop does not log into your registrar for you (except via Domain Connect consent you approve).
+- Reloop does not see private DNS behind a firewall — only what the public internet resolves.
+- Reloop cannot fix typos in your panel; you must edit DNS and re-verify.
+
+## Partial matches
+
+Some records may pass while others fail (e.g. SPF OK, DKIM truncated). The domain stays non-active until required rows succeed. Open the domain’s DNS records UI in Reloop to see which groups still fail.
+
+## Re-verification
+
+After any DNS edit, click **Verify** again (or wait for background jobs). Cached resolvers may lag — see [propagation](/docs/guides/connect-domain/verification/propagation).
+
+## Related
+
+- [DNS records explained](/docs/guides/connect-domain/dns-records-explained)
+- [Domain not verifying](/docs/guides/connect-domain/troubleshoot/not-verifying)

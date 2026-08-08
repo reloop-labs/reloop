@@ -6,10 +6,7 @@
 	"pages": [
 		"---Guides---",
 		"index",
-		"---Domains (see Connect a domain)---",
-		"dns-setup",
-		"avoid-mx-conflicts",
-		"domain-not-verifying",
+		"connect-domain",
 		"---Tutorials---",
 		"supabase-quickstart",
 		"supabase-deliverability",

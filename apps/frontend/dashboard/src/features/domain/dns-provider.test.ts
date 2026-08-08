@@ -15,7 +15,7 @@ describe("inferDnsProvider", () => {
 		expect(result?.label).toBe("Cloudflare");
 		expect(result?.docsSlug).toBe("cloudflare");
 		expect(result?.docsUrl).toBe(
-			"https://reloop.sh/docs/connect-domain/providers/cloudflare",
+			"https://reloop.sh/docs/guides/connect-domain/providers/cloudflare",
 		);
 		expect(result?.supportsAutoConnect).toBe(true);
 	});

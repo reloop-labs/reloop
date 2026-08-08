@@ -1,5 +1,5 @@
 /** Public docs base for domain / DNS help. */
-export const DNS_DOCS_BASE = "https://reloop.sh/docs/connect-domain/providers";
+export const DNS_DOCS_BASE = "https://reloop.sh/docs/guides/connect-domain/providers";
 
 /** Hub listing every provider-specific DNS guide. */
 export const DNS_SETUP_HUB_URL = DNS_DOCS_BASE;
@@ -17,7 +17,7 @@ export type InferredDnsProvider = {
 	 * Falls back to the DNS setup hub for unknown providers.
 	 */
 	docsUrl: string;
-	/** Provider guide slug under /docs/connect-domain/providers, e.g. `cloudflare`. */
+	/** Provider guide slug under /docs/guides/connect-domain/providers, e.g. `cloudflare`. */
 	docsSlug: string | null;
 	/**
 	 * True when this DNS host has onboarded Reloop's Domain Connect

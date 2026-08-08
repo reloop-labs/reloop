@@ -1,0 +1,134 @@
+---
+title: "Vercel"
+sidebarTitle: "Vercel"
+description: "Verify your domain on Vercel with Reloop."
+---
+
+Vercel can use Reloop **Auto-populate** when nameservers match. Manual steps are always available as a fallback.
+
+## Add a domain in Reloop
+
+1. Log in to [Reloop](https://reloop.sh/dashboard/domain) and [add a domain](/docs/guides/connect-domain/add-domain).
+2. Keep that tab open — every host and value you paste must match Reloop exactly (especially the DKIM key).
+
+<Tip>
+Reloop works with the [root domain, a subdomain, or both](/docs/guides/connect-domain/what-is-a-domain) — for example `example.com`, `mail.example.com`, or `updates.example.com`.
+</Tip>
+
+## Automatic setup (recommended)
+
+Vercel supports Reloop **Auto-populate** (Domain Connect). This is usually the fastest path.
+
+<Steps>
+  <Step title="Open the domain in Reloop">
+    Go to [Domains](https://reloop.sh/dashboard/domain) and open the domain you added.
+  </Step>
+  <Step title="Enable receiving first (optional)">
+    If you need Reloop to **receive** mail on this hostname, turn receiving on in the domain settings **before** Auto-populate so the correct MX rows are included. See [Sending vs receiving](/docs/guides/connect-domain/sending-vs-receiving).
+  </Step>
+  <Step title="Click Auto populate">
+    Reloop opens Vercel for consent. Sign in if asked, review the records, and approve.
+  </Step>
+  <Step title="Verify">
+    Return to Reloop and click **Verify**. Status should move to **active** within a few minutes (see [propagation](/docs/guides/connect-domain/verification/propagation)).
+  </Step>
+</Steps>
+
+If Auto-populate fails or you prefer full control, use **Manual setup** below. Details: [Auto-populate DNS](/docs/guides/connect-domain/auto-populate) and [Auto-populate failed](/docs/guides/connect-domain/troubleshoot/auto-populate-failed).
+
+## Manual setup
+
+### Log in to Vercel
+
+Open [Vercel](https://vercel.com/dashboard/domains) and go to DNS for the domain whose **nameservers** match `vercel-dns.com`.
+
+Vercel → Domains → domain DNS.
+
+If Reloop or `dig NS yourdomain.com` shows a different host, stop and edit that host instead — see [Wrong nameservers](/docs/guides/connect-domain/troubleshoot/wrong-nameservers).
+
+### Field mapping
+
+| Reloop | Vercel field | Example |
+| --- | --- | --- |
+| Type | Type | `TXT` / `MX` / `CNAME` |
+| Name / Host | Name | `@`, `reloop._domainkey`, `_dmarc`, `link`, … |
+| Value / Content | Value | Exact value from Reloop |
+| TTL | TTL | `Auto` or provider default |
+| Priority (MX only) | Priority | As shown in Reloop (often `10`) |
+
+<Info>
+Omit your domain from the Name/Host field when the provider appends it automatically. Paste `reloop._domainkey` or `link`, not `reloop._domainkey.example.com`.
+</Info>
+
+### Add the records from Reloop
+
+For **each required row** on the Reloop domain page:
+
+<Steps>
+  <Step title="Choose the type">
+    Match Reloop’s type: `TXT`, `MX`, or `CNAME`.
+  </Step>
+  <Step title="Set the name / host">
+    Copy the host from Reloop (`@`, `reloop._domainkey`, `_dmarc`, `link`, …).
+  </Step>
+  <Step title="Paste the value">
+    Copy the value exactly. For MX, also set **Priority** as shown (often `10`). If priority `10` is already used by another MX you must keep, use the next free value only when Reloop’s UI allows it — otherwise use a [subdomain](/docs/guides/connect-domain/what-is-a-domain).
+  </Step>
+  <Step title="Save">
+    Save the record, then continue with the next Reloop row.
+  </Step>
+</Steps>
+
+Typical Reloop rows (always confirm in the dashboard):
+
+| Purpose | Type | Host (typical) | Value (typical) |
+| --- | --- | --- | --- |
+| SPF | TXT | `@` | `v=spf1 include:reloop.sh -all` (or merge into existing SPF) |
+| DKIM | TXT | `reloop._domainkey` | `v=DKIM1; k=rsa; p=…` (unique per domain) |
+| DMARC | TXT | `_dmarc` | `v=DMARC1; p=reject;` (or your existing policy) |
+| Tracking | CNAME | `link` | `link.reloop.sh` |
+| Receiving MX | MX | `@` or subdomain host | `inbound.reloop.sh` (when receiving is enabled) |
+
+<Warning>
+Never create a second SPF TXT on the same host. Merge `include:reloop.sh` into the existing SPF. See [SPF conflicts](/docs/guides/connect-domain/troubleshoot/spf-conflicts).
+</Warning>
+
+## Vercel-specific notes
+
+- Prefer Reloop Auto-populate when Vercel nameservers are detected.
+- If the domain is only bought at Vercel but NS point elsewhere, edit that host.
+
+## Receiving emails
+
+If you enable **Receiving** on the domain in Reloop, you must publish the inbound **MX** Reloop shows (typically `inbound.reloop.sh`).
+
+<Warning>
+When Reloop’s MX is active on a hostname, Reloop receives mail for that hostname according to MX priority. That can conflict with another inbox already using MX on the same name — use a separate hostname for Reloop receiving if needed. See [MX conflicts](/docs/guides/connect-domain/troubleshoot/mx-conflicts) and [Sending vs receiving](/docs/guides/connect-domain/sending-vs-receiving).
+</Warning>
+
+## Complete verification
+
+1. Return to [Domains](https://reloop.sh/dashboard/domain) in Reloop.
+2. Open the domain and click **Verify**.
+3. Wait until status is **active**. Most providers update within minutes; allow up to 48–72 hours in rare cases ([propagation](/docs/guides/connect-domain/verification/propagation)).
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Verification failed after I added records">
+    Re-open the Reloop domain page and compare every Type / Host / Value to Vercel. Fix typos, truncated DKIM keys, and duplicate SPF records. Then click **Verify** again.
+  </Accordion>
+  <Accordion title="I added records but dig does not show them">
+    Confirm you edited the DNS host that matches public nameservers (`dig NS yourdomain.com`). See [Wrong nameservers](/docs/guides/connect-domain/troubleshoot/wrong-nameservers).
+  </Accordion>
+  <Accordion title="It has been hours and status is still pending">
+    Follow [Domain not verifying](/docs/guides/connect-domain/troubleshoot/not-verifying) and [DNS propagation](/docs/guides/connect-domain/verification/propagation).
+  </Accordion>
+</AccordionGroup>
+
+## Related
+
+- [DNS records explained](/docs/guides/connect-domain/dns-records-explained)
+- [Manual DNS setup](/docs/guides/connect-domain/manual-setup)
+- [Auto-populate DNS](/docs/guides/connect-domain/auto-populate)
+- [All provider guides](/docs/guides/connect-domain/providers)

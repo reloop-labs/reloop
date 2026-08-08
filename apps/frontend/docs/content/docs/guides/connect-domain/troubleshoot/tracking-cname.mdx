@@ -1,0 +1,31 @@
+---
+title: Tracking CNAME issues
+sidebarTitle: Tracking CNAME
+description: Resolve conflicts on the link tracking subdomain Reloop uses for clicks and opens.
+---
+
+Reloop typically expects:
+
+| Type | Host | Value |
+| --- | --- | --- |
+| CNAME | `link` | `link.reloop.sh` |
+
+So `link.yourdomain.com` resolves to Reloop’s tracking edge.
+
+## Symptoms
+
+- Tracking record shows failed in Reloop
+- Another app already uses `link.yourdomain.com`
+- Provider error when saving the CNAME
+
+## Fixes
+
+1. Remove or rename the old `link` record if you no longer need it.
+2. If you must keep `link` for something else, change Reloop’s tracking subdomain in domain settings (when available) and publish the new host.
+3. Ensure no A/AAAA sits on the same host as the CNAME.
+4. On Cloudflare, use **DNS only** for the tracking CNAME unless Reloop docs say otherwise.
+
+## Related
+
+- [CNAME conflicts](/docs/guides/connect-domain/troubleshoot/cname-conflicts)
+- [DNS records explained](/docs/guides/connect-domain/dns-records-explained)
