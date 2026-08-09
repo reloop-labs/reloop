@@ -4,15 +4,22 @@ type CategoryVariant = {
 	headline: string;
 	sub: string;
 	primaryLabel: string;
+	secondaryLabel?: string;
 };
 
 const DEFAULT_VARIANT: CategoryVariant = {
-	headline: "Ready to send?",
-	sub: "Open-source email infrastructure with a generous free tier. No vendor lock-in.",
+	headline: "Build in the open.",
+	sub: "Reloop is 100% open-source email infrastructure with a generous free tier. Star us on GitHub, open a PR, or deploy your own stack with zero vendor lock-in.",
 	primaryLabel: "Get started free",
 };
 
 const CATEGORY_VARIANTS: Record<string, CategoryVariant> = {
+	Careers: {
+		headline: "Your commits are your résumé.",
+		sub: "Reloop is fully open-source. Contribute code, fix bugs, or ship features — and if you're good, we'll find you. No cover letters required.",
+		primaryLabel: "Start Contributing",
+		secondaryLabel: "Browse Good First Issues",
+	},
 	Engineering: {
 		headline: "Ready to ship email?",
 		sub: "Drop-in SMTP + REST API. Reloop handles queuing, retries, and observability so you don't have to.",
@@ -118,12 +125,22 @@ export function BlogCta({
 	headline,
 	sub,
 	primaryLabel,
+	primaryHref = "/dashboard/signup",
+	primaryExternal,
+	secondaryLabel,
+	secondaryHref = "/docs",
+	secondaryExternal,
 	accentColor,
 }: {
 	category?: string;
 	headline?: string;
 	sub?: string;
 	primaryLabel?: string;
+	primaryHref?: string;
+	primaryExternal?: boolean;
+	secondaryLabel?: string;
+	secondaryHref?: string;
+	secondaryExternal?: boolean;
 	accentColor?: CtaAccentColor;
 }) {
 	const categoryVariant = category ? CATEGORY_VARIANTS[category] : undefined;
@@ -134,6 +151,10 @@ export function BlogCta({
 			primaryLabel ??
 			categoryVariant?.primaryLabel ??
 			DEFAULT_VARIANT.primaryLabel,
+		secondaryLabel:
+			secondaryLabel ??
+			categoryVariant?.secondaryLabel ??
+			"Documentation",
 	};
 
 	const resolvedAccent =
@@ -175,25 +196,27 @@ export function BlogCta({
 						/>
 					</div>
 
-					<div className="relative z-10 max-w-2xl">
-						<h2 className="font-sans text-2xl text-text-strong-950 leading-tight tracking-tight sm:text-3xl lg:text-[2.1rem] dark:text-white">
+					<div className="relative z-10 max-w-3xl">
+						<h2 className="font-sans text-3xl font-medium text-text-strong-950 leading-tight tracking-tight sm:text-4xl lg:text-[2.5rem] dark:text-white">
 							{variant.headline}
 						</h2>
-						<p className="mt-2 text-[15px] text-text-sub-600 leading-relaxed dark:text-white/60">
+						<p className="mt-3 text-base text-text-sub-600 leading-relaxed sm:text-lg dark:text-white/60">
 							{variant.sub}
 						</p>
 					</div>
 
 					<div className="relative z-10 flex shrink-0 flex-wrap items-center gap-3">
 						<CtaLink
-							label="Documentation"
-							href="/docs"
+							label={variant.secondaryLabel}
+							href={secondaryHref}
+							external={secondaryExternal}
 							filled={false}
 							isSecondery
 						/>
 						<CtaLink
 							label={variant.primaryLabel}
-							href="/dashboard/signup"
+							href={primaryHref}
+							external={primaryExternal}
 							filled
 							variant="neutral"
 						/>

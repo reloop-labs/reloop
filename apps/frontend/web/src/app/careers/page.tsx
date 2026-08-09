@@ -105,7 +105,17 @@ const CareersPage = () => {
 			<KeepUpToDate />
 
 			{/* Blog CTA Section */}
-			<BlogCta />
+			<BlogCta
+				category="Careers"
+				headline="Your commits are your résumé."
+				sub="Reloop is fully open-source. Contribute code, fix bugs, or ship features — and if you're good, we'll find you. No cover letters required."
+				primaryLabel="Start Contributing"
+				primaryHref={socialProfiles.github}
+				primaryExternal
+				secondaryLabel="Browse Good First Issues"
+				secondaryHref={`${socialProfiles.github}/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22`}
+				secondaryExternal
+			/>
 		</>
 	);
 };
