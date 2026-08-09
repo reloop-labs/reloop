@@ -188,73 +188,78 @@ export const Footer = () => {
 	}, []);
 
 	return (
-		<footer className="w-full border-stroke-soft-200 border-t bg-bg-white-0 text-text-strong-950 dark:border-white/10 dark:bg-black dark:text-white">
-			<div className="mx-auto w-full max-w-5xl border-stroke-soft-200 border-x px-4 py-16 sm:px-6 md:max-w-7xl lg:px-8 lg:py-20 dark:border-white/10">
-				<div className="flex h-full flex-col gap-12 lg:flex-row lg:items-stretch lg:gap-20">
-					<div className="flex flex-col justify-between gap-8 lg:w-48 lg:self-stretch">
-						<div className="flex shrink-0 flex-col">
+		<footer className="w-full border-stroke-soft-200 border-t border-b bg-bg-white-0 text-text-strong-950 dark:border-white/10 dark:bg-black dark:text-white">
+			<div className="mx-auto w-full max-w-5xl border-stroke-soft-200 border-x md:max-w-7xl dark:border-white/10">
+				<div className="px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
+					<div className="flex h-full flex-col gap-12 lg:flex-row lg:items-stretch lg:gap-20">
+						<div className="flex flex-col justify-between gap-8 lg:w-48 lg:self-stretch">
+							<div className="flex shrink-0 flex-col">
+								<Link
+									href="/"
+									className="-ml-[11px] inline-flex shrink-0 items-center gap-2.5"
+									aria-label="Reloop home"
+								>
+									<Logo className="size-11 text-text-strong-950 dark:text-white" />
+									<span className="-ml-3 font-semibold text-[17px] text-text-strong-950 tracking-tight dark:text-white">
+										Reloop
+									</span>
+								</Link>
+							</div>
 							<Link
-								href="/"
-								className="-ml-[11px] inline-flex shrink-0 items-center gap-2.5"
-								aria-label="Reloop home"
+								href={statusUrl}
+								target="_blank"
+								rel="noreferrer"
+								className="inline-flex items-center gap-2 transition-opacity hover:opacity-80"
 							>
-								<Logo className="size-11 text-text-strong-950 dark:text-white" />
-								<span className="-ml-3 font-semibold text-[17px] text-text-strong-950 tracking-tight dark:text-white">
-									Reloop
+								<span className="size-2 shrink-0 rounded-full bg-[#0070F3]" />
+								<span className="font-mono text-[#0070F3] text-[11px] uppercase tracking-wide">
+									System Status
 								</span>
 							</Link>
 						</div>
-						<Link
-							href={statusUrl}
-							target="_blank"
-							rel="noreferrer"
-							className="inline-flex items-center gap-2 transition-opacity hover:opacity-80"
-						>
-							<span className="size-2 shrink-0 rounded-full bg-[#0070F3]" />
-							<span className="font-mono text-[#0070F3] text-[11px] uppercase tracking-wide">
-								System Status
-							</span>
-						</Link>
-					</div>
 
-					<div className="flex min-w-0 flex-1 flex-col gap-10 lg:gap-12">
-						{/* Row 1: Primary columns */}
-						<div className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 lg:grid-cols-6 lg:gap-x-8">
-							{columns.slice(0, 6).map((column) => (
-								<div key={column.group}>
-									<h4 className="font-medium text-[14px] text-text-strong-950 dark:text-white">
-										{column.group}
-									</h4>
-									<ul className="mt-4 flex flex-col gap-2.5">
-										{column.items.map((link) => (
-											<FooterLinkItem key={link.title} link={link} />
-										))}
-									</ul>
-								</div>
-							))}
-						</div>
+						<div className="flex min-w-0 flex-1 flex-col gap-10 lg:gap-12">
+							{/* Row 1: Primary columns */}
+							<div className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 lg:grid-cols-6 lg:gap-x-8">
+								{columns.slice(0, 6).map((column) => (
+									<div key={column.group}>
+										<h4 className="font-medium text-[14px] text-text-strong-950 dark:text-white">
+											{column.group}
+										</h4>
+										<ul className="mt-4 flex flex-col gap-2.5">
+											{column.items.map((link) => (
+												<FooterLinkItem key={link.title} link={link} />
+											))}
+										</ul>
+									</div>
+								))}
+							</div>
 
-						{/* Row 2: Secondary info columns */}
-						<div className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 lg:grid-cols-6 lg:gap-x-8">
-							{columns.slice(6).map((column) => (
-								<div key={column.group}>
-									<h4 className="font-medium text-[14px] text-text-strong-950 dark:text-white">
-										{column.group}
-									</h4>
-									<ul className="mt-4 flex flex-col gap-2.5">
-										{column.items.map((link) => (
-											<FooterLinkItem key={link.title} link={link} />
-										))}
-									</ul>
-								</div>
-							))}
+							{/* Row 2: Secondary info columns */}
+							<div className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 lg:grid-cols-6 lg:gap-x-8">
+								{columns.slice(6).map((column) => (
+									<div key={column.group}>
+										<h4 className="font-medium text-[14px] text-text-strong-950 dark:text-white">
+											{column.group}
+										</h4>
+										<ul className="mt-4 flex flex-col gap-2.5">
+											{column.items.map((link) => (
+												<FooterLinkItem key={link.title} link={link} />
+											))}
+										</ul>
+									</div>
+								))}
+							</div>
 						</div>
 					</div>
 				</div>
+			</div>
 
-				<div className="mt-16 flex flex-col gap-6 border-stroke-soft-200 border-t pt-8 sm:flex-row sm:items-center sm:justify-between dark:border-white/10">
-					{/* Left: Theme Switcher Icons & Status Badge */}
-					<div className="flex flex-wrap items-center gap-4">
+			{/* Full-width Divider Line across the entire viewport */}
+			<div className="w-full border-stroke-soft-200 border-t dark:border-white/10">
+				<div className="mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-200 border-x sm:flex-row sm:items-stretch sm:justify-between md:max-w-7xl dark:border-white/10">
+					{/* Left: Theme Switcher Icons */}
+					<div className="flex items-center px-4 py-3">
 						<div className="inline-flex items-center rounded-full border border-stroke-soft-200 bg-bg-weak-50 p-0.5 dark:border-white/10 dark:bg-white/[0.04]">
 							<button
 								type="button"
@@ -295,13 +300,13 @@ export const Footer = () => {
 						</div>
 					</div>
 
-					{/* Right: Social Media Icons */}
-					<div className="flex items-center gap-5 text-text-sub-600 dark:text-white/60">
+					{/* Right: Social Media Icons with Box Dividers */}
+					<div className="flex items-stretch text-text-sub-600 dark:text-white/60">
 						<a
 							href="https://github.com/reloop-labs/reloop"
 							target="_blank"
 							rel="noreferrer"
-							className="transition-colors hover:text-text-strong-950 dark:hover:text-white"
+							className="flex h-14 w-14 items-center justify-center border-stroke-soft-200 border-t transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 sm:border-t-0 sm:border-l dark:border-white/10 dark:hover:bg-white/[0.04] dark:hover:text-white"
 							aria-label="GitHub"
 						>
 							<Icon name="github" className="size-4" />
@@ -310,7 +315,7 @@ export const Footer = () => {
 							href="https://x.com/reloophq"
 							target="_blank"
 							rel="noreferrer"
-							className="transition-colors hover:text-text-strong-950 dark:hover:text-white"
+							className="flex h-14 w-14 items-center justify-center border-stroke-soft-200 border-l transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-white/10 dark:hover:bg-white/[0.04] dark:hover:text-white"
 							aria-label="X"
 						>
 							<Icon name="twitter" className="size-4" />
@@ -319,7 +324,7 @@ export const Footer = () => {
 							href="https://linkedin.com/company/reloop"
 							target="_blank"
 							rel="noreferrer"
-							className="transition-colors hover:text-text-strong-950 dark:hover:text-white"
+							className="flex h-14 w-14 items-center justify-center border-stroke-soft-200 border-l transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-white/10 dark:hover:bg-white/[0.04] dark:hover:text-white"
 							aria-label="LinkedIn"
 						>
 							<Icon name="linkedin" className="size-4" />
