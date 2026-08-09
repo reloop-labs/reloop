@@ -5379,17 +5379,17 @@ Integrate Reloop into Node.js applications.
 <CardGroup cols={2}>
   <Card icon="siNextdotjs" title="Next.js">
     Send emails in Next.js Server Actions and Route Handlers.
-    <div className="mt-4 flex gap-4 text-xs font-semibold">
+    <span className="mt-4 flex gap-4 text-xs font-semibold">
       <a href="/docs/examples/nodejs/nextjs" className="text-primary hover:underline">Read Guide →</a>
       <a href="https://github.com/reloop-labs/reloop-examples/tree/main/nextjs" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-primary dark:text-gray-400 dark:hover:text-white hover:underline">GitHub ↗</a>
-    </div>
+    </span>
   </Card>
   <Card icon="siExpress" title="Express">
     Connect Reloop to an Express REST API backend.
-    <div className="mt-4 flex gap-4 text-xs font-semibold">
+    <span className="mt-4 flex gap-4 text-xs font-semibold">
       <a href="/docs/examples/nodejs/express" className="text-primary hover:underline">Read Guide →</a>
       <a href="https://github.com/reloop-labs/reloop-examples/tree/main/express" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-primary dark:text-gray-400 dark:hover:text-white hover:underline">GitHub ↗</a>
-    </div>
+    </span>
   </Card>
 </CardGroup>
 
@@ -5400,24 +5400,24 @@ Integrate Reloop into Python applications.
 <CardGroup cols={3}>
   <Card icon="siFastapi" title="FastAPI">
     Asynchronous email sending with FastAPI.
-    <div className="mt-4 flex gap-4 text-xs font-semibold">
+    <span className="mt-4 flex gap-4 text-xs font-semibold">
       <a href="/docs/examples/python/fastapi" className="text-primary hover:underline">Read Guide →</a>
       <a href="https://github.com/reloop-labs/reloop-examples/tree/main/fastapi" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-primary dark:text-gray-400 dark:hover:text-white hover:underline">GitHub ↗</a>
-    </div>
+    </span>
   </Card>
   <Card icon="siDjango" title="Django">
     Configure email sending using Django's backend.
-    <div className="mt-4 flex gap-4 text-xs font-semibold">
+    <span className="mt-4 flex gap-4 text-xs font-semibold">
       <a href="/docs/examples/python/django" className="text-primary hover:underline">Read Guide →</a>
       <a href="https://github.com/reloop-labs/reloop-examples/tree/main/django" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-primary dark:text-gray-400 dark:hover:text-white hover:underline">GitHub ↗</a>
-    </div>
+    </span>
   </Card>
   <Card icon="siFlask" title="Flask">
     Simple email templates in Flask.
-    <div className="mt-4 flex gap-4 text-xs font-semibold">
+    <span className="mt-4 flex gap-4 text-xs font-semibold">
       <a href="/docs/examples/python/flask" className="text-primary hover:underline">Read Guide →</a>
       <a href="https://github.com/reloop-labs/reloop-examples/tree/main/flask" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-primary dark:text-gray-400 dark:hover:text-white hover:underline">GitHub ↗</a>
-    </div>
+    </span>
   </Card>
 </CardGroup>
 
@@ -5428,10 +5428,10 @@ Integrate Reloop into Go applications.
 <CardGroup cols={1}>
   <Card icon="siGo" title="Gin">
     Send emails through a Go Gin web server.
-    <div className="mt-4 flex gap-4 text-xs font-semibold">
+    <span className="mt-4 flex gap-4 text-xs font-semibold">
       <a href="/docs/examples/go/gin" className="text-primary hover:underline">Read Guide →</a>
       <a href="https://github.com/reloop-labs/reloop-examples/tree/main/gin" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-primary dark:text-gray-400 dark:hover:text-white hover:underline">GitHub ↗</a>
-    </div>
+    </span>
   </Card>
 </CardGroup>
 
@@ -5442,10 +5442,10 @@ Integrate Reloop into Ruby applications.
 <CardGroup cols={1}>
   <Card icon="siRubyonrails" title="Ruby on Rails">
     Configure Rails Action Mailer to send via Reloop.
-    <div className="mt-4 flex gap-4 text-xs font-semibold">
+    <span className="mt-4 flex gap-4 text-xs font-semibold">
       <a href="/docs/examples/ruby/rails" className="text-primary hover:underline">Read Guide →</a>
       <a href="https://github.com/reloop-labs/reloop-examples/tree/main/rails" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-primary dark:text-gray-400 dark:hover:text-white hover:underline">GitHub ↗</a>
-    </div>
+    </span>
   </Card>
 </CardGroup>
 
@@ -5456,10 +5456,10 @@ Integrate Reloop into PHP applications.
 <CardGroup cols={1}>
   <Card icon="siLaravel" title="Laravel">
     Configure Laravel Mail driver to route through Reloop.
-    <div className="mt-4 flex gap-4 text-xs font-semibold">
+    <span className="mt-4 flex gap-4 text-xs font-semibold">
       <a href="/docs/examples/php/laravel" className="text-primary hover:underline">Read Guide →</a>
       <a href="https://github.com/reloop-labs/reloop-examples/tree/main/laravel" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-primary dark:text-gray-400 dark:hover:text-white hover:underline">GitHub ↗</a>
-    </div>
+    </span>
   </Card>
 </CardGroup>
 
@@ -5470,10 +5470,10 @@ Integrate Reloop into Rust applications.
 <CardGroup cols={1}>
   <Card icon="siRust" title="Axum">
     Asynchronous email dispatch inside an Axum web framework.
-    <div className="mt-4 flex gap-4 text-xs font-semibold">
+    <span className="mt-4 flex gap-4 text-xs font-semibold">
       <a href="/docs/examples/rust/axum" className="text-primary hover:underline">Read Guide →</a>
       <a href="https://github.com/reloop-labs/reloop-examples/tree/main/axum" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-primary dark:text-gray-400 dark:hover:text-white hover:underline">GitHub ↗</a>
-    </div>
+    </span>
   </Card>
 </CardGroup>
 
@@ -5484,45 +5484,45 @@ Configure standard SMTP library examples.
 <CardGroup cols={3}>
   <Card icon="siNodedotjs" title="Nodemailer (Node.js)">
     Standard Node SMTP using Nodemailer.
-    <div className="mt-4 flex gap-4 text-xs font-semibold">
+    <span className="mt-4 flex gap-4 text-xs font-semibold">
       <a href="/docs/examples/smtp/nodemailer" className="text-primary hover:underline">Read Guide →</a>
       <a href="https://github.com/reloop-labs/reloop-examples/tree/main/smtp-nodemailer" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-primary dark:text-gray-400 dark:hover:text-white hover:underline">GitHub ↗</a>
-    </div>
+    </span>
   </Card>
   <Card icon="siPython" title="Python SMTP">
     Built-in smtplib Python SMTP.
-    <div className="mt-4 flex gap-4 text-xs font-semibold">
+    <span className="mt-4 flex gap-4 text-xs font-semibold">
       <a href="/docs/examples/smtp/python" className="text-primary hover:underline">Read Guide →</a>
       <a href="https://github.com/reloop-labs/reloop-examples/tree/main/smtp-python" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-primary dark:text-gray-400 dark:hover:text-white hover:underline">GitHub ↗</a>
-    </div>
+    </span>
   </Card>
   <Card icon="siGo" title="Go SMTP">
     Built-in net/smtp Go implementation.
-    <div className="mt-4 flex gap-4 text-xs font-semibold">
+    <span className="mt-4 flex gap-4 text-xs font-semibold">
       <a href="/docs/examples/smtp/go" className="text-primary hover:underline">Read Guide →</a>
       <a href="https://github.com/reloop-labs/reloop-examples/tree/main/smtp-go" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-primary dark:text-gray-400 dark:hover:text-white hover:underline">GitHub ↗</a>
-    </div>
+    </span>
   </Card>
   <Card icon="siPhp" title="PHP SMTP">
     Standard PHP SMTP connection.
-    <div className="mt-4 flex gap-4 text-xs font-semibold">
+    <span className="mt-4 flex gap-4 text-xs font-semibold">
       <a href="/docs/examples/smtp/php" className="text-primary hover:underline">Read Guide →</a>
       <a href="https://github.com/reloop-labs/reloop-examples/tree/main/smtp-php" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-primary dark:text-gray-400 dark:hover:text-white hover:underline">GitHub ↗</a>
-    </div>
+    </span>
   </Card>
   <Card icon="siRuby" title="Ruby SMTP">
     Standard Ruby Net::SMTP integration.
-    <div className="mt-4 flex gap-4 text-xs font-semibold">
+    <span className="mt-4 flex gap-4 text-xs font-semibold">
       <a href="/docs/examples/smtp/ruby" className="text-primary hover:underline">Read Guide →</a>
       <a href="https://github.com/reloop-labs/reloop-examples/tree/main/smtp-ruby" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-primary dark:text-gray-400 dark:hover:text-white hover:underline">GitHub ↗</a>
-    </div>
+    </span>
   </Card>
   <Card icon="siRust" title="Rust SMTP">
     Lettre SMTP library for Rust.
-    <div className="mt-4 flex gap-4 text-xs font-semibold">
+    <span className="mt-4 flex gap-4 text-xs font-semibold">
       <a href="/docs/examples/smtp/rust" className="text-primary hover:underline">Read Guide →</a>
       <a href="https://github.com/reloop-labs/reloop-examples/tree/main/smtp-rust" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-primary dark:text-gray-400 dark:hover:text-white hover:underline">GitHub ↗</a>
-    </div>
+    </span>
   </Card>
 </CardGroup>
 
@@ -6045,45 +6045,45 @@ Configure standard SMTP library examples or explore step-by-step guides for your
 <CardGroup cols={3}>
   <Card icon="siNodedotjs" title="Nodemailer (Node.js)">
     Standard Node SMTP using Nodemailer.
-    <div className="mt-4 flex gap-4 text-xs font-semibold">
+    <span className="mt-4 flex gap-4 text-xs font-semibold">
       <a href="/docs/examples/smtp/nodemailer" className="text-primary hover:underline">Read Guide →</a>
       <a href="https://github.com/reloop-labs/reloop-examples/tree/main/smtp-nodemailer" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-primary dark:text-gray-400 dark:hover:text-white hover:underline">GitHub ↗</a>
-    </div>
+    </span>
   </Card>
   <Card icon="siPython" title="Python SMTP">
     Built-in smtplib Python SMTP.
-    <div className="mt-4 flex gap-4 text-xs font-semibold">
+    <span className="mt-4 flex gap-4 text-xs font-semibold">
       <a href="/docs/examples/smtp/python" className="text-primary hover:underline">Read Guide →</a>
       <a href="https://github.com/reloop-labs/reloop-examples/tree/main/smtp-python" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-primary dark:text-gray-400 dark:hover:text-white hover:underline">GitHub ↗</a>
-    </div>
+    </span>
   </Card>
   <Card icon="siGo" title="Go SMTP">
     Built-in net/smtp Go implementation.
-    <div className="mt-4 flex gap-4 text-xs font-semibold">
+    <span className="mt-4 flex gap-4 text-xs font-semibold">
       <a href="/docs/examples/smtp/go" className="text-primary hover:underline">Read Guide →</a>
       <a href="https://github.com/reloop-labs/reloop-examples/tree/main/smtp-go" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-primary dark:text-gray-400 dark:hover:text-white hover:underline">GitHub ↗</a>
-    </div>
+    </span>
   </Card>
   <Card icon="siPhp" title="PHP SMTP">
     Standard PHP SMTP connection.
-    <div className="mt-4 flex gap-4 text-xs font-semibold">
+    <span className="mt-4 flex gap-4 text-xs font-semibold">
       <a href="/docs/examples/smtp/php" className="text-primary hover:underline">Read Guide →</a>
       <a href="https://github.com/reloop-labs/reloop-examples/tree/main/smtp-php" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-primary dark:text-gray-400 dark:hover:text-white hover:underline">GitHub ↗</a>
-    </div>
+    </span>
   </Card>
   <Card icon="siRuby" title="Ruby SMTP">
     Standard Ruby Net::SMTP integration.
-    <div className="mt-4 flex gap-4 text-xs font-semibold">
+    <span className="mt-4 flex gap-4 text-xs font-semibold">
       <a href="/docs/examples/smtp/ruby" className="text-primary hover:underline">Read Guide →</a>
       <a href="https://github.com/reloop-labs/reloop-examples/tree/main/smtp-ruby" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-primary dark:text-gray-400 dark:hover:text-white hover:underline">GitHub ↗</a>
-    </div>
+    </span>
   </Card>
   <Card icon="siRust" title="Rust SMTP">
     Lettre SMTP library for Rust.
-    <div className="mt-4 flex gap-4 text-xs font-semibold">
+    <span className="mt-4 flex gap-4 text-xs font-semibold">
       <a href="/docs/examples/smtp/rust" className="text-primary hover:underline">Read Guide →</a>
       <a href="https://github.com/reloop-labs/reloop-examples/tree/main/smtp-rust" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-primary dark:text-gray-400 dark:hover:text-white hover:underline">GitHub ↗</a>
-    </div>
+    </span>
   </Card>
 </CardGroup>
 
@@ -12353,27 +12353,27 @@ Deploy and run Reloop or route emails directly from your cloud providers.
 <CardGroup cols={3}>
   <Card icon="siVercel" title="Vercel" href="/docs/integrations/vercel">
     Deploy frontend applications and route transactional emails.
-    <div className="mt-4 text-xs font-semibold text-primary">Read Guide →</div>
+    <span className="mt-4 block text-xs font-semibold text-primary">Read Guide →</span>
   </Card>
   <Card icon="siRailway" title="Railway" href="/docs/integrations/railway">
     Host your Reloop instance or run your backends.
-    <div className="mt-4 text-xs font-semibold text-primary">Read Guide →</div>
+    <span className="mt-4 block text-xs font-semibold text-primary">Read Guide →</span>
   </Card>
   <Card icon="siCloudflare" title="Cloudflare" href="/docs/integrations/cloudflare">
     Deliver emails globally using Cloudflare Workers and Pages.
-    <div className="mt-4 text-xs font-semibold text-primary">Read Guide →</div>
+    <span className="mt-4 block text-xs font-semibold text-primary">Read Guide →</span>
   </Card>
   <Card icon="siNetlify" title="Netlify" href="/docs/integrations/netlify">
     Connect your Netlify builds and serverless functions.
-    <div className="mt-4 text-xs font-semibold text-primary">Read Guide →</div>
+    <span className="mt-4 block text-xs font-semibold text-primary">Read Guide →</span>
   </Card>
   <Card icon="siDocker" title="Docker" href="/docs/integrations/docker">
     Run Reloop services locally or in production containers.
-    <div className="mt-4 text-xs font-semibold text-primary">Read Guide →</div>
+    <span className="mt-4 block text-xs font-semibold text-primary">Read Guide →</span>
   </Card>
   <Card icon="siCoolify" title="Coolify" href="/docs/integrations/coolify">
     Self-host Reloop with simple open-source PaaS integrations.
-    <div className="mt-4 text-xs font-semibold text-primary">Read Guide →</div>
+    <span className="mt-4 block text-xs font-semibold text-primary">Read Guide →</span>
   </Card>
 </CardGroup>
 
@@ -12384,19 +12384,19 @@ Integrate Reloop email sending and inbox automation into AI-generated applicatio
 <CardGroup cols={3}>
   <Card icon="heart" title="Lovable" href="/docs/integrations/lovable">
     Build full-stack apps with natural language using Reloop SMTP or REST APIs.
-    <div className="mt-4 text-xs font-semibold text-primary">Read Guide →</div>
+    <span className="mt-4 block text-xs font-semibold text-primary">Read Guide →</span>
   </Card>
   <Card icon="zap" title="Bolt.new" href="/docs/integrations/bolt">
     Integrate Reloop into full-stack web applications generated in the browser.
-    <div className="mt-4 text-xs font-semibold text-primary">Read Guide →</div>
+    <span className="mt-4 block text-xs font-semibold text-primary">Read Guide →</span>
   </Card>
   <Card icon="siV0" title="v0" href="/docs/integrations/v0">
     Integrate Reloop email templates and APIs into AI-generated React/Next.js components.
-    <div className="mt-4 text-xs font-semibold text-primary">Read Guide →</div>
+    <span className="mt-4 block text-xs font-semibold text-primary">Read Guide →</span>
   </Card>
   <Card icon="siReplit" title="Replit" href="/docs/integrations/replit">
     Deploy Reloop-integrated apps and agent inboxes instantly on Replit Repls.
-    <div className="mt-4 text-xs font-semibold text-primary">Read Guide →</div>
+    <span className="mt-4 block text-xs font-semibold text-primary">Read Guide →</span>
   </Card>
 </CardGroup>
 
@@ -12407,15 +12407,15 @@ Build intelligent agents that send and receive email autonomously.
 <CardGroup cols={3}>
   <Card icon="workflow" title="MCP Server" href="/docs/integrations/ai-tools/mcp-server">
     Connect Model Context Protocol (MCP) clients like Claude Code or Cursor.
-    <div className="mt-4 text-xs font-semibold text-primary">Read Guide →</div>
+    <span className="mt-4 block text-xs font-semibold text-primary">Read Guide →</span>
   </Card>
   <Card icon="siCursor" title="Cursor" href="/docs/integrations/cursor">
     Use Cursor composer or chat with Reloop's MCP server and agent-ready docs.
-    <div className="mt-4 text-xs font-semibold text-primary">Read Guide →</div>
+    <span className="mt-4 block text-xs font-semibold text-primary">Read Guide →</span>
   </Card>
   <Card icon="siWindsurf" title="Windsurf" href="/docs/integrations/windsurf">
     Code alongside the Windsurf agent with full monorepo and API context.
-    <div className="mt-4 text-xs font-semibold text-primary">Read Guide →</div>
+    <span className="mt-4 block text-xs font-semibold text-primary">Read Guide →</span>
   </Card>
 </CardGroup>
 
@@ -12426,35 +12426,35 @@ Integrate Reloop email sending into your automated workflows, databases, and web
 <CardGroup cols={3}>
   <Card icon="siN8n" title="n8n" href="/docs/integrations/n8n">
     Automate workflows and send emails using Reloop SMTP or REST APIs.
-    <div className="mt-4 text-xs font-semibold text-primary">Read Guide →</div>
+    <span className="mt-4 block text-xs font-semibold text-primary">Read Guide →</span>
   </Card>
   <Card icon="siMake" title="Make.com" href="/docs/integrations/make">
     Integrate Reloop email sending into your Make scenarios.
-    <div className="mt-4 text-xs font-semibold text-primary">Read Guide →</div>
+    <span className="mt-4 block text-xs font-semibold text-primary">Read Guide →</span>
   </Card>
   <Card icon="siZapier" title="Zapier" href="/docs/integrations/zapier">
     Connect Reloop with thousands of apps via Zapier Zaps.
-    <div className="mt-4 text-xs font-semibold text-primary">Read Guide →</div>
+    <span className="mt-4 block text-xs font-semibold text-primary">Read Guide →</span>
   </Card>
   <Card icon="siWordpress" title="WordPress" href="/docs/integrations/wordpress">
     Route your WordPress site's emails through Reloop SMTP.
-    <div className="mt-4 text-xs font-semibold text-primary">Read Guide →</div>
+    <span className="mt-4 block text-xs font-semibold text-primary">Read Guide →</span>
   </Card>
   <Card icon="siGhost" title="Ghost CMS" href="/docs/integrations/ghost">
     Configure Ghost CMS to send newsletter signups and transactional emails.
-    <div className="mt-4 text-xs font-semibold text-primary">Read Guide →</div>
+    <span className="mt-4 block text-xs font-semibold text-primary">Read Guide →</span>
   </Card>
   <Card icon="siStrapi" title="Strapi" href="/docs/integrations/strapi">
     Configure the Strapi headless CMS to send emails via Reloop SMTP.
-    <div className="mt-4 text-xs font-semibold text-primary">Read Guide →</div>
+    <span className="mt-4 block text-xs font-semibold text-primary">Read Guide →</span>
   </Card>
   <Card icon="siDirectus" title="Directus" href="/docs/integrations/directus">
     Configure Directus CMS via environment variables to send system emails.
-    <div className="mt-4 text-xs font-semibold text-primary">Read Guide →</div>
+    <span className="mt-4 block text-xs font-semibold text-primary">Read Guide →</span>
   </Card>
   <Card icon="siSupabase" title="Supabase" href="/docs/guides/supabase-quickstart">
     Configure Supabase authentication and database emails via Reloop SMTP.
-    <div className="mt-4 text-xs font-semibold text-primary">Read Guide →</div>
+    <span className="mt-4 block text-xs font-semibold text-primary">Read Guide →</span>
   </Card>
 </CardGroup>
 

@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ChangelogGridBody } from "../changelog-grid";
 import { ChangelogReleaseContent } from "../changelog-release-content";
 import {
 	changelogReleases,
 	getChangelogReleaseByVersion,
+	getTagDotColor,
 } from "../changelog-utils";
 
 // TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
@@ -42,11 +41,19 @@ export async function generateMetadata({
 			title,
 			description: release.description,
 			type: "article",
-			...(release.preview && {
-				images: [{ url: release.preview.src, alt: release.preview.alt }],
-			}),
 		},
 	};
+}
+
+function getBreadcrumbParts(dateStr: string) {
+	const parts = dateStr.split(" ");
+	const lastPart = parts[parts.length - 1];
+	const isYear = Boolean(lastPart && /^\d{4}$/.test(lastPart));
+	if (isYear && lastPart) {
+		const datePart = parts.slice(0, -1).join(" ").toUpperCase();
+		return { year: lastPart, date: datePart };
+	}
+	return { year: "2026", date: dateStr.toUpperCase() };
 }
 
 export default async function ChangelogReleasePage({ params }: PageProps) {
@@ -57,56 +64,57 @@ export default async function ChangelogReleasePage({ params }: PageProps) {
 		notFound();
 	}
 
+	const { year, date: formattedDate } = getBreadcrumbParts(release.date);
+
 	return (
 		<div className="min-h-screen bg-white dark:bg-black">
-			<section className="relative overflow-clip border-stroke-soft-200 border-b px-4 sm:px-6 lg:px-8 dark:border-white/10">
-				<div className="relative z-0 mx-auto w-full max-w-5xl border-stroke-soft-200 border-x px-4 pt-36 pb-10 sm:px-6 sm:pt-44 sm:pb-12 md:max-w-7xl lg:px-8 dark:border-white/10">
-					<Link
-						href="/changelog"
-						className="inline-flex items-center gap-1 font-medium text-[13px] text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/55 dark:hover:text-white"
-					>
-						<span aria-hidden="true">‹</span>
-						All updates
-					</Link>
+			<section className="relative w-full border-stroke-soft-200 border-b bg-bg-white-0 text-text-strong-950 dark:border-white/10 dark:bg-black dark:text-white">
+				<div className="mx-auto w-full max-w-5xl border-stroke-soft-200 border-x px-6 pt-28 pb-14 sm:px-10 sm:pt-32 sm:pb-16 md:max-w-7xl lg:px-12 dark:border-white/10">
+					{/* Breadcrumb Header */}
+					<div className="flex items-center gap-2 font-medium text-[11px] tracking-wider text-text-sub-600 uppercase dark:text-white/50">
+						<Link
+							href="/changelog"
+							className="transition-colors hover:text-text-strong-950 dark:hover:text-white"
+						>
+							CHANGELOG
+						</Link>
+						<span className="text-text-soft-400 dark:text-white/30">/</span>
+						<span>{year}</span>
+						<span className="text-text-soft-400 dark:text-white/30">/</span>
+						<span>{formattedDate}</span>
+					</div>
+
+					{/* Title */}
+					<h1 className="mt-6 font-semibold text-3xl text-text-strong-950 tracking-tight sm:text-4xl lg:text-[2.5rem] dark:text-white">
+						{release.title}
+					</h1>
+
+					{/* Tag Bullet Dots */}
+					{release.tags && release.tags.length > 0 && (
+						<div className="mt-3.5 flex flex-wrap items-center gap-4 text-[13px] font-medium text-text-sub-600 dark:text-white/60">
+							{release.tags.map((tag) => (
+								<div key={tag} className="flex items-center gap-1.5">
+									<span
+										className={`size-1.5 rounded-full ${getTagDotColor(tag)}`}
+										aria-hidden="true"
+									/>
+									<span>{tag}</span>
+								</div>
+							))}
+						</div>
+					)}
+
+					{/* Lead Description */}
+					<p className="mt-6 max-w-2xl text-[16px] text-text-sub-600 leading-relaxed sm:text-[17px] dark:text-white/65">
+						{release.description}
+					</p>
+
+					{/* Release Content Sections */}
+					<div className="mt-10 max-w-3xl sm:mt-12">
+						<ChangelogReleaseContent release={release} />
+					</div>
 				</div>
 			</section>
-
-			<ChangelogGridBody>
-				<article className="grid grid-cols-1 gap-4 py-12 sm:grid-cols-[10.5rem_minmax(0,1fr)] sm:gap-12 sm:py-16 md:grid-cols-4">
-					<div className="sm:pt-1.5 md:col-span-1">
-						<time className="block text-[13px] text-text-sub-600 tabular-nums dark:text-white/55">
-							{release.date}
-						</time>
-					</div>
-
-					<div className="min-w-0 md:col-span-3">
-						<h1 className="font-semibold text-[1.35rem] text-text-strong-950 leading-snug tracking-tight sm:text-2xl dark:text-white">
-							{release.title}
-						</h1>
-
-						{release.preview ? (
-							<div className="relative mt-5 aspect-video overflow-hidden rounded-lg border border-stroke-soft-200 bg-bg-weak-50 dark:border-white/10 dark:bg-white/[0.02]">
-								<Image
-									src={release.preview.src}
-									alt={release.preview.alt}
-									fill
-									className="object-cover"
-									sizes="(max-width: 768px) 100vw, 720px"
-									priority
-								/>
-							</div>
-						) : null}
-
-						<p className="mt-5 max-w-2xl text-[15px] text-text-sub-600 leading-relaxed dark:text-white/55">
-							{release.description}
-						</p>
-
-						<div className="mt-10 sm:mt-12">
-							<ChangelogReleaseContent release={release} />
-						</div>
-					</div>
-				</article>
-			</ChangelogGridBody>
 		</div>
 	);
 }

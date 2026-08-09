@@ -26,19 +26,25 @@ function ReleaseSections({ release }: { release: ChangelogRelease }) {
 		<div className="space-y-8">
 			{sorted.map((section) => (
 				<div key={section.category}>
-					<h2 className="font-semibold text-[12px] text-text-soft-400 uppercase tracking-wider dark:text-white/35">
+					<h2 className="font-medium text-[11px] text-text-sub-600 uppercase tracking-wider dark:text-white/40">
 						{section.category}
 					</h2>
-					<ul className="mt-3 space-y-3">
+					<ul className="mt-3 space-y-3.5">
 						{section.items.map((item) => (
 							<li
 								key={`${section.category}-${item.label}`}
-								className="text-[14px] text-text-sub-600 leading-relaxed sm:text-[15px] dark:text-white/50"
+								className="flex items-start gap-3 text-[14.5px] text-text-sub-600 leading-relaxed sm:text-[15px] dark:text-white/60"
 							>
-								<span className="font-semibold text-text-strong-950 dark:text-white">
-									{item.label}
-								</span>{" "}
-								{item.description}
+								<span
+									className="mt-2.5 size-1 shrink-0 rounded-[1px] bg-text-sub-600/40 dark:bg-white/35"
+									aria-hidden="true"
+								/>
+								<div>
+									<span className="font-semibold text-text-strong-950 dark:text-white">
+										{item.label}.
+									</span>{" "}
+									{item.description}
+								</div>
 							</li>
 						))}
 					</ul>
@@ -55,20 +61,7 @@ export function ChangelogReleaseContent({
 }) {
 	return (
 		<div>
-			<div className="flex flex-wrap gap-2">
-				{release.tags.map((tag) => (
-					<span
-						key={tag}
-						className="rounded-md border border-stroke-soft-200 bg-bg-weak-50 px-2.5 py-1 font-medium text-[12px] text-text-sub-600 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/60"
-					>
-						{tag}
-					</span>
-				))}
-			</div>
-
-			<div className="mt-10">
-				<ReleaseSections release={release} />
-			</div>
+			<ReleaseSections release={release} />
 
 			{release.code && (
 				<div className="mt-10">
@@ -78,3 +71,4 @@ export function ChangelogReleaseContent({
 		</div>
 	);
 }
+

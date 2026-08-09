@@ -1,76 +1,107 @@
-import Image from "next/image";
 import Link from "next/link";
 import type { ChangelogRelease } from "./changelog-types";
-import { getChangelogReleasePath } from "./changelog-utils";
+import { getChangelogReleasePath, getTagDotColor } from "./changelog-utils";
 
-function ReleaseEntry({
-	release,
-	index,
-}: {
-	release: ChangelogRelease;
-	index: number;
-}) {
-	const href = getChangelogReleasePath(release.version);
-
-	return (
-		<article className="grid grid-cols-1 gap-4 py-12 sm:grid-cols-[10.5rem_minmax(0,1fr)] sm:gap-12 sm:py-16 md:grid-cols-4">
-			<div className="sm:pt-1.5 md:col-span-1">
-				<time className="block text-[13px] text-text-sub-600 tabular-nums dark:text-white/55">
-					{release.date}
-				</time>
-			</div>
-
-			<div className="min-w-0 md:col-span-3">
-				<Link
-					href={href}
-					className="group block rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-primary-base focus-visible:ring-offset-2 focus-visible:ring-offset-bg-white-0 dark:focus-visible:ring-offset-black"
-				>
-					<h2 className="font-semibold text-[1.35rem] text-text-strong-950 leading-snug tracking-tight transition-colors group-hover:underline group-hover:decoration-1 group-hover:underline-offset-4 sm:text-2xl dark:text-white">
-						{release.title}
-					</h2>
-
-					<div className="relative mt-5 aspect-video overflow-hidden rounded-lg border border-stroke-soft-200 bg-bg-weak-50 dark:border-white/10 dark:bg-white/[0.02]">
-						{release.preview ? (
-							<Image
-								src={release.preview.src}
-								alt={release.preview.alt}
-								fill
-								className="object-cover transition-transform duration-300 group-hover:scale-[1.01]"
-								sizes="(max-width: 768px) 100vw, 720px"
-								priority={index === 0}
-							/>
-						) : (
-							<div className="flex h-full items-center justify-center px-6">
-								<p className="text-center text-[13px] text-text-soft-400 dark:text-white/25">
-									Release preview
-								</p>
-							</div>
-						)}
-					</div>
-				</Link>
-
-				<p className="mt-5 max-w-2xl text-[15px] text-text-sub-600 leading-relaxed dark:text-white/55">
-					{release.description}
-				</p>
-			</div>
-		</article>
-	);
-}
+type MonthGroup = {
+	date: string;
+	releases: ChangelogRelease[];
+};
 
 export function ChangelogTimeline({
 	releases,
 }: {
 	releases: ChangelogRelease[];
 }) {
+	// Group consecutive releases by date month
+	const groups: MonthGroup[] = [];
+	for (const release of releases) {
+		const lastGroup = groups[groups.length - 1];
+		if (lastGroup && lastGroup.date === release.date) {
+			lastGroup.releases.push(release);
+		} else {
+			groups.push({ date: release.date, releases: [release] });
+		}
+	}
+
 	return (
-		<div className="divide-y divide-stroke-soft-200 dark:divide-white/10">
-			{releases.map((release, index) => (
-				<ReleaseEntry
-					key={`${release.version}-${release.title}`}
-					release={release}
-					index={index}
-				/>
+		<div className="divide-y divide-stroke-soft-200/80 dark:divide-white/10">
+			{groups.map((group) => (
+				<section
+					key={group.date}
+					className="grid grid-cols-1 gap-4 px-6 py-8 sm:grid-cols-[7.5rem_minmax(0,1fr)] sm:gap-6 sm:px-10 sm:py-10 lg:gap-8 lg:px-12"
+				>
+					{/* Left sticky column for the month header */}
+					<div className="sm:sticky sm:top-24 sm:self-start sm:pt-1">
+						<time className="block font-medium text-[13.5px] text-text-sub-600 tabular-nums dark:text-white/55">
+							{group.date}
+						</time>
+					</div>
+
+					{/* Right column with list of release items in this month */}
+					<div className="min-w-0 divide-y divide-dashed divide-stroke-soft-200/90 dark:divide-white/10">
+						{group.releases.map((release) => {
+							const href = getChangelogReleasePath(release.version);
+							return (
+								<div
+									key={`${release.version}-${release.title}`}
+									className="py-5 first:pt-0 last:pb-0"
+								>
+									<Link
+										href={href}
+										className="group flex flex-col gap-4 outline-none sm:flex-row sm:items-center sm:justify-between"
+									>
+										<div className="min-w-0 flex-1 pr-4 sm:pr-6">
+											<h2 className="font-medium text-[16px] text-text-strong-950 leading-snug tracking-tight transition-colors group-hover:text-primary-base sm:text-[17px] dark:text-white dark:group-hover:text-white">
+												{release.title}
+											</h2>
+											<p className="mt-1 max-w-xl text-[13.5px] text-text-sub-600 leading-normal sm:text-[14px] dark:text-white/55">
+												{release.description}
+											</p>
+										</div>
+
+										<div className="flex shrink-0 items-center justify-between gap-6 sm:gap-10 w-full sm:w-auto self-start sm:self-center">
+											{release.tags && release.tags.length > 0 ? (
+												<ul className="flex flex-col gap-1 font-medium text-[12.5px] text-text-sub-600 dark:text-white/55 w-28 sm:w-32">
+													{release.tags.slice(0, 3).map((tag) => (
+														<li key={tag} className="flex items-center gap-1.5">
+															<span
+																className={`size-1.5 shrink-0 rounded-full ${getTagDotColor(tag)}`}
+																aria-hidden="true"
+															/>
+															<span className="truncate">{tag}</span>
+														</li>
+													))}
+												</ul>
+											) : (
+												<div className="w-28 sm:w-32" />
+											)}
+
+											<div className="flex items-center justify-end shrink-0">
+												<svg
+													className="size-4 text-text-sub-600/60 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-text-strong-950 dark:text-white/40 dark:group-hover:text-white"
+													fill="none"
+													viewBox="0 0 24 24"
+													stroke="currentColor"
+													strokeWidth="1.5"
+													aria-hidden="true"
+												>
+													<path
+														strokeLinecap="round"
+														strokeLinejoin="round"
+														d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"
+													/>
+												</svg>
+											</div>
+										</div>
+									</Link>
+								</div>
+							);
+						})}
+					</div>
+				</section>
 			))}
 		</div>
 	);
 }
+
+
