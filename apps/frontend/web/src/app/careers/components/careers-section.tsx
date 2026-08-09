@@ -5,12 +5,6 @@ import { GitHubContributionGraph } from "./github-contribution-graph";
 
 const careersMailto = `mailto:${contactEmail}?subject=${encodeURIComponent("I'd like to build with Reloop")}`;
 
-const cultureParagraphs = [
-	"We're not hiring for a résumé. We're hiring for taste—the instinct that something is off before anyone else says it, and the conviction to fix it anyway. That's rarer than any credential.",
-	"Taste means you know the difference between work that's done and work that's good. You notice the pixel that's two points too heavy. You rewrite the sentence that technically says the right thing but feels wrong. You don't stop at functional.",
-	"This place will cost you something. You'll sit with problems longer than is comfortable. You'll throw out things you spent days on. But what comes out the other side is work you'd actually put your name on.",
-];
-
 function BlueprintGrid({ id }: { id: string }) {
 	const patternId = `contact-grid-${id}`;
 	return (
@@ -74,11 +68,7 @@ function ContactDiagram() {
 					stroke="currentColor"
 					strokeWidth="1.2"
 				/>
-				<path
-					d="M12 11.5V14.8229"
-					stroke="currentColor"
-					strokeWidth="1.2"
-				/>
+				<path d="M12 11.5V14.8229" stroke="currentColor" strokeWidth="1.2" />
 				<path
 					d="M2 6.5L11.3292 11.1646C11.7515 11.3757 12.2485 11.3757 12.6708 11.1646L22 6.5"
 					stroke="currentColor"
@@ -96,34 +86,23 @@ function ContactDiagram() {
 
 export function CareersHero() {
 	return (
-		<section className="relative w-full border-stroke-soft-200 border-b bg-bg-white-0 text-text-strong-950 dark:border-white/10 dark:bg-black dark:text-white">
-			<div className="mx-auto w-full max-w-5xl border-stroke-soft-200 border-x px-6 pt-32 pb-16 sm:px-10 md:max-w-7xl lg:px-12 dark:border-white/10">
-				{/* Header Section similar to Blog detail page */}
-				<header className="text-left">
-					<div className="flex w-full max-w-3xl flex-col gap-4">
-						<div className="flex flex-wrap items-center gap-2 font-medium font-mono text-primary-base text-xs/[150%] uppercase tracking-[0.6px]">
-							<span>Careers</span>
-						</div>
-						<h1 className="font-semibold text-3xl text-text-strong-950 leading-[110%] tracking-[-0.8px] sm:text-[40px] lg:text-[48px] dark:text-white">
-							People who care about taste.
-						</h1>
-					</div>
+		<section className="relative w-full border-stroke-soft-200 bg-bg-white-0 text-text-strong-950 dark:border-white/10 dark:bg-black dark:text-white">
+			<div className="mx-auto w-full max-w-5xl border-stroke-soft-200 border-x px-6 pt-28 pb-14 text-left sm:px-10 sm:pt-32 sm:pb-16 md:max-w-7xl lg:px-12 dark:border-white/10">
+				{/* Main Headline */}
+				<h1 className="max-w-3xl font-semibold text-3xl text-text-strong-950 leading-[1.15] tracking-tight sm:text-4xl lg:text-[2.6rem] dark:text-white">
+					Our mission is to build the email infrastructure for the next
+					generation.
+				</h1>
 
-					{/* Culture paragraphs */}
-					<div className="mt-8 max-w-3xl space-y-6">
-						{cultureParagraphs.map((paragraph) => (
-							<p
-								key={paragraph}
-								className="text-[15px] text-text-sub-600 leading-[1.8] sm:text-[17px] dark:text-white/60"
-							>
-								{paragraph}
-							</p>
-						))}
-					</div>
-				</header>
+				{/* Subheadline / Description */}
+				<p className="mt-4 max-w-2xl text-[15px] text-text-sub-600 leading-relaxed sm:text-[16px] dark:text-white/60">
+					We&apos;re redefining email infrastructure — shipping powerful,
+					groundbreaking features at every turn. Join us to revolutionize
+					developer communications.
+				</p>
 
 				{/* GitHub Green Contribution Graph */}
-				<div className="mt-12 max-w-4xl">
+				<div className="mt-10 w-full max-w-4xl">
 					<GitHubContributionGraph />
 				</div>
 			</div>
@@ -142,41 +121,41 @@ export function CareersContact() {
 				{/* 2-Column Box */}
 				<div className="grid grid-cols-1 md:grid-cols-2">
 					{/* Left Column: Heading, Subtext, Card Box with Introduce yourself, and GitHub link */}
-					<div className="flex flex-col justify-between border-stroke-soft-200 p-8 sm:p-10 md:border-r lg:p-14 dark:border-white/10">
+					<div className="flex flex-col justify-between border-stroke-soft-200 p-6 sm:p-8 md:border-r lg:p-10 dark:border-white/10">
 						<div>
-							<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em]">
+							<p className="font-semibold text-text-sub-600 text-xs uppercase tracking-wider">
 								Get in touch
 							</p>
-							<h2 className="mt-3 font-semibold text-2xl text-text-strong-950 tracking-tight sm:text-3xl lg:text-[2.2rem] dark:text-white">
+							<h2 className="mt-2.5 font-semibold text-2xl text-text-strong-950 tracking-tight sm:text-[1.75rem] dark:text-white">
 								Think you&apos;d fit here?
 							</h2>
-							<p className="mt-3.5 text-[14px] text-text-sub-600 leading-relaxed sm:text-[15px] dark:text-white/60">
+							<p className="mt-3 text-sm text-text-sub-600 leading-relaxed dark:text-white/60">
 								Reloop is open-source email infrastructure for developers. If
 								that&apos;s the work you want to do, send us a note—your GitHub,
 								portfolio, or what you&apos;d help build.
 							</p>
 						</div>
 
-						<div className="mt-8">
-							<div className="rounded-2xl border border-stroke-soft-200 bg-bg-weak-50 p-6 text-center sm:p-7 dark:border-white/[0.08] dark:bg-white/[0.03]">
-								<p className="text-[13.5px] text-text-sub-600 leading-relaxed dark:text-white/50">
+						<div className="mt-6">
+							<div className="rounded-2xl border border-stroke-soft-200 bg-bg-weak-50 p-5 text-center sm:p-6 dark:border-white/[0.08] dark:bg-white/[0.03]">
+								<p className="text-sm text-text-sub-600 leading-relaxed dark:text-white/60">
 									We read every message. Skip the cover letter template. Tell us
 									what you&apos;d work on and why it matters to you.
 								</p>
-								<div className="mt-5 flex justify-center">
+								<div className="mt-4 flex justify-center">
 									<a
 										href={careersMailto}
 										className={`${Button.buttonVariants({
 											variant: "neutral",
 											mode: "filled",
-										}).root()} inline-flex h-10! rounded-full! px-6! font-medium text-sm! dark:bg-white dark:text-black dark:hover:bg-white/90`}
+										}).root()} inline-flex h-9! rounded-full! px-5! font-medium text-xs! sm:h-10! sm:px-6! sm:text-sm! dark:bg-white dark:text-black dark:hover:bg-white/90`}
 									>
 										Introduce yourself
 									</a>
 								</div>
 							</div>
 
-							<p className="mt-5 text-[13px] text-text-sub-600 text-center sm:text-left dark:text-white/45">
+							<p className="mt-4 text-center text-text-sub-600 text-xs sm:text-left dark:text-white/45">
 								Want to show your work first?{" "}
 								<Link
 									href={socialProfiles.github}

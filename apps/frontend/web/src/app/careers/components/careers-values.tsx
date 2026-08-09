@@ -193,8 +193,8 @@ export function CareersValues() {
 
 			<div className="mx-auto w-full max-w-5xl border-stroke-soft-200 border-x md:max-w-7xl dark:border-white/10">
 				{/* Centered Header */}
-				<div className="px-6 pt-20 pb-16 text-center sm:px-10 sm:pt-24 sm:pb-20">
-					<h2 className="font-semibold text-3xl text-text-strong-950 tracking-tight sm:text-4xl lg:text-[2.6rem] dark:text-white">
+				<div className="px-6 pt-16 pb-12 text-center sm:px-10 sm:pt-20 sm:pb-16">
+					<h2 className="font-semibold text-2xl text-text-strong-950 tracking-tight sm:text-3xl lg:text-[2.2rem] dark:text-white">
 						Our values
 					</h2>
 				</div>
@@ -204,13 +204,13 @@ export function CareersValues() {
 					{/* Left Column (Starts higher) */}
 					<div className="flex flex-col border-stroke-soft-200 md:border-r dark:border-white/10">
 						{/* Users » Σ */}
-						<div className="flex flex-col gap-6 border-stroke-soft-200 border-b p-8 sm:flex-row sm:items-center sm:gap-8 sm:p-10 lg:p-12 dark:border-white/10">
+						<div className="flex flex-col gap-5 border-stroke-soft-200 border-b p-6 sm:flex-row sm:items-center sm:gap-7 sm:p-8 lg:p-10 dark:border-white/10">
 							{renderDiagram01()}
 							<div className="flex-1">
-								<h3 className="font-semibold text-[1.25rem] text-text-strong-950 tracking-tight sm:text-[1.4rem] lg:text-[1.5rem] dark:text-white">
+								<h3 className="font-semibold text-[1.15rem] text-text-strong-950 tracking-tight sm:text-[1.25rem] dark:text-white">
 									Users » Σ
 								</h3>
-								<p className="mt-2.5 max-w-lg text-[13.5px] text-text-sub-600 leading-relaxed sm:text-[14px] dark:text-white/60">
+								<p className="mt-2 max-w-lg text-sm text-text-sub-600 leading-relaxed dark:text-white/60">
 									We speak to our{" "}
 									<span className="underline decoration-dotted decoration-text-sub-600/70 underline-offset-4 dark:decoration-white/50">
 										users
@@ -225,13 +225,13 @@ export function CareersValues() {
 						</div>
 
 						{/* First Principles Thinking */}
-						<div className="flex flex-col gap-6 border-stroke-soft-200 border-b p-8 sm:flex-row sm:items-center sm:gap-8 sm:p-10 lg:p-12 dark:border-white/10">
+						<div className="flex flex-col gap-5 border-stroke-soft-200 border-b p-6 sm:flex-row sm:items-center sm:gap-7 sm:p-8 lg:p-10 dark:border-white/10">
 							{renderDiagram03()}
 							<div className="flex-1">
-								<h3 className="font-semibold text-[1.25rem] text-text-strong-950 tracking-tight sm:text-[1.4rem] lg:text-[1.5rem] dark:text-white">
+								<h3 className="font-semibold text-[1.15rem] text-text-strong-950 tracking-tight sm:text-[1.25rem] dark:text-white">
 									First Principles Thinking
 								</h3>
-								<p className="mt-2.5 max-w-lg text-[13.5px] text-text-sub-600 leading-relaxed sm:text-[14px] dark:text-white/60">
+								<p className="mt-2 max-w-lg text-sm text-text-sub-600 leading-relaxed dark:text-white/60">
 									We challenge status quo by breaking down problems to their{" "}
 									<span className="underline decoration-dotted decoration-text-sub-600/70 underline-offset-4 dark:decoration-white/50">
 										fundamental truths
@@ -242,22 +242,22 @@ export function CareersValues() {
 						</div>
 
 						{/* Bottom Step Spacer for Left Column */}
-						<div className="hidden h-14 md:block lg:h-16" />
+						<div className="hidden h-12 md:block lg:h-14" />
 					</div>
 
 					{/* Right Column (Stepped down) */}
 					<div className="flex flex-col">
 						{/* Top Step Spacer for Right Column */}
-						<div className="hidden h-14 border-stroke-soft-200 border-b md:block lg:h-16 dark:border-white/10" />
+						<div className="hidden h-12 border-stroke-soft-200 border-b md:block lg:h-14 dark:border-white/10" />
 
 						{/* Obsession Over Craft */}
-						<div className="flex flex-col gap-6 border-stroke-soft-200 border-b p-8 sm:flex-row sm:items-center sm:gap-8 sm:p-10 lg:p-12 dark:border-white/10">
+						<div className="flex flex-col gap-5 border-stroke-soft-200 border-b p-6 sm:flex-row sm:items-center sm:gap-7 sm:p-8 lg:p-10 dark:border-white/10">
 							{renderDiagram02()}
 							<div className="flex-1">
-								<h3 className="font-semibold text-[1.25rem] text-text-strong-950 tracking-tight sm:text-[1.4rem] lg:text-[1.5rem] dark:text-white">
+								<h3 className="font-semibold text-[1.15rem] text-text-strong-950 tracking-tight sm:text-[1.25rem] dark:text-white">
 									Obsession Over Craft
 								</h3>
-								<p className="mt-2.5 max-w-lg text-[13.5px] text-text-sub-600 leading-relaxed sm:text-[14px] dark:text-white/60">
+								<p className="mt-2 max-w-lg text-sm text-text-sub-600 leading-relaxed dark:text-white/60">
 									Obsession is in the{" "}
 									<span className="underline decoration-dotted decoration-text-sub-600/70 underline-offset-4 dark:decoration-white/50">
 										details
@@ -268,13 +268,13 @@ export function CareersValues() {
 						</div>
 
 						{/* Don't Stop Shipping */}
-						<div className="flex flex-col gap-6 p-8 sm:flex-row sm:items-center sm:gap-8 sm:p-10 lg:p-12">
+						<div className="flex flex-col gap-5 p-6 sm:flex-row sm:items-center sm:gap-7 sm:p-8 lg:p-10">
 							{renderDiagram04()}
 							<div className="flex-1">
-								<h3 className="font-semibold text-[1.25rem] text-text-strong-950 tracking-tight sm:text-[1.4rem] lg:text-[1.5rem] dark:text-white">
+								<h3 className="font-semibold text-[1.15rem] text-text-strong-950 tracking-tight sm:text-[1.25rem] dark:text-white">
 									Don&apos;t Stop Shipping
 								</h3>
-								<p className="mt-2.5 max-w-lg text-[13.5px] text-text-sub-600 leading-relaxed sm:text-[14px] dark:text-white/60">
+								<p className="mt-2 max-w-lg text-sm text-text-sub-600 leading-relaxed dark:text-white/60">
 									Complacency is the root of all evil. As a company, you&apos;re
 									either growing or you&apos;re dying. We{" "}
 									<span className="underline decoration-dotted decoration-text-sub-600/70 underline-offset-4 dark:decoration-white/50">
