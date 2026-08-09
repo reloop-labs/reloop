@@ -6,8 +6,10 @@ export function getChangelogReleasePath(version: string) {
 	return `/changelog/${version}`;
 }
 
-export function getChangelogReleaseByVersion(version: string) {
-	return changelogReleases.find((release) => release.version === version);
+export function getChangelogReleaseByVersion(versionOrSlug: string) {
+	return changelogReleases.find(
+		(release) => release.slug === versionOrSlug || release.version === versionOrSlug,
+	);
 }
 
 export function getTagDotColor(tag: string) {

@@ -59,7 +59,7 @@ function RssIcon({ className }: { className?: string }) {
 
 const ChangelogPage = () => {
 	return (
-		<div className="min-h-screen bg-white dark:bg-black">
+		<div>
 			<ChangelogGridHero>
 				<div>
 					<h1 className="max-w-3xl font-semibold text-3xl text-text-strong-950 leading-[1.15] tracking-tight sm:text-4xl lg:text-[2.6rem] dark:text-white">

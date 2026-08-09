@@ -17,9 +17,10 @@ type PageProps = {
 };
 
 export function generateStaticParams() {
-	return changelogReleases.map((release) => ({
-		version: release.version,
-	}));
+	return changelogReleases.flatMap((release) => [
+		{ version: release.slug },
+		{ version: release.version },
+	]);
 }
 
 export async function generateMetadata({
@@ -59,55 +60,53 @@ export default async function ChangelogReleasePage({ params }: PageProps) {
 	}
 
 	return (
-		<div className="min-h-screen bg-white dark:bg-black">
-			<section className="relative w-full border-stroke-soft-200 bg-bg-white-0 text-text-strong-950 dark:border-white/10 dark:bg-black dark:text-white">
-				<div className="mx-auto w-full max-w-5xl border-stroke-soft-200 border-x px-6 pt-28 pb-14 sm:px-10 sm:pt-32 sm:pb-16 md:max-w-7xl lg:px-12 dark:border-white/10">
-					{/* Breadcrumb Header */}
-					<div className="flex items-center gap-2 font-medium text-[11px] text-text-sub-600 uppercase tracking-wider dark:text-white/50">
-						<Link
-							href="/changelog"
-							className="transition-colors hover:text-text-strong-950 dark:hover:text-white"
-						>
-							CHANGELOG
-						</Link>
-						<span className="text-text-soft-400 dark:text-white/30">/</span>
-						<span>{getBreadcrumbDate(release)}</span>
-					</div>
-
-					{/* Title */}
-					<h1 className="mt-5 font-semibold text-3xl text-text-strong-950 leading-[1.15] tracking-tight sm:text-4xl lg:text-[2.6rem] dark:text-white">
-						{release.title}
-					</h1>
-
-					{/* Tag Bullet Dots */}
-					{release.tags && release.tags.length > 0 && (
-						<div className="mt-3.5 flex flex-wrap items-center gap-x-4 gap-y-2 font-medium text-[13px] text-text-sub-600 dark:text-white/60">
-							{release.tags.map((tag) => (
-								<div key={tag} className="flex items-center gap-1.5">
-									<span
-										className={`size-1.5 rounded-full ${getTagDotColor(tag)}`}
-										aria-hidden="true"
-									/>
-									<span>{tag}</span>
-								</div>
-							))}
-						</div>
-					)}
-
-					{/* Lead Description */}
-					<p className="mt-6 max-w-2xl text-[15px] text-text-sub-600 leading-relaxed sm:text-[16px] dark:text-white/60">
-						{release.description}
-					</p>
-
-					{/* Horizontal Divider */}
-					<div className="-mx-6 sm:-mx-10 lg:-mx-12 my-8 border-stroke-soft-200/80 border-b sm:my-10 dark:border-white/10" />
-
-					{/* Release Content Sections */}
-					<div className="max-w-3xl">
-						<ChangelogReleaseContent release={release} />
-					</div>
+		<section className="relative w-full border-stroke-soft-200 bg-bg-white-0 text-text-strong-950 dark:border-white/10 dark:bg-black dark:text-white">
+			<div className="mx-auto w-full max-w-5xl border-stroke-soft-200 border-x px-6 pt-28 pb-14 sm:px-10 sm:pt-32 sm:pb-16 md:max-w-7xl lg:px-12 dark:border-white/10">
+				{/* Breadcrumb Header */}
+				<div className="flex items-center gap-2 font-medium text-[11px] text-text-sub-600 uppercase tracking-wider dark:text-white/50">
+					<Link
+						href="/changelog"
+						className="transition-colors hover:text-text-strong-950 dark:hover:text-white"
+					>
+						CHANGELOG
+					</Link>
+					<span className="text-text-soft-400 dark:text-white/30">/</span>
+					<span>{getBreadcrumbDate(release)}</span>
 				</div>
-			</section>
-		</div>
+
+				{/* Title */}
+				<h1 className="mt-5 font-semibold text-3xl text-text-strong-950 leading-[1.15] tracking-tight sm:text-4xl lg:text-[2.6rem] dark:text-white">
+					{release.title}
+				</h1>
+
+				{/* Tag Bullet Dots */}
+				{release.tags && release.tags.length > 0 && (
+					<div className="mt-3.5 flex flex-wrap items-center gap-x-4 gap-y-2 font-medium text-[13px] text-text-sub-600 dark:text-white/60">
+						{release.tags.map((tag) => (
+							<div key={tag} className="flex items-center gap-1.5">
+								<span
+									className={`size-1.5 rounded-full ${getTagDotColor(tag)}`}
+									aria-hidden="true"
+								/>
+								<span>{tag}</span>
+							</div>
+						))}
+					</div>
+				)}
+
+				{/* Lead Description */}
+				<p className="mt-6 max-w-2xl text-[15px] text-text-sub-600 leading-relaxed sm:text-[16px] dark:text-white/60">
+					{release.description}
+				</p>
+
+				{/* Horizontal Divider */}
+				<div className="-mx-6 sm:-mx-10 lg:-mx-12 my-8 border-stroke-soft-200/80 border-b sm:my-10 dark:border-white/10" />
+
+				{/* Release Content Sections */}
+				<div className="max-w-3xl">
+					<ChangelogReleaseContent release={release} />
+				</div>
+			</div>
+		</section>
 	);
 }

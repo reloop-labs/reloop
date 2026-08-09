@@ -40,7 +40,7 @@ export function ChangelogTimeline({
 					{/* Right column with list of release items in this month */}
 					<div className="min-w-0 divide-y divide-dashed divide-stroke-soft-200/90 dark:divide-white/10">
 						{group.releases.map((release) => {
-							const href = getChangelogReleasePath(release.version);
+							const href = getChangelogReleasePath(release.slug || release.version);
 							return (
 								<div
 									key={`${release.version}-${release.title}`}

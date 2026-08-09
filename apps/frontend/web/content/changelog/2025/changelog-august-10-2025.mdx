@@ -1,0 +1,38 @@
+---
+slug: changelog-august-10-2025
+version: 0.1.0
+date: August 2025
+launchDate: 10 August 2025
+title: Open source foundation
+description: >-
+  The open-source monorepo launch with authentication, API keys, contacts, and
+  Docker-based local development.
+tags:
+  - GitHub
+  - Auth
+  - API Keys
+  - Contacts
+  - DevOps
+  - Monorepo
+  - Email
+---
+### PLANNING
+
+- **Monorepo architecture.** Centralized Drizzle schema with @reloop/* packages and clear separation between web, dashboard, and backend services. Turborepo for build orchestration.
+- **Open source launch.** Public GitHub repository under Apache 2.0 with README, getting started guides, and API package for typed Elysia clients.
+- **Technology stack decisions.** Next.js for frontends, Elysia (Bun) for backend services, Drizzle ORM for database, Redis for caching/sessions, and Caddy as reverse proxy.
+
+### DESIGN
+
+- **Design system foundation.** @reloop/tailwind and @reloop/ui package integration; global styles, PostCSS configuration, icon component with consistent attribute naming.
+- **Landing content pages.** About, engineering, product beliefs, deliverability, community, and campaign narrative pages with content structure and visual hierarchy.
+- **Dashboard layout system.** Navbar with breadcrumb navigation, organization management sidebar with animations, and full-height page components.
+
+### FRONTEND
+
+- **Dashboard application.** New Next.js dashboard with navbar, breadcrumbs, adaptive layout, organization-scoped routing, and loading state management.
+- **Authentication system.** Login, signup, password reset pages, Google/GitHub OAuth integration, appearance and security settings pages.
+- **Contacts & API keys pages.** Initial Contacts, API Keys, and Webhooks pages with CreateOrganizationModal in org layout.
+- **Domains & mailboxes.** Domain pages with DNS table and clipboard copy; mailbox list and AddNewMailboxModal with form validation.
+- **Team settings.** Invites UI, members table with @tanstack/react-table, Nuqs integration for URL state, Team section renamed from Members.
+- **Organization settings.** Logo upload with preview, name/slug editing, delete workspace with confirmation, dynamic org switcher in sidebar.

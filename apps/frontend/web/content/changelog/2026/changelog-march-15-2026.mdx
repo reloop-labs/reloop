@@ -1,0 +1,32 @@
+---
+slug: changelog-march-15-2026
+version: 0.6.0
+date: March 2026
+launchDate: 15 March 2026
+title: Template editor & observability
+description: >-
+  A visual template editor, ClickHouse-backed logs, domain settings
+  improvements, and editor observability tooling.
+tags:
+  - Templates
+  - Logs
+  - Domains
+  - Editor
+  - Observability
+---
+### PLANNING
+
+- **ClickHouse logging.** Designed event schema for email delivery, bounces, opens, clicks, and complaints with 30-day retention TTL.
+
+### DESIGN
+
+- **Template editor layout.** Full-screen canvas, dark mode palette, breadcrumb header, floating preview panel, code view mode.
+
+### FRONTEND
+
+- **Visual template editor.** Drag-and-drop block builder, live HTML preview, variable insertion.
+- **ClickHouse log viewer.** Search, filter by status, detail modal with raw MIME payload.
+
+### BACKEND
+
+- **ClickHouse ingestion pipeline.** High-throughput log writer for KumoMTA delivery events.

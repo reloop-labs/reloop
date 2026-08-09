@@ -1,0 +1,60 @@
+---
+slug: changelog-june-26-2026
+version: 0.9.0
+date: June 2026
+launchDate: 26 June 2026
+title: 'Agent inbox, workflows & marketing site'
+description: >-
+  Inbound agent inbox APIs, a workflow editor prototype, Chatwoot live chat, and
+  a redesigned marketing site with SEO and licensing pages.
+tags:
+  - Inbox
+  - Workflows
+  - Marketing
+  - Chatwoot
+  - SMTP
+  - SEO
+  - Licensing
+---
+### PLANNING
+
+- **Inbound email architecture.** Defined mailbox, thread, and message models with JetStream-backed inbound processing for agent workflows. Designed S3 attachment storage strategy and organization-scoped access patterns.
+- **Marketing site information architecture.** Standardized product pages (developers, marketing teams, AI agents), resources section (blog, license, contact, changelog), and structured SEO/sitemap/robots.txt/JSON-LD strategy across all routes.
+- **Licensing model.** Migrated from MIT to Apache 2.0 with custom restrictions. Defined self-hosting requirements, commercial licensing FAQ, and permission bento grid for the license page.
+- **Live support integration.** Chatwoot widget on the marketing site and dashboard. User identification and logout reset on the dashboard; anonymous widget on the web app.
+
+### DESIGN
+
+- **Changelog timeline.** New release timeline layout with version badges, date columns, tags, categorized sections (Planning → Design → Frontend → Backend → DevOps), and code block previews.
+- **SMTP feature page.** Redesigned SMTP landing with interactive sandbox, CopyCodeBlock tabs with animated pill indicators, custom CSS-variable-based Shiki syntax theme, and browser chrome styling.
+- **Contact & license pages.** Streamlined contact form layout with valibot validation, Apache 2.0 license bento grid with LicensePermissions component, and compact marketing page shell variants.
+- **Homepage & theme system.** Light/dark theme provider with UI toggle, hero decorative underlines with hover-triggered primary color transitions, use-case grid refresh with updated color palette, and footer theme toggle.
+- **Product landing pages.** Modular FeatureMarketingPage component system with shared configuration. Custom layouts for developers (hero, bento, code samples), marketing teams (metrics, guide), and AI agents (component-based architecture).
+- **Code block redesign.** Reusable CopyCodeBlock component with consolidated copy button, dynamic icon logic, tab navigation with animated pill and indicator, and simplified browser chrome visual assets.
+
+### FRONTEND
+
+- **Agent inbox (dashboard).** Mailbox and message management UI wired to inbox APIs: list and create mailboxes, list messages, read/unread toggle, and message deletion. Reply, attachments, and other thread actions remain prototype UI.
+- **Workflow editor (prototype).** Visual workflow editor with trigger nodes and empty-state guidance. Workflows persist locally in the browser; automated execution and template triggers are not shipped yet.
+- **Template editor enhancements.** CodeMirror integration (xcodeDark theme), variable suggestion dropdown with fixed positioning replacing tippy.js, split-pane visual/code/history modes, image upload slash commands, deliverability score panel, and email HTML sanitization with styling normalization.
+- **Template versioning.** Save and restore functionality implemented in the editor sidebar for template version management.
+- **Forward DNS (dashboard).** Forward domain DNS records to an email address from domain settings with tracking domain support.
+- **Marketing web app.** Product pages (developers, marketing teams, AI agents), languages/SDK documentation hub with individual integration pages, FeatureMarketingPage system with shared config, JSON-LD structured data, robots.txt, and comprehensive sitemap.
+- **Contact form (web).** Valibot-validated contact form with updated metadata, FeatureCta component, and streamlined layout.
+- **Blog & community pages.** Blog page with changelog integration, community page redesign with Platform and Stats components, compact hero variant, and about page messaging updates.
+- **Chatwoot live chat.** Live chat widget on the marketing site and dashboard. Dashboard syncs the signed-in user to Chatwoot and clears the session on logout; the web app loads the widget without user identification.
+- **Header & scroll performance.** Optimized header scroll animations with requestAnimationFrame and CSS contain. Native scroll behavior tuning, responsive layout adjustments for integrations section and footer typography.
+
+### BACKEND
+
+- **Inbox service.** New be-inbox service (port 8021): mail routing, CRUD for mailboxes/threads/messages, attachment retrieval via S3, organization-scoped auth middleware, and email thread/message database schema with migrations.
+- **Inbound email pipeline.** KumoMTA inbound JetStream initialization and inbound email subscriber for processing incoming mail into inbox threads.
+- **S3 integration.** S3 client implementation with nested configuration object, path-style env support, and bucket connectivity check integrated into the health route.
+- **Observability.** Elysia OpenTelemetry plugin integration; removed Bull Board dashboard and legacy tracking routes to simplify backend architecture.
+- **Workflow service.** Workflow service cleanup with evlog OTLP logging, improved controller logic, standardized import formatting, and refactored routing structure.
+
+### DEVOPS
+
+- **Inbox CI pipeline.** GitHub Actions workflow to build and publish the inbox service Docker image. Updated controller return types and standardized authentication properties.
+- **KumoMTA SMTP expansion.** Expanded SMTP listener support to include submission and SMTPS ports via Docker and Lua configuration. Added relay hosts for ESMTP listeners and port 2025 for alternate submission. Removed implicit SMTPS where simplified.
+- **Status page & configuration.** Status page URL updates, codebase-wide format pass, and Discord invite link standardization across documentation and frontend pages.

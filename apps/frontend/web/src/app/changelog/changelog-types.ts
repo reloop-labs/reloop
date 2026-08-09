@@ -17,6 +17,7 @@ type ChangelogSection = {
 };
 
 export type ChangelogRelease = {
+	slug: string;
 	date: string;
 	/** Optional exact launch date string, e.g. "26 October 2025" */
 	launchDate?: string;
