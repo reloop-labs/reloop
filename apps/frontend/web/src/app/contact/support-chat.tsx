@@ -2,6 +2,7 @@
 
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
+import * as Textarea from "@reloop/ui/textarea";
 import Image from "next/image";
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 
@@ -147,17 +148,13 @@ function useSupportSocket({
 
 	const join = useCallback((conversationId: string) => {
 		if (wsRef.current?.readyState === WebSocket.OPEN) {
-			wsRef.current.send(
-				JSON.stringify({ type: "join", conversationId }),
-			);
+			wsRef.current.send(JSON.stringify({ type: "join", conversationId }));
 		}
 	}, []);
 
 	const leave = useCallback((conversationId: string) => {
 		if (wsRef.current?.readyState === WebSocket.OPEN) {
-			wsRef.current.send(
-				JSON.stringify({ type: "leave", conversationId }),
-			);
+			wsRef.current.send(JSON.stringify({ type: "leave", conversationId }));
 		}
 	}, []);
 
@@ -181,7 +178,7 @@ function useSupportSocket({
 
 export function FoundersAvatarStack() {
 	return (
-		<div className="relative flex items-center -space-x-2">
+		<div className="-space-x-2 relative flex items-center">
 			<div className="relative size-7 overflow-hidden rounded-full border border-stroke-soft-200 bg-bg-weak-50 ring-2 ring-white dark:border-white/10 dark:bg-white/5 dark:ring-[#0c0c0c]">
 				<Image
 					src="/company/team/pranav-patel.jpg"
@@ -197,35 +194,9 @@ export function FoundersAvatarStack() {
 					fill
 					className="object-cover object-top"
 				/>
-				<span className="absolute bottom-0 right-0 size-2 rounded-full border-2 border-white bg-emerald-500 dark:border-[#0c0c0c]" />
+				<span className="absolute right-0 bottom-0 size-2 rounded-full border-2 border-white bg-emerald-500 dark:border-[#0c0c0c]" />
 			</div>
 		</div>
-	);
-}
-
-function SendIcon({ className = "size-4" }: { className?: string }) {
-	return (
-		<svg
-			viewBox="0 0 24 24"
-			fill="none"
-			className={className}
-			xmlns="http://www.w3.org/2000/svg"
-		>
-			<path
-				d="M22 2L11 13"
-				stroke="currentColor"
-				strokeWidth="2"
-				strokeLinecap="round"
-				strokeLinejoin="round"
-			/>
-			<path
-				d="M22 2L15 22L11 13L2 9L22 2Z"
-				stroke="currentColor"
-				strokeWidth="2"
-				strokeLinecap="round"
-				strokeLinejoin="round"
-			/>
-		</svg>
 	);
 }
 
@@ -392,7 +363,7 @@ export function ContactSupportChat({ userName }: { userName?: string | null }) {
 	return (
 		<div className="relative flex h-[min(520px,calc(100dvh-12rem))] min-h-[420px] w-full flex-col overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 text-text-strong-950 dark:border-white/10 dark:bg-[#0c0c0c] dark:text-white">
 			{/* Header */}
-			<div className="flex shrink-0 items-center justify-between gap-3 border-b border-stroke-soft-200 bg-bg-weak-50/50 px-4 py-3.5 dark:border-white/10 dark:bg-white/[0.02]">
+			<div className="flex shrink-0 items-center justify-between gap-3 border-stroke-soft-200 border-b bg-bg-weak-50/50 px-4 py-3.5 dark:border-white/10 dark:bg-white/[0.02]">
 				<div className="flex min-w-0 items-center gap-3">
 					<FoundersAvatarStack />
 					<div className="min-w-0">
@@ -467,9 +438,11 @@ export function ContactSupportChat({ userName }: { userName?: string | null }) {
 					>
 						{/* Founders welcome greeting bubble matching Reloop design system */}
 						<div className="mb-4 flex w-full flex-col items-start">
-							<div className="max-w-[90%] rounded-2xl rounded-tl-xs border border-stroke-soft-200/80 bg-bg-weak-50 px-4 py-3 text-[14px] leading-relaxed text-text-strong-950 dark:border-white/10 dark:bg-white/[0.05] dark:text-white">
+							<div className="max-w-[90%] rounded-2xl rounded-tl-xs border border-stroke-soft-200/80 bg-bg-weak-50 px-4 py-3 text-[14px] text-text-strong-950 leading-relaxed dark:border-white/10 dark:bg-white/[0.05] dark:text-white">
 								<p className="whitespace-pre-wrap break-words">
-									Hey — this goes straight to the founders&apos; inboxes. Whoever&apos;s free jumps in, so you might hear back from any of us. Tell us what&apos;s up.
+									Hey — this goes straight to the founders&apos; inboxes.
+									Whoever&apos;s free jumps in, so you might hear back from any
+									of us. Tell us what&apos;s up.
 								</p>
 							</div>
 							<p className="mt-1 ml-1 font-mono text-[11px] text-text-soft-400 dark:text-white/35">
@@ -570,11 +543,12 @@ export function ContactSupportChat({ userName }: { userName?: string | null }) {
 
 						<div
 							className={cn(
-								"flex items-center gap-2.5 rounded-full border border-stroke-soft-200 bg-bg-white-0/90 py-1.5 pr-1.5 pl-4 backdrop-blur-md transition-all focus-within:border-text-strong-950/30 focus-within:ring-2 focus-within:ring-text-strong-950/5 dark:border-white/15 dark:bg-[#161616]/90 dark:focus-within:border-white/30",
+								"flex items-center gap-2.5 rounded-full border border-stroke-soft-200 bg-bg-white-0/90 py-1.5 pr-1.5 pl-4 shadow-sm backdrop-blur-md transition-all focus-within:border-text-strong-950/30 focus-within:ring-2 focus-within:ring-text-strong-950/5 dark:border-white/15 dark:bg-[#161616]/90 dark:focus-within:border-white/30",
 								closed && "pointer-events-none opacity-40",
 							)}
 						>
-							<textarea
+							<Textarea.Root
+								simple
 								ref={textareaRef}
 								value={draft}
 								onChange={(e) => {
@@ -590,25 +564,23 @@ export function ContactSupportChat({ userName }: { userName?: string | null }) {
 								}}
 								disabled={closed}
 								placeholder={
-									closed
-										? "Conversation closed"
-										: "Write your message…"
+									closed ? "Conversation closed" : "Write your message…"
 								}
 								rows={1}
-								className="flex-1 resize-none bg-transparent py-1 text-[14px] text-text-strong-950 placeholder-text-soft-400 outline-none dark:text-white dark:placeholder-white/30"
+								className="min-h-0 flex-1 resize-none rounded-none bg-transparent py-1 text-[14px] text-text-strong-950 shadow-none! ring-0 focus:shadow-none focus:ring-0 dark:text-white hover:[&:not(:focus)]:bg-transparent hover:[&:not(:focus)]:ring-0"
 							/>
 							<button
 								type="button"
 								onClick={() => void handleSend()}
 								disabled={!draft.trim() || sending || closed}
 								className={cn(
-									"flex size-8 shrink-0 items-center justify-center rounded-full transition-all cursor-pointer",
+									"flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-full transition-all",
 									draft.trim() && !closed
 										? "bg-text-strong-950 text-white hover:bg-text-strong-950/90 dark:bg-white dark:text-black dark:hover:bg-white/90"
-										: "bg-bg-weak-100 text-text-sub-400 dark:bg-white/10 dark:text-white/30 cursor-not-allowed",
+										: "cursor-not-allowed bg-bg-weak-100 text-text-sub-400 dark:bg-white/10 dark:text-white/30",
 								)}
 							>
-								<SendIcon className="size-3.5" />
+								<Icon name="send-1" className="size-3.5" />
 							</button>
 						</div>
 					</div>
