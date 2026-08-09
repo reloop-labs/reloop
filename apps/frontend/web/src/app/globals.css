@@ -166,3 +166,17 @@
 	margin-top: 0.75rem !important;
 	margin-bottom: 0.75rem !important;
 }
+
+@keyframes infinite-scroll {
+	from {
+		transform: translateX(0);
+	}
+	to {
+		transform: translateX(-50%);
+	}
+}
+
+.animate-infinite-scroll {
+	animation: infinite-scroll 45s linear infinite;
+}
+
