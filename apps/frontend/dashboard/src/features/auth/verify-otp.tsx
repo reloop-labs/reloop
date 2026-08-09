@@ -19,12 +19,14 @@ export function VerifyOTP({
 	email,
 	onBack,
 	inviteId,
+	redirectTo,
 	mode = "login",
 }: {
 	email: string;
 	onBack: () => void;
 	/** Organization invitation id preserved through email OTP auth. */
 	inviteId?: string;
+	redirectTo?: string;
 	mode?: "login" | "signup";
 }) {
 	const router = useRouter();
@@ -77,7 +79,7 @@ export function VerifyOTP({
 				});
 				const destination = await resolvePostAuthDestinationWithQuery(
 					queryClient,
-					{ inviteId: inviteId || null },
+					{ inviteId: inviteId || null, redirectTo: redirectTo || null },
 				);
 				timeoutRef.current = setTimeout(() => {
 					void navigatePostAuth(router, destination);

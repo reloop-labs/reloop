@@ -3,7 +3,6 @@
 import { authClient } from "@reloop/auth/client";
 import * as Button from "@reloop/ui/button";
 import { contactEmail } from "@reloop/web/lib/site";
-import Link from "next/link";
 import { useEffect, useState } from "react";
 import { ContactSupportChat } from "./support-chat";
 
@@ -17,15 +16,15 @@ function LoginPrompt() {
 				<p className="text-[14px] text-text-sub-600 leading-relaxed sm:text-[15px] dark:text-white/45">
 					Log in to your Reloop account so we can open live support for you:
 				</p>
-				<Link
-					href="/dashboard/login"
+				<a
+					href="/dashboard/login?redirectTo=/contact"
 					className={`${Button.buttonVariants({
 						variant: "neutral",
 						mode: "filled",
 					}).root()} mt-5 inline-flex h-10! w-full rounded-full! px-5! font-medium text-sm! sm:mt-6 sm:h-9! sm:w-auto dark:bg-white dark:text-black dark:hover:bg-white/90`}
 				>
 					Log in
-				</Link>
+				</a>
 			</div>
 			<p className="text-[13px] text-text-sub-600 sm:text-[14px] dark:text-white/45">
 				Or email us at{" "}

@@ -9,6 +9,8 @@ import { isInvitationActionable } from "./invitations";
 export type PostAuthDestinationOptions = {
 	/** Deep-linked organization invitation id (from `?inviteId=`). */
 	inviteId?: string | null;
+	/** Deep-linked target redirect path/URL post-auth (from `?redirectTo=` or `?redirect=`). */
+	redirectTo?: string | null;
 };
 
 type OrganizationListResult = {
@@ -29,6 +31,37 @@ export type PostAuthDestinationDeps = {
 };
 
 /**
+ * Validates and sanitizes a return target URL to prevent open redirect vulnerabilities.
+ * Accepts relative paths (starting with `/` but not `//`) or HTTP/HTTPS URLs matching local/prod domains.
+ */
+export function sanitizeRedirectUrl(redirectTo?: string | null): string | null {
+	if (!redirectTo) return null;
+	const trimmed = redirectTo.trim();
+	if (!trimmed) return null;
+
+	if (trimmed.startsWith("/") && !trimmed.startsWith("//")) {
+		return trimmed;
+	}
+
+	try {
+		const parsed = new URL(trimmed);
+		const host = parsed.hostname;
+		if (
+			host === "local.reloop.sh" ||
+			host.endsWith(".local.reloop.sh") ||
+			host === "reloop.sh" ||
+			host.endsWith(".reloop.sh")
+		) {
+			return trimmed;
+		}
+	} catch {
+		// Ignore parsing failure
+	}
+
+	return null;
+}
+
+/**
  * Default deps call Better Auth directly. Prefer
  * `resolvePostAuthDestinationWithQuery` so results share the RQ cache.
  */
@@ -42,10 +75,11 @@ const defaultDeps: PostAuthDestinationDeps = {
  * Where a freshly authenticated user should land.
  *
  * Priority:
- * 1. Explicit invite deep link → accept page
- * 2. Existing organization membership → dashboard home
- * 3. Actionable pending invite (not expired) → accept page
- * 4. Otherwise → onboarding (create a workspace)
+ * 1. Explicit redirect parameter (`?redirectTo=`)
+ * 2. Explicit invite deep link → accept page
+ * 3. Existing organization membership → dashboard home
+ * 4. Actionable pending invite (not expired) → accept page
+ * 5. Otherwise → onboarding (create a workspace)
  *
  * Paths are router-relative (basepath `/dashboard` is applied by the router).
  */
@@ -53,6 +87,11 @@ export async function resolvePostAuthDestination(
 	options: PostAuthDestinationOptions = {},
 	deps: PostAuthDestinationDeps = defaultDeps,
 ): Promise<string> {
+	const sanitizedRedirect = sanitizeRedirectUrl(options.redirectTo);
+	if (sanitizedRedirect) {
+		return sanitizedRedirect;
+	}
+
 	const inviteId = options.inviteId?.trim();
 	if (inviteId) {
 		return `/invite?id=${encodeURIComponent(inviteId)}`;

@@ -8,19 +8,24 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 /** Public path for OAuth return (includes app basepath). */
-function loginCallbackURL(inviteId?: string) {
-	const path = inviteId
-		? `/dashboard/login?inviteId=${inviteId}`
-		: "/dashboard/login";
-	return path;
+function loginCallbackURL(inviteId?: string, redirectTo?: string) {
+	if (inviteId) {
+		return `/dashboard/login?inviteId=${encodeURIComponent(inviteId)}`;
+	}
+	if (redirectTo) {
+		return `/dashboard/login?redirectTo=${encodeURIComponent(redirectTo)}`;
+	}
+	return "/dashboard/login";
 }
 
 export function SocialLogin({
 	onContinueWithEmail,
 	inviteId,
+	redirectTo,
 }: {
 	onContinueWithEmail: () => void;
 	inviteId?: string;
+	redirectTo?: string;
 }) {
 	const [lastLoggedIn, setLastLoggedIn] = useState<string | undefined>(
 		undefined,
@@ -77,7 +82,7 @@ export function SocialLogin({
 					setLoading({ name: "google", loading: true });
 					await authClient.signIn.social({
 						provider: "google",
-						callbackURL: loginCallbackURL(inviteId),
+						callbackURL: loginCallbackURL(inviteId, redirectTo),
 					});
 				} catch {
 					setLoading({ name: "google", loading: false });
@@ -102,7 +107,7 @@ export function SocialLogin({
 					setLoading({ name: "github", loading: true });
 					await authClient.signIn.social({
 						provider: "github",
-						callbackURL: loginCallbackURL(inviteId),
+						callbackURL: loginCallbackURL(inviteId, redirectTo),
 					});
 				} catch {
 					setLoading({ name: "github", loading: false });

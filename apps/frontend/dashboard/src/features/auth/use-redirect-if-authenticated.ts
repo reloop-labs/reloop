@@ -10,7 +10,10 @@ import { resolvePostAuthDestinationWithQuery } from "#/utils/post-auth-destinati
  * When a session already exists, resolve post-auth destination and navigate away.
  * Returns flags so pages can show a loader instead of flashing auth UI.
  */
-export function useRedirectIfAuthenticated(inviteId?: string) {
+export function useRedirectIfAuthenticated(
+	inviteId?: string,
+	redirectTo?: string,
+) {
 	const router = useRouter();
 	const queryClient = useQueryClient();
 	const { data: session, isPending, isLoading } = useSessionQuery();
@@ -21,14 +24,14 @@ export function useRedirectIfAuthenticated(inviteId?: string) {
 		void (async () => {
 			const destination = await resolvePostAuthDestinationWithQuery(
 				queryClient,
-				{ inviteId: inviteId || null },
+				{ inviteId: inviteId || null, redirectTo: redirectTo || null },
 			);
 			if (!cancelled) await navigatePostAuth(router, destination);
 		})();
 		return () => {
 			cancelled = true;
 		};
-	}, [session, router, inviteId, queryClient]);
+	}, [session, router, inviteId, redirectTo, queryClient]);
 
 	const isSessionLoading = isPending || isLoading;
 	const isRedirecting = Boolean(session);

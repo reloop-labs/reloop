@@ -26,11 +26,20 @@ export function LoginPage() {
 		"inviteId",
 		parseAsString.withDefault(""),
 	);
+	const [redirectToQuery] = useQueryState(
+		"redirectTo",
+		parseAsString.withDefault(""),
+	);
+	const [redirectQuery] = useQueryState(
+		"redirect",
+		parseAsString.withDefault(""),
+	);
 	const inviteId = inviteIdQuery || undefined;
+	const redirectTo = redirectToQuery || redirectQuery || undefined;
 
 	const currentLevel = otpSentEmail ? 2 : showEmail ? 1 : 0;
 	const direction = useAuthStepDirection(currentLevel);
-	const { shouldBlockAuthUi } = useRedirectIfAuthenticated(inviteId);
+	const { shouldBlockAuthUi } = useRedirectIfAuthenticated(inviteId, redirectTo);
 
 	if (shouldBlockAuthUi) {
 		return <AuthSessionLoader />;
@@ -67,6 +76,7 @@ export function LoginPage() {
 						email={otpSentEmail}
 						mode="login"
 						inviteId={inviteId}
+						redirectTo={redirectTo}
 						onBack={() => {
 							setOtpSentEmail(null);
 							setEnterCode(null);
@@ -94,6 +104,7 @@ export function LoginPage() {
 					<SocialLogin
 						onContinueWithEmail={() => setShowEmail(true)}
 						inviteId={inviteId}
+						redirectTo={redirectTo}
 					/>
 				</motion.div>
 			) : (
