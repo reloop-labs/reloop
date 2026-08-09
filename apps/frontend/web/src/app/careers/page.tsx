@@ -1,4 +1,5 @@
 import { JsonLd } from "@reloop/web/components/json-ld";
+import { BlogCta } from "@reloop/web/components/landing/blog/blog-cta";
 import {
 	MarketingPageShell,
 	PageSection,
@@ -116,6 +117,9 @@ const CareersPage = () => {
 
 			{/* Keep Up To Date Section */}
 			<KeepUpToDate />
+
+			{/* Blog CTA Section */}
+			<BlogCta />
 		</>
 	);
 };

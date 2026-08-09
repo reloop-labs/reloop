@@ -125,45 +125,60 @@ function renderDiagram04() {
 	return (
 		<div className="flex shrink-0 items-center justify-center">
 			<svg
-				viewBox="0 0 100 100"
+				viewBox="0 0 24 24"
 				className="size-16 text-text-strong-950 sm:size-20 dark:text-white"
 				fill="none"
 				xmlns="http://www.w3.org/2000/svg"
 				aria-hidden="true"
 			>
-				<rect
-					x="30"
-					y="30"
-					width="40"
-					height="40"
-					transform="rotate(14 50 50)"
-					stroke="currentColor"
-					strokeWidth="1.25"
-					strokeDasharray="3 3"
-				/>
-				<rect
-					x="30"
-					y="30"
-					width="40"
-					height="40"
-					transform="rotate(-14 50 50)"
-					stroke="currentColor"
-					strokeWidth="1.25"
-					strokeDasharray="3 3"
-				/>
-				<rect
-					x="30"
-					y="30"
-					width="40"
-					height="40"
-					stroke="currentColor"
-					strokeWidth="1.25"
+				<path
+					fillRule="evenodd"
+					clipRule="evenodd"
+					d="M12 11V23L22 18V6L12 11ZM19 15.6006C18.9999 15.6384 18.9781 15.6726 18.9443 15.6895L16.1445 17.0898C16.0781 17.1229 16 17.0743 16 17V9.16211L19 7.66211V15.6006Z"
+					fill="currentColor"
+					fillOpacity={0.12}
 				/>
 				<path
-					d="M48 50h4M50 48v4"
+					d="M16 9V16.8382C16 16.9125 16.0782 16.9609 16.1447 16.9276L18.9447 15.5276C18.9786 15.5107 19 15.4761 19 15.4382V7.5"
 					stroke="currentColor"
-					strokeWidth="1"
+					strokeWidth="1.2"
+					strokeLinejoin="round"
+				/>
+				<path
+					d="M19 7.5L9 2.5"
+					stroke="currentColor"
+					strokeWidth="1.2"
+					strokeLinejoin="round"
+				/>
+				<path
+					d="M16 9L6 4"
+					stroke="currentColor"
+					strokeWidth="1.2"
+					strokeLinejoin="round"
+				/>
+				<path
+					d="M12 11V23"
+					stroke="currentColor"
+					strokeWidth="1.2"
+					strokeLinejoin="round"
+				/>
+				<path
+					d="M22 6L12.6708 10.6646C12.2485 10.8757 11.7515 10.8757 11.3292 10.6646L2 6"
+					stroke="currentColor"
+					strokeWidth="1.2"
+					strokeLinejoin="round"
+				/>
+				<path
+					d="M8.25 13.125L7 12.5L5.75 11.875"
+					stroke="currentColor"
+					strokeWidth="1.2"
 					strokeLinecap="round"
+				/>
+				<path
+					d="M21.4472 5.72361L12.6708 1.33541C12.2485 1.12426 11.7515 1.12426 11.3292 1.33541L2.55279 5.72361C2.214 5.893 2 6.23926 2 6.61803V17.382C2 17.7607 2.214 18.107 2.55279 18.2764L11.3292 22.6646C11.7515 22.8757 12.2485 22.8757 12.6708 22.6646L21.4472 18.2764C21.786 18.107 22 17.7607 22 17.382V6.61803C22 6.23926 21.786 5.893 21.4472 5.72361Z"
+					stroke="currentColor"
+					strokeWidth="1.2"
+					strokeLinejoin="round"
 				/>
 			</svg>
 		</div>
@@ -188,42 +203,40 @@ export function CareersValues() {
 				<div className="grid grid-cols-1 border-stroke-soft-200 border-t md:grid-cols-2 dark:border-white/10">
 					{/* Left Column (Starts higher) */}
 					<div className="flex flex-col border-stroke-soft-200 md:border-r dark:border-white/10">
-						{/* 01 Customers First */}
+						{/* Users » Σ */}
 						<div className="flex flex-col gap-6 border-stroke-soft-200 border-b p-8 sm:flex-row sm:items-center sm:gap-8 sm:p-10 lg:p-12 dark:border-white/10">
 							{renderDiagram01()}
 							<div className="flex-1">
-								<span className="font-semibold font-mono text-[13px] text-orange-500 sm:text-[14px] dark:text-orange-400">
-									01
-								</span>
-								<h3 className="mt-2 font-semibold text-[1.25rem] text-text-strong-950 tracking-tight sm:text-[1.4rem] lg:text-[1.5rem] dark:text-white">
-									Customers First
+								<h3 className="font-semibold text-[1.25rem] text-text-strong-950 tracking-tight sm:text-[1.4rem] lg:text-[1.5rem] dark:text-white">
+									Users » Σ
 								</h3>
 								<p className="mt-2.5 max-w-lg text-[13.5px] text-text-sub-600 leading-relaxed sm:text-[14px] dark:text-white/60">
-									Our{" "}
+									We speak to our{" "}
 									<span className="underline decoration-dotted decoration-text-sub-600/70 underline-offset-4 dark:decoration-white/50">
-										customers
+										users
+									</span>
+									, have no judgements, and are{" "}
+									<span className="underline decoration-dotted decoration-text-sub-600/70 underline-offset-4 dark:decoration-white/50">
+										obsessed
 									</span>{" "}
-									are the heart of our business. We succeed when they succeed, and
-									we are committed to delivering products that not only meet but
-									exceed their expectations.
+									with understanding them deeply.
 								</p>
 							</div>
 						</div>
 
-						{/* 03 Act as an Owner */}
+						{/* First Principles Thinking */}
 						<div className="flex flex-col gap-6 border-stroke-soft-200 border-b p-8 sm:flex-row sm:items-center sm:gap-8 sm:p-10 lg:p-12 dark:border-white/10">
 							{renderDiagram03()}
 							<div className="flex-1">
-								<span className="font-semibold font-mono text-[13px] text-orange-500 sm:text-[14px] dark:text-orange-400">
-									03
-								</span>
-								<h3 className="mt-2 font-semibold text-[1.25rem] text-text-strong-950 tracking-tight sm:text-[1.4rem] lg:text-[1.5rem] dark:text-white">
-									Act as an Owner
+								<h3 className="font-semibold text-[1.25rem] text-text-strong-950 tracking-tight sm:text-[1.4rem] lg:text-[1.5rem] dark:text-white">
+									First Principles Thinking
 								</h3>
 								<p className="mt-2.5 max-w-lg text-[13.5px] text-text-sub-600 leading-relaxed sm:text-[14px] dark:text-white/60">
-									We empower our team to own projects without the need for
-									redundant meetings or standups. We trust our team to make
-									decisions and take ownership of their work.
+									We challenge status quo by breaking down problems to their{" "}
+									<span className="underline decoration-dotted decoration-text-sub-600/70 underline-offset-4 dark:decoration-white/50">
+										fundamental truths
+									</span>
+									, grounded in logic.
 								</p>
 							</div>
 						</div>
@@ -237,35 +250,28 @@ export function CareersValues() {
 						{/* Top Step Spacer for Right Column */}
 						<div className="hidden h-14 border-stroke-soft-200 border-b md:block lg:h-16 dark:border-white/10" />
 
-						{/* 02 Security by Design */}
+						{/* Obsession Over Craft */}
 						<div className="flex flex-col gap-6 border-stroke-soft-200 border-b p-8 sm:flex-row sm:items-center sm:gap-8 sm:p-10 lg:p-12 dark:border-white/10">
 							{renderDiagram02()}
 							<div className="flex-1">
-								<span className="font-semibold font-mono text-[13px] text-orange-500 sm:text-[14px] dark:text-orange-400">
-									02
-								</span>
-								<h3 className="mt-2 font-semibold text-[1.25rem] text-text-strong-950 tracking-tight sm:text-[1.4rem] lg:text-[1.5rem] dark:text-white">
-									Security by Design
+								<h3 className="font-semibold text-[1.25rem] text-text-strong-950 tracking-tight sm:text-[1.4rem] lg:text-[1.5rem] dark:text-white">
+									Obsession Over Craft
 								</h3>
 								<p className="mt-2.5 max-w-lg text-[13.5px] text-text-sub-600 leading-relaxed sm:text-[14px] dark:text-white/60">
-									Being an open-source company, we uphold trust and transparency
-									in every process. We also{" "}
+									Obsession is in the{" "}
 									<span className="underline decoration-dotted decoration-text-sub-600/70 underline-offset-4 dark:decoration-white/50">
-										regularly audit
+										details
 									</span>{" "}
-									our codebase and infrastructure to ensure it&apos;s secure.
+									and higher the obsession, more the details seem non-existent.
 								</p>
 							</div>
 						</div>
 
-						{/* 04 Don't Stop Shipping */}
+						{/* Don't Stop Shipping */}
 						<div className="flex flex-col gap-6 p-8 sm:flex-row sm:items-center sm:gap-8 sm:p-10 lg:p-12">
 							{renderDiagram04()}
 							<div className="flex-1">
-								<span className="font-semibold font-mono text-[13px] text-orange-500 sm:text-[14px] dark:text-orange-400">
-									04
-								</span>
-								<h3 className="mt-2 font-semibold text-[1.25rem] text-text-strong-950 tracking-tight sm:text-[1.4rem] lg:text-[1.5rem] dark:text-white">
+								<h3 className="font-semibold text-[1.25rem] text-text-strong-950 tracking-tight sm:text-[1.4rem] lg:text-[1.5rem] dark:text-white">
 									Don&apos;t Stop Shipping
 								</h3>
 								<p className="mt-2.5 max-w-lg text-[13.5px] text-text-sub-600 leading-relaxed sm:text-[14px] dark:text-white/60">
