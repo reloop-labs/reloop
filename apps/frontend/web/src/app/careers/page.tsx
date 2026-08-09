@@ -5,7 +5,8 @@ import {
 } from "@reloop/web/components/page-shell";
 import { contactEmail, getSiteUrl, socialProfiles } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
-import { CareersSection } from "./components/careers-section";
+import { CareersContact, CareersCulture } from "./components/careers-section";
+import { CareersValues } from "./components/careers-values";
 import { KeepUpToDate } from "./components/keep-up-to-date";
 
 // TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
@@ -94,17 +95,26 @@ const CareersPage = () => {
 	return (
 		<>
 			<JsonLd data={jsonLd} />
+			{/* Top Hero & Culture Section */}
 			<div className="mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-200 border-x pt-6 pb-16 md:max-w-7xl dark:border-white/10">
 				<MarketingPageShell
 					titleLines={["Careers at Reloop."]}
 					compactHero
 					tightHeroBottom
 				>
-					<PageSection flushTop>
-						<CareersSection />
+					<PageSection narrow flushTop>
+						<CareersCulture />
 					</PageSection>
 				</MarketingPageShell>
 			</div>
+
+			{/* Our Values Section */}
+			<CareersValues />
+
+			{/* Get in Touch Section */}
+			<CareersContact />
+
+			{/* Keep Up To Date Section */}
 			<KeepUpToDate />
 		</>
 	);
