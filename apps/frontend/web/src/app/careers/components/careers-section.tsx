@@ -123,7 +123,7 @@ export function CareersContact() {
 					<h2 className="font-semibold text-text-strong-950 text-xl tracking-tight sm:text-2xl lg:text-[1.65rem] dark:text-white">
 						Think you&apos;d fit here?
 					</h2>
-					<p className="mt-1.5 text-[13.5px] text-text-sub-600 sm:text-[14.5px] dark:text-white/60">
+					<p className="mt-1.5 max-w-2xl text-[13.5px] text-text-sub-600 sm:text-[14.5px] dark:text-white/60">
 						Reloop is open-source email infrastructure for developers. If
 						that&apos;s the work you want to do, send us a note—your GitHub,
 						portfolio, or what you&apos;d help build.

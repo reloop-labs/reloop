@@ -16,7 +16,7 @@ const DEFAULT_VARIANT: CategoryVariant = {
 const CATEGORY_VARIANTS: Record<string, CategoryVariant> = {
 	Careers: {
 		headline: "Your commits are your résumé.",
-		sub: "Reloop is fully open-source. Contribute code, fix bugs, or ship features — and if you're good, we'll find you. No cover letters required.",
+		sub: "Reloop is fully open-source. Contribute code, fix bugs, or ship features — and if you're good, we'll find you.",
 		primaryLabel: "Start Contributing",
 		secondaryLabel: "Browse Good First Issues",
 	},
@@ -152,9 +152,7 @@ export function BlogCta({
 			categoryVariant?.primaryLabel ??
 			DEFAULT_VARIANT.primaryLabel,
 		secondaryLabel:
-			secondaryLabel ??
-			categoryVariant?.secondaryLabel ??
-			"Documentation",
+			secondaryLabel ?? categoryVariant?.secondaryLabel ?? "Documentation",
 	};
 
 	const resolvedAccent =
@@ -197,10 +195,10 @@ export function BlogCta({
 					</div>
 
 					<div className="relative z-10 max-w-3xl">
-						<h2 className="font-sans text-3xl font-medium text-text-strong-950 leading-tight tracking-tight sm:text-4xl lg:text-[2.5rem] dark:text-white">
+						<h2 className="font-medium font-sans text-3xl text-text-strong-950 leading-tight tracking-tight sm:text-4xl lg:text-[2.5rem] dark:text-white">
 							{variant.headline}
 						</h2>
-						<p className="mt-3 text-base text-text-sub-600 leading-relaxed sm:text-lg dark:text-white/60">
+						<p className="mt-3 max-w-xl text-base text-text-sub-600 leading-relaxed sm:text-lg dark:text-white/60">
 							{variant.sub}
 						</p>
 					</div>
