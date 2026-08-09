@@ -192,170 +192,138 @@ export function CareersValues() {
 			<div className="pointer-events-none absolute inset-x-0 top-0 h-48 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-500/[0.04] via-sky-400/[0.02] to-transparent dark:from-blue-500/[0.08] dark:via-transparent" />
 
 			<div className="mx-auto w-full max-w-5xl border-stroke-soft-200 border-x md:max-w-7xl dark:border-white/10">
-				{/* Centered Header with Clouds Pattern and Flag Icon */}
-				<div className="relative pt-32 pb-44 sm:pt-40 sm:pb-56 lg:pt-48 lg:pb-72">
-					<div className="-translate-x-1/2 pointer-events-none absolute top-0 left-1/2 size-full max-w-xl overflow-hidden opacity-50 saturate-[1.25] [mask-image:radial-gradient(closest-side,black_0%,transparent)]">
-						<div className="absolute inset-0 flex w-[200vw]">
-							<img
-								alt=""
-								loading="lazy"
-								width="887"
-								height="267"
-								className="relative block h-full w-auto animate-infinite-scroll [--scroll:-100%] [animation-duration:60s]"
-								src="https://assets.dub.co/about/clouds-pattern.png"
+				{/* Left-Aligned Header with Flag Icon */}
+				<div className="flex flex-col items-start gap-2.5 px-6 py-12 sm:px-10 sm:py-14 lg:px-12">
+					<svg
+						height="18"
+						width="18"
+						viewBox="0 0 18 18"
+						xmlns="http://www.w3.org/2000/svg"
+						className="size-5 text-text-strong-950 dark:text-white"
+						aria-hidden="true"
+					>
+						<g fill="currentColor">
+							<path
+								d="M3.75,3.25h7.5c.552,0,1,.448,1,1v5H3.75"
+								fill="none"
+								stroke="currentColor"
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								strokeWidth="1.5"
 							/>
-							<img
-								alt=""
-								loading="lazy"
-								width="887"
-								height="267"
-								className="-ml-px relative block h-full w-auto animate-infinite-scroll [--scroll:-100%] [animation-duration:60s]"
-								src="https://assets.dub.co/about/clouds-pattern.png"
+							<path
+								d="M12.25,5.75h2c.552,0,1,.448,1,1v4c0,.552-.448,1-1,1h-3.5c-.552,0-1-.448-1-1v-1.5"
+								fill="none"
+								stroke="currentColor"
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								strokeWidth="1.5"
 							/>
-						</div>
-					</div>
-
-					<div className="relative flex flex-col items-center text-center">
-						<svg
-							height="18"
-							width="18"
-							viewBox="0 0 18 18"
-							xmlns="http://www.w3.org/2000/svg"
-							className="size-6 text-neutral-800 dark:text-neutral-200"
-							aria-hidden="true"
-						>
-							<g fill="currentColor">
-								<path
-									d="M3.75,3.25h7.5c.552,0,1,.448,1,1v5H3.75"
-									fill="none"
-									stroke="currentColor"
-									strokeLinecap="round"
-									strokeLinejoin="round"
-									strokeWidth="1.5"
-								/>
-								<path
-									d="M12.25,5.75h2c.552,0,1,.448,1,1v4c0,.552-.448,1-1,1h-3.5c-.552,0-1-.448-1-1v-1.5"
-									fill="none"
-									stroke="currentColor"
-									strokeLinecap="round"
-									strokeLinejoin="round"
-									strokeWidth="1.5"
-								/>
-								<line
-									fill="none"
-									stroke="currentColor"
-									strokeLinecap="round"
-									strokeLinejoin="round"
-									strokeWidth="1.5"
-									x1="10.043"
-									x2="12.25"
-									y1="11.457"
-									y2="9.25"
-								/>
-								<line
-									fill="none"
-									stroke="currentColor"
-									strokeLinecap="round"
-									strokeLinejoin="round"
-									strokeWidth="1.5"
-									x1="3.75"
-									x2="3.75"
-									y1="1.75"
-									y2="16.25"
-								/>
-							</g>
-						</svg>
-						<h2 className="mt-3.5 text-balance font-medium text-3xl text-neutral-900 tracking-tight sm:text-4xl dark:text-white">
-							Our values
-						</h2>
-					</div>
+							<line
+								fill="none"
+								stroke="currentColor"
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								strokeWidth="1.5"
+								x1="10.043"
+								x2="12.25"
+								y1="11.457"
+								y2="9.25"
+							/>
+							<line
+								fill="none"
+								stroke="currentColor"
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								strokeWidth="1.5"
+								x1="3.75"
+								x2="3.75"
+								y1="1.75"
+								y2="16.25"
+							/>
+						</g>
+					</svg>
+					<h2 className="font-semibold text-text-strong-950 text-xl tracking-tight sm:text-2xl lg:text-[1.65rem] dark:text-white">
+						Our values.
+					</h2>
 				</div>
 
-				{/* Stepped / Staggered 2-Column Grid */}
-				<div className="grid grid-cols-1 md:grid-cols-2">
-					{/* Left Column (Starts higher with top border) */}
-					<div className="flex flex-col border-stroke-soft-200 border-t md:border-r dark:border-white/10">
-						{/* Users » Σ */}
-						<div className="flex flex-col gap-6 border-stroke-soft-200 border-b p-8 sm:flex-row sm:items-center sm:gap-8 sm:p-12 lg:p-16 dark:border-white/10">
-							{renderDiagram01()}
-							<div className="flex-1">
-								<h3 className="font-semibold text-[1.15rem] text-text-strong-950 tracking-tight sm:text-[1.25rem] dark:text-white">
-									Users » Σ
-								</h3>
-								<p className="mt-2.5 max-w-lg text-sm text-text-sub-600 leading-relaxed dark:text-white/60">
-									We speak to our{" "}
-									<span className="underline decoration-text-sub-600/70 decoration-dotted underline-offset-4 dark:decoration-white/50">
-										users
-									</span>
-									, have no judgements, and are{" "}
-									<span className="underline decoration-text-sub-600/70 decoration-dotted underline-offset-4 dark:decoration-white/50">
-										obsessed
-									</span>{" "}
-									with understanding them deeply.
-								</p>
-							</div>
-						</div>
-
-						{/* First Principles Thinking */}
-						<div className="flex flex-col gap-6 p-8 sm:flex-row sm:items-center sm:gap-8 sm:p-12 lg:p-16">
-							{renderDiagram03()}
-							<div className="flex-1">
-								<h3 className="font-semibold text-[1.15rem] text-text-strong-950 tracking-tight sm:text-[1.25rem] dark:text-white">
-									First Principles Thinking
-								</h3>
-								<p className="mt-2.5 max-w-lg text-sm text-text-sub-600 leading-relaxed dark:text-white/60">
-									We challenge status quo by breaking down problems to their{" "}
-									<span className="underline decoration-text-sub-600/70 decoration-dotted underline-offset-4 dark:decoration-white/50">
-										fundamental truths
-									</span>
-									, grounded in logic.
-								</p>
-							</div>
+				{/* Aligned 2x2 Grid */}
+				<div className="grid grid-cols-1 border-stroke-soft-200 border-t md:grid-cols-2 dark:border-white/10">
+					{/* Users » Σ (Top Left) */}
+					<div className="flex flex-col gap-6 border-stroke-soft-200 border-b p-8 sm:flex-row sm:items-center sm:gap-8 sm:p-12 md:border-r lg:p-16 dark:border-white/10">
+						{renderDiagram01()}
+						<div className="flex-1">
+							<h3 className="font-semibold text-[1.15rem] text-text-strong-950 tracking-tight sm:text-[1.25rem] dark:text-white">
+								Users » Σ
+							</h3>
+							<p className="mt-2.5 max-w-lg text-sm text-text-sub-600 leading-relaxed dark:text-white/60">
+								We speak to our{" "}
+								<span className="underline decoration-text-sub-600/70 decoration-dotted underline-offset-4 dark:decoration-white/50">
+									users
+								</span>
+								, have no judgements, and are{" "}
+								<span className="underline decoration-text-sub-600/70 decoration-dotted underline-offset-4 dark:decoration-white/50">
+									obsessed
+								</span>{" "}
+								with understanding them deeply.
+							</p>
 						</div>
 					</div>
 
-					{/* Right Column (Stepped down - no top border) */}
-					<div className="flex flex-col">
-						{/* Top Step Spacer for Right Column (Open without top or bottom border) */}
-						<div className="hidden h-20 md:block lg:h-24" />
-
-						{/* Obsession Over Craft (Starts with border-t) */}
-						<div className="flex flex-col gap-6 border-stroke-soft-200 border-t border-b p-8 sm:flex-row sm:items-center sm:gap-8 sm:p-12 lg:p-16 dark:border-white/10">
-							{renderDiagram02()}
-							<div className="flex-1">
-								<h3 className="font-semibold text-[1.15rem] text-text-strong-950 tracking-tight sm:text-[1.25rem] dark:text-white">
-									Obsession Over Craft
-								</h3>
-								<p className="mt-2.5 max-w-lg text-sm text-text-sub-600 leading-relaxed dark:text-white/60">
-									Obsession is in the{" "}
-									<span className="underline decoration-text-sub-600/70 decoration-dotted underline-offset-4 dark:decoration-white/50">
-										details
-									</span>{" "}
-									and higher the obsession, more the details seem non-existent.
-								</p>
-							</div>
+					{/* Obsession Over Craft (Top Right) */}
+					<div className="flex flex-col gap-6 border-stroke-soft-200 border-b p-8 sm:flex-row sm:items-center sm:gap-8 sm:p-12 lg:p-16 dark:border-white/10">
+						{renderDiagram02()}
+						<div className="flex-1">
+							<h3 className="font-semibold text-[1.15rem] text-text-strong-950 tracking-tight sm:text-[1.25rem] dark:text-white">
+								Obsession Over Craft
+							</h3>
+							<p className="mt-2.5 max-w-lg text-sm text-text-sub-600 leading-relaxed dark:text-white/60">
+								Obsession is in the{" "}
+								<span className="underline decoration-text-sub-600/70 decoration-dotted underline-offset-4 dark:decoration-white/50">
+									details
+								</span>{" "}
+								and higher the obsession, more the details seem non-existent.
+							</p>
 						</div>
+					</div>
 
-						{/* Don't Stop Shipping */}
-						<div className="flex flex-col gap-6 p-8 sm:flex-row sm:items-center sm:gap-8 sm:p-12 lg:p-16">
-							{renderDiagram04()}
-							<div className="flex-1">
-								<h3 className="font-semibold text-[1.15rem] text-text-strong-950 tracking-tight sm:text-[1.25rem] dark:text-white">
-									Don&apos;t Stop Shipping
-								</h3>
-								<p className="mt-2.5 max-w-lg text-sm text-text-sub-600 leading-relaxed dark:text-white/60">
-									Complacency is the root of all evil. As a company, you&apos;re
-									either growing or you&apos;re dying. We{" "}
-									<span className="underline decoration-text-sub-600/70 decoration-dotted underline-offset-4 dark:decoration-white/50">
-										ship fast
-									</span>{" "}
-									and{" "}
-									<span className="underline decoration-text-sub-600/70 decoration-dotted underline-offset-4 dark:decoration-white/50">
-										iterate faster
-									</span>{" "}
-									— all without compromising on quality.
-								</p>
-							</div>
+					{/* First Principles Thinking (Bottom Left) */}
+					<div className="flex flex-col gap-6 border-stroke-soft-200 border-b md:border-b-0 p-8 sm:flex-row sm:items-center sm:gap-8 sm:p-12 md:border-r lg:p-16 dark:border-white/10">
+						{renderDiagram03()}
+						<div className="flex-1">
+							<h3 className="font-semibold text-[1.15rem] text-text-strong-950 tracking-tight sm:text-[1.25rem] dark:text-white">
+								First Principles Thinking
+							</h3>
+							<p className="mt-2.5 max-w-lg text-sm text-text-sub-600 leading-relaxed dark:text-white/60">
+								We challenge status quo by breaking down problems to their{" "}
+								<span className="underline decoration-text-sub-600/70 decoration-dotted underline-offset-4 dark:decoration-white/50">
+									fundamental truths
+								</span>
+								, grounded in logic.
+							</p>
+						</div>
+					</div>
+
+					{/* Don't Stop Shipping (Bottom Right) */}
+					<div className="flex flex-col gap-6 p-8 sm:flex-row sm:items-center sm:gap-8 sm:p-12 lg:p-16">
+						{renderDiagram04()}
+						<div className="flex-1">
+							<h3 className="font-semibold text-[1.15rem] text-text-strong-950 tracking-tight sm:text-[1.25rem] dark:text-white">
+								Don&apos;t Stop Shipping
+							</h3>
+							<p className="mt-2.5 max-w-lg text-sm text-text-sub-600 leading-relaxed dark:text-white/60">
+								Complacency is the root of all evil. As a company, you&apos;re
+								either growing or you&apos;re dying. We{" "}
+								<span className="underline decoration-text-sub-600/70 decoration-dotted underline-offset-4 dark:decoration-white/50">
+									ship fast
+								</span>{" "}
+								and{" "}
+								<span className="underline decoration-text-sub-600/70 decoration-dotted underline-offset-4 dark:decoration-white/50">
+									iterate faster
+								</span>{" "}
+								— all without compromising on quality.
+							</p>
 						</div>
 					</div>
 				</div>

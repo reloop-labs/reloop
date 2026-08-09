@@ -118,6 +118,16 @@ export function CareersContact() {
 	return (
 		<section className="relative w-full border-stroke-soft-200 border-t bg-bg-white-0 text-text-strong-950 dark:border-white/10 dark:bg-black dark:text-white">
 			<div className="mx-auto w-full max-w-5xl border-stroke-soft-200 border-x md:max-w-7xl dark:border-white/10">
+				{/* Section Header */}
+				<div className="border-stroke-soft-200 border-b px-6 py-14 sm:px-10 sm:py-16 lg:px-12 dark:border-white/10">
+					<h2 className="font-semibold text-text-strong-950 text-xl tracking-tight sm:text-2xl lg:text-[1.65rem] dark:text-white">
+						Open positions.
+					</h2>
+					<p className="mt-1.5 text-[13.5px] text-text-sub-600 sm:text-[14.5px] dark:text-white/60">
+						Find your next role at Reloop or pitch your own.
+					</p>
+				</div>
+
 				{/* 2-Column Box */}
 				<div className="grid grid-cols-1 md:grid-cols-2">
 					{/* Left Column: Heading, Subtext, Card Box with Introduce yourself, and GitHub link */}
