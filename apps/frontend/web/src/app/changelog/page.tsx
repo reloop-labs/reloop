@@ -91,10 +91,10 @@ const ChangelogPage = async ({ searchParams }: PageProps) => {
 		<div>
 			<ChangelogGridHero>
 				<div>
-					<h1 className="max-w-3xl font-semibold text-3xl text-text-strong-950 leading-[1.15] tracking-tight sm:text-4xl lg:text-[2.6rem] dark:text-white">
+					<h1 className="max-w-3xl font-semibold text-xl text-text-strong-950 leading-snug tracking-tight sm:text-2xl lg:text-[1.65rem] dark:text-white">
 						Changelog
 					</h1>
-					<p className="mt-4 max-w-2xl text-[15px] text-text-sub-600 leading-relaxed sm:text-[16px] dark:text-white/60">
+					<p className="mt-3 max-w-2xl text-[14px] text-text-sub-600 leading-relaxed sm:text-[14.5px] dark:text-white/60">
 						All the latest updates, improvements, and fixes to Reloop
 					</p>
 				</div>
