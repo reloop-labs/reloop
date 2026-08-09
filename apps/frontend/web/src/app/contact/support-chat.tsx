@@ -2,6 +2,7 @@
 
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
+import Image from "next/image";
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 
 type SupportConversation = {
@@ -71,26 +72,23 @@ function formatTime(value: string) {
 			d.getMonth() === now.getMonth() &&
 			d.getDate() === now.getDate();
 		if (sameDay) {
-			return d.toLocaleTimeString(undefined, {
-				hour: "2-digit",
-				minute: "2-digit",
-			});
+			return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 		}
-		return d.toLocaleString(undefined, {
+		return d.toLocaleDateString([], {
 			month: "short",
 			day: "numeric",
 			hour: "2-digit",
 			minute: "2-digit",
 		});
 	} catch {
-		return "";
+		return value;
 	}
 }
 
 function greetingForHour() {
-	const hour = new Date().getHours();
-	if (hour < 12) return "Good morning";
-	if (hour < 18) return "Good afternoon";
+	const h = new Date().getHours();
+	if (h < 12) return "Good morning";
+	if (h < 17) return "Good afternoon";
 	return "Good evening";
 }
 
@@ -103,59 +101,69 @@ function useSupportSocket({
 }) {
 	const [ready, setReady] = useState(false);
 	const wsRef = useRef<WebSocket | null>(null);
+	const reconnectTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 	const onEventRef = useRef(onEvent);
 	onEventRef.current = onEvent;
-	const reconnectTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-	const send = useCallback((payload: Record<string, unknown>) => {
-		const ws = wsRef.current;
-		if (!ws || ws.readyState !== WebSocket.OPEN) return false;
-		ws.send(JSON.stringify(payload));
-		return true;
-	}, []);
-
-	const join = useCallback(
-		(conversationId: string) => send({ type: "join", conversationId }),
-		[send],
-	);
-
-	const leave = useCallback(
-		(conversationId: string) => send({ type: "leave", conversationId }),
-		[send],
-	);
-
-	useEffect(() => {
+	const connect = useCallback(() => {
 		if (!enabled) return;
+		const url = supportWsUrl();
+		if (!url) return;
 
-		let closed = false;
-
-		const connect = () => {
-			const url = supportWsUrl();
-			if (!url) return;
+		try {
 			const ws = new WebSocket(url);
 			wsRef.current = ws;
 
-			ws.onopen = () => setReady(true);
+			ws.onopen = () => {
+				setReady(true);
+			};
 
-			ws.onmessage = (ev) => {
+			ws.onmessage = (e) => {
 				try {
-					const data = JSON.parse(String(ev.data)) as SupportServerEvent;
-					onEventRef.current?.(data);
+					const data = JSON.parse(e.data as string) as SupportServerEvent;
+					onEventRef.current(data);
 				} catch {
-					// ignore malformed frames
+					// ignore malformed frame
 				}
 			};
 
 			ws.onclose = () => {
 				setReady(false);
-				wsRef.current = null;
-				if (!closed) {
-					reconnectTimer.current = setTimeout(connect, 2000);
+				if (enabled) {
+					reconnectTimer.current = setTimeout(connect, 3000);
 				}
 			};
 
-			ws.onerror = () => ws.close();
-		};
+			ws.onerror = () => {
+				setReady(false);
+			};
+		} catch {
+			setReady(false);
+			if (enabled) {
+				reconnectTimer.current = setTimeout(connect, 3000);
+			}
+		}
+	}, [enabled]);
+
+	const join = useCallback((conversationId: string) => {
+		if (wsRef.current?.readyState === WebSocket.OPEN) {
+			wsRef.current.send(
+				JSON.stringify({ type: "join", conversationId }),
+			);
+		}
+	}, []);
+
+	const leave = useCallback((conversationId: string) => {
+		if (wsRef.current?.readyState === WebSocket.OPEN) {
+			wsRef.current.send(
+				JSON.stringify({ type: "leave", conversationId }),
+			);
+		}
+	}, []);
+
+	useEffect(() => {
+		if (!enabled) return;
+		let closed = false;
 
 		connect();
 
@@ -166,22 +174,29 @@ function useSupportSocket({
 			wsRef.current = null;
 			setReady(false);
 		};
-	}, [enabled]);
+	}, [enabled, connect]);
 
 	return { ready, join, leave };
 }
 
 export function FoundersAvatarStack() {
 	return (
-		<div className="relative flex items-center -space-x-2.5">
-			<div className="flex size-7 items-center justify-center rounded-full bg-amber-500/20 text-[11px] font-semibold text-amber-700 ring-2 ring-white dark:bg-amber-500/20 dark:text-amber-300 dark:ring-[#0c0c0c]">
-				MO
+		<div className="relative flex items-center -space-x-2">
+			<div className="relative size-7 overflow-hidden rounded-full border border-stroke-soft-200 bg-bg-weak-50 ring-2 ring-white dark:border-white/10 dark:bg-white/5 dark:ring-[#0c0c0c]">
+				<Image
+					src="/company/team/pranav-patel.jpg"
+					alt="Pranav Patel"
+					fill
+					className="object-cover object-top"
+				/>
 			</div>
-			<div className="flex size-7 items-center justify-center rounded-full bg-blue-500/20 text-[11px] font-semibold text-blue-700 ring-2 ring-white dark:bg-blue-500/20 dark:text-blue-300 dark:ring-[#0c0c0c]">
-				TL
-			</div>
-			<div className="relative flex size-7 items-center justify-center rounded-full bg-emerald-500/20 text-[11px] font-semibold text-emerald-700 ring-2 ring-white dark:bg-emerald-500/20 dark:text-emerald-300 dark:ring-[#0c0c0c]">
-				PR
+			<div className="relative size-7 overflow-hidden rounded-full border border-stroke-soft-200 bg-bg-weak-50 ring-2 ring-white dark:border-white/10 dark:bg-white/5 dark:ring-[#0c0c0c]">
+				<Image
+					src="/company/team/twinkal-p.jpg"
+					alt="Twinkal P"
+					fill
+					className="object-cover object-top"
+				/>
 				<span className="absolute bottom-0 right-0 size-2 rounded-full border-2 border-white bg-emerald-500 dark:border-[#0c0c0c]" />
 			</div>
 		</div>
@@ -385,7 +400,7 @@ export function ContactSupportChat({ userName }: { userName?: string | null }) {
 							The Founders
 						</h2>
 						<p className="truncate text-[11px] text-text-sub-600 dark:text-white/45">
-							Maya · Theo · Priya · replies in ~2 mins
+							Pranav · Twinkal · replies in ~2 mins
 						</p>
 					</div>
 				</div>
@@ -444,7 +459,7 @@ export function ContactSupportChat({ userName }: { userName?: string | null }) {
 					<div
 						ref={viewportRef}
 						onScroll={onViewportScroll}
-						className="relative min-h-0 flex-1 overflow-y-auto px-4 py-4"
+						className="relative min-h-0 flex-1 overflow-y-auto px-4 pt-4 pb-20"
 						role="log"
 						aria-label="Support messages"
 						aria-relevant="additions"
@@ -533,10 +548,10 @@ export function ContactSupportChat({ userName }: { userName?: string | null }) {
 						</p>
 					) : null}
 
-					{/* Composer */}
-					<div className="shrink-0 border-t border-stroke-soft-200 bg-bg-white-0 p-3 dark:border-white/10 dark:bg-[#0c0c0c]">
+					{/* Floating Composer */}
+					<div className="absolute inset-x-3 bottom-3 z-10">
 						{closed ? (
-							<div className="mb-3 rounded-xl border border-stroke-soft-200 bg-bg-weak-50 p-3 dark:border-white/10 dark:bg-white/[0.03]">
+							<div className="mb-2 rounded-2xl border border-stroke-soft-200 bg-bg-white-0/95 p-3 backdrop-blur-md dark:border-white/10 dark:bg-[#161616]/95">
 								<p className="font-medium text-[12px] text-text-strong-950 dark:text-white">
 									This conversation is closed
 								</p>
@@ -555,7 +570,7 @@ export function ContactSupportChat({ userName }: { userName?: string | null }) {
 
 						<div
 							className={cn(
-								"flex items-center gap-2.5 rounded-2xl border border-stroke-soft-200 bg-bg-weak-50/50 px-3.5 py-2.5 transition-all focus-within:border-blue-500/50 focus-within:ring-2 focus-within:ring-blue-500/10 dark:border-white/10 dark:bg-white/[0.02]",
+								"flex items-center gap-2.5 rounded-full border border-stroke-soft-200 bg-bg-white-0/90 py-1.5 pr-1.5 pl-4 backdrop-blur-md transition-all focus-within:border-text-strong-950/30 focus-within:ring-2 focus-within:ring-text-strong-950/5 dark:border-white/15 dark:bg-[#161616]/90 dark:focus-within:border-white/30",
 								closed && "pointer-events-none opacity-40",
 							)}
 						>
@@ -565,7 +580,7 @@ export function ContactSupportChat({ userName }: { userName?: string | null }) {
 								onChange={(e) => {
 									setDraft(e.target.value);
 									e.target.style.height = "auto";
-									e.target.style.height = `${Math.min(e.target.scrollHeight, 120)}px`;
+									e.target.style.height = `${Math.min(e.target.scrollHeight, 100)}px`;
 								}}
 								onKeyDown={(e) => {
 									if (e.key === "Enter" && !e.shiftKey) {
@@ -580,20 +595,20 @@ export function ContactSupportChat({ userName }: { userName?: string | null }) {
 										: "Write your message…"
 								}
 								rows={1}
-								className="flex-1 resize-none bg-transparent text-[14px] text-text-strong-950 placeholder-text-soft-400 outline-none dark:text-white dark:placeholder-white/30"
+								className="flex-1 resize-none bg-transparent py-1 text-[14px] text-text-strong-950 placeholder-text-soft-400 outline-none dark:text-white dark:placeholder-white/30"
 							/>
 							<button
 								type="button"
 								onClick={() => void handleSend()}
 								disabled={!draft.trim() || sending || closed}
 								className={cn(
-									"flex size-9 shrink-0 items-center justify-center rounded-full transition-all cursor-pointer",
+									"flex size-8 shrink-0 items-center justify-center rounded-full transition-all cursor-pointer",
 									draft.trim() && !closed
-										? "bg-text-strong-950 text-white dark:bg-white dark:text-black"
-										: "bg-bg-weak-100 text-text-sub-400 dark:bg-white/5 dark:text-white/20 cursor-not-allowed",
+										? "bg-text-strong-950 text-white hover:bg-text-strong-950/90 dark:bg-white dark:text-black dark:hover:bg-white/90"
+										: "bg-bg-weak-100 text-text-sub-400 dark:bg-white/10 dark:text-white/30 cursor-not-allowed",
 								)}
 							>
-								<SendIcon className="size-4" />
+								<SendIcon className="size-3.5" />
 							</button>
 						</div>
 					</div>

@@ -18,7 +18,7 @@ function LoginPromptCard() {
 							The Founders
 						</h2>
 						<p className="truncate text-[11px] text-text-sub-600 dark:text-white/45">
-							Maya · Theo · Priya · replies in ~2 mins
+							Pranav · Twinkal · replies in ~2 mins
 						</p>
 					</div>
 				</div>
