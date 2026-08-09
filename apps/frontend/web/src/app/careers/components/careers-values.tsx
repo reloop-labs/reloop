@@ -193,7 +193,7 @@ export function CareersValues() {
 
 			<div className="mx-auto w-full max-w-5xl border-stroke-soft-200 border-x md:max-w-7xl dark:border-white/10">
 				{/* Centered Header with Clouds Pattern and Flag Icon */}
-				<div className="relative pt-36 pb-24 sm:pt-44 sm:pb-28 lg:pt-52 lg:pb-32">
+				<div className="relative pt-32 pb-44 sm:pt-40 sm:pb-56 lg:pt-48 lg:pb-72">
 					<div className="-translate-x-1/2 pointer-events-none absolute top-0 left-1/2 size-full max-w-xl overflow-hidden opacity-50 saturate-[1.25] [mask-image:radial-gradient(closest-side,black_0%,transparent)]">
 						<div className="absolute inset-0 flex w-[200vw]">
 							<img
@@ -272,7 +272,7 @@ export function CareersValues() {
 				</div>
 
 				{/* Stepped / Staggered 2-Column Grid */}
-				<div className="grid grid-cols-1 pb-28 sm:pb-36 md:grid-cols-2 lg:pb-48">
+				<div className="grid grid-cols-1 md:grid-cols-2">
 					{/* Left Column (Starts higher with top border) */}
 					<div className="flex flex-col border-stroke-soft-200 border-t md:border-r dark:border-white/10">
 						{/* Users » Σ */}
@@ -297,7 +297,7 @@ export function CareersValues() {
 						</div>
 
 						{/* First Principles Thinking */}
-						<div className="flex flex-col gap-6 border-stroke-soft-200 border-b p-8 sm:flex-row sm:items-center sm:gap-8 sm:p-12 lg:p-16 dark:border-white/10">
+						<div className="flex flex-col gap-6 p-8 sm:flex-row sm:items-center sm:gap-8 sm:p-12 lg:p-16">
 							{renderDiagram03()}
 							<div className="flex-1">
 								<h3 className="font-semibold text-[1.15rem] text-text-strong-950 tracking-tight sm:text-[1.25rem] dark:text-white">
@@ -312,9 +312,6 @@ export function CareersValues() {
 								</p>
 							</div>
 						</div>
-
-						{/* Bottom Step Spacer for Left Column */}
-						<div className="hidden h-28 md:block lg:h-36" />
 					</div>
 
 					{/* Right Column (Stepped down - no top border) */}
