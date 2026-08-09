@@ -121,51 +121,37 @@ export function CareersContact() {
 				{/* Section Header */}
 				<div className="border-stroke-soft-200 border-b px-6 py-14 sm:px-10 sm:py-16 lg:px-12 dark:border-white/10">
 					<h2 className="font-semibold text-text-strong-950 text-xl tracking-tight sm:text-2xl lg:text-[1.65rem] dark:text-white">
-						Open positions.
+						Think you&apos;d fit here?
 					</h2>
 					<p className="mt-1.5 text-[13.5px] text-text-sub-600 sm:text-[14.5px] dark:text-white/60">
-						Find your next role at Reloop or pitch your own.
+						Reloop is open-source email infrastructure for developers. If
+						that&apos;s the work you want to do, send us a note—your GitHub,
+						portfolio, or what you&apos;d help build.
 					</p>
 				</div>
 
 				{/* 2-Column Box */}
 				<div className="grid grid-cols-1 md:grid-cols-2">
-					{/* Left Column: Heading, Subtext, Card Box with Introduce yourself, and GitHub link */}
+					{/* Left Column: Get in touch, Card Box with Introduce yourself, and GitHub link */}
 					<div className="flex flex-col justify-between border-stroke-soft-200 p-6 sm:p-8 md:border-r lg:p-10 dark:border-white/10">
 						<div>
-							<p className="font-semibold text-text-sub-600 text-xs uppercase tracking-wider">
-								Get in touch
+							<p className="text-sm text-text-sub-600 leading-relaxed dark:text-white/60">
+								We read every message. Skip the cover letter template. Tell us
+								what you&apos;d work on and why it matters to you.
 							</p>
-							<h2 className="mt-2.5 font-semibold text-2xl text-text-strong-950 tracking-tight sm:text-[1.75rem] dark:text-white">
-								Think you&apos;d fit here?
-							</h2>
-							<p className="mt-3 text-sm text-text-sub-600 leading-relaxed dark:text-white/60">
-								Reloop is open-source email infrastructure for developers. If
-								that&apos;s the work you want to do, send us a note—your GitHub,
-								portfolio, or what you&apos;d help build.
-							</p>
-						</div>
-
-						<div className="mt-6">
-							<div className="rounded-2xl border border-stroke-soft-200 bg-bg-weak-50 p-5 text-center sm:p-6 dark:border-white/[0.08] dark:bg-white/[0.03]">
-								<p className="text-sm text-text-sub-600 leading-relaxed dark:text-white/60">
-									We read every message. Skip the cover letter template. Tell us
-									what you&apos;d work on and why it matters to you.
-								</p>
-								<div className="mt-4 flex justify-center">
-									<a
-										href={careersMailto}
-										className={`${Button.buttonVariants({
-											variant: "neutral",
-											mode: "filled",
-										}).root()} inline-flex h-9! rounded-full! px-5! font-medium text-xs! sm:h-10! sm:px-6! sm:text-sm! dark:bg-white dark:text-black dark:hover:bg-white/90`}
-									>
-										Introduce yourself
-									</a>
-								</div>
+							<div className="mt-4 flex">
+								<a
+									href={careersMailto}
+									className={`${Button.buttonVariants({
+										variant: "neutral",
+										mode: "filled",
+									}).root()} inline-flex h-9! rounded-full! px-5! font-medium text-xs! sm:h-10! sm:px-6! sm:text-sm! dark:bg-white dark:text-black dark:hover:bg-white/90`}
+								>
+									Introduce yourself
+								</a>
 							</div>
 
-							<p className="mt-4 text-center text-text-sub-600 text-xs sm:text-left dark:text-white/45">
+							<p className="mt-6 text-text-sub-600 text-xs dark:text-white/45">
 								Want to show your work first?{" "}
 								<Link
 									href={socialProfiles.github}
