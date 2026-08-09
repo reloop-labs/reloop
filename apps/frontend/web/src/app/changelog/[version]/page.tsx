@@ -75,13 +75,13 @@ export default async function ChangelogReleasePage({ params }: PageProps) {
 				</div>
 
 				{/* Title */}
-				<h1 className="mt-5 font-semibold text-3xl text-text-strong-950 leading-[1.15] tracking-tight sm:text-4xl lg:text-[2.6rem] dark:text-white">
+				<h1 className="mt-4 font-semibold text-xl text-text-strong-950 leading-snug tracking-tight sm:text-2xl lg:text-[1.65rem] dark:text-white">
 					{release.title}
 				</h1>
 
 				{/* Tag Bullet Dots */}
 				{release.tags && release.tags.length > 0 && (
-					<div className="mt-3.5 flex flex-wrap items-center gap-x-4 gap-y-2 font-medium text-[13px] text-text-sub-600 dark:text-white/60">
+					<div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 font-medium text-[12.5px] text-text-sub-600 dark:text-white/60">
 						{release.tags.map((tag) => (
 							<div key={tag} className="flex items-center gap-1.5">
 								<span
@@ -95,7 +95,7 @@ export default async function ChangelogReleasePage({ params }: PageProps) {
 				)}
 
 				{/* Lead Description */}
-				<p className="mt-6 max-w-2xl text-[15px] text-text-sub-600 leading-relaxed sm:text-[16px] dark:text-white/60">
+				<p className="mt-5 max-w-2xl text-[14px] text-text-sub-600 leading-relaxed sm:text-[14.5px] dark:text-white/60">
 					{release.description}
 				</p>
 

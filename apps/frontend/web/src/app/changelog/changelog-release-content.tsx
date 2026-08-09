@@ -37,15 +37,15 @@ export function getReleaseMarkdown(release: ChangelogRelease): string {
 
 const changelogMdxComponents: MDXComponents = {
 	h3: ({ children }) => (
-		<h3 className="mt-8 mb-3 font-medium text-[11px] text-text-sub-600 uppercase tracking-wider first:mt-0 dark:text-white/40">
+		<h3 className="mt-7 mb-2.5 font-medium text-[11px] text-text-sub-600 uppercase tracking-wider first:mt-0 dark:text-white/40">
 			{children}
 		</h3>
 	),
-	ul: ({ children }) => <ul className="my-3 space-y-3.5">{children}</ul>,
+	ul: ({ children }) => <ul className="my-3 space-y-3">{children}</ul>,
 	li: ({ children }) => (
-		<li className="flex items-start gap-3 text-[14.5px] text-text-sub-600 leading-relaxed sm:text-[15px] dark:text-white/60">
+		<li className="flex items-start gap-3 text-[14px] text-text-sub-600 leading-relaxed sm:text-[14.5px] dark:text-white/60">
 			<span
-				className="mt-2.5 size-1 shrink-0 rounded-[1px] bg-text-sub-600/40 dark:bg-white/35"
+				className="mt-2 size-1 shrink-0 rounded-[1px] bg-text-sub-600/40 dark:bg-white/35"
 				aria-hidden="true"
 			/>
 			<div>{children}</div>
@@ -57,7 +57,7 @@ const changelogMdxComponents: MDXComponents = {
 		</strong>
 	),
 	p: ({ children }) => (
-		<p className="my-3 text-[14.5px] text-text-sub-600 leading-relaxed sm:text-[15px] dark:text-white/60">
+		<p className="my-2.5 text-[14px] text-text-sub-600 leading-relaxed sm:text-[14.5px] dark:text-white/60">
 			{children}
 		</p>
 	),
