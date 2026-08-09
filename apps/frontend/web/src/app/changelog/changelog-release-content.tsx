@@ -1,4 +1,3 @@
-import { CodeBlock } from "@reloop/web/components/page-shell";
 import type { ChangelogCategory, ChangelogRelease } from "./changelog-types";
 
 const categoryOrder: ChangelogCategory[] = [
@@ -60,12 +59,13 @@ export function ChangelogReleaseContent({
 	release: ChangelogRelease;
 }) {
 	return (
-		<div>
-			<ReleaseSections release={release} />
-
-			{release.code && (
-				<div className="mt-10">
-					<CodeBlock>{release.code}</CodeBlock>
+		<div className="space-y-8">
+			{release.sections && release.sections.length > 0 && (
+				<ReleaseSections release={release} />
+			)}
+			{release.markdown && (
+				<div className="prose prose-neutral max-w-none text-[15px] text-text-sub-600 leading-relaxed dark:prose-invert dark:text-white/65">
+					{release.markdown}
 				</div>
 			)}
 		</div>

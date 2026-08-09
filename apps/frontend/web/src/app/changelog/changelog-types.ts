@@ -28,6 +28,8 @@ export type ChangelogRelease = {
 	/** Legacy flat list; use `sections` for categorized entries. */
 	items?: ChangelogItem[];
 	sections?: ChangelogSection[];
+	/** Markdown content string for freeform markdown release notes. */
+	markdown?: string;
 	code?: string;
 	preview?: {
 		src: string;
