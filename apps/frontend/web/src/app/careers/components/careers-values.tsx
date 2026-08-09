@@ -10,23 +10,51 @@ function renderDiagram01() {
 				xmlns="http://www.w3.org/2000/svg"
 				aria-hidden="true"
 			>
-				<path
-					d="M7.78463 1.91187L5.44686 3.34204L5.00684 3.56208L8.41717 5.07473L10.8099 8.12753L12.7615 7.38666L14.3317 7.94228L16.778 9.8877L18.5932 13.5181V16.9284L20.1054 16.2525L21.3434 14.7557L21.1234 11.5104L19.0607 7.57748L15.5404 5.67979L13.2851 6.31235L11.36 3.56208L7.78463 1.91187Z"
-					fill="currentColor"
-					fillOpacity={0.12}
-				/>
-				<path
-					d="M3.94828 4.09247C2.22588 5.12409 2.22588 8.21957 3.94828 11.0064L10.1486 21.2202C10.4383 21.6974 11.0627 21.845 11.5354 21.548L17.4028 17.8618C19.1252 16.8302 19.1252 13.7347 17.4028 10.9479C15.6804 8.16105 12.8878 6.73817 11.1654 7.76979C10.9828 7.8792 10.8195 8.01183 10.6755 8.16484C10.5316 7.86516 10.3683 7.56613 10.1856 7.27057C8.46324 4.48373 5.67068 3.06085 3.94828 4.09247Z"
-					stroke="currentColor"
-					strokeWidth="1.2"
-					strokeLinejoin="round"
-				/>
-				<path
-					d="M14.2054 19.8719L20.0502 16.2168C21.7726 15.1852 21.7726 12.0897 20.0502 9.3029C18.3278 6.51606 15.5352 5.09318 13.8128 6.1248C13.6302 6.23421 13.4669 6.36683 13.3229 6.51984C13.179 6.22017 13.0157 5.92114 12.833 5.62557C11.1106 2.83874 8.31808 1.41585 6.59568 2.44748L5.73298 2.98437L4.00757 4.05741"
-					stroke="currentColor"
-					strokeWidth="1.2"
-					strokeLinejoin="round"
-				/>
+				<g fill="none" className="nc-icon-wrapper">
+					<path
+						d="M9.5 13C9 9.99997 5.5 6.99997 2.5 8.99997L4 7.49997L5.50968 7.15344L6.94067 7.23765L8.25 7.99997L9.5 8.99997L11.5 12L9.5 13Z"
+						fill="currentColor"
+						fillOpacity={0.12}
+					/>
+					<path
+						d="M22 16.8309V13.8309L16.4044 16.6288L14.2596 17.7011L12 18.8309V21.8309L22 16.8309Z"
+						fill="currentColor"
+						fillOpacity={0.12}
+					/>
+					<path
+						d="M22 14.3309V16.2129C22 16.5917 21.786 16.9379 21.4472 17.1073L12.4472 21.6073C12.1657 21.7481 11.8343 21.7481 11.5528 21.6073L2.82918 17.2455C2.321 16.9914 2 16.472 2 15.9039V10.8437C2 8.08122 4.90716 6.28449 7.37801 7.51992C10.2107 8.93625 12 11.8314 12 14.9985V21.7071"
+						stroke="currentColor"
+						strokeWidth="1.2"
+						strokeLinejoin="round"
+					/>
+					<path
+						d="M22 15.2129V9.99852C22 6.83151 20.2106 3.93631 17.378 2.51998C16.0522 1.8571 14.7445 2.23172 13.5403 2.831L4.20703 7.44812"
+						stroke="currentColor"
+						strokeWidth="1.2"
+						strokeLinejoin="round"
+					/>
+					<path
+						d="M11.5 12.0809L2.15186 16.755"
+						stroke="currentColor"
+						strokeWidth="1.2"
+						strokeLinejoin="round"
+					/>
+					<path
+						d="M14.1079 16.2243C14.1447 17 14.7276 17.2875 15.4098 16.8664C16.092 16.4453 16.6152 15.475 16.5783 14.6993C16.5415 13.9236 15.9586 13.6362 15.2764 14.0573C14.5942 14.4784 14.0711 15.4486 14.1079 16.2243Z"
+						stroke="currentColor"
+						strokeWidth="1.2"
+						strokeLinejoin="round"
+					/>
+					<path
+						d="M18 5.83093L15 7.33093V10.8309L15.7889 10.4365C17.144 9.75894 18 8.37388 18 6.8588V5.83093Z"
+						fill="currentColor"
+						fillOpacity={0.12}
+					/>
+					<path
+						d="M15 7.33093L14.7764 6.88372L14.5 7.02192V7.33093H15ZM18 5.83093H18.5C18.5 5.65764 18.4103 5.49671 18.2629 5.40561C18.1155 5.3145 17.9314 5.30622 17.7764 5.38372L18 5.83093ZM15.7889 10.4365L15.5652 9.98929L15.7889 10.4365ZM15 7.33093L15.2236 7.77815L18.2236 6.27815L18 5.83093L17.7764 5.38372L14.7764 6.88372L15 7.33093ZM18 5.83093H17.5V6.8588H18H18.5V5.83093H18ZM15 14.3309H15.5V10.8309H15H14.5V14.3309H15ZM15 10.8309H15.5V7.33093H15H14.5V10.8309H15ZM15.7889 10.4365L15.5652 9.98929L14.7764 10.3837L15 10.8309L15.2236 11.2781L16.0125 10.8837L15.7889 10.4365ZM18 6.8588H17.5C17.5 8.1845 16.751 9.39642 15.5652 9.98929L15.7889 10.4365L16.0125 10.8837C17.537 10.1215 18.5 8.56327 18.5 6.8588H18Z"
+						fill="currentColor"
+					/>
+				</g>
 			</svg>
 		</div>
 	);
@@ -42,34 +70,50 @@ function renderDiagram02() {
 				xmlns="http://www.w3.org/2000/svg"
 				aria-hidden="true"
 			>
-				<path
-					d="M14.5 10.2V20L12 19V10L11.5 9L7 6.5V5L13.4412 8.43529C14.0929 8.78288 14.5 9.46138 14.5 10.2Z"
-					fill="currentColor"
-					fillOpacity={0.12}
-				/>
-				<path
-					d="M19.5 8.7V18.5L17 17.5V8.5L16.5 7.5L12 5V3.5L18.4412 6.93529C19.0929 7.28288 19.5 7.96138 19.5 8.7Z"
-					fill="currentColor"
-					fillOpacity={0.12}
-				/>
-				<path
-					d="M17 17.5L20.5528 19.2764C21.2177 19.6088 22 19.1253 22 18.382V6.92705C22 6.35889 21.679 5.8395 21.1708 5.58541L13.4472 1.72361C12.7823 1.39116 12 1.87465 12 2.61803V5"
-					stroke="currentColor"
-					strokeWidth="1.2"
-					strokeLinejoin="round"
-				/>
-				<path
-					d="M12 19L15.5528 20.7764C16.2177 21.1088 17 20.6253 17 19.882V8.42705C17 7.85889 16.679 7.3395 16.1708 7.08541L8.44721 3.22361C7.78231 2.89116 7 3.37465 7 4.11803V6.5"
-					stroke="currentColor"
-					strokeWidth="1.2"
-					strokeLinejoin="round"
-				/>
-				<path
-					d="M2.82918 18.4146L10.5528 22.2764C11.2177 22.6088 12 22.1253 12 21.382V9.92705C12 9.35889 11.679 8.8395 11.1708 8.58541L3.44721 4.72361C2.78231 4.39116 2 4.87465 2 5.61803V17.0729C2 17.6411 2.321 18.1605 2.82918 18.4146Z"
-					stroke="currentColor"
-					strokeWidth="1.2"
-					strokeLinejoin="round"
-				/>
+				<g transform="translate(24 0) scale(-1 1)">
+					<g fill="none" className="nc-icon-wrapper">
+						<path
+							d="M15 21.5L9 18.5V16.5L15 19.5V21.5Z"
+							fill="currentColor"
+							fillOpacity={0.12}
+						/>
+						<path
+							d="M17.5 18.25L3.5 11.25"
+							stroke="currentColor"
+							strokeWidth="1.2"
+							strokeLinejoin="round"
+						/>
+						<path
+							d="M17.5 21V9.5L20.5 8V19.5L17.5 21Z"
+							fill="currentColor"
+							fillOpacity={0.12}
+						/>
+						<path
+							d="M17.5 9.5L20.5 8"
+							stroke="currentColor"
+							strokeWidth="1.2"
+							strokeLinejoin="round"
+						/>
+						<path
+							d="M3.5 2.5L17.5 9.5L17.5 21"
+							stroke="currentColor"
+							strokeWidth="1.2"
+							strokeLinejoin="round"
+						/>
+						<path
+							d="M9 16.6824V17.882C9 18.2608 8.78601 18.607 8.44723 18.7764L6.8944 19.5529C6.52588 19.7372 6.52588 20.263 6.8944 20.4473L11.5528 22.7765C11.8343 22.9173 12.1657 22.9173 12.4472 22.7765L14.4474 21.7764C14.7862 21.607 15.0002 21.2607 15.0002 20.8819V19.7189"
+							stroke="currentColor"
+							strokeWidth="1.2"
+							strokeLinejoin="round"
+						/>
+						<path
+							d="M3.5 13.382V3.11803C3.5 2.73926 3.714 2.393 4.05279 2.22361L5.82918 1.33541C6.25147 1.12426 6.74853 1.12426 7.17082 1.33541L19.9472 7.72361C20.286 7.893 20.5 8.23926 20.5 8.61803V18.882C20.5 19.2608 20.286 19.607 19.9472 19.7764L18.1708 20.6646C17.7485 20.8758 17.2515 20.8758 16.8292 20.6646L4.05279 14.2764C3.714 14.107 3.5 13.7608 3.5 13.382Z"
+							stroke="currentColor"
+							strokeWidth="1.2"
+							strokeLinejoin="round"
+						/>
+					</g>
+				</g>
 			</svg>
 		</div>
 	);
@@ -85,37 +129,65 @@ function renderDiagram03() {
 				xmlns="http://www.w3.org/2000/svg"
 				aria-hidden="true"
 			>
-				<path
-					d="M13.3005 1.6895L10.446 2.89214L12.5282 10.2976L15.6276 8.66508L13.3005 1.6895Z"
-					fill="currentColor"
-					fillOpacity={0.12}
-				/>
-				<path
-					d="M17.284 13.9218L14.5215 15.1898L15.7216 22.4354L18.869 20.9863L17.284 13.9218Z"
-					fill="currentColor"
-					fillOpacity={0.12}
-				/>
-				<path
-					d="M15.7654 8.724L12.6484 10.2963"
-					stroke="currentColor"
-					strokeWidth="1.2"
-					strokeMiterlimit="10"
-					strokeLinejoin="round"
-				/>
-				<path
-					d="M2.61186 5.46453L7.83517 8.10636L10.2857 2.95361L12.566 10.4702L18.2907 13.3394L14.4305 15.2552L15.6864 22.3534"
-					stroke="currentColor"
-					strokeWidth="1.2"
-					strokeMiterlimit="10"
-					strokeLinejoin="round"
-				/>
-				<path
-					d="M9.10339 5.42584L5.92333 3.84981C5.71293 3.74553 5.46583 3.74582 5.25567 3.85059L3.02087 4.96467C2.62583 5.16161 2.48545 5.65543 2.71783 6.03073L6.32372 11.8543L4.87631 16.939H10.1004L15.3465 22.2078C15.5747 22.437 15.9241 22.4941 16.2134 22.3494L18.297 21.3074C18.6029 21.1545 18.7666 20.8139 18.6949 20.4794L17.2739 13.8519L20.8106 12.0551C21.1803 11.8673 21.1739 11.3371 20.7998 11.1582L15.5968 8.67078L13.6261 2.25784C13.4896 1.8137 12.9862 1.59926 12.5714 1.80853L10.248 2.98054"
-					stroke="currentColor"
-					strokeWidth="1.2"
-					strokeMiterlimit="10"
-					strokeLinejoin="round"
-				/>
+				<g fill="none" className="nc-icon-wrapper">
+					<path
+						d="M9.91457 12.4551L11.5 5.5L7 3.5V10.5L9.91457 12.4551Z"
+						fill="currentColor"
+						fillOpacity={0.12}
+					/>
+					<path
+						d="M18 11.5L14.0929 10.5128L18.563 6.49997L21.1447 7.16386L18 11.5Z"
+						fill="currentColor"
+						fillOpacity={0.12}
+					/>
+					<path
+						d="M22 17V13.4301L12 18.4148V22L22 17Z"
+						fill="currentColor"
+						fillOpacity={0.12}
+					/>
+					<path
+						d="M11.9999 18.4149V21.801"
+						stroke="currentColor"
+						strokeWidth="1.2"
+						strokeLinejoin="round"
+					/>
+					<path
+						d="M2 13.5L11.5528 18.2764C11.8343 18.4172 12.1657 18.4172 12.4472 18.2764L22 13.5"
+						stroke="currentColor"
+						strokeWidth="1.2"
+						strokeLinejoin="round"
+					/>
+					<path
+						d="M11.3292 21.6646L2.55279 17.2764C2.214 17.107 2 16.7607 2 16.382V13.0902C2 13.0302 2.0054 12.9703 2.01613 12.9113L2.97206 7.65367C2.99025 7.55361 3.03853 7.46147 3.11044 7.38956L6.75718 3.74282C6.90347 3.59653 7.12475 3.55544 7.3138 3.63947L11.2114 5.37171C11.3877 5.45007 11.5933 5.42 11.7398 5.29444L14.6242 2.82209C14.8324 2.64368 15.1454 2.66615 15.3259 2.87247L18.3882 6.37225C18.4607 6.4551 18.5585 6.5117 18.6665 6.53329L20.6616 6.93232C20.8653 6.97306 21.0226 7.1355 21.0567 7.34041L21.9864 12.9184C21.9954 12.9727 22 13.0277 22 13.0828V16.382C22 16.7607 21.786 17.107 21.4472 17.2764L12.6708 21.6646C12.2485 21.8757 11.7515 21.8757 11.3292 21.6646Z"
+						stroke="currentColor"
+						strokeWidth="1.2"
+						strokeLinejoin="round"
+					/>
+					<path
+						d="M10 12.5L14 10.5"
+						stroke="currentColor"
+						strokeWidth="1.2"
+						strokeLinejoin="round"
+					/>
+					<path
+						d="M15 2.5L14.0275 10.2802C14.0118 10.4056 14.0923 10.5231 14.2149 10.5537L17.8125 11.4531C17.9331 11.4833 18.0382 11.5573 18.1072 11.6608L20 14.5"
+						stroke="currentColor"
+						strokeWidth="1.2"
+						strokeLinejoin="round"
+					/>
+					<path
+						d="M7 3.5V10.2324C7 10.3996 7.08355 10.5557 7.22265 10.6484L9.85726 12.4048C9.94977 12.4665 10.0191 12.5573 10.0543 12.6628L12 18.5"
+						stroke="currentColor"
+						strokeWidth="1.2"
+						strokeLinejoin="round"
+					/>
+					<path
+						d="M18 11.5L21 7.5"
+						stroke="currentColor"
+						strokeWidth="1.2"
+						strokeLinejoin="round"
+					/>
+				</g>
 			</svg>
 		</div>
 	);
@@ -250,30 +322,51 @@ export function CareersValues() {
 
 				{/* Aligned 2x2 Grid */}
 				<div className="grid grid-cols-1 border-stroke-soft-200 border-t md:grid-cols-2 dark:border-white/10">
-					{/* Users » Σ (Top Left) */}
+					{/* Deliverability Is a Feature (Top Left) */}
 					<div className="flex flex-col gap-6 border-stroke-soft-200 border-b p-8 sm:flex-row sm:items-center sm:gap-8 sm:p-12 md:border-r lg:p-16 dark:border-white/10">
 						{renderDiagram01()}
 						<div className="flex-1">
 							<h3 className="font-semibold text-[1.15rem] text-text-strong-950 tracking-tight sm:text-[1.25rem] dark:text-white">
-								Users » Σ
+								Deliverability Is a Feature
 							</h3>
 							<p className="mt-2.5 max-w-lg text-sm text-text-sub-600 leading-relaxed dark:text-white/60">
-								We speak to our{" "}
+								We don&apos;t treat{" "}
 								<span className="underline decoration-text-sub-600/70 decoration-dotted underline-offset-4 dark:decoration-white/50">
-									users
-								</span>
-								, have no judgements, and are{" "}
-								<span className="underline decoration-text-sub-600/70 decoration-dotted underline-offset-4 dark:decoration-white/50">
-									obsessed
+									email delivery
 								</span>{" "}
-								with understanding them deeply.
+								as infrastructure. We treat it as the{" "}
+								<span className="underline decoration-text-sub-600/70 decoration-dotted underline-offset-4 dark:decoration-white/50">
+									product
+								</span>
+								. Every email should reach the inbox it was meant for.
 							</p>
 						</div>
 					</div>
 
-					{/* Obsession Over Craft (Top Right) */}
+					{/* Developers First (Top Right) */}
 					<div className="flex flex-col gap-6 border-stroke-soft-200 border-b p-8 sm:flex-row sm:items-center sm:gap-8 sm:p-12 lg:p-16 dark:border-white/10">
 						{renderDiagram02()}
+						<div className="flex-1">
+							<h3 className="font-semibold text-[1.15rem] text-text-strong-950 tracking-tight sm:text-[1.25rem] dark:text-white">
+								Developers First
+							</h3>
+							<p className="mt-2.5 max-w-lg text-sm text-text-sub-600 leading-relaxed dark:text-white/60">
+								Great infrastructure should feel{" "}
+								<span className="underline decoration-text-sub-600/70 decoration-dotted underline-offset-4 dark:decoration-white/50">
+									invisible
+								</span>
+								. Simple APIs, excellent docs, and a{" "}
+								<span className="underline decoration-text-sub-600/70 decoration-dotted underline-offset-4 dark:decoration-white/50">
+									developer experience
+								</span>{" "}
+								that gets out of the way.
+							</p>
+						</div>
+					</div>
+
+					{/* Obsession Over Craft (Bottom Left) */}
+					<div className="flex flex-col gap-6 border-stroke-soft-200 border-b p-8 sm:flex-row sm:items-center sm:gap-8 sm:p-12 md:border-r md:border-b-0 lg:p-16 dark:border-white/10">
+						{renderDiagram03()}
 						<div className="flex-1">
 							<h3 className="font-semibold text-[1.15rem] text-text-strong-950 tracking-tight sm:text-[1.25rem] dark:text-white">
 								Obsession Over Craft
@@ -288,41 +381,23 @@ export function CareersValues() {
 						</div>
 					</div>
 
-					{/* First Principles Thinking (Bottom Left) */}
-					<div className="flex flex-col gap-6 border-stroke-soft-200 border-b md:border-b-0 p-8 sm:flex-row sm:items-center sm:gap-8 sm:p-12 md:border-r lg:p-16 dark:border-white/10">
-						{renderDiagram03()}
-						<div className="flex-1">
-							<h3 className="font-semibold text-[1.15rem] text-text-strong-950 tracking-tight sm:text-[1.25rem] dark:text-white">
-								First Principles Thinking
-							</h3>
-							<p className="mt-2.5 max-w-lg text-sm text-text-sub-600 leading-relaxed dark:text-white/60">
-								We challenge status quo by breaking down problems to their{" "}
-								<span className="underline decoration-text-sub-600/70 decoration-dotted underline-offset-4 dark:decoration-white/50">
-									fundamental truths
-								</span>
-								, grounded in logic.
-							</p>
-						</div>
-					</div>
-
-					{/* Don't Stop Shipping (Bottom Right) */}
+					{/* Ship. Learn. Repeat. (Bottom Right) */}
 					<div className="flex flex-col gap-6 p-8 sm:flex-row sm:items-center sm:gap-8 sm:p-12 lg:p-16">
 						{renderDiagram04()}
 						<div className="flex-1">
 							<h3 className="font-semibold text-[1.15rem] text-text-strong-950 tracking-tight sm:text-[1.25rem] dark:text-white">
-								Don&apos;t Stop Shipping
+								Ship Fast. Learn. Repeat.
 							</h3>
 							<p className="mt-2.5 max-w-lg text-sm text-text-sub-600 leading-relaxed dark:text-white/60">
-								Complacency is the root of all evil. As a company, you&apos;re
-								either growing or you&apos;re dying. We{" "}
+								Move fast,{" "}
 								<span className="underline decoration-text-sub-600/70 decoration-dotted underline-offset-4 dark:decoration-white/50">
-									ship fast
-								</span>{" "}
-								and{" "}
+									learn from real users
+								</span>
+								, and keep improving. We&apos;d rather{" "}
 								<span className="underline decoration-text-sub-600/70 decoration-dotted underline-offset-4 dark:decoration-white/50">
-									iterate faster
+									ship something useful
 								</span>{" "}
-								— all without compromising on quality.
+								today than perfect something nobody needs.
 							</p>
 						</div>
 					</div>
