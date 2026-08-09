@@ -42,7 +42,8 @@ const TermsPage = () => {
 	return (
 		<PageLayout
 			title="Terms of Service"
-			subtitle={`Last updated: ${LAST_UPDATED}`}
+			subtitle={`LAST UPDATED: ${LAST_UPDATED}`}
+			description="Terms governing use of reloop.sh and the open-source Reloop email infrastructure software from Reloop Labs."
 		>
 			<div>
 				<p>
