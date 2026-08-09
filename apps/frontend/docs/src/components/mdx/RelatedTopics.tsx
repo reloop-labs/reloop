@@ -20,7 +20,7 @@ function renderTopicIcon(icon?: string | React.ReactNode) {
 	if (!icon) {
 		return (
 			<svg
-				className="size-4 shrink-0 text-gray-400 transition-colors group-hover:text-primary dark:text-gray-500 dark:group-hover:text-white"
+				className="size-4 shrink-0 text-gray-400 transition-colors group-hover:text-primary-base dark:text-gray-500"
 				fill="none"
 				viewBox="0 0 24 24"
 				stroke="currentColor"
@@ -45,8 +45,8 @@ function renderTopicIcon(icon?: string | React.ReactNode) {
 
 	if (icon.startsWith("si") || icon.startsWith("Si")) {
 		return (
-			<span className="flex size-4 shrink-0 items-center justify-center text-gray-400 transition-colors group-hover:text-primary dark:text-gray-400 dark:group-hover:text-white">
-				<SimpleIcon name={icon} />
+			<span className="flex size-4 shrink-0 items-center justify-center overflow-hidden text-gray-400 transition-colors group-hover:text-primary-base dark:text-gray-400">
+				<SimpleIcon name={icon} size={16} className="size-4 shrink-0" />
 			</span>
 		);
 	}
@@ -55,14 +55,14 @@ function renderTopicIcon(icon?: string | React.ReactNode) {
 		return (
 			<ReloopIcon
 				name={icon}
-				className="size-4 shrink-0 text-gray-400 transition-colors group-hover:text-primary dark:text-gray-400 dark:group-hover:text-white"
+				className="size-4 shrink-0 text-gray-400 transition-colors group-hover:text-primary-base dark:text-gray-400"
 			/>
 		);
 	}
 
 	return (
 		<svg
-			className="size-4 shrink-0 text-gray-400 transition-colors group-hover:text-primary dark:text-gray-500 dark:group-hover:text-white"
+			className="size-4 shrink-0 text-gray-400 transition-colors group-hover:text-primary-base dark:text-gray-500"
 			fill="none"
 			viewBox="0 0 24 24"
 			stroke="currentColor"
@@ -84,7 +84,7 @@ export function RelatedTopic({ title, href, icon }: RelatedTopicProps) {
 	return (
 		<Link
 			href={finalHref}
-			className="group flex items-center gap-2.5 font-medium text-gray-700 text-sm no-underline transition-colors hover:text-primary dark:text-gray-300 dark:hover:text-white"
+			className="group flex items-center gap-2.5 font-medium text-gray-700 text-sm no-underline transition-colors hover:text-primary-base dark:text-gray-300 dark:hover:text-primary-base"
 		>
 			{renderTopicIcon(icon)}
 			<span>{title}</span>
