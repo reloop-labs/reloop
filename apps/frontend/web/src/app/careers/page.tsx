@@ -1,12 +1,8 @@
 import { JsonLd } from "@reloop/web/components/json-ld";
 import { BlogCta } from "@reloop/web/components/landing/blog/blog-cta";
-import {
-	MarketingPageShell,
-	PageSection,
-} from "@reloop/web/components/page-shell";
 import { contactEmail, getSiteUrl, socialProfiles } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
-import { CareersContact, CareersCulture } from "./components/careers-section";
+import { CareersContact, CareersHero } from "./components/careers-section";
 import { CareersValues } from "./components/careers-values";
 import { KeepUpToDate } from "./components/keep-up-to-date";
 
@@ -96,18 +92,8 @@ const CareersPage = () => {
 	return (
 		<>
 			<JsonLd data={jsonLd} />
-			{/* Top Hero & Culture Section */}
-			<div className="mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-200 border-x pt-6 pb-16 md:max-w-7xl dark:border-white/10">
-				<MarketingPageShell
-					titleLines={["Careers at Reloop."]}
-					compactHero
-					tightHeroBottom
-				>
-					<PageSection narrow flushTop>
-						<CareersCulture />
-					</PageSection>
-				</MarketingPageShell>
-			</div>
+			{/* Top Header & Culture Section */}
+			<CareersHero />
 
 			{/* Our Values Section */}
 			<CareersValues />

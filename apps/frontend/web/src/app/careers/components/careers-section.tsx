@@ -1,6 +1,7 @@
 import * as Button from "@reloop/ui/button";
 import { contactEmail, socialProfiles } from "@reloop/web/lib/site";
 import Link from "next/link";
+import { GitHubContributionGraph } from "./github-contribution-graph";
 
 const careersMailto = `mailto:${contactEmail}?subject=${encodeURIComponent("I'd like to build with Reloop")}`;
 
@@ -93,27 +94,45 @@ function ContactDiagram() {
 	);
 }
 
-export function CareersCulture() {
+export function CareersHero() {
 	return (
-		<div className="mx-auto max-w-2xl text-left">
-			<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em]">
-				Our culture
-			</p>
-			<h2 className="mt-4 font-serif text-[2rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[2.6rem] lg:text-[3rem] dark:text-white">
-				People who care about taste.
-			</h2>
-			<div className="mt-8 space-y-6">
-				{cultureParagraphs.map((paragraph) => (
-					<p
-						key={paragraph}
-						className="text-[15px] text-text-sub-600 leading-[1.8] sm:text-[17px] dark:text-white/55"
-					>
-						{paragraph}
-					</p>
-				))}
+		<section className="relative w-full border-stroke-soft-200 border-b bg-bg-white-0 text-text-strong-950 dark:border-white/10 dark:bg-black dark:text-white">
+			<div className="mx-auto w-full max-w-5xl border-stroke-soft-200 border-x px-6 pt-32 pb-16 sm:px-10 md:max-w-7xl lg:px-12 dark:border-white/10">
+				{/* Header Section similar to Blog detail page */}
+				<header className="text-left">
+					<div className="flex w-full max-w-3xl flex-col gap-4">
+						<div className="flex flex-wrap items-center gap-2 font-medium font-mono text-primary-base text-xs/[150%] uppercase tracking-[0.6px]">
+							<span>Careers</span>
+						</div>
+						<h1 className="font-semibold text-3xl text-text-strong-950 leading-[110%] tracking-[-0.8px] sm:text-[40px] lg:text-[48px] dark:text-white">
+							People who care about taste.
+						</h1>
+					</div>
+
+					{/* Culture paragraphs */}
+					<div className="mt-8 max-w-3xl space-y-6">
+						{cultureParagraphs.map((paragraph) => (
+							<p
+								key={paragraph}
+								className="text-[15px] text-text-sub-600 leading-[1.8] sm:text-[17px] dark:text-white/60"
+							>
+								{paragraph}
+							</p>
+						))}
+					</div>
+				</header>
+
+				{/* GitHub Green Contribution Graph */}
+				<div className="mt-12 max-w-4xl">
+					<GitHubContributionGraph />
+				</div>
 			</div>
-		</div>
+		</section>
 	);
+}
+
+export function CareersCulture() {
+	return <CareersHero />;
 }
 
 export function CareersContact() {
