@@ -40,33 +40,6 @@ type ConversationPayload = {
 const API = "/api/admin/v1/support";
 const NEAR_BOTTOM_PX = 80;
 
-const QUICK_TOPICS = [
-	{
-		id: "sending",
-		label: "Sending issue",
-		message:
-			"I'm having trouble sending emails. Can you help me diagnose delivery or domain configuration?",
-	},
-	{
-		id: "domain",
-		label: "Domain / DNS",
-		message:
-			"I need help verifying my domain or fixing DNS records for sending.",
-	},
-	{
-		id: "billing",
-		label: "Billing & credits",
-		message:
-			"I have a question about my plan, credits, or billing. Can someone from support help?",
-	},
-	{
-		id: "api",
-		label: "API / SMTP",
-		message:
-			"I need help with the API or SMTP integration. Here's what I'm trying to do:",
-	},
-] as const;
-
 function supportWsUrl() {
 	if (typeof window === "undefined") return "";
 	const proto = window.location.protocol === "https:" ? "wss:" : "ws:";
@@ -196,6 +169,49 @@ function useSupportSocket({
 	}, [enabled]);
 
 	return { ready, join, leave };
+}
+
+export function FoundersAvatarStack() {
+	return (
+		<div className="relative flex items-center -space-x-2.5">
+			<div className="flex size-7 items-center justify-center rounded-full bg-amber-500/20 text-[11px] font-semibold text-amber-700 ring-2 ring-white dark:bg-amber-500/20 dark:text-amber-300 dark:ring-[#0c0c0c]">
+				MO
+			</div>
+			<div className="flex size-7 items-center justify-center rounded-full bg-blue-500/20 text-[11px] font-semibold text-blue-700 ring-2 ring-white dark:bg-blue-500/20 dark:text-blue-300 dark:ring-[#0c0c0c]">
+				TL
+			</div>
+			<div className="relative flex size-7 items-center justify-center rounded-full bg-emerald-500/20 text-[11px] font-semibold text-emerald-700 ring-2 ring-white dark:bg-emerald-500/20 dark:text-emerald-300 dark:ring-[#0c0c0c]">
+				PR
+				<span className="absolute bottom-0 right-0 size-2 rounded-full border-2 border-white bg-emerald-500 dark:border-[#0c0c0c]" />
+			</div>
+		</div>
+	);
+}
+
+function SendIcon({ className = "size-4" }: { className?: string }) {
+	return (
+		<svg
+			viewBox="0 0 24 24"
+			fill="none"
+			className={className}
+			xmlns="http://www.w3.org/2000/svg"
+		>
+			<path
+				d="M22 2L11 13"
+				stroke="currentColor"
+				strokeWidth="2"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+			<path
+				d="M22 2L15 22L11 13L2 9L22 2Z"
+				stroke="currentColor"
+				strokeWidth="2"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+		</svg>
+	);
 }
 
 export function ContactSupportChat({ userName }: { userName?: string | null }) {
@@ -355,62 +371,21 @@ export function ContactSupportChat({ userName }: { userName?: string | null }) {
 		}
 	};
 
-	const applyTopic = (message: string) => {
-		setDraft(message);
-		requestAnimationFrame(() => {
-			const el = textareaRef.current;
-			if (!el) return;
-			el.focus();
-			el.style.height = "auto";
-			el.style.height = `${el.scrollHeight}px`;
-			const len = message.length;
-			el.setSelectionRange(len, len);
-		});
-	};
-
 	const closed = conversation?.status === "closed";
 	const hasMessages = messages.length > 0;
 
 	return (
-		<div className="relative flex h-[min(520px,calc(100dvh-12rem))] min-h-[360px] w-full flex-col overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 dark:border-white/[0.08] dark:bg-[#0c0c0c]">
+		<div className="relative flex h-[min(520px,calc(100dvh-12rem))] min-h-[420px] w-full flex-col overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 text-text-strong-950 dark:border-white/10 dark:bg-[#0c0c0c] dark:text-white">
 			{/* Header */}
-			<div className="flex shrink-0 items-center justify-between gap-3 border-stroke-soft-200 border-b px-4 py-3.5 dark:border-white/10">
+			<div className="flex shrink-0 items-center justify-between gap-3 border-b border-stroke-soft-200 bg-bg-weak-50/50 px-4 py-3.5 dark:border-white/10 dark:bg-white/[0.02]">
 				<div className="flex min-w-0 items-center gap-3">
-					<div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-blue-600 text-white">
-						<Icon name="headset" className="size-4" />
-					</div>
+					<FoundersAvatarStack />
 					<div className="min-w-0">
-						<div className="flex flex-wrap items-center gap-2">
-							<h2 className="font-semibold text-[14px] text-text-strong-950 tracking-tight dark:text-white">
-								Reloop support
-							</h2>
-							<span
-								className={cn(
-									"inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 font-medium text-[10px]",
-									closed
-										? "bg-bg-weak-50 text-text-sub-600 dark:bg-white/5 dark:text-white/40"
-										: ready
-											? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
-											: "bg-bg-weak-50 text-text-sub-600 dark:bg-white/5 dark:text-white/40",
-								)}
-							>
-								<span
-									className={cn(
-										"size-1.5 rounded-full",
-										closed
-											? "bg-text-soft-400"
-											: ready
-												? "bg-emerald-500"
-												: "animate-pulse bg-text-soft-400",
-									)}
-								/>
-								{closed ? "Closed" : ready ? "Online" : "Connecting"}
-							</span>
-						</div>
-						<p className="mt-0.5 truncate text-[11px] text-text-sub-600 dark:text-white/40">
-							{closed
-								? "This conversation was closed by our team"
-								: "Real people · typically reply in a few minutes"}
+						<h2 className="font-semibold text-[15px] text-text-strong-950 tracking-tight dark:text-white">
+							The Founders
+						</h2>
+						<p className="truncate text-[11px] text-text-sub-600 dark:text-white/45">
+							Maya · Theo · Priya · replies in ~2 mins
 						</p>
 					</div>
 				</div>
@@ -426,10 +401,10 @@ export function ContactSupportChat({ userName }: { userName?: string | null }) {
 
 			{loading ? (
 				<div className="flex flex-1 flex-col items-center justify-center gap-3 px-6">
-					<div className="flex size-12 items-center justify-center rounded-2xl bg-blue-500/10">
+					<div className="flex size-12 items-center justify-center rounded-2xl bg-bg-weak-50 dark:bg-white/5">
 						<Icon
 							name="headset"
-							className="size-5 animate-pulse text-blue-600 dark:text-blue-400"
+							className="size-5 animate-pulse text-text-sub-600 dark:text-white/60"
 						/>
 					</div>
 					<div className="text-center">
@@ -469,115 +444,78 @@ export function ContactSupportChat({ userName }: { userName?: string | null }) {
 					<div
 						ref={viewportRef}
 						onScroll={onViewportScroll}
-						className="relative min-h-0 flex-1 overflow-y-auto"
+						className="relative min-h-0 flex-1 overflow-y-auto px-4 py-4"
 						role="log"
 						aria-label="Support messages"
 						aria-relevant="additions"
 						data-autoscrolling={followOutput ? "true" : "false"}
 					>
-						{!hasMessages ? (
-							<div className="flex h-full min-h-[200px] flex-col px-4 py-6">
-								<div className="flex flex-1 flex-col items-center justify-center text-center">
-									<div className="mb-4 flex size-14 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500/15 to-violet-500/10 ring-1 ring-blue-500/10">
-										<Icon
-											name="headset"
-											className="size-6 text-blue-600 dark:text-blue-400"
-										/>
-									</div>
-									<p className="font-semibold text-[17px] text-text-strong-950 dark:text-white">
-										{greetingForHour()}, {firstName}
-									</p>
-									<p className="mt-1.5 max-w-[280px] text-[13px] text-text-sub-600 leading-relaxed dark:text-white/45">
-										We&apos;re here to help with domains, sending, billing, and
-										API issues. Pick a topic or type your own message.
-									</p>
-								</div>
-
-								{!closed ? (
-									<div className="mx-auto w-full max-w-sm space-y-2 pb-2">
-										<p className="text-center font-medium text-[11px] text-text-soft-400 uppercase tracking-wide dark:text-white/30">
-											Common topics
-										</p>
-										<div className="grid grid-cols-2 gap-2">
-											{QUICK_TOPICS.map((topic) => (
-												<button
-													key={topic.id}
-													type="button"
-													onClick={() => applyTopic(topic.message)}
-													className="group flex items-center gap-2.5 rounded-xl border border-stroke-soft-200 bg-bg-weak-50/80 px-3 py-2.5 text-left transition-all hover:border-blue-500/30 hover:bg-white dark:border-white/10 dark:bg-white/[0.03] dark:hover:border-blue-500/25 dark:hover:bg-white/[0.05]"
-												>
-													<span className="min-w-0 font-medium text-[12px] text-text-strong-950 dark:text-white">
-														{topic.label}
-													</span>
-												</button>
-											))}
-										</div>
-									</div>
-								) : null}
+						{/* Founders welcome greeting bubble matching Reloop design system */}
+						<div className="mb-4 flex w-full flex-col items-start">
+							<div className="max-w-[90%] rounded-2xl rounded-tl-xs border border-stroke-soft-200/80 bg-bg-weak-50 px-4 py-3 text-[14px] leading-relaxed text-text-strong-950 dark:border-white/10 dark:bg-white/[0.05] dark:text-white">
+								<p className="whitespace-pre-wrap break-words">
+									Hey — this goes straight to the founders&apos; inboxes. Whoever&apos;s free jumps in, so you might hear back from any of us. Tell us what&apos;s up.
+								</p>
 							</div>
-						) : (
-							<div className="mx-auto flex w-full max-w-md flex-col gap-1 px-4 py-5">
-								<div className="mb-3 flex justify-center">
-									<span className="rounded-full bg-bg-weak-50 px-3 py-1 text-[11px] text-text-sub-600 dark:bg-white/5 dark:text-white/40">
-										Conversation with Reloop support
-									</span>
-								</div>
+							<p className="mt-1 ml-1 font-mono text-[11px] text-text-soft-400 dark:text-white/35">
+								The founders
+							</p>
+						</div>
 
-								{messages.map((m, idx) => {
-									const mine = m.senderRole === "user";
-									const prev = messages[idx - 1];
-									const showMeta = !prev || prev.senderRole !== m.senderRole;
-									return (
-										<Fragment key={m.id}>
+						{messages.map((m, idx) => {
+							const mine = m.senderRole === "user";
+							const prev = messages[idx - 1];
+							const showMeta = !prev || prev.senderRole !== m.senderRole;
+							return (
+								<Fragment key={m.id}>
+									<div
+										data-message-id={m.id}
+										className={cn(
+											"flex w-full flex-col",
+											mine ? "items-end" : "items-start",
+											showMeta ? "mt-4" : "mt-1",
+										)}
+									>
+										<div
+											className={cn(
+												"flex max-w-[90%] items-end gap-2",
+												mine ? "flex-row-reverse" : "flex-row",
+											)}
+										>
 											<div
-												data-message-id={m.id}
 												className={cn(
-													"flex w-full flex-col",
-													mine ? "items-end" : "items-start",
-													showMeta ? "mt-4" : "mt-1",
+													"min-w-0 px-4 py-3 text-[14px] leading-relaxed",
+													mine
+														? "rounded-2xl rounded-br-xs bg-blue-600 text-white"
+														: "rounded-2xl rounded-bl-xs border border-stroke-soft-200/80 bg-bg-weak-50 text-text-strong-950 dark:border-white/10 dark:bg-white/[0.05] dark:text-white",
 												)}
 											>
-												<div
-													className={cn(
-														"flex max-w-[92%] items-end gap-2",
-														mine ? "flex-row-reverse" : "flex-row",
-													)}
-												>
-													<div
-														className={cn(
-															"min-w-0 px-3.5 py-2.5 text-[13px] leading-relaxed",
-															mine
-																? "rounded-2xl rounded-br-md bg-blue-600 text-white"
-																: "rounded-2xl rounded-bl-md border border-stroke-soft-200 bg-bg-weak-50 text-text-strong-950 dark:border-white/10 dark:bg-white/[0.06] dark:text-white/90",
-														)}
-													>
-														<p className="whitespace-pre-wrap break-words">
-															{m.body}
-														</p>
-													</div>
-												</div>
-												{showMeta ? (
-													<p
-														className={cn(
-															"mt-1 text-[10px] text-text-soft-400 dark:text-white/30",
-															mine ? "mr-1" : "ml-1",
-														)}
-													>
-														{mine ? "You" : m.senderName || "Reloop support"} ·{" "}
-														{formatTime(m.createdAt)}
-													</p>
-												) : null}
+												<p className="whitespace-pre-wrap break-words">
+													{m.body}
+												</p>
 											</div>
-										</Fragment>
-									);
-								})}
-								<div ref={bottomRef} className="h-px w-full shrink-0" />
-							</div>
-						)}
+										</div>
+										{showMeta ? (
+											<p
+												className={cn(
+													"mt-1 font-mono text-[11px] text-text-soft-400 dark:text-white/35",
+													mine ? "mr-1" : "ml-1",
+												)}
+											>
+												{mine ? "You" : m.senderName || "The founders"} ·{" "}
+												{formatTime(m.createdAt)}
+											</p>
+										) : null}
+									</div>
+								</Fragment>
+							);
+						})}
+
+						<div ref={bottomRef} className="h-px w-full shrink-0" />
 					</div>
 
 					{showJumpLatest ? (
-						<div className="pointer-events-none absolute inset-x-0 bottom-[120px] z-10 flex justify-center">
+						<div className="pointer-events-none absolute inset-x-0 bottom-[80px] z-10 flex justify-center">
 							<button
 								type="button"
 								onClick={() => scrollToLatest()}
@@ -596,9 +534,9 @@ export function ContactSupportChat({ userName }: { userName?: string | null }) {
 					) : null}
 
 					{/* Composer */}
-					<div className="shrink-0 border-stroke-soft-200 border-t bg-bg-white-0 px-4 py-4 dark:border-white/10 dark:bg-[#0c0c0c]">
+					<div className="shrink-0 border-t border-stroke-soft-200 bg-bg-white-0 p-3 dark:border-white/10 dark:bg-[#0c0c0c]">
 						{closed ? (
-							<div className="mb-3 rounded-xl border border-stroke-soft-200 bg-bg-weak-50 px-3.5 py-3 dark:border-white/10 dark:bg-white/[0.03]">
+							<div className="mb-3 rounded-xl border border-stroke-soft-200 bg-bg-weak-50 p-3 dark:border-white/10 dark:bg-white/[0.03]">
 								<p className="font-medium text-[12px] text-text-strong-950 dark:text-white">
 									This conversation is closed
 								</p>
@@ -615,15 +553,9 @@ export function ContactSupportChat({ userName }: { userName?: string | null }) {
 							</div>
 						) : null}
 
-						{!closed && !hasMessages ? (
-							<p className="mb-2 text-center text-[11px] text-text-soft-400 dark:text-white/30">
-								Or write your own message below
-							</p>
-						) : null}
-
 						<div
 							className={cn(
-								"flex flex-col rounded-2xl border border-stroke-soft-200 bg-bg-weak-50/50 p-2.5 focus-within:border-primary-base/40 focus-within:ring-2 focus-within:ring-primary-base/10 dark:border-white/10 dark:bg-white/[0.02]",
+								"flex items-center gap-2.5 rounded-2xl border border-stroke-soft-200 bg-bg-weak-50/50 px-3.5 py-2.5 transition-all focus-within:border-blue-500/50 focus-within:ring-2 focus-within:ring-blue-500/10 dark:border-white/10 dark:bg-white/[0.02]",
 								closed && "pointer-events-none opacity-40",
 							)}
 						>
@@ -645,36 +577,24 @@ export function ContactSupportChat({ userName }: { userName?: string | null }) {
 								placeholder={
 									closed
 										? "Conversation closed"
-										: hasMessages
-											? "Reply to support…"
-											: "What can we help you with?"
+										: "Write your message…"
 								}
-								rows={2}
-								className="w-full resize-none bg-transparent px-2.5 py-1 text-text-strong-950 text-xs placeholder-text-soft-400 outline-none dark:text-white/90 dark:placeholder-white/20"
+								rows={1}
+								className="flex-1 resize-none bg-transparent text-[14px] text-text-strong-950 placeholder-text-soft-400 outline-none dark:text-white dark:placeholder-white/30"
 							/>
-							<div className="mt-2.5 flex items-center justify-between border-stroke-soft-200/50 border-t pt-2 dark:border-white/5">
-								<span className="px-1.5 text-[10px] text-text-soft-400 dark:text-white/25">
-									{closed
-										? "Closed"
-										: ready
-											? "Live · Enter to send"
-											: "Reconnecting…"}
-								</span>
-								<button
-									type="button"
-									onClick={() => void handleSend()}
-									disabled={!draft.trim() || sending || closed}
-									className={cn(
-										"flex h-7 items-center gap-1 rounded-lg px-3 font-semibold text-xs transition-all",
-										draft.trim() && !closed
-											? "bg-text-strong-950 text-white dark:bg-white dark:text-black"
-											: "bg-bg-weak-100 text-text-sub-400 dark:bg-white/5 dark:text-white/20",
-									)}
-								>
-									{sending ? "Sending" : "Send"}
-									<Icon name="arrow-top" className="size-3.5" />
-								</button>
-							</div>
+							<button
+								type="button"
+								onClick={() => void handleSend()}
+								disabled={!draft.trim() || sending || closed}
+								className={cn(
+									"flex size-9 shrink-0 items-center justify-center rounded-full transition-all cursor-pointer",
+									draft.trim() && !closed
+										? "bg-text-strong-950 text-white dark:bg-white dark:text-black"
+										: "bg-bg-weak-100 text-text-sub-400 dark:bg-white/5 dark:text-white/20 cursor-not-allowed",
+								)}
+							>
+								<SendIcon className="size-4" />
+							</button>
 						</div>
 					</div>
 				</>

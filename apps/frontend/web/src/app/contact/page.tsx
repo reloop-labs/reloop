@@ -1,3 +1,4 @@
+import { Icon } from "@reloop/ui/icon";
 import { JsonLd } from "@reloop/web/components/json-ld";
 import { contactEmail, defaultOgImage, getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
@@ -116,6 +117,42 @@ const ContactPage = () => {
 									Share feedback and feature requests directly
 								</CheckItem>
 							</ul>
+
+							<div className="mt-8 space-y-3 border-t border-stroke-soft-200 pt-6 sm:mt-10 sm:pt-8 dark:border-white/10">
+								<div className="flex items-center gap-2.5">
+									<Icon name="mail-single" className="size-4 shrink-0 text-text-sub-600 dark:text-white/60" />
+									<a
+										href={`mailto:${contactEmail}`}
+										className="text-[14px] font-medium text-text-strong-950 underline decoration-text-sub-600/40 underline-offset-2 transition-colors hover:decoration-text-strong-950 dark:text-white dark:decoration-white/30 dark:hover:decoration-white"
+									>
+										{contactEmail}
+									</a>
+								</div>
+
+								<div className="flex items-center gap-2.5">
+									<svg
+										className="size-4 shrink-0 text-text-sub-600 dark:text-white/60"
+										viewBox="0 0 24 24"
+										fill="none"
+										xmlns="http://www.w3.org/2000/svg"
+									>
+										<rect opacity="0.12" x="5" y="2" width="14" height="20" rx="4" fill="currentColor" />
+										<path
+											d="M12 6H12.01M10 19H14M12.5 6C12.5 6.27614 12.2761 6.5 12 6.5C11.7239 6.5 11.5 6.27614 11.5 6C11.5 5.72386 11.7239 5.5 12 5.5C12.2761 5.5 12.5 5.72386 12.5 6ZM11.4 22H12.6C14.8402 22 15.9603 22 16.816 21.564C17.5686 21.1805 18.1805 20.5686 18.564 19.816C19 18.9603 19 17.8402 19 15.6V8.4C19 6.15979 19 5.03968 18.564 4.18404C18.1805 3.43139 17.5686 2.81947 16.816 2.43597C15.9603 2 14.8402 2 12.6 2H11.4C9.15979 2 8.03968 2 7.18404 2.43597C6.43139 2.81947 5.81947 3.43139 5.43597 4.18404C5 5.03968 5 6.15979 5 8.4V15.6C5 17.8402 5 18.9603 5.43597 19.816C5.81947 20.5686 6.43139 21.1805 7.18404 21.564C8.03968 22 9.15979 22 11.4 22Z"
+											stroke="currentColor"
+											strokeWidth="1.5"
+											strokeLinecap="round"
+											strokeLinejoin="round"
+										/>
+									</svg>
+									<a
+										href="tel:+917411367725"
+										className="text-[14px] font-medium text-text-strong-950 underline decoration-text-sub-600/40 underline-offset-2 transition-colors hover:decoration-text-strong-950 dark:text-white dark:decoration-white/30 dark:hover:decoration-white"
+									>
+										+91 7411367725
+									</a>
+								</div>
+							</div>
 						</div>
 						<div className="min-w-0 lg:pt-1">
 							<ContactPanel />
