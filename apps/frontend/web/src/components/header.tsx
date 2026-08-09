@@ -1,6 +1,7 @@
 "use client";
 
 import { authClient } from "@reloop/auth/client";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { Logo } from "@reloop/ui/logo";
 import { AnimatePresence, motion } from "framer-motion";
@@ -323,12 +324,14 @@ export const Header = () => {
 						</a>
 
 						{mounted && session ? (
-							<a
-								href="/dashboard"
-								className="inline-flex items-center justify-center rounded-full bg-text-strong-950 px-4 py-1.5 font-medium text-[13px] text-white transition-opacity hover:opacity-90 dark:bg-white dark:text-black"
+							<FancyButton.Root
+								asChild
+								variant="neutral"
+								size="xsmall"
+								className="rounded-full! px-3.5!"
 							>
-								Dashboard
-							</a>
+								<a href="/dashboard">Dashboard</a>
+							</FancyButton.Root>
 						) : (
 							<>
 								<a
@@ -337,12 +340,14 @@ export const Header = () => {
 								>
 									Log in
 								</a>
-								<a
-									href="/dashboard/signup"
-									className="inline-flex items-center justify-center rounded-full bg-text-strong-950 px-4 py-1.5 font-medium text-[13px] text-white transition-opacity hover:opacity-90 dark:bg-white dark:text-black"
+								<FancyButton.Root
+									asChild
+									variant="neutral"
+									size="xsmall"
+									className="rounded-full! px-3.5!"
 								>
-									Sign up
-								</a>
+									<a href="/dashboard/signup">Sign up</a>
+								</FancyButton.Root>
 							</>
 						)}
 					</div>
@@ -487,13 +492,16 @@ export const Header = () => {
 									</a>
 
 									{mounted && session ? (
-										<a
-											href="/dashboard"
-											onClick={closeMobileMenu}
-											className="inline-flex items-center justify-center rounded-full bg-text-strong-950 px-4 py-3 font-medium text-[15px] text-white transition-opacity hover:opacity-90 dark:bg-white dark:text-black"
+										<FancyButton.Root
+											asChild
+											variant="neutral"
+											size="medium"
+											className="w-full! rounded-full!"
 										>
-											Dashboard
-										</a>
+											<a href="/dashboard" onClick={closeMobileMenu}>
+												Dashboard
+											</a>
+										</FancyButton.Root>
 									) : (
 										<div className="grid grid-cols-2 gap-3">
 											<a
@@ -503,13 +511,16 @@ export const Header = () => {
 											>
 												Log in
 											</a>
-											<a
-												href="/dashboard/signup"
-												onClick={closeMobileMenu}
-												className="inline-flex items-center justify-center rounded-full bg-text-strong-950 px-4 py-3 font-medium text-[15px] text-white transition-opacity hover:opacity-90 dark:bg-white dark:text-black"
+											<FancyButton.Root
+												asChild
+												variant="neutral"
+												size="medium"
+												className="w-full! rounded-full!"
 											>
-												Sign up
-											</a>
+												<a href="/dashboard/signup" onClick={closeMobileMenu}>
+													Sign up
+												</a>
+											</FancyButton.Root>
 										</div>
 									)}
 								</div>
