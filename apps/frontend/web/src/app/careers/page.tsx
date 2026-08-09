@@ -100,7 +100,7 @@ const CareersPage = () => {
 					compactHero
 					tightHeroBottom
 				>
-					<PageSection narrow flushTop>
+					<PageSection flushTop>
 						<CareersSection />
 					</PageSection>
 				</MarketingPageShell>

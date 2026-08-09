@@ -1,6 +1,7 @@
 import * as Button from "@reloop/ui/button";
 import { contactEmail, socialProfiles } from "@reloop/web/lib/site";
 import Link from "next/link";
+import { CareersValues } from "./careers-values";
 
 const careersMailto = `mailto:${contactEmail}?subject=${encodeURIComponent("I'd like to build with Reloop")}`;
 
@@ -12,8 +13,9 @@ const cultureParagraphs = [
 
 export function CareersSection() {
 	return (
-		<div className="mx-auto max-w-2xl">
-			<div className="text-left">
+		<div className="w-full">
+			{/* Our culture section */}
+			<div className="mx-auto max-w-2xl text-left">
 				<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em]">
 					Our culture
 				</p>
@@ -32,7 +34,13 @@ export function CareersSection() {
 				</div>
 			</div>
 
-			<div className="mt-16 text-center">
+			{/* Our values section */}
+			<div className="mx-auto mt-24 max-w-5xl sm:mt-32">
+				<CareersValues />
+			</div>
+
+			{/* Get in touch section */}
+			<div className="mx-auto mt-24 max-w-2xl text-center sm:mt-32">
 				<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em]">
 					Get in touch
 				</p>
