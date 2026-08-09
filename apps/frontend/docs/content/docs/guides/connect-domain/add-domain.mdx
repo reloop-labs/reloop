@@ -10,7 +10,7 @@ This is the main path from “I have a domain” to “I can send as `@mydomain.
 
 - You can log in to the place that manages **nameservers** for the domain ([find your DNS provider](/docs/guides/connect-domain/find-dns-provider)).
 - Decide [root vs subdomain](/docs/guides/connect-domain/what-is-a-domain) — Reloop supports either, or both.
-- Decide if you need [receiving](/docs/guides/connect-domain/sending-vs-receiving) or only sending.
+- Decide if you need [receiving](/docs/guides/connect-domain/sending-vs-receiving) or only sending. New domains start with Email Receiving on — turn it off before publishing DNS if this hostname must keep Google Workspace / Microsoft 365.
 
 ## Steps
 
@@ -26,7 +26,7 @@ This is the main path from “I have a domain” to “I can send as `@mydomain.
     - `acme.com` (root)
     - `mail.acme.com` or `notifications.acme.com` (subdomain)
 
-    Confirm organization and create the domain. Reloop generates DNS records and DKIM keys.
+    Confirm organization and create the domain. Reloop generates DNS records and DKIM keys. Email Sending, Email Receiving, and click/open tracking start on by default.
   </Step>
   <Step title="See how Reloop detected DNS">
     On the domain page, Reloop shows a provider when nameservers are recognized.
@@ -36,10 +36,10 @@ This is the main path from “I have a domain” to “I can send as `@mydomain.
     - **Unknown** → [Unknown provider](/docs/guides/connect-domain/providers/unknown-provider)
   </Step>
   <Step title="Publish DNS records">
-    Either complete the Domain Connect consent flow, or copy every required record into your DNS panel. Do not skip DKIM or SPF.
+    Either complete the Domain Connect consent flow, or copy every required record into your DNS panel. Do not skip DKIM, SPF, DMARC, or Sending MX when Email Sending is on.
   </Step>
   <Step title="Verify">
-    Click **Verify** (or wait for automatic checks). Status moves through [pending → verifying → active](/docs/guides/connect-domain/verification/statuses) when public DNS matches.
+    Click **Verify & finish** on the setup page, or **Verify Domain** on the domain detail page, to start checks. Reloop may retry that verification job; it does not verify on its own while status stays pending. Status moves through [pending → verifying → active](/docs/guides/connect-domain/verification/statuses) when public DNS matches.
   </Step>
   <Step title="Send a test">
     Use [Test your domain](/docs/guides/connect-domain/after/test-domain) to confirm SPF/DKIM/DMARC in a real inbox.

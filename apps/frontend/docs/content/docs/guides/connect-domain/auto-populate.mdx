@@ -6,44 +6,60 @@ description: Use Domain Connect to apply Reloop DNS records in one click when yo
 
 **Auto-populate** uses the open [Domain Connect](https://www.domainconnect.org/) standard. Reloop opens your DNS provider, you approve a template, and the provider writes SPF, DKIM, DMARC, MX, and tracking records for you.
 
-Which hosts can do this **changes over time**. Reloop does not rely on a fixed allowlist in the docs — it checks live whether your domain’s DNS host supports Reloop’s Domain Connect template (`reloop.sh` / `email-setup` in the [Domain Connect Templates](https://github.com/Domain-Connect/Templates) registry).
-
 ## When you see the button
+
+Reloop shows **Auto populate** when nameserver detection matches a host where Reloop’s Domain Connect template is known to work today:
+
+- [Cloudflare](/docs/guides/connect-domain/providers/cloudflare)
+- [Vercel](/docs/guides/connect-domain/providers/vercel)
+- [Domain Chief](/docs/guides/connect-domain/providers/domain-chief)
+- [NameSilo](/docs/guides/connect-domain/providers/namesilo)
 
 On the domain page (and during onboarding DNS step):
 
-- **Auto populate** → your host can apply Reloop’s template; use this flow
+- **Auto populate** → use this flow
 - **Open DNS settings** (or no Auto populate) → use [manual setup](/docs/guides/connect-domain/manual-setup)
 
-Trust the dashboard for your domain. A host that supports Domain Connect in general may still lack Reloop’s template until they onboard it.
+When you click **Auto populate**, Reloop also runs live Domain Connect discovery as a safety check (`_domainconnect` DNS + provider API) to confirm the Reloop template (`reloop.sh` / `email-setup`) is still available. A host that supports Domain Connect in general may still fail that check if Reloop’s template is not onboarded there.
+
+Trust the dashboard for your domain: if the button is missing, use manual setup even if the provider advertises Domain Connect elsewhere.
+
+## Defaults before you approve
+
+New domains start with **Email Receiving** and **click/open tracking** on. Auto-populate therefore typically includes inbound MX (`inbound.reloop.sh`) and the tracking CNAME unless you turn those off first.
+
+<Warning>
+If this hostname already uses Google Workspace, Microsoft 365, or another inbox, turn **Email Receiving** off on the Reloop domain page before Auto-populate — or use a [separate subdomain](/docs/guides/connect-domain/what-is-a-domain) for Reloop. See [Sending vs receiving](/docs/guides/connect-domain/sending-vs-receiving).
+</Warning>
 
 ## How the flow works
 
 <Steps>
   <Step title="Click Auto populate">
-    Reloop runs Domain Connect **discovery** against your domain (`_domainconnect` DNS + provider API) and confirms the Reloop template is available.
+    Reloop runs Domain Connect discovery and builds a signed apply URL when the Reloop template is available.
   </Step>
   <Step title="Approve at your provider">
     A new tab opens on your DNS host. Sign in if needed, review the records, and confirm.
   </Step>
   <Step title="Return to Reloop">
-    After success you are redirected back (or you can return manually). Click **Verify** if status is still pending.
+    After success you are redirected back (or you can return manually). Click **Verify & finish** on the setup page, or **Verify Domain** on the domain detail page, if status is still pending.
   </Step>
 </Steps>
 
-Reloop re-checks live discovery when you click Auto populate. If the provider dropped the template or discovery fails, you get an error toast and should continue manually.
+If discovery fails or the provider dropped the template, you get an error toast and should continue manually.
 
 ## What gets applied
 
-The Reloop Domain Connect template typically applies:
+The Reloop Domain Connect template typically applies groups based on your domain toggles:
 
 - DKIM TXT on `reloop._domainkey`
 - SPF via SPFM / merge (`include:reloop.sh`)
-- DMARC on `_dmarc`
-- MX for sending/receiving as defined in the template
-- Tracking CNAME `link` → `link.reloop.sh`
+- DMARC on `_dmarc` (required for verification when Email Sending is on)
+- **Sending MX** → `reloop.sh` when Email Sending is on
+- **Receiving MX** → `inbound.reloop.sh` when Email Receiving is on (default for new domains)
+- Tracking CNAME → `link.reloop.sh` when tracking is on (host is usually `link` on apex, or `link.<subdomain>` when the Reloop domain is a subdomain)
 
-Exact groups can depend on template version; the consent screen lists what will change.
+Exact groups depend on your toggles and template version; the consent screen lists what will change. Always confirm hosts and values in the Reloop dashboard.
 
 ## If Auto-populate fails
 
@@ -60,4 +76,4 @@ You can always fall back to [manual setup](/docs/guides/connect-domain/manual-se
 
 - Only approve the flow while logged into **your** DNS account for that domain.
 - Reloop signs Domain Connect apply URLs; do not reuse apply links from untrusted sources.
-- After you approve, check the records in your DNS panel, then click **Verify** in Reloop.
+- After you approve, check the records in your DNS panel, then click **Verify Domain** (or **Verify & finish**) in Reloop.

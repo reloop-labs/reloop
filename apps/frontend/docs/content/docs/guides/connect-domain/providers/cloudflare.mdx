@@ -15,7 +15,7 @@ First, log in to [Reloop](https://reloop.sh/dashboard/domain) and [add a domain]
 />
 
 <Tip>
-It is [best practice to use a subdomain](/docs/guides/connect-domain/what-is-a-domain) (for example `mail.example.com` or `team.example.com`) instead of the root domain (`example.com`). A subdomain keeps sending reputation separate and is especially important if you enable receiving with Reloop.
+It is [best practice to use a subdomain](/docs/guides/connect-domain/what-is-a-domain) (for example `mail.example.com` or `team.example.com`) instead of the root domain (`example.com`). A subdomain keeps sending reputation separate and is especially important if you use Reloop receiving (on by default for new domains).
 </Tip>
 
 ## Automatic setup (recommended)
@@ -23,14 +23,14 @@ It is [best practice to use a subdomain](/docs/guides/connect-domain/what-is-a-d
 The fastest way to verify your domain on Cloudflare is **Auto populate** in Reloop. This uses [Domain Connect](https://www.domainconnect.org/) to configure your DNS records.
 
 1. Go to your [Domains](https://reloop.sh/dashboard/domain) page in Reloop and open the domain.
-2. (Optional) If you want to receive emails, turn **Receiving** on before Auto-populate so the inbound MX is included. [Learn more below](#receiving-emails).
+2. Check **Email Receiving** before Auto-populate. New domains start with Receiving on, so inbound MX (`inbound.reloop.sh`) is usually included. Turn **Email Receiving** off first if this hostname must keep Google Workspace / Microsoft 365 — or use a [subdomain](/docs/guides/connect-domain/what-is-a-domain). [Learn more below](#receiving-emails).
 3. Click **Auto populate**.
 4. Authorize Reloop in Cloudflare and approve the records.
-5. Return to Reloop — records are written automatically.
+5. Return to Reloop and click **Verify & finish** (setup) or **Verify Domain** (detail) to start checks.
 
 <Video src="/docs/images/docs/guides/connect-domain/providers/cloudflare/auto-populate.mp4" autoPlay loop muted playsInline />
 
-That’s it. Your domain will usually verify within a few minutes.
+Verification often finishes within a few minutes after DNS publishes; allow longer if resolvers are slow ([propagation](/docs/guides/connect-domain/verification/propagation)).
 
 If Auto-populate fails, use **Manual setup** below. See also [Auto-populate DNS](/docs/guides/connect-domain/auto-populate) and [Auto-populate failed](/docs/guides/connect-domain/troubleshoot/auto-populate-failed).
 
@@ -50,7 +50,7 @@ Log in to your [Cloudflare account](https://dash.cloudflare.com) and open **DNS 
 
 If Reloop or `dig NS yourdomain.com` shows a different host, stop and edit that host instead — see [Wrong nameservers](/docs/guides/connect-domain/troubleshoot/wrong-nameservers).
 
-### Add MX SPF record
+### Add Sending MX record
 
 Click **Add record** on Cloudflare:
 
@@ -64,7 +64,7 @@ Click **Add record** on Cloudflare:
 <DocImage
 	label="Reloop — Sending MX"
 	src="/docs/images/docs/guides/connect-domain/providers/cloudflare/spf-mx-reloop.png"
-	alt="Reloop sending MX (SPF) record"
+	alt="Reloop sending MX record"
 />
 
 <DocImage
@@ -163,7 +163,7 @@ Omit your domain from the Name field when Cloudflare appends it. Paste `reloop._
 
 ### Receiving emails
 
-If you want Reloop to **receive** mail on this hostname, turn **Receiving** on in the domain settings in Reloop, then click **Add record** on Cloudflare:
+**Email Receiving** is on by default for new domains. If it stays on, add the inbound MX in Cloudflare:
 
 1. Set the Type to `MX`.
 2. Set the **Name** to the host Reloop shows (e.g. `team` or `@`).
@@ -193,12 +193,12 @@ If you want Reloop to **receive** mail on this hostname, turn **Receiving** on i
 | TTL | TTL | `Auto` |
 
 <Warning>
-When Reloop’s inbound MX is active on a hostname, Reloop receives mail for that hostname according to MX priority. That can conflict with another inbox already using MX on the same name — prefer a [subdomain](/docs/guides/connect-domain/what-is-a-domain). See [MX conflicts](/docs/guides/connect-domain/troubleshoot/mx-conflicts) and [Sending vs receiving](/docs/guides/connect-domain/sending-vs-receiving).
+Publishing Reloop’s inbound MX on a hostname that already has Google/Microsoft MX can divert or split delivery depending on priority. Prefer a [subdomain](/docs/guides/connect-domain/what-is-a-domain), or turn Email Receiving off for send-only. See [MX conflicts](/docs/guides/connect-domain/troubleshoot/mx-conflicts) and [Sending vs receiving](/docs/guides/connect-domain/sending-vs-receiving).
 </Warning>
 
 ### Complete verification
 
-Return to [Domains](https://reloop.sh/dashboard/domain) in Reloop, open the domain, and click **Verify & finish**. It may take a few minutes (rarely up to 48–72 hours) — see [propagation](/docs/guides/connect-domain/verification/propagation).
+Return to [Domains](https://reloop.sh/dashboard/domain) in Reloop. On the setup page click **Verify & finish**; on the domain detail page click **Verify Domain** (menu: **Re-verify DNS**). It may take a few minutes (rarely up to 48–72 hours) — see [propagation](/docs/guides/connect-domain/verification/propagation).
 
 <DocImage
 	label="Reloop — Verify & finish"
@@ -217,7 +217,7 @@ When verification succeeds, Reloop shows **You're all set!** — Domain added �
 ## Cloudflare-specific notes
 
 - Keep Reloop mail/auth records on **DNS only** (grey cloud). Orange-cloud proxy often breaks verification.
-- Optional **DMARC** and **tracking** (`link` CNAME) rows also appear in Reloop when enabled — add them the same way from the dashboard values.
+- **DMARC** is required for verification when Email Sending is on (keep an existing policy if you already have one). **Tracking** CNAME is on by default for new domains — host is usually `link` on apex, or `link.<sub>` for subdomains; copy from the dashboard.
 
 ## Troubleshooting
 
@@ -228,7 +228,7 @@ If your domain is not successfully verified, try these common fixes.
     Confirm Reloop records use **DNS only** (grey cloud), not Proxied (orange cloud).
   </Accordion>
   <Accordion title="Verification failed after I added records">
-    Re-open the Reloop domain page and compare every Type / Name / Value to Cloudflare. Fix typos, truncated DKIM keys, and duplicate SPF records. Then click **Verify** again.
+    Re-open the Reloop domain page and compare every Type / Name / Value to Cloudflare. Fix typos, truncated DKIM keys, and duplicate SPF records. Then click **Verify Domain** again.
   </Accordion>
   <Accordion title="It has been hours and status is still pending">
     Follow [Domain not verifying](/docs/guides/connect-domain/troubleshoot/not-verifying) and [DNS propagation](/docs/guides/connect-domain/verification/propagation).

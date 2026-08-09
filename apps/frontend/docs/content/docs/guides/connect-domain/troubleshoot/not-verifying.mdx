@@ -22,9 +22,11 @@ If NS say Cloudflare but you edited GoDaddy, Reloop will never see your changes.
 dig TXT reloop._domainkey.yourdomain.com +short
 dig TXT yourdomain.com +short
 dig TXT _dmarc.yourdomain.com +short
+dig MX yourdomain.com +short
+dig CNAME link.yourdomain.com +short
 ```
 
-Compare to the Reloop dashboard. If dig is empty, wait for [propagation](/docs/guides/connect-domain/verification/propagation) or fix the publish step.
+Compare to the Reloop dashboard (for subdomains, dig the subdomain hosts Reloop shows — e.g. `link.mail.yourdomain.com`). If dig is empty, wait for [propagation](/docs/guides/connect-domain/verification/propagation) or fix the publish step.
 
 ## 3. Fix common record mistakes
 
@@ -32,14 +34,15 @@ Compare to the Reloop dashboard. If dig is empty, wait for [propagation](/docs/g
 - **Two SPF TXT records** — merge ([SPF conflicts](/docs/guides/connect-domain/troubleshoot/spf-conflicts))
 - **Wrong host** — UI double-appended the domain (`reloop._domainkey.example.com.example.com`)
 - **Proxied Cloudflare records** — set mail-related records to DNS only
-- **Missing required group** — receiving MX or tracking still off while dashboard expects them
+- **Missing Sending MX** — when Email Sending is on, MX → `reloop.sh` must be present
+- **Missing required group** — receiving MX or tracking still expected while toggles are on (defaults are on for new domains)
 
 ## 4. Re-verify
 
-In Reloop, open the domain → **Verify**. Repeat after 15–30 minutes if dig just started showing values.
+In Reloop, open the domain → **Verify Domain** (setup: **Verify & finish**; menu: **Re-verify DNS**). Repeat after 15–30 minutes if dig just started showing values.
 
 ## 5. Still failing?
 
 - Open the matching [provider guide](/docs/guides/connect-domain/providers)
-- Try [Auto-populate](/docs/guides/connect-domain/auto-populate) if your host supports it
+- Try [Auto-populate](/docs/guides/connect-domain/auto-populate) if the dashboard shows **Auto populate**
 - Contact Reloop support with: domain name, screenshot of DNS rows, and `dig` output

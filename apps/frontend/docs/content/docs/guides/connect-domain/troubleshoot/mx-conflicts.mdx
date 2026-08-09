@@ -4,15 +4,17 @@ sidebarTitle: MX conflicts
 description: Keep an existing inbox working while using Reloop — when MX changes are safe and when to use a separate hostname.
 ---
 
-MX records decide **where inbound mail is delivered**.
+MX records decide **where inbound mail is delivered**. Lower priority number = higher preference.
 
 ## Sending-only with an existing inbox
 
-If you only need Reloop to **send**, keep your current MX where it is. Publish SPF, DKIM, DMARC (and tracking) for Reloop without replacing MX.
+If you only need Reloop to **send**, keep your current inbox MX where it is. Publish SPF, DKIM, DMARC, **Sending MX** (`reloop.sh`), and tracking as shown in Reloop — and turn **Email Receiving** off so Reloop does not expect inbound MX (`inbound.reloop.sh`).
+
+New domains start with Email Receiving on; turn it off before Auto-populate or manual publish if you must keep Google Workspace / Microsoft 365 on that hostname.
 
 ## Receiving with Reloop
 
-Enabling Reloop receiving sets MX toward `inbound.reloop.sh`. On the **same hostname**, that typically **stops** delivery to any other inbox on that name.
+Enabling Reloop receiving expects MX toward `inbound.reloop.sh`. On the **same hostname** as another inbox, adding Reloop’s inbound MX can divert or split delivery depending on priority and which MX records you keep. Do not remove Google/Microsoft MX unless you intend Reloop to receive mail for that name.
 
 ### Safe pattern
 

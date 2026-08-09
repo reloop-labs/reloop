@@ -12,12 +12,12 @@ When you add a domain, Reloop generates the exact records to publish. Always pre
 | --- | --- | --- | --- |
 | **SPF** | TXT | `@` | Authorizes Reloop to send for your domain |
 | **DKIM** | TXT | `reloop._domainkey` | Cryptographic signature so receivers trust the message |
-| **DMARC** | TXT | `_dmarc` | Policy if SPF/DKIM fail (Reloop suggests a strict policy) |
-| **Sending MX** | MX | `@` | Used in Reloop’s sending/return-path setup as shown in the dashboard |
-| **Receiving MX** | MX | `@` or your subdomain | Routes **inbound** mail to Reloop (`inbound.reloop.sh`) when receiving is on |
-| **Tracking** | CNAME | `link` | Click/open tracking (`link.yourdomain.com` → `link.reloop.sh`) |
+| **DMARC** | TXT | `_dmarc` | Policy if SPF/DKIM fail — required for verification when Email Sending is on |
+| **Sending MX** | MX | `@` or subdomain host | Required when Email Sending is on (`reloop.sh`) — does not by itself replace your inbox |
+| **Receiving MX** | MX | `@` or subdomain host | Routes **inbound** mail to Reloop (`inbound.reloop.sh`) when Email Receiving is on (default for new domains) |
+| **Tracking** | CNAME | `link` or `link.<sub>` | Click/open tracking → `link.reloop.sh` (on by default for new domains) |
 
-Hosts and whether MX/tracking appear depend on your domain settings (apex vs subdomain, sending/receiving toggles).
+Hosts and whether MX/tracking appear depend on your domain settings (apex vs subdomain, sending/receiving/tracking toggles). Always copy the host from the Reloop dashboard.
 
 ## SPF (Sender Policy Framework)
 
@@ -56,24 +56,24 @@ The long `p=` string is your public key. Reloop signs outbound mail with the mat
 v=DMARC1; p=reject;
 ```
 
-DMARC tells receivers what to do when authentication fails. Reloop’s default template uses `p=reject`. If you already have DMARC for Google/Microsoft, review carefully before overwriting — you may keep your existing policy and align later.
+DMARC tells receivers what to do when authentication fails. Reloop’s default template uses `p=reject`. When **Email Sending** is on, a matching DMARC record is required for Reloop verification. If you already have DMARC for Google/Microsoft, you can often keep your existing policy — Reloop checks that a valid DMARC record is present; review carefully before overwriting a production policy.
 
 ## MX (mail exchange)
 
-MX records control **where inbound mail is delivered**.
+Reloop may show two different MX purposes:
 
-- **Sending-only:** you may still see MX-related rows in Reloop; follow the dashboard. Reloop sending does not require replacing your existing inbox MX if you only send from Reloop.
-- **Receiving enabled:** Reloop expects MX pointing at `inbound.reloop.sh` (priority typically `10`). That **will conflict** with another inbox already using MX on the same hostname. Use a [separate hostname](/docs/guides/connect-domain/what-is-a-domain) for Reloop receiving, or see [MX conflicts](/docs/guides/connect-domain/troubleshoot/mx-conflicts).
+- **Sending MX** → typically `reloop.sh`. Required when Email Sending is on. Publishing this record does **not** require removing your existing inbox MX.
+- **Receiving MX** → typically `inbound.reloop.sh`. Used when Email Receiving is on (default for new domains). On the same hostname as Google Workspace / Microsoft 365, this can divert or split inbound delivery — turn Receiving off for send-only, or use a [separate hostname](/docs/guides/connect-domain/what-is-a-domain). See [MX conflicts](/docs/guides/connect-domain/troubleshoot/mx-conflicts).
 
 ## Tracking CNAME
 
 **Type:** CNAME  
-**Host:** usually `link`  
+**Host:** `link` on an apex domain; for a Reloop subdomain such as `mail.example.com`, the host is often `link.mail` (always copy from the dashboard)  
 **Value:** `link.reloop.sh`
 
-Used for branded click/open tracking links (`https://link.yourdomain.com/...`).
+Used for branded click/open tracking links. Click and open tracking are **on by default** for new domains; disable tracking in Reloop if you do not want this CNAME.
 
-Conflicts if `link` already points elsewhere, or if your provider disallows CNAMEs in that spot. See [Tracking CNAME issues](/docs/guides/connect-domain/troubleshoot/tracking-cname).
+Conflicts if that host already points elsewhere, or if your provider disallows CNAMEs in that spot. See [Tracking CNAME issues](/docs/guides/connect-domain/troubleshoot/tracking-cname).
 
 ## How to read a Reloop dashboard row
 

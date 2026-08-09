@@ -6,7 +6,7 @@ faq:
   - question: Why do I need to verify a domain?
     answer: Verification proves you control the DNS for that hostname and publishes SPF, DKIM, and related records so mailbox providers can authenticate mail from Reloop. Unverified domains cannot send reliably.
   - question: What is the difference between Auto-populate and manual DNS setup?
-    answer: Auto-populate uses Domain Connect so your DNS host can apply Reloop’s records after you approve a template. Manual setup means copying each TXT, MX, and CNAME into your DNS panel yourself.
+    answer: Auto-populate uses Domain Connect so your DNS host can apply Reloop’s records after you approve a template. Reloop currently offers Auto populate for Cloudflare, Vercel, Domain Chief, and NameSilo. Manual setup means copying each TXT, MX, and CNAME into your DNS panel yourself.
   - question: Can I use a subdomain instead of my root domain?
     answer: Yes. Reloop supports root domains (e.g. acme.com) and subdomains (e.g. mail.acme.com or notifications.acme.com). Subdomains are often easier when the root already has other email or DNS services.
   - question: What happens if I disable sending or receiving?
@@ -33,7 +33,7 @@ faq:
     4. Optionally open **Advanced options** to set click/open tracking defaults
     5. Click **Add Domain**
 
-    Reloop creates the domain in `pending` status and opens the DNS setup page with the records you need to publish.
+    Reloop creates the domain in `pending` status and opens the DNS setup page with the records you need to publish. Email Sending, Email Receiving, and click/open tracking start **on** by default — turn Receiving off before publishing DNS if this hostname must keep another inbox.
 
     ![Add a domain in the Reloop dashboard](/docs/images/docs/guides/connect-domain/shared/add-domain.png)
 
@@ -43,9 +43,9 @@ faq:
 
     ## Configure DNS
 
-    After you add a domain, Reloop shows the required DNS records (SPF, DKIM, DMARC, and MX/tracking when enabled).
+    After you add a domain, Reloop shows the required DNS records (SPF, DKIM, DMARC, Sending MX, and receiving/tracking rows based on your toggles).
 
-    **Auto-populate** (when available):
+    **Auto-populate** (when available — today Cloudflare, Vercel, Domain Chief, and NameSilo):
 
     1. On the setup or domain page, click **Auto populate**
     2. Approve Reloop’s Domain Connect template at your DNS host
@@ -64,7 +64,7 @@ faq:
     ## Verify a domain
 
     1. Open the domain from [Domains](https://reloop.sh/dashboard/domain) (or stay on the post-add setup page)
-    2. Click **Verify** (or use the row/header menu → **Re-verify DNS**)
+    2. Click **Verify & finish** on setup, or **Verify Domain** on the detail page (menu → **Re-verify DNS**)
     3. Wait for status to move through `pending` → `verifying` → `active`
 
     ![Verify DNS and finish in the Reloop dashboard](/docs/images/docs/guides/connect-domain/shared/verify-and-finish.png)
@@ -80,13 +80,13 @@ faq:
     On the domain detail page you can toggle capabilities without deleting the domain:
 
     1. Open [Domains](https://reloop.sh/dashboard/domain) and click a domain
-    2. On the **DNS** tab, toggle **Email Sending**, **Email Receiving**, or **Tracking** as needed
+    2. On the **DNS Records** tab, toggle **Email Sending**, **Email Receiving**, or **Tracking** as needed
     3. Open the **Configuration** tab for click tracking, open tracking, and TLS (`opportunistic` or `enforced`)
 
     <Video src="/docs/images/docs/domain/domain-config.mp4" autoPlay loop muted playsInline />
 
     <Info>
-    Receiving uses Reloop MX and can conflict with Google Workspace, Microsoft 365, or other inbox hosts. See [Sending vs receiving](/docs/guides/connect-domain/sending-vs-receiving) and [Avoid MX conflicts](/docs/guides/avoid-mx-conflicts).
+    Email Receiving is on by default for new domains. Publishing Reloop inbound MX (`inbound.reloop.sh`) on a hostname that already uses Google Workspace or Microsoft 365 can divert or split delivery — turn Receiving off for send-only, or use a subdomain. See [Sending vs receiving](/docs/guides/connect-domain/sending-vs-receiving) and [MX conflicts](/docs/guides/connect-domain/troubleshoot/mx-conflicts).
     </Info>
 
     ## Forward DNS records
@@ -155,11 +155,11 @@ faq:
   </Accordion>
 
   <Accordion title="What is the difference between Auto-populate and manual DNS setup?">
-    **Auto-populate** uses [Domain Connect](/docs/guides/connect-domain/auto-populate) so your DNS host applies Reloop’s records after you approve a template. **Manual setup** means copying each TXT, MX, and CNAME into your DNS panel yourself.
+    **Auto-populate** uses [Domain Connect](/docs/guides/connect-domain/auto-populate) so your DNS host applies Reloop’s records after you approve a template. Reloop currently offers **Auto populate** for Cloudflare, Vercel, Domain Chief, and NameSilo. **Manual setup** means copying each TXT, MX, and CNAME into your DNS panel yourself.
   </Accordion>
 
   <Accordion title="Can I use a subdomain instead of my root domain?">
-    Yes. Reloop supports root domains (e.g. `acme.com`) and subdomains (e.g. `mail.acme.com`). Subdomains are often easier when the root already has other email or DNS services. See [What is a domain?](/docs/guides/connect-domain/what-is-a-domain) and [Subdomain vs root](/docs/guides/subdomain-vs-root).
+    Yes. Reloop supports root domains (e.g. `acme.com`) and subdomains (e.g. `mail.acme.com`). Subdomains are often easier when the root already has other email or DNS services. See [What is a domain?](/docs/guides/connect-domain/what-is-a-domain).
   </Accordion>
 
   <Accordion title="What happens if I disable sending or receiving?">
@@ -167,7 +167,7 @@ faq:
   </Accordion>
 
   <Accordion title="How long does DNS verification take?">
-    Often minutes after records publish, but propagation can take up to 48 hours depending on TTL and your DNS host. Click **Verify** / **Re-verify DNS** after changes. Details: [Propagation](/docs/guides/connect-domain/verification/propagation).
+    Often minutes after records publish, but propagation can take up to 48 hours depending on TTL and your DNS host. Click **Verify Domain** / **Verify & finish** / **Re-verify DNS** after changes. Details: [Propagation](/docs/guides/connect-domain/verification/propagation).
   </Accordion>
 
   <Accordion title="What should I do if my domain will not verify?">

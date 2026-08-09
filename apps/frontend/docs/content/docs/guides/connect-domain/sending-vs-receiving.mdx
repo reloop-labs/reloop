@@ -6,6 +6,8 @@ description: Which Reloop DNS records matter for outbound mail only versus inbou
 
 Reloop can **send** mail as your domain, **receive** mail into Reloop, or both. DNS requirements differ.
 
+New domains start with **Email Sending**, **Email Receiving**, and click/open **tracking** on. Turn Receiving off before publishing DNS if this hostname must keep another inbox (Google Workspace, Microsoft 365, etc.).
+
 ## Sending (outbound)
 
 Goal: Gmail/Outlook/others accept mail from `you@yourdomain.com` as authenticated.
@@ -14,16 +16,17 @@ Typically involves:
 
 - **SPF** — authorize Reloop (`include:reloop.sh`)
 - **DKIM** — sign messages (`reloop._domainkey`)
-- **DMARC** — policy for failures
-- **Tracking CNAME** — optional but used for click/open tracking (`link`)
+- **DMARC** — policy for failures (required for Reloop verification when Email Sending is on)
+- **Sending MX** — MX → `reloop.sh` (required when Email Sending is on; this does **not** replace your inbox MX by itself)
+- **Tracking CNAME** — on by default for new domains (`link` on apex, or `link.<subdomain>` when using a subdomain) → `link.reloop.sh`
 
-You can keep another provider as the inbox on the same domain **if** you do not point MX at Reloop for that hostname.
+You can keep another provider as the inbox on the same domain **if** you leave **Email Receiving** off and do not publish Reloop’s inbound MX for that hostname.
 
 ## Receiving (inbound)
 
 Goal: Mail addressed to your domain is delivered into Reloop (Agent Inbox / inbound pipelines).
 
-Requires **MX** records pointing at Reloop’s inbound host, typically:
+Requires **Receiving MX** pointing at Reloop’s inbound host, typically:
 
 ```
 inbound.reloop.sh
@@ -32,19 +35,19 @@ inbound.reloop.sh
 (with the priority shown in the dashboard).
 
 <Warning>
-MX is winner-take-most for delivery. Pointing apex MX at Reloop **replaces** any existing inbox on that hostname. Use a [separate hostname](/docs/guides/connect-domain/what-is-a-domain) if you need Reloop receiving alongside another inbox.
+MX priority decides where inbound mail goes (lower number = higher preference). Publishing Reloop’s inbound MX (`inbound.reloop.sh`) on a hostname that already has Google/Microsoft MX can divert or split delivery. Prefer a [separate hostname](/docs/guides/connect-domain/what-is-a-domain) for Reloop receiving, or turn **Email Receiving** off for send-only. See [MX conflicts](/docs/guides/connect-domain/troubleshoot/mx-conflicts).
 </Warning>
 
 ## Dashboard toggles
 
-On the domain configuration screen you may enable or disable sending/receiving features. When you change them, Reloop shows which DNS rows are required. Publish only what the dashboard marks as needed, then verify again.
+On the domain **DNS Records** and **Configuration** tabs you can enable or disable sending, receiving, and tracking. When you change them, Reloop shows which DNS rows are required. Publish what the dashboard marks as needed, then verify again.
 
 ## Practical recipes
 
 | Goal | Approach |
 | --- | --- |
-| Transactional send only; keep existing inbox | Root or subdomain + SPF/DKIM/DMARC (+ tracking); **do not** move your current MX to Reloop |
-| Full Reloop inbox + send | Subdomain or dedicated domain; MX → `inbound.reloop.sh` |
+| Transactional send only; keep existing inbox | Root or subdomain + SPF/DKIM/DMARC/Sending MX (+ tracking as needed); turn **Email Receiving** off; do not publish inbound MX → `inbound.reloop.sh` |
+| Full Reloop inbox + send | Subdomain or dedicated domain; Receiving MX → `inbound.reloop.sh` |
 | Send from `news.acme.com`, inbox stays on `acme.com` | Add `news.acme.com` in Reloop; leave root MX alone |
 
 ## Related

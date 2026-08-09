@@ -23,14 +23,14 @@ Vercel supports Reloop **Auto-populate** (Domain Connect). This is usually the f
   <Step title="Open the domain in Reloop">
     Go to [Domains](https://reloop.sh/dashboard/domain) and open the domain you added.
   </Step>
-  <Step title="Enable receiving first (optional)">
-    If you need Reloop to **receive** mail on this hostname, turn receiving on in the domain settings **before** Auto-populate so the correct MX rows are included. See [Sending vs receiving](/docs/guides/connect-domain/sending-vs-receiving).
+  <Step title="Check receiving before Auto-populate">
+    New domains start with **Email Receiving** on, so Auto-populate usually includes inbound MX (`inbound.reloop.sh`). If this hostname must keep Google Workspace / Microsoft 365, turn **Email Receiving** off first — or use a [separate subdomain](/docs/guides/connect-domain/what-is-a-domain). See [Sending vs receiving](/docs/guides/connect-domain/sending-vs-receiving).
   </Step>
   <Step title="Click Auto populate">
     Reloop opens Vercel for consent. Sign in if asked, review the records, and approve.
   </Step>
   <Step title="Verify">
-    Return to Reloop and click **Verify**. Status should move to **active** within a few minutes (see [propagation](/docs/guides/connect-domain/verification/propagation)).
+    Return to Reloop and click **Verify & finish** or **Verify Domain** to start checks. Status should move to **active** within a few minutes (see [propagation](/docs/guides/connect-domain/verification/propagation)).
   </Step>
 </Steps>
 
@@ -57,7 +57,7 @@ If Reloop or `dig NS yourdomain.com` shows a different host, stop and edit that 
 | Priority (MX only) | Priority | As shown in Reloop (often `10`) |
 
 <Info>
-Omit your domain from the Name/Host field when the provider appends it automatically. Paste `reloop._domainkey` or `link`, not `reloop._domainkey.example.com`.
+Omit your domain from the Name/Host field when the provider appends it automatically. Paste `reloop._domainkey` or `link` (or `link.<sub>` for subdomains), not the full FQDN ending in `.example.com`. Always copy the host from Reloop.
 </Info>
 
 ### Add the records from Reloop
@@ -69,7 +69,7 @@ For **each required row** on the Reloop domain page:
     Match Reloop’s type: `TXT`, `MX`, or `CNAME`.
   </Step>
   <Step title="Set the name / host">
-    Copy the host from Reloop (`@`, `reloop._domainkey`, `_dmarc`, `link`, …).
+    Copy the host from Reloop (`@`, `reloop._domainkey`, `_dmarc`, `link` or `link.<sub>`, …).
   </Step>
   <Step title="Paste the value">
     Copy the value exactly. For MX, also set **Priority** as shown (often `10`). If priority `10` is already used by another MX you must keep, use the next free value only when Reloop’s UI allows it — otherwise use a [subdomain](/docs/guides/connect-domain/what-is-a-domain).
@@ -85,9 +85,10 @@ Typical Reloop rows (always confirm in the dashboard):
 | --- | --- | --- | --- |
 | SPF | TXT | `@` | `v=spf1 include:reloop.sh -all` (or merge into existing SPF) |
 | DKIM | TXT | `reloop._domainkey` | `v=DKIM1; k=rsa; p=…` (unique per domain) |
-| DMARC | TXT | `_dmarc` | `v=DMARC1; p=reject;` (or your existing policy) |
-| Tracking | CNAME | `link` | `link.reloop.sh` |
-| Receiving MX | MX | `@` or subdomain host | `inbound.reloop.sh` (when receiving is enabled) |
+| DMARC | TXT | `_dmarc` | `v=DMARC1; p=reject;` (or your existing policy) — required when Email Sending is on |
+| Sending MX | MX | `@` or subdomain host | `reloop.sh` (required when Email Sending is on) |
+| Tracking | CNAME | `link` (or `link.<sub>` for subdomains) | `link.reloop.sh` (on by default for new domains) |
+| Receiving MX | MX | `@` or subdomain host | `inbound.reloop.sh` (on by default for new domains — turn Email Receiving off if you keep another inbox here) |
 
 <Warning>
 Never create a second SPF TXT on the same host. Merge `include:reloop.sh` into the existing SPF. See [SPF conflicts](/docs/guides/connect-domain/troubleshoot/spf-conflicts).
@@ -100,7 +101,7 @@ Never create a second SPF TXT on the same host. Merge `include:reloop.sh` into t
 
 ## Receiving emails
 
-If you enable **Receiving** on the domain in Reloop, you must publish the inbound **MX** Reloop shows (typically `inbound.reloop.sh`).
+**Email Receiving** is on by default for new domains. If it stays on, you must publish the inbound **MX** Reloop shows (typically `inbound.reloop.sh`). Turn Email Receiving off for send-only if this hostname must keep another inbox.
 
 <Warning>
 When Reloop’s MX is active on a hostname, Reloop receives mail for that hostname according to MX priority. That can conflict with another inbox already using MX on the same name — use a separate hostname for Reloop receiving if needed. See [MX conflicts](/docs/guides/connect-domain/troubleshoot/mx-conflicts) and [Sending vs receiving](/docs/guides/connect-domain/sending-vs-receiving).
@@ -109,14 +110,14 @@ When Reloop’s MX is active on a hostname, Reloop receives mail for that hostna
 ## Complete verification
 
 1. Return to [Domains](https://reloop.sh/dashboard/domain) in Reloop.
-2. Open the domain and click **Verify**.
+2. Open the domain and click **Verify Domain** (setup page: **Verify & finish**; menu: **Re-verify DNS**).
 3. Wait until status is **active**. Most providers update within minutes; allow up to 48–72 hours in rare cases ([propagation](/docs/guides/connect-domain/verification/propagation)).
 
 ## Troubleshooting
 
 <AccordionGroup>
   <Accordion title="Verification failed after I added records">
-    Re-open the Reloop domain page and compare every Type / Host / Value to Vercel. Fix typos, truncated DKIM keys, and duplicate SPF records. Then click **Verify** again.
+    Re-open the Reloop domain page and compare every Type / Host / Value to Vercel. Fix typos, truncated DKIM keys, and duplicate SPF records. Then click **Verify Domain** again.
   </Accordion>
   <Accordion title="I added records but dig does not show them">
     Confirm you edited the DNS host that matches public nameservers (`dig NS yourdomain.com`). See [Wrong nameservers](/docs/guides/connect-domain/troubleshoot/wrong-nameservers).
