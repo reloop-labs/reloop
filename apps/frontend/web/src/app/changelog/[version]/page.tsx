@@ -85,13 +85,13 @@ export default async function ChangelogReleasePage({ params }: PageProps) {
 					</div>
 
 					{/* Title */}
-					<h1 className="mt-6 font-semibold text-3xl text-text-strong-950 tracking-tight sm:text-4xl lg:text-[2.5rem] dark:text-white">
+					<h1 className="mt-5 font-semibold text-3xl text-text-strong-950 leading-[1.15] tracking-tight sm:text-4xl lg:text-[2.6rem] dark:text-white">
 						{release.title}
 					</h1>
 
 					{/* Tag Bullet Dots */}
 					{release.tags && release.tags.length > 0 && (
-						<div className="mt-3.5 flex flex-wrap items-center gap-4 text-[13px] font-medium text-text-sub-600 dark:text-white/60">
+						<div className="mt-3.5 flex flex-wrap items-center gap-x-4 gap-y-2 text-[13px] font-medium text-text-sub-600 dark:text-white/60">
 							{release.tags.map((tag) => (
 								<div key={tag} className="flex items-center gap-1.5">
 									<span
@@ -105,12 +105,15 @@ export default async function ChangelogReleasePage({ params }: PageProps) {
 					)}
 
 					{/* Lead Description */}
-					<p className="mt-6 max-w-2xl text-[16px] text-text-sub-600 leading-relaxed sm:text-[17px] dark:text-white/65">
+					<p className="mt-6 max-w-2xl text-[15px] text-text-sub-600 leading-relaxed sm:text-[16px] dark:text-white/60">
 						{release.description}
 					</p>
 
+					{/* Horizontal Divider */}
+					<div className="my-8 border-b border-stroke-soft-200/80 sm:my-10 dark:border-white/10" />
+
 					{/* Release Content Sections */}
-					<div className="mt-10 max-w-3xl sm:mt-12">
+					<div className="max-w-3xl">
 						<ChangelogReleaseContent release={release} />
 					</div>
 				</div>
