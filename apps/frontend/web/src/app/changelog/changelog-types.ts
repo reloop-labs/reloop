@@ -18,6 +18,8 @@ type ChangelogSection = {
 
 export type ChangelogRelease = {
 	date: string;
+	/** Optional exact launch date string, e.g. "26 October 2025" */
+	launchDate?: string;
 	version: string;
 	title: string;
 	/** One-line summary shown on the changelog index and release header. */

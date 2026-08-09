@@ -31,7 +31,7 @@ export function ChangelogTimeline({
 					className="grid grid-cols-1 gap-4 px-6 py-8 sm:grid-cols-[7.5rem_minmax(0,1fr)] sm:gap-6 sm:px-10 sm:py-10 lg:gap-8 lg:px-12"
 				>
 					{/* Left sticky column for the month header */}
-					<div className="sm:sticky sm:top-24 sm:self-start sm:pt-3.5">
+					<div className="sm:sticky sm:top-24 sm:self-start sm:pt-4">
 						<time className="block font-medium text-[13.5px] text-text-sub-600 tabular-nums dark:text-white/55">
 							{group.date}
 						</time>
@@ -48,7 +48,7 @@ export function ChangelogTimeline({
 								>
 									<Link
 										href={href}
-										className="-mx-3.5 p-3.5 group flex flex-col gap-4 rounded-xl outline-none transition-colors hover:bg-bg-weak-50/80 sm:flex-row sm:items-center sm:justify-between dark:hover:bg-white/[0.03]"
+										className="-mx-3.5 group flex flex-col gap-4 rounded-xl p-3.5 outline-none transition-colors hover:bg-bg-weak-50/80 sm:flex-row sm:items-center sm:justify-between dark:hover:bg-white/[0.03]"
 									>
 										<div className="min-w-0 flex-1 pr-4 sm:pr-6">
 											<h2 className="font-medium text-[16px] text-text-strong-950 leading-snug tracking-tight sm:text-[17px] dark:text-white">

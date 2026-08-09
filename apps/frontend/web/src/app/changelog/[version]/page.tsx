@@ -45,15 +45,9 @@ export async function generateMetadata({
 	};
 }
 
-function getBreadcrumbParts(dateStr: string) {
-	const parts = dateStr.split(" ");
-	const lastPart = parts[parts.length - 1];
-	const isYear = Boolean(lastPart && /^\d{4}$/.test(lastPart));
-	if (isYear && lastPart) {
-		const datePart = parts.slice(0, -1).join(" ").toUpperCase();
-		return { year: lastPart, date: datePart };
-	}
-	return { year: "2026", date: dateStr.toUpperCase() };
+function getBreadcrumbDate(release: { date: string; launchDate?: string }) {
+	const rawDate = release.launchDate || release.date;
+	return rawDate.toUpperCase();
 }
 
 export default async function ChangelogReleasePage({ params }: PageProps) {
@@ -64,14 +58,12 @@ export default async function ChangelogReleasePage({ params }: PageProps) {
 		notFound();
 	}
 
-	const { year, date: formattedDate } = getBreadcrumbParts(release.date);
-
 	return (
 		<div className="min-h-screen bg-white dark:bg-black">
-			<section className="relative w-full border-stroke-soft-200 border-b bg-bg-white-0 text-text-strong-950 dark:border-white/10 dark:bg-black dark:text-white">
+			<section className="relative w-full border-stroke-soft-200 bg-bg-white-0 text-text-strong-950 dark:border-white/10 dark:bg-black dark:text-white">
 				<div className="mx-auto w-full max-w-5xl border-stroke-soft-200 border-x px-6 pt-28 pb-14 sm:px-10 sm:pt-32 sm:pb-16 md:max-w-7xl lg:px-12 dark:border-white/10">
 					{/* Breadcrumb Header */}
-					<div className="flex items-center gap-2 font-medium text-[11px] tracking-wider text-text-sub-600 uppercase dark:text-white/50">
+					<div className="flex items-center gap-2 font-medium text-[11px] text-text-sub-600 uppercase tracking-wider dark:text-white/50">
 						<Link
 							href="/changelog"
 							className="transition-colors hover:text-text-strong-950 dark:hover:text-white"
@@ -79,9 +71,7 @@ export default async function ChangelogReleasePage({ params }: PageProps) {
 							CHANGELOG
 						</Link>
 						<span className="text-text-soft-400 dark:text-white/30">/</span>
-						<span>{year}</span>
-						<span className="text-text-soft-400 dark:text-white/30">/</span>
-						<span>{formattedDate}</span>
+						<span>{getBreadcrumbDate(release)}</span>
 					</div>
 
 					{/* Title */}
@@ -91,7 +81,7 @@ export default async function ChangelogReleasePage({ params }: PageProps) {
 
 					{/* Tag Bullet Dots */}
 					{release.tags && release.tags.length > 0 && (
-						<div className="mt-3.5 flex flex-wrap items-center gap-x-4 gap-y-2 text-[13px] font-medium text-text-sub-600 dark:text-white/60">
+						<div className="mt-3.5 flex flex-wrap items-center gap-x-4 gap-y-2 font-medium text-[13px] text-text-sub-600 dark:text-white/60">
 							{release.tags.map((tag) => (
 								<div key={tag} className="flex items-center gap-1.5">
 									<span
@@ -110,7 +100,7 @@ export default async function ChangelogReleasePage({ params }: PageProps) {
 					</p>
 
 					{/* Horizontal Divider */}
-					<div className="my-8 border-b border-stroke-soft-200/80 sm:my-10 dark:border-white/10" />
+					<div className="-mx-6 sm:-mx-10 lg:-mx-12 my-8 border-stroke-soft-200/80 border-b sm:my-10 dark:border-white/10" />
 
 					{/* Release Content Sections */}
 					<div className="max-w-3xl">
