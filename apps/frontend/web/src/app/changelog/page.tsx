@@ -79,14 +79,14 @@ const ChangelogPage = () => {
 							href={socialProfiles.x}
 							target="_blank"
 							rel="noopener noreferrer"
-							className="inline-flex items-center gap-2 rounded-lg border border-[#e5e5e5] bg-white px-3 py-2 font-medium text-[13px] text-text-strong-950 shadow-sm transition-all hover:border-neutral-400 hover:ring-4 hover:ring-neutral-200 dark:border-white/15 dark:bg-transparent dark:text-white dark:hover:border-white/30 dark:hover:ring-white/10"
+							className="inline-flex items-center gap-2 rounded-lg border border-stroke-soft-200 bg-white px-3 py-2 font-medium text-[13px] text-text-strong-950 shadow-sm transition-all hover:border-neutral-400 hover:ring-4 hover:ring-neutral-200 dark:border-white/15 dark:bg-transparent dark:text-white dark:hover:border-white/30 dark:hover:ring-white/10"
 						>
 							<Icon name="twitter" className="size-3.5" aria-hidden="true" />
 							Follow
 						</a>
 						<a
 							href="/changelog/feed.xml"
-							className="inline-flex items-center justify-center rounded-lg border border-[#e5e5e5] bg-white p-2 text-text-sub-600 shadow-sm transition-all hover:border-neutral-400 hover:ring-4 hover:ring-neutral-200 dark:border-white/15 dark:bg-transparent dark:text-white/55 dark:hover:border-white/30 dark:hover:text-white dark:hover:ring-white/10"
+							className="inline-flex items-center justify-center rounded-lg border border-stroke-soft-200 bg-white p-2 text-text-sub-600 shadow-sm transition-all hover:border-neutral-400 hover:ring-4 hover:ring-neutral-200 dark:border-white/15 dark:bg-transparent dark:text-white/55 dark:hover:border-white/30 dark:hover:text-white dark:hover:ring-white/10"
 							aria-label="RSS feed"
 						>
 							<RssIcon className="size-3.5 text-text-strong-950 dark:text-white" />

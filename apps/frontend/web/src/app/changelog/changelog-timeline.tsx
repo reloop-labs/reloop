@@ -29,7 +29,7 @@ function ReleaseEntry({
 						{release.title}
 					</h2>
 
-					<div className="relative mt-5 aspect-video overflow-hidden rounded-lg border border-[#e5e5e5] bg-bg-weak-50 dark:border-white/10 dark:bg-white/[0.02]">
+					<div className="relative mt-5 aspect-video overflow-hidden rounded-lg border border-stroke-soft-200 bg-bg-weak-50 dark:border-white/10 dark:bg-white/[0.02]">
 						{release.preview ? (
 							<Image
 								src={release.preview.src}
@@ -63,7 +63,7 @@ export function ChangelogTimeline({
 	releases: ChangelogRelease[];
 }) {
 	return (
-		<div className="divide-y divide-[#e5e5e5] dark:divide-white/10">
+		<div className="divide-y divide-stroke-soft-200 dark:divide-white/10">
 			{releases.map((release, index) => (
 				<ReleaseEntry
 					key={`${release.version}-${release.title}`}

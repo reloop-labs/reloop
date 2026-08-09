@@ -47,11 +47,11 @@ export function ChangelogGridPattern({
 
 export function ChangelogGridHero({ children }: { children: ReactNode }) {
 	return (
-		<section className="relative overflow-clip border-[#e5e5e5] border-b px-4 dark:border-white/10">
-			<div className="relative z-0 mx-auto max-w-[1080px] px-4 sm:px-12">
+		<section className="relative overflow-clip border-stroke-soft-200 border-b px-4 sm:px-6 lg:px-8 dark:border-white/10">
+			<div className="relative z-0 mx-auto w-full max-w-5xl border-stroke-soft-200 border-x px-4 sm:px-6 md:max-w-7xl lg:px-8 dark:border-white/10">
 				{/* Vertical edges of the title box */}
 				<div
-					className="pointer-events-none absolute inset-0 border-[#e5e5e5] border-x [mask-image:linear-gradient(transparent,black)] dark:border-white/10"
+					className="pointer-events-none absolute inset-0 border-stroke-soft-200 border-x [mask-image:linear-gradient(transparent,black)] dark:border-white/10"
 					aria-hidden="true"
 				/>
 
@@ -81,7 +81,7 @@ export function ChangelogGridHero({ children }: { children: ReactNode }) {
 				>
 					<ChangelogGridPattern
 						id="changelog-grid-center"
-						className="-translate-x-1/2 absolute inset-[unset] bottom-0 left-1/2 h-[600px] w-[1080px]"
+						className="-translate-x-1/2 absolute inset-[unset] bottom-0 left-1/2 h-[600px] w-full"
 						patternOffset={[-1, 0]}
 					/>
 				</div>
@@ -94,8 +94,8 @@ export function ChangelogGridHero({ children }: { children: ReactNode }) {
 
 export function ChangelogGridBody({ children }: { children: ReactNode }) {
 	return (
-		<section className="relative overflow-clip border-[#e5e5e5] border-b px-4 dark:border-white/10">
-			<div className="relative z-0 mx-auto max-w-[1080px] border-[#e5e5e5] border-x px-4 sm:px-12 dark:border-white/10">
+		<section className="relative overflow-clip border-stroke-soft-200 border-b px-4 sm:px-6 lg:px-8 dark:border-white/10">
+			<div className="relative z-0 mx-auto w-full max-w-5xl border-stroke-soft-200 border-x px-4 sm:px-6 md:max-w-7xl lg:px-8 dark:border-white/10">
 				{children}
 			</div>
 		</section>

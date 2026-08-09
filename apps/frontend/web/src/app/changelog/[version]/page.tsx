@@ -59,8 +59,8 @@ export default async function ChangelogReleasePage({ params }: PageProps) {
 
 	return (
 		<div className="min-h-screen bg-white dark:bg-black">
-			<section className="relative overflow-clip border-[#e5e5e5] border-b px-4 dark:border-white/10">
-				<div className="relative z-0 mx-auto max-w-[1080px] border-[#e5e5e5] border-x px-4 pt-36 pb-10 sm:px-12 sm:pt-44 sm:pb-12 dark:border-white/10">
+			<section className="relative overflow-clip border-stroke-soft-200 border-b px-4 sm:px-6 lg:px-8 dark:border-white/10">
+				<div className="relative z-0 mx-auto w-full max-w-5xl border-stroke-soft-200 border-x px-4 pt-36 pb-10 sm:px-6 sm:pt-44 sm:pb-12 md:max-w-7xl lg:px-8 dark:border-white/10">
 					<Link
 						href="/changelog"
 						className="inline-flex items-center gap-1 font-medium text-[13px] text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/55 dark:hover:text-white"
@@ -85,7 +85,7 @@ export default async function ChangelogReleasePage({ params }: PageProps) {
 						</h1>
 
 						{release.preview ? (
-							<div className="relative mt-5 aspect-video overflow-hidden rounded-lg border border-[#e5e5e5] bg-bg-weak-50 dark:border-white/10 dark:bg-white/[0.02]">
+							<div className="relative mt-5 aspect-video overflow-hidden rounded-lg border border-stroke-soft-200 bg-bg-weak-50 dark:border-white/10 dark:bg-white/[0.02]">
 								<Image
 									src={release.preview.src}
 									alt={release.preview.alt}
