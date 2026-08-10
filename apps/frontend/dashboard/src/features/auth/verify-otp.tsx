@@ -1,12 +1,8 @@
 import { authClient } from "@reloop/auth/client";
 import * as DigitInput from "@reloop/ui/digit-input";
-import * as FancyButton from "@reloop/ui/fancy-button";
-import { Icon } from "@reloop/ui/icon";
 import * as LinkButton from "@reloop/ui/link-button";
-import Spinner from "@reloop/ui/spinner";
 import { useLoading } from "@reloop/ui/use-loading";
 import { useQueryClient } from "@tanstack/react-query";
-import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { parseAsString, useQueryState } from "nuqs";
 import {
@@ -30,6 +26,12 @@ import { resolvePostAuthDestinationWithQuery } from "#/utils/post-auth-destinati
 /** Matches Better Auth emailOTP send rate-limit window (3 / 60s). */
 const OTP_RESEND_COOLDOWN_SECONDS = 60;
 
+export type VerifyOtpUiState = {
+	canSubmit: boolean;
+	isLoading: boolean;
+	isSuccess: boolean;
+};
+
 export function VerifyOTP({
 	email,
 	onBack,
@@ -38,6 +40,9 @@ export function VerifyOTP({
 	mode = "login",
 	onResendFooterChange,
 	showBack = false,
+	/** When set, primary CTA is owned by the page — wire verify + disabled state. */
+	onUiStateChange,
+	registerVerify,
 }: {
 	email: string;
 	onBack?: () => void;
@@ -47,6 +52,9 @@ export function VerifyOTP({
 	mode?: "login" | "signup";
 	onResendFooterChange?: (footer: ReactNode | null) => void;
 	showBack?: boolean;
+	onUiStateChange?: (state: VerifyOtpUiState) => void;
+	/** Parent stores this and calls it from the shared primary button. */
+	registerVerify?: (verify: (() => void) | null) => void;
 }) {
 	const router = useRouter();
 	const queryClient = useQueryClient();
@@ -83,6 +91,7 @@ export function VerifyOTP({
 	}, [secondsLeft]);
 
 	const handleVerify = async (otpToVerify: string) => {
+		if (otpToVerify.length !== 6 || status === "loading" || isSuccess) return;
 		try {
 			changeStatus("loading");
 			const { data, error: verifyError } = await authClient.signIn.emailOtp({
@@ -163,6 +172,27 @@ export function VerifyOTP({
 	};
 
 	const canResend = secondsLeft <= 0 && !isResending && !isSuccess;
+	const canSubmit = otpValue.length === 6 && status !== "loading";
+	const isLoading = status === "loading";
+
+	// Keep parent CTA in sync (shared Create account / Sign in button).
+	useEffect(() => {
+		onUiStateChange?.({
+			canSubmit: canSubmit || isSuccess,
+			isLoading,
+			isSuccess,
+		});
+	}, [canSubmit, isLoading, isSuccess, onUiStateChange]);
+
+	useEffect(() => {
+		const run = () => {
+			void handleVerify(otpValue);
+		};
+		registerVerify?.(run);
+		return () => registerVerify?.(null);
+		// otpValue must be current when parent clicks the shared button.
+		// eslint-disable-next-line react-hooks/exhaustive-deps -- register stable wrapper
+	}, [otpValue, registerVerify, status, isSuccess]);
 
 	const resendLine = isSuccess ? null : isResending ? (
 		"Sending a new code…"
@@ -193,13 +223,12 @@ export function VerifyOTP({
 		if (!onResendFooterChange) return;
 		onResendFooterChange(resendLine);
 		return () => onResendFooterChange(null);
-		// resendLine is derived from these fields — avoid depending on the element identity.
 		// eslint-disable-next-line react-hooks/exhaustive-deps -- intentional
 	}, [onResendFooterChange, isSuccess, isResending, canResend, secondsLeft]);
 
 	return (
 		<div className="flex flex-col gap-5">
-			{/* Six equal digit boxes — left-aligned, larger slots */}
+			{/* Six equal digit boxes — left-aligned */}
 			<div className="flex w-full flex-col items-start">
 				<DigitInput.Root
 					value={otpValue}
@@ -226,57 +255,24 @@ export function VerifyOTP({
 						))}
 					</DigitInput.Group>
 				</DigitInput.Root>
+				{error.error && (
+					<p className="pt-2 text-left text-error-base text-sm">
+						{error.error}
+					</p>
+				)}
 			</div>
 
-			<FancyButton.Root
-				type="button"
-				variant="blue"
-				size="medium"
-				className="h-11 w-full justify-center gap-2 overflow-hidden rounded-xl font-medium text-sm"
-				onClick={() => {
-					if (isSuccess || status === "loading") return;
-					handleVerify(otpValue);
-				}}
-				disabled={(otpValue.length !== 6 || status === "loading") && !isSuccess}
-			>
-				<AnimatePresence mode="popLayout" initial={false}>
-					<motion.span
-						key={
-							isSuccess ? "success" : status === "loading" ? "loading" : "idle"
-						}
-						transition={{
-							type: "spring",
-							duration: 0.25,
-							bounce: 0,
-						}}
-						initial={{
-							opacity: 0,
-							y: -14,
-						}}
-						animate={{
-							opacity: 1,
-							y: 0,
-						}}
-						exit={{
-							opacity: 0,
-							y: 14,
-						}}
-						className="flex items-center justify-center gap-1.5"
-					>
-						{status === "loading" && <Spinner size={14} color="currentColor" />}
-						{isSuccess && (
-							<Icon name="check-circle" className="h-4 w-4 shrink-0" />
-						)}
-						<span>
-							{isSuccess
-								? "Verified successfully!"
-								: status === "loading"
-									? "Confirming…"
-									: "Confirm email"}
-						</span>
-					</motion.span>
-				</AnimatePresence>
-			</FancyButton.Root>
+			{/* Primary CTA is the shared page button (Create account / Sign in). */}
+
+			{showBack && onBack ? (
+				<button
+					type="button"
+					onClick={onBack}
+					className="cursor-pointer text-center font-medium text-[13px] text-text-soft-400 transition-colors hover:text-text-strong-950 hover:underline"
+				>
+					Back to {mode}
+				</button>
+			) : null}
 		</div>
 	);
 }

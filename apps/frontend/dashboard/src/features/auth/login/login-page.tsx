@@ -1,17 +1,23 @@
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import * as LinkButton from "@reloop/ui/link-button";
+import Spinner from "@reloop/ui/spinner";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { parseAsString, useQueryState } from "nuqs";
-import { type ReactNode, useCallback, useState } from "react";
+import { type ReactNode, useCallback, useRef, useState } from "react";
 import { AuthAside } from "#/features/auth/auth-aside";
 import { AuthCard, AuthCardHeader } from "#/features/auth/auth-card";
 import { AuthSessionLoader } from "#/features/auth/auth-session-loader";
 import { AuthShell, authStepVariants } from "#/features/auth/auth-shell";
+import { LOGIN_EMAIL_FORM_ID } from "#/features/auth/login/login-form";
 import { SocialLogin } from "#/features/auth/login/social-login";
 import { useAuthStepDirection } from "#/features/auth/use-auth-step-direction";
 import { useRedirectIfAuthenticated } from "#/features/auth/use-redirect-if-authenticated";
-import { VerifyOTP } from "#/features/auth/verify-otp";
+import {
+	type VerifyOtpUiState,
+	VerifyOTP,
+} from "#/features/auth/verify-otp";
 
 export function LoginPage() {
 	const [otpSentEmail, setOtpSentEmail] = useQueryState(
@@ -43,10 +49,21 @@ export function LoginPage() {
 	const direction = useAuthStepDirection(currentLevel);
 	const { shouldBlockAuthUi } = useRedirectIfAuthenticated(inviteId, redirectTo);
 
-	// OTP step: card footer shows "Didn't receive a code?" instead of signup link.
 	const [otpResendFooter, setOtpResendFooter] = useState<ReactNode>(null);
 	const handleResendFooterChange = useCallback((footer: ReactNode | null) => {
 		setOtpResendFooter(footer);
+	}, []);
+
+	const [emailCanSubmit, setEmailCanSubmit] = useState(false);
+	const [emailLoading, setEmailLoading] = useState(false);
+	const [otpUi, setOtpUi] = useState<VerifyOtpUiState>({
+		canSubmit: false,
+		isLoading: false,
+		isSuccess: false,
+	});
+	const verifyOtpRef = useRef<(() => void) | null>(null);
+	const registerVerify = useCallback((fn: (() => void) | null) => {
+		verifyOtpRef.current = fn;
 	}, []);
 
 	if (shouldBlockAuthUi) {
@@ -67,72 +84,132 @@ export function LoginPage() {
 		</>
 	);
 
-	const cardFooter = otpSentEmail ? (otpResendFooter ?? null) : signupFooter;
+	const isOtpStep = Boolean(otpSentEmail);
+	const cardFooter = isOtpStep ? (otpResendFooter ?? null) : signupFooter;
+
+	const ctaLoading = isOtpStep ? otpUi.isLoading : emailLoading;
+	const ctaSuccess = isOtpStep && otpUi.isSuccess;
+	const ctaDisabled = isOtpStep
+		? (!otpUi.canSubmit && !otpUi.isSuccess) || otpUi.isLoading
+		: !emailCanSubmit || emailLoading;
 
 	return (
-		// Shell stays static; step animation lives inside the card only.
 		<AuthShell direction={direction} aside={<AuthAside />} hideLogo>
 			<AuthCard footer={cardFooter}>
-				<AnimatePresence mode="wait" custom={direction} initial={false}>
-					{otpSentEmail ? (
-						<motion.div
-							key="verify-otp"
-							custom={direction}
-							variants={authStepVariants}
-							initial="initial"
-							animate="animate"
-							exit="exit"
-							transition={{ duration: 0.25, ease: [0.23, 1, 0.32, 1] }}
-							className="space-y-6"
-						>
-							<AuthCardHeader
-								title="Confirm your email"
-								description={
-									<>
-										We sent a 6 digit code to{" "}
-										<span className="inline-flex items-center gap-1 font-medium text-text-strong-950">
-											{otpSentEmail}
-											<button
-												type="button"
-												onClick={handleEditEmail}
-												className="inline-flex shrink-0 items-center justify-center rounded-md p-0.5 text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950"
-												aria-label="Edit email"
-											>
-												<Icon name="pencil" className="size-3" />
-											</button>
-										</span>
-									</>
+				<div className="relative">
+					<AnimatePresence mode="sync" custom={direction} initial={false}>
+						{isOtpStep ? (
+							<motion.div
+								key="verify-otp"
+								custom={direction}
+								variants={authStepVariants}
+								initial="initial"
+								animate="animate"
+								exit="exit"
+								transition={{ duration: 0.28, ease: [0.23, 1, 0.32, 1] }}
+								className="w-full space-y-6"
+							>
+								<AuthCardHeader
+									title="Confirm your email"
+									description={
+										<>
+											We sent a 6 digit code to{" "}
+											<span className="inline-flex items-center gap-1 font-medium text-text-strong-950">
+												{otpSentEmail}
+												<button
+													type="button"
+													onClick={handleEditEmail}
+													className="inline-flex shrink-0 items-center justify-center rounded-md p-0.5 text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950"
+													aria-label="Edit email"
+												>
+													<Icon name="pencil" className="size-3" />
+												</button>
+											</span>
+										</>
+									}
+								/>
+								<VerifyOTP
+									email={otpSentEmail}
+									mode="login"
+									inviteId={inviteId}
+									redirectTo={redirectTo}
+									onResendFooterChange={handleResendFooterChange}
+									onUiStateChange={setOtpUi}
+									registerVerify={registerVerify}
+								/>
+							</motion.div>
+						) : (
+							<motion.div
+								key="social-login"
+								custom={direction}
+								variants={authStepVariants}
+								initial={
+									currentLevel === 0 && direction === -1 ? "initial" : false
 								}
-							/>
-							<VerifyOTP
-								email={otpSentEmail}
-								mode="login"
-								inviteId={inviteId}
-								redirectTo={redirectTo}
-								onResendFooterChange={handleResendFooterChange}
-							/>
-						</motion.div>
-					) : (
-						<motion.div
-							key="social-login"
-							custom={direction}
-							variants={authStepVariants}
-							initial={
-								currentLevel === 0 && direction === -1 ? "initial" : false
-							}
-							animate="animate"
-							exit="exit"
-							transition={{ duration: 0.25, ease: [0.23, 1, 0.32, 1] }}
-							className="space-y-6"
-						>
-							<AuthCardHeader
-								title="Sign in to Reloop"
-								description="Welcome back — continue where you left off"
-							/>
-							<SocialLogin inviteId={inviteId} redirectTo={redirectTo} />
-						</motion.div>
-					)}
-				</AnimatePresence>
+								animate="animate"
+								exit="exit"
+								transition={{ duration: 0.28, ease: [0.23, 1, 0.32, 1] }}
+								className="w-full space-y-6"
+							>
+								<AuthCardHeader
+									title="Sign in to Reloop"
+									description="Welcome back — continue where you left off"
+								/>
+								<SocialLogin
+									inviteId={inviteId}
+									redirectTo={redirectTo}
+									onEmailCanSubmitChange={setEmailCanSubmit}
+									onEmailLoadingChange={setEmailLoading}
+								/>
+							</motion.div>
+						)}
+					</AnimatePresence>
+				</div>
+
+				{/* One primary button for both steps */}
+				<div className="mt-6">
+					<FancyButton.Root
+						type={isOtpStep ? "button" : "submit"}
+						form={isOtpStep ? undefined : LOGIN_EMAIL_FORM_ID}
+						variant="blue"
+						size="medium"
+						disabled={ctaDisabled}
+						className="h-11 w-full justify-center gap-2 overflow-hidden rounded-xl font-medium text-sm"
+						onClick={() => {
+							if (!isOtpStep || ctaSuccess || ctaLoading) return;
+							verifyOtpRef.current?.();
+						}}
+					>
+						<AnimatePresence mode="popLayout" initial={false}>
+							<motion.span
+								key={
+									ctaSuccess
+										? "success"
+										: ctaLoading
+											? "loading"
+											: "idle"
+								}
+								transition={{ type: "spring", duration: 0.25, bounce: 0 }}
+								initial={{ opacity: 0, y: -14 }}
+								animate={{ opacity: 1, y: 0 }}
+								exit={{ opacity: 0, y: 14 }}
+								className="flex items-center justify-center gap-1.5"
+							>
+								{ctaLoading && <Spinner size={14} color="currentColor" />}
+								{ctaSuccess && (
+									<Icon name="check-circle" className="h-4 w-4 shrink-0" />
+								)}
+								<span>
+									{ctaSuccess
+										? "Verified successfully!"
+										: ctaLoading
+											? "Signing in…"
+											: "Sign in"}
+								</span>
+							</motion.span>
+						</AnimatePresence>
+					</FancyButton.Root>
+				</div>
 			</AuthCard>
 		</AuthShell>
 	);

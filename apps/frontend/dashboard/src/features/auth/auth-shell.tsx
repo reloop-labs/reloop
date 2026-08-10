@@ -5,15 +5,22 @@ import type { ReactNode } from "react";
 export const authStepVariants = {
 	initial: (direction: number) => ({
 		opacity: 0,
-		transform: `translateX(${direction > 0 ? 20 : -20}px)`,
+		x: direction > 0 ? 16 : -16,
 	}),
 	animate: {
 		opacity: 1,
-		transform: "translateX(0px)",
+		x: 0,
+		// Stay in document flow so AnimatedHeight can measure the active step.
+		position: "relative" as const,
 	},
 	exit: (direction: number) => ({
 		opacity: 0,
-		transform: `translateX(${direction > 0 ? -20 : 20}px)`,
+		x: direction > 0 ? -16 : 16,
+		// Leave flow so the card height can tween to the incoming step only.
+		position: "absolute" as const,
+		top: 0,
+		left: 0,
+		right: 0,
 	}),
 };
 

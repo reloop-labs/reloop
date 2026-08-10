@@ -1,11 +1,9 @@
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { authClient } from "@reloop/auth/client";
-import * as FancyButton from "@reloop/ui/fancy-button";
 import * as Input from "@reloop/ui/input";
-import Spinner from "@reloop/ui/spinner";
 import { useLoading } from "@reloop/ui/use-loading";
-import { AnimatePresence, motion } from "framer-motion";
 import { useQueryState } from "nuqs";
+import { useEffect } from "react";
 import type { Resolver } from "react-hook-form";
 import { useForm } from "react-hook-form";
 import * as v from "valibot";
@@ -21,14 +19,20 @@ const loginSchema = v.object({
 
 type LoginFormData = v.InferInput<typeof loginSchema>;
 
+/** Shared form id so the persistent Sign in button can submit this form. */
+export const LOGIN_EMAIL_FORM_ID = "login-email-form";
+
 export function LoginForm({
 	disabled = false,
 	onLoadingChange,
+	onCanSubmitChange,
 }: {
 	/** Disable the form (e.g. while a social provider is loading). */
 	disabled?: boolean;
 	/** Notify parent when email submit loading state changes. */
 	onLoadingChange?: (loading: boolean) => void;
+	/** Notify parent when the form is ready to submit (for shared CTA). */
+	onCanSubmitChange?: (canSubmit: boolean) => void;
 }) {
 	const { changeStatus, status } = useLoading();
 	const [, setOtpSentEmail] = useQueryState("otpSent");
@@ -45,10 +49,20 @@ export function LoginForm({
 		},
 	});
 
+	const isBusy = status === "loading" || disabled;
+	const canSubmit = isValid && !isBusy;
+
+	useEffect(() => {
+		onCanSubmitChange?.(canSubmit);
+	}, [canSubmit, onCanSubmitChange]);
+
+	useEffect(() => {
+		onLoadingChange?.(status === "loading");
+	}, [status, onLoadingChange]);
+
 	const onSubmit = async (data: LoginFormData) => {
 		try {
 			changeStatus("loading");
-			onLoadingChange?.(true);
 			const email = data.email;
 			const { error } = await authClient.emailOtp.sendVerificationOtp({
 				email,
@@ -57,23 +71,22 @@ export function LoginForm({
 			if (error) {
 				toastApiError(error, "Could not send the login code.");
 				changeStatus("idle");
-				onLoadingChange?.(false);
 				return;
 			}
 			setOtpSentEmail(email);
 			changeStatus("idle");
-			onLoadingChange?.(false);
 		} catch (e) {
 			changeStatus("idle");
-			onLoadingChange?.(false);
 			toastApiError(e, "An unexpected error occurred.");
 		}
 	};
 
-	const isBusy = status === "loading" || disabled;
-
 	return (
-		<form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+		<form
+			id={LOGIN_EMAIL_FORM_ID}
+			onSubmit={handleSubmit(onSubmit)}
+			className="flex flex-col gap-4"
+		>
 			<div className="flex flex-col gap-1.5">
 				<label
 					htmlFor="email"
@@ -97,47 +110,7 @@ export function LoginForm({
 					<p className="text-error-base text-sm">{errors.email.message}</p>
 				)}
 			</div>
-
-			<FancyButton.Root
-				type="submit"
-				disabled={isBusy || !isValid}
-				variant="blue"
-				size="medium"
-				className="h-10 w-full overflow-hidden rounded-xl font-medium text-sm"
-			>
-				<AnimatePresence mode="popLayout" initial={false}>
-					<motion.span
-						key={status === "loading" ? "loading" : "idle"}
-						transition={{
-							type: "spring",
-							duration: 0.25,
-							bounce: 0,
-						}}
-						initial={{
-							opacity: 0,
-							y: -14,
-						}}
-						animate={{
-							opacity: 1,
-							y: 0,
-						}}
-						exit={{
-							opacity: 0,
-							y: 14,
-						}}
-						className="flex items-center justify-center gap-1.5"
-					>
-						{status === "loading" ? (
-							<>
-								<Spinner size={14} color="currentColor" />
-								<span>Signing in…</span>
-							</>
-						) : (
-							<span>Sign in</span>
-						)}
-					</motion.span>
-				</AnimatePresence>
-			</FancyButton.Root>
+			{/* Primary CTA lives on the page (shared with OTP confirm). */}
 		</form>
 	);
 }

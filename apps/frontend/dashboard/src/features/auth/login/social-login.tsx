@@ -20,9 +20,13 @@ function loginCallbackURL(inviteId?: string, redirectTo?: string) {
 export function SocialLogin({
 	inviteId,
 	redirectTo,
+	onEmailLoadingChange,
+	onEmailCanSubmitChange,
 }: {
 	inviteId?: string;
 	redirectTo?: string;
+	onEmailLoadingChange?: (loading: boolean) => void;
+	onEmailCanSubmitChange?: (canSubmit: boolean) => void;
 }) {
 	const [loading, setLoading] = useState<{
 		name: "google" | "github" | "email";
@@ -118,12 +122,14 @@ export function SocialLogin({
 				<div className="h-px flex-1 border-stroke-soft-200 border-t border-dashed dark:border-stroke-soft-100/40" />
 			</div>
 
-			{/* Email field + Sign in — same single-step layout as signup */}
+			{/* Email field only — Sign in is the shared page CTA */}
 			<LoginForm
 				disabled={socialBusy}
-				onLoadingChange={(isLoading) =>
-					setLoading({ name: "email", loading: isLoading })
-				}
+				onLoadingChange={(isLoading) => {
+					setLoading({ name: "email", loading: isLoading });
+					onEmailLoadingChange?.(isLoading);
+				}}
+				onCanSubmitChange={onEmailCanSubmitChange}
 			/>
 		</>
 	);

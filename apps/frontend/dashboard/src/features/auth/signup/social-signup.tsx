@@ -16,9 +16,13 @@ function signupCallbackURL(inviteId?: string) {
 
 export function SocialSignup({
 	inviteId,
+	onEmailLoadingChange,
+	onEmailCanSubmitChange,
 }: {
 	/** Organization Invitation id — preserved through OAuth callback. */
 	inviteId?: string;
+	onEmailLoadingChange?: (loading: boolean) => void;
+	onEmailCanSubmitChange?: (canSubmit: boolean) => void;
 }) {
 	const [loading, setLoading] = useState<{
 		name: "google" | "github" | "email";
@@ -113,12 +117,14 @@ export function SocialSignup({
 				<div className="h-px flex-1 border-stroke-soft-200 border-t border-dashed dark:border-stroke-soft-100/40" />
 			</div>
 
-			{/* Email field + Create account — no intermediate "Continue with Email" step */}
+			{/* Email field only — Create account is the shared page CTA */}
 			<SignupForm
 				disabled={socialBusy}
-				onLoadingChange={(isLoading) =>
-					setLoading({ name: "email", loading: isLoading })
-				}
+				onLoadingChange={(isLoading) => {
+					setLoading({ name: "email", loading: isLoading });
+					onEmailLoadingChange?.(isLoading);
+				}}
+				onCanSubmitChange={onEmailCanSubmitChange}
 			/>
 		</>
 	);
