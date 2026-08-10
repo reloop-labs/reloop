@@ -1,13 +1,7 @@
-import {
-	FeatureCta,
-	MarketingPageShell,
-	PageSection,
-} from "@reloop/web/components/page-shell";
-import { getSiteUrl } from "@reloop/web/lib/site";
+import { JsonLd } from "@reloop/web/components/json-ld";
+import { contactEmail, getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
-import { LicenseFaq } from "./components/license-faq";
-import { LicensePermissions } from "./components/license-permissions";
-import { LicenseText } from "./components/license-text";
+import { LicenseDocument } from "./components/license-document";
 
 // TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
 // See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
@@ -43,79 +37,73 @@ export const metadata: Metadata = {
 	},
 };
 
-const LICENSE_TEXT = `Copyright (c) 2025 Reloop Labs
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-
-----------------------------------------------------------------------
-ADDITIONAL USE RESTRICTIONS (Custom Clause by Reloop Labs)
-----------------------------------------------------------------------
-
-1. You are free to use, copy, modify, and distribute this software for
-   personal use and internal company purposes.
-
-2. You are NOT permitted to:
-   - Sell, sublicense, or otherwise commercially redistribute this software.
-   - Offer this software, or any modified version of it, as a hosted service
-     (including but not limited to Software-as-a-Service, Platform-as-a-Service,
-     or any similar commercial hosting model).
-   - Use this software in any product or service whose primary purpose is to
-     compete with Reloop Labs.
-
-3. Reloop Labs offers Reloop as a hosted email service, or you may
-   self-host the open-source software on your own infrastructure.
-   There is no commercial license for third parties to resell or
-   offer competing hosted services using this software.
-
-   For questions about the license or project, contact:
-   reloop.sh@gmail.com`;
-
 const LicensePage = () => {
+	const siteUrl = getSiteUrl();
+	const jsonLd = {
+		"@context": "https://schema.org",
+		"@type": "WebPage",
+		"@id": `${pageUrl}#webpage`,
+		url: pageUrl,
+		name: "License | Reloop",
+		description:
+			"Reloop is licensed under Apache License 2.0 with additional use restrictions from Reloop Labs.",
+		isPartOf: {
+			"@type": "WebSite",
+			"@id": `${siteUrl}/#website`,
+			name: "Reloop",
+			url: siteUrl,
+		},
+		about: {
+			"@type": "CreativeWork",
+			name: "Reloop License",
+			license: "https://www.apache.org/licenses/LICENSE-2.0",
+			copyrightHolder: {
+				"@type": "Organization",
+				name: "Reloop Labs",
+				email: contactEmail,
+			},
+		},
+	};
+
 	return (
-		<MarketingPageShell
-			titleLines={["Apache 2.0 License"]}
-			description="Apache 2.0 with Reloop Labs terms—use our hosted email service or self-host the open-source platform."
-			primaryCta={{
-				label: "Get started",
-				href: "/dashboard/signup",
-			}}
-			secondaryCta={{
-				label: "Self-hosting guide",
-				href: "/docs/self-host",
-			}}
-			compactHero
-		>
-			<PageSection narrow flushTop>
-				<LicenseText>{LICENSE_TEXT}</LicenseText>
-			</PageSection>
+		<>
+			<JsonLd data={jsonLd} />
+			<div className="mx-auto flex min-h-dvh w-full max-w-5xl flex-col border-stroke-soft-200 border-x pt-16 md:max-w-7xl dark:border-white/10">
+				{/* 3-column layout with solid straight dividers */}
+				<div className="grid flex-1 grid-cols-1 lg:grid-cols-12">
+					{/* Left label */}
+					<div className="flex justify-start border-stroke-soft-200 border-b px-6 py-8 text-left sm:px-8 lg:col-span-2 lg:justify-end lg:border-r lg:border-b-0 lg:px-6 lg:py-16 lg:text-right dark:border-white/10">
+						<div className="font-medium text-text-sub-600/70 text-xs">
+							License
+						</div>
+					</div>
 
-			<PageSection>
-				<LicensePermissions />
-			</PageSection>
+					{/* Center layered card — wider */}
+					<div className="flex flex-col border-stroke-soft-200 border-b px-5 py-8 sm:px-8 sm:py-10 lg:col-span-8 lg:border-r lg:border-b-0 lg:px-8 lg:py-14 xl:px-10 dark:border-white/10">
+						<LicenseDocument />
+					</div>
 
-			<LicenseFaq />
-
-			<FeatureCta
-				title="Ready to use Reloop?"
-				titleMuted="Hosted or self-hosted."
-				description="Sign up for our email service, or clone the repo and deploy Reloop on infrastructure you control."
-				primary={{ label: "Get started", href: "/dashboard/signup" }}
-				secondary={{
-					label: "Self-hosting guide",
-					href: "/docs/self-host",
-				}}
-			/>
-		</MarketingPageShell>
+					{/* Right meta */}
+					<div className="flex justify-start px-6 py-8 sm:px-8 lg:col-span-2 lg:px-6 lg:py-16 dark:border-white/10">
+						<div className="w-full space-y-2.5">
+							<p className="font-medium text-text-sub-600 text-xs dark:text-white/55">
+								Apache License 2.0
+							</p>
+							<p className="text-text-soft-400 text-xs leading-relaxed dark:text-white/40">
+								Personal &amp; internal use allowed. No commercial redistribution
+								or competing hosted services.
+							</p>
+							<a
+								href={`mailto:${contactEmail}`}
+								className="inline-block font-medium text-text-sub-600 text-xs underline decoration-text-sub-600/40 underline-offset-2 transition-colors hover:text-text-strong-950 hover:decoration-text-strong-950 dark:text-white/50 dark:hover:text-white"
+							>
+								{contactEmail}
+							</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</>
 	);
 };
 

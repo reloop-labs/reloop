@@ -118,7 +118,6 @@ const navItems: NavItem[] = [
 					title: "Company",
 					links: [
 						{ title: "About", href: "/about" },
-						{ title: "From the founder", href: "/from-the-founder" },
 						{ title: "Contact", href: "/contact" },
 						{ title: "Blog", href: "/blog" },
 						{ title: "Pricing", href: "/pricing" },
