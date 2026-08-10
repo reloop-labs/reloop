@@ -51,7 +51,7 @@ export function LoginPage() {
 
 	const [otpResendFooter, setOtpResendFooter] = useState<ReactNode>(null);
 	const handleResendFooterChange = useCallback((footer: ReactNode | null) => {
-		setOtpResendFooter(footer);
+		if (footer != null) setOtpResendFooter(footer);
 	}, []);
 
 	const [emailCanSubmit, setEmailCanSubmit] = useState(false);
@@ -84,8 +84,18 @@ export function LoginPage() {
 		</>
 	);
 
+	const otpFooterPlaceholder = (
+		<>
+			Didn&apos;t receive a code?{" "}
+			<span className="text-text-soft-400">Resend in 60s</span>
+		</>
+	);
+
 	const isOtpStep = Boolean(otpSentEmail);
-	const cardFooter = isOtpStep ? (otpResendFooter ?? null) : signupFooter;
+	const cardFooter = isOtpStep
+		? (otpResendFooter ?? otpFooterPlaceholder)
+		: signupFooter;
+	const cardFooterKey = isOtpStep ? "otp-resend" : "signup-link";
 
 	const ctaLoading = isOtpStep ? otpUi.isLoading : emailLoading;
 	const ctaSuccess = isOtpStep && otpUi.isSuccess;
@@ -95,7 +105,7 @@ export function LoginPage() {
 
 	return (
 		<AuthShell direction={direction} aside={<AuthAside />} hideLogo>
-			<AuthCard footer={cardFooter}>
+			<AuthCard footer={cardFooter} footerKey={cardFooterKey}>
 				<div className="relative">
 					<AnimatePresence mode="sync" custom={direction} initial={false}>
 						{isOtpStep ? (

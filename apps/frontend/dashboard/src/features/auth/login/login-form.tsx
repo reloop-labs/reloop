@@ -3,7 +3,7 @@ import { authClient } from "@reloop/auth/client";
 import * as Input from "@reloop/ui/input";
 import { useLoading } from "@reloop/ui/use-loading";
 import { useQueryState } from "nuqs";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import type { Resolver } from "react-hook-form";
 import { useForm } from "react-hook-form";
 import * as v from "valibot";
@@ -52,13 +52,19 @@ export function LoginForm({
 	const isBusy = status === "loading" || disabled;
 	const canSubmit = isValid && !isBusy;
 
-	useEffect(() => {
-		onCanSubmitChange?.(canSubmit);
-	}, [canSubmit, onCanSubmitChange]);
+	// Refs avoid re-running effects when parents pass inline callbacks (infinite setState loop).
+	const onCanSubmitChangeRef = useRef(onCanSubmitChange);
+	const onLoadingChangeRef = useRef(onLoadingChange);
+	onCanSubmitChangeRef.current = onCanSubmitChange;
+	onLoadingChangeRef.current = onLoadingChange;
 
 	useEffect(() => {
-		onLoadingChange?.(status === "loading");
-	}, [status, onLoadingChange]);
+		onCanSubmitChangeRef.current?.(canSubmit);
+	}, [canSubmit]);
+
+	useEffect(() => {
+		onLoadingChangeRef.current?.(status === "loading");
+	}, [status]);
 
 	const onSubmit = async (data: LoginFormData) => {
 		try {

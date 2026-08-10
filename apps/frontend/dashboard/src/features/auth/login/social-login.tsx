@@ -2,7 +2,7 @@ import { authClient } from "@reloop/auth/client";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import Spinner from "@reloop/ui/spinner";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { GoogleLogo } from "#/features/auth/google-logo";
 import { LoginForm } from "#/features/auth/login/login-form";
 
@@ -51,6 +51,17 @@ export function SocialLogin({
 	}>({ name: "email", error: null });
 
 	const socialBusy = loading.loading && loading.name !== "email";
+
+	const handleEmailLoadingChange = useCallback(
+		(isLoading: boolean) => {
+			setLoading((prev) => {
+				if (prev.name === "email" && prev.loading === isLoading) return prev;
+				return { name: "email", loading: isLoading };
+			});
+			onEmailLoadingChange?.(isLoading);
+		},
+		[onEmailLoadingChange],
+	);
 
 	return (
 		<>
@@ -125,10 +136,7 @@ export function SocialLogin({
 			{/* Email field only — Sign in is the shared page CTA */}
 			<LoginForm
 				disabled={socialBusy}
-				onLoadingChange={(isLoading) => {
-					setLoading({ name: "email", loading: isLoading });
-					onEmailLoadingChange?.(isLoading);
-				}}
+				onLoadingChange={handleEmailLoadingChange}
 				onCanSubmitChange={onEmailCanSubmitChange}
 			/>
 		</>

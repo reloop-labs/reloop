@@ -176,13 +176,27 @@ export function VerifyOTP({
 	const isLoading = status === "loading";
 
 	// Keep parent CTA in sync (shared Create account / Sign in button).
+	const onUiStateChangeRef = useRef(onUiStateChange);
+	onUiStateChangeRef.current = onUiStateChange;
+	const lastUiStateRef = useRef<VerifyOtpUiState | null>(null);
 	useEffect(() => {
-		onUiStateChange?.({
+		const next: VerifyOtpUiState = {
 			canSubmit: canSubmit || isSuccess,
 			isLoading,
 			isSuccess,
-		});
-	}, [canSubmit, isLoading, isSuccess, onUiStateChange]);
+		};
+		const prev = lastUiStateRef.current;
+		if (
+			prev &&
+			prev.canSubmit === next.canSubmit &&
+			prev.isLoading === next.isLoading &&
+			prev.isSuccess === next.isSuccess
+		) {
+			return;
+		}
+		lastUiStateRef.current = next;
+		onUiStateChangeRef.current?.(next);
+	}, [canSubmit, isLoading, isSuccess]);
 
 	useEffect(() => {
 		const run = () => {
@@ -218,11 +232,11 @@ export function VerifyOTP({
 		</>
 	);
 
-	// Push resend into AuthCard footer when requested; clear on unmount.
+	// Push resend into AuthCard footer. Do not clear to null on unmount —
+	// that collapses the footer strip before the parent swaps copy (pop/gap).
 	useLayoutEffect(() => {
-		if (!onResendFooterChange) return;
+		if (!onResendFooterChange || resendLine == null) return;
 		onResendFooterChange(resendLine);
-		return () => onResendFooterChange(null);
 		// eslint-disable-next-line react-hooks/exhaustive-deps -- intentional
 	}, [onResendFooterChange, isSuccess, isResending, canResend, secondsLeft]);
 

@@ -40,10 +40,10 @@ export function SignupPage() {
 	const direction = useAuthStepDirection(currentLevel);
 	const { shouldBlockAuthUi } = useRedirectIfAuthenticated(inviteId);
 
-	// OTP step: card footer shows "Didn't receive a code?" instead of login link.
+	// OTP step footer — keep a placeholder so the strip never unmounts mid-transition.
 	const [otpResendFooter, setOtpResendFooter] = useState<ReactNode>(null);
 	const handleResendFooterChange = useCallback((footer: ReactNode | null) => {
-		setOtpResendFooter(footer);
+		if (footer != null) setOtpResendFooter(footer);
 	}, []);
 
 	// Shared primary CTA state (one button for email send + OTP confirm).
@@ -77,8 +77,19 @@ export function SignupPage() {
 		</>
 	);
 
+	const otpFooterPlaceholder = (
+		<>
+			Didn&apos;t receive a code?{" "}
+			<span className="text-text-soft-400">Resend in 60s</span>
+		</>
+	);
+
 	const isOtpStep = Boolean(otpSentEmail);
-	const cardFooter = isOtpStep ? (otpResendFooter ?? null) : loginFooter;
+	// Always provide footer content — never null — so the soft strip doesn't collapse.
+	const cardFooter = isOtpStep
+		? (otpResendFooter ?? otpFooterPlaceholder)
+		: loginFooter;
+	const cardFooterKey = isOtpStep ? "otp-resend" : "login-link";
 
 	const ctaLoading = isOtpStep ? otpUi.isLoading : emailLoading;
 	const ctaSuccess = isOtpStep && otpUi.isSuccess;
@@ -89,7 +100,7 @@ export function SignupPage() {
 	return (
 		// Shell stays static; step animation lives inside the card only.
 		<AuthShell direction={direction} aside={<AuthAside />} hideLogo>
-			<AuthCard footer={cardFooter}>
+			<AuthCard footer={cardFooter} footerKey={cardFooterKey}>
 				{/* relative + sync exit so card height can tween without collapsing to 0 */}
 				<div className="relative">
 					<AnimatePresence mode="sync" custom={direction} initial={false}>
