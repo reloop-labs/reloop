@@ -1,14 +1,13 @@
 import { authClient } from "@reloop/auth/client";
-import * as Button from "@reloop/ui/button";
-import * as DigitInput from "@reloop/ui/digit-input";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
+import * as DigitInput from "@reloop/ui/digit-input";
 import Spinner from "@reloop/ui/spinner";
 import { useLoading } from "@reloop/ui/use-loading";
 import { useQueryClient } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { parseAsBoolean, parseAsString, useQueryState } from "nuqs";
+import { parseAsString, useQueryState } from "nuqs";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { sessionQueryOptions } from "#/features/auth/session-query";
@@ -50,10 +49,6 @@ export function VerifyOTP({
 		};
 	}, []);
 
-	const [enterCode, setEnterCode] = useQueryState(
-		"enterCode",
-		parseAsBoolean.withDefault(false),
-	);
 	const [otpValue, setOtpValue] = useQueryState(
 		"otp",
 		parseAsString.withDefault(""),
@@ -160,117 +155,99 @@ export function VerifyOTP({
 
 	return (
 		<div>
-			{enterCode && (
-				<motion.div
-					key="otp-input"
-					initial={{ opacity: 0, height: 0 }}
-					animate={{ opacity: 1, height: "auto" }}
-					exit={{ opacity: 0, height: 0 }}
-					transition={{ duration: 0.2 }}
-					className="flex flex-col items-center overflow-hidden"
-				>
-					<div className="pt-1 pb-5">
-						<DigitInput.Root
-							value={otpValue}
-							onChange={(val) => {
-								setError({ name: "email", error: null });
-								setIsSuccess(false);
-								setOtpValue(val);
-							}}
-							onComplete={handleVerify}
-							inputMode="numeric"
-							maxLength={6}
-							autoFocus
-							hasError={!!error.error}
-							isSuccess={isSuccess}
-						>
-							<DigitInput.Group>
-								<DigitInput.Slot index={0} />
-								<DigitInput.Slot index={1} />
-								<DigitInput.Slot index={2} />
-								<DigitInput.Separator />
-								<DigitInput.Slot index={3} />
-								<DigitInput.Slot index={4} />
-								<DigitInput.Slot index={5} />
-							</DigitInput.Group>
-						</DigitInput.Root>
-						{error.error && (
-							<p className="pt-2 text-center text-error-base text-sm">
-								{error.error}
-							</p>
+			{/* OTP input always visible — no "Enter code manually" gate */}
+			<div className="flex flex-col items-center">
+				<div className="pt-1 pb-5">
+					<DigitInput.Root
+						value={otpValue}
+						onChange={(val) => {
+							setError({ name: "email", error: null });
+							setIsSuccess(false);
+							setOtpValue(val);
+						}}
+						onComplete={handleVerify}
+						inputMode="numeric"
+						maxLength={6}
+						autoFocus
+						hasError={!!error.error}
+						isSuccess={isSuccess}
+					>
+						<DigitInput.Group>
+							<DigitInput.Slot index={0} />
+							<DigitInput.Slot index={1} />
+							<DigitInput.Slot index={2} />
+							<DigitInput.Separator />
+							<DigitInput.Slot index={3} />
+							<DigitInput.Slot index={4} />
+							<DigitInput.Slot index={5} />
+						</DigitInput.Group>
+					</DigitInput.Root>
+					{error.error && (
+						<p className="pt-2 text-center text-error-base text-sm">
+							{error.error}
+						</p>
+					)}
+				</div>
+			</div>
+
+			<FancyButton.Root
+				type="button"
+				variant="blue"
+				size="medium"
+				className="h-10 w-full justify-center gap-2 overflow-hidden rounded-xl font-medium text-sm"
+				onClick={() => {
+					if (isSuccess || status === "loading") return;
+					handleVerify(otpValue);
+				}}
+				disabled={
+					(otpValue.length !== 6 || status === "loading") && !isSuccess
+				}
+			>
+				<AnimatePresence mode="popLayout" initial={false}>
+					<motion.span
+						key={
+							isSuccess
+								? "success"
+								: status === "loading"
+									? "loading"
+									: "idle"
+						}
+						transition={{
+							type: "spring",
+							duration: 0.25,
+							bounce: 0,
+						}}
+						initial={{
+							opacity: 0,
+							y: -14,
+						}}
+						animate={{
+							opacity: 1,
+							y: 0,
+						}}
+						exit={{
+							opacity: 0,
+							y: 14,
+						}}
+						className="flex items-center justify-center gap-1.5"
+					>
+						{status === "loading" && (
+							<Spinner size={14} color="currentColor" />
 						)}
-					</div>
-				</motion.div>
-			)}
-			{!enterCode ? (
-				<Button.Root
-					type="button"
-					variant="neutral"
-					mode="stroke"
-					className="flex h-10 w-full items-center justify-center gap-2 rounded-xl font-medium text-sm"
-					onClick={() => setEnterCode(true)}
-				>
-					Enter code manually
-				</Button.Root>
-			) : (
-				<FancyButton.Root
-					type="button"
-					variant="blue"
-					size="medium"
-					className="h-10 w-full justify-center gap-2 overflow-hidden rounded-xl font-medium text-sm"
-					onClick={() => {
-						if (isSuccess || status === "loading") return;
-						handleVerify(otpValue);
-					}}
-					disabled={
-						(otpValue.length !== 6 || status === "loading") && !isSuccess
-					}
-				>
-					<AnimatePresence mode="popLayout" initial={false}>
-						<motion.span
-							key={
-								isSuccess
-									? "success"
-									: status === "loading"
-										? "loading"
-										: "idle"
-							}
-							transition={{
-								type: "spring",
-								duration: 0.25,
-								bounce: 0,
-							}}
-							initial={{
-								opacity: 0,
-								y: -14,
-							}}
-							animate={{
-								opacity: 1,
-								y: 0,
-							}}
-							exit={{
-								opacity: 0,
-								y: 14,
-							}}
-							className="flex items-center justify-center gap-1.5"
-						>
-							{status === "loading" && (
-								<Spinner size={14} color="currentColor" />
-							)}
-							{isSuccess && (
-								<Icon name="check-circle" className="h-4 w-4 shrink-0" />
-							)}
-							<span>
-								{isSuccess
-									? "Verified successfully!"
-									: status === "loading"
-										? "Verifying..."
-										: `Continue with ${mode} code`}
-							</span>
-						</motion.span>
-					</AnimatePresence>
-				</FancyButton.Root>
-			)}
+						{isSuccess && (
+							<Icon name="check-circle" className="h-4 w-4 shrink-0" />
+						)}
+						<span>
+							{isSuccess
+								? "Verified successfully!"
+								: status === "loading"
+									? "Verifying..."
+									: `Continue with ${mode} code`}
+						</span>
+					</motion.span>
+				</AnimatePresence>
+			</FancyButton.Root>
+
 			<div className="mt-4 flex flex-col items-center gap-2">
 				{canResend ? (
 					<button

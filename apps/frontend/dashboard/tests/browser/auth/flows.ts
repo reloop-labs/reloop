@@ -71,7 +71,7 @@ export async function completeEmailOtpAuth(
 		return;
 	}
 
-	await page.getByRole("button", { name: "Enter code manually" }).click();
+	// OTP input is always visible — no "Enter code manually" step.
 	await fillOtp(page, otp);
 }
 

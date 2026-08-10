@@ -18,10 +18,6 @@ export function LoginPage() {
 		"otpSent",
 		parseAsString.withDefault(""),
 	);
-	const [, setEnterCode] = useQueryState(
-		"enterCode",
-		parseAsBoolean.withDefault(false),
-	);
 	const [, setOtpValue] = useQueryState("otp", parseAsString.withDefault(""));
 	const [inviteIdQuery] = useQueryState(
 		"inviteId",
@@ -80,7 +76,6 @@ export function LoginPage() {
 						redirectTo={redirectTo}
 						onBack={() => {
 							setOtpSentEmail(null);
-							setEnterCode(null);
 							setOtpValue("");
 						}}
 					/>

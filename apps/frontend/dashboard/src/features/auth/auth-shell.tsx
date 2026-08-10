@@ -63,7 +63,12 @@ export function AuthShell({
 						<div
 							className={hideLogo ? "w-full max-w-107.5" : "w-full max-w-sm"}
 						>
-							<AuthStepFrame direction={direction}>{children}</AuthStepFrame>
+							{/* Card-mode pages (hideLogo) own their own step animation inside the card. */}
+							{hideLogo ? (
+								children
+							) : (
+								<AuthStepFrame direction={direction}>{children}</AuthStepFrame>
+							)}
 						</div>
 					</div>
 				</div>

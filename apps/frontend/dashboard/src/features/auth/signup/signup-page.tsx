@@ -1,9 +1,9 @@
 import * as LinkButton from "@reloop/ui/link-button";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
-import { parseAsBoolean, parseAsString, useQueryState } from "nuqs";
+import { parseAsString, useQueryState } from "nuqs";
 import { AuthAside } from "#/features/auth/auth-aside";
-import { AuthCard } from "#/features/auth/auth-card";
+import { AuthCard, AuthCardHeader } from "#/features/auth/auth-card";
 import { AuthSessionLoader } from "#/features/auth/auth-session-loader";
 import { AuthShell, authStepVariants } from "#/features/auth/auth-shell";
 import { SocialSignup } from "#/features/auth/signup/social-signup";
@@ -15,10 +15,6 @@ export function SignupPage() {
 	const [otpSentEmail, setOtpSentEmail] = useQueryState(
 		"otpSent",
 		parseAsString.withDefault(""),
-	);
-	const [, setEnterCode] = useQueryState(
-		"enterCode",
-		parseAsBoolean.withDefault(false),
 	);
 	const [, setOtpValue] = useQueryState("otp", parseAsString.withDefault(""));
 	const [inviteIdQuery] = useQueryState(
@@ -50,64 +46,66 @@ export function SignupPage() {
 	);
 
 	return (
+		// Shell stays static; step animation lives inside the card only.
 		<AuthShell direction={direction} aside={<AuthAside />} hideLogo>
-			{otpSentEmail ? (
-				<motion.div
-					key="verify-otp"
-					custom={direction}
-					variants={authStepVariants}
-					initial="initial"
-					animate="animate"
-					exit="exit"
-					transition={{ duration: 0.25, ease: [0.23, 1, 0.32, 1] }}
-				>
-					<AuthCard
-						title="Check your email"
-						description={
-							<>
-								We&apos;ve sent you a temporary signup otp. Please check your
-								inbox at{" "}
-								<span className="font-medium text-text-strong-950">
-									{otpSentEmail}
-								</span>
-								.
-							</>
-						}
-						footer={loginFooter}
-					>
-						<VerifyOTP
-							email={otpSentEmail}
-							mode="signup"
-							inviteId={inviteId}
-							onBack={() => {
-								setOtpSentEmail(null);
-								setEnterCode(null);
-								setOtpValue("");
-							}}
-						/>
-					</AuthCard>
-				</motion.div>
-			) : (
-				<motion.div
-					key="social-signup"
-					custom={direction}
-					variants={authStepVariants}
-					initial={
-						currentLevel === 0 && direction === -1 ? "initial" : undefined
-					}
-					animate="animate"
-					exit="exit"
-					transition={{ duration: 0.25, ease: [0.23, 1, 0.32, 1] }}
-				>
-					<AuthCard
-						title="Create your Account"
-						description="Sign up and start sending email in 5 mins"
-						footer={loginFooter}
-					>
-						<SocialSignup inviteId={inviteId} />
-					</AuthCard>
-				</motion.div>
-			)}
+			<AuthCard footer={loginFooter}>
+				<AnimatePresence mode="wait" custom={direction} initial={false}>
+					{otpSentEmail ? (
+						<motion.div
+							key="verify-otp"
+							custom={direction}
+							variants={authStepVariants}
+							initial="initial"
+							animate="animate"
+							exit="exit"
+							transition={{ duration: 0.25, ease: [0.23, 1, 0.32, 1] }}
+							className="space-y-6"
+						>
+							<AuthCardHeader
+								title="Check your email"
+								description={
+									<>
+										We&apos;ve sent you a temporary signup otp. Please check
+										your inbox at{" "}
+										<span className="font-medium text-text-strong-950">
+											{otpSentEmail}
+										</span>
+										.
+									</>
+								}
+							/>
+							<VerifyOTP
+								email={otpSentEmail}
+								mode="signup"
+								inviteId={inviteId}
+								onBack={() => {
+									setOtpSentEmail(null);
+									setOtpValue("");
+								}}
+							/>
+						</motion.div>
+					) : (
+						<motion.div
+							key="social-signup"
+							custom={direction}
+							variants={authStepVariants}
+							initial={
+								currentLevel === 0 && direction === -1 ? "initial" : false
+							}
+							animate="animate"
+							exit="exit"
+							transition={{ duration: 0.25, ease: [0.23, 1, 0.32, 1] }}
+							className="space-y-6"
+						>
+							<AuthCardHeader
+								title="Create your Account"
+								description="Sign up and start sending email in 5 mins"
+							/>
+							<SocialSignup inviteId={inviteId} />
+						</motion.div>
+					)}
+				</AnimatePresence>
+			</AuthCard>
 		</AuthShell>
 	);
 }
