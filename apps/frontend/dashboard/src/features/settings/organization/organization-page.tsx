@@ -1,5 +1,9 @@
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { authClient } from "@reloop/auth/client";
+import {
+	ORGANIZATION_NAME_MAX_LENGTH,
+	organizationNameMaxLengthMessage,
+} from "@reloop/auth/organization-limits";
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
@@ -33,7 +37,10 @@ const organizationSchema = v.object({
 	name: v.pipe(
 		v.string(),
 		v.minLength(1, "Name is required"),
-		v.maxLength(30, "Name must be 30 characters or less"),
+		v.maxLength(
+			ORGANIZATION_NAME_MAX_LENGTH,
+			organizationNameMaxLengthMessage(),
+		),
 	),
 	logo: v.string(),
 });
@@ -171,12 +178,8 @@ function OrganizationForm({
 									id="name"
 									type="text"
 									placeholder="Organization Name"
-									{...register("name", {
-										maxLength: {
-											value: 30,
-											message: "Name must be 30 characters or less",
-										},
-									})}
+									maxLength={ORGANIZATION_NAME_MAX_LENGTH}
+									{...register("name")}
 								/>
 							</Input.Wrapper>
 						</Input.Root>

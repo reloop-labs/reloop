@@ -8,8 +8,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useQueryState } from "nuqs";
 import type { Resolver } from "react-hook-form";
 import { useForm } from "react-hook-form";
-import { toast } from "sonner";
 import * as v from "valibot";
+import { toastApiError } from "#/lib/rate-limit-toast";
 
 const signupSchema = v.object({
 	email: v.pipe(
@@ -41,21 +41,20 @@ export function SignupForm() {
 		try {
 			changeStatus("loading");
 			const email = data.email;
-			const success = await authClient.emailOtp.sendVerificationOtp({
+			const { error } = await authClient.emailOtp.sendVerificationOtp({
 				email,
 				type: "sign-in",
 			});
-			if (success) {
-				setOtpSentEmail(email);
+			if (error) {
+				toastApiError(error, "Could not send the signup code.");
 				changeStatus("idle");
+				return;
 			}
+			setOtpSentEmail(email);
+			changeStatus("idle");
 		} catch (e) {
 			changeStatus("idle");
-			if (e instanceof Error && e.message) {
-				toast.error(e.message);
-			} else {
-				toast.error("An unexpected error occurred.");
-			}
+			toastApiError(e, "An unexpected error occurred.");
 		}
 	};
 

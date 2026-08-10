@@ -122,26 +122,29 @@ export function UserDropdown({ user }: { user: HeaderUser | null }) {
 								Organization
 							</Dropdown.Label>
 							<Dropdown.Group className="gap-0">
-								{workspaceItems.map((item, index) => (
-									<Dropdown.Item
-										key={item.path}
-										ref={(el) => {
-											if (el) itemRefs.current[index] = el;
-										}}
-										className="gap-2 px-2 py-1.5 data-[highlighted]:bg-transparent!"
-										onPointerEnter={() => setHoverIdx(index)}
-										onPointerLeave={() => setHoverIdx(undefined)}
-										onClick={() => goToSettings(item.path)}
-									>
-										<Icon
-											name={item.iconName}
-											className="h-4 w-4 text-text-sub-600"
-										/>
-										<span className="flex-1 truncate text-sm">
-											{item.label}
-										</span>
-									</Dropdown.Item>
-								))}
+								{workspaceItems.map((item, index) => {
+									const isTeams = item.path === "/settings/teams";
+									return (
+										<Dropdown.Item
+											key={item.path}
+											ref={(el) => {
+												if (el) itemRefs.current[index] = el;
+											}}
+											className="gap-2 px-2 py-1.5 data-[highlighted]:bg-transparent!"
+											onPointerEnter={() => setHoverIdx(index)}
+											onPointerLeave={() => setHoverIdx(undefined)}
+											onClick={() => goToSettings(item.path)}
+										>
+											<Icon
+												name={item.iconName}
+												className="h-4 w-4 text-text-sub-600"
+											/>
+											<span className="flex-1 truncate text-sm">
+												{isTeams ? "Invite user" : item.label}
+											</span>
+										</Dropdown.Item>
+									);
+								})}
 							</Dropdown.Group>
 							<div className="my-1.5 h-px bg-stroke-soft-100 dark:bg-stroke-soft-100/40" />
 						</>

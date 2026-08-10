@@ -10,10 +10,19 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { parseAsBoolean, parseAsString, useQueryState } from "nuqs";
 import { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 import { sessionQueryOptions } from "#/features/auth/session-query";
 import { queryKeys } from "#/lib/query-keys";
+import {
+	getRateLimitInfo,
+	showRateLimitCountdownToast,
+	toastApiError,
+} from "#/lib/rate-limit-toast";
 import { navigatePostAuth } from "#/utils/navigate-post-auth";
 import { resolvePostAuthDestinationWithQuery } from "#/utils/post-auth-destination";
+
+/** Matches Better Auth emailOTP send rate-limit window (3 / 60s). */
+const OTP_RESEND_COOLDOWN_SECONDS = 60;
 
 export function VerifyOTP({
 	email,
@@ -55,6 +64,17 @@ export function VerifyOTP({
 		error: string | null;
 	}>({ name: "email", error: null });
 	const [isSuccess, setIsSuccess] = useState(false);
+	const [isResending, setIsResending] = useState(false);
+	// OTP was just sent from login/signup — start cooldown immediately.
+	const [secondsLeft, setSecondsLeft] = useState(OTP_RESEND_COOLDOWN_SECONDS);
+
+	useEffect(() => {
+		if (secondsLeft <= 0) return;
+		const id = setTimeout(() => {
+			setSecondsLeft((current) => Math.max(0, current - 1));
+		}, 1000);
+		return () => clearTimeout(id);
+	}, [secondsLeft]);
 
 	const handleVerify = async (otpToVerify: string) => {
 		try {
@@ -101,6 +121,42 @@ export function VerifyOTP({
 			});
 		}
 	};
+
+	const handleResend = async () => {
+		if (secondsLeft > 0 || isResending || isSuccess) return;
+
+		setIsResending(true);
+		setError({ name: "email", error: null });
+		try {
+			const { error: resendError } =
+				await authClient.emailOtp.sendVerificationOtp({
+					email,
+					type: "sign-in",
+				});
+
+			if (resendError) {
+				const info = getRateLimitInfo(resendError);
+				if (info) {
+					setSecondsLeft(info.retryAfter);
+					showRateLimitCountdownToast(info);
+				} else {
+					toastApiError(resendError, "Could not resend the code.");
+				}
+				return;
+			}
+
+			setOtpValue("");
+			setIsSuccess(false);
+			setSecondsLeft(OTP_RESEND_COOLDOWN_SECONDS);
+			toast.success("A new code was sent to your email.");
+		} catch {
+			toast.error("Could not resend the code. Please try again.");
+		} finally {
+			setIsResending(false);
+		}
+	};
+
+	const canResend = secondsLeft <= 0 && !isResending && !isSuccess;
 
 	return (
 		<div>
@@ -215,7 +271,22 @@ export function VerifyOTP({
 					</AnimatePresence>
 				</FancyButton.Root>
 			)}
-			<div className="mt-4 flex justify-center">
+			<div className="mt-4 flex flex-col items-center gap-2">
+				{canResend ? (
+					<button
+						type="button"
+						onClick={() => void handleResend()}
+						className="cursor-pointer text-center font-medium text-[13px] text-text-sub-600 transition-colors hover:text-text-strong-950 hover:underline"
+					>
+						Resend code
+					</button>
+				) : isSuccess ? null : (
+					<p className="text-center font-medium text-[13px] text-text-soft-400">
+						{isResending
+							? "Sending a new code…"
+							: `Resend code in ${secondsLeft}s`}
+					</p>
+				)}
 				<button
 					type="button"
 					onClick={onBack}

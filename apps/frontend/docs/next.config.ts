@@ -47,6 +47,17 @@ const config = {
 				destination: "/guides/connect-domain/:path*",
 				permanent: true,
 			},
+			// Old /docs/dns/* bookmarks → DNS records explained
+			{
+				source: "/dns",
+				destination: "/guides/connect-domain/dns-records-explained",
+				permanent: true,
+			},
+			{
+				source: "/dns/:path*",
+				destination: "/guides/connect-domain/dns-records-explained",
+				permanent: true,
+			},
 		];
 	},
 	async rewrites() {

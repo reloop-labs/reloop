@@ -33,7 +33,14 @@ export function AuthShell({
 						className="flex flex-col items-center justify-center gap-2"
 					>
 						<div className="mb-2 flex items-center justify-center">
-							<Logo className="h-16" />
+							{/* Plain <a> so we leave /dashboard basePath and hit the marketing site root. */}
+							<a
+								href="/"
+								aria-label="Reloop home"
+								className="rounded-lg transition-opacity hover:opacity-80"
+							>
+								<Logo className="h-16" />
+							</a>
 						</div>
 					</motion.div>
 					{children}

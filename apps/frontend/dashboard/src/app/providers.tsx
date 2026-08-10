@@ -9,8 +9,12 @@ import { Suspense, useState } from "react";
 import { LazyIconsSprite } from "#/components/lazy-icons-sprite";
 import { KeyboardShortcutsRevealListener } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { createQueryClient } from "#/lib/query-client";
+import { installAxiosRateLimitInterceptor } from "#/lib/rate-limit-toast";
 import { ThemeProvider } from "#/providers/theme-provider";
 import { ProvidersSuspenseFallback } from "./providers-suspense-fallback";
+
+// Install once for every Axios 429 in the dashboard (domain, contacts, API keys, …).
+installAxiosRateLimitInterceptor();
 
 export function Providers({ children }: { children: React.ReactNode }) {
 	const [queryClient] = useState(createQueryClient);
