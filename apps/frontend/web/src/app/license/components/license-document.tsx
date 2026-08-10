@@ -42,7 +42,7 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
  */
 export function LicenseDocument() {
 	return (
-		<div className="mx-auto w-full max-w-2xl font-sans">
+		<div className="w-full font-sans">
 			<div className="overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-soft-50 dark:border-white/10 dark:bg-white/[0.03]">
 				<div className="m-0.5 overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 px-5 py-6 sm:px-8 sm:py-8 md:px-9 md:py-9 dark:border-white/10 dark:bg-[#0c0c0c]">
 					{/* Title — changelog page h1 scale */}

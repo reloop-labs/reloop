@@ -72,19 +72,19 @@ const LicensePage = () => {
 				{/* 3-column layout with solid straight dividers */}
 				<div className="grid flex-1 grid-cols-1 lg:grid-cols-12">
 					{/* Left label */}
-					<div className="flex justify-start border-stroke-soft-200 border-b px-6 py-8 text-left sm:px-8 lg:col-span-2 lg:justify-end lg:border-r lg:border-b-0 lg:px-6 lg:py-16 lg:text-right dark:border-white/10">
+					<div className="flex justify-start border-stroke-soft-200 border-b px-5 py-6 text-left sm:px-6 lg:col-span-3 lg:justify-end lg:border-r lg:border-b-0 lg:px-6 lg:py-10 lg:text-right dark:border-white/10">
 						<div className="font-medium text-[11px] text-text-sub-600 uppercase tracking-wider dark:text-white/50">
 							License
 						</div>
 					</div>
 
-					{/* Center layered card — wider */}
-					<div className="flex flex-col border-stroke-soft-200 border-b px-5 py-8 sm:px-8 sm:py-10 lg:col-span-8 lg:border-r lg:border-b-0 lg:px-8 lg:py-14 xl:px-10 dark:border-white/10">
+					{/* Center layered card — 6 columns for optimal reading width */}
+					<div className="flex flex-col border-stroke-soft-200 border-b px-4 py-6 sm:px-6 sm:py-8 lg:col-span-6 lg:border-r lg:border-b-0 lg:px-6 lg:py-10 dark:border-white/10">
 						<LicenseDocument />
 					</div>
 
 					{/* Right meta */}
-					<div className="flex justify-start px-6 py-8 sm:px-8 lg:col-span-2 lg:px-6 lg:py-16 dark:border-white/10">
+					<div className="flex justify-start px-5 py-6 sm:px-6 lg:col-span-3 lg:px-6 lg:py-10 dark:border-white/10">
 						<div className="w-full space-y-2.5">
 							<p className="font-medium text-[11px] text-text-sub-600 uppercase tracking-wider dark:text-white/50">
 								Apache License 2.0
