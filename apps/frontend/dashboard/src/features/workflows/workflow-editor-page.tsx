@@ -21,7 +21,6 @@ export function WorkflowEditorPage({ workflowId }: { workflowId: string }) {
 	const {
 		getWorkflow,
 		updateWorkflow,
-		setWorkflowGraph,
 		setWorkflowStatus,
 		isHydrated,
 	} = useWorkflows();
@@ -66,25 +65,10 @@ export function WorkflowEditorPage({ workflowId }: { workflowId: string }) {
 	const handleStatusChange = useCallback(
 		async (status: WorkflowStatus) => {
 			if (!workflow) return;
-			// Persist latest graph before activate
-			if (status === "active" && localNodes && localEdges) {
-				await setWorkflowGraph(workflow.id, localNodes, localEdges);
-			} else if (localName !== workflow.name) {
-				await updateWorkflow(workflow.id, { name: localName });
-			}
 			await setWorkflowStatus(workflow.id, status);
 			await detailQuery.refetch();
 		},
-		[
-			workflow,
-			localNodes,
-			localEdges,
-			localName,
-			setWorkflowGraph,
-			setWorkflowStatus,
-			updateWorkflow,
-			detailQuery,
-		],
+		[workflow, setWorkflowStatus, detailQuery],
 	);
 
 	const handleSave = useCallback(

@@ -33,30 +33,26 @@ export const WorkflowEditorToolbar = ({
 
 	const handleToggleActive = async (checked: boolean) => {
 		if (busy) return;
-		if (checked) {
-			if (!validation.isValid) {
-				toast.error(validation.warnings[0] ?? "Complete the workflow first");
-				return;
-			}
-			setBusy(true);
-			try {
-				await onStatusChange("active");
-				toast.success("Workflow activated");
-			} catch (e) {
-				toast.error(e instanceof Error ? e.message : "Failed to activate");
-			} finally {
-				setBusy(false);
-			}
-		} else {
-			setBusy(true);
-			try {
-				await onStatusChange("paused");
-				toast.success("Workflow paused");
-			} catch (e) {
-				toast.error(e instanceof Error ? e.message : "Failed to pause");
-			} finally {
-				setBusy(false);
-			}
+		if (checked && !validation.isValid) {
+			toast.error(validation.warnings[0] ?? "Complete the workflow first");
+			return;
+		}
+
+		setBusy(true);
+		try {
+			await onSave();
+			await onStatusChange(checked ? "active" : "paused");
+			toast.success(checked ? "Workflow activated" : "Workflow paused");
+		} catch (e) {
+			toast.error(
+				e instanceof Error
+					? e.message
+					: checked
+						? "Failed to activate"
+						: "Failed to pause",
+			);
+		} finally {
+			setBusy(false);
 		}
 	};
 
