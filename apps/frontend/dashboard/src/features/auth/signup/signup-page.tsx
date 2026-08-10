@@ -210,24 +210,20 @@ export function SignupPage() {
 						</AnimatePresence>
 					</FancyButton.Root>
 
-					{/* Legal notice under CTA — stays out of the header so the pitch stays clear */}
+					{/* Legal notice under CTA — soft dotted underlines so links don’t dominate */}
 					{!isOtpStep ? (
 						<p className="mt-3 text-center text-[12px] text-text-soft-400 leading-relaxed">
 							By continuing, you agree to our{" "}
 							<a
 								href="/terms-and-conditions"
-								className={LinkButton.linkButtonVariants({
-									variant: "black",
-								}).root({ className: "text-[12px]!" })}
+								className="text-text-sub-600 underline decoration-dotted decoration-current/30 underline-offset-[3px]"
 							>
 								Terms
 							</a>{" "}
 							and{" "}
 							<a
 								href="/privacy"
-								className={LinkButton.linkButtonVariants({
-									variant: "black",
-								}).root({ className: "text-[12px]!" })}
+								className="text-text-sub-600 underline decoration-dotted decoration-current/30 underline-offset-[3px]"
 							>
 								Privacy Policy
 							</a>
