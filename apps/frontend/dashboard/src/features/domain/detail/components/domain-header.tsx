@@ -1,7 +1,5 @@
 import * as FancyButton from "@reloop/ui/fancy-button";
-import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
-import { useHotkeys } from "react-hotkeys-hook";
 import { ForwardDNSRecordsButton } from "../../add/setup/components/forward-dns-records";
 import { DeleteDomainModal } from "../../components/delete-domain";
 import { DomainAvatar } from "../../components/domain-avatar";
@@ -25,27 +23,6 @@ export function DomainHeader({
 	const { handleVerifyDNS, isVerifying } = useDomainActions(
 		domainRecordId,
 		domain as never,
-	);
-
-	useHotkeys(
-		"mod+v",
-		(e) => {
-			e.preventDefault();
-			if (status === "pending" || status === "failed") {
-				void handleVerifyDNS();
-			}
-		},
-		{ enableOnFormTags: true },
-		[status, handleVerifyDNS],
-	);
-
-	useHotkeys(
-		"d",
-		(e) => {
-			e.preventDefault();
-			window.open("https://reloop.sh/docs/domains", "_blank");
-		},
-		{ enableOnFormTags: true },
 	);
 
 	return (

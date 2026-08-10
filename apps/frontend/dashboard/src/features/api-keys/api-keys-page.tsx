@@ -6,7 +6,6 @@ import { ApiKeyList } from "./list/api-key-list";
 import { ApiKeyListHeader } from "./list/api-key-list-header";
 
 const DOCS_URL = "https://reloop.sh/docs/learn/api-keys";
-const API_REFERENCE_URL = "https://reloop.sh/docs/api-reference/api-keys";
 
 export function ApiKeysPage() {
 	const [, setModal] = useQueryState("modal");

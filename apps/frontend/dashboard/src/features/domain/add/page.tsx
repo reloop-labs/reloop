@@ -71,6 +71,7 @@ export function AddDomainPage() {
 				{ withCredentials: true },
 			);
 			await invalidate();
+			changeStatus("idle");
 			goToSetup(data.id);
 		} catch (error) {
 			const isAlreadyExists =
@@ -88,6 +89,7 @@ export function AddDomainPage() {
 						(d) => d.domain.toLowerCase() === domain.toLowerCase(),
 					);
 					if (existingDomain) {
+						changeStatus("idle");
 						goToSetup(existingDomain.id);
 						return;
 					}

@@ -327,8 +327,12 @@ export const ChangeRoleModal = ({
 											<FancyButton.Icon as={Icon} name="user-role" />
 											<span>Update role</span>
 											<span className="inline-flex items-center gap-0.5 opacity-90">
-												<KbdCommand />
-												<KbdEnter />
+												<ActionKbd className={actionKbdOnBlueClassName}>
+													⌘
+												</ActionKbd>
+												<ActionKbd className={actionKbdOnBlueClassName}>
+													↵
+												</ActionKbd>
 											</span>
 										</>
 									)}

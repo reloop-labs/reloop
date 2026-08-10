@@ -58,6 +58,58 @@ const config = {
 				destination: "/guides/connect-domain/dns-records-explained",
 				permanent: true,
 			},
+			// Old /docs/domains shortcut used by dashboard hotkeys
+			{
+				source: "/domains",
+				destination: "/learn/domain",
+				permanent: true,
+			},
+			// Renamed / legacy product docs paths from the dashboard
+			{
+				source: "/features/contacts",
+				destination: "/learn/contacts",
+				permanent: true,
+			},
+			{
+				source: "/features/contacts/:path*",
+				destination: "/learn/contacts/:path*",
+				permanent: true,
+			},
+			{
+				source: "/learn/automations",
+				destination: "/learn/workflows",
+				permanent: true,
+			},
+			{
+				source: "/api-reference/api-keys",
+				destination: "/api/api-key/get-api-api-key-v1",
+				permanent: true,
+			},
+			{
+				source: "/api-reference/contacts",
+				destination: "/api/contacts/post-api-contacts-create",
+				permanent: true,
+			},
+			{
+				source: "/api/contacts",
+				destination: "/api/contacts/get-api-contacts-list",
+				permanent: true,
+			},
+			{
+				source: "/api/api-key",
+				destination: "/api/api-key/get-api-api-key-v1",
+				permanent: true,
+			},
+			{
+				source: "/email",
+				destination: "/setup/backend/email",
+				permanent: true,
+			},
+			{
+				source: "/setup/email",
+				destination: "/setup/backend/email",
+				permanent: true,
+			},
 		];
 	},
 	async rewrites() {
