@@ -5,7 +5,6 @@ import { forwardRef, type ReactNode } from "react";
 import { parseEmail } from "#/features/agent-inbox/lib/email-address";
 import { resolveLabelColor } from "#/features/agent-inbox/lib/label-colors";
 import type { InboundThread } from "../../types";
-import { useInboxMail } from "./use-inbox-mail";
 
 function formatRecipientLabel(addresses: string[] | undefined): string {
 	if (!addresses?.length) return "No recipients";
@@ -103,11 +102,9 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 		},
 		ref,
 	) => {
-		const [mail] = useInboxMail();
 		const listId = thread.id;
 		const isUnread = thread.unread;
 		const isOutbound = thread.direction === "outbound";
-		const isSelectMode = mail.bulkSelected.length > 0;
 		const displayName = isOutbound
 			? formatRecipientLabel(thread.toEmails)
 			: thread.from.name ||
@@ -132,45 +129,38 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 						"bg-[var(--inbox-row-focused)]",
 				)}
 			>
-				{/* Unread / bulk select gutter */}
+				{/* Bulk select gutter — always visible like Gmail */}
 				<span className="ml-1 flex w-5 shrink-0 items-center justify-center">
-					{isSelectMode || isBulkSelected ? (
-						<button
-							type="button"
-							aria-label={isBulkSelected ? "Deselect thread" : "Select thread"}
-							aria-pressed={isBulkSelected}
-							onClick={(e) => {
-								e.stopPropagation();
-								onToggleBulk(listId, e);
-							}}
-							className={cn(
-								"flex size-4 items-center justify-center rounded border transition-colors",
-								isBulkSelected
-									? "border-zero-blue bg-zero-blue text-white"
-									: "border-mail-border bg-transparent hover:border-mail-foreground/40",
-							)}
-						>
-							{isBulkSelected && (
-								<Icon name="check" className="h-2.5 w-2.5 text-white" />
-							)}
-						</button>
-					) : isUnread ? (
+					<button
+						type="button"
+						aria-label={isBulkSelected ? "Deselect thread" : "Select thread"}
+						aria-pressed={isBulkSelected}
+						onClick={(e) => {
+							e.stopPropagation();
+							onToggleBulk(listId, e);
+						}}
+						className={cn(
+							"flex size-4 items-center justify-center rounded border transition-colors",
+							isBulkSelected
+								? "border-zero-blue bg-zero-blue text-white"
+								: "border-mail-border bg-transparent hover:border-mail-foreground/40",
+						)}
+					>
+						{isBulkSelected && (
+							<Icon name="check" className="h-2.5 w-2.5 text-white" />
+						)}
+					</button>
+				</span>
+
+				{/* Unread marker */}
+				<span className="flex w-3 shrink-0 items-center justify-center">
+					{isUnread ? (
 						<span
-							className="size-2 rounded-full"
+							className="size-1.5 rounded-full"
 							style={{ background: "var(--inbox-unread)" }}
 							title="Unread"
 						/>
-					) : (
-						<button
-							type="button"
-							aria-label="Select thread"
-							onClick={(e) => {
-								e.stopPropagation();
-								onToggleBulk(listId, e);
-							}}
-							className="flex size-4 items-center justify-center rounded border border-transparent opacity-0 transition-opacity group-hover:border-mail-border group-hover:opacity-100"
-						/>
-					)}
+					) : null}
 				</span>
 
 				{/* Sender */}

@@ -1,3 +1,4 @@
+import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { parseAsString, useQueryState } from "nuqs";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -446,7 +447,31 @@ export const AgentInboxContent = ({
 			<div className="sticky top-0 z-15 shrink-0 bg-panel-light dark:bg-panel-dark">
 				<div className="flex items-center py-3.5 pr-6 pl-4">
 					<InboxSidebarToggle onClick={toggleSidebar} />
-					<span className="ml-1 w-2 shrink-0" aria-hidden="true" />
+					<span className="ml-1 flex w-5 shrink-0 items-center justify-center">
+						<button
+							type="button"
+							aria-label={
+								allVisibleSelected ? "Deselect all threads" : "Select all threads"
+							}
+							aria-pressed={allVisibleSelected}
+							disabled={filteredThreads.length === 0}
+							onClick={handleToggleSelectAll}
+							className={cn(
+								"flex size-4 items-center justify-center rounded border transition-colors disabled:opacity-40",
+								allVisibleSelected || mail.bulkSelected.length > 0
+									? "border-zero-blue bg-zero-blue text-white"
+									: "border-mail-border bg-transparent hover:border-mail-foreground/40",
+							)}
+						>
+							{(allVisibleSelected || mail.bulkSelected.length > 0) && (
+								<Icon
+									name={allVisibleSelected ? "check" : "minus"}
+									className="h-2.5 w-2.5 text-white"
+								/>
+							)}
+						</button>
+					</span>
+					<span className="w-3 shrink-0" aria-hidden="true" />
 					<h1 className="min-w-0 truncate font-semibold text-[18px] text-mail-foreground">
 						{folderTitle}
 					</h1>

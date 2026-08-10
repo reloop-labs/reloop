@@ -7,13 +7,20 @@ import { getSentMessagesController } from "./list-sent-messages.controllers";
 export const listSentMessagesRoute = new Elysia().use(authMiddleware).get(
 	"/sent",
 	async ({ query, organizationId }) => {
-		return getSentMessagesController(organizationId, query.mailboxId);
+		return getSentMessagesController(
+			organizationId,
+			query.mailboxId,
+			query.q,
+		);
 	},
 	{
 		auth: true,
 		query: t.Object({
 			mailboxId: t.Optional(
 				t.String({ description: "Filter sent messages by mailbox ID" }),
+			),
+			q: t.Optional(
+				t.String({ description: "Search subject, body, and recipients" }),
 			),
 		}),
 		response: {
@@ -33,6 +40,8 @@ export const listSentMessagesRoute = new Elysia().use(authMiddleware).get(
 					htmlBody: t.Union([t.String(), t.Null()]),
 					status: t.String(),
 					createdAt: t.Union([t.Date(), t.String()]),
+					threadId: t.Optional(t.Union([t.String(), t.Null()])),
+					isStarred: t.Optional(t.Boolean()),
 				}),
 			),
 			401: MailModel.ErrorResponseSchema,

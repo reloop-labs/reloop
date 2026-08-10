@@ -122,26 +122,37 @@ export const ZeroMailDisplay = ({
 		: email?.textBody || msg.textBody;
 
 	const mailboxEmail = extractBareEmail(mailbox?.email || "").toLowerCase();
-	const rawTo = email?.toEmails ?? msg.toEmails ?? mailbox?.email ?? [];
-	const toList: string[] = (Array.isArray(rawTo) ? rawTo : [rawTo]).flatMap(
-		(addr) => {
+	const parseRecipients = (raw: unknown) => {
+		const list: string[] = (
+			Array.isArray(raw) ? raw : raw != null && raw !== "" ? [raw] : []
+		).flatMap((addr) => {
 			if (addr == null || addr === "") return [];
 			return [String(addr)];
-		},
-	);
-	const toRecipients = (
-		toList.length > 0 ? toList : mailbox?.email ? [mailbox.email] : []
-	)
-		.map((addr) => {
-			const bare = extractBareEmail(addr);
-			const display = formatRecipient(null, addr) || bare;
-			return {
-				email: bare,
-				display,
-				isYou: Boolean(mailboxEmail && bare.toLowerCase() === mailboxEmail),
-			};
-		})
-		.filter((r) => r.email.length > 0);
+		});
+		return list
+			.map((addr) => {
+				const bare = extractBareEmail(addr);
+				const display = formatRecipient(null, addr) || bare;
+				return {
+					email: bare,
+					display,
+					isYou: Boolean(mailboxEmail && bare.toLowerCase() === mailboxEmail),
+				};
+			})
+			.filter((r) => r.email.length > 0);
+	};
+
+	const rawTo = email?.toEmails ?? msg.toEmails ?? mailbox?.email ?? [];
+	const toRecipients = (() => {
+		const parsed = parseRecipients(rawTo);
+		if (parsed.length > 0) return parsed;
+		if (mailbox?.email) return parseRecipients([mailbox.email]);
+		return [];
+	})();
+	const ccRecipients = parseRecipients(email?.ccEmails ?? msg.ccEmails);
+	const bccRecipients = isOutbound
+		? parseRecipients(email?.bccEmails ?? msg.bccEmails)
+		: [];
 
 	const displayAttachments = (email?.attachments || msg.attachments || []).map(
 		(att: any) => ({
@@ -168,14 +179,22 @@ export const ZeroMailDisplay = ({
 		const onlyYou =
 			toRecipients.length > 0 && toRecipients.every((r) => r.isYou);
 		const first = toRecipients[0];
-		if (onlyYou || (first?.isYou && toRecipients.length === 1)) return "to me";
-		if (!first || toRecipients.length === 0) return "to —";
+		const ccHint =
+			ccRecipients.length > 0
+				? `, cc ${ccRecipients.length === 1 ? (ccRecipients[0]?.email.split("@")[0] ?? "1") : ccRecipients.length}`
+				: "";
+		if (onlyYou || (first?.isYou && toRecipients.length === 1)) {
+			return `to me${ccHint}`;
+		}
+		if (!first || toRecipients.length === 0) {
+			return ccRecipients.length > 0 ? `to —${ccHint}` : "to —";
+		}
 		if (toRecipients.length === 1) {
 			const label =
 				first.display && !first.display.includes("@")
 					? first.display
 					: first.email.split("@")[0] || first.email;
-			return `to ${first.isYou ? "me" : label}`;
+			return `to ${first.isYou ? "me" : label}${ccHint}`;
 		}
 		const names = toRecipients
 			.slice(0, 2)
@@ -188,7 +207,7 @@ export const ZeroMailDisplay = ({
 			)
 			.join(", ");
 		const extra = toRecipients.length > 2 ? ` +${toRecipients.length - 2}` : "";
-		return `to ${names}${extra}`;
+		return `to ${names}${extra}${ccHint}`;
 	})();
 
 	return (
@@ -308,6 +327,41 @@ export const ZeroMailDisplay = ({
 														))}
 													</span>
 												</DetailsRow>
+												{ccRecipients.length > 0 ? (
+													<DetailsRow label="cc">
+														<span className="inline-flex items-center gap-1.5 whitespace-nowrap">
+															{ccRecipients.map((recipient, i) => (
+																<span
+																	key={`details-cc-${recipient.email}-${i}`}
+																	className="inline-flex items-center gap-1.5 whitespace-nowrap"
+																>
+																	{i > 0 && (
+																		<span className="text-mail-muted">,</span>
+																	)}
+																	<span>{recipient.email}</span>
+																	{recipient.isYou && <YouBadge />}
+																</span>
+															))}
+														</span>
+													</DetailsRow>
+												) : null}
+												{bccRecipients.length > 0 ? (
+													<DetailsRow label="bcc">
+														<span className="inline-flex items-center gap-1.5 whitespace-nowrap">
+															{bccRecipients.map((recipient, i) => (
+																<span
+																	key={`details-bcc-${recipient.email}-${i}`}
+																	className="inline-flex items-center gap-1.5 whitespace-nowrap"
+																>
+																	{i > 0 && (
+																		<span className="text-mail-muted">,</span>
+																	)}
+																	<span>{recipient.email}</span>
+																</span>
+															))}
+														</span>
+													</DetailsRow>
+												) : null}
 												<DetailsRow label="date">
 													{formatMessageTimestamp(msg.messageAt)}
 												</DetailsRow>

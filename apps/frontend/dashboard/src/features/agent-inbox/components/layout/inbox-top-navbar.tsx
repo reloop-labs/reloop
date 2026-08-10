@@ -6,6 +6,7 @@ import { Logo } from "@reloop/ui/logo";
 import { Search } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { parseAsString, useQueryState } from "nuqs";
 import { useState } from "react";
 import { toast } from "sonner";
 import { AddAgentAddressModal } from "#/features/agent-inbox/components/add-agent-address-modal";
@@ -29,6 +30,8 @@ export function InboxTopNavbar({ mailbox }: { mailbox: AgentMailbox }) {
 		useAgentInbox();
 	const mailboxReady = !!getMailbox(mailbox.id) && !!mailbox.email;
 	const [isAddMailboxOpen, setIsAddMailboxOpen] = useState(false);
+	const [searchQuery] = useQueryState("q", parseAsString.withDefault(""));
+	const activeSearch = searchQuery.trim();
 
 	const {
 		isAiPanelOpen,
@@ -110,8 +113,13 @@ export function InboxTopNavbar({ mailbox }: { mailbox: AgentMailbox }) {
 							className="h-4 w-4 shrink-0 opacity-70"
 							strokeWidth={1.75}
 						/>
-						<span className="min-w-0 flex-1 truncate text-[14px] sm:text-[15px]">
-							Search mail
+						<span
+							className={cn(
+								"min-w-0 flex-1 truncate text-[14px] sm:text-[15px]",
+								activeSearch && "text-mail-foreground",
+							)}
+						>
+							{activeSearch || "Search mail"}
 						</span>
 						<span className="hidden shrink-0 items-center gap-0.5 sm:inline-flex">
 							<ActionKbd className="w-auto min-w-4 px-1">⌘</ActionKbd>

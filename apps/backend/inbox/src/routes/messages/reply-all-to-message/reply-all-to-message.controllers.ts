@@ -11,6 +11,8 @@ export async function replyAllToMessageController(
 	body: {
 		text?: string;
 		html?: string;
+		to?: string | string[];
+		cc?: string | string[];
 		bcc?: string | string[];
 		attachments?: Array<{
 			content?: string;
@@ -56,21 +58,29 @@ export async function replyAllToMessageController(
 	});
 
 	// Build reply-all recipients
-	// To: original sender
-	const replyTo = original.replyTo || original.fromEmail;
+	// To: original sender (or client override)
+	const defaultReplyTo = original.replyTo || original.fromEmail;
+	const replyTo = body.to ?? defaultReplyTo;
 
-	// CC: original to + cc, excluding ourselves
-	const allRecipients = [
+	// CC: original to + cc, excluding ourselves — or client override
+	const defaultCc = [
 		...(original.toEmails || []),
 		...((original.ccEmails as string[]) || []),
-	].filter((email) => email && email !== ourEmail && email !== replyTo);
+	].filter((email) => email && email !== ourEmail && email !== defaultReplyTo);
+
+	const replyCc = body.cc !== undefined ? body.cc : defaultCc;
+	const ccList = Array.isArray(replyCc)
+		? replyCc
+		: replyCc
+			? [replyCc]
+			: [];
 
 	const replySubject = original.subject?.startsWith("Re:")
 		? original.subject
 		: `Re: ${original.subject || ""}`;
 
 	log.info(
-		`[INBOX] Reply-all to message ${messageId} → ${replyTo}, CC: ${allRecipients.join(", ")}`,
+		`[INBOX] Reply-all to message ${messageId} → ${Array.isArray(replyTo) ? replyTo.join(", ") : replyTo}, CC: ${ccList.join(", ")}`,
 	);
 
 	return proxySendToMailService(
@@ -81,7 +91,7 @@ export async function replyAllToMessageController(
 			subject: replySubject,
 			text: body.text,
 			html: body.html,
-			cc: allRecipients.length > 0 ? allRecipients : undefined,
+			cc: ccList.length > 0 ? ccList : undefined,
 			bcc: body.bcc,
 			attachments: body.attachments,
 			threadId: threadMsg?.threadId || undefined,

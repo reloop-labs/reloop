@@ -3,14 +3,11 @@ import { Icon } from "@reloop/ui/icon";
 import {
 	Archive,
 	ExternalLink,
-	Forward,
 	Inbox,
 	Mail,
 	MailOpen,
 	Pin,
 	PinOff,
-	Reply,
-	ReplyAll,
 	Tag,
 	Trash2,
 	Zap,
@@ -121,7 +118,7 @@ export const ThreadContextMenu = ({
 						className={itemClass}
 						onSelect={() => onReply(thread)}
 					>
-						<Reply className="h-3.5 w-3.5" />
+						<Icon name="reply" className="h-3.5 w-3.5" />
 						Reply
 					</ContextMenu.Item>
 				)}
@@ -130,7 +127,7 @@ export const ThreadContextMenu = ({
 						className={itemClass}
 						onSelect={() => onReplyAll(thread)}
 					>
-						<ReplyAll className="h-3.5 w-3.5" />
+						<Icon name="reply-all" className="h-3.5 w-3.5" />
 						Reply all
 					</ContextMenu.Item>
 				)}
@@ -139,7 +136,7 @@ export const ThreadContextMenu = ({
 						className={itemClass}
 						onSelect={() => onForward(thread)}
 					>
-						<Forward className="h-3.5 w-3.5" />
+						<Icon name="forward" className="h-3.5 w-3.5" />
 						Forward
 					</ContextMenu.Item>
 				)}

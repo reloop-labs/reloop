@@ -38,7 +38,7 @@ export function MessageActionBar({
 					}}
 					className="rounded-full"
 				>
-					<Button.Icon as={Icon} name="reply" className="size-3.5" />
+					<Button.Icon as={Icon} name="reply-all" className="size-3.5" />
 					Reply all
 				</Button.Root>
 			) : null}

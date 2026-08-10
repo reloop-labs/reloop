@@ -1,4 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
+import { parseAsString, useQueryState } from "nuqs";
 import {
 	createContext,
 	type ReactNode,
@@ -165,6 +166,8 @@ interface BackendSentMessage {
 	htmlBody: string | null;
 	status: string;
 	createdAt: string | Date;
+	threadId?: string | null;
+	isStarred?: boolean;
 }
 
 interface BackendThread {
@@ -230,6 +233,11 @@ interface AgentInboxContextValue {
 			path?: string;
 			content_type?: string;
 		}>,
+		recipients?: {
+			to?: string | string[];
+			cc?: string | string[];
+			bcc?: string | string[];
+		},
 	) => Promise<void>;
 	sendReplyAll: (
 		id: string,
@@ -240,6 +248,11 @@ interface AgentInboxContextValue {
 			path?: string;
 			content_type?: string;
 		}>,
+		recipients?: {
+			to?: string | string[];
+			cc?: string | string[];
+			bcc?: string | string[];
+		},
 	) => Promise<void>;
 	sendForward: (
 		id: string,
@@ -421,6 +434,7 @@ const mapBackendThreadToInbound = (
 export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 	const queryClient = useQueryClient();
 	const routeMailboxId = useMailboxId();
+	const [searchQuery] = useQueryState("q", parseAsString.withDefault(""));
 	const [optimisticOutbound, setOptimisticOutbound] = useState<InboundThread[]>(
 		[],
 	);
@@ -448,16 +462,27 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 		mutate: mutateMailboxes,
 	} = useSWR<BackendMailbox[]>("/api/inbox/v1/mailboxes/list");
 
+	const trimmedSearch = searchQuery.trim();
+	const messagesListUrl = trimmedSearch
+		? `/api/inbox/v1/messages?q=${encodeURIComponent(trimmedSearch)}&limit=200`
+		: "/api/inbox/v1/messages";
+
 	const {
 		data: messagesData,
 		isLoading: isLoadingInboundThreads,
 		error: inboundThreadsError,
 		mutate: mutateMessages,
-	} = useSWR<BackendMessage[]>("/api/inbox/v1/messages");
+	} = useSWR<BackendMessage[]>(messagesListUrl);
 
-	const sentListUrl = routeMailboxId
-		? `/api/inbox/v1/messages/sent?mailboxId=${encodeURIComponent(routeMailboxId)}`
-		: "/api/inbox/v1/messages/sent";
+	const sentListUrl = (() => {
+		const params = new URLSearchParams();
+		if (routeMailboxId) params.set("mailboxId", routeMailboxId);
+		if (trimmedSearch) params.set("q", trimmedSearch);
+		const qs = params.toString();
+		return qs
+			? `/api/inbox/v1/messages/sent?${qs}`
+			: "/api/inbox/v1/messages/sent";
+	})();
 
 	const {
 		data: sentMessagesData,
@@ -466,9 +491,13 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 		mutate: mutateSentMessages,
 	} = useSWR<BackendSentMessage[]>(sentListUrl);
 
+	const threadsListUrl = trimmedSearch
+		? `/api/inbox/v1/threads?limit=200&q=${encodeURIComponent(trimmedSearch)}`
+		: "/api/inbox/v1/threads?limit=200";
+
 	const { data: allThreadsData, mutate: mutateThreads } = useSWR<
 		BackendThread[]
-	>("/api/inbox/v1/threads?limit=200");
+	>(threadsListUrl);
 
 	const isLoadingThreads = isLoadingInboundThreads || isLoadingSentMessages;
 
@@ -624,7 +653,7 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 					return {
 						id: msg.id,
 						mailboxId: mailbox?.id ?? "",
-						threadId: undefined,
+						threadId: msg.threadId ?? undefined,
 						messageId: msg.id,
 						from: normalizeFrom(msg.fromEmail, msg.fromName),
 						subject: msg.subject || "(No Subject)",
@@ -638,7 +667,7 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 						status: "handled" as const,
 						securityLevel: 5 as const,
 						unread: false,
-						isStarred: false,
+						isStarred: Boolean(msg.isStarred),
 						isArchived: false,
 						isImportant: false,
 						isPinned: false,
@@ -898,9 +927,13 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 				throw new Error(body || "Failed to update star status");
 			}
 
-			await Promise.all([mutateMessages(), mutateThreads()]);
+			await Promise.all([
+				mutateMessages(),
+				mutateThreads(),
+				mutateSentMessages(),
+			]);
 		},
-		[mutateMessages, mutateThreads],
+		[mutateMessages, mutateThreads, mutateSentMessages],
 	);
 
 	const archiveThread = useCallback(
@@ -1053,11 +1086,16 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 				path?: string;
 				content_type?: string;
 			}>,
+			recipients?: {
+				to?: string | string[];
+				cc?: string | string[];
+				bcc?: string | string[];
+			},
 		) => {
 			const res = await fetch(`/api/inbox/v1/messages/${id}/reply`, {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ text, html, attachments }),
+				body: JSON.stringify({ text, html, attachments, ...recipients }),
 			});
 
 			if (!res.ok) {
@@ -1080,11 +1118,16 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 				path?: string;
 				content_type?: string;
 			}>,
+			recipients?: {
+				to?: string | string[];
+				cc?: string | string[];
+				bcc?: string | string[];
+			},
 		) => {
 			const res = await fetch(`/api/inbox/v1/messages/${id}/reply-all`, {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ text, html, attachments }),
+				body: JSON.stringify({ text, html, attachments, ...recipients }),
 			});
 
 			if (!res.ok) {

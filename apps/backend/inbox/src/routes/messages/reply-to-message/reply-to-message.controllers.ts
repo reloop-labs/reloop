@@ -11,6 +11,7 @@ export async function replyToMessageController(
 	body: {
 		text?: string;
 		html?: string;
+		to?: string | string[];
 		cc?: string | string[];
 		bcc?: string | string[];
 		attachments?: Array<{
@@ -50,13 +51,13 @@ export async function replyToMessageController(
 	});
 
 	// Build reply
-	const replyTo = original.replyTo || original.fromEmail;
+	const replyTo = body.to ?? original.replyTo ?? original.fromEmail;
 	const replySubject = original.subject?.startsWith("Re:")
 		? original.subject
 		: `Re: ${original.subject || ""}`;
 
 	log.info(
-		`[INBOX] Replying to message ${messageId} → ${replyTo} (thread: ${threadMsg?.threadId})`,
+		`[INBOX] Replying to message ${messageId} → ${Array.isArray(replyTo) ? replyTo.join(", ") : replyTo} (thread: ${threadMsg?.threadId})`,
 	);
 
 	return proxySendToMailService(

@@ -14,6 +14,7 @@ import {
 } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { LoadingDot } from "#/features/agent-inbox/components/shared/loading-dot";
+import { extractBareEmail } from "#/features/agent-inbox/lib/email-address";
 import { useSWR } from "#/features/agent-inbox/lib/use-swr-compat";
 import { buildDisplayMessages } from "#/features/agent-inbox/utils/build-display-messages";
 import type {
@@ -670,6 +671,9 @@ export const ThreadDetail = ({
 			path?: string;
 			content_type?: string;
 		}>;
+		to?: string[];
+		cc?: string[];
+		bcc?: string[];
 		/** Optional override when sending without opening the composer (e.g. approve). */
 		replyToId?: string;
 	}) => {
@@ -682,6 +686,11 @@ export const ThreadDetail = ({
 		isReplyingRef.current = true;
 		setIsReplying(true);
 
+		const toList =
+			payload.to && payload.to.length > 0
+				? payload.to
+				: [replyTargetPerson?.email || thread.from.email].filter(Boolean);
+
 		const optimisticMsg = {
 			id: `optimistic-${Date.now()}`,
 			direction: "outbound",
@@ -692,7 +701,8 @@ export const ThreadDetail = ({
 			email: {
 				id: `optimistic-${Date.now()}`,
 				fromEmail: mailbox?.email || "me",
-				toEmails: [replyTargetPerson?.email || thread.from.email],
+				toEmails: toList,
+				ccEmails: payload.cc ?? [],
 				subject: `Re: ${thread.subject}`,
 				textBody: body,
 				htmlBody: payload.html || null,
@@ -706,10 +716,28 @@ export const ThreadDetail = ({
 		closeReplyComposer();
 		setReplyDraftId(null);
 
+		const recipients = {
+			to: toList,
+			cc: payload.cc && payload.cc.length > 0 ? payload.cc : undefined,
+			bcc: payload.bcc && payload.bcc.length > 0 ? payload.bcc : undefined,
+		};
+
 		const send =
 			replyMode === "replyAll"
-				? sendReplyAll(sendId, body, payload.html, payload.attachments)
-				: sendReply(sendId, body, payload.html, payload.attachments);
+				? sendReplyAll(
+						sendId,
+						body,
+						payload.html,
+						payload.attachments,
+						recipients,
+					)
+				: sendReply(
+						sendId,
+						body,
+						payload.html,
+						payload.attachments,
+						recipients,
+					);
 
 		toast.promise(send, {
 			loading: "Sending reply...",
@@ -725,7 +753,7 @@ export const ThreadDetail = ({
 				setOptimisticReplies([]);
 				isReplyingRef.current = false;
 				setIsReplying(false);
-				return `Reply sent to ${thread.from.email} successfully`;
+				return "Reply sent successfully";
 			},
 			error: (err) => {
 				setOptimisticReplies((prev) =>
@@ -796,6 +824,27 @@ export const ThreadDetail = ({
 		const raw = msg.fromEmail || msg.email?.fromEmail || thread.from.email;
 		const name = msg.fromName || msg.email?.fromName || thread.from.name || "";
 		return { name, email: raw };
+	};
+
+	const resolveReplyAllCc = (msg?: any, primaryTo?: string) => {
+		const email = msg?.email ?? msg;
+		const mailboxBare = extractBareEmail(mailbox?.email || "").toLowerCase();
+		const primaryBare = extractBareEmail(primaryTo || "").toLowerCase();
+		const raw = [
+			...(email?.toEmails ?? msg?.toEmails ?? []),
+			...(email?.ccEmails ?? msg?.ccEmails ?? []),
+		];
+		const seen = new Set<string>();
+		const out: string[] = [];
+		for (const addr of raw) {
+			const bare = extractBareEmail(String(addr ?? ""));
+			if (!bare) continue;
+			const key = bare.toLowerCase();
+			if (key === mailboxBare || key === primaryBare || seen.has(key)) continue;
+			seen.add(key);
+			out.push(bare);
+		}
+		return out;
 	};
 
 	const openReplyComposer = (
@@ -1135,12 +1184,23 @@ export const ThreadDetail = ({
 			toName={replyTargetPerson?.name || thread.from.name || ""}
 			toEmail={replyTargetPerson?.email || thread.from.email}
 			fromEmail={mailbox?.email || "agent@local.reloop.sh"}
+			replyAllCc={resolveReplyAllCc(
+				displayMessages.find((m) => m.id === replyAnchorMessageId) ??
+					displayMessages[displayMessages.length - 1],
+				replyTargetPerson?.email || thread.from.email,
+			)}
 			mode={replyMode}
 			canReplyAll
 			variant="inline"
 			skipEnter={skipReplyEnter}
 			threadId={conversationThreadId}
 			onModeChange={setReplyMode}
+			onForward={() =>
+				openForwardComposer(
+					displayMessages.find((m) => m.id === replyAnchorMessageId) ??
+						displayMessages[displayMessages.length - 1],
+				)
+			}
 			initialContent={replySeed}
 			initialHtml={replyInitialHtml}
 			draft={

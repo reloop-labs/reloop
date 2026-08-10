@@ -577,7 +577,7 @@ export const InboxCommandPalette = ({
 									onSelect={() => toggleFilter(chip.id)}
 								>
 									<AppIcon name={FILTER_ICONS[chip.id]} />
-									<ItemTitle title={chip.label} subtitle="Inbox" />
+									<ItemTitle title={chip.label} />
 									<ItemMeta>
 										{active ? (
 											<span className="text-[#55B3FF]">On</span>
@@ -600,7 +600,7 @@ export const InboxCommandPalette = ({
 								onSelect={() => runAndClose(openCompose)}
 							>
 								<AppIcon name="pencil" />
-								<ItemTitle title="Compose Email" subtitle="Inbox" />
+								<ItemTitle title="Compose Email" />
 								<ItemMeta>Command</ItemMeta>
 							</CommandMenu.Item>
 						)}
@@ -614,7 +614,7 @@ export const InboxCommandPalette = ({
 								}}
 							>
 								<AppIcon name="cross" />
-								<ItemTitle title="Clear Filters" subtitle="Inbox" />
+								<ItemTitle title="Clear Filters" />
 								<ItemMeta>Command</ItemMeta>
 							</CommandMenu.Item>
 						)}
@@ -631,7 +631,7 @@ export const InboxCommandPalette = ({
 								onSelect={() => goToFolder(jump)}
 							>
 								<AppIcon name={jump.icon} />
-								<ItemTitle title={`Go to ${jump.label}`} subtitle="Inbox" />
+								<ItemTitle title={`Go to ${jump.label}`} />
 								<ItemMeta>Folder</ItemMeta>
 							</CommandMenu.Item>
 						))}
