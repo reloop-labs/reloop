@@ -60,9 +60,7 @@ export function AuthShell({
 						</div>
 					) : null}
 					<div className="flex flex-1 flex-col items-center justify-center px-5 py-16 md:px-8">
-						<div
-							className={hideLogo ? "w-full max-w-107.5" : "w-full max-w-sm"}
-						>
+						<div className={hideLogo ? "w-full max-w-md" : "w-full max-w-md"}>
 							{/* Card-mode pages (hideLogo) own their own step animation inside the card. */}
 							{hideLogo ? (
 								children

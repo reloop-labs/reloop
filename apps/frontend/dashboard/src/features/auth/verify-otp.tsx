@@ -36,9 +36,7 @@ export function VerifyOTP({
 	inviteId,
 	redirectTo,
 	mode = "login",
-	/** When set, resend copy is pushed here (e.g. AuthCard footer) instead of inline. */
 	onResendFooterChange,
-	/** Show "Back to login/signup" under the form. Default false. */
 	showBack = false,
 }: {
 	email: string;
@@ -199,8 +197,6 @@ export function VerifyOTP({
 		// eslint-disable-next-line react-hooks/exhaustive-deps -- intentional
 	}, [onResendFooterChange, isSuccess, isResending, canResend, secondsLeft]);
 
-	const showInlineResend = !onResendFooterChange;
-
 	return (
 		<div className="flex flex-col gap-5">
 			{/* Six equal digit boxes — left-aligned, larger slots */}
@@ -230,18 +226,13 @@ export function VerifyOTP({
 						))}
 					</DigitInput.Group>
 				</DigitInput.Root>
-				{error.error && (
-					<p className="pt-2 text-left text-error-base text-sm">
-						{error.error}
-					</p>
-				)}
 			</div>
 
 			<FancyButton.Root
 				type="button"
 				variant="blue"
 				size="medium"
-				className="h-10 w-full justify-center gap-2 overflow-hidden rounded-xl font-medium text-sm"
+				className="h-11 w-full justify-center gap-2 overflow-hidden rounded-xl font-medium text-sm"
 				onClick={() => {
 					if (isSuccess || status === "loading") return;
 					handleVerify(otpValue);
@@ -286,25 +277,6 @@ export function VerifyOTP({
 					</motion.span>
 				</AnimatePresence>
 			</FancyButton.Root>
-
-			{(showInlineResend || showBack) && (
-				<div className="flex flex-col gap-2">
-					{showInlineResend && resendLine ? (
-						<p className="font-medium text-[13px] text-text-sub-600">
-							{resendLine}
-						</p>
-					) : null}
-					{showBack && onBack ? (
-						<button
-							type="button"
-							onClick={onBack}
-							className="cursor-pointer text-center font-medium text-[13px] text-text-soft-400 transition-colors hover:text-text-strong-950 hover:underline"
-						>
-							Back to {mode}
-						</button>
-					) : null}
-				</div>
-			)}
 		</div>
 	);
 }

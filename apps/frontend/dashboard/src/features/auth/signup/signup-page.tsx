@@ -1,3 +1,4 @@
+import { Icon } from "@reloop/ui/icon";
 import * as LinkButton from "@reloop/ui/link-button";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
@@ -13,15 +14,21 @@ import { useRedirectIfAuthenticated } from "#/features/auth/use-redirect-if-auth
 import { VerifyOTP } from "#/features/auth/verify-otp";
 
 export function SignupPage() {
-	const [otpSentEmail] = useQueryState(
+	const [otpSentEmail, setOtpSentEmail] = useQueryState(
 		"otpSent",
 		parseAsString.withDefault(""),
 	);
+	const [, setOtpValue] = useQueryState("otp", parseAsString.withDefault(""));
 	const [inviteIdQuery] = useQueryState(
 		"inviteId",
 		parseAsString.withDefault(""),
 	);
 	const inviteId = inviteIdQuery || undefined;
+
+	const handleEditEmail = () => {
+		void setOtpSentEmail(null);
+		void setOtpValue("");
+	};
 
 	const currentLevel = otpSentEmail ? 1 : 0;
 	const direction = useAuthStepDirection(currentLevel);
@@ -74,8 +81,16 @@ export function SignupPage() {
 								description={
 									<>
 										We sent a 6 digit code to{" "}
-										<span className="font-medium text-text-strong-950">
+										<span className="inline-flex items-center gap-1 font-medium text-text-strong-950 underline decoration-stroke-soft-200 decoration-dashed underline-offset-4">
 											{otpSentEmail}
+											<button
+												type="button"
+												onClick={handleEditEmail}
+												className="inline-flex shrink-0 items-center justify-center rounded-md p-0.5 text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950"
+												aria-label="Edit email"
+											>
+												<Icon name="pencil" className="size-3" />
+											</button>
 										</span>
 									</>
 								}
