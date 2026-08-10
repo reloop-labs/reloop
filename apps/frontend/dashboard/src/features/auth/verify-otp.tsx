@@ -1,14 +1,21 @@
 import { authClient } from "@reloop/auth/client";
+import * as DigitInput from "@reloop/ui/digit-input";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
-import * as DigitInput from "@reloop/ui/digit-input";
+import * as LinkButton from "@reloop/ui/link-button";
 import Spinner from "@reloop/ui/spinner";
 import { useLoading } from "@reloop/ui/use-loading";
 import { useQueryClient } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { parseAsString, useQueryState } from "nuqs";
-import { useEffect, useRef, useState } from "react";
+import {
+	type ReactNode,
+	useEffect,
+	useLayoutEffect,
+	useRef,
+	useState,
+} from "react";
 import { toast } from "sonner";
 import { sessionQueryOptions } from "#/features/auth/session-query";
 import { queryKeys } from "#/lib/query-keys";
@@ -29,13 +36,19 @@ export function VerifyOTP({
 	inviteId,
 	redirectTo,
 	mode = "login",
+	/** When set, resend copy is pushed here (e.g. AuthCard footer) instead of inline. */
+	onResendFooterChange,
+	/** Show "Back to login/signup" under the form. Default false. */
+	showBack = false,
 }: {
 	email: string;
-	onBack: () => void;
+	onBack?: () => void;
 	/** Organization invitation id preserved through email OTP auth. */
 	inviteId?: string;
 	redirectTo?: string;
 	mode?: "login" | "signup";
+	onResendFooterChange?: (footer: ReactNode | null) => void;
+	showBack?: boolean;
 }) {
 	const router = useRouter();
 	const queryClient = useQueryClient();
@@ -153,41 +166,75 @@ export function VerifyOTP({
 
 	const canResend = secondsLeft <= 0 && !isResending && !isSuccess;
 
+	const resendLine = isSuccess ? null : isResending ? (
+		"Sending a new code…"
+	) : canResend ? (
+		<>
+			Didn&apos;t receive a code?{" "}
+			<button
+				type="button"
+				onClick={() => void handleResend()}
+				className={LinkButton.linkButtonVariants({
+					variant: "primary",
+				}).root({
+					className: "cursor-pointer font-medium! text-[13px]!",
+				})}
+			>
+				Resend
+			</button>
+		</>
+	) : (
+		<>
+			Didn&apos;t receive a code?{" "}
+			<span className="text-text-soft-400">Resend in {secondsLeft}s</span>
+		</>
+	);
+
+	// Push resend into AuthCard footer when requested; clear on unmount.
+	useLayoutEffect(() => {
+		if (!onResendFooterChange) return;
+		onResendFooterChange(resendLine);
+		return () => onResendFooterChange(null);
+		// resendLine is derived from these fields — avoid depending on the element identity.
+		// eslint-disable-next-line react-hooks/exhaustive-deps -- intentional
+	}, [onResendFooterChange, isSuccess, isResending, canResend, secondsLeft]);
+
+	const showInlineResend = !onResendFooterChange;
+
 	return (
-		<div>
-			{/* OTP input always visible — no "Enter code manually" gate */}
-			<div className="flex flex-col items-center">
-				<div className="pt-1 pb-5">
-					<DigitInput.Root
-						value={otpValue}
-						onChange={(val) => {
-							setError({ name: "email", error: null });
-							setIsSuccess(false);
-							setOtpValue(val);
-						}}
-						onComplete={handleVerify}
-						inputMode="numeric"
-						maxLength={6}
-						autoFocus
-						hasError={!!error.error}
-						isSuccess={isSuccess}
-					>
-						<DigitInput.Group>
-							<DigitInput.Slot index={0} />
-							<DigitInput.Slot index={1} />
-							<DigitInput.Slot index={2} />
-							<DigitInput.Separator />
-							<DigitInput.Slot index={3} />
-							<DigitInput.Slot index={4} />
-							<DigitInput.Slot index={5} />
-						</DigitInput.Group>
-					</DigitInput.Root>
-					{error.error && (
-						<p className="pt-2 text-center text-error-base text-sm">
-							{error.error}
-						</p>
-					)}
-				</div>
+		<div className="flex flex-col gap-5">
+			{/* Six equal digit boxes — left-aligned, larger slots */}
+			<div className="flex w-full flex-col items-start">
+				<DigitInput.Root
+					value={otpValue}
+					onChange={(val) => {
+						setError({ name: "email", error: null });
+						setIsSuccess(false);
+						setOtpValue(val);
+					}}
+					onComplete={handleVerify}
+					inputMode="numeric"
+					maxLength={6}
+					autoFocus
+					hasError={!!error.error}
+					isSuccess={isSuccess}
+					containerClassName="w-full justify-start gap-2.5"
+				>
+					<DigitInput.Group className="w-full justify-center gap-2.5">
+						{[0, 1, 2, 3, 4, 5].map((index) => (
+							<DigitInput.Slot
+								key={index}
+								index={index}
+								className="size-13 shrink-0 rounded-xl border-stroke-soft-200 bg-bg-white-0 text-lg data-[active=true]:border-primary-base data-[active=true]:ring-primary-base/30"
+							/>
+						))}
+					</DigitInput.Group>
+				</DigitInput.Root>
+				{error.error && (
+					<p className="pt-2 text-left text-error-base text-sm">
+						{error.error}
+					</p>
+				)}
 			</div>
 
 			<FancyButton.Root
@@ -199,18 +246,12 @@ export function VerifyOTP({
 					if (isSuccess || status === "loading") return;
 					handleVerify(otpValue);
 				}}
-				disabled={
-					(otpValue.length !== 6 || status === "loading") && !isSuccess
-				}
+				disabled={(otpValue.length !== 6 || status === "loading") && !isSuccess}
 			>
 				<AnimatePresence mode="popLayout" initial={false}>
 					<motion.span
 						key={
-							isSuccess
-								? "success"
-								: status === "loading"
-									? "loading"
-									: "idle"
+							isSuccess ? "success" : status === "loading" ? "loading" : "idle"
 						}
 						transition={{
 							type: "spring",
@@ -231,9 +272,7 @@ export function VerifyOTP({
 						}}
 						className="flex items-center justify-center gap-1.5"
 					>
-						{status === "loading" && (
-							<Spinner size={14} color="currentColor" />
-						)}
+						{status === "loading" && <Spinner size={14} color="currentColor" />}
 						{isSuccess && (
 							<Icon name="check-circle" className="h-4 w-4 shrink-0" />
 						)}
@@ -241,37 +280,31 @@ export function VerifyOTP({
 							{isSuccess
 								? "Verified successfully!"
 								: status === "loading"
-									? "Verifying..."
-									: `Continue with ${mode} code`}
+									? "Confirming…"
+									: "Confirm email"}
 						</span>
 					</motion.span>
 				</AnimatePresence>
 			</FancyButton.Root>
 
-			<div className="mt-4 flex flex-col items-center gap-2">
-				{canResend ? (
-					<button
-						type="button"
-						onClick={() => void handleResend()}
-						className="cursor-pointer text-center font-medium text-[13px] text-text-sub-600 transition-colors hover:text-text-strong-950 hover:underline"
-					>
-						Resend code
-					</button>
-				) : isSuccess ? null : (
-					<p className="text-center font-medium text-[13px] text-text-soft-400">
-						{isResending
-							? "Sending a new code…"
-							: `Resend code in ${secondsLeft}s`}
-					</p>
-				)}
-				<button
-					type="button"
-					onClick={onBack}
-					className="cursor-pointer text-center font-medium text-[13px] text-text-sub-600 transition-colors hover:text-text-strong-950 hover:underline"
-				>
-					Back to {mode}
-				</button>
-			</div>
+			{(showInlineResend || showBack) && (
+				<div className="flex flex-col gap-2">
+					{showInlineResend && resendLine ? (
+						<p className="font-medium text-[13px] text-text-sub-600">
+							{resendLine}
+						</p>
+					) : null}
+					{showBack && onBack ? (
+						<button
+							type="button"
+							onClick={onBack}
+							className="cursor-pointer text-center font-medium text-[13px] text-text-soft-400 transition-colors hover:text-text-strong-950 hover:underline"
+						>
+							Back to {mode}
+						</button>
+					) : null}
+				</div>
+			)}
 		</div>
 	);
 }

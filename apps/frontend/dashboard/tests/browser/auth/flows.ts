@@ -63,7 +63,7 @@ export async function completeEmailOtpAuth(
 	}
 
 	await expect(
-		page.getByRole("heading", { name: "Check your email" }),
+		page.getByRole("heading", { name: "Confirm your email" }),
 	).toBeVisible({ timeout: 20_000 });
 	await expect(page.getByText(options.email, { exact: true })).toBeVisible();
 

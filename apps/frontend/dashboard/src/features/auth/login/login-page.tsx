@@ -56,17 +56,13 @@ export function LoginPage() {
 				>
 					<div className="space-y-1 pb-6 text-center">
 						<h2 className="font-medium text-label-lg text-text-strong-950">
-							Check your email
+							Confirm your email
 						</h2>
 						<p className="mt-2 text-center text-[13px] text-text-sub-600">
-							We&apos;ve sent you a temporary login otp.
-							<br />
-							Please check your inbox at
-							<br />
+							We sent a 6 digit code to{" "}
 							<span className="font-medium text-text-strong-950">
 								{otpSentEmail}
 							</span>
-							.
 						</p>
 					</div>
 					<VerifyOTP
@@ -74,6 +70,7 @@ export function LoginPage() {
 						mode="login"
 						inviteId={inviteId}
 						redirectTo={redirectTo}
+						showBack
 						onBack={() => {
 							setOtpSentEmail(null);
 							setOtpValue("");

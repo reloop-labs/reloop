@@ -2,6 +2,7 @@ import * as LinkButton from "@reloop/ui/link-button";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { parseAsString, useQueryState } from "nuqs";
+import { type ReactNode, useCallback, useState } from "react";
 import { AuthAside } from "#/features/auth/auth-aside";
 import { AuthCard, AuthCardHeader } from "#/features/auth/auth-card";
 import { AuthSessionLoader } from "#/features/auth/auth-session-loader";
@@ -12,11 +13,10 @@ import { useRedirectIfAuthenticated } from "#/features/auth/use-redirect-if-auth
 import { VerifyOTP } from "#/features/auth/verify-otp";
 
 export function SignupPage() {
-	const [otpSentEmail, setOtpSentEmail] = useQueryState(
+	const [otpSentEmail] = useQueryState(
 		"otpSent",
 		parseAsString.withDefault(""),
 	);
-	const [, setOtpValue] = useQueryState("otp", parseAsString.withDefault(""));
 	const [inviteIdQuery] = useQueryState(
 		"inviteId",
 		parseAsString.withDefault(""),
@@ -26,6 +26,12 @@ export function SignupPage() {
 	const currentLevel = otpSentEmail ? 1 : 0;
 	const direction = useAuthStepDirection(currentLevel);
 	const { shouldBlockAuthUi } = useRedirectIfAuthenticated(inviteId);
+
+	// OTP step: card footer shows "Didn't receive a code?" instead of login link.
+	const [otpResendFooter, setOtpResendFooter] = useState<ReactNode>(null);
+	const handleResendFooterChange = useCallback((footer: ReactNode | null) => {
+		setOtpResendFooter(footer);
+	}, []);
 
 	if (shouldBlockAuthUi) {
 		return <AuthSessionLoader />;
@@ -45,10 +51,12 @@ export function SignupPage() {
 		</>
 	);
 
+	const cardFooter = otpSentEmail ? (otpResendFooter ?? null) : loginFooter;
+
 	return (
 		// Shell stays static; step animation lives inside the card only.
 		<AuthShell direction={direction} aside={<AuthAside />} hideLogo>
-			<AuthCard footer={loginFooter}>
+			<AuthCard footer={cardFooter}>
 				<AnimatePresence mode="wait" custom={direction} initial={false}>
 					{otpSentEmail ? (
 						<motion.div
@@ -62,15 +70,13 @@ export function SignupPage() {
 							className="space-y-6"
 						>
 							<AuthCardHeader
-								title="Check your email"
+								title="Confirm your email"
 								description={
 									<>
-										We&apos;ve sent you a temporary signup otp. Please check
-										your inbox at{" "}
+										We sent a 6 digit code to{" "}
 										<span className="font-medium text-text-strong-950">
 											{otpSentEmail}
 										</span>
-										.
 									</>
 								}
 							/>
@@ -78,10 +84,7 @@ export function SignupPage() {
 								email={otpSentEmail}
 								mode="signup"
 								inviteId={inviteId}
-								onBack={() => {
-									setOtpSentEmail(null);
-									setOtpValue("");
-								}}
+								onResendFooterChange={handleResendFooterChange}
 							/>
 						</motion.div>
 					) : (

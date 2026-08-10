@@ -41,7 +41,7 @@ export function AuthCard({
 
 				{/* Footer between inner panel and outer shell */}
 				{footer ? (
-					<div className="px-6 pt-3 pb-3.5 text-center font-medium text-[13px] text-text-sub-600 dark:bg-bg-weak-50/40">
+					<div className="px-6 pt-3 pb-3.5 font-medium text-[13px] text-text-sub-600 dark:bg-bg-weak-50/40">
 						{footer}
 					</div>
 				) : null}
