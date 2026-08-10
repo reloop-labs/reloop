@@ -3,9 +3,11 @@ import { Icon } from "@reloop/ui/icon";
 
 export function MessageActionBar({
 	onReply,
+	onReplyAll,
 	onForward,
 }: {
 	onReply: () => void;
+	onReplyAll?: () => void;
 	onForward: () => void;
 }) {
 	return (
@@ -24,6 +26,22 @@ export function MessageActionBar({
 				<Button.Icon as={Icon} name="reply" className="size-3.5" />
 				Reply
 			</Button.Root>
+			{onReplyAll ? (
+				<Button.Root
+					type="button"
+					variant="neutral"
+					mode="stroke"
+					size="small"
+					onClick={(e) => {
+						e.stopPropagation();
+						onReplyAll();
+					}}
+					className="rounded-full"
+				>
+					<Button.Icon as={Icon} name="reply" className="size-3.5" />
+					Reply all
+				</Button.Root>
+			) : null}
 			<Button.Root
 				type="button"
 				variant="neutral"

@@ -448,6 +448,7 @@ export const ZeroMailDisplay = ({
 								<div className="mt-4 pb-2">
 									<MessageActionBar
 										onReply={onReply}
+										onReplyAll={onReplyAll}
 										onForward={onForward}
 									/>
 								</div>
