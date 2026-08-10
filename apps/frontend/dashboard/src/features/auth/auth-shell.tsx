@@ -82,8 +82,8 @@ export function AuthShell({
 				<div
 					className={
 						hideLogo
-							? "relative hidden min-h-dvh w-1/2 overflow-hidden border-stroke-soft-100 border-l bg-bg-white-0 lg:flex dark:border-stroke-soft-100/40"
-							: "relative hidden min-h-dvh w-1/2 overflow-hidden border-stroke-soft-100 border-l bg-bg-weak-50 lg:flex dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/40"
+							? "relative hidden min-h-dvh w-1/2 overflow-hidden border-stroke-soft-100 border-l bg-bg-white-0 lg:flex dark:border-stroke-soft-200"
+							: "relative hidden min-h-dvh w-1/2 overflow-hidden border-stroke-soft-100 border-l bg-bg-weak-50 lg:flex dark:border-stroke-soft-200 dark:bg-bg-weak-50/40"
 					}
 				>
 					{aside}

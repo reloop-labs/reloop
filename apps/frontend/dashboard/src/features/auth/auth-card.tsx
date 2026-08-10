@@ -97,16 +97,16 @@ export function AuthCard({
 	return (
 		<div className="w-full font-sans">
 			{/* Outer soft shell */}
-			<div className="overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-soft-50 dark:border-stroke-soft-100/40">
+			<div className="overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-soft-50 dark:border-stroke-soft-100/60">
 				{/* White panel height-animates alone */}
 				<AnimatedHeight>
-					<div className="space-y-6 overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 px-6 pt-5 pb-7 dark:border-stroke-soft-100/40">
+					<div className="space-y-6 overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 px-6 pt-5 pb-7 dark:border-stroke-soft-100/60">
 						{showBrandMark ? (
 							<div
-								className="w-fit overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-soft-50 dark:border-stroke-soft-100/40"
+								className="w-fit overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-soft-50 dark:border-stroke-soft-100/60"
 								aria-hidden
 							>
-								<div className="m-px flex size-11 items-center justify-center rounded-[14px] border border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/40">
+								<div className="m-px flex size-11 items-center justify-center rounded-[14px] border border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/60">
 									<Logo className="h-10 w-10" />
 								</div>
 							</div>
@@ -159,7 +159,7 @@ export function AuthCardHeader({
 			) : null}
 
 			<div
-				className="mt-4 border-stroke-soft-200 border-t border-dashed pb-2 dark:border-stroke-soft-100/40"
+				className="mt-4 border-stroke-soft-200 border-t border-dashed pb-2 dark:border-stroke-soft-100/60"
 				aria-hidden
 			/>
 		</div>
