@@ -68,12 +68,12 @@ const LicensePage = () => {
 	return (
 		<>
 			<JsonLd data={jsonLd} />
-			<div className="mx-auto flex min-h-dvh w-full max-w-5xl flex-col border-stroke-soft-200 border-x pt-16 md:max-w-7xl dark:border-white/10">
+			<div className="mx-auto flex min-h-dvh w-full max-w-5xl flex-col border-stroke-soft-200 border-x pt-24 sm:pt-16 md:max-w-7xl dark:border-white/10">
 				{/* 3-column layout with solid straight dividers */}
 				<div className="grid flex-1 grid-cols-1 lg:grid-cols-12">
 					{/* Left label */}
 					<div className="flex justify-start border-stroke-soft-200 border-b px-6 py-8 text-left sm:px-8 lg:col-span-2 lg:justify-end lg:border-r lg:border-b-0 lg:px-6 lg:py-16 lg:text-right dark:border-white/10">
-						<div className="font-medium text-text-sub-600/70 text-xs">
+						<div className="font-medium text-[11px] text-text-sub-600 uppercase tracking-wider dark:text-white/50">
 							License
 						</div>
 					</div>
@@ -86,16 +86,16 @@ const LicensePage = () => {
 					{/* Right meta */}
 					<div className="flex justify-start px-6 py-8 sm:px-8 lg:col-span-2 lg:px-6 lg:py-16 dark:border-white/10">
 						<div className="w-full space-y-2.5">
-							<p className="font-medium text-text-sub-600 text-xs dark:text-white/55">
+							<p className="font-medium text-[11px] text-text-sub-600 uppercase tracking-wider dark:text-white/50">
 								Apache License 2.0
 							</p>
-							<p className="text-text-soft-400 text-xs leading-relaxed dark:text-white/40">
-								Personal &amp; internal use allowed. No commercial redistribution
-								or competing hosted services.
+							<p className="text-[13.5px] text-text-sub-600 leading-normal dark:text-white/55">
+								Personal &amp; internal use allowed. No commercial
+								redistribution or competing hosted services.
 							</p>
 							<a
 								href={`mailto:${contactEmail}`}
-								className="inline-block font-medium text-text-sub-600 text-xs underline decoration-text-sub-600/40 underline-offset-2 transition-colors hover:text-text-strong-950 hover:decoration-text-strong-950 dark:text-white/50 dark:hover:text-white"
+								className="inline-block font-medium text-[13.5px] text-text-sub-600 underline decoration-text-sub-600/40 underline-offset-2 transition-colors hover:text-text-strong-950 hover:decoration-text-strong-950 dark:text-white/50 dark:hover:text-white"
 							>
 								{contactEmail}
 							</a>

@@ -12,7 +12,7 @@ function Chip({
 	return (
 		<span
 			className={cn(
-				"mx-0.5 inline-flex translate-y-px items-center gap-1 rounded-md border border-blue-200/80 bg-blue-50 px-1.5 py-[0.2em] font-medium text-[0.92em] text-primary-base leading-none align-middle dark:border-blue-400/20 dark:bg-blue-500/10 dark:text-blue-300",
+				"mx-0.5 inline-flex translate-y-px items-center gap-1 rounded-md border border-blue-200/80 bg-blue-50 px-1.5 py-[0.2em] align-middle font-medium text-[0.92em] text-primary-base leading-none dark:border-blue-400/20 dark:bg-blue-500/10 dark:text-blue-300",
 				className,
 			)}
 		>
@@ -21,17 +21,11 @@ function Chip({
 	);
 }
 
-function Section({
-	title,
-	children,
-}: {
-	title: string;
-	children: ReactNode;
-}) {
+function Section({ title, children }: { title: string; children: ReactNode }) {
 	return (
 		<section className="mt-7 sm:mt-8">
-			{/* Matches changelog release titles: 16–17px medium */}
-			<h2 className="font-medium text-[16px] text-text-strong-950 leading-snug tracking-tight sm:text-[17px] dark:text-white">
+			{/* Section title matched to changelog category headers: 11px uppercase tracking-wider */}
+			<h2 className="font-medium text-[11px] text-text-sub-600 uppercase tracking-wider dark:text-white/40">
 				{title}
 			</h2>
 			{/* Matches changelog body: 14–14.5px muted */}
@@ -48,21 +42,16 @@ function Section({
  */
 export function LicenseDocument() {
 	return (
-		<div className="w-full font-sans">
+		<div className="mx-auto w-full max-w-2xl font-sans">
 			<div className="overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-soft-50 dark:border-white/10 dark:bg-white/[0.03]">
 				<div className="m-0.5 overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 px-5 py-6 sm:px-8 sm:py-8 md:px-9 md:py-9 dark:border-white/10 dark:bg-[#0c0c0c]">
 					{/* Title — changelog page h1 scale */}
-					<header className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-						<div>
-							<p className="font-medium text-[11px] text-text-sub-600 uppercase tracking-wider dark:text-white/50">
-								Reloop Labs
-							</p>
-							<h1 className="mt-2 font-semibold text-xl text-text-strong-950 leading-snug tracking-tight sm:text-2xl lg:text-[1.65rem] dark:text-white">
-								License Agreement
-							</h1>
-						</div>
-						<p className="shrink-0 font-medium text-[12.5px] text-text-sub-600 sm:pt-7 dark:text-white/60">
-							Apache 2.0 · 2025
+					<header className="mb-4 flex items-center justify-between">
+						<h1 className="font-semibold text-text-strong-950 leading-snug tracking-tight dark:text-white">
+							License Agreement
+						</h1>
+						<p className="shrink-0 font-medium text-[12.5px] text-text-sub-600 dark:text-white/60">
+							Apache 2.0 · 2026
 						</p>
 					</header>
 
@@ -130,34 +119,53 @@ export function LicenseDocument() {
 							<Chip>http://www.apache.org/licenses/LICENSE-2.0</Chip>.
 						</p>
 						<p>
-							Unless required by applicable law or agreed to in writing, software
-							distributed under the License is distributed on an{" "}
-							<Chip>“AS IS”</Chip> BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-							KIND, either express or implied. See the License for the specific
-							language governing permissions and limitations under the License.
+							Unless required by applicable law or agreed to in writing,
+							software distributed under the License is distributed on an{" "}
+							<Chip>“AS IS”</Chip> BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
+							ANY KIND, either express or implied. See the License for the
+							specific language governing permissions and limitations under the
+							License.
 						</p>
 					</Section>
 
 					<Section title="Additional use restrictions">
 						<p>
-							You are free to use, copy, modify, and distribute this software for{" "}
-							<Chip>personal use</Chip> and{" "}
+							You are free to use, copy, modify, and distribute this software
+							for <Chip>personal use</Chip> and{" "}
 							<Chip>internal company purposes</Chip>.
 						</p>
 						<p>You are NOT permitted to:</p>
-						<ul className="list-disc space-y-2 pl-5 marker:text-text-soft-400">
-							<li>
-								<Chip>Sell</Chip>, sublicense, or otherwise commercially
-								redistribute this software.
+						<ul className="my-3 space-y-3">
+							<li className="flex items-start gap-3 text-[14px] text-text-sub-600 leading-relaxed sm:text-[14.5px] dark:text-white/60">
+								<span
+									className="mt-2 size-1 shrink-0 rounded-[1px] bg-text-sub-600/40 dark:bg-white/35"
+									aria-hidden="true"
+								/>
+								<div>
+									<Chip>Sell</Chip>, sublicense, or otherwise commercially
+									redistribute this software.
+								</div>
 							</li>
-							<li>
-								Offer this software, or any modified version of it, as a{" "}
-								<Chip>hosted service</Chip> (including SaaS, PaaS, or any similar
-								commercial hosting model).
+							<li className="flex items-start gap-3 text-[14px] text-text-sub-600 leading-relaxed sm:text-[14.5px] dark:text-white/60">
+								<span
+									className="mt-2 size-1 shrink-0 rounded-[1px] bg-text-sub-600/40 dark:bg-white/35"
+									aria-hidden="true"
+								/>
+								<div>
+									Offer this software, or any modified version of it, as a{" "}
+									<Chip>hosted service</Chip> (including SaaS, PaaS, or any
+									similar commercial hosting model).
+								</div>
 							</li>
-							<li>
-								Use this software in any product or service whose primary purpose
-								is to <Chip>compete with Reloop Labs</Chip>.
+							<li className="flex items-start gap-3 text-[14px] text-text-sub-600 leading-relaxed sm:text-[14.5px] dark:text-white/60">
+								<span
+									className="mt-2 size-1 shrink-0 rounded-[1px] bg-text-sub-600/40 dark:bg-white/35"
+									aria-hidden="true"
+								/>
+								<div>
+									Use this software in any product or service whose primary
+									purpose is to <Chip>compete with Reloop Labs</Chip>.
+								</div>
 							</li>
 						</ul>
 					</Section>
@@ -169,8 +177,8 @@ export function LicenseDocument() {
 							software on your own infrastructure.
 						</p>
 						<p>
-							There is no commercial license for third parties to resell or offer
-							competing hosted services using this software.
+							There is no commercial license for third parties to resell or
+							offer competing hosted services using this software.
 						</p>
 					</Section>
 
@@ -186,32 +194,6 @@ export function LicenseDocument() {
 							.
 						</p>
 					</Section>
-
-					{/* Actions */}
-					<div className="mt-8 space-y-3 border-stroke-soft-200 border-t pt-6 dark:border-white/10">
-						<div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
-							<a
-								href="/dashboard/signup"
-								className="inline-flex h-9 items-center justify-center rounded-xl bg-text-strong-950 px-4 font-medium text-[13.5px] text-white transition-all hover:bg-text-strong-950/90 dark:bg-white dark:text-black dark:hover:bg-white/90"
-							>
-								Use Reloop hosted
-							</a>
-							<a
-								href="/docs/self-host"
-								className="inline-flex h-9 items-center justify-center rounded-xl border border-stroke-soft-200 px-4 font-medium text-[13.5px] text-text-strong-950 transition-colors hover:bg-bg-weak-50 dark:border-white/10 dark:text-white dark:hover:bg-white/[0.04]"
-							>
-								Self-host guide
-							</a>
-							<a
-								href="https://www.apache.org/licenses/LICENSE-2.0"
-								target="_blank"
-								rel="noopener noreferrer"
-								className="inline-flex h-9 items-center justify-center rounded-xl border border-stroke-soft-200 px-4 font-medium text-[13.5px] text-text-strong-950 transition-colors hover:bg-bg-weak-50 dark:border-white/10 dark:text-white dark:hover:bg-white/[0.04]"
-							>
-								Full Apache 2.0
-							</a>
-						</div>
-					</div>
 				</div>
 			</div>
 		</div>
