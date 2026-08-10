@@ -17,6 +17,7 @@ export type SitemapEntry = {
 const STATIC_TITLES: Record<string, string> = {
 	"/": "Home",
 	"/about": "About",
+	"/from-the-founder": "From the founder",
 	"/alternatives": "Alternatives",
 	"/blog": "Blog",
 	"/careers": "Careers",
@@ -232,7 +233,7 @@ export function buildPublicDiscoveryMarkdown(
 		"",
 		"## Human URLs",
 		"",
-		`- Home and company: \`${origin}/\`, \`/about\`, \`/pricing\`, \`/contact\`, \`/careers\`, \`/community\`, \`/developers\``,
+		`- Home and company: \`${origin}/\`, \`/about\`, \`/from-the-founder\`, \`/pricing\`, \`/contact\`, \`/careers\`, \`/community\`, \`/developers\``,
 		`- Features: \`${origin}/features/<slug>\``,
 		`- Blog posts: \`${origin}/blog/<slug>\``,
 		`- Blog categories: \`${origin}/blog/category/<slug>\``,
