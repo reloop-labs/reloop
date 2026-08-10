@@ -163,15 +163,15 @@ export function SignupPage() {
 								<AuthCardHeader
 									title="Create an account"
 									description={
-										<>
-											By creating an account, you agree to our{" "}
+										<span className="block whitespace-nowrap">
+											By continuing, you agree to our{" "}
 											<a
 												href="/terms-and-conditions"
 												className={LinkButton.linkButtonVariants({
 													variant: "black",
 												}).root({ className: "text-sm!" })}
 											>
-												Terms of Service
+												Terms
 											</a>{" "}
 											and{" "}
 											<a
@@ -182,7 +182,8 @@ export function SignupPage() {
 											>
 												Privacy Policy
 											</a>
-										</>
+											.
+										</span>
 									}
 								/>
 								<SocialSignup
