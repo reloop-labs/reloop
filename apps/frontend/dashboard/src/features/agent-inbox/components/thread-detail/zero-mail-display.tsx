@@ -11,6 +11,7 @@ import type { AgentMailbox } from "../../types";
 import { ContactHoverCard } from "./contact-hover-card";
 import { formatMessageHeaderTime, formatMessageTimestamp } from "./date-utils";
 import { HoverPopover } from "./hover-popover";
+import { MessageActionBar } from "./message-action-bar";
 import { MessageActionsDropdown } from "./message-actions-dropdown";
 import { MessageAttachments } from "./message-attachments";
 import { MessageBody } from "./message-body";
@@ -439,6 +440,15 @@ export const ZeroMailDisplay = ({
 										parsed={msg.parsed}
 										isExpanded={parsedExpanded}
 										onToggle={onToggleParsed}
+									/>
+								</div>
+							)}
+
+							{!forceExpanded && !isApproval && (
+								<div className="mt-4 pb-2">
+									<MessageActionBar
+										onReply={onReply}
+										onForward={onForward}
 									/>
 								</div>
 							)}

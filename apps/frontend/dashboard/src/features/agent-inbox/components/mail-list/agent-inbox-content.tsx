@@ -562,7 +562,20 @@ export const AgentInboxContent = ({
 					/>
 				) : filteredThreads.length === 0 && !listLoading && !threadsError ? (
 					<div className="flex min-h-0 flex-1 items-center justify-center p-6">
-						<InboxEmptyState onCompose={openCompose} onOpenAi={toggleAi} />
+						<InboxEmptyState
+							title={
+								folder === "inbox" ? "No received mail yet" : "It's empty here"
+							}
+							description={
+								folder === "inbox"
+									? "Inbox shows emails sent to this address. Outbound mail lives in Sent."
+									: folder === "sent"
+										? "Emails you send from this address will show up here."
+										: "Choose an email to view details"
+							}
+							onCompose={openCompose}
+							onOpenAi={toggleAi}
+						/>
 					</div>
 				) : (
 					<ThreadList

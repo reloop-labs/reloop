@@ -4,6 +4,7 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
 	type ClipboardEvent,
 	type KeyboardEvent,
+	type PointerEvent,
 	useEffect,
 	useId,
 	useLayoutEffect,
@@ -60,7 +61,11 @@ export const EmailPillsInput = ({
 	const rootRef = useRef<HTMLDivElement>(null);
 	const listRef = useRef<HTMLDivElement>(null);
 	const optionRefs = useRef<Array<HTMLDivElement | null>>([]);
+	/** Skip blur-commit when selecting a suggestion (pointerdown can blur before mousedown). */
 	const ignoreBlurCommit = useRef(false);
+	const blurCommitTimer = useRef<number | null>(null);
+	const inputValueRef = useRef(inputValue);
+	inputValueRef.current = inputValue;
 
 	const selectedEmails = useMemo(
 		() => new Set(emails.map((e) => parseEmail(e).email.toLowerCase())),
@@ -153,21 +158,44 @@ export const EmailPillsInput = ({
 
 		const seen = new Set(emails.map((e) => parseEmail(e).email.toLowerCase()));
 		const updated = [...emails];
+		let added = false;
 		for (const val of parsed) {
 			const key = parseEmail(val).email.toLowerCase();
 			if (!key || seen.has(key)) continue;
 			seen.add(key);
 			updated.push(val);
+			added = true;
 		}
-		onChange(updated);
 		setInputValue("");
 		setListOpen(false);
 		setHighlight(0);
+		// Avoid onChange when nothing was added (e.g. blur committing a typed
+		// fragment like "s") — a stale closure can otherwise wipe recipients.
+		if (added) onChange(updated);
 	};
 
 	const selectSuggestion = (suggestion: ParsedSuggestion) => {
+		if (blurCommitTimer.current != null) {
+			window.clearTimeout(blurCommitTimer.current);
+			blurCommitTimer.current = null;
+		}
+		ignoreBlurCommit.current = true;
 		addEmails(suggestion.raw);
-		requestAnimationFrame(() => inputRef.current?.focus());
+		requestAnimationFrame(() => {
+			inputRef.current?.focus();
+			// Keep ignoring until after any deferred blur from the pointer event.
+			ignoreBlurCommit.current = false;
+		});
+	};
+
+	const handleSuggestionPointerDown = (
+		e: PointerEvent,
+		suggestion: ParsedSuggestion,
+	) => {
+		// Prevent input blur so the option click isn't racing a commit of the typed query.
+		e.preventDefault();
+		e.stopPropagation();
+		selectSuggestion(suggestion);
 	};
 
 	const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
@@ -248,15 +276,19 @@ export const EmailPillsInput = ({
 	};
 
 	const handleBlur = () => {
-		if (ignoreBlurCommit.current) {
-			ignoreBlurCommit.current = false;
-			return;
+		if (ignoreBlurCommit.current) return;
+		if (blurCommitTimer.current != null) {
+			window.clearTimeout(blurCommitTimer.current);
 		}
 		// Close list; commit typed address after a tick so option clicks win.
-		window.setTimeout(() => {
+		blurCommitTimer.current = window.setTimeout(() => {
+			blurCommitTimer.current = null;
+			if (ignoreBlurCommit.current) return;
 			if (document.activeElement === inputRef.current) return;
+			if (listRef.current?.contains(document.activeElement)) return;
 			setListOpen(false);
-			if (inputValue.trim()) addEmails(inputValue);
+			const pending = inputValueRef.current.trim();
+			if (pending) addEmails(pending);
 		}, 0);
 	};
 
@@ -311,18 +343,17 @@ export const EmailPillsInput = ({
 										}}
 										id={`${optionIdPrefix}-${i}`}
 										role="option"
+										tabIndex={-1}
 										aria-selected={selected}
 										className={cn(
 											"flex w-full cursor-pointer items-center gap-3 rounded-lg px-2.5 py-2 text-left transition-colors duration-100 ease-out",
 											selected
 												? "bg-mail-foreground/[0.07] ring-1 ring-mail-border/50 dark:bg-white/[0.08]"
-												: "hover:bg-[var(--inbox-hover)]",
+												: "hover:bg-(--inbox-hover)",
 										)}
 										onMouseEnter={() => setHighlight(i)}
-										onMouseDown={(e) => {
-											e.preventDefault();
-											ignoreBlurCommit.current = true;
-											selectSuggestion(s);
+										onPointerDown={(e) => {
+											handleSuggestionPointerDown(e, s);
 										}}
 									>
 										<div

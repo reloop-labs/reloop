@@ -13,6 +13,7 @@ import {
 	Sparkles,
 	X as XIcon,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { parseAsString, useQueryState } from "nuqs";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useDropzone } from "react-dropzone";
@@ -115,6 +116,7 @@ export const ComposeModal = ({
 	onClose,
 	mailbox,
 }: ComposeModalProps) => {
+	const router = useRouter();
 	const {
 		sendMessage,
 		removeOptimisticOutbound,
@@ -595,7 +597,19 @@ export const ComposeModal = ({
 				});
 			} else {
 				toast.success(
-					scheduleAt ? "Email scheduled" : "Email sent successfully!",
+					scheduleAt ? "Email scheduled" : "Email sent",
+					{
+						description: scheduleAt
+							? "It will send at the scheduled time. Find it in Sent."
+							: "Find it in Sent — Inbox only shows mail you receive.",
+						action: {
+							label: "View Sent",
+							onClick: () => {
+								router.push(`/inbox/${mailbox.id}/sent`);
+							},
+						},
+						duration: 6000,
+					},
 				);
 			}
 
