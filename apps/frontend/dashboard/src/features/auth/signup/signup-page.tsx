@@ -81,7 +81,7 @@ export function SignupPage() {
 								description={
 									<>
 										We sent a 6 digit code to{" "}
-										<span className="inline-flex items-center gap-1 font-medium text-text-strong-950 underline decoration-stroke-soft-200 decoration-dashed underline-offset-4">
+										<span className="inline-flex items-center gap-1 font-medium text-text-strong-950">
 											{otpSentEmail}
 											<button
 												type="button"
@@ -116,8 +116,29 @@ export function SignupPage() {
 							className="space-y-6"
 						>
 							<AuthCardHeader
-								title="Create your Account"
-								description="Sign up and start sending email in 5 mins"
+								title="Create an account"
+								description={
+									<>
+										By creating an account, you agree to our{" "}
+										<a
+											href="/terms-and-conditions"
+											className={LinkButton.linkButtonVariants({
+												variant: "black",
+											}).root({ className: "text-sm!" })}
+										>
+											Terms of Service
+										</a>{" "}
+										and{" "}
+										<a
+											href="/privacy"
+											className={LinkButton.linkButtonVariants({
+												variant: "black",
+											}).root({ className: "text-sm!" })}
+										>
+											Privacy Policy
+										</a>
+									</>
+								}
 							/>
 							<SocialSignup inviteId={inviteId} />
 						</motion.div>

@@ -41,26 +41,14 @@ export async function completeEmailOtpAuth(
 
 	await page.goto(dashboardURL(path), { waitUntil: "domcontentloaded" });
 
-	if (mode === "signup") {
-		// Signup shows email + Create account on the first step (no intermediate).
-		const emailInput = page.getByPlaceholder("steve@apple.com");
-		await expect(emailInput).toBeVisible();
-		await emailInput.fill(options.email);
-		const submit = page.getByRole("button", { name: "Create account" });
-		await expect(submit).toBeEnabled({ timeout: 5_000 });
-		await submit.click();
-	} else {
-		await page.getByRole("button", { name: "Continue with Email" }).click();
-		await expect(
-			page.getByRole("heading", { name: "What's your email address?" }),
-		).toBeVisible();
-
-		const emailInput = page.getByPlaceholder("steve@apple.com");
-		await emailInput.fill(options.email);
-		const submit = page.getByRole("button", { name: "Continue with email" });
-		await expect(submit).toBeEnabled({ timeout: 5_000 });
-		await submit.click();
-	}
+	// Login and signup both show email + primary CTA on the first step.
+	const emailInput = page.getByPlaceholder("steve@apple.com");
+	await expect(emailInput).toBeVisible();
+	await emailInput.fill(options.email);
+	const submitName = mode === "signup" ? "Create account" : "Sign in";
+	const submit = page.getByRole("button", { name: submitName });
+	await expect(submit).toBeEnabled({ timeout: 5_000 });
+	await submit.click();
 
 	await expect(
 		page.getByRole("heading", { name: "Confirm your email" }),

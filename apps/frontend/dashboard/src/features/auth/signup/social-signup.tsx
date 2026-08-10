@@ -1,7 +1,6 @@
 import { authClient } from "@reloop/auth/client";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
-import * as LinkButton from "@reloop/ui/link-button";
 import Spinner from "@reloop/ui/spinner";
 import { useEffect, useState } from "react";
 import { GoogleLogo } from "#/features/auth/google-logo";
@@ -121,27 +120,6 @@ export function SocialSignup({
 					setLoading({ name: "email", loading: isLoading })
 				}
 			/>
-
-			<p className="pt-1 text-center font-medium text-[13px] text-text-sub-600">
-				By creating an account, you agree to our <br />
-				<a
-					href="/terms-and-conditions"
-					className={LinkButton.linkButtonVariants({
-						variant: "black",
-					}).root({ className: "text-xs!" })}
-				>
-					Terms of Service
-				</a>{" "}
-				and{" "}
-				<a
-					href="/privacy"
-					className={LinkButton.linkButtonVariants({
-						variant: "black",
-					}).root({ className: "text-xs!" })}
-				>
-					Privacy Policy
-				</a>
-			</p>
 		</>
 	);
 }

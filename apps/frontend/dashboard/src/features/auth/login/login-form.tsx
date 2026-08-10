@@ -21,9 +21,18 @@ const loginSchema = v.object({
 
 type LoginFormData = v.InferInput<typeof loginSchema>;
 
-export function LoginForm() {
+export function LoginForm({
+	disabled = false,
+	onLoadingChange,
+}: {
+	/** Disable the form (e.g. while a social provider is loading). */
+	disabled?: boolean;
+	/** Notify parent when email submit loading state changes. */
+	onLoadingChange?: (loading: boolean) => void;
+}) {
 	const { changeStatus, status } = useLoading();
 	const [, setOtpSentEmail] = useQueryState("otpSent");
+
 	const {
 		register,
 		handleSubmit,
@@ -31,31 +40,47 @@ export function LoginForm() {
 	} = useForm<LoginFormData>({
 		resolver: valibotResolver(loginSchema) as Resolver<LoginFormData>,
 		mode: "onChange",
+		defaultValues: {
+			email: "",
+		},
 	});
 
 	const onSubmit = async (data: LoginFormData) => {
 		try {
 			changeStatus("loading");
+			onLoadingChange?.(true);
+			const email = data.email;
 			const { error } = await authClient.emailOtp.sendVerificationOtp({
-				email: data.email,
+				email,
 				type: "sign-in",
 			});
 			if (error) {
 				toastApiError(error, "Could not send the login code.");
 				changeStatus("idle");
+				onLoadingChange?.(false);
 				return;
 			}
-			setOtpSentEmail(data.email);
+			setOtpSentEmail(email);
 			changeStatus("idle");
+			onLoadingChange?.(false);
 		} catch (e) {
 			changeStatus("idle");
+			onLoadingChange?.(false);
 			toastApiError(e, "An unexpected error occurred.");
 		}
 	};
 
+	const isBusy = status === "loading" || disabled;
+
 	return (
-		<form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-3">
-			<div className="flex flex-col gap-1">
+		<form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+			<div className="flex flex-col gap-1.5">
+				<label
+					htmlFor="email"
+					className="font-medium text-[13px] text-text-strong-950"
+				>
+					Email
+				</label>
 				<Input.Root hasError={!!errors.email} className="rounded-xl!">
 					<Input.Wrapper>
 						<Input.Input
@@ -63,6 +88,7 @@ export function LoginForm() {
 							id="email"
 							type="email"
 							placeholder="steve@apple.com"
+							disabled={isBusy}
 							{...register("email")}
 						/>
 					</Input.Wrapper>
@@ -74,10 +100,10 @@ export function LoginForm() {
 
 			<FancyButton.Root
 				type="submit"
-				disabled={status === "loading" || !isValid}
+				disabled={isBusy || !isValid}
 				variant="blue"
 				size="medium"
-				className="mt-2 h-10 w-full overflow-hidden rounded-xl font-medium text-sm"
+				className="h-10 w-full overflow-hidden rounded-xl font-medium text-sm"
 			>
 				<AnimatePresence mode="popLayout" initial={false}>
 					<motion.span
@@ -104,10 +130,10 @@ export function LoginForm() {
 						{status === "loading" ? (
 							<>
 								<Spinner size={14} color="currentColor" />
-								<span>Continuing...</span>
+								<span>Signing in…</span>
 							</>
 						) : (
-							<span>Continue with email</span>
+							<span>Sign in</span>
 						)}
 					</motion.span>
 				</AnimatePresence>

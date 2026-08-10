@@ -8,21 +8,18 @@ import {
 import { dashboardURL } from "./runtime";
 
 test.describe("auth UI — unauthenticated", () => {
-	test("login page shows social options and signup link", async ({ page }) => {
+	test("login page shows social options, email field, and signup link", async ({
+		page,
+	}) => {
 		await page.goto(dashboardURL("/login"), { waitUntil: "domcontentloaded" });
 
 		await expect(
-			page.getByRole("heading", { name: "Login in to Reloop" }),
+			page.getByRole("heading", { name: "Sign in to Reloop" }),
 		).toBeVisible();
-		await expect(
-			page.getByRole("button", { name: "Continue with Google" }),
-		).toBeVisible();
-		await expect(
-			page.getByRole("button", { name: "Continue with GitHub" }),
-		).toBeVisible();
-		await expect(
-			page.getByRole("button", { name: "Continue with Email" }),
-		).toBeVisible();
+		await expect(page.getByRole("button", { name: "Google" })).toBeVisible();
+		await expect(page.getByRole("button", { name: "GitHub" })).toBeVisible();
+		await expect(page.getByPlaceholder("steve@apple.com")).toBeVisible();
+		await expect(page.getByRole("button", { name: "Sign in" })).toBeVisible();
 		await expect(page.getByRole("link", { name: "Sign up" })).toBeVisible();
 	});
 
@@ -47,12 +44,11 @@ test.describe("auth UI — unauthenticated", () => {
 		page,
 	}) => {
 		await page.goto(dashboardURL("/login"), { waitUntil: "domcontentloaded" });
-		await page.getByRole("button", { name: "Continue with Email" }).click();
 
 		const emailInput = page.getByPlaceholder("steve@apple.com");
 		await emailInput.fill("not-an-email");
 
-		const submit = page.getByRole("button", { name: "Continue with email" });
+		const submit = page.getByRole("button", { name: "Sign in" });
 		await expect(submit).toBeDisabled();
 		await expect(
 			page.getByText("Please enter a valid email address"),
@@ -95,7 +91,7 @@ test.describe("auth UI — unauthenticated", () => {
 			);
 		});
 		await expect(
-			page.getByRole("heading", { name: "Login in to Reloop" }),
+			page.getByRole("heading", { name: "Sign in to Reloop" }),
 		).toBeVisible();
 	});
 });
