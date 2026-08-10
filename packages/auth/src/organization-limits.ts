@@ -1,5 +1,5 @@
 /** Max length for organization display names (create + update). */
-export const ORGANIZATION_NAME_MAX_LENGTH = 100;
+export const ORGANIZATION_NAME_MAX_LENGTH = 30;
 
 export function organizationNameTooLong(name: string): boolean {
 	return name.length > ORGANIZATION_NAME_MAX_LENGTH;
