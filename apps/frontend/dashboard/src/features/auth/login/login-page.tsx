@@ -105,7 +105,11 @@ export function LoginPage() {
 
 	return (
 		<AuthShell direction={direction} aside={<AuthAside />} hideLogo>
-			<AuthCard footer={cardFooter} footerKey={cardFooterKey}>
+			<AuthCard
+				footer={cardFooter}
+				footerKey={cardFooterKey}
+				direction={direction}
+			>
 				<div className="relative">
 					<AnimatePresence mode="sync" custom={direction} initial={false}>
 						{isOtpStep ? (

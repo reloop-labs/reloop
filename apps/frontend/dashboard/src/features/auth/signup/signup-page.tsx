@@ -100,7 +100,11 @@ export function SignupPage() {
 	return (
 		// Shell stays static; step animation lives inside the card only.
 		<AuthShell direction={direction} aside={<AuthAside />} hideLogo>
-			<AuthCard footer={cardFooter} footerKey={cardFooterKey}>
+			<AuthCard
+				footer={cardFooter}
+				footerKey={cardFooterKey}
+				direction={direction}
+			>
 				{/* relative + sync exit so card height can tween without collapsing to 0 */}
 				<div className="relative">
 					<AnimatePresence mode="sync" custom={direction} initial={false}>

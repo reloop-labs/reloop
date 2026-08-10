@@ -51,22 +51,46 @@ function AnimatedHeight({ children }: { children: ReactNode }) {
 	);
 }
 
+/** Same horizontal slide as card body steps (forward → exit left / enter right). */
+const footerStepVariants = {
+	initial: (direction: number) => ({
+		opacity: 0,
+		x: direction > 0 ? 16 : -16,
+	}),
+	animate: {
+		opacity: 1,
+		x: 0,
+		position: "relative" as const,
+	},
+	exit: (direction: number) => ({
+		opacity: 0,
+		x: direction > 0 ? -16 : 16,
+		position: "absolute" as const,
+		top: 0,
+		left: 0,
+		right: 0,
+	}),
+};
+
 /**
  * Auth form card shell — same chrome as the add-contact method card.
  * Outer soft shell + inset white panel; footer sits in the outer shell and
- * always keeps its strip height (content crossfades, never unmounts the bar).
+ * always keeps its strip height. Footer slides horizontally with step direction.
  */
 export function AuthCard({
 	children,
 	footer,
 	footerKey = "footer",
+	/** Step direction from useAuthStepDirection — footer slides with the card body. */
+	direction = 1,
 	showBrandMark = true,
 }: {
 	children: ReactNode;
 	/** Soft outer-shell footer (e.g. "Already have an account?"). */
 	footer?: ReactNode;
-	/** Stable key for footer content crossfade between steps. */
+	/** Stable key for footer content transition between steps. */
 	footerKey?: string;
+	direction?: number;
 	/** Gray two-layer logo tile above step content (default true). */
 	showBrandMark?: boolean;
 }) {
@@ -92,16 +116,18 @@ export function AuthCard({
 					</div>
 				</AnimatedHeight>
 
-				{/* Footer strip always mounted — crossfade text, no collapse/pop */}
+				{/* Footer strip — same L/R slide as the card body steps */}
 				{footer != null ? (
-					<div className="relative min-h-12 px-6 pt-3.5 pb-4 font-medium text-[13px] text-text-sub-600 dark:bg-bg-weak-50/40">
-						<AnimatePresence mode="wait" initial={false}>
+					<div className="relative min-h-12 overflow-hidden px-6 pt-3.5 pb-4 font-medium text-[13px] text-text-sub-600 dark:bg-bg-weak-50/40">
+						<AnimatePresence mode="sync" custom={direction} initial={false}>
 							<motion.div
 								key={footerKey}
-								initial={{ opacity: 0, y: 6 }}
-								animate={{ opacity: 1, y: 0 }}
-								exit={{ opacity: 0, y: -6 }}
-								transition={{ duration: 0.22, ease: [0.23, 1, 0.32, 1] }}
+								custom={direction}
+								variants={footerStepVariants}
+								initial="initial"
+								animate="animate"
+								exit="exit"
+								transition={{ duration: 0.28, ease: [0.23, 1, 0.32, 1] }}
 							>
 								{footer}
 							</motion.div>

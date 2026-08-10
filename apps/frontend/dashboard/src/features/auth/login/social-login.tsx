@@ -70,7 +70,7 @@ export function SocialLogin({
 					disabled={loading.loading}
 					variant="neutral"
 					mode="stroke"
-					className="relative flex h-10 w-full items-center justify-center gap-2 rounded-xl font-medium text-sm"
+					className="relative flex h-11 w-full items-center justify-center gap-2 rounded-xl font-medium text-sm"
 					onClick={async () => {
 						try {
 							setLoading({ name: "google", loading: true });
@@ -98,7 +98,7 @@ export function SocialLogin({
 					disabled={loading.loading}
 					variant="neutral"
 					mode="stroke"
-					className="relative flex h-10 w-full items-center justify-center gap-2 rounded-xl font-medium text-sm"
+					className="relative flex h-11 w-full items-center justify-center gap-2 rounded-xl font-medium text-sm"
 					onClick={async () => {
 						try {
 							setLoading({ name: "github", loading: true });
