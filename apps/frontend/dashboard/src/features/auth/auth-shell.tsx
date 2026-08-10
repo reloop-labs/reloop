@@ -1,6 +1,7 @@
 import { Logo } from "@reloop/ui/logo";
 import { AnimatePresence, motion } from "framer-motion";
 import type { ReactNode } from "react";
+import { ThemeToggle } from "#/features/dashboard/page-header/theme-toggle";
 
 export const authStepVariants = {
 	initial: (direction: number) => ({
@@ -38,6 +39,15 @@ function AuthStepFrame({
 	);
 }
 
+/** Fixed corner control — matches onboarding so theme is always reachable. */
+function AuthThemeToggle() {
+	return (
+		<div className="fixed right-5 bottom-5 z-50 sm:right-6 sm:bottom-6">
+			<ThemeToggle />
+		</div>
+	);
+}
+
 /**
  * Centered single-column auth chrome (login, etc.).
  * Pass `aside` for a Cloudflare-style split: form left, panel right.
@@ -58,7 +68,9 @@ export function AuthShell({
 }) {
 	if (aside !== undefined) {
 		return (
-			<div className="flex min-h-dvh w-full">
+			<div className="relative flex min-h-dvh w-full">
+				{/* Quiet corner control so users can switch theme without hunting settings. */}
+				<AuthThemeToggle />
 				{/* Form column — soft surface under AuthCard so the card reads as elevated */}
 				<div className={"relative flex w-full flex-col lg:w-1/2"}>
 					{!hideLogo ? (
@@ -82,8 +94,8 @@ export function AuthShell({
 				<div
 					className={
 						hideLogo
-							? "relative hidden min-h-dvh w-1/2 overflow-hidden border-stroke-soft-100 border-l bg-bg-white-0 lg:flex dark:border-stroke-soft-200"
-							: "relative hidden min-h-dvh w-1/2 overflow-hidden border-stroke-soft-100 border-l bg-bg-weak-50 lg:flex dark:border-stroke-soft-200 dark:bg-bg-weak-50/40"
+							? "relative hidden min-h-dvh w-1/2 overflow-hidden border-stroke-soft-100 border-l bg-bg-white-0 lg:flex dark:border-stroke-soft-100/40 dark:bg-[#0c0c0c]"
+							: "relative hidden min-h-dvh w-1/2 overflow-hidden border-stroke-soft-100 border-l bg-bg-weak-50 lg:flex dark:border-stroke-soft-100/40 dark:bg-white/[0.03]"
 					}
 				>
 					{aside}
@@ -93,7 +105,8 @@ export function AuthShell({
 	}
 
 	return (
-		<div className="flex h-dvh flex-col items-center justify-center">
+		<div className="relative flex h-dvh flex-col items-center justify-center">
+			<AuthThemeToggle />
 			<div className="w-full max-w-sm p-5 md:p-8">
 				{!hideLogo ? (
 					<motion.div

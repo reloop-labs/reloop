@@ -126,11 +126,11 @@ export function SocialLogin({
 
 			{/* OR divider between social and email */}
 			<div className="flex w-full items-center gap-3 pb-1">
-				<div className="h-px flex-1 border-stroke-soft-200 border-t border-dashed dark:border-stroke-soft-100/60" />
+				<div className="h-px flex-1 border-stroke-soft-200 border-t border-dashed dark:border-stroke-soft-100/40" />
 				<span className="shrink-0 font-medium text-[11px] text-text-soft-400 uppercase tracking-wide">
 					or
 				</span>
-				<div className="h-px flex-1 border-stroke-soft-200 border-t border-dashed dark:border-stroke-soft-100/60" />
+				<div className="h-px flex-1 border-stroke-soft-200 border-t border-dashed dark:border-stroke-soft-100/40" />
 			</div>
 
 			{/* Email field only — Login is the shared page CTA */}

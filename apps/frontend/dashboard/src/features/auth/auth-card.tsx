@@ -96,17 +96,17 @@ export function AuthCard({
 }) {
 	return (
 		<div className="w-full font-sans">
-			{/* Outer soft shell */}
-			<div className="overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-soft-50 dark:border-stroke-soft-100/60">
+			{/* Outer soft shell — same dark chrome as HomeCardShell */}
+			<div className="overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-soft-50 dark:border-stroke-soft-100/40 dark:bg-white/[0.03]">
 				{/* White panel height-animates alone */}
 				<AnimatedHeight>
-					<div className="space-y-6 overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 px-6 pt-5 pb-7 dark:border-stroke-soft-100/60">
+					<div className="space-y-6 overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 px-6 pt-5 pb-7 dark:border-stroke-soft-100/40 dark:bg-[#0c0c0c]">
 						{showBrandMark ? (
 							<div
-								className="w-fit overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-soft-50 dark:border-stroke-soft-100/60"
+								className="w-fit overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-soft-50 dark:border-stroke-soft-100/40 dark:bg-white/[0.03]"
 								aria-hidden
 							>
-								<div className="m-px flex size-11 items-center justify-center rounded-[14px] border border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/60">
+								<div className="m-px flex size-11 items-center justify-center rounded-[14px] border border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-[#0c0c0c]">
 									<Logo className="h-10 w-10" />
 								</div>
 							</div>
@@ -118,7 +118,7 @@ export function AuthCard({
 
 				{/* Footer strip — same L/R slide as the card body steps */}
 				{footer != null ? (
-					<div className="relative min-h-12 overflow-hidden px-6 pt-3.5 pb-4 font-medium text-[13px] text-text-sub-600 dark:bg-bg-weak-50/40">
+					<div className="relative min-h-12 overflow-hidden px-6 pt-3.5 pb-4 font-medium text-[13px] text-text-sub-600">
 						<AnimatePresence mode="sync" custom={direction} initial={false}>
 							<motion.div
 								key={footerKey}
@@ -159,7 +159,7 @@ export function AuthCardHeader({
 			) : null}
 
 			<div
-				className="mt-4 border-stroke-soft-200 border-t border-dashed pb-2 dark:border-stroke-soft-100/60"
+				className="mt-4 border-stroke-soft-200 border-t border-dashed pb-2 dark:border-stroke-soft-100/40"
 				aria-hidden
 			/>
 		</div>
