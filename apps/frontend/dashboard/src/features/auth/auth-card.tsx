@@ -9,6 +9,12 @@ import { type ReactNode, useEffect, useRef, useState } from "react";
  * Only wraps the white panel — the soft footer strip stays outside so it
  * never collapses and "pops" when footer copy swaps.
  */
+function measureHeight(el: HTMLElement) {
+	// ceil + 1px buffer so bottom borders aren't clipped by overflow:hidden
+	// (subpixel rounding / margin collapse often short by 1px).
+	return Math.ceil(el.getBoundingClientRect().height) + 1;
+}
+
 function AnimatedHeight({ children }: { children: ReactNode }) {
 	const innerRef = useRef<HTMLDivElement>(null);
 	const [height, setHeight] = useState<number | "auto">("auto");
@@ -16,10 +22,10 @@ function AnimatedHeight({ children }: { children: ReactNode }) {
 	useEffect(() => {
 		if (!innerRef.current) return;
 		// Snapshot the initial height so the first paint doesn't animate from 0.
-		setHeight(innerRef.current.offsetHeight);
+		setHeight(measureHeight(innerRef.current));
 		const ro = new ResizeObserver(() => {
 			if (innerRef.current) {
-				setHeight(innerRef.current.offsetHeight);
+				setHeight(measureHeight(innerRef.current));
 			}
 		});
 		ro.observe(innerRef.current);
@@ -37,7 +43,10 @@ function AnimatedHeight({ children }: { children: ReactNode }) {
 			}
 			className="overflow-hidden"
 		>
-			<div ref={innerRef}>{children}</div>
+			{/* p-0.5 is measured (unlike margin) so the white panel border stays visible */}
+			<div ref={innerRef} className="p-0.5">
+				{children}
+			</div>
 		</motion.div>
 	);
 }
@@ -67,7 +76,7 @@ export function AuthCard({
 			<div className="overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-soft-50 dark:border-stroke-soft-100/40">
 				{/* White panel height-animates alone */}
 				<AnimatedHeight>
-					<div className="m-0.5 space-y-6 overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 px-6 pt-5 pb-6 dark:border-stroke-soft-100/40">
+					<div className="space-y-6 overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 px-6 pt-5 pb-7 dark:border-stroke-soft-100/40">
 						{showBrandMark ? (
 							<div
 								className="w-fit overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-soft-50 dark:border-stroke-soft-100/40"
@@ -85,7 +94,7 @@ export function AuthCard({
 
 				{/* Footer strip always mounted — crossfade text, no collapse/pop */}
 				{footer != null ? (
-					<div className="relative min-h-11 px-6 pt-3 pb-3.5 font-medium text-[13px] text-text-sub-600 dark:bg-bg-weak-50/40">
+					<div className="relative min-h-12 px-6 pt-3.5 pb-4 font-medium text-[13px] text-text-sub-600 dark:bg-bg-weak-50/40">
 						<AnimatePresence mode="wait" initial={false}>
 							<motion.div
 								key={footerKey}
