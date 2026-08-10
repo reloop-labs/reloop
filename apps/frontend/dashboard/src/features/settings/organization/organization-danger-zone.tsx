@@ -20,7 +20,11 @@ export function OrganizationDangerZone() {
 					</div>
 					{/* Delete flow not ported yet — keep error styling. */}
 					<FancyButton.Root variant="destructive" size="xsmall" type="button">
-						<FancyButton.Icon as={Icon} name="trash-2" />
+						<FancyButton.Icon
+							as={Icon}
+							name="trash-2"
+							className="ml-0.5 h-3.5 w-3.5"
+						/>
 						Delete organization
 					</FancyButton.Root>
 				</div>

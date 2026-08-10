@@ -4,8 +4,6 @@ import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
-import { KbdCommand } from "@reloop/ui/kbd-command";
-import { KbdEnter } from "@reloop/ui/kbd-enter";
 import * as Label from "@reloop/ui/label";
 import Spinner from "@reloop/ui/spinner";
 import { useQueryClient } from "@tanstack/react-query";
@@ -16,10 +14,14 @@ import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import * as v from "valibot";
 import { useSessionQuery } from "#/features/auth/session-query";
+import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { queryKeys } from "#/lib/query-keys";
 import { AccountDangerZone } from "./account-danger-zone";
 import { AccountHeader } from "./account-header";
 import { AccountProfilePicture } from "./account-profile-picture";
+
+const actionKbdOnBlueClassName =
+	"border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]";
 
 const accountSchema = v.object({
 	firstName: v.pipe(v.string(), v.minLength(1, "First name is required")),
@@ -106,7 +108,7 @@ export function ProfilePage() {
 	};
 
 	useHotkeys(
-		"mod+enter",
+		"enter",
 		() => {
 			if (hasChanges && status === "idle") {
 				void handleSubmit(handleSaveChanges)();
@@ -224,7 +226,7 @@ export function ProfilePage() {
 								"min-w-[140px] justify-center overflow-hidden transition-all duration-200",
 								status === "saving" && "opacity-90",
 							)}
-							disabled={!hasChanges || status !== "idle"}
+							disabled={!hasChanges || status === "saving"}
 						>
 							<AnimatePresence mode="popLayout" initial={false}>
 								<motion.span
@@ -251,11 +253,8 @@ export function ProfilePage() {
 										</>
 									) : (
 										<>
-											Save Changes
-											<span className="inline-flex items-center gap-0.5 opacity-90">
-												<KbdCommand />
-												<KbdEnter />
-											</span>
+											<span>Save Changes</span>
+											<ActionKbd className={actionKbdOnBlueClassName}>↵</ActionKbd>
 										</>
 									)}
 								</motion.span>

@@ -171,9 +171,9 @@ export function OrganizationLogoUpload({
 					size="xsmall"
 					type="button"
 					onClick={handleFileUploadClick}
-					disabled={status !== "idle"}
+					disabled={status === "uploading"}
 					className={cn(
-						"min-w-[140px] justify-center overflow-hidden font-medium transition-all duration-200",
+						"min-w-[140px] justify-center overflow-hidden transition-all duration-200",
 						status === "uploading" && "opacity-90",
 					)}
 				>
@@ -202,7 +202,11 @@ export function OrganizationLogoUpload({
 								</>
 							) : (
 								<>
-									<FancyButton.Icon as={Icon} name="camera" />
+									<FancyButton.Icon
+										as={Icon}
+										name="camera"
+										className="mr-0.5 h-4 w-4"
+									/>
 									<span>Upload Logo</span>
 								</>
 							)}
