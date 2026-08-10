@@ -6,7 +6,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { parseAsString, useQueryState } from "nuqs";
 import { type ReactNode, useCallback, useRef, useState } from "react";
-import { AuthAside } from "#/features/auth/auth-aside";
 import { AuthCard, AuthCardHeader } from "#/features/auth/auth-card";
 import { AuthSessionLoader } from "#/features/auth/auth-session-loader";
 import { AuthShell, authStepVariants } from "#/features/auth/auth-shell";
@@ -14,10 +13,7 @@ import { LOGIN_EMAIL_FORM_ID } from "#/features/auth/login/login-form";
 import { SocialLogin } from "#/features/auth/login/social-login";
 import { useAuthStepDirection } from "#/features/auth/use-auth-step-direction";
 import { useRedirectIfAuthenticated } from "#/features/auth/use-redirect-if-authenticated";
-import {
-	type VerifyOtpUiState,
-	VerifyOTP,
-} from "#/features/auth/verify-otp";
+import { VerifyOTP, type VerifyOtpUiState } from "#/features/auth/verify-otp";
 
 export function LoginPage() {
 	const [otpSentEmail, setOtpSentEmail] = useQueryState(
@@ -47,7 +43,10 @@ export function LoginPage() {
 
 	const currentLevel = otpSentEmail ? 1 : 0;
 	const direction = useAuthStepDirection(currentLevel);
-	const { shouldBlockAuthUi } = useRedirectIfAuthenticated(inviteId, redirectTo);
+	const { shouldBlockAuthUi } = useRedirectIfAuthenticated(
+		inviteId,
+		redirectTo,
+	);
 
 	const [otpResendFooter, setOtpResendFooter] = useState<ReactNode>(null);
 	const handleResendFooterChange = useCallback((footer: ReactNode | null) => {
@@ -104,7 +103,7 @@ export function LoginPage() {
 		: !emailCanSubmit || emailLoading;
 
 	return (
-		<AuthShell direction={direction} aside={<AuthAside />} hideLogo>
+		<AuthShell direction={direction} hideLogo>
 			<AuthCard
 				footer={cardFooter}
 				footerKey={cardFooterKey}
@@ -196,13 +195,7 @@ export function LoginPage() {
 					>
 						<AnimatePresence mode="popLayout" initial={false}>
 							<motion.span
-								key={
-									ctaSuccess
-										? "success"
-										: ctaLoading
-											? "loading"
-											: "idle"
-								}
+								key={ctaSuccess ? "success" : ctaLoading ? "loading" : "idle"}
 								transition={{ type: "spring", duration: 0.25, bounce: 0 }}
 								initial={{ opacity: 0, y: -14 }}
 								animate={{ opacity: 1, y: 0 }}

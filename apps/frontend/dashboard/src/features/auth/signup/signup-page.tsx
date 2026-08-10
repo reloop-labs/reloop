@@ -6,7 +6,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { parseAsString, useQueryState } from "nuqs";
 import { type ReactNode, useCallback, useRef, useState } from "react";
-import { AuthAside } from "#/features/auth/auth-aside";
 import { AuthCard, AuthCardHeader } from "#/features/auth/auth-card";
 import { AuthSessionLoader } from "#/features/auth/auth-session-loader";
 import { AuthShell, authStepVariants } from "#/features/auth/auth-shell";
@@ -14,10 +13,7 @@ import { SIGNUP_EMAIL_FORM_ID } from "#/features/auth/signup/signup-form";
 import { SocialSignup } from "#/features/auth/signup/social-signup";
 import { useAuthStepDirection } from "#/features/auth/use-auth-step-direction";
 import { useRedirectIfAuthenticated } from "#/features/auth/use-redirect-if-authenticated";
-import {
-	type VerifyOtpUiState,
-	VerifyOTP,
-} from "#/features/auth/verify-otp";
+import { VerifyOTP, type VerifyOtpUiState } from "#/features/auth/verify-otp";
 
 export function SignupPage() {
 	const [otpSentEmail, setOtpSentEmail] = useQueryState(
@@ -99,7 +95,7 @@ export function SignupPage() {
 
 	return (
 		// Shell stays static; step animation lives inside the card only.
-		<AuthShell direction={direction} aside={<AuthAside />} hideLogo>
+		<AuthShell direction={direction} hideLogo>
 			<AuthCard
 				footer={cardFooter}
 				footerKey={cardFooterKey}
@@ -163,7 +159,7 @@ export function SignupPage() {
 								<AuthCardHeader
 									title="Create an account"
 									description={
-										<span className="block whitespace-nowrap">
+										<span className="block">
 											By continuing, you agree to our{" "}
 											<a
 												href="/terms-and-conditions"
@@ -212,13 +208,7 @@ export function SignupPage() {
 					>
 						<AnimatePresence mode="popLayout" initial={false}>
 							<motion.span
-								key={
-									ctaSuccess
-										? "success"
-										: ctaLoading
-											? "loading"
-											: "idle"
-								}
+								key={ctaSuccess ? "success" : ctaLoading ? "loading" : "idle"}
 								transition={{ type: "spring", duration: 0.25, bounce: 0 }}
 								initial={{ opacity: 0, y: -14 }}
 								animate={{ opacity: 1, y: 0 }}
