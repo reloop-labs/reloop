@@ -1,8 +1,8 @@
 import { cn } from "@reloop/ui/cn";
-import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import * as Tooltip from "@reloop/ui/tooltip";
 import { useMemo, useState } from "react";
+import { CopyableDnsValue } from "#/features/domain/components/copyable-dns-value";
 import type { DNSRecord } from "#/features/domain/types";
 
 interface DNSRecordTableMinimalProps {
@@ -108,72 +108,44 @@ export const DNSRecordTableMinimal = ({
 								<div className="flex items-center">
 									<button
 										type="button"
+										aria-label={
+											copiedId === `type-${index}`
+												? "Copied"
+												: `Copy ${record.recordType}`
+										}
 										onClick={() =>
 											handleCopy(record.recordType, `type-${index}`)
 										}
 										className={cn(
-											"inline-flex cursor-pointer items-center rounded-md px-2 py-0.5 font-semibold text-xs transition-colors",
+											"inline-flex cursor-pointer items-center rounded-md px-2 py-0.5 font-semibold text-xs transition-colors duration-150 ease-out",
 											copiedId === `type-${index}`
 												? "bg-success-alpha-10 text-success-dark dark:bg-success-alpha-20"
 												: "bg-neutral-alpha-10 text-text-strong-950 hover:bg-neutral-alpha-20 dark:bg-neutral-alpha-16 hover:dark:bg-neutral-alpha-24",
 										)}
 									>
-										{copiedId === `type-${index}`
-											? "Copied"
-											: record.recordType}
+										{record.recordType}
 									</button>
 								</div>
 
 								{/* Name Column */}
-								<button
-									type="button"
-									onClick={() => handleCopy(record.name, `name-${index}`)}
-									className="group/copy flex min-w-0 max-w-full cursor-pointer items-center gap-1.5 overflow-hidden pr-2 text-left"
-								>
-									<span
-										className={cn(
-											"truncate font-medium text-label-sm",
-											copiedId === `name-${index}`
-												? "text-text-strong-950"
-												: "text-text-strong-950",
-										)}
-									>
-										{copiedId === `name-${index}` ? "Copied" : record.name}
-									</span>
-									<Icon
-										name="copy"
-										className="size-3.5 shrink-0 text-text-sub-600/50 transition-colors group-hover/copy:text-text-strong-950"
-									/>
-								</button>
+								<CopyableDnsValue
+									value={record.name}
+									copied={copiedId === `name-${index}`}
+									onCopy={() => handleCopy(record.name, `name-${index}`)}
+								/>
 
 								{/* Value Column */}
 								<Tooltip.Provider delayDuration={0}>
 									<Tooltip.Root>
 										<Tooltip.Trigger asChild>
-											<button
-												type="button"
-												onClick={() =>
+											<CopyableDnsValue
+												value={record.value}
+												copied={copiedId === `value-${index}`}
+												mono
+												onCopy={() =>
 													handleCopy(record.value, `value-${index}`)
 												}
-												className="group/copy flex min-w-0 max-w-full cursor-pointer items-center gap-1.5 overflow-hidden pr-2 text-left"
-											>
-												<span
-													className={cn(
-														"truncate font-mono text-label-sm",
-														copiedId === `value-${index}`
-															? "font-medium text-text-strong-950"
-															: "text-text-sub-600",
-													)}
-												>
-													{copiedId === `value-${index}`
-														? "Copied"
-														: record.value}
-												</span>
-												<Icon
-													name="copy"
-													className="size-3.5 shrink-0 text-text-sub-600/50 transition-colors group-hover/copy:text-text-strong-950"
-												/>
-											</button>
+											/>
 										</Tooltip.Trigger>
 										<Tooltip.Content
 											side="top"
