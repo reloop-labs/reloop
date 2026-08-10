@@ -29,7 +29,7 @@ export async function signUpToOnboarding(
 	});
 	// Step indicator uses NumberFlow (split text nodes) — assert by form chrome.
 	await expect(
-		page.getByRole("heading", { name: "Create your workspace" }),
+		page.getByRole("heading", { name: "Create your account" }),
 	).toBeVisible({ timeout: 15_000 });
 	await expect(page.getByPlaceholder("e.g. Acme Corp")).toBeVisible();
 	await expect(

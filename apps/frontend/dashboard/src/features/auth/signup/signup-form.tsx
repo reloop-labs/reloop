@@ -21,7 +21,15 @@ const signupSchema = v.object({
 
 type SignupFormData = v.InferInput<typeof signupSchema>;
 
-export function SignupForm() {
+export function SignupForm({
+	disabled = false,
+	onLoadingChange,
+}: {
+	/** Disable the form (e.g. while a social provider is loading). */
+	disabled?: boolean;
+	/** Notify parent when email submit loading state changes. */
+	onLoadingChange?: (loading: boolean) => void;
+}) {
 	const { changeStatus, status } = useLoading();
 	const [, setOtpSentEmail] = useQueryState("otpSent");
 
@@ -40,6 +48,7 @@ export function SignupForm() {
 	const onSubmit = async (data: SignupFormData) => {
 		try {
 			changeStatus("loading");
+			onLoadingChange?.(true);
 			const email = data.email;
 			const { error } = await authClient.emailOtp.sendVerificationOtp({
 				email,
@@ -48,19 +57,30 @@ export function SignupForm() {
 			if (error) {
 				toastApiError(error, "Could not send the signup code.");
 				changeStatus("idle");
+				onLoadingChange?.(false);
 				return;
 			}
 			setOtpSentEmail(email);
 			changeStatus("idle");
+			onLoadingChange?.(false);
 		} catch (e) {
 			changeStatus("idle");
+			onLoadingChange?.(false);
 			toastApiError(e, "An unexpected error occurred.");
 		}
 	};
 
+	const isBusy = status === "loading" || disabled;
+
 	return (
-		<form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-3">
-			<div className="flex flex-col gap-1">
+		<form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+			<div className="flex flex-col gap-1.5">
+				<label
+					htmlFor="email"
+					className="font-medium text-[13px] text-text-strong-950"
+				>
+					Email
+				</label>
 				<Input.Root hasError={!!errors.email} className="rounded-xl!">
 					<Input.Wrapper>
 						<Input.Input
@@ -68,6 +88,7 @@ export function SignupForm() {
 							id="email"
 							type="email"
 							placeholder="steve@apple.com"
+							disabled={isBusy}
 							{...register("email")}
 						/>
 					</Input.Wrapper>
@@ -79,10 +100,10 @@ export function SignupForm() {
 
 			<FancyButton.Root
 				type="submit"
-				disabled={status === "loading" || !isValid}
+				disabled={isBusy || !isValid}
 				variant="blue"
 				size="medium"
-				className="mt-2 h-10 w-full overflow-hidden rounded-xl font-medium text-sm"
+				className="h-10 w-full overflow-hidden rounded-xl font-medium text-sm"
 			>
 				<AnimatePresence mode="popLayout" initial={false}>
 					<motion.span
@@ -109,10 +130,10 @@ export function SignupForm() {
 						{status === "loading" ? (
 							<>
 								<Spinner size={14} color="currentColor" />
-								<span>Sending…</span>
+								<span>Creating…</span>
 							</>
 						) : (
-							<span>Continue</span>
+							<span>Create account</span>
 						)}
 					</motion.span>
 				</AnimatePresence>

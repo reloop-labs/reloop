@@ -26,14 +26,19 @@ test.describe("auth UI — unauthenticated", () => {
 		await expect(page.getByRole("link", { name: "Sign up" })).toBeVisible();
 	});
 
-	test("signup page shows social options and login link", async ({ page }) => {
+	test("signup page shows social options, email field, and login link", async ({
+		page,
+	}) => {
 		await page.goto(dashboardURL("/signup"), { waitUntil: "domcontentloaded" });
 
 		await expect(
-			page.getByRole("heading", { name: "Create your workspace" }),
+			page.getByRole("heading", { name: "Create your account" }),
 		).toBeVisible();
+		await expect(page.getByRole("button", { name: "Google" })).toBeVisible();
+		await expect(page.getByRole("button", { name: "GitHub" })).toBeVisible();
+		await expect(page.getByPlaceholder("steve@apple.com")).toBeVisible();
 		await expect(
-			page.getByRole("button", { name: "Continue with Email" }),
+			page.getByRole("button", { name: "Create account" }),
 		).toBeVisible();
 		await expect(page.getByRole("link", { name: "Login" })).toBeVisible();
 	});

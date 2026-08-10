@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { parseAsBoolean, parseAsString, useQueryState } from "nuqs";
+import { AuthAside } from "#/features/auth/auth-aside";
 import { AuthSessionLoader } from "#/features/auth/auth-session-loader";
 import { AuthShell, authStepVariants } from "#/features/auth/auth-shell";
 import { LoginForm } from "#/features/auth/login/login-form";
@@ -46,7 +47,7 @@ export function LoginPage() {
 	}
 
 	return (
-		<AuthShell direction={direction}>
+		<AuthShell direction={direction} aside={<AuthAside />}>
 			{otpSentEmail ? (
 				<motion.div
 					key="verify-otp"
