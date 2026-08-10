@@ -375,8 +375,14 @@ export function LogList({
 				<button
 					type="button"
 					onClick={handleRefresh}
-					className="flex h-9 shrink-0 items-center gap-1.5 rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-2.5 text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-stroke-soft-100/40"
+					disabled={isFetching}
+					className={cn(
+						"flex h-9 shrink-0 items-center gap-1.5 rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-2.5 text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-stroke-soft-100/40",
+						isFetching ? "pointer-events-none" : "cursor-pointer",
+					)}
 					title="Refresh logs (R)"
+					aria-label="Refresh logs"
+					aria-busy={isFetching}
 				>
 					<Icon
 						name="rotate-cw"

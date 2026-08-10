@@ -7,6 +7,8 @@ import {
 	parseAsStringLiteral,
 	useQueryState,
 } from "nuqs";
+import { useCallback } from "react";
+import { useToolbarRefresh } from "#/components/data-table/use-toolbar-refresh";
 import {
 	Select,
 	SelectContent,
@@ -85,7 +87,11 @@ function MailboxStatusFilterDropdown({
 }
 
 export function AgentMailboxListToolbar() {
-	const { refresh } = useAgentInbox();
+	const { refresh: refreshMailboxes } = useAgentInbox();
+	const onRefresh = useCallback(() => {
+		void refreshMailboxes();
+	}, [refreshMailboxes]);
+	const { isRefreshing, refresh } = useToolbarRefresh(onRefresh);
 	const [statusFilter, setStatusFilter] = useQueryState(
 		"status",
 		parseAsStringLiteral(["active", "disabled"] as const),
@@ -126,11 +132,20 @@ export function AgentMailboxListToolbar() {
 				/>
 				<button
 					type="button"
-					onClick={() => void refresh()}
-					className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-white-0 text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-stroke-soft-100/40"
+					onClick={refresh}
+					disabled={isRefreshing}
+					className={cn(
+						"flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-white-0 text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-stroke-soft-100/40",
+						isRefreshing ? "pointer-events-none" : "cursor-pointer",
+					)}
 					title="Refresh addresses"
+					aria-label="Refresh addresses"
+					aria-busy={isRefreshing}
 				>
-					<Icon name="rotate-cw" className="h-4 w-4" />
+					<Icon
+						name="rotate-cw"
+						className={cn("h-4 w-4", isRefreshing && "animate-spin")}
+					/>
 				</button>
 			</div>
 		</div>
