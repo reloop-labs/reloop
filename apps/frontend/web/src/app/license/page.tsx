@@ -73,7 +73,7 @@ const LicensePage = () => {
 				<div className="grid flex-1 grid-cols-1 lg:grid-cols-12">
 					{/* Left label */}
 					<div className="flex justify-start border-stroke-soft-200 border-b px-5 py-6 text-left sm:px-6 lg:col-span-3 lg:justify-end lg:border-r lg:border-b-0 lg:px-6 lg:py-10 lg:text-right dark:border-white/10">
-						<div className="font-medium text-[11px] text-text-sub-600 uppercase tracking-wider dark:text-white/50">
+						<div className="font-medium text-[11px] text-text-sub-600 uppercase tracking-wider lg:sticky lg:top-28 lg:self-start dark:text-white/50">
 							License
 						</div>
 					</div>
@@ -85,7 +85,7 @@ const LicensePage = () => {
 
 					{/* Right meta */}
 					<div className="flex justify-start px-5 py-6 sm:px-6 lg:col-span-3 lg:px-6 lg:py-10 dark:border-white/10">
-						<div className="w-full space-y-2.5">
+						<div className="w-full space-y-2.5 lg:sticky lg:top-28 lg:self-start">
 							<p className="font-medium text-[11px] text-text-sub-600 uppercase tracking-wider dark:text-white/50">
 								Apache License 2.0
 							</p>
