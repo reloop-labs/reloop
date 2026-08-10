@@ -1,21 +1,21 @@
 import { apiKey } from "@better-auth/api-key";
-import { handleAuthLifecycleEviction } from "@reloop/auth/middleware/eviction/handle-auth-lifecycle-eviction";
+import { handleAuthLifecycleEviction } from "../middleware/eviction/handle-auth-lifecycle-eviction";
 import {
 	ORGANIZATION_NAME_MAX_LENGTH,
 	organizationNameMaxLengthMessage,
 	organizationNameTooLong,
-} from "@reloop/auth/organization-limits";
-import { ac, orgRoles } from "@reloop/auth/permissions";
-import { platformAc, platformRoles } from "@reloop/auth/platform-permissions";
-import { DEFAULT_USER_ROLE, PLATFORM_ADMIN_ROLE } from "@reloop/auth/roles";
-import { authServerConfig } from "@reloop/auth/server/config";
-import { redis } from "@reloop/auth/server/redis";
-import { sessionCacheRedis } from "@reloop/auth/server/session-cache-redis";
+} from "../organization-limits";
+import { ac, orgRoles } from "../permissions";
+import { platformAc, platformRoles } from "../platform-permissions";
+import { DEFAULT_USER_ROLE, PLATFORM_ADMIN_ROLE } from "../roles";
+import { authServerConfig } from "./config";
+import { redis } from "./redis";
+import { sessionCacheRedis } from "./session-cache-redis";
 import {
 	USER_NAME_PART_MAX_LENGTH,
 	userDisplayNamePartsTooLong,
 	userNamePartMaxLengthMessage,
-} from "@reloop/auth/user-name-limits";
+} from "../user-name-limits";
 import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";

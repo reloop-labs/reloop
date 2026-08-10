@@ -1,7 +1,7 @@
 import { apiKeyClient } from "@better-auth/api-key/client";
-import { ac, orgRoles } from "@reloop/auth/permissions";
-import { platformAc, platformRoles } from "@reloop/auth/platform-permissions";
-import type { AuthInstance } from "@reloop/auth/types";
+import { ac, orgRoles } from "./permissions";
+import { platformAc, platformRoles } from "./platform-permissions";
+import type { AuthInstance } from "./types";
 import {
 	adminClient,
 	emailOTPClient,

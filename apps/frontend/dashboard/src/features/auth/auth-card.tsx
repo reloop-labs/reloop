@@ -21,7 +21,7 @@ export function AuthCard({
 	children: ReactNode;
 	/** Rendered in the soft shell below the inset panel (e.g. "Already have an account?"). */
 	footer?: ReactNode;
-	/** Blue app-icon badge above the title (default true). */
+	/** Gray logo tile above the title (default true). */
 	showBrandMark?: boolean;
 }) {
 	return (
@@ -33,8 +33,14 @@ export function AuthCard({
 					{/* Header: icon → title → description → dashed rule */}
 					<div>
 						{showBrandMark ? (
-							<div className="mb-6 flex size-10 items-center justify-center rounded-[10px] bg-primary-base shadow-sm">
-								<Logo className="h-6 w-6 brightness-0 invert" />
+							// Two-layer logo tile: outer gray shell + inset white panel (same chrome as this card)
+							<div
+								className="mb-5 w-fit overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-soft-50 dark:border-stroke-soft-100/40"
+								aria-hidden
+							>
+								<div className="m-px flex size-11 items-center justify-center rounded-[14px] border border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/40">
+									<Logo className="h-10 w-10" />
+								</div>
 							</div>
 						) : null}
 
@@ -42,7 +48,7 @@ export function AuthCard({
 							{title}
 						</h2>
 						{description ? (
-							<div className="font-medium text-sm text-text-sub-600 leading-relaxed">
+							<div className="mt-0.5 font-medium text-sm text-text-sub-600 leading-relaxed">
 								{description}
 							</div>
 						) : null}

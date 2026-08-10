@@ -8,4 +8,4 @@ export {
 	getKeyStart,
 	hashApiKey,
 	isPlausibleApiKeyShape,
-} from "@reloop/auth/apikey/helpers";
+} from "./helpers";

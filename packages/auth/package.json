@@ -11,9 +11,12 @@
 		"./apikey/credential-cache": "./src/apikey/credential-cache.ts",
 		"./apikey/validate": "./src/apikey/validate.ts",
 		"./middleware": "./src/middleware/index.ts",
+		"./middleware/*": "./src/middleware/*.ts",
 		"./roles": "./src/roles.ts",
 		"./permissions": "./src/permissions.ts",
 		"./platform-permissions": "./src/platform-permissions.ts",
+		"./organization-limits": "./src/organization-limits.ts",
+		"./user-name-limits": "./src/user-name-limits.ts",
 		"./*": "./src/*.ts"
 	},
 	"scripts": {

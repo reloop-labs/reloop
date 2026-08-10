@@ -41,7 +41,7 @@ export function SignupPage() {
 			<Link
 				href={"/login"}
 				className={LinkButton.linkButtonVariants({
-					variant: "black",
+					variant: "primary",
 				}).root({ className: "text-[13px]!" })}
 			>
 				Login
@@ -101,7 +101,7 @@ export function SignupPage() {
 				>
 					<AuthCard
 						title="Create your Account"
-						description="Sign up and start sending email"
+						description="Sign up and start sending email in 5 mins"
 						footer={loginFooter}
 					>
 						<SocialSignup inviteId={inviteId} />
