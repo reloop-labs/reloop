@@ -103,7 +103,7 @@ export function SignupForm({
 				<Input.Root hasError={!!errors.email} className="rounded-xl!">
 					<Input.Wrapper>
 						<Input.Input
-							className="h-10 font-medium"
+							className="h-11 font-medium"
 							id="email"
 							type="email"
 							placeholder="steve@apple.com"

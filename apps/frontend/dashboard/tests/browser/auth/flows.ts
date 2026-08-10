@@ -45,7 +45,7 @@ export async function completeEmailOtpAuth(
 	const emailInput = page.getByPlaceholder("steve@apple.com");
 	await expect(emailInput).toBeVisible();
 	await emailInput.fill(options.email);
-	const submitName = mode === "signup" ? "Create account" : "Sign in";
+	const submitName = mode === "signup" ? "Create account" : "Login";
 	const submit = page.getByRole("button", { name: submitName });
 	await expect(submit).toBeEnabled({ timeout: 5_000 });
 	await submit.click();

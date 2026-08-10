@@ -166,7 +166,7 @@ export function LoginPage() {
 								className="w-full space-y-6"
 							>
 								<AuthCardHeader
-									title="Sign in to Reloop"
+									title="Login to Reloop"
 									description="Welcome back — continue where you left off"
 								/>
 								<SocialLogin
@@ -217,8 +217,8 @@ export function LoginPage() {
 									{ctaSuccess
 										? "Verified successfully!"
 										: ctaLoading
-											? "Signing in…"
-											: "Sign in"}
+											? "Logging in…"
+											: "Login"}
 								</span>
 							</motion.span>
 						</AnimatePresence>

@@ -19,7 +19,7 @@ const loginSchema = v.object({
 
 type LoginFormData = v.InferInput<typeof loginSchema>;
 
-/** Shared form id so the persistent Sign in button can submit this form. */
+/** Shared form id so the persistent Login button can submit this form. */
 export const LOGIN_EMAIL_FORM_ID = "login-email-form";
 
 export function LoginForm({
@@ -103,7 +103,7 @@ export function LoginForm({
 				<Input.Root hasError={!!errors.email} className="rounded-xl!">
 					<Input.Wrapper>
 						<Input.Input
-							className="h-10 font-medium"
+							className="h-11 font-medium"
 							id="email"
 							type="email"
 							placeholder="steve@apple.com"

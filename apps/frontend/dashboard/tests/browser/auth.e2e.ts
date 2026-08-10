@@ -14,12 +14,12 @@ test.describe("auth UI — unauthenticated", () => {
 		await page.goto(dashboardURL("/login"), { waitUntil: "domcontentloaded" });
 
 		await expect(
-			page.getByRole("heading", { name: "Sign in to Reloop" }),
+			page.getByRole("heading", { name: "Login to Reloop" }),
 		).toBeVisible();
 		await expect(page.getByRole("button", { name: "Google" })).toBeVisible();
 		await expect(page.getByRole("button", { name: "GitHub" })).toBeVisible();
 		await expect(page.getByPlaceholder("steve@apple.com")).toBeVisible();
-		await expect(page.getByRole("button", { name: "Sign in" })).toBeVisible();
+		await expect(page.getByRole("button", { name: "Login" })).toBeVisible();
 		await expect(page.getByRole("link", { name: "Sign up" })).toBeVisible();
 	});
 
@@ -48,7 +48,7 @@ test.describe("auth UI — unauthenticated", () => {
 		const emailInput = page.getByPlaceholder("steve@apple.com");
 		await emailInput.fill("not-an-email");
 
-		const submit = page.getByRole("button", { name: "Sign in" });
+		const submit = page.getByRole("button", { name: "Login" });
 		await expect(submit).toBeDisabled();
 		await expect(
 			page.getByText("Please enter a valid email address"),
@@ -91,7 +91,7 @@ test.describe("auth UI — unauthenticated", () => {
 			);
 		});
 		await expect(
-			page.getByRole("heading", { name: "Sign in to Reloop" }),
+			page.getByRole("heading", { name: "Login to Reloop" }),
 		).toBeVisible();
 	});
 });

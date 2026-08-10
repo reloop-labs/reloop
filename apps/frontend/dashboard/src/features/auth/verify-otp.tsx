@@ -175,7 +175,7 @@ export function VerifyOTP({
 	const canSubmit = otpValue.length === 6 && status !== "loading";
 	const isLoading = status === "loading";
 
-	// Keep parent CTA in sync (shared Create account / Sign in button).
+	// Keep parent CTA in sync (shared Create account / Login button).
 	const onUiStateChangeRef = useRef(onUiStateChange);
 	onUiStateChangeRef.current = onUiStateChange;
 	const lastUiStateRef = useRef<VerifyOtpUiState | null>(null);
@@ -276,7 +276,7 @@ export function VerifyOTP({
 				)}
 			</div>
 
-			{/* Primary CTA is the shared page button (Create account / Sign in). */}
+			{/* Primary CTA is the shared page button (Create account / Login). */}
 
 			{showBack && onBack ? (
 				<button
