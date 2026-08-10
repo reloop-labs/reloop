@@ -158,29 +158,7 @@ export function SignupPage() {
 							>
 								<AuthCardHeader
 									title="Create an account"
-									description={
-										<span className="block">
-											By continuing, you agree to our{" "}
-											<a
-												href="/terms-and-conditions"
-												className={LinkButton.linkButtonVariants({
-													variant: "black",
-												}).root({ className: "text-sm!" })}
-											>
-												Terms
-											</a>{" "}
-											and{" "}
-											<a
-												href="/privacy"
-												className={LinkButton.linkButtonVariants({
-													variant: "black",
-												}).root({ className: "text-sm!" })}
-											>
-												Privacy Policy
-											</a>
-											.
-										</span>
-									}
+									description="Start free — no card required"
 								/>
 								<SocialSignup
 									inviteId={inviteId}
@@ -231,6 +209,31 @@ export function SignupPage() {
 							</motion.span>
 						</AnimatePresence>
 					</FancyButton.Root>
+
+					{/* Legal notice under CTA — stays out of the header so the pitch stays clear */}
+					{!isOtpStep ? (
+						<p className="mt-3 text-center text-[12px] text-text-soft-400 leading-relaxed">
+							By continuing, you agree to our{" "}
+							<a
+								href="/terms-and-conditions"
+								className={LinkButton.linkButtonVariants({
+									variant: "black",
+								}).root({ className: "text-[12px]!" })}
+							>
+								Terms
+							</a>{" "}
+							and{" "}
+							<a
+								href="/privacy"
+								className={LinkButton.linkButtonVariants({
+									variant: "black",
+								}).root({ className: "text-[12px]!" })}
+							>
+								Privacy Policy
+							</a>
+							.
+						</p>
+					) : null}
 				</div>
 			</AuthCard>
 		</AuthShell>
