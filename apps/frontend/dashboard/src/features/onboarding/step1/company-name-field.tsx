@@ -19,7 +19,6 @@ export function CompanyNameField() {
 						id="company-name"
 						type="text"
 						value={name}
-						maxLength={30}
 						className="font-medium"
 						maxLength={ORGANIZATION_NAME_MAX_LENGTH}
 						onChange={(e) => {
