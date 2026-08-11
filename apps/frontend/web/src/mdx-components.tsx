@@ -1,5 +1,9 @@
 import { Callout } from "@reloop/web/components/mdx/callout";
 import { CodeBlock } from "@reloop/web/components/mdx/code-block";
+import {
+	CodeSamples,
+	SendEmailCodeSamples,
+} from "@reloop/web/components/mdx/code-samples";
 import { Cta } from "@reloop/web/components/mdx/cta";
 import { MdxImage } from "@reloop/web/components/mdx/image";
 import { Tab, Tabs } from "@reloop/web/components/mdx/tabs";
@@ -76,6 +80,8 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
 		),
 		Callout,
 		CodeBlock,
+		CodeSamples,
+		SendEmailCodeSamples,
 		Tabs,
 		Tab,
 		Cta,

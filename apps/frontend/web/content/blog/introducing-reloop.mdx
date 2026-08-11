@@ -23,6 +23,8 @@ relatedSlugs:
   - why-we-open-sourced-email-infrastructure
   - self-hosted-email-infrastructure
   - email-infrastructure-for-ai-agents
+  - email-provider-comparison-2026
+  - migrating-from-sendgrid
 ---
 
 Here's the one thing every developer and every company cares about with email infrastructure:
@@ -31,63 +33,59 @@ Here's the one thing every developer and every company cares about with email in
 
 Pretty dashboards, fancy editors, and feature checklists are secondary. Password resets, receipts, and agent replies only matter if they reach the inbox, stay affordable as you grow, and don't trap you in a vendor you can't leave.
 
-Today we're introducing Reloop: open-source email infrastructure built around the five things people actually evaluate when they pick (or regret picking) an email provider.
+Today we're introducing Reloop: [open-source email infrastructure](https://github.com/reloop-labs/reloop) built around the five things people actually evaluate when they pick (or regret picking) an email provider. Prefer a side-by-side? Start with [Compare Reloop](/compare) or our [2026 provider comparison](/blog/email-provider-comparison-2026).
 
 ## The five things that matter
 
 ### 1. Deliverability
 
-If mail lands in spam, nothing else counts. Reloop is built as real delivery infrastructure: SMTP, DKIM/SPF-oriented setup, bounce classification, and the operational pieces that keep reputation from becoming someone else's mystery. Use Reloop Cloud when you want managed reputation and IP pools. Self-host when you want the sending path on your own terms.
+If mail lands in spam, nothing else counts. Reloop is built as real [delivery infrastructure](/features/deliverability): [SMTP](/features/smtp), [DKIM/SPF-oriented setup](/blog/spf-dkim-dmarc-setup-guide), bounce classification, and the operational pieces that keep reputation from becoming someone else's mystery. Use Reloop Cloud when you want managed reputation and IP pools. [Self-host](/docs/self-host) when you want the sending path on your own terms—see [self-hosted email infrastructure](/blog/self-hosted-email-infrastructure) for when that tradeoff is worth it.
 
 ### 2. Developer experience
 
-You should ship a transactional email in minutes, not a sprint. Reloop has a clean REST API (familiar if you've used modern email APIs), an SDK, and SMTP drop-in for Nodemailer, Laravel, Django, and the rest.
+You should ship a [transactional email](/features/transaction-emails) in minutes, not a sprint. Reloop has a clean REST API (familiar if you've used modern email APIs), [SDKs for every major language](/languages), and [SMTP drop-in](/features/smtp) for Nodemailer, Laravel, Django, and the rest. Prefer the product tour for builders? See [Developers](/developers).
 
-```typescript
-import { Reloop } from '@reloop/sdk';
+<SendEmailCodeSamples />
 
-const reloop = new Reloop({ apiKey: process.env.RELOOP_API_KEY });
-
-await reloop.emails.send({
-  from: 'hello@yourdomain.com',
-  to: 'user@example.com',
-  subject: 'Welcome to Reloop',
-  html: '<p>Open-source email that feels like modern infra.</p>',
-});
-```
-
-Local and production should feel like the same product. Docs should help you ship, not send you hunting.
+Local and production should feel like the same product. [Docs](/docs) should help you ship, not send you hunting.
 
 ### 3. Cost that doesn't punish growth
 
-Email SaaS pricing is famous for feeling cheap at 10k sends and painful at 1M. Companies care about predictability. Developers care about not getting a surprise invoice after a launch week. Reloop gives you two answers: a hosted path when you want zero ops, and a full open-source path when you want to run the stack yourself and stop renting your outbound channel forever.
+Email SaaS pricing often feels cheap at low volume and painful once you scale. Don't take that on faith—check the numbers yourself:
+
+- [Reloop pricing](/pricing) for hosted plans and what you get at each tier
+- [Compare Reloop vs Resend](/compare/resend), [vs SendGrid](/compare/sendgrid), [vs Mailgun](/compare/mailgun), and [vs AWS SES](/compare/aws-ses)
+- Full grid: [all provider comparisons](/compare)
+- Deeper write-up: [email provider comparison 2026](/blog/email-provider-comparison-2026)
+
+Reloop gives you two answers: a hosted path when you want zero ops, and a [full open-source path](/docs/self-host) when you want to run the stack yourself and stop renting your outbound channel forever—including a [low-cost self-host path](/blog/self-host-email-5-dollars) if you're optimizing ops spend.
 
 ### 4. Ownership (no vendor lock-in)
 
-This is the quiet deal-breaker. Proprietary APIs, opaque logs, and "you can't leave without a rewrite" are how email becomes a hostage situation. Reloop is Apache 2.0. The cloud product runs the same codebase you can `docker compose up` on Fly, Coolify, Kubernetes, or your own machines. Audit it. Fork it. Move it. Your data and compliance boundary stay yours.
+This is the quiet deal-breaker. Proprietary APIs, opaque logs, and "you can't leave without a rewrite" are how email becomes a hostage situation. Reloop is [Apache 2.0](/license). The cloud product runs the same codebase you can `docker compose up` on Fly, Coolify, Kubernetes, or your own machines—see [Fly.io](/blog/reloop-flyio-deployment) and [Coolify](/blog/reloop-coolify-setup) guides, or the [self-host docs](/docs/self-host). Audit it. Fork it. Move it. Your data and compliance boundary stay yours. More on the bet: [why we open-sourced email infrastructure](/blog/why-we-open-sourced-email-infrastructure) and [why open source](/philosophy/why-open-source).
 
 ### 5. Visibility and the full loop
 
-"Did it send?" is not enough. You need deliveries, opens, clicks, bounces, and complaints as signed webhooks your app can act on: retries, suppressions, support alerts. And for modern products (especially AI agents), send-only is half a system. Reloop includes inbound parsing, agent inboxes, and MCP support so agents can send, receive, and inspect mail with structured tools instead of scraping a random mailbox.
+"Did it send?" is not enough. You need deliveries, opens, clicks, bounces, and complaints as signed [webhooks](/features/webhooks) your app can act on: retries, suppressions, support alerts—plus [email analytics](/features/email-analytics) when you need the operational view. And for modern products (especially AI agents), send-only is half a system. Reloop includes inbound parsing, [agent inboxes](/features/ai-agents), and MCP support so agents can send, receive, and inspect mail with structured tools instead of scraping a random mailbox. See [email infrastructure for AI agents](/blog/email-infrastructure-for-ai-agents) and the [AI agent inbox use case](/use-cases/ai-agent-inbox).
 
 ## Why we open-sourced it
 
 Linux, Postgres, Redis, Nginx: the boring foundations of the internet are open. Email sits in that category. If it fails, users can't log in, can't reset passwords, and can't get receipts.
 
-Open source is how we make the five things above credible. You can read how delivery works. You can leave without rewriting your notification stack. The roadmap gets shaped by people shipping real mail, not only by a pricing page.
+Open source is how we make the five things above credible. You can read how delivery works. You can leave without rewriting your notification stack. The roadmap gets shaped by people shipping real mail, not only by a [pricing page](/pricing). Full rationale: [why we open-sourced email infrastructure](/blog/why-we-open-sourced-email-infrastructure) and [what we stand for](/philosophy/what-we-stand-for).
 
-We're not open-sourcing a demo. Reloop Cloud and Reloop open source are the same product.
+We're not open-sourcing a demo. Reloop Cloud and Reloop open source are the same product—same APIs whether you use [hosted](/pricing) or [self-host](/docs/self-host).
 
 ## Who should care
 
-Indie hackers who don't want email to become their most expensive utility. Companies that need multi-tenant delivery without building an MTA team. Teams migrating off SendGrid, Resend, or Mailgun who want parity without a science project. Anyone building AI agents that need inbound and outbound as real infrastructure.
+Indie hackers who don't want email to become their most expensive utility—[price it](/pricing) and [compare providers](/compare) before you commit. Companies that need multi-tenant delivery without building an MTA team. Teams migrating off [SendGrid](/compare/sendgrid), [Resend](/compare/resend), or [Mailgun](/compare/mailgun) who want parity without a science project (there's also a [SendGrid migration guide](/blog/migrating-from-sendgrid)). Anyone building AI agents that need inbound and outbound as [real infrastructure](/features/ai-agents).
 
-If deliverability, DX, cost, ownership, and visibility are how you judge email tools, keep Reloop on your radar.
+If deliverability, DX, cost, ownership, and visibility are how you judge email tools, keep Reloop on your radar—and verify the claims on [compare](/compare), [pricing](/pricing), and the [docs](/docs).
 
 ## Get in
 
 - GitHub: [github.com/reloop-labs/reloop](https://github.com/reloop-labs/reloop) (star it, watch it, contribute)
 - Cloud: [reloop.sh/dashboard/signup](https://reloop.sh/dashboard/signup) (first email in a couple of minutes)
-- Docs: [reloop.sh/docs](https://reloop.sh/docs/introduction) (APIs, SMTP, self-host, agents)
+- Docs: [Docs](/docs) · [Pricing](/pricing) · [Compare](/compare) · [Self-host](/docs/self-host)
 
 We're early, shipping in public, and still at the stage where your feedback bends the curve. If those five things are what you care about, this is the project to watch.
