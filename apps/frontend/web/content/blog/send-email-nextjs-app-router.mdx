@@ -13,6 +13,7 @@ publishedAt: 2026-05-10
 category: Tutorials
 tags: [nextjs, nodejs, sdk, app-router, server-actions, route-handlers]
 readTime: 12 min read
+image: /blog/images/send-email-nextjs-app-router.png
 author:
   name: Pranav Patel
   role: Co-founder
@@ -466,25 +467,33 @@ Details: [Vercel + Reloop](/docs/integrations/vercel).
 
 ## 11. FAQ
 
-### Can I send email from a Client Component?
+<AccordionGroup>
+  <Accordion title="Can I send email from a Client Component?">
+    Not directly. Client Components can **call** a Server Action or `fetch` your
+    Route Handler. The Reloop SDK and API key stay on the server.
+  </Accordion>
 
-Not directly. Client Components can **call** a Server Action or `fetch` your Route Handler. The Reloop SDK and API key stay on the server.
+  <Accordion title="Server Action or API route for a contact form?">
+    Server Action. Less plumbing, works with `<form action>`, and stays
+    same-origin by default.
+  </Accordion>
 
-### Server Action or API route for a contact form?
+  <Accordion title="How do I send after signup with Auth.js / Clerk / Supabase?">
+    In the server-side callback or server action that creates the user, call
+    `sendWelcomeEmail(user.email)`. Do not wait for the client to “remember” to
+    hit an API.
+  </Accordion>
 
-Server Action. Less plumbing, works with `<form action>`, and stays same-origin by default.
+  <Accordion title="Does this work with React Email?">
+    Yes. Render your React Email template to HTML on the server, then pass the
+    string as `html` to `reloop.mail.send`.
+  </Accordion>
 
-### How do I send after signup with Auth.js / Clerk / Supabase?
-
-In the server-side callback or server action that creates the user, call `sendWelcomeEmail(user.email)`. Do not wait for the client to “remember” to hit an API.
-
-### Does this work with React Email?
-
-Yes. Render your React Email template to HTML on the server, then pass the string as `html` to `reloop.mail.send`.
-
-### Where do I see delivery status?
-
-In the Reloop dashboard logs, and via [webhooks](/docs/webhooks) for delivered, bounced, opened, and clicked events.
+  <Accordion title="Where do I see delivery status?">
+    In the Reloop dashboard logs, and via [webhooks](/docs/webhooks) for
+    delivered, bounced, opened, and clicked events.
+  </Accordion>
+</AccordionGroup>
 
 ---
 
@@ -508,11 +517,3 @@ In the Reloop dashboard logs, and via [webhooks](/docs/webhooks) for delivered, 
 - [Send mail API](/docs/api/mail/post-api-mail-v1send) — full payload
 - [Vercel AI SDK + Reloop](/blog/vercel-ai-sdk-reloop-notifications) — tool-calling notifications
 - Sibling guides: [SvelteKit](/blog/send-email-sveltekit) · [Remix](/blog/send-email-remix) · [Cloudflare Workers](/blog/send-email-cloudflare-workers)
-
-<Cta
-  title="Send your first email from Next.js"
-  description="Create an API key, verify a domain, and ship transactional mail in minutes — open source, hosted or self-hosted."
-  href="https://app.reloop.sh"
-  label="Open the dashboard"
-  external
-/>

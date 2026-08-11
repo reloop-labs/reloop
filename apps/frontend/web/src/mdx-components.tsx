@@ -1,3 +1,7 @@
+import {
+	Accordion,
+	AccordionGroup,
+} from "@reloop/web/components/mdx/accordion";
 import { Callout } from "@reloop/web/components/mdx/callout";
 import { CodeBlock } from "@reloop/web/components/mdx/code-block";
 import {
@@ -7,6 +11,15 @@ import {
 import { Cta } from "@reloop/web/components/mdx/cta";
 import { MdxImage } from "@reloop/web/components/mdx/image";
 import { InstallSdkCode } from "@reloop/web/components/mdx/install-sdk-code";
+import {
+	MdxInlineCode,
+	MdxTable,
+	MdxTbody,
+	MdxTd,
+	MdxTh,
+	MdxThead,
+	MdxTr,
+} from "@reloop/web/components/mdx/mdx-table";
 import { Tab, Tabs } from "@reloop/web/components/mdx/tabs";
 import type { MDXComponents } from "mdx/types";
 import React from "react";
@@ -53,32 +66,16 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
 				{...props}
 			/>
 		),
-		table: (props) => (
-			<div className="my-6! w-full overflow-y-auto rounded-xl border border-stroke-soft-100 dark:border-stroke-soft-100/50">
-				<table className="my-0! w-full border-collapse text-sm" {...props} />
-			</div>
-		),
-		thead: (props) => (
-			<thead className="bg-bg-soft-50 text-left dark:bg-white/5" {...props} />
-		),
-		tr: (props) => (
-			<tr
-				className="transition-colors hover:bg-bg-soft-50 dark:hover:bg-white/5"
-				{...props}
-			/>
-		),
-		th: (props) => (
-			<th
-				className="border-stroke-soft-100 border-b px-4 py-3 font-semibold text-[#171717] dark:border-stroke-soft-100/50 dark:text-white"
-				{...props}
-			/>
-		),
-		td: (props) => (
-			<td
-				className="border-stroke-soft-100 border-b px-4 py-3 text-[#171717] dark:border-stroke-soft-100/50 dark:text-white"
-				{...props}
-			/>
-		),
+		// Card table — same two-layer shell as dashboard API key list
+		table: MdxTable,
+		thead: MdxThead,
+		tbody: MdxTbody,
+		tr: MdxTr,
+		th: MdxTh,
+		td: MdxTd,
+		code: MdxInlineCode,
+		Accordion,
+		AccordionGroup,
 		Callout,
 		CodeBlock,
 		CodeSamples,
@@ -102,7 +99,10 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
 					title?: string;
 					"data-path"?: string;
 					"data-title"?: string;
-				}> => React.isValidElement(child) && child.type === "code",
+				}> =>
+					React.isValidElement(child) &&
+					// MDX may pass the intrinsic "code" or our MdxInlineCode override
+					(child.type === "code" || child.type === MdxInlineCode),
 			);
 
 			if (codeElement) {
