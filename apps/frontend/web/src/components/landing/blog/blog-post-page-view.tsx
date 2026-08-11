@@ -145,7 +145,7 @@ export function BlogPostPageView({
 									{formatBlogDateUpper(post.publishedAt)}
 								</time>
 							</div>
-							<h1 className="font-semibold text-3xl text-text-strong-950 leading-[110%] tracking-[-0.8px] sm:text-[40px] dark:text-white">
+							<h1 className="font-semibold text-xl text-text-strong-950 leading-snug tracking-tight sm:text-2xl lg:text-[1.65rem] dark:text-white">
 								{post.title}
 							</h1>
 							<p className="font-medium font-mono text-text-sub-600 text-xs/[150%] uppercase tracking-[0.6px] dark:text-white/60">
@@ -196,7 +196,7 @@ export function BlogPostPageView({
 									<SparklesIcon className="size-3" />
 									<span>Summary</span>
 								</div>
-								<p className="text-[14px] text-text-sub-600 leading-relaxed sm:text-[15px] dark:text-white/70">
+								<p className="text-[14px] text-text-sub-600 leading-relaxed sm:text-[14.5px] dark:text-white/60">
 									{post.description}
 								</p>
 							</div>
@@ -462,7 +462,11 @@ export function BlogPostPageView({
 			</div>
 
 			{/* CTA Section */}
-			<BlogCta category={post.category} />
+			<BlogCta
+				category={post.category}
+				headline="Ship your first email with Reloop in minutes"
+				sub="Open-source, deliverability-focused, and yours to self-host or run on Reloop Cloud. No lock-in, no rewrite later."
+			/>
 		</div>
 	);
 }

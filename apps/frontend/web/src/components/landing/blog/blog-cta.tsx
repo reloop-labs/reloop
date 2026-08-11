@@ -8,8 +8,8 @@ type CategoryVariant = {
 };
 
 const DEFAULT_VARIANT: CategoryVariant = {
-	headline: "Build in the open.",
-	sub: "Reloop is 100% open-source email infrastructure with a generous free tier. Star us on GitHub, open a PR, or deploy your own stack with zero vendor lock-in.",
+	headline: "Ship your first email in minutes",
+	sub: "Open-source, deliverability-focused, and yours to self-host or run on Reloop Cloud. No lock-in, no rewrite later.",
 	primaryLabel: "Get started free",
 };
 
@@ -195,10 +195,10 @@ export function BlogCta({
 					</div>
 
 					<div className="relative z-10 max-w-3xl">
-						<h2 className="font-medium font-sans text-3xl text-text-strong-950 leading-tight tracking-tight sm:text-4xl lg:text-[2.5rem] dark:text-white">
+						<h2 className="font-semibold text-xl text-text-strong-950 leading-snug tracking-tight sm:text-2xl lg:text-[1.65rem] dark:text-white">
 							{variant.headline}
 						</h2>
-						<p className="mt-3 max-w-xl text-base text-text-sub-600 leading-relaxed sm:text-lg dark:text-white/60">
+						<p className="mt-3 max-w-xl text-[14px] text-text-sub-600 leading-relaxed sm:text-[14.5px] dark:text-white/60">
 							{variant.sub}
 						</p>
 					</div>
