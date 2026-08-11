@@ -5,6 +5,7 @@ import { forwardRef, type ReactNode } from "react";
 import { parseEmail } from "#/features/agent-inbox/lib/email-address";
 import { resolveLabelColor } from "#/features/agent-inbox/lib/label-colors";
 import type { InboundThread } from "../../types";
+import { useInboxMail } from "./use-inbox-mail";
 
 function formatRecipientLabel(addresses: string[] | undefined): string {
 	if (!addresses?.length) return "No recipients";
@@ -102,9 +103,11 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 		},
 		ref,
 	) => {
+		const [mail] = useInboxMail();
 		const listId = thread.id;
 		const isUnread = thread.unread;
 		const isOutbound = thread.direction === "outbound";
+		const isSelectMode = mail.bulkSelected.length > 0;
 		const displayName = isOutbound
 			? formatRecipientLabel(thread.toEmails)
 			: thread.from.name ||
@@ -123,10 +126,10 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 				onClick={(e) => onSelect(listId, e)}
 				onMouseEnter={() => onMouseEnter(listId)}
 				className={cn(
-					"group flex cursor-pointer items-center border-b pt-[10px] pr-6 pb-[10px] pl-4 text-left transition-colors duration-200",
-					"border-[var(--inbox-divider)] hover:bg-[var(--inbox-row-hover)]",
+					"group flex cursor-pointer items-center border-b pt-2.5 pr-6 pb-2.5 pl-4 text-left transition-colors duration-200",
+					"border-(--inbox-divider) hover:bg-(--inbox-row-hover)",
 					(isSelected || isBulkSelected || isKeyboardFocused) &&
-						"bg-[var(--inbox-row-focused)]",
+						"bg-(--inbox-row-focused)",
 				)}
 			>
 				{/* Bulk select gutter — always visible like Gmail */}
@@ -200,7 +203,7 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 				{primaryLabel && (
 					<span className="flex shrink-0 items-center gap-2">
 						<span
-							className="flex h-5 max-w-[120px] items-center truncate rounded-[7px] border px-1.5 text-[12px]"
+							className="flex h-5 max-w-30 items-center truncate rounded-[7px] border px-1.5 text-[12px]"
 							style={{
 								background: chipBackground(primaryLabel.color),
 								color: "var(--inbox-chip-fg)",
@@ -232,9 +235,7 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 							name={thread.isStarred ? "star-filled" : "star"}
 							className={cn(
 								"h-4 w-4",
-								thread.isStarred
-									? "text-[var(--inbox-star)]"
-									: "text-mail-muted",
+								thread.isStarred ? "text-(--inbox-star)" : "text-mail-muted",
 							)}
 						/>
 					</button>
@@ -254,7 +255,7 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 							e.stopPropagation();
 							onArchive(listId);
 						}}
-						className="flex size-6 items-center justify-center rounded-md hover:bg-[var(--inbox-control-hover)]"
+						className="flex size-6 items-center justify-center rounded-md hover:bg-(--inbox-control-hover)"
 					>
 						<Icon name="archive" className="h-3.5 w-3.5 text-mail-muted" />
 					</button>
@@ -272,7 +273,7 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 				</span>
 
 				{/* Time */}
-				<span className="ml-1 w-[60px] shrink-0 text-right text-[13px] text-mail-muted tabular-nums">
+				<span className="ml-1 w-15 shrink-0 text-right text-[13px] text-mail-muted tabular-nums">
 					{formatReceivedAt(thread.receivedAt, isFirstToday)}
 				</span>
 			</div>
