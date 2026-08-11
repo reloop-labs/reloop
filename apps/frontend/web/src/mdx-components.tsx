@@ -96,6 +96,12 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
 				): child is React.ReactElement<{
 					className?: string;
 					children?: React.ReactNode;
+					/** Fence meta, e.g. `path=lib/reloop.ts` or `title="app/page.tsx"` */
+					metastring?: string;
+					path?: string;
+					title?: string;
+					"data-path"?: string;
+					"data-title"?: string;
 				}> => React.isValidElement(child) && child.type === "code",
 			);
 
@@ -103,8 +109,19 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
 				const language =
 					codeElement.props.className?.replace("language-", "") || "text";
 				const code = String(codeElement.props.children ?? "").trim();
+				const meta = codeElement.props.metastring ?? "";
+				const pathFromMeta =
+					codeElement.props.path ??
+					codeElement.props["data-path"] ??
+					codeElement.props.title ??
+					codeElement.props["data-title"] ??
+					meta.match(/(?:path|title|filename)=["']?([^\s"']+)["']?/)?.[1];
 
-				return <CodeBlock lang={language}>{code}</CodeBlock>;
+				return (
+					<CodeBlock lang={language} path={pathFromMeta}>
+						{code}
+					</CodeBlock>
+				);
 			}
 
 			return <pre {...props} />;

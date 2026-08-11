@@ -345,42 +345,47 @@ export function CopyCodeBlock({
 				</div>
 			) : (
 				<div className="flex items-center gap-3 px-4 py-2.5">
+					{/*
+					 * Header layout (global):
+					 * - Left: language logo (from `si` / `icon`)
+					 * - When `title` is a file path: path sits after the logo (replaces language name)
+					 * - When no path: language label (e.g. "bash") after the logo
+					 * - Far right: copy
+					 */}
 					<div className="flex min-w-0 flex-1 items-center gap-2.5">
+						{icon ??
+							(si ? (
+								<BrandLanguageIcon
+									icon={si}
+									className="size-3.5 shrink-0"
+								/>
+							) : null)}
 						{title ? (
-							<div className="flex shrink-0 items-center gap-1.5">
-								{icon}
-								{titleHref ? (
-									<a
-										href={titleHref}
-										target="_blank"
-										rel="noopener noreferrer"
-										className="flex items-center gap-1 font-semibold text-[13px] text-text-strong-950 hover:underline dark:text-white"
-									>
-										{title}
-										<Icon
-											name="arrow-up-right"
-											className="h-3 w-3 text-text-sub-400"
-										/>
-									</a>
-								) : (
-									<span className="font-semibold text-[13px] text-text-strong-950 dark:text-white">
-										{title}
-									</span>
-								)}
-							</div>
-						) : (
-							<>
-								{icon ||
-									(si && (
-										<BrandLanguageIcon
-											icon={si}
-											className="size-3.5 shrink-0"
-										/>
-									))}
-								<span className="font-mono text-[11px] text-text-sub-500 dark:text-white/55">
-									{displayLabel}
+							titleHref ? (
+								<a
+									href={titleHref}
+									target="_blank"
+									rel="noopener noreferrer"
+									className="flex min-w-0 items-center gap-1 font-mono text-[12px] text-text-sub-600 hover:text-text-strong-950 hover:underline dark:text-white/70 dark:hover:text-white"
+								>
+									<span className="truncate">{title}</span>
+									<Icon
+										name="arrow-up-right"
+										className="h-3 w-3 shrink-0 text-text-sub-400"
+									/>
+								</a>
+							) : (
+								<span
+									className="min-w-0 truncate font-mono text-[12px] text-text-sub-600 dark:text-white/70"
+									title={title}
+								>
+									{title}
 								</span>
-							</>
+							)
+						) : (
+							<span className="font-mono text-[11px] text-text-sub-500 dark:text-white/55">
+								{displayLabel}
+							</span>
 						)}
 					</div>
 					{copyButton}
