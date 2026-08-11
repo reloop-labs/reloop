@@ -6,6 +6,7 @@ import {
 } from "@reloop/web/components/mdx/code-samples";
 import { Cta } from "@reloop/web/components/mdx/cta";
 import { MdxImage } from "@reloop/web/components/mdx/image";
+import { InstallSdkCode } from "@reloop/web/components/mdx/install-sdk-code";
 import { Tab, Tabs } from "@reloop/web/components/mdx/tabs";
 import type { MDXComponents } from "mdx/types";
 import React from "react";
@@ -82,6 +83,7 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
 		CodeBlock,
 		CodeSamples,
 		SendEmailCodeSamples,
+		InstallSdkCode,
 		Tabs,
 		Tab,
 		Cta,

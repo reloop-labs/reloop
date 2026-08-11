@@ -1,14 +1,18 @@
 ---
 title: How to Send Email in Next.js App Router (2026)
-description: Send transactional email from Next.js App Router using Reloop's Node.js SDK in Server Actions and Route Handlers.
+description: Send transactional email from Next.js App Router with Reloop — complete Server Action and Route Handler examples, env setup, error handling, and Vercel deploy.
 keywords:
   - send email Next.js App Router
+  - Next.js Server Action email
+  - Next.js Route Handler email
   - Next.js transactional email
   - Next.js email tutorial 2026
+  - reloop-email Next.js
+  - send email from Next.js API route
 publishedAt: 2026-05-10
 category: Tutorials
-tags: [nextjs, nodejs, sdk, app-router]
-readTime: 6 min read
+tags: [nextjs, nodejs, sdk, app-router, server-actions, route-handlers]
+readTime: 12 min read
 author:
   name: Pranav Patel
   role: Co-founder
@@ -16,38 +20,499 @@ author:
 draft: false
 relatedSlugs:
   - transactional-email-best-practices
-  - self-hosted-email-infrastructure
+  - send-email-sveltekit
+  - send-email-remix
+  - vercel-ai-sdk-reloop-notifications
 ---
 
-## Install the SDK
+**To send email in Next.js App Router, call Reloop only on the server** — from a [Server Action](https://nextjs.org/docs/app/building-your-application/data-fetching/server-actions-and-mutations) or a [Route Handler](https://nextjs.org/docs/app/building-your-application/routing/route-handlers). Never put your API key in a Client Component or public env var.
 
-Run `npm install reloop-email` and add `RELOOP_API_KEY` to `.env.local`. Never expose the key to the client—send only from server components, Server Actions, or Route Handlers.
+This guide covers both patterns end-to-end: install, shared client, form + Server Action, API route + `fetch`, error handling, and deploy on Vercel.
 
-```bash
-npm install reloop-email
+---
+
+## What you will build
+
+| Approach | Best for | File shape |
+|----------|----------|------------|
+| **Server Action** | Forms, signup, password reset, any UI in the same Next app | `app/actions/send-email.ts` + client form |
+| **Route Handler (API)** | Webhooks, mobile clients, external services, cron, AI tools | `app/api/send-email/route.ts` |
+
+Both run on the server. Both use the same Reloop SDK call. Pick Server Actions for app UI. Pick Route Handlers when something outside your React tree needs HTTP.
+
+---
+
+## Prerequisites
+
+1. A Next.js app on the **App Router** (this guide uses `app/`, not `pages/`)
+2. A Reloop account and API key from the [dashboard](https://app.reloop.sh) (keys look like `rl_…`)
+3. A verified sending domain — see [connect a domain](/docs/guides/connect-domain) and [SPF / DKIM / DMARC](/blog/spf-dkim-dmarc-setup-guide)
+
+Optional but useful: the [Node.js SDK docs](/docs/examples/nodejs/nextjs) and full [send mail API](/docs/api/mail/post-api-mail-v1send).
+
+---
+
+## 1. Install the SDK
+
+<InstallSdkCode />
+
+Package: [`reloop-email`](https://www.npmjs.com/package/reloop-email) · source: [reloop-labs/reloop-node](https://github.com/reloop-labs/reloop-node)
+
+---
+
+## 2. Add the API key (server only)
+
+Create or edit `.env.local` in the project root:
+
+```env
+RELOOP_API_KEY=rl_your_api_key_here
 ```
 
-## Server Action example
+Rules that matter:
 
-Create a `sendWelcomeEmail` action that calls `reloop.emails.send` after signup. Return success or error to the client without leaking API details.
+- Use `RELOOP_API_KEY` (no `NEXT_PUBLIC_` prefix). Public vars are bundled into the browser.
+- Do not commit `.env.local`. Keep it in `.gitignore`.
+- On Vercel, add the same key under **Project → Settings → Environment Variables** (see [Vercel integration](/docs/integrations/vercel)).
+
+<Callout type="warning">
+  If the key appears in browser Network tabs or client bundles, treat it as leaked: rotate it in the dashboard and redeploy.
+</Callout>
+
+---
+
+## 3. Create a shared Reloop client
+
+One client file keeps Server Actions and Route Handlers identical.
 
 ```typescript
-"use server";
-
+// lib/reloop.ts
 import { Reloop } from "reloop-email";
 
-const reloop = new Reloop(process.env.RELOOP_API_KEY!);
+if (!process.env.RELOOP_API_KEY) {
+  throw new Error("Missing RELOOP_API_KEY");
+}
 
-export async function sendWelcomeEmail(email: string) {
-  await reloop.emails.send({
-    from: "onboarding@yourdomain.com",
-    to: email,
-    subject: "Welcome",
-    html: "<p>Thanks for signing up.</p>",
-  });
+export const reloop = new Reloop({
+  apiKey: process.env.RELOOP_API_KEY,
+});
+```
+
+Initialize with an object: `{ apiKey: string }`. Optional: `baseUrl` if you [self-host](/docs/self-host) Reloop.
+
+---
+
+## 4. Method A — Server Action (forms & app UI)
+
+### When to use this
+
+- Contact form, welcome email after signup, magic link, password reset
+- Call site is a React Server Component or Client Component in **this** app
+- You want progressive enhancement with `<form action={...}>` and no hand-written `fetch`
+
+### Action
+
+```typescript
+// app/actions/send-welcome-email.ts
+"use server";
+
+import { reloop } from "@/lib/reloop";
+
+export type SendWelcomeResult =
+  | { ok: true; messageId?: string }
+  | { ok: false; error: string };
+
+export async function sendWelcomeEmail(
+  email: string,
+  name?: string,
+): Promise<SendWelcomeResult> {
+  const to = email.trim().toLowerCase();
+
+  if (!to || !to.includes("@")) {
+    return { ok: false, error: "Enter a valid email address." };
+  }
+
+  try {
+    const { response, emailError } = await reloop.mail.send({
+      from: "Acme <onboarding@mail.yourdomain.com>",
+      to,
+      subject: name ? `Welcome, ${name}` : "Welcome to Acme",
+      html: `<p>Thanks for signing up${name ? `, ${name}` : ""}.</p>
+             <p>You're ready to go.</p>`,
+      text: `Thanks for signing up${name ? `, ${name}` : ""}. You're ready to go.`,
+      reply_to: "support@yourdomain.com",
+      tags: [{ name: "type", value: "welcome" }],
+    });
+
+    if (emailError) {
+      console.error("Reloop send failed", emailError);
+      return { ok: false, error: "Could not send email. Try again." };
+    }
+
+    return { ok: true, messageId: response?.messageId };
+  } catch (err) {
+    console.error("Reloop send threw", err);
+    return { ok: false, error: "Could not send email. Try again." };
+  }
 }
 ```
 
-## Deploy on Vercel
+Notes:
 
-Add `RELOOP_API_KEY` to Vercel environment variables. The HTTP API works on Edge Runtime where SMTP does not.
+- `"use server"` must be at the top of the file (or above the exported function).
+- Return a **safe** result to the client. Log Reloop details server-side; do not dump API errors into the UI.
+- `from` must use a domain you verified in Reloop.
+
+### Client form that calls the action
+
+```tsx
+// app/signup/welcome-form.tsx
+"use client";
+
+import { useState, useTransition } from "react";
+import { sendWelcomeEmail } from "@/app/actions/send-welcome-email";
+
+export function WelcomeForm() {
+  const [message, setMessage] = useState<string | null>(null);
+  const [pending, startTransition] = useTransition();
+
+  return (
+    <form
+      className="space-y-3"
+      onSubmit={(e) => {
+        e.preventDefault();
+        const form = e.currentTarget;
+        const data = new FormData(form);
+        const email = String(data.get("email") ?? "");
+        const name = String(data.get("name") ?? "");
+
+        startTransition(async () => {
+          const result = await sendWelcomeEmail(email, name || undefined);
+          setMessage(
+            result.ok
+              ? "Check your inbox for a welcome email."
+              : result.error,
+          );
+          if (result.ok) form.reset();
+        });
+      }}
+    >
+      <input name="name" type="text" placeholder="Name" />
+      <input name="email" type="email" required placeholder="you@company.com" />
+      <button type="submit" disabled={pending}>
+        {pending ? "Sending…" : "Create account"}
+      </button>
+      {message ? <p>{message}</p> : null}
+    </form>
+  );
+}
+```
+
+### Form Action without client JS (optional)
+
+You can also bind the action directly:
+
+```tsx
+// app/contact/page.tsx
+import { sendWelcomeEmail } from "@/app/actions/send-welcome-email";
+
+async function contactAction(formData: FormData) {
+  "use server";
+  const email = String(formData.get("email") ?? "");
+  await sendWelcomeEmail(email);
+}
+
+export default function ContactPage() {
+  return (
+    <form action={contactAction}>
+      <input name="email" type="email" required />
+      <button type="submit">Send</button>
+    </form>
+  );
+}
+```
+
+Server Actions work for same-origin app flows. For external HTTP callers, use a Route Handler.
+
+---
+
+## 5. Method B — Route Handler (API route)
+
+### When to use this
+
+- Stripe / Clerk / Supabase webhooks that should fire an email
+- Mobile apps, desktop clients, or another backend posting JSON
+- Cron jobs, n8n, Zapier, or AI agents that call HTTP
+- You need a stable URL like `POST /api/send-email`
+
+### Route Handler
+
+```typescript
+// app/api/send-email/route.ts
+import { NextResponse } from "next/server";
+import { reloop } from "@/lib/reloop";
+
+type Body = {
+  to?: string;
+  subject?: string;
+  html?: string;
+  text?: string;
+  name?: string;
+};
+
+export async function POST(request: Request) {
+  let body: Body;
+
+  try {
+    body = (await request.json()) as Body;
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+  }
+
+  const to = body.to?.trim().toLowerCase();
+  if (!to || !to.includes("@")) {
+    return NextResponse.json(
+      { error: "Field `to` must be a valid email" },
+      { status: 400 },
+    );
+  }
+
+  const subject = body.subject?.trim() || "Hello from Next.js";
+  const html =
+    body.html?.trim() ||
+    `<p>Hi${body.name ? ` ${body.name}` : ""},</p><p>This was sent from a Next.js Route Handler.</p>`;
+  const text =
+    body.text?.trim() ||
+    `Hi${body.name ? ` ${body.name}` : ""}, This was sent from a Next.js Route Handler.`;
+
+  try {
+    const { response, emailError } = await reloop.mail.send({
+      from: "Acme <hello@mail.yourdomain.com>",
+      to,
+      subject,
+      html,
+      text,
+      reply_to: "support@yourdomain.com",
+      tags: [{ name: "source", value: "api-route" }],
+    });
+
+    if (emailError) {
+      console.error("Reloop send failed", emailError);
+      return NextResponse.json(
+        { error: "Failed to send email" },
+        { status: 502 },
+      );
+    }
+
+    return NextResponse.json({
+      ok: true,
+      id: response?.id,
+      messageId: response?.messageId,
+    });
+  } catch (err) {
+    console.error("Reloop send threw", err);
+    return NextResponse.json(
+      { error: "Failed to send email" },
+      { status: 500 },
+    );
+  }
+}
+```
+
+### Call it from the browser or another service
+
+```typescript
+// From a Client Component or any HTTP client
+const res = await fetch("/api/send-email", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    to: "user@example.com",
+    name: "Ada",
+    subject: "Your receipt",
+    html: "<p>Thanks for your purchase.</p>",
+    text: "Thanks for your purchase.",
+  }),
+});
+
+const data = await res.json();
+if (!res.ok) throw new Error(data.error ?? "Send failed");
+```
+
+cURL for local testing:
+
+```bash
+curl -X POST http://localhost:3000/api/send-email \
+  -H "Content-Type: application/json" \
+  -d '{"to":"you@example.com","name":"Ada","subject":"Test from Next.js"}'
+```
+
+### Protect the route
+
+An open send endpoint is an open relay. At minimum:
+
+1. Require a session / auth check for user-triggered sends
+2. Or require a shared secret header for webhooks and cron
+3. Rate-limit by IP or user id
+
+Example secret gate for internal callers:
+
+```typescript
+// inside POST, before sending
+const secret = request.headers.get("x-internal-secret");
+if (secret !== process.env.INTERNAL_SEND_SECRET) {
+  return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+}
+```
+
+Add `INTERNAL_SEND_SECRET` to `.env.local` and Vercel the same way as the API key.
+
+---
+
+## 6. Server Action vs Route Handler — pick one
+
+| Question | Prefer Server Action | Prefer Route Handler |
+|----------|----------------------|----------------------|
+| Triggered by a form in this Next app? | Yes | — |
+| Need a public HTTP URL for webhooks / mobile / cron? | — | Yes |
+| Want zero client `fetch` boilerplate? | Yes | — |
+| Called from non-Next code? | — | Yes |
+| Same Reloop SDK? | Yes | Yes |
+| Safe for `RELOOP_API_KEY`? | Yes (server) | Yes (server) |
+
+You can use **both** in one app: Server Actions for product UI, Route Handlers for integrations.
+
+---
+
+## 7. Full `mail.send` fields you will use most
+
+```typescript
+const { response, emailError } = await reloop.mail.send({
+  from: "Acme <hello@mail.yourdomain.com>", // required — verified domain
+  to: "user@example.com",                   // string or string[]
+  subject: "Order confirmed",               // required
+  html: "<p>Your order shipped.</p>",       // HTML body
+  text: "Your order shipped.",              // plain-text fallback
+  reply_to: "support@yourdomain.com",
+  cc: "ops@yourdomain.com",
+  bcc: "archive@yourdomain.com",
+  tags: [{ name: "type", value: "receipt" }],
+});
+```
+
+More options (attachments, templates, scheduling, headers) are on the [send email API reference](/docs/api/mail/post-api-mail-v1send).
+
+Always send both `html` and `text` when you can — better deliverability and clients that block HTML still get a readable message. See [transactional email best practices](/blog/transactional-email-best-practices).
+
+---
+
+## 8. Runtime: Node vs Edge
+
+- Prefer the default **Node.js** runtime for the Reloop SDK.
+- Edge Runtime is a restricted environment. If you must run on Edge, call Reloop’s **HTTP API** with `fetch` instead of relying on Node-only modules — same idea as the [Cloudflare Workers guide](/blog/send-email-cloudflare-workers).
+
+```typescript
+// Edge-friendly alternative (no SDK)
+export const runtime = "edge";
+
+export async function POST(request: Request) {
+  const body = await request.json();
+
+  const res = await fetch("https://reloop.sh/api/mail/v1/send", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": process.env.RELOOP_API_KEY!,
+    },
+    body: JSON.stringify({
+      from: "Acme <hello@mail.yourdomain.com>",
+      to: body.to,
+      subject: body.subject,
+      html: body.html,
+      text: body.text,
+    }),
+  });
+
+  const data = await res.json();
+  return Response.json(data, { status: res.status });
+}
+```
+
+For most App Router apps on Vercel, stick with the SDK on Node.
+
+---
+
+## 9. Deploy on Vercel
+
+1. Push the app and import it in [Vercel](https://vercel.com)
+2. Add env vars: `RELOOP_API_KEY` (and `INTERNAL_SEND_SECRET` if you use it)
+3. Redeploy so server functions pick up the vars
+4. Send a test from production; confirm delivery in the [Reloop logs](https://app.reloop.sh)
+
+Details: [Vercel + Reloop](/docs/integrations/vercel).
+
+---
+
+## 10. Common mistakes
+
+1. **`NEXT_PUBLIC_RELOOP_API_KEY`** — exposes the key. Use server-only `RELOOP_API_KEY`.
+2. **Calling Reloop from a Client Component** — keys and secrets belong in Server Actions / Route Handlers only.
+3. **Unverified `from` domain** — verify DNS first ([domain guide](/docs/guides/connect-domain)).
+4. **Open `/api/send-email`** — always authenticate or use a shared secret.
+5. **Wrong constructor** — use `new Reloop({ apiKey })`, not a bare string, for the current SDK.
+6. **Ignoring `emailError`** — check it (or catch throws) and return a safe user message.
+7. **HTML only** — include `text` as a fallback.
+
+---
+
+## 11. FAQ
+
+### Can I send email from a Client Component?
+
+Not directly. Client Components can **call** a Server Action or `fetch` your Route Handler. The Reloop SDK and API key stay on the server.
+
+### Server Action or API route for a contact form?
+
+Server Action. Less plumbing, works with `<form action>`, and stays same-origin by default.
+
+### How do I send after signup with Auth.js / Clerk / Supabase?
+
+In the server-side callback or server action that creates the user, call `sendWelcomeEmail(user.email)`. Do not wait for the client to “remember” to hit an API.
+
+### Does this work with React Email?
+
+Yes. Render your React Email template to HTML on the server, then pass the string as `html` to `reloop.mail.send`.
+
+### Where do I see delivery status?
+
+In the Reloop dashboard logs, and via [webhooks](/docs/webhooks) for delivered, bounced, opened, and clicked events.
+
+---
+
+## 12. Copy-paste checklist
+
+- [ ] `npm install reloop-email`
+- [ ] `.env.local` → `RELOOP_API_KEY=rl_…` (no `NEXT_PUBLIC_`)
+- [ ] `lib/reloop.ts` shared client
+- [ ] **UI path:** `app/actions/send-welcome-email.ts` + form
+- [ ] **HTTP path:** `app/api/send-email/route.ts` + auth/secret
+- [ ] Verified sending domain on `from`
+- [ ] Vercel env vars set and redeployed
+- [ ] Test send + check logs
+
+---
+
+## Next steps
+
+- [Transactional email best practices](/blog/transactional-email-best-practices) — templates, timing, deliverability
+- [Next.js example in docs](/docs/examples/nodejs/nextjs) — short SDK reference
+- [Send mail API](/docs/api/mail/post-api-mail-v1send) — full payload
+- [Vercel AI SDK + Reloop](/blog/vercel-ai-sdk-reloop-notifications) — tool-calling notifications
+- Sibling guides: [SvelteKit](/blog/send-email-sveltekit) · [Remix](/blog/send-email-remix) · [Cloudflare Workers](/blog/send-email-cloudflare-workers)
+
+<Cta
+  title="Send your first email from Next.js"
+  description="Create an API key, verify a domain, and ship transactional mail in minutes — open source, hosted or self-hosted."
+  href="https://app.reloop.sh"
+  label="Open the dashboard"
+  external
+/>
