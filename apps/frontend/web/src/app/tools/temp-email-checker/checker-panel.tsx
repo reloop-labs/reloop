@@ -2,13 +2,14 @@
 
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import { type FormEvent, useId, useRef, useState } from "react";
+import { type FormEvent, useEffect, useId, useRef, useState } from "react";
+import { CheckRequestError, runCheck } from "./check-api";
 import {
 	type CheckResult,
 	type CheckVerdict,
-	previewCheck,
 	type SignalStatus,
-} from "./preview-check";
+	toCheckResult,
+} from "./presenter";
 
 const EXAMPLES = [
 	"you@mailinator.com",
@@ -149,24 +150,51 @@ export function CheckerPanel() {
 	const inputRef = useRef<HTMLInputElement>(null);
 	const [value, setValue] = useState("");
 	const [result, setResult] = useState<CheckResult | null>(null);
+	const [error, setError] = useState<string | null>(null);
+	const [isPending, setIsPending] = useState(false);
 
-	const run = (raw: string) => {
+	const requestRef = useRef<AbortController | null>(null);
+
+	useEffect(() => () => requestRef.current?.abort(), []);
+
+	const run = async (raw: string) => {
 		if (!raw.trim()) {
 			setResult(null);
+			setError(null);
 			return;
 		}
-		// TODO: swap for the route handler once the check is built.
-		setResult(previewCheck(raw));
+
+		requestRef.current?.abort();
+		const controller = new AbortController();
+		requestRef.current = controller;
+
+		setIsPending(true);
+		setError(null);
+
+		try {
+			const response = await runCheck(raw, controller.signal);
+			setResult(toCheckResult(response));
+		} catch (err) {
+			if (controller.signal.aborted) return;
+			setResult(null);
+			setError(
+				err instanceof CheckRequestError
+					? err.message
+					: "Something went wrong running that check.",
+			);
+		} finally {
+			if (!controller.signal.aborted) setIsPending(false);
+		}
 	};
 
 	const onSubmit = (e: FormEvent) => {
 		e.preventDefault();
-		run(value);
+		void run(value);
 	};
 
 	const onExample = (example: string) => {
 		setValue(example);
-		run(example);
+		void run(example);
 		inputRef.current?.focus();
 	};
 
@@ -199,9 +227,9 @@ export function CheckerPanel() {
 					<button
 						type="submit"
 						className="inline-flex h-12 shrink-0 items-center justify-center rounded-full bg-text-strong-950 px-7 font-semibold text-[15px] text-bg-white-0 transition-opacity hover:opacity-90 disabled:opacity-40 dark:bg-white dark:text-black"
-						disabled={value.trim().length === 0}
+						disabled={value.trim().length === 0 || isPending}
 					>
-						Check address
+						{isPending ? "Checking…" : "Check address"}
 					</button>
 				</div>
 			</form>
@@ -215,7 +243,8 @@ export function CheckerPanel() {
 						key={example}
 						type="button"
 						onClick={() => onExample(example)}
-						className="rounded-full border border-stroke-soft-200 px-3 py-1 font-mono text-[12px] text-text-sub-600 transition-colors hover:border-text-strong-950/30 hover:text-text-strong-950 dark:border-white/10 dark:text-white/45 dark:hover:border-white/30 dark:hover:text-white"
+						disabled={isPending}
+						className="rounded-full border border-stroke-soft-200 px-3 py-1 font-mono text-[12px] text-text-sub-600 transition-colors hover:border-text-strong-950/30 hover:text-text-strong-950 disabled:opacity-40 dark:border-white/10 dark:text-white/45 dark:hover:border-white/30 dark:hover:text-white"
 					>
 						{example}
 					</button>
@@ -223,7 +252,17 @@ export function CheckerPanel() {
 			</div>
 
 			<div aria-live="polite">
-				{result ? (
+				{error ? (
+					<div className="mt-5 flex items-start gap-3 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 px-5 py-4 dark:border-white/10 dark:bg-[#111]">
+						<Icon
+							name="alert-triangle"
+							className="mt-0.5 size-4 shrink-0 text-warning-base"
+						/>
+						<p className="text-[14px] text-text-sub-600 leading-relaxed dark:text-white/50">
+							{error}
+						</p>
+					</div>
+				) : result ? (
 					<ResultCard result={result} />
 				) : (
 					<p className="mt-6 text-center text-[13px] text-text-soft-400 dark:text-white/30">
