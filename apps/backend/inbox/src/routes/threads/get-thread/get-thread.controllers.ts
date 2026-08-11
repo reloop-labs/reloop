@@ -8,6 +8,27 @@ import {
 import { and, desc, eq, or } from "drizzle-orm";
 import { createError } from "evlog";
 
+function asIso(value: Date | string | null | undefined): string {
+	if (!value) return new Date(0).toISOString();
+	return typeof value === "string" ? value : value.toISOString();
+}
+
+function uniqueAddresses(...groups: Array<string[] | null | undefined>): string[] {
+	const seen = new Set<string>();
+	const out: string[] = [];
+	for (const group of groups) {
+		for (const raw of group ?? []) {
+			const addr = String(raw ?? "").trim();
+			if (!addr) continue;
+			const key = addr.toLowerCase();
+			if (seen.has(key)) continue;
+			seen.add(key);
+			out.push(addr);
+		}
+	}
+	return out;
+}
+
 export async function getThreadController(id: string, organizationId: string) {
 	// 1. Try finding directly by emailThread.id
 	let thread = await db.query.emailThread.findFirst({
@@ -78,7 +99,7 @@ export async function getThreadController(id: string, organizationId: string) {
 									fromEmail: email.fromEmail,
 									fromName: email.fromName,
 									toEmails: email.toEmails,
-									ccEmails: email.ccEmails,
+									ccEmails: email.ccEmails ?? [],
 									replyTo: email.replyTo,
 									subject: email.subject,
 									textBody: email.textBody,
@@ -104,8 +125,8 @@ export async function getThreadController(id: string, organizationId: string) {
 									fromEmail: email.fromEmail,
 									fromName: email.fromName,
 									toEmails: email.toEmails,
-									ccEmails: email.ccEmails,
-									bccEmails: email.bccEmails,
+									ccEmails: email.ccEmails ?? [],
+									bccEmails: email.bccEmails ?? [],
 									subject: email.subject,
 									textBody: email.textBody,
 									htmlBody: email.htmlBody,
@@ -128,84 +149,140 @@ export async function getThreadController(id: string, organizationId: string) {
 		};
 	}
 
-	// 5. Fallback: Check if id is a standalone inbound email (e.g. eml_...)
+	// 5. Fallback: Check if id is a standalone inbound email
 	const standaloneInbound = await db.query.inboundEmail.findFirst({
-		where: eq(inboundEmail.id, id),
+		where: and(
+			eq(inboundEmail.id, id),
+			eq(inboundEmail.organizationId, organizationId),
+		),
 		with: { attachments: true },
 	});
 
 	if (standaloneInbound) {
+		const createdAt = asIso(standaloneInbound.createdAt);
 		return {
 			id: standaloneInbound.id,
-			organizationId: standaloneInbound.organizationId,
 			mailboxId: standaloneInbound.mailboxId,
+			organizationId: standaloneInbound.organizationId,
 			subject: standaloneInbound.subject ?? "(no subject)",
-			participants: [
-				standaloneInbound.fromEmail,
-				...(standaloneInbound.toEmails || []),
-			].filter(Boolean),
+			lastMessagePreview: (standaloneInbound.snippet ||
+				standaloneInbound.textBody ||
+				"")
+				.toString()
+				.slice(0, 200),
+			lastMessageAt: createdAt,
+			status: "active",
+			messageCount: 1,
+			participants: uniqueAddresses(
+				[standaloneInbound.fromEmail],
+				standaloneInbound.toEmails,
+				standaloneInbound.ccEmails,
+			),
+			isRead: Boolean(standaloneInbound.isRead),
+			isStarred: Boolean(standaloneInbound.isStarred),
+			createdAt,
+			updatedAt: createdAt,
 			messages: [
 				{
 					id: `msg_${standaloneInbound.id}`,
 					threadId: standaloneInbound.id,
 					direction: "inbound",
-					messageAt: standaloneInbound.createdAt,
 					inboundEmailId: standaloneInbound.id,
+					emailLogId: null,
+					fromEmail: standaloneInbound.fromEmail,
+					fromName: standaloneInbound.fromName,
+					subject: standaloneInbound.subject,
+					preview: (standaloneInbound.snippet ||
+						standaloneInbound.textBody ||
+						"")
+						.toString()
+						.slice(0, 200),
+					messageAt: createdAt,
+					rfc822MessageId: standaloneInbound.messageId ?? null,
+					inReplyTo: null,
+					createdAt,
 					email: {
 						id: standaloneInbound.id,
 						fromEmail: standaloneInbound.fromEmail,
 						fromName: standaloneInbound.fromName,
-						toEmails: standaloneInbound.toEmails,
-						ccEmails: standaloneInbound.ccEmails,
+						toEmails: standaloneInbound.toEmails ?? [],
+						ccEmails: standaloneInbound.ccEmails ?? [],
 						replyTo: standaloneInbound.replyTo,
 						subject: standaloneInbound.subject,
 						textBody: standaloneInbound.textBody,
 						htmlBody: standaloneInbound.htmlBody,
-						isRead: standaloneInbound.isRead,
-						isStarred: standaloneInbound.isStarred,
-						attachments: standaloneInbound.attachments,
-						createdAt: standaloneInbound.createdAt,
+						isRead: Boolean(standaloneInbound.isRead),
+						isStarred: Boolean(standaloneInbound.isStarred),
+						attachments: standaloneInbound.attachments ?? [],
+						createdAt,
 					},
 				},
 			],
 		};
 	}
 
-	// 6. Fallback: Check if id is a standalone email log (outbound)
+	// 6. Fallback: Check if id is a standalone email log (outbound / Sent)
 	const standaloneLog = await db.query.emailLog.findFirst({
-		where: eq(emailLog.id, id),
+		where: and(
+			eq(emailLog.id, id),
+			eq(emailLog.organizationId, organizationId),
+		),
 	});
 
 	if (standaloneLog) {
+		const createdAt = asIso(standaloneLog.createdAt);
+		const ccEmails = standaloneLog.ccEmails ?? [];
+		const bccEmails = standaloneLog.bccEmails ?? [];
 		return {
 			id: standaloneLog.id,
-			organizationId: standaloneLog.organizationId,
 			mailboxId: null,
+			organizationId: standaloneLog.organizationId,
 			subject: standaloneLog.subject ?? "(no subject)",
-			participants: [
-				standaloneLog.fromEmail,
-				...(standaloneLog.toEmails || []),
-			].filter(Boolean),
+			lastMessagePreview: (standaloneLog.textBody || "")
+				.toString()
+				.slice(0, 200),
+			lastMessageAt: createdAt,
+			status: "active",
+			messageCount: 1,
+			participants: uniqueAddresses(
+				[standaloneLog.fromEmail],
+				standaloneLog.toEmails,
+				ccEmails,
+			),
+			isRead: true,
+			isStarred: false,
+			createdAt,
+			updatedAt: createdAt,
 			messages: [
 				{
 					id: `msg_${standaloneLog.id}`,
 					threadId: standaloneLog.id,
 					direction: "outbound",
-					messageAt: standaloneLog.createdAt,
+					inboundEmailId: null,
 					emailLogId: standaloneLog.id,
+					fromEmail: standaloneLog.fromEmail,
+					fromName: standaloneLog.fromName,
+					subject: standaloneLog.subject,
+					preview: (standaloneLog.textBody || "").toString().slice(0, 200),
+					messageAt: createdAt,
+					rfc822MessageId: standaloneLog.messageId ?? null,
+					inReplyTo: null,
+					createdAt,
 					email: {
 						id: standaloneLog.id,
 						fromEmail: standaloneLog.fromEmail,
 						fromName: standaloneLog.fromName,
-						toEmails: standaloneLog.toEmails,
-						ccEmails: standaloneLog.ccEmails,
-						bccEmails: standaloneLog.bccEmails,
+						toEmails: standaloneLog.toEmails ?? [],
+						ccEmails,
+						bccEmails,
 						subject: standaloneLog.subject,
 						textBody: standaloneLog.textBody,
 						htmlBody: standaloneLog.htmlBody,
 						status: standaloneLog.status,
-						sentAt: standaloneLog.sentAt,
-						createdAt: standaloneLog.createdAt,
+						sentAt: standaloneLog.sentAt
+							? asIso(standaloneLog.sentAt)
+							: null,
+						createdAt,
 					},
 				},
 			],

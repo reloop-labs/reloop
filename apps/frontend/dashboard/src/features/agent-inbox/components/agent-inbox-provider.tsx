@@ -676,6 +676,8 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 						isTrashed: false,
 						direction: "outbound" as const,
 						toEmails: msg.toEmails,
+						ccEmails: msg.ccEmails ?? [],
+						bccEmails: msg.bccEmails ?? [],
 						attachments: [],
 						timeline: [
 							{

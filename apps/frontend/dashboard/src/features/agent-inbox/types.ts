@@ -81,6 +81,8 @@ export interface InboundThread {
 	entityTag?: "invoice" | "support" | "order" | "security";
 	direction?: "inbound" | "outbound";
 	toEmails?: string[];
+	ccEmails?: string[];
+	bccEmails?: string[];
 	attachments?: InboundAttachment[];
 	parsed?: Record<string, unknown>;
 	timeline: InboundTimelineStep[];

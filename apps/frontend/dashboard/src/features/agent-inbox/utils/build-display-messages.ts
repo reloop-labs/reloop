@@ -14,6 +14,8 @@ export type DisplayMessageThread = {
 	subject: string;
 	receivedAt: string;
 	toEmails?: string[];
+	ccEmails?: string[];
+	bccEmails?: string[];
 	bodyText?: string;
 	bodyHtml?: string;
 	attachments?: unknown[];
@@ -51,10 +53,30 @@ export function buildDisplayMessages({
 				new Date(a.messageAt).getTime() - new Date(b.messageAt).getTime(),
 		);
 		base = sorted.map((msg) => {
+			const email = msg.email
+				? {
+						...msg.email,
+						// List preview can retain Cc/Bcc when a thin get-thread
+						// payload omits them (e.g. older standalone responses).
+						ccEmails:
+							msg.email.ccEmails?.length > 0
+								? msg.email.ccEmails
+								: (thread.ccEmails ?? msg.email.ccEmails ?? []),
+						bccEmails:
+							msg.email.bccEmails?.length > 0
+								? msg.email.bccEmails
+								: (thread.bccEmails ?? msg.email.bccEmails ?? []),
+						toEmails:
+							msg.email.toEmails?.length > 0
+								? msg.email.toEmails
+								: (thread.toEmails ?? msg.email.toEmails ?? []),
+					}
+				: msg.email;
+			const next = { ...msg, email };
 			if (msg.inboundEmailId === thread.id || msg.id === thread.id) {
-				return { ...msg, parsed: thread.parsed || msg.parsed };
+				return { ...next, parsed: thread.parsed || msg.parsed };
 			}
-			return msg;
+			return next;
 		});
 	} else if (thread.threadId && isLoadingThread && !threadDataMatches) {
 		// Full conversation still loading — do not paint the list preview.
@@ -72,6 +94,8 @@ export function buildDisplayMessages({
 					id: thread.id,
 					fromEmail: thread.from.email,
 					toEmails: thread.toEmails || [mailboxEmail],
+					ccEmails: thread.ccEmails ?? [],
+					bccEmails: thread.bccEmails ?? [],
 					subject: thread.subject,
 					textBody: thread.bodyText,
 					htmlBody: thread.bodyHtml,

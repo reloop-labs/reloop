@@ -313,24 +313,28 @@ export const ZeroMailDisplay = ({
 												</DetailsRow>
 												<DetailsRow label="to">
 													<span className="inline-flex items-center gap-1.5 whitespace-nowrap">
-														{toRecipients.map((recipient, i) => (
-															<span
-																key={`details-${recipient.email}-${i}`}
-																className="inline-flex items-center gap-1.5 whitespace-nowrap"
-															>
-																{i > 0 && (
-																	<span className="text-mail-muted">,</span>
-																)}
-																<span>{recipient.email}</span>
-																{recipient.isYou && <YouBadge />}
-															</span>
-														))}
+														{toRecipients.length > 0 ? (
+															toRecipients.map((recipient, i) => (
+																<span
+																	key={`details-${recipient.email}-${i}`}
+																	className="inline-flex items-center gap-1.5 whitespace-nowrap"
+																>
+																	{i > 0 && (
+																		<span className="text-mail-muted">,</span>
+																	)}
+																	<span>{recipient.email}</span>
+																	{recipient.isYou && <YouBadge />}
+																</span>
+															))
+														) : (
+															<span className="text-mail-muted">—</span>
+														)}
 													</span>
 												</DetailsRow>
-												{ccRecipients.length > 0 ? (
-													<DetailsRow label="cc">
-														<span className="inline-flex items-center gap-1.5 whitespace-nowrap">
-															{ccRecipients.map((recipient, i) => (
+												<DetailsRow label="cc">
+													<span className="inline-flex items-center gap-1.5 whitespace-nowrap">
+														{ccRecipients.length > 0 ? (
+															ccRecipients.map((recipient, i) => (
 																<span
 																	key={`details-cc-${recipient.email}-${i}`}
 																	className="inline-flex items-center gap-1.5 whitespace-nowrap"
@@ -341,24 +345,30 @@ export const ZeroMailDisplay = ({
 																	<span>{recipient.email}</span>
 																	{recipient.isYou && <YouBadge />}
 																</span>
-															))}
-														</span>
-													</DetailsRow>
-												) : null}
-												{bccRecipients.length > 0 ? (
+															))
+														) : (
+															<span className="text-mail-muted">—</span>
+														)}
+													</span>
+												</DetailsRow>
+												{isOutbound ? (
 													<DetailsRow label="bcc">
 														<span className="inline-flex items-center gap-1.5 whitespace-nowrap">
-															{bccRecipients.map((recipient, i) => (
-																<span
-																	key={`details-bcc-${recipient.email}-${i}`}
-																	className="inline-flex items-center gap-1.5 whitespace-nowrap"
-																>
-																	{i > 0 && (
-																		<span className="text-mail-muted">,</span>
-																	)}
-																	<span>{recipient.email}</span>
-																</span>
-															))}
+															{bccRecipients.length > 0 ? (
+																bccRecipients.map((recipient, i) => (
+																	<span
+																		key={`details-bcc-${recipient.email}-${i}`}
+																		className="inline-flex items-center gap-1.5 whitespace-nowrap"
+																	>
+																		{i > 0 && (
+																			<span className="text-mail-muted">,</span>
+																		)}
+																		<span>{recipient.email}</span>
+																	</span>
+																))
+															) : (
+																<span className="text-mail-muted">—</span>
+															)}
 														</span>
 													</DetailsRow>
 												) : null}
