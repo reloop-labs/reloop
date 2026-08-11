@@ -3,6 +3,7 @@ import { mailbox, pendingOutboundEmail } from "@reloop/db/schema";
 import { and, eq } from "drizzle-orm";
 import { createError } from "evlog";
 import { useLogger } from "evlog/elysia";
+import { ensureOutboundThreadForEmailLog } from "../../../lib/thread-correlation";
 import { proxySendToMailService } from "../messages.helper";
 
 export async function sendMessageController(
@@ -110,7 +111,7 @@ export async function sendMessageController(
 		};
 	}
 
-	return proxySendToMailService(
+	const result = await proxySendToMailService(
 		{
 			mailboxId: body.mailboxId,
 			organizationId,
@@ -125,4 +126,31 @@ export async function sendMessageController(
 		apiKey,
 		cookie,
 	);
+
+	// Compose creates an email_log without a thr_ — link one so Sent can
+	// star / open a conversation immediately.
+	const emailLogId =
+		result &&
+		typeof result === "object" &&
+		"id" in result &&
+		typeof (result as { id?: unknown }).id === "string"
+			? (result as { id: string }).id
+			: null;
+	if (emailLogId?.startsWith("eml_")) {
+		try {
+			await ensureOutboundThreadForEmailLog({
+				emailLogId,
+				organizationId,
+				mailboxId: body.mailboxId,
+			});
+		} catch (err) {
+			log.warn(
+				`[INBOX] Sent ok but failed to create thread for ${emailLogId}: ${
+					err instanceof Error ? err.message : String(err)
+				}`,
+			);
+		}
+	}
+
+	return result;
 }

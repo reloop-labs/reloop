@@ -2,6 +2,7 @@ import { cron, Patterns } from "@elysiajs/cron";
 import { db } from "@reloop/db/client";
 import { pendingOutboundEmail } from "@reloop/db/schema";
 import { eq, sql } from "drizzle-orm";
+import { ensureOutboundThreadForEmailLog } from "../lib/thread-correlation";
 import { proxySendToMailService } from "../routes/messages/messages.helper";
 
 type PendingPayload = {
@@ -117,6 +118,28 @@ export const pendingOutboundCron = cron({
 						},
 						"",
 					)) as { messageId?: string; id?: string };
+
+					const emailLogId =
+						typeof result.id === "string" ? result.id : null;
+					if (
+						emailLogId?.startsWith("eml_") &&
+						!row.payload.threadId
+					) {
+						try {
+							await ensureOutboundThreadForEmailLog({
+								emailLogId,
+								organizationId: row.organizationId,
+								mailboxId: row.mailboxId,
+							});
+						} catch (threadErr) {
+							console.warn(
+								`[Cron] Sent pending ${row.id} but failed to create thread:`,
+								threadErr instanceof Error
+									? threadErr.message
+									: String(threadErr),
+							);
+						}
+					}
 
 					await db
 						.update(pendingOutboundEmail)

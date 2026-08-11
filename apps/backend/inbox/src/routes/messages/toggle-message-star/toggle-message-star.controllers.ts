@@ -1,8 +1,9 @@
 import { db } from "@reloop/db/client";
-import { emailLog, emailThread, threadMessage } from "@reloop/db/schema";
+import { emailThread } from "@reloop/db/schema";
 import { and, eq } from "drizzle-orm";
 import { createError } from "evlog";
 import { useLogger } from "evlog/elysia";
+import { ensureOutboundThreadForEmailLog } from "../../../lib/thread-correlation";
 import { updateMessageController } from "../update-message/update-message.controllers";
 
 async function starThreadForEmailLog(
@@ -12,38 +13,14 @@ async function starThreadForEmailLog(
 ) {
 	const log = useLogger();
 
-	const owned = await db.query.emailLog.findFirst({
-		where: and(
-			eq(emailLog.id, emailLogId),
-			eq(emailLog.organizationId, organizationId),
-		),
-		columns: { id: true },
+	const { threadId } = await ensureOutboundThreadForEmailLog({
+		emailLogId,
+		organizationId,
 	});
-	if (!owned) {
-		throw createError({
-			status: 404,
-			message: "Message not found",
-			why: `Message ${emailLogId} was not found in your organization`,
-			fix: "Verify the message ID and ensure it belongs to your organization",
-		});
-	}
-
-	const link = await db.query.threadMessage.findFirst({
-		where: eq(threadMessage.emailLogId, emailLogId),
-		columns: { threadId: true },
-	});
-	if (!link?.threadId) {
-		throw createError({
-			status: 400,
-			message: "Can't star this message yet",
-			why: `Outbound message ${emailLogId} is not linked to a conversation thread`,
-			fix: "Star the conversation from Inbox once it has inbound replies, or open the thread view",
-		});
-	}
 
 	const thread = await db.query.emailThread.findFirst({
 		where: and(
-			eq(emailThread.id, link.threadId),
+			eq(emailThread.id, threadId),
 			eq(emailThread.organizationId, organizationId),
 		),
 		columns: { id: true },
@@ -52,7 +29,7 @@ async function starThreadForEmailLog(
 		throw createError({
 			status: 404,
 			message: "Thread not found",
-			why: `Thread ${link.threadId} was not found in your organization`,
+			why: `Thread ${threadId} was not found in your organization`,
 			fix: "Verify the thread ID and ensure it belongs to your organization",
 		});
 	}
@@ -60,12 +37,12 @@ async function starThreadForEmailLog(
 	await db
 		.update(emailThread)
 		.set({ isStarred })
-		.where(eq(emailThread.id, link.threadId));
+		.where(eq(emailThread.id, threadId));
 
 	log.info(
-		`[THREAD] ${isStarred ? "Starred" : "Unstarred"} thread ${link.threadId} via outbound ${emailLogId}`,
+		`[THREAD] ${isStarred ? "Starred" : "Unstarred"} thread ${threadId} via outbound ${emailLogId}`,
 	);
-	return { success: true, id: emailLogId, threadId: link.threadId, isStarred };
+	return { success: true, id: emailLogId, threadId, isStarred };
 }
 
 export async function toggleStarController(
@@ -73,7 +50,7 @@ export async function toggleStarController(
 	organizationId: string,
 	isStarred: boolean,
 ) {
-	// Sent items use email_log ids (eml_…) — star the linked conversation instead.
+	// Sent items use email_log ids (eml_…) — ensure a conversation, then star it.
 	if (id.startsWith("eml_")) {
 		return starThreadForEmailLog(id, organizationId, isStarred);
 	}
@@ -82,13 +59,10 @@ export async function toggleStarController(
 		return await updateMessageController(id, organizationId, { isStarred });
 	} catch (err) {
 		// Fallback: some clients pass an outbound id without the eml_ prefix check.
-		const link = await db.query.threadMessage.findFirst({
-			where: eq(threadMessage.emailLogId, id),
-			columns: { threadId: true },
-		});
-		if (link?.threadId) {
-			return starThreadForEmailLog(id, organizationId, isStarred);
+		try {
+			return await starThreadForEmailLog(id, organizationId, isStarred);
+		} catch {
+			throw err;
 		}
-		throw err;
 	}
 }

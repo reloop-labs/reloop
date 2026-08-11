@@ -1,13 +1,39 @@
 import { db } from "@reloop/db/client";
-import { emailThread, threadMessage } from "@reloop/db/schema";
-import { eq, sql } from "drizzle-orm";
-import { log as evlog } from "evlog";
+import {
+	emailLog,
+	emailThread,
+	mailbox,
+	threadMessage,
+} from "@reloop/db/schema";
+import { and, eq, or, sql } from "drizzle-orm";
+import { createError, log as evlog } from "evlog";
 
 const log = {
 	info: (msg: string) => evlog.info("thread", msg),
 	warn: (msg: string) => evlog.warn("thread", msg),
 	error: (msg: string) => evlog.error("thread", msg),
 };
+
+function bareEmail(value: string): string {
+	const match = value.match(/<([^>]+)>/);
+	return (match?.[1] ?? value).trim().toLowerCase();
+}
+
+function uniqueParticipants(...groups: Array<string[] | null | undefined>) {
+	const seen = new Set<string>();
+	const out: string[] = [];
+	for (const group of groups) {
+		for (const raw of group ?? []) {
+			const addr = String(raw ?? "").trim();
+			if (!addr) continue;
+			const key = bareEmail(addr);
+			if (!key || seen.has(key)) continue;
+			seen.add(key);
+			out.push(addr);
+		}
+	}
+	return out;
+}
 
 /**
  * Finds or creates a thread for an inbound email.
@@ -222,4 +248,107 @@ export async function appendOutboundToThread({
 
 	log.info(`[THREAD] Appended outbound message to thread ${threadId}`);
 	return { success: true };
+}
+
+/**
+ * Ensures a conversation thread exists for an outbound email_log.
+ * Compose-from-inbox historically created logs without a thread; starring,
+ * Sent detail, and reply-all need a thr_ link. Creates one lazily when missing.
+ */
+export async function ensureOutboundThreadForEmailLog({
+	emailLogId,
+	organizationId,
+	mailboxId,
+}: {
+	emailLogId: string;
+	organizationId: string;
+	mailboxId?: string | null;
+}): Promise<{ threadId: string; created: boolean }> {
+	const existing = await db.query.threadMessage.findFirst({
+		where: eq(threadMessage.emailLogId, emailLogId),
+		columns: { threadId: true },
+	});
+	if (existing?.threadId) {
+		return { threadId: existing.threadId, created: false };
+	}
+
+	const logRow = await db.query.emailLog.findFirst({
+		where: and(
+			eq(emailLog.id, emailLogId),
+			eq(emailLog.organizationId, organizationId),
+		),
+	});
+	if (!logRow) {
+		throw createError({
+			status: 404,
+			message: "Message not found",
+			why: `Message ${emailLogId} was not found in your organization`,
+			fix: "Verify the message ID and ensure it belongs to your organization",
+		});
+	}
+
+	let resolvedMailboxId = mailboxId ?? null;
+	if (!resolvedMailboxId) {
+		const fromBare = bareEmail(logRow.fromEmail);
+		const mbx = await db.query.mailbox.findFirst({
+			where: and(
+				eq(mailbox.organizationId, organizationId),
+				or(
+					eq(mailbox.email, logRow.fromEmail),
+					eq(mailbox.email, fromBare),
+					sql`lower(${mailbox.email}) = ${fromBare}`,
+				),
+			),
+			columns: { id: true },
+		});
+		resolvedMailboxId = mbx?.id ?? null;
+	}
+
+	const preview = (logRow.textBody || logRow.subject || "").substring(0, 200);
+	const messageAt = logRow.sentAt ?? logRow.createdAt ?? new Date();
+	const participants = uniqueParticipants(
+		[logRow.fromEmail],
+		logRow.toEmails,
+		logRow.ccEmails,
+	);
+
+	const [newThread] = await db
+		.insert(emailThread)
+		.values({
+			mailboxId: resolvedMailboxId,
+			organizationId,
+			subject: logRow.subject || "(No Subject)",
+			lastMessagePreview: preview,
+			lastMessageAt: messageAt,
+			messageCount: 1,
+			participants,
+			isRead: true,
+		})
+		.returning({ id: emailThread.id });
+
+	if (!newThread) {
+		throw createError({
+			status: 500,
+			message: "Failed to create conversation",
+			why: `Could not create a thread for outbound message ${emailLogId}`,
+			fix: "Retry the request",
+		});
+	}
+
+	await db.insert(threadMessage).values({
+		threadId: newThread.id,
+		direction: "outbound",
+		emailLogId,
+		fromEmail: bareEmail(logRow.fromEmail) || logRow.fromEmail,
+		fromName: logRow.fromName,
+		subject: logRow.subject,
+		preview,
+		messageAt,
+		rfc822MessageId: logRow.messageId || undefined,
+	});
+
+	log.info(
+		`[THREAD] Created outbound thread ${newThread.id} for email_log ${emailLogId}`,
+	);
+	return { threadId: newThread.id, created: true };
 }
