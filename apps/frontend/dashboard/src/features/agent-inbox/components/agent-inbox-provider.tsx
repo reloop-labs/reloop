@@ -1,5 +1,6 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { parseAsString, useQueryState } from "nuqs";
+import { apiFetch } from "#/features/agent-inbox/lib/api-fetch";
 import {
 	createContext,
 	type ReactNode,
@@ -739,7 +740,7 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 	const addMailbox = useCallback(
 		async (input: NewAgentAddressInput) => {
 			const email = `${input.localPart}@${input.domain}`;
-			const res = await fetch("/api/inbox/v1/mailboxes/create", {
+			const res = await apiFetch("/api/inbox/v1/mailboxes/create", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({
@@ -790,7 +791,7 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 				throw new Error("Display name is required");
 			}
 
-			const res = await fetch(`/api/inbox/v1/mailboxes/${id}`, {
+			const res = await apiFetch(`/api/inbox/v1/mailboxes/${id}`, {
 				method: "PATCH",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({ displayName: trimmed }),
@@ -856,9 +857,8 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 
 			let res: Response;
 			try {
-				res = await fetch(endpoint, {
+				res = await apiFetch(endpoint, {
 					method: "PATCH",
-					credentials: "include",
 					headers: { "Content-Type": "application/json" },
 					body: JSON.stringify({ isRead }),
 				});
@@ -884,7 +884,7 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 
 	const deleteMessage = useCallback(
 		async (id: string) => {
-			const res = await fetch(`/api/inbox/v1/messages/${id}`, {
+			const res = await apiFetch(`/api/inbox/v1/messages/${id}`, {
 				method: "DELETE",
 			});
 
@@ -900,7 +900,7 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 
 	const markMessageSpam = useCallback(
 		async (id: string, isSpam: boolean) => {
-			const res = await fetch(`/api/inbox/v1/messages/${id}`, {
+			const res = await apiFetch(`/api/inbox/v1/messages/${id}`, {
 				method: "PATCH",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({ isSpam }),
@@ -918,7 +918,7 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 
 	const toggleMessageStar = useCallback(
 		async (id: string, isStarred: boolean) => {
-			const res = await fetch(`/api/inbox/v1/messages/${id}/star`, {
+			const res = await apiFetch(`/api/inbox/v1/messages/${id}/star`, {
 				method: "PATCH",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({ isStarred }),
@@ -940,7 +940,7 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 
 	const archiveThread = useCallback(
 		async (threadId: string) => {
-			const res = await fetch(`/api/inbox/v1/threads/${threadId}/archive`, {
+			const res = await apiFetch(`/api/inbox/v1/threads/${threadId}/archive`, {
 				method: "POST",
 			});
 
@@ -960,7 +960,7 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 
 	const unarchiveThread = useCallback(
 		async (threadId: string) => {
-			const res = await fetch(`/api/inbox/v1/threads/${threadId}`, {
+			const res = await apiFetch(`/api/inbox/v1/threads/${threadId}`, {
 				method: "PATCH",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({ status: "active" }),
@@ -982,7 +982,7 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 
 	const trashThread = useCallback(
 		async (threadId: string) => {
-			const res = await fetch(`/api/inbox/v1/threads/${threadId}/trash`, {
+			const res = await apiFetch(`/api/inbox/v1/threads/${threadId}/trash`, {
 				method: "POST",
 			});
 
@@ -1002,7 +1002,7 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 
 	const restoreThread = useCallback(
 		async (threadId: string) => {
-			const res = await fetch(`/api/inbox/v1/threads/${threadId}/restore`, {
+			const res = await apiFetch(`/api/inbox/v1/threads/${threadId}/restore`, {
 				method: "POST",
 			});
 
@@ -1022,7 +1022,7 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 
 	const toggleThreadImportant = useCallback(
 		async (threadId: string, isImportant: boolean) => {
-			const res = await fetch(`/api/inbox/v1/threads/${threadId}`, {
+			const res = await apiFetch(`/api/inbox/v1/threads/${threadId}`, {
 				method: "PATCH",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({ isImportant }),
@@ -1040,7 +1040,7 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 
 	const toggleThreadPinned = useCallback(
 		async (threadId: string, isPinned: boolean) => {
-			const res = await fetch(`/api/inbox/v1/threads/${threadId}`, {
+			const res = await apiFetch(`/api/inbox/v1/threads/${threadId}`, {
 				method: "PATCH",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({ isPinned }),
@@ -1058,7 +1058,7 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 
 	const batchThreads = useCallback(
 		async (ids: string[], action: BatchThreadAction) => {
-			const res = await fetch("/api/inbox/v1/threads/batch", {
+			const res = await apiFetch("/api/inbox/v1/threads/batch", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({ ids, action }),
@@ -1094,7 +1094,7 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 				bcc?: string | string[];
 			},
 		) => {
-			const res = await fetch(`/api/inbox/v1/messages/${id}/reply`, {
+			const res = await apiFetch(`/api/inbox/v1/messages/${id}/reply`, {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({ text, html, attachments, ...recipients }),
@@ -1126,7 +1126,7 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 				bcc?: string | string[];
 			},
 		) => {
-			const res = await fetch(`/api/inbox/v1/messages/${id}/reply-all`, {
+			const res = await apiFetch(`/api/inbox/v1/messages/${id}/reply-all`, {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({ text, html, attachments, ...recipients }),
@@ -1158,7 +1158,7 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 				}>;
 			},
 		) => {
-			const res = await fetch(`/api/inbox/v1/messages/${id}/forward`, {
+			const res = await apiFetch(`/api/inbox/v1/messages/${id}/forward`, {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({ to, ...options }),
@@ -1191,7 +1191,7 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 			scheduledAt?: string;
 			undoWindowSeconds?: number;
 		}) => {
-			const res = await fetch("/api/inbox/v1/messages/send", {
+			const res = await apiFetch("/api/inbox/v1/messages/send", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify(input),
@@ -1277,7 +1277,7 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 				attachments: input.attachments,
 			};
 			if (input.id) {
-				const res = await fetch(`/api/inbox/v1/drafts/${input.id}`, {
+				const res = await apiFetch(`/api/inbox/v1/drafts/${input.id}`, {
 					method: "PATCH",
 					headers: { "Content-Type": "application/json" },
 					body: JSON.stringify(body),
@@ -1287,7 +1287,7 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 				void refreshDrafts(input.mailboxId);
 				return data;
 			}
-			const res = await fetch("/api/inbox/v1/drafts", {
+			const res = await apiFetch("/api/inbox/v1/drafts", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify(body),
@@ -1301,14 +1301,14 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 	);
 
 	const getDraft = useCallback(async (id: string) => {
-		const res = await fetch(`/api/inbox/v1/drafts/${id}`);
+		const res = await apiFetch(`/api/inbox/v1/drafts/${id}`);
 		if (!res.ok) return null;
 		return parseComposeDraft(await res.json());
 	}, []);
 
 	const deleteDraft = useCallback(
 		async (id: string) => {
-			const res = await fetch(`/api/inbox/v1/drafts/${id}`, {
+			const res = await apiFetch(`/api/inbox/v1/drafts/${id}`, {
 				method: "DELETE",
 			});
 			if (!res.ok) throw new Error("Failed to delete draft");
@@ -1325,7 +1325,7 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 			const params = new URLSearchParams({ mailboxId });
 			if (filters?.threadId) params.set("threadId", filters.threadId);
 			if (filters?.kind) params.set("kind", filters.kind);
-			const res = await fetch(`/api/inbox/v1/drafts?${params.toString()}`);
+			const res = await apiFetch(`/api/inbox/v1/drafts?${params.toString()}`);
 			if (!res.ok) return [];
 			return parseComposeDraftsList(await res.json());
 		},

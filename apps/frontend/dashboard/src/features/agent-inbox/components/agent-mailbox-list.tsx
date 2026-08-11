@@ -329,9 +329,11 @@ export const AgentMailboxList = () => {
 		const newStatus = mailbox.status === "active" ? "disabled" : "active";
 		try {
 			setTogglingId(mailbox.id);
-			await axios.patch(`/api/inbox/v1/mailboxes/${mailbox.id}`, {
-				status: newStatus,
-			});
+			await axios.patch(
+				`/api/inbox/v1/mailboxes/${mailbox.id}`,
+				{ status: newStatus },
+				{ withCredentials: true },
+			);
 			toast.success(
 				`Inbox address ${newStatus === "active" ? "enabled" : "disabled"} successfully`,
 			);

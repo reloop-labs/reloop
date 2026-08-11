@@ -4,6 +4,7 @@ import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Paperclip } from "lucide-react";
+import { apiFetch } from "#/features/agent-inbox/lib/api-fetch";
 import {
 	type FocusEvent,
 	forwardRef,
@@ -364,7 +365,7 @@ export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
 			setAiPhase("thinking");
 
 			try {
-				const res = await fetch("/api/inbox/v1/ai/reply", {
+				const res = await apiFetch("/api/inbox/v1/ai/reply", {
 					method: "POST",
 					headers: { "Content-Type": "application/json" },
 					signal: abort.signal,

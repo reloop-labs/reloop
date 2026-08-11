@@ -1,20 +1,22 @@
-/**
- * Minimal SWR-shaped wrapper over React Query for the agent-inbox port.
- * Supports `mutate()`, `isLoading`, and key-based fetching used throughout
- * the Next inbox components.
- */
 import {
 	keepPreviousData,
 	useQuery,
 	useQueryClient,
 } from "@tanstack/react-query";
+import { apiFetch } from "#/features/agent-inbox/lib/api-fetch";
+
+/**
+ * Minimal SWR-shaped wrapper over React Query for the agent-inbox port.
+ * Supports `mutate()`, `isLoading`, and key-based fetching used throughout
+ * the Next inbox components.
+ */
 
 type MutatorCallback<T> = (
 	current?: T,
 ) => T | undefined | Promise<T | undefined>;
 
 async function defaultFetcher<T>(url: string): Promise<T> {
-	const res = await fetch(url, { credentials: "include" });
+	const res = await apiFetch(url);
 	if (!res.ok) {
 		throw new Error(`Request failed (${res.status}): ${url}`);
 	}

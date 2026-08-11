@@ -6,6 +6,7 @@ import * as Modal from "@reloop/ui/modal";
 import * as Popover from "@reloop/ui/popover";
 import { toast } from "@reloop/ui/toast";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { apiFetch } from "#/features/agent-inbox/lib/api-fetch";
 import {
 	FileText,
 	Image as ImageIcon,
@@ -455,7 +456,7 @@ export const ComposeModal = ({
 		try {
 			const formData = new FormData();
 			formData.append("file", file);
-			const res = await fetch("/api/upload/v1/upload", {
+			const res = await apiFetch("/api/upload/v1/upload", {
 				method: "POST",
 				body: formData,
 			});
@@ -611,7 +612,7 @@ export const ComposeModal = ({
 					seconds: SCHEDULE_UNDO_SECONDS,
 					onUndo: async () => {
 						try {
-							const cancelRes = await fetch(
+							const cancelRes = await apiFetch(
 								`/api/inbox/v1/messages/pending/${pendingId}/cancel`,
 								{ method: "POST" },
 							);
@@ -669,7 +670,7 @@ export const ComposeModal = ({
 		}
 		setSubjectGenerating(true);
 		try {
-			const res = await fetch("/api/inbox/v1/ai/subject", {
+			const res = await apiFetch("/api/inbox/v1/ai/subject", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({ text }),
@@ -709,7 +710,7 @@ export const ComposeModal = ({
 		try {
 			if (!subject.trim()) await generateSubject(prompt);
 
-			const res = await fetch("/api/inbox/v1/ai/compose", {
+			const res = await apiFetch("/api/inbox/v1/ai/compose", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				signal: abort.signal,

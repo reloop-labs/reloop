@@ -2,6 +2,7 @@ import * as Popover from "@reloop/ui/popover";
 import { FileText, Search } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { LoadingDot } from "../shared/loading-dot";
+import { apiFetch } from "#/features/agent-inbox/lib/api-fetch";
 
 type TemplateListItem = {
 	id: string;
@@ -33,7 +34,7 @@ export const TemplateButton = ({
 	const load = useCallback(async () => {
 		setLoading(true);
 		try {
-			const res = await fetch("/api/template/v1/list?limit=50");
+			const res = await apiFetch("/api/template/v1/list?limit=50");
 			if (!res.ok) throw new Error("Failed to load templates");
 			const data = (await res.json()) as {
 				templates?: TemplateListItem[];
@@ -63,7 +64,7 @@ export const TemplateButton = ({
 	const apply = async (id: string) => {
 		setApplying(id);
 		try {
-			const res = await fetch(`/api/template/v1/${id}/versions`);
+			const res = await apiFetch(`/api/template/v1/${id}/versions`);
 			if (!res.ok) throw new Error("Failed to load template");
 			const data = (await res.json()) as {
 				versions?: Array<{
