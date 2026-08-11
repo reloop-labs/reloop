@@ -1,0 +1,21 @@
+{
+	"extends": "@reloop/tsconfig/base.json",
+	"compilerOptions": {
+		"target": "ESNext",
+		"module": "ESNext",
+		"moduleResolution": "bundler",
+		"verbatimModuleSyntax": true,
+		"strict": true,
+		"skipLibCheck": true,
+		"outDir": "./dist",
+		"types": ["bun"],
+		"composite": false,
+		"declaration": false,
+		"declarationMap": false,
+		"baseUrl": "./src",
+		"paths": {
+			"@be/validation/*": ["./*"]
+		}
+	},
+	"include": ["src", "test"]
+}

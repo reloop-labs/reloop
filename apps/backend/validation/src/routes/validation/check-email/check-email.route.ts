@@ -1,0 +1,46 @@
+import { rateLimitPlugin } from "@be/validation/middleware/rate-limit";
+import { ValidationModel } from "@be/validation/model/validation.model";
+import { Elysia } from "elysia";
+import { log } from "evlog";
+import { evlog, useLogger } from "evlog/elysia";
+import { checkEmailController } from "./check-email.controllers";
+
+// Domain and verdict only — never the local part. The tool page promises
+// addresses are checked and discarded.
+function check(input: string) {
+	const result = checkEmailController(input);
+	useLogger().set({ domain: result.domain, verdict: result.verdict });
+	log.info("check", "Evaluated address");
+	return result;
+}
+
+const detail = {
+	tags: ["Validation"],
+	summary: "Check an email address",
+	description:
+		"Reports whether an email address or bare domain is disposable, a role address, or from a free consumer provider. Public and unauthenticated; rate limited per IP. Nothing is stored.",
+};
+
+export const checkEmailRoute = new Elysia()
+	.use(evlog())
+	.use(rateLimitPlugin)
+	.post("/check", ({ body }) => check(body.email), {
+		body: ValidationModel.checkBody,
+		response: {
+			200: ValidationModel.checkResponse,
+			400: ValidationModel.errorResponse,
+			429: ValidationModel.errorResponse,
+		},
+		rateLimit: true,
+		detail,
+	})
+	.get("/check", ({ query }) => check(query.email), {
+		query: ValidationModel.checkQuery,
+		response: {
+			200: ValidationModel.checkResponse,
+			400: ValidationModel.errorResponse,
+			429: ValidationModel.errorResponse,
+		},
+		rateLimit: true,
+		detail,
+	});
