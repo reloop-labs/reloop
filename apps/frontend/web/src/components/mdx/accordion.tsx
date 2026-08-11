@@ -22,7 +22,7 @@ export function AccordionGroup({
 		<AccordionGroupContext.Provider value={true}>
 			<div
 				className={cn(
-					"my-6 divide-y divide-stroke-soft-200 overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 dark:divide-stroke-soft-100/40 dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a]",
+					"my-5 divide-y divide-stroke-soft-200 overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 dark:divide-stroke-soft-100/40 dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a]",
 					className,
 				)}
 			>
@@ -54,22 +54,26 @@ export function Accordion({
 				onClick={() => setIsOpen((prev) => !prev)}
 				aria-expanded={isOpen}
 				aria-controls={panelId}
-				className="flex w-full items-center gap-3 px-5 py-4 text-left font-medium text-[15px] text-text-strong-950 transition-colors hover:bg-bg-weak-50/60 sm:px-6 dark:text-white dark:hover:bg-white/[0.03]"
+				className={cn(
+					"flex w-full items-center gap-2.5 px-4 py-2.5 text-left font-medium text-[14px] text-text-strong-950 transition-colors hover:bg-bg-weak-50/60 sm:text-[15px] dark:text-white dark:hover:bg-white/[0.03]",
+					isOpen && "pb-1.5",
+				)}
 			>
 				<span
 					className={cn(
-						"mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full border border-stroke-soft-200 text-text-sub-400 transition-transform duration-200 dark:border-white/12 dark:text-white/50",
-						isOpen && "rotate-45 border-stroke-soft-200 text-text-strong-950 dark:text-white",
+						"flex size-4 shrink-0 items-center justify-center rounded-full border border-stroke-soft-200 text-text-sub-400 transition-transform duration-200 dark:border-white/12 dark:text-white/50",
+						isOpen &&
+							"rotate-45 border-stroke-soft-200 text-text-strong-950 dark:text-white",
 					)}
 					aria-hidden
 				>
 					<svg
-						width="10"
-						height="10"
+						width="8"
+						height="8"
 						viewBox="0 0 12 12"
 						fill="none"
 						stroke="currentColor"
-						strokeWidth="1.5"
+						strokeWidth="1.75"
 						strokeLinecap="round"
 					>
 						<path d="M6 1v10M1 6h10" />
@@ -85,7 +89,15 @@ export function Accordion({
 				)}
 			>
 				<div className="overflow-hidden">
-					<div className="px-5 pt-0 pb-5 pl-[52px] text-[14px] text-text-sub-600 leading-relaxed sm:px-6 sm:pl-[56px] sm:text-[15px] dark:text-white/55 [&>p+p]:mt-3 [&>p]:m-0 [&_a]:underline [&_a]:underline-offset-2 [&_code]:rounded-md [&_code]:bg-bg-weak-50 [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:font-mono [&_code]:text-[12px] dark:[&_code]:bg-white/5">
+					<div
+						className={cn(
+							"px-4 pr-4 pb-3 pl-[34px] text-[13px] text-text-sub-600 leading-snug sm:text-[14px] dark:text-white/55",
+							// Collapse MDX paragraph / list spacing so answers sit tight under the title
+							"[&_:first-child]:mt-0! [&>p]:my-0! [&>p+p]:mt-2! [&_ul]:my-2! [&_ol]:my-2! [&_li]:my-0.5!",
+							"[&_a]:underline [&_a]:underline-offset-2",
+							"[&_code]:rounded-md [&_code]:bg-bg-weak-50 [&_code]:px-1 [&_code]:py-0.5 [&_code]:font-mono [&_code]:text-[11px] dark:[&_code]:bg-white/5",
+						)}
+					>
 						{children}
 					</div>
 				</div>
@@ -95,7 +107,7 @@ export function Accordion({
 
 	if (!isInGroup) {
 		return (
-			<div className="my-4 overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a]">
+			<div className="my-3 overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a]">
 				{item}
 			</div>
 		);
