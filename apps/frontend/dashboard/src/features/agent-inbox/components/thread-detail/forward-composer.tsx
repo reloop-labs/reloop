@@ -3,7 +3,14 @@ import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Paperclip } from "lucide-react";
-import { forwardRef, useCallback, useEffect, useRef, useState } from "react";
+import {
+	type FocusEvent,
+	forwardRef,
+	useCallback,
+	useEffect,
+	useRef,
+	useState,
+} from "react";
 import { useDropzone } from "react-dropzone";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -102,6 +109,8 @@ export const ForwardComposer = forwardRef<HTMLDivElement, ForwardComposerProps>(
 		const [textBody, setTextBody] = useState(initialContent);
 		const [attachments, setAttachments] = useState<ComposeAttachment[]>([]);
 		const [showCc, setShowCc] = useState(initialCc.length > 0);
+		const [focusCcOnShow, setFocusCcOnShow] = useState(false);
+		const addressFieldsRef = useRef<HTMLDivElement>(null);
 
 		const { control, handleSubmit, watch } = useForm<{
 			to: string[];
@@ -112,6 +121,21 @@ export const ForwardComposer = forwardRef<HTMLDivElement, ForwardComposerProps>(
 
 		const toValue = watch("to") || [];
 		const ccValue = watch("cc") || [];
+		const ccValueRef = useRef(ccValue);
+		ccValueRef.current = ccValue;
+
+		/** Hide empty Cc once focus leaves the To/Cc block (Gmail-style). */
+		const handleAddressFocusOut = (e: FocusEvent<HTMLDivElement>) => {
+			const container = addressFieldsRef.current;
+			const next = e.relatedTarget as Node | null;
+			if (next && container?.contains(next)) return;
+			window.setTimeout(() => {
+				if (!container) return;
+				if (container.contains(document.activeElement)) return;
+				if (document.activeElement?.closest('[role="listbox"]')) return;
+				if (ccValueRef.current.length === 0) setShowCc(false);
+			}, 0);
+		};
 
 		const hasInvalidTo = toValue.some((email) => !validateEmail(email));
 		const hasInvalidCc = ccValue.some((email) => !validateEmail(email));
@@ -297,6 +321,10 @@ export const ForwardComposer = forwardRef<HTMLDivElement, ForwardComposerProps>(
 							</p>
 						</div>
 
+						<div
+							ref={addressFieldsRef}
+							onBlur={handleAddressFocusOut}
+						>
 						<div className="grid grid-cols-[3rem_minmax(0,1fr)_auto] items-center gap-x-2 border-mail-border/30 border-b py-2">
 							<span className="font-medium text-[12px] text-mail-muted leading-none">
 								To
@@ -318,7 +346,13 @@ export const ForwardComposer = forwardRef<HTMLDivElement, ForwardComposerProps>(
 							<button
 								type="button"
 								tabIndex={-1}
-								onClick={() => setShowCc((v) => !v)}
+								onClick={() =>
+									setShowCc((v) => {
+										const next = !v;
+										setFocusCcOnShow(next);
+										return next;
+									})
+								}
 								className={cn(
 									"rounded-md px-1.5 py-1 font-medium text-[11px] text-mail-muted transition-colors hover:bg-[var(--inbox-hover)] hover:text-mail-foreground",
 									showCc && "bg-[var(--inbox-hover)] text-mail-foreground",
@@ -359,6 +393,7 @@ export const ForwardComposer = forwardRef<HTMLDivElement, ForwardComposerProps>(
 														onChange={field.onChange}
 														placeholder="Add Cc…"
 														disabled={isSending}
+														autoFocus={focusCcOnShow}
 													/>
 												)}
 											/>
@@ -367,10 +402,16 @@ export const ForwardComposer = forwardRef<HTMLDivElement, ForwardComposerProps>(
 								</motion.div>
 							)}
 						</AnimatePresence>
+						</div>
 					</div>
 
 					{/* Note editor */}
-					<div className="relative flex min-h-[140px] flex-col">
+					<div
+						className="relative flex min-h-[140px] flex-col"
+						onFocusCapture={() => {
+							if (ccValueRef.current.length === 0) setShowCc(false);
+						}}
+					>
 						<ComposeBodyEditor
 							ref={editorRef}
 							content={initialHtml}

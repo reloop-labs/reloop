@@ -33,6 +33,8 @@ interface EmailPillsInputProps {
 	disabled?: boolean;
 	/** Optional suggestions (emails or "Name <email>") from loaded threads */
 	suggestions?: string[];
+	/** Focus the text input when this becomes true (e.g. Cc/Bcc row revealed). */
+	autoFocus?: boolean;
 }
 
 type DropdownPos = { top: number; left: number; width: number };
@@ -49,6 +51,7 @@ export const EmailPillsInput = ({
 	placeholder = "Add email address",
 	disabled = false,
 	suggestions = [],
+	autoFocus = false,
 }: EmailPillsInputProps) => {
 	const shouldReduceMotion = useReducedMotion();
 	const listboxId = useId();
@@ -130,6 +133,11 @@ export const EmailPillsInput = ({
 			block: "nearest",
 		});
 	}, [highlight, isListVisible]);
+
+	useEffect(() => {
+		if (!autoFocus || disabled) return;
+		inputRef.current?.focus();
+	}, [autoFocus, disabled]);
 
 	const addEmails = (newEmailsStr: string) => {
 		const initialSplit = newEmailsStr

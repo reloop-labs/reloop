@@ -15,7 +15,14 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { parseAsString, useQueryState } from "nuqs";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+	type FocusEvent,
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from "react";
 import { useDropzone } from "react-dropzone";
 import { Controller, useForm } from "react-hook-form";
 import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
@@ -143,6 +150,33 @@ export const ComposeModal = ({
 
 	const [showCc, setShowCc] = useState(false);
 	const [showBcc, setShowBcc] = useState(false);
+	const [focusCcOnShow, setFocusCcOnShow] = useState(false);
+	const [focusBccOnShow, setFocusBccOnShow] = useState(false);
+	const addressFieldsRef = useRef<HTMLDivElement>(null);
+	const ccRef = useRef(cc);
+	const bccRef = useRef(bcc);
+	ccRef.current = cc;
+	bccRef.current = bcc;
+
+	/** Hide empty Cc/Bcc once focus leaves the To/Cc/Bcc block (Gmail-style). */
+	const handleAddressFocusOut = (e: FocusEvent<HTMLDivElement>) => {
+		const container = addressFieldsRef.current;
+		const next = e.relatedTarget as Node | null;
+		if (next && container?.contains(next)) return;
+		window.setTimeout(() => {
+			if (!container) return;
+			if (container.contains(document.activeElement)) return;
+			if (document.activeElement?.closest('[role="listbox"]')) return;
+			if (isComposeFloatingUi(document.activeElement)) return;
+			if (ccRef.current.length === 0) setShowCc(false);
+			if (bccRef.current.length === 0) setShowBcc(false);
+		}, 0);
+	};
+
+	const collapseEmptyCcBcc = () => {
+		if (ccRef.current.length === 0) setShowCc(false);
+		if (bccRef.current.length === 0) setShowBcc(false);
+	};
 	const [isSending, setIsSending] = useState(false);
 	const [scheduleAt, setScheduleAt] = useState<string | undefined>();
 	const [attachments, setAttachments] = useState<AttachmentItem[]>([]);
@@ -853,6 +887,11 @@ export const ComposeModal = ({
 								</div>
 							</div>
 
+							{/* To / Cc / Bcc — collapse empty Cc/Bcc when leaving this block */}
+							<div
+								ref={addressFieldsRef}
+								onBlur={handleAddressFocusOut}
+							>
 							{/* To */}
 							<div className="grid grid-cols-[3.75rem_minmax(0,1fr)_auto] items-center gap-x-2 border-mail-border/30 border-b py-2">
 								<span className="font-medium text-[12px] text-mail-muted leading-none">
@@ -888,7 +927,13 @@ export const ComposeModal = ({
 									<button
 										type="button"
 										tabIndex={-1}
-										onClick={() => setShowCc((v) => !v)}
+										onClick={() =>
+											setShowCc((v) => {
+												const next = !v;
+												setFocusCcOnShow(next);
+												return next;
+											})
+										}
 										className={cn(
 											"rounded-md px-1.5 py-1 font-medium text-[11px] text-mail-muted hover:bg-[var(--inbox-hover)] hover:text-mail-foreground",
 											showCc && "bg-[var(--inbox-hover)] text-mail-foreground",
@@ -899,7 +944,13 @@ export const ComposeModal = ({
 									<button
 										type="button"
 										tabIndex={-1}
-										onClick={() => setShowBcc((v) => !v)}
+										onClick={() =>
+											setShowBcc((v) => {
+												const next = !v;
+												setFocusBccOnShow(next);
+												return next;
+											})
+										}
 										className={cn(
 											"rounded-md px-1.5 py-1 font-medium text-[11px] text-mail-muted hover:bg-[var(--inbox-hover)] hover:text-mail-foreground",
 											showBcc && "bg-[var(--inbox-hover)] text-mail-foreground",
@@ -949,6 +1000,7 @@ export const ComposeModal = ({
 														placeholder="Add Cc…"
 														disabled={isSending}
 														suggestions={recipientSuggestions}
+														autoFocus={focusCcOnShow}
 													/>
 												)}
 											/>
@@ -996,6 +1048,7 @@ export const ComposeModal = ({
 														placeholder="Add Bcc…"
 														disabled={isSending}
 														suggestions={recipientSuggestions}
+														autoFocus={focusBccOnShow}
 													/>
 												)}
 											/>
@@ -1003,9 +1056,13 @@ export const ComposeModal = ({
 									</motion.div>
 								)}
 							</AnimatePresence>
+							</div>
 
 							{/* Subject */}
-							<div className="grid grid-cols-[3.75rem_minmax(0,1fr)_auto] items-center gap-x-2 py-2">
+							<div
+								className="grid grid-cols-[3.75rem_minmax(0,1fr)_auto] items-center gap-x-2 py-2"
+								onFocusCapture={collapseEmptyCcBcc}
+							>
 								<span className="font-medium text-[12px] text-mail-muted leading-none">
 									Subject
 								</span>
@@ -1036,6 +1093,7 @@ export const ComposeModal = ({
 										textBody.trim().length > 0 &&
 										"ai-body-thinking",
 								)}
+								onFocusCapture={collapseEmptyCcBcc}
 							>
 								<ComposeBodyEditor
 									ref={editorRef}

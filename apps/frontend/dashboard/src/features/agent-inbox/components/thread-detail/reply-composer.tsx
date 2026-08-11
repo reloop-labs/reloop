@@ -4,7 +4,14 @@ import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Paperclip } from "lucide-react";
-import { forwardRef, useCallback, useEffect, useRef, useState } from "react";
+import {
+	type FocusEvent,
+	forwardRef,
+	useCallback,
+	useEffect,
+	useRef,
+	useState,
+} from "react";
 import { useDropzone } from "react-dropzone";
 import { toast } from "sonner";
 import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
@@ -162,6 +169,28 @@ export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
 			mode === "replyAll" && defaultReplyAllCc.length > 0,
 		);
 		const [showBcc, setShowBcc] = useState(false);
+		/** Only autofocus Cc/Bcc when the user opens the row (not reply-all seed). */
+		const [focusCcOnShow, setFocusCcOnShow] = useState(false);
+		const [focusBccOnShow, setFocusBccOnShow] = useState(false);
+		const addressFieldsRef = useRef<HTMLDivElement>(null);
+		const ccEmailsRef = useRef(ccEmails);
+		const bccEmailsRef = useRef(bccEmails);
+		ccEmailsRef.current = ccEmails;
+		bccEmailsRef.current = bccEmails;
+
+		/** Hide empty Cc/Bcc once focus leaves the To/Cc/Bcc block (Gmail-style). */
+		const handleAddressFocusOut = (e: FocusEvent<HTMLDivElement>) => {
+			const container = addressFieldsRef.current;
+			const next = e.relatedTarget as Node | null;
+			if (next && container?.contains(next)) return;
+			window.setTimeout(() => {
+				if (!container) return;
+				if (container.contains(document.activeElement)) return;
+				if (document.activeElement?.closest('[role="listbox"]')) return;
+				if (ccEmailsRef.current.length === 0) setShowCc(false);
+				if (bccEmailsRef.current.length === 0) setShowBcc(false);
+			}, 0);
+		};
 
 		useEffect(() => {
 			setToEmails(defaultTo);
@@ -604,7 +633,11 @@ export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
 							</button>
 						</div>
 
-						<div className="px-4 pb-2">
+						<div
+							ref={addressFieldsRef}
+							className="px-4 pb-2"
+							onBlur={handleAddressFocusOut}
+						>
 							<div className="grid grid-cols-[2.5rem_minmax(0,1fr)_auto] items-center gap-x-2 border-mail-border/30 border-t py-2">
 								<span className="font-medium text-[12px] text-mail-muted leading-none">
 									To
@@ -621,7 +654,13 @@ export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
 									<button
 										type="button"
 										tabIndex={-1}
-										onClick={() => setShowCc((v) => !v)}
+										onClick={() =>
+											setShowCc((v) => {
+												const next = !v;
+												setFocusCcOnShow(next);
+												return next;
+											})
+										}
 										className={cn(
 											"rounded-md px-1.5 py-1 font-medium text-[11px] text-mail-muted transition-colors hover:bg-[var(--inbox-hover)] hover:text-mail-foreground",
 											showCc && "bg-[var(--inbox-hover)] text-mail-foreground",
@@ -632,7 +671,13 @@ export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
 									<button
 										type="button"
 										tabIndex={-1}
-										onClick={() => setShowBcc((v) => !v)}
+										onClick={() =>
+											setShowBcc((v) => {
+												const next = !v;
+												setFocusBccOnShow(next);
+												return next;
+											})
+										}
 										className={cn(
 											"rounded-md px-1.5 py-1 font-medium text-[11px] text-mail-muted transition-colors hover:bg-[var(--inbox-hover)] hover:text-mail-foreground",
 											showBcc &&
@@ -673,6 +718,7 @@ export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
 													onChange={setCcEmails}
 													placeholder="Add Cc…"
 													disabled={isSending}
+													autoFocus={focusCcOnShow}
 												/>
 											</div>
 										</div>
@@ -709,6 +755,7 @@ export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
 													onChange={setBccEmails}
 													placeholder="Add Bcc…"
 													disabled={isSending}
+													autoFocus={focusBccOnShow}
 												/>
 											</div>
 										</div>
@@ -726,6 +773,10 @@ export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
 								textBody.trim().length > 0 &&
 								"ai-body-thinking",
 						)}
+						onFocusCapture={() => {
+							if (ccEmailsRef.current.length === 0) setShowCc(false);
+							if (bccEmailsRef.current.length === 0) setShowBcc(false);
+						}}
 					>
 						<ComposeBodyEditor
 							ref={editorRef}
