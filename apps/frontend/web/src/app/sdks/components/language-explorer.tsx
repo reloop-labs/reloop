@@ -299,7 +299,7 @@ export default function LanguageExplorer() {
 			>
 				{/* Left meta & frameworks: compact tinted rail matching framework details */}
 				<aside className="border-stroke-soft-200 border-b bg-[#fafafa] lg:col-span-3 lg:border-r lg:border-b-0 dark:border-white/10 dark:bg-white/[0.025]">
-					<div className="flex flex-col gap-6 p-6 sm:p-7 lg:sticky lg:top-24 lg:p-7">
+					<div className="flex flex-col gap-6 p-6 sm:p-7 lg:sticky lg:top-16 lg:p-7">
 						<div className="flex items-center gap-3">
 							<div
 								className="inline-flex size-10 items-center justify-center rounded-xl border border-stroke-soft-200 bg-bg-white-0 dark:border-white/10 dark:bg-black"
@@ -317,7 +317,7 @@ export default function LanguageExplorer() {
 							</div>
 						</div>
 
-						<div className="mt-6 flex flex-col">
+						<div className="-ml-2.5 mt-6 flex flex-col">
 							<div className="px-2.5 pb-1.5 font-semibold text-[10px] text-text-soft-400 uppercase tracking-[0.06em] dark:text-white/45">
 								{relatedFrameworks.length > 0 ? "Frameworks" : "SDK"}
 							</div>
