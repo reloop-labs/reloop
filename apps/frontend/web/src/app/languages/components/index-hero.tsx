@@ -14,8 +14,8 @@ export default function IndexHero() {
 					Send email in your language.
 				</h1>
 				<p className="mt-4 max-w-xl text-[15px] text-text-sub-600 leading-relaxed sm:text-[16px] dark:text-white/60">
-					Official clients for Node.js, Python, Go, Rust, PHP, Ruby, Elixir,
-					Java, and .NET. Same API. Idiomatic for each runtime.
+					Framework guides for Next.js, Django, Laravel, and more—plus official
+					SDKs for Node.js, Python, Go, Rust, PHP, Ruby, Elixir, Java, and .NET.
 				</p>
 
 				<div className="mt-8 flex flex-wrap items-center gap-3">
@@ -29,13 +29,13 @@ export default function IndexHero() {
 						Get API Key
 					</a>
 					<Link
-						href="#languages"
+						href="#frameworks"
 						className={`${Button.buttonVariants({
 							variant: "neutral",
 							mode: "stroke",
 						}).root()} inline-flex h-10! rounded-full! px-6! font-medium text-sm!`}
 					>
-						Browse SDKs →
+						Browse frameworks →
 					</Link>
 				</div>
 			</div>

@@ -4,6 +4,7 @@ import {
 	changelogReleases,
 	getChangelogReleasePath,
 } from "../app/changelog/changelog-utils";
+import { FRAMEWORK_SLUGS } from "../app/languages/frameworks";
 import { LANGUAGE_SLUGS } from "../app/languages/languages";
 import {
 	generateStaticParams as generateBlogStaticParams,
@@ -47,6 +48,10 @@ function collectStaticRoutes(dir: string, segments: string[] = []): string[] {
 			} else if (entry === "[slug]" && segmentPath === "languages") {
 				for (const slug of LANGUAGE_SLUGS) {
 					routes.push(`/languages/${slug}`);
+				}
+			} else if (entry === "[slug]" && segmentPath === "frameworks") {
+				for (const slug of FRAMEWORK_SLUGS) {
+					routes.push(`/frameworks/${slug}`);
 				}
 			} else if (entry === "[slug]" && segmentPath === "blog") {
 				for (const { slug } of generateBlogStaticParams()) {

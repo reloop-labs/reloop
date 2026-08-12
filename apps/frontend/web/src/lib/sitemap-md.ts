@@ -1,4 +1,5 @@
 import { changelogReleases } from "@reloop/web/app/changelog/changelog-utils";
+import { frameworks } from "@reloop/web/app/languages/frameworks";
 import { languages } from "@reloop/web/app/languages/languages";
 import {
 	getCategories,
@@ -28,7 +29,7 @@ const STATIC_TITLES: Record<string, string> = {
 	"/docs/resources/sdks": "SDKs",
 	"/features": "Features",
 	"/glossary": "Glossary",
-	"/languages": "Languages",
+	"/languages": "Languages & Frameworks",
 	"/license": "License",
 	"/pricing": "Pricing",
 	"/privacy": "Privacy Policy",
@@ -69,11 +70,14 @@ function buildLookups() {
 	const langs = new Map<string, string>(
 		languages.map((lang) => [lang.slug, lang.name]),
 	);
+	const fws = new Map<string, string>(
+		frameworks.map((fw) => [fw.slug, fw.name]),
+	);
 	const glossary = new Map(
 		glossaryTerms.map((term) => [term.slug, term.title]),
 	);
 
-	return { posts, categories, releases, langs, glossary };
+	return { posts, categories, releases, langs, fws, glossary };
 }
 
 function classifyRoute(
@@ -121,6 +125,16 @@ function classifyRoute(
 			path,
 			title: lookups.langs.get(slug) ?? humanizeSlug(slug),
 			type: "language",
+		};
+	}
+
+	const frameworkMatch = path.match(/^\/frameworks\/([^/]+)$/);
+	if (frameworkMatch?.[1]) {
+		const slug = frameworkMatch[1];
+		return {
+			path,
+			title: lookups.fws.get(slug) ?? humanizeSlug(slug),
+			type: "framework",
 		};
 	}
 
@@ -238,6 +252,7 @@ export function buildPublicDiscoveryMarkdown(
 		`- Blog categories: \`${origin}/blog/category/<slug>\``,
 		`- Changelog: \`${origin}/changelog/<version>\``,
 		`- Languages / SDKs: \`${origin}/languages/<slug>\``,
+		`- Frameworks: \`${origin}/frameworks/<slug>\``,
 		`- Comparisons: \`${origin}/compare/<vendor>\``,
 		`- Alternatives: \`${origin}/alternatives/<vendor>\``,
 		`- Glossary index: \`${origin}/glossary\``,

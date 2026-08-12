@@ -61,7 +61,7 @@ const navItems: NavItem[] = [
 						{ title: "API Reference", href: "/docs/api" },
 						{ title: "Getting Started", href: "/docs" },
 						{ title: "Campaign Builder", href: "/docs/features/templates" },
-						{ title: "Languages", href: "/languages" },
+						{ title: "Languages & Frameworks", href: "/languages" },
 						{ title: "Webhooks", href: "/docs/webhooks" },
 					],
 				},

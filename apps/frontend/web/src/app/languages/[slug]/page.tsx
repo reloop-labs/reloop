@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import LanguageCode from "../components/language-code";
 import LanguageCta from "../components/language-cta";
+import LanguageFrameworks from "../components/language-frameworks";
 import LanguageHero from "../components/language-hero";
 import LanguageMore from "../components/language-more";
 import { getLanguage, isLanguageSlug, LANGUAGE_SLUGS } from "../languages";
@@ -53,6 +54,7 @@ export default async function LanguagePage({ params }: PageProps) {
 		<main className="w-full bg-bg-white-0 dark:bg-black">
 			<LanguageHero language={language} />
 			<LanguageCode language={language} />
+			<LanguageFrameworks language={language} />
 			<LanguageMore current={language} />
 			<LanguageCta language={language} />
 		</main>
