@@ -7,6 +7,7 @@ import { languages } from "../languages";
 import { LanguageIcon } from "./language-icon";
 import { SdkCodeBlock } from "./sdk-code-block";
 import { SectionFrame } from "./section-frame";
+import { SectionTitle } from "./section-title";
 
 export default function LanguageExplorer() {
 	const [activeSlug, setActiveSlug] = useState(languages[0]!.slug);
@@ -16,15 +17,7 @@ export default function LanguageExplorer() {
 
 	return (
 		<SectionFrame id="languages">
-			{/* Header */}
-			<div className="border-stroke-soft-200 border-b px-6 py-10 sm:px-10 sm:py-12 lg:px-12 dark:border-white/10">
-				<h2 className="font-semibold text-text-strong-950 text-xl tracking-tight sm:text-2xl lg:text-[1.65rem] dark:text-white">
-					Pick your runtime.
-				</h2>
-				<p className="mt-1.5 max-w-xl text-[13.5px] text-text-sub-600 sm:text-[14.5px] dark:text-white/60">
-					Switch languages to see install and sample code.
-				</p>
-			</div>
+			<SectionTitle title="Pick your runtime." icon="terminal" />
 
 			{/* Language tabs */}
 			<div className="border-stroke-soft-200 border-b dark:border-white/10">

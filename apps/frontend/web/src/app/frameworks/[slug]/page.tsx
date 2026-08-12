@@ -72,7 +72,7 @@ export default async function FrameworkPage({ params }: PageProps) {
 	}
 
 	return (
-		<main className="w-full bg-bg-white-0 dark:bg-black">
+		<main className="w-full max-w-full overflow-x-clip bg-bg-white-0 dark:bg-black">
 			<FrameworkHero framework={framework} />
 			<FrameworkSteps framework={framework} />
 			<FrameworkMore current={framework} />

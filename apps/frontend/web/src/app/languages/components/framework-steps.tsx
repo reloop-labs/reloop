@@ -82,23 +82,19 @@ function FrameworkResources({
 	];
 
 	return (
-		<div className="border-stroke-soft-200 border-t px-6 py-10 sm:px-10 sm:py-12 lg:px-12 dark:border-white/10">
-			<div className="mb-6 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between sm:gap-4">
-				<div>
-					<p className="font-mono text-[10px] text-text-sub-600 uppercase tracking-[0.12em] dark:text-white/45">
-						Next steps
-					</p>
-					<h2 className="mt-1.5 font-semibold text-[1.05rem] text-text-strong-950 tracking-tight sm:text-[1.2rem] dark:text-white">
-						Examples, docs, and API reference
-					</h2>
-				</div>
-				<p className="max-w-sm text-[13px] text-text-sub-600 sm:text-right dark:text-white/55">
-					Go deeper with working code and the full API for{" "}
-					{framework.languageName}.
-				</p>
+		<div className="border-stroke-soft-200 border-t dark:border-white/10">
+			<div className="flex flex-col items-start gap-2.5 border-stroke-soft-200 border-b px-6 py-10 sm:px-10 sm:py-12 lg:px-12 dark:border-white/10">
+				<Icon
+					name="book-open"
+					className="size-5 shrink-0 text-text-strong-950 dark:text-white"
+					aria-hidden
+				/>
+				<h2 className="font-semibold text-text-strong-950 text-xl tracking-tight sm:text-2xl lg:text-[1.65rem] dark:text-white">
+					Examples, docs, and API reference
+				</h2>
 			</div>
 
-			<div className="grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
+			<div className="grid grid-cols-1 gap-3 p-6 sm:grid-cols-3 sm:gap-4 sm:p-10 lg:p-12">
 				{cards.map((card) => (
 					<a
 						key={card.title}

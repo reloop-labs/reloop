@@ -37,18 +37,19 @@ export default function LanguageResources({
 
 	return (
 		<section className="relative w-full border-stroke-soft-200 border-t bg-bg-white-0 text-text-strong-950 dark:border-white/10 dark:bg-black dark:text-white">
-			<div className="mx-auto w-full max-w-5xl border-stroke-soft-200 border-x px-6 py-14 sm:px-10 sm:py-16 md:max-w-7xl lg:px-12 lg:py-20 dark:border-white/10">
-				<div className="mx-auto max-w-2xl text-center">
+			<div className="mx-auto w-full max-w-5xl border-stroke-soft-200 border-x md:max-w-7xl dark:border-white/10">
+				<div className="flex flex-col items-start gap-2.5 border-stroke-soft-200 border-b px-6 py-10 sm:px-10 sm:py-12 lg:px-12 dark:border-white/10">
+					<Icon
+						name="book-open"
+						className="size-5 shrink-0 text-text-strong-950 dark:text-white"
+						aria-hidden
+					/>
 					<h2 className="font-semibold text-text-strong-950 text-xl tracking-tight sm:text-2xl lg:text-[1.65rem] dark:text-white">
 						All you need to get started
 					</h2>
-					<p className="mt-2 text-[13.5px] text-text-sub-600 sm:text-[14.5px] dark:text-white/60">
-						Resources to get the full potential out of the Reloop {language.name}{" "}
-						SDK.
-					</p>
 				</div>
 
-				<div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-3 sm:gap-4.5">
+				<div className="grid grid-cols-1 gap-4 p-6 sm:grid-cols-3 sm:gap-4.5 sm:p-10 lg:p-12">
 					{cards.map((card) => {
 						const isHash = card.href.startsWith("#");
 						const className =

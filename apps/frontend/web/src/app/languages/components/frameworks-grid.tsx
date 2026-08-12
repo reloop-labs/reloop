@@ -2,22 +2,12 @@ import Link from "next/link";
 import { frameworks } from "../frameworks";
 import { LanguageIcon } from "./language-icon";
 import { AlignedIconBand, SectionFrame } from "./section-frame";
+import { SectionTitle } from "./section-title";
 
 export default function FrameworksGrid() {
 	return (
 		<SectionFrame id="frameworks">
-			<div className="border-stroke-soft-200 border-b px-6 py-10 sm:px-10 sm:py-12 lg:px-12 dark:border-white/10">
-				<p className="font-mono text-[11px] text-text-sub-600 uppercase tracking-[0.14em] dark:text-white/45">
-					Framework integrations
-				</p>
-				<h2 className="mt-2 font-semibold text-text-strong-950 text-xl tracking-tight sm:text-2xl lg:text-[1.65rem] dark:text-white">
-					Send email from your stack.
-				</h2>
-				<p className="mt-1.5 max-w-xl text-[13.5px] text-text-sub-600 sm:text-[14.5px] dark:text-white/60">
-					Copy-paste guides for Next.js, Django, Laravel, Rails, Spring Boot,
-					and more—built on the official SDKs.
-				</p>
-			</div>
+			<SectionTitle title="Send email from your stack." icon="code" />
 
 			{/* Hatched side gutters align icon columns with the title padding above */}
 			<AlignedIconBand>

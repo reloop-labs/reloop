@@ -91,7 +91,7 @@ export default function LanguagesIndexPage() {
 	return (
 		<>
 			<JsonLd data={pageSchema} />
-			<main className="w-full bg-bg-white-0 dark:bg-black">
+			<main className="w-full max-w-full overflow-x-clip bg-bg-white-0 dark:bg-black">
 				<IndexHero />
 				{/* Frameworks first — how most people search */}
 				<FrameworksGrid />

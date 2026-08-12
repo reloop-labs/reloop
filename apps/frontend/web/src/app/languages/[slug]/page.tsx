@@ -52,7 +52,7 @@ export default async function LanguagePage({ params }: PageProps) {
 	}
 
 	return (
-		<main className="w-full bg-bg-white-0 dark:bg-black">
+		<main className="w-full max-w-full overflow-x-clip bg-bg-white-0 dark:bg-black">
 			<LanguageHero language={language} />
 			<LanguageCode language={language} />
 			<LanguageFrameworks language={language} />

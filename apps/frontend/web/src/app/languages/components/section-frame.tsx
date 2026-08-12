@@ -3,8 +3,8 @@ import type { ReactNode } from "react";
 
 /**
  * Languages/SDKs section chrome:
- * - Full-bleed horizontal rule(s) that run into the side gutters
- * - Centered content column with left/right vertical borders
+ * - Top rule on the section (w-full, never w-screen — avoids horizontal scroll)
+ * - Content constrained to max-w-5xl / md:max-w-7xl with left/right borders
  */
 export function SectionFrame({
 	id,
@@ -15,26 +15,19 @@ export function SectionFrame({
 	id?: string;
 	children: ReactNode;
 	className?: string;
-	/** Draw a full-viewport top hairline into the side gutters */
+	/** Top hairline across the section width */
 	showTopRule?: boolean;
 }) {
 	return (
 		<section
 			id={id}
 			className={cn(
-				"relative w-full bg-bg-white-0 text-text-strong-950 dark:bg-black dark:text-white",
+				"relative w-full max-w-full overflow-x-clip bg-bg-white-0 text-text-strong-950 dark:bg-black dark:text-white",
+				showTopRule && "border-stroke-soft-200 border-t dark:border-white/10",
 				className,
 			)}
 		>
-			{/* Full-bleed bg line — spans viewport, including side spacing/gutters */}
-			{showTopRule ? (
-				<div
-					aria-hidden
-					className="-translate-x-1/2 pointer-events-none absolute top-0 left-1/2 z-10 h-px w-screen bg-stroke-soft-200 dark:bg-white/10"
-				/>
-			) : null}
-
-			{/* Content column: vertical rules only */}
+			{/* Content column — max width + vertical rails */}
 			<div className="relative mx-auto w-full max-w-5xl border-stroke-soft-200 border-x md:max-w-7xl dark:border-white/10">
 				{children}
 			</div>
@@ -83,9 +76,9 @@ export function AlignedIconBand({
 	className?: string;
 }) {
 	return (
-		<div className={cn("flex min-h-0", className)}>
+		<div className={cn("flex min-h-0 min-w-0", className)}>
 			<HatchGutter side="left" />
-			<div className="min-w-0 flex-1">{children}</div>
+			<div className="min-w-0 flex-1 overflow-hidden">{children}</div>
 			<HatchGutter side="right" />
 		</div>
 	);
