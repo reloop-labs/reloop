@@ -10,8 +10,52 @@ import { LanguageIcon } from "./language-icon";
 import { SdkCodeBlock } from "./sdk-code-block";
 import { SectionFrame } from "./section-frame";
 
+const nodeInstallCommands = {
+	npm: "npm install reloop-email",
+	pnpm: "pnpm add reloop-email",
+	yarn: "yarn add reloop-email",
+	bun: "bun add reloop-email",
+} as const;
+
+type PackageManager = keyof typeof nodeInstallCommands;
+
+function StepItem({
+	number,
+	title,
+	isLast = false,
+	children,
+}: {
+	number: number;
+	title: string;
+	isLast?: boolean;
+	children: React.ReactNode;
+}) {
+	return (
+		<div className="flex gap-3.5">
+			<div className="flex flex-col items-center">
+				<div className="flex size-6 shrink-0 items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-weak-50 font-mono font-semibold text-[11px] text-text-sub-600 dark:border-white/10 dark:bg-white/[0.06] dark:text-white/75">
+					{number}
+				</div>
+				{!isLast && (
+					<div className="my-1.5 w-px flex-1 bg-stroke-soft-200 dark:bg-white/10" />
+				)}
+			</div>
+
+			<div
+				className={`flex min-w-0 flex-1 flex-col gap-2.5 ${isLast ? "" : "pb-6"}`}
+			>
+				<h4 className="mt-0.5 font-medium text-[13.5px] text-text-strong-950 dark:text-white">
+					{title}
+				</h4>
+				<div className="w-full min-w-0">{children}</div>
+			</div>
+		</div>
+	);
+}
+
 export default function LanguageExplorer() {
 	const [activeSlug, setActiveSlug] = useState(languages[0]!.slug);
+	const [pkgManager, setPkgManager] = useState<PackageManager>("npm");
 	const [hoveredTabIdx, setHoveredTabIdx] = useState<number | undefined>(
 		undefined,
 	);
@@ -39,6 +83,11 @@ export default function LanguageExplorer() {
 
 	const active = languages.find((l) => l.slug === activeSlug) ?? languages[0]!;
 	const brandColor = `#${active.icon.hex}`;
+
+	const installCode =
+		active.slug === "nodejs"
+			? nodeInstallCommands[pkgManager]
+			: active.installCommand;
 
 	useEffect(() => {
 		if (!mounted) {
@@ -153,14 +202,14 @@ export default function LanguageExplorer() {
 				</div>
 			</div>
 
-			{/* Content: left meta + right code */}
+			{/* Content: left meta + right code steps */}
 			<div
 				id="lang-panel"
 				role="tabpanel"
 				aria-labelledby={`lang-tab-${active.slug}`}
 				className="grid grid-cols-1 lg:grid-cols-12"
 			>
-				{/* Left */}
+				{/* Left meta & guide link */}
 				<div className="flex flex-col justify-between gap-8 border-stroke-soft-200 p-6 sm:p-8 lg:col-span-4 lg:border-r lg:p-10 dark:border-white/10">
 					<div>
 						<div className="flex items-center gap-3">
@@ -185,51 +234,70 @@ export default function LanguageExplorer() {
 						</p>
 					</div>
 
-					<div className="flex flex-col gap-4">
-						<div>
-							<p className="mb-2 font-mono text-[10px] text-text-sub-600 uppercase tracking-[0.12em] dark:text-white/45">
-								Install
-							</p>
-							<SdkCodeBlock
-								key={`install-${active.slug}`}
-								code={active.installCommand}
-								lang="bash"
-							/>
-						</div>
-
-						<div className="flex flex-wrap gap-2">
-							<a
-								href="/dashboard/signup"
-								className={`${Button.buttonVariants({
-									variant: "neutral",
-									mode: "filled",
-								}).root()} inline-flex h-9! rounded-full! px-4! font-medium text-xs! dark:bg-white dark:text-black dark:hover:bg-white/90`}
-							>
-								Get API Key
-							</a>
-							<Link
-								href={`/sdks/${active.slug}`}
-								className={`${Button.buttonVariants({
-									variant: "neutral",
-									mode: "stroke",
-								}).root()} inline-flex h-9! rounded-full! px-4! font-medium text-xs!`}
-							>
-								{active.name} guide →
-							</Link>
-						</div>
+					<div className="flex flex-wrap gap-2">
+						<a
+							href="/dashboard/signup"
+							className={`${Button.buttonVariants({
+								variant: "neutral",
+								mode: "filled",
+							}).root()} inline-flex h-9! rounded-full! px-4! font-medium text-xs! dark:bg-white dark:text-black dark:hover:bg-white/90`}
+						>
+							Get API Key
+						</a>
+						<Link
+							href={`/sdks/${active.slug}`}
+							className={`${Button.buttonVariants({
+								variant: "neutral",
+								mode: "stroke",
+							}).root()} inline-flex h-9! rounded-full! px-4! font-medium text-xs!`}
+						>
+							{active.name} guide →
+						</Link>
 					</div>
 				</div>
 
-				{/* Right: Reloop code UI */}
-				<div className="border-stroke-soft-200 border-t p-6 sm:p-8 lg:col-span-8 lg:border-t-0 lg:p-8 dark:border-white/10">
-					<p className="mb-3 font-mono text-[10px] text-text-sub-600 uppercase tracking-[0.12em] dark:text-white/45">
-						Sample
-					</p>
-					<SdkCodeBlock
-						key={`code-${active.slug}`}
-						code={active.sendCode}
-						slug={active.slug}
-					/>
+				{/* Right: Step-by-step playground */}
+				<div className="border-stroke-soft-200 border-t p-6 sm:p-8 lg:col-span-8 lg:border-t-0 lg:p-10 dark:border-white/10">
+					<div className="flex flex-col">
+						{/* Step 1: Install */}
+						<StepItem number={1} title="Install the Reloop SDK">
+							<div className="space-y-2.5">
+								{active.slug === "nodejs" && (
+									<div className="flex items-center gap-1">
+										{(["npm", "pnpm", "yarn", "bun"] as const).map((pm) => (
+											<button
+												key={pm}
+												type="button"
+												onClick={() => setPkgManager(pm)}
+												className={cn(
+													"rounded-md border px-2.5 py-1 font-mono text-[11px] transition-colors",
+													pkgManager === pm
+														? "border-stroke-soft-300 bg-bg-white-0 font-medium text-text-strong-950 shadow-xs dark:border-white/20 dark:bg-white/10 dark:text-white"
+														: "border-transparent text-text-sub-600 hover:text-text-strong-950 dark:text-white/50 dark:hover:text-white",
+												)}
+											>
+												{pm}
+											</button>
+										))}
+									</div>
+								)}
+								<SdkCodeBlock
+									key={`install-${active.slug}-${pkgManager}`}
+									code={installCode}
+									lang="bash"
+								/>
+							</div>
+						</StepItem>
+
+						{/* Step 2: Send request */}
+						<StepItem number={2} title="Send your first request" isLast>
+							<SdkCodeBlock
+								key={`code-${active.slug}`}
+								code={active.sendCode}
+								slug={active.slug}
+							/>
+						</StepItem>
+					</div>
 				</div>
 			</div>
 		</SectionFrame>
