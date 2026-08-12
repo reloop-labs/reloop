@@ -54,7 +54,7 @@ export default function LanguageResources({
 					{cards.map((card) => {
 						const isHash = card.href.startsWith("#");
 						const className =
-							"group relative flex flex-col overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-6 transition-all duration-200 hover:border-stroke-soft-300 hover:bg-bg-weak-50 dark:border-white/10 dark:bg-black dark:hover:border-white/20 dark:hover:bg-white/[0.04]";
+							"group relative flex flex-col overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-6 transition-colors duration-200 hover:bg-bg-weak-50 dark:border-white/10 dark:bg-black dark:hover:bg-gray-800";
 
 						const content = (
 							<>

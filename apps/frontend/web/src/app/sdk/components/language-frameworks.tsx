@@ -33,7 +33,7 @@ export default function LanguageFrameworks({
 							<Link
 								key={fw.slug}
 								href={`/frameworks/${fw.slug}`}
-								className="group flex flex-col gap-3 bg-bg-white-0 p-6 transition-colors duration-150 hover:bg-bg-weak-50 sm:p-8 dark:bg-black dark:hover:bg-white/[0.04]"
+								className="group flex flex-col gap-3 bg-white p-6 transition-colors duration-200 hover:bg-[#f7f7f7] sm:p-8 dark:bg-black dark:hover:!bg-gray-900/50"
 							>
 								<div className="flex items-start justify-between gap-3">
 									<div
