@@ -2,6 +2,7 @@ import { Icon } from "@reloop/ui/icon";
 import Link from "next/link";
 import { frameworks, type FrameworkDefinition } from "../frameworks";
 import { LanguageIcon } from "./language-icon";
+import { AlignedIconBand } from "./section-frame";
 
 export default function FrameworkMore({
 	current,
@@ -31,26 +32,28 @@ export default function FrameworkMore({
 					</Link>
 				</div>
 
-				{/* Two rows — name only, no language */}
-				<div className="grid grid-cols-3 gap-px bg-stroke-soft-200 sm:grid-cols-5 lg:grid-cols-6 dark:bg-white/10">
-					{others.map((fw) => (
-						<Link
-							key={fw.slug}
-							href={`/frameworks/${fw.slug}`}
-							className="group flex flex-col items-start gap-3 bg-bg-white-0 p-5 transition-colors hover:bg-bg-weak-50 sm:p-6 dark:bg-black dark:hover:bg-white/[0.03]"
-						>
-							<span
-								className="inline-flex size-8 items-center justify-center rounded-lg border border-stroke-soft-200 dark:border-white/10"
-								style={{ color: `#${fw.icon.hex}` }}
+				{/* Hatched side gutters align icons with title padding */}
+				<AlignedIconBand>
+					<div className="grid grid-cols-3 gap-px bg-stroke-soft-200 sm:grid-cols-5 lg:grid-cols-6 dark:bg-white/10">
+						{others.map((fw) => (
+							<Link
+								key={fw.slug}
+								href={`/frameworks/${fw.slug}`}
+								className="group flex flex-col items-start gap-3 bg-bg-white-0 p-5 transition-colors hover:bg-bg-weak-50 sm:p-6 dark:bg-black dark:hover:bg-white/[0.03]"
 							>
-								<LanguageIcon icon={fw.icon} className="size-4" />
-							</span>
-							<span className="font-medium text-[13px] text-text-strong-950 dark:text-white">
-								{fw.name}
-							</span>
-						</Link>
-					))}
-				</div>
+								<span
+									className="inline-flex size-8 items-center justify-center rounded-lg border border-stroke-soft-200 dark:border-white/10"
+									style={{ color: `#${fw.icon.hex}` }}
+								>
+									<LanguageIcon icon={fw.icon} className="size-4" />
+								</span>
+								<span className="font-medium text-[13px] text-text-strong-950 dark:text-white">
+									{fw.name}
+								</span>
+							</Link>
+						))}
+					</div>
+				</AlignedIconBand>
 			</div>
 		</section>
 	);

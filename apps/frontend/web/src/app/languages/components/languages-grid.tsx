@@ -1,27 +1,25 @@
 import Link from "next/link";
 import { languages } from "../languages";
 import { LanguageIcon } from "./language-icon";
+import { AlignedIconBand, SectionFrame } from "./section-frame";
 
 export default function LanguagesGrid() {
 	return (
-		<section
-			id="sdk-guides"
-			className="relative w-full border-stroke-soft-200 border-t bg-bg-white-0 text-text-strong-950 dark:border-white/10 dark:bg-black dark:text-white"
-		>
-			<div className="mx-auto w-full max-w-5xl border-stroke-soft-200 border-x md:max-w-7xl dark:border-white/10">
-				<div className="border-stroke-soft-200 border-b px-6 py-10 sm:px-10 sm:py-12 lg:px-12 dark:border-white/10">
-					<p className="font-mono text-[11px] text-text-sub-600 uppercase tracking-[0.14em] dark:text-white/45">
-						Official clients
-					</p>
-					<h2 className="mt-2 font-semibold text-text-strong-950 text-xl tracking-tight sm:text-2xl lg:text-[1.65rem] dark:text-white">
-						SDK guides
-					</h2>
-					<p className="mt-1.5 max-w-xl text-[13.5px] text-text-sub-600 sm:text-[14.5px] dark:text-white/60">
-						Install an official client and start sending in a few lines of code.
-					</p>
-				</div>
+		<SectionFrame id="sdk-guides">
+			<div className="border-stroke-soft-200 border-b px-6 py-10 sm:px-10 sm:py-12 lg:px-12 dark:border-white/10">
+				<p className="font-mono text-[11px] text-text-sub-600 uppercase tracking-[0.14em] dark:text-white/45">
+					Official clients
+				</p>
+				<h2 className="mt-2 font-semibold text-text-strong-950 text-xl tracking-tight sm:text-2xl lg:text-[1.65rem] dark:text-white">
+					SDK guides
+				</h2>
+				<p className="mt-1.5 max-w-xl text-[13.5px] text-text-sub-600 sm:text-[14.5px] dark:text-white/60">
+					Install an official client and start sending in a few lines of code.
+				</p>
+			</div>
 
-				{/* Compact chips — icon + name + install only */}
+			{/* Hatched side gutters align icon columns with the title padding above */}
+			<AlignedIconBand>
 				<div className="grid grid-cols-2 gap-px bg-stroke-soft-200 sm:grid-cols-3 lg:grid-cols-5 dark:bg-white/10">
 					{languages.map((lang) => (
 						<Link
@@ -44,7 +42,7 @@ export default function LanguagesGrid() {
 						</Link>
 					))}
 				</div>
-			</div>
-		</section>
+			</AlignedIconBand>
+		</SectionFrame>
 	);
 }

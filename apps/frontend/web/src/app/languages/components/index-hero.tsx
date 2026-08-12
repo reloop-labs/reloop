@@ -1,12 +1,13 @@
 import * as Button from "@reloop/ui/button";
 import Link from "next/link";
+import { SectionFrame } from "./section-frame";
 
 export default function IndexHero() {
 	return (
-		<section className="relative w-full border-stroke-soft-200 bg-bg-white-0 text-text-strong-950 dark:border-white/10 dark:bg-black dark:text-white">
+		<SectionFrame showTopRule={false}>
 			<div className="pointer-events-none absolute inset-x-0 top-0 h-48 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-500/[0.04] via-sky-400/[0.02] to-transparent dark:from-blue-500/[0.08] dark:via-transparent" />
 
-			<div className="relative mx-auto w-full max-w-5xl border-stroke-soft-200 border-x px-6 pt-28 pb-12 text-left sm:px-10 sm:pt-32 sm:pb-14 md:max-w-7xl lg:px-12 dark:border-white/10">
+			<div className="relative px-6 pt-28 pb-12 text-left sm:px-10 sm:pt-32 sm:pb-14 lg:px-12">
 				<p className="font-mono text-[11px] text-text-sub-600 uppercase tracking-[0.14em] dark:text-white/45">
 					Official SDKs
 				</p>
@@ -39,6 +40,6 @@ export default function IndexHero() {
 					</Link>
 				</div>
 			</div>
-		</section>
+		</SectionFrame>
 	);
 }
