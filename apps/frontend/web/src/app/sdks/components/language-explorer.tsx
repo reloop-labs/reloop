@@ -26,6 +26,33 @@ const nodeInstallCommands = {
 
 type PackageManager = keyof typeof nodeInstallCommands;
 
+type PillBox = {
+	width: number;
+	height: number;
+	left: number;
+	top: number;
+};
+
+const PILL_EASE = [0.23, 1, 0.32, 1] as const;
+
+function hexToRgba(hex: string, alpha: number) {
+	const value = hex.replace("#", "");
+	const r = Number.parseInt(value.slice(0, 2), 16);
+	const g = Number.parseInt(value.slice(2, 4), 16);
+	const b = Number.parseInt(value.slice(4, 6), 16);
+	return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+function measureTab(button: HTMLButtonElement | null): PillBox | null {
+	if (!button) return null;
+	return {
+		width: button.offsetWidth,
+		height: button.offsetHeight,
+		left: button.offsetLeft,
+		top: button.offsetTop,
+	};
+}
+
 const NODE_PKG_TABS: CopyCodeBlockTab[] = [
 	{ id: "npm", label: "npm", si: siNpm },
 	{ id: "pnpm", label: "pnpm", si: siPnpm },
@@ -74,12 +101,8 @@ export default function LanguageExplorer() {
 		undefined,
 	);
 	const [mounted, setMounted] = useState(false);
-	const [pillPosition, setPillPosition] = useState<{
-		width: number;
-		height: number;
-		left: number;
-		top: number;
-	} | null>(null);
+	const [activePill, setActivePill] = useState<PillBox | null>(null);
+	const [hoverPill, setHoverPill] = useState<PillBox | null>(null);
 	const tabButtonRefs = useRef<(HTMLButtonElement | null)[]>([]);
 	const containerRef = useRef<HTMLDivElement>(null);
 
@@ -88,11 +111,11 @@ export default function LanguageExplorer() {
 	}, []);
 
 	const activeTabIndex = languages.findIndex((l) => l.slug === activeSlug);
-	const highlightedTabIndex =
-		hoveredTabIdx !== undefined ? hoveredTabIdx : activeTabIndex;
-	const highlightedBrandColor =
-		highlightedTabIndex >= 0
-			? `#${languages[highlightedTabIndex]!.icon.hex}`
+	const isHoveringOther =
+		hoveredTabIdx !== undefined && hoveredTabIdx !== activeTabIndex;
+	const hoverBrandColor =
+		isHoveringOther && hoveredTabIdx !== undefined
+			? `#${languages[hoveredTabIdx]!.icon.hex}`
 			: undefined;
 
 	const active = languages.find((l) => l.slug === activeSlug) ?? languages[0]!;
@@ -150,23 +173,18 @@ export default function LanguageExplorer() {
 
 	useEffect(() => {
 		if (!mounted) {
-			setPillPosition(null);
+			setActivePill(null);
+			setHoverPill(null);
 			return;
 		}
 
 		const updatePosition = () => {
-			const button = tabButtonRefs.current[highlightedTabIndex];
-			if (!button) {
-				setPillPosition(null);
-				return;
-			}
-
-			setPillPosition({
-				width: button.offsetWidth,
-				height: button.offsetHeight,
-				left: button.offsetLeft,
-				top: button.offsetTop,
-			});
+			setActivePill(measureTab(tabButtonRefs.current[activeTabIndex] ?? null));
+			setHoverPill(
+				isHoveringOther && hoveredTabIdx !== undefined
+					? measureTab(tabButtonRefs.current[hoveredTabIdx] ?? null)
+					: null,
+			);
 		};
 
 		const handle = requestAnimationFrame(updatePosition);
@@ -183,7 +201,7 @@ export default function LanguageExplorer() {
 			observer?.disconnect();
 			window.removeEventListener("resize", updatePosition);
 		};
-	}, [highlightedTabIndex, mounted, activeSlug]);
+	}, [activeTabIndex, hoveredTabIdx, isHoveringOther, mounted, activeSlug]);
 
 	return (
 		<SectionFrame id="languages">
@@ -200,12 +218,7 @@ export default function LanguageExplorer() {
 					{languages.map((lang, index) => {
 						const isActive = lang.slug === activeSlug;
 						const langBrandColor = `#${lang.icon.hex}`;
-						const isHighlighted = index === highlightedTabIndex;
-
-						let textColorStyle: React.CSSProperties | undefined;
-						if (isHighlighted && pillPosition) {
-							textColorStyle = { color: "#ffffff" };
-						}
+						const showActiveLabel = isActive && Boolean(activePill || !mounted);
 
 						return (
 							<button
@@ -221,22 +234,18 @@ export default function LanguageExplorer() {
 								onClick={() => setActiveSlug(lang.slug)}
 								onPointerEnter={() => setHoveredTabIdx(index)}
 								className={cn(
-									"relative z-10 inline-flex shrink-0 items-center gap-2 rounded-full px-3.5 py-2 font-medium text-xs transition-colors duration-150",
+									"relative z-10 inline-flex shrink-0 items-center gap-2 rounded-full px-3.5 py-2 font-medium text-xs transition-colors duration-150 ease-[cubic-bezier(0.23,1,0.32,1)]",
 									!mounted && isActive
 										? "bg-text-strong-950 text-white dark:bg-white dark:text-black"
-										: isHighlighted && pillPosition
+										: showActiveLabel
 											? "text-white"
 											: "text-text-sub-600 dark:text-white/60",
 								)}
-								style={textColorStyle}
 							>
 								<span
-									className="inline-flex items-center transition-colors duration-150"
+									className="inline-flex items-center"
 									style={{
-										color:
-											isHighlighted && pillPosition
-												? "#ffffff"
-												: langBrandColor,
+										color: showActiveLabel ? "#ffffff" : langBrandColor,
 									}}
 								>
 									<LanguageIcon icon={lang.icon} className="size-3.5" />
@@ -247,14 +256,29 @@ export default function LanguageExplorer() {
 					})}
 
 					<AnimatePresence>
-						{pillPosition && highlightedTabIndex !== -1 ? (
+						{hoverPill && hoverBrandColor ? (
 							<motion.div
+								key="hover-pill"
 								className="pointer-events-none absolute top-0 left-0 rounded-full"
-								style={{ backgroundColor: highlightedBrandColor || undefined }}
-								initial={{ ...pillPosition, opacity: 0 }}
-								animate={{ ...pillPosition, opacity: 1 }}
-								exit={{ ...pillPosition, opacity: 0 }}
-								transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
+								style={{ backgroundColor: hexToRgba(hoverBrandColor, 0.14) }}
+								initial={{ ...hoverPill, opacity: 0 }}
+								animate={{ ...hoverPill, opacity: 1 }}
+								exit={{ ...hoverPill, opacity: 0 }}
+								transition={{ duration: 0.16, ease: PILL_EASE }}
+							/>
+						) : null}
+					</AnimatePresence>
+
+					<AnimatePresence>
+						{activePill ? (
+							<motion.div
+								key="active-pill"
+								className="pointer-events-none absolute top-0 left-0 rounded-full"
+								style={{ backgroundColor: brandColor }}
+								initial={{ ...activePill, opacity: 0 }}
+								animate={{ ...activePill, opacity: 1 }}
+								exit={{ ...activePill, opacity: 0 }}
+								transition={{ duration: 0.2, ease: PILL_EASE }}
 							/>
 						) : null}
 					</AnimatePresence>
