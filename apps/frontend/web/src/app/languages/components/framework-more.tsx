@@ -8,7 +8,7 @@ export default function FrameworkMore({
 }: {
 	current: FrameworkDefinition;
 }) {
-	const others = frameworks.filter((f) => f.slug !== current.slug).slice(0, 8);
+	const others = frameworks.filter((f) => f.slug !== current.slug);
 
 	return (
 		<section className="relative w-full border-stroke-soft-200 border-t bg-bg-white-0 text-text-strong-950 dark:border-white/10 dark:bg-black dark:text-white">
@@ -31,19 +31,13 @@ export default function FrameworkMore({
 					</Link>
 				</div>
 
-				<div className="flex gap-0 overflow-x-auto">
-					{others.map((fw, i) => (
+				{/* Two rows — name only, no language */}
+				<div className="grid grid-cols-3 gap-px bg-stroke-soft-200 sm:grid-cols-5 lg:grid-cols-6 dark:bg-white/10">
+					{others.map((fw) => (
 						<Link
 							key={fw.slug}
 							href={`/frameworks/${fw.slug}`}
-							className={[
-								"group flex min-w-[140px] flex-1 flex-col items-start gap-3 p-5 transition-colors hover:bg-bg-weak-50 sm:min-w-0 sm:p-6 dark:hover:bg-white/[0.03]",
-								i < others.length - 1
-									? "border-stroke-soft-200 border-r dark:border-white/10"
-									: "",
-							]
-								.filter(Boolean)
-								.join(" ")}
+							className="group flex flex-col items-start gap-3 bg-bg-white-0 p-5 transition-colors hover:bg-bg-weak-50 sm:p-6 dark:bg-black dark:hover:bg-white/[0.03]"
 						>
 							<span
 								className="inline-flex size-8 items-center justify-center rounded-lg border border-stroke-soft-200 bg-bg-weak-50 dark:border-white/10 dark:bg-white/[0.04]"

@@ -1,4 +1,3 @@
-import { Icon } from "@reloop/ui/icon";
 import Link from "next/link";
 import { frameworks } from "../frameworks";
 import { LanguageIcon } from "./language-icon";
@@ -23,53 +22,24 @@ export default function FrameworksGrid() {
 					</p>
 				</div>
 
-				<div className="grid grid-cols-1 gap-px bg-stroke-soft-200 sm:grid-cols-2 lg:grid-cols-3 dark:bg-white/10">
+				{/* Two rows of compact framework chips (name only — no language) */}
+				<div className="grid grid-cols-3 gap-px bg-stroke-soft-200 sm:grid-cols-5 lg:grid-cols-7 dark:bg-white/10">
 					{frameworks.map((fw) => (
-						<article key={fw.slug} className="contents">
-							<Link
-								href={`/frameworks/${fw.slug}`}
-								className="group flex flex-col gap-4 bg-bg-white-0 p-6 transition-colors duration-150 hover:bg-bg-weak-50 sm:p-8 dark:bg-black dark:hover:bg-white/[0.03]"
+						<Link
+							key={fw.slug}
+							href={`/frameworks/${fw.slug}`}
+							className="group flex flex-col items-start gap-3 bg-bg-white-0 p-5 transition-colors hover:bg-bg-weak-50 sm:p-6 dark:bg-black dark:hover:bg-white/[0.03]"
+						>
+							<span
+								className="inline-flex size-8 items-center justify-center rounded-lg border border-stroke-soft-200 bg-bg-weak-50 dark:border-white/10 dark:bg-white/[0.04]"
+								style={{ color: `#${fw.icon.hex}` }}
 							>
-								<div className="flex items-start justify-between gap-3">
-									<div
-										className="inline-flex size-10 items-center justify-center rounded-xl border border-stroke-soft-200 bg-bg-weak-50 dark:border-white/10 dark:bg-white/[0.04]"
-										style={{ color: `#${fw.icon.hex}` }}
-									>
-										<LanguageIcon icon={fw.icon} className="size-5" />
-									</div>
-									<Icon
-										name="arrow-up-right"
-										className="size-3.5 text-text-sub-600 opacity-0 transition-all duration-150 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:opacity-100 dark:text-white/50"
-										aria-hidden
-									/>
-								</div>
-
-								<div>
-									<h3 className="font-semibold text-[15px] text-text-strong-950 tracking-tight sm:text-base dark:text-white">
-										{fw.name} email
-									</h3>
-									<p className="mt-1 text-[11px] text-text-sub-600 dark:text-white/45">
-										<span className="font-mono">{fw.languageName}</span>
-										<span className="mx-1.5 text-text-soft-400">·</span>
-										{fw.runtimeHint}
-									</p>
-									<p className="mt-2.5 line-clamp-3 text-[13px] text-text-sub-600 leading-relaxed dark:text-white/55">
-										{fw.shortDescription}
-									</p>
-								</div>
-
-								<div className="mt-auto flex flex-wrap gap-1.5">
-									{fw.highlights.slice(0, 3).map((tag) => (
-										<span
-											key={tag}
-											className="rounded-md border border-stroke-soft-200 bg-bg-weak-50 px-2 py-0.5 font-mono text-[10px] text-text-sub-600 dark:border-white/10 dark:bg-white/[0.03] dark:text-white/50"
-										>
-											{tag}
-										</span>
-									))}
-								</div>
-							</Link>
-						</article>
+								<LanguageIcon icon={fw.icon} className="size-4" />
+							</span>
+							<span className="font-medium text-[13px] text-text-strong-950 dark:text-white">
+								{fw.name}
+							</span>
+						</Link>
 					))}
 				</div>
 			</div>
