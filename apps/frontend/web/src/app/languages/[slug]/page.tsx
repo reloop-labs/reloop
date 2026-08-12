@@ -5,6 +5,7 @@ import LanguageCta from "../components/language-cta";
 import LanguageFrameworks from "../components/language-frameworks";
 import LanguageHero from "../components/language-hero";
 import LanguageMore from "../components/language-more";
+import LanguageResources from "../components/language-resources";
 import { getLanguage, isLanguageSlug, LANGUAGE_SLUGS } from "../languages";
 
 // TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
@@ -56,6 +57,7 @@ export default async function LanguagePage({ params }: PageProps) {
 			<LanguageCode language={language} />
 			<LanguageFrameworks language={language} />
 			<LanguageMore current={language} />
+			<LanguageResources language={language} />
 			<LanguageCta language={language} />
 		</main>
 	);
