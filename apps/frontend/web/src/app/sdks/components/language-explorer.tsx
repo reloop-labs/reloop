@@ -332,7 +332,7 @@ export default function LanguageExplorer() {
 						{/* Step 1: Install */}
 						<StepItem number={1} title={`Install the ${activeDisplayName} package`}>
 							<SdkCodeBlock
-								key={`install-${active.slug}-${activeFramework?.slug ?? "base"}-${pkgManager}`}
+								key={`install-${active.slug}-${activeFramework?.slug ?? "base"}`}
 								code={installCode}
 								lang="bash"
 								tabs={active.slug === "nodejs" ? NODE_PKG_TABS : undefined}

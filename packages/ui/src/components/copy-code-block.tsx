@@ -101,6 +101,10 @@ export function CopyCodeBlock({
 		undefined,
 	);
 	const [mounted, setMounted] = useState(false);
+	const [activeTabPos, setActiveTabPos] = useState<{
+		width: number;
+		left: number;
+	} | null>(null);
 	const tabButtonRefs = useRef<(HTMLButtonElement | null)[]>([]);
 	const containerRef = useRef<HTMLDivElement>(null);
 	const isFirstScrollRef = useRef(true);
@@ -114,6 +118,34 @@ export function CopyCodeBlock({
 	const activeTabIndex = hasTabs
 		? tabs.findIndex((tab) => tab.id === activeTab)
 		: -1;
+
+	useEffect(() => {
+		if (!mounted) return;
+		const updateActivePos = () => {
+			const activeBtn = tabButtonRefs.current[activeTabIndex];
+			if (activeBtn) {
+				setActiveTabPos({
+					width: activeBtn.offsetWidth,
+					left: activeBtn.offsetLeft,
+				});
+			} else {
+				setActiveTabPos(null);
+			}
+		};
+
+		updateActivePos();
+		const container = containerRef.current;
+		let observer: ResizeObserver | null = null;
+		if (container) {
+			observer = new ResizeObserver(updateActivePos);
+			observer.observe(container);
+		}
+		window.addEventListener("resize", updateActivePos);
+		return () => {
+			observer?.disconnect();
+			window.removeEventListener("resize", updateActivePos);
+		};
+	}, [activeTabIndex, mounted]);
 
 	useEffect(() => {
 		if (!mounted) return;
@@ -173,7 +205,6 @@ export function CopyCodeBlock({
 	const highlightedTabIndex =
 		hoveredTabIdx !== undefined ? hoveredTabIdx : activeTabIndex;
 	const highlightedTab = tabButtonRefs.current[highlightedTabIndex];
-	const activeTabButton = tabButtonRefs.current[activeTabIndex];
 	const highlightedBrandColor =
 		highlightedTabIndex >= 0 && tabs
 			? `#${tabs[highlightedTabIndex]?.si.hex}`
@@ -209,7 +240,6 @@ export function CopyCodeBlock({
 	const highlightedTabPosition = mounted
 		? getTabPosition(highlightedTab)
 		: null;
-	const activeTabPosition = mounted ? getTabPosition(activeTabButton) : null;
 	const highlightedPillPosition = getPillPosition(highlightedTabPosition);
 
 	const copyButton = (
@@ -327,17 +357,18 @@ export function CopyCodeBlock({
 								/>
 							) : null}
 						</AnimatePresence>
-						{activeTabPosition && activeTabIndex !== -1 ? (
+						{activeTabPos && activeTabIndex !== -1 ? (
 							<motion.div
 								className="pointer-events-none absolute bottom-0 left-0 h-[2px] rounded-full"
 								style={{ backgroundColor: activeTabBrandColor }}
 								initial={false}
 								animate={{
-									width: activeTabPosition.width,
-									left: activeTabPosition.left,
+									width: activeTabPos.width,
+									left: activeTabPos.left,
+									backgroundColor: activeTabBrandColor,
 									opacity: 1,
 								}}
-								transition={{ duration: 0.14 }}
+								transition={{ duration: 0.15, ease: "easeOut" }}
 							/>
 						) : null}
 					</div>
