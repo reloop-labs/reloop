@@ -1,77 +1,42 @@
-"use client";
-
 import * as Button from "@reloop/ui/button";
+import Link from "next/link";
 
 export default function IndexHero() {
 	return (
-		<section className="relative flex flex-col items-center justify-center pt-32 pb-16 sm:pt-40 sm:pb-24">
-			<div className="mx-auto flex max-w-4xl flex-col px-4 text-center sm:px-6 lg:px-8">
-				{/* Vercel Masthead / Meta Badge */}
-				<div className="mx-auto mb-6 inline-flex items-center gap-2 rounded-full border border-stroke-soft-200 bg-bg-weak-50 px-3.5 py-1 font-mono text-text-sub-600 text-xs dark:border-white/10 dark:bg-white/[0.03] dark:text-white/70">
-					<span className="size-1.5 rounded-full bg-emerald-500" />
-					<span>OFFICIAL SDK INDEX • 9 RUNTIMES SUPPORTED</span>
-				</div>
+		<section className="relative w-full border-stroke-soft-200 bg-bg-white-0 text-text-strong-950 dark:border-white/10 dark:bg-black dark:text-white">
+			<div className="pointer-events-none absolute inset-x-0 top-0 h-48 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-500/[0.04] via-sky-400/[0.02] to-transparent dark:from-blue-500/[0.08] dark:via-transparent" />
 
-				{/* Primary Claim Title */}
-				<h1 className="font-bold font-sans text-4xl text-text-strong-950 leading-[1.08] tracking-tight sm:text-6xl dark:text-white">
-					Send email in your native runtime.
+			<div className="relative mx-auto w-full max-w-5xl border-stroke-soft-200 border-x px-6 pt-28 pb-12 text-left sm:px-10 sm:pt-32 sm:pb-14 md:max-w-7xl lg:px-12 dark:border-white/10">
+				<p className="font-mono text-[11px] text-text-sub-600 uppercase tracking-[0.14em] dark:text-white/45">
+					Official SDKs
+				</p>
+				<h1 className="mt-3 max-w-2xl font-semibold text-3xl text-text-strong-950 leading-[1.12] tracking-tight sm:text-4xl lg:text-[2.6rem] dark:text-white">
+					Send email in your language.
 				</h1>
-
-				{/* Subheadline / Orientation */}
-				<p className="mx-auto mt-6 max-w-2xl text-base text-text-sub-600 leading-relaxed sm:text-lg dark:text-white/60">
-					Official Reloop SDKs for Node.js, Python, Go, Rust, PHP, Ruby, Elixir,
-					Java, and .NET. Fully typed, zero unnecessary runtime overhead, and
-					pre-configured for modern serverless and cloud environments.
+				<p className="mt-4 max-w-xl text-[15px] text-text-sub-600 leading-relaxed sm:text-[16px] dark:text-white/60">
+					Official clients for Node.js, Python, Go, Rust, PHP, Ruby, Elixir,
+					Java, and .NET. Same API. Idiomatic for each runtime.
 				</p>
 
-				{/* Actions */}
-				<div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+				<div className="mt-8 flex flex-wrap items-center gap-3">
 					<a
 						href="/dashboard/signup"
 						className={`${Button.buttonVariants({
 							variant: "neutral",
 							mode: "filled",
-						}).root()} h-11! rounded-full! px-7! font-medium text-sm`}
+						}).root()} inline-flex h-10! rounded-full! px-6! font-medium text-sm! dark:bg-white dark:text-black dark:hover:bg-white/90`}
 					>
 						Get API Key
 					</a>
-					<a
-						href="#sdk-explorer"
+					<Link
+						href="#languages"
 						className={`${Button.buttonVariants({
 							variant: "neutral",
 							mode: "stroke",
-						}).root()} h-11! rounded-full! px-7! font-medium text-sm`}
+						}).root()} inline-flex h-10! rounded-full! px-6! font-medium text-sm!`}
 					>
-						Explore SDKs &rarr;
-					</a>
-				</div>
-
-				{/* Stat Strip (Vercel primitive .vbg-stat-strip concept) */}
-				<div className="mt-14 grid grid-cols-3 divide-x divide-stroke-soft-200 border-stroke-soft-200 border-y py-6 dark:divide-white/10 dark:border-white/10">
-					<div className="flex flex-col items-center px-2">
-						<span className="font-mono font-semibold text-text-strong-950 text-xl tabular-nums tracking-tight sm:text-2xl dark:text-white">
-							09
-						</span>
-						<span className="mt-1 text-text-sub-600 text-xs dark:text-white/50">
-							Official Runtimes
-						</span>
-					</div>
-					<div className="flex flex-col items-center px-2">
-						<span className="font-mono font-semibold text-text-strong-950 text-xl tabular-nums tracking-tight sm:text-2xl dark:text-white">
-							100%
-						</span>
-						<span className="mt-1 text-text-sub-600 text-xs dark:text-white/50">
-							Type Coverage
-						</span>
-					</div>
-					<div className="flex flex-col items-center px-2">
-						<span className="font-mono font-semibold text-text-strong-950 text-xl tabular-nums tracking-tight sm:text-2xl dark:text-white">
-							&lt;50ms
-						</span>
-						<span className="mt-1 text-text-sub-600 text-xs dark:text-white/50">
-							p99 Delivery Latency
-						</span>
-					</div>
+						Browse SDKs →
+					</Link>
 				</div>
 			</div>
 		</section>

@@ -1,75 +1,66 @@
+import { Icon } from "@reloop/ui/icon";
 import Link from "next/link";
 import { languages } from "../languages";
 import { LanguageIcon } from "./language-icon";
 
 export default function LanguagesGrid() {
 	return (
-		<section id="languages" className="w-full py-16 sm:py-20 lg:py-24">
-			<div className="mx-auto max-w-[1320px] px-4 sm:px-6 lg:px-8">
-				<div className="flex flex-col gap-2">
-					<p className="font-mono text-text-sub-600 text-xs uppercase tracking-wider dark:text-white/50">
-						SDK Directory • 9 Packages
-					</p>
-					<h2 className="font-sans font-semibold text-2xl text-text-strong-950 tracking-tight sm:text-3xl dark:text-white">
-						Select your language guide
+		<section
+			id="sdk-guides"
+			className="relative w-full border-stroke-soft-200 border-t bg-bg-white-0 text-text-strong-950 dark:border-white/10 dark:bg-black dark:text-white"
+		>
+			<div className="mx-auto w-full max-w-5xl border-stroke-soft-200 border-x md:max-w-7xl dark:border-white/10">
+				<div className="border-stroke-soft-200 border-b px-6 py-10 sm:px-10 sm:py-12 lg:px-12 dark:border-white/10">
+					<h2 className="font-semibold text-text-strong-950 text-xl tracking-tight sm:text-2xl lg:text-[1.65rem] dark:text-white">
+						SDK guides
 					</h2>
-					<p className="max-w-2xl text-base text-text-sub-600 leading-relaxed dark:text-white/60">
-						Each official repository includes complete installation
-						instructions, authentication patterns, error handling, and framework
-						integration quickstarts.
+					<p className="mt-1.5 max-w-xl text-[13.5px] text-text-sub-600 sm:text-[14.5px] dark:text-white/60">
+						Dedicated pages for each official client—install, sample code, and
+						docs.
 					</p>
 				</div>
 
-				<div className="mt-10 grid gap-px overflow-hidden rounded-xl border border-stroke-soft-200 bg-stroke-soft-200 sm:grid-cols-2 lg:grid-cols-3 dark:border-white/10 dark:bg-white/10">
-					{languages.map((lang, i) => (
-						<Link
-							key={lang.slug}
-							href={`/languages/${lang.slug}`}
-							className="group flex flex-col justify-between bg-bg-white-0 p-6 transition-colors duration-200 hover:bg-bg-weak-50 dark:bg-bg-black-950 dark:hover:bg-white/[0.02]"
-						>
-							<div>
-								<div className="flex items-center justify-between">
+				<div className="grid grid-cols-1 gap-px bg-stroke-soft-200 sm:grid-cols-2 lg:grid-cols-3 dark:bg-white/10">
+					{languages.map((lang) => (
+						<article key={lang.slug} className="contents">
+							<Link
+								href={`/languages/${lang.slug}`}
+								className="group flex flex-col gap-4 bg-bg-white-0 p-6 transition-colors duration-150 hover:bg-bg-weak-50 sm:p-8 dark:bg-black dark:hover:bg-white/[0.03]"
+							>
+								<div className="flex items-start justify-between gap-3">
 									<div
-										className="inline-flex size-9 items-center justify-center rounded-lg border border-stroke-soft-200 bg-bg-weak-50 transition-transform group-hover:scale-105 dark:border-white/10 dark:bg-white/5"
+										className="inline-flex size-10 items-center justify-center rounded-xl border border-stroke-soft-200 bg-bg-weak-50 dark:border-white/10 dark:bg-white/[0.04]"
 										style={{ color: `#${lang.icon.hex}` }}
 									>
-										<LanguageIcon icon={lang.icon} className="size-4" />
+										<LanguageIcon icon={lang.icon} className="size-5" />
 									</div>
-									<span className="font-mono text-text-sub-600 text-xs tabular-nums dark:text-white/40">
-										0{i + 1}
-									</span>
+									<Icon
+										name="arrow-up-right"
+										className="size-3.5 text-text-sub-600 opacity-0 transition-all duration-150 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:opacity-100 dark:text-white/50"
+										aria-hidden
+									/>
 								</div>
 
-								<h3 className="mt-4 font-semibold text-base text-text-strong-950 transition-colors group-hover:text-primary-base dark:text-white">
-									{lang.name}
-								</h3>
-
-								<p className="mt-2 line-clamp-3 text-text-sub-600 text-xs leading-relaxed dark:text-white/60">
-									{lang.shortDescription}
-								</p>
-
-								{/* Framework highlights */}
-								<div className="mt-4 flex flex-wrap gap-1.5">
-									{lang.highlights.map((h) => (
-										<span
-											key={h}
-											className="rounded-md border border-stroke-soft-200 bg-bg-weak-50 px-2 py-0.5 font-mono text-[11px] text-text-sub-600 dark:border-white/10 dark:bg-white/5 dark:text-white/60"
-										>
-											{h}
-										</span>
-									))}
+								<div>
+									<h3 className="font-semibold text-[15px] text-text-strong-950 tracking-tight sm:text-base dark:text-white">
+										{lang.name} email SDK
+									</h3>
+									<p className="mt-1 font-mono text-[11px] text-text-sub-600 dark:text-white/45">
+										{lang.packageName}
+									</p>
+									<p className="mt-2.5 line-clamp-3 text-[13px] text-text-sub-600 leading-relaxed dark:text-white/55">
+										{lang.shortDescription}
+									</p>
+									<p className="mt-2 text-[12px] text-text-sub-600 dark:text-white/40">
+										{lang.primaryFramework}
+									</p>
 								</div>
-							</div>
 
-							<div className="mt-6 border-stroke-soft-200 border-t pt-4 dark:border-white/10">
-								<code className="block truncate font-mono text-[11px] text-text-sub-600 dark:text-white/50">
+								<code className="mt-auto block truncate rounded-lg border border-stroke-soft-200 bg-bg-weak-50 px-2.5 py-1.5 font-mono text-[11px] text-text-sub-600 dark:border-white/10 dark:bg-white/[0.03] dark:text-white/50">
 									{lang.installCommand}
 								</code>
-								<span className="mt-2 inline-flex items-center gap-1 font-medium text-primary-base text-xs transition-opacity group-hover:opacity-80">
-									View {lang.name} SDK guide &rarr;
-								</span>
-							</div>
-						</Link>
+							</Link>
+						</article>
 					))}
 				</div>
 			</div>

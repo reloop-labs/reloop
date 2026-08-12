@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import LanguageBento from "../components/language-bento";
 import LanguageCode from "../components/language-code";
 import LanguageCta from "../components/language-cta";
-import LanguageGuide from "../components/language-guide";
 import LanguageHero from "../components/language-hero";
+import LanguageMore from "../components/language-more";
 import { getLanguage, isLanguageSlug, LANGUAGE_SLUGS } from "../languages";
 
 // TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
@@ -28,7 +27,7 @@ export async function generateMetadata({
 		return { title: "Language | Reloop" };
 	}
 	const title = `Integrate with Reloop using ${language.name} | Reloop`;
-	const description = `Integrate Reloop's email infrastructure in your ${language.name} application with just a few lines of code. Official SDK for ${language.primaryFramework}.`;
+	const description = `Official ${language.name} SDK for Reloop. Install ${language.packageName} and send email with a few lines of code.`;
 	return {
 		title,
 		description,
@@ -54,8 +53,7 @@ export default async function LanguagePage({ params }: PageProps) {
 		<main className="w-full bg-bg-white-0 dark:bg-black">
 			<LanguageHero language={language} />
 			<LanguageCode language={language} />
-			<LanguageBento language={language} />
-			<LanguageGuide language={language} />
+			<LanguageMore current={language} />
 			<LanguageCta language={language} />
 		</main>
 	);

@@ -8,11 +8,11 @@ export default function LanguageCta({
 }) {
 	return (
 		<BlogCta
-			headline={`Start sending with ${language.name} today.`}
-			sub={`Get your API key, verify a domain, and build reliable email infrastructure with the official ${language.name} SDK.`}
+			headline={`Send with ${language.name}.`}
+			sub="Get an API key, verify your domain, and ship transactional email in minutes."
 			primaryLabel="Get API Key"
 			primaryHref="/dashboard/signup"
-			secondaryLabel={`${language.name} Docs`}
+			secondaryLabel="Docs"
 			secondaryHref={language.docsPath}
 			accentColor="blue"
 		/>
