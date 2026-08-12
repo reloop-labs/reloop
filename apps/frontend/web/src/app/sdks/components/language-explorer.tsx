@@ -1,11 +1,15 @@
 "use client";
 
-import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
+import type { CopyCodeBlockTab } from "@reloop/ui/copy-code-block";
+import { Icon } from "@reloop/ui/icon";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { siNpm, siPnpm, siYarn } from "simple-icons";
+import { frameworksForLanguage } from "../frameworks";
 import { languages } from "../languages";
+import { bunIcon } from "./bun-icon";
 import { LanguageIcon } from "./language-icon";
 import { SdkCodeBlock } from "./sdk-code-block";
 import { SectionFrame } from "./section-frame";
@@ -18,6 +22,13 @@ const nodeInstallCommands = {
 } as const;
 
 type PackageManager = keyof typeof nodeInstallCommands;
+
+const NODE_PKG_TABS: CopyCodeBlockTab[] = [
+	{ id: "npm", label: "npm", si: siNpm },
+	{ id: "pnpm", label: "pnpm", si: siPnpm },
+	{ id: "yarn", label: "yarn", si: siYarn },
+	{ id: "bun", label: "bun", si: bunIcon },
+];
 
 function StepItem({
 	number,
@@ -83,11 +94,33 @@ export default function LanguageExplorer() {
 
 	const active = languages.find((l) => l.slug === activeSlug) ?? languages[0]!;
 	const brandColor = `#${active.icon.hex}`;
+	const relatedFrameworks = frameworksForLanguage(active.slug);
+
+	const [selectedFrameworkSlug, setSelectedFrameworkSlug] = useState<
+		string | null
+	>(relatedFrameworks[0]?.slug ?? null);
+
+	// Update selected framework when active language changes
+	useEffect(() => {
+		const fws = frameworksForLanguage(activeSlug);
+		setSelectedFrameworkSlug(fws[0]?.slug ?? null);
+	}, [activeSlug]);
+
+	const activeFramework =
+		relatedFrameworks.find((fw) => fw.slug === selectedFrameworkSlug) ??
+		relatedFrameworks[0] ??
+		null;
 
 	const installCode =
 		active.slug === "nodejs"
 			? nodeInstallCommands[pkgManager]
-			: active.installCommand;
+			: activeFramework
+				? activeFramework.installCommand
+				: active.installCommand;
+
+	const sendCode = activeFramework ? activeFramework.sendCode : active.sendCode;
+	const codeSlug = activeFramework ? activeFramework.slug : active.slug;
+	const activeDisplayName = activeFramework ? activeFramework.name : active.name;
 
 	useEffect(() => {
 		if (!mounted) {
@@ -209,8 +242,8 @@ export default function LanguageExplorer() {
 				aria-labelledby={`lang-tab-${active.slug}`}
 				className="grid grid-cols-1 lg:grid-cols-12"
 			>
-				{/* Left meta & guide link */}
-				<div className="flex flex-col justify-between gap-8 border-stroke-soft-200 p-6 sm:p-8 lg:col-span-4 lg:border-r lg:p-10 dark:border-white/10">
+				{/* Left meta & frameworks */}
+				<div className="flex flex-col gap-6 border-stroke-soft-200 p-6 sm:p-8 lg:col-span-4 lg:border-r lg:p-8 dark:border-white/10">
 					<div>
 						<div className="flex items-center gap-3">
 							<div
@@ -229,30 +262,67 @@ export default function LanguageExplorer() {
 							</div>
 						</div>
 
-						<p className="mt-5 text-[13.5px] text-text-sub-600 leading-relaxed dark:text-white/60">
-							{active.shortDescription}
-						</p>
-					</div>
+						{relatedFrameworks.length > 0 ? (
+							<div className="mt-6">
+								<p className="mb-2.5 font-mono text-[10px] text-text-sub-600 uppercase tracking-[0.12em] dark:text-white/45">
+									Frameworks
+								</p>
+								<div
+									role="tablist"
+									aria-label={`${active.name} frameworks`}
+									className="flex flex-col gap-0.5"
+								>
+									{relatedFrameworks.map((fw) => {
+										const isSelected = activeFramework?.slug === fw.slug;
+										return (
+											<button
+												key={fw.slug}
+												type="button"
+												role="tab"
+												aria-selected={isSelected}
+												onClick={() => setSelectedFrameworkSlug(fw.slug)}
+												className={cn(
+													"group flex w-full cursor-pointer items-center justify-between rounded-lg px-2.5 py-2 text-left text-xs transition-colors",
+													isSelected
+														? "bg-bg-weak-50 font-medium text-text-strong-950 dark:bg-white/[0.08] dark:text-white"
+														: "text-text-sub-600 hover:bg-bg-weak-50/60 hover:text-text-strong-950 dark:text-white/60 dark:hover:bg-white/[0.04] dark:hover:text-white",
+												)}
+											>
+												<div className="flex min-w-0 items-center gap-2.5">
+													<span
+														className={cn(
+															"inline-flex size-6 shrink-0 items-center justify-center rounded-md transition-colors",
+															isSelected
+																? "bg-bg-white-0 shadow-xs dark:bg-white/10"
+																: "bg-bg-weak-50 dark:bg-white/[0.06]",
+														)}
+														style={{ color: `#${fw.icon.hex}` }}
+													>
+														<LanguageIcon icon={fw.icon} className="size-3.5" />
+													</span>
+													<span className="truncate text-[13px]">
+														{fw.name}
+													</span>
+												</div>
 
-					<div className="flex flex-wrap gap-2">
-						<a
-							href="/dashboard/signup"
-							className={`${Button.buttonVariants({
-								variant: "neutral",
-								mode: "filled",
-							}).root()} inline-flex h-9! rounded-full! px-4! font-medium text-xs! dark:bg-white dark:text-black dark:hover:bg-white/90`}
-						>
-							Get API Key
-						</a>
-						<Link
-							href={`/sdks/${active.slug}`}
-							className={`${Button.buttonVariants({
-								variant: "neutral",
-								mode: "stroke",
-							}).root()} inline-flex h-9! rounded-full! px-4! font-medium text-xs!`}
-						>
-							{active.name} guide →
-						</Link>
+												<Link
+													href={`/frameworks/${fw.slug}`}
+													onClick={(e) => e.stopPropagation()}
+													title={`View ${fw.name} guide`}
+													className="inline-flex size-6 items-center justify-center rounded-md text-text-sub-600 opacity-0 transition-all hover:bg-bg-white-0 hover:text-text-strong-950 group-hover:opacity-100 dark:text-white/50 dark:hover:bg-white/10 dark:hover:text-white"
+												>
+													<Icon
+														name="arrow-up-right"
+														className="size-3"
+														aria-hidden="true"
+													/>
+												</Link>
+											</button>
+										);
+									})}
+								</div>
+							</div>
+						) : null}
 					</div>
 				</div>
 
@@ -260,41 +330,27 @@ export default function LanguageExplorer() {
 				<div className="border-stroke-soft-200 border-t p-6 sm:p-8 lg:col-span-8 lg:border-t-0 lg:p-10 dark:border-white/10">
 					<div className="flex flex-col">
 						{/* Step 1: Install */}
-						<StepItem number={1} title="Install the Reloop SDK">
-							<div className="space-y-2.5">
-								{active.slug === "nodejs" && (
-									<div className="flex items-center gap-1">
-										{(["npm", "pnpm", "yarn", "bun"] as const).map((pm) => (
-											<button
-												key={pm}
-												type="button"
-												onClick={() => setPkgManager(pm)}
-												className={cn(
-													"rounded-md border px-2.5 py-1 font-mono text-[11px] transition-colors",
-													pkgManager === pm
-														? "border-stroke-soft-300 bg-bg-white-0 font-medium text-text-strong-950 shadow-xs dark:border-white/20 dark:bg-white/10 dark:text-white"
-														: "border-transparent text-text-sub-600 hover:text-text-strong-950 dark:text-white/50 dark:hover:text-white",
-												)}
-											>
-												{pm}
-											</button>
-										))}
-									</div>
-								)}
-								<SdkCodeBlock
-									key={`install-${active.slug}-${pkgManager}`}
-									code={installCode}
-									lang="bash"
-								/>
-							</div>
+						<StepItem number={1} title={`Install the ${activeDisplayName} package`}>
+							<SdkCodeBlock
+								key={`install-${active.slug}-${activeFramework?.slug ?? "base"}-${pkgManager}`}
+								code={installCode}
+								lang="bash"
+								tabs={active.slug === "nodejs" ? NODE_PKG_TABS : undefined}
+								activeTab={active.slug === "nodejs" ? pkgManager : undefined}
+								onTabChange={
+									active.slug === "nodejs"
+										? (id) => setPkgManager(id as PackageManager)
+										: undefined
+								}
+							/>
 						</StepItem>
 
 						{/* Step 2: Send request */}
-						<StepItem number={2} title="Send your first request" isLast>
+						<StepItem number={2} title={`Send email with ${activeDisplayName}`} isLast>
 							<SdkCodeBlock
-								key={`code-${active.slug}`}
-								code={active.sendCode}
-								slug={active.slug}
+								key={`code-${active.slug}-${activeFramework?.slug ?? "base"}`}
+								code={sendCode}
+								slug={codeSlug}
 							/>
 						</StepItem>
 					</div>

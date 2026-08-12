@@ -1,6 +1,7 @@
-"use client";
-
-import { CopyCodeBlock } from "@reloop/ui/copy-code-block";
+import {
+	CopyCodeBlock,
+	type CopyCodeBlockTab,
+} from "@reloop/ui/copy-code-block";
 import { getLanguageIcon } from "@reloop/web/components/mdx/language-icons";
 
 /** Map language / framework slugs → highlighter lang for Reloop CodeBlock. */
@@ -53,6 +54,9 @@ export function SdkCodeBlock({
 	slug,
 	lang: langOverride,
 	path,
+	tabs,
+	activeTab,
+	onTabChange,
 }: {
 	code: string;
 	/** Language or framework slug → picks highlighter + icon */
@@ -61,12 +65,15 @@ export function SdkCodeBlock({
 	lang?: string;
 	/** Header path, e.g. send_email.ts — omit for shell one-liners */
 	path?: string;
+	tabs?: CopyCodeBlockTab[];
+	activeTab?: string;
+	onTabChange?: (id: string) => void;
 }) {
 	const lang =
 		langOverride ?? (slug ? (LANG_BY_SLUG[slug] ?? "typescript") : "bash");
 	const ext = EXT_BY_LANG[lang] ?? "txt";
 	const isShell = lang === "bash" || lang === "shell" || lang === "sh";
-	const filePath = path ?? (isShell ? undefined : `send_email.${ext}`);
+	const filePath = path ?? (isShell || tabs ? undefined : `send_email.${ext}`);
 	const si = getLanguageIcon(lang);
 	const lineCount = code.split("\n").length;
 
@@ -76,7 +83,10 @@ export function SdkCodeBlock({
 			lang={lang}
 			title={filePath}
 			si={si}
-			label={filePath ? undefined : lang}
+			label={filePath || tabs ? undefined : lang}
+			tabs={tabs}
+			activeTab={activeTab}
+			onTabChange={onTabChange}
 			hideLineNumbers={lineCount < 3}
 		/>
 	);
