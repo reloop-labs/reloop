@@ -263,7 +263,7 @@ export function CompareMasterMatrix() {
 	return (
 		<div className="w-full">
 			{/* Left-Aligned Header matching ComparisonGrid & CompareCalculator style with bottom border */}
-			<div className="-mx-6 -mt-12 border-stroke-soft-200 border-b px-6 pt-12 pb-8 sm:-mx-10 sm:-mt-16 sm:px-10 sm:pt-16 sm:pb-10 lg:-mx-12 lg:px-12 dark:border-white/10">
+			<div className="-mx-6 -mt-12 sm:-mx-10 sm:-mt-16 lg:-mx-12 border-stroke-soft-200 border-b px-6 pt-12 pb-8 sm:px-10 sm:pt-16 sm:pb-10 lg:px-12 dark:border-white/10">
 				<div className="flex flex-col items-start gap-2.5">
 					<svg
 						viewBox="0 0 24 24"
@@ -296,7 +296,7 @@ export function CompareMasterMatrix() {
 				</div>
 			</div>
 
-			<div className="-mx-6 overflow-x-auto sm:-mx-10 lg:-mx-12">
+			<div className="-mx-6 sm:-mx-10 lg:-mx-12 overflow-x-auto">
 				<table className="w-full min-w-[760px] border-collapse text-left">
 					<thead>
 						<tr className="sticky top-16 z-30 border-stroke-soft-200 border-b bg-bg-white-0/95 backdrop-blur-md dark:border-white/10 dark:bg-black/95">
