@@ -14,7 +14,7 @@ import { languages } from "./languages";
 export const instant = false;
 
 const siteUrl = getSiteUrl();
-const pageUrl = `${siteUrl}/languages`;
+const pageUrl = `${siteUrl}/sdks`;
 
 export const metadata: Metadata = {
 	title: "SDKs & Framework Integrations | Next.js, Django, Laravel & more",
@@ -79,7 +79,7 @@ const pageSchema = {
 			itemListElement: languages.map((lang, index) => ({
 				"@type": "ListItem" as const,
 				position: index + 1,
-				url: `${siteUrl}/languages/${lang.slug}`,
+				url: `${siteUrl}/sdks/${lang.slug}`,
 				name: `${lang.name} email SDK`,
 				description: lang.shortDescription,
 			})),
@@ -87,15 +87,14 @@ const pageSchema = {
 	],
 };
 
-export default function LanguagesIndexPage() {
+export default function SdksIndexPage() {
 	return (
 		<>
 			<JsonLd data={pageSchema} />
 			<main className="w-full max-w-full overflow-x-clip bg-bg-white-0 dark:bg-black">
 				<IndexHero />
-				{/* Frameworks first — how most people search */}
-				<FrameworksGrid />
 				<LanguageExplorer />
+				<FrameworksGrid />
 				<LanguagesGrid />
 				<BlogCta
 					headline="One API key. Every stack."

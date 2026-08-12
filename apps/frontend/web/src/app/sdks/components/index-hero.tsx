@@ -22,7 +22,7 @@ Do the following:
 4. Follow this repo's conventions and handle errors cleanly.
 
 Useful docs:
-- SDKs & frameworks: https://reloop.sh/languages
+- SDKs & frameworks: https://reloop.sh/sdks
 - API keys: https://reloop.sh/docs/learn/api-keys
 - Send email: https://reloop.sh/docs/api/mail/post-api-mail-v1send
 - SMTP: https://reloop.sh/docs/examples/smtp/introduction

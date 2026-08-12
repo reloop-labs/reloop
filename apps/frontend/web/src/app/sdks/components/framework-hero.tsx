@@ -55,10 +55,10 @@ export default function FrameworkHero({
 						className="flex flex-wrap items-center gap-1.5 font-mono text-[10px] text-text-sub-600 uppercase tracking-[0.14em] dark:text-white/45"
 					>
 						<Link
-							href="/languages"
+							href="/sdks"
 							className="transition-colors hover:text-text-strong-950 dark:hover:text-white"
 						>
-							Languages
+							SDKs
 						</Link>
 						<span className="text-text-soft-400 dark:text-white/25">/</span>
 						<Link

@@ -9,7 +9,6 @@ import { languages } from "../languages";
 import { LanguageIcon } from "./language-icon";
 import { SdkCodeBlock } from "./sdk-code-block";
 import { SectionFrame } from "./section-frame";
-import { SectionTitle } from "./section-title";
 
 export default function LanguageExplorer() {
 	const [activeSlug, setActiveSlug] = useState(languages[0]!.slug);
@@ -80,8 +79,6 @@ export default function LanguageExplorer() {
 
 	return (
 		<SectionFrame id="languages">
-			<SectionTitle title="Pick your runtime." icon="terminal" />
-
 			{/* Language tabs */}
 			<div className="border-stroke-soft-200 border-b dark:border-white/10">
 				<div
@@ -211,7 +208,7 @@ export default function LanguageExplorer() {
 								Get API Key
 							</a>
 							<Link
-								href={`/languages/${active.slug}`}
+								href={`/sdks/${active.slug}`}
 								className={`${Button.buttonVariants({
 									variant: "neutral",
 									mode: "stroke",

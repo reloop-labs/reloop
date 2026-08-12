@@ -254,7 +254,7 @@ export default function FrameworkSteps({
 										</dt>
 										<dd>
 											<Link
-												href={`/languages/${framework.languageSlug}`}
+												href={`/sdks/${framework.languageSlug}`}
 												className="text-[12px] text-text-strong-950 underline decoration-text-sub-600/30 underline-offset-2 transition-colors hover:decoration-text-strong-950 dark:text-white dark:decoration-white/25 dark:hover:decoration-white"
 											>
 												{framework.languageName}

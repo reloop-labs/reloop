@@ -55,10 +55,10 @@ export default function LanguageHero({
 						className="mb-5 flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.6px]"
 					>
 						<Link
-							href="/languages"
+							href="/sdks"
 							className="text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/50 dark:hover:text-white"
 						>
-							Languages
+							SDKs
 						</Link>
 						<span className="text-text-soft-400 dark:text-white/30">/</span>
 						<span className="text-text-strong-950 dark:text-white">

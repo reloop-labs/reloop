@@ -2,11 +2,12 @@ import { BlogCta } from "@reloop/web/components/landing/blog/blog-cta";
 import { JsonLd } from "@reloop/web/components/json-ld";
 import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
-import FrameworksGrid from "../languages/components/frameworks-grid";
-import LanguagesGrid from "../languages/components/languages-grid";
-import { frameworks } from "../languages/frameworks";
-import { languages } from "../languages/languages";
+import FrameworksGrid from "../sdks/components/frameworks-grid";
+import LanguagesGrid from "../sdks/components/languages-grid";
+import { frameworks } from "../sdks/frameworks";
+import { languages } from "../sdks/languages";
 import FrameworksIndexHero from "./components/frameworks-index-hero";
+import FrameworksResources from "./components/frameworks-resources";
 
 // TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
 // See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
@@ -82,7 +83,7 @@ const pageSchema = {
 			itemListElement: languages.map((lang, index) => ({
 				"@type": "ListItem" as const,
 				position: index + 1,
-				url: `${siteUrl}/languages/${lang.slug}`,
+				url: `${siteUrl}/sdks/${lang.slug}`,
 				name: `${lang.name} email SDK`,
 				description: lang.shortDescription,
 			})),
@@ -98,6 +99,7 @@ export default function FrameworksIndexPage() {
 				<FrameworksIndexHero />
 				<FrameworksGrid />
 				<LanguagesGrid />
+				<FrameworksResources />
 				<BlogCta
 					headline="One API key. Every stack."
 					sub="Create an account, verify a domain, and send from any framework or official SDK."

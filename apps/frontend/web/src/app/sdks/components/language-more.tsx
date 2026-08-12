@@ -19,7 +19,7 @@ export default function LanguageMore({
 					icon="terminal"
 					action={
 						<Link
-							href="/languages"
+							href="/sdks"
 							className="hidden items-center gap-1 font-medium text-[13px] text-text-sub-600 transition-colors hover:text-text-strong-950 sm:inline-flex dark:text-white/50 dark:hover:text-white"
 						>
 							View all
@@ -32,7 +32,7 @@ export default function LanguageMore({
 					{others.map((lang, i) => (
 						<Link
 							key={lang.slug}
-							href={`/languages/${lang.slug}`}
+							href={`/sdks/${lang.slug}`}
 							className={[
 								"group flex min-w-[140px] flex-1 flex-col items-start gap-3 p-5 transition-colors hover:bg-bg-weak-50 sm:min-w-0 sm:p-6 dark:hover:bg-white/[0.03]",
 								i < others.length - 1
