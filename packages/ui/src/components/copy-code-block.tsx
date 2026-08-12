@@ -12,7 +12,11 @@ export type CopyCodeBlockIcon = {
 	/** Optional viewBox when path data is not 0 0 24 24 (e.g. multi-color brand marks). */
 	viewBox?: string;
 	/** Multi-color layers; when set, each path uses its own fill instead of monochrome hex. */
-	layers?: ReadonlyArray<{ d: string; fill: string }>;
+	layers?: ReadonlyArray<{
+		d: string;
+		fill: string;
+		fillRule?: "nonzero" | "evenodd";
+	}>;
 };
 
 export function BrandLanguageIcon({
@@ -32,8 +36,14 @@ export function BrandLanguageIcon({
 				xmlns="http://www.w3.org/2000/svg"
 				aria-hidden
 			>
-				{icon.layers.map((layer) => (
-					<path key={layer.d.slice(0, 24)} d={layer.d} fill={layer.fill} />
+				{icon.layers.map((layer, index) => (
+					<path
+						key={`${layer.fill}-${index}`}
+						d={layer.d}
+						fill={layer.fill}
+						fillRule={layer.fillRule}
+						clipRule={layer.fillRule}
+					/>
 				))}
 			</svg>
 		);
