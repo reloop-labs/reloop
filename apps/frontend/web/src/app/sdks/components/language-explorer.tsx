@@ -148,6 +148,9 @@ export default function LanguageExplorer() {
 		: null;
 
 	const isLanguageSelected = activeFramework === null;
+	const activeRailColor = activeFramework
+		? `#${activeFramework.icon.hex}`
+		: brandColor;
 
 	useLayoutEffect(() => {
 		if (!fwContainerEl) {
@@ -425,7 +428,7 @@ export default function LanguageExplorer() {
 									<motion.div
 										aria-hidden
 										className="pointer-events-none absolute z-20 w-0.5 rounded-full"
-										style={{ backgroundColor: brandColor }}
+										style={{ backgroundColor: activeRailColor }}
 										initial={false}
 										animate={{
 											left: fwActiveBox.left + 4,
