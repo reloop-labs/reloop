@@ -9,6 +9,8 @@ import { frameworksForLanguage } from "../frameworks";
 import { languages } from "../languages";
 import { AccountSetupActions } from "./account-setup-actions";
 import { AnimatedHoverBackground } from "./animated-hover-background";
+import { ExtraLinks } from "./extra-links";
+import { ResourceLinks } from "./resource-links";
 import { bunIcon } from "./bun-icon";
 import { LanguageIcon } from "./language-icon";
 import { SdkCodeBlock } from "./sdk-code-block";
@@ -267,8 +269,8 @@ export default function LanguageExplorer() {
 				className="grid grid-cols-1 lg:grid-cols-12"
 			>
 				{/* Left meta & frameworks: compact tinted rail matching framework details */}
-				<aside className="flex flex-col gap-6 border-stroke-soft-200 border-b bg-[#fafafa] p-6 sm:p-7 lg:col-span-3 lg:border-r lg:border-b-0 lg:p-7 dark:border-white/10 dark:bg-white/[0.025]">
-					<div>
+				<aside className="border-stroke-soft-200 border-b bg-[#fafafa] lg:col-span-3 lg:border-r lg:border-b-0 dark:border-white/10 dark:bg-white/[0.025]">
+					<div className="flex flex-col gap-6 p-6 sm:p-7 lg:sticky lg:top-24 lg:p-7">
 						<div className="flex items-center gap-3">
 							<div
 								className="inline-flex size-10 items-center justify-center rounded-xl border border-stroke-soft-200 bg-bg-white-0 dark:border-white/10 dark:bg-black"
@@ -375,13 +377,27 @@ export default function LanguageExplorer() {
 						<StepItem
 							number={3}
 							title={`Send email with ${activeDisplayName}`}
-							isLast
 						>
 							<SdkCodeBlock
 								key={`code-${active.slug}-${activeFramework?.slug ?? "base"}`}
 								code={sendCode}
 								slug={codeSlug}
 							/>
+						</StepItem>
+
+						<StepItem
+							number={4}
+							title="GitHub, examples, and API reference"
+						>
+							<ResourceLinks
+								languageSlug={active.slug}
+								docsPath={activeFramework?.docsPath ?? active.docsPath}
+								frameworkSlug={activeFramework?.slug}
+							/>
+						</StepItem>
+
+						<StepItem number={5} title="Need more help?" isLast>
+							<ExtraLinks />
 						</StepItem>
 					</div>
 				</div>

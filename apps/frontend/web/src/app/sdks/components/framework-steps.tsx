@@ -3,9 +3,11 @@
 import { Icon } from "@reloop/ui/icon";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import type { FrameworkDefinition, FrameworkSlug } from "../frameworks";
+import type { FrameworkDefinition } from "../frameworks";
 import { AccountSetupActions } from "./account-setup-actions";
+import { ExtraLinks } from "./extra-links";
 import { LanguageIcon } from "./language-icon";
+import { getExamplesPath, ResourceLinks } from "./resource-links";
 import { SdkCodeBlock } from "./sdk-code-block";
 
 type StepDef = {
@@ -18,36 +20,9 @@ type StepDef = {
 	isShell: boolean;
 	filename: string | null;
 	showSetupActions?: boolean;
+	showResourceLinks?: boolean;
+	showExtraLinks?: boolean;
 };
-
-/** Docs example pages that exist for a framework; else language examples hub. */
-const FRAMEWORK_EXAMPLES_PATH: Partial<Record<FrameworkSlug, string>> = {
-	nextjs: "/docs/examples/nodejs/nextjs",
-	express: "/docs/examples/nodejs/express",
-	django: "/docs/examples/python/django",
-	fastapi: "/docs/examples/python/fastapi",
-	flask: "/docs/examples/python/flask",
-	laravel: "/docs/examples/php/laravel",
-	rails: "/docs/examples/ruby/rails",
-	gin: "/docs/examples/go/gin",
-};
-
-const LANGUAGE_EXAMPLES_PATH: Record<string, string> = {
-	nodejs: "/docs/examples/nodejs",
-	python: "/docs/examples/python",
-	php: "/docs/examples/php",
-	ruby: "/docs/examples/ruby",
-	go: "/docs/examples/go",
-	rust: "/docs/examples/rust",
-};
-
-function getExamplesPath(framework: FrameworkDefinition): string {
-	return (
-		FRAMEWORK_EXAMPLES_PATH[framework.slug] ??
-		LANGUAGE_EXAMPLES_PATH[framework.languageSlug] ??
-		"/docs/examples"
-	);
-}
 
 type ResourceCard = {
 	title: string;
@@ -65,7 +40,7 @@ function FrameworkResources({
 		{
 			title: "Examples",
 			description: `Copy-paste ${framework.name} snippets and full integration guides.`,
-			href: getExamplesPath(framework),
+			href: getExamplesPath(framework.languageSlug, framework.slug),
 			iconName: "brackets",
 		},
 		{
@@ -176,6 +151,26 @@ export default function FrameworkSteps({
 			code: framework.sendCode,
 			isShell: false,
 			filename: null,
+		},
+		{
+			id: "resources",
+			number: 4,
+			label: "Resources",
+			title: "GitHub, examples, and API reference",
+			body: `Official ${framework.languageName} SDK source, example repos, and API docs.`,
+			isShell: false,
+			filename: null,
+			showResourceLinks: true,
+		},
+		{
+			id: "more",
+			number: 5,
+			label: "More",
+			title: "Need more help?",
+			body: "Support, Discord, changelog, sales, and the agent index.",
+			isShell: false,
+			filename: null,
+			showExtraLinks: true,
 		},
 	];
 
@@ -374,6 +369,14 @@ export default function FrameworkSteps({
 
 								<div className="mt-5 flex flex-col gap-3">
 									{step.showSetupActions ? <AccountSetupActions /> : null}
+									{step.showResourceLinks ? (
+										<ResourceLinks
+											languageSlug={framework.languageSlug}
+											docsPath={framework.docsPath}
+											frameworkSlug={framework.slug}
+										/>
+									) : null}
+									{step.showExtraLinks ? <ExtraLinks /> : null}
 									{step.code ? (
 										step.isShell ? (
 											<SdkCodeBlock code={step.code} lang="bash" />
