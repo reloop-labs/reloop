@@ -187,14 +187,15 @@ export function FoundersAvatarStack() {
 					className="object-cover object-top"
 				/>
 			</div>
-			<div className="relative size-9 overflow-hidden rounded-full border-2 border-white bg-bg-weak-50 shadow-xs dark:border-[#0c0c0c] dark:bg-white/5">
-				<Image
-					src="/company/team/twinkal-p.jpg"
-					alt="Twinkal P"
-					fill
-					className="object-cover object-top"
-				/>
-				<span className="absolute right-0 bottom-0 size-2.5 rounded-full border-2 border-white bg-emerald-500 ring-1 ring-emerald-500/20 dark:border-[#0c0c0c]" />
+			<div className="relative size-9 shrink-0">
+				<div className="relative size-full overflow-hidden rounded-full border-2 border-white bg-bg-weak-50 shadow-xs dark:border-[#0c0c0c] dark:bg-white/5">
+					<Image
+						src="/company/team/twinkal-p.jpg"
+						alt="Twinkal P"
+						fill
+						className="object-cover object-top"
+					/>
+				</div>
 			</div>
 		</div>
 	);
@@ -205,7 +206,11 @@ export function SupportChatHeader({
 	onRefresh,
 	closed,
 }: {
-	user?: { name?: string | null; image?: string | null; email?: string | null } | null;
+	user?: {
+		name?: string | null;
+		image?: string | null;
+		email?: string | null;
+	} | null;
 	onRefresh?: () => void;
 	closed?: boolean;
 }) {
@@ -218,10 +223,10 @@ export function SupportChatHeader({
 					<h2 className="font-semibold text-[15px] text-text-strong-950 tracking-tight dark:text-white">
 						The Founders
 					</h2>
-					<div className="flex items-center gap-1.5 truncate text-[12px]">
-						<span className="relative flex size-2 shrink-0 items-center justify-center">
+					<div className="flex items-center gap-1.5 truncate pl-1 text-[12px]">
+						<span className="relative flex size-1.5 shrink-0 items-center justify-center">
 							<span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-							<span className="relative inline-flex size-2 rounded-full bg-emerald-500" />
+							<span className="relative inline-flex size-1.5 rounded-full bg-emerald-500" />
 						</span>
 						<span className="font-medium text-emerald-600 dark:text-emerald-400">
 							Online
@@ -275,7 +280,11 @@ export function ContactSupportChat({
 	user,
 }: {
 	userName?: string | null;
-	user?: { name?: string | null; image?: string | null; email?: string | null } | null;
+	user?: {
+		name?: string | null;
+		image?: string | null;
+		email?: string | null;
+	} | null;
 }) {
 	const firstName = userName?.split(" ")[0] || "there";
 
