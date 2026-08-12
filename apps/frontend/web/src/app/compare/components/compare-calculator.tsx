@@ -21,8 +21,8 @@ const MARKETING_PRESETS = [
 	{ label: "10k", value: 10000 },
 	{ label: "25k", value: 25000 },
 	{ label: "50k", value: 50000 },
+	{ label: "75k", value: 75000 },
 	{ label: "100k", value: 100000 },
-	{ label: "500k", value: 500000 },
 ];
 
 interface CostsResult {
@@ -135,7 +135,7 @@ function calculateMarketingCost(contacts: number): CostsResult {
 
 interface CalculatorColumnProps {
 	title: string;
-	badge: string;
+	subtitle: string;
 	valueLabel: string;
 	unitLabel: string;
 	volume: number;
@@ -151,7 +151,7 @@ interface CalculatorColumnProps {
 
 function CalculatorColumn({
 	title,
-	badge,
+	subtitle,
 	valueLabel,
 	unitLabel,
 	volume,
@@ -215,16 +215,14 @@ function CalculatorColumn({
 
 	return (
 		<div className="space-y-6">
-			{/* Column Header */}
-			<div className="flex items-center justify-between">
-				<div className="flex items-center gap-2.5">
-					<span className="font-semibold text-[16px] text-text-strong-950 tracking-tight sm:text-[17px] dark:text-white">
-						{title}
-					</span>
-					<span className="rounded-full border border-stroke-soft-200/80 bg-bg-weak-50/80 px-2 py-0.5 font-medium text-[11px] text-text-sub-600 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/60">
-						{badge}
-					</span>
-				</div>
+			{/* Column Header: Title & Subtitle */}
+			<div>
+				<h3 className="font-semibold text-[18px] text-text-strong-950 tracking-tight sm:text-[19px] dark:text-white">
+					{title}
+				</h3>
+				<p className="mt-1 text-[14px] text-text-sub-600 dark:text-white/60">
+					{subtitle}
+				</p>
 			</div>
 
 			{/* Slider Section */}
@@ -383,7 +381,7 @@ export function CompareCalculator() {
 	const marketingCosts = calculateMarketingCost(marketingContacts);
 
 	return (
-		<div className="w-full space-y-8 sm:space-y-10">
+		<div className="w-full">
 			{/* Left-Aligned Header matching ComparisonGrid style with bottom border */}
 			<div className="-mx-6 -mt-12 border-stroke-soft-200 border-b px-6 pt-12 pb-8 sm:-mx-10 sm:-mt-16 sm:px-10 sm:pt-16 sm:pb-10 lg:-mx-12 lg:px-12 dark:border-white/10">
 				<div className="flex flex-col items-start gap-2.5">
@@ -414,12 +412,12 @@ export function CompareCalculator() {
 			</div>
 
 			{/* Side-by-Side Transactional and Marketing Comparison */}
-			<div className="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-0">
+			<div className="flex flex-col gap-10 lg:flex-row lg:items-stretch lg:gap-0">
 				{/* Left Column: Transactional Email (Monthly Volume) */}
-				<div className="flex-1 lg:border-stroke-soft-200 lg:border-r lg:pr-8 xl:pr-12 dark:lg:border-white/10">
+				<div className="flex flex-1 flex-col justify-between pt-8 pb-10 lg:border-stroke-soft-200 lg:border-r lg:pr-8 xl:pr-12 dark:lg:border-white/10">
 					<CalculatorColumn
-						title="Transactional Email"
-						badge="API & System"
+						title="Transactional email."
+						subtitle="API and system-triggered messaging."
 						valueLabel="Monthly email volume"
 						unitLabel="/ mo"
 						volume={transactionalVolume}
@@ -435,18 +433,18 @@ export function CompareCalculator() {
 				</div>
 
 				{/* Right Column: Marketing Email (Audience Contacts) */}
-				<div className="flex-1 lg:pl-8 xl:pl-12">
+				<div className="flex flex-1 flex-col justify-between pt-8 pb-10 lg:pl-8 xl:pl-12">
 					<CalculatorColumn
-						title="Marketing Email"
-						badge="Broadcasts & Campaigns"
+						title="Marketing email."
+						subtitle="Broadcasts, audiences, and campaigns."
 						valueLabel="Audience contacts"
 						unitLabel="contacts"
 						volume={marketingContacts}
 						setVolume={setMarketingContacts}
 						sliderId="marketing-contacts-slider"
-						min={5000}
-						max={500000}
-						step={5000}
+						min={1000}
+						max={100000}
+						step={1000}
 						presets={MARKETING_PRESETS}
 						costs={marketingCosts}
 						savingsFootnote="Reloop charges $0 for contact storage. You only pay for what you actually send ($0.10 / 1k emails)."
@@ -454,10 +452,13 @@ export function CompareCalculator() {
 				</div>
 			</div>
 
-			<p className="pt-2 text-[12px] text-text-sub-600 leading-snug dark:text-white/40">
-				*Estimates based on published public cloud pricing tiers as of 2026.
-				Infrastructure data transfer fees may apply.
-			</p>
+			{/* Bottom border & footnote */}
+			<div className="-mx-6 border-stroke-soft-200 border-t px-6 pt-6 sm:-mx-10 sm:px-10 lg:-mx-12 lg:px-12 dark:border-white/10">
+				<p className="text-[12px] text-text-sub-600 leading-snug dark:text-white/40">
+					*Estimates based on published public cloud pricing tiers as of 2026.
+					Infrastructure data transfer fees may apply.
+				</p>
+			</div>
 		</div>
 	);
 }
