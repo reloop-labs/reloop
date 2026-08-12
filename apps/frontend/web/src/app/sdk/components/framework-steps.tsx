@@ -31,11 +31,7 @@ type ResourceCard = {
 	iconName: string;
 };
 
-function FrameworkResources({
-	framework,
-}: {
-	framework: FrameworkDefinition;
-}) {
+function FrameworkResources({ framework }: { framework: FrameworkDefinition }) {
 	const cards: ResourceCard[] = [
 		{
 			title: "Examples",
@@ -45,7 +41,7 @@ function FrameworkResources({
 		},
 		{
 			title: `${framework.languageName} docs`,
-			description: `Install the SDK, authenticate, and send your first email.`,
+			description: "Install the SDK, authenticate, and send your first email.",
 			href: framework.docsPath,
 			iconName: "book-open",
 		},
@@ -96,7 +92,7 @@ function FrameworkResources({
 								</span>
 								<Icon
 									name="arrow-up-right"
-									className="size-3.5 text-text-sub-600 opacity-0 transition-all duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:opacity-100 dark:text-white/50"
+									className="group-hover:-translate-y-0.5 size-3.5 text-text-sub-600 opacity-0 transition-all duration-200 group-hover:translate-x-0.5 group-hover:opacity-100 dark:text-white/50"
 									aria-hidden
 								/>
 							</div>
@@ -224,10 +220,7 @@ export default function FrameworkSteps({
 										className="inline-flex size-8 shrink-0 items-center justify-center rounded-lg border border-stroke-soft-200 bg-bg-white-0 dark:border-white/10 dark:bg-black"
 										style={{ color: `#${framework.icon.hex}` }}
 									>
-										<LanguageIcon
-											icon={framework.icon}
-											className="size-4"
-										/>
+										<LanguageIcon icon={framework.icon} className="size-4" />
 									</span>
 									<div className="min-w-0">
 										<p className="truncate font-semibold text-[14px] text-text-strong-950 tracking-tight dark:text-white">

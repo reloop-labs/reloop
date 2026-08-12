@@ -1,5 +1,5 @@
-import { BlogCta } from "@reloop/web/components/landing/blog/blog-cta";
 import { JsonLd } from "@reloop/web/components/json-ld";
+import { BlogCta } from "@reloop/web/components/landing/blog/blog-cta";
 import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 import FrameworksGrid from "./components/frameworks-grid";

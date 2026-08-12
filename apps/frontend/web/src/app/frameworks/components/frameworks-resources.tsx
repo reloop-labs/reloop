@@ -54,7 +54,8 @@ export default function FrameworksResources() {
 						All you need to get started.
 					</h2>
 					<p className="max-w-xl text-[14px] text-text-sub-600 leading-relaxed dark:text-white/60">
-						Guides, open-source repositories, and complete API references to help you build and scale transactional emails.
+						Guides, open-source repositories, and complete API references to
+						help you build and scale transactional emails.
 					</p>
 				</div>
 
@@ -87,7 +88,7 @@ export default function FrameworksResources() {
 										</div>
 										<Icon
 											name="arrow-up-right"
-											className="size-3.5 text-text-sub-600 opacity-0 transition-all duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:opacity-100 dark:text-white/50"
+											className="group-hover:-translate-y-0.5 size-3.5 text-text-sub-600 opacity-0 transition-all duration-200 group-hover:translate-x-0.5 group-hover:opacity-100 dark:text-white/50"
 											aria-hidden
 										/>
 									</div>

@@ -63,8 +63,8 @@ export default function FrameworksIndexHero() {
 
 				<p className="mt-4 max-w-2xl text-[15px] text-text-sub-600 leading-relaxed sm:text-[16px] dark:text-white/60">
 					Step-by-step guides for Next.js, Express, Django, FastAPI, Laravel,
-					Rails, Spring Boot, and more—with native idiomatic patterns and type-safe
-					payloads.
+					Rails, Spring Boot, and more—with native idiomatic patterns and
+					type-safe payloads.
 				</p>
 
 				<div className="mt-8 flex flex-wrap items-center gap-3">

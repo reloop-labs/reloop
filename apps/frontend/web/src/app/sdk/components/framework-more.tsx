@@ -1,6 +1,6 @@
 import { Icon } from "@reloop/ui/icon";
 import Link from "next/link";
-import { frameworks, type FrameworkDefinition } from "../frameworks";
+import { type FrameworkDefinition, frameworks } from "../frameworks";
 import { LanguageIcon } from "./language-icon";
 import { AlignedIconBand } from "./section-frame";
 import { SectionTitle } from "./section-title";
@@ -36,7 +36,7 @@ export default function FrameworkMore({
 							<Link
 								key={fw.slug}
 								href={`/frameworks/${fw.slug}`}
-								className="group flex flex-col items-start gap-3 bg-bg-white-0 p-5 transition-colors hover:bg-bg-weak-50 sm:p-6 dark:bg-black dark:hover:bg-white/[0.03]"
+								className="group flex flex-col items-start gap-2 bg-bg-white-0 p-4 transition-colors hover:bg-bg-weak-50 sm:p-5 dark:bg-black dark:hover:bg-white/[0.03]"
 							>
 								<span
 									className="inline-flex size-8 items-center justify-center rounded-lg border border-stroke-soft-200 dark:border-white/10"

@@ -29,7 +29,8 @@ export default function LanguageResources({
 		},
 		{
 			title: "API Reference",
-			description: "Learn about Reloop's REST API and every endpoint available.",
+			description:
+				"Learn about Reloop's REST API and every endpoint available.",
 			href: "/docs/api",
 			iconName: "api",
 		},
@@ -78,7 +79,7 @@ export default function LanguageResources({
 										</div>
 										<Icon
 											name="arrow-up-right"
-											className="size-3.5 text-text-sub-600 opacity-0 transition-all duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:opacity-100 dark:text-white/50"
+											className="group-hover:-translate-y-0.5 size-3.5 text-text-sub-600 opacity-0 transition-all duration-200 group-hover:translate-x-0.5 group-hover:opacity-100 dark:text-white/50"
 											aria-hidden
 										/>
 									</div>

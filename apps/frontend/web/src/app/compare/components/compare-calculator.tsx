@@ -294,10 +294,7 @@ function CalculatorColumn({
 										</span>
 									) : provider.icon ? (
 										<span className="flex size-6 items-center justify-center rounded-md border border-stroke-soft-200/80 bg-bg-weak-50 dark:border-white/10 dark:bg-white/10">
-											<BrandIcon
-												icon={provider.icon}
-												className="size-3.5"
-											/>
+											<BrandIcon icon={provider.icon} className="size-3.5" />
 										</span>
 									) : null}
 
@@ -376,14 +373,13 @@ export function CompareCalculator() {
 		useState<number>(100000);
 	const [marketingContacts, setMarketingContacts] = useState<number>(50000);
 
-	const transactionalCosts =
-		calculateTransactionalCost(transactionalVolume);
+	const transactionalCosts = calculateTransactionalCost(transactionalVolume);
 	const marketingCosts = calculateMarketingCost(marketingContacts);
 
 	return (
 		<div className="w-full">
 			{/* Left-Aligned Header matching ComparisonGrid style with bottom border */}
-			<div className="-mx-6 -mt-12 border-stroke-soft-200 border-b px-6 pt-12 pb-8 sm:-mx-10 sm:-mt-16 sm:px-10 sm:pt-16 sm:pb-10 lg:-mx-12 lg:px-12 dark:border-white/10">
+			<div className="-mx-6 -mt-12 sm:-mx-10 sm:-mt-16 lg:-mx-12 border-stroke-soft-200 border-b px-6 pt-12 pb-8 sm:px-10 sm:pt-16 sm:pb-10 lg:px-12 dark:border-white/10">
 				<div className="flex flex-col items-start gap-2.5">
 					<svg
 						viewBox="0 0 24 24"

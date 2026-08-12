@@ -271,8 +271,8 @@ export default function OpenGraphImage() {
 							marginTop: "16px",
 						}}
 					>
-						Zero-boilerplate guides for Next.js, Django, FastAPI, Laravel, Rails,
-						Spring Boot, and more.
+						Zero-boilerplate guides for Next.js, Django, FastAPI, Laravel,
+						Rails, Spring Boot, and more.
 					</div>
 				</div>
 

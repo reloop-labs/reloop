@@ -161,7 +161,12 @@ export default function LanguageExplorer() {
 			'[role="tab"][aria-selected="true"]',
 		);
 		setActiveFwEl(selected ?? undefined);
-	}, [fwContainerEl, selectedFrameworkSlug, activeSlug, relatedFrameworks.length]);
+	}, [
+		fwContainerEl,
+		selectedFrameworkSlug,
+		activeSlug,
+		relatedFrameworks.length,
+	]);
 
 	const isHoveringOtherFw = Boolean(
 		hoveredFwEl && activeFwEl && hoveredFwEl !== activeFwEl,

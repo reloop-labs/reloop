@@ -58,9 +58,16 @@ const LINKS: ExtraLink[] = [
 	},
 ];
 
-function LinkLabel({ href, external, children }: { href: string; external?: boolean; children: ReactNode }) {
-	const className =
-		"font-medium text-primary-link hover:underline";
+function LinkLabel({
+	href,
+	external,
+	children,
+}: {
+	href: string;
+	external?: boolean;
+	children: ReactNode;
+}) {
+	const className = "font-medium text-primary-link hover:underline";
 
 	if (external) {
 		return (

@@ -1,6 +1,6 @@
 import { Icon } from "@reloop/ui/icon";
 import Link from "next/link";
-import { languages, type LanguageDefinition } from "../languages";
+import { type LanguageDefinition, languages } from "../languages";
 import { LanguageIcon } from "./language-icon";
 import { SectionTitle } from "./section-title";
 
@@ -34,7 +34,7 @@ export default function LanguageMore({
 							key={lang.slug}
 							href={`/sdks/${lang.slug}`}
 							className={[
-								"group flex min-w-[140px] flex-1 flex-col items-start gap-3 p-5 transition-colors hover:bg-bg-weak-50 sm:min-w-0 sm:p-6 dark:hover:bg-white/[0.03]",
+								"group flex min-w-[140px] flex-1 flex-col items-start gap-2 p-4 transition-colors hover:bg-bg-weak-50 sm:min-w-0 sm:p-5 dark:hover:bg-white/[0.03]",
 								i < others.length - 1
 									? "border-stroke-soft-200 border-r dark:border-white/10"
 									: "",

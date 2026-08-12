@@ -37,7 +37,7 @@ export default function LanguageFrameworks({
 								</div>
 								<Icon
 									name="arrow-up-right"
-									className="size-3.5 text-text-sub-600 opacity-0 transition-all duration-150 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:opacity-100 dark:text-white/50"
+									className="group-hover:-translate-y-0.5 size-3.5 text-text-sub-600 opacity-0 transition-all duration-150 group-hover:translate-x-0.5 group-hover:opacity-100 dark:text-white/50"
 									aria-hidden
 								/>
 							</div>
