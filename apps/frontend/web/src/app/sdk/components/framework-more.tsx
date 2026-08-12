@@ -43,7 +43,7 @@ export default function FrameworkMore({
 								<Link
 									key={fw.slug}
 									href={`/frameworks/${fw.slug}`}
-									className="group flex flex-col items-start gap-2 bg-bg-white-0 p-4 transition-colors hover:bg-bg-weak-50 sm:p-5 dark:bg-black dark:hover:bg-white/[0.04]"
+									className="group flex flex-col items-start gap-2 bg-bg-white-0 p-4 transition-colors hover:bg-bg-weak-50 sm:p-5 dark:bg-black dark:hover:!bg-[#0A0A0A]"
 								>
 									<div className="flex w-full items-start justify-between gap-2">
 										<span

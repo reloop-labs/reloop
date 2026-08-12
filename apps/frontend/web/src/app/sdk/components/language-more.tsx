@@ -41,7 +41,7 @@ export default function LanguageMore({
 								key={lang.slug}
 								href={`/sdk/${lang.slug}`}
 								className={[
-									"group flex min-w-[140px] flex-1 flex-col items-start gap-2 p-4 transition-colors hover:bg-bg-weak-50 sm:min-w-0 sm:p-5 dark:hover:bg-white/[0.04]",
+									"group flex min-w-[140px] flex-1 flex-col items-start gap-2 p-4 transition-colors hover:bg-bg-weak-50 sm:min-w-0 sm:p-5 dark:hover:!bg-[#0A0A0A]",
 									i < others.length - 1
 										? "border-stroke-soft-200 border-r dark:border-white/10"
 										: "",

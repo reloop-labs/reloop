@@ -153,7 +153,7 @@ export default function FrameworkHero({
 								<button
 									type="button"
 									onClick={handleOpenCursor}
-									className="inline-flex h-9 cursor-pointer items-center gap-2 rounded-full border border-stroke-soft-200 bg-bg-white-0 px-4 font-medium text-[13px] text-text-strong-950 transition-colors hover:bg-bg-weak-50 active:scale-[0.98] dark:border-white/15 dark:bg-black dark:text-white dark:hover:bg-white/[0.06]"
+									className="inline-flex h-9 cursor-pointer items-center gap-2 rounded-full border border-stroke-soft-200 bg-bg-white-0 px-4 font-medium text-[13px] text-text-strong-950 transition-colors hover:bg-bg-weak-50 active:scale-[0.98] dark:border-white/15 dark:bg-black dark:text-white dark:hover:!bg-[#0A0A0A]"
 								>
 									<svg
 										role="img"

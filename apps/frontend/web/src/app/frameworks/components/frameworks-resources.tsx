@@ -63,7 +63,7 @@ export default function FrameworksResources() {
 				<div className="grid grid-cols-1 gap-4 p-6 sm:grid-cols-3 sm:gap-4.5 sm:p-10 lg:p-12">
 					{cards.map((card) => {
 						const cardClassName =
-							"group relative flex flex-col overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-6 transition-all duration-200 hover:border-stroke-soft-300 hover:bg-bg-weak-50 dark:border-white/10 dark:bg-black dark:hover:border-white/20 dark:hover:bg-white/[0.04]";
+							"group relative flex flex-col overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-6 transition-all duration-200 hover:border-stroke-soft-300 hover:bg-bg-weak-50 dark:border-white/10 dark:bg-black dark:hover:border-white/20 dark:hover:!bg-[#0A0A0A]";
 
 						const content = (
 							<>

@@ -76,7 +76,7 @@ function FrameworkResources({ framework }: { framework: FrameworkDefinition }) {
 					<a
 						key={card.title}
 						href={card.href}
-						className="group relative flex flex-col overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-5 transition-colors duration-200 hover:bg-bg-weak-50 dark:border-white/10 dark:bg-black dark:hover:bg-white/[0.04]"
+						className="group relative flex flex-col overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-5 transition-colors duration-200 hover:bg-bg-weak-50 dark:border-white/10 dark:bg-black dark:hover:!bg-[#0A0A0A]"
 					>
 						<div
 							aria-hidden
