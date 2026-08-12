@@ -66,9 +66,7 @@ const CompareIndexPage = () => {
 			</PageSection>
 
 			{/* Dedicated Brand Directory Grid */}
-			<PageSection>
-				<ComparisonGrid />
-			</PageSection>
+			<ComparisonGrid />
 		</div>
 	);
 };
