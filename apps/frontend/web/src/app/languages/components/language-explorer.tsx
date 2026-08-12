@@ -26,17 +26,21 @@ export default function LanguageExplorer() {
 	};
 
 	return (
-		<section id="sdk-explorer" className="w-full border-y border-stroke-soft-200 bg-bg-weak-50 py-16 dark:border-white/10 dark:bg-white/[0.01]">
+		<section
+			id="sdk-explorer"
+			className="w-full border-stroke-soft-200 border-y bg-bg-weak-50 py-16 dark:border-white/10 dark:bg-white/[0.01]"
+		>
 			<div className="mx-auto max-w-[1320px] px-4 sm:px-6 lg:px-8">
 				<div className="flex flex-col gap-2">
-					<p className="font-mono text-xs text-text-sub-600 uppercase tracking-wider dark:text-white/50">
+					<p className="font-mono text-text-sub-600 text-xs uppercase tracking-wider dark:text-white/50">
 						Interactive Playground • 0.1
 					</p>
 					<h2 className="font-sans font-semibold text-2xl text-text-strong-950 tracking-tight sm:text-3xl dark:text-white">
 						Explore official SDKs in real time
 					</h2>
 					<p className="max-w-2xl text-base text-text-sub-600 leading-relaxed dark:text-white/60">
-						Select your runtime below to view package installation syntax, framework integration details, and production code snippets.
+						Select your runtime below to view package installation syntax,
+						framework integration details, and production code snippets.
 					</p>
 				</div>
 
@@ -55,7 +59,11 @@ export default function LanguageExplorer() {
 										: "bg-transparent text-text-sub-600 hover:bg-bg-soft-50 hover:text-text-strong-950 dark:text-white/60 dark:hover:bg-white/5 dark:hover:text-white"
 								}`}
 							>
-								<span style={{ color: isActive ? "currentColor" : `#${lang.icon.hex}` }}>
+								<span
+									style={{
+										color: isActive ? "currentColor" : `#${lang.icon.hex}`,
+									}}
+								>
 									<LanguageIcon icon={lang.icon} className="size-3.5" />
 								</span>
 								<span>{lang.name}</span>
@@ -80,7 +88,7 @@ export default function LanguageExplorer() {
 									<h3 className="font-semibold text-lg text-text-strong-950 dark:text-white">
 										{activeLang.name} SDK
 									</h3>
-									<p className="font-mono text-xs text-text-sub-600 dark:text-white/40">
+									<p className="font-mono text-text-sub-600 text-xs dark:text-white/40">
 										{activeLang.packageName}
 									</p>
 								</div>
@@ -93,16 +101,28 @@ export default function LanguageExplorer() {
 							{/* Key Specs Pill Matrix */}
 							<div className="mt-6 flex flex-col gap-2.5">
 								<div className="flex items-center justify-between border-stroke-soft-200 border-b py-2 text-xs dark:border-white/10">
-									<span className="text-text-sub-600 dark:text-white/50">Type Safety</span>
-									<span className="font-mono text-text-strong-950 dark:text-white">{activeLang.typeSafety}</span>
+									<span className="text-text-sub-600 dark:text-white/50">
+										Type Safety
+									</span>
+									<span className="font-mono text-text-strong-950 dark:text-white">
+										{activeLang.typeSafety}
+									</span>
 								</div>
 								<div className="flex items-center justify-between border-stroke-soft-200 border-b py-2 text-xs dark:border-white/10">
-									<span className="text-text-sub-600 dark:text-white/50">Concurrency</span>
-									<span className="font-mono text-text-strong-950 dark:text-white">{activeLang.concurrency}</span>
+									<span className="text-text-sub-600 dark:text-white/50">
+										Concurrency
+									</span>
+									<span className="font-mono text-text-strong-950 dark:text-white">
+										{activeLang.concurrency}
+									</span>
 								</div>
 								<div className="flex items-center justify-between border-stroke-soft-200 border-b py-2 text-xs dark:border-white/10">
-									<span className="text-text-sub-600 dark:text-white/50">Primary Ecosystems</span>
-									<span className="font-sans text-text-strong-950 dark:text-white">{activeLang.primaryFramework}</span>
+									<span className="text-text-sub-600 dark:text-white/50">
+										Primary Ecosystems
+									</span>
+									<span className="font-sans text-text-strong-950 dark:text-white">
+										{activeLang.primaryFramework}
+									</span>
 								</div>
 							</div>
 						</div>
@@ -119,7 +139,7 @@ export default function LanguageExplorer() {
 								<button
 									type="button"
 									onClick={handleCopyInstall}
-									className="ml-3 shrink-0 font-sans font-medium text-xs text-primary-base transition-opacity hover:opacity-80"
+									className="ml-3 shrink-0 font-medium font-sans text-primary-base text-xs transition-opacity hover:opacity-80"
 								>
 									{copiedInstall ? "Copied!" : "Copy"}
 								</button>
@@ -144,21 +164,38 @@ export default function LanguageExplorer() {
 								<span className="size-2.5 rounded-full bg-[#ff5f56]" />
 								<span className="size-2.5 rounded-full bg-[#ffbd2e]" />
 								<span className="size-2.5 rounded-full bg-[#27c93f]" />
-								<span className="ml-2 font-mono text-xs text-white/50">
-									send_email.{activeLang.slug === "python" ? "py" : activeLang.slug === "go" ? "go" : activeLang.slug === "rust" ? "rs" : activeLang.slug === "ruby" ? "rb" : activeLang.slug === "elixir" ? "ex" : activeLang.slug === "java" ? "java" : activeLang.slug === "dotnet" ? "cs" : activeLang.slug === "php" ? "php" : "ts"}
+								<span className="ml-2 font-mono text-white/50 text-xs">
+									send_email.
+									{activeLang.slug === "python"
+										? "py"
+										: activeLang.slug === "go"
+											? "go"
+											: activeLang.slug === "rust"
+												? "rs"
+												: activeLang.slug === "ruby"
+													? "rb"
+													: activeLang.slug === "elixir"
+														? "ex"
+														: activeLang.slug === "java"
+															? "java"
+															: activeLang.slug === "dotnet"
+																? "cs"
+																: activeLang.slug === "php"
+																	? "php"
+																	: "ts"}
 								</span>
 							</div>
 							<button
 								type="button"
 								onClick={handleCopyCode}
-								className="font-mono text-xs text-white/60 transition-colors hover:text-white"
+								className="font-mono text-white/60 text-xs transition-colors hover:text-white"
 							>
 								{copiedCode ? "Copied snippet!" : "Copy code"}
 							</button>
 						</div>
 
 						{/* Code Body */}
-						<div className="overflow-x-auto p-4 font-mono text-[13px] leading-relaxed text-slate-200">
+						<div className="overflow-x-auto p-4 font-mono text-[13px] text-slate-200 leading-relaxed">
 							<pre className="whitespace-pre">
 								<code>{activeLang.sendCode}</code>
 							</pre>

@@ -8,7 +8,11 @@ import { ContactSupportChat, SupportChatHeader } from "./support-chat";
 function LoginPromptCard({
 	user,
 }: {
-	user?: { name?: string | null; image?: string | null; email?: string | null } | null;
+	user?: {
+		name?: string | null;
+		image?: string | null;
+		email?: string | null;
+	} | null;
 }) {
 	return (
 		<div className="relative flex h-full min-h-[360px] w-full flex-col overflow-hidden text-text-strong-950 dark:text-white">
@@ -34,7 +38,7 @@ function LoginPromptCard({
 						asChild
 						variant="neutral"
 						size="medium"
-						className="w-full! h-11! rounded-xl!"
+						className="h-11! w-full! rounded-xl!"
 					>
 						<a href="/dashboard/login?redirectTo=/contact">
 							Log in to start chat

@@ -7,14 +7,16 @@ export default function LanguagesGrid() {
 		<section id="languages" className="w-full py-16 sm:py-20 lg:py-24">
 			<div className="mx-auto max-w-[1320px] px-4 sm:px-6 lg:px-8">
 				<div className="flex flex-col gap-2">
-					<p className="font-mono text-xs text-text-sub-600 uppercase tracking-wider dark:text-white/50">
+					<p className="font-mono text-text-sub-600 text-xs uppercase tracking-wider dark:text-white/50">
 						SDK Directory • 9 Packages
 					</p>
 					<h2 className="font-sans font-semibold text-2xl text-text-strong-950 tracking-tight sm:text-3xl dark:text-white">
 						Select your language guide
 					</h2>
 					<p className="max-w-2xl text-base text-text-sub-600 leading-relaxed dark:text-white/60">
-						Each official repository includes complete installation instructions, authentication patterns, error handling, and framework integration quickstarts.
+						Each official repository includes complete installation
+						instructions, authentication patterns, error handling, and framework
+						integration quickstarts.
 					</p>
 				</div>
 
@@ -42,7 +44,7 @@ export default function LanguagesGrid() {
 									{lang.name}
 								</h3>
 
-								<p className="mt-2 line-clamp-3 text-xs text-text-sub-600 leading-relaxed dark:text-white/60">
+								<p className="mt-2 line-clamp-3 text-text-sub-600 text-xs leading-relaxed dark:text-white/60">
 									{lang.shortDescription}
 								</p>
 

@@ -36,8 +36,8 @@ export function LoopsCostCalculator() {
 							Why pay for inactive contacts?
 						</h3>
 						<p className="mt-2 text-[15px] text-text-sub-600 leading-relaxed dark:text-white/60">
-							Loops increases your monthly bill whenever your contact list grows.
-							Reloop charges only for emails actually sent.
+							Loops increases your monthly bill whenever your contact list
+							grows. Reloop charges only for emails actually sent.
 						</p>
 					</div>
 
@@ -52,7 +52,7 @@ export function LoopsCostCalculator() {
 									type="button"
 									onClick={() => setSelectedTierIndex(idx)}
 									className={cn(
-										"rounded-xl py-2 font-mono text-[13px] font-medium transition-all duration-200",
+										"rounded-xl py-2 font-medium font-mono text-[13px] transition-all duration-200",
 										selectedTierIndex === idx
 											? "bg-text-strong-950 text-white shadow-sm dark:bg-white dark:text-black"
 											: "border border-stroke-soft-200/80 bg-bg-weak-50/50 text-text-sub-600 hover:border-stroke-soft-300 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/60 dark:hover:text-white",
@@ -100,7 +100,7 @@ export function LoopsCostCalculator() {
 								</div>
 							</div>
 							<div className="text-right">
-								<span className="font-mono font-bold text-[2rem] text-text-strong-950 dark:text-white">
+								<span className="font-bold font-mono text-[2rem] text-text-strong-950 dark:text-white">
 									${current.reloop}
 								</span>
 								<span className="text-[12px] text-text-sub-600 dark:text-white/40">
@@ -129,7 +129,7 @@ export function LoopsCostCalculator() {
 								</div>
 							</div>
 							<div className="text-right">
-								<span className="font-mono font-bold text-[2rem] text-text-sub-600 line-through dark:text-white/40">
+								<span className="font-bold font-mono text-[2rem] text-text-sub-600 line-through dark:text-white/40">
 									${current.loops}
 								</span>
 								<span className="text-[12px] text-text-sub-600 dark:text-white/40">

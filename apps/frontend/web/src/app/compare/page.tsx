@@ -1,5 +1,4 @@
 import { BlogCta } from "@reloop/web/components/landing/blog/blog-cta";
-import { PageSection } from "@reloop/web/components/page-shell";
 import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 import { CompareCalculator } from "./components/compare-calculator";
@@ -58,14 +57,14 @@ const CompareIndexPage = () => {
 				<CompareHeroHeader />
 
 				{/* Volume & ROI Cost Calculator */}
-				<PageSection>
+				<section className="border-stroke-soft-200 border-b px-6 py-12 sm:px-10 sm:py-16 lg:px-12 dark:border-white/10">
 					<CompareCalculator />
-				</PageSection>
+				</section>
 
 				{/* Master Feature Matrix */}
-				<PageSection>
+				<section className="border-stroke-soft-200 border-b px-6 py-12 sm:px-10 sm:py-16 lg:px-12 dark:border-white/10">
 					<CompareMasterMatrix />
-				</PageSection>
+				</section>
 
 				{/* Dedicated Brand Directory Grid */}
 				<ComparisonGrid />

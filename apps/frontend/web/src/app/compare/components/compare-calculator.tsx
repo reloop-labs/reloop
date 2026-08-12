@@ -179,7 +179,7 @@ export function CompareCalculator() {
 									type="button"
 									onClick={() => setVolume(preset.value)}
 									className={cn(
-										"rounded-lg px-3 py-1.5 font-mono text-[13px] font-medium transition-all duration-200",
+										"rounded-lg px-3 py-1.5 font-medium font-mono text-[13px] transition-all duration-200",
 										volume === preset.value
 											? "bg-text-strong-950 text-white shadow-sm dark:bg-white dark:text-black"
 											: "border border-stroke-soft-200/80 bg-bg-weak-50/50 text-text-sub-600 hover:border-stroke-soft-300 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/60 dark:hover:text-white",
@@ -240,8 +240,11 @@ export function CompareCalculator() {
 													<Logo className="size-3.5 text-white dark:text-black" />
 												</span>
 											) : provider.icon ? (
-												<span className="flex size-6 items-center justify-center rounded-md bg-bg-weak-50 border border-stroke-soft-200/80 dark:border-white/10 dark:bg-white/10">
-													<BrandIcon icon={provider.icon} className="size-3.5" />
+												<span className="flex size-6 items-center justify-center rounded-md border border-stroke-soft-200/80 bg-bg-weak-50 dark:border-white/10 dark:bg-white/10">
+													<BrandIcon
+														icon={provider.icon}
+														className="size-3.5"
+													/>
 												</span>
 											) : null}
 

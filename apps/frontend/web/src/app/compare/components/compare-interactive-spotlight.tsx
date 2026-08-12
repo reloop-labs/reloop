@@ -39,7 +39,10 @@ const SPOTLIGHT_DATA: Record<string, ProviderSnapshot> = {
 			"Requires third-party tools for inbound AI logic",
 		],
 		freeTier: { reloop: "10,000 emails / mo", competitor: "3,000 emails / mo" },
-		openSource: { reloop: "Yes (KumoMTA Engine)", competitor: "No (Proprietary)" },
+		openSource: {
+			reloop: "Yes (KumoMTA Engine)",
+			competitor: "No (Proprietary)",
+		},
 		inboundAi: { reloop: "Built-in Agent Inbox", competitor: "Webhooks only" },
 	},
 	SendGrid: {
@@ -61,7 +64,10 @@ const SPOTLIGHT_DATA: Record<string, ProviderSnapshot> = {
 			"Expensive dedicated IP add-ons",
 		],
 		freeTier: { reloop: "10,000 emails / mo", competitor: "100 emails / day" },
-		openSource: { reloop: "Yes (KumoMTA Engine)", competitor: "No (Closed Source)" },
+		openSource: {
+			reloop: "Yes (KumoMTA Engine)",
+			competitor: "No (Closed Source)",
+		},
 		inboundAi: { reloop: "Built-in Agent Inbox", competitor: "No" },
 	},
 	Mailgun: {
@@ -106,7 +112,10 @@ const SPOTLIGHT_DATA: Record<string, ProviderSnapshot> = {
 		],
 		freeTier: { reloop: "10,000 emails / mo", competitor: "62k/mo (EC2 only)" },
 		openSource: { reloop: "Yes (KumoMTA Engine)", competitor: "No" },
-		inboundAi: { reloop: "Built-in Agent Inbox", competitor: "S3 + Lambda pipeline" },
+		inboundAi: {
+			reloop: "Built-in Agent Inbox",
+			competitor: "S3 + Lambda pipeline",
+		},
 	},
 	Postmark: {
 		name: "Postmark",
@@ -170,7 +179,10 @@ const SPOTLIGHT_DATA: Record<string, ProviderSnapshot> = {
 			"Transactional email requires separate Mandrill add-on",
 			"Expensive monthly contact tier locks",
 		],
-		freeTier: { reloop: "10,000 emails / mo", competitor: "500 contacts limit" },
+		freeTier: {
+			reloop: "10,000 emails / mo",
+			competitor: "500 contacts limit",
+		},
 		openSource: { reloop: "Yes (KumoMTA Engine)", competitor: "No" },
 		inboundAi: { reloop: "Built-in Agent Inbox", competitor: "No" },
 	},
@@ -210,7 +222,7 @@ export function CompareInteractiveSpotlight() {
 							type="button"
 							onClick={() => setSelectedBrand(brand.name)}
 							className={cn(
-								"flex items-center gap-2.5 rounded-full px-4 py-2 text-[14px] font-medium transition-all duration-200",
+								"flex items-center gap-2.5 rounded-full px-4 py-2 font-medium text-[14px] transition-all duration-200",
 								isSelected
 									? "bg-text-strong-950 text-white shadow-md dark:bg-white dark:text-black"
 									: "border border-stroke-soft-200/80 bg-bg-weak-50/50 text-text-sub-600 hover:border-stroke-soft-300 hover:bg-bg-soft-50 dark:border-white/10 dark:bg-white/[0.03] dark:text-white/70 dark:hover:border-white/20 dark:hover:text-white",

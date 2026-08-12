@@ -51,7 +51,7 @@ export function CompareHeroHeader() {
 
 			{/* 5-Column Static Grid Strip */}
 			<div className="border-stroke-soft-200 border-t dark:border-white/10">
-				<div className="grid grid-cols-1 divide-y divide-stroke-soft-200 sm:grid-cols-2 sm:divide-x sm:divide-y-0 md:grid-cols-5 dark:divide-white/10">
+				<div className="grid grid-cols-1 divide-y divide-stroke-soft-200 px-7 text-left sm:grid-cols-2 sm:divide-x sm:divide-y-0 md:grid-cols-5 dark:divide-white/10">
 					{HERO_TABS.map((tab) => (
 						<div
 							key={tab.id}

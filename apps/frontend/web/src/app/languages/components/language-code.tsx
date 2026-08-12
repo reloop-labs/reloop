@@ -43,17 +43,25 @@ export default function LanguageCode({
 										: "ts";
 
 	return (
-		<section id="code" className="scroll-mt-16 w-full border-t border-stroke-soft-200 bg-bg-weak-50/50 py-16 dark:border-white/10 dark:bg-white/[0.01]">
+		<section
+			id="code"
+			className="w-full scroll-mt-16 border-stroke-soft-200 border-t bg-bg-weak-50/50 py-16 dark:border-white/10 dark:bg-white/[0.01]"
+		>
 			<div className="mx-auto max-w-[1320px] px-4 sm:px-6 lg:px-8">
 				<div className="flex flex-col gap-2 text-center sm:text-left">
-					<p className="font-mono text-xs text-text-sub-600 uppercase tracking-wider dark:text-white/50">
+					<p className="font-mono text-text-sub-600 text-xs uppercase tracking-wider dark:text-white/50">
 						Implementation • Code Example
 					</p>
 					<h2 className="font-sans font-semibold text-2xl text-text-strong-950 tracking-tight sm:text-3xl dark:text-white">
 						Send your first email in {language.name}
 					</h2>
 					<p className="max-w-2xl text-base text-text-sub-600 leading-relaxed dark:text-white/60">
-						Install the official package, initialize the client with your API key, and call <code className="font-mono text-text-strong-950 dark:text-white">emails.send</code>.
+						Install the official package, initialize the client with your API
+						key, and call{" "}
+						<code className="font-mono text-text-strong-950 dark:text-white">
+							emails.send
+						</code>
+						.
 					</p>
 				</div>
 
@@ -71,7 +79,7 @@ export default function LanguageCode({
 								<button
 									type="button"
 									onClick={handleCopyInstall}
-									className="ml-2 font-sans font-medium text-xs text-primary-base hover:opacity-80"
+									className="ml-2 font-medium font-sans text-primary-base text-xs hover:opacity-80"
 								>
 									{copiedInstall ? "Copied!" : "Copy"}
 								</button>
@@ -82,7 +90,7 @@ export default function LanguageCode({
 							<h4 className="font-semibold text-sm text-text-strong-950 dark:text-white">
 								Ecosystem Features
 							</h4>
-							<ul className="mt-3 flex flex-col gap-2 text-xs text-text-sub-600 dark:text-white/60">
+							<ul className="mt-3 flex flex-col gap-2 text-text-sub-600 text-xs dark:text-white/60">
 								<li className="flex items-center gap-2">
 									<span className="size-1.5 rounded-full bg-emerald-500" />
 									<span>Type definition coverage &amp; auto-completion</span>
@@ -106,19 +114,19 @@ export default function LanguageCode({
 								<span className="size-2.5 rounded-full bg-[#ff5f56]" />
 								<span className="size-2.5 rounded-full bg-[#ffbd2e]" />
 								<span className="size-2.5 rounded-full bg-[#27c93f]" />
-								<span className="ml-2 font-mono text-xs text-white/50">
+								<span className="ml-2 font-mono text-white/50 text-xs">
 									send_email.{ext}
 								</span>
 							</div>
 							<button
 								type="button"
 								onClick={handleCopyCode}
-								className="font-mono text-xs text-white/60 transition-colors hover:text-white"
+								className="font-mono text-white/60 text-xs transition-colors hover:text-white"
 							>
 								{copiedCode ? "Copied!" : "Copy code"}
 							</button>
 						</div>
-						<div className="overflow-x-auto p-4 font-mono text-[13px] leading-relaxed text-slate-200">
+						<div className="overflow-x-auto p-4 font-mono text-[13px] text-slate-200 leading-relaxed">
 							<pre className="whitespace-pre">
 								<code>{language.sendCode}</code>
 							</pre>

@@ -4,17 +4,22 @@ import Link from "next/link";
 
 export default function IndexCta() {
 	return (
-		<section id="cta" className="w-full border-stroke-soft-200 border-t py-20 lg:py-24 dark:border-white/10">
+		<section
+			id="cta"
+			className="w-full border-stroke-soft-200 border-t py-20 lg:py-24 dark:border-white/10"
+		>
 			<div className="mx-auto max-w-[1320px] px-4 sm:px-6 lg:px-8">
 				<div className="mx-auto flex max-w-3xl flex-col items-center text-center">
-					<span className="font-mono text-xs text-text-sub-600 uppercase tracking-wider dark:text-white/50">
+					<span className="font-mono text-text-sub-600 text-xs uppercase tracking-wider dark:text-white/50">
 						Unified Infrastructure • One Credentials Model
 					</span>
-					<h2 className="mt-4 font-sans font-bold text-3xl text-text-strong-950 tracking-tight sm:text-4xl dark:text-white">
+					<h2 className="mt-4 font-bold font-sans text-3xl text-text-strong-950 tracking-tight sm:text-4xl dark:text-white">
 						One API key for every stack.
 					</h2>
 					<p className="mt-4 max-w-xl text-base text-text-sub-600 leading-relaxed dark:text-white/60">
-						Create your Reloop account, verify a domain, and send from any SDK. Need traditional mail protocols? Our SMTP relay works seamlessly out of the box.
+						Create your Reloop account, verify a domain, and send from any SDK.
+						Need traditional mail protocols? Our SMTP relay works seamlessly out
+						of the box.
 					</p>
 
 					<div className="mt-8 flex flex-wrap items-center justify-center gap-3">

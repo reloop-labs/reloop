@@ -105,8 +105,8 @@ const LoopsComparisonPage = () => {
 					<p className="text-[16px] text-text-sub-600 leading-relaxed dark:text-white/60">
 						Many SaaS teams start with Loops for product onboarding loops, then
 						quickly realize they still need Resend or Postmark for auth emails,
-						invoices, and transactional webhooks. Reloop unifies both under one API
-						key.
+						invoices, and transactional webhooks. Reloop unifies both under one
+						API key.
 					</p>
 
 					{/* Visual Stack Comparison */}
@@ -117,16 +117,20 @@ const LoopsComparisonPage = () => {
 							</span>
 							<ul className="mt-3 space-y-2 font-mono text-[13px] text-text-sub-600 dark:text-white/60">
 								<li className="flex items-center gap-2">
-									<span className="text-red-500">✕</span> Loops → Onboarding &amp; Newsletters
+									<span className="text-red-500">✕</span> Loops → Onboarding
+									&amp; Newsletters
 								</li>
 								<li className="flex items-center gap-2">
-									<span className="text-red-500">✕</span> Resend / Postmark → Auth &amp; Receipts
+									<span className="text-red-500">✕</span> Resend / Postmark →
+									Auth &amp; Receipts
 								</li>
 								<li className="flex items-center gap-2">
-									<span className="text-red-500">✕</span> 2 Domain Reputation Pools
+									<span className="text-red-500">✕</span> 2 Domain Reputation
+									Pools
 								</li>
 								<li className="flex items-center gap-2">
-									<span className="text-red-500">✕</span> 2 Separate Monthly Bills
+									<span className="text-red-500">✕</span> 2 Separate Monthly
+									Bills
 								</li>
 							</ul>
 						</div>
@@ -137,16 +141,20 @@ const LoopsComparisonPage = () => {
 							</span>
 							<ul className="mt-3 space-y-2 font-mono text-[13px] text-text-strong-950 dark:text-white">
 								<li className="flex items-center gap-2">
-									<span className="text-emerald-500">✓</span> Reloop → Onboarding &amp; Newsletters
+									<span className="text-emerald-500">✓</span> Reloop →
+									Onboarding &amp; Newsletters
 								</li>
 								<li className="flex items-center gap-2">
-									<span className="text-emerald-500">✓</span> Reloop → Auth, Billing &amp; Receipts
+									<span className="text-emerald-500">✓</span> Reloop → Auth,
+									Billing &amp; Receipts
 								</li>
 								<li className="flex items-center gap-2">
-									<span className="text-emerald-500">✓</span> Reloop → Inbound AI Agent Inbox
+									<span className="text-emerald-500">✓</span> Reloop → Inbound
+									AI Agent Inbox
 								</li>
 								<li className="flex items-center gap-2">
-									<span className="text-emerald-500">✓</span> 1 Domain Reputation Pool
+									<span className="text-emerald-500">✓</span> 1 Domain
+									Reputation Pool
 								</li>
 							</ul>
 						</div>
@@ -166,7 +174,8 @@ const LoopsComparisonPage = () => {
 						Reloop &nbsp;&nbsp;vs&nbsp;&nbsp;&nbsp;Loops
 					</h2>
 					<p className="mx-auto mt-3 max-w-xl font-medium text-[15px] text-text-sub-600 leading-7 sm:text-[17px] dark:text-white/50">
-						Compare capabilities, sending mechanisms, and open-source data ownership.
+						Compare capabilities, sending mechanisms, and open-source data
+						ownership.
 					</p>
 				</div>
 
@@ -203,12 +212,14 @@ const LoopsComparisonPage = () => {
 					title="Loops vs Reloop FAQ"
 					items={[
 						{
-							question: "Why should we choose send-based pricing over contact-based pricing?",
+							question:
+								"Why should we choose send-based pricing over contact-based pricing?",
 							answer:
 								"Contact-based pricing charges you for inactive leads and users who never open your emails. Reloop's send-based pricing ensures you only pay when emails are delivered.",
 						},
 						{
-							question: "Can Reloop handle both marketing campaigns and transactional APIs?",
+							question:
+								"Can Reloop handle both marketing campaigns and transactional APIs?",
 							answer:
 								"Yes! Reloop includes transactional API endpoints, SMTP relays, drag-and-drop/JSX email template builders, broadcast campaigns, and AI agent inboxes under one unified platform.",
 						},

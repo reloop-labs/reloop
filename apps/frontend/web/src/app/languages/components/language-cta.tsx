@@ -7,17 +7,21 @@ export default function LanguageCta({
 	language: LanguageDefinition;
 }) {
 	return (
-		<section id="cta" className="w-full border-t border-stroke-soft-200 py-20 lg:py-24 dark:border-white/10">
+		<section
+			id="cta"
+			className="w-full border-stroke-soft-200 border-t py-20 lg:py-24 dark:border-white/10"
+		>
 			<div className="mx-auto max-w-[1320px] px-4 sm:px-6 lg:px-8">
 				<div className="mx-auto flex max-w-3xl flex-col items-center text-center">
-					<span className="font-mono text-xs text-text-sub-600 uppercase tracking-wider dark:text-white/50">
+					<span className="font-mono text-text-sub-600 text-xs uppercase tracking-wider dark:text-white/50">
 						Ready for Production • {language.name}
 					</span>
-					<h2 className="mt-4 font-sans font-bold text-3xl text-text-strong-950 tracking-tight sm:text-4xl dark:text-white">
+					<h2 className="mt-4 font-bold font-sans text-3xl text-text-strong-950 tracking-tight sm:text-4xl dark:text-white">
 						Start sending with {language.name} today.
 					</h2>
 					<p className="mt-4 max-w-xl text-base text-text-sub-600 leading-relaxed dark:text-white/60">
-						Get your API key, configure domain DNS records, and build reliable email infrastructure with official {language.name} support.
+						Get your API key, configure domain DNS records, and build reliable
+						email infrastructure with official {language.name} support.
 					</p>
 
 					<div className="mt-8 flex flex-wrap items-center justify-center gap-3">
@@ -38,7 +42,7 @@ export default function LanguageCta({
 					<div className="mt-10">
 						<Link
 							href="/languages"
-							className="font-mono text-xs text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/50 dark:hover:text-white"
+							className="font-mono text-text-sub-600 text-xs transition-colors hover:text-text-strong-950 dark:text-white/50 dark:hover:text-white"
 						>
 							&larr; View all supported languages &amp; runtimes
 						</Link>

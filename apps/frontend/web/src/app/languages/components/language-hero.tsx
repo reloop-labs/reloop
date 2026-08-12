@@ -21,7 +21,9 @@ export default function LanguageHero({
 					>
 						Languages
 					</Link>
-					<span className="font-mono text-text-sub-600 text-xs dark:text-white/30">/</span>
+					<span className="font-mono text-text-sub-600 text-xs dark:text-white/30">
+						/
+					</span>
 					<div className="inline-flex items-center gap-1.5 rounded-full border border-stroke-soft-200 bg-bg-weak-50 px-3 py-0.5 font-mono text-text-sub-600 text-xs dark:border-white/10 dark:bg-white/[0.03] dark:text-white/70">
 						<span style={{ color: `#${language.icon.hex}` }}>
 							<LanguageIcon icon={language.icon} className="size-3.5" />
@@ -31,7 +33,7 @@ export default function LanguageHero({
 				</div>
 
 				{/* Title */}
-				<h1 className="font-sans font-bold text-4xl text-text-strong-950 leading-[1.08] tracking-tight sm:text-6xl dark:text-white">
+				<h1 className="font-bold font-sans text-4xl text-text-strong-950 leading-[1.08] tracking-tight sm:text-6xl dark:text-white">
 					Send email with {language.name}.
 				</h1>
 
@@ -65,26 +67,34 @@ export default function LanguageHero({
 				{/* 4-Column Spec Bar */}
 				<div className="mt-14 grid grid-cols-2 gap-4 border-stroke-soft-200 border-y py-6 sm:grid-cols-4 dark:border-white/10">
 					<div className="flex flex-col items-center">
-						<span className="font-mono text-text-sub-600 text-xs dark:text-white/50">Package</span>
-						<span className="mt-1 font-mono font-semibold text-text-strong-950 text-sm dark:text-white">
+						<span className="font-mono text-text-sub-600 text-xs dark:text-white/50">
+							Package
+						</span>
+						<span className="mt-1 font-mono font-semibold text-sm text-text-strong-950 dark:text-white">
 							{language.packageName}
 						</span>
 					</div>
 					<div className="flex flex-col items-center">
-						<span className="font-mono text-text-sub-600 text-xs dark:text-white/50">Type Safety</span>
-						<span className="mt-1 font-sans font-semibold text-text-strong-950 text-sm dark:text-white">
+						<span className="font-mono text-text-sub-600 text-xs dark:text-white/50">
+							Type Safety
+						</span>
+						<span className="mt-1 font-sans font-semibold text-sm text-text-strong-950 dark:text-white">
 							{language.typeSafety}
 						</span>
 					</div>
 					<div className="flex flex-col items-center">
-						<span className="font-mono text-text-sub-600 text-xs dark:text-white/50">Concurrency</span>
-						<span className="mt-1 font-sans font-semibold text-text-strong-950 text-sm dark:text-white">
+						<span className="font-mono text-text-sub-600 text-xs dark:text-white/50">
+							Concurrency
+						</span>
+						<span className="mt-1 font-sans font-semibold text-sm text-text-strong-950 dark:text-white">
 							{language.concurrency}
 						</span>
 					</div>
 					<div className="flex flex-col items-center">
-						<span className="font-mono text-text-sub-600 text-xs dark:text-white/50">Frameworks</span>
-						<span className="mt-1 font-sans font-semibold text-text-strong-950 text-sm dark:text-white">
+						<span className="font-mono text-text-sub-600 text-xs dark:text-white/50">
+							Frameworks
+						</span>
+						<span className="mt-1 font-sans font-semibold text-sm text-text-strong-950 dark:text-white">
 							{language.primaryFramework}
 						</span>
 					</div>

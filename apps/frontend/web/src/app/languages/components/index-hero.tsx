@@ -13,13 +13,15 @@ export default function IndexHero() {
 				</div>
 
 				{/* Primary Claim Title */}
-				<h1 className="font-sans font-bold text-4xl text-text-strong-950 leading-[1.08] tracking-tight sm:text-6xl dark:text-white">
+				<h1 className="font-bold font-sans text-4xl text-text-strong-950 leading-[1.08] tracking-tight sm:text-6xl dark:text-white">
 					Send email in your native runtime.
 				</h1>
 
 				{/* Subheadline / Orientation */}
 				<p className="mx-auto mt-6 max-w-2xl text-base text-text-sub-600 leading-relaxed sm:text-lg dark:text-white/60">
-					Official Reloop SDKs for Node.js, Python, Go, Rust, PHP, Ruby, Elixir, Java, and .NET. Fully typed, zero unnecessary runtime overhead, and pre-configured for modern serverless and cloud environments.
+					Official Reloop SDKs for Node.js, Python, Go, Rust, PHP, Ruby, Elixir,
+					Java, and .NET. Fully typed, zero unnecessary runtime overhead, and
+					pre-configured for modern serverless and cloud environments.
 				</p>
 
 				{/* Actions */}
@@ -47,7 +49,7 @@ export default function IndexHero() {
 				{/* Stat Strip (Vercel primitive .vbg-stat-strip concept) */}
 				<div className="mt-14 grid grid-cols-3 divide-x divide-stroke-soft-200 border-stroke-soft-200 border-y py-6 dark:divide-white/10 dark:border-white/10">
 					<div className="flex flex-col items-center px-2">
-						<span className="font-mono font-semibold text-text-strong-950 text-xl tracking-tight sm:text-2xl tabular-nums dark:text-white">
+						<span className="font-mono font-semibold text-text-strong-950 text-xl tabular-nums tracking-tight sm:text-2xl dark:text-white">
 							09
 						</span>
 						<span className="mt-1 text-text-sub-600 text-xs dark:text-white/50">
@@ -55,7 +57,7 @@ export default function IndexHero() {
 						</span>
 					</div>
 					<div className="flex flex-col items-center px-2">
-						<span className="font-mono font-semibold text-text-strong-950 text-xl tracking-tight sm:text-2xl tabular-nums dark:text-white">
+						<span className="font-mono font-semibold text-text-strong-950 text-xl tabular-nums tracking-tight sm:text-2xl dark:text-white">
 							100%
 						</span>
 						<span className="mt-1 text-text-sub-600 text-xs dark:text-white/50">
@@ -63,7 +65,7 @@ export default function IndexHero() {
 						</span>
 					</div>
 					<div className="flex flex-col items-center px-2">
-						<span className="font-mono font-semibold text-text-strong-950 text-xl tracking-tight sm:text-2xl tabular-nums dark:text-white">
+						<span className="font-mono font-semibold text-text-strong-950 text-xl tabular-nums tracking-tight sm:text-2xl dark:text-white">
 							&lt;50ms
 						</span>
 						<span className="mt-1 text-text-sub-600 text-xs dark:text-white/50">
