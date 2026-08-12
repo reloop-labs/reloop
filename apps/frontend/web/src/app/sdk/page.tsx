@@ -101,8 +101,6 @@ export default function SdkIndexPage() {
 					sub="Create an account, verify a domain, and send from any framework or official SDK."
 					primaryLabel="Get started free"
 					primaryHref="/dashboard/signup"
-					secondaryLabel="Quickstart"
-					secondaryHref="/docs/quickstart"
 					accentColor="blue"
 				/>
 			</main>
