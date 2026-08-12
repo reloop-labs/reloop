@@ -152,7 +152,10 @@ export function BlogCta({
 			categoryVariant?.primaryLabel ??
 			DEFAULT_VARIANT.primaryLabel,
 		secondaryLabel:
-			secondaryLabel ?? categoryVariant?.secondaryLabel ?? "Documentation",
+			secondaryLabel !== undefined
+				? secondaryLabel
+				: (categoryVariant?.secondaryLabel ??
+					(headline ? undefined : "Documentation")),
 	};
 
 	const resolvedAccent =
@@ -204,13 +207,15 @@ export function BlogCta({
 					</div>
 
 					<div className="relative z-10 flex shrink-0 flex-wrap items-center gap-3">
-						<CtaLink
-							label={variant.secondaryLabel}
-							href={secondaryHref}
-							external={secondaryExternal}
-							filled={false}
-							isSecondery
-						/>
+						{variant.secondaryLabel && (
+							<CtaLink
+								label={variant.secondaryLabel}
+								href={secondaryHref}
+								external={secondaryExternal}
+								filled={false}
+								isSecondery
+							/>
+						)}
 						<CtaLink
 							label={variant.primaryLabel}
 							href={primaryHref}
