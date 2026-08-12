@@ -7,7 +7,6 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { siNpm, siPnpm, siYarn } from "simple-icons";
 import { frameworksForLanguage } from "../frameworks";
 import { languages } from "../languages";
-import { AccountSetupActions } from "./account-setup-actions";
 import { AnimatedHoverBackground } from "./animated-hover-background";
 import { bunIcon } from "./bun-icon";
 import { ExtraLinks } from "./extra-links";
@@ -483,15 +482,11 @@ export default function LanguageExplorer() {
 					</div>
 				</aside>
 
-				{/* Right: Step-by-step playground */}
+				{/* Right: step-by-step playground */}
 				<div className="border-stroke-soft-200 border-t p-6 sm:p-8 lg:col-span-9 lg:border-t-0 lg:p-10 dark:border-white/10">
 					<div className="flex flex-col">
-						<StepItem number={1} title="Get an API key and add a domain">
-							<AccountSetupActions />
-						</StepItem>
-
 						<StepItem
-							number={2}
+							number={1}
 							title={`Install the ${activeDisplayName} package`}
 						>
 							<SdkCodeBlock
@@ -508,7 +503,7 @@ export default function LanguageExplorer() {
 							/>
 						</StepItem>
 
-						<StepItem number={3} title={`Send email with ${activeDisplayName}`}>
+						<StepItem number={2} title={`Send email with ${activeDisplayName}`}>
 							<SdkCodeBlock
 								key={`code-${active.slug}-${activeFramework?.slug ?? "base"}`}
 								code={sendCode}
@@ -516,7 +511,7 @@ export default function LanguageExplorer() {
 							/>
 						</StepItem>
 
-						<StepItem number={4} title="GitHub, examples, and API reference">
+						<StepItem number={3} title="GitHub, examples, and API reference">
 							<ResourceLinks
 								languageSlug={active.slug}
 								languageName={active.name}
@@ -526,7 +521,7 @@ export default function LanguageExplorer() {
 							/>
 						</StepItem>
 
-						<StepItem number={5} title="Need more help?" isLast>
+						<StepItem number={4} title="Need more help?" isLast>
 							<ExtraLinks />
 						</StepItem>
 					</div>

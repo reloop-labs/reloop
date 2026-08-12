@@ -5,7 +5,6 @@ import { Icon } from "@reloop/ui/icon";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { FrameworkDefinition } from "../frameworks";
-import { AccountSetupActions } from "./account-setup-actions";
 import { ExtraLinks } from "./extra-links";
 import {
 	getBrandColorStyle,
@@ -24,7 +23,6 @@ type StepDef = {
 	code?: string;
 	isShell: boolean;
 	filename: string | null;
-	showSetupActions?: boolean;
 	showResourceLinks?: boolean;
 	showExtraLinks?: boolean;
 };
@@ -124,18 +122,8 @@ export default function FrameworkSteps({
 }) {
 	const steps: StepDef[] = [
 		{
-			id: "setup",
-			number: 1,
-			label: "Setup",
-			title: "Get an API key and add a domain",
-			body: `Create a free Reloop account, copy your API key into your ${framework.name} environment, and add a sending domain.`,
-			isShell: true,
-			filename: null,
-			showSetupActions: true,
-		},
-		{
 			id: "install",
-			number: 2,
+			number: 1,
 			label: "Install",
 			title: "Install the package",
 			body: `Add the official ${framework.languageName} client to your ${framework.name} project.`,
@@ -145,7 +133,7 @@ export default function FrameworkSteps({
 		},
 		{
 			id: "send",
-			number: 3,
+			number: 2,
 			label: "Send",
 			title: `Send email from ${framework.name}`,
 			body: `Use this ${framework.name} snippet to send your first message. Works with ${framework.runtimeHint}.`,
@@ -155,7 +143,7 @@ export default function FrameworkSteps({
 		},
 		{
 			id: "resources",
-			number: 4,
+			number: 3,
 			label: "Resources",
 			title: "GitHub, examples, and API reference",
 			body: `Official ${framework.languageName} SDK source, example repos, and API docs.`,
@@ -165,7 +153,7 @@ export default function FrameworkSteps({
 		},
 		{
 			id: "more",
-			number: 5,
+			number: 4,
 			label: "More",
 			title: "Need more help?",
 			body: "Support, Discord, changelog, sales, and the agent index.",
@@ -370,7 +358,6 @@ export default function FrameworkSteps({
 								</p>
 
 								<div className="mt-5 flex flex-col gap-3">
-									{step.showSetupActions ? <AccountSetupActions /> : null}
 									{step.showResourceLinks ? (
 										<ResourceLinks
 											languageSlug={framework.languageSlug}
