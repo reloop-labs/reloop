@@ -39,12 +39,12 @@ export default function FrameworkMore({
 								className="group flex flex-col items-start gap-2 bg-bg-white-0 p-4 transition-colors hover:bg-bg-weak-50 sm:p-5 dark:bg-black dark:hover:bg-white/[0.03]"
 							>
 								<span
-									className="inline-flex size-8 items-center justify-center rounded-lg border border-stroke-soft-200 dark:border-white/10"
+									className="inline-flex size-8 items-center justify-center rounded-[10px] border border-stroke-soft-200 dark:border-white/10"
 									style={{ color: `#${fw.icon.hex}` }}
 								>
 									<LanguageIcon icon={fw.icon} className="size-4" />
 								</span>
-								<span className="font-medium text-[13px] text-text-strong-950 dark:text-white">
+								<span className="pl-0.5 font-medium text-[13px] text-text-strong-950 dark:text-white">
 									{fw.name}
 								</span>
 							</Link>
