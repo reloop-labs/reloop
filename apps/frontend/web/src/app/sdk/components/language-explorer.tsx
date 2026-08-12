@@ -152,9 +152,11 @@ export default function LanguageExplorer() {
 		: null;
 
 	const isLanguageSelected = activeFramework === null;
-	const activeRailColor = activeFramework
-		? `#${activeFramework.icon.hex}`
-		: brandColor;
+	const activeRailHex = activeFramework
+		? activeFramework.icon.hex
+		: active.icon.hex;
+	const isDarkRail = isDarkBrandColor(activeRailHex);
+	const activeRailColor = isDarkRail ? undefined : `#${activeRailHex}`;
 
 	useLayoutEffect(() => {
 		if (!fwContainerEl) {
@@ -248,6 +250,7 @@ export default function LanguageExplorer() {
 						const isActive = lang.slug === activeSlug;
 						const langBrandColor = `#${lang.icon.hex}`;
 						const showActiveLabel = isActive && Boolean(activePill || !mounted);
+						const isTabLangDark = isDarkBrandColor(lang.icon.hex);
 
 						return (
 							<button
@@ -272,9 +275,18 @@ export default function LanguageExplorer() {
 								)}
 							>
 								<span
-									className="inline-flex items-center"
+									className={cn(
+										"inline-flex items-center",
+										!showActiveLabel &&
+											isTabLangDark &&
+											"text-text-strong-950 dark:text-white",
+									)}
 									style={{
-										color: showActiveLabel ? "#ffffff" : langBrandColor,
+										color: showActiveLabel
+											? "#ffffff"
+											: isTabLangDark
+												? undefined
+												: langBrandColor,
 									}}
 								>
 									<LanguageIcon icon={lang.icon} className="size-3.5" />
@@ -326,8 +338,12 @@ export default function LanguageExplorer() {
 					<div className="flex flex-col gap-4 p-6 sm:p-7 lg:sticky lg:top-16 lg:p-7">
 						<div className="flex items-center gap-3">
 							<div
-								className="inline-flex size-10 items-center justify-center rounded-xl border border-stroke-soft-200 bg-bg-white-0 dark:border-white/10 dark:bg-black"
-								style={{ color: brandColor }}
+								className={cn(
+									"inline-flex size-10 items-center justify-center rounded-xl border border-stroke-soft-200 bg-bg-white-0 dark:border-white/10 dark:bg-black",
+									isDarkBrandColor(active.icon.hex) &&
+										"text-text-strong-950 dark:text-white",
+								)}
+								style={getBrandColorStyle(active.icon.hex)}
 							>
 								<LanguageIcon icon={active.icon} className="size-4.5" />
 							</div>
@@ -368,8 +384,12 @@ export default function LanguageExplorer() {
 									className="group relative z-10 flex h-8 w-full cursor-pointer items-center gap-2.5 rounded-lg px-2.5 text-left transition-colors"
 								>
 									<span
-										className="flex size-4 shrink-0 items-center justify-center"
-										style={{ color: brandColor }}
+										className={cn(
+											"flex size-4 shrink-0 items-center justify-center",
+											isDarkBrandColor(active.icon.hex) &&
+												"text-text-strong-950 dark:text-white",
+										)}
+										style={getBrandColorStyle(active.icon.hex)}
 									>
 										<LanguageIcon icon={active.icon} className="size-3.5" />
 									</span>
@@ -440,8 +460,15 @@ export default function LanguageExplorer() {
 								{fwActiveBox ? (
 									<motion.div
 										aria-hidden
-										className="pointer-events-none absolute z-20 w-0.5 rounded-full"
-										style={{ backgroundColor: activeRailColor }}
+										className={cn(
+											"pointer-events-none absolute z-20 w-0.5 rounded-full",
+											isDarkRail && "bg-text-strong-950 dark:bg-white",
+										)}
+										style={
+											activeRailColor
+												? { backgroundColor: activeRailColor }
+												: undefined
+										}
 										initial={false}
 										animate={{
 											left: fwActiveBox.left + 4,

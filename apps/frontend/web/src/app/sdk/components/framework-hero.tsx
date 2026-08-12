@@ -1,6 +1,7 @@
 "use client";
 
 import * as Button from "@reloop/ui/button";
+import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
@@ -8,7 +9,11 @@ import { useState } from "react";
 import { siCursor } from "simple-icons";
 import { buildFrameworkPrompt } from "../build-framework-prompt";
 import type { FrameworkDefinition } from "../frameworks";
-import { LanguageIcon } from "./language-icon";
+import {
+	getBrandColorStyle,
+	isDarkBrandColor,
+	LanguageIcon,
+} from "./language-icon";
 
 /** Prompt/matrix mark used on SMTP + framework copy-prompt controls. */
 function PromptIcon({ className }: { className?: string }) {
@@ -27,7 +32,6 @@ export default function FrameworkHero({
 }: {
 	framework: FrameworkDefinition;
 }) {
-	const brandColor = `#${framework.icon.hex}`;
 	const [copied, setCopied] = useState(false);
 	const prompt = buildFrameworkPrompt(framework);
 
@@ -93,8 +97,12 @@ export default function FrameworkHero({
 					<div className="relative z-10 flex flex-col gap-6 sm:flex-row sm:items-start sm:gap-5">
 						{/* App icon tile */}
 						<div
-							className="flex size-14 shrink-0 items-center justify-center rounded-2xl border border-stroke-soft-200 bg-bg-white-0 shadow-[0_8px_24px_-8px_rgba(0,0,0,0.12)] sm:size-16 dark:border-white/10 dark:bg-bg-black-950 dark:shadow-[0_8px_24px_-8px_rgba(0,0,0,0.45)]"
-							style={{ color: brandColor }}
+							className={cn(
+								"flex size-14 shrink-0 items-center justify-center rounded-2xl border border-stroke-soft-200 bg-bg-white-0 shadow-[0_8px_24px_-8px_rgba(0,0,0,0.12)] sm:size-16 dark:border-white/10 dark:bg-bg-black-950 dark:shadow-[0_8px_24px_-8px_rgba(0,0,0,0.45)]",
+								isDarkBrandColor(framework.icon.hex) &&
+									"text-text-strong-950 dark:text-white",
+							)}
+							style={getBrandColorStyle(framework.icon.hex)}
 						>
 							<LanguageIcon
 								icon={framework.icon}

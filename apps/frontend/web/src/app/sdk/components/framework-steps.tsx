@@ -1,12 +1,17 @@
 "use client";
 
+import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { FrameworkDefinition } from "../frameworks";
 import { AccountSetupActions } from "./account-setup-actions";
 import { ExtraLinks } from "./extra-links";
-import { LanguageIcon } from "./language-icon";
+import {
+	getBrandColorStyle,
+	isDarkBrandColor,
+	LanguageIcon,
+} from "./language-icon";
 import { getExamplesPath, ResourceLinks } from "./resource-links";
 import { SdkCodeBlock } from "./sdk-code-block";
 
@@ -217,8 +222,12 @@ export default function FrameworkSteps({
 
 								<div className="mt-3.5 flex items-center gap-2.5">
 									<span
-										className="inline-flex size-8 shrink-0 items-center justify-center rounded-lg border border-stroke-soft-200 bg-bg-white-0 dark:border-white/10 dark:bg-black"
-										style={{ color: `#${framework.icon.hex}` }}
+										className={cn(
+											"inline-flex size-8 shrink-0 items-center justify-center rounded-lg border border-stroke-soft-200 bg-bg-white-0 dark:border-white/10 dark:bg-black",
+											isDarkBrandColor(framework.icon.hex) &&
+												"text-text-strong-950 dark:text-white",
+										)}
+										style={getBrandColorStyle(framework.icon.hex)}
 									>
 										<LanguageIcon icon={framework.icon} className="size-4" />
 									</span>
