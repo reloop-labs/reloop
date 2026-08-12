@@ -11,7 +11,7 @@ export default function LanguagesGrid() {
 
 			{/* Hatched side gutters align icon columns with the title padding above */}
 			<AlignedIconBand>
-				<div className="grid grid-cols-2 gap-px bg-stroke-soft-200 sm:grid-cols-3 lg:grid-cols-5 dark:bg-white/10">
+				<div className="grid grid-cols-1 gap-px bg-stroke-soft-200 sm:grid-cols-2 lg:grid-cols-3 dark:bg-white/10">
 					{languages.map((lang) => (
 						<Link
 							key={lang.slug}

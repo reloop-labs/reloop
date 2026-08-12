@@ -6,8 +6,8 @@ import FrameworksGrid from "../languages/components/frameworks-grid";
 import LanguagesGrid from "../languages/components/languages-grid";
 import { frameworks } from "../languages/frameworks";
 import { languages } from "../languages/languages";
-import FrameworkExplorer from "./components/framework-explorer";
 import FrameworksIndexHero from "./components/frameworks-index-hero";
+import FrameworksResources from "./components/frameworks-resources";
 
 // TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
 // See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
@@ -63,7 +63,7 @@ const pageSchema = {
 			name: "Reloop Framework Integrations",
 			description:
 				"Step-by-step guides for sending transactional email from web frameworks.",
-			url: `${pageUrl}#framework-explorer`,
+			url: `${pageUrl}#frameworks`,
 			numberOfItems: frameworks.length,
 			itemListElement: frameworks.map((fw, index) => ({
 				"@type": "ListItem" as const,
@@ -97,9 +97,9 @@ export default function FrameworksIndexPage() {
 			<JsonLd data={pageSchema} />
 			<main className="w-full max-w-full overflow-x-clip bg-bg-white-0 dark:bg-black">
 				<FrameworksIndexHero />
-				<FrameworkExplorer />
 				<FrameworksGrid />
 				<LanguagesGrid />
+				<FrameworksResources />
 				<BlogCta
 					headline="One API key. Every stack."
 					sub="Create an account, verify a domain, and send from any framework or official SDK."
