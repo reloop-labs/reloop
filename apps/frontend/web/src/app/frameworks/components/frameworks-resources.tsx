@@ -1,189 +1,242 @@
-import { cn } from "@reloop/ui/cn";
+import { Icon } from "@reloop/ui/icon";
 import Link from "next/link";
 import type { ReactNode } from "react";
+import type { BrandIcon } from "../../languages/components/language-icon";
 import { LanguageIcon } from "../../languages/components/language-icon";
+import { frameworks } from "../../languages/frameworks";
 import { languages } from "../../languages/languages";
 
 type Prerequisite = {
+	step: number;
 	title: string;
 	body: string;
 	href: string;
 	visual: ReactNode;
 };
 
-function DotGrid() {
+/**
+ * Auth-style graph for API key:
+ * top request pill → shield node → horizontal dashed timeline
+ */
+function ApiKeyVisual() {
+	const timelineDots = [0, 1, 2, 3, 4] as const;
+
+	return (
+		<div className="relative mx-auto flex w-full max-w-[240px] flex-col items-center py-1">
+			{/* Top — API key as request pill */}
+			<div className="relative z-10 inline-flex items-center gap-1.5 rounded-full border border-stroke-soft-200 bg-bg-white-0 px-3 py-1.5 shadow-[0_2px_8px_rgba(0,0,0,0.04)] dark:border-white/15 dark:bg-black dark:shadow-none">
+				<span className="rounded-md bg-bg-weak-50 px-1.5 py-0.5 font-mono text-[10px] font-semibold text-text-sub-600 dark:bg-white/[0.06] dark:text-white/50">
+					KEY
+				</span>
+				<code className="font-mono text-[11.5px] text-text-strong-950 tracking-tight dark:text-white">
+					rl_live_••••
+				</code>
+			</div>
+
+			{/* Vertical dashed connector */}
+			<div
+				aria-hidden
+				className="h-8 w-px border-stroke-soft-300 border-l border-dashed dark:border-white/20"
+			/>
+
+			{/* Center — shield / authorized */}
+			<div className="relative z-10 flex size-14 items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-white-0 shadow-[0_2px_12px_rgba(0,0,0,0.05)] ring-[6px] ring-stroke-soft-200/50 dark:border-white/15 dark:bg-black dark:shadow-none dark:ring-white/10">
+				<svg
+					viewBox="0 0 24 24"
+					className="size-6 text-text-strong-950 dark:text-white"
+					fill="none"
+					stroke="currentColor"
+					strokeWidth="1.6"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+					aria-hidden
+				>
+					<path d="M12 3 5 6v5c0 4.5 3 7.5 7 9 4-1.5 7-4.5 7-9V6l-7-3Z" />
+					<path d="m9.5 12 1.8 1.8L15 10" />
+				</svg>
+			</div>
+
+			{/* Vertical dashed connector into timeline */}
+			<div
+				aria-hidden
+				className="h-8 w-px border-stroke-soft-300 border-l border-dashed dark:border-white/20"
+			/>
+
+			{/* Bottom — horizontal dashed timeline with nodes */}
+			<div className="relative flex w-full max-w-[200px] items-center justify-between">
+				{/* Dashed line through centers of dots */}
+				<div
+					aria-hidden
+					className="absolute top-1/2 right-1 left-1 h-px -translate-y-1/2 border-stroke-soft-300 border-t border-dashed dark:border-white/20"
+				/>
+				{timelineDots.map((i) => (
+					<span
+						key={i}
+						aria-hidden
+						className={
+							i === 2
+								? "relative z-10 size-2.5 rounded-full border-2 border-stroke-soft-300 bg-bg-white-0 dark:border-white/30 dark:bg-black"
+								: "relative z-10 size-1.5 rounded-full bg-stroke-soft-300 dark:bg-white/25"
+						}
+					/>
+				))}
+			</div>
+		</div>
+	);
+}
+
+/**
+ * Domain visual — same background language as the blog product CTA card:
+ * grey diagonal hatch, concentric orbital rings, soft blue glow.
+ */
+function DomainVisual() {
+	return (
+		<div className="relative mx-auto flex aspect-[16/10] w-full max-w-[280px] items-center justify-center overflow-hidden rounded-xl bg-bg-weak-50/40 p-3.5 text-text-strong-950 dark:bg-neutral-900/30 dark:text-white">
+			{/* Subtle grey diagonal hatch pattern */}
+			<div
+				aria-hidden
+				className="pointer-events-none absolute inset-0 opacity-[0.03] dark:opacity-[0.05]"
+				style={{
+					backgroundImage:
+						"repeating-linear-gradient(45deg, currentColor 0, currentColor 1px, transparent 0, transparent 10px)",
+				}}
+			/>
+
+			{/* Subtle grey concentric orbital & dotted rings */}
+			<svg
+				className="pointer-events-none absolute inset-0 size-full text-text-strong-950/[0.05] dark:text-white/[0.06]"
+				viewBox="0 0 200 120"
+				fill="none"
+				xmlns="http://www.w3.org/2000/svg"
+				aria-hidden
+			>
+				<circle
+					cx="100"
+					cy="60"
+					r="28"
+					stroke="currentColor"
+					strokeDasharray="3 3"
+				/>
+				<circle
+					cx="100"
+					cy="60"
+					r="54"
+					stroke="currentColor"
+					strokeWidth="0.75"
+				/>
+				<circle
+					cx="100"
+					cy="60"
+					r="82"
+					stroke="currentColor"
+					strokeDasharray="4 4"
+				/>
+			</svg>
+
+			{/* Ultra subtle blue glow */}
+			<div
+				aria-hidden
+				className="pointer-events-none absolute size-32 rounded-full bg-gradient-to-tr from-blue-500/[0.06] via-sky-400/[0.04] to-indigo-500/[0.04] blur-2xl dark:from-blue-500/[0.08] dark:via-sky-400/[0.06] dark:to-indigo-500/[0.06]"
+			/>
+
+			{/* Globe + domain label */}
+			<div className="relative z-10 flex flex-col items-center gap-2.5">
+				<div className="flex size-12 items-center justify-center rounded-full border border-stroke-soft-200/80 bg-bg-white-0 shadow-sm dark:border-white/15 dark:bg-black/60">
+					<Icon
+						name="globe"
+						className="size-5 text-text-strong-950 dark:text-white"
+						aria-hidden
+					/>
+				</div>
+				<span className="rounded-full border border-stroke-soft-200/80 bg-bg-white-0/90 px-3 py-1 font-mono text-[11.5px] text-text-strong-950 tracking-tight shadow-sm dark:border-white/15 dark:bg-black/70 dark:text-white">
+					send.apple.com
+				</span>
+			</div>
+		</div>
+	);
+}
+
+type MarqueeItem = {
+	slug: string;
+	name: string;
+	icon: BrandIcon;
+};
+
+function MarqueeChip({ item }: { item: MarqueeItem }) {
+	return (
+		<span
+			className="inline-flex size-10 shrink-0 items-center justify-center rounded-[12px] border border-stroke-soft-200 bg-bg-white-0 shadow-[0_1px_2px_rgba(0,0,0,0.03)] dark:border-white/10 dark:bg-white/[0.04]"
+			style={{ color: `#${item.icon.hex}` }}
+			title={item.name}
+		>
+			<LanguageIcon icon={item.icon} className="size-4" />
+		</span>
+	);
+}
+
+/**
+ * Infinite horizontal marquee row.
+ * Duplicates items so `translateX(-50%)` loops seamlessly.
+ */
+function MarqueeRow({
+	items,
+	reverse = false,
+	duration = 28,
+}: {
+	items: MarqueeItem[];
+	reverse?: boolean;
+	duration?: number;
+}) {
+	const loop = [...items, ...items];
+
+	return (
+		<div className="flex overflow-hidden">
+			<div
+				className="flex w-max gap-2.5 pr-2.5 will-change-transform motion-reduce:animate-none"
+				style={{
+					animation: `infinite-scroll ${duration}s linear infinite`,
+					animationDirection: reverse ? "reverse" : "normal",
+				}}
+			>
+				{loop.map((item, i) => (
+					<MarqueeChip key={`${item.slug}-${i}`} item={item} />
+				))}
+			</div>
+		</div>
+	);
+}
+
+/**
+ * Two-row marquee: frameworks L→R on top, languages R→L below.
+ * Soft edge fade like a component mannequin / logo wall.
+ */
+function LanguageVisual() {
+	const frameworkItems: MarqueeItem[] = frameworks.map((fw) => ({
+		slug: fw.slug,
+		name: fw.name,
+		icon: fw.icon,
+	}));
+	const languageItems: MarqueeItem[] = languages.map((lang) => ({
+		slug: lang.slug,
+		name: lang.name,
+		icon: lang.icon,
+	}));
+
 	return (
 		<div
-			aria-hidden
-			className="pointer-events-none absolute inset-0 text-text-strong-950/[0.14] dark:text-white/[0.14]"
+			className="relative w-full overflow-hidden py-2"
 			style={{
-				backgroundImage:
-					"radial-gradient(circle, currentColor 1px, transparent 1px)",
-				backgroundSize: "16px 16px",
 				maskImage:
-					"radial-gradient(ellipse at 50% 45%, black 15%, transparent 72%)",
+					"linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%)",
 				WebkitMaskImage:
-					"radial-gradient(ellipse at 50% 45%, black 15%, transparent 72%)",
+					"linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%)",
 			}}
-		/>
-	);
-}
-
-/** Floating field-list mock — API key setup */
-function ApiKeyVisual() {
-	const rows = [
-		{ label: "API key", value: "rl_live_••••••••", active: true },
-		{ label: "Environment", value: "Production", active: false },
-		{ label: "Permission", value: "Send only", active: false },
-	];
-
-	return (
-		<div className="w-full max-w-[260px] overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 shadow-[0_8px_30px_rgba(0,0,0,0.06)] dark:border-white/10 dark:bg-black dark:shadow-[0_8px_30px_rgba(0,0,0,0.35)]">
-			<div className="flex items-center justify-between border-stroke-soft-200 border-b px-3.5 py-2.5 dark:border-white/10">
-				<span className="font-medium text-[11px] text-text-sub-600 dark:text-white/45">
-					Credentials
-				</span>
-				<span className="flex size-5 items-center justify-center rounded-md border border-stroke-soft-200 text-text-sub-600 dark:border-white/10 dark:text-white/40">
-					<svg
-						width="10"
-						height="10"
-						viewBox="0 0 24 24"
-						fill="none"
-						stroke="currentColor"
-						strokeWidth="2.25"
-						strokeLinecap="round"
-						aria-hidden
-					>
-						<path d="M12 5v14M5 12h14" />
-					</svg>
-				</span>
-			</div>
-			<ul className="divide-y divide-stroke-soft-200 dark:divide-white/10">
-				{rows.map((row) => (
-					<li
-						key={row.label}
-						className={cn(
-							"flex items-center justify-between gap-3 px-3.5 py-2.5",
-							row.active && "bg-bg-weak-50 dark:bg-white/[0.04]",
-						)}
-					>
-						<span className="flex min-w-0 items-center gap-2">
-							<span className="flex size-5 shrink-0 items-center justify-center rounded-md border border-stroke-soft-200 bg-bg-weak-50 text-text-sub-600 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/50">
-								<svg
-									width="10"
-									height="10"
-									viewBox="0 0 24 24"
-									fill="none"
-									stroke="currentColor"
-									strokeWidth="2"
-									strokeLinecap="round"
-									strokeLinejoin="round"
-									aria-hidden
-								>
-									<rect x="3" y="11" width="18" height="11" rx="2" />
-									<path d="M7 11V7a5 5 0 0 1 10 0v4" />
-								</svg>
-							</span>
-							<span className="truncate text-[12px] text-text-strong-950 dark:text-white">
-								{row.label}
-							</span>
-						</span>
-						<span className="shrink-0 font-mono text-[10.5px] text-text-sub-600 dark:text-white/45">
-							{row.value}
-						</span>
-					</li>
-				))}
-			</ul>
-		</div>
-	);
-}
-
-/** Floating domain list with verify toggles */
-function DomainVisual() {
-	const rows = [
-		{ domain: "yourdomain.com", on: true },
-		{ domain: "mail.yourdomain.com", on: true },
-		{ domain: "staging.yourdomain.com", on: false },
-	];
-
-	return (
-		<div className="w-full max-w-[260px] overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 shadow-[0_8px_30px_rgba(0,0,0,0.06)] dark:border-white/10 dark:bg-black dark:shadow-[0_8px_30px_rgba(0,0,0,0.35)]">
-			<div className="flex items-center justify-between border-stroke-soft-200 border-b px-3.5 py-2.5 dark:border-white/10">
-				<span className="font-medium text-[11px] text-text-sub-600 dark:text-white/45">
-					Sending domains
-				</span>
-				<span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 font-medium text-[10px] text-emerald-600 dark:text-emerald-400">
-					<span className="size-1.5 rounded-full bg-emerald-500" />
-					Verified
-				</span>
-			</div>
-			<ul className="space-y-0 p-2.5">
-				{rows.map((row) => (
-					<li
-						key={row.domain}
-						className="flex items-center justify-between gap-3 rounded-xl px-2.5 py-2"
-					>
-						<span
-							className={cn(
-								"truncate font-medium text-[12px] tracking-tight",
-								row.on
-									? "text-text-strong-950 dark:text-white"
-									: "text-text-sub-600/50 dark:text-white/30",
-							)}
-						>
-							{row.domain}
-						</span>
-						<span
-							className={cn(
-								"relative h-5 w-9 shrink-0 rounded-full",
-								row.on
-									? "bg-primary-base"
-									: "bg-stroke-soft-200 dark:bg-white/15",
-							)}
-							aria-hidden
-						>
-							<span
-								className={cn(
-									"absolute top-0.5 size-4 rounded-full bg-white shadow-sm",
-									row.on ? "left-4" : "left-0.5",
-								)}
-							/>
-						</span>
-					</li>
-				))}
-			</ul>
-		</div>
-	);
-}
-
-/** Floating language / SDK picker */
-function LanguageVisual() {
-	const previewLangs = languages.slice(0, 6);
-
-	return (
-		<div className="w-full max-w-[260px] overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 shadow-[0_8px_30px_rgba(0,0,0,0.06)] dark:border-white/10 dark:bg-black dark:shadow-[0_8px_30px_rgba(0,0,0,0.35)]">
-			<div className="border-stroke-soft-200 border-b px-3.5 py-2.5 dark:border-white/10">
-				<span className="font-medium text-[11px] text-text-sub-600 dark:text-white/45">
-					Official SDKs
-				</span>
-			</div>
-			<div className="grid grid-cols-3 gap-2 p-3">
-				{previewLangs.map((lang) => (
-					<span
-						key={lang.slug}
-						className="flex flex-col items-center gap-1.5 rounded-xl border border-stroke-soft-200 bg-bg-weak-50/80 px-2 py-2.5 dark:border-white/10 dark:bg-white/[0.03]"
-					>
-						<span
-							className="inline-flex size-7 items-center justify-center"
-							style={{ color: `#${lang.icon.hex}` }}
-						>
-							<LanguageIcon icon={lang.icon} className="size-4" />
-						</span>
-						<span className="truncate text-center font-medium text-[10px] text-text-sub-600 dark:text-white/50">
-							{lang.name}
-						</span>
-					</span>
-				))}
+		>
+			<div className="flex flex-col gap-2.5">
+				{/* Frameworks — left → right */}
+				<MarqueeRow items={frameworkItems} reverse duration={32} />
+				{/* Languages — right → left (opposite) */}
+				<MarqueeRow items={languageItems} reverse={false} duration={26} />
 			</div>
 		</div>
 	);
@@ -191,18 +244,21 @@ function LanguageVisual() {
 
 const prerequisites: Prerequisite[] = [
 	{
+		step: 1,
 		title: "An API key.",
 		body: "Create a free account and copy a key. Drop it in your env—never commit the real value.",
 		href: "/dashboard/signup",
 		visual: <ApiKeyVisual />,
 	},
 	{
+		step: 2,
 		title: "A sending domain.",
 		body: "Pick the domain you want to send from and verify it so mail lands in the inbox, not spam.",
 		href: "/docs/learn/domain",
 		visual: <DomainVisual />,
 	},
 	{
+		step: 3,
 		title: "A language.",
 		body: "Choose the SDK for your stack—Node, Python, Go, PHP, Ruby, and more—or call the REST API.",
 		href: "#sdk-guides",
@@ -228,14 +284,17 @@ export default function FrameworksResources() {
 				<div className="grid grid-cols-1 divide-y divide-stroke-soft-200 border-stroke-soft-200 border-t sm:grid-cols-3 sm:divide-x sm:divide-y-0 dark:divide-white/10 dark:border-white/10">
 					{prerequisites.map((step) => {
 						const className =
-							"group flex min-h-0 cursor-pointer flex-col px-5 pb-10 pt-8 transition-colors duration-200 hover:bg-bg-weak-50/50 sm:px-7 sm:pb-12 sm:pt-10 dark:hover:bg-white/[0.02]";
+							"group relative flex min-h-0 cursor-pointer flex-col overflow-hidden px-5 pb-10 pt-8 transition-colors duration-200 hover:bg-bg-weak-50/50 sm:px-7 sm:pb-12 sm:pt-10 dark:hover:bg-white/[0.02]";
 
 						const content = (
 							<>
-								{/* Visual — floating mock on soft dot grid */}
-								<div className="relative mb-8 flex min-h-[240px] flex-1 items-center justify-center sm:min-h-[260px]">
-									<DotGrid />
-									<div className="pointer-events-none relative z-10 w-full max-w-[260px]">
+								<p className="relative z-10 font-mono text-[11px] text-text-sub-600 uppercase tracking-[0.08em] dark:text-white/45">
+									[step {step.step}]
+								</p>
+
+								{/* Visual */}
+								<div className="relative z-10 mt-5 mb-8 flex min-h-[220px] flex-1 items-center justify-center sm:min-h-[240px]">
+									<div className="pointer-events-none w-full max-w-[280px]">
 										{step.visual}
 									</div>
 								</div>
