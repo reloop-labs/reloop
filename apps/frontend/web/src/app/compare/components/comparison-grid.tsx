@@ -78,14 +78,14 @@ export function ComparisonGrid() {
 								{/* Top Row: Icon, Titles & Hover Arrow */}
 								<div className="relative z-10 flex items-start justify-between gap-3.5">
 									<div className="flex items-center gap-2.5 max-xl:gap-2 min-w-0 flex-1">
-										<div className="relative size-10 shrink-0 overflow-hidden rounded-[30%] border border-stroke-soft-200/80 p-2 flex items-center justify-center dark:border-white/10">
+										<div className="relative size-8 shrink-0 overflow-hidden rounded-[28%] border border-stroke-soft-200/80 p-1.5 flex items-center justify-center dark:border-white/10">
 											<BrandIcon icon={brand.icon} className="size-full object-contain" />
 										</div>
 										<div className="flex flex-col min-w-0 flex-1">
-											<h4 className="font-semibold text-text-strong-950 max-xl:text-sm dark:text-white">
+											<h4 className="font-semibold text-sm text-text-strong-950 dark:text-white">
 												{brand.name}
 											</h4>
-											<p className="shrink truncate text-text-sub-600 text-sm dark:text-white/50">
+											<p className="shrink truncate text-xs text-text-sub-600 dark:text-white/50">
 												Reloop vs {brand.name}
 											</p>
 										</div>
@@ -100,7 +100,7 @@ export function ComparisonGrid() {
 
 								{/* Description Section */}
 								<div className="relative z-10 flex flex-col gap-1">
-									<p className="text-sm text-pretty text-text-sub-600 pr-2 line-clamp-2 leading-relaxed dark:text-white/60">
+									<p className="text-xs font-medium text-pretty text-text-sub-600 pr-2 line-clamp-2 leading-relaxed dark:text-white/60">
 										{description}
 									</p>
 								</div>
