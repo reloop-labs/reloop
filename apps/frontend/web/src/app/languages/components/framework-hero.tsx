@@ -2,6 +2,9 @@
 
 import * as Button from "@reloop/ui/button";
 import Link from "next/link";
+import { useState } from "react";
+import { siCursor } from "simple-icons";
+import { buildFrameworkPrompt } from "../build-framework-prompt";
 import type { FrameworkDefinition } from "../frameworks";
 import { LanguageIcon } from "./language-icon";
 
@@ -11,6 +14,22 @@ export default function FrameworkHero({
 	framework: FrameworkDefinition;
 }) {
 	const brandColor = `#${framework.icon.hex}`;
+	const [copied, setCopied] = useState(false);
+	const prompt = buildFrameworkPrompt(framework);
+
+	const handleCopyPrompt = async () => {
+		try {
+			await navigator.clipboard.writeText(prompt);
+			setCopied(true);
+			window.setTimeout(() => setCopied(false), 2000);
+		} catch {
+			// ignore
+		}
+	};
+
+	const handleOpenCursor = () => {
+		window.open(`cursor://?prompt=${encodeURIComponent(prompt)}`, "_blank");
+	};
 
 	return (
 		<section className="relative w-full border-stroke-soft-200 bg-bg-white-0 text-text-strong-950 dark:border-white/10 dark:bg-black dark:text-white">
@@ -78,21 +97,34 @@ export default function FrameworkHero({
 							</p>
 
 							<div className="mt-6 flex flex-wrap items-center gap-3">
-								<a
-									href="#steps"
+								<button
+									type="button"
+									onClick={handleCopyPrompt}
 									className={`${Button.buttonVariants({
 										variant: "neutral",
 										mode: "filled",
-									}).root()} inline-flex h-9! rounded-full! px-5! font-medium text-sm! dark:bg-white dark:text-black dark:hover:bg-white/90`}
+									}).root()} inline-flex h-9! cursor-pointer rounded-full! px-5! font-medium text-sm! dark:bg-white dark:text-black dark:hover:bg-white/90`}
 								>
-									Start integration
-								</a>
-								<Link
-									href={`/languages/${framework.languageSlug}`}
-									className="font-medium text-[13px] text-text-sub-600 underline decoration-text-sub-600/30 underline-offset-2 transition-colors hover:text-text-strong-950 hover:decoration-text-strong-950 dark:text-white/50 dark:hover:text-white dark:hover:decoration-white"
+									{copied ? "Copied!" : "Copy prompt"}
+								</button>
+								<button
+									type="button"
+									onClick={handleOpenCursor}
+									className="inline-flex h-9 cursor-pointer items-center gap-2 rounded-full border border-stroke-soft-200 bg-bg-white-0 px-4 font-medium text-[13px] text-text-strong-950 transition-colors hover:bg-bg-weak-50 active:scale-[0.98] dark:border-white/15 dark:bg-black dark:text-white dark:hover:bg-white/[0.06]"
 								>
-									{framework.languageName} SDK →
-								</Link>
+									<svg
+										role="img"
+										viewBox="0 0 24 24"
+										width={14}
+										height={14}
+										aria-hidden
+										className="shrink-0"
+										fill="currentColor"
+									>
+										<path d={siCursor.path} />
+									</svg>
+									<span>Open in Cursor</span>
+								</button>
 							</div>
 						</div>
 					</div>

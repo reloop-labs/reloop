@@ -93,20 +93,6 @@ export default function FrameworkSteps({
 			className="relative w-full scroll-mt-20 border-stroke-soft-200 border-t bg-bg-white-0 text-text-strong-950 dark:border-white/10 dark:bg-black dark:text-white"
 		>
 			<div className="mx-auto w-full max-w-5xl border-stroke-soft-200 border-x md:max-w-7xl dark:border-white/10">
-				{/* Header */}
-				<div className="border-stroke-soft-200 border-b px-6 py-10 sm:px-10 sm:py-12 lg:px-12 dark:border-white/10">
-					<p className="font-mono text-[11px] text-text-sub-600 uppercase tracking-[0.14em] dark:text-white/45">
-						Integration · 3 steps
-					</p>
-					<h2 className="mt-2 font-semibold text-text-strong-950 text-xl tracking-tight sm:text-2xl lg:text-[1.65rem] dark:text-white">
-						Get started with {framework.name}
-					</h2>
-					<p className="mt-1.5 max-w-xl text-[13.5px] text-text-sub-600 sm:text-[14.5px] dark:text-white/60">
-						Install the SDK, set your key, and send your first email—usually in
-						under five minutes.
-					</p>
-				</div>
-
 				{/* Two columns: compact left rail · right details */}
 				<div className="grid grid-cols-1 lg:grid-cols-12">
 					{/* LEFT: sticky tinted rail — framework meta + connected steps */}
