@@ -391,6 +391,8 @@ export default function LanguageExplorer() {
 						>
 							<ResourceLinks
 								languageSlug={active.slug}
+								languageName={active.name}
+								name={activeDisplayName}
 								docsPath={activeFramework?.docsPath ?? active.docsPath}
 								frameworkSlug={activeFramework?.slug}
 							/>

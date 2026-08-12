@@ -372,6 +372,8 @@ export default function FrameworkSteps({
 									{step.showResourceLinks ? (
 										<ResourceLinks
 											languageSlug={framework.languageSlug}
+											languageName={framework.languageName}
+											name={framework.name}
 											docsPath={framework.docsPath}
 											frameworkSlug={framework.slug}
 										/>
