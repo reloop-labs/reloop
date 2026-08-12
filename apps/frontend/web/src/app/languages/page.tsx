@@ -2,7 +2,9 @@ import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 import IndexCta from "./components/index-cta";
 import IndexHero from "./components/index-hero";
+import LanguageExplorer from "./components/language-explorer";
 import LanguagesGrid from "./components/languages-grid";
+import LanguagesMatrix from "./components/languages-matrix";
 
 // TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
 // See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
@@ -11,9 +13,9 @@ export const instant = false;
 const pageUrl = `${getSiteUrl()}/languages`;
 
 export const metadata: Metadata = {
-	title: "Send Email in Your Language | Reloop",
+	title: "Official Reloop SDKs & Runtimes | Node.js, Python, Go, Rust",
 	description:
-		"Official Reloop SDKs for Node.js, Python, Go, Rust, PHP, Ruby, Elixir, Java, and .NET. Send transactional and marketing email with type-safe clients.",
+		"Send transactional and marketing email using official Reloop SDKs for Node.js, Python, Go, Rust, PHP, Ruby, Elixir, Java, and .NET. 100% type-safe with zero-cost abstractions.",
 	keywords: [
 		"email SDK",
 		"Node.js email",
@@ -27,7 +29,7 @@ export const metadata: Metadata = {
 	],
 	alternates: { canonical: pageUrl },
 	openGraph: {
-		title: "Send Email in Your Language | Reloop",
+		title: "Official Reloop SDKs & Runtimes | Reloop",
 		description:
 			"Official Reloop SDKs for Node.js, Python, Go, Rust, PHP, Ruby, Elixir, Java, and .NET.",
 		type: "website",
@@ -36,7 +38,7 @@ export const metadata: Metadata = {
 	},
 	twitter: {
 		card: "summary_large_image",
-		title: "Send Email in Your Language | Reloop",
+		title: "Official Reloop SDKs & Runtimes | Reloop",
 		description:
 			"Official Reloop SDKs for Node.js, Python, Go, Rust, PHP, Ruby, Elixir, Java, and .NET.",
 	},
@@ -44,10 +46,12 @@ export const metadata: Metadata = {
 
 export default function LanguagesIndexPage() {
 	return (
-		<div>
+		<main className="w-full bg-bg-white-0 dark:bg-bg-black-950">
 			<IndexHero />
+			<LanguageExplorer />
+			<LanguagesMatrix />
 			<LanguagesGrid />
 			<IndexCta />
-		</div>
+		</main>
 	);
 }

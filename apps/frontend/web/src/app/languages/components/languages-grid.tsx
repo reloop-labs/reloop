@@ -4,46 +4,69 @@ import { LanguageIcon } from "./language-icon";
 
 export default function LanguagesGrid() {
 	return (
-		<section id="languages">
-			<div className="mx-auto max-w-[1320px] px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
-				<div className="text-center">
-					<h2 className="font-serif text-[2.6rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[3.4rem] lg:text-[4.2rem]">
-						Choose your stack
+		<section id="languages" className="w-full py-16 sm:py-20 lg:py-24">
+			<div className="mx-auto max-w-[1320px] px-4 sm:px-6 lg:px-8">
+				<div className="flex flex-col gap-2">
+					<p className="font-mono text-xs text-text-sub-600 uppercase tracking-wider dark:text-white/50">
+						SDK Directory • 9 Packages
+					</p>
+					<h2 className="font-sans font-semibold text-2xl text-text-strong-950 tracking-tight sm:text-3xl dark:text-white">
+						Select your language guide
 					</h2>
-					<p className="mx-auto mt-4 max-w-xl text-base text-text-sub-600 dark:text-white/50">
-						Each SDK includes install guides, code samples, and links to
-						framework-specific docs.
+					<p className="max-w-2xl text-base text-text-sub-600 leading-relaxed dark:text-white/60">
+						Each official repository includes complete installation instructions, authentication patterns, error handling, and framework integration quickstarts.
 					</p>
 				</div>
 
-				<div className="mt-20 grid gap-px overflow-hidden rounded-4xl border border-stroke-soft-200 sm:grid-cols-2 lg:grid-cols-3 dark:border-white/10">
+				<div className="mt-10 grid gap-px overflow-hidden rounded-xl border border-stroke-soft-200 bg-stroke-soft-200 sm:grid-cols-2 lg:grid-cols-3 dark:border-white/10 dark:bg-white/10">
 					{languages.map((lang, i) => (
 						<Link
 							key={lang.slug}
 							href={`/languages/${lang.slug}`}
-							className="group flex flex-col border-stroke-soft-200 border-t border-l-0 bg-bg-weak-50 p-8 transition-colors duration-300 first:border-t-0 hover:bg-bg-soft-50 sm:border-t sm:border-l lg:border-t lg:border-l lg:p-10 dark:border-white/10 dark:bg-transparent dark:hover:bg-white/[0.02] sm:[&:nth-child(-n+2)]:border-t-0 lg:[&:nth-child(-n+3)]:border-t-0 sm:[&:nth-child(2n+1)]:border-l-0 lg:[&:nth-child(3n)]:border-l lg:[&:nth-child(3n+1)]:border-l-0 lg:[&:nth-child(3n+2)]:border-l"
+							className="group flex flex-col justify-between bg-bg-white-0 p-6 transition-colors duration-200 hover:bg-bg-weak-50 dark:bg-bg-black-950 dark:hover:bg-white/[0.02]"
 						>
-							<span className="font-semibold text-sm text-text-soft-400 tabular-nums dark:text-white/28">
-								{String(i + 1).padStart(2, "0")}
-							</span>
-							<div
-								className="mt-4 inline-flex size-10 items-center justify-center rounded-xl border border-stroke-soft-200 bg-bg-white-0 dark:border-white/10"
-								style={{ color: `#${lang.icon.hex}` }}
-							>
-								<LanguageIcon icon={lang.icon} className="size-5" />
+							<div>
+								<div className="flex items-center justify-between">
+									<div
+										className="inline-flex size-9 items-center justify-center rounded-lg border border-stroke-soft-200 bg-bg-weak-50 transition-transform group-hover:scale-105 dark:border-white/10 dark:bg-white/5"
+										style={{ color: `#${lang.icon.hex}` }}
+									>
+										<LanguageIcon icon={lang.icon} className="size-4" />
+									</div>
+									<span className="font-mono text-text-sub-600 text-xs tabular-nums dark:text-white/40">
+										0{i + 1}
+									</span>
+								</div>
+
+								<h3 className="mt-4 font-semibold text-base text-text-strong-950 transition-colors group-hover:text-primary-base dark:text-white">
+									{lang.name}
+								</h3>
+
+								<p className="mt-2 line-clamp-3 text-xs text-text-sub-600 leading-relaxed dark:text-white/60">
+									{lang.shortDescription}
+								</p>
+
+								{/* Framework highlights */}
+								<div className="mt-4 flex flex-wrap gap-1.5">
+									{lang.highlights.map((h) => (
+										<span
+											key={h}
+											className="rounded-md border border-stroke-soft-200 bg-bg-weak-50 px-2 py-0.5 font-mono text-[11px] text-text-sub-600 dark:border-white/10 dark:bg-white/5 dark:text-white/60"
+										>
+											{h}
+										</span>
+									))}
+								</div>
 							</div>
-							<h3 className="mt-4 font-semibold text-lg text-text-strong-950 leading-snug group-hover:text-primary-base dark:text-white">
-								{lang.name}
-							</h3>
-							<p className="mt-3 line-clamp-3 font-medium text-sm text-text-sub-600 leading-relaxed dark:text-white/50">
-								{lang.shortDescription}
-							</p>
-							<code className="mt-4 block truncate rounded-lg border border-stroke-soft-200 bg-bg-soft-50 px-3 py-2 font-mono text-[11px] text-text-sub-600 dark:border-white/10">
-								{lang.installCommand}
-							</code>
-							<span className="mt-4 font-semibold text-primary-base text-sm">
-								View {lang.name} guide →
-							</span>
+
+							<div className="mt-6 border-stroke-soft-200 border-t pt-4 dark:border-white/10">
+								<code className="block truncate font-mono text-[11px] text-text-sub-600 dark:text-white/50">
+									{lang.installCommand}
+								</code>
+								<span className="mt-2 inline-flex items-center gap-1 font-medium text-primary-base text-xs transition-opacity group-hover:opacity-80">
+									View {lang.name} SDK guide &rarr;
+								</span>
+							</div>
 						</Link>
 					))}
 				</div>

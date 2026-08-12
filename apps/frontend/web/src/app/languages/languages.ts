@@ -30,6 +30,10 @@ export interface LanguageDefinition {
 	name: string;
 	shortDescription: string;
 	installCommand: string;
+	packageName: string;
+	typeSafety: string;
+	concurrency: string;
+	primaryFramework: string;
 	docsPath: string;
 	icon: SimpleIcon;
 	sendCode: string;
@@ -43,6 +47,10 @@ export const languages: LanguageDefinition[] = [
 		shortDescription:
 			"Send email from Node.js and TypeScript with the official SDK—async/await, full types, and framework guides for Next.js, Express, and more.",
 		installCommand: "npm install reloop-email",
+		packageName: "reloop-email",
+		typeSafety: "Strict TypeScript",
+		concurrency: "Async / Event Loop",
+		primaryFramework: "Next.js, Express, Fastify",
 		docsPath: "/docs/quickstart/nodejs",
 		icon: siNodedotjs,
 		highlights: ["TypeScript", "Next.js", "Serverless"],
@@ -70,6 +78,10 @@ console.log('Email sent:', data.id);`,
 		shortDescription:
 			"Integrate Reloop with Flask, FastAPI, or any Python app using a clean client with type hints and straightforward error handling.",
 		installCommand: "pip install reloop-email",
+		packageName: "reloop-email",
+		typeSafety: "Python Type Hints",
+		concurrency: "Asyncio / Sync",
+		primaryFramework: "FastAPI, Flask, Django",
 		docsPath: "/docs/quickstart/python",
 		icon: siPython,
 		highlights: ["Flask", "FastAPI", "Django SMTP"],
@@ -98,6 +110,10 @@ print(f"Email sent: {result.response['id']}")`,
 		shortDescription:
 			"Use the Go SDK for high-throughput services with context-aware requests and minimal dependencies.",
 		installCommand: "go get github.com/reloop-labs/reloop-email",
+		packageName: "reloop-email",
+		typeSafety: "Static / Strong",
+		concurrency: "Goroutines & Channels",
+		primaryFramework: "Gin, Fiber, Echo",
 		docsPath: "/docs/quickstart/go",
 		icon: siGo,
 		highlights: ["Context", "Goroutines", "Microservices"],
@@ -134,6 +150,10 @@ func main() {
 		shortDescription:
 			"Send email from Rust with an async-first crate built for performance-critical applications.",
 		installCommand: "cargo add reloop-email",
+		packageName: "reloop-email",
+		typeSafety: "Zero-Cost Types",
+		concurrency: "Async Tokio Runtime",
+		primaryFramework: "Axum, Actix, Warp",
 		docsPath: "/docs/quickstart/rust",
 		// Brand hex is #000000 — override so the gear stays visible on dark UI
 		icon: { ...siRust, hex: "e24d2b" },
@@ -165,6 +185,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 		shortDescription:
 			"Composer-ready PHP SDK with Laravel and Symfony guides for transactional and marketing email.",
 		installCommand: "composer require reloop/reloop-email",
+		packageName: "reloop/reloop-email",
+		typeSafety: "PHP 8.1+ Strict Types",
+		concurrency: "Sync / Swoole",
+		primaryFramework: "Laravel, Symfony, WordPress",
 		docsPath: "/docs/quickstart/php",
 		icon: siPhp,
 		highlights: ["Laravel", "Symfony", "WordPress"],
@@ -183,6 +207,10 @@ $reloop->emails->send([
 		shortDescription:
 			"Ship email from Rails, Sinatra, or any Ruby app with a gem that follows familiar conventions.",
 		installCommand: "gem install reloop-email",
+		packageName: "reloop-email",
+		typeSafety: "Typed Interface (RBS)",
+		concurrency: "Fibers / Threads",
+		primaryFramework: "Rails, Sinatra, Hanami",
 		docsPath: "/docs/quickstart/ruby",
 		icon: siRuby,
 		highlights: ["Rails", "Sinatra", "Bundler"],
@@ -206,6 +234,10 @@ puts "Email sent: #{email[:id]}"`,
 		shortDescription:
 			"Send email from Elixir and Phoenix with an OTP-friendly client for reliable, concurrent delivery.",
 		installCommand: '{:reloop, "~> 0.1.0"}',
+		packageName: "reloop",
+		typeSafety: "Dialyzer Typespecs",
+		concurrency: "BEAM / OTP Processes",
+		primaryFramework: "Phoenix, LiveView",
 		docsPath: "/docs/quickstart/elixir",
 		icon: siElixir,
 		highlights: ["Phoenix", "OTP", "LiveView"],
@@ -228,6 +260,10 @@ end`,
 		shortDescription:
 			"Use the Java SDK in Spring Boot or plain JVM apps with Maven or Gradle dependencies.",
 		installCommand: "sh.reloop:reloop-email",
+		packageName: "reloop-email",
+		typeSafety: "Static Java 17+",
+		concurrency: "Virtual Threads / Executors",
+		primaryFramework: "Spring Boot, Quarkus",
 		docsPath: "/docs/quickstart/java",
 		icon: siSpringboot,
 		highlights: ["Spring Boot", "Maven", "Gradle"],
@@ -256,6 +292,10 @@ public class Main {
 		shortDescription:
 			"Send email from C# and .NET 6+ with a NuGet package designed for modern async applications.",
 		installCommand: "dotnet add package Reloop.Email",
+		packageName: "Reloop.Email",
+		typeSafety: "Strong Static C# 10+",
+		concurrency: "Async / Await Tasks",
+		primaryFramework: "ASP.NET Core, Worker Services",
 		docsPath: "/docs/quickstart/dotnet",
 		icon: siDotnet,
 		highlights: ["C#", "ASP.NET", "NuGet"],

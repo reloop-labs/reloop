@@ -49,12 +49,12 @@ export default async function LanguagePage({ params }: PageProps) {
 	}
 
 	return (
-		<div>
+		<main className="w-full bg-bg-white-0 dark:bg-bg-black-950">
 			<LanguageHero language={language} />
 			<LanguageCode language={language} />
 			<LanguageBento language={language} />
 			<LanguageGuide language={language} />
 			<LanguageCta language={language} />
-		</div>
+		</main>
 	);
 }
