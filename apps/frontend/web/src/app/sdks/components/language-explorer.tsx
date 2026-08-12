@@ -242,15 +242,15 @@ export default function LanguageExplorer() {
 				aria-labelledby={`lang-tab-${active.slug}`}
 				className="grid grid-cols-1 lg:grid-cols-12"
 			>
-				{/* Left meta & frameworks */}
-				<div className="flex flex-col gap-6 border-stroke-soft-200 p-6 sm:p-8 lg:col-span-4 lg:border-r lg:p-8 dark:border-white/10">
+				{/* Left meta & frameworks: compact tinted rail matching framework details */}
+				<aside className="flex flex-col gap-6 border-stroke-soft-200 border-b bg-[#fafafa] p-6 sm:p-7 lg:col-span-3 lg:border-r lg:border-b-0 lg:p-7 dark:border-white/10 dark:bg-white/[0.025]">
 					<div>
 						<div className="flex items-center gap-3">
 							<div
-								className="inline-flex size-11 items-center justify-center rounded-xl border border-stroke-soft-200 dark:border-white/10"
+								className="inline-flex size-10 items-center justify-center rounded-xl border border-stroke-soft-200 bg-bg-white-0 dark:border-white/10 dark:bg-black"
 								style={{ color: brandColor }}
 							>
-								<LanguageIcon icon={active.icon} className="size-5" />
+								<LanguageIcon icon={active.icon} className="size-4.5" />
 							</div>
 							<div className="min-w-0">
 								<h3 className="font-semibold text-base text-text-strong-950 tracking-tight dark:text-white">
@@ -284,8 +284,8 @@ export default function LanguageExplorer() {
 												className={cn(
 													"group flex w-full cursor-pointer items-center justify-between rounded-lg px-2.5 py-2 text-left text-xs transition-colors",
 													isSelected
-														? "bg-bg-weak-50 font-medium text-text-strong-950 dark:bg-white/[0.08] dark:text-white"
-														: "text-text-sub-600 hover:bg-bg-weak-50/60 hover:text-text-strong-950 dark:text-white/60 dark:hover:bg-white/[0.04] dark:hover:text-white",
+														? "bg-bg-white-0 font-medium text-text-strong-950 shadow-xs border border-stroke-soft-200/80 dark:border-white/10 dark:bg-white/[0.08] dark:text-white"
+														: "text-text-sub-600 hover:bg-black/[0.03] hover:text-text-strong-950 dark:text-white/60 dark:hover:bg-white/[0.04] dark:hover:text-white",
 												)}
 											>
 												<div className="flex min-w-0 items-center gap-2.5">
@@ -293,8 +293,8 @@ export default function LanguageExplorer() {
 														className={cn(
 															"inline-flex size-6 shrink-0 items-center justify-center rounded-md transition-colors",
 															isSelected
-																? "bg-bg-white-0 shadow-xs dark:bg-white/10"
-																: "bg-bg-weak-50 dark:bg-white/[0.06]",
+																? "bg-bg-weak-50 dark:bg-white/10"
+																: "bg-transparent",
 														)}
 														style={{ color: `#${fw.icon.hex}` }}
 													>
@@ -309,7 +309,7 @@ export default function LanguageExplorer() {
 													href={`/frameworks/${fw.slug}`}
 													onClick={(e) => e.stopPropagation()}
 													title={`View ${fw.name} guide`}
-													className="inline-flex size-6 items-center justify-center rounded-md text-text-sub-600 opacity-0 transition-all hover:bg-bg-white-0 hover:text-text-strong-950 group-hover:opacity-100 dark:text-white/50 dark:hover:bg-white/10 dark:hover:text-white"
+													className="inline-flex size-6 items-center justify-center rounded-md text-text-sub-600 opacity-0 transition-all hover:bg-bg-weak-50 hover:text-text-strong-950 group-hover:opacity-100 dark:text-white/50 dark:hover:bg-white/10 dark:hover:text-white"
 												>
 													<Icon
 														name="arrow-up-right"
@@ -324,10 +324,10 @@ export default function LanguageExplorer() {
 							</div>
 						) : null}
 					</div>
-				</div>
+				</aside>
 
 				{/* Right: Step-by-step playground */}
-				<div className="border-stroke-soft-200 border-t p-6 sm:p-8 lg:col-span-8 lg:border-t-0 lg:p-10 dark:border-white/10">
+				<div className="border-stroke-soft-200 border-t p-6 sm:p-8 lg:col-span-9 lg:border-t-0 lg:p-10 dark:border-white/10">
 					<div className="flex flex-col">
 						{/* Step 1: Install */}
 						<StepItem number={1} title={`Install the ${activeDisplayName} package`}>
