@@ -178,8 +178,8 @@ function useSupportSocket({
 
 export function FoundersAvatarStack() {
 	return (
-		<div className="-space-x-2 relative flex items-center">
-			<div className="relative size-7 overflow-hidden rounded-full border border-stroke-soft-200 bg-bg-weak-50 ring-2 ring-white dark:border-white/10 dark:bg-white/5 dark:ring-[#0c0c0c]">
+		<div className="-space-x-2.5 relative flex shrink-0 items-center">
+			<div className="relative size-9 overflow-hidden rounded-full border-2 border-white bg-bg-weak-50 shadow-xs dark:border-[#0c0c0c] dark:bg-white/5">
 				<Image
 					src="/company/team/pranav-patel.jpg"
 					alt="Pranav Patel"
@@ -187,20 +187,96 @@ export function FoundersAvatarStack() {
 					className="object-cover object-top"
 				/>
 			</div>
-			<div className="relative size-7 overflow-hidden rounded-full border border-stroke-soft-200 bg-bg-weak-50 ring-2 ring-white dark:border-white/10 dark:bg-white/5 dark:ring-[#0c0c0c]">
+			<div className="relative size-9 overflow-hidden rounded-full border-2 border-white bg-bg-weak-50 shadow-xs dark:border-[#0c0c0c] dark:bg-white/5">
 				<Image
 					src="/company/team/twinkal-p.jpg"
 					alt="Twinkal P"
 					fill
 					className="object-cover object-top"
 				/>
-				<span className="absolute right-0 bottom-0 size-2 rounded-full border-2 border-white bg-emerald-500 dark:border-[#0c0c0c]" />
+				<span className="absolute right-0 bottom-0 size-2.5 rounded-full border-2 border-white bg-emerald-500 ring-1 ring-emerald-500/20 dark:border-[#0c0c0c]" />
 			</div>
 		</div>
 	);
 }
 
-export function ContactSupportChat({ userName }: { userName?: string | null }) {
+export function SupportChatHeader({
+	user,
+	onRefresh,
+	closed,
+}: {
+	user?: { name?: string | null; image?: string | null; email?: string | null } | null;
+	onRefresh?: () => void;
+	closed?: boolean;
+}) {
+	return (
+		<div className="flex shrink-0 items-center justify-between gap-3 border-stroke-soft-200 border-b px-4 py-3.5 sm:px-6 dark:border-white/10">
+			{/* Left: Founders Profile info (WhatsApp style) */}
+			<div className="flex min-w-0 items-center gap-3">
+				<FoundersAvatarStack />
+				<div className="min-w-0">
+					<h2 className="font-semibold text-[15px] text-text-strong-950 tracking-tight dark:text-white">
+						The Founders
+					</h2>
+					<div className="flex items-center gap-1.5 truncate text-[12px]">
+						<span className="relative flex size-2 shrink-0 items-center justify-center">
+							<span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+							<span className="relative inline-flex size-2 rounded-full bg-emerald-500" />
+						</span>
+						<span className="font-medium text-emerald-600 dark:text-emerald-400">
+							Online
+						</span>
+						<span className="text-text-sub-600 dark:text-white/45">
+							· Pranav & Twinkal · replies in ~2 mins
+						</span>
+					</div>
+				</div>
+			</div>
+
+			{/* Right: User Profile (if logged in) + Refresh button */}
+			<div className="flex items-center gap-2">
+				{user ? (
+					<div className="flex items-center gap-2 rounded-full border border-stroke-soft-200/80 bg-bg-white-0 py-1 pr-2.5 pl-1 shadow-xs dark:border-white/10 dark:bg-white/5">
+						<div className="relative flex size-6 shrink-0 items-center justify-center overflow-hidden rounded-full bg-text-strong-950 font-medium text-[11px] text-white dark:bg-white dark:text-black">
+							{user.image ? (
+								<Image
+									src={user.image}
+									alt={user.name || "User"}
+									fill
+									className="object-cover"
+								/>
+							) : (
+								(user.name?.[0] || user.email?.[0] || "U").toUpperCase()
+							)}
+						</div>
+						<span className="max-w-[80px] truncate font-medium text-[12px] text-text-strong-950 dark:text-white">
+							{user.name?.split(" ")[0] || "You"}
+						</span>
+					</div>
+				) : null}
+
+				{onRefresh ? (
+					<button
+						type="button"
+						onClick={onRefresh}
+						title={closed ? "Start a new conversation" : "Refresh"}
+						className="flex size-8 shrink-0 items-center justify-center rounded-xl border border-stroke-soft-200 text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-white/10 dark:text-white/50 dark:hover:bg-white/5 dark:hover:text-white"
+					>
+						<Icon name="rotate-cw" className="size-3.5" />
+					</button>
+				) : null}
+			</div>
+		</div>
+	);
+}
+
+export function ContactSupportChat({
+	userName,
+	user,
+}: {
+	userName?: string | null;
+	user?: { name?: string | null; image?: string | null; email?: string | null } | null;
+}) {
 	const firstName = userName?.split(" ")[0] || "there";
 
 	const [conversation, setConversation] = useState<SupportConversation | null>(
@@ -361,29 +437,13 @@ export function ContactSupportChat({ userName }: { userName?: string | null }) {
 	const hasMessages = messages.length > 0;
 
 	return (
-		<div className="relative flex h-full min-h-[360px] w-full flex-col overflow-hidden rounded-2xl bg-bg-white-0 text-text-strong-950 dark:bg-[#0c0c0c] dark:text-white">
+		<div className="relative flex h-full min-h-[360px] w-full flex-col overflow-hidden text-text-strong-950 dark:text-white">
 			{/* Header */}
-			<div className="flex shrink-0 items-center justify-between gap-3 border-stroke-soft-200 border-b bg-bg-weak-50/50 px-4 py-3.5 dark:border-white/10 dark:bg-white/[0.02]">
-				<div className="flex min-w-0 items-center gap-3">
-					<FoundersAvatarStack />
-					<div className="min-w-0">
-						<h2 className="font-semibold text-[15px] text-text-strong-950 tracking-tight dark:text-white">
-							The Founders
-						</h2>
-						<p className="truncate text-[11px] text-text-sub-600 dark:text-white/45">
-							Pranav · Twinkal · replies in ~2 mins
-						</p>
-					</div>
-				</div>
-				<button
-					type="button"
-					onClick={() => void bootstrap()}
-					title={closed ? "Start a new conversation" : "Refresh"}
-					className="flex size-8 shrink-0 items-center justify-center rounded-xl border border-stroke-soft-200 text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-white/10 dark:text-white/50 dark:hover:bg-white/5 dark:hover:text-white"
-				>
-					<Icon name="rotate-cw" className="size-3.5" />
-				</button>
-			</div>
+			<SupportChatHeader
+				user={user || (userName ? { name: userName } : null)}
+				onRefresh={() => void bootstrap()}
+				closed={closed}
+			/>
 
 			{loading ? (
 				<div className="flex flex-1 flex-col items-center justify-center gap-3 px-6">
@@ -475,7 +535,7 @@ export function ContactSupportChat({ userName }: { userName?: string | null }) {
 													"min-w-0 px-4 py-3 text-[14px] leading-relaxed",
 													mine
 														? "rounded-2xl rounded-br-xs bg-blue-600 text-white"
-														: "rounded-2xl rounded-bl-xs border border-stroke-soft-200/80 bg-bg-weak-50 text-text-strong-950 dark:border-white/10 dark:bg-white/[0.05] dark:text-white",
+														: "rounded-2xl rounded-bl-xs border border-stroke-soft-200/80 bg-bg-white-0 text-text-strong-950 dark:border-white/10 dark:bg-white/[0.05] dark:text-white",
 												)}
 											>
 												<p className="whitespace-pre-wrap break-words">

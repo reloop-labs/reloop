@@ -167,8 +167,8 @@ const ContactPage = () => {
 					</section>
 
 					{/* ── Right: chat panel ── */}
-					<section className="relative flex flex-col bg-bg-weak-50/80 px-6 pt-28 pb-10 sm:px-10 sm:pt-32 sm:pb-12 lg:px-12 lg:pt-36 lg:pb-14 xl:px-16 dark:bg-white/[0.02]">
-						<div className="mx-auto flex h-full w-full max-w-md flex-col lg:max-w-none">
+					<section className="relative flex flex-col bg-bg-weak-50/80 pt-16 pb-0 dark:bg-white/[0.02]">
+						<div className="flex h-full w-full flex-col">
 							<ContactPanel />
 						</div>
 					</section>
