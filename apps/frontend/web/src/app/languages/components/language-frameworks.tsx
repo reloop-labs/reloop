@@ -36,7 +36,7 @@ export default function LanguageFrameworks({
 						>
 							<div className="flex items-start justify-between gap-3">
 								<div
-									className="inline-flex size-9 items-center justify-center rounded-xl border border-stroke-soft-200 bg-bg-weak-50 dark:border-white/10 dark:bg-white/[0.04]"
+									className="inline-flex size-9 items-center justify-center rounded-xl border border-stroke-soft-200 dark:border-white/10"
 									style={{ color: `#${fw.icon.hex}` }}
 								>
 									<LanguageIcon icon={fw.icon} className="size-4" />
