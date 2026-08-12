@@ -124,7 +124,7 @@ export default function LanguageExplorer() {
 
 	const [selectedFrameworkSlug, setSelectedFrameworkSlug] = useState<
 		string | null
-	>(relatedFrameworks[0]?.slug ?? null);
+	>(null);
 
 	const [hoveredFwEl, setHoveredFwEl] = useState<HTMLElement | undefined>(
 		undefined,
@@ -134,30 +134,35 @@ export default function LanguageExplorer() {
 	);
 	const fwRefs = useRef<(HTMLElement | null)[]>([]);
 
-	// Update selected framework when active language changes
 	useEffect(() => {
-		const fws = frameworksForLanguage(activeSlug);
-		setSelectedFrameworkSlug(fws[0]?.slug ?? null);
+		setSelectedFrameworkSlug(null);
 		setHoveredFwEl(undefined);
 		fwRefs.current = [];
 	}, [activeSlug]);
 
-	const activeFramework =
-		relatedFrameworks.find((fw) => fw.slug === selectedFrameworkSlug) ??
-		relatedFrameworks[0] ??
-		null;
+	const activeFramework = selectedFrameworkSlug
+		? (relatedFrameworks.find((fw) => fw.slug === selectedFrameworkSlug) ??
+			null)
+		: null;
 
-	const activeFwIdx = relatedFrameworks.findIndex(
-		(fw) => fw.slug === activeFramework?.slug,
+	const isLanguageSelected = activeFramework === null;
+	const activeFwIdx = isLanguageSelected
+		? 0
+		: relatedFrameworks.findIndex((fw) => fw.slug === activeFramework.slug) + 1;
+	const activeFwEl = fwRefs.current[activeFwIdx] ?? undefined;
+	const isHoveringOtherFw = Boolean(
+		hoveredFwEl && activeFwEl && hoveredFwEl !== activeFwEl,
 	);
-	const activeFwEl =
-		fwRefs.current[activeFwIdx >= 0 ? activeFwIdx : 0] ?? undefined;
-	const currentFwEl = hoveredFwEl ?? activeFwEl;
 
-	const fwHoverBox = useSidebarHoverBox(
-		currentFwEl,
+	const fwActiveBox = useSidebarHoverBox(
+		activeFwEl,
 		fwContainerEl,
 		`${active.slug}:${activeFramework?.slug}`,
+	);
+	const fwHoverBox = useSidebarHoverBox(
+		isHoveringOtherFw ? hoveredFwEl : undefined,
+		fwContainerEl,
+		`${active.slug}:hover:${activeFramework?.slug}`,
 	);
 
 	const installCode =
@@ -312,64 +317,113 @@ export default function LanguageExplorer() {
 							</div>
 						</div>
 
-						{relatedFrameworks.length > 0 ? (
-							<div className="mt-6 flex flex-col">
-								<div className="px-2.5 pb-1.5 font-semibold text-[10px] text-text-soft-400 uppercase tracking-[0.06em] dark:text-white/45">
-									Frameworks
-								</div>
-								<div
-									ref={setFwContainerEl}
-									role="tablist"
-									aria-label={`${active.name} frameworks`}
-									className="relative flex w-full flex-col"
-									onPointerLeave={() => setHoveredFwEl(undefined)}
-								>
-									{relatedFrameworks.map((fw, index) => {
-										const isSelected = activeFramework?.slug === fw.slug;
-										return (
-											<button
-												key={fw.slug}
-												ref={(el) => {
-													if (el) fwRefs.current[index] = el;
-												}}
-												type="button"
-												role="tab"
-												aria-selected={isSelected}
-												onPointerEnter={() =>
-													setHoveredFwEl(fwRefs.current[index] ?? undefined)
-												}
-												onClick={() => {
-													setSelectedFrameworkSlug(fw.slug);
-												}}
-												className="group relative z-10 flex h-8 w-full cursor-pointer items-center gap-2.5 rounded-lg px-2.5 text-left transition-all"
-											>
-												<span
-													className="flex size-4 shrink-0 items-center justify-center"
-													style={{ color: `#${fw.icon.hex}` }}
-												>
-													<LanguageIcon icon={fw.icon} className="size-3.5" />
-												</span>
-												<span
-													className={cn(
-														"truncate font-medium text-[13px] transition-colors",
-														isSelected
-															? "text-text-strong-950 dark:text-white"
-															: "text-text-sub-600 group-hover:text-text-strong-950 dark:text-white/60 dark:group-hover:text-white",
-													)}
-												>
-													{fw.name}
-												</span>
-											</button>
-										);
-									})}
-
-									<AnimatedHoverBackground
-										box={fwHoverBox}
-										className="!bg-neutral-alpha-10 dark:!bg-white/[0.08]"
-									/>
-								</div>
+						<div className="mt-6 flex flex-col">
+							<div className="px-2.5 pb-1.5 font-semibold text-[10px] text-text-soft-400 uppercase tracking-[0.06em] dark:text-white/45">
+								{relatedFrameworks.length > 0 ? "Frameworks" : "SDK"}
 							</div>
-						) : null}
+							<div
+								ref={setFwContainerEl}
+								role="tablist"
+								aria-label={`${active.name} options`}
+								className="relative flex w-full flex-col"
+								onPointerLeave={() => setHoveredFwEl(undefined)}
+							>
+								<button
+									ref={(el) => {
+										if (el) fwRefs.current[0] = el;
+									}}
+									type="button"
+									role="tab"
+									aria-selected={isLanguageSelected}
+									onPointerEnter={() =>
+										setHoveredFwEl(fwRefs.current[0] ?? undefined)
+									}
+									onClick={() => {
+										setSelectedFrameworkSlug(null);
+									}}
+									className="group relative z-10 flex h-8 w-full cursor-pointer items-center gap-2.5 rounded-lg px-2.5 text-left transition-colors"
+								>
+									<span
+										className="flex size-4 shrink-0 items-center justify-center"
+										style={{ color: brandColor }}
+									>
+										<LanguageIcon icon={active.icon} className="size-3.5" />
+									</span>
+									<span
+										className={cn(
+											"truncate font-medium text-[13px] transition-colors",
+											isLanguageSelected
+												? "text-text-strong-950 dark:text-white"
+												: "text-text-sub-600 group-hover:text-text-strong-950 dark:text-white/60 dark:group-hover:text-white",
+										)}
+									>
+										{active.name}
+									</span>
+								</button>
+
+								{relatedFrameworks.map((fw, index) => {
+									const refIndex = index + 1;
+									const isSelected = activeFramework?.slug === fw.slug;
+									return (
+										<button
+											key={fw.slug}
+											ref={(el) => {
+												if (el) fwRefs.current[refIndex] = el;
+											}}
+											type="button"
+											role="tab"
+											aria-selected={isSelected}
+											onPointerEnter={() =>
+												setHoveredFwEl(fwRefs.current[refIndex] ?? undefined)
+											}
+											onClick={() => {
+												setSelectedFrameworkSlug(fw.slug);
+											}}
+											className="group relative z-10 flex h-8 w-full cursor-pointer items-center gap-2.5 rounded-lg px-2.5 text-left transition-colors"
+										>
+											<span
+												className="flex size-4 shrink-0 items-center justify-center"
+												style={{ color: `#${fw.icon.hex}` }}
+											>
+												<LanguageIcon icon={fw.icon} className="size-3.5" />
+											</span>
+											<span
+												className={cn(
+													"truncate font-medium text-[13px] transition-colors",
+													isSelected
+														? "text-text-strong-950 dark:text-white"
+														: "text-text-sub-600 group-hover:text-text-strong-950 dark:text-white/60 dark:group-hover:text-white",
+												)}
+											>
+												{fw.name}
+											</span>
+										</button>
+									);
+								})}
+
+								<AnimatedHoverBackground
+									box={fwHoverBox}
+									className="!bg-black/[0.04] dark:!bg-white/[0.04]"
+								/>
+								<AnimatedHoverBackground
+									box={fwActiveBox}
+									className="!bg-neutral-alpha-10 dark:!bg-white/[0.08]"
+								/>
+								{fwActiveBox ? (
+									<motion.div
+										aria-hidden
+										className="pointer-events-none absolute z-20 w-0.5 rounded-full bg-primary-base"
+										initial={false}
+										animate={{
+											left: fwActiveBox.left,
+											top: fwActiveBox.top + 8,
+											height: Math.max(fwActiveBox.height - 16, 12),
+										}}
+										transition={{ type: "spring", bounce: 0, duration: 0.2 }}
+									/>
+								) : null}
+							</div>
+						</div>
 					</div>
 				</aside>
 
