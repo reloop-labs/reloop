@@ -424,7 +424,8 @@ export default function LanguageExplorer() {
 								{fwActiveBox ? (
 									<motion.div
 										aria-hidden
-										className="pointer-events-none absolute z-20 w-0.5 rounded-full bg-primary-base"
+										className="pointer-events-none absolute z-20 w-0.5 rounded-full"
+										style={{ backgroundColor: brandColor }}
 										initial={false}
 										animate={{
 											left: fwActiveBox.left + 4,
