@@ -5,39 +5,13 @@ import Link from "next/link";
 import { useState } from "react";
 import { languages } from "../languages";
 import { LanguageIcon } from "./language-icon";
-
-const EXT_BY_SLUG: Record<string, string> = {
-	python: "py",
-	go: "go",
-	rust: "rs",
-	ruby: "rb",
-	elixir: "ex",
-	java: "java",
-	dotnet: "cs",
-	php: "php",
-	nodejs: "ts",
-};
+import { SdkCodeBlock } from "./sdk-code-block";
 
 export default function LanguageExplorer() {
 	const [activeSlug, setActiveSlug] = useState(languages[0]!.slug);
-	const [copiedInstall, setCopiedInstall] = useState(false);
-	const [copiedCode, setCopiedCode] = useState(false);
 
 	const active = languages.find((l) => l.slug === activeSlug) ?? languages[0]!;
-	const ext = EXT_BY_SLUG[active.slug] ?? "ts";
 	const brandColor = `#${active.icon.hex}`;
-
-	const copyInstall = async () => {
-		await navigator.clipboard.writeText(active.installCommand);
-		setCopiedInstall(true);
-		setTimeout(() => setCopiedInstall(false), 2000);
-	};
-
-	const copyCode = async () => {
-		await navigator.clipboard.writeText(active.sendCode);
-		setCopiedCode(true);
-		setTimeout(() => setCopiedCode(false), 2000);
-	};
 
 	return (
 		<section
@@ -72,11 +46,7 @@ export default function LanguageExplorer() {
 									aria-selected={isActive}
 									id={`lang-tab-${lang.slug}`}
 									aria-controls="lang-panel"
-									onClick={() => {
-										setActiveSlug(lang.slug);
-										setCopiedInstall(false);
-										setCopiedCode(false);
-									}}
+									onClick={() => setActiveSlug(lang.slug)}
 									className={[
 										"inline-flex shrink-0 items-center gap-2 rounded-full px-3.5 py-2 font-medium text-xs transition-colors duration-150",
 										isActive
@@ -139,21 +109,14 @@ export default function LanguageExplorer() {
 
 						<div className="flex flex-col gap-4">
 							<div>
-								<p className="font-mono text-[10px] text-text-sub-600 uppercase tracking-[0.12em] dark:text-white/45">
+								<p className="mb-2 font-mono text-[10px] text-text-sub-600 uppercase tracking-[0.12em] dark:text-white/45">
 									Install
 								</p>
-								<div className="mt-2 flex items-center justify-between gap-3 rounded-xl border border-stroke-soft-200 bg-bg-weak-50 px-3.5 py-2.5 dark:border-white/10 dark:bg-white/[0.03]">
-									<code className="truncate font-mono text-[12px] text-text-strong-950 dark:text-white">
-										{active.installCommand}
-									</code>
-									<button
-										type="button"
-										onClick={copyInstall}
-										className="shrink-0 font-medium text-text-strong-950 text-xs underline decoration-text-sub-600/40 underline-offset-2 transition-colors hover:decoration-text-strong-950 dark:text-white dark:decoration-white/30 dark:hover:decoration-white"
-									>
-										{copiedInstall ? "Copied" : "Copy"}
-									</button>
-								</div>
+								<SdkCodeBlock
+									key={`install-${active.slug}`}
+									code={active.installCommand}
+									lang="bash"
+								/>
 							</div>
 
 							<div className="flex flex-wrap gap-2">
@@ -179,30 +142,16 @@ export default function LanguageExplorer() {
 						</div>
 					</div>
 
-					{/* Right: code */}
-					<div className="relative overflow-hidden border-stroke-soft-200 border-t bg-[#0d1117] text-white lg:col-span-8 lg:border-t-0 dark:border-white/10">
-						<div className="flex items-center justify-between border-[#21262d] border-b bg-[#161b22] px-4 py-3">
-							<div className="flex items-center gap-2">
-								<span className="size-2.5 rounded-full bg-[#ff5f56]" />
-								<span className="size-2.5 rounded-full bg-[#ffbd2e]" />
-								<span className="size-2.5 rounded-full bg-[#27c93f]" />
-								<span className="ml-2 font-mono text-white/50 text-xs">
-									send_email.{ext}
-								</span>
-							</div>
-							<button
-								type="button"
-								onClick={copyCode}
-								className="font-mono text-white/60 text-xs transition-colors hover:text-white"
-							>
-								{copiedCode ? "Copied" : "Copy code"}
-							</button>
-						</div>
-						<div className="max-h-[min(28rem,70vh)] overflow-auto p-5 font-mono text-[13px] text-slate-200 leading-relaxed sm:p-6">
-							<pre className="whitespace-pre">
-								<code key={active.slug}>{active.sendCode}</code>
-							</pre>
-						</div>
+					{/* Right: Reloop code UI */}
+					<div className="border-stroke-soft-200 border-t p-6 sm:p-8 lg:col-span-8 lg:border-t-0 lg:p-8 dark:border-white/10">
+						<p className="mb-3 font-mono text-[10px] text-text-sub-600 uppercase tracking-[0.12em] dark:text-white/45">
+							Sample
+						</p>
+						<SdkCodeBlock
+							key={`code-${active.slug}`}
+							code={active.sendCode}
+							slug={active.slug}
+						/>
 					</div>
 				</div>
 			</div>

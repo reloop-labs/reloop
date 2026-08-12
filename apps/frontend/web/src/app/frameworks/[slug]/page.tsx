@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import FrameworkHero from "../../languages/components/framework-hero";
 import FrameworkMore from "../../languages/components/framework-more";
-import LanguageCode from "../../languages/components/language-code";
+import FrameworkSteps from "../../languages/components/framework-steps";
 import {
 	FRAMEWORK_SLUGS,
 	getFramework,
@@ -32,7 +32,7 @@ export async function generateMetadata({
 		return { title: "Framework | Reloop" };
 	}
 	const title = `Send Email with ${framework.name} | Reloop`;
-	const description = framework.shortDescription;
+	const description = `${framework.shortDescription} Step-by-step: install, set your API key, and send.`;
 	const url = `${getSiteUrl()}/frameworks/${framework.slug}`;
 	return {
 		title,
@@ -54,6 +54,7 @@ export async function generateMetadata({
 			`${framework.name} email`,
 			`send email ${framework.name}`,
 			`${framework.name} transactional email`,
+			`${framework.name} integration`,
 			`${framework.languageName} email SDK`,
 			"Reloop",
 		],
@@ -73,13 +74,7 @@ export default async function FrameworkPage({ params }: PageProps) {
 	return (
 		<main className="w-full bg-bg-white-0 dark:bg-black">
 			<FrameworkHero framework={framework} />
-			<LanguageCode
-				sample={{
-					slug: framework.slug,
-					installCommand: framework.installCommand,
-					sendCode: framework.sendCode,
-				}}
-			/>
+			<FrameworkSteps framework={framework} />
 			<FrameworkMore current={framework} />
 			<BlogCta
 				headline={`Send with ${framework.name}.`}

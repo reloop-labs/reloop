@@ -82,13 +82,13 @@ export default function FrameworkHero({
 
 					<div className="mt-7 flex flex-wrap items-center justify-center gap-3">
 						<a
-							href="#code"
+							href="#steps"
 							className={`${Button.buttonVariants({
 								variant: "neutral",
 								mode: "filled",
 							}).root()} inline-flex h-10! rounded-full! px-6! font-medium text-sm! dark:bg-white dark:text-black dark:hover:bg-white/90`}
 						>
-							View code
+							Start integration
 						</a>
 						<Link
 							href={`/languages/${framework.languageSlug}`}
