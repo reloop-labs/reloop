@@ -25,9 +25,9 @@ const defaultStats: StatItem[] = [
 		detail: "Standard SMTP & REST APIs; bring your own IPs",
 	},
 	{
-		label: "Global Delivery Latency",
-		value: "<50ms",
-		detail: "Edge routed transactional delivery pipeline",
+		label: "Developer Experience",
+		value: "10/10",
+		detail: "React email components, TypeScript SDKs, and clean APIs",
 	},
 ];
 

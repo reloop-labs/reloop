@@ -1,12 +1,9 @@
-import {
-	MarketingPageShell,
-	PageSection,
-} from "@reloop/web/components/page-shell";
+import { PageSection } from "@reloop/web/components/page-shell";
 import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 import { CompareCalculator } from "./components/compare-calculator";
-import { CompareHeroStatStrip } from "./components/compare-hero-stat-strip";
-import { CompareInteractiveSpotlight } from "./components/compare-interactive-spotlight";
+
+import { CompareHeroHeader } from "./components/compare-hero-header";
 import { CompareMasterMatrix } from "./components/compare-master-matrix";
 import { ComparisonGrid } from "./components/comparison-grid";
 
@@ -54,20 +51,9 @@ export const metadata: Metadata = {
 
 const CompareIndexPage = () => {
 	return (
-		<MarketingPageShell
-			titleLines={["Reloop vs", "the competition."]}
-			description="Compare Reloop against leading email service providers. Learn how Reloop delivers 10x lower costs, open-source transparency, and unified email infrastructure."
-			compactHero
-		>
-			{/* Metric Stat Strip */}
-			<PageSection flushTop>
-				<CompareHeroStatStrip />
-			</PageSection>
-
-			{/* Interactive Brand Spotlight */}
-			<PageSection>
-				<CompareInteractiveSpotlight />
-			</PageSection>
+		<div className="mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-200 border-x pb-16 md:max-w-7xl dark:border-white/10">
+			{/* Top Hero Header */}
+			<CompareHeroHeader />
 
 			{/* Volume & ROI Cost Calculator */}
 			<PageSection>
@@ -83,7 +69,7 @@ const CompareIndexPage = () => {
 			<PageSection>
 				<ComparisonGrid />
 			</PageSection>
-		</MarketingPageShell>
+		</div>
 	);
 };
 
