@@ -415,7 +415,7 @@ export default function LanguageExplorer() {
 										className="pointer-events-none absolute z-20 w-0.5 rounded-full bg-primary-base"
 										initial={false}
 										animate={{
-											left: fwActiveBox.left,
+											left: fwActiveBox.left + 4,
 											top: fwActiveBox.top + 8,
 											height: Math.max(fwActiveBox.height - 16, 12),
 										}}
