@@ -153,170 +153,159 @@ export function CompareCalculator() {
 				</div>
 			</div>
 
-			{/* Comparison Results Card */}
-			<div className="w-full rounded-3xl border border-stroke-soft-200/80 bg-bg-weak-50/50 p-6 sm:p-10 dark:border-white/10 dark:bg-white/[0.02]">
-				<div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:justify-between lg:gap-12">
-					{/* Left Column: Volume Slider + Annual Savings Summary Callout */}
-					<div className="flex-1 space-y-6">
-						{/* Volume Input Controls Card */}
-						<div className="space-y-4 rounded-2xl border border-stroke-soft-200/80 bg-white p-5 shadow-sm sm:p-6 dark:border-white/10 dark:bg-white/[0.03]">
-							<div className="flex items-center justify-between">
-								<label
-									htmlFor="email-volume-slider"
-									className="font-medium text-[14px] text-text-strong-950 dark:text-white"
-								>
-									Monthly email volume
-								</label>
-								<div className="flex items-baseline gap-1">
-									<span className="font-bold font-mono text-[1.5rem] text-text-strong-950 tracking-tight dark:text-white">
-										{formatNumber(volume)}
-									</span>
-									<span className="text-[13px] text-text-sub-600 dark:text-white/50">
-										/ mo
-									</span>
-								</div>
-							</div>
-
-							{/* Slider */}
-							<input
-								id="email-volume-slider"
-								type="range"
-								min={10000}
-								max={5000000}
-								step={10000}
-								value={volume}
-								onChange={(e) => setVolume(Number(e.target.value))}
-								className="h-2 w-full cursor-pointer appearance-none rounded-lg bg-bg-weak-50 accent-text-strong-950 dark:bg-white/10 dark:accent-white"
-							/>
-
-							{/* Preset Buttons */}
-							<div className="flex flex-wrap items-center gap-2 pt-1">
-								{VOLUME_PRESETS.map((preset) => (
-									<button
-										key={preset.label}
-										type="button"
-										onClick={() => setVolume(preset.value)}
-										className={cn(
-											"rounded-lg px-3 py-1.5 font-medium font-mono text-[13px] transition-all duration-200",
-											volume === preset.value
-												? "bg-text-strong-950 text-white shadow-sm dark:bg-white dark:text-black"
-												: "border border-stroke-soft-200/80 bg-bg-weak-50/50 text-text-sub-600 hover:border-stroke-soft-300 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/60 dark:hover:text-white",
-										)}
-									>
-										{preset.label}
-									</button>
-								))}
+			{/* Comparison Results Flat Layout with Divider */}
+			<div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:justify-between">
+				{/* Left Column: Volume Slider + Annual Savings Summary Callout */}
+				<div className="flex-1 space-y-8 lg:border-stroke-soft-200 lg:border-r lg:pr-8 xl:pr-12 dark:lg:border-white/10">
+					{/* Volume Input Controls */}
+					<div className="space-y-4">
+						<div className="flex items-center justify-between">
+							<label
+								htmlFor="email-volume-slider"
+								className="font-medium text-[14px] text-text-strong-950 dark:text-white"
+							>
+								Monthly email volume
+							</label>
+							<div className="flex items-baseline gap-1">
+								<span className="font-bold font-mono text-[1.5rem] text-text-strong-950 tracking-tight dark:text-white">
+									{formatNumber(volume)}
+								</span>
+								<span className="text-[13px] text-text-sub-600 dark:text-white/50">
+									/ mo
+								</span>
 							</div>
 						</div>
 
-						{/* Annual Savings Summary Callout */}
-						{annualSavingsVsResend > 0 ? (
-							<div className="rounded-2xl border border-stroke-soft-200/80 bg-bg-white-0 p-6 dark:border-white/10 dark:bg-white/[0.03]">
-								<p className="font-semibold text-[12px] text-text-sub-600 uppercase tracking-wider dark:text-white/50">
-									Estimated Annual Savings vs Resend
-								</p>
-								<div className="mt-2 flex items-baseline gap-2">
-									<span className="font-bold font-mono text-[2.2rem] text-primary-base leading-none tracking-tight sm:text-[2.6rem]">
-										${formatNumber(annualSavingsVsResend)}
-									</span>
-									<span className="text-[14px] text-text-sub-600 dark:text-white/60">
-										/ year saved on Reloop Cloud
-									</span>
-								</div>
-								<p className="mt-3 text-[14px] text-text-sub-600 leading-relaxed dark:text-white/50">
-									Or self-host Reloop on your own infrastructure for $0 software
-									licensing cost.
-								</p>
-							</div>
-						) : null}
+						{/* Slider */}
+						<input
+							id="email-volume-slider"
+							type="range"
+							min={10000}
+							max={5000000}
+							step={10000}
+							value={volume}
+							onChange={(e) => setVolume(Number(e.target.value))}
+							className="h-2 w-full cursor-pointer appearance-none rounded-lg bg-bg-weak-50 accent-text-strong-950 dark:bg-white/10 dark:accent-white"
+						/>
+
+						{/* Preset Buttons */}
+						<div className="flex flex-wrap items-center gap-2 pt-1">
+							{VOLUME_PRESETS.map((preset) => (
+								<button
+									key={preset.label}
+									type="button"
+									onClick={() => setVolume(preset.value)}
+									className={cn(
+										"rounded-lg px-3 py-1.5 font-medium font-mono text-[13px] transition-all duration-200",
+										volume === preset.value
+											? "bg-text-strong-950 text-white shadow-sm dark:bg-white dark:text-black"
+											: "border border-stroke-soft-200/80 bg-bg-weak-50/50 text-text-sub-600 hover:border-stroke-soft-300 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/60 dark:hover:text-white",
+									)}
+								>
+									{preset.label}
+								</button>
+							))}
+						</div>
 					</div>
 
-					{/* Provider Visual Bar Chart */}
-					<div className="flex-1 space-y-4">
-						<div className="flex items-center justify-between border-stroke-soft-200 border-b pb-3 dark:border-white/10">
-							<span className="font-bold text-[13px] text-text-sub-600 uppercase tracking-wider dark:text-white/50">
-								Provider
-							</span>
-							<span className="font-bold text-[13px] text-text-sub-600 uppercase tracking-wider dark:text-white/50">
-								Estimated Monthly Bill
-							</span>
+					{/* Annual Savings Summary Callout */}
+					{annualSavingsVsResend > 0 ? (
+						<div className="border-stroke-soft-200 border-t pt-6 dark:border-white/10">
+							<p className="font-semibold text-[12px] text-text-sub-600 uppercase tracking-wider dark:text-white/50">
+								Estimated Annual Savings vs Resend
+							</p>
+							<div className="mt-2 flex items-baseline gap-2">
+								<span className="font-bold font-mono text-[2.2rem] text-primary-base leading-none tracking-tight sm:text-[2.6rem]">
+									${formatNumber(annualSavingsVsResend)}
+								</span>
+								<span className="text-[14px] text-text-sub-600 dark:text-white/60">
+									/ year saved on Reloop Cloud
+								</span>
+							</div>
+							<p className="mt-3 text-[14px] text-text-sub-600 leading-relaxed dark:text-white/50">
+								Or self-host Reloop on your own infrastructure for $0 software
+								licensing cost.
+							</p>
 						</div>
+					) : null}
+				</div>
 
-						<div className="space-y-3">
-							{providers.map((provider) => {
-								const percentage = Math.max(
-									(provider.cost / highestCompetitorCost) * 100,
-									6,
-								);
+				{/* Right Column: Provider Visual Bar Chart */}
+				<div className="flex-1 space-y-4 lg:pl-4 xl:pl-6">
+					<div className="space-y-3">
+						{providers.map((provider) => {
+							const percentage = Math.max(
+								(provider.cost / highestCompetitorCost) * 100,
+								6,
+							);
 
-								return (
-									<div key={provider.name} className="group space-y-1.5">
-										<div className="flex items-center justify-between">
-											<div className="flex items-center gap-2.5">
-												{provider.isReloop ? (
-													<span className="flex size-6 items-center justify-center rounded-md bg-text-strong-950 dark:bg-white">
-														<Logo className="size-3.5 text-white dark:text-black" />
-													</span>
-												) : provider.icon ? (
-													<span className="flex size-6 items-center justify-center rounded-md border border-stroke-soft-200/80 bg-bg-weak-50 dark:border-white/10 dark:bg-white/10">
-														<BrandIcon
-															icon={provider.icon}
-															className="size-3.5"
-														/>
-													</span>
-												) : null}
-
-												<Link
-													href={provider.href}
-													className={cn(
-														"font-medium text-[14px] transition-colors",
-														provider.isReloop
-															? "font-bold text-text-strong-950 dark:text-white"
-															: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/70 dark:hover:text-white",
-													)}
-												>
-													{provider.name}
-												</Link>
-
-												{provider.isReloop ? (
-													<span className="rounded-full bg-text-strong-950/10 px-2 py-0.5 font-bold font-mono text-[10px] text-text-strong-950 uppercase dark:bg-white/10 dark:text-white">
-														Recommended
-													</span>
-												) : null}
-											</div>
-
-											<div className="flex items-baseline gap-2">
-												<span className="font-mono font-semibold text-[15px] text-text-strong-950 tabular-nums dark:text-white">
-													${formatNumber(provider.cost)}
+							return (
+								<div key={provider.name} className="group space-y-1.5">
+									<div className="flex items-center justify-between">
+										<div className="flex items-center gap-2.5">
+											{provider.isReloop ? (
+												<span className="flex size-6 items-center justify-center rounded-md bg-text-strong-950 dark:bg-white">
+													<Logo className="size-3.5 text-white dark:text-black" />
 												</span>
-												<span className="text-[11px] text-text-sub-600 dark:text-white/40">
-													/mo
+											) : provider.icon ? (
+												<span className="flex size-6 items-center justify-center rounded-md border border-stroke-soft-200/80 bg-bg-weak-50 dark:border-white/10 dark:bg-white/10">
+													<BrandIcon
+														icon={provider.icon}
+														className="size-3.5"
+													/>
 												</span>
-											</div>
+											) : null}
+
+											<Link
+												href={provider.href}
+												className={cn(
+													"font-medium text-[14px] transition-colors",
+													provider.isReloop
+														? "font-bold text-text-strong-950 dark:text-white"
+														: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/70 dark:hover:text-white",
+												)}
+											>
+												{provider.name}
+											</Link>
+
+											{provider.isReloop ? (
+												<span className="rounded-full bg-text-strong-950/10 px-2 py-0.5 font-bold font-mono text-[10px] text-text-strong-950 uppercase dark:bg-white/10 dark:text-white">
+													Recommended
+												</span>
+											) : null}
 										</div>
 
-										{/* Bar Fill */}
-										<div className="h-3 w-full overflow-hidden rounded-full bg-bg-weak-50/80 dark:bg-white/[0.06]">
-											<div
-												className={cn(
-													"h-full rounded-full transition-all duration-500 ease-out",
-													provider.isReloop
-														? "bg-text-strong-950 dark:bg-white"
-														: "bg-slate-300 dark:bg-white/20",
-												)}
-												style={{ width: `${percentage}%` }}
-											/>
+										<div className="flex items-baseline gap-2">
+											<span className="font-mono font-semibold text-[15px] text-text-strong-950 tabular-nums dark:text-white">
+												${formatNumber(provider.cost)}
+											</span>
+											<span className="text-[11px] text-text-sub-600 dark:text-white/40">
+												/mo
+											</span>
 										</div>
 									</div>
-								);
-							})}
-						</div>
 
-						<p className="pt-2 text-[12px] text-text-sub-600 leading-snug dark:text-white/40">
-							*Estimates based on published public cloud pricing tiers as of 2026.
-							Infrastructure data transfer fees may apply.
-						</p>
+									{/* Bar Fill */}
+									<div className="h-3 w-full overflow-hidden rounded-full bg-bg-weak-50/80 dark:bg-white/[0.06]">
+										<div
+											className={cn(
+												"h-full rounded-full transition-all duration-500 ease-out",
+												provider.isReloop
+													? "bg-text-strong-950 dark:bg-white"
+													: "bg-slate-300 dark:bg-white/20",
+											)}
+											style={{ width: `${percentage}%` }}
+										/>
+									</div>
+								</div>
+							);
+						})}
 					</div>
+
+					<p className="pt-2 text-[12px] text-text-sub-600 leading-snug dark:text-white/40">
+						*Estimates based on published public cloud pricing tiers as of 2026.
+						Infrastructure data transfer fees may apply.
+					</p>
 				</div>
 			</div>
 		</div>
