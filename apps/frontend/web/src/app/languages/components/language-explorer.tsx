@@ -186,13 +186,6 @@ export default function LanguageExplorer() {
 						<p className="mt-5 text-[13.5px] text-text-sub-600 leading-relaxed dark:text-white/60">
 							{active.shortDescription}
 						</p>
-
-						<p className="mt-4 text-[12px] text-text-sub-600 dark:text-white/45">
-							<span className="text-text-strong-950 dark:text-white/70">
-								Works with
-							</span>{" "}
-							{active.primaryFramework}
-						</p>
 					</div>
 
 					<div className="flex flex-col gap-4">

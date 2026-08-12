@@ -71,8 +71,8 @@ export default function LanguageHero({
 					</h1>
 
 					<p className="mt-4 max-w-lg text-[15px] text-text-sub-600 leading-relaxed sm:text-[16px] dark:text-white/60">
-						Official {language.name} SDK for {language.primaryFramework}. A few
-						lines of code to send production email.
+						Official {language.name} SDK for Reloop. A few lines of code to
+						send production email.
 					</p>
 
 					<div className="mt-7 flex flex-wrap items-center justify-center gap-3">
