@@ -1,7 +1,5 @@
-import { Icon } from "@reloop/ui/icon";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import type { BrandIcon } from "../../languages/components/language-icon";
 import { LanguageIcon } from "../../languages/components/language-icon";
 import { frameworks } from "../../languages/frameworks";
 import { languages } from "../../languages/languages";
@@ -14,229 +12,214 @@ type Prerequisite = {
 	visual: ReactNode;
 };
 
-/**
- * Auth-style graph for API key:
- * top request pill → shield node → horizontal dashed timeline
- */
+/** Step 1 — Dashboard-style API key row */
 function ApiKeyVisual() {
-	const timelineDots = [0, 1, 2, 3, 4] as const;
-
 	return (
-		<div className="relative mx-auto flex w-full max-w-[240px] flex-col items-center py-1">
-			{/* Top — API key as request pill */}
-			<div className="relative z-10 inline-flex items-center gap-1.5 rounded-full border border-stroke-soft-200 bg-bg-white-0 px-3 py-1.5 shadow-[0_2px_8px_rgba(0,0,0,0.04)] dark:border-white/15 dark:bg-black dark:shadow-none">
-				<span className="rounded-md bg-bg-weak-50 px-1.5 py-0.5 font-mono text-[10px] font-semibold text-text-sub-600 dark:bg-white/[0.06] dark:text-white/50">
-					KEY
+		<div className="mx-auto w-full max-w-[300px] overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-white-0 shadow-[0_4px_20px_rgba(0,0,0,0.04)] dark:border-white/10 dark:bg-black dark:shadow-none">
+			<div className="flex items-center justify-between border-stroke-soft-200 border-b px-3.5 py-2.5 dark:border-white/10">
+				<span className="font-medium text-[11px] text-text-sub-600 dark:text-white/45">
+					API keys
 				</span>
-				<code className="font-mono text-[11.5px] text-text-strong-950 tracking-tight dark:text-white">
-					rl_live_••••
-				</code>
+				<span className="rounded-md border border-stroke-soft-200 px-2 py-0.5 font-medium text-[10px] text-text-strong-950 dark:border-white/10 dark:text-white">
+					Create key
+				</span>
 			</div>
-
-			{/* Vertical dashed connector */}
-			<div
-				aria-hidden
-				className="h-8 w-px border-stroke-soft-300 border-l border-dashed dark:border-white/20"
-			/>
-
-			{/* Center — shield / authorized */}
-			<div className="relative z-10 flex size-14 items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-white-0 shadow-[0_2px_12px_rgba(0,0,0,0.05)] ring-[6px] ring-stroke-soft-200/50 dark:border-white/15 dark:bg-black dark:shadow-none dark:ring-white/10">
-				<svg
-					viewBox="0 0 24 24"
-					className="size-6 text-text-strong-950 dark:text-white"
-					fill="none"
-					stroke="currentColor"
-					strokeWidth="1.6"
-					strokeLinecap="round"
-					strokeLinejoin="round"
-					aria-hidden
-				>
-					<path d="M12 3 5 6v5c0 4.5 3 7.5 7 9 4-1.5 7-4.5 7-9V6l-7-3Z" />
-					<path d="m9.5 12 1.8 1.8L15 10" />
-				</svg>
-			</div>
-
-			{/* Vertical dashed connector into timeline */}
-			<div
-				aria-hidden
-				className="h-8 w-px border-stroke-soft-300 border-l border-dashed dark:border-white/20"
-			/>
-
-			{/* Bottom — horizontal dashed timeline with nodes */}
-			<div className="relative flex w-full max-w-[200px] items-center justify-between">
-				{/* Dashed line through centers of dots */}
-				<div
-					aria-hidden
-					className="absolute top-1/2 right-1 left-1 h-px -translate-y-1/2 border-stroke-soft-300 border-t border-dashed dark:border-white/20"
-				/>
-				{timelineDots.map((i) => (
-					<span
-						key={i}
+			<div className="flex items-center gap-3 px-3.5 py-3">
+				<span className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-stroke-soft-200 bg-bg-weak-50 dark:border-white/10 dark:bg-white/[0.04]">
+					<svg
+						viewBox="0 0 24 24"
+						className="size-3.5 text-text-strong-950 dark:text-white"
+						fill="none"
+						stroke="currentColor"
+						strokeWidth="1.75"
+						strokeLinecap="round"
+						strokeLinejoin="round"
 						aria-hidden
-						className={
-							i === 2
-								? "relative z-10 size-2.5 rounded-full border-2 border-stroke-soft-300 bg-bg-white-0 dark:border-white/30 dark:bg-black"
-								: "relative z-10 size-1.5 rounded-full bg-stroke-soft-300 dark:bg-white/25"
-						}
-					/>
-				))}
-			</div>
-		</div>
-	);
-}
-
-/**
- * Domain visual — same background language as the blog product CTA card:
- * grey diagonal hatch, concentric orbital rings, soft blue glow.
- */
-function DomainVisual() {
-	return (
-		<div className="relative mx-auto flex aspect-[16/10] w-full max-w-[280px] items-center justify-center overflow-hidden rounded-xl bg-bg-weak-50/40 p-3.5 text-text-strong-950 dark:bg-neutral-900/30 dark:text-white">
-			{/* Subtle grey diagonal hatch pattern */}
-			<div
-				aria-hidden
-				className="pointer-events-none absolute inset-0 opacity-[0.03] dark:opacity-[0.05]"
-				style={{
-					backgroundImage:
-						"repeating-linear-gradient(45deg, currentColor 0, currentColor 1px, transparent 0, transparent 10px)",
-				}}
-			/>
-
-			{/* Subtle grey concentric orbital & dotted rings */}
-			<svg
-				className="pointer-events-none absolute inset-0 size-full text-text-strong-950/[0.05] dark:text-white/[0.06]"
-				viewBox="0 0 200 120"
-				fill="none"
-				xmlns="http://www.w3.org/2000/svg"
-				aria-hidden
-			>
-				<circle
-					cx="100"
-					cy="60"
-					r="28"
-					stroke="currentColor"
-					strokeDasharray="3 3"
-				/>
-				<circle
-					cx="100"
-					cy="60"
-					r="54"
-					stroke="currentColor"
-					strokeWidth="0.75"
-				/>
-				<circle
-					cx="100"
-					cy="60"
-					r="82"
-					stroke="currentColor"
-					strokeDasharray="4 4"
-				/>
-			</svg>
-
-			{/* Ultra subtle blue glow */}
-			<div
-				aria-hidden
-				className="pointer-events-none absolute size-32 rounded-full bg-gradient-to-tr from-blue-500/[0.06] via-sky-400/[0.04] to-indigo-500/[0.04] blur-2xl dark:from-blue-500/[0.08] dark:via-sky-400/[0.06] dark:to-indigo-500/[0.06]"
-			/>
-
-			{/* Globe + domain label */}
-			<div className="relative z-10 flex flex-col items-center gap-2.5">
-				<div className="flex size-12 items-center justify-center rounded-full border border-stroke-soft-200/80 bg-bg-white-0 shadow-sm dark:border-white/15 dark:bg-black/60">
-					<Icon
-						name="globe"
-						className="size-5 text-text-strong-950 dark:text-white"
-						aria-hidden
-					/>
+					>
+						<path d="m21 2-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0 3 3L22 7l-3-3m-3.5 3.5L19 4" />
+					</svg>
+				</span>
+				<div className="min-w-0 flex-1">
+					<p className="font-medium text-[12px] text-text-strong-950 dark:text-white">
+						Production
+					</p>
+					<p className="mt-0.5 truncate font-mono text-[11px] text-text-sub-600 dark:text-white/45">
+						rl_live_8f3a••••••••c2
+					</p>
 				</div>
-				<span className="rounded-full border border-stroke-soft-200/80 bg-bg-white-0/90 px-3 py-1 font-mono text-[11.5px] text-text-strong-950 tracking-tight shadow-sm dark:border-white/15 dark:bg-black/70 dark:text-white">
-					send.apple.com
+				<span className="shrink-0 rounded-full bg-emerald-500/10 px-2 py-0.5 font-medium text-[10px] text-emerald-600 dark:text-emerald-400">
+					Active
 				</span>
+			</div>
+			<div className="border-stroke-soft-200 border-t px-3.5 py-2 dark:border-white/10">
+				<p className="font-mono text-[10.5px] text-text-sub-600 dark:text-white/40">
+					RELOOP_API_KEY=rl_live_…
+				</p>
 			</div>
 		</div>
 	);
 }
 
-type MarqueeItem = {
-	slug: string;
-	name: string;
-	icon: BrandIcon;
-};
+/** Step 2 — Domain dashboard with verified DNS */
+function DomainVisual() {
+	const records = [
+		{ name: "SPF", value: "v=spf1 include:_spf.reloop.sh ~all" },
+		{ name: "DKIM", value: "reloop._domainkey TXT" },
+		{ name: "DMARC", value: "v=DMARC1; p=none; rua=…" },
+	];
 
-function MarqueeChip({ item }: { item: MarqueeItem }) {
 	return (
-		<span
-			className="inline-flex size-10 shrink-0 items-center justify-center rounded-[12px] border border-stroke-soft-200 bg-bg-white-0 shadow-[0_1px_2px_rgba(0,0,0,0.03)] dark:border-white/10 dark:bg-white/[0.04]"
-			style={{ color: `#${item.icon.hex}` }}
-			title={item.name}
-		>
-			<LanguageIcon icon={item.icon} className="size-4" />
-		</span>
+		<div className="mx-auto w-full max-w-[300px] overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-white-0 shadow-[0_4px_20px_rgba(0,0,0,0.04)] dark:border-white/10 dark:bg-black dark:shadow-none">
+			<div className="flex items-center justify-between border-stroke-soft-200 border-b px-3.5 py-2.5 dark:border-white/10">
+				<div className="min-w-0">
+					<p className="font-medium text-[12px] text-text-strong-950 dark:text-white">
+						send.apple.com
+					</p>
+					<p className="mt-0.5 font-mono text-[10px] text-text-sub-600 dark:text-white/40">
+						Sending domain
+					</p>
+				</div>
+				<span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 font-medium text-[10px] text-emerald-600 dark:text-emerald-400">
+					<span className="size-1.5 rounded-full bg-emerald-500" />
+					Verified
+				</span>
+			</div>
+			<ul className="divide-y divide-stroke-soft-200 dark:divide-white/10">
+				{records.map((row) => (
+					<li
+						key={row.name}
+						className="flex items-center gap-2.5 px-3.5 py-2.5"
+					>
+						<span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-white">
+							<svg
+								width="10"
+								height="10"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								strokeWidth="3"
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								aria-hidden
+							>
+								<path d="M20 6 9 17l-5-5" />
+							</svg>
+						</span>
+						<div className="min-w-0 flex-1">
+							<p className="font-semibold text-[11px] text-text-strong-950 dark:text-white">
+								{row.name}
+							</p>
+							<p className="truncate font-mono text-[10px] text-text-sub-600 dark:text-white/45">
+								{row.value}
+							</p>
+						</div>
+					</li>
+				))}
+			</ul>
+		</div>
 	);
 }
 
-/**
- * Infinite horizontal marquee row.
- * Duplicates items so `translateX(-50%)` loops seamlessly.
- */
-function MarqueeRow({
-	items,
-	reverse = false,
-	duration = 28,
-}: {
-	items: MarqueeItem[];
-	reverse?: boolean;
-	duration?: number;
-}) {
-	const loop = [...items, ...items];
+/** Step 3 — Static SDK / language picker grid */
+function LanguageVisual() {
+	const items = [
+		...languages.slice(0, 4).map((lang) => ({
+			slug: lang.slug,
+			name: lang.name,
+			icon: lang.icon,
+			meta: lang.installCommand.split(" ").slice(-1)[0] ?? lang.packageName,
+		})),
+		...frameworks.slice(0, 2).map((fw) => ({
+			slug: fw.slug,
+			name: fw.name,
+			icon: fw.icon,
+			meta: fw.languageName,
+		})),
+	];
 
 	return (
-		<div className="flex overflow-hidden">
-			<div
-				className="flex w-max gap-2.5 pr-2.5 will-change-transform motion-reduce:animate-none"
-				style={{
-					animation: `infinite-scroll ${duration}s linear infinite`,
-					animationDirection: reverse ? "reverse" : "normal",
-				}}
-			>
-				{loop.map((item, i) => (
-					<MarqueeChip key={`${item.slug}-${i}`} item={item} />
+		<div className="mx-auto w-full max-w-[300px] overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-white-0 shadow-[0_4px_20px_rgba(0,0,0,0.04)] dark:border-white/10 dark:bg-black dark:shadow-none">
+			<div className="border-stroke-soft-200 border-b px-3.5 py-2.5 dark:border-white/10">
+				<p className="font-medium text-[11px] text-text-sub-600 dark:text-white/45">
+					Official SDKs
+				</p>
+			</div>
+			<div className="grid grid-cols-3 gap-px bg-stroke-soft-200 dark:bg-white/10">
+				{items.map((item) => (
+					<div
+						key={item.slug}
+						className="flex flex-col items-center gap-1.5 bg-bg-white-0 px-2 py-3 dark:bg-black"
+					>
+						<span
+							className="inline-flex size-8 items-center justify-center rounded-lg border border-stroke-soft-200 dark:border-white/10"
+							style={{ color: `#${item.icon.hex}` }}
+						>
+							<LanguageIcon icon={item.icon} className="size-3.5" />
+						</span>
+						<span className="truncate text-center font-medium text-[10px] text-text-strong-950 dark:text-white">
+							{item.name}
+						</span>
+					</div>
 				))}
 			</div>
 		</div>
 	);
 }
 
-/**
- * Two-row marquee: frameworks L→R on top, languages R→L below.
- * Soft edge fade like a component mannequin / logo wall.
- */
-function LanguageVisual() {
-	const frameworkItems: MarqueeItem[] = frameworks.map((fw) => ({
-		slug: fw.slug,
-		name: fw.name,
-		icon: fw.icon,
-	}));
-	const languageItems: MarqueeItem[] = languages.map((lang) => ({
-		slug: lang.slug,
-		name: lang.name,
-		icon: lang.icon,
-	}));
-
+/** Step 4 — Email activity / delivery log row */
+function EmailSentVisual() {
 	return (
-		<div
-			className="relative w-full overflow-hidden py-2"
-			style={{
-				maskImage:
-					"linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%)",
-				WebkitMaskImage:
-					"linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%)",
-			}}
-		>
-			<div className="flex flex-col gap-2.5">
-				{/* Frameworks — left → right */}
-				<MarqueeRow items={frameworkItems} reverse duration={32} />
-				{/* Languages — right → left (opposite) */}
-				<MarqueeRow items={languageItems} reverse={false} duration={26} />
+		<div className="mx-auto w-full max-w-[300px] overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-white-0 shadow-[0_4px_20px_rgba(0,0,0,0.04)] dark:border-white/10 dark:bg-black dark:shadow-none">
+			<div className="flex items-center justify-between border-stroke-soft-200 border-b px-3.5 py-2.5 dark:border-white/10">
+				<span className="font-medium text-[11px] text-text-sub-600 dark:text-white/45">
+					Activity
+				</span>
+				<span className="font-mono text-[10px] text-text-sub-600 dark:text-white/40">
+					Just now
+				</span>
+			</div>
+			<div className="px-3.5 py-3">
+				<div className="flex items-start gap-2.5">
+					<span className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-lg border border-stroke-soft-200 bg-bg-weak-50 dark:border-white/10 dark:bg-white/[0.04]">
+						<svg
+							viewBox="0 0 24 24"
+							className="size-3.5 text-text-strong-950 dark:text-white"
+							fill="none"
+							stroke="currentColor"
+							strokeWidth="1.75"
+							strokeLinecap="round"
+							strokeLinejoin="round"
+							aria-hidden
+						>
+							<path d="M4 6h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1Z" />
+							<path d="m3.5 7.5 8.5 6 8.5-6" />
+						</svg>
+					</span>
+					<div className="min-w-0 flex-1">
+						<div className="flex items-center justify-between gap-2">
+							<p className="truncate font-medium text-[12px] text-text-strong-950 dark:text-white">
+								Welcome to Acme
+							</p>
+							<span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 font-medium text-[10px] text-emerald-600 dark:text-emerald-400">
+								<span className="size-1.5 rounded-full bg-emerald-500" />
+								Delivered
+							</span>
+						</div>
+						<p className="mt-0.5 truncate text-[11px] text-text-sub-600 dark:text-white/50">
+							to hello@customer.com
+						</p>
+						<p className="mt-1.5 font-mono text-[10px] text-text-sub-600 dark:text-white/40">
+							id · msg_01h8k2f9…
+						</p>
+					</div>
+				</div>
+			</div>
+			<div className="border-stroke-soft-200 border-t px-3.5 py-2 dark:border-white/10">
+				<div className="flex items-center gap-3 font-mono text-[10px] text-text-sub-600 dark:text-white/40">
+					<span>from · send.apple.com</span>
+					<span aria-hidden>·</span>
+					<span>200 OK</span>
+				</div>
 			</div>
 		</div>
 	);
@@ -264,6 +247,13 @@ const prerequisites: Prerequisite[] = [
 		href: "#sdk-guides",
 		visual: <LanguageVisual />,
 	},
+	{
+		step: 4,
+		title: "An email sent.",
+		body: "Call send once. Reloop delivers the message and returns an id you can track end to end.",
+		href: "/docs/quickstart",
+		visual: <EmailSentVisual />,
+	},
 ];
 
 export default function FrameworksResources() {
@@ -276,15 +266,15 @@ export default function FrameworksResources() {
 						All you need to get started.
 					</h2>
 					<p className="mt-2 max-w-lg text-[13.5px] text-text-sub-600 sm:text-[14.5px] dark:text-white/60">
-						Three things. Then send from any framework with the official SDK.
+						Four things. Then send from any framework with the official SDK.
 					</p>
 				</div>
 
-				{/* Three columns */}
-				<div className="grid grid-cols-1 divide-y divide-stroke-soft-200 border-stroke-soft-200 border-t sm:grid-cols-3 sm:divide-x sm:divide-y-0 dark:divide-white/10 dark:border-white/10">
+				{/* 2×2 grid */}
+				<div className="grid grid-cols-1 gap-px border-stroke-soft-200 border-t bg-stroke-soft-200 sm:grid-cols-2 dark:border-white/10 dark:bg-white/10">
 					{prerequisites.map((step) => {
 						const className =
-							"group relative flex min-h-0 cursor-pointer flex-col overflow-hidden px-5 pb-10 pt-8 transition-colors duration-200 hover:bg-bg-weak-50/50 sm:px-7 sm:pb-12 sm:pt-10 dark:hover:bg-white/[0.02]";
+							"group relative flex min-h-0 cursor-pointer flex-col overflow-hidden bg-bg-white-0 px-5 pb-10 pt-8 transition-colors duration-200 hover:bg-bg-weak-50/80 sm:px-8 sm:pb-12 sm:pt-10 lg:px-10 dark:bg-black dark:hover:bg-white/[0.03]";
 
 						const content = (
 							<>
@@ -292,19 +282,18 @@ export default function FrameworksResources() {
 									[step {step.step}]
 								</p>
 
-								{/* Visual */}
+								{/* Visual — static product UI mock */}
 								<div className="relative z-10 mt-5 mb-8 flex min-h-[220px] flex-1 items-center justify-center sm:min-h-[240px]">
-									<div className="pointer-events-none w-full max-w-[280px]">
+									<div className="pointer-events-none w-full max-w-[300px]">
 										{step.visual}
 									</div>
 								</div>
 
-								{/* Copy under the mock */}
 								<div className="relative z-10">
 									<h3 className="font-semibold text-[16px] text-text-strong-950 tracking-tight sm:text-[17px] dark:text-white">
 										{step.title}
 									</h3>
-									<p className="mt-2 max-w-[28ch] text-[13.5px] text-text-sub-600 leading-relaxed sm:text-[14px] dark:text-white/55">
+									<p className="mt-2 max-w-[36ch] text-[13.5px] text-text-sub-600 leading-relaxed sm:text-[14px] dark:text-white/55">
 										{step.body}
 									</p>
 								</div>
