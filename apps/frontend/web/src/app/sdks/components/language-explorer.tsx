@@ -9,10 +9,10 @@ import { frameworksForLanguage } from "../frameworks";
 import { languages } from "../languages";
 import { AccountSetupActions } from "./account-setup-actions";
 import { AnimatedHoverBackground } from "./animated-hover-background";
-import { ExtraLinks } from "./extra-links";
-import { ResourceLinks } from "./resource-links";
 import { bunIcon } from "./bun-icon";
+import { ExtraLinks } from "./extra-links";
 import { LanguageIcon } from "./language-icon";
+import { ResourceLinks } from "./resource-links";
 import { SdkCodeBlock } from "./sdk-code-block";
 import { SectionFrame } from "./section-frame";
 import { useSidebarHoverBox } from "./use-sidebar-hover-box";
@@ -174,7 +174,9 @@ export default function LanguageExplorer() {
 
 	const sendCode = activeFramework ? activeFramework.sendCode : active.sendCode;
 	const codeSlug = activeFramework ? activeFramework.slug : active.slug;
-	const activeDisplayName = activeFramework ? activeFramework.name : active.name;
+	const activeDisplayName = activeFramework
+		? activeFramework.name
+		: active.name;
 
 	useEffect(() => {
 		if (!mounted) {
@@ -299,7 +301,7 @@ export default function LanguageExplorer() {
 			>
 				{/* Left meta & frameworks: compact tinted rail matching framework details */}
 				<aside className="border-stroke-soft-200 border-b bg-[#fafafa] lg:col-span-3 lg:border-r lg:border-b-0 dark:border-white/10 dark:bg-white/[0.025]">
-					<div className="flex flex-col gap-6 p-6 sm:p-7 lg:sticky lg:top-16 lg:p-7">
+					<div className="flex flex-col gap-4 p-6 sm:p-7 lg:sticky lg:top-16 lg:p-7">
 						<div className="flex items-center gap-3">
 							<div
 								className="inline-flex size-10 items-center justify-center rounded-xl border border-stroke-soft-200 bg-bg-white-0 dark:border-white/10 dark:bg-black"
@@ -317,7 +319,7 @@ export default function LanguageExplorer() {
 							</div>
 						</div>
 
-						<div className="-ml-2.5 mt-6 flex flex-col">
+						<div className="-ml-2.5 mt-3 flex flex-col">
 							<div className="px-2.5 pb-1.5 font-semibold text-[10px] text-text-soft-400 uppercase tracking-[0.06em] dark:text-white/45">
 								{relatedFrameworks.length > 0 ? "Frameworks" : "SDK"}
 							</div>
@@ -452,10 +454,7 @@ export default function LanguageExplorer() {
 							/>
 						</StepItem>
 
-						<StepItem
-							number={3}
-							title={`Send email with ${activeDisplayName}`}
-						>
+						<StepItem number={3} title={`Send email with ${activeDisplayName}`}>
 							<SdkCodeBlock
 								key={`code-${active.slug}-${activeFramework?.slug ?? "base"}`}
 								code={sendCode}
@@ -463,10 +462,7 @@ export default function LanguageExplorer() {
 							/>
 						</StepItem>
 
-						<StepItem
-							number={4}
-							title="GitHub, examples, and API reference"
-						>
+						<StepItem number={4} title="GitHub, examples, and API reference">
 							<ResourceLinks
 								languageSlug={active.slug}
 								languageName={active.name}
