@@ -1,5 +1,6 @@
 import { Icon } from "@reloop/ui/icon";
 import { JsonLd } from "@reloop/web/components/json-ld";
+import { BlogCta } from "@reloop/web/components/landing/blog/blog-cta";
 import { contactEmail, defaultOgImage, getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 import { ContactPanel } from "./contact-form";
@@ -174,6 +175,18 @@ const ContactPage = () => {
 					</section>
 				</div>
 			</div>
+
+			<BlogCta
+				headline="Need dedicated help or custom setup?"
+				sub="Whether you're migrating high-volume sending, configuring custom SMTP routing, or setting up self-hosted infrastructure, our founders and engineers are here to help."
+				primaryLabel="Email founders"
+				primaryHref={`mailto:${contactEmail}`}
+				primaryExternal
+				secondaryLabel="Join Discord"
+				secondaryHref="https://discord.gg/bHnkBcp7xR"
+				secondaryExternal
+				accentColor="blue"
+			/>
 		</>
 	);
 };
