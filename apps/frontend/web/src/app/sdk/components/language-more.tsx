@@ -42,13 +42,20 @@ export default function LanguageMore({
 								.filter(Boolean)
 								.join(" ")}
 						>
-							<span
-								className="inline-flex size-8 items-center justify-center rounded-[10px] border border-stroke-soft-200 dark:border-white/10"
-								style={{ color: `#${lang.icon.hex}` }}
-							>
-								<LanguageIcon icon={lang.icon} className="size-4" />
-							</span>
-							<span className="font-medium text-[13px] text-text-strong-950 dark:text-white">
+							<div className="flex w-full items-start justify-between gap-2">
+								<span
+									className="inline-flex size-8 items-center justify-center rounded-[10px] border border-stroke-soft-200 dark:border-white/10"
+									style={{ color: `#${lang.icon.hex}` }}
+								>
+									<LanguageIcon icon={lang.icon} className="size-4" />
+								</span>
+								<Icon
+									name="arrow-right"
+									className="size-3.5 text-text-sub-600 opacity-0 transition-all duration-150 group-hover:translate-x-0.5 group-hover:opacity-100 dark:text-white/50"
+									aria-hidden
+								/>
+							</div>
+							<span className="pl-0.5 font-medium text-[13px] text-text-strong-950 dark:text-white">
 								{lang.name}
 							</span>
 						</Link>

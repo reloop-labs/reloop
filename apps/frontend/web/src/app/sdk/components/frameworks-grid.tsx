@@ -1,3 +1,4 @@
+import { Icon } from "@reloop/ui/icon";
 import Link from "next/link";
 import { frameworks } from "../frameworks";
 import { LanguageIcon } from "./language-icon";
@@ -18,12 +19,19 @@ export default function FrameworksGrid() {
 							href={`/frameworks/${fw.slug}`}
 							className="group flex flex-col items-start gap-2 bg-bg-white-0 p-4 transition-colors hover:bg-bg-weak-50 sm:p-5 dark:bg-black dark:hover:bg-white/[0.03]"
 						>
-							<span
-								className="inline-flex size-8 items-center justify-center rounded-[10px] border border-stroke-soft-200 dark:border-white/10"
-								style={{ color: `#${fw.icon.hex}` }}
-							>
-								<LanguageIcon icon={fw.icon} className="size-4" />
-							</span>
+							<div className="flex w-full items-start justify-between gap-2">
+								<span
+									className="inline-flex size-8 items-center justify-center rounded-[10px] border border-stroke-soft-200 dark:border-white/10"
+									style={{ color: `#${fw.icon.hex}` }}
+								>
+									<LanguageIcon icon={fw.icon} className="size-4" />
+								</span>
+								<Icon
+									name="arrow-right"
+									className="size-3.5 text-text-sub-600 opacity-0 transition-all duration-150 group-hover:translate-x-0.5 group-hover:opacity-100 dark:text-white/50"
+									aria-hidden
+								/>
+							</div>
 							<span className="pl-0.5 font-medium text-[13px] text-text-strong-950 dark:text-white">
 								{fw.name}
 							</span>
