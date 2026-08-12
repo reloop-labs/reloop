@@ -1,3 +1,4 @@
+import { BlogCta } from "@reloop/web/components/landing/blog/blog-cta";
 import { PageSection } from "@reloop/web/components/page-shell";
 import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
@@ -51,23 +52,34 @@ export const metadata: Metadata = {
 
 const CompareIndexPage = () => {
 	return (
-		<div className="mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-200 border-x pb-16 md:max-w-7xl dark:border-white/10">
-			{/* Top Hero Header */}
-			<CompareHeroHeader />
+		<>
+			<div className="mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-200 border-x md:max-w-7xl dark:border-white/10">
+				{/* Top Hero Header */}
+				<CompareHeroHeader />
 
-			{/* Volume & ROI Cost Calculator */}
-			<PageSection>
-				<CompareCalculator />
-			</PageSection>
+				{/* Volume & ROI Cost Calculator */}
+				<PageSection>
+					<CompareCalculator />
+				</PageSection>
 
-			{/* Master Feature Matrix */}
-			<PageSection>
-				<CompareMasterMatrix />
-			</PageSection>
+				{/* Master Feature Matrix */}
+				<PageSection>
+					<CompareMasterMatrix />
+				</PageSection>
 
-			{/* Dedicated Brand Directory Grid */}
-			<ComparisonGrid />
-		</div>
+				{/* Dedicated Brand Directory Grid */}
+				<ComparisonGrid />
+			</div>
+
+			{/* Bottom Blog-Style CTA Band */}
+			<BlogCta
+				category="Comparison"
+				headline="Ready to switch to Reloop?"
+				sub="10x lower volume costs, 100% open-source engine, and drop-in SMTP + REST APIs. No lock-in, no rewrite later."
+				primaryLabel="Get started free"
+				secondaryLabel="Documentation"
+			/>
+		</>
 	);
 };
 
