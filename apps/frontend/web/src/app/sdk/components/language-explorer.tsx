@@ -11,7 +11,11 @@ import { AccountSetupActions } from "./account-setup-actions";
 import { AnimatedHoverBackground } from "./animated-hover-background";
 import { bunIcon } from "./bun-icon";
 import { ExtraLinks } from "./extra-links";
-import { LanguageIcon } from "./language-icon";
+import {
+	getBrandColorStyle,
+	isDarkBrandColor,
+	LanguageIcon,
+} from "./language-icon";
 import { ResourceLinks } from "./resource-links";
 import { SdkCodeBlock } from "./sdk-code-block";
 import { SectionFrame } from "./section-frame";
@@ -384,6 +388,7 @@ export default function LanguageExplorer() {
 								{relatedFrameworks.map((fw, index) => {
 									const refIndex = index + 1;
 									const isSelected = activeFramework?.slug === fw.slug;
+									const isFwDark = isDarkBrandColor(fw.icon.hex);
 									return (
 										<button
 											key={fw.slug}
@@ -402,8 +407,11 @@ export default function LanguageExplorer() {
 											className="group relative z-10 flex h-8 w-full cursor-pointer items-center gap-2.5 rounded-lg px-2.5 text-left transition-colors"
 										>
 											<span
-												className="flex size-4 shrink-0 items-center justify-center"
-												style={{ color: `#${fw.icon.hex}` }}
+												className={cn(
+													"flex size-4 shrink-0 items-center justify-center",
+													isFwDark && "text-text-strong-950 dark:text-white",
+												)}
+												style={getBrandColorStyle(fw.icon.hex)}
 											>
 												<LanguageIcon icon={fw.icon} className="size-3.5" />
 											</span>

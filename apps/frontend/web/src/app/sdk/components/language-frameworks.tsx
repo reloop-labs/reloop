@@ -1,8 +1,13 @@
+import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import Link from "next/link";
 import { frameworksForLanguage } from "../frameworks";
 import type { LanguageDefinition } from "../languages";
-import { LanguageIcon } from "./language-icon";
+import {
+	getBrandColorStyle,
+	isDarkBrandColor,
+	LanguageIcon,
+} from "./language-icon";
 import { SectionTitle } from "./section-title";
 
 export default function LanguageFrameworks({
@@ -22,35 +27,41 @@ export default function LanguageFrameworks({
 				/>
 
 				<div className="grid grid-cols-1 gap-px bg-stroke-soft-200 sm:grid-cols-2 lg:grid-cols-3 dark:bg-white/10">
-					{related.map((fw) => (
-						<Link
-							key={fw.slug}
-							href={`/frameworks/${fw.slug}`}
-							className="group flex flex-col gap-3 bg-bg-white-0 p-6 transition-colors duration-150 hover:bg-bg-weak-50 sm:p-8 dark:bg-black dark:hover:bg-white/[0.03]"
-						>
-							<div className="flex items-start justify-between gap-3">
-								<div
-									className="inline-flex size-9 items-center justify-center rounded-xl border border-stroke-soft-200 dark:border-white/10"
-									style={{ color: `#${fw.icon.hex}` }}
-								>
-									<LanguageIcon icon={fw.icon} className="size-4" />
+					{related.map((fw) => {
+						const isDark = isDarkBrandColor(fw.icon.hex);
+						return (
+							<Link
+								key={fw.slug}
+								href={`/frameworks/${fw.slug}`}
+								className="group flex flex-col gap-3 bg-bg-white-0 p-6 transition-colors duration-150 hover:bg-bg-weak-50 sm:p-8 dark:bg-black dark:hover:bg-white/[0.04]"
+							>
+								<div className="flex items-start justify-between gap-3">
+									<div
+										className={cn(
+											"inline-flex size-9 items-center justify-center rounded-xl border border-stroke-soft-200 dark:border-white/10",
+											isDark && "text-text-strong-950 dark:text-white",
+										)}
+										style={getBrandColorStyle(fw.icon.hex)}
+									>
+										<LanguageIcon icon={fw.icon} className="size-4" />
+									</div>
+									<Icon
+										name="arrow-right"
+										className="size-3.5 text-text-sub-600 opacity-0 transition-all duration-150 group-hover:translate-x-0.5 group-hover:text-text-strong-950 group-hover:opacity-100 dark:text-white/40 dark:group-hover:text-white"
+										aria-hidden
+									/>
 								</div>
-								<Icon
-									name="arrow-up-right"
-									className="group-hover:-translate-y-0.5 size-3.5 text-text-sub-600 opacity-0 transition-all duration-150 group-hover:translate-x-0.5 group-hover:opacity-100 dark:text-white/50"
-									aria-hidden
-								/>
-							</div>
-							<div>
-								<h3 className="font-semibold text-[15px] text-text-strong-950 dark:text-white">
-									{fw.name}
-								</h3>
-								<p className="mt-1.5 line-clamp-2 text-[13px] text-text-sub-600 dark:text-white/55">
-									{fw.shortDescription}
-								</p>
-							</div>
-						</Link>
-					))}
+								<div>
+									<h3 className="font-semibold text-[15px] text-text-strong-950 dark:text-white">
+										{fw.name}
+									</h3>
+									<p className="mt-1.5 line-clamp-2 text-[13px] text-text-sub-600 dark:text-white/55">
+										{fw.shortDescription}
+									</p>
+								</div>
+							</Link>
+						);
+					})}
 				</div>
 			</div>
 		</section>

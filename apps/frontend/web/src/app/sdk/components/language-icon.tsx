@@ -22,6 +22,40 @@ export function isCustomBrandIcon(icon: BrandIcon): icon is CustomBrandIcon {
 	return "kind" in icon && icon.kind === "custom";
 }
 
+/**
+ * Returns true if a brand hex color is black or too dark to be visible on dark backgrounds.
+ */
+export function isDarkBrandColor(hex: string): boolean {
+	const clean = hex.replace("#", "").toLowerCase();
+	if (
+		clean === "000000" ||
+		clean === "000" ||
+		clean === "092e20" ||
+		clean === "333333"
+	) {
+		return true;
+	}
+	if (clean.length === 6) {
+		const r = Number.parseInt(clean.slice(0, 2), 16);
+		const g = Number.parseInt(clean.slice(2, 4), 16);
+		const b = Number.parseInt(clean.slice(4, 6), 16);
+		const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+		return luminance < 0.25;
+	}
+	return false;
+}
+
+/**
+ * Returns inline color style object if the color is bright enough in both modes,
+ * or undefined for dark/black brands so Tailwind text-text-strong-950 dark:text-white takes effect.
+ */
+export function getBrandColorStyle(hex: string): { color: string } | undefined {
+	if (isDarkBrandColor(hex)) {
+		return undefined;
+	}
+	return { color: `#${hex}` };
+}
+
 export function LanguageIcon({
 	icon,
 	className = "size-6",
