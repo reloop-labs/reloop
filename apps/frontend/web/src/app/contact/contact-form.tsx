@@ -1,6 +1,7 @@
 "use client";
 
 import { authClient } from "@reloop/auth/client";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { useEffect, useState } from "react";
 import { ContactSupportChat, SupportChatHeader } from "./support-chat";
 
@@ -29,12 +30,16 @@ function LoginPromptCard({
 				</div>
 
 				<div className="mt-6">
-					<a
-						href="/dashboard/login?redirectTo=/contact"
-						className="inline-flex h-11 w-full items-center justify-center rounded-xl bg-text-strong-950 font-medium text-sm text-white transition-all hover:bg-text-strong-950/90 dark:bg-white dark:text-black dark:hover:bg-white/90"
+					<FancyButton.Root
+						asChild
+						variant="neutral"
+						size="medium"
+						className="w-full! h-11! rounded-xl!"
 					>
-						Log in to start chat
-					</a>
+						<a href="/dashboard/login?redirectTo=/contact">
+							Log in to start chat
+						</a>
+					</FancyButton.Root>
 				</div>
 			</div>
 		</div>
