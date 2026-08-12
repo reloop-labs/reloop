@@ -284,7 +284,9 @@ export function ProfilePage() {
 									) : (
 										<>
 											<span>Save Changes</span>
-											<ActionKbd className={actionKbdOnBlueClassName}>↵</ActionKbd>
+											<ActionKbd className={actionKbdOnBlueClassName}>
+												↵
+											</ActionKbd>
 										</>
 									)}
 								</motion.span>

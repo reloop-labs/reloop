@@ -69,11 +69,7 @@ export async function replyAllToMessageController(
 	].filter((email) => email && email !== ourEmail && email !== defaultReplyTo);
 
 	const replyCc = body.cc !== undefined ? body.cc : defaultCc;
-	const ccList = Array.isArray(replyCc)
-		? replyCc
-		: replyCc
-			? [replyCc]
-			: [];
+	const ccList = Array.isArray(replyCc) ? replyCc : replyCc ? [replyCc] : [];
 
 	const replySubject = original.subject?.startsWith("Re:")
 		? original.subject

@@ -195,7 +195,7 @@ export function BlogCta({
 					</div>
 
 					<div className="relative z-10 max-w-3xl">
-						<h2 className="font-semibold text-xl text-text-strong-950 leading-snug tracking-tight sm:text-2xl lg:text-[1.65rem] dark:text-white">
+						<h2 className="font-semibold text-text-strong-950 text-xl leading-snug tracking-tight sm:text-2xl lg:text-[1.65rem] dark:text-white">
 							{variant.headline}
 						</h2>
 						<p className="mt-3 max-w-xl text-[14px] text-text-sub-600 leading-relaxed sm:text-[14.5px] dark:text-white/60">

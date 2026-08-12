@@ -145,7 +145,7 @@ export function BlogPostPageView({
 									{formatBlogDateUpper(post.publishedAt)}
 								</time>
 							</div>
-							<h1 className="font-semibold text-xl text-text-strong-950 leading-snug tracking-tight sm:text-2xl lg:text-[1.65rem] dark:text-white">
+							<h1 className="font-semibold text-text-strong-950 text-xl leading-snug tracking-tight sm:text-2xl lg:text-[1.65rem] dark:text-white">
 								{post.title}
 							</h1>
 							<p className="font-medium font-mono text-text-sub-600 text-xs/[150%] uppercase tracking-[0.6px] dark:text-white/60">

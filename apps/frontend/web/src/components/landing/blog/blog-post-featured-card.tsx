@@ -28,7 +28,7 @@ export function BlogPostFeaturedCard({ post }: { post: BlogPostDefinition }) {
 						</span>
 					</div>
 
-					<h1 className="mt-3 font-semibold font-sans text-xl text-text-strong-950 leading-snug tracking-tight sm:text-2xl lg:text-[1.65rem] dark:text-white">
+					<h1 className="mt-3 font-sans font-semibold text-text-strong-950 text-xl leading-snug tracking-tight sm:text-2xl lg:text-[1.65rem] dark:text-white">
 						{post.title}
 					</h1>
 				</div>

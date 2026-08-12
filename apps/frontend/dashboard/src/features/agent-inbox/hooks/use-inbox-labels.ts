@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from "react";
+import { apiFetch } from "#/features/agent-inbox/lib/api-fetch";
 import { useSWR } from "#/features/agent-inbox/lib/use-swr-compat";
 import type { InboxLabel } from "../types";
-import { apiFetch } from "#/features/agent-inbox/lib/api-fetch";
 
 type ApiLabel = {
 	id: string;

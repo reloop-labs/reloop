@@ -1,6 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { parseAsString, useQueryState } from "nuqs";
-import { apiFetch } from "#/features/agent-inbox/lib/api-fetch";
 import {
 	createContext,
 	type ReactNode,
@@ -11,6 +10,7 @@ import {
 	useRef,
 	useState,
 } from "react";
+import { apiFetch } from "#/features/agent-inbox/lib/api-fetch";
 import { useMailboxId } from "#/features/agent-inbox/lib/use-mailbox-id";
 import { useSWR } from "#/features/agent-inbox/lib/use-swr-compat";
 import { extractBareEmail, extractDisplayName } from "../lib/email-address";
@@ -496,9 +496,8 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 		? `/api/inbox/v1/threads?limit=200&q=${encodeURIComponent(trimmedSearch)}`
 		: "/api/inbox/v1/threads?limit=200";
 
-	const { data: allThreadsData, mutate: mutateThreads } = useSWR<
-		BackendThread[]
-	>(threadsListUrl);
+	const { data: allThreadsData, mutate: mutateThreads } =
+		useSWR<BackendThread[]>(threadsListUrl);
 
 	const isLoadingThreads = isLoadingInboundThreads || isLoadingSentMessages;
 

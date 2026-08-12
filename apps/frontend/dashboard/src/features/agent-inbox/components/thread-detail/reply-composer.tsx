@@ -4,7 +4,6 @@ import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Paperclip } from "lucide-react";
-import { apiFetch } from "#/features/agent-inbox/lib/api-fetch";
 import {
 	type FocusEvent,
 	forwardRef,
@@ -15,6 +14,7 @@ import {
 } from "react";
 import { useDropzone } from "react-dropzone";
 import { toast } from "sonner";
+import { apiFetch } from "#/features/agent-inbox/lib/api-fetch";
 import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { useDraftAutosave } from "../../hooks/use-draft-autosave";
 import { extractBareEmail, extractDisplayName } from "../../lib/email-address";
@@ -563,10 +563,17 @@ export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
 											className="size-3.5 text-mail-muted"
 										/>
 										{mode === "replyAll" ? "Reply all" : "Reply"}
-										<Icon name="chevron-down" className="size-3 text-mail-muted" />
+										<Icon
+											name="chevron-down"
+											className="size-3 text-mail-muted"
+										/>
 									</button>
 								</Dropdown.Trigger>
-								<Dropdown.Content align="start" sideOffset={6} className="w-44 p-1.5">
+								<Dropdown.Content
+									align="start"
+									sideOffset={6}
+									className="w-44 p-1.5"
+								>
 									<Dropdown.Item
 										onSelect={() => applyMode("reply")}
 										className="gap-2"
@@ -681,8 +688,7 @@ export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
 										}
 										className={cn(
 											"rounded-md px-1.5 py-1 font-medium text-[11px] text-mail-muted transition-colors hover:bg-[var(--inbox-hover)] hover:text-mail-foreground",
-											showBcc &&
-												"bg-[var(--inbox-hover)] text-mail-foreground",
+											showBcc && "bg-[var(--inbox-hover)] text-mail-foreground",
 										)}
 									>
 										Bcc
@@ -702,9 +708,7 @@ export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
 												: { height: "auto", opacity: 1 }
 										}
 										exit={
-											reduceMotion
-												? { opacity: 0 }
-												: { height: 0, opacity: 0 }
+											reduceMotion ? { opacity: 0 } : { height: 0, opacity: 0 }
 										}
 										transition={{ duration: 0.18, ease: easeOut }}
 										className="overflow-hidden"
@@ -739,9 +743,7 @@ export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
 												: { height: "auto", opacity: 1 }
 										}
 										exit={
-											reduceMotion
-												? { opacity: 0 }
-												: { height: 0, opacity: 0 }
+											reduceMotion ? { opacity: 0 } : { height: 0, opacity: 0 }
 										}
 										transition={{ duration: 0.18, ease: easeOut }}
 										className="overflow-hidden"

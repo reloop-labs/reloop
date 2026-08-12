@@ -62,9 +62,7 @@ function toBareEmail(value: string): string {
 		}
 		break;
 	}
-	const match = current.match(
-		/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/,
-	);
+	const match = current.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
 	return (match?.[0] ?? current).trim().toLowerCase();
 }
 

@@ -1,10 +1,10 @@
-import { DEFAULT_USER_ROLE, PLATFORM_ADMIN_ROLE } from "./roles";
 import { createAccessControl } from "better-auth/plugins/access";
 import {
 	adminAc,
 	defaultStatements,
 	userAc,
 } from "better-auth/plugins/admin/access";
+import { DEFAULT_USER_ROLE, PLATFORM_ADMIN_ROLE } from "./roles";
 
 export const platformAc = createAccessControl(defaultStatements);
 

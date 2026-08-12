@@ -321,87 +321,84 @@ export const ForwardComposer = forwardRef<HTMLDivElement, ForwardComposerProps>(
 							</p>
 						</div>
 
-						<div
-							ref={addressFieldsRef}
-							onBlur={handleAddressFocusOut}
-						>
-						<div className="grid grid-cols-[3rem_minmax(0,1fr)_auto] items-center gap-x-2 border-mail-border/30 border-b py-2">
-							<span className="font-medium text-[12px] text-mail-muted leading-none">
-								To
-							</span>
-							<div className="min-w-0">
-								<Controller
-									name="to"
-									control={control}
-									render={({ field }) => (
-										<EmailPillsInput
-											emails={field.value}
-											onChange={field.onChange}
-											placeholder="Add recipients…"
-											disabled={isSending}
-										/>
-									)}
-								/>
-							</div>
-							<button
-								type="button"
-								tabIndex={-1}
-								onClick={() =>
-									setShowCc((v) => {
-										const next = !v;
-										setFocusCcOnShow(next);
-										return next;
-									})
-								}
-								className={cn(
-									"rounded-md px-1.5 py-1 font-medium text-[11px] text-mail-muted transition-colors hover:bg-[var(--inbox-hover)] hover:text-mail-foreground",
-									showCc && "bg-[var(--inbox-hover)] text-mail-foreground",
-								)}
-							>
-								Cc
-							</button>
-						</div>
-
-						<AnimatePresence initial={false}>
-							{showCc && (
-								<motion.div
-									initial={
-										reduceMotion ? { opacity: 0 } : { height: 0, opacity: 0 }
-									}
-									animate={
-										reduceMotion
-											? { opacity: 1 }
-											: { height: "auto", opacity: 1 }
-									}
-									exit={
-										reduceMotion ? { opacity: 0 } : { height: 0, opacity: 0 }
-									}
-									transition={{ duration: 0.18, ease: easeOut }}
-									className="overflow-hidden"
-								>
-									<div className="grid grid-cols-[3rem_minmax(0,1fr)] items-center gap-x-2 py-2">
-										<span className="font-medium text-[12px] text-mail-muted leading-none">
-											Cc
-										</span>
-										<div className="min-w-0">
-											<Controller
-												name="cc"
-												control={control}
-												render={({ field }) => (
-													<EmailPillsInput
-														emails={field.value}
-														onChange={field.onChange}
-														placeholder="Add Cc…"
-														disabled={isSending}
-														autoFocus={focusCcOnShow}
-													/>
-												)}
+						<div ref={addressFieldsRef} onBlur={handleAddressFocusOut}>
+							<div className="grid grid-cols-[3rem_minmax(0,1fr)_auto] items-center gap-x-2 border-mail-border/30 border-b py-2">
+								<span className="font-medium text-[12px] text-mail-muted leading-none">
+									To
+								</span>
+								<div className="min-w-0">
+									<Controller
+										name="to"
+										control={control}
+										render={({ field }) => (
+											<EmailPillsInput
+												emails={field.value}
+												onChange={field.onChange}
+												placeholder="Add recipients…"
+												disabled={isSending}
 											/>
+										)}
+									/>
+								</div>
+								<button
+									type="button"
+									tabIndex={-1}
+									onClick={() =>
+										setShowCc((v) => {
+											const next = !v;
+											setFocusCcOnShow(next);
+											return next;
+										})
+									}
+									className={cn(
+										"rounded-md px-1.5 py-1 font-medium text-[11px] text-mail-muted transition-colors hover:bg-[var(--inbox-hover)] hover:text-mail-foreground",
+										showCc && "bg-[var(--inbox-hover)] text-mail-foreground",
+									)}
+								>
+									Cc
+								</button>
+							</div>
+
+							<AnimatePresence initial={false}>
+								{showCc && (
+									<motion.div
+										initial={
+											reduceMotion ? { opacity: 0 } : { height: 0, opacity: 0 }
+										}
+										animate={
+											reduceMotion
+												? { opacity: 1 }
+												: { height: "auto", opacity: 1 }
+										}
+										exit={
+											reduceMotion ? { opacity: 0 } : { height: 0, opacity: 0 }
+										}
+										transition={{ duration: 0.18, ease: easeOut }}
+										className="overflow-hidden"
+									>
+										<div className="grid grid-cols-[3rem_minmax(0,1fr)] items-center gap-x-2 py-2">
+											<span className="font-medium text-[12px] text-mail-muted leading-none">
+												Cc
+											</span>
+											<div className="min-w-0">
+												<Controller
+													name="cc"
+													control={control}
+													render={({ field }) => (
+														<EmailPillsInput
+															emails={field.value}
+															onChange={field.onChange}
+															placeholder="Add Cc…"
+															disabled={isSending}
+															autoFocus={focusCcOnShow}
+														/>
+													)}
+												/>
+											</div>
 										</div>
-									</div>
-								</motion.div>
-							)}
-						</AnimatePresence>
+									</motion.div>
+								)}
+							</AnimatePresence>
 						</div>
 					</div>
 

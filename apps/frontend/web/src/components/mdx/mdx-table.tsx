@@ -13,7 +13,9 @@ import {
 
 type PropsWithChildren = { children?: ReactNode };
 
-function isReactElement(child: ReactNode): child is ReactElement<PropsWithChildren> {
+function isReactElement(
+	child: ReactNode,
+): child is ReactElement<PropsWithChildren> {
 	return isValidElement(child);
 }
 
@@ -88,7 +90,10 @@ export function MdxTable({
 			<div className="my-6 w-full overflow-x-auto">
 				<div className="overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40">
 					<table
-						className={cn("my-0! w-full border-collapse text-[13px]", className)}
+						className={cn(
+							"my-0! w-full border-collapse text-[13px]",
+							className,
+						)}
 						{...props}
 					>
 						{children}

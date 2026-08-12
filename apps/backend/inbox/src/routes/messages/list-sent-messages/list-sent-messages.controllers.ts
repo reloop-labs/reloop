@@ -1,5 +1,10 @@
 import { db } from "@reloop/db/client";
-import { emailLog, emailThread, mailbox, threadMessage } from "@reloop/db/schema";
+import {
+	emailLog,
+	emailThread,
+	mailbox,
+	threadMessage,
+} from "@reloop/db/schema";
 import { and, eq, inArray, or, sql } from "drizzle-orm";
 
 function bareEmail(value: string): string {

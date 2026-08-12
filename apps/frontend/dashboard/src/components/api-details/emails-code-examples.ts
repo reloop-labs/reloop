@@ -1,10 +1,10 @@
-import { sendEmailXCodeSamples } from "@reloop/code-samples/mail";
+import { toDashboardCodeExamples } from "@reloop/code-samples/helpers";
 import {
 	getMessageXCodeSamples,
 	listMessagesXCodeSamples,
 	listSentMessagesXCodeSamples,
 } from "@reloop/code-samples/inbox";
-import { toDashboardCodeExamples } from "@reloop/code-samples/helpers";
+import { sendEmailXCodeSamples } from "@reloop/code-samples/mail";
 
 /** Package sample id order matching email drawer language tabs. */
 const LANG_IDS = [

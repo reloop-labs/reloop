@@ -4,7 +4,10 @@ import matter from "gray-matter";
 import type { ChangelogRelease } from "./changelog-types";
 
 function getChangelogDir(): string {
-	const primary = path.join(process.cwd(), "apps/frontend/web/content/changelog");
+	const primary = path.join(
+		process.cwd(),
+		"apps/frontend/web/content/changelog",
+	);
 	if (fs.existsSync(primary)) {
 		return primary;
 	}

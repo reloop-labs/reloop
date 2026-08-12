@@ -216,14 +216,14 @@ export function SignupPage() {
 							By continuing, you agree to our{" "}
 							<a
 								href="/terms-and-conditions"
-								className="text-text-sub-600 underline decoration-dotted decoration-current/30 underline-offset-[3px]"
+								className="text-text-sub-600 underline decoration-current/30 decoration-dotted underline-offset-[3px]"
 							>
 								Terms
 							</a>{" "}
 							and{" "}
 							<a
 								href="/privacy"
-								className="text-text-sub-600 underline decoration-dotted decoration-current/30 underline-offset-[3px]"
+								className="text-text-sub-600 underline decoration-current/30 decoration-dotted underline-offset-[3px]"
 							>
 								Privacy Policy
 							</a>

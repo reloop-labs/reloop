@@ -355,10 +355,7 @@ export function CopyCodeBlock({
 					<div className="flex min-w-0 flex-1 items-center gap-2.5">
 						{icon ??
 							(si ? (
-								<BrandLanguageIcon
-									icon={si}
-									className="size-3.5 shrink-0"
-								/>
+								<BrandLanguageIcon icon={si} className="size-3.5 shrink-0" />
 							) : null)}
 						{title ? (
 							titleHref ? (

@@ -119,12 +119,8 @@ export const pendingOutboundCron = cron({
 						"",
 					)) as { messageId?: string; id?: string };
 
-					const emailLogId =
-						typeof result.id === "string" ? result.id : null;
-					if (
-						emailLogId?.startsWith("eml_") &&
-						!row.payload.threadId
-					) {
+					const emailLogId = typeof result.id === "string" ? result.id : null;
+					if (emailLogId?.startsWith("eml_") && !row.payload.threadId) {
 						try {
 							await ensureOutboundThreadForEmailLog({
 								emailLogId,

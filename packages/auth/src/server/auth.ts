@@ -1,21 +1,4 @@
 import { apiKey } from "@better-auth/api-key";
-import { handleAuthLifecycleEviction } from "../middleware/eviction/handle-auth-lifecycle-eviction";
-import {
-	ORGANIZATION_NAME_MAX_LENGTH,
-	organizationNameMaxLengthMessage,
-	organizationNameTooLong,
-} from "../organization-limits";
-import { ac, orgRoles } from "../permissions";
-import { platformAc, platformRoles } from "../platform-permissions";
-import { DEFAULT_USER_ROLE, PLATFORM_ADMIN_ROLE } from "../roles";
-import { authServerConfig } from "./config";
-import { redis } from "./redis";
-import { sessionCacheRedis } from "./session-cache-redis";
-import {
-	USER_NAME_PART_MAX_LENGTH,
-	userDisplayNamePartsTooLong,
-	userNamePartMaxLengthMessage,
-} from "../user-name-limits";
 import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
@@ -33,6 +16,23 @@ import {
 } from "better-auth/plugins";
 import { and, eq } from "drizzle-orm";
 import { log } from "evlog";
+import { handleAuthLifecycleEviction } from "../middleware/eviction/handle-auth-lifecycle-eviction";
+import {
+	ORGANIZATION_NAME_MAX_LENGTH,
+	organizationNameMaxLengthMessage,
+	organizationNameTooLong,
+} from "../organization-limits";
+import { ac, orgRoles } from "../permissions";
+import { platformAc, platformRoles } from "../platform-permissions";
+import { DEFAULT_USER_ROLE, PLATFORM_ADMIN_ROLE } from "../roles";
+import {
+	USER_NAME_PART_MAX_LENGTH,
+	userDisplayNamePartsTooLong,
+	userNamePartMaxLengthMessage,
+} from "../user-name-limits";
+import { authServerConfig } from "./config";
+import { redis } from "./redis";
+import { sessionCacheRedis } from "./session-cache-redis";
 
 function assertOrganizationNameLength(name: string | undefined) {
 	if (typeof name !== "string") return;

@@ -7,9 +7,9 @@ import {
 
 describe("organization name limits", () => {
 	test("allows names up to the max length", () => {
-		expect(organizationNameTooLong("a".repeat(ORGANIZATION_NAME_MAX_LENGTH))).toBe(
-			false,
-		);
+		expect(
+			organizationNameTooLong("a".repeat(ORGANIZATION_NAME_MAX_LENGTH)),
+		).toBe(false);
 	});
 
 	test("rejects names over the max length", () => {

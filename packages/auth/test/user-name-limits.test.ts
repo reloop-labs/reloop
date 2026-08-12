@@ -14,9 +14,9 @@ describe("user name limits", () => {
 	});
 
 	test("rejects parts over the max length", () => {
-		expect(
-			userNamePartTooLong("a".repeat(USER_NAME_PART_MAX_LENGTH + 1)),
-		).toBe(true);
+		expect(userNamePartTooLong("a".repeat(USER_NAME_PART_MAX_LENGTH + 1))).toBe(
+			true,
+		);
 	});
 
 	test("validates combined display name parts", () => {

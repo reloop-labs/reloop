@@ -18,12 +18,8 @@ import type {
 } from "./workflow-types";
 
 export function WorkflowEditorPage({ workflowId }: { workflowId: string }) {
-	const {
-		getWorkflow,
-		updateWorkflow,
-		setWorkflowStatus,
-		isHydrated,
-	} = useWorkflows();
+	const { getWorkflow, updateWorkflow, setWorkflowStatus, isHydrated } =
+		useWorkflows();
 
 	const cached = getWorkflow(workflowId);
 

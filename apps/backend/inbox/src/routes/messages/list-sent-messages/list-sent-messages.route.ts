@@ -7,11 +7,7 @@ import { getSentMessagesController } from "./list-sent-messages.controllers";
 export const listSentMessagesRoute = new Elysia().use(authMiddleware).get(
 	"/sent",
 	async ({ query, organizationId }) => {
-		return getSentMessagesController(
-			organizationId,
-			query.mailboxId,
-			query.q,
-		);
+		return getSentMessagesController(organizationId, query.mailboxId, query.q);
 	},
 	{
 		auth: true,

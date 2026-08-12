@@ -1,7 +1,4 @@
 import { apiKeyClient } from "@better-auth/api-key/client";
-import { ac, orgRoles } from "./permissions";
-import { platformAc, platformRoles } from "./platform-permissions";
-import type { AuthInstance } from "./types";
 import {
 	adminClient,
 	emailOTPClient,
@@ -11,6 +8,9 @@ import {
 	organizationClient,
 } from "better-auth/client/plugins";
 import { createAuthClient } from "better-auth/react";
+import { ac, orgRoles } from "./permissions";
+import { platformAc, platformRoles } from "./platform-permissions";
+import type { AuthInstance } from "./types";
 
 /**
  * Public site origin for Better Auth (reverse-proxied at `/api/auth/v1`).

@@ -451,7 +451,9 @@ export const AgentInboxContent = ({
 						<button
 							type="button"
 							aria-label={
-								allVisibleSelected ? "Deselect all threads" : "Select all threads"
+								allVisibleSelected
+									? "Deselect all threads"
+									: "Select all threads"
 							}
 							aria-pressed={allVisibleSelected}
 							disabled={filteredThreads.length === 0}

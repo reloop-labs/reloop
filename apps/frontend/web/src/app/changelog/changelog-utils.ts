@@ -8,7 +8,8 @@ export function getChangelogReleasePath(version: string) {
 
 export function getChangelogReleaseByVersion(versionOrSlug: string) {
 	return changelogReleases.find(
-		(release) => release.slug === versionOrSlug || release.version === versionOrSlug,
+		(release) =>
+			release.slug === versionOrSlug || release.version === versionOrSlug,
 	);
 }
 
@@ -49,4 +50,3 @@ function withChangelogPreviews(
 }
 
 export const changelogReleases = withChangelogPreviews(changelogReleasesData);
-

@@ -13,7 +13,9 @@ function asIso(value: Date | string | null | undefined): string {
 	return typeof value === "string" ? value : value.toISOString();
 }
 
-function uniqueAddresses(...groups: Array<string[] | null | undefined>): string[] {
+function uniqueAddresses(
+	...groups: Array<string[] | null | undefined>
+): string[] {
 	const seen = new Set<string>();
 	const out: string[] = [];
 	for (const group of groups) {
@@ -165,9 +167,11 @@ export async function getThreadController(id: string, organizationId: string) {
 			mailboxId: standaloneInbound.mailboxId,
 			organizationId: standaloneInbound.organizationId,
 			subject: standaloneInbound.subject ?? "(no subject)",
-			lastMessagePreview: (standaloneInbound.snippet ||
+			lastMessagePreview: (
+				standaloneInbound.snippet ||
 				standaloneInbound.textBody ||
-				"")
+				""
+			)
 				.toString()
 				.slice(0, 200),
 			lastMessageAt: createdAt,
@@ -192,9 +196,11 @@ export async function getThreadController(id: string, organizationId: string) {
 					fromEmail: standaloneInbound.fromEmail,
 					fromName: standaloneInbound.fromName,
 					subject: standaloneInbound.subject,
-					preview: (standaloneInbound.snippet ||
+					preview: (
+						standaloneInbound.snippet ||
 						standaloneInbound.textBody ||
-						"")
+						""
+					)
 						.toString()
 						.slice(0, 200),
 					messageAt: createdAt,
@@ -279,9 +285,7 @@ export async function getThreadController(id: string, organizationId: string) {
 						textBody: standaloneLog.textBody,
 						htmlBody: standaloneLog.htmlBody,
 						status: standaloneLog.status,
-						sentAt: standaloneLog.sentAt
-							? asIso(standaloneLog.sentAt)
-							: null,
+						sentAt: standaloneLog.sentAt ? asIso(standaloneLog.sentAt) : null,
 						createdAt,
 					},
 				},

@@ -361,7 +361,7 @@ export function ContactSupportChat({ userName }: { userName?: string | null }) {
 	const hasMessages = messages.length > 0;
 
 	return (
-		<div className="relative flex h-[min(520px,calc(100dvh-12rem))] min-h-[420px] w-full flex-col overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 text-text-strong-950 dark:border-white/10 dark:bg-[#0c0c0c] dark:text-white">
+		<div className="relative flex h-full min-h-[360px] w-full flex-col overflow-hidden rounded-2xl bg-bg-white-0 text-text-strong-950 dark:bg-[#0c0c0c] dark:text-white">
 			{/* Header */}
 			<div className="flex shrink-0 items-center justify-between gap-3 border-stroke-soft-200 border-b bg-bg-weak-50/50 px-4 py-3.5 dark:border-white/10 dark:bg-white/[0.02]">
 				<div className="flex min-w-0 items-center gap-3">

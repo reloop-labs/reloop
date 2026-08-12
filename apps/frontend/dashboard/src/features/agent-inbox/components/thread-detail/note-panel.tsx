@@ -4,9 +4,9 @@ import { Icon } from "@reloop/ui/icon";
 import { Copy, MoreVertical, StickyNote } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
+import { apiFetch } from "#/features/agent-inbox/lib/api-fetch";
 import { useSWR } from "#/features/agent-inbox/lib/use-swr-compat";
 import type { ThreadNote } from "../../types";
-import { apiFetch } from "#/features/agent-inbox/lib/api-fetch";
 
 const NOTE_COLORS = [
 	"default",

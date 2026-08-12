@@ -47,7 +47,9 @@ export function ChangelogTimeline({
 						{/* Right column with list of release items in this month */}
 						<div className="min-w-0 divide-y divide-dashed divide-stroke-soft-200/90 dark:divide-white/10">
 							{group.releases.map((release) => {
-								const href = getChangelogReleasePath(release.slug || release.version);
+								const href = getChangelogReleasePath(
+									release.slug || release.version,
+								);
 								return (
 									<div
 										key={`${release.version}-${release.title}`}
@@ -70,7 +72,10 @@ export function ChangelogTimeline({
 												{release.tags && release.tags.length > 0 ? (
 													<ul className="flex w-28 flex-col gap-1 font-medium text-[12.5px] text-text-sub-600 sm:w-32 dark:text-white/55">
 														{release.tags.slice(0, 3).map((tag) => (
-															<li key={tag} className="flex items-center gap-1.5">
+															<li
+																key={tag}
+																className="flex items-center gap-1.5"
+															>
 																<span
 																	className={`size-1.5 shrink-0 rounded-full ${getTagDotColor(tag)}`}
 																	aria-hidden="true"

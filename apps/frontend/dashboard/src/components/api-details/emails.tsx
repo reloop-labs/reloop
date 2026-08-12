@@ -60,8 +60,7 @@ export const EmailsApiDetails = ({
 }: EmailsApiDetailsProps) => {
 	const pathname = usePathname();
 	const activeIsReceived =
-		isReceived ??
-		(pathname === "/receive" || pathname.startsWith("/receive/"));
+		isReceived ?? (pathname === "/receive" || pathname.startsWith("/receive/"));
 
 	const operations = activeIsReceived ? receiveOperations : sendOperations;
 	const title = activeIsReceived ? "Inbound Email API" : "Send Email API";

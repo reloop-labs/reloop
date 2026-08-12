@@ -93,7 +93,7 @@ export function Accordion({
 						className={cn(
 							"px-4 pr-4 pb-3 pl-[34px] text-[13px] text-text-sub-600 leading-snug sm:text-[14px] dark:text-white/55",
 							// Collapse MDX paragraph / list spacing so answers sit tight under the title
-							"[&_:first-child]:mt-0! [&>p]:my-0! [&>p+p]:mt-2! [&_ul]:my-2! [&_ol]:my-2! [&_li]:my-0.5!",
+							"[&>p+p]:mt-2! [&>p]:my-0! [&_:first-child]:mt-0! [&_li]:my-0.5! [&_ol]:my-2! [&_ul]:my-2!",
 							"[&_a]:underline [&_a]:underline-offset-2",
 							"[&_code]:rounded-md [&_code]:bg-bg-weak-50 [&_code]:px-1 [&_code]:py-0.5 [&_code]:font-mono [&_code]:text-[11px] dark:[&_code]:bg-white/5",
 						)}

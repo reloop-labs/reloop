@@ -75,7 +75,7 @@ export default async function ChangelogReleasePage({ params }: PageProps) {
 				</div>
 
 				{/* Title */}
-				<h1 className="mt-4 font-semibold text-xl text-text-strong-950 leading-snug tracking-tight sm:text-2xl lg:text-[1.65rem] dark:text-white">
+				<h1 className="mt-4 font-semibold text-text-strong-950 text-xl leading-snug tracking-tight sm:text-2xl lg:text-[1.65rem] dark:text-white">
 					{release.title}
 				</h1>
 
