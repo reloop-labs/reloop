@@ -2,17 +2,18 @@
 
 import { cn } from "@reloop/ui/cn";
 import type { CopyCodeBlockTab } from "@reloop/ui/copy-code-block";
-import { Icon } from "@reloop/ui/icon";
 import { AnimatePresence, motion } from "framer-motion";
-import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { siNpm, siPnpm, siYarn } from "simple-icons";
 import { frameworksForLanguage } from "../frameworks";
 import { languages } from "../languages";
+import { AccountSetupActions } from "./account-setup-actions";
+import { AnimatedHoverBackground } from "./animated-hover-background";
 import { bunIcon } from "./bun-icon";
 import { LanguageIcon } from "./language-icon";
 import { SdkCodeBlock } from "./sdk-code-block";
 import { SectionFrame } from "./section-frame";
+import { useSidebarHoverBox } from "./use-sidebar-hover-box";
 
 const nodeInstallCommands = {
 	npm: "npm install reloop-email",
@@ -100,16 +101,39 @@ export default function LanguageExplorer() {
 		string | null
 	>(relatedFrameworks[0]?.slug ?? null);
 
+	const [hoveredFwEl, setHoveredFwEl] = useState<HTMLElement | undefined>(
+		undefined,
+	);
+	const [fwContainerEl, setFwContainerEl] = useState<HTMLDivElement | null>(
+		null,
+	);
+	const fwRefs = useRef<(HTMLElement | null)[]>([]);
+
 	// Update selected framework when active language changes
 	useEffect(() => {
 		const fws = frameworksForLanguage(activeSlug);
 		setSelectedFrameworkSlug(fws[0]?.slug ?? null);
+		setHoveredFwEl(undefined);
+		fwRefs.current = [];
 	}, [activeSlug]);
 
 	const activeFramework =
 		relatedFrameworks.find((fw) => fw.slug === selectedFrameworkSlug) ??
 		relatedFrameworks[0] ??
 		null;
+
+	const activeFwIdx = relatedFrameworks.findIndex(
+		(fw) => fw.slug === activeFramework?.slug,
+	);
+	const activeFwEl =
+		fwRefs.current[activeFwIdx >= 0 ? activeFwIdx : 0] ?? undefined;
+	const currentFwEl = hoveredFwEl ?? activeFwEl;
+
+	const fwHoverBox = useSidebarHoverBox(
+		currentFwEl,
+		fwContainerEl,
+		`${active.slug}:${activeFramework?.slug}`,
+	);
 
 	const installCode =
 		active.slug === "nodejs"
@@ -263,63 +287,60 @@ export default function LanguageExplorer() {
 						</div>
 
 						{relatedFrameworks.length > 0 ? (
-							<div className="mt-6">
-								<p className="mb-2.5 font-mono text-[10px] text-text-sub-600 uppercase tracking-[0.12em] dark:text-white/45">
+							<div className="mt-6 flex flex-col">
+								<div className="px-2.5 pb-1.5 font-semibold text-[10px] text-text-soft-400 uppercase tracking-[0.06em] dark:text-white/45">
 									Frameworks
-								</p>
+								</div>
 								<div
+									ref={setFwContainerEl}
 									role="tablist"
 									aria-label={`${active.name} frameworks`}
-									className="flex flex-col gap-0.5"
+									className="relative flex w-full flex-col"
+									onPointerLeave={() => setHoveredFwEl(undefined)}
 								>
-									{relatedFrameworks.map((fw) => {
+									{relatedFrameworks.map((fw, index) => {
 										const isSelected = activeFramework?.slug === fw.slug;
 										return (
 											<button
 												key={fw.slug}
+												ref={(el) => {
+													if (el) fwRefs.current[index] = el;
+												}}
 												type="button"
 												role="tab"
 												aria-selected={isSelected}
-												onClick={() => setSelectedFrameworkSlug(fw.slug)}
-												className={cn(
-													"group flex w-full cursor-pointer items-center justify-between rounded-lg px-2.5 py-2 text-left text-xs transition-colors",
-													isSelected
-														? "bg-bg-white-0 font-medium text-text-strong-950 shadow-xs border border-stroke-soft-200/80 dark:border-white/10 dark:bg-white/[0.08] dark:text-white"
-														: "text-text-sub-600 hover:bg-black/[0.03] hover:text-text-strong-950 dark:text-white/60 dark:hover:bg-white/[0.04] dark:hover:text-white",
-												)}
+												onPointerEnter={() =>
+													setHoveredFwEl(fwRefs.current[index] ?? undefined)
+												}
+												onClick={() => {
+													setSelectedFrameworkSlug(fw.slug);
+												}}
+												className="group relative z-10 flex h-8 w-full cursor-pointer items-center gap-2.5 rounded-lg px-2.5 text-left transition-all"
 											>
-												<div className="flex min-w-0 items-center gap-2.5">
-													<span
-														className={cn(
-															"inline-flex size-6 shrink-0 items-center justify-center rounded-md transition-colors",
-															isSelected
-																? "bg-bg-weak-50 dark:bg-white/10"
-																: "bg-transparent",
-														)}
-														style={{ color: `#${fw.icon.hex}` }}
-													>
-														<LanguageIcon icon={fw.icon} className="size-3.5" />
-													</span>
-													<span className="truncate text-[13px]">
-														{fw.name}
-													</span>
-												</div>
-
-												<Link
-													href={`/frameworks/${fw.slug}`}
-													onClick={(e) => e.stopPropagation()}
-													title={`View ${fw.name} guide`}
-													className="inline-flex size-6 items-center justify-center rounded-md text-text-sub-600 opacity-0 transition-all hover:bg-bg-weak-50 hover:text-text-strong-950 group-hover:opacity-100 dark:text-white/50 dark:hover:bg-white/10 dark:hover:text-white"
+												<span
+													className="flex size-4 shrink-0 items-center justify-center"
+													style={{ color: `#${fw.icon.hex}` }}
 												>
-													<Icon
-														name="arrow-up-right"
-														className="size-3"
-														aria-hidden="true"
-													/>
-												</Link>
+													<LanguageIcon icon={fw.icon} className="size-3.5" />
+												</span>
+												<span
+													className={cn(
+														"truncate font-medium text-[13px] transition-colors",
+														isSelected
+															? "text-text-strong-950 dark:text-white"
+															: "text-text-sub-600 group-hover:text-text-strong-950 dark:text-white/60 dark:group-hover:text-white",
+													)}
+												>
+													{fw.name}
+												</span>
 											</button>
 										);
 									})}
+
+									<AnimatedHoverBackground
+										box={fwHoverBox}
+										className="!bg-neutral-alpha-10 dark:!bg-white/[0.08]"
+									/>
 								</div>
 							</div>
 						) : null}
@@ -329,8 +350,14 @@ export default function LanguageExplorer() {
 				{/* Right: Step-by-step playground */}
 				<div className="border-stroke-soft-200 border-t p-6 sm:p-8 lg:col-span-9 lg:border-t-0 lg:p-10 dark:border-white/10">
 					<div className="flex flex-col">
-						{/* Step 1: Install */}
-						<StepItem number={1} title={`Install the ${activeDisplayName} package`}>
+						<StepItem number={1} title="Get an API key and add a domain">
+							<AccountSetupActions />
+						</StepItem>
+
+						<StepItem
+							number={2}
+							title={`Install the ${activeDisplayName} package`}
+						>
 							<SdkCodeBlock
 								key={`install-${active.slug}-${activeFramework?.slug ?? "base"}`}
 								code={installCode}
@@ -345,8 +372,11 @@ export default function LanguageExplorer() {
 							/>
 						</StepItem>
 
-						{/* Step 2: Send request */}
-						<StepItem number={2} title={`Send email with ${activeDisplayName}`} isLast>
+						<StepItem
+							number={3}
+							title={`Send email with ${activeDisplayName}`}
+							isLast
+						>
 							<SdkCodeBlock
 								key={`code-${active.slug}-${activeFramework?.slug ?? "base"}`}
 								code={sendCode}

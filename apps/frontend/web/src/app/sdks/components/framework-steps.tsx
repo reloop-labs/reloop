@@ -4,6 +4,7 @@ import { Icon } from "@reloop/ui/icon";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { FrameworkDefinition, FrameworkSlug } from "../frameworks";
+import { AccountSetupActions } from "./account-setup-actions";
 import { LanguageIcon } from "./language-icon";
 import { SdkCodeBlock } from "./sdk-code-block";
 
@@ -13,10 +14,10 @@ type StepDef = {
 	label: string;
 	title: string;
 	body: string;
-	code: string;
+	code?: string;
 	isShell: boolean;
 	filename: string | null;
-	cta?: { href: string; label: string };
+	showSetupActions?: boolean;
 };
 
 /** Docs example pages that exist for a framework; else language examples hub. */
@@ -145,29 +146,26 @@ export default function FrameworkSteps({
 }: {
 	framework: FrameworkDefinition;
 }) {
-	const envLine = 'RELOOP_API_KEY="re_xxxxxxxx"';
-
 	const steps: StepDef[] = [
 		{
-			id: "install",
+			id: "setup",
 			number: 1,
+			label: "Setup",
+			title: "Get an API key and add a domain",
+			body: `Create a free Reloop account, copy your API key into your ${framework.name} environment, and add a sending domain.`,
+			isShell: true,
+			filename: null,
+			showSetupActions: true,
+		},
+		{
+			id: "install",
+			number: 2,
 			label: "Install",
 			title: "Install the package",
 			body: `Add the official ${framework.languageName} client to your ${framework.name} project.`,
 			code: framework.installCommand,
 			isShell: true,
 			filename: null,
-		},
-		{
-			id: "api-key",
-			number: 2,
-			label: "API key",
-			title: "Set your API key",
-			body: `Create a free Reloop account, copy your API key, and add it to your ${framework.name} environment.`,
-			code: envLine,
-			isShell: true,
-			filename: null,
-			cta: { href: "/dashboard/signup", label: "Get an API key free →" },
 		},
 		{
 			id: "send",
@@ -373,25 +371,20 @@ export default function FrameworkSteps({
 								<p className="mt-2 max-w-xl text-[13.5px] text-text-sub-600 leading-relaxed dark:text-white/60">
 									{step.body}
 								</p>
-								{step.cta && (
-									<a
-										href={step.cta.href}
-										className="mt-3 inline-flex font-medium text-[13px] text-text-strong-950 underline decoration-text-sub-600/40 underline-offset-2 transition-colors hover:decoration-text-strong-950 dark:text-white dark:decoration-white/30 dark:hover:decoration-white"
-									>
-										{step.cta.label}
-									</a>
-								)}
 
-								<div className="mt-5">
-									{step.isShell ? (
-										<SdkCodeBlock code={step.code} lang="bash" />
-									) : (
-										<SdkCodeBlock
-											code={step.code}
-											slug={framework.slug}
-											path={step.filename ?? undefined}
-										/>
-									)}
+								<div className="mt-5 flex flex-col gap-3">
+									{step.showSetupActions ? <AccountSetupActions /> : null}
+									{step.code ? (
+										step.isShell ? (
+											<SdkCodeBlock code={step.code} lang="bash" />
+										) : (
+											<SdkCodeBlock
+												code={step.code}
+												slug={framework.slug}
+												path={step.filename ?? undefined}
+											/>
+										)
+									) : null}
 								</div>
 							</div>
 						))}
