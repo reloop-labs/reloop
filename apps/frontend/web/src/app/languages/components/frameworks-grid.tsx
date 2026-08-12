@@ -31,7 +31,7 @@ export default function FrameworksGrid() {
 							className="group flex flex-col items-start gap-3 bg-bg-white-0 p-5 transition-colors hover:bg-bg-weak-50 sm:p-6 dark:bg-black dark:hover:bg-white/[0.03]"
 						>
 							<span
-								className="inline-flex size-8 items-center justify-center rounded-lg border border-stroke-soft-200 bg-bg-weak-50 dark:border-white/10 dark:bg-white/[0.04]"
+								className="inline-flex size-8 items-center justify-center rounded-lg border border-stroke-soft-200 dark:border-white/10"
 								style={{ color: `#${fw.icon.hex}` }}
 							>
 								<LanguageIcon icon={fw.icon} className="size-4" />

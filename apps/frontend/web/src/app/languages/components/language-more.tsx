@@ -46,7 +46,7 @@ export default function LanguageMore({
 								.join(" ")}
 						>
 							<span
-								className="inline-flex size-8 items-center justify-center rounded-lg border border-stroke-soft-200 bg-bg-weak-50 dark:border-white/10 dark:bg-white/[0.04]"
+								className="inline-flex size-8 items-center justify-center rounded-lg border border-stroke-soft-200 dark:border-white/10"
 								style={{ color: `#${lang.icon.hex}` }}
 							>
 								<LanguageIcon icon={lang.icon} className="size-4" />
