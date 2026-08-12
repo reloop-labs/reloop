@@ -1,8 +1,9 @@
 "use client";
 
+import { Icon } from "@reloop/ui/icon";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import type { FrameworkDefinition } from "../frameworks";
+import type { FrameworkDefinition, FrameworkSlug } from "../frameworks";
 import { LanguageIcon } from "./language-icon";
 import { SdkCodeBlock } from "./sdk-code-block";
 
@@ -17,6 +18,131 @@ type StepDef = {
 	filename: string | null;
 	cta?: { href: string; label: string };
 };
+
+/** Docs example pages that exist for a framework; else language examples hub. */
+const FRAMEWORK_EXAMPLES_PATH: Partial<Record<FrameworkSlug, string>> = {
+	nextjs: "/docs/examples/nodejs/nextjs",
+	express: "/docs/examples/nodejs/express",
+	django: "/docs/examples/python/django",
+	fastapi: "/docs/examples/python/fastapi",
+	flask: "/docs/examples/python/flask",
+	laravel: "/docs/examples/php/laravel",
+	rails: "/docs/examples/ruby/rails",
+	gin: "/docs/examples/go/gin",
+};
+
+const LANGUAGE_EXAMPLES_PATH: Record<string, string> = {
+	nodejs: "/docs/examples/nodejs",
+	python: "/docs/examples/python",
+	php: "/docs/examples/php",
+	ruby: "/docs/examples/ruby",
+	go: "/docs/examples/go",
+	rust: "/docs/examples/rust",
+};
+
+function getExamplesPath(framework: FrameworkDefinition): string {
+	return (
+		FRAMEWORK_EXAMPLES_PATH[framework.slug] ??
+		LANGUAGE_EXAMPLES_PATH[framework.languageSlug] ??
+		"/docs/examples"
+	);
+}
+
+type ResourceCard = {
+	title: string;
+	description: string;
+	href: string;
+	iconName: string;
+};
+
+function FrameworkResources({
+	framework,
+}: {
+	framework: FrameworkDefinition;
+}) {
+	const cards: ResourceCard[] = [
+		{
+			title: "Examples",
+			description: `Copy-paste ${framework.name} snippets and full integration guides.`,
+			href: getExamplesPath(framework),
+			iconName: "brackets",
+		},
+		{
+			title: `${framework.languageName} docs`,
+			description: `Install the SDK, authenticate, and send your first email.`,
+			href: framework.docsPath,
+			iconName: "book-open",
+		},
+		{
+			title: "API reference",
+			description: "Every REST endpoint, request body, and response shape.",
+			href: "/docs/api",
+			iconName: "api",
+		},
+	];
+
+	return (
+		<div className="border-stroke-soft-200 border-t px-6 py-10 sm:px-10 sm:py-12 lg:px-12 dark:border-white/10">
+			<div className="mb-6 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between sm:gap-4">
+				<div>
+					<p className="font-mono text-[10px] text-text-sub-600 uppercase tracking-[0.12em] dark:text-white/45">
+						Next steps
+					</p>
+					<h2 className="mt-1.5 font-semibold text-[1.05rem] text-text-strong-950 tracking-tight sm:text-[1.2rem] dark:text-white">
+						Examples, docs, and API reference
+					</h2>
+				</div>
+				<p className="max-w-sm text-[13px] text-text-sub-600 sm:text-right dark:text-white/55">
+					Go deeper with working code and the full API for{" "}
+					{framework.languageName}.
+				</p>
+			</div>
+
+			<div className="grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
+				{cards.map((card) => (
+					<a
+						key={card.title}
+						href={card.href}
+						className="group relative flex flex-col overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-5 transition-all duration-200 hover:border-stroke-soft-300 hover:bg-bg-weak-50 dark:border-white/10 dark:bg-black dark:hover:border-white/20 dark:hover:bg-white/[0.04]"
+					>
+						<div
+							aria-hidden
+							className="pointer-events-none absolute inset-0 text-stroke-soft-200/70 dark:text-white/[0.06]"
+							style={{
+								backgroundImage:
+									"repeating-linear-gradient(-45deg, transparent 0, transparent 10px, currentColor 10px, currentColor 10.75px)",
+								maskImage:
+									"linear-gradient(to bottom right, black 0%, transparent 70%)",
+								WebkitMaskImage:
+									"linear-gradient(to bottom right, black 0%, transparent 70%)",
+							}}
+						/>
+						<div className="relative z-10 flex flex-col gap-3.5">
+							<div className="flex items-start justify-between">
+								<span className="flex size-9 items-center justify-center rounded-lg border border-stroke-soft-200 bg-bg-weak-50 text-text-strong-950 dark:border-white/10 dark:bg-white/[0.04] dark:text-white">
+									<Icon name={card.iconName} className="size-4" />
+								</span>
+								<Icon
+									name="arrow-up-right"
+									className="size-3.5 text-text-sub-600 opacity-0 transition-all duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:opacity-100 dark:text-white/50"
+									aria-hidden
+								/>
+							</div>
+							<div>
+								<p className="font-semibold text-[14px] text-text-strong-950 tracking-tight dark:text-white">
+									{card.title}
+								</p>
+								<p className="mt-1 text-[12.5px] text-text-sub-600 leading-relaxed dark:text-white/55">
+									{card.description}
+								</p>
+							</div>
+						</div>
+					</a>
+				))}
+			</div>
+		</div>
+	);
+}
 
 export default function FrameworkSteps({
 	framework,
@@ -276,27 +402,8 @@ export default function FrameworkSteps({
 					</div>
 				</div>
 
-				{/* Docs strip */}
-				<div className="flex flex-col gap-3 border-stroke-soft-200 border-t px-6 py-6 sm:flex-row sm:items-center sm:justify-between sm:px-10 lg:px-12 dark:border-white/10">
-					<p className="text-[13px] text-text-sub-600 dark:text-white/55">
-						Need more detail? Full {framework.languageName} docs and API
-						reference.
-					</p>
-					<div className="flex flex-wrap gap-3">
-						<a
-							href={framework.docsPath}
-							className="inline-flex h-9 items-center rounded-full border border-stroke-soft-200 bg-bg-weak-50 px-4 font-medium text-text-strong-950 text-xs transition-colors hover:bg-bg-soft-50 dark:border-white/10 dark:bg-white/[0.04] dark:text-white dark:hover:bg-white/[0.08]"
-						>
-							{framework.languageName} docs
-						</a>
-						<a
-							href="/docs/api"
-							className="inline-flex h-9 items-center rounded-full border border-stroke-soft-200 bg-bg-weak-50 px-4 font-medium text-text-strong-950 text-xs transition-colors hover:bg-bg-soft-50 dark:border-white/10 dark:bg-white/[0.04] dark:text-white dark:hover:bg-white/[0.08]"
-						>
-							API reference
-						</a>
-					</div>
-				</div>
+				{/* Resources: examples + docs + API */}
+				<FrameworkResources framework={framework} />
 			</div>
 		</section>
 	);

@@ -1,12 +1,26 @@
 "use client";
 
 import * as Button from "@reloop/ui/button";
+import { cn } from "@reloop/ui/cn";
+import { Icon } from "@reloop/ui/icon";
 import Link from "next/link";
 import { useState } from "react";
 import { siCursor } from "simple-icons";
 import { buildFrameworkPrompt } from "../build-framework-prompt";
 import type { FrameworkDefinition } from "../frameworks";
 import { LanguageIcon } from "./language-icon";
+
+/** Prompt/matrix mark used on SMTP + framework copy-prompt controls. */
+function PromptIcon({ className }: { className?: string }) {
+	return (
+		<svg viewBox="0 0 16 16" className={className} aria-hidden>
+			<path
+				fill="currentColor"
+				d="M6.75 14a.75.75 0 1 1 0 1.5.75.75 0 0 1 0-1.5m3.75 0a.75.75 0 1 1 0 1.5.75.75 0 0 1 0-1.5m3.75 0a.75.75 0 1 1 0 1.5.75.75 0 0 1 0-1.5m-7.5-3.25a.75.75 0 1 1 0 1.5.75.75 0 0 1 0-1.5m7.5 0a.75.75 0 1 1 0 1.5.75.75 0 0 1 0-1.5M8.25.5C9.22.5 10 1.28 10 2.25V3H8.5v-.75A.25.25 0 0 0 8.25 2h-5.5a.25.25 0 0 0-.25.25v7.5c0 .14.11.25.25.25H4.5v1.5H2.75C1.78 11.5 1 10.72 1 9.75v-7.5C1 1.28 1.78.5 2.75.5zm-1.5 7.25a.75.75 0 1 1 0 1.5.75.75 0 0 1 0-1.5m7.5 0a.75.75 0 1 1 0 1.5.75.75 0 0 1 0-1.5M6.75 4.5a.75.75 0 1 1 0 1.5.75.75 0 0 1 0-1.5m3.75 0a.75.75 0 1 1 0 1.5.75.75 0 0 1 0-1.5m3.75 0a.75.75 0 1 1 0 1.5.75.75 0 0 1 0-1.5"
+			/>
+		</svg>
+	);
+}
 
 export default function FrameworkHero({
 	framework,
@@ -100,22 +114,47 @@ export default function FrameworkHero({
 								<button
 									type="button"
 									onClick={handleCopyPrompt}
+									aria-label={copied ? "Copied" : "Copy prompt"}
 									className={`${Button.buttonVariants({
 										variant: "neutral",
 										mode: "filled",
-									}).root()} inline-flex h-9! cursor-pointer items-center gap-2! rounded-full! px-5! font-medium text-sm! dark:bg-white dark:text-black dark:hover:bg-white/90`}
+									}).root()} inline-flex h-9! cursor-pointer items-center gap-2! rounded-full! px-5! font-medium text-sm! transition-[transform,opacity] duration-150 ease-out active:scale-[0.98] dark:bg-white dark:text-black dark:hover:bg-white/90`}
 								>
-									<svg
-										viewBox="0 0 16 16"
-										className="h-4 w-4 shrink-0"
-										aria-hidden
-									>
-										<path
-											fill="currentColor"
-											d="M6.75 14a.75.75 0 1 1 0 1.5.75.75 0 0 1 0-1.5m3.75 0a.75.75 0 1 1 0 1.5.75.75 0 0 1 0-1.5m3.75 0a.75.75 0 1 1 0 1.5.75.75 0 0 1 0-1.5m-7.5-3.25a.75.75 0 1 1 0 1.5.75.75 0 0 1 0-1.5m7.5 0a.75.75 0 1 1 0 1.5.75.75 0 0 1 0-1.5M8.25.5C9.22.5 10 1.28 10 2.25V3H8.5v-.75A.25.25 0 0 0 8.25 2h-5.5a.25.25 0 0 0-.25.25v7.5c0 .14.11.25.25.25H4.5v1.5H2.75C1.78 11.5 1 10.72 1 9.75v-7.5C1 1.28 1.78.5 2.75.5zm-1.5 7.25a.75.75 0 1 1 0 1.5.75.75 0 0 1 0-1.5m7.5 0a.75.75 0 1 1 0 1.5.75.75 0 0 1 0-1.5M6.75 4.5a.75.75 0 1 1 0 1.5.75.75 0 0 1 0-1.5m3.75 0a.75.75 0 1 1 0 1.5.75.75 0 0 1 0-1.5m3.75 0a.75.75 0 1 1 0 1.5.75.75 0 0 1 0-1.5"
+									{/* Fixed-size slot so prompt↔check never shifts layout */}
+									<span className="relative size-4 shrink-0" aria-hidden>
+										<PromptIcon
+											className={cn(
+												"absolute inset-0 size-4 transition-opacity duration-150 ease-out",
+												copied ? "opacity-0" : "opacity-100",
+											)}
 										/>
-									</svg>
-									<span>{copied ? "Copied!" : "Copy prompt"}</span>
+										<Icon
+											name="check"
+											className={cn(
+												"absolute inset-0 size-4 transition-opacity duration-150 ease-out",
+												copied ? "opacity-100" : "opacity-0",
+											)}
+										/>
+									</span>
+									{/* Stack labels so “Copied!” doesn’t shrink the button */}
+									<span className="relative grid" aria-hidden>
+										<span
+											className={cn(
+												"col-start-1 row-start-1 transition-opacity duration-150 ease-out",
+												copied ? "opacity-0" : "opacity-100",
+											)}
+										>
+											Copy prompt
+										</span>
+										<span
+											className={cn(
+												"col-start-1 row-start-1 transition-opacity duration-150 ease-out",
+												copied ? "opacity-100" : "opacity-0",
+											)}
+										>
+											Copied!
+										</span>
+									</span>
 								</button>
 								<button
 									type="button"
