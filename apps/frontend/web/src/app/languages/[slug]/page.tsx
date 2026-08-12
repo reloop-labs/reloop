@@ -27,12 +27,14 @@ export async function generateMetadata({
 	if (!language) {
 		return { title: "Language | Reloop" };
 	}
+	const title = `Integrate with Reloop using ${language.name} | Reloop`;
+	const description = `Integrate Reloop's email infrastructure in your ${language.name} application with just a few lines of code. Official SDK for ${language.primaryFramework}.`;
 	return {
-		title: `Send Email with ${language.name} | Reloop`,
-		description: language.shortDescription,
+		title,
+		description,
 		openGraph: {
-			title: `Send Email with ${language.name} | Reloop`,
-			description: language.shortDescription,
+			title,
+			description,
 			type: "website",
 		},
 	};
@@ -49,7 +51,7 @@ export default async function LanguagePage({ params }: PageProps) {
 	}
 
 	return (
-		<main className="w-full bg-bg-white-0 dark:bg-bg-black-950">
+		<main className="w-full bg-bg-white-0 dark:bg-black">
 			<LanguageHero language={language} />
 			<LanguageCode language={language} />
 			<LanguageBento language={language} />
