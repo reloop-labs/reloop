@@ -3,7 +3,7 @@
 import { cn } from "@reloop/ui/cn";
 import type { CopyCodeBlockTab } from "@reloop/ui/copy-code-block";
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { siNpm, siPnpm, siYarn } from "simple-icons";
 import { frameworksForLanguage } from "../frameworks";
 import { languages } from "../languages";
@@ -129,6 +129,9 @@ export default function LanguageExplorer() {
 	const [hoveredFwEl, setHoveredFwEl] = useState<HTMLElement | undefined>(
 		undefined,
 	);
+	const [activeFwEl, setActiveFwEl] = useState<HTMLElement | undefined>(
+		undefined,
+	);
 	const [fwContainerEl, setFwContainerEl] = useState<HTMLDivElement | null>(
 		null,
 	);
@@ -137,7 +140,6 @@ export default function LanguageExplorer() {
 	useEffect(() => {
 		setSelectedFrameworkSlug(null);
 		setHoveredFwEl(undefined);
-		fwRefs.current = [];
 	}, [activeSlug]);
 
 	const activeFramework = selectedFrameworkSlug
@@ -146,10 +148,18 @@ export default function LanguageExplorer() {
 		: null;
 
 	const isLanguageSelected = activeFramework === null;
-	const activeFwIdx = isLanguageSelected
-		? 0
-		: relatedFrameworks.findIndex((fw) => fw.slug === activeFramework.slug) + 1;
-	const activeFwEl = fwRefs.current[activeFwIdx] ?? undefined;
+
+	useLayoutEffect(() => {
+		if (!fwContainerEl) {
+			setActiveFwEl(undefined);
+			return;
+		}
+		const selected = fwContainerEl.querySelector<HTMLElement>(
+			'[role="tab"][aria-selected="true"]',
+		);
+		setActiveFwEl(selected ?? undefined);
+	}, [fwContainerEl, selectedFrameworkSlug, activeSlug, relatedFrameworks.length]);
+
 	const isHoveringOtherFw = Boolean(
 		hoveredFwEl && activeFwEl && hoveredFwEl !== activeFwEl,
 	);
