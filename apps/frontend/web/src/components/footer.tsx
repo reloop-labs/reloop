@@ -41,11 +41,9 @@ const columns: FooterColumn[] = [
 	{
 		group: "Developers",
 		items: [
-			{ title: "SDKs", href: "/docs/resources/sdks" },
-			{ title: "API Reference", href: "/docs/api" },
-			{ title: "Getting Started", href: "/docs" },
-			{ title: "Languages", href: "/languages" },
+			{ title: "SDKs", href: "/languages" },
 			{ title: "Frameworks", href: "/frameworks" },
+			{ title: "API Reference", href: "/docs/api" },
 			{ title: "Webhooks", href: "/docs/webhooks" },
 		],
 	},
