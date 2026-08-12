@@ -451,14 +451,6 @@ export function CompareCalculator() {
 					/>
 				</div>
 			</div>
-
-			{/* Bottom border & footnote */}
-			<div className="-mx-6 border-stroke-soft-200 border-t px-6 pt-6 sm:-mx-10 sm:px-10 lg:-mx-12 lg:px-12 dark:border-white/10">
-				<p className="text-[12px] text-text-sub-600 leading-snug dark:text-white/40">
-					*Estimates based on published public cloud pricing tiers as of 2026.
-					Infrastructure data transfer fees may apply.
-				</p>
-			</div>
 		</div>
 	);
 }

@@ -57,7 +57,7 @@ const CompareIndexPage = () => {
 				<CompareHeroHeader />
 
 				{/* Volume & ROI Cost Calculator */}
-				<section className="border-stroke-soft-200 border-b px-6 py-12 sm:px-10 sm:py-16 lg:px-12 dark:border-white/10">
+				<section className="border-stroke-soft-200 border-b px-6 pt-12 pb-0 sm:px-10 sm:pt-16 sm:pb-0 lg:px-12 dark:border-white/10">
 					<CompareCalculator />
 				</section>
 
