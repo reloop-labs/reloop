@@ -96,7 +96,6 @@ export function ResourceLinks({
 	languageSlug,
 	languageName,
 	name,
-	docsPath,
 	frameworkSlug,
 	className,
 }: {
@@ -104,30 +103,17 @@ export function ResourceLinks({
 	languageName: string;
 	/** Selected framework or language display name, e.g. Next.js */
 	name: string;
-	docsPath: string;
+	docsPath?: string;
 	frameworkSlug?: FrameworkSlug | null;
 	className?: string;
 }) {
 	const links: ResourceLink[] = [
 		{
-			href: GITHUB_SDK[languageSlug],
-			icon: "github",
-			iconFill: "currentColor",
-			title: `${languageName} SDK`,
-			external: true,
-		},
-		{
 			href: exampleRepoUrl(frameworkSlug),
-			icon: "brackets",
-			iconFill: "currentColor",
-			title: `${name} example repo`,
-			external: true,
-		},
-		{
-			href: getExamplesPath(languageSlug, frameworkSlug),
 			icon: "integration",
 			iconFill: "none",
-			title: `${name} examples`,
+			title: `${name} example`,
+			external: true,
 		},
 		{
 			href: "/docs/api",
@@ -136,10 +122,11 @@ export function ResourceLinks({
 			title: "API reference",
 		},
 		{
-			href: docsPath,
-			icon: "file-text",
-			iconFill: "none",
-			title: `${name} docs`,
+			href: GITHUB_SDK[languageSlug],
+			icon: "github",
+			iconFill: "currentColor",
+			title: `${languageName} SDK`,
+			external: true,
 		},
 	];
 
