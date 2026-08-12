@@ -62,7 +62,7 @@ export default function FrameworkHero({
 						</Link>
 						<span className="text-text-soft-400 dark:text-white/25">/</span>
 						<Link
-							href="/languages#frameworks"
+							href="/frameworks"
 							className="transition-colors hover:text-text-strong-950 dark:hover:text-white"
 						>
 							Frameworks

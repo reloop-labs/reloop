@@ -5,14 +5,14 @@ import { cn } from "@reloop/ui/cn";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { languages } from "../languages";
-import { LanguageIcon } from "./language-icon";
-import { SdkCodeBlock } from "./sdk-code-block";
-import { SectionFrame } from "./section-frame";
-import { SectionTitle } from "./section-title";
+import { LanguageIcon } from "../../languages/components/language-icon";
+import { SdkCodeBlock } from "../../languages/components/sdk-code-block";
+import { SectionFrame } from "../../languages/components/section-frame";
+import { SectionTitle } from "../../languages/components/section-title";
+import { frameworks } from "../../languages/frameworks";
 
-export default function LanguageExplorer() {
-	const [activeSlug, setActiveSlug] = useState(languages[0]!.slug);
+export default function FrameworkExplorer() {
+	const [activeSlug, setActiveSlug] = useState(frameworks[0]!.slug);
 	const [hoveredTabIdx, setHoveredTabIdx] = useState<number | undefined>(
 		undefined,
 	);
@@ -30,15 +30,16 @@ export default function LanguageExplorer() {
 		setMounted(true);
 	}, []);
 
-	const activeTabIndex = languages.findIndex((l) => l.slug === activeSlug);
+	const activeTabIndex = frameworks.findIndex((f) => f.slug === activeSlug);
 	const highlightedTabIndex =
 		hoveredTabIdx !== undefined ? hoveredTabIdx : activeTabIndex;
 	const highlightedBrandColor =
 		highlightedTabIndex >= 0
-			? `#${languages[highlightedTabIndex]!.icon.hex}`
+			? `#${frameworks[highlightedTabIndex]!.icon.hex}`
 			: undefined;
 
-	const active = languages.find((l) => l.slug === activeSlug) ?? languages[0]!;
+	const active =
+		frameworks.find((f) => f.slug === activeSlug) ?? frameworks[0]!;
 	const brandColor = `#${active.icon.hex}`;
 
 	useEffect(() => {
@@ -79,22 +80,22 @@ export default function LanguageExplorer() {
 	}, [highlightedTabIndex, mounted, activeSlug]);
 
 	return (
-		<SectionFrame id="languages">
-			<SectionTitle title="Pick your runtime." icon="terminal" />
+		<SectionFrame id="framework-explorer">
+			<SectionTitle title="Pick your framework." icon="terminal" />
 
-			{/* Language tabs */}
+			{/* Framework tabs */}
 			<div className="border-stroke-soft-200 border-b dark:border-white/10">
 				<div
 					ref={containerRef}
 					role="tablist"
-					aria-label="SDK languages"
+					aria-label="Framework integrations"
 					onPointerLeave={() => setHoveredTabIdx(undefined)}
 					className="scrollbar-none relative flex gap-1 overflow-x-auto px-4 py-3 sm:px-6 sm:py-3.5 lg:px-8"
 					style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
 				>
-					{languages.map((lang, index) => {
-						const isActive = lang.slug === activeSlug;
-						const langBrandColor = `#${lang.icon.hex}`;
+					{frameworks.map((fw, index) => {
+						const isActive = fw.slug === activeSlug;
+						const fwBrandColor = `#${fw.icon.hex}`;
 						const isHighlighted = index === highlightedTabIndex;
 
 						let textColorStyle: React.CSSProperties | undefined;
@@ -104,16 +105,16 @@ export default function LanguageExplorer() {
 
 						return (
 							<button
-								key={lang.slug}
+								key={fw.slug}
 								ref={(el) => {
 									tabButtonRefs.current[index] = el;
 								}}
 								type="button"
 								role="tab"
 								aria-selected={isActive}
-								id={`lang-tab-${lang.slug}`}
-								aria-controls="lang-panel"
-								onClick={() => setActiveSlug(lang.slug)}
+								id={`fw-tab-${fw.slug}`}
+								aria-controls="fw-panel"
+								onClick={() => setActiveSlug(fw.slug)}
 								onPointerEnter={() => setHoveredTabIdx(index)}
 								className={cn(
 									"relative z-10 inline-flex shrink-0 items-center gap-2 rounded-full px-3.5 py-2 font-medium text-xs transition-colors duration-150",
@@ -131,12 +132,12 @@ export default function LanguageExplorer() {
 										color:
 											isHighlighted && pillPosition
 												? "#ffffff"
-												: langBrandColor,
+												: fwBrandColor,
 									}}
 								>
-									<LanguageIcon icon={lang.icon} className="size-3.5" />
+									<LanguageIcon icon={fw.icon} className="size-3.5" />
 								</span>
-								{lang.name}
+								{fw.name}
 							</button>
 						);
 					})}
@@ -158,9 +159,9 @@ export default function LanguageExplorer() {
 
 			{/* Content: left meta + right code */}
 			<div
-				id="lang-panel"
+				id="fw-panel"
 				role="tabpanel"
-				aria-labelledby={`lang-tab-${active.slug}`}
+				aria-labelledby={`fw-tab-${active.slug}`}
 				className="grid grid-cols-1 lg:grid-cols-12"
 			>
 				{/* Left */}
@@ -178,7 +179,7 @@ export default function LanguageExplorer() {
 									{active.name}
 								</h3>
 								<p className="truncate font-mono text-[11px] text-text-sub-600 dark:text-white/45">
-									{active.packageName}
+									{active.runtimeHint}
 								</p>
 							</div>
 						</div>
@@ -187,12 +188,31 @@ export default function LanguageExplorer() {
 							{active.shortDescription}
 						</p>
 
-						<p className="mt-4 text-[12px] text-text-sub-600 dark:text-white/45">
-							<span className="text-text-strong-950 dark:text-white/70">
-								Works with
-							</span>{" "}
-							{active.primaryFramework}
-						</p>
+						<div className="mt-4 flex flex-wrap items-center gap-1.5">
+							<span className="text-[12px] text-text-sub-600 dark:text-white/45">
+								<span className="text-text-strong-950 dark:text-white/70">
+									SDK:
+								</span>{" "}
+								{active.languageName}
+							</span>
+							<span className="text-text-soft-400 dark:text-white/20">·</span>
+							<span className="font-mono text-[11px] text-text-sub-600 dark:text-white/45">
+								{active.packageName}
+							</span>
+						</div>
+
+						{active.highlights.length > 0 && (
+							<div className="mt-4 flex flex-wrap gap-1.5">
+								{active.highlights.map((highlight) => (
+									<span
+										key={highlight}
+										className="inline-flex items-center rounded-md border border-stroke-soft-200 bg-bg-weak-50 px-2 py-0.5 font-mono text-[11px] text-text-sub-600 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/60"
+									>
+										{highlight}
+									</span>
+								))}
+							</div>
+						)}
 					</div>
 
 					<div className="flex flex-col gap-4">
@@ -218,7 +238,7 @@ export default function LanguageExplorer() {
 								Get API Key
 							</a>
 							<Link
-								href={`/languages/${active.slug}`}
+								href={`/frameworks/${active.slug}`}
 								className={`${Button.buttonVariants({
 									variant: "neutral",
 									mode: "stroke",

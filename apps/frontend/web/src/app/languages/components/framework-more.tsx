@@ -20,7 +20,7 @@ export default function FrameworkMore({
 					icon="grid"
 					action={
 						<Link
-							href="/languages#frameworks"
+							href="/frameworks"
 							className="hidden items-center gap-1 font-medium text-[13px] text-text-sub-600 transition-colors hover:text-text-strong-950 sm:inline-flex dark:text-white/50 dark:hover:text-white"
 						>
 							View all

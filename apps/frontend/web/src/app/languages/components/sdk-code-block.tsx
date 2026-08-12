@@ -19,6 +19,7 @@ export const LANG_BY_SLUG: Record<string, string> = {
 	express: "typescript",
 	nestjs: "typescript",
 	fastify: "typescript",
+	elysia: "typescript",
 	django: "python",
 	fastapi: "python",
 	flask: "python",
