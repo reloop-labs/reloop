@@ -1,8 +1,8 @@
 "use client";
 
 import * as Button from "@reloop/ui/button";
-import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
+import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { useState } from "react";
 import { siCursor } from "simple-icons";
@@ -118,43 +118,29 @@ export default function FrameworkHero({
 									className={`${Button.buttonVariants({
 										variant: "neutral",
 										mode: "filled",
-									}).root()} inline-flex h-9! cursor-pointer items-center gap-2! rounded-full! px-5! font-medium text-sm! transition-[transform,opacity] duration-150 ease-out active:scale-[0.98] dark:bg-white dark:text-black dark:hover:bg-white/90`}
+									}).root()} inline-flex h-9! min-w-[9.25rem] cursor-pointer items-center justify-center gap-2! overflow-hidden rounded-full! px-5! font-medium text-sm! active:scale-[0.98] dark:bg-white dark:text-black dark:hover:bg-white/90`}
 								>
-									{/* Fixed-size slot so prompt↔check never shifts layout */}
-									<span className="relative size-4 shrink-0" aria-hidden>
-										<PromptIcon
-											className={cn(
-												"absolute inset-0 size-4 transition-opacity duration-150 ease-out",
-												copied ? "opacity-0" : "opacity-100",
-											)}
-										/>
-										<Icon
-											name="check"
-											className={cn(
-												"absolute inset-0 size-4 transition-opacity duration-150 ease-out",
-												copied ? "opacity-100" : "opacity-0",
-											)}
-										/>
-									</span>
-									{/* Stack labels so “Copied!” doesn’t shrink the button */}
-									<span className="relative grid" aria-hidden>
-										<span
-											className={cn(
-												"col-start-1 row-start-1 transition-opacity duration-150 ease-out",
-												copied ? "opacity-0" : "opacity-100",
-											)}
+									{/* Same spring swap as the Login CTA */}
+									<AnimatePresence mode="popLayout" initial={false}>
+										<motion.span
+											key={copied ? "copied" : "idle"}
+											transition={{ type: "spring", duration: 0.25, bounce: 0 }}
+											initial={{ opacity: 0, y: -14 }}
+											animate={{ opacity: 1, y: 0 }}
+											exit={{ opacity: 0, y: 14 }}
+											className="flex items-center justify-center gap-1.5"
 										>
-											Copy prompt
-										</span>
-										<span
-											className={cn(
-												"col-start-1 row-start-1 transition-opacity duration-150 ease-out",
-												copied ? "opacity-100" : "opacity-0",
+											{copied ? (
+												<Icon
+													name="check-circle"
+													className="h-4 w-4 shrink-0"
+												/>
+											) : (
+												<PromptIcon className="size-4 shrink-0" />
 											)}
-										>
-											Copied!
-										</span>
-									</span>
+											<span>{copied ? "Copied!" : "Copy prompt"}</span>
+										</motion.span>
+									</AnimatePresence>
 								</button>
 								<button
 									type="button"
