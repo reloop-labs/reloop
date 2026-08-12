@@ -15,7 +15,7 @@ export default function LanguagesGrid() {
 					{languages.map((lang) => (
 						<Link
 							key={lang.slug}
-							href={`/sdks/${lang.slug}`}
+							href={`/sdk/${lang.slug}`}
 							className="group flex flex-col items-start gap-2 bg-bg-white-0 p-4 transition-colors hover:bg-bg-weak-50 sm:p-5 dark:bg-black dark:hover:bg-white/[0.03]"
 						>
 							<span

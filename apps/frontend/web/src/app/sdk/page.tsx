@@ -14,7 +14,7 @@ import { languages } from "./languages";
 export const instant = false;
 
 const siteUrl = getSiteUrl();
-const pageUrl = `${siteUrl}/sdks`;
+const pageUrl = `${siteUrl}/sdk`;
 
 export const metadata: Metadata = {
 	title: "SDKs & Framework Integrations | Next.js, Django, Laravel & more",
@@ -79,7 +79,7 @@ const pageSchema = {
 			itemListElement: languages.map((lang, index) => ({
 				"@type": "ListItem" as const,
 				position: index + 1,
-				url: `${siteUrl}/sdks/${lang.slug}`,
+				url: `${siteUrl}/sdk/${lang.slug}`,
 				name: `${lang.name} email SDK`,
 				description: lang.shortDescription,
 			})),
@@ -87,7 +87,7 @@ const pageSchema = {
 	],
 };
 
-export default function SdksIndexPage() {
+export default function SdkIndexPage() {
 	return (
 		<>
 			<JsonLd data={pageSchema} />

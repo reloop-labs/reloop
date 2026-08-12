@@ -55,7 +55,7 @@ export default function FrameworkHero({
 						className="flex flex-wrap items-center gap-1.5 font-mono text-[10px] text-text-sub-600 uppercase tracking-[0.14em] dark:text-white/45"
 					>
 						<Link
-							href="/sdks"
+							href="/sdk"
 							className="transition-colors hover:text-text-strong-950 dark:hover:text-white"
 						>
 							SDKs

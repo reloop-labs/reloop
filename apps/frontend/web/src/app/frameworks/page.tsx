@@ -2,10 +2,10 @@ import { JsonLd } from "@reloop/web/components/json-ld";
 import { BlogCta } from "@reloop/web/components/landing/blog/blog-cta";
 import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
-import FrameworksGrid from "../sdks/components/frameworks-grid";
-import LanguagesGrid from "../sdks/components/languages-grid";
-import { frameworks } from "../sdks/frameworks";
-import { languages } from "../sdks/languages";
+import FrameworksGrid from "../sdk/components/frameworks-grid";
+import LanguagesGrid from "../sdk/components/languages-grid";
+import { frameworks } from "../sdk/frameworks";
+import { languages } from "../sdk/languages";
 import FrameworksIndexHero from "./components/frameworks-index-hero";
 import FrameworksResources from "./components/frameworks-resources";
 
@@ -83,7 +83,7 @@ const pageSchema = {
 			itemListElement: languages.map((lang, index) => ({
 				"@type": "ListItem" as const,
 				position: index + 1,
-				url: `${siteUrl}/sdks/${lang.slug}`,
+				url: `${siteUrl}/sdk/${lang.slug}`,
 				name: `${lang.name} email SDK`,
 				description: lang.shortDescription,
 			})),

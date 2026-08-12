@@ -1,6 +1,6 @@
 import { changelogReleases } from "@reloop/web/app/changelog/changelog-utils";
-import { frameworks } from "@reloop/web/app/sdks/frameworks";
-import { languages } from "@reloop/web/app/sdks/languages";
+import { frameworks } from "@reloop/web/app/sdk/frameworks";
+import { languages } from "@reloop/web/app/sdk/languages";
 import {
 	getCategories,
 	getPublishedPosts,
@@ -30,7 +30,7 @@ const STATIC_TITLES: Record<string, string> = {
 	"/features": "Features",
 	"/frameworks": "Frameworks",
 	"/glossary": "Glossary",
-	"/sdks": "SDKs",
+	"/sdk": "SDK",
 	"/license": "License",
 	"/pricing": "Pricing",
 	"/privacy": "Privacy Policy",
@@ -119,7 +119,7 @@ function classifyRoute(
 		};
 	}
 
-	const languageMatch = path.match(/^\/sdks\/([^/]+)$/);
+	const languageMatch = path.match(/^\/sdk\/([^/]+)$/);
 	if (languageMatch?.[1]) {
 		const slug = languageMatch[1];
 		return {
@@ -252,7 +252,7 @@ export function buildPublicDiscoveryMarkdown(
 		`- Blog posts: \`${origin}/blog/<slug>\``,
 		`- Blog categories: \`${origin}/blog/category/<slug>\``,
 		`- Changelog: \`${origin}/changelog/<version>\``,
-		`- SDKs: \`${origin}/sdks/<slug>\``,
+		`- SDKs: \`${origin}/sdk/<slug>\``,
 		`- Frameworks: \`${origin}/frameworks/<slug>\``,
 		`- Comparisons: \`${origin}/compare/<vendor>\``,
 		`- Alternatives: \`${origin}/alternatives/<vendor>\``,

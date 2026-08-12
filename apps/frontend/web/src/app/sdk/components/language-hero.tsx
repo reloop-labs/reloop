@@ -55,7 +55,7 @@ export default function LanguageHero({
 						className="mb-5 flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.6px]"
 					>
 						<Link
-							href="/sdks"
+							href="/sdk"
 							className="text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/50 dark:hover:text-white"
 						>
 							SDKs

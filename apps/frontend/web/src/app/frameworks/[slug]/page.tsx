@@ -2,14 +2,14 @@ import { BlogCta } from "@reloop/web/components/landing/blog/blog-cta";
 import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import FrameworkHero from "../../sdks/components/framework-hero";
-import FrameworkMore from "../../sdks/components/framework-more";
-import FrameworkSteps from "../../sdks/components/framework-steps";
+import FrameworkHero from "../../sdk/components/framework-hero";
+import FrameworkMore from "../../sdk/components/framework-more";
+import FrameworkSteps from "../../sdk/components/framework-steps";
 import {
 	FRAMEWORK_SLUGS,
 	getFramework,
 	isFrameworkSlug,
-} from "../../sdks/frameworks";
+} from "../../sdk/frameworks";
 
 // TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
 // See: https://nextjs.org/docs/app/guides/migrating-to-cache-components

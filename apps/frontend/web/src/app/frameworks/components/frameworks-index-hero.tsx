@@ -23,7 +23,7 @@ Do the following:
 
 Useful docs:
 - Framework guides: https://reloop.sh/frameworks
-- SDKs & languages: https://reloop.sh/sdks
+- SDKs & languages: https://reloop.sh/sdk
 - API keys: https://reloop.sh/docs/learn/api-keys
 - Send email: https://reloop.sh/docs/api/mail/post-api-mail-v1send
 
