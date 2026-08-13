@@ -149,13 +149,16 @@ function FooterLinkItem({ link }: { link: FooterLink }) {
 	const isCrossDomain =
 		link.href.startsWith("/docs") || link.href.startsWith("/dashboard");
 
+	const className =
+		"text-[12px] font-medium text-text-sub-600 transition-colors hover:text-text-strong-950 sm:text-[14px] dark:text-white/55 dark:hover:text-white";
+
 	if (isCrossDomain) {
 		return (
 			<li>
 				<a
 					href={link.href}
 					{...(link.external ? { target: "_blank", rel: "noreferrer" } : {})}
-					className="text-[14px] text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/55 dark:hover:text-white"
+					className={className}
 				>
 					{link.title}
 				</a>
@@ -168,7 +171,7 @@ function FooterLinkItem({ link }: { link: FooterLink }) {
 			<Link
 				href={link.href}
 				{...(link.external ? { target: "_blank", rel: "noreferrer" } : {})}
-				className="text-[14px] text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/55 dark:hover:text-white"
+				className={className}
 			>
 				{link.title}
 			</Link>
@@ -189,17 +192,17 @@ export const Footer = () => {
 	return (
 		<footer className="w-full border-stroke-soft-200 border-t border-b bg-bg-white-0 text-text-strong-950 dark:border-white/10 dark:bg-black dark:text-white">
 			<div className="mx-auto w-full max-w-5xl border-stroke-soft-200 md:max-w-7xl xl:border-x dark:border-white/10">
-				<div className="px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
-					<div className="flex h-full flex-col gap-12 lg:flex-row lg:items-stretch lg:gap-20">
-						<div className="flex flex-col justify-between gap-8 lg:w-48 lg:self-stretch">
+				<div className="px-4 py-10 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
+					<div className="flex h-full flex-col gap-8 sm:gap-12 lg:flex-row lg:items-stretch lg:gap-20">
+						<div className="flex flex-col justify-between gap-6 sm:gap-8 lg:w-48 lg:self-stretch">
 							<div className="flex shrink-0 flex-col">
 								<Link
 									href="/"
-									className="-ml-[11px] inline-flex shrink-0 items-center gap-2.5"
+									className="-ml-[9px] sm:-ml-[11px] inline-flex shrink-0 items-center gap-2 sm:gap-2.5"
 									aria-label="Reloop home"
 								>
-									<Logo className="size-11 text-text-strong-950 dark:text-white" />
-									<span className="-ml-3 font-semibold text-[17px] text-text-strong-950 tracking-tight dark:text-white">
+									<Logo className="size-9 text-text-strong-950 sm:size-11 dark:text-white" />
+									<span className="-ml-2.5 sm:-ml-3 font-semibold text-[15px] text-text-strong-950 tracking-tight sm:text-[17px] dark:text-white">
 										Reloop
 									</span>
 								</Link>
@@ -211,21 +214,21 @@ export const Footer = () => {
 								className="inline-flex items-center gap-2 transition-opacity hover:opacity-80"
 							>
 								<span className="size-2 shrink-0 rounded-full bg-[#0070F3]" />
-								<span className="font-mono text-[#0070F3] text-[11px] uppercase tracking-wide">
+								<span className="font-mono text-[#0070F3] text-[10px] uppercase tracking-wide sm:text-[11px]">
 									System Status
 								</span>
 							</Link>
 						</div>
 
-						<div className="flex min-w-0 flex-1 flex-col gap-10 lg:gap-12">
+						<div className="flex min-w-0 flex-1 flex-col gap-8 sm:gap-10 lg:gap-12">
 							{/* Row 1: Primary columns */}
-							<div className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 lg:grid-cols-6 lg:gap-x-8">
+							<div className="grid grid-cols-2 gap-x-4 gap-y-7 sm:grid-cols-3 sm:gap-x-6 sm:gap-y-10 lg:grid-cols-6 lg:gap-x-8">
 								{columns.slice(0, 6).map((column) => (
 									<div key={column.group}>
-										<h4 className="font-medium text-[14px] text-text-strong-950 dark:text-white">
+										<h4 className="font-medium text-[13px] text-text-strong-950 sm:text-[14px] dark:text-white">
 											{column.group}
 										</h4>
-										<ul className="mt-4 flex flex-col gap-2.5">
+										<ul className="mt-2.5 flex flex-col gap-2 sm:mt-4 sm:gap-2.5">
 											{column.items.map((link) => (
 												<FooterLinkItem key={link.title} link={link} />
 											))}
@@ -235,13 +238,13 @@ export const Footer = () => {
 							</div>
 
 							{/* Row 2: Secondary info columns */}
-							<div className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 lg:grid-cols-6 lg:gap-x-8">
+							<div className="grid grid-cols-2 gap-x-4 gap-y-7 sm:grid-cols-3 sm:gap-x-6 sm:gap-y-10 lg:grid-cols-6 lg:gap-x-8">
 								{columns.slice(6).map((column) => (
 									<div key={column.group}>
-										<h4 className="font-medium text-[14px] text-text-strong-950 dark:text-white">
+										<h4 className="font-medium text-[13px] text-text-strong-950 sm:text-[14px] dark:text-white">
 											{column.group}
 										</h4>
-										<ul className="mt-4 flex flex-col gap-2.5">
+										<ul className="mt-2.5 flex flex-col gap-2 sm:mt-4 sm:gap-2.5">
 											{column.items.map((link) => (
 												<FooterLinkItem key={link.title} link={link} />
 											))}
