@@ -72,130 +72,113 @@ const WhyOpenSourcePage = () => {
 			<JsonLd data={jsonLd} />
 
 			<section className="relative w-full max-w-full overflow-x-clip border-stroke-soft-200 bg-bg-white-0 text-text-strong-950 dark:border-white/10 dark:bg-black dark:text-white">
-				<div className="mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-200 border-x px-6 pt-28 pb-16 sm:px-10 sm:pt-32 sm:pb-20 md:max-w-7xl lg:px-12 dark:border-white/10">
-					{/* Essay sits left within the bordered column */}
-					<div className="w-full max-w-2xl">
-						{/* Title sizing matches changelog */}
-						<h1 className="font-semibold text-text-strong-950 text-xl leading-snug tracking-tight sm:text-2xl lg:text-[1.65rem] dark:text-white">
-							Why Open Source
-						</h1>
+				<div className="mx-auto w-full max-w-5xl border-stroke-soft-200 border-x px-6 pt-28 pb-16 sm:px-10 sm:pt-32 sm:pb-20 md:max-w-7xl lg:px-12 dark:border-white/10">
+					{/* Two columns: essay left, note right */}
+					<div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-10 xl:gap-14">
+						{/* Left — main essay */}
+						<div className="min-w-0 lg:col-span-7">
+							<h1 className="font-semibold text-text-strong-950 text-xl leading-snug tracking-tight sm:text-2xl lg:text-[1.65rem] dark:text-white">
+								Why Open Source
+							</h1>
 
-						{/* Short scroll-stopper before the sections */}
-						<p className="mt-5 max-w-xl text-[15px] text-text-sub-600 leading-snug sm:text-[16px] dark:text-white/55">
-							Closed email tools sell trust. We sell a repo you can open.
-						</p>
+							<p className="mt-3 max-w-xl text-[14px] text-text-sub-600 leading-snug sm:text-[14.5px] dark:text-white/55">
+								Closed email tools sell trust. We sell a repo you can open.
+							</p>
 
-						<div className="mt-10 space-y-12 text-[14px] text-text-sub-600 leading-relaxed sm:text-[14.5px] dark:text-white/60">
-							{/* 1 */}
-							<section className="space-y-4">
-								<h2 className="font-semibold text-[15px] text-text-strong-950 tracking-tight sm:text-[16px] dark:text-white">
-									<span className="mr-2 text-text-sub-600 tabular-nums dark:text-white/45">
-										1.
-									</span>
-									Trust
-								</h2>
-								<p>
-									You don&apos;t trust Stripe because of their homepage. You
-									trust them because every payment can be traced.
-								</p>
-								<p>Email should work the same way.</p>
-								<p>
-									Today, most email providers ask you to trust a dashboard you
-									can&apos;t verify. If an email disappears, you&apos;re left
-									opening a support ticket.
-								</p>
-								<p>We think trust should be inspectable.</p>
-								<p>
-									With Reloop, the logic isn&apos;t hidden behind a marketing
-									page. The retries, queues, webhooks, and bounce handling are
-									all in the open.
-								</p>
-								<p className="font-medium text-text-strong-950 dark:text-white">
-									You don&apos;t have to trust us. You can verify us.
-								</p>
-							</section>
+							<div className="mt-8 space-y-8 text-[13.5px] text-text-sub-600 leading-relaxed sm:text-[14px] dark:text-white/60">
+								{/* 1 */}
+								<section className="space-y-2.5">
+									<h2 className="font-semibold text-[14.5px] text-text-strong-950 tracking-tight sm:text-[15px] dark:text-white">
+										<span className="mr-2 text-text-sub-600 tabular-nums dark:text-white/45">
+											1.
+										</span>
+										Trust
+									</h2>
+									<p>
+										You don&apos;t trust Stripe because of their homepage.
+										You trust them because every payment can be traced.
+										Email should work the same way.
+									</p>
+									<p>
+										Most providers ask you to trust a dashboard you
+										can&apos;t verify. With Reloop, retries, queues,
+										webhooks, and bounce handling are all in the open.
+									</p>
+									<p className="font-medium text-text-strong-950 dark:text-white">
+										You don&apos;t have to trust us. You can verify us.
+									</p>
+								</section>
 
-							{/* 2 */}
-							<section className="space-y-4">
-								<h2 className="font-semibold text-[15px] text-text-strong-950 tracking-tight sm:text-[16px] dark:text-white">
-									<span className="mr-2 text-text-sub-600 tabular-nums dark:text-white/45">
-										2.
-									</span>
-									Closed doesn't mean smarter.
-								</h2>
-								<p>
-									Every provider claims they have a &quot;proprietary sending
-									engine.&quot;
-								</p>
-								<p>The funny part?</p>
-								<p>
-									Most of them are built on the same open-source components
-									everyone else uses.
-								</p>
-								<p>The difference isn&apos;t magic.</p>
-								<p>It&apos;s packaging.</p>
-								<p>
-									We&apos;d rather show you exactly how our system works than
-									ask you to believe ours is somehow smarter.
-								</p>
-								<p className="font-medium text-text-strong-950 dark:text-white">
-									Open beats mysterious.
-								</p>
-							</section>
+								{/* 2 */}
+								<section className="space-y-2.5">
+									<h2 className="font-semibold text-[14.5px] text-text-strong-950 tracking-tight sm:text-[15px] dark:text-white">
+										<span className="mr-2 text-text-sub-600 tabular-nums dark:text-white/45">
+											2.
+										</span>
+										Closed doesn&apos;t mean smarter.
+									</h2>
+									<p>
+										Every provider claims a &quot;proprietary sending
+										engine.&quot; Most of them run on the same open-source
+										components everyone else uses. The difference
+										isn&apos;t magic. It&apos;s packaging.
+									</p>
+									<p className="font-medium text-text-strong-950 dark:text-white">
+										Open beats mysterious.
+									</p>
+								</section>
 
-							{/* 3 */}
-							<section className="space-y-4">
-								<h2 className="font-semibold text-[15px] text-text-strong-950 tracking-tight sm:text-[16px] dark:text-white">
-									<span className="mr-2 text-text-sub-600 tabular-nums dark:text-white/45">
-										3.
-									</span>
-									Open Source Isn&apos;t Enough
-								</h2>
-								<p>Most open-source email projects stop at the repository.</p>
-								<p>You still have to wire everything together yourself.</p>
-								<ul className="list-disc space-y-2 pl-5 marker:text-text-sub-600 dark:marker:text-white/40">
-									<li>DNS.</li>
-									<li>Queues.</li>
-									<li>Monitoring.</li>
-									<li>Retries.</li>
-									<li>Deployments.</li>
-								</ul>
-								<p>The software is free.</p>
-								<p>Your time isn&apos;t.</p>
-								<p className="font-medium text-text-strong-950 dark:text-white">
-									Reloop turns an open-source project into a product you can
-									actually deploy.
-								</p>
-							</section>
+								{/* 3 */}
+								<section className="space-y-2.5">
+									<h2 className="font-semibold text-[14.5px] text-text-strong-950 tracking-tight sm:text-[15px] dark:text-white">
+										<span className="mr-2 text-text-sub-600 tabular-nums dark:text-white/45">
+											3.
+										</span>
+										Open source isn&apos;t enough
+									</h2>
+									<p>
+										Most open-source email projects stop at the repo. You
+										still wire DNS, queues, monitoring, retries, and
+										deploys yourself. The software is free. Your time
+										isn&apos;t.
+									</p>
+									<p className="font-medium text-text-strong-950 dark:text-white">
+										Reloop turns open source into something you can
+										actually deploy.
+									</p>
+								</section>
 
-							<div className="pt-1">
-								<FancyButton.Root
-									asChild
-									variant="neutral"
-									size="medium"
-									className="rounded-full! px-5!"
-								>
-									<a
-										href={socialProfiles.github}
-										target="_blank"
-										rel="noopener noreferrer"
+								<div className="pt-0.5">
+									<FancyButton.Root
+										asChild
+										variant="neutral"
+										size="medium"
+										className="rounded-full! px-5!"
 									>
-										<FancyButton.Icon
-											as={Icon}
-											name="social-github"
-											className="size-4"
-										/>
-										<span>View on GitHub</span>
-									</a>
-								</FancyButton.Root>
+										<a
+											href={socialProfiles.github}
+											target="_blank"
+											rel="noopener noreferrer"
+										>
+											<FancyButton.Icon
+												as={Icon}
+												name="social-github"
+												className="size-4"
+											/>
+											<span>View on GitHub</span>
+										</a>
+									</FancyButton.Root>
+								</div>
 							</div>
+						</div>
+
+						{/* Right — compact note */}
+						<div className="min-w-0 lg:col-span-5 lg:pt-2">
+							<OpenSourceIsntCheap />
 						</div>
 					</div>
 				</div>
 			</section>
-
-			{/* Open source isn't cheap — misconception section */}
-			<OpenSourceIsntCheap />
 
 			{/* Full-width bottom CTA */}
 			<BlogCta
