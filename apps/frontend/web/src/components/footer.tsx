@@ -19,20 +19,15 @@ type FooterColumn = {
 };
 
 const columns: FooterColumn[] = [
-	// --- Row 1: Product & Developer ---
+	// --- Row 1: Product & developer ---
 	{
-		group: "Email",
+		group: "Product",
 		items: [
 			{ title: "Transaction Emails", href: "/features/transaction-emails" },
 			{ title: "SMTP Relay", href: "/features/smtp" },
 			{ title: "Email Analytics", href: "/features/email-analytics" },
 			{ title: "Email Validation", href: "/features/email-validation" },
 			{ title: "Email Templates", href: "/features/email-templates" },
-		],
-	},
-	{
-		group: "Feather",
-		items: [
 			{ title: "AI Agents", href: "/features/ai-agents" },
 			{ title: "Webhooks", href: "/features/webhooks" },
 			{ title: "Deliverability", href: "/features/deliverability" },
@@ -43,16 +38,12 @@ const columns: FooterColumn[] = [
 		items: [
 			{ title: "SDKs", href: "/sdk" },
 			{ title: "Frameworks", href: "/frameworks" },
+			{ title: "Documentation", href: "/docs" },
 			{ title: "API Reference", href: "/docs/api" },
 			{ title: "Webhooks", href: "/docs/webhooks" },
-		],
-	},
-	{
-		group: "Docs",
-		items: [
-			{ title: "Documentation", href: "/docs" },
 			{ title: "Self-host", href: "/docs/self-host" },
 			{ title: "SMTP", href: "/docs/examples/smtp/introduction" },
+			{ title: "Integrations", href: "/docs/integrations" },
 		],
 	},
 	{
@@ -80,7 +71,7 @@ const columns: FooterColumn[] = [
 			{ title: "All comparisons", href: "/compare" },
 		],
 	},
-	// --- Row 2: Company & Info ---
+	// --- Row 2: Agents & company ---
 	{
 		group: "Agents",
 		items: [
@@ -96,6 +87,9 @@ const columns: FooterColumn[] = [
 			{ title: "Blog", href: "/blog" },
 			{ title: "Changelog", href: "/changelog" },
 			{ title: "Glossary", href: "/glossary" },
+			{ title: "Product Beliefs", href: "/philosophy/our-product-beliefs" },
+			{ title: "Engineering", href: "/philosophy/engineering" },
+			{ title: "Why Open Source", href: "/philosophy/why-open-source" },
 		],
 	},
 	{
@@ -105,23 +99,6 @@ const columns: FooterColumn[] = [
 			{ title: "Contact", href: "/contact" },
 			{ title: "Pricing", href: "/pricing" },
 			{ title: "Careers", href: "/careers" },
-		],
-	},
-	{
-		group: "Open Source",
-		items: [
-			{ title: "Why Open Source", href: "/philosophy/why-open-source" },
-			{ title: "Integrations", href: "/docs/integrations" },
-			{ title: "Self-host", href: "/docs/self-host" },
-		],
-	},
-	{
-		group: "Philosophy",
-		items: [
-			{ title: "Why Reloop", href: "/philosophy/why-reloop" },
-			{ title: "What We Stand For", href: "/philosophy/what-we-stand-for" },
-			{ title: "Product Beliefs", href: "/philosophy/our-product-beliefs" },
-			{ title: "Engineering", href: "/philosophy/engineering" },
 		],
 	},
 	{
@@ -202,9 +179,9 @@ export const Footer = () => {
 						</div>
 
 						<div className="flex min-w-0 flex-1 flex-col gap-8 sm:gap-10 lg:gap-12">
-							{/* Row 1: Primary columns */}
-							<div className="grid grid-cols-2 gap-x-4 gap-y-7 sm:grid-cols-3 sm:gap-x-6 sm:gap-y-10 lg:grid-cols-6 lg:gap-x-8">
-								{columns.slice(0, 6).map((column) => (
+							{/* Row 1: Product & developer */}
+							<div className="grid grid-cols-2 gap-x-4 gap-y-7 sm:grid-cols-3 sm:gap-x-6 sm:gap-y-10 lg:grid-cols-4 lg:gap-x-8">
+								{columns.slice(0, 4).map((column) => (
 									<div key={column.group}>
 										<h4 className="font-medium text-[13px] text-text-strong-950 sm:text-[14px] dark:text-white">
 											{column.group}
@@ -218,9 +195,9 @@ export const Footer = () => {
 								))}
 							</div>
 
-							{/* Row 2: Secondary info columns */}
-							<div className="grid grid-cols-2 gap-x-4 gap-y-7 sm:grid-cols-3 sm:gap-x-6 sm:gap-y-10 lg:grid-cols-6 lg:gap-x-8">
-								{columns.slice(6).map((column) => (
+							{/* Row 2: Agents & company */}
+							<div className="grid grid-cols-2 gap-x-4 gap-y-7 sm:grid-cols-3 sm:gap-x-6 sm:gap-y-10 lg:grid-cols-4 lg:gap-x-8">
+								{columns.slice(4).map((column) => (
 									<div key={column.group}>
 										<h4 className="font-medium text-[13px] text-text-strong-950 sm:text-[14px] dark:text-white">
 											{column.group}

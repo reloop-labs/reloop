@@ -107,10 +107,9 @@ const columns: FooterColumn[] = [
 	{
 		group: "Philosophy",
 		items: [
-			{ title: "Why Reloop", href: "/philosophy/why-reloop" },
-			{ title: "What We Stand For", href: "/philosophy/what-we-stand-for" },
 			{ title: "Product Beliefs", href: "/philosophy/our-product-beliefs" },
 			{ title: "Engineering", href: "/philosophy/engineering" },
+			{ title: "Why Open Source", href: "/philosophy/why-open-source" },
 		],
 	},
 	{

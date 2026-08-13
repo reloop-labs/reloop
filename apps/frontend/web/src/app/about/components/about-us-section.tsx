@@ -176,19 +176,19 @@ export function AboutUsSection() {
 			</div>
 
 			<p className="mx-auto mt-14 max-w-2xl text-center text-[15px] text-text-sub-600 leading-[1.8] dark:text-white/50">
-				Want the reasoning behind every decision? Read{" "}
+				Want the reasoning behind every decision? Read our{" "}
 				<Link
-					href="/philosophy/why-reloop"
+					href="/philosophy/our-product-beliefs"
 					className="font-semibold text-primary-link underline decoration-primary-link/30 underline-offset-4"
 				>
-					why we built Reloop
+					product beliefs
 				</Link>{" "}
 				and{" "}
 				<Link
-					href="/philosophy/what-we-stand-for"
+					href="/philosophy/engineering"
 					className="font-semibold text-primary-link underline decoration-primary-link/30 underline-offset-4"
 				>
-					what we won&apos;t compromise on
+					engineering principles
 				</Link>
 				. Questions?{" "}
 				<a
