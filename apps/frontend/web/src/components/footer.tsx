@@ -194,15 +194,15 @@ export const Footer = () => {
 			<div className="mx-auto w-full max-w-5xl border-stroke-soft-200 md:max-w-7xl xl:border-x dark:border-white/10">
 				<div className="px-4 py-10 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
 					<div className="flex h-full flex-col gap-8 sm:gap-12 lg:flex-row lg:items-stretch lg:gap-20">
-						<div className="flex flex-col justify-between gap-6 sm:gap-8 lg:w-48 lg:self-stretch">
+						<div className="flex flex-row items-center justify-between gap-4 lg:w-48 lg:flex-col lg:items-start lg:justify-between lg:self-stretch">
 							<div className="flex shrink-0 flex-col">
 								<Link
 									href="/"
-									className="-ml-[9px] sm:-ml-[11px] inline-flex shrink-0 items-center gap-2 sm:gap-2.5"
+									className="-ml-[9px] inline-flex shrink-0 items-center gap-2 sm:-ml-[11px] sm:gap-2.5"
 									aria-label="Reloop home"
 								>
 									<Logo className="size-9 text-text-strong-950 sm:size-11 dark:text-white" />
-									<span className="-ml-2.5 sm:-ml-3 font-semibold text-[15px] text-text-strong-950 tracking-tight sm:text-[17px] dark:text-white">
+									<span className="-ml-2.5 font-semibold text-[15px] text-text-strong-950 tracking-tight sm:-ml-3 sm:text-[17px] dark:text-white">
 										Reloop
 									</span>
 								</Link>
@@ -211,7 +211,7 @@ export const Footer = () => {
 								href={statusUrl}
 								target="_blank"
 								rel="noreferrer"
-								className="inline-flex items-center gap-2 transition-opacity hover:opacity-80"
+								className="inline-flex shrink-0 items-center gap-2 transition-opacity hover:opacity-80"
 							>
 								<span className="size-2 shrink-0 rounded-full bg-[#0070F3]" />
 								<span className="font-mono text-[#0070F3] text-[10px] uppercase tracking-wide sm:text-[11px]">
