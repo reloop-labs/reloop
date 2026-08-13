@@ -56,6 +56,20 @@ const columns: FooterColumn[] = [
 		],
 	},
 	{
+		group: "Tools",
+		items: [
+			{ title: "Free Tools", href: "/tools" },
+			{ title: "Email Validator", href: "/tools/email-validator" },
+			{ title: "Subject Tester", href: "/tools/subject-tester" },
+			{ title: "Template Generator", href: "/tools/template-generator" },
+			{
+				title: "Deliverability Tester",
+				href: "/tools/deliverability-tester",
+			},
+			{ title: "Auth Checker", href: "/tools/auth-checker" },
+		],
+	},
+	{
 		group: "Compare",
 		items: [
 			{ title: "vs Resend", href: "/compare/resend" },
@@ -66,20 +80,16 @@ const columns: FooterColumn[] = [
 			{ title: "All comparisons", href: "/compare" },
 		],
 	},
+	// --- Row 2: Company & Info ---
 	{
 		group: "Agents",
 		items: [
-			{ title: "llms.txt", href: "/llms.txt" },
-			{ title: "llms-docs.txt", href: "/llms-docs.txt" },
-			{ title: "llms-full.txt", href: "/llms-full.txt" },
-			{ title: "llms-full-docs.txt", href: "/llms-full-docs.txt" },
-			{ title: "skill.md", href: "/skill.md" },
-			{ title: "pricing.md", href: "/pricing.md" },
 			{ title: "sitemap.md", href: "/sitemap.md" },
+			{ title: "llms.txt", href: "/llms.txt" },
+			{ title: "skills.md", href: "/skill.md" },
 			{ title: "rss.xml", href: "/blog/feed.xml" },
 		],
 	},
-	// --- Row 2: Company & Info ---
 	{
 		group: "Learn",
 		items: [
@@ -123,22 +133,6 @@ const columns: FooterColumn[] = [
 			{
 				title: "Status",
 				href: "https://status.reloop.sh/status/live",
-				external: true,
-			},
-		],
-	},
-	{
-		group: "Social",
-		items: [
-			{
-				title: "GitHub",
-				href: "https://github.com/reloop-labs/reloop",
-				external: true,
-			},
-			{ title: "X", href: "https://x.com/reloophq", external: true },
-			{
-				title: "Discord",
-				href: "https://discord.gg/bHnkBcp7xR",
 				external: true,
 			},
 		],
