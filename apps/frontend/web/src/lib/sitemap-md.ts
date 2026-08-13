@@ -189,14 +189,6 @@ function classifyRoute(
 		};
 	}
 
-	if (path.startsWith("/philosophy/")) {
-		return {
-			path,
-			title: humanizeSlug(path.slice("/philosophy/".length)),
-			type: "philosophy",
-		};
-	}
-
 	const leaf = path.split("/").filter(Boolean).at(-1) ?? path;
 	return { path, title: humanizeSlug(leaf), type: "page" };
 }
