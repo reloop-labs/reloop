@@ -57,7 +57,7 @@ export default function IndexHero() {
 	return (
 		// Careers-style header: title + description (no SectionTitle icon)
 		<section className="relative w-full max-w-full overflow-x-clip bg-bg-white-0 text-text-strong-950 dark:bg-black dark:text-white">
-			<div className="mx-auto flex w-full max-w-5xl flex-col items-center border-stroke-soft-200 px-6 pt-28 pb-14 text-center sm:px-10 sm:pt-32 sm:pb-16 md:max-w-7xl md:items-start md:text-left lg:px-12 xl:border-x dark:border-white/10">
+			<div className="mx-auto flex w-full max-w-5xl flex-col items-center border-stroke-soft-200 px-6 pt-28 pb-14 text-center sm:px-10 sm:pt-32 sm:pb-16 md:max-w-7xl lg:items-start lg:px-12 lg:text-left xl:border-x dark:border-white/10">
 				<h1 className="max-w-3xl font-semibold text-xl text-balance text-text-strong-950 leading-snug tracking-tight sm:text-4xl sm:leading-[1.15] lg:text-[2.6rem] dark:text-white">
 					Send email in your language.
 				</h1>
@@ -67,7 +67,7 @@ export default function IndexHero() {
 					SDKs for Node.js, Python, Go, Rust, PHP, Ruby, Elixir, Java, and .NET.
 				</p>
 
-				<div className="mt-8 flex flex-wrap items-center justify-center gap-3 md:justify-start">
+				<div className="mt-8 flex flex-wrap items-center justify-center gap-3 lg:justify-start">
 					<FancyButton.Root
 						asChild
 						variant="neutral"
