@@ -514,7 +514,7 @@ export default function LanguageExplorer() {
 				</aside>
 
 				{/* Right: step-by-step playground */}
-				<div className="border-stroke-soft-200 border-t p-6 sm:p-8 lg:col-span-9 lg:border-t-0 lg:p-10 dark:border-white/10">
+				<div className="p-6 sm:p-8 lg:col-span-9 lg:p-10">
 					<div className="flex flex-col">
 						<StepItem
 							number={1}

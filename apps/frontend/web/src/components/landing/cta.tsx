@@ -25,7 +25,7 @@ export function FeatureCta({
 						}}
 					/>
 					<div className="mx-auto flex max-w-3xl flex-col items-center text-center">
-						<h2 className="font-semibold text-2xl text-text-strong-950 tracking-tight sm:text-4xl lg:text-5xl dark:text-white">
+						<h2 className="font-semibold text-2xl text-balance text-text-strong-950 tracking-tight sm:text-4xl lg:text-5xl dark:text-white">
 							{title}
 							{titleMuted && (
 								<>
@@ -35,7 +35,7 @@ export function FeatureCta({
 							)}
 						</h2>
 						{description && (
-							<p className="mt-3 max-w-xl text-[15px] text-text-sub-600 leading-relaxed dark:text-white/60">
+							<p className="mt-3 max-w-xl text-[15px] text-balance text-text-sub-600 leading-relaxed dark:text-white/60">
 								{description}
 							</p>
 						)}
