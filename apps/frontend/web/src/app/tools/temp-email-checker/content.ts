@@ -85,24 +85,6 @@ export const reasons: { stat: string; title: string; description: string }[] = [
 	},
 ];
 
-export const steps: { title: string; description: string }[] = [
-	{
-		title: "Paste an address or domain",
-		description:
-			"Enter a full email address or just the domain. Input is normalised and checked for shape before any lookup happens.",
-	},
-	{
-		title: "Match against the catalogue",
-		description:
-			"The domain is compared against known disposable providers, wildcard suffix patterns, and the whitelist of false-positive exceptions.",
-	},
-	{
-		title: "Read the verdict",
-		description:
-			"You get a clear result plus the individual signals behind it, so you can decide whether to block, flag, or allow the address.",
-	},
-];
-
 export const faqs: FaqItem[] = [
 	{
 		question: "What is a disposable email address?",

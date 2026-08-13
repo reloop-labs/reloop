@@ -16,7 +16,6 @@ import {
 	faqs,
 	reasons,
 	signals,
-	steps,
 	toolDescription,
 	toolKeywords,
 	toolPath,
@@ -112,31 +111,6 @@ export default function TempEmailCheckerPage() {
 
 				<PageSection alt>
 					<SectionHeading
-						title="What the check looks at."
-						description="A verdict is only useful if you can see how it was reached. Every signal behind the result is reported on its own."
-					/>
-					<div className={cardGridClass}>
-						{signals.map((item) => (
-							<div
-								key={item.title}
-								className="rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-8 dark:border-white/10 dark:bg-[#111]"
-							>
-								<span className="flex size-9 items-center justify-center rounded-full bg-bg-weak-50 text-text-strong-950 dark:bg-white/5 dark:text-white">
-									<Icon name={item.icon} className="size-[18px]" />
-								</span>
-								<h3 className="mt-5 mb-3 font-semibold text-lg text-text-strong-950 dark:text-white">
-									{item.title}
-								</h3>
-								<p className="text-sm text-text-sub-600 leading-relaxed dark:text-white/50">
-									{item.description}
-								</p>
-							</div>
-						))}
-					</div>
-				</PageSection>
-
-				<PageSection>
-					<SectionHeading
 						title="Why throwaway signups cost you."
 						description="A burner address is not just a junk row in your database. It actively degrades the deliverability of every other message you send."
 					/>
@@ -160,19 +134,19 @@ export default function TempEmailCheckerPage() {
 					</div>
 				</PageSection>
 
-				<PageSection alt>
+				<PageSection>
 					<SectionHeading
-						title="How it works."
-						description="Three steps, no account, nothing stored."
+						title="What the check looks at."
+						description="A verdict is only useful if you can see how it was reached. Every signal behind the result is reported on its own."
 					/>
 					<div className={cardGridClass}>
-						{steps.map((item, index) => (
+						{signals.map((item) => (
 							<div
 								key={item.title}
 								className="rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-8 dark:border-white/10 dark:bg-[#111]"
 							>
-								<span className="flex size-9 items-center justify-center rounded-full bg-bg-weak-50 font-mono text-[13px] text-text-strong-950 dark:bg-white/5 dark:text-white">
-									{String(index + 1).padStart(2, "0")}
+								<span className="flex size-9 items-center justify-center rounded-full bg-bg-weak-50 text-text-strong-950 dark:bg-white/5 dark:text-white">
+									<Icon name={item.icon} className="size-[18px]" />
 								</span>
 								<h3 className="mt-5 mb-3 font-semibold text-lg text-text-strong-950 dark:text-white">
 									{item.title}
