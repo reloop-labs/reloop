@@ -177,26 +177,10 @@ export const Footer = () => {
 							</div>
 						</div>
 
-						<div className="flex min-w-0 flex-1 flex-col gap-8 sm:gap-10 lg:gap-12">
-							{/* Row 1: Product & developer */}
-							<div className="grid grid-cols-2 gap-x-4 gap-y-7 sm:grid-cols-3 sm:gap-x-6 sm:gap-y-10 lg:grid-cols-4 lg:gap-x-8">
-								{columns.slice(0, 4).map((column) => (
-									<div key={column.group}>
-										<h4 className="font-medium text-[13px] text-text-strong-950 sm:text-[14px] dark:text-white">
-											{column.group}
-										</h4>
-										<ul className="mt-2.5 flex flex-col gap-2 sm:mt-4 sm:gap-2.5">
-											{column.items.map((link) => (
-												<FooterLinkItem key={link.title} link={link} />
-											))}
-										</ul>
-									</div>
-								))}
-							</div>
-
-							{/* Row 2: Agents & company */}
-							<div className="grid grid-cols-2 gap-x-4 gap-y-7 sm:grid-cols-3 sm:gap-x-6 sm:gap-y-10 lg:grid-cols-4 lg:gap-x-8">
-								{columns.slice(4).map((column) => (
+						<div className="min-w-0 flex-1">
+							{/* Single continuous grid — reflows cleanly at 2/3/4 cols (no orphan row) */}
+							<div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 sm:gap-x-6 sm:gap-y-10 lg:grid-cols-4 lg:gap-x-8">
+								{columns.map((column) => (
 									<div key={column.group}>
 										<h4 className="font-medium text-[13px] text-text-strong-950 sm:text-[14px] dark:text-white">
 											{column.group}
