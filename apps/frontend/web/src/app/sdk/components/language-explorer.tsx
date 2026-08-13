@@ -335,7 +335,7 @@ export default function LanguageExplorer() {
 			>
 				{/* Left meta & frameworks: compact tinted rail matching framework details */}
 				<aside className="border-stroke-soft-200 border-b bg-[#fafafa] lg:col-span-3 lg:border-r lg:border-b-0 dark:border-white/10 dark:bg-white/[0.025]">
-					<div className="flex flex-col gap-4 p-6 sm:p-7 lg:sticky lg:top-16 lg:p-7">
+					<div className="flex flex-col gap-4 px-4 py-6 sm:px-6 sm:py-7 lg:sticky lg:top-16 lg:px-8 lg:py-8">
 						<div className="flex items-center gap-3">
 							<div
 								className={cn(
