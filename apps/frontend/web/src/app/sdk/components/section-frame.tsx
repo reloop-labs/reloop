@@ -28,7 +28,7 @@ export function SectionFrame({
 			)}
 		>
 			{/* Content column — max width + vertical rails */}
-			<div className="relative mx-auto w-full max-w-5xl border-stroke-soft-200 border-x md:max-w-7xl dark:border-white/10">
+			<div className="relative mx-auto w-full max-w-5xl border-stroke-soft-200 xl:border-x md:max-w-7xl dark:border-white/10">
 				{children}
 			</div>
 		</section>

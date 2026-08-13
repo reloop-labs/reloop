@@ -254,7 +254,7 @@ export const Header = () => {
 			className="fixed top-0 right-0 left-0 z-50 border-stroke-soft-200/70 border-b bg-bg-white-0 dark:border-white/10 dark:bg-black"
 			onMouseLeave={() => setActiveMega(null)}
 		>
-			<div className="mx-auto w-full max-w-5xl px-6 sm:px-0 md:max-w-7xl">
+			<div className="mx-auto w-full max-w-5xl px-6 md:max-w-7xl">
 				<div className="flex h-16 items-center justify-between gap-4">
 					<div className="flex items-center gap-6 sm:gap-8">
 						<Link

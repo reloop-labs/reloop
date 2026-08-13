@@ -57,7 +57,7 @@ export default function IndexHero() {
 	return (
 		// Careers-style header: title + description (no SectionTitle icon)
 		<section className="relative w-full max-w-full overflow-x-clip bg-bg-white-0 text-text-strong-950 dark:bg-black dark:text-white">
-			<div className="mx-auto w-full max-w-5xl border-stroke-soft-200 border-x px-6 pt-28 pb-14 text-left sm:px-10 sm:pt-32 sm:pb-16 md:max-w-7xl lg:px-12 dark:border-white/10">
+			<div className="mx-auto w-full max-w-5xl border-stroke-soft-200 xl:border-x px-6 pt-28 pb-14 text-left sm:px-10 sm:pt-32 sm:pb-16 md:max-w-7xl lg:px-12 dark:border-white/10">
 				<h1 className="max-w-3xl font-semibold text-3xl text-text-strong-950 leading-[1.15] tracking-tight sm:text-4xl lg:text-[2.6rem] dark:text-white">
 					Send email in your language.
 				</h1>
