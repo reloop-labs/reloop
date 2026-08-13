@@ -30,7 +30,7 @@ export function AboutHero() {
 						View on GitHub
 					</a>
 					<Link
-						href="/philosophy/why-open-source"
+						href="/why-open-source"
 						className={`${Button.buttonVariants({
 							variant: "neutral",
 							mode: "stroke",

@@ -5,7 +5,7 @@ const philosophyCards = [
 	{
 		title: "Why Open Source",
 		description: "Why we believe email infrastructure must be auditable, self-hostable, and public.",
-		href: "/philosophy/why-open-source",
+		href: "/why-open-source",
 		iconName: "globe",
 	},
 	{

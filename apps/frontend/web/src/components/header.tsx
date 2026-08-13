@@ -126,7 +126,7 @@ const navItems: NavItem[] = [
 				{
 					title: "Open Source",
 					links: [
-						{ title: "Why Open Source", href: "/philosophy/why-open-source" },
+						{ title: "Why Open Source", href: "/why-open-source" },
 						{ title: "Self-host", href: "/docs/self-host" },
 						{ title: "License", href: "/license" },
 						{
@@ -146,7 +146,7 @@ const navItems: NavItem[] = [
 						{ title: "Engineering", href: "/philosophy/engineering" },
 						{
 							title: "Why Open Source",
-							href: "/philosophy/why-open-source",
+							href: "/why-open-source",
 						},
 					],
 				},

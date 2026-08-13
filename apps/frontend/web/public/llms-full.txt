@@ -252,7 +252,7 @@ Reloop gives you two answers: a hosted path when you want zero ops, and a [full 
 
 ### 4. Ownership (no vendor lock-in)
 
-This is the quiet deal-breaker. Proprietary APIs, opaque logs, and "you can't leave without a rewrite" are how email becomes a hostage situation. Reloop is [Apache 2.0](/license). The cloud product runs the same codebase you can `docker compose up` on Fly, Coolify, Kubernetes, or your own machines—see [Fly.io](/blog/reloop-flyio-deployment) and [Coolify](/blog/reloop-coolify-setup) guides, or the [self-host docs](/docs/self-host). Audit it. Fork it. Move it. Your data and compliance boundary stay yours. More on the bet: [why we open-sourced email infrastructure](/blog/why-we-open-sourced-email-infrastructure) and [why open source](/philosophy/why-open-source).
+This is the quiet deal-breaker. Proprietary APIs, opaque logs, and "you can't leave without a rewrite" are how email becomes a hostage situation. Reloop is [Apache 2.0](/license). The cloud product runs the same codebase you can `docker compose up` on Fly, Coolify, Kubernetes, or your own machines—see [Fly.io](/blog/reloop-flyio-deployment) and [Coolify](/blog/reloop-coolify-setup) guides, or the [self-host docs](/docs/self-host). Audit it. Fork it. Move it. Your data and compliance boundary stay yours. More on the bet: [why we open-sourced email infrastructure](/blog/why-we-open-sourced-email-infrastructure) and [why open source](/why-open-source).
 
 ### 5. Visibility and the full loop
 

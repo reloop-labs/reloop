@@ -99,7 +99,7 @@ const columns: FooterColumn[] = [
 	{
 		group: "Open Source",
 		items: [
-			{ title: "Why Open Source", href: "/philosophy/why-open-source" },
+			{ title: "Why Open Source", href: "/why-open-source" },
 			{ title: "Self-host", href: "/docs/self-host" },
 			{ title: "License", href: "/license" },
 		],
@@ -109,7 +109,7 @@ const columns: FooterColumn[] = [
 		items: [
 			{ title: "Product Beliefs", href: "/philosophy/our-product-beliefs" },
 			{ title: "Engineering", href: "/philosophy/engineering" },
-			{ title: "Why Open Source", href: "/philosophy/why-open-source" },
+			{ title: "Why Open Source", href: "/why-open-source" },
 		],
 	},
 	{

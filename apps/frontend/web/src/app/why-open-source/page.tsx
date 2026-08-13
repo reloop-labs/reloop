@@ -12,7 +12,7 @@ import { WhyOpenSourceValues } from "./components/why-open-source-values";
 // See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
 export const instant = false;
 
-const pagePath = "/philosophy/why-open-source";
+const pagePath = "/why-open-source";
 const pageUrl = `${getSiteUrl()}${pagePath}`;
 const pageTitle = "Why Open Source | Reloop";
 const pageDescription =

@@ -511,7 +511,7 @@ export default function OpenGraphImage() {
 						letterSpacing: "1px",
 					}}
 				>
-					reloop.sh/philosophy/why-open-source
+					reloop.sh/why-open-source
 				</span>
 			</div>
 		</div>,
