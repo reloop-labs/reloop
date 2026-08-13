@@ -57,11 +57,11 @@ export default function FrameworksIndexHero() {
 	return (
 		<section className="relative w-full max-w-full overflow-x-clip bg-bg-white-0 text-text-strong-950 dark:bg-black dark:text-white">
 			<div className="mx-auto flex w-full max-w-5xl flex-col items-center border-stroke-soft-200 px-6 pt-28 pb-14 text-center sm:px-10 sm:pt-32 sm:pb-16 md:max-w-7xl md:items-start md:text-left lg:px-12 xl:border-x dark:border-white/10">
-				<h1 className="max-w-3xl font-semibold text-3xl text-balance text-text-strong-950 leading-[1.15] tracking-tight sm:text-4xl lg:text-[2.6rem] dark:text-white">
+				<h1 className="max-w-3xl font-semibold text-2xl text-balance text-text-strong-950 leading-[1.2] tracking-tight sm:text-4xl sm:leading-[1.15] lg:text-[2.6rem] dark:text-white">
 					Send email from your framework.
 				</h1>
 
-				<p className="mt-4 max-w-2xl text-[15px] text-balance text-text-sub-600 leading-relaxed sm:text-[16px] dark:text-white/60">
+				<p className="mt-3.5 max-w-2xl text-[14px] text-balance text-text-sub-600 leading-relaxed sm:mt-4 sm:text-[16px] dark:text-white/60">
 					Step-by-step guides for Next.js, Express, Django, FastAPI, Laravel,
 					Rails, Spring Boot, and more—with native idiomatic patterns and
 					type-safe payloads.
