@@ -192,17 +192,17 @@ export const Footer = () => {
 	return (
 		<footer className="w-full border-stroke-soft-200 border-t border-b bg-bg-white-0 text-text-strong-950 dark:border-white/10 dark:bg-black dark:text-white">
 			<div className="mx-auto w-full max-w-5xl border-stroke-soft-200 md:max-w-7xl xl:border-x dark:border-white/10">
-				<div className="px-4 py-10 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
+				<div className="px-6 py-10 sm:px-10 sm:py-16 lg:px-12 lg:py-20">
 					<div className="flex h-full flex-col gap-8 sm:gap-12 lg:flex-row lg:items-stretch lg:gap-20">
 						<div className="flex flex-row items-center justify-between gap-4 lg:w-48 lg:flex-col lg:items-start lg:justify-between lg:self-stretch">
-							<div className="flex shrink-0 flex-col">
+							<div className="-ml-2 -mt-2 flex shrink-0 flex-col">
 								<Link
 									href="/"
-									className="-ml-[9px] inline-flex shrink-0 items-center gap-2 sm:-ml-[11px] sm:gap-2.5"
+									className="inline-flex shrink-0 items-center gap-2 sm:gap-2.5"
 									aria-label="Reloop home"
 								>
 									<Logo className="size-9 text-text-strong-950 sm:size-11 dark:text-white" />
-									<span className="-ml-2.5 font-semibold text-[15px] text-text-strong-950 tracking-tight sm:-ml-3 sm:text-[17px] dark:text-white">
+									<span className="-ml-1.5 sm:-ml-3 font-semibold text-[15px] text-text-strong-950 tracking-tight sm:text-[17px] dark:text-white">
 										Reloop
 									</span>
 								</Link>
@@ -261,7 +261,7 @@ export const Footer = () => {
 			<div className="w-full border-stroke-soft-200 border-t dark:border-white/10">
 				<div className="mx-auto flex w-full max-w-5xl flex-row items-stretch justify-between border-stroke-soft-200 md:max-w-7xl xl:border-x dark:border-white/10">
 					{/* Left: Theme Switcher Icons */}
-					<div className="flex items-center px-4 py-3 sm:px-6 lg:px-8">
+					<div className="flex items-center px-6 py-3 sm:px-10 lg:px-12">
 						<div className="inline-flex items-center rounded-full border border-stroke-soft-200 bg-bg-weak-50 p-0.5 dark:border-white/10 dark:bg-white/[0.04]">
 							<button
 								type="button"
