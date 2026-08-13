@@ -1,43 +1,45 @@
+import { KeepUpToDate } from "@reloop/web/app/careers/components/keep-up-to-date";
 import { JsonLd } from "@reloop/web/components/json-ld";
-import {
-	MarketingPageShell,
-	PageSection,
-} from "@reloop/web/components/page-shell";
-import { getSiteUrl } from "@reloop/web/lib/site";
+import { BlogCta } from "@reloop/web/components/landing/blog/blog-cta";
+import { getSiteUrl, socialProfiles } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
-import { AboutUsSection } from "./components/about-us-section";
+import { AboutFounders } from "./components/about-founders";
+import { AboutHero } from "./components/about-hero";
+import { AboutPhilosophyCompass } from "./components/about-philosophy-compass";
+import { AboutStory } from "./components/about-story";
 
 // TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
 // See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
 export const instant = false;
 
 const pageUrl = `${getSiteUrl()}/about`;
+const pageTitle = "About Reloop Labs | The Open-Source Email Infrastructure";
+const pageDescription =
+	"Learn why we built Reloop Labs: proprietary-grade, self-hostable email infrastructure. Meet our founders and see our open-source commitment to developer freedom.";
 
 export const metadata: Metadata = {
-	title: "About Reloop Labs | The Open-Source Email Infrastructure",
-	description:
-		"Learn why we built Reloop Labs: proprietary-grade, self-hostable email infrastructure. Meet our founders and see our open-source commitment to developer freedom.",
+	title: pageTitle,
+	description: pageDescription,
 	keywords: [
 		"Reloop Labs",
 		"about Reloop",
 		"open source email company",
 		"email infrastructure team",
 		"Reloop founders",
+		"self-hostable email platform",
 	],
 	alternates: { canonical: pageUrl },
 	openGraph: {
-		title: "About Reloop Labs | The Open-Source Email Infrastructure",
-		description:
-			"Learn why we built Reloop Labs: proprietary-grade, self-hostable email infrastructure. Meet our founders and see our open-source commitment to developer freedom.",
+		title: pageTitle,
+		description: pageDescription,
 		type: "website",
 		url: pageUrl,
 		siteName: "Reloop",
 	},
 	twitter: {
 		card: "summary_large_image",
-		title: "About Reloop Labs | The Open-Source Email Infrastructure",
-		description:
-			"Learn why we built Reloop Labs: proprietary-grade, self-hostable email infrastructure. Meet our founders and see our open-source commitment to developer freedom.",
+		title: pageTitle,
+		description: pageDescription,
 	},
 };
 
@@ -67,9 +69,9 @@ const AboutUsPage = () => {
 				},
 			],
 			sameAs: [
-				"https://github.com/reloop-labs/reloop",
-				"https://discord.gg/bHnkBcp7xR",
-				"https://x.com/reloophq",
+				socialProfiles.github,
+				socialProfiles.discord,
+				socialProfiles.x,
 			],
 		},
 	};
@@ -77,18 +79,34 @@ const AboutUsPage = () => {
 	return (
 		<>
 			<JsonLd data={jsonLd} />
-			<div className="mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-200 border-x pt-6 pb-16 md:max-w-7xl dark:border-white/10">
-				<MarketingPageShell
-					titleLines={["We built the email", "infrastructure we couldn't buy."]}
-					description="We started Reloop Labs to build email infrastructure you actually control. Send transactionals, run campaigns, and track analytics from our hosted platform or your own servers."
-					compactHero
-					tightHeroBottom
-				>
-					<PageSection flushTop>
-						<AboutUsSection />
-					</PageSection>
-				</MarketingPageShell>
-			</div>
+
+			{/* Hero & Key Facts */}
+			<AboutHero />
+
+			{/* Story Narrative */}
+			<AboutStory />
+
+			{/* Founders Section */}
+			<AboutFounders />
+
+			{/* Philosophy Compass Navigation */}
+			<AboutPhilosophyCompass />
+
+			{/* Keep Up To Date Section */}
+			<KeepUpToDate />
+
+			{/* Blog CTA Section */}
+			<BlogCta
+				category="Open Source"
+				headline="Build email infrastructure you actually control."
+				sub="Sign up for our hosted platform at reloop.sh or self-host Reloop on your own servers."
+				primaryLabel="Get Started Free"
+				primaryHref="/dashboard/signup"
+				secondaryLabel="Explore GitHub"
+				secondaryHref={socialProfiles.github}
+				secondaryExternal
+				accentColor="blue"
+			/>
 		</>
 	);
 };
