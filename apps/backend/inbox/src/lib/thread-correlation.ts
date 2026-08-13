@@ -123,6 +123,7 @@ export async function correlateInboundThread({
 				lastMessageAt: receivedAt,
 				messageCount: sql`${emailThread.messageCount} + 1`,
 				isRead: false, // New message → unread
+				status: "active", // New message → unarchive thread to inbox
 				participants: sql`
 					CASE
 						WHEN ${emailThread.participants}::jsonb ? ${fromEmail}

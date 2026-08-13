@@ -1,5 +1,5 @@
 import { db } from "@reloop/db/client";
-import { inboundEmail, threadMessage } from "@reloop/db/schema";
+import { emailLog, inboundEmail, mailbox, threadMessage } from "@reloop/db/schema";
 import { and, eq } from "drizzle-orm";
 import { createError } from "evlog";
 import { useLogger } from "evlog/elysia";
@@ -27,42 +27,78 @@ export async function replyToMessageController(
 ) {
 	const log = useLogger();
 
-	// Fetch original message
-	const original = await db.query.inboundEmail.findFirst({
+	// Fetch original message (inbound or outbound log)
+	const originalInbound = await db.query.inboundEmail.findFirst({
 		where: and(
 			eq(inboundEmail.id, messageId),
 			eq(inboundEmail.organizationId, organizationId),
 		),
 	});
 
-	if (!original) {
-		throw createError({
-			status: 404,
-			message: "Message not found",
-			why: `Message ${messageId} was not found in your organization`,
-			fix: "Verify the message ID",
+	let mailboxId = originalInbound?.mailboxId;
+	let defaultReplyTo: string | string[] =
+		originalInbound?.replyTo ?? originalInbound?.fromEmail ?? "";
+	let originalSubject = originalInbound?.subject ?? "";
+	let headerMsgId = originalInbound?.messageId ?? null;
+	let resolvedThreadId: string | undefined = undefined;
+
+	if (!originalInbound) {
+		const outboundLog = await db.query.emailLog.findFirst({
+			where: and(
+				eq(emailLog.id, messageId),
+				eq(emailLog.organizationId, organizationId),
+			),
 		});
+
+		if (!outboundLog) {
+			throw createError({
+				status: 404,
+				message: "Message not found",
+				why: `Message ${messageId} was not found in your organization`,
+				fix: "Verify the message ID",
+			});
+		}
+
+		// Resolve mailbox for outbound log
+		const mbx = await db.query.mailbox.findFirst({
+			where: and(
+				eq(mailbox.organizationId, organizationId),
+				eq(mailbox.email, outboundLog.fromEmail),
+			),
+		});
+		const firstMbx = mbx || (await db.query.mailbox.findFirst({
+			where: eq(mailbox.organizationId, organizationId),
+		}));
+
+		mailboxId = firstMbx?.id ?? "";
+		const toArray = Array.isArray(outboundLog.toEmails)
+			? (outboundLog.toEmails as string[])
+			: [];
+		defaultReplyTo = toArray[0] || outboundLog.replyTo || outboundLog.fromEmail;
+		originalSubject = outboundLog.subject || "";
+		headerMsgId = outboundLog.messageId || null;
+	} else {
+		// Find thread for inbound email
+		const threadMsg = await db.query.threadMessage.findFirst({
+			where: eq(threadMessage.inboundEmailId, messageId),
+			columns: { threadId: true },
+		});
+		resolvedThreadId = threadMsg?.threadId;
 	}
 
-	// Find the thread this message belongs to
-	const threadMsg = await db.query.threadMessage.findFirst({
-		where: eq(threadMessage.inboundEmailId, messageId),
-		columns: { threadId: true },
-	});
-
 	// Build reply
-	const replyTo = body.to ?? original.replyTo ?? original.fromEmail;
-	const replySubject = original.subject?.startsWith("Re:")
-		? original.subject
-		: `Re: ${original.subject || ""}`;
+	const replyTo = body.to ?? defaultReplyTo;
+	const replySubject = originalSubject.startsWith("Re:")
+		? originalSubject
+		: `Re: ${originalSubject}`;
 
 	log.info(
-		`[INBOX] Replying to message ${messageId} → ${Array.isArray(replyTo) ? replyTo.join(", ") : replyTo} (thread: ${threadMsg?.threadId})`,
+		`[INBOX] Replying to message ${messageId} → ${Array.isArray(replyTo) ? replyTo.join(", ") : replyTo} (thread: ${resolvedThreadId})`,
 	);
 
 	return proxySendToMailService(
 		{
-			mailboxId: original.mailboxId,
+			mailboxId: mailboxId ?? "",
 			organizationId,
 			to: replyTo,
 			subject: replySubject,
@@ -71,10 +107,8 @@ export async function replyToMessageController(
 			cc: body.cc,
 			bcc: body.bcc,
 			attachments: body.attachments,
-			threadId: threadMsg?.threadId || undefined,
-			headers: original.messageId
-				? { "In-Reply-To": original.messageId }
-				: undefined,
+			threadId: resolvedThreadId,
+			headers: headerMsgId ? { "In-Reply-To": headerMsgId } : undefined,
 		},
 		apiKey,
 		cookie,

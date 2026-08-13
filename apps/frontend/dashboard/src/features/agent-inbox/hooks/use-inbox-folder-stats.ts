@@ -16,12 +16,15 @@ export type InboxFolderStats = {
 };
 
 export const useInboxFolderStats = (mailboxId: string): InboxFolderStats => {
-	const { threads, archivedThreads } = useAgentInbox();
+	const { threads, archivedThreads, trashThreads } = useAgentInbox();
 	const { count: draftsCount } = useComposeDrafts(mailboxId || undefined);
 
 	return useMemo(() => {
 		const mailboxThreads = threads.filter((t) => t.mailboxId === mailboxId);
 		const mailboxArchived = archivedThreads.filter(
+			(t) => t.mailboxId === mailboxId,
+		);
+		const mailboxTrash = trashThreads.filter(
 			(t) => t.mailboxId === mailboxId,
 		);
 
@@ -40,10 +43,10 @@ export const useInboxFolderStats = (mailboxId: string): InboxFolderStats => {
 			spam: mailboxThreads.filter(
 				(t) => t.direction === "inbound" && t.status === "blocked",
 			).length,
-			trash: 0,
+			trash: mailboxTrash.length,
 			starred: groupThreadsByConversation(
 				mailboxThreads.filter((t) => t.isStarred),
 			).length,
 		};
-	}, [threads, archivedThreads, mailboxId, draftsCount]);
+	}, [threads, archivedThreads, trashThreads, mailboxId, draftsCount]);
 };

@@ -52,7 +52,7 @@ export const ThreadList = ({
 	onForward,
 	isLoading = false,
 }: ThreadListProps) => {
-	const { toggleMessageStar, archiveThread, trashThread } = useAgentInbox();
+	const { toggleMessageStar, archiveThread, unarchiveThread, trashThread } = useAgentInbox();
 	const [mail, setMail] = useInboxMail();
 	const containerRef = useRef<HTMLDivElement>(null);
 	const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
@@ -172,9 +172,30 @@ export const ThreadList = ({
 		const archiveId = thread?.threadId || listId;
 		try {
 			await archiveThread(archiveId);
-			toast.success("Archived");
+			toast.success("Archived", {
+				action: {
+					label: "Undo",
+					onClick: () => void unarchiveThread(archiveId),
+				},
+			});
 		} catch (err: unknown) {
 			toast.error(err instanceof Error ? err.message : "Failed to archive");
+		}
+	};
+
+	const handleUnarchive = async (listId: string) => {
+		const thread = threads.find((t) => t.id === listId);
+		const archiveId = thread?.threadId || listId;
+		try {
+			await unarchiveThread(archiveId);
+			toast.success("Moved to inbox", {
+				action: {
+					label: "Undo",
+					onClick: () => void archiveThread(archiveId),
+				},
+			});
+		} catch (err: unknown) {
+			toast.error(err instanceof Error ? err.message : "Failed to move to inbox");
 		}
 	};
 
@@ -263,6 +284,8 @@ export const ThreadList = ({
 									onMouseEnter={onMouseEnterRow ?? (() => {})}
 									onToggleStar={handleToggleStar}
 									onArchive={handleArchive}
+									onUnarchive={handleUnarchive}
+									isArchived={folder === "archive" || folder === "archived"}
 									onDelete={handleDelete}
 									onToggleBulk={handleToggleBulk}
 								/>

@@ -90,6 +90,7 @@ export interface InboundThread {
 
 export type BatchThreadAction =
 	| "archive"
+	| "unarchive"
 	| "trash"
 	| "restore"
 	| "star"

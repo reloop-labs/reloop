@@ -201,7 +201,20 @@ export const AgentInboxContent = ({
 			try {
 				await batchThreads(ids, action);
 				pushBatchUndo(ids, action, success);
-				toast.success(success);
+				const undoAction: BatchThreadAction | null =
+					action === "archive"
+						? "restore"
+						: action === "restore" || action === "unarchive"
+							? "archive"
+							: null;
+				toast.success(success, {
+					action: undoAction
+						? {
+								label: "Undo",
+								onClick: () => void batchThreads(ids, undoAction),
+							}
+						: undefined,
+				});
 				setMail((prev) => ({ ...prev, bulkSelected: [] }));
 			} catch (err: unknown) {
 				toast.error(err instanceof Error ? err.message : "Bulk action failed");
@@ -253,24 +266,49 @@ export const AgentInboxContent = ({
 
 	const listHotkeysEnabled = !paletteOpen;
 
-	useHotkeys(
-		"e",
-		(e) => {
+	const inArchiveFolder = folder === "archive" || folder === "archived";
+
+	const handleArchiveOrUnarchiveHotKey = useCallback(
+		(e: KeyboardEvent) => {
 			if (isTypingTarget(e.target)) return;
+			const targetAction: BatchThreadAction = inArchiveFolder
+				? "restore"
+				: "archive";
+			const successMsg = inArchiveFolder ? "Moved to inbox" : "Archived";
 			if (mail.bulkSelected.length > 0) {
-				void runBulkAction("archive", "Archived");
+				void runBulkAction(targetAction, successMsg);
 				return;
 			}
 			if (!selectedThread) return;
 			const id = selectedThread.threadId || selectedThread.id;
-			void batchThreads([id], "archive")
-				.then(() => toast.success("Archived"))
+			void batchThreads([id], targetAction)
+				.then(() => {
+					const undoAction: BatchThreadAction = inArchiveFolder
+						? "archive"
+						: "restore";
+					toast.success(successMsg, {
+						action: {
+							label: "Undo",
+							onClick: () => void batchThreads([id], undoAction),
+						},
+					});
+				})
 				.catch((err: unknown) =>
-					toast.error(err instanceof Error ? err.message : "Failed to archive"),
+					toast.error(
+						err instanceof Error ? err.message : "Failed to update thread",
+					),
 				);
 		},
+		[inArchiveFolder, mail.bulkSelected.length, selectedThread, runBulkAction, batchThreads],
+	);
+
+	useHotkeys(
+		"e, y",
+		(e) => {
+			handleArchiveOrUnarchiveHotKey(e as any);
+		},
 		{ enabled: hotkeysEnabled, preventDefault: true },
-		[mail.bulkSelected.length, selectedThread, runBulkAction, batchThreads],
+		[handleArchiveOrUnarchiveHotKey, hotkeysEnabled],
 	);
 
 	useHotkeys(
@@ -505,14 +543,27 @@ export const AgentInboxContent = ({
 						</div>
 					) : (
 						<div className="ml-auto flex items-center gap-1">
-							<button
-								type="button"
-								title="Archive"
-								onClick={() => void runBulkAction("archive", "Archived")}
-								className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--inbox-control)] hover:bg-[var(--inbox-control-hover)]"
-							>
-								<Icon name="archive" className="h-3.5 w-3.5 text-mail-muted" />
-							</button>
+							{inArchiveFolder ? (
+								<button
+									type="button"
+									title="Move to inbox"
+									onClick={() =>
+										void runBulkAction("restore", "Moved to inbox")
+									}
+									className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--inbox-control)] hover:bg-[var(--inbox-control-hover)]"
+								>
+									<Icon name="inbox" className="h-3.5 w-3.5 text-mail-muted" />
+								</button>
+							) : (
+								<button
+									type="button"
+									title="Archive"
+									onClick={() => void runBulkAction("archive", "Archived")}
+									className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--inbox-control)] hover:bg-[var(--inbox-control-hover)]"
+								>
+									<Icon name="archive" className="h-3.5 w-3.5 text-mail-muted" />
+								</button>
+							)}
 							<button
 								type="button"
 								title="Trash"

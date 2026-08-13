@@ -638,66 +638,75 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 			: [];
 
 		const mappedSent = sentMessagesData
-			? sentMessagesData.map((msg) => {
-					const receivedAtDate = msg.createdAt;
-					const receivedAt =
-						typeof receivedAtDate === "string"
-							? receivedAtDate
-							: receivedAtDate.toISOString();
+			? sentMessagesData
+					.filter(
+						(msg) =>
+							!excludedThreadIds.has(msg.threadId || "") &&
+							!excludedThreadIds.has(msg.id),
+					)
+					.map((msg) => {
+						const receivedAtDate = msg.createdAt;
+						const receivedAt =
+							typeof receivedAtDate === "string"
+								? receivedAtDate
+								: receivedAtDate.toISOString();
 
-					const fromEmailParsed = parseEmailAddress(msg.fromEmail);
-					const mailbox = mailboxes.find(
-						(mb) => parseEmailAddress(mb.email) === fromEmailParsed,
-					);
+						const fromEmailParsed = parseEmailAddress(msg.fromEmail);
+						const mailbox = mailboxes.find(
+							(mb) => parseEmailAddress(mb.email) === fromEmailParsed,
+						);
 
-					return {
-						id: msg.id,
-						mailboxId: mailbox?.id ?? "",
-						threadId: msg.threadId ?? undefined,
-						messageId: msg.id,
-						from: normalizeFrom(msg.fromEmail, msg.fromName),
-						subject: msg.subject || "(No Subject)",
-						preview: msg.textBody
-							? msg.textBody.substring(0, 120) +
-								(msg.textBody.length > 120 ? "..." : "")
-							: "",
-						bodyText: msg.textBody || "",
-						bodyHtml: msg.htmlBody || undefined,
-						receivedAt,
-						status: "handled" as const,
-						securityLevel: 5 as const,
-						unread: false,
-						isStarred: Boolean(msg.isStarred),
-						isArchived: false,
-						isImportant: false,
-						isPinned: false,
-						messageCount: 1,
-						isSpam: false,
-						isTrashed: false,
-						direction: "outbound" as const,
-						toEmails: msg.toEmails,
-						ccEmails: msg.ccEmails ?? [],
-						bccEmails: msg.bccEmails ?? [],
-						attachments: [],
-						timeline: [
-							{
-								label: "Email composed",
-								at: receivedAt,
-								state: "done" as const,
-							},
-							{
-								label: "Sent to KumoMTA",
-								at: receivedAt,
-								state: "done" as const,
-							},
-							{
-								label: "Delivered",
-								at: receivedAt,
-								state: "done" as const,
-							},
-						],
-					};
-				})
+						const metaId = msg.threadId || msg.id;
+						const meta = threadMeta.get(metaId);
+
+						return {
+							id: msg.id,
+							mailboxId: mailbox?.id ?? "",
+							threadId: msg.threadId ?? undefined,
+							messageId: msg.id,
+							from: normalizeFrom(msg.fromEmail, msg.fromName),
+							subject: msg.subject || "(No Subject)",
+							preview: msg.textBody
+								? msg.textBody.substring(0, 120) +
+									(msg.textBody.length > 120 ? "..." : "")
+								: "",
+							bodyText: msg.textBody || "",
+							bodyHtml: msg.htmlBody || undefined,
+							receivedAt,
+							status: "handled" as const,
+							securityLevel: 5 as const,
+							unread: false,
+							isStarred: Boolean(msg.isStarred || meta?.isStarred),
+							isArchived: meta?.status === "archived",
+							isImportant: meta?.isImportant ?? false,
+							isPinned: meta?.isPinned ?? false,
+							messageCount: meta?.messageCount ?? 1,
+							isSpam: false,
+							isTrashed: meta?.status === "trash",
+							direction: "outbound" as const,
+							toEmails: msg.toEmails,
+							ccEmails: msg.ccEmails ?? [],
+							bccEmails: msg.bccEmails ?? [],
+							attachments: [],
+							timeline: [
+								{
+									label: "Email composed",
+									at: receivedAt,
+									state: "done" as const,
+								},
+								{
+									label: "Sent to KumoMTA",
+									at: receivedAt,
+									state: "done" as const,
+								},
+								{
+									label: "Delivered",
+									at: receivedAt,
+									state: "done" as const,
+								},
+							],
+						};
+					})
 			: [];
 
 		const sentIds = new Set(mappedSent.map((t) => t.id));
@@ -937,86 +946,174 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 		[mutateMessages, mutateThreads, mutateSentMessages],
 	);
 
+	const updateThreadStatusOptimistic = useCallback(
+		(threadIds: string[], status: "active" | "archived" | "trash") => {
+			const idSet = new Set(threadIds);
+			void mutateThreads(
+				(current) => {
+					const list = current ? [...current] : [];
+					const existingIds = new Set(list.map((t) => t.id));
+
+					const updated = list.map((t) =>
+						idSet.has(t.id)
+							? {
+									...t,
+									status,
+									deletedAt: status === "trash" ? new Date().toISOString() : null,
+								}
+							: t,
+					);
+
+					for (const id of threadIds) {
+						if (!existingIds.has(id)) {
+							const sentMsg = (sentMessagesData || []).find(
+								(s) => s.id === id || s.threadId === id,
+							);
+							const inMsg = (messagesData || []).find(
+								(m) => m.id === id || m.threadId === id,
+							);
+							const subject =
+								sentMsg?.subject || inMsg?.subject || "(No Subject)";
+							const preview = sentMsg?.textBody || inMsg?.snippet || "";
+							const date = sentMsg?.createdAt || inMsg?.date || new Date();
+
+							updated.push({
+								id,
+								mailboxId: inMsg?.mailboxId || "",
+								subject,
+								lastMessagePreview: preview
+									? preview.substring(0, 120)
+									: "",
+								lastMessageAt:
+									typeof date === "string" ? date : date.toISOString(),
+								status,
+								isRead: true,
+								isStarred: false,
+								isImportant: false,
+								isPinned: false,
+								messageCount: 1,
+								participants: sentMsg
+									? [sentMsg.fromEmail]
+									: inMsg
+										? [inMsg.fromEmail]
+										: [],
+								labels: [],
+								deletedAt: status === "trash" ? new Date().toISOString() : null,
+							});
+						}
+					}
+					return updated;
+				},
+				{ revalidate: false },
+			);
+		},
+		[mutateThreads, sentMessagesData, messagesData],
+	);
+
 	const archiveThread = useCallback(
 		async (threadId: string) => {
-			const res = await apiFetch(`/api/inbox/v1/threads/${threadId}/archive`, {
-				method: "POST",
-			});
+			updateThreadStatusOptimistic([threadId], "archived");
+			try {
+				const res = await apiFetch(`/api/inbox/v1/threads/${threadId}/archive`, {
+					method: "POST",
+				});
 
-			if (!res.ok) {
-				const body = await res.text();
-				throw new Error(body || "Failed to archive thread");
+				if (!res.ok) {
+					const body = await res.text();
+					throw new Error(body || "Failed to archive thread");
+				}
+
+				await Promise.all([
+					mutateMessages(),
+					mutateThreads(),
+					mutateSentMessages(),
+				]);
+			} catch (err) {
+				await mutateThreads();
+				throw err;
 			}
-
-			await Promise.all([
-				mutateMessages(),
-				mutateThreads(),
-				mutateSentMessages(),
-			]);
 		},
-		[mutateMessages, mutateThreads, mutateSentMessages],
+		[mutateMessages, mutateThreads, mutateSentMessages, updateThreadStatusOptimistic],
 	);
 
 	const unarchiveThread = useCallback(
 		async (threadId: string) => {
-			const res = await apiFetch(`/api/inbox/v1/threads/${threadId}`, {
-				method: "PATCH",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ status: "active" }),
-			});
+			updateThreadStatusOptimistic([threadId], "active");
+			try {
+				const res = await apiFetch(`/api/inbox/v1/threads/${threadId}`, {
+					method: "PATCH",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({ status: "active" }),
+				});
 
-			if (!res.ok) {
-				const body = await res.text();
-				throw new Error(body || "Failed to unarchive thread");
+				if (!res.ok) {
+					const body = await res.text();
+					throw new Error(body || "Failed to unarchive thread");
+				}
+
+				await Promise.all([
+					mutateMessages(),
+					mutateThreads(),
+					mutateSentMessages(),
+				]);
+			} catch (err) {
+				await mutateThreads();
+				throw err;
 			}
-
-			await Promise.all([
-				mutateMessages(),
-				mutateThreads(),
-				mutateSentMessages(),
-			]);
 		},
-		[mutateMessages, mutateThreads, mutateSentMessages],
+		[mutateMessages, mutateThreads, mutateSentMessages, updateThreadStatusOptimistic],
 	);
 
 	const trashThread = useCallback(
 		async (threadId: string) => {
-			const res = await apiFetch(`/api/inbox/v1/threads/${threadId}/trash`, {
-				method: "POST",
-			});
+			updateThreadStatusOptimistic([threadId], "trash");
+			try {
+				const res = await apiFetch(`/api/inbox/v1/threads/${threadId}/trash`, {
+					method: "POST",
+				});
 
-			if (!res.ok) {
-				const body = await res.text();
-				throw new Error(body || "Failed to trash thread");
+				if (!res.ok) {
+					const body = await res.text();
+					throw new Error(body || "Failed to trash thread");
+				}
+
+				await Promise.all([
+					mutateMessages(),
+					mutateThreads(),
+					mutateSentMessages(),
+				]);
+			} catch (err) {
+				await mutateThreads();
+				throw err;
 			}
-
-			await Promise.all([
-				mutateMessages(),
-				mutateThreads(),
-				mutateSentMessages(),
-			]);
 		},
-		[mutateMessages, mutateThreads, mutateSentMessages],
+		[mutateMessages, mutateThreads, mutateSentMessages, updateThreadStatusOptimistic],
 	);
 
 	const restoreThread = useCallback(
 		async (threadId: string) => {
-			const res = await apiFetch(`/api/inbox/v1/threads/${threadId}/restore`, {
-				method: "POST",
-			});
+			updateThreadStatusOptimistic([threadId], "active");
+			try {
+				const res = await apiFetch(`/api/inbox/v1/threads/${threadId}/restore`, {
+					method: "POST",
+				});
 
-			if (!res.ok) {
-				const body = await res.text();
-				throw new Error(body || "Failed to restore thread");
+				if (!res.ok) {
+					const body = await res.text();
+					throw new Error(body || "Failed to restore thread");
+				}
+
+				await Promise.all([
+					mutateMessages(),
+					mutateThreads(),
+					mutateSentMessages(),
+				]);
+			} catch (err) {
+				await mutateThreads();
+				throw err;
 			}
-
-			await Promise.all([
-				mutateMessages(),
-				mutateThreads(),
-				mutateSentMessages(),
-			]);
 		},
-		[mutateMessages, mutateThreads, mutateSentMessages],
+		[mutateMessages, mutateThreads, mutateSentMessages, updateThreadStatusOptimistic],
 	);
 
 	const toggleThreadImportant = useCallback(
@@ -1057,24 +1154,37 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 
 	const batchThreads = useCallback(
 		async (ids: string[], action: BatchThreadAction) => {
-			const res = await apiFetch("/api/inbox/v1/threads/batch", {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ ids, action }),
-			});
-
-			if (!res.ok) {
-				const body = await res.text();
-				throw new Error(body || "Failed to batch update threads");
+			if (action === "archive") {
+				updateThreadStatusOptimistic(ids, "archived");
+			} else if (action === "unarchive" || action === "restore") {
+				updateThreadStatusOptimistic(ids, "active");
+			} else if (action === "trash") {
+				updateThreadStatusOptimistic(ids, "trash");
 			}
 
-			await Promise.all([
-				mutateMessages(),
-				mutateThreads(),
-				mutateSentMessages(),
-			]);
+			try {
+				const res = await apiFetch("/api/inbox/v1/threads/batch", {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({ ids, action }),
+				});
+
+				if (!res.ok) {
+					const body = await res.text();
+					throw new Error(body || "Failed to batch update threads");
+				}
+
+				await Promise.all([
+					mutateMessages(),
+					mutateThreads(),
+					mutateSentMessages(),
+				]);
+			} catch (err) {
+				await mutateThreads();
+				throw err;
+			}
 		},
-		[mutateMessages, mutateThreads, mutateSentMessages],
+		[mutateMessages, mutateThreads, mutateSentMessages, updateThreadStatusOptimistic],
 	);
 
 	const sendReply = useCallback(

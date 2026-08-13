@@ -81,8 +81,10 @@ export interface InboxThreadRowProps {
 	onMouseEnter: (id: string) => void;
 	onToggleStar: (id: string, starred: boolean) => void;
 	onArchive: (id: string) => void;
+	onUnarchive?: (id: string) => void;
 	onDelete: (id: string) => void;
 	onToggleBulk: (id: string, event?: React.MouseEvent) => void;
+	isArchived?: boolean;
 }
 
 export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
@@ -98,8 +100,10 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 			onMouseEnter,
 			onToggleStar,
 			onArchive,
+			onUnarchive,
 			onDelete,
 			onToggleBulk,
+			isArchived,
 		},
 		ref,
 	) => {
@@ -248,17 +252,35 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 						isSelectMode && "pointer-events-none opacity-0",
 					)}
 				>
-					<button
-						type="button"
-						title="Archive"
-						onClick={(e) => {
-							e.stopPropagation();
-							onArchive(listId);
-						}}
-						className="flex size-6 items-center justify-center rounded-md hover:bg-(--inbox-control-hover)"
-					>
-						<Icon name="archive" className="h-3.5 w-3.5 text-mail-muted" />
-					</button>
+					{isArchived || thread.isArchived ? (
+						<button
+							type="button"
+							title="Move to inbox"
+							onClick={(e) => {
+								e.stopPropagation();
+								if (onUnarchive) {
+									onUnarchive(listId);
+								} else {
+									onArchive(listId);
+								}
+							}}
+							className="flex size-6 items-center justify-center rounded-md hover:bg-(--inbox-control-hover)"
+						>
+							<Icon name="inbox" className="h-3.5 w-3.5 text-mail-muted" />
+						</button>
+					) : (
+						<button
+							type="button"
+							title="Archive"
+							onClick={(e) => {
+								e.stopPropagation();
+								onArchive(listId);
+							}}
+							className="flex size-6 items-center justify-center rounded-md hover:bg-(--inbox-control-hover)"
+						>
+							<Icon name="archive" className="h-3.5 w-3.5 text-mail-muted" />
+						</button>
+					)}
 					<button
 						type="button"
 						title="Delete"

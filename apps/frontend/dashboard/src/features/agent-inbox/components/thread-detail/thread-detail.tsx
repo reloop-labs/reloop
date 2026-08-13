@@ -580,7 +580,12 @@ export const ThreadDetail = ({
 		if (!thread || !threadKey) return;
 		try {
 			await archiveThread(threadKey);
-			toast.success("Archived");
+			toast.success("Archived", {
+				action: {
+					label: "Undo",
+					onClick: () => void unarchiveThread(threadKey),
+				},
+			});
 			onBack?.();
 		} catch (err: unknown) {
 			toast.error(err instanceof Error ? err.message : "Failed to archive");
@@ -591,7 +596,12 @@ export const ThreadDetail = ({
 		if (!threadKey) return;
 		try {
 			await unarchiveThread(threadKey);
-			toast.success("Moved to inbox");
+			toast.success("Moved to inbox", {
+				action: {
+					label: "Undo",
+					onClick: () => void archiveThread(threadKey),
+				},
+			});
 			onBack?.();
 		} catch (err: unknown) {
 			toast.error(err instanceof Error ? err.message : "Failed to unarchive");
@@ -904,8 +914,12 @@ export const ThreadDetail = ({
 	useHotkeys("s", () => {
 		void handleToggleStar();
 	});
-	useHotkeys("e", () => {
-		void handleArchive();
+	useHotkeys("e, y", () => {
+		if (folder === "archive" || folder === "archived" || thread?.isArchived) {
+			void handleUnarchive();
+		} else {
+			void handleArchive();
+		}
 	});
 	useHotkeys("shift+3", () => {
 		void handleDelete();
