@@ -243,7 +243,7 @@ export default function LanguageExplorer() {
 					role="tablist"
 					aria-label="SDK languages"
 					onPointerLeave={() => setHoveredTabIdx(undefined)}
-					className="scrollbar-none relative flex gap-1 overflow-x-auto px-4 py-3 sm:px-6 sm:py-3.5 lg:px-8"
+					className="scrollbar-none relative flex gap-1 overflow-x-auto px-6 py-3 sm:px-10 sm:py-3.5 lg:px-12"
 					style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
 				>
 					{languages.map((lang, index) => {
@@ -335,7 +335,7 @@ export default function LanguageExplorer() {
 			>
 				{/* Left meta & frameworks: compact tinted rail matching framework details */}
 				<aside className="border-stroke-soft-200 border-b bg-[#fafafa] lg:col-span-3 lg:border-r lg:border-b-0 dark:border-white/10 dark:bg-white/[0.025]">
-					<div className="flex flex-col gap-4 px-4 py-6 sm:px-6 sm:py-7 lg:sticky lg:top-16 lg:px-8 lg:py-8">
+					<div className="flex flex-col gap-4 px-6 py-6 sm:px-10 sm:py-7 lg:sticky lg:top-16 lg:py-8 lg:pr-5 lg:pl-12">
 						<div className="flex items-center gap-3">
 							<div
 								className={cn(
@@ -520,7 +520,7 @@ export default function LanguageExplorer() {
 				</aside>
 
 				{/* Right: step-by-step playground */}
-				<div className="p-6 sm:p-8 lg:col-span-9 lg:p-10">
+				<div className="px-6 py-6 sm:px-10 sm:py-8 lg:col-span-9 lg:py-10 lg:pr-12 lg:pl-8">
 					<div className="flex flex-col">
 						<StepItem
 							number={1}
