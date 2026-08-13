@@ -5,7 +5,7 @@ import { getSiteUrl, socialProfiles } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 import { WhyOpenSourceComparison } from "./components/why-open-source-comparison";
 import { WhyOpenSourceDeployment } from "./components/why-open-source-deployment";
-import { WhyOpenSourceHero } from "./components/why-open-source-hero";
+import { WhyOpenSourceLetter } from "./components/why-open-source-letter";
 import { WhyOpenSourceValues } from "./components/why-open-source-values";
 
 // TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
@@ -73,10 +73,10 @@ const WhyOpenSourcePage = () => {
 		<>
 			<JsonLd data={jsonLd} />
 
-			{/* Hero & Architectural Facts */}
-			<WhyOpenSourceHero />
+			{/* Letter from Reloop Labs at the top (License page styled layered card) */}
+			<WhyOpenSourceLetter />
 
-			{/* Commitments & Values Section (2x2 Grid with Isometric Diagrams) */}
+			{/* Commitments & 4-Column Architectural Guarantees */}
 			<WhyOpenSourceValues />
 
 			{/* Comparative Operational Decision Matrix */}
