@@ -482,33 +482,39 @@ export default function LanguageExplorer() {
 						</div>
 
 						{/* Prerequisite: API key + domain */}
-						<div className="flex flex-col gap-1 border-stroke-soft-200 border-t pt-4 dark:border-white/10">
-							<p className="px-0.5 pb-1 font-semibold text-[10px] text-text-soft-400 uppercase tracking-[0.06em] dark:text-white/45">
+						<div className="-ml-2.5 mt-2 flex flex-col gap-1 border-stroke-soft-200 border-t pt-4 dark:border-white/10">
+							<div className="px-2.5 pb-1.5 font-semibold text-[10px] text-text-soft-400 uppercase tracking-[0.06em] dark:text-white/45">
 								Prerequisite
-							</p>
-							<a
-								href="/dashboard/api-keys/create"
-								className="group flex h-8 items-center gap-2.5 rounded-lg px-2.5 font-medium text-[13px] text-text-sub-600 transition-colors hover:bg-black/[0.04] hover:text-text-strong-950 dark:text-white/60 dark:hover:!bg-[#0A0A0A] dark:hover:text-white"
-							>
-								<Icon
-									name="key-new"
-									className="size-3.5 shrink-0"
-									aria-hidden
-								/>
-								Get an API key
-							</a>
-							<a
-								href="/dashboard/domain/add"
-								className="group flex h-8 items-center gap-2.5 rounded-lg px-2.5 font-medium text-[13px] text-text-sub-600 transition-colors hover:bg-black/[0.04] hover:text-text-strong-950 dark:text-white/60 dark:hover:!bg-[#0A0A0A] dark:hover:text-white"
-							>
-								<Icon
-									name="globe"
-									fill="none"
-									className="size-3.5 shrink-0"
-									aria-hidden
-								/>
-								Add a domain
-							</a>
+							</div>
+							<div className="flex w-full flex-col">
+								<a
+									href="/dashboard/api-keys/create"
+									className="group flex h-8 w-full items-center gap-2.5 rounded-lg px-2.5 font-medium text-[13px] text-text-sub-600 transition-colors hover:bg-black/[0.04] hover:text-text-strong-950 dark:text-white/60 dark:hover:!bg-[#0A0A0A] dark:hover:text-white"
+								>
+									<span className="flex size-4 shrink-0 items-center justify-center text-text-sub-600 group-hover:text-text-strong-950 dark:text-white/60 dark:group-hover:text-white">
+										<Icon
+											name="key-new"
+											className="size-3.5 shrink-0"
+											aria-hidden
+										/>
+									</span>
+									<span className="truncate">Get an API key</span>
+								</a>
+								<a
+									href="/dashboard/domain/add"
+									className="group flex h-8 w-full items-center gap-2.5 rounded-lg px-2.5 font-medium text-[13px] text-text-sub-600 transition-colors hover:bg-black/[0.04] hover:text-text-strong-950 dark:text-white/60 dark:hover:!bg-[#0A0A0A] dark:hover:text-white"
+								>
+									<span className="flex size-4 shrink-0 items-center justify-center text-text-sub-600 group-hover:text-text-strong-950 dark:text-white/60 dark:group-hover:text-white">
+										<Icon
+											name="globe"
+											fill="none"
+											className="size-3.5 shrink-0"
+											aria-hidden
+										/>
+									</span>
+									<span className="truncate">Add a domain</span>
+								</a>
+							</div>
 						</div>
 					</div>
 				</aside>

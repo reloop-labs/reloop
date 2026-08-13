@@ -167,7 +167,7 @@ export function BlogCta({
 	return (
 		<section className="w-full">
 			<div className="relative overflow-hidden border-stroke-soft-200 border-t bg-bg-white-0 dark:border-white/10 dark:bg-black">
-				<div className="relative z-10 mx-auto flex w-full max-w-5xl flex-col items-center gap-6 border-stroke-soft-200 px-4 py-10 text-center sm:px-6 sm:py-12 md:max-w-7xl md:items-start md:text-left lg:flex-row lg:items-center lg:justify-between lg:px-8 xl:border-x dark:border-white/10">
+				<div className="relative z-10 mx-auto flex w-full max-w-5xl flex-col items-center gap-6 border-stroke-soft-200 px-6 py-10 text-center sm:px-10 sm:py-12 md:max-w-7xl md:items-start md:text-left lg:flex-row lg:items-center lg:justify-between lg:px-12 xl:border-x dark:border-white/10">
 					{/* Background color gradient fill & diagonal hatch pattern */}
 					<div
 						aria-hidden
