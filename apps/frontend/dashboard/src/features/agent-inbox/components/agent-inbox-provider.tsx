@@ -285,13 +285,16 @@ interface AgentInboxContextValue {
 		}>;
 		scheduledAt?: string;
 		undoWindowSeconds?: number;
-	}) => Promise<{
-		pending?: boolean;
-		id?: string;
-		sendAt?: string;
-		messageId?: string;
-		success?: boolean;
-	} | void>;
+	}) => Promise<
+		| {
+				pending?: boolean;
+				id?: string;
+				sendAt?: string;
+				messageId?: string;
+				success?: boolean;
+		  }
+		| undefined
+	>;
 	/** Remove a pending optimistic Sent row (e.g. after Undo cancel). */
 	removeOptimisticOutbound: (pendingId: string) => void;
 	saveDraft: (input: SaveComposeDraftInput) => Promise<{ id: string }>;
@@ -602,8 +605,10 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 					.filter((msg) => !excludedThreadIds.has(msg.threadId || ""))
 					.map((msg) => {
 						const base = mapMessageToThread(msg);
-						if (msg.threadId && threadMeta.has(msg.threadId)) {
-							const meta = threadMeta.get(msg.threadId)!;
+						const meta = msg.threadId
+							? threadMeta.get(msg.threadId)
+							: undefined;
+						if (meta) {
 							const isArchived = meta.status === "archived";
 							const isTrashed = meta.status === "trash";
 							return {
@@ -858,10 +863,9 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 			// Prefer thread endpoint when we have a canonical conversation id.
 			// List APIs return email_thread.id via thread_message (thr_…); message
 			// endpoint also resolves via thread_message when only a message id is known.
-			const endpoint =
-				threadId && threadId.startsWith("thr_")
-					? `/api/inbox/v1/threads/${encodeURIComponent(threadId)}/read`
-					: `/api/inbox/v1/messages/${encodeURIComponent(id)}/read`;
+			const endpoint = threadId?.startsWith("thr_")
+				? `/api/inbox/v1/threads/${encodeURIComponent(threadId)}/read`
+				: `/api/inbox/v1/messages/${encodeURIComponent(id)}/read`;
 
 			let res: Response;
 			try {
@@ -959,7 +963,8 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 							? {
 									...t,
 									status,
-									deletedAt: status === "trash" ? new Date().toISOString() : null,
+									deletedAt:
+										status === "trash" ? new Date().toISOString() : null,
 								}
 							: t,
 					);
@@ -977,15 +982,16 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 							const preview = sentMsg?.textBody || inMsg?.snippet || "";
 							const date = sentMsg?.createdAt || inMsg?.date || new Date();
 
+							const isoDate =
+								typeof date === "string" ? date : date.toISOString();
+
 							updated.push({
 								id,
-								mailboxId: inMsg?.mailboxId || "",
+								mailboxId: inMsg?.mailboxId || null,
+								organizationId: "",
 								subject,
-								lastMessagePreview: preview
-									? preview.substring(0, 120)
-									: "",
-								lastMessageAt:
-									typeof date === "string" ? date : date.toISOString(),
+								lastMessagePreview: preview ? preview.substring(0, 120) : "",
+								lastMessageAt: isoDate,
 								status,
 								isRead: true,
 								isStarred: false,
@@ -999,6 +1005,8 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 										: [],
 								labels: [],
 								deletedAt: status === "trash" ? new Date().toISOString() : null,
+								createdAt: isoDate,
+								updatedAt: isoDate,
 							});
 						}
 					}
@@ -1014,9 +1022,12 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 		async (threadId: string) => {
 			updateThreadStatusOptimistic([threadId], "archived");
 			try {
-				const res = await apiFetch(`/api/inbox/v1/threads/${threadId}/archive`, {
-					method: "POST",
-				});
+				const res = await apiFetch(
+					`/api/inbox/v1/threads/${threadId}/archive`,
+					{
+						method: "POST",
+					},
+				);
 
 				if (!res.ok) {
 					const body = await res.text();
@@ -1033,7 +1044,12 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 				throw err;
 			}
 		},
-		[mutateMessages, mutateThreads, mutateSentMessages, updateThreadStatusOptimistic],
+		[
+			mutateMessages,
+			mutateThreads,
+			mutateSentMessages,
+			updateThreadStatusOptimistic,
+		],
 	);
 
 	const unarchiveThread = useCallback(
@@ -1061,7 +1077,12 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 				throw err;
 			}
 		},
-		[mutateMessages, mutateThreads, mutateSentMessages, updateThreadStatusOptimistic],
+		[
+			mutateMessages,
+			mutateThreads,
+			mutateSentMessages,
+			updateThreadStatusOptimistic,
+		],
 	);
 
 	const trashThread = useCallback(
@@ -1087,16 +1108,24 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 				throw err;
 			}
 		},
-		[mutateMessages, mutateThreads, mutateSentMessages, updateThreadStatusOptimistic],
+		[
+			mutateMessages,
+			mutateThreads,
+			mutateSentMessages,
+			updateThreadStatusOptimistic,
+		],
 	);
 
 	const restoreThread = useCallback(
 		async (threadId: string) => {
 			updateThreadStatusOptimistic([threadId], "active");
 			try {
-				const res = await apiFetch(`/api/inbox/v1/threads/${threadId}/restore`, {
-					method: "POST",
-				});
+				const res = await apiFetch(
+					`/api/inbox/v1/threads/${threadId}/restore`,
+					{
+						method: "POST",
+					},
+				);
 
 				if (!res.ok) {
 					const body = await res.text();
@@ -1113,7 +1142,12 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 				throw err;
 			}
 		},
-		[mutateMessages, mutateThreads, mutateSentMessages, updateThreadStatusOptimistic],
+		[
+			mutateMessages,
+			mutateThreads,
+			mutateSentMessages,
+			updateThreadStatusOptimistic,
+		],
 	);
 
 	const toggleThreadImportant = useCallback(
@@ -1184,7 +1218,12 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 				throw err;
 			}
 		},
-		[mutateMessages, mutateThreads, mutateSentMessages, updateThreadStatusOptimistic],
+		[
+			mutateMessages,
+			mutateThreads,
+			mutateSentMessages,
+			updateThreadStatusOptimistic,
+		],
 	);
 
 	const sendReply = useCallback(
