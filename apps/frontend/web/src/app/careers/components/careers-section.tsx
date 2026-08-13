@@ -86,23 +86,23 @@ function ContactDiagram() {
 
 export function CareersHero() {
 	return (
-		<section className="relative w-full border-stroke-soft-200 bg-bg-white-0 text-text-strong-950 dark:border-white/10 dark:bg-black dark:text-white">
-			<div className="mx-auto w-full max-w-5xl border-stroke-soft-200 border-x px-6 pt-28 pb-14 text-left sm:px-10 sm:pt-32 sm:pb-16 md:max-w-7xl lg:px-12 dark:border-white/10">
+		<section className="relative w-full max-w-full overflow-x-clip border-stroke-soft-200 bg-bg-white-0 text-text-strong-950 dark:border-white/10 dark:bg-black dark:text-white">
+			<div className="mx-auto flex w-full max-w-5xl flex-col items-center border-stroke-soft-200 px-6 pt-28 pb-14 text-center sm:px-10 sm:pt-32 sm:pb-16 md:max-w-7xl lg:items-start lg:px-12 lg:text-left xl:border-x dark:border-white/10">
 				{/* Main Headline */}
-				<h1 className="max-w-3xl font-semibold text-3xl text-text-strong-950 leading-[1.15] tracking-tight sm:text-4xl lg:text-[2.6rem] dark:text-white">
+				<h1 className="max-w-3xl font-semibold text-xl text-balance text-text-strong-950 leading-snug tracking-tight sm:text-4xl sm:leading-[1.15] lg:text-[2.6rem] dark:text-white">
 					Our mission is to build the email infrastructure for the next
 					generation.
 				</h1>
 
 				{/* Subheadline / Description */}
-				<p className="mt-4 max-w-2xl text-[15px] text-text-sub-600 leading-relaxed sm:text-[16px] dark:text-white/60">
+				<p className="mx-auto mt-3 max-w-2xl text-[14px] text-balance text-text-sub-600 leading-relaxed sm:mt-4 sm:text-[16px] lg:mx-0 dark:text-white/60">
 					We&apos;re redefining email infrastructure — shipping powerful,
 					groundbreaking features at every turn. Join us to revolutionize
 					developer communications.
 				</p>
 
-				{/* GitHub Green Contribution Graph */}
-				<div className="mt-10 w-full max-w-4xl">
+				{/* GitHub contribution graph — centered until lg */}
+				<div className="mx-auto mt-10 w-full max-w-4xl lg:mx-0">
 					<GitHubContributionGraph />
 				</div>
 			</div>

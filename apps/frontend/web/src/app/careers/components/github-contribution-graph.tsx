@@ -57,7 +57,7 @@ export function GitHubContributionGraph() {
 	};
 
 	return (
-		<div className="flex w-full justify-start overflow-x-auto py-2">
+		<div className="flex w-full justify-center overflow-x-auto py-2 lg:justify-start">
 			<div className="flex items-center gap-[3px]">
 				{weeks.map((week, wIndex) => (
 					<div key={wIndex} className="flex flex-col gap-[3px]">
