@@ -97,15 +97,12 @@ const WhyOpenSourcePage = () => {
 									<p>
 										You don&apos;t trust Stripe because of their homepage.
 										You trust them because every payment can be traced.
-										Email should work the same way.
 									</p>
 									<p>
-										Most providers ask you to trust a dashboard you
-										can&apos;t verify. With Reloop, retries, queues,
-										webhooks, and bounce handling are all in the open.
+										Email should work the same way.
 									</p>
 									<p className="font-medium text-text-strong-950 dark:text-white">
-										You don&apos;t have to trust us. You can verify us.
+										Don&apos;t trust our dashboard. Verify our code.
 									</p>
 								</section>
 
@@ -118,10 +115,11 @@ const WhyOpenSourcePage = () => {
 										Closed doesn&apos;t mean smarter.
 									</h2>
 									<p>
-										Every provider claims a &quot;proprietary sending
-										engine.&quot; Most of them run on the same open-source
-										components everyone else uses. The difference
-										isn&apos;t magic. It&apos;s packaging.
+										Every provider claims a &quot;proprietary engine.&quot;
+										Most run the same open-source parts everyone else does.
+									</p>
+									<p>
+										The difference isn&apos;t magic. It&apos;s marketing.
 									</p>
 									<p className="font-medium text-text-strong-950 dark:text-white">
 										Open beats mysterious.
@@ -137,14 +135,14 @@ const WhyOpenSourcePage = () => {
 										Open source isn&apos;t enough
 									</h2>
 									<p>
-										Most open-source email projects stop at the repo. You
-										still wire DNS, queues, monitoring, retries, and
-										deploys yourself. The software is free. Your time
-										isn&apos;t.
+										Free software. Not free time.
+									</p>
+									<p>
+										DNS, queues, retries, monitoring &mdash; the repo doesn&apos;t
+										do that. You do.
 									</p>
 									<p className="font-medium text-text-strong-950 dark:text-white">
-										Reloop turns open source into something you can
-										actually deploy.
+										Reloop ships the part open source leaves out: done.
 									</p>
 								</section>
 

@@ -31,35 +31,35 @@ export function OpenSourceIsntCheap() {
 					A note
 				</p>
 
-				<div className="mt-3 space-y-2.5 text-[12.5px] text-[#3d3420] leading-[1.55] sm:text-[13px] dark:text-[#e8dfc8]/88">
+				<div className="mt-3 space-y-3 text-[12.5px] text-[#3d3420] leading-[1.55] sm:text-[13px] dark:text-[#e8dfc8]/88">
 					<p className="font-semibold text-[15px] text-[#1f1a10] leading-snug tracking-tight sm:text-[16px] dark:text-[#f5efdc]">
 						Open source isn&apos;t cheap.
 					</p>
 
-					<p>
-						You might think it is. If the code is public, why would anyone
-						pay for it?
-					</p>
+					<div className="space-y-1">
+						<p>Cheap means no one paid.</p>
+						<p className="font-medium text-[#1f1a10] dark:text-[#f5efdc]">
+							This means someone paid &mdash; just not you.
+						</p>
+					</div>
 
-					<p className="font-medium text-[#1f1a10] dark:text-[#f5efdc]">
-						But look around. The internet runs on it.
-					</p>
+					<div className="space-y-1 rounded border border-[#e0d4b0]/70 bg-[#f7f0dc]/50 px-3 py-2 text-[#3d3420]/90 dark:border-[#3a3428]/80 dark:bg-[#25211b]/50 dark:text-[#e8dfc8]/85">
+						<p className="font-medium text-[12.5px] text-[#1f1a10] tracking-tight dark:text-[#f5efdc]">
+							Linux &middot; Postgres &middot; K8s &middot; React
+						</p>
+						<p className="text-[12px] text-[#8a7a55] dark:text-[#a89870]">
+							Free to use. Never free to build.
+						</p>
+					</div>
 
-					<ul className="list-none space-y-1 pl-0 text-[#3d3420]/90 dark:text-[#e8dfc8]/75">
-						<li>Google · Stripe · startups · your tools</li>
-						<li>Linux · Postgres · K8s · React</li>
-					</ul>
-
-					<p className="border-[#e0d4b0] border-t pt-2.5 font-semibold text-[#1f1a10] dark:border-[#3a3428] dark:text-[#f5efdc]">
-						Not the cheap alternative. The foundation.
-					</p>
-
-					<p>
-						So why treat email infrastructure differently?
-					</p>
+					<p>Email infrastructure deserves the same honesty.</p>
 
 					<p className="font-medium text-[#1f1a10] italic dark:text-[#f5efdc]">
 						That&apos;s why we built Reloop.
+					</p>
+
+					<p className="border-[#e0d4b0] border-t pt-3 font-semibold text-[#1f1a10] text-[12.5px] leading-snug sm:text-[13px] dark:border-[#3a3428] dark:text-[#f5efdc]">
+						&ldquo;Take open source away for a week. Watch &apos;enterprise-grade&apos; collapse.&rdquo;
 					</p>
 				</div>
 			</article>
