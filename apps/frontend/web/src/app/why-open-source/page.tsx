@@ -13,7 +13,7 @@ const pagePath = "/why-open-source";
 const pageUrl = `${getSiteUrl()}${pagePath}`;
 const pageTitle = "Why Open Source | Reloop";
 const pageDescription =
-	"Why open source matters for email infrastructure: verify claims in code, skip black-box vendors, and run the same Apache 2.0 product on reloop.sh or self-host.";
+	"Don't take our word for it. Reloop is open-source email infrastructure you can verify in code: no black-box claims page, single-click deploy, real product UI and DX.";
 
 export const metadata: Metadata = {
 	title: pageTitle,
@@ -73,86 +73,99 @@ const WhyOpenSourcePage = () => {
 			<section className="relative w-full max-w-full overflow-x-clip border-stroke-soft-200 bg-bg-white-0 text-text-strong-950 dark:border-white/10 dark:bg-black dark:text-white">
 				<div className="mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-200 border-x px-6 pt-28 pb-16 sm:px-10 sm:pt-32 sm:pb-20 md:max-w-7xl lg:px-12 dark:border-white/10">
 					{/* Essay sits left within the bordered column */}
-					<div className="max-w-2xl">
+					<div className="w-full max-w-2xl">
 						{/* Title sizing matches changelog */}
 						<h1 className="font-semibold text-text-strong-950 text-xl leading-snug tracking-tight sm:text-2xl lg:text-[1.65rem] dark:text-white">
 							Why Open Source
 						</h1>
 
-						<div className="mt-6 space-y-8 text-[14px] text-text-sub-600 leading-relaxed sm:text-[14.5px] dark:text-white/60">
-							{/* Why "trust us" isn't good enough */}
-							<div className="space-y-3">
-								<h2 className="font-semibold text-[15px] text-text-strong-950 tracking-tight sm:text-[16px] dark:text-white">
-									Why &quot;trust us&quot; isn&apos;t good enough
-								</h2>
-								<p>
-									Every email API makes big claims about what&apos;s
-									happening under the hood: proprietary retry logic,
-									&quot;smart&quot; deliverability engines, custom-built
-									infrastructure. They back it up with clean dashboards
-									and confident marketing copy. But none of it is
-									verifiable. You&apos;re taking their word for it.
-								</p>
-								<p>
-									Here&apos;s the uncomfortable truth: a lot of that
-									&quot;proprietary&quot; infrastructure is built on the
-									same open-source foundations everyone else uses. The
-									logic might be identical to what&apos;s sitting in a
-									public repo somewhere. What you pay a premium for is
-									the closed label, the landing page confidence, and the
-									claim that their secret sauce is unique. It often
-									isn&apos;t. You&apos;re charged enterprise prices for
-									software you cannot inspect, while the hard parts under
-									the hood may be the same open tools everyone else runs.
-									Good branding isn&apos;t the same as good engineering,
-									and from outside a black box you have no way to tell
-									them apart.
-								</p>
-								<p>
-									With Reloop, you don&apos;t have to take our word for
-									anything. The retry logic, the bounce handling, the
-									webhook signing: it&apos;s all right there in the code.
-									If we say we do something a certain way, you can go
-									verify it in ten minutes instead of trusting a claims
-									page. That&apos;s the actual difference open source
-									makes: not that we&apos;re smarter, but that you
-									don&apos;t have to guess.
-								</p>
-							</div>
+						{/* Short scroll-stopper before the sections */}
+						<p className="mt-5 max-w-xl text-[15px] text-text-sub-600 leading-snug sm:text-[16px] dark:text-white/55">
+							Closed email tools sell trust. We sell a repo you can open.
+						</p>
 
-							{/* 3 — Where open source fails */}
-							<div className="space-y-3">
+						<div className="mt-10 space-y-12 text-[14px] text-text-sub-600 leading-relaxed sm:text-[14.5px] dark:text-white/60">
+							{/* 1 */}
+							<section className="space-y-4">
 								<h2 className="font-semibold text-[15px] text-text-strong-950 tracking-tight sm:text-[16px] dark:text-white">
-									Where open source usually fails
+									<span className="mr-2 text-text-sub-600 tabular-nums dark:text-white/45">
+										1.
+									</span>
+									Trust
 								</h2>
 								<p>
-									Most &quot;open&quot; email projects are a demo, a raw
-									MTA that still needs months of glue, or a public repo
-									that drifts from the hosted product. Stars are not a
-									product.
+									You don&apos;t trust Stripe because of their homepage. You
+									trust them because every payment can be traced.
 								</p>
-							</div>
+								<p>Email should work the same way.</p>
+								<p>
+									Today, most email providers ask you to trust a dashboard you
+									can&apos;t verify. If an email disappears, you&apos;re left
+									opening a support ticket.
+								</p>
+								<p>We think trust should be inspectable.</p>
+								<p>
+									With Reloop, the logic isn&apos;t hidden behind a marketing
+									page. The retries, queues, webhooks, and bounce handling are
+									all in the open.
+								</p>
+								<p className="font-medium text-text-strong-950 dark:text-white">
+									You don&apos;t have to trust us. You can verify us.
+								</p>
+							</section>
 
-							{/* 4 — How Reloop is different */}
-							<div className="space-y-3">
+							{/* 2 */}
+							<section className="space-y-4">
 								<h2 className="font-semibold text-[15px] text-text-strong-950 tracking-tight sm:text-[16px] dark:text-white">
-									How Reloop is built differently
+									<span className="mr-2 text-text-sub-600 tabular-nums dark:text-white/45">
+										2.
+									</span>
+									Closed doesn't mean smarter.
 								</h2>
 								<p>
-									Reloop is{" "}
-									<strong className="font-semibold text-text-strong-950 dark:text-white">
-										Apache 2.0
-									</strong>
-									. Cloud and self-host run the same monorepo: APIs,
-									SMTP, webhooks, templates, analytics, and routing. Use
-									reloop.sh for zero ops, or{" "}
-									<code className="rounded bg-bg-weak-50 px-1 py-0.5 font-mono text-[12.5px] text-text-strong-950 dark:bg-white/10 dark:text-white">
-										docker compose up
-									</code>{" "}
-									in your VPC. Same code. No enterprise fork. Leave
-									whenever you want.
+									Every provider claims they have a &quot;proprietary sending
+									engine.&quot;
 								</p>
-							</div>
+								<p>The funny part?</p>
+								<p>
+									Most of them are built on the same open-source components
+									everyone else uses.
+								</p>
+								<p>The difference isn&apos;t magic.</p>
+								<p>It&apos;s packaging.</p>
+								<p>
+									We&apos;d rather show you exactly how our system works than
+									ask you to believe ours is somehow smarter.
+								</p>
+								<p className="font-medium text-text-strong-950 dark:text-white">
+									Open beats mysterious.
+								</p>
+							</section>
+
+							{/* 3 */}
+							<section className="space-y-4">
+								<h2 className="font-semibold text-[15px] text-text-strong-950 tracking-tight sm:text-[16px] dark:text-white">
+									<span className="mr-2 text-text-sub-600 tabular-nums dark:text-white/45">
+										3.
+									</span>
+									Open Source Isn&apos;t Enough
+								</h2>
+								<p>Most open-source email projects stop at the repository.</p>
+								<p>You still have to wire everything together yourself.</p>
+								<ul className="list-disc space-y-2 pl-5 marker:text-text-sub-600 dark:marker:text-white/40">
+									<li>DNS.</li>
+									<li>Queues.</li>
+									<li>Monitoring.</li>
+									<li>Retries.</li>
+									<li>Deployments.</li>
+								</ul>
+								<p>The software is free.</p>
+								<p>Your time isn&apos;t.</p>
+								<p className="font-medium text-text-strong-950 dark:text-white">
+									Reloop turns an open-source project into a product you can
+									actually deploy.
+								</p>
+							</section>
 
 							<div className="pt-1">
 								<FancyButton.Root
