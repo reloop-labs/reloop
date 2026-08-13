@@ -4,8 +4,8 @@ Disposable, role and free-provider detection for email addresses. Pure
 in-memory lookups — no network calls, no database, no I/O beyond reading the
 vendored catalogue once per process.
 
-Used by the [validation service](../../apps/backend/validation) behind
-`/api/validation`, and available to any other service that wants to reject
+Used by the [tool service](../../apps/backend/tool) behind
+`/api/tool`, and available to any other service that wants to reject
 throwaway addresses at the point they arrive.
 
 ## Usage

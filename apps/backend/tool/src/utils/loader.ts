@@ -1,14 +1,10 @@
-import { withDeadline } from "@be/validation/utils/deadline";
-import { validationConfig } from "@be/validation/validation.config";
+import { toolConfig } from "@be/tool/tool.config";
+import { withDeadline } from "@be/tool/utils/deadline";
 import { RedisCache } from "@reloop/cache/redis-client";
 import { warmCatalogue } from "@reloop/email-validation";
 import { log } from "evlog";
 
-export const redis = new RedisCache(
-	"validation",
-	60,
-	validationConfig.REDIS_URL,
-);
+export const redis = new RedisCache("tool", 60, toolConfig.REDIS_URL);
 
 export const loader = async () => {
 	try {

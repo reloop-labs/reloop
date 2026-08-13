@@ -1,7 +1,7 @@
 import { Elysia } from "elysia";
 
 export const agentCardRoute = new Elysia().get("/agent-card.json", () => ({
-	name: "Validation Service",
+	name: "Tool Service",
 	version: "1.0.0",
 	description:
 		"Checks email addresses for disposable domains, role addresses and free consumer providers. Public, unauthenticated and stateless.",
@@ -13,9 +13,9 @@ export const agentCardRoute = new Elysia().get("/agent-card.json", () => ({
 		{
 			id: "health_check",
 			name: "Health Check",
-			description: "Check the health of the validation service.",
+			description: "Check the health of the tool service.",
 			method: "GET",
-			path: "/api/validation/health",
+			path: "/api/tool/health",
 			tags: ["monitoring"],
 			inputSchema: {},
 			outputSchema: {
@@ -31,8 +31,8 @@ export const agentCardRoute = new Elysia().get("/agent-card.json", () => ({
 			description:
 				"Report whether an email address or bare domain is disposable, a role address, or from a free consumer provider.",
 			method: "POST",
-			path: "/api/validation/v1/check",
-			tags: ["validation"],
+			path: "/api/tool/v1/check",
+			tags: ["tool"],
 			inputSchema: {
 				email: {
 					type: "string",

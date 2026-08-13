@@ -1,23 +1,23 @@
-# Validation Service API
+# Tool Service API
 
 Public email-address validation: disposable domains, role addresses and free
 consumer providers. Powers the [temp email checker](https://reloop.sh/tools/temp-email-checker).
 
 ## 🔗 Quick Links
 
-- 📚 **Documentation**: [Setup Guide](https://reloop.sh/docs/setup/backend/validation)
-- 🌐 **Production API**: [API Base](https://reloop.sh/api/validation)
-- 📜 **OpenAPI Spec**: [OpenAPI](https://reloop.sh/api/validation/openapi)
+- 📚 **Documentation**: [Setup Guide](https://reloop.sh/docs/setup/backend/tool)
+- 🌐 **Production API**: [API Base](https://reloop.sh/api/tool)
+- 📜 **OpenAPI Spec**: [OpenAPI](https://reloop.sh/api/tool/openapi)
 
 ## Endpoints
 
 | Method | Path | Purpose |
 |---|---|---|
-| `POST` | `/api/validation/v1/check` | Check an address or bare domain |
-| `GET` | `/api/validation/v1/check?email=…` | Same, for links and `curl` |
+| `POST` | `/api/tool/v1/check` | Check an address or bare domain |
+| `GET` | `/api/tool/v1/check?email=…` | Same, for links and `curl` |
 
 ```bash
-curl -X POST https://local.reloop.sh/api/validation/v1/check \
+curl -X POST https://local.reloop.sh/api/tool/v1/check \
   -H 'content-type: application/json' \
   -d '{"email":"you@mailinator.com"}'
 ```
@@ -58,11 +58,11 @@ Verdicts are `invalid`, `disposable`, `risky` (a real but shared team inbox) or
 ## Dev
 
 ```bash
-bun run be:validation:dev
+bun run be:tool:dev
 ```
 
 Or via root `bun run dev` / `bun run backend:dev`. Serves on **8026**, proxied
-at `/api/validation` (see `local/Caddyfile`).
+at `/api/tool` (see `local/Caddyfile`).
 
 The service loads ~210k domains into memory at boot (~60ms, ~25MB). `/health`
 reports `catalogueSize` and fails if the catalogue is empty.
@@ -79,9 +79,9 @@ See the [package README](../../../packages/email-validation/README.md).
 
 ## 🔗 Resources & Community
 
-- 📚 **Docs**: [Documentation](https://reloop.sh/docs/setup/backend/validation)
-- 🤖 **Discovery**: [Discovery Spec](https://reloop.sh/api/validation/agent-card.json)
-- 📖 **OpenAPI**: [OpenAPI Spec](https://reloop.sh/api/validation/openapi)
+- 📚 **Docs**: [Documentation](https://reloop.sh/docs/setup/backend/tool)
+- 🤖 **Discovery**: [Discovery Spec](https://reloop.sh/api/tool/agent-card.json)
+- 📖 **OpenAPI**: [OpenAPI Spec](https://reloop.sh/api/tool/openapi)
 - 🐙 **GitHub**: [Source Code](https://github.com/reloop-labs/reloop)
 - 🆘 **Support**: [Get Help](https://reloop.sh/support)
 - 💬 **Discord**: [Join Chat](https://discord.gg/bHnkBcp7xR)

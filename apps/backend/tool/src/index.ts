@@ -1,10 +1,10 @@
 import "dotenv/config";
-import { agentCardRoute } from "@be/validation/routes/landing/agent-card.route";
-import { healthRoute } from "@be/validation/routes/landing/health.route";
-import { landingRoute } from "@be/validation/routes/landing/landing.route";
-import { validationRoutes } from "@be/validation/routes/validation/validation.routes";
-import { loader } from "@be/validation/utils/loader";
-import { validationConfig } from "@be/validation/validation.config";
+import { agentCardRoute } from "@be/tool/routes/landing/agent-card.route";
+import { healthRoute } from "@be/tool/routes/landing/health.route";
+import { landingRoute } from "@be/tool/routes/landing/landing.route";
+import { toolRoutes } from "@be/tool/routes/tool/tool.routes";
+import { toolConfig } from "@be/tool/tool.config";
+import { loader } from "@be/tool/utils/loader";
 import { opentelemetry } from "@elysia/opentelemetry";
 import { cors } from "@elysiajs/cors";
 import { openapi } from "@elysiajs/openapi";
@@ -36,20 +36,20 @@ const parseOtlpHeaders = (
 };
 
 initLogger({
-	env: { service: "validation" },
-	drain: validationConfig.OTEL_EXPORTER_OTLP_ENDPOINT
+	env: { service: "tool" },
+	drain: toolConfig.OTEL_EXPORTER_OTLP_ENDPOINT
 		? createOTLPDrain({
-				endpoint: validationConfig.OTEL_EXPORTER_OTLP_ENDPOINT,
-				headers: parseOtlpHeaders(validationConfig.OTEL_EXPORTER_OTLP_HEADERS),
+				endpoint: toolConfig.OTEL_EXPORTER_OTLP_ENDPOINT,
+				headers: parseOtlpHeaders(toolConfig.OTEL_EXPORTER_OTLP_HEADERS),
 			})
 		: undefined,
 });
 
-const port = validationConfig.port;
+const port = toolConfig.port;
 
-const validationService = new Elysia({
-	prefix: "/api/validation",
-	name: "Validation Service",
+const toolService = new Elysia({
+	prefix: "/api/tool",
+	name: "Tool Service",
 })
 	.use(secureHeadersPlugin({ profile: "api" }))
 	.use(
@@ -80,7 +80,7 @@ const validationService = new Elysia({
 		openapi({
 			documentation: {
 				info: {
-					title: "Validation Service",
+					title: "Tool Service",
 					version: "1.0.0",
 					description:
 						"Disposable, role and free-provider checks for email addresses. Public and unauthenticated — no API key required, rate limited per IP.",
@@ -97,7 +97,7 @@ const validationService = new Elysia({
 			set.status = 400;
 			return {
 				message: "Invalid request",
-				why: `Expected an "email" field holding an address or domain of 1–${validationConfig.constants.maxInputLength} characters.`,
+				why: `Expected an "email" field holding an address or domain of 1–${toolConfig.constants.maxInputLength} characters.`,
 				fix: 'Send {"email": "you@example.com"} as JSON, or use GET /v1/check?email=you@example.com',
 			};
 		}
@@ -114,15 +114,15 @@ const validationService = new Elysia({
 	.use(landingRoute)
 	.use(healthRoute)
 	.use(agentCardRoute)
-	.use(validationRoutes)
+	.use(toolRoutes)
 	.onStart(async () => {
 		await loader();
 	})
 	.listen(port, () => {
 		log.info(
-			"Validation Service",
-			`Running on:\n  - Local: http://localhost:${port}/api/validation\n  - Base:  ${validationConfig.BASE_URL}/api/validation`,
+			"Tool Service",
+			`Running on:\n  - Local: http://localhost:${port}/api/tool\n  - Base:  ${toolConfig.BASE_URL}/api/tool`,
 		);
 	});
 
-export type ValidationService = typeof validationService;
+export type ToolService = typeof toolService;

@@ -6,7 +6,7 @@ WORKDIR /app
 RUN apk add --no-cache python3 make g++
 
 COPY . .
-RUN bun --filter=be-validation install
+RUN bun --filter=be-tool install
 
 FROM base AS builder
 WORKDIR /app
@@ -16,7 +16,7 @@ ENV NODE_ENV=${NODE_ENV}
 
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-RUN bun run --filter=be-validation build
+RUN bun run --filter=be-tool build
 
 FROM base AS runner
 WORKDIR /app
@@ -32,16 +32,16 @@ ARG BUILD_DATE
 # Set environment variables
 ENV APP_VERSION=${APP_VERSION}
 
-COPY --from=builder /app/apps/backend/validation/dist ./dist
+COPY --from=builder /app/apps/backend/tool/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
 # Carries packages/email-validation/data — the catalogue is read from disk at
 # runtime, so the service will not start correctly without it.
 COPY --from=builder /app/packages ./packages
-COPY --from=builder /app/apps/backend/validation/package.json ./package.json
+COPY --from=builder /app/apps/backend/tool/package.json ./package.json
 
 # Standard OCI labels
-LABEL org.opencontainers.image.title="reloop-validation" \
-      org.opencontainers.image.description="Reloop Validation Service" \
+LABEL org.opencontainers.image.title="reloop-tool" \
+      org.opencontainers.image.description="Reloop Tool Service" \
       org.opencontainers.image.version=${APP_VERSION} \
       org.opencontainers.image.created=${BUILD_DATE} \
       org.opencontainers.image.source="https://github.com/reloop-labs/reloop"

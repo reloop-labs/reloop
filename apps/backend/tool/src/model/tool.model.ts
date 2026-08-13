@@ -1,4 +1,4 @@
-import { validationConfig } from "@be/validation/validation.config";
+import { toolConfig } from "@be/tool/tool.config";
 import { t } from "elysia";
 
 const signalStatus = t.Union([
@@ -8,11 +8,11 @@ const signalStatus = t.Union([
 	t.Literal("neutral"),
 ]);
 
-export namespace ValidationModel {
+export namespace ToolModel {
 	export const checkBody = t.Object({
 		email: t.String({
 			minLength: 1,
-			maxLength: validationConfig.constants.maxInputLength,
+			maxLength: toolConfig.constants.maxInputLength,
 			description: "An email address or a bare domain.",
 			examples: ["you@mailinator.com", "tempmail.com"],
 		}),
@@ -21,7 +21,7 @@ export namespace ValidationModel {
 	export const checkQuery = t.Object({
 		email: t.String({
 			minLength: 1,
-			maxLength: validationConfig.constants.maxInputLength,
+			maxLength: toolConfig.constants.maxInputLength,
 			description: "An email address or a bare domain.",
 		}),
 	});

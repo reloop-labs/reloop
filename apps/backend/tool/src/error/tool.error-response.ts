@@ -1,12 +1,12 @@
-import { validationConfig } from "@be/validation/validation.config";
+import { toolConfig } from "@be/tool/tool.config";
 import { createError } from "evlog";
 
-export const ValidationErrors = {
+export const ToolErrors = {
 	inputTooLong: () =>
 		createError({
 			status: 400,
 			message: "Input too long",
-			why: `An email address cannot exceed ${validationConfig.constants.maxInputLength} characters.`,
+			why: `An email address cannot exceed ${toolConfig.constants.maxInputLength} characters.`,
 			fix: "Check the value you sent — it looks like more than a single address.",
 		}),
 	emptyInput: () =>

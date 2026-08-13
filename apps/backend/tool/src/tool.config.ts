@@ -1,4 +1,4 @@
-export const validationConfig = {
+export const toolConfig = {
 	port: Number(process.env.PORT || "8026"),
 	REDIS_URL: process.env.REDIS_URL || "redis://:reloop123@localhost:6379",
 	BASE_URL: process.env.BASE_URL || "https://local.reloop.sh",

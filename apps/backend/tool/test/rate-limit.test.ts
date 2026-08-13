@@ -59,16 +59,16 @@ const redisDelegate = {
 	healthCheck: () => activeRedis.healthCheck(),
 };
 
-mock.module("@be/validation/utils/loader", () => ({
+mock.module("@be/tool/utils/loader", () => ({
 	redis: redisDelegate,
 	loader: async () => {},
 }));
 
 const { Elysia } = await import("elysia");
 const { rateLimitPlugin } = await import("../src/middleware/rate-limit");
-const { validationConfig } = await import("../src/validation.config");
+const { toolConfig } = await import("../src/tool.config");
 
-const { rateLimitMax } = validationConfig.constants;
+const { rateLimitMax } = toolConfig.constants;
 
 const app = new Elysia()
 	.use(rateLimitPlugin)
