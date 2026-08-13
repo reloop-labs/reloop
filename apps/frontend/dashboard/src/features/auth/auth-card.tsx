@@ -102,14 +102,16 @@ export function AuthCard({
 				<AnimatedHeight>
 					<div className="space-y-6 overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 px-6 pt-5 pb-7 dark:border-stroke-soft-100/40 dark:bg-[#0c0c0c]">
 						{showBrandMark ? (
-							<div
-								className="w-fit overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-soft-50 dark:border-stroke-soft-100/40 dark:bg-white/[0.03]"
-								aria-hidden
+							// Plain <a> so we leave /dashboard basePath and hit the marketing site root.
+							<a
+								href="/"
+								aria-label="Reloop home"
+								className="block w-fit overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-soft-50 transition-opacity hover:opacity-80 dark:border-stroke-soft-100/40 dark:bg-white/[0.03]"
 							>
 								<div className="m-px flex size-11 items-center justify-center rounded-[14px] border border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-[#0c0c0c]">
 									<Logo className="h-10 w-10" />
 								</div>
-							</div>
+							</a>
 						) : null}
 
 						{children}
