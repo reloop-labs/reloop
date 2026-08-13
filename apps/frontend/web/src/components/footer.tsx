@@ -188,7 +188,7 @@ export const Footer = () => {
 
 	return (
 		<footer className="w-full border-stroke-soft-200 border-t border-b bg-bg-white-0 text-text-strong-950 dark:border-white/10 dark:bg-black dark:text-white">
-			<div className="mx-auto w-full max-w-5xl border-stroke-soft-200 border-x md:max-w-7xl dark:border-white/10">
+			<div className="mx-auto w-full max-w-5xl border-stroke-soft-200 md:max-w-7xl xl:border-x dark:border-white/10">
 				<div className="px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
 					<div className="flex h-full flex-col gap-12 lg:flex-row lg:items-stretch lg:gap-20">
 						<div className="flex flex-col justify-between gap-8 lg:w-48 lg:self-stretch">
@@ -256,9 +256,9 @@ export const Footer = () => {
 
 			{/* Full-width Divider Line across the entire viewport */}
 			<div className="w-full border-stroke-soft-200 border-t dark:border-white/10">
-				<div className="mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-200 border-x sm:flex-row sm:items-stretch sm:justify-between md:max-w-7xl dark:border-white/10">
+				<div className="mx-auto flex w-full max-w-5xl flex-row items-stretch justify-between border-stroke-soft-200 md:max-w-7xl xl:border-x dark:border-white/10">
 					{/* Left: Theme Switcher Icons */}
-					<div className="flex items-center px-4 py-3">
+					<div className="flex items-center px-4 py-3 sm:px-6 lg:px-8">
 						<div className="inline-flex items-center rounded-full border border-stroke-soft-200 bg-bg-weak-50 p-0.5 dark:border-white/10 dark:bg-white/[0.04]">
 							<button
 								type="button"
@@ -305,7 +305,7 @@ export const Footer = () => {
 							href="https://github.com/reloop-labs/reloop"
 							target="_blank"
 							rel="noreferrer"
-							className="flex h-14 w-14 items-center justify-center border-stroke-soft-200 border-t transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 sm:border-t-0 sm:border-l dark:border-white/10 dark:hover:bg-white/[0.04] dark:hover:text-white"
+							className="flex w-12 items-center justify-center border-stroke-soft-200 border-l transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 sm:w-14 dark:border-white/10 dark:hover:bg-white/[0.04] dark:hover:text-white"
 							aria-label="GitHub"
 						>
 							<Icon name="github" className="size-4" />
@@ -314,7 +314,7 @@ export const Footer = () => {
 							href="https://x.com/reloophq"
 							target="_blank"
 							rel="noreferrer"
-							className="flex h-14 w-14 items-center justify-center border-stroke-soft-200 border-l transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-white/10 dark:hover:bg-white/[0.04] dark:hover:text-white"
+							className="flex w-12 items-center justify-center border-stroke-soft-200 border-l transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 sm:w-14 dark:border-white/10 dark:hover:bg-white/[0.04] dark:hover:text-white"
 							aria-label="X"
 						>
 							<Icon name="twitter" className="size-4" />
@@ -323,7 +323,7 @@ export const Footer = () => {
 							href="https://linkedin.com/company/reloop"
 							target="_blank"
 							rel="noreferrer"
-							className="flex h-14 w-14 items-center justify-center border-stroke-soft-200 border-l transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-white/10 dark:hover:bg-white/[0.04] dark:hover:text-white"
+							className="flex w-12 items-center justify-center border-stroke-soft-200 border-l transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 sm:w-14 dark:border-white/10 dark:hover:bg-white/[0.04] dark:hover:text-white"
 							aria-label="LinkedIn"
 						>
 							<Icon name="linkedin" className="size-4" />
