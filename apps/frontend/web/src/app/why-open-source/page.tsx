@@ -4,6 +4,7 @@ import { JsonLd } from "@reloop/web/components/json-ld";
 import { BlogCta } from "@reloop/web/components/landing/blog/blog-cta";
 import { getSiteUrl, socialProfiles } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
+import { OpenSourceIsntCheap } from "./components/open-source-isnt-cheap";
 
 // TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
 // See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
@@ -192,6 +193,9 @@ const WhyOpenSourcePage = () => {
 					</div>
 				</div>
 			</section>
+
+			{/* Open source isn't cheap — misconception section */}
+			<OpenSourceIsntCheap />
 
 			{/* Full-width bottom CTA */}
 			<BlogCta
