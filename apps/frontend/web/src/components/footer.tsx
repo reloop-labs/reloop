@@ -179,8 +179,6 @@ function FooterLinkItem({ link }: { link: FooterLink }) {
 	);
 }
 
-const statusUrl = "https://status.reloop.sh/status/live";
-
 export const Footer = () => {
 	const { theme, setTheme } = useTheme();
 	const [mounted, setMounted] = useState(false);
@@ -194,7 +192,7 @@ export const Footer = () => {
 			<div className="mx-auto w-full max-w-5xl border-stroke-soft-200 md:max-w-7xl xl:border-x dark:border-white/10">
 				<div className="px-6 py-10 sm:px-10 sm:py-16 lg:px-12 lg:py-20">
 					<div className="flex h-full flex-col gap-8 sm:gap-12 lg:flex-row lg:items-stretch lg:gap-20">
-						<div className="flex flex-row items-center justify-between gap-4 lg:w-48 lg:flex-col lg:items-start lg:justify-between lg:self-stretch">
+						<div className="flex shrink-0 lg:w-48">
 							<div className="-ml-2 -mt-2 flex shrink-0 flex-col">
 								<Link
 									href="/"
@@ -207,17 +205,6 @@ export const Footer = () => {
 									</span>
 								</Link>
 							</div>
-							<Link
-								href={statusUrl}
-								target="_blank"
-								rel="noreferrer"
-								className="inline-flex shrink-0 items-center gap-2 transition-opacity hover:opacity-80"
-							>
-								<span className="size-2 shrink-0 rounded-full bg-[#0070F3]" />
-								<span className="font-mono text-[#0070F3] text-[10px] uppercase tracking-wide sm:text-[11px]">
-									System Status
-								</span>
-							</Link>
 						</div>
 
 						<div className="flex min-w-0 flex-1 flex-col gap-8 sm:gap-10 lg:gap-12">
