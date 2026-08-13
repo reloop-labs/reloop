@@ -2,9 +2,13 @@ import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
+import * as Tooltip from "@reloop/ui/tooltip";
 import { useQueryClient } from "@tanstack/react-query";
 import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
-import { useState } from "react";
+import { useCallback, useRef, useState } from "react";
+import { useHotkeys } from "react-hotkeys-hook";
+import { dataTableToolbarControlClassName } from "#/components/data-table/toolbar-control";
+import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import { useSentEmailsQuery } from "#/features/emails/hooks/use-emails-query";
 import { DateRangeFilter } from "#/features/logs/date-range-filter";
@@ -13,6 +17,8 @@ import { ApiKeySelector } from "./api-key-selector";
 import { DomainSelector } from "./domain-selector";
 import { EmailTable } from "./email-table";
 import { StatusSelector } from "./status-selector";
+
+const SEARCH_INPUT_ID = "sent-emails-search-input";
 
 export function EmailList() {
 	const { activeOrganization } = useActiveOrganization();
@@ -50,6 +56,16 @@ export function EmailList() {
 		"preset",
 		parseAsString.withDefault(""),
 	);
+
+	const searchInputRef = useRef<HTMLInputElement>(null);
+
+	const focusSearch = useCallback(() => {
+		const input =
+			searchInputRef.current ?? document.getElementById(SEARCH_INPUT_ID);
+		if (!(input instanceof HTMLInputElement)) return;
+		input.focus();
+		input.select();
+	}, []);
 
 	const listParams = {
 		page: currentPage ?? 1,
@@ -102,11 +118,29 @@ export function EmailList() {
 		void setCurrentPage(1);
 	};
 
-	const handleRefresh = () => {
+	const handleRefresh = useCallback(() => {
 		void queryClient.invalidateQueries({
 			queryKey: [...queryKeys.emails.all, "sent"],
 		});
-	};
+	}, [queryClient]);
+
+	useHotkeys(
+		"r",
+		(e) => {
+			e.preventDefault();
+			handleRefresh();
+		},
+		{ enableOnFormTags: false, preventDefault: true },
+	);
+
+	useHotkeys(
+		"slash",
+		(e) => {
+			e.preventDefault();
+			focusSearch();
+		},
+		{ enableOnFormTags: false, preventDefault: true },
+	);
 
 	if (error) {
 		return (
@@ -163,23 +197,74 @@ export function EmailList() {
 							Clear filters
 						</Button.Root>
 					)}
-					<button
-						type="button"
-						onClick={handleRefresh}
-						disabled={isFetching}
-						className={cn(
-							"ml-auto flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-white-0 text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-stroke-soft-100/40",
-							isFetching ? "pointer-events-none" : "cursor-pointer",
-						)}
-						title="Refresh sent emails"
-						aria-label="Refresh sent emails"
-						aria-busy={isFetching}
-					>
-						<Icon
-							name="rotate-cw"
-							className={cn("h-4 w-4", isFetching && "animate-spin")}
-						/>
-					</button>
+					<div className="ml-auto flex items-center gap-2">
+						<Tooltip.Provider delayDuration={200}>
+							<Tooltip.Root>
+								<Tooltip.Trigger asChild>
+									<button
+										type="button"
+										onClick={handleRefresh}
+										disabled={isFetching}
+										className={cn(
+											dataTableToolbarControlClassName,
+											"gap-2 px-1.5",
+											isFetching ? "pointer-events-none" : "cursor-pointer",
+										)}
+										aria-label="Refresh sent emails"
+										aria-keyshortcuts="r"
+										aria-busy={isFetching}
+									>
+										<Icon
+											name="rotate-cw"
+											className={cn(
+												"h-3.5 w-3.5 shrink-0",
+												isFetching && "animate-spin",
+											)}
+										/>
+										<ActionKbd>R</ActionKbd>
+									</button>
+								</Tooltip.Trigger>
+								<Tooltip.Content
+									side="top"
+									sideOffset={-1}
+									size="medium"
+									variant="light"
+									className="max-w-63 p-2.5"
+								>
+									<div className="flex items-start gap-2.5">
+										<div
+											className={cn(
+												"mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-lg",
+												"bg-bg-weak-50 ring-1 ring-stroke-soft-200",
+											)}
+											aria-hidden
+										>
+											<Icon
+												name="rotate-cw"
+												className={cn(
+													"h-3.5 w-3.5 text-text-sub-600",
+													isFetching && "animate-spin",
+												)}
+											/>
+										</div>
+										<div className="min-w-0 flex-1">
+											<div className="flex items-center justify-between gap-3">
+												<p className="font-medium text-label-sm text-text-strong-950">
+													{isFetching ? "Refreshing…" : "Refresh"}
+												</p>
+												<ActionKbd>R</ActionKbd>
+											</div>
+											<p className="mt-0.5 text-paragraph-xs text-text-sub-600">
+												{isFetching
+													? "Fetching sent emails."
+													: "Reload sent emails from the server."}
+											</p>
+										</div>
+									</div>
+								</Tooltip.Content>
+							</Tooltip.Root>
+						</Tooltip.Provider>
+					</div>
 				</div>
 
 				{/* Full-width search */}
@@ -187,8 +272,11 @@ export function EmailList() {
 					<Input.Wrapper>
 						<Input.Icon as={Icon} name="search" size="small" />
 						<Input.Input
+							id={SEARCH_INPUT_ID}
+							ref={searchInputRef}
 							placeholder="Search subject or sender..."
 							value={searchQuery}
+							aria-keyshortcuts="/"
 							onChange={(e) => {
 								setSearchQuery(e.target.value);
 								void setCurrentPage(1);
@@ -199,7 +287,7 @@ export function EmailList() {
 								}
 							}}
 						/>
-						{searchQuery && (
+						{searchQuery ? (
 							<button
 								type="button"
 								onMouseDown={(e) => e.preventDefault()}
@@ -210,6 +298,19 @@ export function EmailList() {
 								className="mr-1 rounded p-0.5 text-text-soft-400 transition-colors hover:bg-neutral-alpha-10 hover:text-text-strong-950"
 							>
 								<Icon name="cross" className="h-3 w-3" />
+							</button>
+						) : (
+							<button
+								type="button"
+								tabIndex={-1}
+								aria-label="Focus search"
+								onMouseDown={(e) => {
+									e.preventDefault();
+									focusSearch();
+								}}
+								className="shrink-0 cursor-pointer rounded-[5px] outline-none focus-visible:ring-2 focus-visible:ring-stroke-strong-950"
+							>
+								<ActionKbd>/</ActionKbd>
 							</button>
 						)}
 					</Input.Wrapper>
