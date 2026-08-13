@@ -7,7 +7,7 @@ import Link from "next/link";
 // See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
 export const instant = false;
 
-const pagePath = "/philosophy/our-product-beliefs";
+const pagePath = "/our-product-beliefs";
 const pageUrl = `${getSiteUrl()}${pagePath}`;
 
 export const metadata: Metadata = {

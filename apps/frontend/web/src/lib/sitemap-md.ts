@@ -260,7 +260,6 @@ export function buildPublicDiscoveryMarkdown(
 		`- Glossary terms: \`${origin}/glossary/<term>\``,
 		`- Tools: \`${origin}/tools/<slug>\``,
 		`- Use cases: \`${origin}/use-cases/<slug>\``,
-		`- Philosophy: \`${origin}/philosophy/<slug>\``,
 		`- Docs: \`${origin}/docs/<path>\``,
 		"",
 		"### Indexed public examples",

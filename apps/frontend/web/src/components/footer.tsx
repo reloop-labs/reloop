@@ -86,8 +86,8 @@ const columns: FooterColumn[] = [
 		items: [
 			{ title: "Blog", href: "/blog" },
 			{ title: "Changelog", href: "/changelog" },
-			{ title: "Product Beliefs", href: "/philosophy/our-product-beliefs" },
-			{ title: "Engineering", href: "/philosophy/engineering" },
+			{ title: "Product Beliefs", href: "/our-product-beliefs" },
+			{ title: "Engineering", href: "/docs/setup" },
 			{ title: "Why Open Source", href: "/why-open-source" },
 		],
 	},

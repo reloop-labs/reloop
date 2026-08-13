@@ -11,13 +11,13 @@ const philosophyCards = [
 	{
 		title: "Product Beliefs",
 		description: "The principles that guide every product decision, interface, and developer experience.",
-		href: "/philosophy/our-product-beliefs",
+		href: "/our-product-beliefs",
 		iconName: "sparkling",
 	},
 	{
-		title: "Engineering Principles",
-		description: "How we architect for sub-100ms latency, high availability, and horizontal scaling.",
-		href: "/philosophy/engineering",
+		title: "Engineering & Local Setup",
+		description: "Clone, configure, and run Reloop microservices and developer tooling locally.",
+		href: "/docs/setup",
 		iconName: "command",
 	},
 ];

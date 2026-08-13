@@ -141,9 +141,9 @@ const navItems: NavItem[] = [
 					links: [
 						{
 							title: "Product Beliefs",
-							href: "/philosophy/our-product-beliefs",
+							href: "/our-product-beliefs",
 						},
-						{ title: "Engineering", href: "/philosophy/engineering" },
+						{ title: "Engineering", href: "/docs/setup" },
 						{
 							title: "Why Open Source",
 							href: "/why-open-source",
