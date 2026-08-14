@@ -3,32 +3,54 @@ import { beforeEach, describe, expect, mock, test } from "bun:test";
 class MemoryRedis {
 	private counters = new Map<string, number>();
 	private expiries = new Map<string, number>();
+	private now = 0;
+
+	private sweep(key: string): void {
+		const expiresAt = this.expiries.get(key);
+		if (expiresAt !== undefined && this.now >= expiresAt) {
+			this.counters.delete(key);
+			this.expiries.delete(key);
+		}
+	}
 
 	async increment(key: string): Promise<number> {
+		this.sweep(key);
 		const next = (this.counters.get(key) ?? 0) + 1;
 		this.counters.set(key, next);
 		return next;
 	}
 
 	async expire(key: string, seconds: number): Promise<void> {
-		this.expiries.set(key, seconds);
+		this.expiries.set(key, this.now + seconds);
 	}
 
+	// Redis reports -1 for a key with no expiry and -2 for one that is gone.
 	async ttl(key: string): Promise<number> {
-		return this.expiries.get(key) ?? -1;
+		this.sweep(key);
+		if (!this.counters.has(key)) return -2;
+		const expiresAt = this.expiries.get(key);
+		return expiresAt === undefined ? -1 : expiresAt - this.now;
 	}
 
 	async healthCheck(): Promise<boolean> {
 		return true;
 	}
 
+	advance(seconds: number): void {
+		this.now += seconds;
+	}
+
+	dropExpiry(key: string): void {
+		this.expiries.delete(key);
+	}
+
 	reset(): void {
 		this.counters.clear();
 		this.expiries.clear();
+		this.now = 0;
 	}
 }
 
-/** A client that never answers — an unreachable server, not a failing one. */
 class HangingRedis {
 	async increment(_key: string): Promise<number> {
 		return new Promise<never>(() => {});
@@ -68,7 +90,7 @@ const { Elysia } = await import("elysia");
 const { rateLimitPlugin } = await import("../src/middleware/rate-limit");
 const { toolConfig } = await import("../src/tool.config");
 
-const { rateLimitMax } = toolConfig.constants;
+const { rateLimitMax, rateLimitWindowSeconds } = toolConfig.constants;
 
 const app = new Elysia()
 	.use(rateLimitPlugin)
@@ -130,6 +152,29 @@ describe("per-IP rate limiting", () => {
 		for (let i = 0; i < rateLimitMax; i++) await probe("203.0.113.7");
 		const response = await probe("203.0.113.7");
 		expect(response.headers.get("retry-after")).toBeTruthy();
+	});
+
+	test("hands the budget back once the window ends", async () => {
+		for (let i = 0; i < rateLimitMax; i++) await probe("203.0.113.10");
+		expect((await probe("203.0.113.10")).status).toBe(429);
+
+		memoryRedis.advance(rateLimitWindowSeconds);
+
+		expect((await probe("203.0.113.10")).status).toBe(200);
+	});
+
+	test("re-arms the window when the key lost its expiry", async () => {
+		const key = "rate-limit:check:203.0.113.11";
+		await probe("203.0.113.11");
+		memoryRedis.dropExpiry(key);
+
+		await probe("203.0.113.11");
+		expect(await memoryRedis.ttl(key)).toBe(rateLimitWindowSeconds);
+
+		memoryRedis.advance(rateLimitWindowSeconds);
+		for (let i = 0; i < rateLimitMax; i++) {
+			expect((await probe("203.0.113.11")).status).toBe(200);
+		}
 	});
 });
 

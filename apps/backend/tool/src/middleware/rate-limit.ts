@@ -28,7 +28,15 @@ async function consumeBudget(
 ): Promise<{ count: number; ttl: number }> {
 	const count = await redis.increment(key);
 	if (count === 1) await redis.expire(key, rateLimitWindowSeconds);
-	const ttl = await redis.ttl(key);
+
+	// A negative TTL means the key carries no expiry, so the count would climb
+	// forever and lock the IP out for good. Re-arm the window instead.
+	let ttl = await redis.ttl(key);
+	if (ttl < 0) {
+		await redis.expire(key, rateLimitWindowSeconds);
+		ttl = rateLimitWindowSeconds;
+	}
+
 	return { count, ttl };
 }
 
