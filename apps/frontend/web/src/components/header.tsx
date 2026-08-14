@@ -10,9 +10,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
-/** Strong ease-out for UI (Emil / animations.dev) */
-const EASE_OUT: [number, number, number, number] = [0.23, 1, 0.32, 1];
-/** CSS `ease` — used for directional mega content slides */
+/** CSS `ease` — mega open/close (scaleIn/Out) and directional content slides */
 const EASE_DEFAULT: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
 /** Horizontal travel for enter/exit when switching mega menus (matches Radix nav motion) */
 const MEGA_SLIDE_PX = 200;
@@ -1540,9 +1538,9 @@ export const Header = () => {
 				</AnimatePresence>
 
 				{/*
-				  Mega menu motion:
-				  - Open/close: opacity + slight y/scale (ease-out)
-				  - Tab switch: height spring on shell; content slides like Radix nav
+				  Mega menu motion (Radix nav viewport):
+				  - Open/close: scaleIn / scaleOut — opacity + scale 0.98, 200ms ease
+				  - Tab switch: height spring on shell; content slides
 				    (from-end/from-start enter, to-start/to-end exit, 250ms ease)
 				*/}
 				<AnimatePresence>
@@ -1552,20 +1550,24 @@ export const Header = () => {
 							initial={
 								shouldReduceMotion
 									? { opacity: 0 }
-									: { opacity: 0, y: 6, scale: 0.98 }
+									: { opacity: 0, scale: 0.98 }
 							}
 							animate={
 								shouldReduceMotion
 									? { opacity: 1 }
-									: { opacity: 1, y: 0, scale: 1 }
+									: { opacity: 1, scale: 1 }
 							}
 							exit={
 								shouldReduceMotion
 									? { opacity: 0 }
-									: { opacity: 0, y: 4, scale: 0.98 }
+									: { opacity: 0, scale: 0.98 }
 							}
-							transition={{ duration: 0.18, ease: EASE_OUT }}
-							className="-translate-x-1/2 absolute top-full left-1/2 z-50 hidden pt-2 lg:block"
+							transition={
+								shouldReduceMotion
+									? { duration: 0 }
+									: { duration: 0.2, ease: EASE_DEFAULT }
+							}
+							className="-translate-x-1/2 absolute top-full left-1/2 z-50 hidden origin-top pt-2 lg:block"
 						>
 							{/* Hover bridge so the gap between bar and card doesn't close the menu */}
 							<div className="-top-2 absolute inset-x-0 h-2" aria-hidden />
