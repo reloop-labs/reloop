@@ -6,7 +6,7 @@
 > Docs index: https://reloop.sh/llms-docs.txt
 > Product skill: https://reloop.sh/skill.md
 
-Generated from 6 pages.
+Generated from 7 pages.
 
 ---
 
@@ -766,3 +766,117 @@ Details: [Vercel + Reloop](/docs/integrations/vercel).
 - [Send mail API](/docs/api/mail/post-api-mail-v1send) — full payload
 - [Vercel AI SDK + Reloop](/blog/vercel-ai-sdk-reloop-notifications) — tool-calling notifications
 - Sibling guides: [SvelteKit](/blog/send-email-sveltekit) · [Remix](/blog/send-email-remix) · [Cloudflare Workers](/blog/send-email-cloudflare-workers)
+
+---
+
+# Why We Open-Sourced Our Email Infrastructure
+
+Path: /blog/why-we-open-sourced-email-infrastructure
+URL: https://reloop.sh/blog/why-we-open-sourced-email-infrastructure
+Markdown: https://reloop.sh/blog/why-we-open-sourced-email-infrastructure.md
+
+The story behind Reloop: why we built an open-source alternative to SendGrid, Resend, and Mailgun, why email infrastructure is too critical to rent forever, and what we're changing.
+
+**Email is the most critical communication backbone of modern software, yet it has quietly become one of the most expensive and locked-down tools in SaaS.**
+
+When your auth tokens, receipts, password resets, and user notifications fail, your business is effectively down. Yet for over a decade, developers have been forced to accept a frustrating tradeoff: **either pay skyrocketing bills to closed email vendors**, or **spend months wrestling with fragile mail servers** that lack modern APIs, webhooks, and analytics.
+
+We built [Reloop](https://github.com/reloop-labs/reloop) because we believe **email infrastructure belongs in the open**. Here is the story behind why we started, the structural problems we kept running into, and why we made Reloop [Apache 2.0](/license).
+
+---
+
+## The problem: Email became a hostage situation
+
+Every growing startup and engineering team we spoke with was hitting the same predictable wall: **monthly email bills exploding from $20 to $2,000+ as user volume scaled**, without any corresponding increase in value or underlying infrastructure costs.
+
+Beyond pricing, closed-source email providers introduce compounding technical risks:
+
+- **Vendor lock-in by design**: Proprietary APIs, custom template formats, and vendor-specific webhook payloads ensure that **leaving a provider requires a painful, multi-week engineering rewrite**.
+- **Opaque black-box delivery**: When emails silently fail or get flagged as spam, closed vendors offer vague deliverability scores rather than raw [SMTP](/features/smtp) transcripts and transparent queue visibility.
+- **Zero data sovereignty**: Every user interaction, email address, password reset token, and payload metadata passes through third-party servers—**creating compliance headaches for HIPAA, GDPR, and enterprise audits**.
+- **Single point of failure**: If your closed email SaaS suffers an outage, **your entire authentication and notification loop goes dark with zero fallback**.
+
+To see how these tradeoffs compare across the ecosystem, check our [2026 email provider comparison](/blog/email-provider-comparison-2026) or explore side-by-side breakdowns against [SendGrid](/compare/sendgrid), [Resend](/compare/resend), [Mailgun](/compare/mailgun), and [AWS SES](/compare/aws-ses).
+
+---
+
+## Why "just use Postfix" isn't the answer
+
+The traditional counterargument from senior engineers has always been: *"Why not just run your own Postfix or Haraka instance?"*
+
+**The harsh reality is that raw Postfix provides a mail transfer agent, not modern developer infrastructure.** 
+
+Running bare SMTP solves packet transmission, but it leaves you with months of grueling undifferentiated engineering work:
+
+1. **Reputation & protocol engineering**: Configuring [SPF, DKIM, and DMARC](/blog/spf-dkim-dmarc-setup-guide), handling [IP warming sequences](/blog/ip-warming-guide), and managing suppression lists.
+2. **Bounce classification**: Distinguishing between temporary soft bounces and permanent hard bounces automatically to protect domain reputation (see our guide on [email bounce processing automation](/blog/email-bounce-processing-automation)).
+3. **Developer ergonomics**: Building ergonomic REST APIs, multi-language [SDKs](/sdk), and template render engines.
+4. **Visibility & observability**: Parsing real-time delivery events into signed [webhooks](/features/webhooks) and actionable [email analytics](/features/email-analytics).
+
+Building all of this in-house takes **6 to 9 months of full-time platform engineering** before sending your first production receipt. Most teams cannot afford that distraction, so they reluctantly pay the SaaS tax.
+
+---
+
+## What we built with Reloop
+
+Reloop bridges this gap: **a production-grade, fully open-source email engine with the developer experience of modern email SaaS, built to run anywhere.**
+
+<SendEmailCodeSamples />
+
+Reloop gives you the complete lifecycle out of the box:
+
+- **Unified REST API & Drop-in SDKs**: Ergonomic endpoints and official [SDKs for Node.js, Python, and Go](/sdk) designed for seamless migration from existing providers (see our [SendGrid migration guide](/blog/migrating-from-sendgrid)).
+- **[SMTP relay](/features/smtp) & Drop-in replacement**: Instantly plug Reloop into Nodemailer, Next.js, Django, Laravel, Rails, or Supabase.
+- **Automated deliverability loop**: Built-in [SPF/DKIM validation](/blog/spf-dkim-dmarc-setup-guide), feedback loops, and intelligent retry queues powered by BullMQ (detailed in [how we built our queue engine](/blog/how-we-built-email-delivery-queue-bullmq)).
+- **Real-time [email analytics](/features/email-analytics)**: Full visibility into deliveries, opens, click tracking, bounces, and complaint rates with zero third-party tracking scripts.
+- **Signed [webhook delivery](/features/webhooks)**: Guaranteed event delivery with automatic backoff, replay capabilities, and secret signing.
+- **[AI Agent inboxes & MCP support](/features/ai-agents)**: Two-way inbound parsing and Model Context Protocol tooling so autonomous agents can send, receive, and reason over email safely (explore our [AI agent inbox use case](/use-cases/ai-agent-inbox) and [email infrastructure for AI agents](/blog/email-infrastructure-for-ai-agents)).
+
+---
+
+## The open-source bet: Boring infrastructure must be open
+
+Think about the foundational software that powers modern computing: **Linux, PostgreSQL, Redis, Kubernetes, and Nginx**. 
+
+Nobody rents their primary database or operating system behind a closed, proprietary paywall where the underlying code cannot be inspected, self-hosted, or audited. **Email sits squarely in that foundational tier.**
+
+```
+┌────────────────────────────────────────────────────────┐
+│               Your Application & AI Stack              │
+├────────────────────────────────────────────────────────┤
+│  PostgreSQL (Database)  │  Redis (Cache/Queue)  │ Nginx│
+├────────────────────────────────────────────────────────┤
+│         Reloop — Open-Source Email Infrastructure       │
+├────────────────────────────────────────────────────────┤
+│                  Linux & Cloud / Bare Metal            │
+└────────────────────────────────────────────────────────┘
+```
+
+By releasing Reloop under the **[Apache 2.0 license](/license)**, we guarantee:
+
+1. **Complete Stack Ownership**: The cloud platform and the open-source release run the **exact same codebase**. You can `docker compose up` locally, host on [Fly.io](/blog/reloop-flyio-deployment) or [Coolify](/blog/reloop-coolify-setup), or run on bare metal for under $5/mo (see [how to self-host email for $5/month](/blog/self-host-email-5-dollars)).
+2. **Auditability & Security**: Security teams can inspect every line of delivery logic and keep sensitive communication strictly within their own VPC boundary.
+3. **No Ransom Pricing**: If your business grows 100x, your outbound communication channel doesn't become your most expensive utility. You can choose managed [Reloop Cloud pricing](/pricing) for zero ops, or [self-host](/docs/self-host) with complete independence.
+
+For a deeper dive into our architectural philosophy, read our [product beliefs](/our-product-beliefs) and [why open source matters](/why-open-source).
+
+---
+
+## Where we go from here
+
+We are building Reloop in the open with a public roadmap driven by real developer feedback, not arbitrary pricing metrics.
+
+Whether you are an indie hacker shipping your first app, a high-growth startup outgrowing vendor limits, or an enterprise demanding strict compliance: **you should never have to compromise between world-class developer experience and complete infrastructure ownership.**
+
+<Cta
+  title="Take control of your email infrastructure"
+  description="Deploy Reloop in under 5 minutes with Docker Compose, or get started instantly on Reloop Cloud."
+  href="/docs/self-host"
+  label="Read the Self-Host Guide"
+/>
+
+### Get involved
+
+- **Star and explore the repository**: [github.com/reloop-labs/reloop](https://github.com/reloop-labs/reloop)
+- **Start sending on Reloop Cloud**: [reloop.sh/dashboard/signup](https://reloop.sh/dashboard/signup)
+- **Browse the documentation**: [Reloop Docs](/docs) · [Self-Host Guide](/docs/self-host) · [Pricing](/pricing) · [Provider Comparisons](/compare)
