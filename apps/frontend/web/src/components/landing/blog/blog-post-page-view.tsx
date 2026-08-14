@@ -159,9 +159,9 @@ export function BlogPostPageView({
 			{/* Main Article Container */}
 			<div className="mx-auto w-full max-w-5xl border-stroke-soft-200 border-x px-4 sm:px-6 md:max-w-7xl lg:px-8 dark:border-white/10">
 				{/* 3-Column Content Grid */}
-				<div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-0">
+				<div className="grid grid-cols-1 gap-8 lg:grid-cols-[240px_1fr_240px] lg:gap-0">
 					{/* Left Column: Table of Contents */}
-					<aside className="lg:col-span-3 lg:border-stroke-soft-200 lg:border-r lg:pt-10 lg:pr-8 lg:pb-16 dark:lg:border-white/10">
+					<aside className="lg:border-stroke-soft-200 lg:border-r lg:pt-10 lg:pr-6 lg:pb-16 dark:lg:border-white/10">
 						<div className="space-y-5 lg:sticky lg:top-28">
 							<Link
 								href="/blog"
@@ -175,7 +175,7 @@ export function BlogPostPageView({
 					</aside>
 
 					{/* Center Column: Main Content */}
-					<main className="space-y-8 lg:col-span-6 lg:p-10 lg:pb-16">
+					<main className="min-w-0 space-y-8 lg:px-8 lg:pt-10 lg:pb-16 xl:px-10">
 						{/* Cover / Benchmark Image */}
 						{post.image ? (
 							<div className="overflow-hidden rounded-2xl">
@@ -207,7 +207,7 @@ export function BlogPostPageView({
 
 						{/* Read More Section */}
 						{relatedPosts.length > 0 ? (
-							<div className="-mx-4 sm:-mx-6 lg:-mx-10 border-stroke-soft-200 border-t px-4 pt-5 sm:px-6 lg:px-10 dark:border-white/10">
+							<div className="-mx-4 sm:-mx-6 lg:-mx-8 xl:-mx-10 border-stroke-soft-200 border-t px-4 pt-5 sm:px-6 lg:px-8 xl:px-10 dark:border-white/10">
 								<h2 className="mb-6 font-semibold text-text-strong-950 tracking-tight dark:text-white">
 									Read more
 								</h2>
@@ -247,7 +247,7 @@ export function BlogPostPageView({
 					</main>
 
 					{/* Right Column: Author Info, Share & Conversion Card */}
-					<aside className="lg:col-span-3 lg:border-stroke-soft-200 lg:border-l lg:pt-10 lg:pb-16 lg:pl-8 dark:lg:border-white/10">
+					<aside className="lg:border-stroke-soft-200 lg:border-l lg:pt-10 lg:pb-16 lg:pl-6 dark:lg:border-white/10">
 						<div className="space-y-8 lg:sticky lg:top-28">
 							{/* Author Card */}
 							<div>
