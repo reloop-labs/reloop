@@ -26,7 +26,7 @@ type BrandIcon = {
 	title: string;
 };
 
-type ProductCardAccent = "blue" | "violet";
+type ProductCardAccent = "blue" | "orange";
 
 type NavLink = {
 	title: string;
@@ -158,23 +158,26 @@ const PRODUCT_CARD_ACCENTS: Record<
 		// Strong at top-left corner → fade toward bottom-right (mirrors Marketing’s corner reveal)
 		hatchMask:
 			"linear-gradient(to bottom right, black 0%, black 32%, transparent 68%)",
-		ringOuter: "stroke-sky-400/18 dark:stroke-sky-400/22",
-		ringInner: "stroke-blue-500/32 dark:stroke-sky-300/35",
+		// Soft sky strokes (outer light, inner a touch stronger)
+		ringOuter: "text-sky-400/20 dark:text-sky-400/25",
+		ringInner: "text-blue-500/30 dark:text-sky-300/32",
 		ink: "group-hover:text-blue-600 dark:group-hover:text-sky-400",
 	},
-	// Marketing — warm violet / rose; effect originates from top-right corner
-	violet: {
-		wash: "bg-gradient-to-bl from-violet-100/90 via-fuchsia-50/70 to-rose-100/80 dark:from-violet-950/40 dark:via-fuchsia-950/30 dark:to-rose-950/45",
-		glow: "bg-gradient-to-bl from-violet-500/[0.14] via-fuchsia-400/[0.10] to-rose-500/[0.08] dark:from-violet-500/[0.18] dark:via-fuchsia-400/[0.14] dark:to-rose-500/[0.12]",
-		hatch: "text-violet-500/22 dark:text-violet-400/18",
+	// Marketing — soft orange / amber, same subtlety as Transactional
+	orange: {
+		wash: "bg-gradient-to-bl from-orange-100/90 via-amber-50/70 to-yellow-100/70 dark:from-orange-950/40 dark:via-amber-950/30 dark:to-yellow-950/40",
+		glow: "bg-gradient-to-bl from-orange-500/[0.16] via-amber-400/[0.10] to-yellow-500/[0.06] dark:from-orange-500/[0.20] dark:via-amber-400/[0.14] dark:to-yellow-500/[0.10]",
+		hatch: "text-orange-500/20 dark:text-orange-400/18",
 		hatchImage:
-			"repeating-linear-gradient(45deg, transparent 0, transparent 3px, currentColor 3px, currentColor 3.8px)",
+			"repeating-linear-gradient(45deg, transparent 0, transparent 2.5px, currentColor 2.5px, currentColor 3.1px)",
 		// Strong at top-right corner → fade toward bottom-left
 		hatchMask:
 			"linear-gradient(to bottom left, black 0%, black 32%, transparent 68%)",
-		ringOuter: "stroke-violet-400/18 dark:stroke-violet-400/22",
-		ringInner: "stroke-violet-500/30 dark:stroke-fuchsia-300/32",
-		ink: "group-hover:text-violet-600 dark:group-hover:text-fuchsia-400",
+		// Match transactional ring weight
+		ringOuter: "text-orange-400/20 dark:text-orange-400/25",
+		ringInner: "text-orange-500/30 dark:text-amber-300/32",
+		// Title + icon highlight
+		ink: "group-hover:text-orange-600 dark:group-hover:text-orange-400",
 	},
 };
 
@@ -281,7 +284,7 @@ const navItems: NavItem[] = [
 							title: "Marketing",
 							href: "/use-cases/automated-email",
 							customIcon: <MarketingDatabaseIcon className="size-6" />,
-							accent: "violet",
+							accent: "orange",
 						},
 					],
 				},
@@ -737,41 +740,45 @@ function MegaLink({
 								aria-hidden
 								className={`-translate-x-1/2 -translate-y-[51%] pointer-events-none absolute top-1/2 left-1/2 size-28 scale-90 rounded-full opacity-0 blur-2xl transition-all duration-500 group-hover:scale-125 group-hover:opacity-100 ${accent.glow}`}
 							/>
-							{/* Concentric rings — centered on icon, slightly raised */}
+							{/* Concentric rings — centered on icon; stroke via currentColor for even subtlety */}
 							<svg
 								aria-hidden
 								className="-translate-x-1/2 -translate-y-[51%] pointer-events-none absolute top-1/2 left-1/2 size-[9.5rem] opacity-0 transition-opacity duration-300 group-hover:opacity-100"
 								viewBox="0 0 160 160"
 								fill="none"
 							>
-								<circle
-									cx="80"
-									cy="80"
-									r="72"
-									className={accent.ringOuter}
-									strokeWidth="0.75"
-									strokeDasharray="4 4"
-									fill="none"
-								/>
-								<circle
-									cx="80"
-									cy="80"
-									r="50"
-									className={accent.ringOuter}
-									strokeWidth="1"
-									fill="none"
-								/>
+								<g className={accent.ringOuter}>
+									<circle
+										cx="80"
+										cy="80"
+										r="72"
+										stroke="currentColor"
+										strokeWidth="0.75"
+										strokeDasharray="4 4"
+										fill="none"
+									/>
+									<circle
+										cx="80"
+										cy="80"
+										r="50"
+										stroke="currentColor"
+										strokeWidth="1"
+										fill="none"
+									/>
+								</g>
 								{/* Inner ring — true dotted line (round caps + short gaps) */}
-								<circle
-									cx="80"
-									cy="80"
-									r="28"
-									className={accent.ringInner}
-									strokeWidth="1.5"
-									strokeDasharray="0.01 4.5"
-									strokeLinecap="round"
-									fill="none"
-								/>
+								<g className={accent.ringInner}>
+									<circle
+										cx="80"
+										cy="80"
+										r="28"
+										stroke="currentColor"
+										strokeWidth="1.35"
+										strokeDasharray="0.01 4.5"
+										strokeLinecap="round"
+										fill="none"
+									/>
+								</g>
 							</svg>
 						</>
 					)}
