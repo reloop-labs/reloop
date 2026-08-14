@@ -1,13 +1,7 @@
 /**
- * Refresh the vendored disposable-domain catalogue from BillionVerify/disposable.
- *
- *   bun run --filter=@reloop/email-validation refresh
- *
- * Only `data/upstream/` is rewritten. Reloop's own curation in `data/local/`
- * is never touched, which is the whole reason the two are separate: a refresh
- * must never silently drop an allowlist entry we added for a real customer.
- *
- * Pass `--dry-run` to see the diff without writing.
+ * Rewrites `data/upstream/` only. Reloop's curation in `data/local/` is never
+ * touched: a refresh must never silently drop an allowlist entry we added for
+ * a real customer.
  */
 import { readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
@@ -16,6 +10,8 @@ const UPSTREAM =
 	"https://raw.githubusercontent.com/BillionVerify/disposable/main/data";
 
 const FILES = ["domains.txt", "wildcards.txt", "exceptions.txt"] as const;
+
+const REQUEST_TIMEOUT_MS = 15_000;
 
 const MIN_LINES: Record<(typeof FILES)[number], number> = {
 	"domains.txt": 100_000,
@@ -59,22 +55,26 @@ let changed = false;
 for (const name of FILES) {
 	const url = `${UPSTREAM}/${name}`;
 
-	let response: Response;
+	// The signal covers the body read, so text() must stay inside this try.
+	let contents: string;
 	try {
-		response = await fetch(url);
+		const response = await fetch(url, {
+			signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+		});
+
+		if (!response.ok) {
+			console.error(`✗ ${name}: HTTP ${response.status} from ${url}`);
+			failed = true;
+			continue;
+		}
+
+		contents = await response.text();
 	} catch (error) {
 		console.error(`✗ ${name}: request failed — ${String(error)}`);
 		failed = true;
 		continue;
 	}
 
-	if (!response.ok) {
-		console.error(`✗ ${name}: HTTP ${response.status} from ${url}`);
-		failed = true;
-		continue;
-	}
-
-	const contents = await response.text();
 	const next = entriesOf(contents);
 
 	if (next.size < MIN_LINES[name]) {
