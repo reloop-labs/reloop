@@ -8,7 +8,8 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
 	useEffect(() => {
 		if (
 			typeof window === "undefined" ||
-			window.location.hostname !== "reloop.sh"
+			window.location.hostname !== "reloop.sh" ||
+			localStorage.getItem("ph_optout") === "true"
 		) {
 			return;
 		}
@@ -17,6 +18,9 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
 			api_host: "https://r.reloop.sh",
 			ui_host: "https://us.i.posthog.com",
 			defaults: "2026-05-30",
+			loaded: (ph) => {
+				(window as unknown as { posthog: typeof ph }).posthog = ph;
+			},
 		});
 	}, []);
 
