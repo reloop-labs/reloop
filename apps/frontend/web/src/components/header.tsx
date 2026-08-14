@@ -97,10 +97,6 @@ const navItems: NavItem[] = [
 					title: "Tools",
 					links: [
 						{ title: "Free tools", href: "/tools" },
-						{
-							title: "Temp email checker",
-							href: "/tools/temp-email-checker",
-						},
 						{ title: "Email validator", href: "/tools/email-validator" },
 						{ title: "Subject tester", href: "/tools/subject-tester" },
 						{ title: "Template generator", href: "/tools/template-generator" },
