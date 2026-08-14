@@ -69,7 +69,14 @@ export function createBlogPostMetadata(post: BlogPostDefinition): Metadata {
 	const canonicalUrl = blogPostUrl(post.slug);
 	const titleFull = `${post.title} | ${siteName}`;
 	const description = clampDescription(post.description);
-	const coverUrl = blogCoverAbsoluteUrl(post.image);
+	const cover = post.image
+		? {
+				url: post.image,
+				width: 1200,
+				height: 630,
+				alt: post.title,
+			}
+		: undefined;
 
 	return {
 		title: post.title,
@@ -87,24 +94,13 @@ export function createBlogPostMetadata(post: BlogPostDefinition): Metadata {
 			publishedTime: post.publishedAt,
 			authors: [post.author.name],
 			tags: post.tags.length > 0 ? post.tags : undefined,
-			...(coverUrl
-				? {
-						images: [
-							{
-								url: post.image as string,
-								width: 1200,
-								height: 630,
-								alt: post.title,
-							},
-						],
-					}
-				: {}),
+			...(cover ? { images: [cover] } : {}),
 		},
 		twitter: {
 			card: "summary_large_image",
 			title: titleFull,
 			description,
-			...(coverUrl ? { images: [post.image as string] } : {}),
+			...(cover ? { images: [cover.url] } : {}),
 		},
 	};
 }
@@ -277,9 +273,7 @@ export function buildBlogIndexJsonLd(posts: BlogPostDefinition[]) {
 					headline: post.title,
 					description: clampDescription(post.description),
 					datePublished: post.publishedAt,
-					...(post.image
-						? { image: [blogCoverAbsoluteUrl(post.image)] }
-						: {}),
+					...(post.image ? { image: [blogCoverAbsoluteUrl(post.image)] } : {}),
 				})),
 			},
 			{

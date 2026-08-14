@@ -1,5 +1,8 @@
 import { readBlogCoverFile } from "@reloop/web/lib/landing/blog/cover";
-import { generateStaticParams, getPost } from "@reloop/web/lib/landing/blog/source";
+import {
+	generateStaticParams,
+	getPost,
+} from "@reloop/web/lib/landing/blog/source";
 import { ImageResponse } from "next/og";
 
 export const alt = "Reloop Blog";

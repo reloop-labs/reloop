@@ -12,9 +12,7 @@ export async function GET() {
 			posts.map(async (post) => {
 				const url = `${siteUrl}/blog/${post.slug}`;
 				const coverUrl = blogCoverAbsoluteUrl(post.image);
-				const cover = post.image
-					? await statBlogCoverFile(post.image)
-					: null;
+				const cover = post.image ? await statBlogCoverFile(post.image) : null;
 				const enclosure =
 					coverUrl && cover
 						? `
