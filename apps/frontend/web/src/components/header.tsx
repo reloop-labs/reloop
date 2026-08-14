@@ -996,7 +996,9 @@ function MegaLink({
 	const featuredCardWidth = "w-[168px] shrink-0";
 	const className = productCard
 		? cn(
-				"group relative flex h-full min-h-[200px] flex-col justify-between overflow-hidden rounded-[18px] border border-stroke-soft-200/80 bg-bg-weak-50/50 p-4 transition-colors duration-300 sm:min-h-0 sm:p-5 dark:border-white/10 dark:bg-white/[0.04]",
+				"group relative flex h-full min-h-[200px] flex-col justify-between overflow-hidden rounded-[18px] border border-stroke-soft-200/80 bg-bg-weak-50/50 p-4 transition-colors duration-300 sm:min-h-0 sm:p-5",
+				// Dark: near-black surface like the global header (not muddy grey)
+				"dark:border-white/[0.08] dark:bg-white/[0.03]",
 				featuredCardWidth,
 			)
 		: docsCard
@@ -1005,7 +1007,7 @@ function MegaLink({
 					"group relative flex h-full min-h-[132px] flex-col justify-between overflow-hidden rounded-[18px] p-4 sm:min-h-[148px] sm:p-5",
 					"border border-stroke-soft-200/60 bg-bg-white-0",
 					"transition-colors duration-300",
-					"dark:border-white/10 dark:bg-white/[0.04]",
+					"dark:border-white/[0.08] dark:bg-white/[0.03]",
 					featuredCardWidth,
 				)
 			: simple
@@ -1224,7 +1226,7 @@ function ProductSimpleColumn({ links }: { links: NavLink[] }) {
 				// Match reference row: flex items-center gap-3, text-sm title, text-xs desc
 				const className = cn(
 					"group flex min-w-0 items-center gap-3 rounded-lg px-2 py-2 transition-colors",
-					"hover:bg-bg-weak-50/80 dark:hover:bg-white/[0.04]",
+					"hover:bg-bg-weak-50/80 dark:hover:bg-white/[0.05]",
 				);
 				const body = (
 					<>
@@ -1235,8 +1237,9 @@ function ProductSimpleColumn({ links }: { links: NavLink[] }) {
 								"border border-stroke-soft-200/90 bg-bg-white-0/50 text-text-sub-600",
 								"transition-all duration-200",
 								"group-hover:text-text-strong-950",
-								"dark:border-white/20 dark:bg-white/10 dark:text-white/65",
-								"dark:group-hover:text-white",
+								// Match global black mega — soft tiles, not heavy grey blocks
+								"dark:border-white/[0.1] dark:bg-white/[0.05] dark:text-white/65",
+								"dark:group-hover:border-white/15 dark:group-hover:bg-white/[0.08] dark:group-hover:text-white",
 							)}
 						>
 							{link.customIcon ? (
@@ -1308,7 +1311,7 @@ function BrandLinkRow({ link }: { link: NavLink }) {
 				className={cn(
 					"inline-flex size-7 shrink-0 items-center justify-center rounded-lg",
 					"border border-stroke-soft-200/80 bg-bg-weak-50/60 text-text-sub-600",
-					"dark:border-white/10 dark:bg-white/[0.04] dark:text-white/70",
+					"dark:border-white/[0.1] dark:bg-white/[0.05] dark:text-white/70",
 				)}
 				style={brandStyle}
 			>
@@ -1420,8 +1423,8 @@ function MegaSocialIcons({ links }: { links: NavLink[] }) {
 							"inline-flex size-8 shrink-0 items-center justify-center rounded-lg",
 							"border border-stroke-soft-200/80 bg-bg-weak-50/50 text-text-sub-600",
 							"transition-colors hover:border-stroke-soft-200 hover:bg-bg-weak-50 hover:text-text-strong-950",
-							"dark:border-white/10 dark:bg-white/[0.03] dark:text-white/65",
-							"dark:hover:bg-white/[0.07] dark:hover:text-white",
+							"dark:border-white/[0.1] dark:bg-white/[0.05] dark:text-white/65",
+							"dark:hover:bg-white/[0.08] dark:hover:text-white",
 						)}
 						{...(external ? { target: "_blank", rel: "noreferrer" } : {})}
 					>
@@ -2127,7 +2130,7 @@ export const Header = () => {
 							{/* Hover bridge so the gap between bar and card doesn't close the menu */}
 							<div className="-top-2 absolute inset-x-0 h-2" aria-hidden />
 							<div
-								className="overflow-hidden rounded-[20px] border border-stroke-soft-200/90 bg-bg-white-0 px-3 shadow-[0_18px_50px_-12px_rgba(15,23,42,0.14),0_6px_18px_-6px_rgba(15,23,42,0.06)] sm:px-4 dark:border-white/10 dark:bg-neutral-950 dark:shadow-[0_20px_56px_-12px_rgba(0,0,0,0.65)]"
+								className="overflow-hidden rounded-[20px] border border-stroke-soft-200/90 bg-bg-white-0 px-3 shadow-[0_18px_50px_-12px_rgba(15,23,42,0.14),0_6px_18px_-6px_rgba(15,23,42,0.06)] sm:px-4 dark:border-white/10 dark:bg-black dark:shadow-[0_20px_56px_-12px_rgba(0,0,0,0.65)]"
 								role="menu"
 								aria-label={`${activeItem.title} menu`}
 							>
