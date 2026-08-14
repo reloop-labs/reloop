@@ -17,7 +17,7 @@ author:
   role: Co-founder
   avatar: /company/team/pranav-patel.jpg
 draft: false
-image: /blog/images/introducing-reloop.png
+image: /blog/images/why-we-open-sourced-email-infrastructure.png
 relatedSlugs:
   - introducing-reloop
   - self-hosted-email-infrastructure
@@ -51,7 +51,7 @@ To see how these tradeoffs compare across the ecosystem, check our [2026 email p
 
 ## Why "just use Postfix" isn't the answer
 
-The traditional counterargument from senior engineers has always been: *"Why not just run your own Postfix or Haraka instance?"*
+The traditional counterargument from senior engineers has always been: *"Why not just run your own Postfix, KumoMTA or Haraka instance?"*
 
 **The harsh reality is that raw Postfix provides a mail transfer agent, not modern developer infrastructure.** 
 
@@ -62,7 +62,7 @@ Running bare SMTP solves packet transmission, but it leaves you with months of g
 3. **Developer ergonomics**: Building ergonomic REST APIs, multi-language [SDKs](/sdk), and template render engines.
 4. **Visibility & observability**: Parsing real-time delivery events into signed [webhooks](/features/webhooks) and actionable [email analytics](/features/email-analytics).
 
-Building all of this in-house takes **6 to 9 months of full-time platform engineering** before sending your first production receipt. Most teams cannot afford that distraction, so they reluctantly pay the SaaS tax.
+Building all of this in-house takes **6 to 9 months of full-time platform engineering** before sending your first production receipt. Most teams cannot afford that distraction, so they reluctantly pay the SaaS.
 
 ---
 
@@ -89,18 +89,6 @@ Think about the foundational software that powers modern computing: **Linux, Pos
 
 Nobody rents their primary database or operating system behind a closed, proprietary paywall where the underlying code cannot be inspected, self-hosted, or audited. **Email sits squarely in that foundational tier.**
 
-```
-┌────────────────────────────────────────────────────────┐
-│               Your Application & AI Stack              │
-├────────────────────────────────────────────────────────┤
-│  PostgreSQL (Database)  │  Redis (Cache/Queue)  │ Nginx│
-├────────────────────────────────────────────────────────┤
-│         Reloop — Open-Source Email Infrastructure       │
-├────────────────────────────────────────────────────────┤
-│                  Linux & Cloud / Bare Metal            │
-└────────────────────────────────────────────────────────┘
-```
-
 By releasing Reloop under the **[Apache 2.0 license](/license)**, we guarantee:
 
 1. **Complete Stack Ownership**: The cloud platform and the open-source release run the **exact same codebase**. You can `docker compose up` locally, host on [Fly.io](/blog/reloop-flyio-deployment) or [Coolify](/blog/reloop-coolify-setup), or run on bare metal for under $5/mo (see [how to self-host email for $5/month](/blog/self-host-email-5-dollars)).
@@ -116,13 +104,6 @@ For a deeper dive into our architectural philosophy, read our [product beliefs](
 We are building Reloop in the open with a public roadmap driven by real developer feedback, not arbitrary pricing metrics.
 
 Whether you are an indie hacker shipping your first app, a high-growth startup outgrowing vendor limits, or an enterprise demanding strict compliance: **you should never have to compromise between world-class developer experience and complete infrastructure ownership.**
-
-<Cta
-  title="Take control of your email infrastructure"
-  description="Deploy Reloop in under 5 minutes with Docker Compose, or get started instantly on Reloop Cloud."
-  href="/docs/self-host"
-  label="Read the Self-Host Guide"
-/>
 
 ### Get involved
 
