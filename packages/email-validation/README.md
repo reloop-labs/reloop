@@ -49,7 +49,7 @@ to unpick it. Callers own presentation.
 
 ## Data
 
-```
+```text
 data/
   upstream/   vendored from BillionVerify/disposable — refresh script overwrites
   local/      Reloop's curation — the refresh script never touches this
