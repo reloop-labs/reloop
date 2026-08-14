@@ -7,62 +7,255 @@ import { Logo } from "@reloop/ui/logo";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import {
+	siDotnet,
+	siElixir,
+	siGo,
+	siNodedotjs,
+	siPhp,
+	siPython,
+	siRuby,
+	siRust,
+	siSpringboot,
+} from "simple-icons";
+
+type BrandIcon = {
+	path: string;
+	hex: string;
+	title: string;
+};
 
 type NavLink = {
 	title: string;
 	href: string;
+	description?: string;
+	icon?: string;
+	/** simple-icons brand mark (used for language/SDK rows) */
+	brand?: BrandIcon;
 	external?: boolean;
 };
 
 type NavCategory = {
+	/** Empty string hides the section label */
 	title: string;
+	/** Larger featured cards (Docs / Help style) — multi-card row */
+	featured?: boolean;
+	/** Single featured card at the top of this column (Product split) */
+	lead?: NavLink;
+	/** Denser list for long language columns */
+	compact?: boolean;
+	/** Icon + title only (no description) */
+	simple?: boolean;
 	links: NavLink[];
 };
 
 type NavItem = {
 	title: string;
 	href: string;
-	mega?: { categories: NavCategory[] };
+	mega?: {
+		categories: NavCategory[];
+	};
 };
+
+const docLanguages: NavLink[] = [
+	{
+		title: "Node.js",
+		href: "/sdk/nodejs",
+		description: "TypeScript & JavaScript SDK",
+		brand: siNodedotjs,
+	},
+	{
+		title: "Python",
+		href: "/sdk/python",
+		description: "Flask, FastAPI, Django",
+		brand: siPython,
+	},
+	{
+		title: "Go",
+		href: "/sdk/go",
+		description: "High-throughput Go client",
+		brand: siGo,
+	},
+	{
+		title: "Rust",
+		href: "/sdk/rust",
+		description: "Async-first Rust crate",
+		// Brand hex is #000000 — lift so it stays visible on dark UI
+		brand: { ...siRust, hex: "e24d2b" },
+	},
+	{
+		title: "PHP",
+		href: "/sdk/php",
+		description: "Laravel & Symfony ready",
+		brand: siPhp,
+	},
+	{
+		title: "Ruby",
+		href: "/sdk/ruby",
+		description: "Rails and Ruby apps",
+		brand: siRuby,
+	},
+	{
+		title: "Elixir",
+		href: "/sdk/elixir",
+		description: "Phoenix & OTP client",
+		brand: siElixir,
+	},
+	{
+		title: "Java",
+		href: "/sdk/java",
+		description: "Spring Boot & JVM",
+		brand: siSpringboot,
+	},
+	{
+		title: ".NET",
+		href: "/sdk/dotnet",
+		description: "C# & ASP.NET Core",
+		brand: siDotnet,
+	},
+];
 
 const navItems: NavItem[] = [
 	{
-		title: "Products",
+		title: "Product",
 		href: "/features",
+		mega: {
+			// Left: Transactional + Marketing cards
+			// Middle: Email API, Templates, Inbound, Contacts
+			// Right: Agent Inbox, SMTP, Workflows, …
+			categories: [
+				{
+					title: "",
+					featured: true,
+					links: [
+						{
+							title: "Transactional",
+							href: "/features/transaction-emails",
+							icon: "mail-send",
+						},
+						{
+							title: "Marketing",
+							href: "/use-cases/automated-email",
+							icon: "mega-phone",
+						},
+					],
+				},
+				{
+					title: "",
+					simple: true,
+					links: [
+						{
+							title: "Email API",
+							href: "/docs/api",
+							icon: "code",
+						},
+						{
+							title: "Templates",
+							href: "/features/email-templates",
+							icon: "file-text",
+						},
+						{
+							title: "Inbound",
+							href: "/use-cases/inbound-email",
+							icon: "mail-receive",
+						},
+						{
+							title: "Contacts",
+							href: "/docs/learn/contacts",
+							icon: "contacts",
+						},
+					],
+				},
+				{
+					title: "",
+					simple: true,
+					links: [
+						{
+							title: "Agent Inbox",
+							href: "/use-cases/ai-agent-inbox",
+							icon: "agent",
+						},
+						{
+							title: "SMTP",
+							href: "/features/smtp",
+							icon: "smtp",
+						},
+						{
+							title: "Workflows",
+							href: "/docs/learn/workflows",
+							icon: "workflow",
+						},
+						{
+							title: "Webhooks",
+							href: "/features/webhooks",
+							icon: "webhook",
+						},
+					],
+				},
+			],
+		},
+	},
+	{
+		title: "Docs",
+		href: "/docs",
 		mega: {
 			categories: [
 				{
-					title: "Email",
+					title: "Explore",
+					featured: true,
 					links: [
 						{
-							title: "Transaction Emails",
-							href: "/features/transaction-emails",
+							title: "Documentation",
+							href: "/docs",
+							description: "Platform documentation",
+							icon: "book-open",
 						},
-						{ title: "SMTP Relay", href: "/features/smtp" },
-						{ title: "Email Analytics", href: "/features/email-analytics" },
-						{ title: "Email Validation", href: "/features/email-validation" },
-						{ title: "Email Templates", href: "/features/email-templates" },
+						{
+							title: "API Reference",
+							href: "/docs/api",
+							description: "Endpoints, auth, and examples",
+							icon: "brackets",
+						},
 					],
 				},
 				{
-					title: "Feather",
-					links: [
-						{ title: "AI Agents", href: "/features/ai-agents" },
-						{ title: "Webhooks", href: "/features/webhooks" },
-						{ title: "Deliverability", href: "/features/deliverability" },
-						{ title: "Developers", href: "/developers" },
-						{ title: "Integrations", href: "/docs/integrations" },
-					],
+					title: "Languages",
+					compact: true,
+					links: docLanguages,
 				},
 				{
-					title: "Developers",
+					title: "Guides",
 					links: [
-						{ title: "SDKs", href: "/sdk" },
-						{ title: "Frameworks", href: "/frameworks" },
-						{ title: "API Reference", href: "/docs/api" },
-						{ title: "Getting Started", href: "/docs" },
-						{ title: "Campaign Builder", href: "/docs/features/templates" },
-						{ title: "Webhooks", href: "/docs/webhooks" },
+						{
+							title: "SDKs",
+							href: "/sdk",
+							description: "Official libraries for every stack",
+							icon: "code",
+						},
+						{
+							title: "Frameworks",
+							href: "/frameworks",
+							description: "Next.js, Django, Laravel, and more",
+							icon: "layers",
+						},
+						{
+							title: "Integrations",
+							href: "/docs/integrations",
+							description: "Connect the tools you already use",
+							icon: "integration",
+						},
+						{
+							title: "Developers",
+							href: "/developers",
+							description: "Build with the API, MCP, and SDKs",
+							icon: "terminal",
+						},
+						{
+							title: "Self-host",
+							href: "/docs/self-host",
+							description: "Run Reloop on your own infra",
+							icon: "server",
+						},
 					],
 				},
 			],
@@ -70,39 +263,76 @@ const navItems: NavItem[] = [
 	},
 	{
 		title: "Resources",
-		href: "/resources",
+		href: "/blog",
 		mega: {
 			categories: [
 				{
+					title: "Explore",
+					featured: true,
+					links: [
+						{
+							title: "Free tools",
+							href: "/tools",
+							description: "Validators, testers, and generators",
+							icon: "zap",
+						},
+						{
+							title: "Community",
+							href: "/community",
+							description: "Join the conversation",
+							icon: "users",
+						},
+					],
+				},
+				{
 					title: "Learn",
 					links: [
-						{ title: "Blog", href: "/blog" },
-						{ title: "Changelog", href: "/changelog" },
-						{ title: "Glossary", href: "/glossary" },
-						{ title: "Community", href: "/community" },
-						{ title: "Documentation", href: "/docs" },
+						{
+							title: "Blog",
+							href: "/blog",
+							description: "Insights and stories",
+							icon: "pencil",
+						},
+						{
+							title: "Changelog",
+							href: "/changelog",
+							description: "Releases and updates",
+							icon: "list",
+						},
+						{
+							title: "Glossary",
+							href: "/glossary",
+							description: "Email terms, demystified",
+							icon: "book-closed",
+						},
 					],
 				},
 				{
 					title: "Compare",
 					links: [
-						{ title: "vs Resend", href: "/compare/resend" },
-						{ title: "vs SendGrid", href: "/compare/sendgrid" },
-						{ title: "vs Mailgun", href: "/compare/mailgun" },
-						{ title: "vs AWS SES", href: "/compare/aws-ses" },
-						{ title: "All comparisons", href: "/compare" },
-					],
-				},
-				{
-					title: "Tools",
-					links: [
-						{ title: "Free tools", href: "/tools" },
-						{ title: "Email validator", href: "/tools/email-validator" },
-						{ title: "Subject tester", href: "/tools/subject-tester" },
-						{ title: "Template generator", href: "/tools/template-generator" },
 						{
-							title: "Deliverability tester",
-							href: "/tools/deliverability-tester",
+							title: "vs Resend",
+							href: "/compare/resend",
+							description: "Feature and pricing breakdown",
+							icon: "arrow-swap",
+						},
+						{
+							title: "vs SendGrid",
+							href: "/compare/sendgrid",
+							description: "Open-source alternative path",
+							icon: "arrow-swap",
+						},
+						{
+							title: "vs Mailgun",
+							href: "/compare/mailgun",
+							description: "API and deliverability compare",
+							icon: "arrow-swap",
+						},
+						{
+							title: "All comparisons",
+							href: "/compare",
+							description: "Browse every alternative",
+							icon: "layout-grid",
 						},
 					],
 				},
@@ -117,36 +347,83 @@ const navItems: NavItem[] = [
 				{
 					title: "Company",
 					links: [
-						{ title: "About", href: "/about" },
-						{ title: "Contact", href: "/contact" },
-						{ title: "Blog", href: "/blog" },
-						{ title: "Pricing", href: "/pricing" },
+						{
+							title: "About",
+							href: "/about",
+							description: "Company, values, and team",
+							icon: "users",
+						},
+						{
+							title: "Careers",
+							href: "/careers",
+							description: "Join our remote team",
+							icon: "briefcase",
+						},
+						{
+							title: "Contact",
+							href: "/contact",
+							description: "Reach out to support or sales",
+							icon: "mail",
+						},
+						{
+							title: "Product Beliefs",
+							href: "/our-product-beliefs",
+							description: "What we optimize for",
+							icon: "bulb",
+						},
 					],
 				},
 				{
-					title: "Open Source",
+					title: "Open source",
 					links: [
-						{ title: "Why Open Source", href: "/why-open-source" },
-						{ title: "Self-host", href: "/docs/self-host" },
-						{ title: "License", href: "/license" },
+						{
+							title: "Why Open Source",
+							href: "/why-open-source",
+							description: "No lock-in, full transparency",
+							icon: "open-source",
+						},
+						{
+							title: "Self-host",
+							href: "/docs/self-host",
+							description: "Run Reloop on your infra",
+							icon: "server",
+						},
+						{
+							title: "License",
+							href: "/license",
+							description: "How you can use the code",
+							icon: "file",
+						},
 						{
 							title: "GitHub",
 							href: "https://github.com/reloop-labs/reloop",
+							description: "Star the repo and contribute",
+							icon: "social-github",
 							external: true,
 						},
 					],
 				},
 				{
-					title: "Philosophy",
+					title: "Updates",
 					links: [
 						{
-							title: "Product Beliefs",
-							href: "/our-product-beliefs",
+							title: "Blog",
+							href: "/blog",
+							description: "Insights and stories",
+							icon: "pencil",
 						},
-						{ title: "Engineering", href: "/docs/setup" },
 						{
-							title: "Why Open Source",
-							href: "/why-open-source",
+							title: "Changelog",
+							href: "/changelog",
+							description: "Releases and updates",
+							icon: "list",
+						},
+						{
+							title: "Status",
+							href: "https://status.reloop.sh/status/live",
+							description: "System uptime and incidents",
+							icon: "activity",
+							external: true,
 						},
 					],
 				},
@@ -154,43 +431,247 @@ const navItems: NavItem[] = [
 		},
 	},
 	{ title: "Pricing", href: "/pricing" },
-	{ title: "Contact", href: "/contact" },
 ];
 
-function MegaLink({ link }: { link: NavLink }) {
-	const isCrossDomain =
-		link.href.startsWith("/docs") || link.href.startsWith("/dashboard");
+function isCrossDomain(href: string) {
+	return href.startsWith("/docs") || href.startsWith("/dashboard");
+}
 
-	if (isCrossDomain) {
+function isExternalHref(href: string, external?: boolean) {
+	return Boolean(external || href.startsWith("http"));
+}
+
+function isDarkBrandHex(hex: string) {
+	const clean = hex.replace("#", "").toLowerCase();
+	if (clean === "000000" || clean === "000" || clean === "333333") return true;
+	if (clean.length === 6) {
+		const r = Number.parseInt(clean.slice(0, 2), 16);
+		const g = Number.parseInt(clean.slice(2, 4), 16);
+		const b = Number.parseInt(clean.slice(4, 6), 16);
+		return (0.299 * r + 0.587 * g + 0.114 * b) / 255 < 0.25;
+	}
+	return false;
+}
+
+function NavGlyph({
+	link,
+	featured = false,
+	compact = false,
+}: {
+	link: NavLink;
+	featured?: boolean;
+	compact?: boolean;
+}) {
+	if (!link.icon && !link.brand) return null;
+
+	// Featured Explore cards: plain icon (no tile). List rows: soft rounded tile.
+	if (featured) {
+		const iconClass = "size-5 text-text-sub-600 dark:text-white/65";
+		if (link.brand) {
+			const hex = link.brand.hex.replace("#", "");
+			const colorStyle = isDarkBrandHex(hex)
+				? undefined
+				: { color: `#${hex}` };
+			return (
+				<span className="inline-flex" style={colorStyle}>
+					<svg
+						viewBox="0 0 24 24"
+						className="size-5"
+						fill="currentColor"
+						aria-hidden
+					>
+						<title>{link.brand.title}</title>
+						<path d={link.brand.path} />
+					</svg>
+				</span>
+			);
+		}
+		return <Icon name={link.icon!} className={iconClass} />;
+	}
+
+	const boxClass = compact
+		? "mt-px inline-flex size-9 shrink-0 items-center justify-center rounded-[10px] border border-stroke-soft-200/90 bg-bg-weak-50 text-text-sub-600 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/65"
+		: "mt-px inline-flex size-10 shrink-0 items-center justify-center rounded-[12px] border border-stroke-soft-200/90 bg-bg-weak-50 text-text-sub-600 transition-colors group-hover:bg-bg-white-0 group-hover:text-text-strong-950 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/65 dark:group-hover:bg-white/[0.07] dark:group-hover:text-white";
+
+	if (link.brand) {
+		const hex = link.brand.hex.replace("#", "");
+		const colorStyle = isDarkBrandHex(hex)
+			? undefined
+			: { color: `#${hex}` };
 		return (
-			<a
-				href={link.href}
-				{...(link.external ? { target: "_blank", rel: "noreferrer" } : {})}
-				className="group inline-flex items-center gap-1 font-medium text-[18px] text-text-strong-950 leading-snug transition-colors hover:text-text-strong-950/70 dark:text-white dark:hover:text-white/70"
-			>
-				{link.title}
-				{link.external && (
-					<span className="group-hover:-translate-y-px text-[12px] text-text-sub-600 transition-transform group-hover:translate-x-px dark:text-white/55">
-						↗
+			<span className={boxClass} style={colorStyle}>
+				<svg
+					viewBox="0 0 24 24"
+					className={compact ? "size-3.5" : "size-4"}
+					fill="currentColor"
+					aria-hidden
+				>
+					<title>{link.brand.title}</title>
+					<path d={link.brand.path} />
+				</svg>
+			</span>
+		);
+	}
+
+	return (
+		<span className={boxClass}>
+			<Icon name={link.icon!} className={compact ? "size-3.5" : "size-4"} />
+		</span>
+	);
+}
+
+function MegaLink({
+	link,
+	featured = false,
+	compact = false,
+	simple = false,
+}: {
+	link: NavLink;
+	featured?: boolean;
+	compact?: boolean;
+	simple?: boolean;
+}) {
+	const external = isExternalHref(link.href, link.external);
+	const crossDomain = isCrossDomain(link.href);
+	// Explore-style featured card: icon top, title bottom — fills column height
+	const className = featured
+		? "group flex h-full min-h-[148px] min-w-0 flex-col justify-between overflow-hidden rounded-[18px] bg-[#f4f4f5] p-4 sm:p-5 transition-colors hover:bg-[#efeff1] dark:bg-white/[0.045] dark:hover:bg-white/[0.07]"
+		: simple
+			? "group flex min-w-0 items-center gap-3 rounded-[12px] px-1.5 py-2 transition-colors hover:bg-bg-weak-50/80 dark:hover:bg-white/[0.04]"
+			: "group flex min-w-0 items-start gap-3 rounded-[12px] px-1.5 py-2 transition-colors hover:bg-bg-weak-50/80 dark:hover:bg-white/[0.04]";
+
+	const content = featured ? (
+		<>
+			<div className="flex shrink-0 items-start">
+				<NavGlyph link={link} featured />
+			</div>
+			<span className="min-w-0">
+				<span className="flex items-center gap-1">
+					<span className="font-medium text-[15px] text-text-strong-950 leading-snug tracking-[-0.01em] dark:text-white">
+						{link.title}
+					</span>
+					{external && (
+						<span className="text-[11px] text-text-sub-600 dark:text-white/45">
+							↗
+						</span>
+					)}
+				</span>
+				{link.description && (
+					<span className="mt-1 block text-[13px] text-text-sub-600 leading-snug dark:text-white/45">
+						{link.description}
 					</span>
 				)}
+			</span>
+		</>
+	) : (
+		<>
+			<NavGlyph link={link} compact={compact || simple} />
+			<span className={simple ? "min-w-0" : "min-w-0 flex-1 pt-0.5"}>
+				<span className="flex items-center gap-1">
+					<span className="font-medium text-[14.5px] text-text-strong-950 leading-snug tracking-[-0.01em] dark:text-white">
+						{link.title}
+					</span>
+					{external && (
+						<span className="text-[11px] text-text-sub-600 transition-transform group-hover:translate-x-px group-hover:-translate-y-px dark:text-white/45">
+							↗
+						</span>
+					)}
+				</span>
+				{!simple && link.description && (
+					<span className="mt-0.5 block text-[13px] text-text-sub-600 leading-snug dark:text-white/45">
+						{link.description}
+					</span>
+				)}
+			</span>
+		</>
+	);
+
+	const shared = {
+		className,
+		...(external ? { target: "_blank", rel: "noreferrer" } : {}),
+	};
+
+	if (crossDomain || external) {
+		return (
+			<a href={link.href} {...shared}>
+				{content}
 			</a>
 		);
 	}
 
 	return (
-		<Link
-			href={link.href}
-			{...(link.external ? { target: "_blank", rel: "noreferrer" } : {})}
-			className="group inline-flex items-center gap-1 font-medium text-[18px] text-text-strong-950 leading-snug transition-colors hover:text-text-strong-950/70 dark:text-white dark:hover:text-white/70"
-		>
-			{link.title}
-			{link.external && (
-				<span className="group-hover:-translate-y-px text-[12px] text-text-sub-600 transition-transform group-hover:translate-x-px dark:text-white/55">
-					↗
-				</span>
-			)}
+		<Link href={link.href} {...shared}>
+			{content}
 		</Link>
+	);
+}
+
+function MegaPanel({ item }: { item: NavItem }) {
+	if (!item.mega) return null;
+
+	const { categories } = item.mega;
+	const count = categories.length;
+	const hasFeatured = categories.some((c) => c.featured);
+	// Product: featured cards (left) + two simple list columns
+	const productLayout = hasFeatured && count === 3;
+
+	return (
+		<div
+			className={
+				productLayout
+					? "grid min-w-0 grid-cols-1 items-stretch gap-0 sm:grid-cols-[minmax(0,1.2fr)_minmax(0,0.85fr)_minmax(0,0.85fr)] sm:divide-x sm:divide-stroke-soft-200/80 dark:sm:divide-white/[0.08]"
+					: count >= 3
+						? "grid min-w-0 items-stretch sm:grid-cols-2 lg:grid-cols-3 lg:divide-x lg:divide-stroke-soft-200/80 dark:lg:divide-white/[0.08]"
+						: count === 2
+							? hasFeatured
+								? "grid min-w-0 items-stretch sm:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] sm:divide-x sm:divide-stroke-soft-200/80 dark:sm:divide-white/[0.08]"
+								: "grid min-w-0 items-stretch sm:grid-cols-2 sm:divide-x sm:divide-stroke-soft-200/80 dark:sm:divide-white/[0.08]"
+							: "grid min-w-0 grid-cols-1"
+			}
+		>
+			{categories.map((category, categoryIndex) => (
+				<div
+					key={category.title || `col-${categoryIndex}`}
+					className={
+						category.featured
+							? "flex min-h-0 min-w-0 flex-col px-3 py-1 first:pl-0 last:pr-0 sm:px-4"
+							: category.simple
+								? "flex min-w-0 flex-col justify-center px-3 py-1 first:pl-0 last:pr-0 sm:px-4"
+								: "min-w-0 px-3 py-1 first:pl-0 last:pr-0 sm:px-5"
+					}
+				>
+					{category.title ? (
+						<p className="mb-3 px-1 text-[11px] font-medium text-text-sub-600 uppercase tracking-[0.12em] dark:text-white/40">
+							{category.title}
+						</p>
+					) : null}
+					{category.featured ? (
+						<div
+							className={
+								category.links.length >= 2
+									? "grid min-h-0 flex-1 grid-cols-2 gap-2.5"
+									: "grid min-h-0 flex-1 grid-cols-1 gap-2.5"
+							}
+						>
+							{category.links.map((link) => (
+								<MegaLink key={link.title} link={link} featured />
+							))}
+						</div>
+					) : (
+						<div className="flex flex-col gap-0.5">
+							{category.links.map((link) => (
+								<MegaLink
+									key={link.title}
+									link={link}
+									compact={category.compact}
+									simple={category.simple}
+								/>
+							))}
+						</div>
+					)}
+				</div>
+			))}
+		</div>
 	);
 }
 
@@ -253,7 +734,7 @@ export const Header = () => {
 			className="fixed top-0 right-0 left-0 z-50 border-stroke-soft-200/70 border-b bg-bg-white-0 dark:border-white/10 dark:bg-black"
 			onMouseLeave={() => setActiveMega(null)}
 		>
-			<div className="mx-auto w-full max-w-5xl px-6 md:max-w-7xl">
+			<div className="relative mx-auto w-full max-w-5xl px-6 md:max-w-7xl">
 				<div className="flex h-16 items-center justify-between gap-4">
 					<div className="flex items-center gap-6 sm:gap-8">
 						<Link
@@ -408,58 +889,117 @@ export const Header = () => {
 															}}
 															className="overflow-hidden"
 														>
-															<div className="space-y-6 pb-4 pl-2">
-																{item.mega.categories.map((category) => (
-																	<div key={category.title}>
-																		<p className="mb-3 text-[12px] text-text-sub-600 uppercase tracking-[0.12em] dark:text-white/55">
-																			{category.title}
-																		</p>
-																		<div className="flex flex-col gap-2">
-																			{category.links.map((link) => {
-																				const isCrossDomain =
-																					link.href.startsWith("/docs") ||
-																					link.href.startsWith("/dashboard");
-																				const linkProps = {
-																					key: link.title,
-																					href: link.href,
-																					onClick: closeMobileMenu,
-																					className:
-																						"inline-flex items-center gap-1 py-1 font-medium text-[15px] text-text-strong-950 transition-colors hover:text-text-strong-950/70 dark:text-white dark:hover:text-white/70",
-																					...(link.external
-																						? {
-																								target: "_blank",
-																								rel: "noreferrer",
-																							}
-																						: {}),
-																				};
-
-																				if (isCrossDomain) {
-																					return (
-																						<a {...linkProps}>
-																							{link.title}
-																							{link.external && (
-																								<span className="text-[12px] text-text-sub-600 dark:text-white/55">
-																									↗
-																								</span>
-																							)}
-																						</a>
+															<div className="space-y-6 pb-4 pl-1">
+																{item.mega.categories.map(
+																	(category, categoryIndex) => (
+																		<div
+																			key={
+																				category.title ||
+																				category.lead?.title ||
+																				`mcol-${categoryIndex}`
+																			}
+																			className="space-y-2"
+																		>
+																			{category.title ? (
+																				<p className="mb-2 px-2 text-[11px] font-medium text-text-sub-600 uppercase tracking-[0.14em] dark:text-white/40">
+																					{category.title}
+																				</p>
+																			) : null}
+																			{category.lead && (
+																				<div className="min-h-[112px] px-1">
+																					<a
+																						href={category.lead.href}
+																						onClick={closeMobileMenu}
+																						className="group flex h-full min-h-[112px] flex-col justify-between rounded-[18px] bg-[#f4f4f5] p-4 transition-colors hover:bg-[#efeff1] dark:bg-white/[0.045] dark:hover:bg-white/[0.07]"
+																					>
+																						<NavGlyph
+																							link={category.lead}
+																							featured
+																						/>
+																						<span className="font-medium text-[15px] text-text-strong-950 dark:text-white">
+																							{category.lead.title}
+																						</span>
+																					</a>
+																				</div>
+																			)}
+																			<div className="flex flex-col gap-0.5">
+																				{(category.featured
+																					? category.links
+																					: category.links
+																				).map((link) => {
+																					const external = isExternalHref(
+																						link.href,
+																						link.external,
 																					);
-																				}
-
-																				return (
-																					<Link {...linkProps}>
-																						{link.title}
-																						{link.external && (
-																							<span className="text-[12px] text-text-sub-600 dark:text-white/55">
-																								↗
+																					const crossDomain = isCrossDomain(
+																						link.href,
+																					);
+																					const className =
+																						category.simple || category.featured
+																							? "flex items-center gap-3 rounded-xl px-2 py-2 transition-colors hover:bg-neutral-950/[0.04] dark:hover:bg-white/[0.05]"
+																							: "flex items-start gap-3 rounded-xl px-2 py-2 transition-colors hover:bg-neutral-950/[0.04] dark:hover:bg-white/[0.05]";
+																					const body = (
+																						<>
+																							<NavGlyph
+																								link={link}
+																								compact={
+																									category.compact ||
+																									category.simple
+																								}
+																							/>
+																							<span className="min-w-0">
+																								<span className="flex items-center gap-1 font-medium text-[14px] text-text-strong-950 dark:text-white">
+																									{link.title}
+																									{external && (
+																										<span className="text-[11px] text-text-sub-600 dark:text-white/45">
+																											↗
+																										</span>
+																									)}
+																								</span>
+																								{!category.simple &&
+																									link.description && (
+																										<span className="mt-0.5 block text-[13px] text-text-sub-600 leading-snug dark:text-white/45">
+																											{link.description}
+																										</span>
+																									)}
 																							</span>
-																						)}
-																					</Link>
-																				);
-																			})}
+																						</>
+																					);
+
+																					if (crossDomain || external) {
+																						return (
+																							<a
+																								key={link.title}
+																								href={link.href}
+																								onClick={closeMobileMenu}
+																								className={className}
+																								{...(external
+																									? {
+																											target: "_blank",
+																											rel: "noreferrer",
+																										}
+																									: {})}
+																							>
+																								{body}
+																							</a>
+																						);
+																					}
+
+																					return (
+																						<Link
+																							key={link.title}
+																							href={link.href}
+																							onClick={closeMobileMenu}
+																							className={className}
+																						>
+																							{body}
+																						</Link>
+																					);
+																				})}
+																			</div>
 																		</div>
-																	</div>
-																))}
+																	),
+																)}
 															</div>
 														</motion.div>
 													)}
@@ -528,34 +1068,25 @@ export const Header = () => {
 					)}
 				</AnimatePresence>
 
+				{/* Floating card mega menu — reference-style divided panel */}
 				<AnimatePresence>
 					{activeMega && activeItem?.mega && (
 						<motion.div
-							initial={{ opacity: 0, height: 0 }}
-							animate={{ opacity: 1, height: "auto" }}
-							exit={{ opacity: 0, height: 0 }}
-							transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
-							className="hidden overflow-hidden lg:block"
+							key={activeMega}
+							initial={{ opacity: 0, y: 6, scale: 0.98 }}
+							animate={{ opacity: 1, y: 0, scale: 1 }}
+							exit={{ opacity: 0, y: 4, scale: 0.98 }}
+							transition={{ duration: 0.16, ease: [0.23, 1, 0.32, 1] }}
+							className="absolute top-full left-0 z-50 hidden pt-2 lg:block"
 						>
-							<div className="pt-2 pb-10">
-								<div className="grid grid-cols-[1fr_auto_1fr]">
-									<div />
-									<div className="flex flex-wrap justify-center gap-x-20 gap-y-10">
-										{activeItem.mega.categories.map((category) => (
-											<div key={category.title} className="min-w-[160px]">
-												<p className="mb-4 text-[13px] text-text-sub-600 dark:text-[#888888]">
-													{category.title}
-												</p>
-												<div className="flex flex-col gap-3">
-													{category.links.map((link) => (
-														<MegaLink key={link.title} link={link} />
-													))}
-												</div>
-											</div>
-										))}
-									</div>
-									<div />
-								</div>
+							{/* Hover bridge so the gap between bar and card doesn't close the menu */}
+							<div className="absolute inset-x-0 -top-2 h-2" aria-hidden />
+							<div
+								className="w-[min(880px,calc(100vw-2rem))] overflow-hidden rounded-[20px] border border-stroke-soft-200/90 bg-bg-white-0 p-3 shadow-[0_18px_50px_-12px_rgba(15,23,42,0.14),0_6px_18px_-6px_rgba(15,23,42,0.06)] sm:p-4 dark:border-white/10 dark:bg-neutral-950 dark:shadow-[0_20px_56px_-12px_rgba(0,0,0,0.65)]"
+								role="menu"
+								aria-label={`${activeItem.title} menu`}
+							>
+								<MegaPanel item={activeItem} />
 							</div>
 						</motion.div>
 					)}
