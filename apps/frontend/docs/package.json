@@ -22,6 +22,7 @@
 		"@radix-ui/react-popover": "catalog:ui",
 		"@radix-ui/react-presence": "catalog:ui",
 		"@radix-ui/react-scroll-area": "catalog:ui",
+		"@reloop/analytics": "workspace:*",
 		"@reloop/auth": "workspace:*",
 		"@reloop/ui": "workspace:*",
 		"better-auth": "catalog:",
@@ -43,8 +44,7 @@
 		"simple-icons": "catalog:ui",
 		"tailwind-merge": "catalog:ui",
 		"zod": "catalog:ui",
-		"@reloop/code-samples": "workspace:*",
-		"posthog-js": "^1.417.0"
+		"@reloop/code-samples": "workspace:*"
 	},
 	"devDependencies": {
 		"@types/node": "catalog:",

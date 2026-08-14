@@ -13,6 +13,7 @@
 	},
 	"dependencies": {
 		"@hookform/resolvers": "catalog:ui",
+		"@reloop/analytics": "workspace:*",
 		"@reloop/auth": "workspace:*",
 		"@reloop/code-samples": "workspace:*",
 		"@reloop/pricing": "workspace:*",
@@ -39,8 +40,7 @@
 		"sonner": "catalog:ui",
 		"tailwindcss": "catalog:ui",
 		"three": "^0.185.1",
-		"valibot": "catalog:db",
-		"posthog-js": "^1.417.0"
+		"valibot": "catalog:db"
 	},
 	"devDependencies": {
 		"@types/mdx": "catalog:ui",

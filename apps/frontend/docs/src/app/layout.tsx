@@ -1,5 +1,5 @@
 import "./global.css";
-import { PostHogProvider } from "@reloop/fe-docs/components/posthog-provider";
+import { PostHogProvider } from "@reloop/analytics";
 import { ThemeProvider } from "@reloop/fe-docs/components/theme-provider";
 import { cn } from "@reloop/fe-docs/lib/cn";
 import { IconsSprite } from "@reloop/ui/icons-sprite";

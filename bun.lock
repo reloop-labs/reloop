@@ -647,6 +647,7 @@
         "@number-flow/react": "catalog:ui",
         "@radix-ui/react-checkbox": "catalog:ui",
         "@react-email/editor": "catalog:ui",
+        "@reloop/analytics": "workspace:*",
         "@reloop/auth": "workspace:*",
         "@reloop/code-samples": "workspace:*",
         "@reloop/pricing": "workspace:*",
@@ -686,7 +687,6 @@
         "next": "catalog:ui",
         "next-themes": "catalog:ui",
         "nuqs": "catalog:ui",
-        "posthog-js": "^1.417.0",
         "rc-progress": "^4.0.0",
         "react": "catalog:ui",
         "react-day-picker": "catalog:ui",
@@ -733,6 +733,7 @@
         "@radix-ui/react-popover": "catalog:ui",
         "@radix-ui/react-presence": "catalog:ui",
         "@radix-ui/react-scroll-area": "catalog:ui",
+        "@reloop/analytics": "workspace:*",
         "@reloop/auth": "workspace:*",
         "@reloop/code-samples": "workspace:*",
         "@reloop/tailwind": "workspace:*",
@@ -748,7 +749,6 @@
         "next": "catalog:ui",
         "next-mdx-remote": "catalog:ui",
         "next-themes": "catalog:ui",
-        "posthog-js": "^1.417.0",
         "react": "catalog:ui",
         "react-dom": "catalog:ui",
         "react-hotkeys-hook": "catalog:ui",
@@ -800,6 +800,7 @@
       "version": "0.1.0",
       "dependencies": {
         "@hookform/resolvers": "catalog:ui",
+        "@reloop/analytics": "workspace:*",
         "@reloop/auth": "workspace:*",
         "@reloop/code-samples": "workspace:*",
         "@reloop/pricing": "workspace:*",
@@ -817,7 +818,6 @@
         "next-mdx-remote": "catalog:ui",
         "next-themes": "catalog:ui",
         "postcss": "catalog:ui",
-        "posthog-js": "^1.417.0",
         "react": "catalog:ui",
         "react-dom": "catalog:ui",
         "react-hook-form": "catalog:ui",
@@ -836,6 +836,26 @@
         "@types/react": "catalog:ui",
         "@types/react-dom": "catalog:ui",
         "typescript": "catalog:",
+      },
+    },
+    "packages/analytics": {
+      "name": "@reloop/analytics",
+      "version": "0.1.0",
+      "dependencies": {
+        "posthog-js": "^1.417.0",
+      },
+      "devDependencies": {
+        "@reloop/tsconfig": "workspace:*",
+        "@types/node": "catalog:",
+        "@types/react": "catalog:ui",
+        "@types/react-dom": "catalog:ui",
+        "typescript": "catalog:",
+      },
+      "peerDependencies": {
+        "@types/react": "catalog:ui",
+        "@types/react-dom": "catalog:ui",
+        "react": "catalog:ui",
+        "react-dom": "catalog:ui",
       },
     },
     "packages/auth": {
@@ -2107,6 +2127,8 @@
     "@redis/search": ["@redis/search@5.8.2", "", { "peerDependencies": { "@redis/client": "^5.8.2" } }, "sha512-cNv7HlgayavCBXqPXgaS97DRPVWFznuzsAmmuemi2TMCx5scwLiP50TeZvUS06h/MG96YNPe6A0Zt57yayfxwA=="],
 
     "@redis/time-series": ["@redis/time-series@5.8.2", "", { "peerDependencies": { "@redis/client": "^5.8.2" } }, "sha512-g2NlHM07fK8H4k+613NBsk3y70R2JIM2dPMSkhIjl2Z17SYvaYKdusz85d7VYOrZBWtDrHV/WD2E3vGu+zni8A=="],
+
+    "@reloop/analytics": ["@reloop/analytics@workspace:packages/analytics"],
 
     "@reloop/auth": ["@reloop/auth@workspace:packages/auth"],
 

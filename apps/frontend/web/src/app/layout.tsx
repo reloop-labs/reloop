@@ -10,7 +10,7 @@ import {
 	siteDescription,
 	siteName,
 } from "@reloop/web/lib/site";
-import { PostHogProvider } from "@reloop/web/providers/posthog-provider";
+import { PostHogProvider } from "@reloop/analytics";
 import { ThemeProvider } from "@reloop/web/providers/theme-provider";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 import Script from "next/script";

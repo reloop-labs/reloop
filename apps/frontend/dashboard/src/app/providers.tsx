@@ -9,7 +9,7 @@ import { LazyIconsSprite } from "#/components/lazy-icons-sprite";
 import { KeyboardShortcutsRevealListener } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { createQueryClient } from "#/lib/query-client";
 import { installAxiosRateLimitInterceptor } from "#/lib/rate-limit-toast";
-import { PostHogProvider } from "#/providers/posthog-provider";
+import { PostHogProvider } from "@reloop/analytics";
 import { ThemeProvider } from "#/providers/theme-provider";
 import { ProvidersSuspenseFallback } from "./providers-suspense-fallback";
 
