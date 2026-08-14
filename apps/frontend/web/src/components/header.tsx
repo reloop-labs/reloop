@@ -7,7 +7,7 @@ import { Icon } from "@reloop/ui/icon";
 import { Logo } from "@reloop/ui/logo";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import Link from "next/link";
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 /** CSS `ease` — mega open/close (scaleIn/Out) and directional content slides */
@@ -38,15 +38,31 @@ const megaContentVariants = {
 };
 
 import {
+	siCloudflare,
+	siDjango,
+	siDocker,
 	siDotnet,
 	siElixir,
+	siExpress,
+	siFastapi,
 	siGo,
+	siLaravel,
+	siN8n,
+	siNestjs,
+	siNetlify,
+	siNextdotjs,
 	siNodedotjs,
 	siPhp,
 	siPython,
+	siRailway,
 	siRuby,
+	siRubyonrails,
 	siRust,
 	siSpringboot,
+	siStrapi,
+	siVercel,
+	siWordpress,
+	siZapier,
 } from "simple-icons";
 
 type BrandIcon = {
@@ -237,10 +253,21 @@ type NavCategory = {
 	featured?: boolean;
 	/** Single featured card at the top of this column (Product split) */
 	lead?: NavLink;
-	/** Denser list for long language columns */
+	/** Denser brand list (languages / frameworks) */
 	compact?: boolean;
 	/** Icon + title only (no description) */
 	simple?: boolean;
+	/** Optional “View all” next to the section label */
+	viewAllHref?: string;
+	/** When compact: render links as an N-column grid (no section titles) */
+	gridCols?: 2 | 3;
+	links: NavLink[];
+};
+
+type MegaFooter = {
+	title: string;
+	/** Link for “View all” */
+	href: string;
 	links: NavLink[];
 };
 
@@ -249,6 +276,8 @@ type NavItem = {
 	href: string;
 	mega?: {
 		categories: NavCategory[];
+		/** Full-width strip under the main columns (e.g. Docs integrations) */
+		footer?: MegaFooter;
 	};
 };
 
@@ -256,57 +285,141 @@ const docLanguages: NavLink[] = [
 	{
 		title: "Node.js",
 		href: "/sdk/nodejs",
-		description: "TypeScript & JavaScript SDK",
 		brand: siNodedotjs,
 	},
 	{
 		title: "Python",
 		href: "/sdk/python",
-		description: "Flask, FastAPI, Django",
 		brand: siPython,
 	},
 	{
 		title: "Go",
 		href: "/sdk/go",
-		description: "High-throughput Go client",
 		brand: siGo,
 	},
 	{
 		title: "Rust",
 		href: "/sdk/rust",
-		description: "Async-first Rust crate",
 		// Brand hex is #000000 — lift so it stays visible on dark UI
 		brand: { ...siRust, hex: "e24d2b" },
 	},
 	{
 		title: "PHP",
 		href: "/sdk/php",
-		description: "Laravel & Symfony ready",
 		brand: siPhp,
 	},
 	{
 		title: "Ruby",
 		href: "/sdk/ruby",
-		description: "Rails and Ruby apps",
 		brand: siRuby,
 	},
 	{
 		title: "Elixir",
 		href: "/sdk/elixir",
-		description: "Phoenix & OTP client",
 		brand: siElixir,
 	},
 	{
 		title: "Java",
 		href: "/sdk/java",
-		description: "Spring Boot & JVM",
 		brand: siSpringboot,
 	},
 	{
 		title: ".NET",
 		href: "/sdk/dotnet",
-		description: "C# & ASP.NET Core",
 		brand: siDotnet,
+	},
+];
+
+/** Curated framework guides shown in the Docs mega menu */
+const docFrameworks: NavLink[] = [
+	{
+		title: "Next.js",
+		href: "/frameworks/nextjs",
+		brand: siNextdotjs,
+	},
+	{
+		title: "Express",
+		href: "/frameworks/express",
+		brand: siExpress,
+	},
+	{
+		title: "NestJS",
+		href: "/frameworks/nestjs",
+		brand: siNestjs,
+	},
+	{
+		title: "Django",
+		href: "/frameworks/django",
+		brand: siDjango,
+	},
+	{
+		title: "FastAPI",
+		href: "/frameworks/fastapi",
+		brand: siFastapi,
+	},
+	{
+		title: "Laravel",
+		href: "/frameworks/laravel",
+		brand: siLaravel,
+	},
+	{
+		title: "Rails",
+		href: "/frameworks/rails",
+		brand: siRubyonrails,
+	},
+	{
+		title: "Spring Boot",
+		href: "/frameworks/spring-boot",
+		brand: siSpringboot,
+	},
+];
+
+/** Integrations strip under Docs columns */
+const docIntegrations: NavLink[] = [
+	{
+		title: "Vercel",
+		href: "/docs/integrations/vercel",
+		brand: siVercel,
+	},
+	{
+		title: "WordPress",
+		href: "/docs/integrations/wordpress",
+		brand: siWordpress,
+	},
+	{
+		title: "Zapier",
+		href: "/docs/integrations/zapier",
+		brand: siZapier,
+	},
+	{
+		title: "n8n",
+		href: "/docs/integrations/n8n",
+		brand: siN8n,
+	},
+	{
+		title: "Netlify",
+		href: "/docs/integrations/netlify",
+		brand: siNetlify,
+	},
+	{
+		title: "Cloudflare",
+		href: "/docs/integrations/cloudflare",
+		brand: siCloudflare,
+	},
+	{
+		title: "Railway",
+		href: "/docs/integrations/railway",
+		brand: siRailway,
+	},
+	{
+		title: "Docker",
+		href: "/docs/integrations/docker",
+		brand: siDocker,
+	},
+	{
+		title: "Strapi",
+		href: "/docs/integrations/strapi",
+		brand: siStrapi,
 	},
 ];
 
@@ -405,9 +518,12 @@ const navItems: NavItem[] = [
 		title: "Docs",
 		href: "/docs",
 		mega: {
+			// Left: Documentation + API Reference cards
+			// Right: frameworks + languages combined into 3 columns (no titles)
+			// Footer: Integrations strip
 			categories: [
 				{
-					title: "Explore",
+					title: "",
 					featured: true,
 					links: [
 						{
@@ -425,46 +541,17 @@ const navItems: NavItem[] = [
 					],
 				},
 				{
-					title: "Languages",
+					title: "",
 					compact: true,
-					links: docLanguages,
-				},
-				{
-					title: "Guides",
-					links: [
-						{
-							title: "SDKs",
-							href: "/sdk",
-							description: "Official libraries for every stack",
-							icon: "code",
-						},
-						{
-							title: "Frameworks",
-							href: "/frameworks",
-							description: "Next.js, Django, Laravel, and more",
-							icon: "layers",
-						},
-						{
-							title: "Integrations",
-							href: "/docs/integrations",
-							description: "Connect the tools you already use",
-							icon: "integration",
-						},
-						{
-							title: "Developers",
-							href: "/developers",
-							description: "Build with the API, MCP, and SDKs",
-							icon: "terminal",
-						},
-						{
-							title: "Self-host",
-							href: "/docs/self-host",
-							description: "Run Reloop on your own infra",
-							icon: "server",
-						},
-					],
+					gridCols: 3,
+					links: [...docFrameworks, ...docLanguages],
 				},
 			],
+			footer: {
+				title: "Integrations",
+				href: "/docs/integrations",
+				links: docIntegrations,
+			},
 		},
 	},
 	{
@@ -989,27 +1076,231 @@ function ProductSimpleColumn({ links }: { links: NavLink[] }) {
 	);
 }
 
+function BrandLinkRow({ link }: { link: NavLink }) {
+	const external = isExternalHref(link.href, link.external);
+	const crossDomain = isCrossDomain(link.href);
+	const className = cn(
+		"group flex min-w-0 items-center gap-2.5 rounded-lg px-1.5 py-1.5 transition-colors",
+		"hover:bg-bg-weak-50/80 dark:hover:bg-white/[0.04]",
+	);
+
+	let brandStyle: CSSProperties | undefined;
+	if (link.brand) {
+		const hex = link.brand.hex.replace("#", "");
+		if (!isDarkBrandHex(hex)) {
+			brandStyle = { color: `#${hex}` };
+		}
+	}
+
+	const body = (
+		<>
+			<span
+				className={cn(
+					"inline-flex size-7 shrink-0 items-center justify-center rounded-lg",
+					"border border-stroke-soft-200/80 bg-bg-weak-50/60 text-text-sub-600",
+					"dark:border-white/10 dark:bg-white/[0.04] dark:text-white/70",
+				)}
+				style={brandStyle}
+			>
+				{link.brand ? (
+					<svg
+						viewBox="0 0 24 24"
+						className="size-3.5"
+						fill="currentColor"
+						aria-hidden
+					>
+						<title>{link.brand.title}</title>
+						<path d={link.brand.path} />
+					</svg>
+				) : link.icon ? (
+					<Icon name={link.icon} className="size-3.5" />
+				) : null}
+			</span>
+			<span className="min-w-0 flex-1 font-medium text-[13.5px] text-text-strong-950 leading-snug dark:text-white">
+				{link.title}
+			</span>
+		</>
+	);
+
+	const shared = {
+		className,
+		...(external ? { target: "_blank", rel: "noreferrer" } : {}),
+	};
+
+	if (crossDomain || external) {
+		return (
+			<a href={link.href} {...shared}>
+				{body}
+			</a>
+		);
+	}
+
+	return (
+		<Link href={link.href} {...shared}>
+			{body}
+		</Link>
+	);
+}
+
+/**
+ * Dense brand rows for Docs frameworks / languages.
+ * Optional multi-column layout — items fill top-to-bottom per column, no titles.
+ */
+function CompactBrandColumn({
+	links,
+	gridCols,
+}: {
+	links: NavLink[];
+	gridCols?: 2 | 3;
+}) {
+	if (!gridCols) {
+		return (
+			<div className="relative flex min-h-0 w-full flex-col gap-0.5">
+				{links.map((link) => (
+					<BrandLinkRow key={link.title} link={link} />
+				))}
+			</div>
+		);
+	}
+
+	// Split into equal columns (fill down, then next column)
+	const perCol = Math.ceil(links.length / gridCols);
+	const columns = Array.from({ length: gridCols }, (_, i) =>
+		links.slice(i * perCol, (i + 1) * perCol),
+	);
+
+	return (
+		<div
+			className={cn(
+				"relative grid min-h-0 w-full gap-x-1 gap-y-0",
+				gridCols === 3 ? "grid-cols-1 sm:grid-cols-3" : "grid-cols-1 sm:grid-cols-2",
+			)}
+		>
+			{columns.map((col, colIndex) => (
+				<div
+					key={`brand-col-${colIndex}`}
+					className="flex min-w-0 flex-col gap-0.5"
+				>
+					{col.map((link) => (
+						<BrandLinkRow key={link.title} link={link} />
+					))}
+				</div>
+			))}
+		</div>
+	);
+}
+
+/**
+ * Full-width integrations strip under Docs mega columns.
+ */
+function MegaIntegrationsFooter({ footer }: { footer: MegaFooter }) {
+	return (
+		<div className="border-stroke-soft-200/80 border-t px-1 pt-3 pb-1 sm:px-0 dark:border-white/[0.08]">
+			<div className="mb-2.5 flex items-center justify-between gap-3 px-1">
+				<p className="font-medium text-[11px] text-text-sub-600 uppercase tracking-[0.12em] dark:text-white/40">
+					{footer.title}
+				</p>
+				<a
+					href={footer.href}
+					className="font-medium text-[12px] text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/45 dark:hover:text-white"
+				>
+					View all
+				</a>
+			</div>
+			<div className="flex flex-wrap gap-1.5">
+				{footer.links.map((link) => {
+					const external = isExternalHref(link.href, link.external);
+					const crossDomain = isCrossDomain(link.href);
+					const className = cn(
+						"group inline-flex items-center gap-2 rounded-full border border-stroke-soft-200/80 bg-bg-weak-50/50 px-2.5 py-1.5",
+						"transition-colors hover:border-stroke-soft-200 hover:bg-bg-weak-50",
+						"dark:border-white/10 dark:bg-white/[0.03] dark:hover:bg-white/[0.06]",
+					);
+
+					let brandStyle: CSSProperties | undefined;
+					if (link.brand) {
+						const hex = link.brand.hex.replace("#", "");
+						if (!isDarkBrandHex(hex)) {
+							brandStyle = { color: `#${hex}` };
+						}
+					}
+
+					const body = (
+						<>
+							<span
+								className="inline-flex size-4 shrink-0 items-center justify-center text-text-sub-600 dark:text-white/70"
+								style={brandStyle}
+							>
+								{link.brand ? (
+									<svg
+										viewBox="0 0 24 24"
+										className="size-3.5"
+										fill="currentColor"
+										aria-hidden
+									>
+										<title>{link.brand.title}</title>
+										<path d={link.brand.path} />
+									</svg>
+								) : link.icon ? (
+									<Icon name={link.icon} className="size-3.5" />
+								) : null}
+							</span>
+							<span className="font-medium text-[12.5px] text-text-strong-950 dark:text-white">
+								{link.title}
+							</span>
+						</>
+					);
+
+					const shared = {
+						className,
+						...(external ? { target: "_blank", rel: "noreferrer" } : {}),
+					};
+
+					if (crossDomain || external) {
+						return (
+							<a key={link.title} href={link.href} {...shared}>
+								{body}
+							</a>
+						);
+					}
+
+					return (
+						<Link key={link.title} href={link.href} {...shared}>
+							{body}
+						</Link>
+					);
+				})}
+			</div>
+		</div>
+	);
+}
+
 function MegaPanel({ item }: { item: NavItem }) {
 	if (!item.mega) return null;
 
-	const { categories } = item.mega;
+	const { categories, footer } = item.mega;
 	const count = categories.length;
 	const hasFeatured = categories.some((c) => c.featured);
-	// Product: featured cards (left) + two simple list columns
+	const hasBrandGrid = categories.some((c) => c.compact && c.gridCols);
+	// Product: featured cards (left) + two list columns
 	const productLayout = hasFeatured && count === 3;
+	// Docs: featured cards (left) + combined brand grid (right)
+	const docsBrandLayout = hasFeatured && hasBrandGrid && count === 2;
 
-	return (
+	const columns = (
 		<div
 			className={
 				productLayout
 					? "grid min-h-full min-w-0 grid-cols-1 items-stretch gap-0 sm:grid-cols-[minmax(0,1.2fr)_minmax(0,0.85fr)_minmax(0,0.85fr)] sm:divide-x sm:divide-stroke-soft-200/80 dark:sm:divide-white/[0.08]"
-					: count >= 3
-						? "grid min-h-full min-w-0 items-stretch sm:grid-cols-2 lg:grid-cols-3 lg:divide-x lg:divide-stroke-soft-200/80 dark:lg:divide-white/[0.08]"
-						: count === 2
-							? hasFeatured
-								? "grid min-h-full min-w-0 items-stretch sm:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] sm:divide-x sm:divide-stroke-soft-200/80 dark:sm:divide-white/[0.08]"
-								: "grid min-h-full min-w-0 items-stretch sm:grid-cols-2 sm:divide-x sm:divide-stroke-soft-200/80 dark:sm:divide-white/[0.08]"
-							: "grid min-w-0 grid-cols-1"
+					: docsBrandLayout
+						? "grid min-h-full min-w-0 grid-cols-1 items-stretch gap-0 sm:grid-cols-[minmax(0,1.05fr)_minmax(0,1.55fr)] sm:divide-x sm:divide-stroke-soft-200/80 dark:sm:divide-white/[0.08]"
+						: count >= 3
+							? "grid min-h-full min-w-0 items-stretch sm:grid-cols-2 lg:grid-cols-3 lg:divide-x lg:divide-stroke-soft-200/80 dark:lg:divide-white/[0.08]"
+							: count === 2
+								? hasFeatured
+									? "grid min-h-full min-w-0 items-stretch sm:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] sm:divide-x sm:divide-stroke-soft-200/80 dark:sm:divide-white/[0.08]"
+									: "grid min-h-full min-w-0 items-stretch sm:grid-cols-2 sm:divide-x sm:divide-stroke-soft-200/80 dark:sm:divide-white/[0.08]"
+								: "grid min-w-0 grid-cols-1"
 			}
 		>
 			{categories.map((category, categoryIndex) => (
@@ -1021,13 +1312,25 @@ function MegaPanel({ item }: { item: NavItem }) {
 							? "flex min-h-0 min-w-0 flex-col self-stretch px-3 py-3 first:pl-0 last:pr-0 sm:px-4 sm:py-4"
 							: category.simple
 								? "flex min-h-0 min-w-0 flex-col justify-center self-stretch px-3 py-3 first:pl-0 last:pr-0 sm:px-4 sm:py-4"
-								: "min-h-0 min-w-0 self-stretch px-3 py-3 first:pl-0 last:pr-0 sm:px-5 sm:py-4"
+								: category.compact
+									? "flex min-h-0 min-w-0 flex-col justify-center self-stretch px-3 py-3 first:pl-0 last:pr-0 sm:px-4 sm:py-4"
+									: "min-h-0 min-w-0 self-stretch px-3 py-3 first:pl-0 last:pr-0 sm:px-5 sm:py-4"
 					}
 				>
 					{category.title ? (
-						<p className="mb-3 px-1 font-medium text-[11px] text-text-sub-600 uppercase tracking-[0.12em] dark:text-white/40">
-							{category.title}
-						</p>
+						<div className="mb-3 flex items-center justify-between gap-2 px-1">
+							<p className="font-medium text-[11px] text-text-sub-600 uppercase tracking-[0.12em] dark:text-white/40">
+								{category.title}
+							</p>
+							{category.viewAllHref ? (
+								<a
+									href={category.viewAllHref}
+									className="shrink-0 font-medium text-[11.5px] text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/40 dark:hover:text-white"
+								>
+									View all
+								</a>
+							) : null}
+						</div>
 					) : null}
 					{category.featured ? (
 						<div
@@ -1043,19 +1346,31 @@ function MegaPanel({ item }: { item: NavItem }) {
 						</div>
 					) : category.simple ? (
 						<ProductSimpleColumn links={category.links} />
+					) : category.compact ? (
+						<CompactBrandColumn
+							links={category.links}
+							gridCols={category.gridCols}
+						/>
 					) : (
 						<div className="flex flex-col gap-0.5">
 							{category.links.map((link) => (
-								<MegaLink
-									key={link.title}
-									link={link}
-									compact={category.compact}
-								/>
+								<MegaLink key={link.title} link={link} />
 							))}
 						</div>
 					)}
 				</div>
 			))}
+		</div>
+	);
+
+	if (!footer) return columns;
+
+	return (
+		<div className="flex min-w-0 flex-col">
+			{columns}
+			<div className="px-3 pb-3 sm:px-4 sm:pb-4">
+				<MegaIntegrationsFooter footer={footer} />
+			</div>
 		</div>
 	);
 }
@@ -1372,9 +1687,20 @@ export const Header = () => {
 																			className="space-y-2"
 																		>
 																			{category.title ? (
-																				<p className="mb-2 px-2 font-medium text-[11px] text-text-sub-600 uppercase tracking-[0.14em] dark:text-white/40">
-																					{category.title}
-																				</p>
+																				<div className="mb-2 flex items-center justify-between gap-2 px-2">
+																					<p className="font-medium text-[11px] text-text-sub-600 uppercase tracking-[0.14em] dark:text-white/40">
+																						{category.title}
+																					</p>
+																					{category.viewAllHref ? (
+																						<a
+																							href={category.viewAllHref}
+																							onClick={closeMobileMenu}
+																							className="font-medium text-[12px] text-text-sub-600 dark:text-white/45"
+																						>
+																							View all
+																						</a>
+																					) : null}
+																				</div>
 																			) : null}
 																			{category.lead && (
 																				<div className="min-h-[112px] px-1">
@@ -1403,7 +1729,9 @@ export const Header = () => {
 																						link.href,
 																					);
 																					const className =
-																						category.simple || category.featured
+																						category.simple ||
+																						category.featured ||
+																						category.compact
 																							? "flex items-center gap-2.5 rounded-xl px-2 py-2 transition-opacity hover:opacity-70"
 																							: "flex items-start gap-3 rounded-xl px-2 py-2 transition-colors hover:bg-neutral-950/[0.04] dark:hover:bg-white/[0.05]";
 																					const body = (
@@ -1413,7 +1741,8 @@ export const Header = () => {
 																								featured={category.featured}
 																								plain={
 																									category.simple ||
-																									category.featured
+																									category.featured ||
+																									category.compact
 																								}
 																							/>
 																							<span className="min-w-0">
@@ -1469,6 +1798,37 @@ export const Header = () => {
 																		</div>
 																	),
 																)}
+																{item.mega.footer ? (
+																	<div className="space-y-2">
+																		<div className="mb-2 flex items-center justify-between gap-2 px-2">
+																			<p className="font-medium text-[11px] text-text-sub-600 uppercase tracking-[0.14em] dark:text-white/40">
+																				{item.mega.footer.title}
+																			</p>
+																			<a
+																				href={item.mega.footer.href}
+																				onClick={closeMobileMenu}
+																				className="font-medium text-[12px] text-text-sub-600 dark:text-white/45"
+																			>
+																				View all
+																			</a>
+																		</div>
+																		<div className="flex flex-wrap gap-1.5 px-1">
+																			{item.mega.footer.links.map((link) => (
+																				<a
+																					key={link.title}
+																					href={link.href}
+																					onClick={closeMobileMenu}
+																					className="inline-flex items-center gap-2 rounded-full border border-stroke-soft-200/80 bg-bg-weak-50/50 px-2.5 py-1.5 dark:border-white/10 dark:bg-white/[0.03]"
+																				>
+																					<NavGlyph link={link} plain />
+																					<span className="font-medium text-[13px] text-text-strong-950 dark:text-white">
+																						{link.title}
+																					</span>
+																				</a>
+																			))}
+																		</div>
+																	</div>
+																) : null}
 															</div>
 														</motion.div>
 													)}
