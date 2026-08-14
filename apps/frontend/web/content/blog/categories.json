@@ -1,23 +1,8 @@
 [
 	{
-		"slug": "engineering",
-		"name": "Engineering",
-		"description": "How we build Reloop — architecture, systems design, and technical deep dives."
-	},
-	{
 		"slug": "ai-automation",
 		"name": "AI & Automation",
 		"description": "AI-powered email workflows, LLM integration, and intelligent notification systems."
-	},
-	{
-		"slug": "growth",
-		"name": "Growth",
-		"description": "Use email as a growth channel — activation flows, re-engagement, and product-led strategies."
-	},
-	{
-		"slug": "self-hosting",
-		"name": "Self-Hosting",
-		"description": "Deploy and operate Reloop on your own infrastructure."
 	},
 	{
 		"slug": "deliverability",
@@ -25,13 +10,28 @@
 		"description": "SPF, DKIM, DMARC, IP warming, and getting to the inbox."
 	},
 	{
-		"slug": "tutorials",
-		"name": "Tutorials",
-		"description": "Step-by-step guides for integrating Reloop into Next.js, Remix, Python, and more."
+		"slug": "engineering",
+		"name": "Engineering",
+		"description": "How we build Reloop — architecture, systems design, and technical deep dives."
+	},
+	{
+		"slug": "growth",
+		"name": "Growth",
+		"description": "Use email as a growth channel — activation flows, re-engagement, and product-led strategies."
 	},
 	{
 		"slug": "open-source",
 		"name": "Open Source",
 		"description": "Company updates, product releases, and why open source email matters."
+	},
+	{
+		"slug": "self-hosting",
+		"name": "Self-Hosting",
+		"description": "Deploy and operate Reloop on your own infrastructure."
+	},
+	{
+		"slug": "tutorials",
+		"name": "Tutorials",
+		"description": "Step-by-step guides for integrating Reloop into Next.js, Remix, Python, and more."
 	}
 ]

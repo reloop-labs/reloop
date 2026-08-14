@@ -227,9 +227,13 @@ export function getCategories(): BlogCategoryDefinition[] {
 		return [];
 	}
 
-	return JSON.parse(
+	const categories = JSON.parse(
 		fs.readFileSync(categoriesPath, "utf8"),
 	) as BlogCategoryDefinition[];
+
+	return [...categories].sort((a, b) =>
+		a.name.localeCompare(b.name, "en", { sensitivity: "base" }),
+	);
 }
 
 export function getCategoryBySlug(slug: string) {
