@@ -957,15 +957,21 @@ function MegaLink({
 		PRODUCT_CARD_ACCENTS[link.accent ?? "blue"] ?? PRODUCT_CARD_ACCENTS.blue;
 	const docsTheme =
 		DOCS_CARD_THEMES[link.docsTheme ?? "book"] ?? DOCS_CARD_THEMES.book;
+	// Shared fixed width for all mega featured tiles (Transactional, Free tools, Contact, …)
+	const featuredCardWidth = "w-[168px] shrink-0";
 	const className = productCard
-		? "group relative flex h-full min-h-[200px] min-w-0 flex-col justify-between overflow-hidden rounded-[18px] border border-stroke-soft-200/80 bg-bg-weak-50/50 p-4 transition-colors duration-300 sm:min-h-[220px] sm:p-5 dark:border-white/10 dark:bg-white/[0.04]"
+		? cn(
+				"group relative flex h-full min-h-[200px] flex-col justify-between overflow-hidden rounded-[18px] border border-stroke-soft-200/80 bg-bg-weak-50/50 p-4 transition-colors duration-300 sm:min-h-0 sm:p-5 dark:border-white/10 dark:bg-white/[0.04]",
+				featuredCardWidth,
+			)
 		: docsCard
-			? // Docs cards: Help Center–style soft wash + perspective grid on hover
+			? // Docs / Resources / Company featured: Help Center–style hover
 				cn(
-					"group relative flex h-full min-h-[120px] min-w-0 flex-col justify-between overflow-hidden rounded-[18px] p-4 sm:min-h-[132px] sm:p-5",
+					"group relative flex h-full min-h-[132px] flex-col justify-between overflow-hidden rounded-[18px] p-4 sm:min-h-[148px] sm:p-5",
 					"border border-stroke-soft-200/60 bg-bg-white-0",
 					"transition-colors duration-300",
 					"dark:border-white/10 dark:bg-white/[0.04]",
+					featuredCardWidth,
 				)
 			: simple
 				? "group flex min-w-0 items-center gap-2.5 rounded-[12px] px-1.5 py-2 transition-opacity hover:opacity-70"
@@ -1412,15 +1418,15 @@ function MegaPanel({ item }: { item: NavItem }) {
 		<div
 			className={
 				productLayout
-					? "grid min-h-full min-w-0 grid-cols-1 items-stretch gap-0 sm:grid-cols-[minmax(0,1.2fr)_minmax(0,0.85fr)_minmax(0,0.85fr)] sm:divide-x sm:divide-stroke-soft-200/80 dark:sm:divide-white/[0.08]"
+					? // Featured hugs card tiles (auto); list columns share remaining width
+						"grid min-h-full min-w-0 grid-cols-1 items-stretch gap-0 sm:grid-cols-[auto_minmax(0,1fr)_minmax(0,1fr)] sm:divide-x sm:divide-stroke-soft-200/80 dark:sm:divide-white/[0.08]"
 					: docsBrandLayout
-						? "grid min-h-full min-w-0 grid-cols-1 items-stretch gap-0 sm:grid-cols-[minmax(0,1.15fr)_minmax(0,1.45fr)] sm:divide-x sm:divide-stroke-soft-200/80 dark:sm:divide-white/[0.08]"
+						? "grid min-h-full min-w-0 grid-cols-1 items-stretch gap-0 sm:grid-cols-[auto_minmax(0,1fr)] sm:divide-x sm:divide-stroke-soft-200/80 dark:sm:divide-white/[0.08]"
 						: count >= 3
 							? "grid min-h-full min-w-0 items-stretch sm:grid-cols-2 lg:grid-cols-3 lg:divide-x lg:divide-stroke-soft-200/80 dark:lg:divide-white/[0.08]"
 							: count === 2
 								? hasFeatured
-									? // Resources-style: featured cards + short list — keep list column compact
-										"grid min-h-full min-w-0 items-stretch sm:grid-cols-[minmax(0,1fr)_minmax(0,0.85fr)] sm:divide-x sm:divide-stroke-soft-200/80 dark:sm:divide-white/[0.08]"
+									? "grid min-h-full min-w-0 items-stretch sm:grid-cols-[auto_minmax(0,1fr)] sm:divide-x sm:divide-stroke-soft-200/80 dark:sm:divide-white/[0.08]"
 									: "grid min-h-full min-w-0 items-stretch sm:grid-cols-2 sm:divide-x sm:divide-stroke-soft-200/80 dark:sm:divide-white/[0.08]"
 								: "grid min-w-0 grid-cols-1"
 			}
@@ -1433,7 +1439,7 @@ function MegaPanel({ item }: { item: NavItem }) {
 					<div
 						key={category.title || `col-${categoryIndex}`}
 						className={
-							// Self-stretch + full py so divide-x borders run top → bottom of the card
+							// Self-stretch + full py so divide-x borders run top → bottom
 							category.featured
 								? "flex min-h-0 min-w-0 flex-col self-stretch px-3 py-3 first:pl-0 last:pr-0 sm:px-4 sm:py-4"
 								: category.simple
@@ -1459,11 +1465,10 @@ function MegaPanel({ item }: { item: NavItem }) {
 							</div>
 						) : null}
 						{category.featured ? (
-							// Docs: 1 tall card + 2 stacked (Documentation | API / Integrations)
-							// Product / Resources: equal multi-card row
+							// Equal fixed-width tiles; stretch to full column height
 							category.links.length === 3 ? (
-								<div className="grid min-h-0 flex-1 grid-cols-2 grid-rows-2 gap-2.5">
-									<div className="row-span-2 min-h-0 [&>a]:h-full [&>a]:min-h-0">
+								<div className="grid h-full min-h-[200px] w-max grid-cols-2 grid-rows-2 gap-2.5">
+									<div className="row-span-2 min-h-0 [&>a]:h-full">
 										<MegaLink
 											key={category.links[0]!.title}
 											link={category.links[0]!}
@@ -1483,11 +1488,12 @@ function MegaPanel({ item }: { item: NavItem }) {
 								</div>
 							) : (
 								<div
-									className={
+									className={cn(
+										"flex h-full min-h-[148px] gap-2.5",
 										category.links.length >= 2
-											? "grid min-h-0 flex-1 grid-cols-2 gap-2.5"
-											: "grid min-h-0 flex-1 grid-cols-1 gap-2.5"
-									}
+											? "w-max flex-row items-stretch"
+											: "w-max flex-col",
+									)}
 								>
 									{category.links.map((link) => (
 										<MegaLink key={link.title} link={link} featured />
@@ -1495,12 +1501,16 @@ function MegaPanel({ item }: { item: NavItem }) {
 								</div>
 							)
 						) : category.simple ? (
-							<ProductSimpleColumn links={category.links} />
+							<div className="flex min-h-0 flex-1 flex-col justify-center">
+								<ProductSimpleColumn links={category.links} />
+							</div>
 						) : category.compact ? (
-							<CompactBrandColumn
-								links={category.links}
-								gridCols={category.gridCols}
-							/>
+							<div className="flex min-h-0 flex-1 flex-col justify-center">
+								<CompactBrandColumn
+									links={category.links}
+									gridCols={category.gridCols}
+								/>
+							</div>
 						) : (
 							<div className="flex flex-col gap-0.5">
 								{category.links.map((link) => (
@@ -1523,6 +1533,21 @@ function MegaPanel({ item }: { item: NavItem }) {
 const megaTabOrder = navItems
 	.filter((item) => item.mega)
 	.map((item) => item.title);
+
+/**
+ * Target content width (px) per mega panel shape — springs smoothly on tab switch.
+ * (Separate from featured *tile* width, which is fixed on each Free tools / Marketing card.)
+ */
+function getMegaPanelWidthPx(item: NavItem | undefined): number {
+	if (!item?.mega) return 560;
+	const cats = item.mega.categories;
+	const hasFeatured = cats.some((c) => c.featured);
+	const hasBrandGrid = cats.some((c) => c.compact && c.gridCols);
+	if (hasBrandGrid) return 840; // Docs: fixed cards + brand grid
+	if (cats.length <= 2 && hasFeatured) return 560; // Resources / Company
+	if (cats.length >= 3 && hasFeatured) return 780; // Product: cards + 2 lists
+	return 640;
+}
 
 export const Header = () => {
 	const { useSession } = authClient;
@@ -1579,7 +1604,8 @@ export const Header = () => {
 		});
 	}, [activeMega]);
 
-	// Measure mega content height after tab switch for a clean height tween
+	// Measure mega content height after tab switch for a clean height tween.
+	// Panel shell width springs via targetMegaWidth.
 	useLayoutEffect(() => {
 		if (!activeMega) {
 			setMegaHeight("auto");
@@ -1635,21 +1661,7 @@ export const Header = () => {
 	};
 
 	const activeItem = navItems.find((item) => item.title === activeMega);
-
-	// Compact panels (e.g. Resources: 2 cols) stay narrower; dense menus keep full width
-	const megaCategoryCount = activeItem?.mega?.categories.length ?? 0;
-	const megaHasFeatured = Boolean(
-		activeItem?.mega?.categories.some((c) => c.featured),
-	);
-	const megaHasBrandGrid = Boolean(
-		activeItem?.mega?.categories.some((c) => c.compact && c.gridCols),
-	);
-	const megaPanelWidthClass =
-		megaCategoryCount <= 2 && megaHasFeatured && !megaHasBrandGrid
-			? "w-[min(520px,calc(100vw-2rem))]"
-			: megaHasBrandGrid
-				? "w-[min(820px,calc(100vw-2rem))]"
-				: "w-[min(760px,calc(100vw-2rem))]";
+	const targetMegaWidth = getMegaPanelWidthPx(activeItem);
 
 	return (
 		<header
@@ -2087,10 +2099,11 @@ export const Header = () => {
 								role="menu"
 								aria-label={`${activeItem.title} menu`}
 							>
-								{/* Height morph via measured px; bounce 0 = crisp, not floaty */}
+								{/* Panel shell: width springs per menu; height morphs with content */}
 								<motion.div
 									initial={false}
 									animate={{
+										width: targetMegaWidth,
 										height:
 											shouldReduceMotion || megaHeight === "auto"
 												? "auto"
@@ -2099,17 +2112,21 @@ export const Header = () => {
 									transition={
 										shouldReduceMotion
 											? { duration: 0 }
-											: { type: "spring", bounce: 0, duration: 0.26 }
+											: {
+													type: "spring",
+													bounce: 0,
+													duration: 0.32,
+												}
 									}
-									style={{ overflow: "hidden" }}
+									style={{
+										overflow: "hidden",
+										maxWidth: "calc(100vw - 2rem)",
+									}}
 								>
-									{/*
-									  Relative + absolute exit so enter/exit overlap (sync mode).
-									  Direction from tab order: rightward → enterFromRight / exitToLeft.
-									*/}
 									<div
 										ref={megaContentRef}
-										className={`relative ${megaPanelWidthClass}`}
+										className="relative"
+										style={{ width: targetMegaWidth }}
 									>
 										<AnimatePresence
 											initial={false}
