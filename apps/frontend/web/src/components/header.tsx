@@ -456,27 +456,30 @@ function isDarkBrandHex(hex: string) {
 function NavGlyph({
 	link,
 	featured = false,
-	compact = false,
+	plain = false,
 }: {
 	link: NavLink;
 	featured?: boolean;
-	compact?: boolean;
+	/** Icon only — no tile background or border */
+	plain?: boolean;
 }) {
 	if (!link.icon && !link.brand) return null;
 
-	// Featured Explore cards: plain icon (no tile). List rows: soft rounded tile.
-	if (featured) {
-		const iconClass = "size-5 text-text-sub-600 dark:text-white/65";
+	const sizeClass = featured ? "size-5" : "size-4";
+	const colorClass = "text-text-sub-600 dark:text-white/65";
+
+	// Plain icon (featured cards + simple product rows): no tile
+	if (featured || plain) {
 		if (link.brand) {
 			const hex = link.brand.hex.replace("#", "");
 			const colorStyle = isDarkBrandHex(hex)
 				? undefined
 				: { color: `#${hex}` };
 			return (
-				<span className="inline-flex" style={colorStyle}>
+				<span className={`inline-flex shrink-0 ${colorClass}`} style={colorStyle}>
 					<svg
 						viewBox="0 0 24 24"
-						className="size-5"
+						className={sizeClass}
 						fill="currentColor"
 						aria-hidden
 					>
@@ -486,12 +489,16 @@ function NavGlyph({
 				</span>
 			);
 		}
-		return <Icon name={link.icon!} className={iconClass} />;
+		return (
+			<span className={`inline-flex shrink-0 ${colorClass}`}>
+				<Icon name={link.icon!} className={sizeClass} />
+			</span>
+		);
 	}
 
-	const boxClass = compact
-		? "mt-px inline-flex size-9 shrink-0 items-center justify-center rounded-[10px] border border-stroke-soft-200/90 bg-bg-weak-50 text-text-sub-600 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/65"
-		: "mt-px inline-flex size-10 shrink-0 items-center justify-center rounded-[12px] border border-stroke-soft-200/90 bg-bg-weak-50 text-text-sub-600 transition-colors group-hover:bg-bg-white-0 group-hover:text-text-strong-950 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/65 dark:group-hover:bg-white/[0.07] dark:group-hover:text-white";
+	// Default list rows (Docs, Resources, Company): soft rounded tile
+	const boxClass =
+		"mt-px inline-flex size-10 shrink-0 items-center justify-center rounded-[12px] border border-stroke-soft-200/90 bg-bg-weak-50 text-text-sub-600 transition-colors group-hover:bg-bg-white-0 group-hover:text-text-strong-950 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/65 dark:group-hover:bg-white/[0.07] dark:group-hover:text-white";
 
 	if (link.brand) {
 		const hex = link.brand.hex.replace("#", "");
@@ -502,7 +509,7 @@ function NavGlyph({
 			<span className={boxClass} style={colorStyle}>
 				<svg
 					viewBox="0 0 24 24"
-					className={compact ? "size-3.5" : "size-4"}
+					className="size-4"
 					fill="currentColor"
 					aria-hidden
 				>
@@ -515,7 +522,7 @@ function NavGlyph({
 
 	return (
 		<span className={boxClass}>
-			<Icon name={link.icon!} className={compact ? "size-3.5" : "size-4"} />
+			<Icon name={link.icon!} className="size-4" />
 		</span>
 	);
 }
@@ -533,12 +540,15 @@ function MegaLink({
 }) {
 	const external = isExternalHref(link.href, link.external);
 	const crossDomain = isCrossDomain(link.href);
-	// Explore-style featured card: icon top, title bottom — fills column height
-	const className = featured
-		? "group flex h-full min-h-[148px] min-w-0 flex-col justify-between overflow-hidden rounded-[18px] bg-[#f4f4f5] p-4 sm:p-5 transition-colors hover:bg-[#efeff1] dark:bg-white/[0.045] dark:hover:bg-white/[0.07]"
-		: simple
-			? "group flex min-w-0 items-center gap-3 rounded-[12px] px-1.5 py-2 transition-colors hover:bg-bg-weak-50/80 dark:hover:bg-white/[0.04]"
-			: "group flex min-w-0 items-start gap-3 rounded-[12px] px-1.5 py-2 transition-colors hover:bg-bg-weak-50/80 dark:hover:bg-white/[0.04]";
+	// Product featured: plain icon + title. Docs/Resources featured: soft card + description.
+	const plainFeatured = featured && !link.description;
+	const className = plainFeatured
+		? "group flex h-full min-h-[148px] min-w-0 flex-col justify-between px-1.5 py-2 transition-opacity hover:opacity-70"
+		: featured
+			? "group flex h-full min-h-[148px] min-w-0 flex-col justify-between overflow-hidden rounded-[18px] bg-[#f4f4f5] p-4 sm:p-5 transition-colors hover:bg-[#efeff1] dark:bg-white/[0.045] dark:hover:bg-white/[0.07]"
+			: simple
+				? "group flex min-w-0 items-center gap-2.5 rounded-[12px] px-1.5 py-2 transition-opacity hover:opacity-70"
+				: "group flex min-w-0 items-start gap-3 rounded-[12px] px-1.5 py-2 transition-colors hover:bg-bg-weak-50/80 dark:hover:bg-white/[0.04]";
 
 	const content = featured ? (
 		<>
@@ -565,7 +575,7 @@ function MegaLink({
 		</>
 	) : (
 		<>
-			<NavGlyph link={link} compact={compact || simple} />
+			<NavGlyph link={link} plain={simple} />
 			<span className={simple ? "min-w-0" : "min-w-0 flex-1 pt-0.5"}>
 				<span className="flex items-center gap-1">
 					<span className="font-medium text-[14.5px] text-text-strong-950 leading-snug tracking-[-0.01em] dark:text-white">
@@ -910,7 +920,7 @@ export const Header = () => {
 																					<a
 																						href={category.lead.href}
 																						onClick={closeMobileMenu}
-																						className="group flex h-full min-h-[112px] flex-col justify-between rounded-[18px] bg-[#f4f4f5] p-4 transition-colors hover:bg-[#efeff1] dark:bg-white/[0.045] dark:hover:bg-white/[0.07]"
+																						className="group flex h-full min-h-[112px] flex-col justify-between px-1.5 py-2 transition-opacity hover:opacity-70"
 																					>
 																						<NavGlyph
 																							link={category.lead}
@@ -923,10 +933,7 @@ export const Header = () => {
 																				</div>
 																			)}
 																			<div className="flex flex-col gap-0.5">
-																				{(category.featured
-																					? category.links
-																					: category.links
-																				).map((link) => {
+																				{category.links.map((link) => {
 																					const external = isExternalHref(
 																						link.href,
 																						link.external,
@@ -936,15 +943,16 @@ export const Header = () => {
 																					);
 																					const className =
 																						category.simple || category.featured
-																							? "flex items-center gap-3 rounded-xl px-2 py-2 transition-colors hover:bg-neutral-950/[0.04] dark:hover:bg-white/[0.05]"
+																							? "flex items-center gap-2.5 rounded-xl px-2 py-2 transition-opacity hover:opacity-70"
 																							: "flex items-start gap-3 rounded-xl px-2 py-2 transition-colors hover:bg-neutral-950/[0.04] dark:hover:bg-white/[0.05]";
 																					const body = (
 																						<>
 																							<NavGlyph
 																								link={link}
-																								compact={
-																									category.compact ||
-																									category.simple
+																								featured={category.featured}
+																								plain={
+																									category.simple ||
+																									category.featured
 																								}
 																							/>
 																							<span className="min-w-0">
