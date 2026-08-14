@@ -748,6 +748,7 @@
         "next": "catalog:ui",
         "next-mdx-remote": "catalog:ui",
         "next-themes": "catalog:ui",
+        "posthog-js": "^1.417.0",
         "react": "catalog:ui",
         "react-dom": "catalog:ui",
         "react-hotkeys-hook": "catalog:ui",

@@ -1,4 +1,5 @@
 import "./global.css";
+import { PostHogProvider } from "@reloop/fe-docs/components/posthog-provider";
 import { ThemeProvider } from "@reloop/fe-docs/components/theme-provider";
 import { cn } from "@reloop/fe-docs/lib/cn";
 import { IconsSprite } from "@reloop/ui/icons-sprite";
@@ -52,8 +53,10 @@ export default function Layout({ children }: { children: ReactNode }) {
 				className="flex min-h-screen flex-col overflow-x-hidden bg-bg-weak-50 text-fd-foreground dark:bg-black"
 				suppressHydrationWarning
 			>
-				<ThemeProvider>{children}</ThemeProvider>
-				<IconsSprite />
+				<PostHogProvider>
+					<ThemeProvider>{children}</ThemeProvider>
+					<IconsSprite />
+				</PostHogProvider>
 			</body>
 		</html>
 	);

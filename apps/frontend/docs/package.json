@@ -43,7 +43,8 @@
 		"simple-icons": "catalog:ui",
 		"tailwind-merge": "catalog:ui",
 		"zod": "catalog:ui",
-		"@reloop/code-samples": "workspace:*"
+		"@reloop/code-samples": "workspace:*",
+		"posthog-js": "^1.417.0"
 	},
 	"devDependencies": {
 		"@types/node": "catalog:",
