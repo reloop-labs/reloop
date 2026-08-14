@@ -38,31 +38,22 @@ const megaContentVariants = {
 };
 
 import {
-	siCloudflare,
 	siDjango,
-	siDocker,
 	siDotnet,
 	siElixir,
 	siExpress,
 	siFastapi,
 	siGo,
 	siLaravel,
-	siN8n,
 	siNestjs,
-	siNetlify,
 	siNextdotjs,
 	siNodedotjs,
 	siPhp,
 	siPython,
-	siRailway,
 	siRuby,
 	siRubyonrails,
 	siRust,
 	siSpringboot,
-	siStrapi,
-	siVercel,
-	siWordpress,
-	siZapier,
 } from "simple-icons";
 
 type BrandIcon = {
@@ -72,6 +63,9 @@ type BrandIcon = {
 };
 
 type ProductCardAccent = "blue" | "orange";
+
+/** Help Center–style hover themes for Docs featured cards */
+type DocsCardTheme = "book" | "green" | "multi";
 
 type NavLink = {
 	title: string;
@@ -84,7 +78,48 @@ type NavLink = {
 	brand?: BrandIcon;
 	/** Hover wash + glow for product featured cards */
 	accent?: ProductCardAccent;
+	/** Soft wash + grid + icon color for Docs featured cards */
+	docsTheme?: DocsCardTheme;
 	external?: boolean;
+};
+
+const DOCS_CARD_THEMES: Record<
+	DocsCardTheme,
+	{
+		washLight: string;
+		washDark: string;
+		gridRgba: string;
+		/** Icon + title color on hover (currentColor for SVG icons) */
+		ink: string;
+	}
+> = {
+	// Documentation — warm paper / book cloth
+	book: {
+		washLight:
+			"linear-gradient(155deg, rgba(254,243,199,0.95) 0%, rgba(253,230,138,0.42) 36%, rgba(255,255,255,0) 72%)",
+		washDark:
+			"linear-gradient(155deg, rgba(180,83,9,0.2) 0%, rgba(217,119,6,0.08) 40%, transparent 72%)",
+		gridRgba: "rgba(180, 83, 9, 0.2)",
+		ink: "group-hover:text-amber-800 dark:group-hover:text-amber-400",
+	},
+	// API — teal
+	green: {
+		washLight:
+			"linear-gradient(155deg, rgba(20,184,166,0.2) 0%, rgba(45,212,191,0.1) 38%, rgba(255,255,255,0) 72%)",
+		washDark:
+			"linear-gradient(155deg, rgba(13,148,136,0.22) 0%, rgba(20,184,166,0.08) 40%, transparent 72%)",
+		gridRgba: "rgba(20, 184, 166, 0.28)",
+		ink: "group-hover:text-teal-600 dark:group-hover:text-teal-400",
+	},
+	// Integrations — multi-hue soft blend
+	multi: {
+		washLight:
+			"linear-gradient(145deg, rgba(237,233,254,0.95) 0%, rgba(252,231,243,0.7) 28%, rgba(224,242,254,0.55) 52%, rgba(255,255,255,0) 78%)",
+		washDark:
+			"linear-gradient(145deg, rgba(109,40,217,0.18) 0%, rgba(219,39,119,0.1) 32%, rgba(14,165,233,0.08) 55%, transparent 78%)",
+		gridRgba: "rgba(139, 92, 246, 0.2)",
+		ink: "group-hover:text-violet-600 dark:group-hover:text-violet-300",
+	},
 };
 
 /** Layered stack mark for Transactional product card */
@@ -174,6 +209,107 @@ function MarketingDatabaseIcon({ className }: { className?: string }) {
 }
 
 /**
+ * Book mark for Documentation featured card — monochrome via currentColor
+ * so Docs theme hover recolors icon + title together.
+ */
+function DocsBookIcon({ className }: { className?: string }) {
+	return (
+		<svg
+			viewBox="0 0 24 24"
+			xmlns="http://www.w3.org/2000/svg"
+			className={className}
+			fill="none"
+			aria-hidden
+		>
+			{/* Soft fills (originally #1C1F214D ≈ 30% opacity) */}
+			<path
+				d="M7 4.5L5 3.5V17.5L7 19V4.5Z"
+				fill="currentColor"
+				className="opacity-30"
+			/>
+			<path
+				d="M13 11.8923L13 8.73607C13 7.51384 12.572 7.286 11.8944 6.94721L11.4472 6.72361C10.7823 6.39115 10 5.47511 10 7.61803L10 10.2756C10 10.3863 10.1095 10.4584 10.2028 10.4091L11.2775 9.84059C11.4045 9.77342 11.5587 9.81755 11.6368 9.94341L12.8713 11.9334C12.9096 11.9951 13 11.9663 13 11.8923Z"
+				fill="currentColor"
+				className="opacity-30"
+			/>
+			<path
+				d="M13 7.5L13 11.8924C13 11.9663 12.9096 11.9951 12.8713 11.9334L11.6368 9.94341C11.5587 9.81755 11.4045 9.77342 11.2775 9.84059L10.2028 10.4091C10.1095 10.4584 10 10.3863 10 10.2756L10 6"
+				stroke="currentColor"
+			/>
+			<path d="M7 4.5V19" stroke="currentColor" />
+			<path
+				d="M5 3.5L14.1708 8.08541C14.679 8.3395 15 8.85889 15 9.42705V21.7865C15 22.344 14.4133 22.7066 13.9146 22.4573L5.82918 18.4146C5.321 18.1605 5 17.6411 5 17.0729V3.61803C5 3.23926 5.214 2.893 5.55279 2.72361L8.32918 1.33541C8.75147 1.12426 9.24853 1.12426 9.67082 1.33541L18.1708 5.58541C18.679 5.8395 19 6.35889 19 6.92705V19.7865C19 20.344 18.4133 20.7066 17.9146 20.4573L17.0339 20.0169"
+				stroke="currentColor"
+			/>
+			<path
+				d="M9.02856 3.36768L16.1794 6.94312C16.6832 7.19499 17.0034 7.70782 17.0086 8.271L17.1227 20.7189C17.1279 21.2794 16.5387 21.6473 16.0374 21.3966L15.0029 20.8793"
+				stroke="currentColor"
+				strokeLinecap="round"
+			/>
+		</svg>
+	);
+}
+
+/**
+ * Stacked blocks mark for Integrations featured card — monochrome via currentColor.
+ * Mirrored horizontally to match the source glyph orientation.
+ */
+function DocsIntegrationsIcon({ className }: { className?: string }) {
+	return (
+		<svg
+			viewBox="0 0 24 24"
+			xmlns="http://www.w3.org/2000/svg"
+			className={className}
+			fill="none"
+			aria-hidden
+		>
+			<g transform="translate(24 0) scale(-1 1)">
+				<path
+					d="M22 7L19 8.5L19.5 17L22.5 15.5V9.5L22 7Z"
+					fill="currentColor"
+					className="opacity-30"
+				/>
+				<path
+					d="M15.5 20V15L18.5 16.5V18.5L15.5 20Z"
+					fill="currentColor"
+					className="opacity-30"
+				/>
+				<path
+					d="M5.5 20V15.5L8.5 16.5V18L5.5 20Z"
+					fill="currentColor"
+					className="opacity-30"
+				/>
+				<path d="M15.5 19.5V11L5.5 6" stroke="currentColor" />
+				<path
+					d="M19.5 16.5V8.30902C19.5 8.11963 19.393 7.9465 19.2236 7.8618L15.5 6"
+					stroke="currentColor"
+				/>
+				<path
+					d="M15.5 7.5L9.17082 4.33541C8.74853 4.12426 8.25147 4.12426 7.82918 4.33541L6.05279 5.22361C5.714 5.393 5.5 5.73926 5.5 6.11803V14.382C5.5 14.7608 5.714 15.107 6.05279 15.2764L14.8292 19.6646C15.2515 19.8758 15.7485 19.8758 16.1708 19.6646L17.9472 18.7764C18.286 18.607 18.5 18.2608 18.5 17.882V16.5"
+					stroke="currentColor"
+				/>
+				<path
+					d="M15.5 15V6.11803C15.5 5.73926 15.714 5.393 16.0528 5.22361L18.0528 4.22361C18.3343 4.08284 18.6659 4.08296 18.9475 4.22373L21.6707 5.58535C22.1789 5.83944 22.5 6.35889 22.5 6.92705V14.882C22.5 15.2608 22.286 15.607 21.9472 15.7764L20.1708 16.6646C19.7485 16.8758 19.2515 16.8758 18.8292 16.6646L15.5 15Z"
+					stroke="currentColor"
+				/>
+				<path
+					d="M8.5 16.5V17.882C8.5 18.2608 8.286 18.607 7.94721 18.7764L5.94721 19.7764C5.66569 19.9172 5.33431 19.9172 5.05279 19.7764L2.32918 18.4146C1.821 18.1605 1.5 17.6411 1.5 17.073V9.42705C1.5 8.85889 1.821 8.3395 2.32918 8.08541L4.05279 7.22361C4.33431 7.08284 4.66569 7.08284 4.94721 7.22361L5.5 7.5"
+					stroke="currentColor"
+				/>
+				<path d="M5.5 20V14.5" stroke="currentColor" />
+				<path d="M1.5 9L5.5 11" stroke="currentColor" />
+				<path
+					d="M7 13.2303V9.23035L13.5001 12.5V16.5L7 13.2303Z"
+					fill="currentColor"
+					className="opacity-30"
+				/>
+				<path d="M19.5 8L22.5 6.5" stroke="currentColor" />
+			</g>
+		</svg>
+	);
+}
+
+/**
  * OpenAPI Initiative mark — monochrome glyph via currentColor
  * (matches outline icon tone in tiles; solid brand path, not #000).
  */
@@ -189,6 +325,69 @@ function OpenApiIcon({ className }: { className?: string }) {
 		>
 			<title>OpenAPI</title>
 			<path d="M21.039 0a2.959 2.959 0 00-2.65 4.274l-6.447 6.447a2.96 2.96 0 101.335 1.336l6.447-6.447A2.959 2.959 0 1021.04 0zM10.628 2.745c-.072 0-.143.003-.214.004-.072.002-.143.002-.215.005-.447.018-.893.064-1.335.138l-.03.005-.185.033-.105.02a7.718 7.718 0 00-.289.062l-.032.008a10.69 10.69 0 00-2.55.95l-.155.089c-.063.034-.125.07-.187.105-.046.027-.093.051-.14.079H5.19l-.01.005-.036.02v.002l.111.184 3.15 5.23a4.168 4.168 0 01.38-.202 4.294 4.294 0 011.628-.413c.071-.004.143-.008.214-.008zm.428.01v6.333c.325.034.647.103.96.209l4.66-4.66c-.173-.12-.348-.237-.528-.347l-.026-.015c-.056-.035-.112-.067-.168-.1l-.098-.056-.099-.055a12.735 12.735 0 00-.171-.092l-.027-.014a10.628 10.628 0 00-1.425-.617c-.69-.241-1.403-.41-2.128-.505l-.089-.012-.09-.01a6.56 6.56 0 00-.17-.019l-.049-.004-.204-.017a6.44 6.44 0 00-.255-.015c-.031-.003-.062-.003-.093-.004zM4.782 4.498a9.92 9.92 0 00-1.36 1.062l4.461 4.461.018.018c.049-.04.098-.078.149-.116l-.011-.018zm-1.67 1.36c-.05.05-.098.103-.147.154l-.149.155c-.33.357-.63.73-.902 1.118l-.039.056a10.588 10.588 0 00-.216.326 10.6 10.6 0 00-1.65 5.276l-.006.215-.003.214h6.317c0-.072.007-.143.01-.214.005-.072.006-.144.013-.215.081-.822.399-1.625.952-2.3.045-.055.096-.106.144-.16.048-.052.093-.107.144-.158zm16.255 1.464l-4.663 4.663c.106.312.175.634.21.959h6.332l-.004-.094a11.579 11.579 0 00-.032-.456l-.005-.052a13.044 13.044 0 00-.026-.241v-.009l-.033-.24v-.009a10.618 10.618 0 00-.327-1.493l-.003-.01a15.839 15.839 0 00-.07-.228l-.01-.03a14.111 14.111 0 00-.069-.204l-.02-.055a5.65 5.65 0 00-.153-.405 7.84 7.84 0 00-.093-.227 16.67 16.67 0 00-.063-.144l-.037-.081a13.776 13.776 0 00-.08-.171l-.024-.052-.096-.194-.014-.027a11.2 11.2 0 00-.112-.212l-.004-.008a10.615 10.615 0 00-.604-.98zm-4.43 6.05c0 .071-.006.142-.01.214-.003.072-.005.143-.012.214a4.29 4.29 0 01-.952 2.301c-.045.055-.096.107-.144.16-.048.053-.093.108-.144.159l4.467 4.467c.051-.051.099-.104.148-.155.05-.052.1-.103.148-.155.331-.358.633-.733.905-1.122l.032-.046.098-.144.085-.13.04-.063a10.597 10.597 0 001.647-5.272c.003-.071.004-.143.006-.214.001-.071.004-.143.004-.214zM.01 13.8l.004.093.01.179.005.076.017.206.005.046c.007.076.015.153.024.228l.003.022a9.605 9.605 0 00.033.248c.072.505.182 1.005.327 1.497l.002.006c.022.077.047.154.071.23l.004.014.005.014a15.737 15.737 0 00.153.439l.03.08.059.148a7.702 7.702 0 00.093.228l.062.14.038.084.078.169.027.054a10.677 10.677 0 00.225.441l.025.043 5.408-3.258.02-.012a4.314 4.314 0 01-.395-1.414h-.025zm.505 2.846l-.206.058.002.005zm6.425-1.052l-5.415 3.262c.083.139.17.273.259.406l.008.014.004.005.008.014h.001c.007.012.014.022.022.032l.001.002v.001a10.634 10.634 0 00.298.417l.006.008a9.963 9.963 0 00.29.368l.033.04c.043.052.086.103.13.153l.057.065.112.127.064.069.029.031.083.09.035.035c.049.051.098.103.149.153L7.58 16.42a3.86 3.86 0 01-.285-.321 4.422 4.422 0 01-.356-.505zm6.416 1.111c-.05.04-.1.079-.15.116l.011.018 3.257 5.407c.151-.099.3-.2.446-.307.315-.232.62-.484.914-.756l-4.46-4.46zm-5.457.003l-.015.015-4.46 4.46a8.966 8.966 0 00.195.176c.022.02.043.04.065.058l.152.13a10.622 10.622 0 00.215.174l.023.017.191.148.008.005c.268.2.547.389.834.564l.03.018.164.097.101.057a5.458 5.458 0 00.27.148c.008.004.016.01.025.013.162.085.327.164.493.24l.158-.385 2.243-5.448.009-.02a4.328 4.328 0 01-.701-.467zm4.951.353c-.061.037-.124.07-.187.104a4.318 4.318 0 01-3.271.336c-.069-.02-.135-.047-.203-.071-.067-.024-.136-.044-.202-.072l-2.242 5.444-.088.213-.075.183v.001l.017.007a.137.137 0 00.019.007l.005.003c.052.021.106.04.159.06.067.027.133.053.2.077l.102.04c.702.247 1.43.42 2.168.518l.087.012.09.01.172.019a7.173 7.173 0 00.252.022c.023.001.048.001.071.003l.184.011.112.005a7.06 7.06 0 00.358.007h.05a10.667 10.667 0 001.793-.15l.185-.034.105-.02.109-.023.18-.04.032-.008a10.684 10.684 0 002.55-.95c.052-.028.104-.06.156-.089.063-.034.125-.07.187-.105.043-.024.087-.047.13-.073h.001l.002-.002.002-.001.002-.001.007-.004.042-.025-.11-.183-.11-.184zm3.262 5.414l-.042.025.042-.024zm-.05.029h-.001.002zm-.005.004h-.002z" />
+		</svg>
+	);
+}
+
+/**
+ * Globe + database mark for API featured card — monochrome via currentColor.
+ * Mirrored and rotated −45° to match the source glyph.
+ */
+function DocsApiIcon({ className }: { className?: string }) {
+	return (
+		<svg
+			viewBox="0 0 24 24"
+			xmlns="http://www.w3.org/2000/svg"
+			className={className}
+			fill="none"
+			aria-hidden
+		>
+			<g transform="translate(24 0) scale(-1 1) rotate(-45, 12, 12)">
+				<path
+					d="M16.4463 4.69365L15.6939 3.69482C17.9043 8.62737 12.0824 12.6728 8.7669 10.57L9.40253 11.1797L10.6247 11.7996L13.231 12L15.3048 10.9202L16.374 9.59392L16.9999 7.58881L16.8035 6.38575L16.4463 4.69365Z"
+					fill="currentColor"
+					className="opacity-30"
+				/>
+				<path
+					d="M7 12.5L9 13V11L8 10L6.5 10.5L6 11.5L7 12.5Z"
+					fill="currentColor"
+					className="opacity-30"
+				/>
+				<path
+					d="M12 21.5V16.5L17 16L19 15L20.5 14L21.3126 13.2726L22 12V17L21.2382 18.5066L20 19.5L16 21L12 21.5Z"
+					fill="currentColor"
+					className="opacity-30"
+				/>
+				<path
+					d="M7 7.16888C4.01099 8.03341 2 9.64927 2 11.5C2 14.2614 6.47715 16.5 12 16.5C17.5228 16.5 22 14.2614 22 11.5C22 9.64927 19.989 8.03341 17 7.16888"
+					stroke="currentColor"
+				/>
+				<path
+					d="M16 10.0093C17.2275 10.3755 18 10.9077 18 11.5C18 12.6046 15.3137 13.5 12 13.5C8.68629 13.5 6 12.6046 6 11.5C6 10.9077 6.7725 10.3755 7.99999 10.0093"
+					stroke="currentColor"
+				/>
+				<path
+					d="M22 11.5V16.5C22 19.2614 17.5228 21.5 12 21.5C6.47715 21.5 2 19.2614 2 16.5V11.5"
+					stroke="currentColor"
+				/>
+				<path
+					d="M9 13L5 15V20"
+					stroke="currentColor"
+					strokeLinecap="round"
+				/>
+				<path d="M15 13V11" stroke="currentColor" strokeLinecap="round" />
+				<path
+					d="M15 13L19 15V20"
+					stroke="currentColor"
+					strokeLinecap="round"
+				/>
+				<path d="M9 13V11" stroke="currentColor" strokeLinecap="round" />
+				<path
+					d="M12 12C14.7614 12 17 9.7614 17 7C17 4.23857 14.7614 2 12 2C9.23857 2 7 4.23857 7 7C7 9.7614 9.23857 12 12 12Z"
+					stroke="currentColor"
+					strokeLinecap="square"
+				/>
+			</g>
 		</svg>
 	);
 }
@@ -264,20 +463,11 @@ type NavCategory = {
 	links: NavLink[];
 };
 
-type MegaFooter = {
-	title: string;
-	/** Link for “View all” */
-	href: string;
-	links: NavLink[];
-};
-
 type NavItem = {
 	title: string;
 	href: string;
 	mega?: {
 		categories: NavCategory[];
-		/** Full-width strip under the main columns (e.g. Docs integrations) */
-		footer?: MegaFooter;
 	};
 };
 
@@ -371,55 +561,6 @@ const docFrameworks: NavLink[] = [
 		title: "Spring Boot",
 		href: "/frameworks/spring-boot",
 		brand: siSpringboot,
-	},
-];
-
-/** Integrations strip under Docs columns */
-const docIntegrations: NavLink[] = [
-	{
-		title: "Vercel",
-		href: "/docs/integrations/vercel",
-		brand: siVercel,
-	},
-	{
-		title: "WordPress",
-		href: "/docs/integrations/wordpress",
-		brand: siWordpress,
-	},
-	{
-		title: "Zapier",
-		href: "/docs/integrations/zapier",
-		brand: siZapier,
-	},
-	{
-		title: "n8n",
-		href: "/docs/integrations/n8n",
-		brand: siN8n,
-	},
-	{
-		title: "Netlify",
-		href: "/docs/integrations/netlify",
-		brand: siNetlify,
-	},
-	{
-		title: "Cloudflare",
-		href: "/docs/integrations/cloudflare",
-		brand: siCloudflare,
-	},
-	{
-		title: "Railway",
-		href: "/docs/integrations/railway",
-		brand: siRailway,
-	},
-	{
-		title: "Docker",
-		href: "/docs/integrations/docker",
-		brand: siDocker,
-	},
-	{
-		title: "Strapi",
-		href: "/docs/integrations/strapi",
-		brand: siStrapi,
 	},
 ];
 
@@ -518,9 +659,8 @@ const navItems: NavItem[] = [
 		title: "Docs",
 		href: "/docs",
 		mega: {
-			// Left: Documentation + API Reference cards
+			// Left: Documentation (tall) + API + Integrations cards
 			// Right: frameworks + languages combined into 3 columns (no titles)
-			// Footer: Integrations strip
 			categories: [
 				{
 					title: "",
@@ -529,14 +669,20 @@ const navItems: NavItem[] = [
 						{
 							title: "Documentation",
 							href: "/docs",
-							description: "Platform documentation",
-							icon: "book-open",
+							customIcon: <DocsBookIcon className="size-6" />,
+							docsTheme: "book",
 						},
 						{
-							title: "API Reference",
+							title: "API",
 							href: "/docs/api",
-							description: "Endpoints, auth, and examples",
-							icon: "brackets",
+							customIcon: <DocsApiIcon className="size-6" />,
+							docsTheme: "green",
+						},
+						{
+							title: "Integrations",
+							href: "/docs/integrations",
+							customIcon: <DocsIntegrationsIcon className="size-6" />,
+							docsTheme: "multi",
 						},
 					],
 				},
@@ -547,11 +693,6 @@ const navItems: NavItem[] = [
 					links: [...docFrameworks, ...docLanguages],
 				},
 			],
-			footer: {
-				title: "Integrations",
-				href: "/docs/integrations",
-				links: docIntegrations,
-			},
 		},
 	},
 	{
@@ -838,14 +979,24 @@ function MegaLink({
 }) {
 	const external = isExternalHref(link.href, link.external);
 	const crossDomain = isCrossDomain(link.href);
-	// Product featured cards: gray by default; hatch + rings + accent glow on hover
-	const productCard = featured && !link.description;
+	// Product accent cards only when an accent is set (Transactional / Marketing).
+	const productCard = featured && Boolean(link.accent);
+	// Docs / Resources featured cards — different hover language from product
+	const docsCard = featured && !productCard;
 	const accent =
 		PRODUCT_CARD_ACCENTS[link.accent ?? "blue"] ?? PRODUCT_CARD_ACCENTS.blue;
+	const docsTheme =
+		DOCS_CARD_THEMES[link.docsTheme ?? "book"] ?? DOCS_CARD_THEMES.book;
 	const className = productCard
 		? "group relative flex h-full min-h-[200px] min-w-0 flex-col justify-between overflow-hidden rounded-[18px] border border-stroke-soft-200/80 bg-bg-weak-50/50 p-4 transition-colors duration-300 sm:min-h-[220px] sm:p-5 dark:border-white/10 dark:bg-white/[0.04]"
-		: featured
-			? "group flex h-full min-h-[200px] min-w-0 flex-col justify-between overflow-hidden rounded-[18px] bg-[#f4f4f5] p-4 sm:min-h-[220px] sm:p-5 transition-colors hover:bg-[#efeff1] dark:bg-white/[0.045] dark:hover:bg-white/[0.07]"
+		: docsCard
+			? // Docs cards: Help Center–style soft wash + perspective grid on hover
+				cn(
+					"group relative flex h-full min-h-[120px] min-w-0 flex-col justify-between overflow-hidden rounded-[18px] p-4 sm:min-h-[132px] sm:p-5",
+					"border border-stroke-soft-200/60 bg-bg-white-0",
+					"transition-colors duration-300",
+					"dark:border-white/10 dark:bg-white/[0.04]",
+				)
 			: simple
 				? "group flex min-w-0 items-center gap-2.5 rounded-[12px] px-1.5 py-2 transition-opacity hover:opacity-70"
 				: "group flex min-w-0 items-start gap-3 rounded-[12px] px-1.5 py-2 transition-colors hover:bg-bg-weak-50/80 dark:hover:bg-white/[0.04]";
@@ -875,7 +1026,52 @@ function MegaLink({
 					/>
 				</>
 			)}
-			{/* Icon stays put; rings + glow centered on the icon (not the whole card) */}
+			{docsCard && (
+				<>
+					{/*
+					  Help Center hover: themed wash + perspective grid.
+					  book = Documentation · green = API · multi = Integrations
+					*/}
+					<div
+						aria-hidden
+						className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 ease-out group-hover:opacity-100"
+					>
+						<div
+							className="absolute inset-0 dark:hidden"
+							style={{ background: docsTheme.washLight }}
+						/>
+						<div
+							className="absolute inset-0 hidden dark:block"
+							style={{ background: docsTheme.washDark }}
+						/>
+						{/* Perspective grid */}
+						<div
+							className="absolute inset-0 overflow-hidden"
+							style={{
+								maskImage:
+									"linear-gradient(160deg, black 0%, black 35%, transparent 78%)",
+								WebkitMaskImage:
+									"linear-gradient(160deg, black 0%, black 35%, transparent 78%)",
+							}}
+						>
+							<div
+								className="absolute"
+								style={{
+									inset: "-45% -15% -15% -45%",
+									backgroundImage: `
+										linear-gradient(to right, ${docsTheme.gridRgba} 1px, transparent 1px),
+										linear-gradient(to bottom, ${docsTheme.gridRgba} 1px, transparent 1px)
+									`,
+									backgroundSize: "28px 28px",
+									transform: "perspective(320px) rotateX(58deg) scale(1.35)",
+									transformOrigin: "50% 100%",
+								}}
+							/>
+						</div>
+					</div>
+				</>
+			)}
+			{/* Icon — product: rings/glow; docs: themed ink on hover */}
 			<div className="relative z-10 flex shrink-0 items-start">
 				<div className="relative flex size-6 items-center justify-center sm:size-7">
 					{productCard && (
@@ -928,7 +1124,11 @@ function MegaLink({
 						</>
 					)}
 					<span
-						className={`relative z-10 text-text-strong-950 transition-colors duration-300 dark:text-white ${productCard ? accent.ink : ""}`}
+						className={cn(
+							"relative z-10 text-text-strong-950 transition-colors duration-300 dark:text-white",
+							productCard && accent.ink,
+							docsCard && docsTheme.ink,
+						)}
 					>
 						<NavGlyph link={link} featured />
 					</span>
@@ -937,7 +1137,11 @@ function MegaLink({
 			<span className="relative z-10 min-w-0">
 				<span className="flex items-center gap-1">
 					<span
-						className={`font-medium text-[15px] leading-snug tracking-[-0.01em] transition-colors duration-300 text-text-strong-950 dark:text-white ${productCard ? accent.ink : ""}`}
+						className={cn(
+							"font-medium text-[15px] leading-snug tracking-[-0.01em] text-text-strong-950 transition-colors duration-300 dark:text-white",
+							productCard && accent.ink,
+							docsCard && docsTheme.ink,
+						)}
 					>
 						{link.title}
 					</span>
@@ -1190,95 +1394,10 @@ function CompactBrandColumn({
 	);
 }
 
-/**
- * Full-width integrations strip under Docs mega columns.
- */
-function MegaIntegrationsFooter({ footer }: { footer: MegaFooter }) {
-	return (
-		<div className="border-stroke-soft-200/80 border-t px-1 pt-3 pb-1 sm:px-0 dark:border-white/[0.08]">
-			<div className="mb-2.5 flex items-center justify-between gap-3 px-1">
-				<p className="font-medium text-[11px] text-text-sub-600 uppercase tracking-[0.12em] dark:text-white/40">
-					{footer.title}
-				</p>
-				<a
-					href={footer.href}
-					className="font-medium text-[12px] text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/45 dark:hover:text-white"
-				>
-					View all
-				</a>
-			</div>
-			<div className="flex flex-wrap gap-1.5">
-				{footer.links.map((link) => {
-					const external = isExternalHref(link.href, link.external);
-					const crossDomain = isCrossDomain(link.href);
-					const className = cn(
-						"group inline-flex items-center gap-2 rounded-full border border-stroke-soft-200/80 bg-bg-weak-50/50 px-2.5 py-1.5",
-						"transition-colors hover:border-stroke-soft-200 hover:bg-bg-weak-50",
-						"dark:border-white/10 dark:bg-white/[0.03] dark:hover:bg-white/[0.06]",
-					);
-
-					let brandStyle: CSSProperties | undefined;
-					if (link.brand) {
-						const hex = link.brand.hex.replace("#", "");
-						if (!isDarkBrandHex(hex)) {
-							brandStyle = { color: `#${hex}` };
-						}
-					}
-
-					const body = (
-						<>
-							<span
-								className="inline-flex size-4 shrink-0 items-center justify-center text-text-sub-600 dark:text-white/70"
-								style={brandStyle}
-							>
-								{link.brand ? (
-									<svg
-										viewBox="0 0 24 24"
-										className="size-3.5"
-										fill="currentColor"
-										aria-hidden
-									>
-										<title>{link.brand.title}</title>
-										<path d={link.brand.path} />
-									</svg>
-								) : link.icon ? (
-									<Icon name={link.icon} className="size-3.5" />
-								) : null}
-							</span>
-							<span className="font-medium text-[12.5px] text-text-strong-950 dark:text-white">
-								{link.title}
-							</span>
-						</>
-					);
-
-					const shared = {
-						className,
-						...(external ? { target: "_blank", rel: "noreferrer" } : {}),
-					};
-
-					if (crossDomain || external) {
-						return (
-							<a key={link.title} href={link.href} {...shared}>
-								{body}
-							</a>
-						);
-					}
-
-					return (
-						<Link key={link.title} href={link.href} {...shared}>
-							{body}
-						</Link>
-					);
-				})}
-			</div>
-		</div>
-	);
-}
-
 function MegaPanel({ item }: { item: NavItem }) {
 	if (!item.mega) return null;
 
-	const { categories, footer } = item.mega;
+	const { categories } = item.mega;
 	const count = categories.length;
 	const hasFeatured = categories.some((c) => c.featured);
 	const hasBrandGrid = categories.some((c) => c.compact && c.gridCols);
@@ -1287,13 +1406,13 @@ function MegaPanel({ item }: { item: NavItem }) {
 	// Docs: featured cards (left) + combined brand grid (right)
 	const docsBrandLayout = hasFeatured && hasBrandGrid && count === 2;
 
-	const columns = (
+	return (
 		<div
 			className={
 				productLayout
 					? "grid min-h-full min-w-0 grid-cols-1 items-stretch gap-0 sm:grid-cols-[minmax(0,1.2fr)_minmax(0,0.85fr)_minmax(0,0.85fr)] sm:divide-x sm:divide-stroke-soft-200/80 dark:sm:divide-white/[0.08]"
 					: docsBrandLayout
-						? "grid min-h-full min-w-0 grid-cols-1 items-stretch gap-0 sm:grid-cols-[minmax(0,1.05fr)_minmax(0,1.55fr)] sm:divide-x sm:divide-stroke-soft-200/80 dark:sm:divide-white/[0.08]"
+						? "grid min-h-full min-w-0 grid-cols-1 items-stretch gap-0 sm:grid-cols-[minmax(0,1.15fr)_minmax(0,1.45fr)] sm:divide-x sm:divide-stroke-soft-200/80 dark:sm:divide-white/[0.08]"
 						: count >= 3
 							? "grid min-h-full min-w-0 items-stretch sm:grid-cols-2 lg:grid-cols-3 lg:divide-x lg:divide-stroke-soft-200/80 dark:lg:divide-white/[0.08]"
 							: count === 2
@@ -1333,17 +1452,41 @@ function MegaPanel({ item }: { item: NavItem }) {
 						</div>
 					) : null}
 					{category.featured ? (
-						<div
-							className={
-								category.links.length >= 2
-									? "grid min-h-0 flex-1 grid-cols-2 gap-2.5"
-									: "grid min-h-0 flex-1 grid-cols-1 gap-2.5"
-							}
-						>
-							{category.links.map((link) => (
-								<MegaLink key={link.title} link={link} featured />
-							))}
-						</div>
+						// Docs: 1 tall card + 2 stacked (Documentation | API / Integrations)
+						// Product / Resources: equal multi-card row
+						category.links.length === 3 ? (
+							<div className="grid min-h-0 flex-1 grid-cols-2 grid-rows-2 gap-2.5">
+								<div className="row-span-2 min-h-0 [&>a]:h-full [&>a]:min-h-0">
+									<MegaLink
+										key={category.links[0]!.title}
+										link={category.links[0]!}
+										featured
+									/>
+								</div>
+								<MegaLink
+									key={category.links[1]!.title}
+									link={category.links[1]!}
+									featured
+								/>
+								<MegaLink
+									key={category.links[2]!.title}
+									link={category.links[2]!}
+									featured
+								/>
+							</div>
+						) : (
+							<div
+								className={
+									category.links.length >= 2
+										? "grid min-h-0 flex-1 grid-cols-2 gap-2.5"
+										: "grid min-h-0 flex-1 grid-cols-1 gap-2.5"
+								}
+							>
+								{category.links.map((link) => (
+									<MegaLink key={link.title} link={link} featured />
+								))}
+							</div>
+						)
 					) : category.simple ? (
 						<ProductSimpleColumn links={category.links} />
 					) : category.compact ? (
@@ -1360,17 +1503,6 @@ function MegaPanel({ item }: { item: NavItem }) {
 					)}
 				</div>
 			))}
-		</div>
-	);
-
-	if (!footer) return columns;
-
-	return (
-		<div className="flex min-w-0 flex-col">
-			{columns}
-			<div className="px-3 pb-3 sm:px-4 sm:pb-4">
-				<MegaIntegrationsFooter footer={footer} />
-			</div>
 		</div>
 	);
 }
@@ -1798,37 +1930,7 @@ export const Header = () => {
 																		</div>
 																	),
 																)}
-																{item.mega.footer ? (
-																	<div className="space-y-2">
-																		<div className="mb-2 flex items-center justify-between gap-2 px-2">
-																			<p className="font-medium text-[11px] text-text-sub-600 uppercase tracking-[0.14em] dark:text-white/40">
-																				{item.mega.footer.title}
-																			</p>
-																			<a
-																				href={item.mega.footer.href}
-																				onClick={closeMobileMenu}
-																				className="font-medium text-[12px] text-text-sub-600 dark:text-white/45"
-																			>
-																				View all
-																			</a>
-																		</div>
-																		<div className="flex flex-wrap gap-1.5 px-1">
-																			{item.mega.footer.links.map((link) => (
-																				<a
-																					key={link.title}
-																					href={link.href}
-																					onClick={closeMobileMenu}
-																					className="inline-flex items-center gap-2 rounded-full border border-stroke-soft-200/80 bg-bg-weak-50/50 px-2.5 py-1.5 dark:border-white/10 dark:bg-white/[0.03]"
-																				>
-																					<NavGlyph link={link} plain />
-																					<span className="font-medium text-[13px] text-text-strong-950 dark:text-white">
-																						{link.title}
-																					</span>
-																				</a>
-																			))}
-																		</div>
-																	</div>
-																) : null}
+
 															</div>
 														</motion.div>
 													)}
