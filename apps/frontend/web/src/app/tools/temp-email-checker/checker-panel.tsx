@@ -39,7 +39,7 @@ const VERDICT_STYLES: Record<
 		icon: "shield-check",
 		badge: "bg-success-lighter text-success-base",
 		accent: "bg-success-base",
-		label: "Looks fine",
+		label: "Not listed",
 	},
 	invalid: {
 		icon: "cross-circle",

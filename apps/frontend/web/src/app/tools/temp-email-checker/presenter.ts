@@ -38,6 +38,10 @@ const SYNTAX_DETAIL: Record<string, string> = {
 	"tld-invalid": "The ending does not look like a real top-level domain",
 };
 
+// The check never contacts a mail server — no copy here may promise delivery.
+const DELIVERY_LIMIT =
+	"Nothing here confirms the mailbox exists or that mail would be delivered.";
+
 function signal(
 	id: string,
 	label: string,
@@ -104,8 +108,8 @@ export function toCheckResult(api: ApiCheckResponse): CheckResult {
 			"Free provider",
 			api.signals.freeProvider,
 			api.isFreeProvider
-				? `${domain} is a consumer mailbox — real, but not a company domain`
-				: "Not a consumer mailbox provider",
+				? `${domain} is a consumer mailbox provider, not a company domain`
+				: "Not a known consumer mailbox provider",
 		),
 	];
 
@@ -127,7 +131,7 @@ export function toCheckResult(api: ApiCheckResponse): CheckResult {
 			verdict: "disposable",
 			headline: "Disposable address",
 			summary:
-				"This domain hands out temporary mailboxes that expire on their own. Sending here will hard-bounce once the inbox is gone, and those bounces count against your sending domain.",
+				"This domain is on the disposable list. Providers like it typically hand out mailboxes that are discarded within minutes or hours, so mail sent here risks bouncing, and bounces count against your sending domain.",
 			signals,
 		};
 	}
@@ -150,8 +154,8 @@ export function toCheckResult(api: ApiCheckResponse): CheckResult {
 		verdict: "deliverable",
 		headline: "No disposable signals",
 		summary: api.isFreeProvider
-			? "This is a consumer mailbox from a mainstream provider — free to create, but persistent and real. Safe to send to unless your product requires a company domain."
-			: "This domain isn't on the known disposable list and shows no throwaway signals. Safe to accept.",
+			? `${domain} is a mainstream consumer mailbox provider rather than a company domain, and it is not on the disposable list. ${DELIVERY_LIMIT}`
+			: `This domain isn't on the known disposable list and shows no throwaway signals. ${DELIVERY_LIMIT}`,
 		signals,
 	};
 }
