@@ -6,6 +6,13 @@ import { useEffect } from "react";
 
 export function PostHogProvider({ children }: { children: React.ReactNode }) {
 	useEffect(() => {
+		if (
+			typeof window === "undefined" ||
+			window.location.hostname !== "reloop.sh"
+		) {
+			return;
+		}
+
 		posthog.init("phc_yupmDjjcfcjsFXbwgrzpwfb5zUYrWvneXDqhTdZjeuoE", {
 			api_host: "https://r.reloop.sh",
 			ui_host: "https://us.i.posthog.com",
