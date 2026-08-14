@@ -737,12 +737,12 @@ function MegaLink({
 							{/* Soft accent glow behind icon — nudged up to match icon optical center */}
 							<div
 								aria-hidden
-								className={`-translate-x-1/2 -translate-y-[52%] pointer-events-none absolute top-1/2 left-1/2 size-28 scale-90 rounded-full opacity-0 blur-2xl transition-all duration-500 group-hover:scale-125 group-hover:opacity-100 ${accent.glow}`}
+								className={`-translate-x-1/2 -translate-y-[51%] pointer-events-none absolute top-1/2 left-1/2 size-28 scale-90 rounded-full opacity-0 blur-2xl transition-all duration-500 group-hover:scale-125 group-hover:opacity-100 ${accent.glow}`}
 							/>
 							{/* Concentric rings — centered on icon, slightly raised */}
 							<svg
 								aria-hidden
-								className="-translate-x-1/2 -translate-y-[52%] pointer-events-none absolute top-1/2 left-1/2 size-[9.5rem] opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+								className="-translate-x-1/2 -translate-y-[51%] pointer-events-none absolute top-1/2 left-1/2 size-[9.5rem] opacity-0 transition-opacity duration-300 group-hover:opacity-100"
 								viewBox="0 0 160 160"
 								fill="none"
 							>
@@ -763,13 +763,15 @@ function MegaLink({
 									strokeWidth="1"
 									fill="none"
 								/>
+								{/* Inner ring — true dotted line (round caps + short gaps) */}
 								<circle
 									cx="80"
 									cy="80"
 									r="28"
 									className={accent.ringInner}
-									strokeWidth="1.35"
-									strokeDasharray="3 3"
+									strokeWidth="1.5"
+									strokeDasharray="0.01 4.5"
+									strokeLinecap="round"
 									fill="none"
 								/>
 							</svg>
