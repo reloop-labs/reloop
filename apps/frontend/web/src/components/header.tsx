@@ -911,7 +911,9 @@ function NavGlyph({
 	if (!link.icon && !link.brand) return null;
 
 	const sizeClass = featured ? "size-5" : "size-4";
-	const colorClass = "text-text-sub-600 dark:text-white/65";
+	const colorClass = featured
+		? "text-current"
+		: "text-text-sub-600 dark:text-white/65";
 
 	// Plain icon (featured cards + simple product rows): no tile
 	if (featured || plain) {
@@ -1005,7 +1007,7 @@ function MegaLink({
 			? // Docs / Resources / Company featured: Help Center–style hover
 				cn(
 					"group relative flex h-full min-h-[132px] flex-col justify-between overflow-hidden rounded-[18px] p-4 sm:min-h-[148px] sm:p-5",
-					"border border-stroke-soft-200/60 bg-bg-white-0",
+					"border border-stroke-soft-200/80 bg-bg-weak-50/50",
 					"transition-colors duration-300",
 					"dark:border-white/[0.08] dark:bg-white/[0.03]",
 					featuredCardWidth,
