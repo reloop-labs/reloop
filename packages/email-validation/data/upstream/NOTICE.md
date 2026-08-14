@@ -20,7 +20,7 @@ and refreshes hourly via GitHub Actions.
 BillionVerify/disposable is MIT licensed. The notice below is reproduced in
 full as the license requires.
 
-```
+```text
 MIT License
 
 Copyright (c) 2026 BillionVerify
