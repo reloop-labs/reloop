@@ -6,6 +6,7 @@ import { Icon } from "@reloop/ui/icon";
 import { Logo } from "@reloop/ui/logo";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
+import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 import {
 	siDotnet,
@@ -25,14 +26,152 @@ type BrandIcon = {
 	title: string;
 };
 
+type ProductCardAccent = "blue" | "violet";
+
 type NavLink = {
 	title: string;
 	href: string;
 	description?: string;
 	icon?: string;
+	/** Inline custom SVG (e.g. product featured marks) */
+	customIcon?: ReactNode;
 	/** simple-icons brand mark (used for language/SDK rows) */
 	brand?: BrandIcon;
+	/** Hover wash + glow for product featured cards */
+	accent?: ProductCardAccent;
 	external?: boolean;
+};
+
+/** Layered stack mark for Transactional product card */
+function TransactionalStackIcon({ className }: { className?: string }) {
+	return (
+		<svg
+			viewBox="0 0 24 24"
+			xmlns="http://www.w3.org/2000/svg"
+			className={className}
+			fill="none"
+			aria-hidden
+		>
+			<g transform="rotate(90, 12, 12)">
+				<path
+					d="M22 10V6.5L12 11.5V15L22 10Z"
+					fill="currentColor"
+					fillOpacity={0.3}
+				/>
+				<path
+					d="M22 17.5V14L12 19V22.5L22 17.5Z"
+					fill="currentColor"
+					fillOpacity={0.3}
+				/>
+				<path d="M12 19V22.3213" stroke="currentColor" />
+				<path
+					d="M2 14L11.3292 18.6646C11.7515 18.8757 12.2485 18.8757 12.6708 18.6646L22 14"
+					stroke="currentColor"
+				/>
+				<path
+					d="M6 12L2.55279 13.7236C2.214 13.893 2 14.2393 2 14.618V16.882C2 17.2607 2.214 17.607 2.55279 17.7764L11.3292 22.1646C11.7515 22.3757 12.2485 22.3757 12.6708 22.1646L21.4472 17.7764C21.786 17.607 22 17.2607 22 16.882V14.618C22 14.2393 21.786 13.893 21.4472 13.7236L18 12"
+					stroke="currentColor"
+				/>
+				<path d="M12 11.5V14.8229" stroke="currentColor" />
+				<path
+					d="M2 6.5L11.3292 11.1646C11.7515 11.3757 12.2485 11.3757 12.6708 11.1646L22 6.5"
+					stroke="currentColor"
+				/>
+				<path
+					d="M11.3292 14.6646L2.55279 10.2764C2.214 10.107 2 9.76074 2 9.38197V7.11803C2 6.73926 2.214 6.393 2.55279 6.22361L11.3292 1.83541C11.7515 1.62426 12.2485 1.62426 12.6708 1.83541L21.4472 6.22361C21.786 6.393 22 6.73926 22 7.11803V9.38197C22 9.76074 21.786 10.107 21.4472 10.2764L12.6708 14.6646C12.2485 14.8757 11.7515 14.8757 11.3292 14.6646Z"
+					stroke="currentColor"
+				/>
+			</g>
+		</svg>
+	);
+}
+
+/** Database / cylinder mark for Marketing product card */
+function MarketingDatabaseIcon({ className }: { className?: string }) {
+	return (
+		<svg
+			viewBox="0 0 24 24"
+			xmlns="http://www.w3.org/2000/svg"
+			className={className}
+			fill="none"
+			aria-hidden
+		>
+			<g transform="rotate(90, 12, 12)">
+				<path
+					d="M12 21.5C15.3137 21.5 18 20.433 18 18.5V17L15.145 18.1719L12 18.5L8.76297 18.1719L6 17V18.5C6 20.433 8.68629 21.5 12 21.5Z"
+					fill="currentColor"
+					fillOpacity={0.3}
+				/>
+				<path
+					d="M18 17V18.5C18 20.433 15.3137 21.5 12 21.5C8.68629 21.5 6 20.433 6 18.5V17"
+					stroke="currentColor"
+				/>
+				<path
+					d="M16 7.46219C16 8.45378 14.2091 9.25763 12 9.25763C9.79086 9.25763 8 8.45378 8 7.46219C8 6.47059 9.79086 5.66675 12 5.66675C14.2091 5.66675 16 6.47059 16 7.46219Z"
+					fill="currentColor"
+					fillOpacity={0.3}
+				/>
+				<path
+					d="M20 7C20 9.48528 16.4183 11.5 12 11.5C7.58172 11.5 4 9.48528 4 7C4 4.51472 7.58172 2.5 12 2.5C16.4183 2.5 20 4.51472 20 7Z"
+					stroke="currentColor"
+				/>
+				<path
+					d="M16 7.46219C16 8.45378 14.2091 9.25763 12 9.25763C9.79086 9.25763 8 8.45378 8 7.46219C8 6.47059 9.79086 5.66675 12 5.66675C14.2091 5.66675 16 6.47059 16 7.46219Z"
+					stroke="currentColor"
+				/>
+				<path
+					d="M20 7V14C20 16.4853 16.4183 18.5 12 18.5C7.58172 18.5 4 16.4853 4 14V7"
+					stroke="currentColor"
+				/>
+			</g>
+		</svg>
+	);
+}
+
+const PRODUCT_CARD_ACCENTS: Record<
+	ProductCardAccent,
+	{
+		wash: string;
+		glow: string;
+		/** Hatch stroke color (tinted per accent) */
+		hatch: string;
+		/** Diagonal hatch direction + spacing (matches blog CTA half-fade style) */
+		hatchImage: string;
+		/** Mask: lines only on half the card (blog CTA pattern) */
+		hatchMask: string;
+		/** Outer ring stroke class */
+		ringOuter: string;
+		/** Inner ring stroke class (stronger / more accented) */
+		ringInner: string;
+	}
+> = {
+	// Transactional — cool blue / sky; effect originates from top-left corner
+	blue: {
+		wash: "bg-gradient-to-br from-sky-100/90 via-blue-50/70 to-indigo-100/80 dark:from-sky-950/40 dark:via-blue-950/30 dark:to-indigo-950/45",
+		glow: "bg-gradient-to-br from-blue-500/[0.16] via-sky-400/[0.10] to-indigo-500/[0.06] dark:from-blue-500/[0.20] dark:via-sky-400/[0.14] dark:to-indigo-500/[0.10]",
+		// Lighter hatch so rings read as the hero detail
+		hatch: "text-sky-500/20 dark:text-sky-400/18",
+		hatchImage:
+			"repeating-linear-gradient(-45deg, transparent 0, transparent 2.5px, currentColor 2.5px, currentColor 3.1px)",
+		// Strong at top-left corner → fade toward bottom-right (mirrors Marketing’s corner reveal)
+		hatchMask:
+			"linear-gradient(to bottom right, black 0%, black 32%, transparent 68%)",
+		ringOuter: "stroke-sky-400/35 dark:stroke-sky-400/40",
+		ringInner: "stroke-blue-500/70 dark:stroke-sky-300/75",
+	},
+	// Marketing — warm violet / rose; effect originates from top-right corner
+	violet: {
+		wash: "bg-gradient-to-bl from-violet-100/90 via-fuchsia-50/70 to-rose-100/80 dark:from-violet-950/40 dark:via-fuchsia-950/30 dark:to-rose-950/45",
+		glow: "bg-gradient-to-bl from-violet-500/[0.14] via-fuchsia-400/[0.10] to-rose-500/[0.08] dark:from-violet-500/[0.18] dark:via-fuchsia-400/[0.14] dark:to-rose-500/[0.12]",
+		hatch: "text-violet-500/22 dark:text-violet-400/18",
+		hatchImage:
+			"repeating-linear-gradient(45deg, transparent 0, transparent 3px, currentColor 3px, currentColor 3.8px)",
+		// Strong at top-right corner → fade toward bottom-left
+		hatchMask:
+			"linear-gradient(to bottom left, black 0%, black 32%, transparent 68%)",
+		ringOuter: "stroke-violet-400/35 dark:stroke-violet-400/40",
+		ringInner: "stroke-violet-500/65 dark:stroke-fuchsia-300/70",
+	},
 };
 
 type NavCategory = {
@@ -131,12 +270,18 @@ const navItems: NavItem[] = [
 						{
 							title: "Transactional",
 							href: "/features/transaction-emails",
-							icon: "mail-send",
+							customIcon: (
+								<TransactionalStackIcon className="size-6 text-text-strong-950 dark:text-white" />
+							),
+							accent: "blue",
 						},
 						{
 							title: "Marketing",
 							href: "/use-cases/automated-email",
-							icon: "mega-phone",
+							customIcon: (
+								<MarketingDatabaseIcon className="size-6 text-text-strong-950 dark:text-white" />
+							),
+							accent: "violet",
 						},
 					],
 				},
@@ -463,6 +608,14 @@ function NavGlyph({
 	/** Icon only — no tile background or border */
 	plain?: boolean;
 }) {
+	if (link.customIcon) {
+		return (
+			<span className="inline-flex shrink-0 text-text-strong-950 dark:text-white">
+				{link.customIcon}
+			</span>
+		);
+	}
+
 	if (!link.icon && !link.brand) return null;
 
 	const sizeClass = featured ? "size-5" : "size-4";
@@ -540,22 +693,95 @@ function MegaLink({
 }) {
 	const external = isExternalHref(link.href, link.external);
 	const crossDomain = isCrossDomain(link.href);
-	// Product featured: plain icon + title. Docs/Resources featured: soft card + description.
-	const plainFeatured = featured && !link.description;
-	const className = plainFeatured
-		? "group flex h-full min-h-[148px] min-w-0 flex-col justify-between px-1.5 py-2 transition-opacity hover:opacity-70"
+	// Product featured cards: gray by default; hatch + rings + accent glow on hover
+	const productCard = featured && !link.description;
+	const accent =
+		PRODUCT_CARD_ACCENTS[link.accent ?? "blue"] ?? PRODUCT_CARD_ACCENTS.blue;
+	const className = productCard
+		? "group relative flex h-full min-h-[200px] min-w-0 flex-col justify-between overflow-hidden rounded-[18px] border border-stroke-soft-200/80 bg-bg-weak-50/50 p-4 transition-colors duration-300 sm:min-h-[220px] sm:p-5 dark:border-white/10 dark:bg-white/[0.04]"
 		: featured
-			? "group flex h-full min-h-[148px] min-w-0 flex-col justify-between overflow-hidden rounded-[18px] bg-[#f4f4f5] p-4 sm:p-5 transition-colors hover:bg-[#efeff1] dark:bg-white/[0.045] dark:hover:bg-white/[0.07]"
+			? "group flex h-full min-h-[200px] min-w-0 flex-col justify-between overflow-hidden rounded-[18px] bg-[#f4f4f5] p-4 sm:min-h-[220px] sm:p-5 transition-colors hover:bg-[#efeff1] dark:bg-white/[0.045] dark:hover:bg-white/[0.07]"
 			: simple
 				? "group flex min-w-0 items-center gap-2.5 rounded-[12px] px-1.5 py-2 transition-opacity hover:opacity-70"
 				: "group flex min-w-0 items-start gap-3 rounded-[12px] px-1.5 py-2 transition-colors hover:bg-bg-weak-50/80 dark:hover:bg-white/[0.04]";
 
 	const content = featured ? (
 		<>
-			<div className="flex shrink-0 items-start">
-				<NavGlyph link={link} featured />
+			{productCard && (
+				<>
+					{/* Soft color wash — half-card fade (blog CTA), only on hover */}
+					<div
+						aria-hidden
+						className={`pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100 ${accent.wash}`}
+						style={{
+							maskImage: accent.hatchMask,
+							WebkitMaskImage: accent.hatchMask,
+						}}
+					/>
+					{/* Diagonal hatch — half-card only, soft accent tint, reveal on hover */}
+					<div
+						aria-hidden
+						className={`pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100 ${accent.hatch}`}
+						style={{
+							backgroundImage: accent.hatchImage,
+							maskImage: accent.hatchMask,
+							WebkitMaskImage: accent.hatchMask,
+						}}
+					/>
+				</>
+			)}
+			{/* Icon stays put; rings + glow centered on the icon (not the whole card) */}
+			<div className="relative z-10 flex shrink-0 items-start">
+				<div className="relative flex size-6 items-center justify-center sm:size-7">
+					{productCard && (
+						<>
+							{/* Soft accent glow behind icon */}
+							<div
+								aria-hidden
+								className={`pointer-events-none absolute top-1/2 left-1/2 size-28 -translate-x-1/2 -translate-y-1/2 scale-90 rounded-full opacity-0 blur-2xl transition-all duration-500 group-hover:scale-125 group-hover:opacity-100 ${accent.glow}`}
+							/>
+							{/* Concentric rings — centered on icon */}
+							<svg
+								aria-hidden
+								className="pointer-events-none absolute top-1/2 left-1/2 size-[9.5rem] -translate-x-1/2 -translate-y-1/2 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+								viewBox="0 0 160 160"
+								fill="none"
+							>
+								<circle
+									cx="80"
+									cy="80"
+									r="72"
+									className={accent.ringOuter}
+									strokeWidth="0.75"
+									strokeDasharray="4 4"
+									fill="none"
+								/>
+								<circle
+									cx="80"
+									cy="80"
+									r="50"
+									className={accent.ringOuter}
+									strokeWidth="1"
+									fill="none"
+								/>
+								<circle
+									cx="80"
+									cy="80"
+									r="28"
+									className={accent.ringInner}
+									strokeWidth="1.35"
+									strokeDasharray="3 3"
+									fill="none"
+								/>
+							</svg>
+						</>
+					)}
+					<span className="relative z-10">
+						<NavGlyph link={link} featured />
+					</span>
+				</div>
 			</div>
-			<span className="min-w-0">
+			<span className="relative z-10 min-w-0">
 				<span className="flex items-center gap-1">
 					<span className="font-medium text-[15px] text-text-strong-950 leading-snug tracking-[-0.01em] dark:text-white">
 						{link.title}
