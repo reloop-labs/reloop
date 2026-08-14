@@ -18,25 +18,25 @@ const nextConfig: NextConfig = {
 			...(isDev
 				? []
 				: [
-					{
-						source: "/_next/static/:path*",
-						headers: [
-							{
-								key: "Cache-Control",
-								value: "public, max-age=31536000, immutable",
-							},
-						],
-					},
-					{
-						source: "/font/:path*",
-						headers: [
-							{
-								key: "Cache-Control",
-								value: "public, max-age=31536000, immutable",
-							},
-						],
-					},
-				]),
+						{
+							source: "/_next/static/:path*",
+							headers: [
+								{
+									key: "Cache-Control",
+									value: "public, max-age=31536000, immutable",
+								},
+							],
+						},
+						{
+							source: "/font/:path*",
+							headers: [
+								{
+									key: "Cache-Control",
+									value: "public, max-age=31536000, immutable",
+								},
+							],
+						},
+					]),
 			{
 				source: "/manifest.json",
 				headers: [
@@ -66,14 +66,6 @@ const nextConfig: NextConfig = {
 	},
 	async rewrites() {
 		return [
-			{
-				source: "/api/analytics/track",
-				destination: "https://rybbit.reloop.sh/api/track",
-			},
-			{
-				source: "/api/analytics/site/:path*",
-				destination: "https://rybbit.reloop.sh/api/site/:path*",
-			},
 			// Markdown twins (App Router skill.md / pricing.md win over afterFiles rewrite)
 			{
 				source: "/:path*.md",

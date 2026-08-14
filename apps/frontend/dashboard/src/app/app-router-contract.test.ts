@@ -59,15 +59,10 @@ describe("App Router provider lifetimes", () => {
 		expect(suspenseFallback).toContain("AuthSessionLoader");
 	});
 
-	it("mounts analytics through the base-path rewrite", () => {
+	it("mounts PostHog analytics provider", () => {
 		const providers = read("./providers.tsx");
-		const config = read("../../next.config.ts");
 
-		expect(providers).toContain("<RybbitLoader");
-		expect(providers).toContain(
-			'scriptSrc="/dashboard/api/analytics/script.js"',
-		);
-		expect(config).toContain('source: "/api/analytics/script.js"');
+		expect(providers).toContain("<PostHogProvider>");
 	});
 
 	it("publishes branded metadata and no-indexes the not-found route", () => {
