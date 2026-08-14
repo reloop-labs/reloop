@@ -148,7 +148,7 @@ export function createBlogCategoryMetadata(category: {
 	const description = clampDescription(category.description);
 
 	return {
-		title,
+		title: { absolute: title },
 		description,
 		alternates: { canonical: pageUrl },
 		robots: articleRobots,
