@@ -1,11 +1,15 @@
+import { JsonLd } from "@reloop/web/components/json-ld";
 import { BlogPostPageView } from "@reloop/web/components/landing/blog/blog-post-page-view";
+import {
+	buildBlogPostJsonLd,
+	createBlogPostMetadata,
+} from "@reloop/web/lib/landing/blog/seo";
 import {
 	generateStaticParams,
 	getPost,
 	getRelatedPosts,
 	isPostViewable,
 } from "@reloop/web/lib/landing/blog/source";
-import { createLandingMetadata } from "@reloop/web/lib/landing/metadata";
 import { notFound } from "next/navigation";
 
 export const instant = false;
@@ -22,12 +26,7 @@ export async function generateMetadata({ params }: PageProps) {
 		return {};
 	}
 
-	return createLandingMetadata(
-		post.title,
-		post.description,
-		`/blog/${post.slug}`,
-		post.keywords,
-	);
+	return createBlogPostMetadata(post);
 }
 
 export { generateStaticParams };
@@ -44,11 +43,14 @@ export default async function BlogPostPage({ params }: PageProps) {
 	const relatedPosts = getRelatedPosts(slug, 4);
 
 	return (
-		<BlogPostPageView
-			post={postData}
-			body={renderBody()}
-			toc={post.toc}
-			relatedPosts={relatedPosts}
-		/>
+		<>
+			<JsonLd data={buildBlogPostJsonLd(postData)} />
+			<BlogPostPageView
+				post={postData}
+				body={renderBody()}
+				toc={post.toc}
+				relatedPosts={relatedPosts}
+			/>
+		</>
 	);
 }
