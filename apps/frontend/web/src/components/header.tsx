@@ -762,31 +762,26 @@ const navItems: NavItem[] = [
 				},
 				{
 					title: "",
-					simple: true,
+					compact: true,
 					links: [
 						{
 							title: "Blog",
 							href: "/blog",
-							description: "Insights and stories",
 							icon: "pencil",
 						},
 						{
 							title: "Changelog",
 							href: "/changelog",
-							description: "Releases and updates",
 							icon: "list",
 						},
 						{
 							title: "Status",
 							href: "https://status.reloop.sh/status/live",
-							description: "System uptime and incidents",
 							icon: "activity",
-							external: true,
 						},
 						{
 							title: "Self-host",
 							href: "/docs/self-host",
-							description: "Run Reloop on your infra",
 							icon: "server",
 						},
 					],
@@ -1256,13 +1251,8 @@ function ProductSimpleColumn({ links }: { links: NavLink[] }) {
 							) : null}
 						</span>
 						<span className="min-w-0 flex-1">
-							<p className="flex items-center gap-1 font-medium text-sm text-text-strong-950 dark:text-white">
+							<p className="font-medium text-sm text-text-strong-950 dark:text-white">
 								{link.title}
-								{external && (
-									<span className="text-[11px] text-text-sub-600 dark:text-white/45">
-										↗
-									</span>
-								)}
 							</p>
 							{link.description && (
 								<p className="line-clamp-1 text-text-sub-600 text-xs dark:text-white/60">
@@ -1961,11 +1951,13 @@ export const Header = () => {
 																							<span className="min-w-0">
 																								<span className="flex items-center gap-1 font-medium text-[14px] text-text-strong-950 dark:text-white">
 																									{link.title}
-																									{external && (
-																										<span className="text-[11px] text-text-sub-600 dark:text-white/45">
-																											↗
-																										</span>
-																									)}
+																									{external &&
+																										!category.simple &&
+																										!category.compact && (
+																											<span className="text-[11px] text-text-sub-600 dark:text-white/45">
+																												↗
+																											</span>
+																										)}
 																								</span>
 																								{!category.simple &&
 																									link.description && (
