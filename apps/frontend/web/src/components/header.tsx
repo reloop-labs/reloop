@@ -12,6 +12,33 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 /** Strong ease-out for UI (Emil / animations.dev) */
 const EASE_OUT: [number, number, number, number] = [0.23, 1, 0.32, 1];
+/** CSS `ease` — used for directional mega content slides */
+const EASE_DEFAULT: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
+/** Horizontal travel for enter/exit when switching mega menus (matches Radix nav motion) */
+const MEGA_SLIDE_PX = 200;
+const MEGA_SLIDE_MS = 0.25;
+
+/**
+ * Directional content motion when switching mega tabs.
+ * dir > 0: moved toward end → enter from right, exit to left
+ * dir < 0: moved toward start → enter from left, exit to right
+ * dir = 0: first open (no horizontal slide)
+ */
+const megaContentVariants = {
+	enter: (dir: number) => ({
+		opacity: 0,
+		x: dir > 0 ? MEGA_SLIDE_PX : dir < 0 ? -MEGA_SLIDE_PX : 0,
+	}),
+	center: {
+		opacity: 1,
+		x: 0,
+	},
+	exit: (dir: number) => ({
+		opacity: 0,
+		x: dir > 0 ? -MEGA_SLIDE_PX : dir < 0 ? MEGA_SLIDE_PX : 0,
+	}),
+};
+
 import {
 	siDotnet,
 	siElixir,
@@ -1035,11 +1062,18 @@ function MegaPanel({ item }: { item: NavItem }) {
 	);
 }
 
+/** Order of mega tabs in the nav — used to derive slide direction on switch */
+const megaTabOrder = navItems
+	.filter((item) => item.mega)
+	.map((item) => item.title);
+
 export const Header = () => {
 	const { useSession } = authClient;
 	const { data: session } = useSession();
 	const shouldReduceMotion = useReducedMotion();
 	const [activeMega, setActiveMega] = useState<string | null>(null);
+	/** 1 = toward end (enter from right), -1 = toward start (enter from left), 0 = open */
+	const [megaDirection, setMegaDirection] = useState(0);
 	const navRef = useRef<HTMLElement | null>(null);
 	const tabRefs = useRef<Record<string, HTMLElement | null>>({});
 	const megaContentRef = useRef<HTMLDivElement | null>(null);
@@ -1052,6 +1086,18 @@ export const Header = () => {
 	const [stars, setStars] = useState<string>("GitHub");
 
 	const openMega = (title: string | null) => {
+		if (title && activeMega && title !== activeMega) {
+			const from = megaTabOrder.indexOf(activeMega);
+			const to = megaTabOrder.indexOf(title);
+			if (from !== -1 && to !== -1) {
+				setMegaDirection(to > from ? 1 : -1);
+			} else {
+				setMegaDirection(0);
+			}
+		} else {
+			// First open or close — no horizontal slide
+			setMegaDirection(0);
+		}
 		setActiveMega(title);
 	};
 
@@ -1494,10 +1540,10 @@ export const Header = () => {
 				</AnimatePresence>
 
 				{/*
-				  Mega menu motion (Emil principles):
-				  - Open/close: opacity + slight y/scale only (ease-out ≤200ms)
-				  - Tab switch: keep shell; height spring (bounce 0); content opacity only
-				  - No layout prop, no popLayout, no blur, no directional slide (those felt janky)
+				  Mega menu motion:
+				  - Open/close: opacity + slight y/scale (ease-out)
+				  - Tab switch: height spring on shell; content slides like Radix nav
+				    (from-end/from-start enter, to-start/to-end exit, 250ms ease)
 				*/}
 				<AnimatePresence>
 					{activeMega && activeItem?.mega && (
@@ -1544,21 +1590,40 @@ export const Header = () => {
 									}
 									style={{ overflow: "hidden" }}
 								>
-									{/* No AnimatePresence exit — avoid empty frame / height collapse mid-switch */}
+									{/*
+									  Relative + absolute exit so enter/exit overlap (sync mode).
+									  Direction from tab order: rightward → enterFromRight / exitToLeft.
+									*/}
 									<div
 										ref={megaContentRef}
-										className="w-[min(880px,calc(100vw-2rem))]"
+										className="relative w-[min(880px,calc(100vw-2rem))]"
 									>
-										<motion.div
-											key={activeMega}
-											initial={
-												shouldReduceMotion ? false : { opacity: 0.35 }
-											}
-											animate={{ opacity: 1 }}
-											transition={{ duration: 0.12, ease: EASE_OUT }}
+										<AnimatePresence
+											initial={false}
+											custom={megaDirection}
+											mode="popLayout"
 										>
-											<MegaPanel item={activeItem} />
-										</motion.div>
+											<motion.div
+												key={activeMega}
+												custom={megaDirection}
+												variants={megaContentVariants}
+												initial={shouldReduceMotion ? false : "enter"}
+												animate="center"
+												exit={shouldReduceMotion ? undefined : "exit"}
+												transition={
+													shouldReduceMotion
+														? { duration: 0 }
+														: {
+																duration: MEGA_SLIDE_MS,
+																ease: EASE_DEFAULT,
+															}
+												}
+												// Keep full width while popLayout takes the exiting panel out of flow
+												className="w-full"
+											>
+												<MegaPanel item={activeItem} />
+											</motion.div>
+										</AnimatePresence>
 									</div>
 								</motion.div>
 							</div>
