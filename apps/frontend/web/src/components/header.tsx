@@ -156,8 +156,8 @@ const PRODUCT_CARD_ACCENTS: Record<
 		// Strong at top-left corner → fade toward bottom-right (mirrors Marketing’s corner reveal)
 		hatchMask:
 			"linear-gradient(to bottom right, black 0%, black 32%, transparent 68%)",
-		ringOuter: "stroke-sky-400/35 dark:stroke-sky-400/40",
-		ringInner: "stroke-blue-500/70 dark:stroke-sky-300/75",
+		ringOuter: "stroke-sky-400/18 dark:stroke-sky-400/22",
+		ringInner: "stroke-blue-500/32 dark:stroke-sky-300/35",
 	},
 	// Marketing — warm violet / rose; effect originates from top-right corner
 	violet: {
@@ -169,8 +169,8 @@ const PRODUCT_CARD_ACCENTS: Record<
 		// Strong at top-right corner → fade toward bottom-left
 		hatchMask:
 			"linear-gradient(to bottom left, black 0%, black 32%, transparent 68%)",
-		ringOuter: "stroke-violet-400/35 dark:stroke-violet-400/40",
-		ringInner: "stroke-violet-500/65 dark:stroke-fuchsia-300/70",
+		ringOuter: "stroke-violet-400/18 dark:stroke-violet-400/22",
+		ringInner: "stroke-violet-500/30 dark:stroke-fuchsia-300/32",
 	},
 };
 
@@ -625,11 +625,12 @@ function NavGlyph({
 	if (featured || plain) {
 		if (link.brand) {
 			const hex = link.brand.hex.replace("#", "");
-			const colorStyle = isDarkBrandHex(hex)
-				? undefined
-				: { color: `#${hex}` };
+			const colorStyle = isDarkBrandHex(hex) ? undefined : { color: `#${hex}` };
 			return (
-				<span className={`inline-flex shrink-0 ${colorClass}`} style={colorStyle}>
+				<span
+					className={`inline-flex shrink-0 ${colorClass}`}
+					style={colorStyle}
+				>
 					<svg
 						viewBox="0 0 24 24"
 						className={sizeClass}
@@ -655,9 +656,7 @@ function NavGlyph({
 
 	if (link.brand) {
 		const hex = link.brand.hex.replace("#", "");
-		const colorStyle = isDarkBrandHex(hex)
-			? undefined
-			: { color: `#${hex}` };
+		const colorStyle = isDarkBrandHex(hex) ? undefined : { color: `#${hex}` };
 		return (
 			<span className={boxClass} style={colorStyle}>
 				<svg
@@ -735,15 +734,15 @@ function MegaLink({
 				<div className="relative flex size-6 items-center justify-center sm:size-7">
 					{productCard && (
 						<>
-							{/* Soft accent glow behind icon */}
+							{/* Soft accent glow behind icon — nudged up to match icon optical center */}
 							<div
 								aria-hidden
-								className={`pointer-events-none absolute top-1/2 left-1/2 size-28 -translate-x-1/2 -translate-y-1/2 scale-90 rounded-full opacity-0 blur-2xl transition-all duration-500 group-hover:scale-125 group-hover:opacity-100 ${accent.glow}`}
+								className={`-translate-x-1/2 -translate-y-[52%] pointer-events-none absolute top-1/2 left-1/2 size-28 scale-90 rounded-full opacity-0 blur-2xl transition-all duration-500 group-hover:scale-125 group-hover:opacity-100 ${accent.glow}`}
 							/>
-							{/* Concentric rings — centered on icon */}
+							{/* Concentric rings — centered on icon, slightly raised */}
 							<svg
 								aria-hidden
-								className="pointer-events-none absolute top-1/2 left-1/2 size-[9.5rem] -translate-x-1/2 -translate-y-1/2 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+								className="-translate-x-1/2 -translate-y-[52%] pointer-events-none absolute top-1/2 left-1/2 size-[9.5rem] opacity-0 transition-opacity duration-300 group-hover:opacity-100"
 								viewBox="0 0 160 160"
 								fill="none"
 							>
@@ -808,7 +807,7 @@ function MegaLink({
 						{link.title}
 					</span>
 					{external && (
-						<span className="text-[11px] text-text-sub-600 transition-transform group-hover:translate-x-px group-hover:-translate-y-px dark:text-white/45">
+						<span className="group-hover:-translate-y-px text-[11px] text-text-sub-600 transition-transform group-hover:translate-x-px dark:text-white/45">
 							↗
 						</span>
 					)}
@@ -877,7 +876,7 @@ function MegaPanel({ item }: { item: NavItem }) {
 					}
 				>
 					{category.title ? (
-						<p className="mb-3 px-1 text-[11px] font-medium text-text-sub-600 uppercase tracking-[0.12em] dark:text-white/40">
+						<p className="mb-3 px-1 font-medium text-[11px] text-text-sub-600 uppercase tracking-[0.12em] dark:text-white/40">
 							{category.title}
 						</p>
 					) : null}
@@ -1137,7 +1136,7 @@ export const Header = () => {
 																			className="space-y-2"
 																		>
 																			{category.title ? (
-																				<p className="mb-2 px-2 text-[11px] font-medium text-text-sub-600 uppercase tracking-[0.14em] dark:text-white/40">
+																				<p className="mb-2 px-2 font-medium text-[11px] text-text-sub-600 uppercase tracking-[0.14em] dark:text-white/40">
 																					{category.title}
 																				</p>
 																			) : null}
@@ -1314,7 +1313,7 @@ export const Header = () => {
 							className="absolute top-full left-0 z-50 hidden pt-2 lg:block"
 						>
 							{/* Hover bridge so the gap between bar and card doesn't close the menu */}
-							<div className="absolute inset-x-0 -top-2 h-2" aria-hidden />
+							<div className="-top-2 absolute inset-x-0 h-2" aria-hidden />
 							<div
 								className="w-[min(880px,calc(100vw-2rem))] overflow-hidden rounded-[20px] border border-stroke-soft-200/90 bg-bg-white-0 p-3 shadow-[0_18px_50px_-12px_rgba(15,23,42,0.14),0_6px_18px_-6px_rgba(15,23,42,0.06)] sm:p-4 dark:border-white/10 dark:bg-neutral-950 dark:shadow-[0_20px_56px_-12px_rgba(0,0,0,0.65)]"
 								role="menu"
