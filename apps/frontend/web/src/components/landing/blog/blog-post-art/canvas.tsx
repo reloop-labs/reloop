@@ -20,7 +20,7 @@ export function BlogArtCanvas({
 			className={cn(
 				"relative overflow-hidden text-text-strong-950 dark:text-white",
 				isCard
-					? "aspect-[16/10] rounded-xl border border-stroke-soft-200 bg-bg-weak-50 dark:border-white/10 dark:bg-[#111]"
+					? "aspect-[16/10] rounded-xl bg-bg-weak-50 dark:bg-[#111]"
 					: "mx-auto aspect-[2/1] w-full max-w-[720px]",
 				className,
 			)}
