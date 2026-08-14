@@ -99,9 +99,9 @@ export function BlogTableOfContents({
 								href={item.url}
 								onClick={(e) => handleScrollTo(e, id, setActiveId)}
 								className={cn(
-									"block border-l-2 py-0.5 pl-3 text-xs leading-relaxed transition-colors",
+									"block border-l-2 py-0.5 pl-3 font-normal text-xs leading-relaxed transition-colors",
 									isActive
-										? "border-text-strong-950 font-medium text-text-strong-950 dark:border-white dark:text-white"
+										? "border-text-strong-950 text-text-strong-950 dark:border-white dark:text-white"
 										: "border-transparent text-text-sub-600 hover:text-text-strong-950 dark:text-white/45 dark:hover:text-white",
 								)}
 								title={item.title}
