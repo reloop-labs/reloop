@@ -39,7 +39,11 @@ export const metadata: Metadata = {
 
 const BlogPage = () => {
 	return (
-		<BlogIndex posts={getPublishedPosts()} categories={getCategories()}>
+		<BlogIndex
+			posts={getPublishedPosts()}
+			categories={getCategories()}
+			description="Guides, tutorials, and engineering notes from Reloop Labs on email infrastructure, deliverability, and self-hosting."
+		>
 			<BlogCta />
 		</BlogIndex>
 	);
