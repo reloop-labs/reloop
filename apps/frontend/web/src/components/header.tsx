@@ -1,13 +1,18 @@
 "use client";
 
 import { authClient } from "@reloop/auth/client";
+import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { Logo } from "@reloop/ui/logo";
+import {
+	AnimatedHoverBackground,
+	type HoverBox,
+} from "@reloop/web/app/sdk/components/animated-hover-background";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import {
 	siDotnet,
 	siElixir,
@@ -289,18 +294,19 @@ const navItems: NavItem[] = [
 					],
 				},
 				{
+					// Dashboard icon names; 5 items to fill the column
 					title: "",
 					simple: true,
 					links: [
 						{
 							title: "Email API",
 							href: "/docs/api",
-							icon: "code",
+							icon: "key-new",
 						},
 						{
 							title: "Templates",
 							href: "/features/email-templates",
-							icon: "file-text",
+							icon: "layout",
 						},
 						{
 							title: "Inbound",
@@ -312,6 +318,11 @@ const navItems: NavItem[] = [
 							href: "/docs/learn/contacts",
 							icon: "contacts",
 						},
+						{
+							title: "Domain",
+							href: "/docs",
+							icon: "globe",
+						},
 					],
 				},
 				{
@@ -321,7 +332,7 @@ const navItems: NavItem[] = [
 						{
 							title: "Agent Inbox",
 							href: "/use-cases/ai-agent-inbox",
-							icon: "agent",
+							icon: "inbox",
 						},
 						{
 							title: "SMTP",
@@ -337,6 +348,11 @@ const navItems: NavItem[] = [
 							title: "Webhooks",
 							href: "/features/webhooks",
 							icon: "webhook",
+						},
+						{
+							title: "Integrations",
+							href: "/docs/integrations",
+							icon: "integration",
 						},
 					],
 				},
@@ -852,6 +868,111 @@ function MegaLink({
 	);
 }
 
+/**
+ * Product simple list column — dashboard-style sliding hover + icon pop.
+ * Hover highlight slides between sibling items (same as dashboard sidebar).
+ */
+function ProductSimpleColumn({ links }: { links: NavLink[] }) {
+	const containerRef = useRef<HTMLDivElement | null>(null);
+	const itemRefs = useRef<(HTMLElement | null)[]>([]);
+	const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+	const [box, setBox] = useState<HoverBox | null>(null);
+
+	const measure = useCallback(() => {
+		const container = containerRef.current;
+		const el =
+			hoveredIndex != null ? itemRefs.current[hoveredIndex] : null;
+		if (!container || !el) {
+			setBox(null);
+			return;
+		}
+		const cr = container.getBoundingClientRect();
+		const tr = el.getBoundingClientRect();
+		setBox({
+			left: tr.left - cr.left + container.scrollLeft,
+			top: tr.top - cr.top + container.scrollTop,
+			width: tr.width,
+			height: tr.height,
+		});
+	}, [hoveredIndex]);
+
+	useLayoutEffect(() => {
+		measure();
+	}, [measure]);
+
+	useEffect(() => {
+		window.addEventListener("resize", measure);
+		return () => window.removeEventListener("resize", measure);
+	}, [measure]);
+
+	return (
+		<div
+			ref={containerRef}
+			className="relative flex min-h-0 w-full flex-col gap-0.5"
+			onPointerLeave={() => setHoveredIndex(null)}
+		>
+			<AnimatedHoverBackground
+				box={box}
+				className="!bg-black/[0.04] dark:!bg-white/[0.06]"
+			/>
+			{links.map((link, index) => {
+				const external = isExternalHref(link.href, link.external);
+				const crossDomain = isCrossDomain(link.href);
+				const className = cn(
+					"group relative z-10 flex min-w-0 items-center gap-2.5 rounded-lg px-2 py-2 transition-colors",
+					"text-text-strong-950 dark:text-white",
+				);
+				const body = (
+					<>
+						<span
+							className={cn(
+								"inline-flex size-4 shrink-0 items-center justify-center text-text-sub-600 opacity-70 transition-all duration-200",
+								"group-hover:scale-110 group-hover:text-text-strong-950 group-hover:opacity-100",
+								"dark:text-white/65 dark:group-hover:text-white",
+							)}
+						>
+							{link.icon ? (
+								<Icon name={link.icon} className="size-4" />
+							) : null}
+						</span>
+						<span className="min-w-0 truncate font-medium text-[14.5px] leading-snug tracking-[-0.01em] transition-colors duration-200">
+							{link.title}
+						</span>
+						{external && (
+							<span className="text-[11px] text-text-sub-600 opacity-0 transition-opacity group-hover:opacity-100 dark:text-white/45">
+								↗
+							</span>
+						)}
+					</>
+				);
+
+				const shared = {
+					className,
+					onPointerEnter: () => setHoveredIndex(index),
+					ref: (el: HTMLElement | null) => {
+						itemRefs.current[index] = el;
+					},
+					...(external ? { target: "_blank", rel: "noreferrer" } : {}),
+				};
+
+				if (crossDomain || external) {
+					return (
+						<a key={link.title} href={link.href} {...shared}>
+							{body}
+						</a>
+					);
+				}
+
+				return (
+					<Link key={link.title} href={link.href} {...shared}>
+						{body}
+					</Link>
+				);
+			})}
+		</div>
+	);
+}
+
 function MegaPanel({ item }: { item: NavItem }) {
 	if (!item.mega) return null;
 
@@ -865,13 +986,13 @@ function MegaPanel({ item }: { item: NavItem }) {
 		<div
 			className={
 				productLayout
-					? "grid min-w-0 grid-cols-1 items-stretch gap-0 sm:grid-cols-[minmax(0,1.2fr)_minmax(0,0.85fr)_minmax(0,0.85fr)] sm:divide-x sm:divide-stroke-soft-200/80 dark:sm:divide-white/[0.08]"
+					? "grid min-h-full min-w-0 grid-cols-1 items-stretch gap-0 sm:grid-cols-[minmax(0,1.2fr)_minmax(0,0.85fr)_minmax(0,0.85fr)] sm:divide-x sm:divide-stroke-soft-200/80 dark:sm:divide-white/[0.08]"
 					: count >= 3
-						? "grid min-w-0 items-stretch sm:grid-cols-2 lg:grid-cols-3 lg:divide-x lg:divide-stroke-soft-200/80 dark:lg:divide-white/[0.08]"
+						? "grid min-h-full min-w-0 items-stretch sm:grid-cols-2 lg:grid-cols-3 lg:divide-x lg:divide-stroke-soft-200/80 dark:lg:divide-white/[0.08]"
 						: count === 2
 							? hasFeatured
-								? "grid min-w-0 items-stretch sm:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] sm:divide-x sm:divide-stroke-soft-200/80 dark:sm:divide-white/[0.08]"
-								: "grid min-w-0 items-stretch sm:grid-cols-2 sm:divide-x sm:divide-stroke-soft-200/80 dark:sm:divide-white/[0.08]"
+								? "grid min-h-full min-w-0 items-stretch sm:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] sm:divide-x sm:divide-stroke-soft-200/80 dark:sm:divide-white/[0.08]"
+								: "grid min-h-full min-w-0 items-stretch sm:grid-cols-2 sm:divide-x sm:divide-stroke-soft-200/80 dark:sm:divide-white/[0.08]"
 							: "grid min-w-0 grid-cols-1"
 			}
 		>
@@ -879,11 +1000,12 @@ function MegaPanel({ item }: { item: NavItem }) {
 				<div
 					key={category.title || `col-${categoryIndex}`}
 					className={
+						// Self-stretch + full py so divide-x borders run top → bottom of the card
 						category.featured
-							? "flex min-h-0 min-w-0 flex-col px-3 py-1 first:pl-0 last:pr-0 sm:px-4"
+							? "flex min-h-0 min-w-0 flex-col self-stretch px-3 py-3 first:pl-0 last:pr-0 sm:px-4 sm:py-4"
 							: category.simple
-								? "flex min-w-0 flex-col justify-center px-3 py-1 first:pl-0 last:pr-0 sm:px-4"
-								: "min-w-0 px-3 py-1 first:pl-0 last:pr-0 sm:px-5"
+								? "flex min-h-0 min-w-0 flex-col justify-center self-stretch px-3 py-3 first:pl-0 last:pr-0 sm:px-4 sm:py-4"
+								: "min-h-0 min-w-0 self-stretch px-3 py-3 first:pl-0 last:pr-0 sm:px-5 sm:py-4"
 					}
 				>
 					{category.title ? (
@@ -903,6 +1025,8 @@ function MegaPanel({ item }: { item: NavItem }) {
 								<MegaLink key={link.title} link={link} featured />
 							))}
 						</div>
+					) : category.simple ? (
+						<ProductSimpleColumn links={category.links} />
 					) : (
 						<div className="flex flex-col gap-0.5">
 							{category.links.map((link) => (
@@ -910,7 +1034,6 @@ function MegaPanel({ item }: { item: NavItem }) {
 									key={link.title}
 									link={link}
 									compact={category.compact}
-									simple={category.simple}
 								/>
 							))}
 						</div>
@@ -1326,7 +1449,7 @@ export const Header = () => {
 							{/* Hover bridge so the gap between bar and card doesn't close the menu */}
 							<div className="-top-2 absolute inset-x-0 h-2" aria-hidden />
 							<div
-								className="w-[min(880px,calc(100vw-2rem))] overflow-hidden rounded-[20px] border border-stroke-soft-200/90 bg-bg-white-0 p-3 shadow-[0_18px_50px_-12px_rgba(15,23,42,0.14),0_6px_18px_-6px_rgba(15,23,42,0.06)] sm:p-4 dark:border-white/10 dark:bg-neutral-950 dark:shadow-[0_20px_56px_-12px_rgba(0,0,0,0.65)]"
+								className="w-[min(880px,calc(100vw-2rem))] overflow-hidden rounded-[20px] border border-stroke-soft-200/90 bg-bg-white-0 px-3 shadow-[0_18px_50px_-12px_rgba(15,23,42,0.14),0_6px_18px_-6px_rgba(15,23,42,0.06)] sm:px-4 dark:border-white/10 dark:bg-neutral-950 dark:shadow-[0_20px_56px_-12px_rgba(0,0,0,0.65)]"
 								role="menu"
 								aria-label={`${activeItem.title} menu`}
 							>
