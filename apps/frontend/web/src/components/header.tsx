@@ -5,14 +5,10 @@ import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { Logo } from "@reloop/ui/logo";
-import {
-	AnimatedHoverBackground,
-	type HoverBox,
-} from "@reloop/web/app/sdk/components/animated-hover-background";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import {
 	siDotnet,
 	siElixir,
@@ -294,7 +290,7 @@ const navItems: NavItem[] = [
 					],
 				},
 				{
-					// Dashboard icon names; 5 items to fill the column
+					// Dashboard icon names; short descriptions under titles
 					title: "",
 					simple: true,
 					links: [
@@ -302,26 +298,25 @@ const navItems: NavItem[] = [
 							title: "Email API",
 							href: "/docs/api",
 							icon: "key-new",
+							description: "Send mail with REST",
 						},
 						{
 							title: "Templates",
 							href: "/features/email-templates",
 							icon: "layout",
+							description: "Design reusable emails",
 						},
 						{
 							title: "Inbound",
 							href: "/use-cases/inbound-email",
 							icon: "mail-receive",
+							description: "Receive and parse mail",
 						},
 						{
 							title: "Contacts",
 							href: "/docs/learn/contacts",
 							icon: "contacts",
-						},
-						{
-							title: "Domain",
-							href: "/docs",
-							icon: "globe",
+							description: "Audiences and segments",
 						},
 					],
 				},
@@ -333,26 +328,25 @@ const navItems: NavItem[] = [
 							title: "Agent Inbox",
 							href: "/use-cases/ai-agent-inbox",
 							icon: "inbox",
+							description: "Email for AI agents",
 						},
 						{
 							title: "SMTP",
 							href: "/features/smtp",
 							icon: "smtp",
+							description: "Drop-in SMTP relay",
 						},
 						{
 							title: "Workflows",
 							href: "/docs/learn/workflows",
 							icon: "workflow",
+							description: "Automate email sequences",
 						},
 						{
 							title: "Webhooks",
 							href: "/features/webhooks",
 							icon: "webhook",
-						},
-						{
-							title: "Integrations",
-							href: "/docs/integrations",
-							icon: "integration",
+							description: "Realtime delivery events",
 						},
 					],
 				},
@@ -869,89 +863,59 @@ function MegaLink({
 }
 
 /**
- * Product simple list column — dashboard-style sliding hover + icon pop.
- * Hover highlight slides between sibling items (same as dashboard sidebar).
+ * Product simple list column — plain row hover (no sliding highlight).
  */
 function ProductSimpleColumn({ links }: { links: NavLink[] }) {
-	const containerRef = useRef<HTMLDivElement | null>(null);
-	const itemRefs = useRef<(HTMLElement | null)[]>([]);
-	const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
-	const [box, setBox] = useState<HoverBox | null>(null);
-
-	const measure = useCallback(() => {
-		const container = containerRef.current;
-		const el =
-			hoveredIndex != null ? itemRefs.current[hoveredIndex] : null;
-		if (!container || !el) {
-			setBox(null);
-			return;
-		}
-		const cr = container.getBoundingClientRect();
-		const tr = el.getBoundingClientRect();
-		setBox({
-			left: tr.left - cr.left + container.scrollLeft,
-			top: tr.top - cr.top + container.scrollTop,
-			width: tr.width,
-			height: tr.height,
-		});
-	}, [hoveredIndex]);
-
-	useLayoutEffect(() => {
-		measure();
-	}, [measure]);
-
-	useEffect(() => {
-		window.addEventListener("resize", measure);
-		return () => window.removeEventListener("resize", measure);
-	}, [measure]);
-
 	return (
-		<div
-			ref={containerRef}
-			className="relative flex min-h-0 w-full flex-col gap-0.5"
-			onPointerLeave={() => setHoveredIndex(null)}
-		>
-			<AnimatedHoverBackground
-				box={box}
-				className="!bg-black/[0.04] dark:!bg-white/[0.06]"
-			/>
-			{links.map((link, index) => {
+		<div className="relative flex min-h-0 w-full flex-col gap-0.5">
+			{links.map((link) => {
 				const external = isExternalHref(link.href, link.external);
 				const crossDomain = isCrossDomain(link.href);
+				// Match reference row: flex items-center gap-3, text-sm title, text-xs desc
 				const className = cn(
-					"group relative z-10 flex min-w-0 items-center gap-2.5 rounded-lg px-2 py-2 transition-colors",
-					"text-text-strong-950 dark:text-white",
+					"group flex min-w-0 items-center gap-3 rounded-lg px-2 py-2 transition-colors",
+					"hover:bg-bg-weak-50/80 dark:hover:bg-white/[0.04]",
 				);
 				const body = (
 					<>
+						{/* Soft icon tile — larger radius for a softer square */}
 						<span
 							className={cn(
-								"inline-flex size-4 shrink-0 items-center justify-center text-text-sub-600 opacity-70 transition-all duration-200",
-								"group-hover:scale-110 group-hover:text-text-strong-950 group-hover:opacity-100",
-								"dark:text-white/65 dark:group-hover:text-white",
+								"inline-flex shrink-0 items-center justify-center rounded-xl p-2.5",
+								"border border-stroke-soft-200/90 bg-bg-white-0/50 text-text-sub-600",
+								"transition-all duration-200",
+								"group-hover:text-text-strong-950",
+								"dark:border-white/20 dark:bg-white/10 dark:text-white/65",
+								"dark:group-hover:text-white",
 							)}
 						>
 							{link.icon ? (
-								<Icon name={link.icon} className="size-4" />
+								<Icon
+									name={link.icon}
+									className="size-3.5 transition-transform duration-200 group-hover:scale-110"
+								/>
 							) : null}
 						</span>
-						<span className="min-w-0 truncate font-medium text-[14.5px] leading-snug tracking-[-0.01em] transition-colors duration-200">
-							{link.title}
+						<span className="min-w-0 flex-1">
+							<p className="flex items-center gap-1 font-medium text-sm text-text-strong-950 dark:text-white">
+								{link.title}
+								{external && (
+									<span className="text-[11px] text-text-sub-600 dark:text-white/45">
+										↗
+									</span>
+								)}
+							</p>
+							{link.description && (
+								<p className="line-clamp-1 text-xs text-text-sub-600 dark:text-white/60">
+									{link.description}
+								</p>
+							)}
 						</span>
-						{external && (
-							<span className="text-[11px] text-text-sub-600 opacity-0 transition-opacity group-hover:opacity-100 dark:text-white/45">
-								↗
-							</span>
-						)}
 					</>
 				);
 
 				const shared = {
 					className,
-					onPointerEnter: () => setHoveredIndex(index),
-					ref: (el: HTMLElement | null) => {
-						itemRefs.current[index] = el;
-					},
 					...(external ? { target: "_blank", rel: "noreferrer" } : {}),
 				};
 
