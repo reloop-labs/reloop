@@ -11,6 +11,7 @@ import {
 	siteDescription,
 	siteName,
 } from "@reloop/web/lib/site";
+import { PostHogProvider } from "@reloop/web/providers/posthog-provider";
 import { ThemeProvider } from "@reloop/web/providers/theme-provider";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 import Script from "next/script";
@@ -89,31 +90,33 @@ export default function RootLayout({
 				className={`${geistSans.variable} ${geistMono.variable} min-h-full overscroll-y-none bg-bg-white-0 antialiased`}
 				style={{ fontFamily: "var(--font-inter), sans-serif" }}
 			>
-				<ThemeProvider
-					attribute="class"
-					defaultTheme="system"
-					enableSystem
-					disableTransitionOnChange
-				>
-					{/*
-					  Main before header in DOM for earlier content-start in agent HTML→text
-					  conversion; CSS order keeps header on top visually.
-					*/}
-					<div className="flex min-h-full flex-col">
-						<main className="relative order-2 flex-1">
-							<AgentDirective />
-							{children}
-						</main>
-						<div className="order-1">
-							<Header />
+				<PostHogProvider>
+					<ThemeProvider
+						attribute="class"
+						defaultTheme="system"
+						enableSystem
+						disableTransitionOnChange
+					>
+						{/*
+						  Main before header in DOM for earlier content-start in agent HTML→text
+						  conversion; CSS order keeps header on top visually.
+						*/}
+						<div className="flex min-h-full flex-col">
+							<main className="relative order-2 flex-1">
+								<AgentDirective />
+								{children}
+							</main>
+							<div className="order-1">
+								<Header />
+							</div>
+							<div className="order-3">
+								<Footer />
+							</div>
 						</div>
-						<div className="order-3">
-							<Footer />
-						</div>
-					</div>
-					<IconsSprite />
-					<RybbitLoader />
-				</ThemeProvider>
+						<IconsSprite />
+						<RybbitLoader />
+					</ThemeProvider>
+				</PostHogProvider>
 			</body>
 		</html>
 	);

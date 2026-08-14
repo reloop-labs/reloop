@@ -39,7 +39,8 @@
 		"sonner": "catalog:ui",
 		"tailwindcss": "catalog:ui",
 		"three": "^0.185.1",
-		"valibot": "catalog:db"
+		"valibot": "catalog:db",
+		"posthog-js": "^1.417.0"
 	},
 	"devDependencies": {
 		"@types/mdx": "catalog:ui",
