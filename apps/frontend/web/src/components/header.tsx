@@ -56,12 +56,12 @@ function TransactionalStackIcon({ className }: { className?: string }) {
 				<path
 					d="M22 10V6.5L12 11.5V15L22 10Z"
 					fill="currentColor"
-					fillOpacity={0.3}
+					className="opacity-30 transition-opacity duration-300 group-hover:opacity-55"
 				/>
 				<path
 					d="M22 17.5V14L12 19V22.5L22 17.5Z"
 					fill="currentColor"
-					fillOpacity={0.3}
+					className="opacity-30 transition-opacity duration-300 group-hover:opacity-55"
 				/>
 				<path d="M12 19V22.3213" stroke="currentColor" />
 				<path
@@ -100,7 +100,7 @@ function MarketingDatabaseIcon({ className }: { className?: string }) {
 				<path
 					d="M12 21.5C15.3137 21.5 18 20.433 18 18.5V17L15.145 18.1719L12 18.5L8.76297 18.1719L6 17V18.5C6 20.433 8.68629 21.5 12 21.5Z"
 					fill="currentColor"
-					fillOpacity={0.3}
+					className="opacity-30 transition-opacity duration-300 group-hover:opacity-55"
 				/>
 				<path
 					d="M18 17V18.5C18 20.433 15.3137 21.5 12 21.5C8.68629 21.5 6 20.433 6 18.5V17"
@@ -109,7 +109,7 @@ function MarketingDatabaseIcon({ className }: { className?: string }) {
 				<path
 					d="M16 7.46219C16 8.45378 14.2091 9.25763 12 9.25763C9.79086 9.25763 8 8.45378 8 7.46219C8 6.47059 9.79086 5.66675 12 5.66675C14.2091 5.66675 16 6.47059 16 7.46219Z"
 					fill="currentColor"
-					fillOpacity={0.3}
+					className="opacity-30 transition-opacity duration-300 group-hover:opacity-55"
 				/>
 				<path
 					d="M20 7C20 9.48528 16.4183 11.5 12 11.5C7.58172 11.5 4 9.48528 4 7C4 4.51472 7.58172 2.5 12 2.5C16.4183 2.5 20 4.51472 20 7Z"
@@ -143,6 +143,8 @@ const PRODUCT_CARD_ACCENTS: Record<
 		ringOuter: string;
 		/** Inner ring stroke class (stronger / more accented) */
 		ringInner: string;
+		/** Icon + title color on hover (currentColor flows into SVG fill/stroke) */
+		ink: string;
 	}
 > = {
 	// Transactional — cool blue / sky; effect originates from top-left corner
@@ -158,6 +160,7 @@ const PRODUCT_CARD_ACCENTS: Record<
 			"linear-gradient(to bottom right, black 0%, black 32%, transparent 68%)",
 		ringOuter: "stroke-sky-400/18 dark:stroke-sky-400/22",
 		ringInner: "stroke-blue-500/32 dark:stroke-sky-300/35",
+		ink: "group-hover:text-blue-600 dark:group-hover:text-sky-400",
 	},
 	// Marketing — warm violet / rose; effect originates from top-right corner
 	violet: {
@@ -171,6 +174,7 @@ const PRODUCT_CARD_ACCENTS: Record<
 			"linear-gradient(to bottom left, black 0%, black 32%, transparent 68%)",
 		ringOuter: "stroke-violet-400/18 dark:stroke-violet-400/22",
 		ringInner: "stroke-violet-500/30 dark:stroke-fuchsia-300/32",
+		ink: "group-hover:text-violet-600 dark:group-hover:text-fuchsia-400",
 	},
 };
 
@@ -270,17 +274,13 @@ const navItems: NavItem[] = [
 						{
 							title: "Transactional",
 							href: "/features/transaction-emails",
-							customIcon: (
-								<TransactionalStackIcon className="size-6 text-text-strong-950 dark:text-white" />
-							),
+							customIcon: <TransactionalStackIcon className="size-6" />,
 							accent: "blue",
 						},
 						{
 							title: "Marketing",
 							href: "/use-cases/automated-email",
-							customIcon: (
-								<MarketingDatabaseIcon className="size-6 text-text-strong-950 dark:text-white" />
-							),
+							customIcon: <MarketingDatabaseIcon className="size-6" />,
 							accent: "violet",
 						},
 					],
@@ -610,9 +610,7 @@ function NavGlyph({
 }) {
 	if (link.customIcon) {
 		return (
-			<span className="inline-flex shrink-0 text-text-strong-950 dark:text-white">
-				{link.customIcon}
-			</span>
+			<span className="inline-flex shrink-0 text-current">{link.customIcon}</span>
 		);
 	}
 
@@ -777,14 +775,18 @@ function MegaLink({
 							</svg>
 						</>
 					)}
-					<span className="relative z-10">
+					<span
+						className={`relative z-10 text-text-strong-950 transition-colors duration-300 dark:text-white ${productCard ? accent.ink : ""}`}
+					>
 						<NavGlyph link={link} featured />
 					</span>
 				</div>
 			</div>
 			<span className="relative z-10 min-w-0">
 				<span className="flex items-center gap-1">
-					<span className="font-medium text-[15px] text-text-strong-950 leading-snug tracking-[-0.01em] dark:text-white">
+					<span
+						className={`font-medium text-[15px] leading-snug tracking-[-0.01em] transition-colors duration-300 text-text-strong-950 dark:text-white ${productCard ? accent.ink : ""}`}
+					>
 						{link.title}
 					</span>
 					{external && (
