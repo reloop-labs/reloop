@@ -36,8 +36,6 @@ In 2024, **Google, Yahoo, and Microsoft made all three protocols strictly mandat
 
 This guide walks you through configuring all three authentication layers correctly, in the exact sequence required, and verifying them with real-world tools before sending your first production message.
 
----
-
 ## Step 1: SPF (Sender Policy Framework)
 
 **SPF is a DNS TXT record that explicitly declares which mail transfer agents and IP addresses are authorized to send email on behalf of your domain.**
@@ -83,8 +81,6 @@ dig TXT yourdomain.com +short | grep spf
 
 Alternatively, use the [MXToolbox SPF Lookup](https://mxtoolbox.com/spf.aspx) web tool. You should see a single TXT entry returned with your authorized `include:` directives.
 
----
-
 ## Step 2: DKIM (DomainKeys Identified Mail)
 
 **DKIM adds an asymmetric cryptographic signature to every outgoing email header, guaranteeing that the message was not forged or tampered with in transit.**
@@ -125,8 +121,6 @@ You can also send a test email to [mail-tester.com](https://mail-tester.com) or 
 - **DNS propagation delay**: DNS record updates can take anywhere from 15 minutes to 24 hours to propagate globally across resolver caches.
 - **Accidental quote wrapping or truncation**: Some DNS providers (like Namecheap or GoDaddy) limit TXT record lengths or wrap strings in double quotes. Ensure the entire `p=` public key string is pasted without truncation or extra quotes.
 - **Hostname duplication**: A frequent mistake is entering the full domain twice (e.g. `reloop._domainkey.yourdomain.com.yourdomain.com`). If your DNS provider automatically appends your domain, enter only `reloop._domainkey`.
-
----
 
 ## Step 3: DMARC (Domain-based Message Authentication, Reporting & Conformance)
 
@@ -214,8 +208,6 @@ Once your reports confirm that 100% of your legitimate outbound mail passes SPF 
 
 At `p=reject`, you are also eligible to configure [BIMI (Brand Indicators for Message Identification)](/blog/bimi-email-setup-guide) to display your official brand logo in user inboxes.
 
----
-
 ## The complete verification checklist
 
 Run through this pre-flight checklist before routing production traffic:
@@ -229,8 +221,6 @@ Run through this pre-flight checklist before routing production traffic:
 - [ ] **Google Postmaster Tools configured**: Register your domain with [Google Postmaster Tools](https://postmaster.google.com) to track domain and IP reputation.
 - [ ] **Automated bounce tracking**: Verify that hard and soft bounces are captured via [signed webhooks](/features/webhooks) (see our guide on [email bounce processing automation](/blog/email-bounce-processing-automation)).
 
----
-
 ## What Reloop's dashboard does for you
 
 When you add a sending domain in the [Reloop dashboard](https://reloop.sh/dashboard/signup), the platform simplifies the entire authentication lifecycle:
@@ -243,8 +233,6 @@ When you add a sending domain in the [Reloop dashboard](https://reloop.sh/dashbo
 
 Whether you choose [Reloop Cloud pricing](/pricing) for managed deliverability or [self-host Reloop on your own infrastructure](/docs/self-host) (for under $5/mo with our [self-host tutorial](/blog/self-host-email-5-dollars)), the authentication requirements remain identical.
 
----
-
 ## Common gotchas & deliverability pitfalls
 
 ### 1. Subdomain vs. root domain sending
@@ -256,20 +244,3 @@ Email authentication establishes your domain identity, but **it does not replace
 ### 3. Separating transactional and marketing streams
 **Never mix transactional receipts with marketing newsletters on the same sending domain or IP.** Protect your mission-critical password resets and auth tokens by isolating them on a dedicated transactional subdomain (see [transactional email best practices](/blog/transactional-email-best-practices)).
 
----
-
-## Where to go from here
-
-Proper authentication is the single most impactful step you can take to safeguard your email deliverability. Once your DNS records are verified, explore these related guides to build modern, reliable email infrastructure:
-
-- **[Why Emails Land in Spam  And How to Fix It](/blog/why-emails-land-in-spam-fix)**: A systematic debugging guide for ISP-specific spam issues.
-- **[IP Warming Schedule Guide (2026)](/blog/ip-warming-guide)**: How to ramp up sending volume on new IPs without deliverability penalties.
-- **[BIMI Setup Guide](/blog/bimi-email-setup-guide)**: How to display your verified company logo in Gmail and Apple Mail.
-- **[Transactional Email Best Practices](/blog/transactional-email-best-practices)**: Architecture patterns for high-reliability transactional messaging.
-- **[Why We Open-Sourced Our Email Infrastructure](/blog/why-we-open-sourced-email-infrastructure)**: The story behind Reloop and why email infrastructure belongs in the open.
-
-### Get involved
-
-- **Star and explore the repository**: [github.com/reloop-labs/reloop](https://github.com/reloop-labs/reloop)
-- **Start sending on Reloop Cloud**: [reloop.sh/dashboard/signup](https://reloop.sh/dashboard/signup)
-- **Browse the documentation**: [Reloop Docs](/docs) · [Self-Host Guide](/docs/self-host) · [Deliverability Features](/features/deliverability) · [Pricing](/pricing) · [Provider Comparisons](/compare)
