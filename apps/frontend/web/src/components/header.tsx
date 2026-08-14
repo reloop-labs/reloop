@@ -468,6 +468,8 @@ type NavItem = {
 	href: string;
 	mega?: {
 		categories: NavCategory[];
+		/** Optional social strip at the bottom of the panel (e.g. Company) */
+		social?: NavLink[];
 	};
 };
 
@@ -699,146 +701,30 @@ const navItems: NavItem[] = [
 		title: "Resources",
 		href: "/blog",
 		mega: {
+			// Featured: Free tools + Comparisons
+			// Right: Blog / Changelog / Status / Self-host + social icons
 			categories: [
 				{
-					title: "Explore",
+					title: "",
 					featured: true,
 					links: [
 						{
 							title: "Free tools",
 							href: "/tools",
-							description: "Validators, testers, and generators",
 							icon: "zap",
+							docsTheme: "multi",
 						},
 						{
-							title: "Community",
-							href: "/community",
-							description: "Join the conversation",
-							icon: "users",
-						},
-					],
-				},
-				{
-					title: "Learn",
-					links: [
-						{
-							title: "Blog",
-							href: "/blog",
-							description: "Insights and stories",
-							icon: "pencil",
-						},
-						{
-							title: "Changelog",
-							href: "/changelog",
-							description: "Releases and updates",
-							icon: "list",
-						},
-						{
-							title: "Glossary",
-							href: "/glossary",
-							description: "Email terms, demystified",
-							icon: "book-closed",
-						},
-					],
-				},
-				{
-					title: "Compare",
-					links: [
-						{
-							title: "vs Resend",
-							href: "/compare/resend",
-							description: "Feature and pricing breakdown",
-							icon: "arrow-swap",
-						},
-						{
-							title: "vs SendGrid",
-							href: "/compare/sendgrid",
-							description: "Open-source alternative path",
-							icon: "arrow-swap",
-						},
-						{
-							title: "vs Mailgun",
-							href: "/compare/mailgun",
-							description: "API and deliverability compare",
-							icon: "arrow-swap",
-						},
-						{
-							title: "All comparisons",
+							title: "Comparisons",
 							href: "/compare",
-							description: "Browse every alternative",
-							icon: "layout-grid",
-						},
-					],
-				},
-			],
-		},
-	},
-	{
-		title: "Company",
-		href: "/about",
-		mega: {
-			categories: [
-				{
-					title: "Company",
-					links: [
-						{
-							title: "About",
-							href: "/about",
-							description: "Company, values, and team",
-							icon: "users",
-						},
-						{
-							title: "Careers",
-							href: "/careers",
-							description: "Join our remote team",
-							icon: "briefcase",
-						},
-						{
-							title: "Contact",
-							href: "/contact",
-							description: "Reach out to support or sales",
-							icon: "mail",
-						},
-						{
-							title: "Product Beliefs",
-							href: "/our-product-beliefs",
-							description: "What we optimize for",
-							icon: "bulb",
+							icon: "arrow-swap",
+							docsTheme: "green",
 						},
 					],
 				},
 				{
-					title: "Open source",
-					links: [
-						{
-							title: "Why Open Source",
-							href: "/why-open-source",
-							description: "No lock-in, full transparency",
-							icon: "open-source",
-						},
-						{
-							title: "Self-host",
-							href: "/docs/self-host",
-							description: "Run Reloop on your infra",
-							icon: "server",
-						},
-						{
-							title: "License",
-							href: "/license",
-							description: "How you can use the code",
-							icon: "file",
-						},
-						{
-							title: "GitHub",
-							href: "https://github.com/reloop-labs/reloop",
-							description: "Star the repo and contribute",
-							icon: "social-github",
-							external: true,
-						},
-					],
-				},
-				{
-					title: "Updates",
+					title: "",
+					simple: true,
 					links: [
 						{
 							title: "Blog",
@@ -858,6 +744,90 @@ const navItems: NavItem[] = [
 							description: "System uptime and incidents",
 							icon: "activity",
 							external: true,
+						},
+						{
+							title: "Self-host",
+							href: "/docs/self-host",
+							description: "Run Reloop on your infra",
+							icon: "server",
+						},
+					],
+				},
+			],
+			social: [
+				{
+					title: "GitHub",
+					href: "https://github.com/reloop-labs/reloop",
+					icon: "social-github",
+					external: true,
+				},
+				{
+					title: "X",
+					href: "https://x.com/reloophq",
+					icon: "social-x",
+					external: true,
+				},
+				{
+					title: "LinkedIn",
+					href: "https://linkedin.com/company/reloop",
+					icon: "social-linkedin",
+					external: true,
+				},
+				{
+					title: "Discord",
+					href: "https://discord.gg/bHnkBcp7xR",
+					icon: "social-discord",
+					external: true,
+				},
+			],
+		},
+	},
+	{
+		title: "Company",
+		href: "/about",
+		mega: {
+			// Contact featured card · compact list (no section titles)
+			categories: [
+				{
+					title: "",
+					featured: true,
+					links: [
+						{
+							title: "Contact",
+							href: "/contact",
+							icon: "mail",
+							docsTheme: "book",
+						},
+					],
+				},
+				{
+					title: "",
+					compact: true,
+					links: [
+						{
+							title: "About",
+							href: "/about",
+							icon: "users",
+						},
+						{
+							title: "Careers",
+							href: "/careers",
+							icon: "briefcase",
+						},
+						{
+							title: "Product Beliefs",
+							href: "/our-product-beliefs",
+							icon: "bulb",
+						},
+						{
+							title: "Why Open Source",
+							href: "/why-open-source",
+							icon: "open-source",
+						},
+						{
+							title: "License",
+							href: "/license",
+							icon: "file",
 						},
 					],
 				},
@@ -1394,10 +1364,41 @@ function CompactBrandColumn({
 	);
 }
 
+/**
+ * Icon-only social row (no labels) — sits under GitHub in the right Resources column.
+ */
+function MegaSocialIcons({ links }: { links: NavLink[] }) {
+	return (
+		<div className="mt-2 flex items-center gap-1.5 px-1">
+			{links.map((link) => {
+				const external = isExternalHref(link.href, link.external);
+				return (
+					<a
+						key={link.title}
+						href={link.href}
+						title={link.title}
+						aria-label={link.title}
+						className={cn(
+							"inline-flex size-8 shrink-0 items-center justify-center rounded-lg",
+							"border border-stroke-soft-200/80 bg-bg-weak-50/50 text-text-sub-600",
+							"transition-colors hover:border-stroke-soft-200 hover:bg-bg-weak-50 hover:text-text-strong-950",
+							"dark:border-white/10 dark:bg-white/[0.03] dark:text-white/65",
+							"dark:hover:bg-white/[0.07] dark:hover:text-white",
+						)}
+						{...(external ? { target: "_blank", rel: "noreferrer" } : {})}
+					>
+						{link.icon ? <Icon name={link.icon} className="size-3.5" /> : null}
+					</a>
+				);
+			})}
+		</div>
+	);
+}
+
 function MegaPanel({ item }: { item: NavItem }) {
 	if (!item.mega) return null;
 
-	const { categories } = item.mega;
+	const { categories, social } = item.mega;
 	const count = categories.length;
 	const hasFeatured = categories.some((c) => c.featured);
 	const hasBrandGrid = categories.some((c) => c.compact && c.gridCols);
@@ -1405,6 +1406,7 @@ function MegaPanel({ item }: { item: NavItem }) {
 	const productLayout = hasFeatured && count === 3;
 	// Docs: featured cards (left) + combined brand grid (right)
 	const docsBrandLayout = hasFeatured && hasBrandGrid && count === 2;
+	const lastCategoryIndex = count - 1;
 
 	return (
 		<div
@@ -1417,92 +1419,102 @@ function MegaPanel({ item }: { item: NavItem }) {
 							? "grid min-h-full min-w-0 items-stretch sm:grid-cols-2 lg:grid-cols-3 lg:divide-x lg:divide-stroke-soft-200/80 dark:lg:divide-white/[0.08]"
 							: count === 2
 								? hasFeatured
-									? "grid min-h-full min-w-0 items-stretch sm:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] sm:divide-x sm:divide-stroke-soft-200/80 dark:sm:divide-white/[0.08]"
+									? // Resources-style: featured cards + short list — keep list column compact
+										"grid min-h-full min-w-0 items-stretch sm:grid-cols-[minmax(0,1fr)_minmax(0,0.85fr)] sm:divide-x sm:divide-stroke-soft-200/80 dark:sm:divide-white/[0.08]"
 									: "grid min-h-full min-w-0 items-stretch sm:grid-cols-2 sm:divide-x sm:divide-stroke-soft-200/80 dark:sm:divide-white/[0.08]"
 								: "grid min-w-0 grid-cols-1"
 			}
 		>
-			{categories.map((category, categoryIndex) => (
-				<div
-					key={category.title || `col-${categoryIndex}`}
-					className={
-						// Self-stretch + full py so divide-x borders run top → bottom of the card
-						category.featured
-							? "flex min-h-0 min-w-0 flex-col self-stretch px-3 py-3 first:pl-0 last:pr-0 sm:px-4 sm:py-4"
-							: category.simple
-								? "flex min-h-0 min-w-0 flex-col justify-center self-stretch px-3 py-3 first:pl-0 last:pr-0 sm:px-4 sm:py-4"
-								: category.compact
+			{categories.map((category, categoryIndex) => {
+				const showSocial =
+					Boolean(social?.length) && categoryIndex === lastCategoryIndex;
+
+				return (
+					<div
+						key={category.title || `col-${categoryIndex}`}
+						className={
+							// Self-stretch + full py so divide-x borders run top → bottom of the card
+							category.featured
+								? "flex min-h-0 min-w-0 flex-col self-stretch px-3 py-3 first:pl-0 last:pr-0 sm:px-4 sm:py-4"
+								: category.simple
 									? "flex min-h-0 min-w-0 flex-col justify-center self-stretch px-3 py-3 first:pl-0 last:pr-0 sm:px-4 sm:py-4"
-									: "min-h-0 min-w-0 self-stretch px-3 py-3 first:pl-0 last:pr-0 sm:px-5 sm:py-4"
-					}
-				>
-					{category.title ? (
-						<div className="mb-3 flex items-center justify-between gap-2 px-1">
-							<p className="font-medium text-[11px] text-text-sub-600 uppercase tracking-[0.12em] dark:text-white/40">
-								{category.title}
-							</p>
-							{category.viewAllHref ? (
-								<a
-									href={category.viewAllHref}
-									className="shrink-0 font-medium text-[11.5px] text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/40 dark:hover:text-white"
-								>
-									View all
-								</a>
-							) : null}
-						</div>
-					) : null}
-					{category.featured ? (
-						// Docs: 1 tall card + 2 stacked (Documentation | API / Integrations)
-						// Product / Resources: equal multi-card row
-						category.links.length === 3 ? (
-							<div className="grid min-h-0 flex-1 grid-cols-2 grid-rows-2 gap-2.5">
-								<div className="row-span-2 min-h-0 [&>a]:h-full [&>a]:min-h-0">
+									: category.compact
+										? "flex min-h-0 min-w-0 flex-col justify-center self-stretch px-3 py-3 first:pl-0 last:pr-0 sm:px-4 sm:py-4"
+										: "min-h-0 min-w-0 self-stretch px-3 py-3 first:pl-0 last:pr-0 sm:px-5 sm:py-4"
+						}
+					>
+						{category.title ? (
+							<div className="mb-3 flex items-center justify-between gap-2 px-1">
+								<p className="font-medium text-[11px] text-text-sub-600 uppercase tracking-[0.12em] dark:text-white/40">
+									{category.title}
+								</p>
+								{category.viewAllHref ? (
+									<a
+										href={category.viewAllHref}
+										className="shrink-0 font-medium text-[11.5px] text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/40 dark:hover:text-white"
+									>
+										View all
+									</a>
+								) : null}
+							</div>
+						) : null}
+						{category.featured ? (
+							// Docs: 1 tall card + 2 stacked (Documentation | API / Integrations)
+							// Product / Resources: equal multi-card row
+							category.links.length === 3 ? (
+								<div className="grid min-h-0 flex-1 grid-cols-2 grid-rows-2 gap-2.5">
+									<div className="row-span-2 min-h-0 [&>a]:h-full [&>a]:min-h-0">
+										<MegaLink
+											key={category.links[0]!.title}
+											link={category.links[0]!}
+											featured
+										/>
+									</div>
 									<MegaLink
-										key={category.links[0]!.title}
-										link={category.links[0]!}
+										key={category.links[1]!.title}
+										link={category.links[1]!}
+										featured
+									/>
+									<MegaLink
+										key={category.links[2]!.title}
+										link={category.links[2]!}
 										featured
 									/>
 								</div>
-								<MegaLink
-									key={category.links[1]!.title}
-									link={category.links[1]!}
-									featured
-								/>
-								<MegaLink
-									key={category.links[2]!.title}
-									link={category.links[2]!}
-									featured
-								/>
-							</div>
+							) : (
+								<div
+									className={
+										category.links.length >= 2
+											? "grid min-h-0 flex-1 grid-cols-2 gap-2.5"
+											: "grid min-h-0 flex-1 grid-cols-1 gap-2.5"
+									}
+								>
+									{category.links.map((link) => (
+										<MegaLink key={link.title} link={link} featured />
+									))}
+								</div>
+							)
+						) : category.simple ? (
+							<ProductSimpleColumn links={category.links} />
+						) : category.compact ? (
+							<CompactBrandColumn
+								links={category.links}
+								gridCols={category.gridCols}
+							/>
 						) : (
-							<div
-								className={
-									category.links.length >= 2
-										? "grid min-h-0 flex-1 grid-cols-2 gap-2.5"
-										: "grid min-h-0 flex-1 grid-cols-1 gap-2.5"
-								}
-							>
+							<div className="flex flex-col gap-0.5">
 								{category.links.map((link) => (
-									<MegaLink key={link.title} link={link} featured />
+									<MegaLink key={link.title} link={link} />
 								))}
 							</div>
-						)
-					) : category.simple ? (
-						<ProductSimpleColumn links={category.links} />
-					) : category.compact ? (
-						<CompactBrandColumn
-							links={category.links}
-							gridCols={category.gridCols}
-						/>
-					) : (
-						<div className="flex flex-col gap-0.5">
-							{category.links.map((link) => (
-								<MegaLink key={link.title} link={link} />
-							))}
-						</div>
-					)}
-				</div>
-			))}
+						)}
+						{/* Social icons under last column (e.g. below Self-host / GitHub) */}
+						{showSocial && social ? (
+							<MegaSocialIcons links={social} />
+						) : null}
+					</div>
+				);
+			})}
 		</div>
 	);
 }
@@ -1623,6 +1635,21 @@ export const Header = () => {
 	};
 
 	const activeItem = navItems.find((item) => item.title === activeMega);
+
+	// Compact panels (e.g. Resources: 2 cols) stay narrower; dense menus keep full width
+	const megaCategoryCount = activeItem?.mega?.categories.length ?? 0;
+	const megaHasFeatured = Boolean(
+		activeItem?.mega?.categories.some((c) => c.featured),
+	);
+	const megaHasBrandGrid = Boolean(
+		activeItem?.mega?.categories.some((c) => c.compact && c.gridCols),
+	);
+	const megaPanelWidthClass =
+		megaCategoryCount <= 2 && megaHasFeatured && !megaHasBrandGrid
+			? "w-[min(520px,calc(100vw-2rem))]"
+			: megaHasBrandGrid
+				? "w-[min(820px,calc(100vw-2rem))]"
+				: "w-[min(760px,calc(100vw-2rem))]";
 
 	return (
 		<header
@@ -1930,7 +1957,29 @@ export const Header = () => {
 																		</div>
 																	),
 																)}
-
+																{item.mega.social?.length ? (
+																	<div className="flex items-center gap-1.5 px-2 pt-1">
+																		{item.mega.social.map((link) => (
+																			<a
+																				key={link.title}
+																				href={link.href}
+																				onClick={closeMobileMenu}
+																				target="_blank"
+																				rel="noreferrer"
+																				title={link.title}
+																				aria-label={link.title}
+																				className="inline-flex size-9 items-center justify-center rounded-lg border border-stroke-soft-200/80 bg-bg-weak-50/40 text-text-sub-600 dark:border-white/10 dark:bg-white/[0.03] dark:text-white/65"
+																			>
+																				{link.icon ? (
+																					<Icon
+																						name={link.icon}
+																						className="size-3.5"
+																					/>
+																				) : null}
+																			</a>
+																		))}
+																	</div>
+																) : null}
 															</div>
 														</motion.div>
 													)}
@@ -2060,7 +2109,7 @@ export const Header = () => {
 									*/}
 									<div
 										ref={megaContentRef}
-										className="relative w-[min(880px,calc(100vw-2rem))]"
+										className={`relative ${megaPanelWidthClass}`}
 									>
 										<AnimatePresence
 											initial={false}
