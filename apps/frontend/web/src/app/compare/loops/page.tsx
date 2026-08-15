@@ -233,7 +233,7 @@ const LoopsComparisonPage = () => {
 				/>
 			</CompareSection>
 
-			<CompareSection maxWidth="2xl" noDivider>
+			<CompareSection maxWidth="full" noDivider>
 				<CompareOtherLinks currentHref={pagePath} />
 			</CompareSection>
 		</ComparisonPageShell>

@@ -1,7 +1,19 @@
+import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
+import { Logo } from "@reloop/ui/logo";
 import Link from "next/link";
 import { competitorBrands } from "../competitor-brands";
 import { BrandIcon } from "./brand-icon";
+
+function isDarkBrandHex(hex: string) {
+	const clean = hex.replace("#", "").toLowerCase();
+	if (clean === "000" || clean === "000000") return true;
+	if (clean.length !== 6) return false;
+	const r = Number.parseInt(clean.slice(0, 2), 16);
+	const g = Number.parseInt(clean.slice(2, 4), 16);
+	const b = Number.parseInt(clean.slice(4, 6), 16);
+	return (0.299 * r + 0.587 * g + 0.114 * b) / 255 < 0.25;
+}
 
 const BRAND_DESCRIPTIONS: Record<string, string> = {
 	Resend:
@@ -19,6 +31,88 @@ const BRAND_DESCRIPTIONS: Record<string, string> = {
 	Mailchimp:
 		"Pay only for sent email volume without contact list size penalty pricing.",
 };
+
+export function ComparisonBrandCards({
+	excludeHref,
+}: {
+	excludeHref?: string;
+}) {
+	const brands = excludeHref
+		? competitorBrands.filter((brand) => brand.href !== excludeHref)
+		: competitorBrands;
+
+	return (
+		<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+			{brands.map((brand) => {
+				const description =
+					BRAND_DESCRIPTIONS[brand.name] ??
+					"Compare Reloop's open-source architecture, pricing, and features.";
+				const glow = `#${brand.icon.hex}`;
+				const dark = isDarkBrandHex(brand.icon.hex);
+
+				return (
+					<Link
+						key={brand.href}
+						href={brand.href}
+						aria-label={`Reloop vs ${brand.name}`}
+						className="group relative flex flex-col justify-between gap-3.5 overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-5 transition-all duration-200 hover:border-stroke-soft-300 hover:bg-bg-weak-50 max-lg:p-4 max-xl:gap-3 dark:border-white/10 dark:bg-black dark:hover:border-white/20 dark:hover:bg-white/[0.04]"
+					>
+						<div
+							aria-hidden
+							className="pointer-events-none absolute inset-x-6 bottom-2 h-12 opacity-0 blur-xl transition-opacity duration-300 group-hover:opacity-65"
+							style={{
+								background: `radial-gradient(ellipse at center, color-mix(in srgb, ${glow} 55%, transparent) 0%, transparent 75%)`,
+							}}
+						/>
+
+						<div className="relative z-10 flex items-center justify-between gap-3.5">
+							<div className="flex min-w-0 flex-1 items-center gap-2.5 max-xl:gap-2">
+								<div className="flex shrink-0 items-center gap-1.5">
+									<div className="relative flex size-8 items-center justify-center overflow-hidden rounded-[28%] border border-stroke-soft-200/80 p-1.5 dark:border-white/10">
+										<BrandIcon
+											icon={brand.icon}
+											fill={dark ? "currentColor" : `#${brand.icon.hex}`}
+											className={cn(
+												"size-full object-contain",
+												dark && "text-text-strong-950 dark:text-white",
+											)}
+										/>
+									</div>
+									<span className="font-mono text-[10px] text-text-sub-600 uppercase tracking-[0.12em] dark:text-white/40">
+										vs
+									</span>
+									<div className="relative flex size-8 items-center justify-center overflow-hidden rounded-[28%] border border-stroke-soft-200/80 dark:border-white/10">
+										<Logo className="size-[135%]" />
+									</div>
+								</div>
+								<div className="flex min-w-0 flex-1 flex-col">
+									<h4 className="font-semibold text-sm text-text-strong-950 dark:text-white">
+										{brand.name}
+									</h4>
+									<p className="shrink truncate text-text-sub-600 text-xs dark:text-white/50">
+										Reloop vs {brand.name}
+									</p>
+								</div>
+							</div>
+
+							<Icon
+								name="arrow-right"
+								className="size-3.5 shrink-0 text-text-sub-600 opacity-0 transition-all duration-200 group-hover:translate-x-0.5 group-hover:opacity-100 dark:text-white/60"
+								aria-hidden="true"
+							/>
+						</div>
+
+						<div className="relative z-10 flex flex-col gap-1">
+							<p className="line-clamp-2 text-pretty pr-2 font-medium text-text-sub-600 text-xs leading-relaxed dark:text-white/60">
+								{description}
+							</p>
+						</div>
+					</Link>
+				);
+			})}
+		</div>
+	);
+}
 
 export function ComparisonGrid() {
 	return (
@@ -52,65 +146,7 @@ export function ComparisonGrid() {
 
 			{/* Full-width Divider & Grid Section */}
 			<div className="border-stroke-soft-200 border-t px-6 py-12 sm:px-10 lg:px-12 dark:border-white/10">
-				<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-					{competitorBrands.map((brand) => {
-						const description =
-							BRAND_DESCRIPTIONS[brand.name] ??
-							"Compare Reloop's open-source architecture, pricing, and features.";
-						const glow = `#${brand.icon.hex}`;
-
-						return (
-							<Link
-								key={brand.href}
-								href={brand.href}
-								aria-label={`Reloop vs ${brand.name}`}
-								className="group relative flex flex-col justify-between gap-3.5 overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-5 transition-all duration-200 hover:border-stroke-soft-300 hover:bg-bg-weak-50 max-lg:p-4 max-xl:gap-3 dark:border-white/10 dark:bg-black dark:hover:border-white/20 dark:hover:bg-white/[0.04]"
-							>
-								{/* Brand Logo Ambient Color Glow Shadow (ONLY ON HOVER) */}
-								<div
-									aria-hidden
-									className="pointer-events-none absolute inset-x-6 bottom-2 h-12 opacity-0 blur-xl transition-opacity duration-300 group-hover:opacity-65"
-									style={{
-										background: `radial-gradient(ellipse at center, color-mix(in srgb, ${glow} 55%, transparent) 0%, transparent 75%)`,
-									}}
-								/>
-
-								{/* Top Row: Icon, Titles & Hover Arrow */}
-								<div className="relative z-10 flex items-start justify-between gap-3.5">
-									<div className="flex min-w-0 flex-1 items-center gap-2.5 max-xl:gap-2">
-										<div className="relative flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-[28%] border border-stroke-soft-200/80 p-1.5 dark:border-white/10">
-											<BrandIcon
-												icon={brand.icon}
-												className="size-full object-contain"
-											/>
-										</div>
-										<div className="flex min-w-0 flex-1 flex-col">
-											<h4 className="font-semibold text-sm text-text-strong-950 dark:text-white">
-												{brand.name}
-											</h4>
-											<p className="shrink truncate text-text-sub-600 text-xs dark:text-white/50">
-												Reloop vs {brand.name}
-											</p>
-										</div>
-									</div>
-
-									<Icon
-										name="arrow-right"
-										className="size-3.5 shrink-0 text-text-sub-600 opacity-0 transition-all duration-200 group-hover:translate-x-0.5 group-hover:opacity-100 dark:text-white/60"
-										aria-hidden="true"
-									/>
-								</div>
-
-								{/* Description Section */}
-								<div className="relative z-10 flex flex-col gap-1">
-									<p className="line-clamp-2 text-pretty pr-2 font-medium text-text-sub-600 text-xs leading-relaxed dark:text-white/60">
-										{description}
-									</p>
-								</div>
-							</Link>
-						);
-					})}
-				</div>
+				<ComparisonBrandCards />
 			</div>
 		</section>
 	);

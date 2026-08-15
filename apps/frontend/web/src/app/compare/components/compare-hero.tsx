@@ -8,14 +8,40 @@ import Link from "next/link";
 import type { SimpleIcon } from "simple-icons";
 import { BrandIcon } from "./brand-icon";
 
+type Rgb = [number, number, number];
+
+function hexToRgb(hex: string): Rgb {
+	const clean = hex.replace("#", "");
+	return [
+		Number.parseInt(clean.slice(0, 2), 16),
+		Number.parseInt(clean.slice(2, 4), 16),
+		Number.parseInt(clean.slice(4, 6), 16),
+	];
+}
+
 function isDarkBrandHex(hex: string) {
 	const clean = hex.replace("#", "").toLowerCase();
 	if (clean === "000" || clean === "000000") return true;
 	if (clean.length !== 6) return false;
-	const r = Number.parseInt(clean.slice(0, 2), 16);
-	const g = Number.parseInt(clean.slice(2, 4), 16);
-	const b = Number.parseInt(clean.slice(4, 6), 16);
+	const [r, g, b] = hexToRgb(clean);
 	return (0.299 * r + 0.587 * g + 0.114 * b) / 255 < 0.25;
+}
+
+/** Lift near-black marks so the bloom still reads, keep hue otherwise. */
+function glowRgb(hex: string): Rgb {
+	const rgb = hexToRgb(hex);
+	if (!isDarkBrandHex(hex)) return rgb;
+	const [r, g, b] = rgb;
+	if (r + g + b < 24) return [212, 212, 216];
+	return [
+		Math.min(255, Math.round(r + (255 - r) * 0.55)),
+		Math.min(255, Math.round(g + (255 - g) * 0.55)),
+		Math.min(255, Math.round(b + (255 - b) * 0.55)),
+	];
+}
+
+function rgba(rgb: Rgb, alpha: number) {
+	return `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${alpha})`;
 }
 
 function VsBadge() {
@@ -23,6 +49,46 @@ function VsBadge() {
 		<span className="relative z-10 inline-flex size-10 shrink-0 items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-white-0 font-mono font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.14em] dark:border-white/10 dark:bg-black dark:text-white/50">
 			vs
 		</span>
+	);
+}
+
+/** Blog CTA atmosphere, tinted to the competitor mark. */
+function SubtleCtaAtmosphere({ hex }: { hex?: string }) {
+	const rgb = hex ? glowRgb(hex) : ([56, 189, 248] satisfies Rgb);
+	const rgbAlt: Rgb = [
+		Math.min(255, Math.round(rgb[0] + (255 - rgb[0]) * 0.22)),
+		Math.min(255, Math.round(rgb[1] + (255 - rgb[1]) * 0.22)),
+		Math.min(255, Math.round(rgb[2] + (255 - rgb[2]) * 0.22)),
+	];
+	const lineMask =
+		"radial-gradient(ellipse 85% 95% at 88% 110%, black 0%, transparent 68%), radial-gradient(ellipse 70% 90% at 4% -5%, black 0%, transparent 62%)";
+
+	return (
+		<div
+			aria-hidden
+			className="pointer-events-none absolute inset-0 overflow-hidden"
+		>
+			<div
+				className="absolute inset-0"
+				style={{
+					backgroundImage: `radial-gradient(ellipse 110% 160% at 82% 100%, ${rgba(rgb, 0.14)} 0%, transparent 62%)`,
+				}}
+			/>
+			<div
+				className="absolute inset-0"
+				style={{
+					backgroundImage: `radial-gradient(ellipse 90% 140% at 6% 0%, ${rgba(rgbAlt, 0.09)} 0%, transparent 60%)`,
+				}}
+			/>
+			<div
+				className="absolute inset-0"
+				style={{
+					backgroundImage: `repeating-linear-gradient(-45deg, transparent 0, transparent 3px, ${rgba(rgb, 0.07)} 3px, ${rgba(rgb, 0.07)} 3.55px)`,
+					maskImage: lineMask,
+					WebkitMaskImage: lineMask,
+				}}
+			/>
+		</div>
 	);
 }
 
@@ -98,7 +164,8 @@ export function CompareHero({
 			<h1 className="sr-only">{title}</h1>
 
 			{/* Divided brand row: larger tiles, titles centered underneath */}
-			<div className="relative flex border-stroke-soft-200 border-b border-dashed dark:border-white/10">
+			<div className="relative flex overflow-hidden border-stroke-soft-200 border-b border-dashed dark:border-white/10">
+				<SubtleCtaAtmosphere hex={icon?.hex} />
 				<HatchGutter side="left" />
 
 				<div className="relative min-w-0 flex-1">
