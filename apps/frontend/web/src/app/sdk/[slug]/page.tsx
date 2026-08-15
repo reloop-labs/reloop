@@ -1,11 +1,11 @@
+import { BlogCta } from "@reloop/web/components/landing/blog/blog-cta";
+import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import LanguageCode from "../components/language-code";
-import LanguageCta from "../components/language-cta";
 import LanguageFrameworks from "../components/language-frameworks";
 import LanguageHero from "../components/language-hero";
 import LanguageMore from "../components/language-more";
-import LanguageResources from "../components/language-resources";
+import LanguageSteps from "../components/language-steps";
 import { getLanguage, isLanguageSlug, LANGUAGE_SLUGS } from "../languages";
 
 // TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
@@ -26,18 +26,35 @@ export async function generateMetadata({
 	const { slug } = await params;
 	const language = getLanguage(slug);
 	if (!language) {
-		return { title: "Language | Reloop" };
+		return { title: "SDK | Reloop" };
 	}
-	const title = `Integrate with Reloop using ${language.name} | Reloop`;
-	const description = `Official ${language.name} SDK for Reloop. Install ${language.packageName} and send email with a few lines of code.`;
+	const title = `Send Email with ${language.name} | Reloop`;
+	const description = `${language.shortDescription} Step-by-step: install, set your API key, and send.`;
+	const url = `${getSiteUrl()}/sdk/${language.slug}`;
 	return {
 		title,
 		description,
+		alternates: { canonical: url },
 		openGraph: {
 			title,
 			description,
 			type: "website",
+			url,
+			siteName: "Reloop",
 		},
+		twitter: {
+			card: "summary_large_image",
+			title,
+			description,
+		},
+		keywords: [
+			`${language.name} email`,
+			`send email ${language.name}`,
+			`${language.name} transactional email`,
+			`${language.name} SDK`,
+			`${language.packageName}`,
+			"Reloop",
+		],
 	};
 }
 
@@ -54,11 +71,16 @@ export default async function LanguagePage({ params }: PageProps) {
 	return (
 		<main className="w-full max-w-full overflow-x-clip bg-bg-white-0 dark:bg-black">
 			<LanguageHero language={language} />
-			<LanguageCode language={language} />
+			<LanguageSteps language={language} />
 			<LanguageFrameworks language={language} />
 			<LanguageMore current={language} />
-			<LanguageResources language={language} />
-			<LanguageCta language={language} />
+			<BlogCta
+				headline={`Send with ${language.name}.`}
+				sub={`Get an API key and ship transactional email from ${language.name} using the official SDK.`}
+				primaryLabel="Get API Key"
+				primaryHref="/dashboard/signup"
+				accentHex={language.icon.hex}
+			/>
 		</main>
 	);
 }

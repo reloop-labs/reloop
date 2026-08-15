@@ -274,7 +274,7 @@ export function ResourceLinks({
 	if (variant === "cards") {
 		const framework = frameworkSlug ? getFramework(frameworkSlug) : undefined;
 		const language = getLanguage(languageSlug);
-		const frameworkIcon = framework?.icon;
+		const exampleIcon = framework?.icon ?? language?.icon;
 
 		return (
 			<div className={cn("flex flex-wrap gap-3 sm:gap-4", className)}>
@@ -283,10 +283,10 @@ export function ResourceLinks({
 					title={`${name} example`}
 					external
 					accent="blue"
-					hex={frameworkIcon?.hex}
+					hex={exampleIcon?.hex}
 					icon={
-						frameworkIcon ? (
-							<LanguageIcon icon={frameworkIcon} className="size-5" />
+						exampleIcon ? (
+							<LanguageIcon icon={exampleIcon} className="size-5" />
 						) : (
 							<Icon name="integration" fill="none" className="size-5" />
 						)
