@@ -83,7 +83,7 @@ export default function FrameworkHero({
 
 				{/* Product fold: icon + title + sub + CTA */}
 				<div className="relative px-6 py-10 sm:px-10 sm:py-12 lg:px-12 lg:py-14">
-					<div className="relative z-10 flex flex-col gap-5 sm:flex-row sm:items-start sm:gap-5">
+					<div className="relative z-10 flex items-start gap-4 sm:gap-5">
 						{/* App icon tile — same height as the title row so they share one line */}
 						<div
 							className={cn(

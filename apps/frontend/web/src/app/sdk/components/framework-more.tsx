@@ -10,6 +10,37 @@ import {
 import { AlignedIconBand } from "./section-frame";
 import { SectionTitle } from "./section-title";
 
+/** Empty cells so leftover last-row tracks match the card surface. */
+function GridFillers({
+	count,
+	cols,
+}: {
+	count: number;
+	cols: { base: number; sm: number; lg: number };
+}) {
+	const leftover = (n: number) => {
+		const rem = count % n;
+		return rem === 0 ? 0 : n - rem;
+	};
+	const fillBase = leftover(cols.base);
+	const fillSm = leftover(cols.sm);
+	const fillLg = leftover(cols.lg);
+	const max = Math.max(fillBase, fillSm, fillLg);
+
+	return Array.from({ length: max }, (_, i) => (
+		<div
+			key={`fill-${i}`}
+			aria-hidden
+			className={cn(
+				"bg-bg-white-0 dark:bg-black",
+				i < fillBase ? "block" : "hidden",
+				i < fillSm ? "sm:block" : "sm:hidden",
+				i < fillLg ? "lg:block" : "lg:hidden",
+			)}
+		/>
+	));
+}
+
 export default function FrameworkMore({
 	current,
 }: {
@@ -67,6 +98,10 @@ export default function FrameworkMore({
 								</Link>
 							);
 						})}
+						<GridFillers
+							count={others.length}
+							cols={{ base: 3, sm: 5, lg: 6 }}
+						/>
 					</div>
 				</AlignedIconBand>
 			</div>
