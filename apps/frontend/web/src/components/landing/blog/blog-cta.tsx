@@ -140,6 +140,46 @@ const ACCENT_STYLES: Record<
 	},
 };
 
+function normalizeHex(hex: string): string {
+	return hex.replace("#", "").toUpperCase();
+}
+
+function hexToRgba(hex: string, alpha: number): string {
+	const h = normalizeHex(hex);
+	const r = Number.parseInt(h.slice(0, 2), 16);
+	const g = Number.parseInt(h.slice(2, 4), 16);
+	const b = Number.parseInt(h.slice(4, 6), 16);
+	return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+function isDimHex(hex: string): boolean {
+	const h = normalizeHex(hex);
+	if (h === "000000" || h === "000" || h === "111111" || h === "333333") {
+		return true;
+	}
+	if (h.length !== 6) return false;
+	const r = Number.parseInt(h.slice(0, 2), 16);
+	const g = Number.parseInt(h.slice(2, 4), 16);
+	const b = Number.parseInt(h.slice(4, 6), 16);
+	return (0.299 * r + 0.587 * g + 0.114 * b) / 255 < 0.25;
+}
+
+/** Dark-mode glows need a lift when the brand mark is black. */
+function glowHex(hex: string): string {
+	return isDimHex(hex) ? "D4D4D8" : normalizeHex(hex);
+}
+
+function brandAtmosphere(hex: string) {
+	const h = glowHex(hex);
+	return {
+		darkGlow: `radial-gradient(ellipse 110% 160% at 82% 100%, ${hexToRgba(h, 0.34)} 0%, transparent 62%)`,
+		darkGlowAlt: `radial-gradient(ellipse 90% 140% at 6% 0%, ${hexToRgba(h, 0.24)} 0%, transparent 60%)`,
+		darkLine: hexToRgba(h, 0.18),
+		lightGradient: `linear-gradient(to right, transparent 0%, ${hexToRgba(h, 0.18)} 45%, ${hexToRgba(h, 0.3)} 100%)`,
+		lightLine: hexToRgba(h, 0.28),
+	};
+}
+
 const CATEGORY_ACCENTS: Record<string, CtaAccentColor> = {
 	Engineering: "indigo",
 	"AI & Automation": "blue",
@@ -164,6 +204,7 @@ export function BlogCta({
 	secondaryHref = "/docs",
 	secondaryExternal,
 	accentColor,
+	accentHex,
 }: {
 	category?: string;
 	headline?: string;
@@ -175,6 +216,8 @@ export function BlogCta({
 	secondaryHref?: string;
 	secondaryExternal?: boolean;
 	accentColor?: CtaAccentColor;
+	/** Brand hex (e.g. NestJS red) — tints the CTA glow and lines */
+	accentHex?: string;
 }) {
 	const categoryVariant = category ? CATEGORY_VARIANTS[category] : undefined;
 	const variant = {
@@ -196,19 +239,23 @@ export function BlogCta({
 		(category ? CATEGORY_ACCENTS[category] : undefined) ??
 		"blue";
 	const colorStyle = ACCENT_STYLES[resolvedAccent] ?? ACCENT_STYLES.blue;
+	const brand = accentHex ? brandAtmosphere(accentHex) : null;
 
 	return (
 		<section className="w-full">
 			<div className="relative overflow-hidden border-stroke-soft-200 border-t bg-bg-white-0 dark:border-white/10 dark:bg-black">
 				<div className="relative z-10 mx-auto flex w-full max-w-5xl flex-col items-center gap-6 border-stroke-soft-200 px-6 py-10 text-center sm:px-10 sm:py-12 md:max-w-7xl lg:flex-row lg:items-center lg:justify-between lg:px-12 lg:text-left xl:border-x dark:border-white/10">
-					{/* Light: tinted hatch on the right (hidden in dark — stripes kill contrast) */}
+					{/* Light: tinted hatch on the right */}
 					<div
 						aria-hidden
 						className="pointer-events-none absolute top-0 right-0 bottom-0 z-0 w-full sm:w-7/12 dark:hidden"
 					>
 						<div
-							className={`absolute inset-0 bg-gradient-to-r ${colorStyle.bg}`}
+							className={
+								brand ? "absolute inset-0" : `absolute inset-0 bg-gradient-to-r ${colorStyle.bg}`
+							}
 							style={{
+								backgroundImage: brand?.lightGradient,
 								maskImage:
 									"linear-gradient(to right, transparent 0%, black 35%, black 100%)",
 								WebkitMaskImage:
@@ -216,10 +263,13 @@ export function BlogCta({
 							}}
 						/>
 						<div
-							className={`absolute inset-0 ${colorStyle.pattern}`}
+							className={
+								brand ? "absolute inset-0" : `absolute inset-0 ${colorStyle.pattern}`
+							}
 							style={{
-								backgroundImage:
-									"repeating-linear-gradient(-45deg, transparent 0, transparent 2px, currentColor 2px, currentColor 2.8px)",
+								backgroundImage: brand
+									? `repeating-linear-gradient(-45deg, transparent 0, transparent 2px, ${brand.lightLine} 2px, ${brand.lightLine} 2.8px)`
+									: "repeating-linear-gradient(-45deg, transparent 0, transparent 2px, currentColor 2px, currentColor 2.8px)",
 								maskImage:
 									"linear-gradient(to right, transparent 0%, black 30%, black 100%)",
 								WebkitMaskImage:
@@ -228,29 +278,31 @@ export function BlogCta({
 						/>
 					</div>
 
-					{/* Dark: quiet blooms + a faint speckle, kept off the type */}
+					{/* Dark: brand blooms + lighter hatch, kept off the type */}
 					<div
 						aria-hidden
 						className="pointer-events-none absolute inset-0 z-0 hidden dark:block"
 					>
 						<div
 							className="absolute inset-0"
-							style={{ backgroundImage: colorStyle.darkGlow }}
+							style={{
+								backgroundImage: brand?.darkGlow ?? colorStyle.darkGlow,
+							}}
 						/>
 						<div
 							className="absolute inset-0"
-							style={{ backgroundImage: colorStyle.darkGlowAlt }}
+							style={{
+								backgroundImage: brand?.darkGlowAlt ?? colorStyle.darkGlowAlt,
+							}}
 						/>
 						<div
-							className="absolute inset-0 text-white/[0.07]"
+							className="absolute inset-0"
 							style={{
-								backgroundImage:
-									"radial-gradient(circle, currentColor 0.55px, transparent 0.6px)",
-								backgroundSize: "18px 18px",
+								backgroundImage: `repeating-linear-gradient(-45deg, transparent 0, transparent 3px, ${brand?.darkLine ?? "rgba(255,255,255,0.08)"} 3px, ${brand?.darkLine ?? "rgba(255,255,255,0.08)"} 3.55px)`,
 								maskImage:
-									"radial-gradient(ellipse 75% 70% at 80% 100%, black 0%, transparent 68%)",
+									"radial-gradient(ellipse 85% 95% at 88% 110%, black 0%, transparent 68%), radial-gradient(ellipse 70% 90% at 4% -5%, black 0%, transparent 62%)",
 								WebkitMaskImage:
-									"radial-gradient(ellipse 75% 70% at 80% 100%, black 0%, transparent 68%)",
+									"radial-gradient(ellipse 85% 95% at 88% 110%, black 0%, transparent 68%), radial-gradient(ellipse 70% 90% at 4% -5%, black 0%, transparent 62%)",
 							}}
 						/>
 					</div>

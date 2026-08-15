@@ -81,7 +81,7 @@ export default async function FrameworkPage({ params }: PageProps) {
 				sub={`Get an API key and ship transactional email from ${framework.name} using the official ${framework.languageName} SDK.`}
 				primaryLabel="Get API Key"
 				primaryHref="/dashboard/signup"
-				accentColor="blue"
+				accentHex={framework.icon.hex}
 			/>
 		</main>
 	);
