@@ -187,7 +187,7 @@ function ResourceCard({
 				}}
 			/>
 
-			<div className="relative z-10 flex shrink-0 items-start">
+			<div className="relative z-10 flex shrink-0 items-start justify-between">
 				<div className="relative flex size-9 items-center justify-center sm:size-10">
 					<span
 						aria-hidden
@@ -205,6 +205,11 @@ function ResourceCard({
 					/>
 					<span className="relative z-10">{icon}</span>
 				</div>
+				<Icon
+					name="arrow-up-right"
+					className="group-hover:-translate-y-0.5 size-3.5 text-[var(--card-ink)] opacity-0 transition-all duration-200 group-hover:translate-x-0.5 group-hover:opacity-100 dark:text-[var(--card-ink-dark)]"
+					aria-hidden
+				/>
 			</div>
 
 			<span className="relative z-10 min-w-0 font-medium text-[15px] leading-snug tracking-[-0.01em]">
@@ -290,7 +295,7 @@ export function ResourceLinks({
 				<ResourceCard
 					href="/docs/api"
 					title="API reference"
-					accent="teal"
+					accent="orange"
 					icon={<ShapesIcon className="size-5" />}
 				/>
 				<ResourceCard
