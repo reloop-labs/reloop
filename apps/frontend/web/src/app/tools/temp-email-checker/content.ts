@@ -1,5 +1,4 @@
 import type { FaqItem } from "@reloop/web/components/faq-section";
-import type { FeatureCtaBand } from "@reloop/web/components/landing/types";
 import { productionSiteUrl } from "@reloop/web/lib/site";
 
 export const toolPath = "/tools/temp-email-checker";
@@ -263,11 +262,3 @@ export const faqGroups: { title: string; items: FaqItem[] }[] = [
 
 export const faqs: FaqItem[] = faqGroups.flatMap((group) => group.items);
 
-export const cta: FeatureCtaBand = {
-	title: "Stop sending to inboxes",
-	titleMuted: "that no longer exist.",
-	description:
-		"Reloop is open-source email infrastructure — validation, sending, inbound, and analytics in one stack you can host yourself.",
-	primary: { label: "Start for free", href: "/dashboard/signup" },
-	secondary: { label: "Read the docs", href: "/docs" },
-};

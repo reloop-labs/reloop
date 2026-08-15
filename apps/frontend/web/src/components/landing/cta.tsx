@@ -16,14 +16,6 @@ export function FeatureCta({
 		<section id="cta" className="w-full">
 			<div className="relative overflow-hidden border-stroke-soft-200 border-t bg-bg-white-0 dark:border-white/10 dark:bg-black">
 				<div className="relative z-10 mx-auto flex w-full max-w-5xl flex-col items-center justify-center gap-10 border-stroke-soft-200 px-4 pt-12 pb-13 sm:px-6 md:max-w-7xl lg:px-8 xl:border-x dark:border-white/10">
-					<div
-						aria-hidden
-						className="pointer-events-none absolute inset-0 z-0 text-primary-base/20 dark:text-primary-base/30"
-						style={{
-							backgroundImage:
-								"repeating-linear-gradient(-45deg, transparent 0, transparent 2px, currentColor 2px, currentColor 2.8px)",
-						}}
-					/>
 					<div className="mx-auto flex max-w-3xl flex-col items-center text-center">
 						<h2 className="font-semibold text-2xl text-balance text-text-strong-950 tracking-tight sm:text-4xl lg:text-5xl dark:text-white">
 							{title}
@@ -96,7 +88,7 @@ export function CtaLink({
 			asChild
 			variant={variant}
 			size="medium"
-			className="rounded-lg! px-5!"
+			className={cn("rounded-full!", !isSecondery && "px-10!")}
 		>
 			<Link href={href}>
 				<span>{label}</span>

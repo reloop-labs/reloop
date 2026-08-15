@@ -94,11 +94,11 @@ export default function FrameworkHero({
 						}}
 					/>
 
-					<div className="relative z-10 flex flex-col gap-6 sm:flex-row sm:items-start sm:gap-5">
-						{/* App icon tile */}
+					<div className="relative z-10 flex flex-col gap-5 sm:flex-row sm:items-start sm:gap-5">
+						{/* App icon tile — same height as the title row so they share one line */}
 						<div
 							className={cn(
-								"flex size-14 shrink-0 items-center justify-center rounded-2xl border border-stroke-soft-200 bg-bg-white-0 shadow-[0_8px_24px_-8px_rgba(0,0,0,0.12)] sm:size-16 dark:border-white/10 dark:bg-bg-black-950 dark:shadow-[0_8px_24px_-8px_rgba(0,0,0,0.45)]",
+								"flex size-16 shrink-0 items-center justify-center rounded-2xl border border-stroke-soft-200 bg-bg-white-0 shadow-[0_8px_24px_-8px_rgba(0,0,0,0.12)] sm:size-20 dark:border-white/10 dark:bg-bg-black-950 dark:shadow-[0_8px_24px_-8px_rgba(0,0,0,0.45)]",
 								isDarkBrandColor(framework.icon.hex) &&
 									"text-text-strong-950 dark:text-white",
 							)}
@@ -106,12 +106,12 @@ export default function FrameworkHero({
 						>
 							<LanguageIcon
 								icon={framework.icon}
-								className="size-7 sm:size-8"
+								className="size-8 sm:size-10"
 							/>
 						</div>
 
 						<div className="min-w-0 flex-1">
-							<h1 className="font-semibold text-3xl text-text-strong-950 tracking-tight sm:text-4xl lg:text-[2.5rem] dark:text-white">
+							<h1 className="flex min-h-16 items-center font-semibold text-3xl text-text-strong-950 tracking-tight sm:min-h-20 sm:text-4xl lg:text-[2.5rem] dark:text-white">
 								{framework.name}
 							</h1>
 							<p className="mt-2 max-w-xl text-[15px] text-text-sub-600 leading-relaxed sm:text-[16px] dark:text-white/60">

@@ -1,11 +1,10 @@
 import { JsonLd } from "@reloop/web/components/json-ld";
-import { FeatureCta } from "@reloop/web/components/landing/cta";
+import { BlogCta } from "@reloop/web/components/landing/blog/blog-cta";
 import { createPageMetadata } from "@reloop/web/lib/metadata";
 import { getSiteUrl } from "@reloop/web/lib/site";
 import { ApiSection } from "./api-section";
 import { CheckerPanel } from "./checker-panel";
 import {
-	cta,
 	faqGroups,
 	faqs,
 	reasons,
@@ -98,20 +97,6 @@ export default function TempEmailCheckerPage() {
 			/>
 
 			<Band className="relative overflow-hidden pt-16">
-				<div
-					aria-hidden
-					className="pointer-events-none absolute inset-x-0 top-0 h-[560px] text-stroke-soft-200 dark:text-white/[0.07]"
-					style={{
-						backgroundImage:
-							"linear-gradient(currentColor 1px, transparent 1px), linear-gradient(90deg, currentColor 1px, transparent 1px)",
-						backgroundSize: "72px 72px",
-						maskImage:
-							"radial-gradient(ellipse 65% 42% at 50% 26%, #000 5%, transparent 78%)",
-						WebkitMaskImage:
-							"radial-gradient(ellipse 65% 42% at 50% 26%, #000 5%, transparent 78%)",
-					}}
-				/>
-
 				<div className="relative px-5 pt-14 pb-16 sm:px-6 sm:pt-16 md:px-8 lg:pb-20">
 					<div className="mx-auto max-w-2xl text-center">
 						<span className="inline-flex items-center gap-2 rounded-full border border-stroke-soft-200 bg-bg-white-0 px-3 py-1 font-mono text-[11px] text-text-sub-600 uppercase tracking-[0.12em] dark:border-white/12 dark:bg-black dark:text-white/45">
@@ -185,7 +170,7 @@ export default function TempEmailCheckerPage() {
 				<FaqGrid groups={faqGroups} />
 			</Band>
 
-			<FeatureCta {...cta} />
+			<BlogCta />
 		</>
 	);
 }

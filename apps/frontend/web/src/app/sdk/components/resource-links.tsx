@@ -1,8 +1,10 @@
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import Link from "next/link";
-import type { FrameworkSlug } from "../frameworks";
+import type { ReactNode } from "react";
+import { getFramework, type FrameworkSlug } from "../frameworks";
 import type { LanguageSlug } from "../languages";
+import { LanguageIcon } from "./language-icon";
 
 const GITHUB_SDK: Record<LanguageSlug, string> = {
 	nodejs: "https://github.com/reloop-labs/reloop-node",
@@ -84,6 +86,184 @@ function ShapesIcon({ className }: { className?: string }) {
 	);
 }
 
+type ResourceAccent = "blue" | "teal" | "orange";
+
+const RESOURCE_CARD_ACCENTS: Record<
+	ResourceAccent,
+	{
+		wash: string;
+		glow: string;
+		hatch: string;
+		hatchImage: string;
+		hatchMask: string;
+		ringOuter: string;
+		ringInner: string;
+		ink: string;
+	}
+> = {
+	blue: {
+		wash: "bg-gradient-to-br from-sky-100/90 via-blue-50/70 to-indigo-100/80 dark:from-sky-950/40 dark:via-blue-950/30 dark:to-indigo-950/45",
+		glow: "bg-gradient-to-br from-blue-500/[0.16] via-sky-400/[0.10] to-indigo-500/[0.06] dark:from-blue-500/[0.20] dark:via-sky-400/[0.14] dark:to-indigo-500/[0.10]",
+		hatch: "text-sky-500/20 dark:text-sky-400/18",
+		hatchImage:
+			"repeating-linear-gradient(-45deg, transparent 0, transparent 2.5px, currentColor 2.5px, currentColor 3.1px)",
+		hatchMask:
+			"linear-gradient(to bottom right, black 0%, black 32%, transparent 68%)",
+		ringOuter: "text-sky-400/20 dark:text-sky-400/25",
+		ringInner: "text-blue-500/30 dark:text-sky-300/32",
+		ink: "group-hover:text-blue-600 dark:group-hover:text-sky-400",
+	},
+	teal: {
+		wash: "bg-gradient-to-br from-teal-100/90 via-cyan-50/70 to-emerald-100/70 dark:from-teal-950/40 dark:via-cyan-950/30 dark:to-emerald-950/40",
+		glow: "bg-gradient-to-br from-teal-500/[0.16] via-cyan-400/[0.10] to-emerald-500/[0.06] dark:from-teal-500/[0.20] dark:via-cyan-400/[0.14] dark:to-emerald-500/[0.10]",
+		hatch: "text-teal-500/20 dark:text-teal-400/18",
+		hatchImage:
+			"repeating-linear-gradient(-45deg, transparent 0, transparent 2.5px, currentColor 2.5px, currentColor 3.1px)",
+		hatchMask:
+			"linear-gradient(to bottom right, black 0%, black 32%, transparent 68%)",
+		ringOuter: "text-teal-400/20 dark:text-teal-400/25",
+		ringInner: "text-teal-500/30 dark:text-cyan-300/32",
+		ink: "group-hover:text-teal-600 dark:group-hover:text-teal-400",
+	},
+	orange: {
+		wash: "bg-gradient-to-bl from-orange-100/90 via-amber-50/70 to-yellow-100/70 dark:from-orange-950/40 dark:via-amber-950/30 dark:to-yellow-950/40",
+		glow: "bg-gradient-to-bl from-orange-500/[0.16] via-amber-400/[0.10] to-yellow-500/[0.06] dark:from-orange-500/[0.20] dark:via-amber-400/[0.14] dark:to-yellow-500/[0.10]",
+		hatch: "text-orange-500/20 dark:text-orange-400/18",
+		hatchImage:
+			"repeating-linear-gradient(45deg, transparent 0, transparent 2.5px, currentColor 2.5px, currentColor 3.1px)",
+		hatchMask:
+			"linear-gradient(to bottom left, black 0%, black 32%, transparent 68%)",
+		ringOuter: "text-orange-400/20 dark:text-orange-400/25",
+		ringInner: "text-orange-500/30 dark:text-amber-300/32",
+		ink: "group-hover:text-orange-600 dark:group-hover:text-orange-400",
+	},
+};
+
+function ResourceCard({
+	href,
+	title,
+	external,
+	accent,
+	icon,
+}: {
+	href: string;
+	title: string;
+	external?: boolean;
+	accent: ResourceAccent;
+	icon: ReactNode;
+}) {
+	const theme = RESOURCE_CARD_ACCENTS[accent];
+	const className = cn(
+		"group relative flex h-full w-full max-w-[168px] min-h-[180px] flex-col justify-between overflow-hidden rounded-[18px] border border-stroke-soft-200/80 bg-bg-weak-50/50 p-4 transition-colors duration-300 sm:min-h-[200px] sm:p-5",
+		"dark:border-white/[0.08] dark:bg-white/[0.03]",
+	);
+
+	const content = (
+		<>
+			<div
+				aria-hidden
+				className={`pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100 ${theme.wash}`}
+				style={{
+					maskImage: theme.hatchMask,
+					WebkitMaskImage: theme.hatchMask,
+				}}
+			/>
+			<div
+				aria-hidden
+				className={`pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100 ${theme.hatch}`}
+				style={{
+					backgroundImage: theme.hatchImage,
+					maskImage: theme.hatchMask,
+					WebkitMaskImage: theme.hatchMask,
+				}}
+			/>
+
+			<div className="relative z-10 flex shrink-0 items-start">
+				<div className="relative flex size-6 items-center justify-center sm:size-7">
+					<div
+						aria-hidden
+						className={`-translate-x-1/2 -translate-y-[51%] pointer-events-none absolute top-1/2 left-1/2 size-28 scale-90 rounded-full opacity-0 blur-2xl transition-all duration-500 group-hover:scale-125 group-hover:opacity-100 ${theme.glow}`}
+					/>
+					<svg
+						aria-hidden
+						className="-translate-x-1/2 -translate-y-[51%] pointer-events-none absolute top-1/2 left-1/2 size-[9.5rem] opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+						viewBox="0 0 160 160"
+						fill="none"
+					>
+						<g className={theme.ringOuter}>
+							<circle
+								cx="80"
+								cy="80"
+								r="72"
+								stroke="currentColor"
+								strokeWidth="0.75"
+								strokeDasharray="4 4"
+								fill="none"
+							/>
+							<circle
+								cx="80"
+								cy="80"
+								r="50"
+								stroke="currentColor"
+								strokeWidth="1"
+								fill="none"
+							/>
+						</g>
+						<g className={theme.ringInner}>
+							<circle
+								cx="80"
+								cy="80"
+								r="28"
+								stroke="currentColor"
+								strokeWidth="1.35"
+								strokeDasharray="0.01 4.5"
+								strokeLinecap="round"
+								fill="none"
+							/>
+						</g>
+					</svg>
+					<span
+						className={cn(
+							"relative z-10 text-text-strong-950 transition-colors duration-300 dark:text-white",
+							theme.ink,
+						)}
+					>
+						{icon}
+					</span>
+				</div>
+			</div>
+
+			<span
+				className={cn(
+					"relative z-10 min-w-0 font-medium text-[15px] text-text-strong-950 leading-snug tracking-[-0.01em] transition-colors duration-300 dark:text-white",
+					theme.ink,
+				)}
+			>
+				{title}
+			</span>
+		</>
+	);
+
+	if (external) {
+		return (
+			<a
+				href={href}
+				target="_blank"
+				rel="noreferrer"
+				className={className}
+			>
+				{content}
+			</a>
+		);
+	}
+
+	return (
+		<Link href={href} className={className}>
+			{content}
+		</Link>
+	);
+}
+
 type ResourceLink = {
 	href: string;
 	icon: string | "shapes";
@@ -98,6 +278,7 @@ export function ResourceLinks({
 	name,
 	frameworkSlug,
 	className,
+	variant = "links",
 }: {
 	languageSlug: LanguageSlug;
 	languageName: string;
@@ -106,7 +287,45 @@ export function ResourceLinks({
 	docsPath?: string;
 	frameworkSlug?: FrameworkSlug | null;
 	className?: string;
+	variant?: "links" | "cards";
 }) {
+	if (variant === "cards") {
+		const frameworkIcon = frameworkSlug
+			? getFramework(frameworkSlug)?.icon
+			: undefined;
+
+		return (
+			<div className={cn("flex flex-wrap gap-3 sm:gap-4", className)}>
+				<ResourceCard
+					href={exampleRepoUrl(frameworkSlug)}
+					title={`${name} example`}
+					external
+					accent="blue"
+					icon={
+						frameworkIcon ? (
+							<LanguageIcon icon={frameworkIcon} className="size-6" />
+						) : (
+							<Icon name="integration" fill="none" className="size-6" />
+						)
+					}
+				/>
+				<ResourceCard
+					href="/docs/api"
+					title="API reference"
+					accent="teal"
+					icon={<ShapesIcon className="size-6" />}
+				/>
+				<ResourceCard
+					href={GITHUB_SDK[languageSlug]}
+					title={languageName}
+					external
+					accent="orange"
+					icon={<Icon name="github" fill="currentColor" className="size-6" />}
+				/>
+			</div>
+		);
+	}
+
 	const links: ResourceLink[] = [
 		{
 			href: exampleRepoUrl(frameworkSlug),
