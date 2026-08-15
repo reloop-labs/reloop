@@ -28,6 +28,7 @@ export function ComparisonPageShell({
 			 */}
 			<CompareHero
 				titleLines={titleLines}
+				competitorName={brand?.name}
 				description={description}
 				primaryCta={primaryCta}
 				secondaryCta={secondaryCta}
