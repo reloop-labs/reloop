@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import type { FrameworkDefinition } from "../frameworks";
 import { ExtraLinks } from "./extra-links";
+import { NodeInstallBlock } from "./node-install-block";
 import { ResourceLinks } from "./resource-links";
 import { SdkCodeBlock } from "./sdk-code-block";
 
@@ -54,7 +55,11 @@ export default function FrameworkSteps({
 						number={1}
 						title={`Install the ${framework.languageName} package`}
 					>
-						<SdkCodeBlock code={framework.installCommand} lang="bash" />
+						{framework.languageSlug === "nodejs" ? (
+							<NodeInstallBlock />
+						) : (
+							<SdkCodeBlock code={framework.installCommand} lang="bash" />
+						)}
 					</StepItem>
 
 					<StepItem

@@ -317,7 +317,7 @@ export function ResourceLinks({
 				/>
 				<ResourceCard
 					href={GITHUB_SDK[languageSlug]}
-					title={languageName}
+					title={`${languageName} SDK`}
 					external
 					accent="orange"
 					icon={<Icon name="github" fill="currentColor" className="size-6" />}

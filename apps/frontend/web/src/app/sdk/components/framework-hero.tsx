@@ -82,18 +82,7 @@ export default function FrameworkHero({
 				</div>
 
 				{/* Product fold: icon + title + sub + CTA */}
-				<div className="relative overflow-hidden px-6 py-10 sm:px-10 sm:py-12 lg:px-12 lg:py-14">
-					{/* Right-side dotted panel (reference) */}
-					<div
-						aria-hidden
-						className="pointer-events-none absolute inset-y-0 right-0 hidden w-[28%] border-stroke-soft-200 border-l border-dashed sm:block dark:border-white/10 dark:opacity-40"
-						style={{
-							backgroundImage:
-								"radial-gradient(circle, #d4d4d8 0.55px, transparent 0.6px)",
-							backgroundSize: "12px 12px",
-						}}
-					/>
-
+				<div className="relative px-6 py-10 sm:px-10 sm:py-12 lg:px-12 lg:py-14">
 					<div className="relative z-10 flex flex-col gap-5 sm:flex-row sm:items-start sm:gap-5">
 						{/* App icon tile — same height as the title row so they share one line */}
 						<div

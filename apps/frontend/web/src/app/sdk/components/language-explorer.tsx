@@ -1,34 +1,27 @@
 "use client";
 
 import { cn } from "@reloop/ui/cn";
-import type { CopyCodeBlockTab } from "@reloop/ui/copy-code-block";
 import { Icon } from "@reloop/ui/icon";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { siNpm, siPnpm, siYarn } from "simple-icons";
 import { frameworksForLanguage } from "../frameworks";
 import { languages } from "../languages";
 import { AnimatedHoverBackground } from "./animated-hover-background";
-import { bunIcon } from "./bun-icon";
 import { ExtraLinks } from "./extra-links";
 import {
 	getBrandColorStyle,
 	isDarkBrandColor,
 	LanguageIcon,
 } from "./language-icon";
+import {
+	NODE_PKG_TABS,
+	nodeInstallCommands,
+	type PackageManager,
+} from "./node-install-block";
 import { ResourceLinks } from "./resource-links";
 import { SdkCodeBlock } from "./sdk-code-block";
 import { SectionFrame } from "./section-frame";
 import { useSidebarHoverBox } from "./use-sidebar-hover-box";
-
-const nodeInstallCommands = {
-	npm: "npm install reloop-email",
-	pnpm: "pnpm add reloop-email",
-	yarn: "yarn add reloop-email",
-	bun: "bun add reloop-email",
-} as const;
-
-type PackageManager = keyof typeof nodeInstallCommands;
 
 type PillBox = {
 	width: number;
@@ -56,13 +49,6 @@ function measureTab(button: HTMLButtonElement | null): PillBox | null {
 		top: button.offsetTop,
 	};
 }
-
-const NODE_PKG_TABS: CopyCodeBlockTab[] = [
-	{ id: "npm", label: "npm", si: siNpm },
-	{ id: "pnpm", label: "pnpm", si: siPnpm },
-	{ id: "yarn", label: "yarn", si: siYarn },
-	{ id: "bun", label: "bun", si: bunIcon },
-];
 
 function StepItem({
 	number,
