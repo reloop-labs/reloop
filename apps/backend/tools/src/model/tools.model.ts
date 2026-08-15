@@ -1,4 +1,4 @@
-import { toolConfig } from "@be/tool/tool.config";
+import { toolsConfig } from "@be/tools/tools.config";
 import { t } from "elysia";
 
 const signalStatus = t.Union([
@@ -8,11 +8,11 @@ const signalStatus = t.Union([
 	t.Literal("neutral"),
 ]);
 
-export namespace ToolModel {
+export namespace ToolsModel {
 	export const checkBody = t.Object({
 		email: t.String({
 			minLength: 1,
-			maxLength: toolConfig.constants.maxInputLength,
+			maxLength: toolsConfig.constants.maxInputLength,
 			description: "An email address or a bare domain.",
 			examples: ["you@mailinator.com", "tempmail.com"],
 		}),
@@ -21,7 +21,7 @@ export namespace ToolModel {
 	export const checkQuery = t.Object({
 		email: t.String({
 			minLength: 1,
-			maxLength: toolConfig.constants.maxInputLength,
+			maxLength: toolsConfig.constants.maxInputLength,
 			description: "An email address or a bare domain.",
 		}),
 	});

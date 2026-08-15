@@ -1,14 +1,16 @@
-import { ToolErrors } from "@be/tool/error/tool.error-response";
-import type { ToolModel } from "@be/tool/model/tool.model";
-import { toolConfig } from "@be/tool/tool.config";
+import { ToolsErrors } from "@be/tools/error/tools.error-response";
+import type { ToolsModel } from "@be/tools/model/tools.model";
+import { toolsConfig } from "@be/tools/tools.config";
 import { evaluate } from "@reloop/email-validation";
 
-export function checkEmailController(input: string): ToolModel.CheckResponse {
+export function checkEmailController(
+	input: string,
+): ToolsModel.CheckResponse {
 	const trimmed = input.trim();
 
-	if (trimmed.length === 0) throw ToolErrors.emptyInput();
-	if (trimmed.length > toolConfig.constants.maxInputLength) {
-		throw ToolErrors.inputTooLong();
+	if (trimmed.length === 0) throw ToolsErrors.emptyInput();
+	if (trimmed.length > toolsConfig.constants.maxInputLength) {
+		throw ToolsErrors.inputTooLong();
 	}
 
 	const result = evaluate(trimmed);

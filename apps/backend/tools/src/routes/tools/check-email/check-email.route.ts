@@ -1,5 +1,5 @@
-import { rateLimitPlugin } from "@be/tool/middleware/rate-limit";
-import { ToolModel } from "@be/tool/model/tool.model";
+import { rateLimitPlugin } from "@be/tools/middleware/rate-limit";
+import { ToolsModel } from "@be/tools/model/tools.model";
 import { Elysia } from "elysia";
 import { log } from "evlog";
 import { evlog, useLogger } from "evlog/elysia";
@@ -15,7 +15,7 @@ function check(input: string) {
 }
 
 const detail = {
-	tags: ["Tool"],
+	tags: ["Tools"],
 	summary: "Check an email address",
 	description:
 		"Reports whether an email address or bare domain is disposable, a role address, or from a free consumer provider. Public and unauthenticated; rate limited per IP. Nothing is stored.",
@@ -25,21 +25,21 @@ export const checkEmailRoute = new Elysia()
 	.use(evlog())
 	.use(rateLimitPlugin)
 	.post("/check", ({ body }) => check(body.email), {
-		body: ToolModel.checkBody,
+		body: ToolsModel.checkBody,
 		response: {
-			200: ToolModel.checkResponse,
-			400: ToolModel.errorResponse,
-			429: ToolModel.errorResponse,
+			200: ToolsModel.checkResponse,
+			400: ToolsModel.errorResponse,
+			429: ToolsModel.errorResponse,
 		},
 		rateLimit: true,
 		detail,
 	})
 	.get("/check", ({ query }) => check(query.email), {
-		query: ToolModel.checkQuery,
+		query: ToolsModel.checkQuery,
 		response: {
-			200: ToolModel.checkResponse,
-			400: ToolModel.errorResponse,
-			429: ToolModel.errorResponse,
+			200: ToolsModel.checkResponse,
+			400: ToolsModel.errorResponse,
+			429: ToolsModel.errorResponse,
 		},
 		rateLimit: true,
 		detail,

@@ -1,23 +1,23 @@
-name: BE Tool Docker
+name: BE Tools Docker
 
 on:
   push:
     branches: [ main ]
     paths:
-      - 'apps/backend/tool/**'
+      - 'apps/backend/tools/**'
       - 'packages/email-validation/**'
-      - '.github/workflows/be-tool.yml'
+      - '.github/workflows/be-tools.yml'
   pull_request:
     branches: [ main ]
     paths:
-      - 'apps/backend/tool/**'
+      - 'apps/backend/tools/**'
       - 'packages/email-validation/**'
-      - '.github/workflows/be-tool.yml'
+      - '.github/workflows/be-tools.yml'
   workflow_dispatch:
 
 env:
   REGISTRY: docker.io
-  IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/be-tool
+  IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/be-tools
 
 jobs:
   test:
@@ -38,9 +38,9 @@ jobs:
         run: bun run test
         working-directory: packages/email-validation
 
-      - name: Run be-tool tests
+      - name: Run be-tools tests
         run: bun run test
-        working-directory: apps/backend/tool
+        working-directory: apps/backend/tools
 
   build-and-push:
     needs: test
@@ -77,7 +77,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: ./apps/backend/tool/Dockerfile
+          file: ./apps/backend/tools/Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

@@ -1,12 +1,12 @@
-import { toolConfig } from "@be/tool/tool.config";
+import { toolsConfig } from "@be/tools/tools.config";
 import { createError } from "evlog";
 
-export const ToolErrors = {
+export const ToolsErrors = {
 	inputTooLong: () =>
 		createError({
 			status: 400,
 			message: "Input too long",
-			why: `An email address cannot exceed ${toolConfig.constants.maxInputLength} characters.`,
+			why: `An email address cannot exceed ${toolsConfig.constants.maxInputLength} characters.`,
 			fix: "Check the value you sent — it looks like more than a single address.",
 		}),
 	emptyInput: () =>

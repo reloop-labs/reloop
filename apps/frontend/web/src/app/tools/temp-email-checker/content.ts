@@ -106,7 +106,7 @@ export const reasons: {
 	},
 ];
 
-export const apiEndpoint = `${productionSiteUrl}/api/tool/v1/check`;
+export const apiEndpoint = `${productionSiteUrl}/api/tools/v1/check`;
 
 export type ApiSnippet = {
 	id: string;

@@ -14,7 +14,7 @@
 		"declarationMap": false,
 		"baseUrl": "./src",
 		"paths": {
-			"@be/tool/*": ["./*"]
+			"@be/tools/*": ["./*"]
 		}
 	},
 	"include": ["src", "test"]

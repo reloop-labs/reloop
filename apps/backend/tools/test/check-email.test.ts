@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { checkEmailController } from "../src/routes/tool/check-email/check-email.controllers";
-import { toolConfig } from "../src/tool.config";
+import { checkEmailController } from "../src/routes/tools/check-email/check-email.controllers";
+import { toolsConfig } from "../src/tools.config";
 
 describe("checkEmailController", () => {
 	test("reports a disposable address", () => {
@@ -41,7 +41,7 @@ describe("checkEmailController", () => {
 
 	test("rejects input beyond the length cap", () => {
 		const tooLong = `${"a".repeat(
-			toolConfig.constants.maxInputLength,
+			toolsConfig.constants.maxInputLength,
 		)}@example.com`;
 		expect(() => checkEmailController(tooLong)).toThrow("Input too long");
 	});

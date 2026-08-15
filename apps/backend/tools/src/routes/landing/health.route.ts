@@ -1,5 +1,5 @@
-import { withDeadline } from "@be/tool/utils/deadline";
-import { redis } from "@be/tool/utils/loader";
+import { withDeadline } from "@be/tools/utils/deadline";
+import { redis } from "@be/tools/utils/loader";
 import { loadCatalogue } from "@reloop/email-validation";
 import { Elysia } from "elysia";
 

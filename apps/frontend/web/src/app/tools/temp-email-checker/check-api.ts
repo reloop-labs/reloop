@@ -27,7 +27,7 @@ export type ApiCheckResponse = {
 	};
 };
 
-const CHECK_URL = `${(process.env.NEXT_PUBLIC_URL || "").trim().replace(/\/$/, "")}/api/tool/v1/check`;
+const CHECK_URL = `${(process.env.NEXT_PUBLIC_URL || "").trim().replace(/\/$/, "")}/api/tools/v1/check`;
 
 export class CheckRequestError extends Error {
 	constructor(

@@ -1,6 +1,6 @@
-import { toolConfig } from "@be/tool/tool.config";
-import { withDeadline } from "@be/tool/utils/deadline";
-import { redis } from "@be/tool/utils/loader";
+import { toolsConfig } from "@be/tools/tools.config";
+import { withDeadline } from "@be/tools/utils/deadline";
+import { redis } from "@be/tools/utils/loader";
 import {
 	applyResponseHeaders,
 	buildRateLimitHeaders,
@@ -8,7 +8,7 @@ import {
 import { Elysia } from "elysia";
 import { log } from "evlog";
 
-const { rateLimitMax, rateLimitWindowSeconds } = toolConfig.constants;
+const { rateLimitMax, rateLimitWindowSeconds } = toolsConfig.constants;
 
 const REDIS_DEADLINE_MS = 250;
 
@@ -81,7 +81,7 @@ async function checkRateLimit(ip: string): Promise<{
 }
 
 export const rateLimitPlugin = new Elysia({
-	name: "rate-limit-tool",
+	name: "rate-limit-tools",
 }).macro({
 	rateLimit: {
 		async resolve({ status, set, request, server }) {
