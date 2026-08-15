@@ -466,8 +466,8 @@
         "typescript": "catalog:",
       },
     },
-    "apps/backend/tool": {
-      "name": "be-tool",
+    "apps/backend/tools": {
+      "name": "be-tools",
       "version": "1.0.0",
       "dependencies": {
         "@elysia/opentelemetry": "catalog:backend",
@@ -2802,7 +2802,7 @@
 
     "be-template": ["be-template@workspace:apps/backend/template"],
 
-    "be-tool": ["be-tool@workspace:apps/backend/tool"],
+    "be-tools": ["be-tools@workspace:apps/backend/tools"],
 
     "be-upload": ["be-upload@workspace:apps/backend/upload"],
 
