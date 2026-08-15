@@ -80,104 +80,53 @@ export type CtaAccentColor =
 	| "amber"
 	| "primary";
 
-const ACCENT_STYLES: Record<
-	CtaAccentColor,
-	{
-		bg: string;
-		pattern: string;
-		/** Soft blooms used only in dark mode — no hatch through the type */
-		darkGlow: string;
-		darkGlowAlt: string;
-	}
-> = {
-	blue: {
-		bg: "from-transparent via-sky-100/75 to-blue-100/90",
-		pattern: "text-sky-500/35",
-		darkGlow:
-			"radial-gradient(ellipse 110% 160% at 82% 100%, rgba(56,189,248,0.28) 0%, transparent 62%)",
-		darkGlowAlt:
-			"radial-gradient(ellipse 90% 140% at 6% 0%, rgba(99,102,241,0.22) 0%, transparent 60%)",
-	},
-	indigo: {
-		bg: "from-transparent via-indigo-100/75 to-purple-100/90",
-		pattern: "text-indigo-500/35",
-		darkGlow:
-			"radial-gradient(ellipse 110% 160% at 82% 100%, rgba(129,140,248,0.28) 0%, transparent 62%)",
-		darkGlowAlt:
-			"radial-gradient(ellipse 90% 140% at 6% 0%, rgba(192,132,252,0.22) 0%, transparent 60%)",
-	},
-	emerald: {
-		bg: "from-transparent via-emerald-100/75 to-teal-100/90",
-		pattern: "text-emerald-500/35",
-		darkGlow:
-			"radial-gradient(ellipse 110% 160% at 82% 100%, rgba(52,211,153,0.24) 0%, transparent 62%)",
-		darkGlowAlt:
-			"radial-gradient(ellipse 90% 140% at 6% 0%, rgba(45,212,191,0.18) 0%, transparent 60%)",
-	},
-	violet: {
-		bg: "from-transparent via-violet-100/75 to-fuchsia-100/90",
-		pattern: "text-violet-500/35",
-		darkGlow:
-			"radial-gradient(ellipse 110% 160% at 82% 100%, rgba(167,139,250,0.28) 0%, transparent 62%)",
-		darkGlowAlt:
-			"radial-gradient(ellipse 90% 140% at 6% 0%, rgba(232,121,249,0.20) 0%, transparent 60%)",
-	},
-	amber: {
-		bg: "from-transparent via-amber-100/75 to-orange-100/90",
-		pattern: "text-amber-500/35",
-		darkGlow:
-			"radial-gradient(ellipse 110% 160% at 82% 100%, rgba(251,191,36,0.22) 0%, transparent 62%)",
-		darkGlowAlt:
-			"radial-gradient(ellipse 90% 140% at 6% 0%, rgba(251,146,60,0.18) 0%, transparent 60%)",
-	},
-	primary: {
-		bg: "from-transparent via-primary-base/15 to-primary-base/25",
-		pattern: "text-primary-base/35",
-		darkGlow:
-			"radial-gradient(ellipse 110% 160% at 82% 100%, rgba(0,111,254,0.30) 0%, transparent 62%)",
-		darkGlowAlt:
-			"radial-gradient(ellipse 90% 140% at 6% 0%, rgba(56,189,248,0.20) 0%, transparent 60%)",
-	},
+type Rgb = [number, number, number];
+
+const ACCENT_RGB: Record<CtaAccentColor, { primary: Rgb; secondary: Rgb }> = {
+	blue: { primary: [56, 189, 248], secondary: [99, 102, 241] },
+	indigo: { primary: [129, 140, 248], secondary: [192, 132, 252] },
+	emerald: { primary: [52, 211, 153], secondary: [45, 212, 191] },
+	violet: { primary: [167, 139, 250], secondary: [232, 121, 249] },
+	amber: { primary: [251, 191, 36], secondary: [251, 146, 60] },
+	primary: { primary: [0, 111, 254], secondary: [56, 189, 248] },
 };
+
+function rgba(rgb: Rgb, alpha: number): string {
+	return `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${alpha})`;
+}
+
+function atmosphere(primary: Rgb, secondary: Rgb) {
+	return {
+		glow: `radial-gradient(ellipse 110% 160% at 82% 100%, ${rgba(primary, 0.3)} 0%, transparent 62%)`,
+		glowAlt: `radial-gradient(ellipse 90% 140% at 6% 0%, ${rgba(secondary, 0.22)} 0%, transparent 60%)`,
+		line: rgba(primary, 0.16),
+	};
+}
 
 function normalizeHex(hex: string): string {
 	return hex.replace("#", "").toUpperCase();
 }
 
-function hexToRgba(hex: string, alpha: number): string {
+function hexToRgb(hex: string): Rgb {
 	const h = normalizeHex(hex);
-	const r = Number.parseInt(h.slice(0, 2), 16);
-	const g = Number.parseInt(h.slice(2, 4), 16);
-	const b = Number.parseInt(h.slice(4, 6), 16);
-	return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+	return [
+		Number.parseInt(h.slice(0, 2), 16),
+		Number.parseInt(h.slice(2, 4), 16),
+		Number.parseInt(h.slice(4, 6), 16),
+	];
 }
 
 function isDimHex(hex: string): boolean {
-	const h = normalizeHex(hex);
-	if (h === "000000" || h === "000" || h === "111111" || h === "333333") {
+	const [r, g, b] = hexToRgb(hex);
+	if (normalizeHex(hex) === "000000" || normalizeHex(hex) === "000") {
 		return true;
 	}
-	if (h.length !== 6) return false;
-	const r = Number.parseInt(h.slice(0, 2), 16);
-	const g = Number.parseInt(h.slice(2, 4), 16);
-	const b = Number.parseInt(h.slice(4, 6), 16);
 	return (0.299 * r + 0.587 * g + 0.114 * b) / 255 < 0.25;
 }
 
-/** Dark-mode glows need a lift when the brand mark is black. */
-function glowHex(hex: string): string {
-	return isDimHex(hex) ? "D4D4D8" : normalizeHex(hex);
-}
-
-function brandAtmosphere(hex: string) {
-	const h = glowHex(hex);
-	return {
-		darkGlow: `radial-gradient(ellipse 110% 160% at 82% 100%, ${hexToRgba(h, 0.34)} 0%, transparent 62%)`,
-		darkGlowAlt: `radial-gradient(ellipse 90% 140% at 6% 0%, ${hexToRgba(h, 0.24)} 0%, transparent 60%)`,
-		darkLine: hexToRgba(h, 0.18),
-		lightGradient: `linear-gradient(to right, transparent 0%, ${hexToRgba(h, 0.18)} 45%, ${hexToRgba(h, 0.3)} 100%)`,
-		lightLine: hexToRgba(h, 0.28),
-	};
+/** Black brand marks need a lift so the bloom still reads. */
+function glowRgb(hex: string): Rgb {
+	return isDimHex(hex) ? [212, 212, 216] : hexToRgb(hex);
 }
 
 const CATEGORY_ACCENTS: Record<string, CtaAccentColor> = {
@@ -238,71 +187,34 @@ export function BlogCta({
 		accentColor ??
 		(category ? CATEGORY_ACCENTS[category] : undefined) ??
 		"blue";
-	const colorStyle = ACCENT_STYLES[resolvedAccent] ?? ACCENT_STYLES.blue;
-	const brand = accentHex ? brandAtmosphere(accentHex) : null;
+	const named = ACCENT_RGB[resolvedAccent] ?? ACCENT_RGB.blue;
+	const brandRgb = accentHex ? glowRgb(accentHex) : null;
+	const fx = atmosphere(brandRgb ?? named.primary, brandRgb ?? named.secondary);
+	const lineMask =
+		"radial-gradient(ellipse 85% 95% at 88% 110%, black 0%, transparent 68%), radial-gradient(ellipse 70% 90% at 4% -5%, black 0%, transparent 62%)";
 
 	return (
 		<section className="w-full">
 			<div className="relative overflow-hidden border-stroke-soft-200 border-t bg-bg-white-0 dark:border-white/10 dark:bg-black">
 				<div className="relative z-10 mx-auto flex w-full max-w-5xl flex-col items-center gap-6 border-stroke-soft-200 px-6 py-10 text-center sm:px-10 sm:py-12 md:max-w-7xl lg:flex-row lg:items-center lg:justify-between lg:px-12 lg:text-left xl:border-x dark:border-white/10">
-					{/* Light: tinted hatch on the right */}
 					<div
 						aria-hidden
-						className="pointer-events-none absolute top-0 right-0 bottom-0 z-0 w-full sm:w-7/12 dark:hidden"
-					>
-						<div
-							className={
-								brand ? "absolute inset-0" : `absolute inset-0 bg-gradient-to-r ${colorStyle.bg}`
-							}
-							style={{
-								backgroundImage: brand?.lightGradient,
-								maskImage:
-									"linear-gradient(to right, transparent 0%, black 35%, black 100%)",
-								WebkitMaskImage:
-									"linear-gradient(to right, transparent 0%, black 35%, black 100%)",
-							}}
-						/>
-						<div
-							className={
-								brand ? "absolute inset-0" : `absolute inset-0 ${colorStyle.pattern}`
-							}
-							style={{
-								backgroundImage: brand
-									? `repeating-linear-gradient(-45deg, transparent 0, transparent 2px, ${brand.lightLine} 2px, ${brand.lightLine} 2.8px)`
-									: "repeating-linear-gradient(-45deg, transparent 0, transparent 2px, currentColor 2px, currentColor 2.8px)",
-								maskImage:
-									"linear-gradient(to right, transparent 0%, black 30%, black 100%)",
-								WebkitMaskImage:
-									"linear-gradient(to right, transparent 0%, black 30%, black 100%)",
-							}}
-						/>
-					</div>
-
-					{/* Dark: brand blooms + lighter hatch, kept off the type */}
-					<div
-						aria-hidden
-						className="pointer-events-none absolute inset-0 z-0 hidden dark:block"
+						className="pointer-events-none absolute inset-0 z-0"
 					>
 						<div
 							className="absolute inset-0"
-							style={{
-								backgroundImage: brand?.darkGlow ?? colorStyle.darkGlow,
-							}}
+							style={{ backgroundImage: fx.glow }}
+						/>
+						<div
+							className="absolute inset-0"
+							style={{ backgroundImage: fx.glowAlt }}
 						/>
 						<div
 							className="absolute inset-0"
 							style={{
-								backgroundImage: brand?.darkGlowAlt ?? colorStyle.darkGlowAlt,
-							}}
-						/>
-						<div
-							className="absolute inset-0"
-							style={{
-								backgroundImage: `repeating-linear-gradient(-45deg, transparent 0, transparent 3px, ${brand?.darkLine ?? "rgba(255,255,255,0.08)"} 3px, ${brand?.darkLine ?? "rgba(255,255,255,0.08)"} 3.55px)`,
-								maskImage:
-									"radial-gradient(ellipse 85% 95% at 88% 110%, black 0%, transparent 68%), radial-gradient(ellipse 70% 90% at 4% -5%, black 0%, transparent 62%)",
-								WebkitMaskImage:
-									"radial-gradient(ellipse 85% 95% at 88% 110%, black 0%, transparent 68%), radial-gradient(ellipse 70% 90% at 4% -5%, black 0%, transparent 62%)",
+								backgroundImage: `repeating-linear-gradient(-45deg, transparent 0, transparent 3px, ${fx.line} 3px, ${fx.line} 3.55px)`,
+								maskImage: lineMask,
+								WebkitMaskImage: lineMask,
 							}}
 						/>
 					</div>
