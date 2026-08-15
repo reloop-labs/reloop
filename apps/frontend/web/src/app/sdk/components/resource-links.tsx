@@ -3,7 +3,7 @@ import { Icon } from "@reloop/ui/icon";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { getFramework, type FrameworkSlug } from "../frameworks";
-import type { LanguageSlug } from "../languages";
+import { getLanguage, type LanguageSlug } from "../languages";
 import { LanguageIcon } from "./language-icon";
 
 const GITHUB_SDK: Record<LanguageSlug, string> = {
@@ -86,163 +86,139 @@ function ShapesIcon({ className }: { className?: string }) {
 	);
 }
 
-type ResourceAccent = "blue" | "teal" | "orange";
+type Rgb = [number, number, number];
 
-const RESOURCE_CARD_ACCENTS: Record<
-	ResourceAccent,
-	{
-		wash: string;
-		glow: string;
-		hatch: string;
-		hatchImage: string;
-		hatchMask: string;
-		ringOuter: string;
-		ringInner: string;
-		ink: string;
-	}
-> = {
-	blue: {
-		wash: "bg-gradient-to-br from-sky-100/90 via-blue-50/70 to-indigo-100/80 dark:from-sky-950/40 dark:via-blue-950/30 dark:to-indigo-950/45",
-		glow: "bg-gradient-to-br from-blue-500/[0.16] via-sky-400/[0.10] to-indigo-500/[0.06] dark:from-blue-500/[0.20] dark:via-sky-400/[0.14] dark:to-indigo-500/[0.10]",
-		hatch: "text-sky-500/20 dark:text-sky-400/18",
-		hatchImage:
-			"repeating-linear-gradient(-45deg, transparent 0, transparent 2.5px, currentColor 2.5px, currentColor 3.1px)",
-		hatchMask:
-			"linear-gradient(to bottom right, black 0%, black 32%, transparent 68%)",
-		ringOuter: "text-sky-400/20 dark:text-sky-400/25",
-		ringInner: "text-blue-500/30 dark:text-sky-300/32",
-		ink: "group-hover:text-blue-600 dark:group-hover:text-sky-400",
-	},
-	teal: {
-		wash: "bg-gradient-to-br from-teal-100/90 via-cyan-50/70 to-emerald-100/70 dark:from-teal-950/40 dark:via-cyan-950/30 dark:to-emerald-950/40",
-		glow: "bg-gradient-to-br from-teal-500/[0.16] via-cyan-400/[0.10] to-emerald-500/[0.06] dark:from-teal-500/[0.20] dark:via-cyan-400/[0.14] dark:to-emerald-500/[0.10]",
-		hatch: "text-teal-500/20 dark:text-teal-400/18",
-		hatchImage:
-			"repeating-linear-gradient(-45deg, transparent 0, transparent 2.5px, currentColor 2.5px, currentColor 3.1px)",
-		hatchMask:
-			"linear-gradient(to bottom right, black 0%, black 32%, transparent 68%)",
-		ringOuter: "text-teal-400/20 dark:text-teal-400/25",
-		ringInner: "text-teal-500/30 dark:text-cyan-300/32",
-		ink: "group-hover:text-teal-600 dark:group-hover:text-teal-400",
-	},
-	orange: {
-		wash: "bg-gradient-to-bl from-orange-100/90 via-amber-50/70 to-yellow-100/70 dark:from-orange-950/40 dark:via-amber-950/30 dark:to-yellow-950/40",
-		glow: "bg-gradient-to-bl from-orange-500/[0.16] via-amber-400/[0.10] to-yellow-500/[0.06] dark:from-orange-500/[0.20] dark:via-amber-400/[0.14] dark:to-yellow-500/[0.10]",
-		hatch: "text-orange-500/20 dark:text-orange-400/18",
-		hatchImage:
-			"repeating-linear-gradient(45deg, transparent 0, transparent 2.5px, currentColor 2.5px, currentColor 3.1px)",
-		hatchMask:
-			"linear-gradient(to bottom left, black 0%, black 32%, transparent 68%)",
-		ringOuter: "text-orange-400/20 dark:text-orange-400/25",
-		ringInner: "text-orange-500/30 dark:text-amber-300/32",
-		ink: "group-hover:text-orange-600 dark:group-hover:text-orange-400",
-	},
+const NAMED_RGB: Record<"blue" | "teal" | "orange", Rgb> = {
+	blue: [56, 189, 248],
+	teal: [45, 212, 191],
+	orange: [251, 146, 60],
 };
+
+function hexToRgb(hex: string): Rgb {
+	const h = hex.replace("#", "");
+	return [
+		Number.parseInt(h.slice(0, 2), 16),
+		Number.parseInt(h.slice(2, 4), 16),
+		Number.parseInt(h.slice(4, 6), 16),
+	];
+}
+
+function isDimRgb([r, g, b]: Rgb): boolean {
+	return (0.299 * r + 0.587 * g + 0.114 * b) / 255 < 0.28;
+}
+
+function resolveRgb(hex?: string, fallback: Rgb = NAMED_RGB.blue): Rgb {
+	if (!hex) return fallback;
+	return hexToRgb(hex);
+}
+
+function rgba(rgb: Rgb, a: number): string {
+	return `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${a})`;
+}
 
 function ResourceCard({
 	href,
 	title,
 	external,
 	accent,
+	hex,
 	icon,
 }: {
 	href: string;
 	title: string;
 	external?: boolean;
-	accent: ResourceAccent;
+	accent: keyof typeof NAMED_RGB;
+	hex?: string;
 	icon: ReactNode;
 }) {
-	const theme = RESOURCE_CARD_ACCENTS[accent];
+	const brand = resolveRgb(hex, NAMED_RGB[accent]);
+	const dim = isDimRgb(brand);
+	// Light keeps the true brand (charcoal for black marks). Dark lifts black so the bloom reads.
+	const lightRgb: Rgb = dim ? [24, 24, 27] : brand;
+	const darkRgb: Rgb = dim ? [228, 228, 231] : brand;
+	const inkLight = `rgb(${lightRgb[0]}, ${lightRgb[1]}, ${lightRgb[2]})`;
+	const inkDark = `rgb(${darkRgb[0]}, ${darkRgb[1]}, ${darkRgb[2]})`;
+	const meshDark = [
+		`radial-gradient(ellipse 110% 85% at 14% 8%, ${rgba(darkRgb, 0.36)} 0%, transparent 58%)`,
+		`radial-gradient(ellipse 80% 70% at 100% 100%, ${rgba(darkRgb, 0.14)} 0%, transparent 52%)`,
+	].join(", ");
+	const meshLight = `radial-gradient(ellipse 80% 60% at 16% 12%, ${rgba(lightRgb, 0.16)} 0%, transparent 68%)`;
+
 	const className = cn(
-		"group relative flex h-full w-full max-w-[168px] min-h-[180px] flex-col justify-between overflow-hidden rounded-[18px] border border-stroke-soft-200/80 bg-bg-weak-50/50 p-4 transition-colors duration-300 sm:min-h-[200px] sm:p-5",
-		"dark:border-white/[0.08] dark:bg-white/[0.03]",
+		"group relative flex h-full w-full max-w-[168px] min-h-[180px] flex-col justify-between overflow-hidden rounded-[18px] border border-stroke-soft-200/80 bg-bg-white-0 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)] transition-[border-color,transform,color,box-shadow] duration-300 ease-out sm:min-h-[200px] sm:p-5",
+		"text-text-strong-950 dark:border-white/[0.08] dark:bg-white/[0.03] dark:text-white dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]",
+		"hover:border-[color:var(--card-ring)] hover:text-[var(--card-ink)] dark:hover:border-[color:var(--card-ring-dark)] dark:hover:text-[var(--card-ink-dark)] active:scale-[0.98]",
 	);
 
 	const content = (
 		<>
+			{/* Light: tight, quiet tint — no grain, no full-card fog */}
 			<div
 				aria-hidden
-				className={`pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100 ${theme.wash}`}
+				className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 ease-out group-hover:opacity-100 dark:hidden"
+				style={{ backgroundImage: meshLight }}
+			/>
+			{/* Dark: fuller lantern bloom */}
+			<div
+				aria-hidden
+				className="pointer-events-none absolute inset-0 hidden opacity-0 transition-opacity duration-300 ease-out group-hover:opacity-100 dark:block"
+				style={{ backgroundImage: meshDark }}
+			/>
+			{/* Grain is dark-only — on light it reads as cheap stipple */}
+			<div
+				aria-hidden
+				className="pointer-events-none absolute inset-0 hidden opacity-0 mix-blend-soft-light transition-opacity duration-300 ease-out group-hover:opacity-100 dark:block"
 				style={{
-					maskImage: theme.hatchMask,
-					WebkitMaskImage: theme.hatchMask,
+					backgroundImage:
+						"radial-gradient(rgba(255,255,255,0.22) 0.55px, transparent 0.55px)",
+					backgroundSize: "3px 3px",
+					maskImage:
+						"linear-gradient(to bottom, black 0%, black 45%, transparent 100%)",
+					WebkitMaskImage:
+						"linear-gradient(to bottom, black 0%, black 45%, transparent 100%)",
 				}}
 			/>
+			{/* Glass edge — dark only */}
 			<div
 				aria-hidden
-				className={`pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100 ${theme.hatch}`}
+				className="pointer-events-none absolute inset-x-4 top-0 hidden h-px opacity-0 transition-opacity duration-300 ease-out group-hover:opacity-100 dark:block"
 				style={{
-					backgroundImage: theme.hatchImage,
-					maskImage: theme.hatchMask,
-					WebkitMaskImage: theme.hatchMask,
+					background: `linear-gradient(90deg, transparent, ${rgba(darkRgb, 0.7)}, transparent)`,
 				}}
 			/>
 
 			<div className="relative z-10 flex shrink-0 items-start">
-				<div className="relative flex size-6 items-center justify-center sm:size-7">
-					<div
-						aria-hidden
-						className={`-translate-x-1/2 -translate-y-[51%] pointer-events-none absolute top-1/2 left-1/2 size-28 scale-90 rounded-full opacity-0 blur-2xl transition-all duration-500 group-hover:scale-125 group-hover:opacity-100 ${theme.glow}`}
-					/>
-					<svg
-						aria-hidden
-						className="-translate-x-1/2 -translate-y-[51%] pointer-events-none absolute top-1/2 left-1/2 size-[9.5rem] opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-						viewBox="0 0 160 160"
-						fill="none"
-					>
-						<g className={theme.ringOuter}>
-							<circle
-								cx="80"
-								cy="80"
-								r="72"
-								stroke="currentColor"
-								strokeWidth="0.75"
-								strokeDasharray="4 4"
-								fill="none"
-							/>
-							<circle
-								cx="80"
-								cy="80"
-								r="50"
-								stroke="currentColor"
-								strokeWidth="1"
-								fill="none"
-							/>
-						</g>
-						<g className={theme.ringInner}>
-							<circle
-								cx="80"
-								cy="80"
-								r="28"
-								stroke="currentColor"
-								strokeWidth="1.35"
-								strokeDasharray="0.01 4.5"
-								strokeLinecap="round"
-								fill="none"
-							/>
-						</g>
-					</svg>
+				<div className="relative flex size-9 items-center justify-center sm:size-10">
 					<span
-						className={cn(
-							"relative z-10 text-text-strong-950 transition-colors duration-300 dark:text-white",
-							theme.ink,
-						)}
-					>
-						{icon}
-					</span>
+						aria-hidden
+						className="absolute inset-0 rounded-xl opacity-0 blur-lg transition-opacity duration-300 ease-out group-hover:opacity-100 dark:hidden"
+						style={{ background: rgba(lightRgb, 0.28) }}
+					/>
+					<span
+						aria-hidden
+						className="absolute inset-0 hidden rounded-xl opacity-0 blur-xl transition-opacity duration-300 ease-out group-hover:opacity-100 dark:block"
+						style={{ background: rgba(darkRgb, 0.55) }}
+					/>
+					<span
+						aria-hidden
+						className="absolute inset-0 rounded-xl bg-bg-weak-50 shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)] transition-shadow duration-300 ease-out dark:bg-white/[0.03] dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.06)] group-hover:shadow-[inset_0_0_0_1px_var(--card-ring)]"
+					/>
+					<span className="relative z-10">{icon}</span>
 				</div>
 			</div>
 
-			<span
-				className={cn(
-					"relative z-10 min-w-0 font-medium text-[15px] text-text-strong-950 leading-snug tracking-[-0.01em] transition-colors duration-300 dark:text-white",
-					theme.ink,
-				)}
-			>
+			<span className="relative z-10 min-w-0 font-medium text-[15px] leading-snug tracking-[-0.01em]">
 				{title}
 			</span>
 		</>
 	);
+
+	const cardStyle = {
+		["--card-ink" as string]: inkLight,
+		["--card-ink-dark" as string]: inkDark,
+		["--card-ring" as string]: rgba(lightRgb, 0.28),
+		["--card-ring-dark" as string]: rgba(darkRgb, 0.4),
+	};
 
 	if (external) {
 		return (
@@ -251,6 +227,7 @@ function ResourceCard({
 				target="_blank"
 				rel="noreferrer"
 				className={className}
+				style={cardStyle}
 			>
 				{content}
 			</a>
@@ -258,7 +235,7 @@ function ResourceCard({
 	}
 
 	return (
-		<Link href={href} className={className}>
+		<Link href={href} className={className} style={cardStyle}>
 			{content}
 		</Link>
 	);
@@ -290,9 +267,9 @@ export function ResourceLinks({
 	variant?: "links" | "cards";
 }) {
 	if (variant === "cards") {
-		const frameworkIcon = frameworkSlug
-			? getFramework(frameworkSlug)?.icon
-			: undefined;
+		const framework = frameworkSlug ? getFramework(frameworkSlug) : undefined;
+		const language = getLanguage(languageSlug);
+		const frameworkIcon = framework?.icon;
 
 		return (
 			<div className={cn("flex flex-wrap gap-3 sm:gap-4", className)}>
@@ -301,11 +278,12 @@ export function ResourceLinks({
 					title={`${name} example`}
 					external
 					accent="blue"
+					hex={frameworkIcon?.hex}
 					icon={
 						frameworkIcon ? (
-							<LanguageIcon icon={frameworkIcon} className="size-6" />
+							<LanguageIcon icon={frameworkIcon} className="size-5" />
 						) : (
-							<Icon name="integration" fill="none" className="size-6" />
+							<Icon name="integration" fill="none" className="size-5" />
 						)
 					}
 				/>
@@ -313,14 +291,15 @@ export function ResourceLinks({
 					href="/docs/api"
 					title="API reference"
 					accent="teal"
-					icon={<ShapesIcon className="size-6" />}
+					icon={<ShapesIcon className="size-5" />}
 				/>
 				<ResourceCard
 					href={GITHUB_SDK[languageSlug]}
 					title={`${languageName} SDK`}
 					external
-					accent="orange"
-					icon={<Icon name="github" fill="currentColor" className="size-6" />}
+					accent="blue"
+					hex={language?.icon.hex}
+					icon={<Icon name="github" fill="currentColor" className="size-5" />}
 				/>
 			</div>
 		);
