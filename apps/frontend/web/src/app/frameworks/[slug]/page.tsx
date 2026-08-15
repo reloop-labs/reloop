@@ -34,6 +34,12 @@ export async function generateMetadata({
 	const title = `Send Email with ${framework.name} | Reloop`;
 	const description = `${framework.shortDescription} Step-by-step: install, set your API key, and send.`;
 	const url = `${getSiteUrl()}/frameworks/${framework.slug}`;
+	const ogImage = {
+		url: `${url}/opengraph-image`,
+		width: 1200,
+		height: 630,
+		alt: `${framework.name} | Reloop`,
+	};
 	return {
 		title,
 		description,
@@ -44,11 +50,13 @@ export async function generateMetadata({
 			type: "website",
 			url,
 			siteName: "Reloop",
+			images: [ogImage],
 		},
 		twitter: {
 			card: "summary_large_image",
 			title,
 			description,
+			images: [ogImage.url],
 		},
 		keywords: [
 			`${framework.name} email`,

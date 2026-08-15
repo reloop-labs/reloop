@@ -2,7 +2,11 @@ import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { ImageResponse } from "next/og";
 import { siNpm, siPnpm, siYarn } from "simple-icons";
-import { getLanguage } from "../languages";
+import {
+	type BrandIcon,
+	isCustomBrandIcon,
+} from "../../sdk/components/language-icon";
+import { getFramework } from "../../sdk/frameworks";
 
 export const alt = "Send email with Reloop";
 export const size = { width: 1200, height: 630 };
@@ -18,10 +22,10 @@ const INNER = "#09090b";
 const CODE = "rgba(245, 245, 244, 0.90)";
 
 const NODE_TABS = [
-	{ id: "npm", label: "npm", icon: siNpm },
-	{ id: "pnpm", label: "pnpm", icon: siPnpm },
-	{ id: "yarn", label: "yarn", icon: siYarn },
-	{ id: "bun", label: "bun", icon: null },
+	{ id: "npm", label: "npm", icon: siNpm, accent: "#CB3837" },
+	{ id: "pnpm", label: "pnpm", icon: siPnpm, accent: "#F69220" },
+	{ id: "yarn", label: "yarn", icon: siYarn, accent: "#2C8EBB" },
+	{ id: "bun", label: "bun", icon: null, accent: "#F472B6" },
 ] as const;
 
 function iconFill(hex: string): string {
@@ -292,25 +296,60 @@ function CopyIcon() {
 	);
 }
 
+function FrameworkGlyph({ icon }: { icon: BrandIcon }) {
+	if (isCustomBrandIcon(icon)) {
+		return (
+			<svg
+				width="44"
+				height="44"
+				viewBox={icon.viewBox}
+				fill="none"
+				xmlns="http://www.w3.org/2000/svg"
+			>
+				{icon.paths.map((p) => (
+					<path
+						key={`${p.fill}-${p.d.slice(0, 24)}`}
+						d={p.d}
+						fill={p.fill}
+						fillRule={p.fillRule}
+						clipRule={p.clipRule}
+					/>
+				))}
+			</svg>
+		);
+	}
+
+	return (
+		<svg
+			width="44"
+			height="44"
+			viewBox="0 0 24 24"
+			fill="none"
+			xmlns="http://www.w3.org/2000/svg"
+		>
+			<path d={icon.path} fill={iconFill(icon.hex)} />
+		</svg>
+	);
+}
+
 export default async function Image({
 	params,
 }: {
 	params: Promise<{ slug: string }>;
 }) {
 	const { slug } = await params;
-	const language = getLanguage(slug);
+	const framework = getFramework(slug);
 	const fonts = await loadFonts();
 
-	const name = language?.name ?? "SDKs";
+	const name = framework?.name ?? "Frameworks";
 	const description =
-		language?.shortDescription ??
-		"Official Reloop email SDKs for your language.";
-	const install = language?.installCommand ?? "npm install reloop-email";
-	const packageName = language?.packageName ?? "reloop-email";
-	const isNode = language?.slug === "nodejs";
-	const iconPath =
-		language && "path" in language.icon ? language.icon.path : "";
-	const brandFill = language ? iconFill(language.icon.hex) : "#ffffff";
+		framework?.shortDescription ??
+		"Send transactional email from your framework with Reloop.";
+	const install = framework?.installCommand ?? "npm install reloop-email";
+	const languageName = framework?.languageName ?? "SDK";
+	const isNode = framework?.languageSlug === "nodejs";
+	const activeTab = install.startsWith("bun") ? "bun" : "npm";
+	const titleSize = name.length > 12 ? 44 : 52;
 
 	return new ImageResponse(
 		<div
@@ -325,7 +364,6 @@ export default async function Image({
 				padding: "44px 56px 40px",
 			}}
 		>
-			{/* Page breadcrumb bar */}
 			<div
 				style={{
 					display: "flex",
@@ -364,6 +402,27 @@ export default async function Image({
 							fontWeight: 500,
 							letterSpacing: "0.14em",
 							textTransform: "uppercase",
+							color: FAINT,
+						}}
+					>
+						Frameworks
+					</span>
+					<span
+						style={{
+							marginLeft: "10px",
+							fontSize: "14px",
+							color: "rgba(255,255,255,0.22)",
+						}}
+					>
+						/
+					</span>
+					<span
+						style={{
+							marginLeft: "10px",
+							fontSize: "14px",
+							fontWeight: 500,
+							letterSpacing: "0.14em",
+							textTransform: "uppercase",
 							color: MUTED,
 						}}
 					>
@@ -379,11 +438,10 @@ export default async function Image({
 						color: FAINT,
 					}}
 				>
-					[{packageName}]
+					[{languageName} SDK]
 				</span>
 			</div>
 
-			{/* Header: icon left, title + description right */}
 			<div
 				style={{
 					display: "flex",
@@ -393,7 +451,7 @@ export default async function Image({
 					marginTop: "36px",
 				}}
 			>
-				{iconPath ? (
+				{framework ? (
 					<div
 						style={{
 							display: "flex",
@@ -408,15 +466,7 @@ export default async function Image({
 							marginRight: "24px",
 						}}
 					>
-						<svg
-							width="44"
-							height="44"
-							viewBox="0 0 24 24"
-							fill="none"
-							xmlns="http://www.w3.org/2000/svg"
-						>
-							<path d={iconPath} fill={brandFill} />
-						</svg>
+						<FrameworkGlyph icon={framework.icon} />
 					</div>
 				) : null}
 				<div
@@ -432,7 +482,7 @@ export default async function Image({
 							display: "flex",
 							alignItems: "center",
 							height: "88px",
-							fontSize: "52px",
+							fontSize: `${titleSize}px`,
 							fontWeight: 600,
 							letterSpacing: "-0.04em",
 							lineHeight: 1,
@@ -455,7 +505,6 @@ export default async function Image({
 				</div>
 			</div>
 
-			{/* Install window — same chrome as the page code UI */}
 			<div
 				style={{
 					display: "flex",
@@ -479,7 +528,7 @@ export default async function Image({
 					{isNode ? (
 						<div style={{ display: "flex", alignItems: "center" }}>
 							{NODE_TABS.map((tab) => {
-								const active = tab.id === "npm";
+								const active = tab.id === activeTab;
 								return (
 									<div
 										key={tab.id}
@@ -488,7 +537,7 @@ export default async function Image({
 											alignItems: "center",
 											padding: "14px 16px",
 											borderBottom: active
-												? "2px solid #CB3837"
+												? `2px solid ${tab.accent}`
 												: "2px solid transparent",
 										}}
 									>
