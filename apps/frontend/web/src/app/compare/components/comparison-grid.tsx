@@ -68,6 +68,12 @@ export function ComparisonBrandCards({
 						<div className="relative z-10 flex items-center justify-between gap-3.5">
 							<div className="flex min-w-0 flex-1 items-center gap-2.5 max-xl:gap-2">
 								<div className="flex shrink-0 items-center gap-1.5">
+									<div className="relative flex size-8 items-center justify-center overflow-hidden rounded-[28%] border border-stroke-soft-200/80 dark:border-white/10">
+										<Logo className="size-[135%]" />
+									</div>
+									<span className="font-mono text-[10px] text-text-sub-600 uppercase tracking-[0.12em] dark:text-white/40">
+										vs
+									</span>
 									<div className="relative flex size-8 items-center justify-center overflow-hidden rounded-[28%] border border-stroke-soft-200/80 p-1.5 dark:border-white/10">
 										<BrandIcon
 											icon={brand.icon}
@@ -77,12 +83,6 @@ export function ComparisonBrandCards({
 												dark && "text-text-strong-950 dark:text-white",
 											)}
 										/>
-									</div>
-									<span className="font-mono text-[10px] text-text-sub-600 uppercase tracking-[0.12em] dark:text-white/40">
-										vs
-									</span>
-									<div className="relative flex size-8 items-center justify-center overflow-hidden rounded-[28%] border border-stroke-soft-200/80 dark:border-white/10">
-										<Logo className="size-[135%]" />
 									</div>
 								</div>
 								<div className="flex min-w-0 flex-1 flex-col">
