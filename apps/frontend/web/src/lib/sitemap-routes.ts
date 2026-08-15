@@ -28,7 +28,7 @@ function collectStaticRoutes(dir: string, segments: string[] = []): string[] {
 	}
 
 	for (const entry of readdirSync(dir)) {
-		if (entry.startsWith(".") || entry === "api") continue;
+		if (entry.startsWith(".") || entry === "api" || entry === "twitter") continue;
 
 		const fullPath = join(dir, entry);
 		if (!statSync(fullPath).isDirectory()) continue;

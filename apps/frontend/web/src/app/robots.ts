@@ -8,7 +8,7 @@ export default function robots(): MetadataRoute.Robots {
 		rules: {
 			userAgent: "*",
 			allow: "/",
-			disallow: ["/api/", "/preferences/", "/redirect/"],
+			disallow: ["/api/", "/preferences/", "/redirect/", "/twitter"],
 		},
 		// Main site map + glossary-specific map for term pages
 		sitemap: [`${siteUrl}/sitemap.xml`, `${siteUrl}/glossary/sitemap.xml`],
