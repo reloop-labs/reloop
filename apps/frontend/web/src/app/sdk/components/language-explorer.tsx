@@ -541,6 +541,7 @@ export default function LanguageExplorer() {
 								name={activeDisplayName}
 								docsPath={activeFramework?.docsPath ?? active.docsPath}
 								frameworkSlug={activeFramework?.slug}
+								variant="cards"
 							/>
 						</StepItem>
 

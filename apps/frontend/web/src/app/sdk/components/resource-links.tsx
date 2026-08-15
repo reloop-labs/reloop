@@ -2,7 +2,7 @@ import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { getFramework, type FrameworkSlug } from "../frameworks";
+import { type FrameworkSlug, getFramework } from "../frameworks";
 import { getLanguage, type LanguageSlug } from "../languages";
 import { LanguageIcon } from "./language-icon";
 
@@ -145,9 +145,9 @@ function ResourceCard({
 	const meshLight = `radial-gradient(ellipse 80% 60% at 16% 12%, ${rgba(lightRgb, 0.16)} 0%, transparent 68%)`;
 
 	const className = cn(
-		"group relative flex h-full w-full max-w-[168px] min-h-[180px] flex-col justify-between overflow-hidden rounded-[18px] border border-stroke-soft-200/80 bg-bg-white-0 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)] transition-[border-color,transform,color,box-shadow] duration-300 ease-out sm:min-h-[200px] sm:p-5",
+		"group relative flex h-full min-h-[180px] w-full max-w-[154px] flex-col justify-between overflow-hidden rounded-[18px] border border-stroke-soft-200/80 bg-bg-white-0 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)] transition-[border-color,transform,color,box-shadow] duration-300 ease-out sm:min-h-[200px] sm:p-5",
 		"text-text-strong-950 dark:border-white/[0.08] dark:bg-white/[0.03] dark:text-white dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]",
-		"hover:border-[color:var(--card-ring)] hover:text-[var(--card-ink)] dark:hover:border-[color:var(--card-ring-dark)] dark:hover:text-[var(--card-ink-dark)] active:scale-[0.98]",
+		"hover:border-[color:var(--card-ring)] hover:text-[var(--card-ink)] active:scale-[0.98] dark:hover:border-[color:var(--card-ring-dark)] dark:hover:text-[var(--card-ink-dark)]",
 	);
 
 	const content = (
@@ -201,7 +201,7 @@ function ResourceCard({
 					/>
 					<span
 						aria-hidden
-						className="absolute inset-0 rounded-xl bg-bg-weak-50 shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)] transition-shadow duration-300 ease-out dark:bg-white/[0.03] dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.06)] group-hover:shadow-[inset_0_0_0_1px_var(--card-ring)]"
+						className="absolute inset-0 rounded-xl bg-bg-weak-50 shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)] transition-shadow duration-300 ease-out group-hover:shadow-[inset_0_0_0_1px_var(--card-ring)] dark:bg-white/[0.03] dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.06)]"
 					/>
 					<span className="relative z-10">{icon}</span>
 				</div>
