@@ -34,6 +34,74 @@ function iconFill(hex: string): string {
 	return luminance < 0.35 ? "#ffffff" : `#${clean}`;
 }
 
+/** Same bloom as BlogCta — lift black marks so the glow still reads. */
+function glowRgb(hex: string): [number, number, number] {
+	const clean = hex.replace("#", "");
+	if (clean.length !== 6) return [56, 189, 248];
+	const r = Number.parseInt(clean.slice(0, 2), 16);
+	const g = Number.parseInt(clean.slice(2, 4), 16);
+	const b = Number.parseInt(clean.slice(4, 6), 16);
+	if (
+		clean.toLowerCase() === "000000" ||
+		(0.299 * r + 0.587 * g + 0.114 * b) / 255 < 0.25
+	) {
+		return [212, 212, 216];
+	}
+	return [r, g, b];
+}
+
+function CtaAtmosphere({ hex }: { hex: string }) {
+	const [r, g, b] = glowRgb(hex);
+	return (
+		<div
+			style={{
+				position: "absolute",
+				top: 0,
+				left: 0,
+				width: "100%",
+				height: "100%",
+				display: "flex",
+			}}
+		>
+			<div
+				style={{
+					position: "absolute",
+					top: 0,
+					left: 0,
+					width: "100%",
+					height: "100%",
+					display: "flex",
+					backgroundImage: `radial-gradient(ellipse 110% 160% at 82% 100%, rgba(${r}, ${g}, ${b}, 0.3) 0%, transparent 62%)`,
+				}}
+			/>
+			<div
+				style={{
+					position: "absolute",
+					top: 0,
+					left: 0,
+					width: "100%",
+					height: "100%",
+					display: "flex",
+					backgroundImage: `radial-gradient(ellipse 90% 140% at 6% 0%, rgba(${r}, ${g}, ${b}, 0.22) 0%, transparent 60%)`,
+				}}
+			/>
+			<div
+				style={{
+					position: "absolute",
+					top: 0,
+					left: 0,
+					width: "100%",
+					height: "100%",
+					display: "flex",
+					backgroundImage: `repeating-linear-gradient(-45deg, transparent 0, transparent 3px, rgba(${r}, ${g}, ${b}, 0.16) 3px, rgba(${r}, ${g}, ${b}, 0.16) 3.55px)`,
+					maskImage:
+						"radial-gradient(ellipse 85% 95% at 88% 110%, black 0%, transparent 68%), radial-gradient(ellipse 70% 90% at 4% -5%, black 0%, transparent 62%)",
+				}}
+			/>
+		</div>
+	);
+}
+
 async function loadFonts() {
 	const candidates = [
 		join(process.cwd(), "public/font/openRunde"),
@@ -311,6 +379,7 @@ export default async function Image({
 	const iconPath =
 		language && "path" in language.icon ? language.icon.path : "";
 	const brandFill = language ? iconFill(language.icon.hex) : "#ffffff";
+	const accentHex = language?.icon.hex ?? "38BDF8";
 
 	return new ImageResponse(
 		<div
@@ -322,249 +391,262 @@ export default async function Image({
 				backgroundColor: BG,
 				fontFamily: "OpenRunde",
 				color: TEXT,
-				padding: "44px 56px 40px",
+				position: "relative",
+				overflow: "hidden",
 			}}
 		>
-			{/* Page breadcrumb bar */}
-			<div
-				style={{
-					display: "flex",
-					alignItems: "center",
-					justifyContent: "space-between",
-					width: "100%",
-				}}
-			>
-				<div style={{ display: "flex", alignItems: "center" }}>
-					<ReloopMark sizePx={36} />
-					<span
-						style={{
-							marginLeft: "14px",
-							fontSize: "14px",
-							fontWeight: 500,
-							letterSpacing: "0.14em",
-							textTransform: "uppercase",
-							color: FAINT,
-						}}
-					>
-						SDKs
-					</span>
-					<span
-						style={{
-							marginLeft: "10px",
-							fontSize: "14px",
-							color: "rgba(255,255,255,0.22)",
-						}}
-					>
-						/
-					</span>
-					<span
-						style={{
-							marginLeft: "10px",
-							fontSize: "14px",
-							fontWeight: 500,
-							letterSpacing: "0.14em",
-							textTransform: "uppercase",
-							color: MUTED,
-						}}
-					>
-						{name}
-					</span>
-				</div>
-				<span
-					style={{
-						fontSize: "14px",
-						fontWeight: 500,
-						letterSpacing: "0.12em",
-						textTransform: "uppercase",
-						color: FAINT,
-					}}
-				>
-					[{packageName}]
-				</span>
-			</div>
-
-			{/* Header: icon left, title + description right */}
-			<div
-				style={{
-					display: "flex",
-					flexDirection: "row",
-					alignItems: "flex-start",
-					width: "100%",
-					marginTop: "36px",
-				}}
-			>
-				{iconPath ? (
-					<div
-						style={{
-							display: "flex",
-							alignItems: "center",
-							justifyContent: "center",
-							width: "88px",
-							height: "88px",
-							borderRadius: "22px",
-							border: `1px solid ${LINE}`,
-							backgroundColor: "#0a0a0a",
-							flexShrink: 0,
-							marginRight: "24px",
-						}}
-					>
-						<svg
-							width="44"
-							height="44"
-							viewBox="0 0 24 24"
-							fill="none"
-							xmlns="http://www.w3.org/2000/svg"
-						>
-							<path d={iconPath} fill={brandFill} />
-						</svg>
-					</div>
-				) : null}
-				<div
-					style={{
-						display: "flex",
-						flexDirection: "column",
-						flex: 1,
-						minWidth: 0,
-					}}
-				>
-					<div
-						style={{
-							display: "flex",
-							alignItems: "center",
-							height: "88px",
-							fontSize: "52px",
-							fontWeight: 600,
-							letterSpacing: "-0.04em",
-							lineHeight: 1,
-						}}
-					>
-						{name}
-					</div>
-					<span
-						style={{
-							marginTop: "8px",
-							fontSize: "20px",
-							fontWeight: 400,
-							color: MUTED,
-							lineHeight: 1.45,
-							letterSpacing: "-0.015em",
-						}}
-					>
-						{description}
-					</span>
-				</div>
-			</div>
-
-			{/* Install window — same chrome as the page code UI */}
+			<CtaAtmosphere hex={accentHex} />
 			<div
 				style={{
 					display: "flex",
 					flexDirection: "column",
 					width: "100%",
-					marginTop: "40px",
-					backgroundColor: WINDOW,
-					border: `1px solid ${LINE}`,
-					borderRadius: "18px",
-					overflow: "hidden",
+					height: "100%",
+					padding: "44px 56px 40px",
+					position: "relative",
 				}}
 			>
+				{/* Page breadcrumb bar */}
 				<div
 					style={{
 						display: "flex",
 						alignItems: "center",
 						justifyContent: "space-between",
-						padding: isNode ? "0 16px 0 8px" : "12px 16px",
+						width: "100%",
 					}}
 				>
-					{isNode ? (
-						<div style={{ display: "flex", alignItems: "center" }}>
-							{NODE_TABS.map((tab) => {
-								const active = tab.id === "npm";
-								return (
-									<div
-										key={tab.id}
-										style={{
-											display: "flex",
-											alignItems: "center",
-											padding: "14px 16px",
-											borderBottom: active
-												? "2px solid #CB3837"
-												: "2px solid transparent",
-										}}
-									>
-										{tab.icon ? (
-											<svg
-												width="14"
-												height="14"
-												viewBox="0 0 24 24"
-												fill="none"
-												xmlns="http://www.w3.org/2000/svg"
-											>
-												<path d={tab.icon.path} fill={`#${tab.icon.hex}`} />
-											</svg>
-										) : (
-											<div
-												style={{
-													width: "10px",
-													height: "10px",
-													borderRadius: "99px",
-													backgroundColor: "#F472B6",
-												}}
-											/>
-										)}
-										<span
-											style={{
-												marginLeft: "8px",
-												fontSize: "15px",
-												fontWeight: 500,
-												color: active ? TEXT : "rgba(255,255,255,0.55)",
-											}}
-										>
-											{tab.label}
-										</span>
-									</div>
-								);
-							})}
-						</div>
-					) : (
-						<div style={{ display: "flex", alignItems: "center" }}>
-							<span
-								style={{
-									fontSize: "14px",
-									fontWeight: 500,
-									color: "rgba(255,255,255,0.5)",
-									letterSpacing: "0.02em",
-								}}
-							>
-								bash
-							</span>
-						</div>
-					)}
-					<CopyIcon />
+					<div style={{ display: "flex", alignItems: "center" }}>
+						<ReloopMark sizePx={36} />
+						<span
+							style={{
+								marginLeft: "14px",
+								fontSize: "14px",
+								fontWeight: 500,
+								letterSpacing: "0.14em",
+								textTransform: "uppercase",
+								color: FAINT,
+							}}
+						>
+							SDKs
+						</span>
+						<span
+							style={{
+								marginLeft: "10px",
+								fontSize: "14px",
+								color: "rgba(255,255,255,0.22)",
+							}}
+						>
+							/
+						</span>
+						<span
+							style={{
+								marginLeft: "10px",
+								fontSize: "14px",
+								fontWeight: 500,
+								letterSpacing: "0.14em",
+								textTransform: "uppercase",
+								color: MUTED,
+							}}
+						>
+							{name}
+						</span>
+					</div>
+					<span
+						style={{
+							fontSize: "14px",
+							fontWeight: 500,
+							letterSpacing: "0.12em",
+							textTransform: "uppercase",
+							color: FAINT,
+						}}
+					>
+						[{packageName}]
+					</span>
 				</div>
 
+				{/* Header: icon left, title + description right */}
 				<div
 					style={{
 						display: "flex",
-						alignItems: "center",
-						margin: "0 2px 2px",
-						backgroundColor: INNER,
-						border: "1px solid rgba(255,255,255,0.08)",
-						borderRadius: "16px",
-						padding: "22px 24px",
+						flexDirection: "row",
+						alignItems: "flex-start",
+						width: "100%",
+						marginTop: "36px",
 					}}
 				>
-					<span
+					{iconPath ? (
+						<div
+							style={{
+								display: "flex",
+								alignItems: "center",
+								justifyContent: "center",
+								width: "88px",
+								height: "88px",
+								borderRadius: "22px",
+								border: `1px solid ${LINE}`,
+								backgroundColor: "#0a0a0a",
+								flexShrink: 0,
+								marginRight: "24px",
+							}}
+						>
+							<svg
+								width="44"
+								height="44"
+								viewBox="0 0 24 24"
+								fill="none"
+								xmlns="http://www.w3.org/2000/svg"
+							>
+								<path d={iconPath} fill={brandFill} />
+							</svg>
+						</div>
+					) : null}
+					<div
 						style={{
-							fontSize: "22px",
-							fontWeight: 500,
-							color: CODE,
-							letterSpacing: "-0.015em",
-							whiteSpace: "pre",
+							display: "flex",
+							flexDirection: "column",
+							flex: 1,
+							minWidth: 0,
 						}}
 					>
-						{install.replaceAll(" ", "\u00A0")}
-					</span>
+						<div
+							style={{
+								display: "flex",
+								alignItems: "center",
+								height: "88px",
+								fontSize: "52px",
+								fontWeight: 600,
+								letterSpacing: "-0.04em",
+								lineHeight: 1,
+							}}
+						>
+							{name}
+						</div>
+						<span
+							style={{
+								marginTop: "8px",
+								fontSize: "20px",
+								fontWeight: 400,
+								color: MUTED,
+								lineHeight: 1.45,
+								letterSpacing: "-0.015em",
+							}}
+						>
+							{description}
+						</span>
+					</div>
+				</div>
+
+				{/* Install window — same chrome as the page code UI */}
+				<div
+					style={{
+						display: "flex",
+						flexDirection: "column",
+						width: "100%",
+						marginTop: "40px",
+						backgroundColor: WINDOW,
+						border: `1px solid ${LINE}`,
+						borderRadius: "18px",
+						overflow: "hidden",
+					}}
+				>
+					<div
+						style={{
+							display: "flex",
+							alignItems: "center",
+							justifyContent: "space-between",
+							padding: isNode ? "0 16px 0 8px" : "12px 16px",
+						}}
+					>
+						{isNode ? (
+							<div style={{ display: "flex", alignItems: "center" }}>
+								{NODE_TABS.map((tab) => {
+									const active = tab.id === "npm";
+									return (
+										<div
+											key={tab.id}
+											style={{
+												display: "flex",
+												alignItems: "center",
+												padding: "14px 16px",
+												borderBottom: active
+													? "2px solid #CB3837"
+													: "2px solid transparent",
+											}}
+										>
+											{tab.icon ? (
+												<svg
+													width="14"
+													height="14"
+													viewBox="0 0 24 24"
+													fill="none"
+													xmlns="http://www.w3.org/2000/svg"
+												>
+													<path d={tab.icon.path} fill={`#${tab.icon.hex}`} />
+												</svg>
+											) : (
+												<div
+													style={{
+														width: "10px",
+														height: "10px",
+														borderRadius: "99px",
+														backgroundColor: "#F472B6",
+													}}
+												/>
+											)}
+											<span
+												style={{
+													marginLeft: "8px",
+													fontSize: "15px",
+													fontWeight: 500,
+													color: active ? TEXT : "rgba(255,255,255,0.55)",
+												}}
+											>
+												{tab.label}
+											</span>
+										</div>
+									);
+								})}
+							</div>
+						) : (
+							<div style={{ display: "flex", alignItems: "center" }}>
+								<span
+									style={{
+										fontSize: "14px",
+										fontWeight: 500,
+										color: "rgba(255,255,255,0.5)",
+										letterSpacing: "0.02em",
+									}}
+								>
+									bash
+								</span>
+							</div>
+						)}
+						<CopyIcon />
+					</div>
+
+					<div
+						style={{
+							display: "flex",
+							alignItems: "center",
+							margin: "0 2px 2px",
+							backgroundColor: INNER,
+							border: "1px solid rgba(255,255,255,0.08)",
+							borderRadius: "16px",
+							padding: "22px 24px",
+						}}
+					>
+						<span
+							style={{
+								fontSize: "22px",
+								fontWeight: 500,
+								color: CODE,
+								letterSpacing: "-0.015em",
+								whiteSpace: "pre",
+							}}
+						>
+							{install.replaceAll(" ", "\u00A0")}
+						</span>
+					</div>
 				</div>
 			</div>
 		</div>,
