@@ -1,0 +1,47 @@
+import { Elysia } from "elysia";
+
+export const landingRoute = new Elysia().get(
+	"/",
+	async () => {
+		return `
+╔══════════════════════════════════════════════════════════════════════╗
+║                             TOOL SERVICE                             ║
+╠══════════════════════════════════════════════════════════════════════╣
+║                                                                      ║
+║  ████████╗ ██████╗  ██████╗ ██╗                                      ║
+║  ╚══██╔══╝██╔═══██╗██╔═══██╗██║                                      ║
+║     ██║   ██║   ██║██║   ██║██║                                      ║
+║     ██║   ██║   ██║██║   ██║██║                                      ║
+║     ██║   ╚██████╔╝╚██████╔╝███████╗                                 ║
+║     ╚═╝    ╚═════╝  ╚═════╝ ╚══════╝                                 ║
+║                                                                      ║
+║                          ONLINE & READY                              ║
+║                         Version: v1.0.0                              ║
+║                                                                      ║
+╠══════════════════════════════════════════════════════════════════════╣
+║                                                                      ║
+║ 📚 Docs: https://reloop.sh/docs/setup/backend/tool                   ║
+║ 🤖 Discovery: https://reloop.sh/api/tool/agent-card.json             ║
+║ 📖 OpenAPI: https://reloop.sh/api/tool/openapi                       ║
+║ 🧪 Try it: https://reloop.sh/tools/temp-email-checker                ║
+║ 🐙 GitHub: https://github.com/reloop-labs/reloop                     ║
+║ 🆘 Support: https://reloop.sh/support                                ║
+║ 💬 Discord: https://discord.gg/bHnkBcp7xR                            ║
+║ 🐦 Twitter: https://x.com/reloophq                                   ║
+║                                                                      ║
+╠══════════════════════════════════════════════════════════════════════╣
+║                                                                      ║
+║  "Checked and discarded — nothing kept."                             ║
+║                - Your Reloop Team                                    ║
+║                                                                      ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+
+    Powered by ☕ Coffee, 🍕 Pizza & 💻 Late Night Coding
+
+                Made with ❤️ for developers
+
+`;
+	},
+	{ detail: { hide: true } },
+);

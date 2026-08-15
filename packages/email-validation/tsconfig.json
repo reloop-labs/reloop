@@ -1,0 +1,13 @@
+{
+	"extends": "@reloop/tsconfig/base.json",
+	"compilerOptions": {
+		"target": "ESNext",
+		"module": "ESNext",
+		"moduleResolution": "bundler",
+		"verbatimModuleSyntax": true,
+		"noEmit": true,
+		"strict": true
+	},
+	"include": ["src/**/*", "test/**/*", "scripts/**/*"],
+	"exclude": ["node_modules", "dist"]
+}

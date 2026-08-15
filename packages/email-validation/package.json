@@ -1,0 +1,22 @@
+{
+	"name": "@reloop/email-validation",
+	"version": "0.1.0",
+	"private": true,
+	"type": "module",
+	"exports": {
+		".": "./src/index.ts"
+	},
+	"scripts": {
+		"typecheck": "tsc --noEmit",
+		"test": "bun test",
+		"lint": "biome check .",
+		"fix-lint": "biome check --fix .",
+		"refresh": "bun run scripts/refresh-catalogue.ts"
+	},
+	"devDependencies": {
+		"@reloop/tsconfig": "workspace:*",
+		"@types/bun": "catalog:backend",
+		"@types/node": "catalog:",
+		"typescript": "catalog:"
+	}
+}

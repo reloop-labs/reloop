@@ -466,6 +466,31 @@
         "typescript": "catalog:",
       },
     },
+    "apps/backend/tool": {
+      "name": "be-tool",
+      "version": "1.0.0",
+      "dependencies": {
+        "@elysia/opentelemetry": "catalog:backend",
+        "@elysiajs/cors": "catalog:backend",
+        "@elysiajs/openapi": "catalog:backend",
+        "@elysiajs/server-timing": "catalog:backend",
+        "@opentelemetry/exporter-trace-otlp-http": "catalog:backend",
+        "@opentelemetry/exporter-trace-otlp-proto": "catalog:backend",
+        "@opentelemetry/sdk-trace-node": "catalog:backend",
+        "@reloop/auth": "workspace:*",
+        "@reloop/cache": "workspace:*",
+        "@reloop/email-validation": "workspace:*",
+        "dotenv": "catalog:backend",
+        "elysia": "catalog:backend",
+        "evlog": "catalog:backend",
+      },
+      "devDependencies": {
+        "@reloop/tsconfig": "workspace:*",
+        "@types/bun": "catalog:backend",
+        "tsdown": "catalog:backend",
+        "typescript": "catalog:",
+      },
+    },
     "apps/backend/upload": {
       "name": "be-upload",
       "dependencies": {
@@ -926,6 +951,16 @@
         "dotenv-cli": "catalog:db",
         "drizzle-kit": "catalog:db",
         "shx": "catalog:db",
+        "typescript": "catalog:",
+      },
+    },
+    "packages/email-validation": {
+      "name": "@reloop/email-validation",
+      "version": "0.1.0",
+      "devDependencies": {
+        "@reloop/tsconfig": "workspace:*",
+        "@types/bun": "catalog:backend",
+        "@types/node": "catalog:",
         "typescript": "catalog:",
       },
     },
@@ -2141,6 +2176,8 @@
 
     "@reloop/db": ["@reloop/db@workspace:packages/db"],
 
+    "@reloop/email-validation": ["@reloop/email-validation@workspace:packages/email-validation"],
+
     "@reloop/pricing": ["@reloop/pricing@workspace:packages/pricing"],
 
     "@reloop/tailwind": ["@reloop/tailwind@workspace:packages/tailwind"],
@@ -2764,6 +2801,8 @@
     "be-spam": ["be-spam@workspace:apps/backend/spam"],
 
     "be-template": ["be-template@workspace:apps/backend/template"],
+
+    "be-tool": ["be-tool@workspace:apps/backend/tool"],
 
     "be-upload": ["be-upload@workspace:apps/backend/upload"],
 

@@ -1,0 +1,5 @@
+# Suffixes matching the base domain and every subdomain: *.foo.example covers
+# foo.example and a.b.foo.example. The `*.` prefix is optional.
+#
+# A wrong entry blocks every real customer under that suffix, so only add a
+# family whose parent domain has no legitimate mailboxes of its own.

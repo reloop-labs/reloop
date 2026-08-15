@@ -1,0 +1,10 @@
+# Domains we never flag as disposable, even if upstream sources list them.
+# This file overrides data/domains.txt — see CONTRIBUTING.md.
+#
+# RFC-2606 reserved second-level domains (reserved for documentation and
+# testing — must never resolve to a real mailbox, but some upstream lists
+# include them anyway).
+example.com
+example.edu
+example.net
+example.org

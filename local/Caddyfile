@@ -116,6 +116,13 @@ local.reloop.sh, *.local.reloop.sh {
             header_up X-Forwarded-For {remote}
         }
     }
+    handle /api/tool* {
+        reverse_proxy host.docker.internal:8026 {
+            header_up Host {host}
+            header_up X-Forwarded-Proto {scheme}
+            header_up X-Forwarded-For {remote}
+        }
+    }
     handle /api/inbox* {
         reverse_proxy host.docker.internal:8021 {
             header_up Host {host}
