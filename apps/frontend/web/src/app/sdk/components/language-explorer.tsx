@@ -351,7 +351,7 @@ export default function LanguageExplorer() {
 								ref={setFwContainerEl}
 								role="tablist"
 								aria-label={`${active.name} options`}
-								className="relative flex w-full flex-col"
+								className="relative ml-3 flex w-full flex-col"
 								onPointerLeave={() => setHoveredFwEl(undefined)}
 							>
 								<button
@@ -475,7 +475,7 @@ export default function LanguageExplorer() {
 							<div className="flex w-full flex-col">
 								<a
 									href="/dashboard/api-keys/create"
-									className="group flex h-8 w-full items-center gap-2.5 rounded-lg px-2.5 font-medium text-[13px] text-text-sub-600 transition-colors hover:bg-black/[0.04] hover:text-text-strong-950 dark:text-white/60 dark:hover:!bg-[#0A0A0A] dark:hover:text-white"
+									className="group dark:hover:!bg-[#0A0A0A] flex h-8 w-full items-center gap-2.5 rounded-lg px-2.5 font-medium text-[13px] text-text-sub-600 transition-colors hover:bg-black/[0.04] hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white"
 								>
 									<span className="flex size-4 shrink-0 items-center justify-center text-text-sub-600 group-hover:text-text-strong-950 dark:text-white/60 dark:group-hover:text-white">
 										<Icon
@@ -488,7 +488,7 @@ export default function LanguageExplorer() {
 								</a>
 								<a
 									href="/dashboard/domain/add"
-									className="group flex h-8 w-full items-center gap-2.5 rounded-lg px-2.5 font-medium text-[13px] text-text-sub-600 transition-colors hover:bg-black/[0.04] hover:text-text-strong-950 dark:text-white/60 dark:hover:!bg-[#0A0A0A] dark:hover:text-white"
+									className="group dark:hover:!bg-[#0A0A0A] flex h-8 w-full items-center gap-2.5 rounded-lg px-2.5 font-medium text-[13px] text-text-sub-600 transition-colors hover:bg-black/[0.04] hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white"
 								>
 									<span className="flex size-4 shrink-0 items-center justify-center text-text-sub-600 group-hover:text-text-strong-950 dark:text-white/60 dark:group-hover:text-white">
 										<Icon
