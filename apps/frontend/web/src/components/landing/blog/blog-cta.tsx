@@ -80,30 +80,63 @@ export type CtaAccentColor =
 	| "amber"
 	| "primary";
 
-const ACCENT_STYLES: Record<CtaAccentColor, { bg: string; pattern: string }> = {
+const ACCENT_STYLES: Record<
+	CtaAccentColor,
+	{
+		bg: string;
+		pattern: string;
+		/** Soft blooms used only in dark mode — no hatch through the type */
+		darkGlow: string;
+		darkGlowAlt: string;
+	}
+> = {
 	blue: {
-		bg: "from-transparent via-sky-100/75 to-blue-100/90 dark:via-sky-950/40 dark:to-blue-950/50",
-		pattern: "text-sky-500/35 dark:text-sky-400/40",
+		bg: "from-transparent via-sky-100/75 to-blue-100/90",
+		pattern: "text-sky-500/35",
+		darkGlow:
+			"radial-gradient(ellipse 110% 160% at 82% 100%, rgba(56,189,248,0.28) 0%, transparent 62%)",
+		darkGlowAlt:
+			"radial-gradient(ellipse 90% 140% at 6% 0%, rgba(99,102,241,0.22) 0%, transparent 60%)",
 	},
 	indigo: {
-		bg: "from-transparent via-indigo-100/75 to-purple-100/90 dark:via-indigo-950/40 dark:to-purple-950/50",
-		pattern: "text-indigo-500/35 dark:text-indigo-400/40",
+		bg: "from-transparent via-indigo-100/75 to-purple-100/90",
+		pattern: "text-indigo-500/35",
+		darkGlow:
+			"radial-gradient(ellipse 110% 160% at 82% 100%, rgba(129,140,248,0.28) 0%, transparent 62%)",
+		darkGlowAlt:
+			"radial-gradient(ellipse 90% 140% at 6% 0%, rgba(192,132,252,0.22) 0%, transparent 60%)",
 	},
 	emerald: {
-		bg: "from-transparent via-emerald-100/75 to-teal-100/90 dark:via-emerald-950/40 dark:to-teal-950/50",
-		pattern: "text-emerald-500/35 dark:text-emerald-400/40",
+		bg: "from-transparent via-emerald-100/75 to-teal-100/90",
+		pattern: "text-emerald-500/35",
+		darkGlow:
+			"radial-gradient(ellipse 110% 160% at 82% 100%, rgba(52,211,153,0.24) 0%, transparent 62%)",
+		darkGlowAlt:
+			"radial-gradient(ellipse 90% 140% at 6% 0%, rgba(45,212,191,0.18) 0%, transparent 60%)",
 	},
 	violet: {
-		bg: "from-transparent via-violet-100/75 to-fuchsia-100/90 dark:via-violet-950/40 dark:to-fuchsia-950/50",
-		pattern: "text-violet-500/35 dark:text-violet-400/40",
+		bg: "from-transparent via-violet-100/75 to-fuchsia-100/90",
+		pattern: "text-violet-500/35",
+		darkGlow:
+			"radial-gradient(ellipse 110% 160% at 82% 100%, rgba(167,139,250,0.28) 0%, transparent 62%)",
+		darkGlowAlt:
+			"radial-gradient(ellipse 90% 140% at 6% 0%, rgba(232,121,249,0.20) 0%, transparent 60%)",
 	},
 	amber: {
-		bg: "from-transparent via-amber-100/75 to-orange-100/90 dark:via-amber-950/40 dark:to-orange-950/50",
-		pattern: "text-amber-500/35 dark:text-amber-400/40",
+		bg: "from-transparent via-amber-100/75 to-orange-100/90",
+		pattern: "text-amber-500/35",
+		darkGlow:
+			"radial-gradient(ellipse 110% 160% at 82% 100%, rgba(251,191,36,0.22) 0%, transparent 62%)",
+		darkGlowAlt:
+			"radial-gradient(ellipse 90% 140% at 6% 0%, rgba(251,146,60,0.18) 0%, transparent 60%)",
 	},
 	primary: {
-		bg: "from-transparent via-primary-base/15 to-primary-base/25 dark:via-primary-base/20 dark:to-primary-base/30",
-		pattern: "text-primary-base/35 dark:text-primary-base/40",
+		bg: "from-transparent via-primary-base/15 to-primary-base/25",
+		pattern: "text-primary-base/35",
+		darkGlow:
+			"radial-gradient(ellipse 110% 160% at 82% 100%, rgba(0,111,254,0.30) 0%, transparent 62%)",
+		darkGlowAlt:
+			"radial-gradient(ellipse 90% 140% at 6% 0%, rgba(56,189,248,0.20) 0%, transparent 60%)",
 	},
 };
 
@@ -168,12 +201,11 @@ export function BlogCta({
 		<section className="w-full">
 			<div className="relative overflow-hidden border-stroke-soft-200 border-t bg-bg-white-0 dark:border-white/10 dark:bg-black">
 				<div className="relative z-10 mx-auto flex w-full max-w-5xl flex-col items-center gap-6 border-stroke-soft-200 px-6 py-10 text-center sm:px-10 sm:py-12 md:max-w-7xl lg:flex-row lg:items-center lg:justify-between lg:px-12 lg:text-left xl:border-x dark:border-white/10">
-					{/* Background color gradient fill & diagonal hatch pattern */}
+					{/* Light: tinted hatch on the right (hidden in dark — stripes kill contrast) */}
 					<div
 						aria-hidden
-						className="pointer-events-none absolute top-0 right-0 bottom-0 z-0 w-full sm:w-7/12"
+						className="pointer-events-none absolute top-0 right-0 bottom-0 z-0 w-full sm:w-7/12 dark:hidden"
 					>
-						{/* Soft background color tint gradient */}
 						<div
 							className={`absolute inset-0 bg-gradient-to-r ${colorStyle.bg}`}
 							style={{
@@ -183,7 +215,6 @@ export function BlogCta({
 									"linear-gradient(to right, transparent 0%, black 35%, black 100%)",
 							}}
 						/>
-						{/* Diagonal hatch lines */}
 						<div
 							className={`absolute inset-0 ${colorStyle.pattern}`}
 							style={{
@@ -197,11 +228,38 @@ export function BlogCta({
 						/>
 					</div>
 
+					{/* Dark: quiet blooms + a faint speckle, kept off the type */}
+					<div
+						aria-hidden
+						className="pointer-events-none absolute inset-0 z-0 hidden dark:block"
+					>
+						<div
+							className="absolute inset-0"
+							style={{ backgroundImage: colorStyle.darkGlow }}
+						/>
+						<div
+							className="absolute inset-0"
+							style={{ backgroundImage: colorStyle.darkGlowAlt }}
+						/>
+						<div
+							className="absolute inset-0 text-white/[0.07]"
+							style={{
+								backgroundImage:
+									"radial-gradient(circle, currentColor 0.55px, transparent 0.6px)",
+								backgroundSize: "18px 18px",
+								maskImage:
+									"radial-gradient(ellipse 75% 70% at 80% 100%, black 0%, transparent 68%)",
+								WebkitMaskImage:
+									"radial-gradient(ellipse 75% 70% at 80% 100%, black 0%, transparent 68%)",
+							}}
+						/>
+					</div>
+
 					<div className="relative z-10 max-w-3xl">
 						<h2 className="font-semibold text-text-strong-950 text-xl text-balance leading-snug tracking-tight sm:text-2xl lg:text-[1.65rem] dark:text-white">
 							{variant.headline}
 						</h2>
-						<p className="mt-3 max-w-xl text-[14px] text-balance text-text-sub-600 leading-relaxed sm:text-[14.5px] dark:text-white/60">
+						<p className="mt-3 max-w-xl text-[14px] text-balance text-text-sub-600 leading-relaxed sm:text-[14.5px] dark:text-white/70">
 							{variant.sub}
 						</p>
 					</div>
