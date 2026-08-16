@@ -1,5 +1,6 @@
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
+import { CopyableDnsValue } from "./copyable-dns-value";
 import type { DemoDnsRecord } from "./data";
 import { getStatusColorClass, getStatusIcon, getStatusLabel } from "./status";
 
@@ -73,14 +74,10 @@ export function DnsRecordTable({
 							</span>
 						</div>
 						<div className="flex min-w-0 items-center">
-							<span className="truncate font-medium text-label-sm text-text-strong-950">
-								{record.name}
-							</span>
+							<CopyableDnsValue value={record.name} />
 						</div>
 						<div className="flex min-w-0 items-center">
-							<span className="truncate font-mono text-label-sm text-text-sub-600">
-								{record.value}
-							</span>
+							<CopyableDnsValue value={record.value} mono />
 						</div>
 						<div className="flex items-center">
 							<span className="text-label-sm text-text-sub-600">
