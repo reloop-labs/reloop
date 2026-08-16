@@ -7,6 +7,8 @@ export type EmailStatsResponse = {
 	delivered: number[];
 	bounced: number[];
 	complaint: number[];
+	opened?: number[];
+	unsubscribed?: number[];
 	rate: number[];
 	bounceBreakdown?: {
 		transient: number[];

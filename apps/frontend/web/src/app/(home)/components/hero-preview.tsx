@@ -1,14 +1,20 @@
 import { Logo } from "@reloop/ui/logo";
 import type { ReactNode } from "react";
+import { HeroAnalyticsPreview } from "./hero-analytics-preview";
 
-export type HeroTabId = "api" | "dashboard" | "sdk" | "cloud" | "agents";
+export type HeroTabId =
+	| "analytics"
+	| "dashboard"
+	| "sdk"
+	| "cloud"
+	| "agents";
 
 export function HeroPreview({ tab }: { tab: HeroTabId }) {
 	return (
 		<div className="flex h-full flex-col" aria-hidden>
 			<PreviewChrome />
 			<div className="min-h-0 flex-1 overflow-hidden">
-				{tab === "api" && <ApiPanel />}
+				{tab === "analytics" && <HeroAnalyticsPreview />}
 				{tab === "dashboard" && <DashboardPanel />}
 				{tab === "sdk" && <SdkPanel />}
 				{tab === "cloud" && <CloudPanel />}
@@ -270,34 +276,6 @@ function DashboardPanel() {
 	);
 }
 
-function ApiPanel() {
-	return (
-		<div className="grid h-full lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)]">
-			<div className="border-stroke-soft-200 border-b p-5 font-mono text-[12px] leading-6 sm:p-6 lg:border-r lg:border-b-0 dark:border-white/10">
-				<p className="text-text-soft-400 dark:text-white/35">POST /v1/emails</p>
-				<pre className="mt-4 overflow-hidden whitespace-pre-wrap text-text-sub-600 dark:text-white/60">{`{
-  "from": "hello@mail.acme.com",
-  "to": ["alex@northwind.io"],
-  "subject": "Your invoice is ready",
-  "template": "invoice-ready",
-  "data": { "amount": "$240.00" }
-}`}</pre>
-			</div>
-			<div className="p-5 sm:p-6">
-				<p className="font-medium text-[13px] text-text-strong-950 dark:text-white">
-					Delivery
-				</p>
-				<div className="mt-4 space-y-3">
-					<Step done label="Accepted" detail="12ms" />
-					<Step done label="Authenticated" detail="SPF · DKIM · DMARC" />
-					<Step done label="Delivered" detail="inbox · 1.4s" />
-					<Step label="Opened" detail="waiting" />
-				</div>
-			</div>
-		</div>
-	);
-}
-
 function SdkPanel() {
 	return (
 		<div className="p-5 sm:p-6">
@@ -450,32 +428,6 @@ function EmailRow({
 			<span className="w-8 text-right text-[12px] text-text-soft-400 dark:text-white/35">
 				{time}
 			</span>
-		</div>
-	);
-}
-
-function Step({
-	label,
-	detail,
-	done,
-}: {
-	label: string;
-	detail: string;
-	done?: boolean;
-}) {
-	return (
-		<div className="flex items-center justify-between text-[13px]">
-			<span className="flex items-center gap-2 text-text-strong-950 dark:text-white">
-				<span
-					className={
-						done
-							? "size-1.5 rounded-full bg-emerald-500"
-							: "size-1.5 rounded-full bg-stroke-soft-200 dark:bg-white/15"
-					}
-				/>
-				{label}
-			</span>
-			<span className="text-text-soft-400 dark:text-white/40">{detail}</span>
 		</div>
 	);
 }

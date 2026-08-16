@@ -11,7 +11,7 @@ const SCENES = [
 		nav: "Send transactional",
 		title: "Receipts and resets that actually arrive.",
 		body: "One API, one SMTP relay. Same payload from Node, Python, or a cron on the box.",
-		preview: "api" as HeroTabId,
+		preview: "dashboard" as HeroTabId,
 	},
 	{
 		id: "deliver",
@@ -25,7 +25,7 @@ const SCENES = [
 		nav: "Receive inbound",
 		title: "Mail hits your domain. Your app gets the payload.",
 		body: "Parse the body, pull the attachments, POST a webhook. No extra inbox to babysit.",
-		preview: "api" as HeroTabId,
+		preview: "dashboard" as HeroTabId,
 	},
 	{
 		id: "agents",
@@ -39,7 +39,7 @@ const SCENES = [
 		nav: "Watch every send",
 		title: "Opens, clicks, bounces — as they happen.",
 		body: "A live console for the mail you just sent. No waiting on a daily dump.",
-		preview: "dashboard" as HeroTabId,
+		preview: "analytics" as HeroTabId,
 	},
 ] as const;
 

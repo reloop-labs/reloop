@@ -18,18 +18,18 @@ const TABS: {
 		title: string;
 		description: string;
 		href: string;
-		icon: "mail-receive" | "layout" | "book-open" | "server" | "headset";
+		icon: "activity" | "layout" | "book-open" | "server" | "headset";
 	};
 }[] = [
 	{
-		id: "api",
-		title: "API",
-		description: "Send, receive, and route email for any use case.",
+		id: "analytics",
+		title: "Analytics",
+		description: "Deliverability and engagement for every send.",
 		banner: {
-			title: "Email API",
-			description: "Send, receive, and route email for any use case.",
-			href: "/docs/api",
-			icon: "mail-receive",
+			title: "Analytics",
+			description: "Deliverability and engagement for every send.",
+			href: "/docs/learn/metrics",
+			icon: "activity",
 		},
 	},
 	{
@@ -83,7 +83,7 @@ const TABS: {
 const EASE_OUT: [number, number, number, number] = [0.23, 1, 0.32, 1];
 
 export default function Hero() {
-	const [active, setActive] = useState<HeroTabId>("cloud");
+	const [active, setActive] = useState<HeroTabId>("analytics");
 	const reduceMotion = useReducedMotion();
 	const tablistId = useId();
 
