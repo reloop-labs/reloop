@@ -50,6 +50,7 @@ export function CtaLink({
 	filled = true,
 	isSecondery,
 	variant: variantProp,
+	pill = true,
 }: {
 	label: string;
 	href: string;
@@ -57,11 +58,13 @@ export function CtaLink({
 	filled?: boolean;
 	isSecondery?: boolean;
 	variant?: "neutral" | "primary" | "basic";
+	pill?: boolean;
 }) {
 	const isCrossDomain =
 		href.startsWith("/docs") || href.startsWith("/dashboard");
 
 	const variant = filled ? (variantProp ?? "primary") : "basic";
+	const buttonClassName = cn(pill && "rounded-full!", !isSecondery && "px-10!");
 
 	if (external || isCrossDomain) {
 		return (
@@ -69,7 +72,7 @@ export function CtaLink({
 				asChild
 				variant={variant}
 				size="medium"
-				className={cn("rounded-full!", !isSecondery && "px-10!")}
+				className={buttonClassName}
 			>
 				<a
 					href={href}
@@ -88,7 +91,7 @@ export function CtaLink({
 			asChild
 			variant={variant}
 			size="medium"
-			className={cn("rounded-full!", !isSecondery && "px-10!")}
+			className={buttonClassName}
 		>
 			<Link href={href}>
 				<span>{label}</span>

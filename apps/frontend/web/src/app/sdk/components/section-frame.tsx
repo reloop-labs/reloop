@@ -11,12 +11,15 @@ export function SectionFrame({
 	children,
 	className,
 	showTopRule = true,
+	framed = true,
 }: {
 	id?: string;
 	children: ReactNode;
 	className?: string;
 	/** Top hairline across the section width */
 	showTopRule?: boolean;
+	/** Inner max-width + vertical rails. Skip when the parent page is already framed. */
+	framed?: boolean;
 }) {
 	return (
 		<section
@@ -27,10 +30,13 @@ export function SectionFrame({
 				className,
 			)}
 		>
-			{/* Content column — max width + vertical rails */}
-			<div className="relative mx-auto w-full max-w-5xl border-stroke-soft-200 xl:border-x md:max-w-7xl dark:border-white/10">
-				{children}
-			</div>
+			{framed ? (
+				<div className="relative mx-auto w-full max-w-5xl border-stroke-soft-200 xl:border-x md:max-w-7xl dark:border-white/10">
+					{children}
+				</div>
+			) : (
+				children
+			)}
 		</section>
 	);
 }

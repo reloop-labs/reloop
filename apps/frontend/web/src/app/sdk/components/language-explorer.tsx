@@ -84,7 +84,13 @@ function StepItem({
 	);
 }
 
-export default function LanguageExplorer() {
+export default function LanguageExplorer({
+	framed = true,
+	id = "languages",
+}: {
+	framed?: boolean;
+	id?: string;
+}) {
 	const [activeSlug, setActiveSlug] = useState(languages[0]!.slug);
 	const [pkgManager, setPkgManager] = useState<PackageManager>("npm");
 	const [hoveredTabIdx, setHoveredTabIdx] = useState<number | undefined>(
@@ -221,7 +227,7 @@ export default function LanguageExplorer() {
 	}, [activeTabIndex, hoveredTabIdx, isHoveringOther, mounted, activeSlug]);
 
 	return (
-		<SectionFrame id="languages">
+		<SectionFrame id={id} framed={framed}>
 			{/* Language tabs */}
 			<div className="border-stroke-soft-200 border-b dark:border-white/10">
 				<div

@@ -1,12 +1,10 @@
-"use client";
-
 import { cn } from "@reloop/ui/cn";
 import { Logo } from "@reloop/ui/logo";
-import { HeroCtaLink } from "@reloop/web/components/landing/hero";
-import type { FeatureCtaLink } from "@reloop/web/components/landing/types";
 import Link from "next/link";
+import type { ReactNode } from "react";
 import type { SimpleIcon } from "simple-icons";
 import { BrandIcon } from "./brand-icon";
+import { CompareHeroPricing } from "./compare-hero-pricing";
 
 type Rgb = [number, number, number];
 
@@ -42,6 +40,14 @@ function glowRgb(hex: string): Rgb {
 
 function rgba(rgb: Rgb, alpha: number) {
 	return `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${alpha})`;
+}
+
+function BrandTile({ children }: { children: ReactNode }) {
+	return (
+		<div className="flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 shadow-[0_8px_24px_-8px_rgba(0,0,0,0.12)] sm:size-20 md:size-24 dark:border-white/10 dark:bg-bg-black-950 dark:shadow-[0_8px_24px_-8px_rgba(0,0,0,0.45)]">
+			{children}
+		</div>
+	);
 }
 
 function VsBadge() {
@@ -117,16 +123,10 @@ function HatchGutter({ side }: { side: "left" | "right" }) {
 export function CompareHero({
 	titleLines,
 	competitorName,
-	description,
-	primaryCta,
-	secondaryCta,
 	icon,
 }: {
 	titleLines: string[];
 	competitorName?: string;
-	description?: string;
-	primaryCta?: FeatureCtaLink;
-	secondaryCta?: FeatureCtaLink;
 	icon?: Pick<SimpleIcon, "hex" | "path">;
 }) {
 	const parsed =
@@ -175,30 +175,32 @@ export function CompareHero({
 					/>
 
 					<div className="relative mx-auto flex items-start justify-center gap-5 py-10 sm:gap-7 sm:py-12 md:gap-8">
-						<div className="flex w-32 flex-col items-center gap-3 sm:w-36 md:w-44">
-							<div className="flex size-28 items-center justify-center overflow-visible sm:size-32 md:size-40">
-								{/* Logo viewBox is padded — scale so the mark matches the other brand. */}
-								<Logo className="size-full origin-center scale-[1.85]" />
-							</div>
+						<div className="flex w-28 flex-col items-center gap-3 sm:w-32 md:w-36">
+							<BrandTile>
+								<Logo className="size-[72%] origin-center scale-[1.55]" />
+							</BrandTile>
 							<p className="text-center font-semibold text-[17px] text-text-strong-950 tracking-tight sm:text-xl md:text-2xl dark:text-white">
 								Reloop
 							</p>
 						</div>
 
-						<div className="flex h-28 shrink-0 items-center sm:h-32 md:h-40">
+						<div className="flex h-16 shrink-0 items-center sm:h-20 md:h-24">
 							<VsBadge />
 						</div>
 
-						<div className="flex w-32 flex-col items-center gap-3 sm:w-36 md:w-44">
+						<div className="flex w-28 flex-col items-center gap-3 sm:w-32 md:w-36">
 							{icon ? (
-								<BrandIcon
-									icon={icon}
-									fill={competitorIsDark ? "currentColor" : `#${icon.hex}`}
-									className={cn(
-										"size-28 sm:size-32 md:size-40",
-										competitorIsDark && "text-text-strong-950 dark:text-white",
-									)}
-								/>
+								<BrandTile>
+									<BrandIcon
+										icon={icon}
+										fill={competitorIsDark ? "currentColor" : `#${icon.hex}`}
+										className={cn(
+											"size-8 sm:size-9 md:size-11",
+											competitorIsDark &&
+												"text-text-strong-950 dark:text-white",
+										)}
+									/>
+								</BrandTile>
 							) : null}
 							<p className="text-center font-semibold text-[17px] text-text-strong-950 tracking-tight sm:text-xl md:text-2xl dark:text-white">
 								{parsed}
@@ -210,34 +212,13 @@ export function CompareHero({
 				<HatchGutter side="right" />
 			</div>
 
-			{/* Copy + CTAs — SDK details body, left-aligned under the fold */}
-			{(description || primaryCta) && (
-				<div className="px-6 py-10 sm:px-10 sm:py-12 lg:px-12 lg:py-14">
-					{description ? (
-						<p className="max-w-xl text-[15px] text-text-sub-600 leading-relaxed sm:text-[16px] dark:text-white/60">
-							{description}
-						</p>
-					) : null}
-					{primaryCta ? (
-						<div className="mt-6 flex flex-wrap items-center gap-3">
-							<HeroCtaLink
-								href={primaryCta.href}
-								label={primaryCta.label}
-								external={primaryCta.external}
-								variant="primary"
-							/>
-							{secondaryCta ? (
-								<HeroCtaLink
-									href={secondaryCta.href}
-									label={secondaryCta.label}
-									external={secondaryCta.external}
-									variant="secondary"
-								/>
-							) : null}
-						</div>
-					) : null}
+			<div className="relative flex overflow-hidden">
+				<HatchGutter side="left" />
+				<div className="relative min-w-0 flex-1">
+					<CompareHeroPricing competitorName={parsed} />
 				</div>
-			)}
+				<HatchGutter side="right" />
+			</div>
 		</section>
 	);
 }
