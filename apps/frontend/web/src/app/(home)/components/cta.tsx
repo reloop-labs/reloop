@@ -20,6 +20,7 @@ export default function CTA() {
 			flush
 			align="center"
 			pill={false}
+			showTopRule={false}
 		/>
 	);
 }

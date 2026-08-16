@@ -123,7 +123,7 @@ export default function Integrate() {
 		<section
 			id="integrate"
 			aria-labelledby="integrate-heading"
-			className="w-full border-stroke-soft-200 border-t dark:border-white/10"
+			className="w-full"
 		>
 			<div className="flex flex-col gap-8 px-4 py-16 sm:px-6 sm:py-20 lg:flex-row lg:items-end lg:justify-between lg:gap-16 lg:px-12 lg:py-24">
 				<div className="max-w-xl">
@@ -163,7 +163,7 @@ export default function Integrate() {
 					className="pointer-events-none absolute inset-y-0 right-0 z-10 w-12 bg-gradient-to-l from-bg-white-0 to-transparent sm:w-20"
 				/>
 
-				<div className="flex w-max hover:[animation-play-state:paused] motion-reduce:w-full motion-reduce:flex-wrap motion-reduce:justify-center motion-reduce:gap-3 motion-reduce:[animation:none] animate-infinite-scroll">
+				<div className="flex w-max animate-infinite-scroll motion-reduce:w-full motion-reduce:flex-wrap motion-reduce:justify-center motion-reduce:gap-3 hover:[animation-play-state:paused] motion-reduce:[animation:none]">
 					<ul className="flex items-center gap-3 px-1.5 motion-reduce:flex-wrap motion-reduce:justify-center">
 						{frameworks.map((fw) => (
 							<li key={fw.slug}>

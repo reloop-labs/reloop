@@ -161,6 +161,7 @@ export function BlogCta({
 	flush = false,
 	align = "split",
 	pill = true,
+	showTopRule = true,
 }: {
 	category?: string;
 	headline?: ReactNode;
@@ -183,6 +184,8 @@ export function BlogCta({
 	align?: "split" | "center";
 	/** Pill-shaped buttons. Set false for the default FancyButton radius. */
 	pill?: boolean;
+	/** Hairline above the CTA. Turn off when a page-level separator already draws it. */
+	showTopRule?: boolean;
 }) {
 	const categoryVariant = category ? CATEGORY_VARIANTS[category] : undefined;
 	const variant = {
@@ -211,7 +214,9 @@ export function BlogCta({
 
 	return (
 		<section className="w-full">
-			<div className="relative overflow-hidden border-stroke-soft-200 border-t bg-bg-white-0 dark:border-white/10 dark:bg-black">
+			<div
+				className={`relative overflow-hidden bg-bg-white-0 dark:bg-black ${showTopRule ? "border-stroke-soft-200 border-t dark:border-white/10" : ""}`}
+			>
 				<div
 					className={`relative z-10 mx-auto flex w-full flex-col items-center border-stroke-soft-200 px-6 text-center sm:px-10 lg:px-12 dark:border-white/10 ${
 						align === "split"

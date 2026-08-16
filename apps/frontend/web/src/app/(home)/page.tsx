@@ -12,6 +12,7 @@ import CTA from "./components/cta";
 import Hero from "./components/hero";
 import Highlights from "./components/highlights";
 import Integrate from "./components/integrate";
+import { SectionSeparator } from "./components/section-separator";
 import ShipFast from "./components/ship-fast";
 import UseCase from "./components/use-case";
 
@@ -58,12 +59,19 @@ export default function Home() {
 		<div className="relative mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-200 border-x md:max-w-7xl dark:border-white/10">
 			<JsonLd data={homeSchema} />
 			<Hero />
+			<SectionSeparator />
 			<Convictions />
+			<SectionSeparator />
 			<UseCase />
-			<LanguageExplorer framed={false} id="sdks" />
+			<SectionSeparator />
+			<LanguageExplorer framed={false} showTopRule={false} id="sdks" />
+			<SectionSeparator />
 			<Integrate />
+			<SectionSeparator />
 			<Highlights />
+			<SectionSeparator />
 			<ShipFast />
+			<SectionSeparator />
 			<CTA />
 		</div>
 	);

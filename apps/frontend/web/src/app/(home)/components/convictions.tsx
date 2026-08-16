@@ -56,10 +56,7 @@ const values = [
 
 export default function Convictions() {
 	return (
-		<section
-			aria-labelledby="convictions-heading"
-			className="border-stroke-soft-200 border-t dark:border-white/10"
-		>
+		<section aria-labelledby="convictions-heading">
 			<h2 id="convictions-heading" className="sr-only">
 				What Reloop gives you
 			</h2>
@@ -69,7 +66,7 @@ export default function Convictions() {
 						key={item.title}
 						className={cn(
 							"flex min-h-[13.5rem] flex-col justify-between border-stroke-soft-200 border-r border-b px-6 py-7 sm:min-h-[15rem] lg:px-7 lg:py-8 dark:border-white/10",
-							"max-sm:border-r-0 max-lg:[&:nth-child(2n)]:border-r-0 lg:[&:nth-child(5n)]:border-r-0",
+							"max-sm:border-r-0 max-sm:last:border-b-0 max-lg:[&:nth-child(2n)]:border-r-0 lg:[&:nth-child(5n)]:border-r-0 sm:max-lg:[&:nth-last-child(-n+2)]:border-b-0 lg:[&:nth-last-child(-n+5)]:border-b-0",
 						)}
 					>
 						<Icon

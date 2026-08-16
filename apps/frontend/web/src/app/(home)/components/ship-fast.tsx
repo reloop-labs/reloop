@@ -64,7 +64,7 @@ export default function ShipFast() {
 		<section
 			id="ship-fast"
 			aria-labelledby="ship-fast-heading"
-			className="w-full border-stroke-soft-200 border-t dark:border-white/10"
+			className="w-full"
 		>
 			<div className="lg:grid lg:grid-cols-[minmax(0,1fr)_2rem_minmax(0,1fr)]">
 				<div className="flex flex-col items-start px-4 py-16 sm:px-6 sm:py-20 lg:px-12 lg:py-24">

@@ -86,9 +86,11 @@ function StepItem({
 
 export default function LanguageExplorer({
 	framed = true,
+	showTopRule = true,
 	id = "languages",
 }: {
 	framed?: boolean;
+	showTopRule?: boolean;
 	id?: string;
 }) {
 	const [activeSlug, setActiveSlug] = useState(languages[0]!.slug);
@@ -227,7 +229,7 @@ export default function LanguageExplorer({
 	}, [activeTabIndex, hoveredTabIdx, isHoveringOther, mounted, activeSlug]);
 
 	return (
-		<SectionFrame id={id} framed={framed}>
+		<SectionFrame id={id} framed={framed} showTopRule={showTopRule}>
 			{/* Language tabs */}
 			<div className="border-stroke-soft-200 border-b dark:border-white/10">
 				<div
