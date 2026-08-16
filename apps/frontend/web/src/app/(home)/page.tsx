@@ -7,6 +7,7 @@ import {
 	socialProfiles,
 } from "@reloop/web/lib/site";
 import LanguageExplorer from "../sdk/components/language-explorer";
+import Convictions from "./components/convictions";
 import CTA from "./components/cta";
 import Hero from "./components/hero";
 import Highlights from "./components/highlights";
@@ -57,6 +58,7 @@ export default function Home() {
 		<div className="relative mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-200 border-x md:max-w-7xl dark:border-white/10">
 			<JsonLd data={homeSchema} />
 			<Hero />
+			<Convictions />
 			<UseCase />
 			<LanguageExplorer framed={false} id="sdks" />
 			<Integrate />

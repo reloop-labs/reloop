@@ -64,7 +64,7 @@ export default function Hero() {
 		>
 			<div className="px-6 sm:px-8 lg:px-12">
 				<h1 className="max-w-[12em] font-medium text-[2.5rem] text-text-strong-950 leading-[1.02] tracking-[-0.045em] sm:text-[3.5rem] lg:text-[4.25rem] dark:text-white">
-					Email API for developers
+					Email API for Developers
 					<br />
 					With agent inboxes built in
 				</h1>
