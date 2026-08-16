@@ -264,11 +264,11 @@ export function HeroDomainPreview() {
 			await sleep(3600);
 			if (cancelled) return;
 			setView("list");
-			await sleep(1800);
+			await sleep(2200);
 			if (cancelled) return;
 			setAdded(false);
 			setTyped("");
-			await sleep(700);
+			await sleep(1000);
 		};
 
 		const loop = async () => {

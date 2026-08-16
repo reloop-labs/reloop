@@ -5,7 +5,7 @@ import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
-import { motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import type { ReactNode, Ref } from "react";
 import { ActionKbd } from "../_shared/action-kbd";
 import type { DemoDomain } from "../_shared/data";
@@ -32,11 +32,11 @@ const resourceCardClassName = cn(
 	"dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/20 dark:hover:bg-bg-weak-50/40",
 );
 
-const WAVE_DELAY = 0.04;
-const WAVE_STAGGER = 0.06;
-const CELL_DURATION = 0.28;
+const WAVE_DELAY = 0.08;
+const WAVE_STAGGER = 0.1;
+const CELL_DURATION = 0.42;
 const FOOTER_AFTER_ITEMS = 2;
-const FOOTER_DURATION = 0.26;
+const FOOTER_DURATION = 0.36;
 
 function MatrixCell({
 	row,
@@ -58,7 +58,7 @@ function MatrixCell({
 			) : (
 				<motion.div
 					className="min-w-0 max-w-full"
-					initial={{ opacity: 0, y: 2 }}
+					initial={{ opacity: 0, y: 6 }}
 					animate={{ opacity: 1, y: 0 }}
 					transition={{
 						duration: CELL_DURATION,
@@ -83,56 +83,83 @@ function DomainRow({
 	highlighted?: boolean;
 	row: number;
 }) {
+	const reduceMotion = useReducedMotion();
+
 	return (
-		<div
-			style={domainTableGridStyle}
-			className={cn(
-				"group/row grid w-full items-center px-4 py-2 text-left hover:bg-bg-weak-50",
-				highlighted && "bg-primary-alpha-10",
-			)}
+		<motion.div
+			layout="position"
+			initial={{ opacity: 1 }}
+			animate={{ opacity: 1, height: "auto" }}
+			exit={
+				reduceMotion
+					? { opacity: 0 }
+					: {
+							opacity: 0,
+							height: 0,
+							transition: {
+								opacity: { duration: 0.22, ease: "easeOut" },
+								height: { duration: 0.45, ease: PAGE_EASE },
+								layout: { duration: 0.45, ease: PAGE_EASE },
+							},
+						}
+			}
+			transition={{
+				duration: 0.3,
+				ease: PAGE_EASE,
+				layout: { duration: 0.45, ease: PAGE_EASE },
+			}}
+			style={{ overflow: "hidden" }}
 		>
-			<MatrixCell row={row} col={0}>
-				<span className="flex size-4 shrink-0 rounded-sm border border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/50 dark:bg-bg-white-0/5" />
-			</MatrixCell>
-			<MatrixCell row={row} col={1}>
-				<div className="flex min-w-0 items-center gap-2">
-					<Icon
-						name="globe"
+			<div
+				style={domainTableGridStyle}
+				className={cn(
+					"group/row grid w-full items-center px-4 py-2 text-left hover:bg-bg-weak-50",
+					highlighted && "bg-primary-alpha-10",
+				)}
+			>
+				<MatrixCell row={row} col={0}>
+					<span className="flex size-4 shrink-0 rounded-sm border border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/50 dark:bg-bg-white-0/5" />
+				</MatrixCell>
+				<MatrixCell row={row} col={1}>
+					<div className="flex min-w-0 items-center gap-2">
+						<Icon
+							name="globe"
+							className={cn(
+								"h-4 w-4 shrink-0",
+								getStatusColorClass(domain.status),
+							)}
+						/>
+						<span className="truncate font-semibold text-label-sm text-text-strong-950 underline decoration-dotted underline-offset-2">
+							{domain.domain}
+						</span>
+					</div>
+				</MatrixCell>
+				<MatrixCell row={row} col={2}>
+					<div
 						className={cn(
-							"h-4 w-4 shrink-0",
+							"flex items-center gap-2 rounded-lg py-0.5 font-medium text-[13px] capitalize",
 							getStatusColorClass(domain.status),
 						)}
-					/>
-					<span className="truncate font-semibold text-label-sm text-text-strong-950 underline decoration-dotted underline-offset-2">
-						{domain.domain}
+					>
+						<Icon name={getStatusIcon(domain.status)} className="h-3.5 w-3.5" />
+						{getStatusLabel(domain.status)}
+					</div>
+				</MatrixCell>
+				<MatrixCell row={row} col={3}>
+					<span className="whitespace-nowrap font-medium text-sm text-text-sub-600">
+						{domain.createdAtLabel}
 					</span>
-				</div>
-			</MatrixCell>
-			<MatrixCell row={row} col={2}>
-				<div
-					className={cn(
-						"flex items-center gap-2 rounded-lg py-0.5 font-medium text-[13px] capitalize",
-						getStatusColorClass(domain.status),
-					)}
-				>
-					<Icon name={getStatusIcon(domain.status)} className="h-3.5 w-3.5" />
-					{getStatusLabel(domain.status)}
-				</div>
-			</MatrixCell>
-			<MatrixCell row={row} col={3}>
-				<span className="whitespace-nowrap font-medium text-sm text-text-sub-600">
-					{domain.createdAtLabel}
-				</span>
-			</MatrixCell>
-			<MatrixCell row={row} col={4} className="justify-end">
-				<span className="inline-flex aspect-square h-7 w-7 items-center justify-center rounded-lg">
-					<Icon
-						name="more-horizontal"
-						className="h-3.5 w-3.5 text-text-sub-600"
-					/>
-				</span>
-			</MatrixCell>
-		</div>
+				</MatrixCell>
+				<MatrixCell row={row} col={4} className="justify-end">
+					<span className="inline-flex aspect-square h-7 w-7 items-center justify-center rounded-lg">
+						<Icon
+							name="more-horizontal"
+							className="h-3.5 w-3.5 text-text-sub-600"
+						/>
+					</span>
+				</MatrixCell>
+			</div>
+		</motion.div>
 	);
 }
 
@@ -179,15 +206,18 @@ function DomainTable({
 			</div>
 
 			<div className="-mt-2.5 divide-y divide-stroke-soft-100 overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:divide-stroke-soft-100/50 dark:border-stroke-soft-100/40">
-				{domains.map((domain, rowIndex) => (
-					<DomainRow
-						key={domain.id}
-						domain={domain}
-						row={rowIndex + 1}
-						highlighted={domain.id === highlightId}
-					/>
-				))}
+				<AnimatePresence>
+					{domains.map((domain, rowIndex) => (
+						<DomainRow
+							key={domain.id}
+							domain={domain}
+							row={rowIndex + 1}
+							highlighted={domain.id === highlightId}
+						/>
+					))}
+				</AnimatePresence>
 				<motion.div
+					layout="position"
 					className="flex items-center justify-between px-4 py-2 text-label-xs text-text-sub-600"
 					initial={reduceMotion ? false : { opacity: 0, y: 16 }}
 					animate={{ opacity: 1, y: 0 }}
@@ -195,6 +225,7 @@ function DomainTable({
 						duration: FOOTER_DURATION,
 						delay: footerDelay,
 						ease: PAGE_EASE,
+						layout: { duration: 0.45, ease: PAGE_EASE },
 					}}
 				>
 					<div className="flex items-center gap-3">
