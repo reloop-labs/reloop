@@ -55,26 +55,28 @@ const homeSchema = [
 
 export default function Home() {
 	return (
-		<div className="relative mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-200 border-x md:max-w-7xl dark:border-white/10">
+		<div className="relative w-full">
 			<JsonLd data={homeSchema} />
 			<Hero />
-			<SectionSeparator />
-			<Convictions />
-			<SectionSeparator />
-			<EmailSystem />
-			<SectionSeparator />
-			<LanguageExplorer
-				framed={false}
-				showTopRule={false}
-				showHeading
-				id="sdks"
-			/>
-			<SectionSeparator />
-			<Highlights />
-			<SectionSeparator />
-			<ShipFast />
-			<SectionSeparator />
-			<CTA />
+			<div className="relative mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-200 border-x md:max-w-7xl dark:border-white/10">
+				<SectionSeparator />
+				<Convictions />
+				<SectionSeparator />
+				<EmailSystem />
+				<SectionSeparator />
+				<LanguageExplorer
+					framed={false}
+					showTopRule={false}
+					showHeading
+					id="sdks"
+				/>
+				<SectionSeparator />
+				<Highlights />
+				<SectionSeparator />
+				<ShipFast />
+				<SectionSeparator />
+				<CTA />
+			</div>
 		</div>
 	);
 }

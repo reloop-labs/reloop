@@ -99,9 +99,9 @@ export default function Hero() {
 	return (
 		<section
 			id="features"
-			className="relative flex min-h-dvh flex-col overflow-x-hidden bg-transparent pt-40 sm:pt-48 lg:pt-56"
+			className="relative flex min-h-dvh flex-col bg-transparent pt-40 sm:pt-48 lg:pt-56"
 		>
-			<div className="px-6 sm:px-8 lg:px-12">
+			<div className="relative mx-auto w-full max-w-5xl border-stroke-soft-200 border-x px-6 sm:px-8 md:max-w-7xl lg:px-12 dark:border-white/10">
 				<h1 className="max-w-[12em] font-medium text-[2.5rem] text-text-strong-950 leading-[1.02] tracking-[-0.045em] sm:text-[3.5rem] lg:text-[4.25rem] dark:text-white">
 					Email API for Developers
 					<br />
@@ -121,7 +121,7 @@ export default function Hero() {
 				</div>
 			</div>
 
-			<div className="mt-8 flex min-h-0 flex-1 flex-col sm:mt-10">
+			<div className="relative mx-auto mt-8 w-full max-w-5xl flex-1 flex-col border-stroke-soft-200 border-x sm:mt-10 md:max-w-7xl dark:border-white/10">
 				<div
 					role="tablist"
 					aria-label="Product surfaces"
@@ -198,45 +198,46 @@ export default function Hero() {
 					})}
 				</div>
 
-				<div className="relative flex flex-1 flex-col overflow-hidden bg-bg-white-0 px-3 pt-10 pb-10 sm:px-6 sm:pt-14 sm:pb-14 lg:px-8 lg:pt-20 lg:pb-16 dark:bg-black">
-					<HeroAtmosphere />
-					<div
-						id={`${tablistId}-panel`}
-						role="tabpanel"
-						aria-labelledby={`${tablistId}-${active}`}
-						className="relative z-10 mx-auto flex h-[32rem] w-full max-w-5xl flex-col sm:h-[38rem] lg:h-[44rem]"
-					>
-						<HeroWindowChrome>
-							<AnimatePresence mode="wait" initial={false}>
-								<motion.div
-									key={active}
-									className="absolute inset-0"
-									initial={
-										reduceMotion
-											? { opacity: 1 }
-											: { opacity: 0, filter: "blur(2px)" }
-									}
-									animate={{ opacity: 1, filter: "blur(0px)" }}
-									exit={
-										reduceMotion
-											? { opacity: 0 }
-											: { opacity: 0, filter: "blur(2px)" }
-									}
-									transition={
-										reduceMotion
-											? { duration: 0 }
-											: { duration: 0.2, ease: EASE_OUT }
-									}
-								>
-									<HeroPreview tab={active} />
-								</motion.div>
-							</AnimatePresence>
-							<HeroTabBanner
-								tabId={active}
-								reduceMotion={Boolean(reduceMotion)}
-							/>
-						</HeroWindowChrome>
-					</div>
+			</div>
+
+			<div className="relative w-full flex-1 overflow-hidden bg-bg-white-0 dark:bg-black">
+				<HeroAtmosphere />
+				<div
+					id={`${tablistId}-panel`}
+					role="tabpanel"
+					aria-labelledby={`${tablistId}-${active}`}
+					className="relative z-10 mx-auto flex h-[32rem] w-full max-w-5xl flex-col px-3 pt-10 pb-10 sm:h-[40rem] sm:px-6 sm:pt-14 sm:pb-14 md:max-w-7xl lg:h-[48rem] lg:px-8 lg:pt-20 lg:pb-16"
+				>
+					<HeroWindowChrome>
+						<AnimatePresence mode="wait" initial={false}>
+							<motion.div
+								key={active}
+								className="absolute inset-0"
+								initial={
+									reduceMotion
+										? { opacity: 1 }
+										: { opacity: 0, filter: "blur(2px)" }
+								}
+								animate={{ opacity: 1, filter: "blur(0px)" }}
+								exit={
+									reduceMotion
+										? { opacity: 0 }
+										: { opacity: 0, filter: "blur(2px)" }
+								}
+								transition={
+									reduceMotion
+										? { duration: 0 }
+										: { duration: 0.2, ease: EASE_OUT }
+								}
+							>
+								<HeroPreview tab={active} />
+							</motion.div>
+						</AnimatePresence>
+						<HeroTabBanner
+							tabId={active}
+							reduceMotion={Boolean(reduceMotion)}
+						/>
+					</HeroWindowChrome>
 				</div>
 			</div>
 		</section>
