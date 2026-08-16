@@ -98,7 +98,7 @@ export default function Hero() {
 	return (
 		<section
 			id="features"
-			className="relative flex min-h-dvh flex-col overflow-hidden bg-transparent pt-40 sm:pt-48 lg:pt-56"
+			className="relative flex min-h-dvh flex-col overflow-x-hidden bg-transparent pt-40 sm:pt-48 lg:pt-56"
 		>
 			<div className="px-6 sm:px-8 lg:px-12">
 				<h1 className="max-w-[12em] font-medium text-[2.5rem] text-text-strong-950 leading-[1.02] tracking-[-0.045em] sm:text-[3.5rem] lg:text-[4.25rem] dark:text-white">
@@ -197,12 +197,13 @@ export default function Hero() {
 					})}
 				</div>
 
-				<div className="relative flex min-h-0 flex-1 flex-col px-3 pt-3 pb-6 sm:px-6 sm:pt-5 sm:pb-8 lg:px-8 lg:pt-6 lg:pb-10">
+				<div className="relative flex flex-1 flex-col overflow-hidden bg-bg-white-0 px-3 pt-3 pb-6 sm:px-6 sm:pt-5 sm:pb-8 lg:px-8 lg:pt-6 lg:pb-10 dark:bg-black">
+					<HeroAtmosphere />
 					<div
 						id={`${tablistId}-panel`}
 						role="tabpanel"
 						aria-labelledby={`${tablistId}-${active}`}
-						className="relative flex min-h-[28rem] flex-1 flex-col sm:min-h-[34rem] lg:min-h-[40rem]"
+						className="relative z-10 mx-auto flex min-h-[40rem] w-full max-w-5xl flex-1 flex-col sm:min-h-[48rem] lg:min-h-[56rem]"
 					>
 						<HeroWindowChrome>
 							<AnimatePresence mode="wait" initial={false}>
@@ -241,9 +242,38 @@ export default function Hero() {
 	);
 }
 
+function HeroAtmosphere() {
+	const fx = {
+		glow: "radial-gradient(ellipse 110% 160% at 82% 100%, rgba(0, 111, 254, 0.3) 0%, transparent 62%)",
+		glowAlt:
+			"radial-gradient(ellipse 90% 140% at 6% 0%, rgba(56, 189, 248, 0.22) 0%, transparent 60%)",
+		line: "rgba(0, 111, 254, 0.16)",
+	};
+	const lineMask =
+		"radial-gradient(ellipse 85% 95% at 88% 110%, black 0%, transparent 68%), radial-gradient(ellipse 70% 90% at 4% -5%, black 0%, transparent 62%)";
+
+	return (
+		<div aria-hidden className="pointer-events-none absolute inset-0 z-0">
+			<div className="absolute inset-0" style={{ backgroundImage: fx.glow }} />
+			<div
+				className="absolute inset-0"
+				style={{ backgroundImage: fx.glowAlt }}
+			/>
+			<div
+				className="absolute inset-0"
+				style={{
+					backgroundImage: `repeating-linear-gradient(-45deg, transparent 0, transparent 3px, ${fx.line} 3px, ${fx.line} 3.55px)`,
+					maskImage: lineMask,
+					WebkitMaskImage: lineMask,
+				}}
+			/>
+		</div>
+	);
+}
+
 function HeroWindowChrome({ children }: { children: ReactNode }) {
 	return (
-		<div className="relative flex min-h-0 flex-1 flex-col overflow-hidden rounded-[20px] bg-[#ececee] p-[7px] pt-8 shadow-[0_1px_1px_rgba(0,0,0,0.04),0_16px_40px_rgba(0,0,0,0.08)] sm:rounded-[24px] sm:p-2 sm:pt-9 dark:bg-[#c9c9cc] dark:shadow-[0_16px_48px_rgba(0,0,0,0.45)]">
+		<div className="relative flex min-h-0 flex-1 flex-col overflow-hidden rounded-[20px] bg-[#F5F6F8] p-[7px] pt-8 sm:rounded-[24px] sm:p-2 sm:pt-9 dark:bg-[#1C1C1E] dark:ring-1 dark:ring-white/10">
 			<div
 				aria-hidden
 				className="absolute top-[11px] left-3.5 flex items-center gap-[7px] sm:top-3 sm:left-4"
@@ -295,7 +325,7 @@ function HeroTabBanner({
 					</div>
 					<Link
 						href={banner.href}
-						className="inline-flex h-9 shrink-0 items-center rounded-full bg-white px-3.5 font-medium text-[13px] text-text-strong-950 transition-opacity hover:opacity-90 sm:h-10 sm:px-4"
+						className="inline-flex h-9 shrink-0 items-center rounded-full bg-white px-3.5 font-medium text-[#171717] text-[13px] transition-opacity hover:opacity-90 sm:h-10 sm:px-4"
 					>
 						Learn more
 					</Link>
