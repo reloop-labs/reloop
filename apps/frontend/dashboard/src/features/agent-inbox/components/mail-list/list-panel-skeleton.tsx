@@ -22,11 +22,16 @@ export function ListPanelSkeleton({ className }: { className?: string }) {
 					<div className="flex-1" />
 					<Skeleton className={cn("size-8 shrink-0 rounded-lg", sk)} />
 				</div>
-				<div className="flex h-10 items-center gap-1 border-mail-border/50 border-b px-2">
-					<Skeleton className={cn("h-6 w-16 rounded-md", sk)} />
-					<Skeleton className={cn("h-6 w-[4.5rem] rounded-md", sk)} />
-					<Skeleton className={cn("h-6 w-[5.5rem] rounded-md", sk)} />
-					<Skeleton className={cn("h-6 w-[4.25rem] rounded-md", sk)} />
+				<div className="grid grid-cols-4 border-mail-border/50 border-b">
+					{["a", "b", "c", "d"].map((id) => (
+						<div
+							key={id}
+							className="flex items-center gap-2 border-mail-border/50 border-l px-4 py-4 first:border-l-0"
+						>
+							<Skeleton className={cn("size-4 shrink-0 rounded", sk)} />
+							<Skeleton className={cn("h-4 w-16 rounded", sk)} />
+						</div>
+					))}
 				</div>
 			</div>
 			<MailListSkeleton />
