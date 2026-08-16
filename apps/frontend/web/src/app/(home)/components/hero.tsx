@@ -203,7 +203,7 @@ export default function Hero() {
 						id={`${tablistId}-panel`}
 						role="tabpanel"
 						aria-labelledby={`${tablistId}-${active}`}
-						className="relative z-10 mx-auto flex min-h-[40rem] w-full max-w-5xl flex-1 flex-col sm:min-h-[48rem] lg:min-h-[56rem]"
+						className="relative z-10 mx-auto flex h-[32rem] w-full max-w-5xl flex-col sm:h-[38rem] lg:h-[44rem]"
 					>
 						<HeroWindowChrome>
 							<AnimatePresence mode="wait" initial={false}>
@@ -244,25 +244,19 @@ export default function Hero() {
 
 function HeroAtmosphere() {
 	const fx = {
-		glow: "radial-gradient(ellipse 110% 160% at 82% 100%, rgba(0, 111, 254, 0.3) 0%, transparent 62%)",
-		glowAlt:
-			"radial-gradient(ellipse 90% 140% at 6% 0%, rgba(56, 189, 248, 0.22) 0%, transparent 60%)",
+		glow: "linear-gradient(to top, rgba(0, 111, 254, 0.3) 0%, transparent 62%)",
 		line: "rgba(0, 111, 254, 0.16)",
 	};
 	const lineMask =
-		"radial-gradient(ellipse 85% 95% at 88% 110%, black 0%, transparent 68%), radial-gradient(ellipse 70% 90% at 4% -5%, black 0%, transparent 62%)";
+		"linear-gradient(to top, black 0%, rgba(0, 0, 0, 0.22) 100%)";
 
 	return (
 		<div aria-hidden className="pointer-events-none absolute inset-0 z-0">
 			<div className="absolute inset-0" style={{ backgroundImage: fx.glow }} />
 			<div
 				className="absolute inset-0"
-				style={{ backgroundImage: fx.glowAlt }}
-			/>
-			<div
-				className="absolute inset-0"
 				style={{
-					backgroundImage: `repeating-linear-gradient(-45deg, transparent 0, transparent 3px, ${fx.line} 3px, ${fx.line} 3.55px)`,
+					backgroundImage: `repeating-linear-gradient(to right, transparent 0, transparent 3px, ${fx.line} 3px, ${fx.line} 3.55px)`,
 					maskImage: lineMask,
 					WebkitMaskImage: lineMask,
 				}}
