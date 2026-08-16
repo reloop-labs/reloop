@@ -2,8 +2,10 @@
 
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
+import { Icon } from "@reloop/ui/icon";
 import { hostedSignupHref } from "@reloop/web/lib/site";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import Link from "next/link";
 import { useCallback, useId, useState } from "react";
 import { HeroPreview, type HeroTabId } from "./hero-preview";
 
@@ -12,33 +14,69 @@ const TABS: {
 	title: string;
 	description: string;
 	cloud?: boolean;
+	banner: {
+		title: string;
+		description: string;
+		href: string;
+		icon: "mail-receive" | "layout" | "book-open" | "server" | "headset";
+	};
 }[] = [
 	{
 		id: "api",
 		title: "API",
 		description: "Send, receive, and route email for any use case.",
+		banner: {
+			title: "Email API",
+			description: "Send, receive, and route email for any use case.",
+			href: "/docs/api",
+			icon: "mail-receive",
+		},
 	},
 	{
 		id: "dashboard",
 		title: "Dashboard",
 		description: "Customizable console for your email.",
+		banner: {
+			title: "Dashboard",
+			description: "Customizable console for your email.",
+			href: hostedSignupHref,
+			icon: "layout",
+		},
 	},
 	{
 		id: "sdk",
 		title: "SDK",
 		description: "Guardrails for agents to build email workflows.",
+		banner: {
+			title: "SDKs",
+			description: "Typed clients for Node, Python, Go, and more.",
+			href: "/sdk",
+			icon: "book-open",
+		},
 	},
 	{
 		id: "cloud",
 		title: "Infrastructure",
 		description: "Push from GitHub to the fastest infrastructure.",
 		cloud: true,
+		banner: {
+			title: "Infrastructure",
+			description: "Self-host or run on Reloop Cloud.",
+			href: "/docs/self-host",
+			icon: "server",
+		},
 	},
 	{
 		id: "agents",
 		title: "Agent Inbox",
 		description: "MCP, CLI, Skills, and Agent Previews.",
 		cloud: true,
+		banner: {
+			title: "Agent Inbox",
+			description: "MCP, CLI, Skills, and agent previews.",
+			href: "/features/ai-agents",
+			icon: "headset",
+		},
 	},
 ];
 
@@ -190,9 +228,56 @@ export default function Hero() {
 								<HeroPreview tab={active} />
 							</motion.div>
 						</AnimatePresence>
+						<HeroTabBanner tabId={active} reduceMotion={Boolean(reduceMotion)} />
 					</div>
 				</div>
 			</div>
 		</section>
+	);
+}
+
+function HeroTabBanner({
+	tabId,
+	reduceMotion,
+}: {
+	tabId: HeroTabId;
+	reduceMotion: boolean;
+}) {
+	const tab = TABS.find((item) => item.id === tabId) ?? TABS[0];
+	const { banner } = tab;
+
+	return (
+		<AnimatePresence mode="wait" initial={false}>
+			<motion.div
+				key={tab.id}
+				className="pointer-events-none absolute inset-x-3 bottom-3 z-10 sm:inset-x-5 sm:bottom-5"
+				initial={reduceMotion ? { opacity: 1 } : { opacity: 0, y: 8 }}
+				animate={{ opacity: 1, y: 0 }}
+				exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 8 }}
+				transition={
+					reduceMotion ? { duration: 0 } : { duration: 0.2, ease: EASE_OUT }
+				}
+			>
+				<div className="pointer-events-auto flex items-center gap-3 rounded-2xl bg-[#171717] px-3 py-2.5 text-white shadow-[0_8px_28px_rgba(0,0,0,0.18)] sm:gap-4 sm:rounded-[1.35rem] sm:px-4 sm:py-3 dark:bg-[#111]">
+					<span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-white/10 sm:size-11">
+						<Icon name={banner.icon} className="size-5 text-white" />
+					</span>
+					<div className="min-w-0 flex-1">
+						<p className="truncate font-semibold text-[14px] leading-tight tracking-tight sm:text-[15px]">
+							{banner.title}
+						</p>
+						<p className="mt-0.5 truncate text-[12px] text-white/55 leading-snug sm:text-[13px]">
+							{banner.description}
+						</p>
+					</div>
+					<Link
+						href={banner.href}
+						className="inline-flex h-9 shrink-0 items-center rounded-full bg-white px-3.5 font-medium text-[13px] text-text-strong-950 transition-opacity hover:opacity-90 sm:h-10 sm:px-4"
+					>
+						Learn more
+					</Link>
+				</div>
+			</motion.div>
+		</AnimatePresence>
 	);
 }

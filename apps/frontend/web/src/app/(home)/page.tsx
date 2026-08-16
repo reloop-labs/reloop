@@ -9,9 +9,9 @@ import {
 import LanguageExplorer from "../sdk/components/language-explorer";
 import Convictions from "./components/convictions";
 import CTA from "./components/cta";
+import EmailSystem from "./components/email-system";
 import Hero from "./components/hero";
 import Highlights from "./components/highlights";
-import Integrate from "./components/integrate";
 import { SectionSeparator } from "./components/section-separator";
 import ShipFast from "./components/ship-fast";
 
@@ -61,14 +61,14 @@ export default function Home() {
 			<SectionSeparator />
 			<Convictions />
 			<SectionSeparator />
+			<EmailSystem />
+			<SectionSeparator />
 			<LanguageExplorer
 				framed={false}
 				showTopRule={false}
 				showHeading
 				id="sdks"
 			/>
-			<SectionSeparator />
-			<Integrate />
 			<SectionSeparator />
 			<Highlights />
 			<SectionSeparator />
