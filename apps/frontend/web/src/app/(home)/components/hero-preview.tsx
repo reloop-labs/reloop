@@ -1,5 +1,6 @@
 import { HeroAnalyticsPreview } from "./hero-analytics-preview";
 import { HeroDashboardShell } from "./hero-dashboard-shell";
+import { HeroEmailsPreview } from "./hero-emails-preview";
 
 export type HeroTabId = "analytics" | "dashboard" | "sdk" | "cloud" | "agents";
 
@@ -14,7 +15,9 @@ export function HeroPreview({ tab }: { tab: HeroTabId }) {
 							? "domain"
 							: tab === "sdk"
 								? "api-keys"
-								: "metrics"
+								: tab === "dashboard"
+									? "emails"
+									: "metrics"
 				}
 			>
 				{tab === "sdk" ? (
@@ -23,6 +26,8 @@ export function HeroPreview({ tab }: { tab: HeroTabId }) {
 					<CloudPanel />
 				) : tab === "agents" ? (
 					<AgentsPanel />
+				) : tab === "dashboard" ? (
+					<HeroEmailsPreview />
 				) : (
 					<HeroAnalyticsPreview />
 				)}

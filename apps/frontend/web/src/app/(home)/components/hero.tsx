@@ -197,7 +197,7 @@ export default function Hero() {
 					})}
 				</div>
 
-				<div className="relative flex flex-1 flex-col overflow-hidden bg-bg-white-0 px-3 pt-3 pb-6 sm:px-6 sm:pt-5 sm:pb-8 lg:px-8 lg:pt-6 lg:pb-10 dark:bg-black">
+				<div className="relative flex flex-1 flex-col overflow-hidden bg-bg-white-0 px-3 pt-10 pb-10 sm:px-6 sm:pt-14 sm:pb-14 lg:px-8 lg:pt-20 lg:pb-16 dark:bg-black">
 					<HeroAtmosphere />
 					<div
 						id={`${tablistId}-panel`}
