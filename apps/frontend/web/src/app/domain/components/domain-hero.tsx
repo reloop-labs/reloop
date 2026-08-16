@@ -6,6 +6,7 @@ import {
 } from "../../(home)/components/hero-chrome";
 import { HeroDashboardShell } from "../../(home)/components/hero-dashboard-shell";
 import { HeroDomainPreview } from "../../(home)/components/hero-domain-preview";
+import { DomainScrollWindow } from "./domain-scroll-window";
 
 export default function DomainHero() {
 	return (
@@ -30,17 +31,15 @@ export default function DomainHero() {
 				</div>
 			</div>
 
-			<div className="relative mt-8 w-full flex-1 overflow-hidden bg-bg-white-0 sm:mt-10 dark:bg-black">
+			<div className="relative mt-8 w-full flex-1 overflow-x-clip bg-bg-white-0 sm:mt-10 dark:bg-black">
 				<HeroAtmosphere />
-				<div className="relative z-10 mx-auto w-full max-w-5xl px-3 pt-10 pb-10 sm:px-6 sm:pt-14 sm:pb-14 md:max-w-7xl lg:px-8 lg:pt-20 lg:pb-16">
-					<div className="flex h-[32rem] w-full flex-col sm:h-[40rem] lg:h-[48rem]">
-						<HeroWindowChrome>
-							<HeroDashboardShell activeItem="domain">
-								<HeroDomainPreview />
-							</HeroDashboardShell>
-						</HeroWindowChrome>
-					</div>
-				</div>
+				<DomainScrollWindow>
+					<HeroWindowChrome>
+						<HeroDashboardShell activeItem="domain">
+							<HeroDomainPreview />
+						</HeroDashboardShell>
+					</HeroWindowChrome>
+				</DomainScrollWindow>
 			</div>
 		</section>
 	);
