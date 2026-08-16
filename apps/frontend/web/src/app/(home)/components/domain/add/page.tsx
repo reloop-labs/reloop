@@ -63,7 +63,7 @@ export function DomainAddPage({
 		domainParts.length >= 2 ? domainParts.slice(-2).join(".") : "example.com";
 
 	return (
-		<div className="mx-auto grid h-full w-full max-w-5xl lg:grid-cols-2">
+		<div className="mx-auto grid h-full w-full max-w-5xl overflow-hidden lg:grid-cols-2">
 			<div className="mx-auto w-full max-w-md px-6 py-10 lg:px-8 lg:py-12">
 				<div className="pb-4">
 					<h1 className="font-semibold text-title-h6 leading-8">Add Domain</h1>

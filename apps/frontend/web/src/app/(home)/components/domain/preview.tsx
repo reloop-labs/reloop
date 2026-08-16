@@ -301,7 +301,7 @@ export function HeroDomainPreview() {
 				{view === "setup" && (
 					<motion.div
 						key="setup"
-						className="absolute inset-0 z-20 overflow-auto bg-bg-white-0 dark:bg-black"
+						className="absolute inset-0 z-20 overflow-hidden bg-bg-white-0 dark:bg-black"
 						initial={
 							reduceMotion
 								? { opacity: 1 }
@@ -326,7 +326,7 @@ export function HeroDomainPreview() {
 				{view === "detail" && (
 					<motion.div
 						key="detail"
-						className="absolute inset-0 z-20 overflow-auto bg-bg-white-0 dark:bg-black"
+						className="absolute inset-0 z-20 overflow-hidden bg-bg-white-0 dark:bg-black"
 						initial={
 							reduceMotion
 								? { opacity: 1 }

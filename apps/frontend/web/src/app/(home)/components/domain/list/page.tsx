@@ -100,7 +100,7 @@ export function DomainListPage({
 	highlightId?: string | null;
 }) {
 	return (
-		<div className="mx-auto max-w-6xl space-y-6 p-6 lg:p-8">
+		<div className="mx-auto max-w-6xl space-y-6 overflow-hidden p-6 lg:p-8">
 			<div className="flex flex-col gap-4 pt-2 pb-4 sm:flex-row sm:items-start sm:justify-between">
 				<div>
 					<div className="flex items-center gap-2.5">

@@ -64,7 +64,7 @@ export function DomainSetupPage({
 	);
 
 	return (
-		<div className="mx-auto max-w-3xl space-y-6 p-6 lg:p-8">
+		<div className="mx-auto max-w-3xl space-y-6 overflow-hidden p-6 lg:p-8">
 			<div className="pt-6">
 				<h1 className="font-semibold text-title-h6 leading-8">
 					Configure DNS for {domain.domain}

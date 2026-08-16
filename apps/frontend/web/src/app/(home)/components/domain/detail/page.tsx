@@ -161,7 +161,7 @@ export function DomainDetailPage({ domain }: { domain: DemoDomain }) {
 				: "Almost there! Add the DNS records shown below, then click Verify — and you'll be ready to send.";
 
 	return (
-		<div className="mx-auto max-w-3xl space-y-8 p-6 lg:p-8">
+		<div className="mx-auto max-w-3xl space-y-8 overflow-hidden p-6 lg:p-8">
 			<div className="flex items-center justify-between">
 				<div className="flex min-w-0 items-center gap-3">
 					<div
@@ -293,7 +293,7 @@ export function DomainDetailPage({ domain }: { domain: DemoDomain }) {
 					</button>
 				</div>
 
-				<div className="mt-6 mb-24 flex flex-col space-y-6">
+				<div className="mt-6 flex flex-col space-y-6">
 					<div className="rounded-2xl border border-stroke-soft-100 p-4 dark:border-stroke-soft-100/10">
 						<div className="mb-4 flex items-center gap-2 text-base text-text-strong-950">
 							<Icon name="shield" className="h-4 w-4 text-text-sub-600" />
