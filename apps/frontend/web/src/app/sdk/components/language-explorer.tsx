@@ -87,10 +87,12 @@ function StepItem({
 export default function LanguageExplorer({
 	framed = true,
 	showTopRule = true,
+	showHeading = false,
 	id = "languages",
 }: {
 	framed?: boolean;
 	showTopRule?: boolean;
+	showHeading?: boolean;
 	id?: string;
 }) {
 	const [activeSlug, setActiveSlug] = useState(languages[0]!.slug);
@@ -230,8 +232,26 @@ export default function LanguageExplorer({
 
 	return (
 		<SectionFrame id={id} framed={framed} showTopRule={showTopRule}>
+			{showHeading ? (
+				<div className="px-4 py-16 sm:px-6 sm:py-20 lg:px-12 lg:py-24">
+					<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em] dark:text-white/45">
+						SDK
+					</p>
+					<h2
+						id={`${id}-heading`}
+						className="mt-4 max-w-3xl font-serif text-[2.4rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[3rem] lg:text-[3.4rem] dark:text-white"
+					>
+						Send in the language you already write.
+					</h2>
+				</div>
+			) : null}
 			{/* Language tabs */}
-			<div className="border-stroke-soft-200 border-b dark:border-white/10">
+			<div
+				className={cn(
+					"border-stroke-soft-200 border-b dark:border-white/10",
+					showHeading && "border-t",
+				)}
+			>
 				<div
 					ref={containerRef}
 					role="tablist"

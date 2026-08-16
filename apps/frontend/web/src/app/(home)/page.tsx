@@ -14,7 +14,6 @@ import Highlights from "./components/highlights";
 import Integrate from "./components/integrate";
 import { SectionSeparator } from "./components/section-separator";
 import ShipFast from "./components/ship-fast";
-import UseCase from "./components/use-case";
 
 // TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
 // See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
@@ -62,9 +61,12 @@ export default function Home() {
 			<SectionSeparator />
 			<Convictions />
 			<SectionSeparator />
-			<UseCase />
-			<SectionSeparator />
-			<LanguageExplorer framed={false} showTopRule={false} id="sdks" />
+			<LanguageExplorer
+				framed={false}
+				showTopRule={false}
+				showHeading
+				id="sdks"
+			/>
 			<SectionSeparator />
 			<Integrate />
 			<SectionSeparator />
