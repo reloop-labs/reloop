@@ -1,27 +1,60 @@
 "use client";
 
 import { cn } from "@reloop/ui/cn";
+import { Icon } from "@reloop/ui/icon";
 import { motion, useReducedMotion } from "framer-motion";
 import { useEffect, useMemo, useState } from "react";
 
-const DAYS = [
-	"Mar 2",
-	"Mar 4",
-	"Mar 6",
-	"Mar 8",
-	"Mar 10",
-	"Mar 12",
-	"Mar 14",
-	"Mar 16",
+const DAYS = ["2 mar", "4 mar", "6 mar", "8 mar", "10 mar", "12 mar", "14 mar"];
+const SENT = [4200, 4680, 4410, 5120, 5870, 5540, 6390];
+const DELIVERED = [4120, 4600, 4330, 5040, 5780, 5450, 6290];
+
+const W = 720;
+const H = 148;
+const PAD = { t: 10, r: 28, b: 22, l: 4 };
+const EASE: [number, number, number, number] = [0.23, 1, 0.32, 1];
+
+const CARDS = [
+	{
+		title: "Deliverability",
+		rating: "Good",
+		rows: [
+			{ label: "Sent", count: "29,486", percent: "100%", color: "#3B82F6" },
+			{
+				label: "Delivered",
+				count: "29,012",
+				percent: "98.39%",
+				color: "#10B981",
+			},
+		],
+	},
+	{
+		title: "Reputation",
+		rating: "Good",
+		rows: [
+			{ label: "Bounced", count: "546", percent: "1.85%", color: "#EF4444" },
+			{
+				label: "Complained",
+				count: "2",
+				percent: "0.01%",
+				color: "#FDB022",
+			},
+		],
+	},
+	{
+		title: "Engagement",
+		rating: "Good",
+		rows: [
+			{ label: "Opened", count: "13,612", percent: "46.16%", color: "#8B5CF6" },
+			{
+				label: "Unsubscribed",
+				count: "137",
+				percent: "0.46%",
+				color: "#9CA3AF",
+			},
+		],
+	},
 ] as const;
-
-const SENT = [4200, 4680, 4410, 5120, 5870, 5540, 6390, 7120];
-const DELIVERED = [4120, 4600, 4330, 5040, 5780, 5450, 6290, 7010];
-const OPENED = [1840, 2110, 1980, 2360, 2710, 2540, 2980, 3340];
-
-const W = 640;
-const H = 168;
-const PAD = { t: 12, r: 8, b: 22, l: 8 };
 
 function linePath(values: number[], max: number): string {
 	const innerW = W - PAD.l - PAD.r;
@@ -41,8 +74,6 @@ function areaPath(values: number[], max: number): string {
 	const lastX = PAD.l + innerW;
 	return `${linePath(values, max)} L${lastX.toFixed(1)} ${baseline} L${PAD.l} ${baseline} Z`;
 }
-
-const EASE: [number, number, number, number] = [0.23, 1, 0.32, 1];
 
 export function HeroAnalyticsPreview() {
 	const reduceMotion = useReducedMotion();
@@ -65,144 +96,176 @@ export function HeroAnalyticsPreview() {
 			delivered: DELIVERED.map((v, i) =>
 				i === DELIVERED.length - 1 ? Math.round(v * (wave - 0.008)) : v,
 			),
-			opened: OPENED,
 		};
 	}, [tick]);
 
-	const max = Math.max(...series.sent) * 1.12;
-	const sentTotal = series.sent.reduce((a, b) => a + b, 0);
-	const deliveredTotal = series.delivered.reduce((a, b) => a + b, 0);
-	const openedTotal = series.opened.reduce((a, b) => a + b, 0);
-	const deliveredPct = ((deliveredTotal / sentTotal) * 100).toFixed(1);
-	const openedPct = ((openedTotal / sentTotal) * 100).toFixed(1);
-
-	const sentD = linePath(series.sent, max);
+	const max = Math.max(...series.sent) * 1.08;
+	const sentTotal = 29486;
 	const deliveredD = linePath(series.delivered, max);
 	const areaD = areaPath(series.delivered, max);
 
 	return (
-		<div className="flex h-full flex-col px-5 pt-5 sm:px-7 sm:pt-6">
+		<div className="flex h-full flex-col overflow-hidden px-5 pt-5 pb-28 sm:px-7 sm:pt-6 sm:pb-24">
 			<div className="flex items-start justify-between gap-3">
 				<div>
-					<p className="font-medium text-[13px] text-text-strong-950 dark:text-white">
-						Metrics
-					</p>
-					<p className="mt-0.5 text-[12px] text-text-soft-400 dark:text-white/40">
-						Last 15 days · mail.acme.com
-					</p>
-				</div>
-				<div className="hidden items-center gap-1.5 sm:flex">
-					<span className="inline-flex h-7 items-center rounded-lg border border-stroke-soft-200 px-2 text-[11px] text-text-sub-600 dark:border-white/10 dark:text-white/50">
-						15 days
-					</span>
-					<span className="inline-flex h-7 items-center rounded-lg border border-stroke-soft-200 px-2 text-[11px] text-text-sub-600 dark:border-white/10 dark:text-white/50">
-						All events
-					</span>
-				</div>
-			</div>
-
-			<div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
-				<Kpi label="Sent" value={sentTotal.toLocaleString()} />
-				<Kpi label="Delivered" value={`${deliveredPct}%`} accent="emerald" />
-				<Kpi label="Opened" value={`${openedPct}%`} accent="sky" />
-				<Kpi label="Bounce" value="0.6%" accent="rose" />
-			</div>
-
-			<div className="mt-4 min-h-0 flex-1">
-				<svg
-					viewBox={`0 0 ${W} ${H}`}
-					className="h-full w-full"
-					preserveAspectRatio="none"
-					aria-hidden
-				>
-					<title>Deliverability over 15 days</title>
-					<defs>
-						<linearGradient id="hero-metrics-fill" x1="0" y1="0" x2="0" y2="1">
-							<stop offset="0%" stopColor="#10B981" stopOpacity="0.28" />
-							<stop offset="100%" stopColor="#10B981" stopOpacity="0" />
-						</linearGradient>
-					</defs>
-					{[0.25, 0.5, 0.75].map((t) => (
-						<line
-							key={t}
-							x1={PAD.l}
-							x2={W - PAD.r}
-							y1={PAD.t + (H - PAD.t - PAD.b) * t}
-							y2={PAD.t + (H - PAD.t - PAD.b) * t}
-							className="stroke-stroke-soft-200 dark:stroke-white/10"
-							strokeWidth="1"
+					<div className="flex items-center gap-2">
+						<Icon
+							name="fat-row"
+							className="size-5 text-text-strong-950 dark:text-white"
 						/>
-					))}
-					<motion.path
-						d={areaD}
-						fill="url(#hero-metrics-fill)"
-						initial={reduceMotion ? false : { opacity: 0 }}
-						animate={{ opacity: 1 }}
-						transition={{ duration: 0.45, ease: EASE }}
-					/>
-					<motion.path
-						d={sentD}
-						fill="none"
-						stroke="#0E7090"
-						strokeWidth="2"
-						strokeLinejoin="round"
-						strokeLinecap="round"
-						initial={reduceMotion ? false : { pathLength: 0 }}
-						animate={{ pathLength: 1 }}
-						transition={{ duration: 0.7, ease: EASE }}
-					/>
-					<motion.path
-						d={deliveredD}
-						fill="none"
-						stroke="#10B981"
-						strokeWidth="2"
-						strokeLinejoin="round"
-						strokeLinecap="round"
-						initial={reduceMotion ? false : { pathLength: 0 }}
-						animate={{ pathLength: 1 }}
-						transition={{ duration: 0.7, delay: 0.08, ease: EASE }}
-					/>
-				</svg>
+						<h3 className="font-semibold text-[22px] text-text-strong-950 tracking-tight dark:text-white">
+							Metrics
+						</h3>
+					</div>
+					<p className="mt-1 text-[13px] text-text-sub-600 dark:text-white/45">
+						Deliverability and engagement metrics for your emails.
+					</p>
+				</div>
+				<span className="hidden h-8 items-center rounded-xl border border-stroke-soft-200 px-3 text-[12px] text-text-sub-600 sm:inline-flex dark:border-white/10 dark:text-white/50">
+					Documentation
+				</span>
 			</div>
 
-			<div className="flex items-center gap-4 pb-4 text-[11px] text-text-sub-600 dark:text-white/45">
-				<span className="flex items-center gap-1.5">
-					<span className="size-1.5 rounded-full bg-[#0E7090]" />
-					Sent
+			<div className="mt-4 flex flex-wrap items-center gap-2">
+				<span className="inline-flex h-8 items-center rounded-xl border border-stroke-soft-200 px-2.5 text-[12px] text-text-sub-600 dark:border-white/10 dark:text-white/50">
+					Last 15 days
 				</span>
-				<span className="flex items-center gap-1.5">
-					<span className="size-1.5 rounded-full bg-emerald-500" />
-					Delivered
+				<span className="inline-flex h-8 items-center rounded-xl border border-stroke-soft-200 px-2.5 text-[12px] text-text-sub-600 dark:border-white/10 dark:text-white/50">
+					All Domains
 				</span>
-				<span className="ml-auto hidden sm:inline">{DAYS[0]} – {DAYS.at(-1)}</span>
+			</div>
+
+			<div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
+				{CARDS.map((card) => (
+					<section
+						key={card.title}
+						className="rounded-2xl border border-stroke-soft-200 bg-bg-white-0 px-4 pt-4 pb-1 dark:border-white/10 dark:bg-white/[0.01]"
+					>
+						<p className="font-medium text-[10px] text-text-soft-400 uppercase tracking-[0.08em]">
+							{card.title}
+						</p>
+						<p className="mt-1.5 font-semibold text-[24px] text-text-strong-950 tracking-tight dark:text-white">
+							{card.rating}
+						</p>
+						<ul className="mt-4">
+							{card.rows.map((row, index) => (
+								<li
+									key={row.label}
+									className={cn(
+										"flex items-center justify-between py-2.5",
+										index === 0 &&
+											"border-stroke-soft-200 border-b dark:border-white/10",
+									)}
+								>
+									<span className="flex items-center gap-2 text-[12px] text-text-sub-600">
+										<span
+											className="size-1.5 rounded-full"
+											style={{ backgroundColor: row.color }}
+										/>
+										{row.label}
+									</span>
+									<span className="flex items-baseline gap-2.5 text-[12px] text-text-soft-400 tabular-nums">
+										<span>{row.count}</span>
+										<span className="w-10 text-right">{row.percent}</span>
+									</span>
+								</li>
+							))}
+						</ul>
+					</section>
+				))}
+			</div>
+
+			<div className="mt-4 min-h-0 flex-1 overflow-hidden rounded-2xl border border-stroke-soft-200 dark:border-white/10">
+				<div className="border-stroke-soft-200 border-b bg-bg-weak-50/60 px-4 py-2 dark:border-white/10 dark:bg-white/[0.03]">
+					<p className="font-medium text-[14px] text-text-strong-950 dark:text-white">
+						Deliverability
+					</p>
+				</div>
+				<div className="flex h-full flex-col px-4 pt-3">
+					<div className="flex gap-8">
+						<Stat label="Emails" value={sentTotal.toLocaleString()} />
+						<Stat label="Deliverability Rate" value="98%" />
+						<Stat label="Bounces" value="546" />
+					</div>
+					<div className="mt-3 min-h-0 flex-1">
+						<svg
+							viewBox={`0 0 ${W} ${H}`}
+							className="h-full w-full"
+							preserveAspectRatio="none"
+							aria-hidden
+						>
+							<title>Deliverability over 15 days</title>
+							<defs>
+								<linearGradient
+									id="hero-metrics-fill"
+									x1="0"
+									y1="0"
+									x2="0"
+									y2="1"
+								>
+									<stop offset="0%" stopColor="#10B981" stopOpacity="0.22" />
+									<stop offset="100%" stopColor="#10B981" stopOpacity="0" />
+								</linearGradient>
+							</defs>
+							{[0.25, 0.5, 0.75].map((t) => (
+								<line
+									key={t}
+									x1={PAD.l}
+									x2={W - PAD.r}
+									y1={PAD.t + (H - PAD.t - PAD.b) * t}
+									y2={PAD.t + (H - PAD.t - PAD.b) * t}
+									className="stroke-stroke-soft-200 dark:stroke-white/10"
+									strokeWidth="1"
+								/>
+							))}
+							<motion.path
+								d={areaD}
+								fill="url(#hero-metrics-fill)"
+								initial={reduceMotion ? false : { opacity: 0 }}
+								animate={{ opacity: 1 }}
+								transition={{ duration: 0.45, ease: EASE }}
+							/>
+							<motion.path
+								d={deliveredD}
+								fill="none"
+								stroke="#10B981"
+								strokeWidth="2"
+								strokeLinejoin="round"
+								strokeLinecap="round"
+								initial={reduceMotion ? false : { pathLength: 0 }}
+								animate={{ pathLength: 1 }}
+								transition={{ duration: 0.7, ease: EASE }}
+							/>
+							{DAYS.map((day, i) => {
+								const x = PAD.l + (i / (DAYS.length - 1)) * (W - PAD.l - PAD.r);
+								return (
+									<text
+										key={day}
+										x={x}
+										y={H - 4}
+										textAnchor="middle"
+										className="fill-text-soft-400 dark:fill-white/35"
+										fontSize="10"
+									>
+										{day}
+									</text>
+								);
+							})}
+						</svg>
+					</div>
+				</div>
 			</div>
 		</div>
 	);
 }
 
-function Kpi({
-	label,
-	value,
-	accent,
-}: {
-	label: string;
-	value: string;
-	accent?: "emerald" | "sky" | "rose";
-}) {
+function Stat({ label, value }: { label: string; value: string }) {
 	return (
-		<div className="rounded-xl border border-stroke-soft-200 px-3 py-2 dark:border-white/10">
-			<p className="text-[11px] text-text-soft-400 dark:text-white/40">
+		<div>
+			<p className="font-semibold text-[10px] text-text-soft-400 uppercase tracking-wider">
 				{label}
 			</p>
-			<p
-				className={cn(
-					"mt-0.5 font-medium text-[15px] tabular-nums tracking-tight",
-					accent === "emerald" && "text-emerald-600 dark:text-emerald-400",
-					accent === "sky" && "text-sky-600 dark:text-sky-400",
-					accent === "rose" && "text-rose-600 dark:text-rose-400",
-					!accent && "text-text-strong-950 dark:text-white",
-				)}
-			>
+			<p className="mt-0.5 font-semibold text-[20px] text-text-strong-950 tabular-nums tracking-tight dark:text-white">
 				{value}
 			</p>
 		</div>

@@ -1,110 +1,33 @@
-import { Logo } from "@reloop/ui/logo";
-import type { ReactNode } from "react";
 import { HeroAnalyticsPreview } from "./hero-analytics-preview";
+import { HeroDashboardShell } from "./hero-dashboard-shell";
 
-export type HeroTabId =
-	| "analytics"
-	| "dashboard"
-	| "sdk"
-	| "cloud"
-	| "agents";
+export type HeroTabId = "analytics" | "dashboard" | "sdk" | "cloud" | "agents";
 
 export function HeroPreview({ tab }: { tab: HeroTabId }) {
 	return (
 		<div className="flex h-full flex-col" aria-hidden>
-			<PreviewChrome />
-			<div className="min-h-0 flex-1 overflow-hidden">
-				{tab === "analytics" && <HeroAnalyticsPreview />}
-				{tab === "dashboard" && <DashboardPanel />}
-				{tab === "sdk" && <SdkPanel />}
-				{tab === "cloud" && <CloudPanel />}
-				{tab === "agents" && <AgentsPanel />}
-			</div>
+			<HeroDashboardShell
+				activeItem={
+					tab === "agents"
+						? "inbox"
+						: tab === "cloud"
+							? "domain"
+							: tab === "sdk"
+								? "api-keys"
+								: "metrics"
+				}
+			>
+				{tab === "sdk" ? (
+					<SdkPanel />
+				) : tab === "cloud" ? (
+					<CloudPanel />
+				) : tab === "agents" ? (
+					<AgentsPanel />
+				) : (
+					<HeroAnalyticsPreview />
+				)}
+			</HeroDashboardShell>
 		</div>
-	);
-}
-
-function PreviewChrome() {
-	return (
-		<div className="flex h-11 shrink-0 items-center justify-between border-stroke-soft-200 border-b px-3 sm:h-12 sm:px-4 dark:border-white/10">
-			<div className="flex items-center gap-2.5">
-				<span className="flex size-6 items-center justify-center text-text-soft-400 dark:text-white/35">
-					<svg viewBox="0 0 16 16" className="size-3.5" fill="none">
-						<circle cx="3" cy="3" r="1.15" fill="currentColor" />
-						<circle cx="8" cy="3" r="1.15" fill="currentColor" />
-						<circle cx="13" cy="3" r="1.15" fill="currentColor" />
-						<circle cx="3" cy="8" r="1.15" fill="currentColor" />
-						<circle cx="8" cy="8" r="1.15" fill="currentColor" />
-						<circle cx="13" cy="8" r="1.15" fill="currentColor" />
-						<circle cx="3" cy="13" r="1.15" fill="currentColor" />
-						<circle cx="8" cy="13" r="1.15" fill="currentColor" />
-						<circle cx="13" cy="13" r="1.15" fill="currentColor" />
-					</svg>
-				</span>
-				<span className="flex items-center gap-1.5">
-					<Logo className="size-5" />
-					<span className="font-medium text-[13px] text-text-strong-950 tracking-tight dark:text-white">
-						Acme, Inc.
-					</span>
-					<svg
-						viewBox="0 0 12 12"
-						className="size-2.5 text-text-soft-400 dark:text-white/35"
-						fill="none"
-					>
-						<path
-							d="M3 4.5 6 7.5 9 4.5"
-							stroke="currentColor"
-							strokeWidth="1.4"
-							strokeLinecap="round"
-							strokeLinejoin="round"
-						/>
-					</svg>
-				</span>
-			</div>
-			<div className="flex items-center gap-1">
-				<ChromeIcon>
-					<path
-						d="M10 2.2A6.2 6.2 0 1 0 10 14.6 6.2 6.2 0 0 0 10 2.2Zm0 1.5a4.7 4.7 0 1 1 0 9.4 4.7 4.7 0 0 1 0-9.4Z"
-						fill="currentColor"
-					/>
-					<path
-						d="M10 5.2v3.1l2.1 1.2"
-						stroke="currentColor"
-						strokeWidth="1.2"
-						strokeLinecap="round"
-					/>
-				</ChromeIcon>
-				<ChromeIcon>
-					<circle
-						cx="10"
-						cy="10"
-						r="6.2"
-						stroke="currentColor"
-						strokeWidth="1.3"
-					/>
-					<circle cx="10" cy="10" r="0.8" fill="currentColor" />
-					<path
-						d="M10 6.4v.9"
-						stroke="currentColor"
-						strokeWidth="1.3"
-						strokeLinecap="round"
-					/>
-				</ChromeIcon>
-				<span className="ml-1 flex size-6 items-center justify-center rounded-full bg-amber-100 font-medium text-[10px] text-amber-900 dark:bg-amber-400/20 dark:text-amber-200">
-					A
-				</span>
-			</div>
-		</div>
-	);
-}
-
-function ChromeIcon({ children }: { children: ReactNode }) {
-	return (
-		<span className="flex size-7 items-center justify-center rounded-md text-text-soft-400 dark:text-white/40">
-			<svg viewBox="0 0 20 20" className="size-4" fill="none">
-				{children}
-			</svg>
-		</span>
 	);
 }
 
@@ -203,73 +126,6 @@ function CloudPanel() {
 						<span className="size-3.5 rounded-full border border-current" />
 						<span className="size-3.5 rounded-[3px] border border-current" />
 					</div>
-				</div>
-			</div>
-		</div>
-	);
-}
-
-function DashboardPanel() {
-	return (
-		<div className="px-5 pt-7 sm:px-8 sm:pt-9">
-			<div className="flex items-end justify-between">
-				<div>
-					<p className="text-[12px] text-text-soft-400 dark:text-white/40">
-						Last 15 days
-					</p>
-					<h3 className="mt-1 font-medium text-[18px] text-text-strong-950 tracking-tight dark:text-white">
-						84,210 sent
-					</h3>
-				</div>
-				<div className="flex gap-4 text-[12px] text-text-sub-600 dark:text-white/50">
-					<span className="flex items-center gap-1.5">
-						<span className="size-1.5 rounded-full bg-emerald-500" />
-						98.4% delivered
-					</span>
-					<span className="hidden items-center gap-1.5 sm:flex">
-						<span className="size-1.5 rounded-full bg-sky-500" />
-						46.1% opened
-					</span>
-				</div>
-			</div>
-			<div className="mt-5 h-28">
-				<svg
-					viewBox="0 0 640 120"
-					className="h-full w-full text-text-strong-950 dark:text-white"
-					preserveAspectRatio="none"
-				>
-					<polyline
-						fill="none"
-						stroke="currentColor"
-						strokeWidth="1.6"
-						strokeLinejoin="round"
-						points="0,86 40,80 80,88 120,70 160,74 200,52 240,58 280,40 320,46 360,28 400,36 440,22 480,30 520,18 560,26 600,14 640,20"
-					/>
-				</svg>
-			</div>
-			<div className="mt-6">
-				<p className="font-medium text-[13px] text-text-strong-950 dark:text-white">
-					Recent email
-				</p>
-				<div className="mt-3 divide-y divide-stroke-soft-200 border-stroke-soft-200 border-t dark:divide-white/10 dark:border-white/10">
-					<EmailRow
-						to="alex@northwind.io"
-						subject="Your invoice is ready"
-						status="Delivered"
-						time="2m"
-					/>
-					<EmailRow
-						to="maya@lattice.dev"
-						subject="Reset your password"
-						status="Opened"
-						time="14m"
-					/>
-					<EmailRow
-						to="team@orbit.app"
-						subject="Welcome to Acme"
-						status="Clicked"
-						time="1h"
-					/>
 				</div>
 			</div>
 		</div>
@@ -396,38 +252,6 @@ function Meta({ label, value }: { label: string; value: string }) {
 			<p className="mt-1 truncate text-[13px] text-text-strong-950 dark:text-white">
 				{value}
 			</p>
-		</div>
-	);
-}
-
-function EmailRow({
-	to,
-	subject,
-	status,
-	time,
-}: {
-	to: string;
-	subject: string;
-	status: string;
-	time: string;
-}) {
-	return (
-		<div className="flex items-center gap-3 py-2.5">
-			<span className="size-1.5 shrink-0 rounded-full bg-emerald-500" />
-			<div className="min-w-0 flex-1">
-				<p className="truncate text-[13px] text-text-strong-950 dark:text-white">
-					{subject}
-				</p>
-				<p className="truncate text-[12px] text-text-soft-400 dark:text-white/40">
-					{to}
-				</p>
-			</div>
-			<span className="hidden text-[12px] text-text-sub-600 sm:block dark:text-white/50">
-				{status}
-			</span>
-			<span className="w-8 text-right text-[12px] text-text-soft-400 dark:text-white/35">
-				{time}
-			</span>
 		</div>
 	);
 }

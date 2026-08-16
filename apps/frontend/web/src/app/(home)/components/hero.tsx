@@ -6,7 +6,7 @@ import { Icon } from "@reloop/ui/icon";
 import { hostedSignupHref } from "@reloop/web/lib/site";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import Link from "next/link";
-import { useCallback, useId, useState } from "react";
+import { type ReactNode, useCallback, useId, useState } from "react";
 import { HeroPreview, type HeroTabId } from "./hero-preview";
 
 const TABS: {
@@ -124,7 +124,7 @@ export default function Hero() {
 				<div
 					role="tablist"
 					aria-label="Product surfaces"
-					className="flex overflow-x-auto border-stroke-soft-200 border-t [scrollbar-width:none] lg:grid lg:grid-cols-5 dark:border-white/10 [&::-webkit-scrollbar]:hidden"
+					className="flex overflow-x-auto border-stroke-soft-200 border-t border-b [scrollbar-width:none] lg:grid lg:grid-cols-5 dark:border-white/10 [&::-webkit-scrollbar]:hidden"
 					onKeyDown={(event) => {
 						if (event.key === "ArrowRight") {
 							event.preventDefault();
@@ -197,42 +197,65 @@ export default function Hero() {
 					})}
 				</div>
 
-				<div className="relative flex min-h-0 flex-1 flex-col bg-bg-weak-50 px-3 pt-3 sm:px-6 sm:pt-5 lg:px-8 lg:pt-6 dark:bg-white/[0.03]">
+				<div className="relative flex min-h-0 flex-1 flex-col px-3 pt-3 pb-6 sm:px-6 sm:pt-5 sm:pb-8 lg:px-8 lg:pt-6 lg:pb-10">
 					<div
 						id={`${tablistId}-panel`}
 						role="tabpanel"
 						aria-labelledby={`${tablistId}-${active}`}
-						className="relative min-h-[22rem] flex-1 overflow-hidden rounded-t-xl border border-stroke-soft-200 border-b-0 bg-bg-white-0 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_rgba(0,0,0,0.04)] sm:min-h-[26rem] sm:rounded-t-2xl dark:border-white/10 dark:bg-black dark:shadow-[0_8px_24px_rgba(0,0,0,0.35)]"
+						className="relative flex min-h-[28rem] flex-1 flex-col sm:min-h-[34rem] lg:min-h-[40rem]"
 					>
-						<AnimatePresence mode="wait" initial={false}>
-							<motion.div
-								key={active}
-								className="absolute inset-0"
-								initial={
-									reduceMotion
-										? { opacity: 1 }
-										: { opacity: 0, filter: "blur(2px)" }
-								}
-								animate={{ opacity: 1, filter: "blur(0px)" }}
-								exit={
-									reduceMotion
-										? { opacity: 0 }
-										: { opacity: 0, filter: "blur(2px)" }
-								}
-								transition={
-									reduceMotion
-										? { duration: 0 }
-										: { duration: 0.2, ease: EASE_OUT }
-								}
-							>
-								<HeroPreview tab={active} />
-							</motion.div>
-						</AnimatePresence>
-						<HeroTabBanner tabId={active} reduceMotion={Boolean(reduceMotion)} />
+						<HeroWindowChrome>
+							<AnimatePresence mode="wait" initial={false}>
+								<motion.div
+									key={active}
+									className="absolute inset-0"
+									initial={
+										reduceMotion
+											? { opacity: 1 }
+											: { opacity: 0, filter: "blur(2px)" }
+									}
+									animate={{ opacity: 1, filter: "blur(0px)" }}
+									exit={
+										reduceMotion
+											? { opacity: 0 }
+											: { opacity: 0, filter: "blur(2px)" }
+									}
+									transition={
+										reduceMotion
+											? { duration: 0 }
+											: { duration: 0.2, ease: EASE_OUT }
+									}
+								>
+									<HeroPreview tab={active} />
+								</motion.div>
+							</AnimatePresence>
+							<HeroTabBanner
+								tabId={active}
+								reduceMotion={Boolean(reduceMotion)}
+							/>
+						</HeroWindowChrome>
 					</div>
 				</div>
 			</div>
 		</section>
+	);
+}
+
+function HeroWindowChrome({ children }: { children: ReactNode }) {
+	return (
+		<div className="relative flex min-h-0 flex-1 flex-col overflow-hidden rounded-[20px] bg-[#ececee] p-[7px] pt-8 shadow-[0_1px_1px_rgba(0,0,0,0.04),0_16px_40px_rgba(0,0,0,0.08)] sm:rounded-[24px] sm:p-2 sm:pt-9 dark:bg-[#c9c9cc] dark:shadow-[0_16px_48px_rgba(0,0,0,0.45)]">
+			<div
+				aria-hidden
+				className="absolute top-[11px] left-3.5 flex items-center gap-[7px] sm:top-3 sm:left-4"
+			>
+				<span className="size-[11px] rounded-full bg-[#ff5f57] shadow-[inset_0_0_0_0.5px_rgba(0,0,0,0.12)] sm:size-3" />
+				<span className="size-[11px] rounded-full bg-[#febc2e] shadow-[inset_0_0_0_0.5px_rgba(0,0,0,0.12)] sm:size-3" />
+				<span className="size-[11px] rounded-full bg-[#28c840] shadow-[inset_0_0_0_0.5px_rgba(0,0,0,0.12)] sm:size-3" />
+			</div>
+			<div className="relative min-h-0 flex-1 overflow-hidden rounded-[13px] bg-bg-white-0 sm:rounded-[16px] dark:bg-black">
+				{children}
+			</div>
+		</div>
 	);
 }
 
