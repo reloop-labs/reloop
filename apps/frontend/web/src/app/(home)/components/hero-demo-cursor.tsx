@@ -21,7 +21,7 @@ export function HeroDemoCursor({
 		<motion.div
 			aria-hidden
 			className="pointer-events-none absolute top-0 left-0 z-40"
-			style={{ x, y, scale, opacity }}
+			style={{ x, y, scale, opacity, transformOrigin: "0px 0px" }}
 		>
 			<div
 				className="relative"

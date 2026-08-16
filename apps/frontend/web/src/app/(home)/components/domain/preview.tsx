@@ -12,15 +12,26 @@ import { DomainSetupPage } from "./setup/page";
 
 const PAGE_EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
-function pointIn(container: HTMLElement, el: HTMLElement) {
+function pointIn(
+	container: HTMLElement,
+	el: HTMLElement,
+	alignX = 0.5,
+	alignY = 0.5,
+) {
 	const c = container.getBoundingClientRect();
 	const r = el.getBoundingClientRect();
 	const scaleX = c.width / container.offsetWidth || 1;
 	const scaleY = c.height / container.offsetHeight || 1;
 	return {
-		x: (r.left - c.left + r.width * 0.58) / scaleX,
-		y: (r.top - c.top + r.height * 0.52) / scaleY,
+		x: (r.left - c.left + r.width * alignX) / scaleX,
+		y: (r.top - c.top + r.height * alignY) / scaleY,
 	};
+}
+
+function frame() {
+	return new Promise<void>((resolve) => {
+		requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+	});
 }
 
 export function HeroDomainPreview() {
@@ -77,22 +88,39 @@ export function HeroDomainPreview() {
 				timers.add(id);
 			});
 
-		const moveTo = async (el: HTMLElement | null) => {
+		const waitForTarget = async (getEl: () => HTMLElement | null) => {
+			for (let i = 0; i < 24; i += 1) {
+				const el = getEl();
+				if (el && el.getBoundingClientRect().width > 1) {
+					await frame();
+					return el;
+				}
+				await sleep(16);
+			}
+			return getEl();
+		};
+
+		const moveTo = async (
+			getEl: () => HTMLElement | null,
+			alignX = 0.5,
+			alignY = 0.5,
+		) => {
 			const root = containerRef.current;
+			const el = await waitForTarget(getEl);
 			if (!root || !el) return;
-			const { x, y } = pointIn(root, el);
+			const { x, y } = pointIn(root, el, alignX, alignY);
 			await Promise.all([
 				animate(cursorX, x, {
 					type: "spring",
-					stiffness: 160,
-					damping: 22,
-					mass: 0.7,
+					stiffness: 180,
+					damping: 24,
+					mass: 0.65,
 				}),
 				animate(cursorY, y, {
 					type: "spring",
-					stiffness: 160,
-					damping: 22,
-					mass: 0.7,
+					stiffness: 180,
+					damping: 24,
+					mass: 0.65,
 				}),
 			]);
 		};
@@ -130,17 +158,17 @@ export function HeroDomainPreview() {
 
 			await sleep(280);
 			if (cancelled) return;
-			await moveTo(addBtnRef.current);
+			await moveTo(() => addBtnRef.current);
 			if (cancelled) return;
 			await sleep(140);
 			await click(setAddPressed);
 			if (cancelled) return;
 
 			setView("add");
-			await sleep(360);
+			await sleep(320);
 			if (cancelled) return;
 
-			await moveTo(inputWrapRef.current);
+			await moveTo(() => inputWrapRef.current, 0.22, 0.5);
 			if (cancelled) return;
 			inputWrapRef.current
 				?.querySelector("input")
@@ -156,7 +184,7 @@ export function HeroDomainPreview() {
 
 			await sleep(280);
 			if (cancelled) return;
-			await moveTo(submitRef.current);
+			await moveTo(() => submitRef.current);
 			if (cancelled) return;
 			await sleep(120);
 			await click(setSubmitPressed);
@@ -168,10 +196,10 @@ export function HeroDomainPreview() {
 			setSubmitting(false);
 			setAdded(true);
 			setView("setup");
-			await sleep(420);
+			await sleep(320);
 			if (cancelled) return;
 
-			await moveTo(cloudflareRef.current);
+			await moveTo(() => cloudflareRef.current);
 			if (cancelled) return;
 			await sleep(160);
 			await click(setCloudflarePressed);
@@ -188,7 +216,10 @@ export function HeroDomainPreview() {
 			if (cancelled) return;
 			await animate(cursorOpacity, 0, { duration: 0.28, ease: PAGE_EASE });
 
-			await sleep(2400);
+			await sleep(2500);
+			if (cancelled) return;
+			setNewStatus("active");
+			await sleep(3600);
 			if (cancelled) return;
 			setView("list");
 			await sleep(1800);

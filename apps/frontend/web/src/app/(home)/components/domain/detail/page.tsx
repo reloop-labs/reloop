@@ -3,6 +3,7 @@
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
+import Spinner from "@reloop/ui/spinner";
 import { siCloudflare } from "simple-icons";
 import type { DemoDomain } from "../_shared/data";
 import { DnsRecordTable } from "../_shared/dns-record-table";
@@ -13,33 +14,54 @@ import {
 } from "../_shared/status";
 
 function StatusTimeline({ domain }: { domain: DemoDomain }) {
-	const currentStep = domain.status === "verifying" ? 2 : 1;
+	let currentStep = 1;
+	if (domain.status === "verifying") currentStep = 2;
+	if (domain.status === "active") currentStep = 3;
+
+	const getStepState = (stepNumber: number) => {
+		if (domain.status === "active") return "completed";
+		if (stepNumber < currentStep) return "completed";
+		if (stepNumber === currentStep) return "active";
+		return "upcoming";
+	};
+
 	const steps = [
 		{
 			number: 1,
 			label: "Domain Added",
 			icon: "globe",
-			state: "completed" as const,
 		},
 		{
 			number: 2,
-			label: domain.status === "verifying" ? "Verifying DNS" : "Start verification",
-			icon: domain.status === "verifying" ? "scan" : "question",
-			state:
-				currentStep === 2 ? ("active" as const) : ("upcoming" as const),
+			label:
+				domain.status === "active"
+					? "Verified"
+					: domain.status === "verifying"
+						? "Verifying DNS"
+						: "Start verification",
+			icon:
+				domain.status === "active"
+					? "shield-check"
+					: domain.status === "verifying"
+						? "scan"
+						: "question",
 		},
 		{
 			number: 3,
 			label: "Ready to Send",
 			icon: "mail-single",
-			state: "upcoming" as const,
 		},
 	];
 
 	return (
 		<div className="relative mx-auto flex w-full max-w-md items-start gap-0">
 			{steps.map((step, index) => {
+				const state = getStepState(step.number);
 				const isLast = index === steps.length - 1;
+				const canShowSuccess = step.number !== 1 || domain.status === "active";
+				const shouldForceNeutral =
+					step.number === 1 && domain.status !== "active";
+
 				return (
 					<div
 						key={step.number}
@@ -49,42 +71,70 @@ function StatusTimeline({ domain }: { domain: DemoDomain }) {
 							<div className="flex items-center">
 								<div
 									className={cn(
-										"relative z-10 flex size-10 shrink-0 items-center justify-center rounded-[14px] border bg-bg-white-0",
-										step.state === "completed" &&
+										"relative z-10 flex size-10 shrink-0 items-center justify-center rounded-[14px] border bg-bg-white-0 transition-all duration-300",
+										state === "completed" &&
+											canShowSuccess &&
 											"border-success-base text-success-base",
-										step.state === "active" &&
+										state === "active" &&
+											step.number !== 1 &&
 											"border-warning-base text-warning-base",
-										step.state === "upcoming" &&
+										(state === "upcoming" || shouldForceNeutral) &&
 											"border-stroke-soft-200 text-text-soft-400",
 									)}
 								>
 									<div
 										className={cn(
-											"absolute inset-0 rounded-[14px]",
-											step.state === "completed" && "bg-success-base/10",
-											step.state === "active" && "bg-warning-base/10",
+											"absolute inset-0 rounded-[14px] transition-colors duration-300",
+											state === "completed" &&
+												canShowSuccess &&
+												"bg-success-base/10",
+											state === "active" &&
+												step.number !== 1 &&
+												"bg-warning-base/10",
 										)}
 									/>
-									<Icon name={step.icon} className="relative z-10 h-4 w-4" />
+									{domain.status === "verifying" && step.number === 2 ? (
+										<Spinner size={20} color="currentColor" />
+									) : (
+										<Icon
+											name={step.icon}
+											className={cn(
+												"relative z-10 h-5 w-5 transition-colors duration-300",
+												state === "active" && step.number !== 1
+													? "text-warning-base"
+													: state === "completed" && canShowSuccess
+														? "text-success-base"
+														: "text-text-soft-400",
+											)}
+										/>
+									)}
 								</div>
 								{!isLast && (
-									<div
-										className={cn(
-											"h-px flex-1 bg-stroke-soft-200",
-											step.state === "completed" && "bg-success-base/40",
-										)}
-									/>
+									<div className="-right-5 absolute top-5 left-5 h-[1px] bg-stroke-soft-200">
+										<div
+											className={cn(
+												"h-full transition-all duration-700 ease-out",
+												state === "completed" && canShowSuccess
+													? "w-full bg-success-base"
+													: "w-0",
+											)}
+										/>
+									</div>
 								)}
 							</div>
-							<div>
-								<p className="font-medium text-[12px] text-text-strong-950">
+							<div className="flex w-10 flex-col items-center gap-0.5">
+								<p
+									className={cn(
+										"whitespace-nowrap text-center font-medium text-[10px] uppercase tracking-wider transition-colors duration-300",
+										state === "upcoming"
+											? "text-text-soft-400"
+											: "text-text-strong-950",
+									)}
+								>
 									{step.label}
 								</p>
 							</div>
 						</div>
-						{!isLast && (
-							<div className="mt-5 h-px min-w-6 flex-1 bg-stroke-soft-200 dark:bg-stroke-soft-100/40" />
-						)}
 					</div>
 				);
 			})}
@@ -104,9 +154,11 @@ export function DomainDetailPage({ domain }: { domain: DemoDomain }) {
 	);
 
 	const bannerMessage =
-		domain.status === "verifying"
-			? "Your domain is being verified — this can take a few hours depending on your DNS provider."
-			: "Almost there! Add the DNS records shown below, then click Verify — and you'll be ready to send.";
+		domain.status === "active"
+			? "You're all set! Your domain is ready to send emails."
+			: domain.status === "verifying"
+				? "Your domain is being verified — this can take a few hours depending on your DNS provider."
+				: "Almost there! Add the DNS records shown below, then click Verify — and you'll be ready to send.";
 
 	return (
 		<div className="mx-auto max-w-3xl space-y-8 p-6 lg:p-8">
@@ -115,9 +167,11 @@ export function DomainDetailPage({ domain }: { domain: DemoDomain }) {
 					<div
 						className={cn(
 							"flex h-12 w-12 shrink-0 items-center justify-center rounded-[14px] border",
-							domain.status === "verifying"
-								? "border-warning-base/25 bg-warning-base/10"
-								: "border-stroke-soft-200 bg-bg-weak-50",
+							domain.status === "active"
+								? "border-success-base/25 bg-success-base/10"
+								: domain.status === "verifying"
+									? "border-warning-base/25 bg-warning-base/10"
+									: "border-stroke-soft-200 bg-bg-weak-50",
 						)}
 					>
 						<Icon
@@ -137,14 +191,16 @@ export function DomainDetailPage({ domain }: { domain: DemoDomain }) {
 						</h1>
 					</div>
 				</div>
-				<FancyButton.Root
-					variant="blue"
-					size="xsmall"
-					tabIndex={-1}
-					className="font-medium"
-				>
-					{domain.status === "verifying" ? "Verifying..." : "Verify Domain"}
-				</FancyButton.Root>
+				{domain.status !== "active" && (
+					<FancyButton.Root
+						variant="blue"
+						size="xsmall"
+						tabIndex={-1}
+						className="font-medium"
+					>
+						{domain.status === "verifying" ? "Verifying..." : "Verify Domain"}
+					</FancyButton.Root>
+				)}
 			</div>
 
 			<div className="mt-7 grid grid-cols-3 gap-x-12 gap-y-6">

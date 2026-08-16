@@ -80,29 +80,31 @@ export function DomainAddPage({
 								<span className="text-error-base">*</span>
 							</div>
 						</div>
-						<div ref={inputWrapRef} className="relative">
-							<Input.Root className="w-full rounded-xl" size="small">
-								<Input.Wrapper>
-									<Input.Input
-										readOnly
-										tabIndex={-1}
-										value={domain}
-										placeholder="send.example.com"
-									/>
-									{isSubdomain ? (
-										<Input.Icon>
-											<Icon name="check" className="h-4 w-4 text-green-500" />
-										</Input.Icon>
-									) : domainParts.length > 0 ? (
-										<Input.Icon>
-											<Icon
-												name="alert-triangle"
-												className="h-4 w-4 text-orange-500"
-											/>
-										</Input.Icon>
-									) : null}
-								</Input.Wrapper>
-							</Input.Root>
+						<div className="relative">
+							<div ref={inputWrapRef}>
+								<Input.Root className="w-full rounded-xl" size="small">
+									<Input.Wrapper>
+										<Input.Input
+											readOnly
+											tabIndex={-1}
+											value={domain}
+											placeholder="send.example.com"
+										/>
+										{isSubdomain ? (
+											<Input.Icon>
+												<Icon name="check" className="h-4 w-4 text-green-500" />
+											</Input.Icon>
+										) : domainParts.length > 0 ? (
+											<Input.Icon>
+												<Icon
+													name="alert-triangle"
+													className="h-4 w-4 text-orange-500"
+												/>
+											</Input.Icon>
+										) : null}
+									</Input.Wrapper>
+								</Input.Root>
+							</div>
 
 							<div className="mt-2 space-y-2">
 								<div className="font-medium text-text-sub-600 text-xs">
