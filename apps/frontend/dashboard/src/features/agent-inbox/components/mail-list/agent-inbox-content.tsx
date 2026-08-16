@@ -10,12 +10,12 @@ import {
 	AiSidebar,
 	useAiSidebar,
 } from "#/features/agent-inbox/components/ai-sidebar";
+import { InboxCategoryNavbar } from "#/features/agent-inbox/components/mail-list/inbox-category-navbar";
 import {
 	applyInboxFilters,
 	InboxCommandPalette,
 	useInboxActiveFilterCount,
 } from "#/features/agent-inbox/components/mail-list/inbox-command-palette";
-import { InboxCategoryNavbar } from "#/features/agent-inbox/components/mail-list/inbox-category-navbar";
 import { InboxEmptyState } from "#/features/agent-inbox/components/mail-list/inbox-empty-state";
 import {
 	ThreadList,
@@ -167,9 +167,7 @@ export const AgentInboxContent = ({
 			searchQuery,
 			filterParam,
 		);
-		return showInboxTabs
-			? applyInboxViewFilter(searched, activeTab)
-			: searched;
+		return showInboxTabs ? applyInboxViewFilter(searched, activeTab) : searched;
 	}, [groupedThreads, searchQuery, filterParam, showInboxTabs, activeTab]);
 
 	const tabCounts = useMemo(() => {
@@ -177,8 +175,9 @@ export const AgentInboxContent = ({
 		return {
 			unread: groupedThreads.filter((t) => t.unread).length,
 			starred: groupedThreads.filter((t) => t.isStarred).length,
-			needs_approval: groupedThreads.filter((t) => t.status === "needs_approval")
-				.length,
+			needs_approval: groupedThreads.filter(
+				(t) => t.status === "needs_approval",
+			).length,
 		};
 	}, [groupedThreads, showInboxTabs]);
 
@@ -350,7 +349,13 @@ export const AgentInboxContent = ({
 					),
 				);
 		},
-		[inArchiveFolder, mail.bulkSelected.length, selectedThread, runBulkAction, batchThreads],
+		[
+			inArchiveFolder,
+			mail.bulkSelected.length,
+			selectedThread,
+			runBulkAction,
+			batchThreads,
+		],
 	);
 
 	useHotkeys(
@@ -534,8 +539,8 @@ export const AgentInboxContent = ({
 	const listPane = (
 		<div className="flex min-h-0 flex-1 flex-col">
 			<div className="sticky top-0 z-15 shrink-0 bg-panel-light dark:bg-panel-dark">
-				<div className="flex h-11 items-center px-3">
-					<span className="flex w-5 shrink-0 items-center justify-center">
+				<div className="flex h-11 items-center pr-6 pl-4">
+					<span className="ml-1 flex w-5 shrink-0 items-center justify-center">
 						<button
 							type="button"
 							aria-label={
@@ -561,12 +566,16 @@ export const AgentInboxContent = ({
 							)}
 						</button>
 					</span>
-					<span className="w-3 shrink-0" aria-hidden="true" />
-					<h1 className="min-w-0 truncate font-semibold text-[18px] text-mail-foreground">
-						{folderTitle}
-					</h1>
+					{!showInboxTabs ? (
+						<>
+							<span className="w-3 shrink-0" aria-hidden="true" />
+							<h1 className="min-w-0 truncate font-semibold text-[18px] text-mail-foreground">
+								{folderTitle}
+							</h1>
+						</>
+					) : null}
 					{mail.bulkSelected.length === 0 ? (
-						<div className="ml-auto flex items-center gap-1 text-mail-muted">
+						<div className="flex items-center gap-1 text-mail-muted">
 							{activeFilterCount > 0 && (
 								<span className="mr-1 rounded-full bg-zero-blue/15 px-1.5 py-0.5 font-medium text-[11px] text-zero-blue tabular-nums">
 									{activeFilterCount}
@@ -611,7 +620,10 @@ export const AgentInboxContent = ({
 									onClick={() => void runBulkAction("archive", "Archived")}
 									className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--inbox-control)] hover:bg-[var(--inbox-control-hover)]"
 								>
-									<Icon name="archive" className="h-3.5 w-3.5 text-mail-muted" />
+									<Icon
+										name="archive"
+										className="h-3.5 w-3.5 text-mail-muted"
+									/>
 								</button>
 							)}
 							<button

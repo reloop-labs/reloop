@@ -32,21 +32,28 @@ export function InboxCategoryNavbar({
 						type="button"
 						onClick={() => onViewChange(view.id)}
 						className={cn(
-							"relative flex items-center gap-2.5 border-mail-border/50 border-l px-4 py-4 text-left first:border-l-0 sm:px-5",
+							"relative flex items-center gap-2.5 border-mail-border/50 border-l px-4 py-4 text-left first:border-l-0 first:pr-4 first:pl-4 sm:px-5 sm:first:pl-4",
 							isActive
 								? "bg-transparent"
 								: "bg-transparent hover:bg-[var(--inbox-row-hover)]",
 						)}
 						aria-current={isActive ? "page" : undefined}
 					>
-						<Icon
-							name={view.icon}
+						<span
 							className={cn(
-								"h-4 w-4 shrink-0",
-								isActive ? "text-mail-foreground" : "text-mail-muted",
+								"flex w-5 shrink-0 items-center justify-center",
+								view.id === "all" && "ml-1",
 							)}
-							aria-hidden
-						/>
+						>
+							<Icon
+								name={view.icon}
+								className={cn(
+									"h-4 w-4 shrink-0",
+									isActive ? "text-mail-foreground" : "text-mail-muted",
+								)}
+								aria-hidden
+							/>
+						</span>
 						<span
 							className={cn(
 								"truncate font-medium text-[14px] tracking-[-0.01em] sm:text-[15px]",
