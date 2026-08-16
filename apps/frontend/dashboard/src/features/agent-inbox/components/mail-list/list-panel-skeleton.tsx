@@ -9,13 +9,13 @@ export function ListPanelSkeleton({ className }: { className?: string }) {
 	return (
 		<div
 			className={cn(
-				"flex h-full min-h-0 flex-1 flex-col bg-panel-light md:rounded-2xl dark:bg-panel-dark",
+				"flex h-full min-h-0 flex-1 flex-col bg-panel-light dark:bg-panel-dark",
 				className,
 			)}
 			aria-busy="true"
 		>
 			<span className="sr-only">Loading inbox list</span>
-			<div className="sticky top-0 z-15 shrink-0 space-y-3 p-4 pb-2">
+			<div className="sticky top-0 z-15 shrink-0 space-y-3 px-3 py-2.5">
 				<div className="flex items-center gap-2">
 					<Skeleton className={cn("h-8 w-8 shrink-0 rounded-lg", sk)} />
 					<Skeleton className={cn("h-5 w-24", sk)} />

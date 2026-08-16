@@ -24,7 +24,6 @@ import { useInboxMail } from "#/features/agent-inbox/components/mail-list/use-in
 import { LoadingDot } from "#/features/agent-inbox/components/shared/loading-dot";
 import { SectionError } from "#/features/agent-inbox/components/shared/section-error";
 import { useInboxSidebar } from "#/features/agent-inbox/components/sidebar/inbox-sidebar-context";
-import { InboxSidebarToggle } from "#/features/agent-inbox/components/sidebar/inbox-sidebar-toggle";
 import { ThreadDetail } from "#/features/agent-inbox/components/thread-detail";
 import { useInboxUndo } from "#/features/agent-inbox/hooks/use-inbox-undo";
 import type {
@@ -78,7 +77,7 @@ export const AgentInboxContent = ({
 		retryThreads,
 	} = useAgentInbox();
 	const mailboxReady = !!getMailbox(mailbox.id) && !!mailbox.email;
-	const { toggleSidebar, openCompose } = useInboxSidebar();
+	const { openCompose } = useInboxSidebar();
 	const { pushBatchUndo, undo } = useInboxUndo();
 	const [mail, setMail] = useInboxMail();
 	const isDesktop = useMediaQuery("(min-width: 1024px)");
@@ -441,7 +440,7 @@ export const AgentInboxContent = ({
 		/>
 	) : selectedThreadId && threadsError ? (
 		<div className="flex h-full min-h-0 flex-col">
-			<div className="flex shrink-0 items-center gap-2 px-3 pt-3 pb-2">
+			<div className="flex h-11 shrink-0 items-center gap-2 px-3">
 				<button
 					type="button"
 					onClick={handleCloseThread}
@@ -483,9 +482,8 @@ export const AgentInboxContent = ({
 	const listPane = (
 		<div className="flex min-h-0 flex-1 flex-col">
 			<div className="sticky top-0 z-15 shrink-0 bg-panel-light dark:bg-panel-dark">
-				<div className="flex items-center py-3.5 pr-6 pl-4">
-					<InboxSidebarToggle onClick={toggleSidebar} />
-					<span className="ml-1 flex w-5 shrink-0 items-center justify-center">
+				<div className="flex h-11 items-center px-3">
+					<span className="flex w-5 shrink-0 items-center justify-center">
 						<button
 							type="button"
 							aria-label={
@@ -690,8 +688,8 @@ export const AgentInboxContent = ({
 				onSelectThread={handleSelectThread}
 			/>
 			{/* Gmail-style: list OR detail fills the main pane (not side-by-side). */}
-			<div className="relative flex min-h-0 min-w-0 flex-1 gap-1 rounded-inherit p-0 lg:h-[calc(100dvh-65px)]">
-				<div className="mb-1 flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-panel-light md:rounded-2xl lg:h-[calc(100dvh-66px)] dark:bg-panel-dark">
+			<div className="relative flex min-h-0 min-w-0 flex-1 p-0">
+				<div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-panel-light dark:bg-panel-dark">
 					{isThreadOpen ? detailPane : listPane}
 				</div>
 

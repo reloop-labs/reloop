@@ -1283,7 +1283,7 @@ export const ThreadDetail = ({
 	);
 
 	return (
-		<div className="relative flex h-full min-h-0 flex-col rounded-2xl bg-panel-light dark:bg-panel-dark">
+		<div className="relative flex h-full min-h-0 flex-col bg-panel-light dark:bg-panel-dark">
 			<ZeroThreadToolbar
 				isUnread={!!thread.unread}
 				folder={folder}

@@ -17,7 +17,7 @@ export const AgentInboxLayoutWrapper = ({
 			<InboxTopNavbar mailbox={mailbox} />
 			<div className="flex min-h-0 min-w-0 flex-1 overflow-hidden">
 				<InboxSidebar mailbox={mailbox} folder={folder} />
-				<div className="relative z-[5] flex min-h-0 min-w-0 flex-1 bg-sidebar p-0 md:mt-0 md:mr-1 md:mb-1">
+				<div className="relative z-[5] flex min-h-0 min-w-0 flex-1 overflow-hidden">
 					{children}
 				</div>
 				<InboxSupportPanel />

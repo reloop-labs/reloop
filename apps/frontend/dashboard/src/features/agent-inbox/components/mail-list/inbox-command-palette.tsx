@@ -720,7 +720,7 @@ export const InboxSearchTrigger = ({
 			type="button"
 			onClick={onOpenPalette}
 			className={cn(
-				"relative flex h-10 w-full flex-1 select-none items-center justify-start overflow-hidden rounded-2xl border border-mail-border/40 bg-[var(--inbox-control)] pl-3 text-left font-normal text-mail-foreground text-sm shadow-none transition-colors",
+				"relative flex h-8 w-full flex-1 select-none items-center justify-start overflow-hidden rounded-lg border border-mail-border/40 bg-[var(--inbox-control)] pl-2.5 text-left font-normal text-[13px] text-mail-foreground shadow-none transition-colors",
 				"hover:bg-[var(--inbox-control-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mail-foreground/15",
 			)}
 		>
