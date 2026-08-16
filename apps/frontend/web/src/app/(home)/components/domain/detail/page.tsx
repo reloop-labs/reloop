@@ -7,6 +7,7 @@ import Spinner from "@reloop/ui/spinner";
 import { siCloudflare } from "simple-icons";
 import type { DemoDomain } from "../_shared/data";
 import { DnsRecordTable } from "../_shared/dns-record-table";
+import { MotionItem, MotionStage } from "../_shared/page-motion";
 import {
 	getStatusColorClass,
 	getStatusIcon,
@@ -161,8 +162,8 @@ export function DomainDetailPage({ domain }: { domain: DemoDomain }) {
 				: "Almost there! Add the DNS records shown below, then click Verify — and you'll be ready to send.";
 
 	return (
-		<div className="mx-auto max-w-3xl space-y-8 overflow-hidden p-6 lg:p-8">
-			<div className="flex items-center justify-between">
+		<MotionStage className="mx-auto max-w-3xl space-y-8 overflow-hidden p-6 lg:p-8">
+			<MotionItem className="flex items-center justify-between">
 				<div className="flex min-w-0 items-center gap-3">
 					<div
 						className={cn(
@@ -201,9 +202,9 @@ export function DomainDetailPage({ domain }: { domain: DemoDomain }) {
 						{domain.status === "verifying" ? "Verifying..." : "Verify Domain"}
 					</FancyButton.Root>
 				)}
-			</div>
+			</MotionItem>
 
-			<div className="mt-7 grid grid-cols-3 gap-x-12 gap-y-6">
+			<MotionItem className="mt-7 grid grid-cols-3 gap-x-12 gap-y-6">
 				<div className="flex flex-col gap-1.5">
 					<div className="flex items-center gap-1.5">
 						<Icon name="calendar" className="h-3.5 w-3.5 text-text-sub-600" />
@@ -255,9 +256,9 @@ export function DomainDetailPage({ domain }: { domain: DemoDomain }) {
 						</span>
 					</div>
 				</div>
-			</div>
+			</MotionItem>
 
-			<div className="mt-7 flex flex-col gap-6 rounded-2xl border border-stroke-soft-200 bg-bg-weak-50/50 p-6 dark:border-stroke-soft-100/40">
+			<MotionItem className="mt-7 flex flex-col gap-6 rounded-2xl border border-stroke-soft-200 bg-bg-weak-50/50 p-6 dark:border-stroke-soft-100/40">
 				<div className="flex flex-col gap-1">
 					<div className="flex items-center gap-1.5">
 						<Icon name="activity" className="h-3.5 w-3.5 text-text-sub-600" />
@@ -271,9 +272,9 @@ export function DomainDetailPage({ domain }: { domain: DemoDomain }) {
 				</div>
 				<div className="h-[1px] w-full bg-stroke-soft-200 dark:bg-stroke-soft-100/40" />
 				<StatusTimeline domain={domain} />
-			</div>
+			</MotionItem>
 
-			<div className="mt-7">
+			<MotionItem className="mt-7">
 				<div className="relative flex h-12 items-center gap-0 border-stroke-soft-200 border-b dark:border-white/10">
 					<button
 						type="button"
@@ -314,7 +315,7 @@ export function DomainDetailPage({ domain }: { domain: DemoDomain }) {
 						)}
 					</div>
 				</div>
-			</div>
-		</div>
+			</MotionItem>
+		</MotionStage>
 	);
 }

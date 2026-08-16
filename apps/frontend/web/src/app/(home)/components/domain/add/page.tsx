@@ -10,6 +10,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import type { Ref } from "react";
 import { ActionKbd, actionKbdOnBlueClassName } from "../_shared/action-kbd";
 import { DomainPreview } from "../_shared/domain-preview";
+import { MotionItem, MotionStage } from "../_shared/page-motion";
 
 function RecommendRow({
 	ok,
@@ -63,16 +64,17 @@ export function DomainAddPage({
 		domainParts.length >= 2 ? domainParts.slice(-2).join(".") : "example.com";
 
 	return (
-		<div className="mx-auto grid h-full w-full max-w-5xl overflow-hidden lg:grid-cols-2">
+		<MotionStage className="mx-auto grid h-full w-full max-w-5xl overflow-hidden lg:grid-cols-2">
 			<div className="mx-auto w-full max-w-md px-6 py-10 lg:px-8 lg:py-12">
-				<div className="pb-4">
+				<MotionItem className="pb-4">
 					<h1 className="font-semibold text-title-h6 leading-8">Add Domain</h1>
 					<p className="text-text-sub-600 text-xs">
 						Send emails from a domain you control
 					</p>
-				</div>
+				</MotionItem>
 
 				<div className="mt-6 flex w-full flex-col">
+					<MotionItem>
 					<section className="space-y-1">
 						<div className="space-y-1">
 							<div className="block font-medium text-sm text-text-strong-950">
@@ -125,8 +127,9 @@ export function DomainAddPage({
 							</div>
 						</div>
 					</section>
+					</MotionItem>
 
-					<div className="mt-2 w-full">
+					<MotionItem className="mt-2 w-full">
 						<button
 							type="button"
 							tabIndex={-1}
@@ -140,9 +143,9 @@ export function DomainAddPage({
 								className="size-4 shrink-0 text-text-sub-600"
 							/>
 						</button>
-					</div>
+					</MotionItem>
 
-					<div className="mt-5 flex items-center gap-3">
+					<MotionItem className="mt-5 flex items-center gap-3">
 						<div
 							ref={submitRef}
 							className={cn(
@@ -199,13 +202,13 @@ export function DomainAddPage({
 								<ActionKbd className="w-auto min-w-4 px-1">⌫</ActionKbd>
 							</span>
 						</Button.Root>
-					</div>
+					</MotionItem>
 				</div>
 			</div>
 
-			<div className="relative hidden overflow-hidden lg:block">
+			<MotionItem className="relative hidden overflow-hidden lg:block">
 				<DomainPreview domain={domain} variant="domain" />
-			</div>
-		</div>
+			</MotionItem>
+		</MotionStage>
 	);
 }

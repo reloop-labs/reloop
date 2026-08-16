@@ -9,6 +9,7 @@ import { ActionKbd, actionKbdOnBlueClassName } from "../_shared/action-kbd";
 import { CloudflareBanner } from "../_shared/cloudflare-banner";
 import type { DemoDomain } from "../_shared/data";
 import { DnsRecordTable } from "../_shared/dns-record-table";
+import { MotionItem, MotionStage } from "../_shared/page-motion";
 
 function RecordGroup({
 	title,
@@ -64,42 +65,48 @@ export function DomainSetupPage({
 	);
 
 	return (
-		<div className="mx-auto max-w-3xl space-y-6 overflow-hidden p-6 lg:p-8">
-			<div className="pt-6">
+		<MotionStage className="mx-auto max-w-3xl space-y-6 overflow-hidden p-6 lg:p-8">
+			<MotionItem className="pt-6">
 				<h1 className="font-semibold text-title-h6 leading-8">
 					Configure DNS for {domain.domain}
 				</h1>
 				<p className="mt-1 text-paragraph-sm text-text-sub-600">
 					Add these records at your DNS provider, then verify.
 				</p>
-			</div>
+			</MotionItem>
 
-			<CloudflareBanner
-				boxRef={cloudflareRef}
-				pressed={cloudflarePressed}
-				connecting={connecting}
-			/>
+			<MotionItem>
+				<CloudflareBanner
+					boxRef={cloudflareRef}
+					pressed={cloudflarePressed}
+					connecting={connecting}
+				/>
+			</MotionItem>
 
-			<div className="flex flex-col space-y-6">
+			<MotionItem>
 				<RecordGroup
 					title="Domain Verification"
 					icon="shield"
 					records={dkimRecords}
 				/>
+			</MotionItem>
+			<MotionItem>
 				<RecordGroup
 					title="Email Sending"
 					icon="mail-send"
 					records={[...sendingRecords, ...dmarcRecords]}
 				/>
+			</MotionItem>
+			<MotionItem>
 				<RecordGroup
 					title="Email Receiving"
 					icon="mail-receive"
 					records={receivingRecords}
 					showPriority
 				/>
-			</div>
+			</MotionItem>
 
-			<div className="flex items-center justify-between gap-3 pt-6">
+			<MotionItem className="flex items-center justify-between gap-3 pt-6">
 				<Button.Root
 					type="button"
 					variant="neutral"
@@ -126,7 +133,7 @@ export function DomainSetupPage({
 					<span>Verify & finish</span>
 					<ActionKbd className={actionKbdOnBlueClassName}>↵</ActionKbd>
 				</FancyButton.Root>
-			</div>
-		</div>
+			</MotionItem>
+		</MotionStage>
 	);
 }

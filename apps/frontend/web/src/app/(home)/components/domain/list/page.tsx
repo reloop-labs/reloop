@@ -9,6 +9,7 @@ import type { Ref } from "react";
 import { ActionKbd } from "../_shared/action-kbd";
 import type { DemoDomain } from "../_shared/data";
 import { domainTableGridStyle } from "../_shared/data";
+import { MotionItem, MotionStage } from "../_shared/page-motion";
 import {
 	getStatusColorClass,
 	getStatusIcon,
@@ -100,8 +101,8 @@ export function DomainListPage({
 	highlightId?: string | null;
 }) {
 	return (
-		<div className="mx-auto max-w-6xl space-y-6 overflow-hidden p-6 lg:p-8">
-			<div className="flex flex-col gap-4 pt-2 pb-4 sm:flex-row sm:items-start sm:justify-between">
+		<MotionStage className="mx-auto max-w-6xl space-y-6 overflow-hidden p-6 lg:p-8">
+			<MotionItem className="flex flex-col gap-4 pt-2 pb-4 sm:flex-row sm:items-start sm:justify-between">
 				<div>
 					<div className="flex items-center gap-2.5">
 						<Icon
@@ -164,11 +165,12 @@ export function DomainListPage({
 						</FancyButton.Root>
 					</div>
 				</div>
-			</div>
+			</MotionItem>
 
 			<div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
 				<div className="lg:col-span-9 xl:col-span-9">
 					<div className="space-y-4">
+						<MotionItem>
 						<div
 							role="toolbar"
 							aria-orientation="horizontal"
@@ -224,8 +226,9 @@ export function DomainListPage({
 								</button>
 							</div>
 						</div>
+						</MotionItem>
 
-						<div className="w-full text-paragraph-sm">
+						<MotionItem className="w-full text-paragraph-sm">
 							<div
 								style={domainTableGridStyle}
 								className="grid items-center rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-4 pt-2.5 pb-5 font-medium text-text-sub-600 text-xs dark:border-[#101010] dark:bg-bg-weak-50/40"
@@ -273,11 +276,12 @@ export function DomainListPage({
 									</span>
 								</div>
 							</div>
-						</div>
+						</MotionItem>
 					</div>
 				</div>
 
 				<div className="lg:col-span-3 xl:col-span-3">
+					<MotionItem>
 					<aside className="space-y-3 lg:sticky lg:top-6">
 						<div>
 							<h2 className="font-semibold text-lg text-text-strong-950 tracking-tight">
@@ -318,8 +322,9 @@ export function DomainListPage({
 							</p>
 						</div>
 					</aside>
+					</MotionItem>
 				</div>
 			</div>
-		</div>
+		</MotionStage>
 	);
 }

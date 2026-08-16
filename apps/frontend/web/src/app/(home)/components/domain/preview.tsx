@@ -5,12 +5,15 @@ import { useEffect, useRef, useState } from "react";
 import { HeroDemoCursor } from "../hero-demo-cursor";
 import { DomainAddPage } from "./add/page";
 import { LIST_DOMAINS, NEW_DOMAIN, type DemoDomain } from "./_shared/data";
+import {
+	PAGE_EASE,
+	PAGE_TRANSITION_MS,
+	stageVariants,
+} from "./_shared/page-motion";
 import type { DomainStatus } from "./_shared/status";
 import { DomainDetailPage } from "./detail/page";
 import { DomainListPage } from "./list/page";
 import { DomainSetupPage } from "./setup/page";
-
-const PAGE_EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 function pointIn(
 	container: HTMLElement,
@@ -156,7 +159,7 @@ export function HeroDomainPreview() {
 			await animate(cursorOpacity, 1, { duration: 0.22, ease: PAGE_EASE });
 			if (cancelled) return;
 
-			await sleep(280);
+			await sleep(480);
 			if (cancelled) return;
 			await moveTo(() => addBtnRef.current);
 			if (cancelled) return;
@@ -165,7 +168,7 @@ export function HeroDomainPreview() {
 			if (cancelled) return;
 
 			setView("add");
-			await sleep(320);
+			await sleep(PAGE_TRANSITION_MS);
 			if (cancelled) return;
 
 			await moveTo(() => inputWrapRef.current, 0.22, 0.5);
@@ -196,7 +199,7 @@ export function HeroDomainPreview() {
 			setSubmitting(false);
 			setAdded(true);
 			setView("setup");
-			await sleep(320);
+			await sleep(PAGE_TRANSITION_MS);
 			if (cancelled) return;
 
 			await moveTo(() => cloudflareRef.current);
@@ -212,7 +215,7 @@ export function HeroDomainPreview() {
 			setNewStatus("verifying");
 			setView("detail");
 
-			await sleep(280);
+			await sleep(PAGE_TRANSITION_MS);
 			if (cancelled) return;
 			await animate(cursorOpacity, 0, { duration: 0.28, ease: PAGE_EASE });
 
@@ -264,30 +267,32 @@ export function HeroDomainPreview() {
 			aria-hidden
 			className="relative h-full overflow-hidden bg-bg-white-0 select-none dark:bg-black"
 		>
-			<DomainListPage
-				domains={listDomains}
-				addBtnRef={addBtnRef}
-				addPressed={addPressed}
-				highlightId={added ? NEW_DOMAIN.id : null}
-			/>
-
 			<AnimatePresence>
+				{view === "list" && (
+					<motion.div
+						key="list"
+						className="absolute inset-0 overflow-hidden bg-bg-white-0 dark:bg-black"
+						variants={stageVariants}
+						initial={reduceMotion ? false : "hidden"}
+						animate="show"
+						exit="exit"
+					>
+						<DomainListPage
+							domains={listDomains}
+							addBtnRef={addBtnRef}
+							addPressed={addPressed}
+							highlightId={added ? NEW_DOMAIN.id : null}
+						/>
+					</motion.div>
+				)}
 				{view === "add" && (
 					<motion.div
 						key="add"
 						className="absolute inset-0 z-20 overflow-hidden bg-bg-white-0 dark:bg-black"
-						initial={
-							reduceMotion
-								? { opacity: 1 }
-								: { opacity: 0, scale: 0.96, y: 10 }
-						}
-						animate={{ opacity: 1, scale: 1, y: 0 }}
-						exit={
-							reduceMotion
-								? { opacity: 0 }
-								: { opacity: 0, scale: 0.96, y: 8 }
-						}
-						transition={{ duration: 0.25, ease: PAGE_EASE }}
+						variants={stageVariants}
+						initial={reduceMotion ? false : "hidden"}
+						animate="show"
+						exit="exit"
 					>
 						<DomainAddPage
 							domain={typed}
@@ -302,18 +307,10 @@ export function HeroDomainPreview() {
 					<motion.div
 						key="setup"
 						className="absolute inset-0 z-20 overflow-hidden bg-bg-white-0 dark:bg-black"
-						initial={
-							reduceMotion
-								? { opacity: 1 }
-								: { opacity: 0, scale: 0.96, y: 10 }
-						}
-						animate={{ opacity: 1, scale: 1, y: 0 }}
-						exit={
-							reduceMotion
-								? { opacity: 0 }
-								: { opacity: 0, scale: 0.96, y: 8 }
-						}
-						transition={{ duration: 0.25, ease: PAGE_EASE }}
+						variants={stageVariants}
+						initial={reduceMotion ? false : "hidden"}
+						animate="show"
+						exit="exit"
 					>
 						<DomainSetupPage
 							domain={addedDomain}
@@ -327,18 +324,10 @@ export function HeroDomainPreview() {
 					<motion.div
 						key="detail"
 						className="absolute inset-0 z-20 overflow-hidden bg-bg-white-0 dark:bg-black"
-						initial={
-							reduceMotion
-								? { opacity: 1 }
-								: { opacity: 0, scale: 0.96, y: 10 }
-						}
-						animate={{ opacity: 1, scale: 1, y: 0 }}
-						exit={
-							reduceMotion
-								? { opacity: 0 }
-								: { opacity: 0, scale: 0.96, y: 8 }
-						}
-						transition={{ duration: 0.25, ease: PAGE_EASE }}
+						variants={stageVariants}
+						initial={reduceMotion ? false : "hidden"}
+						animate="show"
+						exit="exit"
 					>
 						<DomainDetailPage domain={addedDomain} />
 					</motion.div>
