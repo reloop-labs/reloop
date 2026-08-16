@@ -58,7 +58,7 @@ function MatrixCell({
 			) : (
 				<motion.div
 					className="min-w-0 max-w-full"
-					initial={{ opacity: 0, y: 4 }}
+					initial={{ opacity: 0, y: 2 }}
 					animate={{ opacity: 1, y: 0 }}
 					transition={{
 						duration: CELL_DURATION,
@@ -115,10 +115,7 @@ function DomainRow({
 						getStatusColorClass(domain.status),
 					)}
 				>
-					<Icon
-						name={getStatusIcon(domain.status)}
-						className="h-3.5 w-3.5"
-					/>
+					<Icon name={getStatusIcon(domain.status)} className="h-3.5 w-3.5" />
 					{getStatusLabel(domain.status)}
 				</div>
 			</MatrixCell>
@@ -211,9 +208,7 @@ function DomainTable({
 							<Icon name="chevron-down" className="h-3 w-3" />
 						</button>
 					</div>
-					<span className="px-2 text-text-sub-600 text-xs">
-						Page 1 of 1
-					</span>
+					<span className="px-2 text-text-sub-600 text-xs">Page 1 of 1</span>
 				</motion.div>
 			</div>
 		</div>
@@ -302,61 +297,61 @@ export function DomainListPage({
 				<div className="lg:col-span-9 xl:col-span-9">
 					<div className="space-y-4">
 						<MotionItem>
-						<div
-							role="toolbar"
-							aria-orientation="horizontal"
-							className="flex w-full items-start justify-between gap-2"
-						>
-							<div className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
-								<Input.Root
-									size="small"
-									className="w-40 rounded-xl shadow-none! lg:w-56"
-								>
-									<Input.Wrapper>
-										<Input.Icon as={Icon} name="search" size="small" />
-										<Input.Input
-											readOnly
-											tabIndex={-1}
-											placeholder="Search domains..."
-										/>
-										<button
-											type="button"
-											tabIndex={-1}
-											aria-label="Focus search"
-											className="shrink-0 cursor-pointer rounded-[5px] outline-none"
-										>
-											<ActionKbd>/</ActionKbd>
-										</button>
-									</Input.Wrapper>
-								</Input.Root>
-								<button
-									type="button"
-									tabIndex={-1}
-									className={toolbarControlClassName}
-								>
-									<Icon name="plus-circle" className="size-4" />
-									Status
-								</button>
+							<div
+								role="toolbar"
+								aria-orientation="horizontal"
+								className="flex w-full items-start justify-between gap-2"
+							>
+								<div className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
+									<Input.Root
+										size="small"
+										className="w-40 rounded-xl shadow-none! lg:w-56"
+									>
+										<Input.Wrapper>
+											<Input.Icon as={Icon} name="search" size="small" />
+											<Input.Input
+												readOnly
+												tabIndex={-1}
+												placeholder="Search domains..."
+											/>
+											<button
+												type="button"
+												tabIndex={-1}
+												aria-label="Focus search"
+												className="shrink-0 cursor-pointer rounded-[5px] outline-none"
+											>
+												<ActionKbd>/</ActionKbd>
+											</button>
+										</Input.Wrapper>
+									</Input.Root>
+									<button
+										type="button"
+										tabIndex={-1}
+										className={toolbarControlClassName}
+									>
+										<Icon name="plus-circle" className="size-4" />
+										Status
+									</button>
+								</div>
+								<div className="flex shrink-0 items-center gap-2">
+									<button
+										type="button"
+										tabIndex={-1}
+										className={toolbarControlClassName}
+									>
+										<Icon name="gear" className="size-4 text-text-soft-400" />
+										View
+									</button>
+									<button
+										type="button"
+										tabIndex={-1}
+										className={cn(toolbarControlClassName, "gap-2 px-1.5")}
+									>
+										<Icon name="rotate-cw" className="h-3.5 w-3.5 shrink-0" />
+										<ActionKbd>R</ActionKbd>
+									</button>
+								</div>
 							</div>
-							<div className="flex shrink-0 items-center gap-2">
-								<button
-									type="button"
-									tabIndex={-1}
-									className={toolbarControlClassName}
-								>
-									<Icon name="gear" className="size-4 text-text-soft-400" />
-									View
-								</button>
-								<button
-									type="button"
-									tabIndex={-1}
-									className={cn(toolbarControlClassName, "gap-2 px-1.5")}
-								>
-									<Icon name="rotate-cw" className="h-3.5 w-3.5 shrink-0" />
-									<ActionKbd>R</ActionKbd>
-								</button>
-							</div>
-						</div>
 						</MotionItem>
 
 						<DomainTable domains={domains} highlightId={highlightId} />
@@ -365,46 +360,46 @@ export function DomainListPage({
 
 				<div className="lg:col-span-3 xl:col-span-3">
 					<MotionItem>
-					<aside className="space-y-3 lg:sticky lg:top-6">
-						<div>
-							<h2 className="font-semibold text-lg text-text-strong-950 tracking-tight">
-								Domain resources
-							</h2>
-							<p className="mt-1 text-text-sub-600 text-xs leading-relaxed">
-								Guides & documentation for domain management.
-							</p>
-						</div>
-						<div className={resourceCardClassName}>
-							<div className="flex items-start justify-between gap-3">
-								<h3 className="font-semibold text-sm text-text-strong-950">
-									Configure DNS by provider
-								</h3>
-								<Icon
-									name="chevron-right"
-									className="mt-0.5 h-4 w-4 shrink-0 text-text-soft-400"
-								/>
+						<aside className="space-y-3 lg:sticky lg:top-6">
+							<div>
+								<h2 className="font-semibold text-lg text-text-strong-950 tracking-tight">
+									Domain resources
+								</h2>
+								<p className="mt-1 text-text-sub-600 text-xs leading-relaxed">
+									Guides & documentation for domain management.
+								</p>
 							</div>
-							<p className="mt-1.5 text-text-sub-600 text-xs leading-relaxed">
-								Step-by-step guides for Cloudflare, GoDaddy, Route 53,
-								Namecheap, and more.
-							</p>
-						</div>
-						<div className={resourceCardClassName}>
-							<div className="flex items-start justify-between gap-3">
-								<h3 className="font-semibold text-sm text-text-strong-950">
-									Domain verification guide
-								</h3>
-								<Icon
-									name="chevron-right"
-									className="mt-0.5 h-4 w-4 shrink-0 text-text-soft-400"
-								/>
+							<div className={resourceCardClassName}>
+								<div className="flex items-start justify-between gap-3">
+									<h3 className="font-semibold text-sm text-text-strong-950">
+										Configure DNS by provider
+									</h3>
+									<Icon
+										name="chevron-right"
+										className="mt-0.5 h-4 w-4 shrink-0 text-text-soft-400"
+									/>
+								</div>
+								<p className="mt-1.5 text-text-sub-600 text-xs leading-relaxed">
+									Step-by-step guides for Cloudflare, GoDaddy, Route 53,
+									Namecheap, and more.
+								</p>
 							</div>
-							<p className="mt-1.5 text-text-sub-600 text-xs leading-relaxed">
-								Add a sending domain and verify SPF, DKIM, and DMARC for
-								deliverability.
-							</p>
-						</div>
-					</aside>
+							<div className={resourceCardClassName}>
+								<div className="flex items-start justify-between gap-3">
+									<h3 className="font-semibold text-sm text-text-strong-950">
+										Domain verification guide
+									</h3>
+									<Icon
+										name="chevron-right"
+										className="mt-0.5 h-4 w-4 shrink-0 text-text-soft-400"
+									/>
+								</div>
+								<p className="mt-1.5 text-text-sub-600 text-xs leading-relaxed">
+									Add a sending domain and verify SPF, DKIM, and DMARC for
+									deliverability.
+								</p>
+							</div>
+						</aside>
 					</MotionItem>
 				</div>
 			</div>
