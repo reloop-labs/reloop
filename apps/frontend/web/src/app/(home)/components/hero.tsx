@@ -46,10 +46,10 @@ const TABS: {
 	{
 		id: "sdk",
 		title: "Domain",
-		description: "Add and verify custom domains to send with maximum deliverability.",
+		description: "SPF, DKIM, and DMARC authentication for your domain.",
 		banner: {
 			title: "Domains",
-			description: "Add and verify custom domains to send with maximum deliverability.",
+			description: "Set up SPF, DKIM, and DMARC so every send authenticates.",
 			href: "/docs/learn/domain",
 			icon: "globe",
 		},
