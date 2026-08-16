@@ -7,6 +7,7 @@ import Spinner from "@reloop/ui/spinner";
 import { siCloudflare } from "simple-icons";
 import type { DemoDomain } from "../_shared/data";
 import { DnsRecordTable } from "../_shared/dns-record-table";
+import { FlowCell } from "../_shared/flow-cell";
 import { MotionItem, MotionStage } from "../_shared/page-motion";
 import {
 	getStatusColorClass,
@@ -143,6 +144,36 @@ function StatusTimeline({ domain }: { domain: DemoDomain }) {
 	);
 }
 
+function DetailRecordGroup({
+	title,
+	icon,
+	records,
+	secondaryRecords,
+}: {
+	title: string;
+	icon: string;
+	records: DemoDomain["dnsRecords"];
+	secondaryRecords?: DemoDomain["dnsRecords"];
+}) {
+	if (records.length === 0) return null;
+	return (
+		<div className="rounded-2xl border border-stroke-soft-100 p-4 dark:border-stroke-soft-100/10">
+			<FlowCell index={0} enabled className="mb-4 inline-flex">
+				<div className="flex items-center gap-2 text-base text-text-strong-950">
+					<Icon name={icon} className="h-4 w-4 text-text-sub-600" />
+					<h3 className="font-semibold">{title}</h3>
+				</div>
+			</FlowCell>
+			<DnsRecordTable records={records} flow />
+			{secondaryRecords && secondaryRecords.length > 0 && (
+				<div className="mt-7">
+					<DnsRecordTable records={secondaryRecords} flow />
+				</div>
+			)}
+		</div>
+	);
+}
+
 export function DomainDetailPage({ domain }: { domain: DemoDomain }) {
 	const dkimRecords = domain.dnsRecords.filter(
 		(record) => record.recordTypeName === "DKIM",
@@ -162,7 +193,12 @@ export function DomainDetailPage({ domain }: { domain: DemoDomain }) {
 				: "Almost there! Add the DNS records shown below, then click Verify — and you'll be ready to send.";
 
 	return (
-		<MotionStage className="mx-auto max-w-3xl space-y-8 overflow-hidden p-6 lg:p-8">
+		<MotionStage
+			className="mx-auto max-w-3xl space-y-8 overflow-hidden p-6 lg:p-8"
+			staggerChildren={0.12}
+			delayChildren={0.06}
+			orchestrate
+		>
 			<MotionItem className="flex items-center justify-between">
 				<div className="flex min-w-0 items-center gap-3">
 					<div
@@ -184,12 +220,16 @@ export function DomainDetailPage({ domain }: { domain: DemoDomain }) {
 						/>
 					</div>
 					<div className="min-w-0">
-						<p className="font-medium text-paragraph-xs text-text-sub-600">
-							Domain
-						</p>
-						<h1 className="mb-0.5 font-semibold text-title-h6 leading-5">
-							{domain.domain}
-						</h1>
+						<FlowCell index={0} enabled>
+							<p className="font-medium text-paragraph-xs text-text-sub-600">
+								Domain
+							</p>
+						</FlowCell>
+						<FlowCell index={1} enabled>
+							<h1 className="mb-0.5 font-semibold text-title-h6 leading-5">
+								{domain.domain}
+							</h1>
+						</FlowCell>
 					</div>
 				</div>
 				{domain.status !== "active" && (
@@ -295,25 +335,17 @@ export function DomainDetailPage({ domain }: { domain: DemoDomain }) {
 				</div>
 
 				<div className="mt-6 flex flex-col space-y-6">
-					<div className="rounded-2xl border border-stroke-soft-100 p-4 dark:border-stroke-soft-100/10">
-						<div className="mb-4 flex items-center gap-2 text-base text-text-strong-950">
-							<Icon name="shield" className="h-4 w-4 text-text-sub-600" />
-							<h3 className="font-semibold">Domain Verification</h3>
-						</div>
-						<DnsRecordTable records={dkimRecords} />
-					</div>
-					<div className="rounded-2xl border border-stroke-soft-100 p-4 dark:border-stroke-soft-100/10">
-						<div className="mb-4 flex items-center gap-2 text-base text-text-strong-950">
-							<Icon name="mail-send" className="h-4 w-4 text-text-sub-600" />
-							<h3 className="font-semibold">Email Sending</h3>
-						</div>
-						<DnsRecordTable records={sendingRecords} />
-						{dmarcRecords.length > 0 && (
-							<div className="mt-7">
-								<DnsRecordTable records={dmarcRecords} />
-							</div>
-						)}
-					</div>
+					<DetailRecordGroup
+						title="Domain Verification"
+						icon="shield"
+						records={dkimRecords}
+					/>
+					<DetailRecordGroup
+						title="Email Sending"
+						icon="mail-send"
+						records={sendingRecords}
+						secondaryRecords={dmarcRecords}
+					/>
 				</div>
 			</MotionItem>
 		</MotionStage>

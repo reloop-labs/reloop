@@ -9,6 +9,7 @@ import { ActionKbd, actionKbdOnBlueClassName } from "../_shared/action-kbd";
 import { CloudflareBanner } from "../_shared/cloudflare-banner";
 import type { DemoDomain } from "../_shared/data";
 import { DnsRecordTable } from "../_shared/dns-record-table";
+import { FlowCell } from "../_shared/flow-cell";
 import { MotionItem, MotionStage } from "../_shared/page-motion";
 
 function RecordGroup({
@@ -27,10 +28,12 @@ function RecordGroup({
 	if (records.length === 0) return null;
 	return (
 		<div className="rounded-2xl border border-stroke-soft-100 p-4 dark:border-stroke-soft-100/10">
-			<div className="mb-4 flex items-center gap-2 text-base text-text-strong-950">
-				<Icon name={icon} className="h-4 w-4 text-text-sub-600" />
-				<h3 className="font-semibold">{title}</h3>
-			</div>
+			<FlowCell index={0} enabled className="mb-4 inline-flex">
+				<div className="flex items-center gap-2 text-base text-text-strong-950">
+					<Icon name={icon} className="h-4 w-4 text-text-sub-600" />
+					<h3 className="font-semibold">{title}</h3>
+				</div>
+			</FlowCell>
 			<DnsRecordTable
 				records={records}
 				hideStatus={hideStatus}
