@@ -32,11 +32,11 @@ const resourceCardClassName = cn(
 	"dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/20 dark:hover:bg-bg-weak-50/40",
 );
 
-const WAVE_DELAY = 0.1;
-const WAVE_STAGGER = 0.14;
-const CELL_DURATION = 0.5;
+const WAVE_DELAY = 0.04;
+const WAVE_STAGGER = 0.06;
+const CELL_DURATION = 0.28;
 const FOOTER_AFTER_ITEMS = 2;
-const FOOTER_DURATION = 0.42;
+const FOOTER_DURATION = 0.26;
 
 function MatrixCell({
 	row,
@@ -52,13 +52,13 @@ function MatrixCell({
 	const reduceMotion = useReducedMotion();
 
 	return (
-		<div className={cn("flex min-w-0 items-center overflow-hidden", className)}>
+		<div className={cn("flex min-w-0 items-center", className)}>
 			{reduceMotion ? (
 				children
 			) : (
 				<motion.div
 					className="min-w-0 max-w-full"
-					initial={{ opacity: 0, y: 8 }}
+					initial={{ opacity: 0, y: 4 }}
 					animate={{ opacity: 1, y: 0 }}
 					transition={{
 						duration: CELL_DURATION,
