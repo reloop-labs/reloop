@@ -1,25 +1,56 @@
 "use client";
 
 import {
+	animate,
 	motion,
+	useMotionValue,
 	useReducedMotion,
 	useScroll,
 	useTransform,
 } from "framer-motion";
-import type { ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 
 const SHRINK_DISTANCE_PX = 900;
 const SCALE_START = 1;
 const SCALE_END = 0.9;
+const INTRO_SCALE = 1.045;
+const INTRO_MS = 720;
+const INTRO_EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
 export function DomainScrollWindow({ children }: { children: ReactNode }) {
 	const reduceMotion = useReducedMotion();
 	const { scrollY } = useScroll();
-	const transform = useTransform(
+	const scrollScale = useTransform(
 		scrollY,
 		[0, SHRINK_DISTANCE_PX],
-		[`scale(${SCALE_START})`, `scale(${SCALE_END})`],
+		[SCALE_START, SCALE_END],
 	);
+	const scale = useMotionValue(reduceMotion ? SCALE_START : INTRO_SCALE);
+	const transform = useTransform(scale, (value) => `scale(${value})`);
+
+	useEffect(() => {
+		if (reduceMotion) {
+			scale.set(scrollScale.get());
+			return scrollScale.on("change", (value) => scale.set(value));
+		}
+
+		let introFinished = false;
+		const intro = animate(scale, scrollScale.get(), {
+			duration: INTRO_MS / 1000,
+			ease: INTRO_EASE,
+			onComplete: () => {
+				introFinished = true;
+			},
+		});
+		const unsubscribe = scrollScale.on("change", (value) => {
+			if (introFinished) scale.set(value);
+		});
+
+		return () => {
+			intro.stop();
+			unsubscribe();
+		};
+	}, [reduceMotion, scale, scrollScale]);
 
 	const frame = (
 		<div className="flex h-[32rem] w-full flex-col sm:h-[40rem] lg:h-[48rem]">
