@@ -15,6 +15,7 @@ import {
 	InboxCommandPalette,
 	useInboxActiveFilterCount,
 } from "#/features/agent-inbox/components/mail-list/inbox-command-palette";
+import { InboxCategoryNavbar } from "#/features/agent-inbox/components/mail-list/inbox-category-navbar";
 import { InboxEmptyState } from "#/features/agent-inbox/components/mail-list/inbox-empty-state";
 import {
 	ThreadList,
@@ -30,12 +31,41 @@ import type {
 	AgentMailbox,
 	BatchThreadAction,
 	InboundThread,
+	InboxView,
 } from "#/features/agent-inbox/types";
+import { INBOX_VIEWS } from "#/features/agent-inbox/types";
 import {
+	applyInboxViewFilter,
 	findThreadByListId,
 	groupThreadsByConversation,
 } from "#/features/agent-inbox/utils/group-threads";
 import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
+
+const INBOX_VIEW_IDS = new Set<string>(INBOX_VIEWS.map((view) => view.id));
+
+function parseInboxView(value: string): InboxView {
+	return INBOX_VIEW_IDS.has(value) ? (value as InboxView) : "all";
+}
+
+const TAB_EMPTY: Record<InboxView, { title: string; description: string }> = {
+	all: {
+		title: "No received mail yet",
+		description:
+			"Inbox shows emails sent to this address. Outbound mail lives in Sent.",
+	},
+	unread: {
+		title: "You're all caught up",
+		description: "No unread mail in this inbox.",
+	},
+	needs_approval: {
+		title: "Nothing to review",
+		description: "Agent drafts that need your approval will show up here.",
+	},
+	starred: {
+		title: "No starred mail",
+		description: "Star a thread to keep it here.",
+	},
+};
 
 const FOLDER_TITLES: Record<string, string> = {
 	inbox: "Inbox",
@@ -105,10 +135,16 @@ export const AgentInboxContent = ({
 		"filter",
 		parseAsString.withDefault(""),
 	);
+	const [tabParam, setTabParam] = useQueryState(
+		"tab",
+		parseAsString.withDefault("all"),
+	);
 	const [selectedThreadId, setSelectedThreadId] = useQueryState(
 		"threadId",
 		parseAsString.withDefault(""),
 	);
+	const activeTab = parseInboxView(tabParam);
+	const showInboxTabs = folder === "inbox";
 
 	const folderTitle = folder.startsWith("label:")
 		? "Label"
@@ -125,10 +161,26 @@ export const AgentInboxContent = ({
 		[threads],
 	);
 
-	const filteredThreads = useMemo(
-		() => applyInboxFilters(groupedThreads, searchQuery, filterParam),
-		[groupedThreads, searchQuery, filterParam],
-	);
+	const filteredThreads = useMemo(() => {
+		const searched = applyInboxFilters(
+			groupedThreads,
+			searchQuery,
+			filterParam,
+		);
+		return showInboxTabs
+			? applyInboxViewFilter(searched, activeTab)
+			: searched;
+	}, [groupedThreads, searchQuery, filterParam, showInboxTabs, activeTab]);
+
+	const tabCounts = useMemo(() => {
+		if (!showInboxTabs) return undefined;
+		return {
+			unread: groupedThreads.filter((t) => t.unread).length,
+			starred: groupedThreads.filter((t) => t.isStarred).length,
+			needs_approval: groupedThreads.filter((t) => t.status === "needs_approval")
+				.length,
+		};
+	}, [groupedThreads, showInboxTabs]);
 
 	/** Row skeleton until mailbox metadata + first thread fetch settle. */
 	const listLoading =
@@ -624,6 +676,15 @@ export const AgentInboxContent = ({
 						</div>
 					)}
 				</div>
+				{showInboxTabs ? (
+					<InboxCategoryNavbar
+						activeView={activeTab}
+						onViewChange={(view) => {
+							void setTabParam(view === "all" ? null : view);
+						}}
+						counts={tabCounts}
+					/>
+				) : null}
 			</div>
 
 			<div
@@ -640,14 +701,20 @@ export const AgentInboxContent = ({
 					<div className="flex min-h-0 flex-1 items-center justify-center p-6">
 						<InboxEmptyState
 							title={
-								folder === "inbox" ? "No received mail yet" : "It's empty here"
+								showInboxTabs
+									? TAB_EMPTY[activeTab].title
+									: folder === "inbox"
+										? "No received mail yet"
+										: "It's empty here"
 							}
 							description={
-								folder === "inbox"
-									? "Inbox shows emails sent to this address. Outbound mail lives in Sent."
-									: folder === "sent"
-										? "Emails you send from this address will show up here."
-										: "Choose an email to view details"
+								showInboxTabs
+									? TAB_EMPTY[activeTab].description
+									: folder === "inbox"
+										? "Inbox shows emails sent to this address. Outbound mail lives in Sent."
+										: folder === "sent"
+											? "Emails you send from this address will show up here."
+											: "Choose an email to view details"
 							}
 							onCompose={openCompose}
 							onOpenAi={toggleAi}

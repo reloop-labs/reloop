@@ -70,17 +70,13 @@ export function applyInboxViewFilter(
 	view: string,
 ): InboundThread[] {
 	switch (view) {
-		case "alerts":
-			return threads.filter(
-				(t) => t.status === "needs_approval" || t.isImportant,
-			);
-		case "person":
-			return threads.filter(
-				(t) => t.direction !== "outbound" && t.status !== "handled",
-			);
-		case "tag":
-			return threads.filter((t) => (t.labels?.length ?? 0) > 0);
-		case "primary":
+		case "unread":
+			return threads.filter((t) => t.unread);
+		case "starred":
+			return threads.filter((t) => t.isStarred);
+		case "needs_approval":
+			return threads.filter((t) => t.status === "needs_approval");
+		case "all":
 		default:
 			return threads;
 	}

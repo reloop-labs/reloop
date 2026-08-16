@@ -15,19 +15,18 @@ export function ListPanelSkeleton({ className }: { className?: string }) {
 			aria-busy="true"
 		>
 			<span className="sr-only">Loading inbox list</span>
-			<div className="sticky top-0 z-15 shrink-0 space-y-3 px-3 py-2.5">
-				<div className="flex items-center gap-2">
-					<Skeleton className={cn("h-8 w-8 shrink-0 rounded-lg", sk)} />
-					<Skeleton className={cn("h-5 w-24", sk)} />
+			<div className="sticky top-0 z-15 shrink-0">
+				<div className="flex h-11 items-center gap-2 px-3">
+					<Skeleton className={cn("size-4 shrink-0 rounded", sk)} />
+					<Skeleton className={cn("h-5 w-20", sk)} />
 					<div className="flex-1" />
-					<Skeleton className={cn("h-8 w-8 shrink-0 rounded-lg", sk)} />
+					<Skeleton className={cn("size-8 shrink-0 rounded-lg", sk)} />
 				</div>
-				<Skeleton className={cn("h-9 w-full rounded-xl", sk)} />
-				<div className="flex items-center gap-2">
-					<Skeleton className={cn("h-7 w-16 rounded-full", sk)} />
-					<Skeleton className={cn("h-7 w-14 rounded-full", sk)} />
-					<Skeleton className={cn("h-7 w-16 rounded-full", sk)} />
-					<Skeleton className={cn("h-7 w-12 rounded-full", sk)} />
+				<div className="flex h-10 items-center gap-1 border-mail-border/50 border-b px-2">
+					<Skeleton className={cn("h-6 w-16 rounded-md", sk)} />
+					<Skeleton className={cn("h-6 w-[4.5rem] rounded-md", sk)} />
+					<Skeleton className={cn("h-6 w-[5.5rem] rounded-md", sk)} />
+					<Skeleton className={cn("h-6 w-[4.25rem] rounded-md", sk)} />
 				</div>
 			</div>
 			<MailListSkeleton />
