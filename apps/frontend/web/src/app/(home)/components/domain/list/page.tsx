@@ -9,6 +9,7 @@ import type { Ref } from "react";
 import { ActionKbd } from "../_shared/action-kbd";
 import type { DemoDomain } from "../_shared/data";
 import { domainTableGridStyle } from "../_shared/data";
+import { FlowCell } from "../_shared/flow-cell";
 import { MotionItem, MotionStage } from "../_shared/page-motion";
 import {
 	getStatusColorClass,
@@ -31,13 +32,19 @@ const resourceCardClassName = cn(
 	"dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/20 dark:hover:bg-bg-weak-50/40",
 );
 
+const DOMAIN_ROW_COLS = 5;
+
 function DomainRow({
 	domain,
 	highlighted,
+	rowIndex,
 }: {
 	domain: DemoDomain;
 	highlighted?: boolean;
+	rowIndex: number;
 }) {
+	const base = rowIndex * DOMAIN_ROW_COLS;
+
 	return (
 		<div
 			style={domainTableGridStyle}
@@ -46,19 +53,24 @@ function DomainRow({
 				highlighted && "bg-primary-alpha-10",
 			)}
 		>
-			<div className="flex items-center">
+			<FlowCell index={base} enabled>
 				<span className="flex size-4 shrink-0 rounded-sm border border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/50 dark:bg-bg-white-0/5" />
-			</div>
-			<div className="flex min-w-0 items-center gap-2">
-				<Icon
-					name="globe"
-					className={cn("h-4 w-4 shrink-0", getStatusColorClass(domain.status))}
-				/>
-				<span className="truncate font-semibold text-label-sm text-text-strong-950 underline decoration-dotted underline-offset-2">
-					{domain.domain}
-				</span>
-			</div>
-			<div className="flex items-center">
+			</FlowCell>
+			<FlowCell index={base + 1} enabled>
+				<div className="flex min-w-0 items-center gap-2">
+					<Icon
+						name="globe"
+						className={cn(
+							"h-4 w-4 shrink-0",
+							getStatusColorClass(domain.status),
+						)}
+					/>
+					<span className="truncate font-semibold text-label-sm text-text-strong-950 underline decoration-dotted underline-offset-2">
+						{domain.domain}
+					</span>
+				</div>
+			</FlowCell>
+			<FlowCell index={base + 2} enabled>
 				<div
 					className={cn(
 						"flex items-center gap-2 rounded-lg py-0.5 font-medium text-[13px] capitalize",
@@ -71,20 +83,20 @@ function DomainRow({
 					/>
 					{getStatusLabel(domain.status)}
 				</div>
-			</div>
-			<div className="flex items-center">
+			</FlowCell>
+			<FlowCell index={base + 3} enabled>
 				<span className="whitespace-nowrap font-medium text-sm text-text-sub-600">
 					{domain.createdAtLabel}
 				</span>
-			</div>
-			<div className="flex items-center justify-end">
+			</FlowCell>
+			<FlowCell index={base + 4} enabled className="justify-end">
 				<span className="inline-flex aspect-square h-7 w-7 items-center justify-center rounded-lg">
 					<Icon
 						name="more-horizontal"
 						className="h-3.5 w-3.5 text-text-sub-600"
 					/>
 				</span>
-			</div>
+			</FlowCell>
 		</div>
 	);
 }
@@ -252,10 +264,11 @@ export function DomainListPage({
 							</div>
 
 							<div className="-mt-2.5 divide-y divide-stroke-soft-100 overflow-visible rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:divide-stroke-soft-100/50 dark:border-stroke-soft-100/40">
-								{domains.map((domain) => (
+								{domains.map((domain, rowIndex) => (
 									<DomainRow
 										key={domain.id}
 										domain={domain}
+										rowIndex={rowIndex}
 										highlighted={domain.id === highlightId}
 									/>
 								))}
