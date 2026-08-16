@@ -1,5 +1,6 @@
 import { HeroAnalyticsPreview } from "./hero-analytics-preview";
 import { HeroDashboardShell } from "./hero-dashboard-shell";
+import { HeroDomainPreview } from "./hero-domain-preview";
 import { HeroEmailsPreview } from "./hero-emails-preview";
 
 export type HeroTabId = "analytics" | "dashboard" | "sdk" | "cloud" | "agents";
@@ -11,17 +12,15 @@ export function HeroPreview({ tab }: { tab: HeroTabId }) {
 				activeItem={
 					tab === "agents"
 						? "inbox"
-						: tab === "cloud"
+						: tab === "cloud" || tab === "sdk"
 							? "domain"
-							: tab === "sdk"
-								? "api-keys"
-								: tab === "dashboard"
-									? "emails"
-									: "metrics"
+							: tab === "dashboard"
+								? "emails"
+								: "metrics"
 				}
 			>
 				{tab === "sdk" ? (
-					<SdkPanel />
+					<HeroDomainPreview />
 				) : tab === "cloud" ? (
 					<CloudPanel />
 				) : tab === "agents" ? (

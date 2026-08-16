@@ -18,7 +18,7 @@ const TABS: {
 		title: string;
 		description: string;
 		href: string;
-		icon: "activity" | "layout" | "book-open" | "server" | "headset";
+		icon: "activity" | "layout" | "globe" | "server" | "headset";
 	};
 }[] = [
 	{
@@ -45,13 +45,13 @@ const TABS: {
 	},
 	{
 		id: "sdk",
-		title: "SDK",
-		description: "Guardrails for agents to build email workflows.",
+		title: "Domain",
+		description: "Add and verify custom domains to send with maximum deliverability.",
 		banner: {
-			title: "SDKs",
-			description: "Typed clients for Node, Python, Go, and more.",
-			href: "/sdk",
-			icon: "book-open",
+			title: "Domains",
+			description: "Add and verify custom domains to send with maximum deliverability.",
+			href: "/docs/learn/domain",
+			icon: "globe",
 		},
 	},
 	{
