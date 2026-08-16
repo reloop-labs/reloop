@@ -1,11 +1,7 @@
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { hostedSignupHref } from "@reloop/web/lib/site";
-import {
-	HeroAtmosphere,
-	HeroWindowChrome,
-} from "../../(home)/components/hero-chrome";
-import { HeroDashboardShell } from "../../(home)/components/hero-dashboard-shell";
-import { HeroDomainPreview } from "../../(home)/components/hero-domain-preview";
+import { HeroAtmosphere } from "../../(home)/components/hero-chrome";
+import { DomainDemoWindow } from "./domain-demo-window";
 import { DomainScrollWindow } from "./domain-scroll-window";
 
 export default function DomainHero() {
@@ -34,11 +30,7 @@ export default function DomainHero() {
 			<div className="relative mt-8 w-full flex-1 overflow-x-clip bg-bg-white-0 sm:mt-10 dark:bg-black">
 				<HeroAtmosphere />
 				<DomainScrollWindow>
-					<HeroWindowChrome>
-						<HeroDashboardShell activeItem="domain">
-							<HeroDomainPreview />
-						</HeroDashboardShell>
-					</HeroWindowChrome>
+					<DomainDemoWindow />
 				</DomainScrollWindow>
 			</div>
 		</section>

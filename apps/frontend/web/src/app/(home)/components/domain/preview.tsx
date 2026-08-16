@@ -3,6 +3,7 @@
 import { AnimatePresence, animate, motion, useMotionValue, useReducedMotion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { HeroDemoCursor } from "../hero-demo-cursor";
+import { useHeroDemoPlayback } from "../hero-demo-playback";
 import { DomainAddPage } from "./add/page";
 import { LIST_DOMAINS, NEW_DOMAIN, type DemoDomain } from "./_shared/data";
 import {
@@ -39,6 +40,11 @@ function frame() {
 
 export function HeroDomainPreview() {
 	const reduceMotion = useReducedMotion();
+	const playback = useHeroDemoPlayback();
+	const paused = playback?.paused ?? false;
+	const pausedRef = useRef(paused);
+	pausedRef.current = paused;
+	const cursorShownRef = useRef(false);
 	const containerRef = useRef<HTMLDivElement>(null);
 	const addBtnRef = useRef<HTMLDivElement>(null);
 	const inputWrapRef = useRef<HTMLDivElement>(null);
@@ -77,12 +83,22 @@ export function HeroDomainPreview() {
 	}, []);
 
 	useEffect(() => {
+		if (paused) {
+			void animate(cursorOpacity, 0, { duration: 0.18, ease: PAGE_EASE });
+			return;
+		}
+		if (cursorShownRef.current) {
+			void animate(cursorOpacity, 1, { duration: 0.18, ease: PAGE_EASE });
+		}
+	}, [cursorOpacity, paused]);
+
+	useEffect(() => {
 		if (reduceMotion) return;
 
 		let cancelled = false;
 		const timers = new Set<number>();
 
-		const sleep = (ms: number) =>
+		const sleepRaw = (ms: number) =>
 			new Promise<void>((resolve) => {
 				const id = window.setTimeout(() => {
 					timers.delete(id);
@@ -90,6 +106,24 @@ export function HeroDomainPreview() {
 				}, ms);
 				timers.add(id);
 			});
+
+		const waitIfPaused = async () => {
+			while (pausedRef.current && !cancelled) {
+				await sleepRaw(40);
+			}
+		};
+
+		const sleep = async (ms: number) => {
+			let remaining = ms;
+			while (remaining > 0 && !cancelled) {
+				await waitIfPaused();
+				if (cancelled) return;
+				const started = performance.now();
+				await sleepRaw(Math.min(remaining, 40));
+				if (pausedRef.current) continue;
+				remaining -= performance.now() - started;
+			}
+		};
 
 		const waitForTarget = async (getEl: () => HTMLElement | null) => {
 			for (let i = 0; i < 24; i += 1) {
@@ -156,7 +190,11 @@ export function HeroDomainPreview() {
 			cursorX.set(root.offsetWidth * 0.28);
 			cursorY.set(root.offsetHeight * 0.62);
 			cursorScale.set(1);
-			await animate(cursorOpacity, 1, { duration: 0.22, ease: PAGE_EASE });
+			cursorShownRef.current = true;
+			await animate(cursorOpacity, pausedRef.current ? 0 : 1, {
+				duration: 0.22,
+				ease: PAGE_EASE,
+			});
 			if (cancelled) return;
 
 			await sleep(480);
@@ -217,6 +255,7 @@ export function HeroDomainPreview() {
 
 			await sleep(PAGE_TRANSITION_MS);
 			if (cancelled) return;
+			cursorShownRef.current = false;
 			await animate(cursorOpacity, 0, { duration: 0.28, ease: PAGE_EASE });
 
 			await sleep(2500);

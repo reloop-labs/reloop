@@ -8,6 +8,10 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import Link from "next/link";
 import { useCallback, useId, useState } from "react";
 import { HeroAtmosphere, HeroWindowChrome } from "./hero-chrome";
+import {
+	HeroDemoPlaybackButton,
+	HeroDemoPlaybackProvider,
+} from "./hero-demo-playback";
 import { HeroPreview, type HeroTabId } from "./hero-preview";
 
 const TABS: {
@@ -208,36 +212,42 @@ export default function Hero() {
 					aria-labelledby={`${tablistId}-${active}`}
 					className="relative z-10 mx-auto flex h-[32rem] w-full max-w-5xl flex-col px-3 pt-10 pb-10 sm:h-[40rem] sm:px-6 sm:pt-14 sm:pb-14 md:max-w-7xl lg:h-[48rem] lg:px-8 lg:pt-20 lg:pb-16"
 				>
-					<HeroWindowChrome>
-						<AnimatePresence mode="wait" initial={false}>
-							<motion.div
-								key={active}
-								className="absolute inset-0"
-								initial={
-									reduceMotion
-										? { opacity: 1 }
-										: { opacity: 0, filter: "blur(2px)" }
-								}
-								animate={{ opacity: 1, filter: "blur(0px)" }}
-								exit={
-									reduceMotion
-										? { opacity: 0 }
-										: { opacity: 0, filter: "blur(2px)" }
-								}
-								transition={
-									reduceMotion
-										? { duration: 0 }
-										: { duration: 0.2, ease: EASE_OUT }
-								}
-							>
-								<HeroPreview tab={active} />
-							</motion.div>
-						</AnimatePresence>
-						<HeroTabBanner
-							tabId={active}
-							reduceMotion={Boolean(reduceMotion)}
-						/>
-					</HeroWindowChrome>
+					<HeroDemoPlaybackProvider>
+						<HeroWindowChrome
+							action={
+								active === "sdk" ? <HeroDemoPlaybackButton /> : undefined
+							}
+						>
+							<AnimatePresence mode="wait" initial={false}>
+								<motion.div
+									key={active}
+									className="absolute inset-0"
+									initial={
+										reduceMotion
+											? { opacity: 1 }
+											: { opacity: 0, filter: "blur(2px)" }
+									}
+									animate={{ opacity: 1, filter: "blur(0px)" }}
+									exit={
+										reduceMotion
+											? { opacity: 0 }
+											: { opacity: 0, filter: "blur(2px)" }
+									}
+									transition={
+										reduceMotion
+											? { duration: 0 }
+											: { duration: 0.2, ease: EASE_OUT }
+									}
+								>
+									<HeroPreview tab={active} />
+								</motion.div>
+							</AnimatePresence>
+							<HeroTabBanner
+								tabId={active}
+								reduceMotion={Boolean(reduceMotion)}
+							/>
+						</HeroWindowChrome>
+					</HeroDemoPlaybackProvider>
 				</div>
 			</div>
 		</section>

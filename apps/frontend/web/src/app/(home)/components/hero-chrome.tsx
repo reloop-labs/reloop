@@ -23,7 +23,13 @@ export function HeroAtmosphere() {
 	);
 }
 
-export function HeroWindowChrome({ children }: { children: ReactNode }) {
+export function HeroWindowChrome({
+	children,
+	action,
+}: {
+	children: ReactNode;
+	action?: ReactNode;
+}) {
 	return (
 		<div className="relative flex min-h-0 flex-1 flex-col overflow-hidden rounded-[20px] bg-[#F5F6F8] p-[7px] pt-8 sm:rounded-[24px] sm:p-2 sm:pt-9 dark:bg-[#1C1C1E] dark:ring-1 dark:ring-white/10">
 			<div
@@ -34,6 +40,11 @@ export function HeroWindowChrome({ children }: { children: ReactNode }) {
 				<span className="size-[11px] rounded-full bg-[#febc2e] shadow-[inset_0_0_0_0.5px_rgba(0,0,0,0.12)] sm:size-3" />
 				<span className="size-[11px] rounded-full bg-[#28c840] shadow-[inset_0_0_0_0.5px_rgba(0,0,0,0.12)] sm:size-3" />
 			</div>
+			{action ? (
+				<div className="absolute top-[6px] right-2.5 z-20 sm:top-1.5 sm:right-3">
+					{action}
+				</div>
+			) : null}
 			<div className="relative min-h-0 flex-1 overflow-hidden rounded-[13px] bg-bg-white-0 sm:rounded-[16px] dark:bg-black">
 				{children}
 			</div>
