@@ -35,6 +35,7 @@ function RecordGroup({
 				records={records}
 				hideStatus={hideStatus}
 				showPriorityColumn={showPriority}
+				flow
 			/>
 		</div>
 	);
@@ -65,7 +66,12 @@ export function DomainSetupPage({
 	);
 
 	return (
-		<MotionStage className="mx-auto max-w-3xl space-y-6 overflow-hidden p-6 lg:p-8">
+		<MotionStage
+			className="mx-auto max-w-3xl space-y-6 overflow-hidden p-6 lg:p-8"
+			staggerChildren={0.12}
+			delayChildren={0.06}
+			orchestrate
+		>
 			<MotionItem className="pt-6">
 				<h1 className="font-semibold text-title-h6 leading-8">
 					Configure DNS for {domain.domain}

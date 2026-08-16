@@ -199,7 +199,7 @@ export function HeroDomainPreview() {
 			setSubmitting(false);
 			setAdded(true);
 			setView("setup");
-			await sleep(PAGE_TRANSITION_MS);
+			await sleep(720);
 			if (cancelled) return;
 
 			await moveTo(() => cloudflareRef.current);
@@ -307,10 +307,10 @@ export function HeroDomainPreview() {
 					<motion.div
 						key="setup"
 						className="absolute inset-0 z-20 overflow-hidden bg-bg-white-0 dark:bg-black"
-						variants={stageVariants}
-						initial={reduceMotion ? false : "hidden"}
-						animate="show"
-						exit="exit"
+						initial={{ opacity: 1 }}
+						animate={{ opacity: 1 }}
+						exit={{ opacity: 0 }}
+						transition={{ duration: 0.26, ease: PAGE_EASE }}
 					>
 						<DomainSetupPage
 							domain={addedDomain}
