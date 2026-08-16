@@ -11,13 +11,11 @@ export function HeroDemoCursor({
 	y,
 	scale,
 	opacity,
-	label = "You",
 }: {
 	x: MotionValue<number>;
 	y: MotionValue<number>;
 	scale: MotionValue<number>;
 	opacity: MotionValue<number>;
-	label?: string;
 }) {
 	return (
 		<motion.div
@@ -44,12 +42,6 @@ export function HeroDemoCursor({
 						strokeLinejoin="round"
 					/>
 				</svg>
-				<span
-					className="absolute top-[14px] left-[12px] rounded-md px-1.5 py-0.5 font-semibold text-[10px] text-white leading-none shadow-[0_2px_8px_rgba(0,111,254,0.35)]"
-					style={{ backgroundColor: CURSOR_FILL }}
-				>
-					{label}
-				</span>
 			</div>
 		</motion.div>
 	);
