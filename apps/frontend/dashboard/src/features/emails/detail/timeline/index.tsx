@@ -129,10 +129,10 @@ export function EmailTimeline({
 	}, [isFailed, onDeliveredClick]);
 
 	return (
-		<div className="relative flex h-[128px] w-full items-center justify-start rounded-3xl border border-stroke-soft-100 bg-bg-white-0 px-8 py-4 transition-all hover:border-stroke-soft-200 dark:border-stroke-soft-100/50 dark:bg-bg-white-0/5">
+		<div className="relative flex h-[156px] w-full items-center justify-start rounded-3xl border border-stroke-soft-100 bg-bg-white-0 px-8 py-6 transition-all hover:border-stroke-soft-200 dark:border-stroke-soft-100/50 dark:bg-bg-white-0/5">
 			<div
 				className={cn(
-					"flex items-center",
+					"flex items-start",
 					isFailed
 						? "w-64 justify-between"
 						: "w-full max-w-2xl justify-between",
@@ -199,14 +199,14 @@ export function EmailTimeline({
 						<div className="flex flex-col items-center gap-2">
 							<div
 								className={cn(
-									"flex h-10 w-10 items-center justify-center rounded-[10px] border transition-all duration-300",
+									"flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] border transition-all duration-300",
 									getIconStyles(),
 								)}
 							>
 								<Icon name={step.icon} className="h-5 w-5" />
 							</div>
 
-							<div className="flex flex-col items-center text-center">
+							<div className="flex flex-col items-center gap-1 text-center">
 								<span
 									className={cn(
 										"rounded-md px-2 py-1 font-semibold text-xs transition-colors duration-300",
@@ -215,16 +215,17 @@ export function EmailTimeline({
 								>
 									{step.label}
 								</span>
-								{isLoading ? (
-									<Skeleton className="mx-auto mt-1 h-3 w-16 rounded-md" />
-								) : (
-									isCompleted &&
-									formattedTime && (
-										<span className="mt-1 whitespace-nowrap font-medium text-text-soft-400 text-xs">
+								<div className="flex h-4 items-center justify-center">
+									{isLoading ? (
+										<Skeleton className="h-3 w-16 rounded-md" />
+									) : isCompleted && formattedTime ? (
+										<span className="whitespace-nowrap font-medium text-text-soft-400 text-xs">
 											{formattedTime}
 										</span>
-									)
-								)}
+									) : (
+										<span className="h-4 w-16 opacity-0" aria-hidden="true" />
+									)}
+								</div>
 							</div>
 						</div>
 					);
@@ -248,7 +249,7 @@ export function EmailTimeline({
 								)}
 							</div>
 							{index < steps.length - 1 && (
-								<div className="-mt-8 h-0 flex-1 border-stroke-soft-100 border-t-[1.5px] border-dashed dark:border-neutral-800" />
+								<div className="mt-5 h-0 flex-1 border-stroke-soft-100 border-t-[1.5px] border-dashed dark:border-neutral-800" />
 							)}
 						</Fragment>
 					);
