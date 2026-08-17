@@ -201,7 +201,6 @@ export default function Hero() {
 						);
 					})}
 				</div>
-
 			</div>
 
 			<div className="relative w-full flex-1 overflow-hidden bg-bg-white-0 dark:bg-black">
@@ -214,9 +213,7 @@ export default function Hero() {
 				>
 					<HeroDemoPlaybackProvider>
 						<HeroWindowChrome
-							action={
-								active === "sdk" ? <HeroDemoPlaybackButton /> : undefined
-							}
+							action={active === "sdk" ? <HeroDemoPlaybackButton /> : undefined}
 						>
 							<AnimatePresence mode="wait" initial={false}>
 								<motion.div

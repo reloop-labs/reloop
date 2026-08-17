@@ -13,8 +13,8 @@ import { AddAgentAddressModal } from "#/features/agent-inbox/components/add-agen
 import { useAgentInbox } from "#/features/agent-inbox/components/agent-inbox-provider";
 import { useAiSidebar } from "#/features/agent-inbox/components/ai-sidebar";
 import { InboxNavUser } from "#/features/agent-inbox/components/sidebar/inbox-nav-user";
-import { InboxSidebarToggle } from "#/features/agent-inbox/components/sidebar/inbox-sidebar-toggle";
 import { useInboxSidebar } from "#/features/agent-inbox/components/sidebar/inbox-sidebar-context";
+import { InboxSidebarToggle } from "#/features/agent-inbox/components/sidebar/inbox-sidebar-toggle";
 import type { AgentMailbox } from "#/features/agent-inbox/types";
 import { useSupportUnread } from "#/features/dashboard/hooks/use-support-unread";
 import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
@@ -98,10 +98,7 @@ export function InboxTopNavbar({ mailbox }: { mailbox: AgentMailbox }) {
 
 				{/* Content column: compact search + actions, padded like the dashboard header */}
 				<div className="flex h-full min-w-0 flex-1 items-center gap-2 bg-panel-light px-3 dark:bg-panel-dark">
-					<InboxSidebarToggle
-						onClick={toggleSidebar}
-						collapsed={collapsed}
-					/>
+					<InboxSidebarToggle onClick={toggleSidebar} collapsed={collapsed} />
 					<button
 						type="button"
 						onClick={openSearch}

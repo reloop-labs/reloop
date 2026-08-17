@@ -1,6 +1,6 @@
 import { DeliverabilityTesterPageView } from "@reloop/web/components/landing/tools/deliverability-tester-page";
-import { config } from "@reloop/web/lib/landing/tools/deliverability-tester";
 import { createLandingMetadata } from "@reloop/web/lib/landing/metadata";
+import { config } from "@reloop/web/lib/landing/tools/deliverability-tester";
 
 export const instant = false;
 

@@ -1,17 +1,23 @@
 "use client";
 
-import { AnimatePresence, animate, motion, useMotionValue, useReducedMotion } from "framer-motion";
+import {
+	AnimatePresence,
+	animate,
+	motion,
+	useMotionValue,
+	useReducedMotion,
+} from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { HeroDemoCursor } from "../hero-demo-cursor";
 import { useHeroDemoPlayback } from "../hero-demo-playback";
-import { DomainAddPage } from "./add/page";
-import { LIST_DOMAINS, NEW_DOMAIN, type DemoDomain } from "./_shared/data";
+import { type DemoDomain, LIST_DOMAINS, NEW_DOMAIN } from "./_shared/data";
 import {
 	PAGE_EASE,
 	PAGE_TRANSITION_MS,
 	stageVariants,
 } from "./_shared/page-motion";
 import type { DomainStatus } from "./_shared/status";
+import { DomainAddPage } from "./add/page";
 import { DomainDetailPage } from "./detail/page";
 import { DomainListPage } from "./list/page";
 import { DomainSetupPage } from "./setup/page";
@@ -57,9 +63,7 @@ export function HeroDomainPreview() {
 	const cursorScale = useMotionValue(1);
 	const cursorOpacity = useMotionValue(0);
 
-	const [view, setView] = useState<"list" | "add" | "setup" | "detail">(
-		"list",
-	);
+	const [view, setView] = useState<"list" | "add" | "setup" | "detail">("list");
 	const [typed, setTyped] = useState("");
 	const [submitting, setSubmitting] = useState(false);
 	const [added, setAdded] = useState(false);
@@ -304,7 +308,7 @@ export function HeroDomainPreview() {
 		<div
 			ref={containerRef}
 			aria-hidden
-			className="relative h-full overflow-hidden bg-bg-white-0 select-none dark:bg-black"
+			className="relative h-full select-none overflow-hidden bg-bg-white-0 dark:bg-black"
 		>
 			<AnimatePresence>
 				{view === "list" && (

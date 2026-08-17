@@ -1,5 +1,6 @@
 "use client";
 
+import { PostHogProvider } from "@reloop/analytics";
 import { Toaster } from "@reloop/ui/toast";
 import * as Tooltip from "@reloop/ui/tooltip";
 import { QueryClientProvider } from "@tanstack/react-query";
@@ -9,7 +10,6 @@ import { LazyIconsSprite } from "#/components/lazy-icons-sprite";
 import { KeyboardShortcutsRevealListener } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { createQueryClient } from "#/lib/query-client";
 import { installAxiosRateLimitInterceptor } from "#/lib/rate-limit-toast";
-import { PostHogProvider } from "@reloop/analytics";
 import { ThemeProvider } from "#/providers/theme-provider";
 import { ProvidersSuspenseFallback } from "./providers-suspense-fallback";
 

@@ -50,7 +50,7 @@ export default function LanguageHero({
 
 	return (
 		<section className="relative w-full border-stroke-soft-200 bg-bg-white-0 text-text-strong-950 dark:border-white/10 dark:bg-black dark:text-white">
-			<div className="relative mx-auto w-full max-w-5xl border-stroke-soft-200 xl:border-x md:max-w-7xl dark:border-white/10">
+			<div className="relative mx-auto w-full max-w-5xl border-stroke-soft-200 md:max-w-7xl xl:border-x dark:border-white/10">
 				<div className="flex items-center justify-between gap-4 border-stroke-soft-200 border-b border-dashed px-6 pt-28 pb-4 sm:px-10 sm:pt-32 lg:px-12 dark:border-white/10">
 					<nav
 						aria-label="Breadcrumb"
@@ -130,7 +130,7 @@ export default function LanguageHero({
 								<button
 									type="button"
 									onClick={handleOpenCursor}
-									className="inline-flex h-9 cursor-pointer items-center gap-2 rounded-full border border-stroke-soft-200 bg-bg-white-0 px-4 font-medium text-[13px] text-text-strong-950 transition-colors hover:bg-bg-weak-50 active:scale-[0.98] dark:border-white/15 dark:bg-black dark:text-white dark:hover:!bg-[#0A0A0A]"
+									className="dark:hover:!bg-[#0A0A0A] inline-flex h-9 cursor-pointer items-center gap-2 rounded-full border border-stroke-soft-200 bg-bg-white-0 px-4 font-medium text-[13px] text-text-strong-950 transition-colors hover:bg-bg-weak-50 active:scale-[0.98] dark:border-white/15 dark:bg-black dark:text-white"
 								>
 									<svg
 										role="img"

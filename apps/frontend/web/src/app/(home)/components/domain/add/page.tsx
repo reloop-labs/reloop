@@ -75,58 +75,61 @@ export function DomainAddPage({
 
 				<div className="mt-6 flex w-full flex-col">
 					<MotionItem>
-					<section className="space-y-1">
-						<div className="space-y-1">
-							<div className="block font-medium text-sm text-text-strong-950">
-								Domain Name
-								<span className="text-error-base">*</span>
+						<section className="space-y-1">
+							<div className="space-y-1">
+								<div className="block font-medium text-sm text-text-strong-950">
+									Domain Name
+									<span className="text-error-base">*</span>
+								</div>
 							</div>
-						</div>
-						<div className="relative">
-							<div ref={inputWrapRef}>
-								<Input.Root className="w-full rounded-xl" size="small">
-									<Input.Wrapper>
-										<Input.Input
-											readOnly
-											tabIndex={-1}
-											value={domain}
-											placeholder="send.example.com"
-										/>
-										{isSubdomain ? (
-											<Input.Icon>
-												<Icon name="check" className="h-4 w-4 text-green-500" />
-											</Input.Icon>
-										) : domainParts.length > 0 ? (
-											<Input.Icon>
-												<Icon
-													name="alert-triangle"
-													className="h-4 w-4 text-orange-500"
-												/>
-											</Input.Icon>
-										) : null}
-									</Input.Wrapper>
-								</Input.Root>
-							</div>
+							<div className="relative">
+								<div ref={inputWrapRef}>
+									<Input.Root className="w-full rounded-xl" size="small">
+										<Input.Wrapper>
+											<Input.Input
+												readOnly
+												tabIndex={-1}
+												value={domain}
+												placeholder="send.example.com"
+											/>
+											{isSubdomain ? (
+												<Input.Icon>
+													<Icon
+														name="check"
+														className="h-4 w-4 text-green-500"
+													/>
+												</Input.Icon>
+											) : domainParts.length > 0 ? (
+												<Input.Icon>
+													<Icon
+														name="alert-triangle"
+														className="h-4 w-4 text-orange-500"
+													/>
+												</Input.Icon>
+											) : null}
+										</Input.Wrapper>
+									</Input.Root>
+								</div>
 
-							<div className="mt-2 space-y-2">
-								<div className="font-medium text-text-sub-600 text-xs">
-									Domain Recommendations:
-								</div>
-								<div className="space-y-1.5">
-									<RecommendRow
-										ok={isSubdomain}
-										title="Use a subdomain"
-										detail={`(e.g., mail.${rootDomain}, send.${rootDomain}, m.${rootDomain})`}
-									/>
-									<RecommendRow
-										ok={isSubdomain}
-										title="Avoid using your root domain"
-									/>
-									<RecommendRow ok={isValid} title="Valid domain format" />
+								<div className="mt-2 space-y-2">
+									<div className="font-medium text-text-sub-600 text-xs">
+										Domain Recommendations:
+									</div>
+									<div className="space-y-1.5">
+										<RecommendRow
+											ok={isSubdomain}
+											title="Use a subdomain"
+											detail={`(e.g., mail.${rootDomain}, send.${rootDomain}, m.${rootDomain})`}
+										/>
+										<RecommendRow
+											ok={isSubdomain}
+											title="Avoid using your root domain"
+										/>
+										<RecommendRow ok={isValid} title="Valid domain format" />
+									</div>
 								</div>
 							</div>
-						</div>
-					</section>
+						</section>
 					</MotionItem>
 
 					<MotionItem className="mt-2 w-full">

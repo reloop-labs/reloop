@@ -261,4 +261,3 @@ export const faqGroups: { title: string; items: FaqItem[] }[] = [
 ];
 
 export const faqs: FaqItem[] = faqGroups.flatMap((group) => group.items);
-

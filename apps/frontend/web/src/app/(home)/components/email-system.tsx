@@ -111,7 +111,7 @@ export default function EmailSystem() {
 				<aside className="top-16 z-10 border-stroke-soft-200 border-b bg-bg-white-0 lg:sticky lg:self-start lg:border-r lg:border-b-0 dark:border-white/10 dark:bg-black">
 					<nav
 						aria-label="Product scenes"
-						className="flex gap-1 overflow-x-auto px-4 py-3 [scrollbar-width:none] lg:flex-col lg:gap-0 lg:px-0 lg:py-10 lg:pl-8 lg:pr-6 [&::-webkit-scrollbar]:hidden"
+						className="flex gap-1 overflow-x-auto px-4 py-3 [scrollbar-width:none] lg:flex-col lg:gap-0 lg:px-0 lg:py-10 lg:pr-6 lg:pl-8 [&::-webkit-scrollbar]:hidden"
 					>
 						{SCENES.map((scene) => {
 							const selected = scene.id === active;

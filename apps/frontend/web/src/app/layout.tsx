@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { PostHogProvider } from "@reloop/analytics";
 import { IconsSprite } from "@reloop/ui/icons-sprite";
 import { AgentDirective } from "@reloop/web/components/agent-directive";
 import { Footer } from "@reloop/web/components/footer";
@@ -10,7 +11,6 @@ import {
 	siteDescription,
 	siteName,
 } from "@reloop/web/lib/site";
-import { PostHogProvider } from "@reloop/analytics";
 import { ThemeProvider } from "@reloop/web/providers/theme-provider";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 import Script from "next/script";

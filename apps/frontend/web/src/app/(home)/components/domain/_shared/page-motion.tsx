@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useReducedMotion, type Variants } from "framer-motion";
-import { useMemo, type ReactNode } from "react";
+import { type ReactNode, useMemo } from "react";
 
 export const PAGE_EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
 

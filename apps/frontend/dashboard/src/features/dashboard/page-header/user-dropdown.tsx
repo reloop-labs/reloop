@@ -79,7 +79,8 @@ export function UserDropdown({ user }: { user: HeaderUser | null }) {
 	const accountItems = (accountSection?.items ?? []).filter(
 		(item) => item.path !== "/settings/theme",
 	);
-	const logoutHoverIdx = workspaceItems.length + accountItems.length;
+	const homeHoverIdx = workspaceItems.length + accountItems.length;
+	const logoutHoverIdx = workspaceItems.length + accountItems.length + 1;
 
 	return (
 		<Dropdown.Root open={isOpen} onOpenChange={setIsOpen}>
@@ -189,6 +190,22 @@ export function UserDropdown({ user }: { user: HeaderUser | null }) {
 								</Dropdown.Item>
 							);
 						})}
+
+						<Dropdown.Item
+							ref={(el) => {
+								if (el) itemRefs.current[homeHoverIdx] = el;
+							}}
+							className="gap-2 px-2 py-1.5 data-[highlighted]:bg-transparent!"
+							onPointerEnter={() => setHoverIdx(homeHoverIdx)}
+							onPointerLeave={() => setHoverIdx(undefined)}
+							onClick={() => {
+								setIsOpen(false);
+								window.location.href = "/home";
+							}}
+						>
+							<Icon name="home" className="h-4 w-4 text-text-sub-600" />
+							<span className="flex-1 truncate text-sm">Home</span>
+						</Dropdown.Item>
 
 						<div className="flex items-center justify-between px-2.5 py-1.5">
 							<div className="flex items-center gap-2">

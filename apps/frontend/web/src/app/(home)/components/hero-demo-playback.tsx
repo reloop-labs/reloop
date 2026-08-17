@@ -5,11 +5,11 @@ import { Icon } from "@reloop/ui/icon";
 import { useReducedMotion } from "framer-motion";
 import {
 	createContext,
+	type ReactNode,
 	useCallback,
 	useContext,
 	useMemo,
 	useState,
-	type ReactNode,
 } from "react";
 
 type PlaybackContextValue = {
@@ -19,7 +19,11 @@ type PlaybackContextValue = {
 
 const PlaybackContext = createContext<PlaybackContextValue | null>(null);
 
-export function HeroDemoPlaybackProvider({ children }: { children: ReactNode }) {
+export function HeroDemoPlaybackProvider({
+	children,
+}: {
+	children: ReactNode;
+}) {
 	const [paused, setPaused] = useState(false);
 	const toggle = useCallback(() => {
 		setPaused((current) => !current);
@@ -27,7 +31,9 @@ export function HeroDemoPlaybackProvider({ children }: { children: ReactNode }) 
 	const value = useMemo(() => ({ paused, toggle }), [paused, toggle]);
 
 	return (
-		<PlaybackContext.Provider value={value}>{children}</PlaybackContext.Provider>
+		<PlaybackContext.Provider value={value}>
+			{children}
+		</PlaybackContext.Provider>
 	);
 }
 

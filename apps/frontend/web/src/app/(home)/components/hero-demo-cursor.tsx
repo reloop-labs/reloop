@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, type MotionValue } from "framer-motion";
+import { type MotionValue, motion } from "framer-motion";
 
 const CURSOR_FILL = "#006FFE";
 const TIP_X = 3.73;

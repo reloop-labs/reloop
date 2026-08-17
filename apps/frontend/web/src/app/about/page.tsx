@@ -62,11 +62,7 @@ const AboutPage = () => {
 					sameAs: "https://github.com/twinkalp10",
 				},
 			],
-			sameAs: [
-				socialProfiles.github,
-				socialProfiles.discord,
-				socialProfiles.x,
-			],
+			sameAs: [socialProfiles.github, socialProfiles.discord, socialProfiles.x],
 		},
 	};
 
@@ -76,34 +72,55 @@ const AboutPage = () => {
 
 			<div className="mx-auto flex min-h-[calc(100vh-140px)] w-full max-w-2xl flex-col px-6 pt-28 pb-20 sm:pt-36 sm:pb-28">
 				{/* Title in Instrument Serif */}
-				<h1 className="font-serif text-5xl sm:text-6xl lg:text-[4rem] text-text-strong-950 tracking-tight leading-none dark:text-white">
+				<h1 className="font-serif text-5xl text-text-strong-950 leading-none tracking-tight sm:text-6xl lg:text-[4rem] dark:text-white">
 					About Reloop
 				</h1>
 
 				{/* Essay Body */}
-				<div className="mt-10 space-y-6 sm:space-y-7 text-[16px] sm:text-[17.5px] leading-[1.8] text-neutral-700 dark:text-neutral-300 font-normal">
+				<div className="mt-10 space-y-6 font-normal text-[16px] text-neutral-700 leading-[1.8] sm:space-y-7 sm:text-[17.5px] dark:text-neutral-300">
 					<p>
-						Reloop — <strong>Re</strong>liable, Open-<strong>Loop</strong> Email Infrastructure.
+						Reloop — <strong>Re</strong>liable, Open-<strong>Loop</strong> Email
+						Infrastructure.
 					</p>
 
 					<p>
-						The name is a nod to closed-loop feedback systems: the idea that every transactional send, retry, bounce, and webhook should be observable, deterministic, and verifiable in code. Incumbent email platforms turned routing into a black box — proprietary deliverability scores, uninspectable queues, and escalating volume tiers.
+						The name is a nod to closed-loop feedback systems: the idea that
+						every transactional send, retry, bounce, and webhook should be
+						observable, deterministic, and verifiable in code. Incumbent email
+						platforms turned routing into a black box — proprietary
+						deliverability scores, uninspectable queues, and escalating volume
+						tiers.
 					</p>
 
 					<p>
-						We think infrastructure belongs in the open. For decades, the foundations of the internet — Linux, Postgres, Redis, and Nginx — have succeeded because they are transparent, self-hostable, and predictable. Email belongs in that exact same category: when it fails, users can&apos;t log in, can&apos;t reset passwords, and can&apos;t receive receipts.
+						We think infrastructure belongs in the open. For decades, the
+						foundations of the internet — Linux, Postgres, Redis, and Nginx —
+						have succeeded because they are transparent, self-hostable, and
+						predictable. Email belongs in that exact same category: when it
+						fails, users can&apos;t log in, can&apos;t reset passwords, and
+						can&apos;t receive receipts.
 					</p>
 
 					<p>
-						In Reloop, open source is not a stripped-down demo or an enterprise bait-and-switch. Reloop Cloud and Reloop open source are the exact same product. The same transactional APIs, the same high-speed SMTP relays, the same inbound webhooks, and the same deliverability engines — whether you deploy on your own servers with Docker Compose or send from reloop.sh.
+						In Reloop, open source is not a stripped-down demo or an enterprise
+						bait-and-switch. Reloop Cloud and Reloop open source are the exact
+						same product. The same transactional APIs, the same high-speed SMTP
+						relays, the same inbound webhooks, and the same deliverability
+						engines — whether you deploy on your own servers with Docker Compose
+						or send from reloop.sh.
 					</p>
 
 					<p>
-						Like the open-source tools before it, the bet is on developer sovereignty: a small team shouldn&apos;t be locked into proprietary platforms. With the right architecture, two engineers and a fleet of agents can ship email infrastructure that scales to millions.
+						Like the open-source tools before it, the bet is on developer
+						sovereignty: a small team shouldn&apos;t be locked into proprietary
+						platforms. With the right architecture, two engineers and a fleet of
+						agents can ship email infrastructure that scales to millions.
 					</p>
 
 					<p>
-						The platform is fully open source and self-hostable. Your data stays on your infrastructure. Inspect every line, extend the API, customize your routing, and contribute back to the community.
+						The platform is fully open source and self-hostable. Your data stays
+						on your infrastructure. Inspect every line, extend the API,
+						customize your routing, and contribute back to the community.
 					</p>
 
 					{/* GitHub CTA Button */}

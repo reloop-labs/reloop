@@ -104,10 +104,7 @@ export function DnsRecordTable({
 								</FlowCell>
 							)}
 							{!hideStatus && (
-								<FlowCell
-									index={base + (hasPriority ? 5 : 4)}
-									enabled={flow}
-								>
+								<FlowCell index={base + (hasPriority ? 5 : 4)} enabled={flow}>
 									<div
 										className={cn(
 											"flex items-center gap-1.5 font-medium text-[12px]",

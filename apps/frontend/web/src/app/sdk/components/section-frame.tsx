@@ -31,7 +31,7 @@ export function SectionFrame({
 			)}
 		>
 			{framed ? (
-				<div className="relative mx-auto w-full max-w-5xl border-stroke-soft-200 xl:border-x md:max-w-7xl dark:border-white/10">
+				<div className="relative mx-auto w-full max-w-5xl border-stroke-soft-200 md:max-w-7xl xl:border-x dark:border-white/10">
 					{children}
 				</div>
 			) : (

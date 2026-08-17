@@ -1,5 +1,10 @@
 import { db } from "@reloop/db/client";
-import { emailLog, inboundEmail, mailbox, threadMessage } from "@reloop/db/schema";
+import {
+	emailLog,
+	inboundEmail,
+	mailbox,
+	threadMessage,
+} from "@reloop/db/schema";
 import { and, eq } from "drizzle-orm";
 import { createError } from "evlog";
 import { useLogger } from "evlog/elysia";
@@ -40,7 +45,7 @@ export async function replyAllToMessageController(
 		originalInbound?.replyTo ?? originalInbound?.fromEmail ?? "";
 	let originalSubject = originalInbound?.subject ?? "";
 	let headerMsgId = originalInbound?.messageId ?? null;
-	let resolvedThreadId: string | undefined = undefined;
+	let resolvedThreadId: string | undefined;
 	let originalToEmails = originalInbound?.toEmails ?? [];
 	let originalCcEmails = (originalInbound?.ccEmails as string[]) ?? [];
 
@@ -67,9 +72,11 @@ export async function replyAllToMessageController(
 				eq(mailbox.email, outboundLog.fromEmail),
 			),
 		});
-		const firstMbx = mbx || (await db.query.mailbox.findFirst({
-			where: eq(mailbox.organizationId, organizationId),
-		}));
+		const firstMbx =
+			mbx ||
+			(await db.query.mailbox.findFirst({
+				where: eq(mailbox.organizationId, organizationId),
+			}));
 
 		mailboxId = firstMbx?.id ?? "";
 		const toArray = Array.isArray(outboundLog.toEmails)
@@ -100,10 +107,9 @@ export async function replyAllToMessageController(
 	// Build reply-all recipients
 	const replyTo = body.to ?? defaultReplyTo;
 
-	const defaultCc = [
-		...originalToEmails,
-		...originalCcEmails,
-	].filter((email) => email && email !== ourEmail && email !== defaultReplyTo);
+	const defaultCc = [...originalToEmails, ...originalCcEmails].filter(
+		(email) => email && email !== ourEmail && email !== defaultReplyTo,
+	);
 
 	const replyCc = body.cc !== undefined ? body.cc : defaultCc;
 	const ccList = Array.isArray(replyCc) ? replyCc : replyCc ? [replyCc] : [];

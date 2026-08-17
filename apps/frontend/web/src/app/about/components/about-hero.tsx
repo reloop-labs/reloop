@@ -7,13 +7,16 @@ export function AboutHero() {
 		<section className="relative w-full max-w-full overflow-x-clip border-stroke-soft-200 bg-bg-white-0 text-text-strong-950 dark:border-white/10 dark:bg-black dark:text-white">
 			<div className="mx-auto flex w-full max-w-5xl flex-col items-center border-stroke-soft-200 px-6 pt-28 pb-14 text-center sm:px-10 sm:pt-32 sm:pb-16 md:max-w-7xl lg:items-start lg:px-12 lg:text-left xl:border-x dark:border-white/10">
 				{/* Main Headline */}
-				<h1 className="max-w-4xl font-semibold text-xl text-balance text-text-strong-950 leading-snug tracking-tight sm:text-4xl sm:leading-[1.15] lg:text-[2.6rem] dark:text-white">
+				<h1 className="max-w-4xl text-balance font-semibold text-text-strong-950 text-xl leading-snug tracking-tight sm:text-4xl sm:leading-[1.15] lg:text-[2.6rem] dark:text-white">
 					We built the email infrastructure we couldn&apos;t buy.
 				</h1>
 
 				{/* Subheadline / Description */}
-				<p className="mx-auto mt-3 max-w-2xl text-[14px] text-balance text-text-sub-600 leading-relaxed sm:mt-4 sm:text-[16px] lg:mx-0 dark:text-white/60">
-					We started Reloop Labs to build email infrastructure you actually control. Send transactional messages, run marketing campaigns, and track deliverability from our managed hosted platform or your own servers.
+				<p className="mx-auto mt-3 max-w-2xl text-balance text-[14px] text-text-sub-600 leading-relaxed sm:mt-4 sm:text-[16px] lg:mx-0 dark:text-white/60">
+					We started Reloop Labs to build email infrastructure you actually
+					control. Send transactional messages, run marketing campaigns, and
+					track deliverability from our managed hosted platform or your own
+					servers.
 				</p>
 
 				{/* Action Buttons */}
@@ -41,7 +44,7 @@ export function AboutHero() {
 				</div>
 
 				{/* Key Company Facts Strip */}
-				<div className="mt-10 w-full overflow-hidden border border-stroke-soft-200 divide-y divide-stroke-soft-200 sm:grid sm:grid-cols-4 sm:divide-x sm:divide-y-0 dark:border-white/10 dark:divide-white/10">
+				<div className="mt-10 w-full divide-y divide-stroke-soft-200 overflow-hidden border border-stroke-soft-200 sm:grid sm:grid-cols-4 sm:divide-x sm:divide-y-0 dark:divide-white/10 dark:border-white/10">
 					<div className="p-5 sm:p-6">
 						<p className="font-medium text-[12px] text-text-sub-600 dark:text-white/50">
 							Founded

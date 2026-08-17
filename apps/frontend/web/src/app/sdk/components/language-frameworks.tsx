@@ -51,7 +51,7 @@ export default function LanguageFrameworks({
 
 	return (
 		<section className="relative w-full border-stroke-soft-200 border-t bg-bg-white-0 text-text-strong-950 dark:border-white/10 dark:bg-black dark:text-white">
-			<div className="mx-auto w-full max-w-5xl border-stroke-soft-200 xl:border-x md:max-w-7xl dark:border-white/10">
+			<div className="mx-auto w-full max-w-5xl border-stroke-soft-200 md:max-w-7xl xl:border-x dark:border-white/10">
 				<SectionTitle
 					title={`${language.name} frameworks`}
 					icon="code"
@@ -74,7 +74,7 @@ export default function LanguageFrameworks({
 								<Link
 									key={fw.slug}
 									href={`/frameworks/${fw.slug}`}
-									className="group flex flex-col items-start gap-2 bg-bg-white-0 p-4 transition-colors hover:bg-bg-weak-50 sm:p-5 dark:bg-black dark:hover:!bg-[#0A0A0A]"
+									className="group dark:hover:!bg-[#0A0A0A] flex flex-col items-start gap-2 bg-bg-white-0 p-4 transition-colors hover:bg-bg-weak-50 sm:p-5 dark:bg-black"
 								>
 									<div className="flex w-full items-start justify-between gap-2">
 										<span

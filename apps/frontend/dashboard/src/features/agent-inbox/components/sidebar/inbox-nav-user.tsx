@@ -124,9 +124,7 @@ export const InboxNavUser = ({
 				<span
 					className={cn(
 						"grid shrink-0 place-items-center rounded-full font-medium text-white",
-						compact
-							? "size-5 text-[10px]"
-							: "size-5 text-[11px]",
+						compact ? "size-5 text-[10px]" : "size-5 text-[11px]",
 						getAvatarGradient(mailbox.email || displayName),
 						compact && switcherOpen && "ring-zero-blue/40",
 					)}

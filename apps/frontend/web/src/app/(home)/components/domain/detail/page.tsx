@@ -213,10 +213,7 @@ export function DomainDetailPage({ domain }: { domain: DemoDomain }) {
 					>
 						<Icon
 							name="globe"
-							className={cn(
-								"h-5 w-5",
-								getStatusColorClass(domain.status),
-							)}
+							className={cn("h-5 w-5", getStatusColorClass(domain.status))}
 						/>
 					</div>
 					<div className="min-w-0">
@@ -269,10 +266,7 @@ export function DomainDetailPage({ domain }: { domain: DemoDomain }) {
 							getStatusColorClass(domain.status),
 						)}
 					>
-						<Icon
-							name={getStatusIcon(domain.status)}
-							className="h-3.5 w-3.5"
-						/>
+						<Icon name={getStatusIcon(domain.status)} className="h-3.5 w-3.5" />
 						<p className="font-medium text-paragraph-xs capitalize">
 							{getStatusLabel(domain.status)}
 						</p>

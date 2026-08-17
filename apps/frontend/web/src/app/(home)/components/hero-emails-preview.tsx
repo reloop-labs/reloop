@@ -81,7 +81,8 @@ const EMAILS = [
 ] as const;
 
 const emailGridStyle = {
-	gridTemplateColumns: "32px minmax(0, 1.2fr) minmax(0, 1.8fr) 120px 110px 32px",
+	gridTemplateColumns:
+		"32px minmax(0, 1.2fr) minmax(0, 1.8fr) 120px 110px 32px",
 };
 
 const AVATAR_GRADIENTS = [
@@ -213,9 +214,7 @@ function ActionKbd({
 	children: React.ReactNode;
 	className?: string;
 }) {
-	return (
-		<KbdKey className={cn(kbdClassName, className)}>{children}</KbdKey>
-	);
+	return <KbdKey className={cn(kbdClassName, className)}>{children}</KbdKey>;
 }
 
 export function HeroEmailsPreview() {

@@ -8,7 +8,7 @@ import {
 	useScroll,
 	useTransform,
 } from "framer-motion";
-import { useEffect, type ReactNode } from "react";
+import { type ReactNode, useEffect } from "react";
 
 const SHRINK_DISTANCE_PX = 900;
 const SCALE_START = 1;
