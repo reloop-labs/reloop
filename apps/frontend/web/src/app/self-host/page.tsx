@@ -2,12 +2,12 @@ import { JsonLd } from "@reloop/web/components/json-ld";
 import { BlogCta } from "@reloop/web/components/landing/blog/blog-cta";
 import { getSiteUrl, siteName, socialProfiles } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
-import Convictions from "../(home)/components/convictions";
 import { SectionSeparator } from "../(home)/components/section-separator";
 import { SelfHostComparison } from "./components/self-host-comparison";
 import { SelfHostFaq } from "./components/self-host-faq";
 import { SelfHostHero } from "./components/self-host-hero";
 import { SelfHostProviders } from "./components/self-host-providers";
+import { SelfHostRequirements } from "./components/self-host-requirements";
 
 // TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
 export const instant = false;
@@ -69,11 +69,7 @@ export default function SelfHostPage() {
 			<SelfHostHero />
 			<div className="relative mx-auto w-full max-w-5xl border-stroke-soft-200 border-x md:max-w-7xl dark:border-white/10">
 				<SectionSeparator />
-				<Convictions
-					showHeading
-					title="What Reloop Gives You"
-					description="Full-featured email infrastructure with open-source sovereignty and zero vendor lock-in."
-				/>
+				<SelfHostRequirements />
 				<SectionSeparator />
 				<SelfHostProviders />
 				<SectionSeparator />
