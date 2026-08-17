@@ -6,6 +6,9 @@ import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import { KbdKey } from "@reloop/ui/kbd-key";
 import * as TabMenuHorizontal from "@reloop/ui/tab-menu-horizontal";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import type { ReactNode } from "react";
+import { MotionItem, MotionStage, PAGE_EASE } from "./domain/_shared/page-motion";
 
 const EMAILS = [
 	{
@@ -217,11 +220,56 @@ function ActionKbd({
 	return <KbdKey className={cn(kbdClassName, className)}>{children}</KbdKey>;
 }
 
+const WAVE_DELAY = 0.08;
+const WAVE_STAGGER = 0.06;
+const CELL_DURATION = 0.42;
+const FOOTER_AFTER_ITEMS = 3;
+const FOOTER_DURATION = 0.36;
+
+function MatrixCell({
+	row,
+	col,
+	className,
+	children,
+}: {
+	row: number;
+	col: number;
+	className?: string;
+	children: ReactNode;
+}) {
+	const reduceMotion = useReducedMotion();
+
+	return (
+		<div className={cn("flex min-w-0 items-center", className)}>
+			{reduceMotion ? (
+				children
+			) : (
+				<motion.div
+					className="min-w-0 max-w-full"
+					initial={{ opacity: 0, y: 6 }}
+					animate={{ opacity: 1, y: 0 }}
+					transition={{
+						duration: CELL_DURATION,
+						delay: WAVE_DELAY + (row + col) * WAVE_STAGGER,
+						ease: PAGE_EASE,
+					}}
+					style={{ willChange: "transform, opacity" }}
+				>
+					{children}
+				</motion.div>
+			)}
+		</div>
+	);
+}
+
 export function HeroEmailsPreview() {
+	const reduceMotion = useReducedMotion();
+	const footerDelay = WAVE_DELAY + FOOTER_AFTER_ITEMS * WAVE_STAGGER;
+
 	return (
 		<div className="h-full overflow-hidden bg-bg-white-0 dark:bg-black">
-			<div className="mx-auto max-w-6xl space-y-6 p-6 lg:p-8">
-				<div className="flex flex-col gap-4 pt-2 pb-4 sm:flex-row sm:items-start sm:justify-between">
+			<MotionStage className="mx-auto max-w-6xl space-y-6 overflow-hidden p-6 lg:p-8">
+				<MotionItem className="flex flex-col gap-4 pt-2 pb-4 sm:flex-row sm:items-start sm:justify-between">
 					<div>
 						<div className="flex items-center gap-2.5">
 							<Icon
@@ -262,9 +310,9 @@ export function HeroEmailsPreview() {
 							<ActionKbd className="w-auto min-w-4 px-1">D</ActionKbd>
 						</Button.Root>
 					</div>
-				</div>
+				</MotionItem>
 
-				<div>
+				<MotionItem>
 					<TabMenuHorizontal.Root value="sent">
 						<TabMenuHorizontal.List className="relative h-11 gap-0 border-b! py-0">
 							<TabMenuHorizontal.Trigger
@@ -397,89 +445,148 @@ export function HeroEmailsPreview() {
 										style={emailGridStyle}
 										className="grid items-center rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-4 pt-2.5 pb-5 font-medium text-text-sub-600 text-xs dark:border-[#101010] dark:bg-bg-weak-50/40"
 									>
-										<div className="flex items-center">
+										<MatrixCell row={0} col={0}>
 											<span className="flex size-4 shrink-0 rounded-sm border border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/50 dark:bg-bg-white-0/5" />
-										</div>
-										<div className="flex items-center gap-1">
-											<Icon name="user" className="h-3 w-3" />
-											<span className="text-xs">To</span>
-										</div>
-										<div className="flex items-center gap-1">
-											<Icon name="file-text" className="h-3 w-3" />
-											<span className="text-xs">Subject</span>
-										</div>
-										<div className="flex items-center gap-1">
-											<Icon name="check-circle" className="h-3 w-3" />
-											<span className="text-xs">Status</span>
-										</div>
-										<div className="flex items-center gap-1">
-											<Icon name="clock" className="h-3 w-3" />
-											<span className="text-xs">Time</span>
-										</div>
-										<div />
+										</MatrixCell>
+										<MatrixCell row={0} col={1}>
+											<div className="flex items-center gap-1">
+												<Icon name="user" className="h-3 w-3" />
+												<span className="text-xs">To</span>
+											</div>
+										</MatrixCell>
+										<MatrixCell row={0} col={2}>
+											<div className="flex items-center gap-1">
+												<Icon name="file-text" className="h-3 w-3" />
+												<span className="text-xs">Subject</span>
+											</div>
+										</MatrixCell>
+										<MatrixCell row={0} col={3}>
+											<div className="flex items-center gap-1">
+												<Icon name="check-circle" className="h-3 w-3" />
+												<span className="text-xs">Status</span>
+											</div>
+										</MatrixCell>
+										<MatrixCell row={0} col={4}>
+											<div className="flex items-center gap-1">
+												<Icon name="clock" className="h-3 w-3" />
+												<span className="text-xs">Time</span>
+											</div>
+										</MatrixCell>
+										<MatrixCell row={0} col={5} className="justify-end">
+											<span />
+										</MatrixCell>
 									</div>
 
 									<div className="-mt-2.5 divide-y divide-stroke-soft-100 overflow-visible rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:divide-stroke-soft-100/50 dark:border-stroke-soft-100/40">
-										{EMAILS.map((email) => (
-											<div
-												key={email.id}
-												style={emailGridStyle}
-												className="group/row grid w-full cursor-pointer items-center px-4 py-2 text-left transition-colors hover:bg-bg-weak-50"
-											>
-												<div className="flex items-center">
-													<span className="flex size-4 shrink-0 rounded-sm border border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/50 dark:bg-bg-white-0/5" />
-												</div>
-												<div className="flex min-w-0 items-center gap-2 pr-4">
-													<span className="flex size-5 shrink-0 items-center justify-center overflow-hidden rounded-full">
-														<span
-															className={cn(
-																"flex h-full w-full items-center justify-center rounded-full font-semibold text-white text-xs uppercase tracking-wide shadow-sm",
-																getAvatarGradient(email.to),
-															)}
-														>
-															{getAvatarInitial(email.to)}
-														</span>
-													</span>
-													<span className="truncate font-medium text-label-sm text-text-strong-950">
-														{email.to}
-													</span>
-												</div>
-												<div className="min-w-0 truncate pr-4">
-													<span className="truncate font-medium text-label-sm text-text-strong-950 underline decoration-dotted underline-offset-2">
-														{email.subject}
-													</span>
-												</div>
-												<div className="flex items-center">
-													<div
-														className={cn(
-															"flex items-center gap-2 rounded-lg py-0.5 font-medium text-[13px] capitalize",
-															getEmailStatusColorClass(email.status),
-														)}
+										<AnimatePresence>
+											{EMAILS.map((email, rowIndex) => {
+												const row = rowIndex + 1;
+												return (
+													<motion.div
+														key={email.id}
+														layout="position"
+														initial={{ opacity: 1 }}
+														animate={{ opacity: 1, height: "auto" }}
+														exit={
+															reduceMotion
+																? { opacity: 0 }
+																: {
+																		opacity: 0,
+																		height: 0,
+																		transition: {
+																			opacity: { duration: 0.22, ease: "easeOut" },
+																			height: { duration: 0.45, ease: PAGE_EASE },
+																			layout: { duration: 0.45, ease: PAGE_EASE },
+																		},
+																	}
+														}
+														transition={{
+															duration: 0.3,
+															ease: PAGE_EASE,
+															layout: { duration: 0.45, ease: PAGE_EASE },
+														}}
+														style={{ overflow: "hidden" }}
 													>
-														<Icon
-															name={getEmailStatusIcon(email.status)}
-															className="h-3.5 w-3.5"
-														/>
-														{getEmailStatusLabel(email.status)}
-													</div>
-												</div>
-												<div className="flex items-center">
-													<span className="whitespace-nowrap font-medium text-[13px] text-text-sub-600">
-														{email.time}
-													</span>
-												</div>
-												<div className="flex items-center justify-end">
-													<span className="inline-flex aspect-square h-7 w-7 items-center justify-center rounded-lg">
-														<Icon
-															name="more-horizontal"
-															className="h-3.5 w-3.5 text-text-sub-600"
-														/>
-													</span>
-												</div>
-											</div>
-										))}
+														<div
+															style={emailGridStyle}
+															className="group/row grid w-full cursor-pointer items-center px-4 py-2 text-left transition-colors hover:bg-bg-weak-50"
+														>
+															<MatrixCell row={row} col={0}>
+																<span className="flex size-4 shrink-0 rounded-sm border border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/50 dark:bg-bg-white-0/5" />
+															</MatrixCell>
+															<MatrixCell row={row} col={1}>
+																<div className="flex min-w-0 items-center gap-2 pr-4">
+																	<span className="flex size-5 shrink-0 items-center justify-center overflow-hidden rounded-full">
+																		<span
+																			className={cn(
+																				"flex h-full w-full items-center justify-center rounded-full font-semibold text-white text-xs uppercase tracking-wide shadow-sm",
+																				getAvatarGradient(email.to),
+																			)}
+																		>
+																			{getAvatarInitial(email.to)}
+																		</span>
+																	</span>
+																	<span className="truncate font-medium text-label-sm text-text-strong-950">
+																		{email.to}
+																	</span>
+																</div>
+															</MatrixCell>
+															<MatrixCell row={row} col={2}>
+																<div className="min-w-0 truncate pr-4">
+																	<span className="truncate font-medium text-label-sm text-text-strong-950 underline decoration-dotted underline-offset-2">
+																		{email.subject}
+																	</span>
+																</div>
+															</MatrixCell>
+															<MatrixCell row={row} col={3}>
+																<div className="flex items-center">
+																	<div
+																		className={cn(
+																			"flex items-center gap-2 rounded-lg py-0.5 font-medium text-[13px] capitalize",
+																			getEmailStatusColorClass(email.status),
+																		)}
+																	>
+																		<Icon
+																			name={getEmailStatusIcon(email.status)}
+																			className="h-3.5 w-3.5"
+																		/>
+																		{getEmailStatusLabel(email.status)}
+																	</div>
+																</div>
+															</MatrixCell>
+															<MatrixCell row={row} col={4}>
+																<div className="flex items-center">
+																	<span className="whitespace-nowrap font-medium text-[13px] text-text-sub-600">
+																		{email.time}
+																	</span>
+																</div>
+															</MatrixCell>
+															<MatrixCell row={row} col={5} className="justify-end">
+																<span className="inline-flex aspect-square h-7 w-7 items-center justify-center rounded-lg">
+																	<Icon
+																		name="more-horizontal"
+																		className="h-3.5 w-3.5 text-text-sub-600"
+																	/>
+																</span>
+															</MatrixCell>
+														</div>
+													</motion.div>
+												);
+											})}
+										</AnimatePresence>
 
-										<div className="flex items-center justify-between px-4 py-2 text-label-xs text-text-sub-600">
+										<motion.div
+											layout="position"
+											className="flex items-center justify-between px-4 py-2 text-label-xs text-text-sub-600"
+											initial={reduceMotion ? false : { opacity: 0, y: 16 }}
+											animate={{ opacity: 1, y: 0 }}
+											transition={{
+												duration: FOOTER_DURATION,
+												delay: footerDelay,
+												ease: PAGE_EASE,
+												layout: { duration: 0.45, ease: PAGE_EASE },
+											}}
+										>
 											<div className="flex items-center gap-3">
 												<span>0 of 10 row(s) selected.</span>
 												<button
@@ -515,14 +622,14 @@ export function HeroEmailsPreview() {
 													<Icon name="chevron-right" className="h-3.5 w-3.5" />
 												</Button.Root>
 											</div>
-										</div>
+										</motion.div>
 									</div>
 								</div>
 							</div>
 						</div>
 					</div>
-				</div>
-			</div>
+				</MotionItem>
+			</MotionStage>
 		</div>
 	);
 }
