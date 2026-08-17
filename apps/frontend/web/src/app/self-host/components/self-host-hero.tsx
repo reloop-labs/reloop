@@ -150,6 +150,15 @@ export function SelfHostHero() {
 		});
 	}, []);
 
+	const activeNav = TAB_TO_NAV[active] ?? "emails";
+
+	const handleSidebarClick = useCallback((id: string) => {
+		const targetTab = NAV_TO_TAB[id];
+		if (targetTab) {
+			setActive(targetTab);
+		}
+	}, []);
+
 	return (
 		<section
 			id="features"
