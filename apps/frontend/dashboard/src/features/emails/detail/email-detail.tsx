@@ -605,29 +605,6 @@ function EmailInsightsPanel({
 		setExpandedItems((prev) => ({ ...prev, [id]: !prev[id] }));
 	}, []);
 
-	const latency = useMemo(() => {
-		if (!email.deliveredAt || !email.sentAt) return null;
-		const diff =
-			new Date(email.deliveredAt).getTime() - new Date(email.sentAt).getTime();
-		if (diff < 0) return null;
-		if (diff < 1000) return `${diff}ms`;
-		return `${(diff / 1000).toFixed(2)}s`;
-	}, [email.deliveredAt, email.sentAt]);
-
-	const calculatedSize = useMemo(() => {
-		if (email.size && email.size > 0) return formatBytes(email.size);
-		const htmlLen = email.htmlBody?.length ?? 0;
-		const textLen = email.textBody?.length ?? 0;
-		const rawLen = email.rawMessage?.length ?? 0;
-		const estimated = rawLen || htmlLen + textLen;
-		return estimated > 0 ? formatBytes(estimated) : "—";
-	}, [email.size, email.htmlBody, email.textBody, email.rawMessage]);
-
-	const totalRecipients =
-		email.toEmails.length +
-		(email.ccEmails?.length ?? 0) +
-		(email.bccEmails?.length ?? 0);
-
 	// Compute deliverability and quality checks
 	const { improvements, doingGreat } = useMemo(() => {
 		const checks: InsightCheckItem[] = [];
@@ -842,108 +819,43 @@ function EmailInsightsPanel({
 	}, [email]);
 
 	return (
-		<div className="space-y-8 p-6">
-			{/* Metric Cards Grid */}
-			<div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-				<div className="rounded-xl border border-stroke-soft-100 p-4 dark:border-neutral-800/80">
-					<div className="flex items-center gap-1.5 text-text-sub-600 dark:text-neutral-400">
-						<Icon name="activity" className="h-4 w-4" />
-						<span className="font-medium text-paragraph-xs">
-							Delivery Speed
-						</span>
-					</div>
-					<div className="mt-2 flex items-baseline gap-2">
-						<span className="font-semibold text-lg text-text-strong-950 tabular-nums dark:text-neutral-100">
-							{latency ?? "Instant"}
-						</span>
-						{email.deliveredAt && (
-							<span className="inline-flex items-center gap-1 rounded-md bg-success-alpha-10 px-1.5 py-0.5 font-medium text-[11px] text-success-base">
-								<span className="h-1.5 w-1.5 rounded-full bg-success-base" />
-								Delivered
-							</span>
-						)}
-					</div>
-				</div>
-
-				<div className="rounded-xl border border-stroke-soft-100 p-4 dark:border-neutral-800/80">
-					<div className="flex items-center gap-1.5 text-text-sub-600 dark:text-neutral-400">
-						<Icon name="file-code" className="h-4 w-4" />
-						<span className="font-medium text-paragraph-xs">Message Size</span>
-					</div>
-					<div className="mt-2">
-						<span className="font-semibold text-lg text-text-strong-950 tabular-nums dark:text-neutral-100">
-							{calculatedSize}
-						</span>
-					</div>
-				</div>
-
-				<div className="rounded-xl border border-stroke-soft-100 p-4 dark:border-neutral-800/80">
-					<div className="flex items-center gap-1.5 text-text-sub-600 dark:text-neutral-400">
-						<Icon name="users" className="h-4 w-4" />
-						<span className="font-medium text-paragraph-xs">Recipients</span>
-					</div>
-					<div className="mt-2 flex items-baseline gap-2">
-						<span className="font-semibold text-lg text-text-strong-950 tabular-nums dark:text-neutral-100">
-							{totalRecipients}
-						</span>
-						<span className="text-paragraph-xs text-text-sub-600 dark:text-neutral-400">
-							({email.toEmails.length} to
-							{email.ccEmails?.length ? `, ${email.ccEmails.length} cc` : ""})
-						</span>
-					</div>
-				</div>
-
-				<div className="rounded-xl border border-stroke-soft-100 p-4 dark:border-neutral-800/80">
-					<div className="flex items-center gap-1.5 text-text-sub-600 dark:text-neutral-400">
-						<Icon name="server" className="h-4 w-4" />
-						<span className="font-medium text-paragraph-xs">Provider</span>
-					</div>
-					<div className="mt-2">
-						<span className="font-semibold text-lg text-text-strong-950 capitalize dark:text-neutral-100">
-							{email.provider || "Reloop"}
-						</span>
-					</div>
-				</div>
-			</div>
-
+		<div className="space-y-6 pt-2 pb-6">
 			{/* Deliverability & Quality Checks */}
-			<div className="space-y-6">
-				{improvements.length > 0 && (
-					<div className="space-y-2">
-						<h4 className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-wider dark:text-neutral-400">
-							POSSIBLE IMPROVEMENTS
-						</h4>
-						<div className="border-stroke-soft-100/60 border-t dark:border-neutral-800/80">
-							{improvements.map((item) => (
-								<InsightAccordionItem
-									key={item.id}
-									item={item}
-									isOpen={Boolean(expandedItems[item.id])}
-									onToggle={() => toggleItem(item.id)}
-								/>
-							))}
-						</div>
+			{improvements.length > 0 && (
+				<div className="space-y-2">
+					<h4 className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-wider dark:text-neutral-400">
+						POSSIBLE IMPROVEMENTS
+					</h4>
+					<div className="border-stroke-soft-100/60 border-t dark:border-neutral-800/80">
+						{improvements.map((item) => (
+							<InsightAccordionItem
+								key={item.id}
+								item={item}
+								isOpen={Boolean(expandedItems[item.id])}
+								onToggle={() => toggleItem(item.id)}
+							/>
+						))}
 					</div>
-				)}
+				</div>
+			)}
 
-				{doingGreat.length > 0 && (
-					<div className="space-y-2">
-						<h4 className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-wider dark:text-neutral-400">
-							DOING GREAT
-						</h4>
-						<div className="border-stroke-soft-100/60 border-t dark:border-neutral-800/80">
-							{doingGreat.map((item) => (
-								<InsightAccordionItem
-									key={item.id}
-									item={item}
-									isOpen={Boolean(expandedItems[item.id])}
-									onToggle={() => toggleItem(item.id)}
-								/>
-							))}
-						</div>
+			{doingGreat.length > 0 && (
+				<div className="space-y-2">
+					<h4 className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-wider dark:text-neutral-400">
+						DOING GREAT
+					</h4>
+					<div className="border-stroke-soft-100/60 border-t dark:border-neutral-800/80">
+						{doingGreat.map((item) => (
+							<InsightAccordionItem
+								key={item.id}
+								item={item}
+								isOpen={Boolean(expandedItems[item.id])}
+								onToggle={() => toggleItem(item.id)}
+							/>
+						))}
 					</div>
-				)}
-			</div>
+				</div>
+			)}
 		</div>
 	);
 }
@@ -1305,7 +1217,13 @@ export const EmailDetail = ({ email, isLoading }: EmailDetailProps) => {
 						</AnimatePresence>
 					</TabMenu.List>
 
-					<div className="mb-10 overflow-hidden rounded-xl border border-stroke-soft-100 dark:border-stroke-soft-100/50">
+					<div
+						className={cn(
+							"mb-10",
+							activeTab !== "insights" &&
+								"overflow-hidden rounded-xl border border-stroke-soft-100 dark:border-stroke-soft-100/50",
+						)}
+					>
 						{isLoading ? (
 							<div className="p-6">
 								<Skeleton className="h-64 w-full rounded-lg" />
