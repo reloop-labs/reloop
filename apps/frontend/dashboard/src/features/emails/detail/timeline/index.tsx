@@ -2,7 +2,6 @@
 
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import { Skeleton } from "@reloop/ui/skeleton";
 import { Fragment, useMemo } from "react";
 import { formatTimelineDate } from "./timeline-flow-node";
 import type { EmailEvent } from "./types";
@@ -13,7 +12,6 @@ export function EmailTimeline({
 	deliveredAt,
 	failedAt,
 	errorMessage,
-	isLoading,
 	onDeliveredClick,
 }: {
 	events: EmailEvent[];
@@ -21,7 +19,6 @@ export function EmailTimeline({
 	deliveredAt?: string | null;
 	failedAt?: string | null;
 	errorMessage?: string | null;
-	isLoading?: boolean;
 	/** Open delivered details sidebar when the completed Delivered step is clicked */
 	onDeliveredClick?: () => void;
 }) {
@@ -128,45 +125,14 @@ export function EmailTimeline({
 		];
 	}, [isFailed, onDeliveredClick]);
 
-	if (isLoading) {
-		const loadingSteps = [
-			{ label: "Sent", icon: "send-1" },
-			{ label: "Delivered", icon: "check-circle" },
-			{ label: "Opened", icon: "eye-outline" },
-			{ label: "Clicked", icon: "cursor-click" },
-		];
-		return (
-			<div className="relative flex h-[128px] w-full items-center justify-start rounded-3xl border border-stroke-soft-100 bg-bg-white-0 px-8 py-4 transition-all hover:border-stroke-soft-200 dark:border-stroke-soft-100/50 dark:bg-bg-white-0/5">
-				<div className="flex w-full max-w-2xl items-center justify-between">
-					{loadingSteps.map((step, index) => (
-						<Fragment key={index}>
-							<div className="flex min-w-[70px] flex-col items-center gap-2">
-								<div className="flex h-10 w-10 items-center justify-center rounded-[10px] border border-stroke-soft-200 bg-bg-weak-50 text-text-soft-400">
-									<Icon name={step.icon} className="h-5 w-5 opacity-40" />
-								</div>
-								<div className="flex flex-col items-center text-center">
-									<span className="rounded-md bg-bg-weak-50 px-2 py-1 font-semibold text-text-soft-400 text-xs">
-										{step.label}
-									</span>
-									<Skeleton className="mx-auto mt-1 h-3 w-16 rounded-md" />
-								</div>
-							</div>
-							{index < loadingSteps.length - 1 && (
-								<div className="-mt-8 h-0 flex-1 border-stroke-soft-100 border-t-[1.5px] border-dashed dark:border-neutral-800" />
-							)}
-						</Fragment>
-					))}
-				</div>
-			</div>
-		);
-	}
-
 	return (
 		<div className="relative flex h-[128px] w-full items-center justify-start rounded-3xl border border-stroke-soft-100 bg-bg-white-0 px-8 py-4 transition-all hover:border-stroke-soft-200 dark:border-stroke-soft-100/50 dark:bg-bg-white-0/5">
 			<div
 				className={cn(
 					"flex items-center",
-					isFailed ? "w-64 justify-between" : "w-full max-w-2xl justify-between",
+					isFailed
+						? "w-64 justify-between"
+						: "w-full max-w-2xl justify-between",
 				)}
 			>
 				{steps.map((step, index) => {
