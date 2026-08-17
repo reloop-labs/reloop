@@ -3,7 +3,7 @@
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { motion, useReducedMotion } from "framer-motion";
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { PAGE_EASE } from "../../domain/_shared/page-motion";
 
 const SUCCESS_STEPS = [
@@ -45,6 +45,14 @@ function completedThrough(status: string): number {
 const STEP_STAGGER = 0.09;
 const LIGHT_BASE_MS = 280;
 const LIGHT_STAGGER_MS = 220;
+const DELIVERED_STEP = 1;
+
+function startingLit(target: number, reduceMotion: boolean | null): number {
+	if (reduceMotion) return target;
+	// Past delivery: keep Sent + Delivered locked and only play later steps.
+	if (target > DELIVERED_STEP) return DELIVERED_STEP;
+	return -1;
+}
 
 export function EmailTimeline({
 	status = "opened",
@@ -61,30 +69,38 @@ export function EmailTimeline({
 		normalized === "spam";
 	const steps = isFailed ? FAILED_STEPS : SUCCESS_STEPS;
 	const currentStepIndex = isFailed ? 1 : completedThrough(normalized);
-	const [litThrough, setLitThrough] = useState(
-		reduceMotion ? currentStepIndex : -1,
+	const [litThrough, setLitThrough] = useState(() =>
+		startingLit(currentStepIndex, reduceMotion),
 	);
+	const litRef = useRef(startingLit(currentStepIndex, reduceMotion));
 
 	useEffect(() => {
+		const lockForward = (index: number) => {
+			if (index < litRef.current) return;
+			litRef.current = index;
+			setLitThrough(index);
+		};
+
 		if (reduceMotion) {
-			setLitThrough(currentStepIndex);
+			lockForward(currentStepIndex);
 			return;
 		}
 
-		if (!mounted) {
-			setLitThrough(-1);
-			return;
-		}
+		if (!mounted) return;
 
-		setLitThrough(-1);
+		const start = litRef.current + 1;
+		if (start > currentStepIndex) return;
+
 		const timers: number[] = [];
-		for (let i = 0; i <= currentStepIndex; i++) {
+		for (let i = start; i <= currentStepIndex; i++) {
+			const offset = i - start;
 			timers.push(
 				window.setTimeout(
 					() => {
-						setLitThrough(i);
+						lockForward(i);
 					},
-					LIGHT_BASE_MS + i * LIGHT_STAGGER_MS,
+					(litRef.current < 0 ? LIGHT_BASE_MS : LIGHT_STAGGER_MS) +
+						offset * LIGHT_STAGGER_MS,
 				),
 			);
 		}

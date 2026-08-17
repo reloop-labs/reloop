@@ -71,9 +71,7 @@ export function HeroEmailsPreview() {
 	const [emails, setEmails] = useState<EmailItem[]>(INITIAL_EMAILS);
 	const [highlightedId, setHighlightedId] = useState<string | null>(null);
 	const [view, setView] = useState<"list" | "detail">("list");
-	const [selectedEmail, setSelectedEmail] = useState<EmailItem>(
-		INITIAL_EMAILS[0]!,
-	);
+	const [detailEmail, setDetailEmail] = useState<EmailItem | null>(null);
 	const [isRowPressed, setIsRowPressed] = useState(false);
 	const [detailTab, setDetailTab] = useState("preview");
 
@@ -104,6 +102,8 @@ export function HeroEmailsPreview() {
 	const paused = playback?.paused ?? false;
 	const pausedRef = useRef(paused);
 	pausedRef.current = paused;
+	const emailsRef = useRef(emails);
+	emailsRef.current = emails;
 
 	useEffect(() => {
 		setMounted(true);
@@ -179,7 +179,7 @@ export function HeroEmailsPreview() {
 		return () => clearInterval(interval);
 	}, [reduceMotion, view]);
 
-	// Organic status transition loop for items below the top row
+	// Organic status updates stay on the list only — detail uses its own session.
 	useEffect(() => {
 		if (reduceMotion) return;
 
@@ -344,9 +344,12 @@ export function HeroEmailsPreview() {
 			await click(setIsRowPressed);
 			if (cancelled) return;
 
-			// Pick current first email or selected
-			setSelectedEmail((prev) => emails[0] || prev);
-			setView("detail");
+			const opened = emailsRef.current[0];
+			if (opened) {
+				setDetailEmail({ ...opened });
+				setDetailTab("preview");
+				setView("detail");
+			}
 
 			await sleep(PAGE_TRANSITION_MS);
 			if (cancelled) return;
@@ -405,11 +408,16 @@ export function HeroEmailsPreview() {
 			cancelled = true;
 			for (const id of timers) window.clearTimeout(id);
 		};
-	}, [cursorOpacity, cursorScale, cursorX, cursorY, emails, reduceMotion]);
+	}, [cursorOpacity, cursorScale, cursorX, cursorY, reduceMotion]);
+
+	const openDetail = (email: EmailItem) => {
+		setDetailEmail({ ...email });
+		setDetailTab("preview");
+		setView("detail");
+	};
 
 	const handleRowClick = (email: EmailItem) => {
-		setSelectedEmail(email);
-		setView("detail");
+		openDetail(email);
 	};
 
 	const handleBack = () => {
@@ -450,7 +458,7 @@ export function HeroEmailsPreview() {
 					</motion.div>
 				)}
 
-				{view === "detail" && (
+				{view === "detail" && detailEmail && (
 					<motion.div
 						key="email-detail"
 						variants={stageVariants}
@@ -460,7 +468,7 @@ export function HeroEmailsPreview() {
 						className="w-full"
 					>
 						<EmailDetailPage
-							email={selectedEmail}
+							email={detailEmail}
 							onBack={handleBack}
 							backButtonRef={backBtnRef}
 							tabRefs={tabRefs}

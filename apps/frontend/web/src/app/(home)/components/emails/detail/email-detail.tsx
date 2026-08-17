@@ -334,7 +334,11 @@ export function EmailDetail({
 
 			<AnimateIn mounted={mounted} delay={0.22} y={14}>
 				<section>
-					<EmailTimeline status={email.status} mounted={mounted} />
+					<EmailTimeline
+						key={email.id}
+						status={email.status}
+						mounted={mounted}
+					/>
 				</section>
 			</AnimateIn>
 
