@@ -1,51 +1,11 @@
 "use client";
 
+import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
-import {
-	type Edge,
-	type NodeTypes,
-	ReactFlow,
-	ReactFlowProvider,
-	useReactFlow,
-} from "@xyflow/react";
-import "@xyflow/react/dist/style.css";
-import { Fragment, useEffect, useMemo } from "react";
-import { TimelineFlowEdge } from "./timeline-flow-edge";
-import {
-	type TimelineFlowNode,
-	TimelineFlowNodeComponent,
-} from "./timeline-flow-node";
+import { Fragment, useMemo } from "react";
+import { formatTimelineDate } from "./timeline-flow-node";
 import type { EmailEvent } from "./types";
-
-const nodeTypes: NodeTypes = {
-	timelineStep: TimelineFlowNodeComponent,
-};
-
-const edgeTypes = {
-	timelineEdge: TimelineFlowEdge,
-};
-
-const proOptions = { hideAttribution: true };
-
-function FlowAutoFitter() {
-	const { fitView } = useReactFlow();
-
-	useEffect(() => {
-		fitView({ padding: 0.18, maxZoom: 1, minZoom: 0.3 });
-
-		const handleResize = () => {
-			fitView({ padding: 0.18, maxZoom: 1, minZoom: 0.3 });
-		};
-
-		window.addEventListener("resize", handleResize);
-		return () => window.removeEventListener("resize", handleResize);
-	}, [fitView]);
-
-	return null;
-}
-
-const STEP_SPACING = 220;
 
 export function EmailTimeline({
 	events,
@@ -121,43 +81,32 @@ export function EmailTimeline({
 		return list;
 	}, [events, sentAt, isFailed, failedAt, deliveredAt]);
 
-	const rawSteps = useMemo(() => {
+	const steps = useMemo(() => {
 		if (isFailed) {
 			return [
 				{
 					id: "sent",
-					slotIndex: 0,
 					stepType: "sent",
 					label: "Sent",
 					icon: "send-1",
 				},
 				{
 					id: "failed",
-					slotIndex: 1,
 					stepType: "failed",
 					label: "Failed",
 					icon: "cross-circle",
-				},
-				{
-					id: "anchor",
-					slotIndex: 3,
-					stepType: "anchor",
-					label: "",
-					icon: "",
 				},
 			];
 		}
 		return [
 			{
 				id: "sent",
-				slotIndex: 0,
 				stepType: "sent",
 				label: "Sent",
 				icon: "send-1",
 			},
 			{
 				id: "delivered",
-				slotIndex: 1,
 				stepType: "delivered",
 				label: "Delivered",
 				icon: "check-circle",
@@ -166,82 +115,18 @@ export function EmailTimeline({
 			},
 			{
 				id: "opened",
-				slotIndex: 2,
 				stepType: "opened",
 				label: "Opened",
 				icon: "eye-outline",
 			},
 			{
 				id: "clicked",
-				slotIndex: 3,
 				stepType: "clicked",
 				label: "Clicked",
 				icon: "cursor-click",
 			},
 		];
 	}, [isFailed, onDeliveredClick]);
-
-	const nodes: TimelineFlowNode[] = useMemo(() => {
-		return rawSteps.map((step) => {
-			const event = allEvents.find((e) => e.type === step.stepType);
-			const isCompleted = !!event;
-			const timestamp = event?.createdAt;
-
-			return {
-				id: step.id,
-				type: "timelineStep" as const,
-				position: { x: step.slotIndex * STEP_SPACING, y: 0 },
-				data: {
-					stepType: step.stepType,
-					label: step.label,
-					icon: step.icon,
-					isCompleted,
-					timestamp,
-					onClick: step.onClick,
-					isInteractive: step.isInteractive,
-					hasTarget: step.slotIndex > 0 && step.stepType !== "anchor",
-					hasSource:
-						step.slotIndex < (isFailed ? 1 : 3) && step.stepType !== "anchor",
-				},
-				draggable: false,
-				selectable: false,
-				focusable: false,
-			};
-		});
-	}, [rawSteps, allEvents, isFailed]);
-
-	const edges: Edge[] = useMemo(() => {
-		if (isFailed) {
-			return [
-				{
-					id: "e-sent-failed",
-					source: "sent",
-					target: "failed",
-					type: "timelineEdge",
-				},
-			];
-		}
-		return [
-			{
-				id: "e-sent-delivered",
-				source: "sent",
-				target: "delivered",
-				type: "timelineEdge",
-			},
-			{
-				id: "e-delivered-opened",
-				source: "delivered",
-				target: "opened",
-				type: "timelineEdge",
-			},
-			{
-				id: "e-opened-clicked",
-				source: "opened",
-				target: "clicked",
-				type: "timelineEdge",
-			},
-		];
-	}, [isFailed]);
 
 	if (isLoading) {
 		const loadingSteps = [
@@ -251,59 +136,150 @@ export function EmailTimeline({
 			{ label: "Clicked", icon: "cursor-click" },
 		];
 		return (
-			<div className="relative flex h-[128px] w-full items-center justify-between gap-0 rounded-3xl border border-stroke-soft-100 bg-bg-white-0 px-8 py-4 transition-all hover:border-stroke-soft-200">
-				{loadingSteps.map((step, index) => (
-					<Fragment key={index}>
-						<div className="flex min-w-[70px] flex-grow flex-col items-center gap-2">
-							<div className="flex h-10 w-10 items-center justify-center rounded-[10px] border border-stroke-soft-200 bg-bg-weak-50 text-text-soft-400">
-								<Icon name={step.icon} className="h-5 w-5 opacity-40" />
+			<div className="relative flex h-[128px] w-full items-center justify-start rounded-3xl border border-stroke-soft-100 bg-bg-white-0 px-8 py-4 transition-all hover:border-stroke-soft-200 dark:border-stroke-soft-100/50 dark:bg-bg-white-0/5">
+				<div className="flex w-full max-w-2xl items-center justify-between">
+					{loadingSteps.map((step, index) => (
+						<Fragment key={index}>
+							<div className="flex min-w-[70px] flex-col items-center gap-2">
+								<div className="flex h-10 w-10 items-center justify-center rounded-[10px] border border-stroke-soft-200 bg-bg-weak-50 text-text-soft-400">
+									<Icon name={step.icon} className="h-5 w-5 opacity-40" />
+								</div>
+								<div className="flex flex-col items-center text-center">
+									<span className="rounded-md bg-bg-weak-50 px-2 py-1 font-semibold text-text-soft-400 text-xs">
+										{step.label}
+									</span>
+									<Skeleton className="mx-auto mt-1 h-3 w-16 rounded-md" />
+								</div>
 							</div>
-							<div className="flex flex-col items-center text-center">
-								<span className="rounded-md bg-bg-weak-50 px-2 py-1 font-semibold text-text-soft-400 text-xs">
-									{step.label}
-								</span>
-								<Skeleton className="mx-auto mt-1 h-3 w-16 rounded-md" />
-							</div>
-						</div>
-						{index < loadingSteps.length - 1 && (
-							<div className="mt-5 h-0 flex-1 border-stroke-soft-100 border-t-[1.5px] border-dashed" />
-						)}
-					</Fragment>
-				))}
+							{index < loadingSteps.length - 1 && (
+								<div className="-mt-8 h-0 flex-1 border-stroke-soft-100 border-t-[1.5px] border-dashed dark:border-neutral-800" />
+							)}
+						</Fragment>
+					))}
+				</div>
 			</div>
 		);
 	}
 
 	return (
-		<div className="relative h-[128px] w-full overflow-hidden rounded-3xl border border-stroke-soft-100 bg-bg-white-0 transition-all hover:border-stroke-soft-200">
-			<ReactFlowProvider>
-				<ReactFlow
-					nodes={nodes}
-					edges={edges}
-					nodeTypes={nodeTypes}
-					edgeTypes={edgeTypes}
-					nodesDraggable={false}
-					nodesConnectable={false}
-					nodesFocusable={false}
-					elementsSelectable={false}
-					panOnDrag={false}
-					zoomOnScroll={false}
-					zoomOnPinch={false}
-					zoomOnDoubleClick={false}
-					preventScrolling={false}
-					proOptions={proOptions}
-					fitView
-					fitViewOptions={{
-						padding: 0.18,
-						maxZoom: 1,
-						minZoom: 0.3,
-					}}
-					aria-label="Email Delivery Timeline"
-					className="pointer-events-auto select-none [&_.react-flow__viewport]:transition-transform [&_.react-flow__viewport]:duration-200"
-				>
-					<FlowAutoFitter key={`${isFailed}-${allEvents.length}`} />
-				</ReactFlow>
-			</ReactFlowProvider>
+		<div className="relative flex h-[128px] w-full items-center justify-start rounded-3xl border border-stroke-soft-100 bg-bg-white-0 px-8 py-4 transition-all hover:border-stroke-soft-200 dark:border-stroke-soft-100/50 dark:bg-bg-white-0/5">
+			<div
+				className={cn(
+					"flex items-center",
+					isFailed ? "w-64 justify-between" : "w-full max-w-2xl justify-between",
+				)}
+			>
+				{steps.map((step, index) => {
+					const event = allEvents.find((e) => e.type === step.stepType);
+					const isCompleted = !!event;
+					const timestamp = event?.createdAt;
+					const formattedTime = formatTimelineDate(timestamp);
+
+					const getIconStyles = () => {
+						if (!isCompleted) {
+							return "border-stroke-soft-200 bg-bg-weak-50 text-text-sub-600 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-400";
+						}
+						switch (step.stepType) {
+							case "sent":
+								return "border-information-base/20 bg-information-lighter/50 text-information-base";
+							case "failed":
+							case "bounced":
+							case "complaint":
+								return "border-error-light bg-error-lighter text-error-base";
+							case "delivered":
+								return cn(
+									"border-success-base/20 bg-success-lighter/50 text-success-base",
+									step.isInteractive &&
+										"group-hover:border-success-base/40 group-hover:shadow-[0_0_0_3px_rgba(34,197,94,0.12)]",
+								);
+							case "opened":
+								return "border-orange-500/20 bg-orange-50/50 text-orange-600 dark:bg-orange-950/30 dark:text-orange-400";
+							case "clicked":
+								return "border-purple-500/20 bg-purple-50/50 text-purple-600 dark:bg-purple-950/30 dark:text-purple-400";
+							default:
+								return "border-information-base/20 bg-information-lighter/50 text-information-base";
+						}
+					};
+
+					const getBadgeStyles = () => {
+						if (!isCompleted) {
+							return "bg-bg-weak-50 text-text-sub-600 dark:bg-neutral-900 dark:text-neutral-400";
+						}
+						switch (step.stepType) {
+							case "sent":
+								return "bg-information-lighter text-information-base";
+							case "failed":
+							case "bounced":
+							case "complaint":
+								return "bg-error-lighter text-error-base";
+							case "delivered":
+								return cn(
+									"bg-success-lighter text-success-base",
+									step.isInteractive && "group-hover:underline",
+								);
+							case "opened":
+								return "bg-orange-50 text-orange-600 dark:bg-orange-950/40 dark:text-orange-400";
+							case "clicked":
+								return "bg-purple-50 text-purple-600 dark:bg-purple-950/40 dark:text-purple-400";
+							default:
+								return "bg-information-lighter text-information-base";
+						}
+					};
+
+					const nodeBody = (
+						<div className="flex flex-col items-center gap-2">
+							<div
+								className={cn(
+									"flex h-10 w-10 items-center justify-center rounded-[10px] border transition-all duration-300",
+									getIconStyles(),
+								)}
+							>
+								<Icon name={step.icon} className="h-5 w-5" />
+							</div>
+
+							<div className="flex flex-col items-center text-center">
+								<span
+									className={cn(
+										"rounded-md px-2 py-1 font-semibold text-xs transition-colors duration-300",
+										getBadgeStyles(),
+									)}
+								>
+									{step.label}
+								</span>
+								{isCompleted && formattedTime && (
+									<span className="mt-1 whitespace-nowrap font-medium text-text-soft-400 text-xs">
+										{formattedTime}
+									</span>
+								)}
+							</div>
+						</div>
+					);
+
+					return (
+						<Fragment key={step.id}>
+							<div className="flex min-w-[90px] flex-col items-center">
+								{step.isInteractive && step.onClick ? (
+									<button
+										type="button"
+										onClick={step.onClick}
+										className="group flex flex-col items-center rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-success-base/40"
+										aria-label={`View ${step.label} details`}
+									>
+										{nodeBody}
+									</button>
+								) : (
+									<div className="group flex flex-col items-center">
+										{nodeBody}
+									</div>
+								)}
+							</div>
+							{index < steps.length - 1 && (
+								<div className="-mt-8 h-0 flex-1 border-stroke-soft-100 border-t-[1.5px] border-dashed dark:border-neutral-800" />
+							)}
+						</Fragment>
+					);
+				})}
+			</div>
 		</div>
 	);
 }
