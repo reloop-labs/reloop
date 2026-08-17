@@ -19,6 +19,7 @@ const NAV: {
 		items: [
 			{ id: "contacts", label: "Contacts", icon: "contacts" },
 			{ id: "templates", label: "Templates", icon: "layout" },
+			{ id: "workflow", label: "Workflows", icon: "workflow" },
 		],
 	},
 	{
