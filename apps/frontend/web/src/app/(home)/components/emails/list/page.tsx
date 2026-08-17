@@ -1,5 +1,6 @@
 "use client";
 
+import type { RefObject } from "react";
 import type { EmailItem } from "../_shared/data";
 import { AnimateIn } from "../_shared/animate-in";
 import { EmailsListHeader } from "./header";
@@ -11,10 +12,18 @@ export function EmailsListPage({
 	emails,
 	mounted,
 	highlightedId,
+	onRowClick,
+	targetRowRef,
+	targetEmailId,
+	isRowPressed,
 }: {
 	emails: EmailItem[];
 	mounted: boolean;
 	highlightedId?: string | null;
+	onRowClick?: (email: EmailItem) => void;
+	targetRowRef?: RefObject<HTMLDivElement | null>;
+	targetEmailId?: string | null;
+	isRowPressed?: boolean;
 }) {
 	return (
 		<div className="mx-auto max-w-6xl space-y-6 overflow-hidden p-6 lg:p-8">
@@ -30,6 +39,10 @@ export function EmailsListPage({
 							emails={emails}
 							mounted={mounted}
 							highlightedId={highlightedId}
+							onRowClick={onRowClick}
+							targetRowRef={targetRowRef}
+							targetEmailId={targetEmailId}
+							isRowPressed={isRowPressed}
 						/>
 					</AnimateIn>
 				</div>

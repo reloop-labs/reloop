@@ -23,10 +23,18 @@ export function EmailsListTable({
 	emails,
 	mounted,
 	highlightedId,
+	onRowClick,
+	targetRowRef,
+	targetEmailId,
+	isRowPressed,
 }: {
 	emails: EmailItem[];
 	mounted: boolean;
 	highlightedId?: string | null;
+	onRowClick?: (email: EmailItem) => void;
+	targetRowRef?: React.RefObject<HTMLDivElement | null>;
+	targetEmailId?: string | null;
+	isRowPressed?: boolean;
 }) {
 	const reduceMotion = useReducedMotion();
 
@@ -76,6 +84,7 @@ export function EmailsListTable({
 						const row = rowIndex + 1;
 						const isHighlighted = highlightedId === email.id;
 						const isLive = email.id.startsWith("em_live_");
+						const isTargetRow = targetEmailId ? email.id === targetEmailId : rowIndex === 0;
 
 						return (
 							<motion.div
@@ -121,11 +130,14 @@ export function EmailsListTable({
 								style={{ overflow: "hidden" }}
 							>
 								<div
+									ref={isTargetRow ? targetRowRef : undefined}
+									onClick={() => onRowClick?.(email)}
 									style={emailGridStyle}
 									className={cn(
-										"group/row grid w-full cursor-pointer items-center px-4 py-2 text-left transition-colors duration-300 hover:bg-bg-weak-50",
+										"group/row grid w-full cursor-pointer items-center px-4 py-2 text-left transition-all duration-200 hover:bg-bg-weak-50",
 										"first:rounded-t-xl",
 										isHighlighted && "bg-neutral-100/90 dark:bg-white/[0.06]",
+										isTargetRow && isRowPressed && "bg-bg-weak-50/80 scale-[0.995]",
 									)}
 								>
 									<MatrixCell
