@@ -76,7 +76,8 @@ const TABS: {
 		description: "Visual editor with dynamic variables and components.",
 		banner: {
 			title: "Templates",
-			description: "Design and preview transactional and marketing email templates.",
+			description:
+				"Design and preview transactional and marketing email templates.",
 			href: "/features/email-templates",
 			icon: "layout",
 		},
@@ -115,7 +116,7 @@ export default function Hero() {
 				</p>
 				<div className="mt-6 flex flex-wrap items-center justify-center gap-3 sm:mt-7">
 					<FancyButton.Root asChild variant="neutral" size="small">
-						<a href={hostedSignupHref}>Start Building</a>
+						<a href={hostedSignupHref}>Get Started</a>
 					</FancyButton.Root>
 					<FancyButton.Root asChild variant="basic" size="small">
 						<a href="/docs">Documentation</a>
