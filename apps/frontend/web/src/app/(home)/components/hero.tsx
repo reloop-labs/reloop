@@ -113,9 +113,9 @@ export default function Hero() {
 	return (
 		<section
 			id="features"
-			className="relative flex min-h-dvh flex-col bg-transparent pt-40 sm:pt-48 lg:pt-56"
+			className="relative flex min-h-dvh flex-col bg-transparent"
 		>
-			<div className="relative mx-auto flex w-full max-w-5xl flex-col items-center px-6 text-center sm:px-8 md:max-w-7xl lg:px-12">
+			<div className="relative mx-auto flex w-full max-w-5xl flex-col items-center border-stroke-soft-200 border-x px-6 pt-36 pb-12 text-center sm:px-8 sm:pt-44 sm:pb-16 md:max-w-7xl lg:px-12 lg:pt-52 dark:border-white/10">
 				<h1 className="max-w-4xl text-center font-medium text-[2.5rem] text-text-strong-950 leading-[1.02] tracking-[-0.045em] sm:text-[3.5rem] lg:text-[4.25rem] dark:text-white">
 					Email API for Developers
 					<br />
@@ -166,7 +166,7 @@ export default function Hero() {
 				</div>
 			</div>
 
-			<div className="relative mx-auto mt-8 w-full max-w-5xl flex-1 flex-col border-stroke-soft-200 border-x sm:mt-10 md:max-w-7xl dark:border-white/10">
+			<div className="relative mx-auto w-full max-w-5xl flex-1 flex-col border-stroke-soft-200 border-x md:max-w-7xl dark:border-white/10">
 				<div
 					role="tablist"
 					aria-label="Product surfaces"
@@ -252,6 +252,15 @@ export default function Hero() {
 					aria-labelledby={`${tablistId}-${active}`}
 					className="relative z-10 mx-auto flex h-[32rem] w-full max-w-5xl flex-col px-3 pt-10 pb-10 sm:h-[40rem] sm:px-6 sm:pt-14 sm:pb-14 md:max-w-7xl lg:h-[48rem] lg:px-8 lg:pt-20 lg:pb-16"
 				>
+					{/* Left and Right vertical borders matching the HeroAtmosphere line color and vertical gradient */}
+					<div
+						aria-hidden
+						className="pointer-events-none absolute inset-y-0 left-0 w-px bg-gradient-to-b from-[rgba(0,111,254,0.06)] via-[rgba(0,111,254,0.16)] to-[rgba(0,111,254,0.28)] dark:from-[rgba(0,111,254,0.1)] dark:via-[rgba(0,111,254,0.22)] dark:to-[rgba(0,111,254,0.38)]"
+					/>
+					<div
+						aria-hidden
+						className="pointer-events-none absolute inset-y-0 right-0 w-px bg-gradient-to-b from-[rgba(0,111,254,0.06)] via-[rgba(0,111,254,0.16)] to-[rgba(0,111,254,0.28)] dark:from-[rgba(0,111,254,0.1)] dark:via-[rgba(0,111,254,0.22)] dark:to-[rgba(0,111,254,0.38)]"
+					/>
 					<HeroDemoPlaybackProvider>
 						<HeroWindowChrome
 							action={active === "sdk" ? <HeroDemoPlaybackButton /> : undefined}
