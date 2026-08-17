@@ -37,11 +37,7 @@ const DEFAULT_TIMELINE_STEPS: TimelineStepData[] = [
 	},
 ];
 
-export function EmailTimeline({
-	status = "opened",
-}: {
-	status?: string;
-}) {
+export function EmailTimeline({ status = "opened" }: { status?: string }) {
 	const currentStepIndex = (() => {
 		switch (status.toLowerCase()) {
 			case "clicked":
@@ -107,13 +103,11 @@ export function EmailTimeline({
 						>
 							{/* Connecting Flow Edge */}
 							{hasNext && (
-								<div className="absolute top-5 left-1/2 -z-0 h-[1.5px] w-full -translate-y-1/2 bg-stroke-soft-200 dark:bg-stroke-soft-100/40">
+								<div className="-z-0 -translate-y-1/2 absolute top-5 left-1/2 h-[1.5px] w-full bg-stroke-soft-200 dark:bg-stroke-soft-100/40">
 									<div
 										className={cn(
 											"h-full transition-all duration-300",
-											nextIsCompleted
-												? "bg-primary-base"
-												: "bg-transparent",
+											nextIsCompleted ? "bg-primary-base" : "bg-transparent",
 										)}
 									/>
 								</div>

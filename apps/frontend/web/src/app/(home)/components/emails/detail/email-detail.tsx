@@ -130,7 +130,9 @@ function InsightAccordionItem({
 }
 
 function EmailInsightsPanel({ email }: { email: EmailItem }) {
-	const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
+	const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>(
+		{},
+	);
 
 	const toggleItem = useCallback((id: string) => {
 		setExpandedItems((prev) => ({ ...prev, [id]: !prev[id] }));
@@ -241,32 +243,27 @@ export function EmailDetail({
 			title: "Preview",
 			value: "preview",
 			icon: "mail-single" as const,
-			shortcut: "1",
 			ref: tabPreviewRef,
 		},
 		{
 			title: "Plain Text",
 			value: "plain",
 			icon: "file-text" as const,
-			shortcut: "2",
 		},
 		{
 			title: "HTML Source",
 			value: "html",
 			icon: "code" as const,
-			shortcut: "3",
 		},
 		{
 			title: "Raw",
 			value: "raw",
 			icon: "file-code" as const,
-			shortcut: "4",
 		},
 		{
 			title: "Insights",
 			value: "insights",
 			icon: "bulb" as const,
-			shortcut: "5",
 			ref: tabInsightsRef,
 		},
 	];
@@ -278,11 +275,11 @@ export function EmailDetail({
 
 	const headersData = {
 		"Message-ID": `<msg_${email.id}_94a28f@mail.reloop.sh>`,
-		"From": "Reloop <notifications@reloop.sh>",
-		"To": email.to,
-		"Subject": email.subject,
-		"Date": "Mon, 17 Aug 2026 18:24:10 +0000",
-		"Content-Type": "multipart/alternative; boundary=\"_=_swift_178294_=_\"",
+		From: "Reloop <notifications@reloop.sh>",
+		To: email.to,
+		Subject: email.subject,
+		Date: "Mon, 17 Aug 2026 18:24:10 +0000",
+		"Content-Type": 'multipart/alternative; boundary="_=_swift_178294_=_"',
 		"MIME-Version": "1.0",
 		"X-Entity-ID": `ent_${email.id}`,
 		"DKIM-Signature": "v=1; a=rsa-sha256; d=reloop.sh; s=rel1; bh=...",
@@ -346,7 +343,9 @@ export function EmailDetail({
 									if (el) {
 										buttonRefs.current[index] = el;
 										if (item.ref) {
-											(item.ref as React.MutableRefObject<HTMLButtonElement | null>).current = el;
+											(
+												item.ref as React.MutableRefObject<HTMLButtonElement | null>
+											).current = el;
 										}
 									}
 								}}
@@ -361,25 +360,24 @@ export function EmailDetail({
 							>
 								<Icon name={item.icon} className="h-4 w-4" />
 								{item.title}
-								<span className="ml-0.5 rounded px-1 font-mono text-[10px] text-text-soft-400 bg-bg-weak-50">
-									{item.shortcut}
-								</span>
 							</TabMenu.Trigger>
 						))}
 
 						<AnimatePresence>
 							{rect && activeIndex !== -1 ? (
 								<motion.div
-									className="absolute top-0 left-0 rounded-xl bg-neutral-alpha-10 pointer-events-none"
+									className="pointer-events-none absolute top-0 left-0 rounded-xl bg-neutral-alpha-10"
 									initial={{
 										width: rect.width,
 										height: rect.height - 14,
 										left:
 											rect.left -
-											(activeBtn?.offsetParent?.getBoundingClientRect().left || 0),
+											(activeBtn?.offsetParent?.getBoundingClientRect().left ||
+												0),
 										top:
 											rect.top -
-											(activeBtn?.offsetParent?.getBoundingClientRect().top || 0) +
+											(activeBtn?.offsetParent?.getBoundingClientRect().top ||
+												0) +
 											7,
 										opacity: 0,
 									}}
@@ -388,10 +386,12 @@ export function EmailDetail({
 										height: rect.height - 14,
 										left:
 											rect.left -
-											(activeBtn?.offsetParent?.getBoundingClientRect().left || 0),
+											(activeBtn?.offsetParent?.getBoundingClientRect().left ||
+												0),
 										top:
 											rect.top -
-											(activeBtn?.offsetParent?.getBoundingClientRect().top || 0) +
+											(activeBtn?.offsetParent?.getBoundingClientRect().top ||
+												0) +
 											7,
 										opacity: 1,
 									}}
@@ -413,7 +413,7 @@ export function EmailDetail({
 							<div className="bg-white p-6 dark:bg-neutral-950">
 								<div className="mx-auto max-w-lg space-y-4 py-4">
 									<div className="flex items-center gap-3 border-stroke-soft-100 border-b pb-4 dark:border-neutral-800">
-										<div className="flex size-9 items-center justify-center rounded-xl bg-primary-base font-semibold text-white text-sm shadow-sm">
+										<div className="flex size-9 items-center justify-center rounded-xl bg-primary-base font-semibold text-sm text-white shadow-sm">
 											R
 										</div>
 										<div>
@@ -427,19 +427,18 @@ export function EmailDetail({
 									</div>
 
 									<div className="space-y-3 pt-2 text-sm text-text-sub-600">
-										<p className="font-medium text-text-strong-950">
-											Hello,
-										</p>
+										<p className="font-medium text-text-strong-950">Hello,</p>
 										<p>
-											Your production API key has been created and is ready for use.
-											You can start sending transactional emails immediately through
-											the SDK or SMTP interface.
+											Your production API key has been created and is ready for
+											use. You can start sending transactional emails
+											immediately through the SDK or SMTP interface.
 										</p>
 										<div className="rounded-xl border border-stroke-soft-200 bg-bg-weak-50 p-3 font-mono text-text-strong-950 text-xs dark:border-neutral-800 dark:bg-neutral-900">
 											reloop_live_sk_948f29104c8a2b
 										</div>
 										<p className="text-xs">
-											If you did not generate this key, please revoke it immediately in your dashboard settings.
+											If you did not generate this key, please revoke it
+											immediately in your dashboard settings.
 										</p>
 									</div>
 
@@ -460,7 +459,7 @@ export function EmailDetail({
 						{currentTab === "plain" && (
 							<div className="rounded-xl border border-stroke-soft-100 bg-bg-weak-50/50 p-5 font-mono text-text-sub-600 text-xs dark:border-stroke-soft-100/50 dark:bg-neutral-900">
 								<pre className="whitespace-pre-wrap leading-relaxed">
-{`From: Reloop <notifications@reloop.sh>
+									{`From: Reloop <notifications@reloop.sh>
 To: ${email.to}
 Subject: ${email.subject}
 
@@ -477,7 +476,7 @@ View Documentation: https://reloop.sh/docs`}
 						{currentTab === "html" && (
 							<div className="rounded-xl border border-stroke-soft-100 bg-bg-weak-50/50 p-5 font-mono text-text-sub-600 text-xs dark:border-stroke-soft-100/50 dark:bg-neutral-900">
 								<pre className="overflow-x-auto whitespace-pre-wrap leading-relaxed">
-{`<!DOCTYPE html>
+									{`<!DOCTYPE html>
 <html>
   <head>
     <meta charset="utf-8">
@@ -496,7 +495,7 @@ View Documentation: https://reloop.sh/docs`}
 						{currentTab === "raw" && (
 							<div className="rounded-xl border border-stroke-soft-100 bg-bg-weak-50/50 p-5 font-mono text-text-sub-600 text-xs dark:border-stroke-soft-100/50 dark:bg-neutral-900">
 								<pre className="overflow-x-auto whitespace-pre-wrap leading-relaxed">
-{`Received: by mail.reloop.sh with SMTP id msg_${email.id}
+									{`Received: by mail.reloop.sh with SMTP id msg_${email.id}
 From: Reloop <notifications@reloop.sh>
 To: ${email.to}
 Subject: ${email.subject}
@@ -508,9 +507,7 @@ Content-Type: text/html; charset=UTF-8
 							</div>
 						)}
 
-						{currentTab === "insights" && (
-							<EmailInsightsPanel email={email} />
-						)}
+						{currentTab === "insights" && <EmailInsightsPanel email={email} />}
 					</div>
 				</TabMenu.Root>
 			</section>
