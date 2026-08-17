@@ -5,7 +5,7 @@ export default function CTA() {
 	return (
 		<FeatureCta
 			title="Give your AI Agents an inbox."
-			titleMuted="Start for free."
+			titleMuted="Get Started ."
 			description="Connect your LLMs, LangChain, or Autogen framework to Reloop today and empower your autonomous workforce with real-time email operations."
 			primary={{ label: "Get started", href: hostedSignupHref }}
 			secondary={{

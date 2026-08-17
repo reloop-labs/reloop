@@ -1,7 +1,7 @@
 import type { FeatureCtaBand } from "@reloop/web/components/landing/types";
 
 const defaultSignupCta = {
-	label: "Start for free",
+	label: "Get Started ",
 	href: "/dashboard/signup",
 } as const;
 

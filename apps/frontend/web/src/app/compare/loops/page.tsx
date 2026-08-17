@@ -80,7 +80,7 @@ const LoopsComparisonPage = () => {
 			titleLines={["Reloop vs Loops"]}
 			description="Loops is great for simple onboarding loops—until engineering needs password resets, billing receipts, and raw API sends. Reloop unifies product email and transactional infrastructure into one open-source platform."
 			primaryCta={{
-				label: "Start for free",
+				label: "Get Started ",
 				href: "/dashboard/signup",
 			}}
 			secondaryCta={{
