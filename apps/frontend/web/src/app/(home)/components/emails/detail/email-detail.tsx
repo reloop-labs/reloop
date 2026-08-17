@@ -8,6 +8,12 @@ import { type RefObject, useCallback, useRef, useState } from "react";
 import { PAGE_EASE } from "../../domain/_shared/page-motion";
 import { AnimateIn } from "../_shared/animate-in";
 import type { EmailItem } from "../_shared/data";
+import {
+	ReloopMessagePreview,
+	reloopMessageHtml,
+	reloopMessagePlainText,
+	reloopMessageRaw,
+} from "./reloop-message-preview";
 import { EmailTimeline } from "./timeline";
 
 export type DetailTabId = "preview" | "plain" | "html" | "raw" | "insights";
@@ -425,68 +431,13 @@ export function EmailDetail({
 									transition={{ duration: 0.32, ease: PAGE_EASE }}
 								>
 									{currentTab === "preview" && (
-										<div className="bg-white p-6 dark:bg-neutral-950">
-											<div className="mx-auto max-w-lg space-y-4 py-4">
-												<div className="flex items-center gap-3 border-stroke-soft-100 border-b pb-4 dark:border-neutral-800">
-													<div className="flex size-9 items-center justify-center rounded-xl bg-primary-base font-semibold text-sm text-white shadow-sm">
-														R
-													</div>
-													<div>
-														<h4 className="font-semibold text-sm text-text-strong-950">
-															Reloop
-														</h4>
-														<p className="text-text-sub-600 text-xs">
-															High-throughput transactional email engine
-														</p>
-													</div>
-												</div>
-
-												<div className="space-y-3 pt-2 text-sm text-text-sub-600">
-													<p className="font-medium text-text-strong-950">
-														Hello,
-													</p>
-													<p>
-														Your production API key has been created and is
-														ready for use. You can start sending transactional
-														emails immediately through the SDK or SMTP
-														interface.
-													</p>
-													<div className="rounded-xl border border-stroke-soft-200 bg-bg-weak-50 p-3 font-mono text-text-strong-950 text-xs dark:border-neutral-800 dark:bg-neutral-900">
-														reloop_live_sk_948f29104c8a2b
-													</div>
-													<p className="text-xs">
-														If you did not generate this key, please revoke it
-														immediately in your dashboard settings.
-													</p>
-												</div>
-
-												<div className="pt-2">
-													<button
-														type="button"
-														tabIndex={-1}
-														className="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-primary-base px-4 py-2 font-medium text-white text-xs shadow-sm hover:bg-primary-base/90"
-													>
-														View Documentation
-														<Icon name="arrow-right" className="size-3.5" />
-													</button>
-												</div>
-											</div>
-										</div>
+										<ReloopMessagePreview to={email.to} />
 									)}
 
 									{currentTab === "plain" && (
 										<div className="rounded-xl border border-stroke-soft-100 bg-bg-weak-50/50 p-5 font-mono text-text-sub-600 text-xs dark:border-stroke-soft-100/50 dark:bg-neutral-900">
 											<pre className="whitespace-pre-wrap leading-relaxed">
-												{`From: Reloop <notifications@reloop.sh>
-To: ${email.to}
-Subject: ${email.subject}
-
-Hello,
-
-Your production API key has been created and is ready for use.
-Key: reloop_live_sk_948f29104c8a2b
-
-View Documentation: https://reloop.sh/docs`}
+												{reloopMessagePlainText(email.to, email.subject)}
 											</pre>
 										</div>
 									)}
@@ -494,18 +445,7 @@ View Documentation: https://reloop.sh/docs`}
 									{currentTab === "html" && (
 										<div className="rounded-xl border border-stroke-soft-100 bg-bg-weak-50/50 p-5 font-mono text-text-sub-600 text-xs dark:border-stroke-soft-100/50 dark:bg-neutral-900">
 											<pre className="overflow-x-auto whitespace-pre-wrap leading-relaxed">
-												{`<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <title>${email.subject}</title>
-  </head>
-  <body style="font-family: sans-serif; padding: 24px; color: #111;">
-    <h2>Reloop</h2>
-    <p>Your production API key has been created and is ready for use.</p>
-    <code>reloop_live_sk_948f29104c8a2b</code>
-  </body>
-</html>`}
+												{reloopMessageHtml(email.to, email.subject)}
 											</pre>
 										</div>
 									)}
@@ -513,14 +453,7 @@ View Documentation: https://reloop.sh/docs`}
 									{currentTab === "raw" && (
 										<div className="rounded-xl border border-stroke-soft-100 bg-bg-weak-50/50 p-5 font-mono text-text-sub-600 text-xs dark:border-stroke-soft-100/50 dark:bg-neutral-900">
 											<pre className="overflow-x-auto whitespace-pre-wrap leading-relaxed">
-												{`Received: by mail.reloop.sh with SMTP id msg_${email.id}
-From: Reloop <notifications@reloop.sh>
-To: ${email.to}
-Subject: ${email.subject}
-Date: Mon, 17 Aug 2026 18:24:10 +0000
-Content-Type: text/html; charset=UTF-8
-
-<!DOCTYPE html>...`}
+												{reloopMessageRaw(email.id, email.to, email.subject)}
 											</pre>
 										</div>
 									)}
