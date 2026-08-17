@@ -45,19 +45,18 @@ const TABS: {
 		title: string;
 		description: string;
 		href: string;
-		icon: "activity" | "layout" | "globe" | "server" | "headset";
+		icon: string;
 	};
 }[] = [
 	{
-		id: "cloud",
-		title: "Infrastructure",
-		description: "Self-host on your own hardware or cloud VPS.",
-		cloud: true,
+		id: "overview",
+		title: "Overview",
+		description: "Live feed of sent emails, opens, clicks, and deliveries.",
 		banner: {
-			title: "Infrastructure",
-			description: "Self-host or run on Reloop Cloud.",
-			href: "/self-host",
-			icon: "server",
+			title: "Overview",
+			description: "Live feed of sent emails, deliveries, opens, and clicks.",
+			href: hostedSignupHref,
+			icon: "layout",
 		},
 	},
 	{
@@ -72,18 +71,7 @@ const TABS: {
 		},
 	},
 	{
-		id: "dashboard",
-		title: "Dashboard",
-		description: "Customizable console for your email.",
-		banner: {
-			title: "Dashboard",
-			description: "Customizable console for your email.",
-			href: hostedSignupHref,
-			icon: "layout",
-		},
-	},
-	{
-		id: "sdk",
+		id: "domain",
 		title: "Domain",
 		description: "SPF, DKIM, and DMARC authentication for your domain.",
 		banner: {
@@ -94,15 +82,25 @@ const TABS: {
 		},
 	},
 	{
-		id: "agents",
-		title: "Agent Inbox",
-		description: "MCP, CLI, Skills, and Agent Previews.",
-		cloud: true,
+		id: "workflow",
+		title: "Workflow",
+		description: "Trigger automated sequences, webhooks, and logic.",
 		banner: {
-			title: "Agent Inbox",
-			description: "MCP, CLI, Skills, and agent previews.",
-			href: "/features/ai-agents",
-			icon: "headset",
+			title: "Workflows",
+			description: "Trigger automated sequences and event-driven email logic.",
+			href: "/docs/learn/workflows",
+			icon: "workflow",
+		},
+	},
+	{
+		id: "templates",
+		title: "Templates",
+		description: "Visual editor with dynamic variables and components.",
+		banner: {
+			title: "Templates",
+			description: "Design and preview transactional and marketing email templates.",
+			href: "/features/email-templates",
+			icon: "layout",
 		},
 	},
 ];
@@ -111,7 +109,7 @@ const EASE_OUT: [number, number, number, number] = [0.23, 1, 0.32, 1];
 
 export function SelfHostHero() {
 	const [installMethod, setInstallMethod] = useState<InstallMethod>("curl");
-	const [active, setActive] = useState<HeroTabId>("cloud");
+	const [active, setActive] = useState<HeroTabId>("overview");
 	const reduceMotion = useReducedMotion();
 	const tablistId = useId();
 
