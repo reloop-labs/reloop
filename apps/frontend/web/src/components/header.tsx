@@ -1802,7 +1802,7 @@ export const Header = () => {
 								asChild
 								variant="neutral"
 								size="xsmall"
-								className="rounded-full! px-3.5!"
+								className="px-3.5!"
 							>
 								<a href="/dashboard">Dashboard</a>
 							</FancyButton.Root>
@@ -1818,7 +1818,7 @@ export const Header = () => {
 									asChild
 									variant="neutral"
 									size="xsmall"
-									className="rounded-full! px-3.5!"
+									className="px-3.5!"
 								>
 									<a href="/dashboard/signup">Sign up</a>
 								</FancyButton.Root>
@@ -2066,7 +2066,7 @@ export const Header = () => {
 											asChild
 											variant="neutral"
 											size="medium"
-											className="w-full! rounded-full!"
+											className="w-full!"
 										>
 											<a href="/dashboard" onClick={closeMobileMenu}>
 												Dashboard
@@ -2074,18 +2074,21 @@ export const Header = () => {
 										</FancyButton.Root>
 									) : (
 										<div className="grid grid-cols-2 gap-3">
-											<a
-												href="/dashboard/login"
-												onClick={closeMobileMenu}
-												className="inline-flex items-center justify-center rounded-full border border-stroke-soft-200 px-4 py-3 font-medium text-[15px] text-text-strong-950 transition-colors hover:bg-neutral-950/[0.04] dark:border-white/15 dark:text-white dark:hover:bg-white/[0.06]"
+											<FancyButton.Root
+												asChild
+												variant="basic"
+												size="medium"
+												className="w-full!"
 											>
-												Log in
-											</a>
+												<a href="/dashboard/login" onClick={closeMobileMenu}>
+													Log in
+												</a>
+											</FancyButton.Root>
 											<FancyButton.Root
 												asChild
 												variant="neutral"
 												size="medium"
-												className="w-full! rounded-full!"
+												className="w-full!"
 											>
 												<a href="/dashboard/signup" onClick={closeMobileMenu}>
 													Sign up
