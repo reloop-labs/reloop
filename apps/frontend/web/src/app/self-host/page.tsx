@@ -68,14 +68,11 @@ export default function SelfHostPage() {
 			<JsonLd data={pageSchema} />
 			<SelfHostHero />
 			<div className="relative mx-auto w-full max-w-5xl border-stroke-soft-200 border-x md:max-w-7xl dark:border-white/10">
-				<SectionSeparator />
 				<SelfHostRequirements />
 				<SectionSeparator />
 				<SelfHostProviders />
 				<SectionSeparator />
 				<SelfHostComparison />
-				<SectionSeparator />
-				<SelfHostFaq />
 			</div>
 			<BlogCta
 				category="Self-Hosting"
