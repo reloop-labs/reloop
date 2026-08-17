@@ -98,24 +98,12 @@ export default function Hero() {
 		});
 	}, []);
 
-	const [copiedCommand, setCopiedCommand] = useState(false);
-
-	const handleCopyCommand = async () => {
-		try {
-			await navigator.clipboard.writeText("npx reloop init");
-			setCopiedCommand(true);
-			window.setTimeout(() => setCopiedCommand(false), 2000);
-		} catch {
-			// ignore
-		}
-	};
-
 	return (
 		<section
 			id="features"
 			className="relative flex min-h-dvh flex-col bg-transparent"
 		>
-			<div className="relative mx-auto flex w-full max-w-5xl flex-col items-center border-stroke-soft-200 border-x px-6 pt-36 pb-12 text-center sm:px-8 sm:pt-44 sm:pb-16 md:max-w-7xl lg:px-12 lg:pt-52 dark:border-white/10">
+			<div className="relative mx-auto flex w-full max-w-5xl flex-col items-center border-stroke-soft-200 border-x px-6 pt-36 pb-14 text-center sm:px-8 sm:pt-44 sm:pb-16 md:max-w-7xl lg:px-12 lg:pt-52 lg:pb-20 dark:border-white/10">
 				<h1 className="max-w-4xl text-center font-medium text-[2.5rem] text-text-strong-950 leading-[1.02] tracking-[-0.045em] sm:text-[3.5rem] lg:text-[4.25rem] dark:text-white">
 					Email API for Developers
 					<br />
@@ -132,37 +120,6 @@ export default function Hero() {
 					<FancyButton.Root asChild variant="basic" size="small">
 						<a href="/docs">Documentation</a>
 					</FancyButton.Root>
-				</div>
-
-				<div className="mt-8 w-full max-w-2xl rounded-xl border border-stroke-soft-200 bg-[#121214] p-4 text-left font-mono text-[13px] shadow-sm sm:mt-10 sm:px-5 sm:py-4 sm:text-sm dark:border-white/10">
-					<p className="text-zinc-400 leading-relaxed">
-						<span className="text-zinc-500"># </span>
-						<span>The self-hosted version is ready on your server in under a minute – </span>
-						<span className="text-amber-300/90 dark:text-amber-300/90">
-							always free, with all functionalities.
-						</span>
-					</p>
-					<div className="mt-2.5 flex items-center justify-between gap-4 sm:mt-3">
-						<div className="flex items-center gap-2.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-							<span className="select-none text-zinc-500">&gt;</span>
-							<code className="text-zinc-100">npx reloop init</code>
-						</div>
-						<button
-							type="button"
-							onClick={handleCopyCommand}
-							aria-label="Copy command"
-							className="inline-flex size-8 shrink-0 items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-white/10 hover:text-white"
-						>
-							{copiedCommand ? (
-								<Icon
-									name="check"
-									className="size-4 text-emerald-400"
-								/>
-							) : (
-								<Icon name="copy" className="size-4" />
-							)}
-						</button>
-					</div>
 				</div>
 			</div>
 
