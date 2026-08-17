@@ -246,7 +246,7 @@ export default function Hero() {
 					id={`${tablistId}-panel`}
 					role="tabpanel"
 					aria-labelledby={`${tablistId}-${active}`}
-					className="relative z-10 mx-auto flex h-[calc(100dvh-100px)] w-full max-w-5xl flex-col px-3 pt-10 pb-10 sm:px-6 sm:pt-14 sm:pb-14 md:max-w-7xl lg:px-8 lg:pt-20 lg:pb-16"
+					className="relative z-10 mx-auto flex h-dvh w-full max-w-5xl flex-col px-3 pt-10 pb-10 sm:px-6 sm:pt-14 sm:pb-14 md:max-w-7xl lg:px-8 lg:pt-20 lg:pb-16"
 				>
 					{/* Left and Right vertical borders matching the HeroAtmosphere line color and vertical gradient */}
 					<div
