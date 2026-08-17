@@ -39,6 +39,7 @@ function toIsoDate(raw: string): string | undefined {
 	const parts = raw.trim().split(/\s+/);
 	if (parts.length !== 3) return undefined;
 	const [day, month, year] = parts;
+	if (!day || !month || !year) return undefined;
 	const monthIndex = Object.keys(MONTHS).indexOf(month);
 	if (monthIndex === -1) return undefined;
 	return `${year}-${String(monthIndex + 1).padStart(2, "0")}-${String(Number(day)).padStart(2, "0")}`;
@@ -90,7 +91,7 @@ export default function ShipFast() {
 
 				<div
 					aria-hidden="true"
-					className="hidden self-stretch text-stroke-soft-200 lg:block dark:text-white/15"
+					className="hidden self-stretch border-stroke-soft-200 border-l text-stroke-soft-200 lg:block dark:border-white/10 dark:text-white/15"
 					style={{
 						backgroundImage:
 							"repeating-linear-gradient(to bottom, currentColor 0 1px, transparent 1px 7px)",
@@ -98,7 +99,7 @@ export default function ShipFast() {
 				/>
 
 				<div className="flex min-w-0 flex-col">
-					<ol className="flex flex-1 flex-col border-stroke-soft-200 border-r dark:border-white/10">
+					<ol className="flex flex-1 flex-col">
 						{recentReleases.map((release) => (
 							<li
 								key={release.href}

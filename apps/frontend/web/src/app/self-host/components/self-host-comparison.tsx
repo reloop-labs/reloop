@@ -1,3 +1,4 @@
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { SectionTitle } from "@reloop/web/app/sdk/components/section-title";
 import { hostedSignupHref, socialProfiles } from "@reloop/web/lib/site";
@@ -393,16 +394,9 @@ export function SelfHostComparison() {
 						</span>
 					</div>
 					<div className="flex items-center justify-center border-stroke-soft-200 border-x border-b bg-bg-weak-50/40 p-5 sm:p-6 dark:border-white/10 dark:bg-white/[0.02]">
-						<Link
-							href={hostedSignupHref}
-							className="group inline-flex items-center gap-1.5 font-medium text-[13px] text-blue-600 transition-colors hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
-						>
-							<span>Start on Reloop Cloud</span>
-							<Icon
-								name="arrow-up-right"
-								className="group-hover:-translate-y-0.5 size-3.5 rotate-45 transition-transform group-hover:translate-x-0.5"
-							/>
-						</Link>
+						<FancyButton.Root asChild variant="neutral" size="small">
+							<Link href={hostedSignupHref}>Start on Reloop Cloud</Link>
+						</FancyButton.Root>
 					</div>
 					<div className="flex items-center justify-center border-stroke-soft-200 border-b bg-bg-weak-50/40 p-5 sm:p-6 dark:border-white/10 dark:bg-white/[0.02]">
 						<a

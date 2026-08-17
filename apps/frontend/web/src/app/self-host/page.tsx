@@ -3,8 +3,8 @@ import { BlogCta } from "@reloop/web/components/landing/blog/blog-cta";
 import { getSiteUrl, siteName, socialProfiles } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 import { SectionSeparator } from "../(home)/components/section-separator";
+import ShipFast from "../(home)/components/ship-fast";
 import { SelfHostComparison } from "./components/self-host-comparison";
-import { SelfHostFaq } from "./components/self-host-faq";
 import { SelfHostHero } from "./components/self-host-hero";
 import { SelfHostProviders } from "./components/self-host-providers";
 import { SelfHostRequirements } from "./components/self-host-requirements";
@@ -73,6 +73,8 @@ export default function SelfHostPage() {
 				<SelfHostProviders />
 				<SectionSeparator />
 				<SelfHostComparison />
+				<SectionSeparator />
+				<ShipFast />
 			</div>
 			<BlogCta
 				category="Self-Hosting"
