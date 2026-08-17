@@ -122,6 +122,38 @@ If your website accepts user registrations, checking every email manually isn't 
 
 Instead, integrate disposable email detection into your signup process to automatically flag temporary email addresses before accounts are created.
 
+The [Reloop Temp Email Checker](https://reloop.sh/tools/temp-email-checker) is a thin wrapper over one public endpoint. `POST` an address to `https://reloop.sh/api/tools/v1/check` — no API key, no account.
+
+<TempEmailCheckerCodeSamples />
+
+A throwaway mailbox comes back with `"verdict": "disposable"` and `"isDisposable": true`:
+
+```json
+{
+  "input": "you@mailinator.com",
+  "kind": "email",
+  "domain": "mailinator.com",
+  "verdict": "disposable",
+  "isValidSyntax": true,
+  "isDisposable": true,
+  "disposableMatch": {
+    "kind": "exact",
+    "domain": "mailinator.com"
+  },
+  "isAllowlisted": false,
+  "isRoleAddress": false,
+  "isFreeProvider": false,
+  "signals": {
+    "syntax": "pass",
+    "disposable": "fail",
+    "role": "pass",
+    "freeProvider": "pass"
+  }
+}
+```
+
+Reject or flag the signup when `isDisposable` is `true`. The endpoint is rate limited per IP, so keep it to signup-time checks rather than bulk list scrubbing.
+
 This saves time and helps prevent abuse from the start.
 
 ## Why We Built the Reloop Temp Email Checker
