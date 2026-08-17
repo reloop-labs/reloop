@@ -16,7 +16,7 @@ import {
 import { MatrixCell } from "../_shared/matrix-cell";
 import { PAGE_EASE } from "../../domain/_shared/page-motion";
 
-const FOOTER_DELAY = 0.58;
+const FOOTER_DELAY = 0.62;
 const FOOTER_DURATION = 0.38;
 
 export function EmailsListTable({
@@ -32,6 +32,7 @@ export function EmailsListTable({
 
 	return (
 		<div className="w-full text-paragraph-sm">
+			{/* Table Header */}
 			<div
 				style={emailGridStyle}
 				className="grid items-center rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-4 pt-2.5 pb-5 font-medium text-text-sub-600 text-xs dark:border-[#101010] dark:bg-bg-weak-50/40"
@@ -68,22 +69,29 @@ export function EmailsListTable({
 				</MatrixCell>
 			</div>
 
-			<div className="-mt-2.5 divide-y divide-stroke-soft-100 overflow-visible rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:divide-stroke-soft-100/50 dark:border-stroke-soft-100/40">
+			{/* Table Rows */}
+			<div className="-mt-2.5 divide-y divide-stroke-soft-100 overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:divide-stroke-soft-100/50 dark:border-stroke-soft-100/40">
 				<AnimatePresence initial={false}>
 					{emails.map((email, rowIndex) => {
 						const row = rowIndex + 1;
 						const isHighlighted = highlightedId === email.id;
+						const isLive = email.id.startsWith("em_live_");
 
 						return (
 							<motion.div
 								key={email.id}
 								layout="position"
-								initial={{
-									opacity: 0,
-									height: 0,
-									y: -16,
-									filter: "blur(4px)",
-								}}
+								className="first:rounded-t-xl"
+								initial={
+									isLive
+										? {
+												opacity: 0,
+												height: 0,
+												y: -16,
+												filter: "blur(3px)",
+											}
+										: { opacity: 1, height: "auto" }
+								}
 								animate={{
 									opacity: 1,
 									height: "auto",
@@ -97,24 +105,43 @@ export function EmailsListTable({
 									filter: "blur(2px)",
 									transition: { duration: 0.35, ease: PAGE_EASE },
 								}}
-								transition={{
-									duration: 0.42,
-									ease: PAGE_EASE,
-									layout: { duration: 0.45, ease: PAGE_EASE },
-								}}
+								transition={
+									isLive
+										? {
+												duration: 0.42,
+												ease: PAGE_EASE,
+												layout: { duration: 0.45, ease: PAGE_EASE },
+											}
+										: {
+												duration: 0.3,
+												ease: PAGE_EASE,
+												layout: { duration: 0.45, ease: PAGE_EASE },
+											}
+								}
 								style={{ overflow: "hidden" }}
 							>
 								<div
 									style={emailGridStyle}
 									className={cn(
 										"group/row grid w-full cursor-pointer items-center px-4 py-2 text-left transition-colors duration-300 hover:bg-bg-weak-50",
-										isHighlighted && "bg-blue-500/10 dark:bg-blue-400/10",
+										"first:rounded-t-xl",
+										isHighlighted && "bg-neutral-100/90 dark:bg-white/[0.06]",
 									)}
 								>
-									<MatrixCell mounted={mounted} row={row} col={0}>
+									<MatrixCell
+										mounted={mounted}
+										row={row}
+										col={0}
+										animateWave={!isLive}
+									>
 										<span className="flex size-4 shrink-0 rounded-sm border border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/50 dark:bg-bg-white-0/5" />
 									</MatrixCell>
-									<MatrixCell mounted={mounted} row={row} col={1}>
+									<MatrixCell
+										mounted={mounted}
+										row={row}
+										col={1}
+										animateWave={!isLive}
+									>
 										<div className="flex min-w-0 items-center gap-2 pr-4">
 											<span className="flex size-5 shrink-0 items-center justify-center overflow-hidden rounded-full">
 												<span
@@ -131,37 +158,65 @@ export function EmailsListTable({
 											</span>
 										</div>
 									</MatrixCell>
-									<MatrixCell mounted={mounted} row={row} col={2}>
+									<MatrixCell
+										mounted={mounted}
+										row={row}
+										col={2}
+										animateWave={!isLive}
+									>
 										<div className="min-w-0 truncate pr-4">
 											<span className="truncate font-medium text-label-sm text-text-strong-950 underline decoration-dotted underline-offset-2">
 												{email.subject}
 											</span>
 										</div>
 									</MatrixCell>
-									<MatrixCell mounted={mounted} row={row} col={3}>
+									<MatrixCell
+										mounted={mounted}
+										row={row}
+										col={3}
+										animateWave={!isLive}
+									>
 										<div className="flex items-center">
-											<div
-												className={cn(
-													"flex items-center gap-2 rounded-lg py-0.5 font-medium text-[13px] capitalize",
-													getEmailStatusColorClass(email.status),
-												)}
-											>
-												<Icon
-													name={getEmailStatusIcon(email.status)}
-													className="h-3.5 w-3.5"
-												/>
-												{getEmailStatusLabel(email.status)}
-											</div>
+											<AnimatePresence mode="wait" initial={false}>
+												<motion.div
+													key={email.status}
+													initial={{ opacity: 0, y: -3, filter: "blur(1px)" }}
+													animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+													exit={{ opacity: 0, y: 3, filter: "blur(1px)" }}
+													transition={{ duration: 0.25, ease: "easeOut" }}
+													className={cn(
+														"flex items-center gap-2 rounded-lg py-0.5 font-medium text-[13px] capitalize",
+														getEmailStatusColorClass(email.status),
+													)}
+												>
+													<Icon
+														name={getEmailStatusIcon(email.status)}
+														className="h-3.5 w-3.5"
+													/>
+													{getEmailStatusLabel(email.status)}
+												</motion.div>
+											</AnimatePresence>
 										</div>
 									</MatrixCell>
-									<MatrixCell mounted={mounted} row={row} col={4}>
+									<MatrixCell
+										mounted={mounted}
+										row={row}
+										col={4}
+										animateWave={!isLive}
+									>
 										<div className="flex items-center">
 											<span className="whitespace-nowrap font-medium text-[13px] text-text-sub-600">
 												{email.time}
 											</span>
 										</div>
 									</MatrixCell>
-									<MatrixCell mounted={mounted} row={row} col={5} className="justify-end">
+									<MatrixCell
+										mounted={mounted}
+										row={row}
+										col={5}
+										animateWave={!isLive}
+										className="justify-end"
+									>
 										<span className="inline-flex aspect-square h-7 w-7 items-center justify-center rounded-lg">
 											<Icon
 												name="more-horizontal"
@@ -175,6 +230,7 @@ export function EmailsListTable({
 					})}
 				</AnimatePresence>
 
+				{/* Table Footer */}
 				<motion.div
 					layout="position"
 					className="flex items-center justify-between px-4 py-2 text-label-xs text-text-sub-600"

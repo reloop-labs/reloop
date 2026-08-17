@@ -70,7 +70,7 @@ export function HeroEmailsPreview() {
 				id: newId,
 				to: template.to,
 				subject: template.subject,
-				status: template.status,
+				status: template.initialStatus,
 				time: "Just now",
 			};
 
@@ -79,10 +79,56 @@ export function HeroEmailsPreview() {
 
 			setTimeout(() => {
 				setHighlightedId((current) => (current === newId ? null : current));
-			}, 1400);
-		}, 1900);
+			}, 1200);
+		}, 2200);
 
 		return () => clearInterval(interval);
+	}, [reduceMotion]);
+
+	// Organic status transition loop for items below the top row
+	useEffect(() => {
+		if (reduceMotion) return;
+
+		const statusInterval = setInterval(() => {
+			if (pausedRef.current || !inViewRef.current || isInitialMountRef.current) {
+				return;
+			}
+
+			setEmails((prev) => {
+				// Only target items below the top row (index 1 to length - 1)
+				const eligibleIndices: { index: number; nextStatus: string }[] = [];
+
+				for (let i = 1; i < prev.length; i++) {
+					const item = prev[i];
+					if (!item) continue;
+
+					if (item.status === "delivered" || item.status === "sent") {
+						// 50% chance to candidate for "opened"
+						if (Math.random() < 0.6) {
+							eligibleIndices.push({ index: i, nextStatus: "opened" });
+						}
+					} else if (item.status === "opened") {
+						// 30% chance to candidate for "clicked"
+						if (Math.random() < 0.35) {
+							eligibleIndices.push({ index: i, nextStatus: "clicked" });
+						}
+					}
+				}
+
+				if (eligibleIndices.length === 0) return prev;
+
+				// Pick one candidate at random
+				const target =
+					eligibleIndices[Math.floor(Math.random() * eligibleIndices.length)];
+				if (!target) return prev;
+
+				return prev.map((item, idx) =>
+					idx === target.index ? { ...item, status: target.nextStatus } : item,
+				);
+			});
+		}, 1800);
+
+		return () => clearInterval(statusInterval);
 	}, [reduceMotion]);
 
 	return (

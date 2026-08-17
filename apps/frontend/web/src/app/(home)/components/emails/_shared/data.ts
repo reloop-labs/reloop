@@ -84,66 +84,85 @@ export const INITIAL_EMAILS: EmailItem[] = [
 	},
 ];
 
-export const INCOMING_STREAM_POOL: Omit<EmailItem, "id" | "time">[] = [
+export interface IncomingEmailEvent {
+	to: string;
+	subject: string;
+	initialStatus: "delivered" | "sent";
+	nextStatus?: "opened" | "clicked";
+}
+
+export const INCOMING_STREAM_POOL: IncomingEmailEvent[] = [
 	{
 		to: "sarah@vertex.io",
 		subject: "Your API key has been created",
-		status: "delivered",
+		initialStatus: "delivered",
+		nextStatus: "opened",
 	},
 	{
 		to: "dev@linear.app",
 		subject: "Security alert: New login from macOS",
-		status: "opened",
+		initialStatus: "sent",
+		nextStatus: "opened",
 	},
 	{
 		to: "mira@hyper.co",
 		subject: "Invoice #2049 has been paid",
-		status: "delivered",
+		initialStatus: "delivered",
+		nextStatus: "clicked",
 	},
 	{
 		to: "lucas@supabase.io",
 		subject: "Confirm your magic link to log in",
-		status: "clicked",
+		initialStatus: "delivered",
+		nextStatus: "clicked",
 	},
 	{
 		to: "kate@resend.com",
 		subject: "Domain verified — mail.acme.com",
-		status: "delivered",
+		initialStatus: "delivered",
+		nextStatus: "opened",
 	},
 	{
 		to: "liam@cursor.sh",
 		subject: "Weekly usage summary: 2.4M sends",
-		status: "sent",
+		initialStatus: "sent",
+		nextStatus: "opened",
 	},
 	{
 		to: "elena@clerk.dev",
 		subject: "One-time passcode: 849-201",
-		status: "delivered",
+		initialStatus: "delivered",
+		nextStatus: "opened",
 	},
 	{
 		to: "hugo@prisma.io",
 		subject: "Subscription upgraded to Pro",
-		status: "opened",
+		initialStatus: "delivered",
+		nextStatus: "clicked",
 	},
 	{
 		to: "zoe@stripe.com",
 		subject: "Payment of $14,280.00 confirmed",
-		status: "delivered",
+		initialStatus: "delivered",
+		nextStatus: "opened",
 	},
 	{
 		to: "noah@vercel.com",
 		subject: "Production deployment finished",
-		status: "clicked",
+		initialStatus: "delivered",
+		nextStatus: "clicked",
 	},
 	{
 		to: "chloe@raycast.com",
 		subject: "Welcome to Acme Enterprise",
-		status: "delivered",
+		initialStatus: "delivered",
+		nextStatus: "opened",
 	},
 	{
 		to: "felix@posthog.com",
 		subject: "Monthly event limit threshold (80%)",
-		status: "opened",
+		initialStatus: "sent",
+		nextStatus: "opened",
 	},
 ];
 
