@@ -5,7 +5,6 @@ import type { Metadata } from "next";
 import { SectionSeparator } from "../(home)/components/section-separator";
 import { SelfHostArchitecture } from "./components/self-host-architecture";
 import { SelfHostComparison } from "./components/self-host-comparison";
-import { SelfHostDeployTabs } from "./components/self-host-deploy-tabs";
 import { SelfHostEnvConfig } from "./components/self-host-env-config";
 import { SelfHostFaq } from "./components/self-host-faq";
 import { SelfHostHero } from "./components/self-host-hero";
@@ -69,8 +68,6 @@ export default function SelfHostPage() {
 			<JsonLd data={pageSchema} />
 			<SelfHostHero />
 			<div className="relative mx-auto w-full max-w-5xl border-stroke-soft-200 border-x md:max-w-7xl dark:border-white/10">
-				<SectionSeparator />
-				<SelfHostDeployTabs />
 				<SectionSeparator />
 				<SelfHostArchitecture />
 				<SectionSeparator />

@@ -301,7 +301,7 @@ function HeroTabBanner({
 	tabId: HeroTabId;
 	reduceMotion: boolean;
 }) {
-	const tab = TABS.find((item) => item.id === tabId) ?? TABS[0];
+	const tab = TABS.find((item) => item.id === tabId) ?? TABS[0]!;
 	const { banner } = tab;
 
 	return (

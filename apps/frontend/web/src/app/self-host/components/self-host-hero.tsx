@@ -31,7 +31,8 @@ const INSTALL_TABS = [
 
 const INSTALL_COMMANDS: Record<InstallMethod, string> = {
 	curl: "curl -fsSL https://reloop.sh/install.sh | bash",
-	docker: "docker run -d -p 3000:3000 -p 25:25 ghcr.io/reloop-labs/reloop:latest",
+	docker:
+		"docker run -d -p 3000:3000 -p 25:25 ghcr.io/reloop-labs/reloop:latest",
 	cli: "npx reloop init",
 };
 
@@ -125,18 +126,18 @@ export function SelfHostHero() {
 	return (
 		<section
 			id="features"
-			className="relative flex min-h-dvh flex-col bg-transparent pt-40 sm:pt-48 lg:pt-56"
+			className="relative flex min-h-dvh flex-col bg-transparent pt-28 sm:pt-32 lg:pt-36"
 		>
 			{/* Top Hero Centered Title & Code Block with Shell/Icons & Copy Toolbar */}
 			<div className="relative mx-auto flex w-full max-w-5xl flex-col items-center px-6 text-center sm:px-8 md:max-w-7xl lg:px-12">
-				<h1 className="max-w-4xl text-center font-medium text-[2.5rem] text-text-strong-950 leading-[1.02] tracking-[-0.045em] sm:text-[3.5rem] lg:text-[4.25rem] dark:text-white">
+				<h1 className="max-w-3xl text-center font-semibold text-[2rem] text-text-strong-950 leading-[1.08] tracking-[-0.035em] sm:text-[2.75rem] lg:text-[3.25rem] dark:text-white">
 					Self-Host Reloop
 					<br />
 					On your own server
 				</h1>
 
 				{/* Copy Code Block with Shell/Brand Icons & Copy Button */}
-				<div className="mt-8 w-full max-w-xl text-left sm:mt-10">
+				<div className="mt-10 w-full max-w-xl text-left sm:mt-12 lg:mt-14">
 					<CopyCodeBlock
 						code={INSTALL_COMMANDS[installMethod]}
 						lang="bash"
@@ -145,11 +146,25 @@ export function SelfHostHero() {
 						onTabChange={(id) => setInstallMethod(id as InstallMethod)}
 						hideLineNumbers
 					/>
+					<p className="mt-3.5 text-center text-[13px] text-text-sub-600 sm:text-[13.5px] dark:text-white/50">
+						Prefer a managed solution?{" "}
+						<Link
+							href={hostedSignupHref}
+							className="group inline-flex items-center gap-1 font-medium text-text-strong-950 underline decoration-text-sub-600/30 underline-offset-4 transition-colors hover:text-blue-600 hover:decoration-blue-600 dark:text-white dark:hover:text-blue-400 dark:hover:decoration-blue-400"
+						>
+							<span>Get started on Reloop Cloud</span>
+							<Icon
+								name="arrow-up-right"
+								className="size-3.5 rotate-45 transition-transform duration-200"
+								aria-hidden="true"
+							/>
+						</Link>
+					</p>
 				</div>
 			</div>
 
 			{/* Interactive Modern Tabs Bar */}
-			<div className="relative mx-auto mt-8 w-full max-w-4xl px-4 sm:mt-10">
+			<div className="relative mx-auto mt-10 w-full max-w-4xl px-4 sm:mt-12">
 				<div
 					role="tablist"
 					aria-label="Product surfaces"
@@ -185,7 +200,9 @@ export function SelfHostHero() {
 							>
 								{selected && (
 									<motion.div
-										layoutId={reduceMotion ? undefined : "self-host-hero-tab-pill"}
+										layoutId={
+											reduceMotion ? undefined : "self-host-hero-tab-pill"
+										}
 										className="absolute inset-0 rounded-xl bg-white shadow-[0_2px_12px_rgba(0,0,0,0.06),0_0_0_1px_rgba(0,0,0,0.04)] dark:bg-[#1a1c20] dark:shadow-[0_4px_20px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.08)]"
 										transition={
 											reduceMotion
@@ -268,7 +285,7 @@ function SelfHostHeroTabBanner({
 	tabId: HeroTabId;
 	reduceMotion: boolean;
 }) {
-	const tab = TABS.find((item) => item.id === tabId) ?? TABS[0];
+	const tab = TABS.find((item) => item.id === tabId) ?? TABS[0]!;
 	const { banner } = tab;
 
 	return (
