@@ -5,7 +5,9 @@ import { Skeleton } from "@reloop/ui/skeleton";
 import * as TabMenu from "@reloop/ui/tab-menu-horizontal";
 import { AnimatePresence, motion } from "motion/react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
+import { ShortcutHint } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { type SmtpDetailRow, SmtpResponseDrawer } from "./smtp-response-drawer";
 import { EmailTimeline } from "./timeline";
 
@@ -531,10 +533,30 @@ export const EmailDetail = ({ email, isLoading }: EmailDetailProps) => {
 
 	const tabItems = isLoading
 		? [
-				{ title: "Preview", value: "preview", icon: "mail-single" as const },
-				{ title: "Plain Text", value: "plain", icon: "file-text" as const },
-				{ title: "HTML Source", value: "html", icon: "code" as const },
-				{ title: "Raw", value: "raw", icon: "file-code" as const },
+				{
+					title: "Preview",
+					value: "preview",
+					icon: "mail-single" as const,
+					shortcut: "1",
+				},
+				{
+					title: "Plain Text",
+					value: "plain",
+					icon: "file-text" as const,
+					shortcut: "2",
+				},
+				{
+					title: "HTML Source",
+					value: "html",
+					icon: "code" as const,
+					shortcut: "3",
+				},
+				{
+					title: "Raw",
+					value: "raw",
+					icon: "file-code" as const,
+					shortcut: "4",
+				},
 			]
 		: [
 				...(email?.htmlBody
@@ -543,24 +565,86 @@ export const EmailDetail = ({ email, isLoading }: EmailDetailProps) => {
 								title: "Preview",
 								value: "preview",
 								icon: "mail-single" as const,
+								shortcut: "1",
 							},
 							{
 								title: "Plain Text",
 								value: "plain",
 								icon: "file-text" as const,
+								shortcut: "2",
 							},
-							{ title: "HTML Source", value: "html", icon: "code" as const },
-							{ title: "Raw", value: "raw", icon: "file-code" as const },
+							{
+								title: "HTML Source",
+								value: "html",
+								icon: "code" as const,
+								shortcut: "3",
+							},
+							{
+								title: "Raw",
+								value: "raw",
+								icon: "file-code" as const,
+								shortcut: "4",
+							},
 						]
 					: [
 							{
 								title: "Plain Text",
 								value: "plain",
 								icon: "file-text" as const,
+								shortcut: "1",
 							},
-							{ title: "Raw", value: "raw", icon: "file-code" as const },
+							{
+								title: "Raw",
+								value: "raw",
+								icon: "file-code" as const,
+								shortcut: "2",
+							},
 						]),
 			];
+
+	useHotkeys(
+		"1",
+		(e) => {
+			e.preventDefault();
+			const target = tabItems[0]?.value;
+			if (target) setActiveTab(target);
+		},
+		{ enableOnFormTags: false, preventDefault: true },
+		[tabItems],
+	);
+
+	useHotkeys(
+		"2",
+		(e) => {
+			e.preventDefault();
+			const target = tabItems[1]?.value;
+			if (target) setActiveTab(target);
+		},
+		{ enableOnFormTags: false, preventDefault: true },
+		[tabItems],
+	);
+
+	useHotkeys(
+		"3",
+		(e) => {
+			e.preventDefault();
+			const target = tabItems[2]?.value;
+			if (target) setActiveTab(target);
+		},
+		{ enableOnFormTags: false, preventDefault: true },
+		[tabItems],
+	);
+
+	useHotkeys(
+		"4",
+		(e) => {
+			e.preventDefault();
+			const target = tabItems[3]?.value;
+			if (target) setActiveTab(target);
+		},
+		{ enableOnFormTags: false, preventDefault: true },
+		[tabItems],
+	);
 
 	const activeIndex = tabItems.findIndex((item) => item.value === activeTab);
 	const currentIdx = hoveredIdx !== undefined ? hoveredIdx : activeIndex;
@@ -670,7 +754,7 @@ export const EmailDetail = ({ email, isLoading }: EmailDetailProps) => {
 			{/* Content Preview Tabs */}
 			<section>
 				<TabMenu.Root value={activeTab} onValueChange={setActiveTab}>
-					<TabMenu.List className="relative mb-6 h-10 gap-0 border-b! py-0">
+					<TabMenu.List className="relative mb-6 h-11 gap-0 border-b! py-0">
 						{tabItems.map((item, index) => (
 							<TabMenu.Trigger
 								key={item.value}
@@ -681,25 +765,26 @@ export const EmailDetail = ({ email, isLoading }: EmailDetailProps) => {
 								onPointerEnter={() => setHoveredIdx(index)}
 								onPointerLeave={() => setHoveredIdx(undefined)}
 								className={cn(
-									"flex cursor-pointer items-center gap-2 px-2.5 py-0! text-sm transition-colors",
-									activeTab === item.value
-										? "text-text-strong-950"
-										: "text-text-sub-600 hover:text-text-strong-950",
+									"flex cursor-pointer items-center gap-2 px-3 py-0! font-medium text-sm",
+									hoveredIdx === undefined &&
+										activeIndex === index &&
+										"text-text-strong-950",
 								)}
 							>
 								<Icon name={item.icon} className="h-4 w-4" />
 								{item.title}
+								<ShortcutHint>{item.shortcut}</ShortcutHint>
 							</TabMenu.Trigger>
 						))}
 
 						<AnimatePresence>
-							{rect && activeIndex !== -1 && (
+							{rect && activeIndex !== -1 ? (
 								<motion.div
-									className="absolute top-0 left-0 rounded-lg bg-neutral-alpha-10"
+									className="absolute top-0 left-0 rounded-xl bg-neutral-alpha-10"
 									initial={{
 										pointerEvents: "none",
 										width: rect.width,
-										height: rect.height - 20,
+										height: rect.height - 14,
 										left:
 											rect.left -
 											(currentTab?.offsetParent?.getBoundingClientRect().left ||
@@ -708,13 +793,13 @@ export const EmailDetail = ({ email, isLoading }: EmailDetailProps) => {
 											rect.top -
 											(currentTab?.offsetParent?.getBoundingClientRect().top ||
 												0) +
-											10,
+											7,
 										opacity: 0,
 									}}
 									animate={{
 										pointerEvents: "none",
 										width: rect.width,
-										height: rect.height - 20,
+										height: rect.height - 14,
 										left:
 											rect.left -
 											(currentTab?.offsetParent?.getBoundingClientRect().left ||
@@ -723,27 +808,13 @@ export const EmailDetail = ({ email, isLoading }: EmailDetailProps) => {
 											rect.top -
 											(currentTab?.offsetParent?.getBoundingClientRect().top ||
 												0) +
-											10,
+											7,
 										opacity: 1,
 									}}
-									exit={{
-										pointerEvents: "none",
-										opacity: 0,
-										width: rect.width,
-										height: rect.height - 20,
-										left:
-											rect.left -
-											(currentTab?.offsetParent?.getBoundingClientRect().left ||
-												0),
-										top:
-											rect.top -
-											(currentTab?.offsetParent?.getBoundingClientRect().top ||
-												0) +
-											10,
-									}}
+									exit={{ opacity: 0 }}
 									transition={{ duration: 0.14 }}
 								/>
-							)}
+							) : null}
 						</AnimatePresence>
 					</TabMenu.List>
 

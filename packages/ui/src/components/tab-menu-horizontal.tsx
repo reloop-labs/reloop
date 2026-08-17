@@ -76,7 +76,7 @@ const TabMenuHorizontalList = React.forwardRef<
 				{/* Floating Bg */}
 				<div
 					className={cn(
-						"-bottom-0.5 absolute left-0 h-[3px] bg-bg-strong-950 opacity-0 transition-all duration-300 group-has-[[data-state=active]]/tab-list:opacity-100",
+						"-bottom-px absolute left-0 h-0.5 bg-bg-strong-950 opacity-0 transition-all duration-300 group-has-[[data-state=active]]/tab-list:opacity-100",
 						{
 							hidden: !mounted,
 						},
