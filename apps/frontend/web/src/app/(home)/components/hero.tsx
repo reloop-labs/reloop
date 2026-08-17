@@ -1,8 +1,10 @@
 "use client";
 
 import { cn } from "@reloop/ui/cn";
+import { CopyCodeBlock } from "@reloop/ui/copy-code-block";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
+import { getLanguageIcon } from "@reloop/web/components/mdx/language-icons";
 import { hostedSignupHref } from "@reloop/web/lib/site";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import Link from "next/link";
@@ -109,7 +111,27 @@ const TABS: {
 
 const EASE_OUT: [number, number, number, number] = [0.23, 1, 0.32, 1];
 
-export default function Hero() {
+type InstallMethod = "curl" | "docker" | "cli";
+
+const INSTALL_TABS = [
+	{ id: "curl", label: "curl", si: getLanguageIcon("bash")! },
+	{ id: "docker", label: "docker", si: getLanguageIcon("docker")! },
+	{ id: "cli", label: "cli", si: getLanguageIcon("bash")! },
+];
+
+const INSTALL_COMMANDS: Record<InstallMethod, string> = {
+	curl: "curl -fsSL https://reloop.sh/install.sh | bash",
+	docker:
+		"docker run -d -p 3000:3000 -p 25:25 ghcr.io/reloop-labs/reloop:latest",
+	cli: "npx reloop init",
+};
+
+export interface HeroProps {
+	variant?: "default" | "self-host";
+}
+
+export function Hero({ variant = "default" }: HeroProps) {
+	const [installMethod, setInstallMethod] = useState<InstallMethod>("curl");
 	const [active, setActive] = useState<HeroTabId>("overview");
 	const reduceMotion = useReducedMotion();
 	const tablistId = useId();
@@ -136,25 +158,60 @@ export default function Hero() {
 			id="features"
 			className="relative flex min-h-dvh flex-col bg-transparent"
 		>
-			<div className="relative mx-auto flex w-full max-w-5xl flex-col items-center border-stroke-soft-200 border-x px-6 pt-36 pb-14 text-center sm:px-8 sm:pt-44 sm:pb-16 md:max-w-7xl lg:px-12 lg:pt-52 lg:pb-20 dark:border-white/10">
-				<h1 className="max-w-4xl text-center font-medium text-[2.5rem] text-text-strong-950 leading-[1.02] tracking-[-0.045em] sm:text-[3.5rem] lg:text-[4.25rem] dark:text-white">
-					Email API for Developers
-					<br />
-					With agent inboxes built in
-				</h1>
-				<p className="mt-5 max-w-[52rem] text-center text-[15px] text-text-sub-600 leading-relaxed sm:mt-6 sm:text-[17px] dark:text-white/55">
-					Open-source email infrastructure on GitHub. Extend, customize, and own
-					every email workflow.
-				</p>
-				<div className="mt-6 flex flex-wrap items-center justify-center gap-3 sm:mt-7">
-					<FancyButton.Root asChild variant="neutral" size="small">
-						<a href={hostedSignupHref}>Get Started</a>
-					</FancyButton.Root>
-					<FancyButton.Root asChild variant="basic" size="small">
-						<a href="/docs">Documentation</a>
-					</FancyButton.Root>
+			{variant === "self-host" ? (
+				<div className="relative mx-auto flex w-full max-w-5xl flex-col items-center border-stroke-soft-200 border-x px-6 pt-36 pb-12 text-center sm:px-8 sm:pt-44 sm:pb-16 md:max-w-7xl lg:px-12 lg:pt-52 dark:border-white/10">
+					<h1 className="max-w-3xl text-center font-semibold text-[2rem] text-text-strong-950 leading-[1.08] tracking-[-0.035em] sm:text-[2.75rem] lg:text-[3.25rem] dark:text-white">
+						Self-Host Reloop
+						<br />
+						On your own server
+					</h1>
+
+					<div className="mt-10 w-full max-w-xl text-left sm:mt-12 lg:mt-14">
+						<CopyCodeBlock
+							code={INSTALL_COMMANDS[installMethod]}
+							lang="bash"
+							tabs={INSTALL_TABS}
+							activeTab={installMethod}
+							onTabChange={(id) => setInstallMethod(id as InstallMethod)}
+							hideLineNumbers
+						/>
+						<p className="mt-4 text-center text-[13px] text-text-sub-600 sm:text-[13.5px] dark:text-white/50">
+							Prefer a managed solution?{" "}
+							<Link
+								href={hostedSignupHref}
+								className="group inline-flex items-center gap-1 font-medium text-text-strong-950 underline decoration-text-sub-600/30 underline-offset-4 transition-colors hover:text-blue-600 hover:decoration-blue-600 dark:text-white dark:hover:text-blue-400 dark:hover:decoration-blue-400"
+							>
+								<span>Get started on Reloop Cloud</span>
+								<Icon
+									name="arrow-up-right"
+									className="size-3.5 rotate-45 transition-transform duration-200"
+									aria-hidden="true"
+								/>
+							</Link>
+						</p>
+					</div>
 				</div>
-			</div>
+			) : (
+				<div className="relative mx-auto flex w-full max-w-5xl flex-col items-center border-stroke-soft-200 border-x px-6 pt-36 pb-14 text-center sm:px-8 sm:pt-44 sm:pb-16 md:max-w-7xl lg:px-12 lg:pt-52 lg:pb-20 dark:border-white/10">
+					<h1 className="max-w-4xl text-center font-medium text-[2.5rem] text-text-strong-950 leading-[1.02] tracking-[-0.045em] sm:text-[3.5rem] lg:text-[4.25rem] dark:text-white">
+						Email API for Developers
+						<br />
+						With agent inboxes built in
+					</h1>
+					<p className="mt-5 max-w-[52rem] text-center text-[15px] text-text-sub-600 leading-relaxed sm:mt-6 sm:text-[17px] dark:text-white/55">
+						Open-source email infrastructure on GitHub. Extend, customize, and own
+						every email workflow.
+					</p>
+					<div className="mt-6 flex flex-wrap items-center justify-center gap-3 sm:mt-7">
+						<FancyButton.Root asChild variant="neutral" size="small">
+							<a href={hostedSignupHref}>Get Started</a>
+						</FancyButton.Root>
+						<FancyButton.Root asChild variant="basic" size="small">
+							<a href="/docs">Documentation</a>
+						</FancyButton.Root>
+					</div>
+				</div>
+			)}
 
 			<div className="relative mx-auto w-full max-w-5xl flex-1 flex-col border-stroke-soft-200 border-x md:max-w-7xl dark:border-white/10">
 				<div
@@ -345,3 +402,5 @@ function HeroTabBanner({
 		</AnimatePresence>
 	);
 }
+
+export default Hero;
