@@ -5,12 +5,32 @@ import { navigationTabs } from "@reloop/fe-docs/lib/navigation";
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
+import { KbdKey } from "@reloop/ui/kbd-key";
 import { Logo } from "@reloop/ui/logo";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { normalizeDocsPathname } from "../../lib/is-active";
+
+function ActionKbd({
+	children,
+	className,
+}: {
+	children: React.ReactNode;
+	className?: string;
+}) {
+	return (
+		<KbdKey
+			className={cn(
+				"h-4 min-w-3.5 select-none items-center justify-center rounded-[4px] border border-stroke-soft-200 bg-bg-weak-50 px-1 font-medium font-mono text-[9px] text-text-sub-600 leading-none shadow-[0_1.5px_0_0_var(--color-stroke-soft-200)] dark:border-white/[0.14] dark:bg-white/[0.07] dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.55),0_0_0_0.5px_rgba(255,255,255,0.06),inset_0_0.5px_0_0_rgba(255,255,255,0.08)]",
+				className,
+			)}
+		>
+			{children}
+		</KbdKey>
+	);
+}
 
 const tabColors: Record<string, string> = {
 	Documentation: "#3b82f6",
@@ -153,9 +173,10 @@ export function Navbar({
 								Search...
 							</span>
 						</div>
-						<kbd className="pointer-events-none hidden h-4.5 select-none items-center gap-0.5 rounded border border-stroke-soft-100 bg-bg-weak-50 px-1 font-medium font-mono text-[9px] leading-none xl:inline-flex">
-							<span className="text-[9px]">⌘</span>K
-						</kbd>
+						<div className="pointer-events-none hidden items-center gap-0.5 xl:inline-flex">
+							<ActionKbd>⌘</ActionKbd>
+							<ActionKbd>K</ActionKbd>
+						</div>
 					</button>
 				)}
 				<Link
