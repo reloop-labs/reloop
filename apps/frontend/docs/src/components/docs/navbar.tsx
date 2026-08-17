@@ -155,30 +155,6 @@ export function Navbar({
 			</div>
 
 			<div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
-				{onSearchClick && (
-					<button
-						type="button"
-						onClick={onSearchClick}
-						className={cn(
-							"flex h-7 w-7 items-center justify-center rounded-full border border-stroke-soft-100 bg-bg-white-0 text-text-sub-600 text-xs transition-all",
-							"hover:scale-[1.02] hover:border-black/15 hover:text-[#171717] active:scale-[0.98]",
-							"dark:hover:border-white/15 dark:hover:text-white",
-							"xl:w-40 xl:justify-between xl:px-2.5 2xl:w-48",
-						)}
-						title="Search (⌘K)"
-					>
-						<div className="flex items-center gap-1.5">
-							<Icon name="search" className="h-3.5 w-3.5 shrink-0" />
-							<span className="hidden text-left text-xs xl:inline-block">
-								Search...
-							</span>
-						</div>
-						<div className="pointer-events-none hidden items-center gap-0.5 xl:inline-flex">
-							<ActionKbd>⌘</ActionKbd>
-							<ActionKbd>K</ActionKbd>
-						</div>
-					</button>
-				)}
 				<Link
 					href="https://github.com/reloop-labs/reloop"
 					target="_blank"

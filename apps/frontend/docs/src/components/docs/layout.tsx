@@ -48,24 +48,25 @@ export function DocsLayout({ children, tree, pathname }: DocsLayoutProps) {
 		<div className="flex h-[100dvh] w-full flex-col overflow-hidden bg-bg-white-0 dark:bg-black">
 			{/* Top Header - border bottom matching dashboard */}
 			<header className="z-50 flex h-12 w-full min-w-0 shrink-0 border-b border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-black">
-				{/* Desktop Logo Area — match dashboard brand lockup with right border and sidebar bg */}
-				<div className="hidden shrink-0 items-center border-r border-stroke-soft-100 bg-sidebar px-3 lg:flex lg:w-[270px] dark:border-stroke-soft-100/40">
-					<a href="/" className="flex items-center gap-2">
-						<Logo className="-ml-1 w-10 shrink-0" />
-						<p className="-ml-2 font-semibold text-text-strong-950 dark:text-white">
-							Reloop
-						</p>
-						<span className="inline-flex items-center rounded-full bg-bg-weak-50 px-2 py-0.5 font-bold text-[8px] text-text-sub-600 uppercase tracking-wide dark:bg-white/[0.06]">
-							Beta
-						</span>
-					</a>
-				</div>
-				{/* Navigation Row - Fluid on all screens */}
-				<div className="h-full min-w-0 flex-1">
-					<Navbar
-						onMobileMenuClick={() => setOpen(true)}
-						onSearchClick={() => setIsSearchOpen(true)}
-					/>
+				<div className="mx-auto flex h-full w-full max-w-5xl md:max-w-7xl">
+					{/* Desktop Logo Area — match dashboard brand lockup with right border */}
+					<div className="hidden shrink-0 items-center border-r border-stroke-soft-100 px-3 lg:flex lg:w-[270px] dark:border-stroke-soft-100/40">
+						<a href="/" className="flex items-center gap-2">
+							<Logo className="-ml-1 w-10 shrink-0" />
+							<p className="-ml-2 font-semibold text-text-strong-950 dark:text-white">
+								Reloop
+							</p>
+							<span className="inline-flex items-center rounded-full bg-bg-weak-50 px-2 py-0.5 font-bold text-[8px] text-text-sub-600 uppercase tracking-wide dark:bg-white/[0.06]">
+								Beta
+							</span>
+						</a>
+					</div>
+					{/* Navigation Row - Fluid on all screens */}
+					<div className="h-full min-w-0 flex-1">
+						<Navbar
+							onMobileMenuClick={() => setOpen(true)}
+						/>
+					</div>
 				</div>
 			</header>
 
@@ -74,22 +75,38 @@ export function DocsLayout({ children, tree, pathname }: DocsLayoutProps) {
 			  (AFDocs content-start-position). Visual order: sidebar left via order-*.
 			*/}
 			<div className="flex flex-1 flex-row overflow-hidden bg-bg-white-0 dark:bg-black">
-				{/* Main Content Area - Full width edge-to-edge dashboard style (DOM first) */}
-				<main className="relative order-2 flex min-h-0 flex-1 flex-col overflow-hidden bg-bg-white-0 dark:bg-black">
+				{/* Main Content Area - Extends to the right edge of viewport for scrollbar placement (DOM first) */}
+				<main className="relative order-2 flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-bg-white-0 dark:bg-black">
 					<div
 						id="nd-page"
 						className="flex-1 overflow-y-auto overflow-x-hidden"
 					>
-						<div className="mx-auto min-h-full w-full transition-all duration-300">
+						<div
+							className="min-h-full w-full transition-all duration-300"
+							style={{
+								maxWidth: "calc(1280px - 270px)",
+							}}
+						>
 							{children}
 						</div>
 					</div>
 				</main>
 
-				{/* Desktop Sidebar - visually left, after main in DOM */}
-				<div className="order-1 hidden shrink-0 border-r border-stroke-soft-100 bg-sidebar lg:flex lg:w-[270px] dark:border-stroke-soft-100/40">
-					<Sidebar tree={tree} pathname={pathname} />
+				{/* Desktop Sidebar - visually left, fixed in viewport, dynamically padded to align with centered header */}
+				<div
+					className="order-1 hidden shrink-0 border-r border-stroke-soft-100 lg:flex dark:border-stroke-soft-100/40"
+					style={{
+						width: "calc(270px + max(0px, (100% - 1280px) / 2))",
+						paddingLeft: "max(0px, (100% - 1280px) / 2)",
+					}}
+				>
+					<Sidebar
+						tree={tree}
+						pathname={pathname}
+						onSearchClick={() => setIsSearchOpen(true)}
+					/>
 				</div>
+			</div>
 
 				{/* Mobile Drawer — CSS transitions only, no framer-motion */}
 				{/* Overlay */}
@@ -107,11 +124,11 @@ export function DocsLayout({ children, tree, pathname }: DocsLayoutProps) {
 					role="dialog"
 					aria-modal={open}
 					aria-label="Documentation Navigation"
-					className={`fixed inset-y-0 left-0 z-50 w-[270px] border-stroke-soft-100 border-r bg-sidebar p-0 transition-transform duration-300 ease-out focus:outline-none dark:border-stroke-soft-100/40 ${
+					className={`fixed inset-y-0 left-0 z-50 w-[270px] border-stroke-soft-100 border-r bg-bg-white-0 p-0 transition-transform duration-300 ease-out focus:outline-none dark:border-stroke-soft-100/40 dark:bg-black ${
 						open ? "translate-x-0" : "-translate-x-full"
 					}`}
 				>
-					<div className="flex h-12 items-center border-stroke-soft-100 border-b bg-sidebar px-3 dark:border-stroke-soft-100/40">
+					<div className="flex h-12 items-center border-stroke-soft-100 border-b bg-bg-white-0 px-3 dark:border-stroke-soft-100/40 dark:bg-black">
 						<a
 							href="/"
 							className="flex items-center gap-2"
@@ -131,11 +148,11 @@ export function DocsLayout({ children, tree, pathname }: DocsLayoutProps) {
 							tree={tree}
 							isMobile
 							onLinkClick={() => setOpen(false)}
+							onSearchClick={() => setIsSearchOpen(true)}
 							pathname={pathname}
 						/>
 					</div>
 				</div>
-			</div>
 
 			{isSearchOpen && (
 				<Suspense fallback={null}>

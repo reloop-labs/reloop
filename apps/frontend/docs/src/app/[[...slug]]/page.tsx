@@ -313,9 +313,7 @@ export default async function Page(props: {
 				<div
 					className={`relative w-full flex-col ${
 						hideToc
-							? isApiPage
-								? "mx-auto max-w-5xl md:max-w-7xl"
-								: "max-w-none"
+							? "max-w-none"
 							: "w-full xl:grid xl:grid-cols-[1fr_260px] xl:gap-8"
 					}`}
 				>
@@ -402,7 +400,7 @@ export default async function Page(props: {
 						{/* Right column: sticky code + response (desktop only) */}
 						{useSplitLayout && (
 							<div className="hidden xl:block">
-								<div className="sticky top-10 space-y-6 pb-12 pl-2">
+								<div className="sticky top-0 space-y-6 pb-12 pl-2">
 									<CodeDisplay />
 								</div>
 							</div>
