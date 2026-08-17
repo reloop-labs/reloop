@@ -4,14 +4,7 @@ import { Skeleton } from "@reloop/ui/skeleton";
 import * as TabMenu from "@reloop/ui/tab-menu-horizontal";
 import { AnimatePresence, motion } from "motion/react";
 import { useTheme } from "next-themes";
-import {
-	Fragment,
-	useCallback,
-	useEffect,
-	useMemo,
-	useRef,
-	useState,
-} from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import {
@@ -824,95 +817,6 @@ function EmailInsightsPanel({
 	);
 }
 
-function EmailDetailSkeleton() {
-	return (
-		<div className="space-y-6">
-			{/* Delivery Info Skeleton */}
-			<section>
-				<div className="flex flex-col gap-3.5">
-					<div className="flex items-center gap-4">
-						<span className="w-16 font-medium text-paragraph-sm text-text-sub-600">
-							From
-						</span>
-						<Skeleton className="h-4 w-64 rounded-md" />
-					</div>
-					<div className="flex items-center gap-4">
-						<span className="w-16 font-medium text-paragraph-sm text-text-sub-600">
-							To
-						</span>
-						<Skeleton className="h-4 w-48 rounded-md" />
-					</div>
-					<div className="flex items-center gap-4">
-						<span className="w-16 font-medium text-paragraph-sm text-text-sub-600">
-							Date
-						</span>
-						<Skeleton className="h-4 w-40 rounded-md" />
-					</div>
-					<div className="flex items-center gap-4">
-						<span className="w-16 font-medium text-paragraph-sm text-text-sub-600">
-							Subject
-						</span>
-						<Skeleton className="h-4 w-80 rounded-md" />
-					</div>
-				</div>
-			</section>
-
-			{/* Timeline Skeleton */}
-			<section>
-				<div className="relative flex h-[128px] w-full items-center justify-start rounded-3xl border border-stroke-soft-100 bg-bg-white-0 px-8 py-4 dark:border-stroke-soft-100/50 dark:bg-bg-white-0/5">
-					<div className="flex w-full max-w-2xl items-center justify-between">
-						{[
-							{ label: "Sent", icon: "send-1" },
-							{ label: "Delivered", icon: "check-circle" },
-							{ label: "Opened", icon: "eye-outline" },
-							{ label: "Clicked", icon: "cursor-click" },
-						].map((step, index) => (
-							<Fragment key={step.label}>
-								<div className="flex min-w-[70px] flex-col items-center gap-2">
-									<div className="flex h-10 w-10 items-center justify-center rounded-[10px] border border-stroke-soft-200 bg-bg-weak-50 text-text-soft-400">
-										<Icon name={step.icon} className="h-5 w-5 opacity-40" />
-									</div>
-									<div className="flex flex-col items-center text-center">
-										<span className="rounded-md bg-bg-weak-50 px-2 py-1 font-semibold text-text-soft-400 text-xs">
-											{step.label}
-										</span>
-										<Skeleton className="mx-auto mt-1 h-3 w-16 rounded-md" />
-									</div>
-								</div>
-								{index < 3 && (
-									<div className="-mt-8 h-0 flex-1 border-stroke-soft-100 border-t-[1.5px] border-dashed dark:border-neutral-800" />
-								)}
-							</Fragment>
-						))}
-					</div>
-				</div>
-			</section>
-
-			{/* Content Preview Tabs Skeleton */}
-			<section className="space-y-4">
-				<div className="flex h-11 items-center gap-4 border-stroke-soft-100 border-b px-1 dark:border-stroke-soft-100/50">
-					<Skeleton className="h-7 w-24 rounded-lg" />
-					<Skeleton className="h-7 w-24 rounded-lg" />
-					<Skeleton className="h-7 w-28 rounded-lg" />
-					<Skeleton className="h-7 w-20 rounded-lg" />
-					<Skeleton className="h-7 w-24 rounded-lg" />
-				</div>
-				<div className="overflow-hidden rounded-xl border border-stroke-soft-100 p-6 dark:border-stroke-soft-100/50">
-					<div className="space-y-4">
-						<Skeleton className="h-6 w-1/3 rounded-md" />
-						<Skeleton className="h-4 w-full rounded-md" />
-						<Skeleton className="h-4 w-5/6 rounded-md" />
-						<Skeleton className="h-4 w-2/3 rounded-md" />
-						<div className="pt-4">
-							<Skeleton className="h-48 w-full rounded-lg" />
-						</div>
-					</div>
-				</div>
-			</section>
-		</div>
-	);
-}
-
 export const EmailDetail = ({ email, isLoading }: EmailDetailProps) => {
 	const [activeTab, setActiveTab] = useState<string>("preview");
 	const [hoveredIdx, setHoveredIdx] = useState<number | undefined>(undefined);
@@ -952,61 +856,59 @@ export const EmailDetail = ({ email, isLoading }: EmailDetailProps) => {
 	}, [email]);
 
 	const tabItems = useMemo(() => {
-		if (!email) return [];
+		if (email && !email.htmlBody) {
+			return [
+				{
+					title: "Plain Text",
+					value: "plain",
+					icon: "file-text" as const,
+					shortcut: "1",
+				},
+				{
+					title: "Raw",
+					value: "raw",
+					icon: "file-code" as const,
+					shortcut: "2",
+				},
+				{
+					title: "Insights",
+					value: "insights",
+					icon: "bulb" as const,
+					shortcut: "3",
+				},
+			];
+		}
 		return [
-			...(email.htmlBody
-				? [
-						{
-							title: "Preview",
-							value: "preview",
-							icon: "mail-single" as const,
-							shortcut: "1",
-						},
-						{
-							title: "Plain Text",
-							value: "plain",
-							icon: "file-text" as const,
-							shortcut: "2",
-						},
-						{
-							title: "HTML Source",
-							value: "html",
-							icon: "code" as const,
-							shortcut: "3",
-						},
-						{
-							title: "Raw",
-							value: "raw",
-							icon: "file-code" as const,
-							shortcut: "4",
-						},
-						{
-							title: "Insights",
-							value: "insights",
-							icon: "bulb" as const,
-							shortcut: "5",
-						},
-					]
-				: [
-						{
-							title: "Plain Text",
-							value: "plain",
-							icon: "file-text" as const,
-							shortcut: "1",
-						},
-						{
-							title: "Raw",
-							value: "raw",
-							icon: "file-code" as const,
-							shortcut: "2",
-						},
-						{
-							title: "Insights",
-							value: "insights",
-							icon: "bulb" as const,
-							shortcut: "3",
-						},
-					]),
+			{
+				title: "Preview",
+				value: "preview",
+				icon: "mail-single" as const,
+				shortcut: "1",
+			},
+			{
+				title: "Plain Text",
+				value: "plain",
+				icon: "file-text" as const,
+				shortcut: "2",
+			},
+			{
+				title: "HTML Source",
+				value: "html",
+				icon: "code" as const,
+				shortcut: "3",
+			},
+			{
+				title: "Raw",
+				value: "raw",
+				icon: "file-code" as const,
+				shortcut: "4",
+			},
+			{
+				title: "Insights",
+				value: "insights",
+				icon: "bulb" as const,
+				shortcut: "5",
+			},
 		];
 	}, [email]);
 
@@ -1065,12 +967,6 @@ export const EmailDetail = ({ email, isLoading }: EmailDetailProps) => {
 		[tabItems],
 	);
 
-	if (isLoading) {
-		return <EmailDetailSkeleton />;
-	}
-
-	if (!email) return null;
-
 	const activeIndex = tabItems.findIndex((item) => item.value === activeTab);
 	const currentIdx = hoveredIdx !== undefined ? hoveredIdx : activeIndex;
 	const currentTab = buttonRefs.current[currentIdx];
@@ -1086,9 +982,13 @@ export const EmailDetail = ({ email, isLoading }: EmailDetailProps) => {
 							From
 						</span>
 						<span className="font-medium text-paragraph-sm text-text-strong-950">
-							{email.fromName
-								? `${email.fromName} <${email.fromEmail}>`
-								: email.fromEmail}
+							{isLoading ? (
+								<Skeleton className="h-4 w-64 rounded-md" />
+							) : email?.fromName ? (
+								`${email.fromName} <${email.fromEmail}>`
+							) : (
+								email?.fromEmail
+							)}
 						</span>
 					</div>
 					<div className="flex items-start gap-4">
@@ -1096,10 +996,14 @@ export const EmailDetail = ({ email, isLoading }: EmailDetailProps) => {
 							To
 						</span>
 						<span className="font-medium text-paragraph-sm text-text-strong-950">
-							{email.toEmails.join(", ")}
+							{isLoading ? (
+								<Skeleton className="h-4 w-48 rounded-md" />
+							) : (
+								email?.toEmails.join(", ")
+							)}
 						</span>
 					</div>
-					{email.ccEmails && email.ccEmails.length > 0 && (
+					{!isLoading && email?.ccEmails && email.ccEmails.length > 0 && (
 						<div className="flex items-start gap-4">
 							<span className="w-16 flex-shrink-0 font-medium text-paragraph-sm text-text-sub-600">
 								Cc
@@ -1114,14 +1018,19 @@ export const EmailDetail = ({ email, isLoading }: EmailDetailProps) => {
 							Date
 						</span>
 						<span className="font-medium text-paragraph-sm text-text-strong-950">
-							{new Date(email.createdAt).toLocaleString(undefined, {
-								weekday: "long",
-								year: "numeric",
-								month: "long",
-								day: "numeric",
-								hour: "2-digit",
-								minute: "2-digit",
-							})}
+							{isLoading ? (
+								<Skeleton className="h-4 w-40 rounded-md" />
+							) : (
+								email &&
+								new Date(email.createdAt).toLocaleString(undefined, {
+									weekday: "long",
+									year: "numeric",
+									month: "long",
+									day: "numeric",
+									hour: "2-digit",
+									minute: "2-digit",
+								})
+							)}
 						</span>
 					</div>
 					<div className="flex items-start gap-4">
@@ -1129,7 +1038,11 @@ export const EmailDetail = ({ email, isLoading }: EmailDetailProps) => {
 							Subject
 						</span>
 						<span className="font-medium text-paragraph-sm text-text-strong-950">
-							{email.subject}
+							{isLoading ? (
+								<Skeleton className="h-4 w-80 rounded-md" />
+							) : (
+								email?.subject
+							)}
 						</span>
 					</div>
 				</div>
@@ -1138,16 +1051,19 @@ export const EmailDetail = ({ email, isLoading }: EmailDetailProps) => {
 			{/* Event Tracking Timeline */}
 			<section>
 				<EmailTimeline
-					events={email.events || []}
-					sentAt={email.sentAt || email.createdAt}
-					deliveredAt={email.deliveredAt}
-					failedAt={email.failedAt}
-					errorMessage={email.errorMessage}
-					onDeliveredClick={email.deliveredAt ? openDeliveredDetail : undefined}
+					events={email?.events || []}
+					sentAt={email?.sentAt || email?.createdAt}
+					deliveredAt={email?.deliveredAt}
+					failedAt={email?.failedAt}
+					errorMessage={email?.errorMessage}
+					isLoading={isLoading}
+					onDeliveredClick={
+						!isLoading && email?.deliveredAt ? openDeliveredDetail : undefined
+					}
 				/>
 			</section>
 
-			{email.errorMessage && (
+			{!isLoading && email?.errorMessage && (
 				<ErrorDetailsPanel errorMessage={email.errorMessage} />
 			)}
 
@@ -1231,81 +1147,93 @@ export const EmailDetail = ({ email, isLoading }: EmailDetailProps) => {
 								"overflow-hidden rounded-xl border border-stroke-soft-100 dark:border-stroke-soft-100/50",
 						)}
 					>
-						<TabMenu.Content value="preview">
-							<div className="bg-white p-6 dark:bg-neutral-950">
-								{email.htmlBody && <EmailHtmlPreview html={email.htmlBody} />}
+						{isLoading ? (
+							<div className="p-6">
+								<Skeleton className="h-64 w-full rounded-lg" />
 							</div>
-						</TabMenu.Content>
+						) : (
+							<>
+								<TabMenu.Content value="preview">
+									<div className="bg-white p-6 dark:bg-neutral-950">
+										{email?.htmlBody && (
+											<EmailHtmlPreview html={email.htmlBody} />
+										)}
+									</div>
+								</TabMenu.Content>
 
-						<TabMenu.Content value="plain">
-							{email.textBody ? (
-								<CopyCodeBlock
-									code={email.textBody}
-									lang="text"
-									label="Plain Text"
-								/>
-							) : (
-								<div className="p-6 text-paragraph-sm text-text-sub-600">
-									No text content
-								</div>
-							)}
-						</TabMenu.Content>
+								<TabMenu.Content value="plain">
+									{email?.textBody ? (
+										<CopyCodeBlock
+											code={email.textBody}
+											lang="text"
+											label="Plain Text"
+										/>
+									) : (
+										<div className="p-6 text-paragraph-sm text-text-sub-600">
+											No text content
+										</div>
+									)}
+								</TabMenu.Content>
 
-						<TabMenu.Content value="html">
-							{email.htmlBody ? (
-								<CopyCodeBlock
-									code={formatHtml(email.htmlBody)}
-									lang="html"
-									label="HTML Source"
-								/>
-							) : (
-								<div className="p-6 text-paragraph-sm text-text-sub-600">
-									No HTML content available
-								</div>
-							)}
-						</TabMenu.Content>
+								<TabMenu.Content value="html">
+									{email?.htmlBody ? (
+										<CopyCodeBlock
+											code={formatHtml(email.htmlBody)}
+											lang="html"
+											label="HTML Source"
+										/>
+									) : (
+										<div className="p-6 text-paragraph-sm text-text-sub-600">
+											No HTML content available
+										</div>
+									)}
+								</TabMenu.Content>
 
-						<TabMenu.Content value="raw">
-							{email.rawMessage ? (
-								<CopyCodeBlock
-									code={email.rawMessage}
-									lang="text"
-									label="Raw message"
-								/>
-							) : (
-								<p className="p-6 text-paragraph-sm text-text-sub-600">
-									Raw message not available for this send. New messages store
-									the full SMTP MIME after delivery preparation.
-								</p>
-							)}
-						</TabMenu.Content>
+								<TabMenu.Content value="raw">
+									{email?.rawMessage ? (
+										<CopyCodeBlock
+											code={email.rawMessage}
+											lang="text"
+											label="Raw message"
+										/>
+									) : (
+										<p className="p-6 text-paragraph-sm text-text-sub-600">
+											Raw message not available for this send. New messages
+											store the full SMTP MIME after delivery preparation.
+										</p>
+									)}
+								</TabMenu.Content>
 
-						<TabMenu.Content value="insights">
-							<EmailInsightsPanel email={email} />
-						</TabMenu.Content>
+								<TabMenu.Content value="insights">
+									{email && <EmailInsightsPanel email={email} />}
+								</TabMenu.Content>
+							</>
+						)}
 					</div>
 				</TabMenu.Root>
 			</section>
 
 			{/* Headers */}
-			{email.headers && Object.keys(email.headers).length > 0 && (
-				<section>
-					<div className="mb-4 flex items-center justify-between">
-						<h3 className="font-medium text-paragraph-sm text-text-strong-950">
-							SMTP Headers
-						</h3>
-						<CopyButton
-							value={JSON.stringify(email.headers, null, 2)}
-							label="Headers"
-						/>
-					</div>
-					<div className="overflow-auto rounded-xl border border-stroke-soft-100 p-6 dark:border-stroke-soft-100/50">
-						<pre className="font-mono text-[11px] text-text-sub-600 leading-relaxed">
-							{JSON.stringify(email.headers, null, 2)}
-						</pre>
-					</div>
-				</section>
-			)}
+			{!isLoading &&
+				email?.headers &&
+				Object.keys(email.headers).length > 0 && (
+					<section>
+						<div className="mb-4 flex items-center justify-between">
+							<h3 className="font-medium text-paragraph-sm text-text-strong-950">
+								SMTP Headers
+							</h3>
+							<CopyButton
+								value={JSON.stringify(email.headers, null, 2)}
+								label="Headers"
+							/>
+						</div>
+						<div className="overflow-auto rounded-xl border border-stroke-soft-100 p-6 dark:border-stroke-soft-100/50">
+							<pre className="font-mono text-[11px] text-text-sub-600 leading-relaxed">
+								{JSON.stringify(email.headers, null, 2)}
+							</pre>
+						</div>
+					</section>
+				)}
 		</div>
 	);
 };

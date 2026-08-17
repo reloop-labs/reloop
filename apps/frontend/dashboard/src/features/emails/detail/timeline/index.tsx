@@ -2,6 +2,7 @@
 
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
+import { Skeleton } from "@reloop/ui/skeleton";
 import { Fragment, useMemo } from "react";
 import { formatTimelineDate } from "./timeline-flow-node";
 import type { EmailEvent } from "./types";
@@ -12,6 +13,7 @@ export function EmailTimeline({
 	deliveredAt,
 	failedAt,
 	errorMessage,
+	isLoading = false,
 	onDeliveredClick,
 }: {
 	events: EmailEvent[];
@@ -19,6 +21,7 @@ export function EmailTimeline({
 	deliveredAt?: string | null;
 	failedAt?: string | null;
 	errorMessage?: string | null;
+	isLoading?: boolean;
 	/** Open delivered details sidebar when the completed Delivered step is clicked */
 	onDeliveredClick?: () => void;
 }) {
@@ -212,10 +215,15 @@ export function EmailTimeline({
 								>
 									{step.label}
 								</span>
-								{isCompleted && formattedTime && (
-									<span className="mt-1 whitespace-nowrap font-medium text-text-soft-400 text-xs">
-										{formattedTime}
-									</span>
+								{isLoading ? (
+									<Skeleton className="mx-auto mt-1 h-3 w-16 rounded-md" />
+								) : (
+									isCompleted &&
+									formattedTime && (
+										<span className="mt-1 whitespace-nowrap font-medium text-text-soft-400 text-xs">
+											{formattedTime}
+										</span>
+									)
 								)}
 							</div>
 						</div>
