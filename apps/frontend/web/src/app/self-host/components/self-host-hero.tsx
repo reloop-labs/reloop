@@ -1,7 +1,9 @@
 "use client";
 
 import { cn } from "@reloop/ui/cn";
+import { CopyCodeBlock } from "@reloop/ui/copy-code-block";
 import { Icon } from "@reloop/ui/icon";
+import { getLanguageIcon } from "@reloop/web/components/mdx/language-icons";
 import { hostedSignupHref } from "@reloop/web/lib/site";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import Link from "next/link";
@@ -18,6 +20,20 @@ import {
 	HeroPreview,
 	type HeroTabId,
 } from "../../(home)/components/hero-preview";
+
+type InstallMethod = "curl" | "docker" | "cli";
+
+const INSTALL_TABS = [
+	{ id: "curl", label: "curl", si: getLanguageIcon("bash")! },
+	{ id: "docker", label: "docker", si: getLanguageIcon("docker")! },
+	{ id: "cli", label: "cli", si: getLanguageIcon("bash")! },
+];
+
+const INSTALL_COMMANDS: Record<InstallMethod, string> = {
+	curl: "curl -fsSL https://reloop.sh/install.sh | bash",
+	docker: "docker run -d -p 3000:3000 -p 25:25 ghcr.io/reloop-labs/reloop:latest",
+	cli: "npx reloop init",
+};
 
 const TABS: {
 	id: HeroTabId;
@@ -93,11 +109,10 @@ const TABS: {
 const EASE_OUT: [number, number, number, number] = [0.23, 1, 0.32, 1];
 
 export function SelfHostHero() {
+	const [installMethod, setInstallMethod] = useState<InstallMethod>("curl");
 	const [active, setActive] = useState<HeroTabId>("cloud");
 	const reduceMotion = useReducedMotion();
 	const tablistId = useId();
-	const [copied, setCopied] = useState(false);
-	const command = "curl -fsSL https://reloop.sh/install.sh | bash";
 
 	const selectByOffset = useCallback((offset: number) => {
 		setActive((current) => {
@@ -107,22 +122,12 @@ export function SelfHostHero() {
 		});
 	}, []);
 
-	const handleCopy = async () => {
-		try {
-			await navigator.clipboard.writeText(command);
-			setCopied(true);
-			setTimeout(() => setCopied(false), 2000);
-		} catch {
-			// ignore
-		}
-	};
-
 	return (
 		<section
 			id="features"
 			className="relative flex min-h-dvh flex-col bg-transparent pt-40 sm:pt-48 lg:pt-56"
 		>
-			{/* Top Hero Centered Title & Curl Pill Button */}
+			{/* Top Hero Centered Title & Code Block with Shell/Icons & Copy Toolbar */}
 			<div className="relative mx-auto flex w-full max-w-5xl flex-col items-center px-6 text-center sm:px-8 md:max-w-7xl lg:px-12">
 				<h1 className="max-w-4xl text-center font-medium text-[2.5rem] text-text-strong-950 leading-[1.02] tracking-[-0.045em] sm:text-[3.5rem] lg:text-[4.25rem] dark:text-white">
 					Self-Host Reloop
@@ -130,39 +135,25 @@ export function SelfHostHero() {
 					On your own server
 				</h1>
 
-				{/* Quick Install Pill Button */}
-				<div className="mt-8 flex flex-col items-center gap-2.5 sm:mt-10">
-					<button
-						type="button"
-						onClick={handleCopy}
-						className="group inline-flex items-center gap-2.5 rounded-full border border-stroke-soft-200 bg-bg-weak-50/80 px-4 py-2 font-mono text-[13px] text-text-sub-600 transition-all hover:border-stroke-soft-300 hover:bg-bg-weak-100 hover:text-text-strong-950 dark:border-white/10 dark:bg-white/5 dark:text-white/70 dark:hover:border-white/20 dark:hover:bg-white/10 dark:hover:text-white"
-					>
-						<span className="select-none font-semibold text-blue-600 dark:text-blue-400">
-							$
-						</span>
-						<span className="text-text-strong-950 dark:text-white">
-							{command}
-						</span>
-						<span className="ml-1 text-text-soft-400 transition-colors group-hover:text-text-strong-950 dark:text-white/40 dark:group-hover:text-white">
-							{copied ? (
-								<Icon
-									name="check"
-									className="h-3.5 w-3.5 text-green-600 dark:text-green-400"
-								/>
-							) : (
-								<Icon name="copy" className="h-3.5 w-3.5" />
-							)}
-						</span>
-					</button>
+				{/* Copy Code Block with Shell/Brand Icons & Copy Button */}
+				<div className="mt-8 w-full max-w-xl text-left sm:mt-10">
+					<CopyCodeBlock
+						code={INSTALL_COMMANDS[installMethod]}
+						lang="bash"
+						tabs={INSTALL_TABS}
+						activeTab={installMethod}
+						onTabChange={(id) => setInstallMethod(id as InstallMethod)}
+						hideLineNumbers
+					/>
 				</div>
 			</div>
 
-			{/* Interactive Tabs Bar */}
-			<div className="relative mx-auto mt-8 w-full max-w-5xl flex-1 flex-col border-stroke-soft-200 border-x sm:mt-10 md:max-w-7xl dark:border-white/10">
+			{/* Interactive Modern Tabs Bar */}
+			<div className="relative mx-auto mt-8 w-full max-w-4xl px-4 sm:mt-10">
 				<div
 					role="tablist"
 					aria-label="Product surfaces"
-					className="flex overflow-x-auto border-stroke-soft-200 border-t border-b [scrollbar-width:none] lg:grid lg:grid-cols-5 dark:border-white/10 [&::-webkit-scrollbar]:hidden"
+					className="flex items-center justify-between gap-1 overflow-x-auto rounded-2xl border border-stroke-soft-200 bg-bg-weak-50/80 p-1.5 backdrop-blur-md [scrollbar-width:none] dark:border-white/10 dark:bg-white/[0.04] [&::-webkit-scrollbar]:hidden"
 					onKeyDown={(event) => {
 						if (event.key === "ArrowRight") {
 							event.preventDefault();
@@ -186,50 +177,35 @@ export function SelfHostHero() {
 								tabIndex={selected ? 0 : -1}
 								onClick={() => setActive(tab.id)}
 								className={cn(
-									"relative min-w-[11.5rem] flex-1 cursor-pointer border-stroke-soft-200 border-l px-5 py-4 text-left transition-colors duration-200 first:border-l-0 sm:min-w-[13rem] sm:px-6 sm:py-5 dark:border-white/10",
+									"relative flex flex-1 items-center justify-center gap-2 rounded-xl px-3.5 py-2.5 font-medium text-[13px] transition-all duration-200 sm:px-4 sm:py-3 sm:text-sm",
 									selected
-										? "bg-transparent"
-										: "bg-transparent hover:bg-bg-weak-50/70 dark:hover:bg-white/[0.02]",
+										? "text-text-strong-950 dark:text-white"
+										: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white",
 								)}
 							>
-								<span className="flex items-center gap-2">
-									<span
-										className={cn(
-											"font-medium text-[14px] tracking-[-0.01em] transition-colors duration-200 sm:text-[15px]",
-											selected
-												? "text-text-strong-950 dark:text-white"
-												: "text-text-sub-600 dark:text-white/55",
-										)}
-									>
-										{tab.title}
-									</span>
-									{tab.cloud && (
-										<span className="inline-flex items-center rounded-full bg-bg-weak-50 px-1.5 py-0.5 font-medium text-[10px] text-text-sub-600 leading-none dark:bg-white/[0.08] dark:text-white/55">
-											Self-Host
-										</span>
-									)}
-								</span>
-								<span
-									className={cn(
-										"mt-1.5 block max-w-[16rem] text-[13px] leading-snug transition-colors duration-200 sm:text-[14px]",
-										selected
-											? "text-text-sub-600 dark:text-white/50"
-											: "text-text-soft-400 dark:text-white/35",
-									)}
-								>
-									{tab.description}
-								</span>
 								{selected && (
-									<motion.span
-										layoutId={reduceMotion ? undefined : "self-host-hero-tab-underline"}
-										className="absolute right-0 bottom-0 left-0 h-[2px] bg-text-strong-950 dark:bg-white"
+									<motion.div
+										layoutId={reduceMotion ? undefined : "self-host-hero-tab-pill"}
+										className="absolute inset-0 rounded-xl bg-white shadow-[0_2px_12px_rgba(0,0,0,0.06),0_0_0_1px_rgba(0,0,0,0.04)] dark:bg-[#1a1c20] dark:shadow-[0_4px_20px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.08)]"
 										transition={
 											reduceMotion
 												? { duration: 0 }
-												: { duration: 0.22, ease: EASE_OUT }
+												: { type: "spring", stiffness: 350, damping: 30 }
 										}
 									/>
 								)}
+								<span className="relative z-10 flex items-center gap-2">
+									<Icon
+										name={tab.banner.icon}
+										className={cn(
+											"size-4 transition-colors",
+											selected
+												? "text-text-strong-950 dark:text-white"
+												: "text-text-sub-600/70 dark:text-white/40",
+										)}
+									/>
+									<span className="whitespace-nowrap">{tab.title}</span>
+								</span>
 							</button>
 						);
 					})}

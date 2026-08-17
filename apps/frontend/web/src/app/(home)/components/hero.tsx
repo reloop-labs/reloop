@@ -104,7 +104,7 @@ export default function Hero() {
 
 	const handleCopyCommand = async () => {
 		try {
-			await navigator.clipboard.writeText("npx getopen init");
+			await navigator.clipboard.writeText("npx reloop init");
 			setCopiedCommand(true);
 			window.setTimeout(() => setCopiedCommand(false), 2000);
 		} catch {
@@ -147,7 +147,7 @@ export default function Hero() {
 					<div className="mt-2.5 flex items-center justify-between gap-4 sm:mt-3">
 						<div className="flex items-center gap-2.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
 							<span className="select-none text-zinc-500">&gt;</span>
-							<code className="text-zinc-100">npx getopen init</code>
+							<code className="text-zinc-100">npx reloop init</code>
 						</div>
 						<button
 							type="button"

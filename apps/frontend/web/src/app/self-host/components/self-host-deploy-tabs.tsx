@@ -45,7 +45,7 @@ volumes:
   redisdata:`;
 
 const CLI_SCRIPT = `# 1. Download and run the interactive setup wizard
-npx getopen init
+npx reloop init
 
 # Or bootstrap directly with environment checks
 curl -fsSL https://reloop.sh/install.sh | bash
