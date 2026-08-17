@@ -39,6 +39,7 @@ function toIsoDate(raw: string): string | undefined {
 	const parts = raw.trim().split(/\s+/);
 	if (parts.length !== 3) return undefined;
 	const [day, month, year] = parts;
+	if (!day || !month || !year) return undefined;
 	const monthIndex = Object.keys(MONTHS).indexOf(month);
 	if (monthIndex === -1) return undefined;
 	return `${year}-${String(monthIndex + 1).padStart(2, "0")}-${String(Number(day)).padStart(2, "0")}`;
