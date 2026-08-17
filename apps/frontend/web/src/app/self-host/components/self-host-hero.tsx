@@ -126,10 +126,10 @@ export function SelfHostHero() {
 	return (
 		<section
 			id="features"
-			className="relative flex min-h-dvh flex-col bg-transparent pt-28 sm:pt-32 lg:pt-36"
+			className="relative flex min-h-dvh flex-col bg-transparent"
 		>
 			{/* Top Hero Centered Title & Code Block with Shell/Icons & Copy Toolbar */}
-			<div className="relative mx-auto flex w-full max-w-5xl flex-col items-center px-6 text-center sm:px-8 md:max-w-7xl lg:px-12">
+			<div className="relative mx-auto flex w-full max-w-5xl flex-col items-center border-stroke-soft-200 border-x px-6 pt-36 pb-12 text-center sm:px-8 sm:pt-44 sm:pb-16 md:max-w-7xl lg:px-12 lg:pt-52 dark:border-white/10">
 				<h1 className="max-w-3xl text-center font-semibold text-[2rem] text-text-strong-950 leading-[1.08] tracking-[-0.035em] sm:text-[2.75rem] lg:text-[3.25rem] dark:text-white">
 					Self-Host Reloop
 					<br />
@@ -146,7 +146,7 @@ export function SelfHostHero() {
 						onTabChange={(id) => setInstallMethod(id as InstallMethod)}
 						hideLineNumbers
 					/>
-					<p className="mt-3.5 text-center text-[13px] text-text-sub-600 sm:text-[13.5px] dark:text-white/50">
+					<p className="mt-4 text-center text-[13px] text-text-sub-600 sm:text-[13.5px] dark:text-white/50">
 						Prefer a managed solution?{" "}
 						<Link
 							href={hostedSignupHref}
@@ -163,12 +163,12 @@ export function SelfHostHero() {
 				</div>
 			</div>
 
-			{/* Interactive Modern Tabs Bar */}
-			<div className="relative mx-auto mt-10 w-full max-w-4xl px-4 sm:mt-12">
+			{/* Product Surfaces Tabs Bar */}
+			<div className="relative mx-auto w-full max-w-5xl flex-1 flex-col border-stroke-soft-200 border-x md:max-w-7xl dark:border-white/10">
 				<div
 					role="tablist"
 					aria-label="Product surfaces"
-					className="flex items-center justify-between gap-1 overflow-x-auto rounded-2xl border border-stroke-soft-200 bg-bg-weak-50/80 p-1.5 backdrop-blur-md [scrollbar-width:none] dark:border-white/10 dark:bg-white/[0.04] [&::-webkit-scrollbar]:hidden"
+					className="flex overflow-x-auto border-stroke-soft-200 border-t border-b [scrollbar-width:none] lg:grid lg:grid-cols-5 dark:border-white/10 [&::-webkit-scrollbar]:hidden"
 					onKeyDown={(event) => {
 						if (event.key === "ArrowRight") {
 							event.preventDefault();
@@ -192,37 +192,52 @@ export function SelfHostHero() {
 								tabIndex={selected ? 0 : -1}
 								onClick={() => setActive(tab.id)}
 								className={cn(
-									"relative flex flex-1 items-center justify-center gap-2 rounded-xl px-3.5 py-2.5 font-medium text-[13px] transition-all duration-200 sm:px-4 sm:py-3 sm:text-sm",
+									"relative min-w-[11.5rem] flex-1 cursor-pointer border-stroke-soft-200 border-l px-5 py-4 text-left transition-colors duration-200 first:border-l-0 sm:min-w-[13rem] sm:px-6 sm:py-5 dark:border-white/10",
 									selected
-										? "text-text-strong-950 dark:text-white"
-										: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white",
+										? "bg-transparent"
+										: "bg-transparent hover:bg-bg-weak-50/70 dark:hover:bg-white/[0.02]",
 								)}
 							>
+								<span className="flex items-center gap-2">
+									<span
+										className={cn(
+											"font-medium text-[14px] tracking-[-0.01em] transition-colors duration-200 sm:text-[15px]",
+											selected
+												? "text-text-strong-950 dark:text-white"
+												: "text-text-sub-600 dark:text-white/55",
+										)}
+									>
+										{tab.title}
+									</span>
+									{tab.cloud && (
+										<span className="inline-flex items-center rounded-full bg-bg-weak-50 px-1.5 py-0.5 font-medium text-[10px] text-text-sub-600 leading-none dark:bg-white/[0.08] dark:text-white/55">
+											Cloud
+										</span>
+									)}
+								</span>
+								<span
+									className={cn(
+										"mt-1.5 block max-w-[16rem] text-[13px] leading-snug transition-colors duration-200 sm:text-[14px]",
+										selected
+											? "text-text-sub-600 dark:text-white/50"
+											: "text-text-soft-400 dark:text-white/35",
+									)}
+								>
+									{tab.description}
+								</span>
 								{selected && (
-									<motion.div
+									<motion.span
 										layoutId={
-											reduceMotion ? undefined : "self-host-hero-tab-pill"
+											reduceMotion ? undefined : "self-host-hero-tab-underline"
 										}
-										className="absolute inset-0 rounded-xl bg-white shadow-[0_2px_12px_rgba(0,0,0,0.06),0_0_0_1px_rgba(0,0,0,0.04)] dark:bg-[#1a1c20] dark:shadow-[0_4px_20px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.08)]"
+										className="absolute right-0 bottom-0 left-0 h-[2px] bg-text-strong-950 dark:bg-white"
 										transition={
 											reduceMotion
 												? { duration: 0 }
-												: { type: "spring", stiffness: 350, damping: 30 }
+												: { duration: 0.22, ease: EASE_OUT }
 										}
 									/>
 								)}
-								<span className="relative z-10 flex items-center gap-2">
-									<Icon
-										name={tab.banner.icon}
-										className={cn(
-											"size-4 transition-colors",
-											selected
-												? "text-text-strong-950 dark:text-white"
-												: "text-text-sub-600/70 dark:text-white/40",
-										)}
-									/>
-									<span className="whitespace-nowrap">{tab.title}</span>
-								</span>
 							</button>
 						);
 					})}
@@ -238,6 +253,15 @@ export function SelfHostHero() {
 					aria-labelledby={`${tablistId}-${active}`}
 					className="relative z-10 mx-auto flex h-[32rem] w-full max-w-5xl flex-col px-3 pt-10 pb-10 sm:h-[40rem] sm:px-6 sm:pt-14 sm:pb-14 md:max-w-7xl lg:h-[48rem] lg:px-8 lg:pt-20 lg:pb-16"
 				>
+					{/* Left and Right vertical borders matching the HeroAtmosphere line color and vertical gradient */}
+					<div
+						aria-hidden
+						className="pointer-events-none absolute inset-y-0 left-0 w-px bg-gradient-to-b from-[rgba(0,111,254,0.06)] via-[rgba(0,111,254,0.16)] to-[rgba(0,111,254,0.28)] dark:from-[rgba(0,111,254,0.1)] dark:via-[rgba(0,111,254,0.22)] dark:to-[rgba(0,111,254,0.38)]"
+					/>
+					<div
+						aria-hidden
+						className="pointer-events-none absolute inset-y-0 right-0 w-px bg-gradient-to-b from-[rgba(0,111,254,0.06)] via-[rgba(0,111,254,0.16)] to-[rgba(0,111,254,0.28)] dark:from-[rgba(0,111,254,0.1)] dark:via-[rgba(0,111,254,0.22)] dark:to-[rgba(0,111,254,0.38)]"
+					/>
 					<HeroDemoPlaybackProvider>
 						<HeroWindowChrome
 							action={active === "sdk" ? <HeroDemoPlaybackButton /> : undefined}

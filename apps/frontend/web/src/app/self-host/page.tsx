@@ -2,10 +2,9 @@ import { JsonLd } from "@reloop/web/components/json-ld";
 import { BlogCta } from "@reloop/web/components/landing/blog/blog-cta";
 import { getSiteUrl, siteName, socialProfiles } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
+import Convictions from "../(home)/components/convictions";
 import { SectionSeparator } from "../(home)/components/section-separator";
-import { SelfHostArchitecture } from "./components/self-host-architecture";
 import { SelfHostComparison } from "./components/self-host-comparison";
-import { SelfHostEnvConfig } from "./components/self-host-env-config";
 import { SelfHostFaq } from "./components/self-host-faq";
 import { SelfHostHero } from "./components/self-host-hero";
 
@@ -69,9 +68,11 @@ export default function SelfHostPage() {
 			<SelfHostHero />
 			<div className="relative mx-auto w-full max-w-5xl border-stroke-soft-200 border-x md:max-w-7xl dark:border-white/10">
 				<SectionSeparator />
-				<SelfHostArchitecture />
-				<SectionSeparator />
-				<SelfHostEnvConfig />
+				<Convictions
+					showHeading
+					title="What Reloop Gives You"
+					description="Full-featured email infrastructure with open-source sovereignty and zero vendor lock-in."
+				/>
 				<SectionSeparator />
 				<SelfHostComparison />
 				<SectionSeparator />

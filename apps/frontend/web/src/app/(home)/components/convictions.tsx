@@ -54,12 +54,36 @@ const values = [
 	},
 ] as const;
 
-export default function Convictions() {
+export default function Convictions({
+	title = "What Reloop gives you",
+	description,
+	showHeading = false,
+}: {
+	title?: string;
+	description?: string;
+	showHeading?: boolean;
+} = {}) {
 	return (
 		<section aria-labelledby="convictions-heading">
-			<h2 id="convictions-heading" className="sr-only">
-				What Reloop gives you
-			</h2>
+			{showHeading ? (
+				<div className="border-stroke-soft-200 border-b px-6 py-12 text-center sm:px-8 sm:py-16 md:px-12 dark:border-white/10">
+					<h2
+						id="convictions-heading"
+						className="font-semibold text-2xl text-text-strong-950 tracking-tight sm:text-3xl lg:text-4xl dark:text-white"
+					>
+						{title}
+					</h2>
+					{description && (
+						<p className="mt-3 text-[14.5px] text-text-sub-600 sm:text-base dark:text-white/60">
+							{description}
+						</p>
+					)}
+				</div>
+			) : (
+				<h2 id="convictions-heading" className="sr-only">
+					{title}
+				</h2>
+			)}
 			<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5">
 				{values.map((item) => (
 					<div
