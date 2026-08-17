@@ -7,27 +7,58 @@ const REQUIREMENTS = [
 		icon: "shield",
 		title: "Open Cloud Ports",
 		points: [
-			"Port 80 & 443 — Web UI & REST API traffic",
-			"Port 25 — Inbound SMTP mail receiving",
-			"Port 587 — Authenticated mail submission",
-		],
-	},
-	{
-		icon: "globe",
-		title: "Domain & DNS Access",
-		points: [
-			"MX Records — Inbound routing to Reloop",
-			"SPF & DKIM — Cryptographic email signing",
-			"DMARC — Domain alignment & deliverability",
+			{
+				highlight: "Port 80 & 443",
+				text: "Web UI & REST API traffic",
+			},
+			{
+				highlight: "Port 25",
+				text: "Inbound SMTP mail receiving",
+			},
+			{
+				highlight: "Port 587",
+				text: "Authenticated mail submission",
+			},
 		],
 	},
 	{
 		icon: "cpu",
 		title: "System Requirements",
 		points: [
-			"1–2 vCPU & 2–4 GB RAM base compute",
-			"Docker Engine 24.0+ with Docker Compose v2",
-			"PostgreSQL 15+ & Redis 7+ runtime",
+			{
+				highlight: "4–8 vCPUs & 8–16 GB RAM",
+				text: "Base compute footprint",
+			},
+			{
+				highlight: "Docker Engine 24.0+",
+				text: "With Docker Compose v2",
+			},
+			{
+				highlight: "PostgreSQL 15+ & Redis 7+",
+				text: "Database and queue runtime",
+			},
+		],
+	},
+	{
+		icon: "globe",
+		title: "Domain & Subdomains",
+		points: [
+			{
+				highlight: "app.{YOUR_DOMAIN}",
+				text: "Web Dashboard & unified API",
+			},
+			{
+				highlight: "inbound.{YOUR_DOMAIN}",
+				text: "Inbound MX mail receiving",
+			},
+			{
+				highlight: "smtp.{YOUR_DOMAIN}",
+				text: "Outbound authenticated SMTP",
+			},
+			{
+				highlight: "link.{YOUR_DOMAIN}",
+				text: "Click tracking & open pixels",
+			},
 		],
 	},
 ] as const;
@@ -128,11 +159,16 @@ export function SelfHostRequirements() {
 								<ul className="mt-2.5 space-y-1.5">
 									{req.points.map((point) => (
 										<li
-											key={point}
-											className="flex items-start gap-2 text-[13px] text-text-sub-600 leading-relaxed dark:text-white/60"
+											key={point.highlight}
+											className="flex items-start gap-2 text-[13px] leading-relaxed"
 										>
 											<span className="mt-2 size-1 shrink-0 rounded-full bg-text-sub-600/60 dark:bg-white/40" />
-											<span>{point}</span>
+											<span className="text-text-sub-600 dark:text-white/60">
+												<strong className="font-medium text-text-strong-950 dark:text-white">
+													{point.highlight}:
+												</strong>{" "}
+												{point.text}
+											</span>
 										</li>
 									))}
 								</ul>

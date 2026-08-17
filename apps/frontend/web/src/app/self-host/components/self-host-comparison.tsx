@@ -110,12 +110,12 @@ const CATEGORIES: ComparisonCategory[] = [
 			},
 			{
 				label: "High-Availability Multi-Region SLA",
-				selfHost: "Configurable by your team",
+				selfHost: "—",
 				cloud: "99.99% Guaranteed SLA",
 			},
 			{
 				label: "Automatic Updates & Security Patches",
-				selfHost: "Git pull / Docker update",
+				selfHost: "—",
 				cloud: "Continuous zero-downtime",
 			},
 		],
