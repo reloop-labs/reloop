@@ -34,8 +34,8 @@ const platforms: {
 		title: "Twitter / X",
 		description:
 			"Product updates, tips, and community highlights. Share your Reloop success stories.",
-		href: "https://twitter.com/reloophq",
-		label: "Follow @reloophq",
+		href: "https://x.com/reloop_labs",
+		label: "Follow @reloop_labs",
 		icon: siX,
 		iconClassName: "fill-[#0a0a0a] dark:fill-white",
 		gridClass: "col-start-3 row-start-2 sm:-translate-x-2",

@@ -133,7 +133,12 @@ const columns: FooterColumn[] = [
 				href: "https://github.com/reloop-labs/reloop",
 				external: true,
 			},
-			{ title: "X", href: "https://x.com/reloophq", external: true },
+			{ title: "X", href: "https://x.com/reloop_labs", external: true },
+			{
+				title: "LinkedIn",
+				href: "https://www.linkedin.com/company/reloop-labs",
+				external: true,
+			},
 			{
 				title: "Discord",
 				href: "https://discord.gg/bHnkBcp7xR",

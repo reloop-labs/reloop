@@ -12,7 +12,8 @@ export const socialProfiles = {
 	docs: "https://reloop.sh/docs",
 	github: "https://github.com/reloop-labs/reloop",
 	discord: "https://discord.gg/bHnkBcp7xR",
-	x: "https://x.com/reloophq",
+	x: "https://x.com/reloop_labs",
+	linkedin: "https://www.linkedin.com/company/reloop-labs",
 } as const;
 
 function isLocalDevOrigin(url: string): boolean {

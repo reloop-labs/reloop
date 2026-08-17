@@ -255,7 +255,7 @@ export const Footer = () => {
 							<Icon name="github" className="size-4" />
 						</a>
 						<a
-							href="https://x.com/reloophq"
+							href="https://x.com/reloop_labs"
 							target="_blank"
 							rel="noreferrer"
 							className="flex w-12 items-center justify-center border-stroke-soft-200 border-l transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 sm:w-14 dark:border-white/10 dark:hover:bg-white/[0.04] dark:hover:text-white"
@@ -264,7 +264,7 @@ export const Footer = () => {
 							<Icon name="twitter" className="size-4" />
 						</a>
 						<a
-							href="https://linkedin.com/company/reloop"
+							href="https://www.linkedin.com/company/reloop-labs"
 							target="_blank"
 							rel="noreferrer"
 							className="flex w-12 items-center justify-center border-stroke-soft-200 border-l transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 sm:w-14 dark:border-white/10 dark:hover:bg-white/[0.04] dark:hover:text-white"

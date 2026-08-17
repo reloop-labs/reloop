@@ -14,6 +14,7 @@ export const socialProfiles = {
 	github: "https://github.com/reloop-labs/reloop",
 	discord: "https://discord.gg/bHnkBcp7xR",
 	x: "https://x.com/reloop_labs",
+	linkedin: "https://www.linkedin.com/company/reloop-labs",
 } as const;
 
 /** Production marketing origin used in canonicals, sitemaps, and JSON-LD. */
