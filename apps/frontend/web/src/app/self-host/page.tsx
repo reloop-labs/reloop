@@ -7,6 +7,7 @@ import { SectionSeparator } from "../(home)/components/section-separator";
 import { SelfHostComparison } from "./components/self-host-comparison";
 import { SelfHostFaq } from "./components/self-host-faq";
 import { SelfHostHero } from "./components/self-host-hero";
+import { SelfHostProviders } from "./components/self-host-providers";
 
 // TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
 export const instant = false;
@@ -73,6 +74,8 @@ export default function SelfHostPage() {
 					title="What Reloop Gives You"
 					description="Full-featured email infrastructure with open-source sovereignty and zero vendor lock-in."
 				/>
+				<SectionSeparator />
+				<SelfHostProviders />
 				<SectionSeparator />
 				<SelfHostComparison />
 				<SectionSeparator />
