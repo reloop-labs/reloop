@@ -62,9 +62,7 @@ export function Sidebar({
 }: SidebarProps) {
 	const clientPathname = usePathname();
 	const pathname = normalizeDocsPathname(propPathname || clientPathname || "");
-	const gradientFromClass = isMobile
-		? "from-bg-white-0 dark:from-[#0a0a0a]"
-		: "from-bg-weak-50 dark:from-black";
+	const gradientFromClass = "from-sidebar to-transparent";
 	const activeTab =
 		navigationTabs.find((tab) => {
 			if (tab.url === "/") {
