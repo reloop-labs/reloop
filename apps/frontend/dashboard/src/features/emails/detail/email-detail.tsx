@@ -191,7 +191,7 @@ function classifyError(msg: string): ErrorClassification {
 	// Generic fallback
 	return {
 		category: "Delivery Error",
-		summary: "Email delivery failed — check technical details below.",
+		summary: "Email delivery failed.",
 		fixes: [
 			"Verify SMTP host, port & credentials",
 			"Confirm recipient address is valid",
@@ -452,7 +452,6 @@ function CopyButton({ value, label }: { value: string; label?: string }) {
 }
 
 function ErrorDetailsPanel({ errorMessage }: { errorMessage: string }) {
-	const [showRaw, setShowRaw] = useState(false);
 	const { summary } = classifyError(errorMessage);
 
 	return (
@@ -475,46 +474,15 @@ function ErrorDetailsPanel({ errorMessage }: { errorMessage: string }) {
 							{summary}
 						</span>
 					</div>
-					<button
-						type="button"
-						onClick={() => setShowRaw((v) => !v)}
-						className="flex flex-shrink-0 cursor-pointer items-center gap-1 font-semibold text-text-soft-400 text-xs transition-colors hover:text-text-strong-950"
-					>
-						<span>{showRaw ? "Hide details" : "Technical details"}</span>
-						<motion.div
-							animate={{ rotate: showRaw ? 180 : 0 }}
-							transition={{ duration: 0.2 }}
-							className="flex items-center justify-center"
-						>
-							<Icon
-								name="chevron-down"
-								className="h-3 w-3 text-text-soft-400"
-							/>
-						</motion.div>
-					</button>
+					<CopyButton value={errorMessage} label="Error details" />
 				</div>
 
-				{/* Expanded details - inside the same container! */}
-				<AnimatePresence initial={false}>
-					{showRaw && (
-						<motion.div
-							initial={{ height: 0, opacity: 0 }}
-							animate={{ height: "auto", opacity: 1 }}
-							exit={{ height: 0, opacity: 0 }}
-							transition={{ duration: 0.2, ease: "easeInOut" }}
-							className="overflow-hidden"
-						>
-							<div className="relative border-error-light/20 border-t bg-bg-weak-50/30 p-3.5 dark:bg-bg-weak-50/5">
-								<div className="absolute top-3 right-3 z-10">
-									<CopyButton value={errorMessage} label="Error details" />
-								</div>
-								<pre className="overflow-x-auto whitespace-pre-wrap break-all pr-8 text-error-base text-sm leading-relaxed">
-									{errorMessage}
-								</pre>
-							</div>
-						</motion.div>
-					)}
-				</AnimatePresence>
+				{/* Error details content - always visible */}
+				<div className="relative border-error-light/20 border-t bg-bg-weak-50/30 p-3.5 dark:bg-bg-weak-50/5">
+					<pre className="overflow-x-auto whitespace-pre-wrap break-all font-mono text-error-base text-xs leading-relaxed">
+						{errorMessage}
+					</pre>
+				</div>
 			</div>
 		</section>
 	);
