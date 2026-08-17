@@ -1,9 +1,9 @@
 "use client";
 
 import { cn } from "@reloop/ui/cn";
-import { KbdKey } from "@reloop/ui/kbd-key";
 import { motion } from "framer-motion";
 import { type RefObject, useState } from "react";
+import { ActionKbd } from "../../domain/_shared/action-kbd";
 
 const easing = [0.4, 0, 0.2, 1] as const;
 const transition = { duration: 0.22, ease: easing };
@@ -77,9 +77,9 @@ export function AnimatedBackButton({
 				)}
 
 				{showEscKey && (
-					<KbdKey className="lowercase! w-auto min-w-0 px-1 font-sans text-[10px]">
+					<ActionKbd className="lowercase! w-auto min-w-0 px-1 font-sans text-[10px]">
 						esc
-					</KbdKey>
+					</ActionKbd>
 				)}
 			</motion.div>
 		</motion.button>

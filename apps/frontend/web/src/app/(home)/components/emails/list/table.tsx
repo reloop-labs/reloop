@@ -18,6 +18,9 @@ import { PAGE_EASE } from "../../domain/_shared/page-motion";
 
 const FOOTER_DELAY = 0.62;
 const FOOTER_DURATION = 0.38;
+const LIVE_INSERT_DURATION = 0.82;
+const LIVE_LAYOUT_DURATION = 0.78;
+const ROW_LAYOUT_DURATION = 0.78;
 
 export function EmailsListTable({
 	emails,
@@ -96,8 +99,8 @@ export function EmailsListTable({
 										? {
 												opacity: 0,
 												height: 0,
-												y: -16,
-												filter: "blur(3px)",
+												y: -22,
+												filter: "blur(4px)",
 											}
 										: { opacity: 1, height: "auto" }
 								}
@@ -112,19 +115,41 @@ export function EmailsListTable({
 									height: 0,
 									y: 10,
 									filter: "blur(2px)",
-									transition: { duration: 0.35, ease: PAGE_EASE },
+									transition: { duration: 0.42, ease: PAGE_EASE },
 								}}
 								transition={
 									isLive
 										? {
-												duration: 0.42,
-												ease: PAGE_EASE,
-												layout: { duration: 0.45, ease: PAGE_EASE },
+												height: {
+													duration: LIVE_INSERT_DURATION,
+													ease: PAGE_EASE,
+												},
+												y: {
+													duration: LIVE_INSERT_DURATION,
+													ease: PAGE_EASE,
+												},
+												opacity: {
+													duration: 0.58,
+													delay: 0.16,
+													ease: PAGE_EASE,
+												},
+												filter: {
+													duration: 0.58,
+													delay: 0.16,
+													ease: PAGE_EASE,
+												},
+												layout: {
+													duration: LIVE_LAYOUT_DURATION,
+													ease: PAGE_EASE,
+												},
 											}
 										: {
 												duration: 0.3,
 												ease: PAGE_EASE,
-												layout: { duration: 0.45, ease: PAGE_EASE },
+												layout: {
+													duration: ROW_LAYOUT_DURATION,
+													ease: PAGE_EASE,
+												},
 											}
 								}
 								style={{ overflow: "hidden" }}
@@ -256,7 +281,7 @@ export function EmailsListTable({
 						duration: FOOTER_DURATION,
 						delay: FOOTER_DELAY,
 						ease: PAGE_EASE,
-						layout: { duration: 0.45, ease: PAGE_EASE },
+						layout: { duration: ROW_LAYOUT_DURATION, ease: PAGE_EASE },
 					}}
 				>
 					<div className="flex items-center gap-3">

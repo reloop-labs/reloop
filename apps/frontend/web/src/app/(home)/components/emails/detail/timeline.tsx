@@ -2,73 +2,125 @@
 
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
+import { motion, useReducedMotion } from "framer-motion";
+import { Fragment, useEffect, useState } from "react";
+import { PAGE_EASE } from "../../domain/_shared/page-motion";
 
-export interface TimelineStepData {
-	id: "sent" | "delivered" | "opened" | "clicked" | "failed";
-	label: string;
-	icon: string;
-	timestamp?: string;
+const SUCCESS_STEPS = [
+	{ id: "sent", label: "Sent", icon: "send-1" },
+	{ id: "delivered", label: "Delivered", icon: "check-circle" },
+	{ id: "opened", label: "Opened", icon: "eye-outline" },
+	{ id: "clicked", label: "Clicked", icon: "cursor-click" },
+] as const;
+
+const FAILED_STEPS = [
+	{ id: "sent", label: "Sent", icon: "send-1" },
+	{ id: "failed", label: "Failed", icon: "cross-circle" },
+] as const;
+
+const COMPLETED_AT: Record<string, string> = {
+	sent: "17 Aug, 6:24pm",
+	delivered: "17 Aug, 6:24pm",
+	opened: "17 Aug, 6:25pm",
+	clicked: "17 Aug, 6:25pm",
+	failed: "17 Aug, 6:24pm",
+	bounced: "17 Aug, 6:24pm",
+};
+
+function completedThrough(status: string): number {
+	switch (status.toLowerCase()) {
+		case "clicked":
+			return 3;
+		case "opened":
+			return 2;
+		case "delivered":
+			return 1;
+		case "sent":
+			return 0;
+		default:
+			return 0;
+	}
 }
 
-const DEFAULT_TIMELINE_STEPS: TimelineStepData[] = [
-	{
-		id: "sent",
-		label: "Sent",
-		icon: "send-1",
-		timestamp: "17 Aug, 6:24pm",
-	},
-	{
-		id: "delivered",
-		label: "Delivered",
-		icon: "check-circle",
-		timestamp: "17 Aug, 6:24pm",
-	},
-	{
-		id: "opened",
-		label: "Opened",
-		icon: "eye-outline",
-		timestamp: "17 Aug, 6:25pm",
-	},
-	{
-		id: "clicked",
-		label: "Clicked",
-		icon: "cursor-click",
-		timestamp: "17 Aug, 6:25pm",
-	},
-];
+const STEP_STAGGER = 0.09;
+const LIGHT_BASE_MS = 280;
+const LIGHT_STAGGER_MS = 220;
 
-export function EmailTimeline({ status = "opened" }: { status?: string }) {
-	const currentStepIndex = (() => {
-		switch (status.toLowerCase()) {
-			case "clicked":
-				return 3;
-			case "opened":
-				return 2;
-			case "delivered":
-				return 1;
-			case "sent":
-			default:
-				return 0;
+export function EmailTimeline({
+	status = "opened",
+	mounted = true,
+}: {
+	status?: string;
+	mounted?: boolean;
+}) {
+	const reduceMotion = useReducedMotion();
+	const normalized = status.toLowerCase();
+	const isFailed =
+		normalized === "failed" ||
+		normalized === "bounced" ||
+		normalized === "spam";
+	const steps = isFailed ? FAILED_STEPS : SUCCESS_STEPS;
+	const currentStepIndex = isFailed ? 1 : completedThrough(normalized);
+	const [litThrough, setLitThrough] = useState(
+		reduceMotion ? currentStepIndex : -1,
+	);
+
+	useEffect(() => {
+		if (reduceMotion) {
+			setLitThrough(currentStepIndex);
+			return;
 		}
-	})();
+
+		if (!mounted) {
+			setLitThrough(-1);
+			return;
+		}
+
+		setLitThrough(-1);
+		const timers: number[] = [];
+		for (let i = 0; i <= currentStepIndex; i++) {
+			timers.push(
+				window.setTimeout(
+					() => {
+						setLitThrough(i);
+					},
+					LIGHT_BASE_MS + i * LIGHT_STAGGER_MS,
+				),
+			);
+		}
+
+		return () => {
+			for (const id of timers) window.clearTimeout(id);
+		};
+	}, [currentStepIndex, mounted, reduceMotion]);
 
 	return (
-		<div className="relative flex h-[176px] w-full items-center justify-start rounded-3xl border border-stroke-soft-100 bg-bg-white-0 px-8 pt-6 pb-5 transition-all hover:border-stroke-soft-200 dark:border-stroke-soft-100/50 dark:bg-bg-white-0/5">
-			<div className="flex w-full max-w-2xl items-start justify-between">
-				{DEFAULT_TIMELINE_STEPS.map((step, idx) => {
-					const isCompleted = idx <= currentStepIndex;
-					const hasNext = idx < DEFAULT_TIMELINE_STEPS.length - 1;
-					const nextIsCompleted = idx + 1 <= currentStepIndex;
+		<div className="relative flex h-[176px] w-full items-center justify-start overflow-x-auto rounded-3xl border border-stroke-soft-100 bg-bg-white-0 px-8 pt-6 pb-5 transition-all hover:border-stroke-soft-200 dark:border-stroke-soft-100/50 dark:bg-bg-white-0/5">
+			<div
+				className={cn(
+					"flex items-start",
+					isFailed
+						? "w-64 justify-between"
+						: "w-full min-w-[520px] max-w-2xl justify-between",
+				)}
+			>
+				{steps.map((step, index) => {
+					const isCompleted = index <= litThrough;
+					const timestamp = isCompleted
+						? (COMPLETED_AT[step.id] ?? COMPLETED_AT.sent)
+						: undefined;
 
 					const getIconStyles = () => {
 						if (!isCompleted) {
-							return "border-stroke-soft-200 bg-bg-weak-50 text-text-sub-600 dark:border-stroke-soft-100/40 dark:bg-neutral-900";
+							return "border-stroke-soft-200 bg-bg-weak-50 text-text-sub-600 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-400";
 						}
 						switch (step.id) {
 							case "sent":
-								return "border-information-base/20 bg-information-lighter/50 text-information-base dark:bg-information-lighter/20";
+								return "border-information-base/20 bg-information-lighter/50 text-information-base";
+							case "failed":
+								return "border-error-light bg-error-lighter text-error-base";
 							case "delivered":
-								return "border-success-base/20 bg-success-lighter/50 text-success-base dark:bg-success-lighter/20";
+								return "border-success-base/20 bg-success-lighter/50 text-success-base";
 							case "opened":
 								return "border-orange-500/20 bg-orange-50/50 text-orange-600 dark:bg-orange-950/30 dark:text-orange-400";
 							case "clicked":
@@ -80,13 +132,15 @@ export function EmailTimeline({ status = "opened" }: { status?: string }) {
 
 					const getBadgeStyles = () => {
 						if (!isCompleted) {
-							return "bg-bg-weak-50 text-text-sub-600 dark:bg-neutral-900";
+							return "bg-bg-weak-50 text-text-sub-600 dark:bg-neutral-900 dark:text-neutral-400";
 						}
 						switch (step.id) {
 							case "sent":
-								return "bg-information-lighter text-information-base dark:bg-information-lighter/20";
+								return "bg-information-lighter text-information-base";
+							case "failed":
+								return "bg-error-lighter text-error-base";
 							case "delivered":
-								return "bg-success-lighter text-success-base dark:bg-success-lighter/20";
+								return "bg-success-lighter text-success-base";
 							case "opened":
 								return "bg-orange-50 text-orange-600 dark:bg-orange-950/40 dark:text-orange-400";
 							case "clicked":
@@ -96,51 +150,91 @@ export function EmailTimeline({ status = "opened" }: { status?: string }) {
 						}
 					};
 
-					return (
-						<div
-							key={step.id}
-							className="relative flex flex-1 flex-col items-center last:flex-none"
+					const nodeBody = (
+						<motion.div
+							className="flex flex-col items-center gap-2"
+							initial={
+								reduceMotion
+									? false
+									: { opacity: 0, y: 10, scale: 0.96, filter: "blur(3px)" }
+							}
+							animate={
+								mounted
+									? { opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }
+									: { opacity: 0, y: 10, scale: 0.96, filter: "blur(3px)" }
+							}
+							transition={{
+								duration: 0.52,
+								delay: 0.08 + index * STEP_STAGGER,
+								ease: PAGE_EASE,
+							}}
+							style={{ willChange: "transform, opacity, filter" }}
 						>
-							{/* Connecting Flow Edge */}
-							{hasNext && (
-								<div className="-z-0 -translate-y-1/2 absolute top-5 left-1/2 h-[1.5px] w-full bg-stroke-soft-200 dark:bg-stroke-soft-100/40">
-									<div
-										className={cn(
-											"h-full transition-all duration-300",
-											nextIsCompleted ? "bg-primary-base" : "bg-transparent",
-										)}
-									/>
-								</div>
-							)}
+							<div
+								className={cn(
+									"flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] border transition-all duration-300",
+									getIconStyles(),
+								)}
+							>
+								<Icon name={step.icon} className="h-5 w-5" />
+							</div>
 
-							{/* Icon Node */}
-							<div className="relative z-10 flex flex-col items-center gap-2">
-								<div
+							<div className="flex flex-col items-center gap-1 text-center">
+								<span
 									className={cn(
-										"flex h-10 w-10 items-center justify-center rounded-[10px] border transition-all duration-300",
-										getIconStyles(),
+										"rounded-md px-2 py-1 font-semibold text-xs transition-colors duration-300",
+										getBadgeStyles(),
 									)}
 								>
-									<Icon name={step.icon} className="h-5 w-5" />
-								</div>
-
-								<div className="flex flex-col items-center text-center">
-									<span
-										className={cn(
-											"rounded-md px-2 py-1 font-semibold text-xs transition-colors duration-300",
-											getBadgeStyles(),
-										)}
-									>
-										{step.label}
-									</span>
-									{isCompleted && step.timestamp && (
-										<span className="mt-1 font-mono text-[11px] text-text-sub-600">
-											{step.timestamp}
-										</span>
+									{step.label}
+								</span>
+								<div className="flex h-4 items-center justify-center">
+									{isCompleted && timestamp ? (
+										<motion.span
+											key={timestamp}
+											initial={
+												reduceMotion
+													? false
+													: { opacity: 0, y: 4, filter: "blur(2px)" }
+											}
+											animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+											transition={{ duration: 0.32, ease: PAGE_EASE }}
+											className="whitespace-nowrap font-medium text-text-soft-400 text-xs"
+										>
+											{timestamp}
+										</motion.span>
+									) : (
+										<span className="h-4 w-16 opacity-0" aria-hidden="true" />
 									)}
 								</div>
 							</div>
-						</div>
+						</motion.div>
+					);
+
+					return (
+						<Fragment key={step.id}>
+							<div className="flex min-w-[90px] flex-col items-center">
+								<div className="group flex flex-col items-center">
+									{nodeBody}
+								</div>
+							</div>
+							{index < steps.length - 1 && (
+								<motion.div
+									className="mt-5 h-0 flex-1 origin-left border-stroke-soft-100 border-t-[1.5px] border-dashed dark:border-neutral-800"
+									initial={reduceMotion ? false : { opacity: 0, scaleX: 0.4 }}
+									animate={
+										mounted
+											? { opacity: 1, scaleX: 1 }
+											: { opacity: 0, scaleX: 0.4 }
+									}
+									transition={{
+										duration: 0.48,
+										delay: 0.16 + index * STEP_STAGGER,
+										ease: PAGE_EASE,
+									}}
+								/>
+							)}
+						</Fragment>
 					);
 				})}
 			</div>

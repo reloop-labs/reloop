@@ -8,16 +8,41 @@ import {
 	useReducedMotion,
 } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
+import {
+	PAGE_EASE,
+	PAGE_TRANSITION_MS,
+	stageVariants,
+} from "../domain/_shared/page-motion";
 import { HeroDemoCursor } from "../hero-demo-cursor";
 import { useHeroDemoPlayback } from "../hero-demo-playback";
 import {
 	type EmailItem,
-	INITIAL_EMAILS,
 	INCOMING_STREAM_POOL,
+	INITIAL_EMAILS,
 } from "./_shared/data";
-import { PAGE_EASE, PAGE_TRANSITION_MS, stageVariants } from "../domain/_shared/page-motion";
+import { type DetailTabId, EmailDetailPage } from "./detail/page";
 import { EmailsListPage } from "./list/page";
-import { EmailDetailPage } from "./detail/page";
+
+const DETAIL_TABS: { id: DetailTabId; dwell: number }[] = [
+	{ id: "preview", dwell: 1600 },
+	{ id: "plain", dwell: 1400 },
+	{ id: "html", dwell: 1400 },
+	{ id: "raw", dwell: 1400 },
+	{ id: "insights", dwell: 1800 },
+];
+
+function shuffleTabs<T>(items: T[]): T[] {
+	const next = [...items];
+	for (let i = next.length - 1; i > 0; i -= 1) {
+		const j = Math.floor(Math.random() * (i + 1));
+		const current = next[i];
+		const swap = next[j];
+		if (current === undefined || swap === undefined) continue;
+		next[i] = swap;
+		next[j] = current;
+	}
+	return next;
+}
 
 function pointIn(
 	container: HTMLElement,
@@ -46,15 +71,22 @@ export function HeroEmailsPreview() {
 	const [emails, setEmails] = useState<EmailItem[]>(INITIAL_EMAILS);
 	const [highlightedId, setHighlightedId] = useState<string | null>(null);
 	const [view, setView] = useState<"list" | "detail">("list");
-	const [selectedEmail, setSelectedEmail] = useState<EmailItem>(INITIAL_EMAILS[0]!);
+	const [selectedEmail, setSelectedEmail] = useState<EmailItem>(
+		INITIAL_EMAILS[0]!,
+	);
 	const [isRowPressed, setIsRowPressed] = useState(false);
 	const [detailTab, setDetailTab] = useState("preview");
 
 	const containerRef = useRef<HTMLDivElement>(null);
 	const targetRowRef = useRef<HTMLDivElement>(null);
 	const backBtnRef = useRef<HTMLButtonElement>(null);
-	const tabInsightsRef = useRef<HTMLButtonElement>(null);
-	const tabPreviewRef = useRef<HTMLButtonElement>(null);
+	const tabRefs = useRef<Record<DetailTabId, HTMLButtonElement | null>>({
+		preview: null,
+		plain: null,
+		html: null,
+		raw: null,
+		insights: null,
+	});
 
 	const inViewRef = useRef(true);
 	const isInitialMountRef = useRef(true);
@@ -141,8 +173,8 @@ export function HeroEmailsPreview() {
 
 			setTimeout(() => {
 				setHighlightedId((current) => (current === newId ? null : current));
-			}, 1200);
-		}, 2200);
+			}, 2200);
+		}, 4000);
 
 		return () => clearInterval(interval);
 	}, [reduceMotion, view]);
@@ -319,29 +351,24 @@ export function HeroEmailsPreview() {
 			await sleep(PAGE_TRANSITION_MS);
 			if (cancelled) return;
 
-			// Explore Detail View: Move to Security & Insights tab
-			await sleep(600);
-			if (cancelled) return;
-			await moveTo(() => tabInsightsRef.current);
-			if (cancelled) return;
-			await sleep(180);
-			await click();
-			setDetailTab("insights");
-
-			// Stay on insights for 2.2s
-			await sleep(2200);
+			await sleep(700);
 			if (cancelled) return;
 
-			// Move back to Preview tab
-			await moveTo(() => tabPreviewRef.current);
-			if (cancelled) return;
-			await sleep(180);
-			await click();
-			setDetailTab("preview");
-
-			// Stay on preview card for 2.4s
-			await sleep(2400);
-			if (cancelled) return;
+			const tour = shuffleTabs(DETAIL_TABS);
+			let current = "preview";
+			for (const tab of tour) {
+				if (cancelled) return;
+				await moveTo(() => tabRefs.current[tab.id]);
+				if (cancelled) return;
+				await sleep(160);
+				if (current !== tab.id) {
+					await click();
+					setDetailTab(tab.id);
+					current = tab.id;
+				}
+				await sleep(tab.dwell);
+				if (cancelled) return;
+			}
 
 			// Move to Back button
 			await moveTo(() => backBtnRef.current);
@@ -436,8 +463,7 @@ export function HeroEmailsPreview() {
 							email={selectedEmail}
 							onBack={handleBack}
 							backButtonRef={backBtnRef}
-							tabPreviewRef={tabPreviewRef}
-							tabInsightsRef={tabInsightsRef}
+							tabRefs={tabRefs}
 							activeTab={detailTab}
 							onTabChange={setDetailTab}
 						/>
