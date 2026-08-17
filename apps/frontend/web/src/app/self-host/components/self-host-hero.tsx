@@ -1,18 +1,23 @@
 "use client";
 
 import { cn } from "@reloop/ui/cn";
-import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { hostedSignupHref } from "@reloop/web/lib/site";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import Link from "next/link";
 import { useCallback, useId, useState } from "react";
-import { HeroAtmosphere, HeroWindowChrome } from "./hero-chrome";
+import {
+	HeroAtmosphere,
+	HeroWindowChrome,
+} from "../../(home)/components/hero-chrome";
 import {
 	HeroDemoPlaybackButton,
 	HeroDemoPlaybackProvider,
-} from "./hero-demo-playback";
-import { HeroPreview, type HeroTabId } from "./hero-preview";
+} from "../../(home)/components/hero-demo-playback";
+import {
+	HeroPreview,
+	type HeroTabId,
+} from "../../(home)/components/hero-preview";
 
 const TABS: {
 	id: HeroTabId;
@@ -26,6 +31,18 @@ const TABS: {
 		icon: "activity" | "layout" | "globe" | "server" | "headset";
 	};
 }[] = [
+	{
+		id: "cloud",
+		title: "Infrastructure",
+		description: "Self-host on your own hardware or cloud VPS.",
+		cloud: true,
+		banner: {
+			title: "Infrastructure",
+			description: "Self-host or run on Reloop Cloud.",
+			href: "/self-host",
+			icon: "server",
+		},
+	},
 	{
 		id: "analytics",
 		title: "Analytics",
@@ -60,18 +77,6 @@ const TABS: {
 		},
 	},
 	{
-		id: "cloud",
-		title: "Infrastructure",
-		description: "Push from GitHub to the fastest infrastructure.",
-		cloud: true,
-		banner: {
-			title: "Infrastructure",
-			description: "Self-host or run on Reloop Cloud.",
-			href: "/self-host",
-			icon: "server",
-		},
-	},
-	{
 		id: "agents",
 		title: "Agent Inbox",
 		description: "MCP, CLI, Skills, and Agent Previews.",
@@ -87,10 +92,12 @@ const TABS: {
 
 const EASE_OUT: [number, number, number, number] = [0.23, 1, 0.32, 1];
 
-export default function Hero() {
-	const [active, setActive] = useState<HeroTabId>("analytics");
+export function SelfHostHero() {
+	const [active, setActive] = useState<HeroTabId>("cloud");
 	const reduceMotion = useReducedMotion();
 	const tablistId = useId();
+	const [copied, setCopied] = useState(false);
+	const command = "curl -fsSL https://reloop.sh/install.sh | bash";
 
 	const selectByOffset = useCallback((offset: number) => {
 		setActive((current) => {
@@ -100,13 +107,11 @@ export default function Hero() {
 		});
 	}, []);
 
-	const [copiedCommand, setCopiedCommand] = useState(false);
-
-	const handleCopyCommand = async () => {
+	const handleCopy = async () => {
 		try {
-			await navigator.clipboard.writeText("npx getopen init");
-			setCopiedCommand(true);
-			window.setTimeout(() => setCopiedCommand(false), 2000);
+			await navigator.clipboard.writeText(command);
+			setCopied(true);
+			setTimeout(() => setCopied(false), 2000);
 		} catch {
 			// ignore
 		}
@@ -117,57 +122,42 @@ export default function Hero() {
 			id="features"
 			className="relative flex min-h-dvh flex-col bg-transparent pt-40 sm:pt-48 lg:pt-56"
 		>
+			{/* Top Hero Centered Title & Curl Pill Button */}
 			<div className="relative mx-auto flex w-full max-w-5xl flex-col items-center px-6 text-center sm:px-8 md:max-w-7xl lg:px-12">
 				<h1 className="max-w-4xl text-center font-medium text-[2.5rem] text-text-strong-950 leading-[1.02] tracking-[-0.045em] sm:text-[3.5rem] lg:text-[4.25rem] dark:text-white">
-					Email API for Developers
+					Self-Host Reloop
 					<br />
-					With agent inboxes built in
+					On your own server
 				</h1>
-				<p className="mt-5 max-w-[52rem] text-center text-[15px] text-text-sub-600 leading-relaxed sm:mt-6 sm:text-[17px] dark:text-white/55">
-					Open-source email infrastructure on GitHub. Extend, customize, and own
-					every email workflow.
-				</p>
-				<div className="mt-6 flex flex-wrap items-center justify-center gap-3 sm:mt-7">
-					<FancyButton.Root asChild variant="neutral" size="small">
-						<a href={hostedSignupHref}>Start Building</a>
-					</FancyButton.Root>
-					<FancyButton.Root asChild variant="basic" size="small">
-						<a href="/docs">Documentation</a>
-					</FancyButton.Root>
-				</div>
 
-				<div className="mt-8 w-full max-w-2xl rounded-xl border border-stroke-soft-200 bg-[#121214] p-4 text-left font-mono text-[13px] shadow-sm sm:mt-10 sm:px-5 sm:py-4 sm:text-sm dark:border-white/10">
-					<p className="text-zinc-400 leading-relaxed">
-						<span className="text-zinc-500"># </span>
-						<span>The self-hosted version is ready on your server in under a minute – </span>
-						<span className="text-amber-300/90 dark:text-amber-300/90">
-							always free, with all functionalities.
+				{/* Quick Install Pill Button */}
+				<div className="mt-8 flex flex-col items-center gap-2.5 sm:mt-10">
+					<button
+						type="button"
+						onClick={handleCopy}
+						className="group inline-flex items-center gap-2.5 rounded-full border border-stroke-soft-200 bg-bg-weak-50/80 px-4 py-2 font-mono text-[13px] text-text-sub-600 transition-all hover:border-stroke-soft-300 hover:bg-bg-weak-100 hover:text-text-strong-950 dark:border-white/10 dark:bg-white/5 dark:text-white/70 dark:hover:border-white/20 dark:hover:bg-white/10 dark:hover:text-white"
+					>
+						<span className="select-none font-semibold text-blue-600 dark:text-blue-400">
+							$
 						</span>
-					</p>
-					<div className="mt-2.5 flex items-center justify-between gap-4 sm:mt-3">
-						<div className="flex items-center gap-2.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-							<span className="select-none text-zinc-500">&gt;</span>
-							<code className="text-zinc-100">npx getopen init</code>
-						</div>
-						<button
-							type="button"
-							onClick={handleCopyCommand}
-							aria-label="Copy command"
-							className="inline-flex size-8 shrink-0 items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-white/10 hover:text-white"
-						>
-							{copiedCommand ? (
+						<span className="text-text-strong-950 dark:text-white">
+							{command}
+						</span>
+						<span className="ml-1 text-text-soft-400 transition-colors group-hover:text-text-strong-950 dark:text-white/40 dark:group-hover:text-white">
+							{copied ? (
 								<Icon
 									name="check"
-									className="size-4 text-emerald-400"
+									className="h-3.5 w-3.5 text-green-600 dark:text-green-400"
 								/>
 							) : (
-								<Icon name="copy" className="size-4" />
+								<Icon name="copy" className="h-3.5 w-3.5" />
 							)}
-						</button>
-					</div>
+						</span>
+					</button>
 				</div>
 			</div>
 
+			{/* Interactive Tabs Bar */}
 			<div className="relative mx-auto mt-8 w-full max-w-5xl flex-1 flex-col border-stroke-soft-200 border-x sm:mt-10 md:max-w-7xl dark:border-white/10">
 				<div
 					role="tablist"
@@ -215,7 +205,7 @@ export default function Hero() {
 									</span>
 									{tab.cloud && (
 										<span className="inline-flex items-center rounded-full bg-bg-weak-50 px-1.5 py-0.5 font-medium text-[10px] text-text-sub-600 leading-none dark:bg-white/[0.08] dark:text-white/55">
-											Cloud
+											Self-Host
 										</span>
 									)}
 								</span>
@@ -231,7 +221,7 @@ export default function Hero() {
 								</span>
 								{selected && (
 									<motion.span
-										layoutId={reduceMotion ? undefined : "hero-tab-underline"}
+										layoutId={reduceMotion ? undefined : "self-host-hero-tab-underline"}
 										className="absolute right-0 bottom-0 left-0 h-[2px] bg-text-strong-950 dark:bg-white"
 										transition={
 											reduceMotion
@@ -246,6 +236,7 @@ export default function Hero() {
 				</div>
 			</div>
 
+			{/* Interactive Animated Preview Window */}
 			<div className="relative w-full flex-1 overflow-hidden bg-bg-white-0 dark:bg-black">
 				<HeroAtmosphere />
 				<div
@@ -282,7 +273,7 @@ export default function Hero() {
 									<HeroPreview tab={active} />
 								</motion.div>
 							</AnimatePresence>
-							<HeroTabBanner
+							<SelfHostHeroTabBanner
 								tabId={active}
 								reduceMotion={Boolean(reduceMotion)}
 							/>
@@ -294,7 +285,7 @@ export default function Hero() {
 	);
 }
 
-function HeroTabBanner({
+function SelfHostHeroTabBanner({
 	tabId,
 	reduceMotion,
 }: {

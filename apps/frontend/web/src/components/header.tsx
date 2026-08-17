@@ -781,7 +781,7 @@ const navItems: NavItem[] = [
 						},
 						{
 							title: "Self-host",
-							href: "/docs/self-host",
+							href: "/self-host",
 							icon: "server",
 						},
 					],

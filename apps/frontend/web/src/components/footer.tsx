@@ -42,7 +42,7 @@ const columns: FooterColumn[] = [
 			{ title: "Documentation", href: "/docs" },
 			{ title: "API Reference", href: "/docs/api" },
 			{ title: "Webhooks", href: "/docs/webhooks" },
-			{ title: "Self-host", href: "/docs/self-host" },
+			{ title: "Self-host", href: "/self-host" },
 			{ title: "SMTP", href: "/docs/examples/smtp/introduction" },
 			{ title: "Integrations", href: "/docs/integrations" },
 		],
