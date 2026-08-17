@@ -6,20 +6,29 @@ const REQUIREMENTS = [
 	{
 		icon: "shield",
 		title: "Open Cloud Ports",
-		description:
-			"Open ports 80/443 for web/API traffic, port 25 for SMTP inbound, and port 587 for submission in your cloud security group.",
+		points: [
+			"Port 80 & 443 — Web UI & REST API traffic",
+			"Port 25 — Inbound SMTP mail receiving",
+			"Port 587 — Authenticated mail submission",
+		],
 	},
 	{
 		icon: "globe",
 		title: "Domain & DNS Access",
-		description:
-			"Full control over domain DNS records to configure MX routing, SPF, DKIM, and DMARC authentication.",
+		points: [
+			"MX Records — Inbound routing to Reloop",
+			"SPF & DKIM — Cryptographic email signing",
+			"DMARC — Domain alignment & deliverability",
+		],
 	},
 	{
 		icon: "cpu",
 		title: "System Requirements",
-		description:
-			"Minimum 1 vCPU, 2 GB RAM, and Docker Engine 24.0+ with Docker Compose v2 installed on your server.",
+		points: [
+			"1–2 vCPU & 2–4 GB RAM base compute",
+			"Docker Engine 24.0+ with Docker Compose v2",
+			"PostgreSQL 15+ & Redis 7+ runtime",
+		],
 	},
 ] as const;
 
@@ -62,6 +71,32 @@ function ServerCustomIcon({ className }: { className?: string }) {
 	);
 }
 
+function CpuCustomIcon({ className }: { className?: string }) {
+	return (
+		<svg
+			viewBox="0 0 24 24"
+			fill="none"
+			className={className}
+			aria-hidden="true"
+		>
+			<path
+				opacity="0.12"
+				fillRule="evenodd"
+				clipRule="evenodd"
+				d="M20 10.4C20 8.15979 20 7.03969 19.564 6.18404C19.1805 5.43139 18.5686 4.81947 17.816 4.43597C16.9603 4 15.8402 4 13.6 4H10.4C8.15979 4 7.03969 4 6.18404 4.43597C5.43139 4.81947 4.81947 5.43139 4.43597 6.18404C4 7.03969 4 8.15979 4 10.4V13.6C4 15.8402 4 16.9603 4.43597 17.816C4.81947 18.5686 5.43139 19.1805 6.18404 19.564C7.03969 20 8.15979 20 10.4 20H13.6C15.8402 20 16.9603 20 17.816 19.564C18.5686 19.1805 19.1805 18.5686 19.564 17.816C20 16.9603 20 15.8402 20 13.6V10.4ZM9.16349 9.81901C9 10.1399 9 10.5599 9 11.4V12.6C9 13.4401 9 13.8601 9.16349 14.181C9.3073 14.4632 9.53677 14.6927 9.81901 14.8365C10.1399 15 10.5599 15 11.4 15H12.6C13.4401 15 13.8601 15 14.181 14.8365C14.4632 14.6927 14.6927 14.4632 14.8365 14.181C15 13.8601 15 13.4401 15 12.6V11.4C15 10.5599 15 10.1399 14.8365 9.81901C14.6927 9.53677 14.4632 9.3073 14.181 9.16349C13.8601 9 13.4401 9 12.6 9H11.4C10.5599 9 10.1399 9 9.81901 9.16349C9.53677 9.3073 9.3073 9.53677 9.16349 9.81901Z"
+				fill="currentColor"
+			/>
+			<path
+				d="M8 4V2M8 22V20M2 8H4M20 8H22M12 4V2M12 22V20M2 12H4M20 12H22M16 4V2M16 22V20M2 16H4M20 16H22M11.4 15H12.6C13.4401 15 13.8601 15 14.181 14.8365C14.4632 14.6927 14.6927 14.4632 14.8365 14.181C15 13.8601 15 13.4401 15 12.6V11.4C15 10.5599 15 10.1399 14.8365 9.81901C14.6927 9.53677 14.4632 9.3073 14.181 9.16349C13.8601 9 13.4401 9 12.6 9H11.4C10.5599 9 10.1399 9 9.81901 9.16349C9.53677 9.3073 9.3073 9.53677 9.16349 9.81901C9 10.1399 9 10.5599 9 11.4V12.6C9 13.4401 9 13.8601 9.16349 14.181C9.3073 14.4632 9.53677 14.6927 9.81901 14.8365C10.1399 15 10.5599 15 11.4 15ZM10.4 20H13.6C15.8402 20 16.9603 20 17.816 19.564C18.5686 19.1805 19.1805 18.5686 19.564 17.816C20 16.9603 20 15.8402 20 13.6V10.4C20 8.15979 20 7.03968 19.564 6.18404C19.1805 5.43139 18.5686 4.81947 17.816 4.43597C16.9603 4 15.8402 4 13.6 4H10.4C8.15979 4 7.03968 4 6.18404 4.43597C5.43139 4.81947 4.81947 5.43139 4.43597 6.18404C4 7.03968 4 8.15979 4 10.4V13.6C4 15.8402 4 16.9603 4.43597 17.816C4.81947 18.5686 5.43139 19.1805 6.18404 19.564C7.03968 20 8.15979 20 10.4 20Z"
+				stroke="currentColor"
+				strokeWidth="1.5"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+		</svg>
+	);
+}
+
 export function SelfHostRequirements() {
 	return (
 		<section id="requirements" className="w-full">
@@ -80,15 +115,27 @@ export function SelfHostRequirements() {
 							className="flex flex-col items-start gap-4 bg-bg-white-0 p-6 sm:p-7 dark:bg-black"
 						>
 							<span className="inline-flex size-9 items-center justify-center rounded-[10px] border border-stroke-soft-200 bg-bg-weak-50/50 text-text-strong-950 dark:border-white/10 dark:bg-white/[0.04] dark:text-white">
-								<Icon name={req.icon} className="size-4" aria-hidden />
+								{req.icon === "cpu" ? (
+									<CpuCustomIcon className="size-4" />
+								) : (
+									<Icon name={req.icon} className="size-4" aria-hidden />
+								)}
 							</span>
-							<div>
+							<div className="w-full">
 								<h3 className="font-semibold text-[15px] text-text-strong-950 dark:text-white">
 									{req.title}
 								</h3>
-								<p className="mt-1.5 text-[13px] text-text-sub-600 leading-relaxed dark:text-white/60">
-									{req.description}
-								</p>
+								<ul className="mt-2.5 space-y-1.5">
+									{req.points.map((point) => (
+										<li
+											key={point}
+											className="flex items-start gap-2 text-[13px] text-text-sub-600 leading-relaxed dark:text-white/60"
+										>
+											<span className="mt-2 size-1 shrink-0 rounded-full bg-text-sub-600/60 dark:bg-white/40" />
+											<span>{point}</span>
+										</li>
+									))}
+								</ul>
 							</div>
 						</div>
 					))}
