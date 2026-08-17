@@ -1786,7 +1786,7 @@ export const Header = () => {
 					</nav>
 
 					{/* Right — actions */}
-					<div className="relative z-10 hidden items-center gap-3 sm:gap-4 lg:flex">
+					<div className="relative z-10 hidden items-center gap-3 lg:flex">
 						<a
 							href="https://github.com/reloop-labs/reloop"
 							target="_blank"
@@ -1807,22 +1807,24 @@ export const Header = () => {
 								<a href="/dashboard">Dashboard</a>
 							</FancyButton.Root>
 						) : (
-							<>
-								<a
-									href="/dashboard/login"
-									className="font-medium text-[13px] text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/55 dark:hover:text-white"
+							<div className="flex gap-2">
+								<FancyButton.Root
+									asChild
+									variant="basic"
+									size="xsmall"
+									className="px-3.5!"
 								>
-									Log in
-								</a>
+									<a href="/dashboard/login">Sign in</a>
+								</FancyButton.Root>
 								<FancyButton.Root
 									asChild
 									variant="neutral"
 									size="xsmall"
 									className="px-3.5!"
 								>
-									<a href="/dashboard/signup">Sign up</a>
+									<a href="/dashboard/signup">Start for free</a>
 								</FancyButton.Root>
-							</>
+							</div>
 						)}
 					</div>
 
