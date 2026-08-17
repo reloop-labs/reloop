@@ -12,14 +12,43 @@ import {
 	HeroAtmosphere,
 	HeroWindowChrome,
 } from "../../(home)/components/hero-chrome";
+import { HeroDashboardShell } from "../../(home)/components/hero-dashboard-shell";
 import {
 	HeroDemoPlaybackButton,
 	HeroDemoPlaybackProvider,
 } from "../../(home)/components/hero-demo-playback";
 import {
-	HeroPreview,
+	HeroPreviewContent,
 	type HeroTabId,
-} from "../../(home)/components/hero-preview";
+} from "../../(home)/components/hero-preview-content";
+
+const TAB_TO_NAV: Record<HeroTabId, string> = {
+	overview: "emails",
+	analytics: "metrics",
+	domain: "domain",
+	workflow: "workflow",
+	templates: "templates",
+	dashboard: "emails",
+	sdk: "domain",
+	cloud: "domain",
+	agents: "inbox",
+};
+
+const NAV_TO_TAB: Record<string, HeroTabId> = {
+	emails: "overview",
+	inbox: "overview",
+	contacts: "workflow",
+	templates: "templates",
+	workflow: "workflow",
+	metrics: "analytics",
+	logs: "analytics",
+	"api-keys": "domain",
+	domain: "domain",
+	webhooks: "workflow",
+	integrations: "workflow",
+	smtp: "overview",
+	settings: "overview",
+};
 
 type InstallMethod = "curl" | "docker" | "cli";
 
@@ -161,7 +190,6 @@ export function SelfHostHero() {
 				</div>
 			</div>
 
-			{/* Product Surfaces Tabs Bar */}
 			<div className="relative mx-auto w-full max-w-5xl flex-1 flex-col border-stroke-soft-200 border-x md:max-w-7xl dark:border-white/10">
 				<div
 					role="tablist"
@@ -264,30 +292,35 @@ export function SelfHostHero() {
 						<HeroWindowChrome
 							action={active === "sdk" ? <HeroDemoPlaybackButton /> : undefined}
 						>
-							<AnimatePresence mode="wait" initial={false}>
-								<motion.div
-									key={active}
-									className="absolute inset-0"
-									initial={
-										reduceMotion
-											? { opacity: 1 }
-											: { opacity: 0, filter: "blur(2px)" }
-									}
-									animate={{ opacity: 1, filter: "blur(0px)" }}
-									exit={
-										reduceMotion
-											? { opacity: 0 }
-											: { opacity: 0, filter: "blur(2px)" }
-									}
-									transition={
-										reduceMotion
-											? { duration: 0 }
-											: { duration: 0.2, ease: EASE_OUT }
-									}
-								>
-									<HeroPreview tab={active} />
-								</motion.div>
-							</AnimatePresence>
+							<HeroDashboardShell
+								activeItem={activeNav}
+								onItemClick={handleSidebarClick}
+							>
+								<AnimatePresence mode="wait" initial={false}>
+									<motion.div
+										key={active}
+										className="h-full w-full"
+										initial={
+											reduceMotion
+												? { opacity: 1 }
+												: { opacity: 0, filter: "blur(2px)" }
+										}
+										animate={{ opacity: 1, filter: "blur(0px)" }}
+										exit={
+											reduceMotion
+												? { opacity: 0 }
+												: { opacity: 0, filter: "blur(2px)" }
+										}
+										transition={
+											reduceMotion
+												? { duration: 0 }
+												: { duration: 0.2, ease: EASE_OUT }
+										}
+									>
+										<HeroPreviewContent tab={active} />
+									</motion.div>
+								</AnimatePresence>
+							</HeroDashboardShell>
 							<SelfHostHeroTabBanner
 								tabId={active}
 								reduceMotion={Boolean(reduceMotion)}

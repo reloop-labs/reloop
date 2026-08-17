@@ -314,7 +314,7 @@ export default async function Page(props: {
 					className={`relative w-full flex-col ${
 						hideToc
 							? isApiPage
-								? "mx-auto max-w-6xl"
+								? "mx-auto max-w-5xl md:max-w-7xl"
 								: "max-w-none"
 							: "w-full xl:grid xl:grid-cols-[1fr_260px] xl:gap-8"
 					}`}

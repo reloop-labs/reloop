@@ -218,7 +218,7 @@ function PromptCard() {
 
 export function DocsHome() {
 	return (
-		<div className="not-prose mx-auto w-full max-w-6xl space-y-12 px-6 py-8 md:px-10 md:py-10">
+		<div className="not-prose mx-auto w-full max-w-5xl md:max-w-7xl space-y-12 px-6 py-8 md:px-10 md:py-10">
 			{/* ── Hero ── */}
 			<header className="max-w-2xl">
 				<p className="mb-3 font-semibold text-[12px] text-text-sub-600 uppercase tracking-wider">

@@ -8,11 +8,40 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import Link from "next/link";
 import { useCallback, useId, useState } from "react";
 import { HeroAtmosphere, HeroWindowChrome } from "./hero-chrome";
+import { HeroDashboardShell } from "./hero-dashboard-shell";
 import {
 	HeroDemoPlaybackButton,
 	HeroDemoPlaybackProvider,
 } from "./hero-demo-playback";
-import { HeroPreview, type HeroTabId } from "./hero-preview";
+import { HeroPreviewContent, type HeroTabId } from "./hero-preview-content";
+
+const TAB_TO_NAV: Record<HeroTabId, string> = {
+	overview: "emails",
+	analytics: "metrics",
+	domain: "domain",
+	workflow: "workflow",
+	templates: "templates",
+	dashboard: "emails",
+	sdk: "domain",
+	cloud: "domain",
+	agents: "inbox",
+};
+
+const NAV_TO_TAB: Record<string, HeroTabId> = {
+	emails: "overview",
+	inbox: "overview",
+	contacts: "workflow",
+	templates: "templates",
+	workflow: "workflow",
+	metrics: "analytics",
+	logs: "analytics",
+	"api-keys": "domain",
+	domain: "domain",
+	webhooks: "workflow",
+	integrations: "workflow",
+	smtp: "overview",
+	settings: "overview",
+};
 
 const TABS: {
 	id: HeroTabId;
@@ -97,6 +126,15 @@ export default function Hero() {
 			const next = (index + offset + TABS.length) % TABS.length;
 			return TABS[next]?.id ?? current;
 		});
+	}, []);
+
+	const activeNav = TAB_TO_NAV[active] ?? "emails";
+
+	const handleSidebarClick = useCallback((id: string) => {
+		const targetTab = NAV_TO_TAB[id];
+		if (targetTab) {
+			setActive(targetTab);
+		}
 	}, []);
 
 	return (
@@ -223,30 +261,35 @@ export default function Hero() {
 						<HeroWindowChrome
 							action={active === "sdk" ? <HeroDemoPlaybackButton /> : undefined}
 						>
-							<AnimatePresence mode="wait" initial={false}>
-								<motion.div
-									key={active}
-									className="absolute inset-0"
-									initial={
-										reduceMotion
-											? { opacity: 1 }
-											: { opacity: 0, filter: "blur(2px)" }
-									}
-									animate={{ opacity: 1, filter: "blur(0px)" }}
-									exit={
-										reduceMotion
-											? { opacity: 0 }
-											: { opacity: 0, filter: "blur(2px)" }
-									}
-									transition={
-										reduceMotion
-											? { duration: 0 }
-											: { duration: 0.2, ease: EASE_OUT }
-									}
-								>
-									<HeroPreview tab={active} />
-								</motion.div>
-							</AnimatePresence>
+							<HeroDashboardShell
+								activeItem={activeNav}
+								onItemClick={handleSidebarClick}
+							>
+								<AnimatePresence mode="wait" initial={false}>
+									<motion.div
+										key={active}
+										className="h-full w-full"
+										initial={
+											reduceMotion
+												? { opacity: 1 }
+												: { opacity: 0, filter: "blur(2px)" }
+										}
+										animate={{ opacity: 1, filter: "blur(0px)" }}
+										exit={
+											reduceMotion
+												? { opacity: 0 }
+												: { opacity: 0, filter: "blur(2px)" }
+										}
+										transition={
+											reduceMotion
+												? { duration: 0 }
+												: { duration: 0.2, ease: EASE_OUT }
+										}
+									>
+										<HeroPreviewContent tab={active} />
+									</motion.div>
+								</AnimatePresence>
+							</HeroDashboardShell>
 							<HeroTabBanner
 								tabId={active}
 								reduceMotion={Boolean(reduceMotion)}
