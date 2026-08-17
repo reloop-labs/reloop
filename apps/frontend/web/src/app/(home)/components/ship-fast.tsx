@@ -117,14 +117,8 @@ export default function ShipFast() {
 
 									<Link
 										href={release.href}
-										className="group relative flex flex-1 items-center gap-5 px-6 py-6.5 text-left outline-none transition-colors duration-200 hover:bg-[#f6f6f7] sm:px-8 sm:py-7 lg:px-10 lg:py-8 dark:hover:bg-white/[0.03]"
+										className="group relative flex flex-1 items-center gap-5 px-6 py-6.5 text-left outline-none transition-colors duration-200 hover:bg-bg-weak-50/70 sm:px-8 sm:py-7 lg:px-10 lg:py-8 dark:hover:bg-white/[0.02]"
 									>
-										{/* Subtle grid texture overlay on hover */}
-										<div
-											aria-hidden="true"
-											className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#0000000a_1px,transparent_1px),linear-gradient(to_bottom,#0000000a_1px,transparent_1px)] bg-[size:24px_24px] opacity-0 transition-opacity duration-200 group-hover:opacity-100 dark:bg-[linear-gradient(to_right,#ffffff0c_1px,transparent_1px),linear-gradient(to_bottom,#ffffff0c_1px,transparent_1px)]"
-										/>
-
 										{/* Circular badge with calendar <-> arrow icon swap on hover */}
 										<div className="relative z-10 flex size-10 shrink-0 items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-white-0 text-text-sub-600 shadow-xs transition-colors duration-200 group-hover:border-stroke-strong-950 group-hover:text-text-strong-950 dark:border-white/10 dark:bg-black dark:text-white/60 dark:group-hover:border-white/40 dark:group-hover:text-white">
 											<Icon
@@ -138,8 +132,8 @@ export default function ShipFast() {
 										</div>
 
 										{/* Content: Title & Date */}
-										<div className="relative z-10">
-											<span className="block font-semibold text-[15px] text-text-strong-950 leading-snug tracking-tight transition-colors duration-200 group-hover:text-text-strong-950/75 sm:text-[16px] dark:text-white dark:group-hover:text-white/80">
+										<div className="relative z-10 transition-transform duration-200 group-hover:translate-x-0.5">
+											<span className="block font-medium text-[15px] text-text-strong-950 leading-snug tracking-tight sm:text-[16px] dark:text-white">
 												{release.title}
 											</span>
 											<time
