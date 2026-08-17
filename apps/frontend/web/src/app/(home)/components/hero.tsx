@@ -48,10 +48,10 @@ const TABS: {
 	title: string;
 	description: string;
 	cloud?: boolean;
-	banner: {
+	banner?: {
 		title: string;
 		description: string;
-		href: string;
+		href?: string;
 		icon: string;
 	};
 }[] = [
@@ -59,12 +59,6 @@ const TABS: {
 		id: "overview",
 		title: "Overview",
 		description: "Live feed of sent emails, opens, clicks, and deliveries.",
-		banner: {
-			title: "Overview",
-			description: "Live feed of sent emails, deliveries, opens, and clicks.",
-			href: hostedSignupHref,
-			icon: "layout",
-		},
 	},
 	{
 		id: "analytics",
@@ -309,41 +303,45 @@ function HeroTabBanner({
 	tabId: HeroTabId;
 	reduceMotion: boolean;
 }) {
-	const tab = TABS.find((item) => item.id === tabId) ?? TABS[0]!;
-	const { banner } = tab;
+	const tab = TABS.find((item) => item.id === tabId);
+	const banner = tab?.banner;
 
 	return (
 		<AnimatePresence mode="wait" initial={false}>
-			<motion.div
-				key={tab.id}
-				className="pointer-events-none absolute inset-x-3 bottom-3 z-10 sm:inset-x-5 sm:bottom-5"
-				initial={reduceMotion ? { opacity: 1 } : { opacity: 0, y: 8 }}
-				animate={{ opacity: 1, y: 0 }}
-				exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 8 }}
-				transition={
-					reduceMotion ? { duration: 0 } : { duration: 0.2, ease: EASE_OUT }
-				}
-			>
-				<div className="pointer-events-auto flex items-center gap-3 rounded-2xl bg-[#171717] px-3 py-2.5 text-white shadow-[0_8px_28px_rgba(0,0,0,0.18)] sm:gap-4 sm:rounded-[1.35rem] sm:px-4 sm:py-3 dark:bg-[#111]">
-					<span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-white/10 sm:size-11">
-						<Icon name={banner.icon} className="size-5 text-white" />
-					</span>
-					<div className="min-w-0 flex-1">
-						<p className="truncate font-semibold text-[14px] leading-tight tracking-tight sm:text-[15px]">
-							{banner.title}
-						</p>
-						<p className="mt-0.5 truncate text-[12px] text-white/55 leading-snug sm:text-[13px]">
-							{banner.description}
-						</p>
+			{banner && (
+				<motion.div
+					key={tab.id}
+					className="pointer-events-none absolute inset-x-3 bottom-3 z-10 sm:inset-x-5 sm:bottom-5"
+					initial={reduceMotion ? { opacity: 1 } : { opacity: 0, y: 8 }}
+					animate={{ opacity: 1, y: 0 }}
+					exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 8 }}
+					transition={
+						reduceMotion ? { duration: 0 } : { duration: 0.2, ease: EASE_OUT }
+					}
+				>
+					<div className="pointer-events-auto flex items-center gap-3 rounded-2xl bg-[#171717] px-3 py-2.5 text-white shadow-[0_8px_28px_rgba(0,0,0,0.18)] sm:gap-4 sm:rounded-[1.35rem] sm:px-4 sm:py-3 dark:bg-[#111]">
+						<span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-white/10 sm:size-11">
+							<Icon name={banner.icon} className="size-5 text-white" />
+						</span>
+						<div className="min-w-0 flex-1">
+							<p className="truncate font-semibold text-[14px] leading-tight tracking-tight sm:text-[15px]">
+								{banner.title}
+							</p>
+							<p className="mt-0.5 truncate text-[12px] text-white/55 leading-snug sm:text-[13px]">
+								{banner.description}
+							</p>
+						</div>
+						{banner.href && (
+							<Link
+								href={banner.href}
+								className="inline-flex h-9 shrink-0 items-center rounded-full bg-white px-3.5 font-medium text-[#171717] text-[13px] transition-opacity hover:opacity-90 sm:h-10 sm:px-4"
+							>
+								Learn more
+							</Link>
+						)}
 					</div>
-					<Link
-						href={banner.href}
-						className="inline-flex h-9 shrink-0 items-center rounded-full bg-white px-3.5 font-medium text-[#171717] text-[13px] transition-opacity hover:opacity-90 sm:h-10 sm:px-4"
-					>
-						Learn more
-					</Link>
-				</div>
-			</motion.div>
+				</motion.div>
+			)}
 		</AnimatePresence>
 	);
 }
