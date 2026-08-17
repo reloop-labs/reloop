@@ -347,8 +347,8 @@ export default function LanguageExplorer({
 				aria-labelledby={`lang-tab-${active.slug}`}
 				className="grid grid-cols-1 lg:grid-cols-12"
 			>
-				{/* Left meta & frameworks: compact tinted rail matching framework details */}
-				<aside className="border-stroke-soft-200 border-b bg-[#fafafa] lg:col-span-3 lg:border-r lg:border-b-0 dark:border-white/10 dark:bg-white/[0.025]">
+				{/* Left meta & frameworks: compact rail matching framework details */}
+				<aside className="border-stroke-soft-200 border-b bg-transparent lg:col-span-3 lg:border-r lg:border-b-0 dark:border-white/10">
 					<div className="flex flex-col gap-4 px-6 py-6 sm:px-10 sm:py-7 lg:sticky lg:top-16 lg:py-8 lg:pr-5 lg:pl-12">
 						<div className="flex items-center gap-3">
 							<div
@@ -469,7 +469,7 @@ export default function LanguageExplorer({
 								/>
 								<AnimatedHoverBackground
 									box={fwActiveBox}
-									className="!bg-neutral-alpha-10 dark:!bg-white/[0.08]"
+									className="!bg-black/[0.04] dark:!bg-white/[0.08]"
 								/>
 								{fwActiveBox ? (
 									<motion.div
