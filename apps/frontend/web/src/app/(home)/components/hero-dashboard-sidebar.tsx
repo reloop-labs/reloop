@@ -56,6 +56,12 @@ export const NAV_SECTIONS: NavGroup[] = [
 	},
 ];
 
+const CRISP_TRANSITION = {
+	type: "spring",
+	bounce: 0,
+	duration: 0.24,
+} as const;
+
 export function HeroDashboardSidebar({
 	activeItem = "emails",
 	onItemClick,
@@ -114,16 +120,12 @@ export function HeroDashboardSidebar({
 													transition={
 														reduceMotion
 															? { duration: 0 }
-															: {
-																	type: "spring",
-																	stiffness: 400,
-																	damping: 32,
-																}
+															: CRISP_TRANSITION
 													}
 												/>
 											)}
 
-											{/* Moving sliding hover pill */}
+											{/* Moving sliding hover pill (zero bounce, crisp glide) */}
 											<AnimatePresence>
 												{isHovered && !active && (
 													<motion.div
@@ -139,11 +141,7 @@ export function HeroDashboardSidebar({
 														transition={
 															reduceMotion
 																? { duration: 0 }
-																: {
-																		type: "spring",
-																		stiffness: 400,
-																		damping: 30,
-																	}
+																: CRISP_TRANSITION
 														}
 													/>
 												)}
