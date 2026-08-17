@@ -7,10 +7,19 @@ import * as Input from "@reloop/ui/input";
 import { KbdKey } from "@reloop/ui/kbd-key";
 import * as TabMenuHorizontal from "@reloop/ui/tab-menu-horizontal";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import type { ReactNode } from "react";
-import { MotionItem, MotionStage, PAGE_EASE } from "./domain/_shared/page-motion";
+import { type ReactNode, useEffect, useRef, useState } from "react";
+import { useHeroDemoPlayback } from "./hero-demo-playback";
+import { PAGE_EASE } from "./domain/_shared/page-motion";
 
-const EMAILS = [
+export interface EmailItem {
+	id: string;
+	to: string;
+	subject: string;
+	status: string;
+	time: string;
+}
+
+const INITIAL_EMAILS: EmailItem[] = [
 	{
 		id: "em_01",
 		to: "maya@northwind.io",
@@ -81,7 +90,70 @@ const EMAILS = [
 		status: "delivered",
 		time: "2 days ago",
 	},
-] as const;
+];
+
+const INCOMING_STREAM_POOL: Omit<EmailItem, "id" | "time">[] = [
+	{
+		to: "sarah@vertex.io",
+		subject: "Your API key has been created",
+		status: "delivered",
+	},
+	{
+		to: "dev@linear.app",
+		subject: "Security alert: New login from macOS",
+		status: "opened",
+	},
+	{
+		to: "mira@hyper.co",
+		subject: "Invoice #2049 has been paid",
+		status: "delivered",
+	},
+	{
+		to: "lucas@supabase.io",
+		subject: "Confirm your magic link to log in",
+		status: "clicked",
+	},
+	{
+		to: "kate@resend.com",
+		subject: "Domain verified — mail.acme.com",
+		status: "delivered",
+	},
+	{
+		to: "liam@cursor.sh",
+		subject: "Weekly usage summary: 2.4M sends",
+		status: "sent",
+	},
+	{
+		to: "elena@clerk.dev",
+		subject: "One-time passcode: 849-201",
+		status: "delivered",
+	},
+	{
+		to: "hugo@prisma.io",
+		subject: "Subscription upgraded to Pro",
+		status: "opened",
+	},
+	{
+		to: "zoe@stripe.com",
+		subject: "Payment of $14,280.00 confirmed",
+		status: "delivered",
+	},
+	{
+		to: "noah@vercel.com",
+		subject: "Production deployment finished",
+		status: "clicked",
+	},
+	{
+		to: "chloe@raycast.com",
+		subject: "Welcome to Acme Enterprise",
+		status: "delivered",
+	},
+	{
+		to: "felix@posthog.com",
+		subject: "Monthly event limit threshold (80%)",
+		status: "opened",
+	},
+];
 
 const emailGridStyle = {
 	gridTemplateColumns:
@@ -220,18 +292,59 @@ function ActionKbd({
 	return <KbdKey className={cn(kbdClassName, className)}>{children}</KbdKey>;
 }
 
-const WAVE_DELAY = 0.08;
-const WAVE_STAGGER = 0.06;
-const CELL_DURATION = 0.42;
-const FOOTER_AFTER_ITEMS = 3;
-const FOOTER_DURATION = 0.36;
+const WAVE_DELAY = 0.16;
+const WAVE_STAGGER = 0.045;
+const CELL_DURATION = 0.44;
+const FOOTER_DELAY = 0.58;
+const FOOTER_DURATION = 0.38;
+
+function AnimateIn({
+	mounted,
+	delay = 0,
+	y = 14,
+	className,
+	children,
+}: {
+	mounted: boolean;
+	delay?: number;
+	y?: number;
+	className?: string;
+	children: ReactNode;
+}) {
+	const reduceMotion = useReducedMotion();
+	if (reduceMotion) {
+		return <div className={className}>{children}</div>;
+	}
+
+	return (
+		<motion.div
+			className={className}
+			initial={{ opacity: 0, y, filter: "blur(4px)" }}
+			animate={
+				mounted
+					? { opacity: 1, y: 0, filter: "blur(0px)" }
+					: { opacity: 0, y, filter: "blur(4px)" }
+			}
+			transition={{
+				duration: 0.55,
+				delay,
+				ease: PAGE_EASE,
+			}}
+			style={{ willChange: "transform, opacity, filter" }}
+		>
+			{children}
+		</motion.div>
+	);
+}
 
 function MatrixCell({
+	mounted,
 	row,
 	col,
 	className,
 	children,
 }: {
+	mounted: boolean;
 	row: number;
 	col: number;
 	className?: string;
@@ -246,14 +359,18 @@ function MatrixCell({
 			) : (
 				<motion.div
 					className="min-w-0 max-w-full"
-					initial={{ opacity: 0, y: 6 }}
-					animate={{ opacity: 1, y: 0 }}
+					initial={{ opacity: 0, y: 8, filter: "blur(2px)" }}
+					animate={
+						mounted
+							? { opacity: 1, y: 0, filter: "blur(0px)" }
+							: { opacity: 0, y: 8, filter: "blur(2px)" }
+					}
 					transition={{
 						duration: CELL_DURATION,
 						delay: WAVE_DELAY + (row + col) * WAVE_STAGGER,
 						ease: PAGE_EASE,
 					}}
-					style={{ willChange: "transform, opacity" }}
+					style={{ willChange: "transform, opacity, filter" }}
 				>
 					{children}
 				</motion.div>
@@ -263,56 +380,140 @@ function MatrixCell({
 }
 
 export function HeroEmailsPreview() {
+	const [mounted, setMounted] = useState(false);
+	const [emails, setEmails] = useState<EmailItem[]>(INITIAL_EMAILS);
+	const [highlightedId, setHighlightedId] = useState<string | null>(null);
+
+	const containerRef = useRef<HTMLDivElement>(null);
+	const inViewRef = useRef(true);
+	const isInitialMountRef = useRef(true);
+	const streamIndexRef = useRef(0);
+	const nextIdRef = useRef(1);
+
 	const reduceMotion = useReducedMotion();
-	const footerDelay = WAVE_DELAY + FOOTER_AFTER_ITEMS * WAVE_STAGGER;
+	const playback = useHeroDemoPlayback();
+	const paused = playback?.paused ?? false;
+	const pausedRef = useRef(paused);
+	pausedRef.current = paused;
+
+	useEffect(() => {
+		setMounted(true);
+		const timer = setTimeout(() => {
+			isInitialMountRef.current = false;
+		}, 1200);
+		return () => clearTimeout(timer);
+	}, []);
+
+	// Observe viewport visibility
+	useEffect(() => {
+		const root = containerRef.current;
+		if (!root) return;
+		const observer = new IntersectionObserver(
+			([entry]) => {
+				inViewRef.current = Boolean(entry?.isIntersecting);
+			},
+			{ threshold: 0.2 },
+		);
+		observer.observe(root);
+		return () => observer.disconnect();
+	}, []);
+
+	// Live email incoming stream
+	useEffect(() => {
+		if (reduceMotion) return;
+
+		const interval = setInterval(() => {
+			if (pausedRef.current || !inViewRef.current || isInitialMountRef.current) {
+				return;
+			}
+
+			const template =
+				INCOMING_STREAM_POOL[
+					streamIndexRef.current % INCOMING_STREAM_POOL.length
+				];
+			if (!template) return;
+			streamIndexRef.current += 1;
+			const newId = `em_live_${nextIdRef.current++}`;
+
+			const newEmail: EmailItem = {
+				id: newId,
+				to: template.to,
+				subject: template.subject,
+				status: template.status,
+				time: "Just now",
+			};
+
+			setHighlightedId(newId);
+			setEmails((prev) => [newEmail, ...prev.slice(0, 9)]);
+
+			setTimeout(() => {
+				setHighlightedId((current) => (current === newId ? null : current));
+			}, 1400);
+		}, 1900);
+
+		return () => clearInterval(interval);
+	}, [reduceMotion]);
 
 	return (
-		<div className="h-full overflow-hidden bg-bg-white-0 dark:bg-black">
-			<MotionStage className="mx-auto max-w-6xl space-y-6 overflow-hidden p-6 lg:p-8">
-				<MotionItem className="flex flex-col gap-4 pt-2 pb-4 sm:flex-row sm:items-start sm:justify-between">
-					<div>
-						<div className="flex items-center gap-2.5">
-							<Icon
-								name="mail-send"
-								className="h-6 w-6 shrink-0 text-text-strong-950"
-							/>
-							<h1 className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
-								Email Sent
-							</h1>
-						</div>
-						<p className="mt-1 text-sm text-text-sub-600">
-							Track and monitor your outbound transactional emails.
-						</p>
+		<div
+			ref={containerRef}
+			className="h-full overflow-hidden bg-bg-white-0 dark:bg-black"
+		>
+			<div className="mx-auto max-w-6xl space-y-6 overflow-hidden p-6 lg:p-8">
+				{/* Top Header */}
+				<div className="flex flex-col gap-4 pt-2 pb-4 sm:flex-row sm:items-start sm:justify-between">
+					<div className="space-y-1">
+						<AnimateIn mounted={mounted} delay={0.03} y={14}>
+							<div className="flex items-center gap-2.5">
+								<Icon
+									name="mail-send"
+									className="h-6 w-6 shrink-0 text-text-strong-950"
+								/>
+								<h1 className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
+									Email Sent
+								</h1>
+							</div>
+						</AnimateIn>
+						<AnimateIn mounted={mounted} delay={0.07} y={10}>
+							<p className="text-sm text-text-sub-600">
+								Track and monitor your outbound transactional emails.
+							</p>
+						</AnimateIn>
 					</div>
 
 					<div className="flex shrink-0 items-center gap-2">
-						<Button.Root
-							type="button"
-							variant="neutral"
-							mode="stroke"
-							size="small"
-							tabIndex={-1}
-							className="gap-1.5 rounded-xl text-text-strong-950"
-						>
-							<Icon name="code" className="h-4 w-4 text-text-sub-600" />
-							SDK
-							<ActionKbd className="w-auto min-w-4 px-1">S</ActionKbd>
-						</Button.Root>
-						<Button.Root
-							type="button"
-							variant="neutral"
-							mode="stroke"
-							size="small"
-							tabIndex={-1}
-							className="gap-1.5 rounded-xl text-text-strong-950"
-						>
-							Documentation
-							<ActionKbd className="w-auto min-w-4 px-1">D</ActionKbd>
-						</Button.Root>
+						<AnimateIn mounted={mounted} delay={0.1} y={12}>
+							<Button.Root
+								type="button"
+								variant="neutral"
+								mode="stroke"
+								size="small"
+								tabIndex={-1}
+								className="gap-1.5 rounded-xl text-text-strong-950"
+							>
+								<Icon name="code" className="h-4 w-4 text-text-sub-600" />
+								SDK
+								<ActionKbd className="w-auto min-w-4 px-1">S</ActionKbd>
+							</Button.Root>
+						</AnimateIn>
+						<AnimateIn mounted={mounted} delay={0.14} y={12}>
+							<Button.Root
+								type="button"
+								variant="neutral"
+								mode="stroke"
+								size="small"
+								tabIndex={-1}
+								className="gap-1.5 rounded-xl text-text-strong-950"
+							>
+								Documentation
+								<ActionKbd className="w-auto min-w-4 px-1">D</ActionKbd>
+							</Button.Root>
+						</AnimateIn>
 					</div>
-				</MotionItem>
+				</div>
 
-				<MotionItem>
+				{/* Tabs Navigation */}
+				<AnimateIn mounted={mounted} delay={0.12} y={10}>
 					<TabMenuHorizontal.Root value="sent">
 						<TabMenuHorizontal.List className="relative h-11 gap-0 border-b! py-0">
 							<TabMenuHorizontal.Trigger
@@ -333,11 +534,14 @@ export function HeroEmailsPreview() {
 							</TabMenuHorizontal.Trigger>
 						</TabMenuHorizontal.List>
 					</TabMenuHorizontal.Root>
+				</AnimateIn>
 
-					<div className="mt-4 pb-8">
-						<div>
-							<div className="space-y-2">
-								<div className="flex flex-wrap items-center gap-2">
+				<div className="mt-4 pb-8">
+					<div className="space-y-4">
+						{/* Filters and Search Toolbar */}
+						<div className="space-y-3">
+							<div className="flex flex-wrap items-center gap-2">
+								<AnimateIn mounted={mounted} delay={0.16} y={10}>
 									<Button.Root
 										type="button"
 										variant="neutral"
@@ -354,7 +558,9 @@ export function HeroEmailsPreview() {
 											<Icon name="chevron-down" className="h-3.5 w-3.5" />
 										</Button.Icon>
 									</Button.Root>
+								</AnimateIn>
 
+								<AnimateIn mounted={mounted} delay={0.2} y={10}>
 									<button
 										type="button"
 										tabIndex={-1}
@@ -369,7 +575,9 @@ export function HeroEmailsPreview() {
 											className="-me-1 size-4 opacity-70"
 										/>
 									</button>
+								</AnimateIn>
 
+								<AnimateIn mounted={mounted} delay={0.24} y={10}>
 									<button
 										type="button"
 										tabIndex={-1}
@@ -387,7 +595,9 @@ export function HeroEmailsPreview() {
 											className="-me-1 size-4 opacity-70"
 										/>
 									</button>
+								</AnimateIn>
 
+								<AnimateIn mounted={mounted} delay={0.28} y={10}>
 									<button
 										type="button"
 										tabIndex={-1}
@@ -405,8 +615,10 @@ export function HeroEmailsPreview() {
 											className="-me-1 size-4 opacity-70"
 										/>
 									</button>
+								</AnimateIn>
 
-									<div className="ml-auto flex items-center gap-2">
+								<AnimateIn mounted={mounted} delay={0.32} y={10} className="ml-auto">
+									<div className="flex items-center gap-2">
 										<button
 											type="button"
 											tabIndex={-1}
@@ -417,8 +629,10 @@ export function HeroEmailsPreview() {
 											<ActionKbd>R</ActionKbd>
 										</button>
 									</div>
-								</div>
+								</AnimateIn>
+							</div>
 
+							<AnimateIn mounted={mounted} delay={0.34} y={10}>
 								<Input.Root size="small" className="w-full rounded-xl">
 									<Input.Wrapper>
 										<Input.Icon as={Icon} name="search" size="small" />
@@ -437,71 +651,80 @@ export function HeroEmailsPreview() {
 										</button>
 									</Input.Wrapper>
 								</Input.Root>
-							</div>
+							</AnimateIn>
+						</div>
 
+						{/* Emails Table */}
+						<AnimateIn mounted={mounted} delay={0.2} y={10}>
 							<div className="mt-4">
 								<div className="w-full text-paragraph-sm">
 									<div
 										style={emailGridStyle}
 										className="grid items-center rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-4 pt-2.5 pb-5 font-medium text-text-sub-600 text-xs dark:border-[#101010] dark:bg-bg-weak-50/40"
 									>
-										<MatrixCell row={0} col={0}>
+										<MatrixCell mounted={mounted} row={0} col={0}>
 											<span className="flex size-4 shrink-0 rounded-sm border border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/50 dark:bg-bg-white-0/5" />
 										</MatrixCell>
-										<MatrixCell row={0} col={1}>
+										<MatrixCell mounted={mounted} row={0} col={1}>
 											<div className="flex items-center gap-1">
 												<Icon name="user" className="h-3 w-3" />
 												<span className="text-xs">To</span>
 											</div>
 										</MatrixCell>
-										<MatrixCell row={0} col={2}>
+										<MatrixCell mounted={mounted} row={0} col={2}>
 											<div className="flex items-center gap-1">
 												<Icon name="file-text" className="h-3 w-3" />
 												<span className="text-xs">Subject</span>
 											</div>
 										</MatrixCell>
-										<MatrixCell row={0} col={3}>
+										<MatrixCell mounted={mounted} row={0} col={3}>
 											<div className="flex items-center gap-1">
 												<Icon name="check-circle" className="h-3 w-3" />
 												<span className="text-xs">Status</span>
 											</div>
 										</MatrixCell>
-										<MatrixCell row={0} col={4}>
+										<MatrixCell mounted={mounted} row={0} col={4}>
 											<div className="flex items-center gap-1">
 												<Icon name="clock" className="h-3 w-3" />
 												<span className="text-xs">Time</span>
 											</div>
 										</MatrixCell>
-										<MatrixCell row={0} col={5} className="justify-end">
+										<MatrixCell mounted={mounted} row={0} col={5} className="justify-end">
 											<span />
 										</MatrixCell>
 									</div>
 
 									<div className="-mt-2.5 divide-y divide-stroke-soft-100 overflow-visible rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:divide-stroke-soft-100/50 dark:border-stroke-soft-100/40">
-										<AnimatePresence>
-											{EMAILS.map((email, rowIndex) => {
+										<AnimatePresence initial={false}>
+											{emails.map((email, rowIndex) => {
 												const row = rowIndex + 1;
+												const isHighlighted = highlightedId === email.id;
+
 												return (
 													<motion.div
 														key={email.id}
 														layout="position"
-														initial={{ opacity: 1 }}
-														animate={{ opacity: 1, height: "auto" }}
-														exit={
-															reduceMotion
-																? { opacity: 0 }
-																: {
-																		opacity: 0,
-																		height: 0,
-																		transition: {
-																			opacity: { duration: 0.22, ease: "easeOut" },
-																			height: { duration: 0.45, ease: PAGE_EASE },
-																			layout: { duration: 0.45, ease: PAGE_EASE },
-																		},
-																	}
-														}
+														initial={{
+															opacity: 0,
+															height: 0,
+															y: -16,
+															filter: "blur(4px)",
+														}}
+														animate={{
+															opacity: 1,
+															height: "auto",
+															y: 0,
+															filter: "blur(0px)",
+														}}
+														exit={{
+															opacity: 0,
+															height: 0,
+															y: 10,
+															filter: "blur(2px)",
+															transition: { duration: 0.35, ease: PAGE_EASE },
+														}}
 														transition={{
-															duration: 0.3,
+															duration: 0.42,
 															ease: PAGE_EASE,
 															layout: { duration: 0.45, ease: PAGE_EASE },
 														}}
@@ -509,12 +732,15 @@ export function HeroEmailsPreview() {
 													>
 														<div
 															style={emailGridStyle}
-															className="group/row grid w-full cursor-pointer items-center px-4 py-2 text-left transition-colors hover:bg-bg-weak-50"
+															className={cn(
+																"group/row grid w-full cursor-pointer items-center px-4 py-2 text-left transition-colors duration-300 hover:bg-bg-weak-50",
+																isHighlighted && "bg-blue-500/10 dark:bg-blue-400/10",
+															)}
 														>
-															<MatrixCell row={row} col={0}>
+															<MatrixCell mounted={mounted} row={row} col={0}>
 																<span className="flex size-4 shrink-0 rounded-sm border border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/50 dark:bg-bg-white-0/5" />
 															</MatrixCell>
-															<MatrixCell row={row} col={1}>
+															<MatrixCell mounted={mounted} row={row} col={1}>
 																<div className="flex min-w-0 items-center gap-2 pr-4">
 																	<span className="flex size-5 shrink-0 items-center justify-center overflow-hidden rounded-full">
 																		<span
@@ -531,14 +757,14 @@ export function HeroEmailsPreview() {
 																	</span>
 																</div>
 															</MatrixCell>
-															<MatrixCell row={row} col={2}>
+															<MatrixCell mounted={mounted} row={row} col={2}>
 																<div className="min-w-0 truncate pr-4">
 																	<span className="truncate font-medium text-label-sm text-text-strong-950 underline decoration-dotted underline-offset-2">
 																		{email.subject}
 																	</span>
 																</div>
 															</MatrixCell>
-															<MatrixCell row={row} col={3}>
+															<MatrixCell mounted={mounted} row={row} col={3}>
 																<div className="flex items-center">
 																	<div
 																		className={cn(
@@ -554,14 +780,14 @@ export function HeroEmailsPreview() {
 																	</div>
 																</div>
 															</MatrixCell>
-															<MatrixCell row={row} col={4}>
+															<MatrixCell mounted={mounted} row={row} col={4}>
 																<div className="flex items-center">
 																	<span className="whitespace-nowrap font-medium text-[13px] text-text-sub-600">
 																		{email.time}
 																	</span>
 																</div>
 															</MatrixCell>
-															<MatrixCell row={row} col={5} className="justify-end">
+															<MatrixCell mounted={mounted} row={row} col={5} className="justify-end">
 																<span className="inline-flex aspect-square h-7 w-7 items-center justify-center rounded-lg">
 																	<Icon
 																		name="more-horizontal"
@@ -578,11 +804,15 @@ export function HeroEmailsPreview() {
 										<motion.div
 											layout="position"
 											className="flex items-center justify-between px-4 py-2 text-label-xs text-text-sub-600"
-											initial={reduceMotion ? false : { opacity: 0, y: 16 }}
-											animate={{ opacity: 1, y: 0 }}
+											initial={reduceMotion ? false : { opacity: 0, y: 16, filter: "blur(3px)" }}
+											animate={
+												reduceMotion || mounted
+													? { opacity: 1, y: 0, filter: "blur(0px)" }
+													: { opacity: 0, y: 16, filter: "blur(3px)" }
+											}
 											transition={{
 												duration: FOOTER_DURATION,
-												delay: footerDelay,
+												delay: FOOTER_DELAY,
 												ease: PAGE_EASE,
 												layout: { duration: 0.45, ease: PAGE_EASE },
 											}}
@@ -626,10 +856,10 @@ export function HeroEmailsPreview() {
 									</div>
 								</div>
 							</div>
-						</div>
+						</AnimateIn>
 					</div>
-				</MotionItem>
-			</MotionStage>
+				</div>
+			</div>
 		</div>
 	);
 }

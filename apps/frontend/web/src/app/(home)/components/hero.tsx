@@ -310,13 +310,19 @@ export function Hero({ variant = "default" }: HeroProps) {
 					/>
 					<HeroDemoPlaybackProvider>
 						<HeroWindowChrome
-							action={active === "sdk" ? <HeroDemoPlaybackButton /> : undefined}
+							action={
+								active === "overview" ||
+								active === "sdk" ||
+								active === "domain" ? (
+									<HeroDemoPlaybackButton />
+								) : undefined
+							}
 						>
 							<HeroDashboardShell
 								activeItem={activeNav}
 								onItemClick={handleSidebarClick}
 							>
-								<AnimatePresence mode="wait" initial={false}>
+								<AnimatePresence mode="wait">
 									<motion.div
 										key={active}
 										className="h-full w-full"
