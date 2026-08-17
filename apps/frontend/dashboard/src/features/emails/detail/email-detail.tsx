@@ -930,7 +930,7 @@ export const EmailDetail = ({ email, isLoading }: EmailDetailProps) => {
 				{
 					title: "Insights",
 					value: "insights",
-					icon: "delivery-analytics" as const,
+					icon: "bulb" as const,
 					shortcut: "5",
 				},
 			]
@@ -964,7 +964,7 @@ export const EmailDetail = ({ email, isLoading }: EmailDetailProps) => {
 							{
 								title: "Insights",
 								value: "insights",
-								icon: "delivery-analytics" as const,
+								icon: "bulb" as const,
 								shortcut: "5",
 							},
 						]
@@ -984,7 +984,7 @@ export const EmailDetail = ({ email, isLoading }: EmailDetailProps) => {
 							{
 								title: "Insights",
 								value: "insights",
-								icon: "delivery-analytics" as const,
+								icon: "bulb" as const,
 								shortcut: "3",
 							},
 						]),
@@ -1125,10 +1125,6 @@ export const EmailDetail = ({ email, isLoading }: EmailDetailProps) => {
 					</div>
 				</div>
 			</section>
-			{!isLoading && email?.errorMessage && (
-				<ErrorDetailsPanel errorMessage={email.errorMessage} />
-			)}
-
 			{/* Event Tracking Timeline */}
 			<section>
 				<EmailTimeline
@@ -1143,6 +1139,10 @@ export const EmailDetail = ({ email, isLoading }: EmailDetailProps) => {
 					}
 				/>
 			</section>
+
+			{!isLoading && email?.errorMessage && (
+				<ErrorDetailsPanel errorMessage={email.errorMessage} />
+			)}
 
 			<SmtpResponseDrawer
 				row={smtpDetail}
