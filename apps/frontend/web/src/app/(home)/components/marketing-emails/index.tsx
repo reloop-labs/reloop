@@ -13,8 +13,8 @@ export function MarketingEmailsSection() {
 					icon="mega-phone"
 					color="pink"
 					badge="Marketing Emails"
-					title="Deliver Broadcasts that Convert"
-					description="Upload and sync customer data, orchestrate automated conversion funnels, and monitor engagement analytics with zero deliverability friction."
+					title="Turn broadcasts into conversions"
+					description="Sync your audience, build automated funnels, and measure campaign performance from delivery to conversion."
 					ctaLabel="Explore Marketing"
 					ctaHref="/docs/marketing"
 				/>
