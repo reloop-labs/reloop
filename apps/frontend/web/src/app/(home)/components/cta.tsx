@@ -6,7 +6,7 @@ export default function CTA() {
 		<BlogCta
 			headline={
 				<>
-					Built for developers
+					Built for Developers
 					<br />
 					Available today.
 				</>
