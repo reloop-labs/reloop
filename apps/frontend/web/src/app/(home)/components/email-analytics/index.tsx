@@ -8,7 +8,7 @@ export function EmailAnalyticsSection() {
 			className="scroll-mt-28 px-4 py-12 sm:px-8 sm:py-16 lg:px-12 lg:py-16"
 		>
 			<SceneHeader
-				icon="graph-up"
+				icon="fat-row"
 				color="blue"
 				badge="Reloop Analytics"
 				title="Opens, clicks, bounces — as they happen."

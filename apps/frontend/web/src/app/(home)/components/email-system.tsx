@@ -1,8 +1,14 @@
 "use client";
 
 import { cn } from "@reloop/ui/cn";
-import { motion, useReducedMotion } from "framer-motion";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useReducedMotion } from "framer-motion";
+import {
+	useCallback,
+	useEffect,
+	useLayoutEffect,
+	useRef,
+	useState,
+} from "react";
 import { EmailAnalyticsSection } from "./email-analytics";
 import { MarketingEmailsSection } from "./marketing-emails";
 import { TemplatesSection } from "./templates";
@@ -22,7 +28,7 @@ const SECTIONS = [
 	},
 	{
 		id: "templates",
-		nav: "Templates",
+		nav: "AI templates",
 		Component: TemplatesSection,
 	},
 	{
@@ -39,44 +45,107 @@ const SECTIONS = [
 
 type SectionId = (typeof SECTIONS)[number]["id"];
 
+/** Matches `scroll-mt-24` so spy and click land on the same item. */
+const SCROLL_MARKER = 96;
+const INDICATOR_INSET = 4;
+const EASE_OUT = "cubic-bezier(0.23, 1, 0.32, 1)";
+
 export default function EmailSystem() {
 	const [active, setActive] = useState<SectionId>(SECTIONS[0].id);
+	const [indicator, setIndicator] = useState({ top: 0, height: 0, ready: false });
 	const reduceMotion = useReducedMotion();
 	const panelRefs = useRef<Record<string, HTMLElement | null>>({});
+	const buttonRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+	const navRef = useRef<HTMLElement>(null);
+	const scrollingTo = useRef<SectionId | null>(null);
+	const activeRef = useRef(active);
+	activeRef.current = active;
+
+	const placeIndicator = useCallback((id: SectionId) => {
+		const button = buttonRefs.current[id];
+		const nav = navRef.current;
+		if (!button || !nav) return;
+		const navBox = nav.getBoundingClientRect();
+		const btnBox = button.getBoundingClientRect();
+		setIndicator({
+			top: btnBox.top - navBox.top + INDICATOR_INSET,
+			height: Math.max(btnBox.height - INDICATOR_INSET * 2, 0),
+			ready: true,
+		});
+	}, []);
+
+	const pickActiveFromScroll = useCallback(() => {
+		if (scrollingTo.current) return;
+
+		let next = SECTIONS[0].id;
+		for (const section of SECTIONS) {
+			const el = panelRefs.current[section.id];
+			if (!el) continue;
+			if (el.getBoundingClientRect().top <= SCROLL_MARKER + 8) {
+				next = section.id;
+			}
+		}
+
+		if (next !== activeRef.current) {
+			setActive(next);
+		}
+	}, []);
+
+	useLayoutEffect(() => {
+		placeIndicator(active);
+	}, [active, placeIndicator]);
 
 	useEffect(() => {
-		const nodes = SECTIONS.map(
-			(section) => panelRefs.current[section.id],
-		).filter((el): el is HTMLElement => Boolean(el));
-		if (nodes.length === 0) return;
-
-		const observer = new IntersectionObserver(
-			(entries) => {
-				const visible = entries
-					.filter((entry) => entry.isIntersecting)
-					.sort((a, b) => b.intersectionRatio - a.intersectionRatio);
-				const id = visible[0]?.target.getAttribute("data-scene");
-				if (id) setActive(id as SectionId);
-			},
-			{
-				rootMargin: "-20% 0px -40% 0px",
-				threshold: [0, 0.2, 0.4, 0.6, 0.8, 1],
-			},
-		);
-
-		for (const node of nodes) observer.observe(node);
+		const nav = navRef.current;
+		if (!nav) return;
+		const observer = new ResizeObserver(() => placeIndicator(activeRef.current));
+		observer.observe(nav);
 		return () => observer.disconnect();
-	}, []);
+	}, [placeIndicator]);
+
+	useEffect(() => {
+		let frame = 0;
+		const onScroll = () => {
+			if (frame) return;
+			frame = window.requestAnimationFrame(() => {
+				frame = 0;
+				pickActiveFromScroll();
+			});
+		};
+
+		const unlock = () => {
+			scrollingTo.current = null;
+			pickActiveFromScroll();
+		};
+
+		pickActiveFromScroll();
+		window.addEventListener("scroll", onScroll, { passive: true });
+		window.addEventListener("resize", onScroll);
+		window.addEventListener("scrollend", unlock);
+		return () => {
+			window.cancelAnimationFrame(frame);
+			window.removeEventListener("scroll", onScroll);
+			window.removeEventListener("resize", onScroll);
+			window.removeEventListener("scrollend", unlock);
+		};
+	}, [pickActiveFromScroll]);
 
 	const goTo = useCallback(
 		(id: SectionId) => {
 			setActive(id);
+			scrollingTo.current = id;
 			panelRefs.current[id]?.scrollIntoView({
 				behavior: reduceMotion ? "auto" : "smooth",
 				block: "start",
 			});
+			window.setTimeout(() => {
+				if (scrollingTo.current === id) {
+					scrollingTo.current = null;
+					pickActiveFromScroll();
+				}
+			}, 800);
 		},
-		[reduceMotion],
+		[pickActiveFromScroll, reduceMotion],
 	);
 
 	return (
@@ -102,35 +171,41 @@ export default function EmailSystem() {
 				<div className="border-stroke-soft-200 border-b lg:border-r lg:border-b-0 dark:border-white/10">
 					<aside className="top-16 z-10 bg-bg-white-0 lg:sticky dark:bg-black">
 						<nav
+							ref={navRef}
 							aria-label="Product scenes"
-							className="flex gap-1 overflow-x-auto px-4 py-3 [scrollbar-width:none] lg:flex-col lg:gap-0.5 lg:p-0 lg:py-10 [&::-webkit-scrollbar]:hidden"
+							className="relative flex gap-1 overflow-x-auto px-4 py-3 [scrollbar-width:none] lg:flex-col lg:gap-0.5 lg:p-0 lg:py-10 [&::-webkit-scrollbar]:hidden"
 						>
+							<span
+								aria-hidden
+								className="pointer-events-none absolute left-0 hidden w-[3.5px] rounded-r-full bg-blue-600 lg:block dark:bg-blue-500"
+								style={{
+									top: 0,
+									height: indicator.height,
+									opacity: indicator.ready ? 1 : 0,
+									transform: `translateY(${indicator.top}px)`,
+									transition: reduceMotion
+										? "opacity 120ms ease"
+										: `transform 180ms ${EASE_OUT}, height 180ms ${EASE_OUT}, opacity 120ms ease`,
+								}}
+							/>
 							{SECTIONS.map((section) => {
 								const selected = section.id === active;
 								return (
 									<button
 										key={section.id}
+										ref={(el) => {
+											buttonRefs.current[section.id] = el;
+										}}
 										type="button"
 										onClick={() => goTo(section.id)}
 										className={cn(
-											"relative w-full shrink-0 px-3.5 py-2 text-left font-medium text-[15px] tracking-[-0.01em] transition-colors lg:py-2 lg:pr-6 lg:pl-8 lg:text-[17px]",
+											"relative w-full shrink-0 px-3.5 py-2 text-left font-medium text-[15px] tracking-[-0.01em] transition-colors duration-150 lg:py-2 lg:pr-6 lg:pl-8 lg:text-[17px]",
 											selected
 												? "font-semibold text-text-strong-950 dark:text-white"
 												: "text-text-soft-400 hover:text-text-sub-600 dark:text-white/30 dark:hover:text-white/60",
 										)}
 										aria-current={selected ? "true" : undefined}
 									>
-										{selected ? (
-											<motion.span
-												layoutId="sidebar-active-indicator"
-												className="-left-px absolute top-1 bottom-1 hidden w-[3.5px] rounded-r-full bg-blue-600 lg:block dark:bg-blue-500"
-												transition={{
-													type: "spring",
-													stiffness: 380,
-													damping: 30,
-												}}
-											/>
-										) : null}
 										{section.nav}
 									</button>
 								);
