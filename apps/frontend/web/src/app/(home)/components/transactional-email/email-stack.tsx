@@ -2,6 +2,7 @@
 
 import { cn } from "@reloop/ui/cn";
 import { Logo } from "@reloop/ui/logo";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import type { ReactNode } from "react";
 
 type StackEmail = {
@@ -11,10 +12,14 @@ type StackEmail = {
 
 const EMAILS: StackEmail[] = [
 	{ id: "otp", body: <OtpEmailBody /> },
+	{ id: "reset", body: <ResetEmailBody /> },
+	{ id: "welcome", body: <WelcomeEmailBody /> },
+	{ id: "invite", body: <InviteEmailBody /> },
 ];
 
-export function EmailStack() {
-	const email = EMAILS[0]!;
+export function EmailStack({ activeId = "otp" }: { activeId?: string }) {
+	const shouldReduceMotion = useReducedMotion();
+	const email = EMAILS.find((e) => e.id === activeId) ?? EMAILS[0]!;
 
 	return (
 		<div className="relative mx-auto h-[32rem] w-full">
@@ -24,10 +29,20 @@ export function EmailStack() {
 					"border-stroke-soft-200 shadow-[0_24px_60px_rgba(15,23,42,0.14)] dark:border-[#2a2a2a] dark:shadow-[0_24px_60px_rgba(0,0,0,0.5)]",
 				)}
 			>
-				{email.body}
+				<AnimatePresence mode="wait" initial={false}>
+					<motion.div
+						key={email.id}
+						initial={shouldReduceMotion ? false : { opacity: 0, y: 6 }}
+						animate={{ opacity: 1, y: 0 }}
+						exit={shouldReduceMotion ? undefined : { opacity: 0, y: -6 }}
+						transition={{ duration: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
+					>
+						{email.body}
+					</motion.div>
+				</AnimatePresence>
 				<div
 					aria-hidden
-					className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-white from-15% to-transparent dark:from-[#0e0e0e]"
+					className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-28 bg-gradient-to-t from-white from-15% to-transparent dark:from-[#0e0e0e]"
 				/>
 			</article>
 		</div>

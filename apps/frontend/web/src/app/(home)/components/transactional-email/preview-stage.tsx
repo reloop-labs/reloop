@@ -9,9 +9,11 @@ import {
 	EVENTS_CODE,
 	SEND_API_TABS,
 	SEND_CODE,
+	TEMPLATE_TABS,
 	TEMPLATES_CODE,
 	type PreviewTabId,
 	type SendApiTabId,
+	type TemplateTabId,
 } from "./preview-scenes";
 import { PreviewTabs } from "./preview-tabs";
 import { WebhookEvents } from "./webhook-events";
@@ -42,6 +44,7 @@ export function PreviewStage() {
 	const shouldReduceMotion = useReducedMotion();
 	const [active, setActive] = useState<PreviewTabId>("send");
 	const [sendSubTab, setSendSubTab] = useState<SendApiTabId>("send");
+	const [templateSubTab, setTemplateSubTab] = useState<TemplateTabId>("otp");
 	const [direction, setDirection] = useState(0);
 
 	const handleTabChange = (newTab: PreviewTabId) => {
@@ -96,10 +99,12 @@ export function PreviewStage() {
 									/>
 								) : active === "templates" ? (
 									<SdkCodeBlock
-										code={TEMPLATES_CODE}
+										code={TEMPLATES_CODE[templateSubTab]}
 										slug="nextjs"
 										lang="tsx"
-										path="otp.tsx"
+										tabs={TEMPLATE_TABS}
+										activeTab={templateSubTab}
+										onTabChange={(id) => setTemplateSubTab(id as TemplateTabId)}
 									/>
 								) : (
 									<SdkCodeBlock
@@ -115,7 +120,7 @@ export function PreviewStage() {
 									{active === "events" ? (
 										<WebhookEvents active={active === "events"} />
 									) : (
-										<EmailStack />
+										<EmailStack activeId={templateSubTab} />
 									)}
 								</div>
 							)}

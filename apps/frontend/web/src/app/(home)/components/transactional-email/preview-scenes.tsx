@@ -98,7 +98,17 @@ await reloop.batch.send([
 ]);`,
 };
 
-export const TEMPLATES_CODE = `export function OtpEmail({ code = '842 190' }) {
+export const TEMPLATE_TABS: CopyCodeBlockTab[] = [
+	{ id: "otp", label: "otp.tsx", si: getLanguageIcon("typescript")! },
+	{ id: "reset", label: "password-reset.tsx", si: getLanguageIcon("typescript")! },
+	{ id: "welcome", label: "welcome-email.tsx", si: getLanguageIcon("typescript")! },
+	{ id: "invite", label: "user-invite.tsx", si: getLanguageIcon("typescript")! },
+];
+
+export type TemplateTabId = "otp" | "reset" | "welcome" | "invite";
+
+export const TEMPLATES_CODE: Record<TemplateTabId, string> = {
+	otp: `export function OtpEmail({ code = '842 190' }) {
   return (
     <Email>
       <Heading>Your verification code</Heading>
@@ -106,8 +116,37 @@ export const TEMPLATES_CODE = `export function OtpEmail({ code = '842 190' }) {
       <OtpCode value={code} expiresIn="10 minutes" />
       <Text muted>If you didn't request this code, ignore this email.</Text>
     </Email>
-  )
-}`;
+  );
+}`,
+	reset: `export function PasswordReset({ link = 'https://reloop.sh/reset?token=xyz' }) {
+  return (
+    <Email>
+      <Heading>Reset your Reloop password</Heading>
+      <Text>We received a request to reset your password. Link expires in 20 min.</Text>
+      <Button href={link}>Choose a new password</Button>
+      <Text muted>If you didn't request this, ignore this email.</Text>
+    </Email>
+  );
+}`,
+	welcome: `export function WelcomeEmail({ name = 'Maya' }) {
+  return (
+    <Email>
+      <Heading>Welcome to Reloop, {name}</Heading>
+      <Text>Open-source email infrastructure built for developers and AI agents.</Text>
+      <Button href="https://reloop.sh/dashboard">Get Started</Button>
+    </Email>
+  );
+}`,
+	invite: `export function TeamInvite({ inviter = 'Pranav Patel', team = 'Reloop' }) {
+  return (
+    <Email>
+      <Heading>Join {team} on Reloop</Heading>
+      <Text>{inviter} has invited you to collaborate on the team.</Text>
+      <Button href="https://reloop.sh/invite/abc123">Join the team</Button>
+    </Email>
+  );
+}`,
+};
 
 export const EVENTS_CODE = `reloop.webhooks.on('email.opened', async (event) => {
   console.log(event.to, event.openedAt);
