@@ -39,11 +39,23 @@ export const PREVIEW_FILES: Record<PreviewTabId, string> = {
 	events: "webhook.ts",
 };
 
-export function SendApiCode() {
+export const SEND_API_TABS = [
+	{ id: "send", label: "send.ts" },
+	{ id: "contacts", label: "contacts.ts" },
+	{ id: "groups", label: "groups.ts" },
+	{ id: "batch", label: "batch.ts" },
+] as const;
+
+export type SendApiTabId = (typeof SEND_API_TABS)[number]["id"];
+
+export function SendApiCode({ tab = "send" }: { tab?: SendApiTabId }) {
+	if (tab === "contacts") return <ContactsSnippet />;
+	if (tab === "groups") return <GroupsSnippet />;
+	if (tab === "batch") return <BatchSnippet />;
 	return <SendSnippet />;
 }
 
-function SendSnippet() {
+export function SendSnippet() {
 	return (
 		<code>
 			<span className="text-[#c2410c] dark:text-[#fb923c]">import</span>
@@ -99,6 +111,171 @@ function SendSnippet() {
 			<span className="text-text-soft-400">,</span>
 			{"\n"}
 			<span className="text-text-strong-950 dark:text-white">{"})"}</span>
+			<span className="text-text-soft-400">;</span>
+		</code>
+	);
+}
+
+export function ContactsSnippet() {
+	return (
+		<code>
+			<span className="text-[#c2410c] dark:text-[#fb923c]">import</span>
+			<span className="text-text-strong-950 dark:text-white"> Reloop </span>
+			<span className="text-[#c2410c] dark:text-[#fb923c]">from</span>
+			<span className="text-emerald-700 dark:text-emerald-400">
+				{" 'reloop-email'"}
+			</span>
+			<span className="text-text-soft-400">;</span>
+			{"\n\n"}
+			<span className="text-[#c2410c] dark:text-[#fb923c]">const</span>
+			<span className="text-text-strong-950 dark:text-white"> reloop </span>
+			<span className="text-text-soft-400">= </span>
+			<span className="text-[#c2410c] dark:text-[#fb923c]">new</span>
+			<span className="text-text-strong-950 dark:text-white"> Reloop</span>
+			<span className="text-text-soft-400">(</span>
+			<span className="text-text-sub-600 dark:text-white/55">
+				process.env.RELOOP_API_KEY
+			</span>
+			<span className="text-text-soft-400">);</span>
+			{"\n\n"}
+			<span className="text-[#c2410c] dark:text-[#fb923c]">await</span>
+			<span className="text-text-strong-950 dark:text-white">
+				{" reloop.contacts.create({"}
+			</span>
+			{"\n"}
+			<span className="text-text-sub-600 dark:text-white/55">{"  email: "}</span>
+			<span className="text-emerald-700 dark:text-emerald-400">
+				{"'maya@northwind.io'"}
+			</span>
+			<span className="text-text-soft-400">,</span>
+			{"\n"}
+			<span className="text-text-sub-600 dark:text-white/55">
+				{"  firstName: "}
+			</span>
+			<span className="text-emerald-700 dark:text-emerald-400">
+				{"'Maya'"}
+			</span>
+			<span className="text-text-soft-400">,</span>
+			{"\n"}
+			<span className="text-text-sub-600 dark:text-white/55">
+				{"  lastName: "}
+			</span>
+			<span className="text-emerald-700 dark:text-emerald-400">
+				{"'Chen'"}
+			</span>
+			<span className="text-text-soft-400">,</span>
+			{"\n"}
+			<span className="text-text-sub-600 dark:text-white/55">
+				{"  unsubscribed: "}
+			</span>
+			<span className="text-[#c2410c] dark:text-[#fb923c]">false</span>
+			<span className="text-text-soft-400">,</span>
+			{"\n"}
+			<span className="text-text-strong-950 dark:text-white">{"})"}</span>
+			<span className="text-text-soft-400">;</span>
+		</code>
+	);
+}
+
+export function GroupsSnippet() {
+	return (
+		<code>
+			<span className="text-[#c2410c] dark:text-[#fb923c]">import</span>
+			<span className="text-text-strong-950 dark:text-white"> Reloop </span>
+			<span className="text-[#c2410c] dark:text-[#fb923c]">from</span>
+			<span className="text-emerald-700 dark:text-emerald-400">
+				{" 'reloop-email'"}
+			</span>
+			<span className="text-text-soft-400">;</span>
+			{"\n\n"}
+			<span className="text-[#c2410c] dark:text-[#fb923c]">const</span>
+			<span className="text-text-strong-950 dark:text-white"> reloop </span>
+			<span className="text-text-soft-400">= </span>
+			<span className="text-[#c2410c] dark:text-[#fb923c]">new</span>
+			<span className="text-text-strong-950 dark:text-white"> Reloop</span>
+			<span className="text-text-soft-400">(</span>
+			<span className="text-text-sub-600 dark:text-white/55">
+				process.env.RELOOP_API_KEY
+			</span>
+			<span className="text-text-soft-400">);</span>
+			{"\n\n"}
+			<span className="text-[#c2410c] dark:text-[#fb923c]">await</span>
+			<span className="text-text-strong-950 dark:text-white">
+				{" reloop.audiences.create({"}
+			</span>
+			{"\n"}
+			<span className="text-text-sub-600 dark:text-white/55">{"  name: "}</span>
+			<span className="text-emerald-700 dark:text-emerald-400">
+				{"'Beta Testers'"}
+			</span>
+			<span className="text-text-soft-400">,</span>
+			{"\n"}
+			<span className="text-text-sub-600 dark:text-white/55">
+				{"  description: "}
+			</span>
+			<span className="text-emerald-700 dark:text-emerald-400">
+				{"'Early access user group'"}
+			</span>
+			<span className="text-text-soft-400">,</span>
+			{"\n"}
+			<span className="text-text-strong-950 dark:text-white">{"})"}</span>
+			<span className="text-text-soft-400">;</span>
+		</code>
+	);
+}
+
+export function BatchSnippet() {
+	return (
+		<code>
+			<span className="text-[#c2410c] dark:text-[#fb923c]">import</span>
+			<span className="text-text-strong-950 dark:text-white"> Reloop </span>
+			<span className="text-[#c2410c] dark:text-[#fb923c]">from</span>
+			<span className="text-emerald-700 dark:text-emerald-400">
+				{" 'reloop-email'"}
+			</span>
+			<span className="text-text-soft-400">;</span>
+			{"\n\n"}
+			<span className="text-[#c2410c] dark:text-[#fb923c]">const</span>
+			<span className="text-text-strong-950 dark:text-white"> reloop </span>
+			<span className="text-text-soft-400">= </span>
+			<span className="text-[#c2410c] dark:text-[#fb923c]">new</span>
+			<span className="text-text-strong-950 dark:text-white"> Reloop</span>
+			<span className="text-text-soft-400">(</span>
+			<span className="text-text-sub-600 dark:text-white/55">
+				process.env.RELOOP_API_KEY
+			</span>
+			<span className="text-text-soft-400">);</span>
+			{"\n\n"}
+			<span className="text-[#c2410c] dark:text-[#fb923c]">await</span>
+			<span className="text-text-strong-950 dark:text-white">
+				{" reloop.batch.send(["}
+			</span>
+			{"\n"}
+			<span className="text-text-sub-600 dark:text-white/55">{"  { to: "}</span>
+			<span className="text-emerald-700 dark:text-emerald-400">
+				{"'maya@northwind.io'"}
+			</span>
+			<span className="text-text-sub-600 dark:text-white/55">
+				{", subject: "}
+			</span>
+			<span className="text-emerald-700 dark:text-emerald-400">
+				{"'Welcome'"}
+			</span>
+			<span className="text-text-sub-600 dark:text-white/55">{" },"}</span>
+			{"\n"}
+			<span className="text-text-sub-600 dark:text-white/55">{"  { to: "}</span>
+			<span className="text-emerald-700 dark:text-emerald-400">
+				{"'alex@harbor.co'"}
+			</span>
+			<span className="text-text-sub-600 dark:text-white/55">
+				{", subject: "}
+			</span>
+			<span className="text-emerald-700 dark:text-emerald-400">
+				{"'Welcome'"}
+			</span>
+			<span className="text-text-sub-600 dark:text-white/55">{" }"}</span>
+			{"\n"}
+			<span className="text-text-strong-950 dark:text-white">{"])"}</span>
 			<span className="text-text-soft-400">;</span>
 		</code>
 	);

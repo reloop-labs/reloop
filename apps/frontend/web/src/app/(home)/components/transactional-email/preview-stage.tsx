@@ -8,7 +8,10 @@ import { EmailStack } from "./email-stack";
 import {
 	PREVIEW_CODE,
 	PREVIEW_FILES,
+	SEND_API_TABS,
 	type PreviewTabId,
+	type SendApiTabId,
+	SendApiCode,
 } from "./preview-scenes";
 import { PreviewTabs } from "./preview-tabs";
 import { WebhookEvents } from "./webhook-events";
@@ -38,6 +41,7 @@ const contentVariants = {
 export function PreviewStage() {
 	const shouldReduceMotion = useReducedMotion();
 	const [active, setActive] = useState<PreviewTabId>("send");
+	const [sendSubTab, setSendSubTab] = useState<SendApiTabId>("send");
 	const [direction, setDirection] = useState(0);
 
 	const handleTabChange = (newTab: PreviewTabId) => {
@@ -82,27 +86,23 @@ export function PreviewStage() {
 									"w-full max-w-xl lg:max-w-[34rem]",
 									active === "send" && "mx-auto",
 								)}
-								style={{
-									maskImage:
-										"linear-gradient(to bottom, black 0%, black 52%, transparent 96%)",
-									WebkitMaskImage:
-										"linear-gradient(to bottom, black 0%, black 52%, transparent 96%)",
-								}}
 							>
-								<CodeWindow file={PREVIEW_FILES[active]}>
-									<Code />
-								</CodeWindow>
+								{active === "send" ? (
+									<CodeWindow
+										tabs={SEND_API_TABS}
+										activeTab={sendSubTab}
+										onTabChange={(id) => setSendSubTab(id as SendApiTabId)}
+									>
+										<SendApiCode tab={sendSubTab} />
+									</CodeWindow>
+								) : (
+									<CodeWindow file={PREVIEW_FILES[active]}>
+										<Code />
+									</CodeWindow>
+								)}
 							</div>
 							{active !== "send" && (
-								<div
-									className="relative z-10 mt-6 w-full max-w-sm lg:absolute lg:top-4 lg:right-0 xl:right-2"
-									style={{
-										maskImage:
-											"linear-gradient(to bottom, black 0%, black 52%, transparent 96%)",
-										WebkitMaskImage:
-											"linear-gradient(to bottom, black 0%, black 52%, transparent 96%)",
-									}}
-								>
+								<div className="relative z-10 mt-6 w-full max-w-sm lg:absolute lg:top-4 lg:right-0 xl:right-2">
 									{active === "events" ? (
 										<WebhookEvents active={active === "events"} />
 									) : (
@@ -115,7 +115,7 @@ export function PreviewStage() {
 				</div>
 				<div
 					aria-hidden
-					className="pointer-events-none absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-[#f4f5f7] from-15% via-[#f4f5f7]/75 to-transparent dark:from-[#111] dark:via-[#111]/75"
+					className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-44 bg-gradient-to-t from-[#f4f5f7] from-15% via-[#f4f5f7]/75 to-transparent dark:from-[#111] dark:via-[#111]/75"
 				/>
 			</div>
 			<PreviewTabs active={active} onChange={handleTabChange} />

@@ -70,16 +70,15 @@ const EVENT_POOL: Omit<WebhookEvent, "id">[] = [
 	},
 ];
 
-const KIND_STYLE: Record<
-	WebhookKind,
-	{ badge: string; icon: string }
-> = {
+const KIND_STYLE: Record<WebhookKind, { badge: string; icon: string }> = {
 	sent: {
-		badge: "bg-bg-weak-50 text-text-sub-600 dark:bg-white/10 dark:text-white/70",
+		badge:
+			"bg-bg-weak-50 text-text-sub-600 dark:bg-white/10 dark:text-white/70",
 		icon: "send-2",
 	},
 	delivered: {
-		badge: "bg-emerald-50 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300",
+		badge:
+			"bg-emerald-50 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300",
 		icon: "check-circle",
 	},
 	opened: {
@@ -87,7 +86,8 @@ const KIND_STYLE: Record<
 		icon: "eye-outline",
 	},
 	clicked: {
-		badge: "bg-violet-50 text-violet-700 dark:bg-violet-500/15 dark:text-violet-300",
+		badge:
+			"bg-violet-50 text-violet-700 dark:bg-violet-500/15 dark:text-violet-300",
 		icon: "cursor-click",
 	},
 	bounced: {
