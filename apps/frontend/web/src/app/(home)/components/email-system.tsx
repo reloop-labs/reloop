@@ -38,7 +38,7 @@ const SECTIONS = [
 	},
 	{
 		id: "marketing",
-		nav: "Marketing Email",
+		nav: "Marketing Emails",
 		Component: MarketingEmailsSection,
 	},
 ] as const;
