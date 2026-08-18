@@ -26,17 +26,18 @@ export const PREVIEW_TABS: {
 	},
 	{
 		id: "events",
-		icon: "fat-row",
+		icon: "webhook",
 		title: "Live events",
-		description: "Delivered, opened, clicked — as they happen, not the next day.",
-		href: "/features/email-analytics",
+		description:
+			"POST delivered, opened, and bounced to your app the moment they fire.",
+		href: "/features/webhooks",
 	},
 ];
 
 export const PREVIEW_FILES: Record<PreviewTabId, string> = {
 	send: "send.ts",
 	templates: "welcome.tsx",
-	events: "events.ts",
+	events: "webhook.ts",
 };
 
 export function SendApiCode() {

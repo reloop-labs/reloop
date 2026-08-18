@@ -17,7 +17,7 @@ export function PreviewTabs({
 		<div
 			role="tablist"
 			aria-label="Transactional features"
-			className="grid border-stroke-soft-200 border-b sm:grid-cols-3 dark:border-white/10"
+			className="grid border-stroke-soft-200 border-t bg-bg-white-0 sm:grid-cols-3 dark:border-white/10 dark:bg-black"
 		>
 			{PREVIEW_TABS.map((tab) => {
 				const selected = tab.id === active;
