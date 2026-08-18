@@ -5,7 +5,7 @@ export type PreviewTabId = "send" | "templates" | "events";
 
 export const PREVIEW_TABS: {
 	id: PreviewTabId;
-	icon: IconName;
+	icon?: IconName;
 	title: string;
 	description: string;
 	href: string;
@@ -19,10 +19,9 @@ export const PREVIEW_TABS: {
 	},
 	{
 		id: "templates",
-		icon: "layout",
-		title: "Email templates",
-		description: "Write the email once. Variables fill in on every send.",
-		href: "/features/email-templates",
+		title: "React Email supported",
+		description: "Write the email once in React. Variables fill in on every send.",
+		href: "https://react.email",
 	},
 	{
 		id: "events",
@@ -112,7 +111,10 @@ export function TemplatesCode() {
 			<span className="text-text-strong-950 dark:text-white"> function </span>
 			<span className="text-primary-base">OtpEmail</span>
 			<span className="text-text-soft-400">{"({ "}</span>
-			<span className="text-text-strong-950 dark:text-white">code</span>
+			<span className="text-text-strong-950 dark:text-white">code = </span>
+			<span className="text-emerald-700 dark:text-emerald-400">
+				{"'842 190'"}
+			</span>
 			<span className="text-text-soft-400">{" }) {"}</span>
 			{"\n"}
 			<span className="text-[#c2410c] dark:text-[#fb923c]">{"  return"}</span>
@@ -123,11 +125,23 @@ export function TemplatesCode() {
 			</span>
 			{"\n"}
 			<span className="text-text-sub-600 dark:text-white/55">
-				{"      <Heading>Verification code</Heading>"}
+				{"      <Heading>Your verification code</Heading>"}
 			</span>
 			{"\n"}
 			<span className="text-text-sub-600 dark:text-white/55">
-				{"      <OtpCode value={code} />"}
+				{
+					"      <Text>Enter this 6-digit code to complete sign-in to Reloop.</Text>"
+				}
+			</span>
+			{"\n"}
+			<span className="text-text-sub-600 dark:text-white/55">
+				{"      <OtpCode value={code} expiresIn=\"10 minutes\" />"}
+			</span>
+			{"\n"}
+			<span className="text-text-sub-600 dark:text-white/55">
+				{
+					"      <Text muted>If you didn't request this code, ignore this email.</Text>"
+				}
 			</span>
 			{"\n"}
 			<span className="text-text-sub-600 dark:text-white/55">

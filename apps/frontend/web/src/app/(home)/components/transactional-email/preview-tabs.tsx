@@ -6,6 +6,36 @@ import Link from "next/link";
 import type { PreviewTabId } from "./preview-scenes";
 import { PREVIEW_TABS } from "./preview-scenes";
 
+function ReactEmailIcon({ className }: { className?: string }) {
+	return (
+		<svg
+			viewBox="0 0 24 24"
+			fill="none"
+			stroke="currentColor"
+			strokeWidth="1.5"
+			className={className}
+			aria-hidden="true"
+		>
+			<ellipse cx="12" cy="12" rx="10" ry="4.5" />
+			<ellipse
+				cx="12"
+				cy="12"
+				rx="10"
+				ry="4.5"
+				transform="rotate(60 12 12)"
+			/>
+			<ellipse
+				cx="12"
+				cy="12"
+				rx="10"
+				ry="4.5"
+				transform="rotate(120 12 12)"
+			/>
+			<circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none" />
+		</svg>
+	);
+}
+
 export function PreviewTabs({
 	active,
 	onChange,
@@ -45,15 +75,26 @@ export function PreviewTabs({
 								selected ? "bg-primary-base" : "bg-transparent",
 							)}
 						/>
-						<Icon
-							name={tab.icon}
-							className={cn(
-								"size-4",
-								selected
-									? "text-text-strong-950 dark:text-white"
-									: "text-text-soft-400 dark:text-white/30",
-							)}
-						/>
+						{tab.id === "templates" ? (
+							<ReactEmailIcon
+								className={cn(
+									"size-4",
+									selected
+										? "text-text-strong-950 dark:text-white"
+										: "text-text-soft-400 dark:text-white/30",
+								)}
+							/>
+						) : (
+							<Icon
+								name={tab.icon!}
+								className={cn(
+									"size-4",
+									selected
+										? "text-text-strong-950 dark:text-white"
+										: "text-text-soft-400 dark:text-white/30",
+								)}
+							/>
+						)}
 						<p
 							className={cn(
 								"mt-3 font-semibold text-[15px] tracking-tight",
@@ -76,6 +117,9 @@ export function PreviewTabs({
 						</p>
 						<Link
 							href={tab.href}
+							{...(tab.href.startsWith("http")
+								? { target: "_blank", rel: "noopener noreferrer" }
+								: {})}
 							onClick={(event) => event.stopPropagation()}
 							className={cn(
 								"mt-4 inline-flex items-center gap-1 text-[13.5px]",

@@ -36,8 +36,8 @@ export function EmailStack() {
 
 function EmailShell({ children }: { children: ReactNode }) {
 	return (
-		<div className="bg-white px-6 pt-8 pb-10 text-[#0e0e0e] dark:bg-[#0e0e0e] dark:text-white">
-			<Logo className="-ml-2.5 mb-6 size-[52px] dark:invert" />
+		<div className="bg-white px-5 pt-6 pb-8 text-[#0e0e0e] sm:px-6 sm:pt-7 sm:pb-9 dark:bg-[#0e0e0e] dark:text-white">
+			<Logo className="-ml-1.5 mb-4 size-[40px] dark:invert" />
 			{children}
 		</div>
 	);
@@ -60,7 +60,7 @@ function SerifHeading({
 }) {
 	return (
 		<h3
-			className="mt-6 mb-8 p-0 font-normal text-[#0e0e0e] text-[32px] leading-[1.2] dark:text-white"
+			className="mt-3.5 mb-4 p-0 font-medium text-[#0e0e0e] text-[20px] leading-snug tracking-tight sm:text-[22px] dark:text-white"
 			style={{ fontFamily: "Georgia, serif" }}
 		>
 			{children}
@@ -70,7 +70,7 @@ function SerifHeading({
 }
 
 function Rule() {
-	return <div className="my-8 h-px w-full bg-[#e0e0e0] dark:bg-[#222]" />;
+	return <div className="my-5 h-px w-full bg-[#e0e0e0] dark:bg-[#222]" />;
 }
 
 function BodyText({
@@ -135,25 +135,25 @@ function OtpEmailBody() {
 	return (
 		<EmailShell>
 			<MonoLabel>One-Time Passcode</MonoLabel>
-			<SerifHeading>Your login verification code.</SerifHeading>
+			<SerifHeading>Your verification code</SerifHeading>
 			<Rule />
 			<BodyText>
 				Enter this 6-digit verification code to complete your sign-in to
 				Reloop. This code expires in 10 minutes.
 			</BodyText>
 
-			<div className="my-8 rounded-xl border border-[#e0e0e0] bg-[#fbfbfb] p-6 text-center dark:border-[#222] dark:bg-[#141414]">
-				<p className="m-0 font-bold font-mono text-[30px] text-[#0e0e0e] tracking-[0.25em] dark:text-white">
+			<div className="my-6 rounded-xl border border-[#e0e0e0] bg-[#fbfbfb] p-5 text-center dark:border-[#222] dark:bg-[#141414]">
+				<p className="m-0 font-bold font-mono text-[26px] text-[#0e0e0e] tracking-[0.2em] sm:text-[28px] dark:text-white">
 					842 190
 				</p>
-				<p className="mt-2.5 mb-0 text-[#707070] text-[12px]">
+				<p className="mt-2 mb-0 text-[#707070] text-[11.5px]">
 					Valid for 10 minutes · Do not share this code
 				</p>
 			</div>
 
-			<BodyText className="text-[13px] text-[#707070] dark:text-[#888]">
+			<BodyText className="text-[12.5px] text-[#707070] dark:text-[#888]">
 				If you didn&apos;t request this code, you can safely ignore this
-				message. Someone might have typed your email address by mistake.
+				message.
 			</BodyText>
 
 			<EmailFooter />
