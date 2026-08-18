@@ -52,7 +52,11 @@ const EASE_OUT = "cubic-bezier(0.23, 1, 0.32, 1)";
 
 export default function EmailSystem() {
 	const [active, setActive] = useState<SectionId>(SECTIONS[0].id);
-	const [indicator, setIndicator] = useState({ top: 0, height: 0, ready: false });
+	const [indicator, setIndicator] = useState({
+		top: 0,
+		height: 0,
+		ready: false,
+	});
 	const reduceMotion = useReducedMotion();
 	const panelRefs = useRef<Record<string, HTMLElement | null>>({});
 	const buttonRefs = useRef<Record<string, HTMLButtonElement | null>>({});
@@ -98,7 +102,9 @@ export default function EmailSystem() {
 	useEffect(() => {
 		const nav = navRef.current;
 		if (!nav) return;
-		const observer = new ResizeObserver(() => placeIndicator(activeRef.current));
+		const observer = new ResizeObserver(() =>
+			placeIndicator(activeRef.current),
+		);
 		observer.observe(nav);
 		return () => observer.disconnect();
 	}, [placeIndicator]);
@@ -168,16 +174,16 @@ export default function EmailSystem() {
 			</div>
 
 			<div className="border-stroke-soft-200 border-t lg:grid lg:grid-cols-[minmax(14rem,18.5rem)_minmax(0,1fr)] dark:border-white/10">
-				<div className="border-stroke-soft-200 border-b lg:border-r lg:border-b-0 dark:border-white/10">
-					<aside className="top-16 z-10 bg-bg-white-0 lg:sticky dark:bg-black">
+				<div className="border-stroke-soft-200 border-b lg:overflow-visible lg:border-r lg:border-b-0 dark:border-white/10">
+					<aside className="top-16 z-10 overflow-visible bg-bg-white-0 lg:sticky dark:bg-black">
 						<nav
 							ref={navRef}
 							aria-label="Product scenes"
-							className="relative flex gap-1 overflow-x-auto px-4 py-3 [scrollbar-width:none] lg:flex-col lg:gap-0.5 lg:p-0 lg:py-10 [&::-webkit-scrollbar]:hidden"
+							className="relative flex gap-1 overflow-x-auto px-4 py-3 [scrollbar-width:none] lg:flex-col lg:gap-0.5 lg:overflow-visible lg:p-0 lg:py-10 [&::-webkit-scrollbar]:hidden"
 						>
 							<span
 								aria-hidden
-								className="pointer-events-none absolute left-0 hidden w-[3.5px] rounded-r-full bg-blue-600 lg:block dark:bg-blue-500"
+								className="pointer-events-none absolute top-0 left-[-1.5px] hidden w-0.5 bg-primary-base lg:block"
 								style={{
 									top: 0,
 									height: indicator.height,
@@ -201,7 +207,7 @@ export default function EmailSystem() {
 										className={cn(
 											"relative w-full shrink-0 px-3.5 py-2 text-left font-medium text-[15px] tracking-[-0.01em] transition-colors duration-150 lg:py-2 lg:pr-6 lg:pl-8 lg:text-[17px]",
 											selected
-												? "font-semibold text-text-strong-950 dark:text-white"
+												? "text-text-strong-950 dark:text-white"
 												: "text-text-soft-400 hover:text-text-sub-600 dark:text-white/30 dark:hover:text-white/60",
 										)}
 										aria-current={selected ? "true" : undefined}
