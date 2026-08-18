@@ -796,13 +796,13 @@ const navItems: NavItem[] = [
 				},
 				{
 					title: "X",
-					href: "https://x.com/reloophq",
+					href: "https://x.com/reloop_labs",
 					icon: "social-x",
 					external: true,
 				},
 				{
 					title: "LinkedIn",
-					href: "https://linkedin.com/company/reloop",
+					href: "https://www.linkedin.com/company/reloop-labs",
 					icon: "social-linkedin",
 					external: true,
 				},
