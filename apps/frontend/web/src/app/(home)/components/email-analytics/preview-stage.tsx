@@ -858,138 +858,479 @@ function MetricsLayeredView() {
 	);
 }
 
-/* --- Scene 2: Engagement & Clicks Preview --- */
+/* --- Scene 2: Reloop Engagement Funnel (Sankey Flow) --- */
+type FunnelStage = "delivered" | "opened" | "clicked";
+
 function EngagementView() {
+	const [activeStage, setActiveStage] = useState<FunnelStage>("opened");
+	const [timePreset, setTimePreset] = useState("Last 24 hours");
+	const [filterOpen, setFilterOpen] = useState(false);
+
 	return (
-		<div className="w-full space-y-4">
-			{/* Metric Top Row */}
-			<div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-				<div className="rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-3.5 shadow-sm dark:border-white/10 dark:bg-white/[0.03]">
-					<span className="text-text-sub-600 text-xs dark:text-white/60">
-						Open Rate
-					</span>
-					<p className="mt-1 font-semibold text-text-strong-950 text-xl tracking-tight dark:text-white">
-						48.2%
-					</p>
-					<span className="text-[11px] text-emerald-600 dark:text-emerald-400">
-						+9.7% vs industry avg
-					</span>
-				</div>
-
-				<div className="rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-3.5 shadow-sm dark:border-white/10 dark:bg-white/[0.03]">
-					<span className="text-text-sub-600 text-xs dark:text-white/60">
-						Click-Through (CTR)
-					</span>
-					<p className="mt-1 font-semibold text-text-strong-950 text-xl tracking-tight dark:text-white">
-						14.6%
-					</p>
-					<span className="text-[11px] text-text-soft-400 dark:text-white/50">
-						8,321 unique clicks
-					</span>
-				</div>
-
-				<div className="rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-3.5 shadow-sm dark:border-white/10 dark:bg-white/[0.03]">
-					<span className="text-text-sub-600 text-xs dark:text-white/60">
-						Click-to-Open (CTOR)
-					</span>
-					<p className="mt-1 font-semibold text-text-strong-950 text-xl tracking-tight dark:text-white">
-						30.3%
-					</p>
-					<span className="text-[11px] text-emerald-600 dark:text-emerald-400">
-						High engagement
-					</span>
-				</div>
-
-				<div className="rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-3.5 shadow-sm dark:border-white/10 dark:bg-white/[0.03]">
-					<span className="text-text-sub-600 text-xs dark:text-white/60">
-						Unsubscribe Rate
-					</span>
-					<p className="mt-1 font-semibold text-text-strong-950 text-xl tracking-tight dark:text-white">
-						0.12%
-					</p>
-					<span className="text-[11px] text-emerald-600 dark:text-emerald-400">
-						Ultra-low friction
-					</span>
-				</div>
-			</div>
-
-			{/* Link Heatmap & Client Breakdown Grid */}
-			<div className="grid grid-cols-1 gap-3 lg:grid-cols-[1.5fr_1fr]">
-				{/* Top Clicked Links */}
-				<div className="rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-4 shadow-sm dark:border-white/10 dark:bg-white/[0.03]">
-					<div className="flex items-center justify-between border-stroke-soft-100 border-b pb-2.5 dark:border-white/5">
-						<span className="font-medium text-text-strong-950 text-xs dark:text-white">
-							Top Clicked Links
-						</span>
-						<span className="text-[11px] text-text-soft-400 dark:text-white/40">
-							Unique Clicks
-						</span>
+		<div className="relative mx-auto w-full max-w-5xl">
+			{/* Main Funnel Console Window */}
+			<div className="relative rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-5 shadow-[0_4px_24px_rgba(0,0,0,0.04)] sm:p-6 dark:border-white/10 dark:bg-[#0c0c0e]">
+				{/* Header & Controls */}
+				<div className="flex flex-wrap items-center justify-between gap-3 border-stroke-soft-100 border-b pb-4 dark:border-white/5">
+					<div className="flex items-center gap-2.5">
+						<div className="flex size-7 items-center justify-center rounded-lg border border-stroke-soft-200 bg-bg-weak-50 text-text-strong-950 dark:border-white/10 dark:bg-white/[0.05] dark:text-white">
+							<Icon name="cursor-click" className="size-4" />
+						</div>
+						<div>
+							<h3 className="font-semibold text-sm text-text-strong-950 tracking-tight dark:text-white">
+								Engagement Funnel
+							</h3>
+							<p className="text-[11px] text-text-sub-600 dark:text-white/50">
+								Conversion drop-off from delivery to opens, clicks, and actions.
+							</p>
+						</div>
 					</div>
 
-					<div className="mt-3 space-y-3">
-						{[
-							{
-								url: "https://reloop.sh/dashboard/verify",
-								clicks: "4,120",
-								pct: 49.5,
-							},
-							{
-								url: "https://reloop.sh/docs/quickstart",
-								clicks: "2,680",
-								pct: 32.2,
-							},
-							{
-								url: "https://reloop.sh/pricing",
-								clicks: "1,521",
-								pct: 18.3,
-							},
-						].map((link) => (
-							<div key={link.url} className="space-y-1">
-								<div className="flex items-center justify-between text-xs">
-									<span className="truncate font-mono text-text-sub-600 dark:text-white/70">
-										{link.url}
-									</span>
-									<span className="font-medium text-text-strong-950 dark:text-white">
-										{link.clicks}
-									</span>
-								</div>
-								<div className="h-1.5 w-full overflow-hidden rounded-full bg-stroke-soft-100 dark:bg-white/10">
-									<div
-										className="h-full rounded-full bg-blue-500"
-										style={{ width: `${link.pct}%` }}
-									/>
-								</div>
-							</div>
-						))}
-					</div>
-				</div>
-
-				{/* Email Clients Share */}
-				<div className="rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-4 shadow-sm dark:border-white/10 dark:bg-white/[0.03]">
-					<div className="border-stroke-soft-100 border-b pb-2.5 dark:border-white/5">
-						<span className="font-medium text-text-strong-950 text-xs dark:text-white">
-							Device & Client Share
-						</span>
-					</div>
-
-					<div className="mt-3 space-y-2.5">
-						{[
-							{ client: "Apple Mail (iOS / macOS)", share: "54%" },
-							{ client: "Gmail (Mobile & Web)", share: "33%" },
-							{ client: "Outlook / Exchange", share: "13%" },
-						].map((item) => (
-							<div
-								key={item.client}
-								className="flex items-center justify-between rounded-lg border border-stroke-soft-100 bg-bg-weak-50/50 px-3 py-2 text-xs dark:border-white/5 dark:bg-white/[0.02]"
+					<div className="flex items-center gap-2">
+						{/* Filter Preset Pill */}
+						<div className="relative">
+							<button
+								type="button"
+								onClick={() => setFilterOpen(!filterOpen)}
+								className="flex cursor-pointer items-center gap-1.5 rounded-lg border border-stroke-soft-200 bg-bg-white-0 px-2.5 py-1 text-text-sub-600 text-xs shadow-xs hover:bg-bg-weak-50 dark:border-white/10 dark:bg-white/[0.03] dark:text-white/70 dark:hover:bg-white/5"
 							>
-								<span className="text-text-sub-600 dark:text-white/60">
-									{item.client}
-								</span>
-								<span className="font-semibold text-text-strong-950 dark:text-white">
-									{item.share}
+								<Icon name="calendar" className="size-3.5" />
+								<span>{timePreset}</span>
+								<span className="text-[10px]">▾</span>
+							</button>
+
+							<AnimatePresence>
+								{filterOpen && (
+									<motion.div
+										initial={{ opacity: 0, y: 4, scale: 0.98 }}
+										animate={{ opacity: 1, y: 0, scale: 1 }}
+										exit={{ opacity: 0, y: 4, scale: 0.98 }}
+										className="absolute top-full right-0 z-30 mt-1.5 w-36 overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-1 shadow-lg dark:border-white/10 dark:bg-[#141416]"
+									>
+										{["Last 24 hours", "Last 7 days", "Last 15 days"].map(
+											(p) => (
+												<button
+													key={p}
+													type="button"
+													onClick={() => {
+														setTimePreset(p);
+														setFilterOpen(false);
+													}}
+													className={cn(
+														"flex w-full cursor-pointer items-center justify-between rounded-lg px-2.5 py-1.5 text-left text-xs transition-colors",
+														p === timePreset
+															? "bg-bg-weak-50 font-medium text-text-strong-950 dark:bg-white/10 dark:text-white"
+															: "text-text-sub-600 hover:bg-bg-weak-50 dark:text-white/70 dark:hover:bg-white/5",
+													)}
+												>
+													<span>{p}</span>
+													{p === timePreset && <span>✓</span>}
+												</button>
+											),
+										)}
+									</motion.div>
+								)}
+							</AnimatePresence>
+						</div>
+
+						<div className="flex items-center gap-1.5 rounded-lg border border-stroke-soft-200 bg-bg-white-0 px-2.5 py-1 text-text-sub-600 text-xs shadow-xs dark:border-white/10 dark:bg-white/[0.03] dark:text-white/70">
+							<span className="size-1.5 animate-pulse rounded-full bg-emerald-500" />
+							<span>Live stream</span>
+						</div>
+					</div>
+				</div>
+
+				{/* 3 Clickable Funnel Stage Metric Cards */}
+				<div className="mt-4 grid grid-cols-3 divide-x divide-stroke-soft-100 overflow-hidden rounded-xl border border-stroke-soft-200 dark:divide-white/5 dark:border-white/10">
+					{/* Stage 1: Delivered */}
+					<button
+						type="button"
+						onClick={() => setActiveStage("delivered")}
+						className={cn(
+							"group relative flex cursor-pointer flex-col p-4 text-left transition-all",
+							activeStage === "delivered"
+								? "bg-indigo-50/40 dark:bg-indigo-950/20"
+								: "hover:bg-bg-weak-50/50 dark:hover:bg-white/[0.02]",
+						)}
+					>
+						<div className="flex items-center justify-between">
+							<div className="flex items-center gap-2">
+								<span className="size-2 rounded-full bg-[#4F46E5]" />
+								<span className="font-medium text-text-sub-600 text-xs dark:text-white/60">
+									Delivered
 								</span>
 							</div>
-						))}
+							<span className="text-text-soft-400 text-xs transition-transform group-hover:translate-x-0.5 dark:text-white/30">
+								›
+							</span>
+						</div>
+						<p className="mt-2 font-bold text-2xl text-text-strong-950 tracking-tight sm:text-3xl dark:text-white">
+							29.4K
+						</p>
+						<div className="mt-1 flex items-center gap-1.5 text-[#4F46E5] text-[11px] dark:text-indigo-400">
+							<span>100% of sent</span>
+							<span className="text-text-soft-400 dark:text-white/30">·</span>
+							<span className="text-text-sub-600 dark:text-white/50">
+								128ms avg
+							</span>
+						</div>
+						{activeStage === "delivered" && (
+							<motion.div
+								layoutId="funnel-tab"
+								className="absolute inset-x-0 bottom-0 h-0.5 bg-[#4F46E5]"
+							/>
+						)}
+					</button>
+
+					{/* Stage 2: Opened */}
+					<button
+						type="button"
+						onClick={() => setActiveStage("opened")}
+						className={cn(
+							"group relative flex cursor-pointer flex-col p-4 text-left transition-all",
+							activeStage === "opened"
+								? "bg-cyan-50/40 dark:bg-cyan-950/20"
+								: "hover:bg-bg-weak-50/50 dark:hover:bg-white/[0.02]",
+						)}
+					>
+						<div className="flex items-center justify-between">
+							<div className="flex items-center gap-2">
+								<span className="size-2 rounded-full bg-[#0284C7]" />
+								<span className="font-medium text-text-sub-600 text-xs dark:text-white/60">
+									Opened
+								</span>
+							</div>
+							<span className="text-text-soft-400 text-xs transition-transform group-hover:translate-x-0.5 dark:text-white/30">
+								›
+							</span>
+						</div>
+						<p className="mt-2 font-bold text-2xl text-text-strong-950 tracking-tight sm:text-3xl dark:text-white">
+							14.1K
+						</p>
+						<div className="mt-1 flex items-center gap-1.5 text-[#0284C7] text-[11px] dark:text-cyan-400">
+							<span>48.2% open rate</span>
+							<span className="text-text-soft-400 dark:text-white/30">·</span>
+							<span className="text-emerald-600 dark:text-emerald-400">
+								+9.7% avg
+							</span>
+						</div>
+						{activeStage === "opened" && (
+							<motion.div
+								layoutId="funnel-tab"
+								className="absolute inset-x-0 bottom-0 h-0.5 bg-[#0284C7]"
+							/>
+						)}
+					</button>
+
+					{/* Stage 3: Clicked */}
+					<button
+						type="button"
+						onClick={() => setActiveStage("clicked")}
+						className={cn(
+							"group relative flex cursor-pointer flex-col p-4 text-left transition-all",
+							activeStage === "clicked"
+								? "bg-emerald-50/40 dark:bg-emerald-950/20"
+								: "hover:bg-bg-weak-50/50 dark:hover:bg-white/[0.02]",
+						)}
+					>
+						<div className="flex items-center justify-between">
+							<div className="flex items-center gap-2">
+								<span className="size-2 rounded-full bg-[#059669]" />
+								<span className="font-medium text-text-sub-600 text-xs dark:text-white/60">
+									Clicked
+								</span>
+							</div>
+							<div className="flex items-center gap-1 text-[11px] text-text-soft-400 dark:text-white/40">
+								<span>CTOR 30%</span>
+							</div>
+						</div>
+						<p className="mt-2 font-bold text-2xl text-text-strong-950 tracking-tight sm:text-3xl dark:text-white">
+							4,286
+						</p>
+						<div className="mt-1 flex items-center gap-1.5 text-[#059669] text-[11px] dark:text-emerald-400">
+							<span>14.6% unique CTR</span>
+							<span className="text-text-soft-400 dark:text-white/30">·</span>
+							<span className="text-text-sub-600 dark:text-white/50">
+								8.3K total
+							</span>
+						</div>
+						{activeStage === "clicked" && (
+							<motion.div
+								layoutId="funnel-tab"
+								className="absolute inset-x-0 bottom-0 h-0.5 bg-[#059669]"
+							/>
+						)}
+					</button>
+				</div>
+
+				{/* Fluid Organic Sankey Stream Graphic */}
+				<div className="relative mt-4 overflow-hidden rounded-xl border border-stroke-soft-200 p-2 sm:p-4 dark:border-white/10">
+					<div className="relative h-[180px] w-full">
+						<svg
+							viewBox="0 0 760 180"
+							className="h-full w-full overflow-visible"
+							preserveAspectRatio="none"
+						>
+							<defs>
+								{/* Gradients for smooth fluid transitions: Indigo -> Cyan -> Emerald */}
+								<linearGradient
+									id="funnel-indigo-cyan"
+									x1="0%"
+									y1="0%"
+									x2="100%"
+									y2="0%"
+								>
+									<stop offset="0%" stopColor="#4338CA" />
+									<stop offset="60%" stopColor="#4F46E5" />
+									<stop offset="100%" stopColor="#0284C7" />
+								</linearGradient>
+
+								<linearGradient
+									id="funnel-cyan-emerald"
+									x1="0%"
+									y1="0%"
+									x2="100%"
+									y2="0%"
+								>
+									<stop offset="0%" stopColor="#0284C7" />
+									<stop offset="60%" stopColor="#0EA5E9" />
+									<stop offset="100%" stopColor="#059669" />
+								</linearGradient>
+
+								<linearGradient
+									id="funnel-emerald-end"
+									x1="0%"
+									y1="0%"
+									x2="100%"
+									y2="0%"
+								>
+									<stop offset="0%" stopColor="#059669" />
+									<stop offset="60%" stopColor="#10B981" />
+									<stop offset="100%" stopColor="#34D399" />
+								</linearGradient>
+							</defs>
+
+							{/* --- 1. Delivered Stream (Indigo Stream) --- */}
+							<g
+								className="cursor-pointer transition-opacity duration-200"
+								onClick={() => setActiveStage("delivered")}
+								opacity={
+									activeStage === "delivered"
+										? 1
+										: activeStage === "opened" || activeStage === "clicked"
+											? 0.75
+											: 1
+								}
+							>
+								{/* Outer Layer Glow Band */}
+								<path
+									d="M 0 10 L 240 10 C 290 10, 290 42, 340 42 L 340 138 C 290 138, 290 170, 240 170 L 0 170 Z"
+									fill="#4F46E5"
+									fillOpacity="0.16"
+								/>
+								{/* Middle Layer */}
+								<path
+									d="M 0 15 L 240 15 C 290 15, 290 46, 340 46 L 340 134 C 290 134, 290 165, 240 165 L 0 165 Z"
+									fill="#4F46E5"
+									fillOpacity="0.3"
+								/>
+								{/* Core Stream */}
+								<path
+									d="M 0 20 L 240 20 C 290 20, 290 50, 340 50 L 340 130 C 290 130, 290 160, 240 160 L 0 160 Z"
+									fill="url(#funnel-indigo-cyan)"
+								/>
+							</g>
+
+							{/* --- 2. Opened Stream (Cyan Stream) --- */}
+							<g
+								className="cursor-pointer transition-opacity duration-200"
+								onClick={() => setActiveStage("opened")}
+								opacity={
+									activeStage === "opened"
+										? 1
+										: activeStage === "delivered" || activeStage === "clicked"
+											? 0.75
+											: 1
+								}
+							>
+								{/* Outer Layer Glow Band */}
+								<path
+									d="M 340 42 L 500 42 C 550 42, 550 68, 600 68 L 600 112 C 550 112, 550 138, 500 138 L 340 138 Z"
+									fill="#0EA5E9"
+									fillOpacity="0.16"
+								/>
+								{/* Middle Layer */}
+								<path
+									d="M 340 46 L 500 46 C 550 46, 550 71, 600 71 L 600 109 C 550 109, 550 134, 500 134 L 340 134 Z"
+									fill="#0EA5E9"
+									fillOpacity="0.3"
+								/>
+								{/* Core Stream */}
+								<path
+									d="M 340 50 L 500 50 C 550 50, 550 74, 600 74 L 600 106 C 550 106, 550 130, 500 130 L 340 130 Z"
+									fill="url(#funnel-cyan-emerald)"
+								/>
+							</g>
+
+							{/* --- 3. Clicked Stream (Reloop Signature Emerald Stream) --- */}
+							<g
+								className="cursor-pointer transition-opacity duration-200"
+								onClick={() => setActiveStage("clicked")}
+								opacity={
+									activeStage === "clicked"
+										? 1
+										: activeStage === "delivered" || activeStage === "opened"
+											? 0.75
+											: 1
+								}
+							>
+								{/* Outer Layer Glow Band */}
+								<path
+									d="M 600 68 L 760 68 L 760 112 L 600 112 Z"
+									fill="#059669"
+									fillOpacity="0.18"
+								/>
+								{/* Middle Layer */}
+								<path
+									d="M 600 71 L 760 71 L 760 109 L 600 109 Z"
+									fill="#059669"
+									fillOpacity="0.32"
+								/>
+								{/* Core Stream */}
+								<path
+									d="M 600 74 L 760 74 L 760 106 L 600 106 Z"
+									fill="url(#funnel-emerald-end)"
+								/>
+							</g>
+						</svg>
+
+						{/* Centered Retention Badges overlay */}
+						<div className="pointer-events-none absolute inset-0 flex items-center justify-between px-16 sm:px-24">
+							{/* Delivered 100% badge */}
+							<div className="flex items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-white-0/95 px-3 py-1 font-bold text-[#4F46E5] text-xs shadow-md dark:border-white/10 dark:bg-black/90 dark:text-indigo-400">
+								100%
+							</div>
+
+							{/* Opened 48.2% badge */}
+							<div className="flex items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-white-0/95 px-3 py-1 font-bold text-[#0284C7] text-xs shadow-md dark:border-white/10 dark:bg-black/90 dark:text-cyan-400">
+								48.2%
+							</div>
+
+							{/* Clicked 14.6% badge */}
+							<div className="flex items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-white-0/95 px-3 py-1 font-bold text-[#059669] text-xs shadow-md dark:border-white/10 dark:bg-black/90 dark:text-emerald-400">
+								14.6%
+							</div>
+						</div>
+					</div>
+
+					{/* Minimal Stage Insights Footer */}
+					<div className="mt-3.5 border-stroke-soft-100 border-t pt-3 text-xs dark:border-white/5">
+						<AnimatePresence mode="wait">
+							{activeStage === "delivered" && (
+								<motion.div
+									key="delivered-footer"
+									initial={{ opacity: 0 }}
+									animate={{ opacity: 1 }}
+									exit={{ opacity: 0 }}
+									transition={{ duration: 0.15 }}
+									className="flex flex-wrap items-center justify-between gap-3 text-[11px]"
+								>
+									<div className="flex items-center gap-4">
+										<span className="text-text-sub-600 dark:text-white/60">
+											Gmail{" "}
+											<strong className="font-semibold text-text-strong-950 dark:text-white">
+												99.8%
+											</strong>
+										</span>
+										<span className="text-text-sub-600 dark:text-white/60">
+											Apple Mail{" "}
+											<strong className="font-semibold text-text-strong-950 dark:text-white">
+												99.9%
+											</strong>
+										</span>
+										<span className="text-text-sub-600 dark:text-white/60">
+											Outlook{" "}
+											<strong className="font-semibold text-text-strong-950 dark:text-white">
+												98.6%
+											</strong>
+										</span>
+									</div>
+									<span className="text-text-soft-400 dark:text-white/40">
+										Direct TLS 1.3 Routing
+									</span>
+								</motion.div>
+							)}
+
+							{activeStage === "opened" && (
+								<motion.div
+									key="opened-footer"
+									initial={{ opacity: 0 }}
+									animate={{ opacity: 1 }}
+									exit={{ opacity: 0 }}
+									transition={{ duration: 0.15 }}
+									className="flex flex-wrap items-center justify-between gap-3 text-[11px]"
+								>
+									<div className="flex items-center gap-4">
+										<span className="text-text-sub-600 dark:text-white/60">
+											Apple Mail{" "}
+											<strong className="font-semibold text-text-strong-950 dark:text-white">
+												54%
+											</strong>
+										</span>
+										<span className="text-text-sub-600 dark:text-white/60">
+											Gmail{" "}
+											<strong className="font-semibold text-text-strong-950 dark:text-white">
+												33%
+											</strong>
+										</span>
+										<span className="text-text-sub-600 dark:text-white/60">
+											Outlook{" "}
+											<strong className="font-semibold text-text-strong-950 dark:text-white">
+												13%
+											</strong>
+										</span>
+									</div>
+									<span className="text-text-soft-400 dark:text-white/40">
+										Peak: 9:00 AM – 11:30 AM
+									</span>
+								</motion.div>
+							)}
+
+							{activeStage === "clicked" && (
+								<motion.div
+									key="clicked-footer"
+									initial={{ opacity: 0 }}
+									animate={{ opacity: 1 }}
+									exit={{ opacity: 0 }}
+									transition={{ duration: 0.15 }}
+									className="flex flex-wrap items-center justify-between gap-3 text-[11px]"
+								>
+									<div className="flex items-center gap-4">
+										<span className="text-text-sub-600 dark:text-white/60">
+											Verify Email{" "}
+											<strong className="font-semibold text-text-strong-950 dark:text-white">
+												49.5%
+											</strong>
+										</span>
+										<span className="text-text-sub-600 dark:text-white/60">
+											Quickstart{" "}
+											<strong className="font-semibold text-text-strong-950 dark:text-white">
+												32.2%
+											</strong>
+										</span>
+										<span className="text-text-sub-600 dark:text-white/60">
+											Pricing{" "}
+											<strong className="font-semibold text-text-strong-950 dark:text-white">
+												18.3%
+											</strong>
+										</span>
+									</div>
+									<span className="text-text-soft-400 dark:text-white/40">
+										CTOR: 30.3%
+									</span>
+								</motion.div>
+							)}
+						</AnimatePresence>
 					</div>
 				</div>
 			</div>
