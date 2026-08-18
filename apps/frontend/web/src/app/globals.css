@@ -179,3 +179,25 @@
 .animate-infinite-scroll {
 	animation: infinite-scroll 45s linear infinite;
 }
+
+@keyframes ticker {
+	0%, 20% { transform: translateY(0%); }
+	25%, 45% { transform: translateY(-25%); }
+	50%, 70% { transform: translateY(-50%); }
+	75%, 95% { transform: translateY(-75%); }
+	100% { transform: translateY(0%); }
+}
+
+@keyframes scrollEvents {
+	0%, 20% { transform: translateY(0%); }
+	25%, 45% { transform: translateY(-25%); }
+	50%, 70% { transform: translateY(-50%); }
+	75%, 95% { transform: translateY(-75%); }
+	100% { transform: translateY(0%); }
+}
+
+@keyframes blink {
+	0%, 100% { opacity: 1; }
+	50% { opacity: 0; }
+}
+
