@@ -1,5 +1,6 @@
 "use client";
 
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useState } from "react";
 import { CodeWindow } from "./code-window";
 import { EmailPreviewCard } from "./email-preview-card";
@@ -13,8 +14,45 @@ import {
 import { PreviewTabs } from "./preview-tabs";
 import { WebhookEvents } from "./webhook-events";
 
+const TAB_ORDER: PreviewTabId[] = ["send", "templates", "events"];
+
+/** CSS ease matching header mega-menu directional slides */
+const EASE_DEFAULT: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
+const SLIDE_PX = 160;
+const SLIDE_MS = 0.28;
+
+const contentVariants = {
+	enter: (dir: number) => ({
+		opacity: 0,
+		x: dir > 0 ? SLIDE_PX : dir < 0 ? -SLIDE_PX : 0,
+	}),
+	center: {
+		opacity: 1,
+		x: 0,
+	},
+	exit: (dir: number) => ({
+		opacity: 0,
+		x: dir > 0 ? -SLIDE_PX : dir < 0 ? SLIDE_PX : 0,
+	}),
+};
+
 export function PreviewStage() {
+	const shouldReduceMotion = useReducedMotion();
 	const [active, setActive] = useState<PreviewTabId>("send");
+	const [direction, setDirection] = useState(0);
+
+	const handleTabChange = (newTab: PreviewTabId) => {
+		if (newTab === active) return;
+		const from = TAB_ORDER.indexOf(active);
+		const to = TAB_ORDER.indexOf(newTab);
+		if (from !== -1 && to !== -1) {
+			setDirection(to > from ? 1 : -1);
+		} else {
+			setDirection(0);
+		}
+		setActive(newTab);
+	};
+
 	const Code = PREVIEW_CODE[active];
 	const card = PREVIEW_CARD[active];
 
@@ -22,48 +60,69 @@ export function PreviewStage() {
 		<div className="bg-[#f4f5f7] dark:bg-[#111]">
 			<div className="relative overflow-hidden">
 				<div className="relative mx-auto min-h-[28rem] max-w-5xl px-5 pt-12 pb-16 sm:min-h-[32rem] sm:px-8 sm:pt-14 sm:pb-20 lg:px-10">
-					<div
-						className="w-full max-w-xl lg:max-w-[34rem]"
-						style={{
-							maskImage:
-								"linear-gradient(to bottom, black 0%, black 52%, transparent 96%)",
-							WebkitMaskImage:
-								"linear-gradient(to bottom, black 0%, black 52%, transparent 96%)",
-						}}
+					<AnimatePresence
+						initial={false}
+						custom={direction}
+						mode="popLayout"
 					>
-						<CodeWindow file={PREVIEW_FILES[active]}>
-							<Code />
-						</CodeWindow>
-					</div>
-					<div
-						className="relative z-10 mt-6 w-full max-w-sm lg:absolute lg:top-16 lg:right-8 lg:mt-0 xl:right-12"
-						style={{
-							maskImage:
-								"linear-gradient(to bottom, black 0%, black 52%, transparent 96%)",
-							WebkitMaskImage:
-								"linear-gradient(to bottom, black 0%, black 52%, transparent 96%)",
-						}}
-					>
-						{active === "events" ? (
-							<WebhookEvents active={active === "events"} />
-						) : active === "templates" ? (
-							<EmailStack />
-						) : (
-							<EmailPreviewCard
-								badge={card.badge}
-								heading={card.heading}
-								body={card.body}
-								cta={card.cta}
-							/>
-						)}
-					</div>
+						<motion.div
+							key={active}
+							custom={direction}
+							variants={contentVariants}
+							initial={shouldReduceMotion ? false : "enter"}
+							animate="center"
+							exit={shouldReduceMotion ? undefined : "exit"}
+							transition={
+								shouldReduceMotion
+									? { duration: 0 }
+									: { duration: SLIDE_MS, ease: EASE_DEFAULT }
+							}
+							className="relative w-full"
+						>
+							<div
+								className="w-full max-w-xl lg:max-w-[34rem]"
+								style={{
+									maskImage:
+										"linear-gradient(to bottom, black 0%, black 52%, transparent 96%)",
+									WebkitMaskImage:
+										"linear-gradient(to bottom, black 0%, black 52%, transparent 96%)",
+								}}
+							>
+								<CodeWindow file={PREVIEW_FILES[active]}>
+									<Code />
+								</CodeWindow>
+							</div>
+							<div
+								className="relative z-10 mt-6 w-full max-w-sm lg:absolute lg:top-4 lg:right-0 xl:right-2"
+								style={{
+									maskImage:
+										"linear-gradient(to bottom, black 0%, black 52%, transparent 96%)",
+									WebkitMaskImage:
+										"linear-gradient(to bottom, black 0%, black 52%, transparent 96%)",
+								}}
+							>
+								{active === "events" ? (
+									<WebhookEvents active={active === "events"} />
+								) : active === "templates" ? (
+									<EmailStack />
+								) : (
+									<EmailPreviewCard
+										badge={card.badge}
+										heading={card.heading}
+										body={card.body}
+										cta={card.cta}
+									/>
+								)}
+							</div>
+						</motion.div>
+					</AnimatePresence>
 				</div>
 				<div
 					aria-hidden
 					className="pointer-events-none absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-[#f4f5f7] from-15% via-[#f4f5f7]/75 to-transparent dark:from-[#111] dark:via-[#111]/75"
 				/>
 			</div>
-			<PreviewTabs active={active} onChange={setActive} />
+			<PreviewTabs active={active} onChange={handleTabChange} />
 		</div>
 	);
 }
