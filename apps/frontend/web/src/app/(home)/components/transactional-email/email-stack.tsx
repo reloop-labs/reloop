@@ -25,8 +25,8 @@ export function EmailStack({ activeId = "otp" }: { activeId?: string }) {
 		<div className="relative mx-auto h-[32rem] w-full">
 			<article
 				className={cn(
-					"absolute inset-0 overflow-hidden rounded-[22px] border bg-white dark:bg-[#0e0e0e]",
-					"border-stroke-soft-200 shadow-[0_24px_60px_rgba(15,23,42,0.14)] dark:border-[#2a2a2a] dark:shadow-[0_24px_60px_rgba(0,0,0,0.5)]",
+					"absolute inset-0 overflow-hidden rounded-[22px] border bg-bg-white-0 dark:bg-[#141414]",
+					"border-stroke-soft-200 shadow-[0_24px_60px_rgba(15,23,42,0.14)] dark:border-white/10 dark:shadow-[0_24px_60px_rgba(0,0,0,0.5)]",
 				)}
 			>
 				<AnimatePresence mode="wait" initial={false}>
@@ -42,7 +42,7 @@ export function EmailStack({ activeId = "otp" }: { activeId?: string }) {
 				</AnimatePresence>
 				<div
 					aria-hidden
-					className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-28 bg-gradient-to-t from-white from-15% to-transparent dark:from-[#0e0e0e]"
+					className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-28 bg-gradient-to-t from-bg-white-0 from-15% to-transparent dark:from-[#141414]"
 				/>
 			</article>
 		</div>
@@ -51,7 +51,7 @@ export function EmailStack({ activeId = "otp" }: { activeId?: string }) {
 
 function EmailShell({ children }: { children: ReactNode }) {
 	return (
-		<div className="bg-white px-5 pt-6 pb-8 text-[#0e0e0e] sm:px-6 sm:pt-7 sm:pb-9 dark:bg-[#0e0e0e] dark:text-white">
+		<div className="bg-bg-white-0 px-5 pt-6 pb-8 text-text-strong-950 sm:px-6 sm:pt-7 sm:pb-9 dark:bg-[#141414] dark:text-white">
 			<Logo className="-ml-1.5 mb-4 size-[40px] dark:invert" />
 			{children}
 		</div>
@@ -157,8 +157,8 @@ function OtpEmailBody() {
 				Reloop. This code expires in 10 minutes.
 			</BodyText>
 
-			<div className="my-6 rounded-xl border border-[#e0e0e0] bg-[#fbfbfb] p-5 text-center dark:border-[#222] dark:bg-[#141414]">
-				<p className="m-0 font-bold font-mono text-[26px] text-[#0e0e0e] tracking-[0.2em] sm:text-[28px] dark:text-white">
+			<div className="my-6 rounded-xl border border-stroke-soft-200 bg-bg-weak-50 p-5 text-center dark:border-white/10 dark:bg-white/[0.04]">
+				<p className="m-0 font-bold font-mono text-[26px] text-text-strong-950 tracking-[0.2em] sm:text-[28px] dark:text-white">
 					842 190
 				</p>
 				<p className="mt-2 mb-0 text-[#707070] text-[11.5px]">
@@ -194,7 +194,7 @@ function WelcomeEmailBody() {
 			</BodyText>
 			<BodyText>That&apos;s why Reloop exists.</BodyText>
 
-			<div className="mt-10 mb-10 border-[#e0e0e0] border-l border-solid pl-6 dark:border-[#222]">
+			<div className="mt-10 mb-10 border-stroke-soft-200 border-l border-solid pl-6 dark:border-white/10">
 				<MonoLabel>Our Mission</MonoLabel>
 				<p
 					className="mt-4 mb-0 font-serif text-[#0e0e0e] text-[18px] italic leading-[1.6] dark:text-white"
@@ -216,7 +216,7 @@ function WelcomeEmailBody() {
 				and transparent, and self-hostable.
 			</BodyText>
 
-			<div className="mt-10 rounded-lg border border-[#e0e0e0] border-solid p-8 dark:border-[#222]">
+			<div className="mt-10 rounded-lg border border-stroke-soft-200 border-solid p-8 dark:border-white/10">
 				<MonoLabel>What you can do with Reloop</MonoLabel>
 				<div className="mt-6 flex gap-2">
 					<p className="m-0 w-8 shrink-0 font-mono text-[#404040] text-[12px]">

@@ -6,14 +6,16 @@ import { useState } from "react";
 import { SdkCodeBlock } from "@reloop/web/app/sdk/components/sdk-code-block";
 import { EmailStack } from "./email-stack";
 import {
-	EVENTS_CODE,
 	SEND_API_TABS,
 	SEND_CODE,
 	TEMPLATE_TABS,
 	TEMPLATES_CODE,
+	WEBHOOK_CODE,
+	WEBHOOK_TABS,
 	type PreviewTabId,
 	type SendApiTabId,
 	type TemplateTabId,
+	type WebhookTabId,
 } from "./preview-scenes";
 import { PreviewTabs } from "./preview-tabs";
 import { WebhookEvents } from "./webhook-events";
@@ -45,6 +47,7 @@ export function PreviewStage() {
 	const [active, setActive] = useState<PreviewTabId>("send");
 	const [sendSubTab, setSendSubTab] = useState<SendApiTabId>("send");
 	const [templateSubTab, setTemplateSubTab] = useState<TemplateTabId>("otp");
+	const [webhookSubTab, setWebhookSubTab] = useState<WebhookTabId>("nextjs");
 	const [direction, setDirection] = useState(0);
 
 	const handleTabChange = (newTab: PreviewTabId) => {
@@ -60,7 +63,7 @@ export function PreviewStage() {
 	};
 
 	return (
-		<div className="bg-[#f4f5f7] dark:bg-[#111]">
+		<div className="bg-bg-weak-50/60 dark:bg-white/[0.015]">
 			<div className="relative overflow-hidden">
 				<div className="relative mx-auto h-[29rem] max-w-5xl px-5 pt-12 sm:h-[32rem] sm:px-8 sm:pt-14 lg:h-[34rem] lg:px-10">
 					<AnimatePresence
@@ -108,10 +111,12 @@ export function PreviewStage() {
 									/>
 								) : (
 									<SdkCodeBlock
-										code={EVENTS_CODE}
-										slug="nodejs"
-										lang="typescript"
-										path="webhook.ts"
+										code={WEBHOOK_CODE[webhookSubTab]}
+										slug={webhookSubTab === "python" ? "python" : "nodejs"}
+										lang={webhookSubTab === "python" ? "python" : "typescript"}
+										tabs={WEBHOOK_TABS}
+										activeTab={webhookSubTab}
+										onTabChange={(id) => setWebhookSubTab(id as WebhookTabId)}
 									/>
 								)}
 							</div>
@@ -129,7 +134,7 @@ export function PreviewStage() {
 				</div>
 				<div
 					aria-hidden
-					className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-44 bg-gradient-to-t from-[#f4f5f7] from-15% via-[#f4f5f7]/75 to-transparent dark:from-[#111] dark:via-[#111]/75"
+					className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-44 bg-gradient-to-t from-[#fbfbfb] from-15% via-[#fbfbfb]/80 to-transparent dark:from-[#0a0a0a] dark:via-[#0a0a0a]/80"
 				/>
 			</div>
 			<PreviewTabs active={active} onChange={handleTabChange} />

@@ -99,10 +99,10 @@ await reloop.batch.send([
 };
 
 export const TEMPLATE_TABS: CopyCodeBlockTab[] = [
-	{ id: "otp", label: "otp.tsx", si: getLanguageIcon("typescript")! },
-	{ id: "reset", label: "password-reset.tsx", si: getLanguageIcon("typescript")! },
-	{ id: "welcome", label: "welcome-email.tsx", si: getLanguageIcon("typescript")! },
-	{ id: "invite", label: "user-invite.tsx", si: getLanguageIcon("typescript")! },
+	{ id: "otp", label: "otp.tsx", si: getLanguageIcon("react")! },
+	{ id: "reset", label: "password-reset.tsx", si: getLanguageIcon("react")! },
+	{ id: "welcome", label: "welcome-email.tsx", si: getLanguageIcon("react")! },
+	{ id: "invite", label: "user-invite.tsx", si: getLanguageIcon("react")! },
 ];
 
 export type TemplateTabId = "otp" | "reset" | "welcome" | "invite";
@@ -288,9 +288,99 @@ export const InviteEmail = ({
 );`,
 };
 
-export const EVENTS_CODE = `reloop.webhooks.on('email.opened', async (event) => {
-  console.log(event.to, event.openedAt);
-});`;
+export const WEBHOOK_TABS: CopyCodeBlockTab[] = [
+	{ id: "nextjs", label: "route.ts", si: getLanguageIcon("typescript")! },
+	{ id: "express", label: "express.ts", si: getLanguageIcon("typescript")! },
+	{ id: "python", label: "fastapi.py", si: getLanguageIcon("python")! },
+	{ id: "types", label: "events.ts", si: getLanguageIcon("typescript")! },
+];
+
+export type WebhookTabId = "nextjs" | "express" | "python" | "types";
+
+export const WEBHOOK_CODE: Record<WebhookTabId, string> = {
+	nextjs: `import { Webhook } from 'svix';
+import { headers } from 'next/headers';
+
+export async function POST(req: Request) {
+  const payload = await req.text();
+  const headerList = await headers();
+  const wh = new Webhook(process.env.RELOOP_WEBHOOK_SECRET!);
+
+  const evt = wh.verify(payload, {
+    'svix-id': headerList.get('svix-id')!,
+    'svix-timestamp': headerList.get('svix-timestamp')!,
+    'svix-signature': headerList.get('svix-signature')!,
+  }) as { type: string; data: Record<string, any> };
+
+  switch (evt.type) {
+    case 'email.delivered':
+      console.log('Delivered to:', evt.data.to);
+      break;
+    case 'email.opened':
+      console.log('Opened at:', evt.data.openedAt);
+      break;
+    case 'email.bounced':
+      console.error('Bounced:', evt.data.reason);
+      break;
+  }
+
+  return new Response('ok', { status: 200 });
+}`,
+	express: `import express from 'express';
+import { Webhook } from 'svix';
+
+const app = express();
+
+app.post('/api/webhook', express.raw({ type: 'application/json' }), (req, res) => {
+  const wh = new Webhook(process.env.RELOOP_WEBHOOK_SECRET!);
+  const evt = wh.verify(req.body.toString(), req.headers as any) as any;
+
+  if (evt.type === 'email.delivered') {
+    console.log('Email delivered to', evt.data.to);
+  } else if (evt.type === 'email.opened') {
+    console.log('Email opened by', evt.data.to);
+  }
+
+  res.status(200).json({ received: true });
+});`,
+	python: `import os
+from fastapi import FastAPI, Request, HTTPException
+from svix.webhooks import Webhook
+
+app = FastAPI()
+
+@app.post("/api/webhook")
+async def handle_webhook(request: Request):
+    payload = await request.body()
+    headers = dict(request.headers)
+    wh = Webhook(os.environ["RELOOP_WEBHOOK_SECRET"])
+
+    try:
+        event = wh.verify(payload, headers)
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid signature")
+
+    if event["type"] == "email.delivered":
+        print(f"Delivered to {event['data']['to']}")
+    return {"status": "ok"}`,
+	types: `export type ReloopWebhookEvent =
+  | {
+      type: 'email.delivered';
+      data: { id: string; to: string[]; deliveredAt: string };
+    }
+  | {
+      type: 'email.opened';
+      data: { id: string; to: string; openedAt: string; userAgent: string };
+    }
+  | {
+      type: 'email.clicked';
+      data: { id: string; to: string; link: string; clickedAt: string };
+    }
+  | {
+      type: 'email.bounced';
+      data: { id: string; to: string[]; reason: string; bouncedAt: string };
+    };`,
+};
 
 export const PREVIEW_CARD: Record<
 	PreviewTabId,

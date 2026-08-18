@@ -259,7 +259,7 @@ export function WebhookEvents({ active }: { active: boolean }) {
 											{item.name}
 										</p>
 									</div>
-									<div className="rounded-2xl border border-stroke-soft-200 bg-bg-white-0 px-3.5 py-3 dark:border-white/10 dark:bg-[#1a1a1a]">
+									<div className="rounded-2xl border border-stroke-soft-200 bg-bg-weak-50/70 px-3.5 py-3 dark:border-white/10 dark:bg-white/[0.03]">
 										<div className="flex items-center gap-2">
 											<span
 												className={cn(
