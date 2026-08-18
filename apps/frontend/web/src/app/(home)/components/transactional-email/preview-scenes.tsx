@@ -108,44 +108,184 @@ export const TEMPLATE_TABS: CopyCodeBlockTab[] = [
 export type TemplateTabId = "otp" | "reset" | "welcome" | "invite";
 
 export const TEMPLATES_CODE: Record<TemplateTabId, string> = {
-	otp: `export function OtpEmail({ code = '842 190' }) {
-  return (
-    <Email>
-      <Heading>Your verification code</Heading>
-      <Text>Enter this 6-digit code to complete sign-in to Reloop.</Text>
-      <OtpCode value={code} expiresIn="10 minutes" />
-      <Text muted>If you didn't request this code, ignore this email.</Text>
-    </Email>
-  );
-}`,
-	reset: `export function PasswordReset({ link = 'https://reloop.sh/reset?token=xyz' }) {
-  return (
-    <Email>
-      <Heading>Reset your Reloop password</Heading>
-      <Text>We received a request to reset your password. Link expires in 20 min.</Text>
-      <Button href={link}>Choose a new password</Button>
-      <Text muted>If you didn't request this, ignore this email.</Text>
-    </Email>
-  );
-}`,
-	welcome: `export function WelcomeEmail({ name = 'Maya' }) {
-  return (
-    <Email>
-      <Heading>Welcome to Reloop, {name}</Heading>
-      <Text>Open-source email infrastructure built for developers and AI agents.</Text>
-      <Button href="https://reloop.sh/dashboard">Get Started</Button>
-    </Email>
-  );
-}`,
-	invite: `export function TeamInvite({ inviter = 'Pranav Patel', team = 'Reloop' }) {
-  return (
-    <Email>
-      <Heading>Join {team} on Reloop</Heading>
-      <Text>{inviter} has invited you to collaborate on the team.</Text>
-      <Button href="https://reloop.sh/invite/abc123">Join the team</Button>
-    </Email>
-  );
-}`,
+	otp: `import {
+  Body,
+  Button,
+  Head,
+  Heading,
+  Hr,
+  Html,
+  Preview,
+  Section,
+  Tailwind,
+  Text,
+} from "react-email";
+
+export const OTPTokenEmail = ({
+  otp = "842190",
+  baseUrl = "https://reloop.sh",
+}) => (
+  <Html>
+    <Head />
+    <Preview>Your login code for Reloop is {otp}</Preview>
+    <Tailwind>
+      <Body className="bg-white text-[#0e0e0e] font-sans">
+        <Text className="font-mono text-[#707070] text-xs uppercase tracking-widest">
+          Login Verification
+        </Text>
+        <Heading className="font-serif text-3xl text-[#0e0e0e]">
+          Your login code for Reloop.
+        </Heading>
+        <Hr className="my-8 border-[#e0e0e0]" />
+        <Text className="text-[#555] text-sm leading-relaxed">
+          This link and code will only be valid for the next 10 minutes.
+        </Text>
+        <Section className="my-8 rounded-2xl border border-[#e0e0e0] py-8 text-center">
+          <Text className="font-mono text-4xl text-[#0e0e0e] tracking-widest">{otp}</Text>
+        </Section>
+        <Button
+          className="rounded-xl bg-[#0e0e0e] px-6 py-3 font-bold text-white uppercase"
+          href={\`\${baseUrl}/dashboard/verify?otp=\${otp}\`}
+        >
+          Login to Reloop
+        </Button>
+      </Body>
+    </Tailwind>
+  </Html>
+);`,
+	reset: `import {
+  Body,
+  Button,
+  Head,
+  Heading,
+  Hr,
+  Html,
+  Preview,
+  Section,
+  Tailwind,
+  Text,
+} from "react-email";
+
+export const ResetPasswordEmail = ({
+  resetUrl = "https://reloop.sh/reset?token=xyz",
+}) => (
+  <Html>
+    <Head />
+    <Preview>Reset your Reloop account password</Preview>
+    <Tailwind>
+      <Body className="bg-white text-[#0e0e0e] font-sans">
+        <Text className="font-mono text-[#707070] text-xs uppercase tracking-widest">
+          Password Reset
+        </Text>
+        <Heading className="font-serif text-3xl text-[#0e0e0e]">
+          Reset your Reloop password.
+        </Heading>
+        <Hr className="my-8 border-[#e0e0e0]" />
+        <Text className="text-[#555] text-sm leading-relaxed">
+          We received a request to reset your password. This link expires in 20 minutes.
+        </Text>
+        <Section className="mt-8">
+          <Button
+            className="rounded-xl bg-[#0e0e0e] px-6 py-3 font-bold text-white uppercase"
+            href={resetUrl}
+          >
+            Choose a new password
+          </Button>
+        </Section>
+      </Body>
+    </Tailwind>
+  </Html>
+);`,
+	welcome: `import {
+  Body,
+  Button,
+  Head,
+  Heading,
+  Hr,
+  Html,
+  Preview,
+  Section,
+  Tailwind,
+  Text,
+} from "react-email";
+
+export const WelcomeEmail = ({
+  fullName = "Maya",
+  baseUrl = "https://reloop.sh",
+}) => (
+  <Html>
+    <Head />
+    <Preview>Open-source email infrastructure. Deliverability is on us.</Preview>
+    <Tailwind>
+      <Body className="bg-white text-[#0e0e0e] font-sans">
+        <Text className="font-mono text-[#707070] text-xs uppercase tracking-widest">
+          Welcome to Reloop
+        </Text>
+        <Heading className="font-serif text-3xl text-[#0e0e0e]">
+          Open-source email infrastructure built for developers.
+        </Heading>
+        <Hr className="my-8 border-[#e0e0e0]" />
+        <Text className="text-[#555] text-sm leading-relaxed">
+          Hey {fullName}, welcome! Really glad you're here.
+        </Text>
+        <Section className="mt-8">
+          <Button
+            className="rounded-xl bg-[#0e0e0e] px-6 py-3 font-bold text-white uppercase"
+            href={\`\${baseUrl}/dashboard\`}
+          >
+            Get Started
+          </Button>
+        </Section>
+      </Body>
+    </Tailwind>
+  </Html>
+);`,
+	invite: `import {
+  Body,
+  Button,
+  Head,
+  Heading,
+  Hr,
+  Html,
+  Preview,
+  Section,
+  Tailwind,
+  Text,
+} from "react-email";
+
+export const InviteEmail = ({
+  inviterName = "Pranav Patel",
+  inviterEmail = "reloop.sh@gmail.com",
+  teamName = "Reloop",
+  inviteUrl = "https://reloop.sh/invite/abc123",
+}) => (
+  <Html>
+    <Head />
+    <Preview>Join {teamName} on Reloop</Preview>
+    <Tailwind>
+      <Body className="bg-white text-[#0e0e0e] font-sans">
+        <Text className="font-mono text-[#707070] text-xs uppercase tracking-widest">
+          Team Invitation
+        </Text>
+        <Heading className="font-serif text-3xl text-[#0e0e0e]">
+          Join <span className="font-bold">{teamName}</span> on Reloop.
+        </Heading>
+        <Hr className="my-8 border-[#e0e0e0]" />
+        <Text className="text-[#555] text-sm leading-relaxed">
+          <strong>{inviterName}</strong> ({inviterEmail}) has invited you to the team.
+        </Text>
+        <Section className="mt-8">
+          <Button
+            className="rounded-xl bg-[#0e0e0e] px-6 py-3 font-bold text-white uppercase"
+            href={inviteUrl}
+          >
+            Join the team
+          </Button>
+        </Section>
+      </Body>
+    </Tailwind>
+  </Html>
+);`,
 };
 
 export const EVENTS_CODE = `reloop.webhooks.on('email.opened', async (event) => {
