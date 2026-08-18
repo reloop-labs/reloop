@@ -36,14 +36,14 @@ const contentVariants = {
 function AiTemplatesView() {
 	return (
 		<div className="relative mx-auto w-full max-w-3xl overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 shadow-xs dark:border-white/10 dark:bg-[#0c0c0e]">
-			<div className="grid grid-cols-1 divide-y divide-stroke-soft-100 sm:grid-cols-[1fr_1.1fr] sm:divide-x sm:divide-y-0 dark:divide-white/10">
+			<div className="grid grid-cols-1 divide-y divide-stroke-soft-100 sm:grid-cols-[1.05fr_1.1fr] sm:divide-x sm:divide-y-0 dark:divide-white/10">
 				{/* Left Panel: Chat Interface */}
-				<div className="flex min-h-[340px] flex-col justify-between p-5 sm:p-6">
+				<div className="flex min-h-[440px] flex-col justify-between p-5 sm:p-6">
 					{/* Message Stream */}
-					<div className="space-y-4">
-						{/* User Message */}
+					<div className="space-y-3.5">
+						{/* User Message 1 */}
 						<div className="flex flex-col items-end">
-							<div className="rounded-2xl rounded-tr-xs bg-bg-weak-50 px-3.5 py-2.5 text-text-strong-950 text-xs dark:bg-white/[0.06] dark:text-white">
+							<div className="rounded-2xl rounded-tr-xs bg-bg-weak-50 px-3.5 py-2 text-text-strong-950 text-xs dark:bg-white/[0.06] dark:text-white">
 								<p className="font-mono text-[11px] leading-relaxed">
 									Build an order confirmation receipt with item breakdown and
 									PDF download
@@ -51,21 +51,37 @@ function AiTemplatesView() {
 							</div>
 						</div>
 
-						{/* AI Response with Skeletons */}
-						<div className="space-y-2 pt-1">
+						{/* AI Response 1 with Skeletons */}
+						<div className="space-y-1.5 pt-0.5">
 							<div className="flex items-center gap-1.5 text-[10px] text-text-soft-400 dark:text-white/40">
 								<span className="size-1.5 rounded-full bg-emerald-500" />
 								<span>Reloop AI</span>
 							</div>
 
-							<div className="space-y-1.5 rounded-xl rounded-tl-xs border border-stroke-soft-100 bg-bg-weak-50/40 p-3 dark:border-white/5 dark:bg-white/[0.02]">
+							<div className="space-y-1.5 rounded-xl rounded-tl-xs border border-stroke-soft-100 bg-bg-weak-50/40 p-2.5 dark:border-white/5 dark:bg-white/[0.02]">
 								<div className="h-2 w-3/4 rounded-full bg-stroke-soft-200 dark:bg-white/15" />
 								<div className="h-2 w-1/2 rounded-full bg-stroke-soft-200 dark:bg-white/10" />
-								<div className="h-2 w-5/6 rounded-full bg-stroke-soft-100 dark:bg-white/5" />
+							</div>
+						</div>
+
+						{/* User Follow-up Message */}
+						<div className="flex flex-col items-end">
+							<div className="rounded-2xl rounded-tr-xs bg-bg-weak-50 px-3.5 py-2 text-text-strong-950 text-xs dark:bg-white/[0.06] dark:text-white">
+								<p className="font-mono text-[11px] leading-relaxed">
+									Add line item table for Pro Plan and dedicated IP
+								</p>
+							</div>
+						</div>
+
+						{/* AI Response 2 with Skeletons */}
+						<div className="space-y-1.5">
+							<div className="space-y-1.5 rounded-xl rounded-tl-xs border border-stroke-soft-100 bg-bg-weak-50/40 p-2.5 dark:border-white/5 dark:bg-white/[0.02]">
+								<div className="h-2 w-5/6 rounded-full bg-stroke-soft-200 dark:bg-white/15" />
+								<div className="h-2 w-3/5 rounded-full bg-stroke-soft-100 dark:bg-white/10" />
 							</div>
 
 							{/* Thinking Dots */}
-							<div className="flex items-center gap-1 pt-1 text-text-soft-400 text-xs dark:text-white/40">
+							<div className="flex items-center gap-1 pl-1 text-text-soft-400 text-xs dark:text-white/40">
 								<span className="size-1 animate-bounce rounded-full bg-text-soft-400 [animation-delay:-0.3s] dark:bg-white/40" />
 								<span className="size-1 animate-bounce rounded-full bg-text-soft-400 [animation-delay:-0.15s] dark:bg-white/40" />
 								<span className="size-1 animate-bounce rounded-full bg-text-soft-400 dark:bg-white/40" />
@@ -74,7 +90,7 @@ function AiTemplatesView() {
 					</div>
 
 					{/* Bottom Chat Prompt Input */}
-					<div className="mt-6 flex items-center justify-between rounded-xl border border-stroke-soft-200 bg-bg-weak-50/50 p-1.5 pl-3 dark:border-white/10 dark:bg-white/[0.02]">
+					<div className="mt-4 flex items-center justify-between rounded-xl border border-stroke-soft-200 bg-bg-weak-50/50 p-1.5 pl-3 dark:border-white/10 dark:bg-white/[0.02]">
 						<div className="flex items-center gap-1 text-[11px] text-text-soft-400 dark:text-white/40">
 							<span>Ask agent to edit styles or wire props...</span>
 							<span className="animate-pulse text-text-strong-950 dark:text-white">
@@ -92,38 +108,47 @@ function AiTemplatesView() {
 				</div>
 
 				{/* Right Panel: Email Document Sheet with Skeletons */}
-				<div className="flex items-center justify-center bg-bg-weak-50/30 p-5 sm:p-6 dark:bg-white/[0.01]">
-					<div className="w-full max-w-[270px] space-y-4 rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-5 shadow-xs dark:border-white/10 dark:bg-[#111114]">
+				<div className="flex min-h-[440px] items-center justify-center bg-bg-weak-50/30 p-5 sm:p-6 dark:bg-white/[0.01]">
+					<div className="w-full max-w-[280px] space-y-3.5 rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-5 shadow-xs dark:border-white/10 dark:bg-[#111114]">
 						{/* Document Header Skeleton Bars */}
-						<div className="space-y-2">
+						<div className="space-y-1.5">
 							<div className="h-3 w-3/4 rounded-full bg-text-strong-950/80 dark:bg-white/80" />
 							<div className="h-2 w-1/2 rounded-full bg-stroke-soft-200 dark:bg-white/20" />
 						</div>
 
 						{/* Body Skeletons */}
-						<div className="space-y-1.5 pt-1">
+						<div className="space-y-1 pt-0.5">
 							<div className="h-1.5 w-full rounded-full bg-stroke-soft-100 dark:bg-white/10" />
 							<div className="h-1.5 w-4/5 rounded-full bg-stroke-soft-100 dark:bg-white/10" />
 						</div>
 
-						{/* Transactional Invoice Card */}
-						<div className="rounded-lg border border-stroke-soft-100 bg-bg-weak-50/50 p-2.5 text-xs dark:border-white/5 dark:bg-white/[0.02]">
+						{/* Transactional Invoice Card with Breakdown */}
+						<div className="rounded-lg border border-stroke-soft-100 bg-bg-weak-50/50 p-3 text-xs dark:border-white/5 dark:bg-white/[0.02]">
 							<div className="flex items-center justify-between font-mono text-[10px] text-text-sub-600 dark:text-white/70">
 								<span>Invoice #ACME-8921</span>
 								<span className="font-semibold text-text-strong-950 dark:text-white">
-									$49.00
+									$64.00
 								</span>
 							</div>
-							<div className="mt-1.5 flex justify-between text-[9.5px] text-text-soft-400 dark:text-white/40">
-								<span>Pro Developer Plan</span>
-								<span>Paid</span>
+							<div className="mt-2 space-y-1 border-stroke-soft-100 border-t pt-1.5 text-[9.5px] dark:border-white/5">
+								<div className="flex justify-between text-text-sub-600 dark:text-white/70">
+									<span>Pro Developer Plan</span>
+									<span>$49.00</span>
+								</div>
+								<div className="flex justify-between text-text-soft-400 dark:text-white/40">
+									<span>Dedicated IP Add-on</span>
+									<span>$15.00</span>
+								</div>
 							</div>
 						</div>
 
-						{/* Action Button */}
-						<div className="pt-1">
+						{/* Action Buttons */}
+						<div className="space-y-1.5 pt-0.5">
 							<span className="flex h-7.5 w-full items-center justify-center rounded-lg bg-text-strong-950 font-medium text-[11px] text-white shadow-xs dark:bg-white dark:text-black">
 								Download Receipt (PDF) →
+							</span>
+							<span className="flex h-6 w-full items-center justify-center text-[10.5px] text-text-soft-400 hover:text-text-strong-950 dark:text-white/50">
+								View in dashboard →
 							</span>
 						</div>
 
@@ -468,141 +493,224 @@ function RealtimeEditorView() {
 	);
 }
 
-/* --- Scene 3: Version History View --- */
+/* --- Scene 3: Version History View (Single Focused Widget Block) --- */
 function VersionHistoryView() {
+	const [showChanges, setShowChanges] = useState(true);
+	const [selectedVersion, setSelectedVersion] = useState("v1");
+
+	const VERSIONS = [
+		{
+			id: "v1",
+			time: "11:12:10",
+			title: "Button Block was added",
+			author: "Maya Chen",
+			authorColor: "bg-emerald-500",
+			changes: "12 Changes",
+			icon: "modules" as const,
+		},
+		{
+			id: "v2",
+			time: "11:12:08",
+			title: "Subject Line updated",
+			author: "Sarah Jenkins",
+			authorColor: "bg-amber-400",
+			changes: "2 Changes",
+			icon: "file-code" as const,
+		},
+		{
+			id: "v3",
+			time: "11:12:05",
+			title: "Header props modified",
+			author: "Alex Rivera",
+			authorColor: "bg-sky-500",
+			changes: "4 Changes",
+			icon: "user" as const,
+		},
+		{
+			id: "v4",
+			time: "11:12:02",
+			title: "Greeting & Intro tuned",
+			author: "Noah Patel",
+			authorColor: "bg-indigo-500",
+			changes: "6 Changes",
+			icon: "sparkling" as const,
+		},
+		{
+			id: "v5",
+			time: "11:11:59",
+			title: "Template scaffold created",
+			author: "Maya Chen",
+			authorColor: "bg-emerald-500",
+			changes: "Initial",
+			icon: "layout" as const,
+		},
+	];
+
 	return (
-		<div className="w-full space-y-2.5">
-			{/* Top Revision Bar */}
-			<div className="flex items-center justify-between rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-2.5 shadow-xs dark:border-white/10 dark:bg-white/[0.02]">
+		<div className="relative mx-auto w-full max-w-xl">
+			{/* Top Bar with Logo & Restore Button */}
+			<div className="mb-3 flex items-center justify-between">
 				<div className="flex items-center gap-2">
-					<span className="flex size-4.5 items-center justify-center rounded-md bg-purple-500/10 text-purple-600 dark:bg-purple-400/10 dark:text-purple-400">
-						<Icon name="history" className="size-3" />
-					</span>
-					<span className="font-semibold text-text-strong-950 text-xs dark:text-white">
-						order-confirmation.tsx · Revision History
-					</span>
-					<span className="rounded-full bg-emerald-50 px-2 py-0.5 font-medium text-[9.5px] text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300">
-						4 saved versions
-					</span>
+					<div className="flex size-7 items-center justify-center rounded-lg border border-stroke-soft-200 bg-bg-white-0 shadow-2xs dark:border-white/10 dark:bg-white/5">
+						<Icon
+							name="sparkling"
+							className="size-3.5 text-purple-600 dark:text-purple-400"
+						/>
+					</div>
+					<button
+						type="button"
+						className="flex size-7 items-center justify-center rounded-lg border border-stroke-soft-200 bg-bg-white-0 text-text-sub-600 shadow-2xs transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-white/10 dark:bg-white/5 dark:text-white/70 dark:hover:bg-white/10"
+					>
+						<span className="text-xs">←</span>
+					</button>
 				</div>
 
 				<button
 					type="button"
-					className="rounded-lg bg-text-strong-950 px-2.5 py-1 font-medium text-[10.5px] text-white hover:opacity-90 dark:bg-white dark:text-black"
+					className="flex items-center gap-1.5 rounded-lg bg-purple-600 px-3.5 py-1.5 font-medium text-white text-xs shadow-xs transition-opacity hover:opacity-90 dark:bg-purple-500"
 				>
-					Restore version v1.3
+					<span>↺</span>
+					<span>Restore this version</span>
 				</button>
 			</div>
 
-			{/* History Timeline & Visual Diff Split */}
-			<div className="grid grid-cols-1 gap-2.5 lg:grid-cols-[1.1fr_1.4fr]">
-				{/* Revisions Timeline List */}
-				<div className="rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-2.5 shadow-xs dark:border-white/10 dark:bg-white/[0.02]">
-					<div className="border-stroke-soft-100 border-b pb-1.5 dark:border-white/5">
-						<span className="font-semibold text-[9.5px] text-text-soft-400 uppercase tracking-wider dark:text-white/40">
-							Saved Revisions
-						</span>
+			{/* Main Single Block: Version History Widget */}
+			<div className="relative overflow-visible rounded-2xl border border-stroke-soft-200 bg-bg-white-0 shadow-sm dark:border-white/10 dark:bg-[#0c0c0e]">
+				{/* Card Header */}
+				<div className="flex items-center justify-between border-stroke-soft-100 border-b px-5 py-3 dark:border-white/10">
+					<h3 className="font-semibold text-text-strong-950 text-xs tracking-tight dark:text-white">
+						Version History
+					</h3>
+					<span className="text-text-soft-400 text-xs dark:text-white/40">
+						🔍
+					</span>
+				</div>
+
+				{/* Timeline Content */}
+				<div className="relative p-4 sm:p-5">
+					<div className="mb-2 font-medium text-[11px] text-text-soft-400 dark:text-white/40">
+						Today
 					</div>
 
-					<div className="mt-2 divide-y divide-stroke-soft-100 dark:divide-white/5">
-						{[
-							{
-								tag: "v1.4",
-								current: true,
-								author: "Drew Austin",
-								time: "10m ago",
-								diff: "+14 / -4",
-								summary: "Updated CTA link and tracking parameters",
-							},
-							{
-								tag: "v1.3",
-								current: false,
-								author: "Maya Chen",
-								time: "2h ago",
-								diff: "+28 / -2",
-								summary: "Dark mode background polish & avatar stack",
-							},
-							{
-								tag: "v1.2",
-								current: false,
-								author: "Drew Austin",
-								time: "Yesterday",
-								diff: "+94 / -0",
-								summary: "Initial layout schema and React Email setup",
-							},
-						].map((rev) => (
-							<div
-								key={rev.tag}
-								className={cn(
-									"cursor-pointer rounded-lg p-2 transition-colors",
-									rev.current
-										? "bg-purple-50/50 dark:bg-purple-950/20"
-										: "hover:bg-bg-weak-50/60 dark:hover:bg-white/[0.02]",
-								)}
-							>
-								<div className="flex items-center justify-between text-xs">
-									<div className="flex items-center gap-1.5">
-										<span
-											className={cn(
-												"rounded px-1.5 py-0.5 font-bold font-mono text-[10px]",
-												rev.current
-													? "bg-purple-600 text-white"
-													: "bg-stroke-soft-100 text-text-sub-600 dark:bg-white/10 dark:text-white/70",
-											)}
-										>
-											{rev.tag}
-										</span>
-										<span className="font-medium text-text-strong-950 text-xs dark:text-white">
-											{rev.author}
+					{/* Vertical Timeline Rail & Items */}
+					<div className="relative space-y-1.5">
+						{/* Vertical Connecting Line */}
+						<div className="absolute top-3 bottom-3 left-[15px] w-px bg-stroke-soft-200 dark:bg-white/10" />
+
+						{VERSIONS.map((v) => {
+							const isSelected = selectedVersion === v.id;
+
+							return (
+								<div key={v.id} className="relative flex items-center gap-3">
+									{/* Timeline Icon Node */}
+									<div
+										className={cn(
+											"relative z-10 flex size-8 shrink-0 items-center justify-center rounded-lg border text-xs transition-colors",
+											isSelected
+												? "border-purple-500/40 bg-purple-500/10 text-purple-600 dark:border-purple-400/40 dark:bg-purple-400/10 dark:text-purple-400"
+												: "border-stroke-soft-200 bg-bg-white-0 text-text-sub-600 dark:border-white/10 dark:bg-[#121215] dark:text-white/60",
+										)}
+									>
+										<Icon name={v.icon} className="size-3.5" />
+									</div>
+
+									{/* Snapshot Card */}
+									<div
+										onClick={() => setSelectedVersion(v.id)}
+										className={cn(
+											"group flex flex-1 cursor-pointer items-center justify-between rounded-xl border p-2.5 transition-all",
+											isSelected
+												? "border-purple-500/60 bg-purple-500/5 shadow-xs dark:border-purple-400/60 dark:bg-purple-400/5"
+												: "border-transparent bg-transparent hover:border-stroke-soft-200 hover:bg-bg-weak-50/50 dark:hover:border-white/10 dark:hover:bg-white/[0.02]",
+										)}
+									>
+										<div className="space-y-0.5">
+											<div className="flex items-center gap-2">
+												<span className="font-mono text-[10.5px] text-text-soft-400 dark:text-white/40">
+													{v.time}
+												</span>
+												<span className="font-semibold text-text-strong-950 text-xs dark:text-white">
+													{v.title}
+												</span>
+											</div>
+											<div className="flex items-center gap-1.5 text-[10.5px]">
+												<span
+													className={cn("size-1.5 rounded-full", v.authorColor)}
+												/>
+												<span className="text-text-sub-600 dark:text-white/60">
+													{v.author}
+												</span>
+												<span className="text-text-soft-400 dark:text-white/30">
+													·
+												</span>
+												<span className="text-purple-600 dark:text-purple-400">
+													{v.changes} {isSelected && "▾"}
+												</span>
+											</div>
+										</div>
+
+										<span className="text-text-soft-400 text-xs opacity-0 transition-opacity group-hover:opacity-100 dark:text-white/40">
+											•••
 										</span>
 									</div>
-									<span className="font-mono text-[9.5px] text-emerald-600 dark:text-emerald-400">
-										{rev.diff}
-									</span>
 								</div>
-								<p className="mt-1 truncate text-[10.5px] text-text-sub-600 dark:text-white/60">
-									{rev.summary}
-								</p>
-								<span className="text-[9px] text-text-soft-400 dark:text-white/30">
-									{rev.time}
-								</span>
+							);
+						})}
+
+						{/* Floating Action Menu Popover (Anchored like screenshot) */}
+						<div className="-right-4 absolute top-2 z-30 hidden w-44 rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-1.5 shadow-xl sm:block dark:border-white/15 dark:bg-[#151518]">
+							<div className="space-y-0.5 text-[11px]">
+								<button
+									type="button"
+									className="flex w-full cursor-pointer items-center gap-2 rounded-lg bg-purple-500/10 px-2.5 py-1.5 font-medium text-purple-600 dark:bg-purple-400/10 dark:text-purple-400"
+								>
+									<span>↺</span>
+									<span>Restore</span>
+								</button>
+								{[
+									{ label: "Restore as new", badge: "Soon" },
+									{ label: "Preview snapshot", badge: "Soon" },
+									{ label: "Add a Name", badge: "Soon" },
+									{ label: "Add a Tag", badge: "Soon" },
+									{ label: "Export React Email", badge: "Soon" },
+								].map((item) => (
+									<div
+										key={item.label}
+										className="flex cursor-pointer items-center justify-between rounded-lg px-2.5 py-1.5 text-text-sub-600 hover:bg-bg-weak-50 hover:text-text-strong-950 dark:text-white/70 dark:hover:bg-white/5 dark:hover:text-white"
+									>
+										<span>{item.label}</span>
+										<span className="rounded bg-purple-500/15 px-1.5 py-0.2 font-semibold text-[8.5px] text-purple-600 dark:bg-purple-400/20 dark:text-purple-300">
+											{item.badge}
+										</span>
+									</div>
+								))}
 							</div>
-						))}
+						</div>
 					</div>
 				</div>
 
-				{/* Visual Diff Window */}
-				<div className="overflow-hidden rounded-xl border border-stroke-soft-200 bg-[#0d0d0e] p-3 text-left font-mono text-[10.5px] text-white/90 shadow-xs dark:border-white/10">
-					<div className="flex items-center justify-between border-white/10 border-b pb-1.5 text-[10px] text-white/40">
-						<span>Diff: v1.3 → v1.4</span>
-						<span className="text-purple-400">14 additions · 4 deletions</span>
-					</div>
-
-					<pre className="mt-2 overflow-x-auto text-[10.5px] leading-relaxed">
-						<code>
-							<span className="text-white/40">
-								{'  <Container className="max-w-md p-4">\n'}
-							</span>
-							<span className="bg-rose-500/20 text-rose-300">
-								{
-									'-   <Button href="https://legacy.reloop.sh/orders">Pay</Button>\n'
-								}
-							</span>
-							<span className="bg-emerald-500/20 text-emerald-300">
-								{
-									'+   <Button href={checkoutUrl} className="bg-brand-emerald">\n'
-								}
-							</span>
-							<span className="bg-emerald-500/20 text-emerald-300">
-								{"+     Complete Order Payment (1-Click) →\n+   </Button>\n"}
-							</span>
-							<span className="text-white/40">
-								{
-									"    <SecurityFooter dkimAligned verifiedDomain />\n  </Container>"
-								}
-							</span>
-						</code>
-					</pre>
+				{/* Card Footer with Toggle Switch */}
+				<div className="flex items-center justify-between border-stroke-soft-100 border-t px-5 py-3 dark:border-white/10">
+					<span className="font-medium text-text-sub-600 text-xs dark:text-white/70">
+						Show Changes
+					</span>
+					<button
+						type="button"
+						onClick={() => setShowChanges(!showChanges)}
+						className={cn(
+							"relative inline-flex h-5 w-9 cursor-pointer items-center rounded-full transition-colors",
+							showChanges
+								? "bg-purple-600 dark:bg-purple-500"
+								: "bg-stroke-soft-200 dark:bg-white/20",
+						)}
+					>
+						<span
+							className={cn(
+								"inline-block size-3.5 rounded-full bg-white transition-transform",
+								showChanges ? "translate-x-4.5" : "translate-x-1",
+							)}
+						/>
+					</button>
 				</div>
 			</div>
 		</div>
