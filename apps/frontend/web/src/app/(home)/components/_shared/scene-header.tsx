@@ -5,16 +5,55 @@ import type { ReactNode } from "react";
 
 export type SceneColor = "orange" | "blue" | "violet" | "emerald" | "pink";
 
-const COLOR_STYLES: Record<SceneColor, string> = {
-	orange:
-		"bg-gradient-to-b from-[#fb923c] to-[#ea580c] border border-[#ea580c]/60 shadow-[0_1.5px_0_0_#9a3412,0_1px_2px_0_rgba(0,0,0,0.15),inset_0_1px_0_0_rgba(255,255,255,0.5)] dark:shadow-[0_1.5px_0_0_#7c2d12,inset_0_1px_0_0_rgba(255,255,255,0.4)]",
-	blue: "bg-gradient-to-b from-[#3b82f6] to-[#1d4ed8] border border-[#1d4ed8]/60 shadow-[0_1.5px_0_0_#1e3a8a,0_1px_2px_0_rgba(0,0,0,0.15),inset_0_1px_0_0_rgba(255,255,255,0.5)] dark:shadow-[0_1.5px_0_0_#172554,inset_0_1px_0_0_rgba(255,255,255,0.4)]",
-	violet:
-		"bg-gradient-to-b from-[#8b5cf6] to-[#6d28d9] border border-[#6d28d9]/60 shadow-[0_1.5px_0_0_#4c1d95,0_1px_2px_0_rgba(0,0,0,0.15),inset_0_1px_0_0_rgba(255,255,255,0.5)] dark:shadow-[0_1.5px_0_0_#2e1065,inset_0_1px_0_0_rgba(255,255,255,0.4)]",
-	emerald:
-		"bg-gradient-to-b from-[#10b981] to-[#047857] border border-[#047857]/60 shadow-[0_1.5px_0_0_#064e3b,0_1px_2px_0_rgba(0,0,0,0.15),inset_0_1px_0_0_rgba(255,255,255,0.5)] dark:shadow-[0_1.5px_0_0_#022c22,inset_0_1px_0_0_rgba(255,255,255,0.4)]",
-	pink: "bg-gradient-to-b from-[#ec4899] to-[#be185d] border border-[#be185d]/60 shadow-[0_1.5px_0_0_#831843,0_1px_2px_0_rgba(0,0,0,0.15),inset_0_1px_0_0_rgba(255,255,255,0.5)] dark:shadow-[0_1.5px_0_0_#500724,inset_0_1px_0_0_rgba(255,255,255,0.4)]",
+/**
+ * Physical keycap — same extrusion language as ActionKbd:
+ * dark shell as the 1.5px lip, flatter face, hairline inset highlight.
+ */
+const GLYPH: Record<SceneColor, { shell: string; face: string }> = {
+	orange: {
+		shell: "bg-[#9a3412] dark:bg-[#7c2d12]",
+		face: "bg-[#f97316] shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.45)] dark:bg-[#ea580c] dark:shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.28),0_0_0_0.5px_rgba(255,255,255,0.08)]",
+	},
+	blue: {
+		shell: "bg-[#1e3a8a] dark:bg-[#172554]",
+		face: "bg-[#2563eb] shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.45)] dark:bg-[#1d4ed8] dark:shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.28),0_0_0_0.5px_rgba(255,255,255,0.08)]",
+	},
+	violet: {
+		shell: "bg-[#4c1d95] dark:bg-[#2e1065]",
+		face: "bg-[#7c3aed] shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.45)] dark:bg-[#6d28d9] dark:shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.28),0_0_0_0.5px_rgba(255,255,255,0.08)]",
+	},
+	emerald: {
+		shell: "bg-[#064e3b] dark:bg-[#022c22]",
+		face: "bg-[#059669] shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.45)] dark:bg-[#047857] dark:shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.28),0_0_0_0.5px_rgba(255,255,255,0.08)]",
+	},
+	pink: {
+		shell: "bg-[#831843] dark:bg-[#500724]",
+		face: "bg-[#db2777] shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.45)] dark:bg-[#be185d] dark:shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.28),0_0_0_0.5px_rgba(255,255,255,0.08)]",
+	},
 };
+
+function SceneGlyph({ icon, color }: { icon: IconName; color: SceneColor }) {
+	const glyph = GLYPH[color];
+
+	return (
+		<span
+			aria-hidden
+			className={cn(
+				"inline-flex size-5 shrink-0 items-center justify-center rounded-[5px] p-px pb-[2px]",
+				glyph.shell,
+			)}
+		>
+			<span
+				className={cn(
+					"flex size-full items-center justify-center rounded-[4px] text-white",
+					glyph.face,
+				)}
+			>
+				<Icon name={icon} className="size-3 text-white" />
+			</span>
+		</span>
+	);
+}
 
 export interface SceneHeaderProps {
 	icon: IconName;
@@ -40,18 +79,7 @@ export function SceneHeader({
 	return (
 		<div>
 			<div className="flex items-center gap-2">
-				<div
-					className={cn(
-						"flex size-5 items-center justify-center rounded-[5.5px] text-white",
-						COLOR_STYLES[color],
-					)}
-				>
-					<Icon
-						name={icon}
-						className="size-3.5 text-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.25)]"
-						aria-hidden
-					/>
-				</div>
+				<SceneGlyph icon={icon} color={color} />
 				<span className="font-medium text-[13.5px] text-text-strong-950 tracking-tight dark:text-white">
 					{badge}
 				</span>
