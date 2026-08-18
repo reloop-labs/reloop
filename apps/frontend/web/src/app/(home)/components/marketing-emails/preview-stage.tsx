@@ -94,7 +94,7 @@ function UploadDataView() {
 			{/* Main Content Body */}
 			<div className="space-y-3.5 p-5 sm:p-6">
 				{/* File Summary Card */}
-				<div className="flex items-center justify-between rounded-xl border border-stroke-soft-200 bg-bg-weak-50/50 p-3 dark:border-white/10 dark:bg-white/[0.02]">
+				<div className="flex items-center justify-between rounded-xl border border-stroke-soft-200 bg-transparent p-3 dark:border-white/10">
 					<div className="flex items-center gap-3">
 						<div className="flex size-8 items-center justify-center rounded-lg bg-text-strong-950 text-white dark:bg-white dark:text-black">
 							<Icon name="file-code" className="size-4" />
@@ -122,7 +122,7 @@ function UploadDataView() {
 				{/* Simple, Readable Spreadsheet Preview Table */}
 				<div className="overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-white-0 dark:border-white/10 dark:bg-[#111114]">
 					{/* Table Columns Header */}
-					<div className="grid grid-cols-[1.5fr_1.2fr_1fr_1fr] border-stroke-soft-100 border-b bg-bg-weak-50/60 px-4 py-2 font-medium text-[10.5px] text-text-soft-400 dark:border-white/5 dark:bg-white/[0.02] dark:text-white/40">
+					<div className="grid grid-cols-[1.5fr_1.2fr_1fr_1fr] border-stroke-soft-100 border-b px-4 py-2 font-medium text-[10.5px] text-text-soft-400 dark:border-white/5 dark:text-white/40">
 						<span>EMAIL</span>
 						<span>NAME</span>
 						<span>PLAN</span>
