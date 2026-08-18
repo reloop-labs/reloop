@@ -18,20 +18,8 @@ function ReactEmailIcon({ className }: { className?: string }) {
 			aria-hidden="true"
 		>
 			<ellipse cx="12" cy="12" rx="10" ry="4.5" />
-			<ellipse
-				cx="12"
-				cy="12"
-				rx="10"
-				ry="4.5"
-				transform="rotate(60 12 12)"
-			/>
-			<ellipse
-				cx="12"
-				cy="12"
-				rx="10"
-				ry="4.5"
-				transform="rotate(120 12 12)"
-			/>
+			<ellipse cx="12" cy="12" rx="10" ry="4.5" transform="rotate(60 12 12)" />
+			<ellipse cx="12" cy="12" rx="10" ry="4.5" transform="rotate(120 12 12)" />
 			<circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none" />
 		</svg>
 	);
@@ -75,9 +63,7 @@ export function PreviewTabs({
 						{selected && (
 							<motion.span
 								layoutId={
-									shouldReduceMotion
-										? undefined
-										: "transactional-tab-indicator"
+									shouldReduceMotion ? undefined : "transactional-tab-indicator"
 								}
 								className="absolute right-0 bottom-0 left-0 z-10 h-0.5 bg-[#f97316] dark:bg-[#ea580c]"
 								transition={
@@ -119,7 +105,7 @@ export function PreviewTabs({
 						</p>
 						<p
 							className={cn(
-								"mt-2 line-clamp-2 text-[13.5px] leading-relaxed transition-colors duration-200",
+								"mt-2 text-[12.5px] leading-relaxed transition-colors duration-200",
 								selected
 									? "text-text-sub-600 dark:text-white/70"
 									: "text-text-soft-400 group-hover:text-text-sub-600 dark:text-white/30 dark:group-hover:text-white/50",

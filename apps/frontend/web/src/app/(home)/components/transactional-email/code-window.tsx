@@ -54,7 +54,7 @@ export function CodeWindow({
 					</div>
 
 					{/* Chrome-style Tab Strip */}
-					<div className="flex items-end gap-1 overflow-x-auto scrollbar-none">
+					<div className="scrollbar-none flex items-end gap-1 overflow-x-auto">
 						{tabs && tabs.length > 0 ? (
 							tabs.map((tab) => {
 								const selected = tab.id === (activeTab ?? tabs[0]?.id);
@@ -64,7 +64,7 @@ export function CodeWindow({
 										type="button"
 										onClick={() => onTabChange?.(tab.id)}
 										className={cn(
-											"group relative -mb-px flex h-8 items-center gap-2 rounded-t-[9px] px-3 font-medium font-mono text-[12px] transition-colors",
+											"group -mb-px relative flex h-8 items-center gap-2 rounded-t-[9px] px-3 font-medium font-mono text-[12px] transition-colors",
 											selected
 												? "border-stroke-soft-200 border-t border-r border-l bg-bg-white-0 text-text-strong-950 shadow-[0_1px_4px_rgba(0,0,0,0.04)] dark:border-white/10 dark:bg-[#161616] dark:text-white"
 												: "text-text-sub-600 hover:bg-black/[0.04] hover:text-text-strong-950 dark:text-white/45 dark:hover:bg-white/[0.04] dark:hover:text-white",

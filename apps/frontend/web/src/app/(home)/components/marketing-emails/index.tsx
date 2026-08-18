@@ -1,25 +1,26 @@
 import { SceneHeader } from "../_shared/scene-header";
+import { MarketingEmailsPreview } from "./preview";
 
 export function MarketingEmailsSection() {
 	return (
 		<article
 			id="email-system-marketing"
 			data-scene="marketing"
-			className="scroll-mt-28 px-4 py-12 sm:px-8 sm:py-16 lg:px-12 lg:py-16"
+			className="scroll-mt-28 pt-12 sm:pt-16 lg:pt-16"
 		>
-			<SceneHeader
-				icon="mega-phone"
-				color="pink"
-				badge="Reloop Marketing"
-				title="Reach your audience without spam flags."
-				description="Send broadcasts and newsletters with audience segmentation, warm-up protection, and high inbox delivery."
-				ctaLabel="Explore Marketing"
-				ctaHref="/docs/marketing"
-			/>
-
-			<div className="relative mt-10 min-h-[20rem] overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-6 sm:min-h-[24rem] dark:border-white/10 dark:bg-black">
-				{/* Marketing emails visual content */}
+			<div className="px-4 sm:px-8 lg:px-12">
+				<SceneHeader
+					icon="mega-phone"
+					color="pink"
+					badge="Marketing Emails"
+					title="Deliver Broadcasts that Convert"
+					description="Upload and sync customer data, orchestrate automated conversion funnels, and monitor engagement analytics with zero deliverability friction."
+					ctaLabel="Explore Marketing"
+					ctaHref="/docs/marketing"
+				/>
 			</div>
+
+			<MarketingEmailsPreview />
 		</article>
 	);
 }

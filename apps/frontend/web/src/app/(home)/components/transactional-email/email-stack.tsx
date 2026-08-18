@@ -42,7 +42,7 @@ export function EmailStack({ activeId = "otp" }: { activeId?: string }) {
 				</AnimatePresence>
 				<div
 					aria-hidden
-					className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-28 bg-gradient-to-t from-bg-white-0 from-15% to-transparent dark:from-[#141414]"
+					className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-28 bg-gradient-to-t from-15% from-bg-white-0 to-transparent dark:from-[#141414]"
 				/>
 			</article>
 		</div>
@@ -120,11 +120,11 @@ function EmailFooter() {
 		<div className="mt-10 text-[#707070] text-[12px] leading-[24px]">
 			<div className="mb-4 font-mono tracking-[0.05em]">
 				<span className="text-[18px]">𝕏</span>
-				<span className="mx-2 text-[18px] text-[#d0d0d0] dark:text-[#333]">
+				<span className="mx-2 text-[#d0d0d0] text-[18px] dark:text-[#333]">
 					·
 				</span>
 				<span className="text-[13px]">GitHub</span>
-				<span className="mx-2 text-[18px] text-[#d0d0d0] dark:text-[#333]">
+				<span className="mx-2 text-[#d0d0d0] text-[18px] dark:text-[#333]">
 					·
 				</span>
 				<span className="text-[13px]">LinkedIn</span>
@@ -153,8 +153,8 @@ function OtpEmailBody() {
 			<SerifHeading>Your verification code</SerifHeading>
 			<Rule />
 			<BodyText>
-				Enter this 6-digit verification code to complete your sign-in to
-				Reloop. This code expires in 10 minutes.
+				Enter this 6-digit verification code to complete your sign-in to Reloop.
+				This code expires in 10 minutes.
 			</BodyText>
 
 			<div className="my-6 rounded-xl border border-stroke-soft-200 bg-bg-weak-50 p-5 text-center dark:border-white/10 dark:bg-white/[0.04]">
@@ -166,7 +166,7 @@ function OtpEmailBody() {
 				</p>
 			</div>
 
-			<BodyText className="text-[12.5px] text-[#707070] dark:text-[#888]">
+			<BodyText className="text-[#707070] text-[12.5px] dark:text-[#888]">
 				If you didn&apos;t request this code, you can safely ignore this
 				message.
 			</BodyText>

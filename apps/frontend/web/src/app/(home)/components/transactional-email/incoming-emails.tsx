@@ -7,13 +7,13 @@ import { useEffect, useRef, useState } from "react";
 import { PAGE_EASE } from "../domain/_shared/page-motion";
 import {
 	type EmailItem,
-	INCOMING_STREAM_POOL,
-	INITIAL_EMAILS,
 	getAvatarGradient,
 	getAvatarInitial,
 	getEmailStatusColorClass,
 	getEmailStatusIcon,
 	getEmailStatusLabel,
+	INCOMING_STREAM_POOL,
+	INITIAL_EMAILS,
 } from "../emails/_shared/data";
 
 const VISIBLE_ROWS = 6;

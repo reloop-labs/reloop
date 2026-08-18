@@ -1,7 +1,9 @@
 "use client";
 
 import { cn } from "@reloop/ui/cn";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
+import * as Switch from "@reloop/ui/switch";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useState } from "react";
 import type { TemplateTabId } from "./preview-scenes";
@@ -142,11 +144,15 @@ function AiTemplatesView() {
 							</div>
 						</div>
 
-						{/* Action Buttons */}
+						{/* Action Buttons with Reloop UI FancyButton */}
 						<div className="space-y-1.5 pt-0.5">
-							<span className="flex h-7.5 w-full items-center justify-center rounded-lg bg-text-strong-950 font-medium text-[11px] text-white shadow-xs dark:bg-white dark:text-black">
-								Download Receipt (PDF) →
-							</span>
+							<FancyButton.Root
+								variant="neutral"
+								size="xsmall"
+								className="w-full rounded-lg! px-3!"
+							>
+								<span>Download Receipt (PDF) →</span>
+							</FancyButton.Root>
 							<span className="flex h-6 w-full items-center justify-center text-[10.5px] text-text-soft-400 hover:text-text-strong-950 dark:text-white/50">
 								View in dashboard →
 							</span>
@@ -471,15 +477,19 @@ function RealtimeEditorView() {
 					canvas.
 				</p>
 
-				{/* Primary Button */}
+				{/* Primary Button with Reloop UI FancyButton */}
 				<div className="pt-1">
-					<span className="inline-flex h-7.5 items-center justify-center rounded-lg bg-text-strong-950 px-4 font-medium text-[11px] text-white shadow-xs dark:bg-white dark:text-black">
-						Deploy to Production →
-					</span>
+					<FancyButton.Root
+						variant="neutral"
+						size="xsmall"
+						className="rounded-lg! px-3.5!"
+					>
+						<span>Deploy to Production →</span>
+					</FancyButton.Root>
 				</div>
 
 				{/* Section Header & Subtitle */}
-				<div className="space-y-1 border-stroke-soft-100 border-t pt-2 dark:border-white/5">
+				<div className="space-y-1.5 border-stroke-soft-100 border-t pt-3 dark:border-white/5">
 					<h4 className="font-bold text-sm text-text-strong-950 tracking-tight dark:text-white">
 						What's new in Reloop 2.0?
 					</h4>
@@ -487,6 +497,20 @@ function RealtimeEditorView() {
 						Type-safe component primitives, multiplayer canvas editing, and
 						automated deliverability monitoring right out of the box.
 					</p>
+				</div>
+
+				{/* Document Ending Skeletons for Natural Height */}
+				<div className="space-y-2 pt-2">
+					<div className="flex gap-2">
+						<div className="h-2 w-2/5 rounded-full bg-stroke-soft-200 dark:bg-white/10" />
+						<div className="h-2 w-1/3 rounded-full bg-stroke-soft-100 dark:bg-white/5" />
+						<div className="h-2 w-1/5 rounded-full bg-stroke-soft-200 dark:bg-white/10" />
+					</div>
+					<div className="flex gap-2">
+						<div className="h-2 w-1/2 rounded-full bg-stroke-soft-100 dark:bg-white/5" />
+						<div className="h-2 w-2/5 rounded-full bg-stroke-soft-200 dark:bg-white/10" />
+					</div>
+					<div className="h-2 w-3/5 rounded-full bg-stroke-soft-100 dark:bg-white/5" />
 				</div>
 			</div>
 		</div>
@@ -554,7 +578,7 @@ function VersionHistoryView() {
 					<div className="flex size-7 items-center justify-center rounded-lg border border-stroke-soft-200 bg-bg-white-0 shadow-2xs dark:border-white/10 dark:bg-white/5">
 						<Icon
 							name="sparkling"
-							className="size-3.5 text-purple-600 dark:text-purple-400"
+							className="size-3.5 text-text-strong-950 dark:text-white"
 						/>
 					</div>
 					<button
@@ -565,20 +589,22 @@ function VersionHistoryView() {
 					</button>
 				</div>
 
-				<button
-					type="button"
-					className="flex items-center gap-1.5 rounded-lg bg-purple-600 px-3.5 py-1.5 font-medium text-white text-xs shadow-xs transition-opacity hover:opacity-90 dark:bg-purple-500"
+				{/* Signature Reloop UI FancyButton Root */}
+				<FancyButton.Root
+					variant="neutral"
+					size="xsmall"
+					className="rounded-full! px-3.5!"
 				>
-					<span>↺</span>
+					<Icon name="history" className="size-3" />
 					<span>Restore this version</span>
-				</button>
+				</FancyButton.Root>
 			</div>
 
 			{/* Main Single Block: Version History Widget */}
 			<div className="relative overflow-visible rounded-2xl border border-stroke-soft-200 bg-bg-white-0 shadow-sm dark:border-white/10 dark:bg-[#0c0c0e]">
 				{/* Card Header */}
 				<div className="flex items-center justify-between border-stroke-soft-100 border-b px-5 py-3 dark:border-white/10">
-					<h3 className="font-semibold text-text-strong-950 text-xs tracking-tight dark:text-white">
+					<h3 className="font-medium text-text-strong-950 text-xs tracking-tight dark:text-white">
 						Version History
 					</h3>
 					<span className="text-text-soft-400 text-xs dark:text-white/40">
@@ -588,7 +614,7 @@ function VersionHistoryView() {
 
 				{/* Timeline Content */}
 				<div className="relative p-4 sm:p-5">
-					<div className="mb-2 font-medium text-[11px] text-text-soft-400 dark:text-white/40">
+					<div className="mb-2 font-normal text-[11px] text-text-soft-400 dark:text-white/40">
 						Today
 					</div>
 
@@ -607,7 +633,7 @@ function VersionHistoryView() {
 										className={cn(
 											"relative z-10 flex size-8 shrink-0 items-center justify-center rounded-lg border text-xs transition-colors",
 											isSelected
-												? "border-purple-500/40 bg-purple-500/10 text-purple-600 dark:border-purple-400/40 dark:bg-purple-400/10 dark:text-purple-400"
+												? "border-stroke-soft-300 bg-bg-weak-50 text-text-strong-950 dark:border-white/20 dark:bg-white/10 dark:text-white"
 												: "border-stroke-soft-200 bg-bg-white-0 text-text-sub-600 dark:border-white/10 dark:bg-[#121215] dark:text-white/60",
 										)}
 									>
@@ -620,7 +646,7 @@ function VersionHistoryView() {
 										className={cn(
 											"group flex flex-1 cursor-pointer items-center justify-between rounded-xl border p-2.5 transition-all",
 											isSelected
-												? "border-purple-500/60 bg-purple-500/5 shadow-xs dark:border-purple-400/60 dark:bg-purple-400/5"
+												? "border-stroke-soft-200 bg-bg-weak-50/60 shadow-2xs dark:border-white/10 dark:bg-white/[0.02]"
 												: "border-transparent bg-transparent hover:border-stroke-soft-200 hover:bg-bg-weak-50/50 dark:hover:border-white/10 dark:hover:bg-white/[0.02]",
 										)}
 									>
@@ -629,7 +655,7 @@ function VersionHistoryView() {
 												<span className="font-mono text-[10.5px] text-text-soft-400 dark:text-white/40">
 													{v.time}
 												</span>
-												<span className="font-semibold text-text-strong-950 text-xs dark:text-white">
+												<span className="font-normal text-text-strong-950 text-xs dark:text-white">
 													{v.title}
 												</span>
 											</div>
@@ -643,7 +669,7 @@ function VersionHistoryView() {
 												<span className="text-text-soft-400 dark:text-white/30">
 													·
 												</span>
-												<span className="text-purple-600 dark:text-purple-400">
+												<span className="text-text-soft-400 dark:text-white/50">
 													{v.changes} {isSelected && "▾"}
 												</span>
 											</div>
@@ -657,16 +683,17 @@ function VersionHistoryView() {
 							);
 						})}
 
-						{/* Floating Action Menu Popover (Anchored like screenshot) */}
+						{/* Floating Action Menu Popover */}
 						<div className="-right-4 absolute top-2 z-30 hidden w-44 rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-1.5 shadow-xl sm:block dark:border-white/15 dark:bg-[#151518]">
 							<div className="space-y-0.5 text-[11px]">
-								<button
-									type="button"
-									className="flex w-full cursor-pointer items-center gap-2 rounded-lg bg-purple-500/10 px-2.5 py-1.5 font-medium text-purple-600 dark:bg-purple-400/10 dark:text-purple-400"
+								<FancyButton.Root
+									variant="neutral"
+									size="xsmall"
+									className="w-full justify-start rounded-lg! px-2.5! font-normal"
 								>
-									<span>↺</span>
+									<Icon name="history" className="size-3" />
 									<span>Restore</span>
-								</button>
+								</FancyButton.Root>
 								{[
 									{ label: "Restore as new", badge: "Soon" },
 									{ label: "Preview snapshot", badge: "Soon" },
@@ -676,10 +703,10 @@ function VersionHistoryView() {
 								].map((item) => (
 									<div
 										key={item.label}
-										className="flex cursor-pointer items-center justify-between rounded-lg px-2.5 py-1.5 text-text-sub-600 hover:bg-bg-weak-50 hover:text-text-strong-950 dark:text-white/70 dark:hover:bg-white/5 dark:hover:text-white"
+										className="flex cursor-pointer items-center justify-between rounded-lg px-2.5 py-1.5 font-normal text-text-sub-600 hover:bg-bg-weak-50 hover:text-text-strong-950 dark:text-white/70 dark:hover:bg-white/5 dark:hover:text-white"
 									>
 										<span>{item.label}</span>
-										<span className="rounded bg-purple-500/15 px-1.5 py-0.2 font-semibold text-[8.5px] text-purple-600 dark:bg-purple-400/20 dark:text-purple-300">
+										<span className="rounded border border-stroke-soft-200 bg-bg-weak-50 px-1.5 py-0.2 font-medium text-[8.5px] text-text-soft-400 dark:border-white/10 dark:bg-white/5 dark:text-white/40">
 											{item.badge}
 										</span>
 									</div>
@@ -689,28 +716,12 @@ function VersionHistoryView() {
 					</div>
 				</div>
 
-				{/* Card Footer with Toggle Switch */}
+				{/* Card Footer with Reloop UI Switch */}
 				<div className="flex items-center justify-between border-stroke-soft-100 border-t px-5 py-3 dark:border-white/10">
 					<span className="font-medium text-text-sub-600 text-xs dark:text-white/70">
 						Show Changes
 					</span>
-					<button
-						type="button"
-						onClick={() => setShowChanges(!showChanges)}
-						className={cn(
-							"relative inline-flex h-5 w-9 cursor-pointer items-center rounded-full transition-colors",
-							showChanges
-								? "bg-purple-600 dark:bg-purple-500"
-								: "bg-stroke-soft-200 dark:bg-white/20",
-						)}
-					>
-						<span
-							className={cn(
-								"inline-block size-3.5 rounded-full bg-white transition-transform",
-								showChanges ? "translate-x-4.5" : "translate-x-1",
-							)}
-						/>
-					</button>
+					<Switch.Root checked={showChanges} onCheckedChange={setShowChanges} />
 				</div>
 			</div>
 		</div>

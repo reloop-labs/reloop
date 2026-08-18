@@ -75,7 +75,7 @@ export function PreviewTabs({
 						</p>
 						<p
 							className={cn(
-								"mt-2 line-clamp-2 text-[13.5px] leading-relaxed transition-colors duration-200",
+								"mt-2 text-[12.5px] leading-relaxed transition-colors duration-200",
 								selected
 									? "text-text-sub-600 dark:text-white/70"
 									: "text-text-soft-400 group-hover:text-text-sub-600 dark:text-white/30 dark:group-hover:text-white/50",
