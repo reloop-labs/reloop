@@ -13,7 +13,7 @@
 	font-family: var(--font-geist-sans, var(--font-sans));
 
 	/* Light mode (default) — mirrors Zero panelLight surfaces */
-	--sidebar-background: var(--bg-weak-50);
+	--sidebar-background: hsl(0 0% 98%);
 	--mail-background: var(--bg-white-0);
 	--mail-foreground: var(--text-strong-950);
 	--mail-muted: var(--text-sub-600);
@@ -60,7 +60,7 @@
 }
 
 .inbox-zero-theme.dark {
-	--sidebar-background: #000000;
+	--sidebar-background: hsl(240 3.9% 7%);
 	--mail-background: #0a0a0a;
 	--mail-foreground: var(--text-strong-950);
 	--mail-muted: var(--text-sub-600);

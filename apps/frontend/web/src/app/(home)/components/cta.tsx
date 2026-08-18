@@ -12,7 +12,7 @@ export default function CTA() {
 				</>
 			}
 			sub=""
-			primaryLabel="Start for free"
+			primaryLabel="Get Started "
 			primaryHref={hostedSignupHref}
 			secondaryLabel="Contact us"
 			secondaryHref="/contact"
@@ -20,6 +20,7 @@ export default function CTA() {
 			flush
 			align="center"
 			pill={false}
+			showTopRule={false}
 		/>
 	);
 }

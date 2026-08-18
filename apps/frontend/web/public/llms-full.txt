@@ -96,7 +96,7 @@ Markdown: https://reloop.sh/pricing.md
 ## Self-host
 
 Self-hosting the open-source Reloop stack is free (infrastructure costs are yours).
-See https://reloop.sh/docs/self-host
+See https://reloop.sh/self-host
 
 ## Related
 
@@ -229,7 +229,7 @@ Today we're introducing Reloop: [open-source email infrastructure](https://githu
 
 ### 1. Deliverability
 
-If mail lands in spam, nothing else counts. Reloop is built as real [delivery infrastructure](/features/deliverability): [SMTP](/features/smtp), [DKIM/SPF-oriented setup](/blog/spf-dkim-dmarc-setup-guide), bounce classification, and the operational pieces that keep reputation from becoming someone else's mystery. Use Reloop Cloud when you want managed reputation and IP pools. [Self-host](/docs/self-host) when you want the sending path on your own terms—see [self-hosted email infrastructure](/blog/self-hosted-email-infrastructure) for when that tradeoff is worth it.
+If mail lands in spam, nothing else counts. Reloop is built as real [delivery infrastructure](/features/deliverability): [SMTP](/features/smtp), [DKIM/SPF-oriented setup](/blog/spf-dkim-dmarc-setup-guide), bounce classification, and the operational pieces that keep reputation from becoming someone else's mystery. Use Reloop Cloud when you want managed reputation and IP pools. [Self-host](/self-host) when you want the sending path on your own terms—see [self-hosted email infrastructure](/blog/self-hosted-email-infrastructure) for when that tradeoff is worth it.
 
 ### 2. Developer experience
 
@@ -248,11 +248,11 @@ Email SaaS pricing often feels cheap at low volume and painful once you scale. D
 - Full grid: [all provider comparisons](/compare)
 - Deeper write-up: [email provider comparison 2026](/blog/email-provider-comparison-2026)
 
-Reloop gives you two answers: a hosted path when you want zero ops, and a [full open-source path](/docs/self-host) when you want to run the stack yourself and stop renting your outbound channel forever—including a [low-cost self-host path](/blog/self-host-email-5-dollars) if you're optimizing ops spend.
+Reloop gives you two answers: a hosted path when you want zero ops, and a [full open-source path](/self-host) when you want to run the stack yourself and stop renting your outbound channel forever—including a [low-cost self-host path](/blog/self-host-email-5-dollars) if you're optimizing ops spend.
 
 ### 4. Ownership (no vendor lock-in)
 
-This is the quiet deal-breaker. Proprietary APIs, opaque logs, and "you can't leave without a rewrite" are how email becomes a hostage situation. Reloop is [Apache 2.0](/license). The cloud product runs the same codebase you can `docker compose up` on Fly, Coolify, Kubernetes, or your own machines—see [Fly.io](/blog/reloop-flyio-deployment) and [Coolify](/blog/reloop-coolify-setup) guides, or the [self-host docs](/docs/self-host). Audit it. Fork it. Move it. Your data and compliance boundary stay yours. More on the bet: [why we open-sourced email infrastructure](/blog/why-we-open-sourced-email-infrastructure) and [why open source](/why-open-source).
+This is the quiet deal-breaker. Proprietary APIs, opaque logs, and "you can't leave without a rewrite" are how email becomes a hostage situation. Reloop is [Apache 2.0](/license). The cloud product runs the same codebase you can `docker compose up` on Fly, Coolify, Kubernetes, or your own machines—see [Fly.io](/blog/reloop-flyio-deployment) and [Coolify](/blog/reloop-coolify-setup) guides, or the [self-host docs](/self-host). Audit it. Fork it. Move it. Your data and compliance boundary stay yours. More on the bet: [why we open-sourced email infrastructure](/blog/why-we-open-sourced-email-infrastructure) and [why open source](/why-open-source).
 
 ### 5. Visibility and the full loop
 
@@ -264,7 +264,7 @@ Linux, Postgres, Redis, Nginx: the boring foundations of the internet are open. 
 
 Open source is how we make the five things above credible. You can read how delivery works. You can leave without rewriting your notification stack. The roadmap gets shaped by people shipping real mail, not only by a [pricing page](/pricing). Full rationale: [why we open-sourced email infrastructure](/blog/why-we-open-sourced-email-infrastructure) and our [product beliefs](/our-product-beliefs).
 
-We're not open-sourcing a demo. Reloop Cloud and Reloop open source are the same product—same APIs whether you use [hosted](/pricing) or [self-host](/docs/self-host).
+We're not open-sourcing a demo. Reloop Cloud and Reloop open source are the same product—same APIs whether you use [hosted](/pricing) or [self-host](/self-host).
 
 ## Who should care
 
@@ -278,7 +278,7 @@ Whatever your scale or stack, if deliverability, DX, cost, ownership, and visibi
 
 - GitHub: [github.com/reloop-labs/reloop](https://github.com/reloop-labs/reloop) (star it, watch it, contribute)
 - Cloud: [reloop.sh/dashboard/signup](https://reloop.sh/dashboard/signup) (first email in a couple of minutes)
-- Docs: [Docs](/docs) · [Pricing](/pricing) · [Compare](/compare) · [Self-host](/docs/self-host)
+- Docs: [Docs](/docs) · [Pricing](/pricing) · [Compare](/compare) · [Self-host](/self-host)
 
 We're early, shipping in public, and still at the stage where your feedback bends the curve. If those five things are what you care about, this is the project to watch.
 
@@ -362,7 +362,7 @@ if (!process.env.RELOOP_API_KEY) {
 });
 ```
 
-Initialize with an object: `{ apiKey: string }`. Optional: `baseUrl` if you [self-host](/docs/self-host) Reloop.
+Initialize with an object: `{ apiKey: string }`. Optional: `baseUrl` if you [self-host](/self-host) Reloop.
 
 ---
 
@@ -1221,7 +1221,7 @@ When you add a sending domain in the [Reloop dashboard](https://reloop.sh/dashbo
 4. **Deliverability & Bounce Management**: Built-in [bounce classification](/blog/email-bounce-processing-automation), [real-time email analytics](/features/email-analytics), and suppression lists keep your sender reputation safe.
 5. **Developer APIs & Drop-in SDKs**: Send authenticated mail via [Node.js, Python, or Go SDKs](/sdk) or drop-in [SMTP relay](/features/smtp).
 
-Whether you choose [Reloop Cloud pricing](/pricing) for managed deliverability or [self-host Reloop on your own infrastructure](/docs/self-host) (for under $5/mo with our [self-host tutorial](/blog/self-host-email-5-dollars)), the authentication requirements remain identical.
+Whether you choose [Reloop Cloud pricing](/pricing) for managed deliverability or [self-host Reloop on your own infrastructure](/self-host) (for under $5/mo with our [self-host tutorial](/blog/self-host-email-5-dollars)), the authentication requirements remain identical.
 
 ## Common gotchas & deliverability pitfalls
 
@@ -1311,7 +1311,7 @@ By releasing Reloop under the **[Apache 2.0 license](/license)**, we guarantee:
 
 1. **Complete Stack Ownership**: The cloud platform and the open-source release run the **exact same codebase**. You can `docker compose up` locally, host on [Fly.io](/blog/reloop-flyio-deployment) or [Coolify](/blog/reloop-coolify-setup), or run on bare metal for under $5/mo (see [how to self-host email for $5/month](/blog/self-host-email-5-dollars)).
 2. **Auditability & Security**: Security teams can inspect every line of delivery logic and keep sensitive communication strictly within their own VPC boundary.
-3. **No Ransom Pricing**: If your business grows 100x, your outbound communication channel doesn't become your most expensive utility. You can choose managed [Reloop Cloud pricing](/pricing) for zero ops, or [self-host](/docs/self-host) with complete independence.
+3. **No Ransom Pricing**: If your business grows 100x, your outbound communication channel doesn't become your most expensive utility. You can choose managed [Reloop Cloud pricing](/pricing) for zero ops, or [self-host](/self-host) with complete independence.
 
 For a deeper dive into our architectural philosophy, read our [product beliefs](/our-product-beliefs) and [why open source matters](/why-open-source).
 
@@ -1327,7 +1327,7 @@ Whether you are an indie hacker shipping your first app, a high-growth startup o
 
 - **Star and explore the repository**: [github.com/reloop-labs/reloop](https://github.com/reloop-labs/reloop)
 - **Start sending on Reloop Cloud**: [reloop.sh/dashboard/signup](https://reloop.sh/dashboard/signup)
-- **Browse the documentation**: [Reloop Docs](/docs) · [Self-Host Guide](/docs/self-host) · [Pricing](/pricing) · [Provider Comparisons](/compare)
+- **Browse the documentation**: [Reloop Docs](/docs) · [Self-Host Guide](/self-host) · [Pricing](/pricing) · [Provider Comparisons](/compare)
 
 ---
 
@@ -1345,7 +1345,7 @@ When an Internet Service Provider (such as Gmail, Microsoft 365, or Yahoo) detec
 
 **IP warm-up is the disciplined process of gradually ramping up sending volume over 4 to 6 weeks to establish positive, trusted reputation signals with major mailbox algorithms.**
 
-Whether you are configuring a dedicated IP on [Reloop Cloud](/pricing) or deploying [self-hosted Reloop on your own VPS or bare metal](/docs/self-host), this guide provides the exact week-by-week volume schedules, recipient segmentation techniques, and diagnostic tools required to warm your sending IPs safely.
+Whether you are configuring a dedicated IP on [Reloop Cloud](/pricing) or deploying [self-hosted Reloop on your own VPS or bare metal](/self-host), this guide provides the exact week-by-week volume schedules, recipient segmentation techniques, and diagnostic tools required to warm your sending IPs safely.
 
 ---
 

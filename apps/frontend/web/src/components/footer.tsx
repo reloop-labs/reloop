@@ -31,6 +31,7 @@ const columns: FooterColumn[] = [
 			{ title: "AI Agents", href: "/features/ai-agents" },
 			{ title: "Webhooks", href: "/features/webhooks" },
 			{ title: "Deliverability", href: "/features/deliverability" },
+			{ title: "Domains", href: "/domain" },
 		],
 	},
 	{
@@ -41,7 +42,7 @@ const columns: FooterColumn[] = [
 			{ title: "Documentation", href: "/docs" },
 			{ title: "API Reference", href: "/docs/api" },
 			{ title: "Webhooks", href: "/docs/webhooks" },
-			{ title: "Self-host", href: "/docs/self-host" },
+			{ title: "Self-host", href: "/self-host" },
 			{ title: "SMTP", href: "/docs/examples/smtp/introduction" },
 			{ title: "Integrations", href: "/docs/integrations" },
 		],

@@ -160,7 +160,7 @@ export const AiSidebar = ({
 	return (
 		<aside
 			className={cn(
-				"mb-1 flex h-full w-[min(340px,100%)] shrink-0 flex-col overflow-hidden rounded-2xl border border-mail-border bg-panel-light dark:bg-panel-dark",
+				"flex h-full w-[min(340px,100%)] shrink-0 flex-col overflow-hidden border-mail-border border-l bg-panel-light dark:bg-panel-dark",
 			)}
 		>
 			{/* Header tools */}

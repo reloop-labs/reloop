@@ -52,7 +52,8 @@ export const ThreadList = ({
 	onForward,
 	isLoading = false,
 }: ThreadListProps) => {
-	const { toggleMessageStar, archiveThread, unarchiveThread, trashThread } = useAgentInbox();
+	const { toggleMessageStar, archiveThread, unarchiveThread, trashThread } =
+		useAgentInbox();
 	const [mail, setMail] = useInboxMail();
 	const containerRef = useRef<HTMLDivElement>(null);
 	const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
@@ -195,7 +196,9 @@ export const ThreadList = ({
 				},
 			});
 		} catch (err: unknown) {
-			toast.error(err instanceof Error ? err.message : "Failed to move to inbox");
+			toast.error(
+				err instanceof Error ? err.message : "Failed to move to inbox",
+			);
 		}
 	};
 

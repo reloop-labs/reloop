@@ -1,7 +1,7 @@
 import { Icon, type IconName } from "@reloop/ui/icon";
 import { BlogCta } from "@reloop/web/components/landing/blog/blog-cta";
-import { toolConfigs } from "@reloop/web/lib/landing/tools";
 import { createLandingMetadata } from "@reloop/web/lib/landing/metadata";
+import { toolConfigs } from "@reloop/web/lib/landing/tools";
 import Link from "next/link";
 
 export const instant = false;
@@ -121,8 +121,8 @@ export default function ToolsIndexPage() {
 					</h1>
 					<p className="mt-4 text-[16px] text-text-sub-600 leading-relaxed sm:text-[18px] dark:text-white/60">
 						Zero signup required. Browser-based utilities to validate addresses,
-						inspect DNS auth records, calculate deliverability scores, and preview
-						responsive templates.
+						inspect DNS auth records, calculate deliverability scores, and
+						preview responsive templates.
 					</p>
 
 					{/* Fast Highlights Bar */}
@@ -161,7 +161,7 @@ export default function ToolsIndexPage() {
 							<Link
 								key={tool.path}
 								href={tool.path}
-								className={`group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-stroke-soft-200 bg-white p-6 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg dark:border-white/10 dark:bg-[#0d0d0f] ${visual.glowColor}`}
+								className={`group hover:-translate-y-0.5 relative flex flex-col justify-between overflow-hidden rounded-2xl border border-stroke-soft-200 bg-white p-6 transition-all duration-200 hover:shadow-lg dark:border-white/10 dark:bg-[#0d0d0f] ${visual.glowColor}`}
 							>
 								<div>
 									<div className="flex items-center justify-between gap-3">

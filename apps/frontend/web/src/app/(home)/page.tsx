@@ -7,12 +7,13 @@ import {
 	socialProfiles,
 } from "@reloop/web/lib/site";
 import LanguageExplorer from "../sdk/components/language-explorer";
+import Convictions from "./components/convictions";
 import CTA from "./components/cta";
+import EmailSystem from "./components/email-system";
 import Hero from "./components/hero";
 import Highlights from "./components/highlights";
-import Integrate from "./components/integrate";
+import { SectionSeparator } from "./components/section-separator";
 import ShipFast from "./components/ship-fast";
-import UseCase from "./components/use-case";
 
 // TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
 // See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
@@ -54,15 +55,28 @@ const homeSchema = [
 
 export default function Home() {
 	return (
-		<div className="relative mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-200 border-x md:max-w-7xl dark:border-white/10">
+		<div className="relative w-full">
 			<JsonLd data={homeSchema} />
 			<Hero />
-			<UseCase />
-			<LanguageExplorer framed={false} id="sdks" />
-			<Integrate />
-			<Highlights />
-			<ShipFast />
-			<CTA />
+			<div className="relative mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-200 border-x md:max-w-7xl dark:border-white/10">
+				<SectionSeparator />
+				<Convictions />
+				<SectionSeparator />
+				<EmailSystem />
+				<SectionSeparator />
+				<LanguageExplorer
+					framed={false}
+					showTopRule={false}
+					showHeading
+					id="sdks"
+				/>
+				<SectionSeparator />
+				<Highlights />
+				<SectionSeparator />
+				<ShipFast />
+				<SectionSeparator />
+				<CTA />
+			</div>
 		</div>
 	);
 }

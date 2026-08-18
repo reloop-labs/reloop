@@ -4,13 +4,7 @@ import {
 } from "@reloop/web/components/landing/feature-highlights";
 import Link from "next/link";
 
-function Term({
-	href,
-	children,
-}: {
-	href: string;
-	children: React.ReactNode;
-}) {
+function Term({ href, children }: { href: string; children: React.ReactNode }) {
 	return (
 		<Link
 			href={href}
@@ -136,7 +130,7 @@ export default function Highlights() {
 		<section
 			id="highlights"
 			aria-labelledby="highlights-heading"
-			className="w-full border-stroke-soft-200 border-t dark:border-white/10"
+			className="w-full"
 		>
 			<div className="px-4 py-16 sm:px-6 sm:py-20 lg:px-12 lg:py-24">
 				<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em]">

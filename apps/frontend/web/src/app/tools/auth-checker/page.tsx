@@ -1,6 +1,6 @@
 import { AuthCheckerPageView } from "@reloop/web/components/landing/tools/auth-checker-page";
-import { config } from "@reloop/web/lib/landing/tools/auth-checker";
 import { createLandingMetadata } from "@reloop/web/lib/landing/metadata";
+import { config } from "@reloop/web/lib/landing/tools/auth-checker";
 
 export const instant = false;
 

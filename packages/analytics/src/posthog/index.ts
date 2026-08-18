@@ -1,11 +1,11 @@
 "use client";
 
-export * from "./posthog-provider";
 export { posthog } from "posthog-js";
 export {
-	usePostHog,
+	useActiveFeatureFlags,
 	useFeatureFlagEnabled,
 	useFeatureFlagPayload,
-	useActiveFeatureFlags,
 	useFeatureFlagVariantKey,
+	usePostHog,
 } from "posthog-js/react";
+export * from "./posthog-provider";

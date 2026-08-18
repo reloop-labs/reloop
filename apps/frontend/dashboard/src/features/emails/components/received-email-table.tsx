@@ -15,7 +15,14 @@ import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { parseAsInteger, useQueryState } from "nuqs";
-import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+	type ReactNode,
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import {
@@ -60,7 +67,8 @@ interface ReceivedEmailTableProps {
 }
 
 const receivedGridStyle = {
-	gridTemplateColumns: "32px minmax(0, 1.2fr) minmax(0, 1.8fr) 110px 110px 32px",
+	gridTemplateColumns:
+		"32px minmax(0, 1.2fr) minmax(0, 1.8fr) 110px 110px 32px",
 };
 
 const getInboundStatusColorClass = (status: string): string => {
@@ -344,9 +352,7 @@ function ReceivedActionsMenuItems({
 	return (
 		<div className="relative">
 			{menuItems.map((item, idx) => {
-				const label = (
-					<MenuItemLabel item={item} copiedItem={copiedItem} />
-				);
+				const label = <MenuItemLabel item={item} copiedItem={copiedItem} />;
 
 				if (variant === "context") {
 					return (
@@ -486,7 +492,9 @@ function ReceivedEmailSelectionActionBar({
 	const handleCopyIds = async () => {
 		const ids = selectedLogs.map((l) => l.id).join("\n");
 		await navigator.clipboard.writeText(ids);
-		toast.success(`Copied ${selectedCount} email ID${selectedCount === 1 ? "" : "s"}`);
+		toast.success(
+			`Copied ${selectedCount} email ID${selectedCount === 1 ? "" : "s"}`,
+		);
 	};
 
 	const handleCopySenders = async () => {
@@ -494,7 +502,9 @@ function ReceivedEmailSelectionActionBar({
 			new Set(selectedLogs.map((l) => l.fromEmail)),
 		).join("\n");
 		await navigator.clipboard.writeText(senders);
-		toast.success(`Copied senders for ${selectedCount} email${selectedCount === 1 ? "" : "s"}`);
+		toast.success(
+			`Copied senders for ${selectedCount} email${selectedCount === 1 ? "" : "s"}`,
+		);
 	};
 
 	return (
@@ -652,10 +662,7 @@ const receivedColumns: ColumnDef<ReceivedEmailData>[] = [
 							getInboundStatusColorClass(status),
 						)}
 					>
-						<Icon
-							name={getInboundStatusIcon(status)}
-							className="h-3.5 w-3.5"
-						/>
+						<Icon name={getInboundStatusIcon(status)} className="h-3.5 w-3.5" />
 						{getInboundStatusLabel(status)}
 					</div>
 				</div>
@@ -769,7 +776,8 @@ export const ReceivedEmailTable = ({
 			table.toggleAllPageRowsSelected(!allSelected);
 		};
 		window.addEventListener("emails-received:select-all", handler);
-		return () => window.removeEventListener("emails-received:select-all", handler);
+		return () =>
+			window.removeEventListener("emails-received:select-all", handler);
 	}, [logs.length, table]);
 
 	const headerGroup = table.getHeaderGroups()[0];
@@ -825,7 +833,7 @@ export const ReceivedEmailTable = ({
 											style={receivedGridStyle}
 											data-state={row.getIsSelected() ? "selected" : undefined}
 											className={cn(
-												"group/row grid w-full items-center px-4 py-2 text-left transition-colors cursor-pointer",
+												"group/row grid w-full cursor-pointer items-center px-4 py-2 text-left transition-colors",
 												"hover:bg-bg-weak-50",
 												(isRowActive || row.getIsSelected()) &&
 													"bg-bg-weak-50/50",

@@ -4,19 +4,22 @@ import Link from "next/link";
 const philosophyCards = [
 	{
 		title: "Why Open Source",
-		description: "Why we believe email infrastructure must be auditable, self-hostable, and public.",
+		description:
+			"Why we believe email infrastructure must be auditable, self-hostable, and public.",
 		href: "/why-open-source",
 		iconName: "globe",
 	},
 	{
 		title: "Product Beliefs",
-		description: "The principles that guide every product decision, interface, and developer experience.",
+		description:
+			"The principles that guide every product decision, interface, and developer experience.",
 		href: "/our-product-beliefs",
 		iconName: "sparkling",
 	},
 	{
 		title: "Engineering & Local Setup",
-		description: "Clone, configure, and run Reloop microservices and developer tooling locally.",
+		description:
+			"Clone, configure, and run Reloop microservices and developer tooling locally.",
 		href: "/docs/setup",
 		iconName: "command",
 	},
@@ -31,7 +34,8 @@ export function AboutPhilosophyCompass() {
 						Explore our philosophy.
 					</h2>
 					<p className="mt-1.5 text-[13.5px] text-text-sub-600 sm:text-[14.5px] dark:text-white/60">
-						Read the foundational thinking behind every architectural and product decision at Reloop.
+						Read the foundational thinking behind every architectural and
+						product decision at Reloop.
 					</p>
 				</div>
 

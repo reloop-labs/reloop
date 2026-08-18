@@ -24,9 +24,7 @@ export const useInboxFolderStats = (mailboxId: string): InboxFolderStats => {
 		const mailboxArchived = archivedThreads.filter(
 			(t) => t.mailboxId === mailboxId,
 		);
-		const mailboxTrash = trashThreads.filter(
-			(t) => t.mailboxId === mailboxId,
-		);
+		const mailboxTrash = trashThreads.filter((t) => t.mailboxId === mailboxId);
 
 		return {
 			inbox: groupThreadsByConversation(

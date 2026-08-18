@@ -20,19 +20,19 @@ export function OpenSourceIsntCheap() {
 				{/* Tape */}
 				<div
 					aria-hidden
-					className="-top-2.5 absolute left-1/2 h-5 w-16 -translate-x-1/2 rotate-[-2deg] rounded-[1px] bg-[#f0e6c0]/90 shadow-sm dark:bg-[#4a4334]/90"
+					className="-top-2.5 -translate-x-1/2 absolute left-1/2 h-5 w-16 rotate-[-2deg] rounded-[1px] bg-[#f0e6c0]/90 shadow-sm dark:bg-[#4a4334]/90"
 					style={{
 						backgroundImage:
 							"linear-gradient(135deg, transparent 40%, rgba(255,255,255,0.25) 50%, transparent 60%)",
 					}}
 				/>
 
-				<p className="font-medium text-[10px] text-[#8a7a55] uppercase tracking-[0.16em] dark:text-[#a89870]">
+				<p className="font-medium text-[#8a7a55] text-[10px] uppercase tracking-[0.16em] dark:text-[#a89870]">
 					A note
 				</p>
 
-				<div className="mt-3 space-y-3 text-[12.5px] text-[#3d3420] leading-[1.55] sm:text-[13px] dark:text-[#e8dfc8]/88">
-					<p className="font-semibold text-[15px] text-[#1f1a10] leading-snug tracking-tight sm:text-[16px] dark:text-[#f5efdc]">
+				<div className="mt-3 space-y-3 text-[#3d3420] text-[12.5px] leading-[1.55] sm:text-[13px] dark:text-[#e8dfc8]/88">
+					<p className="font-semibold text-[#1f1a10] text-[15px] leading-snug tracking-tight sm:text-[16px] dark:text-[#f5efdc]">
 						Open source isn&apos;t cheap.
 					</p>
 
@@ -44,10 +44,10 @@ export function OpenSourceIsntCheap() {
 					</div>
 
 					<div className="space-y-1 rounded border border-[#e0d4b0]/70 bg-[#f7f0dc]/50 px-3 py-2 text-[#3d3420]/90 dark:border-[#3a3428]/80 dark:bg-[#25211b]/50 dark:text-[#e8dfc8]/85">
-						<p className="font-medium text-[12.5px] text-[#1f1a10] tracking-tight dark:text-[#f5efdc]">
+						<p className="font-medium text-[#1f1a10] text-[12.5px] tracking-tight dark:text-[#f5efdc]">
 							Linux &middot; Postgres &middot; K8s &middot; React
 						</p>
-						<p className="text-[12px] text-[#8a7a55] dark:text-[#a89870]">
+						<p className="text-[#8a7a55] text-[12px] dark:text-[#a89870]">
 							Free to use. Never free to build.
 						</p>
 					</div>
@@ -59,7 +59,8 @@ export function OpenSourceIsntCheap() {
 					</p>
 
 					<p className="border-[#e0d4b0] border-t pt-3 font-semibold text-[#1f1a10] text-[12.5px] leading-snug sm:text-[13px] dark:border-[#3a3428] dark:text-[#f5efdc]">
-						&ldquo;Take open source away for a week. Watch &apos;enterprise-grade&apos; collapse.&rdquo;
+						&ldquo;Take open source away for a week. Watch
+						&apos;enterprise-grade&apos; collapse.&rdquo;
 					</p>
 				</div>
 			</article>

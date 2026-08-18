@@ -70,18 +70,18 @@ const NavLink = ({
 	onPointerEnter?: () => void;
 }) => {
 	const className = cn(
-		"group relative z-10 flex h-8 w-full items-center rounded-lg px-2 font-medium text-[14px] leading-5",
+		"group relative z-10 flex h-8 items-center rounded-lg font-medium text-[13px] leading-5",
 		active
 			? "bg-[var(--inbox-selected)] text-mail-foreground"
 			: "text-[var(--inbox-sidebar-text-inactive)] hover:text-mail-foreground",
-		collapsed ? "justify-center" : "gap-2.5",
+		collapsed ? "w-8 justify-center px-0" : "w-full gap-2.5 px-2.5",
 	);
 
 	const content = (
 		<>
 			<item.icon
 				className={cn(
-					"h-[17px] w-[17px] shrink-0",
+					"h-4 w-4 shrink-0",
 					active
 						? "text-mail-foreground"
 						: "text-[var(--inbox-sidebar-icon)] group-hover:text-mail-foreground",
@@ -131,10 +131,13 @@ const SectionHeader = ({
 		return <div className="mx-2 mt-1 mb-2 h-px bg-[var(--inbox-muted-bg)]" />;
 	}
 	return (
-		<div className={cn("px-2 py-2", isFirst ? "pt-1" : "pt-3.5")}>
-			<span className="font-semibold text-[12px] text-mail-foreground opacity-40">
-				{title}
-			</span>
+		<div
+			className={cn(
+				"px-2.5 pt-4 pb-1.5 font-semibold text-[10px] text-mail-muted uppercase tracking-[0.06em]",
+				isFirst && "pt-2",
+			)}
+		>
+			{title}
 		</div>
 	);
 };
@@ -271,12 +274,12 @@ export const InboxSidebar = ({
 		<>
 			<aside
 				className={cn(
-					"flex h-full shrink-0 select-none flex-col border-mail-border border-r bg-sidebar pt-2.5 pb-2 transition-[width] duration-200 ease-in-out",
-					collapsed ? "w-[52px] px-1.5" : "w-[220px] px-2",
+					"flex h-full shrink-0 select-none flex-col border-mail-border border-r bg-sidebar py-2 transition-[width] duration-200 ease-in-out",
+					collapsed ? "w-14 items-center px-0" : "w-60 px-2",
 				)}
 			>
 				{/* Compose — outline / light */}
-				<div className={cn("", collapsed ? "flex justify-center" : "")}>
+				<div className={cn(collapsed && "flex justify-center")}>
 					<Button.Root
 						type="button"
 						mode="lighter"
@@ -284,10 +287,10 @@ export const InboxSidebar = ({
 							if (!mailboxReady) return;
 							setIsComposeOpen(true);
 						}}
-						size="medium"
+						size="xsmall"
 						disabled={!mailboxReady}
 						title="Compose"
-						className="w-full"
+						className={collapsed ? "h-8 w-8 px-0" : "w-full"}
 					>
 						<Pencil
 							className="h-4 w-4 shrink-0 opacity-80"
@@ -299,10 +302,10 @@ export const InboxSidebar = ({
 
 				<div
 					onPointerLeave={() => setHoveredEl(undefined)}
-					className="relative mt-3.5 min-h-0 flex-1 overflow-y-auto overflow-x-hidden"
+					className="relative mt-2 min-h-0 w-full flex-1 overflow-y-auto overflow-x-hidden"
 				>
 					{/* Mail folders — no section header */}
-					<div className="flex flex-col">
+					<div className={cn("flex flex-col", collapsed && "items-center")}>
 						{/* All (inbox) with inbox icon */}
 						<NavLink
 							item={{
@@ -341,7 +344,7 @@ export const InboxSidebar = ({
 
 					{/* Labels below Mail */}
 					<SectionHeader title="Labels" collapsed={collapsed} />
-					<div className="flex flex-col">
+					<div className={cn("flex flex-col", collapsed && "items-center")}>
 						{!collapsed &&
 							(labelsError ? (
 								<SectionError
@@ -391,7 +394,7 @@ export const InboxSidebar = ({
 												setHoveredEl(navRefs.current[labelKey])
 											}
 											className={cn(
-												"relative z-10 flex items-center justify-between rounded-lg px-2 py-1 font-medium text-[14px] leading-5",
+												"relative z-10 flex h-8 items-center justify-between rounded-lg px-2.5 font-medium text-[13px] leading-5",
 												active
 													? "bg-[var(--inbox-selected)] text-mail-foreground"
 													: "text-[var(--inbox-sidebar-text-inactive)] hover:text-mail-foreground",
@@ -415,7 +418,7 @@ export const InboxSidebar = ({
 								type="button"
 								onClick={() => setIsLabelDialogOpen(true)}
 								disabled={!mailboxReady}
-								className="mt-0.5 flex items-center gap-2 rounded-lg px-2 py-1 text-[13px] text-mail-muted opacity-70 hover:bg-[var(--inbox-row-hover)] hover:opacity-100 disabled:opacity-40"
+								className="mt-0.5 flex h-8 items-center gap-2 rounded-lg px-2.5 text-[13px] text-mail-muted opacity-70 hover:bg-[var(--inbox-row-hover)] hover:opacity-100 disabled:opacity-40"
 								aria-label="Create label (⌥L)"
 								title="Create label (⌥L)"
 							>
@@ -432,7 +435,12 @@ export const InboxSidebar = ({
 					/>
 				</div>
 
-				<div className="mt-auto flex w-full py-2">
+				<div
+					className={cn(
+						"mt-auto flex w-full py-2",
+						collapsed && "justify-center",
+					)}
+				>
 					{!collapsed ? <FooterThemeToggle /> : <CollapsedThemeToggle />}
 				</div>
 			</aside>

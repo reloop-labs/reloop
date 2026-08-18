@@ -1,5 +1,10 @@
 import { db } from "@reloop/db/client";
-import { emailLog, inboundEmail, mailbox, threadMessage } from "@reloop/db/schema";
+import {
+	emailLog,
+	inboundEmail,
+	mailbox,
+	threadMessage,
+} from "@reloop/db/schema";
 import { and, eq } from "drizzle-orm";
 import { createError } from "evlog";
 import { useLogger } from "evlog/elysia";
@@ -40,7 +45,7 @@ export async function replyToMessageController(
 		originalInbound?.replyTo ?? originalInbound?.fromEmail ?? "";
 	let originalSubject = originalInbound?.subject ?? "";
 	let headerMsgId = originalInbound?.messageId ?? null;
-	let resolvedThreadId: string | undefined = undefined;
+	let resolvedThreadId: string | undefined;
 
 	if (!originalInbound) {
 		const outboundLog = await db.query.emailLog.findFirst({
@@ -66,9 +71,11 @@ export async function replyToMessageController(
 				eq(mailbox.email, outboundLog.fromEmail),
 			),
 		});
-		const firstMbx = mbx || (await db.query.mailbox.findFirst({
-			where: eq(mailbox.organizationId, organizationId),
-		}));
+		const firstMbx =
+			mbx ||
+			(await db.query.mailbox.findFirst({
+				where: eq(mailbox.organizationId, organizationId),
+			}));
 
 		mailboxId = firstMbx?.id ?? "";
 		const toArray = Array.isArray(outboundLog.toEmails)

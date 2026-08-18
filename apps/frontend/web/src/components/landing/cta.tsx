@@ -17,7 +17,7 @@ export function FeatureCta({
 			<div className="relative overflow-hidden border-stroke-soft-200 border-t bg-bg-white-0 dark:border-white/10 dark:bg-black">
 				<div className="relative z-10 mx-auto flex w-full max-w-5xl flex-col items-center justify-center gap-10 border-stroke-soft-200 px-4 pt-12 pb-13 sm:px-6 md:max-w-7xl lg:px-8 xl:border-x dark:border-white/10">
 					<div className="mx-auto flex max-w-3xl flex-col items-center text-center">
-						<h2 className="font-semibold text-2xl text-balance text-text-strong-950 tracking-tight sm:text-4xl lg:text-5xl dark:text-white">
+						<h2 className="text-balance font-semibold text-2xl text-text-strong-950 tracking-tight sm:text-4xl lg:text-5xl dark:text-white">
 							{title}
 							{titleMuted && (
 								<>
@@ -27,7 +27,7 @@ export function FeatureCta({
 							)}
 						</h2>
 						{description && (
-							<p className="mt-3 max-w-xl text-[15px] text-balance text-text-sub-600 leading-relaxed dark:text-white/60">
+							<p className="mt-3 max-w-xl text-balance text-[15px] text-text-sub-600 leading-relaxed dark:text-white/60">
 								{description}
 							</p>
 						)}

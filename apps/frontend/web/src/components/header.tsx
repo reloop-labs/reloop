@@ -781,7 +781,7 @@ const navItems: NavItem[] = [
 						},
 						{
 							title: "Self-host",
-							href: "/docs/self-host",
+							href: "/self-host",
 							icon: "server",
 						},
 					],
@@ -1705,88 +1705,195 @@ export const Header = () => {
 		>
 			<div className="relative mx-auto w-full max-w-5xl px-6 md:max-w-7xl">
 				<div className="relative flex h-16 items-center justify-between gap-4">
-					{/* Left — brand */}
-					<Link
-						href="/"
-						className="relative z-10 flex shrink-0 items-center gap-2.5"
-						aria-label="Reloop home"
-					>
-						<Logo className="size-11 text-text-strong-950 dark:text-white" />
-						<span className="-ml-3 font-semibold text-[17px] text-text-strong-950 tracking-tight dark:text-white">
-							Reloop
-						</span>
-					</Link>
+					{/* Left — brand + main nav */}
+					<div className="flex items-center gap-6">
+						<Link
+							href="/"
+							className="relative z-10 flex shrink-0 items-center gap-2.5"
+							aria-label="Reloop home"
+						>
+							<Logo className="size-11 text-text-strong-950 dark:text-white" />
+							<span className="-ml-3 font-semibold text-[17px] text-text-strong-950 tracking-tight dark:text-white">
+								Reloop
+							</span>
+						</Link>
 
-					{/* Center — main nav + sliding active pill */}
-					<nav
-						ref={navRef}
-						className="-translate-x-1/2 absolute left-1/2 hidden items-center gap-1 lg:flex"
-					>
-						{/* Pill: on-screen morph → short spring, zero bounce (crisp) */}
-						<motion.div
-							aria-hidden
-							className="pointer-events-none absolute top-1 bottom-1 rounded-full bg-bg-weak-50 dark:bg-white/[0.08]"
-							initial={false}
-							animate={{
-								left: navPill.left,
-								width: navPill.width,
-								opacity: shouldReduceMotion
-									? navPill.opacity
-										? 1
-										: 0
-									: navPill.opacity,
-							}}
-							transition={
-								shouldReduceMotion
-									? { duration: 0 }
-									: { type: "spring", bounce: 0, duration: 0.28 }
-							}
-						/>
-						{navItems.map((item) => (
-							<div
-								key={item.title}
-								ref={(el) => {
-									tabRefs.current[item.title] = el;
+						{/* Main nav + sliding active pill */}
+						<nav
+							ref={navRef}
+							className="relative hidden items-center gap-1 lg:flex"
+						>
+							{/* Pill: on-screen morph → short spring, zero bounce (crisp) */}
+							<motion.div
+								aria-hidden
+								className="pointer-events-none absolute top-1 bottom-1 rounded-full bg-bg-weak-50 dark:bg-white/[0.08]"
+								initial={false}
+								animate={{
+									left: navPill.left,
+									width: navPill.width,
+									opacity: shouldReduceMotion
+										? navPill.opacity
+											? 1
+											: 0
+										: navPill.opacity,
 								}}
-								className="relative z-10"
-								onMouseEnter={() =>
-									item.mega ? openMega(item.title) : openMega(null)
+								transition={
+									shouldReduceMotion
+										? { duration: 0 }
+										: { type: "spring", bounce: 0, duration: 0.28 }
 								}
-							>
-								{item.mega ? (
-									<span
-										className={`inline-flex cursor-default items-center gap-1 px-3 py-2 font-medium text-[14px] transition-colors ${
-											activeMega === item.title
-												? "text-text-strong-950 dark:text-white"
-												: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/55 dark:hover:text-white"
-										}`}
-									>
-										{item.title}
-										<Icon
-											name="chevron-down"
-											className={`size-3 transition-transform duration-200 ${
-												activeMega === item.title ? "rotate-180" : "opacity-50"
+							/>
+							{navItems.map((item) => (
+								<div
+									key={item.title}
+									ref={(el) => {
+										tabRefs.current[item.title] = el;
+									}}
+									className="relative z-10"
+									onMouseEnter={() =>
+										item.mega ? openMega(item.title) : openMega(null)
+									}
+								>
+									{item.mega ? (
+										<span
+											className={`inline-flex cursor-default items-center gap-1 px-3 py-2 font-medium text-[14px] transition-colors ${
+												activeMega === item.title
+													? "text-text-strong-950 dark:text-white"
+													: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/55 dark:hover:text-white"
 											}`}
-										/>
-									</span>
-								) : (
-									<Link
-										href={item.href}
-										className={`inline-flex items-center gap-1 px-3 py-2 font-medium text-[14px] transition-colors ${
-											activeMega === item.title
-												? "text-text-strong-950 dark:text-white"
-												: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/55 dark:hover:text-white"
-										}`}
+										>
+											{item.title}
+											<Icon
+												name="chevron-down"
+												className={`size-3 transition-transform duration-200 ${
+													activeMega === item.title
+														? "rotate-180"
+														: "opacity-50"
+												}`}
+											/>
+										</span>
+									) : (
+										<Link
+											href={item.href}
+											className={`inline-flex items-center gap-1 px-3 py-2 font-medium text-[14px] transition-colors ${
+												activeMega === item.title
+													? "text-text-strong-950 dark:text-white"
+													: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/55 dark:hover:text-white"
+											}`}
+										>
+											{item.title}
+										</Link>
+									)}
+								</div>
+							))}
+
+							{/*
+							  Mega menu motion (Radix nav viewport):
+							  - Open/close: scaleIn / scaleOut from top-left (Product)
+							  - Tab switch: height spring on shell; content slides
+							*/}
+							<AnimatePresence>
+								{activeMega && activeItem?.mega && (
+									<motion.div
+										key="mega-shell"
+										initial={
+											shouldReduceMotion
+												? { opacity: 0 }
+												: { opacity: 0, scale: 0.98 }
+										}
+										animate={
+											shouldReduceMotion
+												? { opacity: 1 }
+												: { opacity: 1, scale: 1 }
+										}
+										exit={
+											shouldReduceMotion
+												? { opacity: 0 }
+												: { opacity: 0, scale: 0.98 }
+										}
+										transition={
+											shouldReduceMotion
+												? { duration: 0 }
+												: { duration: 0.2, ease: EASE_DEFAULT }
+										}
+										className="absolute top-full left-0 z-50 hidden origin-top-left pt-2 lg:block"
 									>
-										{item.title}
-									</Link>
+										{/* Hover bridge so the gap between bar and card doesn't close the menu */}
+										<div
+											className="-top-2 absolute inset-x-0 h-2"
+											aria-hidden
+										/>
+										<div
+											className="overflow-hidden rounded-[20px] border border-stroke-soft-200/90 bg-bg-white-0 px-3 shadow-[0_18px_50px_-12px_rgba(15,23,42,0.14),0_6px_18px_-6px_rgba(15,23,42,0.06)] sm:px-4 dark:border-white/10 dark:bg-black dark:shadow-[0_20px_56px_-12px_rgba(0,0,0,0.65)]"
+											role="menu"
+											aria-label={`${activeItem.title} menu`}
+										>
+											{/* Panel shell: width springs per menu; height morphs with content */}
+											<motion.div
+												initial={false}
+												animate={{
+													width: targetMegaWidth,
+													height:
+														shouldReduceMotion || megaHeight === "auto"
+															? "auto"
+															: megaHeight,
+												}}
+												transition={
+													shouldReduceMotion
+														? { duration: 0 }
+														: {
+																type: "spring",
+																bounce: 0,
+																duration: 0.32,
+															}
+												}
+												style={{
+													overflow: "hidden",
+													maxWidth: "calc(100vw - 2rem)",
+												}}
+											>
+												<div
+													ref={megaContentRef}
+													className="relative"
+													style={{ width: targetMegaWidth }}
+												>
+													<AnimatePresence
+														initial={false}
+														custom={megaDirection}
+														mode="popLayout"
+													>
+														<motion.div
+															key={activeMega}
+															custom={megaDirection}
+															variants={megaContentVariants}
+															initial={shouldReduceMotion ? false : "enter"}
+															animate="center"
+															exit={shouldReduceMotion ? undefined : "exit"}
+															transition={
+																shouldReduceMotion
+																	? { duration: 0 }
+																	: {
+																			duration: MEGA_SLIDE_MS,
+																			ease: EASE_DEFAULT,
+																		}
+															}
+															// Keep full width while popLayout takes the exiting panel out of flow
+															className="w-full"
+														>
+															<MegaPanel item={activeItem} />
+														</motion.div>
+													</AnimatePresence>
+												</div>
+											</motion.div>
+										</div>
+									</motion.div>
 								)}
-							</div>
-						))}
-					</nav>
+							</AnimatePresence>
+						</nav>
+					</div>
 
 					{/* Right — actions */}
-					<div className="relative z-10 hidden items-center gap-3 sm:gap-4 lg:flex">
+					<div className="relative z-10 hidden items-center gap-3 lg:flex">
 						<a
 							href="https://github.com/reloop-labs/reloop"
 							target="_blank"
@@ -1802,27 +1909,29 @@ export const Header = () => {
 								asChild
 								variant="neutral"
 								size="xsmall"
-								className="rounded-full! px-3.5!"
+								className="px-3.5!"
 							>
 								<a href="/dashboard">Dashboard</a>
 							</FancyButton.Root>
 						) : (
-							<>
-								<a
-									href="/dashboard/login"
-									className="font-medium text-[13px] text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/55 dark:hover:text-white"
+							<div className="flex gap-2">
+								<FancyButton.Root
+									asChild
+									variant="basic"
+									size="xsmall"
+									className="px-3.5!"
 								>
-									Log in
-								</a>
+									<a href="/dashboard/login">Sign in</a>
+								</FancyButton.Root>
 								<FancyButton.Root
 									asChild
 									variant="neutral"
 									size="xsmall"
-									className="rounded-full! px-3.5!"
+									className="px-3.5!"
 								>
-									<a href="/dashboard/signup">Sign up</a>
+									<a href="/dashboard/signup">Get Started</a>
 								</FancyButton.Root>
-							</>
+							</div>
 						)}
 					</div>
 
@@ -2066,7 +2175,7 @@ export const Header = () => {
 											asChild
 											variant="neutral"
 											size="medium"
-											className="w-full! rounded-full!"
+											className="w-full!"
 										>
 											<a href="/dashboard" onClick={closeMobileMenu}>
 												Dashboard
@@ -2074,18 +2183,21 @@ export const Header = () => {
 										</FancyButton.Root>
 									) : (
 										<div className="grid grid-cols-2 gap-3">
-											<a
-												href="/dashboard/login"
-												onClick={closeMobileMenu}
-												className="inline-flex items-center justify-center rounded-full border border-stroke-soft-200 px-4 py-3 font-medium text-[15px] text-text-strong-950 transition-colors hover:bg-neutral-950/[0.04] dark:border-white/15 dark:text-white dark:hover:bg-white/[0.06]"
+											<FancyButton.Root
+												asChild
+												variant="basic"
+												size="medium"
+												className="w-full!"
 											>
-												Log in
-											</a>
+												<a href="/dashboard/login" onClick={closeMobileMenu}>
+													Log in
+												</a>
+											</FancyButton.Root>
 											<FancyButton.Root
 												asChild
 												variant="neutral"
 												size="medium"
-												className="w-full! rounded-full!"
+												className="w-full!"
 											>
 												<a href="/dashboard/signup" onClick={closeMobileMenu}>
 													Sign up
@@ -2094,105 +2206,6 @@ export const Header = () => {
 										</div>
 									)}
 								</div>
-							</div>
-						</motion.div>
-					)}
-				</AnimatePresence>
-
-				{/*
-				  Mega menu motion (Radix nav viewport):
-				  - Open/close: scaleIn / scaleOut — opacity + scale 0.98, 200ms ease
-				  - Tab switch: height spring on shell; content slides
-				    (from-end/from-start enter, to-start/to-end exit, 250ms ease)
-				*/}
-				<AnimatePresence>
-					{activeMega && activeItem?.mega && (
-						<motion.div
-							key="mega-shell"
-							initial={
-								shouldReduceMotion
-									? { opacity: 0 }
-									: { opacity: 0, scale: 0.98 }
-							}
-							animate={
-								shouldReduceMotion ? { opacity: 1 } : { opacity: 1, scale: 1 }
-							}
-							exit={
-								shouldReduceMotion
-									? { opacity: 0 }
-									: { opacity: 0, scale: 0.98 }
-							}
-							transition={
-								shouldReduceMotion
-									? { duration: 0 }
-									: { duration: 0.2, ease: EASE_DEFAULT }
-							}
-							className="-translate-x-1/2 absolute top-full left-1/2 z-50 hidden origin-top pt-2 lg:block"
-						>
-							{/* Hover bridge so the gap between bar and card doesn't close the menu */}
-							<div className="-top-2 absolute inset-x-0 h-2" aria-hidden />
-							<div
-								className="overflow-hidden rounded-[20px] border border-stroke-soft-200/90 bg-bg-white-0 px-3 shadow-[0_18px_50px_-12px_rgba(15,23,42,0.14),0_6px_18px_-6px_rgba(15,23,42,0.06)] sm:px-4 dark:border-white/10 dark:bg-black dark:shadow-[0_20px_56px_-12px_rgba(0,0,0,0.65)]"
-								role="menu"
-								aria-label={`${activeItem.title} menu`}
-							>
-								{/* Panel shell: width springs per menu; height morphs with content */}
-								<motion.div
-									initial={false}
-									animate={{
-										width: targetMegaWidth,
-										height:
-											shouldReduceMotion || megaHeight === "auto"
-												? "auto"
-												: megaHeight,
-									}}
-									transition={
-										shouldReduceMotion
-											? { duration: 0 }
-											: {
-													type: "spring",
-													bounce: 0,
-													duration: 0.32,
-												}
-									}
-									style={{
-										overflow: "hidden",
-										maxWidth: "calc(100vw - 2rem)",
-									}}
-								>
-									<div
-										ref={megaContentRef}
-										className="relative"
-										style={{ width: targetMegaWidth }}
-									>
-										<AnimatePresence
-											initial={false}
-											custom={megaDirection}
-											mode="popLayout"
-										>
-											<motion.div
-												key={activeMega}
-												custom={megaDirection}
-												variants={megaContentVariants}
-												initial={shouldReduceMotion ? false : "enter"}
-												animate="center"
-												exit={shouldReduceMotion ? undefined : "exit"}
-												transition={
-													shouldReduceMotion
-														? { duration: 0 }
-														: {
-																duration: MEGA_SLIDE_MS,
-																ease: EASE_DEFAULT,
-															}
-												}
-												// Keep full width while popLayout takes the exiting panel out of flow
-												className="w-full"
-											>
-												<MegaPanel item={activeItem} />
-											</motion.div>
-										</AnimatePresence>
-									</div>
-								</motion.div>
 							</div>
 						</motion.div>
 					)}

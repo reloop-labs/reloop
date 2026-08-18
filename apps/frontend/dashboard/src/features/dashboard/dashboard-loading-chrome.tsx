@@ -10,8 +10,8 @@ import { DashboardContentSkeleton } from "./dashboard-content-skeleton";
  */
 export function DashboardLoadingChrome() {
 	return (
-		<div className="flex h-screen overflow-hidden bg-bg-weak-50 dark:bg-black">
-			<div className="sticky top-0 z-10 flex h-screen w-60 flex-col">
+		<div className="flex h-screen overflow-hidden bg-bg-white-0 dark:bg-black">
+			<div className="sticky top-0 z-10 flex h-screen w-60 flex-col border-stroke-soft-100 border-r bg-sidebar dark:border-white/10">
 				<div className="flex h-12 items-center justify-between pr-3 pl-3">
 					<div className="flex items-center gap-2">
 						<Logo className="-ml-1 w-10" />
@@ -29,7 +29,7 @@ export function DashboardLoadingChrome() {
 					<div className="h-8 w-2/3 animate-pulse rounded-lg bg-bg-weak-50 dark:bg-white/[0.04]" />
 				</div>
 			</div>
-			<main className="relative m-2 flex flex-1 overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a]">
+			<main className="relative flex min-w-0 flex-1 overflow-hidden">
 				<div className="flex min-w-0 flex-1 flex-col overflow-hidden">
 					<div className="sticky top-0 z-10 flex h-11 shrink-0 items-center justify-between border-stroke-soft-100 border-b pr-3 pl-3 dark:border-stroke-soft-100/40">
 						<div className="flex items-center gap-2">

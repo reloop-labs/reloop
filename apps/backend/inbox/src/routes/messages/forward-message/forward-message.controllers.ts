@@ -70,9 +70,11 @@ export async function forwardMessageController(
 				eq(mailbox.email, outboundLog.fromEmail),
 			),
 		});
-		const firstMbx = mbx || (await db.query.mailbox.findFirst({
-			where: eq(mailbox.organizationId, organizationId),
-		}));
+		const firstMbx =
+			mbx ||
+			(await db.query.mailbox.findFirst({
+				where: eq(mailbox.organizationId, organizationId),
+			}));
 
 		mailboxId = firstMbx?.id ?? "";
 		fromName = outboundLog.fromName;

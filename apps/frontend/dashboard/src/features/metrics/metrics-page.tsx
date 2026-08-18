@@ -7,7 +7,9 @@ import { useActiveOrganization } from "#/features/dashboard/page-header/use-acti
 import { DomainSelector } from "#/features/emails/components/domain-selector";
 import { DateRangeFilter } from "#/features/logs/date-range-filter";
 import { DeliverabilityChart } from "#/features/metrics/components/deliverability-chart";
+import { HealthCards } from "#/features/metrics/components/health-cards";
 import { RateChart } from "#/features/metrics/components/rate-chart";
+import { buildHealthCards } from "#/features/metrics/health-ratings";
 import { useEmailStatsQuery } from "#/features/metrics/hooks/use-email-stats-query";
 import {
 	formatBucketDateLabel,
@@ -82,7 +84,7 @@ export function MetricsPage() {
 		domain: selectedDomain ?? "",
 	};
 
-	const { data, isFetching } = useEmailStatsQuery({
+	const { data, isFetching, isPending } = useEmailStatsQuery({
 		...statsParams,
 		enabled: !!activeOrganization?.id,
 	});
@@ -218,10 +220,25 @@ export function MetricsPage() {
 		});
 
 		const totalBouncedSum = totalPermanent + totalTransient + totalUndetermined;
+		const totalSentSum = totalSent;
+		const totalDelivered = data.delivered.reduce((a, b) => a + b, 0);
+		const totalOpened = (data.opened ?? []).reduce((a, b) => a + b, 0);
+		const totalUnsubscribed = (data.unsubscribed ?? []).reduce(
+			(a, b) => a + b,
+			0,
+		);
 
 		return {
 			bounceRate: Math.round(bounceRate * 100) / 100,
 			complaintRate: Math.round(complaintRate * 100) / 100,
+			healthCards: buildHealthCards({
+				sent: totalSentSum,
+				delivered: totalDelivered,
+				bounced: totalBouncedSum,
+				complaint: totalComplaint,
+				opened: totalOpened,
+				unsubscribed: totalUnsubscribed,
+			}),
 			chartData,
 			breakdown: {
 				bounce: [
@@ -316,6 +333,11 @@ export function MetricsPage() {
 				</div>
 
 				<div className="mt-4 flex flex-col gap-6">
+					<HealthCards
+						cards={stats?.healthCards ?? []}
+						isLoading={isPending && !stats}
+					/>
+
 					<DeliverabilityChart
 						startDate={effectiveStartDate}
 						endDate={effectiveEndDate}

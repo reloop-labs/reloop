@@ -95,12 +95,10 @@ const WhyOpenSourcePage = () => {
 										Trust
 									</h2>
 									<p>
-										You don&apos;t trust Stripe because of their homepage.
-										You trust them because every payment can be traced.
+										You don&apos;t trust Stripe because of their homepage. You
+										trust them because every payment can be traced.
 									</p>
-									<p>
-										Email should work the same way.
-									</p>
+									<p>Email should work the same way.</p>
 									<p className="font-medium text-text-strong-950 dark:text-white">
 										Don&apos;t trust our dashboard. Verify our code.
 									</p>
@@ -115,12 +113,10 @@ const WhyOpenSourcePage = () => {
 										Closed doesn&apos;t mean smarter.
 									</h2>
 									<p>
-										Every provider claims a &quot;proprietary engine.&quot;
-										Most run the same open-source parts everyone else does.
+										Every provider claims a &quot;proprietary engine.&quot; Most
+										run the same open-source parts everyone else does.
 									</p>
-									<p>
-										The difference isn&apos;t magic. It&apos;s marketing.
-									</p>
+									<p>The difference isn&apos;t magic. It&apos;s marketing.</p>
 									<p className="font-medium text-text-strong-950 dark:text-white">
 										Open beats mysterious.
 									</p>
@@ -134,12 +130,10 @@ const WhyOpenSourcePage = () => {
 										</span>
 										Open source isn&apos;t enough
 									</h2>
+									<p>Free software. Not free time.</p>
 									<p>
-										Free software. Not free time.
-									</p>
-									<p>
-										DNS, queues, retries, monitoring &mdash; the repo doesn&apos;t
-										do that. You do.
+										DNS, queues, retries, monitoring &mdash; the repo
+										doesn&apos;t do that. You do.
 									</p>
 									<p className="font-medium text-text-strong-950 dark:text-white">
 										Reloop ships the part open source leaves out: done.

@@ -36,14 +36,18 @@ export function AboutFounders() {
 						Founders and maintainers.
 					</h2>
 					<p className="mt-1.5 max-w-2xl text-[13.5px] text-text-sub-600 sm:text-[14.5px] dark:text-white/60">
-						Two engineers building the email infrastructure we wanted to use. Still actively architecting and writing the codebase.
+						Two engineers building the email infrastructure we wanted to use.
+						Still actively architecting and writing the codebase.
 					</p>
 				</div>
 
 				{/* 2-Column Founder Cards */}
-				<div className="grid grid-cols-1 sm:grid-cols-2 divide-y divide-stroke-soft-200 sm:divide-y-0 sm:divide-x dark:divide-white/10">
+				<div className="grid grid-cols-1 divide-y divide-stroke-soft-200 sm:grid-cols-2 sm:divide-x sm:divide-y-0 dark:divide-white/10">
 					{founders.map((founder) => (
-						<div key={founder.name} className="flex flex-col p-6 sm:p-8 lg:p-10">
+						<div
+							key={founder.name}
+							className="flex flex-col p-6 sm:p-8 lg:p-10"
+						>
 							<div className="relative aspect-[16/10] w-full overflow-hidden bg-neutral-100 sm:aspect-[4/3] dark:bg-white/5">
 								<Image
 									src={founder.image}
@@ -63,7 +67,7 @@ export function AboutFounders() {
 								<p className="mt-2.5 text-[13.5px] text-text-sub-600 leading-relaxed sm:text-[14px] dark:text-white/55">
 									{founder.bio}
 								</p>
-								<div className="mt-6 pt-4 border-t border-stroke-soft-200 dark:border-white/10">
+								<div className="mt-6 border-stroke-soft-200 border-t pt-4 dark:border-white/10">
 									<a
 										href={founder.github}
 										target="_blank"
@@ -73,7 +77,7 @@ export function AboutFounders() {
 										GitHub profile
 										<Icon
 											name="arrow-up-right"
-											className="size-3.5 opacity-60 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:opacity-100"
+											className="group-hover:-translate-y-0.5 size-3.5 opacity-60 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:opacity-100"
 											aria-hidden
 										/>
 									</a>

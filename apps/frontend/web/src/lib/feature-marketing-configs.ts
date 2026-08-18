@@ -154,7 +154,7 @@ export const emailAnalyticsConfig: FeatureMarketingPageConfig = {
 	],
 	cta: {
 		title: "Unlock email analytics",
-		titleMuted: "Start for free.",
+		titleMuted: "Get Started .",
 		description:
 			"Get visibility into every send with analytics built into the Reloop platform.",
 		primary: signup,

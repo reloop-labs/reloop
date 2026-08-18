@@ -7,7 +7,8 @@ type StoryChapter = {
 const story: StoryChapter[] = [
 	{
 		period: "The black-box problem",
-		title: "Every application needs email. Incumbent platforms keep routing hidden.",
+		title:
+			"Every application needs email. Incumbent platforms keep routing hidden.",
 		paragraphs: [
 			"Password resets, receipts, onboarding flows, campaigns: email is in every software product we build. Yet traditional vendors force developers to trust routing heuristics and deliverability scoring you cannot inspect. When deliverability drops at 2 a.m., the only tool available is a public status page.",
 			"Volume-tiered bills escalate while black-box routing stays black-box. We wanted what engineering teams need: production-grade email infrastructure that is auditable, self-hostable, and completely transparent in source.",
@@ -49,7 +50,8 @@ export function AboutStory() {
 						The Reloop story.
 					</h2>
 					<p className="mt-1.5 max-w-2xl text-[13.5px] text-text-sub-600 sm:text-[14.5px] dark:text-white/60">
-						How we started, what we learned from proprietary email vendors, and why we build in public.
+						How we started, what we learned from proprietary email vendors, and
+						why we build in public.
 					</p>
 				</div>
 

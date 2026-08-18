@@ -5,7 +5,7 @@ export default function CTA() {
 	return (
 		<FeatureCta
 			title="Ready to create beautiful emails?"
-			titleMuted="Start for free."
+			titleMuted="Get Started ."
 			description="Choose from our template library or build custom designs that match your brand. No credit card required."
 			primary={{ label: "Get started", href: hostedSignupHref }}
 			secondary={{

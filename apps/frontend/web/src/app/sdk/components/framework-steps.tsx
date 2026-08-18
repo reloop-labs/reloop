@@ -49,7 +49,7 @@ export default function FrameworkSteps({
 			id="steps"
 			className="relative w-full scroll-mt-20 border-stroke-soft-200 border-t bg-bg-white-0 text-text-strong-950 dark:border-white/10 dark:bg-black dark:text-white"
 		>
-			<div className="mx-auto w-full max-w-5xl border-stroke-soft-200 xl:border-x md:max-w-7xl dark:border-white/10">
+			<div className="mx-auto w-full max-w-5xl border-stroke-soft-200 md:max-w-7xl xl:border-x dark:border-white/10">
 				<div className="flex flex-col px-6 py-10 sm:px-8 sm:py-12 lg:px-12">
 					<StepItem
 						number={1}
@@ -62,14 +62,8 @@ export default function FrameworkSteps({
 						)}
 					</StepItem>
 
-					<StepItem
-						number={2}
-						title={`Send email from ${framework.name}`}
-					>
-						<SdkCodeBlock
-							code={framework.sendCode}
-							slug={framework.slug}
-						/>
+					<StepItem number={2} title={`Send email from ${framework.name}`}>
+						<SdkCodeBlock code={framework.sendCode} slug={framework.slug} />
 					</StepItem>
 
 					<StepItem number={3} title="GitHub, examples, and API reference">

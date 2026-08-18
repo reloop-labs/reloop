@@ -1,6 +1,6 @@
 import { SubjectTesterPageView } from "@reloop/web/components/landing/tools/subject-tester-page";
-import { config } from "@reloop/web/lib/landing/tools/subject-tester";
 import { createLandingMetadata } from "@reloop/web/lib/landing/metadata";
+import { config } from "@reloop/web/lib/landing/tools/subject-tester";
 
 export const instant = false;
 

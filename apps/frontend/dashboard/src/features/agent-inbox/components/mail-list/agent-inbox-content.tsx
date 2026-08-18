@@ -10,6 +10,7 @@ import {
 	AiSidebar,
 	useAiSidebar,
 } from "#/features/agent-inbox/components/ai-sidebar";
+import { InboxCategoryNavbar } from "#/features/agent-inbox/components/mail-list/inbox-category-navbar";
 import {
 	applyInboxFilters,
 	InboxCommandPalette,
@@ -24,19 +25,47 @@ import { useInboxMail } from "#/features/agent-inbox/components/mail-list/use-in
 import { LoadingDot } from "#/features/agent-inbox/components/shared/loading-dot";
 import { SectionError } from "#/features/agent-inbox/components/shared/section-error";
 import { useInboxSidebar } from "#/features/agent-inbox/components/sidebar/inbox-sidebar-context";
-import { InboxSidebarToggle } from "#/features/agent-inbox/components/sidebar/inbox-sidebar-toggle";
 import { ThreadDetail } from "#/features/agent-inbox/components/thread-detail";
 import { useInboxUndo } from "#/features/agent-inbox/hooks/use-inbox-undo";
 import type {
 	AgentMailbox,
 	BatchThreadAction,
 	InboundThread,
+	InboxView,
 } from "#/features/agent-inbox/types";
+import { INBOX_VIEWS } from "#/features/agent-inbox/types";
 import {
+	applyInboxViewFilter,
 	findThreadByListId,
 	groupThreadsByConversation,
 } from "#/features/agent-inbox/utils/group-threads";
 import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
+
+const INBOX_VIEW_IDS = new Set<string>(INBOX_VIEWS.map((view) => view.id));
+
+function parseInboxView(value: string): InboxView {
+	return INBOX_VIEW_IDS.has(value) ? (value as InboxView) : "all";
+}
+
+const TAB_EMPTY: Record<InboxView, { title: string; description: string }> = {
+	all: {
+		title: "No received mail yet",
+		description:
+			"Inbox shows emails sent to this address. Outbound mail lives in Sent.",
+	},
+	unread: {
+		title: "You're all caught up",
+		description: "No unread mail in this inbox.",
+	},
+	needs_approval: {
+		title: "Nothing to review",
+		description: "Agent drafts that need your approval will show up here.",
+	},
+	starred: {
+		title: "No starred mail",
+		description: "Star a thread to keep it here.",
+	},
+};
 
 const FOLDER_TITLES: Record<string, string> = {
 	inbox: "Inbox",
@@ -78,7 +107,7 @@ export const AgentInboxContent = ({
 		retryThreads,
 	} = useAgentInbox();
 	const mailboxReady = !!getMailbox(mailbox.id) && !!mailbox.email;
-	const { toggleSidebar, openCompose } = useInboxSidebar();
+	const { openCompose } = useInboxSidebar();
 	const { pushBatchUndo, undo } = useInboxUndo();
 	const [mail, setMail] = useInboxMail();
 	const isDesktop = useMediaQuery("(min-width: 1024px)");
@@ -106,10 +135,16 @@ export const AgentInboxContent = ({
 		"filter",
 		parseAsString.withDefault(""),
 	);
+	const [tabParam, setTabParam] = useQueryState(
+		"tab",
+		parseAsString.withDefault("all"),
+	);
 	const [selectedThreadId, setSelectedThreadId] = useQueryState(
 		"threadId",
 		parseAsString.withDefault(""),
 	);
+	const activeTab = parseInboxView(tabParam);
+	const showInboxTabs = folder === "inbox";
 
 	const folderTitle = folder.startsWith("label:")
 		? "Label"
@@ -126,10 +161,25 @@ export const AgentInboxContent = ({
 		[threads],
 	);
 
-	const filteredThreads = useMemo(
-		() => applyInboxFilters(groupedThreads, searchQuery, filterParam),
-		[groupedThreads, searchQuery, filterParam],
-	);
+	const filteredThreads = useMemo(() => {
+		const searched = applyInboxFilters(
+			groupedThreads,
+			searchQuery,
+			filterParam,
+		);
+		return showInboxTabs ? applyInboxViewFilter(searched, activeTab) : searched;
+	}, [groupedThreads, searchQuery, filterParam, showInboxTabs, activeTab]);
+
+	const tabCounts = useMemo(() => {
+		if (!showInboxTabs) return undefined;
+		return {
+			unread: groupedThreads.filter((t) => t.unread).length,
+			starred: groupedThreads.filter((t) => t.isStarred).length,
+			needs_approval: groupedThreads.filter(
+				(t) => t.status === "needs_approval",
+			).length,
+		};
+	}, [groupedThreads, showInboxTabs]);
 
 	/** Row skeleton until mailbox metadata + first thread fetch settle. */
 	const listLoading =
@@ -299,7 +349,13 @@ export const AgentInboxContent = ({
 					),
 				);
 		},
-		[inArchiveFolder, mail.bulkSelected.length, selectedThread, runBulkAction, batchThreads],
+		[
+			inArchiveFolder,
+			mail.bulkSelected.length,
+			selectedThread,
+			runBulkAction,
+			batchThreads,
+		],
 	);
 
 	useHotkeys(
@@ -441,7 +497,7 @@ export const AgentInboxContent = ({
 		/>
 	) : selectedThreadId && threadsError ? (
 		<div className="flex h-full min-h-0 flex-col">
-			<div className="flex shrink-0 items-center gap-2 px-3 pt-3 pb-2">
+			<div className="flex h-11 shrink-0 items-center gap-2 px-3">
 				<button
 					type="button"
 					onClick={handleCloseThread}
@@ -483,8 +539,7 @@ export const AgentInboxContent = ({
 	const listPane = (
 		<div className="flex min-h-0 flex-1 flex-col">
 			<div className="sticky top-0 z-15 shrink-0 bg-panel-light dark:bg-panel-dark">
-				<div className="flex items-center py-3.5 pr-6 pl-4">
-					<InboxSidebarToggle onClick={toggleSidebar} />
+				<div className="flex h-11 items-center pr-6 pl-4">
 					<span className="ml-1 flex w-5 shrink-0 items-center justify-center">
 						<button
 							type="button"
@@ -511,12 +566,16 @@ export const AgentInboxContent = ({
 							)}
 						</button>
 					</span>
-					<span className="w-3 shrink-0" aria-hidden="true" />
-					<h1 className="min-w-0 truncate font-semibold text-[18px] text-mail-foreground">
-						{folderTitle}
-					</h1>
+					{!showInboxTabs ? (
+						<>
+							<span className="w-3 shrink-0" aria-hidden="true" />
+							<h1 className="min-w-0 truncate font-semibold text-[18px] text-mail-foreground">
+								{folderTitle}
+							</h1>
+						</>
+					) : null}
 					{mail.bulkSelected.length === 0 ? (
-						<div className="ml-auto flex items-center gap-1 text-mail-muted">
+						<div className="flex items-center gap-1 text-mail-muted">
 							{activeFilterCount > 0 && (
 								<span className="mr-1 rounded-full bg-zero-blue/15 px-1.5 py-0.5 font-medium text-[11px] text-zero-blue tabular-nums">
 									{activeFilterCount}
@@ -561,7 +620,10 @@ export const AgentInboxContent = ({
 									onClick={() => void runBulkAction("archive", "Archived")}
 									className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--inbox-control)] hover:bg-[var(--inbox-control-hover)]"
 								>
-									<Icon name="archive" className="h-3.5 w-3.5 text-mail-muted" />
+									<Icon
+										name="archive"
+										className="h-3.5 w-3.5 text-mail-muted"
+									/>
 								</button>
 							)}
 							<button
@@ -626,6 +688,15 @@ export const AgentInboxContent = ({
 						</div>
 					)}
 				</div>
+				{showInboxTabs ? (
+					<InboxCategoryNavbar
+						activeView={activeTab}
+						onViewChange={(view) => {
+							void setTabParam(view === "all" ? null : view);
+						}}
+						counts={tabCounts}
+					/>
+				) : null}
 			</div>
 
 			<div
@@ -642,14 +713,20 @@ export const AgentInboxContent = ({
 					<div className="flex min-h-0 flex-1 items-center justify-center p-6">
 						<InboxEmptyState
 							title={
-								folder === "inbox" ? "No received mail yet" : "It's empty here"
+								showInboxTabs
+									? TAB_EMPTY[activeTab].title
+									: folder === "inbox"
+										? "No received mail yet"
+										: "It's empty here"
 							}
 							description={
-								folder === "inbox"
-									? "Inbox shows emails sent to this address. Outbound mail lives in Sent."
-									: folder === "sent"
-										? "Emails you send from this address will show up here."
-										: "Choose an email to view details"
+								showInboxTabs
+									? TAB_EMPTY[activeTab].description
+									: folder === "inbox"
+										? "Inbox shows emails sent to this address. Outbound mail lives in Sent."
+										: folder === "sent"
+											? "Emails you send from this address will show up here."
+											: "Choose an email to view details"
 							}
 							onCompose={openCompose}
 							onOpenAi={toggleAi}
@@ -690,8 +767,8 @@ export const AgentInboxContent = ({
 				onSelectThread={handleSelectThread}
 			/>
 			{/* Gmail-style: list OR detail fills the main pane (not side-by-side). */}
-			<div className="relative flex min-h-0 min-w-0 flex-1 gap-1 rounded-inherit p-0 lg:h-[calc(100dvh-65px)]">
-				<div className="mb-1 flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-panel-light md:rounded-2xl lg:h-[calc(100dvh-66px)] dark:bg-panel-dark">
+			<div className="relative flex min-h-0 min-w-0 flex-1 p-0">
+				<div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-panel-light dark:bg-panel-dark">
 					{isThreadOpen ? detailPane : listPane}
 				</div>
 

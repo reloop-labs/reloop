@@ -1,11 +1,12 @@
 import * as Button from "@reloop/ui/button";
+import { Icon } from "@reloop/ui/icon";
 import Link from "next/link";
 import {
 	changelogReleases,
 	getChangelogReleasePath,
 } from "../../changelog/changelog-utils";
 
-const RECENT_COUNT = 4;
+const RECENT_COUNT = 5;
 
 const MONTHS: Record<string, string> = {
 	January: "Jan",
@@ -26,11 +27,13 @@ function formatTimelineDate(raw: string): string {
 	const parts = raw.trim().split(/\s+/);
 	if (parts.length === 3) {
 		const [day, month, year] = parts;
-		return `${month} ${Number(day)}, ${year}`;
+		const shortMonth = month ? (MONTHS[month] ?? month) : "";
+		return `${shortMonth} ${Number(day)}, ${year}`;
 	}
 	if (parts.length === 2) {
 		const [month, year] = parts;
-		return `${month} ${year}`;
+		const shortMonth = month ? (MONTHS[month] ?? month) : "";
+		return `${shortMonth} ${year}`;
 	}
 	return raw;
 }
@@ -65,15 +68,15 @@ export default function ShipFast() {
 		<section
 			id="ship-fast"
 			aria-labelledby="ship-fast-heading"
-			className="w-full border-stroke-soft-200 border-t dark:border-white/10"
+			className="w-full"
 		>
-			<div className="lg:grid lg:grid-cols-[minmax(0,1fr)_2rem_minmax(0,1fr)]">
+			<div className="lg:grid lg:grid-cols-2">
 				<div className="flex flex-col items-start px-4 py-16 sm:px-6 sm:py-20 lg:px-12 lg:py-24">
 					<h2
 						id="ship-fast-heading"
-						className="font-serif text-[2.4rem] text-text-strong-950 italic leading-[1.05] tracking-tighter sm:text-[3rem] lg:text-[3.4rem] dark:text-white"
+						className="font-medium font-serif text-[2.4rem] text-text-strong-950 italic leading-[1.05] tracking-tighter sm:text-[3rem] lg:text-[3.4rem] dark:text-white"
 					>
-						We ship fast
+						We ship <b className="font-bold font-sans">Fast</b>
 					</h2>
 					<p className="mt-4 max-w-[420px] text-[15px] text-text-sub-600 leading-7 sm:text-[16px] dark:text-white/60">
 						Always improving, adding features and functionality.
@@ -83,49 +86,69 @@ export default function ShipFast() {
 						className={`${Button.buttonVariants({
 							variant: "neutral",
 							mode: "stroke",
-						}).root()} mt-8 h-10! rounded-full! px-5! font-medium text-[13.5px]`}
+						}).root()} mt-8 h-10! px-5! font-medium text-[13.5px]`}
 					>
 						Full changelog
 					</Link>
 				</div>
 
-				<div
-					aria-hidden="true"
-					className="hidden self-stretch text-stroke-soft-200 lg:block dark:text-white/15"
-					style={{
-						backgroundImage:
-							"repeating-linear-gradient(to bottom, currentColor 0 1px, transparent 1px 7px)",
-					}}
-				/>
-
-				<div className="flex min-w-0 flex-col">
-					<ol className="flex flex-1 flex-col border-stroke-soft-200 border-r dark:border-white/10">
-						{recentReleases.map((release) => (
-							<li
-								key={release.href}
-								className="border-stroke-soft-200 border-t first:border-t-0 lg:border-t-0 dark:border-white/10"
-							>
-								<Link
-									href={release.href}
-									className="group block px-4 py-8 outline-none transition-colors duration-200 ease-out sm:px-6 sm:py-9 lg:px-8 lg:py-10"
+				<div className="flex min-w-0 flex-col justify-center border-stroke-soft-200 border-t lg:border-t-0 lg:border-l dark:border-white/10">
+					<ol className="relative flex flex-1 flex-col">
+						{recentReleases.map((release, index) => {
+							const isLast = index === recentReleases.length - 1;
+							return (
+								<li
+									key={release.href}
+									className={`relative flex flex-1 ${isLast ? "opacity-35" : ""}`}
 								>
-									<time
-										className="block text-[12.5px] text-text-sub-600 leading-none dark:text-white/45"
-										{...(release.isoDate ? { dateTime: release.isoDate } : {})}
+									{/* Vertical timeline line segments */}
+									{index > 0 && (
+										<div
+											aria-hidden="true"
+											className="-translate-x-1/2 pointer-events-none absolute top-0 bottom-1/2 left-[44px] w-px bg-stroke-soft-200 sm:left-[52px] lg:left-[60px] dark:bg-white/10"
+										/>
+									)}
+									{!isLast && (
+										<div
+											aria-hidden="true"
+											className="-translate-x-1/2 pointer-events-none absolute top-1/2 bottom-0 left-[44px] w-px bg-stroke-soft-200 sm:left-[52px] lg:left-[60px] dark:bg-white/10"
+										/>
+									)}
+
+									<Link
+										href={release.href}
+										className="group relative flex flex-1 items-center gap-5 px-6 py-6.5 text-left outline-none transition-colors duration-200 hover:bg-bg-weak-50/70 sm:px-8 sm:py-7 lg:px-10 lg:py-8 dark:hover:bg-white/[0.02]"
 									>
-										{release.date}
-									</time>
-									<span className="mt-2.5 block font-semibold text-[17px] text-text-strong-950 leading-snug tracking-tight transition-colors duration-200 ease-out group-hover:text-text-strong-950/75 sm:text-[18px] dark:text-white dark:group-hover:text-white/80">
-										{release.title}
-									</span>
-									{release.description ? (
-										<span className="mt-1.5 block max-w-xl text-[14px] text-text-sub-600 leading-relaxed dark:text-white/50">
-											{release.description}
-										</span>
-									) : null}
-								</Link>
-							</li>
-						))}
+										{/* Circular badge with calendar <-> arrow icon swap on hover */}
+										<div className="relative z-10 flex size-10 shrink-0 items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-white-0 text-text-sub-600 shadow-xs transition-colors duration-200 group-hover:border-stroke-strong-950 group-hover:text-text-strong-950 dark:border-white/10 dark:bg-black dark:text-white/60 dark:group-hover:border-white/40 dark:group-hover:text-white">
+											<Icon
+												name="calendar"
+												className="size-4.5 transition-all duration-200 group-hover:scale-0 group-hover:opacity-0"
+											/>
+											<Icon
+												name="arrow-up-right"
+												className="absolute size-4.5 scale-0 opacity-0 transition-all duration-200 group-hover:scale-100 group-hover:opacity-100"
+											/>
+										</div>
+
+										{/* Content: Title & Date */}
+										<div className="relative z-10 transition-transform duration-200 group-hover:translate-x-0.5">
+											<span className="block font-medium text-[15px] text-text-strong-950 leading-snug tracking-tight sm:text-[16px] dark:text-white">
+												{release.title}
+											</span>
+											<time
+												className="mt-1 block text-[13px] text-text-sub-600 leading-none dark:text-white/45"
+												{...(release.isoDate
+													? { dateTime: release.isoDate }
+													: {})}
+											>
+												{release.date}
+											</time>
+										</div>
+									</Link>
+								</li>
+							);
+						})}
 					</ol>
 				</div>
 			</div>

@@ -15,7 +15,14 @@ import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { parseAsInteger, useQueryState } from "nuqs";
-import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+	type ReactNode,
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import {
@@ -59,7 +66,8 @@ interface EmailTableProps {
 }
 
 const emailGridStyle = {
-	gridTemplateColumns: "32px minmax(0, 1.2fr) minmax(0, 1.8fr) 120px 110px 32px",
+	gridTemplateColumns:
+		"32px minmax(0, 1.2fr) minmax(0, 1.8fr) 120px 110px 32px",
 };
 
 const getEmailStatusColorClass = (status: string): string => {
@@ -355,9 +363,7 @@ function EmailActionsMenuItems({
 	return (
 		<div className="relative">
 			{menuItems.map((item, idx) => {
-				const label = (
-					<MenuItemLabel item={item} copiedItem={copiedItem} />
-				);
+				const label = <MenuItemLabel item={item} copiedItem={copiedItem} />;
 
 				if (variant === "context") {
 					return (
@@ -497,7 +503,9 @@ function EmailSelectionActionBar({
 	const handleCopyIds = async () => {
 		const ids = selectedLogs.map((l) => l.id).join("\n");
 		await navigator.clipboard.writeText(ids);
-		toast.success(`Copied ${selectedCount} email ID${selectedCount === 1 ? "" : "s"}`);
+		toast.success(
+			`Copied ${selectedCount} email ID${selectedCount === 1 ? "" : "s"}`,
+		);
 	};
 
 	const handleCopyRecipients = async () => {
@@ -505,7 +513,9 @@ function EmailSelectionActionBar({
 			new Set(selectedLogs.flatMap((l) => l.toEmails)),
 		).join("\n");
 		await navigator.clipboard.writeText(recipients);
-		toast.success(`Copied recipients for ${selectedCount} email${selectedCount === 1 ? "" : "s"}`);
+		toast.success(
+			`Copied recipients for ${selectedCount} email${selectedCount === 1 ? "" : "s"}`,
+		);
 	};
 
 	return (
@@ -647,10 +657,7 @@ const emailColumns: ColumnDef<EmailLogData>[] = [
 							getEmailStatusColorClass(status),
 						)}
 					>
-						<Icon
-							name={getEmailStatusIcon(status)}
-							className="h-3.5 w-3.5"
-						/>
+						<Icon name={getEmailStatusIcon(status)} className="h-3.5 w-3.5" />
 						{getEmailStatusLabel(status)}
 					</div>
 				</div>
@@ -824,7 +831,7 @@ export const EmailTable = ({
 											style={emailGridStyle}
 											data-state={row.getIsSelected() ? "selected" : undefined}
 											className={cn(
-												"group/row grid w-full items-center px-4 py-2 text-left transition-colors cursor-pointer",
+												"group/row grid w-full cursor-pointer items-center px-4 py-2 text-left transition-colors",
 												"hover:bg-bg-weak-50",
 												(isRowActive || row.getIsSelected()) &&
 													"bg-bg-weak-50/50",

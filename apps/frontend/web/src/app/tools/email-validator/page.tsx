@@ -1,6 +1,6 @@
 import { EmailValidatorPageView } from "@reloop/web/components/landing/tools/email-validator-page";
-import { config } from "@reloop/web/lib/landing/tools/email-validator";
 import { createLandingMetadata } from "@reloop/web/lib/landing/metadata";
+import { config } from "@reloop/web/lib/landing/tools/email-validator";
 
 export const instant = false;
 

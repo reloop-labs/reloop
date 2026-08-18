@@ -1,6 +1,6 @@
 import { MobilePreviewPageView } from "@reloop/web/components/landing/tools/mobile-preview-page";
-import { config } from "@reloop/web/lib/landing/tools/mobile-preview";
 import { createLandingMetadata } from "@reloop/web/lib/landing/metadata";
+import { config } from "@reloop/web/lib/landing/tools/mobile-preview";
 
 export const instant = false;
 
