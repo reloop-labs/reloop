@@ -29,7 +29,7 @@ export const PREVIEW_TABS: {
 	{
 		id: "events",
 		icon: "webhook",
-		title: "Live events",
+		title: "Webhooks",
 		description:
 			"Stream delivery, open, and bounce webhook events the moment they fire.",
 		href: "/features/webhooks",
