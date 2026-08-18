@@ -18,6 +18,7 @@ export function PreviewStage() {
 
 	return (
 		<div className="bg-[#f4f5f7] dark:bg-[#111]">
+			<PreviewTabs active={active} onChange={setActive} />
 			<div className="relative overflow-hidden">
 				<div className="relative mx-auto min-h-[28rem] max-w-5xl px-5 pt-12 pb-16 sm:min-h-[32rem] sm:px-8 sm:pt-14 sm:pb-20 lg:px-10">
 					<div className="w-full max-w-xl lg:max-w-[34rem]">
@@ -39,7 +40,6 @@ export function PreviewStage() {
 					className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[#f4f5f7] dark:from-[#111]"
 				/>
 			</div>
-			<PreviewTabs active={active} onChange={setActive} />
 		</div>
 	);
 }
