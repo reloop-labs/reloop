@@ -10,7 +10,7 @@ export function TemplatesSection() {
 			<SceneHeader
 				icon="layout"
 				color="violet"
-				badge="AI Templates"
+				badge="AI Email Templates"
 				title="Describe the email. Get a template."
 				description="Prompt Reloop, preview the result, then ship. Variables and components stay editable."
 				ctaLabel="Explore AI Templates"

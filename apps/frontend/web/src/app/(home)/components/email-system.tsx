@@ -18,27 +18,27 @@ import { WorkflowsSection } from "./workflows";
 const SECTIONS = [
 	{
 		id: "transactional",
-		nav: "Transactional email",
+		nav: "Transactional Email",
 		Component: TransactionalEmailSection,
 	},
 	{
 		id: "analytics",
-		nav: "Email analytics",
+		nav: "Email Analytics",
 		Component: EmailAnalyticsSection,
 	},
 	{
 		id: "templates",
-		nav: "AI templates",
+		nav: "AI Email Templates",
 		Component: TemplatesSection,
 	},
 	{
 		id: "workflows",
-		nav: "AI workflow",
+		nav: "AI Workflow",
 		Component: WorkflowsSection,
 	},
 	{
 		id: "marketing",
-		nav: "Marketing emails",
+		nav: "Marketing Email",
 		Component: MarketingEmailsSection,
 	},
 ] as const;

@@ -1,4 +1,6 @@
+import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
+import * as Divider from "@reloop/ui/divider";
 import { Icon, type IconName } from "@reloop/ui/icon";
 import Link from "next/link";
 import type { ReactNode } from "react";
@@ -64,6 +66,7 @@ export interface SceneHeaderProps {
 	ctaLabel?: string;
 	ctaHref?: string;
 	action?: ReactNode;
+	withDivider?: boolean;
 }
 
 export function SceneHeader({
@@ -75,6 +78,7 @@ export function SceneHeader({
 	ctaLabel,
 	ctaHref = "#",
 	action,
+	withDivider = true,
 }: SceneHeaderProps) {
 	return (
 		<div>
@@ -97,14 +101,15 @@ export function SceneHeader({
 				<div className="mt-6">{action}</div>
 			) : ctaLabel ? (
 				<div className="mt-6">
-					<Link
-						href={ctaHref}
-						className="inline-flex items-center justify-center rounded-lg border border-stroke-soft-200 bg-white px-3.5 py-1.5 font-medium text-[13.5px] text-text-strong-950 shadow-xs transition-colors hover:bg-bg-sub-50 dark:border-white/15 dark:bg-neutral-900 dark:text-white dark:hover:bg-neutral-800"
-					>
-						{ctaLabel}
-					</Link>
+					<Button.Root variant="neutral" mode="stroke" size="small" asChild>
+						<Link href={ctaHref}>{ctaLabel}</Link>
+					</Button.Root>
 				</div>
 			) : null}
+
+			{withDivider && (
+				<Divider.Root className="mt-8 -mx-4 sm:-mx-8 lg:-mx-12 !w-auto dark:before:bg-white/10" />
+			)}
 		</div>
 	);
 }
