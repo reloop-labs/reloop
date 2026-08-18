@@ -192,16 +192,12 @@ export function Hero({ variant = "default" }: HeroProps) {
 					</div>
 				</div>
 			) : (
-				<div className="relative mx-auto flex w-full max-w-5xl flex-col items-center border-stroke-soft-200 border-x px-6 pt-36 pb-14 text-center sm:px-8 sm:pt-44 sm:pb-16 md:max-w-7xl lg:px-12 lg:pt-52 lg:pb-20 dark:border-white/10">
-					<h1 className="max-w-4xl text-center font-medium text-[2.5rem] text-text-strong-950 leading-[1.02] tracking-[-0.045em] sm:text-[3.5rem] lg:text-[4.25rem] dark:text-white">
+				<div className="relative mx-auto flex w-full max-w-5xl flex-col items-center border-stroke-soft-200 border-x px-6 pt-32 pb-12 text-center sm:px-8 sm:pt-36 sm:pb-14 md:max-w-7xl lg:px-12 lg:pt-44 lg:pb-16 dark:border-white/10">
+					<h1 className="max-w-3xl text-center font-semibold text-[2rem] text-text-strong-950 leading-[1.08] tracking-[-0.035em] sm:text-[2.75rem] lg:text-[3.25rem] dark:text-white">
 						Email API for Developers
 						<br />
 						With agent inboxes built in
 					</h1>
-					<p className="mt-5 max-w-[52rem] text-center text-[15px] text-text-sub-600 leading-relaxed sm:mt-6 sm:text-[17px] dark:text-white/55">
-						Open-source email infrastructure on GitHub. Extend, customize, and own
-						every email workflow.
-					</p>
 					<div className="mt-6 flex flex-wrap items-center justify-center gap-3 sm:mt-7">
 						<FancyButton.Root asChild variant="neutral" size="small">
 							<a href={hostedSignupHref}>Get Started</a>
