@@ -1,12 +1,11 @@
 "use client";
 
+import { cn } from "@reloop/ui/cn";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useState } from "react";
 import { CodeWindow } from "./code-window";
-import { EmailPreviewCard } from "./email-preview-card";
 import { EmailStack } from "./email-stack";
 import {
-	PREVIEW_CARD,
 	PREVIEW_CODE,
 	PREVIEW_FILES,
 	type PreviewTabId,
@@ -54,7 +53,6 @@ export function PreviewStage() {
 	};
 
 	const Code = PREVIEW_CODE[active];
-	const card = PREVIEW_CARD[active];
 
 	return (
 		<div className="bg-[#f4f5f7] dark:bg-[#111]">
@@ -80,7 +78,10 @@ export function PreviewStage() {
 							className="relative w-full"
 						>
 							<div
-								className="w-full max-w-xl lg:max-w-[34rem]"
+								className={cn(
+									"w-full max-w-xl lg:max-w-[34rem]",
+									active === "send" && "mx-auto",
+								)}
 								style={{
 									maskImage:
 										"linear-gradient(to bottom, black 0%, black 52%, transparent 96%)",
@@ -92,28 +93,23 @@ export function PreviewStage() {
 									<Code />
 								</CodeWindow>
 							</div>
-							<div
-								className="relative z-10 mt-6 w-full max-w-sm lg:absolute lg:top-4 lg:right-0 xl:right-2"
-								style={{
-									maskImage:
-										"linear-gradient(to bottom, black 0%, black 52%, transparent 96%)",
-									WebkitMaskImage:
-										"linear-gradient(to bottom, black 0%, black 52%, transparent 96%)",
-								}}
-							>
-								{active === "events" ? (
-									<WebhookEvents active={active === "events"} />
-								) : active === "templates" ? (
-									<EmailStack />
-								) : (
-									<EmailPreviewCard
-										badge={card.badge}
-										heading={card.heading}
-										body={card.body}
-										cta={card.cta}
-									/>
-								)}
-							</div>
+							{active !== "send" && (
+								<div
+									className="relative z-10 mt-6 w-full max-w-sm lg:absolute lg:top-4 lg:right-0 xl:right-2"
+									style={{
+										maskImage:
+											"linear-gradient(to bottom, black 0%, black 52%, transparent 96%)",
+										WebkitMaskImage:
+											"linear-gradient(to bottom, black 0%, black 52%, transparent 96%)",
+									}}
+								>
+									{active === "events" ? (
+										<WebhookEvents active={active === "events"} />
+									) : (
+										<EmailStack />
+									)}
+								</div>
+							)}
 						</motion.div>
 					</AnimatePresence>
 				</div>
