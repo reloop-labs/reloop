@@ -1,3 +1,4 @@
+import { SectionTitle } from "@reloop/web/app/sdk/components/section-title";
 import {
 	type FeatureHighlight,
 	FeatureHighlightsGrid,
@@ -22,10 +23,9 @@ const deliverabilityHighlights: FeatureHighlight[] = [
 		title: "Proactive blocklist tracking",
 		description: (
 			<>
-				Know first if your domain hits a{" "}
-				<Term href="/glossary/blocklist">DNSBL</Term> or{" "}
-				<Term href="/glossary/rbl">RBL</Term>. Reloop surfaces listings before
-				they become a delivery incident.
+				Catch <Term href="/glossary/blocklist">DNSBL</Term> and{" "}
+				<Term href="/glossary/rbl">RBL</Term> listings before they hurt
+				delivery.
 			</>
 		),
 	},
@@ -35,8 +35,8 @@ const deliverabilityHighlights: FeatureHighlight[] = [
 		title: "Faster time to inbox",
 		description: (
 			<>
-				Send from the region closest to the recipient. Fewer hops, less latency,
-				better <Term href="/glossary/inbox-placement">inbox placement</Term>.
+				Send from the closest region. Fewer hops, faster{" "}
+				<Term href="/glossary/inbox-placement">inbox</Term>.
 			</>
 		),
 	},
@@ -46,9 +46,8 @@ const deliverabilityHighlights: FeatureHighlight[] = [
 		title: "Build confidence with BIMI",
 		description: (
 			<>
-				Show your logo next to authenticated mail with{" "}
-				<Term href="/glossary/bimi">BIMI</Term>. Get DMARC to enforcement first
-				— the logo only works on top of it.
+				Show your logo on authenticated mail with{" "}
+				<Term href="/glossary/bimi">BIMI</Term>.
 			</>
 		),
 	},
@@ -59,7 +58,7 @@ const deliverabilityHighlights: FeatureHighlight[] = [
 		description: (
 			<>
 				A <Term href="/glossary/dedicated-ip">dedicated IP</Term> that warms
-				with your volume — or bring your own. No waiting around to send.
+				with you — or bring your own.
 			</>
 		),
 	},
@@ -69,9 +68,7 @@ const deliverabilityHighlights: FeatureHighlight[] = [
 		title: "Dynamic suppression list",
 		description: (
 			<>
-				Stop mailing people who bounced, complained, or unsubscribed. The{" "}
-				<Term href="/glossary/suppression-list">suppression list</Term> is
-				checked on every send path.
+				Never mail bounces, complaints, or unsubs.
 			</>
 		),
 	},
@@ -83,7 +80,7 @@ const deliverabilityHighlights: FeatureHighlight[] = [
 			<>
 				Watch <Term href="/glossary/dns">DNS</Term> and{" "}
 				<Term href="/glossary/ip-reputation">IP reputation</Term>. Get told when
-				a record drifts or a change could hurt delivery.
+				they drift.
 			</>
 		),
 	},
@@ -93,8 +90,7 @@ const deliverabilityHighlights: FeatureHighlight[] = [
 		title: "Verify DNS records",
 		description: (
 			<>
-				Prove you are a legitimate sender. Guided{" "}
-				<Term href="/glossary/dkim">DKIM</Term> and{" "}
+				Guided <Term href="/glossary/dkim">DKIM</Term> and{" "}
 				<Term href="/glossary/spf">SPF</Term> setup when you add a domain.
 			</>
 		),
@@ -105,9 +101,8 @@ const deliverabilityHighlights: FeatureHighlight[] = [
 		title: "Battle-tested infrastructure",
 		description: (
 			<>
-				Shared and dedicated pools used by senders who already have to land.
-				Distributed workloads across{" "}
-				<Term href="/glossary/shared-ip">IP pools</Term>.
+				Shared and dedicated <Term href="/glossary/shared-ip">IP pools</Term>{" "}
+				that already have to land.
 			</>
 		),
 	},
@@ -117,9 +112,19 @@ const deliverabilityHighlights: FeatureHighlight[] = [
 		title: "Prevent spoofing with DMARC",
 		description: (
 			<>
-				Tell inbox providers what to do with mail that isn&apos;t yours.{" "}
-				<Term href="/glossary/dmarc">DMARC</Term> policies stop impersonation
-				before it hits the inbox.
+				<Term href="/glossary/dmarc">DMARC</Term> stops impersonation before it
+				hits the inbox.
+			</>
+		),
+	},
+	{
+		id: "warmup",
+		icon: "zap",
+		title: "Automated IP warmup",
+		description: (
+			<>
+				Volume ramps that protect your{" "}
+				<Term href="/glossary/email-warmup">warmup</Term>.
 			</>
 		),
 	},
@@ -132,25 +137,16 @@ export default function Highlights() {
 			aria-labelledby="highlights-heading"
 			className="w-full"
 		>
-			<div className="px-4 py-16 sm:px-6 sm:py-20 lg:px-12 lg:py-24">
-				<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em]">
-					Deliverability
-				</p>
-				<h2
-					id="highlights-heading"
-					className="mt-4 max-w-3xl font-serif text-[2.4rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[3rem] lg:text-[3.4rem] dark:text-white"
-				>
-					Built to land in the inbox.
-				</h2>
-			</div>
-
-			<div className="border-stroke-soft-200 border-t dark:border-white/10">
-				<FeatureHighlightsGrid
-					items={deliverabilityHighlights}
-					columns={3}
-					stacked
-				/>
-			</div>
+			<SectionTitle
+				id="highlights-heading"
+				icon="shield"
+				size="xl"
+				title="Built to land in the inbox."
+			/>
+			<FeatureHighlightsGrid
+				items={deliverabilityHighlights}
+				columns={5}
+			/>
 		</section>
 	);
 }

@@ -41,6 +41,36 @@ export const featureHighlights: FeatureHighlight[] = [
 		title: "Agent Inboxes",
 		description: "Built-in AI agent parsing, webhooks & MCP.",
 	},
+	{
+		id: "inbox-placement",
+		icon: "shield",
+		title: "Inbox Placement",
+		description: "SPF, DKIM, and DMARC setup so mail lands where it should.",
+	},
+	{
+		id: "inbound-email",
+		icon: "mail-receive",
+		title: "Inbound Email",
+		description: "Receive at your domain, parse the body, POST it to your app.",
+	},
+	{
+		id: "live-events",
+		icon: "activity",
+		title: "Live Events",
+		description: "Opens, clicks, bounces, and complaints as they happen.",
+	},
+	{
+		id: "host-it-yourself",
+		icon: "server",
+		title: "Host It Yourself",
+		description: "Same APIs on your machines, or Reloop Cloud. Switch later.",
+	},
+	{
+		id: "templates",
+		icon: "layout",
+		title: "Templates",
+		description: "Visual editor and React email. Variables, no extra tool.",
+	},
 ];
 
 export function FeatureHighlightsGrid({
@@ -56,18 +86,22 @@ export function FeatureHighlightsGrid({
 	return (
 		<div
 			className={cn(
-				"grid grid-cols-1 divide-y divide-stroke-soft-200 text-left sm:grid-cols-2 sm:divide-x dark:divide-white/10",
-				columns === 3 ? "lg:grid-cols-3" : "md:grid-cols-5",
+				"grid grid-cols-1 sm:grid-cols-2",
+				columns === 3 ? "lg:grid-cols-3" : "lg:grid-cols-5",
 			)}
 		>
 			{items.map((tab) => (
 				<div
 					key={tab.id}
-					className={
+					className={cn(
+						"flex flex-col border-stroke-soft-200 border-r border-b px-6 py-7 lg:px-7 lg:py-8 dark:border-white/10",
 						stacked
-							? "flex flex-col gap-4 px-6 py-8 sm:px-7 sm:py-9 lg:px-8 lg:py-10"
-							: "flex min-h-[11.5rem] flex-col justify-between px-6 py-7 sm:min-h-[13rem] md:min-h-[14.5rem] lg:px-7 lg:py-8"
-					}
+							? "gap-4 py-8 sm:py-9 lg:py-10"
+							: "min-h-[13.5rem] justify-between sm:min-h-[15rem]",
+						columns === 3
+							? "max-sm:border-r-0 max-sm:last:border-b-0 max-lg:[&:nth-child(2n)]:border-r-0 lg:[&:nth-child(3n)]:border-r-0 sm:max-lg:[&:nth-last-child(-n+2)]:border-b-0 lg:[&:nth-last-child(-n+3)]:border-b-0"
+							: "max-sm:border-r-0 max-sm:last:border-b-0 max-lg:[&:nth-child(2n)]:border-r-0 lg:[&:nth-child(5n)]:border-r-0 sm:max-lg:[&:nth-last-child(-n+2)]:border-b-0 lg:[&:nth-last-child(-n+5)]:border-b-0",
+					)}
 				>
 					<Icon
 						name={tab.icon}
@@ -84,12 +118,7 @@ export function FeatureHighlightsGrid({
 								</span>
 							) : null}
 						</div>
-						<p
-							className={cn(
-								"mt-1.5 text-[13px] text-text-sub-600 leading-snug dark:text-white/50",
-								!stacked && "max-w-[16rem]",
-							)}
-						>
+						<p className="mt-1.5 line-clamp-2 max-w-[16rem] text-[13px] text-text-sub-600 leading-snug dark:text-white/50">
 							{tab.description}
 						</p>
 					</div>
