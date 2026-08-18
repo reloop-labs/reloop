@@ -14,7 +14,7 @@ export const ANALYTICS_TABS: {
 		icon: "graph-up",
 		title: "Metrics",
 		description:
-			"Track deliverability, reputation, and sent volumes with real-time domain breakdown.",
+			"Track deliverability, reputation, and sent volume with clear domain-level insights.",
 		href: "/docs/analytics",
 	},
 	{
@@ -22,7 +22,7 @@ export const ANALYTICS_TABS: {
 		icon: "cursor-click",
 		title: "Engagement & clicks",
 		description:
-			"Monitor live open rates, unique click heatmaps, and recipient device distribution as they happen.",
+			"Monitor opens, clicks, and recipient behavior with live engagement analytics.",
 		href: "/docs/analytics/engagement",
 	},
 	{
@@ -30,7 +30,7 @@ export const ANALYTICS_TABS: {
 		icon: "alert-triangle",
 		title: "Bounces & Diagnostics",
 		description:
-			"Inspect hard/soft bounce causes, spam complaints, and raw SMTP server return codes.",
+			"Inspect bounce causes, spam complaints, and raw SMTP responses to debug issues.",
 		href: "/docs/analytics/deliverability",
 	},
 ];

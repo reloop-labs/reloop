@@ -17,7 +17,7 @@ export const TEMPLATE_TABS: {
 		icon: "sparkling",
 		title: "AI-powered templates",
 		description:
-			"Generate complete email layouts from natural-language prompts with reusable components and variables.",
+			"Generate complete, responsive email layouts from simple natural-language prompts.",
 		href: "/features/email-templates#ai-templates",
 	},
 	{
@@ -25,7 +25,7 @@ export const TEMPLATE_TABS: {
 		icon: "code",
 		title: "Real-time editor",
 		description:
-			"Work directly on your templates with live previews, instant updates, and a shared editing experience.",
+			"Edit layouts, content, and variables with live previews and instant updates.",
 		href: "/features/email-templates#editor",
 	},
 	{
@@ -33,7 +33,7 @@ export const TEMPLATE_TABS: {
 		icon: "history",
 		title: "Version history",
 		description:
-			"Keep a complete history of your changes and restore any previous version when needed.",
+			"Review changes, compare revisions, and restore any previous version in seconds.",
 		href: "/features/email-templates#version-history",
 	},
 ];

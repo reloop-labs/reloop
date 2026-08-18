@@ -14,7 +14,7 @@ export const MARKETING_TABS: {
 		icon: "file-code",
 		title: "Upload data",
 		description:
-			"Import audiences seamlessly via CSV, REST API, or live database sync with custom traits and tags.",
+			"Import audiences from CSV, REST API, or live database sync with flexible traits and tags.",
 		href: "/features/marketing#upload-data",
 	},
 	{
@@ -22,7 +22,7 @@ export const MARKETING_TABS: {
 		icon: "workflow",
 		title: "Manage funnels",
 		description:
-			"Design multi-step automation journeys, conditional branch triggers, and personalized drip flows.",
+			"Design multi-step journeys with conditional branches, triggers, and personalized flows.",
 		href: "/features/marketing#funnels",
 	},
 	{
@@ -30,7 +30,7 @@ export const MARKETING_TABS: {
 		icon: "chart-bar",
 		title: "Analytics",
 		description:
-			"Track real-time delivery, engagement heatmaps, conversion rates, and revenue impact across campaigns.",
+			"Monitor delivery, engagement, conversions, and revenue impact with real-time insights.",
 		href: "/features/marketing#analytics",
 	},
 ];
