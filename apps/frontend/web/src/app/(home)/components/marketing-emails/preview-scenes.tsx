@@ -27,7 +27,7 @@ export const MARKETING_TABS: {
 	},
 	{
 		id: "analytics",
-		icon: "chart-bar",
+		icon: "graph-up",
 		title: "Analytics",
 		description:
 			"Monitor delivery, engagement, conversions, and revenue impact with real-time insights.",
