@@ -1,6 +1,9 @@
 import type { IconName } from "@reloop/ui/icon";
 
-export type TemplateTabId = "prompt" | "canvas" | "variables";
+export type TemplateTabId =
+	| "ai-templates"
+	| "realtime-editor"
+	| "version-history";
 
 export const TEMPLATE_TABS: {
 	id: TemplateTabId;
@@ -10,27 +13,27 @@ export const TEMPLATE_TABS: {
 	href: string;
 }[] = [
 	{
-		id: "prompt",
+		id: "ai-templates",
 		icon: "sparkling",
-		title: "Prompt to Template",
+		title: "AI-powered templates",
 		description:
-			"Describe any email flow in natural language. Reloop generates production-ready React Email and responsive HTML.",
-		href: "/features/email-templates#ai-prompt",
+			"Generate complete email layouts from natural-language prompts with reusable components and variables.",
+		href: "/features/email-templates#ai-templates",
 	},
 	{
-		id: "canvas",
-		icon: "layout",
-		title: "Visual Canvas & Preview",
+		id: "realtime-editor",
+		icon: "code",
+		title: "Real-time editor",
 		description:
-			"Customize typography, padding, brand colors, and layout components visually with instant mobile and desktop views.",
-		href: "/features/email-templates#visual-editor",
+			"Work directly on your templates with live previews, instant updates, and a shared editing experience.",
+		href: "/features/email-templates#editor",
 	},
 	{
-		id: "variables",
-		icon: "modules",
-		title: "Variables & Components",
+		id: "version-history",
+		icon: "history",
+		title: "Version history",
 		description:
-			"Inject typed TypeScript props, personalization variables, and reusable design system modules into every message.",
-		href: "/features/email-templates#components",
+			"Keep a complete history of your changes and restore any previous version when needed.",
+		href: "/features/email-templates#version-history",
 	},
 ];

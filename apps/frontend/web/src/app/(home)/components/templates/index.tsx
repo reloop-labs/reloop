@@ -14,7 +14,7 @@ export function TemplatesSection() {
 					color="violet"
 					badge="AI Email Templates"
 					title="Generate Dynamic Email Templates"
-					description="Prompt Reloop, preview the result, then ship. Variables and components stay editable."
+					description="Describe what you need in plain language, generate production-ready emails, and refine every detail with an AI-powered editor built for developers."
 					ctaLabel="Explore AI Templates"
 					ctaHref="/features/email-templates"
 				/>
