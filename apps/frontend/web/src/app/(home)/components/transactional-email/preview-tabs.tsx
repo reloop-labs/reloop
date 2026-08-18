@@ -79,7 +79,7 @@ export function PreviewTabs({
 										? undefined
 										: "transactional-tab-indicator"
 								}
-								className="absolute right-0 bottom-0 left-0 z-10 h-0.5 bg-primary-base"
+								className="absolute right-0 bottom-0 left-0 z-10 h-0.5 bg-[#f97316] dark:bg-[#ea580c]"
 								transition={
 									shouldReduceMotion
 										? { duration: 0 }
@@ -92,7 +92,7 @@ export function PreviewTabs({
 								className={cn(
 									"size-4 transition-colors duration-200",
 									selected
-										? "text-text-strong-950 dark:text-white"
+										? "text-[#f97316] dark:text-[#fb923c]"
 										: "text-text-soft-400 group-hover:text-text-sub-600 dark:text-white/30 dark:group-hover:text-white/60",
 								)}
 							/>
@@ -102,7 +102,7 @@ export function PreviewTabs({
 								className={cn(
 									"size-4 transition-colors duration-200",
 									selected
-										? "text-text-strong-950 dark:text-white"
+										? "text-[#f97316] dark:text-[#fb923c]"
 										: "text-text-soft-400 group-hover:text-text-sub-600 dark:text-white/30 dark:group-hover:text-white/60",
 								)}
 							/>
@@ -119,9 +119,9 @@ export function PreviewTabs({
 						</p>
 						<p
 							className={cn(
-								"mt-2 max-w-[18rem] text-[13.5px] leading-relaxed transition-colors duration-200",
+								"mt-2 line-clamp-2 text-[13.5px] leading-relaxed transition-colors duration-200",
 								selected
-									? "text-text-sub-600 dark:text-white/55"
+									? "text-text-sub-600 dark:text-white/70"
 									: "text-text-soft-400 group-hover:text-text-sub-600 dark:text-white/30 dark:group-hover:text-white/50",
 							)}
 						>
@@ -136,8 +136,8 @@ export function PreviewTabs({
 							className={cn(
 								"mt-4 inline-flex items-center gap-1 text-[13.5px] transition-colors duration-200",
 								selected
-									? "text-primary-base font-medium"
-									: "text-text-soft-400 group-hover:text-primary-base dark:text-white/30 dark:group-hover:text-primary-base",
+									? "font-medium text-[#f97316] dark:text-[#fb923c]"
+									: "text-text-soft-400 group-hover:text-[#f97316] dark:text-white/30 dark:group-hover:text-[#fb923c]",
 							)}
 						>
 							Learn more

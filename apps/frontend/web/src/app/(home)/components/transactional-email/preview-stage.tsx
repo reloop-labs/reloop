@@ -3,15 +3,15 @@
 import { cn } from "@reloop/ui/cn";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useState } from "react";
-import { CodeWindow } from "./code-window";
+import { SdkCodeBlock } from "@reloop/web/app/sdk/components/sdk-code-block";
 import { EmailStack } from "./email-stack";
 import {
-	PREVIEW_CODE,
-	PREVIEW_FILES,
+	EVENTS_CODE,
 	SEND_API_TABS,
+	SEND_CODE,
+	TEMPLATES_CODE,
 	type PreviewTabId,
 	type SendApiTabId,
-	SendApiCode,
 } from "./preview-scenes";
 import { PreviewTabs } from "./preview-tabs";
 import { WebhookEvents } from "./webhook-events";
@@ -56,12 +56,10 @@ export function PreviewStage() {
 		setActive(newTab);
 	};
 
-	const Code = PREVIEW_CODE[active];
-
 	return (
 		<div className="bg-[#f4f5f7] dark:bg-[#111]">
 			<div className="relative overflow-hidden">
-				<div className="relative mx-auto min-h-[28rem] max-w-5xl px-5 pt-12 pb-16 sm:min-h-[32rem] sm:px-8 sm:pt-14 sm:pb-20 lg:px-10">
+				<div className="relative mx-auto h-[29rem] max-w-5xl px-5 pt-12 sm:h-[32rem] sm:px-8 sm:pt-14 lg:h-[34rem] lg:px-10">
 					<AnimatePresence
 						initial={false}
 						custom={direction}
@@ -88,17 +86,28 @@ export function PreviewStage() {
 								)}
 							>
 								{active === "send" ? (
-									<CodeWindow
+									<SdkCodeBlock
+										code={SEND_CODE[sendSubTab]}
+										slug="nodejs"
+										lang="typescript"
 										tabs={SEND_API_TABS}
 										activeTab={sendSubTab}
 										onTabChange={(id) => setSendSubTab(id as SendApiTabId)}
-									>
-										<SendApiCode tab={sendSubTab} />
-									</CodeWindow>
+									/>
+								) : active === "templates" ? (
+									<SdkCodeBlock
+										code={TEMPLATES_CODE}
+										slug="nextjs"
+										lang="tsx"
+										path="otp.tsx"
+									/>
 								) : (
-									<CodeWindow file={PREVIEW_FILES[active]}>
-										<Code />
-									</CodeWindow>
+									<SdkCodeBlock
+										code={EVENTS_CODE}
+										slug="nodejs"
+										lang="typescript"
+										path="webhook.ts"
+									/>
 								)}
 							</div>
 							{active !== "send" && (
