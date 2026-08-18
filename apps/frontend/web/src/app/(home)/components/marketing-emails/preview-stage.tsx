@@ -334,7 +334,7 @@ function AnalyticsView() {
 			<div className="flex items-center justify-between border-stroke-soft-100 border-b px-4 py-2.5 sm:px-6 dark:border-white/10">
 				<div className="flex items-center gap-2">
 					<div className="flex size-6 items-center justify-center rounded-md bg-bg-weak-50 text-text-strong-950 dark:bg-white/10 dark:text-white">
-						<Icon name="chart-bar" className="size-3.5" />
+						<Icon name="graph-up" className="size-3.5" />
 					</div>
 					<span className="font-medium text-text-strong-950 text-xs dark:text-white">
 						Campaign: Summer Product Release Broadcast
@@ -377,7 +377,7 @@ function AnalyticsView() {
 					].map((kpi) => (
 						<div
 							key={kpi.label}
-							className="rounded-xl border border-stroke-soft-200 bg-bg-weak-50/40 p-3.5 dark:border-white/10 dark:bg-white/[0.02]"
+							className="rounded-xl border border-stroke-soft-200 bg-transparent p-3.5 dark:border-white/10"
 						>
 							<span className="font-medium text-[10.5px] text-text-soft-400 dark:text-white/40">
 								{kpi.label}
@@ -399,7 +399,7 @@ function AnalyticsView() {
 
 				{/* Link Click Engagement Table with Visual Progress Bars */}
 				<div className="overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-white-0 dark:border-white/10 dark:bg-[#111114]">
-					<div className="flex items-center justify-between border-stroke-soft-100 border-b bg-bg-weak-50/60 px-4 py-2 font-medium text-[10.5px] text-text-soft-400 dark:border-white/5 dark:bg-white/[0.02] dark:text-white/40">
+					<div className="flex items-center justify-between border-stroke-soft-100 border-b px-4 py-2 font-medium text-[10.5px] text-text-soft-400 dark:border-white/5 dark:text-white/40">
 						<span>TOP CLICKED LINKS</span>
 						<span>CLICKS &amp; SHARE</span>
 					</div>
