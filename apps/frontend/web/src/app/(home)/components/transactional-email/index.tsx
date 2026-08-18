@@ -13,7 +13,7 @@ export function TransactionalEmailSection() {
 					icon="send-2"
 					color="orange"
 					badge="Transactional Email"
-					title="It starts with transactional"
+					title="It starts with transactional email"
 					description="One API, one SMTP relay. Same reliable payload from Node, Python, or a cron on the box."
 					ctaLabel="Explore Transactional"
 					ctaHref="/docs/transactional"
