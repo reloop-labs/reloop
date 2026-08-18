@@ -1,188 +1,362 @@
 "use client";
 
 import { cn } from "@reloop/ui/cn";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { useState } from "react";
+import { Logo } from "@reloop/ui/logo";
+import type { ReactNode } from "react";
 
 type StackEmail = {
 	id: string;
-	from: string;
-	initial: string;
-	mark: string;
-	heading: string;
-	body: string;
-	cta: string;
-	accent: string;
+	body: ReactNode;
 };
 
 const EMAILS: StackEmail[] = [
-	{
-		id: "welcome",
-		from: "Acme",
-		initial: "A",
-		mark: "onboarding@acme.dev",
-		heading: "Welcome to Acme",
-		body: "Hi Maya — your workspace is ready. Confirm your email and send the first message in a few lines of code.",
-		cta: "Confirm email",
-		accent: "bg-text-strong-950 text-white dark:bg-white dark:text-black",
-	},
-	{
-		id: "reset",
-		from: "Acme Security",
-		initial: "A",
-		mark: "security@acme.dev",
-		heading: "Reset your password",
-		body: "Hi Alex — we got a request to reset your password. This link expires in 20 minutes. If you didn’t ask, ignore this.",
-		cta: "Choose a new password",
-		accent: "bg-[#111827] text-white dark:bg-white dark:text-black",
-	},
-	{
-		id: "invoice",
-		from: "Acme Billing",
-		initial: "A",
-		mark: "billing@acme.dev",
-		heading: "Invoice #2049 is paid",
-		body: "Thanks, Drew. $240.00 hit the account. A PDF receipt is attached if you need it for books.",
-		cta: "Download receipt",
-		accent: "bg-emerald-700 text-white dark:bg-emerald-400 dark:text-black",
-	},
-	{
-		id: "shipped",
-		from: "Acme",
-		initial: "A",
-		mark: "orders@acme.dev",
-		heading: "Your order is on the way",
-		body: "Jordan, the kit left the warehouse. Tracking updates as it moves. Most deliveries land in two days.",
-		cta: "Track package",
-		accent: "bg-blue-700 text-white dark:bg-blue-400 dark:text-black",
-	},
-	{
-		id: "otp",
-		from: "Acme",
-		initial: "A",
-		mark: "noreply@acme.dev",
-		heading: "Your sign-in code",
-		body: "Elena, use 849-201 to finish signing in. It expires in 10 minutes. Don’t share it with anyone.",
-		cta: "Open the app",
-		accent: "bg-violet-700 text-white dark:bg-violet-400 dark:text-black",
-	},
+	{ id: "otp", body: <OtpEmailBody /> },
 ];
 
-const SWIPE_PX = 88;
-const SWIPE_VELOCITY = 650;
-
 export function EmailStack() {
-	const [deck, setDeck] = useState(EMAILS);
-	const [exitX, setExitX] = useState(0);
-	const reduceMotion = useReducedMotion();
-	const visible = deck.slice(0, 3);
-	const front = visible[0];
-
-	const advance = (direction: number) => {
-		if (!front) return;
-		setExitX(direction * 280);
-		setDeck((current) => [...current.slice(1), current[0]!]);
-	};
+	const email = EMAILS[0]!;
 
 	return (
-		<div className="relative mx-auto h-[24.5rem] w-full max-w-[22rem]">
-			<AnimatePresence initial={false}>
-				{visible.map((email, index) => {
-					const isFront = index === 0;
-					return (
-						<motion.article
-							key={email.id}
-							className={cn(
-								"absolute inset-x-0 top-0 overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 dark:border-white/10 dark:bg-[#141414]",
-								isFront
-									? "cursor-grab shadow-[0_24px_60px_rgba(15,23,42,0.16)] active:cursor-grabbing dark:shadow-[0_24px_60px_rgba(0,0,0,0.5)]"
-									: "shadow-[0_10px_30px_rgba(15,23,42,0.06)]",
-							)}
-							style={{ zIndex: 20 - index, touchAction: "pan-y" }}
-							initial={false}
-							animate={
-								isFront
-									? { scale: 1, y: 0, opacity: 1 }
-									: {
-											scale: 1 - index * 0.05,
-											y: index * 18,
-											opacity: 1,
-										}
-							}
-							exit={
-								reduceMotion
-									? { opacity: 0 }
-									: {
-											x: exitX || 240,
-											opacity: 0,
-											rotate: exitX > 0 ? 8 : -8,
-										}
-							}
-							transition={{
-								type: "spring",
-								duration: 0.38,
-								bounce: 0.12,
-							}}
-							drag={isFront && !reduceMotion ? "x" : false}
-							dragConstraints={{ left: 0, right: 0 }}
-							dragElastic={0.82}
-							onDragEnd={(_, info) => {
-								if (!isFront) return;
-								const shouldGo =
-									Math.abs(info.offset.x) > SWIPE_PX ||
-									Math.abs(info.velocity.x) > SWIPE_VELOCITY;
-								if (shouldGo) {
-									advance(info.offset.x >= 0 ? 1 : -1);
-								}
-							}}
-							onClick={() => {
-								if (isFront && reduceMotion) advance(1);
-							}}
-						>
-							<EmailBody email={email} />
-						</motion.article>
-					);
-				})}
-			</AnimatePresence>
+		<div className="relative mx-auto h-[32rem] w-full">
+			<article
+				className={cn(
+					"absolute inset-0 overflow-hidden rounded-[22px] border bg-white dark:bg-[#0e0e0e]",
+					"border-stroke-soft-200 shadow-[0_24px_60px_rgba(15,23,42,0.14)] dark:border-[#2a2a2a] dark:shadow-[0_24px_60px_rgba(0,0,0,0.5)]",
+				)}
+			>
+				{email.body}
+				<div
+					aria-hidden
+					className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-white from-15% to-transparent dark:from-[#0e0e0e]"
+				/>
+			</article>
 		</div>
 	);
 }
 
-function EmailBody({ email }: { email: StackEmail }) {
+function EmailShell({ children }: { children: ReactNode }) {
 	return (
-		<div className="px-5 pt-5 pb-6">
-			<div className="flex items-center gap-2.5">
-				<span
-					className={cn(
-						"flex size-8 shrink-0 items-center justify-center rounded-lg font-bold text-[13px]",
-						email.accent,
-					)}
-				>
-					{email.initial}
+		<div className="bg-white px-6 pt-8 pb-10 text-[#0e0e0e] dark:bg-[#0e0e0e] dark:text-white">
+			<Logo className="-ml-2.5 mb-6 size-[52px] dark:invert" />
+			{children}
+		</div>
+	);
+}
+
+function MonoLabel({ children }: { children: ReactNode }) {
+	return (
+		<p className="m-0 font-medium font-mono text-[#707070] text-[12px] uppercase tracking-[0.2em]">
+			{children}
+		</p>
+	);
+}
+
+function SerifHeading({
+	children,
+	muted,
+}: {
+	children: ReactNode;
+	muted?: ReactNode;
+}) {
+	return (
+		<h3
+			className="mt-6 mb-8 p-0 font-normal text-[#0e0e0e] text-[32px] leading-[1.2] dark:text-white"
+			style={{ fontFamily: "Georgia, serif" }}
+		>
+			{children}
+			{muted ? <span className="text-[#707070]">{muted}</span> : null}
+		</h3>
+	);
+}
+
+function Rule() {
+	return <div className="my-8 h-px w-full bg-[#e0e0e0] dark:bg-[#222]" />;
+}
+
+function BodyText({
+	children,
+	className,
+}: {
+	children: ReactNode;
+	className?: string;
+}) {
+	return (
+		<p
+			className={cn(
+				"mt-4 text-[#555555] text-[15px] leading-[1.6] dark:text-[#b0b0b0]",
+				className,
+			)}
+		>
+			{children}
+		</p>
+	);
+}
+
+function Cta({ children }: { children: ReactNode }) {
+	return (
+		<span className="mt-10 inline-flex items-center rounded-xl bg-[#0e0e0e] px-6 py-3 text-center font-bold font-mono text-[12px] text-white uppercase tracking-wider dark:bg-[#edece1] dark:text-black">
+			{children}
+		</span>
+	);
+}
+
+function EmailFooter() {
+	return (
+		<div className="mt-10 text-[#707070] text-[12px] leading-[24px]">
+			<div className="mb-4 font-mono tracking-[0.05em]">
+				<span className="text-[18px]">𝕏</span>
+				<span className="mx-2 text-[18px] text-[#d0d0d0] dark:text-[#333]">
+					·
 				</span>
-				<div className="min-w-0">
-					<p className="font-semibold text-[13.5px] text-text-strong-950 dark:text-white">
-						{email.from}
+				<span className="text-[13px]">GitHub</span>
+				<span className="mx-2 text-[18px] text-[#d0d0d0] dark:text-[#333]">
+					·
+				</span>
+				<span className="text-[13px]">LinkedIn</span>
+			</div>
+			<div className="my-8 h-px w-full bg-[#e0e0e0] dark:bg-[#222]" />
+			<p className="m-0">
+				If you&apos;d like to report an issue, reach out to{" "}
+				<span className="underline">Reloop Help</span>.
+			</p>
+			<p className="m-0">
+				<span className="underline">Manage your notification settings</span>
+			</p>
+			<p className="m-0 mt-4">
+				Copyright © 2026 Reloop Inc. All rights reserved.
+				<br />
+				440 N Barranca Ave #4133 Covina, CA 91723
+			</p>
+		</div>
+	);
+}
+
+function OtpEmailBody() {
+	return (
+		<EmailShell>
+			<MonoLabel>One-Time Passcode</MonoLabel>
+			<SerifHeading>Your login verification code.</SerifHeading>
+			<Rule />
+			<BodyText>
+				Enter this 6-digit verification code to complete your sign-in to
+				Reloop. This code expires in 10 minutes.
+			</BodyText>
+
+			<div className="my-8 rounded-xl border border-[#e0e0e0] bg-[#fbfbfb] p-6 text-center dark:border-[#222] dark:bg-[#141414]">
+				<p className="m-0 font-bold font-mono text-[30px] text-[#0e0e0e] tracking-[0.25em] dark:text-white">
+					842 190
+				</p>
+				<p className="mt-2.5 mb-0 text-[#707070] text-[12px]">
+					Valid for 10 minutes · Do not share this code
+				</p>
+			</div>
+
+			<BodyText className="text-[13px] text-[#707070] dark:text-[#888]">
+				If you didn&apos;t request this code, you can safely ignore this
+				message. Someone might have typed your email address by mistake.
+			</BodyText>
+
+			<EmailFooter />
+		</EmailShell>
+	);
+}
+
+function WelcomeEmailBody() {
+	return (
+		<EmailShell>
+			<MonoLabel>Welcome to Reloop</MonoLabel>
+			<SerifHeading muted="built for deliverability and scale.">
+				Open-source email infrastructure
+				<br />
+			</SerifHeading>
+			<Rule />
+			<BodyText>Hey, welcome! Really glad you&apos;re here.</BodyText>
+			<BodyText>
+				A new era of software is being built — AI agents that run autonomously,
+				indie developers shipping overnight, and startups moving from idea to
+				launch in days. The builders are getting faster. The tools around email
+				haven&apos;t changed much.
+			</BodyText>
+			<BodyText>That&apos;s why Reloop exists.</BodyText>
+
+			<div className="mt-10 mb-10 border-[#e0e0e0] border-l border-solid pl-6 dark:border-[#222]">
+				<MonoLabel>Our Mission</MonoLabel>
+				<p
+					className="mt-4 mb-0 font-serif text-[#0e0e0e] text-[18px] italic leading-[1.6] dark:text-white"
+					style={{ fontFamily: "Georgia, serif" }}
+				>
+					&ldquo;Open-source email infrastructure built for AI agents and
+					developers — so you can focus on what you&apos;re building, and not on
+					email deliverability.&rdquo;
+				</p>
+			</div>
+
+			<BodyText>
+				We&apos;ve seen the next generation of companies — smaller teams, bigger
+				ambitions. They&apos;ll be powered by AI, built in the open, and run by
+				founders who care more about their product than their billing stack.
+			</BodyText>
+			<BodyText>
+				Reloop gives them the email layer they deserve: reliable, composable,
+				and transparent, and self-hostable.
+			</BodyText>
+
+			<div className="mt-10 rounded-lg border border-[#e0e0e0] border-solid p-8 dark:border-[#222]">
+				<MonoLabel>What you can do with Reloop</MonoLabel>
+				<div className="mt-6 flex gap-2">
+					<p className="m-0 w-8 shrink-0 font-mono text-[#404040] text-[12px]">
+						01
 					</p>
-					<p className="truncate text-[11px] text-text-soft-400 dark:text-white/40">
-						{email.mark}
+					<div className="border-[#e0e0e0] border-b pb-6 dark:border-[#222]">
+						<p className="m-0 font-semibold text-[#0e0e0e] text-[16px] dark:text-white">
+							AI Agents
+						</p>
+						<p className="mt-1 mb-0 text-[#707070] text-[15px]">
+							A dedicated email inbox for AI agents — a webhook to get notified,
+							CLI to read and respond. Everything your agent needs.
+						</p>
+					</div>
+				</div>
+				<div className="mt-6 flex gap-2">
+					<p className="m-0 w-8 shrink-0 font-mono text-[#404040] text-[12px]">
+						02
 					</p>
+					<div>
+						<p className="m-0 font-semibold text-[#0e0e0e] text-[16px] dark:text-white">
+							Developers
+						</p>
+						<p className="mt-1 mb-0 text-[#707070] text-[15px]">
+							Built for developers — clean APIs, great DX, and full control.
+							Self-host or use our cloud. Your stack, your rules.
+						</p>
+					</div>
 				</div>
 			</div>
-			<h3 className="mt-5 font-semibold text-[1.2rem] text-text-strong-950 leading-snug tracking-tight dark:text-white">
-				{email.heading}
-			</h3>
-			<p className="mt-2 text-[13.5px] text-text-sub-600 leading-relaxed dark:text-white/55">
-				{email.body}
+
+			<Cta>Get Started</Cta>
+
+			<p className="mt-10 mb-8 text-[#555555] text-[15px] leading-[1.6] dark:text-[#b0b0b0]">
+				Honestly? We&apos;ll probably get things wrong. But that&apos;s exactly
+				why I&apos;m writing to you. Every critique, every &apos;this feels
+				off&apos;, every &apos;why doesn&apos;t it do this&apos; — that&apos;s
+				what shapes Reloop into something worth using. You&apos;re not just a
+				user here. You&apos;re the reason it gets better. Hit reply. I read
+				everything personally.
 			</p>
-			<span
-				className={cn(
-					"mt-5 inline-flex items-center rounded-lg px-4 py-2 font-medium text-[12.5px]",
-					email.accent,
-				)}
-			>
-				{email.cta}
-			</span>
-		</div>
+			<EmailFooter />
+		</EmailShell>
+	);
+}
+
+function ResetEmailBody() {
+	return (
+		<EmailShell>
+			<MonoLabel>Password Reset</MonoLabel>
+			<SerifHeading>Reset your Reloop password.</SerifHeading>
+			<Rule />
+			<BodyText>
+				We received a request to reset the password for your Reloop account.
+				This link expires in 20 minutes.
+			</BodyText>
+			<BodyText>
+				If you didn&apos;t ask for this, you can ignore the email — your
+				password stays the same.
+			</BodyText>
+			<Cta>Choose a new password</Cta>
+			<EmailFooter />
+		</EmailShell>
+	);
+}
+
+function InviteEmailBody() {
+	return (
+		<EmailShell>
+			<MonoLabel>Team Invitation</MonoLabel>
+			<SerifHeading>
+				Join <span className="font-bold">Reloop</span> on{" "}
+				<span className="font-bold">Reloop.</span>
+			</SerifHeading>
+			<Rule />
+			<BodyText>
+				Hello, <strong className="text-[#0e0e0e] dark:text-white">Maya.</strong>
+			</BodyText>
+			<BodyText>
+				<strong className="text-[#0e0e0e] dark:text-white">Pranav Patel</strong>{" "}
+				(
+				<strong className="text-[#0e0e0e] dark:text-white">
+					reloop.sh@gmail.com
+				</strong>
+				) has invited you to the{" "}
+				<strong className="text-[#0e0e0e] dark:text-white">Reloop</strong> team
+				on <strong className="text-[#0e0e0e] dark:text-white">Reloop</strong>.
+			</BodyText>
+			<Cta>Join the team</Cta>
+			<p className="mt-8 text-[#888888] text-[13px] leading-[1.6] dark:text-[#707070]">
+				or copy and paste this URL into your browser:{" "}
+				<span className="text-[#0e0e0e] underline dark:text-[#edece1]">
+					https://reloop.sh/invite/abc123
+				</span>
+			</p>
+			<div className="my-10 h-px w-full bg-[#e0e0e0] dark:bg-[#222]" />
+			<div className="text-[#707070] text-[12px] leading-[24px]">
+				<p className="m-0">
+					If you&apos;d like to report an issue, reach out to{" "}
+					<span className="underline">Reloop Help</span>.
+				</p>
+				<p className="m-0">
+					<span className="underline">Manage your notification settings</span>
+				</p>
+				<p className="m-0 mt-4">
+					Copyright © 2026 Reloop Inc. All rights reserved.
+					<br />
+					440 N Barranca Ave #4133 Covina, CA 91723
+				</p>
+			</div>
+		</EmailShell>
+	);
+}
+
+function DigestEmailBody() {
+	return (
+		<EmailShell>
+			<MonoLabel>Weekly Digest</MonoLabel>
+			<SerifHeading muted="delivered, opened, bounced.">
+				Your week in email,
+				<br />
+			</SerifHeading>
+			<Rule />
+			<BodyText>Here&apos;s what moved across Reloop this week.</BodyText>
+			<div className="mt-10 rounded-lg border border-[#e0e0e0] border-solid p-8 dark:border-[#222]">
+				<MonoLabel>This week</MonoLabel>
+				<div className="mt-6 flex gap-2">
+					<p className="m-0 w-8 shrink-0 font-mono text-[#404040] text-[12px]">
+						01
+					</p>
+					<div className="border-[#e0e0e0] border-b pb-6 dark:border-[#222]">
+						<p className="m-0 font-semibold text-[#0e0e0e] text-[16px] dark:text-white">
+							48,210 sent
+						</p>
+						<p className="mt-1 mb-0 text-[#707070] text-[15px]">
+							Transactional volume across welcome, reset, and invite.
+						</p>
+					</div>
+				</div>
+				<div className="mt-6 flex gap-2">
+					<p className="m-0 w-8 shrink-0 font-mono text-[#404040] text-[12px]">
+						02
+					</p>
+					<div>
+						<p className="m-0 font-semibold text-[#0e0e0e] text-[16px] dark:text-white">
+							99.2% delivered
+						</p>
+						<p className="mt-1 mb-0 text-[#707070] text-[15px]">
+							Opens at 42%. Two domains need a DKIM look.
+						</p>
+					</div>
+				</div>
+			</div>
+			<Cta>Open analytics</Cta>
+			<EmailFooter />
+		</EmailShell>
 	);
 }

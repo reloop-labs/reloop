@@ -36,7 +36,7 @@ export const PREVIEW_TABS: {
 
 export const PREVIEW_FILES: Record<PreviewTabId, string> = {
 	send: "send.ts",
-	templates: "welcome.tsx",
+	templates: "otp.tsx",
 	events: "webhook.ts",
 };
 
@@ -110,9 +110,9 @@ export function TemplatesCode() {
 		<code>
 			<span className="text-[#c2410c] dark:text-[#fb923c]">export</span>
 			<span className="text-text-strong-950 dark:text-white"> function </span>
-			<span className="text-primary-base">Welcome</span>
+			<span className="text-primary-base">OtpEmail</span>
 			<span className="text-text-soft-400">{"({ "}</span>
-			<span className="text-text-strong-950 dark:text-white">name</span>
+			<span className="text-text-strong-950 dark:text-white">code</span>
 			<span className="text-text-soft-400">{" }) {"}</span>
 			{"\n"}
 			<span className="text-[#c2410c] dark:text-[#fb923c]">{"  return"}</span>
@@ -123,11 +123,11 @@ export function TemplatesCode() {
 			</span>
 			{"\n"}
 			<span className="text-text-sub-600 dark:text-white/55">
-				{"      <Heading>Welcome, {name}</Heading>"}
+				{"      <Heading>Verification code</Heading>"}
 			</span>
 			{"\n"}
 			<span className="text-text-sub-600 dark:text-white/55">
-				{"      <Button href={url}>Confirm email</Button>"}
+				{"      <OtpCode value={code} />"}
 			</span>
 			{"\n"}
 			<span className="text-text-sub-600 dark:text-white/55">
