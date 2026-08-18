@@ -192,12 +192,34 @@ export function Hero({ variant = "default" }: HeroProps) {
 					</div>
 				</div>
 			) : (
-				<div className="relative mx-auto flex w-full max-w-5xl flex-col items-center border-stroke-soft-200 border-x px-6 pt-32 pb-12 text-center sm:px-8 sm:pt-36 sm:pb-14 md:max-w-7xl lg:px-12 lg:pt-44 lg:pb-16 dark:border-white/10">
+				<div className="relative mx-auto flex w-full max-w-5xl flex-col items-center border-stroke-soft-200 border-x px-6 pt-28 pb-12 text-center sm:px-8 sm:pt-32 sm:pb-14 md:max-w-7xl lg:px-12 lg:pt-36 lg:pb-16 dark:border-white/10">
+					<Link
+						href="/compare/resend"
+						className="group mb-6 inline-flex items-center gap-0 overflow-hidden rounded-full border border-stroke-soft-200 bg-bg-white-0 text-[13px] shadow-[0_1px_2px_rgba(0,0,0,0.04)] transition-all duration-200 hover:border-stroke-strong-950/20 sm:mb-8 sm:text-[13.5px] dark:border-white/10 dark:bg-white/[0.04] dark:shadow-none dark:hover:border-white/25"
+					>
+						<span className="px-3.5 py-1.5 font-medium text-text-sub-600 dark:text-white/70">
+							An open-source alternative to Resend
+						</span>
+						<span
+							className="h-3.5 w-px bg-stroke-soft-200 dark:bg-white/10"
+							aria-hidden="true"
+						/>
+						<span className="inline-flex items-center gap-1 px-3 py-1.5 font-medium text-text-strong-950 transition-colors group-hover:text-blue-600 dark:text-white dark:group-hover:text-blue-400">
+							<span>Read more</span>
+							<Icon
+								name="arrow-up-right"
+								className="group-hover:-translate-y-0.5 size-3.5 transition-transform duration-200 group-hover:translate-x-0.5"
+								aria-hidden="true"
+							/>
+						</span>
+					</Link>
 					<h1 className="max-w-3xl text-center font-semibold text-[2rem] text-text-strong-950 leading-[1.08] tracking-[-0.035em] sm:text-[2.75rem] lg:text-[3.25rem] dark:text-white">
 						Email API for Developers
-						<br />
-						With agent inboxes built in
 					</h1>
+					<p className="mt-4 max-w-[42rem] text-balance text-center text-[15px] text-text-sub-600 leading-relaxed sm:mt-5 sm:text-[16.5px] dark:text-white/55">
+						Reloop is the open-source email platform for transactional mail,
+						agent inboxes, and automated workflows.
+					</p>
 					<div className="mt-6 flex flex-wrap items-center justify-center gap-3 sm:mt-7">
 						<FancyButton.Root asChild variant="neutral" size="small">
 							<a href={hostedSignupHref}>Get Started</a>
