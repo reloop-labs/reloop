@@ -1,9 +1,10 @@
 "use client";
 
 import * as Button from "@reloop/ui/button";
-import { Icon } from "@reloop/ui/icon";
 import { cn } from "@reloop/ui/cn";
+import { Icon } from "@reloop/ui/icon";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { PAGE_EASE } from "../../domain/_shared/page-motion";
 import {
 	type EmailItem,
 	emailGridStyle,
@@ -14,7 +15,6 @@ import {
 	getEmailStatusLabel,
 } from "../_shared/data";
 import { MatrixCell } from "../_shared/matrix-cell";
-import { PAGE_EASE } from "../../domain/_shared/page-motion";
 
 const FOOTER_DELAY = 0.62;
 const FOOTER_DURATION = 0.38;
@@ -87,7 +87,9 @@ export function EmailsListTable({
 						const row = rowIndex + 1;
 						const isHighlighted = highlightedId === email.id;
 						const isLive = email.id.startsWith("em_live_");
-						const isTargetRow = targetEmailId ? email.id === targetEmailId : rowIndex === 0;
+						const isTargetRow = targetEmailId
+							? email.id === targetEmailId
+							: rowIndex === 0;
 
 						return (
 							<motion.div
@@ -162,7 +164,9 @@ export function EmailsListTable({
 										"group/row grid w-full cursor-pointer items-center px-4 py-2 text-left transition-all duration-200 hover:bg-bg-weak-50",
 										"first:rounded-t-xl",
 										isHighlighted && "bg-neutral-100/90 dark:bg-white/[0.06]",
-										isTargetRow && isRowPressed && "bg-bg-weak-50/80 scale-[0.995]",
+										isTargetRow &&
+											isRowPressed &&
+											"scale-[0.995] bg-bg-weak-50/80",
 									)}
 								>
 									<MatrixCell
@@ -271,7 +275,9 @@ export function EmailsListTable({
 				<motion.div
 					layout="position"
 					className="flex items-center justify-between px-4 py-2 text-label-xs text-text-sub-600"
-					initial={reduceMotion ? false : { opacity: 0, y: 16, filter: "blur(3px)" }}
+					initial={
+						reduceMotion ? false : { opacity: 0, y: 16, filter: "blur(3px)" }
+					}
 					animate={
 						reduceMotion || mounted
 							? { opacity: 1, y: 0, filter: "blur(0px)" }
@@ -306,9 +312,7 @@ export function EmailsListTable({
 						>
 							<Icon name="chevron-left" className="h-3.5 w-3.5" />
 						</Button.Root>
-						<span className="px-2 text-text-sub-600 text-xs">
-							Page 1 of 5
-						</span>
+						<span className="px-2 text-text-sub-600 text-xs">Page 1 of 5</span>
 						<Button.Root
 							variant="neutral"
 							mode="stroke"

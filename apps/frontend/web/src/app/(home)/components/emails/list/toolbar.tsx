@@ -1,10 +1,10 @@
 "use client";
 
 import * as Button from "@reloop/ui/button";
+import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import { KbdKey } from "@reloop/ui/kbd-key";
-import { cn } from "@reloop/ui/cn";
 import { AnimateIn } from "../_shared/animate-in";
 
 const toolbarControlClassName = cn(
@@ -60,10 +60,7 @@ export function EmailsListToolbar({ mounted }: { mounted: boolean }) {
 							<Icon name="activity" className="h-4 w-4 shrink-0" />
 							<span className="min-w-0 truncate">All Status</span>
 						</span>
-						<Icon
-							name="chevron-down"
-							className="-me-1 size-4 opacity-70"
-						/>
+						<Icon name="chevron-down" className="-me-1 size-4 opacity-70" />
 					</button>
 				</AnimateIn>
 
@@ -80,10 +77,7 @@ export function EmailsListToolbar({ mounted }: { mounted: boolean }) {
 							/>
 							<span className="min-w-0 truncate">All Domains</span>
 						</span>
-						<Icon
-							name="chevron-down"
-							className="-me-1 size-4 opacity-70"
-						/>
+						<Icon name="chevron-down" className="-me-1 size-4 opacity-70" />
 					</button>
 				</AnimateIn>
 
@@ -100,10 +94,7 @@ export function EmailsListToolbar({ mounted }: { mounted: boolean }) {
 							/>
 							<span className="min-w-0 truncate">All API Keys</span>
 						</span>
-						<Icon
-							name="chevron-down"
-							className="-me-1 size-4 opacity-70"
-						/>
+						<Icon name="chevron-down" className="-me-1 size-4 opacity-70" />
 					</button>
 				</AnimateIn>
 

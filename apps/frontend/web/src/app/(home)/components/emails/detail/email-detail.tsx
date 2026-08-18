@@ -254,12 +254,14 @@ export function EmailDetail({
 	activeTab = "preview",
 	onTabChange,
 	tabRefs,
+	compact = false,
 }: {
 	email: EmailItem;
 	mounted?: boolean;
 	activeTab?: string;
 	onTabChange?: (tab: string) => void;
 	tabRefs?: RefObject<Record<DetailTabId, HTMLButtonElement | null>>;
+	compact?: boolean;
 }) {
 	const [internalTab, setInternalTab] = useState("preview");
 	const currentTab = onTabChange ? activeTab : internalTab;
@@ -315,9 +317,13 @@ export function EmailDetail({
 	};
 
 	return (
-		<div className="space-y-6">
+		<div className={compact ? "space-y-3.5" : "space-y-6"}>
 			<section>
-				<div className="flex flex-col gap-3.5">
+				<div
+					className={
+						compact ? "flex flex-col gap-1.5" : "flex flex-col gap-3.5"
+					}
+				>
 					{HEADER_ROWS.map((row, index) => (
 						<AnimateIn
 							key={row.label}
@@ -325,11 +331,21 @@ export function EmailDetail({
 							delay={0.05 + index * 0.045}
 							y={10}
 						>
-							<div className="flex items-start gap-4">
-								<span className="w-16 flex-shrink-0 font-medium text-paragraph-sm text-text-sub-600">
+							<div className="flex items-start gap-3">
+								<span
+									className={cn(
+										"flex-shrink-0 font-medium text-text-sub-600",
+										compact ? "w-14 text-xs" : "w-16 text-paragraph-sm",
+									)}
+								>
 									{row.label}
 								</span>
-								<span className="font-medium text-paragraph-sm text-text-strong-950">
+								<span
+									className={cn(
+										"font-medium text-text-strong-950",
+										compact ? "text-xs" : "text-paragraph-sm",
+									)}
+								>
 									{"value" in row ? row.value : email[row.key]}
 								</span>
 							</div>
@@ -344,6 +360,7 @@ export function EmailDetail({
 						key={email.id}
 						status={email.status}
 						mounted={mounted}
+						compact={compact}
 					/>
 				</section>
 			</AnimateIn>
@@ -351,7 +368,12 @@ export function EmailDetail({
 			<AnimateIn mounted={mounted} delay={0.3} y={14}>
 				<section>
 					<TabMenu.Root value={currentTab} onValueChange={setTab}>
-						<TabMenu.List className="relative mb-6 h-11 gap-0 border-b! py-0">
+						<TabMenu.List
+							className={cn(
+								"relative gap-0 border-b! py-0",
+								compact ? "mb-3 h-8.5" : "mb-6 h-11",
+							)}
+						>
 							{tabItems.map((item, index) => (
 								<TabMenu.Trigger
 									key={item.value}

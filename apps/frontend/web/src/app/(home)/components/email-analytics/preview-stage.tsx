@@ -4,6 +4,8 @@ import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useState } from "react";
+import type { EmailItem } from "../emails/_shared/data";
+import { type DetailTabId, EmailDetail } from "../emails/detail/email-detail";
 import type { AnalyticsTabId } from "./preview-scenes";
 import { PreviewTabs } from "./preview-tabs";
 
@@ -440,21 +442,21 @@ function MetricsLayeredView() {
 				</div>
 
 				{/* 3 KPI Health Cards Row */}
-				<div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
+				<div className="mt-2.5 grid grid-cols-1 gap-2.5 sm:grid-cols-3">
 					{/* Deliverability */}
-					<div className="flex flex-col justify-between rounded-xl border border-stroke-soft-200 p-4 dark:border-white/10">
+					<div className="flex flex-col justify-between rounded-xl border border-stroke-soft-200 p-3 dark:border-white/10">
 						<div>
-							<span className="font-medium text-[11px] text-text-soft-400 uppercase tracking-[0.08em] dark:text-white/40">
+							<span className="font-medium text-[10px] text-text-soft-400 uppercase tracking-[0.08em] dark:text-white/40">
 								Deliverability
 							</span>
-							<p className="mt-1 font-semibold text-2xl text-text-strong-950 tracking-tight dark:text-white">
+							<p className="mt-0.5 font-semibold text-text-strong-950 text-xl tracking-tight dark:text-white">
 								Excellent
 							</p>
 						</div>
-						<div className="mt-4 space-y-1.5 border-stroke-soft-100 border-t pt-2.5 text-[12px] dark:border-white/5">
+						<div className="mt-2 space-y-1 border-stroke-soft-100 border-t pt-1.5 text-[11px] dark:border-white/5">
 							<div className="flex items-center justify-between">
-								<div className="flex items-center gap-2">
-									<span className="size-2 rounded-full bg-blue-500" />
+								<div className="flex items-center gap-1.5">
+									<span className="size-1.5 rounded-full bg-blue-500" />
 									<span className="text-text-sub-600 dark:text-white/60">
 										Sent
 									</span>
@@ -464,8 +466,8 @@ function MetricsLayeredView() {
 								</span>
 							</div>
 							<div className="flex items-center justify-between">
-								<div className="flex items-center gap-2">
-									<span className="size-2 rounded-full bg-[#10B981]" />
+								<div className="flex items-center gap-1.5">
+									<span className="size-1.5 rounded-full bg-[#10B981]" />
 									<span className="text-text-sub-600 dark:text-white/60">
 										Delivered
 									</span>
@@ -478,19 +480,19 @@ function MetricsLayeredView() {
 					</div>
 
 					{/* Reputation */}
-					<div className="flex flex-col justify-between rounded-xl border border-stroke-soft-200 p-4 dark:border-white/10">
+					<div className="flex flex-col justify-between rounded-xl border border-stroke-soft-200 p-3 dark:border-white/10">
 						<div>
-							<span className="font-medium text-[11px] text-text-soft-400 uppercase tracking-[0.08em] dark:text-white/40">
+							<span className="font-medium text-[10px] text-text-soft-400 uppercase tracking-[0.08em] dark:text-white/40">
 								Reputation
 							</span>
-							<p className="mt-1 font-semibold text-2xl text-text-strong-950 tracking-tight dark:text-white">
+							<p className="mt-0.5 font-semibold text-text-strong-950 text-xl tracking-tight dark:text-white">
 								Excellent
 							</p>
 						</div>
-						<div className="mt-4 space-y-1.5 border-stroke-soft-100 border-t pt-2.5 text-[12px] dark:border-white/5">
+						<div className="mt-2 space-y-1 border-stroke-soft-100 border-t pt-1.5 text-[11px] dark:border-white/5">
 							<div className="flex items-center justify-between">
-								<div className="flex items-center gap-2">
-									<span className="size-2 rounded-full bg-[#EF4444]" />
+								<div className="flex items-center gap-1.5">
+									<span className="size-1.5 rounded-full bg-[#EF4444]" />
 									<span className="text-text-sub-600 dark:text-white/60">
 										Bounced
 									</span>
@@ -500,8 +502,8 @@ function MetricsLayeredView() {
 								</span>
 							</div>
 							<div className="flex items-center justify-between">
-								<div className="flex items-center gap-2">
-									<span className="size-2 rounded-full bg-[#FDB022]" />
+								<div className="flex items-center gap-1.5">
+									<span className="size-1.5 rounded-full bg-[#FDB022]" />
 									<span className="text-text-sub-600 dark:text-white/60">
 										Complained
 									</span>
@@ -514,19 +516,19 @@ function MetricsLayeredView() {
 					</div>
 
 					{/* Engagement */}
-					<div className="flex flex-col justify-between rounded-xl border border-stroke-soft-200 p-4 dark:border-white/10">
+					<div className="flex flex-col justify-between rounded-xl border border-stroke-soft-200 p-3 dark:border-white/10">
 						<div>
-							<span className="font-medium text-[11px] text-text-soft-400 uppercase tracking-[0.08em] dark:text-white/40">
+							<span className="font-medium text-[10px] text-text-soft-400 uppercase tracking-[0.08em] dark:text-white/40">
 								Engagement
 							</span>
-							<p className="mt-1 font-semibold text-2xl text-text-strong-950 tracking-tight dark:text-white">
+							<p className="mt-0.5 font-semibold text-text-strong-950 text-xl tracking-tight dark:text-white">
 								Good
 							</p>
 						</div>
-						<div className="mt-4 space-y-1.5 border-stroke-soft-100 border-t pt-2.5 text-[12px] dark:border-white/5">
+						<div className="mt-2 space-y-1 border-stroke-soft-100 border-t pt-1.5 text-[11px] dark:border-white/5">
 							<div className="flex items-center justify-between">
-								<div className="flex items-center gap-2">
-									<span className="size-2 rounded-full bg-[#8B5CF6]" />
+								<div className="flex items-center gap-1.5">
+									<span className="size-1.5 rounded-full bg-[#8B5CF6]" />
 									<span className="text-text-sub-600 dark:text-white/60">
 										Opened
 									</span>
@@ -536,8 +538,8 @@ function MetricsLayeredView() {
 								</span>
 							</div>
 							<div className="flex items-center justify-between">
-								<div className="flex items-center gap-2">
-									<span className="size-2 rounded-full bg-[#9CA3AF]" />
+								<div className="flex items-center gap-1.5">
+									<span className="size-1.5 rounded-full bg-[#9CA3AF]" />
 									<span className="text-text-sub-600 dark:text-white/60">
 										Unsubscribed
 									</span>
@@ -551,14 +553,14 @@ function MetricsLayeredView() {
 				</div>
 
 				{/* Main Deliverability Chart Area */}
-				<div className="mt-4 rounded-xl border border-stroke-soft-200 p-4 dark:border-white/10">
-					<div className="flex flex-wrap items-center justify-between gap-3 border-stroke-soft-100 border-b pb-3 dark:border-white/5">
-						<div className="flex items-baseline gap-6">
+				<div className="mt-2.5 rounded-xl border border-stroke-soft-200 p-3.5 dark:border-white/10">
+					<div className="flex flex-wrap items-center justify-between gap-3 border-stroke-soft-100 border-b pb-2 dark:border-white/5">
+						<div className="flex items-baseline gap-5">
 							<div>
 								<span className="text-[10px] text-text-soft-400 uppercase tracking-wider dark:text-white/40">
 									Emails
 								</span>
-								<p className="font-bold text-lg text-text-strong-950 tabular-nums dark:text-white">
+								<p className="font-bold text-base text-text-strong-950 tabular-nums dark:text-white">
 									29,486
 								</p>
 							</div>
@@ -566,7 +568,7 @@ function MetricsLayeredView() {
 								<span className="text-[10px] text-text-soft-400 uppercase tracking-wider dark:text-white/40">
 									Deliverability Rate
 								</span>
-								<p className="font-bold text-[#10B981] text-lg tabular-nums">
+								<p className="font-bold text-[#10B981] text-base tabular-nums">
 									99.4%
 								</p>
 							</div>
@@ -574,7 +576,7 @@ function MetricsLayeredView() {
 								<span className="text-[10px] text-text-soft-400 uppercase tracking-wider dark:text-white/40">
 									Bounces
 								</span>
-								<p className="font-bold text-lg text-text-strong-950 tabular-nums dark:text-white">
+								<p className="font-bold text-base text-text-strong-950 tabular-nums dark:text-white">
 									158
 								</p>
 							</div>
@@ -588,7 +590,7 @@ function MetricsLayeredView() {
 
 					{/* SVG Line / Area Graph */}
 					<div
-						className="relative mt-3 h-[140px] w-full cursor-crosshair"
+						className="relative mt-2 h-[130px] w-full cursor-crosshair"
 						onMouseMove={handleMouseMove}
 					>
 						<svg
@@ -941,22 +943,22 @@ function EngagementView() {
 				</div>
 
 				{/* 3 Clickable Funnel Stage Metric Cards */}
-				<div className="mt-4 grid grid-cols-3 divide-x divide-stroke-soft-100 overflow-hidden rounded-xl border border-stroke-soft-200 dark:divide-white/5 dark:border-white/10">
+				<div className="mt-2.5 grid grid-cols-3 divide-x divide-stroke-soft-100 overflow-hidden rounded-xl border border-stroke-soft-200 dark:divide-white/5 dark:border-white/10">
 					{/* Stage 1: Delivered */}
 					<button
 						type="button"
 						onClick={() => setActiveStage("delivered")}
 						className={cn(
-							"group relative flex cursor-pointer flex-col p-4 text-left transition-all",
+							"group relative flex cursor-pointer flex-col p-2.5 text-left transition-all sm:p-3",
 							activeStage === "delivered"
 								? "bg-indigo-50/40 dark:bg-indigo-950/20"
 								: "hover:bg-bg-weak-50/50 dark:hover:bg-white/[0.02]",
 						)}
 					>
 						<div className="flex items-center justify-between">
-							<div className="flex items-center gap-2">
-								<span className="size-2 rounded-full bg-[#4F46E5]" />
-								<span className="font-medium text-text-sub-600 text-xs dark:text-white/60">
+							<div className="flex items-center gap-1.5">
+								<span className="size-1.5 rounded-full bg-[#4F46E5]" />
+								<span className="font-medium text-[11px] text-text-sub-600 dark:text-white/60">
 									Delivered
 								</span>
 							</div>
@@ -964,11 +966,11 @@ function EngagementView() {
 								›
 							</span>
 						</div>
-						<p className="mt-2 font-bold text-2xl text-text-strong-950 tracking-tight sm:text-3xl dark:text-white">
+						<p className="mt-1 font-bold text-text-strong-950 text-xl tracking-tight sm:text-2xl dark:text-white">
 							29.4K
 						</p>
-						<div className="mt-1 flex items-center gap-1.5 text-[#4F46E5] text-[11px] dark:text-indigo-400">
-							<span>100% of sent</span>
+						<div className="mt-0.5 flex items-center gap-1 text-[#4F46E5] text-[10px] dark:text-indigo-400">
+							<span>100% sent</span>
 							<span className="text-text-soft-400 dark:text-white/30">·</span>
 							<span className="text-text-sub-600 dark:text-white/50">
 								128ms avg
@@ -987,16 +989,16 @@ function EngagementView() {
 						type="button"
 						onClick={() => setActiveStage("opened")}
 						className={cn(
-							"group relative flex cursor-pointer flex-col p-4 text-left transition-all",
+							"group relative flex cursor-pointer flex-col p-2.5 text-left transition-all sm:p-3",
 							activeStage === "opened"
 								? "bg-cyan-50/40 dark:bg-cyan-950/20"
 								: "hover:bg-bg-weak-50/50 dark:hover:bg-white/[0.02]",
 						)}
 					>
 						<div className="flex items-center justify-between">
-							<div className="flex items-center gap-2">
-								<span className="size-2 rounded-full bg-[#0284C7]" />
-								<span className="font-medium text-text-sub-600 text-xs dark:text-white/60">
+							<div className="flex items-center gap-1.5">
+								<span className="size-1.5 rounded-full bg-[#0284C7]" />
+								<span className="font-medium text-[11px] text-text-sub-600 dark:text-white/60">
 									Opened
 								</span>
 							</div>
@@ -1004,10 +1006,10 @@ function EngagementView() {
 								›
 							</span>
 						</div>
-						<p className="mt-2 font-bold text-2xl text-text-strong-950 tracking-tight sm:text-3xl dark:text-white">
+						<p className="mt-1 font-bold text-text-strong-950 text-xl tracking-tight sm:text-2xl dark:text-white">
 							14.1K
 						</p>
-						<div className="mt-1 flex items-center gap-1.5 text-[#0284C7] text-[11px] dark:text-cyan-400">
+						<div className="mt-0.5 flex items-center gap-1 text-[#0284C7] text-[10px] dark:text-cyan-400">
 							<span>48.2% open rate</span>
 							<span className="text-text-soft-400 dark:text-white/30">·</span>
 							<span className="text-emerald-600 dark:text-emerald-400">
@@ -1027,28 +1029,28 @@ function EngagementView() {
 						type="button"
 						onClick={() => setActiveStage("clicked")}
 						className={cn(
-							"group relative flex cursor-pointer flex-col p-4 text-left transition-all",
+							"group relative flex cursor-pointer flex-col p-2.5 text-left transition-all sm:p-3",
 							activeStage === "clicked"
 								? "bg-emerald-50/40 dark:bg-emerald-950/20"
 								: "hover:bg-bg-weak-50/50 dark:hover:bg-white/[0.02]",
 						)}
 					>
 						<div className="flex items-center justify-between">
-							<div className="flex items-center gap-2">
-								<span className="size-2 rounded-full bg-[#059669]" />
-								<span className="font-medium text-text-sub-600 text-xs dark:text-white/60">
+							<div className="flex items-center gap-1.5">
+								<span className="size-1.5 rounded-full bg-[#059669]" />
+								<span className="font-medium text-[11px] text-text-sub-600 dark:text-white/60">
 									Clicked
 								</span>
 							</div>
-							<div className="flex items-center gap-1 text-[11px] text-text-soft-400 dark:text-white/40">
+							<div className="flex items-center gap-1 text-[10px] text-text-soft-400 dark:text-white/40">
 								<span>CTOR 30%</span>
 							</div>
 						</div>
-						<p className="mt-2 font-bold text-2xl text-text-strong-950 tracking-tight sm:text-3xl dark:text-white">
+						<p className="mt-1 font-bold text-text-strong-950 text-xl tracking-tight sm:text-2xl dark:text-white">
 							4,286
 						</p>
-						<div className="mt-1 flex items-center gap-1.5 text-[#059669] text-[11px] dark:text-emerald-400">
-							<span>14.6% unique CTR</span>
+						<div className="mt-0.5 flex items-center gap-1 text-[#059669] text-[10px] dark:text-emerald-400">
+							<span>14.6% CTR</span>
 							<span className="text-text-soft-400 dark:text-white/30">·</span>
 							<span className="text-text-sub-600 dark:text-white/50">
 								8.3K total
@@ -1064,8 +1066,8 @@ function EngagementView() {
 				</div>
 
 				{/* Fluid Organic Sankey Stream Graphic */}
-				<div className="relative mt-4 overflow-hidden rounded-xl border border-stroke-soft-200 p-2 sm:p-4 dark:border-white/10">
-					<div className="relative h-[180px] w-full">
+				<div className="relative mt-2.5 overflow-hidden rounded-xl border border-stroke-soft-200 p-2 sm:p-3 dark:border-white/10">
+					<div className="relative h-[130px] w-full">
 						<svg
 							viewBox="0 0 760 180"
 							className="h-full w-full overflow-visible"
@@ -1205,26 +1207,26 @@ function EngagementView() {
 						</svg>
 
 						{/* Centered Retention Badges overlay */}
-						<div className="pointer-events-none absolute inset-0 flex items-center justify-between px-16 sm:px-24">
+						<div className="pointer-events-none absolute inset-0 flex items-center justify-between px-14 sm:px-20">
 							{/* Delivered 100% badge */}
-							<div className="flex items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-white-0/95 px-3 py-1 font-bold text-[#4F46E5] text-xs shadow-md dark:border-white/10 dark:bg-black/90 dark:text-indigo-400">
+							<div className="flex items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-white-0/95 px-2.5 py-0.5 font-bold text-[#4F46E5] text-[10px] shadow-sm dark:border-white/10 dark:bg-black/90 dark:text-indigo-400">
 								100%
 							</div>
 
 							{/* Opened 48.2% badge */}
-							<div className="flex items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-white-0/95 px-3 py-1 font-bold text-[#0284C7] text-xs shadow-md dark:border-white/10 dark:bg-black/90 dark:text-cyan-400">
+							<div className="flex items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-white-0/95 px-2.5 py-0.5 font-bold text-[#0284C7] text-[10px] shadow-sm dark:border-white/10 dark:bg-black/90 dark:text-cyan-400">
 								48.2%
 							</div>
 
 							{/* Clicked 14.6% badge */}
-							<div className="flex items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-white-0/95 px-3 py-1 font-bold text-[#059669] text-xs shadow-md dark:border-white/10 dark:bg-black/90 dark:text-emerald-400">
+							<div className="flex items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-white-0/95 px-2.5 py-0.5 font-bold text-[#059669] text-[10px] shadow-sm dark:border-white/10 dark:bg-black/90 dark:text-emerald-400">
 								14.6%
 							</div>
 						</div>
 					</div>
 
 					{/* Minimal Stage Insights Footer */}
-					<div className="mt-3.5 border-stroke-soft-100 border-t pt-3 text-xs dark:border-white/5">
+					<div className="mt-2.5 border-stroke-soft-100 border-t pt-2 text-[10px] dark:border-white/5">
 						<AnimatePresence mode="wait">
 							{activeStage === "delivered" && (
 								<motion.div
@@ -1233,9 +1235,9 @@ function EngagementView() {
 									animate={{ opacity: 1 }}
 									exit={{ opacity: 0 }}
 									transition={{ duration: 0.15 }}
-									className="flex flex-wrap items-center justify-between gap-3 text-[11px]"
+									className="flex flex-wrap items-center justify-between gap-2 text-[10px]"
 								>
-									<div className="flex items-center gap-4">
+									<div className="flex items-center gap-3">
 										<span className="text-text-sub-600 dark:text-white/60">
 											Gmail{" "}
 											<strong className="font-semibold text-text-strong-950 dark:text-white">
@@ -1268,9 +1270,9 @@ function EngagementView() {
 									animate={{ opacity: 1 }}
 									exit={{ opacity: 0 }}
 									transition={{ duration: 0.15 }}
-									className="flex flex-wrap items-center justify-between gap-3 text-[11px]"
+									className="flex flex-wrap items-center justify-between gap-2 text-[10px]"
 								>
-									<div className="flex items-center gap-4">
+									<div className="flex items-center gap-3">
 										<span className="text-text-sub-600 dark:text-white/60">
 											Apple Mail{" "}
 											<strong className="font-semibold text-text-strong-950 dark:text-white">
@@ -1303,9 +1305,9 @@ function EngagementView() {
 									animate={{ opacity: 1 }}
 									exit={{ opacity: 0 }}
 									transition={{ duration: 0.15 }}
-									className="flex flex-wrap items-center justify-between gap-3 text-[11px]"
+									className="flex flex-wrap items-center justify-between gap-2 text-[10px]"
 								>
-									<div className="flex items-center gap-4">
+									<div className="flex items-center gap-3">
 										<span className="text-text-sub-600 dark:text-white/60">
 											Verify Email{" "}
 											<strong className="font-semibold text-text-strong-950 dark:text-white">
@@ -1338,140 +1340,30 @@ function EngagementView() {
 	);
 }
 
-/* --- Scene 3: Bounce & Diagnostics Preview --- */
+/* --- Scene 3: Bounce & Diagnostics (Email Detail & Insights View) --- */
+const SAMPLE_DIAGNOSTIC_EMAIL: EmailItem = {
+	id: "msg_prod_deploy_948",
+	to: "noah@vercel.com",
+	subject: "Production deployment finished",
+	status: "clicked",
+	time: "17 Aug, 6:24pm",
+};
+
 function BouncesView() {
-	const logs = [
-		{
-			code: "250 OK",
-			type: "delivered",
-			email: "alex@acme.corp",
-			detail: "Delivered to mx1.google.com (128ms)",
-			time: "2s ago",
-		},
-		{
-			code: "550 5.1.1",
-			type: "hard_bounce",
-			email: "no-user@invalid-domain.xyz",
-			detail: "User unknown; mailbox does not exist",
-			time: "14s ago",
-		},
-		{
-			code: "452 4.2.2",
-			type: "soft_bounce",
-			email: "storage@enterprise.io",
-			detail: "Mailbox full; auto-retry queued in 15m",
-			time: "48s ago",
-		},
-		{
-			code: "250 2.1.5",
-			type: "delivered",
-			email: "dev-team@northwind.dev",
-			detail: "DKIM passed, SPF aligned, TLS 1.3",
-			time: "1m ago",
-		},
-	];
+	const [activeDetailTab, setActiveDetailTab] =
+		useState<DetailTabId>("insights");
 
 	return (
-		<div className="w-full space-y-4">
-			{/* Health Stats */}
-			<div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-				<div className="rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-3.5 shadow-sm dark:border-white/10 dark:bg-white/[0.03]">
-					<span className="text-text-sub-600 text-xs dark:text-white/60">
-						Hard Bounces
-					</span>
-					<p className="mt-1 font-semibold text-emerald-600 text-xl tracking-tight dark:text-emerald-400">
-						0.42%
-					</p>
-					<span className="text-[11px] text-text-soft-400 dark:text-white/50">
-						Auto-suppressed
-					</span>
-				</div>
-
-				<div className="rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-3.5 shadow-sm dark:border-white/10 dark:bg-white/[0.03]">
-					<span className="text-text-sub-600 text-xs dark:text-white/60">
-						Soft Bounces
-					</span>
-					<p className="mt-1 font-semibold text-amber-500 text-xl tracking-tight dark:text-amber-400">
-						0.19%
-					</p>
-					<span className="text-[11px] text-text-soft-400 dark:text-white/50">
-						Exponential backoff
-					</span>
-				</div>
-
-				<div className="rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-3.5 shadow-sm dark:border-white/10 dark:bg-white/[0.03]">
-					<span className="text-text-sub-600 text-xs dark:text-white/60">
-						Spam Complaints
-					</span>
-					<p className="mt-1 font-semibold text-emerald-600 text-xl tracking-tight dark:text-emerald-400">
-						0.01%
-					</p>
-					<span className="text-[11px] text-emerald-600 dark:text-emerald-400">
-						Compliant (&lt; 0.1%)
-					</span>
-				</div>
-
-				<div className="rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-3.5 shadow-sm dark:border-white/10 dark:bg-white/[0.03]">
-					<span className="text-text-sub-600 text-xs dark:text-white/60">
-						Auth Alignment
-					</span>
-					<p className="mt-1 font-semibold text-text-strong-950 text-xl tracking-tight dark:text-white">
-						100%
-					</p>
-					<span className="text-[11px] text-emerald-600 dark:text-emerald-400">
-						SPF + DKIM + DMARC
-					</span>
-				</div>
-			</div>
-
-			{/* Real-time SMTP Diagnostic Feed */}
-			<div className="rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-4 shadow-sm dark:border-white/10 dark:bg-white/[0.03]">
-				<div className="flex items-center justify-between border-stroke-soft-100 border-b pb-2.5 dark:border-white/5">
-					<div className="flex items-center gap-2">
-						<span className="font-medium text-text-strong-950 text-xs dark:text-white">
-							Live SMTP Event Stream
-						</span>
-						<span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300">
-							<span className="size-1.5 animate-pulse rounded-full bg-emerald-500" />
-							Streaming
-						</span>
-					</div>
-					<span className="text-[11px] text-text-soft-400 dark:text-white/40">
-						Auto-refreshing
-					</span>
-				</div>
-
-				<div className="mt-3 divide-y divide-stroke-soft-100 dark:divide-white/5">
-					{logs.map((log) => (
-						<div
-							key={log.email}
-							className="flex flex-col gap-1 py-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4"
-						>
-							<div className="flex items-center gap-2.5 truncate">
-								<span
-									className={cn(
-										"font-mono font-semibold text-[11px]",
-										log.type === "delivered"
-											? "text-emerald-600 dark:text-emerald-400"
-											: log.type === "hard_bounce"
-												? "text-rose-600 dark:text-rose-400"
-												: "text-amber-600 dark:text-amber-400",
-									)}
-								>
-									{log.code}
-								</span>
-								<span className="truncate font-medium text-text-strong-950 text-xs dark:text-white">
-									{log.email}
-								</span>
-								<span className="hidden truncate text-[11px] text-text-soft-400 sm:inline dark:text-white/40">
-									— {log.detail}
-								</span>
-							</div>
-							<span className="shrink-0 text-[11px] text-text-soft-400 dark:text-white/40">
-								{log.time}
-							</span>
-						</div>
-					))}
+		<div className="relative mx-auto w-full max-w-5xl">
+			<div className="relative rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-3.5 shadow-xs sm:p-4.5 dark:border-white/10 dark:bg-white/[0.02]">
+				<div className="mx-auto max-w-3xl overflow-hidden sm:px-1">
+					<EmailDetail
+						email={SAMPLE_DIAGNOSTIC_EMAIL}
+						mounted={true}
+						compact={true}
+						activeTab={activeDetailTab}
+						onTabChange={(tab) => setActiveDetailTab(tab as DetailTabId)}
+					/>
 				</div>
 			</div>
 		</div>
@@ -1499,7 +1391,7 @@ export function PreviewStage() {
 	return (
 		<div className="bg-bg-weak-50/60 dark:bg-white/[0.015]">
 			<div className="relative overflow-hidden">
-				<div className="relative mx-auto min-h-[30rem] max-w-5xl px-5 pt-8 pb-14 sm:px-8 sm:pt-10 lg:px-10">
+				<div className="relative mx-auto h-[29rem] max-w-5xl px-5 pt-6 sm:h-[32rem] sm:px-8 sm:pt-7 lg:h-[34rem] lg:px-10 lg:pt-8">
 					<AnimatePresence initial={false} custom={direction} mode="popLayout">
 						<motion.div
 							key={active}
@@ -1527,7 +1419,7 @@ export function PreviewStage() {
 				</div>
 				<div
 					aria-hidden
-					className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-32 bg-gradient-to-t from-15% from-[#fbfbfb] via-[#fbfbfb]/80 to-transparent dark:from-[#0a0a0a] dark:via-[#0a0a0a]/80"
+					className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-44 bg-gradient-to-t from-15% from-[#fbfbfb] via-[#fbfbfb]/80 to-transparent dark:from-[#0a0a0a] dark:via-[#0a0a0a]/80"
 				/>
 			</div>
 			<PreviewTabs active={active} onChange={handleTabChange} />

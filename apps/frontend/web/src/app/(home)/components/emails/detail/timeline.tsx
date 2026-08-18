@@ -57,9 +57,11 @@ function startingLit(target: number, reduceMotion: boolean | null): number {
 export function EmailTimeline({
 	status = "opened",
 	mounted = true,
+	compact = false,
 }: {
 	status?: string;
 	mounted?: boolean;
+	compact?: boolean;
 }) {
 	const reduceMotion = useReducedMotion();
 	const normalized = status.toLowerCase();
@@ -111,13 +113,20 @@ export function EmailTimeline({
 	}, [currentStepIndex, mounted, reduceMotion]);
 
 	return (
-		<div className="relative flex h-[176px] w-full items-center justify-start overflow-x-auto rounded-3xl border border-stroke-soft-100 bg-bg-white-0 px-8 pt-6 pb-5 transition-all hover:border-stroke-soft-200 dark:border-stroke-soft-100/50 dark:bg-bg-white-0/5">
+		<div
+			className={cn(
+				"relative flex w-full items-center justify-start overflow-x-auto border border-stroke-soft-100 bg-bg-white-0 transition-all hover:border-stroke-soft-200 dark:border-stroke-soft-100/50 dark:bg-bg-white-0/5",
+				compact
+					? "h-[96px] rounded-xl px-5 pt-2 pb-1.5"
+					: "h-[176px] rounded-3xl px-8 pt-6 pb-5",
+			)}
+		>
 			<div
 				className={cn(
 					"flex items-start",
 					isFailed
 						? "w-64 justify-between"
-						: "w-full min-w-[520px] max-w-2xl justify-between",
+						: "w-full min-w-[480px] max-w-2xl justify-between",
 				)}
 			>
 				{steps.map((step, index) => {
@@ -168,7 +177,10 @@ export function EmailTimeline({
 
 					const nodeBody = (
 						<motion.div
-							className="flex flex-col items-center gap-2"
+							className={cn(
+								"flex flex-col items-center",
+								compact ? "gap-1" : "gap-2",
+							)}
 							initial={
 								reduceMotion
 									? false
@@ -188,23 +200,35 @@ export function EmailTimeline({
 						>
 							<div
 								className={cn(
-									"flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] border transition-all duration-300",
+									"flex shrink-0 items-center justify-center border transition-all duration-300",
+									compact ? "size-7 rounded-md" : "size-10 rounded-[10px]",
 									getIconStyles(),
 								)}
 							>
-								<Icon name={step.icon} className="h-5 w-5" />
+								<Icon
+									name={step.icon}
+									className={compact ? "size-3.5" : "size-5"}
+								/>
 							</div>
 
-							<div className="flex flex-col items-center gap-1 text-center">
+							<div className="flex flex-col items-center gap-0.5 text-center">
 								<span
 									className={cn(
-										"rounded-md px-2 py-1 font-semibold text-xs transition-colors duration-300",
+										"font-semibold transition-colors duration-300",
+										compact
+											? "rounded px-1 py-0 text-[10px]"
+											: "rounded-md px-2 py-1 text-xs",
 										getBadgeStyles(),
 									)}
 								>
 									{step.label}
 								</span>
-								<div className="flex h-4 items-center justify-center">
+								<div
+									className={cn(
+										"flex items-center justify-center",
+										compact ? "h-3" : "h-4",
+									)}
+								>
 									{isCompleted && timestamp ? (
 										<motion.span
 											key={timestamp}
@@ -215,12 +239,21 @@ export function EmailTimeline({
 											}
 											animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
 											transition={{ duration: 0.32, ease: PAGE_EASE }}
-											className="whitespace-nowrap font-medium text-text-soft-400 text-xs"
+											className={cn(
+												"whitespace-nowrap font-medium text-text-soft-400",
+												compact ? "text-[9.5px]" : "text-xs",
+											)}
 										>
 											{timestamp}
 										</motion.span>
 									) : (
-										<span className="h-4 w-16 opacity-0" aria-hidden="true" />
+										<span
+											className={cn(
+												"opacity-0",
+												compact ? "h-3 w-10" : "h-4 w-16",
+											)}
+											aria-hidden="true"
+										/>
 									)}
 								</div>
 							</div>
@@ -229,14 +262,22 @@ export function EmailTimeline({
 
 					return (
 						<Fragment key={step.id}>
-							<div className="flex min-w-[90px] flex-col items-center">
+							<div
+								className={cn(
+									"flex flex-col items-center",
+									compact ? "min-w-[68px]" : "min-w-[90px]",
+								)}
+							>
 								<div className="group flex flex-col items-center">
 									{nodeBody}
 								</div>
 							</div>
 							{index < steps.length - 1 && (
 								<motion.div
-									className="mt-5 h-0 flex-1 origin-left border-stroke-soft-100 border-t-[1.5px] border-dashed dark:border-neutral-800"
+									className={cn(
+										"h-0 flex-1 origin-left border-stroke-soft-100 border-t-[1.5px] border-dashed dark:border-neutral-800",
+										compact ? "mt-3.5" : "mt-5",
+									)}
 									initial={reduceMotion ? false : { opacity: 0, scaleX: 0.4 }}
 									animate={
 										mounted

@@ -1,12 +1,12 @@
 "use client";
 
 import type { RefObject } from "react";
-import type { EmailItem } from "../_shared/data";
 import { AnimateIn } from "../_shared/animate-in";
+import type { EmailItem } from "../_shared/data";
 import { EmailsListHeader } from "./header";
+import { EmailsListTable } from "./table";
 import { EmailsListTabs } from "./tabs";
 import { EmailsListToolbar } from "./toolbar";
-import { EmailsListTable } from "./table";
 
 export function EmailsListPage({
 	emails,

@@ -1,9 +1,9 @@
 "use client";
 
 import * as Button from "@reloop/ui/button";
+import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { KbdKey } from "@reloop/ui/kbd-key";
-import { cn } from "@reloop/ui/cn";
 import { AnimateIn } from "../_shared/animate-in";
 
 const kbdClassName = cn(
@@ -48,7 +48,9 @@ export function EmailsListHeader({ mounted }: { mounted: boolean }) {
 					>
 						<Icon name="code" className="h-4 w-4 text-text-sub-600" />
 						SDK
-						<KbdKey className={cn(kbdClassName, "w-auto min-w-4 px-1")}>S</KbdKey>
+						<KbdKey className={cn(kbdClassName, "w-auto min-w-4 px-1")}>
+							S
+						</KbdKey>
 					</Button.Root>
 				</AnimateIn>
 				<AnimateIn mounted={mounted} delay={0.14} y={12}>
@@ -61,7 +63,9 @@ export function EmailsListHeader({ mounted }: { mounted: boolean }) {
 						className="gap-1.5 rounded-xl text-text-strong-950"
 					>
 						Documentation
-						<KbdKey className={cn(kbdClassName, "w-auto min-w-4 px-1")}>D</KbdKey>
+						<KbdKey className={cn(kbdClassName, "w-auto min-w-4 px-1")}>
+							D
+						</KbdKey>
 					</Button.Root>
 				</AnimateIn>
 			</div>

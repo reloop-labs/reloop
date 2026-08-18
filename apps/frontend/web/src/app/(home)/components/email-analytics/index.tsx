@@ -12,9 +12,9 @@ export function EmailAnalyticsSection() {
 				<SceneHeader
 					icon="fat-row"
 					color="blue"
-					badge="Reloop Analytics"
-					title="Opens, clicks, bounces — as they happen."
-					description="A live console for the mail you just sent. Track real-time delivery and reputation without waiting on daily dumps."
+					badge="Email Analytics"
+					title="See exactly what happens to every email."
+					description="Get a complete view of delivery, engagement, reputation, and failures, from the moment you hit send."
 					ctaLabel="Explore Analytics"
 					ctaHref="/docs/analytics"
 				/>

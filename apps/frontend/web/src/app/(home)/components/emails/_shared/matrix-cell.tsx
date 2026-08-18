@@ -27,7 +27,11 @@ export function MatrixCell({
 	const reduceMotion = useReducedMotion();
 
 	if (reduceMotion || !animateWave) {
-		return <div className={cn("flex min-w-0 items-center", className)}>{children}</div>;
+		return (
+			<div className={cn("flex min-w-0 items-center", className)}>
+				{children}
+			</div>
+		);
 	}
 
 	return (
