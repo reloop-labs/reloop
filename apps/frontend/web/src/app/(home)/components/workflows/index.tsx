@@ -9,7 +9,7 @@ export function WorkflowsSection() {
 		>
 			<SceneHeader
 				icon="workflow"
-				iconBgColor="bg-emerald-600"
+				color="emerald"
 				badge="Reloop Workflows"
 				title="Automate every lifecycle event."
 				description="Trigger sequences, add smart delays, handle webhooks, and branch on customer actions automatically."

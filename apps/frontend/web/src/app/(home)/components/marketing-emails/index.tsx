@@ -9,7 +9,7 @@ export function MarketingEmailsSection() {
 		>
 			<SceneHeader
 				icon="mega-phone"
-				iconBgColor="bg-pink-600"
+				color="pink"
 				badge="Reloop Marketing"
 				title="Reach your audience without spam flags."
 				description="Send broadcasts and newsletters with audience segmentation, warm-up protection, and high inbox delivery."

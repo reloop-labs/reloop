@@ -9,7 +9,7 @@ export function EmailAnalyticsSection() {
 		>
 			<SceneHeader
 				icon="graph-up"
-				iconBgColor="bg-blue-600"
+				color="blue"
 				badge="Reloop Analytics"
 				title="Opens, clicks, bounces — as they happen."
 				description="A live console for the mail you just sent. Track real-time delivery and reputation without waiting on daily dumps."

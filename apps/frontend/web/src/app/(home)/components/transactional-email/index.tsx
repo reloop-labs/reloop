@@ -9,8 +9,8 @@ export function TransactionalEmailSection() {
 		>
 			<SceneHeader
 				icon="send-2"
-				iconBgColor="bg-orange-500"
-				badge="Transactional Eamil"
+				color="orange"
+				badge="Transactional Email"
 				title="It starts with transactional"
 				description="One API, one SMTP relay. Same reliable payload from Node, Python, or a cron on the box."
 				ctaLabel="Explore Transactional"

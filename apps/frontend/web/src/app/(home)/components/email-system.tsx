@@ -99,43 +99,45 @@ export default function EmailSystem() {
 			</div>
 
 			<div className="border-stroke-soft-200 border-t lg:grid lg:grid-cols-[minmax(14rem,18.5rem)_minmax(0,1fr)] dark:border-white/10">
-				<aside className="top-16 z-10 border-stroke-soft-200 border-b bg-bg-white-0 lg:sticky lg:self-start lg:border-r lg:border-b-0 dark:border-white/10 dark:bg-black">
-					<nav
-						aria-label="Product scenes"
-						className="flex gap-1 overflow-x-auto px-4 py-3 [scrollbar-width:none] lg:flex-col lg:gap-0.5 lg:p-0 lg:py-10 [&::-webkit-scrollbar]:hidden"
-					>
-						{SECTIONS.map((section) => {
-							const selected = section.id === active;
-							return (
-								<button
-									key={section.id}
-									type="button"
-									onClick={() => goTo(section.id)}
-									className={cn(
-										"relative w-full shrink-0 px-3.5 py-2 text-left font-medium text-[15px] tracking-[-0.01em] transition-colors lg:py-2 lg:pr-6 lg:pl-8 lg:text-[17px]",
-										selected
-											? "font-semibold text-text-strong-950 dark:text-white"
-											: "text-text-soft-400 hover:text-text-sub-600 dark:text-white/30 dark:hover:text-white/60",
-									)}
-									aria-current={selected ? "true" : undefined}
-								>
-									{selected ? (
-										<motion.span
-											layoutId="sidebar-active-indicator"
-											className="-left-px absolute top-1 bottom-1 hidden w-[3.5px] rounded-r-full bg-blue-600 lg:block dark:bg-blue-500"
-											transition={{
-												type: "spring",
-												stiffness: 380,
-												damping: 30,
-											}}
-										/>
-									) : null}
-									{section.nav}
-								</button>
-							);
-						})}
-					</nav>
-				</aside>
+				<div className="border-stroke-soft-200 border-b lg:border-r lg:border-b-0 dark:border-white/10">
+					<aside className="top-16 z-10 bg-bg-white-0 lg:sticky dark:bg-black">
+						<nav
+							aria-label="Product scenes"
+							className="flex gap-1 overflow-x-auto px-4 py-3 [scrollbar-width:none] lg:flex-col lg:gap-0.5 lg:p-0 lg:py-10 [&::-webkit-scrollbar]:hidden"
+						>
+							{SECTIONS.map((section) => {
+								const selected = section.id === active;
+								return (
+									<button
+										key={section.id}
+										type="button"
+										onClick={() => goTo(section.id)}
+										className={cn(
+											"relative w-full shrink-0 px-3.5 py-2 text-left font-medium text-[15px] tracking-[-0.01em] transition-colors lg:py-2 lg:pr-6 lg:pl-8 lg:text-[17px]",
+											selected
+												? "font-semibold text-text-strong-950 dark:text-white"
+												: "text-text-soft-400 hover:text-text-sub-600 dark:text-white/30 dark:hover:text-white/60",
+										)}
+										aria-current={selected ? "true" : undefined}
+									>
+										{selected ? (
+											<motion.span
+												layoutId="sidebar-active-indicator"
+												className="-left-px absolute top-1 bottom-1 hidden w-[3.5px] rounded-r-full bg-blue-600 lg:block dark:bg-blue-500"
+												transition={{
+													type: "spring",
+													stiffness: 380,
+													damping: 30,
+												}}
+											/>
+										) : null}
+										{section.nav}
+									</button>
+								);
+							})}
+						</nav>
+					</aside>
+				</div>
 
 				<div>
 					{SECTIONS.map(({ id, Component }, index) => (

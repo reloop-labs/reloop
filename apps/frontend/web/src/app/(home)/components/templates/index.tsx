@@ -9,7 +9,7 @@ export function TemplatesSection() {
 		>
 			<SceneHeader
 				icon="file-text"
-				iconBgColor="bg-violet-600"
+				color="violet"
 				badge="Reloop Templates"
 				title="Code emails like components."
 				description="Build dynamic React email templates with live previews, type-safe props, and variable interpolation."
