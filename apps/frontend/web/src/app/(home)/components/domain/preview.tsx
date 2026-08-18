@@ -17,10 +17,10 @@ import {
 	stageVariants,
 } from "./_shared/page-motion";
 import type { DomainStatus } from "./_shared/status";
-import { DomainAddPage } from "./add/page";
-import { DomainDetailPage } from "./detail/page";
-import { DomainListPage } from "./list/page";
-import { DomainSetupPage } from "./setup/page";
+import { DomainAddPage } from "./add/domain-add-page";
+import { DomainDetailPage } from "./detail/domain-detail-page";
+import { DomainListPage } from "./list/domain-list-page";
+import { DomainSetupPage } from "./setup/domain-setup-page";
 
 function pointIn(
 	container: HTMLElement,

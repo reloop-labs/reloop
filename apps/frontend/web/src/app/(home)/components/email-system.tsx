@@ -33,7 +33,7 @@ const SECTIONS = [
 	},
 	{
 		id: "workflows",
-		nav: "Workflows",
+		nav: "AI workflow",
 		Component: WorkflowsSection,
 	},
 	{
@@ -77,7 +77,7 @@ export default function EmailSystem() {
 	const pickActiveFromScroll = useCallback(() => {
 		if (scrollingTo.current) return;
 
-		let next = SECTIONS[0].id;
+		let next: SectionId = SECTIONS[0].id;
 		for (const section of SECTIONS) {
 			const el = panelRefs.current[section.id];
 			if (!el) continue;

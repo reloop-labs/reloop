@@ -10,10 +10,10 @@ export function WorkflowsSection() {
 			<SceneHeader
 				icon="workflow"
 				color="emerald"
-				badge="Reloop Workflows"
+				badge="AI Workflow"
 				title="Automate every lifecycle event."
 				description="Trigger sequences, add smart delays, handle webhooks, and branch on customer actions automatically."
-				ctaLabel="Explore Workflows"
+				ctaLabel="Explore AI Workflow"
 				ctaHref="/docs/workflows"
 			/>
 

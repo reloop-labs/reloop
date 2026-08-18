@@ -8,7 +8,7 @@ export function MarketingEmailsSection() {
 			className="scroll-mt-28 px-4 py-12 sm:px-8 sm:py-16 lg:px-12 lg:py-16"
 		>
 			<SceneHeader
-				icon="contacts"
+				icon="mega-phone"
 				color="pink"
 				badge="Reloop Marketing"
 				title="Reach your audience without spam flags."

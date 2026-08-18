@@ -20,8 +20,8 @@ import {
 	INCOMING_STREAM_POOL,
 	INITIAL_EMAILS,
 } from "./_shared/data";
-import { type DetailTabId, EmailDetailPage } from "./detail/page";
-import { EmailsListPage } from "./list/page";
+import { type DetailTabId, EmailDetailPage } from "./detail/email-detail-page";
+import { EmailsListPage } from "./list/emails-list-page";
 
 const DETAIL_TABS: { id: DetailTabId; dwell: number }[] = [
 	{ id: "preview", dwell: 1600 },
