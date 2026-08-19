@@ -4,7 +4,6 @@ import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useEffect, useState } from "react";
-import { Logo } from "@reloop/ui/logo";
 import { EmailTimeline } from "../emails/detail/timeline";
 import type { AnalyticsTabId } from "./preview-scenes";
 import { PreviewTabs } from "./preview-tabs";
@@ -504,104 +503,110 @@ const INSIGHT_CHECKS: InsightCheckItem[] = [
 		description:
 			"Message size is safely below Gmail's 102 KB clipping threshold, ensuring the entire email body renders fully.",
 	},
+	{
+		id: "spf-dkim-alignment",
+		title: "SPF & DKIM identifier alignment",
+		statusLabel: "SPF and DKIM pass with aligned domain",
+		description:
+			"Strict identifier alignment prevents spoofing and guarantees primary inbox delivery.",
+	},
 ];
 
-function InsightsPreviewCard() {
-	const [expandedId, setExpandedId] = useState<string | null>(null);
-
-	const toggle = (id: string) => {
-		setExpandedId((prev) => (prev === id ? null : id));
-	};
-
+function SentDetailsPreviewCard() {
 	return (
-		<div className="relative mx-auto h-[27rem] w-full max-w-sm sm:max-w-[22rem]">
-			<article
-				className={cn(
-					"absolute inset-0 overflow-hidden rounded-[22px] border bg-bg-white-0 dark:bg-[#141414]",
-					"border-stroke-soft-200 shadow-[0_24px_60px_rgba(15,23,42,0.18)] dark:border-white/10 dark:shadow-[0_28px_70px_rgba(0,0,0,0.6)]",
-				)}
-			>
-				<div className="bg-bg-white-0 px-5 pt-6 pb-8 text-text-strong-950 sm:px-6 sm:pt-7 sm:pb-9 dark:bg-[#141414] dark:text-white">
-					<Logo className="-ml-1.5 mb-4 size-[38px] dark:invert" />
+		<div className="relative flex flex-col justify-between rounded-3xl bg-bg-weak-50 p-6 transition-all dark:bg-white/[0.04]">
+			<div className="flex items-center justify-between">
+				<p className="m-0 font-medium font-mono text-[#707070] text-[11px] uppercase tracking-[0.2em] dark:text-neutral-400">
+					SENT DETAILS
+				</p>
+			</div>
+
+			<div className="mt-4 space-y-2.5">
+				<div className="flex items-center gap-3 text-xs">
+					<span className="w-14 shrink-0 font-medium text-text-sub-600 dark:text-neutral-400">
+						From
+					</span>
+					<span className="truncate font-medium text-text-strong-950 dark:text-neutral-100">
+						Reloop &lt;notifications@reloop.sh&gt;
+					</span>
+				</div>
+				<div className="flex items-center gap-3 text-xs">
+					<span className="w-14 shrink-0 font-medium text-text-sub-600 dark:text-neutral-400">
+						To
+					</span>
+					<span className="truncate font-medium text-text-strong-950 dark:text-neutral-100">
+						noah@vercel.com
+					</span>
+				</div>
+				<div className="flex items-center gap-3 text-xs">
+					<span className="w-14 shrink-0 font-medium text-text-sub-600 dark:text-neutral-400">
+						Subject
+					</span>
+					<span className="truncate font-medium text-text-strong-950 dark:text-neutral-100">
+						Welcome to Reloop
+					</span>
+				</div>
+				<div className="flex items-center gap-3 text-xs">
+					<span className="w-14 shrink-0 font-medium text-text-sub-600 dark:text-neutral-400">
+						Date
+					</span>
+					<span className="truncate font-medium text-text-sub-600 dark:text-neutral-400">
+						17 Aug, 6:24pm
+					</span>
+				</div>
+			</div>
+		</div>
+	);
+}
+
+function InsightsPreviewCard() {
+	return (
+		<div className="relative flex h-full w-full flex-col justify-between overflow-hidden rounded-3xl bg-bg-weak-50 p-6 pr-8 transition-all sm:pr-12 lg:w-[calc(100%+2.5rem)] xl:w-[calc(100%+4rem)] dark:bg-white/[0.04]">
+			<div className="flex h-full flex-col justify-between">
+				<div>
 					<div className="flex items-center justify-between">
-						<p className="m-0 font-medium font-mono text-[#707070] text-[11.5px] uppercase tracking-[0.2em] dark:text-neutral-400">
-							DOING GREAT
-						</p>
-						<span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-2 py-0.5 font-mono text-[10.5px] font-medium text-emerald-600 dark:text-emerald-400">
+						<h3
+							className="font-medium text-[#0e0e0e] text-[20px] leading-snug tracking-tight sm:text-[22px] dark:text-white"
+							style={{ fontFamily: "Georgia, serif" }}
+						>
+							Delivery insights
+						</h3>
+						<span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-2 py-0.5 font-medium font-mono text-[10.5px] text-emerald-600 dark:text-emerald-400">
 							<span className="size-1.5 rounded-full bg-emerald-500" />
-							100% Health
+							100% Passed
 						</span>
 					</div>
-
-					<h3
-						className="mt-3 mb-3.5 font-medium text-[#0e0e0e] text-[20px] leading-snug tracking-tight sm:text-[22px] dark:text-white"
-						style={{ fontFamily: "Georgia, serif" }}
-					>
-						Delivery insights
-					</h3>
-					<div className="my-4 h-px w-full bg-[#e0e0e0] dark:bg-[#222]" />
-
-					{/* Insights Check List */}
-					<div className="space-y-3">
-						{INSIGHT_CHECKS.map((item) => {
-							const isOpen = expandedId === item.id;
-							return (
-								<div key={item.id} className="group">
-									<button
-										type="button"
-										onClick={() => toggle(item.id)}
-										className="flex w-full cursor-pointer items-center gap-2.5 text-left transition-opacity hover:opacity-80"
-									>
-										<Icon
-											name="check-circle"
-											className="size-4 shrink-0 text-emerald-500"
-										/>
-										<span className="flex-1 font-medium text-[13px] text-text-strong-950 dark:text-neutral-100">
-											{item.title}
-										</span>
-										<Icon
-											name="chevron-right"
-											className={cn(
-												"size-3 text-text-sub-600 transition-transform duration-200 dark:text-neutral-500",
-												isOpen && "rotate-90",
-											)}
-										/>
-									</button>
-
-									<AnimatePresence initial={false}>
-										{isOpen && (
-											<motion.div
-												initial={{ height: 0, opacity: 0 }}
-												animate={{ height: "auto", opacity: 1 }}
-												exit={{ height: 0, opacity: 0 }}
-												transition={{ duration: 0.2, ease: "easeInOut" }}
-												className="overflow-hidden"
-											>
-												<div className="pt-1.5 pl-6 text-[12px] text-text-sub-600 dark:text-neutral-400">
-													<p className="leading-relaxed">{item.description}</p>
-													<div className="mt-1 flex items-center gap-2">
-														<span className="font-medium text-text-strong-950 dark:text-neutral-200">
-															Status:
-														</span>
-														<span className="inline-flex items-center rounded-md bg-emerald-500/10 px-1.5 py-0.5 font-mono text-[10.5px] text-emerald-600 dark:text-emerald-400">
-															{item.statusLabel}
-														</span>
-													</div>
-												</div>
-											</motion.div>
-										)}
-									</AnimatePresence>
-								</div>
-							);
-						})}
-					</div>
+					<div className="my-3.5 h-px w-full bg-stroke-soft-100/60 dark:bg-white/10" />
 				</div>
 
-				<div
-					aria-hidden
-					className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-24 bg-gradient-to-t from-15% from-bg-white-0 to-transparent dark:from-[#141414]"
-				/>
-			</article>
+				{/* Insights Check List */}
+				<div className="flex flex-1 flex-col justify-between space-y-2 py-1">
+					{INSIGHT_CHECKS.map((item) => (
+						<div
+							key={item.id}
+							className="flex items-center justify-between gap-3 py-0.5"
+						>
+							<div className="flex min-w-0 items-center gap-2.5">
+								<span className="flex size-4 shrink-0 items-center justify-center text-emerald-500">
+									<Icon name="check-circle" className="size-4" />
+								</span>
+								<span className="truncate font-medium text-[12.5px] text-text-strong-950 dark:text-neutral-100">
+									{item.title}
+								</span>
+							</div>
+							<span className="shrink-0 font-mono text-[10.5px] text-text-sub-600 dark:text-neutral-400">
+								{item.statusLabel}
+							</span>
+						</div>
+					))}
+				</div>
+			</div>
+
+			{/* Right-side smooth fade overlay */}
+			<div
+				aria-hidden
+				className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-bg-white-0 via-bg-white-0/80 to-transparent sm:w-20 dark:from-black dark:via-black/80"
+			/>
 		</div>
 	);
 }
@@ -625,15 +630,18 @@ function EngagementView() {
 	}, []);
 
 	return (
-		<div className="relative mx-auto w-full max-w-5xl px-5 pt-8 sm:px-8 sm:pt-10 lg:px-10">
-			{/* Left element: Timeline sequence */}
-			<div className="w-full max-w-xl lg:max-w-[34rem]">
-				<EmailTimeline status={status} mounted={true} compact={false} />
-			</div>
+		<div className="relative mx-auto w-full max-w-5xl px-4 pt-4 pb-6 sm:px-6 sm:pt-6 lg:px-8">
+			<div className="grid grid-cols-1 items-stretch gap-4 lg:grid-cols-12 lg:gap-5">
+				{/* Left column: 2 Stacked Cards (Top: Sent Details, Bottom: Timeline) */}
+				<div className="flex flex-col gap-4 lg:col-span-7 lg:gap-5">
+					<SentDetailsPreviewCard />
+					<EmailTimeline status={status} mounted={true} compact={false} />
+				</div>
 
-			{/* Right overlapping floating insights card */}
-			<div className="relative z-10 -mt-10 w-full max-w-sm sm:max-w-[22rem] lg:absolute lg:top-4 lg:right-4 lg:mt-0 xl:right-10">
-				<InsightsPreviewCard />
+				{/* Right column: Delivery Insights Card matching full height */}
+				<div className="relative flex flex-col lg:col-span-5">
+					<InsightsPreviewCard />
+				</div>
 			</div>
 		</div>
 	);
@@ -710,7 +718,7 @@ export function PreviewStage() {
 	return (
 		<div className="bg-bg-white-0 dark:bg-black">
 			<div className="relative overflow-hidden">
-				<div className="relative mx-auto h-[24rem] max-w-5xl px-0 pt-0 sm:h-[26rem] lg:h-[28rem]">
+				<div className="relative mx-auto min-h-[25rem] max-w-5xl px-0 pt-0 sm:min-h-[27rem] lg:min-h-[29rem]">
 					<AnimatePresence initial={false} custom={direction} mode="popLayout">
 						<motion.div
 							key={active}
@@ -741,7 +749,7 @@ export function PreviewStage() {
 					className={cn(
 						"pointer-events-none absolute inset-x-0 bottom-0 z-20 transition-all duration-300",
 						active === "engagement"
-							? "h-44 bg-gradient-to-t from-15% from-[#fbfbfb] via-[#fbfbfb]/80 to-transparent dark:from-[#0a0a0a] dark:via-[#0a0a0a]/80"
+							? "hidden"
 							: "h-6 bg-gradient-to-t from-[#fbfbfb]/50 to-transparent dark:from-black/50",
 					)}
 				/>
