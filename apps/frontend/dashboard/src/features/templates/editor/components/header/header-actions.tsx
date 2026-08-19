@@ -20,14 +20,7 @@ import { TestEmailModal } from "../panels/test/test-email-modal";
 import { DeleteTemplateModal } from "./delete-template-modal";
 import { PublishTemplateModal } from "./publish-template-modal";
 
-const viewModes = [
-	"visual",
-	"ai",
-	"code",
-	"history",
-	"variables",
-	"score",
-] as const;
+const viewModes = ["visual", "code", "history", "variables"] as const;
 
 const isViewMode = (id: string): id is (typeof viewModes)[number] =>
 	(viewModes as readonly string[]).includes(id);

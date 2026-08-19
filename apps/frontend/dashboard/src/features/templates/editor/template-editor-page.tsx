@@ -1,30 +1,22 @@
 import { cn } from "@reloop/ui/cn";
 import { AnimatePresence, motion } from "motion/react";
 import { parseAsStringLiteral, useQueryState } from "nuqs";
-import { AIPanel } from "./ai/ai-panel";
+import { BlockPalette } from "./components/block-palette";
 import { FullEmailBuilder } from "./components/canvas/email-builder";
 import { GeneratingOverlay } from "./components/canvas/generating-overlay";
 import { CodeEditor } from "./components/panels/code/code-view";
 import { VersionSidebar } from "./components/panels/history/version-sidebar";
-import { ScorePanel } from "./components/panels/score/score-panel";
 import { VariablesPanel } from "./components/panels/variables/variables-panel";
 import { SendDetails } from "./components/send-details/send-details";
 import { EmailInspector } from "./inspector";
 import { EditorProvider } from "./providers/editor-provider";
 
-const viewModes = [
-	"visual",
-	"ai",
-	"code",
-	"history",
-	"variables",
-	"score",
-] as const;
+const viewModes = ["visual", "code", "history", "variables"] as const;
 
 export function TemplateEditorPage({ templateId }: { templateId: string }) {
 	const [viewMode, setViewMode] = useQueryState(
 		"mode",
-		parseAsStringLiteral(viewModes).withDefault("ai"),
+		parseAsStringLiteral(viewModes).withDefault("visual"),
 	);
 
 	const isCodeSplit = viewMode === "code";
@@ -33,27 +25,21 @@ export function TemplateEditorPage({ templateId }: { templateId: string }) {
 		<EditorProvider key={templateId} roomId={templateId}>
 			<div className="flex h-full min-h-0 flex-1 items-stretch overflow-hidden bg-bg-white-0 dark:bg-black">
 				<div className="flex h-full min-h-0 flex-1 overflow-hidden">
-					{/* Left panel / Sidebar (Chat by default, or Code/History/Variables/Score/Test) */}
+					{/* Left panel / Sidebar (Block Palette by default, or Code) */}
 					<div
 						className={cn(
 							"relative flex shrink-0 overflow-hidden border-stroke-soft-200 border-r transition-all duration-300 dark:border-stroke-soft-100/40",
-							isCodeSplit ? "w-1/2 min-w-[480px]" : "w-[360px]",
+							isCodeSplit ? "w-1/2 min-w-[480px]" : "w-72",
 						)}
 					>
-						{viewMode === "code" && (
-							<CodeEditor onClose={() => void setViewMode("ai")} />
+						{viewMode === "code" ? (
+							<CodeEditor onClose={() => void setViewMode("visual")} />
+						) : (
+							<BlockPalette />
 						)}
-						{viewMode === "history" && <VersionSidebar />}
-						{viewMode === "variables" && (
-							<VariablesPanel onClose={() => void setViewMode("ai")} />
-						)}
-						{viewMode === "score" && (
-							<ScorePanel onClose={() => void setViewMode("ai")} />
-						)}
-						{(viewMode === "ai" || viewMode === "visual") && <AIPanel />}
 					</div>
 
-					{/* Center/Right panel (Visual builder + inspector) */}
+					{/* Center/Right panel (Visual builder + inspector/history/variables) */}
 					<div className="relative flex min-h-0 flex-1 overflow-hidden bg-bg-white-0 dark:bg-black">
 						<main className="flex h-full flex-1 flex-col overflow-hidden">
 							<SendDetails />
@@ -77,7 +63,15 @@ export function TemplateEditorPage({ templateId }: { templateId: string }) {
 									className="h-full shrink-0 overflow-hidden border-stroke-soft-200 border-l bg-transparent dark:border-stroke-soft-100/40"
 								>
 									<div className="h-full w-72 overflow-y-auto overflow-x-hidden">
-										<EmailInspector />
+										{viewMode === "history" && <VersionSidebar />}
+										{viewMode === "variables" && (
+											<VariablesPanel
+												onClose={() => void setViewMode("visual")}
+											/>
+										)}
+										{viewMode !== "history" && viewMode !== "variables" && (
+											<EmailInspector />
+										)}
 									</div>
 								</motion.div>
 							)}

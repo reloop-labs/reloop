@@ -18,15 +18,7 @@ import { useTemplateId } from "#/features/templates/editor/hooks/use-template-id
 import { getAvatarGradient, getAvatarInitial } from "#/utils/avatar";
 import { PreviewModal } from "../../preview/preview-modal";
 
-const viewModes = [
-	"visual",
-	"ai",
-	"code",
-	"history",
-	"variables",
-	"score",
-	"test",
-] as const;
+const viewModes = ["visual", "code", "history", "variables", "test"] as const;
 
 interface TemplateVersion {
 	id: string;
@@ -493,7 +485,7 @@ export function VersionSidebar() {
 				</h2>
 				<button
 					type="button"
-					onClick={() => setViewMode("ai")}
+					onClick={() => setViewMode("visual")}
 					className="rounded-lg p-1.5 text-text-soft-400 transition-all hover:bg-bg-weak-50 hover:text-text-strong-950"
 				>
 					<Icon name="cross" className="h-[18px] w-[18px]" />

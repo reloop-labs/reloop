@@ -234,10 +234,8 @@ export function CodeEditor({ onClose }: { onClose?: () => void } = {}) {
 						fontSize: "12px",
 						height: "100%",
 						width: "100%",
-						borderRadius: "24px",
-						overflow: "hidden",
 					}}
-					className="h-full w-full overflow-hidden rounded-[24px] font-mono"
+					className="h-full w-full font-mono"
 				/>
 			</div>
 		</div>
