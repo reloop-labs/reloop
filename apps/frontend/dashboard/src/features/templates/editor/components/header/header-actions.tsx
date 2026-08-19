@@ -16,6 +16,7 @@ import { useTemplateId } from "#/features/templates/editor/hooks/use-template-id
 import { getRenderedEmailHtml } from "#/features/templates/editor/utils/get-rendered-email-html";
 import { CollabPresence } from "../../collobration/Collabpresence";
 import type { ConnectionStatus as ConnectionStatusType } from "../../collobration/hooks/useCollaboration";
+import { TestEmailModal } from "../panels/test/test-email-modal";
 import { DeleteTemplateModal } from "./delete-template-modal";
 import { PublishTemplateModal } from "./publish-template-modal";
 
@@ -26,7 +27,6 @@ const viewModes = [
 	"history",
 	"variables",
 	"score",
-	"test",
 ] as const;
 
 const isViewMode = (id: string): id is (typeof viewModes)[number] =>
@@ -111,6 +111,7 @@ export const HeaderActions = ({
 	// Dialog States
 	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 	const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
+	const [isTestModalOpen, setIsTestModalOpen] = useState(false);
 
 	const currentTab = buttonRefs.current[hoverIdx ?? -1];
 	const currentRect = currentTab?.getBoundingClientRect();
@@ -226,6 +227,8 @@ export const HeaderActions = ({
 			setIsDeleteModalOpen(true);
 		} else if (itemId === "duplicate") {
 			handleDuplicate();
+		} else if (itemId === "test") {
+			setIsTestModalOpen(true);
 		} else if (isViewMode(itemId)) {
 			setViewMode(itemId);
 		}
@@ -302,6 +305,11 @@ export const HeaderActions = ({
 			>
 				{isPublishing ? "Publishing..." : "Publish"}
 			</FancyButton.Root>
+
+			<TestEmailModal
+				isOpen={isTestModalOpen}
+				onClose={() => setIsTestModalOpen(false)}
+			/>
 
 			{/* Delete Confirmation Modal */}
 			<DeleteTemplateModal

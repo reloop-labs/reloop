@@ -7,7 +7,6 @@ import { GeneratingOverlay } from "./components/canvas/generating-overlay";
 import { CodeEditor } from "./components/panels/code/code-view";
 import { VersionSidebar } from "./components/panels/history/version-sidebar";
 import { ScorePanel } from "./components/panels/score/score-panel";
-import { TestPanel } from "./components/panels/test/test-panel";
 import { VariablesPanel } from "./components/panels/variables/variables-panel";
 import { SendDetails } from "./components/send-details/send-details";
 import { EmailInspector } from "./inspector";
@@ -20,7 +19,6 @@ const viewModes = [
 	"history",
 	"variables",
 	"score",
-	"test",
 ] as const;
 
 export function TemplateEditorPage({ templateId }: { templateId: string }) {
@@ -51,9 +49,6 @@ export function TemplateEditorPage({ templateId }: { templateId: string }) {
 						)}
 						{viewMode === "score" && (
 							<ScorePanel onClose={() => void setViewMode("ai")} />
-						)}
-						{viewMode === "test" && (
-							<TestPanel onClose={() => void setViewMode("ai")} />
 						)}
 						{(viewMode === "ai" || viewMode === "visual") && <AIPanel />}
 					</div>
