@@ -634,6 +634,33 @@ function PresenceCursor({
 	);
 }
 
+/** Text caret: vertical insertion bar + name flag. Distinct from the mouse cursor. */
+function PresenceCaret({
+	user,
+	className,
+}: {
+	user: Collaborator;
+	className?: string;
+}) {
+	return (
+		<span
+			aria-hidden
+			className={cn(
+				"relative z-20 mx-px inline-block h-[1.15em] w-0.5 shrink-0 align-text-bottom",
+				className,
+			)}
+			style={{ backgroundColor: user.cursorFill }}
+		>
+			<span
+				className="absolute bottom-full left-0 z-20 mb-px whitespace-nowrap rounded px-1.5 py-[3px] font-semibold text-[10px] leading-none"
+				style={{ backgroundColor: user.cursorFill, color: user.cursorInk }}
+			>
+				{user.firstName}
+			</span>
+		</span>
+	);
+}
+
 function RealtimeEditorView() {
 	const [activeSpotlight, setActiveSpotlight] = useState<CollaboratorId | null>(
 		"sarah",
@@ -725,7 +752,7 @@ function RealtimeEditorView() {
 
 			{/* Document Header Fields (From, To, Subject) */}
 			<div className="space-y-2 border-stroke-soft-100 border-b p-4 text-xs sm:px-6 dark:border-white/5">
-				{/* From Row with Alex's Cursor */}
+				{/* From Row with Alex's caret */}
 				<div className="flex items-center justify-between text-text-sub-600 dark:text-white/70">
 					<div className="flex items-center gap-3">
 						<span className="w-10 text-text-soft-400 dark:text-white/40">
@@ -740,6 +767,7 @@ function RealtimeEditorView() {
 							)}
 						>
 							<span>Maya C</span>
+							<PresenceCaret user={COLLABORATORS.alex} />
 							<span className="text-text-soft-400 dark:text-white/40">
 								&lt;maya@updates.reloop.sh&gt;
 							</span>
@@ -771,6 +799,7 @@ function RealtimeEditorView() {
 							>
 								Early Access Developers ×
 							</span>
+							<PresenceCaret user={COLLABORATORS.maya} />
 						</div>
 					</div>
 					<span className="text-[10.5px] text-text-soft-400 dark:text-white/40">
@@ -778,7 +807,7 @@ function RealtimeEditorView() {
 					</span>
 				</div>
 
-				{/* Subject Row with Sarah's Cursor */}
+				{/* Subject Row with Sarah's caret */}
 				<div className="flex items-center justify-between text-text-sub-600 dark:text-white/70">
 					<div className="flex items-center gap-3">
 						<span className="w-10 text-text-soft-400 dark:text-white/40">
@@ -793,6 +822,7 @@ function RealtimeEditorView() {
 							)}
 						>
 							<span>Introducing Reloop 2.0</span>
+							<PresenceCaret user={COLLABORATORS.sarah} />
 							<span className="text-text-sub-600 dark:text-white/70">
 								{" "}
 								— Real-time Email Engine
@@ -807,7 +837,7 @@ function RealtimeEditorView() {
 
 			{/* Main Email Content Body */}
 			<div className="space-y-3.5 p-5 text-left sm:p-6">
-				{/* Greeting with Noah's Cursor & Highlight */}
+				{/* Greeting with Noah's caret */}
 				<div
 					onMouseEnter={() => setHoveredUser("noah")}
 					onMouseLeave={() => setHoveredUser(null)}
@@ -822,6 +852,7 @@ function RealtimeEditorView() {
 					>
 						developers
 					</span>
+					<PresenceCaret user={COLLABORATORS.noah} />
 					<span>,</span>
 				</div>
 
