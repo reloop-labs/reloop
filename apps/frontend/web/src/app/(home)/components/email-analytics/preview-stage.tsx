@@ -561,7 +561,7 @@ function SentDetailsPreviewCard() {
 
 function InsightsPreviewCard() {
 	return (
-		<div className="relative flex h-full w-full flex-col justify-between overflow-hidden rounded-3xl bg-bg-weak-50 p-6 pr-8 transition-all sm:pr-12 lg:w-[calc(100%+2.5rem)] xl:w-[calc(100%+4rem)] dark:bg-white/[0.04]">
+		<div className="relative flex h-full w-full flex-col justify-between overflow-hidden rounded-3xl bg-bg-weak-50 p-6 pr-8 transition-all lg:w-[calc(100%+2.5rem)] xl:w-[calc(100%+4rem)] dark:bg-white/[0.04]">
 			<div className="flex h-full flex-col justify-between">
 				<div>
 					<div className="flex items-center justify-between">
@@ -605,7 +605,7 @@ function InsightsPreviewCard() {
 			{/* Right-side smooth fade overlay */}
 			<div
 				aria-hidden
-				className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-bg-white-0 via-bg-white-0/80 to-transparent sm:w-20 dark:from-black dark:via-black/80"
+				className="pointer-events-none absolute inset-y-0 right-0 z-10 w-[174px] bg-gradient-to-l from-white to-transparent dark:from-black"
 			/>
 		</div>
 	);

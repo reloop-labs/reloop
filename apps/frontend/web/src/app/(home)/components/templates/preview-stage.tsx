@@ -3,11 +3,35 @@
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
+import { Logo } from "@reloop/ui/logo";
 import * as Switch from "@reloop/ui/switch";
+import { SdkCodeBlock } from "@reloop/web/app/sdk/components/sdk-code-block";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { useState } from "react";
+import {
+	type CSSProperties,
+	type RefObject,
+	useEffect,
+	useRef,
+	useState,
+} from "react";
 import type { TemplateTabId } from "./preview-scenes";
 import { PreviewTabs } from "./preview-tabs";
+
+const SEND_OTP_CODE = `import Reloop from 'reloop-email';
+
+const reloop = new Reloop(process.env.RELOOP_API_KEY);
+
+const { data, error } = await reloop.emails.send({
+  from: 'Reloop <verify@reloop.sh>',
+  to: ['maya@northwind.io'],
+  subject: 'Your Reloop login code',
+  template: {
+    id: 'otp',
+    variables: {
+      OTP: '842190',
+    },
+  },
+});`;
 
 const TAB_ORDER: TemplateTabId[] = [
 	"ai-templates",
@@ -16,8 +40,66 @@ const TAB_ORDER: TemplateTabId[] = [
 ];
 
 const EASE_DEFAULT: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
+const EASE_OUT: [number, number, number, number] = [0.23, 1, 0.32, 1];
+const EASE_MOVE: [number, number, number, number] = [0.77, 0, 0.175, 1];
 const SLIDE_PX = 160;
 const SLIDE_MS = 0.28;
+
+const DEMO_PROMPT = "generate login code for Reloop";
+const EMAIL_HEADING = "Your login code for Reloop.";
+const EMAIL_BODY =
+	"This link and code will only be valid for the next 5 minutes. If the link does not work, you can use the login verification code directly:";
+const EMAIL_FOOTER =
+	"If you didn't request this code, you can safely ignore this email.";
+
+type GeneratePhase =
+	| "idle"
+	| "pending"
+	| "generating"
+	| "centered"
+	| "composed";
+
+type EmailReveal = {
+	label: boolean;
+	headingChars: number;
+	rule: boolean;
+	bodyChars: number;
+	otp: boolean;
+	cta: boolean;
+	footer: boolean;
+};
+
+const EMAIL_HIDDEN: EmailReveal = {
+	label: false,
+	headingChars: 0,
+	rule: false,
+	bodyChars: 0,
+	otp: false,
+	cta: false,
+	footer: false,
+};
+
+const EMAIL_FULL: EmailReveal = {
+	label: true,
+	headingChars: EMAIL_HEADING.length,
+	rule: true,
+	bodyChars: EMAIL_BODY.length,
+	otp: true,
+	cta: true,
+	footer: true,
+};
+
+function wait(ms: number) {
+	return new Promise<void>((resolve) => {
+		setTimeout(resolve, ms);
+	});
+}
+
+function typeDelay(char: string) {
+	if (char === " ") return 12;
+	if (char === "," || char === ".") return 40;
+	return 16;
+}
 
 const contentVariants = {
 	enter: (dir: number) => ({
@@ -34,138 +116,395 @@ const contentVariants = {
 	}),
 };
 
-/* --- Scene 1: AI Email Templates View (Minimalist Chat + Email Sheet Preview) --- */
+/* --- Scene 1: AI Email Templates View (send.ts + overlapping OTP email) --- */
 function AiTemplatesView() {
+	const shouldReduceMotion = useReducedMotion();
+	const [phase, setPhase] = useState<GeneratePhase>("idle");
+	const [prompt, setPrompt] = useState("");
+	const [reveal, setReveal] = useState<EmailReveal>(EMAIL_HIDDEN);
+	const userEdited = useRef(false);
+	const inputRef = useRef<HTMLInputElement>(null);
+	const phaseRef = useRef(phase);
+	phaseRef.current = phase;
+
+	const startGenerate = () => {
+		if (phaseRef.current !== "idle") return;
+		setPhase("pending");
+	};
+	const startGenerateRef = useRef(startGenerate);
+	startGenerateRef.current = startGenerate;
+
+	useEffect(() => {
+		if (phase !== "idle") return;
+		const timer = window.setTimeout(() => inputRef.current?.focus(), 0);
+		return () => window.clearTimeout(timer);
+	}, [phase]);
+
+	useEffect(() => {
+		if (phase !== "pending") return;
+		const timer = window.setTimeout(() => {
+			if (shouldReduceMotion) {
+				setReveal(EMAIL_FULL);
+				setPhase("composed");
+				return;
+			}
+			setReveal(EMAIL_HIDDEN);
+			setPhase("generating");
+		}, 1000);
+		return () => window.clearTimeout(timer);
+	}, [phase, shouldReduceMotion]);
+
+	useEffect(() => {
+		if (shouldReduceMotion) {
+			setPrompt(DEMO_PROMPT);
+			return;
+		}
+		if (phase !== "idle" || userEdited.current) return;
+		let index = 0;
+		let cancelled = false;
+		const tick = async () => {
+			await wait(700);
+			while (!cancelled && index < DEMO_PROMPT.length) {
+				if (userEdited.current) return;
+				index += 1;
+				setPrompt(DEMO_PROMPT.slice(0, index));
+				await wait(DEMO_PROMPT[index - 1] === " " ? 18 : 28);
+			}
+			if (cancelled || userEdited.current) return;
+			await wait(420);
+			if (!cancelled && !userEdited.current) startGenerateRef.current();
+		};
+		void tick();
+		return () => {
+			cancelled = true;
+		};
+	}, [phase, shouldReduceMotion]);
+
+	useEffect(() => {
+		if (phase !== "generating") return;
+		let cancelled = false;
+		const run = async () => {
+			await wait(220);
+			if (cancelled) return;
+			setReveal((current) => ({ ...current, label: true }));
+			for (let i = 1; i <= EMAIL_HEADING.length; i += 1) {
+				if (cancelled) return;
+				setReveal((current) => ({ ...current, headingChars: i }));
+				await wait(typeDelay(EMAIL_HEADING[i - 1] ?? ""));
+			}
+			if (cancelled) return;
+			setReveal((current) => ({ ...current, rule: true }));
+			await wait(90);
+			for (let i = 1; i <= EMAIL_BODY.length; i += 1) {
+				if (cancelled) return;
+				setReveal((current) => ({ ...current, bodyChars: i }));
+				await wait(typeDelay(EMAIL_BODY[i - 1] ?? ""));
+			}
+			if (cancelled) return;
+			await wait(140);
+			setReveal((current) => ({ ...current, otp: true }));
+			await wait(220);
+			setReveal((current) => ({ ...current, cta: true, footer: true }));
+			await wait(480);
+			if (!cancelled) setPhase("centered");
+		};
+		void run();
+		return () => {
+			cancelled = true;
+		};
+	}, [phase]);
+
+	useEffect(() => {
+		if (phase !== "centered") return;
+		const timer = window.setTimeout(() => setPhase("composed"), 560);
+		return () => window.clearTimeout(timer);
+	}, [phase]);
+
+	const headingDone = reveal.headingChars >= EMAIL_HEADING.length;
+	const bodyDone = reveal.bodyChars >= EMAIL_BODY.length;
+	const showSearch =
+		phase === "idle" || phase === "pending" || phase === "generating";
+	const showEmail =
+		phase === "generating" || phase === "centered" || phase === "composed";
+	const showCode = phase === "composed";
+
 	return (
-		<div className="relative mx-auto w-full max-w-3xl overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 shadow-xs dark:border-white/10 dark:bg-[#0c0c0e]">
-			<div className="grid grid-cols-1 divide-y divide-stroke-soft-100 sm:grid-cols-[1.05fr_1.1fr] sm:divide-x sm:divide-y-0 dark:divide-white/10">
-				{/* Left Panel: Chat Interface */}
-				<div className="flex min-h-[440px] flex-col justify-between p-5 sm:p-6">
-					{/* Message Stream */}
-					<div className="space-y-3.5">
-						{/* User Message 1 */}
-						<div className="flex flex-col items-end">
-							<div className="rounded-2xl rounded-tr-xs bg-bg-weak-50 px-3.5 py-2 text-text-strong-950 text-xs dark:bg-white/[0.06] dark:text-white">
-								<p className="font-mono text-[11px] leading-relaxed">
-									Build an order confirmation receipt with item breakdown and
-									PDF download
-								</p>
-							</div>
-						</div>
+		<div className="relative h-full min-h-[25rem] w-full">
+			<AnimatePresence>
+				{showCode ? (
+					<motion.div
+						key="send-code"
+						initial={
+							shouldReduceMotion
+								? false
+								: { opacity: 0, x: -24, filter: "blur(4px)" }
+						}
+						animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
+						transition={
+							shouldReduceMotion
+								? { duration: 0 }
+								: { duration: 0.5, ease: EASE_OUT, delay: 0.06 }
+						}
+						className="absolute top-0 left-0 w-full max-w-xl lg:max-w-[34rem]"
+					>
+						<SdkCodeBlock
+							code={SEND_OTP_CODE}
+							slug="nodejs"
+							lang="typescript"
+							path="send.ts"
+						/>
+					</motion.div>
+				) : null}
+			</AnimatePresence>
 
-						{/* AI Response 1 with Skeletons */}
-						<div className="space-y-1.5 pt-0.5">
-							<div className="flex items-center gap-1.5 text-[10px] text-text-soft-400 dark:text-white/40">
-								<span className="size-1.5 rounded-full bg-emerald-500" />
-								<span>Reloop AI</span>
-							</div>
-
-							<div className="space-y-1.5 rounded-xl rounded-tl-xs border border-stroke-soft-100 bg-bg-weak-50/40 p-2.5 dark:border-white/5 dark:bg-white/[0.02]">
-								<div className="h-2 w-3/4 rounded-full bg-stroke-soft-200 dark:bg-white/15" />
-								<div className="h-2 w-1/2 rounded-full bg-stroke-soft-200 dark:bg-white/10" />
-							</div>
-						</div>
-
-						{/* User Follow-up Message */}
-						<div className="flex flex-col items-end">
-							<div className="rounded-2xl rounded-tr-xs bg-bg-weak-50 px-3.5 py-2 text-text-strong-950 text-xs dark:bg-white/[0.06] dark:text-white">
-								<p className="font-mono text-[11px] leading-relaxed">
-									Add line item table for Pro Plan and dedicated IP
-								</p>
-							</div>
-						</div>
-
-						{/* AI Response 2 with Skeletons */}
-						<div className="space-y-1.5">
-							<div className="space-y-1.5 rounded-xl rounded-tl-xs border border-stroke-soft-100 bg-bg-weak-50/40 p-2.5 dark:border-white/5 dark:bg-white/[0.02]">
-								<div className="h-2 w-5/6 rounded-full bg-stroke-soft-200 dark:bg-white/15" />
-								<div className="h-2 w-3/5 rounded-full bg-stroke-soft-100 dark:bg-white/10" />
-							</div>
-
-							{/* Thinking Dots */}
-							<div className="flex items-center gap-1 pl-1 text-text-soft-400 text-xs dark:text-white/40">
-								<span className="size-1 animate-bounce rounded-full bg-text-soft-400 [animation-delay:-0.3s] dark:bg-white/40" />
-								<span className="size-1 animate-bounce rounded-full bg-text-soft-400 [animation-delay:-0.15s] dark:bg-white/40" />
-								<span className="size-1 animate-bounce rounded-full bg-text-soft-400 dark:bg-white/40" />
-							</div>
-						</div>
-					</div>
-
-					{/* Bottom Chat Prompt Input */}
-					<div className="mt-4 flex items-center justify-between rounded-xl border border-stroke-soft-200 bg-bg-weak-50/50 p-1.5 pl-3 dark:border-white/10 dark:bg-white/[0.02]">
-						<div className="flex items-center gap-1 text-[11px] text-text-soft-400 dark:text-white/40">
-							<span>Ask agent to edit styles or wire props...</span>
-							<span className="animate-pulse text-text-strong-950 dark:text-white">
-								|
-							</span>
-						</div>
-						<button
-							type="button"
-							className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-[#FF5722] text-white shadow-xs transition-opacity hover:opacity-90 dark:bg-[#FF6E40]"
-							title="Send prompt"
+			<div
+				className={cn(
+					"absolute inset-0 z-10 flex",
+					phase === "composed"
+						? "items-start justify-end pt-6 pr-0 xl:pr-2"
+						: "items-start justify-center pt-2",
+				)}
+			>
+				<AnimatePresence>
+					{showEmail ? (
+						<motion.div
+							key="otp-email"
+							layout={!shouldReduceMotion}
+							initial={
+								shouldReduceMotion ? false : { opacity: 0, y: 14, scale: 0.96 }
+							}
+							animate={{ opacity: 1, y: 0, scale: 1 }}
+							transition={
+								shouldReduceMotion
+									? { duration: 0 }
+									: {
+											layout: { duration: 0.55, ease: EASE_MOVE },
+											opacity: { duration: 0.32, ease: EASE_OUT },
+											y: { duration: 0.4, ease: EASE_OUT },
+											scale: { duration: 0.4, ease: EASE_OUT },
+										}
+							}
+							className="w-full max-w-md"
 						>
-							<span className="font-bold text-xs">↑</span>
-						</button>
-					</div>
-				</div>
-
-				{/* Right Panel: Email Document Sheet with Skeletons */}
-				<div className="flex min-h-[440px] items-center justify-center bg-bg-weak-50/30 p-5 sm:p-6 dark:bg-white/[0.01]">
-					<div className="w-full max-w-[280px] space-y-3.5 rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-5 shadow-xs dark:border-white/10 dark:bg-[#111114]">
-						{/* Document Header Skeleton Bars */}
-						<div className="space-y-1.5">
-							<div className="h-3 w-3/4 rounded-full bg-text-strong-950/80 dark:bg-white/80" />
-							<div className="h-2 w-1/2 rounded-full bg-stroke-soft-200 dark:bg-white/20" />
-						</div>
-
-						{/* Body Skeletons */}
-						<div className="space-y-1 pt-0.5">
-							<div className="h-1.5 w-full rounded-full bg-stroke-soft-100 dark:bg-white/10" />
-							<div className="h-1.5 w-4/5 rounded-full bg-stroke-soft-100 dark:bg-white/10" />
-						</div>
-
-						{/* Transactional Invoice Card with Breakdown */}
-						<div className="rounded-lg border border-stroke-soft-100 bg-bg-weak-50/50 p-3 text-xs dark:border-white/5 dark:bg-white/[0.02]">
-							<div className="flex items-center justify-between font-mono text-[10px] text-text-sub-600 dark:text-white/70">
-								<span>Invoice #ACME-8921</span>
-								<span className="font-semibold text-text-strong-950 dark:text-white">
-									$64.00
-								</span>
-							</div>
-							<div className="mt-2 space-y-1 border-stroke-soft-100 border-t pt-1.5 text-[9.5px] dark:border-white/5">
-								<div className="flex justify-between text-text-sub-600 dark:text-white/70">
-									<span>Pro Developer Plan</span>
-									<span>$49.00</span>
-								</div>
-								<div className="flex justify-between text-text-soft-400 dark:text-white/40">
-									<span>Dedicated IP Add-on</span>
-									<span>$15.00</span>
-								</div>
-							</div>
-						</div>
-
-						{/* Action Buttons with Reloop UI FancyButton */}
-						<div className="space-y-1.5 pt-0.5">
-							<FancyButton.Root
-								variant="neutral"
-								size="xsmall"
-								className="w-full rounded-lg! px-3!"
+							<div
+								className={cn(
+									"overflow-hidden rounded-[22px] border border-stroke-soft-200 bg-bg-white-0 p-5 sm:p-6 dark:border-white/10 dark:bg-[#0c0c0e]",
+									"shadow-[0_24px_60px_rgba(15,23,42,0.14)] dark:shadow-[0_24px_60px_rgba(0,0,0,0.5)]",
+								)}
 							>
-								<span>Download Receipt (PDF) →</span>
-							</FancyButton.Root>
-							<span className="flex h-6 w-full items-center justify-center text-[10.5px] text-text-soft-400 hover:text-text-strong-950 dark:text-white/50">
-								View in dashboard →
-							</span>
-						</div>
-
-						{/* Footer Skeletons */}
-						<div className="space-y-1 border-stroke-soft-100 border-t pt-2 dark:border-white/5">
-							<div className="mx-auto h-1 w-2/3 rounded-full bg-stroke-soft-100 dark:bg-white/10" />
-							<div className="mx-auto h-1 w-1/3 rounded-full bg-stroke-soft-100 dark:bg-white/10" />
-						</div>
-					</div>
-				</div>
+								<GeneratedOtpEmail
+									reveal={reveal}
+									headingDone={headingDone}
+									bodyDone={bodyDone}
+								/>
+							</div>
+						</motion.div>
+					) : null}
+				</AnimatePresence>
 			</div>
+
+			<AnimatePresence>
+				{showSearch ? (
+					<motion.form
+						key="ai-prompt"
+						onSubmit={(event) => {
+							event.preventDefault();
+							if (!prompt.trim()) return;
+							startGenerate();
+						}}
+						initial={false}
+						animate={
+							phase === "idle" || phase === "pending"
+								? { top: "46%", y: "-50%", opacity: 1 }
+								: { top: "100%", y: "-100%", opacity: 1 }
+						}
+						exit={
+							shouldReduceMotion
+								? { opacity: 0 }
+								: { top: "100%", y: "24%", opacity: 0 }
+						}
+						transition={
+							shouldReduceMotion
+								? { duration: 0 }
+								: { duration: 0.42, ease: EASE_OUT }
+						}
+						className="-translate-x-1/2 absolute left-1/2 z-30 w-full max-w-md px-1"
+					>
+						<AiPromptBar
+							value={prompt}
+							disabled={phase !== "idle"}
+							loading={phase === "pending"}
+							inputRef={inputRef}
+							onChange={(value) => {
+								userEdited.current = true;
+								setPrompt(value);
+							}}
+						/>
+					</motion.form>
+				) : null}
+			</AnimatePresence>
+		</div>
+	);
+}
+
+function TypeSlot({
+	as: Tag = "p",
+	full,
+	typed,
+	showCaret,
+	className,
+	style,
+}: {
+	as?: "p" | "h3";
+	full: string;
+	typed: string;
+	showCaret: boolean;
+	className?: string;
+	style?: CSSProperties;
+}) {
+	return (
+		<Tag className={cn("relative", className)} style={style}>
+			<span className="invisible" aria-hidden>
+				{full}
+			</span>
+			<span className="absolute inset-0">
+				{typed}
+				{showCaret ? (
+					<span className="animate-pulse text-text-strong-950 dark:text-white">
+						|
+					</span>
+				) : null}
+			</span>
+		</Tag>
+	);
+}
+
+function GeneratedOtpEmail({
+	reveal,
+	headingDone,
+	bodyDone,
+}: {
+	reveal: EmailReveal;
+	headingDone: boolean;
+	bodyDone: boolean;
+}) {
+	return (
+		<>
+			<Logo className="-ml-1 mb-4 size-[40px] dark:invert" />
+
+			<p
+				className={cn(
+					"m-0 font-medium font-mono text-[#707070] text-[11px] uppercase tracking-[0.2em]",
+					!reveal.label && "opacity-0",
+				)}
+			>
+				Login Verification
+			</p>
+
+			<TypeSlot
+				as="h3"
+				full={EMAIL_HEADING}
+				typed={EMAIL_HEADING.slice(0, reveal.headingChars)}
+				showCaret={!headingDone}
+				className="mt-2 mb-4 p-0 font-medium text-[#0e0e0e] text-[22px] leading-snug tracking-tight dark:text-white"
+				style={{ fontFamily: "Georgia, serif" }}
+			/>
+
+			<div
+				className={cn(
+					"h-px w-full bg-[#e0e0e0] dark:bg-[#222]",
+					!reveal.rule && "opacity-0",
+				)}
+			/>
+
+			<TypeSlot
+				full={EMAIL_BODY}
+				typed={EMAIL_BODY.slice(0, reveal.bodyChars)}
+				showCaret={headingDone && !bodyDone}
+				className="mt-4 text-[#555555] text-[15px] leading-[1.6] dark:text-[#b0b0b0]"
+			/>
+
+			<div
+				className={cn(
+					"my-5 rounded-xl border border-stroke-soft-200 bg-bg-weak-50 py-8 text-center dark:border-white/10 dark:bg-white/[0.04]",
+					!reveal.otp && "opacity-0",
+				)}
+			>
+				<span className="inline-flex items-center rounded-xl border border-stroke-soft-200 bg-bg-white-0 px-3.5 py-2 font-mono font-semibold text-[18px] text-text-strong-950 tracking-wide dark:border-white/15 dark:bg-[#151518] dark:text-white">
+					{"{{{OTP}}}"}
+				</span>
+				<p className="mt-2.5 mb-0 text-[#707070] text-[11.5px]">
+					Valid for 5 minutes · Do not share this code
+				</p>
+			</div>
+
+			<div className={cn(!reveal.cta && "opacity-0")}>
+				<FancyButton.Root
+					variant="neutral"
+					size="xsmall"
+					className="rounded-lg! px-3.5!"
+				>
+					<span>Login to Reloop</span>
+				</FancyButton.Root>
+			</div>
+
+			<p
+				className={cn(
+					"mt-4 text-[#888888] text-[13px] leading-[1.6] dark:text-[#707070]",
+					!reveal.footer && "opacity-0",
+				)}
+			>
+				{EMAIL_FOOTER}
+			</p>
+		</>
+	);
+}
+
+function AiPromptBar({
+	value,
+	disabled,
+	loading,
+	inputRef,
+	onChange,
+}: {
+	value: string;
+	disabled: boolean;
+	loading: boolean;
+	inputRef: RefObject<HTMLInputElement | null>;
+	onChange: (value: string) => void;
+}) {
+	return (
+		<div className="flex items-center gap-2 rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-1.5 pl-3 shadow-sm dark:border-white/10 dark:bg-[#0c0c0e]">
+			<input
+				ref={inputRef}
+				value={value}
+				disabled={disabled}
+				onChange={(event) => onChange(event.target.value)}
+				placeholder="generate login code for Reloop"
+				aria-label="Generate an email template"
+				className="h-7 min-w-0 flex-1 bg-transparent text-[13px] text-text-strong-950 caret-[#FF5722] outline-none placeholder:text-text-soft-400 disabled:opacity-70 dark:text-white dark:caret-[#FF6E40] dark:placeholder:text-white/40"
+			/>
+			<button
+				type="submit"
+				disabled={disabled || value.trim().length === 0}
+				aria-busy={loading}
+				className={cn(
+					"flex size-7 shrink-0 items-center justify-center rounded-lg bg-[#FF5722] text-white shadow-xs transition-[transform,opacity] duration-150 ease-out dark:bg-[#FF6E40]",
+					loading
+						? "opacity-100"
+						: "hover:opacity-90 active:scale-[0.97] disabled:opacity-40",
+				)}
+				title="Send prompt"
+			>
+				{loading ? (
+					<span
+						aria-hidden
+						className="size-3.5 animate-spin rounded-full border-2 border-white/30 border-t-white"
+					/>
+				) : (
+					<span className="font-bold text-xs">↑</span>
+				)}
+			</button>
 		</div>
 	);
 }
@@ -763,7 +1102,7 @@ export function PreviewStage() {
 									? { duration: 0 }
 									: { duration: SLIDE_MS, ease: EASE_DEFAULT }
 							}
-							className="relative w-full"
+							className="relative h-full w-full"
 						>
 							{active === "ai-templates" ? (
 								<AiTemplatesView />

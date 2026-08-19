@@ -125,18 +125,16 @@ export function EmailTimeline({
 	return (
 		<div
 			className={cn(
-				"relative flex w-full items-center justify-center overflow-x-auto bg-bg-weak-50 transition-all dark:bg-white/[0.04]",
+				"relative flex w-full items-center justify-center overflow-hidden bg-bg-weak-50 transition-all dark:bg-white/[0.04]",
 				compact
-					? "h-[96px] rounded-xl px-5 pt-2 pb-1.5"
-					: "h-[176px] rounded-3xl px-8 pt-6 pb-5",
+					? "h-[96px] rounded-xl px-3 sm:px-5 pt-2 pb-1.5"
+					: "h-[160px] sm:h-[176px] rounded-3xl px-3 sm:px-6 md:px-8 pt-5 sm:pt-6 pb-4 sm:pb-5",
 			)}
 		>
 			<div
 				className={cn(
-					"mx-auto flex items-start",
-					isFailed
-						? "w-full max-w-sm justify-between"
-						: "w-full min-w-[480px] max-w-2xl justify-between",
+					"mx-auto flex w-full items-start justify-between",
+					isFailed ? "max-w-sm" : "max-w-2xl",
 				)}
 			>
 				{steps.map((step, index) => {
@@ -191,7 +189,7 @@ export function EmailTimeline({
 						<motion.div
 							className={cn(
 								"flex flex-col items-center",
-								compact ? "gap-1" : "gap-2",
+								compact ? "gap-0.5 sm:gap-1" : "gap-1.5 sm:gap-2",
 							)}
 							initial={
 								reduceMotion
@@ -213,13 +211,17 @@ export function EmailTimeline({
 							<div
 								className={cn(
 									"flex shrink-0 items-center justify-center border transition-all duration-300",
-									compact ? "size-7 rounded-md" : "size-10 rounded-[10px]",
+									compact
+										? "size-7 rounded-md"
+										: "size-8 sm:size-10 rounded-lg sm:rounded-[10px]",
 									getIconStyles(),
 								)}
 							>
 								<Icon
 									name={step.icon}
-									className={compact ? "size-3.5" : "size-5"}
+									className={
+										compact ? "size-3.5" : "size-4 sm:size-5"
+									}
 								/>
 							</div>
 
@@ -228,8 +230,8 @@ export function EmailTimeline({
 									className={cn(
 										"font-semibold transition-colors duration-300",
 										compact
-											? "rounded px-1 py-0 text-[10px]"
-											: "rounded-md px-2 py-1 text-xs",
+											? "rounded px-1 py-0 text-[9.5px] sm:text-[10px]"
+											: "rounded-md px-1.5 sm:px-2 py-0.5 sm:py-1 text-[11px] sm:text-xs",
 										getBadgeStyles(),
 									)}
 								>
@@ -253,7 +255,9 @@ export function EmailTimeline({
 											transition={{ duration: 0.32, ease: PAGE_EASE }}
 											className={cn(
 												"whitespace-nowrap font-medium text-text-soft-400",
-												compact ? "text-[9.5px]" : "text-xs",
+												compact
+													? "text-[8.5px] sm:text-[9.5px]"
+													: "text-[10px] sm:text-[11px] md:text-xs tracking-tight",
 											)}
 										>
 											{timestamp}
@@ -262,7 +266,7 @@ export function EmailTimeline({
 										<span
 											className={cn(
 												"opacity-0",
-												compact ? "h-3 w-10" : "h-4 w-16",
+												compact ? "h-3 w-8" : "h-4 w-12 sm:w-16",
 											)}
 											aria-hidden="true"
 										/>
@@ -277,7 +281,9 @@ export function EmailTimeline({
 							<div
 								className={cn(
 									"flex flex-col items-center",
-									compact ? "min-w-[68px]" : "min-w-[90px]",
+									compact
+										? "min-w-[50px] sm:min-w-[68px]"
+										: "min-w-[58px] sm:min-w-[76px] md:min-w-[86px]",
 								)}
 							>
 								<div className="group flex flex-col items-center">
@@ -287,8 +293,8 @@ export function EmailTimeline({
 							{index < steps.length - 1 && (
 								<motion.div
 									className={cn(
-										"h-0 flex-1 origin-left border-stroke-soft-100 border-t-[1.5px] border-dashed dark:border-neutral-800",
-										compact ? "mt-3.5" : "mt-5",
+										"h-0 flex-1 min-w-[8px] sm:min-w-[16px] origin-left border-stroke-soft-100 border-t-[1.5px] border-dashed dark:border-neutral-800",
+										compact ? "mt-3.5" : "mt-4 sm:mt-5",
 									)}
 									initial={reduceMotion ? false : { opacity: 0, scaleX: 0.4 }}
 									animate={
