@@ -29,10 +29,10 @@ export function FullEmailBuilder() {
 				computePositionConfig={DRAG_POSITION_CONFIG}
 			>
 				<div
-					className="mr-1 cursor-pointer rounded-sm bg-bg-soft-200 py-px text-text-sub-600"
+					className="mr-1 cursor-pointer rounded-sm bg-bg-soft-200 py-0.5 text-text-sub-600"
 					title="Drag to reorder"
 				>
-					<Icon name="more-vertical" className="h-4 w-4" />
+					<Icon name="more-vertical" className="h-3.5 w-3.5" />
 				</div>
 			</DragHandle>
 			<EditorContent editor={editor} />
