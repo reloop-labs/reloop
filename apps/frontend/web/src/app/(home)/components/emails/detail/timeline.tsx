@@ -125,7 +125,7 @@ export function EmailTimeline({
 	return (
 		<div
 			className={cn(
-				"relative flex w-full items-center justify-start overflow-x-auto bg-bg-weak-50 transition-all dark:bg-white/[0.04]",
+				"relative flex w-full items-center justify-center overflow-x-auto bg-bg-weak-50 transition-all dark:bg-white/[0.04]",
 				compact
 					? "h-[96px] rounded-xl px-5 pt-2 pb-1.5"
 					: "h-[176px] rounded-3xl px-8 pt-6 pb-5",
@@ -133,7 +133,7 @@ export function EmailTimeline({
 		>
 			<div
 				className={cn(
-					"flex items-start",
+					"mx-auto flex items-start",
 					isFailed
 						? "w-full max-w-sm justify-between"
 						: "w-full min-w-[480px] max-w-2xl justify-between",

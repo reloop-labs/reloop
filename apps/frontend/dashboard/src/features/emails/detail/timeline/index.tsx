@@ -129,10 +129,10 @@ export function EmailTimeline({
 	}, [isFailed, onDeliveredClick]);
 
 	return (
-		<div className="relative flex h-[176px] w-full items-center justify-start rounded-3xl border border-stroke-soft-100 bg-bg-white-0 px-8 pt-6 pb-5 transition-all hover:border-stroke-soft-200 dark:border-stroke-soft-100/50 dark:bg-bg-white-0/5">
+		<div className="relative flex h-[176px] w-full items-center justify-center rounded-3xl border border-stroke-soft-100 bg-bg-white-0 px-8 pt-6 pb-5 transition-all hover:border-stroke-soft-200 dark:border-stroke-soft-100/50 dark:bg-bg-white-0/5">
 			<div
 				className={cn(
-					"flex items-start",
+					"mx-auto flex items-start",
 					isFailed
 						? "w-64 justify-between"
 						: "w-full max-w-2xl justify-between",
