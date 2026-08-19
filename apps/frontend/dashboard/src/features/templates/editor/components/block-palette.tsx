@@ -53,7 +53,7 @@ export function BlockPalette() {
 										}}
 										onClick={() => insert(item)}
 										className={cn(
-											"flex w-full flex-col items-center justify-center gap-1.5 rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-2 py-2.5",
+											"flex w-full flex-col items-center justify-center gap-1.5 rounded-xl border border-stroke-soft-200 bg-bg-white-0 px-2 py-2.5",
 											"text-center font-medium text-[11px] text-text-strong-950",
 											"transition-[border-color,background-color,transform] duration-150 ease-out",
 											"hover:border-stroke-soft-300 hover:bg-bg-weak-50/50",

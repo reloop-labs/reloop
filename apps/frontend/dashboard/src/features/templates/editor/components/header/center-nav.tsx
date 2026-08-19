@@ -18,7 +18,7 @@ export function CenterNav() {
 	const isCodeActive = viewMode === "code";
 
 	return (
-		<div className="flex items-center gap-0.5 rounded-[10px] border border-stroke-soft-200 bg-bg-weak-50/80 p-0.5 dark:border-white/10 dark:bg-white/[0.06]">
+		<div className="flex items-center gap-0.5 rounded-[10px] border border-stroke-soft-200 bg-bg-weak-50/80 p-0.5 dark:border-stroke-soft-100/40 dark:bg-white/[0.06]">
 			{navItems.map((item) => {
 				const isActive = item.id === "code" ? isCodeActive : !isCodeActive;
 				return (

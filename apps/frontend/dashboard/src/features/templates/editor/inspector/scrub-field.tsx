@@ -16,7 +16,7 @@ import {
  * ───────────────────────────────────────────────────────── */
 
 export const inspectorFieldClassName =
-	"flex h-8 w-full min-w-0 items-center rounded-xl border border-stroke-sub-300 bg-transparent px-2.5 shadow-none transition-[box-shadow] duration-200 focus-within:shadow-[0_0_0_1px_var(--color-primary-base)] dark:border-stroke-soft-100/40";
+	"flex h-8 w-full min-w-0 items-center rounded-xl border border-stroke-soft-200 bg-transparent px-2.5 shadow-none transition-[box-shadow,border-color] duration-200 hover:border-stroke-soft-300 focus-within:shadow-[0_0_0_1px_var(--color-primary-base)] focus-within:border-primary-base dark:border-stroke-soft-100/40 dark:hover:border-white/20";
 
 export const inspectorFieldActiveClassName =
 	"shadow-[0_0_0_1px_var(--color-primary-base)]";
