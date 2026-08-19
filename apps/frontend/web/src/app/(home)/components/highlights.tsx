@@ -29,17 +29,7 @@ const deliverabilityHighlights: FeatureHighlight[] = [
 			</>
 		),
 	},
-	{
-		id: "time-to-inbox",
-		icon: "inbox",
-		title: "Faster time to inbox",
-		description: (
-			<>
-				Send from the closest region. Fewer hops, faster{" "}
-				<Term href="/glossary/inbox-placement">inbox</Term>.
-			</>
-		),
-	},
+
 	{
 		id: "bimi",
 		icon: "verified",
@@ -64,7 +54,7 @@ const deliverabilityHighlights: FeatureHighlight[] = [
 	},
 	{
 		id: "smart-retries",
-		icon: "refresh",
+		icon: "bounce",
 		title: "Smart bounce handling",
 		description: (
 			<>
@@ -118,17 +108,7 @@ const deliverabilityHighlights: FeatureHighlight[] = [
 			</>
 		),
 	},
-	{
-		id: "infrastructure",
-		icon: "shield",
-		title: "Battle-tested infrastructure",
-		description: (
-			<>
-				Shared and dedicated <Term href="/glossary/shared-ip">IP pools</Term>{" "}
-				that already have to land.
-			</>
-		),
-	},
+
 	{
 		id: "dmarc",
 		icon: "fingerprint",
