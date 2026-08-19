@@ -404,7 +404,7 @@ export default function LanguageExplorer({
 								ref={setFwContainerEl}
 								role="tablist"
 								aria-label={`${active.name} options`}
-								className="relative ml-3 flex w-full flex-col"
+								className="relative flex w-full flex-col"
 								onPointerLeave={() => setHoveredFwEl(undefined)}
 							>
 								<button
