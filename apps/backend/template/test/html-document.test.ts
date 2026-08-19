@@ -25,13 +25,13 @@ describe("isFullHtmlDocument", () => {
 describe("wrapEmailHtml", () => {
 	test("leaves a full document unchanged", () => {
 		const html = "<html><body><p>Hi</p></body></html>";
-		expect(wrapEmailHtml(html, 600)).toBe(html);
+		expect(wrapEmailHtml(html, 640)).toBe(html);
 	});
 
 	test("wraps a fragment in a fixed-width document", () => {
-		const wrapped = wrapEmailHtml("<h1>Welcome</h1>", 600);
+		const wrapped = wrapEmailHtml("<h1>Welcome</h1>", 640);
 		expect(wrapped).toContain("<!DOCTYPE html>");
-		expect(wrapped).toContain("width: 600px");
+		expect(wrapped).toContain("width: 640px");
 		expect(wrapped).toContain("img { max-width: 100%");
 		expect(wrapped).toContain("<h1>Welcome</h1>");
 	});
@@ -40,7 +40,7 @@ describe("wrapEmailHtml", () => {
 describe("parseHtmlToImageRequest", () => {
 	test("applies email-canvas defaults", () => {
 		const parsed = parseHtmlToImageRequest({ html: "<p>Hi</p>" });
-		expect(parsed.width).toBe(600);
+		expect(parsed.width).toBe(640);
 		expect(parsed.format).toBe("png");
 		expect(parsed.scale).toBe(2);
 		expect(parsed.quality).toBe(80);

@@ -24,7 +24,7 @@ export async function renderAndStoreThumbnail(params: {
 }): Promise<ThumbnailResult> {
 	const request = parseHtmlToImageRequest({
 		html: params.html,
-		width: 600,
+		width: 640,
 		format: "png",
 	});
 	const bytes = await renderHtmlToImage(request);

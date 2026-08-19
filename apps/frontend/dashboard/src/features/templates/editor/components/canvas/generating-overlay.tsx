@@ -18,7 +18,7 @@ const StreamingSkeleton = () => {
 	}, []);
 
 	return (
-		<div className="fade-in mx-auto w-full max-w-[600px] animate-in px-8 py-10 duration-500">
+		<div className="fade-in mx-auto w-full max-w-160 animate-in px-8 py-10 duration-500">
 			<div className="space-y-4">
 				<div className="select-none break-all font-mono text-[10px] text-text-soft-400/40 leading-[1.6] transition-all duration-75">
 					{text.substring(0, 150)}
@@ -56,7 +56,7 @@ export const GeneratingOverlay = () => {
 	if (!isGenerating) return null;
 
 	return (
-		<div className="fade-in mx-auto w-full max-w-[600px] animate-in px-8 py-10 duration-500">
+		<div className="fade-in mx-auto w-full max-w-160 animate-in px-8 py-10 duration-500">
 			{previewHtml && (
 				<iframe
 					title="Template preview"

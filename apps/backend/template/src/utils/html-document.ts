@@ -19,7 +19,7 @@ export function isFullHtmlDocument(html: string): boolean {
 }
 
 /**
- * Email HTML is often a fragment. Wrap fragments in a 600px document so
+ * Email HTML is often a fragment. Wrap fragments in a 640px document so
  * Chromium screenshots the email canvas, not a collapsed empty page.
  */
 export function wrapEmailHtml(html: string, width: number): string {

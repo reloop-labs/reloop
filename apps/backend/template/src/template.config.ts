@@ -31,7 +31,7 @@ export const templateConfig = {
 		maxPageSize: 100,
 		htmlToImage: {
 			maxHtmlBytes: 1_000_000,
-			defaultWidth: 600,
+			defaultWidth: 640,
 			minWidth: 200,
 			maxWidth: 2000,
 			defaultScale: 2,
