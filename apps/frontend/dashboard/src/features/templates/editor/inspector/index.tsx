@@ -1,3 +1,5 @@
+"use client";
+
 import { Inspector } from "@react-email/editor/ui";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
@@ -18,8 +20,8 @@ import Breadcrumb from "./breadcrumb";
 import { ColorPicker } from "./color-picker";
 import { ImageSrcControl } from "./image-src-control";
 import { NodeTypePills } from "./node-type-pills";
-import { NumInput } from "./num-input";
 import { PropRow } from "./prop-row";
+import { ScrubRow } from "./scrub-field";
 import { SectionHeader } from "./section-header";
 import { SpacingControl } from "./spacing-control";
 import { TypographyControls } from "./typography/typography-controls";
@@ -416,27 +418,30 @@ function TextSection({
 				value={String(getStyle("color") ?? "")}
 				onChange={(v) => setStyle("color", v)}
 			/>
-			<PropRow label="Font size">
-				<NumInput
-					value={getStyle("fontSize")}
-					onChange={(v) => setStyle("fontSize", v as number)}
-					unit="px"
-				/>
-			</PropRow>
-			<PropRow label="Line height">
-				<NumInput
-					value={getStyle("lineHeight")}
-					onChange={(v) => setStyle("lineHeight", v as number)}
-					unit="%"
-				/>
-			</PropRow>
-			<PropRow label="Tracking">
-				<NumInput
-					value={getStyle("letterSpacing")}
-					onChange={(v) => setStyle("letterSpacing", v as number)}
-					unit="px"
-				/>
-			</PropRow>
+			<ScrubRow
+				label="Font size"
+				value={getStyle("fontSize")}
+				onChange={(v) => setStyle("fontSize", v as number)}
+				min={8}
+				max={96}
+				suffix="px"
+			/>
+			<ScrubRow
+				label="Line height"
+				value={getStyle("lineHeight")}
+				onChange={(v) => setStyle("lineHeight", v as number)}
+				min={80}
+				max={300}
+				suffix="%"
+			/>
+			<ScrubRow
+				label="Tracking"
+				value={getStyle("letterSpacing")}
+				onChange={(v) => setStyle("letterSpacing", v as number)}
+				min={-20}
+				max={40}
+				suffix="px"
+			/>
 
 			<TypographyControls
 				marks={marks}
@@ -693,28 +698,29 @@ export const EmailInspector = () => {
 					{({ findStyleValue, setGlobalStyle }) => (
 						<InspectorSection>
 							<SectionHeader label="Body" />
-							<PropRow label="Container width">
-								<NumInput
-									value={findStyleValue("container", "width")}
-									onChange={(v) => setGlobalStyle("container", "width", v)}
-									unit="px"
-								/>
-							</PropRow>
-							<PropRow label="Border radius">
-								<NumInput
-									value={findStyleValue("container", "borderRadius")}
-									onChange={(v) =>
-										setGlobalStyle("container", "borderRadius", v)
-									}
-									unit="px"
-								/>
-							</PropRow>
-							<PropRow label="Line height">
-								<NumInput
-									value={findStyleValue("body", "lineHeight")}
-									onChange={(v) => setGlobalStyle("body", "lineHeight", v)}
-								/>
-							</PropRow>
+							<ScrubRow
+								label="Container width"
+								value={findStyleValue("container", "width")}
+								onChange={(v) => setGlobalStyle("container", "width", v)}
+								min={200}
+								max={800}
+								suffix="px"
+							/>
+							<ScrubRow
+								label="Border radius"
+								value={findStyleValue("container", "borderRadius")}
+								onChange={(v) => setGlobalStyle("container", "borderRadius", v)}
+								min={0}
+								max={64}
+								suffix="px"
+							/>
+							<ScrubRow
+								label="Line height"
+								value={findStyleValue("body", "lineHeight")}
+								onChange={(v) => setGlobalStyle("body", "lineHeight", v)}
+								min={80}
+								max={300}
+							/>
 							<ColorRow
 								label="Text color"
 								value={String(findStyleValue("body", "color") ?? "")}

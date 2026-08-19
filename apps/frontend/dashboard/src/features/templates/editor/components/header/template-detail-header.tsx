@@ -1,5 +1,4 @@
 import { cn } from "@reloop/ui/cn";
-import { useEffect } from "react";
 import { AnimatedSidebarToggleIcon } from "#/features/dashboard/sidebar/animated-sidebar-toggle-icon";
 import { usePlayAnimationOnHover } from "#/features/dashboard/sidebar/use-play-animation-on-hover";
 import { useSidebarCollapse } from "#/features/dashboard/sidebar/use-sidebar-collapse";
@@ -48,11 +47,6 @@ export function TemplateDetailHeader({
 	connectionStatus,
 	isSynced,
 }: TemplateDetailHeaderProps) {
-	const { setCollapsed } = useSidebarCollapse();
-
-	useEffect(() => {
-		setCollapsed(true);
-	}, [setCollapsed]);
 	return (
 		<div className="flex shrink-0 items-center justify-between border-stroke-soft-200 border-b bg-bg-white-0 px-4 py-2.5 dark:border-stroke-soft-100/40 dark:bg-black">
 			<div className="flex items-center gap-2">

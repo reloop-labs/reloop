@@ -1,4 +1,6 @@
-import * as Input from "@reloop/ui/input";
+"use client";
+
+import { inspectorFieldClassName } from "./scrub-field";
 
 /* ------------------------------------------------------------------ */
 /* Color picker — circular swatch trigger + hex input                  */
@@ -11,25 +13,23 @@ export function ColorPicker({
 	onChange: (v: string) => void;
 }) {
 	return (
-		<Input.Root
-			size="xsmall"
-			className="rounded-xl border border-stroke-sub-300 shadow-none before:hidden"
-		>
-			<Input.Wrapper>
-				<div className="relative h-5 w-5 shrink-0 overflow-hidden rounded-lg border border-stroke-soft-200 transition-all duration-150 hover:scale-110">
-					<input
-						type="color"
-						value={value || "#000000"}
-						onChange={(e) => onChange(e.target.value)}
-						className="-inset-1 absolute h-[200%] w-[200%] cursor-pointer border-none bg-transparent p-0"
-					/>
-				</div>
-				<Input.Input
-					value={value}
-					placeholder="#000000"
+		<div className={`${inspectorFieldClassName} gap-2`}>
+			<div className="relative size-4 shrink-0 overflow-hidden rounded-full border border-stroke-soft-200 transition-transform duration-150 hover:scale-110">
+				<input
+					type="color"
+					value={value || "#000000"}
 					onChange={(e) => onChange(e.target.value)}
+					aria-label="Pick color"
+					className="absolute -inset-1 h-[200%] w-[200%] cursor-pointer border-none bg-transparent p-0"
 				/>
-			</Input.Wrapper>
-		</Input.Root>
+			</div>
+			<input
+				value={value}
+				placeholder="#000000"
+				aria-label="Hex color"
+				onChange={(e) => onChange(e.target.value)}
+				className="min-w-0 flex-1 bg-transparent text-sm text-text-strong-950 tabular-nums outline-none placeholder:text-text-soft-400"
+			/>
+		</div>
 	);
 }
