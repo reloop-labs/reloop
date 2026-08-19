@@ -14,7 +14,7 @@ export const TEMPLATE_TABS: {
 }[] = [
 	{
 		id: "ai-templates",
-		icon: "sparkling",
+		icon: "magic-wand",
 		title: "AI-powered templates",
 		description:
 			"Generate complete, responsive email layouts from simple natural-language prompts.",
@@ -22,7 +22,7 @@ export const TEMPLATE_TABS: {
 	},
 	{
 		id: "realtime-editor",
-		icon: "code",
+		icon: "cursor",
 		title: "Real-time editor",
 		description:
 			"Edit layouts, content, and variables with live previews and instant updates.",

@@ -316,7 +316,7 @@ function AiTemplatesView() {
 						animate={
 							phase === "idle" || phase === "pending"
 								? { top: "46%", y: "-50%", opacity: 1 }
-								: { top: "100%", y: "-100%", opacity: 1 }
+								: { top: "100%", y: "calc(-100% - 14px)", opacity: 1 }
 						}
 						exit={
 							shouldReduceMotion
