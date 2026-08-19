@@ -8,7 +8,7 @@ import { EmailTimeline } from "../emails/detail/timeline";
 import type { AnalyticsTabId } from "./preview-scenes";
 import { PreviewTabs } from "./preview-tabs";
 
-const TAB_ORDER: AnalyticsTabId[] = ["engagement", "metrics", "bounces"];
+const TAB_ORDER: AnalyticsTabId[] = ["metrics", "engagement", "bounces"];
 
 const EASE_DEFAULT: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
 const SLIDE_PX = 160;
