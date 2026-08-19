@@ -642,6 +642,12 @@ function PresenceCursor({
 				className="size-4 drop-shadow-[0_1px_2px_rgba(0,0,0,0.35)]"
 				style={{ color: user.cursorFill }}
 			/>
+			<span
+				className="absolute top-[14px] left-[12px] whitespace-nowrap rounded-md px-1.5 py-[3px] font-semibold text-[10px] leading-none shadow-[0_1px_2px_rgba(0,0,0,0.18)]"
+				style={{ backgroundColor: user.cursorFill, color: user.cursorInk }}
+			>
+				{user.firstName}
+			</span>
 		</motion.div>
 	);
 }
