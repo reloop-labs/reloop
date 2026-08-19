@@ -1,10 +1,4 @@
-import { imageSlashCommand } from "@react-email/editor/plugins";
-import {
-	BubbleMenu,
-	defaultSlashCommands,
-	SlashCommand,
-} from "@react-email/editor/ui";
-import { Icon } from "@reloop/ui/icon";
+import { BubbleMenu, SlashCommand } from "@react-email/editor/ui";
 import { generateJSON } from "@tiptap/html";
 import { EditorContext } from "@tiptap/react";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -24,22 +18,12 @@ import { AddTemplateVariableModal } from "../components/panels/variables/add-var
 import { useMousePresence } from "../cursor/hooks/useMousePresence";
 import { useRemoteCursors } from "../cursor/hooks/useRemoteCursors";
 import { RemoteCursors } from "../cursor/RemoteCursors";
+import { editorSlashCommands } from "../lib/slash-commands";
 
 interface EditorProviderProps {
 	children: React.ReactNode;
 	roomId: string;
 }
-
-export const variableSlashCommand = {
-	title: "Variable",
-	description: "Create and insert a dynamic variable",
-	icon: <Icon name="brackets" className="h-5 w-5" />,
-	category: "Basic",
-	searchTerms: ["variable", "dynamic", "custom", "tag", "bracket"],
-	command: ({ editor, range }: { editor: any; range: any }) => {
-		editor.chain().focus().deleteRange(range).insertContent("{{").run();
-	},
-};
 
 /**
  * Check if the Y.js-backed TipTap editor has real user content.
@@ -421,13 +405,7 @@ export const EditorProvider = ({ children, roomId }: EditorProviderProps) => {
 					<BubbleMenu.LinkDefault />
 					<BubbleMenu.ButtonDefault />
 					<BubbleMenu.ImageDefault />
-					<SlashCommand
-						items={[
-							...defaultSlashCommands,
-							imageSlashCommand,
-							variableSlashCommand,
-						]}
-					/>
+					<SlashCommand items={editorSlashCommands} />
 				</div>
 				<AddTemplateVariableModal
 					open={isCreatingVar}

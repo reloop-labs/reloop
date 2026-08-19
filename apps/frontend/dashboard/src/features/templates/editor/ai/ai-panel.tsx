@@ -7,6 +7,7 @@ import { useTemplateId } from "#/features/templates/editor/hooks/use-template-id
 import { AiApplyModal } from "./ai-apply-modal";
 import { AiComposer } from "./ai-composer";
 import { AiMessageBubble } from "./ai-message";
+import { BlockPalette } from "./block-palette";
 import type { AiPlan, EditorSnapshot } from "./types";
 import { useAiAttachments } from "./use-ai-attachments";
 import { useTemplateAiAgent } from "./use-template-ai-agent";
@@ -316,7 +317,7 @@ export function AIPanel({ onClose: _onClose }: { onClose?: () => void }) {
 	return (
 		<div className="flex h-full w-full flex-col overflow-hidden bg-bg-white-0 dark:bg-black">
 			{/* Transcript */}
-			<div className="relative min-h-0 flex-1">
+			<div className="relative flex min-h-0 flex-1 flex-col">
 				{messages.length > 0 ? (
 					<div className="absolute top-2 right-2 z-10">
 						<button
@@ -331,24 +332,22 @@ export function AIPanel({ onClose: _onClose }: { onClose?: () => void }) {
 					</div>
 				) : null}
 
-				<div
-					ref={scrollRef}
-					className="h-full space-y-3 overflow-y-auto p-3"
-					onScroll={() => {
-						const el = scrollRef.current;
-						if (!el) return;
-						const distance = el.scrollHeight - el.scrollTop - el.clientHeight;
-						setShowJump(distance > 100);
-					}}
-				>
-					{messages.length === 0 ? (
-						<div className="flex h-full flex-col items-center justify-center px-4 text-center">
-							<p className="text-paragraph-xs text-text-soft-400">
-								Ask anything or paste an image to generate and edit templates
-							</p>
-						</div>
-					) : (
-						messages.map((m) => (
+				{messages.length === 0 ? (
+					<div className="min-h-0 flex-1">
+						<BlockPalette />
+					</div>
+				) : (
+					<div
+						ref={scrollRef}
+						className="min-h-0 flex-1 space-y-3 overflow-y-auto p-3"
+						onScroll={() => {
+							const el = scrollRef.current;
+							if (!el) return;
+							const distance = el.scrollHeight - el.scrollTop - el.clientHeight;
+							setShowJump(distance > 100);
+						}}
+					>
+						{messages.map((m) => (
 							<AiMessageBubble
 								key={m.id}
 								message={m}
@@ -357,15 +356,15 @@ export function AIPanel({ onClose: _onClose }: { onClose?: () => void }) {
 								onApplyHtml={(html) => void requestApply(html)}
 								onRetry={(assistantId) => void retryFromAssistant(assistantId)}
 							/>
-						))
-					)}
-				</div>
+						))}
+					</div>
+				)}
 
 				{showJump && messages.length > 0 ? (
 					<button
 						type="button"
 						onClick={jumpToLatest}
-						className="-translate-x-1/2 absolute bottom-3 left-1/2 z-10 flex items-center gap-1 rounded-full border border-stroke-soft-100 bg-bg-white-0 px-3 py-1 font-medium text-[11px] text-text-sub-600 shadow-regular-sm hover:text-text-strong-950 dark:border-white/10 dark:bg-black"
+						className="absolute bottom-3 left-1/2 z-10 flex -translate-x-1/2 items-center gap-1 rounded-full border border-stroke-soft-100 bg-bg-white-0 px-3 py-1 font-medium text-[11px] text-text-sub-600 shadow-regular-sm hover:text-text-strong-950 dark:border-white/10 dark:bg-black"
 					>
 						<Icon name="arrow-down" className="h-3 w-3" />
 						Latest
@@ -373,25 +372,29 @@ export function AIPanel({ onClose: _onClose }: { onClose?: () => void }) {
 				) : null}
 			</div>
 
-			{pendingPlan && !messages.some((m) => m.plan?.id === pendingPlan.id) ? (
+			{messages.length > 0 &&
+			pendingPlan &&
+			!messages.some((m) => m.plan?.id === pendingPlan.id) ? (
 				<div className="px-3 pb-1 text-[10px] text-text-soft-400">
 					Plan ready — execute from the card above.
 				</div>
 			) : null}
 
-			<AiComposer
-				mode={mode}
-				onModeChange={setMode}
-				value={draft}
-				onChange={setDraft}
-				onSend={() => void send()}
-				onStop={stop}
-				isRunning={isRunning}
-				attachments={attachments}
-				onAddFiles={addFiles}
-				onRemoveAttachment={remove}
-				uploading={uploading}
-			/>
+			{messages.length > 0 ? (
+				<AiComposer
+					mode={mode}
+					onModeChange={setMode}
+					value={draft}
+					onChange={setDraft}
+					onSend={() => void send()}
+					onStop={stop}
+					isRunning={isRunning}
+					attachments={attachments}
+					onAddFiles={addFiles}
+					onRemoveAttachment={remove}
+					uploading={uploading}
+				/>
+			) : null}
 
 			<AiApplyModal
 				open={Boolean(pendingApplyHtml)}

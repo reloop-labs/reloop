@@ -3,6 +3,7 @@ import { AnimatedSidebarToggleIcon } from "#/features/dashboard/sidebar/animated
 import { usePlayAnimationOnHover } from "#/features/dashboard/sidebar/use-play-animation-on-hover";
 import { useSidebarCollapse } from "#/features/dashboard/sidebar/use-sidebar-collapse";
 import type { ConnectionStatus as ConnectionStatusType } from "../../collobration/hooks/useCollaboration";
+import { CenterNav } from "./center-nav";
 import { HeaderActions } from "./header-actions";
 import { TemplateName } from "./template-name";
 
@@ -48,12 +49,17 @@ export function TemplateDetailHeader({
 	isSynced,
 }: TemplateDetailHeaderProps) {
 	return (
-		<div className="flex shrink-0 items-center justify-between border-stroke-soft-200 border-b bg-bg-white-0 px-4 py-2.5 dark:border-stroke-soft-100/40 dark:bg-black">
-			<div className="flex items-center gap-2">
+		<div className="relative flex shrink-0 items-center justify-between border-stroke-soft-200 border-b bg-bg-white-0 px-4 py-2.5 dark:border-stroke-soft-100/40 dark:bg-black">
+			<div className="flex min-w-0 flex-1 items-center gap-3">
 				<SidebarToggleButton />
-				<TemplateName />
+				<CenterNav />
 			</div>
-			<div className="flex items-center justify-end">
+			<div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+				<div className="pointer-events-auto">
+					<TemplateName />
+				</div>
+			</div>
+			<div className="flex flex-1 items-center justify-end">
 				<HeaderActions
 					connectionStatus={connectionStatus}
 					isSynced={isSynced}

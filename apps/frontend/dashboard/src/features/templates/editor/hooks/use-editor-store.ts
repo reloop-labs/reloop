@@ -59,14 +59,25 @@ export const useEditorStore = create<EditorState>((set) => ({
 	isSavingDraft: false,
 	isPublishing: false,
 	setLastSaved: (draftNumber, date) =>
-		set({
-			lastSavedDraftNumber: draftNumber,
-			lastSavedAt: date,
-			hasUnsavedChanges: false,
-		}),
-	setHasUnsavedChanges: (hasUnsavedChanges) => set({ hasUnsavedChanges }),
-	setIsSavingDraft: (isSavingDraft) => set({ isSavingDraft }),
-	setIsPublishing: (isPublishing) => set({ isPublishing }),
+		set((s) =>
+			s.lastSavedDraftNumber === draftNumber &&
+			s.lastSavedAt === date &&
+			!s.hasUnsavedChanges
+				? s
+				: {
+						lastSavedDraftNumber: draftNumber,
+						lastSavedAt: date,
+						hasUnsavedChanges: false,
+					},
+		),
+	setHasUnsavedChanges: (hasUnsavedChanges) =>
+		set((s) =>
+			s.hasUnsavedChanges === hasUnsavedChanges ? s : { hasUnsavedChanges },
+		),
+	setIsSavingDraft: (isSavingDraft) =>
+		set((s) => (s.isSavingDraft === isSavingDraft ? s : { isSavingDraft })),
+	setIsPublishing: (isPublishing) =>
+		set((s) => (s.isPublishing === isPublishing ? s : { isPublishing })),
 
 	// Global Variable creation
 	isCreatingVar: false,

@@ -519,8 +519,7 @@ export function VersionSidebar() {
 								No versions yet
 							</p>
 							<p className="mx-auto max-w-[180px] text-[11px] text-text-soft-400 leading-normal">
-								Click "Save Draft" or "Publish" in the header to record version
-								history.
+								Edits save automatically. Publish to record version history.
 							</p>
 						</div>
 					</div>
@@ -553,7 +552,7 @@ export function VersionSidebar() {
 										{currentList.length > 1 && (
 											<div
 												className={cn(
-													"-translate-x-1/2 absolute left-1/2 w-[1px] bg-stroke-soft-200",
+													"absolute left-1/2 w-[1px] -translate-x-1/2 bg-stroke-soft-200",
 													index === 0
 														? "top-[26px] bottom-0"
 														: index === currentList.length - 1
@@ -683,7 +682,7 @@ export function VersionSidebar() {
 									</div>
 
 									{/* Interactive Actions (shown on hover, no backgrounds/borders) */}
-									<div className="-translate-y-1/2 absolute top-[26px] right-4 flex translate-x-2 items-center gap-1 opacity-0 transition-all duration-200 ease-out group-hover:translate-x-0 group-hover:opacity-100">
+									<div className="absolute top-[26px] right-4 flex translate-x-2 -translate-y-1/2 items-center gap-1 opacity-0 transition-all duration-200 ease-out group-hover:translate-x-0 group-hover:opacity-100">
 										{/* Publish action */}
 										<Tooltip.Root>
 											<Tooltip.Trigger asChild>
