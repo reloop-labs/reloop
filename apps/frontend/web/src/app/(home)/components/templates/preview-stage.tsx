@@ -695,11 +695,10 @@ function RealtimeEditorView() {
 
 				{/* Clickable Avatars with Figma-style Spotlight */}
 				<div className="flex items-center gap-2">
-					<div className="-space-x-1.5 flex">
+					<div className="-space-x-2 flex">
 						{(["maya", "sarah", "alex"] as CollaboratorId[]).map(
-							(id) => {
+							(id, index) => {
 								const user = COLLABORATORS[id];
-								const isCurrent = activeSpotlight === id;
 
 								return (
 									<button
@@ -709,13 +708,11 @@ function RealtimeEditorView() {
 										onMouseEnter={() => setHoveredUser(id)}
 										onMouseLeave={() => setHoveredUser(null)}
 										title={`Click to spotlight ${user.name}`}
+										style={{ zIndex: index }}
 										className={cn(
-											"relative flex size-6 cursor-pointer items-center justify-center rounded-full font-bold text-[10px] ring-2 transition-all",
+											"relative flex size-6 cursor-pointer items-center justify-center rounded-full font-bold text-[10px] ring-2 ring-white hover:z-10 dark:ring-[#0c0c0e]",
 											user.color,
 											user.textColor,
-											isCurrent
-												? "scale-110 ring-text-strong-950 ring-offset-2 ring-offset-bg-white-0 dark:ring-white dark:ring-offset-[#0c0c0e]"
-												: "ring-white hover:scale-105 dark:ring-[#0c0c0e]",
 										)}
 									>
 										{user.initial}
@@ -851,20 +848,19 @@ function RealtimeEditorView() {
 						Type-safe component primitives, multiplayer canvas editing, and
 						automated deliverability monitoring right out of the box.
 					</p>
-				</div>
-
-				{/* Document Ending Skeletons for Natural Height */}
-				<div className="space-y-2 pt-2">
-					<div className="flex gap-2">
-						<div className="h-2 w-2/5 rounded-full bg-stroke-soft-200 dark:bg-white/10" />
-						<div className="h-2 w-1/3 rounded-full bg-stroke-soft-100 dark:bg-white/5" />
-						<div className="h-2 w-1/5 rounded-full bg-stroke-soft-200 dark:bg-white/10" />
-					</div>
-					<div className="flex gap-2">
-						<div className="h-2 w-1/2 rounded-full bg-stroke-soft-100 dark:bg-white/5" />
-						<div className="h-2 w-2/5 rounded-full bg-stroke-soft-200 dark:bg-white/10" />
-					</div>
-					<div className="h-2 w-3/5 rounded-full bg-stroke-soft-100 dark:bg-white/5" />
+					<p className="text-[11px] text-text-sub-600 leading-relaxed dark:text-white/70">
+						Share a template with your team and watch edits land live — subject
+						lines, variables, and layout blocks stay in sync without a refresh.
+					</p>
+					<p className="text-[11px] text-text-sub-600 leading-relaxed dark:text-white/70">
+						Every send still goes through the same React Email pipeline, so what
+						you preview is what lands in the inbox. Reply to this email if you
+						want a walkthrough of the new editor, or jump in from the dashboard
+						and open any template to try it.
+					</p>
+					<p className="text-[11px] text-text-sub-600 leading-relaxed dark:text-white/70">
+						— Maya, on behalf of Reloop
+					</p>
 				</div>
 			</div>
 		</div>
