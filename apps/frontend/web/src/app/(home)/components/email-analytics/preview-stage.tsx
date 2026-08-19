@@ -83,6 +83,7 @@ function getCatmullRomPath(points: { x: number; y: number }[], height: number) {
 }
 
 function MetricsLayeredView() {
+	const shouldReduceMotion = useReducedMotion();
 	const [hoveredIdx, setHoveredIdx] = useState<number>(4); // Default mid point
 
 	const w = 1000;
@@ -139,7 +140,14 @@ function MetricsLayeredView() {
 	return (
 		<div className="relative h-full w-full">
 			{/* Left-Side Status Metric Callouts (Delivered, Opened, Clicked, Bounced) */}
-			<div className="pointer-events-none absolute top-5 left-5 z-20 grid grid-cols-2 gap-x-6 gap-y-4 sm:top-7 sm:left-8 sm:gap-x-12 sm:gap-y-6">
+			<motion.div
+				initial={
+					shouldReduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 }
+				}
+				animate={{ opacity: 1, y: 0 }}
+				transition={{ duration: 0.5, delay: 0.15, ease: "easeOut" }}
+				className="pointer-events-none absolute top-5 left-5 z-20 grid grid-cols-2 gap-x-6 gap-y-4 sm:top-7 sm:left-8 sm:gap-x-12 sm:gap-y-6"
+			>
 				{/* 1. Delivered */}
 				<div className="border-[#3B82F6] border-l-2 pl-2.5 sm:pl-3.5">
 					<p className="font-bold text-text-strong-950 text-xl tracking-tight tabular-nums sm:text-2xl lg:text-3xl dark:text-white">
@@ -179,15 +187,20 @@ function MetricsLayeredView() {
 						Bounced
 					</p>
 				</div>
-			</div>
+			</motion.div>
 
 			{/* Date Badge (Top Right) */}
-			<div className="pointer-events-none absolute top-5 right-5 z-20 flex items-center gap-2 sm:top-7 sm:right-8">
+			<motion.div
+				initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0 }}
+				animate={{ opacity: 1 }}
+				transition={{ duration: 0.4, delay: 0.3 }}
+				className="pointer-events-none absolute top-5 right-5 z-20 flex items-center gap-2 sm:top-7 sm:right-8"
+			>
 				<div className="flex items-center gap-1.5 rounded-full border border-stroke-soft-200 bg-bg-white-0/80 px-2.5 py-1 font-medium text-[11px] text-text-sub-600 shadow-xs backdrop-blur-sm dark:border-white/10 dark:bg-[#141416]/80 dark:text-white/70">
 					<span className="size-1.5 rounded-full bg-blue-500" />
 					<span className="uppercase tracking-wider">{curDate}</span>
 				</div>
-			</div>
+			</motion.div>
 
 			{/* SVG Line / Area Graph (Full-Bleed, Borderless, Numberless) */}
 			<div
@@ -234,7 +247,7 @@ function MetricsLayeredView() {
 					))}
 
 					{/* Vertical Guideline on Hover */}
-					<line
+					<motion.line
 						x1={activeDeliveredPt.x}
 						y1={0}
 						x2={activeDeliveredPt.x}
@@ -242,76 +255,191 @@ function MetricsLayeredView() {
 						stroke="currentColor"
 						className="text-black/15 dark:text-white/20"
 						strokeWidth="1.2"
+						initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0 }}
+						animate={{ opacity: 1 }}
+						transition={{ duration: 0.4, delay: 0.8 }}
 					/>
 
 					{/* 1. Delivered Area & Curve (Blue) */}
-					<path d={deliveredCurve.area} fill="url(#grad-delivered)" />
-					<path
+					<motion.path
+						d={deliveredCurve.area}
+						fill="url(#grad-delivered)"
+						initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0 }}
+						animate={{ opacity: 1 }}
+						transition={{ duration: 0.8, delay: 0.45, ease: "easeOut" }}
+					/>
+					<motion.path
 						d={deliveredCurve.path}
 						fill="none"
 						stroke="#3B82F6"
 						strokeWidth="2.4"
 						strokeLinecap="round"
 						strokeLinejoin="round"
+						initial={
+							shouldReduceMotion
+								? { pathLength: 1, opacity: 1 }
+								: { pathLength: 0, opacity: 0 }
+						}
+						animate={{ pathLength: 1, opacity: 1 }}
+						transition={{
+							duration: 1.25,
+							delay: 0.05,
+							ease: [0.25, 0.1, 0.25, 1],
+						}}
 					/>
 
 					{/* 2. Opened Area & Curve (Purple) */}
-					<path d={openedCurve.area} fill="url(#grad-opened)" />
-					<path
+					<motion.path
+						d={openedCurve.area}
+						fill="url(#grad-opened)"
+						initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0 }}
+						animate={{ opacity: 1 }}
+						transition={{ duration: 0.8, delay: 0.55, ease: "easeOut" }}
+					/>
+					<motion.path
 						d={openedCurve.path}
 						fill="none"
 						stroke="#A855F7"
 						strokeWidth="2.4"
 						strokeLinecap="round"
 						strokeLinejoin="round"
+						initial={
+							shouldReduceMotion
+								? { pathLength: 1, opacity: 1 }
+								: { pathLength: 0, opacity: 0 }
+						}
+						animate={{ pathLength: 1, opacity: 1 }}
+						transition={{
+							duration: 1.25,
+							delay: 0.12,
+							ease: [0.25, 0.1, 0.25, 1],
+						}}
 					/>
 
 					{/* 3. Clicked Area & Curve (Emerald) */}
-					<path d={clickedCurve.area} fill="url(#grad-clicked)" />
-					<path
+					<motion.path
+						d={clickedCurve.area}
+						fill="url(#grad-clicked)"
+						initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0 }}
+						animate={{ opacity: 1 }}
+						transition={{ duration: 0.8, delay: 0.65, ease: "easeOut" }}
+					/>
+					<motion.path
 						d={clickedCurve.path}
 						fill="none"
 						stroke="#10B981"
 						strokeWidth="2.4"
 						strokeLinecap="round"
 						strokeLinejoin="round"
+						initial={
+							shouldReduceMotion
+								? { pathLength: 1, opacity: 1 }
+								: { pathLength: 0, opacity: 0 }
+						}
+						animate={{ pathLength: 1, opacity: 1 }}
+						transition={{
+							duration: 1.25,
+							delay: 0.18,
+							ease: [0.25, 0.1, 0.25, 1],
+						}}
 					/>
 
 					{/* 4. Bounced Area & Curve (Red) */}
-					<path d={bouncedCurve.area} fill="url(#grad-bounced)" />
-					<path
+					<motion.path
+						d={bouncedCurve.area}
+						fill="url(#grad-bounced)"
+						initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0 }}
+						animate={{ opacity: 1 }}
+						transition={{ duration: 0.8, delay: 0.75, ease: "easeOut" }}
+					/>
+					<motion.path
 						d={bouncedCurve.path}
 						fill="none"
 						stroke="#EF4444"
 						strokeWidth="2.4"
 						strokeLinecap="round"
 						strokeLinejoin="round"
+						initial={
+							shouldReduceMotion
+								? { pathLength: 1, opacity: 1 }
+								: { pathLength: 0, opacity: 0 }
+						}
+						animate={{ pathLength: 1, opacity: 1 }}
+						transition={{
+							duration: 1.25,
+							delay: 0.24,
+							ease: [0.25, 0.1, 0.25, 1],
+						}}
 					/>
 
 					{/* Active Glowing Dots on Curves */}
-					<circle
+					<motion.circle
 						cx={activeDeliveredPt.x}
 						cy={activeDeliveredPt.y}
 						r={5}
 						className="fill-white stroke-[#3B82F6] stroke-[2.5] dark:fill-black"
+						initial={
+							shouldReduceMotion
+								? { scale: 1, opacity: 1 }
+								: { scale: 0, opacity: 0 }
+						}
+						animate={{ scale: 1, opacity: 1 }}
+						transition={{
+							duration: 0.35,
+							delay: 0.85,
+							ease: [0.34, 1.56, 0.64, 1],
+						}}
 					/>
-					<circle
+					<motion.circle
 						cx={activeOpenedPt.x}
 						cy={activeOpenedPt.y}
 						r={5}
 						className="fill-white stroke-[#A855F7] stroke-[2.5] dark:fill-black"
+						initial={
+							shouldReduceMotion
+								? { scale: 1, opacity: 1 }
+								: { scale: 0, opacity: 0 }
+						}
+						animate={{ scale: 1, opacity: 1 }}
+						transition={{
+							duration: 0.35,
+							delay: 0.9,
+							ease: [0.34, 1.56, 0.64, 1],
+						}}
 					/>
-					<circle
+					<motion.circle
 						cx={activeClickedPt.x}
 						cy={activeClickedPt.y}
 						r={5}
 						className="fill-white stroke-[#10B981] stroke-[2.5] dark:fill-black"
+						initial={
+							shouldReduceMotion
+								? { scale: 1, opacity: 1 }
+								: { scale: 0, opacity: 0 }
+						}
+						animate={{ scale: 1, opacity: 1 }}
+						transition={{
+							duration: 0.35,
+							delay: 0.95,
+							ease: [0.34, 1.56, 0.64, 1],
+						}}
 					/>
-					<circle
+					<motion.circle
 						cx={activeBouncedPt.x}
 						cy={activeBouncedPt.y}
 						r={5}
 						className="fill-white stroke-[#EF4444] stroke-[2.5] dark:fill-black"
+						initial={
+							shouldReduceMotion
+								? { scale: 1, opacity: 1 }
+								: { scale: 0, opacity: 0 }
+						}
+						animate={{ scale: 1, opacity: 1 }}
+						transition={{
+							duration: 0.35,
+							delay: 1.0,
+							ease: [0.34, 1.56, 0.64, 1],
+						}}
 					/>
 				</svg>
 			</div>
