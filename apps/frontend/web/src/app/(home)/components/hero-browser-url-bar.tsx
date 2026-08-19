@@ -18,7 +18,7 @@ function locationFor(activeItem: string): BrowserLocation {
 	switch (activeItem) {
 		case "emails":
 		case "overview":
-			return { path: "/", search: "" };
+			return { path: "/home", search: "" };
 		case "inbox":
 			return { path: "/inbox", search: "" };
 		case "contacts":
@@ -49,6 +49,9 @@ function locationFor(activeItem: string): BrowserLocation {
 	}
 }
 
+const navButtonClass =
+	"flex size-8 shrink-0 items-center justify-center rounded-full text-[#5f6368] transition-colors duration-150 hover:bg-black/[0.06] hover:text-[#202124] disabled:pointer-events-none disabled:opacity-30 dark:text-[#9aa0a6] dark:hover:bg-white/10 dark:hover:text-white";
+
 export function HeroBrowserUrlBar({
 	activeItem = "emails",
 }: HeroBrowserUrlBarProps) {
@@ -59,17 +62,13 @@ export function HeroBrowserUrlBar({
 	);
 
 	return (
-		<div className="flex h-11 shrink-0 items-center gap-2 border-stroke-soft-200 border-b bg-bg-white-0 px-2.5 text-[12px] text-text-sub-600 select-none dark:border-white/10 dark:text-white/60">
-			<div className="flex items-center gap-0.5">
-				<button
-					type="button"
-					aria-label="Back"
-					className="flex size-6 items-center justify-center rounded-md text-text-sub-600 transition-colors hover:bg-black/5 hover:text-text-strong-950 dark:text-white/60 dark:hover:bg-white/10 dark:hover:text-white"
-				>
+		<div className="flex h-10 shrink-0 items-center gap-1.5 bg-[#e8eaed] px-2 text-[#5f6368] select-none dark:bg-[#3c3c3c] dark:text-[#9aa0a6]">
+			<div className="flex items-center">
+				<button type="button" aria-label="Back" className={navButtonClass}>
 					<svg
 						aria-hidden="true"
 						viewBox="0 0 24 24"
-						className="size-3.5"
+						className="size-4"
 						fill="none"
 						stroke="currentColor"
 						strokeWidth="2"
@@ -83,12 +82,12 @@ export function HeroBrowserUrlBar({
 					type="button"
 					aria-label="Forward"
 					disabled
-					className="flex size-6 items-center justify-center rounded-md text-text-sub-600/40 dark:text-white/20"
+					className={navButtonClass}
 				>
 					<svg
 						aria-hidden="true"
 						viewBox="0 0 24 24"
-						className="size-3.5"
+						className="size-4"
 						fill="none"
 						stroke="currentColor"
 						strokeWidth="2"
@@ -98,48 +97,42 @@ export function HeroBrowserUrlBar({
 						<path d="m9 18 6-6-6-6" />
 					</svg>
 				</button>
-				<button
-					type="button"
-					aria-label="Reload"
-					className="flex size-6 items-center justify-center rounded-md text-text-sub-600 transition-colors hover:bg-black/5 hover:text-text-strong-950 dark:text-white/60 dark:hover:bg-white/10 dark:hover:text-white"
-				>
-					<Icon name="refresh-cw" className="size-3.5" />
+				<button type="button" aria-label="Reload" className={navButtonClass}>
+					<Icon name="refresh-cw" className="size-4" />
 				</button>
 			</div>
 
-			<div className="flex h-8 min-w-0 flex-1 items-center justify-between rounded-full border border-black/5 bg-black/[0.04] px-3 dark:border-white/5 dark:bg-white/[0.06]">
-				<div className="flex min-w-0 items-center gap-1.5 overflow-hidden">
+			<div className="flex h-8 min-w-0 flex-1 items-center gap-2 rounded-full bg-[#fff] px-3 dark:bg-[#2b2b2b]">
+				<span className="grid size-5 shrink-0 place-items-center rounded-full bg-black/[0.06] text-[#5f6368] dark:bg-white/10 dark:text-[#9aa0a6]">
 					<svg
 						aria-hidden="true"
 						viewBox="0 0 24 24"
-						className="size-3.5 shrink-0 text-text-sub-600/70 dark:text-white/40"
+						className="size-3"
 						fill="none"
 						stroke="currentColor"
 						strokeWidth="2"
 						strokeLinecap="round"
 						strokeLinejoin="round"
 					>
-						<rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
-						<path d="M7 11V7a5 5 0 0 1 10 0v4" />
+						<circle cx="12" cy="12" r="10" />
+						<path d="M2 12h20" />
+						<path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
 					</svg>
-					<span className="truncate font-mono text-[11.5px] tracking-tight text-text-strong-950 dark:text-white/90">
-						<span className="text-text-sub-600/75 dark:text-white/50">
-							{HOST}
+				</span>
+				<span className="min-w-0 truncate text-[13px] leading-none tracking-[-0.01em] text-[#202124] dark:text-[#e8eaed]">
+					<span className="text-[#5f6368] dark:text-[#9aa0a6]">{HOST}</span>
+					<span>{path}</span>
+					{search ? (
+						<span className="text-[#5f6368] dark:text-[#9aa0a6]">
+							?{search}
 						</span>
-						<span>{path === "/" ? "" : path}</span>
-						{search ? (
-							<span className="text-text-sub-600 dark:text-white/45">
-								?{search}
-							</span>
-						) : null}
-					</span>
-				</div>
-
+					) : null}
+				</span>
 				<button
 					type="button"
 					aria-label="Bookmark"
 					onClick={() => setIsBookmarked((b) => !b)}
-					className="flex size-4 shrink-0 items-center justify-center text-text-sub-600/50 transition-colors hover:text-amber-500 dark:text-white/35 dark:hover:text-amber-400"
+					className="ml-auto flex size-6 shrink-0 items-center justify-center rounded-full text-[#5f6368] transition-colors duration-150 hover:text-amber-500 dark:text-[#9aa0a6] dark:hover:text-amber-400"
 				>
 					<svg
 						aria-hidden="true"
@@ -156,15 +149,11 @@ export function HeroBrowserUrlBar({
 				</button>
 			</div>
 
-			<button
-				type="button"
-				aria-label="Menu"
-				className="flex size-6 shrink-0 items-center justify-center rounded-md text-text-sub-600/70 transition-colors hover:bg-black/5 hover:text-text-strong-950 dark:text-white/50 dark:hover:bg-white/10 dark:hover:text-white"
-			>
+			<button type="button" aria-label="Menu" className={navButtonClass}>
 				<svg
 					aria-hidden="true"
 					viewBox="0 0 24 24"
-					className="size-3.5"
+					className="size-4"
 					fill="none"
 					stroke="currentColor"
 					strokeWidth="2"

@@ -24,7 +24,11 @@ import {
 import { createPortal } from "react-dom";
 import { cn } from "../utils/cn";
 import { EASE_OUT, SPRING_GLIDE, SPRING_PRESS } from "../utils/ease";
-import { TOUCH_GESTURE_CLASS, capturePointer } from "../utils/touch";
+import {
+	TOUCH_GESTURE_CLASS,
+	capturePointer,
+	isHoveringPointer,
+} from "../utils/touch";
 
 export type MorphingTabsItem = {
 	id: string;
@@ -99,6 +103,8 @@ type SpringTabProps = {
 	registerPosition: (id: string, position: MotionValue<number> | null) => void;
 	onPointerDown: (event: ReactPointerEvent<HTMLDivElement>) => void;
 	onPointerMove: (event: ReactPointerEvent<HTMLDivElement>) => void;
+	onPointerEnter: (event: ReactPointerEvent<HTMLDivElement>) => void;
+	onPointerLeave: (event: ReactPointerEvent<HTMLDivElement>) => void;
 	onPointerUp: (event: ReactPointerEvent<HTMLDivElement>) => void;
 	onPointerCancel: (event: ReactPointerEvent<HTMLDivElement>) => void;
 	onLostPointerCapture: (event: ReactPointerEvent<HTMLDivElement>) => void;
@@ -108,9 +114,9 @@ const DRAG_THRESHOLD = 5;
 const MAX_TAB_WIDTH = 180;
 const MIN_TAB_WIDTH = 96;
 const TAB_HEIGHT = 42;
-const TAB_TOP = 10;
+const TAB_TOP = 4;
 const TAB_RADIUS = 14;
-const RAIL_HEIGHT = 52;
+const RAIL_HEIGHT = 46;
 const TAB_EDGE_INSET = 16;
 const PANEL_INSET = 0;
 const LIQUID_JOIN = 16;
@@ -193,6 +199,8 @@ function SpringTab({
 	registerPosition,
 	onPointerDown,
 	onPointerMove,
+	onPointerEnter,
+	onPointerLeave,
 	onPointerUp,
 	onPointerCancel,
 	onLostPointerCapture,
@@ -235,7 +243,7 @@ function SpringTab({
 							preserveAspectRatio="none"
 							style={{ height: RAIL_HEIGHT + PANEL_RADIUS }}
 							className={cn(
-								"pointer-events-none absolute inset-x-0 top-0 w-full text-bg-white-0",
+								"pointer-events-none absolute inset-x-0 top-0 w-full text-[#e8eaed] dark:text-[#3c3c3c]",
 								dragging ? "z-20" : "z-0",
 								surfaceClassName,
 							)}
@@ -264,6 +272,8 @@ function SpringTab({
 				className={className}
 				onPointerDown={onPointerDown}
 				onPointerMove={onPointerMove}
+				onPointerEnter={onPointerEnter}
+				onPointerLeave={onPointerLeave}
 				onPointerUp={onPointerUp}
 				onPointerCancel={onPointerCancel}
 				onLostPointerCapture={onLostPointerCapture}
@@ -336,6 +346,7 @@ export function MorphingTabs({
 	const [tabGap, setTabGap] = useState(8);
 	const [draggingId, setDraggingId] = useState<string | null>(null);
 	const [dragTargetIndex, setDragTargetIndex] = useState(-1);
+	const [hoveredId, setHoveredId] = useState<string | null>(null);
 
 	const effectiveOffsetLeft = useMemo(() => {
 		if (tabOffsetLeft !== undefined) return tabOffsetLeft;
@@ -574,6 +585,7 @@ export function MorphingTabs({
 					surfaceAnimationRef.current?.stop();
 					surfaceLeft.set(drag.startLeft);
 				}
+				setHoveredId(null);
 				setDraggingId(drag.id);
 				setDragTargetIndex(drag.startIndex);
 			}
@@ -762,17 +774,17 @@ export function MorphingTabs({
 			)}
 		>
 			{leading ? (
-				<div className="pointer-events-none absolute left-4 top-[31px] z-40 flex -translate-y-1/2 items-center gap-[7px]">
+				<div className="pointer-events-none absolute left-4 top-[25px] z-40 flex -translate-y-1/2 items-center gap-[7px]">
 					{leading}
 				</div>
 			) : null}
 			{trailing ? (
-				<div className="absolute right-3.5 top-[31px] z-40 flex -translate-y-1/2 items-center">
+				<div className="absolute right-3.5 top-[25px] z-40 flex -translate-y-1/2 items-center">
 					{trailing}
 				</div>
 			) : null}
 
-			<div className="relative h-[52px] shrink-0">
+			<div className="relative h-[46px] shrink-0">
 				<div
 					ref={railRef}
 					role="tablist"
@@ -786,6 +798,7 @@ export function MorphingTabs({
 					{orderedItems.map((item, index) => {
 						const isActive = item.id === activeId;
 						const isDragging = item.id === draggingId;
+						const isHovered = item.id === hoveredId && !isActive && !isDragging;
 						const visualIndex = visualIndexFor(index);
 						const targetLeft = slotLefts[visualIndex] ?? effectiveOffsetLeft;
 						const tabId = `${uid}-tab-${safeId(item.id)}`;
@@ -807,7 +820,7 @@ export function MorphingTabs({
 								surfaceClassName={classNames?.activeTab}
 								zIndex={isDragging ? 30 : isActive ? 20 : 1}
 								className={cn(
-									"group absolute top-0 left-0 flex touch-pan-y items-stretch",
+									"absolute top-0 left-0 flex touch-pan-y items-stretch",
 									TOUCH_GESTURE_CLASS,
 									item.disabled && "cursor-not-allowed",
 									isDragging ? "cursor-grabbing" : "cursor-grab",
@@ -815,6 +828,16 @@ export function MorphingTabs({
 								registerPosition={registerPosition}
 								onPointerDown={(event) => startDrag(item.id, event)}
 								onPointerMove={moveDrag}
+								onPointerEnter={(event) => {
+									if (item.disabled || !isHoveringPointer(event)) return;
+									setHoveredId(item.id);
+								}}
+								onPointerLeave={(event) => {
+									if (event.pointerType === "touch") return;
+									setHoveredId((current) =>
+										current === item.id ? null : current,
+									);
+								}}
 								onPointerUp={(event) => finishDrag(event.pointerId)}
 								onPointerCancel={(event) => finishDrag(event.pointerId)}
 								onLostPointerCapture={(event) => {
@@ -834,10 +857,10 @@ export function MorphingTabs({
 										<span
 											aria-hidden
 											className={cn(
-												"absolute inset-x-1 top-1 bottom-1 rounded-lg transition-colors duration-150",
-												isDragging
-													? "bg-white/10"
-													: "bg-transparent [@media(hover:hover)_and_(pointer:fine)]:group-hover:bg-white/[0.08]",
+												"pointer-events-none absolute inset-0 rounded-t-[14px] transition-[background-color] duration-150 ease-out",
+												isDragging || isHovered
+													? "bg-white/[0.1]"
+													: "bg-transparent",
 											)}
 										/>
 									) : null}
@@ -861,10 +884,12 @@ export function MorphingTabs({
 										}}
 										onKeyDown={(event) => handleTabKeyDown(item.id, event)}
 										className={cn(
-											"group relative z-10 flex h-full w-full min-w-0 items-center gap-2 overflow-hidden rounded-t-[14px] px-3.5 text-left outline-none transition-colors cursor-pointer",
+											"group relative z-10 flex h-full w-full min-w-0 items-center gap-2 overflow-hidden rounded-t-[14px] px-3.5 text-left outline-none transition-colors duration-150 ease-out cursor-pointer",
 											isActive
 												? "font-medium text-text-strong-950"
-												: "font-medium text-white/60 hover:text-white dark:text-white/60 dark:hover:text-white",
+												: isHovered
+													? "font-medium text-white"
+													: "font-medium text-white/60",
 											classNames?.tab,
 										)}
 									>

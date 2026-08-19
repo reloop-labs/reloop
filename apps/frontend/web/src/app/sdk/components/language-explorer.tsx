@@ -88,11 +88,13 @@ export default function LanguageExplorer({
 	framed = true,
 	showTopRule = true,
 	showHeading = false,
+	showHelp = true,
 	id = "languages",
 }: {
 	framed?: boolean;
 	showTopRule?: boolean;
 	showHeading?: boolean;
+	showHelp?: boolean;
 	id?: string;
 }) {
 	const [activeSlug, setActiveSlug] = useState(languages[0]!.slug);
@@ -562,7 +564,11 @@ export default function LanguageExplorer({
 							/>
 						</StepItem>
 
-						<StepItem number={3} title="GitHub, examples, and API reference">
+						<StepItem
+							number={3}
+							title="GitHub, examples, and API reference"
+							isLast={!showHelp}
+						>
 							<ResourceLinks
 								languageSlug={active.slug}
 								languageName={active.name}
@@ -573,9 +579,11 @@ export default function LanguageExplorer({
 							/>
 						</StepItem>
 
-						<StepItem number={4} title="Need more help?" isLast>
-							<ExtraLinks />
-						</StepItem>
+						{showHelp && (
+							<StepItem number={4} title="Need more help?" isLast>
+								<ExtraLinks />
+							</StepItem>
+						)}
 					</div>
 				</div>
 			</div>

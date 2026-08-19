@@ -174,10 +174,10 @@ export function Hero({ variant = "default" }: HeroProps) {
 						agent inboxes, and automated workflows.
 					</p>
 					<div className="mt-6 flex flex-wrap items-center justify-center gap-3 sm:mt-7">
-						<FancyButton.Root asChild variant="neutral" size="small">
+						<FancyButton.Root asChild variant="neutral" size="medium" className="h-12 px-6 text-[15px] rounded-xl">
 							<a href={hostedSignupHref}>Get Started</a>
 						</FancyButton.Root>
-						<FancyButton.Root asChild variant="basic" size="small">
+						<FancyButton.Root asChild variant="basic" size="medium" className="h-12 px-6 text-[15px] rounded-xl">
 							<a href="/docs">Documentation</a>
 						</FancyButton.Root>
 					</div>

@@ -63,6 +63,7 @@ export default function Home() {
 					framed={false}
 					showTopRule={false}
 					showHeading
+					showHelp={false}
 					id="sdks"
 				/>
 				<SectionSeparator />
