@@ -469,7 +469,7 @@ export const EmailInspector = () => {
 	if (!editor) return null;
 
 	return (
-		<Inspector.Root className="bg-bg-weak-50">
+		<Inspector.Root className="bg-transparent">
 			{/* ── Breadcrumb ── */}
 			<Breadcrumb />
 

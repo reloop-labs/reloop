@@ -79,7 +79,7 @@ export function TemplateEditorPage({ templateId }: { templateId: string }) {
 										damping: 33,
 										opacity: { duration: 0.2 },
 									}}
-									className="h-full shrink-0 overflow-hidden border-stroke-soft-200 border-l bg-bg-weak-50 dark:border-stroke-soft-100/40 dark:bg-black"
+									className="h-full shrink-0 overflow-hidden border-stroke-soft-200 border-l bg-transparent dark:border-stroke-soft-100/40"
 								>
 									<div className="h-full w-72 overflow-y-auto">
 										<EmailInspector />
