@@ -596,10 +596,16 @@ const CURSOR_START = { x: -22, y: -18, scale: 0.96, opacity: 0 };
 const CURSOR_CLICK = { x: 0, y: 0, scale: 0.82, opacity: 1 };
 const CURSOR_ON_TARGET = { x: 0, y: 0, scale: 1, opacity: 1 };
 
+const CURSOR_SLOT: Record<CollaboratorId, string> = {
+	alex: "top-[4.5rem] left-[6.5rem] sm:left-[7.25rem]",
+	sarah: "top-[8rem] left-[6.5rem] sm:left-[7.25rem]",
+	maya: "top-[17.2rem] left-[1.35rem] sm:top-[17.8rem] sm:left-[1.6rem]",
+};
+
 const CURSOR_PARK: Record<CollaboratorId, { x: number; y: number }> = {
-	alex: { x: 64, y: 18 },
-	sarah: { x: 78, y: 20 },
-	maya: { x: 56, y: 28 },
+	alex: { x: -156, y: -40 },
+	sarah: { x: 312, y: -96 },
+	maya: { x: -112, y: 24 },
 };
 
 /** Presence cursor using the shared `cursor` icon (same SVG as the tab). */
@@ -623,7 +629,10 @@ function PresenceCursor({
 	return (
 		<motion.div
 			aria-hidden
-			className="pointer-events-none absolute top-0 left-0 z-30"
+			className={cn(
+				"pointer-events-none absolute z-30",
+				CURSOR_SLOT[user.id],
+			)}
 			initial={shouldReduceMotion ? false : CURSOR_START}
 			animate={pose}
 			transition={
@@ -855,7 +864,16 @@ function RealtimeEditorView() {
 	}, [shouldReduceMotion]);
 
 	return (
-		<div className="relative mx-auto w-full max-w-3xl overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 shadow-xs dark:border-white/10 dark:bg-[#0c0c0e]">
+		<div className="relative mx-auto w-full max-w-3xl overflow-visible rounded-2xl border border-stroke-soft-200 bg-bg-white-0 shadow-xs dark:border-white/10 dark:bg-[#0c0c0e]">
+			{(["alex", "sarah", "maya"] as CollaboratorId[]).map((id) =>
+				fields[id].cursor !== "hidden" ? (
+					<PresenceCursor
+						key={id}
+						user={COLLABORATORS[id]}
+						phase={fields[id].cursor}
+					/>
+				) : null,
+			)}
 
 			{/* Top Bar with Document Title & Multiplayer Avatars */}
 			<div className="flex items-center justify-between border-stroke-soft-100 border-b px-4 py-2.5 dark:border-white/10">
@@ -918,12 +936,6 @@ function RealtimeEditorView() {
 								isAlexActive && COLLABORATORS.alex.highlightBg,
 							)}
 						>
-							{fields.alex.cursor !== "hidden" ? (
-								<PresenceCursor
-									user={COLLABORATORS.alex}
-									phase={fields.alex.cursor}
-								/>
-							) : null}
 							<span>{FROM_NAME.slice(0, fromChars)}</span>
 							<FieldCaret
 								user={COLLABORATORS.alex}
@@ -976,12 +988,6 @@ function RealtimeEditorView() {
 								isSarahActive && COLLABORATORS.sarah.highlightBg,
 							)}
 						>
-							{fields.sarah.cursor !== "hidden" ? (
-								<PresenceCursor
-									user={COLLABORATORS.sarah}
-									phase={fields.sarah.cursor}
-								/>
-							) : null}
 							<span>{SUBJECT_HEAD.slice(0, subjectChars)}</span>
 							<FieldCaret
 								user={COLLABORATORS.sarah}
@@ -1044,12 +1050,6 @@ function RealtimeEditorView() {
 							isMayaActive && COLLABORATORS.maya.highlightBg,
 						)}
 					>
-						{fields.maya.cursor !== "hidden" ? (
-							<PresenceCursor
-								user={COLLABORATORS.maya}
-								phase={fields.maya.cursor}
-							/>
-						) : null}
 						{BODY_EDIT.slice(0, bodyChars)}
 						<FieldCaret
 							user={COLLABORATORS.maya}
