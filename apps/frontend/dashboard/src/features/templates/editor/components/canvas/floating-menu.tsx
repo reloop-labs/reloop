@@ -6,8 +6,8 @@ import {
 import * as Tooltip from "@reloop/ui/tooltip";
 import { useCurrentEditor } from "@tiptap/react";
 import React from "react";
-import { variableSlashCommand } from "./editor-provider";
-import { useEditorStore } from "./use-editor-store";
+import { useEditorStore } from "#/features/templates/editor/hooks/use-editor-store";
+import { variableSlashCommand } from "../../providers/editor-provider";
 
 export function FloatingMenu() {
 	const { editor } = useCurrentEditor();

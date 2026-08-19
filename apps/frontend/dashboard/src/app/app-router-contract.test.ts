@@ -25,15 +25,11 @@ describe("App Router provider lifetimes", () => {
 		expect(dashboardLayout).not.toContain("ActiveOrganizationProvider");
 	});
 
-	it("keeps special full-screen command-menu ownership separate", () => {
-		const templateLayout = read(
-			"./(protected)/(fullscreen)/templates/[templateId]/layout-client.tsx",
-		);
+	it("keeps special full-screen command-menu ownership separate for agent mailbox", () => {
 		const inboxLayout = read(
 			"./(protected)/(fullscreen)/inbox/layout-client.tsx",
 		);
 
-		expect(templateLayout).toContain("<CommandMenuGlobal />");
 		expect(inboxLayout).not.toContain("CommandMenuGlobal");
 		expect(inboxLayout).toContain("<AgentInboxSectionLayout>");
 	});

@@ -13,11 +13,6 @@ export function DocumentPanel() {
 			{({ findStyleValue, setGlobalStyle }) => (
 				<div>
 					<SectionHeader label="Document" />
-					<ColorRow
-						label="Background"
-						value={String(findStyleValue("body", "backgroundColor") ?? "")}
-						onChange={(v) => setGlobalStyle("body", "backgroundColor", v)}
-					/>
 					<PropRow label="Container width">
 						<NumInput
 							value={findStyleValue("container", "width")}
@@ -32,11 +27,6 @@ export function DocumentPanel() {
 							unit="px"
 						/>
 					</PropRow>
-					<ColorRow
-						label="Container bg"
-						value={String(findStyleValue("container", "backgroundColor") ?? "")}
-						onChange={(v) => setGlobalStyle("container", "backgroundColor", v)}
-					/>
 					<PropRow label="Line height">
 						<NumInput
 							value={findStyleValue("body", "lineHeight")}

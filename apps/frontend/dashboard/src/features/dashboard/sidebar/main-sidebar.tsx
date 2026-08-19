@@ -12,6 +12,7 @@ export function MainSidebar() {
 	const pathname = usePathname();
 	const pathWithoutSlug = pathname.replace(/^\/dashboard/, "") || "/";
 	const isSettings = pathWithoutSlug.startsWith("/settings");
+	const isTemplateEditor = Boolean(pathname.match(/\/templates\/[^/]+/));
 	const shouldReduceMotion = useReducedMotion();
 
 	useHotkeys("meta+b", (e) => {
@@ -19,10 +20,14 @@ export function MainSidebar() {
 		toggle();
 	});
 
+	if (isTemplateEditor && isCollapsed) {
+		return null;
+	}
+
 	return (
 		<div
 			className={cn(
-				"sticky top-0 z-10 flex h-screen flex-col border-stroke-soft-100 border-r bg-sidebar transition-[width] duration-200 ease-in-out dark:border-white/10",
+				"sticky top-0 z-10 flex h-screen flex-col border-stroke-soft-100 border-r transition-[width] duration-200 ease-in-out dark:border-white/10",
 				isCollapsed ? "w-14" : "w-60",
 			)}
 		>

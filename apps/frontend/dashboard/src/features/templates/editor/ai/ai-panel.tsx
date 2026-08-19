@@ -3,8 +3,8 @@ import { Icon } from "@reloop/ui/icon";
 import { useCurrentEditor } from "@tiptap/react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
-import { useTemplateId } from "#/features/templates/editor/lib/use-template-id";
-import { useEditorStore } from "#/features/templates/editor/use-editor-store";
+import { useEditorStore } from "#/features/templates/editor/hooks/use-editor-store";
+import { useTemplateId } from "#/features/templates/editor/hooks/use-template-id";
 import { AiApplyModal } from "./ai-apply-modal";
 import { AiComposer } from "./ai-composer";
 import { AiMessageBubble } from "./ai-message";
@@ -47,7 +47,7 @@ function canvasIsEmpty(
 	return text.length === 0 && html.length === 0;
 }
 
-export function AIPanel({ onClose }: { onClose: () => void }) {
+export function AIPanel({ onClose }: { onClose?: () => void }) {
 	const templateId = useTemplateId();
 	const { editor } = useCurrentEditor();
 	const subject = useEditorStore((s) => s.subject);
@@ -329,7 +329,7 @@ export function AIPanel({ onClose }: { onClose: () => void }) {
 	};
 
 	return (
-		<div className="flex h-full w-full flex-col overflow-hidden rounded-3xl border border-stroke-soft-200 bg-bg-white-0 shadow-sm dark:border-stroke-soft-100/40">
+		<div className="flex h-full w-full flex-col overflow-hidden bg-bg-white-0 dark:bg-black">
 			{/* Header */}
 			<div className="flex shrink-0 items-center justify-between border-stroke-soft-200/60 border-b px-4 py-3 dark:border-stroke-soft-100/40">
 				<div className="flex items-center gap-2">
@@ -372,14 +372,16 @@ export function AIPanel({ onClose }: { onClose: () => void }) {
 							Clear
 						</Button.Root>
 					) : null}
-					<button
-						type="button"
-						onClick={onClose}
-						className="rounded-lg p-1 text-text-sub-600 hover:bg-bg-weak-50"
-						aria-label="Close"
-					>
-						<Icon name="cross" className="h-4 w-4" />
-					</button>
+					{onClose ? (
+						<button
+							type="button"
+							onClick={onClose}
+							className="rounded-lg p-1 text-text-sub-600 hover:bg-bg-weak-50"
+							aria-label="Close"
+						>
+							<Icon name="cross" className="h-4 w-4" />
+						</button>
+					) : null}
 				</div>
 			</div>
 

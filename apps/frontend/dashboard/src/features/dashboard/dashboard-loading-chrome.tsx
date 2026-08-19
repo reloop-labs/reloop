@@ -11,7 +11,7 @@ import { DashboardContentSkeleton } from "./dashboard-content-skeleton";
 export function DashboardLoadingChrome() {
 	return (
 		<div className="flex h-screen overflow-hidden bg-bg-white-0 dark:bg-black">
-			<div className="sticky top-0 z-10 flex h-screen w-60 flex-col border-stroke-soft-100 border-r bg-sidebar dark:border-white/10">
+			<div className="sticky top-0 z-10 flex h-screen w-60 flex-col border-stroke-soft-100 border-r dark:border-white/10">
 				<div className="flex h-12 items-center justify-between pr-3 pl-3">
 					<div className="flex items-center gap-2">
 						<Logo className="-ml-1 w-10" />

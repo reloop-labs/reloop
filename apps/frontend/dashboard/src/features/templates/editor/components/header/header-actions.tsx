@@ -2,26 +2,25 @@ import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
-import { KbdEsc } from "@reloop/ui/kbd-esc";
-import * as Modal from "@reloop/ui/modal";
 import * as Popover from "@reloop/ui/popover";
-import * as Textarea from "@reloop/ui/textarea";
 import { useCurrentEditor } from "@tiptap/react";
 import { useRouter } from "next/navigation";
 import { parseAsStringLiteral, useQueryState } from "nuqs";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
-import { getRenderedEmailHtml } from "#/features/templates/editor/get-rendered-email-html";
-import { useSWR } from "#/features/templates/editor/lib/use-swr-compat";
-import { useTemplateId } from "#/features/templates/editor/lib/use-template-id";
-import { CollabPresence } from "./collobration/Collabpresence";
-import type { ConnectionStatus as ConnectionStatusType } from "./collobration/hooks/useCollaboration";
-import { DiffViewer } from "./diff-viewer"; // Cache bust
-import { useEditorStore } from "./use-editor-store";
+import { useEditorStore } from "#/features/templates/editor/hooks/use-editor-store";
+import { useSWR } from "#/features/templates/editor/hooks/use-swr-compat";
+import { useTemplateId } from "#/features/templates/editor/hooks/use-template-id";
+import { getRenderedEmailHtml } from "#/features/templates/editor/utils/get-rendered-email-html";
+import { CollabPresence } from "../../collobration/Collabpresence";
+import type { ConnectionStatus as ConnectionStatusType } from "../../collobration/hooks/useCollaboration";
+import { DeleteTemplateModal } from "./delete-template-modal";
+import { PublishTemplateModal } from "./publish-template-modal";
 
 const viewModes = [
 	"visual",
+	"ai",
 	"code",
 	"history",
 	"variables",
@@ -35,7 +34,7 @@ const isViewMode = (id: string): id is (typeof viewModes)[number] =>
 const fetcher = (url: string) =>
 	fetch(url, { credentials: "include" }).then((res) => res.json());
 
-interface EditorHeaderActionsProps {
+interface HeaderActionsProps {
 	connectionStatus: ConnectionStatusType;
 	isSynced: boolean;
 }
@@ -45,6 +44,12 @@ const menuItems = [
 		id: "visual",
 		label: "Design mode",
 		icon: "brush" as const,
+		isDanger: false,
+	},
+	{
+		id: "ai",
+		label: "Template agent",
+		icon: "sparkling" as const,
 		isDanger: false,
 	},
 	{
@@ -91,198 +96,10 @@ const menuItems = [
 	},
 ];
 
-/* ------------------------------------------------------------------ */
-/* Delete Confirmation Modal                                          */
-/* ------------------------------------------------------------------ */
-interface DeleteModalProps {
-	isOpen: boolean;
-	onClose: () => void;
-	onConfirm: () => void;
-}
-
-function DeleteModal({ isOpen, onClose, onConfirm }: DeleteModalProps) {
-	return (
-		<Modal.Root open={isOpen} onOpenChange={(open) => !open && onClose()}>
-			<Modal.Content
-				className="rounded-2xl border border-stroke-soft-100/50 p-0.5 font-sans sm:max-w-[400px]"
-				showClose={true}
-			>
-				<div className="rounded-2xl border border-stroke-soft-100/50">
-					<Modal.Header className="before:border-stroke-soft-200/50">
-						<div className="flex items-center justify-center">
-							<Icon name="trash" className="h-4 w-4" />
-						</div>
-						<div className="flex-1">
-							<Modal.Title>Delete Template</Modal.Title>
-						</div>
-					</Modal.Header>
-					<Modal.Body className="space-y-2">
-						<p className="text-paragraph-sm text-text-sub-600 leading-relaxed">
-							Are you sure you want to delete this template? This action cannot
-							be undone and will delete all associated versions and drafts.
-						</p>
-					</Modal.Body>
-					<Modal.Footer className="mt-4 flex items-center justify-end gap-3 border-stroke-soft-100/50">
-						<Button.Root
-							type="button"
-							variant="neutral"
-							mode="stroke"
-							size="xsmall"
-							onClick={onClose}
-						>
-							Cancel
-							<KbdEsc />
-						</Button.Root>
-						<Button.Root
-							type="button"
-							variant="error"
-							mode="filled"
-							size="xsmall"
-							onClick={() => {
-								onConfirm();
-								onClose();
-							}}
-						>
-							Delete Template
-						</Button.Root>
-					</Modal.Footer>
-				</div>
-			</Modal.Content>
-		</Modal.Root>
-	);
-}
-
-/* ------------------------------------------------------------------ */
-/* Publish Confirmation Modal with Visual Diffing                     */
-/* ------------------------------------------------------------------ */
-interface PublishModalProps {
-	isOpen: boolean;
-	onClose: () => void;
-	onConfirm: (description: string) => Promise<void>;
-	isPublishing: boolean;
-	latestPublished: any;
-	currentHtml: string;
-	currentSubject: string;
-}
-
-function PublishModal({
-	isOpen,
-	onClose,
-	onConfirm,
-	isPublishing,
-	latestPublished,
-	currentHtml,
-	currentSubject,
-}: PublishModalProps) {
-	const [description, setDescription] = useState("");
-	const [showDiff, setShowDiff] = useState(false);
-
-	return (
-		<Modal.Root open={isOpen} onOpenChange={(open) => !open && onClose()}>
-			<Modal.Content
-				className={cn(
-					"rounded-2xl border border-stroke-soft-100/50 p-0.5 font-sans transition-all duration-300",
-					showDiff ? "h-[85vh] max-w-[80vw]" : "sm:max-w-[480px]",
-				)}
-				showClose={true}
-			>
-				<div className="flex h-full flex-col overflow-hidden rounded-2xl border border-stroke-soft-100/50">
-					<Modal.Header className="before:border-stroke-soft-200/50">
-						<div className="flex items-center justify-center">
-							<Icon name="info-outline" className="h-4 w-4" />
-						</div>
-						<div className="flex-1">
-							<Modal.Title>Publish Template Version</Modal.Title>
-						</div>
-					</Modal.Header>
-
-					<Modal.Body className="flex-1 space-y-4 overflow-y-auto">
-						<p className="text-paragraph-sm text-text-sub-600 leading-relaxed">
-							This will create a new major production version and set it as the
-							active version for transactional sends.
-						</p>
-
-						<div className="space-y-1.5">
-							<span className="mb-1.5 block font-semibold text-text-strong-950 text-xs">
-								Release Description / Changelog
-							</span>
-							<Textarea.Root
-								simple
-								placeholder="Describe what changed in this version (e.g. fixed layout issues, added welcome banner)..."
-								value={description}
-								onChange={(e) => setDescription(e.target.value)}
-								className="h-24 text-xs"
-							/>
-						</div>
-
-						{/* Collapsible Visual Diff */}
-						<div className="overflow-hidden rounded-xl border border-stroke-soft-200 dark:border-stroke-soft-100/40">
-							<button
-								type="button"
-								onClick={() => setShowDiff((prev) => !prev)}
-								className="flex w-full items-center justify-between bg-bg-weak-50 px-4 py-2.5 transition-colors hover:bg-bg-soft-200"
-							>
-								<div className="flex items-center gap-2">
-									<Icon
-										name="refresh-cw"
-										className="size-4 text-text-sub-600"
-									/>
-									<span className="font-semibold text-label-xs text-text-strong-950">
-										Review changes before publishing
-									</span>
-								</div>
-								<Icon
-									name={showDiff ? "chevron-up" : "chevron-down"}
-									className="size-4 text-text-sub-600"
-								/>
-							</button>
-
-							{showDiff && (
-								<div className="h-[48vh] border-stroke-soft-100 border-t dark:border-stroke-soft-100/40">
-									<DiffViewer
-										oldHtml={latestPublished?.renderedHtml || ""}
-										newHtml={currentHtml}
-										oldSubject={latestPublished?.subject || ""}
-										newSubject={currentSubject}
-										viewportWidth="100%"
-									/>
-								</div>
-							)}
-						</div>
-					</Modal.Body>
-
-					<Modal.Footer className="mt-4 flex items-center justify-end gap-3 border-stroke-soft-100/50">
-						<Button.Root
-							type="button"
-							variant="neutral"
-							mode="stroke"
-							size="xsmall"
-							onClick={onClose}
-							disabled={isPublishing}
-						>
-							Cancel
-							<KbdEsc />
-						</Button.Root>
-						<FancyButton.Root
-							type="button"
-							variant="neutral"
-							size="xsmall"
-							onClick={() => onConfirm(description)}
-							disabled={isPublishing}
-						>
-							{isPublishing ? "Publishing..." : "Confirm & Publish"}
-						</FancyButton.Root>
-					</Modal.Footer>
-				</div>
-			</Modal.Content>
-		</Modal.Root>
-	);
-}
-
-export const EditorHeaderActions = ({
+export const HeaderActions = ({
 	connectionStatus,
 	isSynced,
-}: EditorHeaderActionsProps) => {
+}: HeaderActionsProps) => {
 	const templateId = useTemplateId();
 	const router = useRouter();
 	const { editor } = useCurrentEditor();
@@ -373,7 +190,7 @@ export const EditorHeaderActions = ({
 			toast.success(draftNum ? `Saved as Draft ${draftNum}` : "Draft saved", {
 				duration: 2000,
 			});
-			mutate(); // Refresh the sidebar list
+			mutate();
 		} catch (error) {
 			console.error("Failed to save draft:", error);
 			toast.error("Failed to save draft.");
@@ -408,8 +225,6 @@ export const EditorHeaderActions = ({
 			});
 
 			// 2. Sync the template baseline so reopening always finds latest content
-			// (The backend also updates status to "published" via createVersion,
-			//  but we also need to persist the content and subject on the template record)
 			fetch(`/api/template/v1/${templateId}`, {
 				method: "PUT",
 				headers: { "Content-Type": "application/json" },
@@ -434,7 +249,7 @@ export const EditorHeaderActions = ({
 				{ duration: 3000 },
 			);
 			setIsPublishModalOpen(false);
-			mutate(); // Refresh version lists in sidebar and dialog
+			mutate();
 		} catch (error) {
 			console.error("Failed to publish template:", error);
 			toast.error("Failed to publish template.");
@@ -574,14 +389,14 @@ export const EditorHeaderActions = ({
 			</FancyButton.Root>
 
 			{/* Delete Confirmation Modal */}
-			<DeleteModal
+			<DeleteTemplateModal
 				isOpen={isDeleteModalOpen}
 				onClose={() => setIsDeleteModalOpen(false)}
 				onConfirm={handleDelete}
 			/>
 
 			{/* Publish Confirmation Modal */}
-			<PublishModal
+			<PublishTemplateModal
 				isOpen={isPublishModalOpen}
 				onClose={() => setIsPublishModalOpen(false)}
 				onConfirm={handlePublish}

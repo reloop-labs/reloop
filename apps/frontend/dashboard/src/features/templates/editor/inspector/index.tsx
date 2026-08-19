@@ -7,13 +7,13 @@ import { useCurrentEditor } from "@tiptap/react";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { useSWR } from "#/features/templates/editor/lib/use-swr-compat";
-import { useTemplateId } from "#/features/templates/editor/lib/use-template-id";
+import { useSWR } from "#/features/templates/editor/hooks/use-swr-compat";
+import { useTemplateId } from "#/features/templates/editor/hooks/use-template-id";
 import {
 	formatTemplateVariable,
 	mapTemplateVariables,
 } from "#/features/templates/lib/template-variables";
-import { DeleteTemplateVariableModal } from "../delete-template-variable-modal";
+import { DeleteTemplateVariableModal } from "../components/panels/variables/delete-variable-modal";
 import Breadcrumb from "./breadcrumb";
 import { ColorPicker } from "./color-picker";
 import { ImageSrcControl } from "./image-src-control";
@@ -275,12 +275,16 @@ function VariableInspectorCard({ name }: { name: string }) {
 
 				{/* ── Default Value ── */}
 				<div className="flex flex-col gap-1.5">
-					<label className="font-semibold text-text-sub-600 text-xs">
+					<label
+						htmlFor="variable-default-value"
+						className="font-semibold text-text-sub-600 text-xs"
+					>
 						Default Value
 					</label>
 					<Input.Root size="small" className="rounded-xl">
 						<Input.Wrapper>
 							<Input.Input
+								id="variable-default-value"
 								type="text"
 								value={localDefaultValue}
 								onChange={(e) => {
@@ -689,11 +693,6 @@ export const EmailInspector = () => {
 					{({ findStyleValue, setGlobalStyle }) => (
 						<InspectorSection>
 							<SectionHeader label="Body" />
-							<ColorRow
-								label="Background"
-								value={String(findStyleValue("body", "backgroundColor") ?? "")}
-								onChange={(v) => setGlobalStyle("body", "backgroundColor", v)}
-							/>
 							<PropRow label="Container width">
 								<NumInput
 									value={findStyleValue("container", "width")}
@@ -710,15 +709,6 @@ export const EmailInspector = () => {
 									unit="px"
 								/>
 							</PropRow>
-							<ColorRow
-								label="Container bg"
-								value={String(
-									findStyleValue("container", "backgroundColor") ?? "",
-								)}
-								onChange={(v) =>
-									setGlobalStyle("container", "backgroundColor", v)
-								}
-							/>
 							<PropRow label="Line height">
 								<NumInput
 									value={findStyleValue("body", "lineHeight")}

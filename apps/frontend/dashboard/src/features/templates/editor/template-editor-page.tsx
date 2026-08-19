@@ -1,19 +1,17 @@
+import { cn } from "@reloop/ui/cn";
 import { AnimatePresence, motion } from "motion/react";
 import { parseAsStringLiteral, useQueryState } from "nuqs";
-import { CodeEditor } from "./code-view";
-import { FullEmailBuilder } from "./editor";
-import { EditorProvider } from "./editor-provider";
-import {
-	AIPanel,
-	ScorePanel,
-	TestPanel,
-	VariablesPanel,
-} from "./editor-sidebar-panels";
-import { EditorToolbar } from "./editor-toolbar";
-import { GeneratingOverlay } from "./generating-overlay";
+import { AIPanel } from "./ai/ai-panel";
+import { FullEmailBuilder } from "./components/canvas/email-builder";
+import { GeneratingOverlay } from "./components/canvas/generating-overlay";
+import { CodeEditor } from "./components/panels/code/code-view";
+import { VersionSidebar } from "./components/panels/history/version-sidebar";
+import { ScorePanel } from "./components/panels/score/score-panel";
+import { TestPanel } from "./components/panels/test/test-panel";
+import { VariablesPanel } from "./components/panels/variables/variables-panel";
+import { SendDetails } from "./components/send-details/send-details";
 import { EmailInspector } from "./inspector";
-import { SendDetails } from "./send-details";
-import { VersionSidebar } from "./version-sidebar";
+import { EditorProvider } from "./providers/editor-provider";
 
 const viewModes = [
 	"visual",
@@ -28,66 +26,40 @@ const viewModes = [
 export function TemplateEditorPage({ templateId }: { templateId: string }) {
 	const [viewMode, setViewMode] = useQueryState(
 		"mode",
-		parseAsStringLiteral(viewModes).withDefault("visual"),
+		parseAsStringLiteral(viewModes).withDefault("ai"),
 	);
+
+	const isCodeSplit = viewMode === "code";
 
 	return (
 		<EditorProvider key={templateId} roomId={templateId}>
-			<div className="flex h-[calc(100vh-0px)] min-h-0 flex-1 items-stretch overflow-hidden pt-2 pr-2 pl-4">
-				{/* Sidebar Editor Toolbar (Vertical, Left, Top-aligned) */}
-				<div className="-ml-2 flex flex-col justify-start py-2">
-					<EditorToolbar />
-				</div>
-
-				<div className="flex h-full flex-1 overflow-hidden">
-					{/* Left panel (Code, history, or subpanels) */}
-					<AnimatePresence initial={false}>
-						{viewMode !== "visual" && (
-							<motion.div
-								initial={{ width: 0, opacity: 0 }}
-								animate={{
-									width: viewMode === "code" ? "50%" : "356px",
-									opacity: 1,
-								}}
-								exit={{ width: 0, opacity: 0 }}
-								transition={{
-									type: "spring",
-									stiffness: 320,
-									damping: 33,
-									opacity: { duration: 0.2 },
-								}}
-								className="relative flex shrink-0 overflow-hidden"
-							>
-								<div
-									className="relative m-2 flex flex-1 overflow-hidden"
-									style={{
-										minWidth:
-											viewMode === "code" ? "calc(50vw - 48px)" : "340px",
-									}}
-								>
-									{viewMode === "ai" && (
-										<AIPanel onClose={() => void setViewMode("visual")} />
-									)}
-									{viewMode === "code" && <CodeEditor />}
-									{viewMode === "history" && <VersionSidebar />}
-									{viewMode === "variables" && (
-										<VariablesPanel
-											onClose={() => void setViewMode("visual")}
-										/>
-									)}
-									{viewMode === "score" && (
-										<ScorePanel onClose={() => void setViewMode("visual")} />
-									)}
-									{viewMode === "test" && (
-										<TestPanel onClose={() => void setViewMode("visual")} />
-									)}
-								</div>
-							</motion.div>
+			<div className="flex h-full min-h-0 flex-1 items-stretch overflow-hidden bg-bg-white-0 dark:bg-black">
+				<div className="flex h-full min-h-0 flex-1 overflow-hidden">
+					{/* Left panel / Sidebar (Chat by default, or Code/History/Variables/Score/Test) */}
+					<div
+						className={cn(
+							"relative flex shrink-0 overflow-hidden border-stroke-soft-200 border-r transition-all duration-300 dark:border-stroke-soft-100/40",
+							isCodeSplit ? "w-1/2 min-w-[480px]" : "w-[360px]",
 						)}
-					</AnimatePresence>
+					>
+						{viewMode === "code" && (
+							<CodeEditor onClose={() => void setViewMode("ai")} />
+						)}
+						{viewMode === "history" && <VersionSidebar />}
+						{viewMode === "variables" && (
+							<VariablesPanel onClose={() => void setViewMode("ai")} />
+						)}
+						{viewMode === "score" && (
+							<ScorePanel onClose={() => void setViewMode("ai")} />
+						)}
+						{viewMode === "test" && (
+							<TestPanel onClose={() => void setViewMode("ai")} />
+						)}
+						{(viewMode === "ai" || viewMode === "visual") && <AIPanel />}
+					</div>
 
-					{/* Right panel (Visual builder + inspector) */}
-					<div className="relative m-2 flex flex-1 overflow-hidden rounded-3xl border border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/40">
+					{/* Center/Right panel (Visual builder + inspector) */}
+					<div className="relative flex min-h-0 flex-1 overflow-hidden bg-bg-white-0 dark:bg-black">
 						<main className="flex h-full flex-1 flex-col overflow-hidden">
 							<SendDetails />
 							<GeneratingOverlay />
@@ -96,7 +68,7 @@ export function TemplateEditorPage({ templateId }: { templateId: string }) {
 							</div>
 						</main>
 						<AnimatePresence initial={false}>
-							{viewMode === "visual" && (
+							{!isCodeSplit && (
 								<motion.div
 									initial={{ width: 0, opacity: 0 }}
 									animate={{ width: "288px", opacity: 1 }}
@@ -107,7 +79,7 @@ export function TemplateEditorPage({ templateId }: { templateId: string }) {
 										damping: 33,
 										opacity: { duration: 0.2 },
 									}}
-									className="my-2 mr-2 h-[calc(100%-16px)] shrink-0 overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-weak-50 dark:border-stroke-soft-100/40"
+									className="h-full shrink-0 overflow-hidden border-stroke-soft-200 border-l bg-bg-weak-50 dark:border-stroke-soft-100/40 dark:bg-black"
 								>
 									<div className="h-full w-72 overflow-y-auto">
 										<EmailInspector />

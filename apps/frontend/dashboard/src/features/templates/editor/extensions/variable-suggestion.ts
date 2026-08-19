@@ -1,7 +1,7 @@
 import { Extension } from "@tiptap/core";
 import { ReactRenderer } from "@tiptap/react";
 import Suggestion from "@tiptap/suggestion";
-import { VariablesDropdown } from "../variables-dropdown";
+import { VariablesDropdown } from "../components/panels/variables/variables-dropdown";
 
 export const VariableSuggestion = Extension.create({
 	name: "variableSuggestion",

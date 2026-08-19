@@ -1,8 +1,3 @@
-/**
- * Minimal SWR-shaped wrapper over React Query for the template editor port.
- * Supports `mutate()`, `isLoading`, and key-based fetching used throughout
- * the Next template editor components.
- */
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 type MutatorCallback<T> = (

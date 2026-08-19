@@ -3,8 +3,8 @@ import { Icon } from "@reloop/ui/icon";
 import { mergeAttributes, nodeInputRule, nodePasteRule } from "@tiptap/core";
 import { NodeViewWrapper, ReactNodeViewRenderer } from "@tiptap/react";
 import type React from "react";
-import { useSWR } from "#/features/templates/editor/lib/use-swr-compat";
-import { useTemplateId } from "#/features/templates/editor/lib/use-template-id";
+import { useSWR } from "#/features/templates/editor/hooks/use-swr-compat";
+import { useTemplateId } from "#/features/templates/editor/hooks/use-template-id";
 import { normalizeTemplateVariableName } from "#/features/templates/lib/template-variables";
 
 const fetcher = (url: string) =>

@@ -6,8 +6,8 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import type { DomainListResponse } from "#/features/domain/types";
-import { useSWR } from "#/features/templates/editor/lib/use-swr-compat";
-import { useEditorStore } from "./use-editor-store";
+import { useEditorStore } from "#/features/templates/editor/hooks/use-editor-store";
+import { useSWR } from "#/features/templates/editor/hooks/use-swr-compat";
 
 const fetcher = (url: string) =>
 	fetch(url, { credentials: "include" }).then((res) => res.json());

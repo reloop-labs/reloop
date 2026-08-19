@@ -12,14 +12,15 @@ import { parseAsStringLiteral, useQueryState } from "nuqs";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
-import { useSWR } from "#/features/templates/editor/lib/use-swr-compat";
-import { useTemplateId } from "#/features/templates/editor/lib/use-template-id";
+import { useEditorStore } from "#/features/templates/editor/hooks/use-editor-store";
+import { useSWR } from "#/features/templates/editor/hooks/use-swr-compat";
+import { useTemplateId } from "#/features/templates/editor/hooks/use-template-id";
 import { getAvatarGradient, getAvatarInitial } from "#/utils/avatar";
-import { PreviewModal } from "./preview-modal"; // Cache bust
-import { useEditorStore } from "./use-editor-store";
+import { PreviewModal } from "../../preview/preview-modal";
 
 const viewModes = [
 	"visual",
+	"ai",
 	"code",
 	"history",
 	"variables",
@@ -483,19 +484,8 @@ export function VersionSidebar() {
 		return majorVersions.length - index;
 	};
 
-	// Build last saved status text
-	const _getStatusText = () => {
-		if (lastSavedAt) {
-			const label = lastSavedDraftNumber
-				? `Draft ${lastSavedDraftNumber}`
-				: "Published";
-			return `Last saved: ${label}, ${formatRelativeTime(lastSavedAt.toISOString())}`;
-		}
-		return "No saves yet";
-	};
-
 	return (
-		<div className="flex h-full w-full flex-col overflow-hidden rounded-3xl border border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/40">
+		<div className="flex h-full w-full flex-col overflow-hidden bg-bg-white-0 dark:bg-black">
 			{/* Header */}
 			<div className="flex shrink-0 items-center justify-between pt-3 pr-4 pb-4 pl-6">
 				<h2 className="font-semibold text-label-lg text-text-strong-950">
@@ -503,7 +493,7 @@ export function VersionSidebar() {
 				</h2>
 				<button
 					type="button"
-					onClick={() => setViewMode("visual")}
+					onClick={() => setViewMode("ai")}
 					className="rounded-lg p-1.5 text-text-soft-400 transition-all hover:bg-bg-weak-50 hover:text-text-strong-950"
 				>
 					<Icon name="cross" className="h-[18px] w-[18px]" />
@@ -537,7 +527,6 @@ export function VersionSidebar() {
 				) : (
 					<div className="relative flex flex-col">
 						{currentList.map((version, index) => {
-							const _isRestoring = restoringId === version.id;
 							const isDeleting = deletingId === version.id;
 
 							const isFirstMajor = majorVersions[0]?.id === version.id;

@@ -3,8 +3,8 @@ import { Icon } from "@reloop/ui/icon";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useDebounceCallback } from "usehooks-ts";
-import { useSWR } from "#/features/templates/editor/lib/use-swr-compat";
-import { useTemplateId } from "#/features/templates/editor/lib/use-template-id";
+import { useSWR } from "#/features/templates/editor/hooks/use-swr-compat";
+import { useTemplateId } from "#/features/templates/editor/hooks/use-template-id";
 
 const fetcher = (url: string) =>
 	fetch(url, { credentials: "include" }).then((res) => res.json());

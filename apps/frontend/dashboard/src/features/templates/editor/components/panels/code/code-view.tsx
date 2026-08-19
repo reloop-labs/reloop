@@ -10,9 +10,9 @@ import { xcodeDark } from "@uiw/codemirror-theme-xcode";
 import CodeMirror from "@uiw/react-codemirror";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { useEditorStore } from "./use-editor-store";
+import { useEditorStore } from "#/features/templates/editor/hooks/use-editor-store";
 
-export function CodeEditor() {
+export function CodeEditor({ onClose }: { onClose?: () => void } = {}) {
 	const { editor } = useCurrentEditor();
 	const [htmlCode, setHtmlCode] = useState<string>("");
 	const [isLoading, setIsLoading] = useState(false);
@@ -168,7 +168,7 @@ export function CodeEditor() {
 	}, [htmlCode]);
 
 	return (
-		<div className="flex h-full w-full flex-col overflow-hidden rounded-3xl border border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/40">
+		<div className="flex h-full w-full flex-col overflow-hidden bg-bg-white-0 dark:bg-black">
 			<div className="flex h-10 shrink-0 items-center justify-between border-stroke-soft-200 border-b px-3 dark:border-stroke-soft-100/40">
 				<div className="flex items-center gap-1.5 p-0">
 					<Icon name="code" className="h-3.5 w-3.5 text-text-sub-600" />
@@ -206,6 +206,16 @@ export function CodeEditor() {
 						)}
 						Copy
 					</Button.Root>
+					{onClose ? (
+						<button
+							type="button"
+							onClick={onClose}
+							className="rounded-lg p-1 text-text-sub-600 hover:bg-bg-weak-50 hover:text-text-strong-950"
+							aria-label="Close code view"
+						>
+							<Icon name="cross" className="h-3.5 w-3.5" />
+						</button>
+					) : null}
 				</div>
 			</div>
 			<div className="relative flex min-h-0 flex-1">

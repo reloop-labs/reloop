@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useEditorStore } from "./use-editor-store";
+import { useEditorStore } from "#/features/templates/editor/hooks/use-editor-store";
 
 const CHARS = "abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:,.<>?";
 

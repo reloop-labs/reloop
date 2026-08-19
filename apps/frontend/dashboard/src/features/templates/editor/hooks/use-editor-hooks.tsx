@@ -7,8 +7,8 @@ import { useEditor } from "@tiptap/react";
 import { useCallback } from "react";
 import type { WebsocketProvider } from "y-websocket";
 import type * as Y from "yjs";
-import { Variable } from "./extensions/variable";
-import { VariableSuggestion } from "./extensions/variable-suggestion";
+import { Variable } from "../extensions/variable";
+import { VariableSuggestion } from "../extensions/variable-suggestion";
 
 export interface CollabOptions {
 	ydoc: Y.Doc;

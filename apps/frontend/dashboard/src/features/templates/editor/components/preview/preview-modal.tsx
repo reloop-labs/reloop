@@ -7,7 +7,7 @@ import * as Modal from "@reloop/ui/modal";
 import { motion } from "motion/react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { useTemplateId } from "#/features/templates/editor/lib/use-template-id";
+import { useTemplateId } from "#/features/templates/editor/hooks/use-template-id";
 import { getAvatarGradient, getAvatarInitial } from "#/utils/avatar";
 
 interface TemplateVersion {
@@ -402,7 +402,6 @@ export function PreviewModal({
 											type="button"
 											onClick={() => {
 												setViewport(device.id as any);
-												// set orientation to portrait by default on switch
 												setOrientation("portrait");
 											}}
 											className={cn(
