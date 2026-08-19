@@ -510,7 +510,7 @@ function AiPromptBar({
 }
 
 /* --- Scene 2: Real-time Collaborative Editor View --- */
-type CollaboratorId = "maya" | "noah" | "sarah" | "alex";
+type CollaboratorId = "maya" | "sarah" | "alex";
 
 interface Collaborator {
 	id: CollaboratorId;
@@ -534,17 +534,6 @@ const COLLABORATORS: Record<CollaboratorId, Collaborator> = {
 		textColor: "text-white",
 		highlightBg: "bg-emerald-400/20 dark:bg-emerald-400/20",
 		cursorFill: "#10b981",
-		cursorInk: "#ffffff",
-	},
-	noah: {
-		id: "noah",
-		name: "Noah Patel",
-		firstName: "Noah",
-		initial: "N",
-		color: "bg-indigo-500 dark:bg-indigo-500",
-		textColor: "text-white",
-		highlightBg: "bg-indigo-400/20 dark:bg-indigo-400/20",
-		cursorFill: "#6366f1",
 		cursorInk: "#ffffff",
 	},
 	sarah: {
@@ -669,7 +658,6 @@ function RealtimeEditorView() {
 
 	const isSarahActive = activeSpotlight === "sarah" || hoveredUser === "sarah";
 	const isAlexActive = activeSpotlight === "alex" || hoveredUser === "alex";
-	const isNoahActive = activeSpotlight === "noah" || hoveredUser === "noah";
 	const isMayaActive = activeSpotlight === "maya" || hoveredUser === "maya";
 
 	const toggleSpotlight = (id: CollaboratorId) => {
@@ -696,14 +684,8 @@ function RealtimeEditorView() {
 				emphasized={isMayaActive}
 				className="top-[6.9rem] right-[18%] sm:right-[22%]"
 			/>
-			<PresenceCursor
-				user={COLLABORATORS.noah}
-				delay={3.6}
-				emphasized={isNoahActive}
-				className="top-[14.4rem] left-[14%] sm:top-[14.8rem] sm:left-[16%]"
-			/>
 
-			{/* Top Bar with Document Title & 4 Multiplayer Avatars */}
+			{/* Top Bar with Document Title & Multiplayer Avatars */}
 			<div className="flex items-center justify-between border-stroke-soft-100 border-b px-4 py-2.5 dark:border-white/10">
 				<div className="flex items-center gap-2">
 					<span className="font-semibold text-text-strong-950 text-xs tracking-tight dark:text-white">
@@ -711,10 +693,10 @@ function RealtimeEditorView() {
 					</span>
 				</div>
 
-				{/* 4 Clickable Avatars with Figma-style Spotlight */}
+				{/* Clickable Avatars with Figma-style Spotlight */}
 				<div className="flex items-center gap-2">
 					<div className="-space-x-1.5 flex">
-						{(["maya", "noah", "sarah", "alex"] as CollaboratorId[]).map(
+						{(["maya", "sarah", "alex"] as CollaboratorId[]).map(
 							(id) => {
 								const user = COLLABORATORS[id];
 								const isCurrent = activeSpotlight === id;
@@ -745,7 +727,7 @@ function RealtimeEditorView() {
 
 					<div className="flex items-center gap-1 text-[10px] text-text-soft-400 dark:text-white/40">
 						<span className="size-1.5 rounded-full bg-emerald-500" />
-						<span>4 editing</span>
+						<span>3 editing</span>
 					</div>
 				</div>
 			</div>
@@ -837,23 +819,8 @@ function RealtimeEditorView() {
 
 			{/* Main Email Content Body */}
 			<div className="space-y-3.5 p-5 text-left sm:p-6">
-				{/* Greeting with Noah's caret */}
-				<div
-					onMouseEnter={() => setHoveredUser("noah")}
-					onMouseLeave={() => setHoveredUser(null)}
-					className="relative inline-flex items-center text-text-strong-950 text-xs dark:text-white"
-				>
-					<span>Hey&nbsp;</span>
-					<span
-						className={cn(
-							"cursor-pointer rounded-xs px-1 py-0.5 transition-colors",
-							COLLABORATORS.noah.highlightBg,
-						)}
-					>
-						developers
-					</span>
-					<PresenceCaret user={COLLABORATORS.noah} />
-					<span>,</span>
+				<div className="relative inline-flex items-center text-text-strong-950 text-xs dark:text-white">
+					<span>Hey developers,</span>
 				</div>
 
 				{/* Main Paragraph */}
