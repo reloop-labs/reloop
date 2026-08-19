@@ -86,7 +86,7 @@ export function HeroEmailsPreview() {
 		insights: null,
 	});
 
-	const inViewRef = useRef(true);
+	const inViewRef = useRef(false);
 	const isInitialMountRef = useRef(true);
 	const cursorShownRef = useRef(false);
 	const streamIndexRef = useRef(0);

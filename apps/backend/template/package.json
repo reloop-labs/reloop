@@ -48,6 +48,8 @@
 		"@ai-sdk/openai": "catalog:backend",
 		"@ai-sdk/google": "catalog:backend",
 		"@openrouter/ai-sdk-provider": "catalog:backend",
+		"@aws-sdk/client-s3": "catalog:backend",
+		"@aws-sdk/lib-storage": "catalog:backend",
 		"@reloop/code-samples": "workspace:*",
 		"playwright": "1.61.1"
 	},

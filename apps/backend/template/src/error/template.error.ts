@@ -154,4 +154,11 @@ export const TemplateErrors = {
 			why: reason,
 			fix: "Verify the HTML is valid and that Chromium is available to the template service.",
 		}),
+	thumbnailNotFound: (id: string) =>
+		createError({
+			status: 404,
+			message: "Template thumbnail not found",
+			why: `Template "${id}" has no saved HTML to preview.`,
+			fix: "Save a draft of the template so a thumbnail can be generated.",
+		}),
 };

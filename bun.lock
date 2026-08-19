@@ -422,6 +422,8 @@
       "dependencies": {
         "@ai-sdk/google": "catalog:backend",
         "@ai-sdk/openai": "catalog:backend",
+        "@aws-sdk/client-s3": "catalog:backend",
+        "@aws-sdk/lib-storage": "catalog:backend",
         "@elysiajs/cors": "catalog:backend",
         "@elysiajs/cron": "catalog:backend",
         "@elysiajs/openapi": "catalog:backend",

@@ -12,6 +12,7 @@ export type Template = {
 	subject: string | null;
 	status: "draft" | "published" | "archived";
 	content?: unknown[] | null;
+	thumbnailUrl?: string | null;
 	createdAt: string;
 	updatedAt: string;
 };

@@ -13,6 +13,7 @@ Backend service for managing email templates with drag-and-drop builder support.
 - `GET /api/template/` - Health check
 - `GET /api/template/v1/list` - List templates
 - `GET /api/template/v1/:id` - Get template by ID
+- `GET /api/template/v1/:id/thumbnail` - PNG preview of the latest saved HTML
 - `POST /api/template/v1/create` - Create template
 - `POST /api/template/v1/html-to-image` - Convert HTML to a PNG/JPEG/WebP
 - `PUT /api/template/v1/:id` - Update template

@@ -8,7 +8,7 @@ import { getLanguageIcon } from "@reloop/web/components/mdx/language-icons";
 import { hostedSignupHref } from "@reloop/web/lib/site";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import Link from "next/link";
-import { useCallback, useId, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { HeroAtmosphere, HeroWindowChrome } from "./hero-chrome";
 import { HeroDashboardShell } from "./hero-dashboard-shell";
 import {
@@ -105,6 +105,51 @@ export function Hero({ variant = "default" }: HeroProps) {
 	const reduceMotion = useReducedMotion();
 	const tablistId = useId();
 
+	const heroRef = useRef<HTMLElement>(null);
+	const panelRef = useRef<HTMLDivElement>(null);
+	const [isScrolledHalf, setIsScrolledHalf] = useState(false);
+
+	useEffect(() => {
+		const checkScroll = () => {
+			if (isScrolledHalf) return;
+			const heroEl = heroRef.current;
+			const panelEl = panelRef.current;
+			if (!heroEl && !panelEl) return;
+
+			const vh = window.innerHeight || 800;
+
+			// Method 1: Hero element scroll position
+			if (heroEl) {
+				const heroRect = heroEl.getBoundingClientRect();
+				if (
+					-heroRect.top >= vh * 0.5 ||
+					-heroRect.top >= heroRect.height * 0.5
+				) {
+					setIsScrolledHalf(true);
+					return;
+				}
+			}
+
+			// Method 2: Dashboard panel scroll position
+			if (panelEl) {
+				const panelRect = panelEl.getBoundingClientRect();
+				if (panelRect.top <= vh * 0.5) {
+					setIsScrolledHalf(true);
+					return;
+				}
+			}
+		};
+
+		checkScroll();
+		window.addEventListener("scroll", checkScroll, { passive: true });
+		window.addEventListener("resize", checkScroll, { passive: true });
+
+		return () => {
+			window.removeEventListener("scroll", checkScroll);
+			window.removeEventListener("resize", checkScroll);
+		};
+	}, [isScrolledHalf]);
+
 	const selectByOffset = useCallback((offset: number) => {
 		setActive((current) => {
 			const index = TABS.findIndex((tab) => tab.id === current);
@@ -125,6 +170,7 @@ export function Hero({ variant = "default" }: HeroProps) {
 	return (
 		<section
 			id="features"
+			ref={heroRef}
 			className="relative flex min-h-dvh flex-col bg-transparent"
 		>
 			{variant === "self-host" ? (
@@ -291,6 +337,7 @@ export function Hero({ variant = "default" }: HeroProps) {
 			<div className="relative w-full flex-1 overflow-hidden bg-bg-white-0 dark:bg-black">
 				<HeroAtmosphere />
 				<div
+					ref={panelRef}
 					id={`${tablistId}-panel`}
 					role="tabpanel"
 					aria-labelledby={`${tablistId}-${active}`}
@@ -305,7 +352,7 @@ export function Hero({ variant = "default" }: HeroProps) {
 						aria-hidden
 						className="pointer-events-none absolute inset-y-0 right-0 w-px bg-gradient-to-b from-[rgba(0,111,254,0.06)] via-[rgba(0,111,254,0.16)] to-[rgba(0,111,254,0.28)] dark:from-[rgba(0,111,254,0.1)] dark:via-[rgba(0,111,254,0.22)] dark:to-[rgba(0,111,254,0.38)]"
 					/>
-					<HeroDemoPlaybackProvider>
+					<HeroDemoPlaybackProvider started={isScrolledHalf}>
 						<HeroWindowChrome
 							action={
 								active === "overview" ||

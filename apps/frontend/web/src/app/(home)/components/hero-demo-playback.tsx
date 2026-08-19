@@ -8,12 +8,17 @@ import {
 	type ReactNode,
 	useCallback,
 	useContext,
+	useEffect,
 	useMemo,
 	useState,
 } from "react";
 
 type PlaybackContextValue = {
 	paused: boolean;
+	hasStarted: boolean;
+	start: () => void;
+	pause: () => void;
+	resume: () => void;
 	toggle: () => void;
 };
 
@@ -21,14 +26,42 @@ const PlaybackContext = createContext<PlaybackContextValue | null>(null);
 
 export function HeroDemoPlaybackProvider({
 	children,
+	started = false,
 }: {
 	children: ReactNode;
+	started?: boolean;
 }) {
-	const [paused, setPaused] = useState(false);
+	const [hasStarted, setHasStarted] = useState(started);
+	const [paused, setPaused] = useState(!started);
+
+	useEffect(() => {
+		if (started) {
+			setHasStarted(true);
+			setPaused(false);
+		}
+	}, [started]);
+
+	const start = useCallback(() => {
+		setHasStarted(true);
+		setPaused(false);
+	}, []);
+
+	const pause = useCallback(() => {
+		setPaused(true);
+	}, []);
+
+	const resume = useCallback(() => {
+		setPaused(false);
+	}, []);
+
 	const toggle = useCallback(() => {
 		setPaused((current) => !current);
 	}, []);
-	const value = useMemo(() => ({ paused, toggle }), [paused, toggle]);
+
+	const value = useMemo(
+		() => ({ hasStarted, paused, start, pause, resume, toggle }),
+		[hasStarted, paused, start, pause, resume, toggle],
+	);
 
 	return (
 		<PlaybackContext.Provider value={value}>

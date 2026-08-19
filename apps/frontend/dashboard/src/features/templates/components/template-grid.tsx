@@ -1,18 +1,14 @@
-import { StarterKit } from "@react-email/editor/extensions";
-import { EmailTheming } from "@react-email/editor/plugins";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
-import { EditorContent, useEditor } from "@tiptap/react";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import type { Template } from "#/features/templates/hooks/use-templates-query";
 import { DeleteTemplateModal } from "./delete-template-modal";
-import "@react-email/editor/themes/default.css";
 
 interface TemplateGridProps {
 	templates: Template[];
@@ -149,91 +145,69 @@ const TemplateDropdown = ({
 	);
 };
 
-const EMAIL_WIDTH = 600;
 /** Soft inset so the email sits in a padded “stage” like the mockup. */
-const PAPER_INSET = 28;
+const PAPER_INSET = 16;
+
+function templateThumbnailSrc(template: Template): string {
+	const bust = template.updatedAt
+		? `?t=${encodeURIComponent(template.updatedAt)}`
+		: "";
+	if (template.thumbnailUrl) return `${template.thumbnailUrl}${bust}`;
+	return `/api/template/v1/${template.id}/thumbnail${bust}`;
+}
 
 const TemplatePreviewThumbnail = ({ template }: { template: Template }) => {
-	const containerRef = useRef<HTMLDivElement>(null);
-	const [scale, setScale] = useState(0.5);
+	const [failed, setFailed] = useState(false);
+	const src = templateThumbnailSrc(template);
 
-	const editor = useEditor(
-		{
-			extensions: [StarterKit.configure({ UndoRedo: false }), EmailTheming],
-			content: {
-				type: "doc",
-				content: (template.content as never[]) || [],
-			},
-			editable: false,
-			immediatelyRender: false,
-		},
-		[template.id],
-	);
-
-	useEffect(() => {
-		if (editor && template.content) {
-			editor.commands.setContent({
-				type: "doc",
-				content: template.content as never[],
-			});
-		}
-	}, [editor, template.content]);
-
-	useEffect(() => {
-		if (!containerRef.current) return;
-		const el = containerRef.current;
-		const updateScale = () => {
-			const paperWidth = Math.max(el.offsetWidth - PAPER_INSET * 2, 1);
-			setScale(paperWidth / EMAIL_WIDTH);
-		};
-		updateScale();
-		const observer = new ResizeObserver(updateScale);
-		observer.observe(el);
-		return () => observer.disconnect();
-	}, []);
-
-	if (!editor) {
-		return null;
-	}
+	if (failed) return null;
 
 	return (
 		<div
-			ref={containerRef}
 			className="pointer-events-none absolute inset-0 select-none overflow-hidden"
-			style={{ padding: `${PAPER_INSET}px` }}
+			style={{
+				paddingTop: `${PAPER_INSET}px`,
+				paddingRight: `${PAPER_INSET}px`,
+				paddingBottom: 0,
+				paddingLeft: `${PAPER_INSET}px`,
+			}}
 		>
-			{/* Soft white stage behind the email paper */}
-			<div className="relative h-full w-full overflow-hidden rounded-xl bg-bg-white-0 shadow-regular-xs">
+			<div className="relative h-full w-full overflow-hidden rounded-t-2xl bg-bg-white-0 dark:bg-black">
+				<img
+					src={src}
+					alt={`Preview of ${template.name}`}
+					className="h-full w-full rounded-t-2xl object-cover object-top"
+					loading="lazy"
+					decoding="async"
+					onError={() => setFailed(true)}
+				/>
 				<div
-					className="[&_img]:!max-w-full [&_.tiptap]:!m-0 [&_.tiptap]:!min-h-0 [&_.tiptap]:!w-full [&_.tiptap]:!overflow-hidden [&_.tiptap]:!p-0 [&_img]:h-auto"
-					style={{
-						width: `${EMAIL_WIDTH}px`,
-						overflow: "hidden",
-						transform: `scale(${scale})`,
-						transformOrigin: "top left",
-					}}
-				>
-					<EditorContent editor={editor} />
-				</div>
-				{/* Soft fade into the card edges */}
-				<div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-bg-white-0 via-bg-white-0/80 to-transparent" />
-				<div className="pointer-events-none absolute inset-y-0 left-0 w-6 bg-gradient-to-r from-bg-white-0/90 to-transparent" />
-				<div className="pointer-events-none absolute inset-y-0 right-0 w-6 bg-gradient-to-l from-bg-white-0/90 to-transparent" />
+					aria-hidden
+					className={cn(
+						"pointer-events-none absolute inset-0 rounded-t-2xl",
+						"shadow-[inset_0_0_0_1px_rgba(0,0,0,0.06),inset_0_8px_20px_rgba(0,0,0,0.08)]",
+						"dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.08),inset_0_8px_20px_rgba(255,255,255,0.04)]",
+					)}
+				/>
 			</div>
 		</div>
 	);
 };
 
 function TemplateStatusBadge({ status }: { status: Template["status"] }) {
-	// Mockup only surfaces a muted “Draft” pill; published stays badge-free.
-	if (status === "published") return null;
-
-	const label = status === "draft" ? "Draft" : "Archived";
+	const label =
+		status === "published"
+			? "Published"
+			: status === "draft"
+				? "Draft"
+				: "Archived";
 
 	return (
 		<span
 			className={cn(
 				"shrink-0 select-none rounded-full px-2.5 py-1 font-medium text-[11px] leading-none",
+				status === "published" &&
+					"bg-primary-alpha-10 text-primary-base ring-1 ring-primary-alpha-16 ring-inset dark:bg-primary-base/15 dark:text-primary-base dark:ring-primary-base/25",
 				status === "draft" &&
 					"bg-bg-weak-50 text-text-sub-600 ring-1 ring-stroke-soft-100 ring-inset dark:bg-bg-soft-200 dark:text-text-sub-600 dark:ring-stroke-soft-100/40",
 				status === "archived" &&
@@ -250,7 +224,7 @@ const TemplateSkeleton = () => (
 		<div
 			className={cn(
 				"relative aspect-[5/4] w-full overflow-hidden rounded-[28px]",
-				"bg-bg-weak-50 dark:bg-bg-weak-50/40",
+				"bg-bg-weak-50 dark:bg-black",
 				"shadow-[0_0_0_1px_rgba(0,0,0,0.03),0_8px_32px_rgba(0,0,0,0.06)]",
 				"dark:shadow-[0_0_40px_rgba(255,255,255,0.04),0_8px_32px_rgba(0,0,0,0.4)]",
 			)}
@@ -325,7 +299,6 @@ export const TemplateGrid = ({
 			<div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 lg:gap-x-8 lg:gap-y-10">
 				{isLoading
 					? Array.from({ length: loadingRows }).map((_, i) => (
-							// biome-ignore lint/suspicious/noArrayIndexKey: static skeleton placeholders
 							<TemplateSkeleton key={`skeleton-${i}`} />
 						))
 					: templates.map((template) => {
@@ -343,7 +316,7 @@ export const TemplateGrid = ({
 											"relative aspect-[5/4] w-full overflow-hidden rounded-[28px] transition-shadow duration-300",
 											// Soft light fill + ambient glow (mockup)
 											"bg-gradient-to-b from-bg-white-0 to-bg-weak-50",
-											"dark:from-neutral-0 dark:to-bg-weak-50",
+											"dark:from-black dark:to-black",
 											"shadow-[0_0_0_1px_rgba(0,0,0,0.04),0_12px_40px_rgba(0,0,0,0.08)]",
 											"dark:shadow-[0_0_0_1px_rgba(255,255,255,0.06),0_0_48px_rgba(255,255,255,0.06),0_16px_48px_rgba(0,0,0,0.45)]",
 											isCardActive &&
@@ -355,10 +328,13 @@ export const TemplateGrid = ({
 										{/* Soft radial wash so the email floats in the middle */}
 										<div
 											aria-hidden
-											className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_40%,rgba(0,0,0,0.03)_100%)] dark:bg-[radial-gradient(ellipse_at_center,transparent_35%,rgba(0,0,0,0.25)_100%)]"
+											className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_40%,rgba(0,0,0,0.03)_100%)] dark:bg-[radial-gradient(ellipse_at_center,transparent_35%,rgba(0,0,0,0.35)_100%)]"
 										/>
 
-										<TemplatePreviewThumbnail template={template} />
+										<TemplatePreviewThumbnail
+											key={`${template.id}-${template.updatedAt}`}
+											template={template}
+										/>
 
 										<div
 											className="absolute top-3 right-3 z-10"

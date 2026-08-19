@@ -28,6 +28,7 @@ export interface UpdateTemplateInput {
 	variables?: schema.TemplateVariable[];
 	status?: "draft" | "published" | "archived";
 	currentVersion?: number;
+	thumbnailUrl?: string | null;
 }
 
 export const templateModel = {
@@ -114,6 +115,8 @@ export const templateModel = {
 		if (input.status !== undefined) updateData.status = input.status;
 		if (input.currentVersion !== undefined)
 			updateData.currentVersion = input.currentVersion;
+		if (input.thumbnailUrl !== undefined)
+			updateData.thumbnailUrl = input.thumbnailUrl;
 
 		const [result] = await db
 			.update(schema.template)
@@ -147,6 +150,7 @@ export const templateModel = {
 				createdByUserId: userId,
 				content: original.content,
 				variables: original.variables,
+				thumbnailUrl: original.thumbnailUrl,
 				status: "draft",
 			})
 			.returning();
