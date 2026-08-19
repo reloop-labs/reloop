@@ -480,7 +480,7 @@ function AiPromptBar({
 	onChange: (value: string) => void;
 }) {
 	return (
-		<div className="flex items-center gap-2 rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-1.5 pl-3 shadow-sm dark:border-white/10 dark:bg-[#0c0c0e]">
+		<div className="flex items-center gap-2 rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-1.5 pl-3 dark:border-white/10 dark:bg-[#0c0c0e]">
 			<input
 				ref={inputRef}
 				value={value}
@@ -572,57 +572,68 @@ const SUBJECT_TAIL = " — Real-time Email Engine";
 const BODY_EDIT =
 	"Share a template with your team and watch edits land live — subject lines, variables, and layout blocks stay in sync without a refresh.";
 
-const IDLE_EDITS: Record<CollaboratorId, boolean> = {
-	maya: false,
-	sarah: false,
-	alex: false,
+type CursorPhase = "hidden" | "arrive" | "click" | "park";
+
+type FieldState = {
+	cursor: CursorPhase;
+	caret: boolean;
+	typing: boolean;
+};
+
+const FIELD_IDLE: FieldState = {
+	cursor: "hidden",
+	caret: false,
+	typing: false,
+};
+
+const FIELD_DONE: FieldState = {
+	cursor: "park",
+	caret: true,
+	typing: false,
+};
+
+const CURSOR_START = { x: -22, y: -18, scale: 0.96, opacity: 0 };
+const CURSOR_CLICK = { x: 0, y: 0, scale: 0.82, opacity: 1 };
+const CURSOR_ON_TARGET = { x: 0, y: 0, scale: 1, opacity: 1 };
+
+const CURSOR_PARK: Record<CollaboratorId, { x: number; y: number }> = {
+	alex: { x: 64, y: 18 },
+	sarah: { x: 78, y: 20 },
+	maya: { x: 56, y: 28 },
 };
 
 /** Presence cursor using the shared `cursor` icon (same SVG as the tab). */
 function PresenceCursor({
 	user,
-	delay = 0,
-	emphasized = false,
-	className,
+	phase,
 }: {
 	user: Collaborator;
-	delay?: number;
-	emphasized?: boolean;
-	className?: string;
+	phase: Exclude<CursorPhase, "hidden">;
 }) {
 	const shouldReduceMotion = useReducedMotion();
+	const park = CURSOR_PARK[user.id];
+
+	const pose =
+		phase === "click"
+			? CURSOR_CLICK
+			: phase === "park"
+				? { x: park.x, y: park.y, scale: 1, opacity: 1 }
+				: CURSOR_ON_TARGET;
 
 	return (
 		<motion.div
 			aria-hidden
-			className={cn("pointer-events-none absolute z-20", className)}
-			animate={
-				shouldReduceMotion
-					? { scale: emphasized ? 1.08 : 1 }
-					: {
-							x: [0, 6, -3, 5, 0],
-							y: [0, -4, 3, -2, 0],
-							scale: emphasized ? 1.08 : 1,
-						}
-			}
+			className="pointer-events-none absolute top-0 left-0 z-30"
+			initial={shouldReduceMotion ? false : CURSOR_START}
+			animate={pose}
 			transition={
 				shouldReduceMotion
-					? { duration: 0.18, ease: EASE_OUT }
-					: {
-							x: {
-								duration: 8.2,
-								repeat: Number.POSITIVE_INFINITY,
-								ease: EASE_MOVE,
-								delay,
-							},
-							y: {
-								duration: 9.4,
-								repeat: Number.POSITIVE_INFINITY,
-								ease: EASE_MOVE,
-								delay: delay + 0.4,
-							},
-							scale: { duration: 0.18, ease: EASE_OUT },
-						}
+					? { duration: 0 }
+					: phase === "arrive"
+						? { duration: 0.42, ease: EASE_MOVE }
+						: phase === "park"
+							? { duration: 0.34, ease: EASE_MOVE }
+							: { duration: 0.1, ease: EASE_OUT }
 			}
 			style={{ transformOrigin: "2px 2px" }}
 		>
@@ -631,13 +642,29 @@ function PresenceCursor({
 				className="size-4 drop-shadow-[0_1px_2px_rgba(0,0,0,0.35)]"
 				style={{ color: user.cursorFill }}
 			/>
-			<span
-				className="absolute top-[14px] left-[12px] whitespace-nowrap rounded-md px-1.5 py-[3px] font-semibold text-[10px] leading-none shadow-[0_1px_2px_rgba(0,0,0,0.18)]"
-				style={{ backgroundColor: user.cursorFill, color: user.cursorInk }}
-			>
-				{user.firstName}
-			</span>
 		</motion.div>
+	);
+}
+
+function FieldCaret({
+	user,
+	show,
+	blinking,
+}: {
+	user: Collaborator;
+	show: boolean;
+	blinking: boolean;
+}) {
+	return (
+		<AnimatePresence>
+			{show ? (
+				<PresenceCaret
+					key={`${user.id}-caret`}
+					user={user}
+					blinking={blinking}
+				/>
+			) : null}
+		</AnimatePresence>
 	);
 }
 
@@ -655,10 +682,21 @@ function PresenceCaret({
 	const blink = blinking && !shouldReduceMotion;
 
 	return (
-		<span
+		<motion.span
 			aria-hidden
+			initial={
+				shouldReduceMotion ? false : { opacity: 0, scale: 0.95, y: 2 }
+			}
+			animate={{ opacity: 1, scale: 1, y: 0 }}
+			exit={
+				shouldReduceMotion ? undefined : { opacity: 0, scale: 0.97, y: 1 }
+			}
+			transition={{
+				duration: shouldReduceMotion ? 0 : 0.16,
+				ease: EASE_OUT,
+			}}
 			className={cn(
-				"relative z-20 mx-px inline-block h-[1.15em] w-0.5 shrink-0 align-text-bottom",
+				"relative z-20 mx-px inline-block h-[1.15em] w-0.5 shrink-0 origin-bottom align-text-bottom",
 				className,
 			)}
 		>
@@ -683,7 +721,7 @@ function PresenceCaret({
 			>
 				{user.firstName}
 			</span>
-		</span>
+		</motion.span>
 	);
 }
 
@@ -696,19 +734,45 @@ function RealtimeEditorView() {
 	const [fromChars, setFromChars] = useState(0);
 	const [subjectChars, setSubjectChars] = useState(0);
 	const [bodyChars, setBodyChars] = useState(0);
-	const [edits, setEdits] = useState(IDLE_EDITS);
+	const [fields, setFields] = useState<Record<CollaboratorId, FieldState>>({
+		maya: FIELD_IDLE,
+		sarah: FIELD_IDLE,
+		alex: FIELD_IDLE,
+	});
+	const [focusedField, setFocusedField] = useState<CollaboratorId | null>(null);
 
 	const isSarahActive =
-		edits.sarah ||
+		fields.sarah.caret ||
+		focusedField === "sarah" ||
 		activeSpotlight === "sarah" ||
 		hoveredUser === "sarah";
 	const isAlexActive =
-		edits.alex || activeSpotlight === "alex" || hoveredUser === "alex";
+		fields.alex.caret ||
+		focusedField === "alex" ||
+		activeSpotlight === "alex" ||
+		hoveredUser === "alex";
 	const isMayaActive =
-		edits.maya || activeSpotlight === "maya" || hoveredUser === "maya";
+		fields.maya.caret ||
+		focusedField === "maya" ||
+		activeSpotlight === "maya" ||
+		hoveredUser === "maya";
+
+	const focusField = (id: CollaboratorId) => {
+		setFocusedField(id);
+		setActiveSpotlight(id);
+		setFields((prev) => ({
+			...prev,
+			[id]: {
+				...prev[id],
+				caret: true,
+				cursor: prev[id].cursor === "hidden" ? "park" : prev[id].cursor,
+			},
+		}));
+	};
 
 	const toggleSpotlight = (id: CollaboratorId) => {
 		setActiveSpotlight((prev) => (prev === id ? null : id));
+		focusField(id);
 	};
 
 	useEffect(() => {
@@ -716,7 +780,11 @@ function RealtimeEditorView() {
 			setFromChars(FROM_NAME.length);
 			setSubjectChars(SUBJECT_HEAD.length);
 			setBodyChars(BODY_EDIT.length);
-			setEdits(IDLE_EDITS);
+			setFields({
+				maya: FIELD_DONE,
+				sarah: FIELD_DONE,
+				alex: FIELD_DONE,
+			});
 			return;
 		}
 
@@ -733,43 +801,45 @@ function RealtimeEditorView() {
 			}
 		};
 
-		const mark = (id: CollaboratorId, on: boolean) => {
+		const patch = (id: CollaboratorId, next: Partial<FieldState>) => {
 			if (cancelled) return;
-			setEdits((prev) => (prev[id] === on ? prev : { ...prev, [id]: on }));
+			setFields((prev) => ({ ...prev, [id]: { ...prev[id], ...next } }));
+		};
+
+		const runField = async (
+			id: CollaboratorId,
+			text: string,
+			setChars: (n: number) => void,
+		) => {
+			patch(id, { cursor: "arrive", caret: false, typing: false });
+			await wait(440);
+			if (cancelled) return;
+			patch(id, { cursor: "click" });
+			await wait(120);
+			if (cancelled) return;
+			patch(id, { caret: true });
+			await wait(90);
+			if (cancelled) return;
+			patch(id, { cursor: "park" });
+			await wait(280);
+			if (cancelled) return;
+			patch(id, { typing: true });
+			await typeText(text, setChars);
+			if (cancelled) return;
+			patch(id, { typing: false, caret: true, cursor: "park" });
 		};
 
 		const play = async () => {
-			while (!cancelled) {
-				setFromChars(0);
-				setSubjectChars(0);
-				setBodyChars(0);
-				setEdits(IDLE_EDITS);
-				await wait(420);
-				if (cancelled) return;
-
-				mark("alex", true);
-				const alex = typeText(FROM_NAME, setFromChars).then(() =>
-					mark("alex", false),
-				);
-
-				await wait(360);
-				if (cancelled) return;
-				mark("sarah", true);
-				const sarah = typeText(SUBJECT_HEAD, setSubjectChars).then(() =>
-					mark("sarah", false),
-				);
-
-				await wait(480);
-				if (cancelled) return;
-				mark("maya", true);
-				const maya = typeText(BODY_EDIT, setBodyChars).then(() =>
-					mark("maya", false),
-				);
-
-				await Promise.all([alex, sarah, maya]);
-				if (cancelled) return;
-				await wait(2600);
-			}
+			await wait(360);
+			if (cancelled) return;
+			const alex = runField("alex", FROM_NAME, setFromChars);
+			await wait(560);
+			if (cancelled) return;
+			const sarah = runField("sarah", SUBJECT_HEAD, setSubjectChars);
+			await wait(640);
+			if (cancelled) return;
+			const maya = runField("maya", BODY_EDIT, setBodyChars);
+			await Promise.all([alex, sarah, maya]);
 		};
 
 		void play();
@@ -780,24 +850,6 @@ function RealtimeEditorView() {
 
 	return (
 		<div className="relative mx-auto w-full max-w-3xl overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 shadow-xs dark:border-white/10 dark:bg-[#0c0c0e]">
-			<PresenceCursor
-				user={COLLABORATORS.sarah}
-				delay={0.2}
-				emphasized={isSarahActive}
-				className="top-[9.6rem] left-[42%] sm:top-[9.8rem] sm:left-[44%]"
-			/>
-			<PresenceCursor
-				user={COLLABORATORS.alex}
-				delay={1.1}
-				emphasized={isAlexActive}
-				className="top-[4.6rem] left-[28%] sm:left-[30%]"
-			/>
-			<PresenceCursor
-				user={COLLABORATORS.maya}
-				delay={2.4}
-				emphasized={isMayaActive}
-				className="top-[17.5rem] left-[18%] sm:top-[18rem] sm:left-[22%]"
-			/>
 
 			{/* Top Bar with Document Title & Multiplayer Avatars */}
 			<div className="flex items-center justify-between border-stroke-soft-100 border-b px-4 py-2.5 dark:border-white/10">
@@ -852,17 +904,25 @@ function RealtimeEditorView() {
 							From
 						</span>
 						<div
+							onClick={() => focusField("alex")}
 							onMouseEnter={() => setHoveredUser("alex")}
 							onMouseLeave={() => setHoveredUser(null)}
 							className={cn(
-								"relative inline-flex items-center rounded-xs font-mono text-[11px] text-text-strong-950 transition-colors dark:text-white",
+								"relative inline-flex cursor-text items-center rounded-xs font-mono text-[11px] text-text-strong-950 transition-colors dark:text-white",
 								isAlexActive && COLLABORATORS.alex.highlightBg,
 							)}
 						>
+							{fields.alex.cursor !== "hidden" ? (
+								<PresenceCursor
+									user={COLLABORATORS.alex}
+									phase={fields.alex.cursor}
+								/>
+							) : null}
 							<span>{FROM_NAME.slice(0, fromChars)}</span>
-							<PresenceCaret
+							<FieldCaret
 								user={COLLABORATORS.alex}
-								blinking={edits.alex}
+								show={fields.alex.caret || focusedField === "alex"}
+								blinking={fields.alex.typing}
 							/>
 							<span className="text-text-soft-400 dark:text-white/40">
 								&lt;maya@updates.reloop.sh&gt;
@@ -902,17 +962,25 @@ function RealtimeEditorView() {
 							Subject
 						</span>
 						<div
+							onClick={() => focusField("sarah")}
 							onMouseEnter={() => setHoveredUser("sarah")}
 							onMouseLeave={() => setHoveredUser(null)}
 							className={cn(
-								"relative inline-flex items-center rounded-xs font-medium text-[11.5px] text-text-strong-950 transition-colors dark:text-white",
+								"relative inline-flex cursor-text items-center rounded-xs font-medium text-[11.5px] text-text-strong-950 transition-colors dark:text-white",
 								isSarahActive && COLLABORATORS.sarah.highlightBg,
 							)}
 						>
+							{fields.sarah.cursor !== "hidden" ? (
+								<PresenceCursor
+									user={COLLABORATORS.sarah}
+									phase={fields.sarah.cursor}
+								/>
+							) : null}
 							<span>{SUBJECT_HEAD.slice(0, subjectChars)}</span>
-							<PresenceCaret
+							<FieldCaret
 								user={COLLABORATORS.sarah}
-								blinking={edits.sarah}
+								show={fields.sarah.caret || focusedField === "sarah"}
+								blinking={fields.sarah.typing}
 							/>
 							{subjectChars === SUBJECT_HEAD.length ? (
 								<span className="text-text-sub-600 dark:text-white/70">
@@ -962,17 +1030,25 @@ function RealtimeEditorView() {
 						automated deliverability monitoring right out of the box.
 					</p>
 					<p
+						onClick={() => focusField("maya")}
 						onMouseEnter={() => setHoveredUser("maya")}
 						onMouseLeave={() => setHoveredUser(null)}
 						className={cn(
-							"text-[11px] text-text-sub-600 leading-relaxed transition-colors dark:text-white/70",
+							"relative cursor-text text-[11px] text-text-sub-600 leading-relaxed transition-colors dark:text-white/70",
 							isMayaActive && COLLABORATORS.maya.highlightBg,
 						)}
 					>
+						{fields.maya.cursor !== "hidden" ? (
+							<PresenceCursor
+								user={COLLABORATORS.maya}
+								phase={fields.maya.cursor}
+							/>
+						) : null}
 						{BODY_EDIT.slice(0, bodyChars)}
-						<PresenceCaret
+						<FieldCaret
 							user={COLLABORATORS.maya}
-							blinking={edits.maya}
+							show={fields.maya.caret || focusedField === "maya"}
+							blinking={fields.maya.typing}
 						/>
 					</p>
 					<p className="text-[11px] text-text-sub-600 leading-relaxed dark:text-white/70">
