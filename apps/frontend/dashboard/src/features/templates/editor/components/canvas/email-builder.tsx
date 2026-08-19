@@ -18,6 +18,17 @@ const DRAG_POSITION_CONFIG = {
 	strategy: "fixed" as const,
 };
 
+function isCanvasEmpty(
+	editor: NonNullable<ReturnType<typeof useCurrentEditor>["editor"]>,
+) {
+	const nodes = editor.getJSON().content ?? [];
+	if (nodes.length === 0) return true;
+	return nodes.every((node) => {
+		if (node.type !== "paragraph" && node.type !== "heading") return false;
+		return !node.content || node.content.length === 0;
+	});
+}
+
 export function FullEmailBuilder() {
 	const { editor } = useCurrentEditor();
 	const canvasRef = useRef<HTMLDivElement>(null);
@@ -33,7 +44,7 @@ export function FullEmailBuilder() {
 	useEffect(() => {
 		if (!editor) return;
 		const sync = () => {
-			const empty = editor.getText().trim().length === 0;
+			const empty = isCanvasEmpty(editor);
 			setIsEmpty((prev) => (prev === empty ? prev : empty));
 		};
 		sync();
