@@ -9,7 +9,7 @@ import { type DetailTabId, EmailDetail } from "../emails/detail/email-detail";
 import type { AnalyticsTabId } from "./preview-scenes";
 import { PreviewTabs } from "./preview-tabs";
 
-const TAB_ORDER: AnalyticsTabId[] = ["metrics", "engagement", "bounces"];
+const TAB_ORDER: AnalyticsTabId[] = ["engagement", "metrics", "bounces"];
 
 const EASE_DEFAULT: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
 const SLIDE_PX = 160;
@@ -48,10 +48,10 @@ const OPENED_PERCENTAGES = [1.0, 0.95, 0.88, 0.76, 0.6, 0.42, 0.24, 0.12];
 const CLICKED_PERCENTAGES = [1.0, 0.98, 0.93, 0.84, 0.7, 0.54, 0.36, 0.24];
 const BOUNCED_PERCENTAGES = [1.0, 0.99, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96];
 
-const DELIVERED_VALUES = [420, 890, 1420, 2100, 3450, 5100, 6800, 7950];
-const OPENED_VALUES = [210, 480, 780, 1150, 1890, 2950, 4200, 5100];
-const CLICKED_VALUES = [70, 160, 270, 420, 710, 1180, 1750, 2200];
-const BOUNCED_VALUES = [2, 3, 4, 5, 6, 7, 8, 9];
+const DELIVERED_VALUES = [4200, 8900, 14200, 21000, 29400, 38100, 48000, 59500];
+const OPENED_VALUES = [2100, 4800, 7800, 11500, 14100, 19500, 24200, 29100];
+const CLICKED_VALUES = [700, 1600, 2700, 4200, 4286, 5800, 7500, 9200];
+const BOUNCED_VALUES = [4, 11, 18, 26, 38, 49, 62, 74];
 
 function getCatmullRomPath(points: { x: number; y: number }[], height: number) {
 	if (points.length < 2) return { path: "", area: "" };
@@ -129,14 +129,65 @@ function MetricsLayeredView() {
 		}
 	};
 
-	const curDelivered = DELIVERED_VALUES[hoveredIdx] ?? 3450;
-	const curOpened = OPENED_VALUES[hoveredIdx] ?? 1890;
-	const curClicked = CLICKED_VALUES[hoveredIdx] ?? 710;
+	const curDelivered = DELIVERED_VALUES[hoveredIdx] ?? 29400;
+	const curOpened = OPENED_VALUES[hoveredIdx] ?? 14100;
+	const curClicked = CLICKED_VALUES[hoveredIdx] ?? 4286;
 	const curBounced = BOUNCED_VALUES[hoveredIdx] ?? 38;
 	const curDate = DATES[hoveredIdx] ?? "13 aug";
 
 	return (
 		<div className="relative h-full w-full">
+			{/* Left-Side Status Metric Callouts (Delivered, Opened, Clicked, Bounced) */}
+			<div className="pointer-events-none absolute top-5 left-5 z-20 grid grid-cols-2 gap-x-6 gap-y-4 sm:top-7 sm:left-8 sm:gap-x-12 sm:gap-y-6">
+				{/* 1. Delivered */}
+				<div className="border-[#3B82F6] border-l-2 pl-2.5 sm:pl-3.5">
+					<p className="font-bold text-text-strong-950 text-xl tracking-tight tabular-nums sm:text-2xl lg:text-3xl dark:text-white">
+						{curDelivered.toLocaleString()}
+					</p>
+					<p className="mt-0.5 text-[11px] text-text-sub-600 sm:text-xs dark:text-white/60">
+						Delivered
+					</p>
+				</div>
+
+				{/* 2. Opened */}
+				<div className="border-[#A855F7] border-l-2 pl-2.5 sm:pl-3.5">
+					<p className="font-bold text-text-strong-950 text-xl tracking-tight tabular-nums sm:text-2xl lg:text-3xl dark:text-white">
+						{curOpened.toLocaleString()}
+					</p>
+					<p className="mt-0.5 text-[11px] text-text-sub-600 sm:text-xs dark:text-white/60">
+						Opened
+					</p>
+				</div>
+
+				{/* 3. Clicked */}
+				<div className="border-[#10B981] border-l-2 pl-2.5 sm:pl-3.5">
+					<p className="font-bold text-text-strong-950 text-xl tracking-tight tabular-nums sm:text-2xl lg:text-3xl dark:text-white">
+						{curClicked.toLocaleString()}
+					</p>
+					<p className="mt-0.5 text-[11px] text-text-sub-600 sm:text-xs dark:text-white/60">
+						Clicked
+					</p>
+				</div>
+
+				{/* 4. Bounced */}
+				<div className="border-[#EF4444] border-l-2 pl-2.5 sm:pl-3.5">
+					<p className="font-bold text-text-strong-950 text-xl tracking-tight tabular-nums sm:text-2xl lg:text-3xl dark:text-white">
+						{curBounced.toLocaleString()}
+					</p>
+					<p className="mt-0.5 text-[11px] text-text-sub-600 sm:text-xs dark:text-white/60">
+						Bounced
+					</p>
+				</div>
+			</div>
+
+			{/* Date Badge (Top Right) */}
+			<div className="pointer-events-none absolute top-5 right-5 z-20 flex items-center gap-2 sm:top-7 sm:right-8">
+				<div className="flex items-center gap-1.5 rounded-full border border-stroke-soft-200 bg-bg-white-0/80 px-2.5 py-1 font-medium text-[11px] text-text-sub-600 shadow-xs backdrop-blur-sm dark:border-white/10 dark:bg-[#141416]/80 dark:text-white/70">
+					<span className="size-1.5 rounded-full bg-blue-500" />
+					<span className="uppercase tracking-wider">{curDate}</span>
+				</div>
+			</div>
+
 			{/* SVG Line / Area Graph (Full-Bleed, Borderless, Numberless) */}
 			<div
 				className="relative h-full min-h-[300px] w-full cursor-crosshair sm:min-h-[340px] lg:min-h-[380px]"
@@ -262,496 +313,42 @@ function MetricsLayeredView() {
 						className="fill-white stroke-[#EF4444] stroke-[2.5] dark:fill-black"
 					/>
 				</svg>
-
-				{/* Dub-Style Floating Tooltip Card */}
-				<div
-					className="pointer-events-none absolute z-20 flex w-[210px] flex-col gap-2 transition-all duration-150"
-					style={{
-						left: `${(activeDeliveredPt.x / w) * 100}%`,
-						top: `${Math.max(8, Math.min(55, (activeDeliveredPt.y / h) * 100 - 25))}%`,
-						transform:
-							activeDeliveredPt.x > w * 0.62
-								? "translate(-108%, -15%)"
-								: "translate(18px, -15%)",
-					}}
-				>
-					{/* Main Stats Card */}
-					<div className="rounded-xl border border-stroke-soft-200 bg-bg-white-0/95 p-3 shadow-[0_12px_32px_rgba(0,0,0,0.08)] backdrop-blur-md dark:border-white/10 dark:bg-[#121214]/95 dark:shadow-[0_16px_36px_rgba(0,0,0,0.4)]">
-						<div className="flex items-center justify-between border-stroke-soft-100 border-b pb-1.5 dark:border-white/10">
-							<div className="flex items-center gap-1.5">
-								<span className="size-1.5 rounded-full bg-blue-500" />
-								<span className="font-medium text-[11px] text-text-sub-600 dark:text-white/70">
-									reloop.sh/mail
-								</span>
-							</div>
-							<span className="text-[10px] text-text-soft-400 uppercase tracking-wider dark:text-white/40">
-								{curDate}
-							</span>
-						</div>
-
-						<div className="mt-2 space-y-1.5 text-xs">
-							<div className="flex items-center justify-between">
-								<div className="flex items-center gap-2">
-									<span className="size-2 rounded-full bg-[#3B82F6]" />
-									<span className="text-text-sub-600 dark:text-white/70">
-										Delivered
-									</span>
-								</div>
-								<span className="font-semibold text-text-strong-950 tabular-nums dark:text-white">
-									{curDelivered.toLocaleString()}
-								</span>
-							</div>
-							<div className="flex items-center justify-between">
-								<div className="flex items-center gap-2">
-									<span className="size-2 rounded-full bg-[#A855F7]" />
-									<span className="text-text-sub-600 dark:text-white/70">
-										Opened
-									</span>
-								</div>
-								<span className="font-semibold text-text-strong-950 tabular-nums dark:text-white">
-									{curOpened.toLocaleString()}
-								</span>
-							</div>
-							<div className="flex items-center justify-between">
-								<div className="flex items-center gap-2">
-									<span className="size-2 rounded-full bg-[#10B981]" />
-									<span className="text-text-sub-600 dark:text-white/70">
-										Clicked
-									</span>
-								</div>
-								<span className="font-semibold text-text-strong-950 tabular-nums dark:text-white">
-									{curClicked.toLocaleString()}
-								</span>
-							</div>
-							<div className="flex items-center justify-between">
-								<div className="flex items-center gap-2">
-									<span className="size-2 rounded-full bg-[#EF4444]" />
-									<span className="text-text-sub-600 dark:text-white/70">
-										Bounced
-									</span>
-								</div>
-								<span className="font-semibold text-text-strong-950 tabular-nums dark:text-white">
-									{curBounced.toLocaleString()}
-								</span>
-							</div>
-						</div>
-					</div>
-
-					{/* Secondary Mini Chip: Top Providers */}
-					<div className="flex items-center justify-between rounded-lg border border-stroke-soft-200 bg-bg-white-0/90 px-2.5 py-1 text-[10.5px] shadow-sm backdrop-blur-sm dark:border-white/10 dark:bg-[#141416]/90">
-						<span className="text-text-soft-400 dark:text-white/40">
-							Inbox Health
-						</span>
-						<span className="font-medium text-emerald-600 dark:text-emerald-400">
-							99.4% inboxed
-						</span>
-					</div>
-				</div>
 			</div>
 		</div>
 	);
 }
 
-/* --- Scene 2: Reloop Engagement Funnel (Sankey Flow) --- */
-type FunnelStage = "delivered" | "opened" | "clicked";
-
+/* --- Scene 2: Engagement & Clicks (Coming Soon) --- */
 function EngagementView() {
-	const [activeStage, setActiveStage] = useState<FunnelStage>("opened");
-
 	return (
-		<div className="relative mx-auto w-full max-w-5xl space-y-2.5">
-			{/* 3 Clickable Funnel Stage Metric Cards */}
-			<div className="grid grid-cols-3 divide-x divide-stroke-soft-100 overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-white-0 dark:divide-white/5 dark:border-white/10 dark:bg-[#0c0c0e]">
-				{/* Stage 1: Delivered */}
-				<button
-					type="button"
-					onClick={() => setActiveStage("delivered")}
-					className={cn(
-						"group relative flex cursor-pointer flex-col p-2.5 text-left transition-all sm:p-3",
-						activeStage === "delivered"
-							? "bg-indigo-50/40 dark:bg-indigo-950/20"
-							: "hover:bg-bg-weak-50/50 dark:hover:bg-white/[0.02]",
-					)}
-				>
-					<div className="flex items-center justify-between">
-						<div className="flex items-center gap-1.5">
-							<span className="size-1.5 rounded-full bg-[#4F46E5]" />
-							<span className="font-medium text-[11px] text-text-sub-600 dark:text-white/60">
-								Delivered
-							</span>
-						</div>
-						<span className="text-text-soft-400 text-xs transition-transform group-hover:translate-x-0.5 dark:text-white/30">
-							›
-						</span>
-					</div>
-					<p className="mt-1 font-bold text-text-strong-950 text-xl tracking-tight sm:text-2xl dark:text-white">
-						29.4K
-					</p>
-					<div className="mt-0.5 flex items-center gap-1 text-[#4F46E5] text-[10px] dark:text-indigo-400">
-						<span>100% sent</span>
-						<span className="text-text-soft-400 dark:text-white/30">·</span>
-						<span className="text-text-sub-600 dark:text-white/50">
-							128ms avg
-						</span>
-					</div>
-					{activeStage === "delivered" && (
-						<motion.div
-							layoutId="funnel-tab"
-							className="absolute inset-x-0 bottom-0 h-0.5 bg-[#4F46E5]"
-						/>
-					)}
-				</button>
-
-				{/* Stage 2: Opened */}
-				<button
-					type="button"
-					onClick={() => setActiveStage("opened")}
-					className={cn(
-						"group relative flex cursor-pointer flex-col p-2.5 text-left transition-all sm:p-3",
-						activeStage === "opened"
-							? "bg-cyan-50/40 dark:bg-cyan-950/20"
-							: "hover:bg-bg-weak-50/50 dark:hover:bg-white/[0.02]",
-					)}
-				>
-					<div className="flex items-center justify-between">
-						<div className="flex items-center gap-1.5">
-							<span className="size-1.5 rounded-full bg-[#0284C7]" />
-							<span className="font-medium text-[11px] text-text-sub-600 dark:text-white/60">
-								Opened
-							</span>
-						</div>
-						<span className="text-text-soft-400 text-xs transition-transform group-hover:translate-x-0.5 dark:text-white/30">
-							›
-						</span>
-					</div>
-					<p className="mt-1 font-bold text-text-strong-950 text-xl tracking-tight sm:text-2xl dark:text-white">
-						14.1K
-					</p>
-					<div className="mt-0.5 flex items-center gap-1 text-[#0284C7] text-[10px] dark:text-cyan-400">
-						<span>48.2% open rate</span>
-						<span className="text-text-soft-400 dark:text-white/30">·</span>
-						<span className="text-emerald-600 dark:text-emerald-400">
-							+9.7% avg
-						</span>
-					</div>
-					{activeStage === "opened" && (
-						<motion.div
-							layoutId="funnel-tab"
-							className="absolute inset-x-0 bottom-0 h-0.5 bg-[#0284C7]"
-						/>
-					)}
-				</button>
-
-				{/* Stage 3: Clicked */}
-				<button
-					type="button"
-					onClick={() => setActiveStage("clicked")}
-					className={cn(
-						"group relative flex cursor-pointer flex-col p-2.5 text-left transition-all sm:p-3",
-						activeStage === "clicked"
-							? "bg-emerald-50/40 dark:bg-emerald-950/20"
-							: "hover:bg-bg-weak-50/50 dark:hover:bg-white/[0.02]",
-					)}
-				>
-					<div className="flex items-center justify-between">
-						<div className="flex items-center gap-1.5">
-							<span className="size-1.5 rounded-full bg-[#059669]" />
-							<span className="font-medium text-[11px] text-text-sub-600 dark:text-white/60">
-								Clicked
-							</span>
-						</div>
-						<div className="flex items-center gap-1 text-[10px] text-text-soft-400 dark:text-white/40">
-							<span>CTOR 30%</span>
-						</div>
-					</div>
-					<p className="mt-1 font-bold text-text-strong-950 text-xl tracking-tight sm:text-2xl dark:text-white">
-						4,286
-					</p>
-					<div className="mt-0.5 flex items-center gap-1 text-[#059669] text-[10px] dark:text-emerald-400">
-						<span>14.6% CTR</span>
-						<span className="text-text-soft-400 dark:text-white/30">·</span>
-						<span className="text-text-sub-600 dark:text-white/50">
-							8.3K total
-						</span>
-					</div>
-					{activeStage === "clicked" && (
-						<motion.div
-							layoutId="funnel-tab"
-							className="absolute inset-x-0 bottom-0 h-0.5 bg-[#059669]"
-						/>
-					)}
-				</button>
+		<div className="relative mx-auto flex h-full min-h-[300px] w-full max-w-xl flex-col items-center justify-center text-center sm:min-h-[340px] lg:min-h-[380px]">
+			{/* Ambient radial glow background */}
+			<div
+				aria-hidden
+				className="pointer-events-none absolute inset-0 flex items-center justify-center"
+			>
+				<div className="size-60 rounded-full bg-blue-500/10 blur-3xl dark:bg-blue-500/15" />
 			</div>
 
-			{/* Fluid Organic Sankey Stream Graphic */}
-			<div className="relative overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-2 sm:p-3 dark:border-white/10 dark:bg-[#0c0c0e]">
-				<div className="relative h-[130px] w-full">
-					<svg
-						viewBox="0 0 760 180"
-						className="h-full w-full overflow-visible"
-						preserveAspectRatio="none"
-					>
-						<defs>
-							{/* Gradients for smooth fluid transitions: Indigo -> Cyan -> Emerald */}
-							<linearGradient
-								id="funnel-indigo-cyan"
-								x1="0%"
-								y1="0%"
-								x2="100%"
-								y2="0%"
-							>
-								<stop offset="0%" stopColor="#4338CA" />
-								<stop offset="60%" stopColor="#4F46E5" />
-								<stop offset="100%" stopColor="#0284C7" />
-							</linearGradient>
-
-							<linearGradient
-								id="funnel-cyan-emerald"
-								x1="0%"
-								y1="0%"
-								x2="100%"
-								y2="0%"
-							>
-								<stop offset="0%" stopColor="#0284C7" />
-								<stop offset="60%" stopColor="#0EA5E9" />
-								<stop offset="100%" stopColor="#059669" />
-							</linearGradient>
-
-							<linearGradient
-								id="funnel-emerald-end"
-								x1="0%"
-								y1="0%"
-								x2="100%"
-								y2="0%"
-							>
-								<stop offset="0%" stopColor="#059669" />
-								<stop offset="60%" stopColor="#10B981" />
-								<stop offset="100%" stopColor="#34D399" />
-							</linearGradient>
-						</defs>
-
-						{/* --- 1. Delivered Stream (Indigo Stream) --- */}
-						<g
-							className="cursor-pointer transition-opacity duration-200"
-							onClick={() => setActiveStage("delivered")}
-							opacity={
-								activeStage === "delivered"
-									? 1
-									: activeStage === "opened" || activeStage === "clicked"
-										? 0.75
-										: 1
-							}
-						>
-							{/* Outer Layer Glow Band */}
-							<path
-								d="M 0 10 L 240 10 C 290 10, 290 42, 340 42 L 340 138 C 290 138, 290 170, 240 170 L 0 170 Z"
-								fill="#4F46E5"
-								fillOpacity="0.16"
-							/>
-							{/* Middle Layer */}
-							<path
-								d="M 0 15 L 240 15 C 290 15, 290 46, 340 46 L 340 134 C 290 134, 290 165, 240 165 L 0 165 Z"
-								fill="#4F46E5"
-								fillOpacity="0.3"
-							/>
-							{/* Core Stream */}
-							<path
-								d="M 0 20 L 240 20 C 290 20, 290 50, 340 50 L 340 130 C 290 130, 290 160, 240 160 L 0 160 Z"
-								fill="url(#funnel-indigo-cyan)"
-							/>
-						</g>
-
-						{/* --- 2. Opened Stream (Cyan Stream) --- */}
-						<g
-							className="cursor-pointer transition-opacity duration-200"
-							onClick={() => setActiveStage("opened")}
-							opacity={
-								activeStage === "opened"
-									? 1
-									: activeStage === "delivered" || activeStage === "clicked"
-										? 0.75
-										: 1
-							}
-						>
-							{/* Outer Layer Glow Band */}
-							<path
-								d="M 340 42 L 500 42 C 550 42, 550 68, 600 68 L 600 112 C 550 112, 550 138, 500 138 L 340 138 Z"
-								fill="#0EA5E9"
-								fillOpacity="0.16"
-							/>
-							{/* Middle Layer */}
-							<path
-								d="M 340 46 L 500 46 C 550 46, 550 71, 600 71 L 600 109 C 550 109, 550 134, 500 134 L 340 134 Z"
-								fill="#0EA5E9"
-								fillOpacity="0.3"
-							/>
-							{/* Core Stream */}
-							<path
-								d="M 340 50 L 500 50 C 550 50, 550 74, 600 74 L 600 106 C 550 106, 550 130, 500 130 L 340 130 Z"
-								fill="url(#funnel-cyan-emerald)"
-							/>
-						</g>
-
-						{/* --- 3. Clicked Stream (Reloop Signature Emerald Stream) --- */}
-						<g
-							className="cursor-pointer transition-opacity duration-200"
-							onClick={() => setActiveStage("clicked")}
-							opacity={
-								activeStage === "clicked"
-									? 1
-									: activeStage === "delivered" || activeStage === "opened"
-										? 0.75
-										: 1
-							}
-						>
-							{/* Outer Layer Glow Band */}
-							<path
-								d="M 600 68 L 760 68 L 760 112 L 600 112 Z"
-								fill="#059669"
-								fillOpacity="0.18"
-							/>
-							{/* Middle Layer */}
-							<path
-								d="M 600 71 L 760 71 L 760 109 L 600 109 Z"
-								fill="#059669"
-								fillOpacity="0.32"
-							/>
-							{/* Core Stream */}
-							<path
-								d="M 600 74 L 760 74 L 760 106 L 600 106 Z"
-								fill="url(#funnel-emerald-end)"
-							/>
-						</g>
-					</svg>
-
-					{/* Centered Retention Badges overlay */}
-					<div className="pointer-events-none absolute inset-0 flex items-center justify-between px-14 sm:px-20">
-						{/* Delivered 100% badge */}
-						<div className="flex items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-white-0/95 px-2.5 py-0.5 font-bold text-[#4F46E5] text-[10px] shadow-sm dark:border-white/10 dark:bg-black/90 dark:text-indigo-400">
-							100%
-						</div>
-
-						{/* Opened 48.2% badge */}
-						<div className="flex items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-white-0/95 px-2.5 py-0.5 font-bold text-[#0284C7] text-[10px] shadow-sm dark:border-white/10 dark:bg-black/90 dark:text-cyan-400">
-							48.2%
-						</div>
-
-						{/* Clicked 14.6% badge */}
-						<div className="flex items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-white-0/95 px-2.5 py-0.5 font-bold text-[#059669] text-[10px] shadow-sm dark:border-white/10 dark:bg-black/90 dark:text-emerald-400">
-							14.6%
-						</div>
-					</div>
+			<div className="relative flex flex-col items-center px-4">
+				{/* Coming Soon Pill Badge */}
+				<div className="mb-4 flex items-center gap-2 rounded-full border border-stroke-soft-200 bg-bg-white-0/80 px-3 py-1 shadow-xs backdrop-blur-sm dark:border-white/10 dark:bg-white/[0.04]">
+					<span className="relative flex size-2">
+						<span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#3b82f6] opacity-75" />
+						<span className="relative inline-flex size-2 rounded-full bg-[#3b82f6]" />
+					</span>
+					<span className="font-medium text-text-sub-600 text-xs tracking-tight dark:text-white/70">
+						Coming soon
+					</span>
 				</div>
 
-				{/* Minimal Stage Insights Footer */}
-				<div className="mt-2.5 border-stroke-soft-100 border-t pt-2 text-[10px] dark:border-white/5">
-					<AnimatePresence mode="wait">
-						{activeStage === "delivered" && (
-							<motion.div
-								key="delivered-footer"
-								initial={{ opacity: 0 }}
-								animate={{ opacity: 1 }}
-								exit={{ opacity: 0 }}
-								transition={{ duration: 0.15 }}
-								className="flex flex-wrap items-center justify-between gap-2 text-[10px]"
-							>
-								<div className="flex items-center gap-3">
-									<span className="text-text-sub-600 dark:text-white/60">
-										Gmail{" "}
-										<strong className="font-semibold text-text-strong-950 dark:text-white">
-											99.8%
-										</strong>
-									</span>
-									<span className="text-text-sub-600 dark:text-white/60">
-										Apple Mail{" "}
-										<strong className="font-semibold text-text-strong-950 dark:text-white">
-											99.9%
-										</strong>
-									</span>
-									<span className="text-text-sub-600 dark:text-white/60">
-										Outlook{" "}
-										<strong className="font-semibold text-text-strong-950 dark:text-white">
-											98.6%
-										</strong>
-									</span>
-								</div>
-								<span className="text-text-soft-400 dark:text-white/40">
-									Direct TLS 1.3 Routing
-								</span>
-							</motion.div>
-						)}
+				<h3 className="font-semibold text-lg text-text-strong-950 tracking-tight sm:text-xl dark:text-white">
+					Engagement & Click Analytics
+				</h3>
 
-						{activeStage === "opened" && (
-							<motion.div
-								key="opened-footer"
-								initial={{ opacity: 0 }}
-								animate={{ opacity: 1 }}
-								exit={{ opacity: 0 }}
-								transition={{ duration: 0.15 }}
-								className="flex flex-wrap items-center justify-between gap-2 text-[10px]"
-							>
-								<div className="flex items-center gap-3">
-									<span className="text-text-sub-600 dark:text-white/60">
-										Apple Mail{" "}
-										<strong className="font-semibold text-text-strong-950 dark:text-white">
-											54%
-										</strong>
-									</span>
-									<span className="text-text-sub-600 dark:text-white/60">
-										Gmail{" "}
-										<strong className="font-semibold text-text-strong-950 dark:text-white">
-											33%
-										</strong>
-									</span>
-									<span className="text-text-sub-600 dark:text-white/60">
-										Outlook{" "}
-										<strong className="font-semibold text-text-strong-950 dark:text-white">
-											13%
-										</strong>
-									</span>
-								</div>
-								<span className="text-text-soft-400 dark:text-white/40">
-									Peak: 9:00 AM – 11:30 AM
-								</span>
-							</motion.div>
-						)}
-
-						{activeStage === "clicked" && (
-							<motion.div
-								key="clicked-footer"
-								initial={{ opacity: 0 }}
-								animate={{ opacity: 1 }}
-								exit={{ opacity: 0 }}
-								transition={{ duration: 0.15 }}
-								className="flex flex-wrap items-center justify-between gap-2 text-[10px]"
-							>
-								<div className="flex items-center gap-3">
-									<span className="text-text-sub-600 dark:text-white/60">
-										Verify Email{" "}
-										<strong className="font-semibold text-text-strong-950 dark:text-white">
-											49.5%
-										</strong>
-									</span>
-									<span className="text-text-sub-600 dark:text-white/60">
-										Quickstart{" "}
-										<strong className="font-semibold text-text-strong-950 dark:text-white">
-											32.2%
-										</strong>
-									</span>
-									<span className="text-text-sub-600 dark:text-white/60">
-										Pricing{" "}
-										<strong className="font-semibold text-text-strong-950 dark:text-white">
-											18.3%
-										</strong>
-									</span>
-								</div>
-								<span className="text-text-soft-400 dark:text-white/40">
-									CTOR: 30.3%
-								</span>
-							</motion.div>
-						)}
-					</AnimatePresence>
-				</div>
+				<p className="mt-2 max-w-md text-text-sub-600 text-[13px] leading-relaxed dark:text-white/60">
+					Real-time open rates, click heatmaps, and recipient engagement streams are currently in development.
+				</p>
 			</div>
 		</div>
 	);
@@ -822,7 +419,9 @@ export function PreviewStage() {
 							}
 							className={cn(
 								"relative w-full",
-								active === "metrics" ? "h-full" : "px-4 pt-4 sm:px-6 sm:pt-6",
+								active === "bounces"
+									? "px-4 pt-4 sm:px-6 sm:pt-6"
+									: "h-full",
 							)}
 						>
 							{active === "metrics" ? (
@@ -839,9 +438,9 @@ export function PreviewStage() {
 					aria-hidden
 					className={cn(
 						"pointer-events-none absolute inset-x-0 bottom-0 z-20 transition-all duration-300",
-						active === "metrics"
-							? "h-6 bg-gradient-to-t from-[#fbfbfb]/50 to-transparent dark:from-black/50"
-							: "h-44 bg-gradient-to-t from-15% from-[#fbfbfb] via-[#fbfbfb]/80 to-transparent dark:from-[#0a0a0a] dark:via-[#0a0a0a]/80",
+						active === "bounces"
+							? "h-44 bg-gradient-to-t from-15% from-[#fbfbfb] via-[#fbfbfb]/80 to-transparent dark:from-[#0a0a0a] dark:via-[#0a0a0a]/80"
+							: "h-6 bg-gradient-to-t from-[#fbfbfb]/50 to-transparent dark:from-black/50",
 					)}
 				/>
 			</div>
