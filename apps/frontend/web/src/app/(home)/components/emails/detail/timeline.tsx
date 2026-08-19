@@ -49,8 +49,8 @@ const DELIVERED_STEP = 1;
 
 function startingLit(target: number, reduceMotion: boolean | null): number {
 	if (reduceMotion) return target;
-	// Past delivery: keep Sent + Delivered locked and only play later steps.
-	if (target > DELIVERED_STEP) return DELIVERED_STEP;
+	// Keep Sent + Delivered locked and only play later steps (Opened & Clicked).
+	if (target >= DELIVERED_STEP) return DELIVERED_STEP;
 	return -1;
 }
 

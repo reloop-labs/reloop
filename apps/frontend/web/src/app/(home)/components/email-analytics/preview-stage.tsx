@@ -3,9 +3,10 @@
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { EmailItem } from "../emails/_shared/data";
 import { type DetailTabId, EmailDetail } from "../emails/detail/email-detail";
+import { EmailTimeline } from "../emails/detail/timeline";
 import type { AnalyticsTabId } from "./preview-scenes";
 import { PreviewTabs } from "./preview-tabs";
 
@@ -318,37 +319,30 @@ function MetricsLayeredView() {
 	);
 }
 
-/* --- Scene 2: Engagement & Clicks (Coming Soon) --- */
+/* --- Scene 2: Engagement & Clicks (Timeline Sequence View) --- */
 function EngagementView() {
+	const [status, setStatus] = useState<string>("delivered");
+
+	useEffect(() => {
+		const t1 = setTimeout(() => {
+			setStatus("opened");
+		}, 1000);
+
+		const t2 = setTimeout(() => {
+			setStatus("clicked");
+		}, 1800);
+
+		return () => {
+			clearTimeout(t1);
+			clearTimeout(t2);
+		};
+	}, []);
+
 	return (
-		<div className="relative mx-auto flex h-full min-h-[300px] w-full max-w-xl flex-col items-center justify-center text-center sm:min-h-[340px] lg:min-h-[380px]">
-			{/* Ambient radial glow background */}
-			<div
-				aria-hidden
-				className="pointer-events-none absolute inset-0 flex items-center justify-center"
-			>
-				<div className="size-60 rounded-full bg-blue-500/10 blur-3xl dark:bg-blue-500/15" />
-			</div>
-
-			<div className="relative flex flex-col items-center px-4">
-				{/* Coming Soon Pill Badge */}
-				<div className="mb-4 flex items-center gap-2 rounded-full border border-stroke-soft-200 bg-bg-white-0/80 px-3 py-1 shadow-xs backdrop-blur-sm dark:border-white/10 dark:bg-white/[0.04]">
-					<span className="relative flex size-2">
-						<span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#3b82f6] opacity-75" />
-						<span className="relative inline-flex size-2 rounded-full bg-[#3b82f6]" />
-					</span>
-					<span className="font-medium text-text-sub-600 text-xs tracking-tight dark:text-white/70">
-						Coming soon
-					</span>
-				</div>
-
-				<h3 className="font-semibold text-lg text-text-strong-950 tracking-tight sm:text-xl dark:text-white">
-					Engagement & Click Analytics
-				</h3>
-
-				<p className="mt-2 max-w-md text-text-sub-600 text-[13px] leading-relaxed dark:text-white/60">
-					Real-time open rates, click heatmaps, and recipient engagement streams are currently in development.
-				</p>
+		<div className="relative mx-auto flex h-full min-h-[300px] w-full max-w-2xl flex-col items-center justify-center px-4 py-4 sm:min-h-[340px] sm:py-6 lg:min-h-[380px]">
+			{/* Event Timeline Sequence Card */}
+			<div className="relative w-full max-w-xl">
+				<EmailTimeline status={status} mounted={true} compact={false} />
 			</div>
 		</div>
 	);
