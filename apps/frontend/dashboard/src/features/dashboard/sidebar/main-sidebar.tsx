@@ -14,9 +14,7 @@ export function MainSidebar() {
 	const pathname = usePathname();
 	const pathWithoutSlug = pathname.replace(/^\/dashboard/, "") || "/";
 	const isSettings = pathWithoutSlug.startsWith("/settings");
-	const isTemplateEditor =
-		Boolean(pathname.match(/\/templates\/[^/]+/)) &&
-		!pathname.includes("/templates/new");
+	const isTemplateEditor = Boolean(pathname.match(/\/templates\/[^/]+/));
 	const shouldReduceMotion = useReducedMotion();
 
 	useHotkeys("meta+b", (e) => {

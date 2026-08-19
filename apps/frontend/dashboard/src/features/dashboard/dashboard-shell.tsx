@@ -16,7 +16,6 @@ function useIsAgentMailbox() {
 
 function useIsTemplateEditor() {
 	const pathname = usePathname();
-	if (pathname.includes("/templates/new")) return false;
 	return Boolean(pathname.match(/\/templates\/[^/]+/));
 }
 

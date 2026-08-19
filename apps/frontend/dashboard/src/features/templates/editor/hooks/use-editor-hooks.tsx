@@ -19,7 +19,7 @@ export interface CollabOptions {
 const baseExtensions = [
 	EmailTheming,
 	Placeholder.configure({
-		placeholder: "Press '/' for commands...",
+		placeholder: "",
 		showOnlyWhenEditable: true,
 		includeChildren: true,
 	}),
