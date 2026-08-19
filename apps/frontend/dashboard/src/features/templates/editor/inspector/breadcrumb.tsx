@@ -7,18 +7,18 @@ const getIconName = (type: string): string => {
 		case "text":
 		case "paragraph":
 		case "heading":
-			return "type";
+			return "text";
 		case "image":
 			return "image-upload";
 		case "button":
-			return "send";
+			return "button-rect";
 		case "section":
 		case "layout":
-			return "layout";
+			return "section-rect";
 		case "container":
 			return "box";
 		case "blockquote":
-			return "comment-text";
+			return "quote";
 		case "column":
 		case "row":
 			return "layout-grid";
@@ -26,8 +26,13 @@ const getIconName = (type: string): string => {
 			return "file-text";
 		case "variable":
 			return "brackets";
+		case "bulletlist":
+		case "listitem":
+			return "list-bullets";
+		case "orderedlist":
+			return "list-ordered";
 		default:
-			return "box";
+			return "section-rect";
 	}
 };
 

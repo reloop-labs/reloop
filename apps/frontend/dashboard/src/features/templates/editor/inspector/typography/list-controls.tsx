@@ -24,7 +24,7 @@ export function ListControls() {
 					className="h-10 flex-1 first:rounded-l-xl last:rounded-r-xl"
 					title="Quote"
 				>
-					<Icon name="comment-text" className="h-4 w-4" />
+					<Icon name="quote" className="h-4 w-4" />
 				</ButtonGroup.Item>
 				<ButtonGroup.Item
 					data-state={isCodeActive ? "on" : "off"}
@@ -42,7 +42,7 @@ export function ListControls() {
 					className="h-10 flex-1 first:rounded-l-xl last:rounded-r-xl"
 					title="Bullet List"
 				>
-					<Icon name="list-unordered-4-rec" className="h-4 w-4" />
+					<Icon name="list-bullets" className="h-4 w-4" />
 				</ButtonGroup.Item>
 				<ButtonGroup.Item
 					data-state={listType === "ordered" ? "on" : "off"}
@@ -52,7 +52,7 @@ export function ListControls() {
 					className="h-10 flex-1 first:rounded-l-xl last:rounded-r-xl"
 					title="Ordered List"
 				>
-					<Icon name="list" className="h-4 w-4" />
+					<Icon name="list-ordered" className="h-4 w-4" />
 				</ButtonGroup.Item>
 			</ButtonGroup.Root>
 		</div>

@@ -3711,6 +3711,63 @@ export const IconsSprite = () => (
 					stroke="currentColor"
 				/>
 			</symbol>
+			<symbol id="quote" viewBox="0 0 24 24" fill="none">
+				<path
+					d="M6.5 17C5.12 17 4 15.88 4 14.5V12c0-3.31 2.24-5.64 5.5-6.4M17.5 17C16.12 17 15 15.88 15 14.5V12c0-3.31 2.24-5.64 5.5-6.4"
+					stroke="currentColor"
+					strokeWidth="1.5"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				/>
+				<path
+					d="M9.5 17a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5ZM20.5 17a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5Z"
+					stroke="currentColor"
+					strokeWidth="1.5"
+				/>
+			</symbol>
+			<symbol id="list-bullets" viewBox="0 0 24 24" fill="none">
+				<circle cx="5" cy="6" r="1.4" fill="currentColor" />
+				<circle cx="5" cy="12" r="1.4" fill="currentColor" />
+				<circle cx="5" cy="18" r="1.4" fill="currentColor" />
+				<path
+					d="M10 6h10M10 12h10M10 18h10"
+					stroke="currentColor"
+					strokeWidth="1.5"
+					strokeLinecap="round"
+				/>
+			</symbol>
+			<symbol id="list-ordered" viewBox="0 0 24 24" fill="none">
+				<path
+					d="M10 6h10M10 12h10M10 18h10"
+					stroke="currentColor"
+					strokeWidth="1.5"
+					strokeLinecap="round"
+				/>
+				<path
+					d="M4.2 7.6V4.5L3 5.2M3 11.2h2.1v.15L3 13.4h2.2M3.2 16.3c.15-.45.6-.75 1.1-.75.6 0 1.05.4 1.05.95 0 .85-1.7 1.15-2.15 2.15H5.4"
+					stroke="currentColor"
+					strokeWidth="1.4"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				/>
+			</symbol>
+			<symbol id="button-rect" viewBox="0 0 24 24" fill="none">
+				<rect
+					x="3"
+					y="7"
+					width="18"
+					height="10"
+					rx="3"
+					stroke="currentColor"
+					strokeWidth="1.5"
+				/>
+				<path
+					d="M8 12h8"
+					stroke="currentColor"
+					strokeWidth="1.5"
+					strokeLinecap="round"
+				/>
+			</symbol>
 			<symbol id="check-square" viewBox="0 0 24 24" fill="none">
 				<rect
 					opacity="0.12"
