@@ -4,6 +4,7 @@ import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useEffect, useState } from "react";
+import { Logo } from "@reloop/ui/logo";
 import { EmailTimeline } from "../emails/detail/timeline";
 import type { AnalyticsTabId } from "./preview-scenes";
 import { PreviewTabs } from "./preview-tabs";
@@ -148,7 +149,7 @@ function MetricsLayeredView() {
 			>
 				{/* 1. Delivered */}
 				<div className="border-[#3B82F6] border-l-2 pl-2.5 sm:pl-3.5">
-					<p className="font-bold text-text-strong-950 text-xl tracking-tight tabular-nums sm:text-2xl lg:text-3xl dark:text-white">
+					<p className="font-bold text-text-strong-950 text-xl tabular-nums tracking-tight sm:text-2xl lg:text-3xl dark:text-white">
 						{curDelivered.toLocaleString()}
 					</p>
 					<p className="mt-0.5 text-[11px] text-text-sub-600 sm:text-xs dark:text-white/60">
@@ -158,7 +159,7 @@ function MetricsLayeredView() {
 
 				{/* 2. Opened */}
 				<div className="border-[#A855F7] border-l-2 pl-2.5 sm:pl-3.5">
-					<p className="font-bold text-text-strong-950 text-xl tracking-tight tabular-nums sm:text-2xl lg:text-3xl dark:text-white">
+					<p className="font-bold text-text-strong-950 text-xl tabular-nums tracking-tight sm:text-2xl lg:text-3xl dark:text-white">
 						{curOpened.toLocaleString()}
 					</p>
 					<p className="mt-0.5 text-[11px] text-text-sub-600 sm:text-xs dark:text-white/60">
@@ -168,7 +169,7 @@ function MetricsLayeredView() {
 
 				{/* 3. Clicked */}
 				<div className="border-[#10B981] border-l-2 pl-2.5 sm:pl-3.5">
-					<p className="font-bold text-text-strong-950 text-xl tracking-tight tabular-nums sm:text-2xl lg:text-3xl dark:text-white">
+					<p className="font-bold text-text-strong-950 text-xl tabular-nums tracking-tight sm:text-2xl lg:text-3xl dark:text-white">
 						{curClicked.toLocaleString()}
 					</p>
 					<p className="mt-0.5 text-[11px] text-text-sub-600 sm:text-xs dark:text-white/60">
@@ -178,7 +179,7 @@ function MetricsLayeredView() {
 
 				{/* 4. Bounced */}
 				<div className="border-[#EF4444] border-l-2 pl-2.5 sm:pl-3.5">
-					<p className="font-bold text-text-strong-950 text-xl tracking-tight tabular-nums sm:text-2xl lg:text-3xl dark:text-white">
+					<p className="font-bold text-text-strong-950 text-xl tabular-nums tracking-tight sm:text-2xl lg:text-3xl dark:text-white">
 						{curBounced.toLocaleString()}
 					</p>
 					<p className="mt-0.5 text-[11px] text-text-sub-600 sm:text-xs dark:text-white/60">
@@ -445,7 +446,166 @@ function MetricsLayeredView() {
 	);
 }
 
-/* --- Scene 2: Engagement & Clicks (Timeline Sequence View) --- */
+/* --- Scene 2: Engagement & Clicks (Timeline Sequence + Overlapping Insights Card) --- */
+interface InsightCheckItem {
+	id: string;
+	title: string;
+	statusLabel: string;
+	description: string;
+}
+
+const INSIGHT_CHECKS: InsightCheckItem[] = [
+	{
+		id: "use-subdomain",
+		title: "Use a subdomain",
+		statusLabel: "Sent from subdomain (mail.reloop.sh)",
+		description:
+			"Your email is sent from a dedicated subdomain, protecting your apex domain reputation.",
+	},
+	{
+		id: "click-tracking",
+		title: "Use custom subdomain for click tracking",
+		statusLabel: "Branded click tracking active",
+		description:
+			"Links are tracked through a verified custom domain, building subscriber trust and avoiding anti-phishing heuristic blocks.",
+	},
+	{
+		id: "open-tracking",
+		title: "Use custom subdomain for open tracking",
+		statusLabel: "Branded open tracking active",
+		description:
+			"Open tracking pixels are served from your verified sending subdomain, preventing strict privacy filters from blocking tracking assets.",
+	},
+	{
+		id: "link-domain-match",
+		title: "Ensure link URLs match sending domain",
+		statusLabel: "Link destinations match sender domain",
+		description:
+			"Destination links match your brand identity and verified domain, preventing email providers from treating the message as suspicious.",
+	},
+	{
+		id: "dmarc-record",
+		title: "Include valid DMARC record",
+		statusLabel: "DMARC authentication policy valid",
+		description:
+			"A valid DMARC policy is published and verified on your domain, protecting against unauthorized domain spoofing.",
+	},
+	{
+		id: "plain-text-version",
+		title: "Include plain text version",
+		statusLabel: "Plain text version included (184 chars)",
+		description:
+			"A plain text alternative is included alongside HTML, ensuring accessibility and lower spam scores.",
+	},
+	{
+		id: "body-size",
+		title: "Keep email body size small",
+		statusLabel: "2.4 KB (under 102 KB limit)",
+		description:
+			"Message size is safely below Gmail's 102 KB clipping threshold, ensuring the entire email body renders fully.",
+	},
+];
+
+function InsightsPreviewCard() {
+	const [expandedId, setExpandedId] = useState<string | null>(null);
+
+	const toggle = (id: string) => {
+		setExpandedId((prev) => (prev === id ? null : id));
+	};
+
+	return (
+		<div className="relative mx-auto h-[27rem] w-full max-w-sm sm:max-w-[22rem]">
+			<article
+				className={cn(
+					"absolute inset-0 overflow-hidden rounded-[22px] border bg-bg-white-0 dark:bg-[#141414]",
+					"border-stroke-soft-200 shadow-[0_24px_60px_rgba(15,23,42,0.18)] dark:border-white/10 dark:shadow-[0_28px_70px_rgba(0,0,0,0.6)]",
+				)}
+			>
+				<div className="bg-bg-white-0 px-5 pt-6 pb-8 text-text-strong-950 sm:px-6 sm:pt-7 sm:pb-9 dark:bg-[#141414] dark:text-white">
+					<Logo className="-ml-1.5 mb-4 size-[38px] dark:invert" />
+					<div className="flex items-center justify-between">
+						<p className="m-0 font-medium font-mono text-[#707070] text-[11.5px] uppercase tracking-[0.2em] dark:text-neutral-400">
+							DOING GREAT
+						</p>
+						<span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-2 py-0.5 font-mono text-[10.5px] font-medium text-emerald-600 dark:text-emerald-400">
+							<span className="size-1.5 rounded-full bg-emerald-500" />
+							100% Health
+						</span>
+					</div>
+
+					<h3
+						className="mt-3 mb-3.5 font-medium text-[#0e0e0e] text-[20px] leading-snug tracking-tight sm:text-[22px] dark:text-white"
+						style={{ fontFamily: "Georgia, serif" }}
+					>
+						Delivery insights
+					</h3>
+					<div className="my-4 h-px w-full bg-[#e0e0e0] dark:bg-[#222]" />
+
+					{/* Insights Check List */}
+					<div className="space-y-3">
+						{INSIGHT_CHECKS.map((item) => {
+							const isOpen = expandedId === item.id;
+							return (
+								<div key={item.id} className="group">
+									<button
+										type="button"
+										onClick={() => toggle(item.id)}
+										className="flex w-full cursor-pointer items-center gap-2.5 text-left transition-opacity hover:opacity-80"
+									>
+										<Icon
+											name="check-circle"
+											className="size-4 shrink-0 text-emerald-500"
+										/>
+										<span className="flex-1 font-medium text-[13px] text-text-strong-950 dark:text-neutral-100">
+											{item.title}
+										</span>
+										<Icon
+											name="chevron-right"
+											className={cn(
+												"size-3 text-text-sub-600 transition-transform duration-200 dark:text-neutral-500",
+												isOpen && "rotate-90",
+											)}
+										/>
+									</button>
+
+									<AnimatePresence initial={false}>
+										{isOpen && (
+											<motion.div
+												initial={{ height: 0, opacity: 0 }}
+												animate={{ height: "auto", opacity: 1 }}
+												exit={{ height: 0, opacity: 0 }}
+												transition={{ duration: 0.2, ease: "easeInOut" }}
+												className="overflow-hidden"
+											>
+												<div className="pt-1.5 pl-6 text-[12px] text-text-sub-600 dark:text-neutral-400">
+													<p className="leading-relaxed">{item.description}</p>
+													<div className="mt-1 flex items-center gap-2">
+														<span className="font-medium text-text-strong-950 dark:text-neutral-200">
+															Status:
+														</span>
+														<span className="inline-flex items-center rounded-md bg-emerald-500/10 px-1.5 py-0.5 font-mono text-[10.5px] text-emerald-600 dark:text-emerald-400">
+															{item.statusLabel}
+														</span>
+													</div>
+												</div>
+											</motion.div>
+										)}
+									</AnimatePresence>
+								</div>
+							);
+						})}
+					</div>
+				</div>
+
+				<div
+					aria-hidden
+					className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-24 bg-gradient-to-t from-15% from-bg-white-0 to-transparent dark:from-[#141414]"
+				/>
+			</article>
+		</div>
+	);
+}
+
 function EngagementView() {
 	const [status, setStatus] = useState<string>("delivered");
 
@@ -465,10 +625,15 @@ function EngagementView() {
 	}, []);
 
 	return (
-		<div className="relative mx-auto flex h-full min-h-[300px] w-full max-w-2xl flex-col items-center justify-center px-4 py-4 sm:min-h-[340px] sm:py-6 lg:min-h-[380px]">
-			{/* Event Timeline Sequence Card */}
-			<div className="relative w-full max-w-xl">
+		<div className="relative mx-auto w-full max-w-5xl px-5 pt-8 sm:px-8 sm:pt-10 lg:px-10">
+			{/* Left element: Timeline sequence */}
+			<div className="w-full max-w-xl lg:max-w-[34rem]">
 				<EmailTimeline status={status} mounted={true} compact={false} />
+			</div>
+
+			{/* Right overlapping floating insights card */}
+			<div className="relative z-10 -mt-10 w-full max-w-sm sm:max-w-[22rem] lg:absolute lg:top-4 lg:right-4 lg:mt-0 xl:right-10">
+				<InsightsPreviewCard />
 			</div>
 		</div>
 	);
@@ -500,7 +665,8 @@ function BounceErrorPanel() {
 			{/* Error details content */}
 			<div className="border-red-500/10 border-t bg-bg-white-0/80 p-3.5 sm:p-4 dark:border-red-500/10 dark:bg-black/40">
 				<pre className="overflow-x-auto whitespace-pre-wrap break-all font-mono text-[11.5px] text-red-600 leading-relaxed sm:text-xs dark:text-red-400">
-					smtp; 550 5.1.1 &lt;noah@vercel.com&gt;: Recipient address rejected: User unknown in virtual mailbox table
+					smtp; 550 5.1.1 &lt;noah@vercel.com&gt;: Recipient address rejected:
+					User unknown in virtual mailbox table
 				</pre>
 			</div>
 		</div>
@@ -572,7 +738,12 @@ export function PreviewStage() {
 				</div>
 				<div
 					aria-hidden
-					className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-6 bg-gradient-to-t from-[#fbfbfb]/50 to-transparent transition-all duration-300 dark:from-black/50"
+					className={cn(
+						"pointer-events-none absolute inset-x-0 bottom-0 z-20 transition-all duration-300",
+						active === "engagement"
+							? "h-44 bg-gradient-to-t from-15% from-[#fbfbfb] via-[#fbfbfb]/80 to-transparent dark:from-[#0a0a0a] dark:via-[#0a0a0a]/80"
+							: "h-6 bg-gradient-to-t from-[#fbfbfb]/50 to-transparent dark:from-black/50",
+					)}
 				/>
 			</div>
 			<PreviewTabs active={active} onChange={handleTabChange} />

@@ -125,7 +125,7 @@ export function EmailTimeline({
 	return (
 		<div
 			className={cn(
-				"relative flex w-full items-center justify-start overflow-x-auto border border-stroke-soft-100 bg-bg-white-0 transition-all hover:border-stroke-soft-200 dark:border-stroke-soft-100/50 dark:bg-bg-white-0/5",
+				"relative flex w-full items-center justify-start overflow-x-auto bg-bg-weak-50 transition-all dark:bg-white/[0.04]",
 				compact
 					? "h-[96px] rounded-xl px-5 pt-2 pb-1.5"
 					: "h-[176px] rounded-3xl px-8 pt-6 pb-5",
