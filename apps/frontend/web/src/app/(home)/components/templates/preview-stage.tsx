@@ -515,56 +515,124 @@ type CollaboratorId = "maya" | "noah" | "sarah" | "alex";
 interface Collaborator {
 	id: CollaboratorId;
 	name: string;
+	firstName: string;
 	initial: string;
 	color: string;
-	badgeBg: string;
 	textColor: string;
-	cursorColor: string;
 	highlightBg: string;
+	cursorFill: string;
+	cursorInk: string;
 }
 
 const COLLABORATORS: Record<CollaboratorId, Collaborator> = {
 	maya: {
 		id: "maya",
 		name: "Maya Chen",
+		firstName: "Maya",
 		initial: "M",
 		color: "bg-emerald-500 dark:bg-emerald-500",
-		badgeBg: "bg-emerald-500",
 		textColor: "text-white",
-		cursorColor: "bg-emerald-500",
 		highlightBg: "bg-emerald-400/20 dark:bg-emerald-400/20",
+		cursorFill: "#10b981",
+		cursorInk: "#ffffff",
 	},
 	noah: {
 		id: "noah",
 		name: "Noah Patel",
+		firstName: "Noah",
 		initial: "N",
 		color: "bg-indigo-500 dark:bg-indigo-500",
-		badgeBg: "bg-indigo-500",
 		textColor: "text-white",
-		cursorColor: "bg-indigo-500",
 		highlightBg: "bg-indigo-400/20 dark:bg-indigo-400/20",
+		cursorFill: "#6366f1",
+		cursorInk: "#ffffff",
 	},
 	sarah: {
 		id: "sarah",
 		name: "Sarah Jenkins",
+		firstName: "Sarah",
 		initial: "S",
 		color: "bg-amber-400 dark:bg-amber-400",
-		badgeBg: "bg-amber-400",
 		textColor: "text-black",
-		cursorColor: "bg-amber-400",
 		highlightBg: "bg-amber-300/30 dark:bg-amber-400/25",
+		cursorFill: "#facc15",
+		cursorInk: "#111111",
 	},
 	alex: {
 		id: "alex",
 		name: "Alex Rivera",
+		firstName: "Alex",
 		initial: "A",
 		color: "bg-sky-500 dark:bg-sky-400",
-		badgeBg: "bg-sky-500",
 		textColor: "text-white",
-		cursorColor: "bg-sky-500",
 		highlightBg: "bg-sky-400/20 dark:bg-sky-400/20",
+		cursorFill: "#0ea5e9",
+		cursorInk: "#ffffff",
 	},
 };
+
+/** Presence cursor using the shared `cursor` icon (same SVG as the tab). */
+function PresenceCursor({
+	user,
+	delay = 0,
+	emphasized = false,
+	className,
+}: {
+	user: Collaborator;
+	delay?: number;
+	emphasized?: boolean;
+	className?: string;
+}) {
+	const shouldReduceMotion = useReducedMotion();
+
+	return (
+		<motion.div
+			aria-hidden
+			className={cn("pointer-events-none absolute z-20", className)}
+			animate={
+				shouldReduceMotion
+					? { scale: emphasized ? 1.08 : 1 }
+					: {
+							x: [0, 6, -3, 5, 0],
+							y: [0, -4, 3, -2, 0],
+							scale: emphasized ? 1.08 : 1,
+						}
+			}
+			transition={
+				shouldReduceMotion
+					? { duration: 0.18, ease: EASE_OUT }
+					: {
+							x: {
+								duration: 8.2,
+								repeat: Number.POSITIVE_INFINITY,
+								ease: EASE_MOVE,
+								delay,
+							},
+							y: {
+								duration: 9.4,
+								repeat: Number.POSITIVE_INFINITY,
+								ease: EASE_MOVE,
+								delay: delay + 0.4,
+							},
+							scale: { duration: 0.18, ease: EASE_OUT },
+						}
+			}
+			style={{ transformOrigin: "2px 2px" }}
+		>
+			<Icon
+				name="cursor"
+				className="size-4 drop-shadow-[0_1px_2px_rgba(0,0,0,0.35)]"
+				style={{ color: user.cursorFill }}
+			/>
+			<span
+				className="absolute top-[14px] left-[12px] whitespace-nowrap rounded-md px-1.5 py-[3px] font-semibold text-[10px] leading-none shadow-[0_1px_2px_rgba(0,0,0,0.18)]"
+				style={{ backgroundColor: user.cursorFill, color: user.cursorInk }}
+			>
+				{user.firstName}
+			</span>
+		</motion.div>
+	);
+}
 
 function RealtimeEditorView() {
 	const [activeSpotlight, setActiveSpotlight] = useState<CollaboratorId | null>(
@@ -583,6 +651,31 @@ function RealtimeEditorView() {
 
 	return (
 		<div className="relative mx-auto w-full max-w-3xl overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 shadow-xs dark:border-white/10 dark:bg-[#0c0c0e]">
+			<PresenceCursor
+				user={COLLABORATORS.sarah}
+				delay={0.2}
+				emphasized={isSarahActive}
+				className="top-[9.6rem] left-[42%] sm:top-[9.8rem] sm:left-[44%]"
+			/>
+			<PresenceCursor
+				user={COLLABORATORS.alex}
+				delay={1.1}
+				emphasized={isAlexActive}
+				className="top-[4.6rem] left-[28%] sm:left-[30%]"
+			/>
+			<PresenceCursor
+				user={COLLABORATORS.maya}
+				delay={2.4}
+				emphasized={isMayaActive}
+				className="top-[6.9rem] right-[18%] sm:right-[22%]"
+			/>
+			<PresenceCursor
+				user={COLLABORATORS.noah}
+				delay={3.6}
+				emphasized={isNoahActive}
+				className="top-[14.4rem] left-[14%] sm:top-[14.8rem] sm:left-[16%]"
+			/>
+
 			{/* Top Bar with Document Title & 4 Multiplayer Avatars */}
 			<div className="flex items-center justify-between border-stroke-soft-100 border-b px-4 py-2.5 dark:border-white/10">
 				<div className="flex items-center gap-2">
@@ -641,32 +734,12 @@ function RealtimeEditorView() {
 						<div
 							onMouseEnter={() => setHoveredUser("alex")}
 							onMouseLeave={() => setHoveredUser(null)}
-							className="relative inline-flex items-center font-mono text-[11px] text-text-strong-950 dark:text-white"
+							className={cn(
+								"relative inline-flex items-center rounded-xs font-mono text-[11px] text-text-strong-950 transition-colors dark:text-white",
+								isAlexActive && COLLABORATORS.alex.highlightBg,
+							)}
 						>
 							<span>Maya C</span>
-							{/* Alex's Cursor */}
-							<span className="relative">
-								<span
-									className={cn(
-										"inline-block h-3.5 w-0.5 align-middle transition-colors",
-										COLLABORATORS.alex.cursorColor,
-									)}
-								/>
-								{/* Floating Name Tag */}
-								<AnimatePresence>
-									{isAlexActive && (
-										<motion.span
-											initial={{ opacity: 0, y: 3, scale: 0.9 }}
-											animate={{ opacity: 1, y: 0, scale: 1 }}
-											exit={{ opacity: 0, y: 3, scale: 0.9 }}
-											className="-top-5 absolute left-0 z-20 whitespace-nowrap rounded px-1.5 py-0.5 font-bold font-sans text-[9px] text-white shadow-xs"
-											style={{ backgroundColor: "#0284c7" }}
-										>
-											Alex Rivera
-										</motion.span>
-									)}
-								</AnimatePresence>
-							</span>
 							<span className="text-text-soft-400 dark:text-white/40">
 								&lt;maya@updates.reloop.sh&gt;
 							</span>
@@ -698,19 +771,6 @@ function RealtimeEditorView() {
 							>
 								Early Access Developers ×
 							</span>
-							<AnimatePresence>
-								{isMayaActive && (
-									<motion.span
-										initial={{ opacity: 0, y: 3, scale: 0.9 }}
-										animate={{ opacity: 1, y: 0, scale: 1 }}
-										exit={{ opacity: 0, y: 3, scale: 0.9 }}
-										className="-top-5 absolute left-0 z-20 whitespace-nowrap rounded px-1.5 py-0.5 font-bold font-sans text-[9px] text-white shadow-xs"
-										style={{ backgroundColor: "#10b981" }}
-									>
-										Maya Chen
-									</motion.span>
-								)}
-							</AnimatePresence>
 						</div>
 					</div>
 					<span className="text-[10.5px] text-text-soft-400 dark:text-white/40">
@@ -727,32 +787,12 @@ function RealtimeEditorView() {
 						<div
 							onMouseEnter={() => setHoveredUser("sarah")}
 							onMouseLeave={() => setHoveredUser(null)}
-							className="relative inline-flex items-center font-medium text-[11.5px] text-text-strong-950 dark:text-white"
+							className={cn(
+								"relative inline-flex items-center rounded-xs font-medium text-[11.5px] text-text-strong-950 transition-colors dark:text-white",
+								isSarahActive && COLLABORATORS.sarah.highlightBg,
+							)}
 						>
 							<span>Introducing Reloop 2.0</span>
-							{/* Sarah's Cursor */}
-							<span className="relative">
-								<span
-									className={cn(
-										"inline-block h-4 w-0.5 align-middle transition-colors",
-										COLLABORATORS.sarah.cursorColor,
-									)}
-								/>
-								{/* Floating Name Tag */}
-								<AnimatePresence>
-									{isSarahActive && (
-										<motion.span
-											initial={{ opacity: 0, y: 3, scale: 0.9 }}
-											animate={{ opacity: 1, y: 0, scale: 1 }}
-											exit={{ opacity: 0, y: 3, scale: 0.9 }}
-											className="-top-5 absolute left-0 z-20 whitespace-nowrap rounded px-1.5 py-0.5 font-bold font-sans text-[9px] text-black shadow-xs"
-											style={{ backgroundColor: "#facc15" }}
-										>
-											Sarah Jenkins
-										</motion.span>
-									)}
-								</AnimatePresence>
-							</span>
 							<span className="text-text-sub-600 dark:text-white/70">
 								{" "}
 								— Real-time Email Engine
@@ -783,29 +823,6 @@ function RealtimeEditorView() {
 						developers
 					</span>
 					<span>,</span>
-					{/* Noah's Cursor */}
-					<span className="relative">
-						<span
-							className={cn(
-								"inline-block h-3.5 w-0.5 align-middle transition-colors",
-								COLLABORATORS.noah.cursorColor,
-							)}
-						/>
-						{/* Floating Name Tag */}
-						<AnimatePresence>
-							{isNoahActive && (
-								<motion.span
-									initial={{ opacity: 0, y: 3, scale: 0.9 }}
-									animate={{ opacity: 1, y: 0, scale: 1 }}
-									exit={{ opacity: 0, y: 3, scale: 0.9 }}
-									className="-top-5 absolute left-0 z-20 whitespace-nowrap rounded px-1.5 py-0.5 font-bold font-sans text-[9px] text-white shadow-xs"
-									style={{ backgroundColor: "#6366f1" }}
-								>
-									Noah Patel
-								</motion.span>
-							)}
-						</AnimatePresence>
-					</span>
 				</div>
 
 				{/* Main Paragraph */}
