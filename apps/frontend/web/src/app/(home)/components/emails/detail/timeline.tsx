@@ -18,6 +18,11 @@ const FAILED_STEPS = [
 	{ id: "failed", label: "Failed", icon: "cross-circle" },
 ] as const;
 
+const BOUNCED_STEPS = [
+	{ id: "sent", label: "Sent", icon: "send-1" },
+	{ id: "bounced", label: "Bounced", icon: "cross-circle" },
+] as const;
+
 const COMPLETED_AT: Record<string, string> = {
 	sent: "17 Aug, 6:24pm",
 	delivered: "17 Aug, 6:24pm",
@@ -65,11 +70,16 @@ export function EmailTimeline({
 }) {
 	const reduceMotion = useReducedMotion();
 	const normalized = status.toLowerCase();
+	const isBounced = normalized === "bounced";
 	const isFailed =
 		normalized === "failed" ||
 		normalized === "bounced" ||
 		normalized === "spam";
-	const steps = isFailed ? FAILED_STEPS : SUCCESS_STEPS;
+	const steps = isBounced
+		? BOUNCED_STEPS
+		: isFailed
+			? FAILED_STEPS
+			: SUCCESS_STEPS;
 	const currentStepIndex = isFailed ? 1 : completedThrough(normalized);
 	const [litThrough, setLitThrough] = useState(() =>
 		startingLit(currentStepIndex, reduceMotion),
@@ -125,7 +135,7 @@ export function EmailTimeline({
 				className={cn(
 					"flex items-start",
 					isFailed
-						? "w-64 justify-between"
+						? "w-full max-w-sm justify-between"
 						: "w-full min-w-[480px] max-w-2xl justify-between",
 				)}
 			>
@@ -142,6 +152,7 @@ export function EmailTimeline({
 						switch (step.id) {
 							case "sent":
 								return "border-information-base/20 bg-information-lighter/50 text-information-base";
+							case "bounced":
 							case "failed":
 								return "border-error-light bg-error-lighter text-error-base";
 							case "delivered":
@@ -162,6 +173,7 @@ export function EmailTimeline({
 						switch (step.id) {
 							case "sent":
 								return "bg-information-lighter text-information-base";
+							case "bounced":
 							case "failed":
 								return "bg-error-lighter text-error-base";
 							case "delivered":

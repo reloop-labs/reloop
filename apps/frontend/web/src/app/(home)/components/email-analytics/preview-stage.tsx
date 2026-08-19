@@ -4,8 +4,6 @@ import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useEffect, useState } from "react";
-import type { EmailItem } from "../emails/_shared/data";
-import { type DetailTabId, EmailDetail } from "../emails/detail/email-detail";
 import { EmailTimeline } from "../emails/detail/timeline";
 import type { AnalyticsTabId } from "./preview-scenes";
 import { PreviewTabs } from "./preview-tabs";
@@ -476,29 +474,50 @@ function EngagementView() {
 	);
 }
 
-/* --- Scene 3: Bounce & Diagnostics (Email Detail & Insights View) --- */
-const SAMPLE_DIAGNOSTIC_EMAIL: EmailItem = {
-	id: "msg_prod_deploy_948",
-	to: "noah@vercel.com",
-	subject: "Production deployment finished",
-	status: "clicked",
-	time: "17 Aug, 6:24pm",
-};
+/* --- Scene 3: Bounces & Diagnostics --- */
+function BounceErrorPanel() {
+	return (
+		<div className="overflow-hidden rounded-2xl border border-red-500/20 bg-red-50/40 shadow-xs dark:border-red-500/20 dark:bg-red-950/20">
+			{/* Top row */}
+			<div className="flex items-center justify-between gap-3 px-4 py-2.5 text-xs sm:text-sm">
+				<div className="flex min-w-0 items-center gap-2.5">
+					<Icon
+						name="cross-circle"
+						className="size-4 shrink-0 text-red-600 dark:text-red-400"
+					/>
+					<span className="shrink-0 font-semibold text-red-600 dark:text-red-400">
+						Delivery Failed
+					</span>
+					<span className="shrink-0 text-neutral-300 dark:text-neutral-700">
+						|
+					</span>
+					<span className="truncate font-medium text-text-sub-600 dark:text-white/70">
+						Receiving server rejected the address — inbox may not exist.
+					</span>
+				</div>
+			</div>
+
+			{/* Error details content */}
+			<div className="border-red-500/10 border-t bg-bg-white-0/80 p-3.5 sm:p-4 dark:border-red-500/10 dark:bg-black/40">
+				<pre className="overflow-x-auto whitespace-pre-wrap break-all font-mono text-[11.5px] text-red-600 leading-relaxed sm:text-xs dark:text-red-400">
+					smtp; 550 5.1.1 &lt;noah@vercel.com&gt;: Recipient address rejected: User unknown in virtual mailbox table
+				</pre>
+			</div>
+		</div>
+	);
+}
 
 function BouncesView() {
-	const [activeDetailTab, setActiveDetailTab] =
-		useState<DetailTabId>("insights");
-
 	return (
-		<div className="relative mx-auto w-full max-w-5xl">
-			<div className="mx-auto max-w-3xl overflow-hidden sm:px-1">
-				<EmailDetail
-					email={SAMPLE_DIAGNOSTIC_EMAIL}
-					mounted={true}
-					compact={true}
-					activeTab={activeDetailTab}
-					onTabChange={(tab) => setActiveDetailTab(tab as DetailTabId)}
-				/>
+		<div className="relative mx-auto flex h-full min-h-[300px] w-full max-w-2xl flex-col items-center justify-center space-y-4 px-4 py-4 sm:min-h-[340px] sm:space-y-5 sm:py-6 lg:min-h-[380px]">
+			{/* Event Timeline Sequence Card (Sent -> Bounced) */}
+			<div className="relative w-full max-w-xl">
+				<EmailTimeline status="bounced" mounted={true} compact={false} />
+			</div>
+
+			{/* Bounce / SMTP Error Details Panel */}
+			<div className="relative w-full max-w-xl">
+				<BounceErrorPanel />
 			</div>
 		</div>
 	);
@@ -539,12 +558,7 @@ export function PreviewStage() {
 									? { duration: 0 }
 									: { duration: SLIDE_MS, ease: EASE_DEFAULT }
 							}
-							className={cn(
-								"relative w-full",
-								active === "bounces"
-									? "px-4 pt-4 sm:px-6 sm:pt-6"
-									: "h-full",
-							)}
+							className="relative h-full w-full"
 						>
 							{active === "metrics" ? (
 								<MetricsLayeredView />
@@ -558,12 +572,7 @@ export function PreviewStage() {
 				</div>
 				<div
 					aria-hidden
-					className={cn(
-						"pointer-events-none absolute inset-x-0 bottom-0 z-20 transition-all duration-300",
-						active === "bounces"
-							? "h-44 bg-gradient-to-t from-15% from-[#fbfbfb] via-[#fbfbfb]/80 to-transparent dark:from-[#0a0a0a] dark:via-[#0a0a0a]/80"
-							: "h-6 bg-gradient-to-t from-[#fbfbfb]/50 to-transparent dark:from-black/50",
-					)}
+					className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-6 bg-gradient-to-t from-[#fbfbfb]/50 to-transparent transition-all duration-300 dark:from-black/50"
 				/>
 			</div>
 			<PreviewTabs active={active} onChange={handleTabChange} />
