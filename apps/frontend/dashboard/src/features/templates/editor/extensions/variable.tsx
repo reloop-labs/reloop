@@ -56,17 +56,9 @@ export function VariableNodeView({
 		<NodeViewWrapper
 			as="span"
 			onClick={handleClick}
-			className="variable-badge mx-0.5 inline-flex cursor-pointer select-all items-center gap-1 align-baseline font-semibold"
+			className="mx-0.5 inline-flex cursor-pointer select-all items-center gap-1 rounded-xl border border-stroke-soft-200 bg-bg-soft-50 px-1 py-px pl-2 font-semibold"
 			style={{
-				fontWeight: 600,
-				display: "inline-flex",
-				margin: "0 1px",
-				color: "inherit",
-				background: "transparent",
-				border: "none",
-				padding: "0",
 				fontSize: "inherit",
-				verticalAlign: "middle",
 			}}
 		>
 			<span className="align-middle">{`{{{${name}}}}`}</span>
