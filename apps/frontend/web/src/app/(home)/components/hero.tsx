@@ -128,7 +128,7 @@ export function Hero({ variant = "default" }: HeroProps) {
 			className="relative flex min-h-dvh flex-col bg-transparent"
 		>
 			{variant === "self-host" ? (
-				<div className="relative mx-auto flex w-full max-w-5xl flex-col items-center border-stroke-soft-200 border-x px-6 pt-36 pb-12 text-center sm:px-8 sm:pt-44 sm:pb-16 md:max-w-7xl lg:px-12 lg:pt-52 dark:border-white/10">
+				<div className="relative mx-auto flex w-full max-w-5xl flex-col items-center border-stroke-soft-200 border-x px-6 pt-36 pb-20 text-center sm:px-8 sm:pt-44 sm:pb-24 md:max-w-7xl lg:px-12 lg:pt-52 lg:pb-28 dark:border-white/10">
 					<h1 className="max-w-4xl text-center font-semibold text-[2.5rem] text-text-strong-950 leading-[1.06] tracking-[-0.04em] sm:text-[3.5rem] lg:text-[4.25rem] dark:text-white">
 						Self-Host Reloop
 						<br />
@@ -161,7 +161,7 @@ export function Hero({ variant = "default" }: HeroProps) {
 					</div>
 				</div>
 			) : (
-				<div className="relative mx-auto flex w-full max-w-5xl flex-col items-center border-stroke-soft-200 border-x px-6 pt-28 pb-12 text-center sm:px-8 sm:pt-32 sm:pb-14 md:max-w-7xl lg:px-12 lg:pt-36 lg:pb-16 dark:border-white/10">
+				<div className="relative mx-auto flex w-full max-w-5xl flex-col items-center border-stroke-soft-200 border-x px-6 pt-28 pb-20 text-center sm:px-8 sm:pt-32 sm:pb-24 md:max-w-7xl lg:px-12 lg:pt-36 lg:pb-28 dark:border-white/10">
 					<Link
 						href="/compare/resend"
 						className="group mb-6 inline-flex items-center gap-0 overflow-hidden rounded-full border border-stroke-soft-200 bg-bg-white-0 text-[13px] shadow-[0_1px_2px_rgba(0,0,0,0.04)] transition-all duration-200 hover:border-stroke-strong-950/20 sm:mb-8 sm:text-[13.5px] dark:border-white/10 dark:bg-white/[0.04] dark:shadow-none dark:hover:border-white/25"
@@ -189,7 +189,7 @@ export function Hero({ variant = "default" }: HeroProps) {
 						Reloop is the open-source email platform for transactional mail,
 						agent inboxes, and automated workflows.
 					</p>
-					<div className="mt-7 flex flex-wrap items-center justify-center gap-3.5 sm:mt-8 sm:gap-4">
+					<div className="mt-8 flex flex-wrap items-center justify-center gap-3.5 sm:mt-9 sm:gap-4">
 						<FancyButton.Root
 							asChild
 							variant="neutral"

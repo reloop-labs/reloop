@@ -34,7 +34,7 @@ const GLYPH: Record<SceneColor, { shell: string; face: string }> = {
 	},
 };
 
-function SceneGlyph({ icon, color }: { icon: IconName; color: SceneColor }) {
+export function SceneGlyph({ icon, color }: { icon: IconName; color: SceneColor }) {
 	const glyph = GLYPH[color];
 
 	return (

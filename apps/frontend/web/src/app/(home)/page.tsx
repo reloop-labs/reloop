@@ -7,7 +7,6 @@ import {
 	socialProfiles,
 } from "@reloop/web/lib/site";
 import LanguageExplorer from "../sdk/components/language-explorer";
-import Convictions from "./components/convictions";
 import CTA from "./components/cta";
 import EmailSystem from "./components/email-system";
 import Hero from "./components/hero";
@@ -66,8 +65,6 @@ export default function Home() {
 					showHelp={false}
 					id="sdks"
 				/>
-				<SectionSeparator />
-				<Convictions />
 				<SectionSeparator />
 				<EmailSystem />
 				<SectionSeparator />

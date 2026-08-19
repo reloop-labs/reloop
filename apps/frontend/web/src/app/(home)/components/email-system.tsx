@@ -11,6 +11,7 @@ import {
 } from "react";
 import { EmailAnalyticsSection } from "./email-analytics";
 import { MarketingEmailsSection } from "./marketing-emails";
+import { SceneGlyph } from "./_shared/scene-header";
 import { TemplatesSection } from "./templates";
 import { TransactionalEmailSection } from "./transactional-email";
 import { WorkflowsSection } from "./workflows";
@@ -161,16 +162,18 @@ export default function EmailSystem() {
 			className="w-full"
 		>
 			<div className="px-4 py-16 sm:px-6 sm:py-20 lg:px-12 lg:py-24">
+				<div className="flex items-center gap-2">
+					<SceneGlyph icon="agent" color="violet" />
+					<span className="font-medium text-[13.5px] text-text-strong-950 tracking-tight dark:text-white">
+						Agentic AI
+					</span>
+				</div>
 				<h2
 					id="email-system-heading"
-					className="mt-3 max-w-4xl font-semibold text-2xl text-text-strong-950 tracking-tight sm:text-3xl lg:text-4xl dark:text-white"
+					className="mt-3.5 max-w-3xl font-medium text-4xl text-text-strong-950 text-balance leading-[1.05] tracking-tighter sm:text-5xl dark:text-white"
 				>
 					Convert your email stream into revenue.
 				</h2>
-				<p className="mt-3 max-w-3xl text-sm text-text-sub-600 leading-relaxed sm:text-base lg:text-[17px] dark:text-white/60">
-					Sends at 2am. Catches bounces before they pile up. Hands you the draft
-					before you ask.
-				</p>
 			</div>
 
 			<div className="border-stroke-soft-200 border-t lg:grid lg:grid-cols-[minmax(14rem,18.5rem)_minmax(0,1fr)] dark:border-white/10">

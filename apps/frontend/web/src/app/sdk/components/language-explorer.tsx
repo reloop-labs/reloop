@@ -4,6 +4,7 @@ import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { SceneGlyph } from "../../(home)/components/_shared/scene-header";
 import { frameworksForLanguage } from "../frameworks";
 import { languages } from "../languages";
 import { AnimatedHoverBackground } from "./animated-hover-background";
@@ -236,12 +237,15 @@ export default function LanguageExplorer({
 		<SectionFrame id={id} framed={framed} showTopRule={showTopRule}>
 			{showHeading ? (
 				<div className="px-4 py-16 sm:px-6 sm:py-20 lg:px-12 lg:py-24">
-					<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em] dark:text-white/45">
-						SDK
-					</p>
+					<div className="flex items-center gap-2">
+						<SceneGlyph icon="code" color="blue" />
+						<span className="font-medium text-[13.5px] text-text-strong-950 tracking-tight dark:text-white">
+							SDK
+						</span>
+					</div>
 					<h2
 						id={`${id}-heading`}
-						className="mt-4 max-w-3xl font-medium text-4xl text-text-strong-950 leading-[1.05] tracking-tighter sm:text-5xl dark:text-white"
+						className="mt-3.5 max-w-3xl font-medium text-4xl text-text-strong-950 text-balance leading-[1.05] tracking-tighter sm:text-5xl dark:text-white"
 					>
 						Send from your favorite programming languages.
 					</h2>
