@@ -212,6 +212,8 @@ export default function LanguageExplorer({
 	const activeDisplayName = activeFramework
 		? activeFramework.name
 		: active.name;
+	const headerIcon = activeFramework?.icon ?? active.icon;
+	const headerPackage = activeFramework?.packageName ?? active.packageName;
 
 	useEffect(() => {
 		if (!mounted) {
@@ -377,19 +379,19 @@ export default function LanguageExplorer({
 							<div
 								className={cn(
 									"inline-flex size-10 items-center justify-center rounded-xl border border-stroke-soft-200 bg-bg-white-0 dark:border-white/10 dark:bg-black",
-									isDarkBrandColor(active.icon.hex) &&
+									isDarkBrandColor(headerIcon.hex) &&
 										"text-text-strong-950 dark:text-white",
 								)}
-								style={getBrandColorStyle(active.icon.hex)}
+								style={getBrandColorStyle(headerIcon.hex)}
 							>
-								<LanguageIcon icon={active.icon} className="size-4.5" />
+								<LanguageIcon icon={headerIcon} className="size-4.5" />
 							</div>
 							<div className="min-w-0">
 								<h3 className="font-semibold text-base text-text-strong-950 tracking-tight dark:text-white">
-									{active.name}
+									{activeDisplayName}
 								</h3>
 								<p className="truncate font-mono text-[11px] text-text-sub-600 dark:text-white/45">
-									{active.packageName}
+									{headerPackage}
 								</p>
 							</div>
 						</div>
