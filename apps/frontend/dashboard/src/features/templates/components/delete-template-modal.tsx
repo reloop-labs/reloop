@@ -13,6 +13,10 @@ import {
 } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
+import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
+
+const actionKbdOnDestructiveClassName =
+	"border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]";
 
 type DeleteState = "idle" | "deleting" | "success";
 
@@ -100,6 +104,17 @@ export const DeleteTemplateModal = ({
 		{ enabled: isOpen },
 	);
 
+	useHotkeys(
+		"escape",
+		() => {
+			if (deleteState === "idle") {
+				cancelHold();
+				onClose();
+			}
+		},
+		{ enabled: isOpen },
+	);
+
 	return (
 		<Modal.Root
 			open={isOpen}
@@ -149,7 +164,7 @@ export const DeleteTemplateModal = ({
 					<Button.Root
 						type="button"
 						variant="neutral"
-						mode="ghost"
+						mode="stroke"
 						size="small"
 						onClick={() => {
 							if (deleteState === "idle") {
@@ -158,11 +173,14 @@ export const DeleteTemplateModal = ({
 							}
 						}}
 						className={cn(
-							"transition-opacity duration-200",
+							"gap-1.5 transition-opacity duration-200",
 							deleteState !== "idle" && "pointer-events-none opacity-50",
 						)}
 					>
 						Cancel
+						<ActionKbd className="lowercase! w-auto min-w-0 px-1">
+							esc
+						</ActionKbd>
 					</Button.Root>
 					<FancyButton.Root
 						type="button"
@@ -204,7 +222,12 @@ export const DeleteTemplateModal = ({
 										<span>Deleted</span>
 									</>
 								) : (
-									<span>Hold to delete</span>
+									<>
+										<span>Hold to delete</span>
+										<ActionKbd className={actionKbdOnDestructiveClassName}>
+											↵
+										</ActionKbd>
+									</>
 								)}
 							</motion.span>
 						</AnimatePresence>
