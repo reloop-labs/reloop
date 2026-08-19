@@ -500,7 +500,7 @@ export function PreviewStage() {
 	};
 
 	return (
-		<div className="bg-bg-weak-50/60 dark:bg-white/[0.015]">
+		<div className="bg-bg-white-0 dark:bg-black">
 			<div className="relative overflow-hidden">
 				<div className="relative mx-auto h-[29rem] max-w-5xl px-5 pt-6 sm:h-[32rem] sm:px-8 sm:pt-7 lg:h-[34rem] lg:px-10 lg:pt-8">
 					<AnimatePresence initial={false} custom={direction} mode="popLayout">
