@@ -243,7 +243,7 @@ function SpringTab({
 							preserveAspectRatio="none"
 							style={{ height: RAIL_HEIGHT + PANEL_RADIUS }}
 							className={cn(
-								"pointer-events-none absolute inset-x-0 top-0 w-full text-[#e8eaed] dark:text-[#3c3c3c]",
+								"pointer-events-none absolute inset-x-0 top-0 w-full text-bg-white-0 dark:text-[#3c3c3c]",
 								dragging ? "z-20" : "z-0",
 								surfaceClassName,
 							)}

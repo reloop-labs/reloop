@@ -62,7 +62,7 @@ export function HeroBrowserUrlBar({
 	);
 
 	return (
-		<div className="flex h-10 shrink-0 items-center gap-1.5 bg-[#e8eaed] px-2 text-[#5f6368] select-none dark:bg-[#3c3c3c] dark:text-[#9aa0a6]">
+		<div className="flex h-10 shrink-0 items-center gap-1.5 bg-bg-white-0 px-2 text-[#5f6368] select-none dark:bg-[#3c3c3c] dark:text-[#9aa0a6]">
 			<div className="flex items-center">
 				<button type="button" aria-label="Back" className={navButtonClass}>
 					<svg
@@ -102,7 +102,7 @@ export function HeroBrowserUrlBar({
 				</button>
 			</div>
 
-			<div className="flex h-8 min-w-0 flex-1 items-center gap-2 rounded-full bg-[#fff] px-3 dark:bg-[#2b2b2b]">
+			<div className="flex h-8 min-w-0 flex-1 items-center gap-2 rounded-full bg-[#f1f3f4] px-3 dark:bg-[#2b2b2b]">
 				<span className="grid size-5 shrink-0 place-items-center rounded-full bg-black/[0.06] text-[#5f6368] dark:bg-white/10 dark:text-[#9aa0a6]">
 					<svg
 						aria-hidden="true"
