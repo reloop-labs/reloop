@@ -173,7 +173,7 @@ export const SendDetails = () => {
 	}
 
 	return (
-		<div className="mx-auto mt-4 w-full max-w-[600px] overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/40">
+		<div className="mx-auto mt-4 w-full max-w-160 overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/40">
 			{/* From Row */}
 			<FieldRow label="From" required>
 				<div className="relative flex w-full flex-1 items-center justify-between gap-2 text-label-sm text-text-sub-600">

@@ -79,7 +79,7 @@ export function FullEmailBuilder() {
 	return (
 		<div
 			ref={canvasRef}
-			className="email-builder-canvas relative mx-auto w-full max-w-[600px]"
+			className="email-builder-canvas relative mx-auto w-full max-w-160"
 		>
 			<DragHandle
 				editor={editor}
