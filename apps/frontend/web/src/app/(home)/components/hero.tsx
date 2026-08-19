@@ -50,12 +50,6 @@ const TABS: {
 	title: string;
 	description: string;
 	cloud?: boolean;
-	banner?: {
-		title: string;
-		description: string;
-		href?: string;
-		icon: string;
-	};
 }[] = [
 	{
 		id: "overview",
@@ -66,46 +60,21 @@ const TABS: {
 		id: "analytics",
 		title: "Analytics",
 		description: "Deliverability and engagement for every send.",
-		banner: {
-			title: "Analytics",
-			description: "Deliverability and engagement for every send.",
-			href: "/docs/learn/metrics",
-			icon: "activity",
-		},
 	},
 	{
 		id: "domain",
 		title: "Domain",
 		description: "SPF, DKIM, and DMARC authentication for your domain.",
-		banner: {
-			title: "Domains",
-			description: "Set up SPF, DKIM, and DMARC so every send authenticates.",
-			href: "/domain",
-			icon: "globe",
-		},
 	},
 	{
 		id: "workflow",
 		title: "Workflow",
 		description: "Trigger automated sequences, webhooks, and logic.",
-		banner: {
-			title: "Workflows",
-			description: "Trigger automated sequences and event-driven email logic.",
-			href: "/docs/learn/workflows",
-			icon: "workflow",
-		},
 	},
 	{
 		id: "templates",
 		title: "Templates",
 		description: "Visual editor with dynamic variables and components.",
-		banner: {
-			title: "Templates",
-			description:
-				"Design and preview transactional and marketing email templates.",
-			href: "/features/email-templates",
-			icon: "layout",
-		},
 	},
 ];
 
@@ -375,65 +344,11 @@ export function Hero({ variant = "default" }: HeroProps) {
 									</motion.div>
 								</AnimatePresence>
 							</HeroDashboardShell>
-							<HeroTabBanner
-								tabId={active}
-								reduceMotion={Boolean(reduceMotion)}
-							/>
 						</HeroWindowChrome>
 					</HeroDemoPlaybackProvider>
 				</div>
 			</div>
 		</section>
-	);
-}
-
-function HeroTabBanner({
-	tabId,
-	reduceMotion,
-}: {
-	tabId: HeroTabId;
-	reduceMotion: boolean;
-}) {
-	const tab = TABS.find((item) => item.id === tabId);
-	const banner = tab?.banner;
-
-	return (
-		<AnimatePresence mode="wait" initial={false}>
-			{banner && (
-				<motion.div
-					key={tab.id}
-					className="pointer-events-none absolute inset-x-3 bottom-3 z-10 sm:inset-x-5 sm:bottom-5"
-					initial={reduceMotion ? { opacity: 1 } : { opacity: 0, y: 8 }}
-					animate={{ opacity: 1, y: 0 }}
-					exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 8 }}
-					transition={
-						reduceMotion ? { duration: 0 } : { duration: 0.2, ease: EASE_OUT }
-					}
-				>
-					<div className="pointer-events-auto flex items-center gap-3 rounded-2xl bg-[#171717] px-3 py-2.5 text-white shadow-[0_8px_28px_rgba(0,0,0,0.18)] sm:gap-4 sm:rounded-[1.35rem] sm:px-4 sm:py-3 dark:bg-[#111]">
-						<span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-white/10 sm:size-11">
-							<Icon name={banner.icon} className="size-5 text-white" />
-						</span>
-						<div className="min-w-0 flex-1">
-							<p className="truncate font-semibold text-[14px] leading-tight tracking-tight sm:text-[15px]">
-								{banner.title}
-							</p>
-							<p className="mt-0.5 truncate text-[12px] text-white/55 leading-snug sm:text-[13px]">
-								{banner.description}
-							</p>
-						</div>
-						{banner.href && (
-							<Link
-								href={banner.href}
-								className="inline-flex h-9 shrink-0 items-center rounded-full bg-white px-3.5 font-medium text-[#171717] text-[13px] transition-opacity hover:opacity-90 sm:h-10 sm:px-4"
-							>
-								Learn more
-							</Link>
-						)}
-					</div>
-				</motion.div>
-			)}
-		</AnimatePresence>
 	);
 }
 

@@ -88,11 +88,13 @@ export default function LanguageExplorer({
 	framed = true,
 	showTopRule = true,
 	showHeading = false,
+	showHelp = true,
 	id = "languages",
 }: {
 	framed?: boolean;
 	showTopRule?: boolean;
 	showHeading?: boolean;
+	showHelp?: boolean;
 	id?: string;
 }) {
 	const [activeSlug, setActiveSlug] = useState(languages[0]!.slug);
@@ -239,9 +241,9 @@ export default function LanguageExplorer({
 					</p>
 					<h2
 						id={`${id}-heading`}
-						className="mt-4 max-w-3xl font-serif text-[2.4rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[3rem] lg:text-[3.4rem] dark:text-white"
+						className="mt-4 max-w-3xl font-medium text-4xl text-text-strong-950 leading-[1.05] tracking-tighter sm:text-5xl dark:text-white"
 					>
-						Send in the language you already write.
+						Send from your favorite programming languages.
 					</h2>
 				</div>
 			) : null}
@@ -562,7 +564,11 @@ export default function LanguageExplorer({
 							/>
 						</StepItem>
 
-						<StepItem number={3} title="GitHub, examples, and API reference">
+						<StepItem
+							number={3}
+							title="GitHub, examples, and API reference"
+							isLast={!showHelp}
+						>
 							<ResourceLinks
 								languageSlug={active.slug}
 								languageName={active.name}
@@ -573,9 +579,11 @@ export default function LanguageExplorer({
 							/>
 						</StepItem>
 
-						<StepItem number={4} title="Need more help?" isLast>
-							<ExtraLinks />
-						</StepItem>
+						{showHelp && (
+							<StepItem number={4} title="Need more help?" isLast>
+								<ExtraLinks />
+							</StepItem>
+						)}
 					</div>
 				</div>
 			</div>

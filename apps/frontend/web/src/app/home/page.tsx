@@ -83,6 +83,7 @@ export default function HomePage() {
 					framed={false}
 					showTopRule={false}
 					showHeading
+					showHelp={false}
 					id="sdks"
 				/>
 				<SectionSeparator />
