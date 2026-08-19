@@ -19,7 +19,6 @@ import { DeleteTemplateVariableModal } from "../components/panels/variables/dele
 import Breadcrumb from "./breadcrumb";
 import { ColorPicker } from "./color-picker";
 import { ImageSrcControl } from "./image-src-control";
-import { NodeTypePills } from "./node-type-pills";
 import { PropRow } from "./prop-row";
 import { ScrubRow } from "./scrub-field";
 import { SectionHeader } from "./section-header";
@@ -407,10 +406,6 @@ function TextSection({
 }: TextSectionProps) {
 	return (
 		<InspectorSection>
-			<div className="px-4 pt-3 pb-2">
-				<NodeTypePills />
-			</div>
-
 			<SectionHeader label="Text" />
 
 			<ColorRow
@@ -469,7 +464,7 @@ export const EmailInspector = () => {
 	if (!editor) return null;
 
 	return (
-		<Inspector.Root className="bg-transparent">
+		<Inspector.Root className="min-w-0 bg-transparent">
 			{/* ── Breadcrumb ── */}
 			<Breadcrumb />
 
