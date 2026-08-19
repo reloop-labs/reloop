@@ -1,6 +1,6 @@
 import type { IconName } from "@reloop/ui/icon";
 
-export type AnalyticsTabId = "metrics" | "engagement" | "bounces";
+export type AnalyticsTabId = "engagement" | "metrics" | "bounces";
 
 export const ANALYTICS_TABS: {
 	id: AnalyticsTabId;
@@ -10,20 +10,20 @@ export const ANALYTICS_TABS: {
 	href: string;
 }[] = [
 	{
-		id: "metrics",
-		icon: "graph-up",
-		title: "Metrics",
-		description:
-			"Track deliverability, reputation, and sent volume with clear domain-level insights.",
-		href: "/docs/analytics",
-	},
-	{
 		id: "engagement",
 		icon: "cursor-click",
 		title: "Engagement & clicks",
 		description:
 			"Monitor opens, clicks, and recipient behavior with live engagement analytics.",
 		href: "/docs/analytics/engagement",
+	},
+	{
+		id: "metrics",
+		icon: "graph-up",
+		title: "Metrics",
+		description:
+			"Track deliverability, reputation, and sent volume with clear domain-level insights.",
+		href: "/docs/analytics",
 	},
 	{
 		id: "bounces",
