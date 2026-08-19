@@ -14,7 +14,7 @@ export function ColorPicker({
 }) {
 	return (
 		<div className={`${inspectorFieldClassName} gap-2`}>
-			<div className="relative size-4 shrink-0 overflow-hidden rounded-full border border-stroke-soft-200 transition-transform duration-150 hover:scale-110">
+			<div className="relative size-4 shrink-0 overflow-hidden rounded-md border border-stroke-soft-200 transition-transform duration-150 hover:scale-110">
 				<input
 					type="color"
 					value={value || "#000000"}
