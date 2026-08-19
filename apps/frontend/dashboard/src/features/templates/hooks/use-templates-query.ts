@@ -73,25 +73,14 @@ export async function createTemplate(): Promise<Template> {
 	return res.json() as Promise<Template>;
 }
 
-/** Create a draft and open it in the editor. Shared by header, empty state, and ⌘K. */
+/** Open the new template creation page. Shared by header, empty state, and ⌘K. */
 export function useCreateTemplate() {
 	const router = useRouter();
-	const invalidate = useInvalidateTemplates();
-	const [isCreating, setIsCreating] = useState(false);
+	const [isCreating] = useState(false);
 
-	const create = useCallback(async () => {
-		if (isCreating) return;
-		setIsCreating(true);
-		try {
-			const template = await createTemplate();
-			await invalidate();
-			router.push(`/templates/${template.id}`);
-		} catch {
-			toast.error("Failed to create template");
-		} finally {
-			setIsCreating(false);
-		}
-	}, [isCreating, invalidate, router]);
+	const create = useCallback(() => {
+		router.push("/templates/new");
+	}, [router]);
 
 	return { isCreating, create };
 }

@@ -1,4 +1,3 @@
-import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import { useCurrentEditor } from "@tiptap/react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -47,7 +46,7 @@ function canvasIsEmpty(
 	return text.length === 0 && html.length === 0;
 }
 
-export function AIPanel({ onClose }: { onClose?: () => void }) {
+export function AIPanel({ onClose: _onClose }: { onClose?: () => void }) {
 	const templateId = useTemplateId();
 	const { editor } = useCurrentEditor();
 	const subject = useEditorStore((s) => s.subject);
@@ -57,7 +56,7 @@ export function AIPanel({ onClose }: { onClose?: () => void }) {
 	const setLastAiPrompt = useEditorStore((s) => s.setLastAiPrompt);
 
 	const [draft, setDraft] = useState("");
-	const [undoStack, setUndoStack] = useState<{
+	const [, setUndoStack] = useState<{
 		json: unknown;
 		html: string;
 	} | null>(null);
@@ -110,16 +109,15 @@ export function AIPanel({ onClose }: { onClose?: () => void }) {
 		}
 	}, [messages]);
 
-	const isSafeEmailHtml = (html: string) => {
+	const isSafeEmailHtml = useCallback((html: string) => {
 		const t = html.trim();
 		if (!t || !/<[a-z][\s\S]*>/i.test(t)) return false;
-		// Block agent prompt dumps that slipped through
 		if (/##\s*Current editor context/i.test(t)) return false;
 		if (/##\s*Conversation/i.test(t)) return false;
 		if (/Respond with the complete email HTML only/i.test(t)) return false;
 		if (/Current HTML \(may be truncated\)/i.test(t)) return false;
 		return true;
-	};
+	}, []);
 
 	const commitApply = useCallback(
 		async (html: string) => {
@@ -167,7 +165,7 @@ export function AIPanel({ onClose }: { onClose?: () => void }) {
 				);
 			}
 		},
-		[editor, templateId],
+		[editor, templateId, isSafeEmailHtml],
 	);
 
 	const requestApply = useCallback(
@@ -182,17 +180,6 @@ export function AIPanel({ onClose }: { onClose?: () => void }) {
 		},
 		[editor, commitApply],
 	);
-
-	const undoApply = useCallback(() => {
-		if (!editor || !undoStack) return;
-		try {
-			editor.commands.setContent(undoStack.json as never);
-			setUndoStack(null);
-			toast.success("Reverted last apply");
-		} catch {
-			toast.error("Could not undo");
-		}
-	}, [editor, undoStack]);
 
 	const snapshot = useMemo(
 		() => buildSnapshot(editor, subject, previewText),
@@ -225,7 +212,6 @@ export function AIPanel({ onClose }: { onClose?: () => void }) {
 				if (empty) {
 					await commitApply(html);
 				} else {
-					// Soft confirm — don't block stream; offer apply modal
 					setPendingApplyHtml(html);
 				}
 			},
@@ -281,7 +267,6 @@ export function AIPanel({ onClose }: { onClose?: () => void }) {
 		async (assistantMessageId: string) => {
 			const idx = messages.findIndex((m) => m.id === assistantMessageId);
 			if (idx < 0) return;
-			// Find nearest preceding user message
 			let userId: string | null = null;
 			let userText = "";
 			for (let i = idx - 1; i >= 0; i--) {
@@ -330,63 +315,22 @@ export function AIPanel({ onClose }: { onClose?: () => void }) {
 
 	return (
 		<div className="flex h-full w-full flex-col overflow-hidden bg-bg-white-0 dark:bg-black">
-			{/* Header */}
-			<div className="flex shrink-0 items-center justify-between border-stroke-soft-200/60 border-b px-4 py-3 dark:border-stroke-soft-100/40">
-				<div className="flex items-center gap-2">
-					<div className="flex h-7 w-7 items-center justify-center rounded-lg bg-feature-lighter text-feature-base">
-						<Icon name="sparkling" className="h-4 w-4" />
-					</div>
-					<div>
-						<h3 className="font-semibold text-label-sm text-text-strong-950">
-							Template agent
-						</h3>
-						<p className="text-[10px] text-text-soft-400">
-							{mode === "plan" ? "Plan mode" : "Agent mode"}
-							{isRunning ? " · generating (Esc to stop)" : " · multi-turn"}
-						</p>
-					</div>
-				</div>
-				<div className="flex items-center gap-1">
-					{undoStack ? (
-						<Button.Root
-							type="button"
-							variant="neutral"
-							mode="ghost"
-							size="xxsmall"
-							onClick={undoApply}
-							title="Undo last apply"
-						>
-							Undo
-						</Button.Root>
-					) : null}
-					{messages.length > 0 ? (
-						<Button.Root
-							type="button"
-							variant="neutral"
-							mode="ghost"
-							size="xxsmall"
-							onClick={clearChat}
-							disabled={isRunning}
-							title="Clear chat"
-						>
-							Clear
-						</Button.Root>
-					) : null}
-					{onClose ? (
-						<button
-							type="button"
-							onClick={onClose}
-							className="rounded-lg p-1 text-text-sub-600 hover:bg-bg-weak-50"
-							aria-label="Close"
-						>
-							<Icon name="cross" className="h-4 w-4" />
-						</button>
-					) : null}
-				</div>
-			</div>
-
 			{/* Transcript */}
 			<div className="relative min-h-0 flex-1">
+				{messages.length > 0 ? (
+					<div className="absolute top-2 right-2 z-10">
+						<button
+							type="button"
+							onClick={clearChat}
+							disabled={isRunning}
+							className="rounded-lg px-2 py-1 text-[11px] text-text-soft-400 transition-colors hover:bg-bg-weak-50 hover:text-text-sub-600 dark:hover:bg-white/5"
+							title="Clear chat history"
+						>
+							Clear
+						</button>
+					</div>
+				) : null}
+
 				<div
 					ref={scrollRef}
 					className="h-full space-y-3 overflow-y-auto p-3"
@@ -398,16 +342,9 @@ export function AIPanel({ onClose }: { onClose?: () => void }) {
 					}}
 				>
 					{messages.length === 0 ? (
-						<div className="flex h-full flex-col items-center justify-center px-4 py-10 text-center">
-							<div className="mb-3 flex h-10 w-10 items-center justify-center rounded-2xl bg-feature-lighter text-feature-base">
-								<Icon name="sparkling" className="h-5 w-5" />
-							</div>
-							<p className="font-semibold text-label-sm text-text-strong-950">
-								Build emails message by message
-							</p>
-							<p className="mt-1 max-w-[240px] text-paragraph-xs text-text-soft-400">
-								Like Cursor: plan, generate, then refine. Paste a screenshot —
-								chat is saved for this template until you clear it.
+						<div className="flex h-full flex-col items-center justify-center px-4 text-center">
+							<p className="text-paragraph-xs text-text-soft-400">
+								Ask anything or paste an image to generate and edit templates
 							</p>
 						</div>
 					) : (
@@ -428,7 +365,7 @@ export function AIPanel({ onClose }: { onClose?: () => void }) {
 					<button
 						type="button"
 						onClick={jumpToLatest}
-						className="-translate-x-1/2 absolute bottom-3 left-1/2 z-10 flex items-center gap-1 rounded-full border border-stroke-soft-100 bg-bg-white-0 px-3 py-1 font-medium text-[11px] text-text-sub-600 shadow-regular-sm hover:text-text-strong-950"
+						className="-translate-x-1/2 absolute bottom-3 left-1/2 z-10 flex items-center gap-1 rounded-full border border-stroke-soft-100 bg-bg-white-0 px-3 py-1 font-medium text-[11px] text-text-sub-600 shadow-regular-sm hover:text-text-strong-950 dark:border-white/10 dark:bg-black"
 					>
 						<Icon name="arrow-down" className="h-3 w-3" />
 						Latest
