@@ -32,6 +32,7 @@ describe("wrapEmailHtml", () => {
 		const wrapped = wrapEmailHtml("<h1>Welcome</h1>", 600);
 		expect(wrapped).toContain("<!DOCTYPE html>");
 		expect(wrapped).toContain("width: 600px");
+		expect(wrapped).toContain("img { max-width: 100%");
 		expect(wrapped).toContain("<h1>Welcome</h1>");
 	});
 });

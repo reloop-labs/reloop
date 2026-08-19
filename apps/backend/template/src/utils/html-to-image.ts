@@ -2,7 +2,7 @@ import { existsSync } from "node:fs";
 import { TemplateErrors } from "@be/template/error/template.error";
 import { templateConfig } from "@be/template/template.config";
 import { log } from "evlog";
-import type { Browser } from "playwright";
+import type { Browser, Page } from "playwright";
 import { chromium } from "playwright";
 import { type HtmlToImageRequest, wrapEmailHtml } from "./html-document";
 
@@ -14,6 +14,20 @@ function resolveChromiumPath(): string | undefined {
 		return "/usr/bin/chromium-browser";
 	if (existsSync("/usr/bin/chromium")) return "/usr/bin/chromium";
 	return undefined;
+}
+
+async function waitForImages(page: Page, timeoutMs: number): Promise<void> {
+	await page
+		.waitForFunction(
+			() =>
+				[...document.images].every(
+					(img) => img.complete && img.naturalWidth > 0,
+				),
+			{ timeout: timeoutMs },
+		)
+		.catch(() => {
+			// Incomplete images still screenshot; don't fail the render.
+		});
 }
 
 function launchArgs(): string[] {
@@ -101,7 +115,7 @@ export async function renderHtmlToImage(
 	const context = await browser.newContext({
 		viewport: { width: request.width, height: 800 },
 		deviceScaleFactor: request.scale,
-		javaScriptEnabled: false,
+		colorScheme: "light",
 	});
 
 	try {
@@ -110,6 +124,16 @@ export async function renderHtmlToImage(
 		await page.setContent(document, {
 			waitUntil: "load",
 			timeout: limits.timeoutMs,
+		});
+		await waitForImages(page, limits.timeoutMs);
+
+		const contentHeight = await page.evaluate(() => {
+			const el = document.documentElement;
+			return Math.max(el.scrollHeight, el.offsetHeight, 1);
+		});
+		await page.setViewportSize({
+			width: request.width,
+			height: Math.min(Math.ceil(contentHeight), 8000),
 		});
 
 		const buffer = await page.screenshot({

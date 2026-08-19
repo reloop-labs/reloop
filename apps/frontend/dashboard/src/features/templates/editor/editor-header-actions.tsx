@@ -12,6 +12,7 @@ import { parseAsStringLiteral, useQueryState } from "nuqs";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
+import { getRenderedEmailHtml } from "#/features/templates/editor/get-rendered-email-html";
 import { useSWR } from "#/features/templates/editor/lib/use-swr-compat";
 import { useTemplateId } from "#/features/templates/editor/lib/use-template-id";
 import { CollabPresence } from "./collobration/Collabpresence";
@@ -330,7 +331,7 @@ export const EditorHeaderActions = ({
 
 		try {
 			const content = editor.getJSON().content ?? [];
-			const renderedHtml = editor.getHTML();
+			const renderedHtml = await getRenderedEmailHtml(editor, previewText);
 
 			// 1. Create the version snapshot
 			const response = await fetch(`/api/template/v1/${templateId}/versions`, {
@@ -387,7 +388,7 @@ export const EditorHeaderActions = ({
 
 		try {
 			const content = editor.getJSON().content ?? [];
-			const renderedHtml = editor.getHTML();
+			const renderedHtml = await getRenderedEmailHtml(editor, previewText);
 
 			// 1. Create the published version snapshot
 			const response = await fetch(`/api/template/v1/${templateId}/versions`, {

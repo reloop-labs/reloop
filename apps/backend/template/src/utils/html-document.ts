@@ -33,6 +33,8 @@ export function wrapEmailHtml(html: string, width: number): string {
 <style>
   html, body { margin: 0; padding: 0; background: #ffffff; }
   body { width: ${width}px; }
+  img { max-width: 100%; height: auto; display: block; }
+  table { border-collapse: collapse; }
 </style>
 </head>
 <body>
