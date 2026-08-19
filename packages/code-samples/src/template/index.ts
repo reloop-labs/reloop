@@ -6,6 +6,7 @@ import { deleteTemplateXCodeSamples } from "./delete-template/delete-template";
 import { deleteVersionXCodeSamples } from "./delete-version/delete-version";
 import { duplicateTemplateXCodeSamples } from "./duplicate-template/duplicate-template";
 import { getTemplateXCodeSamples } from "./get-template/get-template";
+import { htmlToImageXCodeSamples } from "./html-to-image/html-to-image";
 import { listTemplatesXCodeSamples } from "./list-templates/list-templates";
 import { listVersionsXCodeSamples } from "./list-versions/list-versions";
 import { restoreVersionXCodeSamples } from "./restore-version/restore-version";
@@ -17,6 +18,7 @@ export { deleteTemplateXCodeSamples };
 export { deleteVersionXCodeSamples };
 export { duplicateTemplateXCodeSamples };
 export { getTemplateXCodeSamples };
+export { htmlToImageXCodeSamples };
 export { listTemplatesXCodeSamples };
 export { listVersionsXCodeSamples };
 export { restoreVersionXCodeSamples };
@@ -29,6 +31,7 @@ export const templateSamples = {
 	deleteVersion: deleteVersionXCodeSamples,
 	duplicateTemplate: duplicateTemplateXCodeSamples,
 	getTemplate: getTemplateXCodeSamples,
+	htmlToImage: htmlToImageXCodeSamples,
 	listTemplates: listTemplatesXCodeSamples,
 	listVersions: listVersionsXCodeSamples,
 	restoreVersion: restoreVersionXCodeSamples,

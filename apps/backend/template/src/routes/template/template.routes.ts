@@ -7,6 +7,7 @@ import { deleteTemplateRoute } from "@be/template/routes/template/delete-templat
 import { deleteVersionRoute } from "@be/template/routes/template/delete-version/delete-version.route";
 import { duplicateTemplateRoute } from "@be/template/routes/template/duplicate-template/duplicate-template.route";
 import { getTemplateRoute } from "@be/template/routes/template/get-template/get-template.route";
+import { htmlToImageRoute } from "@be/template/routes/template/html-to-image/html-to-image.route";
 import { listTemplatesRoute } from "@be/template/routes/template/list-templates/list-templates.route";
 import { listVersionsRoute } from "@be/template/routes/template/list-versions/list-versions.route";
 import { restoreVersionRoute } from "@be/template/routes/template/restore-version/restore-version.route";
@@ -20,6 +21,7 @@ export const templateRoutes = new Elysia({
 })
 	.use(authMiddleware)
 	.use(createTemplateRoute)
+	.use(htmlToImageRoute)
 	.use(createVersionRoute)
 	.use(listVersionsRoute)
 	.use(deleteVersionRoute)

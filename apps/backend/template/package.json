@@ -48,7 +48,8 @@
 		"@ai-sdk/openai": "catalog:backend",
 		"@ai-sdk/google": "catalog:backend",
 		"@openrouter/ai-sdk-provider": "catalog:backend",
-		"@reloop/code-samples": "workspace:*"
+		"@reloop/code-samples": "workspace:*",
+		"playwright": "1.61.1"
 	},
 	"devDependencies": {
 		"@reloop/tsconfig": "workspace:*",

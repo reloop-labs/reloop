@@ -33,4 +33,12 @@ export namespace TemplateTypes {
 	export interface RenderTemplateBody {
 		variables?: Record<string, string>;
 	}
+
+	export interface HtmlToImageBody {
+		html: string;
+		width?: number;
+		format?: "png" | "jpeg" | "webp";
+		quality?: number;
+		scale?: number;
+	}
 }

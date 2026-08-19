@@ -29,5 +29,15 @@ export const templateConfig = {
 		maxSubjectLength: 500,
 		defaultPageSize: 10,
 		maxPageSize: 100,
+		htmlToImage: {
+			maxHtmlBytes: 1_000_000,
+			defaultWidth: 600,
+			minWidth: 200,
+			maxWidth: 2000,
+			defaultScale: 2,
+			timeoutMs: 15_000,
+		},
 	},
+	/** Override Playwright’s Chromium when using a system install (Alpine Docker). */
+	CHROMIUM_PATH: process.env.CHROMIUM_PATH || "",
 };
