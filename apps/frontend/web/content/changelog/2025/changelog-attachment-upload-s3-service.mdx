@@ -1,0 +1,20 @@
+---
+slug: attachment-upload-s3-service
+version: 0.17.0
+date: November 2025
+launchDate: 24 November 2025
+title: 'Attachment Upload & S3 Storage Service'
+description: >-
+  Built dedicated upload microservice (apps/backend/upload) to store email attachments with presigned URLs.
+tags:
+  - Infrastructure
+  - Backend
+---
+### PLANNING
+
+- **Attachment storage design.** Designed S3 and MinIO storage abstraction with upload status tracking in packages/db/src/schema/upload.ts.
+
+### BACKEND
+
+- **Upload service.** Built apps/backend/upload with S3 and MinIO compatibility for secure attachment file handling.
+- **Presigned URLs.** Generated short-lived presigned upload URLs and authenticated attachment stream downloads.

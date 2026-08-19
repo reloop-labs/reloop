@@ -1,0 +1,20 @@
+---
+slug: direct-email-reply-dashboard
+version: 0.36.0
+date: April 2026
+launchDate: 1 April 2026
+title: 'Direct Email Reply from Dashboard'
+description: >-
+  Reply to incoming threads directly from the dashboard inbox using verified custom domain addresses.
+tags:
+  - Inbox
+  - Feature
+---
+### FRONTEND
+
+- **Reply composer.** Rich text and markdown composer built into the thread detail view in the dashboard.
+- **Sender address selector.** Dropdown to pick from verified custom sending domains with SPF/DKIM alignment.
+
+### BACKEND
+
+- **Reply routing.** Outbound reply dispatch endpoint in apps/backend/inbox linking responses directly to conversation thread IDs.

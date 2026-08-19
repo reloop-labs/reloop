@@ -5,10 +5,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ChangelogGridBody, ChangelogGridHero } from "./changelog-grid";
 import { ChangelogTimeline } from "./changelog-timeline";
-import { changelogReleases } from "./changelog-utils";
+import { getChangelogReleases } from "./changelog-utils";
 
-// TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
-// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
+// Cache configuration
 export const instant = false;
 
 const pageUrl = `${getSiteUrl()}/changelog`;
@@ -65,9 +64,11 @@ type PageProps = {
 const ChangelogPage = async ({ searchParams }: PageProps) => {
 	const { year } = await searchParams;
 
+	const allReleases = getChangelogReleases();
+
 	const availableYears = Array.from(
 		new Set(
-			changelogReleases
+			allReleases
 				.map((r) => r.date.match(/\d{4}/)?.[0])
 				.filter(Boolean) as string[],
 		),
@@ -76,7 +77,7 @@ const ChangelogPage = async ({ searchParams }: PageProps) => {
 	const activeYear =
 		year && availableYears.includes(year) ? year : availableYears[0] || "2026";
 
-	const filteredReleases = changelogReleases.filter(
+	const filteredReleases = allReleases.filter(
 		(r) => (r.date.match(/\d{4}/)?.[0] || "") === activeYear,
 	);
 

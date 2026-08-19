@@ -1,0 +1,24 @@
+---
+slug: mailing-broadcast-infrastructure
+version: 0.48.0
+date: June 2026
+launchDate: 19 June 2026
+title: 'Mailing & Broadcast Infrastructure'
+description: >-
+  Built the mailing service (apps/backend/mailing) to handle scheduled broadcast deliveries to contact lists.
+tags:
+  - Backend
+  - Infrastructure
+---
+### PLANNING
+
+- **Broadcast engine design.** Planned chunked recipient processing, rate limiting, and deduplication queues for broadcast dispatches.
+
+### BACKEND
+
+- **Mailing microservice.** Built apps/backend/mailing to process scheduled broadcast deliveries and contact list ingestion.
+- **Queue integration.** Direct spooling of broadcast jobs into high-speed KumoMTA delivery queues.
+
+### DEVOPS
+
+- **CI pipeline.** Added be-mailing.yml GitHub Actions workflow for container build and testing.

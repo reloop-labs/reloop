@@ -1,0 +1,23 @@
+---
+slug: domain-dns-verification-engine-core
+version: 0.2.0
+date: August 2025
+launchDate: 23 August 2025
+title: 'Domain DNS Verification Engine (SPF, DKIM, DMARC)'
+description: >-
+  Automated DNS record verification with setup guides for Cloudflare, Route 53, and GoDaddy.
+tags:
+  - Infrastructure
+  - Feature
+---
+### PLANNING
+
+- **Deliverability standards.** Engineered strict automated verification for SPF (TXT v=spf1), DKIM (2048-bit RSA keys), and DMARC policies.
+
+### FRONTEND
+
+- **DNS setup guides.** Interactive DNS setup guides for Cloudflare, AWS Route 53, and GoDaddy.
+
+### BACKEND
+
+- **DNS engine.** Built DNS verification worker validating SPF records, DKIM 2048-bit keys, and DMARC alignment in apps/backend/domain.
