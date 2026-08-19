@@ -33,21 +33,24 @@ type PillBox = {
 
 const PILL_EASE = [0.23, 1, 0.32, 1] as const;
 
-function hexToRgba(hex: string, alpha: number) {
+function hexToRgb(hex: string) {
 	const value = hex.replace("#", "");
-	const r = Number.parseInt(value.slice(0, 2), 16);
-	const g = Number.parseInt(value.slice(2, 4), 16);
-	const b = Number.parseInt(value.slice(4, 6), 16);
+	return {
+		r: Number.parseInt(value.slice(0, 2), 16),
+		g: Number.parseInt(value.slice(2, 4), 16),
+		b: Number.parseInt(value.slice(4, 6), 16),
+	};
+}
+
+function hexToRgba(hex: string, alpha: number) {
+	const { r, g, b } = hexToRgb(hex);
 	return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
-/** Soft lift matching scene preview cards, tinted with the language brand. */
-function activePillShadow(hex: string) {
-	return [
-		`0 1px 2px ${hexToRgba(hex, 0.18)}`,
-		`0 8px 20px -6px ${hexToRgba(hex, 0.48)}`,
-		"inset 0 0.5px 0 0 rgba(255,255,255,0.38)",
-	].join(", ");
+/** Darker lip under the face — same extrusion as SceneGlyph. */
+function darkenHex(hex: string, amount: number) {
+	const { r, g, b } = hexToRgb(hex);
+	return `rgb(${Math.round(r * amount)}, ${Math.round(g * amount)}, ${Math.round(b * amount)})`;
 }
 
 function measureTab(button: HTMLButtonElement | null): PillBox | null {
@@ -272,7 +275,7 @@ export default function LanguageExplorer({
 					role="tablist"
 					aria-label="SDK languages"
 					onPointerLeave={() => setHoveredTabIdx(undefined)}
-					className="scrollbar-none relative flex gap-1 overflow-x-auto px-6 py-3.5 sm:px-10 sm:py-4 lg:px-12"
+					className="scrollbar-none relative flex gap-1 overflow-x-auto px-6 py-3 sm:px-10 sm:py-3.5 lg:px-12"
 					style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
 				>
 					{languages.map((lang, index) => {
@@ -297,7 +300,7 @@ export default function LanguageExplorer({
 								className={cn(
 									"relative z-10 inline-flex shrink-0 items-center gap-2 rounded-full px-3.5 py-2 font-medium text-xs transition-colors duration-150 ease-[cubic-bezier(0.23,1,0.32,1)]",
 									!mounted && isActive
-										? "bg-text-strong-950 text-white shadow-[0_1px_2px_rgba(15,23,42,0.12),0_8px_20px_-6px_rgba(15,23,42,0.28),inset_0_0.5px_0_0_rgba(255,255,255,0.38)] dark:bg-white dark:text-black dark:shadow-[0_1px_2px_rgba(0,0,0,0.35),0_8px_20px_-6px_rgba(0,0,0,0.45),inset_0_0.5px_0_0_rgba(255,255,255,0.55)]"
+										? "bg-text-strong-950 text-white shadow-[0_1.5px_0_0_#1a1a1a,inset_0_0.5px_0_0_rgba(255,255,255,0.45)] dark:bg-white dark:text-black dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.55),0_0_0_0.5px_rgba(255,255,255,0.08),inset_0_0.5px_0_0_rgba(255,255,255,0.28)]"
 										: showActiveLabel
 											? "text-white"
 											: "text-text-sub-600 dark:text-white/60",
@@ -343,16 +346,18 @@ export default function LanguageExplorer({
 						{activePill ? (
 							<motion.div
 								key="active-pill"
-								className="pointer-events-none absolute top-0 left-0 rounded-full"
-								style={{
-									backgroundColor: brandColor,
-									boxShadow: activePillShadow(brandColor),
-								}}
+								className="pointer-events-none absolute top-0 left-0 rounded-full p-px pb-[2px]"
+								style={{ backgroundColor: darkenHex(brandColor, 0.55) }}
 								initial={{ ...activePill, opacity: 0 }}
 								animate={{ ...activePill, opacity: 1 }}
 								exit={{ ...activePill, opacity: 0 }}
 								transition={{ duration: 0.2, ease: PILL_EASE }}
-							/>
+							>
+								<div
+									className="size-full rounded-full shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.45)] dark:shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.28),0_0_0_0.5px_rgba(255,255,255,0.08)]"
+									style={{ backgroundColor: brandColor }}
+								/>
+							</motion.div>
 						) : null}
 					</AnimatePresence>
 				</div>

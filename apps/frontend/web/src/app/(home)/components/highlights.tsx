@@ -1,4 +1,4 @@
-import { SectionTitle } from "@reloop/web/app/sdk/components/section-title";
+import { SceneGlyph } from "./_shared/scene-header";
 import {
 	type FeatureHighlight,
 	FeatureHighlightsGrid,
@@ -58,7 +58,41 @@ const deliverabilityHighlights: FeatureHighlight[] = [
 		description: (
 			<>
 				A <Term href="/glossary/dedicated-ip">dedicated IP</Term> that warms
-				with you — or bring your own.
+				with your sending volume.
+			</>
+		),
+	},
+	{
+		id: "smart-retries",
+		icon: "refresh",
+		title: "Smart bounce handling",
+		description: (
+			<>
+				Distinguish <Term href="/glossary/hard-bounce">hard</Term> from{" "}
+				<Term href="/glossary/soft-bounce">soft bounces</Term> and auto-retry
+				with backoff.
+			</>
+		),
+	},
+	{
+		id: "dkim-rotation",
+		icon: "key",
+		title: "Automatic DKIM key rotation",
+		description: (
+			<>
+				Keep <Term href="/glossary/dkim">DKIM</Term> keys fresh with automated
+				rotation.
+			</>
+		),
+	},
+	{
+		id: "tls-enforcement",
+		icon: "lock",
+		title: "Strict TLS delivery",
+		description: (
+			<>
+				Enforce <Term href="/glossary/starttls">STARTTLS</Term> on every hop so
+				messages stay encrypted in flight.
 			</>
 		),
 	},
@@ -81,17 +115,6 @@ const deliverabilityHighlights: FeatureHighlight[] = [
 				Watch <Term href="/glossary/dns">DNS</Term> and{" "}
 				<Term href="/glossary/ip-reputation">IP reputation</Term>. Get told when
 				they drift.
-			</>
-		),
-	},
-	{
-		id: "verify-dns",
-		icon: "key",
-		title: "Verify DNS records",
-		description: (
-			<>
-				Guided <Term href="/glossary/dkim">DKIM</Term> and{" "}
-				<Term href="/glossary/spf">SPF</Term> setup when you add a domain.
 			</>
 		),
 	},
@@ -137,12 +160,20 @@ export default function Highlights() {
 			aria-labelledby="highlights-heading"
 			className="w-full"
 		>
-			<SectionTitle
-				id="highlights-heading"
-				icon="shield"
-				size="xl"
-				title="Built to land in the inbox."
-			/>
+			<div className="border-stroke-soft-200 border-b px-4 py-16 sm:px-6 sm:py-20 lg:px-12 lg:py-24 dark:border-white/10">
+				<div className="flex items-center gap-2">
+					<SceneGlyph icon="shield" color="emerald" />
+					<span className="font-medium text-[13.5px] text-text-strong-950 tracking-tight dark:text-white">
+						Deliverability
+					</span>
+				</div>
+				<h2
+					id="highlights-heading"
+					className="mt-3.5 max-w-3xl font-medium text-4xl text-text-strong-950 text-balance leading-[1.05] tracking-tighter sm:text-5xl dark:text-white"
+				>
+					Built to land in the inbox.
+				</h2>
+			</div>
 			<FeatureHighlightsGrid
 				items={deliverabilityHighlights}
 				columns={5}
