@@ -160,7 +160,7 @@ export function Hero({ variant = "default" }: HeroProps) {
 		>
 			{variant === "self-host" ? (
 				<div className="relative mx-auto flex w-full max-w-5xl flex-col items-center border-stroke-soft-200 border-x px-6 pt-36 pb-12 text-center sm:px-8 sm:pt-44 sm:pb-16 md:max-w-7xl lg:px-12 lg:pt-52 dark:border-white/10">
-					<h1 className="max-w-3xl text-center font-semibold text-[2rem] text-text-strong-950 leading-[1.08] tracking-[-0.035em] sm:text-[2.75rem] lg:text-[3.25rem] dark:text-white">
+					<h1 className="max-w-4xl text-center font-semibold text-[2.5rem] text-text-strong-950 leading-[1.06] tracking-[-0.04em] sm:text-[3.5rem] lg:text-[4.25rem] dark:text-white">
 						Self-Host Reloop
 						<br />
 						On your own server
@@ -213,18 +213,28 @@ export function Hero({ variant = "default" }: HeroProps) {
 							/>
 						</span>
 					</Link>
-					<h1 className="max-w-3xl text-center font-semibold text-[2rem] text-text-strong-950 leading-[1.08] tracking-[-0.035em] sm:text-[2.75rem] lg:text-[3.25rem] dark:text-white">
+					<h1 className="max-w-4xl text-center font-semibold text-[2.5rem] text-text-strong-950 leading-[1.06] tracking-[-0.04em] sm:text-[3.5rem] lg:text-[4.25rem] dark:text-white">
 						Email API for Developers
 					</h1>
-					<p className="mt-4 max-w-[42rem] text-balance text-center text-[15px] text-text-sub-600 leading-relaxed sm:mt-5 sm:text-[16.5px] dark:text-white/55">
+					<p className="mt-5 max-w-[46rem] text-balance text-center text-[16.5px] text-text-sub-600 leading-relaxed sm:mt-6 sm:text-[18.5px] lg:text-[20px] dark:text-white/60">
 						Reloop is the open-source email platform for transactional mail,
 						agent inboxes, and automated workflows.
 					</p>
-					<div className="mt-6 flex flex-wrap items-center justify-center gap-3 sm:mt-7">
-						<FancyButton.Root asChild variant="neutral" size="small">
+					<div className="mt-7 flex flex-wrap items-center justify-center gap-3.5 sm:mt-8 sm:gap-4">
+						<FancyButton.Root
+							asChild
+							variant="neutral"
+							size="medium"
+							className="h-11 rounded-xl px-6 font-medium text-[15.5px]"
+						>
 							<a href={hostedSignupHref}>Get Started</a>
 						</FancyButton.Root>
-						<FancyButton.Root asChild variant="basic" size="small">
+						<FancyButton.Root
+							asChild
+							variant="basic"
+							size="medium"
+							className="h-11 rounded-xl px-6 font-medium text-[15.5px]"
+						>
 							<a href="/docs">Documentation</a>
 						</FancyButton.Root>
 					</div>
