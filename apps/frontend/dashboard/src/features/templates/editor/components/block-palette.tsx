@@ -35,14 +35,14 @@ export function BlockPalette() {
 	};
 
 	return (
-		<div className="flex h-full min-h-0 flex-col">
-			<div className="min-h-0 flex-1 overflow-y-auto px-4 pt-2 pb-4">
+		<div className="flex h-full w-full min-h-0 flex-1 flex-col">
+			<div className="min-h-0 flex-1 overflow-y-auto px-4 pt-3 pb-4">
 				{groupWidgetSections().map((group) => (
 					<section key={group.category} className="mb-5 last:mb-0">
 						<h3 className="px-0.5 pb-2 font-semibold text-[11px] text-text-soft-400 uppercase tracking-wide">
 							{group.category}
 						</h3>
-						<ul className="grid grid-cols-2 gap-2">
+						<ul className="grid w-full grid-cols-2 gap-2">
 							{group.items.map((item) => (
 								<li key={item.title}>
 									<button

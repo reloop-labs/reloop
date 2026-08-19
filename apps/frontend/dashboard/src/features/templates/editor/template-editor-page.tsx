@@ -28,7 +28,7 @@ export function TemplateEditorPage({ templateId }: { templateId: string }) {
 					{/* Left panel / Sidebar (Block Palette by default, or Code) */}
 					<div
 						className={cn(
-							"relative flex shrink-0 overflow-hidden border-stroke-soft-200 border-r transition-all duration-300 dark:border-stroke-soft-100/40",
+							"relative flex shrink-0 flex-col overflow-hidden border-stroke-soft-200 border-r transition-all duration-300 dark:border-stroke-soft-100/40",
 							isCodeSplit ? "w-1/2 min-w-[480px]" : "w-72",
 						)}
 					>
