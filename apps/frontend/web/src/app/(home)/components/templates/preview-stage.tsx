@@ -101,6 +101,12 @@ function typeDelay(char: string) {
 	return 16;
 }
 
+function collabTypeDelay(char: string) {
+	if (char === " ") return 32;
+	if (char === "," || char === "." || char === "—" || char === "-") return 90;
+	return 42;
+}
+
 const contentVariants = {
 	enter: (dir: number) => ({
 		opacity: 0,
@@ -560,6 +566,18 @@ const COLLABORATORS: Record<CollaboratorId, Collaborator> = {
 	},
 };
 
+const FROM_NAME = "Maya Chen";
+const SUBJECT_HEAD = "Introducing Reloop 2.0";
+const SUBJECT_TAIL = " — Real-time Email Engine";
+const BODY_EDIT =
+	"Share a template with your team and watch edits land live — subject lines, variables, and layout blocks stay in sync without a refresh.";
+
+const IDLE_EDITS: Record<CollaboratorId, boolean> = {
+	maya: false,
+	sarah: false,
+	alex: false,
+};
+
 /** Presence cursor using the shared `cursor` icon (same SVG as the tab). */
 function PresenceCursor({
 	user,
@@ -626,11 +644,16 @@ function PresenceCursor({
 /** Text caret: vertical insertion bar + name flag. Distinct from the mouse cursor. */
 function PresenceCaret({
 	user,
+	blinking = false,
 	className,
 }: {
 	user: Collaborator;
+	blinking?: boolean;
 	className?: string;
 }) {
+	const shouldReduceMotion = useReducedMotion();
+	const blink = blinking && !shouldReduceMotion;
+
 	return (
 		<span
 			aria-hidden
@@ -638,8 +661,22 @@ function PresenceCaret({
 				"relative z-20 mx-px inline-block h-[1.15em] w-0.5 shrink-0 align-text-bottom",
 				className,
 			)}
-			style={{ backgroundColor: user.cursorFill }}
 		>
+			<motion.span
+				className="absolute inset-0 rounded-[1px]"
+				style={{ backgroundColor: user.cursorFill }}
+				animate={{ opacity: blink ? [1, 1, 0, 0] : 1 }}
+				transition={
+					blink
+						? {
+								duration: 1.05,
+								repeat: Number.POSITIVE_INFINITY,
+								ease: "linear",
+								times: [0, 0.46, 0.46, 1],
+							}
+						: { duration: 0.12, ease: EASE_OUT }
+				}
+			/>
 			<span
 				className="absolute bottom-full left-0 z-20 mb-px whitespace-nowrap rounded px-1.5 py-[3px] font-semibold text-[10px] leading-none"
 				style={{ backgroundColor: user.cursorFill, color: user.cursorInk }}
@@ -651,18 +688,95 @@ function PresenceCaret({
 }
 
 function RealtimeEditorView() {
+	const shouldReduceMotion = useReducedMotion();
 	const [activeSpotlight, setActiveSpotlight] = useState<CollaboratorId | null>(
 		"sarah",
 	);
 	const [hoveredUser, setHoveredUser] = useState<CollaboratorId | null>(null);
+	const [fromChars, setFromChars] = useState(0);
+	const [subjectChars, setSubjectChars] = useState(0);
+	const [bodyChars, setBodyChars] = useState(0);
+	const [edits, setEdits] = useState(IDLE_EDITS);
 
-	const isSarahActive = activeSpotlight === "sarah" || hoveredUser === "sarah";
-	const isAlexActive = activeSpotlight === "alex" || hoveredUser === "alex";
-	const isMayaActive = activeSpotlight === "maya" || hoveredUser === "maya";
+	const isSarahActive =
+		edits.sarah ||
+		activeSpotlight === "sarah" ||
+		hoveredUser === "sarah";
+	const isAlexActive =
+		edits.alex || activeSpotlight === "alex" || hoveredUser === "alex";
+	const isMayaActive =
+		edits.maya || activeSpotlight === "maya" || hoveredUser === "maya";
 
 	const toggleSpotlight = (id: CollaboratorId) => {
 		setActiveSpotlight((prev) => (prev === id ? null : id));
 	};
+
+	useEffect(() => {
+		if (shouldReduceMotion) {
+			setFromChars(FROM_NAME.length);
+			setSubjectChars(SUBJECT_HEAD.length);
+			setBodyChars(BODY_EDIT.length);
+			setEdits(IDLE_EDITS);
+			return;
+		}
+
+		let cancelled = false;
+
+		const typeText = async (
+			text: string,
+			setChars: (n: number) => void,
+		) => {
+			for (let i = 1; i <= text.length; i++) {
+				if (cancelled) return;
+				setChars(i);
+				await wait(collabTypeDelay(text[i - 1]!));
+			}
+		};
+
+		const mark = (id: CollaboratorId, on: boolean) => {
+			if (cancelled) return;
+			setEdits((prev) => (prev[id] === on ? prev : { ...prev, [id]: on }));
+		};
+
+		const play = async () => {
+			while (!cancelled) {
+				setFromChars(0);
+				setSubjectChars(0);
+				setBodyChars(0);
+				setEdits(IDLE_EDITS);
+				await wait(420);
+				if (cancelled) return;
+
+				mark("alex", true);
+				const alex = typeText(FROM_NAME, setFromChars).then(() =>
+					mark("alex", false),
+				);
+
+				await wait(360);
+				if (cancelled) return;
+				mark("sarah", true);
+				const sarah = typeText(SUBJECT_HEAD, setSubjectChars).then(() =>
+					mark("sarah", false),
+				);
+
+				await wait(480);
+				if (cancelled) return;
+				mark("maya", true);
+				const maya = typeText(BODY_EDIT, setBodyChars).then(() =>
+					mark("maya", false),
+				);
+
+				await Promise.all([alex, sarah, maya]);
+				if (cancelled) return;
+				await wait(2600);
+			}
+		};
+
+		void play();
+		return () => {
+			cancelled = true;
+		};
+	}, [shouldReduceMotion]);
 
 	return (
 		<div className="relative mx-auto w-full max-w-3xl overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 shadow-xs dark:border-white/10 dark:bg-[#0c0c0e]">
@@ -682,7 +796,7 @@ function RealtimeEditorView() {
 				user={COLLABORATORS.maya}
 				delay={2.4}
 				emphasized={isMayaActive}
-				className="top-[6.9rem] right-[18%] sm:right-[22%]"
+				className="top-[17.5rem] left-[18%] sm:top-[18rem] sm:left-[22%]"
 			/>
 
 			{/* Top Bar with Document Title & Multiplayer Avatars */}
@@ -745,8 +859,11 @@ function RealtimeEditorView() {
 								isAlexActive && COLLABORATORS.alex.highlightBg,
 							)}
 						>
-							<span>Maya C</span>
-							<PresenceCaret user={COLLABORATORS.alex} />
+							<span>{FROM_NAME.slice(0, fromChars)}</span>
+							<PresenceCaret
+								user={COLLABORATORS.alex}
+								blinking={edits.alex}
+							/>
 							<span className="text-text-soft-400 dark:text-white/40">
 								&lt;maya@updates.reloop.sh&gt;
 							</span>
@@ -768,17 +885,9 @@ function RealtimeEditorView() {
 							onMouseLeave={() => setHoveredUser(null)}
 							className="relative inline-flex items-center"
 						>
-							<span
-								className={cn(
-									"rounded px-2 py-0.5 font-mono text-[10.5px] text-text-strong-950 transition-colors dark:text-white",
-									isMayaActive
-										? "bg-emerald-500/20"
-										: "bg-bg-weak-50 dark:bg-white/10",
-								)}
-							>
+							<span className="rounded bg-bg-weak-50 px-2 py-0.5 font-mono text-[10.5px] text-text-strong-950 dark:bg-white/10 dark:text-white">
 								Early Access Developers ×
 							</span>
-							<PresenceCaret user={COLLABORATORS.maya} />
 						</div>
 					</div>
 					<span className="text-[10.5px] text-text-soft-400 dark:text-white/40">
@@ -800,12 +909,16 @@ function RealtimeEditorView() {
 								isSarahActive && COLLABORATORS.sarah.highlightBg,
 							)}
 						>
-							<span>Introducing Reloop 2.0</span>
-							<PresenceCaret user={COLLABORATORS.sarah} />
-							<span className="text-text-sub-600 dark:text-white/70">
-								{" "}
-								— Real-time Email Engine
-							</span>
+							<span>{SUBJECT_HEAD.slice(0, subjectChars)}</span>
+							<PresenceCaret
+								user={COLLABORATORS.sarah}
+								blinking={edits.sarah}
+							/>
+							{subjectChars === SUBJECT_HEAD.length ? (
+								<span className="text-text-sub-600 dark:text-white/70">
+									{SUBJECT_TAIL}
+								</span>
+							) : null}
 						</div>
 					</div>
 					<span className="text-[10.5px] text-text-soft-400 dark:text-white/40">
@@ -848,9 +961,19 @@ function RealtimeEditorView() {
 						Type-safe component primitives, multiplayer canvas editing, and
 						automated deliverability monitoring right out of the box.
 					</p>
-					<p className="text-[11px] text-text-sub-600 leading-relaxed dark:text-white/70">
-						Share a template with your team and watch edits land live — subject
-						lines, variables, and layout blocks stay in sync without a refresh.
+					<p
+						onMouseEnter={() => setHoveredUser("maya")}
+						onMouseLeave={() => setHoveredUser(null)}
+						className={cn(
+							"text-[11px] text-text-sub-600 leading-relaxed transition-colors dark:text-white/70",
+							isMayaActive && COLLABORATORS.maya.highlightBg,
+						)}
+					>
+						{BODY_EDIT.slice(0, bodyChars)}
+						<PresenceCaret
+							user={COLLABORATORS.maya}
+							blinking={edits.maya}
+						/>
 					</p>
 					<p className="text-[11px] text-text-sub-600 leading-relaxed dark:text-white/70">
 						Every send still goes through the same React Email pipeline, so what
