@@ -1204,8 +1204,9 @@ function VersionHistoryView() {
 	const [hoveredId, setHoveredId] = useState<string | null>(null);
 	const [toast, setToast] = useState<string | null>(null);
 	const [isUserInteracting, setIsUserInteracting] = useState(false);
-	const [cursorPos, setCursorPos] = useState({ x: 48, y: 72 });
+	const [cursorPos, setCursorPos] = useState({ x: 490, y: 150 });
 	const [cursorVisible, setCursorVisible] = useState(true);
+	const [isClicking, setIsClicking] = useState(false);
 
 	const restore = (id: string) => {
 		const target = HISTORY_ITEMS.find((item) => item.id === id);
@@ -1231,45 +1232,52 @@ function VersionHistoryView() {
 				timers.push(window.setTimeout(resolve, ms));
 			});
 
-		const pointAt = (
-			el: HTMLElement | null,
-			offset: { x: number; y: number },
-		) => {
+		const pointAtRestore = (id: string) => {
 			const root = rootRef.current;
-			if (!el || !root) return;
-			const a = el.getBoundingClientRect();
-			const b = root.getBoundingClientRect();
-			setCursorPos({
-				x: a.left - b.left + offset.x,
-				y: a.top - b.top + offset.y,
-			});
+			if (!root) return;
+			const btn = restoreRefs.current[id];
+			if (btn) {
+				const a = btn.getBoundingClientRect();
+				const b = root.getBoundingClientRect();
+				setCursorPos({
+					x: a.left - b.left + 24,
+					y: a.top - b.top + 10,
+				});
+			} else {
+				const row = rowRefs.current[id];
+				if (!row) return;
+				const a = row.getBoundingClientRect();
+				const b = root.getBoundingClientRect();
+				setCursorPos({
+					x: a.right - b.left - 52,
+					y: a.top - b.top + 16,
+				});
+			}
 		};
 
 		const run = async () => {
+			await wait(500);
+			pointAtRestore("v4");
 			await wait(400);
+
 			while (!cancelled) {
-				for (const id of ["v4", "v6"] as const) {
+				for (const id of ["v4", "v5", "v6"] as const) {
 					if (cancelled) return;
 					setHoveredId(id);
-					setSelectedId(id);
-					await wait(40);
-					pointAt(rowRefs.current[id], { x: 88, y: 16 });
-					await wait(520);
+					pointAtRestore(id);
+					await wait(650);
 					if (cancelled) return;
 
-					pointAt(restoreRefs.current[id], { x: 22, y: 8 });
-					await wait(480);
+					setIsClicking(true);
+					await wait(120);
 					if (cancelled) return;
 					restore(id);
-					await wait(200);
+					setIsClicking(false);
+					await wait(2400);
 					if (cancelled) return;
 
 					setHoveredId(null);
-					setCursorPos((prev) => ({
-						x: prev.x + (id === "v4" ? 36 : -28),
-						y: prev.y + 42,
-					}));
-					await wait(2400);
+					await wait(400);
 				}
 			}
 		};
@@ -1300,7 +1308,7 @@ function VersionHistoryView() {
 						animate={{
 							x: cursorPos.x,
 							y: cursorPos.y,
-							scale: 1,
+							scale: isClicking ? 0.88 : 1,
 							opacity: 1,
 						}}
 						exit={{ opacity: 0, scale: 0.97 }}
