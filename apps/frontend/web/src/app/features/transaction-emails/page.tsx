@@ -5,10 +5,8 @@ import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { hostedSignupHref } from "@reloop/web/lib/site";
 import Link from "next/link";
-import {
-	HeroAtmosphere,
-	HeroWindowChrome,
-} from "../../(home)/components/hero-chrome";
+import { SceneGlyph } from "../../(home)/components/_shared/scene-header";
+import { HeroWindowChrome } from "../../(home)/components/hero-chrome";
 import { HeroDashboardShell } from "../../(home)/components/hero-dashboard-shell";
 import {
 	HeroDemoPlaybackButton,
@@ -16,75 +14,95 @@ import {
 } from "../../(home)/components/hero-demo-playback";
 import { HeroEmailsPreview } from "../../(home)/components/hero-emails-preview";
 
+function TransactionalEmailsAtmosphere() {
+	const fx = {
+		glow: "linear-gradient(to top, rgba(249, 115, 22, 0.28) 0%, rgba(249, 115, 22, 0.08) 50%, transparent 85%)",
+		line: "rgba(249, 115, 22, 0.16)",
+	};
+	const lineMask = "linear-gradient(to top, black 0%, rgba(0, 0, 0, 0.4) 100%)";
+
+	return (
+		<div aria-hidden className="pointer-events-none absolute inset-0 z-0">
+			<div className="absolute inset-0" style={{ backgroundImage: fx.glow }} />
+			<div
+				className="absolute inset-0"
+				style={{
+					backgroundImage: `repeating-linear-gradient(to right, transparent 0, transparent 3px, ${fx.line} 3px, ${fx.line} 3.55px)`,
+					maskImage: lineMask,
+					WebkitMaskImage: lineMask,
+				}}
+			/>
+		</div>
+	);
+}
+
 const TransactionEmailsPage = () => {
 	return (
-		<div className="relative min-h-screen overflow-x-hidden bg-bg-white-0 font-sans text-text-strong-950 selection:bg-neutral-200 dark:bg-black dark:text-white">
-			{/* Hero Header */}
-			<header className="relative flex w-full flex-col items-center px-6 pt-28 pb-14 text-center sm:px-8 sm:pt-32 sm:pb-16 lg:px-12 lg:pt-36 lg:pb-20">
-				<Link
-					href="/compare/resend"
-					className="group mb-6 inline-flex items-center gap-0 overflow-hidden rounded-full border border-stroke-soft-200 bg-bg-white-0 text-[13px] shadow-[0_1px_2px_rgba(0,0,0,0.04)] transition-all duration-200 hover:border-stroke-strong-950/20 sm:mb-8 sm:text-[13.5px] dark:border-white/10 dark:bg-white/[0.04] dark:shadow-none dark:hover:border-white/25"
-				>
-					<span className="px-3.5 py-1.5 font-medium text-text-sub-600 dark:text-white/70">
-						An open-source alternative to Resend
-					</span>
-					<span
-						className="h-3.5 w-px bg-stroke-soft-200 dark:bg-white/10"
-						aria-hidden="true"
-					/>
-					<span className="inline-flex items-center gap-1 px-3 py-1.5 font-medium text-text-strong-950 transition-colors group-hover:text-blue-600 dark:text-white dark:group-hover:text-blue-400">
-						<span>Read more</span>
-						<Icon
-							name="arrow-up-right"
-							className="group-hover:-translate-y-0.5 size-3.5 transition-transform duration-200 group-hover:translate-x-0.5"
-							aria-hidden="true"
-						/>
-					</span>
-				</Link>
-				<h1 className="max-w-3xl text-balance text-center font-semibold text-[2.5rem] text-text-strong-950 leading-[1.06] tracking-[-0.04em] sm:text-[3.5rem] lg:text-[4.25rem] dark:text-white">
-					Send Transactional Email in 5 Minutes
-				</h1>
-				<p className="mt-5 max-w-[46rem] text-balance text-center text-[16.5px] text-text-sub-600 leading-relaxed sm:mt-6 sm:text-[18.5px] lg:text-[20px] dark:text-white/60">
-					Start sending transactional emails with a robust REST API, native
-					SDKs, and reliable SMTP service.
-				</p>
-				<div className="mt-8 flex flex-wrap items-center justify-center gap-3.5 sm:mt-9 sm:gap-4">
-					<FancyButton.Root
-						asChild
-						variant="neutral"
-						size="medium"
-						className="h-11 rounded-xl px-6 font-medium text-[15.5px]"
-					>
-						<a href={hostedSignupHref}>Get Started</a>
-					</FancyButton.Root>
-					<FancyButton.Root
-						asChild
-						variant="basic"
-						size="medium"
-						className="h-11 rounded-xl px-6 font-medium text-[15.5px]"
-					>
-						<a href="/docs">Documentation</a>
-					</FancyButton.Root>
-				</div>
-			</header>
+		<div className="relative min-h-screen overflow-x-hidden bg-bg-white-0 font-sans text-text-strong-950 selection:bg-orange-500/20 dark:bg-black dark:text-white">
+			{/* Hero & Overview Section with continuous Atmosphere lines */}
+			<div className="relative w-full overflow-hidden">
+				<TransactionalEmailsAtmosphere />
 
-			{/* Overview Window Demo */}
-			<section className="relative w-full overflow-hidden px-3 pt-6 pb-14 sm:px-6 sm:pt-8 sm:pb-16 lg:px-8 lg:pb-20">
-				<HeroAtmosphere />
-				<div className="relative z-10 mx-auto flex h-[34rem] w-full max-w-5xl flex-col sm:h-[42rem] md:max-w-7xl lg:h-[48rem]">
-					<HeroDemoPlaybackProvider started={true}>
-						<HeroWindowChrome action={<HeroDemoPlaybackButton />}>
-							<HeroDashboardShell activeItem="emails">
-								<HeroEmailsPreview />
-							</HeroDashboardShell>
-						</HeroWindowChrome>
-					</HeroDemoPlaybackProvider>
-				</div>
-			</section>
+				{/* Hero Header */}
+				<header className="relative z-10 flex w-full flex-col items-center px-6 pt-28 pb-14 text-center sm:px-8 sm:pt-32 sm:pb-16 lg:px-12 lg:pt-36 lg:pb-20">
+					<div className="mb-6 flex items-center justify-center gap-2 sm:mb-8">
+						<SceneGlyph icon="send-2" color="orange" />
+						<span className="font-medium text-[13.5px] text-text-strong-950 tracking-tight dark:text-white">
+							Transactional Email
+						</span>
+					</div>
+					<h1 className="max-w-3xl text-balance text-center font-semibold text-[2.5rem] text-text-strong-950 leading-[1.06] tracking-[-0.04em] sm:text-[3.5rem] lg:text-[4.25rem] dark:text-white">
+						Send Transactional Email in 5 Minutes
+					</h1>
+					<p className="mt-5 max-w-[46rem] text-balance text-center text-[16.5px] text-text-sub-600 leading-relaxed sm:mt-6 sm:text-[18.5px] lg:text-[20px] dark:text-white/60">
+						Start sending transactional emails with a robust REST API, native
+						SDKs, and reliable SMTP service.
+					</p>
+					<div className="mt-8 flex flex-wrap items-center justify-center gap-3.5 sm:mt-9 sm:gap-4">
+						<FancyButton.Root
+							asChild
+							variant="neutral"
+							size="medium"
+							className="h-11 rounded-xl px-6 font-medium text-[15.5px]"
+						>
+							<a href={hostedSignupHref}>Get Started</a>
+						</FancyButton.Root>
+						<FancyButton.Root
+							asChild
+							variant="basic"
+							size="medium"
+							className="h-11 rounded-xl px-6 font-medium text-[15.5px]"
+						>
+							<a href="/docs">Documentation</a>
+						</FancyButton.Root>
+					</div>
+				</header>
+
+				{/* Overview Window Demo */}
+				<section className="relative z-10 w-full px-3 pt-6 pb-14 sm:px-6 sm:pt-8 sm:pb-16 lg:px-8 lg:pb-20">
+					<div className="mx-auto flex h-[34rem] w-full max-w-5xl flex-col sm:h-[42rem] md:max-w-7xl lg:h-[48rem]">
+						<HeroDemoPlaybackProvider started={true}>
+							<HeroWindowChrome action={<HeroDemoPlaybackButton />}>
+								<HeroDashboardShell activeItem="emails">
+									<HeroEmailsPreview />
+								</HeroDashboardShell>
+							</HeroWindowChrome>
+						</HeroDemoPlaybackProvider>
+					</div>
+				</section>
+			</div>
 
 			{/* Specs Bento Grid */}
-			<section className="border-stroke-soft-200 border-t bg-bg-white-0 py-20 sm:py-28 dark:border-white/10 dark:bg-black">
-				<div className="mx-auto w-full max-w-5xl px-4 sm:px-6 md:max-w-7xl lg:px-8">
+			<section className="relative overflow-hidden border-stroke-soft-200 border-t bg-bg-white-0 py-20 sm:py-28 dark:border-white/10 dark:bg-black">
+				<div
+					aria-hidden
+					className="-left-32 pointer-events-none absolute top-1/3 h-[500px] w-[500px] rounded-full bg-orange-500/10 opacity-70 blur-[140px] dark:opacity-40"
+				/>
+				<div
+					aria-hidden
+					className="-right-32 pointer-events-none absolute bottom-10 h-[450px] w-[450px] rounded-full bg-orange-500/10 opacity-70 blur-[130px] dark:opacity-40"
+				/>
+				<div className="relative z-10 mx-auto w-full max-w-5xl px-4 sm:px-6 md:max-w-7xl lg:px-8">
 					<div className="mb-16 text-center sm:mb-20">
 						<h2 className="font-semibold text-[2.6rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[3.4rem] lg:text-[4.2rem] dark:text-white">
 							SMTP Relay &amp; HTTP APIs
@@ -252,8 +270,12 @@ const TransactionEmailsPage = () => {
 			</section>
 
 			{/* Quick Start Guide Section */}
-			<section className="border-stroke-soft-200 border-t bg-bg-weak-50/60 py-20 sm:py-28 dark:border-white/10 dark:bg-white/[0.02]">
-				<div className="mx-auto w-full max-w-5xl px-4 sm:px-6 md:max-w-7xl lg:px-8">
+			<section className="relative overflow-hidden border-stroke-soft-200 border-t bg-bg-weak-50/60 py-20 sm:py-28 dark:border-white/10 dark:bg-white/[0.02]">
+				<div
+					aria-hidden
+					className="pointer-events-none absolute top-0 right-1/4 h-[400px] w-[600px] rounded-full bg-orange-500/10 opacity-70 blur-[120px] dark:opacity-40"
+				/>
+				<div className="relative z-10 mx-auto w-full max-w-5xl px-4 sm:px-6 md:max-w-7xl lg:px-8">
 					<div className="mb-16 text-center sm:mb-20">
 						<h2 className="font-semibold text-[2.6rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[3.4rem] lg:text-[4.2rem] dark:text-white">
 							Setup in 5 Minutes
@@ -317,12 +339,16 @@ const TransactionEmailsPage = () => {
 			</section>
 
 			{/* CTA Banner Section */}
-			<section className="border-stroke-soft-200 border-t bg-bg-white-0 py-20 sm:py-28 dark:border-white/10 dark:bg-black">
-				<div className="mx-auto max-w-[920px] px-4 text-center">
+			<section className="relative overflow-hidden border-stroke-soft-200 border-t bg-bg-white-0 py-20 sm:py-28 dark:border-white/10 dark:bg-black">
+				<div
+					aria-hidden
+					className="-bottom-24 -translate-x-1/2 pointer-events-none absolute left-1/2 h-[350px] w-[800px] rounded-full bg-orange-500/15 opacity-70 blur-[120px] dark:opacity-50"
+				/>
+				<div className="relative z-10 mx-auto max-w-[920px] px-4 text-center">
 					<h2 className="font-semibold text-[2.6rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[3.4rem] lg:text-[4.2rem] dark:text-white">
 						3,000 emails for free
 						<br />
-						<span className="text-primary-base">per month.</span>
+						<span className="text-[#f97316]">per month.</span>
 					</h2>
 					<p className="mx-auto mt-8 max-w-[550px] font-medium text-[15px] text-text-sub-600 leading-7 sm:text-[17px] dark:text-white/60">
 						No credit card required. Connect your endpoints, optimize
