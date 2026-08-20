@@ -570,7 +570,7 @@ const FROM_NAME = "Maya Chen";
 const LAUNCH_SECTION =
 	"We closed the quarter with the multiplayer editor in production. Customers now write and ship investor notes, receipts, and product emails in one file — copy, from-line, and CTA — without a handoff.";
 const BODY_EDIT =
-	"Deck is attached. Happy to walk the numbers on a 20-minute call this week — reply and we'll find a slot.";
+	"New logos came in through the product, not outbound. Most of them started on a template, invited a teammate, and sent from their own domain the same week.";
 
 type CursorPhase = "hidden" | "arrive" | "click" | "park";
 
@@ -578,61 +578,73 @@ type FieldState = {
 	cursor: CursorPhase;
 	caret: boolean;
 	typing: boolean;
+	parkX: number;
+	parkY: number;
 };
 
 const FIELD_IDLE: FieldState = {
 	cursor: "hidden",
 	caret: false,
 	typing: false,
-};
-
-const FIELD_DONE: FieldState = {
-	cursor: "park",
-	caret: true,
-	typing: false,
+	parkX: 0,
+	parkY: 0,
 };
 
 const CURSOR_START = { x: -22, y: -18, scale: 0.96, opacity: 0 };
 const CURSOR_CLICK = { x: 0, y: 0, scale: 0.82, opacity: 1 };
 const CURSOR_ON_TARGET = { x: 0, y: 0, scale: 1, opacity: 1 };
 
-const CURSOR_SLOT: Record<CollaboratorId, string> = {
-	alex: "top-[4.5rem] left-[6.5rem] sm:left-[7.25rem]",
-	sarah: "top-[12rem] left-[1.35rem] sm:top-[12.4rem] sm:left-[1.6rem]",
-	maya: "top-[17.2rem] left-[1.35rem] sm:top-[17.8rem] sm:left-[1.6rem]",
+/** Different sides of the mail so they never stack in one cluster. */
+const CURSOR_PARK_BASE: Record<CollaboratorId, { x: number; y: number }> = {
+	alex: { x: -148, y: -44 },
+	sarah: { x: 328, y: 18 },
+	maya: { x: 196, y: 56 },
 };
 
-const CURSOR_PARK: Record<CollaboratorId, { x: number; y: number }> = {
-	alex: { x: -156, y: -40 },
-	sarah: { x: 300, y: 20 },
-	maya: { x: -112, y: 24 },
-};
+function scatterPark(id: CollaboratorId) {
+	const base = CURSOR_PARK_BASE[id];
+	return {
+		parkX: Math.round(base.x + (Math.random() - 0.5) * 64),
+		parkY: Math.round(base.y + (Math.random() - 0.5) * 48),
+	};
+}
+
+function fieldDone(id: CollaboratorId): FieldState {
+	const park = CURSOR_PARK_BASE[id];
+	return {
+		cursor: "park",
+		caret: true,
+		typing: false,
+		parkX: park.x,
+		parkY: park.y,
+	};
+}
 
 /** Presence cursor using the shared `cursor` icon (same SVG as the tab). */
 function PresenceCursor({
 	user,
 	phase,
+	parkX,
+	parkY,
 }: {
 	user: Collaborator;
 	phase: Exclude<CursorPhase, "hidden">;
+	parkX: number;
+	parkY: number;
 }) {
 	const shouldReduceMotion = useReducedMotion();
-	const park = CURSOR_PARK[user.id];
 
 	const pose =
 		phase === "click"
 			? CURSOR_CLICK
 			: phase === "park"
-				? { x: park.x, y: park.y, scale: 1, opacity: 1 }
+				? { x: parkX, y: parkY, scale: 1, opacity: 1 }
 				: CURSOR_ON_TARGET;
 
 	return (
 		<motion.div
 			aria-hidden
-			className={cn(
-				"pointer-events-none absolute z-30",
-				CURSOR_SLOT[user.id],
-			)}
+			className="pointer-events-none absolute top-0 left-0 z-30"
 			initial={shouldReduceMotion ? false : CURSOR_START}
 			animate={pose}
 			transition={
@@ -781,6 +793,7 @@ function RealtimeEditorView() {
 				...prev[id],
 				caret: true,
 				cursor: prev[id].cursor === "hidden" ? "park" : prev[id].cursor,
+				...(prev[id].cursor === "hidden" ? scatterPark(id) : null),
 			},
 		}));
 	};
@@ -796,9 +809,9 @@ function RealtimeEditorView() {
 			setLaunchChars(LAUNCH_SECTION.length);
 			setBodyChars(BODY_EDIT.length);
 			setFields({
-				maya: FIELD_DONE,
-				sarah: FIELD_DONE,
-				alex: FIELD_DONE,
+				maya: fieldDone("maya"),
+				sarah: fieldDone("sarah"),
+				alex: fieldDone("alex"),
 			});
 			return;
 		}
@@ -830,13 +843,13 @@ function RealtimeEditorView() {
 			await wait(440);
 			if (cancelled) return;
 			patch(id, { cursor: "click" });
-			await wait(120);
+			await wait(200);
 			if (cancelled) return;
 			patch(id, { caret: true });
-			await wait(90);
+			await wait(140);
 			if (cancelled) return;
-			patch(id, { cursor: "park" });
-			await wait(280);
+			patch(id, { cursor: "park", ...scatterPark(id) });
+			await wait(320);
 			if (cancelled) return;
 			patch(id, { typing: true });
 			await typeText(text, setChars);
@@ -851,7 +864,7 @@ function RealtimeEditorView() {
 			await wait(560);
 			if (cancelled) return;
 			const sarah = runField("sarah", LAUNCH_SECTION, setLaunchChars);
-			await wait(640);
+			await wait(900);
 			if (cancelled) return;
 			const maya = runField("maya", BODY_EDIT, setBodyChars);
 			await Promise.all([alex, sarah, maya]);
@@ -865,16 +878,6 @@ function RealtimeEditorView() {
 
 	return (
 		<div className="relative mx-auto w-full max-w-3xl overflow-visible rounded-2xl border border-stroke-soft-200 bg-bg-white-0 shadow-xs dark:border-white/10 dark:bg-[#0c0c0e]">
-			{(["alex", "sarah", "maya"] as CollaboratorId[]).map((id) =>
-				fields[id].cursor !== "hidden" ? (
-					<PresenceCursor
-						key={id}
-						user={COLLABORATORS[id]}
-						phase={fields[id].cursor}
-					/>
-				) : null,
-			)}
-
 			{/* Top Bar with Document Title & Multiplayer Avatars */}
 			<div className="flex items-center justify-between border-stroke-soft-100 border-b px-4 py-2.5 dark:border-white/10">
 				<div className="flex items-center gap-2">
@@ -936,6 +939,14 @@ function RealtimeEditorView() {
 								isAlexActive && COLLABORATORS.alex.highlightBg,
 							)}
 						>
+							{fields.alex.cursor !== "hidden" ? (
+								<PresenceCursor
+									user={COLLABORATORS.alex}
+									phase={fields.alex.cursor}
+									parkX={fields.alex.parkX}
+									parkY={fields.alex.parkY}
+								/>
+							) : null}
 							<span>{FROM_NAME.slice(0, fromChars)}</span>
 							<FieldCaret
 								user={COLLABORATORS.alex}
@@ -1006,7 +1017,15 @@ function RealtimeEditorView() {
 					<div className="relative inline-flex items-center text-text-strong-950 text-xs dark:text-white">
 						<span>Dear investors,</span>
 					</div>
-					<p className="text-[11.5px] text-text-sub-600 leading-relaxed dark:text-white/80">
+					<p className="relative min-h-[1.2em] text-[11.5px] text-text-sub-600 leading-relaxed dark:text-white/80">
+						{fields.sarah.cursor !== "hidden" ? (
+							<PresenceCursor
+								user={COLLABORATORS.sarah}
+								phase={fields.sarah.cursor}
+								parkX={fields.sarah.parkX}
+								parkY={fields.sarah.parkY}
+							/>
+						) : null}
 						{LAUNCH_SECTION.slice(0, launchChars)}
 						<FieldCaret
 							user={COLLABORATORS.sarah}
@@ -1030,10 +1049,29 @@ function RealtimeEditorView() {
 						<p className="text-[11px] text-text-sub-600 leading-relaxed dark:text-white/70">
 							Editor in production. Self-serve up. Time-to-first-email down.
 						</p>
-						<p className="text-[11px] text-text-sub-600 leading-relaxed dark:text-white/70">
-							New logos came in through the product, not outbound. Most of them
-							started on a template, invited a teammate, and sent from their
-							own domain the same week.
+						<p
+							onClick={() => focusField("maya")}
+							onMouseEnter={() => setHoveredUser("maya")}
+							onMouseLeave={() => setHoveredUser(null)}
+							className={cn(
+								"relative min-h-[1.2em] cursor-text text-[11px] text-text-sub-600 leading-relaxed transition-colors dark:text-white/70",
+								isMayaActive && COLLABORATORS.maya.highlightBg,
+							)}
+						>
+							{fields.maya.cursor !== "hidden" ? (
+								<PresenceCursor
+									user={COLLABORATORS.maya}
+									phase={fields.maya.cursor}
+									parkX={fields.maya.parkX}
+									parkY={fields.maya.parkY}
+								/>
+							) : null}
+							{BODY_EDIT.slice(0, bodyChars)}
+							<FieldCaret
+								user={COLLABORATORS.maya}
+								show={fields.maya.caret || focusedField === "maya"}
+								blinking={fields.maya.typing}
+							/>
 						</p>
 					</div>
 					<div className="space-y-1.5">
@@ -1052,22 +1090,6 @@ function RealtimeEditorView() {
 							deploy.
 						</p>
 					</div>
-					<p
-						onClick={() => focusField("maya")}
-						onMouseEnter={() => setHoveredUser("maya")}
-						onMouseLeave={() => setHoveredUser(null)}
-						className={cn(
-							"relative cursor-text text-[11px] text-text-sub-600 leading-relaxed transition-colors dark:text-white/70",
-							isMayaActive && COLLABORATORS.maya.highlightBg,
-						)}
-					>
-						{BODY_EDIT.slice(0, bodyChars)}
-						<FieldCaret
-							user={COLLABORATORS.maya}
-							show={fields.maya.caret || focusedField === "maya"}
-							blinking={fields.maya.typing}
-						/>
-					</p>
 					<p className="text-[11px] text-text-sub-600 leading-relaxed dark:text-white/70">
 						If you want the full metrics pack, it is in the same folder as this
 						note. We will send the next update after close of Q4.
