@@ -304,27 +304,45 @@ export default function EmailSystem() {
 														(sub) => sub.id === currentTabId,
 													);
 
+													const totalHeight = section.subItems.length * 34;
+
 													return (
 														<>
-															{/* 1. Continuous background vertical trunk down to the last item's curve start */}
-															<div
+															{/* SVG Vector Tree Connector: Mathematically continuous, zero gaps, zero alpha-intersection dots */}
+															<svg
 																aria-hidden="true"
-																className="pointer-events-none absolute left-0 top-0 w-px bg-stroke-soft-200 dark:bg-white/15"
-																style={{
-																	height: `${(section.subItems.length - 1) * 34}px`,
-																}}
-															/>
-
-															{/* 2. Continuous active vertical trunk down to active item's curve start */}
-															{activeIndex > 0 && (
-																<div
-																	aria-hidden="true"
-																	className="pointer-events-none absolute left-0 top-0 w-px bg-stroke-sub-300 transition-all duration-200 dark:bg-white/40 z-10"
-																	style={{
-																		height: `${activeIndex * 34}px`,
-																	}}
+																className="pointer-events-none absolute left-0 top-0 h-full w-5 overflow-visible"
+																width="20"
+																height={totalHeight}
+																viewBox={`0 0 20 ${totalHeight}`}
+																fill="none"
+															>
+																{/* Unified inactive tree path: single path prevents self-intersection alpha blending */}
+																<path
+																	d={[
+																		`M 0.5 0 L 0.5 ${(section.subItems.length - 1) * 34 + 9}`,
+																		...section.subItems.map(
+																			(_, i) =>
+																				`M 0.5 ${i * 34 + 9} Q 0.5 ${i * 34 + 17} 8.5 ${i * 34 + 17} L 14 ${i * 34 + 17}`,
+																		),
+																	].join(" ")}
+																	className="stroke-[#e5e5e7] dark:stroke-[#262628]"
+																	strokeWidth="1"
+																	strokeLinecap="round"
+																	strokeLinejoin="round"
 																/>
-															)}
+
+																{/* Continuous active path from top down to the active sub-item (opaque stroke prevents white dots) */}
+																{activeIndex >= 0 && (
+																	<path
+																		d={`M 0.5 0 L 0.5 ${activeIndex * 34 + 9} Q 0.5 ${activeIndex * 34 + 17} 8.5 ${activeIndex * 34 + 17} L 14 ${activeIndex * 34 + 17}`}
+																		className="stroke-[#9ca3af] transition-all duration-150 dark:stroke-[#66666e]"
+																		strokeWidth="1"
+																		strokeLinecap="round"
+																		strokeLinejoin="round"
+																	/>
+																)}
+															</svg>
 
 															{section.subItems.map((sub, sIdx) => {
 																const isSubActive = sIdx === activeIndex;
@@ -354,17 +372,6 @@ export default function EmailSystem() {
 																				: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/50 dark:hover:text-white",
 																		)}
 																	>
-																		{/* Curved branch connecting trunk to subtitle */}
-																		<span
-																			aria-hidden="true"
-																			className={cn(
-																				"pointer-events-none absolute left-0 top-0 h-1/2 w-3.5 rounded-bl-[6px] border-l border-b transition-colors duration-150",
-																				isSubActive
-																					? "border-stroke-sub-300 dark:border-white/40 z-10"
-																					: "border-stroke-soft-200 dark:border-white/15",
-																			)}
-																		/>
-
 																		{/* Icon matching the preview stage */}
 																		<SubItemIcon
 																			icon={sub.icon}
