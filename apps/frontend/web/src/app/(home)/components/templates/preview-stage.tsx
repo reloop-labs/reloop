@@ -1170,6 +1170,38 @@ const HISTORY_ITEMS = [
 	},
 ] as const;
 
+function RestoreIcon({ className }: { className?: string }) {
+	return (
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			viewBox="0 0 12 12"
+			fill="none"
+			aria-hidden
+			className={className}
+		>
+			<path
+				d="m1.282,3.694C2.136,1.951,3.928.75,6,.75c2.899,0,5.25,2.351,5.25,5.25"
+				stroke="currentColor"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+				strokeWidth="1.5"
+			/>
+			<polyline
+				points="4.25 3.75 1.25 3.75 1.25 .75"
+				stroke="currentColor"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+				strokeWidth="1.5"
+			/>
+			<circle cx="6" cy="11.25" r=".75" fill="currentColor" />
+			<circle cx="3.375" cy="10.547" r=".75" fill="currentColor" />
+			<circle cx="1.453" cy="8.625" r=".75" fill="currentColor" />
+			<circle cx="8.625" cy="10.547" r=".75" fill="currentColor" />
+			<circle cx="10.547" cy="8.625" r=".75" fill="currentColor" />
+		</svg>
+	);
+}
+
 function VersionHistoryView() {
 	const shouldReduceMotion = useReducedMotion();
 	const rootRef = useRef<HTMLDivElement>(null);
@@ -1181,7 +1213,6 @@ function VersionHistoryView() {
 	const [toast, setToast] = useState<string | null>(null);
 	const [isUserInteracting, setIsUserInteracting] = useState(false);
 	const [cursorPos, setCursorPos] = useState({ x: 48, y: 72 });
-	const [cursorClicking, setCursorClicking] = useState(false);
 	const [cursorVisible, setCursorVisible] = useState(true);
 
 	const restore = (id: string) => {
@@ -1189,7 +1220,7 @@ function VersionHistoryView() {
 		if (!target) return;
 		setSelectedId(id);
 		setCurrentId(id);
-		setToast(`Restored ${target.version}`);
+		setToast(`Successfully published ${target.version}`);
 		window.setTimeout(() => setToast(null), 2200);
 	};
 
@@ -1222,12 +1253,6 @@ function VersionHistoryView() {
 			});
 		};
 
-		const click = async () => {
-			setCursorClicking(true);
-			await wait(140);
-			setCursorClicking(false);
-		};
-
 		const run = async () => {
 			await wait(400);
 			while (!cancelled) {
@@ -1237,18 +1262,14 @@ function VersionHistoryView() {
 					setSelectedId(id);
 					await wait(40);
 					pointAt(rowRefs.current[id], { x: 88, y: 16 });
-					await wait(480);
-					if (cancelled) return;
-					await click();
+					await wait(520);
 					if (cancelled) return;
 
-					await wait(80);
 					pointAt(restoreRefs.current[id], { x: 22, y: 8 });
-					await wait(420);
+					await wait(480);
 					if (cancelled) return;
-					await click();
 					restore(id);
-					await wait(160);
+					await wait(200);
 					if (cancelled) return;
 
 					setHoveredId(null);
@@ -1287,15 +1308,11 @@ function VersionHistoryView() {
 						animate={{
 							x: cursorPos.x,
 							y: cursorPos.y,
-							scale: cursorClicking ? 0.82 : 1,
+							scale: 1,
 							opacity: 1,
 						}}
 						exit={{ opacity: 0, scale: 0.97 }}
-						transition={
-							cursorClicking
-								? { duration: 0.1, ease: EASE_OUT }
-								: { duration: 0.42, ease: EASE_MOVE }
-						}
+						transition={{ duration: 0.42, ease: EASE_MOVE }}
 						style={{ transformOrigin: "2px 2px" }}
 					>
 						<Icon
@@ -1324,7 +1341,7 @@ function VersionHistoryView() {
 				</div>
 
 				<div className="relative">
-					<div className="absolute top-3 bottom-3 left-[15px] w-px bg-stroke-soft-200 dark:bg-white/10" />
+					<div className="absolute top-3 bottom-3 left-6 w-px bg-stroke-soft-200 dark:bg-white/10" />
 					<div className="space-y-3.5">
 						{HISTORY_ITEMS.map((item) => {
 							const isCurrent = currentId === item.id;
@@ -1343,30 +1360,30 @@ function VersionHistoryView() {
 									}}
 									onMouseEnter={() => setHoveredId(item.id)}
 									className={cn(
-										"group relative flex cursor-pointer items-start gap-3 rounded-xl px-1.5 py-2 transition-colors duration-200",
+										"group relative grid cursor-pointer grid-cols-[36px_minmax(0,1fr)_auto] items-start gap-x-3 rounded-xl px-1.5 py-2 transition-colors duration-200",
 										isActive
-											? "bg-bg-weak-50 dark:bg-white/[0.04]"
-											: "hover:bg-bg-weak-50/70 dark:hover:bg-white/[0.02]",
+											? "bg-neutral-100 dark:bg-white/[0.04]"
+											: "hover:bg-neutral-50 dark:hover:bg-white/[0.02]",
 									)}
 								>
-									<div className="relative z-10 flex size-8 shrink-0 items-center justify-center">
+									<div className="relative z-10 flex h-6 w-9 items-center justify-center">
 										<span
 											className={cn(
-												"inline-flex min-w-[2.15rem] items-center justify-center rounded-full px-1.5 py-0.5 font-semibold text-[10px] tracking-tight",
+												"flex h-6 w-9 items-center justify-center rounded-full font-semibold text-[10px] tracking-tight",
 												isCurrent
 													? "bg-text-strong-950 text-white dark:bg-white dark:text-black"
-													: "bg-bg-weak-50 text-text-soft-400 dark:bg-white/10 dark:text-white/50",
+													: "bg-neutral-200 text-neutral-600 dark:bg-[#1c1c21] dark:text-neutral-400",
 											)}
 										>
 											{item.version}
 										</span>
 									</div>
 
-									<div className="min-w-0 flex-1">
-										<p className="font-medium text-[13px] text-text-strong-950 leading-snug dark:text-white">
+									<div className="min-w-0">
+										<p className="h-6 truncate font-medium text-[13px] text-text-strong-950 leading-6 dark:text-white">
 											{item.title}
 										</p>
-										<p className="mt-1 flex items-center gap-1.5 text-[11.5px] text-text-sub-600 dark:text-white/50">
+										<p className="mt-1 flex h-4 items-center gap-1.5 text-[11.5px] text-text-sub-600 dark:text-white/50">
 											<span
 												className={cn(
 													"flex size-4 shrink-0 items-center justify-center rounded-full font-semibold text-[9px] leading-none",
@@ -1375,15 +1392,15 @@ function VersionHistoryView() {
 											>
 												{item.initial}
 											</span>
-											<span>{item.author}</span>
+											<span className="leading-none">{item.author}</span>
 											<span className="text-text-soft-400 dark:text-white/30">
 												·
 											</span>
-											<span>{item.timestamp}</span>
+											<span className="leading-none">{item.timestamp}</span>
 										</p>
 									</div>
 
-									<div className="flex h-7 w-[4.75rem] shrink-0 items-start justify-end">
+									<div className="flex items-center justify-end self-stretch">
 										{isCurrent ? (
 											<motion.span
 												layoutId={
@@ -1391,10 +1408,10 @@ function VersionHistoryView() {
 														? undefined
 														: "version-current-badge"
 												}
-												className="inline-flex items-center rounded-md bg-emerald-500/10 px-2 py-0.5 font-medium text-[10.5px] text-emerald-700 dark:text-emerald-400"
+												className="inline-flex h-6 items-center rounded-md bg-emerald-500/10 px-2 font-medium text-[10.5px] text-emerald-700 dark:text-emerald-400"
 												transition={{ duration: 0.22, ease: EASE_OUT }}
 											>
-												Current
+												Published
 											</motion.span>
 										) : (
 											<button
@@ -1407,14 +1424,14 @@ function VersionHistoryView() {
 													restore(item.id);
 												}}
 												className={cn(
-													"inline-flex items-center gap-1 rounded-lg border border-stroke-soft-200 bg-bg-white-0 px-2 py-1 font-medium text-[11px] text-text-strong-950 transition-opacity duration-150 dark:border-white/10 dark:bg-white/10 dark:text-white",
+													"inline-flex h-6 items-center justify-center gap-1.5 rounded-md border border-neutral-200 bg-white px-2 font-medium text-[11px] leading-none text-neutral-900 shadow-xs transition-opacity duration-150 dark:border-white/10 dark:bg-[#1c1c21] dark:text-white dark:shadow-none",
 													isActive
 														? "opacity-100"
 														: "pointer-events-none opacity-0 group-hover:pointer-events-auto group-hover:opacity-100",
 												)}
 											>
-												<Icon name="history" className="size-3" />
-												Restore
+												<RestoreIcon className="size-3 shrink-0" />
+												<span className="leading-none">Restore</span>
 											</button>
 										)}
 									</div>
@@ -1439,10 +1456,10 @@ function VersionHistoryView() {
 							animate={{ opacity: 1, y: 0, scale: 1 }}
 							exit={{ opacity: 0, y: 6, scale: 0.97 }}
 							transition={{ duration: 0.2, ease: EASE_OUT }}
-							className="-translate-x-1/2 absolute bottom-4 left-1/2 z-30 flex items-center gap-2 rounded-full border border-stroke-soft-200 bg-bg-white-0 px-3.5 py-1.5 font-medium text-[11.5px] text-text-strong-950 shadow-lg dark:border-white/10 dark:bg-[#151518] dark:text-white"
+							className="-translate-x-1/2 absolute bottom-4 left-1/2 z-30 flex items-center gap-1.5 rounded-full border border-stroke-soft-200 bg-bg-white-0 px-3.5 py-1.5 font-medium text-[11.5px] text-text-strong-950 shadow-lg dark:border-white/10 dark:bg-[#151518] dark:text-white"
 						>
-							<span className="flex size-4 items-center justify-center rounded-full bg-emerald-500 text-[10px] text-white">
-								✓
+							<span className="flex size-4 shrink-0 items-center justify-center rounded-full bg-success-base text-static-white">
+								<Icon name="check" className="size-2.5" />
 							</span>
 							<span>{toast}</span>
 						</motion.div>
