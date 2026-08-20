@@ -96,7 +96,7 @@ export const DNSRecordTable = ({
 			{/* Table Header */}
 			<div
 				className={cn(
-					"grid items-center rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-4 pt-2.5 pb-5 font-medium text-text-sub-600 dark:border-[#101010] dark:bg-bg-weak-50/40",
+					"grid items-center gap-x-3 rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-4 pt-2.5 pb-5 font-medium text-text-sub-600 dark:border-[#101010] dark:bg-bg-weak-50/40",
 					gridCols,
 				)}
 			>
@@ -139,7 +139,7 @@ export const DNSRecordTable = ({
 							<div
 								key={`record-${index}`}
 								className={cn(
-									"group/row grid items-center px-4 py-3 transition-colors",
+									"group/row grid items-center gap-x-3 px-4 py-2.5 transition-colors",
 									"hover:bg-bg-weak-50/50",
 									gridCols,
 								)}

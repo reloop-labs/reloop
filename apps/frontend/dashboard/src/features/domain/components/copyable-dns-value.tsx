@@ -21,18 +21,22 @@ export const CopyableDnsValue = React.forwardRef<
 		<button
 			ref={ref}
 			type="button"
+			tabIndex={-1}
 			onClick={onCopy}
+			onMouseDown={(e) => e.preventDefault()}
 			aria-label={copied ? "Copied" : `Copy ${value}`}
 			className={cn(
-				"group/copy flex min-w-0 max-w-full cursor-pointer items-center gap-1.5 overflow-hidden rounded-md px-1.5 py-0.5 text-left outline-none transition-colors duration-150 ease-out",
-				"focus-visible:outline-none focus-visible:ring-0",
-				copied ? "bg-success-lighter/10" : "hover:bg-bg-weak-50/80",
+				"group relative flex h-8 w-full min-w-0 cursor-pointer select-none items-center justify-between gap-1.5 overflow-hidden rounded-lg bg-bg-white-0 px-2.5 text-left shadow-regular-xs outline-none transition duration-200 ease-out",
+				"before:pointer-events-none before:absolute before:inset-0 before:rounded-[inherit] before:ring-1 before:ring-inset before:ring-stroke-soft-100 dark:before:ring-stroke-soft-100/40",
+				"hover:bg-bg-weak-50 dark:bg-bg-weak-50/30 dark:hover:bg-bg-weak-50/50",
+				"focus:outline-none focus-visible:outline-none",
+				copied && "bg-success-lighter/10 before:ring-success-base",
 				className,
 			)}
 		>
 			<span
 				className={cn(
-					"min-w-0 flex-1 truncate text-label-sm transition-colors duration-150 ease-out",
+					"min-w-0 flex-1 truncate text-xs select-none transition-colors duration-150 ease-out",
 					mono ? "font-mono" : "font-medium",
 					copied
 						? "text-success-dark"
@@ -43,21 +47,18 @@ export const CopyableDnsValue = React.forwardRef<
 			>
 				{value}
 			</span>
-			{/* Fixed-size slot so copy↔check never shifts the value text */}
-			<span className="relative h-3.5 w-3.5 shrink-0" aria-hidden>
+			<span className="relative size-3.5 shrink-0 select-none" aria-hidden>
 				<Icon
 					name="copy"
 					className={cn(
-						"absolute inset-0 h-3.5 w-3.5 transition-opacity duration-150 ease-out",
-						copied
-							? "opacity-0"
-							: "text-text-sub-600/50 opacity-100 group-hover/copy:text-text-strong-950",
+						"absolute inset-0 size-3.5 text-text-sub-600/50 transition-opacity duration-150 ease-out group-hover:text-text-strong-950",
+						copied ? "opacity-0" : "opacity-100",
 					)}
 				/>
 				<Icon
 					name="check"
 					className={cn(
-						"absolute inset-0 h-3.5 w-3.5 text-success-base transition-opacity duration-150 ease-out",
+						"absolute inset-0 size-3.5 text-success-base transition-opacity duration-150 ease-out",
 						copied ? "opacity-100" : "opacity-0",
 					)}
 				/>
@@ -65,3 +66,5 @@ export const CopyableDnsValue = React.forwardRef<
 		</button>
 	);
 });
+
+
