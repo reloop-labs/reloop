@@ -178,7 +178,7 @@ function ExpandedTrigger({
 			onClick={onOpen}
 			className="relative w-full overflow-visible rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-2.5 text-left transition-[background-color,transform] duration-150 ease-out hover:bg-bg-weak-50 active:scale-[0.99] dark:border-stroke-soft-100/40 dark:bg-white/[0.03] dark:hover:bg-white/[0.06]"
 		>
-			<span className="-top-0.5 -right-0.5 pointer-events-none absolute z-10">
+			<span className="-top-0.75 -right-0.75 pointer-events-none absolute z-10">
 				<GlowingBlueDot />
 			</span>
 			<div className="flex items-center justify-between gap-2">
