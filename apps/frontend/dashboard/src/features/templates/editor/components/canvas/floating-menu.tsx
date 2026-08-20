@@ -12,7 +12,7 @@ export function FloatingMenu() {
 
 	return (
 		<Tooltip.Provider>
-			<div className="absolute bottom-6 left-1/2 z-10 -translate-x-1/2">
+			<div className="-translate-x-1/2 absolute bottom-6 left-1/2 z-10">
 				<div className="flex items-center gap-1 rounded-full border border-stroke-soft-100/20 bg-bg-strong-950 p-1.5 text-static-white shadow-regular-md backdrop-blur-md">
 					{editorSlashCommands.map((item, index) => {
 						return (

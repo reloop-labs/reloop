@@ -346,7 +346,7 @@ export function Sidebar({
 
 			{/* Sticky Search Trigger */}
 			{onSearchClick && (
-				<div className="pl-1 pr-2 pt-0.5 pb-2">
+				<div className="pt-0.5 pr-2 pb-2 pl-1">
 					<button
 						type="button"
 						onClick={onSearchClick}
@@ -372,7 +372,7 @@ export function Sidebar({
 			{/* Navigation tree */}
 			<nav
 				ref={navRef}
-				className="scrollbar-thin relative flex-1 overflow-y-auto pl-1 pr-1.5 pt-0 pb-0"
+				className="scrollbar-thin relative flex-1 overflow-y-auto pt-0 pr-1.5 pb-0 pl-1"
 				onPointerLeave={() => setHoveredEl(null)}
 				onScroll={() => {
 					if (navRef.current) {

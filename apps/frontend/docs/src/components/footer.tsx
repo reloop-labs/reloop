@@ -155,7 +155,7 @@ export function Footer() {
 	}, []);
 
 	return (
-		<footer className="mt-16 w-full border-t border-stroke-soft-100 bg-bg-white-0 text-text-strong-950 dark:border-stroke-soft-100/40 dark:bg-black dark:text-white">
+		<footer className="mt-16 w-full border-stroke-soft-100 border-t bg-bg-white-0 text-text-strong-950 dark:border-stroke-soft-100/40 dark:bg-black dark:text-white">
 			<div className="mx-auto w-full max-w-5xl md:max-w-7xl">
 				<div className="px-6 py-10 sm:px-10 sm:py-16">
 					<div className="flex h-full flex-col gap-8 sm:gap-12 lg:flex-row lg:items-stretch lg:gap-16">
@@ -196,8 +196,8 @@ export function Footer() {
 			</div>
 
 			{/* Full-width Divider Line across the footer */}
-			<div className="w-full border-t border-stroke-soft-100 dark:border-stroke-soft-100/40">
-				<div className="mx-auto flex w-full max-w-5xl md:max-w-7xl flex-row items-stretch justify-between">
+			<div className="w-full border-stroke-soft-100 border-t dark:border-stroke-soft-100/40">
+				<div className="mx-auto flex w-full max-w-5xl flex-row items-stretch justify-between md:max-w-7xl">
 					{/* Left: Theme Switcher Icons */}
 					<div className="flex items-center px-6 py-3 sm:px-10">
 						<div className="inline-flex items-center rounded-full border border-stroke-soft-200 bg-bg-weak-50 p-0.5 dark:border-white/10 dark:bg-white/[0.04]">
@@ -246,7 +246,7 @@ export function Footer() {
 							href="https://github.com/reloop-labs/reloop"
 							target="_blank"
 							rel="noreferrer"
-							className="flex w-12 items-center justify-center border-l border-stroke-soft-100 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 sm:w-14 dark:border-stroke-soft-100/40 dark:hover:bg-white/[0.04] dark:hover:text-white"
+							className="flex w-12 items-center justify-center border-stroke-soft-100 border-l transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 sm:w-14 dark:border-stroke-soft-100/40 dark:hover:bg-white/[0.04] dark:hover:text-white"
 							aria-label="GitHub"
 						>
 							<Icon name="github" className="size-4" />
@@ -255,7 +255,7 @@ export function Footer() {
 							href="https://x.com/reloophq"
 							target="_blank"
 							rel="noreferrer"
-							className="flex w-12 items-center justify-center border-l border-stroke-soft-100 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 sm:w-14 dark:border-stroke-soft-100/40 dark:hover:bg-white/[0.04] dark:hover:text-white"
+							className="flex w-12 items-center justify-center border-stroke-soft-100 border-l transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 sm:w-14 dark:border-stroke-soft-100/40 dark:hover:bg-white/[0.04] dark:hover:text-white"
 							aria-label="X"
 						>
 							<Icon name="social-x" className="size-4" />
@@ -264,7 +264,7 @@ export function Footer() {
 							href="https://discord.gg/bHnkBcp7xR"
 							target="_blank"
 							rel="noreferrer"
-							className="flex w-12 items-center justify-center border-l border-stroke-soft-100 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 sm:w-14 dark:border-stroke-soft-100/40 dark:hover:bg-white/[0.04] dark:hover:text-white"
+							className="flex w-12 items-center justify-center border-stroke-soft-100 border-l transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 sm:w-14 dark:border-stroke-soft-100/40 dark:hover:bg-white/[0.04] dark:hover:text-white"
 							aria-label="Discord"
 						>
 							<Icon name="social-discord" className="size-4" />

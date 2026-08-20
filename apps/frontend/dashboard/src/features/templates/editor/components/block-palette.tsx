@@ -35,7 +35,7 @@ export function BlockPalette() {
 	};
 
 	return (
-		<div className="flex h-full w-full min-h-0 flex-1 flex-col">
+		<div className="flex h-full min-h-0 w-full flex-1 flex-col">
 			<div className="min-h-0 flex-1 overflow-y-auto px-4 pt-3 pb-4">
 				{groupWidgetSections().map((group) => (
 					<section key={group.category} className="mb-5 last:mb-0">

@@ -20,7 +20,7 @@ export function ColorPicker({
 					value={value || "#000000"}
 					onChange={(e) => onChange(e.target.value)}
 					aria-label="Pick color"
-					className="absolute -inset-1 h-[200%] w-[200%] cursor-pointer border-none bg-transparent p-0"
+					className="-inset-1 absolute h-[200%] w-[200%] cursor-pointer border-none bg-transparent p-0"
 				/>
 			</div>
 			<input

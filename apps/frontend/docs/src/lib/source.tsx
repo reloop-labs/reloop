@@ -3,6 +3,7 @@ import path from "node:path";
 import { SimpleIcon } from "@reloop/fe-docs/components/mdx/SimpleIcon";
 import { Icon } from "@reloop/ui/icon";
 import matter from "gray-matter";
+import yaml from "js-yaml";
 import type { MDXComponents } from "mdx/types";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import type React from "react";
@@ -134,7 +135,11 @@ function buildTree(dir: string, base = ""): PageTreeItem[] {
 			}
 
 			if (fs.existsSync(mdxPath)) {
-				const { data } = matter(fs.readFileSync(mdxPath, "utf8"));
+				const { data } = matter(fs.readFileSync(mdxPath, "utf8"), {
+					engines: {
+						yaml: (s) => yaml.load(s) as object,
+					},
+				});
 				const iconName = data.icon;
 
 				let sidebarIcon: React.ReactNode;
@@ -248,7 +253,11 @@ export const source = {
 			}
 
 			const fileContent = fs.readFileSync(filePath, "utf-8");
-			const { data: frontmatter, content } = matter(fileContent);
+			const { data: frontmatter, content } = matter(fileContent, {
+				engines: {
+					yaml: (s) => yaml.load(s) as object,
+				},
+			});
 			const toc: TOCItem[] = [];
 			const headingRegex = /^\s*(##|###)\s+(.*)$/gm;
 			const seenSlugs = new Map<string, number>();

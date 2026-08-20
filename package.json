@@ -123,6 +123,8 @@
 				"@tiptap/extension-collaboration-caret": "^3.22.5",
 				"@mintlify/components": "^1.0.16",
 				"gray-matter": "^4.0.3",
+				"js-yaml": "^4.1.0",
+				"@types/js-yaml": "^4.0.9",
 				"framer-motion": "^12.38.0",
 				"next-mdx-remote": "^6.0.0",
 				"perfect-cursors": "^1.0.5",

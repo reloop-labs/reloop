@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import matter from "gray-matter";
+import yaml from "js-yaml";
 import type { ChangelogRelease } from "./changelog-types";
 
 function getChangelogDir(): string {
@@ -41,7 +42,11 @@ export function loadChangelogReleases(): Omit<
 	for (const filePath of files) {
 		try {
 			const rawContent = fs.readFileSync(filePath, "utf8");
-			const { data, content } = matter(rawContent);
+			const { data, content } = matter(rawContent, {
+				engines: {
+					yaml: (s) => yaml.load(s) as object,
+				},
+			});
 			releases.push({
 				slug: String(data.slug || path.basename(filePath, ".mdx")),
 				version: String(data.version || ""),

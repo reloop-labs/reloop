@@ -3,6 +3,7 @@ import { join } from "node:path";
 import { buildPricingMarkdown } from "@reloop/web/lib/pricing-md";
 import { getSiteUrl, siteDescription, siteName } from "@reloop/web/lib/site";
 import matter from "gray-matter";
+import yaml from "js-yaml";
 import { injectMarkdownAgentDirective } from "./agent-directive";
 
 function getWebRootCandidates(): string[] {
@@ -74,7 +75,11 @@ function listBlogPosts(): BlogMeta[] {
 		.map((file) => {
 			const slug = file.replace(/\.mdx$/, "");
 			const raw = readFileSync(join(blogDir, file), "utf-8");
-			const { data } = matter(raw);
+			const { data } = matter(raw, {
+				engines: {
+					yaml: (s) => yaml.load(s) as object,
+				},
+			});
 			return {
 				slug,
 				title: (data.title as string) || slug,
@@ -115,7 +120,11 @@ export function resolveMarketingMarkdown(path: string): string | null {
 		const file = join(getBlogDir(), `${slug}.mdx`);
 		if (!existsSync(file)) return null;
 		const raw = readFileSync(file, "utf-8");
-		const { data, content } = matter(raw);
+		const { data, content } = matter(raw, {
+			engines: {
+				yaml: (s) => yaml.load(s) as object,
+			},
+		});
 		if (data.draft === true && process.env.NODE_ENV !== "development") {
 			return null;
 		}
@@ -230,7 +239,11 @@ export function loadMarketingCorpus(): SearchablePage[] {
 		const file = join(blogDir, `${post.slug}.mdx`);
 		if (!existsSync(file)) continue;
 		const raw = readFileSync(file, "utf-8");
-		const { content } = matter(raw);
+		const { content } = matter(raw, {
+			engines: {
+				yaml: (s) => yaml.load(s) as object,
+			},
+		});
 		pages.push({
 			title: post.title,
 			path: `/blog/${post.slug}`,
