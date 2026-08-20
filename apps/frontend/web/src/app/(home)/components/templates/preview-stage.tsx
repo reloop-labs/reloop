@@ -1104,101 +1104,95 @@ function RealtimeEditorView() {
 }
 
 /* --- Scene 3: Version History View (Interactive with Cursor & Restore) --- */
+const HISTORY_ITEMS = [
+	{
+		id: "v6",
+		version: "v6",
+		title: "Opened investor Q3 note",
+		author: "Maya Chen",
+		initial: "M",
+		avatar: "bg-emerald-500 text-white",
+		timestamp: "1 hour ago",
+	},
+	{
+		id: "v5",
+		version: "v5",
+		title: "Subject: the editor is live",
+		author: "Sarah Jenkins",
+		initial: "S",
+		avatar: "bg-amber-400 text-black",
+		timestamp: "3 hours ago",
+	},
+	{
+		id: "v4",
+		version: "v4",
+		title: "From-line set to Maya Chen",
+		author: "Alex Rivera",
+		initial: "A",
+		avatar: "bg-sky-500 text-white",
+		timestamp: "5 hours ago",
+	},
+	{
+		id: "v3",
+		version: "v3",
+		title: "Added this-quarter metrics",
+		author: "Maya Chen",
+		initial: "M",
+		avatar: "bg-emerald-500 text-white",
+		timestamp: "Yesterday",
+	},
+	{
+		id: "v2",
+		version: "v2",
+		title: "First draft of the investor note",
+		author: "Sarah Jenkins",
+		initial: "S",
+		avatar: "bg-amber-400 text-black",
+		timestamp: "2 days ago",
+	},
+	{
+		id: "v1",
+		version: "v1",
+		title: "Template scaffold for the Q3 note",
+		author: "Alex Rivera",
+		initial: "A",
+		avatar: "bg-sky-500 text-white",
+		timestamp: "4 days ago",
+	},
+	{
+		id: "v0",
+		version: "v0",
+		title: "Outline: traction, focus, ask",
+		author: "Maya Chen",
+		initial: "M",
+		avatar: "bg-emerald-500 text-white",
+		timestamp: "Last week",
+	},
+] as const;
+
 function VersionHistoryView() {
 	const shouldReduceMotion = useReducedMotion();
-	const [selectedId, setSelectedId] = useState("v5");
-	const [hoveredId, setHoveredId] = useState<string | null>("v5");
-	const [restoredNotification, setRestoredNotification] = useState<
-		string | null
-	>(null);
+	const rootRef = useRef<HTMLDivElement>(null);
+	const rowRefs = useRef<Record<string, HTMLDivElement | null>>({});
+	const restoreRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+	const [currentId, setCurrentId] = useState("v6");
+	const [selectedId, setSelectedId] = useState("v6");
+	const [hoveredId, setHoveredId] = useState<string | null>(null);
+	const [toast, setToast] = useState<string | null>(null);
 	const [isUserInteracting, setIsUserInteracting] = useState(false);
-
-	// Automated cursor state
-	const [cursorPos, setCursorPos] = useState({ x: 220, y: 110 });
-	const [isCursorClicking, setIsCursorClicking] = useState(false);
+	const [cursorPos, setCursorPos] = useState({ x: 48, y: 72 });
+	const [cursorClicking, setCursorClicking] = useState(false);
 	const [cursorVisible, setCursorVisible] = useState(true);
 
-	const [versions, setVersions] = useState([
-		{
-			id: "v6",
-			version: "v6.0",
-			isCurrent: false,
-			title: "Added two new lessons",
-			author: "Dakshi Khatri",
-			avatarBg: "bg-purple-100 dark:bg-purple-950/70",
-			avatarText: "text-purple-700 dark:text-purple-300",
-			timestamp: "1 hour ago",
-		},
-		{
-			id: "v5",
-			version: "v5.0",
-			isCurrent: true,
-			title:
-				"New images added to Lesson 2. Quiz and Survey added to Lesson 3,4,5 & 6",
-			author: "Mukul Joshi",
-			avatarBg: "bg-sky-100 dark:bg-sky-950/70",
-			avatarText: "text-sky-700 dark:text-sky-300",
-			timestamp: "14 hours ago",
-		},
-		{
-			id: "v4",
-			version: "v4.0",
-			isCurrent: false,
-			title: "New images added to Lesson 2",
-			author: "Shuchit Gandhi",
-			avatarBg: "bg-amber-100 dark:bg-amber-950/70",
-			avatarText: "text-amber-700 dark:text-amber-300",
-			timestamp: "Yesterday",
-		},
-		{
-			id: "v-quiz",
-			isCurrent: false,
-			title: "Updated new quiz questions",
-			author: "Suhani Ashok",
-			avatarBg: "bg-emerald-100 dark:bg-emerald-950/70",
-			avatarText: "text-emerald-700 dark:text-emerald-300",
-			timestamp: "3 days ago",
-		},
-		{
-			id: "v-lesson10",
-			isCurrent: false,
-			title: "Lesson 10 updated",
-			author: "Suhani Ashok",
-			avatarBg: "bg-emerald-100 dark:bg-emerald-950/70",
-			avatarText: "text-emerald-700 dark:text-emerald-300",
-			timestamp: "5 days ago",
-		},
-		{
-			id: "v3",
-			version: "v3.0",
-			isCurrent: false,
-			title: "Updated examples in introduction",
-			author: "Sarvesh Pansare",
-			avatarBg: "bg-rose-100 dark:bg-rose-950/70",
-			avatarText: "text-rose-700 dark:text-rose-300",
-			timestamp: "3 Mar, 2022",
-		},
-	]);
-
-	const handleRestore = (id: string) => {
-		const target = versions.find((v) => v.id === id);
+	const restore = (id: string) => {
+		const target = HISTORY_ITEMS.find((item) => item.id === id);
 		if (!target) return;
 		setSelectedId(id);
-		setVersions((prev) =>
-			prev.map((v) => ({
-				...v,
-				isCurrent: v.id === id,
-			})),
-		);
-		setRestoredNotification(
-			`Restored to ${target.version ? target.version : "snapshot"}`,
-		);
-		setTimeout(() => {
-			setRestoredNotification(null);
-		}, 2400);
+		setCurrentId(id);
+		setToast(`Restored ${target.version}`);
+		window.setTimeout(() => setToast(null), 2200);
 	};
 
-	// Automated cursor sequence loop
 	useEffect(() => {
 		if (shouldReduceMotion || isUserInteracting) {
 			setCursorVisible(false);
@@ -1207,111 +1201,101 @@ function VersionHistoryView() {
 
 		setCursorVisible(true);
 		let cancelled = false;
+		const timers: number[] = [];
 
 		const wait = (ms: number) =>
 			new Promise<void>((resolve) => {
-				const t = setTimeout(() => {
-					resolve();
-				}, ms);
-				return () => clearTimeout(t);
+				timers.push(window.setTimeout(resolve, ms));
 			});
 
-		const runSequence = async () => {
+		const pointAt = (
+			el: HTMLElement | null,
+			offset: { x: number; y: number },
+		) => {
+			const root = rootRef.current;
+			if (!el || !root) return;
+			const a = el.getBoundingClientRect();
+			const b = root.getBoundingClientRect();
+			setCursorPos({
+				x: a.left - b.left + offset.x,
+				y: a.top - b.top + offset.y,
+			});
+		};
+
+		const click = async () => {
+			setCursorClicking(true);
+			await wait(140);
+			setCursorClicking(false);
+		};
+
+		const run = async () => {
+			await wait(400);
 			while (!cancelled) {
-				// Step 1: Move to v4
-				setCursorPos({ x: 220, y: 190 });
-				setHoveredId("v4");
-				await wait(900);
-				if (cancelled) return;
+				for (const id of ["v4", "v6"] as const) {
+					if (cancelled) return;
+					setHoveredId(id);
+					setSelectedId(id);
+					await wait(40);
+					pointAt(rowRefs.current[id], { x: 88, y: 16 });
+					await wait(480);
+					if (cancelled) return;
+					await click();
+					if (cancelled) return;
 
-				// Step 2: Click to select v4
-				setIsCursorClicking(true);
-				setSelectedId("v4");
-				await wait(180);
-				setIsCursorClicking(false);
-				if (cancelled) return;
+					await wait(80);
+					pointAt(restoreRefs.current[id], { x: 22, y: 8 });
+					await wait(420);
+					if (cancelled) return;
+					await click();
+					restore(id);
+					await wait(160);
+					if (cancelled) return;
 
-				// Step 3: Move cursor to Restore button on v4
-				setCursorPos({ x: 395, y: 190 });
-				await wait(600);
-				if (cancelled) return;
-
-				// Step 4: Click Restore button
-				setIsCursorClicking(true);
-				handleRestore("v4");
-				await wait(220);
-				setIsCursorClicking(false);
-				if (cancelled) return;
-
-				// Step 5: Park cursor down and wait
-				setCursorPos({ x: 370, y: 320 });
-				setHoveredId(null);
-				await wait(2600);
-				if (cancelled) return;
-
-				// Step 6: Move to v5
-				setCursorPos({ x: 220, y: 110 });
-				setHoveredId("v5");
-				await wait(900);
-				if (cancelled) return;
-
-				// Step 7: Click to select v5
-				setIsCursorClicking(true);
-				setSelectedId("v5");
-				await wait(180);
-				setIsCursorClicking(false);
-				if (cancelled) return;
-
-				// Step 8: Move cursor to Restore button on v5
-				setCursorPos({ x: 395, y: 110 });
-				await wait(600);
-				if (cancelled) return;
-
-				// Step 9: Click Restore on v5
-				setIsCursorClicking(true);
-				handleRestore("v5");
-				await wait(220);
-				setIsCursorClicking(false);
-				if (cancelled) return;
-
-				// Park and wait before restart
-				setCursorPos({ x: 370, y: 320 });
-				setHoveredId(null);
-				await wait(3000);
+					setHoveredId(null);
+					setCursorPos((prev) => ({
+						x: prev.x + (id === "v4" ? 36 : -28),
+						y: prev.y + 42,
+					}));
+					await wait(2400);
+				}
 			}
 		};
 
-		runSequence();
-
+		void run();
 		return () => {
 			cancelled = true;
+			for (const timer of timers) window.clearTimeout(timer);
 		};
 	}, [shouldReduceMotion, isUserInteracting]);
 
 	return (
 		<div
+			ref={rootRef}
 			onMouseEnter={() => setIsUserInteracting(true)}
-			onMouseLeave={() => setIsUserInteracting(false)}
-			className="relative mx-auto w-full max-w-[480px]"
+			onMouseLeave={() => {
+				setIsUserInteracting(false);
+				setHoveredId(null);
+			}}
+			className="relative mx-auto h-full w-full max-w-xl"
 		>
-			{/* Presence Cursor */}
 			<AnimatePresence>
-				{cursorVisible && !isUserInteracting && (
+				{cursorVisible && !isUserInteracting ? (
 					<motion.div
 						aria-hidden
-						className="pointer-events-none absolute z-30 flex flex-col"
-						initial={{ opacity: 0, scale: 0.8 }}
+						className="pointer-events-none absolute top-0 left-0 z-30"
+						initial={{ opacity: 0, scale: 0.95 }}
 						animate={{
 							x: cursorPos.x,
 							y: cursorPos.y,
-							scale: isCursorClicking ? 0.82 : 1,
+							scale: cursorClicking ? 0.82 : 1,
 							opacity: 1,
 						}}
-						exit={{ opacity: 0 }}
-						transition={{
-							duration: 0.38,
-							ease: EASE_OUT,
-						}}
+						exit={{ opacity: 0, scale: 0.97 }}
+						transition={
+							cursorClicking
+								? { duration: 0.1, ease: EASE_OUT }
+								: { duration: 0.42, ease: EASE_MOVE }
+						}
 						style={{ transformOrigin: "2px 2px" }}
 					>
 						<Icon
@@ -1326,111 +1310,111 @@ function VersionHistoryView() {
 							Maya
 						</span>
 					</motion.div>
-				)}
+				) : null}
 			</AnimatePresence>
 
-			{/* Version History Card */}
-			<div className="relative rounded-2xl border border-neutral-200/80 bg-white p-7 sm:p-8 shadow-[0_10px_35px_-4px_rgba(0,0,0,0.06)] dark:border-white/10 dark:bg-[#111114] dark:shadow-none">
-				{/* Header */}
-				<div className="mb-7 flex items-center justify-between">
-					<h3 className="font-bold text-[19px] tracking-tight text-neutral-900 dark:text-white">
-						Version History
+			<div className="relative h-full overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-6 shadow-xs sm:p-8 dark:border-white/10 dark:bg-[#0c0c0e]">
+				<div className="mb-6 flex items-center justify-between">
+					<h3 className="font-semibold text-text-strong-950 text-sm tracking-tight dark:text-white">
+						Version history
 					</h3>
-					<span className="text-[11px] font-normal text-neutral-400 dark:text-neutral-500">
-						Hover to restore
+					<span className="text-[11px] text-text-soft-400 dark:text-white/40">
+						{HISTORY_ITEMS.length} snapshots
 					</span>
 				</div>
 
-				{/* Timeline Container */}
 				<div className="relative">
-					{/* Vertical Timeline Connecting Line */}
-					<div className="absolute top-2.5 bottom-2.5 left-[23px] w-[1px] -translate-x-1/2 bg-neutral-200 dark:bg-white/10" />
-
-					{/* Version Items */}
-					<div className="space-y-4">
-						{versions.map((item) => {
-							const isHovered = hoveredId === item.id;
-							const isSelected = selectedId === item.id;
+					<div className="absolute top-3 bottom-3 left-[15px] w-px bg-stroke-soft-200 dark:bg-white/10" />
+					<div className="space-y-3.5">
+						{HISTORY_ITEMS.map((item) => {
+							const isCurrent = currentId === item.id;
+							const isActive =
+								hoveredId === item.id || selectedId === item.id;
 
 							return (
 								<div
 									key={item.id}
+									ref={(node) => {
+										rowRefs.current[item.id] = node;
+									}}
 									onClick={() => {
 										setSelectedId(item.id);
 										setHoveredId(item.id);
 									}}
-									onMouseEnter={() => {
-										setHoveredId(item.id);
-									}}
+									onMouseEnter={() => setHoveredId(item.id)}
 									className={cn(
-										"group relative flex cursor-pointer items-start gap-4 rounded-xl p-1.5 -mx-1.5 transition-all duration-200",
-										isSelected
-											? "bg-neutral-100/70 dark:bg-white/[0.04]"
-											: "hover:bg-neutral-50 dark:hover:bg-white/[0.02]",
+										"group relative flex cursor-pointer items-start gap-3 rounded-xl px-1.5 py-2 transition-colors duration-200",
+										isActive
+											? "bg-bg-weak-50 dark:bg-white/[0.04]"
+											: "hover:bg-bg-weak-50/70 dark:hover:bg-white/[0.02]",
 									)}
 								>
-									{/* Timeline Node (Badge or Dot) */}
-									<div className="flex w-[46px] shrink-0 items-center justify-center pt-[1px]">
-										{item.version ? (
-											item.isCurrent ? (
-												<span className="relative z-10 inline-flex items-center justify-center rounded-full bg-neutral-950 px-2.5 py-[2.5px] font-semibold text-[10.5px] tracking-tight text-white dark:bg-white dark:text-neutral-950">
-													{item.version}
-												</span>
-											) : (
-												<span className="relative z-10 inline-flex items-center justify-center rounded-full bg-[#f1f2f5] px-2.5 py-[2.5px] font-medium text-[10.5px] tracking-tight text-[#8c8c97] dark:bg-white/10 dark:text-neutral-400">
-													{item.version}
-												</span>
-											)
-										) : (
-											<div className="relative z-10 my-1.5 size-[7px] rounded-full bg-[#b8b8c2] ring-4 ring-white dark:bg-neutral-500 dark:ring-[#111114]" />
-										)}
+									<div className="relative z-10 flex size-8 shrink-0 items-center justify-center">
+										<span
+											className={cn(
+												"inline-flex min-w-[2.15rem] items-center justify-center rounded-full px-1.5 py-0.5 font-semibold text-[10px] tracking-tight",
+												isCurrent
+													? "bg-text-strong-950 text-white dark:bg-white dark:text-black"
+													: "bg-bg-weak-50 text-text-soft-400 dark:bg-white/10 dark:text-white/50",
+											)}
+										>
+											{item.version}
+										</span>
 									</div>
 
-									{/* Content */}
 									<div className="min-w-0 flex-1">
-										<h4 className="font-medium text-[13.5px] leading-[1.38] text-neutral-800 dark:text-neutral-100">
+										<p className="font-medium text-[13px] text-text-strong-950 leading-snug dark:text-white">
 											{item.title}
-										</h4>
-										<p className="mt-1 flex items-center gap-1.5 text-[12px] text-neutral-500 dark:text-neutral-400">
+										</p>
+										<p className="mt-1 flex items-center gap-1.5 text-[11.5px] text-text-sub-600 dark:text-white/50">
 											<span
 												className={cn(
-													"flex size-4 shrink-0 items-center justify-center rounded-full font-semibold text-[9px] leading-none select-none",
-													item.avatarBg,
-													item.avatarText,
+													"flex size-4 shrink-0 items-center justify-center rounded-full font-semibold text-[9px] leading-none",
+													item.avatar,
 												)}
 											>
-												{item.author[0]}
+												{item.initial}
 											</span>
 											<span>{item.author}</span>
-											<span className="text-neutral-400 dark:text-neutral-500">
-												•
+											<span className="text-text-soft-400 dark:text-white/30">
+												·
 											</span>
 											<span>{item.timestamp}</span>
 										</p>
 									</div>
 
-									{/* Restore Action Button */}
-									<div className="shrink-0 pt-0.5">
-										{item.isCurrent ? (
-											<span className="inline-flex items-center rounded-md bg-emerald-50 px-2 py-0.5 text-[10.5px] font-medium text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400">
+									<div className="flex h-7 w-[4.75rem] shrink-0 items-start justify-end">
+										{isCurrent ? (
+											<motion.span
+												layoutId={
+													shouldReduceMotion
+														? undefined
+														: "version-current-badge"
+												}
+												className="inline-flex items-center rounded-md bg-emerald-500/10 px-2 py-0.5 font-medium text-[10.5px] text-emerald-700 dark:text-emerald-400"
+												transition={{ duration: 0.22, ease: EASE_OUT }}
+											>
 												Current
-											</span>
+											</motion.span>
 										) : (
 											<button
+												ref={(node) => {
+													restoreRefs.current[item.id] = node;
+												}}
 												type="button"
-												onClick={(e) => {
-													e.stopPropagation();
-													handleRestore(item.id);
+												onClick={(event) => {
+													event.stopPropagation();
+													restore(item.id);
 												}}
 												className={cn(
-													"inline-flex items-center gap-1 rounded-lg border border-neutral-200/80 bg-white px-2.5 py-1 text-[11px] font-medium text-neutral-800 shadow-2xs transition-all hover:bg-neutral-50 dark:border-white/10 dark:bg-white/10 dark:text-white dark:hover:bg-white/15",
-													isHovered || isSelected
-														? "opacity-100 scale-100 pointer-events-auto"
-														: "opacity-0 scale-95 pointer-events-none sm:group-hover:opacity-100 sm:group-hover:scale-100 sm:group-hover:pointer-events-auto",
+													"inline-flex items-center gap-1 rounded-lg border border-stroke-soft-200 bg-bg-white-0 px-2 py-1 font-medium text-[11px] text-text-strong-950 transition-opacity duration-150 dark:border-white/10 dark:bg-white/10 dark:text-white",
+													isActive
+														? "opacity-100"
+														: "pointer-events-none opacity-0 group-hover:pointer-events-auto group-hover:opacity-100",
 												)}
 											>
 												<Icon name="history" className="size-3" />
-												<span>Restore</span>
+												Restore
 											</button>
 										)}
 									</div>
@@ -1440,22 +1424,29 @@ function VersionHistoryView() {
 					</div>
 				</div>
 
-				{/* Restored Toast Banner */}
+				<div
+					aria-hidden
+					className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-40"
+				>
+					<div className="absolute inset-0 backdrop-blur-[10px] [mask-image:linear-gradient(to_bottom,transparent,black_60%)]" />
+					<div className="absolute inset-0 bg-gradient-to-t from-bg-white-0 from-15% via-bg-white-0/75 to-transparent dark:from-[#0c0c0e] dark:via-[#0c0c0e]/75" />
+				</div>
+
 				<AnimatePresence>
-					{restoredNotification && (
+					{toast ? (
 						<motion.div
-							initial={{ opacity: 0, y: 12, scale: 0.95 }}
+							initial={{ opacity: 0, y: 8, scale: 0.96 }}
 							animate={{ opacity: 1, y: 0, scale: 1 }}
-							exit={{ opacity: 0, y: 8, scale: 0.95 }}
-							transition={{ duration: 0.22, ease: "easeOut" }}
-							className="absolute bottom-4 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 rounded-full border border-neutral-200/80 bg-white/95 px-3.5 py-1.5 text-[11.5px] font-medium text-neutral-900 shadow-lg backdrop-blur-sm dark:border-white/10 dark:bg-neutral-900/95 dark:text-white"
+							exit={{ opacity: 0, y: 6, scale: 0.97 }}
+							transition={{ duration: 0.2, ease: EASE_OUT }}
+							className="-translate-x-1/2 absolute bottom-4 left-1/2 z-30 flex items-center gap-2 rounded-full border border-stroke-soft-200 bg-bg-white-0 px-3.5 py-1.5 font-medium text-[11.5px] text-text-strong-950 shadow-lg dark:border-white/10 dark:bg-[#151518] dark:text-white"
 						>
 							<span className="flex size-4 items-center justify-center rounded-full bg-emerald-500 text-[10px] text-white">
 								✓
 							</span>
-							<span>{restoredNotification}</span>
+							<span>{toast}</span>
 						</motion.div>
-					)}
+					) : null}
 				</AnimatePresence>
 			</div>
 		</div>
