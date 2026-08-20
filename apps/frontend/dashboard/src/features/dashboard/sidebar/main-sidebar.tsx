@@ -1,9 +1,12 @@
 import { cn } from "@reloop/ui/cn";
+import { Icon } from "@reloop/ui/icon";
 import { Logo } from "@reloop/ui/logo";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { usePathname } from "next/navigation";
+import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
+import { ThemeToggle } from "#/features/dashboard/page-header/theme-toggle";
 import { SettingsSidebarItems } from "./settings-sidebar-items";
 import { SidebarItems } from "./sidebar-items";
 import { useSidebarCollapse } from "./use-sidebar-collapse";
@@ -114,6 +117,10 @@ export function MainSidebar() {
 								</motion.div>
 							)}
 						</AnimatePresence>
+					</div>
+
+					<div className="mt-auto flex shrink-0 items-center px-3 py-3">
+						<ThemeToggle />
 					</div>
 				</motion.div>
 			)}
@@ -230,8 +237,50 @@ export function MainSidebar() {
 							)}
 						</AnimatePresence>
 					</div>
+
+					{/* Bottom sidebar footer: Theme Toggle */}
+					<div
+						className={cn(
+							"mt-auto flex shrink-0 items-center py-3 transition-all duration-200 ease-in-out",
+							!isTemplateEditor && isCollapsed
+								? "w-14 justify-center px-0"
+								: "w-full justify-start px-3",
+						)}
+					>
+						{!isTemplateEditor && isCollapsed ? (
+							<CollapsedThemeToggle />
+						) : (
+							<ThemeToggle />
+						)}
+					</div>
 				</div>
 			</div>
 		</>
+	);
+}
+
+function CollapsedThemeToggle() {
+	const { setTheme, resolvedTheme } = useTheme();
+	const [mounted, setMounted] = useState(false);
+
+	useEffect(() => {
+		setMounted(true);
+	}, []);
+
+	if (!mounted) return null;
+
+	const nextTheme = resolvedTheme === "dark" ? "light" : "dark";
+	return (
+		<button
+			type="button"
+			onClick={() => setTheme(nextTheme)}
+			className="flex h-7 w-7 items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:text-white/60 dark:hover:bg-white/10 dark:hover:text-white"
+			title={`Switch to ${nextTheme} theme`}
+		>
+			<Icon
+				name={resolvedTheme === "dark" ? "sun" : "moon"}
+				className="h-4 w-4"
+			/>
+		</button>
 	);
 }
