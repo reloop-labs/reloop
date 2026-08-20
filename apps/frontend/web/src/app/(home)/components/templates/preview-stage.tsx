@@ -654,9 +654,9 @@ function PresenceCursor({
 				: CURSOR_ON_TARGET;
 
 	return (
-		<motion.div
+		<motion.span
 			aria-hidden
-			className="pointer-events-none absolute top-0 left-0 z-30"
+			className="pointer-events-none absolute top-0 left-0 z-30 inline-block"
 			initial={shouldReduceMotion ? false : CURSOR_START}
 			animate={pose}
 			transition={
@@ -681,7 +681,7 @@ function PresenceCursor({
 			>
 				{user.firstName}
 			</span>
-		</motion.div>
+		</motion.span>
 	);
 }
 
@@ -1022,7 +1022,7 @@ function RealtimeEditorView() {
 					<div className="relative inline-flex items-center text-text-strong-950 text-xs dark:text-white">
 						<span>Dear investors,</span>
 					</div>
-					<p className="relative min-h-[1.2em] text-[11.5px] text-text-sub-600 leading-relaxed dark:text-white/80">
+					<div className="relative min-h-[1.2em] text-[11.5px] text-text-sub-600 leading-relaxed dark:text-white/80">
 						{fields.sarah.cursor !== "hidden" ? (
 							<PresenceCursor
 								user={COLLABORATORS.sarah}
@@ -1037,7 +1037,7 @@ function RealtimeEditorView() {
 							show={fields.sarah.caret || focusedField === "sarah"}
 							blinking={fields.sarah.typing}
 						/>
-					</p>
+					</div>
 					<p className="text-[11.5px] text-text-sub-600 leading-relaxed dark:text-white/80">
 						That was the bet in the last note: teams should write email the way
 						they write product. This quarter we put that file in production and
@@ -1054,7 +1054,7 @@ function RealtimeEditorView() {
 						<p className="text-[11px] text-text-sub-600 leading-relaxed dark:text-white/70">
 							Editor in production. Self-serve up. Time-to-first-email down.
 						</p>
-						<p
+						<div
 							onClick={() => focusField("maya")}
 							onMouseEnter={() => setHoveredUser("maya")}
 							onMouseLeave={() => setHoveredUser(null)}
@@ -1077,7 +1077,7 @@ function RealtimeEditorView() {
 								show={fields.maya.caret || focusedField === "maya"}
 								blinking={fields.maya.typing}
 							/>
-						</p>
+						</div>
 					</div>
 					<div className="space-y-1.5">
 						<h4 className="font-bold text-sm text-text-strong-950 tracking-tight dark:text-white">
