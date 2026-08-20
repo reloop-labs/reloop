@@ -1,0 +1,286 @@
+"use client";
+
+import * as Button from "@reloop/ui/button";
+import { cn } from "@reloop/ui/cn";
+import { Icon } from "@reloop/ui/icon";
+import * as Modal from "@reloop/ui/modal";
+import Spinner from "@reloop/ui/spinner";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useSessionQuery } from "#/features/auth/session-query";
+import { formatOwnDomainFrom, type SetupStep } from "./setup-progress";
+import { useSendFromOwnDomain } from "./use-send-from-own-domain";
+import { useSetupProgress } from "./use-setup-progress";
+
+function GlowingBlueDot() {
+	return (
+		<span className="relative flex size-2.5">
+			<span className="absolute inline-flex h-full w-full rounded-full bg-primary-base opacity-75 motion-safe:animate-ping" />
+			<span className="relative inline-flex size-2.5 rounded-full bg-primary-base ring-2 ring-bg-white-0 dark:ring-[#0c0c0c]" />
+		</span>
+	);
+}
+
+function SetupProgressBar({ value, max }: { value: number; max: number }) {
+	const safeMax = max <= 0 ? 1 : max;
+	const pct = Math.min(100, Math.max(0, (value / safeMax) * 100));
+	return (
+		<div
+			className="h-1.5 w-full rounded-full bg-bg-soft-200"
+			role="progressbar"
+			aria-valuenow={value}
+			aria-valuemin={0}
+			aria-valuemax={max}
+		>
+			<div
+				className="h-full rounded-full bg-primary-base transition-[width] duration-300 ease-out"
+				style={{ width: `${pct}%` }}
+			/>
+		</div>
+	);
+}
+
+function StepIndicator({
+	complete,
+	index,
+}: {
+	complete: boolean;
+	index: number;
+}) {
+	return (
+		<span
+			className={cn(
+				"flex h-5 w-5 shrink-0 items-center justify-center rounded-full font-medium text-[11px] tabular-nums",
+				complete
+					? "bg-success-base text-static-white"
+					: "bg-bg-weak-50 text-text-sub-600 ring-1 ring-stroke-soft-200 ring-inset",
+			)}
+			aria-hidden
+		>
+			{complete ? <Icon name="check" className="h-3 w-3" /> : index + 1}
+		</span>
+	);
+}
+
+function StepRow({
+	step,
+	index,
+	onSend,
+	onNavigate,
+	sending,
+	sendDisabled,
+}: {
+	step: SetupStep;
+	index: number;
+	onSend: () => void;
+	onNavigate: (href: string) => void;
+	sending: boolean;
+	sendDisabled: boolean;
+}) {
+	const ctaDisabled =
+		step.disabled || (step.action === "send" && (sending || sendDisabled));
+
+	return (
+		<li className="flex items-center gap-3 py-3">
+			<StepIndicator complete={step.complete} index={index} />
+			<div className="min-w-0 flex-1">
+				<p
+					className={cn(
+						"font-medium text-label-sm",
+						step.complete ? "text-text-sub-600" : "text-text-strong-950",
+					)}
+				>
+					{step.title}
+				</p>
+				<p className="text-paragraph-xs text-text-soft-400">
+					{step.description}
+				</p>
+			</div>
+			{step.complete ? (
+				<span className="shrink-0 font-medium text-label-xs text-success-base">
+					Done
+				</span>
+			) : step.action === "send" ? (
+				<Button.Root
+					type="button"
+					variant="neutral"
+					mode="stroke"
+					size="xxsmall"
+					className="shrink-0 gap-1.5 rounded-xl"
+					disabled={ctaDisabled}
+					onClick={onSend}
+				>
+					{sending ? (
+						<>
+							<Spinner size={12} />
+							Sending…
+						</>
+					) : (
+						<>
+							{step.cta}
+							<Icon name="arrow-right" className="h-3 w-3" />
+						</>
+					)}
+				</Button.Root>
+			) : (
+				<Button.Root
+					type="button"
+					variant="neutral"
+					mode="stroke"
+					size="xxsmall"
+					className="shrink-0 gap-1.5 rounded-xl"
+					onClick={() => onNavigate(step.href ?? "/")}
+				>
+					{step.cta}
+					<Icon name="arrow-right" className="h-3 w-3" />
+				</Button.Root>
+			)}
+		</li>
+	);
+}
+
+function CollapsedTrigger({
+	completedCount,
+	totalCount,
+	onOpen,
+}: {
+	completedCount: number;
+	totalCount: number;
+	onOpen: () => void;
+}) {
+	return (
+		<button
+			type="button"
+			onClick={onOpen}
+			aria-label={`Get started, ${completedCount} of ${totalCount} complete`}
+			title="Get started"
+			className="flex h-8 w-8 items-center justify-center rounded-lg transition-[background-color,transform] duration-150 ease-out hover:bg-bg-weak-50 active:scale-[0.97] dark:hover:bg-white/10"
+		>
+			<GlowingBlueDot />
+		</button>
+	);
+}
+
+function ExpandedTrigger({
+	completedCount,
+	totalCount,
+	nextTitle,
+	onOpen,
+}: {
+	completedCount: number;
+	totalCount: number;
+	nextTitle: string | undefined;
+	onOpen: () => void;
+}) {
+	return (
+		<button
+			type="button"
+			onClick={onOpen}
+			className="relative w-full overflow-visible rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-2.5 text-left transition-[background-color,transform] duration-150 ease-out hover:bg-bg-weak-50 active:scale-[0.99] dark:border-stroke-soft-100/40 dark:bg-white/[0.03] dark:hover:bg-white/[0.06]"
+		>
+			<span className="-top-0.5 -right-0.5 pointer-events-none absolute z-10">
+				<GlowingBlueDot />
+			</span>
+			<div className="flex items-center justify-between gap-2">
+				<span className="font-medium text-label-sm text-text-strong-950">
+					Get started
+				</span>
+				<span className="font-medium text-label-xs text-text-sub-600 tabular-nums">
+					{completedCount}/{totalCount}
+				</span>
+			</div>
+			<div className="mt-2">
+				<SetupProgressBar value={completedCount} max={totalCount} />
+			</div>
+			<p className="mt-1.5 truncate text-paragraph-xs text-text-soft-400">
+				{nextTitle ?? "Finish setup"}
+			</p>
+		</button>
+	);
+}
+
+export function OnboardingBanner({ isCollapsed }: { isCollapsed: boolean }) {
+	const router = useRouter();
+	const { data: session } = useSessionQuery();
+	const { orgName, progress, isPending } = useSetupProgress();
+	const send = useSendFromOwnDomain();
+	const [open, setOpen] = useState(false);
+
+	const visible = !isPending && (!progress.allComplete || open);
+	if (!visible) return null;
+
+	const userEmail = session?.user?.email?.trim() ?? "";
+	const activeDomain = progress.activeDomain;
+	const nextStep = progress.steps.find((step) => !step.complete);
+
+	const handleSend = () => {
+		if (!activeDomain || !userEmail) return;
+		send.mutate({
+			from: formatOwnDomainFrom(orgName, activeDomain.domain),
+			to: userEmail,
+		});
+	};
+
+	const handleNavigate = (href: string) => {
+		setOpen(false);
+		router.push(href);
+	};
+
+	return (
+		<>
+			{isCollapsed ? (
+				<CollapsedTrigger
+					completedCount={progress.completedCount}
+					totalCount={progress.totalCount}
+					onOpen={() => setOpen(true)}
+				/>
+			) : (
+				<ExpandedTrigger
+					completedCount={progress.completedCount}
+					totalCount={progress.totalCount}
+					nextTitle={nextStep?.title}
+					onOpen={() => setOpen(true)}
+				/>
+			)}
+
+			<Modal.Root open={open} onOpenChange={setOpen}>
+				<Modal.Content
+					className="overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 sm:max-w-[460px] dark:border-stroke-soft-100/40"
+					showClose
+				>
+					<Modal.Header
+						iconName="sparkling"
+						title="Get started"
+						description="Finish these three steps so you can send from your own domain."
+					/>
+					<Modal.Body className="pt-2 pb-2">
+						<div className="mb-1">
+							<div className="mb-2 flex items-center justify-between">
+								<span className="font-medium text-label-xs text-text-sub-600 tabular-nums">
+									{progress.completedCount} of {progress.totalCount} complete
+								</span>
+							</div>
+							<SetupProgressBar
+								value={progress.completedCount}
+								max={progress.totalCount}
+							/>
+						</div>
+						<ol className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/40">
+							{progress.steps.map((step, index) => (
+								<StepRow
+									key={step.id}
+									step={step}
+									index={index}
+									onSend={handleSend}
+									onNavigate={handleNavigate}
+									sending={send.isPending}
+									sendDisabled={!userEmail}
+								/>
+							))}
+						</ol>
+					</Modal.Body>
+				</Modal.Content>
+			</Modal.Root>
+		</>
+	);
+}

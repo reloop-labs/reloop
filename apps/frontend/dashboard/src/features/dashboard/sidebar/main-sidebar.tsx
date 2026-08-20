@@ -7,6 +7,7 @@ import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { ThemeToggle } from "#/features/dashboard/page-header/theme-toggle";
+import { OnboardingBanner } from "#/features/setup-banner/onboarding-banner";
 import { SettingsSidebarItems } from "./settings-sidebar-items";
 import { SidebarItems } from "./sidebar-items";
 import { useSidebarCollapse } from "./use-sidebar-collapse";
@@ -119,8 +120,11 @@ export function MainSidebar() {
 						</AnimatePresence>
 					</div>
 
-					<div className="mt-auto flex shrink-0 items-center px-3 py-3">
-						<ThemeToggle />
+					<div className="mt-auto flex shrink-0 flex-col gap-2 px-2 py-3">
+						<OnboardingBanner isCollapsed={false} />
+						<div className="px-1">
+							<ThemeToggle />
+						</div>
 					</div>
 				</motion.div>
 			)}
@@ -238,19 +242,22 @@ export function MainSidebar() {
 						</AnimatePresence>
 					</div>
 
-					{/* Bottom sidebar footer: Theme Toggle */}
+					{/* Bottom sidebar footer: setup card + theme toggle */}
 					<div
 						className={cn(
-							"mt-auto flex shrink-0 items-center py-3 transition-all duration-200 ease-in-out",
+							"mt-auto flex shrink-0 flex-col gap-2 py-3 transition-all duration-200 ease-in-out",
 							!isTemplateEditor && isCollapsed
-								? "w-14 justify-center px-0"
-								: "w-full justify-start px-3",
+								? "w-14 items-center px-0"
+								: "w-full px-2",
 						)}
 					>
+						<OnboardingBanner isCollapsed={!isTemplateEditor && isCollapsed} />
 						{!isTemplateEditor && isCollapsed ? (
 							<CollapsedThemeToggle />
 						) : (
-							<ThemeToggle />
+							<div className="px-1">
+								<ThemeToggle />
+							</div>
 						)}
 					</div>
 				</div>
