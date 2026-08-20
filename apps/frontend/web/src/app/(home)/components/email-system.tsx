@@ -12,8 +12,6 @@ import {
 import { Icon, type IconName } from "@reloop/ui/icon";
 import { EmailAnalyticsSection } from "./email-analytics";
 import type { AnalyticsTabId } from "./email-analytics/preview-scenes";
-import { MarketingEmailsSection } from "./marketing-emails";
-import type { MarketingTabId } from "./marketing-emails/preview-scenes";
 import { SceneGlyph } from "./_shared/scene-header";
 import { TemplatesSection } from "./templates";
 import type { TemplateTabId } from "./templates/preview-scenes";
@@ -100,16 +98,6 @@ const SECTIONS = [
 		nav: "AI Workflow",
 		Component: WorkflowsSection,
 	},
-	{
-		id: "marketing",
-		nav: "Marketing Emails",
-		Component: MarketingEmailsSection,
-		subItems: [
-			{ id: "upload-data", label: "Upload data", icon: "file-code" },
-			{ id: "manage-funnels", label: "Manage funnels", icon: "workflow" },
-			{ id: "analytics", label: "Analytics", icon: "graph-up" },
-		],
-	},
 ] as const;
 
 type SectionId = (typeof SECTIONS)[number]["id"];
@@ -126,8 +114,6 @@ export default function EmailSystem() {
 	const [analyticsTab, setAnalyticsTab] = useState<AnalyticsTabId>("metrics");
 	const [templateTab, setTemplateTab] =
 		useState<TemplateTabId>("ai-templates");
-	const [marketingTab, setMarketingTab] =
-		useState<MarketingTabId>("upload-data");
 
 	const reduceMotion = useReducedMotion();
 	const panelRefs = useRef<Record<string, HTMLElement | null>>({});
@@ -273,8 +259,6 @@ export default function EmailSystem() {
 										setAnalyticsTab("metrics");
 									} else if (section.id === "templates") {
 										setTemplateTab("ai-templates");
-									} else if (section.id === "marketing") {
-										setMarketingTab("upload-data");
 									}
 									goTo(section.id, true);
 								};
@@ -330,9 +314,7 @@ export default function EmailSystem() {
 																	? transactionalTab
 																	: section.id === "analytics"
 																		? analyticsTab
-																		: section.id === "templates"
-																			? templateTab
-																			: marketingTab;
+																		: templateTab;
 															const activeIndex = section.subItems.findIndex(
 																(sub) => sub.id === currentTabId,
 															);
@@ -387,8 +369,6 @@ export default function EmailSystem() {
 																				setAnalyticsTab(sub.id as AnalyticsTabId);
 																			} else if (section.id === "templates") {
 																				setTemplateTab(sub.id as TemplateTabId);
-																			} else if (section.id === "marketing") {
-																				setMarketingTab(sub.id as MarketingTabId);
 																			}
 																			goTo(section.id, true);
 																		};
@@ -462,11 +442,6 @@ export default function EmailSystem() {
 								<TemplatesSection
 									activeTab={templateTab}
 									onTabChange={setTemplateTab}
-								/>
-							) : id === "marketing" ? (
-								<MarketingEmailsSection
-									activeTab={marketingTab}
-									onTabChange={setMarketingTab}
 								/>
 							) : (
 								<Component />
