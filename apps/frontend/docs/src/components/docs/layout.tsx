@@ -48,7 +48,7 @@ export function DocsLayout({ children, tree, pathname }: DocsLayoutProps) {
 		<div className="flex h-[100dvh] w-full flex-col overflow-hidden bg-bg-white-0 dark:bg-black">
 			{/* Top Header - border bottom matching dashboard */}
 			<header className="z-50 flex h-12 w-full min-w-0 shrink-0 border-stroke-soft-100 border-b bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-black">
-				<div className="mx-auto flex h-full w-full max-w-5xl border-stroke-soft-100 border-r md:max-w-7xl dark:border-stroke-soft-100/40">
+				<div className="mx-auto flex h-full w-full max-w-5xl border-stroke-soft-100 border-x md:max-w-7xl dark:border-stroke-soft-100/40">
 					{/* Desktop Logo Area — match dashboard brand lockup with right border */}
 					<div className="hidden shrink-0 items-center border-stroke-soft-100 border-r px-3 lg:flex lg:w-[270px] dark:border-stroke-soft-100/40">
 						<a href="/" className="flex items-center gap-2">
@@ -80,7 +80,7 @@ export function DocsLayout({ children, tree, pathname }: DocsLayoutProps) {
 						className="flex-1 overflow-y-auto overflow-x-hidden"
 					>
 						<div
-							className="min-h-full w-full border-stroke-soft-100 border-r transition-all duration-300 dark:border-stroke-soft-100/40"
+							className="min-h-full w-full border-stroke-soft-100 border-r transition-all duration-300 max-lg:border-l dark:border-stroke-soft-100/40"
 							style={{
 								maxWidth: "calc(1280px - 270px)",
 							}}
@@ -98,11 +98,13 @@ export function DocsLayout({ children, tree, pathname }: DocsLayoutProps) {
 						paddingLeft: "max(0px, (100% - 1280px) / 2)",
 					}}
 				>
-					<Sidebar
-						tree={tree}
-						pathname={pathname}
-						onSearchClick={() => setIsSearchOpen(true)}
-					/>
+					<div className="h-full w-full border-stroke-soft-100 border-l dark:border-stroke-soft-100/40">
+						<Sidebar
+							tree={tree}
+							pathname={pathname}
+							onSearchClick={() => setIsSearchOpen(true)}
+						/>
+					</div>
 				</div>
 			</div>
 

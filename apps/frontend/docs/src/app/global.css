@@ -1,4 +1,3 @@
-@import "@mintlify/components/styles.css";
 @import "tailwindcss";
 @import "@reloop/tailwind/style.css";
 
@@ -108,30 +107,6 @@ figure {
 	border-top-color: var(--color-stroke-soft-100);
 }
 
-/* Fallback: soften Mintlify fd-border tokens inside API docs content */
-#nd-page .prose .border-fd-border {
-	border-color: var(--color-stroke-soft-100) !important;
-}
-
-.dark #nd-page .prose .border-fd-border {
-	border-color: var(--color-stroke-soft-100) !important;
-}
-
-#nd-page .prose .divide-fd-border > :not([hidden]) ~ :not([hidden]),
-.dark .divide-fd-border > :not([hidden]) ~ :not([hidden]) {
-	border-top-color: var(--color-stroke-soft-100) !important;
-}
-
-.dark #nd-page .prose .divide-fd-border > :not([hidden]) ~ :not([hidden]),
-.dark .divide-fd-border > :not([hidden]) ~ :not([hidden]) {
-	border-top-color: var(--color-stroke-soft-100) !important;
-}
-
-.dark #nd-page .prose [class*="bg-fd-muted"],
-.dark .prose [class*="bg-fd-muted"] {
-	background-color: rgb(255 255 255 / 0.03) !important;
-}
-
 /* API reference: code panel styling */
 .api-code-panel .code-group {
 	border-radius: 0.75rem;
@@ -143,13 +118,3 @@ figure {
 	border-color: rgb(255 255 255 / 0.08) !important;
 }
 
-/* Soften Mintlify internal dividers inside code blocks */
-.api-code-panel .code-group [class*="border-b"],
-.api-code-panel [class*="code-block"] [class*="border-b"] {
-	border-color: var(--color-stroke-soft-200) !important;
-}
-
-.dark .api-code-panel .code-group [class*="border-b"],
-.dark .api-code-panel [class*="code-block"] [class*="border-b"] {
-	border-color: rgb(255 255 255 / 0.06) !important;
-}

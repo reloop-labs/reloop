@@ -1,18 +1,29 @@
 "use client";
 
 import { cn } from "@reloop/ui/cn";
-import { useState } from "react";
+import { useId, useState } from "react";
 import { SceneGlyph } from "./_shared/scene-header";
 
-const COS = Math.sqrt(3) / 2;
-const SIN = 0.5;
-const S = 62;
-const H = 20;
-const GAP = 186;
-const CX = 360;
-const PAD_TOP = 92;
-const VIEW_W = 720;
-const VIEW_H = PAD_TOP + (5 - 1) * GAP + 2 * S + H + 80;
+/** Linear isometric tile: 464×~264, stacked 220px apart. */
+const TILE_W = 464;
+const TILE_GAP = 220;
+const TILE_EXTENT = 268;
+const VIEW_W = 640;
+const ORIGIN_X = (VIEW_W - TILE_W) / 2;
+const ICON_CX = 232;
+const ICON_CY = 118;
+
+const TILE_FILL =
+	"M430.894 117.559a2 2 0 0 1 1.106 1.789v49.819c0 3.03-1.712 5.8-4.422 7.156l-188.423 94.211a16 16 0 0 1-14.31 0l-191.74-95.87A2 2 0 0 1 32 172.875v-53.527c0-.758.428-1.451 1.106-1.789l191.739-95.87a16 16 0 0 1 14.31 0z";
+const TILE_FOLD =
+	"m40 122.111 186.633 93.317a12 12 0 0 0 10.734 0L424 122.111";
+const TILE_OUTLINE =
+	"M225.068 22.137a15.5 15.5 0 0 1 13.864 0l190.633 95.316a3.5 3.5 0 0 1 1.935 3.13v51.057a3.5 3.5 0 0 1-1.935 3.13l-190.633 95.316a15.5 15.5 0 0 1-13.864 0L34.435 174.77a3.5 3.5 0 0 1-1.935-3.13v-51.057a3.5 3.5 0 0 1 1.935-3.13z";
+
+const CHEVRON_DOWN =
+	"M374.795 188.316a1.124 1.124 0 1 0-1.59 1.591l6 6c.435.435 1.14.44 1.581.01l6-5.854a1.126 1.126 0 0 0-1.572-1.611l-5.204 5.078z";
+const CHEVRON_UP =
+	"M89.204 275.907a1.126 1.126 0 0 0 1.592-1.591l-6-6a1.125 1.125 0 0 0-1.582-.01l-6 5.854a1.125 1.125 0 0 0 1.572 1.611l5.204-5.078 5.215 5.214Z";
 
 interface Layer {
 	id: string;
@@ -54,58 +65,7 @@ const LAYERS: Layer[] = [
 	},
 ];
 
-function iso(x: number, y: number, z: number) {
-	return {
-		x: (x - z) * COS,
-		y: (x + z) * SIN - y,
-	};
-}
-
-function lerp(
-	a: { x: number; y: number },
-	b: { x: number; y: number },
-	t: number,
-) {
-	return { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t };
-}
-
-function boxCorners(oy: number) {
-	const top = {
-		nw: iso(-S, H, -S),
-		ne: iso(S, H, -S),
-		se: iso(S, H, S),
-		sw: iso(-S, H, S),
-	};
-	const bot = {
-		nw: iso(-S, 0, -S),
-		ne: iso(S, 0, -S),
-		se: iso(S, 0, S),
-		sw: iso(-S, 0, S),
-	};
-	const map = (p: { x: number; y: number }) => ({ x: CX + p.x, y: oy + p.y });
-	return {
-		t: {
-			nw: map(top.nw),
-			ne: map(top.ne),
-			se: map(top.se),
-			sw: map(top.sw),
-		},
-		b: {
-			nw: map(bot.nw),
-			ne: map(bot.ne),
-			se: map(bot.se),
-			sw: map(bot.sw),
-		},
-	};
-}
-
-function d(points: { x: number; y: number }[], close = true) {
-	const [first, ...rest] = points;
-	if (!first) return "";
-	return `M ${first.x.toFixed(1)} ${first.y.toFixed(1)} ${rest
-		.map((p) => `L ${p.x.toFixed(1)} ${p.y.toFixed(1)}`)
-		.join(" ")}${close ? " Z" : ""}`;
-}
+const VIEW_H = (LAYERS.length - 1) * TILE_GAP + TILE_EXTENT + 16;
 
 function ReloopMark() {
 	return (
@@ -292,66 +252,17 @@ function LayerIcon({ icon }: { icon: Layer["icon"] }) {
 	);
 }
 
-function Chevrons({
-	x,
-	y,
-	dir,
-}: {
-	x: number;
-	y: number;
-	dir: "up" | "down";
-}) {
-	const sign = dir === "up" ? 1 : -1;
-	return (
-		<g
-			transform={`translate(${x} ${y})`}
-			fill="none"
-			stroke="currentColor"
-			strokeWidth="1.35"
-			strokeLinecap="round"
-			strokeLinejoin="round"
-			className="text-text-strong-950 dark:text-white"
-		>
-			{[0, 1, 2].map((i) => {
-				const oy = (i - 1) * 13 * sign;
-				const opacity = dir === "up" ? 0.22 + i * 0.18 : 0.58 - i * 0.18;
-				const dPath =
-					dir === "up"
-						? "M -8 5 L 0 -5 L 8 5"
-						: "M -8 -5 L 0 5 L 8 -5";
-				return (
-					<path
-						key={i}
-						d={dPath}
-						transform={`translate(0 ${oy})`}
-						opacity={opacity}
-					/>
-				);
-			})}
-		</g>
-	);
-}
-
-function IsoBox({
+function TileBlock({
 	layer,
-	oy,
+	uid,
 	active,
 	onSelect,
 }: {
 	layer: Layer;
-	oy: number;
+	uid: string;
 	active: boolean;
 	onSelect: () => void;
 }) {
-	const { t, b } = boxCorners(oy);
-	const centroid = {
-		x: (t.nw.x + t.ne.x + t.se.x + t.sw.x) / 4,
-		y: (t.nw.y + t.ne.y + t.se.y + t.sw.y) / 4,
-	};
-	const vLeft = lerp(t.sw, centroid, 0.2);
-	const vApex = lerp(t.se, centroid, 0.14);
-	const vRight = lerp(t.ne, centroid, 0.2);
-
 	return (
 		<g
 			className="cursor-pointer"
@@ -370,63 +281,52 @@ function IsoBox({
 			{[1.55, 1.28, 1].map((scale, i) => (
 				<ellipse
 					key={scale}
-					cx={centroid.x}
-					cy={centroid.y + 10}
-					rx={2 * S * COS * scale + 18}
-					ry={S * scale + 8}
+					cx={ICON_CX}
+					cy={ICON_CY + 18}
+					rx={210 * scale}
+					ry={108 * scale}
 					fill="none"
 					stroke="currentColor"
 					strokeWidth="1"
-					opacity={0.045 - i * 0.01}
+					opacity={active ? 0.09 - i * 0.02 : 0.055 - i * 0.012}
 					className="text-text-strong-950 dark:text-white"
 				/>
 			))}
 
-			<path
-				d={d([t.sw, t.se, b.se, b.sw])}
-				className="fill-bg-white-0 dark:fill-[#0c0c0c]"
-				stroke="currentColor"
-				strokeWidth="1.15"
-				strokeLinejoin="round"
-				vectorEffect="non-scaling-stroke"
-				opacity={active ? 0.95 : 0.72}
-			/>
-			<path
-				d={d([t.ne, t.se, b.se, b.ne])}
-				className="fill-bg-white-0 dark:fill-[#0c0c0c]"
-				stroke="currentColor"
-				strokeWidth="1.15"
-				strokeLinejoin="round"
-				vectorEffect="non-scaling-stroke"
-				opacity={active ? 0.95 : 0.72}
-			/>
-			<path
-				d={d([t.nw, t.ne, t.se, t.sw])}
-				className="fill-bg-white-0 dark:fill-[#111]"
-				stroke="currentColor"
-				strokeWidth="1.15"
-				strokeLinejoin="round"
-				vectorEffect="non-scaling-stroke"
-				opacity={active ? 0.98 : 0.78}
-			/>
+			<g filter={`url(#${uid}-shadow)`}>
+				<path
+					d={TILE_FILL}
+					className="fill-bg-white-0 dark:fill-[#0c0c0c]"
+					opacity={active ? 1 : 0.96}
+				/>
+				<path
+					d={TILE_FOLD}
+					className="reloop-engine-dash-iso stroke-[#3E3E44] dark:stroke-[#8A8F98]"
+					fill="none"
+					strokeDasharray="2 4"
+					strokeLinecap="round"
+				/>
+				<path
+					d={TILE_OUTLINE}
+					fill="none"
+					className="stroke-[#D0D6E0] dark:stroke-[#3E3E44]"
+				/>
+			</g>
 
 			<path
-				d={`M ${vLeft.x.toFixed(1)} ${vLeft.y.toFixed(1)} L ${vApex.x.toFixed(1)} ${vApex.y.toFixed(1)} L ${vRight.x.toFixed(1)} ${vRight.y.toFixed(1)}`}
+				d="M232 226.611v31"
 				fill="none"
 				stroke="currentColor"
-				strokeWidth="1.05"
-				strokeDasharray="4 3.5"
 				strokeLinecap="round"
-				strokeLinejoin="round"
-				vectorEffect="non-scaling-stroke"
-				opacity={0.38}
+				opacity={0.4}
+				className="text-[#62666D] dark:text-white"
 			/>
 
 			<g
-				transform={`translate(${centroid.x} ${centroid.y - 1}) scale(0.68 ${0.68 * 0.577}) translate(-100 -100)`}
+				transform={`translate(${ICON_CX} ${ICON_CY}) scale(0.7 0.35) translate(-100 -100)`}
 				className={cn(
-					"text-text-strong-950 dark:text-white",
-					active ? "opacity-85" : "opacity-60",
+					"text-[#5C6169] dark:text-[#C8CDD4]",
+					active ? "opacity-90" : "opacity-70",
 				)}
 			>
 				<LayerIcon icon={layer.icon} />
@@ -435,8 +335,69 @@ function IsoBox({
 	);
 }
 
+function GapDecor({ index, uid }: { index: number; uid: string }) {
+	const dy = index * TILE_GAP;
+	const opacities = [0.3, 0.5, 0.7, 0.3, 0.5, 0.7];
+
+	return (
+		<g>
+			<path
+				className="reloop-engine-dash-up stroke-[#3E3E44] dark:stroke-[#8A8F98]"
+				strokeDasharray="2 6"
+				strokeLinecap="round"
+				d={`M32.5 ${192.611 + dy}v127`}
+			/>
+			<path
+				className="reloop-engine-dash-down stroke-[#3E3E44] dark:stroke-[#8A8F98]"
+				strokeDasharray="2 6"
+				strokeLinecap="round"
+				d={`M431.5 ${192.611 + dy}v127`}
+			/>
+			<path
+				className="reloop-engine-dash-down stroke-[#3E3E44] dark:stroke-[#8A8F98]"
+				strokeDasharray="2 6"
+				strokeLinecap="round"
+				d={`M232.5 ${290.611 + dy}v127`}
+			/>
+
+			<g mask={`url(#${uid}-mask-down-${index})`}>
+				<g transform={`translate(0 ${dy})`}>
+					<g className="reloop-engine-chevron-down text-text-strong-950 dark:text-white">
+						{opacities.map((opacity, i) => (
+							<path
+								key={`dn-${i}`}
+								d={CHEVRON_DOWN}
+								fill="currentColor"
+								opacity={opacity}
+								transform={`translate(0 ${i * 16})`}
+							/>
+						))}
+					</g>
+				</g>
+			</g>
+
+			<g mask={`url(#${uid}-mask-up-${index})`}>
+				<g transform={`translate(0 ${dy})`}>
+					<g className="reloop-engine-chevron-up text-text-strong-950 dark:text-white">
+						{opacities.map((opacity, i) => (
+							<path
+								key={`up-${i}`}
+								d={CHEVRON_UP}
+								fill="currentColor"
+								opacity={opacity}
+								transform={`translate(0 ${-i * 16})`}
+							/>
+						))}
+					</g>
+				</g>
+			</g>
+		</g>
+	);
+}
+
 export default function ReloopEngine() {
 	const [activeId, setActiveId] = useState("engine");
+	const uid = useId().replace(/:/g, "");
 
 	return (
 		<section
@@ -444,6 +405,36 @@ export default function ReloopEngine() {
 			aria-labelledby="engine-heading"
 			className="relative w-full overflow-hidden bg-bg-white-0 py-16 sm:py-20 lg:py-24 dark:bg-transparent"
 		>
+			<style>{`
+				@keyframes reloop-engine-dash {
+					to { stroke-dashoffset: -24; }
+				}
+				@keyframes reloop-engine-chevron-down {
+					from { transform: translateY(-16px); }
+					to { transform: translateY(16px); }
+				}
+				@keyframes reloop-engine-chevron-up {
+					from { transform: translateY(16px); }
+					to { transform: translateY(-16px); }
+				}
+				@media (prefers-reduced-motion: no-preference) {
+					.reloop-engine-dash-iso,
+					.reloop-engine-dash-up,
+					.reloop-engine-dash-down {
+						animation: reloop-engine-dash 1.4s linear infinite;
+					}
+					.reloop-engine-dash-down {
+						animation-direction: reverse;
+					}
+					.reloop-engine-chevron-down {
+						animation: reloop-engine-chevron-down 2.6s linear infinite;
+					}
+					.reloop-engine-chevron-up {
+						animation: reloop-engine-chevron-up 2.6s linear infinite;
+					}
+				}
+			`}</style>
+
 			<div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
 				<div className="flex flex-col items-center text-center">
 					<div className="inline-flex items-center gap-2 rounded-full border border-stroke-soft-200 bg-bg-soft-50/80 px-3 py-1 backdrop-blur-sm dark:border-white/10 dark:bg-white/[0.04]">
@@ -470,33 +461,104 @@ export default function ReloopEngine() {
 				<div className="relative mx-auto mt-10 max-w-3xl lg:mt-12">
 					<svg
 						viewBox={`0 0 ${VIEW_W} ${VIEW_H}`}
-						className="mx-auto h-auto w-full max-w-[640px] text-text-strong-950 dark:text-white"
+						className="mx-auto h-auto w-full max-w-[640px] overflow-visible text-text-strong-950 dark:text-white"
 						role="img"
 						aria-label="Reloop engine as five isometric layers"
 					>
-						{LAYERS.map((layer, index) => {
-							if (index === LAYERS.length - 1) return null;
-							const oy = PAD_TOP + index * GAP;
-							const nextOy = PAD_TOP + (index + 1) * GAP;
-							const y = (oy + S + (nextOy - S - H)) / 2;
-							const span = 2 * S * COS + 16;
-							return (
-								<g key={`chevrons-${layer.id}`}>
-									<Chevrons x={CX - span} y={y} dir="up" />
-									<Chevrons x={CX + span} y={y} dir="down" />
-								</g>
-							);
-						})}
+						<defs>
+							<linearGradient
+								id={`${uid}-grad`}
+								x1="0"
+								x2="0"
+								y1="0"
+								y2="1"
+							>
+								<stop offset="0%" stopColor="white" stopOpacity="0" />
+								<stop offset="25%" stopColor="white" stopOpacity="1" />
+								<stop offset="75%" stopColor="white" stopOpacity="1" />
+								<stop offset="100%" stopColor="white" stopOpacity="0" />
+							</linearGradient>
+							<filter
+								id={`${uid}-shadow`}
+								width="464"
+								height="320"
+								x="0"
+								y="-1.889"
+								colorInterpolationFilters="sRGB"
+								filterUnits="userSpaceOnUse"
+							>
+								<feFlood floodOpacity="0" result="BackgroundImageFix" />
+								<feColorMatrix
+									in="SourceAlpha"
+									result="hardAlpha"
+									values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
+								/>
+								<feOffset dy="12" />
+								<feGaussianBlur stdDeviation="16" />
+								<feComposite in2="hardAlpha" operator="out" />
+								<feColorMatrix values="0 0 0 0 0.0313726 0 0 0 0 0.0352941 0 0 0 0 0.0392157 0 0 0 0.55 0" />
+								<feBlend in2="BackgroundImageFix" result="effect1_dropShadow" />
+								<feBlend
+									in="SourceGraphic"
+									in2="effect1_dropShadow"
+									result="shape"
+								/>
+							</filter>
+							{LAYERS.slice(0, -1).map((_, index) => {
+								const dy = index * TILE_GAP;
+								return (
+									<g key={`masks-${index}`}>
+										<mask
+											id={`${uid}-mask-down-${index}`}
+											maskContentUnits="userSpaceOnUse"
+										>
+											<rect
+												x="366"
+												y={226 + dy}
+												width="30"
+												height="56"
+												fill={`url(#${uid}-grad)`}
+											/>
+										</mask>
+										<mask
+											id={`${uid}-mask-up-${index}`}
+											maskContentUnits="userSpaceOnUse"
+										>
+											<rect
+												x="70"
+												y={232 + dy}
+												width="30"
+												height="56"
+												fill={`url(#${uid}-grad)`}
+											/>
+										</mask>
+									</g>
+								);
+							})}
+						</defs>
 
-						{LAYERS.map((layer, index) => (
-							<IsoBox
-								key={layer.id}
-								layer={layer}
-								oy={PAD_TOP + index * GAP}
-								active={activeId === layer.id}
-								onSelect={() => setActiveId(layer.id)}
-							/>
-						))}
+						<g transform={`translate(${ORIGIN_X} 0)`}>
+							{[...LAYERS].reverse().map((layer, reverseIndex) => {
+								const index = LAYERS.length - 1 - reverseIndex;
+								return (
+									<g
+										key={layer.id}
+										transform={`translate(0 ${index * TILE_GAP})`}
+									>
+										<TileBlock
+											layer={layer}
+											uid={uid}
+											active={activeId === layer.id}
+											onSelect={() => setActiveId(layer.id)}
+										/>
+									</g>
+								);
+							})}
+
+							{LAYERS.slice(0, -1).map((layer, index) => (
+								<GapDecor key={`gap-${layer.id}`} index={index} uid={uid} />
+							))}
+						</g>
 					</svg>
 
 					<ul className="mx-auto mt-4 grid max-w-3xl grid-cols-1 gap-2 sm:grid-cols-5 sm:gap-3">

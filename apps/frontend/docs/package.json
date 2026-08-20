@@ -16,7 +16,6 @@
 		"update:dotnet-samples": "bun run scripts/update-dotnet-from-python-samples.ts"
 	},
 	"dependencies": {
-		"@mintlify/components": "catalog:ui",
 		"@radix-ui/react-collapsible": "catalog:ui",
 		"@radix-ui/react-dialog": "catalog:ui",
 		"@radix-ui/react-popover": "catalog:ui",

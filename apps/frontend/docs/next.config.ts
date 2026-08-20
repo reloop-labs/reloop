@@ -20,7 +20,6 @@ const config = {
 			"@radix-ui/react-collapsible",
 			"@radix-ui/react-scroll-area",
 			"@radix-ui/react-presence",
-			"@mintlify/components",
 		],
 	},
 	async redirects() {

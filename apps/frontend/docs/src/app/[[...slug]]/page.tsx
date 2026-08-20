@@ -315,7 +315,7 @@ export default async function Page(props: {
 					className={`relative w-full flex-col ${
 						hideToc
 							? "max-w-none"
-							: "w-full xl:grid xl:grid-cols-[1fr_260px] xl:gap-8"
+							: "w-full xl:grid xl:grid-cols-[1fr_260px]"
 					}`}
 				>
 					{/* Agent discovery — top of main content, outside nav */}
@@ -410,8 +410,8 @@ export default async function Page(props: {
 
 					{/* Right sidebar - Table of Contents (hidden on full-width API pages) */}
 					{!hideToc && (
-						<aside className="hidden xl:block">
-							<div className="sticky top-0 h-[calc(100vh-3rem)] overflow-y-auto pt-8 pr-6 md:pr-10">
+						<aside className="hidden border-stroke-soft-100 border-l xl:block dark:border-stroke-soft-100/40">
+							<div className="sticky top-0 h-[calc(100vh-3rem)] overflow-y-auto pt-8 pr-6 pl-6 md:pr-10">
 								<TableOfContents items={page.data.toc as TOCItem[]} />
 							</div>
 						</aside>
