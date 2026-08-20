@@ -82,7 +82,7 @@ export function UseCases() {
 		<section
 			id="use-cases"
 			aria-labelledby="use-cases-heading"
-			className="w-full border-stroke-soft-200 border-t bg-bg-white-0 dark:border-white/10 dark:bg-black"
+			className="w-full bg-bg-white-0 dark:bg-black"
 		>
 			<div className="border-stroke-soft-200 border-b px-4 py-16 sm:px-6 sm:py-20 lg:px-12 lg:py-24 dark:border-white/10">
 				<div className="flex items-center gap-2">

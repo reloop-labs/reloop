@@ -21,7 +21,7 @@ export function TransactionalCta() {
 			align="center"
 			flush
 			pill={false}
-			showTopRule={true}
+			showTopRule={false}
 		/>
 	);
 }

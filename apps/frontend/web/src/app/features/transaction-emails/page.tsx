@@ -1,3 +1,4 @@
+import { SectionSeparator } from "../../(home)/components/section-separator";
 import { QuickStart } from "./components/quick-start";
 import { SpecsBento } from "./components/specs-bento";
 import { TransactionalCta } from "./components/transactional-cta";
@@ -10,8 +11,11 @@ const TransactionEmailsPage = () => {
 			<TransactionalHero />
 			<div className="relative mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-200 border-x md:max-w-7xl dark:border-white/10">
 				<SpecsBento />
+				<SectionSeparator />
 				<QuickStart />
+				<SectionSeparator />
 				<UseCases />
+				<SectionSeparator />
 				<TransactionalCta />
 			</div>
 		</div>
