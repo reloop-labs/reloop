@@ -67,6 +67,8 @@ export interface SceneHeaderProps {
 	ctaHref?: string;
 	action?: ReactNode;
 	withDivider?: boolean;
+	align?: "left" | "center";
+	className?: string;
 }
 
 export function SceneHeader({
@@ -79,10 +81,14 @@ export function SceneHeader({
 	ctaHref = "#",
 	action,
 	withDivider = true,
+	align = "left",
+	className,
 }: SceneHeaderProps) {
+	const isCenter = align === "center";
+
 	return (
-		<div>
-			<div className="flex items-center gap-2">
+		<div className={cn(isCenter && "text-center", className)}>
+			<div className={cn("flex items-center gap-2", isCenter && "justify-center")}>
 				<SceneGlyph icon={icon} color={color} />
 				<span className="font-medium text-[13.5px] text-text-strong-950 tracking-tight dark:text-white">
 					{badge}
@@ -93,14 +99,19 @@ export function SceneHeader({
 				{title}
 			</h3>
 
-			<p className="mt-3 max-w-2xl text-[15px] text-text-sub-600 leading-relaxed sm:text-base dark:text-white/60">
+			<p
+				className={cn(
+					"mt-3 max-w-2xl text-[15px] text-text-sub-600 leading-relaxed sm:text-base dark:text-white/60",
+					isCenter && "mx-auto",
+				)}
+			>
 				{description}
 			</p>
 
 			{action ? (
-				<div className="mt-6">{action}</div>
+				<div className={cn("mt-6", isCenter && "flex justify-center")}>{action}</div>
 			) : ctaLabel ? (
-				<div className="mt-6">
+				<div className={cn("mt-6", isCenter && "flex justify-center")}>
 					<Button.Root variant="neutral" mode="stroke" size="small" asChild>
 						<Link href={ctaHref}>
 							{ctaLabel}
