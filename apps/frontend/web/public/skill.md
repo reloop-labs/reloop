@@ -5,7 +5,7 @@ description: >
   send mail, manage API keys, domains, contacts, webhooks, and templates.
   Use when integrating Reloop, creating or rotating API keys, or sending
   transactional email via API or SMTP.
-license: MIT
+license: Apache-2.0
 metadata:
   author: reloop-labs
   docs: https://reloop.sh/docs
@@ -18,6 +18,8 @@ metadata:
 # Reloop
 
 Reloop is email infrastructure for developers: transactional and marketing email, real-time webhooks, inbound processing, and analytics. SDKs cover Node.js, Python, PHP, Ruby, Go, Rust, Java, .NET, and a CLI.
+
+License: Apache 2.0 with Reloop Labs use restrictions (not MIT). Canonical hosted pricing: https://reloop.sh/pricing.md
 
 ## Documentation index
 

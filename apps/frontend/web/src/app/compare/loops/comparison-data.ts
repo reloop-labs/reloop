@@ -1,4 +1,4 @@
-import type { ComparisonCategory } from "../components/comparison-matrix";
+import type { ComparisonCategory } from "../compare-types";
 
 /**
  * Feature matrix for Reloop vs Loops.
@@ -27,13 +27,19 @@ export const loopsComparisonCategories: ComparisonCategory[] = [
 			{
 				label: "Free monthly tier",
 				icon: "send-2",
-				reloop: "10,000 emails / mo",
+				reloop: {
+					value: "3,000 emails / mo",
+					note: "200 / day cap",
+				},
 				competitor: "1,000 contacts",
 			},
 			{
-				label: "10,000 volume plan",
+				label: "Entry paid plan",
 				icon: "invoice",
-				reloop: "$10 / mo",
+				reloop: {
+					value: "$10 / mo",
+					note: "25,000 emails included",
+				},
 				competitor: "$49 / mo (10k contacts)",
 			},
 			{

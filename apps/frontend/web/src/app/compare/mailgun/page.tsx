@@ -1,8 +1,10 @@
 import { FaqSection } from "@reloop/web/components/faq-section";
 import { PageSection, SectionHeading } from "@reloop/web/components/page-shell";
+import { getComparePage, mailgunFeatures } from "@reloop/web/lib/compare-content";
 import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ComparePageJsonLd } from "../components/compare-json-ld";
 import { CompareOtherLinks } from "../components/compare-other-links";
 import { ComparisonPageShell } from "../components/comparison-page-shell";
 import { ComparisonTable } from "../components/comparison-table";
@@ -43,12 +45,15 @@ export const metadata: Metadata = {
 };
 
 const MailgunComparisonPage = () => {
+	const compare = getComparePage("mailgun");
 	return (
-		<ComparisonPageShell
-			pagePath={pagePath}
-			titleLines={["Reloop vs Mailgun"]}
-			description="Learn how Reloop compares to Mailgun and why Reloop is the best Mailgun alternative for all your developer email API needs."
-		>
+		<>
+			<ComparePageJsonLd slug="mailgun" />
+			<ComparisonPageShell
+				pagePath={pagePath}
+				titleLines={["Reloop vs Mailgun"]}
+				description="Learn how Reloop compares to Mailgun and why Reloop is the best Mailgun alternative for all your developer email API needs."
+			>
 			<PageSection flushTop narrow>
 				<div className="mx-auto max-w-3xl space-y-6 text-[15px] text-text-sub-600 leading-7 sm:text-[17px] dark:text-white/50">
 					<p>
@@ -114,33 +119,7 @@ const MailgunComparisonPage = () => {
 				<SectionHeading title="Capability matrix" compact />
 				<ComparisonTable
 					competitorName="Mailgun"
-					features={[
-						{
-							label: "Open-source codebase",
-							reloop: "Yes (Apache 2.0)",
-							competitor: "No",
-						},
-						{ label: "Self-hostable", reloop: "Yes", competitor: "No" },
-						{ label: "REST API", reloop: "Yes", competitor: "Yes" },
-						{ label: "SMTP relay", reloop: "Yes", competitor: "Yes" },
-						{
-							label: "Inbound / reply handling",
-							reloop: "Agent inbox",
-							competitor: "Inbound routes",
-						},
-						{ label: "Email validation API", reloop: "Yes", competitor: "Yes" },
-						{
-							label: "Marketing campaigns",
-							reloop: "Yes",
-							competitor: "Limited",
-						},
-						{ label: "Agent / AI workflows", reloop: "Yes", competitor: "No" },
-						{
-							label: "Free tier",
-							reloop: "3,000 emails / month",
-							competitor: "Trial-based",
-						},
-					]}
+					features={mailgunFeatures}
 				/>
 			</PageSection>
 
@@ -198,18 +177,7 @@ const MailgunComparisonPage = () => {
 			<FaqSection
 				id="compare-mailgun-faq"
 				title="Mailgun vs Reloop FAQ"
-				items={[
-					{
-						question: "Can Reloop replace Mailgun inbound routes?",
-						answer:
-							"Reloop's agent inbox and webhook model cover reply handling and automated triage. Map your existing inbound URLs to Reloop handlers during migration.",
-					},
-					{
-						question: "Do we lose deliverability moving off Mailgun?",
-						answer:
-							"Deliverability depends on domain reputation, content, and IPs—not the dashboard brand. Self-hosted Reloop lets you own IPs directly; hosted Reloop manages shared pools like other providers.",
-					},
-				]}
+				items={compare?.faqs ?? []}
 				compact
 			/>
 
@@ -217,6 +185,7 @@ const MailgunComparisonPage = () => {
 				<CompareOtherLinks currentHref={pagePath} />
 			</PageSection>
 		</ComparisonPageShell>
+		</>
 	);
 };
 

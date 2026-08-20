@@ -1,7 +1,9 @@
 import { FaqSection } from "@reloop/web/components/faq-section";
 import { PageSection, SectionHeading } from "@reloop/web/components/page-shell";
+import { getComparePage, postmarkFeatures } from "@reloop/web/lib/compare-content";
 import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
+import { ComparePageJsonLd } from "../components/compare-json-ld";
 import { CompareOtherLinks } from "../components/compare-other-links";
 import { ComparisonPageShell } from "../components/comparison-page-shell";
 import { ComparisonTable } from "../components/comparison-table";
@@ -42,12 +44,15 @@ export const metadata: Metadata = {
 };
 
 const PostmarkComparisonPage = () => {
+	const compare = getComparePage("postmark");
 	return (
-		<ComparisonPageShell
-			pagePath={pagePath}
-			titleLines={["Reloop vs Postmark"]}
-			description="Learn how Reloop compares to Postmark and why Reloop is the best Postmark alternative for all your transactional email needs."
-		>
+		<>
+			<ComparePageJsonLd slug="postmark" />
+			<ComparisonPageShell
+				pagePath={pagePath}
+				titleLines={["Reloop vs Postmark"]}
+				description="Learn how Reloop compares to Postmark and why Reloop is the best Postmark alternative for all your transactional email needs."
+			>
 			<PageSection flushTop narrow>
 				<p className="mx-auto max-w-3xl text-center text-[15px] text-text-sub-600 leading-7 sm:text-[17px] dark:text-white/50">
 					Postmark is deliberately focused: transactional messages, excellent
@@ -98,37 +103,7 @@ const PostmarkComparisonPage = () => {
 			<PageSection alt>
 				<ComparisonTable
 					competitorName="Postmark"
-					features={[
-						{
-							label: "Open-source codebase",
-							reloop: "Yes (Apache 2.0)",
-							competitor: "No",
-						},
-						{ label: "Self-hostable", reloop: "Yes", competitor: "No" },
-						{ label: "Transactional API", reloop: "Yes", competitor: "Yes" },
-						{
-							label: "Delivery analytics",
-							reloop: "Yes",
-							competitor: "Yes (detailed)",
-						},
-						{
-							label: "Marketing campaigns",
-							reloop: "Yes",
-							competitor: "Limited",
-						},
-						{ label: "SMTP relay", reloop: "Yes", competitor: "Yes" },
-						{
-							label: "Message streams / separation",
-							reloop: "Domain + campaign types",
-							competitor: "Streams",
-						},
-						{ label: "Agent inbox", reloop: "Yes", competitor: "No" },
-						{
-							label: "Free tier",
-							reloop: "3,000 emails / month",
-							competitor: "Trial credits",
-						},
-					]}
+					features={postmarkFeatures}
 				/>
 			</PageSection>
 
@@ -151,18 +126,7 @@ const PostmarkComparisonPage = () => {
 			<FaqSection
 				id="compare-postmark-faq"
 				title="Postmark vs Reloop FAQ"
-				items={[
-					{
-						question: "Does Reloop match Postmark latency?",
-						answer:
-							"Hosted Reloop targets production-grade transactional latency. Self-hosted performance depends on your network and MTA setup—same as any self-managed stack.",
-					},
-					{
-						question: "Should we use both for streams?",
-						answer:
-							"Reloop can separate transactional API sends from campaign traffic without two vendors. Most Postmark stream use cases map to Reloop domains plus campaign modules.",
-					},
-				]}
+				items={compare?.faqs ?? []}
 				compact
 			/>
 
@@ -170,6 +134,7 @@ const PostmarkComparisonPage = () => {
 				<CompareOtherLinks currentHref={pagePath} />
 			</PageSection>
 		</ComparisonPageShell>
+		</>
 	);
 };
 

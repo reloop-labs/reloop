@@ -79,7 +79,7 @@
 
 ## Self-host
 
-Self-hosting the open-source Reloop stack is free (infrastructure costs are yours).
+Self-hosting the open-source Reloop stack has no Reloop license fee (infrastructure costs are yours). It is not a Reloop Cloud subscription and does not use the hosted Free / Individual / Startup / Enterprise price list.
 See https://reloop.sh/self-host
 
 ## Related

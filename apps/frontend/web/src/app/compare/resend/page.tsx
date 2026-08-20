@@ -1,7 +1,10 @@
+import { FaqSection } from "@reloop/web/components/faq-section";
+import { getComparePage } from "@reloop/web/lib/compare-content";
 import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { competitorBrands } from "../competitor-brands";
+import { ComparePageJsonLd } from "../components/compare-json-ld";
 import { CompareMigrate } from "../components/compare-migrate";
 import { CompareOtherLinks } from "../components/compare-other-links";
 import { CompareSection } from "../components/compare-section";
@@ -48,21 +51,24 @@ export const metadata: Metadata = {
 
 const ResendComparisonPage = () => {
 	const resendBrand = competitorBrands.find((b) => b.name === "Resend");
+	const compare = getComparePage("resend");
 
 	return (
-		<ComparisonPageShell
-			pagePath={pagePath}
-			titleLines={["Reloop vs Resend"]}
-			description="Learn how Reloop compares to Resend and why Reloop is the best Resend alternative for all your developer email needs."
-			primaryCta={{
-				label: "Get Started ",
-				href: "/dashboard/signup",
-			}}
-			secondaryCta={{
-				label: "Migrate from Resend",
-				href: "/compare/resend#migrate",
-			}}
-		>
+		<>
+			<ComparePageJsonLd slug="resend" />
+			<ComparisonPageShell
+				pagePath={pagePath}
+				titleLines={["Reloop vs Resend"]}
+				description="Learn how Reloop compares to Resend and why Reloop is the best Resend alternative for all your developer email needs."
+				primaryCta={{
+					label: "Get Started ",
+					href: "/dashboard/signup",
+				}}
+				secondaryCta={{
+					label: "Migrate from Resend",
+					href: "/compare/resend#migrate",
+				}}
+			>
 			{/* Feature matrix */}
 			<CompareSection maxWidth="full" flushX>
 				<div className="mb-10 text-center">
@@ -115,10 +121,20 @@ const ResendComparisonPage = () => {
 				</p>
 			</CompareSection>
 
+			<CompareSection maxWidth="3xl">
+				<FaqSection
+					id="compare-resend-faq"
+					title="Reloop vs Resend FAQ"
+					items={compare?.faqs ?? []}
+					compact
+				/>
+			</CompareSection>
+
 			<CompareSection maxWidth="full" noDivider>
 				<CompareOtherLinks currentHref={pagePath} />
 			</CompareSection>
 		</ComparisonPageShell>
+		</>
 	);
 };
 

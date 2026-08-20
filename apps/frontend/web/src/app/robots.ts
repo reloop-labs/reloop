@@ -5,11 +5,27 @@ export default function robots(): MetadataRoute.Robots {
 	const siteUrl = getSiteUrl();
 
 	return {
-		rules: {
-			userAgent: "*",
-			allow: "/",
-			disallow: ["/api/", "/preferences/", "/redirect/", "/twitter", "/home"],
-		},
+		rules: [
+			{
+				userAgent: "*",
+				allow: "/",
+				disallow: ["/api/", "/preferences/", "/redirect/", "/twitter", "/home"],
+			},
+			{
+				userAgent: [
+					"GPTBot",
+					"ChatGPT-User",
+					"OAI-SearchBot",
+					"ClaudeBot",
+					"anthropic-ai",
+					"Applebot-Extended",
+					"Google-Extended",
+					"PerplexityBot",
+					"Bytespider",
+				],
+				allow: "/",
+			},
+		],
 		// Main site map + glossary-specific map for term pages
 		sitemap: [`${siteUrl}/sitemap.xml`, `${siteUrl}/glossary/sitemap.xml`],
 	};

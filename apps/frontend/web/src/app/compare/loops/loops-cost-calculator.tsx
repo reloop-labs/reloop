@@ -3,24 +3,26 @@
 import { cn } from "@reloop/ui/cn";
 import { Logo } from "@reloop/ui/logo";
 import { useState } from "react";
+import { hostedMonthlyUsdForVolume } from "@reloop/web/lib/pricing";
 import { competitorBrands } from "../competitor-brands";
 import { BrandIcon } from "../components/brand-icon";
 
 const CONTACT_TIERS = [
-	{ contacts: 5000, loops: 49, reloop: 10, emailsSentEstimate: 15000 },
-	{ contacts: 10000, loops: 49, reloop: 10, emailsSentEstimate: 25000 },
-	{ contacts: 25000, loops: 99, reloop: 20, emailsSentEstimate: 50000 },
-	{ contacts: 50000, loops: 199, reloop: 20, emailsSentEstimate: 75000 },
-	{ contacts: 100000, loops: 399, reloop: 45, emailsSentEstimate: 150000 },
+	{ contacts: 5000, loops: 49, emailsSentEstimate: 15000 },
+	{ contacts: 10000, loops: 49, emailsSentEstimate: 25000 },
+	{ contacts: 25000, loops: 99, emailsSentEstimate: 50000 },
+	{ contacts: 50000, loops: 199, emailsSentEstimate: 75000 },
+	{ contacts: 100000, loops: 399, emailsSentEstimate: 150000 },
 ];
 
 export function LoopsCostCalculator() {
 	const [selectedTierIndex, setSelectedTierIndex] = useState<number>(2); // Default 25k contacts
 
 	const current = CONTACT_TIERS[selectedTierIndex] ?? CONTACT_TIERS[2]!;
+	const reloopCost = hostedMonthlyUsdForVolume(current.emailsSentEstimate);
 	const loopsIcon = competitorBrands.find((b) => b.name === "Loops")?.icon;
 
-	const annualSavings = (current.loops - current.reloop) * 12;
+	const annualSavings = (current.loops - reloopCost) * 12;
 	const formatNum = (n: number) => new Intl.NumberFormat("en-US").format(n);
 
 	return (
@@ -101,7 +103,7 @@ export function LoopsCostCalculator() {
 							</div>
 							<div className="text-right">
 								<span className="font-bold font-mono text-[2rem] text-text-strong-950 dark:text-white">
-									${current.reloop}
+									${reloopCost}
 								</span>
 								<span className="text-[12px] text-text-sub-600 dark:text-white/40">
 									/mo

@@ -1,8 +1,10 @@
 import { FaqSection } from "@reloop/web/components/faq-section";
 import { PageSection, SectionHeading } from "@reloop/web/components/page-shell";
+import { awsSesFeatures, getComparePage } from "@reloop/web/lib/compare-content";
 import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ComparePageJsonLd } from "../components/compare-json-ld";
 import { CompareOtherLinks } from "../components/compare-other-links";
 import { ComparisonPageShell } from "../components/comparison-page-shell";
 import { ComparisonTable } from "../components/comparison-table";
@@ -43,12 +45,15 @@ export const metadata: Metadata = {
 };
 
 const AwsSesComparisonPage = () => {
+	const compare = getComparePage("aws-ses");
 	return (
-		<ComparisonPageShell
-			pagePath={pagePath}
-			titleLines={["Reloop vs AWS SES"]}
-			description="Learn how Reloop compares to Amazon SES and why Reloop is the best SES alternative for all your email delivery and platform needs."
-		>
+		<>
+			<ComparePageJsonLd slug="aws-ses" />
+			<ComparisonPageShell
+				pagePath={pagePath}
+				titleLines={["Reloop vs AWS SES"]}
+				description="Learn how Reloop compares to Amazon SES and why Reloop is the best SES alternative for all your email delivery and platform needs."
+			>
 			<PageSection flushTop narrow>
 				<div className="mx-auto max-w-3xl space-y-6 text-[15px] text-text-sub-600 leading-7 sm:text-[17px] dark:text-white/50">
 					<p>
@@ -109,45 +114,7 @@ const AwsSesComparisonPage = () => {
 				<SectionHeading title="SES vs Reloop capabilities" compact />
 				<ComparisonTable
 					competitorName="AWS SES"
-					features={[
-						{
-							label: "Open-source platform",
-							reloop: "Yes (Apache 2.0)",
-							competitor: "No",
-						},
-						{
-							label: "Self-host on your AWS account",
-							reloop: "Yes",
-							competitor: "SES only",
-						},
-						{
-							label: "Marketing campaigns UI",
-							reloop: "Yes",
-							competitor: "No (DIY)",
-						},
-						{ label: "Transactional API", reloop: "Yes", competitor: "Yes" },
-						{
-							label: "Built-in delivery dashboard",
-							reloop: "Yes",
-							competitor: "CloudWatch / DIY",
-						},
-						{
-							label: "Webhooks",
-							reloop: "Native",
-							competitor: "SNS configuration",
-						},
-						{
-							label: "Template management",
-							reloop: "Yes",
-							competitor: "Limited",
-						},
-						{ label: "Agent inbox", reloop: "Yes", competitor: "No" },
-						{
-							label: "Per-email list price",
-							reloop: "Tier bundles",
-							competitor: "Very low at scale",
-						},
-					]}
+					features={awsSesFeatures}
 				/>
 			</PageSection>
 
@@ -174,23 +141,7 @@ const AwsSesComparisonPage = () => {
 			<FaqSection
 				id="compare-aws-ses-faq"
 				title="AWS SES vs Reloop FAQ"
-				items={[
-					{
-						question: "Is Reloop cheaper than SES at 10M emails/month?",
-						answer:
-							"SES raw sending is often cheaper at extreme volume. Reloop competes on platform TCO—engineering time, campaign tooling, support, and unified ops—not on being the cheapest SMTP pipe.",
-					},
-					{
-						question: "Can we migrate boto3 sends to Reloop?",
-						answer:
-							"Yes. Replace AWS SDK send calls with Reloop REST or SMTP. Map SNS bounce notifications to Reloop webhook endpoints.",
-					},
-					{
-						question: "Do we need both SES and Reloop?",
-						answer:
-							"Not usually. Self-hosted Reloop includes outbound delivery. Some teams keep SES as an MTA backend during transition—that is an advanced integration, not the default path.",
-					},
-				]}
+				items={compare?.faqs ?? []}
 				compact
 			/>
 
@@ -198,6 +149,7 @@ const AwsSesComparisonPage = () => {
 				<CompareOtherLinks currentHref={pagePath} />
 			</PageSection>
 		</ComparisonPageShell>
+		</>
 	);
 };
 

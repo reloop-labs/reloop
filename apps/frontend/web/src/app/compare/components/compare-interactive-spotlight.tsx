@@ -25,12 +25,12 @@ const SPOTLIGHT_DATA: Record<string, ProviderSnapshot> = {
 		href: "/compare/resend",
 		tagline: "Modern UI email API, but proprietary & gets expensive at scale",
 		keyDiff:
-			"Reloop provides open-source transparency (KumoMTA engine), 10x lower volume cost, and built-in AI agent inboxes.",
+			"Reloop provides open-source transparency (KumoMTA), send-based Reloop Cloud pricing, and a built-in agent inbox.",
 		reloopAdvantages: [
 			"100% Open source core (KumoMTA)",
 			"Built-in AI agent inbox & email parsing",
 			"Self-host anywhere or use Reloop Cloud",
-			"10x lower overage costs at high volume",
+			"Overage $0.80 / 1k vs Resend $1.00 / 1k",
 		],
 		competitorDrawbacks: [
 			"Closed-source proprietary backend",
@@ -38,7 +38,10 @@ const SPOTLIGHT_DATA: Record<string, ProviderSnapshot> = {
 			"Costs escalate rapidly above 100k emails/mo",
 			"Requires third-party tools for inbound AI logic",
 		],
-		freeTier: { reloop: "10,000 emails / mo", competitor: "3,000 emails / mo" },
+		freeTier: {
+			reloop: "3,000 / mo · 200 / day",
+			competitor: "3,000 emails / mo",
+		},
 		openSource: {
 			reloop: "Yes (KumoMTA Engine)",
 			competitor: "No (Proprietary)",
@@ -63,7 +66,10 @@ const SPOTLIGHT_DATA: Record<string, ProviderSnapshot> = {
 			"Strict account locks & slow support",
 			"Expensive dedicated IP add-ons",
 		],
-		freeTier: { reloop: "10,000 emails / mo", competitor: "100 emails / day" },
+		freeTier: {
+			reloop: "3,000 / mo · 200 / day",
+			competitor: "100 emails / day",
+		},
 		openSource: {
 			reloop: "Yes (KumoMTA Engine)",
 			competitor: "No (Closed Source)",
@@ -88,7 +94,7 @@ const SPOTLIGHT_DATA: Record<string, ProviderSnapshot> = {
 			"Separate tools needed for marketing campaigns",
 			"No open source option",
 		],
-		freeTier: { reloop: "10,000 emails / mo", competitor: "Trial only" },
+		freeTier: { reloop: "3,000 / mo · 200 / day", competitor: "Trial only" },
 		openSource: { reloop: "Yes (KumoMTA Engine)", competitor: "No" },
 		inboundAi: { reloop: "Built-in Agent Inbox", competitor: "Basic Routes" },
 	},
@@ -110,7 +116,10 @@ const SPOTLIGHT_DATA: Record<string, ProviderSnapshot> = {
 			"Zero built-in AI agent inbox capabilities",
 			"No out-of-the-box marketing campaign tools",
 		],
-		freeTier: { reloop: "10,000 emails / mo", competitor: "62k/mo (EC2 only)" },
+		freeTier: {
+			reloop: "3,000 / mo · 200 / day",
+			competitor: "62k/mo (EC2 only)",
+		},
 		openSource: { reloop: "Yes (KumoMTA Engine)", competitor: "No" },
 		inboundAi: {
 			reloop: "Built-in Agent Inbox",
@@ -135,7 +144,10 @@ const SPOTLIGHT_DATA: Record<string, ProviderSnapshot> = {
 			"No open-source options",
 			"No native AI capabilities",
 		],
-		freeTier: { reloop: "10,000 emails / mo", competitor: "100 emails / mo" },
+		freeTier: {
+			reloop: "3,000 / mo · 200 / day",
+			competitor: "100 emails / mo",
+		},
 		openSource: { reloop: "Yes (KumoMTA Engine)", competitor: "No" },
 		inboundAi: { reloop: "Built-in Agent Inbox", competitor: "Basic Webhooks" },
 	},
@@ -157,7 +169,7 @@ const SPOTLIGHT_DATA: Record<string, ProviderSnapshot> = {
 			"No self-hosting or data sovereignty options",
 			"Gets expensive quickly for high contact volume",
 		],
-		freeTier: { reloop: "10,000 emails / mo", competitor: "1,000 contacts" },
+		freeTier: { reloop: "3,000 / mo · 200 / day", competitor: "1,000 contacts" },
 		openSource: { reloop: "Yes (KumoMTA Engine)", competitor: "No" },
 		inboundAi: { reloop: "Built-in Agent Inbox", competitor: "No" },
 	},
@@ -180,7 +192,7 @@ const SPOTLIGHT_DATA: Record<string, ProviderSnapshot> = {
 			"Expensive monthly contact tier locks",
 		],
 		freeTier: {
-			reloop: "10,000 emails / mo",
+			reloop: "3,000 / mo · 200 / day",
 			competitor: "500 contacts limit",
 		},
 		openSource: { reloop: "Yes (KumoMTA Engine)", competitor: "No" },

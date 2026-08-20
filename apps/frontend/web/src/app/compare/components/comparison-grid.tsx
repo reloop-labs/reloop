@@ -17,7 +17,7 @@ function isDarkBrandHex(hex: string) {
 
 const BRAND_DESCRIPTIONS: Record<string, string> = {
 	Resend:
-		"10x lower volume costs, 100% open-source engine, and built-in AI agent inboxes.",
+		"Apache 2.0 engine, send-based Reloop Cloud pricing, and a built-in agent inbox.",
 	SendGrid:
 		"Modern React/JSX templates and fast developer UI without legacy enterprise clutter.",
 	Mailgun:

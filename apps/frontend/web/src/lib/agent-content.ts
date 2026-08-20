@@ -1,5 +1,10 @@
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
+import {
+	buildCompareIndexMarkdown,
+	buildCompareMarkdown,
+	listComparePages,
+} from "@reloop/web/lib/compare-content";
 import { buildPricingMarkdown } from "@reloop/web/lib/pricing-md";
 import { getSiteUrl, siteDescription, siteName } from "@reloop/web/lib/site";
 import matter from "gray-matter";
@@ -98,6 +103,16 @@ export function resolveMarketingMarkdown(path: string): string | null {
 
 	if (normalized === "/pricing" || normalized === "pricing") {
 		return injectMarkdownAgentDirective(buildPricingMarkdown());
+	}
+
+	if (normalized === "/compare" || normalized === "compare") {
+		return injectMarkdownAgentDirective(buildCompareIndexMarkdown());
+	}
+
+	const compareMatch = normalized.match(/^\/?compare\/([^/]+)$/);
+	if (compareMatch?.[1]) {
+		const md = buildCompareMarkdown(compareMatch[1]);
+		if (md) return injectMarkdownAgentDirective(md);
 	}
 
 	if (normalized === "/" || normalized === "" || normalized === "/index") {
@@ -212,6 +227,22 @@ export function loadMarketingCorpus(): SearchablePage[] {
 		path: "/pricing",
 		body: buildPricingMarkdown(),
 	});
+
+	pages.push({
+		title: "Reloop vs the competition",
+		path: "/compare",
+		body: buildCompareIndexMarkdown(),
+	});
+
+	for (const page of listComparePages()) {
+		const body = buildCompareMarkdown(page.slug);
+		if (!body) continue;
+		pages.push({
+			title: page.title,
+			path: `/compare/${page.slug}`,
+			body,
+		});
+	}
 
 	const home = readAgentPage("home.md") ?? buildHomeMarkdown();
 	pages.push({ title: siteName, path: "/", body: home });

@@ -9,7 +9,7 @@ Important notes:
 - Reloop supports both transactional and marketing (broadcast) emails
 - Inbound email receiving is supported via webhook ingester
 - The product MCP server package is `reloop-mcp` and can be installed via `npx -y reloop-mcp`
-- Prefer markdown: append `.md` to any docs URL (e.g. https://reloop.sh/docs/learn/api-keys.md)
+- Canonical hosted pricing (not this docs tree): [pricing.md](https://reloop.sh/pricing.md)
 
 ## Documentation
 

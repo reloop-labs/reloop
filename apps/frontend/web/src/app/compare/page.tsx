@@ -2,8 +2,8 @@ import { BlogCta } from "@reloop/web/components/landing/blog/blog-cta";
 import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 import { CompareCalculator } from "./components/compare-calculator";
-
 import { CompareHeroHeader } from "./components/compare-hero-header";
+import { CompareIndexJsonLd } from "./components/compare-json-ld";
 import { CompareMasterMatrix } from "./components/compare-master-matrix";
 import { ComparisonGrid } from "./components/comparison-grid";
 
@@ -52,6 +52,7 @@ export const metadata: Metadata = {
 const CompareIndexPage = () => {
 	return (
 		<>
+			<CompareIndexJsonLd />
 			<div className="mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-200 border-x md:max-w-7xl dark:border-white/10">
 				{/* Top Hero Header */}
 				<CompareHeroHeader />
@@ -74,7 +75,7 @@ const CompareIndexPage = () => {
 			<BlogCta
 				category="Comparison"
 				headline="Ready to switch to Reloop?"
-				sub="10x lower volume costs, 100% open-source engine, and drop-in SMTP + REST APIs. No lock-in, no rewrite later."
+				sub="Apache 2.0 engine, send-based Reloop Cloud pricing, SMTP + REST APIs, and a self-host path. No lock-in."
 				primaryLabel="Get started free"
 				secondaryLabel="Documentation"
 			/>

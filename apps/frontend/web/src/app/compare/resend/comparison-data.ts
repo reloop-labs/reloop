@@ -1,4 +1,4 @@
-import type { ComparisonCategory } from "../components/comparison-matrix";
+import type { ComparisonCategory } from "../compare-types";
 
 /**
  * Feature matrix for Reloop vs Resend.
@@ -11,7 +11,7 @@ export const resendComparisonCategories: ComparisonCategory[] = [
 		label: "Pricing & Email Volume",
 		icon: "invoice",
 		intro:
-			"Reloop offers transparent email pricing starting with 3,000 free monthly emails with no daily caps, an entry tier at $10/mo for 25,000 emails, cheaper overages ($0.80 vs $1.00 / 1,000), and unlimited free sends when self-hosting.",
+			"Reloop Cloud Free is 3,000 emails/month with a 200/day cap. Individual is $10/mo for 25,000 emails with no daily cap. Overage is $0.80 vs Resend's $1.00 per 1,000. Self-hosting Reloop has no Reloop license fee (you pay your own infra).",
 		features: [
 			{
 				label: "Free monthly emails",
@@ -23,8 +23,8 @@ export const resendComparisonCategories: ComparisonCategory[] = [
 				label: "Daily send limit (Free tier)",
 				icon: "calendar",
 				reloop: {
-					value: "No daily limit",
-					note: "Use full monthly quota anytime",
+					value: "200 / day",
+					note: "Free also caps at 3,000 / month",
 				},
 				competitor: {
 					value: "100 / day",

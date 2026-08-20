@@ -9,9 +9,9 @@ export function CompareHeroHeader() {
 				</h1>
 
 				<p className="mt-4 max-w-2xl text-[15px] text-text-sub-600 leading-relaxed sm:text-[16px] dark:text-white/60">
-					Compare Reloop against leading email service providers. Learn how
-					Reloop delivers 10x lower costs, open-source transparency, and unified
-					email infrastructure.
+					Compare Reloop against leading email service providers. Reloop is
+					open-source email infrastructure with send-based Reloop Cloud pricing
+					and a self-host path.
 				</p>
 			</div>
 

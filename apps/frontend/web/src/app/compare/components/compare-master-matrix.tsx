@@ -112,7 +112,7 @@ const MASTER_CATEGORIES: MatrixCategory[] = [
 			{
 				feature: "Free Tier Allowance",
 				detail: "Free monthly sending credit",
-				reloop: "10,000 / mo",
+				reloop: "3,000 / mo · 200 / day",
 				resend: "3,000 / mo",
 				sendgrid: "100 / day",
 				postmark: "100 / mo",
@@ -120,8 +120,8 @@ const MASTER_CATEGORIES: MatrixCategory[] = [
 			},
 			{
 				feature: "Cost per 100,000 Emails",
-				detail: "Standard cloud sending cost",
-				reloop: "$9.00",
+				detail: "Hosted Reloop Startup ($20) + $0.80/1k overage",
+				reloop: "$60",
 				resend: "$90.00",
 				sendgrid: "$89.95",
 				postmark: "$115.00",
@@ -130,7 +130,7 @@ const MASTER_CATEGORIES: MatrixCategory[] = [
 			{
 				feature: "Dedicated IP Pricing",
 				detail: "Monthly dedicated IP cost",
-				reloop: "Included on Pro",
+				reloop: "Enterprise (optional)",
 				resend: "$30 / mo",
 				sendgrid: "$30 / mo",
 				postmark: "$50 / mo",

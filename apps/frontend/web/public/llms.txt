@@ -1,18 +1,69 @@
 # Reloop
 
-> Reloop is high-performance, open-source email infrastructure for developers—transactional and marketing email, SMTP, webhooks, analytics, and agent-ready APIs. Use Reloop hosted or self-host.
+> Reloop is high-performance, open-source email infrastructure for developers—transactional and marketing email, SMTP, webhooks, analytics, and agent-ready APIs. Use Reloop hosted (Reloop Cloud) or self-host.
 
 Important notes:
 
 - Authentication uses the `x-api-key` header with API keys prefixed with `rl_`
-- Prefer markdown: append `.md` where available (blog, pricing, docs)
+- Prefer markdown: append `.md` where available (blog, pricing, compare, docs)
 - **All agent discovery files are hosted on this site (web)** — not under the docs app
 - Product HTML docs still live under `/docs/*` with `.md` twins for page content
+- Canonical hosted pricing: [pricing.md](https://reloop.sh/pricing.md) (generated from `@reloop/pricing`)
+- License: Apache 2.0 with Reloop Labs use restrictions — not MIT
+
+## What Reloop is
+
+Reloop is the email service / infrastructure (ESP + MTA). It sends and receives mail over REST and SMTP, runs its own MTA (KumoMTA), verifies domains (SPF/DKIM/DMARC), delivers webhooks, and includes an agent inbox for inbound mail.
+
+## What Reloop is not
+
+- Not a multi-ESP connector or router that sits on SendGrid, Mailgun, Resend, or Amazon SES
+- Not a contact-list marketing tool that bills by stored subscribers (pricing is send-based on Reloop Cloud)
+- Not MIT-licensed
+- Not a paid self-host SaaS SKU — self-host is the Apache 2.0 codebase; you pay your own servers, not Reloop Cloud tiers
+
+## Who it is for (ICP)
+
+- Developers and startups sending transactional email (auth, receipts, alerts) plus campaigns from one API
+- Teams that want to self-host or keep a credible exit from a hosted ESP
+- Agent / AI products that need inbound email (agent inbox) and machine-readable docs (llms.txt, MCP, `.md` twins)
+- Teams comparing Reloop to Resend, SendGrid, Mailgun, Postmark, AWS SES, Loops, or Mailchimp
+
+## Differentiators
+
+- Apache 2.0 codebase, same product hosted or self-hosted
+- Own MTA (KumoMTA) rather than a DX layer over another ESP
+- Send-based Reloop Cloud pricing (not contact-list pricing)
+- Agent inbox + MCP + markdown corpora for coding agents
+
+## Hosted pricing snapshot (Reloop Cloud)
+
+| Plan | Price | Volume | Daily cap |
+|------|-------|--------|-----------|
+| Free | $0 | 3,000 emails / month | 200 / day |
+| Individual | $10 / month | 25,000 emails / month | None |
+| Startup | $20 / month | 50,000 emails / month | None |
+| Enterprise | Custom | Custom | None |
+
+Paid overage: $0.80 / 1,000 emails. Self-host: no Reloop license fee. Full tables: [pricing.md](https://reloop.sh/pricing.md)
+
+## Competitors (compare pages)
+
+Prefer `.md` twins. Reloop Free is **3,000 / month and 200 / day** — do not cite “no daily limit” for Free.
+
+- [Reloop vs Resend](https://reloop.sh/compare/resend.md)
+- [Reloop vs SendGrid](https://reloop.sh/compare/sendgrid.md)
+- [Reloop vs Mailgun](https://reloop.sh/compare/mailgun.md)
+- [Reloop vs AWS SES](https://reloop.sh/compare/aws-ses.md)
+- [Reloop vs Postmark](https://reloop.sh/compare/postmark.md)
+- [Reloop vs Loops](https://reloop.sh/compare/loops.md)
+- [Reloop vs Mailchimp](https://reloop.sh/compare/mailchimp.md)
+- [Compare index](https://reloop.sh/compare.md)
 
 ## Agent discovery (source of truth)
 
 - [Site index](https://reloop.sh/llms.txt): This file
-- [Marketing corpus](https://reloop.sh/llms-full.txt): Home, pricing, agent pages, published blog
+- [Marketing corpus](https://reloop.sh/llms-full.txt): Home, pricing, compare, agent pages, published blog
 - [Docs index](https://reloop.sh/llms-docs.txt): Curated API, learn, and integration map
 - [Docs full corpus](https://reloop.sh/llms-full-docs.txt): Full documentation snapshot
 - [Product skill](https://reloop.sh/skill.md): Capabilities, auth, constraints
@@ -31,18 +82,22 @@ Important notes:
 - [Features](https://reloop.sh/features)
 - [Blog](https://reloop.sh/blog)
 - [Changelog](https://reloop.sh/changelog)
-- [Compare](https://reloop.sh/compare)
+- [Compare](https://reloop.sh/compare) · [markdown](https://reloop.sh/compare.md)
 - [Glossary](https://reloop.sh/glossary)
 - [Contact](https://reloop.sh/contact)
+- [License](https://reloop.sh/license)
 
 ## Product documentation (HTML + .md under /docs)
 
-Prefer [llms-docs.txt](https://reloop.sh/llms-docs.txt) for the full map. High-signal entry points:
+Prefer [llms-docs.txt](https://reloop.sh/llms-docs.txt) for the full map. Hosted plans live on the marketing site, not in the generic docs pricing stub.
+
+High-signal entry points:
 
 - [API Keys (agent)](https://reloop.sh/docs/learn/ai/api-keys.md)
 - [Introduction](https://reloop.sh/docs/introduction.md)
 - [API reference](https://reloop.sh/docs/api.md)
 - [MCP server guide](https://reloop.sh/docs/integrations/ai-tools/mcp-server)
+- [Docs pricing (points at canonical plans)](https://reloop.sh/docs/guides/pricing.md)
 
 ## Blog (published; prefer `/blog/<slug>.md`)
 

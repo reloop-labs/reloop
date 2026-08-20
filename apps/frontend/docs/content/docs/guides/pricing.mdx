@@ -1,33 +1,33 @@
 ---
 title: "Reloop Pricing"
-description: "Understanding Reloop pricing and plans."
+description: "Hosted Reloop Cloud plans and where to read canonical pricing."
 ---
 
-Understanding Reloop pricing and plans.
+Reloop publishes **one** pricing source of truth: the marketing [pricing page](https://reloop.sh/pricing) and its markdown twin [pricing.md](https://reloop.sh/pricing.md) (generated from `@reloop/pricing`).
 
-## Overview
+This docs page exists so agents and the docs MCP do not invent plans. Do not cite “Essentials $9” or “Free has no daily limit.”
 
-Manage your Reloop account settings effectively to ensure smooth operation.
+## Reloop Cloud (hosted)
 
-## Steps
+| Plan | Price | Included volume | Daily limit | Overage |
+|------|-------|-----------------|-------------|---------|
+| Free | $0 | 3,000 emails / month | 200 / day | None (sending pauses) |
+| Individual | $10 / month | 25,000 emails / month | None | $0.80 / 1,000 |
+| Startup | $20 / month | 50,000 emails / month | None | $0.80 / 1,000 |
+| Enterprise | Custom | Custom | None | Custom |
 
-<Steps>
-  <Step title="Access your settings">
-    Navigate to the [Account Settings](https://app.reloop.sh/settings) page in your Reloop dashboard.
-  </Step>
-  <Step title="Make your changes">
-    Follow the on-screen instructions to update your account configuration.
-  </Step>
-  <Step title="Confirm changes">
-    Review and confirm your changes. Some changes may require email verification.
-  </Step>
-</Steps>
+No credit card is required for Free. Data retention on published tiers is 45 days.
 
-<Note>
-If you need assistance with account changes, contact [Reloop support](https://reloop.sh/help).
-</Note>
+## Self-host
 
-## Learn More
+Self-hosting Reloop is Apache 2.0 software with Reloop Labs use restrictions. There is **no Reloop SaaS fee** and **no hosted-tier SKU** for running the stack yourself. You pay your own servers, IPs, and operations. See [self-host](https://reloop.sh/self-host) and [license](https://reloop.sh/license).
 
+## Quotas in the product
+
+Plan limits are enforced on Reloop Cloud. Dashboard usage: [Account settings](https://reloop.sh/dashboard/settings). Sending guides: [Account quotas](/docs/guides/account-quotas-limits), [Sending](/docs/learn/sending).
+
+## Learn more
+
+- [pricing.md](https://reloop.sh/pricing.md) — canonical agent-readable plans
+- [Compare Reloop](https://reloop.sh/compare.md)
 - [Handling API Keys](/docs/guides/handling-api-keys)
-- [Account Quotas and Limits](/docs/guides/account-quotas-limits)

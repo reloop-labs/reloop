@@ -262,7 +262,7 @@ export const pricingPlans: PricingPlan[] = [
 			webhooks: "Custom",
 			customDomains: "Custom",
 			attachmentSize: "Custom",
-			dataRetention: "Custom",
+			dataRetention: "45 days",
 			restApi: true,
 			smtpRelay: true,
 			scheduledEmails: true,
@@ -391,6 +391,32 @@ export const comparisonSections: ComparisonSection[] = [
 		rows: [{ label: "Uptime SLA Guarantee", key: "uptimeSla", type: "text" }],
 	},
 ];
+
+export const paidOverageUsdPerThousand = 0.8;
+
+/**
+ * Cheapest published Reloop Cloud USD for a monthly send volume.
+ * Free has no overage (sending pauses). Paid plans use included volume + $0.80/1k.
+ */
+export function hostedMonthlyUsdForVolume(volume: number): number {
+	if (volume <= 0) return 0;
+	const free = pricingPlans.find((p) => p.id === "free");
+	const freeIncluded = Number(
+		(free?.comparison.monthlyEmails ?? "3000").replace(/,/g, ""),
+	);
+	if (volume <= freeIncluded) return 0;
+
+	let best = Number.POSITIVE_INFINITY;
+	for (const plan of pricingPlans) {
+		if (plan.monthlyPrice === null || plan.monthlyPrice === 0) continue;
+		const included = Number(plan.comparison.monthlyEmails.replace(/,/g, ""));
+		if (!Number.isFinite(included)) continue;
+		const extraThousands = Math.max(0, volume - included) / 1000;
+		const cost = plan.monthlyPrice + extraThousands * paidOverageUsdPerThousand;
+		if (cost < best) best = cost;
+	}
+	return Number.isFinite(best) ? Math.round(best) : 0;
+}
 
 export function formatPrice(amount: number) {
 	return new Intl.NumberFormat("en-US", {

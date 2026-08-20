@@ -1,4 +1,5 @@
 import { JsonLd } from "@reloop/web/components/json-ld";
+import { pricingSoftwareApplicationJsonLd } from "@reloop/web/lib/schema";
 import {
 	defaultOgImage,
 	getSiteUrl,
@@ -37,19 +38,7 @@ const homeSchema = [
 		logo: `${siteUrl}${defaultOgImage}`,
 		sameAs: [socialProfiles.github, socialProfiles.x, socialProfiles.discord],
 	},
-	{
-		"@context": "https://schema.org" as const,
-		"@type": "SoftwareApplication" as const,
-		name: siteName,
-		operatingSystem: "All",
-		applicationCategory: "DeveloperApplication",
-		description: siteDescription,
-		offers: {
-			"@type": "Offer" as const,
-			price: "0",
-			priceCurrency: "USD",
-		},
-	},
+	pricingSoftwareApplicationJsonLd(siteUrl),
 ];
 
 export default function Home() {
