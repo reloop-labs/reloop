@@ -14,48 +14,6 @@ const H = 148;
 const PAD = { t: 10, r: 28, b: 22, l: 4 };
 const EASE: [number, number, number, number] = [0.23, 1, 0.32, 1];
 
-const CARDS = [
-	{
-		title: "Deliverability",
-		rating: "Good",
-		rows: [
-			{ label: "Sent", count: "29,486", percent: "100%", color: "#3B82F6" },
-			{
-				label: "Delivered",
-				count: "29,012",
-				percent: "98.39%",
-				color: "#10B981",
-			},
-		],
-	},
-	{
-		title: "Reputation",
-		rating: "Good",
-		rows: [
-			{ label: "Bounced", count: "546", percent: "1.85%", color: "#EF4444" },
-			{
-				label: "Complained",
-				count: "2",
-				percent: "0.01%",
-				color: "#FDB022",
-			},
-		],
-	},
-	{
-		title: "Engagement",
-		rating: "Good",
-		rows: [
-			{ label: "Opened", count: "13,612", percent: "46.16%", color: "#8B5CF6" },
-			{
-				label: "Unsubscribed",
-				count: "137",
-				percent: "0.46%",
-				color: "#9CA3AF",
-			},
-		],
-	},
-] as const;
-
 function linePath(values: number[], max: number): string {
 	const innerW = W - PAD.l - PAD.r;
 	const innerH = H - PAD.t - PAD.b;
@@ -133,46 +91,6 @@ export function HeroAnalyticsPreview() {
 				<span className="inline-flex h-8 items-center rounded-xl border border-stroke-soft-200 px-2.5 text-[12px] text-text-sub-600 dark:border-white/10 dark:text-white/50">
 					All Domains
 				</span>
-			</div>
-
-			<div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
-				{CARDS.map((card) => (
-					<section
-						key={card.title}
-						className="rounded-2xl border border-stroke-soft-200 bg-bg-white-0 px-4 pt-4 pb-1 dark:border-white/10 dark:bg-white/[0.01]"
-					>
-						<p className="font-medium text-[10px] text-text-soft-400 uppercase tracking-[0.08em]">
-							{card.title}
-						</p>
-						<p className="mt-1.5 font-semibold text-[24px] text-text-strong-950 tracking-tight dark:text-white">
-							{card.rating}
-						</p>
-						<ul className="mt-4">
-							{card.rows.map((row, index) => (
-								<li
-									key={row.label}
-									className={cn(
-										"flex items-center justify-between py-2.5",
-										index === 0 &&
-											"border-stroke-soft-200 border-b dark:border-white/10",
-									)}
-								>
-									<span className="flex items-center gap-2 text-[12px] text-text-sub-600">
-										<span
-											className="size-1.5 rounded-full"
-											style={{ backgroundColor: row.color }}
-										/>
-										{row.label}
-									</span>
-									<span className="flex items-baseline gap-2.5 text-[12px] text-text-soft-400 tabular-nums">
-										<span>{row.count}</span>
-										<span className="w-10 text-right">{row.percent}</span>
-									</span>
-								</li>
-							))}
-						</ul>
-					</section>
-				))}
 			</div>
 
 			<div className="mt-4 min-h-0 flex-1 overflow-hidden rounded-2xl border border-stroke-soft-200 dark:border-white/10">

@@ -63,11 +63,6 @@ export async function getEmailStatsController({
 					where ${emailEvent.emailLogId} = ${emailLog.id}
 					and ${emailEvent.type} = 'opened'
 				))`,
-				unsubscribed: sql<number>`count(*) filter (where exists (
-					select 1 from ${emailEvent}
-					where ${emailEvent.emailLogId} = ${emailLog.id}
-					and ${emailEvent.type} = 'unsubscribed'
-				))`,
 			})
 			.from(emailLog)
 			.where(whereClause)
@@ -81,7 +76,6 @@ export async function getEmailStatsController({
 			bounced: [],
 			complaint: [],
 			opened: [],
-			unsubscribed: [],
 			rate: [],
 			bounceBreakdown: {
 				transient: [],
@@ -103,14 +97,12 @@ export async function getEmailStatsController({
 			const transientCount = Number(row.transient);
 			const undeterminedCount = Number(row.undetermined);
 			const openedCount = Number(row.opened);
-			const unsubscribedCount = Number(row.unsubscribed);
 
 			result.sent.push(sentCount);
 			result.delivered.push(deliveredCount);
 			result.bounced.push(bouncedCount);
 			result.complaint.push(spamCount);
 			result.opened.push(openedCount);
-			result.unsubscribed.push(unsubscribedCount);
 			result.bounceBreakdown.permanent.push(permanentCount);
 			result.bounceBreakdown.transient.push(transientCount);
 			result.bounceBreakdown.undetermined.push(undeterminedCount);
