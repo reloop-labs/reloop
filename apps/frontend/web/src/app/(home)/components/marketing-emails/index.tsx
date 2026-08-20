@@ -1,7 +1,14 @@
+import type { MarketingTabId } from "./preview-scenes";
 import { SceneHeader } from "../_shared/scene-header";
 import { MarketingEmailsPreview } from "./preview";
 
-export function MarketingEmailsSection() {
+export function MarketingEmailsSection({
+	activeTab,
+	onTabChange,
+}: {
+	activeTab?: MarketingTabId;
+	onTabChange?: (id: MarketingTabId) => void;
+} = {}) {
 	return (
 		<article
 			id="email-system-marketing"
@@ -20,7 +27,12 @@ export function MarketingEmailsSection() {
 				/>
 			</div>
 
-			<MarketingEmailsPreview />
+			<div id="email-stage-marketing">
+				<MarketingEmailsPreview
+					activeTab={activeTab}
+					onTabChange={onTabChange}
+				/>
+			</div>
 		</article>
 	);
 }

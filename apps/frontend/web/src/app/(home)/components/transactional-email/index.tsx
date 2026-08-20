@@ -1,7 +1,14 @@
+import type { PreviewTabId } from "./preview-scenes";
 import { SceneHeader } from "../_shared/scene-header";
 import { TransactionalEmailPreview } from "./preview";
 
-export function TransactionalEmailSection() {
+export function TransactionalEmailSection({
+	activeTab,
+	onTabChange,
+}: {
+	activeTab?: PreviewTabId;
+	onTabChange?: (id: PreviewTabId) => void;
+} = {}) {
 	return (
 		<article
 			id="email-system-transactional"
@@ -20,7 +27,12 @@ export function TransactionalEmailSection() {
 				/>
 			</div>
 
-			<TransactionalEmailPreview />
+			<div id="email-stage-transactional">
+				<TransactionalEmailPreview
+					activeTab={activeTab}
+					onTabChange={onTabChange}
+				/>
+			</div>
 		</article>
 	);
 }

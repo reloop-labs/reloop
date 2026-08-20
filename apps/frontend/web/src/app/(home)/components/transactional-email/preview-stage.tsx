@@ -42,9 +42,16 @@ const contentVariants = {
 	}),
 };
 
-export function PreviewStage() {
+export function PreviewStage({
+	activeTab: externalActive,
+	onTabChange: externalOnChange,
+}: {
+	activeTab?: PreviewTabId;
+	onTabChange?: (id: PreviewTabId) => void;
+} = {}) {
 	const shouldReduceMotion = useReducedMotion();
-	const [active, setActive] = useState<PreviewTabId>("send");
+	const [internalActive, setInternalActive] = useState<PreviewTabId>("send");
+	const active = externalActive ?? internalActive;
 	const [sendSubTab, setSendSubTab] = useState<SendApiTabId>("send");
 	const [templateSubTab, setTemplateSubTab] = useState<TemplateTabId>("otp");
 	const [webhookSubTab, setWebhookSubTab] = useState<WebhookTabId>("nextjs");
@@ -59,7 +66,11 @@ export function PreviewStage() {
 		} else {
 			setDirection(0);
 		}
-		setActive(newTab);
+		if (externalOnChange) {
+			externalOnChange(newTab);
+		} else {
+			setInternalActive(newTab);
+		}
 	};
 
 	return (

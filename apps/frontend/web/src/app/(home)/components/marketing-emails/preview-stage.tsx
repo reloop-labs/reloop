@@ -482,9 +482,17 @@ function AnalyticsView() {
 }
 
 /* --- Main PreviewStage Component --- */
-export function PreviewStage() {
+export function PreviewStage({
+	activeTab: externalActive,
+	onTabChange: externalOnChange,
+}: {
+	activeTab?: MarketingTabId;
+	onTabChange?: (id: MarketingTabId) => void;
+} = {}) {
 	const shouldReduceMotion = useReducedMotion();
-	const [active, setActive] = useState<MarketingTabId>("upload-data");
+	const [internalActive, setInternalActive] =
+		useState<MarketingTabId>("upload-data");
+	const active = externalActive ?? internalActive;
 	const [direction, setDirection] = useState(0);
 
 	const handleTabChange = (newTab: MarketingTabId) => {
@@ -496,7 +504,11 @@ export function PreviewStage() {
 		} else {
 			setDirection(0);
 		}
-		setActive(newTab);
+		if (externalOnChange) {
+			externalOnChange(newTab);
+		} else {
+			setInternalActive(newTab);
+		}
 	};
 
 	return (

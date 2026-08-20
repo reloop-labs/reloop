@@ -1,7 +1,14 @@
+import type { AnalyticsTabId } from "./preview-scenes";
 import { SceneHeader } from "../_shared/scene-header";
 import { EmailAnalyticsPreview } from "./preview";
 
-export function EmailAnalyticsSection() {
+export function EmailAnalyticsSection({
+	activeTab,
+	onTabChange,
+}: {
+	activeTab?: AnalyticsTabId;
+	onTabChange?: (id: AnalyticsTabId) => void;
+} = {}) {
 	return (
 		<article
 			id="email-system-analytics"
@@ -20,7 +27,12 @@ export function EmailAnalyticsSection() {
 				/>
 			</div>
 
-			<EmailAnalyticsPreview />
+			<div id="email-stage-analytics">
+				<EmailAnalyticsPreview
+					activeTab={activeTab}
+					onTabChange={onTabChange}
+				/>
+			</div>
 		</article>
 	);
 }

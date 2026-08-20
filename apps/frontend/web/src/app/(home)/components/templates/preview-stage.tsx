@@ -140,11 +140,7 @@ function AiTemplatesView() {
 	const startGenerateRef = useRef(startGenerate);
 	startGenerateRef.current = startGenerate;
 
-	useEffect(() => {
-		if (phase !== "idle") return;
-		const timer = window.setTimeout(() => inputRef.current?.focus(), 0);
-		return () => window.clearTimeout(timer);
-	}, [phase]);
+
 
 	useEffect(() => {
 		if (phase !== "pending") return;
@@ -1470,9 +1466,17 @@ function VersionHistoryView() {
 }
 
 /* --- Main PreviewStage Component --- */
-export function PreviewStage() {
+export function PreviewStage({
+	activeTab: externalActive,
+	onTabChange: externalOnChange,
+}: {
+	activeTab?: TemplateTabId;
+	onTabChange?: (id: TemplateTabId) => void;
+} = {}) {
 	const shouldReduceMotion = useReducedMotion();
-	const [active, setActive] = useState<TemplateTabId>("ai-templates");
+	const [internalActive, setInternalActive] =
+		useState<TemplateTabId>("ai-templates");
+	const active = externalActive ?? internalActive;
 	const [direction, setDirection] = useState(0);
 
 	const handleTabChange = (newTab: TemplateTabId) => {
@@ -1484,7 +1488,11 @@ export function PreviewStage() {
 		} else {
 			setDirection(0);
 		}
-		setActive(newTab);
+		if (externalOnChange) {
+			externalOnChange(newTab);
+		} else {
+			setInternalActive(newTab);
+		}
 	};
 
 	return (

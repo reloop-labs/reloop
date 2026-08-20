@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@reloop/ui/cn";
-import { useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
 	useCallback,
 	useEffect,
@@ -10,10 +10,14 @@ import {
 	useState,
 } from "react";
 import { EmailAnalyticsSection } from "./email-analytics";
+import type { AnalyticsTabId } from "./email-analytics/preview-scenes";
 import { MarketingEmailsSection } from "./marketing-emails";
+import type { MarketingTabId } from "./marketing-emails/preview-scenes";
 import { SceneGlyph } from "./_shared/scene-header";
 import { TemplatesSection } from "./templates";
+import type { TemplateTabId } from "./templates/preview-scenes";
 import { TransactionalEmailSection } from "./transactional-email";
+import type { PreviewTabId } from "./transactional-email/preview-scenes";
 import { WorkflowsSection } from "./workflows";
 
 const SECTIONS = [
@@ -21,16 +25,31 @@ const SECTIONS = [
 		id: "transactional",
 		nav: "Transactional Email",
 		Component: TransactionalEmailSection,
+		subItems: [
+			{ id: "send", label: "Send API" },
+			{ id: "templates", label: "React Email supported" },
+			{ id: "events", label: "Webhooks" },
+		],
 	},
 	{
 		id: "analytics",
 		nav: "Email Analytics",
 		Component: EmailAnalyticsSection,
+		subItems: [
+			{ id: "metrics", label: "Metrics" },
+			{ id: "engagement", label: "Engagement & clicks" },
+			{ id: "bounces", label: "Bounces & Diagnostics" },
+		],
 	},
 	{
 		id: "templates",
 		nav: "AI Email Templates",
 		Component: TemplatesSection,
+		subItems: [
+			{ id: "ai-templates", label: "AI-powered templates" },
+			{ id: "realtime-editor", label: "Real-time editor" },
+			{ id: "version-history", label: "Version history" },
+		],
 	},
 	{
 		id: "workflows",
@@ -41,6 +60,11 @@ const SECTIONS = [
 		id: "marketing",
 		nav: "Marketing Emails",
 		Component: MarketingEmailsSection,
+		subItems: [
+			{ id: "upload-data", label: "Upload data" },
+			{ id: "manage-funnels", label: "Manage funnels" },
+			{ id: "analytics", label: "Analytics" },
+		],
 	},
 ] as const;
 
@@ -53,40 +77,45 @@ const EASE_OUT = "cubic-bezier(0.23, 1, 0.32, 1)";
 
 export default function EmailSystem() {
 	const [active, setActive] = useState<SectionId>(SECTIONS[0].id);
-	const [indicator, setIndicator] = useState({
-		top: 0,
-		height: 0,
-		ready: false,
-	});
+	const [transactionalTab, setTransactionalTab] =
+		useState<PreviewTabId>("send");
+	const [analyticsTab, setAnalyticsTab] = useState<AnalyticsTabId>("metrics");
+	const [templateTab, setTemplateTab] =
+		useState<TemplateTabId>("ai-templates");
+	const [marketingTab, setMarketingTab] =
+		useState<MarketingTabId>("upload-data");
+
 	const reduceMotion = useReducedMotion();
 	const panelRefs = useRef<Record<string, HTMLElement | null>>({});
-	const buttonRefs = useRef<Record<string, HTMLButtonElement | null>>({});
 	const navRef = useRef<HTMLElement>(null);
 	const scrollingTo = useRef<SectionId | null>(null);
+	const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 	const activeRef = useRef(active);
 	activeRef.current = active;
-
-	const placeIndicator = useCallback((id: SectionId) => {
-		const button = buttonRefs.current[id];
-		const nav = navRef.current;
-		if (!button || !nav) return;
-		const navBox = nav.getBoundingClientRect();
-		const btnBox = button.getBoundingClientRect();
-		setIndicator({
-			top: btnBox.top - navBox.top + INDICATOR_INSET,
-			height: Math.max(btnBox.height - INDICATOR_INSET * 2, 0),
-			ready: true,
-		});
-	}, []);
 
 	const pickActiveFromScroll = useCallback(() => {
 		if (scrollingTo.current) return;
 
+		// If user scrolled to near the bottom of the page, pick the last section
+		const lastSection = SECTIONS[SECTIONS.length - 1];
+		if (
+			typeof window !== "undefined" &&
+			lastSection &&
+			window.innerHeight + window.scrollY >=
+				document.documentElement.scrollHeight - 60
+		) {
+			if (lastSection.id !== activeRef.current) {
+				setActive(lastSection.id);
+			}
+			return;
+		}
+
+		const marker = 160;
 		let next: SectionId = SECTIONS[0].id;
 		for (const section of SECTIONS) {
 			const el = panelRefs.current[section.id];
 			if (!el) continue;
-			if (el.getBoundingClientRect().top <= SCROLL_MARKER + 8) {
+			if (el.getBoundingClientRect().top <= marker) {
 				next = section.id;
 			}
 		}
@@ -96,63 +125,59 @@ export default function EmailSystem() {
 		}
 	}, []);
 
-	useLayoutEffect(() => {
-		placeIndicator(active);
-	}, [active, placeIndicator]);
-
 	useEffect(() => {
-		const nav = navRef.current;
-		if (!nav) return;
-		const observer = new ResizeObserver(() =>
-			placeIndicator(activeRef.current),
-		);
-		observer.observe(nav);
-		return () => observer.disconnect();
-	}, [placeIndicator]);
-
-	useEffect(() => {
-		let frame = 0;
+		let ticking = false;
 		const onScroll = () => {
-			if (frame) return;
-			frame = window.requestAnimationFrame(() => {
-				frame = 0;
-				pickActiveFromScroll();
-			});
+			if (scrollingTo.current) return;
+			if (!ticking) {
+				window.requestAnimationFrame(() => {
+					pickActiveFromScroll();
+					ticking = false;
+				});
+				ticking = true;
+			}
 		};
 
-		const unlock = () => {
-			scrollingTo.current = null;
-			pickActiveFromScroll();
-		};
-
-		pickActiveFromScroll();
 		window.addEventListener("scroll", onScroll, { passive: true });
 		window.addEventListener("resize", onScroll);
-		window.addEventListener("scrollend", unlock);
 		return () => {
-			window.cancelAnimationFrame(frame);
 			window.removeEventListener("scroll", onScroll);
 			window.removeEventListener("resize", onScroll);
-			window.removeEventListener("scrollend", unlock);
+			if (scrollTimeoutRef.current) {
+				clearTimeout(scrollTimeoutRef.current);
+			}
 		};
 	}, [pickActiveFromScroll]);
 
 	const goTo = useCallback(
-		(id: SectionId) => {
+		(id: SectionId, isSubItem = false) => {
 			setActive(id);
 			scrollingTo.current = id;
-			panelRefs.current[id]?.scrollIntoView({
-				behavior: reduceMotion ? "auto" : "smooth",
-				block: "start",
-			});
-			window.setTimeout(() => {
-				if (scrollingTo.current === id) {
-					scrollingTo.current = null;
-					pickActiveFromScroll();
-				}
-			}, 800);
+
+			const stageEl = isSubItem
+				? document.getElementById(`email-stage-${id}`)
+				: null;
+			const targetEl = stageEl ?? panelRefs.current[id];
+
+			if (targetEl) {
+				const headerOffset = 72;
+				const elementPosition = targetEl.getBoundingClientRect().top;
+				const offsetPosition =
+					elementPosition + window.scrollY - headerOffset;
+				window.scrollTo({
+					top: offsetPosition,
+					behavior: reduceMotion ? "auto" : "smooth",
+				});
+			}
+
+			if (scrollTimeoutRef.current) {
+				clearTimeout(scrollTimeoutRef.current);
+			}
+			scrollTimeoutRef.current = setTimeout(() => {
+				scrollingTo.current = null;
+			}, 900);
 		},
-		[pickActiveFromScroll, reduceMotion],
+		[reduceMotion],
 	);
 
 	return (
@@ -184,39 +209,103 @@ export default function EmailSystem() {
 							aria-label="Product scenes"
 							className="relative flex gap-1 overflow-x-auto px-4 py-3 [scrollbar-width:none] lg:flex-col lg:gap-0.5 lg:overflow-visible lg:p-0 lg:py-10 [&::-webkit-scrollbar]:hidden"
 						>
-							<span
-								aria-hidden
-								className="pointer-events-none absolute top-0 left-[-1.5px] hidden w-0.5 bg-primary-base lg:block"
-								style={{
-									top: 0,
-									height: indicator.height,
-									opacity: indicator.ready ? 1 : 0,
-									transform: `translateY(${indicator.top}px)`,
-									transition: reduceMotion
-										? "opacity 120ms ease"
-										: `transform 180ms ${EASE_OUT}, height 180ms ${EASE_OUT}, opacity 120ms ease`,
-								}}
-							/>
 							{SECTIONS.map((section) => {
 								const selected = section.id === active;
+								const hasSubItems =
+									"subItems" in section && section.subItems;
+
 								return (
-									<button
-										key={section.id}
-										ref={(el) => {
-											buttonRefs.current[section.id] = el;
-										}}
-										type="button"
-										onClick={() => goTo(section.id)}
-										className={cn(
-											"relative w-full shrink-0 px-3.5 py-2 text-left font-medium text-[15px] tracking-[-0.01em] transition-colors duration-150 lg:py-2 lg:pr-6 lg:pl-8 lg:text-[17px]",
-											selected
-												? "text-text-strong-950 dark:text-white"
-												: "text-text-soft-400 hover:text-text-sub-600 dark:text-white/30 dark:hover:text-white/60",
+									<div key={section.id} className="relative w-full shrink-0">
+										<button
+											type="button"
+											onClick={() => goTo(section.id, false)}
+											className={cn(
+												"relative w-full shrink-0 px-3.5 py-2 text-left font-medium text-[15px] tracking-[-0.01em] transition-colors duration-150 focus:outline-hidden lg:py-2 lg:pr-6 lg:pl-8 lg:text-[17px]",
+												selected
+													? "text-text-strong-950 dark:text-white"
+													: "text-text-soft-400 hover:text-text-sub-600 dark:text-white/30 dark:hover:text-white/60",
+											)}
+											aria-current={selected ? "true" : undefined}
+										>
+											{selected && (
+												<motion.span
+													layoutId="email-system-active-indicator"
+													className="pointer-events-none absolute -left-[1.5px] top-1.5 bottom-1.5 hidden w-0.5 bg-primary-base lg:block"
+													transition={
+														reduceMotion
+															? { duration: 0 }
+															: {
+																	type: "spring",
+																	bounce: 0.15,
+																	duration: 0.28,
+																}
+													}
+												/>
+											)}
+											{section.nav}
+										</button>
+
+										{selected && hasSubItems && (
+											<div className="relative ml-8 my-1.5 hidden flex-col lg:flex animate-in fade-in duration-150">
+												{/* Vertical dotted trunk line */}
+												<div
+													aria-hidden="true"
+													className="pointer-events-none absolute left-0 top-0 bottom-3 w-px border-l border-dotted border-stroke-sub-300 dark:border-white/20"
+												/>
+
+												{section.subItems.map((sub) => {
+													const currentSubTab =
+														section.id === "transactional"
+															? transactionalTab
+															: section.id === "analytics"
+																? analyticsTab
+																: section.id === "templates"
+																	? templateTab
+																	: marketingTab;
+													const isSubActive = currentSubTab === sub.id;
+
+													const handleSubClick = () => {
+														if (section.id === "transactional") {
+															setTransactionalTab(sub.id as PreviewTabId);
+														} else if (section.id === "analytics") {
+															setAnalyticsTab(sub.id as AnalyticsTabId);
+														} else if (section.id === "templates") {
+															setTemplateTab(sub.id as TemplateTabId);
+														} else if (section.id === "marketing") {
+															setMarketingTab(sub.id as MarketingTabId);
+														}
+														goTo(section.id, true);
+													};
+
+													return (
+														<button
+															key={sub.id}
+															type="button"
+															onClick={handleSubClick}
+															className={cn(
+																"group relative flex w-full items-center py-1.5 pl-4 pr-3 text-left text-[13.5px] transition-colors duration-150 focus:outline-hidden",
+																isSubActive
+																	? "font-semibold text-text-strong-950 dark:text-white"
+																	: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/50 dark:hover:text-white",
+															)}
+														>
+															{/* Horizontal dotted connector branch directly touching vertical line */}
+															<span
+																aria-hidden="true"
+																className={cn(
+																	"pointer-events-none absolute left-0 top-1/2 w-2.5 -translate-y-1/2 border-b border-dotted transition-colors duration-150",
+																	isSubActive
+																		? "border-text-strong-950 dark:border-white"
+																		: "border-stroke-sub-300 dark:border-white/20 group-hover:border-text-sub-600 dark:group-hover:border-white/50",
+																)}
+															/>
+															<span className="truncate">{sub.label}</span>
+														</button>
+													);
+												})}
+											</div>
 										)}
-										aria-current={selected ? "true" : undefined}
-									>
-										{section.nav}
-									</button>
+									</div>
 								);
 							})}
 						</nav>
@@ -238,7 +327,29 @@ export default function EmailSystem() {
 									"border-stroke-soft-200 border-b dark:border-white/10",
 							)}
 						>
-							<Component />
+							{id === "transactional" ? (
+								<TransactionalEmailSection
+									activeTab={transactionalTab}
+									onTabChange={setTransactionalTab}
+								/>
+							) : id === "analytics" ? (
+								<EmailAnalyticsSection
+									activeTab={analyticsTab}
+									onTabChange={setAnalyticsTab}
+								/>
+							) : id === "templates" ? (
+								<TemplatesSection
+									activeTab={templateTab}
+									onTabChange={setTemplateTab}
+								/>
+							) : id === "marketing" ? (
+								<MarketingEmailsSection
+									activeTab={marketingTab}
+									onTabChange={setMarketingTab}
+								/>
+							) : (
+								<Component />
+							)}
 						</div>
 					))}
 				</div>

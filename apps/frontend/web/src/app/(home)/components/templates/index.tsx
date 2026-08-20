@@ -1,7 +1,14 @@
+import type { TemplateTabId } from "./preview-scenes";
 import { SceneHeader } from "../_shared/scene-header";
 import { TemplatesPreview } from "./preview";
 
-export function TemplatesSection() {
+export function TemplatesSection({
+	activeTab,
+	onTabChange,
+}: {
+	activeTab?: TemplateTabId;
+	onTabChange?: (id: TemplateTabId) => void;
+} = {}) {
 	return (
 		<article
 			id="email-system-templates"
@@ -20,7 +27,12 @@ export function TemplatesSection() {
 				/>
 			</div>
 
-			<TemplatesPreview />
+			<div id="email-stage-templates">
+				<TemplatesPreview
+					activeTab={activeTab}
+					onTabChange={onTabChange}
+				/>
+			</div>
 		</article>
 	);
 }
