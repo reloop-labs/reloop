@@ -1,0 +1,28 @@
+---
+slug: credits-billing-management-system
+version: 0.51.0
+date: July 2026
+launchDate: 13 July 2026
+title: 'Credits & Billing Management System'
+description: >-
+  Usage tracking, credit top-ups, and subscription tier management in settings (apps/backend/credits).
+tags:
+  - Backend
+  - Billing
+  - Dashboard
+---
+### PLANNING
+
+- **Billing architecture.** Designed organization credits, balance deduction rules, and invoice schemas in packages/db/src/schema/billing.ts.
+
+### FRONTEND
+
+- **Billing dashboard.** Added usage meters, credit top-up dialogs, and downloadable PDF invoice history in organization settings.
+
+### BACKEND
+
+- **Credits service.** Built apps/backend/credits microservice with atomic credit deduction middleware and low-balance warnings.
+
+### DEVOPS
+
+- **CI workflow.** Added be-credits.yml GitHub Actions workflow for automated service testing and deployment.

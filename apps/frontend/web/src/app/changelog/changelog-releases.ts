@@ -29,7 +29,10 @@ function getAllMdxFiles(dirPath: string): string[] {
 	return files;
 }
 
-function loadChangelogReleases(): Omit<ChangelogRelease, "preview" | "code">[] {
+export function loadChangelogReleases(): Omit<
+	ChangelogRelease,
+	"preview" | "code"
+>[] {
 	const dirPath = getChangelogDir();
 	const files = getAllMdxFiles(dirPath);
 

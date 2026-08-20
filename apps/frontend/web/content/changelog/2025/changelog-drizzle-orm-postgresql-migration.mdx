@@ -1,0 +1,24 @@
+---
+slug: drizzle-orm-postgresql-migration
+version: 0.3.0
+date: September 2025
+launchDate: 4 September 2025
+title: 'Migration to Drizzle ORM & PostgreSQL'
+description: >-
+  Replaced raw SQL queries with type-safe Drizzle ORM schemas (packages/db) and automated migrations.
+tags:
+  - Infrastructure
+  - Backend
+---
+### PLANNING
+
+- **ORM migration rationale.** Selected Drizzle ORM for its zero-overhead SQL-like syntax and strict TypeScript schema inference.
+
+### BACKEND
+
+- **Drizzle migration.** Migrated all database models to type-safe Drizzle ORM schemas in packages/db.
+- **PostgreSQL integration.** Automated schema migrations and compile-time type safety across database queries.
+
+### DEVOPS
+
+- **Migration scripts.** Added drizzle-kit migration pipelines and automated schema verification in CI.

@@ -1,0 +1,16 @@
+---
+slug: github-actions-ci-cd-pipelines
+version: 0.37.0
+date: April 2026
+launchDate: 9 April 2026
+title: 'Independent GitHub Actions CI/CD for All 22 Services'
+description: >-
+  Created separate CI/CD workflows (be-*.yml, fe-*.yml) so each backend service and frontend app builds independently.
+tags:
+  - DevOps
+  - Infrastructure
+---
+### DEVOPS
+
+- **Modular CI/CD.** Created 22 independent GitHub Actions workflows (.github/workflows/be-*.yml and fe-*.yml) scoped by directory paths.
+- **Parallel testing.** Isolated automated test suites running in parallel to keep PR check times under 2 minutes.

@@ -1,16 +1,9 @@
 import { changelogCodeByVersion } from "./changelog-code-samples";
-import { changelogReleasesData } from "./changelog-releases";
+import { loadChangelogReleases } from "./changelog-releases";
 import type { ChangelogRelease } from "./changelog-types";
 
 export function getChangelogReleasePath(version: string) {
 	return `/changelog/${version}`;
-}
-
-export function getChangelogReleaseByVersion(versionOrSlug: string) {
-	return changelogReleases.find(
-		(release) =>
-			release.slug === versionOrSlug || release.version === versionOrSlug,
-	);
 }
 
 export function getTagDotColor(tag: string) {
@@ -49,4 +42,22 @@ function withChangelogPreviews(
 	}));
 }
 
-export const changelogReleases = withChangelogPreviews(changelogReleasesData);
+export function getChangelogReleases(): ChangelogRelease[] {
+	return withChangelogPreviews(loadChangelogReleases());
+}
+
+export function getChangelogReleaseByVersion(versionOrSlug: string) {
+	const releases = getChangelogReleases();
+	return releases.find(
+		(release) =>
+			release.slug === versionOrSlug || release.version === versionOrSlug,
+	);
+}
+
+export const changelogReleases = new Proxy([] as ChangelogRelease[], {
+	get(_target, prop) {
+		const fresh = getChangelogReleases();
+		const val = Reflect.get(fresh, prop);
+		return typeof val === "function" ? val.bind(fresh) : val;
+	},
+});

@@ -1,0 +1,20 @@
+---
+slug: agent-email-drafting-review-queue
+version: 0.43.0
+date: May 2026
+launchDate: 14 May 2026
+title: 'Agent Email Drafting & Review Workflow'
+description: >-
+  Configurable review flow: agent drafts remain in a pending queue until approved by a team member.
+tags:
+  - Agents
+  - Inbox
+---
+### FRONTEND
+
+- **Review queue UI.** Added Pending Approval tab in the agent inbox with diff highlighting and message preview.
+- **Approval actions.** Inline editing and single-click approval/dispatch actions for team members.
+
+### BACKEND
+
+- **Draft status states.** Added pending_approval, approved, and rejected status states in packages/db/src/schema/compose.ts.

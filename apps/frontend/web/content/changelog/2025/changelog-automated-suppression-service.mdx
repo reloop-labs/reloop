@@ -1,0 +1,20 @@
+---
+slug: automated-suppression-service
+version: 0.7.0
+date: September 2025
+launchDate: 26 September 2025
+title: 'Automated Suppression Service'
+description: >-
+  Background suppression engine (apps/backend/spam) that automatically filters hard bounces and spam complaints.
+tags:
+  - Backend
+  - Infrastructure
+---
+### PLANNING
+
+- **Reputation protection strategy.** Designed automated bounce handling and suppression synchronization across sending nodes.
+
+### BACKEND
+
+- **Spam microservice.** Built apps/backend/spam to process bounce events and spam complaints.
+- **Reputation guard.** Automatically intercepts outgoing emails to suppressed recipients before dispatch to protect sender score.

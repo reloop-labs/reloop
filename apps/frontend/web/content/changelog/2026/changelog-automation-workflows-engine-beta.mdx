@@ -1,0 +1,24 @@
+---
+slug: automation-workflows-engine-beta
+version: 0.44.0
+date: May 2026
+launchDate: 22 May 2026
+title: 'Automation Workflows Engine (Beta)'
+description: >-
+  Event-driven workflow system (apps/backend/workflow) to trigger automated emails based on custom user events.
+tags:
+  - Backend
+  - Feature
+  - Workflows
+---
+### PLANNING
+
+- **Workflow schema.** Defined trigger events, condition trees, step actions, and execution runs in packages/db/src/schema/automation.ts.
+
+### FRONTEND
+
+- **Workflow canvas.** Visual node canvas in the dashboard for linking custom event triggers to automated email template dispatches.
+
+### BACKEND
+
+- **Workflow microservice.** Built apps/backend/workflow with asynchronous event subscribers and step execution runners.
