@@ -9,6 +9,7 @@ import {
 	useRef,
 	useState,
 } from "react";
+import { Icon, type IconName } from "@reloop/ui/icon";
 import { EmailAnalyticsSection } from "./email-analytics";
 import type { AnalyticsTabId } from "./email-analytics/preview-scenes";
 import { MarketingEmailsSection } from "./marketing-emails";
@@ -20,15 +21,58 @@ import { TransactionalEmailSection } from "./transactional-email";
 import type { PreviewTabId } from "./transactional-email/preview-scenes";
 import { WorkflowsSection } from "./workflows";
 
+function ReactEmailIcon({ className }: { className?: string }) {
+	return (
+		<svg
+			viewBox="0 0 24 24"
+			fill="none"
+			stroke="currentColor"
+			strokeWidth="1.5"
+			className={className}
+			aria-hidden="true"
+		>
+			<ellipse cx="12" cy="12" rx="10" ry="4.5" />
+			<ellipse
+				cx="12"
+				cy="12"
+				rx="10"
+				ry="4.5"
+				transform="rotate(60 12 12)"
+			/>
+			<ellipse
+				cx="12"
+				cy="12"
+				rx="10"
+				ry="4.5"
+				transform="rotate(120 12 12)"
+			/>
+			<circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none" />
+		</svg>
+	);
+}
+
+function SubItemIcon({
+	icon,
+	className,
+}: {
+	icon: string;
+	className?: string;
+}) {
+	if (icon === "react") {
+		return <ReactEmailIcon className={className} />;
+	}
+	return <Icon name={icon as IconName} className={className} />;
+}
+
 const SECTIONS = [
 	{
 		id: "transactional",
 		nav: "Transactional Email",
 		Component: TransactionalEmailSection,
 		subItems: [
-			{ id: "send", label: "Send API" },
-			{ id: "templates", label: "React Email supported" },
-			{ id: "events", label: "Webhooks" },
+			{ id: "send", label: "Send API", icon: "send-2" },
+			{ id: "templates", label: "React Email supported", icon: "react" },
+			{ id: "events", label: "Webhooks", icon: "webhook" },
 		],
 	},
 	{
@@ -36,9 +80,9 @@ const SECTIONS = [
 		nav: "Email Analytics",
 		Component: EmailAnalyticsSection,
 		subItems: [
-			{ id: "metrics", label: "Metrics" },
-			{ id: "engagement", label: "Engagement & clicks" },
-			{ id: "bounces", label: "Bounces & Diagnostics" },
+			{ id: "metrics", label: "Metrics", icon: "graph-up" },
+			{ id: "engagement", label: "Engagement & clicks", icon: "cursor-click" },
+			{ id: "bounces", label: "Bounces & Diagnostics", icon: "alert-triangle" },
 		],
 	},
 	{
@@ -46,9 +90,9 @@ const SECTIONS = [
 		nav: "AI Email Templates",
 		Component: TemplatesSection,
 		subItems: [
-			{ id: "ai-templates", label: "AI-powered templates" },
-			{ id: "realtime-editor", label: "Real-time editor" },
-			{ id: "version-history", label: "Version history" },
+			{ id: "ai-templates", label: "AI-powered templates", icon: "magic-wand" },
+			{ id: "realtime-editor", label: "Real-time editor", icon: "cursor" },
+			{ id: "version-history", label: "Version history", icon: "history" },
 		],
 	},
 	{
@@ -61,9 +105,9 @@ const SECTIONS = [
 		nav: "Marketing Emails",
 		Component: MarketingEmailsSection,
 		subItems: [
-			{ id: "upload-data", label: "Upload data" },
-			{ id: "manage-funnels", label: "Manage funnels" },
-			{ id: "analytics", label: "Analytics" },
+			{ id: "upload-data", label: "Upload data", icon: "file-code" },
+			{ id: "manage-funnels", label: "Manage funnels", icon: "workflow" },
+			{ id: "analytics", label: "Analytics", icon: "graph-up" },
 		],
 	},
 ] as const;
@@ -247,14 +291,8 @@ export default function EmailSystem() {
 
 										{selected && hasSubItems && (
 											<div className="relative ml-8 my-1.5 hidden flex-col lg:flex animate-in fade-in duration-150">
-												{/* Vertical dotted trunk line */}
-												<div
-													aria-hidden="true"
-													className="pointer-events-none absolute left-0 top-0 bottom-3 w-px border-l border-dotted border-stroke-sub-300 dark:border-white/20"
-												/>
-
-												{section.subItems.map((sub) => {
-													const currentSubTab =
+												{(() => {
+													const currentTabId =
 														section.id === "transactional"
 															? transactionalTab
 															: section.id === "analytics"
@@ -262,47 +300,88 @@ export default function EmailSystem() {
 																: section.id === "templates"
 																	? templateTab
 																	: marketingTab;
-													const isSubActive = currentSubTab === sub.id;
-
-													const handleSubClick = () => {
-														if (section.id === "transactional") {
-															setTransactionalTab(sub.id as PreviewTabId);
-														} else if (section.id === "analytics") {
-															setAnalyticsTab(sub.id as AnalyticsTabId);
-														} else if (section.id === "templates") {
-															setTemplateTab(sub.id as TemplateTabId);
-														} else if (section.id === "marketing") {
-															setMarketingTab(sub.id as MarketingTabId);
-														}
-														goTo(section.id, true);
-													};
+													const activeIndex = section.subItems.findIndex(
+														(sub) => sub.id === currentTabId,
+													);
 
 													return (
-														<button
-															key={sub.id}
-															type="button"
-															onClick={handleSubClick}
-															className={cn(
-																"group relative flex w-full items-center py-1.5 pl-4 pr-3 text-left text-[13.5px] transition-colors duration-150 focus:outline-hidden",
-																isSubActive
-																	? "font-semibold text-text-strong-950 dark:text-white"
-																	: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/50 dark:hover:text-white",
-															)}
-														>
-															{/* Horizontal dotted connector branch directly touching vertical line */}
-															<span
+														<>
+															{/* 1. Continuous background vertical trunk down to the last item's curve start */}
+															<div
 																aria-hidden="true"
-																className={cn(
-																	"pointer-events-none absolute left-0 top-1/2 w-2.5 -translate-y-1/2 border-b border-dotted transition-colors duration-150",
-																	isSubActive
-																		? "border-text-strong-950 dark:border-white"
-																		: "border-stroke-sub-300 dark:border-white/20 group-hover:border-text-sub-600 dark:group-hover:border-white/50",
-																)}
+																className="pointer-events-none absolute left-0 top-0 w-px bg-stroke-soft-200 dark:bg-white/15"
+																style={{
+																	height: `${(section.subItems.length - 1) * 34}px`,
+																}}
 															/>
-															<span className="truncate">{sub.label}</span>
-														</button>
+
+															{/* 2. Continuous active vertical trunk down to active item's curve start */}
+															{activeIndex > 0 && (
+																<div
+																	aria-hidden="true"
+																	className="pointer-events-none absolute left-0 top-0 w-px bg-stroke-sub-300 transition-all duration-200 dark:bg-white/40 z-10"
+																	style={{
+																		height: `${activeIndex * 34}px`,
+																	}}
+																/>
+															)}
+
+															{section.subItems.map((sub, sIdx) => {
+																const isSubActive = sIdx === activeIndex;
+
+																const handleSubClick = () => {
+																	if (section.id === "transactional") {
+																		setTransactionalTab(sub.id as PreviewTabId);
+																	} else if (section.id === "analytics") {
+																		setAnalyticsTab(sub.id as AnalyticsTabId);
+																	} else if (section.id === "templates") {
+																		setTemplateTab(sub.id as TemplateTabId);
+																	} else if (section.id === "marketing") {
+																		setMarketingTab(sub.id as MarketingTabId);
+																	}
+																	goTo(section.id, true);
+																};
+
+																return (
+																	<button
+																		key={sub.id}
+																		type="button"
+																		onClick={handleSubClick}
+																		className={cn(
+																			"group relative flex h-[34px] w-full items-center pl-6 pr-3 text-left text-[13.5px] transition-colors duration-150 focus:outline-hidden",
+																			isSubActive
+																				? "font-semibold text-text-strong-950 dark:text-white"
+																				: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/50 dark:hover:text-white",
+																		)}
+																	>
+																		{/* Curved branch connecting trunk to subtitle */}
+																		<span
+																			aria-hidden="true"
+																			className={cn(
+																				"pointer-events-none absolute left-0 top-0 h-1/2 w-3.5 rounded-bl-[6px] border-l border-b transition-colors duration-150",
+																				isSubActive
+																					? "border-stroke-sub-300 dark:border-white/40 z-10"
+																					: "border-stroke-soft-200 dark:border-white/15",
+																			)}
+																		/>
+
+																		{/* Icon matching the preview stage */}
+																		<SubItemIcon
+																			icon={sub.icon}
+																			className={cn(
+																				"mr-2 size-3.5 shrink-0 transition-colors duration-150",
+																				isSubActive
+																					? "text-text-strong-950 dark:text-white"
+																					: "text-text-soft-400 group-hover:text-text-sub-600 dark:text-white/40 dark:group-hover:text-white/70",
+																			)}
+																		/>
+																		<span className="truncate">{sub.label}</span>
+																	</button>
+																);
+															})}
+														</>
 													);
-												})}
+												})()}
 											</div>
 										)}
 									</div>
