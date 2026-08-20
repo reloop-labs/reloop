@@ -99,12 +99,12 @@ function StepRow({
 				>
 					{step.title}
 				</p>
-				<p className="text-paragraph-xs text-text-soft-400">
+				<p className="truncate text-paragraph-xs text-text-soft-400">
 					{step.description}
 				</p>
 			</div>
 			{step.complete ? (
-				<span className="flex h-5 shrink-0 items-center font-medium text-label-xs text-success-base">
+				<span className="flex h-5 shrink-0 self-center items-center font-medium text-label-xs text-success-base">
 					Done
 				</span>
 			) : step.action === "send" ? (
@@ -113,7 +113,7 @@ function StepRow({
 					variant="neutral"
 					mode="stroke"
 					size="xxsmall"
-					className="shrink-0 gap-1.5 rounded-xl"
+					className="self-center shrink-0 gap-1.5 rounded-xl"
 					disabled={ctaDisabled}
 					onClick={onSend}
 				>
@@ -124,8 +124,8 @@ function StepRow({
 						</>
 					) : (
 						<>
+							<Icon name="mail-send" className="h-3.5 w-3.5" />
 							{step.cta}
-							<Icon name="arrow-right" className="h-3.5 w-3.5" />
 						</>
 					)}
 				</Button.Root>
@@ -135,7 +135,7 @@ function StepRow({
 					variant="neutral"
 					mode="stroke"
 					size="xxsmall"
-					className="shrink-0 gap-1.5 rounded-xl"
+					className="self-center shrink-0 gap-1.5 rounded-xl"
 					onClick={() => onNavigate(step.href ?? "/")}
 				>
 					{step.cta}
@@ -297,7 +297,7 @@ export function OnboardingBanner({ isCollapsed }: { isCollapsed: boolean }) {
 							/>
 						</div>
 
-						<ol className="mt-2 divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/40">
+						<ol className="mt-4 divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/40">
 							{progress.steps.map((step, index) => (
 								<StepRow
 									key={step.id}

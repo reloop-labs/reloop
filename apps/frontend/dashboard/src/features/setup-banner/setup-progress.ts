@@ -29,11 +29,11 @@ export type SetupProgress = {
 const STEP_COPY: Record<SetupStepId, { title: string; description: string }> = {
 	domain: {
 		title: "Add a domain",
-		description: "Verify a domain so you can send as you@yourdomain.",
+		description: "Send from your own domain.",
 	},
 	send: {
 		title: "Send from your domain",
-		description: "Send a test email from hello@yourdomain to yourself.",
+		description: "Send a test email to yourself.",
 	},
 	apiKey: {
 		title: "Create an API key",
@@ -102,9 +102,8 @@ export function deriveSetupProgress({
 	let sendDisabled = false;
 
 	if (!hasDomain) {
-		sendCta = "Add a domain first";
-		sendHref = "/domain/add";
-		sendAction = undefined;
+		sendCta = "Send Email";
+		sendDisabled = true;
 	} else if (!activeDomain) {
 		sendCta = "Verify DNS";
 		const fallbackDomainId = pendingDomain?.id ?? domains[0]?.id;
@@ -118,7 +117,7 @@ export function deriveSetupProgress({
 		id: "send",
 		...STEP_COPY.send,
 		description: activeDomain
-			? `Send a test email from hello@${activeDomain.domain} to yourself.`
+			? `Send a test from hello@${activeDomain.domain}.`
 			: STEP_COPY.send.description,
 		complete: sentFromOwnDomain,
 		href: sendHref,
@@ -135,7 +134,7 @@ export function deriveSetupProgress({
 		cta: "Create API key",
 	};
 
-	const steps = [domainStep, sendStep, apiKeyStep];
+	const steps = [apiKeyStep, domainStep, sendStep];
 	const completedCount = steps.filter((s) => s.complete).length;
 
 	return {
