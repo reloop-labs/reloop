@@ -1200,7 +1200,7 @@ function VersionHistoryView() {
 	const [hoveredId, setHoveredId] = useState<string | null>(null);
 	const [toast, setToast] = useState<string | null>(null);
 	const [isUserInteracting, setIsUserInteracting] = useState(false);
-	const [cursorPos, setCursorPos] = useState({ x: 490, y: 150 });
+	const [cursorPos, setCursorPos] = useState({ x: 48, y: 72 });
 	const [cursorVisible, setCursorVisible] = useState(true);
 	const [isClicking, setIsClicking] = useState(false);
 
@@ -1252,9 +1252,7 @@ function VersionHistoryView() {
 		};
 
 		const run = async () => {
-			await wait(500);
-			pointAtRestore("v4");
-			await wait(400);
+			await wait(600);
 
 			while (!cancelled) {
 				for (const id of ["v4", "v5", "v6"] as const) {
