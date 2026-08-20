@@ -102,7 +102,14 @@ export function SceneHeader({
 			) : ctaLabel ? (
 				<div className="mt-6">
 					<Button.Root variant="neutral" mode="stroke" size="small" asChild>
-						<Link href={ctaHref}>{ctaLabel}</Link>
+						<Link href={ctaHref}>
+							{ctaLabel}
+							<Icon
+								name="arrow-right"
+								className="size-3.5 transition-transform duration-200 group-hover:translate-x-0.5"
+								aria-hidden="true"
+							/>
+						</Link>
 					</Button.Root>
 				</div>
 			) : null}
