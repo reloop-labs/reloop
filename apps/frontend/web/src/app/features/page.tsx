@@ -68,6 +68,11 @@ const productFeatures = [
 		description: "Managed SMTP with TLS, auth, and fast delivery.",
 	},
 	{
+		title: "Reloop Engine",
+		href: "/engine",
+		description: "Five synchronized layers from SMTP to autonomous agents.",
+	},
+	{
 		title: "Email Analytics",
 		href: "/features/email-analytics",
 		description: "Opens, clicks, conversions, and real-time reports.",
