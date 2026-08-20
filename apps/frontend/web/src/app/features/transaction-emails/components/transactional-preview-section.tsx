@@ -17,26 +17,19 @@ const nodejsLanguage =
 export function TransactionalPreviewSection() {
 	return (
 		<section className="w-full bg-bg-white-0 dark:bg-black">
-			{/* Title & Header */}
-			<div className="border-stroke-soft-200 border-b px-4 py-12 sm:px-6 sm:py-16 lg:px-12 lg:py-20 dark:border-white/10">
-				<div className="flex items-center gap-2">
-					<SceneGlyph icon="send-2" color="orange" />
-					<span className="font-medium text-[13.5px] text-text-strong-950 tracking-tight dark:text-white">
-						Developer Primitives
-					</span>
-				</div>
-				<h2 className="mt-3.5 max-w-3xl text-balance font-medium text-4xl text-text-strong-950 leading-[1.05] tracking-tighter sm:text-5xl dark:text-white">
-					Developer first.
-				</h2>
-			</div>
-
 			{/* Interactive Code & Live Email Preview */}
 			<div className="relative overflow-hidden">
-				<div className="relative mx-auto flex flex-col gap-10 px-4 pt-10 pb-16 sm:px-8 sm:pt-12 lg:h-[36rem] lg:flex-row lg:items-start lg:gap-8 lg:px-12">
+				<div className="relative mx-auto flex flex-col gap-10 px-4 pt-24 pb-12 sm:px-8 sm:pt-28 sm:pb-14 lg:h-[43rem] lg:flex-row lg:items-start lg:gap-8 lg:px-12 lg:pt-36 lg:pb-16">
 					{/* Left Column: Title + All Framework Icons linking to framework pages */}
-					<div className="flex w-full shrink-0 flex-col gap-6 lg:w-[32%] lg:max-w-sm">
-						<div>
-							<h3 className="font-semibold text-2xl text-text-strong-950 leading-tight tracking-tight sm:text-3xl dark:text-white">
+					<div className="flex w-full shrink-0 flex-col gap-6 lg:w-[34%] lg:max-w-sm xl:w-[36%]">
+						<div className="flex flex-col gap-3">
+							<div className="flex items-center gap-2">
+								<SceneGlyph icon="code" color="orange" />
+								<span className="font-medium text-[13.5px] text-text-strong-950 tracking-tight dark:text-white">
+									Developer First
+								</span>
+							</div>
+							<h3 className="text-balance font-medium text-4xl text-text-strong-950 leading-[1.05] tracking-tighter sm:text-5xl dark:text-white">
 								Send email from your favorite framework
 							</h3>
 						</div>
@@ -49,13 +42,16 @@ export function TransactionalPreviewSection() {
 									href={`/frameworks/${fw.slug}`}
 									title={`Send email with ${fw.name}`}
 									aria-label={`Send email with ${fw.name}`}
-									className="group flex size-12 sm:size-14 cursor-pointer items-center justify-center rounded-2xl bg-transparent transition-transform duration-150 hover:scale-105"
+									className="group flex size-12 cursor-pointer items-center justify-center rounded-2xl bg-transparent transition-transform duration-150 hover:scale-105 sm:size-14"
 								>
 									<span
-										className="flex size-9 sm:size-10 items-center justify-center"
+										className="flex size-9 items-center justify-center sm:size-10"
 										style={getBrandColorStyle(fw.icon.hex)}
 									>
-										<LanguageIcon icon={fw.icon} className="size-9 sm:size-10" />
+										<LanguageIcon
+											icon={fw.icon}
+											className="size-9 sm:size-10"
+										/>
 									</span>
 								</Link>
 							))}
@@ -65,16 +61,24 @@ export function TransactionalPreviewSection() {
 					{/* Right Column: Code block with Overlapping Live Email preview */}
 					<div className="relative w-full min-w-0 flex-1">
 						<div className="w-full max-w-xl lg:max-w-[31rem] xl:max-w-[34rem]">
-							<SdkCodeBlock
-								code={nodejsLanguage.sendCode}
-								slug="nodejs"
-							/>
+							<SdkCodeBlock code={nodejsLanguage.sendCode} slug="nodejs" />
 						</div>
-						<div className="lg:-right-4 relative z-10 mt-6 w-full max-w-sm lg:absolute lg:top-4 xl:right-0">
+						<div className="lg:-right-12 xl:-right-16 relative z-10 mt-6 w-full max-w-sm lg:absolute lg:top-4">
 							<EmailStack activeId="otp" />
 						</div>
 					</div>
 				</div>
+
+				{/* Right-side blur & fade overlay for overflowing email */}
+				<div
+					aria-hidden
+					className="pointer-events-none absolute inset-y-0 right-0 z-20 w-24 sm:w-36 lg:w-48"
+				>
+					<div className="absolute inset-0 backdrop-blur-[8px] [mask-image:linear-gradient(to_right,transparent,black_70%)]" />
+					<div className="absolute inset-0 bg-gradient-to-l from-15% from-bg-white-0 via-bg-white-0/80 to-transparent dark:from-black dark:via-black/80" />
+				</div>
+
+				{/* Bottom fade */}
 				<div
 					aria-hidden
 					className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-44 bg-gradient-to-t from-15% from-bg-white-0 via-bg-white-0/80 to-transparent dark:from-black dark:via-black/80"
