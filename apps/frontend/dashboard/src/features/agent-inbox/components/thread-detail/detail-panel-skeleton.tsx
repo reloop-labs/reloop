@@ -93,13 +93,13 @@ export const ThreadMessagesSkeleton = () => (
  */
 export const DetailPanelSkeleton = () => (
 	<div
-		className="relative flex h-full min-h-0 flex-col rounded-2xl bg-panel-light dark:bg-panel-dark"
+		className="relative flex h-full min-h-0 flex-col bg-panel-light dark:bg-panel-dark"
 		aria-busy="true"
 	>
 		<span className="sr-only">Loading message</span>
 
 		{/* ZeroThreadToolbar */}
-		<div className="flex shrink-0 items-center px-1 pb-[10px] md:px-3 md:pt-3 md:pb-[11px]">
+		<div className="flex h-11 shrink-0 items-center px-3">
 			<div className="flex flex-1 items-center gap-2">
 				<ToolbarButtonSkeleton />
 			</div>

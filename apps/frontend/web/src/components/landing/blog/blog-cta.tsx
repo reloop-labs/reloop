@@ -1,4 +1,5 @@
 import { CtaLink } from "@reloop/web/components/landing/cta";
+import type { ReactNode } from "react";
 
 type CategoryVariant = {
 	headline: string;
@@ -8,8 +9,8 @@ type CategoryVariant = {
 };
 
 const DEFAULT_VARIANT: CategoryVariant = {
-	headline: "Build in the open.",
-	sub: "Reloop is 100% open-source email infrastructure with a generous free tier. Star us on GitHub, open a PR, or deploy your own stack with zero vendor lock-in.",
+	headline: "Ship your first email in minutes",
+	sub: "Open-source, deliverability-focused, and yours to self-host or run on Reloop Cloud. No lock-in, no rewrite later.",
 	primaryLabel: "Get started free",
 };
 
@@ -80,32 +81,54 @@ export type CtaAccentColor =
 	| "amber"
 	| "primary";
 
-const ACCENT_STYLES: Record<CtaAccentColor, { bg: string; pattern: string }> = {
-	blue: {
-		bg: "from-transparent via-sky-100/75 to-blue-100/90 dark:via-sky-950/40 dark:to-blue-950/50",
-		pattern: "text-sky-500/35 dark:text-sky-400/40",
-	},
-	indigo: {
-		bg: "from-transparent via-indigo-100/75 to-purple-100/90 dark:via-indigo-950/40 dark:to-purple-950/50",
-		pattern: "text-indigo-500/35 dark:text-indigo-400/40",
-	},
-	emerald: {
-		bg: "from-transparent via-emerald-100/75 to-teal-100/90 dark:via-emerald-950/40 dark:to-teal-950/50",
-		pattern: "text-emerald-500/35 dark:text-emerald-400/40",
-	},
-	violet: {
-		bg: "from-transparent via-violet-100/75 to-fuchsia-100/90 dark:via-violet-950/40 dark:to-fuchsia-950/50",
-		pattern: "text-violet-500/35 dark:text-violet-400/40",
-	},
-	amber: {
-		bg: "from-transparent via-amber-100/75 to-orange-100/90 dark:via-amber-950/40 dark:to-orange-950/50",
-		pattern: "text-amber-500/35 dark:text-amber-400/40",
-	},
-	primary: {
-		bg: "from-transparent via-primary-base/15 to-primary-base/25 dark:via-primary-base/20 dark:to-primary-base/30",
-		pattern: "text-primary-base/35 dark:text-primary-base/40",
-	},
+type Rgb = [number, number, number];
+
+const ACCENT_RGB: Record<CtaAccentColor, { primary: Rgb; secondary: Rgb }> = {
+	blue: { primary: [56, 189, 248], secondary: [99, 102, 241] },
+	indigo: { primary: [129, 140, 248], secondary: [192, 132, 252] },
+	emerald: { primary: [52, 211, 153], secondary: [45, 212, 191] },
+	violet: { primary: [167, 139, 250], secondary: [232, 121, 249] },
+	amber: { primary: [251, 191, 36], secondary: [251, 146, 60] },
+	primary: { primary: [0, 111, 254], secondary: [56, 189, 248] },
 };
+
+function rgba(rgb: Rgb, alpha: number): string {
+	return `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${alpha})`;
+}
+
+function atmosphere(primary: Rgb, secondary: Rgb) {
+	return {
+		glow: `radial-gradient(ellipse 110% 160% at 82% 100%, ${rgba(primary, 0.3)} 0%, transparent 62%)`,
+		glowAlt: `radial-gradient(ellipse 90% 140% at 6% 0%, ${rgba(secondary, 0.22)} 0%, transparent 60%)`,
+		line: rgba(primary, 0.16),
+	};
+}
+
+function normalizeHex(hex: string): string {
+	return hex.replace("#", "").toUpperCase();
+}
+
+function hexToRgb(hex: string): Rgb {
+	const h = normalizeHex(hex);
+	return [
+		Number.parseInt(h.slice(0, 2), 16),
+		Number.parseInt(h.slice(2, 4), 16),
+		Number.parseInt(h.slice(4, 6), 16),
+	];
+}
+
+function isDimHex(hex: string): boolean {
+	const [r, g, b] = hexToRgb(hex);
+	if (normalizeHex(hex) === "000000" || normalizeHex(hex) === "000") {
+		return true;
+	}
+	return (0.299 * r + 0.587 * g + 0.114 * b) / 255 < 0.25;
+}
+
+/** Black brand marks need a lift so the bloom still reads. */
+function glowRgb(hex: string): Rgb {
+	return isDimHex(hex) ? [212, 212, 216] : hexToRgb(hex);
+}
 
 const CATEGORY_ACCENTS: Record<string, CtaAccentColor> = {
 	Engineering: "indigo",
@@ -130,10 +153,18 @@ export function BlogCta({
 	secondaryLabel,
 	secondaryHref = "/docs",
 	secondaryExternal,
+	tertiaryLabel,
+	tertiaryHref,
+	tertiaryExternal,
 	accentColor,
+	accentHex,
+	flush = false,
+	align = "split",
+	pill = true,
+	showTopRule = true,
 }: {
 	category?: string;
-	headline?: string;
+	headline?: ReactNode;
 	sub?: string;
 	primaryLabel?: string;
 	primaryHref?: string;
@@ -141,7 +172,20 @@ export function BlogCta({
 	secondaryLabel?: string;
 	secondaryHref?: string;
 	secondaryExternal?: boolean;
+	tertiaryLabel?: string;
+	tertiaryHref?: string;
+	tertiaryExternal?: boolean;
 	accentColor?: CtaAccentColor;
+	/** Brand hex (e.g. NestJS red) — tints the CTA glow and lines */
+	accentHex?: string;
+	/** Skip inner max-width rails when the page already has a frame. */
+	flush?: boolean;
+	/** `center` stacks copy and buttons. `split` keeps copy left / buttons right on large screens. */
+	align?: "split" | "center";
+	/** Pill-shaped buttons. Set false for the default FancyButton radius. */
+	pill?: boolean;
+	/** Hairline above the CTA. Turn off when a page-level separator already draws it. */
+	showTopRule?: boolean;
 }) {
 	const categoryVariant = category ? CATEGORY_VARIANTS[category] : undefined;
 	const variant = {
@@ -152,72 +196,111 @@ export function BlogCta({
 			categoryVariant?.primaryLabel ??
 			DEFAULT_VARIANT.primaryLabel,
 		secondaryLabel:
-			secondaryLabel ?? categoryVariant?.secondaryLabel ?? "Documentation",
+			secondaryLabel !== undefined
+				? secondaryLabel
+				: (categoryVariant?.secondaryLabel ??
+					(headline ? undefined : "Documentation")),
 	};
 
 	const resolvedAccent =
 		accentColor ??
 		(category ? CATEGORY_ACCENTS[category] : undefined) ??
 		"blue";
-	const colorStyle = ACCENT_STYLES[resolvedAccent] ?? ACCENT_STYLES.blue;
+	const named = ACCENT_RGB[resolvedAccent] ?? ACCENT_RGB.blue;
+	const brandRgb = accentHex ? glowRgb(accentHex) : null;
+	const fx = atmosphere(brandRgb ?? named.primary, brandRgb ?? named.secondary);
+	const lineMask =
+		"radial-gradient(ellipse 85% 95% at 88% 110%, black 0%, transparent 68%), radial-gradient(ellipse 70% 90% at 4% -5%, black 0%, transparent 62%)";
 
 	return (
 		<section className="w-full">
-			<div className="relative overflow-hidden border-stroke-soft-200 border-t bg-bg-white-0 dark:border-white/10 dark:bg-black">
-				<div className="relative z-10 mx-auto flex w-full max-w-5xl flex-col gap-6 border-stroke-soft-200 border-x px-4 py-10 sm:px-6 sm:py-12 md:max-w-7xl lg:flex-row lg:items-center lg:justify-between lg:px-8 dark:border-white/10">
-					{/* Background color gradient fill & diagonal hatch pattern */}
-					<div
-						aria-hidden
-						className="pointer-events-none absolute top-0 right-0 bottom-0 z-0 w-full sm:w-7/12"
-					>
-						{/* Soft background color tint gradient */}
+			<div
+				className={`relative overflow-hidden bg-bg-white-0 dark:bg-black ${showTopRule ? "border-stroke-soft-200 border-t dark:border-white/10" : ""}`}
+			>
+				<div
+					className={`relative z-10 mx-auto flex w-full flex-col items-center border-stroke-soft-200 px-6 text-center sm:px-10 lg:px-12 dark:border-white/10 ${
+						align === "split"
+							? "gap-6 py-10 sm:py-12 lg:flex-row lg:items-center lg:justify-between lg:text-left"
+							: "gap-8 py-20 sm:py-24 lg:py-28"
+					} ${flush ? "" : "max-w-5xl md:max-w-7xl xl:border-x"}`}
+				>
+					<div aria-hidden className="pointer-events-none absolute inset-0 z-0">
 						<div
-							className={`absolute inset-0 bg-gradient-to-r ${colorStyle.bg}`}
-							style={{
-								maskImage:
-									"linear-gradient(to right, transparent 0%, black 35%, black 100%)",
-								WebkitMaskImage:
-									"linear-gradient(to right, transparent 0%, black 35%, black 100%)",
-							}}
+							className="absolute inset-0"
+							style={{ backgroundImage: fx.glow }}
 						/>
-						{/* Diagonal hatch lines */}
 						<div
-							className={`absolute inset-0 ${colorStyle.pattern}`}
+							className="absolute inset-0"
+							style={{ backgroundImage: fx.glowAlt }}
+						/>
+						<div
+							className="absolute inset-0"
 							style={{
-								backgroundImage:
-									"repeating-linear-gradient(-45deg, transparent 0, transparent 2px, currentColor 2px, currentColor 2.8px)",
-								maskImage:
-									"linear-gradient(to right, transparent 0%, black 30%, black 100%)",
-								WebkitMaskImage:
-									"linear-gradient(to right, transparent 0%, black 30%, black 100%)",
+								backgroundImage: `repeating-linear-gradient(-45deg, transparent 0, transparent 3px, ${fx.line} 3px, ${fx.line} 3.55px)`,
+								maskImage: lineMask,
+								WebkitMaskImage: lineMask,
 							}}
 						/>
 					</div>
 
-					<div className="relative z-10 max-w-3xl">
-						<h2 className="font-medium font-sans text-3xl text-text-strong-950 leading-tight tracking-tight sm:text-4xl lg:text-[2.5rem] dark:text-white">
+					<div
+						className={`relative z-10 ${align === "center" ? "mx-auto max-w-5xl" : "max-w-3xl"}`}
+					>
+						<h2
+							className={
+								align === "center"
+									? "font-semibold text-[40px] text-text-strong-950 leading-[1.12] tracking-tight sm:text-[48px] lg:text-[56px] dark:text-white"
+									: "text-balance font-semibold text-text-strong-950 text-xl leading-snug tracking-tight sm:text-2xl lg:text-[1.65rem] dark:text-white"
+							}
+						>
 							{variant.headline}
 						</h2>
-						<p className="mt-3 max-w-xl text-base text-text-sub-600 leading-relaxed sm:text-lg dark:text-white/60">
-							{variant.sub}
-						</p>
+						{variant.sub ? (
+							<p
+								className={
+									align === "center"
+										? "mx-auto mt-5 max-w-sm text-balance text-[13px] text-text-sub-600 leading-6 dark:text-white/55"
+										: "mt-3 max-w-xl text-balance text-[14px] text-text-sub-600 leading-relaxed sm:text-[14.5px] dark:text-white/70"
+								}
+							>
+								{variant.sub}
+							</p>
+						) : null}
 					</div>
 
-					<div className="relative z-10 flex shrink-0 flex-wrap items-center gap-3">
-						<CtaLink
-							label={variant.secondaryLabel}
-							href={secondaryHref}
-							external={secondaryExternal}
-							filled={false}
-							isSecondery
-						/>
+					<div
+						className={`relative z-10 flex shrink-0 flex-wrap items-center justify-center gap-3 ${
+							align === "split" ? "lg:justify-start" : ""
+						}`}
+					>
 						<CtaLink
 							label={variant.primaryLabel}
 							href={primaryHref}
 							external={primaryExternal}
 							filled
 							variant="neutral"
+							pill={pill}
 						/>
+						{variant.secondaryLabel && (
+							<CtaLink
+								label={variant.secondaryLabel}
+								href={secondaryHref}
+								external={secondaryExternal}
+								filled={false}
+								isSecondery
+								pill={pill}
+							/>
+						)}
+						{tertiaryLabel && tertiaryHref ? (
+							<CtaLink
+								label={tertiaryLabel}
+								href={tertiaryHref}
+								external={tertiaryExternal}
+								filled={false}
+								isSecondery
+								pill={pill}
+							/>
+						) : null}
 					</div>
 				</div>
 			</div>

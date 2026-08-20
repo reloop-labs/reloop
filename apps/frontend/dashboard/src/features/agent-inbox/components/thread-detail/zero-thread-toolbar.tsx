@@ -153,7 +153,7 @@ export const ZeroThreadToolbar = ({
 	}, []);
 
 	return (
-		<div className="flex shrink-0 items-center gap-1 px-1 pb-[10px] md:px-3 md:pt-3 md:pb-[11px]">
+		<div className="flex h-11 shrink-0 items-center gap-1 px-3">
 			{(showBack || onClose) && (
 				<>
 					<ActionButton

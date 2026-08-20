@@ -6,13 +6,11 @@ import { CompareHero } from "./compare-hero";
 export function ComparisonPageShell({
 	pagePath,
 	titleLines,
-	description,
-	primaryCta,
-	secondaryCta,
 	children,
 }: {
 	pagePath: string;
 	titleLines: string[];
+	/** Kept so existing compare pages can still pass hero copy. */
 	description?: string;
 	primaryCta?: FeatureCtaLink;
 	secondaryCta?: FeatureCtaLink;
@@ -28,9 +26,7 @@ export function ComparisonPageShell({
 			 */}
 			<CompareHero
 				titleLines={titleLines}
-				description={description}
-				primaryCta={primaryCta}
-				secondaryCta={secondaryCta}
+				competitorName={brand?.name}
 				icon={brand?.icon}
 			/>
 			{children}

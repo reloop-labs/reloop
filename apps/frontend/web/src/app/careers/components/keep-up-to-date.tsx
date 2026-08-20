@@ -13,7 +13,7 @@ const updateCards: UpdateCard[] = [
 	{
 		title: "LinkedIn",
 		description: "Keep up to date with what the team is building.",
-		href: "https://linkedin.com/company/reloop",
+		href: "https://www.linkedin.com/company/reloop-labs",
 		external: true,
 		iconName: "linkedin",
 	},

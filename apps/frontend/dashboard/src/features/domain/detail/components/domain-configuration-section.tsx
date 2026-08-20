@@ -5,6 +5,7 @@ import { Icon } from "@reloop/ui/icon";
 import * as Switch from "@reloop/ui/switch";
 import { AnimatePresence, motion } from "framer-motion";
 import { useMemo, useRef, useState } from "react";
+import { DNS_RECORD_DOCS } from "#/features/domain/dns-provider";
 import type { DomainResponse } from "#/features/domain/types";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import { useClipboard } from "../hooks/use-clipboard";
@@ -230,7 +231,7 @@ export const DomainConfigurationSection = ({
 						>
 							<div className="mb-3 flex items-start justify-between gap-4">
 								<a
-									href="https://reloop.sh/docs/dns/cname"
+									href={DNS_RECORD_DOCS.cname}
 									target="_blank"
 									rel="noreferrer"
 									className="group flex items-center gap-1 hover:underline"

@@ -51,6 +51,21 @@ interface InjectRequest {
 	content: string;
 }
 
+/** KumoMTA inject recipients/envelope require bare addresses, not "Name <email>". */
+function toBareEmail(value: string): string {
+	let current = value.trim();
+	for (let i = 0; i < 5; i++) {
+		const angled = current.match(/<([^<>]+@[^<>]+)>/);
+		if (angled?.[1]) {
+			current = angled[1].trim();
+			continue;
+		}
+		break;
+	}
+	const match = current.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
+	return (match?.[0] ?? current).trim().toLowerCase();
+}
+
 export class KumomtaClient {
 	private baseUrl: string;
 	private timeoutMs: number;
@@ -92,31 +107,32 @@ export class KumomtaClient {
 		const content = await buildRfcMessage(options);
 
 		// Deduplicate recipients across To, CC, and BCC to avoid multiple
-		// deliveries to the same address
+		// deliveries to the same address. Envelope RCPT must be bare emails —
+		// RFC 5322 "Name <email>" forms are only valid in message headers.
 		const recipientSet = new Set<string>();
 
 		for (const email of toList) {
-			recipientSet.add(email.toLowerCase().trim());
+			const bare = toBareEmail(email);
+			if (bare) recipientSet.add(bare);
 		}
 
 		if (options.cc) {
 			const ccList = Array.isArray(options.cc) ? options.cc : [options.cc];
 			for (const email of ccList) {
-				recipientSet.add(email.toLowerCase().trim());
+				const bare = toBareEmail(email);
+				if (bare) recipientSet.add(bare);
 			}
 		}
 
 		if (options.bcc) {
 			const bccList = Array.isArray(options.bcc) ? options.bcc : [options.bcc];
 			for (const email of bccList) {
-				recipientSet.add(email.toLowerCase().trim());
+				const bare = toBareEmail(email);
+				if (bare) recipientSet.add(bare);
 			}
 		}
 
-		// KumoMTA envelope_sender requires a bare email address, not
-		// RFC 5322 "Display Name <email>" format.
-		const angleMatch = options.from.match(/<([^>]+)>/);
-		const envelopeSender = angleMatch?.[1] ?? options.from;
+		const envelopeSender = toBareEmail(options.from);
 
 		const payload: InjectRequest = {
 			envelope_sender: envelopeSender,

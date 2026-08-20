@@ -14,3 +14,18 @@ apps/frontend/web/.env
 apps/frontend/web/.env.*
 apps/frontend/web/.env.local
 apps/frontend/web/.env.dev
+
+# Secrets: every Dockerfile does `COPY . .`, so anything left here is baked into
+# an image layer. Inject env at runtime and certificates via mounts instead.
+**/.env
+**/.env.*
+**/*.pem
+**/*.key
+**/*.p12
+**/*.pfx
+**/id_rsa*
+**/id_ed25519*
+**/credentials
+**/credentials.json
+**/*.keystore
+local/certs

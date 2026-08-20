@@ -5,10 +5,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ChangelogGridBody, ChangelogGridHero } from "./changelog-grid";
 import { ChangelogTimeline } from "./changelog-timeline";
-import { changelogReleases } from "./changelog-utils";
+import { getChangelogReleases } from "./changelog-utils";
 
-// TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
-// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
+// Cache configuration
 export const instant = false;
 
 const pageUrl = `${getSiteUrl()}/changelog`;
@@ -65,9 +64,11 @@ type PageProps = {
 const ChangelogPage = async ({ searchParams }: PageProps) => {
 	const { year } = await searchParams;
 
+	const allReleases = getChangelogReleases();
+
 	const availableYears = Array.from(
 		new Set(
-			changelogReleases
+			allReleases
 				.map((r) => r.date.match(/\d{4}/)?.[0])
 				.filter(Boolean) as string[],
 		),
@@ -76,7 +77,7 @@ const ChangelogPage = async ({ searchParams }: PageProps) => {
 	const activeYear =
 		year && availableYears.includes(year) ? year : availableYears[0] || "2026";
 
-	const filteredReleases = changelogReleases.filter(
+	const filteredReleases = allReleases.filter(
 		(r) => (r.date.match(/\d{4}/)?.[0] || "") === activeYear,
 	);
 
@@ -91,7 +92,7 @@ const ChangelogPage = async ({ searchParams }: PageProps) => {
 		<div>
 			<ChangelogGridHero>
 				<div>
-					<h1 className="max-w-3xl font-semibold text-xl text-text-strong-950 leading-snug tracking-tight sm:text-2xl lg:text-[1.65rem] dark:text-white">
+					<h1 className="max-w-3xl font-semibold text-text-strong-950 text-xl leading-snug tracking-tight sm:text-2xl lg:text-[1.65rem] dark:text-white">
 						Changelog
 					</h1>
 					<p className="mt-3 max-w-2xl text-[14px] text-text-sub-600 leading-relaxed sm:text-[14.5px] dark:text-white/60">
@@ -129,18 +130,22 @@ const ChangelogPage = async ({ searchParams }: PageProps) => {
 
 			{/* Full-width Year Navigation Bar with top border touching the whole width */}
 			{(newerYear || olderYear) && (
-				<section className="relative w-full border-t border-stroke-soft-200 bg-bg-white-0 text-text-strong-950 dark:border-white/10 dark:bg-black dark:text-white">
+				<section className="relative w-full border-stroke-soft-200 border-t bg-bg-white-0 text-text-strong-950 dark:border-white/10 dark:bg-black dark:text-white">
 					<div className="mx-auto w-full max-w-5xl border-stroke-soft-200 border-x md:max-w-7xl dark:border-white/10">
 						<div className="grid grid-cols-2 divide-x divide-stroke-soft-200 dark:divide-white/10">
 							{/* Left half */}
 							{newerYear ? (
 								<Link
-									href={newerYear === "2026" ? "/changelog" : `/changelog?year=${newerYear}`}
-									className="group flex items-center justify-start px-6 py-7 sm:px-10 lg:px-12 transition-colors hover:bg-bg-weak-50/80 dark:hover:bg-white/[0.03]"
+									href={
+										newerYear === "2026"
+											? "/changelog"
+											: `/changelog?year=${newerYear}`
+									}
+									className="group flex items-center justify-start px-6 py-7 transition-colors hover:bg-bg-weak-50/80 sm:px-10 lg:px-12 dark:hover:bg-white/[0.03]"
 								>
 									<div className="inline-flex items-center gap-1.5 font-medium text-[13.5px] text-text-strong-950 dark:text-white">
 										<svg
-											className="size-3.5 transition-transform duration-200 group-hover:-translate-x-0.5"
+											className="group-hover:-translate-x-0.5 size-3.5 transition-transform duration-200"
 											fill="none"
 											viewBox="0 0 24 24"
 											stroke="currentColor"
@@ -164,7 +169,7 @@ const ChangelogPage = async ({ searchParams }: PageProps) => {
 							{olderYear ? (
 								<Link
 									href={`/changelog?year=${olderYear}`}
-									className="group flex items-center justify-end px-6 py-7 sm:px-10 lg:px-12 transition-colors hover:bg-bg-weak-50/80 dark:hover:bg-white/[0.03]"
+									className="group flex items-center justify-end px-6 py-7 transition-colors hover:bg-bg-weak-50/80 sm:px-10 lg:px-12 dark:hover:bg-white/[0.03]"
 								>
 									<div className="inline-flex items-center gap-1.5 font-medium text-[13.5px] text-text-strong-950 dark:text-white">
 										<span>{olderYear}</span>

@@ -1,4 +1,4 @@
-import * as Input from "@reloop/ui/input";
+import { inspectorFieldClassName } from "./scrub-field";
 
 export function TextInput({
 	value,
@@ -12,19 +12,15 @@ export function TextInput({
 	disabled?: boolean;
 }) {
 	return (
-		<Input.Root
-			size="xsmall"
-			className="border border-stroke-sub-300 shadow-none before:hidden"
-		>
-			<Input.Wrapper>
-				<Input.Input
-					type="text"
-					value={value}
-					onChange={(e) => onChange(e.target.value)}
-					placeholder={placeholder}
-					disabled={disabled}
-				/>
-			</Input.Wrapper>
-		</Input.Root>
+		<div className={inspectorFieldClassName}>
+			<input
+				type="text"
+				value={value}
+				onChange={(e) => onChange(e.target.value)}
+				placeholder={placeholder}
+				disabled={disabled}
+				className="min-w-0 flex-1 bg-transparent text-sm text-text-strong-950 outline-none placeholder:text-text-soft-400 disabled:text-text-disabled-300"
+			/>
+		</div>
 	);
 }

@@ -1,33 +1,25 @@
+import { Icon } from "@reloop/ui/icon";
 import Link from "next/link";
-
-const allComparisons = [
-	{ href: "/compare/resend", label: "Resend" },
-	{ href: "/compare/mailgun", label: "Mailgun" },
-	{ href: "/compare/sendgrid", label: "SendGrid" },
-	{ href: "/compare/aws-ses", label: "AWS SES" },
-	{ href: "/compare/postmark", label: "Postmark" },
-	{ href: "/compare/loops", label: "Loops" },
-	{ href: "/compare/mailchimp", label: "Mailchimp" },
-];
+import { ComparisonBrandCards } from "./comparison-grid";
 
 export function CompareOtherLinks({ currentHref }: { currentHref: string }) {
-	const others = allComparisons.filter((item) => item.href !== currentHref);
-
 	return (
-		<div className="mx-auto max-w-3xl">
-			<p className="text-center font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em]">
-				More comparisons
-			</p>
-			<div className="mt-4 flex flex-wrap justify-center gap-2">
-				{others.map((item) => (
-					<Link
-						key={item.href}
-						href={item.href}
-						className="rounded-full border border-stroke-soft-200 px-4 py-2 font-semibold text-[14px] text-text-strong-950 transition-colors hover:border-primary-base/40 hover:text-primary-base dark:border-white/10 dark:text-white"
-					>
-						vs {item.label}
-					</Link>
-				))}
+		<div className="w-full">
+			<div className="flex items-end justify-between gap-4">
+				<h2 className="font-semibold text-text-strong-950 text-xl tracking-tight sm:text-2xl lg:text-[1.65rem] dark:text-white">
+					More comparisons
+				</h2>
+				<Link
+					href="/compare"
+					className="hidden items-center gap-1 font-medium text-[13px] text-text-sub-600 transition-colors hover:text-text-strong-950 sm:inline-flex dark:text-white/50 dark:hover:text-white"
+				>
+					View all
+					<Icon name="arrow-right" className="size-3.5" aria-hidden />
+				</Link>
+			</div>
+
+			<div className="mt-8">
+				<ComparisonBrandCards excludeHref={currentHref} />
 			</div>
 		</div>
 	);

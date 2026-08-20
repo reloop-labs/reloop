@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { PostHogProvider } from "@reloop/analytics";
 import { IconsSprite } from "@reloop/ui/icons-sprite";
-import { RybbitLoader } from "@reloop/ui/rybbit-loader";
 import { AgentDirective } from "@reloop/web/components/agent-directive";
 import { Footer } from "@reloop/web/components/footer";
 import { Header } from "@reloop/web/components/header";
@@ -89,31 +89,32 @@ export default function RootLayout({
 				className={`${geistSans.variable} ${geistMono.variable} min-h-full overscroll-y-none bg-bg-white-0 antialiased`}
 				style={{ fontFamily: "var(--font-inter), sans-serif" }}
 			>
-				<ThemeProvider
-					attribute="class"
-					defaultTheme="system"
-					enableSystem
-					disableTransitionOnChange
-				>
-					{/*
-					  Main before header in DOM for earlier content-start in agent HTML→text
-					  conversion; CSS order keeps header on top visually.
-					*/}
-					<div className="flex min-h-full flex-col">
-						<main className="relative order-2 flex-1">
-							<AgentDirective />
-							{children}
-						</main>
-						<div className="order-1">
-							<Header />
+				<PostHogProvider>
+					<ThemeProvider
+						attribute="class"
+						defaultTheme="system"
+						enableSystem
+						disableTransitionOnChange
+					>
+						{/*
+						  Main before header in DOM for earlier content-start in agent HTML→text
+						  conversion; CSS order keeps header on top visually.
+						*/}
+						<div className="flex min-h-full flex-col">
+							<main className="relative order-2 flex-1">
+								<AgentDirective />
+								{children}
+							</main>
+							<div className="order-1">
+								<Header />
+							</div>
+							<div className="order-3">
+								<Footer />
+							</div>
 						</div>
-						<div className="order-3">
-							<Footer />
-						</div>
-					</div>
-					<IconsSprite />
-					<RybbitLoader />
-				</ThemeProvider>
+						<IconsSprite />
+					</ThemeProvider>
+				</PostHogProvider>
 			</body>
 		</html>
 	);

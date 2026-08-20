@@ -161,7 +161,7 @@ const AwsSesComparisonPage = () => {
 					Many SES teams already run on AWS. Reloop deploys via Docker Compose,
 					EKS, or ECS—see our{" "}
 					<Link
-						href="/docs/self-host"
+						href="/self-host"
 						className="font-semibold text-primary-base"
 					>
 						self-hosting guide
@@ -194,7 +194,7 @@ const AwsSesComparisonPage = () => {
 				compact
 			/>
 
-			<PageSection narrow>
+			<PageSection>
 				<CompareOtherLinks currentHref={pagePath} />
 			</PageSection>
 		</ComparisonPageShell>

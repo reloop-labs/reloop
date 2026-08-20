@@ -32,7 +32,7 @@ export function BlogPostCoverImage({
 		}
 
 		return (
-			<div className="relative aspect-[16/10] overflow-hidden rounded-xl border border-stroke-soft-200 dark:border-white/10">
+			<div className="relative aspect-[16/10] overflow-hidden rounded-xl">
 				<Image
 					src={image}
 					alt={alt}

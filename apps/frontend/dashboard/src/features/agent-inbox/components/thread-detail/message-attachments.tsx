@@ -1,5 +1,6 @@
 import { cn } from "@reloop/ui/cn";
 import { FileText, HardDriveDownload, Image as ImageIcon } from "lucide-react";
+import { apiFetch } from "#/features/agent-inbox/lib/api-fetch";
 
 export interface AttachmentItem {
 	id?: string;
@@ -89,7 +90,7 @@ export const downloadAttachment = async (
 	if (!msgId || !file.id) return;
 
 	const url = `/api/inbox/v1/messages/${msgId}/attachments/${file.id}`;
-	const res = await fetch(url);
+	const res = await apiFetch(url);
 	if (!res.ok) return;
 
 	const meta = (await res.json()) as {

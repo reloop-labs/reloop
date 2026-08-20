@@ -1,35 +1,29 @@
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
-import * as Input from "@reloop/ui/input";
 import { AnimatePresence, motion } from "framer-motion";
-import { useRouter } from "next/navigation";
-import { parseAsString, parseAsStringLiteral, useQueryState } from "nuqs";
+import { parseAsArrayOf, parseAsString, useQueryState } from "nuqs";
 import { useEffect, useMemo, useState } from "react";
-import { useHotkeys } from "react-hotkeys-hook";
 import type { CommandAction } from "#/features/dashboard/command-menu";
 import { useRegisterCommandActions } from "#/features/dashboard/command-menu-context";
 import {
+	useCreateTemplate,
 	useInvalidateTemplates,
 	useTemplatesQuery,
 } from "#/features/templates/hooks/use-templates-query";
 import { TemplatesListHeader } from "../templates-list-header";
 import { EmptyState } from "./empty-state";
-import {
-	type TemplateStatusFilter,
-	TemplateStatusFilterDropdown,
-} from "./status-filter-dropdown";
 import { TemplateGrid } from "./template-grid";
+import { TemplateListToolbar } from "./template-list-toolbar";
+
+const DOCS_URL = "https://reloop.sh/docs/learn/templates";
 
 export function TemplateList() {
-	const router = useRouter();
+	const { create } = useCreateTemplate();
 	const invalidate = useInvalidateTemplates();
-	const [searchQuery, setSearchQuery] = useQueryState(
-		"q",
-		parseAsString.withDefault(""),
-	);
-	const [statusFilter, setStatusFilter] = useQueryState(
+	const [searchQuery] = useQueryState("q", parseAsString.withDefault(""));
+	const [statusFilter] = useQueryState(
 		"status",
-		parseAsStringLiteral(["draft", "published", "archived"] as const),
+		parseAsArrayOf(parseAsString).withDefault([]),
 	);
 	const [deletedName, setDeletedName] = useState<string | null>(null);
 
@@ -43,39 +37,20 @@ export function TemplateList() {
 				label: "Create Template",
 				icon: "plus",
 				shortcut: { label: "C", keys: ["c"] },
-				onSelect: () => router.push("/templates/new"),
+				onSelect: () => void create(),
 			},
 			{
 				id: "go-to-docs",
 				label: "Go to Docs",
 				icon: "file-text",
 				shortcut: { label: "D", keys: ["d"] },
-				onSelect: () =>
-					window.open("https://reloop.sh/docs/learn/templates", "_blank"),
+				onSelect: () => window.open(DOCS_URL, "_blank"),
 			},
 		],
-		[router],
+		[create],
 	);
 
 	useRegisterCommandActions("templates", "Templates", actions);
-
-	useHotkeys(
-		"c",
-		(e) => {
-			e.preventDefault();
-			router.push("/templates/new");
-		},
-		{ enableOnFormTags: false, preventDefault: true },
-	);
-
-	useHotkeys(
-		"d",
-		(e) => {
-			e.preventDefault();
-			window.open("https://reloop.sh/docs/learn/templates", "_blank");
-		},
-		{ enableOnFormTags: false, preventDefault: true },
-	);
 
 	useEffect(() => {
 		if (deletedName) {
@@ -85,10 +60,13 @@ export function TemplateList() {
 	}, [deletedName]);
 
 	const filteredTemplates = useMemo(() => {
-		const q = (searchQuery ?? "").trim().toLowerCase();
+		const q = searchQuery.trim().toLowerCase();
+		const statuses = statusFilter;
 		return (
 			data?.templates?.filter((template) => {
-				if (statusFilter && template.status !== statusFilter) return false;
+				if (statuses.length > 0 && !statuses.includes(template.status)) {
+					return false;
+				}
 				if (!q) return true;
 				return (
 					template.name.toLowerCase().includes(q) ||
@@ -99,12 +77,6 @@ export function TemplateList() {
 	}, [data?.templates, searchQuery, statusFilter]);
 
 	const hasAnyTemplates = (data?.templates?.length ?? 0) > 0;
-	const isFiltered = !!statusFilter || (searchQuery ?? "").trim() !== "";
-
-	const clearFilters = () => {
-		void setSearchQuery("");
-		void setStatusFilter(null);
-	};
 
 	return (
 		<div className="mx-auto max-w-6xl space-y-6 p-6 lg:p-8">
@@ -161,53 +133,12 @@ export function TemplateList() {
 				</div>
 			) : (
 				<div className="pb-8">
-					<div className="flex items-center gap-2">
-						<div className="flex-1">
-							<Input.Root size="small" className="rounded-xl">
-								<Input.Wrapper>
-									<Input.Icon as={Icon} name="search" size="small" />
-									<Input.Input
-										type="text"
-										placeholder="Search templates..."
-										value={searchQuery ?? ""}
-										onChange={(e) => void setSearchQuery(e.target.value)}
-									/>
-									{(searchQuery ?? "") && (
-										<button
-											type="button"
-											onMouseDown={(e) => e.preventDefault()}
-											onClick={() => void setSearchQuery("")}
-											className="mr-1 rounded p-0.5 text-text-soft-400 transition-colors hover:bg-neutral-alpha-10 hover:text-text-strong-950"
-										>
-											<Icon name="cross" className="h-3 w-3" />
-										</button>
-									)}
-								</Input.Wrapper>
-							</Input.Root>
-						</div>
-						<div className="flex items-center gap-2">
-							<TemplateStatusFilterDropdown
-								value={(statusFilter as TemplateStatusFilter) ?? null}
-								onChange={(status) => void setStatusFilter(status)}
-							/>
-							<button
-								type="button"
-								onClick={() => void invalidate()}
-								className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-white-0 text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-stroke-soft-100/40"
-								title="Refresh templates"
-							>
-								<Icon name="rotate-cw" className="h-4 w-4" />
-							</button>
-						</div>
-					</div>
+					<TemplateListToolbar />
 
 					<div className="mt-4">
 						{!isLoading && filteredTemplates.length === 0 ? (
 							<div className="overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40">
-								<EmptyState
-									isFiltered={isFiltered}
-									onClearFilters={clearFilters}
-								/>
+								<EmptyState />
 							</div>
 						) : (
 							<TemplateGrid

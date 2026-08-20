@@ -5,7 +5,7 @@ export type InboundThreadStatus =
 	| "handled"
 	| "blocked";
 
-export type InboxView = "primary" | "alerts" | "person" | "tag";
+export type InboxView = "all" | "unread" | "needs_approval" | "starred";
 
 export type TimelineStepState = "done" | "active" | "pending";
 
@@ -81,6 +81,8 @@ export interface InboundThread {
 	entityTag?: "invoice" | "support" | "order" | "security";
 	direction?: "inbound" | "outbound";
 	toEmails?: string[];
+	ccEmails?: string[];
+	bccEmails?: string[];
 	attachments?: InboundAttachment[];
 	parsed?: Record<string, unknown>;
 	timeline: InboundTimelineStep[];
@@ -88,6 +90,7 @@ export interface InboundThread {
 
 export type BatchThreadAction =
 	| "archive"
+	| "unarchive"
 	| "trash"
 	| "restore"
 	| "star"
@@ -148,12 +151,12 @@ export type SaveComposeDraftInput = {
 export const INBOX_VIEWS: {
 	id: InboxView;
 	label: string;
-	icon: "zap" | "alert-triangle" | "user" | "tag";
+	icon: "inbox" | "mail-single" | "alert-triangle" | "star";
 }[] = [
-	{ id: "primary", label: "Primary", icon: "zap" },
-	{ id: "alerts", label: "Alerts", icon: "alert-triangle" },
-	{ id: "person", label: "Person", icon: "user" },
-	{ id: "tag", label: "Tag", icon: "tag" },
+	{ id: "all", label: "All", icon: "inbox" },
+	{ id: "unread", label: "Unread", icon: "mail-single" },
+	{ id: "needs_approval", label: "To review", icon: "alert-triangle" },
+	{ id: "starred", label: "Starred", icon: "star" },
 ];
 
 export const SECURITY_LEVEL_LABELS: Record<

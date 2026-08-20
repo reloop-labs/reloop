@@ -1,4 +1,6 @@
-import * as InputPrimitive from "@reloop/ui/input";
+"use client";
+
+import { ScrubField } from "./scrub-field";
 
 /* ------------------------------------------------------------------ */
 /* Inline number input styled like the reference UI                     */
@@ -8,32 +10,30 @@ export function NumInput({
 	onChange,
 	placeholder,
 	unit,
+	label = "Value",
+	min,
+	max,
+	step,
 }: {
 	value: string | number | undefined;
 	onChange: (v: number | "") => void;
 	placeholder?: string;
 	unit?: string;
+	label?: string;
+	min?: number;
+	max?: number;
+	step?: number;
 }) {
 	return (
-		<InputPrimitive.Root
-			size="xsmall"
-			className="flex-1 rounded-xl border border-stroke-sub-300 shadow-none before:hidden"
-		>
-			<InputPrimitive.Wrapper>
-				<InputPrimitive.Input
-					placeholder={placeholder ?? "0"}
-					value={value ?? ""}
-					onChange={(e) => {
-						const raw = e.target.value;
-						onChange(raw === "" ? "" : Number.parseFloat(raw));
-					}}
-				/>
-				{unit && (
-					<InputPrimitive.InlineAffix className="text-text-strong-950">
-						{unit}
-					</InputPrimitive.InlineAffix>
-				)}
-			</InputPrimitive.Wrapper>
-		</InputPrimitive.Root>
+		<ScrubField
+			label={label}
+			value={value}
+			onChange={onChange}
+			placeholder={placeholder}
+			suffix={unit}
+			min={min}
+			max={max}
+			step={step}
+		/>
 	);
 }

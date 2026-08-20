@@ -26,7 +26,7 @@ test.describe("onboarding — new account", () => {
 			);
 		});
 		await expect(
-			page.getByRole("heading", { name: "Create your workspace" }),
+			page.getByRole("heading", { name: "Create your account" }),
 		).toBeVisible();
 		await expect(
 			page.getByRole("button", { name: "Create organization" }),

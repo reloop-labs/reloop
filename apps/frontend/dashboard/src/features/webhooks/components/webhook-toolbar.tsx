@@ -1,6 +1,8 @@
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
+import { useCallback } from "react";
+import { useToolbarRefresh } from "#/components/data-table/use-toolbar-refresh";
 import {
 	Select,
 	SelectContent,
@@ -57,6 +59,10 @@ export const WebhookToolbar = ({
 	onStatusFilterChange,
 }: WebhookToolbarProps) => {
 	const invalidate = useInvalidateWebhooks();
+	const onRefresh = useCallback(() => {
+		void invalidate();
+	}, [invalidate]);
+	const { isRefreshing, refresh } = useToolbarRefresh(onRefresh);
 	const selectedOption =
 		statusOptions.find((o) => o.id === statusFilter) || statusOptions[0];
 
@@ -117,11 +123,20 @@ export const WebhookToolbar = ({
 				</Select>
 				<button
 					type="button"
-					onClick={() => void invalidate()}
-					className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-white-0 text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-stroke-soft-100/40"
+					onClick={refresh}
+					disabled={isRefreshing}
+					className={cn(
+						"flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-white-0 text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-stroke-soft-100/40",
+						isRefreshing ? "pointer-events-none" : "cursor-pointer",
+					)}
 					title="Refresh webhooks"
+					aria-label="Refresh webhooks"
+					aria-busy={isRefreshing}
 				>
-					<Icon name="rotate-cw" className="h-4 w-4" />
+					<Icon
+						name="rotate-cw"
+						className={cn("h-4 w-4", isRefreshing && "animate-spin")}
+					/>
 				</button>
 			</div>
 		</div>

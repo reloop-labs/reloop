@@ -41,4 +41,3 @@ export async function navigatePostAuth(
 
 	router.push(destination);
 }
-

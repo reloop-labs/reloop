@@ -3,7 +3,6 @@
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { BlogPostCard } from "@reloop/web/components/landing/blog/blog-post-card";
-import { BlogPostFeaturedCard } from "@reloop/web/components/landing/blog/blog-post-featured-card";
 import { filterBlogPosts } from "@reloop/web/lib/landing/blog/utils";
 import type {
 	BlogCategoryDefinition,
@@ -58,22 +57,14 @@ export function BlogIndex({
 			{/* Header & Filter Section */}
 			<div className="mx-auto w-full max-w-5xl border-stroke-soft-200 border-x px-4 pt-32 pb-0 sm:px-6 md:max-w-7xl lg:px-8 dark:border-white/10">
 				{breadcrumb}
-				{!activeCategorySlug && !query && filteredPosts[0] ? (
-					<div className="mb-4">
-						<BlogPostFeaturedCard post={filteredPosts[0]} />
-					</div>
-				) : (
-					<>
-						<h1 className="font-sans text-[2.8rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[3.6rem] lg:text-[4.2rem] dark:text-white">
-							{title}
-						</h1>
-						{description ? (
-							<p className="mt-4 max-w-2xl text-[15px] text-text-sub-600 leading-relaxed dark:text-white/50">
-								{description}
-							</p>
-						) : null}
-					</>
-				)}
+				<h1 className="font-sans font-semibold text-[2.4rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[3.2rem] lg:text-[3.6rem] dark:text-white">
+					{title}
+				</h1>
+				{description ? (
+					<p className="mt-3 max-w-2xl text-[15px] text-text-sub-600 leading-relaxed sm:text-[16px] dark:text-white/60">
+						{description}
+					</p>
+				) : null}
 
 				<div className="-mx-4 sm:-mx-6 lg:-mx-8 mt-8 border-stroke-soft-200 border-y px-4 py-4 sm:px-6 lg:px-8 dark:border-white/10">
 					<div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
@@ -149,10 +140,7 @@ export function BlogIndex({
 					</div>
 				) : (
 					<div className="grid gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
-						{(!activeCategorySlug && !query
-							? filteredPosts.slice(1)
-							: filteredPosts
-						).map((post) => (
+						{filteredPosts.map((post) => (
 							<BlogPostCard key={post.slug} post={post} />
 						))}
 					</div>

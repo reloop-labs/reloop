@@ -47,6 +47,69 @@ const config = {
 				destination: "/guides/connect-domain/:path*",
 				permanent: true,
 			},
+			// Old /docs/dns/* bookmarks → DNS records explained
+			{
+				source: "/dns",
+				destination: "/guides/connect-domain/dns-records-explained",
+				permanent: true,
+			},
+			{
+				source: "/dns/:path*",
+				destination: "/guides/connect-domain/dns-records-explained",
+				permanent: true,
+			},
+			// Old /docs/domains shortcut used by dashboard hotkeys
+			{
+				source: "/domains",
+				destination: "/learn/domain",
+				permanent: true,
+			},
+			// Renamed / legacy product docs paths from the dashboard
+			{
+				source: "/features/contacts",
+				destination: "/learn/contacts",
+				permanent: true,
+			},
+			{
+				source: "/features/contacts/:path*",
+				destination: "/learn/contacts/:path*",
+				permanent: true,
+			},
+			{
+				source: "/learn/automations",
+				destination: "/learn/workflows",
+				permanent: true,
+			},
+			{
+				source: "/api-reference/api-keys",
+				destination: "/api/api-key/get-api-api-key-v1",
+				permanent: true,
+			},
+			{
+				source: "/api-reference/contacts",
+				destination: "/api/contacts/post-api-contacts-create",
+				permanent: true,
+			},
+			{
+				source: "/api/contacts",
+				destination: "/api/contacts/get-api-contacts-list",
+				permanent: true,
+			},
+			{
+				source: "/api/api-key",
+				destination: "/api/api-key/get-api-api-key-v1",
+				permanent: true,
+			},
+			{
+				source: "/email",
+				destination: "/setup/backend/email",
+				permanent: true,
+			},
+			{
+				source: "/setup/email",
+				destination: "/setup/backend/email",
+				permanent: true,
+			},
 		];
 	},
 	async rewrites() {
@@ -55,18 +118,6 @@ const config = {
 			{
 				source: "/:path*.md",
 				destination: "/api/markdown/:path*",
-			},
-			{
-				source: "/api/script.js",
-				destination: "https://rybbit.reloop.sh/api/script.js",
-			},
-			{
-				source: "/api/track",
-				destination: "https://rybbit.reloop.sh/api/track",
-			},
-			{
-				source: "/api/site/:path*",
-				destination: "https://rybbit.reloop.sh/api/site/:path*",
 			},
 		];
 	},

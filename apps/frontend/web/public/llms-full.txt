@@ -6,7 +6,7 @@
 > Docs index: https://reloop.sh/llms-docs.txt
 > Product skill: https://reloop.sh/skill.md
 
-Generated from 11 pages.
+Generated from 10 pages.
 
 ---
 
@@ -96,7 +96,7 @@ Markdown: https://reloop.sh/pricing.md
 ## Self-host
 
 Self-hosting the open-source Reloop stack is free (infrastructure costs are yours).
-See https://reloop.sh/docs/self-host
+See https://reloop.sh/self-host
 
 ## Related
 
@@ -215,7 +215,7 @@ Path: /blog/introducing-reloop
 URL: https://reloop.sh/blog/introducing-reloop
 Markdown: https://reloop.sh/blog/introducing-reloop.md
 
-When you pick email infrastructure, five things matter: deliverability, DX, cost, ownership, and visibility. Reloop is built around those. Here's why developers and companies should watch it.
+Open-source email infrastructure for indie hackers, startups, product teams, and enterprises. Ship transactional mail, agent inboxes, and inbound on Reloop Cloud or self-host—same product, no lock-in.
 
 Here's the one thing every developer and every company cares about with email infrastructure:
 
@@ -223,124 +223,64 @@ Here's the one thing every developer and every company cares about with email in
 
 Pretty dashboards, fancy editors, and feature checklists are secondary. Password resets, receipts, and agent replies only matter if they reach the inbox, stay affordable as you grow, and don't trap you in a vendor you can't leave.
 
-Today we're introducing Reloop: open-source email infrastructure built around the five things people actually evaluate when they pick (or regret picking) an email provider.
+Today we're introducing Reloop: [open-source email infrastructure](https://github.com/reloop-labs/reloop) built around the five things people actually evaluate when they pick (or regret picking) an email provider. Prefer a side-by-side? Start with [Compare Reloop](/compare) or our [2026 provider comparison](/blog/email-provider-comparison-2026).
 
 ## The five things that matter
 
 ### 1. Deliverability
 
-If mail lands in spam, nothing else counts. Reloop is built as real delivery infrastructure: SMTP, DKIM/SPF-oriented setup, bounce classification, and the operational pieces that keep reputation from becoming someone else's mystery. Use Reloop Cloud when you want managed reputation and IP pools. Self-host when you want the sending path on your own terms.
+If mail lands in spam, nothing else counts. Reloop is built as real [delivery infrastructure](/features/deliverability): [SMTP](/features/smtp), [DKIM/SPF-oriented setup](/blog/spf-dkim-dmarc-setup-guide), bounce classification, and the operational pieces that keep reputation from becoming someone else's mystery. Use Reloop Cloud when you want managed reputation and IP pools. [Self-host](/self-host) when you want the sending path on your own terms—see [self-hosted email infrastructure](/blog/self-hosted-email-infrastructure) for when that tradeoff is worth it.
 
 ### 2. Developer experience
 
-You should ship a transactional email in minutes, not a sprint. Reloop has a clean REST API (familiar if you've used modern email APIs), an SDK, and SMTP drop-in for Nodemailer, Laravel, Django, and the rest.
+You should ship a [transactional email](/features/transaction-emails) in minutes, not a sprint. Reloop has a clean REST API (familiar if you've used modern email APIs), [SDKs for every major language](/sdk), and [SMTP drop-in](/features/smtp) for Nodemailer, Laravel, Django, and the rest. Prefer the product tour for builders? See [Developers](/developers).
 
-```typescript
+<SendEmailCodeSamples />
 
-const reloop = new Reloop({ apiKey: process.env.RELOOP_API_KEY });
-
-await reloop.emails.send({
-  from: 'hello@yourdomain.com',
-  to: 'user@example.com',
-  subject: 'Welcome to Reloop',
-  html: '<p>Open-source email that feels like modern infra.</p>',
-});
-```
-
-Local and production should feel like the same product. Docs should help you ship, not send you hunting.
+Local and production should feel like the same product. [Docs](/docs) should help you ship, not send you hunting.
 
 ### 3. Cost that doesn't punish growth
 
-Email SaaS pricing is famous for feeling cheap at 10k sends and painful at 1M. Companies care about predictability. Developers care about not getting a surprise invoice after a launch week. Reloop gives you two answers: a hosted path when you want zero ops, and a full open-source path when you want to run the stack yourself and stop renting your outbound channel forever.
+Email SaaS pricing often feels cheap at low volume and painful once you scale. Don't take that on faith—check the numbers yourself:
+
+- [Reloop pricing](/pricing) for hosted plans and what you get at each tier
+- [Compare Reloop vs Resend](/compare/resend), [vs SendGrid](/compare/sendgrid), [vs Mailgun](/compare/mailgun), and [vs AWS SES](/compare/aws-ses)
+- Full grid: [all provider comparisons](/compare)
+- Deeper write-up: [email provider comparison 2026](/blog/email-provider-comparison-2026)
+
+Reloop gives you two answers: a hosted path when you want zero ops, and a [full open-source path](/self-host) when you want to run the stack yourself and stop renting your outbound channel forever—including a [low-cost self-host path](/blog/self-host-email-5-dollars) if you're optimizing ops spend.
 
 ### 4. Ownership (no vendor lock-in)
 
-This is the quiet deal-breaker. Proprietary APIs, opaque logs, and "you can't leave without a rewrite" are how email becomes a hostage situation. Reloop is Apache 2.0. The cloud product runs the same codebase you can `docker compose up` on Fly, Coolify, Kubernetes, or your own machines. Audit it. Fork it. Move it. Your data and compliance boundary stay yours.
+This is the quiet deal-breaker. Proprietary APIs, opaque logs, and "you can't leave without a rewrite" are how email becomes a hostage situation. Reloop is [Apache 2.0](/license). The cloud product runs the same codebase you can `docker compose up` on Fly, Coolify, Kubernetes, or your own machines—see [Fly.io](/blog/reloop-flyio-deployment) and [Coolify](/blog/reloop-coolify-setup) guides, or the [self-host docs](/self-host). Audit it. Fork it. Move it. Your data and compliance boundary stay yours. More on the bet: [why we open-sourced email infrastructure](/blog/why-we-open-sourced-email-infrastructure) and [why open source](/why-open-source).
 
 ### 5. Visibility and the full loop
 
-"Did it send?" is not enough. You need deliveries, opens, clicks, bounces, and complaints as signed webhooks your app can act on: retries, suppressions, support alerts. And for modern products (especially AI agents), send-only is half a system. Reloop includes inbound parsing, agent inboxes, and MCP support so agents can send, receive, and inspect mail with structured tools instead of scraping a random mailbox.
+"Did it send?" is not enough. You need deliveries, opens, clicks, bounces, and complaints as signed [webhooks](/features/webhooks) your app can act on: retries, suppressions, support alerts—plus [email analytics](/features/email-analytics) when you need the operational view. And for modern products (especially AI agents), send-only is half a system. Reloop includes inbound parsing, [agent inboxes](/features/ai-agents), and MCP support so agents can send, receive, and inspect mail with structured tools instead of scraping a random mailbox. See [email infrastructure for AI agents](/blog/email-infrastructure-for-ai-agents) and the [AI agent inbox use case](/use-cases/ai-agent-inbox).
 
 ## Why we open-sourced it
 
 Linux, Postgres, Redis, Nginx: the boring foundations of the internet are open. Email sits in that category. If it fails, users can't log in, can't reset passwords, and can't get receipts.
 
-Open source is how we make the five things above credible. You can read how delivery works. You can leave without rewriting your notification stack. The roadmap gets shaped by people shipping real mail, not only by a pricing page.
+Open source is how we make the five things above credible. You can read how delivery works. You can leave without rewriting your notification stack. The roadmap gets shaped by people shipping real mail, not only by a [pricing page](/pricing). Full rationale: [why we open-sourced email infrastructure](/blog/why-we-open-sourced-email-infrastructure) and our [product beliefs](/our-product-beliefs).
 
-We're not open-sourcing a demo. Reloop Cloud and Reloop open source are the same product.
+We're not open-sourcing a demo. Reloop Cloud and Reloop open source are the same product—same APIs whether you use [hosted](/pricing) or [self-host](/self-host).
 
 ## Who should care
 
-Indie hackers who don't want email to become their most expensive utility. Companies that need multi-tenant delivery without building an MTA team. Teams migrating off SendGrid, Resend, or Mailgun who want parity without a science project. Anyone building AI agents that need inbound and outbound as real infrastructure.
+Indie hackers, startups, side projects, product teams, and enterprises—if you're looking for your thing in email, Reloop is built for you.
 
-If deliverability, DX, cost, ownership, and visibility are how you judge email tools, keep Reloop on your radar.
+Maybe that's cheap transactional mail that doesn't become your most expensive utility ([pricing](/pricing)). Maybe it's multi-tenant delivery without standing up an MTA team. Maybe it's self-host or cloud with real ownership and no lock-in. Maybe you're migrating off [SendGrid](/compare/sendgrid), [Resend](/compare/resend), or [Mailgun](/compare/mailgun) and want parity without a science project ([SendGrid migration guide](/blog/migrating-from-sendgrid)). Or you're building AI agents that need inbound and outbound as [real infrastructure](/features/ai-agents).
+
+Whatever your scale or stack, if deliverability, DX, cost, ownership, and visibility are how you judge email tools, keep Reloop on your radar—and verify the claims on [compare](/compare), [pricing](/pricing), and the [docs](/docs).
 
 ## Get in
 
 - GitHub: [github.com/reloop-labs/reloop](https://github.com/reloop-labs/reloop) (star it, watch it, contribute)
 - Cloud: [reloop.sh/dashboard/signup](https://reloop.sh/dashboard/signup) (first email in a couple of minutes)
-- Docs: [reloop.sh/docs](https://reloop.sh/docs/introduction) (APIs, SMTP, self-host, agents)
+- Docs: [Docs](/docs) · [Pricing](/pricing) · [Compare](/compare) · [Self-host](/self-host)
 
 We're early, shipping in public, and still at the stage where your feedback bends the curve. If those five things are what you care about, this is the project to watch.
-
----
-
-# Email Provider Comparison: Resend vs SendGrid vs Reloop
-
-Path: /blog/email-provider-comparison-2026
-URL: https://reloop.sh/blog/email-provider-comparison-2026
-Markdown: https://reloop.sh/blog/email-provider-comparison-2026.md
-
-A 2026 comparison of developer email providers on open source, self-hosting, campaigns, and pricing.
-
-## What developers actually need
-
-Transactional API, webhooks, SDKs, and deliverability—the baseline. The differentiators are self-hosting, campaigns, open source, and total cost at scale.
-
-## Resend
-
-Excellent DX for hosted transactional email. Proprietary, no self-hosting, limited marketing features.
-
-## SendGrid
-
-Mature but complex. Legacy pricing and Twilio ownership. Still widely used for high volume.
-
-## Reloop
-
-Open source, self-hostable, campaigns + transactional + agent inbox. Hosted free tier or deploy yourself.
-
-<Callout type="tip">
-  Compare total cost at your projected volume—including self-hosting ops time if data residency matters.
-</Callout>
-
----
-
-# Self-Hosted Email Infrastructure: When and How
-
-Path: /blog/self-hosted-email-infrastructure
-URL: https://reloop.sh/blog/self-hosted-email-infrastructure
-Markdown: https://reloop.sh/blog/self-hosted-email-infrastructure.md
-
-Why teams self-host email, what Reloop gives you out of the box, and how to deploy with Docker Compose.
-
-## When self-hosting makes sense
-
-Data residency requirements, cost at scale, security review of source code, or simply not wanting vendor lock-in—these are the common drivers.
-
-## What you get with Reloop
-
-Reloop is Apache 2.0: transactional API, campaigns, SMTP, webhooks, templates, and analytics—same product hosted or self-deployed.
-
-## Docker Compose quickstart
-
-Clone the repo, configure environment variables, and `docker compose up`. See our self-hosting guide for production hardening.
-
-<Cta
-  title="Deploy Reloop yourself"
-  description="Follow the self-hosting guide for Docker Compose and production hardening."
-  href="/docs/self-host"
-  label="Read the guide"
-/>
 
 ---
 
@@ -350,37 +290,723 @@ Path: /blog/send-email-nextjs-app-router
 URL: https://reloop.sh/blog/send-email-nextjs-app-router
 Markdown: https://reloop.sh/blog/send-email-nextjs-app-router.md
 
-Send transactional email from Next.js App Router using Reloop's Node.js SDK in Server Actions and Route Handlers.
+Send transactional email from Next.js App Router with Reloop — complete Server Action and Route Handler examples, env setup, error handling, and Vercel deploy.
 
-## Install the SDK
+**To send email in Next.js App Router, call Reloop only on the server** — from a [Server Action](https://nextjs.org/docs/app/building-your-application/data-fetching/server-actions-and-mutations) or a [Route Handler](https://nextjs.org/docs/app/building-your-application/routing/route-handlers). Never put your API key in a Client Component or public env var.
 
-Run `npm install reloop-email` and add `RELOOP_API_KEY` to `.env.local`. Never expose the key to the client—send only from server components, Server Actions, or Route Handlers.
+This guide covers both patterns end-to-end: install, shared client, form + Server Action, API route + `fetch`, error handling, and deploy on Vercel.
 
-```bash
-npm install reloop-email
+---
+
+## What you will build
+
+| Approach | Best for | File shape |
+|----------|----------|------------|
+| **Server Action** | Forms, signup, password reset, any UI in the same Next app | `app/actions/send-email.ts` + client form |
+| **Route Handler (API)** | Webhooks, mobile clients, external services, cron, AI tools | `app/api/send-email/route.ts` |
+
+Both run on the server. Both use the same Reloop SDK call. Pick Server Actions for app UI. Pick Route Handlers when something outside your React tree needs HTTP.
+
+---
+
+## Prerequisites
+
+1. A Next.js app on the **App Router** (this guide uses `app/`, not `pages/`)
+2. A Reloop account and API key from the [dashboard](https://app.reloop.sh) (keys look like `rl_…`)
+3. A verified sending domain — see [connect a domain](/docs/guides/connect-domain) and [SPF / DKIM / DMARC](/blog/spf-dkim-dmarc-setup-guide)
+
+Optional but useful: the [Node.js SDK docs](/docs/examples/nodejs/nextjs) and full [send mail API](/docs/api/mail/post-api-mail-v1send).
+
+---
+
+## 1. Install the SDK
+
+<InstallSdkCode />
+
+Package: [`reloop-email`](https://www.npmjs.com/package/reloop-email) · source: [reloop-labs/reloop-node](https://github.com/reloop-labs/reloop-node)
+
+---
+
+## 2. Add the API key (server only)
+
+Create or edit `.env.local` in the project root:
+
+```env
+RELOOP_API_KEY=rl_your_api_key_here
 ```
 
-## Server Action example
+Rules that matter:
 
-Create a `sendWelcomeEmail` action that calls `reloop.emails.send` after signup. Return success or error to the client without leaking API details.
+- Use `RELOOP_API_KEY` (no `NEXT_PUBLIC_` prefix). Public vars are bundled into the browser.
+- Do not commit `.env.local`. Keep it in `.gitignore`.
+- On Vercel, add the same key under **Project → Settings → Environment Variables** (see [Vercel integration](/docs/integrations/vercel)).
+
+<Callout type="warning">
+  If the key appears in browser Network tabs or client bundles, treat it as leaked: rotate it in the dashboard and redeploy.
+</Callout>
+
+---
+
+## 3. Create a shared Reloop client
+
+One client file keeps Server Actions and Route Handlers identical.
 
 ```typescript
+// lib/reloop.ts
+
+if (!process.env.RELOOP_API_KEY) {
+  throw new Error("Missing RELOOP_API_KEY");
+}
+
+  apiKey: process.env.RELOOP_API_KEY,
+});
+```
+
+Initialize with an object: `{ apiKey: string }`. Optional: `baseUrl` if you [self-host](/self-host) Reloop.
+
+---
+
+## 4. Method A — Server Action (forms & app UI)
+
+### When to use this
+
+- Contact form, welcome email after signup, magic link, password reset
+- Call site is a React Server Component or Client Component in **this** app
+- You want progressive enhancement with `<form action={...}>` and no hand-written `fetch`
+
+### Action
+
+```typescript
+// app/actions/send-welcome-email.ts
 "use server";
 
-const reloop = new Reloop(process.env.RELOOP_API_KEY!);
+  | { ok: true; messageId?: string }
+  | { ok: false; error: string };
 
-  await reloop.emails.send({
-    from: "onboarding@yourdomain.com",
-    to: email,
-    subject: "Welcome",
-    html: "<p>Thanks for signing up.</p>",
-  });
+  email: string,
+  name?: string,
+): Promise<SendWelcomeResult> {
+  const to = email.trim().toLowerCase();
+
+  if (!to || !to.includes("@")) {
+    return { ok: false, error: "Enter a valid email address." };
+  }
+
+  try {
+    const { response, emailError } = await reloop.mail.send({
+      from: "Acme <onboarding@mail.yourdomain.com>",
+      to,
+      subject: name ? `Welcome, ${name}` : "Welcome to Acme",
+      html: `<p>Thanks for signing up${name ? `, ${name}` : ""}.</p>
+             <p>You're ready to go.</p>`,
+      text: `Thanks for signing up${name ? `, ${name}` : ""}. You're ready to go.`,
+      reply_to: "support@yourdomain.com",
+      tags: [{ name: "type", value: "welcome" }],
+    });
+
+    if (emailError) {
+      console.error("Reloop send failed", emailError);
+      return { ok: false, error: "Could not send email. Try again." };
+    }
+
+    return { ok: true, messageId: response?.messageId };
+  } catch (err) {
+    console.error("Reloop send threw", err);
+    return { ok: false, error: "Could not send email. Try again." };
+  }
 }
 ```
 
-## Deploy on Vercel
+Notes:
 
-Add `RELOOP_API_KEY` to Vercel environment variables. The HTTP API works on Edge Runtime where SMTP does not.
+- `"use server"` must be at the top of the file (or above the exported function).
+- Return a **safe** result to the client. Log Reloop details server-side; do not dump API errors into the UI.
+- `from` must use a domain you verified in Reloop.
+
+### Client form that calls the action
+
+```tsx
+// app/signup/welcome-form.tsx
+"use client";
+
+  const [message, setMessage] = useState<string | null>(null);
+  const [pending, startTransition] = useTransition();
+
+  return (
+    <form
+      className="space-y-3"
+      onSubmit={(e) => {
+        e.preventDefault();
+        const form = e.currentTarget;
+        const data = new FormData(form);
+        const email = String(data.get("email") ?? "");
+        const name = String(data.get("name") ?? "");
+
+        startTransition(async () => {
+          const result = await sendWelcomeEmail(email, name || undefined);
+          setMessage(
+            result.ok
+              ? "Check your inbox for a welcome email."
+              : result.error,
+          );
+          if (result.ok) form.reset();
+        });
+      }}
+    >
+      <input name="name" type="text" placeholder="Name" />
+      <input name="email" type="email" required placeholder="you@company.com" />
+      <button type="submit" disabled={pending}>
+        {pending ? "Sending…" : "Create account"}
+      </button>
+      {message ? <p>{message}</p> : null}
+    </form>
+  );
+}
+```
+
+### Form Action without client JS (optional)
+
+You can also bind the action directly:
+
+```tsx
+// app/contact/page.tsx
+
+async function contactAction(formData: FormData) {
+  "use server";
+  const email = String(formData.get("email") ?? "");
+  await sendWelcomeEmail(email);
+}
+
+  return (
+    <form action={contactAction}>
+      <input name="email" type="email" required />
+      <button type="submit">Send</button>
+    </form>
+  );
+}
+```
+
+Server Actions work for same-origin app flows. For external HTTP callers, use a Route Handler.
+
+---
+
+## 5. Method B — Route Handler (API route)
+
+### When to use this
+
+- Stripe / Clerk / Supabase webhooks that should fire an email
+- Mobile apps, desktop clients, or another backend posting JSON
+- Cron jobs, n8n, Zapier, or AI agents that call HTTP
+- You need a stable URL like `POST /api/send-email`
+
+### Route Handler
+
+```typescript
+// app/api/send-email/route.ts
+
+type Body = {
+  to?: string;
+  subject?: string;
+  html?: string;
+  text?: string;
+  name?: string;
+};
+
+  let body: Body;
+
+  try {
+    body = (await request.json()) as Body;
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+  }
+
+  const to = body.to?.trim().toLowerCase();
+  if (!to || !to.includes("@")) {
+    return NextResponse.json(
+      { error: "Field `to` must be a valid email" },
+      { status: 400 },
+    );
+  }
+
+  const subject = body.subject?.trim() || "Hello from Next.js";
+  const html =
+    body.html?.trim() ||
+    `<p>Hi${body.name ? ` ${body.name}` : ""},</p><p>This was sent from a Next.js Route Handler.</p>`;
+  const text =
+    body.text?.trim() ||
+    `Hi${body.name ? ` ${body.name}` : ""}, This was sent from a Next.js Route Handler.`;
+
+  try {
+    const { response, emailError } = await reloop.mail.send({
+      from: "Acme <hello@mail.yourdomain.com>",
+      to,
+      subject,
+      html,
+      text,
+      reply_to: "support@yourdomain.com",
+      tags: [{ name: "source", value: "api-route" }],
+    });
+
+    if (emailError) {
+      console.error("Reloop send failed", emailError);
+      return NextResponse.json(
+        { error: "Failed to send email" },
+        { status: 502 },
+      );
+    }
+
+    return NextResponse.json({
+      ok: true,
+      id: response?.id,
+      messageId: response?.messageId,
+    });
+  } catch (err) {
+    console.error("Reloop send threw", err);
+    return NextResponse.json(
+      { error: "Failed to send email" },
+      { status: 500 },
+    );
+  }
+}
+```
+
+### Call it from the browser or another service
+
+```typescript
+// From a Client Component or any HTTP client
+const res = await fetch("/api/send-email", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    to: "user@example.com",
+    name: "Ada",
+    subject: "Your receipt",
+    html: "<p>Thanks for your purchase.</p>",
+    text: "Thanks for your purchase.",
+  }),
+});
+
+const data = await res.json();
+if (!res.ok) throw new Error(data.error ?? "Send failed");
+```
+
+cURL for local testing:
+
+```bash
+curl -X POST http://localhost:3000/api/send-email \
+  -H "Content-Type: application/json" \
+  -d '{"to":"you@example.com","name":"Ada","subject":"Test from Next.js"}'
+```
+
+### Protect the route
+
+An open send endpoint is an open relay. At minimum:
+
+1. Require a session / auth check for user-triggered sends
+2. Or require a shared secret header for webhooks and cron
+3. Rate-limit by IP or user id
+
+Example secret gate for internal callers:
+
+```typescript
+// inside POST, before sending
+const secret = request.headers.get("x-internal-secret");
+if (secret !== process.env.INTERNAL_SEND_SECRET) {
+  return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+}
+```
+
+Add `INTERNAL_SEND_SECRET` to `.env.local` and Vercel the same way as the API key.
+
+---
+
+## 6. Server Action vs Route Handler — pick one
+
+| Question | Prefer Server Action | Prefer Route Handler |
+|----------|----------------------|----------------------|
+| Triggered by a form in this Next app? | Yes | — |
+| Need a public HTTP URL for webhooks / mobile / cron? | — | Yes |
+| Want zero client `fetch` boilerplate? | Yes | — |
+| Called from non-Next code? | — | Yes |
+| Same Reloop SDK? | Yes | Yes |
+| Safe for `RELOOP_API_KEY`? | Yes (server) | Yes (server) |
+
+You can use **both** in one app: Server Actions for product UI, Route Handlers for integrations.
+
+---
+
+## 7. Full `mail.send` fields you will use most
+
+```typescript
+const { response, emailError } = await reloop.mail.send({
+  from: "Acme <hello@mail.yourdomain.com>", // required — verified domain
+  to: "user@example.com",                   // string or string[]
+  subject: "Order confirmed",               // required
+  html: "<p>Your order shipped.</p>",       // HTML body
+  text: "Your order shipped.",              // plain-text fallback
+  reply_to: "support@yourdomain.com",
+  cc: "ops@yourdomain.com",
+  bcc: "archive@yourdomain.com",
+  tags: [{ name: "type", value: "receipt" }],
+});
+```
+
+More options (attachments, templates, scheduling, headers) are on the [send email API reference](/docs/api/mail/post-api-mail-v1send).
+
+Always send both `html` and `text` when you can — better deliverability and clients that block HTML still get a readable message. See [transactional email best practices](/blog/transactional-email-best-practices).
+
+---
+
+## 8. Runtime: Node vs Edge
+
+- Prefer the default **Node.js** runtime for the Reloop SDK.
+- Edge Runtime is a restricted environment. If you must run on Edge, call Reloop’s **HTTP API** with `fetch` instead of relying on Node-only modules — same idea as the [Cloudflare Workers guide](/blog/send-email-cloudflare-workers).
+
+```typescript
+// Edge-friendly alternative (no SDK)
+
+  const body = await request.json();
+
+  const res = await fetch("https://reloop.sh/api/mail/v1/send", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": process.env.RELOOP_API_KEY!,
+    },
+    body: JSON.stringify({
+      from: "Acme <hello@mail.yourdomain.com>",
+      to: body.to,
+      subject: body.subject,
+      html: body.html,
+      text: body.text,
+    }),
+  });
+
+  const data = await res.json();
+  return Response.json(data, { status: res.status });
+}
+```
+
+For most App Router apps on Vercel, stick with the SDK on Node.
+
+---
+
+## 9. Deploy on Vercel
+
+1. Push the app and import it in [Vercel](https://vercel.com)
+2. Add env vars: `RELOOP_API_KEY` (and `INTERNAL_SEND_SECRET` if you use it)
+3. Redeploy so server functions pick up the vars
+4. Send a test from production; confirm delivery in the [Reloop logs](https://app.reloop.sh)
+
+Details: [Vercel + Reloop](/docs/integrations/vercel).
+
+---
+
+## 10. Common mistakes
+
+1. **`NEXT_PUBLIC_RELOOP_API_KEY`** — exposes the key. Use server-only `RELOOP_API_KEY`.
+2. **Calling Reloop from a Client Component** — keys and secrets belong in Server Actions / Route Handlers only.
+3. **Unverified `from` domain** — verify DNS first ([domain guide](/docs/guides/connect-domain)).
+4. **Open `/api/send-email`** — always authenticate or use a shared secret.
+5. **Wrong constructor** — use `new Reloop({ apiKey })`, not a bare string, for the current SDK.
+6. **Ignoring `emailError`** — check it (or catch throws) and return a safe user message.
+7. **HTML only** — include `text` as a fallback.
+
+---
+
+## 11. FAQ
+
+<AccordionGroup>
+  <Accordion title="Can I send email from a Client Component?">
+    Not directly. Client Components can **call** a Server Action or `fetch` your
+    Route Handler. The Reloop SDK and API key stay on the server.
+  </Accordion>
+
+  <Accordion title="Server Action or API route for a contact form?">
+    Server Action. Less plumbing, works with `<form action>`, and stays
+    same-origin by default.
+  </Accordion>
+
+  <Accordion title="How do I send after signup with Auth.js / Clerk / Supabase?">
+    In the server-side callback or server action that creates the user, call
+    `sendWelcomeEmail(user.email)`. Do not wait for the client to “remember” to
+    hit an API.
+  </Accordion>
+
+  <Accordion title="Does this work with React Email?">
+    Yes. Render your React Email template to HTML on the server, then pass the
+    string as `html` to `reloop.mail.send`.
+  </Accordion>
+
+  <Accordion title="Where do I see delivery status?">
+    In the Reloop dashboard logs, and via [webhooks](/docs/webhooks) for
+    delivered, bounced, opened, and clicked events.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## 12. Copy-paste checklist
+
+- [ ] `npm install reloop-email`
+- [ ] `.env.local` → `RELOOP_API_KEY=rl_…` (no `NEXT_PUBLIC_`)
+- [ ] `lib/reloop.ts` shared client
+- [ ] **UI path:** `app/actions/send-welcome-email.ts` + form
+- [ ] **HTTP path:** `app/api/send-email/route.ts` + auth/secret
+- [ ] Verified sending domain on `from`
+- [ ] Vercel env vars set and redeployed
+- [ ] Test send + check logs
+
+---
+
+## Next steps
+
+- [Transactional email best practices](/blog/transactional-email-best-practices) — templates, timing, deliverability
+- [Next.js example in docs](/docs/examples/nodejs/nextjs) — short SDK reference
+- [Send mail API](/docs/api/mail/post-api-mail-v1send) — full payload
+- [Vercel AI SDK + Reloop](/blog/vercel-ai-sdk-reloop-notifications) — tool-calling notifications
+- Sibling guides: [SvelteKit](/blog/send-email-sveltekit) · [Remix](/blog/send-email-remix) · [Cloudflare Workers](/blog/send-email-cloudflare-workers)
+
+---
+
+# Why Your Emails Land In Spam & How to Fix It
+
+Path: /blog/why-emails-land-in-spam-fix
+URL: https://reloop.sh/blog/why-emails-land-in-spam-fix
+Markdown: https://reloop.sh/blog/why-emails-land-in-spam-fix.md
+
+The definitive guide to diagnosing and fixing email spam folder placement — covering authentication, content, reputation, list hygiene, and ISP-specific issues.
+
+**Email deliverability does not fail with an HTTP 404 error or a readable stack trace—it fails silently by routing your mission-critical messages into the recipient's spam folder.**
+
+When auth tokens, password reset links, invoices, and user notifications land in spam, your business is effectively down for those users. Because SMTP technically completes message handoff without an error code, deliverability regressions are notoriously difficult to detect and debug without a systematic methodology.
+
+This guide walks you through every major root cause of spam folder placement, provides exact CLI commands and tools to diagnose your sending path, and details the concrete steps required to fix each issue permanently.
+
+## Start with a spam score baseline
+
+**Before debugging individual infrastructure components, establish an objective spam score baseline.**
+
+Send a test email from your production or staging environment to [mail-tester.com](https://mail-tester.com). The service executes automated SpamAssassin heuristics, analyzes message MIME structure, and checks DNSBL blacklists to return a score from 0 to 10.
+
+- **Score 9.0 to 10.0**: **Optimal deliverability baseline** required for transactional infrastructure.
+- **Score 7.0 to 8.9**: **Active deliverability risks**—minor configuration warnings, missing headers, or slight content penalties.
+- **Score Below 7.0**: **Severe deliverability failure**—failing authentication, blacklisted IP, or broken MIME structure.
+
+In parallel, register your sending domain with [Google Postmaster Tools](https://postmaster.google.com). It provides proprietary Gmail telemetry directly from Google—including **domain reputation**, **IP reputation**, **spam complaint rates**, and **authentication success rates**.
+
+## Cause 1: Missing or broken email authentication
+
+**Probability: Very High. Over 70% of inbox placement failures stem from authentication misconfigurations.**
+
+Major mailbox providers ([Google, Yahoo, and Microsoft](https://blog.google/products/gmail/gmail-security-authentication-spam-protection/)) enforce mandatory authentication for all senders. If your messages fail or lack [SPF, DKIM, or DMARC](/blog/spf-dkim-dmarc-setup-guide), inbox providers will aggressively route your traffic to spam or drop it at the SMTP handshake.
+
+### How to diagnose authentication in DNS
+
+Verify that your DNS records are active and resolving across public resolvers:
+
+```bash
+# 1. Verify SPF record
+dig TXT yourdomain.com +short | grep spf
+
+# 2. Verify DKIM record (Reloop uses the 'reloop' selector)
+dig TXT reloop._domainkey.yourdomain.com +short
+
+# 3. Verify DMARC record
+dig TXT _dmarc.yourdomain.com +short
+```
+
+You can also paste raw message headers into the [MXToolbox Email Header Analyzer](https://mxtoolbox.com/EmailHeaders.aspx) to inspect how receiving mail transfer agents evaluate your records.
+
+### What healthy authentication headers look like
+
+Inspect the `Authentication-Results` header inside a delivered email:
+
+```http
+Authentication-Results: mx.google.com;
+  spf=pass (google.com: domain of notifications@yourdomain.com designates 1.2.3.4 as permitted sender) smtp.mailfrom=notifications@yourdomain.com;
+  dkim=pass header.i=@yourdomain.com header.s=reloop;
+  dmarc=pass (p=REJECT) header.from=yourdomain.com
+```
+
+**If any authentication check shows `fail` or `softfail`, resolve authentication before investigating any other deliverability factor.** See our step-by-step [SPF, DKIM, and DMARC complete setup guide](/blog/spf-dkim-dmarc-setup-guide).
+
+### The DMARC alignment trap
+
+**An email can pass SPF and DKIM individually while still failing DMARC due to identifier misalignment.**
+
+DMARC requires that the domain in the user-visible `From:` header matches either:
+1. The domain in the envelope sender `Return-Path` (**SPF Alignment**)
+2. The domain specified in the `d=` tag of a valid `DKIM-Signature` (**DKIM Alignment**)
+
+If you send from `auth@yourdomain.com` but your DKIM signature is signed under a third-party vendor domain without custom domain alignment, DMARC evaluation will fail.
+
+## Cause 2: Sending from a new IP with no reputation
+
+**Probability: High for freshly provisioned servers and new infrastructure.**
+
+Internet Service Providers (ISPs) maintain rolling reputation scores for every sending IP address. **A brand new IP starts with neutral reputation, which anti-abuse filters treat with heightened suspicion.** Jumping immediately to high sending volume from a cold IP triggers automated rate-limiting, temporary deferrals (`421` / `451` SMTP codes), and spam placement.
+
+### Indicators of an IP reputation issue
+
+- Deliverability was flawless on previous infrastructure before migrating to a new server.
+- You recently provisioned a dedicated IP address or switched email infrastructure providers.
+- [Google Postmaster Tools](https://postmaster.google.com) reports **"Low"** or **"Bad"** IP reputation.
+
+### How to fix it: Structured IP warming
+
+**IP warming is the process of gradually scaling outbound volume over 4 to 6 weeks to establish trusted sender reputation.**
+
+| Week | Recommended Daily Sends | Primary Focus |
+| :--- | :--- | :--- |
+| **Week 1** | **50 – 200 emails/day** | High-intent transactional mail (password resets, welcome emails). |
+| **Week 2** | **200 – 500 emails/day** | Active daily users and transactional notifications. |
+| **Week 3** | **500 – 1,000 emails/day** | Expand to weekly summaries and invoice dispatches. |
+| **Week 4** | **1,000 – 2,500 emails/day** | Begin rolling out product updates to engaged segments. |
+| **Week 5** | **2,500 – 5,000 emails/day** | Monitor spam complaint rate; ensure complaints remain < 0.05%. |
+| **Week 6+** | **5,000 – 10,000+ emails/day** | Full production capacity with established reputation. |
+
+**During the initial warm-up window, send exclusively to your most engaged recipients.** High open rates and user engagement accelerate positive reputation scoring with mailbox algorithms. Follow our detailed [IP warming schedule guide](/blog/ip-warming-guide).
+
+## Cause 3: High bounce rate
+
+**Probability: Moderate to High, particularly after user imports or list migrations.**
+
+**A bounce rate exceeding 2% is an immediate warning signal to ISPs; a bounce rate over 5% triggers automated throttling or domain blacklisting.** High bounce rates indicate that a sender is not validating email addresses at collection or is sending to stale, unverified databases.
+
+### Distinguishing Hard vs. Soft Bounces
+
+- **Hard Bounces (5xx SMTP errors)**: Permanent delivery failures (e.g. `550 5.1.1 User unknown`, invalid mailbox, nonexistent domain).
+- **Soft Bounces (4xx SMTP errors)**: Temporary delivery failures (e.g. `452 Mailbox full`, server busy, transient network timeout).
+
+### How to eliminate bounce penalties
+
+1. **Automatically suppress hard-bounced addresses**: Never retry sending to a hard bounce. [Reloop's delivery engine](/features/deliverability) automatically suppresses hard bounces to protect your domain reputation (see our guide on [email bounce processing automation](/blog/email-bounce-processing-automation)).
+2. **Verify addresses in real-time at signup**: Prevent typos and invalid domains directly at your registration form:
+   ```typescript
+
+     // Basic format validation
+     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+     if (!emailRegex.test(email)) return false;
+
+     // Verify domain has active MX records
+     const domain = email.split("@")[1];
+     try {
+       const mxRecords = await resolver.resolveMx(domain);
+       return mxRecords && mxRecords.length > 0;
+     } catch {
+       return false;
+     }
+   }
+   ```
+3. **Never purchase or scrape email lists**: Third-party lists contain spam traps (honeypot addresses maintained by anti-spam organizations) that immediately ruin domain reputation.
+
+## Cause 4: High spam complaint rate
+
+**Probability: High for mixed transactional and notification streams.**
+
+A spam complaint occurs whenever a recipient clicks "Report Spam" or "Mark as Spam" in Gmail, Apple Mail, or Outlook.
+
+- **Google & Yahoo Warning Threshold**: **0.10%** (1 complaint per 1,000 delivered emails).
+- **Enforcement & Blocking Threshold**: **0.30%** (3 complaints per 1,000 delivered emails).
+
+**Exceeding 0.30% spam complaints will cause mailbox providers to route all subsequent domain traffic directly to the spam folder.**
+
+### How to reduce spam complaints
+
+1. **Isolate transactional from promotional sending**: **Never send marketing blasts from your primary transactional domain.** Isolate critical auth tokens and receipts on a dedicated subdomain (e.g. `auth.yourdomain.com` or `mail.yourdomain.com`) as detailed in our [transactional email best practices](/blog/transactional-email-best-practices).
+2. **Implement RFC 8058 One-Click Unsubscribe**: Gmail and Yahoo require one-click unsubscribe headers for non-transactional messages:
+   ```typescript
+
+   const reloop = new Reloop({ apiKey: process.env.RELOOP_API_KEY });
+
+   await reloop.emails.send({
+     from: "notifications@yourdomain.com",
+     to: user.email,
+     subject: "Your weekly analytics digest",
+     headers: {
+       "List-Unsubscribe": `<https://yourdomain.com/unsubscribe?token=${user.token}>`,
+       "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+     },
+     html: "<p>Your weekly digest content...</p>",
+   });
+   ```
+3. **Sunset inactive recipients**: Implement sunset policies for non-essential notifications. If a user has not opened an email in 90 days, reduce sending frequency or require explicit re-opt-in.
+
+## Cause 5: Content triggering Bayesian spam filters
+
+**Probability: Low for standard transactional receipts; Moderate for notification templates.**
+
+Modern spam filters use natural language processing and Bayesian analysis to evaluate message payloads. While keywords alone rarely cause spam placement, poor HTML formatting combined with aggressive promotional phrasing will penalize your delivery score.
+
+### Content practices that degrade inbox placement
+
+- **Missing `text/plain` multipart MIME**: Sending an HTML-only email without an accompanying plain text alternative is a strong spam signal. Reloop automatically generates plain text fallbacks for all outgoing messages.
+- **Extreme Image-to-Text Ratio**: Single large promotional images with little or no accompanying text mimic phishing campaigns.
+- **Link Text vs. Href Domain Mismatches**: If your link anchor text displays `https://yourdomain.com/login` but the underlying `href` points to an unbranded tracking redirect, filters flag the discrepancy as a potential phishing attempt.
+- **Spam Trigger Patterns**: Excessive capitalization in subject lines (`URGENT: RESET NOW`), repetitive punctuation (`$$$`, `!!!`), and deceptive urgency triggers.
+
+## Cause 6: Sending from unmonitored `noreply@` addresses
+
+**Probability: Measurable impact on recipient engagement signals.**
+
+Using `noreply@yourdomain.com` harms deliverability in two distinct ways:
+1. **Machine Learning Heuristics**: Mailbox algorithms associate `noreply@` with low-engagement bulk blasts.
+2. **Missed Engagement Signals**: When recipients reply to an email (e.g. "Thanks!" or asking a question), mailbox algorithms register that interaction as a strong positive reputation signal. A `noreply@` address blocks this positive feedback loop.
+
+**Best Practice**: Use a recognizable sender address such as `notifications@yourdomain.com` or `team@yourdomain.com`, and set a monitored `Reply-To` header to route inbound responses to your support inbox:
+
+```typescript
+await reloop.emails.send({
+  from: "Acme Support <notifications@yourdomain.com>",
+  replyTo: "support@yourdomain.com",
+  to: user.email,
+  subject: "Your order confirmation",
+  html: "<p>Thank you for your purchase...</p>",
+});
+```
+
+## Cause 7: Sending IP or domain listed on a DNSBL blacklist
+
+**Probability: High if credentials were leaked, sending servers were compromised, or list hygiene was neglected.**
+
+DNSBLs (DNS-based Blackhole Lists) are shared databases of IP addresses and domains flagged for spam transmission or compromised SMTP servers. If your IP or domain appears on an authoritative blocklist (such as **Spamhaus**, **Barracuda**, or **Spamcop**), major ISPs will reject or spam-folder your mail immediately.
+
+### How to check blacklist status
+
+Run an automated scan across all major DNSBL registries using the [MXToolbox Blacklist Checker](https://mxtoolbox.com/blacklists.aspx). Enter your sending IP address and sending domain.
+
+### How to request delisting
+
+1. **Isolate and fix the root cause**: Identify and patch the compromised SMTP credential, stop the rogue sending loop, or purge the failing email list.
+2. **Submit a removal request**: Visit the specific blacklist removal portal (e.g. the [Spamhaus Blocklist Removal Center](https://www.spamhaus.org/removal/)) and provide proof of remediation.
+3. **Monitor clearance**: Most reputable blocklists clear listings within 24 to 48 hours once remediation is verified.
+
+## Cause 8: ISP-specific filtering (Gmail, Microsoft 365, Apple)
+
+Each major mailbox provider utilizes proprietary filtering algorithms beyond baseline standards:
+
+### 1. Google (Gmail)
+- **Primary Tool**: Monitor [Google Postmaster Tools](https://postmaster.google.com).
+- **Tab Placement vs. Spam**: If transactional emails route to the **Promotions** tab instead of **Primary**, this is a classification issue rather than a spam penalty. Keep transactional templates lightweight and free from promotional banners to help Gmail route them to Primary.
+- **BIMI Brand Logo**: Implement [BIMI (Brand Indicators for Message Identification)](/blog/bimi-email-setup-guide) with a valid DMARC enforcement policy (`p=quarantine` or `p=reject`) to display your verified company avatar in Gmail inboxes.
+
+### 2. Microsoft (Outlook / Office 365)
+- Microsoft maintains stringent IP reputation filtering and relies heavily on [Smart Network Data Services (SNDS)](https://sendersupport.olc.protection.outlook.com/snds/).
+- Microsoft frequently returns `550 5.7.1` error codes when an IP reputation drops below acceptable thresholds.
+
+## The 8-Step Deliverability Diagnostic Checklist
+
+When emails are landing in spam, work through this diagnostic sequence in order:
+
+1. **Run a [mail-tester.com](https://mail-tester.com) scan (target score ≥ 9/10)** — Identifies broken MIME syntax, missing DNS tags, and Bayesian spam keyword flags before you touch infrastructure.
+2. **Audit raw authentication headers** — Inspect received headers in an actual test inbox to confirm `SPF: PASS`, `DKIM: PASS`, and `DMARC: PASS` with identifier alignment.
+3. **Check [Google Postmaster Tools](https://postmaster.google.com) telemetry** — Verify that your Domain Reputation is "Good" or "High" and inspect Gmail-specific spam rates.
+4. **Check DNSBL blacklists on [MXToolbox](https://mxtoolbox.com/blacklists.aspx)** — Confirm neither your sending IP nor domain is listed on Spamhaus, Barracuda, or Spamcop.
+5. **Review real-time bounce rates in [Reloop Analytics](/features/email-analytics)** — Confirm that your 30-day hard bounce rate is strictly **below 2%** and that auto-suppression is active.
+6. **Review your spam complaint rate** — Ensure complaints remain strictly **below 0.10%** (1 per 1,000 sends) to prevent algorithmic ISP filtering.
+7. **Audit MIME structure & plain text fallback** — Verify that every outgoing template includes both a valid `text/plain` part and a balanced HTML payload without broken tracking URLs.
+8. **Verify ISP-specific routing & tab placement** — Check whether messages are routing to Gmail's Promotions tab vs. spam, and isolate transactional subdomains from promotional lists.
 
 ---
 
@@ -390,19 +1016,21 @@ Path: /blog/spf-dkim-dmarc-setup-guide
 URL: https://reloop.sh/blog/spf-dkim-dmarc-setup-guide
 Markdown: https://reloop.sh/blog/spf-dkim-dmarc-setup-guide.md
 
-A thorough, practical guide to configuring SPF, DKIM, and DMARC for your sending domain — with exact DNS records, common mistakes, and a step-by-step verification checklist.
+A thorough, practical guide to configuring SPF, DKIM, and DMARC for your sending domain  with exact DNS records, common mistakes, and a step-by-step verification checklist.
 
-## Why email authentication exists
+**Email authentication is no longer optionalwithout SPF, DKIM, and DMARC properly configured, your transactional emails will consistently land in spam or be dropped by inbox providers.**
 
-When email was designed in the 1970s, there was no mechanism to verify that a sender was who they claimed to be. Anyone could put any address in the `From:` field. SPF, DKIM, and DMARC were created over the following decades to fix this — and in 2024, Google and Yahoo made all three mandatory for bulk senders. If you're sending transactional email today without proper authentication, you're fighting deliverability with both hands tied behind your back.
+When email protocols were originally designed in the 1970s, there was zero built-in identity verification. Anyone could inject arbitrary sender addresses into the `From:` header. Over subsequent decades, **SPF (Sender Policy Framework)**, **DKIM (DomainKeys Identified Mail)**, and **DMARC (Domain-based Message Authentication, Reporting & Conformance)** were introduced to close this vulnerability.
 
-This guide walks you through configuring all three records correctly, in the right order, and verifying they work before a single production email is sent.
+In 2024, **Google, Yahoo, and Microsoft made all three protocols strictly mandatory** for senders. If you are sending [transactional emails](/features/transaction-emails) today without valid authentication records, you are battling deliverability with both hands tied behind your back (see our deep dive on [why emails land in spam and how to fix it](/blog/why-emails-land-in-spam-fix)).
 
----
+This guide walks you through configuring all three authentication layers correctly, in the exact sequence required, and verifying them with real-world tools before sending your first production message.
 
 ## Step 1: SPF (Sender Policy Framework)
 
-SPF is a DNS TXT record that declares which mail servers are authorized to send email for your domain. When a receiving server gets an email claiming to be from `you@yourdomain.com`, it looks up the SPF record for `yourdomain.com` and checks whether the sending IP is on the authorized list. If it's not, the email fails SPF — and depending on your DMARC policy, may be rejected or marked as spam.
+**SPF is a DNS TXT record that explicitly declares which mail transfer agents and IP addresses are authorized to send email on behalf of your domain.**
+
+When a mailbox provider (like Gmail or Outlook) receives a message claiming to come from `you@yourdomain.com`, it queries the SPF TXT record for `yourdomain.com` and checks whether the originating IP address is authorized. If the sender IP is not on that list, the message fails SPF evaluationand depending on your DMARC policy, it will be marked as spam or rejected outright.
 
 ### What an SPF record looks like
 
@@ -410,89 +1038,95 @@ SPF is a DNS TXT record that declares which mail servers are authorized to send 
 v=spf1 include:_spf.reloop.sh ~all
 ```
 
-Breaking this down:
+Breaking down the core components:
 
-- `v=spf1` — declares this is an SPF record
-- `include:_spf.reloop.sh` — authorizes all IPs in Reloop's published SPF range
-- `~all` — soft fail for everything else (use `-all` to hard fail once confident)
+- `v=spf1`  **declares this record as an SPF version 1 specification** (must appear at the very beginning).
+- `include:_spf.reloop.sh`  **authorizes all IP addresses published in Reloop's sending pool** to dispatch emails for your domain.
+- `~all`  **specifies a SoftFail policy for unauthorized IPs**. This signals to receiving servers that unlisted IPs should be treated with suspicion, while allowing legitimate messages through during testing. Once your records are fully validated, you can graduate to `-all` (HardFail).
 
 ### How to add your SPF record
 
-1. Go to your DNS provider (Cloudflare, Route 53, Namecheap, etc.)
-2. Create a new **TXT record** on your root domain (`@` or `yourdomain.com`)
-3. Set the value to `v=spf1 include:_spf.reloop.sh ~all`
-4. TTL: 300 seconds (low during setup; increase to 3600+ after confirming it works)
+1. Log in to your DNS management console ([Cloudflare](https://dash.cloudflare.com), [AWS Route 53](https://aws.amazon.com/route53/), Namecheap, GoDaddy, etc.).
+2. Create a new **TXT record** on your sending domain (`@` or `yourdomain.com`).
+3. Set the record value to: `v=spf1 include:_spf.reloop.sh ~all`
+4. Set the **TTL (Time to Live)** to **300 seconds** (a low TTL ensures quick propagation while debugging; increase to 3600+ after confirming delivery).
 
-### The most common SPF mistake
+### The most common SPF mistake: Multiple TXT records
 
-**Never create two SPF records for the same domain.** DNS only permits one SPF TXT record per hostname. If you have multiple sending services (Reloop + G Suite, for example), combine them into a single record:
+**Never create two SPF records for the same domain.** DNS RFC specifications strictly permit only **one SPF TXT record per hostname**. If you maintain multiple sending services (such as [Reloop](https://github.com/reloop-labs/reloop) for [transactional emails](/features/transaction-emails) alongside Google Workspace for corporate email), you must combine them into a single consolidated string:
 
 ```
 v=spf1 include:_spf.reloop.sh include:_spf.google.com ~all
 ```
 
+> **The 10-DNS-Lookup Limit**: SPF specifications enforce a strict limit of **10 DNS lookups** during recursive evaluation. Each `include:`, `a`, `mx`, `ptr`, and `exists` mechanism counts toward this quota. Exceeding 10 lookups triggers an immediate `PermError` validation failure. If you use numerous external providers, use an SPF flattening utility or consolidate providers.
+
 ### Verifying your SPF record
 
+You can verify your DNS publication immediately using standard CLI utilities:
+
 ```bash
-dig TXT yourdomain.com | grep spf
+dig TXT yourdomain.com +short | grep spf
 ```
 
-Or use [MXToolbox SPF Lookup](https://mxtoolbox.com/spf.aspx). You should see a single record returned with your `include:` directives.
-
-> **SPF lookup limit**: SPF allows a maximum of 10 DNS lookups during evaluation. Each `include:` counts as one. If you have many services, consolidate using an SPF flattening tool.
-
----
+Alternatively, use the [MXToolbox SPF Lookup](https://mxtoolbox.com/spf.aspx) web tool. You should see a single TXT entry returned with your authorized `include:` directives.
 
 ## Step 2: DKIM (DomainKeys Identified Mail)
 
-DKIM adds a cryptographic signature to every outgoing email. The sending server signs the message with a private key. The receiving server looks up the corresponding public key in DNS and verifies the signature. If the signature is valid, the email hasn't been tampered with in transit and genuinely originated from an authorized sender.
+**DKIM adds an asymmetric cryptographic signature to every outgoing email header, guaranteeing that the message was not forged or tampered with in transit.**
+
+When [Reloop's delivery engine](/features/deliverability) transmits an email, it calculates a hash of the headers and body, signs that hash with your private key, and embeds a `DKIM-Signature` header. The receiving mail server queries the corresponding public key published in your DNS, decrypts the signature, and verifies the hash matches. If the cryptographic signature matches, the recipient is assured that the email genuinely originated from your server and arrived intact.
 
 ### How Reloop handles DKIM
 
-Reloop uses selector-based DKIM. When you add a sending domain in the Reloop dashboard, it generates a public/private key pair and shows you the DNS records to add. These are typically CNAME records pointing to Reloop-managed keys, which means Reloop handles key rotation automatically — you set it once and never touch it again.
+When you register a sending domain in the [Reloop dashboard](https://reloop.sh/dashboard/signup), Reloop automatically provisions a dedicated **2048-bit RSA cryptographic key pair** unique to your domain:
 
-### What Reloop's DKIM records look like
+1. **Private Key**: Kept strictly confidential in Reloop's database and used by [Reloop's KumoMTA sending engine](/features/deliverability) to sign outgoing emails at send-time.
+2. **Public Key**: Formatted as a standard DKIM DNS TXT record that you publish to your DNS provider under the `reloop._domainkey` selector.
 
-You'll be given two CNAME records:
+### What Reloop's DKIM record looks like
 
-```
-reloop1._domainkey.yourdomain.com → reloop1._domainkey.reloop.sh
-reloop2._domainkey.yourdomain.com → reloop2._domainkey.reloop.sh
-```
+You will receive a DNS TXT record structured as follows:
 
-Add both exactly as shown. The selector (`reloop1`, `reloop2`) is what the email header references so receivers know which DNS record to look up.
+| Record Type | Host / Name | Value / Content |
+| :--- | :--- | :--- |
+| **TXT** | `reloop._domainkey` | `v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA...` |
 
-### Verifying your DKIM records
+**Add the record exactly as shown in your Reloop dashboard.** The selector `reloop` tells receiving mail servers which public key record to look up when verifying signatures from your domain.
+
+### Verifying your DKIM record
+
+To confirm that your DKIM TXT record resolves properly in DNS:
 
 ```bash
-dig TXT reloop1._domainkey.yourdomain.com
+dig TXT reloop._domainkey.yourdomain.com +short
 ```
 
-You should see the CNAME resolution chain return a TXT record containing `v=DKIM1; k=rsa; p=...`.
+You should see the published TXT record returned containing `v=DKIM1; k=rsa; p=...`.
 
-Alternatively, send a test email to [mail-tester.com](https://mail-tester.com) — it shows you DKIM pass/fail with the exact header it evaluated.
+You can also send a test email to [mail-tester.com](https://mail-tester.com) or [check your raw message headers](/blog/why-emails-land-in-spam-fix) to inspect the evaluated `DKIM: PASS (selector=reloop)` status.
 
 ### Why DKIM sometimes fails after setup
 
-- **DNS propagation**: New records can take 15 minutes to 48 hours to propagate. Test after waiting at least 15 minutes.
-- **Trailing spaces or quote marks**: Some DNS providers wrap TXT records in quotes. The record itself should not have wrapping quotes in the value field.
-- **Wrong hostname**: Adding the record to `_domainkey.yourdomain.com` instead of `reloop1._domainkey.yourdomain.com` is a common mistake.
-
----
+- **DNS propagation delay**: DNS record updates can take anywhere from 15 minutes to 24 hours to propagate globally across resolver caches.
+- **Accidental quote wrapping or truncation**: Some DNS providers (like Namecheap or GoDaddy) limit TXT record lengths or wrap strings in double quotes. Ensure the entire `p=` public key string is pasted without truncation or extra quotes.
+- **Hostname duplication**: A frequent mistake is entering the full domain twice (e.g. `reloop._domainkey.yourdomain.com.yourdomain.com`). If your DNS provider automatically appends your domain, enter only `reloop._domainkey`.
 
 ## Step 3: DMARC (Domain-based Message Authentication, Reporting & Conformance)
 
-DMARC is the policy layer that sits on top of SPF and DKIM. It tells receiving servers what to do when an email fails authentication: nothing (`none`), quarantine it, or reject it. It also instructs receiving servers to send you reports of authentication failures — which is invaluable for detecting spoofing and misconfiguration.
+**DMARC is the overarching policy and reporting framework that instructs receiving mail servers on how to handle messages that fail SPF or DKIM validation.**
 
-### The three DMARC policies
+Without DMARC, receiving servers must guess whether an unauthenticated email is malicious spoofing or simply a misconfigured server. DMARC gives you explicit control over enforcement, while instructing receiving servers to send XML telemetry reports regarding all messages delivered under your domain identity.
 
-| Policy | Effect |
-|--------|--------|
-| `p=none` | Monitor only. No impact on delivery. Reports are sent. |
-| `p=quarantine` | Failed emails go to spam folder. |
-| `p=reject` | Failed emails are rejected outright. |
+### The three DMARC policy modes
 
-**Always start with `p=none`.** Never jump straight to `p=reject`. You need time to confirm that your own legitimate mail is passing authentication before you start rejecting anything.
+| Policy | Level | Effect on Delivery | Purpose |
+| :--- | :--- | :--- | :--- |
+| `p=none` | **Monitoring** | **Zero impact on delivery**. Failing emails are still delivered to the inbox. Daily aggregate reports are generated. | **Always start here** to audit legitimate email traffic before enforcing rules. |
+| `p=quarantine` | **Protection** | Emails that fail authentication are routed directly to the **Spam / Junk folder**. | Protects recipients from phishing while catching edge-case false positives. |
+| `p=reject` | **Enforcement** | Emails failing authentication are **blocked and dropped outright at the SMTP handshake**. | The gold standard for complete brand protection and prerequisite for [BIMI logo verification](/blog/bimi-email-setup-guide). |
+
+**Always begin your DMARC rollout at `p=none`. Never jump straight to `p=reject` on day one.** You need a minimum observation period (typically 2 to 4 weeks) to confirm that all legitimate outbound mail streams (transactional alerts, invoices, support platforms) are passing alignment.
 
 ### Your starter DMARC record
 
@@ -500,379 +1134,360 @@ DMARC is the policy layer that sits on top of SPF and DKIM. It tells receiving s
 v=DMARC1; p=none; rua=mailto:dmarc@yourdomain.com; ruf=mailto:dmarc@yourdomain.com; fo=1
 ```
 
-Breaking this down:
+Deconstructing the DMARC parameters:
 
-- `v=DMARC1` — declares this as a DMARC record
-- `p=none` — monitor-only policy (start here)
-- `rua=mailto:...` — where to send aggregate reports (daily summaries)
-- `ruf=mailto:...` — where to send forensic reports (individual failure details)
-- `fo=1` — generate forensic reports for any authentication failure
+- `v=DMARC1`  **identifies this record as DMARC protocol version 1** (must be the first tag).
+- `p=none`  **sets the monitoring policy** so no valid messages are blocked during initial testing.
+- `rua=mailto:dmarc@yourdomain.com`  **the destination email address for daily aggregate XML reports** (summary metrics across all receivers).
+- `ruf=mailto:dmarc@yourdomain.com`  **the destination email address for real-time forensic failure reports** (sample headers of failed messages).
+- `fo=1`  **generates forensic failure notifications** if either SPF or DKIM fails alignment.
 
 ### How to add your DMARC record
 
-Create a **TXT record** at `_dmarc.yourdomain.com` (not the root) with the value above.
+1. In your DNS dashboard, create a new **TXT record**.
+2. In the **Host / Name** field, enter: `_dmarc` (or `_dmarc.yourdomain.com` depending on your provider).
+3. In the **Value / Content** field, paste the DMARC record string above.
+4. Save the record with a **300 second TTL**.
 
 ```bash
-# Verify it's in place:
-dig TXT _dmarc.yourdomain.com
+# Verify DMARC in DNS
+dig TXT _dmarc.yourdomain.com +short
 ```
 
-### Reading DMARC reports
+### Understanding DMARC Identifier Alignment
 
-DMARC aggregate reports arrive as XML attachments. They're unreadable raw. Use a free tool like [DMARC Analyzer](https://www.dmarcanalyzer.com) or [Postmark's DMARC tool](https://dmarc.postmarkapp.com) to parse and visualize them. What you're looking for:
+**DMARC evaluation requires identifier alignment between the header `From:` domain and the authenticated domains.**
 
-- **High SPF/DKIM pass rate on your own mail** — should be near 100%
-- **Unexpected sources sending as your domain** — these are either misconfigurations or spoofing attempts
+An email passes DMARC if **either** of the following conditions is met:
 
-### Graduating your DMARC policy
+1. **SPF Alignment**: The domain validated in the envelope sender (`Return-Path` / `Mail From`) matches the domain in the user-visible `From:` header.
+2. **DKIM Alignment**: The domain specified in the `d=` tag of a valid `DKIM-Signature` header matches the domain in the user-visible `From:` header.
 
-Once you've confirmed (via reports) that all your legitimate mail passes authentication:
+Because third-party email forwarders and mailing lists often break SPF by altering sending IPs, **DKIM alignment is crucial for reliable DMARC compliance**.
 
-1. Move from `p=none` to `p=quarantine`:
+### Analyzing DMARC reports
+
+Aggregate DMARC reports arrive as compressed XML files. Rather than reading raw XML, connect your reporting mailbox to free analysis tools such as [DMARC Analyzer](https://www.dmarcanalyzer.com), [Postmark DMARC Monitor](https://dmarc.postmarkapp.com), or [Valimail](https://www.valimail.com).
+
+**Key metrics to monitor in your reports:**
+
+- **Authentication Pass Rate**: Your legitimate sending services should maintain a **99%+ pass rate**.
+- **Unrecognized Sending Sources**: Identify rogue marketing tools, unconfigured staging environments, or spoofing attempts sending under your brand.
+
+### Graduating your DMARC policy to full enforcement
+
+Once your reports confirm that 100% of your legitimate outbound mail passes SPF and DKIM:
+
+1. **Step 1  Gradual Quarantine**:
    ```
    v=DMARC1; p=quarantine; pct=10; rua=mailto:dmarc@yourdomain.com
    ```
-   The `pct=10` applies the quarantine policy to only 10% of failing mail — a safe way to test the change.
+   The `pct=10` parameter applies quarantine enforcement to only 10% of failing messages.
 
-2. After 2–4 weeks with no legitimate mail affected, increase to `pct=100`.
+2. **Step 2  Full Quarantine**:
+   After 2 weeks with zero legitimate delivery issues, remove `pct=10` (or set `pct=100`):
+   ```
+   v=DMARC1; p=quarantine; rua=mailto:dmarc@yourdomain.com
+   ```
 
-3. Finally, move to `p=reject`:
+3. **Step 3  Strict Reject Enforcement**:
+   Upgrade your policy to `p=reject` to completely neutralize email spoofing:
    ```
    v=DMARC1; p=reject; rua=mailto:dmarc@yourdomain.com
    ```
 
-This graduated rollout is the industry standard. Rushing to `p=reject` on day one risks losing legitimate email.
+At `p=reject`, you are also eligible to configure [BIMI (Brand Indicators for Message Identification)](/blog/bimi-email-setup-guide) to display your official brand logo in user inboxes.
 
----
+## The complete verification checklist
 
-## The verification checklist
+Run through this pre-flight checklist before routing production traffic:
 
-Run through this before going to production:
-
-- [ ] **Single SPF record** — `dig TXT yourdomain.com` returns exactly one SPF record
-- [ ] **SPF includes Reloop** — the record includes `include:_spf.reloop.sh`
-- [ ] **Both DKIM CNAME records resolve** — test each selector with `dig TXT selector._domainkey.yourdomain.com`
-- [ ] **DMARC record at `_dmarc.yourdomain.com`** — starts with `p=none`
-- [ ] **Test email passes all three** — send to [mail-tester.com](https://mail-tester.com) and confirm SPF: pass, DKIM: pass, DMARC: pass
-- [ ] **DMARC reports are arriving** — check the `rua` mailbox after 24 hours
-
----
+- [ ] **Single SPF record**: `dig TXT yourdomain.com` returns exactly one consolidated SPF TXT record without duplicate tags.
+- [ ] **SPF lookup limit under 10**: The record contains fewer than 10 total DNS lookups.
+- [ ] **Reloop SPF included**: The SPF string contains `include:_spf.reloop.sh`.
+- [ ] **DKIM TXT record active**: `dig TXT reloop._domainkey.yourdomain.com` resolves with your valid public key.
+- [ ] **DMARC TXT record in place**: `_dmarc.yourdomain.com` is published with at least `p=none` and a working `rua` report destination.
+- [ ] **Mail-Tester test passed**: Send a message to [mail-tester.com](https://mail-tester.com) and confirm a score of **9+/10** with SPF, DKIM, and DMARC passing.
+- [ ] **Google Postmaster Tools configured**: Register your domain with [Google Postmaster Tools](https://postmaster.google.com) to track domain and IP reputation.
+- [ ] **Automated bounce tracking**: Verify that hard and soft bounces are captured via [signed webhooks](/features/webhooks) (see our guide on [email bounce processing automation](/blog/email-bounce-processing-automation)).
 
 ## What Reloop's dashboard does for you
 
-When you add a domain in Reloop, the dashboard:
+When you add a sending domain in the [Reloop dashboard](https://reloop.sh/dashboard/signup), the platform simplifies the entire authentication lifecycle:
 
-1. Generates your DKIM key pair and shows you the exact CNAME records to add
-2. Provides a pre-filled SPF include directive
-3. Runs live verification checks and shows you which records are missing or misconfigured
-4. Alerts you if your DMARC reports indicate authentication failures from your domain
+1. **Automated Key Generation**: Reloop automatically provisions dedicated RSA-2048 DKIM key pairs for your domain.
+2. **One-Click DNS Directives**: Copy ready-to-paste SPF, DKIM, and DMARC records tailored to your specific domain structure.
+3. **Live DNS Status Probing**: Reloop periodically queries your DNS records and provides real-time verification indicators in the dashboard.
+4. **Deliverability & Bounce Management**: Built-in [bounce classification](/blog/email-bounce-processing-automation), [real-time email analytics](/features/email-analytics), and suppression lists keep your sender reputation safe.
+5. **Developer APIs & Drop-in SDKs**: Send authenticated mail via [Node.js, Python, or Go SDKs](/sdk) or drop-in [SMTP relay](/features/smtp).
 
-You don't need to generate keys or write records manually — Reloop produces the exact strings to paste into your DNS provider.
+Whether you choose [Reloop Cloud pricing](/pricing) for managed deliverability or [self-host Reloop on your own infrastructure](/self-host) (for under $5/mo with our [self-host tutorial](/blog/self-host-email-5-dollars)), the authentication requirements remain identical.
 
----
+## Common gotchas & deliverability pitfalls
 
-## Common gotchas
+### 1. Subdomain vs. root domain sending
+If you send notifications from `notifications.yourdomain.com`, your SPF and DKIM records must be added directly to the `notifications` subdomain DNS zone. While DMARC policies on the root domain (`yourdomain.com`) automatically protect subdomains by default, SPF and DKIM do not inherit down.
 
-**Subdomain sending**: If you send from `notifications.yourdomain.com`, the SPF and DKIM records need to be set for that subdomain specifically, not the root domain. DMARC applies at the organisational domain level by default (`yourdomain.com`), so one DMARC record covers all subdomains — but SPF and DKIM must be per-subdomain.
+### 2. IP warming for high-volume senders
+Email authentication establishes your domain identity, but **it does not replace IP and domain reputation**. If you plan to send more than 10,000 emails per day, follow our structured [IP warming sequence guide](/blog/ip-warming-guide) to avoid triggering algorithmic spam filters at Gmail and Microsoft.
 
-**Multiple DKIM selectors**: If you use multiple email services (Reloop for transactional, Google Workspace for internal mail), each service gets its own selector. They don't conflict — just add all of them.
-
-**Testing in staging**: Never use your production domain for testing. Create a separate subdomain (`test.yourdomain.com`) with its own SPF/DKIM/DMARC records. This protects your production sender reputation during development.
-
----
-
-# Migrating from SendGrid to Reloop
-
-Path: /blog/migrating-from-sendgrid
-URL: https://reloop.sh/blog/migrating-from-sendgrid
-Markdown: https://reloop.sh/blog/migrating-from-sendgrid.md
-
-Step-by-step migration — map APIs, switch SMTP, update webhooks, and validate deliverability during the cutover.
-
-## Plan the cutover
-
-Run Reloop in parallel before switching DNS or API keys. Send test traffic to seed inboxes and compare delivery rates.
-
-Map SendGrid endpoints to Reloop's REST API or use SMTP relay for drop-in compatibility with existing code.
-
-<Callout type="info">
-  Keep SendGrid active during a parallel run period so you can roll back quickly if deliverability dips.
-</Callout>
-
-## Update DNS
-
-Replace SendGrid SPF includes with Reloop's. Add new DKIM selectors before removing old ones to avoid a gap in signing.
-
-## Rewire webhooks
-
-Reloop webhook payloads differ from SendGrid's. Update your handlers for delivered, bounce, and spam complaint events.
-
-<Cta
-  title="Ready to migrate?"
-  description="Open-source email infrastructure with a free hosted tier."
-  href="/dashboard/signup"
-  label="Get started"
-/>
+### 3. Separating transactional and marketing streams
+**Never mix transactional receipts with marketing newsletters on the same sending domain or IP.** Protect your mission-critical password resets and auth tokens by isolating them on a dedicated transactional subdomain (see [transactional email best practices](/blog/transactional-email-best-practices)).
 
 ---
 
-# Transactional Email Best Practices: The Complete Developer Guide
+# Why We Open-Sourced Our Email Infrastructure
 
-Path: /blog/transactional-email-best-practices
-URL: https://reloop.sh/blog/transactional-email-best-practices
-Markdown: https://reloop.sh/blog/transactional-email-best-practices.md
+Path: /blog/why-we-open-sourced-email-infrastructure
+URL: https://reloop.sh/blog/why-we-open-sourced-email-infrastructure
+Markdown: https://reloop.sh/blog/why-we-open-sourced-email-infrastructure.md
 
-Everything you need to send fast, reliable, inbox-landing transactional email — from domain setup and template design to delivery patterns and monitoring.
+The story behind Reloop: why we built an open-source alternative to SendGrid, Resend, and Mailgun, why email infrastructure is too critical to rent forever, and what we're changing.
 
-## What makes transactional email different
+**Email is the most critical communication backbone of modern software, yet it has quietly become one of the most expensive and locked-down tools in SaaS.**
 
-Transactional emails — password resets, receipts, order confirmations, notifications, onboarding sequences — are different from marketing email in one critical way: **the recipient expects them.** That expectation drives open rates of 45–65%, compared to 20–25% for marketing campaigns.
+When your auth tokens, receipts, password resets, and user notifications fail, your business is effectively down. Yet for over a decade, developers have been forced to accept a frustrating tradeoff: **either pay skyrocketing bills to closed email vendors**, or **spend months wrestling with fragile mail servers** that lack modern APIs, webhooks, and analytics.
 
-But that expectation also creates an obligation. When someone clicks "Forgot password?" and your reset email takes 4 minutes to arrive, or lands in spam, it's not an inconvenience — it's a product failure. Your transactional email infrastructure is part of your product.
-
-This guide covers everything you need to get transactional email right: from domain architecture to template patterns, delivery behaviour, and what to monitor.
+We built [Reloop](https://github.com/reloop-labs/reloop) because we believe **email infrastructure belongs in the open**. Here is the story behind why we started, the structural problems we kept running into, and why we made Reloop [Apache 2.0](/license).
 
 ---
 
-## 1. Domain and subdomain architecture
+## The problem: Email became a hostage situation
 
-### Use a dedicated sending subdomain
+Every growing startup and engineering team we spoke with was hitting the same predictable wall: **monthly email bills exploding from $20 to $2,000+ as user volume scaled**, without any corresponding increase in value or underlying infrastructure costs.
 
-Never send transactional email from your root domain (`yourdomain.com`). Use a dedicated subdomain:
+Beyond pricing, closed-source email providers introduce compounding technical risks:
 
-- `mail.yourdomain.com` — clean, generic
-- `notifications.yourdomain.com` — descriptive
-- `noreply.yourdomain.com` — avoid this (more on why below)
-- `tx.yourdomain.com` — short, unambiguous
+- **Vendor lock-in by design**: Proprietary APIs, custom template formats, and vendor-specific webhook payloads ensure that **leaving a provider requires a painful, multi-week engineering rewrite**.
+- **Opaque black-box delivery**: When emails silently fail or get flagged as spam, closed vendors offer vague deliverability scores rather than raw [SMTP](/features/smtp) transcripts and transparent queue visibility.
+- **Zero data sovereignty**: Every user interaction, email address, password reset token, and payload metadata passes through third-party servers—**creating compliance headaches for HIPAA, GDPR, and enterprise audits**.
+- **Single point of failure**: If your closed email SaaS suffers an outage, **your entire authentication and notification loop goes dark with zero fallback**.
 
-Why it matters: if your marketing emails damage your sender reputation (high unsubscribes, spam complaints from cold outreach), a dedicated transactional subdomain insulates your password resets and receipts from that reputation hit.
-
-### Separate transactional from marketing at the subdomain level
-
-| Email type | Subdomain |
-|------------|-----------|
-| Password resets, 2FA | `mail.yourdomain.com` |
-| Receipts, order confirmations | `mail.yourdomain.com` |
-| Product notifications | `notifications.yourdomain.com` |
-| Newsletter, campaigns | `marketing.yourdomain.com` |
-
-### Never send from `noreply@`
-
-`noreply@` is a red flag for spam filters and a poor experience for recipients. Spam filters correlate `noreply` addresses with bulk, impersonal sending. And when a recipient wants to reply to a receipt or reset email — and they can't — it damages trust.
-
-Use a monitored address like `hello@` or `support@` with a reply-to if you don't want replies going to your engineering inbox. The deliverability improvement alone is worth the setup cost.
+To see how these tradeoffs compare across the ecosystem, check our [2026 email provider comparison](/blog/email-provider-comparison-2026) or explore side-by-side breakdowns against [SendGrid](/compare/sendgrid), [Resend](/compare/resend), [Mailgun](/compare/mailgun), and [AWS SES](/compare/aws-ses).
 
 ---
 
-## 2. Authentication: table stakes, not optional
+## Why "just use Postfix" isn't the answer
 
-Before your first production send, your sending domain must have:
+The traditional counterargument from senior engineers has always been: *"Why not just run your own Postfix, KumoMTA or Haraka instance?"*
 
-- **SPF** — authorizes your sending servers
-- **DKIM** — signs each message cryptographically
-- **DMARC** — sets policy and sends you reports on failures
+**The harsh reality is that raw Postfix provides a mail transfer agent, not modern developer infrastructure.** 
 
-Gmail and Yahoo have required all three since February 2024. Skipping any one of them will result in your email being rejected or spam-foldered by major ISPs.
+Running bare SMTP solves packet transmission, but it leaves you with months of grueling undifferentiated engineering work:
 
-See the [complete SPF, DKIM, DMARC setup guide](/blog/spf-dkim-dmarc-setup-guide) for step-by-step configuration.
+1. **Reputation & protocol engineering**: Configuring [SPF, DKIM, and DMARC](/blog/spf-dkim-dmarc-setup-guide), handling [IP warming sequences](/blog/ip-warming-guide), and managing suppression lists.
+2. **Bounce classification**: Distinguishing between temporary soft bounces and permanent hard bounces automatically to protect domain reputation (see our guide on [email bounce processing automation](/blog/email-bounce-processing-automation)).
+3. **Developer ergonomics**: Building ergonomic REST APIs, multi-language [SDKs](/sdk), and template render engines.
+4. **Visibility & observability**: Parsing real-time delivery events into signed [webhooks](/features/webhooks) and actionable [email analytics](/features/email-analytics).
+
+Building all of this in-house takes **6 to 9 months of full-time platform engineering** before sending your first production receipt. Most teams cannot afford that distraction, so they reluctantly pay the SaaS.
 
 ---
 
-## 3. Sending patterns that affect deliverability
+## What we built with Reloop
 
-### Send immediately — never batch transactional mail
+Reloop bridges this gap: **a production-grade, fully open-source email engine with the developer experience of modern email SaaS, built to run anywhere.**
 
-Transactional email must be sent with near-zero latency. A user who triggers a password reset expects that email within 30 seconds. If you're batching emails or running them through a slow queue, you're creating support tickets.
+<SendEmailCodeSamples />
 
-The correct pattern:
-1. User action triggers email send
-2. API call to Reloop is made inline or in an immediate background job
-3. Email departs within seconds
+Reloop gives you the complete lifecycle out of the box:
 
-Never schedule transactional emails for "later" or include them in a batch job that runs every few minutes.
+- **Unified REST API & Drop-in SDKs**: Ergonomic endpoints and official [SDKs for Node.js, Python, and Go](/sdk) designed for seamless migration from existing providers (see our [SendGrid migration guide](/blog/migrating-from-sendgrid)).
+- **[SMTP relay](/features/smtp) & Drop-in replacement**: Instantly plug Reloop into Nodemailer, Next.js, Django, Laravel, Rails, or Supabase.
+- **Automated deliverability loop**: Built-in [SPF/DKIM validation](/blog/spf-dkim-dmarc-setup-guide), feedback loops, and intelligent retry queues powered by BullMQ (detailed in [how we built our queue engine](/blog/how-we-built-email-delivery-queue-bullmq)).
+- **Real-time [email analytics](/features/email-analytics)**: Full visibility into deliveries, opens, click tracking, bounces, and complaint rates with zero third-party tracking scripts.
+- **Signed [webhook delivery](/features/webhooks)**: Guaranteed event delivery with automatic backoff, replay capabilities, and secret signing.
+- **[AI Agent inboxes & MCP support](/features/ai-agents)**: Two-way inbound parsing and Model Context Protocol tooling so autonomous agents can send, receive, and reason over email safely (explore our [AI agent inbox use case](/use-cases/ai-agent-inbox) and [email infrastructure for AI agents](/blog/email-infrastructure-for-ai-agents)).
 
-### Use dedicated queues for different priority tiers
+---
 
-If you have a job queue, separate email types into priority lanes:
+## The open-source bet: Boring infrastructure must be open
+
+Think about the foundational software that powers modern computing: **Linux, PostgreSQL, Redis, Kubernetes, and Nginx**. 
+
+Nobody rents their primary database or operating system behind a closed, proprietary paywall where the underlying code cannot be inspected, self-hosted, or audited. **Email sits squarely in that foundational tier.**
+
+By releasing Reloop under the **[Apache 2.0 license](/license)**, we guarantee:
+
+1. **Complete Stack Ownership**: The cloud platform and the open-source release run the **exact same codebase**. You can `docker compose up` locally, host on [Fly.io](/blog/reloop-flyio-deployment) or [Coolify](/blog/reloop-coolify-setup), or run on bare metal for under $5/mo (see [how to self-host email for $5/month](/blog/self-host-email-5-dollars)).
+2. **Auditability & Security**: Security teams can inspect every line of delivery logic and keep sensitive communication strictly within their own VPC boundary.
+3. **No Ransom Pricing**: If your business grows 100x, your outbound communication channel doesn't become your most expensive utility. You can choose managed [Reloop Cloud pricing](/pricing) for zero ops, or [self-host](/self-host) with complete independence.
+
+For a deeper dive into our architectural philosophy, read our [product beliefs](/our-product-beliefs) and [why open source matters](/why-open-source).
+
+---
+
+## Where we go from here
+
+We are building Reloop in the open with a public roadmap driven by real developer feedback, not arbitrary pricing metrics.
+
+Whether you are an indie hacker shipping your first app, a high-growth startup outgrowing vendor limits, or an enterprise demanding strict compliance: **you should never have to compromise between world-class developer experience and complete infrastructure ownership.**
+
+### Get involved
+
+- **Star and explore the repository**: [github.com/reloop-labs/reloop](https://github.com/reloop-labs/reloop)
+- **Start sending on Reloop Cloud**: [reloop.sh/dashboard/signup](https://reloop.sh/dashboard/signup)
+- **Browse the documentation**: [Reloop Docs](/docs) · [Self-Host Guide](/self-host) · [Pricing](/pricing) · [Provider Comparisons](/compare)
+
+---
+
+# IP Warming Schedule Guide: How to Build Sender Reputation (2026)
+
+Path: /blog/ip-warming-guide
+URL: https://reloop.sh/blog/ip-warming-guide
+Markdown: https://reloop.sh/blog/ip-warming-guide.md
+
+A comprehensive, practical guide to warming new sending IP addresses — with an exact week-by-week volume ramp schedule, recipient segmentation strategy, throttle limits, and deliverability monitoring.
+
+**Sending high-volume email traffic from a cold, un-warmed IP address is the single fastest way to get throttled, deferred, or permanently blacklisted by mailbox providers.**
+
+When an Internet Service Provider (such as Gmail, Microsoft 365, or Yahoo) detects sudden spikes of outbound email originating from an unfamiliar IP address, anti-abuse algorithms immediately assume the server is a compromised host or a spam botnet. 
+
+**IP warm-up is the disciplined process of gradually ramping up sending volume over 4 to 6 weeks to establish positive, trusted reputation signals with major mailbox algorithms.**
+
+Whether you are configuring a dedicated IP on [Reloop Cloud](/pricing) or deploying [self-hosted Reloop on your own VPS or bare metal](/self-host), this guide provides the exact week-by-week volume schedules, recipient segmentation techniques, and diagnostic tools required to warm your sending IPs safely.
+
+---
+
+## Shared pools vs. dedicated IPs: Who actually needs to warm up?
+
+Before starting, it is essential to understand whether your setup requires manual IP warming:
+
+1. **Reloop Cloud Shared Pools (No Warm-Up Needed)**: If you send via standard [Reloop Cloud plans](/pricing), your traffic routes through pre-warmed, continuously monitored shared IP pools with established reputation. You can ship production transactional mail immediately.
+2. **Dedicated Sending IPs (Warm-Up Required)**: If your organization provisions dedicated IPs for high-volume isolation, enterprise compliance, or [self-hosted Reloop deployments](/blog/self-hosted-email-infrastructure), **you must execute a structured warm-up schedule before routing 100% of your production traffic**.
+3. **Dormant IP Addresses (Re-Warming Required)**: If a previously warmed dedicated IP sits idle for **30 consecutive days or more**, ISPs decay its reputation score back to neutral, requiring a fresh warm-up cycle.
+
+---
+
+##  Prerequisites before sending email #1
+
+**Warming an IP with broken authentication or dirty recipient lists will permanently destroy the IP's reputation before you finish Week 1.** Complete this checklist first:
+
+- [ ] **SPF, DKIM, and DMARC fully validated**: Your sending domain must have strict DNS records published with proper identifier alignment. Follow our [complete SPF, DKIM, and DMARC setup guide](/blog/spf-dkim-dmarc-setup-guide).
+- [ ] **Reverse DNS (rDNS / PTR Record) configured**: The PTR record of your sending IP must match your sending hostname (e.g. `mail.yourdomain.com`), and that hostname must resolve back to the IP (Forward-Confirmed reverse DNS).
+- [ ] **Clean suppression lists**: Ensure your suppression database contains zero historical hard bounces or spam complaints (see [email bounce processing automation](/blog/email-bounce-processing-automation)).
+- [ ] **Domain age over 30 days**: Brand-new domain names registered within the last 30 days carry an elevated risk profile in spam filter heuristics.
+- [ ] **One-Click Unsubscribe headers configured**: Ensure all non-essential notifications include `List-Unsubscribe` and `List-Unsubscribe-Post` headers per RFC 8058.
+
+---
+
+## The 6-week IP warming schedule
+
+The following schedule outlines conservative daily volume targets per sending IP address across all destination mailbox providers.
+
+| Phase | Daily Sends | Cumulative Total | Target Recipient Segment |
+| :--- | :--- | :--- | :--- |
+| **Week 1** | **50 – 200 / day** | ~1,000 | **High-intent transactional only** (password resets, 2FA OTPs, purchase receipts). |
+| **Week 2** | **200 – 500 / day** | ~3,500 | Active daily users and transactional notifications. |
+| **Week 3** | **500 – 1,000 / day** | ~10,500 | Weekly digests, invoice alerts, and active subscribers. |
+| **Week 4** | **1,000 – 2,500 / day** | ~24,500 | Product announcements to users active in the last 30 days. |
+| **Week 5** | **2,500 – 5,000 / day** | ~59,500 | Broad notifications; monitor spam rates rigorously. |
+| **Week 6+** | **5,000 – 10,000+ / day** | ~129,500+ | Full production volume with established reputation baseline. |
+
+### Per-ISP daily volume distribution
+
+Major mailbox providers evaluate IP reputation independently. When warming an IP, **distribute your daily volume evenly across destination domains**:
+
+| Mailbox Provider / ISP | Volume Share | Target Sends (Example: 400 total/day) | Deliverability Focus |
+| :--- | :--- | :--- | :--- |
+| **Gmail / Google Workspace** | **~40%** | **~160 sends** | Track Domain & IP Reputation on Google Postmaster Tools. |
+| **Microsoft / Outlook / O365** | **~30%** | **~120 sends** | Prone to `451` rate-limit deferrals during early ramp-up. |
+| **Yahoo / AOL / Verizon** | **~15%** | **~60 sends** | Strict spam complaint monitoring (enforces < 0.10% threshold). |
+| **Apple Mail & Other Domains** | **~15%** | **~60 sends** | Custom corporate and private mail servers. |
+
+If you send 2,000 emails in a single day but all 2,000 hit Gmail at once, Gmail's inbound filters will trigger rate limits even if your overall server volume appears moderate.
+
+---
+
+## Recipient segmentation: The secret to accelerating IP trust
+
+**Volume alone does not build reputation—positive recipient engagement is what signals to ISPs that your emails are legitimate and wanted.**
+
+Mailbox algorithms treat user interactions as mathematical multipliers:
+* **Positive Signals (+)**: Opening messages, clicking links, moving emails from Spam to Inbox ("Not Spam"), and adding the sender to address books.
+* **Negative Signals (-)**: Marking messages as Spam, deleting without opening, and hard bouncing.
+
+| Priority Tier | Timing | Qualifying User Criteria | Purpose |
+| :--- | :--- | :--- | :--- |
+| **Tier 1: High-Priority** | **Week 1 – 2** | Password resets, 2FA codes, account signups, invoices. | Near-100% open rate, zero spam complaints. |
+| **Tier 2: Engaged Users** | **Week 3 – 4** | Users who logged in or opened an email in the last 14 days. | Strong positive interaction signals. |
+| **Tier 3: Active Users** | **Week 5 – 6** | Users who engaged with product/email in the last 60 days. | Safely scales daily volume. |
+| **Tier 4: Cold Segments** | **Post Warm-Up** | Inactive users (> 90 days without opens/clicks). | Re-engagement only after reputation is solid. |
+
+**Never send re-engagement campaigns or cold outreach during an IP warm-up window.** Reserve the warm-up period exclusively for your highest-intent, most active users.
+
+---
+
+## Critical deliverability metrics & red flags
+
+Throughout the warm-up cycle, monitor your delivery logs inside [Reloop Analytics](/features/email-analytics) and watch for these hard thresholds:
+
+### 1. Spam Complaint Rate (Threshold: < 0.10%)
+- **Google & Yahoo Warning Threshold**: **0.10%** (1 complaint per 1,000 delivered emails).
+- **Hard Penalty Threshold**: **0.30%** (3 complaints per 1,000 delivered emails).
+- **Action**: If complaints exceed 0.10%, pause volume increases immediately and audit your recipient targeting.
+
+### 2. Hard Bounce Rate (Threshold: < 2.0%)
+- **Healthy Baseline**: Strictly below **1.0%**.
+- **Warning Level**: **2.0% – 5.0%**.
+- **Critical Failure**: Above **5.0%**.
+- **Action**: Hard bounces indicate stale, invalid, or disposable email data. **Reloop automatically suppresses hard-bounced addresses so they are never retried**, protecting your domain and IP reputation. To eliminate bounce spikes before sending, verify that incoming signups are valid and not temporary throwaway addresses using our free [Email Validator tool](/tools/email-validator) (and review our guide on [why emails land in spam and how to fix it](/blog/why-emails-land-in-spam-fix)).
+
+### 3. SMTP Deferral Codes (`421` and `451`)
+- **`421 4.7.0 [IP] Deferred - Connection rate limit exceeded`**: The receiving ISP is asking your server to slow down.
+- **`451 4.7.650 Deferred - Service temporarily unavailable`**: Typical Microsoft rate-limiting during early warm-up.
+- **Action**: Reloop's [KumoMTA sending engine](/features/deliverability) automatically manages backoff queues using intelligent retry logic so deferred emails are retried without dropping packets (see [how we built our queue engine with BullMQ](/blog/how-we-built-email-delivery-queue-bullmq)).
+
+---
+
+## How Reloop simplifies deliverability management
+
+Reloop combines high-performance MTA engineering with modern developer ergonomics:
 
 ```typescript
-// High priority — password resets, 2FA codes
-await queue.add("send-email", payload, { priority: 1 });
 
-// Standard — receipts, welcome emails
-await queue.add("send-email", payload, { priority: 5 });
+const reloop = new Reloop({
+  apiKey: process.env.RELOOP_API_KEY,
+});
 
-// Low — digest emails, weekly summaries
-await queue.add("send-email", payload, { priority: 10 });
-```
-
-This prevents a surge of digest emails from delaying password resets.
-
-### Implement retry logic — but not for hard bounces
-
-If a send fails due to a temporary issue (rate limit, provider timeout), retry with exponential backoff:
-
-- Attempt 1: immediate
-- Attempt 2: 30 seconds
-- Attempt 3: 5 minutes
-- Attempt 4: give up and alert
-
-But never retry a hard bounce (invalid address, domain doesn't exist). Hard bounces are permanent. Re-sending damages your reputation. Reloop's bounce processing handles this automatically — addresses that hard bounce are suppressed and never re-sent to.
-
----
-
-## 4. Template design for transactional email
-
-### Keep HTML minimal
-
-Heavy, image-rich email templates built for marketing campaigns perform poorly as transactional email. Spam filters treat complex HTML with many images, heavy CSS, and tracking pixels with more suspicion.
-
-For transactional email, aim for:
-- Simple one-column layout
-- System fonts or Google Fonts (not embedded fonts)
-- Inline CSS (email clients ignore `<style>` blocks)
-- Single, clear CTA button
-- No background images
-
-### Always include a plain text version
-
-Every transactional email must have both `html` and `text` parts. Some email clients prefer plain text. Others use the presence of a text part as a positive signal.
-
-```typescript
-await reloop.emails.send({
-  from: "mail@yourdomain.com",
-  to: user.email,
-  subject: "Reset your password",
-  html: `<p>Click <a href="${resetUrl}">here</a> to reset your password. This link expires in 15 minutes.</p>`,
-  text: `Reset your password: ${resetUrl}\n\nThis link expires in 15 minutes.`,
+// Dispatch transactional notification with structured metadata
+const response = await reloop.emails.send({
+  from: "Reloop Security <security@yourdomain.com>",
+  to: "user@example.com",
+  subject: "Your login verification code",
+  html: "<p>Your security code is <strong>888888</strong>.</p>",
+  headers: {
+    "X-Entity-Ref-ID": "auth-otp-92841",
+  },
 });
 ```
 
-### The right subject lines for transactional email
+### Reloop's built-in deliverability architecture:
 
-Transactional subject lines should be **specific and functional**, not clever:
-
-| Type | Bad | Good |
-|------|-----|------|
-| Password reset | "Action required" | "Reset your Reloop password" |
-| Receipt | "Your order" | "Receipt for $49.00 — Order #12345" |
-| Welcome | "Welcome!" | "Your Reloop account is ready" |
-| Notification | "New activity" | "5 emails failed delivery in the last hour" |
-
-Specificity reduces support tickets ("I never got my reset email") because users can search their inbox for it by keyword.
-
-### Personalise beyond first name
-
-First-name personalisation is table stakes. Go further:
-
-- Include the specific action the user took that triggered the email
-- Reference the specific resource (order number, domain name, project name)
-- Show the current state they care about (balance, count, status)
-
-```html
-<!-- Weak -->
-<p>Hi Sarah, your email was sent.</p>
-
-<!-- Strong -->
-<p>Hi Sarah, your email to 3 recipients from <strong>onboarding@acme.com</strong>
-was delivered successfully. <a href="/logs/abc123">View delivery details →</a></p>
-```
+1. **Automated Cryptographic Signing**: Dedicated RSA-2048 [DKIM key generation](/blog/spf-dkim-dmarc-setup-guide) signed at line-rate via KumoMTA.
+2. **Intelligent Queue Management**: Outbound queues powered by BullMQ handle backoff retries when destination ISPs return temporary `4xx` deferrals.
+3. **Real-Time Event Stream**: Webhooks dispatch immediate `delivered`, `opened`, `clicked`, `bounced`, and `complained` payloads to your backend (explore [webhook features](/features/webhooks)).
+4. **Automated Suppression Protection**: Hard bounces and spam complaints are instantly isolated to protect your sending IP from repeated reputation penalties.
+5. **AI Agent Inbox Support**: Dedicated routing and Model Context Protocol (MCP) integrations for autonomous agent workflows (see [email infrastructure for AI agents](/blog/email-infrastructure-for-ai-agents) and the [AI agent inbox use case](/use-cases/ai-agent-inbox)).
 
 ---
 
-## 5. Managing suppression and bounces
+## What to do if an ISP throttles your warm-up
 
-### Never send to a bounced address
+If you encounter deliverability issues during warm-up, follow this 4-step recovery protocol:
 
-Sending to an address that has previously hard bounced is one of the fastest ways to damage your sender reputation. Reloop maintains a suppression list automatically — addresses that hard bounce or mark your email as spam are added and never re-sent to.
+1. **Do not increase volume**: Freeze daily send volume at the current tier or drop back to the previous week's volume.
+2. **Audit Google Postmaster Tools**: Check [Google Postmaster Tools](https://postmaster.google.com) for sudden drops in Domain or IP Reputation and inspect the authentication success tab.
+3. **Inspect DNSBL Blacklists**: Query your sending IP on [MXToolbox Blacklist Check](https://mxtoolbox.com/blacklists.aspx) to ensure the IP hasn't been listed on Spamhaus or Barracuda.
+4. **Isolate transactional streams**: Ensure your marketing updates are strictly isolated from mission-critical authentication mail (see [transactional email best practices](/blog/transactional-email-best-practices)).
 
-If you're managing email sends outside of Reloop, implement your own suppression list and check it before every send.
-
-### Handle unsubscribes for every email type
-
-Even transactional emails should have a way for recipients to manage their notification preferences. The legal threshold varies by country (CAN-SPAM, GDPR, etc.), but the practical threshold is simpler: if someone doesn't want an email, give them an easy way to stop receiving it. Frustrated users who can't unsubscribe hit "Report spam" instead.
-
-For truly transactional emails (password resets, receipts), an unsubscribe isn't appropriate — but for notification-style emails, it is.
-
-### Monitor your bounce and complaint rates
-
-Track these metrics per sending domain:
-
-| Metric | Healthy threshold | Action if exceeded |
-|--------|------------------|--------------------|
-| Hard bounce rate | < 2% | Stop, audit list quality |
-| Spam complaint rate | < 0.1% | Audit content + list |
-| Soft bounce rate | < 5% | Review and retry strategy |
-
-Google Postmaster Tools provides domain-level reputation data for Gmail. Register your domain there and check it weekly.
+Once metrics stabilize for 5 to 7 consecutive days, resume the volume schedule.
 
 ---
 
-## 6. What to monitor in production
+## Where to go from here
 
-### Delivery rate per email type
-
-Don't just track aggregate delivery rate. Break it down by email type (password reset, welcome, receipt) and by ISP (Gmail, Outlook, Yahoo). A deliverability problem at one ISP with one email type is invisible in aggregate metrics.
-
-### Time to delivery
-
-Measure how long it takes from the send API call to the delivery event. For critical email types (password resets, 2FA), set an alert if P95 exceeds 30 seconds.
-
-### Open rate as a deliverability proxy
-
-A sudden drop in open rate for a specific email type — without a content change — usually means something changed in deliverability. If your password reset open rate drops from 70% to 30%, investigate immediately.
-
-### Use Reloop's webhook events
-
-Reloop emits events for every step of the email lifecycle: `email.sent`, `email.delivered`, `email.opened`, `email.clicked`, `email.bounced`, `email.complained`. Subscribe to these with a webhook and build dashboards, alerts, or automated responses (like removing a complained address from your list in real-time).
-
-```typescript
-// Webhook handler — remove complaints from your user preferences
-
-  const event = await req.json();
-
-  if (event.type === "email.complained") {
-    await db.userPreferences.update({
-      where: { email: event.data.to },
-      data: { marketingEmails: false },
-    });
-  }
-}
-```
-
----
-
-## 7. Testing before you ship
-
-### Test in multiple email clients
-
-The same HTML renders very differently in Gmail, Outlook (desktop), Apple Mail, and Gmail on Android. Use a tool like [Litmus](https://litmus.com) or [Email on Acid](https://www.emailonacid.com) to preview across clients before shipping.
-
-### Check your spam score
-
-Send a test email to [mail-tester.com](https://mail-tester.com). It scores your email from 0–10 and shows you exactly what's penalizing you — missing authentication, suspicious content patterns, missing plain text part, and so on.
-
-Target a score of 9 or above before any email type goes to production.
-
-### Load test your send path
-
-If you have a feature that sends email on every user action, test what happens when 1,000 users trigger it simultaneously. Make sure your queue doesn't back up and that rate limiting is in place before you're in that situation in production.
-
----
-
-## Quick-reference checklist
-
-Before any transactional email goes live:
-
-- [ ] Sending from a dedicated subdomain, not the root domain
-- [ ] `From` address is a monitored inbox, not `noreply@`
-- [ ] SPF, DKIM, DMARC all configured and verified
-- [ ] Both `html` and `text` parts included
-- [ ] Subject line is specific and functional
-- [ ] Tested at [mail-tester.com](https://mail-tester.com) — score 9+
-- [ ] Previewed in Gmail, Outlook, and Apple Mail
-- [ ] Sending immediately (not batched) for critical types
-- [ ] Retry logic implemented with exponential backoff
-- [ ] Bounced addresses suppressed and never re-sent to
-- [ ] Webhook handler set up for `email.bounced` and `email.complained` events
-- [ ] Delivery rate and time-to-delivery monitored in production
+- **[SPF, DKIM, and DMARC Complete Setup Guide](/blog/spf-dkim-dmarc-setup-guide)**: Publish and verify the three essential authentication records.
+- **[Why Emails Land in Spam & How to Fix It](/blog/why-emails-land-in-spam-fix)**: A complete diagnostic checklist for ISP-specific delivery failures.
+- **[Self-Host Reloop for $5/Month](/blog/self-host-email-5-dollars)**: Deploy production-ready email infrastructure on Fly.io, Coolify, or your own VPS.
+- **[Why We Open-Sourced Our Email Infrastructure](/blog/why-we-open-sourced-email-infrastructure)**: The architectural vision and philosophy behind Reloop.

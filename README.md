@@ -97,7 +97,8 @@ Read [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on reporting bugs, reques
 ## Community & Support
 
 - 💬 **Discord** — [Join the community](https://discord.gg/bHnkBcp7xR)
-- 🐦 **Twitter/X** — [Follow @reloophq](https://x.com/reloophq)
+- 🐦 **Twitter/X** — [Follow @reloop_labs](https://x.com/reloop_labs)
+- 💼 **LinkedIn** — [Follow on LinkedIn](https://www.linkedin.com/company/reloop-labs)
 - 🐙 **GitHub Issues** — [Report bugs or request features](https://github.com/reloop-labs/reloop/issues)
 - 📚 **Documentation** — [reloop.sh/docs](https://reloop.sh/docs)
 - 📋 **Changelog** — [CHANGELOG.md](CHANGELOG.md)

@@ -1,3 +1,5 @@
+import { apiFetch } from "#/features/agent-inbox/lib/api-fetch";
+
 export type ComposeAttachment = {
 	id: string;
 	name: string;
@@ -23,7 +25,7 @@ export async function uploadComposeFile(file: File): Promise<{
 }> {
 	const formData = new FormData();
 	formData.append("file", file);
-	const res = await fetch("/api/upload/v1/upload", {
+	const res = await apiFetch("/api/upload/v1/upload", {
 		method: "POST",
 		body: formData,
 	});

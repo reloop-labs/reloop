@@ -133,6 +133,49 @@ const customToast = (
 	return sonnerToast.custom(renderFunc, options);
 };
 
+function getRetryAfterSeconds(err: unknown): number | null {
+	if (!err || typeof err !== "object") return null;
+	const e = err as {
+		status?: number;
+		statusCode?: number;
+		response?: {
+			status?: number;
+			data?: { retryAfter?: number; message?: string; fix?: string };
+			headers?: Record<string, unknown>;
+		};
+		message?: string;
+	};
+	const status = e.response?.status ?? e.status ?? e.statusCode;
+	if (status !== 429) return null;
+
+	const body = e.response?.data?.retryAfter;
+	if (typeof body === "number" && body > 0) return Math.ceil(body);
+
+	const headers = e.response?.headers;
+	if (headers) {
+		for (const [key, value] of Object.entries(headers)) {
+			if (
+				["retry-after", "x-retry-after", "ratelimit-reset"].includes(
+					key.toLowerCase(),
+				)
+			) {
+				const n = Number.parseInt(String(value), 10);
+				if (Number.isFinite(n) && n > 0) return n;
+			}
+		}
+	}
+
+	const fromText = `${e.response?.data?.fix ?? ""} ${e.message ?? ""}`.match(
+		/(\d+)\s*second/i,
+	)?.[1];
+	if (fromText) {
+		const n = Number.parseInt(fromText, 10);
+		if (Number.isFinite(n) && n > 0) return n;
+	}
+
+	return 60;
+}
+
 const promiseToast = <T,>(
 	promise: Promise<T> | (() => Promise<T>),
 	data: {
@@ -160,6 +203,13 @@ const promiseToast = <T,>(
 			);
 		})
 		.catch(async (err) => {
+			// Axios 429s are handled by the dashboard rate-limit interceptor
+			// (live countdown toast). Dismiss the promise loading toast only.
+			if (getRetryAfterSeconds(err) != null) {
+				sonnerToast.dismiss(id);
+				return;
+			}
+
 			const msg =
 				typeof data.error === "function" ? await data.error(err) : data.error;
 			sonnerToast.custom(

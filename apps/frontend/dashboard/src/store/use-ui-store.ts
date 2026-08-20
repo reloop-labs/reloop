@@ -4,6 +4,9 @@ interface UIState {
 	isSidebarCollapsed: boolean;
 	setIsSidebarCollapsed: (value: boolean) => void;
 	toggleSidebarCollapse: () => void;
+	isEditorSidebarPinned: boolean;
+	setIsEditorSidebarPinned: (value: boolean) => void;
+	toggleEditorSidebarPinned: () => void;
 	isAiPanelOpen: boolean;
 	setIsAiPanelOpen: (value: boolean) => void;
 	toggleAiPanel: () => void;
@@ -36,6 +39,10 @@ export const useUIStore = create<UIState>((set) => ({
 			} catch {}
 			return { isSidebarCollapsed: next };
 		}),
+	isEditorSidebarPinned: false,
+	setIsEditorSidebarPinned: (value) => set({ isEditorSidebarPinned: value }),
+	toggleEditorSidebarPinned: () =>
+		set((state) => ({ isEditorSidebarPinned: !state.isEditorSidebarPinned })),
 	isAiPanelOpen: false,
 	setIsAiPanelOpen: (value) => set({ isAiPanelOpen: value }),
 	toggleAiPanel: () =>

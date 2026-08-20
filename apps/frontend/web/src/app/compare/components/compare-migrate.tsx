@@ -72,7 +72,7 @@ export function CompareMigrate({
 				<div className="mt-8 flex flex-wrap items-center justify-center gap-3">
 					<HeroCtaLink
 						href={primaryHref}
-						label="Start for free"
+						label="Get Started "
 						variant="primary"
 					/>
 					<Link

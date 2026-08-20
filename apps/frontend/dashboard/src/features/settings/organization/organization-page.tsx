@@ -1,11 +1,13 @@
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { authClient } from "@reloop/auth/client";
+import {
+	ORGANIZATION_NAME_MAX_LENGTH,
+	organizationNameMaxLengthMessage,
+} from "@reloop/auth/organization-limits";
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
-import { KbdCommand } from "@reloop/ui/kbd-command";
-import { KbdEnter } from "@reloop/ui/kbd-enter";
 import * as Label from "@reloop/ui/label";
 import { Skeleton } from "@reloop/ui/skeleton";
 import Spinner from "@reloop/ui/spinner";
@@ -14,9 +16,9 @@ import { AnimatePresence, motion } from "motion/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import * as v from "valibot";
+import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { SETTINGS_MEMBER_HOME } from "#/features/dashboard/navigation";
 import {
 	type Organization,
@@ -28,8 +30,18 @@ import { OrganizationDangerZone } from "./organization-danger-zone";
 import { OrganizationHeader } from "./organization-header";
 import { OrganizationLogoUpload } from "./organization-logo-upload";
 
+const actionKbdOnBlueClassName =
+	"border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]";
+
 const organizationSchema = v.object({
-	name: v.pipe(v.string(), v.minLength(1, "Name is required")),
+	name: v.pipe(
+		v.string(),
+		v.minLength(1, "Name is required"),
+		v.maxLength(
+			ORGANIZATION_NAME_MAX_LENGTH,
+			organizationNameMaxLengthMessage(),
+		),
+	),
 	logo: v.string(),
 });
 
@@ -141,18 +153,6 @@ function OrganizationForm({
 		}
 	};
 
-	useHotkeys(
-		"mod+enter",
-		() => {
-			if (hasChanges && status === "idle") {
-				void handleSubmit(handleSaveChanges)();
-			}
-		},
-		{
-			enableOnFormTags: true,
-		},
-	);
-
 	return (
 		<div className="w-full space-y-8 pt-5">
 			<div>
@@ -178,6 +178,7 @@ function OrganizationForm({
 									id="name"
 									type="text"
 									placeholder="Organization Name"
+									maxLength={ORGANIZATION_NAME_MAX_LENGTH}
 									{...register("name")}
 								/>
 							</Input.Wrapper>
@@ -201,7 +202,7 @@ function OrganizationForm({
 								"min-w-[140px] justify-center overflow-hidden transition-all duration-200",
 								status === "saving" && "opacity-90",
 							)}
-							disabled={!hasChanges || status !== "idle"}
+							disabled={!hasChanges || status === "saving"}
 						>
 							<AnimatePresence mode="popLayout" initial={false}>
 								<motion.span
@@ -228,11 +229,10 @@ function OrganizationForm({
 										</>
 									) : (
 										<>
-											Save Changes
-											<span className="inline-flex items-center gap-0.5 opacity-90">
-												<KbdCommand />
-												<KbdEnter />
-											</span>
+											<span>Save Changes</span>
+											<ActionKbd className={actionKbdOnBlueClassName}>
+												↵
+											</ActionKbd>
 										</>
 									)}
 								</motion.span>

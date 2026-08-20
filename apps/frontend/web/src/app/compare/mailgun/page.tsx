@@ -213,7 +213,7 @@ const MailgunComparisonPage = () => {
 				compact
 			/>
 
-			<PageSection narrow>
+			<PageSection>
 				<CompareOtherLinks currentHref={pagePath} />
 			</PageSection>
 		</ComparisonPageShell>

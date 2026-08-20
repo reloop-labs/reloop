@@ -1,0 +1,29 @@
+---
+slug: shared-ui-component-package
+version: 0.21.0
+date: December 2025
+launchDate: 17 December 2025
+title: 'Shared UI Component Package (@reloop/ui)'
+description: >-
+  Extracted buttons, modals, dropdowns, inputs, and icons into a centralized package used across all frontend apps.
+tags:
+  - Frontend
+  - Design
+---
+### PLANNING
+
+- **Monorepo component architecture.** Consolidated UI primitives from web, dashboard, and docs apps into packages/ui to enforce visual consistency.
+
+### DESIGN
+
+- **Design system.** Standardized buttons, modals, dropdown menus, form controls, and icons with shared Tailwind tokens.
+- **Token uniformity.** Shared focus rings, contrast-checked text hierarchies, and dark mode palettes across all frontends.
+
+### FRONTEND
+
+- **Package adoption.** Replaced duplicate component declarations across apps/frontend/web, dashboard, and docs with @reloop/ui imports.
+- **Accessibility.** Built on Radix UI primitives ensuring full keyboard navigation and ARIA attribute compliance.
+
+### DEVOPS
+
+- **Turborepo caching.** Configured Turborepo package dependency pipelines so changes in packages/ui automatically rebuild downstream applications.

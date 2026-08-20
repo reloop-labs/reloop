@@ -1,7 +1,6 @@
 import { Inspector } from "@react-email/editor/ui";
 import { ColorRow } from "./color-row";
-import { NumInput } from "./num-input";
-import { PropRow } from "./prop-row";
+import { ScrubRow } from "./scrub-field";
 import { SectionHeader } from "./section-header";
 
 /* ------------------------------------------------------------------ */
@@ -13,42 +12,34 @@ export function DocumentPanel() {
 			{({ findStyleValue, setGlobalStyle }) => (
 				<div>
 					<SectionHeader label="Document" />
-					<ColorRow
-						label="Background"
-						value={String(findStyleValue("body", "backgroundColor") ?? "")}
-						onChange={(v) => setGlobalStyle("body", "backgroundColor", v)}
+					<ScrubRow
+						label="Container width"
+						value={findStyleValue("container", "width")}
+						onChange={(v) => setGlobalStyle("container", "width", v)}
+						min={200}
+						max={800}
+						suffix="px"
 					/>
-					<PropRow label="Container width">
-						<NumInput
-							value={findStyleValue("container", "width")}
-							onChange={(v) => setGlobalStyle("container", "width", v)}
-							unit="px"
-						/>
-					</PropRow>
-					<PropRow label="Border radius">
-						<NumInput
-							value={findStyleValue("container", "borderRadius")}
-							onChange={(v) => setGlobalStyle("container", "borderRadius", v)}
-							unit="px"
-						/>
-					</PropRow>
-					<ColorRow
-						label="Container bg"
-						value={String(findStyleValue("container", "backgroundColor") ?? "")}
-						onChange={(v) => setGlobalStyle("container", "backgroundColor", v)}
+					<ScrubRow
+						label="Border radius"
+						value={findStyleValue("container", "borderRadius")}
+						onChange={(v) => setGlobalStyle("container", "borderRadius", v)}
+						min={0}
+						max={64}
+						suffix="px"
 					/>
-					<PropRow label="Line height">
-						<NumInput
-							value={findStyleValue("body", "lineHeight")}
-							onChange={(v) => setGlobalStyle("body", "lineHeight", v)}
-						/>
-					</PropRow>
+					<ScrubRow
+						label="Line height"
+						value={findStyleValue("body", "lineHeight")}
+						onChange={(v) => setGlobalStyle("body", "lineHeight", v)}
+						min={80}
+						max={300}
+					/>
 					<ColorRow
 						label="Text color"
 						value={String(findStyleValue("body", "color") ?? "")}
 						onChange={(v) => setGlobalStyle("body", "color", v)}
 					/>
-					{/* Bottom spacing inside card */}
 				</div>
 			)}
 		</Inspector.Document>

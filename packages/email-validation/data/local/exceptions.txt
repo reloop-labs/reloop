@@ -1,0 +1,8 @@
+# Never reported as disposable, even when an upstream source lists them.
+# False-positive fixes go here — never in data/upstream/, which the refresh
+# script overwrites wholesale.
+
+# Hosted mailbox providers that upstream lists as disposable. Both are real,
+# persistent services with paid tiers and business customers.
+zoho.com
+hushmail.com

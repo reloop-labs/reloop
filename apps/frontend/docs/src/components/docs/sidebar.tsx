@@ -5,6 +5,7 @@ import { navigationTabs } from "@reloop/fe-docs/lib/navigation";
 import type { PageTreeItem } from "@reloop/fe-docs/lib/types";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
+import { KbdKey } from "@reloop/ui/kbd-key";
 import { Check, ChevronDown } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -26,6 +27,25 @@ import { AnimatedHoverBackground } from "./animated-hover-background";
 import { ApiSidebarSection } from "./sidebar-api";
 import { DefaultSidebarSection } from "./sidebar-default";
 import { WebhookSidebarSection } from "./sidebar-webhook";
+
+function ActionKbd({
+	children,
+	className,
+}: {
+	children: React.ReactNode;
+	className?: string;
+}) {
+	return (
+		<KbdKey
+			className={cn(
+				"h-4 min-w-3.5 select-none items-center justify-center rounded-[4px] border border-stroke-soft-200 bg-bg-weak-50 px-1 font-medium font-mono text-[9px] text-text-sub-600 leading-none shadow-[0_1.5px_0_0_var(--color-stroke-soft-200)] dark:border-white/[0.14] dark:bg-white/[0.07] dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.55),0_0_0_0.5px_rgba(255,255,255,0.06),inset_0_0.5px_0_0_rgba(255,255,255,0.08)]",
+				className,
+			)}
+		>
+			{children}
+		</KbdKey>
+	);
+}
 
 export interface SidebarContextType {
 	hoveredEl: HTMLElement | null;
@@ -51,6 +71,7 @@ interface SidebarProps {
 	tree: PageTreeItem[];
 	isMobile?: boolean;
 	onLinkClick?: () => void;
+	onSearchClick?: () => void;
 	pathname?: string;
 }
 
@@ -58,13 +79,12 @@ export function Sidebar({
 	tree,
 	isMobile,
 	onLinkClick,
+	onSearchClick,
 	pathname: propPathname,
 }: SidebarProps) {
 	const clientPathname = usePathname();
 	const pathname = normalizeDocsPathname(propPathname || clientPathname || "");
-	const gradientFromClass = isMobile
-		? "from-bg-white-0 dark:from-[#0a0a0a]"
-		: "from-bg-weak-50 dark:from-black";
+	const gradientFromClass = "from-bg-white-0 dark:from-black to-transparent";
 	const activeTab =
 		navigationTabs.find((tab) => {
 			if (tab.url === "/") {
@@ -316,18 +336,43 @@ export function Sidebar({
 	return (
 		<aside
 			className={cn(
-				"z-30 flex h-full w-full flex-col overflow-hidden bg-transparent py-2 pr-2 pl-4",
+				"z-30 flex h-full w-full flex-col overflow-hidden bg-transparent py-2 pr-0 pl-3",
 				isMobile && "bg-bg-weak-50/[0.15]",
 			)}
 		>
-			<div className="border-stroke-soft-100 border-b px-3 py-3 pb-1 lg:hidden">
+			<div className="border-stroke-soft-100 border-b px-2 py-3 pb-1 lg:hidden">
 				<ProductSwitcher pathname={pathname} />
 			</div>
+
+			{/* Sticky Search Trigger */}
+			{onSearchClick && (
+				<div className="pt-0.5 pr-2 pb-2 pl-1">
+					<button
+						type="button"
+						onClick={onSearchClick}
+						className={cn(
+							"flex h-8 w-full items-center justify-between gap-2 rounded-lg border border-stroke-soft-100 bg-bg-white-0 px-2.5 text-text-sub-600 text-xs transition-all",
+							"hover:scale-[1.01] hover:border-black/15 hover:text-[#171717] active:scale-[0.99]",
+							"dark:bg-black dark:hover:border-white/15 dark:hover:text-white",
+						)}
+						title="Search (⌘K)"
+					>
+						<div className="flex items-center gap-2">
+							<Icon name="search" className="h-3.5 w-3.5 shrink-0" />
+							<span className="text-xs">Search...</span>
+						</div>
+						<div className="pointer-events-none flex items-center gap-0.5">
+							<ActionKbd>⌘</ActionKbd>
+							<ActionKbd>K</ActionKbd>
+						</div>
+					</button>
+				</div>
+			)}
 
 			{/* Navigation tree */}
 			<nav
 				ref={navRef}
-				className="scrollbar-thin relative flex-1 overflow-y-auto px-2 pt-0 pb-0"
+				className="scrollbar-thin relative flex-1 overflow-y-auto pt-0 pr-1.5 pb-0 pl-1"
 				onPointerLeave={() => setHoveredEl(null)}
 				onScroll={() => {
 					if (navRef.current) {

@@ -2,6 +2,37 @@ import Link from "next/link";
 import type { ChangelogRelease } from "./changelog-types";
 import { getChangelogReleasePath, getTagDotColor } from "./changelog-utils";
 
+const MONTHS: Record<string, string> = {
+	January: "Jan",
+	February: "Feb",
+	March: "Mar",
+	April: "Apr",
+	May: "May",
+	June: "Jun",
+	July: "Jul",
+	August: "Aug",
+	September: "Sep",
+	October: "Oct",
+	November: "Nov",
+	December: "Dec",
+};
+
+function formatReleaseDate(raw?: string): string {
+	if (!raw) return "";
+	const parts = raw.trim().split(/\s+/);
+	if (parts.length === 3) {
+		const [day, month, year] = parts;
+		const shortMonth = month ? (MONTHS[month] ?? month) : "";
+		return `${shortMonth} ${Number(day)}, ${year}`;
+	}
+	if (parts.length === 2) {
+		const [month, year] = parts;
+		const shortMonth = month ? (MONTHS[month] ?? month) : "";
+		return `${shortMonth} ${year}`;
+	}
+	return raw;
+}
+
 type MonthGroup = {
 	date: string;
 	releases: ChangelogRelease[];
@@ -9,14 +40,8 @@ type MonthGroup = {
 
 export function ChangelogTimeline({
 	releases,
-	activeYear,
-	newerYear,
-	olderYear,
 }: {
 	releases: ChangelogRelease[];
-	activeYear?: string;
-	newerYear?: string | null;
-	olderYear?: string | null;
 }) {
 	// Group consecutive releases by date month
 	const groups: MonthGroup[] = [];
@@ -35,11 +60,11 @@ export function ChangelogTimeline({
 				{groups.map((group) => (
 					<section
 						key={group.date}
-						className="grid grid-cols-1 gap-4 px-6 py-8 sm:grid-cols-[7.5rem_minmax(0,1fr)] sm:gap-6 sm:px-10 sm:py-10 lg:gap-8 lg:px-12"
+						className="grid grid-cols-1 gap-4 px-6 py-8 sm:grid-cols-[8.5rem_minmax(0,1fr)] sm:gap-6 sm:px-10 sm:py-10 lg:gap-8 lg:px-12"
 					>
 						{/* Left sticky column for the month header */}
 						<div className="sm:sticky sm:top-24 sm:self-start sm:pt-4">
-							<time className="block font-medium text-[13.5px] text-text-sub-600 tabular-nums dark:text-white/55">
+							<time className="block font-semibold text-[14px] text-text-strong-950 tabular-nums dark:text-white">
 								{group.date}
 							</time>
 						</div>
@@ -47,17 +72,28 @@ export function ChangelogTimeline({
 						{/* Right column with list of release items in this month */}
 						<div className="min-w-0 divide-y divide-dashed divide-stroke-soft-200/90 dark:divide-white/10">
 							{group.releases.map((release) => {
-								const href = getChangelogReleasePath(release.slug || release.version);
+								const href = getChangelogReleasePath(
+									release.slug || release.version,
+								);
+								const exactDate = formatReleaseDate(
+									release.launchDate || release.date,
+								);
+
 								return (
 									<div
-										key={`${release.version}-${release.title}`}
-										className="py-1.5 first:pt-0 last:pb-0"
+										key={`${release.version}-${release.slug || release.title}`}
+										className="py-2.5 first:pt-0 last:pb-0"
 									>
 										<Link
 											href={href}
 											className="-mx-3.5 group flex flex-col gap-4 rounded-xl p-3.5 outline-none transition-colors hover:bg-bg-weak-50/80 sm:flex-row sm:items-center sm:justify-between dark:hover:bg-white/[0.03]"
 										>
 											<div className="min-w-0 flex-1 pr-4 sm:pr-6">
+												{exactDate && (
+													<time className="mb-1 block font-mono text-[12px] text-text-sub-600/70 transition-colors group-hover:text-text-sub-600 dark:text-white/40 dark:group-hover:text-white/60">
+														{exactDate}
+													</time>
+												)}
 												<h2 className="font-medium text-[16px] text-text-strong-950 leading-snug tracking-tight sm:text-[17px] dark:text-white">
 													{release.title}
 												</h2>
@@ -70,7 +106,10 @@ export function ChangelogTimeline({
 												{release.tags && release.tags.length > 0 ? (
 													<ul className="flex w-28 flex-col gap-1 font-medium text-[12.5px] text-text-sub-600 sm:w-32 dark:text-white/55">
 														{release.tags.slice(0, 3).map((tag) => (
-															<li key={tag} className="flex items-center gap-1.5">
+															<li
+																key={tag}
+																className="flex items-center gap-1.5"
+															>
 																<span
 																	className={`size-1.5 shrink-0 rounded-full ${getTagDotColor(tag)}`}
 																	aria-hidden="true"

@@ -300,6 +300,8 @@ export namespace LogsModel {
 		delivered: t.Array(t.Number()),
 		bounced: t.Array(t.Number()),
 		complaint: t.Array(t.Number()),
+		opened: t.Array(t.Number()),
+		unsubscribed: t.Array(t.Number()),
 		rate: t.Array(t.Number()),
 		bounceBreakdown: t.Object({
 			transient: t.Array(t.Number()),

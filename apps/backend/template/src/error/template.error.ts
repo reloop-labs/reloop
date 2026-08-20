@@ -119,4 +119,46 @@ export const TemplateErrors = {
 			why: `An unexpected error occurred while restoring template "${id}" to version "${versionId}".`,
 			fix: "Please try again later or contact support if the issue persists.",
 		}),
+	htmlRequired: () =>
+		createError({
+			status: 400,
+			message: "HTML is required",
+			why: "The request body did not include an html string to render.",
+			fix: "Send a JSON body with a non-empty `html` field.",
+		}),
+	htmlTooLarge: (size: number, max: number) =>
+		createError({
+			status: 400,
+			message: "HTML is too large",
+			why: `The HTML payload is ${size} bytes, which exceeds the ${max} byte limit.`,
+			fix: "Reduce the HTML size or split the document before converting.",
+		}),
+	invalidImageFormat: (format: string) =>
+		createError({
+			status: 400,
+			message: "Invalid image format",
+			why: `Format "${format}" is not supported.`,
+			fix: "Use png, jpeg, or webp.",
+		}),
+	invalidImageWidth: (width: number, min: number, max: number) =>
+		createError({
+			status: 400,
+			message: "Invalid image width",
+			why: `Width ${width} is outside the allowed range ${min}–${max}.`,
+			fix: `Pass a width between ${min} and ${max}.`,
+		}),
+	htmlToImageFailed: (reason: string) =>
+		createError({
+			status: 500,
+			message: "Failed to convert HTML to an image",
+			why: reason,
+			fix: "Verify the HTML is valid and that Chromium is available to the template service.",
+		}),
+	thumbnailNotFound: (id: string) =>
+		createError({
+			status: 404,
+			message: "Template thumbnail not found",
+			why: `Template "${id}" has no saved HTML to preview.`,
+			fix: "Save a draft of the template so a thumbnail can be generated.",
+		}),
 };

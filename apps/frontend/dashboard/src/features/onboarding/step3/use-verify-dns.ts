@@ -4,6 +4,7 @@ import { useQueryState } from "nuqs";
 import { useState } from "react";
 import { toast } from "sonner";
 import { queryKeys } from "#/lib/query-keys";
+import { toastApiError } from "#/lib/rate-limit-toast";
 import { onboardingStepParser } from "../onboarding-step";
 
 export function useVerifyDns(domainId: string) {
@@ -33,10 +34,7 @@ export function useVerifyDns(domainId: string) {
 			);
 			setStep(4);
 		} catch (error) {
-			const errorMessage = axios.isAxiosError(error)
-				? error.response?.data?.message || "Failed to start DNS verification"
-				: "Failed to start DNS verification";
-			toast.error(errorMessage);
+			toastApiError(error, "Failed to start DNS verification");
 		} finally {
 			setIsVerifying(false);
 		}

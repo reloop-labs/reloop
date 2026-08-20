@@ -24,6 +24,7 @@
 				"@radix-ui/react-checkbox": "1.3.2",
 				"@radix-ui/react-dialog": "1.1.14",
 				"@radix-ui/react-dropdown-menu": "2.1.15",
+				"posthog-js": "^1.417.0",
 				"@radix-ui/react-context-menu": "2.2.15",
 				"@radix-ui/react-icons": "1.3.2",
 				"@radix-ui/react-label": "2.1.7",
@@ -122,6 +123,8 @@
 				"@tiptap/extension-collaboration-caret": "^3.22.5",
 				"@mintlify/components": "^1.0.16",
 				"gray-matter": "^4.0.3",
+				"js-yaml": "^4.1.0",
+				"@types/js-yaml": "^4.0.9",
 				"framer-motion": "^12.38.0",
 				"next-mdx-remote": "^6.0.0",
 				"perfect-cursors": "^1.0.5",
@@ -260,10 +263,14 @@
 		"be:spam:dev": "bun run --filter=be-spam dev",
 		"be:spam:build": "bun run --filter=be-spam build",
 		"be:spam:start": "bun run --filter=be-spam start",
+		"be:tools:dev": "bun run --filter=be-tools dev",
+		"be:tools:build": "bun run --filter=be-tools build",
+		"be:tools:start": "bun run --filter=be-tools start",
+		"disposable:refresh": "bun run --filter=@reloop/email-validation refresh",
 		"check": "biome check --write .",
 		"frontend:dev": "turbo dev --filter='fe-dashboard' --filter='fe-docs' --filter='fe-web' --filter='fe-links' --filter='fe-console'",
-		"backend:dev": "turbo dev --filter='be-contacts' --filter='be-auth' --filter='be-domain' --filter='be-mail' --filter='be-webhook' --filter='be-api-key' --filter='be-logs' --filter='be-upload' --filter='be-template' --filter='be-credits' --filter='be-email' --filter='be-workflow' --filter='be-inbox' --filter='be-admin'",
-		"dev": "turbo dev --filter='fe-dashboard' --filter='fe-docs' --filter='fe-web' --filter='fe-links' --filter='fe-console' --filter='be-contacts' --filter='be-auth' --filter='be-domain' --filter='be-mail' --filter='be-webhook' --filter='be-api-key' --filter='be-logs' --filter='be-upload' --filter='be-template' --filter='be-credits' --filter='be-email' --filter='be-workflow' --filter='be-inbox' --filter='be-admin'",
+		"backend:dev": "turbo dev --filter='be-contacts' --filter='be-auth' --filter='be-domain' --filter='be-mail' --filter='be-webhook' --filter='be-api-key' --filter='be-logs' --filter='be-upload' --filter='be-template' --filter='be-credits' --filter='be-email' --filter='be-workflow' --filter='be-inbox' --filter='be-admin' --filter='be-tools'",
+		"dev": "turbo dev --filter='fe-dashboard' --filter='fe-docs' --filter='fe-web' --filter='fe-links' --filter='fe-console' --filter='be-contacts' --filter='be-auth' --filter='be-domain' --filter='be-mail' --filter='be-webhook' --filter='be-api-key' --filter='be-logs' --filter='be-upload' --filter='be-template' --filter='be-credits' --filter='be-email' --filter='be-workflow' --filter='be-inbox' --filter='be-admin' --filter='be-tools'",
 		"setup": "bash local/bootstrap.sh",
 		"env:setup": "bash local/setup.sh",
 		"docker:up": "docker compose -f local/docker-compose.yml up -d",
@@ -290,6 +297,5 @@
 		"dev",
 		"fe-docs",
 		"protobufjs"
-	],
-	"dependencies": {}
+	]
 }

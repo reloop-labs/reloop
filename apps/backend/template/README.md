@@ -13,7 +13,9 @@ Backend service for managing email templates with drag-and-drop builder support.
 - `GET /api/template/` - Health check
 - `GET /api/template/v1/list` - List templates
 - `GET /api/template/v1/:id` - Get template by ID
+- `GET /api/template/v1/:id/thumbnail` - PNG preview of the latest saved HTML
 - `POST /api/template/v1/create` - Create template
+- `POST /api/template/v1/html-to-image` - Convert HTML to a PNG/JPEG/WebP
 - `PUT /api/template/v1/:id` - Update template
 - `DELETE /api/template/v1/:id` - Delete template
 - `POST /api/template/v1/:id/duplicate` - Duplicate template
@@ -21,6 +23,14 @@ Backend service for managing email templates with drag-and-drop builder support.
 ## 🚀 Setup
 
 For detailed setup and development instructions, please refer to the [Setup Guide](https://reloop.sh/docs/setup/backend/template).
+
+HTML-to-image uses a background Chromium process. Locally:
+
+```bash
+bunx playwright install chromium
+```
+
+In Docker the service uses Alpine’s `chromium` package via `CHROMIUM_PATH`.
 
 ---
 

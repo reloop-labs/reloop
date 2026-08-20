@@ -1,27 +1,57 @@
-import { useEffect } from "react";
+import { usePathname } from "next/navigation";
+import { useCallback, useEffect } from "react";
 import { useUIStore } from "#/store/use-ui-store";
 
 const STORAGE_KEY = "isSidebarCollapsed";
 
 /**
- * Shared sidebar collapse state (Zustand). Hydrates from localStorage once
- * so the page-header toggle and main sidebar stay in sync.
+ * Shared sidebar collapse state (Zustand).
+ * In the template editor, it manages `isEditorSidebarPinned` independently so
+ * navigating into and out of the editor never corrupts the user's dashboard sidebar preference.
  */
 export function useSidebarCollapse() {
-	const isCollapsed = useUIStore((s) => s.isSidebarCollapsed);
-	const setCollapsed = useUIStore((s) => s.setIsSidebarCollapsed);
-	const toggle = useUIStore((s) => s.toggleSidebarCollapse);
+	const pathname = usePathname();
+	const isTemplateEditor = Boolean(pathname.match(/\/templates\/[^/]+/));
+
+	const isDashboardCollapsed = useUIStore((s) => s.isSidebarCollapsed);
+	const setDashboardCollapsed = useUIStore((s) => s.setIsSidebarCollapsed);
+	const toggleDashboardCollapse = useUIStore((s) => s.toggleSidebarCollapse);
+
+	const isEditorPinned = useUIStore((s) => s.isEditorSidebarPinned);
+	const setIsEditorPinned = useUIStore((s) => s.setIsEditorSidebarPinned);
+	const toggleEditorPinned = useUIStore((s) => s.toggleEditorSidebarPinned);
 
 	useEffect(() => {
 		try {
 			const saved = localStorage.getItem(STORAGE_KEY);
 			if (saved !== null) {
-				setCollapsed(saved === "true");
+				setDashboardCollapsed(saved === "true");
 			}
 		} catch {
 			// ignore
 		}
-	}, [setCollapsed]);
+	}, [setDashboardCollapsed]);
+
+	const isCollapsed = isTemplateEditor ? !isEditorPinned : isDashboardCollapsed;
+
+	const toggle = useCallback(() => {
+		if (isTemplateEditor) {
+			toggleEditorPinned();
+		} else {
+			toggleDashboardCollapse();
+		}
+	}, [isTemplateEditor, toggleEditorPinned, toggleDashboardCollapse]);
+
+	const setCollapsed = useCallback(
+		(value: boolean) => {
+			if (isTemplateEditor) {
+				setIsEditorPinned(!value);
+			} else {
+				setDashboardCollapsed(value);
+			}
+		},
+		[isTemplateEditor, setIsEditorPinned, setDashboardCollapsed],
+	);
 
 	return {
 		isCollapsed,

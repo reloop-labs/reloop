@@ -23,6 +23,16 @@ export const replyAllToMessageRoute = new Elysia().use(authMiddleware).post(
 		body: t.Object({
 			text: t.Optional(t.String({ description: "Plain text body content" })),
 			html: t.Optional(t.String({ description: "HTML body content" })),
+			to: t.Optional(
+				t.Union([t.String(), t.Array(t.String())], {
+					description: "Override To recipient address(es)",
+				}),
+			),
+			cc: t.Optional(
+				t.Union([t.String(), t.Array(t.String())], {
+					description: "Override CC recipient address(es)",
+				}),
+			),
 			bcc: t.Optional(
 				t.Union([t.String(), t.Array(t.String())], {
 					description: "BCC recipient address(es)",

@@ -1,4 +1,4 @@
-import * as InputPrimitive from "@reloop/ui/input";
+import { inspectorFieldClassName } from "./scrub-field";
 
 export function UrlInput({
 	value,
@@ -13,19 +13,15 @@ export function UrlInput({
 
 	return (
 		<span className="flex w-full items-center gap-1">
-			<InputPrimitive.Root
-				size="xsmall"
-				className="flex-1 rounded-2xl border border-stroke-sub-300 shadow-none before:hidden"
-			>
-				<InputPrimitive.Wrapper>
-					<InputPrimitive.Input
-						type="url"
-						value={value}
-						onChange={(e) => onChange(e.target.value)}
-						placeholder={placeholder}
-					/>
-				</InputPrimitive.Wrapper>
-			</InputPrimitive.Root>
+			<div className={inspectorFieldClassName}>
+				<input
+					type="url"
+					value={value}
+					onChange={(e) => onChange(e.target.value)}
+					placeholder={placeholder}
+					className="min-w-0 flex-1 bg-transparent text-sm text-text-strong-950 outline-none placeholder:text-text-soft-400"
+				/>
+			</div>
 			{isValid && (
 				<a
 					href={value}

@@ -271,7 +271,7 @@ export function ApiSyncStep({ onBack }: ApiSyncStepProps) {
 
 					<div className="flex items-center gap-3">
 						<a
-							href="https://reloop.sh/docs/api-reference/contacts"
+							href="https://reloop.sh/docs/api/contacts/post-api-contacts-create"
 							target="_blank"
 							rel="noreferrer"
 							className="inline-flex items-center gap-1 font-medium text-text-strong-950 text-xs hover:underline"

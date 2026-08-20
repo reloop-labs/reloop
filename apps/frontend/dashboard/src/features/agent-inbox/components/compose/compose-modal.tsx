@@ -13,10 +13,19 @@ import {
 	Sparkles,
 	X as XIcon,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { parseAsString, useQueryState } from "nuqs";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+	type FocusEvent,
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from "react";
 import { useDropzone } from "react-dropzone";
 import { Controller, useForm } from "react-hook-form";
+import { apiFetch } from "#/features/agent-inbox/lib/api-fetch";
 import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { extractBareEmail, formatRecipient } from "../../lib/email-address";
 import { plainToHtml } from "../../lib/plain-to-html";
@@ -115,6 +124,7 @@ export const ComposeModal = ({
 	onClose,
 	mailbox,
 }: ComposeModalProps) => {
+	const router = useRouter();
 	const {
 		sendMessage,
 		removeOptimisticOutbound,
@@ -141,6 +151,33 @@ export const ComposeModal = ({
 
 	const [showCc, setShowCc] = useState(false);
 	const [showBcc, setShowBcc] = useState(false);
+	const [focusCcOnShow, setFocusCcOnShow] = useState(false);
+	const [focusBccOnShow, setFocusBccOnShow] = useState(false);
+	const addressFieldsRef = useRef<HTMLDivElement>(null);
+	const ccRef = useRef(cc);
+	const bccRef = useRef(bcc);
+	ccRef.current = cc;
+	bccRef.current = bcc;
+
+	/** Hide empty Cc/Bcc once focus leaves the To/Cc/Bcc block (Gmail-style). */
+	const handleAddressFocusOut = (e: FocusEvent<HTMLDivElement>) => {
+		const container = addressFieldsRef.current;
+		const next = e.relatedTarget as Node | null;
+		if (next && container?.contains(next)) return;
+		window.setTimeout(() => {
+			if (!container) return;
+			if (container.contains(document.activeElement)) return;
+			if (document.activeElement?.closest('[role="listbox"]')) return;
+			if (isComposeFloatingUi(document.activeElement)) return;
+			if (ccRef.current.length === 0) setShowCc(false);
+			if (bccRef.current.length === 0) setShowBcc(false);
+		}, 0);
+	};
+
+	const collapseEmptyCcBcc = () => {
+		if (ccRef.current.length === 0) setShowCc(false);
+		if (bccRef.current.length === 0) setShowBcc(false);
+	};
 	const [isSending, setIsSending] = useState(false);
 	const [scheduleAt, setScheduleAt] = useState<string | undefined>();
 	const [attachments, setAttachments] = useState<AttachmentItem[]>([]);
@@ -419,7 +456,7 @@ export const ComposeModal = ({
 		try {
 			const formData = new FormData();
 			formData.append("file", file);
-			const res = await fetch("/api/upload/v1/upload", {
+			const res = await apiFetch("/api/upload/v1/upload", {
 				method: "POST",
 				body: formData,
 			});
@@ -575,7 +612,7 @@ export const ComposeModal = ({
 					seconds: SCHEDULE_UNDO_SECONDS,
 					onUndo: async () => {
 						try {
-							const cancelRes = await fetch(
+							const cancelRes = await apiFetch(
 								`/api/inbox/v1/messages/pending/${pendingId}/cancel`,
 								{ method: "POST" },
 							);
@@ -594,9 +631,18 @@ export const ComposeModal = ({
 					},
 				});
 			} else {
-				toast.success(
-					scheduleAt ? "Email scheduled" : "Email sent successfully!",
-				);
+				toast.success(scheduleAt ? "Email scheduled" : "Email sent", {
+					description: scheduleAt
+						? "It will send at the scheduled time. Find it in Sent."
+						: "Find it in Sent — Inbox only shows mail you receive.",
+					action: {
+						label: "View Sent",
+						onClick: () => {
+							router.push(`/inbox/${mailbox.id}/sent`);
+						},
+					},
+					duration: 6000,
+				});
 			}
 
 			void setDraftId(null);
@@ -621,7 +667,7 @@ export const ComposeModal = ({
 		}
 		setSubjectGenerating(true);
 		try {
-			const res = await fetch("/api/inbox/v1/ai/subject", {
+			const res = await apiFetch("/api/inbox/v1/ai/subject", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({ text }),
@@ -661,7 +707,7 @@ export const ComposeModal = ({
 		try {
 			if (!subject.trim()) await generateSubject(prompt);
 
-			const res = await fetch("/api/inbox/v1/ai/compose", {
+			const res = await apiFetch("/api/inbox/v1/ai/compose", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				signal: abort.signal,
@@ -839,159 +885,181 @@ export const ComposeModal = ({
 								</div>
 							</div>
 
-							{/* To */}
-							<div className="grid grid-cols-[3.75rem_minmax(0,1fr)_auto] items-center gap-x-2 border-mail-border/30 border-b py-2">
-								<span className="font-medium text-[12px] text-mail-muted leading-none">
-									To
-								</span>
-								<div className="min-w-0">
-									<Controller
-										name="to"
-										control={control}
-										render={({ field }) => (
-											<EmailPillsInput
-												emails={field.value}
-												onChange={(emails) => {
-													field.onChange(emails);
-													if (toError) setToError(null);
-												}}
-												placeholder="Add recipients…"
-												disabled={isSending}
-												suggestions={recipientSuggestions}
-											/>
+							{/* To / Cc / Bcc — collapse empty Cc/Bcc when leaving this block */}
+							<div ref={addressFieldsRef} onBlur={handleAddressFocusOut}>
+								{/* To */}
+								<div className="grid grid-cols-[3.75rem_minmax(0,1fr)_auto] items-center gap-x-2 border-mail-border/30 border-b py-2">
+									<span className="font-medium text-[12px] text-mail-muted leading-none">
+										To
+									</span>
+									<div className="min-w-0">
+										<Controller
+											name="to"
+											control={control}
+											render={({ field }) => (
+												<EmailPillsInput
+													emails={field.value}
+													onChange={(emails) => {
+														field.onChange(emails);
+														if (toError) setToError(null);
+													}}
+													placeholder="Add recipients…"
+													disabled={isSending}
+													suggestions={recipientSuggestions}
+												/>
+											)}
+										/>
+										{toError && (
+											<p
+												className="mt-1 text-[12px] text-error-base leading-snug"
+												role="alert"
+											>
+												{toError}
+											</p>
 										)}
-									/>
-									{toError && (
-										<p
-											className="mt-1 text-[12px] text-error-base leading-snug"
-											role="alert"
+									</div>
+									<div className="flex shrink-0 items-center gap-0.5 self-center">
+										<button
+											type="button"
+											tabIndex={-1}
+											onClick={() =>
+												setShowCc((v) => {
+													const next = !v;
+													setFocusCcOnShow(next);
+													return next;
+												})
+											}
+											className={cn(
+												"rounded-md px-1.5 py-1 font-medium text-[11px] text-mail-muted hover:bg-[var(--inbox-hover)] hover:text-mail-foreground",
+												showCc &&
+													"bg-[var(--inbox-hover)] text-mail-foreground",
+											)}
 										>
-											{toError}
-										</p>
+											Cc
+										</button>
+										<button
+											type="button"
+											tabIndex={-1}
+											onClick={() =>
+												setShowBcc((v) => {
+													const next = !v;
+													setFocusBccOnShow(next);
+													return next;
+												})
+											}
+											className={cn(
+												"rounded-md px-1.5 py-1 font-medium text-[11px] text-mail-muted hover:bg-[var(--inbox-hover)] hover:text-mail-foreground",
+												showBcc &&
+													"bg-[var(--inbox-hover)] text-mail-foreground",
+											)}
+										>
+											Bcc
+										</button>
+									</div>
+								</div>
+
+								<AnimatePresence initial={false}>
+									{showCc && (
+										<motion.div
+											initial={
+												shouldReduceMotion
+													? { opacity: 0 }
+													: { height: 0, opacity: 0 }
+											}
+											animate={
+												shouldReduceMotion
+													? { opacity: 1 }
+													: { height: "auto", opacity: 1 }
+											}
+											exit={
+												shouldReduceMotion
+													? { opacity: 0 }
+													: { height: 0, opacity: 0 }
+											}
+											transition={
+												shouldReduceMotion
+													? { duration: 0.15 }
+													: { duration: 0.2, ease: [0.32, 0.72, 0, 1] }
+											}
+											className="overflow-hidden"
+										>
+											<div className="grid grid-cols-[3.75rem_minmax(0,1fr)] items-center gap-x-2 border-mail-border/30 border-b py-2">
+												<span className="font-medium text-[12px] text-mail-muted leading-none">
+													Cc
+												</span>
+												<Controller
+													name="cc"
+													control={control}
+													render={({ field }) => (
+														<EmailPillsInput
+															emails={field.value}
+															onChange={field.onChange}
+															placeholder="Add Cc…"
+															disabled={isSending}
+															suggestions={recipientSuggestions}
+															autoFocus={focusCcOnShow}
+														/>
+													)}
+												/>
+											</div>
+										</motion.div>
 									)}
-								</div>
-								<div className="flex shrink-0 items-center gap-0.5 self-center">
-									<button
-										type="button"
-										tabIndex={-1}
-										onClick={() => setShowCc((v) => !v)}
-										className={cn(
-											"rounded-md px-1.5 py-1 font-medium text-[11px] text-mail-muted hover:bg-[var(--inbox-hover)] hover:text-mail-foreground",
-											showCc && "bg-[var(--inbox-hover)] text-mail-foreground",
-										)}
-									>
-										Cc
-									</button>
-									<button
-										type="button"
-										tabIndex={-1}
-										onClick={() => setShowBcc((v) => !v)}
-										className={cn(
-											"rounded-md px-1.5 py-1 font-medium text-[11px] text-mail-muted hover:bg-[var(--inbox-hover)] hover:text-mail-foreground",
-											showBcc && "bg-[var(--inbox-hover)] text-mail-foreground",
-										)}
-									>
-										Bcc
-									</button>
-								</div>
+								</AnimatePresence>
+
+								<AnimatePresence initial={false}>
+									{showBcc && (
+										<motion.div
+											initial={
+												shouldReduceMotion
+													? { opacity: 0 }
+													: { height: 0, opacity: 0 }
+											}
+											animate={
+												shouldReduceMotion
+													? { opacity: 1 }
+													: { height: "auto", opacity: 1 }
+											}
+											exit={
+												shouldReduceMotion
+													? { opacity: 0 }
+													: { height: 0, opacity: 0 }
+											}
+											transition={
+												shouldReduceMotion
+													? { duration: 0.15 }
+													: { duration: 0.2, ease: [0.32, 0.72, 0, 1] }
+											}
+											className="overflow-hidden"
+										>
+											<div className="grid grid-cols-[3.75rem_minmax(0,1fr)] items-center gap-x-2 border-mail-border/30 border-b py-2">
+												<span className="font-medium text-[12px] text-mail-muted leading-none">
+													Bcc
+												</span>
+												<Controller
+													name="bcc"
+													control={control}
+													render={({ field }) => (
+														<EmailPillsInput
+															emails={field.value}
+															onChange={field.onChange}
+															placeholder="Add Bcc…"
+															disabled={isSending}
+															suggestions={recipientSuggestions}
+															autoFocus={focusBccOnShow}
+														/>
+													)}
+												/>
+											</div>
+										</motion.div>
+									)}
+								</AnimatePresence>
 							</div>
 
-							<AnimatePresence initial={false}>
-								{showCc && (
-									<motion.div
-										initial={
-											shouldReduceMotion
-												? { opacity: 0 }
-												: { height: 0, opacity: 0 }
-										}
-										animate={
-											shouldReduceMotion
-												? { opacity: 1 }
-												: { height: "auto", opacity: 1 }
-										}
-										exit={
-											shouldReduceMotion
-												? { opacity: 0 }
-												: { height: 0, opacity: 0 }
-										}
-										transition={
-											shouldReduceMotion
-												? { duration: 0.15 }
-												: { duration: 0.2, ease: [0.32, 0.72, 0, 1] }
-										}
-										className="overflow-hidden"
-									>
-										<div className="grid grid-cols-[3.75rem_minmax(0,1fr)] items-center gap-x-2 border-mail-border/30 border-b py-2">
-											<span className="font-medium text-[12px] text-mail-muted leading-none">
-												Cc
-											</span>
-											<Controller
-												name="cc"
-												control={control}
-												render={({ field }) => (
-													<EmailPillsInput
-														emails={field.value}
-														onChange={field.onChange}
-														placeholder="Add Cc…"
-														disabled={isSending}
-														suggestions={recipientSuggestions}
-													/>
-												)}
-											/>
-										</div>
-									</motion.div>
-								)}
-							</AnimatePresence>
-
-							<AnimatePresence initial={false}>
-								{showBcc && (
-									<motion.div
-										initial={
-											shouldReduceMotion
-												? { opacity: 0 }
-												: { height: 0, opacity: 0 }
-										}
-										animate={
-											shouldReduceMotion
-												? { opacity: 1 }
-												: { height: "auto", opacity: 1 }
-										}
-										exit={
-											shouldReduceMotion
-												? { opacity: 0 }
-												: { height: 0, opacity: 0 }
-										}
-										transition={
-											shouldReduceMotion
-												? { duration: 0.15 }
-												: { duration: 0.2, ease: [0.32, 0.72, 0, 1] }
-										}
-										className="overflow-hidden"
-									>
-										<div className="grid grid-cols-[3.75rem_minmax(0,1fr)] items-center gap-x-2 border-mail-border/30 border-b py-2">
-											<span className="font-medium text-[12px] text-mail-muted leading-none">
-												Bcc
-											</span>
-											<Controller
-												name="bcc"
-												control={control}
-												render={({ field }) => (
-													<EmailPillsInput
-														emails={field.value}
-														onChange={field.onChange}
-														placeholder="Add Bcc…"
-														disabled={isSending}
-														suggestions={recipientSuggestions}
-													/>
-												)}
-											/>
-										</div>
-									</motion.div>
-								)}
-							</AnimatePresence>
-
 							{/* Subject */}
-							<div className="grid grid-cols-[3.75rem_minmax(0,1fr)_auto] items-center gap-x-2 py-2">
+							<div
+								className="grid grid-cols-[3.75rem_minmax(0,1fr)_auto] items-center gap-x-2 py-2"
+								onFocusCapture={collapseEmptyCcBcc}
+							>
 								<span className="font-medium text-[12px] text-mail-muted leading-none">
 									Subject
 								</span>
@@ -1022,6 +1090,7 @@ export const ComposeModal = ({
 										textBody.trim().length > 0 &&
 										"ai-body-thinking",
 								)}
+								onFocusCapture={collapseEmptyCcBcc}
 							>
 								<ComposeBodyEditor
 									ref={editorRef}

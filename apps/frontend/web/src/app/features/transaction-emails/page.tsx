@@ -326,7 +326,7 @@ const TransactionEmailsPage = () => {
 								mode: "filled",
 							}).root()} h-11! rounded-full! px-8! font-semibold`}
 						>
-							Start for free
+							Get Started
 						</a>
 						<a
 							href="#playground"

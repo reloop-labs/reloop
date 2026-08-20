@@ -1,38 +1,30 @@
+import * as Button from "@reloop/ui/button";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import Spinner from "@reloop/ui/spinner";
-import { useRouter } from "next/navigation";
+import { parseAsArrayOf, parseAsString, useQueryState } from "nuqs";
+import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import { useCreateTemplate } from "#/features/templates/hooks/use-templates-query";
 
-import { useState } from "react";
-import { toast } from "sonner";
-import {
-	createTemplate,
-	useInvalidateTemplates,
-} from "#/features/templates/hooks/use-templates-query";
+const actionKbdOnSolidClassName =
+	"border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]";
 
-export const EmptyState = ({
-	isFiltered = false,
-	onClearFilters,
-}: {
-	isFiltered?: boolean;
-	onClearFilters?: () => void;
-}) => {
-	const router = useRouter();
-	const invalidate = useInvalidateTemplates();
-	const [isCreating, setIsCreating] = useState(false);
+export const EmptyState = () => {
+	const { isCreating, create } = useCreateTemplate();
+	const [searchQuery, setSearchQuery] = useQueryState(
+		"q",
+		parseAsString.withDefault(""),
+	);
+	const [statusFilter, setStatusFilter] = useQueryState(
+		"status",
+		parseAsArrayOf(parseAsString).withDefault([]),
+	);
 
-	const handleCreateTemplate = async () => {
-		if (isCreating) return;
-		setIsCreating(true);
-		try {
-			const template = await createTemplate();
-			await invalidate();
-			router.push(`/templates/${template.id}`);
-		} catch {
-			toast.error("Failed to create template");
-		} finally {
-			setIsCreating(false);
-		}
+	const isFiltered = statusFilter.length > 0 || searchQuery.trim() !== "";
+
+	const handleClearFilters = () => {
+		void setSearchQuery("");
+		void setStatusFilter([]);
 	};
 
 	return (
@@ -51,23 +43,27 @@ export const EmptyState = ({
 					? "Try adjusting your search or filters."
 					: "Design reusable emails with drag-and-drop, then send them via API or campaigns."}
 			</p>
-			{isFiltered && onClearFilters ? (
-				<button
+			{isFiltered ? (
+				<Button.Root
 					type="button"
-					onClick={onClearFilters}
-					className="inline-flex h-9 items-center gap-1.5 rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-3 font-medium text-sm text-text-strong-950 transition-colors hover:bg-bg-weak-50 dark:border-stroke-soft-100/40"
+					variant="neutral"
+					mode="stroke"
+					size="small"
+					onClick={handleClearFilters}
+					className="gap-1.5 rounded-xl"
 				>
 					<Icon name="cross-circle" className="h-4 w-4 text-text-sub-600" />
 					Clear filters
-				</button>
+				</Button.Root>
 			) : (
 				<FancyButton.Root
 					type="button"
 					variant="blue"
 					size="small"
-					onClick={() => void handleCreateTemplate()}
+					onClick={() => void create()}
 					disabled={isCreating}
 					className="gap-1.5 rounded-xl"
+					aria-keyshortcuts="c"
 				>
 					{isCreating ? (
 						<>
@@ -78,6 +74,7 @@ export const EmptyState = ({
 						<>
 							<Icon name="plus" className="h-4 w-4" />
 							Create template
+							<ActionKbd className={actionKbdOnSolidClassName}>C</ActionKbd>
 						</>
 					)}
 				</FancyButton.Root>

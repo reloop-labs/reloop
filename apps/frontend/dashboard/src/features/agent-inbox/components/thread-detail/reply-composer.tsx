@@ -1,11 +1,20 @@
 import { cn } from "@reloop/ui/cn";
+import * as Dropdown from "@reloop/ui/dropdown";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Paperclip } from "lucide-react";
-import { forwardRef, useCallback, useEffect, useRef, useState } from "react";
+import {
+	type FocusEvent,
+	forwardRef,
+	useCallback,
+	useEffect,
+	useRef,
+	useState,
+} from "react";
 import { useDropzone } from "react-dropzone";
 import { toast } from "sonner";
+import { apiFetch } from "#/features/agent-inbox/lib/api-fetch";
 import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { useDraftAutosave } from "../../hooks/use-draft-autosave";
 import { extractBareEmail, extractDisplayName } from "../../lib/email-address";
@@ -29,6 +38,7 @@ import {
 	ComposeBodyEditor,
 	type ComposeBodyEditorHandle,
 } from "../compose/compose-body-editor";
+import { EmailPillsInput } from "../shared/email-pills-input";
 import { LoadingDot } from "../shared/loading-dot";
 
 type ReplyMode = "reply" | "replyAll";
@@ -49,6 +59,8 @@ interface ReplyComposerProps {
 	toName: string;
 	toEmail: string;
 	fromEmail: string;
+	/** Other addresses to include when mode is replyAll (excludes mailbox + primary to). */
+	replyAllCc?: string[];
 	mode?: ReplyMode;
 	canReplyAll?: boolean;
 	/** Inline under a message vs sticky dock at the bottom of the thread. */
@@ -63,6 +75,7 @@ interface ReplyComposerProps {
 	initialHtml?: string;
 	draft?: ReplyDraftContext;
 	onModeChange?: (mode: ReplyMode) => void;
+	onForward?: () => void;
 	onSend: (payload: {
 		text: string;
 		html: string;
@@ -71,6 +84,9 @@ interface ReplyComposerProps {
 			path?: string;
 			content_type?: string;
 		}>;
+		to?: string[];
+		cc?: string[];
+		bcc?: string[];
 	}) => void;
 	onClose: () => void;
 	/** Parent-owned lock while the reply request is in flight. */
@@ -95,12 +111,17 @@ export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
 			toName,
 			toEmail,
 			fromEmail,
+			replyAllCc = [],
+			mode = "reply",
+			canReplyAll = false,
 			variant = "dock",
 			skipEnter = false,
 			threadId = null,
 			initialContent = "",
 			initialHtml = "",
 			draft,
+			onModeChange,
+			onForward,
 			onSend,
 			onClose,
 			isSending = false,
@@ -116,6 +137,83 @@ export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
 			bareTo;
 		const bareFrom = extractBareEmail(fromEmail) || fromEmail;
 		const resolvedThreadId = threadId || draft?.threadId || null;
+
+		const normalizeList = (list: string[]) => {
+			const seen = new Set<string>();
+			const out: string[] = [];
+			for (const raw of list) {
+				const bare = extractBareEmail(raw);
+				if (!bare) continue;
+				const key = bare.toLowerCase();
+				if (seen.has(key)) continue;
+				seen.add(key);
+				out.push(bare);
+			}
+			return out;
+		};
+
+		const defaultTo = normalizeList([bareTo].filter(Boolean));
+		const defaultReplyAllCc = normalizeList(
+			replyAllCc.filter(
+				(addr) =>
+					extractBareEmail(addr).toLowerCase() !== bareTo.toLowerCase() &&
+					extractBareEmail(addr).toLowerCase() !== bareFrom.toLowerCase(),
+			),
+		);
+
+		const [toEmails, setToEmails] = useState(defaultTo);
+		const [ccEmails, setCcEmails] = useState(
+			mode === "replyAll" ? defaultReplyAllCc : [],
+		);
+		const [bccEmails, setBccEmails] = useState<string[]>([]);
+		const [showCc, setShowCc] = useState(
+			mode === "replyAll" && defaultReplyAllCc.length > 0,
+		);
+		const [showBcc, setShowBcc] = useState(false);
+		/** Only autofocus Cc/Bcc when the user opens the row (not reply-all seed). */
+		const [focusCcOnShow, setFocusCcOnShow] = useState(false);
+		const [focusBccOnShow, setFocusBccOnShow] = useState(false);
+		const addressFieldsRef = useRef<HTMLDivElement>(null);
+		const ccEmailsRef = useRef(ccEmails);
+		const bccEmailsRef = useRef(bccEmails);
+		ccEmailsRef.current = ccEmails;
+		bccEmailsRef.current = bccEmails;
+
+		/** Hide empty Cc/Bcc once focus leaves the To/Cc/Bcc block (Gmail-style). */
+		const handleAddressFocusOut = (e: FocusEvent<HTMLDivElement>) => {
+			const container = addressFieldsRef.current;
+			const next = e.relatedTarget as Node | null;
+			if (next && container?.contains(next)) return;
+			window.setTimeout(() => {
+				if (!container) return;
+				if (container.contains(document.activeElement)) return;
+				if (document.activeElement?.closest('[role="listbox"]')) return;
+				if (ccEmailsRef.current.length === 0) setShowCc(false);
+				if (bccEmailsRef.current.length === 0) setShowBcc(false);
+			}, 0);
+		};
+
+		useEffect(() => {
+			setToEmails(defaultTo);
+			if (mode === "replyAll") {
+				setCcEmails(defaultReplyAllCc);
+				setShowCc(defaultReplyAllCc.length > 0);
+			} else {
+				setCcEmails([]);
+			}
+			// Only re-seed when the reply target / mode changes from the parent.
+			// eslint-disable-next-line react-hooks/exhaustive-deps -- intentional seed
+		}, [bareTo, mode, replyAllCc.join("|")]);
+
+		const applyMode = (next: ReplyMode) => {
+			onModeChange?.(next);
+			if (next === "replyAll") {
+				setCcEmails(defaultReplyAllCc);
+				if (defaultReplyAllCc.length > 0) setShowCc(true);
+			} else {
+				setCcEmails([]);
+			}
+		};
 
 		const fileInputRef = useRef<HTMLInputElement>(null);
 		const editorRef = useRef<ComposeBodyEditorHandle>(null);
@@ -186,10 +284,12 @@ export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
 			kind: draft?.kind ?? "reply",
 			threadId: draft?.threadId,
 			inReplyToMessageId: draft?.inReplyToMessageId,
-			to: [bareTo].filter(Boolean),
+			to: toEmails.length > 0 ? toEmails : [bareTo].filter(Boolean),
 			subject: draft?.subject,
 			html: htmlBody,
 			text: textBody,
+			cc: ccEmails,
+			bcc: bccEmails,
 			attachments: attachments
 				.filter((a) => !a.isUploading)
 				.map((a) => ({
@@ -213,6 +313,10 @@ export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
 			// Prevent double-submit from rapid clicks / Cmd+Enter while getEmail() awaits.
 			if (isSending || sendingRef.current) return;
 			if (!textRef.current.trim()) return;
+			if (toEmails.length === 0) {
+				toast.error("Add at least one recipient");
+				return;
+			}
 			if (attachments.some((a) => a.isUploading)) {
 				toast.error("Please wait for attachments to finish uploading.");
 				return;
@@ -227,11 +331,14 @@ export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
 					text: (exported.text || textRef.current).trim(),
 					html: exported.html || htmlRef.current,
 					attachments: toSendAttachments(attachments),
+					to: toEmails,
+					cc: ccEmails,
+					bcc: bccEmails,
 				});
 			} catch {
 				sendingRef.current = false;
 			}
-		}, [attachments, isSending, onSend]);
+		}, [attachments, bccEmails, ccEmails, isSending, onSend, toEmails]);
 
 		const generateReply = useCallback(async () => {
 			if (!resolvedThreadId) {
@@ -258,7 +365,7 @@ export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
 			setAiPhase("thinking");
 
 			try {
-				const res = await fetch("/api/inbox/v1/ai/reply", {
+				const res = await apiFetch("/api/inbox/v1/ai/reply", {
 					method: "POST",
 					headers: { "Content-Type": "application/json" },
 					signal: abort.signal,
@@ -442,25 +549,223 @@ export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
 						)}
 					</AnimatePresence>
 
-					<div className="flex items-center gap-2 border-mail-border/40 border-b px-4 py-2.5">
-						<div className="min-w-0 flex-1 truncate text-[12px] text-mail-muted">
-							<span className="text-mail-muted">to </span>
-							<span className="font-medium text-mail-foreground">
-								{displayName}
-							</span>
-							{bareTo ? (
-								<span className="text-mail-muted"> · {bareTo}</span>
-							) : null}
+					<div className="border-mail-border/40 border-b">
+						<div className="flex items-center gap-2 px-4 py-2">
+							<Dropdown.Root>
+								<Dropdown.Trigger asChild>
+									<button
+										type="button"
+										className="inline-flex shrink-0 items-center gap-1.5 rounded-lg px-1.5 py-1 font-medium text-[13px] text-mail-foreground transition-colors hover:bg-[var(--inbox-hover)]"
+										aria-label="Reply mode"
+									>
+										<Icon
+											name={mode === "replyAll" ? "reply-all" : "reply"}
+											className="size-3.5 text-mail-muted"
+										/>
+										{mode === "replyAll" ? "Reply all" : "Reply"}
+										<Icon
+											name="chevron-down"
+											className="size-3 text-mail-muted"
+										/>
+									</button>
+								</Dropdown.Trigger>
+								<Dropdown.Content
+									align="start"
+									sideOffset={6}
+									className="w-44 p-1.5"
+								>
+									<Dropdown.Item
+										onSelect={() => applyMode("reply")}
+										className="gap-2"
+									>
+										<Icon name="reply" className="size-3.5 text-mail-muted" />
+										Reply
+									</Dropdown.Item>
+									{canReplyAll ? (
+										<Dropdown.Item
+											onSelect={() => applyMode("replyAll")}
+											className="gap-2"
+										>
+											<Icon
+												name="reply-all"
+												className="size-3.5 text-mail-muted"
+											/>
+											Reply all
+										</Dropdown.Item>
+									) : null}
+									{onForward ? (
+										<Dropdown.Item
+											onSelect={() => onForward()}
+											className="gap-2"
+										>
+											<Icon
+												name="forward"
+												className="size-3.5 text-mail-muted"
+											/>
+											Forward
+										</Dropdown.Item>
+									) : null}
+								</Dropdown.Content>
+							</Dropdown.Root>
+
+							<div className="min-w-0 flex-1 truncate text-[12px] text-mail-muted">
+								<span className="text-mail-muted">to </span>
+								<span className="font-medium text-mail-foreground">
+									{toEmails[0]
+										? extractDisplayName(toEmails[0]) ||
+											toEmails[0].split("@")[0] ||
+											toEmails[0]
+										: displayName}
+								</span>
+								{toEmails.length > 1 ? (
+									<span className="text-mail-muted">
+										{" "}
+										+{toEmails.length - 1}
+									</span>
+								) : null}
+								{ccEmails.length > 0 ? (
+									<span className="text-mail-muted">
+										{" "}
+										· cc {ccEmails.length}
+									</span>
+								) : null}
+							</div>
+
+							<button
+								type="button"
+								onClick={onClose}
+								className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-mail-muted transition-colors duration-150 hover:bg-[var(--inbox-hover)] hover:text-mail-foreground active:scale-[0.97]"
+								aria-label="Close reply"
+							>
+								<Icon name="cross" className="h-3.5 w-3.5" />
+							</button>
 						</div>
 
-						<button
-							type="button"
-							onClick={onClose}
-							className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-mail-muted transition-colors duration-150 hover:bg-[var(--inbox-hover)] hover:text-mail-foreground active:scale-[0.97]"
-							aria-label="Close reply"
+						<div
+							ref={addressFieldsRef}
+							className="px-4 pb-2"
+							onBlur={handleAddressFocusOut}
 						>
-							<Icon name="cross" className="h-3.5 w-3.5" />
-						</button>
+							<div className="grid grid-cols-[2.5rem_minmax(0,1fr)_auto] items-center gap-x-2 border-mail-border/30 border-t py-2">
+								<span className="font-medium text-[12px] text-mail-muted leading-none">
+									To
+								</span>
+								<div className="min-w-0">
+									<EmailPillsInput
+										emails={toEmails}
+										onChange={setToEmails}
+										placeholder="Add recipients…"
+										disabled={isSending}
+									/>
+								</div>
+								<div className="flex shrink-0 items-center gap-0.5">
+									<button
+										type="button"
+										tabIndex={-1}
+										onClick={() =>
+											setShowCc((v) => {
+												const next = !v;
+												setFocusCcOnShow(next);
+												return next;
+											})
+										}
+										className={cn(
+											"rounded-md px-1.5 py-1 font-medium text-[11px] text-mail-muted transition-colors hover:bg-[var(--inbox-hover)] hover:text-mail-foreground",
+											showCc && "bg-[var(--inbox-hover)] text-mail-foreground",
+										)}
+									>
+										Cc
+									</button>
+									<button
+										type="button"
+										tabIndex={-1}
+										onClick={() =>
+											setShowBcc((v) => {
+												const next = !v;
+												setFocusBccOnShow(next);
+												return next;
+											})
+										}
+										className={cn(
+											"rounded-md px-1.5 py-1 font-medium text-[11px] text-mail-muted transition-colors hover:bg-[var(--inbox-hover)] hover:text-mail-foreground",
+											showBcc && "bg-[var(--inbox-hover)] text-mail-foreground",
+										)}
+									>
+										Bcc
+									</button>
+								</div>
+							</div>
+
+							<AnimatePresence initial={false}>
+								{showCc && (
+									<motion.div
+										initial={
+											reduceMotion ? { opacity: 0 } : { height: 0, opacity: 0 }
+										}
+										animate={
+											reduceMotion
+												? { opacity: 1 }
+												: { height: "auto", opacity: 1 }
+										}
+										exit={
+											reduceMotion ? { opacity: 0 } : { height: 0, opacity: 0 }
+										}
+										transition={{ duration: 0.18, ease: easeOut }}
+										className="overflow-hidden"
+									>
+										<div className="grid grid-cols-[2.5rem_minmax(0,1fr)] items-center gap-x-2 border-mail-border/30 border-t py-2">
+											<span className="font-medium text-[12px] text-mail-muted leading-none">
+												Cc
+											</span>
+											<div className="min-w-0">
+												<EmailPillsInput
+													emails={ccEmails}
+													onChange={setCcEmails}
+													placeholder="Add Cc…"
+													disabled={isSending}
+													autoFocus={focusCcOnShow}
+												/>
+											</div>
+										</div>
+									</motion.div>
+								)}
+							</AnimatePresence>
+
+							<AnimatePresence initial={false}>
+								{showBcc && (
+									<motion.div
+										initial={
+											reduceMotion ? { opacity: 0 } : { height: 0, opacity: 0 }
+										}
+										animate={
+											reduceMotion
+												? { opacity: 1 }
+												: { height: "auto", opacity: 1 }
+										}
+										exit={
+											reduceMotion ? { opacity: 0 } : { height: 0, opacity: 0 }
+										}
+										transition={{ duration: 0.18, ease: easeOut }}
+										className="overflow-hidden"
+									>
+										<div className="grid grid-cols-[2.5rem_minmax(0,1fr)] items-center gap-x-2 border-mail-border/30 border-t py-2">
+											<span className="font-medium text-[12px] text-mail-muted leading-none">
+												Bcc
+											</span>
+											<div className="min-w-0">
+												<EmailPillsInput
+													emails={bccEmails}
+													onChange={setBccEmails}
+													placeholder="Add Bcc…"
+													disabled={isSending}
+													autoFocus={focusBccOnShow}
+												/>
+											</div>
+										</div>
+									</motion.div>
+								)}
+							</AnimatePresence>
+						</div>
 					</div>
 
 					{/* Same React Email editor + inbox toolbar as compose modal */}
@@ -471,6 +776,10 @@ export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
 								textBody.trim().length > 0 &&
 								"ai-body-thinking",
 						)}
+						onFocusCapture={() => {
+							if (ccEmailsRef.current.length === 0) setShowCc(false);
+							if (bccEmailsRef.current.length === 0) setShowBcc(false);
+						}}
 					>
 						<ComposeBodyEditor
 							ref={editorRef}

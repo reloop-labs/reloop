@@ -1,25 +1,25 @@
-export { applySessionCacheEviction } from "@reloop/auth/middleware/eviction/apply-session-cache-eviction";
-export { evictAllSessionsForUser } from "@reloop/auth/middleware/eviction/evict-all-sessions-for-user";
-export { evictSessionByToken } from "@reloop/auth/middleware/eviction/evict-session-by-token";
-export { evictionEventFromAuthPath } from "@reloop/auth/middleware/eviction/eviction-event-from-auth-path";
-export { handleAuthLifecycleEviction } from "@reloop/auth/middleware/eviction/handle-auth-lifecycle-eviction";
-export { SESSION_CACHE_REDIS_PREFIX } from "@reloop/auth/middleware/eviction/session-cache-redis-prefix";
-export type { SessionEvictionEvent } from "@reloop/auth/middleware/eviction/session-eviction-event";
+export { applySessionCacheEviction } from "./eviction/apply-session-cache-eviction";
+export { evictAllSessionsForUser } from "./eviction/evict-all-sessions-for-user";
+export { evictSessionByToken } from "./eviction/evict-session-by-token";
+export { evictionEventFromAuthPath } from "./eviction/eviction-event-from-auth-path";
+export { handleAuthLifecycleEviction } from "./eviction/handle-auth-lifecycle-eviction";
+export { SESSION_CACHE_REDIS_PREFIX } from "./eviction/session-cache-redis-prefix";
+export type { SessionEvictionEvent } from "./eviction/session-eviction-event";
 export {
 	isInsecureDefaultInternalSecret,
 	KNOWN_INSECURE_INTERNAL_SECRETS,
 	sanitizeInternalSecret,
-} from "@reloop/auth/middleware/internal-secret";
+} from "./internal-secret";
 export {
 	extractSessionToken,
 	sessionTokenCacheKey,
 	sessionUserIndexKey,
-} from "@reloop/auth/middleware/keys";
+} from "./keys";
 
 export {
 	type AuthPlugin,
 	createAuthPlugin,
-} from "@reloop/auth/middleware/plugin/create-auth-plugin";
+} from "./plugin/create-auth-plugin";
 export {
 	applyResponseHeaders,
 	buildRateLimitHeaders,
@@ -28,39 +28,39 @@ export {
 	type RateLimitHeaderInput,
 	RELOOP_QUOTA_HEADER,
 	type ReloopQuotaHeaderInput,
-} from "@reloop/auth/middleware/rate-limit-headers";
-export { createSessionCacheRedis } from "@reloop/auth/middleware/redis/create-session-cache-redis";
-export { resolveAuthRedis } from "@reloop/auth/middleware/redis/resolve-auth-redis";
+} from "./rate-limit-headers";
+export { createSessionCacheRedis } from "./redis/create-session-cache-redis";
+export { resolveAuthRedis } from "./redis/resolve-auth-redis";
 export {
 	type RequireUserAgentOptions,
 	requireUserAgentPlugin,
-} from "@reloop/auth/middleware/require-user-agent";
-export { extractApiKey } from "@reloop/auth/middleware/resolve/extract-api-key";
-export { resolveApiKeyAuth } from "@reloop/auth/middleware/resolve/resolve-api-key-auth";
-export { resolveApiKeyInternalOrSession } from "@reloop/auth/middleware/resolve/resolve-api-key-internal-or-session";
-export { resolveApiKeyOrInternal } from "@reloop/auth/middleware/resolve/resolve-api-key-or-internal";
-export { resolveCollabAuth } from "@reloop/auth/middleware/resolve/resolve-collab-auth";
+} from "./require-user-agent";
+export { extractApiKey } from "./resolve/extract-api-key";
+export { resolveApiKeyAuth } from "./resolve/resolve-api-key-auth";
+export { resolveApiKeyInternalOrSession } from "./resolve/resolve-api-key-internal-or-session";
+export { resolveApiKeyOrInternal } from "./resolve/resolve-api-key-or-internal";
+export { resolveCollabAuth } from "./resolve/resolve-collab-auth";
 export {
 	resolveInternalAuth,
 	timingSafeStringEqual,
-} from "@reloop/auth/middleware/resolve/resolve-internal-auth";
-export { resolvePlatformAdmin } from "@reloop/auth/middleware/resolve/resolve-platform-admin";
-export { resolveSessionAuth } from "@reloop/auth/middleware/resolve/resolve-session-auth";
-export { resolveSessionAuthWithProfile } from "@reloop/auth/middleware/resolve/resolve-session-auth-with-profile";
-export { resolveSessionOrApiKey } from "@reloop/auth/middleware/resolve/resolve-session-or-api-key";
-export { resolveSupportSession } from "@reloop/auth/middleware/resolve/resolve-support-session";
-export type { ResolverDeps } from "@reloop/auth/middleware/resolve/resolver-deps";
+} from "./resolve/resolve-internal-auth";
+export { resolvePlatformAdmin } from "./resolve/resolve-platform-admin";
+export { resolveSessionAuth } from "./resolve/resolve-session-auth";
+export { resolveSessionAuthWithProfile } from "./resolve/resolve-session-auth-with-profile";
+export { resolveSessionOrApiKey } from "./resolve/resolve-session-or-api-key";
+export { resolveSupportSession } from "./resolve/resolve-support-session";
+export type { ResolverDeps } from "./resolve/resolver-deps";
 
 export {
 	SECURE_HEADERS_VALUES,
 	type SecureHeadersOptions,
 	type SecureHeadersProfile,
 	secureHeadersPlugin,
-} from "@reloop/auth/middleware/secure-headers";
+} from "./secure-headers";
 
-export { resolveSession } from "@reloop/auth/middleware/session/resolve-session";
-export type { ResolveSessionOptions } from "@reloop/auth/middleware/session/resolve-session-options";
-export { resolveSessionWithProfile } from "@reloop/auth/middleware/session/resolve-session-with-profile";
+export { resolveSession } from "./session/resolve-session";
+export type { ResolveSessionOptions } from "./session/resolve-session-options";
+export { resolveSessionWithProfile } from "./session/resolve-session-with-profile";
 
 export {
 	type AuthContext,
@@ -72,4 +72,4 @@ export {
 	INTERNAL_SECRET_HEADER,
 	INTERNAL_USER_ID_HEADER,
 	type SupportAuthContext,
-} from "@reloop/auth/middleware/types";
+} from "./types";

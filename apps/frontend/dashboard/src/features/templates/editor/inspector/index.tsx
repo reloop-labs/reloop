@@ -1,3 +1,5 @@
+"use client";
+
 import { Inspector } from "@react-email/editor/ui";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
@@ -7,19 +9,18 @@ import { useCurrentEditor } from "@tiptap/react";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { useSWR } from "#/features/templates/editor/lib/use-swr-compat";
-import { useTemplateId } from "#/features/templates/editor/lib/use-template-id";
+import { useSWR } from "#/features/templates/editor/hooks/use-swr-compat";
+import { useTemplateId } from "#/features/templates/editor/hooks/use-template-id";
 import {
 	formatTemplateVariable,
 	mapTemplateVariables,
 } from "#/features/templates/lib/template-variables";
-import { DeleteTemplateVariableModal } from "../delete-template-variable-modal";
+import { DeleteTemplateVariableModal } from "../components/panels/variables/delete-variable-modal";
 import Breadcrumb from "./breadcrumb";
 import { ColorPicker } from "./color-picker";
 import { ImageSrcControl } from "./image-src-control";
-import { NodeTypePills } from "./node-type-pills";
-import { NumInput } from "./num-input";
 import { PropRow } from "./prop-row";
+import { ScrubRow } from "./scrub-field";
 import { SectionHeader } from "./section-header";
 import { SpacingControl } from "./spacing-control";
 import { TypographyControls } from "./typography/typography-controls";
@@ -275,12 +276,16 @@ function VariableInspectorCard({ name }: { name: string }) {
 
 				{/* ── Default Value ── */}
 				<div className="flex flex-col gap-1.5">
-					<label className="font-semibold text-text-sub-600 text-xs">
+					<label
+						htmlFor="variable-default-value"
+						className="font-semibold text-text-sub-600 text-xs"
+					>
 						Default Value
 					</label>
 					<Input.Root size="small" className="rounded-xl">
 						<Input.Wrapper>
 							<Input.Input
+								id="variable-default-value"
 								type="text"
 								value={localDefaultValue}
 								onChange={(e) => {
@@ -401,10 +406,6 @@ function TextSection({
 }: TextSectionProps) {
 	return (
 		<InspectorSection>
-			<div className="px-4 pt-3 pb-2">
-				<NodeTypePills />
-			</div>
-
 			<SectionHeader label="Text" />
 
 			<ColorRow
@@ -412,27 +413,30 @@ function TextSection({
 				value={String(getStyle("color") ?? "")}
 				onChange={(v) => setStyle("color", v)}
 			/>
-			<PropRow label="Font size">
-				<NumInput
-					value={getStyle("fontSize")}
-					onChange={(v) => setStyle("fontSize", v as number)}
-					unit="px"
-				/>
-			</PropRow>
-			<PropRow label="Line height">
-				<NumInput
-					value={getStyle("lineHeight")}
-					onChange={(v) => setStyle("lineHeight", v as number)}
-					unit="%"
-				/>
-			</PropRow>
-			<PropRow label="Tracking">
-				<NumInput
-					value={getStyle("letterSpacing")}
-					onChange={(v) => setStyle("letterSpacing", v as number)}
-					unit="px"
-				/>
-			</PropRow>
+			<ScrubRow
+				label="Font size"
+				value={getStyle("fontSize")}
+				onChange={(v) => setStyle("fontSize", v as number)}
+				min={8}
+				max={96}
+				suffix="px"
+			/>
+			<ScrubRow
+				label="Line height"
+				value={getStyle("lineHeight")}
+				onChange={(v) => setStyle("lineHeight", v as number)}
+				min={80}
+				max={300}
+				suffix="%"
+			/>
+			<ScrubRow
+				label="Tracking"
+				value={getStyle("letterSpacing")}
+				onChange={(v) => setStyle("letterSpacing", v as number)}
+				min={-20}
+				max={40}
+				suffix="px"
+			/>
 
 			<TypographyControls
 				marks={marks}
@@ -460,7 +464,7 @@ export const EmailInspector = () => {
 	if (!editor) return null;
 
 	return (
-		<Inspector.Root className="bg-bg-weak-50">
+		<Inspector.Root className="min-w-0 bg-transparent">
 			{/* ── Breadcrumb ── */}
 			<Breadcrumb />
 
@@ -689,42 +693,29 @@ export const EmailInspector = () => {
 					{({ findStyleValue, setGlobalStyle }) => (
 						<InspectorSection>
 							<SectionHeader label="Body" />
-							<ColorRow
-								label="Background"
-								value={String(findStyleValue("body", "backgroundColor") ?? "")}
-								onChange={(v) => setGlobalStyle("body", "backgroundColor", v)}
+							<ScrubRow
+								label="Container width"
+								value={findStyleValue("container", "width")}
+								onChange={(v) => setGlobalStyle("container", "width", v)}
+								min={200}
+								max={800}
+								suffix="px"
 							/>
-							<PropRow label="Container width">
-								<NumInput
-									value={findStyleValue("container", "width")}
-									onChange={(v) => setGlobalStyle("container", "width", v)}
-									unit="px"
-								/>
-							</PropRow>
-							<PropRow label="Border radius">
-								<NumInput
-									value={findStyleValue("container", "borderRadius")}
-									onChange={(v) =>
-										setGlobalStyle("container", "borderRadius", v)
-									}
-									unit="px"
-								/>
-							</PropRow>
-							<ColorRow
-								label="Container bg"
-								value={String(
-									findStyleValue("container", "backgroundColor") ?? "",
-								)}
-								onChange={(v) =>
-									setGlobalStyle("container", "backgroundColor", v)
-								}
+							<ScrubRow
+								label="Border radius"
+								value={findStyleValue("container", "borderRadius")}
+								onChange={(v) => setGlobalStyle("container", "borderRadius", v)}
+								min={0}
+								max={64}
+								suffix="px"
 							/>
-							<PropRow label="Line height">
-								<NumInput
-									value={findStyleValue("body", "lineHeight")}
-									onChange={(v) => setGlobalStyle("body", "lineHeight", v)}
-								/>
-							</PropRow>
+							<ScrubRow
+								label="Line height"
+								value={findStyleValue("body", "lineHeight")}
+								onChange={(v) => setGlobalStyle("body", "lineHeight", v)}
+								min={80}
+								max={300}
+							/>
 							<ColorRow
 								label="Text color"
 								value={String(findStyleValue("body", "color") ?? "")}

@@ -25,15 +25,11 @@ describe("App Router provider lifetimes", () => {
 		expect(dashboardLayout).not.toContain("ActiveOrganizationProvider");
 	});
 
-	it("keeps special full-screen command-menu ownership separate", () => {
-		const templateLayout = read(
-			"./(protected)/(fullscreen)/templates/[templateId]/layout-client.tsx",
-		);
+	it("keeps special full-screen command-menu ownership separate for agent mailbox", () => {
 		const inboxLayout = read(
 			"./(protected)/(fullscreen)/inbox/layout-client.tsx",
 		);
 
-		expect(templateLayout).toContain("<CommandMenuGlobal />");
 		expect(inboxLayout).not.toContain("CommandMenuGlobal");
 		expect(inboxLayout).toContain("<AgentInboxSectionLayout>");
 	});
@@ -59,15 +55,10 @@ describe("App Router provider lifetimes", () => {
 		expect(suspenseFallback).toContain("AuthSessionLoader");
 	});
 
-	it("mounts analytics through the base-path rewrite", () => {
+	it("mounts PostHog analytics provider", () => {
 		const providers = read("./providers.tsx");
-		const config = read("../../next.config.ts");
 
-		expect(providers).toContain("<RybbitLoader");
-		expect(providers).toContain(
-			'scriptSrc="/dashboard/api/analytics/script.js"',
-		);
-		expect(config).toContain('source: "/api/analytics/script.js"');
+		expect(providers).toContain("<PostHogProvider>");
 	});
 
 	it("publishes branded metadata and no-indexes the not-found route", () => {

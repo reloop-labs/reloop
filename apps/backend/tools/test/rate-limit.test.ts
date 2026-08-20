@@ -1,0 +1,199 @@
+import { beforeEach, describe, expect, mock, test } from "bun:test";
+
+class MemoryRedis {
+	private counters = new Map<string, number>();
+	private expiries = new Map<string, number>();
+	private now = 0;
+
+	private sweep(key: string): void {
+		const expiresAt = this.expiries.get(key);
+		if (expiresAt !== undefined && this.now >= expiresAt) {
+			this.counters.delete(key);
+			this.expiries.delete(key);
+		}
+	}
+
+	async increment(key: string): Promise<number> {
+		this.sweep(key);
+		const next = (this.counters.get(key) ?? 0) + 1;
+		this.counters.set(key, next);
+		return next;
+	}
+
+	async expire(key: string, seconds: number): Promise<void> {
+		this.expiries.set(key, this.now + seconds);
+	}
+
+	// Redis reports -1 for a key with no expiry and -2 for one that is gone.
+	async ttl(key: string): Promise<number> {
+		this.sweep(key);
+		if (!this.counters.has(key)) return -2;
+		const expiresAt = this.expiries.get(key);
+		return expiresAt === undefined ? -1 : expiresAt - this.now;
+	}
+
+	async healthCheck(): Promise<boolean> {
+		return true;
+	}
+
+	advance(seconds: number): void {
+		this.now += seconds;
+	}
+
+	dropExpiry(key: string): void {
+		this.expiries.delete(key);
+	}
+
+	reset(): void {
+		this.counters.clear();
+		this.expiries.clear();
+		this.now = 0;
+	}
+}
+
+class HangingRedis {
+	async increment(_key: string): Promise<number> {
+		return new Promise<never>(() => {});
+	}
+	async expire(_key: string, _seconds: number): Promise<void> {
+		return new Promise<never>(() => {});
+	}
+	async ttl(_key: string): Promise<number> {
+		return new Promise<never>(() => {});
+	}
+	async healthCheck(): Promise<boolean> {
+		return new Promise<never>(() => {});
+	}
+}
+
+const memoryRedis = new MemoryRedis();
+let activeRedis: MemoryRedis | HangingRedis = memoryRedis;
+
+// The exported binding has to be one stable object that forwards on each call.
+// Swapping the export itself (or exposing it via a getter) does not work: the
+// importing module resolves the binding once, so a later reassignment would be
+// invisible and the "unreachable Redis" tests would quietly exercise the
+// working fake instead.
+const redisDelegate = {
+	increment: (key: string) => activeRedis.increment(key),
+	expire: (key: string, seconds: number) => activeRedis.expire(key, seconds),
+	ttl: (key: string) => activeRedis.ttl(key),
+	healthCheck: () => activeRedis.healthCheck(),
+};
+
+mock.module("@be/tools/utils/loader", () => ({
+	redis: redisDelegate,
+	loader: async () => {},
+}));
+
+const { Elysia } = await import("elysia");
+const { rateLimitPlugin } = await import("../src/middleware/rate-limit");
+const { toolsConfig } = await import("../src/tools.config");
+
+const { rateLimitMax, rateLimitWindowSeconds } = toolsConfig.constants;
+
+const app = new Elysia()
+	.use(rateLimitPlugin)
+	.get("/probe", () => ({ ok: true }), { rateLimit: true });
+
+function probe(ip: string): Promise<Response> {
+	return app.handle(
+		new Request("http://localhost/probe", {
+			headers: { "x-forwarded-for": ip },
+		}),
+	);
+}
+
+beforeEach(() => {
+	memoryRedis.reset();
+	activeRedis = memoryRedis;
+});
+
+describe("per-IP rate limiting", () => {
+	test("allows requests up to the limit", async () => {
+		for (let i = 0; i < rateLimitMax; i++) {
+			const response = await probe("203.0.113.1");
+			expect(response.status).toBe(200);
+		}
+	});
+
+	test("rejects the request past the limit with 429", async () => {
+		for (let i = 0; i < rateLimitMax; i++) await probe("203.0.113.2");
+
+		const response = await probe("203.0.113.2");
+		expect(response.status).toBe(429);
+
+		const body = (await response.json()) as { message: string; fix?: string };
+		expect(body.message).toBe("Too many requests");
+		expect(body.fix).toContain("Wait");
+	});
+
+	test("counts each IP separately", async () => {
+		for (let i = 0; i < rateLimitMax; i++) await probe("203.0.113.3");
+		expect((await probe("203.0.113.3")).status).toBe(429);
+		expect((await probe("203.0.113.4")).status).toBe(200);
+	});
+
+	test("takes the left-most X-Forwarded-For entry", async () => {
+		const forwarded = "203.0.113.5, 10.0.0.1";
+		for (let i = 0; i < rateLimitMax; i++) await probe(forwarded);
+		expect((await probe("203.0.113.5")).status).toBe(429);
+	});
+
+	test("advertises limit and remaining on a successful response", async () => {
+		const response = await probe("203.0.113.6");
+		expect(response.headers.get("ratelimit-limit")).toBe(String(rateLimitMax));
+		expect(response.headers.get("ratelimit-remaining")).toBe(
+			String(rateLimitMax - 1),
+		);
+	});
+
+	test("sets retry-after when limited", async () => {
+		for (let i = 0; i < rateLimitMax; i++) await probe("203.0.113.7");
+		const response = await probe("203.0.113.7");
+		expect(response.headers.get("retry-after")).toBeTruthy();
+	});
+
+	test("hands the budget back once the window ends", async () => {
+		for (let i = 0; i < rateLimitMax; i++) await probe("203.0.113.10");
+		expect((await probe("203.0.113.10")).status).toBe(429);
+
+		memoryRedis.advance(rateLimitWindowSeconds);
+
+		expect((await probe("203.0.113.10")).status).toBe(200);
+	});
+
+	test("re-arms the window when the key lost its expiry", async () => {
+		const key = "rate-limit:check:203.0.113.11";
+		await probe("203.0.113.11");
+		memoryRedis.dropExpiry(key);
+
+		await probe("203.0.113.11");
+		expect(await memoryRedis.ttl(key)).toBe(rateLimitWindowSeconds);
+
+		memoryRedis.advance(rateLimitWindowSeconds);
+		for (let i = 0; i < rateLimitMax; i++) {
+			expect((await probe("203.0.113.11")).status).toBe(200);
+		}
+	});
+});
+
+describe("when Redis is unreachable", () => {
+	test("serves the request instead of hanging on it", async () => {
+		activeRedis = new HangingRedis();
+
+		const started = Date.now();
+		const response = await probe("203.0.113.8");
+
+		expect(response.status).toBe(200);
+		expect(Date.now() - started).toBeLessThan(2_000);
+	});
+
+	test("reports a full budget while failing open", async () => {
+		activeRedis = new HangingRedis();
+		const response = await probe("203.0.113.9");
+		expect(response.headers.get("ratelimit-remaining")).toBe(
+			String(rateLimitMax),
+		);
+	});
+});

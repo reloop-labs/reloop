@@ -117,16 +117,14 @@ export const InboxNavUser = ({
 				className={cn(
 					"flex items-center justify-center rounded-full transition-colors",
 					compact
-						? "size-9 hover:bg-[var(--inbox-row-hover)]"
+						? "size-7 hover:bg-[var(--inbox-row-hover)]"
 						: "w-full gap-2.5 rounded-lg px-2 py-1.5 hover:bg-[var(--inbox-row-hover)]",
 				)}
 			>
 				<span
 					className={cn(
 						"grid shrink-0 place-items-center rounded-full font-medium text-white",
-						compact
-							? "size-8 text-[12px] ring-1 ring-mail-border ring-offset-2 ring-offset-sidebar"
-							: "size-5 text-[11px]",
+						compact ? "size-5 text-[10px]" : "size-5 text-[11px]",
 						getAvatarGradient(mailbox.email || displayName),
 						compact && switcherOpen && "ring-zero-blue/40",
 					)}

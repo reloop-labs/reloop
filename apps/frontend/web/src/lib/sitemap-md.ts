@@ -1,5 +1,6 @@
 import { changelogReleases } from "@reloop/web/app/changelog/changelog-utils";
-import { languages } from "@reloop/web/app/languages/languages";
+import { frameworks } from "@reloop/web/app/sdk/frameworks";
+import { languages } from "@reloop/web/app/sdk/languages";
 import {
 	getCategories,
 	getPublishedPosts,
@@ -25,10 +26,11 @@ const STATIC_TITLES: Record<string, string> = {
 	"/compare": "Compare",
 	"/contact": "Contact",
 	"/developers": "Developers",
-	"/docs/resources/sdks": "SDKs",
+	"/docs/resources/sdks": "SDKs Docs",
 	"/features": "Features",
+	"/frameworks": "Frameworks",
 	"/glossary": "Glossary",
-	"/languages": "Languages",
+	"/sdk": "SDK",
 	"/license": "License",
 	"/pricing": "Pricing",
 	"/privacy": "Privacy Policy",
@@ -69,11 +71,14 @@ function buildLookups() {
 	const langs = new Map<string, string>(
 		languages.map((lang) => [lang.slug, lang.name]),
 	);
+	const fws = new Map<string, string>(
+		frameworks.map((fw) => [fw.slug, fw.name]),
+	);
 	const glossary = new Map(
 		glossaryTerms.map((term) => [term.slug, term.title]),
 	);
 
-	return { posts, categories, releases, langs, glossary };
+	return { posts, categories, releases, langs, fws, glossary };
 }
 
 function classifyRoute(
@@ -114,13 +119,23 @@ function classifyRoute(
 		};
 	}
 
-	const languageMatch = path.match(/^\/languages\/([^/]+)$/);
+	const languageMatch = path.match(/^\/sdk\/([^/]+)$/);
 	if (languageMatch?.[1]) {
 		const slug = languageMatch[1];
 		return {
 			path,
 			title: lookups.langs.get(slug) ?? humanizeSlug(slug),
-			type: "language",
+			type: "sdk",
+		};
+	}
+
+	const frameworkMatch = path.match(/^\/frameworks\/([^/]+)$/);
+	if (frameworkMatch?.[1]) {
+		const slug = frameworkMatch[1];
+		return {
+			path,
+			title: lookups.fws.get(slug) ?? humanizeSlug(slug),
+			type: "framework",
 		};
 	}
 
@@ -171,14 +186,6 @@ function classifyRoute(
 			path,
 			title: humanizeSlug(path.slice("/use-cases/".length)),
 			type: "use-case",
-		};
-	}
-
-	if (path.startsWith("/philosophy/")) {
-		return {
-			path,
-			title: humanizeSlug(path.slice("/philosophy/".length)),
-			type: "philosophy",
 		};
 	}
 
@@ -237,14 +244,14 @@ export function buildPublicDiscoveryMarkdown(
 		`- Blog posts: \`${origin}/blog/<slug>\``,
 		`- Blog categories: \`${origin}/blog/category/<slug>\``,
 		`- Changelog: \`${origin}/changelog/<version>\``,
-		`- Languages / SDKs: \`${origin}/languages/<slug>\``,
+		`- SDKs: \`${origin}/sdk/<slug>\``,
+		`- Frameworks: \`${origin}/frameworks/<slug>\``,
 		`- Comparisons: \`${origin}/compare/<vendor>\``,
 		`- Alternatives: \`${origin}/alternatives/<vendor>\``,
 		`- Glossary index: \`${origin}/glossary\``,
 		`- Glossary terms: \`${origin}/glossary/<term>\``,
 		`- Tools: \`${origin}/tools/<slug>\``,
 		`- Use cases: \`${origin}/use-cases/<slug>\``,
-		`- Philosophy: \`${origin}/philosophy/<slug>\``,
 		`- Docs: \`${origin}/docs/<path>\``,
 		"",
 		"### Indexed public examples",

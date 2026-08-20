@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useHotkeys } from "react-hotkeys-hook";
 import { ShortcutHint } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { isForwardRecordsSequence } from "#/features/domain/add/setup/components/forward-records-shortcut";
+import { DNS_RECORD_DOCS } from "#/features/domain/dns-provider";
 import type { DNSRecord, DomainResponse } from "#/features/domain/types";
 import { useDomainActions } from "../hooks/use-domain-actions";
 import { DNSAutoConnectBanner } from "./dns-auto-connect-banner";
@@ -121,7 +122,7 @@ export const DNSRecordsSection = ({
 				</div>
 				<DNSRecordSectionGroup
 					title="DKIM"
-					docsUrl="https://reloop.sh/docs/dns/dkim"
+					docsUrl={DNS_RECORD_DOCS.dkim}
 					records={dkimRecords}
 					isLoading={!!isLoading}
 					tableId="dkim-"
@@ -166,7 +167,7 @@ export const DNSRecordsSection = ({
 							<div>
 								<DNSRecordSectionGroup
 									title="SPF"
-									docsUrl="https://reloop.sh/docs/dns/spf"
+									docsUrl={DNS_RECORD_DOCS.spf}
 									records={sendingRecords}
 									isLoading={!!isLoading}
 									tableId="spf-"
@@ -174,7 +175,7 @@ export const DNSRecordsSection = ({
 
 								<DNSRecordSectionGroup
 									title="DMARC (Optional)"
-									docsUrl="https://reloop.sh/docs/dns/dmarc"
+									docsUrl={DNS_RECORD_DOCS.dmarc}
 									records={dmarcRecords}
 									isLoading={!!isLoading}
 									tableId="dmarc-"
@@ -225,7 +226,7 @@ export const DNSRecordsSection = ({
 								<div>
 									<DNSRecordSectionGroup
 										title="MX"
-										docsUrl="https://reloop.sh/docs/dns/mx"
+										docsUrl={DNS_RECORD_DOCS.mx}
 										records={receivingRecords}
 										isLoading={!!isLoading}
 										tableId="mx-"
@@ -279,7 +280,7 @@ export const DNSRecordsSection = ({
 							<div>
 								<DNSRecordSectionGroup
 									title="CNAME"
-									docsUrl="https://reloop.sh/docs/dns/cname"
+									docsUrl={DNS_RECORD_DOCS.cname}
 									records={trackingRecords}
 									isLoading={!!isLoading}
 									tableId="cname-"

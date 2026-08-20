@@ -1,0 +1,514 @@
+"use client";
+
+import { cn } from "@reloop/ui/cn";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import {
+	useCallback,
+	useEffect,
+	useLayoutEffect,
+	useRef,
+	useState,
+} from "react";
+import { Icon, type IconName } from "@reloop/ui/icon";
+import { EmailAnalyticsSection } from "./email-analytics";
+import type { AnalyticsTabId } from "./email-analytics/preview-scenes";
+import { SceneGlyph } from "./_shared/scene-header";
+import { TemplatesSection } from "./templates";
+import type { TemplateTabId } from "./templates/preview-scenes";
+import { TransactionalEmailSection } from "./transactional-email";
+import type { PreviewTabId } from "./transactional-email/preview-scenes";
+import { WorkflowsSection } from "./workflows";
+
+function ReactEmailIcon({ className }: { className?: string }) {
+	return (
+		<svg
+			viewBox="0 0 24 24"
+			fill="none"
+			stroke="currentColor"
+			strokeWidth="1.5"
+			className={className}
+			aria-hidden="true"
+		>
+			<ellipse cx="12" cy="12" rx="10" ry="4.5" />
+			<ellipse
+				cx="12"
+				cy="12"
+				rx="10"
+				ry="4.5"
+				transform="rotate(60 12 12)"
+			/>
+			<ellipse
+				cx="12"
+				cy="12"
+				rx="10"
+				ry="4.5"
+				transform="rotate(120 12 12)"
+			/>
+			<circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none" />
+		</svg>
+	);
+}
+
+function SubItemIcon({
+	icon,
+	className,
+}: {
+	icon: string;
+	className?: string;
+}) {
+	if (icon === "react") {
+		return <ReactEmailIcon className={className} />;
+	}
+	return <Icon name={icon as IconName} className={className} />;
+}
+
+const SECTION_THEMES: Record<
+	string,
+	{
+		indicator: string;
+		activeStroke: string;
+		iconActive: string;
+		iconInactive: string;
+	}
+> = {
+	transactional: {
+		indicator: "bg-[#f97316] dark:bg-[#ea580c]",
+		activeStroke: "stroke-[#f97316] dark:stroke-[#ea580c]",
+		iconActive: "text-[#f97316] dark:text-[#fb923c]",
+		iconInactive:
+			"text-text-soft-400 group-hover:text-text-strong-950 dark:text-white/40 dark:group-hover:text-white",
+	},
+	analytics: {
+		indicator: "bg-[#2563eb] dark:bg-[#3b82f6]",
+		activeStroke: "stroke-[#2563eb] dark:stroke-[#3b82f6]",
+		iconActive: "text-[#2563eb] dark:text-[#60a5fa]",
+		iconInactive:
+			"text-text-soft-400 group-hover:text-text-strong-950 dark:text-white/40 dark:group-hover:text-white",
+	},
+	templates: {
+		indicator: "bg-[#7c3aed] dark:bg-[#8b5cf6]",
+		activeStroke: "stroke-[#7c3aed] dark:stroke-[#8b5cf6]",
+		iconActive: "text-[#7c3aed] dark:text-[#a78bfa]",
+		iconInactive:
+			"text-text-soft-400 group-hover:text-text-strong-950 dark:text-white/40 dark:group-hover:text-white",
+	},
+	workflows: {
+		indicator: "bg-[#059669] dark:bg-[#10b981]",
+		activeStroke: "stroke-[#059669] dark:stroke-[#10b981]",
+		iconActive: "text-[#059669] dark:text-[#34d399]",
+		iconInactive:
+			"text-text-soft-400 group-hover:text-text-strong-950 dark:text-white/40 dark:group-hover:text-white",
+	},
+};
+
+const SECTIONS = [
+	{
+		id: "transactional",
+		nav: "Transactional Email",
+		Component: TransactionalEmailSection,
+		subItems: [
+			{ id: "send", label: "Send API", icon: "send-2" },
+			{ id: "templates", label: "React Email supported", icon: "react" },
+			{ id: "events", label: "Webhooks", icon: "webhook" },
+		],
+	},
+	{
+		id: "analytics",
+		nav: "Email Analytics",
+		Component: EmailAnalyticsSection,
+		subItems: [
+			{ id: "metrics", label: "Metrics", icon: "graph-up" },
+			{ id: "engagement", label: "Engagement & clicks", icon: "cursor-click" },
+			{ id: "bounces", label: "Bounces & Diagnostics", icon: "alert-triangle" },
+		],
+	},
+	{
+		id: "templates",
+		nav: "AI Email Templates",
+		Component: TemplatesSection,
+		subItems: [
+			{ id: "ai-templates", label: "AI-powered templates", icon: "magic-wand" },
+			{ id: "realtime-editor", label: "Real-time editor", icon: "cursor" },
+			{ id: "version-history", label: "Version history", icon: "history" },
+		],
+	},
+	{
+		id: "workflows",
+		nav: "AI Workflow",
+		Component: WorkflowsSection,
+	},
+] as const;
+
+type SectionId = (typeof SECTIONS)[number]["id"];
+
+/** Matches `scroll-mt-24` so spy and click land on the same item. */
+const SCROLL_MARKER = 96;
+const INDICATOR_INSET = 4;
+const EASE_OUT = "cubic-bezier(0.23, 1, 0.32, 1)";
+
+export default function EmailSystem() {
+	const [active, setActive] = useState<SectionId>(SECTIONS[0].id);
+	const [transactionalTab, setTransactionalTab] =
+		useState<PreviewTabId>("send");
+	const [analyticsTab, setAnalyticsTab] = useState<AnalyticsTabId>("metrics");
+	const [templateTab, setTemplateTab] =
+		useState<TemplateTabId>("ai-templates");
+
+	const reduceMotion = useReducedMotion();
+	const panelRefs = useRef<Record<string, HTMLElement | null>>({});
+	const navRef = useRef<HTMLElement>(null);
+	const scrollingTo = useRef<SectionId | null>(null);
+	const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+	const activeRef = useRef(active);
+	activeRef.current = active;
+
+	const pickActiveFromScroll = useCallback(() => {
+		if (scrollingTo.current) return;
+
+		// If user scrolled to near the bottom of the page, pick the last section
+		const lastSection = SECTIONS[SECTIONS.length - 1];
+		if (
+			typeof window !== "undefined" &&
+			lastSection &&
+			window.innerHeight + window.scrollY >=
+				document.documentElement.scrollHeight - 60
+		) {
+			if (lastSection.id !== activeRef.current) {
+				setActive(lastSection.id);
+			}
+			return;
+		}
+
+		const marker = 160;
+		let next: SectionId = SECTIONS[0].id;
+		for (const section of SECTIONS) {
+			const el = panelRefs.current[section.id];
+			if (!el) continue;
+			if (el.getBoundingClientRect().top <= marker) {
+				next = section.id;
+			}
+		}
+
+		if (next !== activeRef.current) {
+			setActive(next);
+		}
+	}, []);
+
+	useEffect(() => {
+		let ticking = false;
+		const onScroll = () => {
+			if (scrollingTo.current) return;
+			if (!ticking) {
+				window.requestAnimationFrame(() => {
+					pickActiveFromScroll();
+					ticking = false;
+				});
+				ticking = true;
+			}
+		};
+
+		window.addEventListener("scroll", onScroll, { passive: true });
+		window.addEventListener("resize", onScroll);
+		return () => {
+			window.removeEventListener("scroll", onScroll);
+			window.removeEventListener("resize", onScroll);
+			if (scrollTimeoutRef.current) {
+				clearTimeout(scrollTimeoutRef.current);
+			}
+		};
+	}, [pickActiveFromScroll]);
+
+	const goTo = useCallback(
+		(id: SectionId, _isSubItem = true) => {
+			setActive(id);
+			scrollingTo.current = id;
+
+			const doScroll = () => {
+				const targetEl =
+					document.getElementById(`email-stage-${id}`) ??
+					panelRefs.current[id] ??
+					document.getElementById(`email-system-${id}`);
+
+				if (targetEl) {
+					const headerOffset = 80;
+					const rect = targetEl.getBoundingClientRect();
+					const targetY =
+						rect.top +
+						(window.pageYOffset || document.documentElement.scrollTop) -
+						headerOffset;
+
+					window.scrollTo({
+						top: targetY,
+						behavior: reduceMotion ? "auto" : "smooth",
+					});
+				}
+			};
+
+			// Defer scroll by 30ms to prevent React re-render & Framer Motion accordion from cancelling the smooth scroll
+			setTimeout(doScroll, 30);
+
+			if (scrollTimeoutRef.current) {
+				clearTimeout(scrollTimeoutRef.current);
+			}
+			scrollTimeoutRef.current = setTimeout(() => {
+				scrollingTo.current = null;
+			}, 1200);
+		},
+		[reduceMotion],
+	);
+
+	return (
+		<section
+			id="product"
+			aria-labelledby="email-system-heading"
+			className="w-full"
+		>
+			<div className="px-4 py-16 sm:px-6 sm:py-20 lg:px-12 lg:py-24">
+				<div className="flex items-center gap-2">
+					<SceneGlyph icon="agent" color="violet" />
+					<span className="font-medium text-[13.5px] text-text-strong-950 tracking-tight dark:text-white">
+						Agentic AI
+					</span>
+				</div>
+				<h2
+					id="email-system-heading"
+					className="mt-3.5 max-w-3xl font-medium text-4xl text-text-strong-950 text-balance leading-[1.05] tracking-tighter sm:text-5xl dark:text-white"
+				>
+					Convert your email stream into revenue.
+				</h2>
+			</div>
+
+			<div className="border-stroke-soft-200 border-t lg:grid lg:grid-cols-[minmax(14rem,18.5rem)_minmax(0,1fr)] dark:border-white/10">
+				<div className="border-stroke-soft-200 border-b lg:overflow-visible lg:border-r lg:border-b-0 dark:border-white/10">
+					<aside className="top-16 z-10 overflow-visible bg-bg-white-0 lg:sticky dark:bg-black">
+						<nav
+							ref={navRef}
+							aria-label="Product scenes"
+							className="relative flex gap-1 overflow-x-auto px-4 py-3 [scrollbar-width:none] lg:flex-col lg:gap-0.5 lg:overflow-visible lg:p-0 lg:py-10 [&::-webkit-scrollbar]:hidden"
+						>
+							{SECTIONS.map((section) => {
+								const selected = section.id === active;
+								const hasSubItems =
+									"subItems" in section && section.subItems;
+								const theme = SECTION_THEMES[section.id] ?? {
+									indicator: "bg-primary-base",
+									activeStroke: "stroke-[#9ca3af] dark:stroke-[#66666e]",
+									iconActive: "text-text-strong-950 dark:text-white",
+									iconInactive:
+										"text-text-soft-400 group-hover:text-text-strong-950 dark:text-white/40 dark:group-hover:text-white",
+								};
+
+								const handleParentClick = () => {
+									if (section.id === "transactional") {
+										setTransactionalTab("send");
+									} else if (section.id === "analytics") {
+										setAnalyticsTab("metrics");
+									} else if (section.id === "templates") {
+										setTemplateTab("ai-templates");
+									}
+									goTo(section.id, true);
+								};
+
+								return (
+									<div key={section.id} className="relative w-full shrink-0">
+										<button
+											type="button"
+											onClick={handleParentClick}
+											className={cn(
+												"relative w-full shrink-0 px-3.5 py-2 text-left font-medium text-[15px] tracking-[-0.01em] transition-colors duration-150 focus:outline-hidden lg:py-2 lg:pr-6 lg:pl-8 lg:text-[17px]",
+												selected
+													? "text-text-strong-950 dark:text-white"
+													: "text-text-soft-400 hover:text-text-sub-600 dark:text-white/30 dark:hover:text-white/60",
+											)}
+											aria-current={selected ? "true" : undefined}
+										>
+											{selected && (
+												<motion.span
+													layoutId="email-system-active-indicator"
+													className={cn(
+														"pointer-events-none absolute -left-[1.5px] top-1.5 bottom-1.5 hidden w-0.5 lg:block transition-colors duration-150",
+														theme.indicator,
+													)}
+													transition={
+														reduceMotion
+															? { duration: 0 }
+															: {
+																	type: "spring",
+																	bounce: 0.15,
+																	duration: 0.28,
+																}
+													}
+												/>
+											)}
+											{section.nav}
+										</button>
+
+										<AnimatePresence initial={false}>
+											{selected && hasSubItems && (
+												<motion.div
+													key={`sub-${section.id}`}
+													initial={{ height: 0, opacity: 0 }}
+													animate={{ height: "auto", opacity: 1 }}
+													exit={{ height: 0, opacity: 0 }}
+													transition={{
+														height: { duration: 0.28, ease: [0.16, 1, 0.3, 1] },
+														opacity: { duration: 0.18, ease: "easeInOut" },
+													}}
+													className="relative ml-8 overflow-hidden hidden flex-col lg:flex"
+												>
+													<div className="relative py-1.5 flex flex-col">
+														{(() => {
+															const currentTabId =
+																section.id === "transactional"
+																	? transactionalTab
+																	: section.id === "analytics"
+																		? analyticsTab
+																		: templateTab;
+															const activeIndex = section.subItems.findIndex(
+																(sub) => sub.id === currentTabId,
+															);
+
+															const totalHeight = section.subItems.length * 34;
+															const theme = SECTION_THEMES[section.id] ?? {
+																activeStroke:
+																	"stroke-[#9ca3af] dark:stroke-[#66666e]",
+																iconActive: "text-text-strong-950 dark:text-white",
+																iconInactive:
+																	"text-text-soft-400 group-hover:text-text-sub-600 dark:text-white/40 dark:group-hover:text-white/70",
+															};
+
+															return (
+																<>
+																	{/* SVG Vector Tree Connector: Mathematically continuous, zero gaps, zero alpha-intersection dots */}
+																	<svg
+																		aria-hidden="true"
+																		className="pointer-events-none absolute left-0 top-1.5 h-full w-5 overflow-visible"
+																		width="20"
+																		height={totalHeight}
+																		viewBox={`0 0 20 ${totalHeight}`}
+																		fill="none"
+																	>
+																		{/* Unified inactive tree path: single path prevents self-intersection alpha blending */}
+																		<path
+																			d={[
+																				`M 0.5 0 L 0.5 ${(section.subItems.length - 1) * 34 + 9}`,
+																				...section.subItems.map(
+																					(_, i) =>
+																						`M 0.5 ${i * 34 + 9} Q 0.5 ${i * 34 + 17} 8.5 ${i * 34 + 17} L 14 ${i * 34 + 17}`,
+																				),
+																			].join(" ")}
+																			className="stroke-[#e5e5e7] dark:stroke-[#262628]"
+																			strokeWidth="1"
+																			strokeLinecap="round"
+																			strokeLinejoin="round"
+																		/>
+
+																		{/* Continuous active path colored to match section theme */}
+																		{activeIndex >= 0 && (
+																			<path
+																				d={`M 0.5 0 L 0.5 ${activeIndex * 34 + 9} Q 0.5 ${activeIndex * 34 + 17} 8.5 ${activeIndex * 34 + 17} L 14 ${activeIndex * 34 + 17}`}
+																				className={cn(
+																					theme.activeStroke,
+																					"transition-all duration-150",
+																				)}
+																				strokeWidth="1"
+																				strokeLinecap="round"
+																				strokeLinejoin="round"
+																			/>
+																		)}
+																	</svg>
+
+																	{section.subItems.map((sub, sIdx) => {
+																		const isSubActive = sIdx === activeIndex;
+
+																		const handleSubClick = () => {
+																			if (section.id === "transactional") {
+																				setTransactionalTab(sub.id as PreviewTabId);
+																			} else if (section.id === "analytics") {
+																				setAnalyticsTab(sub.id as AnalyticsTabId);
+																			} else if (section.id === "templates") {
+																				setTemplateTab(sub.id as TemplateTabId);
+																			}
+																			goTo(section.id, true);
+																		};
+
+																		return (
+																			<button
+																				key={sub.id}
+																				type="button"
+																				onClick={handleSubClick}
+																				className={cn(
+																					"group relative flex h-[34px] w-full items-center pl-6 pr-3 text-left text-[13.5px] transition-colors duration-150 focus:outline-hidden",
+																					isSubActive
+																						? "font-semibold text-text-strong-950 dark:text-white"
+																						: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/50 dark:hover:text-white",
+																				)}
+																			>
+																				{/* Icon matching the preview stage theme color */}
+																				<SubItemIcon
+																					icon={sub.icon}
+																					className={cn(
+																						"mr-2 size-3.5 shrink-0 transition-colors duration-150",
+																						isSubActive
+																							? theme.iconActive
+																							: theme.iconInactive,
+																					)}
+																				/>
+																				<span className="truncate">{sub.label}</span>
+																			</button>
+																		);
+																	})}
+																</>
+															);
+														})()}
+													</div>
+												</motion.div>
+											)}
+										</AnimatePresence>
+									</div>
+								);
+							})}
+						</nav>
+					</aside>
+				</div>
+
+				<div>
+					{SECTIONS.map(({ id, Component }, index) => (
+						<div
+							key={id}
+							id={`email-system-${id}`}
+							data-scene={id}
+							ref={(el) => {
+								panelRefs.current[id] = el;
+							}}
+							className={cn(
+								"scroll-mt-24",
+								index < SECTIONS.length - 1 &&
+									"border-stroke-soft-200 border-b dark:border-white/10",
+							)}
+						>
+							{id === "transactional" ? (
+								<TransactionalEmailSection
+									activeTab={transactionalTab}
+									onTabChange={setTransactionalTab}
+								/>
+							) : id === "analytics" ? (
+								<EmailAnalyticsSection
+									activeTab={analyticsTab}
+									onTabChange={setAnalyticsTab}
+								/>
+							) : id === "templates" ? (
+								<TemplatesSection
+									activeTab={templateTab}
+									onTabChange={setTemplateTab}
+								/>
+							) : (
+								<Component />
+							)}
+						</div>
+					))}
+				</div>
+			</div>
+		</section>
+	);
+}

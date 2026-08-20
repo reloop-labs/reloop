@@ -1,0 +1,26 @@
+---
+slug: minimal-shipping-log-ui
+version: 0.56.0
+date: August 2026
+launchDate: 19 August 2026
+title: 'Minimal Shipping Log UI & Homepage Refresh'
+description: >-
+  Streamlined the homepage changelog timeline into a clean, minimal row layout with direct release links.
+tags:
+  - Design
+  - Frontend
+---
+### DESIGN
+
+- **Minimal timeline layout.** Redesigned the homepage changelog section into a minimal, fast-loading row list with lowercase monospace dates.
+- **Calendar-to-arrow hover transitions.** Added circular badge interactions with seamless icon scale transitions on hover.
+- **Visual hierarchy.** Standardized typographic scale and theme-aware contrast across dark and light modes.
+
+### FRONTEND
+
+- **Dynamic shipping feed.** Connected the ship-fast component to dynamically render the 5 most recent releases with direct links to release notes.
+- **Responsive stacking.** Built mobile-optimized row stacking that preserves tap target dimensions and spacing.
+
+### DEVOPS
+
+- **Fast refresh validation.** Optimized MDX loading pipeline to eliminate unnecessary bundle bloat during development.

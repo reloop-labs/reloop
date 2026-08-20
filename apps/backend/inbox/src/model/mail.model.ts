@@ -506,6 +506,7 @@ export namespace MailModel {
 		fromName: t.Union([t.String(), t.Null()]),
 		toEmails: t.Array(t.String()),
 		ccEmails: t.Union([t.Array(t.String()), t.Null(), t.Undefined()]),
+		bccEmails: t.Union([t.Array(t.String()), t.Null(), t.Undefined()]),
 		subject: t.Union([t.String(), t.Null()]),
 		textBody: t.Union([t.String(), t.Null()]),
 		htmlBody: t.Union([t.String(), t.Null()]),

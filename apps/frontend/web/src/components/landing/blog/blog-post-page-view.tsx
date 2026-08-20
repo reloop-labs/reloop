@@ -145,7 +145,7 @@ export function BlogPostPageView({
 									{formatBlogDateUpper(post.publishedAt)}
 								</time>
 							</div>
-							<h1 className="font-semibold text-3xl text-text-strong-950 leading-[110%] tracking-[-0.8px] sm:text-[40px] dark:text-white">
+							<h1 className="font-semibold text-text-strong-950 text-xl leading-snug tracking-tight sm:text-2xl lg:text-[1.65rem] dark:text-white">
 								{post.title}
 							</h1>
 							<p className="font-medium font-mono text-text-sub-600 text-xs/[150%] uppercase tracking-[0.6px] dark:text-white/60">
@@ -159,9 +159,9 @@ export function BlogPostPageView({
 			{/* Main Article Container */}
 			<div className="mx-auto w-full max-w-5xl border-stroke-soft-200 border-x px-4 sm:px-6 md:max-w-7xl lg:px-8 dark:border-white/10">
 				{/* 3-Column Content Grid */}
-				<div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-0">
+				<div className="grid grid-cols-1 gap-8 lg:grid-cols-[240px_1fr_240px] lg:gap-0">
 					{/* Left Column: Table of Contents */}
-					<aside className="lg:col-span-3 lg:border-stroke-soft-200 lg:border-r lg:pt-10 lg:pr-8 lg:pb-16 dark:lg:border-white/10">
+					<aside className="lg:border-stroke-soft-200 lg:border-r lg:pt-10 lg:pr-6 lg:pb-16 dark:lg:border-white/10">
 						<div className="space-y-5 lg:sticky lg:top-28">
 							<Link
 								href="/blog"
@@ -175,10 +175,10 @@ export function BlogPostPageView({
 					</aside>
 
 					{/* Center Column: Main Content */}
-					<main className="space-y-8 lg:col-span-6 lg:p-10 lg:pb-16">
+					<main className="min-w-0 space-y-8 lg:px-8 lg:pt-10 lg:pb-16 xl:px-10">
 						{/* Cover / Benchmark Image */}
 						{post.image ? (
-							<div className="overflow-hidden rounded-2xl border border-stroke-soft-200 dark:border-white/10">
+							<div className="overflow-hidden rounded-2xl">
 								<BlogPostCoverImage
 									slug={post.slug}
 									image={post.image}
@@ -196,7 +196,7 @@ export function BlogPostPageView({
 									<SparklesIcon className="size-3" />
 									<span>Summary</span>
 								</div>
-								<p className="text-[14px] text-text-sub-600 leading-relaxed sm:text-[15px] dark:text-white/70">
+								<p className="text-[14px] text-text-sub-600 leading-relaxed sm:text-[14.5px] dark:text-white/60">
 									{post.description}
 								</p>
 							</div>
@@ -207,7 +207,7 @@ export function BlogPostPageView({
 
 						{/* Read More Section */}
 						{relatedPosts.length > 0 ? (
-							<div className="-mx-4 sm:-mx-6 lg:-mx-10 border-stroke-soft-200 border-t px-4 pt-5 sm:px-6 lg:px-10 dark:border-white/10">
+							<div className="-mx-4 sm:-mx-6 lg:-mx-8 xl:-mx-10 border-stroke-soft-200 border-t px-4 pt-5 sm:px-6 lg:px-8 xl:px-10 dark:border-white/10">
 								<h2 className="mb-6 font-semibold text-text-strong-950 tracking-tight dark:text-white">
 									Read more
 								</h2>
@@ -218,7 +218,7 @@ export function BlogPostPageView({
 											href={`/blog/${relatedPost.slug}`}
 											className="group flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:gap-5"
 										>
-											<div className="relative aspect-[16/10] w-full shrink-0 overflow-hidden rounded-xl border border-stroke-soft-200/80 bg-bg-weak-50/50 sm:w-44 md:w-48 dark:border-white/10 dark:bg-white/[0.04]">
+											<div className="relative aspect-[16/10] w-full shrink-0 overflow-hidden rounded-xl bg-bg-weak-50/50 sm:w-44 md:w-48 dark:bg-white/[0.04]">
 												<BlogPostCoverImage
 													slug={relatedPost.slug}
 													image={relatedPost.image}
@@ -247,7 +247,7 @@ export function BlogPostPageView({
 					</main>
 
 					{/* Right Column: Author Info, Share & Conversion Card */}
-					<aside className="lg:col-span-3 lg:border-stroke-soft-200 lg:border-l lg:pt-10 lg:pb-16 lg:pl-8 dark:lg:border-white/10">
+					<aside className="lg:border-stroke-soft-200 lg:border-l lg:pt-10 lg:pb-16 lg:pl-6 dark:lg:border-white/10">
 						<div className="space-y-8 lg:sticky lg:top-28">
 							{/* Author Card */}
 							<div>
@@ -462,7 +462,11 @@ export function BlogPostPageView({
 			</div>
 
 			{/* CTA Section */}
-			<BlogCta category={post.category} />
+			<BlogCta
+				category={post.category}
+				headline="Ship your first email with Reloop in minutes"
+				sub="Open-source, deliverability-focused, and yours to self-host or run on Reloop Cloud. No lock-in, no rewrite later."
+			/>
 		</div>
 	);
 }

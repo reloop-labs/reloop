@@ -56,6 +56,8 @@ export function DeliverabilityChart({
 				delivered: number;
 				bounced: number;
 				complaint: number;
+				opened: number;
+				unsubscribed: number;
 				rate: number;
 			}
 		>();
@@ -70,6 +72,8 @@ export function DeliverabilityChart({
 					delivered: data.delivered[i] ?? 0,
 					bounced: data.bounced[i] ?? 0,
 					complaint: data.complaint[i] ?? 0,
+					opened: data.opened?.[i] ?? 0,
+					unsubscribed: data.unsubscribed?.[i] ?? 0,
 					rate: data.rate[i] ?? 0,
 				});
 			}
@@ -91,9 +95,9 @@ export function DeliverabilityChart({
 				complaint: existing?.complaint ?? 0,
 				rate: existing?.rate ?? 0,
 				received: 0,
-				opened: 0,
+				opened: existing?.opened ?? 0,
 				clicked: 0,
-				unsubscribed: 0,
+				unsubscribed: existing?.unsubscribed ?? 0,
 				delivery_delayed: 0,
 				failed: 0,
 				suppressed: 0,
