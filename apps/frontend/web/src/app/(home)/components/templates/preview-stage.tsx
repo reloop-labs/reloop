@@ -11,6 +11,7 @@ import {
 	type CSSProperties,
 	type RefObject,
 	useEffect,
+	useLayoutEffect,
 	useRef,
 	useState,
 } from "react";
@@ -45,7 +46,8 @@ const EASE_MOVE: [number, number, number, number] = [0.77, 0, 0.175, 1];
 const SLIDE_PX = 160;
 const SLIDE_MS = 0.28;
 
-const DEMO_PROMPT = "generate login code for Reloop";
+const DEMO_PROMPT =
+	"Generate a Reloop login OTP email with a 6-digit code that expires in 5 minutes.";
 const EMAIL_HEADING = "Your login code for Reloop.";
 const EMAIL_BODY =
 	"This link and code will only be valid for the next 5 minutes. If the link does not work, you can use the login verification code directly:";
@@ -129,7 +131,7 @@ function AiTemplatesView() {
 	const [prompt, setPrompt] = useState("");
 	const [reveal, setReveal] = useState<EmailReveal>(EMAIL_HIDDEN);
 	const userEdited = useRef(false);
-	const inputRef = useRef<HTMLInputElement>(null);
+	const inputRef = useRef<HTMLTextAreaElement>(null);
 	const phaseRef = useRef(phase);
 	phaseRef.current = phase;
 
@@ -472,19 +474,33 @@ function AiPromptBar({
 	value: string;
 	disabled: boolean;
 	loading: boolean;
-	inputRef: RefObject<HTMLInputElement | null>;
+	inputRef: RefObject<HTMLTextAreaElement | null>;
 	onChange: (value: string) => void;
 }) {
+	useLayoutEffect(() => {
+		const el = inputRef.current;
+		if (!el) return;
+		el.style.height = "auto";
+		el.style.height = `${Math.min(el.scrollHeight, 96)}px`;
+	}, [value, inputRef]);
+
 	return (
-		<div className="flex items-center gap-2 rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-1.5 pl-3 dark:border-white/10 dark:bg-[#0c0c0e]">
-			<input
+		<div className="flex items-end gap-2 rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-1.5 pl-3 dark:border-white/10 dark:bg-[#0c0c0e]">
+			<textarea
 				ref={inputRef}
 				value={value}
 				disabled={disabled}
+				rows={1}
 				onChange={(event) => onChange(event.target.value)}
-				placeholder="generate login code for Reloop"
+				onKeyDown={(event) => {
+					if (event.key === "Enter" && !event.shiftKey) {
+						event.preventDefault();
+						event.currentTarget.form?.requestSubmit();
+					}
+				}}
+				placeholder="Generate a Reloop login OTP email…"
 				aria-label="Generate an email template"
-				className="h-7 min-w-0 flex-1 bg-transparent text-[13px] text-text-strong-950 caret-[#FF5722] outline-none placeholder:text-text-soft-400 disabled:opacity-70 dark:text-white dark:caret-[#FF6E40] dark:placeholder:text-white/40"
+				className="min-h-7 max-h-24 min-w-0 flex-1 resize-none overflow-hidden bg-transparent py-1 text-[13px] text-text-strong-950 leading-5 caret-[#FF5722] outline-none placeholder:text-text-soft-400 disabled:opacity-70 dark:text-white dark:caret-[#FF6E40] dark:placeholder:text-white/40"
 			/>
 			<button
 				type="submit"
@@ -1096,7 +1112,7 @@ const HISTORY_ITEMS = [
 	{
 		id: "v6",
 		version: "v6",
-		title: "Opened investor Q3 note",
+		title: "Personalized intro with user name",
 		author: "Maya Chen",
 		initial: "M",
 		avatar: "bg-emerald-500 text-white",
@@ -1105,7 +1121,7 @@ const HISTORY_ITEMS = [
 	{
 		id: "v5",
 		version: "v5",
-		title: "Subject: the editor is live",
+		title: "Subject: Welcome to Reloop",
 		author: "Sarah Jenkins",
 		initial: "S",
 		avatar: "bg-amber-400 text-black",
@@ -1114,7 +1130,7 @@ const HISTORY_ITEMS = [
 	{
 		id: "v4",
 		version: "v4",
-		title: "From-line set to Maya Chen",
+		title: "From-line set to Reloop Team",
 		author: "Alex Rivera",
 		initial: "A",
 		avatar: "bg-sky-500 text-white",
@@ -1123,7 +1139,7 @@ const HISTORY_ITEMS = [
 	{
 		id: "v3",
 		version: "v3",
-		title: "Added this-quarter metrics",
+		title: "Added 3-step onboarding checklist",
 		author: "Maya Chen",
 		initial: "M",
 		avatar: "bg-emerald-500 text-white",
@@ -1132,7 +1148,7 @@ const HISTORY_ITEMS = [
 	{
 		id: "v2",
 		version: "v2",
-		title: "First draft of the investor note",
+		title: "First draft of the welcome email",
 		author: "Sarah Jenkins",
 		initial: "S",
 		avatar: "bg-amber-400 text-black",
@@ -1141,7 +1157,7 @@ const HISTORY_ITEMS = [
 	{
 		id: "v1",
 		version: "v1",
-		title: "Template scaffold for the Q3 note",
+		title: "Template scaffold with header logo",
 		author: "Alex Rivera",
 		initial: "A",
 		avatar: "bg-sky-500 text-white",
@@ -1150,7 +1166,7 @@ const HISTORY_ITEMS = [
 	{
 		id: "v0",
 		version: "v0",
-		title: "Outline: traction, focus, ask",
+		title: "Outline: greeting, features, next steps",
 		author: "Maya Chen",
 		initial: "M",
 		avatar: "bg-emerald-500 text-white",
