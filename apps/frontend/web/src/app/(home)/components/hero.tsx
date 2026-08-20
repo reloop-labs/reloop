@@ -67,14 +67,14 @@ const TABS: {
 		description: "SPF, DKIM, and DMARC authentication for your domain.",
 	},
 	{
-		id: "workflow",
-		title: "Workflow",
-		description: "Trigger automated sequences, webhooks, and logic.",
-	},
-	{
 		id: "templates",
 		title: "Templates",
 		description: "Visual editor with dynamic variables and components.",
+	},
+	{
+		id: "workflow",
+		title: "Workflow",
+		description: "Trigger automated sequences, webhooks, and logic.",
 	},
 ];
 
