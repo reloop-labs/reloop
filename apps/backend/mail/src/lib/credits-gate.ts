@@ -2,7 +2,7 @@ import { countEmailRecipients } from "@reloop/be-mail/lib/count-recipients";
 import { MailErrors } from "@reloop/be-mail/lib/errors";
 import { db } from "@reloop/db/client";
 import { creditLedger, organizationCredits } from "@reloop/db/schema";
-import { eq } from "drizzle-orm";
+import { and, eq, lte } from "drizzle-orm";
 import { log } from "evlog";
 
 const DEFAULT_MONTHLY_CREDITS = 3000;
@@ -10,6 +10,9 @@ const DEFAULT_MONTHLY_CREDITS = 3000;
 /**
  * Load active org credits, provisioning Free defaults or resetting an expired
  * period so the gate matches post-send metering in be-credits.
+ *
+ * Period resets use a conditional UPDATE on `current_period_end` so concurrent
+ * senders cannot each write a reset / ledger row for the same expiry.
  */
 async function ensureActiveCredits(organizationId: string) {
 	if (!organizationId) {
@@ -81,6 +84,7 @@ async function ensureActiveCredits(organizationId: string) {
 		const periodEnd = new Date(now);
 		periodEnd.setMonth(periodEnd.getMonth() + 1);
 
+		// Only the first concurrent sender wins the reset; losers re-read.
 		const [updatedCredits] = await db
 			.update(organizationCredits)
 			.set({
@@ -90,11 +94,26 @@ async function ensureActiveCredits(organizationId: string) {
 				currentPeriodEnd: periodEnd,
 				updatedAt: now,
 			})
-			.where(eq(organizationCredits.id, activeCredits.id))
+			.where(
+				and(
+					eq(organizationCredits.id, activeCredits.id),
+					lte(organizationCredits.currentPeriodEnd, now),
+				),
+			)
 			.returning();
 
 		if (!updatedCredits) {
-			throw new Error("Failed to reset credits for expired period");
+			const refreshed = await db.query.organizationCredits.findFirst({
+				where: (c, { and, eq: equals }) =>
+					and(
+						equals(c.organizationId, organizationId),
+						equals(c.status, "active"),
+					),
+			});
+			if (!refreshed) {
+				throw new Error("Failed to reset credits for expired period");
+			}
+			return refreshed;
 		}
 
 		await db.insert(creditLedger).values({
@@ -115,6 +134,10 @@ async function ensureActiveCredits(organizationId: string) {
 /**
  * Fail closed when the org cannot cover this send's recipient count.
  * Call before creating email logs or calling KumoMTA.
+ *
+ * This is a pre-send balance check (post-send metering still deducts via
+ * EMAIL_SENT). Concurrent sends that each fit the same remaining balance can
+ * still overshoot until metering lands; the gate stops the already-exhausted case.
  */
 export async function assertHasCredits({
 	organizationId,

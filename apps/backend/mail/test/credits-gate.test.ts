@@ -34,11 +34,23 @@ describe("MailErrors.quotaExceeded", () => {
 			remaining: 0,
 			required: 2,
 			monthlyCredits: 3000,
-		}) as Error & { status?: number; why?: string };
+		}) as Error & { status?: number; why?: string; fix?: string };
 
 		expect(err.status).toBe(402);
 		expect(err.message).toBe("Email quota exceeded");
 		expect(err.why).toContain("needs 2 credits");
 		expect(err.why).toContain("only 0 remain");
+		expect(err.fix).toContain("Upgrade your plan");
+	});
+
+	test("uses singular credit wording when required is 1", () => {
+		const err = MailErrors.quotaExceeded({
+			remaining: 0,
+			required: 1,
+			monthlyCredits: 3000,
+		}) as Error & { why?: string };
+
+		expect(err.why).toContain("needs 1 credit,");
+		expect(err.why).not.toContain("needs 1 credits");
 	});
 });
