@@ -194,32 +194,40 @@ export default function EmailSystem() {
 	}, [pickActiveFromScroll]);
 
 	const goTo = useCallback(
-		(id: SectionId, isSubItem = false) => {
+		(id: SectionId, _isSubItem = true) => {
 			setActive(id);
 			scrollingTo.current = id;
 
-			const stageEl = isSubItem
-				? document.getElementById(`email-stage-${id}`)
-				: null;
-			const targetEl = stageEl ?? panelRefs.current[id];
+			const doScroll = () => {
+				const targetEl =
+					document.getElementById(`email-stage-${id}`) ??
+					panelRefs.current[id] ??
+					document.getElementById(`email-system-${id}`);
 
-			if (targetEl) {
-				const headerOffset = 72;
-				const elementPosition = targetEl.getBoundingClientRect().top;
-				const offsetPosition =
-					elementPosition + window.scrollY - headerOffset;
-				window.scrollTo({
-					top: offsetPosition,
-					behavior: reduceMotion ? "auto" : "smooth",
-				});
-			}
+				if (targetEl) {
+					const headerOffset = 80;
+					const rect = targetEl.getBoundingClientRect();
+					const targetY =
+						rect.top +
+						(window.pageYOffset || document.documentElement.scrollTop) -
+						headerOffset;
+
+					window.scrollTo({
+						top: targetY,
+						behavior: reduceMotion ? "auto" : "smooth",
+					});
+				}
+			};
+
+			// Defer scroll by 30ms to prevent React re-render & Framer Motion accordion from cancelling the smooth scroll
+			setTimeout(doScroll, 30);
 
 			if (scrollTimeoutRef.current) {
 				clearTimeout(scrollTimeoutRef.current);
 			}
 			scrollTimeoutRef.current = setTimeout(() => {
 				scrollingTo.current = null;
-			}, 900);
+			}, 1200);
 		},
 		[reduceMotion],
 	);
@@ -258,11 +266,24 @@ export default function EmailSystem() {
 								const hasSubItems =
 									"subItems" in section && section.subItems;
 
+								const handleParentClick = () => {
+									if (section.id === "transactional") {
+										setTransactionalTab("send");
+									} else if (section.id === "analytics") {
+										setAnalyticsTab("metrics");
+									} else if (section.id === "templates") {
+										setTemplateTab("ai-templates");
+									} else if (section.id === "marketing") {
+										setMarketingTab("upload-data");
+									}
+									goTo(section.id, true);
+								};
+
 								return (
 									<div key={section.id} className="relative w-full shrink-0">
 										<button
 											type="button"
-											onClick={() => goTo(section.id, false)}
+											onClick={handleParentClick}
 											className={cn(
 												"relative w-full shrink-0 px-3.5 py-2 text-left font-medium text-[15px] tracking-[-0.01em] transition-colors duration-150 focus:outline-hidden lg:py-2 lg:pr-6 lg:pl-8 lg:text-[17px]",
 												selected
@@ -289,108 +310,122 @@ export default function EmailSystem() {
 											{section.nav}
 										</button>
 
-										{selected && hasSubItems && (
-											<div className="relative ml-8 my-1.5 hidden flex-col lg:flex animate-in fade-in duration-150">
-												{(() => {
-													const currentTabId =
-														section.id === "transactional"
-															? transactionalTab
-															: section.id === "analytics"
-																? analyticsTab
-																: section.id === "templates"
-																	? templateTab
-																	: marketingTab;
-													const activeIndex = section.subItems.findIndex(
-														(sub) => sub.id === currentTabId,
-													);
+										<AnimatePresence initial={false}>
+											{selected && hasSubItems && (
+												<motion.div
+													key={`sub-${section.id}`}
+													initial={{ height: 0, opacity: 0 }}
+													animate={{ height: "auto", opacity: 1 }}
+													exit={{ height: 0, opacity: 0 }}
+													transition={{
+														height: { duration: 0.28, ease: [0.16, 1, 0.3, 1] },
+														opacity: { duration: 0.18, ease: "easeInOut" },
+													}}
+													className="relative ml-8 overflow-hidden hidden flex-col lg:flex"
+												>
+													<div className="relative py-1.5 flex flex-col">
+														{(() => {
+															const currentTabId =
+																section.id === "transactional"
+																	? transactionalTab
+																	: section.id === "analytics"
+																		? analyticsTab
+																		: section.id === "templates"
+																			? templateTab
+																			: marketingTab;
+															const activeIndex = section.subItems.findIndex(
+																(sub) => sub.id === currentTabId,
+															);
 
-													const totalHeight = section.subItems.length * 34;
+															const totalHeight = section.subItems.length * 34;
 
-													return (
-														<>
-															{/* SVG Vector Tree Connector: Mathematically continuous, zero gaps, zero alpha-intersection dots */}
-															<svg
-																aria-hidden="true"
-																className="pointer-events-none absolute left-0 top-0 h-full w-5 overflow-visible"
-																width="20"
-																height={totalHeight}
-																viewBox={`0 0 20 ${totalHeight}`}
-																fill="none"
-															>
-																{/* Unified inactive tree path: single path prevents self-intersection alpha blending */}
-																<path
-																	d={[
-																		`M 0.5 0 L 0.5 ${(section.subItems.length - 1) * 34 + 9}`,
-																		...section.subItems.map(
-																			(_, i) =>
-																				`M 0.5 ${i * 34 + 9} Q 0.5 ${i * 34 + 17} 8.5 ${i * 34 + 17} L 14 ${i * 34 + 17}`,
-																		),
-																	].join(" ")}
-																	className="stroke-[#e5e5e7] dark:stroke-[#262628]"
-																	strokeWidth="1"
-																	strokeLinecap="round"
-																	strokeLinejoin="round"
-																/>
-
-																{/* Continuous active path from top down to the active sub-item (opaque stroke prevents white dots) */}
-																{activeIndex >= 0 && (
-																	<path
-																		d={`M 0.5 0 L 0.5 ${activeIndex * 34 + 9} Q 0.5 ${activeIndex * 34 + 17} 8.5 ${activeIndex * 34 + 17} L 14 ${activeIndex * 34 + 17}`}
-																		className="stroke-[#9ca3af] transition-all duration-150 dark:stroke-[#66666e]"
-																		strokeWidth="1"
-																		strokeLinecap="round"
-																		strokeLinejoin="round"
-																	/>
-																)}
-															</svg>
-
-															{section.subItems.map((sub, sIdx) => {
-																const isSubActive = sIdx === activeIndex;
-
-																const handleSubClick = () => {
-																	if (section.id === "transactional") {
-																		setTransactionalTab(sub.id as PreviewTabId);
-																	} else if (section.id === "analytics") {
-																		setAnalyticsTab(sub.id as AnalyticsTabId);
-																	} else if (section.id === "templates") {
-																		setTemplateTab(sub.id as TemplateTabId);
-																	} else if (section.id === "marketing") {
-																		setMarketingTab(sub.id as MarketingTabId);
-																	}
-																	goTo(section.id, true);
-																};
-
-																return (
-																	<button
-																		key={sub.id}
-																		type="button"
-																		onClick={handleSubClick}
-																		className={cn(
-																			"group relative flex h-[34px] w-full items-center pl-6 pr-3 text-left text-[13.5px] transition-colors duration-150 focus:outline-hidden",
-																			isSubActive
-																				? "font-semibold text-text-strong-950 dark:text-white"
-																				: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/50 dark:hover:text-white",
-																		)}
+															return (
+																<>
+																	{/* SVG Vector Tree Connector: Mathematically continuous, zero gaps, zero alpha-intersection dots */}
+																	<svg
+																		aria-hidden="true"
+																		className="pointer-events-none absolute left-0 top-1.5 h-full w-5 overflow-visible"
+																		width="20"
+																		height={totalHeight}
+																		viewBox={`0 0 20 ${totalHeight}`}
+																		fill="none"
 																	>
-																		{/* Icon matching the preview stage */}
-																		<SubItemIcon
-																			icon={sub.icon}
-																			className={cn(
-																				"mr-2 size-3.5 shrink-0 transition-colors duration-150",
-																				isSubActive
-																					? "text-text-strong-950 dark:text-white"
-																					: "text-text-soft-400 group-hover:text-text-sub-600 dark:text-white/40 dark:group-hover:text-white/70",
-																			)}
+																		{/* Unified inactive tree path: single path prevents self-intersection alpha blending */}
+																		<path
+																			d={[
+																				`M 0.5 0 L 0.5 ${(section.subItems.length - 1) * 34 + 9}`,
+																				...section.subItems.map(
+																					(_, i) =>
+																						`M 0.5 ${i * 34 + 9} Q 0.5 ${i * 34 + 17} 8.5 ${i * 34 + 17} L 14 ${i * 34 + 17}`,
+																				),
+																			].join(" ")}
+																			className="stroke-[#e5e5e7] dark:stroke-[#262628]"
+																			strokeWidth="1"
+																			strokeLinecap="round"
+																			strokeLinejoin="round"
 																		/>
-																		<span className="truncate">{sub.label}</span>
-																	</button>
-																);
-															})}
-														</>
-													);
-												})()}
-											</div>
-										)}
+
+																		{/* Continuous active path from top down to the active sub-item (opaque stroke prevents white dots) */}
+																		{activeIndex >= 0 && (
+																			<path
+																				d={`M 0.5 0 L 0.5 ${activeIndex * 34 + 9} Q 0.5 ${activeIndex * 34 + 17} 8.5 ${activeIndex * 34 + 17} L 14 ${activeIndex * 34 + 17}`}
+																				className="stroke-[#9ca3af] transition-all duration-150 dark:stroke-[#66666e]"
+																				strokeWidth="1"
+																				strokeLinecap="round"
+																				strokeLinejoin="round"
+																			/>
+																		)}
+																	</svg>
+
+																	{section.subItems.map((sub, sIdx) => {
+																		const isSubActive = sIdx === activeIndex;
+
+																		const handleSubClick = () => {
+																			if (section.id === "transactional") {
+																				setTransactionalTab(sub.id as PreviewTabId);
+																			} else if (section.id === "analytics") {
+																				setAnalyticsTab(sub.id as AnalyticsTabId);
+																			} else if (section.id === "templates") {
+																				setTemplateTab(sub.id as TemplateTabId);
+																			} else if (section.id === "marketing") {
+																				setMarketingTab(sub.id as MarketingTabId);
+																			}
+																			goTo(section.id, true);
+																		};
+
+																		return (
+																			<button
+																				key={sub.id}
+																				type="button"
+																				onClick={handleSubClick}
+																				className={cn(
+																					"group relative flex h-[34px] w-full items-center pl-6 pr-3 text-left text-[13.5px] transition-colors duration-150 focus:outline-hidden",
+																					isSubActive
+																						? "font-semibold text-text-strong-950 dark:text-white"
+																						: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/50 dark:hover:text-white",
+																				)}
+																			>
+																				{/* Icon matching the preview stage */}
+																				<SubItemIcon
+																					icon={sub.icon}
+																					className={cn(
+																						"mr-2 size-3.5 shrink-0 transition-colors duration-150",
+																						isSubActive
+																							? "text-text-strong-950 dark:text-white"
+																							: "text-text-soft-400 group-hover:text-text-sub-600 dark:text-white/40 dark:group-hover:text-white/70",
+																					)}
+																				/>
+																				<span className="truncate">{sub.label}</span>
+																			</button>
+																		);
+																	})}
+																</>
+															);
+														})()}
+													</div>
+												</motion.div>
+											)}
+										</AnimatePresence>
 									</div>
 								);
 							})}
