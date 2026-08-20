@@ -6,6 +6,8 @@ import { Icon } from "@reloop/ui/icon";
 import { Check, Copy } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
+import { Footer } from "../footer";
+import { SectionSeparator } from "./section-separator";
 
 /* ─── Design-system primitives (match docs + dashboard chrome) ─── */
 
@@ -218,38 +220,45 @@ function PromptCard() {
 
 export function DocsHome() {
 	return (
-		<div className="not-prose w-full space-y-12 px-6 py-8 md:px-10 md:py-10">
-			{/* ── Hero ── */}
-			<header className="max-w-2xl">
-				<p className="mb-3 font-semibold text-[12px] text-text-sub-600 uppercase tracking-wider">
-					Documentation
-				</p>
-				<h1 className="font-semibold text-[1.75rem] text-text-strong-950 leading-tight tracking-[-0.03em] sm:text-3xl dark:text-white">
-					Learn how to send with Reloop
-				</h1>
-				<p className="mt-3.5 text-[16px] text-text-sub-600 leading-relaxed tracking-[-0.01em]">
-					Guides, API reference, SDKs, and agent tooling — everything you need
-					to send, receive, and automate email.
-				</p>
-				<div className="mt-6 flex flex-wrap gap-2.5">
-					<Link
-						href="/api/mail/post-api-mail-v1send"
-						className="inline-flex h-9 items-center gap-2 rounded-xl bg-text-strong-950 px-4 font-medium text-[13.5px] text-white transition-opacity hover:opacity-90 dark:bg-white dark:text-black"
-					>
-						Send your first email
-						<Icon name="arrow-right" className="size-3.5" />
-					</Link>
-					<Link
-						href="/api"
-						className="inline-flex h-9 items-center gap-2 rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-4 font-medium text-[13.5px] text-text-strong-950 transition-colors hover:bg-bg-weak-50 dark:border-stroke-soft-100/40 dark:bg-zinc-950 dark:text-white dark:hover:bg-white/5"
-					>
-						API Reference
-					</Link>
-				</div>
-			</header>
+		<div className="not-prose w-full">
+			{/* ── Top Hero ── */}
+			<div className="px-6 py-8 md:px-10 md:py-10">
+				<header className="max-w-2xl">
+					<p className="mb-3 font-semibold text-[12px] text-text-sub-600 uppercase tracking-wider">
+						Documentation
+					</p>
+					<h1 className="font-semibold text-[1.75rem] text-text-strong-950 leading-tight tracking-[-0.03em] sm:text-3xl dark:text-white">
+						Learn how to send with Reloop
+					</h1>
+					<p className="mt-3.5 text-[16px] text-text-sub-600 leading-relaxed tracking-[-0.01em]">
+						Guides, API reference, SDKs, and agent tooling — everything you need
+						to send, receive, and automate email.
+					</p>
+					<div className="mt-6 flex flex-wrap gap-2.5">
+						<Link
+							href="/api/mail/post-api-mail-v1send"
+							className="inline-flex h-9 items-center gap-2 rounded-xl bg-text-strong-950 px-4 font-medium text-[13.5px] text-white transition-opacity hover:opacity-90 dark:bg-white dark:text-black"
+						>
+							Send your first email
+							<Icon name="arrow-right" className="size-3.5" />
+						</Link>
+						<Link
+							href="/api"
+							className="inline-flex h-9 items-center gap-2 rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-4 font-medium text-[13.5px] text-text-strong-950 transition-colors hover:bg-bg-weak-50 dark:border-stroke-soft-100/40 dark:bg-zinc-950 dark:text-white dark:hover:bg-white/5"
+						>
+							API Reference
+						</Link>
+					</div>
+				</header>
+			</div>
 
-			{/* ── AI agents ── */}
-			<section>
+			{/* Divider between top and center */}
+			<SectionSeparator />
+
+			{/* ── Center Content ── */}
+			<div className="space-y-12 px-6 py-8 md:px-10 md:py-10">
+				{/* ── AI agents ── */}
+				<section>
 				<SoftWell>
 					<div className="grid overflow-hidden rounded-[16px] md:grid-cols-2">
 						<div className="border-stroke-soft-100/70 border-b p-6 md:border-r md:border-b-0 md:p-8 dark:border-stroke-soft-100/15">
@@ -516,6 +525,10 @@ export function DocsHome() {
 					</SoftPanel>
 				</SoftWell>
 			</section>
+			</div>
+
+			{/* Footer */}
+			<Footer />
 		</div>
 	);
 }

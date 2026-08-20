@@ -11,6 +11,7 @@ import CTA from "./components/cta";
 import EmailSystem from "./components/email-system";
 import Hero from "./components/hero";
 import Highlights from "./components/highlights";
+import ReloopEngine from "./components/reloop-engine";
 import { SectionSeparator } from "./components/section-separator";
 import ShipFast from "./components/ship-fast";
 
@@ -67,6 +68,8 @@ export default function Home() {
 				/>
 				<SectionSeparator />
 				<EmailSystem />
+				<SectionSeparator />
+				<ReloopEngine />
 				<SectionSeparator />
 				<Highlights />
 				<SectionSeparator />
