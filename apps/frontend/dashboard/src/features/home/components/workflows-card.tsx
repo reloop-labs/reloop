@@ -3,61 +3,20 @@ import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
+import { useWorkflowsList } from "#/features/workflows/hooks/use-workflows-list";
 
-interface Workflow {
-	id: string;
-	name: string;
-	description?: string;
-	status: "draft" | "active";
-	updatedAt: string;
-}
+type WorkflowsCardProps = {
+	enabled?: boolean;
+};
 
-export function WorkflowsCard() {
-	const { activeOrganization } = useActiveOrganization();
-	const [workflows, setWorkflows] = useState<Workflow[]>([]);
-	const orgSlug = activeOrganization?.slug ?? "";
-	const orgId = activeOrganization?.id ?? "";
-
-	useEffect(() => {
-		if (orgSlug && orgId) {
-			const storageKey = `workflows:${orgSlug}`;
-			const stored = localStorage.getItem(storageKey);
-			if (stored) {
-				try {
-					setWorkflows(JSON.parse(stored));
-				} catch (_e) {
-					// ignore
-				}
-			} else {
-				const seeds: Workflow[] = [
-					{
-						id: "wf_mock_welcome",
-						name: "Welcome on delivery",
-						description: "Send a follow-up when an email is delivered",
-						status: "active",
-						updatedAt: new Date().toISOString(),
-					},
-					{
-						id: "wf_mock_bounce",
-						name: "Bounce alert",
-						description: "Notify your team when delivery fails",
-						status: "draft",
-						updatedAt: new Date().toISOString(),
-					},
-				];
-				localStorage.setItem(storageKey, JSON.stringify(seeds));
-				setWorkflows(seeds);
-			}
-		} else {
-			setWorkflows([]);
-		}
-	}, [orgSlug, orgId]);
+export function WorkflowsCard({ enabled = true }: WorkflowsCardProps) {
+	const { workflows, isTotalEmpty, isLoading } = useWorkflowsList({
+		limit: 5,
+		enabled,
+	});
 
 	return (
 		<div className="group flex w-full flex-col">
-			{/* Header */}
 			<Link
 				href="/workflows"
 				className="flex items-center justify-between rounded-t-2xl border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-5 pt-3 pb-5 dark:border-white/5 dark:bg-white/[0.02]"
@@ -72,65 +31,66 @@ export function WorkflowsCard() {
 				<ArrowRight className="h-4 w-4 text-text-sub-600 transition-transform group-hover:translate-x-0.5 dark:text-white/60" />
 			</Link>
 
-			{/* Body */}
-			{workflows && workflows.length > 0 ? (
+			{isLoading ? (
+				<div className="-mt-2.5 flex h-[200px] items-center justify-center rounded-xl border border-stroke-soft-100 bg-white dark:border-white/5 dark:bg-white/[0.02]">
+					<span className="text-text-sub-600 text-xs dark:text-white/40">
+						Loading workflows…
+					</span>
+				</div>
+			) : !isTotalEmpty && workflows.length > 0 ? (
 				<div className="-mt-2.5 h-[200px] divide-y divide-stroke-soft-100 overflow-hidden rounded-xl border border-stroke-soft-100 bg-white shadow-[0_1px_2px_rgba(0,0,0,0.02)] dark:border-white/5 dark:bg-white/[0.02]">
 					<div className="divide-y divide-stroke-soft-100/10 dark:divide-white/5">
-						{workflows.slice(0, 3).map((d) => (
-							<div
-								key={d.id}
+						{workflows.slice(0, 3).map((workflow) => (
+							<Link
+								key={workflow.id}
+								href={`/workflows/${workflow.id}`}
 								className="grid grid-cols-3 items-center px-4 py-2.5 transition-colors hover:bg-bg-weak-50/50 dark:hover:bg-white/[0.01]"
 							>
 								<div className="flex min-w-0 flex-col pr-2">
 									<span className="truncate font-semibold text-text-strong-950 text-xs dark:text-white">
-										{d.name}
+										{workflow.name}
 									</span>
 									<span className="truncate text-[10px] text-text-sub-600 dark:text-white/40">
-										{d.description || "No description"}
+										{workflow.description || "No description"}
 									</span>
 								</div>
 								<div className="flex items-center justify-center">
 									<span
 										className={cn(
 											"inline-flex shrink-0 items-center gap-1 rounded-full px-1.5 py-0.5 font-semibold text-[9px] uppercase tracking-wider",
-											d.status === "active"
+											workflow.status === "active"
 												? "bg-green-50 text-green-700 dark:bg-green-500/10 dark:text-green-400"
-												: "bg-zinc-50 text-zinc-600 dark:bg-zinc-500/10 dark:text-zinc-400",
+												: workflow.status === "paused"
+													? "bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400"
+													: "bg-zinc-50 text-zinc-600 dark:bg-zinc-500/10 dark:text-zinc-400",
 										)}
 									>
-										{d.status}
+										{workflow.status}
 									</span>
 								</div>
 								<div className="flex shrink-0 items-center justify-end whitespace-nowrap text-[10px] text-text-sub-600 dark:text-white/40">
-									{new Date(d.updatedAt).toLocaleDateString([], {
+									{new Date(workflow.updatedAt).toLocaleDateString([], {
 										month: "short",
 										day: "numeric",
 									})}
 								</div>
-							</div>
+							</Link>
 						))}
 					</div>
 				</div>
 			) : (
 				<div className="-mt-2.5 flex h-[200px] flex-col items-center justify-center rounded-xl border border-stroke-soft-100 bg-white p-6 text-center shadow-[0_1px_2px_rgba(0,0,0,0.02)] dark:border-white/5 dark:bg-white/[0.02]">
-					{/* Icon outline without pill wrapper */}
 					<Icon
 						name="workflow"
 						className="h-6 w-6 text-text-sub-600 dark:text-white/40"
 					/>
-
-					{/* Heading */}
 					<h4 className="mt-4 font-semibold text-[15px] text-text-strong-950 tracking-tight dark:text-white">
 						Build automations without the overhead
 					</h4>
-
-					{/* Description */}
 					<p className="mt-2 max-w-[240px] text-text-sub-600 text-xs leading-relaxed dark:text-white/50">
-						From triggers to multi-step AI actions — automate your flows in
+						From triggers to multi-step actions — automate your flows in
 						minutes.
 					</p>
-
-					{/* Button */}
 					<Button.Root
 						variant="neutral"
 						mode="stroke"
