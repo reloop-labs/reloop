@@ -86,7 +86,7 @@ export function UseCases() {
 		>
 			<div className="border-stroke-soft-200 border-b px-4 py-16 sm:px-6 sm:py-20 lg:px-12 lg:py-24 dark:border-white/10">
 				<div className="flex items-center gap-2">
-					<SceneGlyph icon="send-2" color="orange" />
+					<SceneGlyph icon="shapes" color="orange" />
 					<span className="font-medium text-[13.5px] text-text-strong-950 tracking-tight dark:text-white">
 						Use Cases
 					</span>
