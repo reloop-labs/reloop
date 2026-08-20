@@ -7,18 +7,18 @@ const getIconName = (type: string): string => {
 		case "text":
 		case "paragraph":
 		case "heading":
-			return "type";
+			return "text";
 		case "image":
 			return "image-upload";
 		case "button":
-			return "send";
+			return "button-rect";
 		case "section":
 		case "layout":
-			return "layout";
+			return "section-rect";
 		case "container":
 			return "box";
 		case "blockquote":
-			return "comment-text";
+			return "quote";
 		case "column":
 		case "row":
 			return "layout-grid";
@@ -26,15 +26,20 @@ const getIconName = (type: string): string => {
 			return "file-text";
 		case "variable":
 			return "brackets";
+		case "bulletlist":
+		case "listitem":
+			return "list-bullets";
+		case "orderedlist":
+			return "list-ordered";
 		default:
-			return "box";
+			return "section-rect";
 	}
 };
 
 const BreadCrumb = () => {
 	return (
-		<div className="sticky top-0 z-10 border-stroke-soft-200 border-b bg-bg-weak-50 px-3 py-3 dark:border-stroke-soft-100/50">
-			<ol className="flex list-none items-center gap-1 rounded-lg">
+		<div className="sticky top-0 z-10 min-w-0 border-stroke-soft-200 border-b bg-bg-white-0 px-3 py-3 dark:border-stroke-soft-100/50 dark:bg-black">
+			<ol className="flex min-w-0 list-none items-center gap-1 overflow-hidden">
 				<Inspector.Breadcrumb>
 					{(segments) =>
 						segments.map((segment, i) => {
@@ -44,21 +49,29 @@ const BreadCrumb = () => {
 
 							const isFirst = i === 0;
 							const isLast = i === segments.length - 1;
-							const showLabel = !isFirst || segments.length === 1;
+							const showLabel = isLast || (!isFirst && segments.length <= 3);
 
 							if (isLast) {
 								return (
-									<li key={i} className="flex items-center gap-1">
+									<li
+										key={i}
+										className="flex min-w-0 flex-1 items-center gap-1 overflow-hidden"
+									>
 										{i !== 0 && (
-											<span className="text-text-disabled-300 text-xs">/</span>
+											<span className="shrink-0 text-text-disabled-300 text-xs">
+												/
+											</span>
 										)}
-										<div className="flex items-center gap-1.5">
+										<div className="flex min-w-0 items-center gap-1.5">
 											<Icon
 												name={iconName}
-												className="h-3.5 w-3.5 text-text-strong-950"
+												className="h-3.5 w-3.5 shrink-0 text-text-strong-950"
 											/>
 											{showLabel && (
-												<span className="font-semibold text-label-xs text-text-strong-950 capitalize">
+												<span
+													title={label}
+													className="min-w-0 truncate font-semibold text-label-xs text-text-strong-950 capitalize"
+												>
 													{label}
 												</span>
 											)}
@@ -67,7 +80,7 @@ const BreadCrumb = () => {
 								);
 							}
 							return (
-								<li key={i} className="flex items-center gap-1">
+								<li key={i} className="flex shrink-0 items-center gap-1">
 									{i !== 0 && (
 										<span className="text-text-disabled-300 text-xs">/</span>
 									)}
@@ -76,11 +89,14 @@ const BreadCrumb = () => {
 										variant="neutral"
 										mode="ghost"
 										size="xxsmall"
-										className="flex cursor-pointer items-center gap-1.5 rounded px-1 py-0.5 text-label-xs text-text-sub-600 capitalize outline-none ring-0 transition-colors hover:text-text-strong-950"
+										title={label}
+										className="flex max-w-24 cursor-pointer items-center gap-1.5 rounded px-1 py-0.5 text-label-xs text-text-sub-600 capitalize outline-none ring-0 transition-colors hover:text-text-strong-950"
 										onClick={() => segment.focus()}
 									>
-										<Icon name={iconName} className="h-3.5 w-3.5" />
-										{showLabel && <span>{label}</span>}
+										<Icon name={iconName} className="h-3.5 w-3.5 shrink-0" />
+										{showLabel && (
+											<span className="min-w-0 truncate">{label}</span>
+										)}
 									</Button.Root>
 								</li>
 							);

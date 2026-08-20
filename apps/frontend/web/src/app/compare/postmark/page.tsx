@@ -166,7 +166,7 @@ const PostmarkComparisonPage = () => {
 				compact
 			/>
 
-			<PageSection narrow>
+			<PageSection>
 				<CompareOtherLinks currentHref={pagePath} />
 			</PageSection>
 		</ComparisonPageShell>

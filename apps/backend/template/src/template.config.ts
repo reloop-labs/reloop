@@ -29,5 +29,23 @@ export const templateConfig = {
 		maxSubjectLength: 500,
 		defaultPageSize: 10,
 		maxPageSize: 100,
+		htmlToImage: {
+			maxHtmlBytes: 1_000_000,
+			defaultWidth: 640,
+			minWidth: 200,
+			maxWidth: 2000,
+			defaultScale: 2,
+			timeoutMs: 15_000,
+		},
+	},
+	/** Override Playwright’s Chromium when using a system install (Alpine Docker). */
+	CHROMIUM_PATH: process.env.CHROMIUM_PATH || "",
+	S3: {
+		ENDPOINT: process.env.S3_ENDPOINT || "http://localhost:9010",
+		ACCESS_KEY: process.env.S3_ACCESS_KEY || "reloop",
+		SECRET_KEY: process.env.S3_SECRET_KEY || "reloop123",
+		BUCKET: process.env.S3_BUCKET || "reloop-uploads",
+		REGION: process.env.S3_REGION || "us-east-1",
+		FORCE_PATH_STYLE: process.env.S3_FORCE_PATH_STYLE || "true",
 	},
 };

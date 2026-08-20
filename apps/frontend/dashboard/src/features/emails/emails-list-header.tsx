@@ -1,6 +1,9 @@
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import { usePathname } from "next/navigation";
+import { useHotkeys } from "react-hotkeys-hook";
+import { EmailsApiDetails } from "#/components/api-details/emails";
+import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 
 const DOCS_URL = "https://reloop.sh/docs/learn/emails";
 
@@ -14,6 +17,17 @@ export function EmailsListHeader() {
 		? "View and filter inbound emails received by your workspace mailboxes."
 		: "Track and monitor your outbound transactional emails.";
 	const iconName = isReceived ? "mail-receive" : "mail-send";
+
+	const openDocs = () => window.open(DOCS_URL, "_blank");
+
+	useHotkeys(
+		"d",
+		(e) => {
+			e.preventDefault();
+			openDocs();
+		},
+		{ enableOnFormTags: false, preventDefault: true },
+	);
 
 	return (
 		<div className="flex flex-col gap-4 pt-2 pb-4 sm:flex-row sm:items-start sm:justify-between">
@@ -31,15 +45,35 @@ export function EmailsListHeader() {
 			</div>
 
 			<div className="flex shrink-0 items-center gap-2">
+				<EmailsApiDetails
+					isReceived={isReceived}
+					renderTrigger={({ open }: { open: () => void }) => (
+						<Button.Root
+							type="button"
+							variant="neutral"
+							mode="stroke"
+							size="small"
+							onClick={open}
+							className="gap-1.5 rounded-xl"
+							aria-keyshortcuts="s"
+						>
+							<Icon name="code" className="h-4 w-4 text-text-sub-600" />
+							SDK
+							<ActionKbd className="w-auto min-w-4 px-1">S</ActionKbd>
+						</Button.Root>
+					)}
+				/>
 				<Button.Root
 					type="button"
 					variant="neutral"
 					mode="stroke"
 					size="small"
-					onClick={() => window.open(DOCS_URL, "_blank")}
-					className="rounded-xl"
+					onClick={openDocs}
+					className="gap-1.5 rounded-xl"
+					aria-keyshortcuts="d"
 				>
 					Documentation
+					<ActionKbd className="w-auto min-w-4 px-1">D</ActionKbd>
 				</Button.Root>
 			</div>
 		</div>

@@ -1,9 +1,15 @@
-import { getPost } from "@reloop/web/lib/landing/blog/source";
+import { readBlogCoverFile } from "@reloop/web/lib/landing/blog/cover";
+import {
+	generateStaticParams,
+	getPost,
+} from "@reloop/web/lib/landing/blog/source";
 import { ImageResponse } from "next/og";
 
 export const alt = "Reloop Blog";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
+
+export { generateStaticParams };
 
 type Props = {
 	params: Promise<{ slug: string }>;
@@ -12,6 +18,19 @@ type Props = {
 export default async function OpenGraphImage({ params }: Props) {
 	const { slug } = await params;
 	const post = getPost(slug);
+
+	if (post?.image) {
+		const cover = await readBlogCoverFile(post.image);
+		if (cover) {
+			return new Response(new Uint8Array(cover.data), {
+				headers: {
+					"Content-Type": cover.contentType,
+					"Cache-Control": "public, max-age=31536000, immutable",
+				},
+			});
+		}
+	}
+
 	const primaryColor = "#d97757";
 	const title = post?.title ?? "Reloop Blog";
 	const category = post?.category ?? "Blog";

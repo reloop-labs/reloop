@@ -1,0 +1,23 @@
+---
+slug: scoped-api-keys-management
+version: 0.4.0
+date: September 2025
+launchDate: 7 September 2025
+title: 'Scoped API Keys & Environment Management'
+description: >-
+  Generate environment-scoped API keys (rl_live_, rl_test_) with granular permissions and instant revocation.
+tags:
+  - Auth
+  - Security
+---
+### PLANNING
+
+- **Key security model.** Defined prefixed key formats (rl_live_ and rl_test_) with SHA-256 hashed storage and scoped permissions.
+
+### FRONTEND
+
+- **API key UI.** Dashboard interface for generating, copying, and revoking API keys with masked secret displays.
+
+### BACKEND
+
+- **Key authentication.** Environment-scoped key generation (rl_live_ and rl_test_) with granular permission validation in packages/apikey.

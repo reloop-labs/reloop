@@ -6,6 +6,7 @@ import { batchThreadsController } from "./batch-threads.controllers";
 
 const batchAction = t.Union([
 	t.Literal("archive"),
+	t.Literal("unarchive"),
 	t.Literal("trash"),
 	t.Literal("restore"),
 	t.Literal("star"),

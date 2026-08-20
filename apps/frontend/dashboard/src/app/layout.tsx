@@ -1,35 +1,27 @@
 import type { Metadata } from "next";
-import localFont from "next/font/local";
+import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "../styles.css";
 import { Providers } from "./providers";
 
 // TODO: Remove this opt-out after the dashboard supports Cache Components.
 export const instant = false;
 
-const openRunde = localFont({
-	src: [
-		{
-			path: "../../public/font/openRunde/OpenRunde-Regular.woff2",
-			weight: "400",
-			style: "normal",
-		},
-		{
-			path: "../../public/font/openRunde/OpenRunde-Medium.woff2",
-			weight: "500",
-			style: "normal",
-		},
-		{
-			path: "../../public/font/openRunde/OpenRunde-Semibold.woff2",
-			weight: "600",
-			style: "normal",
-		},
-		{
-			path: "../../public/font/openRunde/OpenRunde-Bold.woff2",
-			weight: "700",
-			style: "normal",
-		},
-	],
-	variable: "--font-open-runde",
+const inter = Inter({
+	subsets: ["latin"],
+	variable: "--font-inter",
+	display: "swap",
+});
+
+const geistSans = Geist({
+	subsets: ["latin"],
+	variable: "--font-geist-sans",
+	display: "swap",
+});
+
+const geistMono = Geist_Mono({
+	subsets: ["latin"],
+	variable: "--font-geist-mono",
+	display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -68,9 +60,17 @@ export default function RootLayout({
 	children: React.ReactNode;
 }>) {
 	return (
-		<html lang="en" suppressHydrationWarning>
+		<html
+			lang="en"
+			suppressHydrationWarning
+			className={`${inter.variable} ${geistSans.variable} ${geistMono.variable}`}
+		>
 			<body
-				className={`${openRunde.variable} bg-bg-white-0 font-sans text-text-strong-950 antialiased`}
+				className="bg-bg-white-0 font-sans text-text-strong-950 antialiased"
+				style={{
+					fontFamily:
+						"var(--font-inter), -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+				}}
 			>
 				<Providers>{children}</Providers>
 			</body>

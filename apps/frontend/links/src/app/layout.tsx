@@ -3,7 +3,6 @@ import "./globals.css";
 import { getSiteUrl, siteDescription, siteName } from "@reloop/links/lib/site";
 import { ThemeProvider } from "@reloop/links/providers/theme-provider";
 import { IconsSprite } from "@reloop/ui/icons-sprite";
-import { RybbitLoader } from "@reloop/ui/rybbit-loader";
 import localFont from "next/font/local";
 import { Suspense } from "react";
 
@@ -83,7 +82,6 @@ export default function RootLayout({
 					    params / uncached fetches (preferences, redirect tokens). */}
 					<Suspense fallback={null}>{children}</Suspense>
 					<IconsSprite />
-					<RybbitLoader />
 				</ThemeProvider>
 			</body>
 		</html>

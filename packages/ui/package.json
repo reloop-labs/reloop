@@ -98,7 +98,6 @@
 		"./horizontal-stepper": "./src/components/horizontal-stepper.tsx",
 		"./vertical-stepper": "./src/components/vertical-stepper.tsx",
 		"./digit-input": "./src/components/digit-input.tsx",
-		"./rybbit-loader": "./src/components/rybbit-loader.tsx",
 		"./not-found-illustration": "./src/components/not-found-illustration.tsx"
 	},
 	"dependencies": {

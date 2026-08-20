@@ -1,7 +1,9 @@
+"use client";
+
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
-import * as Input from "@reloop/ui/input";
 import { useState } from "react";
+import { ScrubField, ScrubHandle } from "./scrub-field";
 
 /* ------------------------------------------------------------------ */
 /* Spacing control — single-row when linked, 2×2 grid when individual  */
@@ -62,33 +64,23 @@ function PillInput({
 	value,
 	onChange,
 	icon,
+	label,
 }: {
 	value: number | "";
 	onChange: (v: number | "") => void;
 	icon?: React.ReactNode;
+	label: string;
 }) {
 	return (
-		<Input.Root
-			size="xsmall"
-			className="flex-1 rounded-xl border border-stroke-soft-200 shadow-none before:hidden"
-		>
-			<Input.Wrapper>
-				{icon && <span className="shrink-0 text-text-sub-600">{icon}</span>}
-				<Input.Input
-					type="number"
-					value={value}
-					placeholder="0"
-					onChange={(e) => {
-						const raw = e.target.value;
-						onChange(raw === "" ? "" : Number.parseFloat(raw));
-					}}
-					className="[appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-				/>
-				<Input.InlineAffix className="text-text-strong-950!">
-					px
-				</Input.InlineAffix>
-			</Input.Wrapper>
-		</Input.Root>
+		<ScrubField
+			label={label}
+			value={value}
+			onChange={onChange}
+			min={0}
+			max={200}
+			suffix="px"
+			prefix={icon}
+		/>
 	);
 }
 
@@ -124,11 +116,17 @@ export function SpacingControl({
 	if (linked) {
 		return (
 			<div className="flex min-h-9 items-center gap-3 px-4 py-1.5">
-				<span className="w-1/3 min-w-0 shrink-0 text-label-sm text-text-sub-600">
-					{label}
-				</span>
+				<ScrubHandle
+					label={label}
+					value={value.top}
+					onChange={(v) => handleChange("top", v)}
+					min={0}
+					max={200}
+					className="w-1/3 min-w-0 shrink-0 text-label-sm text-text-sub-600 hover:text-text-strong-950"
+				/>
 				<div className="flex w-2/3 min-w-0 items-center justify-end gap-2">
 					<PillInput
+						label={label}
 						value={value.top}
 						onChange={(v) => handleChange("top", v)}
 					/>
@@ -150,6 +148,7 @@ export function SpacingControl({
 			{/* 2×2 grid */}
 			<div className="grid grid-cols-2 gap-2">
 				<PillInput
+					label={`${label} top`}
 					value={value.top}
 					onChange={(v) => handleChange("top", v)}
 					icon={
@@ -161,6 +160,7 @@ export function SpacingControl({
 					}
 				/>
 				<PillInput
+					label={`${label} right`}
 					value={value.right}
 					onChange={(v) => handleChange("right", v)}
 					icon={
@@ -172,6 +172,7 @@ export function SpacingControl({
 					}
 				/>
 				<PillInput
+					label={`${label} bottom`}
 					value={value.bottom}
 					onChange={(v) => handleChange("bottom", v)}
 					icon={
@@ -183,6 +184,7 @@ export function SpacingControl({
 					}
 				/>
 				<PillInput
+					label={`${label} left`}
 					value={value.left}
 					onChange={(v) => handleChange("left", v)}
 					icon={

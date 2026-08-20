@@ -589,7 +589,10 @@ export const DnsConfigEmail = ({
 
 						<Text className={cls.bodyText}>
 							Need help? Visit our{" "}
-							<a href="https://reloop.sh/docs/dns" style={{ color: "inherit" }}>
+							<a
+								href="https://reloop.sh/docs/guides/connect-domain/dns-records-explained"
+								style={{ color: "inherit" }}
+							>
 								DNS setup docs
 							</a>{" "}
 							or reply and we&apos;ll walk you through it.

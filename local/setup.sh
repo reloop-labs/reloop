@@ -55,6 +55,7 @@ populate_env "apps/backend/webhook"
 populate_env "apps/backend/inbox"
 populate_env "apps/backend/workflow"
 populate_env "apps/backend/admin"
+populate_env "apps/backend/tools"
 
 # Database package (drizzle-kit / seed)
 populate_env "packages/db"

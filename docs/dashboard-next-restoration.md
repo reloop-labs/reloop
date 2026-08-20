@@ -103,9 +103,7 @@ exceptions are limited to:
 - focused migration tests.
 
 No backend controller, database migration, API path, schema, query key, shared
-domain contract, or global stylesheet changed. The only shared-package change
-is a backward-compatible optional `scriptSrc` prop on `RybbitLoader`, required
-to address its script through the dashboard base path. Public changes are
+domain contract, or global stylesheet changed. Public changes are
 restricted to the restored branded manifest images and manifest metadata.
 
 ## Semantic parity evidence

@@ -80,7 +80,7 @@
 ## Self-host
 
 Self-hosting the open-source Reloop stack is free (infrastructure costs are yours).
-See https://reloop.sh/docs/self-host
+See https://reloop.sh/self-host
 
 ## Related
 

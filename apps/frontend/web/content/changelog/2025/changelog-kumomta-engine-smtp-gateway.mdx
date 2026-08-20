@@ -1,0 +1,24 @@
+---
+slug: kumomta-engine-smtp-gateway
+version: 0.1.0
+date: August 2025
+launchDate: 12 August 2025
+title: 'KumoMTA Engine & High-Performance SMTP Gateway'
+description: >-
+  Integrated KumoMTA as our core mail transfer agent for high-throughput SMTP processing on ports 587 and 465.
+tags:
+  - Infrastructure
+  - Backend
+---
+### PLANNING
+
+- **MTA evaluation.** Evaluated MTA architectures and adopted KumoMTA for its Lua-scriptable routing and high-throughput Rust engine.
+
+### BACKEND
+
+- **KumoMTA integration.** Integrated KumoMTA as the core Mail Transfer Agent in apps/backend/kumomta and apps/backend/smtp.
+- **Gateway ports.** Configured standard listeners on ports 587 (STARTTLS) and 465 (SMTPS) with TLS 1.3 encryption.
+
+### DEVOPS
+
+- **Docker config.** Built containerized KumoMTA service with environment-configured relay hosts and Mailpit local routing.

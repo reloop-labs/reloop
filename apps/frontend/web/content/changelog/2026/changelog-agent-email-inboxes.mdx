@@ -1,0 +1,24 @@
+---
+slug: agent-email-inboxes
+version: 0.41.0
+date: May 2026
+launchDate: 2 May 2026
+title: 'Agent Email Inboxes'
+description: >-
+  Dedicated mailboxes designed specifically for AI agents to autonomously receive, triage, and reply to messages.
+tags:
+  - Agents
+  - Feature
+  - Inbox
+---
+### PLANNING
+
+- **Agent mailbox schema.** Created mailbox, thread, and message models in packages/db/src/schema/inbox.ts and thread.ts.
+
+### FRONTEND
+
+- **Agent inbox UI.** Built full agent mailbox management interface in apps/frontend/dashboard/src/features/agent-inbox.
+
+### BACKEND
+
+- **Inbox service.** Built apps/backend/inbox with S3 attachment retrieval and inbound JetStream message processing.

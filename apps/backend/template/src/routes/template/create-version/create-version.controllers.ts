@@ -5,6 +5,7 @@ import {
 	extractVariablesFromContent,
 	normalizeVariableName,
 } from "@be/template/utils/extract-variables";
+import { refreshTemplateThumbnail } from "@be/template/utils/template-thumbnail";
 import type * as schema from "@reloop/db/schema";
 import type { TemplateBlock } from "@reloop/db/schema";
 import { log } from "evlog";
@@ -141,6 +142,20 @@ export async function createVersion(params: {
 		}
 
 		await templateModel.update(templateUpdatePayload);
+
+		if (renderedHtml?.trim()) {
+			void refreshTemplateThumbnail({
+				templateId,
+				organizationId,
+				html: renderedHtml,
+			}).catch((error) => {
+				log.warn({
+					message: "Background template thumbnail refresh failed",
+					templateId,
+					error: error instanceof Error ? error.message : String(error),
+				});
+			});
+		}
 
 		log.info({
 			...{

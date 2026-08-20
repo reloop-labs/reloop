@@ -12,7 +12,7 @@ export function BlogPostFeaturedCard({ post }: { post: BlogPostDefinition }) {
 	return (
 		<Link
 			href={`/blog/${post.slug}`}
-			className="group block overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-weak-50/50 p-6 sm:p-8 lg:p-10 dark:border-white/10 dark:bg-white/[0.02]"
+			className="group block overflow-hidden rounded-2xl bg-bg-weak-50/50 p-6 sm:p-8 lg:p-10 dark:bg-white/[0.02]"
 		>
 			<div className="grid gap-8 lg:grid-cols-12 lg:items-center">
 				<div className="flex flex-col justify-center lg:col-span-6">
@@ -28,12 +28,12 @@ export function BlogPostFeaturedCard({ post }: { post: BlogPostDefinition }) {
 						</span>
 					</div>
 
-					<h1 className="mt-4 font-medium font-sans text-3xl text-text-strong-950 leading-[1.1] tracking-tight sm:text-4xl lg:text-[2.6rem] dark:text-white">
+					<h1 className="mt-3 font-sans font-semibold text-text-strong-950 text-xl leading-snug tracking-tight sm:text-2xl lg:text-[1.65rem] dark:text-white">
 						{post.title}
 					</h1>
 				</div>
 
-				<div className="overflow-hidden rounded-2xl border border-stroke-soft-200 lg:col-span-6 dark:border-white/10">
+				<div className="overflow-hidden rounded-2xl lg:col-span-6">
 					<BlogPostCoverImage
 						slug={post.slug}
 						image={post.image}

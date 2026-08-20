@@ -5556,7 +5556,7 @@ Here is an example of an Express route that sends an email:
 ```typescript
 
 const app = express();
-const reloop = new Reloop(process.env.RELOOP_API_KEY);
+const reloop = new Reloop({ apiKey: process.env.RELOOP_API_KEY });
 
 app.post('/send-email', async (req, res) => {
   try {
@@ -5587,42 +5587,79 @@ Markdown: https://reloop.sh/docs/examples/nodejs/nextjs.md
 
 ## Installation
 
-First, install the official Node.js SDK:
-
 ```bash
 npm install reloop-email
 ```
 
-## Setup Environment Variables
+## Setup environment variables
 
-Add your Reloop API key to your `.env.local` file:
+Add your Reloop API key to `.env.local` (server-only — do not use `NEXT_PUBLIC_`):
 
 ```env
-RELOOP_API_KEY=re_your_api_key_here
+RELOOP_API_KEY=rl_your_api_key_here
 ```
 
-## Sending an Email
-
-You can send emails from a Next.js Server Action or Route Handler. Here is an example of a Route Handler:
+## Shared client
 
 ```typescript
+// lib/reloop.ts
 
-const reloop = new Reloop(process.env.RELOOP_API_KEY);
+  apiKey: process.env.RELOOP_API_KEY!,
+});
+```
+
+## Route Handler
+
+```typescript
+// app/api/send-email/route.ts
 
   try {
-    const data = await reloop.mail.send({
-      from: 'onboarding@reloop.sh',
-      to: 'delivered@resend.dev',
-      subject: 'Hello World',
-      html: '<p>Congrats on sending your first email via Reloop!</p>',
+    const { to, subject, html, text } = await request.json();
+
+    const { response, emailError } = await reloop.mail.send({
+      from: "Acme <onboarding@mail.yourdomain.com>",
+      to,
+      subject: subject ?? "Hello from Next.js",
+      html: html ?? "<p>Congrats on sending your first email via Reloop!</p>",
+      text: text ?? "Congrats on sending your first email via Reloop!",
     });
 
-    return NextResponse.json(data);
+    if (emailError) {
+      return NextResponse.json({ error: emailError }, { status: 502 });
+    }
+
+    return NextResponse.json(response);
   } catch (error) {
     return NextResponse.json({ error }, { status: 500 });
   }
 }
 ```
+
+## Server Action
+
+```typescript
+// app/actions/send-email.ts
+"use server";
+
+  const { response, emailError } = await reloop.mail.send({
+    from: "Acme <onboarding@mail.yourdomain.com>",
+    to: email,
+    subject: "Welcome",
+    html: "<p>Thanks for signing up.</p>",
+    text: "Thanks for signing up.",
+  });
+
+  if (emailError) {
+    return { ok: false as const, error: "Failed to send" };
+  }
+
+  return { ok: true as const, messageId: response?.messageId };
+}
+```
+
+## Full guide
+
+For forms, auth, Edge runtime, Vercel deploy, and a full comparison of Server Actions vs Route Handlers, see the blog post: [How to Send Email in Next.js App Router](/blog/send-email-nextjs-app-router).
 
 ---
 
@@ -16012,17 +16049,11 @@ Committed local defaults live in `apps/frontend/docs/.env` (and `.env.dev`). Fre
 
 ```bash
 NEXT_PUBLIC_URL=https://local.reloop.sh
-
-# Rybbit analytics (optional)
-NEXT_PUBLIC_RYBBIT_HOST=https://app.rybbit.io
-NEXT_PUBLIC_RYBBIT_SITE_ID=reloop-docs
 ```
 
 | Variable | Required | Default |
 | :--- | :--- | :--- |
 | `NEXT_PUBLIC_URL` | No | `https://reloop.sh` — canonical URLs, OG metadata, and public origin |
-| `NEXT_PUBLIC_RYBBIT_HOST` | No | Rybbit analytics host |
-| `NEXT_PUBLIC_RYBBIT_SITE_ID` | No | Rybbit site identifier |
 
 ## Content structure
 
@@ -16116,10 +16147,6 @@ INTERNAL_API_URL=http://localhost:8014/api/contacts
 
 # Server-side mail API (open-tracking pixel proxy)
 INTERNAL_MAIL_API_URL=http://localhost:8015/api/mail
-
-# Rybbit analytics (optional)
-NEXT_PUBLIC_RYBBIT_HOST=https://app.rybbit.io
-NEXT_PUBLIC_RYBBIT_SITE_ID=reloop-web
 ```
 
 Preferences call [contacts](/docs/setup/backend/contacts) via `INTERNAL_API_URL`. Open-tracking proxies to [mail](/docs/setup/backend/mail) via `INTERNAL_MAIL_API_URL` (or `NEXT_PUBLIC_URL` as a fallback).
@@ -16130,8 +16157,6 @@ Preferences call [contacts](/docs/setup/backend/contacts) via `INTERNAL_API_URL`
 | `REDIRECT_SECRET` | No | Shared secret with mail / auth / email backends |
 | `INTERNAL_API_URL` | No | `http://localhost:8014/api/contacts` |
 | `INTERNAL_MAIL_API_URL` | No | Falls back to `{NEXT_PUBLIC_URL}/api/mail` |
-| `NEXT_PUBLIC_RYBBIT_HOST` | No | Rybbit analytics host |
-| `NEXT_PUBLIC_RYBBIT_SITE_ID` | No | Rybbit site identifier |
 
 ## Routes
 
@@ -16227,18 +16252,12 @@ Committed local defaults live in `apps/frontend/web/.env` (and `.env.dev`). Fres
 NEXT_PUBLIC_URL=https://local.reloop.sh
 # Must match TRACKING_SECRET in the mail backend and REDIRECT_SECRET in auth/email backends
 REDIRECT_SECRET=reloop_tracking_secret_default_123
-
-# Rybbit analytics (optional)
-NEXT_PUBLIC_RYBBIT_HOST=https://app.rybbit.io
-NEXT_PUBLIC_RYBBIT_SITE_ID=reloop-web
 ```
 
 | Variable | Required | Default |
 | :--- | :--- | :--- |
 | `NEXT_PUBLIC_URL` | No | `https://reloop.sh` — canonical site URL for metadata and OG tags |
 | `REDIRECT_SECRET` | No | Shared redirect/tracking secret for local mail links |
-| `NEXT_PUBLIC_RYBBIT_HOST` | No | Rybbit analytics host |
-| `NEXT_PUBLIC_RYBBIT_SITE_ID` | No | Rybbit site identifier |
 
 ## Commands
 

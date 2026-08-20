@@ -1,14 +1,10 @@
+"use client";
+
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
-import { Fragment } from "react";
-import {
-	ClickedStep,
-	DeliveredStep,
-	FailedStep,
-	OpenedStep,
-	SentStep,
-} from "./steps";
+import { Fragment, useMemo } from "react";
+import { formatTimelineDate } from "./timeline-flow-node";
 import type { EmailEvent } from "./types";
 
 export function EmailTimeline({
@@ -17,7 +13,7 @@ export function EmailTimeline({
 	deliveredAt,
 	failedAt,
 	errorMessage,
-	isLoading,
+	isLoading = false,
 	onDeliveredClick,
 }: {
 	events: EmailEvent[];
@@ -29,124 +25,236 @@ export function EmailTimeline({
 	/** Open delivered details sidebar when the completed Delivered step is clicked */
 	onDeliveredClick?: () => void;
 }) {
-	if (isLoading) {
-		const loadingSteps = [
-			{ label: "Sent", icon: "send-1" },
-			{ label: "Delivered", icon: "check-circle" },
-			{ label: "Opened", icon: "info-outline" },
-			{ label: "Clicked", icon: "mouse-pointer-outline" },
-		];
+	const isFailed = useMemo(() => {
 		return (
-			<div className="relative flex w-full items-start justify-between gap-0 rounded-3xl border border-stroke-soft-100 px-4 pt-10 pb-8 transition-all hover:border-stroke-soft-200">
-				{loadingSteps.map((step, index) => (
-					<Fragment key={index}>
-						<div className="flex min-w-[70px] flex-grow flex-col items-center gap-2">
-							<div className="flex h-10 w-10 items-center justify-center rounded-[10px] border border-stroke-soft-200 bg-bg-weak-50 text-text-soft-400">
-								<Icon name={step.icon} className="h-5 w-5 opacity-40" />
-							</div>
-							<div className="flex flex-col items-center text-center">
-								<span className="rounded-md bg-bg-weak-50 px-2 py-1 font-semibold text-text-soft-400 text-xs">
-									{step.label}
-								</span>
-								<Skeleton className="mx-auto mt-1 h-3 w-16 rounded-md" />
-							</div>
-						</div>
-						{index < loadingSteps.length - 1 && (
-							<div className="mt-5 h-0 flex-1 border-stroke-soft-100 border-t-[1.5px] border-dashed" />
-						)}
-					</Fragment>
-				))}
-			</div>
+			!!errorMessage ||
+			!!failedAt ||
+			events.some(
+				(e) =>
+					e.type === "bounced" || e.type === "failed" || e.type === "complaint",
+			)
 		);
-	}
+	}, [errorMessage, failedAt, events]);
 
 	// Synthesize events for sent, delivered, and failed if they don't exist in the events array
-	const allEvents = [...(events || [])];
+	const allEvents = useMemo(() => {
+		const list = [...(events || [])];
 
-	if (sentAt && !allEvents.find((e) => e.type === "sent")) {
-		allEvents.push({
-			id: "synth-sent",
-			type: "sent",
-			createdAt: sentAt,
-			metadata: {},
-		});
-	}
+		if (sentAt && !list.find((e) => e.type === "sent")) {
+			list.push({
+				id: "synth-sent",
+				type: "sent",
+				createdAt: sentAt,
+				metadata: {},
+			});
+		}
 
-	const isFailed =
-		!!errorMessage ||
-		!!failedAt ||
-		events.some(
+		const bounceEvent = list.find(
 			(e) =>
-				e.type === "bounced" || e.type === "failed" || e.type === "complaint",
+				e.type === "bounced" || e.type === "complaint" || e.type === "failed",
 		);
 
-	// Timeline Failed step uses type "failed"; map real bounce/complaint events onto it.
-	const bounceEvent = allEvents.find(
-		(e) =>
-			e.type === "bounced" || e.type === "complaint" || e.type === "failed",
-	);
-	if (isFailed && bounceEvent && bounceEvent.type !== "failed") {
-		allEvents.push({
-			...bounceEvent,
-			id: `${bounceEvent.id}-as-failed`,
-			type: "failed",
-		});
-	} else if (isFailed && !bounceEvent) {
-		allEvents.push({
-			id: "synth-failed",
-			type: "failed",
-			createdAt: failedAt || sentAt || new Date().toISOString(),
-			metadata: {},
-		});
-	}
+		if (isFailed && bounceEvent && bounceEvent.type !== "failed") {
+			list.push({
+				...bounceEvent,
+				id: `${bounceEvent.id}-as-failed`,
+				type: "failed",
+			});
+		} else if (isFailed && !bounceEvent) {
+			list.push({
+				id: "synth-failed",
+				type: "failed",
+				createdAt: failedAt || sentAt || new Date().toISOString(),
+				metadata: {},
+			});
+		}
 
-	if (
-		!isFailed &&
-		deliveredAt &&
-		!allEvents.find((e) => e.type === "delivered")
-	) {
-		allEvents.push({
-			id: "synth-delivered",
-			type: "delivered",
-			createdAt: deliveredAt,
-			metadata: {},
-		});
-	}
+		if (!isFailed && deliveredAt && !list.find((e) => e.type === "delivered")) {
+			list.push({
+				id: "synth-delivered",
+				type: "delivered",
+				createdAt: deliveredAt,
+				metadata: {},
+			});
+		}
 
-	const steps = isFailed
-		? ["sent", "failed", "", ""]
-		: ["sent", "delivered", "opened", "clicked"];
+		return list;
+	}, [events, sentAt, isFailed, failedAt, deliveredAt]);
+
+	const steps = useMemo(() => {
+		if (isFailed) {
+			return [
+				{
+					id: "sent",
+					stepType: "sent",
+					label: "Sent",
+					icon: "send-1",
+				},
+				{
+					id: "failed",
+					stepType: "failed",
+					label: "Failed",
+					icon: "cross-circle",
+				},
+			];
+		}
+		return [
+			{
+				id: "sent",
+				stepType: "sent",
+				label: "Sent",
+				icon: "send-1",
+			},
+			{
+				id: "delivered",
+				stepType: "delivered",
+				label: "Delivered",
+				icon: "check-circle",
+				onClick: onDeliveredClick,
+				isInteractive: !!onDeliveredClick,
+			},
+			{
+				id: "opened",
+				stepType: "opened",
+				label: "Opened",
+				icon: "eye-outline",
+			},
+			{
+				id: "clicked",
+				stepType: "clicked",
+				label: "Clicked",
+				icon: "cursor-click",
+			},
+		];
+	}, [isFailed, onDeliveredClick]);
 
 	return (
-		<div className="relative flex w-full items-start justify-between gap-0 rounded-3xl border border-stroke-soft-100 px-4 pt-10 pb-8 transition-all hover:border-stroke-soft-200">
-			{steps.map((type, index: number) => {
-				const event = type ? allEvents.find((e) => e.type === type) : undefined;
+		<div className="relative flex h-[176px] w-full items-center justify-center rounded-3xl border border-stroke-soft-100 bg-bg-white-0 px-8 pt-6 pb-5 transition-all hover:border-stroke-soft-200 dark:border-stroke-soft-100/50 dark:bg-bg-white-0/5">
+			<div
+				className={cn(
+					"mx-auto flex items-start",
+					isFailed
+						? "w-64 justify-between"
+						: "w-full max-w-2xl justify-between",
+				)}
+			>
+				{steps.map((step, index) => {
+					const event = allEvents.find((e) => e.type === step.stepType);
+					const isCompleted = !!event;
+					const timestamp = event?.createdAt;
+					const formattedTime = formatTimelineDate(timestamp);
 
-				return (
-					<Fragment key={index}>
-						{type === "sent" && <SentStep event={event} />}
-						{type === "failed" && <FailedStep event={event} />}
-						{type === "delivered" && (
-							<DeliveredStep event={event} onClick={onDeliveredClick} />
-						)}
-						{type === "opened" && <OpenedStep event={event} />}
-						{type === "clicked" && <ClickedStep event={event} />}
-						{!type && <div className="w-10 flex-shrink-0" />}
-						{index < steps.length - 1 && (
+					const getIconStyles = () => {
+						if (!isCompleted) {
+							return "border-stroke-soft-200 bg-bg-weak-50 text-text-sub-600 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-400";
+						}
+						switch (step.stepType) {
+							case "sent":
+								return "border-information-base/20 bg-information-lighter/50 text-information-base";
+							case "failed":
+							case "bounced":
+							case "complaint":
+								return "border-error-light bg-error-lighter text-error-base";
+							case "delivered":
+								return cn(
+									"border-success-base/20 bg-success-lighter/50 text-success-base",
+									step.isInteractive &&
+										"group-hover:border-success-base/40 group-hover:shadow-[0_0_0_3px_rgba(34,197,94,0.12)]",
+								);
+							case "opened":
+								return "border-orange-500/20 bg-orange-50/50 text-orange-600 dark:bg-orange-950/30 dark:text-orange-400";
+							case "clicked":
+								return "border-purple-500/20 bg-purple-50/50 text-purple-600 dark:bg-purple-950/30 dark:text-purple-400";
+							default:
+								return "border-information-base/20 bg-information-lighter/50 text-information-base";
+						}
+					};
+
+					const getBadgeStyles = () => {
+						if (!isCompleted) {
+							return "bg-bg-weak-50 text-text-sub-600 dark:bg-neutral-900 dark:text-neutral-400";
+						}
+						switch (step.stepType) {
+							case "sent":
+								return "bg-information-lighter text-information-base";
+							case "failed":
+							case "bounced":
+							case "complaint":
+								return "bg-error-lighter text-error-base";
+							case "delivered":
+								return cn(
+									"bg-success-lighter text-success-base",
+									step.isInteractive && "group-hover:underline",
+								);
+							case "opened":
+								return "bg-orange-50 text-orange-600 dark:bg-orange-950/40 dark:text-orange-400";
+							case "clicked":
+								return "bg-purple-50 text-purple-600 dark:bg-purple-950/40 dark:text-purple-400";
+							default:
+								return "bg-information-lighter text-information-base";
+						}
+					};
+
+					const nodeBody = (
+						<div className="flex flex-col items-center gap-2">
 							<div
 								className={cn(
-									"mt-5 h-0 flex-1 border-t-[1.5px]",
-									index === 0 && isFailed
-										? "border-stroke-soft-100 border-dashed"
-										: !isFailed
-											? "border-stroke-soft-100 border-dashed"
-											: "border-transparent",
+									"flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] border transition-all duration-300",
+									getIconStyles(),
 								)}
-							/>
-						)}
-					</Fragment>
-				);
-			})}
+							>
+								<Icon name={step.icon} className="h-5 w-5" />
+							</div>
+
+							<div className="flex flex-col items-center gap-1 text-center">
+								<span
+									className={cn(
+										"rounded-md px-2 py-1 font-semibold text-xs transition-colors duration-300",
+										getBadgeStyles(),
+									)}
+								>
+									{step.label}
+								</span>
+								<div className="flex h-4 items-center justify-center">
+									{isLoading ? (
+										<Skeleton className="h-3 w-16 rounded-md" />
+									) : isCompleted && formattedTime ? (
+										<span className="whitespace-nowrap font-medium text-text-soft-400 text-xs">
+											{formattedTime}
+										</span>
+									) : (
+										<span className="h-4 w-16 opacity-0" aria-hidden="true" />
+									)}
+								</div>
+							</div>
+						</div>
+					);
+
+					return (
+						<Fragment key={step.id}>
+							<div className="flex min-w-[90px] flex-col items-center">
+								{step.isInteractive && step.onClick ? (
+									<button
+										type="button"
+										onClick={step.onClick}
+										className="group flex flex-col items-center rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-success-base/40"
+										aria-label={`View ${step.label} details`}
+									>
+										{nodeBody}
+									</button>
+								) : (
+									<div className="group flex flex-col items-center">
+										{nodeBody}
+									</div>
+								)}
+							</div>
+							{index < steps.length - 1 && (
+								<div className="mt-5 h-0 flex-1 border-stroke-soft-100 border-t-[1.5px] border-dashed dark:border-neutral-800" />
+							)}
+						</Fragment>
+					);
+				})}
+			</div>
 		</div>
 	);
 }

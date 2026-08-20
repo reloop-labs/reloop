@@ -1,15 +1,17 @@
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
-import { KbdCommand } from "@reloop/ui/kbd-command";
-import { KbdEnter } from "@reloop/ui/kbd-enter";
 import { KbdEsc } from "@reloop/ui/kbd-esc";
 import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
+import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { getAvatarGradient, getAvatarInitial } from "#/utils/avatar";
+
+const actionKbdOnBlueClassName =
+	"border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]";
 
 export type AssignableRole = "admin" | "member";
 
@@ -325,8 +327,12 @@ export const ChangeRoleModal = ({
 											<FancyButton.Icon as={Icon} name="user-role" />
 											<span>Update role</span>
 											<span className="inline-flex items-center gap-0.5 opacity-90">
-												<KbdCommand />
-												<KbdEnter />
+												<ActionKbd className={actionKbdOnBlueClassName}>
+													⌘
+												</ActionKbd>
+												<ActionKbd className={actionKbdOnBlueClassName}>
+													↵
+												</ActionKbd>
 											</span>
 										</>
 									)}

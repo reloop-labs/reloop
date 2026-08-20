@@ -1,17 +1,14 @@
+import { db as defaultDb } from "@reloop/db/client";
+import { apikey } from "@reloop/db/schema";
+import { and, eq, sql } from "drizzle-orm";
 import {
 	API_KEY_CREDENTIAL_CACHE_TTL_SECONDS,
 	type ApiKeyCredentialCache,
 	type ApiKeyCredentialEntry,
 	type ApiKeyCredentialStore,
 	createApiKeyCredentialCache,
-} from "@reloop/auth/apikey/credential-cache";
-import {
-	hashApiKey,
-	isPlausibleApiKeyShape,
-} from "@reloop/auth/apikey/helpers";
-import { db as defaultDb } from "@reloop/db/client";
-import { apikey } from "@reloop/db/schema";
-import { and, eq, sql } from "drizzle-orm";
+} from "./credential-cache";
+import { hashApiKey, isPlausibleApiKeyShape } from "./helpers";
 
 /** Store used by validate (get/set; delete optional for this path). */
 export type ApiKeyCache = {

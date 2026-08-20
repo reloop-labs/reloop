@@ -47,7 +47,7 @@ export function WorkflowsPage() {
 				icon: "file-text",
 				shortcut: { label: "D", keys: ["d"] },
 				onSelect: () =>
-					window.open("https://reloop.sh/docs/learn/automations", "_blank"),
+					window.open("https://reloop.sh/docs/learn/workflows", "_blank"),
 			},
 		],
 		[activeOrganization?.slug],
@@ -68,7 +68,7 @@ export function WorkflowsPage() {
 		"d",
 		(e) => {
 			e.preventDefault();
-			window.open("https://reloop.sh/docs/learn/automations", "_blank");
+			window.open("https://reloop.sh/docs/learn/workflows", "_blank");
 		},
 		{ enableOnFormTags: false, preventDefault: true },
 	);
@@ -86,7 +86,7 @@ export function WorkflowsPage() {
 						className="gap-2"
 					>
 						<a
-							href="https://reloop.sh/docs/learn/automations"
+							href="https://reloop.sh/docs/learn/workflows"
 							target="_blank"
 							rel="noopener noreferrer"
 						>

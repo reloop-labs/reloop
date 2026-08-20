@@ -1,0 +1,20 @@
+---
+slug: outbound-email-logs-inspector
+version: 0.5.0
+date: September 2025
+launchDate: 15 September 2025
+title: 'Outbound Email Logs & Transmission Inspector'
+description: >-
+  Added the Emails dashboard to inspect every sent message, delivery timestamp, recipient, and HTTP status.
+tags:
+  - Emails
+  - Feature
+---
+### FRONTEND
+
+- **Emails dashboard.** Dedicated page in the dashboard listing all outbound messages with status badges and timestamps.
+- **Log filters.** Filter outbound emails by sending domain, date range, recipient address, and delivery status.
+
+### BACKEND
+
+- **Transmission logger.** Recorded every SMTP relay outcome into packages/db/src/schema/email.ts with full status tracking.

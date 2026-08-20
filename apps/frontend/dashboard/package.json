@@ -32,6 +32,7 @@
 		"@number-flow/react": "catalog:ui",
 		"@radix-ui/react-checkbox": "catalog:ui",
 		"@react-email/editor": "catalog:ui",
+		"@reloop/analytics": "workspace:*",
 		"@reloop/auth": "workspace:*",
 		"@reloop/code-samples": "workspace:*",
 		"@reloop/pricing": "workspace:*",

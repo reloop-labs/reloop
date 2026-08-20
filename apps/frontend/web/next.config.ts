@@ -66,14 +66,6 @@ const nextConfig: NextConfig = {
 	},
 	async rewrites() {
 		return [
-			{
-				source: "/api/analytics/track",
-				destination: "https://rybbit.reloop.sh/api/track",
-			},
-			{
-				source: "/api/analytics/site/:path*",
-				destination: "https://rybbit.reloop.sh/api/site/:path*",
-			},
 			// Markdown twins (App Router skill.md / pricing.md win over afterFiles rewrite)
 			{
 				source: "/:path*.md",

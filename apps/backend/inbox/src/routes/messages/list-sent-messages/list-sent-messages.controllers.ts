@@ -1,6 +1,11 @@
 import { db } from "@reloop/db/client";
-import { emailLog, mailbox } from "@reloop/db/schema";
-import { and, eq, or, sql } from "drizzle-orm";
+import {
+	emailLog,
+	emailThread,
+	mailbox,
+	threadMessage,
+} from "@reloop/db/schema";
+import { and, eq, inArray, or, sql } from "drizzle-orm";
 
 function bareEmail(value: string): string {
 	const match = value.match(/<([^>]+)>/);
@@ -10,6 +15,7 @@ function bareEmail(value: string): string {
 export async function getSentMessagesController(
 	organizationId: string,
 	mailboxId?: string,
+	q?: string,
 ) {
 	const conditions = [eq(emailLog.organizationId, organizationId)];
 
@@ -37,6 +43,19 @@ export async function getSentMessagesController(
 		}
 	}
 
+	const term = q?.trim();
+	if (term) {
+		const like = `%${term}%`;
+		conditions.push(
+			or(
+				sql`cast(${emailLog.subject} as text) ilike ${like}`,
+				sql`cast(${emailLog.textBody} as text) ilike ${like}`,
+				sql`cast(${emailLog.fromEmail} as text) ilike ${like}`,
+				sql`cast(${emailLog.toEmails} as text) ilike ${like}`,
+			)!,
+		);
+	}
+
 	const whereClause = and(...conditions);
 
 	const sentEmails = await db.query.emailLog.findMany({
@@ -45,5 +64,37 @@ export async function getSentMessagesController(
 		limit: 50,
 	});
 
-	return sentEmails;
+	if (sentEmails.length === 0) return [];
+
+	const logIds = sentEmails.map((e) => e.id);
+	const links = await db.query.threadMessage.findMany({
+		where: inArray(threadMessage.emailLogId, logIds),
+		columns: { emailLogId: true, threadId: true },
+	});
+	const threadIdByLog = new Map(
+		links
+			.filter((l): l is typeof l & { emailLogId: string } => !!l.emailLogId)
+			.map((l) => [l.emailLogId, l.threadId]),
+	);
+	const threadIds = [...new Set(threadIdByLog.values())];
+	const threads =
+		threadIds.length > 0
+			? await db.query.emailThread.findMany({
+					where: and(
+						eq(emailThread.organizationId, organizationId),
+						inArray(emailThread.id, threadIds),
+					),
+					columns: { id: true, isStarred: true },
+				})
+			: [];
+	const starredByThread = new Map(threads.map((t) => [t.id, t.isStarred]));
+
+	return sentEmails.map((email) => {
+		const threadId = threadIdByLog.get(email.id);
+		return {
+			...email,
+			threadId: threadId ?? null,
+			isStarred: threadId ? Boolean(starredByThread.get(threadId)) : false,
+		};
+	});
 }

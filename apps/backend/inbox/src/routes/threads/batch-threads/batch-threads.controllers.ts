@@ -6,6 +6,7 @@ import { useLogger } from "evlog/elysia";
 
 export type BatchThreadAction =
 	| "archive"
+	| "unarchive"
 	| "trash"
 	| "restore"
 	| "star"
@@ -74,6 +75,23 @@ export async function batchThreadsController(
 	});
 
 	const foundIds = threads.map((t) => t.id);
+	const missingIds = ids.filter((id) => !foundIds.includes(id));
+
+	if (missingIds.length > 0) {
+		const msgs = await db.query.inboundEmail.findMany({
+			where: and(
+				eq(inboundEmail.organizationId, organizationId),
+				inArray(inboundEmail.id, missingIds),
+			),
+			columns: { threadId: true },
+		});
+		for (const m of msgs) {
+			if (m.threadId && !foundIds.includes(m.threadId)) {
+				foundIds.push(m.threadId);
+			}
+		}
+	}
+
 	if (foundIds.length === 0) {
 		throw createError({
 			status: 404,
@@ -100,6 +118,7 @@ export async function batchThreadsController(
 				.where(inArray(emailThread.id, foundIds));
 			break;
 		case "restore":
+		case "unarchive":
 			await db
 				.update(emailThread)
 				.set({ status: "active", deletedAt: null })

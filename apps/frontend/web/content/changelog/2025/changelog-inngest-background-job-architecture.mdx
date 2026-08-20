@@ -1,0 +1,20 @@
+---
+slug: inngest-background-job-architecture
+version: 0.13.0
+date: November 2025
+launchDate: 1 November 2025
+title: 'Inngest Background Job & Event Bus Architecture'
+description: >-
+  Integrated Inngest (packages/inngest) to handle delayed sends, batch processing, and async worker queues.
+tags:
+  - Infrastructure
+  - Backend
+---
+### PLANNING
+
+- **Background job orchestration.** Adopted Inngest for event-driven orchestration, retries, and step-function workflows across services.
+
+### BACKEND
+
+- **Inngest queues.** Integrated packages/inngest to power asynchronous background job processing, step functions, and delayed sends.
+- **Reliable retries.** Automatic dead-letter queues and step retry logic across background tasks.

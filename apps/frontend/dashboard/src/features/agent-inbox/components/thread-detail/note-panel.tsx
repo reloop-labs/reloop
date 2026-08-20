@@ -4,6 +4,7 @@ import { Icon } from "@reloop/ui/icon";
 import { Copy, MoreVertical, StickyNote } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
+import { apiFetch } from "#/features/agent-inbox/lib/api-fetch";
 import { useSWR } from "#/features/agent-inbox/lib/use-swr-compat";
 import type { ThreadNote } from "../../types";
 
@@ -85,7 +86,7 @@ export const NotesPanel = ({
 	const createNote = useCallback(async () => {
 		const content = newContent.trim();
 		if (!content) return;
-		const res = await fetch("/api/inbox/v1/notes", {
+		const res = await apiFetch("/api/inbox/v1/notes", {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify({
@@ -110,7 +111,7 @@ export const NotesPanel = ({
 			id: string,
 			data: Partial<{ content: string; color: string; isPinned: boolean }>,
 		) => {
-			const res = await fetch(`/api/inbox/v1/notes/${id}`, {
+			const res = await apiFetch(`/api/inbox/v1/notes/${id}`, {
 				method: "PATCH",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify(data),
@@ -126,7 +127,7 @@ export const NotesPanel = ({
 
 	const deleteNote = useCallback(
 		async (id: string) => {
-			const res = await fetch(`/api/inbox/v1/notes/${id}`, {
+			const res = await apiFetch(`/api/inbox/v1/notes/${id}`, {
 				method: "DELETE",
 			});
 			if (!res.ok) {

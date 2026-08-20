@@ -9,7 +9,7 @@ type MessageActionId = "reply" | "replyAll" | "forward" | "print" | "delete";
 type MenuItem = {
 	id: MessageActionId;
 	label: string;
-	icon: "reply" | "forward" | "printer" | "trash";
+	icon: "reply" | "reply-all" | "forward" | "printer" | "trash";
 	isDanger?: boolean;
 };
 
@@ -37,7 +37,7 @@ export function MessageActionsDropdown({
 					{
 						id: "replyAll" as const,
 						label: "Reply all",
-						icon: "reply" as const,
+						icon: "reply-all" as const,
 					},
 				]
 			: []),

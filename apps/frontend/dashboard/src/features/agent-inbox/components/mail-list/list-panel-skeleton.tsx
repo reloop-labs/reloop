@@ -9,25 +9,37 @@ export function ListPanelSkeleton({ className }: { className?: string }) {
 	return (
 		<div
 			className={cn(
-				"flex h-full min-h-0 flex-1 flex-col bg-panel-light md:rounded-2xl dark:bg-panel-dark",
+				"flex h-full min-h-0 flex-1 flex-col bg-panel-light dark:bg-panel-dark",
 				className,
 			)}
 			aria-busy="true"
 		>
 			<span className="sr-only">Loading inbox list</span>
-			<div className="sticky top-0 z-15 shrink-0 space-y-3 p-4 pb-2">
-				<div className="flex items-center gap-2">
-					<Skeleton className={cn("h-8 w-8 shrink-0 rounded-lg", sk)} />
-					<Skeleton className={cn("h-5 w-24", sk)} />
+			<div className="sticky top-0 z-15 shrink-0">
+				<div className="flex h-11 items-center pr-6 pl-4">
+					<span className="ml-1 flex w-5 shrink-0 items-center justify-center">
+						<Skeleton className={cn("size-4 rounded", sk)} />
+					</span>
 					<div className="flex-1" />
-					<Skeleton className={cn("h-8 w-8 shrink-0 rounded-lg", sk)} />
+					<Skeleton className={cn("size-8 shrink-0 rounded-lg", sk)} />
 				</div>
-				<Skeleton className={cn("h-9 w-full rounded-xl", sk)} />
-				<div className="flex items-center gap-2">
-					<Skeleton className={cn("h-7 w-16 rounded-full", sk)} />
-					<Skeleton className={cn("h-7 w-14 rounded-full", sk)} />
-					<Skeleton className={cn("h-7 w-16 rounded-full", sk)} />
-					<Skeleton className={cn("h-7 w-12 rounded-full", sk)} />
+				<div className="grid grid-cols-4 border-mail-border/50 border-y">
+					{["a", "b", "c", "d"].map((id, index) => (
+						<div
+							key={id}
+							className="flex items-center gap-2.5 border-mail-border/50 border-l px-4 py-4 first:border-l-0 first:pl-4"
+						>
+							<span
+								className={cn(
+									"flex w-5 shrink-0 items-center justify-center",
+									index === 0 && "ml-1",
+								)}
+							>
+								<Skeleton className={cn("size-4 rounded", sk)} />
+							</span>
+							<Skeleton className={cn("h-4 w-16 rounded", sk)} />
+						</div>
+					))}
 				</div>
 			</div>
 			<MailListSkeleton />

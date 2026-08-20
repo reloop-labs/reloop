@@ -30,7 +30,7 @@ import express from 'express';
 import Reloop from 'reloop-email';
 
 const app = express();
-const reloop = new Reloop(process.env.RELOOP_API_KEY);
+const reloop = new Reloop({ apiKey: process.env.RELOOP_API_KEY });
 
 app.post('/send-email', async (req, res) => {
   try {

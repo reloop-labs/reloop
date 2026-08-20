@@ -12,7 +12,11 @@ export type CopyCodeBlockIcon = {
 	/** Optional viewBox when path data is not 0 0 24 24 (e.g. multi-color brand marks). */
 	viewBox?: string;
 	/** Multi-color layers; when set, each path uses its own fill instead of monochrome hex. */
-	layers?: ReadonlyArray<{ d: string; fill: string }>;
+	layers?: ReadonlyArray<{
+		d: string;
+		fill: string;
+		fillRule?: "nonzero" | "evenodd";
+	}>;
 };
 
 export function BrandLanguageIcon({
@@ -32,8 +36,14 @@ export function BrandLanguageIcon({
 				xmlns="http://www.w3.org/2000/svg"
 				aria-hidden
 			>
-				{icon.layers.map((layer) => (
-					<path key={layer.d.slice(0, 24)} d={layer.d} fill={layer.fill} />
+				{icon.layers.map((layer, index) => (
+					<path
+						key={`${layer.fill}-${index}`}
+						d={layer.d}
+						fill={layer.fill}
+						fillRule={layer.fillRule}
+						clipRule={layer.fillRule}
+					/>
 				))}
 			</svg>
 		);
@@ -101,6 +111,10 @@ export function CopyCodeBlock({
 		undefined,
 	);
 	const [mounted, setMounted] = useState(false);
+	const [activeTabPos, setActiveTabPos] = useState<{
+		width: number;
+		left: number;
+	} | null>(null);
 	const tabButtonRefs = useRef<(HTMLButtonElement | null)[]>([]);
 	const containerRef = useRef<HTMLDivElement>(null);
 	const isFirstScrollRef = useRef(true);
@@ -114,6 +128,34 @@ export function CopyCodeBlock({
 	const activeTabIndex = hasTabs
 		? tabs.findIndex((tab) => tab.id === activeTab)
 		: -1;
+
+	useEffect(() => {
+		if (!mounted) return;
+		const updateActivePos = () => {
+			const activeBtn = tabButtonRefs.current[activeTabIndex];
+			if (activeBtn) {
+				setActiveTabPos({
+					width: activeBtn.offsetWidth,
+					left: activeBtn.offsetLeft,
+				});
+			} else {
+				setActiveTabPos(null);
+			}
+		};
+
+		updateActivePos();
+		const container = containerRef.current;
+		let observer: ResizeObserver | null = null;
+		if (container) {
+			observer = new ResizeObserver(updateActivePos);
+			observer.observe(container);
+		}
+		window.addEventListener("resize", updateActivePos);
+		return () => {
+			observer?.disconnect();
+			window.removeEventListener("resize", updateActivePos);
+		};
+	}, [activeTabIndex, mounted]);
 
 	useEffect(() => {
 		if (!mounted) return;
@@ -173,7 +215,6 @@ export function CopyCodeBlock({
 	const highlightedTabIndex =
 		hoveredTabIdx !== undefined ? hoveredTabIdx : activeTabIndex;
 	const highlightedTab = tabButtonRefs.current[highlightedTabIndex];
-	const activeTabButton = tabButtonRefs.current[activeTabIndex];
 	const highlightedBrandColor =
 		highlightedTabIndex >= 0 && tabs
 			? `#${tabs[highlightedTabIndex]?.si.hex}`
@@ -209,7 +250,6 @@ export function CopyCodeBlock({
 	const highlightedTabPosition = mounted
 		? getTabPosition(highlightedTab)
 		: null;
-	const activeTabPosition = mounted ? getTabPosition(activeTabButton) : null;
 	const highlightedPillPosition = getPillPosition(highlightedTabPosition);
 
 	const copyButton = (
@@ -327,17 +367,18 @@ export function CopyCodeBlock({
 								/>
 							) : null}
 						</AnimatePresence>
-						{activeTabPosition && activeTabIndex !== -1 ? (
+						{activeTabPos && activeTabIndex !== -1 ? (
 							<motion.div
 								className="pointer-events-none absolute bottom-0 left-0 h-[2px] rounded-full"
 								style={{ backgroundColor: activeTabBrandColor }}
 								initial={false}
 								animate={{
-									width: activeTabPosition.width,
-									left: activeTabPosition.left,
+									width: activeTabPos.width,
+									left: activeTabPos.left,
+									backgroundColor: activeTabBrandColor,
 									opacity: 1,
 								}}
-								transition={{ duration: 0.14 }}
+								transition={{ duration: 0.15, ease: "easeOut" }}
 							/>
 						) : null}
 					</div>
@@ -345,42 +386,44 @@ export function CopyCodeBlock({
 				</div>
 			) : (
 				<div className="flex items-center gap-3 px-4 py-2.5">
+					{/*
+					 * Header layout (global):
+					 * - Left: language logo (from `si` / `icon`)
+					 * - When `title` is a file path: path sits after the logo (replaces language name)
+					 * - When no path: language label (e.g. "bash") after the logo
+					 * - Far right: copy
+					 */}
 					<div className="flex min-w-0 flex-1 items-center gap-2.5">
+						{icon ??
+							(si ? (
+								<BrandLanguageIcon icon={si} className="size-3.5 shrink-0" />
+							) : null)}
 						{title ? (
-							<div className="flex shrink-0 items-center gap-1.5">
-								{icon}
-								{titleHref ? (
-									<a
-										href={titleHref}
-										target="_blank"
-										rel="noopener noreferrer"
-										className="flex items-center gap-1 font-semibold text-[13px] text-text-strong-950 hover:underline dark:text-white"
-									>
-										{title}
-										<Icon
-											name="arrow-up-right"
-											className="h-3 w-3 text-text-sub-400"
-										/>
-									</a>
-								) : (
-									<span className="font-semibold text-[13px] text-text-strong-950 dark:text-white">
-										{title}
-									</span>
-								)}
-							</div>
-						) : (
-							<>
-								{icon ||
-									(si && (
-										<BrandLanguageIcon
-											icon={si}
-											className="size-3.5 shrink-0"
-										/>
-									))}
-								<span className="font-mono text-[11px] text-text-sub-500 dark:text-white/55">
-									{displayLabel}
+							titleHref ? (
+								<a
+									href={titleHref}
+									target="_blank"
+									rel="noopener noreferrer"
+									className="flex min-w-0 items-center gap-1 font-mono text-[12px] text-text-sub-600 hover:text-text-strong-950 hover:underline dark:text-white/70 dark:hover:text-white"
+								>
+									<span className="truncate">{title}</span>
+									<Icon
+										name="arrow-up-right"
+										className="h-3 w-3 shrink-0 text-text-sub-400"
+									/>
+								</a>
+							) : (
+								<span
+									className="min-w-0 truncate font-mono text-[12px] text-text-sub-600 dark:text-white/70"
+									title={title}
+								>
+									{title}
 								</span>
-							</>
+							)
+						) : (
+							<span className="font-mono text-[11px] text-text-sub-500 dark:text-white/55">
+								{displayLabel}
+							</span>
 						)}
 					</div>
 					{copyButton}

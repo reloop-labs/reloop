@@ -8,6 +8,20 @@ export const DNS_SETUP_HUB_URL = DNS_DOCS_BASE;
 /** Product overview for domains (not provider-specific). */
 export const DOMAIN_LEARN_DOCS_URL = "https://reloop.sh/docs/learn/domain";
 
+/** Explains SPF / DKIM / DMARC / MX / tracking CNAME. */
+export const DNS_RECORDS_EXPLAINED_URL =
+	"https://reloop.sh/docs/guides/connect-domain/dns-records-explained";
+
+/** Per-record deep links used by DNS section titles in the dashboard. */
+export const DNS_RECORD_DOCS = {
+	hub: DNS_RECORDS_EXPLAINED_URL,
+	dkim: `${DNS_RECORDS_EXPLAINED_URL}#dkim-domainkeys-identified-mail`,
+	spf: `${DNS_RECORDS_EXPLAINED_URL}#spf-sender-policy-framework`,
+	dmarc: `${DNS_RECORDS_EXPLAINED_URL}#dmarc`,
+	mx: `${DNS_RECORDS_EXPLAINED_URL}#mx-mail-exchange`,
+	cname: `${DNS_RECORDS_EXPLAINED_URL}#tracking-cname`,
+} as const;
+
 export type InferredDnsProvider = {
 	label: string;
 	iconKey: string | null;

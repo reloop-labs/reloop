@@ -1,0 +1,10 @@
+.email-builder-canvas .tiptap.ProseMirror,
+.email-builder-canvas .ProseMirror {
+	outline: none;
+	min-height: 8rem;
+}
+
+.email-builder-canvas .tiptap p.is-editor-empty:first-child::before,
+.email-builder-canvas .ProseMirror p.is-editor-empty:first-child::before {
+	content: none;
+}

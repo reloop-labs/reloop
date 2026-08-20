@@ -2,41 +2,37 @@ import * as Button from "@reloop/ui/button";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import Spinner from "@reloop/ui/spinner";
-import { useRouter } from "next/navigation";
-
-import { useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
-import { toast } from "sonner";
-import {
-	createTemplate,
-	useInvalidateTemplates,
-} from "#/features/templates/hooks/use-templates-query";
+import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import { useCreateTemplate } from "#/features/templates/hooks/use-templates-query";
 
 const DOCS_URL = "https://reloop.sh/docs/learn/templates";
 
+const actionKbdOnSolidClassName =
+	"border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]";
+
 export function TemplatesListHeader() {
-	const router = useRouter();
-	const invalidate = useInvalidateTemplates();
-	const [isCreating, setIsCreating] = useState(false);
+	const { isCreating, create } = useCreateTemplate();
 
-	const handleCreateTemplate = async () => {
-		if (isCreating) return;
-		setIsCreating(true);
-		try {
-			const template = await createTemplate();
-			await invalidate();
-			router.push(`/templates/${template.id}`);
-		} catch {
-			toast.error("Failed to create template");
-		} finally {
-			setIsCreating(false);
-		}
-	};
+	const openDocs = () => window.open(DOCS_URL, "_blank");
 
-	useHotkeys("mod+a", (e) => {
-		e.preventDefault();
-		void handleCreateTemplate();
-	});
+	useHotkeys(
+		"d",
+		(e) => {
+			e.preventDefault();
+			openDocs();
+		},
+		{ enableOnFormTags: false, preventDefault: true },
+	);
+
+	useHotkeys(
+		"c",
+		(e) => {
+			e.preventDefault();
+			void create();
+		},
+		{ enableOnFormTags: false, preventDefault: true },
+	);
 
 	return (
 		<div className="flex flex-col gap-4 pt-2 pb-4 sm:flex-row sm:items-start sm:justify-between">
@@ -61,18 +57,21 @@ export function TemplatesListHeader() {
 					variant="neutral"
 					mode="stroke"
 					size="small"
-					onClick={() => window.open(DOCS_URL, "_blank")}
-					className="rounded-xl"
+					onClick={openDocs}
+					className="gap-1.5 rounded-xl"
+					aria-keyshortcuts="d"
 				>
 					Documentation
+					<ActionKbd>D</ActionKbd>
 				</Button.Root>
 				<FancyButton.Root
 					type="button"
 					variant="blue"
 					size="small"
-					onClick={() => void handleCreateTemplate()}
+					onClick={() => void create()}
 					disabled={isCreating}
 					className="min-w-[148px] gap-1.5 rounded-xl"
+					aria-keyshortcuts="c"
 				>
 					{isCreating ? (
 						<>
@@ -83,6 +82,7 @@ export function TemplatesListHeader() {
 						<>
 							<Icon name="plus" className="h-4 w-4" />
 							Create template
+							<ActionKbd className={actionKbdOnSolidClassName}>C</ActionKbd>
 						</>
 					)}
 				</FancyButton.Root>

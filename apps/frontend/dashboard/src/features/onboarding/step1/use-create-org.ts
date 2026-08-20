@@ -1,4 +1,9 @@
 import { authClient } from "@reloop/auth/client";
+import {
+	ORGANIZATION_NAME_MAX_LENGTH,
+	organizationNameMaxLengthMessage,
+	organizationNameTooLong,
+} from "@reloop/auth/organization-limits";
 import { useQueryClient } from "@tanstack/react-query";
 import { parseAsString, useQueryState } from "nuqs";
 import { useCallback, useRef, useState } from "react";
@@ -47,9 +52,18 @@ export function useCreateOrg() {
 		inFlightRef.current = true;
 		setIsCreating(true);
 		try {
+			if (!name.trim() || organizationNameTooLong(name)) {
+				toast.error(
+					!name.trim()
+						? "Organization name is required"
+						: organizationNameMaxLengthMessage(ORGANIZATION_NAME_MAX_LENGTH),
+				);
+				return;
+			}
+
 			const { error, data: organization } =
 				await authClient.organization.create({
-					name,
+					name: name.trim(),
 					keepCurrentActiveOrganization: true,
 					slug: randomOrgSlug(),
 					logo: logoUrl || undefined,

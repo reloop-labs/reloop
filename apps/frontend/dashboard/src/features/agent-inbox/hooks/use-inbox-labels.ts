@@ -1,4 +1,5 @@
 import { useCallback, useMemo } from "react";
+import { apiFetch } from "#/features/agent-inbox/lib/api-fetch";
 import { useSWR } from "#/features/agent-inbox/lib/use-swr-compat";
 import type { InboxLabel } from "../types";
 
@@ -32,7 +33,7 @@ export const useInboxLabels = (mailboxId: string) => {
 		async (name: string, color = "default") => {
 			const trimmed = name.trim();
 			if (!trimmed || !mailboxId) return null;
-			const res = await fetch("/api/inbox/v1/labels", {
+			const res = await apiFetch("/api/inbox/v1/labels", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({ mailboxId, name: trimmed, color }),
@@ -47,7 +48,7 @@ export const useInboxLabels = (mailboxId: string) => {
 
 	const deleteLabel = useCallback(
 		async (labelId: string) => {
-			const res = await fetch(`/api/inbox/v1/labels/${labelId}`, {
+			const res = await apiFetch(`/api/inbox/v1/labels/${labelId}`, {
 				method: "DELETE",
 			});
 			if (!res.ok) throw new Error("Failed to delete label");
@@ -58,7 +59,7 @@ export const useInboxLabels = (mailboxId: string) => {
 
 	const assignThreadToLabel = useCallback(
 		async (threadId: string, labelId: string) => {
-			const res = await fetch(
+			const res = await apiFetch(
 				`/api/inbox/v1/labels/threads/${threadId}/assign`,
 				{
 					method: "POST",
@@ -73,7 +74,7 @@ export const useInboxLabels = (mailboxId: string) => {
 
 	const unassignThreadFromLabel = useCallback(
 		async (threadId: string, labelId: string) => {
-			const res = await fetch(
+			const res = await apiFetch(
 				`/api/inbox/v1/labels/threads/${threadId}/unassign`,
 				{
 					method: "POST",
@@ -87,7 +88,7 @@ export const useInboxLabels = (mailboxId: string) => {
 	);
 
 	const getThreadLabels = useCallback(async (threadId: string) => {
-		const res = await fetch(`/api/inbox/v1/labels/threads/${threadId}`);
+		const res = await apiFetch(`/api/inbox/v1/labels/threads/${threadId}`);
 		if (!res.ok) return [] as InboxLabel[];
 		const list = (await res.json()) as ApiLabel[];
 		return list.map((l) => ({
@@ -99,7 +100,7 @@ export const useInboxLabels = (mailboxId: string) => {
 	}, []);
 
 	const fetchThreadIdsForLabel = useCallback(async (labelId: string) => {
-		const res = await fetch(`/api/inbox/v1/labels/${labelId}/threads`);
+		const res = await apiFetch(`/api/inbox/v1/labels/${labelId}/threads`);
 		if (!res.ok) return [] as string[];
 		const body = (await res.json()) as { threadIds: string[] };
 		return body.threadIds || [];

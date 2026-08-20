@@ -1,6 +1,6 @@
 ---
 title: "SPF, DKIM, and DMARC: The Complete Setup Guide (2026)"
-description: A thorough, practical guide to configuring SPF, DKIM, and DMARC for your sending domain — with exact DNS records, common mistakes, and a step-by-step verification checklist.
+description: A thorough, practical guide to configuring SPF, DKIM, and DMARC for your sending domain  with exact DNS records, common mistakes, and a step-by-step verification checklist.
 keywords:
   - SPF DKIM DMARC setup
   - email authentication guide
@@ -8,6 +8,8 @@ keywords:
   - configure email authentication
   - SPF record setup
   - DKIM configuration
+  - email deliverability setup
+  - transactional email authentication
 publishedAt: 2026-06-15
 category: Deliverability
 tags: [spf, dkim, dmarc, dns, deliverability, authentication]
@@ -17,22 +19,28 @@ author:
   role: Co-founder
   avatar: /company/team/pranav-patel.jpg
 draft: false
+image: /blog/images/spf-dkim-dmarc-setup-guide.png
 relatedSlugs:
   - why-emails-land-in-spam-fix
   - ip-warming-guide
+  - email-bounce-processing-automation
+  - transactional-email-best-practices
+  - bimi-email-setup-guide
 ---
 
-## Why email authentication exists
+**Email authentication is no longer optionalwithout SPF, DKIM, and DMARC properly configured, your transactional emails will consistently land in spam or be dropped by inbox providers.**
 
-When email was designed in the 1970s, there was no mechanism to verify that a sender was who they claimed to be. Anyone could put any address in the `From:` field. SPF, DKIM, and DMARC were created over the following decades to fix this — and in 2024, Google and Yahoo made all three mandatory for bulk senders. If you're sending transactional email today without proper authentication, you're fighting deliverability with both hands tied behind your back.
+When email protocols were originally designed in the 1970s, there was zero built-in identity verification. Anyone could inject arbitrary sender addresses into the `From:` header. Over subsequent decades, **SPF (Sender Policy Framework)**, **DKIM (DomainKeys Identified Mail)**, and **DMARC (Domain-based Message Authentication, Reporting & Conformance)** were introduced to close this vulnerability.
 
-This guide walks you through configuring all three records correctly, in the right order, and verifying they work before a single production email is sent.
+In 2024, **Google, Yahoo, and Microsoft made all three protocols strictly mandatory** for senders. If you are sending [transactional emails](/features/transaction-emails) today without valid authentication records, you are battling deliverability with both hands tied behind your back (see our deep dive on [why emails land in spam and how to fix it](/blog/why-emails-land-in-spam-fix)).
 
----
+This guide walks you through configuring all three authentication layers correctly, in the exact sequence required, and verifying them with real-world tools before sending your first production message.
 
 ## Step 1: SPF (Sender Policy Framework)
 
-SPF is a DNS TXT record that declares which mail servers are authorized to send email for your domain. When a receiving server gets an email claiming to be from `you@yourdomain.com`, it looks up the SPF record for `yourdomain.com` and checks whether the sending IP is on the authorized list. If it's not, the email fails SPF — and depending on your DMARC policy, may be rejected or marked as spam.
+**SPF is a DNS TXT record that explicitly declares which mail transfer agents and IP addresses are authorized to send email on behalf of your domain.**
+
+When a mailbox provider (like Gmail or Outlook) receives a message claiming to come from `you@yourdomain.com`, it queries the SPF TXT record for `yourdomain.com` and checks whether the originating IP address is authorized. If the sender IP is not on that list, the message fails SPF evaluationand depending on your DMARC policy, it will be marked as spam or rejected outright.
 
 ### What an SPF record looks like
 
@@ -40,89 +48,95 @@ SPF is a DNS TXT record that declares which mail servers are authorized to send 
 v=spf1 include:_spf.reloop.sh ~all
 ```
 
-Breaking this down:
+Breaking down the core components:
 
-- `v=spf1` — declares this is an SPF record
-- `include:_spf.reloop.sh` — authorizes all IPs in Reloop's published SPF range
-- `~all` — soft fail for everything else (use `-all` to hard fail once confident)
+- `v=spf1`  **declares this record as an SPF version 1 specification** (must appear at the very beginning).
+- `include:_spf.reloop.sh`  **authorizes all IP addresses published in Reloop's sending pool** to dispatch emails for your domain.
+- `~all`  **specifies a SoftFail policy for unauthorized IPs**. This signals to receiving servers that unlisted IPs should be treated with suspicion, while allowing legitimate messages through during testing. Once your records are fully validated, you can graduate to `-all` (HardFail).
 
 ### How to add your SPF record
 
-1. Go to your DNS provider (Cloudflare, Route 53, Namecheap, etc.)
-2. Create a new **TXT record** on your root domain (`@` or `yourdomain.com`)
-3. Set the value to `v=spf1 include:_spf.reloop.sh ~all`
-4. TTL: 300 seconds (low during setup; increase to 3600+ after confirming it works)
+1. Log in to your DNS management console ([Cloudflare](https://dash.cloudflare.com), [AWS Route 53](https://aws.amazon.com/route53/), Namecheap, GoDaddy, etc.).
+2. Create a new **TXT record** on your sending domain (`@` or `yourdomain.com`).
+3. Set the record value to: `v=spf1 include:_spf.reloop.sh ~all`
+4. Set the **TTL (Time to Live)** to **300 seconds** (a low TTL ensures quick propagation while debugging; increase to 3600+ after confirming delivery).
 
-### The most common SPF mistake
+### The most common SPF mistake: Multiple TXT records
 
-**Never create two SPF records for the same domain.** DNS only permits one SPF TXT record per hostname. If you have multiple sending services (Reloop + G Suite, for example), combine them into a single record:
+**Never create two SPF records for the same domain.** DNS RFC specifications strictly permit only **one SPF TXT record per hostname**. If you maintain multiple sending services (such as [Reloop](https://github.com/reloop-labs/reloop) for [transactional emails](/features/transaction-emails) alongside Google Workspace for corporate email), you must combine them into a single consolidated string:
 
 ```
 v=spf1 include:_spf.reloop.sh include:_spf.google.com ~all
 ```
 
+> **The 10-DNS-Lookup Limit**: SPF specifications enforce a strict limit of **10 DNS lookups** during recursive evaluation. Each `include:`, `a`, `mx`, `ptr`, and `exists` mechanism counts toward this quota. Exceeding 10 lookups triggers an immediate `PermError` validation failure. If you use numerous external providers, use an SPF flattening utility or consolidate providers.
+
 ### Verifying your SPF record
 
+You can verify your DNS publication immediately using standard CLI utilities:
+
 ```bash
-dig TXT yourdomain.com | grep spf
+dig TXT yourdomain.com +short | grep spf
 ```
 
-Or use [MXToolbox SPF Lookup](https://mxtoolbox.com/spf.aspx). You should see a single record returned with your `include:` directives.
-
-> **SPF lookup limit**: SPF allows a maximum of 10 DNS lookups during evaluation. Each `include:` counts as one. If you have many services, consolidate using an SPF flattening tool.
-
----
+Alternatively, use the [MXToolbox SPF Lookup](https://mxtoolbox.com/spf.aspx) web tool. You should see a single TXT entry returned with your authorized `include:` directives.
 
 ## Step 2: DKIM (DomainKeys Identified Mail)
 
-DKIM adds a cryptographic signature to every outgoing email. The sending server signs the message with a private key. The receiving server looks up the corresponding public key in DNS and verifies the signature. If the signature is valid, the email hasn't been tampered with in transit and genuinely originated from an authorized sender.
+**DKIM adds an asymmetric cryptographic signature to every outgoing email header, guaranteeing that the message was not forged or tampered with in transit.**
+
+When [Reloop's delivery engine](/features/deliverability) transmits an email, it calculates a hash of the headers and body, signs that hash with your private key, and embeds a `DKIM-Signature` header. The receiving mail server queries the corresponding public key published in your DNS, decrypts the signature, and verifies the hash matches. If the cryptographic signature matches, the recipient is assured that the email genuinely originated from your server and arrived intact.
 
 ### How Reloop handles DKIM
 
-Reloop uses selector-based DKIM. When you add a sending domain in the Reloop dashboard, it generates a public/private key pair and shows you the DNS records to add. These are typically CNAME records pointing to Reloop-managed keys, which means Reloop handles key rotation automatically — you set it once and never touch it again.
+When you register a sending domain in the [Reloop dashboard](https://reloop.sh/dashboard/signup), Reloop automatically provisions a dedicated **2048-bit RSA cryptographic key pair** unique to your domain:
 
-### What Reloop's DKIM records look like
+1. **Private Key**: Kept strictly confidential in Reloop's database and used by [Reloop's KumoMTA sending engine](/features/deliverability) to sign outgoing emails at send-time.
+2. **Public Key**: Formatted as a standard DKIM DNS TXT record that you publish to your DNS provider under the `reloop._domainkey` selector.
 
-You'll be given two CNAME records:
+### What Reloop's DKIM record looks like
 
-```
-reloop1._domainkey.yourdomain.com → reloop1._domainkey.reloop.sh
-reloop2._domainkey.yourdomain.com → reloop2._domainkey.reloop.sh
-```
+You will receive a DNS TXT record structured as follows:
 
-Add both exactly as shown. The selector (`reloop1`, `reloop2`) is what the email header references so receivers know which DNS record to look up.
+| Record Type | Host / Name | Value / Content |
+| :--- | :--- | :--- |
+| **TXT** | `reloop._domainkey` | `v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA...` |
 
-### Verifying your DKIM records
+**Add the record exactly as shown in your Reloop dashboard.** The selector `reloop` tells receiving mail servers which public key record to look up when verifying signatures from your domain.
+
+### Verifying your DKIM record
+
+To confirm that your DKIM TXT record resolves properly in DNS:
 
 ```bash
-dig TXT reloop1._domainkey.yourdomain.com
+dig TXT reloop._domainkey.yourdomain.com +short
 ```
 
-You should see the CNAME resolution chain return a TXT record containing `v=DKIM1; k=rsa; p=...`.
+You should see the published TXT record returned containing `v=DKIM1; k=rsa; p=...`.
 
-Alternatively, send a test email to [mail-tester.com](https://mail-tester.com) — it shows you DKIM pass/fail with the exact header it evaluated.
+You can also send a test email to [mail-tester.com](https://mail-tester.com) or [check your raw message headers](/blog/why-emails-land-in-spam-fix) to inspect the evaluated `DKIM: PASS (selector=reloop)` status.
 
 ### Why DKIM sometimes fails after setup
 
-- **DNS propagation**: New records can take 15 minutes to 48 hours to propagate. Test after waiting at least 15 minutes.
-- **Trailing spaces or quote marks**: Some DNS providers wrap TXT records in quotes. The record itself should not have wrapping quotes in the value field.
-- **Wrong hostname**: Adding the record to `_domainkey.yourdomain.com` instead of `reloop1._domainkey.yourdomain.com` is a common mistake.
-
----
+- **DNS propagation delay**: DNS record updates can take anywhere from 15 minutes to 24 hours to propagate globally across resolver caches.
+- **Accidental quote wrapping or truncation**: Some DNS providers (like Namecheap or GoDaddy) limit TXT record lengths or wrap strings in double quotes. Ensure the entire `p=` public key string is pasted without truncation or extra quotes.
+- **Hostname duplication**: A frequent mistake is entering the full domain twice (e.g. `reloop._domainkey.yourdomain.com.yourdomain.com`). If your DNS provider automatically appends your domain, enter only `reloop._domainkey`.
 
 ## Step 3: DMARC (Domain-based Message Authentication, Reporting & Conformance)
 
-DMARC is the policy layer that sits on top of SPF and DKIM. It tells receiving servers what to do when an email fails authentication: nothing (`none`), quarantine it, or reject it. It also instructs receiving servers to send you reports of authentication failures — which is invaluable for detecting spoofing and misconfiguration.
+**DMARC is the overarching policy and reporting framework that instructs receiving mail servers on how to handle messages that fail SPF or DKIM validation.**
 
-### The three DMARC policies
+Without DMARC, receiving servers must guess whether an unauthenticated email is malicious spoofing or simply a misconfigured server. DMARC gives you explicit control over enforcement, while instructing receiving servers to send XML telemetry reports regarding all messages delivered under your domain identity.
 
-| Policy | Effect |
-|--------|--------|
-| `p=none` | Monitor only. No impact on delivery. Reports are sent. |
-| `p=quarantine` | Failed emails go to spam folder. |
-| `p=reject` | Failed emails are rejected outright. |
+### The three DMARC policy modes
 
-**Always start with `p=none`.** Never jump straight to `p=reject`. You need time to confirm that your own legitimate mail is passing authentication before you start rejecting anything.
+| Policy | Level | Effect on Delivery | Purpose |
+| :--- | :--- | :--- | :--- |
+| `p=none` | **Monitoring** | **Zero impact on delivery**. Failing emails are still delivered to the inbox. Daily aggregate reports are generated. | **Always start here** to audit legitimate email traffic before enforcing rules. |
+| `p=quarantine` | **Protection** | Emails that fail authentication are routed directly to the **Spam / Junk folder**. | Protects recipients from phishing while catching edge-case false positives. |
+| `p=reject` | **Enforcement** | Emails failing authentication are **blocked and dropped outright at the SMTP handshake**. | The gold standard for complete brand protection and prerequisite for [BIMI logo verification](/blog/bimi-email-setup-guide). |
+
+**Always begin your DMARC rollout at `p=none`. Never jump straight to `p=reject` on day one.** You need a minimum observation period (typically 2 to 4 weeks) to confirm that all legitimate outbound mail streams (transactional alerts, invoices, support platforms) are passing alignment.
 
 ### Your starter DMARC record
 
@@ -130,81 +144,103 @@ DMARC is the policy layer that sits on top of SPF and DKIM. It tells receiving s
 v=DMARC1; p=none; rua=mailto:dmarc@yourdomain.com; ruf=mailto:dmarc@yourdomain.com; fo=1
 ```
 
-Breaking this down:
+Deconstructing the DMARC parameters:
 
-- `v=DMARC1` — declares this as a DMARC record
-- `p=none` — monitor-only policy (start here)
-- `rua=mailto:...` — where to send aggregate reports (daily summaries)
-- `ruf=mailto:...` — where to send forensic reports (individual failure details)
-- `fo=1` — generate forensic reports for any authentication failure
+- `v=DMARC1`  **identifies this record as DMARC protocol version 1** (must be the first tag).
+- `p=none`  **sets the monitoring policy** so no valid messages are blocked during initial testing.
+- `rua=mailto:dmarc@yourdomain.com`  **the destination email address for daily aggregate XML reports** (summary metrics across all receivers).
+- `ruf=mailto:dmarc@yourdomain.com`  **the destination email address for real-time forensic failure reports** (sample headers of failed messages).
+- `fo=1`  **generates forensic failure notifications** if either SPF or DKIM fails alignment.
 
 ### How to add your DMARC record
 
-Create a **TXT record** at `_dmarc.yourdomain.com` (not the root) with the value above.
+1. In your DNS dashboard, create a new **TXT record**.
+2. In the **Host / Name** field, enter: `_dmarc` (or `_dmarc.yourdomain.com` depending on your provider).
+3. In the **Value / Content** field, paste the DMARC record string above.
+4. Save the record with a **300 second TTL**.
 
 ```bash
-# Verify it's in place:
-dig TXT _dmarc.yourdomain.com
+# Verify DMARC in DNS
+dig TXT _dmarc.yourdomain.com +short
 ```
 
-### Reading DMARC reports
+### Understanding DMARC Identifier Alignment
 
-DMARC aggregate reports arrive as XML attachments. They're unreadable raw. Use a free tool like [DMARC Analyzer](https://www.dmarcanalyzer.com) or [Postmark's DMARC tool](https://dmarc.postmarkapp.com) to parse and visualize them. What you're looking for:
+**DMARC evaluation requires identifier alignment between the header `From:` domain and the authenticated domains.**
 
-- **High SPF/DKIM pass rate on your own mail** — should be near 100%
-- **Unexpected sources sending as your domain** — these are either misconfigurations or spoofing attempts
+An email passes DMARC if **either** of the following conditions is met:
 
-### Graduating your DMARC policy
+1. **SPF Alignment**: The domain validated in the envelope sender (`Return-Path` / `Mail From`) matches the domain in the user-visible `From:` header.
+2. **DKIM Alignment**: The domain specified in the `d=` tag of a valid `DKIM-Signature` header matches the domain in the user-visible `From:` header.
 
-Once you've confirmed (via reports) that all your legitimate mail passes authentication:
+Because third-party email forwarders and mailing lists often break SPF by altering sending IPs, **DKIM alignment is crucial for reliable DMARC compliance**.
 
-1. Move from `p=none` to `p=quarantine`:
+### Analyzing DMARC reports
+
+Aggregate DMARC reports arrive as compressed XML files. Rather than reading raw XML, connect your reporting mailbox to free analysis tools such as [DMARC Analyzer](https://www.dmarcanalyzer.com), [Postmark DMARC Monitor](https://dmarc.postmarkapp.com), or [Valimail](https://www.valimail.com).
+
+**Key metrics to monitor in your reports:**
+
+- **Authentication Pass Rate**: Your legitimate sending services should maintain a **99%+ pass rate**.
+- **Unrecognized Sending Sources**: Identify rogue marketing tools, unconfigured staging environments, or spoofing attempts sending under your brand.
+
+### Graduating your DMARC policy to full enforcement
+
+Once your reports confirm that 100% of your legitimate outbound mail passes SPF and DKIM:
+
+1. **Step 1  Gradual Quarantine**:
    ```
    v=DMARC1; p=quarantine; pct=10; rua=mailto:dmarc@yourdomain.com
    ```
-   The `pct=10` applies the quarantine policy to only 10% of failing mail — a safe way to test the change.
+   The `pct=10` parameter applies quarantine enforcement to only 10% of failing messages.
 
-2. After 2–4 weeks with no legitimate mail affected, increase to `pct=100`.
+2. **Step 2  Full Quarantine**:
+   After 2 weeks with zero legitimate delivery issues, remove `pct=10` (or set `pct=100`):
+   ```
+   v=DMARC1; p=quarantine; rua=mailto:dmarc@yourdomain.com
+   ```
 
-3. Finally, move to `p=reject`:
+3. **Step 3  Strict Reject Enforcement**:
+   Upgrade your policy to `p=reject` to completely neutralize email spoofing:
    ```
    v=DMARC1; p=reject; rua=mailto:dmarc@yourdomain.com
    ```
 
-This graduated rollout is the industry standard. Rushing to `p=reject` on day one risks losing legitimate email.
+At `p=reject`, you are also eligible to configure [BIMI (Brand Indicators for Message Identification)](/blog/bimi-email-setup-guide) to display your official brand logo in user inboxes.
 
----
+## The complete verification checklist
 
-## The verification checklist
+Run through this pre-flight checklist before routing production traffic:
 
-Run through this before going to production:
-
-- [ ] **Single SPF record** — `dig TXT yourdomain.com` returns exactly one SPF record
-- [ ] **SPF includes Reloop** — the record includes `include:_spf.reloop.sh`
-- [ ] **Both DKIM CNAME records resolve** — test each selector with `dig TXT selector._domainkey.yourdomain.com`
-- [ ] **DMARC record at `_dmarc.yourdomain.com`** — starts with `p=none`
-- [ ] **Test email passes all three** — send to [mail-tester.com](https://mail-tester.com) and confirm SPF: pass, DKIM: pass, DMARC: pass
-- [ ] **DMARC reports are arriving** — check the `rua` mailbox after 24 hours
-
----
+- [ ] **Single SPF record**: `dig TXT yourdomain.com` returns exactly one consolidated SPF TXT record without duplicate tags.
+- [ ] **SPF lookup limit under 10**: The record contains fewer than 10 total DNS lookups.
+- [ ] **Reloop SPF included**: The SPF string contains `include:_spf.reloop.sh`.
+- [ ] **DKIM TXT record active**: `dig TXT reloop._domainkey.yourdomain.com` resolves with your valid public key.
+- [ ] **DMARC TXT record in place**: `_dmarc.yourdomain.com` is published with at least `p=none` and a working `rua` report destination.
+- [ ] **Mail-Tester test passed**: Send a message to [mail-tester.com](https://mail-tester.com) and confirm a score of **9+/10** with SPF, DKIM, and DMARC passing.
+- [ ] **Google Postmaster Tools configured**: Register your domain with [Google Postmaster Tools](https://postmaster.google.com) to track domain and IP reputation.
+- [ ] **Automated bounce tracking**: Verify that hard and soft bounces are captured via [signed webhooks](/features/webhooks) (see our guide on [email bounce processing automation](/blog/email-bounce-processing-automation)).
 
 ## What Reloop's dashboard does for you
 
-When you add a domain in Reloop, the dashboard:
+When you add a sending domain in the [Reloop dashboard](https://reloop.sh/dashboard/signup), the platform simplifies the entire authentication lifecycle:
 
-1. Generates your DKIM key pair and shows you the exact CNAME records to add
-2. Provides a pre-filled SPF include directive
-3. Runs live verification checks and shows you which records are missing or misconfigured
-4. Alerts you if your DMARC reports indicate authentication failures from your domain
+1. **Automated Key Generation**: Reloop automatically provisions dedicated RSA-2048 DKIM key pairs for your domain.
+2. **One-Click DNS Directives**: Copy ready-to-paste SPF, DKIM, and DMARC records tailored to your specific domain structure.
+3. **Live DNS Status Probing**: Reloop periodically queries your DNS records and provides real-time verification indicators in the dashboard.
+4. **Deliverability & Bounce Management**: Built-in [bounce classification](/blog/email-bounce-processing-automation), [real-time email analytics](/features/email-analytics), and suppression lists keep your sender reputation safe.
+5. **Developer APIs & Drop-in SDKs**: Send authenticated mail via [Node.js, Python, or Go SDKs](/sdk) or drop-in [SMTP relay](/features/smtp).
 
-You don't need to generate keys or write records manually — Reloop produces the exact strings to paste into your DNS provider.
+Whether you choose [Reloop Cloud pricing](/pricing) for managed deliverability or [self-host Reloop on your own infrastructure](/self-host) (for under $5/mo with our [self-host tutorial](/blog/self-host-email-5-dollars)), the authentication requirements remain identical.
 
----
+## Common gotchas & deliverability pitfalls
 
-## Common gotchas
+### 1. Subdomain vs. root domain sending
+If you send notifications from `notifications.yourdomain.com`, your SPF and DKIM records must be added directly to the `notifications` subdomain DNS zone. While DMARC policies on the root domain (`yourdomain.com`) automatically protect subdomains by default, SPF and DKIM do not inherit down.
 
-**Subdomain sending**: If you send from `notifications.yourdomain.com`, the SPF and DKIM records need to be set for that subdomain specifically, not the root domain. DMARC applies at the organisational domain level by default (`yourdomain.com`), so one DMARC record covers all subdomains — but SPF and DKIM must be per-subdomain.
+### 2. IP warming for high-volume senders
+Email authentication establishes your domain identity, but **it does not replace IP and domain reputation**. If you plan to send more than 10,000 emails per day, follow our structured [IP warming sequence guide](/blog/ip-warming-guide) to avoid triggering algorithmic spam filters at Gmail and Microsoft.
 
-**Multiple DKIM selectors**: If you use multiple email services (Reloop for transactional, Google Workspace for internal mail), each service gets its own selector. They don't conflict — just add all of them.
+### 3. Separating transactional and marketing streams
+**Never mix transactional receipts with marketing newsletters on the same sending domain or IP.** Protect your mission-critical password resets and auth tokens by isolating them on a dedicated transactional subdomain (see [transactional email best practices](/blog/transactional-email-best-practices)).
 
-**Testing in staging**: Never use your production domain for testing. Create a separate subdomain (`test.yourdomain.com`) with its own SPF/DKIM/DMARC records. This protects your production sender reputation during development.

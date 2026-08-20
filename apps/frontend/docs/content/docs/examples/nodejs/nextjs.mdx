@@ -1,48 +1,90 @@
 ---
 title: Send Email with Next.js
 sidebarTitle: Next.js
-description: Send transactional email from Next.js App Router or Pages Router with the Reloop Node.js SDK. Includes install, env setup, and send-mail code samples.
+description: Send transactional email from Next.js App Router with the Reloop Node.js SDK — Server Actions and Route Handlers, install, env setup, and full examples.
 icon: siNextdotjs
 ---
 
 ## Installation
 
-First, install the official Node.js SDK:
-
 ```bash
 npm install reloop-email
 ```
 
-## Setup Environment Variables
+## Setup environment variables
 
-Add your Reloop API key to your `.env.local` file:
+Add your Reloop API key to `.env.local` (server-only — do not use `NEXT_PUBLIC_`):
 
 ```env
-RELOOP_API_KEY=re_your_api_key_here
+RELOOP_API_KEY=rl_your_api_key_here
 ```
 
-## Sending an Email
-
-You can send emails from a Next.js Server Action or Route Handler. Here is an example of a Route Handler:
+## Shared client
 
 ```typescript
-import { NextResponse } from 'next/server';
-import Reloop from 'reloop-email';
+// lib/reloop.ts
+import { Reloop } from "reloop-email";
 
-const reloop = new Reloop(process.env.RELOOP_API_KEY);
+export const reloop = new Reloop({
+  apiKey: process.env.RELOOP_API_KEY!,
+});
+```
 
-export async function POST() {
+## Route Handler
+
+```typescript
+// app/api/send-email/route.ts
+import { NextResponse } from "next/server";
+import { reloop } from "@/lib/reloop";
+
+export async function POST(request: Request) {
   try {
-    const data = await reloop.mail.send({
-      from: 'onboarding@reloop.sh',
-      to: 'delivered@resend.dev',
-      subject: 'Hello World',
-      html: '<p>Congrats on sending your first email via Reloop!</p>',
+    const { to, subject, html, text } = await request.json();
+
+    const { response, emailError } = await reloop.mail.send({
+      from: "Acme <onboarding@mail.yourdomain.com>",
+      to,
+      subject: subject ?? "Hello from Next.js",
+      html: html ?? "<p>Congrats on sending your first email via Reloop!</p>",
+      text: text ?? "Congrats on sending your first email via Reloop!",
     });
 
-    return NextResponse.json(data);
+    if (emailError) {
+      return NextResponse.json({ error: emailError }, { status: 502 });
+    }
+
+    return NextResponse.json(response);
   } catch (error) {
     return NextResponse.json({ error }, { status: 500 });
   }
 }
 ```
+
+## Server Action
+
+```typescript
+// app/actions/send-email.ts
+"use server";
+
+import { reloop } from "@/lib/reloop";
+
+export async function sendWelcomeEmail(email: string) {
+  const { response, emailError } = await reloop.mail.send({
+    from: "Acme <onboarding@mail.yourdomain.com>",
+    to: email,
+    subject: "Welcome",
+    html: "<p>Thanks for signing up.</p>",
+    text: "Thanks for signing up.",
+  });
+
+  if (emailError) {
+    return { ok: false as const, error: "Failed to send" };
+  }
+
+  return { ok: true as const, messageId: response?.messageId };
+}
+```
+
+## Full guide
+
+For forms, auth, Edge runtime, Vercel deploy, and a full comparison of Server Actions vs Route Handlers, see the blog post: [How to Send Email in Next.js App Router](/blog/send-email-nextjs-app-router).

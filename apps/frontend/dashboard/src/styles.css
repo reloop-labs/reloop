@@ -1,8 +1,15 @@
 @import "@reloop/tailwind/style.css";
 
+body {
+	font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI",
+		Roboto, sans-serif;
+}
+
 @theme inline {
-	--font-sans: var(--font-open-runde);
-	--font-geist-sans: var(--font-open-runde);
+	--font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI",
+		Roboto, sans-serif;
+	--font-geist-sans: var(--font-inter), -apple-system, BlinkMacSystemFont,
+		"Segoe UI", Roboto, sans-serif;
 	--animate-door-draw-left: stroke-draw 0.28s ease-out both;
 	--animate-door-draw-top: stroke-draw 0.32s ease-out 0.1s both;
 	--animate-door-draw-right: stroke-draw 0.28s ease-out 0.22s both;

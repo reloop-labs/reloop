@@ -59,13 +59,13 @@ export function ContactsCommonUseCasesSidebar() {
 					title: "Define custom attributes",
 					description:
 						"Store metadata like plan, role, subscription, and custom fields.",
-					href: "https://reloop.sh/docs/features/contacts",
+					href: "https://reloop.sh/docs/learn/contacts/properties",
 				},
 				{
 					title: "Segment contacts by properties",
 					description:
 						"Use custom properties for hyper-targeted audience filtering.",
-					href: "https://reloop.sh/docs/api/contacts",
+					href: "https://reloop.sh/docs/api/contacts/contact-properties/get-api-contacts-v1properties-list",
 				},
 			]
 		: isChannelsPage
@@ -74,13 +74,13 @@ export function ContactsCommonUseCasesSidebar() {
 						title: "Multi-channel delivery",
 						description:
 							"Route transactional & marketing messages across different channels.",
-						href: "https://reloop.sh/docs/features/contacts",
+						href: "https://reloop.sh/docs/learn/contacts/channels",
 					},
 					{
 						title: "Configure channel settings",
 						description:
 							"Set up credentials and defaults for each communication channel.",
-						href: "https://reloop.sh/docs/api/contacts",
+						href: "https://reloop.sh/docs/api/contacts/channels/get-api-contacts-v1channels-list",
 					},
 				]
 			: isGroupsPage
@@ -89,13 +89,13 @@ export function ContactsCommonUseCasesSidebar() {
 							title: "Create audience segments",
 							description:
 								"Group subscribers by campaign, interest, or lifecycle stage.",
-							href: "https://reloop.sh/docs/features/contacts",
+							href: "https://reloop.sh/docs/learn/contacts/groups",
 						},
 						{
 							title: "Bulk group assignments",
 							description:
 								"Add or remove contacts from groups dynamically over API.",
-							href: "https://reloop.sh/docs/api/contacts",
+							href: "https://reloop.sh/docs/api/contacts/groups/get-api-contacts-v1groups-list",
 						},
 					]
 				: [
@@ -103,13 +103,13 @@ export function ContactsCommonUseCasesSidebar() {
 							title: "Import contact lists",
 							description:
 								"Bulk import subscribers and custom attributes via CSV file or API.",
-							href: "https://reloop.sh/docs/features/contacts",
+							href: "https://reloop.sh/docs/learn/contacts",
 						},
 						{
 							title: "Sync contacts via API",
 							description:
 								"Create, retrieve, update, and organize contact groups programmatically.",
-							href: "https://reloop.sh/docs/api/contacts",
+							href: "https://reloop.sh/docs/api/contacts/post-api-contacts-create",
 						},
 					];
 

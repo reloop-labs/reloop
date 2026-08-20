@@ -1,31 +1,12 @@
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import { User } from "lucide-react";
 import type { InboxView } from "../../types";
 import { INBOX_VIEWS } from "../../types";
-
-const ACTIVE_STYLES = {
-	primary: {
-		btn: "bg-[#006ffe] text-white shadow-sm",
-		icon: "fill-white text-white",
-	},
-	alerts: {
-		btn: "bg-red-500 text-white shadow-sm dark:bg-red-600",
-		icon: "text-white",
-	},
-	person: {
-		btn: "bg-emerald-600 text-white shadow-sm dark:bg-emerald-700",
-		icon: "text-white",
-	},
-	tag: {
-		btn: "bg-purple-600 text-white shadow-sm dark:bg-purple-700",
-		icon: "text-white",
-	},
-} as const;
 
 interface InboxCategoryNavbarProps {
 	activeView: InboxView;
 	onViewChange: (view: InboxView) => void;
+	counts?: Partial<Record<InboxView, number>>;
 	className?: string;
 }
 
@@ -36,12 +17,14 @@ export function InboxCategoryNavbar({
 }: InboxCategoryNavbarProps) {
 	return (
 		<nav
-			className={cn("flex w-full items-center gap-2", className)}
-			aria-label="Inbox categories"
+			className={cn(
+				"grid w-full grid-cols-4 overflow-x-auto border-mail-border/50 border-y [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
+				className,
+			)}
+			aria-label="Inbox views"
 		>
 			{INBOX_VIEWS.map((view) => {
 				const isActive = activeView === view.id;
-				const styles = ACTIVE_STYLES[view.id];
 
 				return (
 					<button
@@ -49,45 +32,39 @@ export function InboxCategoryNavbar({
 						type="button"
 						onClick={() => onViewChange(view.id)}
 						className={cn(
-							"inline-flex h-9 cursor-pointer items-center justify-center overflow-hidden rounded-xl font-medium text-sm transition-all duration-300 ease-in-out focus:outline-none",
+							"relative flex items-center gap-2.5 border-mail-border/50 border-l px-4 py-4 text-left first:border-l-0 first:pr-4 first:pl-4 sm:px-5 sm:first:pl-4",
 							isActive
-								? cn("min-w-0 flex-1 gap-1.5 px-3.5", styles.btn)
-								: "w-9 shrink-0 gap-0 bg-[var(--inbox-control)] text-mail-muted hover:bg-[var(--inbox-control-hover)] hover:text-mail-foreground",
+								? "bg-transparent"
+								: "bg-transparent hover:bg-[var(--inbox-row-hover)]",
 						)}
-						aria-pressed={isActive}
-						aria-label={isActive ? undefined : view.label}
-						title={isActive ? undefined : view.label}
+						aria-current={isActive ? "page" : undefined}
 					>
-						<span className="flex h-4 w-4 shrink-0 items-center justify-center">
-							{view.icon === "user" ? (
-								<User
-									className={cn(
-										"h-4 w-4 transition-colors duration-300",
-										isActive ? styles.icon : "text-mail-muted",
-									)}
-									aria-hidden
-								/>
-							) : (
-								<Icon
-									name={view.icon}
-									className={cn(
-										"h-4 w-4 transition-colors duration-300",
-										isActive ? styles.icon : "text-mail-muted",
-									)}
-									aria-hidden
-								/>
+						<span
+							className={cn(
+								"flex w-5 shrink-0 items-center justify-center",
+								view.id === "all" && "ml-1",
 							)}
+						>
+							<Icon
+								name={view.icon}
+								className={cn(
+									"h-4 w-4 shrink-0",
+									isActive ? "text-mail-foreground" : "text-mail-muted",
+								)}
+								aria-hidden
+							/>
 						</span>
 						<span
 							className={cn(
-								"truncate font-semibold transition-all duration-300 ease-in-out",
-								isActive
-									? "max-w-[100px] translate-x-0 opacity-100"
-									: "-translate-x-2 pointer-events-none max-w-0 opacity-0",
+								"truncate font-medium text-[14px] tracking-[-0.01em] sm:text-[15px]",
+								isActive ? "text-mail-foreground" : "text-mail-muted",
 							)}
 						>
 							{view.label}
 						</span>
+						{isActive ? (
+							<span className="absolute inset-x-0 bottom-0 h-[2px] bg-mail-foreground" />
+						) : null}
 					</button>
 				);
 			})}

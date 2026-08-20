@@ -3,6 +3,7 @@ import { Skeleton } from "@reloop/ui/skeleton";
 import { parseAsString, useQueryState } from "nuqs";
 import { useHotkeys } from "react-hotkeys-hook";
 import { isForwardRecordsSequence } from "#/features/domain/add/setup/components/forward-records-shortcut";
+import { DNS_RECORD_DOCS } from "#/features/domain/dns-provider";
 import { useDomainConnectCallback } from "#/features/domain/hooks/use-domain-connect-callback";
 import { onboardingStepParser } from "../onboarding-step";
 import { ConfigureDnsActions } from "./configure-dns-actions";
@@ -215,7 +216,7 @@ export function ConfigureDnsStep() {
 							onCopyToClipboard={copyToClipboard}
 							isLoading={isLoading}
 							loadingRows={1}
-							docsUrl="https://reloop.sh/docs/dns/dkim"
+							docsUrl={DNS_RECORD_DOCS.dkim}
 						/>
 					)}
 				</DnsFeatureSection>
@@ -244,7 +245,7 @@ export function ConfigureDnsStep() {
 							onCopyToClipboard={copyToClipboard}
 							isLoading={isLoading}
 							loadingRows={1}
-							docsUrl="https://reloop.sh/docs/dns/spf"
+							docsUrl={DNS_RECORD_DOCS.spf}
 						/>
 						{dmarcRecords.length > 0 && (
 							<DnsRecordSection
@@ -253,7 +254,7 @@ export function ConfigureDnsStep() {
 								records={dmarcRecords}
 								onCopyToClipboard={copyToClipboard}
 								isLoading={isLoading}
-								docsUrl="https://reloop.sh/docs/dns/dmarc"
+								docsUrl={DNS_RECORD_DOCS.dmarc}
 								className="mt-7"
 							/>
 						)}
@@ -284,7 +285,7 @@ export function ConfigureDnsStep() {
 							onCopyToClipboard={copyToClipboard}
 							isLoading={isLoading}
 							loadingRows={1}
-							docsUrl="https://reloop.sh/docs/dns/mx"
+							docsUrl={DNS_RECORD_DOCS.mx}
 						/>
 					</DnsFeatureSection>
 				)}
@@ -316,7 +317,7 @@ export function ConfigureDnsStep() {
 							onCopyToClipboard={copyToClipboard}
 							isLoading={isLoading}
 							loadingRows={1}
-							docsUrl="https://reloop.sh/docs/dns/cname"
+							docsUrl={DNS_RECORD_DOCS.cname}
 						/>
 					</DnsFeatureSection>
 				)}

@@ -1,5 +1,5 @@
 import { db } from "@reloop/db/client";
-import { domain, emailLog } from "@reloop/db/schema";
+import { domain, emailEvent, emailLog } from "@reloop/db/schema";
 import type { LogsModel } from "@reloop/logs/model/logs.model";
 import { and, eq, gte, lte, or, sql } from "drizzle-orm";
 import { useLogger } from "evlog/elysia";
@@ -58,6 +58,16 @@ export async function getEmailStatsController({
 				permanent: sql<number>`count(*) filter (where ${emailLog.status} = 'bounced' and ${emailLog.errorMessage} ilike '%PermanentFailure%')`,
 				transient: sql<number>`count(*) filter (where ${emailLog.status} = 'bounced' and ${emailLog.errorMessage} ilike '%TransientFailure%')`,
 				undetermined: sql<number>`count(*) filter (where ${emailLog.status} = 'bounced' and ${emailLog.errorMessage} not ilike '%PermanentFailure%' and ${emailLog.errorMessage} not ilike '%TransientFailure%')`,
+				opened: sql<number>`count(*) filter (where exists (
+					select 1 from ${emailEvent}
+					where ${emailEvent.emailLogId} = ${emailLog.id}
+					and ${emailEvent.type} = 'opened'
+				))`,
+				unsubscribed: sql<number>`count(*) filter (where exists (
+					select 1 from ${emailEvent}
+					where ${emailEvent.emailLogId} = ${emailLog.id}
+					and ${emailEvent.type} = 'unsubscribed'
+				))`,
 			})
 			.from(emailLog)
 			.where(whereClause)
@@ -70,6 +80,8 @@ export async function getEmailStatsController({
 			delivered: [],
 			bounced: [],
 			complaint: [],
+			opened: [],
+			unsubscribed: [],
 			rate: [],
 			bounceBreakdown: {
 				transient: [],
@@ -90,11 +102,15 @@ export async function getEmailStatsController({
 			const permanentCount = Number(row.permanent);
 			const transientCount = Number(row.transient);
 			const undeterminedCount = Number(row.undetermined);
+			const openedCount = Number(row.opened);
+			const unsubscribedCount = Number(row.unsubscribed);
 
 			result.sent.push(sentCount);
 			result.delivered.push(deliveredCount);
 			result.bounced.push(bouncedCount);
 			result.complaint.push(spamCount);
+			result.opened.push(openedCount);
+			result.unsubscribed.push(unsubscribedCount);
 			result.bounceBreakdown.permanent.push(permanentCount);
 			result.bounceBreakdown.transient.push(transientCount);
 			result.bounceBreakdown.undetermined.push(undeterminedCount);

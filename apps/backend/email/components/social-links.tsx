@@ -7,7 +7,7 @@ interface SocialLinksProps {
 const socials = [
 	{
 		name: "X (Twitter)",
-		href: "https://x.com/reloopsh",
+		href: "https://x.com/reloop_labs",
 		label: "𝕏",
 	},
 	{
@@ -17,7 +17,7 @@ const socials = [
 	},
 	{
 		name: "LinkedIn",
-		href: "https://linkedin.com/company/reloop",
+		href: "https://www.linkedin.com/company/reloop-labs",
 		label: "LinkedIn",
 	},
 ];

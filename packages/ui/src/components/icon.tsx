@@ -1,7 +1,9 @@
 import type { SVGProps } from "react";
 
+export type IconName = string;
+
 export type ISvgPropType = {
-	name: string;
+	name: IconName;
 } & SVGProps<SVGSVGElement>;
 
 export const Icon = ({

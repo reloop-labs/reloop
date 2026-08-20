@@ -81,8 +81,10 @@ export interface InboxThreadRowProps {
 	onMouseEnter: (id: string) => void;
 	onToggleStar: (id: string, starred: boolean) => void;
 	onArchive: (id: string) => void;
+	onUnarchive?: (id: string) => void;
 	onDelete: (id: string) => void;
 	onToggleBulk: (id: string, event?: React.MouseEvent) => void;
+	isArchived?: boolean;
 }
 
 export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
@@ -98,8 +100,10 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 			onMouseEnter,
 			onToggleStar,
 			onArchive,
+			onUnarchive,
 			onDelete,
 			onToggleBulk,
+			isArchived,
 		},
 		ref,
 	) => {
@@ -126,51 +130,44 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 				onClick={(e) => onSelect(listId, e)}
 				onMouseEnter={() => onMouseEnter(listId)}
 				className={cn(
-					"group flex cursor-pointer items-center border-b pt-[10px] pr-6 pb-[10px] pl-4 text-left transition-colors duration-200",
-					"border-[var(--inbox-divider)] hover:bg-[var(--inbox-row-hover)]",
+					"group flex cursor-pointer items-center border-b pt-2.5 pr-6 pb-2.5 pl-4 text-left transition-colors duration-200",
+					"border-(--inbox-divider) hover:bg-(--inbox-row-hover)",
 					(isSelected || isBulkSelected || isKeyboardFocused) &&
-						"bg-[var(--inbox-row-focused)]",
+						"bg-(--inbox-row-focused)",
 				)}
 			>
-				{/* Unread / bulk select gutter */}
+				{/* Bulk select gutter — always visible like Gmail */}
 				<span className="ml-1 flex w-5 shrink-0 items-center justify-center">
-					{isSelectMode || isBulkSelected ? (
-						<button
-							type="button"
-							aria-label={isBulkSelected ? "Deselect thread" : "Select thread"}
-							aria-pressed={isBulkSelected}
-							onClick={(e) => {
-								e.stopPropagation();
-								onToggleBulk(listId, e);
-							}}
-							className={cn(
-								"flex size-4 items-center justify-center rounded border transition-colors",
-								isBulkSelected
-									? "border-zero-blue bg-zero-blue text-white"
-									: "border-mail-border bg-transparent hover:border-mail-foreground/40",
-							)}
-						>
-							{isBulkSelected && (
-								<Icon name="check" className="h-2.5 w-2.5 text-white" />
-							)}
-						</button>
-					) : isUnread ? (
+					<button
+						type="button"
+						aria-label={isBulkSelected ? "Deselect thread" : "Select thread"}
+						aria-pressed={isBulkSelected}
+						onClick={(e) => {
+							e.stopPropagation();
+							onToggleBulk(listId, e);
+						}}
+						className={cn(
+							"flex size-4 items-center justify-center rounded border transition-colors",
+							isBulkSelected
+								? "border-zero-blue bg-zero-blue text-white"
+								: "border-mail-border bg-transparent hover:border-mail-foreground/40",
+						)}
+					>
+						{isBulkSelected && (
+							<Icon name="check" className="h-2.5 w-2.5 text-white" />
+						)}
+					</button>
+				</span>
+
+				{/* Unread marker */}
+				<span className="flex w-3 shrink-0 items-center justify-center">
+					{isUnread ? (
 						<span
-							className="size-2 rounded-full"
+							className="size-1.5 rounded-full"
 							style={{ background: "var(--inbox-unread)" }}
 							title="Unread"
 						/>
-					) : (
-						<button
-							type="button"
-							aria-label="Select thread"
-							onClick={(e) => {
-								e.stopPropagation();
-								onToggleBulk(listId, e);
-							}}
-							className="flex size-4 items-center justify-center rounded border border-transparent opacity-0 transition-opacity group-hover:border-mail-border group-hover:opacity-100"
-						/>
-					)}
+					) : null}
 				</span>
 
 				{/* Sender */}
@@ -210,7 +207,7 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 				{primaryLabel && (
 					<span className="flex shrink-0 items-center gap-2">
 						<span
-							className="flex h-5 max-w-[120px] items-center truncate rounded-[7px] border px-1.5 text-[12px]"
+							className="flex h-5 max-w-30 items-center truncate rounded-[7px] border px-1.5 text-[12px]"
 							style={{
 								background: chipBackground(primaryLabel.color),
 								color: "var(--inbox-chip-fg)",
@@ -242,9 +239,7 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 							name={thread.isStarred ? "star-filled" : "star"}
 							className={cn(
 								"h-4 w-4",
-								thread.isStarred
-									? "text-[var(--inbox-star)]"
-									: "text-mail-muted",
+								thread.isStarred ? "text-(--inbox-star)" : "text-mail-muted",
 							)}
 						/>
 					</button>
@@ -257,17 +252,35 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 						isSelectMode && "pointer-events-none opacity-0",
 					)}
 				>
-					<button
-						type="button"
-						title="Archive"
-						onClick={(e) => {
-							e.stopPropagation();
-							onArchive(listId);
-						}}
-						className="flex size-6 items-center justify-center rounded-md hover:bg-[var(--inbox-control-hover)]"
-					>
-						<Icon name="archive" className="h-3.5 w-3.5 text-mail-muted" />
-					</button>
+					{isArchived || thread.isArchived ? (
+						<button
+							type="button"
+							title="Move to inbox"
+							onClick={(e) => {
+								e.stopPropagation();
+								if (onUnarchive) {
+									onUnarchive(listId);
+								} else {
+									onArchive(listId);
+								}
+							}}
+							className="flex size-6 items-center justify-center rounded-md hover:bg-(--inbox-control-hover)"
+						>
+							<Icon name="inbox" className="h-3.5 w-3.5 text-mail-muted" />
+						</button>
+					) : (
+						<button
+							type="button"
+							title="Archive"
+							onClick={(e) => {
+								e.stopPropagation();
+								onArchive(listId);
+							}}
+							className="flex size-6 items-center justify-center rounded-md hover:bg-(--inbox-control-hover)"
+						>
+							<Icon name="archive" className="h-3.5 w-3.5 text-mail-muted" />
+						</button>
+					)}
 					<button
 						type="button"
 						title="Delete"
@@ -282,7 +295,7 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 				</span>
 
 				{/* Time */}
-				<span className="ml-1 w-[60px] shrink-0 text-right text-[13px] text-mail-muted tabular-nums">
+				<span className="ml-1 w-15 shrink-0 text-right text-[13px] text-mail-muted tabular-nums">
 					{formatReceivedAt(thread.receivedAt, isFirstToday)}
 				</span>
 			</div>

@@ -26,6 +26,7 @@ export { MarkButton } from "./mark-button";
 export { NumberField } from "./number-field";
 export { OpacitySlider } from "./opacity-slider";
 export { Row } from "./row";
+export { ScrubField, ScrubHandle, ScrubRow } from "./scrub-field";
 export type { SelectOption } from "./select-field";
 // Selects
 export { SelectField } from "./select-field";

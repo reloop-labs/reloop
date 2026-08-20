@@ -1,4 +1,4 @@
-import { NumberField } from "./number-field";
+import { ScrubField } from "./scrub-field";
 import { TextInput } from "./text-input";
 import { UrlInput } from "./url-input";
 
@@ -36,23 +36,25 @@ export function ImageSrcControl({
 				onChange={(alt) => onChange({ ...value, alt })}
 				placeholder="Alt text…"
 			/>
-			<div className="flex items-center gap-2">
-				<span className="flex flex-col items-center gap-0.5">
-					<NumberField
-						value={value.width}
-						onChange={(width) => onChange({ ...value, width })}
-						unit="px"
-					/>
-					<span className="text-(--re-text-muted) text-[10px]">Width</span>
-				</span>
-				<span className="flex flex-col items-center gap-0.5">
-					<NumberField
-						value={value.height}
-						onChange={(height) => onChange({ ...value, height })}
-						unit="px"
-					/>
-					<span className="text-(--re-text-muted) text-[10px]">Height</span>
-				</span>
+			<div className="grid grid-cols-2 gap-2">
+				<ScrubField
+					label="Width"
+					prefix="W"
+					value={value.width}
+					onChange={(width) => onChange({ ...value, width })}
+					suffix="px"
+					min={1}
+					max={2000}
+				/>
+				<ScrubField
+					label="Height"
+					prefix="H"
+					value={value.height}
+					onChange={(height) => onChange({ ...value, height })}
+					suffix="px"
+					min={1}
+					max={2000}
+				/>
 			</div>
 		</div>
 	);

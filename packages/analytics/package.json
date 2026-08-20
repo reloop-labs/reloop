@@ -1,0 +1,32 @@
+{
+	"name": "@reloop/analytics",
+	"version": "0.1.0",
+	"private": true,
+	"type": "module",
+	"exports": {
+		".": "./src/index.ts",
+		"./posthog": "./src/posthog/index.ts",
+		"./posthog-provider": "./src/posthog/posthog-provider.tsx"
+	},
+	"scripts": {
+		"build": "tsc --build",
+		"clean": "git clean -xdf .cache .turbo dist node_modules",
+		"typecheck": "tsc --noEmit"
+	},
+	"dependencies": {
+		"posthog-js": "^1.417.0"
+	},
+	"peerDependencies": {
+		"@types/react": "catalog:ui",
+		"@types/react-dom": "catalog:ui",
+		"react": "catalog:ui",
+		"react-dom": "catalog:ui"
+	},
+	"devDependencies": {
+		"@reloop/tsconfig": "workspace:*",
+		"@types/node": "catalog:",
+		"@types/react": "catalog:ui",
+		"@types/react-dom": "catalog:ui",
+		"typescript": "catalog:"
+	}
+}

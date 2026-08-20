@@ -55,7 +55,7 @@ const ResendComparisonPage = () => {
 			titleLines={["Reloop vs Resend"]}
 			description="Learn how Reloop compares to Resend and why Reloop is the best Resend alternative for all your developer email needs."
 			primaryCta={{
-				label: "Start for free",
+				label: "Get Started ",
 				href: "/dashboard/signup",
 			}}
 			secondaryCta={{
@@ -115,7 +115,7 @@ const ResendComparisonPage = () => {
 				</p>
 			</CompareSection>
 
-			<CompareSection maxWidth="2xl" noDivider>
+			<CompareSection maxWidth="full" noDivider>
 				<CompareOtherLinks currentHref={pagePath} />
 			</CompareSection>
 		</ComparisonPageShell>

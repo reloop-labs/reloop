@@ -6,6 +6,10 @@ import { roomRoutes } from "@be/template/routes/room/room.routes";
 import { collaborationRoute } from "@be/template/routes/template/collaboration/collaboration.route";
 import { templateRoutes } from "@be/template/routes/template/template.routes";
 import { templateConfig } from "@be/template/template.config";
+import {
+	closeHtmlToImageRenderer,
+	warmHtmlToImageRenderer,
+} from "@be/template/utils/html-to-image";
 import { loader } from "@be/template/utils/loader";
 import { persistencePlugin } from "@be/template/utils/persistence";
 import { openapi } from "@elysiajs/openapi";
@@ -93,6 +97,10 @@ const templateService = new Elysia({
 	.use(collaborationRoute)
 	.onStart(async () => {
 		await loader();
+		void warmHtmlToImageRenderer();
+	})
+	.onStop(async () => {
+		await closeHtmlToImageRenderer();
 	})
 	.listen(port, () => {
 		log.info(

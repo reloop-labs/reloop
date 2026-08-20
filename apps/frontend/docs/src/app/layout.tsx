@@ -1,8 +1,8 @@
 import "./global.css";
+import { PostHogProvider } from "@reloop/analytics";
 import { ThemeProvider } from "@reloop/fe-docs/components/theme-provider";
 import { cn } from "@reloop/fe-docs/lib/cn";
 import { IconsSprite } from "@reloop/ui/icons-sprite";
-import { RybbitLoader } from "@reloop/ui/rybbit-loader";
 import localFont from "next/font/local";
 import type { ReactNode } from "react";
 
@@ -50,12 +50,13 @@ export default function Layout({ children }: { children: ReactNode }) {
 			suppressHydrationWarning
 		>
 			<body
-				className="flex min-h-screen flex-col overflow-x-hidden bg-bg-weak-50 text-fd-foreground dark:bg-black"
+				className="flex min-h-screen flex-col overflow-x-hidden bg-bg-white-0 text-fd-foreground dark:bg-black"
 				suppressHydrationWarning
 			>
-				<ThemeProvider>{children}</ThemeProvider>
-				<IconsSprite />
-				<RybbitLoader />
+				<PostHogProvider>
+					<ThemeProvider>{children}</ThemeProvider>
+					<IconsSprite />
+				</PostHogProvider>
 			</body>
 		</html>
 	);

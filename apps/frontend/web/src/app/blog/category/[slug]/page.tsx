@@ -1,11 +1,11 @@
 import { BlogIndex } from "@reloop/web/components/landing/blog/blog-index";
+import { createBlogCategoryMetadata } from "@reloop/web/lib/landing/blog/seo";
 import {
 	generateCategoryStaticParams,
 	getCategories,
 	getCategoryBySlug,
 	getPostsByCategory,
 } from "@reloop/web/lib/landing/blog/source";
-import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -26,20 +26,7 @@ export async function generateMetadata({
 		return {};
 	}
 
-	const pageUrl = `${getSiteUrl()}/blog/category/${slug}`;
-
-	return {
-		title: `${category.name} | Reloop Blog`,
-		description: category.description,
-		alternates: { canonical: pageUrl },
-		openGraph: {
-			title: `${category.name} | Reloop Blog`,
-			description: category.description,
-			type: "website",
-			url: pageUrl,
-			siteName: "Reloop",
-		},
-	};
+	return createBlogCategoryMetadata(category);
 }
 
 export { generateCategoryStaticParams as generateStaticParams };

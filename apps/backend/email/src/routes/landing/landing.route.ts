@@ -20,14 +20,14 @@ export const landingRoute = new Elysia().get(
 ║                                                                      ║
 ╠══════════════════════════════════════════════════════════════════════╣
 ║                                                                      ║
-║ 📚 Docs: https://reloop.sh/docs/email                                ║
+║ 📚 Docs: https://reloop.sh/docs/setup/backend/email                  ║
 ║ 🤖 Discovery: https://reloop.sh/api/email/agent-card.json            ║
 ║ 📖 OpenAPI: https://reloop.sh/api/email/openapi                      ║
 ║ 🐙 GitHub: https://github.com/reloop-labs/reloop                     ║
 ║ 🆘 Support: https://reloop.sh/support                                ║
 ║ 💬 Discord: https://discord.gg/bHnkBcp7xR                                ║
 ║ 🐦 Twitter: https://x.com/reloophq                               ║
-║ 🛠️ Setup: https://reloop.sh/docs/setup/email                        ║
+║ 🛠️ Setup: https://reloop.sh/docs/setup/backend/email                 ║
 ║                                                                      ║
 ╠══════════════════════════════════════════════════════════════════════╣
 ║                                                                      ║

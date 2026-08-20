@@ -1,0 +1,20 @@
+---
+slug: webhook-domain-level-filtering
+version: 0.50.0
+date: July 2026
+launchDate: 5 July 2026
+title: 'Webhook Domain-Level Filtering'
+description: >-
+  Configure webhook subscriptions to only listen to events originating from specific sending domains.
+tags:
+  - Backend
+  - Webhooks
+---
+### FRONTEND
+
+- **Domain selector UI.** Multi-select domain filter dropdown within the webhook creation and edit modals.
+
+### BACKEND
+
+- **Domain-scoped dispatch.** Filter webhook dispatches by source sending domain in the webhook delivery engine to isolate production and staging events.
+- **Signature security.** Enforced HMAC-SHA256 signature verification headers across domain-filtered payloads.

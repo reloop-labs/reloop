@@ -40,7 +40,7 @@ const PageLayout: React.FC<PageLayoutProps> = ({
 								{title}
 							</h1>
 							{description && (
-								<p className="text-xs text-text-sub-600 leading-relaxed sm:text-sm dark:text-white/60">
+								<p className="text-text-sub-600 text-xs leading-relaxed sm:text-sm dark:text-white/60">
 									{description}
 								</p>
 							)}
@@ -73,4 +73,3 @@ const PageLayout: React.FC<PageLayoutProps> = ({
 };
 
 export default PageLayout;
-

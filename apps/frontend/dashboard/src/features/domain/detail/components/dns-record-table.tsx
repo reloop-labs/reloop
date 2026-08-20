@@ -3,6 +3,7 @@ import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import * as Tooltip from "@reloop/ui/tooltip";
 import * as React from "react";
+import { CopyableDnsValue } from "#/features/domain/components/copyable-dns-value";
 import type { DNSRecord } from "#/features/domain/types";
 import {
 	getStatusColorClass,
@@ -147,6 +148,11 @@ export const DNSRecordTable = ({
 								<div className="flex items-center">
 									<button
 										type="button"
+										aria-label={
+											copiedItems.has(`${tableId}type-${index}`)
+												? "Copied"
+												: `Copy ${record.recordType}`
+										}
 										onClick={() =>
 											onCopyToClipboard?.(
 												record.recordType,
@@ -154,78 +160,40 @@ export const DNSRecordTable = ({
 											)
 										}
 										className={cn(
-											"inline-flex cursor-pointer items-center rounded-md px-2 py-0.5 font-semibold text-xs transition-colors",
+											"inline-flex cursor-pointer items-center rounded-md px-2 py-0.5 font-semibold text-xs transition-colors duration-150 ease-out",
 											copiedItems.has(`${tableId}type-${index}`)
 												? "bg-success-alpha-10 text-success-dark dark:bg-success-alpha-20"
 												: "bg-neutral-alpha-10 text-text-strong-950 hover:bg-neutral-alpha-20 dark:bg-neutral-alpha-16 hover:dark:bg-neutral-alpha-24",
 										)}
 									>
-										{copiedItems.has(`${tableId}type-${index}`)
-											? "Copied"
-											: record.recordType}
+										{record.recordType}
 									</button>
 								</div>
 
 								{/* Name Column */}
-								<button
-									type="button"
-									onClick={() =>
+								<CopyableDnsValue
+									value={record.name}
+									copied={copiedItems.has(`${tableId}host-${index}`)}
+									onCopy={() =>
 										onCopyToClipboard?.(record.name, `${tableId}host-${index}`)
 									}
-									className="group/copy flex min-w-0 max-w-full cursor-pointer items-center gap-1.5 overflow-hidden pr-2 text-left"
-								>
-									<span className="truncate font-medium text-label-sm text-text-strong-950">
-										{copiedItems.has(`${tableId}host-${index}`)
-											? "Copied"
-											: record.name}
-									</span>
-									<Icon
-										name="copy"
-										className={cn(
-											"h-3.5 w-3.5 shrink-0 transition-colors",
-											copiedItems.has(`${tableId}host-${index}`)
-												? "hidden"
-												: "text-text-sub-600/50 group-hover/copy:text-text-strong-950",
-										)}
-									/>
-								</button>
+								/>
 
 								{/* Value Column */}
 								<Tooltip.Provider delayDuration={0}>
 									<Tooltip.Root>
 										<Tooltip.Trigger asChild>
-											<button
-												type="button"
-												onClick={() =>
+											<CopyableDnsValue
+												value={record.value}
+												copied={copiedItems.has(`${tableId}value-${index}`)}
+												mono
+												onCopy={() =>
 													onCopyToClipboard?.(
 														record.value,
 														`${tableId}value-${index}`,
 													)
 												}
-												className="group/copy flex min-w-0 max-w-full cursor-pointer items-center gap-1.5 overflow-hidden pr-2 text-left"
-											>
-												<span
-													className={cn(
-														"truncate font-mono text-label-sm",
-														copiedItems.has(`${tableId}value-${index}`)
-															? "font-medium text-text-strong-950"
-															: "text-text-sub-600",
-													)}
-												>
-													{copiedItems.has(`${tableId}value-${index}`)
-														? "Copied"
-														: record.value}
-												</span>
-												<Icon
-													name="copy"
-													className={cn(
-														"h-3.5 w-3.5 shrink-0 transition-colors",
-														copiedItems.has(`${tableId}value-${index}`)
-															? "hidden"
-															: "text-text-sub-600/50 group-hover/copy:opacity-100",
-													)}
-												/>
-											</button>
+											/>
 										</Tooltip.Trigger>
 										<Tooltip.Content
 											side="top"

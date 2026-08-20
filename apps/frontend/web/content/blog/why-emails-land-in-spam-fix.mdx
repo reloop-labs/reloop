@@ -1,5 +1,5 @@
 ---
-title: "Why Your Emails Land in Spam — And How to Fix It"
+title: "Why Your Emails Land In Spam & How to Fix It"
 description: The definitive guide to diagnosing and fixing email spam folder placement — covering authentication, content, reputation, list hygiene, and ISP-specific issues.
 keywords:
   - emails going to spam fix
@@ -8,6 +8,7 @@ keywords:
   - email deliverability problems
   - fix email deliverability
   - emails not reaching inbox
+  - email spam diagnostic checklist
 publishedAt: 2026-08-20
 category: Deliverability
 tags: [deliverability, spam, spf, dkim, dmarc, reputation]
@@ -16,267 +17,249 @@ author:
   name: Pranav Patel
   role: Co-founder
   avatar: /company/team/pranav-patel.jpg
-draft: true
+draft: false
+image: /blog/images/why-emails-land-in-spam-fix.png
 relatedSlugs:
   - spf-dkim-dmarc-setup-guide
   - ip-warming-guide
+  - email-bounce-processing-automation
+  - transactional-email-best-practices
+  - bimi-email-setup-guide
+  - why-we-open-sourced-email-infrastructure
 ---
 
-## Why diagnosing spam problems is hard
+**Email deliverability does not fail with an HTTP 404 error or a readable stack trace—it fails silently by routing your mission-critical messages into the recipient's spam folder.**
 
-Email doesn't give you a useful error when it lands in spam. You don't get a 404 or a stack trace. The mail is delivered — technically — it just ends up in the wrong folder. That silence makes the problem easy to miss and difficult to debug systematically.
+When auth tokens, password reset links, invoices, and user notifications land in spam, your business is effectively down for those users. Because SMTP technically completes message handoff without an error code, deliverability regressions are notoriously difficult to detect and debug without a systematic methodology.
 
-This guide walks through every major cause of spam folder placement, how to determine which one is affecting you, and exactly what to do to fix it.
-
----
+This guide walks you through every major root cause of spam folder placement, provides exact CLI commands and tools to diagnose your sending path, and details the concrete steps required to fix each issue permanently.
 
 ## Start with a spam score baseline
 
-Before debugging specific causes, get a baseline score. Send a test email to [mail-tester.com](https://mail-tester.com). It returns a score from 0–10 with a specific breakdown of what's penalising you.
+**Before debugging individual infrastructure components, establish an objective spam score baseline.**
 
-You want a score of **9 or above** for transactional email. Below 7 means you have multiple active problems. Use this tool as your ground truth throughout the debugging process.
+Send a test email from your production or staging environment to [mail-tester.com](https://mail-tester.com). The service executes automated SpamAssassin heuristics, analyzes message MIME structure, and checks DNSBL blacklists to return a score from 0 to 10.
 
-Also register your domain with [Google Postmaster Tools](https://postmaster.google.com) if you haven't already. It gives you Gmail-specific reputation data — domain reputation, IP reputation, spam rate — that's invaluable for diagnosing Gmail-specific issues.
+- **Score 9.0 to 10.0**: **Optimal deliverability baseline** required for transactional infrastructure.
+- **Score 7.0 to 8.9**: **Active deliverability risks**—minor configuration warnings, missing headers, or slight content penalties.
+- **Score Below 7.0**: **Severe deliverability failure**—failing authentication, blacklisted IP, or broken MIME structure.
 
----
+In parallel, register your sending domain with [Google Postmaster Tools](https://postmaster.google.com). It provides proprietary Gmail telemetry directly from Google—including **domain reputation**, **IP reputation**, **spam complaint rates**, and **authentication success rates**.
 
 ## Cause 1: Missing or broken email authentication
 
-**Probability: Very high. Check this first.**
+**Probability: Very High. Over 70% of inbox placement failures stem from authentication misconfigurations.**
 
-This is the single most common cause of spam folder placement. Gmail, Outlook, and Yahoo all require SPF, DKIM, and DMARC. Missing any one of them immediately degrades your deliverability.
+Major mailbox providers ([Google, Yahoo, and Microsoft](https://blog.google/products/gmail/gmail-security-authentication-spam-protection/)) enforce mandatory authentication for all senders. If your messages fail or lack [SPF, DKIM, or DMARC](/blog/spf-dkim-dmarc-setup-guide), inbox providers will aggressively route your traffic to spam or drop it at the SMTP handshake.
 
-### How to check
+### How to diagnose authentication in DNS
+
+Verify that your DNS records are active and resolving across public resolvers:
 
 ```bash
-# Check SPF
-dig TXT yourdomain.com | grep spf
+# 1. Verify SPF record
+dig TXT yourdomain.com +short | grep spf
 
-# Check DKIM (replace 'reloop1' with your selector)
-dig TXT reloop1._domainkey.yourdomain.com
+# 2. Verify DKIM record (Reloop uses the 'reloop' selector)
+dig TXT reloop._domainkey.yourdomain.com +short
 
-# Check DMARC
-dig TXT _dmarc.yourdomain.com
+# 3. Verify DMARC record
+dig TXT _dmarc.yourdomain.com +short
 ```
 
-Or use [MXToolbox](https://mxtoolbox.com/EmailHeaders.aspx) — paste the full headers from a received email and it will tell you exactly which checks passed and failed.
+You can also paste raw message headers into the [MXToolbox Email Header Analyzer](https://mxtoolbox.com/EmailHeaders.aspx) to inspect how receiving mail transfer agents evaluate your records.
 
-### What to look for
+### What healthy authentication headers look like
 
-A properly authenticated email will show this in the received headers:
+Inspect the `Authentication-Results` header inside a delivered email:
 
-```
+```http
 Authentication-Results: mx.google.com;
-  spf=pass (google.com: domain of you@yourdomain.com designates 1.2.3.4 as permitted sender)
-  dkim=pass header.i=@yourdomain.com
-  dmarc=pass (p=NONE)
+  spf=pass (google.com: domain of notifications@yourdomain.com designates 1.2.3.4 as permitted sender) smtp.mailfrom=notifications@yourdomain.com;
+  dkim=pass header.i=@yourdomain.com header.s=reloop;
+  dmarc=pass (p=REJECT) header.from=yourdomain.com
 ```
 
-If any of these show `fail` or `softfail`, fix authentication before investigating anything else. See the [complete SPF, DKIM, DMARC guide](/blog/spf-dkim-dmarc-setup-guide).
+**If any authentication check shows `fail` or `softfail`, resolve authentication before investigating any other deliverability factor.** See our step-by-step [SPF, DKIM, and DMARC complete setup guide](/blog/spf-dkim-dmarc-setup-guide).
 
 ### The DMARC alignment trap
 
-A common mistake is passing SPF or DKIM individually, but failing DMARC alignment. DMARC requires that either the SPF domain or the DKIM domain matches the `From:` header domain. If you're sending from `mail@yourdomain.com` but your SPF authorises `sendingprovider.com`, DMARC fails even though SPF passes.
+**An email can pass SPF and DKIM individually while still failing DMARC due to identifier misalignment.**
 
----
+DMARC requires that the domain in the user-visible `From:` header matches either:
+1. The domain in the envelope sender `Return-Path` (**SPF Alignment**)
+2. The domain specified in the `d=` tag of a valid `DKIM-Signature` (**DKIM Alignment**)
+
+If you send from `auth@yourdomain.com` but your DKIM signature is signed under a third-party vendor domain without custom domain alignment, DMARC evaluation will fail.
 
 ## Cause 2: Sending from a new IP with no reputation
 
-**Probability: High for new infrastructure.**
+**Probability: High for freshly provisioned servers and new infrastructure.**
 
-ISPs maintain reputation scores for every sending IP. A new IP starts with a neutral score — which ISPs treat with high suspicion. This is why new infrastructure almost always sees worse deliverability than established infrastructure, even with identical configuration.
+Internet Service Providers (ISPs) maintain rolling reputation scores for every sending IP address. **A brand new IP starts with neutral reputation, which anti-abuse filters treat with heightened suspicion.** Jumping immediately to high sending volume from a cold IP triggers automated rate-limiting, temporary deferrals (`421` / `451` SMTP codes), and spam placement.
 
-### Signs this is your problem
+### Indicators of an IP reputation issue
 
-- Deliverability was good previously on different infrastructure
-- You recently migrated to a new provider or dedicated IP
-- Gmail Postmaster Tools shows "Low" IP reputation
+- Deliverability was flawless on previous infrastructure before migrating to a new server.
+- You recently provisioned a dedicated IP address or switched email infrastructure providers.
+- [Google Postmaster Tools](https://postmaster.google.com) reports **"Low"** or **"Bad"** IP reputation.
 
-### How to fix it
+### How to fix it: Structured IP warming
 
-IP warm-up. This is the process of gradually increasing volume over 4–6 weeks to give ISPs time to build positive reputation signals.
+**IP warming is the process of gradually scaling outbound volume over 4 to 6 weeks to establish trusted sender reputation.**
 
-Week-by-week targets:
+| Week | Recommended Daily Sends | Primary Focus |
+| :--- | :--- | :--- |
+| **Week 1** | **50 – 200 emails/day** | High-intent transactional mail (password resets, welcome emails). |
+| **Week 2** | **200 – 500 emails/day** | Active daily users and transactional notifications. |
+| **Week 3** | **500 – 1,000 emails/day** | Expand to weekly summaries and invoice dispatches. |
+| **Week 4** | **1,000 – 2,500 emails/day** | Begin rolling out product updates to engaged segments. |
+| **Week 5** | **2,500 – 5,000 emails/day** | Monitor spam complaint rate; ensure complaints remain < 0.05%. |
+| **Week 6+** | **5,000 – 10,000+ emails/day** | Full production capacity with established reputation. |
 
-| Week | Daily sends |
-|------|------------|
-| 1 | 50–200 |
-| 2 | 200–500 |
-| 3 | 500–1,000 |
-| 4 | 1,000–2,500 |
-| 5 | 2,500–5,000 |
-| 6 | 5,000–10,000+ |
-
-During warm-up, send exclusively to your most engaged recipients — people who recently signed up and actively use your product. Positive engagement signals (opens, clicks) accelerate reputation building.
-
-See the [full IP warm-up guide](/blog/ip-warming-guide) for a complete week-by-week schedule.
-
----
+**During the initial warm-up window, send exclusively to your most engaged recipients.** High open rates and user engagement accelerate positive reputation scoring with mailbox algorithms. Follow our detailed [IP warming schedule guide](/blog/ip-warming-guide).
 
 ## Cause 3: High bounce rate
 
-**Probability: Moderate, especially after list imports.**
+**Probability: Moderate to High, particularly after user imports or list migrations.**
 
-Every hard bounce (permanent failure — invalid address, domain doesn't exist) signals to ISPs that you're not maintaining list hygiene. A bounce rate above 2% is a serious warning sign. Above 5% and some ISPs will start throttling or blocking your mail.
+**A bounce rate exceeding 2% is an immediate warning signal to ISPs; a bounce rate over 5% triggers automated throttling or domain blacklisting.** High bounce rates indicate that a sender is not validating email addresses at collection or is sending to stale, unverified databases.
 
-### How to check your bounce rate
+### Distinguishing Hard vs. Soft Bounces
 
-In Reloop's dashboard, view your delivery analytics filtered by email type. Look at the bounce rate over the past 30 days.
+- **Hard Bounces (5xx SMTP errors)**: Permanent delivery failures (e.g. `550 5.1.1 User unknown`, invalid mailbox, nonexistent domain).
+- **Soft Bounces (4xx SMTP errors)**: Temporary delivery failures (e.g. `452 Mailbox full`, server busy, transient network timeout).
 
-If you don't have analytics, you can estimate: if your SMTP logs show a lot of `550 5.1.1` or `550 5.1.2` responses, those are hard bounces.
+### How to eliminate bounce penalties
 
-### How to fix it
-
-1. **Remove all hard-bounced addresses immediately.** Reloop does this automatically — hard bounces are suppressed and never retried.
-
-2. **Never send to purchased or scraped lists.** These consistently have 10–30% bounce rates. They are the fastest way to get your domain blacklisted.
-
-3. **Use double opt-in for marketing lists.** This ensures every address on your list is valid and the recipient confirmed they want mail from you.
-
-4. **Run your list through a verification tool** before a major send. Services like ZeroBounce, NeverBounce, or Hunter verify addresses without sending mail.
-
-5. **Set up email validation at your signup form.** Catch typos at the source:
+1. **Automatically suppress hard-bounced addresses**: Never retry sending to a hard bounce. [Reloop's delivery engine](/features/deliverability) automatically suppresses hard bounces to protect your domain reputation (see our guide on [email bounce processing automation](/blog/email-bounce-processing-automation)).
+2. **Verify addresses in real-time at signup**: Prevent typos and invalid domains directly at your registration form:
    ```typescript
-   // Simple format check — not sufficient alone, but catches obvious typos
-   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-   if (!emailRegex.test(email)) throw new Error("Invalid email");
+   import { resolver } from "node:dns/promises";
 
-   // Better: check the domain has an MX record
-   const dns = await resolveMx(email.split("@")[1]);
-   if (!dns.length) throw new Error("Domain does not accept email");
+   export async function validateEmailInput(email: string): Promise<boolean> {
+     // Basic format validation
+     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+     if (!emailRegex.test(email)) return false;
+
+     // Verify domain has active MX records
+     const domain = email.split("@")[1];
+     try {
+       const mxRecords = await resolver.resolveMx(domain);
+       return mxRecords && mxRecords.length > 0;
+     } catch {
+       return false;
+     }
+   }
    ```
-
----
+3. **Never purchase or scrape email lists**: Third-party lists contain spam traps (honeypot addresses maintained by anti-spam organizations) that immediately ruin domain reputation.
 
 ## Cause 4: High spam complaint rate
 
-**Probability: Moderate for mixed transactional/marketing streams.**
+**Probability: High for mixed transactional and notification streams.**
 
-A spam complaint happens when a recipient clicks "This is spam" in their email client. ISPs share these complaint signals with senders through feedback loops. Google's threshold for warnings is **0.1%** (1 complaint per 1,000 emails). The threshold for delivery impact starts at **0.3%**.
+A spam complaint occurs whenever a recipient clicks "Report Spam" or "Mark as Spam" in Gmail, Apple Mail, or Outlook.
 
-### Common sources of spam complaints
+- **Google & Yahoo Warning Threshold**: **0.10%** (1 complaint per 1,000 delivered emails).
+- **Enforcement & Blocking Threshold**: **0.30%** (3 complaints per 1,000 delivered emails).
 
-- Sending marketing or promotional content through your transactional stream
-- Not having an easy unsubscribe mechanism for notification-type emails
-- Sending email too frequently without delivering value
-- Recipients forgetting they signed up (low brand recognition, long gap since signup)
+**Exceeding 0.30% spam complaints will cause mailbox providers to route all subsequent domain traffic directly to the spam folder.**
 
-### How to fix it
+### How to reduce spam complaints
 
-1. **Separate transactional from promotional mail** — different subdomains, different sending streams. Complaints from a marketing campaign should not affect your password reset reputation.
-
-2. **Add one-click unsubscribe** — Gmail and Yahoo require the `List-Unsubscribe` header for bulk senders. Add it:
+1. **Isolate transactional from promotional sending**: **Never send marketing blasts from your primary transactional domain.** Isolate critical auth tokens and receipts on a dedicated subdomain (e.g. `auth.yourdomain.com` or `mail.yourdomain.com`) as detailed in our [transactional email best practices](/blog/transactional-email-best-practices).
+2. **Implement RFC 8058 One-Click Unsubscribe**: Gmail and Yahoo require one-click unsubscribe headers for non-transactional messages:
    ```typescript
+   import { Reloop } from "@reloop/sdk";
+
+   const reloop = new Reloop({ apiKey: process.env.RELOOP_API_KEY });
+
    await reloop.emails.send({
      from: "notifications@yourdomain.com",
      to: user.email,
-     subject: "Your weekly digest",
+     subject: "Your weekly analytics digest",
      headers: {
-       "List-Unsubscribe": `<https://yourdomain.com/unsubscribe?token=${token}>`,
+       "List-Unsubscribe": `<https://yourdomain.com/unsubscribe?token=${user.token}>`,
        "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
      },
-     html: "...",
+     html: "<p>Your weekly digest content...</p>",
    });
    ```
+3. **Sunset inactive recipients**: Implement sunset policies for non-essential notifications. If a user has not opened an email in 90 days, reduce sending frequency or require explicit re-opt-in.
 
-3. **Sunset inactive subscribers** — remove recipients who haven't opened in 90 days. A smaller, engaged list outperforms a large, disengaged one in deliverability terms.
+## Cause 5: Content triggering Bayesian spam filters
 
----
+**Probability: Low for standard transactional receipts; Moderate for notification templates.**
 
-## Cause 5: Content triggering spam filters
+Modern spam filters use natural language processing and Bayesian analysis to evaluate message payloads. While keywords alone rarely cause spam placement, poor HTML formatting combined with aggressive promotional phrasing will penalize your delivery score.
 
-**Probability: Low for legitimate transactional email, higher for notifications.**
+### Content practices that degrade inbox placement
 
-Content-based spam filters use Bayesian analysis, machine learning, and pattern matching to score emails. While modern spam filters are much more sophisticated than "does it contain certain words," content quality still matters.
+- **Missing `text/plain` multipart MIME**: Sending an HTML-only email without an accompanying plain text alternative is a strong spam signal. Reloop automatically generates plain text fallbacks for all outgoing messages.
+- **Extreme Image-to-Text Ratio**: Single large promotional images with little or no accompanying text mimic phishing campaigns.
+- **Link Text vs. Href Domain Mismatches**: If your link anchor text displays `https://yourdomain.com/login` but the underlying `href` points to an unbranded tracking redirect, filters flag the discrepancy as a potential phishing attempt.
+- **Spam Trigger Patterns**: Excessive capitalization in subject lines (`URGENT: RESET NOW`), repetitive punctuation (`$$$`, `!!!`), and deceptive urgency triggers.
 
-### What triggers content filters
+## Cause 6: Sending from unmonitored `noreply@` addresses
 
-- **Spam trigger words in subject lines**: "FREE", "WINNER", "Act now", "Limited time", "Click here", excessive exclamation marks
-- **ALL CAPS in subject lines or body**
-- **Mismatched link text and URLs** — if the link text says `yourdomain.com` but the href points to `trackingservice.io`, that's a red flag
-- **Too many images, too little text** — a 600×200px image with two lines of text looks like a phishing email to spam filters
-- **Missing plain text version** — every HTML email must have a corresponding text/plain part
+**Probability: Measurable impact on recipient engagement signals.**
 
-### How to audit your content
+Using `noreply@yourdomain.com` harms deliverability in two distinct ways:
+1. **Machine Learning Heuristics**: Mailbox algorithms associate `noreply@` with low-engagement bulk blasts.
+2. **Missed Engagement Signals**: When recipients reply to an email (e.g. "Thanks!" or asking a question), mailbox algorithms register that interaction as a strong positive reputation signal. A `noreply@` address blocks this positive feedback loop.
 
-Run your email through [mail-tester.com](https://mail-tester.com) before shipping. It will flag specific content issues, not just a generic score.
-
----
-
-## Cause 6: Sending from `noreply@`
-
-**Probability: Low direct impact, but measurable.**
-
-`noreply@` addresses are associated with bulk, impersonal sending in spam filter training data. They also prevent replies, which ISPs interpret as a signal that you're not interested in recipient engagement.
-
-**Fix**: Use a monitored address. `hello@`, `support@`, or even `team@`. If you don't want replies cluttering your inbox, set a `Reply-To` header to route replies elsewhere:
+**Best Practice**: Use a recognizable sender address such as `notifications@yourdomain.com` or `team@yourdomain.com`, and set a monitored `Reply-To` header to route inbound responses to your support inbox:
 
 ```typescript
 await reloop.emails.send({
-  from: "notifications@yourdomain.com",
+  from: "Acme Support <notifications@yourdomain.com>",
   replyTo: "support@yourdomain.com",
   to: user.email,
-  subject: "...",
-  html: "...",
+  subject: "Your order confirmation",
+  html: "<p>Thank you for your purchase...</p>",
 });
 ```
 
----
+## Cause 7: Sending IP or domain listed on a DNSBL blacklist
 
-## Cause 7: IP or domain on a blacklist
+**Probability: High if credentials were leaked, sending servers were compromised, or list hygiene was neglected.**
 
-**Probability: Low if your practices are clean. High if you've had previous problems.**
+DNSBLs (DNS-based Blackhole Lists) are shared databases of IP addresses and domains flagged for spam transmission or compromised SMTP servers. If your IP or domain appears on an authoritative blocklist (such as **Spamhaus**, **Barracuda**, or **Spamcop**), major ISPs will reject or spam-folder your mail immediately.
 
-Email blacklists (also called blocklists or DNSBLs) are databases of IPs and domains known to send spam. If your IP or domain is listed, many ISPs will reject or spam-folder your mail automatically.
+### How to check blacklist status
 
-### How to check
+Run an automated scan across all major DNSBL registries using the [MXToolbox Blacklist Checker](https://mxtoolbox.com/blacklists.aspx). Enter your sending IP address and sending domain.
 
-Check all major blacklists in one place: [MXToolbox Blacklist Check](https://mxtoolbox.com/blacklists.aspx). Enter your sending IP or domain.
+### How to request delisting
 
-### How to get delisted
+1. **Isolate and fix the root cause**: Identify and patch the compromised SMTP credential, stop the rogue sending loop, or purge the failing email list.
+2. **Submit a removal request**: Visit the specific blacklist removal portal (e.g. the [Spamhaus Blocklist Removal Center](https://www.spamhaus.org/removal/)) and provide proof of remediation.
+3. **Monitor clearance**: Most reputable blocklists clear listings within 24 to 48 hours once remediation is verified.
 
-Most blacklists have a self-service delisting process:
-1. Fix the underlying issue that caused the listing (usually bad list hygiene or compromised credentials)
-2. Submit a delisting request explaining what you've fixed
-3. Most listings clear within 24–48 hours if the root cause is resolved
+## Cause 8: ISP-specific filtering (Gmail, Microsoft 365, Apple)
 
-Spamhaus is the most impactful blacklist. Their [Blocklist Removal Center](https://www.spamhaus.org/removal) walks you through their delisting process.
+Each major mailbox provider utilizes proprietary filtering algorithms beyond baseline standards:
 
----
+### 1. Google (Gmail)
+- **Primary Tool**: Monitor [Google Postmaster Tools](https://postmaster.google.com).
+- **Tab Placement vs. Spam**: If transactional emails route to the **Promotions** tab instead of **Primary**, this is a classification issue rather than a spam penalty. Keep transactional templates lightweight and free from promotional banners to help Gmail route them to Primary.
+- **BIMI Brand Logo**: Implement [BIMI (Brand Indicators for Message Identification)](/blog/bimi-email-setup-guide) with a valid DMARC enforcement policy (`p=quarantine` or `p=reject`) to display your verified company avatar in Gmail inboxes.
 
-## Cause 8: Gmail-specific issues
+### 2. Microsoft (Outlook / Office 365)
+- Microsoft maintains stringent IP reputation filtering and relies heavily on [Smart Network Data Services (SNDS)](https://sendersupport.olc.protection.outlook.com/snds/).
+- Microsoft frequently returns `550 5.7.1` error codes when an IP reputation drops below acceptable thresholds.
 
-Gmail has its own deliverability signals beyond standard authentication. If mail is landing in Gmail spam but not Outlook or Yahoo, the issue is likely Gmail-specific.
+## The 8-Step Deliverability Diagnostic Checklist
 
-### Gmail Postmaster Tools signals
+When emails are landing in spam, work through this diagnostic sequence in order:
 
-Register your sending domain at [Google Postmaster Tools](https://postmaster.google.com). Look at:
+1. **Run a [mail-tester.com](https://mail-tester.com) scan (target score ≥ 9/10)** — Identifies broken MIME syntax, missing DNS tags, and Bayesian spam keyword flags before you touch infrastructure.
+2. **Audit raw authentication headers** — Inspect received headers in an actual test inbox to confirm `SPF: PASS`, `DKIM: PASS`, and `DMARC: PASS` with identifier alignment.
+3. **Check [Google Postmaster Tools](https://postmaster.google.com) telemetry** — Verify that your Domain Reputation is "Good" or "High" and inspect Gmail-specific spam rates.
+4. **Check DNSBL blacklists on [MXToolbox](https://mxtoolbox.com/blacklists.aspx)** — Confirm neither your sending IP nor domain is listed on Spamhaus, Barracuda, or Spamcop.
+5. **Review real-time bounce rates in [Reloop Analytics](/features/email-analytics)** — Confirm that your 30-day hard bounce rate is strictly **below 2%** and that auto-suppression is active.
+6. **Review your spam complaint rate** — Ensure complaints remain strictly **below 0.10%** (1 per 1,000 sends) to prevent algorithmic ISP filtering.
+7. **Audit MIME structure & plain text fallback** — Verify that every outgoing template includes both a valid `text/plain` part and a balanced HTML payload without broken tracking URLs.
+8. **Verify ISP-specific routing & tab placement** — Check whether messages are routing to Gmail's Promotions tab vs. spam, and isolate transactional subdomains from promotional lists.
 
-- **Domain Reputation**: Aims for Good or High. Bad or Low means Gmail is actively distrusting your domain.
-- **IP Reputation**: If you use a shared IP pool, you inherit that pool's reputation.
-- **Spam Rate**: Your Gmail-specific complaint rate. Keep below 0.1%.
-- **Authentication**: Confirms SPF, DKIM, DMARC pass rates for Gmail traffic specifically.
 
-### Gmail tabs
-
-Gmail's tabbed inbox (Primary, Social, Promotions) affects transactional email. If your password reset or receipt is routing to Promotions, it's not because of spam — it's tab classification. This is generally harmless for transactional mail but you can help Gmail classify correctly by:
-- Sending from a transactional subdomain (not marketing)
-- Not including promotional offers in transactional emails
-- Keeping HTML minimal
-
----
-
-## The diagnostic flowchart
-
-When mail lands in spam, work through this in order:
-
-1. **Get mail-tester.com score** → identifies multiple issues at once
-2. **Check authentication headers in the received email** → SPF/DKIM/DMARC pass?
-3. **Check Google Postmaster Tools** → domain and IP reputation?
-4. **Check MXToolbox blacklist** → is your IP or domain listed?
-5. **Review recent bounce rate** → above 2%?
-6. **Review recent complaint rate** → above 0.1%?
-7. **Review content** → spam words, image/text ratio, missing text part?
-8. **Check if issue is ISP-specific** → only Gmail? Only Outlook?
-
-Most spam problems stem from the first three items on this list. Fix authentication, monitor your reputation, and keep your bounce and complaint rates low — and most deliverability problems resolve themselves.

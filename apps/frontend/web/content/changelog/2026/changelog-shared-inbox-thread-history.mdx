@@ -1,0 +1,20 @@
+---
+slug: shared-inbox-thread-history
+version: 0.35.0
+date: March 2026
+launchDate: 28 March 2026
+title: 'Shared Inbox & Email Thread History'
+description: >-
+  Built the Inbox dashboard to view incoming emails, complete conversation threads, and message history.
+tags:
+  - Inbox
+  - Feature
+---
+### FRONTEND
+
+- **Thread timeline.** Full chronological email thread view rendering sanitized HTML, plain text, and attachment chips.
+- **Search & filters.** Filter conversation threads by recipient, status (open/closed), and assigned mailbox.
+
+### BACKEND
+
+- **Thread schema.** Database models in packages/db/src/schema/thread.ts linking multiple inbound/outbound messages to persistent conversations.

@@ -1,17 +1,10 @@
 import { apiKey } from "@better-auth/api-key";
-import { handleAuthLifecycleEviction } from "@reloop/auth/middleware/eviction/handle-auth-lifecycle-eviction";
-import { ac, orgRoles } from "@reloop/auth/permissions";
-import { platformAc, platformRoles } from "@reloop/auth/platform-permissions";
-import { DEFAULT_USER_ROLE, PLATFORM_ADMIN_ROLE } from "@reloop/auth/roles";
-import { authServerConfig } from "@reloop/auth/server/config";
-import { redis } from "@reloop/auth/server/redis";
-import { sessionCacheRedis } from "@reloop/auth/server/session-cache-redis";
 import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { createAuthMiddleware } from "better-auth/api";
+import { APIError, createAuthMiddleware } from "better-auth/api";
 import {
 	admin,
 	bearer,
@@ -23,6 +16,41 @@ import {
 } from "better-auth/plugins";
 import { and, eq } from "drizzle-orm";
 import { log } from "evlog";
+import { handleAuthLifecycleEviction } from "../middleware/eviction/handle-auth-lifecycle-eviction";
+import {
+	ORGANIZATION_NAME_MAX_LENGTH,
+	organizationNameMaxLengthMessage,
+	organizationNameTooLong,
+} from "../organization-limits";
+import { ac, orgRoles } from "../permissions";
+import { platformAc, platformRoles } from "../platform-permissions";
+import { DEFAULT_USER_ROLE, PLATFORM_ADMIN_ROLE } from "../roles";
+import {
+	USER_NAME_PART_MAX_LENGTH,
+	userDisplayNamePartsTooLong,
+	userNamePartMaxLengthMessage,
+} from "../user-name-limits";
+import { authServerConfig } from "./config";
+import { redis } from "./redis";
+import { sessionCacheRedis } from "./session-cache-redis";
+
+function assertOrganizationNameLength(name: string | undefined) {
+	if (typeof name !== "string") return;
+	if (organizationNameTooLong(name)) {
+		throw new APIError("BAD_REQUEST", {
+			message: organizationNameMaxLengthMessage(ORGANIZATION_NAME_MAX_LENGTH),
+		});
+	}
+}
+
+function assertUserDisplayNameLength(name: string | undefined) {
+	if (typeof name !== "string") return;
+	if (userDisplayNamePartsTooLong(name)) {
+		throw new APIError("BAD_REQUEST", {
+			message: userNamePartMaxLengthMessage("Name", USER_NAME_PART_MAX_LENGTH),
+		});
+	}
+}
 
 /** Accounts created within this window are treated as signups, not return logins. */
 const NEW_USER_SIGNIN_GRACE_MS = 2 * 60 * 1000;
@@ -90,6 +118,13 @@ export const auth = betterAuth({
 							message: "Failed to publish USER_CREATED",
 						});
 					}
+				},
+			},
+			update: {
+				before: async (user) => {
+					assertUserDisplayNameLength(
+						typeof user.name === "string" ? user.name : undefined,
+					);
 				},
 			},
 		},
@@ -355,6 +390,12 @@ export const auth = betterAuth({
 			// email+org before inserting a new one.
 			cancelPendingInvitationsOnReInvite: true,
 			organizationHooks: {
+				beforeCreateOrganization: async ({ organization: org }) => {
+					assertOrganizationNameLength(org.name);
+				},
+				beforeUpdateOrganization: async ({ organization: org }) => {
+					assertOrganizationNameLength(org.name);
+				},
 				beforeCreateInvitation: async ({ invitation }) => {
 					const email = invitation.email.toLowerCase();
 					const now = new Date();

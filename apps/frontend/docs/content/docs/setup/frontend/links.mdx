@@ -58,10 +58,6 @@ INTERNAL_API_URL=http://localhost:8014/api/contacts
 
 # Server-side mail API (open-tracking pixel proxy)
 INTERNAL_MAIL_API_URL=http://localhost:8015/api/mail
-
-# Rybbit analytics (optional)
-NEXT_PUBLIC_RYBBIT_HOST=https://app.rybbit.io
-NEXT_PUBLIC_RYBBIT_SITE_ID=reloop-web
 ```
 
 Preferences call [contacts](/docs/setup/backend/contacts) via `INTERNAL_API_URL`. Open-tracking proxies to [mail](/docs/setup/backend/mail) via `INTERNAL_MAIL_API_URL` (or `NEXT_PUBLIC_URL` as a fallback).
@@ -72,8 +68,6 @@ Preferences call [contacts](/docs/setup/backend/contacts) via `INTERNAL_API_URL`
 | `REDIRECT_SECRET` | No | Shared secret with mail / auth / email backends |
 | `INTERNAL_API_URL` | No | `http://localhost:8014/api/contacts` |
 | `INTERNAL_MAIL_API_URL` | No | Falls back to `{NEXT_PUBLIC_URL}/api/mail` |
-| `NEXT_PUBLIC_RYBBIT_HOST` | No | Rybbit analytics host |
-| `NEXT_PUBLIC_RYBBIT_SITE_ID` | No | Rybbit site identifier |
 
 
 ## Routes

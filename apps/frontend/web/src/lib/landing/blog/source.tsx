@@ -4,6 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { getMDXComponents } from "@reloop/web/mdx-components";
 import matter from "gray-matter";
+import yaml from "js-yaml";
 import type { MDXComponents } from "mdx/types";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import remarkGfm from "remark-gfm";
@@ -186,7 +187,11 @@ function readPostFile(slug: string) {
 	}
 
 	const fileContent = fs.readFileSync(filePath, "utf8");
-	const { data, content } = matter(fileContent);
+	const { data, content } = matter(fileContent, {
+		engines: {
+			yaml: (s) => yaml.load(s) as object,
+		},
+	});
 	const post = parseFrontmatter(slug, data);
 
 	validateCategory(post.category);
@@ -227,9 +232,13 @@ export function getCategories(): BlogCategoryDefinition[] {
 		return [];
 	}
 
-	return JSON.parse(
+	const categories = JSON.parse(
 		fs.readFileSync(categoriesPath, "utf8"),
 	) as BlogCategoryDefinition[];
+
+	return [...categories].sort((a, b) =>
+		a.name.localeCompare(b.name, "en", { sensitivity: "base" }),
+	);
 }
 
 export function getCategoryBySlug(slug: string) {

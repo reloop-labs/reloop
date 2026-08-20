@@ -1,3 +1,4 @@
+import { ORGANIZATION_NAME_MAX_LENGTH } from "@reloop/auth/organization-limits";
 import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
 import { motion } from "framer-motion";
@@ -19,8 +20,9 @@ export function CompanyNameField() {
 						type="text"
 						value={name}
 						className="font-medium"
+						maxLength={ORGANIZATION_NAME_MAX_LENGTH}
 						onChange={(e) => {
-							setName(e.target.value);
+							setName(e.target.value.slice(0, ORGANIZATION_NAME_MAX_LENGTH));
 						}}
 						placeholder="e.g. Acme Corp"
 					/>

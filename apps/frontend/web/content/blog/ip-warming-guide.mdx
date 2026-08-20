@@ -1,74 +1,183 @@
 ---
-title: "IP Warm-Up Guide: How to Build Sender Reputation From Scratch"
-description: A week-by-week IP warm-up schedule for new sending IPs — with volume targets, recipient selection strategy, and what to watch for along the way.
+title: "IP Warming Schedule Guide: How to Build Sender Reputation (2026)"
+description: "A comprehensive, practical guide to warming new sending IP addresses — with an exact week-by-week volume ramp schedule, recipient segmentation strategy, throttle limits, and deliverability monitoring."
 keywords:
-  - ip warm up email
+  - ip warming schedule
   - email ip warmup guide
-  - new ip warmup schedule
   - build sender reputation email
+  - dedicated ip warmup
+  - dedicated ip deliverability
+  - email warm up strategy
+  - smtp ip warming
 publishedAt: 2026-08-22
 category: Deliverability
-tags: [deliverability, ip-warming, reputation, smtp]
-readTime: 8 min read
+tags: [deliverability, ip-warming, reputation, smtp, kumomta]
+readTime: 9 min read
 author:
   name: Pranav Patel
   role: Co-founder
   avatar: /company/team/pranav-patel.jpg
-draft: true
+draft: false
+image: /blog/images/ip-warming-guide.png
 relatedSlugs:
   - why-emails-land-in-spam-fix
   - spf-dkim-dmarc-setup-guide
+  - email-bounce-processing-automation
+  - transactional-email-best-practices
+  - self-hosted-email-infrastructure
+  - why-we-open-sourced-email-infrastructure
 ---
 
-## Why IP warm-up matters
+**Sending high-volume email traffic from a cold, un-warmed IP address is the single fastest way to get throttled, deferred, or permanently blacklisted by mailbox providers.**
 
-ISPs assign reputation scores to sending IPs. A new IP has no score — which ISPs treat as suspicious. Warm-up is the process of gradually increasing volume to demonstrate consistent, legitimate sending behaviour before going full throttle.
+When an Internet Service Provider (such as Gmail, Microsoft 365, or Yahoo) detects sudden spikes of outbound email originating from an unfamiliar IP address, anti-abuse algorithms immediately assume the server is a compromised host or a spam botnet. 
 
-## Who needs to warm up
+**IP warm-up is the disciplined process of gradually ramping up sending volume over 4 to 6 weeks to establish positive, trusted reputation signals with major mailbox algorithms.**
 
-- New dedicated IPs added to your sending pool
-- Any IP that hasn't sent in 30+ days (reputation decays)
-- Shared IPs from a new provider where your domain is new
+Whether you are configuring a dedicated IP on [Reloop Cloud](/pricing) or deploying [self-hosted Reloop on your own VPS or bare metal](/self-host), this guide provides the exact week-by-week volume schedules, recipient segmentation techniques, and diagnostic tools required to warm your sending IPs safely.
 
-You don't need to warm up if you're using a shared pool from an established provider — they manage pool reputation for you.
+---
 
-## Before you start
+## Shared pools vs. dedicated IPs: Who actually needs to warm up?
 
-Complete these first or warm-up won't help:
-- ✅ SPF, DKIM, DMARC all configured and verified
-- ✅ Unsubscribe link in every email
-- ✅ Suppression list clean (no previous bounces or complaints)
-- ✅ From domain has at least 30 days of age (brand-new domains are high-risk)
+Before starting, it is essential to understand whether your setup requires manual IP warming:
 
-## Week-by-week schedule
+1. **Reloop Cloud Shared Pools (No Warm-Up Needed)**: If you send via standard [Reloop Cloud plans](/pricing), your traffic routes through pre-warmed, continuously monitored shared IP pools with established reputation. You can ship production transactional mail immediately.
+2. **Dedicated Sending IPs (Warm-Up Required)**: If your organization provisions dedicated IPs for high-volume isolation, enterprise compliance, or [self-hosted Reloop deployments](/blog/self-hosted-email-infrastructure), **you must execute a structured warm-up schedule before routing 100% of your production traffic**.
+3. **Dormant IP Addresses (Re-Warming Required)**: If a previously warmed dedicated IP sits idle for **30 consecutive days or more**, ISPs decay its reputation score back to neutral, requiring a fresh warm-up cycle.
 
-| Week | Daily volume | Cumulative |
-|------|-------------|------------|
-| 1 | 50–200 | ~1,000 |
-| 2 | 200–500 | ~3,500 |
-| 3 | 500–1,000 | ~10,500 |
-| 4 | 1,000–2,000 | ~24,500 |
-| 5 | 2,000–5,000 | ~59,500 |
-| 6 | 5,000–10,000 | ~129,500 |
+---
 
-After week 6 you can ramp more aggressively if metrics are healthy.
+##  Prerequisites before sending email #1
 
-## Recipient selection strategy
+**Warming an IP with broken authentication or dirty recipient lists will permanently destroy the IP's reputation before you finish Week 1.** Complete this checklist first:
 
-Send to your most engaged recipients first — people who signed up recently, opened emails in the past 30 days, or are actively using your product. Positive engagement signals (opens, clicks) build reputation faster than just delivering to inactive addresses.
+- [ ] **SPF, DKIM, and DMARC fully validated**: Your sending domain must have strict DNS records published with proper identifier alignment. Follow our [complete SPF, DKIM, and DMARC setup guide](/blog/spf-dkim-dmarc-setup-guide).
+- [ ] **Reverse DNS (rDNS / PTR Record) configured**: The PTR record of your sending IP must match your sending hostname (e.g. `mail.yourdomain.com`), and that hostname must resolve back to the IP (Forward-Confirmed reverse DNS).
+- [ ] **Clean suppression lists**: Ensure your suppression database contains zero historical hard bounces or spam complaints (see [email bounce processing automation](/blog/email-bounce-processing-automation)).
+- [ ] **Domain age over 30 days**: Brand-new domain names registered within the last 30 days carry an elevated risk profile in spam filter heuristics.
+- [ ] **One-Click Unsubscribe headers configured**: Ensure all non-essential notifications include `List-Unsubscribe` and `List-Unsubscribe-Post` headers per RFC 8058.
 
-## Metrics to watch
+---
 
-- **Bounce rate**: Keep below 2%. Stop and investigate if it spikes.
-- **Spam complaint rate**: Keep below 0.1% (Google's threshold for warnings is 0.1%, suspension is 0.3%).
-- **Delivery rate**: Should be above 98% for major ISPs.
+## The 6-week IP warming schedule
 
-## Red flags that mean you should pause
+The following schedule outlines conservative daily volume targets per sending IP address across all destination mailbox providers.
 
-- Bounce rate above 5% for a single send
-- Spam complaint rate above 0.3%
-- Gmail Postmaster Tools showing "Bad" reputation for your domain
+| Phase | Daily Sends | Cumulative Total | Target Recipient Segment |
+| :--- | :--- | :--- | :--- |
+| **Week 1** | **50 – 200 / day** | ~1,000 | **High-intent transactional only** (password resets, 2FA OTPs, purchase receipts). |
+| **Week 2** | **200 – 500 / day** | ~3,500 | Active daily users and transactional notifications. |
+| **Week 3** | **500 – 1,000 / day** | ~10,500 | Weekly digests, invoice alerts, and active subscribers. |
+| **Week 4** | **1,000 – 2,500 / day** | ~24,500 | Product announcements to users active in the last 30 days. |
+| **Week 5** | **2,500 – 5,000 / day** | ~59,500 | Broad notifications; monitor spam rates rigorously. |
+| **Week 6+** | **5,000 – 10,000+ / day** | ~129,500+ | Full production volume with established reputation baseline. |
 
-## Checking your progress
+### Per-ISP daily volume distribution
 
-Use [Google Postmaster Tools](https://postmaster.google.com) and [Microsoft SNDS](https://sendersupport.olc.protection.outlook.com/snds/) to monitor your reputation at the two largest ISPs throughout the warm-up period.
+Major mailbox providers evaluate IP reputation independently. When warming an IP, **distribute your daily volume evenly across destination domains**:
+
+| Mailbox Provider / ISP | Volume Share | Target Sends (Example: 400 total/day) | Deliverability Focus |
+| :--- | :--- | :--- | :--- |
+| **Gmail / Google Workspace** | **~40%** | **~160 sends** | Track Domain & IP Reputation on Google Postmaster Tools. |
+| **Microsoft / Outlook / O365** | **~30%** | **~120 sends** | Prone to `451` rate-limit deferrals during early ramp-up. |
+| **Yahoo / AOL / Verizon** | **~15%** | **~60 sends** | Strict spam complaint monitoring (enforces < 0.10% threshold). |
+| **Apple Mail & Other Domains** | **~15%** | **~60 sends** | Custom corporate and private mail servers. |
+
+If you send 2,000 emails in a single day but all 2,000 hit Gmail at once, Gmail's inbound filters will trigger rate limits even if your overall server volume appears moderate.
+
+---
+
+## Recipient segmentation: The secret to accelerating IP trust
+
+**Volume alone does not build reputation—positive recipient engagement is what signals to ISPs that your emails are legitimate and wanted.**
+
+Mailbox algorithms treat user interactions as mathematical multipliers:
+* **Positive Signals (+)**: Opening messages, clicking links, moving emails from Spam to Inbox ("Not Spam"), and adding the sender to address books.
+* **Negative Signals (-)**: Marking messages as Spam, deleting without opening, and hard bouncing.
+
+| Priority Tier | Timing | Qualifying User Criteria | Purpose |
+| :--- | :--- | :--- | :--- |
+| **Tier 1: High-Priority** | **Week 1 – 2** | Password resets, 2FA codes, account signups, invoices. | Near-100% open rate, zero spam complaints. |
+| **Tier 2: Engaged Users** | **Week 3 – 4** | Users who logged in or opened an email in the last 14 days. | Strong positive interaction signals. |
+| **Tier 3: Active Users** | **Week 5 – 6** | Users who engaged with product/email in the last 60 days. | Safely scales daily volume. |
+| **Tier 4: Cold Segments** | **Post Warm-Up** | Inactive users (> 90 days without opens/clicks). | Re-engagement only after reputation is solid. |
+
+**Never send re-engagement campaigns or cold outreach during an IP warm-up window.** Reserve the warm-up period exclusively for your highest-intent, most active users.
+
+---
+
+## Critical deliverability metrics & red flags
+
+Throughout the warm-up cycle, monitor your delivery logs inside [Reloop Analytics](/features/email-analytics) and watch for these hard thresholds:
+
+### 1. Spam Complaint Rate (Threshold: < 0.10%)
+- **Google & Yahoo Warning Threshold**: **0.10%** (1 complaint per 1,000 delivered emails).
+- **Hard Penalty Threshold**: **0.30%** (3 complaints per 1,000 delivered emails).
+- **Action**: If complaints exceed 0.10%, pause volume increases immediately and audit your recipient targeting.
+
+### 2. Hard Bounce Rate (Threshold: < 2.0%)
+- **Healthy Baseline**: Strictly below **1.0%**.
+- **Warning Level**: **2.0% – 5.0%**.
+- **Critical Failure**: Above **5.0%**.
+- **Action**: Hard bounces indicate stale, invalid, or disposable email data. **Reloop automatically suppresses hard-bounced addresses so they are never retried**, protecting your domain and IP reputation. To eliminate bounce spikes before sending, verify that incoming signups are valid and not temporary throwaway addresses using our free [Email Validator tool](/tools/email-validator) (and review our guide on [why emails land in spam and how to fix it](/blog/why-emails-land-in-spam-fix)).
+
+### 3. SMTP Deferral Codes (`421` and `451`)
+- **`421 4.7.0 [IP] Deferred - Connection rate limit exceeded`**: The receiving ISP is asking your server to slow down.
+- **`451 4.7.650 Deferred - Service temporarily unavailable`**: Typical Microsoft rate-limiting during early warm-up.
+- **Action**: Reloop's [KumoMTA sending engine](/features/deliverability) automatically manages backoff queues using intelligent retry logic so deferred emails are retried without dropping packets (see [how we built our queue engine with BullMQ](/blog/how-we-built-email-delivery-queue-bullmq)).
+
+---
+
+## How Reloop simplifies deliverability management
+
+Reloop combines high-performance MTA engineering with modern developer ergonomics:
+
+```typescript
+import { Reloop } from "@reloop/sdk";
+
+const reloop = new Reloop({
+  apiKey: process.env.RELOOP_API_KEY,
+});
+
+// Dispatch transactional notification with structured metadata
+const response = await reloop.emails.send({
+  from: "Reloop Security <security@yourdomain.com>",
+  to: "user@example.com",
+  subject: "Your login verification code",
+  html: "<p>Your security code is <strong>888888</strong>.</p>",
+  headers: {
+    "X-Entity-Ref-ID": "auth-otp-92841",
+  },
+});
+```
+
+### Reloop's built-in deliverability architecture:
+
+1. **Automated Cryptographic Signing**: Dedicated RSA-2048 [DKIM key generation](/blog/spf-dkim-dmarc-setup-guide) signed at line-rate via KumoMTA.
+2. **Intelligent Queue Management**: Outbound queues powered by BullMQ handle backoff retries when destination ISPs return temporary `4xx` deferrals.
+3. **Real-Time Event Stream**: Webhooks dispatch immediate `delivered`, `opened`, `clicked`, `bounced`, and `complained` payloads to your backend (explore [webhook features](/features/webhooks)).
+4. **Automated Suppression Protection**: Hard bounces and spam complaints are instantly isolated to protect your sending IP from repeated reputation penalties.
+5. **AI Agent Inbox Support**: Dedicated routing and Model Context Protocol (MCP) integrations for autonomous agent workflows (see [email infrastructure for AI agents](/blog/email-infrastructure-for-ai-agents) and the [AI agent inbox use case](/use-cases/ai-agent-inbox)).
+
+---
+
+## What to do if an ISP throttles your warm-up
+
+If you encounter deliverability issues during warm-up, follow this 4-step recovery protocol:
+
+1. **Do not increase volume**: Freeze daily send volume at the current tier or drop back to the previous week's volume.
+2. **Audit Google Postmaster Tools**: Check [Google Postmaster Tools](https://postmaster.google.com) for sudden drops in Domain or IP Reputation and inspect the authentication success tab.
+3. **Inspect DNSBL Blacklists**: Query your sending IP on [MXToolbox Blacklist Check](https://mxtoolbox.com/blacklists.aspx) to ensure the IP hasn't been listed on Spamhaus or Barracuda.
+4. **Isolate transactional streams**: Ensure your marketing updates are strictly isolated from mission-critical authentication mail (see [transactional email best practices](/blog/transactional-email-best-practices)).
+
+Once metrics stabilize for 5 to 7 consecutive days, resume the volume schedule.
+
+---
+
+## Where to go from here
+
+- **[SPF, DKIM, and DMARC Complete Setup Guide](/blog/spf-dkim-dmarc-setup-guide)**: Publish and verify the three essential authentication records.
+- **[Why Emails Land in Spam & How to Fix It](/blog/why-emails-land-in-spam-fix)**: A complete diagnostic checklist for ISP-specific delivery failures.
+- **[Self-Host Reloop for $5/Month](/blog/self-host-email-5-dollars)**: Deploy production-ready email infrastructure on Fly.io, Coolify, or your own VPS.
+- **[Why We Open-Sourced Our Email Infrastructure](/blog/why-we-open-sourced-email-infrastructure)**: The architectural vision and philosophy behind Reloop.

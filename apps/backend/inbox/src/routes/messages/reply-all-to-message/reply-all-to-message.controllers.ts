@@ -1,5 +1,10 @@
 import { db } from "@reloop/db/client";
-import { inboundEmail, mailbox, threadMessage } from "@reloop/db/schema";
+import {
+	emailLog,
+	inboundEmail,
+	mailbox,
+	threadMessage,
+} from "@reloop/db/schema";
 import { and, eq } from "drizzle-orm";
 import { createError } from "evlog";
 import { useLogger } from "evlog/elysia";
@@ -11,6 +16,8 @@ export async function replyAllToMessageController(
 	body: {
 		text?: string;
 		html?: string;
+		to?: string | string[];
+		cc?: string | string[];
 		bcc?: string | string[];
 		attachments?: Array<{
 			content?: string;
@@ -25,69 +32,109 @@ export async function replyAllToMessageController(
 ) {
 	const log = useLogger();
 
-	// Fetch original message
-	const original = await db.query.inboundEmail.findFirst({
+	// Fetch original message (inbound or outbound log)
+	const originalInbound = await db.query.inboundEmail.findFirst({
 		where: and(
 			eq(inboundEmail.id, messageId),
 			eq(inboundEmail.organizationId, organizationId),
 		),
 	});
 
-	if (!original) {
-		throw createError({
-			status: 404,
-			message: "Message not found",
-			why: `Message ${messageId} was not found in your organization`,
-			fix: "Verify the message ID",
+	let mailboxId = originalInbound?.mailboxId;
+	let defaultReplyTo: string | string[] =
+		originalInbound?.replyTo ?? originalInbound?.fromEmail ?? "";
+	let originalSubject = originalInbound?.subject ?? "";
+	let headerMsgId = originalInbound?.messageId ?? null;
+	let resolvedThreadId: string | undefined;
+	let originalToEmails = originalInbound?.toEmails ?? [];
+	let originalCcEmails = (originalInbound?.ccEmails as string[]) ?? [];
+
+	if (!originalInbound) {
+		const outboundLog = await db.query.emailLog.findFirst({
+			where: and(
+				eq(emailLog.id, messageId),
+				eq(emailLog.organizationId, organizationId),
+			),
 		});
+
+		if (!outboundLog) {
+			throw createError({
+				status: 404,
+				message: "Message not found",
+				why: `Message ${messageId} was not found in your organization`,
+				fix: "Verify the message ID",
+			});
+		}
+
+		const mbx = await db.query.mailbox.findFirst({
+			where: and(
+				eq(mailbox.organizationId, organizationId),
+				eq(mailbox.email, outboundLog.fromEmail),
+			),
+		});
+		const firstMbx =
+			mbx ||
+			(await db.query.mailbox.findFirst({
+				where: eq(mailbox.organizationId, organizationId),
+			}));
+
+		mailboxId = firstMbx?.id ?? "";
+		const toArray = Array.isArray(outboundLog.toEmails)
+			? (outboundLog.toEmails as string[])
+			: [];
+		defaultReplyTo = toArray[0] || outboundLog.replyTo || outboundLog.fromEmail;
+		originalToEmails = toArray;
+		originalCcEmails = Array.isArray(outboundLog.ccEmails)
+			? (outboundLog.ccEmails as string[])
+			: [];
+		originalSubject = outboundLog.subject || "";
+		headerMsgId = outboundLog.messageId || null;
+	} else {
+		const threadMsg = await db.query.threadMessage.findFirst({
+			where: eq(threadMessage.inboundEmailId, messageId),
+			columns: { threadId: true },
+		});
+		resolvedThreadId = threadMsg?.threadId;
 	}
 
-	// Resolve the mailbox to get our email
+	// Resolve mailbox to get our email
 	const mbx = await db.query.mailbox.findFirst({
-		where: eq(mailbox.id, original.mailboxId),
+		where: eq(mailbox.id, mailboxId ?? ""),
 	});
 
 	const ourEmail = mbx?.email || "";
 
-	// Find the thread
-	const threadMsg = await db.query.threadMessage.findFirst({
-		where: eq(threadMessage.inboundEmailId, messageId),
-		columns: { threadId: true },
-	});
-
 	// Build reply-all recipients
-	// To: original sender
-	const replyTo = original.replyTo || original.fromEmail;
+	const replyTo = body.to ?? defaultReplyTo;
 
-	// CC: original to + cc, excluding ourselves
-	const allRecipients = [
-		...(original.toEmails || []),
-		...((original.ccEmails as string[]) || []),
-	].filter((email) => email && email !== ourEmail && email !== replyTo);
+	const defaultCc = [...originalToEmails, ...originalCcEmails].filter(
+		(email) => email && email !== ourEmail && email !== defaultReplyTo,
+	);
 
-	const replySubject = original.subject?.startsWith("Re:")
-		? original.subject
-		: `Re: ${original.subject || ""}`;
+	const replyCc = body.cc !== undefined ? body.cc : defaultCc;
+	const ccList = Array.isArray(replyCc) ? replyCc : replyCc ? [replyCc] : [];
+
+	const replySubject = originalSubject.startsWith("Re:")
+		? originalSubject
+		: `Re: ${originalSubject}`;
 
 	log.info(
-		`[INBOX] Reply-all to message ${messageId} → ${replyTo}, CC: ${allRecipients.join(", ")}`,
+		`[INBOX] Reply-all to message ${messageId} → ${Array.isArray(replyTo) ? replyTo.join(", ") : replyTo}, CC: ${ccList.join(", ")}`,
 	);
 
 	return proxySendToMailService(
 		{
-			mailboxId: original.mailboxId,
+			mailboxId: mailboxId ?? "",
 			organizationId,
 			to: replyTo,
 			subject: replySubject,
 			text: body.text,
 			html: body.html,
-			cc: allRecipients.length > 0 ? allRecipients : undefined,
+			cc: ccList.length > 0 ? ccList : undefined,
 			bcc: body.bcc,
 			attachments: body.attachments,
-			threadId: threadMsg?.threadId || undefined,
-			headers: original.messageId
-				? { "In-Reply-To": original.messageId }
-				: undefined,
+			threadId: resolvedThreadId,
+			headers: headerMsgId ? { "In-Reply-To": headerMsgId } : undefined,
 		},
 		apiKey,
 		cookie,

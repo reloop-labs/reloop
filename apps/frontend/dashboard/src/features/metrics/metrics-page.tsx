@@ -1,3 +1,4 @@
+import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { useQueryClient } from "@tanstack/react-query";
 import { parseAsString, useQueryState } from "nuqs";
@@ -6,7 +7,9 @@ import { useActiveOrganization } from "#/features/dashboard/page-header/use-acti
 import { DomainSelector } from "#/features/emails/components/domain-selector";
 import { DateRangeFilter } from "#/features/logs/date-range-filter";
 import { DeliverabilityChart } from "#/features/metrics/components/deliverability-chart";
+import { HealthCards } from "#/features/metrics/components/health-cards";
 import { RateChart } from "#/features/metrics/components/rate-chart";
+import { buildHealthCards } from "#/features/metrics/health-ratings";
 import { useEmailStatsQuery } from "#/features/metrics/hooks/use-email-stats-query";
 import {
 	formatBucketDateLabel,
@@ -81,7 +84,7 @@ export function MetricsPage() {
 		domain: selectedDomain ?? "",
 	};
 
-	const { data, isFetching } = useEmailStatsQuery({
+	const { data, isFetching, isPending } = useEmailStatsQuery({
 		...statsParams,
 		enabled: !!activeOrganization?.id,
 	});
@@ -217,10 +220,25 @@ export function MetricsPage() {
 		});
 
 		const totalBouncedSum = totalPermanent + totalTransient + totalUndetermined;
+		const totalSentSum = totalSent;
+		const totalDelivered = data.delivered.reduce((a, b) => a + b, 0);
+		const totalOpened = (data.opened ?? []).reduce((a, b) => a + b, 0);
+		const totalUnsubscribed = (data.unsubscribed ?? []).reduce(
+			(a, b) => a + b,
+			0,
+		);
 
 		return {
 			bounceRate: Math.round(bounceRate * 100) / 100,
 			complaintRate: Math.round(complaintRate * 100) / 100,
+			healthCards: buildHealthCards({
+				sent: totalSentSum,
+				delivered: totalDelivered,
+				bounced: totalBouncedSum,
+				complaint: totalComplaint,
+				opened: totalOpened,
+				unsubscribed: totalUnsubscribed,
+			}),
 			chartData,
 			breakdown: {
 				bounce: [
@@ -298,17 +316,28 @@ export function MetricsPage() {
 					<button
 						type="button"
 						onClick={handleRefresh}
-						className="ml-auto flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-white-0 text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-stroke-soft-100/40"
+						disabled={isFetching}
+						className={cn(
+							"ml-auto flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-white-0 text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-stroke-soft-100/40",
+							isFetching ? "pointer-events-none" : "cursor-pointer",
+						)}
 						title="Refresh metrics"
+						aria-label="Refresh metrics"
+						aria-busy={isFetching}
 					>
 						<Icon
 							name="rotate-cw"
-							className={`h-4 w-4 ${isFetching ? "animate-spin" : ""}`}
+							className={cn("h-4 w-4", isFetching && "animate-spin")}
 						/>
 					</button>
 				</div>
 
 				<div className="mt-4 flex flex-col gap-6">
+					<HealthCards
+						cards={stats?.healthCards ?? []}
+						isLoading={isPending && !stats}
+					/>
+
 					<DeliverabilityChart
 						startDate={effectiveStartDate}
 						endDate={effectiveEndDate}

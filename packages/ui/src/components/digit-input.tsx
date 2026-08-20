@@ -98,6 +98,7 @@ export function InputOTPSlot({
 		<MotionConfig reducedMotion="user">
 			<motion.div
 				data-slot="input-otp-slot"
+				data-active={isActive || undefined}
 				aria-invalid={hasError}
 				data-success={isSuccess}
 				className={cn(
@@ -117,7 +118,7 @@ export function InputOTPSlot({
 						<motion.div
 							key={`${isActive}-${isMultiSelect}`}
 							layoutId={isMultiSelect ? `indicator-${index}` : "indicator"}
-							className="absolute inset-0 z-10 rounded-[inherit] ring-2"
+							className="absolute inset-0 z-10 rounded-[inherit] ring-2 ring-primary-base"
 							transition={{ duration: 0.12, ease: "easeInOut" }}
 						/>
 					)}

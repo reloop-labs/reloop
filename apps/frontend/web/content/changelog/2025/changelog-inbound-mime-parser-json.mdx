@@ -1,0 +1,16 @@
+---
+slug: inbound-mime-parser-json
+version: 0.16.0
+date: November 2025
+launchDate: 16 November 2025
+title: 'Inbound MIME Parser to Structured JSON'
+description: >-
+  Incoming messages are automatically parsed from raw MIME into clean JSON (apps/backend/inbound).
+tags:
+  - Inbound
+  - Backend
+---
+### BACKEND
+
+- **MIME parser.** Automatically parses complex multipart MIME messages into clean HTML, text, headers, and attachments.
+- **JetStream bus.** Publishes parsed JSON email events onto internal NATS JetStream queues for downstream service processing.

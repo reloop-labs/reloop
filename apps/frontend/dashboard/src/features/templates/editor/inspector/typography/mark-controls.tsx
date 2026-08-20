@@ -37,7 +37,7 @@ export function MarkControls({
 				className="h-10 flex-1 first:rounded-l-xl last:rounded-r-xl"
 			>
 				<Glyph>
-					<span className="italic">I</span>
+					<span className="font-serif italic">I</span>
 				</Glyph>
 			</ButtonGroup.Item>
 			<ButtonGroup.Item

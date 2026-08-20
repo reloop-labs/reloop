@@ -1,0 +1,19 @@
+---
+slug: activity-security-audit-logs
+version: 0.40.0
+date: April 2026
+launchDate: 24 April 2026
+title: 'Activity & Security Audit Logs'
+description: >-
+  Track team actions (key creation, domain updates, template changes) in organization settings.
+tags:
+  - Security
+  - Dashboard
+---
+### FRONTEND
+
+- **Audit log viewer.** Searchable table in settings displaying actor, action type, IP address, and timestamps.
+
+### BACKEND
+
+- **Audit log schema.** Created activity log tables in packages/db/src/schema/activity-log.ts capturing security events across services.
