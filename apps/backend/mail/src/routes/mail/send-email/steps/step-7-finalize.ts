@@ -1,3 +1,4 @@
+import { countEmailRecipients } from "@reloop/be-mail/lib/count-recipients";
 import type { MailModel } from "@reloop/be-mail/model/mail.model";
 import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
@@ -34,10 +35,7 @@ export async function finalizeEmail_step7({
 		})
 		.where(eq(emailLog.id, emailLogId));
 
-	const recipients = Array.isArray(body.to) ? body.to : [body.to];
-	const cc = body.cc ? (Array.isArray(body.cc) ? body.cc : [body.cc]) : [];
-	const bcc = body.bcc ? (Array.isArray(body.bcc) ? body.bcc : [body.bcc]) : [];
-	const totalRecipients = recipients.length + cc.length + bcc.length;
+	const totalRecipients = countEmailRecipients(body);
 	const timestamp = new Date().toISOString();
 	const scheduledAt = isFutureScheduled(body.scheduled_at);
 
