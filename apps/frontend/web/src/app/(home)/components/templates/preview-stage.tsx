@@ -568,9 +568,9 @@ const COLLABORATORS: Record<CollaboratorId, Collaborator> = {
 
 const FROM_NAME = "Maya Chen";
 const LAUNCH_SECTION =
-	"Three of us are in this file right now. Watch the carets: copy changes as I type, the from-line updates with Alex, and nobody dumped a screenshot in Slack to ask for a review.";
+	"We closed the quarter with the multiplayer editor in production. Customers now write and ship investor notes, receipts, and product emails in one file — copy, from-line, and CTA — without a handoff.";
 const BODY_EDIT =
-	"Drop a note on any line. We ship whatever is in this version at 4pm — if you're late, you're editing live with us.";
+	"Deck is attached. Happy to walk the numbers on a 20-minute call this week — reply and we'll find a slot.";
 
 type CursorPhase = "hidden" | "arrive" | "click" | "park";
 
@@ -879,7 +879,7 @@ function RealtimeEditorView() {
 			<div className="flex items-center justify-between border-stroke-soft-100 border-b px-4 py-2.5 dark:border-white/10">
 				<div className="flex items-center gap-2">
 					<span className="font-semibold text-text-strong-950 text-xs tracking-tight dark:text-white">
-						northwind-launch · live
+						investor-update · Q3
 					</span>
 				</div>
 
@@ -943,7 +943,7 @@ function RealtimeEditorView() {
 								blinking={fields.alex.typing}
 							/>
 							<span className="text-text-soft-400 dark:text-white/40">
-								&lt;maya@northwind.io&gt;
+								&lt;maya@reloop.sh&gt;
 							</span>
 						</div>
 					</div>
@@ -964,7 +964,7 @@ function RealtimeEditorView() {
 							className="relative inline-flex items-center"
 						>
 							<span className="rounded bg-bg-weak-50 px-2 py-0.5 font-mono text-[10.5px] text-text-strong-950 dark:bg-white/10 dark:text-white">
-								Northwind launch crew ×
+								Reloop investors ×
 							</span>
 						</div>
 					</div>
@@ -979,10 +979,10 @@ function RealtimeEditorView() {
 							Subject
 						</span>
 						<div className="relative inline-flex items-center font-medium text-[11.5px] text-text-strong-950 dark:text-white">
-							<span>We're in this email together</span>
+							<span>Q3 note from Reloop</span>
 							<span className="text-text-sub-600 dark:text-white/70">
 								{" "}
-								— jump in
+								— the editor is live
 							</span>
 						</div>
 					</div>
@@ -1004,7 +1004,7 @@ function RealtimeEditorView() {
 					)}
 				>
 					<div className="relative inline-flex items-center text-text-strong-950 text-xs dark:text-white">
-						<span>Hey crew,</span>
+						<span>Dear investors,</span>
 					</div>
 					<p className="text-[11.5px] text-text-sub-600 leading-relaxed dark:text-white/80">
 						{LAUNCH_SECTION.slice(0, launchChars)}
@@ -1014,28 +1014,44 @@ function RealtimeEditorView() {
 							blinking={fields.sarah.typing}
 						/>
 					</p>
-				</div>
-
-				{/* Primary Button with Reloop UI FancyButton */}
-				<div className="pt-1">
-					<FancyButton.Root
-						variant="neutral"
-						size="xsmall"
-						className="rounded-lg! px-3.5!"
-					>
-						<span>Jump into the canvas →</span>
-					</FancyButton.Root>
+					<p className="text-[11.5px] text-text-sub-600 leading-relaxed dark:text-white/80">
+						That was the bet in the last note: teams should write email the way
+						they write product. This quarter we put that file in production and
+						started charging for it.
+					</p>
 				</div>
 
 				{/* Section Header & Subtitle */}
-				<div className="space-y-1.5 border-stroke-soft-100 border-t pt-3 dark:border-white/5">
-					<h4 className="font-bold text-sm text-text-strong-950 tracking-tight dark:text-white">
-						While you're in this file
-					</h4>
-					<p className="text-[11px] text-text-sub-600 leading-relaxed dark:text-white/70">
-						Maya on the closer. Sarah on the open. Alex on the from-line. Same
-						canvas, no merge.
-					</p>
+				<div className="space-y-3 border-stroke-soft-100 border-t pt-3 dark:border-white/5">
+					<div className="space-y-1.5">
+						<h4 className="font-bold text-sm text-text-strong-950 tracking-tight dark:text-white">
+							This quarter
+						</h4>
+						<p className="text-[11px] text-text-sub-600 leading-relaxed dark:text-white/70">
+							Editor in production. Self-serve up. Time-to-first-email down.
+						</p>
+						<p className="text-[11px] text-text-sub-600 leading-relaxed dark:text-white/70">
+							New logos came in through the product, not outbound. Most of them
+							started on a template, invited a teammate, and sent from their
+							own domain the same week.
+						</p>
+					</div>
+					<div className="space-y-1.5">
+						<h4 className="font-bold text-sm text-text-strong-950 tracking-tight dark:text-white">
+							Where we are focused
+						</h4>
+						<p className="text-[11px] text-text-sub-600 leading-relaxed dark:text-white/70">
+							Deliverability still leads every conversation. We added domain
+							health in the dashboard and a clearer path from first API key to
+							a signed domain. That is the loop we will keep tightening.
+						</p>
+						<p className="text-[11px] text-text-sub-600 leading-relaxed dark:text-white/70">
+							On the product side: version history, shared templates, and the
+							live editor you are looking at. The goal is one canvas for
+							copy, code, and send — not a Google Doc plus a ticket plus a
+							deploy.
+						</p>
+					</div>
 					<p
 						onClick={() => focusField("maya")}
 						onMouseEnter={() => setHoveredUser("maya")}
@@ -1053,7 +1069,11 @@ function RealtimeEditorView() {
 						/>
 					</p>
 					<p className="text-[11px] text-text-sub-600 leading-relaxed dark:text-white/70">
-						— Maya, still in the file
+						If you want the full metrics pack, it is in the same folder as this
+						note. We will send the next update after close of Q4.
+					</p>
+					<p className="text-[11px] text-text-sub-600 leading-relaxed dark:text-white/70">
+						— Maya, Reloop
 					</p>
 				</div>
 			</div>
