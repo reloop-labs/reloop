@@ -62,6 +62,45 @@ function SubItemIcon({
 	return <Icon name={icon as IconName} className={className} />;
 }
 
+const SECTION_THEMES: Record<
+	string,
+	{
+		indicator: string;
+		activeStroke: string;
+		iconActive: string;
+		iconInactive: string;
+	}
+> = {
+	transactional: {
+		indicator: "bg-[#f97316] dark:bg-[#ea580c]",
+		activeStroke: "stroke-[#f97316] dark:stroke-[#ea580c]",
+		iconActive: "text-[#f97316] dark:text-[#fb923c]",
+		iconInactive:
+			"text-text-soft-400 group-hover:text-text-strong-950 dark:text-white/40 dark:group-hover:text-white",
+	},
+	analytics: {
+		indicator: "bg-[#2563eb] dark:bg-[#3b82f6]",
+		activeStroke: "stroke-[#2563eb] dark:stroke-[#3b82f6]",
+		iconActive: "text-[#2563eb] dark:text-[#60a5fa]",
+		iconInactive:
+			"text-text-soft-400 group-hover:text-text-strong-950 dark:text-white/40 dark:group-hover:text-white",
+	},
+	templates: {
+		indicator: "bg-[#7c3aed] dark:bg-[#8b5cf6]",
+		activeStroke: "stroke-[#7c3aed] dark:stroke-[#8b5cf6]",
+		iconActive: "text-[#7c3aed] dark:text-[#a78bfa]",
+		iconInactive:
+			"text-text-soft-400 group-hover:text-text-strong-950 dark:text-white/40 dark:group-hover:text-white",
+	},
+	workflows: {
+		indicator: "bg-[#059669] dark:bg-[#10b981]",
+		activeStroke: "stroke-[#059669] dark:stroke-[#10b981]",
+		iconActive: "text-[#059669] dark:text-[#34d399]",
+		iconInactive:
+			"text-text-soft-400 group-hover:text-text-strong-950 dark:text-white/40 dark:group-hover:text-white",
+	},
+};
+
 const SECTIONS = [
 	{
 		id: "transactional",
@@ -251,6 +290,13 @@ export default function EmailSystem() {
 								const selected = section.id === active;
 								const hasSubItems =
 									"subItems" in section && section.subItems;
+								const theme = SECTION_THEMES[section.id] ?? {
+									indicator: "bg-primary-base",
+									activeStroke: "stroke-[#9ca3af] dark:stroke-[#66666e]",
+									iconActive: "text-text-strong-950 dark:text-white",
+									iconInactive:
+										"text-text-soft-400 group-hover:text-text-strong-950 dark:text-white/40 dark:group-hover:text-white",
+								};
 
 								const handleParentClick = () => {
 									if (section.id === "transactional") {
@@ -279,7 +325,10 @@ export default function EmailSystem() {
 											{selected && (
 												<motion.span
 													layoutId="email-system-active-indicator"
-													className="pointer-events-none absolute -left-[1.5px] top-1.5 bottom-1.5 hidden w-0.5 bg-primary-base lg:block"
+													className={cn(
+														"pointer-events-none absolute -left-[1.5px] top-1.5 bottom-1.5 hidden w-0.5 lg:block transition-colors duration-150",
+														theme.indicator,
+													)}
 													transition={
 														reduceMotion
 															? { duration: 0 }
@@ -320,6 +369,13 @@ export default function EmailSystem() {
 															);
 
 															const totalHeight = section.subItems.length * 34;
+															const theme = SECTION_THEMES[section.id] ?? {
+																activeStroke:
+																	"stroke-[#9ca3af] dark:stroke-[#66666e]",
+																iconActive: "text-text-strong-950 dark:text-white",
+																iconInactive:
+																	"text-text-soft-400 group-hover:text-text-sub-600 dark:text-white/40 dark:group-hover:text-white/70",
+															};
 
 															return (
 																<>
@@ -347,11 +403,14 @@ export default function EmailSystem() {
 																			strokeLinejoin="round"
 																		/>
 
-																		{/* Continuous active path from top down to the active sub-item (opaque stroke prevents white dots) */}
+																		{/* Continuous active path colored to match section theme */}
 																		{activeIndex >= 0 && (
 																			<path
 																				d={`M 0.5 0 L 0.5 ${activeIndex * 34 + 9} Q 0.5 ${activeIndex * 34 + 17} 8.5 ${activeIndex * 34 + 17} L 14 ${activeIndex * 34 + 17}`}
-																				className="stroke-[#9ca3af] transition-all duration-150 dark:stroke-[#66666e]"
+																				className={cn(
+																					theme.activeStroke,
+																					"transition-all duration-150",
+																				)}
 																				strokeWidth="1"
 																				strokeLinecap="round"
 																				strokeLinejoin="round"
@@ -385,14 +444,14 @@ export default function EmailSystem() {
 																						: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/50 dark:hover:text-white",
 																				)}
 																			>
-																				{/* Icon matching the preview stage */}
+																				{/* Icon matching the preview stage theme color */}
 																				<SubItemIcon
 																					icon={sub.icon}
 																					className={cn(
 																						"mr-2 size-3.5 shrink-0 transition-colors duration-150",
 																						isSubActive
-																							? "text-text-strong-950 dark:text-white"
-																							: "text-text-soft-400 group-hover:text-text-sub-600 dark:text-white/40 dark:group-hover:text-white/70",
+																							? theme.iconActive
+																							: theme.iconInactive,
 																					)}
 																				/>
 																				<span className="truncate">{sub.label}</span>
