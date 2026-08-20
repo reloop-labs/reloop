@@ -165,7 +165,7 @@ Reloop is the email service / infrastructure (ESP + MTA). It is not a multi-ESP 
 
 ## Pricing & Email Volume
 
-Reloop Cloud Free is 3,000 emails/month with a 200/day cap. Individual is $10/mo for 25,000 emails with no daily cap. Overage is $0.80 vs Resend's $1.00 per 1,000. Self-hosting Reloop has no Reloop license fee (you pay your own infra).
+Reloop Cloud Free is 3,000 emails/month with a 200/day cap. Individual is $10/mo for 25,000 emails with no daily cap. Overage is $0.80 vs Resend's $0.90 per 1,000. Self-hosting Reloop has no Reloop license fee (you pay your own infra).
 
 | Feature | Reloop | Resend |
 | --- | --- | --- |
@@ -173,7 +173,7 @@ Reloop Cloud Free is 3,000 emails/month with a 200/day cap. Individual is $10/mo
 | Daily send limit (Free tier) | 200 / day (Free also caps at 3,000 / month) | 100 / day (Free tier limited to 100 sends/day) |
 | Entry paid plan | $10 / mo (25,000 emails included) | $20 / mo (50,000 emails included (no $10 tier)) |
 | 50,000 emails / mo plan | $20 / mo | $20 / mo |
-| Overage rate (per 1k emails) | $0.80 / 1k | $1.00 / 1k |
+| Overage rate (per 1k emails) | $0.80 / 1k | $0.90 / 1k |
 | Self-hosted email sends | Unlimited (Free open-source software (own infra)) | N/A (Hosted SaaS only; pay per send) |
 
 ## Sending & Receiving
@@ -258,7 +258,7 @@ No. Reloop is not a Resend proxy. Plan a small client adapter when migrating. Au
 
 ### Is Reloop open source?
 
-Yes. Reloop is Apache 2.0 with Reloop Labs use restrictions. Self-host at no Reloop license fee, or use Reloop Cloud.
+Yes. Reloop is licensed under Apache License 2.0 plus additional Reloop Labs terms: personal and internal self-host is allowed; commercial redistribution, third-party hosted services, and competing products are not. See https://reloop.sh/license. Reloop Cloud is the official hosted service.
 
 ## Related
 
@@ -618,7 +618,7 @@ Markdown: https://reloop.sh/index.md
 
 > High-performance, open-source email infrastructure—the same service as proprietary platforms. Use Reloop hosted or deploy it yourself.
 
-Reloop is email infrastructure for developers: transactional and marketing email, real-time webhooks, inbound processing, analytics, and an agent-ready API. Reloop **is** the ESP/MTA (KumoMTA), not a connector that routes through SendGrid, Mailgun, Resend, or SES.
+Reloop is email infrastructure for developers: transactional and marketing email, real-time webhooks, inbound processing, analytics, and an agent-ready API. Reloop **is** the ESP; it runs an in-house MTA (KumoMTA), not a connector that routes through SendGrid, Mailgun, Resend, or SES.
 
 ## What Reloop is not
 
@@ -636,8 +636,8 @@ Developers, startups, and agent products that need transactional + campaign emai
 Canonical data: https://reloop.sh/pricing.md
 
 - Free — $0, 3,000 emails / month, **200 / day**
-- Individual — $10 / month, 25,000 emails, no daily cap, overage $0.80 / 1k
-- Startup — $20 / month, 50,000 emails, no daily cap
+- Individual — $10 / month, 25,000 emails / month, no daily cap, overage $0.80 / 1,000
+- Startup — $20 / month, 50,000 emails / month, no daily cap, overage $0.80 / 1,000
 - Enterprise — custom volume and billing
 
 ## Why Reloop
@@ -682,7 +682,7 @@ Reloop Labs builds open-source email infrastructure for developers and AI agents
 ## What we build
 
 - Hosted Reloop Cloud (email API and SMTP) at reloop.sh
-- Self-hostable Apache 2.0 stack (no Reloop license fee; you pay your infra)
+- Self-hostable Apache License 2.0 stack plus Reloop Labs additional restrictions: personal and internal use allowed; no commercial redistribution, hosted services, or competing products. No Reloop license fee; you pay your infra. See https://reloop.sh/license
 - Agent skills, MCP server, and agent-friendly documentation
 
 ## Who it is for

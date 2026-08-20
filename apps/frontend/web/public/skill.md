@@ -5,7 +5,7 @@ description: >
   send mail, manage API keys, domains, contacts, webhooks, and templates.
   Use when integrating Reloop, creating or rotating API keys, or sending
   transactional email via API or SMTP.
-license: Apache-2.0
+license: "Apache-2.0 plus Reloop Labs restrictions (personal/internal use; no commercial redistribution, hosted services, or competing products). See https://reloop.sh/license"
 metadata:
   author: reloop-labs
   docs: https://reloop.sh/docs

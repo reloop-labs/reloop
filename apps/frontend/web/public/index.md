@@ -4,7 +4,7 @@
 
 > High-performance, open-source email infrastructure—the same service as proprietary platforms. Use Reloop hosted or deploy it yourself.
 
-Reloop is email infrastructure for developers: transactional and marketing email, real-time webhooks, inbound processing, analytics, and an agent-ready API. Reloop **is** the ESP/MTA (KumoMTA), not a connector that routes through SendGrid, Mailgun, Resend, or SES.
+Reloop is email infrastructure for developers: transactional and marketing email, real-time webhooks, inbound processing, analytics, and an agent-ready API. Reloop **is** the ESP; it runs an in-house MTA (KumoMTA), not a connector that routes through SendGrid, Mailgun, Resend, or SES.
 
 ## What Reloop is not
 
@@ -22,8 +22,8 @@ Developers, startups, and agent products that need transactional + campaign emai
 Canonical data: https://reloop.sh/pricing.md
 
 - Free — $0, 3,000 emails / month, **200 / day**
-- Individual — $10 / month, 25,000 emails, no daily cap, overage $0.80 / 1k
-- Startup — $20 / month, 50,000 emails, no daily cap
+- Individual — $10 / month, 25,000 emails / month, no daily cap, overage $0.80 / 1,000
+- Startup — $20 / month, 50,000 emails / month, no daily cap, overage $0.80 / 1,000
 - Enterprise — custom volume and billing
 
 ## Why Reloop

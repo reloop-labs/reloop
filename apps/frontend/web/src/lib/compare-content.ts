@@ -208,7 +208,7 @@ export const comparePages: ComparePageContent[] = [
 			{
 				question: "Is Reloop open source?",
 				answer:
-					"Yes. Reloop is Apache 2.0 with Reloop Labs use restrictions. Self-host at no Reloop license fee, or use Reloop Cloud.",
+					"Yes. Reloop is licensed under Apache License 2.0 plus additional Reloop Labs terms: personal and internal self-host is allowed; commercial redistribution, third-party hosted services, and competing products are not. See https://reloop.sh/license. Reloop Cloud is the official hosted service.",
 			},
 		],
 	},

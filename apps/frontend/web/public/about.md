@@ -7,7 +7,7 @@ Reloop Labs builds open-source email infrastructure for developers and AI agents
 ## What we build
 
 - Hosted Reloop Cloud (email API and SMTP) at reloop.sh
-- Self-hostable Apache 2.0 stack (no Reloop license fee; you pay your infra)
+- Self-hostable Apache License 2.0 stack plus Reloop Labs additional restrictions: personal and internal use allowed; no commercial redistribution, hosted services, or competing products. No Reloop license fee; you pay your infra. See https://reloop.sh/license
 - Agent skills, MCP server, and agent-friendly documentation
 
 ## Who it is for

@@ -32,19 +32,9 @@ function planDescription(plan: PricingPlan): string {
 
 export function pricingOfferJsonLd(plan: PricingPlan, siteUrl: string) {
 	const pricingUrl = `${siteUrl}/pricing`;
-	const ctaUrl = plan.ctaHref.startsWith("http")
-		? plan.ctaHref
-		: `${siteUrl}${plan.ctaHref}`;
 
 	if (plan.monthlyPrice === null) {
-		return {
-			"@type": "Offer" as const,
-			name: `${plan.name} plan`,
-			description: planDescription(plan),
-			url: ctaUrl,
-			availability: "https://schema.org/InStock" as const,
-			priceCurrency: "USD",
-		};
+		return null;
 	}
 
 	return {
@@ -65,7 +55,9 @@ export function pricingOfferJsonLd(plan: PricingPlan, siteUrl: string) {
 }
 
 export function pricingOffersJsonLd(siteUrl = getSiteUrl()) {
-	return pricingPlans.map((plan) => pricingOfferJsonLd(plan, siteUrl));
+	return pricingPlans
+		.map((plan) => pricingOfferJsonLd(plan, siteUrl))
+		.filter((offer): offer is NonNullable<typeof offer> => offer !== null);
 }
 
 const PRODUCT_DESCRIPTION =
