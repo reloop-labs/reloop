@@ -2,15 +2,22 @@
 
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
+import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useHotkeys } from "react-hotkeys-hook";
 import { useSessionQuery } from "#/features/auth/session-query";
+import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { formatOwnDomainFrom, type SetupStep } from "./setup-progress";
 import { useSendFromOwnDomain } from "./use-send-from-own-domain";
 import { useSetupProgress } from "./use-setup-progress";
+
+const actionKbdOnBlueClassName =
+	"border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]";
 
 function GlowingBlueDot() {
 	return (
@@ -118,7 +125,7 @@ function StepRow({
 					) : (
 						<>
 							{step.cta}
-							<Icon name="arrow-right" className="h-3 w-3" />
+							<Icon name="arrow-right" className="h-3.5 w-3.5" />
 						</>
 					)}
 				</Button.Root>
@@ -132,7 +139,7 @@ function StepRow({
 					onClick={() => onNavigate(step.href ?? "/")}
 				>
 					{step.cta}
-					<Icon name="arrow-right" className="h-3 w-3" />
+					<Icon name="arrow-right" className="h-3.5 w-3.5" />
 				</Button.Root>
 			)}
 		</li>
@@ -178,7 +185,7 @@ function ExpandedTrigger({
 			onClick={onOpen}
 			className="relative w-full overflow-visible rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-2.5 text-left transition-[background-color,transform] duration-150 ease-out hover:bg-bg-weak-50 active:scale-[0.99] dark:border-stroke-soft-100/40 dark:bg-white/[0.03] dark:hover:bg-white/[0.06]"
 		>
-			<span className="-top-0.75 -right-0.75 pointer-events-none absolute z-10">
+			<span className="pointer-events-none absolute -top-0.75 -right-0.75 z-10">
 				<GlowingBlueDot />
 			</span>
 			<div className="flex items-center justify-between gap-2">
@@ -207,11 +214,15 @@ export function OnboardingBanner({ isCollapsed }: { isCollapsed: boolean }) {
 	const [open, setOpen] = useState(false);
 
 	const visible = !isPending && (!progress.allComplete || open);
-	if (!visible) return null;
-
 	const userEmail = session?.user?.email?.trim() ?? "";
 	const activeDomain = progress.activeDomain;
 	const nextStep = progress.steps.find((step) => !step.complete);
+	const sending = send.isPending;
+	const sendDisabled = !userEmail;
+	const nextDisabled =
+		!nextStep ||
+		nextStep.disabled ||
+		(nextStep.action === "send" && (sending || sendDisabled));
 
 	const handleSend = () => {
 		if (!activeDomain || !userEmail) return;
@@ -221,10 +232,26 @@ export function OnboardingBanner({ isCollapsed }: { isCollapsed: boolean }) {
 		});
 	};
 
-	const handleNavigate = (href: string) => {
+	const runStep = (step: SetupStep) => {
+		if (step.complete) return;
+		if (step.action === "send") {
+			handleSend();
+			return;
+		}
 		setOpen(false);
-		router.push(href);
+		router.push(step.href ?? "/");
 	};
+
+	useHotkeys(
+		"enter",
+		(e) => {
+			e.preventDefault();
+			if (open && nextStep && !nextDisabled) runStep(nextStep);
+		},
+		{ enabled: open && Boolean(nextStep) && !nextDisabled },
+	);
+
+	if (!visible) return null;
 
 	return (
 		<>
@@ -246,15 +273,27 @@ export function OnboardingBanner({ isCollapsed }: { isCollapsed: boolean }) {
 			<Modal.Root open={open} onOpenChange={setOpen}>
 				<Modal.Content
 					className="overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 sm:max-w-[460px] dark:border-stroke-soft-100/40"
-					showClose
+					showClose={false}
 				>
-					<Modal.Header
-						iconName="sparkling"
-						title="Get started"
-						description="Finish these three steps so you can send from your own domain."
-					/>
-					<Modal.Body className="pt-2 pb-2">
-						<div className="mb-1">
+					<div className="p-6">
+						<div className="relative pr-10">
+							<Modal.Title className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
+								Get started
+							</Modal.Title>
+							<p className="mt-1 text-sm text-text-sub-600 leading-relaxed">
+								Finish these three steps so you can send from your own domain.
+							</p>
+							<button
+								type="button"
+								onClick={() => setOpen(false)}
+								aria-label="Close"
+								className="absolute top-0 right-0 flex h-7 w-7 items-center justify-center rounded-lg border border-stroke-soft-200 bg-bg-white-0 text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 active:scale-[0.95]"
+							>
+								<Icon name="cross" className="h-3.5 w-3.5" />
+							</button>
+						</div>
+
+						<div className="mt-5">
 							<div className="mb-2 flex items-center justify-between">
 								<span className="font-medium text-label-xs text-text-sub-600 tabular-nums">
 									{progress.completedCount} of {progress.totalCount} complete
@@ -265,20 +304,90 @@ export function OnboardingBanner({ isCollapsed }: { isCollapsed: boolean }) {
 								max={progress.totalCount}
 							/>
 						</div>
-						<ol className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/40">
+
+						<ol className="mt-2 divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/40">
 							{progress.steps.map((step, index) => (
 								<StepRow
 									key={step.id}
 									step={step}
 									index={index}
 									onSend={handleSend}
-									onNavigate={handleNavigate}
-									sending={send.isPending}
-									sendDisabled={!userEmail}
+									onNavigate={(href) => {
+										setOpen(false);
+										router.push(href);
+									}}
+									sending={sending}
+									sendDisabled={sendDisabled}
 								/>
 							))}
 						</ol>
-					</Modal.Body>
+
+						<div className="mt-6 flex items-center justify-end gap-3">
+							<Button.Root
+								type="button"
+								variant="neutral"
+								mode="stroke"
+								size="small"
+								onClick={() => setOpen(false)}
+								className="gap-1.5 rounded-xl"
+							>
+								Cancel
+								<ActionKbd className="lowercase! w-auto min-w-0 px-1">
+									esc
+								</ActionKbd>
+							</Button.Root>
+							{nextStep ? (
+								<FancyButton.Root
+									type="button"
+									variant="blue"
+									size="small"
+									disabled={nextDisabled}
+									onClick={() => runStep(nextStep)}
+									className="min-w-35 justify-center overflow-hidden rounded-xl"
+								>
+									<AnimatePresence mode="popLayout" initial={false}>
+										<motion.span
+											key={sending ? "sending" : nextStep.id}
+											transition={{
+												type: "spring",
+												duration: 0.25,
+												bounce: 0,
+											}}
+											initial={{ opacity: 0, y: -14 }}
+											animate={{ opacity: 1, y: 0 }}
+											exit={{ opacity: 0, y: 14 }}
+											className="flex items-center justify-center gap-1.5"
+										>
+											{sending ? (
+												<>
+													<Spinner size={14} color="currentColor" />
+													Sending…
+												</>
+											) : (
+												<>
+													{nextStep.cta}
+													<ActionKbd className={actionKbdOnBlueClassName}>
+														↵
+													</ActionKbd>
+												</>
+											)}
+										</motion.span>
+									</AnimatePresence>
+								</FancyButton.Root>
+							) : (
+								<FancyButton.Root
+									type="button"
+									variant="blue"
+									size="small"
+									onClick={() => setOpen(false)}
+									className="gap-1.5 rounded-xl"
+								>
+									Done
+									<ActionKbd className={actionKbdOnBlueClassName}>↵</ActionKbd>
+								</FancyButton.Root>
+							)}
+						</div>
+					</div>
 				</Modal.Content>
 			</Modal.Root>
 		</>
