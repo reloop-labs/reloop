@@ -711,13 +711,9 @@ function PresenceCaret({
 	return (
 		<motion.span
 			aria-hidden
-			initial={
-				shouldReduceMotion ? false : { opacity: 0, scale: 0.95, y: 2 }
-			}
+			initial={shouldReduceMotion ? false : { opacity: 0, scale: 0.95, y: 2 }}
 			animate={{ opacity: 1, scale: 1, y: 0 }}
-			exit={
-				shouldReduceMotion ? undefined : { opacity: 0, scale: 0.97, y: 1 }
-			}
+			exit={shouldReduceMotion ? undefined : { opacity: 0, scale: 0.97, y: 1 }}
 			transition={{
 				duration: shouldReduceMotion ? 0 : 0.16,
 				ease: EASE_OUT,
@@ -818,10 +814,7 @@ function RealtimeEditorView() {
 
 		let cancelled = false;
 
-		const typeText = async (
-			text: string,
-			setChars: (n: number) => void,
-		) => {
+		const typeText = async (text: string, setChars: (n: number) => void) => {
 			for (let i = 1; i <= text.length; i++) {
 				if (cancelled) return;
 				setChars(i);
@@ -879,7 +872,7 @@ function RealtimeEditorView() {
 	return (
 		<div className="relative mx-auto w-full max-w-3xl overflow-visible rounded-2xl border border-stroke-soft-200 bg-bg-white-0 shadow-xs dark:border-white/10 dark:bg-[#0c0c0e]">
 			{/* Top Bar with Document Title & Multiplayer Avatars */}
-			<div className="flex items-center justify-between border-stroke-soft-100 border-b px-4 py-2.5 dark:border-white/10">
+			<div className="flex items-center justify-between border-stroke-soft-100 px-4 py-2.5 dark:border-white/10">
 				<div className="flex items-center gap-2">
 					<span className="font-semibold text-text-strong-950 text-xs tracking-tight dark:text-white">
 						investor-update · Q3
@@ -923,7 +916,7 @@ function RealtimeEditorView() {
 			</div>
 
 			{/* Document Header Fields (From, To, Subject) */}
-			<div className="space-y-2 border-stroke-soft-100 border-b p-4 text-xs sm:px-6 dark:border-white/5">
+			<div className="space-y-2 border-stroke-soft-100 p-4 text-xs sm:px-6 dark:border-white/5">
 				{/* From Row with Alex's caret */}
 				<div className="flex items-center justify-between text-text-sub-600 dark:text-white/70">
 					<div className="flex items-center gap-3">
@@ -1080,14 +1073,13 @@ function RealtimeEditorView() {
 						</h4>
 						<p className="text-[11px] text-text-sub-600 leading-relaxed dark:text-white/70">
 							Deliverability still leads every conversation. We added domain
-							health in the dashboard and a clearer path from first API key to
-							a signed domain. That is the loop we will keep tightening.
+							health in the dashboard and a clearer path from first API key to a
+							signed domain. That is the loop we will keep tightening.
 						</p>
 						<p className="text-[11px] text-text-sub-600 leading-relaxed dark:text-white/70">
 							On the product side: version history, shared templates, and the
-							live editor you are looking at. The goal is one canvas for
-							copy, code, and send — not a Google Doc plus a ticket plus a
-							deploy.
+							live editor you are looking at. The goal is one canvas for copy,
+							code, and send — not a Google Doc plus a ticket plus a deploy.
 						</p>
 					</div>
 					<p className="text-[11px] text-text-sub-600 leading-relaxed dark:text-white/70">
@@ -1321,7 +1313,7 @@ function VersionHistoryView() {
 							style={{ color: "#10b981" }}
 						/>
 						<span
-							className="absolute top-[14px] left-[12px] whitespace-nowrap rounded-md px-1.5 py-[3px] font-semibold text-[10px] leading-none text-white shadow-[0_1px_2px_rgba(0,0,0,0.18)]"
+							className="absolute top-[14px] left-[12px] whitespace-nowrap rounded-md px-1.5 py-[3px] font-semibold text-[10px] text-white leading-none shadow-[0_1px_2px_rgba(0,0,0,0.18)]"
 							style={{ backgroundColor: "#10b981" }}
 						>
 							Maya
@@ -1332,7 +1324,7 @@ function VersionHistoryView() {
 
 			<div className="relative h-full overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-6 shadow-xs sm:p-8 dark:border-white/10 dark:bg-[#0c0c0e]">
 				<div className="mb-6 flex items-center justify-between">
-					<h3 className="font-semibold text-text-strong-950 text-sm tracking-tight dark:text-white">
+					<h3 className="font-semibold text-sm text-text-strong-950 tracking-tight dark:text-white">
 						Version history
 					</h3>
 					<span className="text-[11px] text-text-soft-400 dark:text-white/40">
@@ -1345,8 +1337,7 @@ function VersionHistoryView() {
 					<div className="space-y-3.5">
 						{HISTORY_ITEMS.map((item) => {
 							const isCurrent = currentId === item.id;
-							const isActive =
-								hoveredId === item.id || selectedId === item.id;
+							const isActive = hoveredId === item.id || selectedId === item.id;
 
 							return (
 								<div
@@ -1424,7 +1415,7 @@ function VersionHistoryView() {
 													restore(item.id);
 												}}
 												className={cn(
-													"inline-flex h-6 items-center justify-center gap-1.5 rounded-md border border-neutral-200 bg-white px-2 font-medium text-[11px] leading-none text-neutral-900 shadow-xs transition-opacity duration-150 dark:border-white/10 dark:bg-[#1c1c21] dark:text-white dark:shadow-none",
+													"inline-flex h-6 items-center justify-center gap-1.5 rounded-md border border-neutral-200 bg-white px-2 font-medium text-[11px] text-neutral-900 leading-none shadow-xs transition-opacity duration-150 dark:border-white/10 dark:bg-[#1c1c21] dark:text-white dark:shadow-none",
 													isActive
 														? "opacity-100"
 														: "pointer-events-none opacity-0 group-hover:pointer-events-auto group-hover:opacity-100",
@@ -1446,7 +1437,7 @@ function VersionHistoryView() {
 					className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-40"
 				>
 					<div className="absolute inset-0 backdrop-blur-[10px] [mask-image:linear-gradient(to_bottom,transparent,black_60%)]" />
-					<div className="absolute inset-0 bg-gradient-to-t from-bg-white-0 from-15% via-bg-white-0/75 to-transparent dark:from-[#0c0c0e] dark:via-[#0c0c0e]/75" />
+					<div className="absolute inset-0 bg-gradient-to-t from-15% from-bg-white-0 via-bg-white-0/75 to-transparent dark:from-[#0c0c0e] dark:via-[#0c0c0e]/75" />
 				</div>
 
 				<AnimatePresence>
