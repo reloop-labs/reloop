@@ -88,12 +88,12 @@ function StepRow({
 		step.disabled || (step.action === "send" && (sending || sendDisabled));
 
 	return (
-		<li className="flex items-center gap-3 py-3">
+		<li className="flex items-start gap-3 py-3">
 			<StepIndicator complete={step.complete} index={index} />
 			<div className="min-w-0 flex-1">
 				<p
 					className={cn(
-						"font-medium text-label-sm",
+						"h-5 font-medium text-label-sm leading-5",
 						step.complete ? "text-text-sub-600" : "text-text-strong-950",
 					)}
 				>
@@ -104,7 +104,7 @@ function StepRow({
 				</p>
 			</div>
 			{step.complete ? (
-				<span className="shrink-0 font-medium text-label-xs text-success-base">
+				<span className="flex h-5 shrink-0 items-center font-medium text-label-xs text-success-base">
 					Done
 				</span>
 			) : step.action === "send" ? (
@@ -276,21 +276,13 @@ export function OnboardingBanner({ isCollapsed }: { isCollapsed: boolean }) {
 					showClose={false}
 				>
 					<div className="p-6">
-						<div className="relative pr-10">
+						<div>
 							<Modal.Title className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
 								Get started
 							</Modal.Title>
 							<p className="mt-1 text-sm text-text-sub-600 leading-relaxed">
 								Finish these three steps so you can send from your own domain.
 							</p>
-							<button
-								type="button"
-								onClick={() => setOpen(false)}
-								aria-label="Close"
-								className="absolute top-0 right-0 flex h-7 w-7 items-center justify-center rounded-lg border border-stroke-soft-200 bg-bg-white-0 text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 active:scale-[0.95]"
-							>
-								<Icon name="cross" className="h-3.5 w-3.5" />
-							</button>
 						</div>
 
 						<div className="mt-5">
