@@ -567,10 +567,10 @@ const COLLABORATORS: Record<CollaboratorId, Collaborator> = {
 };
 
 const FROM_NAME = "Maya Chen";
-const SUBJECT_HEAD = "Introducing Reloop 2.0";
-const SUBJECT_TAIL = " — Real-time Email Engine";
+const LAUNCH_SECTION =
+	"Three of us are in this file right now. Watch the carets: copy changes as I type, the from-line updates with Alex, and nobody dumped a screenshot in Slack to ask for a review.";
 const BODY_EDIT =
-	"Share a template with your team and watch edits land live — subject lines, variables, and layout blocks stay in sync without a refresh.";
+	"Drop a note on any line. We ship whatever is in this version at 4pm — if you're late, you're editing live with us.";
 
 type CursorPhase = "hidden" | "arrive" | "click" | "park";
 
@@ -598,13 +598,13 @@ const CURSOR_ON_TARGET = { x: 0, y: 0, scale: 1, opacity: 1 };
 
 const CURSOR_SLOT: Record<CollaboratorId, string> = {
 	alex: "top-[4.5rem] left-[6.5rem] sm:left-[7.25rem]",
-	sarah: "top-[8rem] left-[6.5rem] sm:left-[7.25rem]",
+	sarah: "top-[12rem] left-[1.35rem] sm:top-[12.4rem] sm:left-[1.6rem]",
 	maya: "top-[17.2rem] left-[1.35rem] sm:top-[17.8rem] sm:left-[1.6rem]",
 };
 
 const CURSOR_PARK: Record<CollaboratorId, { x: number; y: number }> = {
 	alex: { x: -156, y: -40 },
-	sarah: { x: 312, y: -96 },
+	sarah: { x: 300, y: 20 },
 	maya: { x: -112, y: 24 },
 };
 
@@ -747,7 +747,7 @@ function RealtimeEditorView() {
 	);
 	const [hoveredUser, setHoveredUser] = useState<CollaboratorId | null>(null);
 	const [fromChars, setFromChars] = useState(0);
-	const [subjectChars, setSubjectChars] = useState(0);
+	const [launchChars, setLaunchChars] = useState(0);
 	const [bodyChars, setBodyChars] = useState(0);
 	const [fields, setFields] = useState<Record<CollaboratorId, FieldState>>({
 		maya: FIELD_IDLE,
@@ -793,7 +793,7 @@ function RealtimeEditorView() {
 	useEffect(() => {
 		if (shouldReduceMotion) {
 			setFromChars(FROM_NAME.length);
-			setSubjectChars(SUBJECT_HEAD.length);
+			setLaunchChars(LAUNCH_SECTION.length);
 			setBodyChars(BODY_EDIT.length);
 			setFields({
 				maya: FIELD_DONE,
@@ -850,7 +850,7 @@ function RealtimeEditorView() {
 			const alex = runField("alex", FROM_NAME, setFromChars);
 			await wait(560);
 			if (cancelled) return;
-			const sarah = runField("sarah", SUBJECT_HEAD, setSubjectChars);
+			const sarah = runField("sarah", LAUNCH_SECTION, setLaunchChars);
 			await wait(640);
 			if (cancelled) return;
 			const maya = runField("maya", BODY_EDIT, setBodyChars);
@@ -879,7 +879,7 @@ function RealtimeEditorView() {
 			<div className="flex items-center justify-between border-stroke-soft-100 border-b px-4 py-2.5 dark:border-white/10">
 				<div className="flex items-center gap-2">
 					<span className="font-semibold text-text-strong-950 text-xs tracking-tight dark:text-white">
-						Reloop 2.0: Developer Preview
+						northwind-launch · live
 					</span>
 				</div>
 
@@ -943,7 +943,7 @@ function RealtimeEditorView() {
 								blinking={fields.alex.typing}
 							/>
 							<span className="text-text-soft-400 dark:text-white/40">
-								&lt;maya@updates.reloop.sh&gt;
+								&lt;maya@northwind.io&gt;
 							</span>
 						</div>
 					</div>
@@ -964,7 +964,7 @@ function RealtimeEditorView() {
 							className="relative inline-flex items-center"
 						>
 							<span className="rounded bg-bg-weak-50 px-2 py-0.5 font-mono text-[10.5px] text-text-strong-950 dark:bg-white/10 dark:text-white">
-								Early Access Developers ×
+								Northwind launch crew ×
 							</span>
 						</div>
 					</div>
@@ -973,32 +973,17 @@ function RealtimeEditorView() {
 					</span>
 				</div>
 
-				{/* Subject Row with Sarah's caret */}
 				<div className="flex items-center justify-between text-text-sub-600 dark:text-white/70">
 					<div className="flex items-center gap-3">
 						<span className="w-10 text-text-soft-400 dark:text-white/40">
 							Subject
 						</span>
-						<div
-							onClick={() => focusField("sarah")}
-							onMouseEnter={() => setHoveredUser("sarah")}
-							onMouseLeave={() => setHoveredUser(null)}
-							className={cn(
-								"relative inline-flex cursor-text items-center rounded-xs font-medium text-[11.5px] text-text-strong-950 transition-colors dark:text-white",
-								isSarahActive && COLLABORATORS.sarah.highlightBg,
-							)}
-						>
-							<span>{SUBJECT_HEAD.slice(0, subjectChars)}</span>
-							<FieldCaret
-								user={COLLABORATORS.sarah}
-								show={fields.sarah.caret || focusedField === "sarah"}
-								blinking={fields.sarah.typing}
-							/>
-							{subjectChars === SUBJECT_HEAD.length ? (
-								<span className="text-text-sub-600 dark:text-white/70">
-									{SUBJECT_TAIL}
-								</span>
-							) : null}
+						<div className="relative inline-flex items-center font-medium text-[11.5px] text-text-strong-950 dark:text-white">
+							<span>We're in this email together</span>
+							<span className="text-text-sub-600 dark:text-white/70">
+								{" "}
+								— jump in
+							</span>
 						</div>
 					</div>
 					<span className="text-[10.5px] text-text-soft-400 dark:text-white/40">
@@ -1009,17 +994,27 @@ function RealtimeEditorView() {
 
 			{/* Main Email Content Body */}
 			<div className="space-y-3.5 p-5 text-left sm:p-6">
-				<div className="relative inline-flex items-center text-text-strong-950 text-xs dark:text-white">
-					<span>Hey developers,</span>
+				<div
+					onClick={() => focusField("sarah")}
+					onMouseEnter={() => setHoveredUser("sarah")}
+					onMouseLeave={() => setHoveredUser(null)}
+					className={cn(
+						"cursor-text space-y-3.5 rounded-xs transition-colors",
+						isSarahActive && COLLABORATORS.sarah.highlightBg,
+					)}
+				>
+					<div className="relative inline-flex items-center text-text-strong-950 text-xs dark:text-white">
+						<span>Hey crew,</span>
+					</div>
+					<p className="text-[11.5px] text-text-sub-600 leading-relaxed dark:text-white/80">
+						{LAUNCH_SECTION.slice(0, launchChars)}
+						<FieldCaret
+							user={COLLABORATORS.sarah}
+							show={fields.sarah.caret || focusedField === "sarah"}
+							blinking={fields.sarah.typing}
+						/>
+					</p>
 				</div>
-
-				{/* Main Paragraph */}
-				<p className="text-[11.5px] text-text-sub-600 leading-relaxed dark:text-white/80">
-					Today we're launching the next evolution of transactional and
-					marketing email. Build with React Email, track deliverability in
-					real-time, and collaborate with your entire team in one unified
-					canvas.
-				</p>
 
 				{/* Primary Button with Reloop UI FancyButton */}
 				<div className="pt-1">
@@ -1028,18 +1023,18 @@ function RealtimeEditorView() {
 						size="xsmall"
 						className="rounded-lg! px-3.5!"
 					>
-						<span>Deploy to Production →</span>
+						<span>Jump into the canvas →</span>
 					</FancyButton.Root>
 				</div>
 
 				{/* Section Header & Subtitle */}
 				<div className="space-y-1.5 border-stroke-soft-100 border-t pt-3 dark:border-white/5">
 					<h4 className="font-bold text-sm text-text-strong-950 tracking-tight dark:text-white">
-						What's new in Reloop 2.0?
+						While you're in this file
 					</h4>
 					<p className="text-[11px] text-text-sub-600 leading-relaxed dark:text-white/70">
-						Type-safe component primitives, multiplayer canvas editing, and
-						automated deliverability monitoring right out of the box.
+						Maya on the closer. Sarah on the open. Alex on the from-line. Same
+						canvas, no merge.
 					</p>
 					<p
 						onClick={() => focusField("maya")}
@@ -1058,13 +1053,7 @@ function RealtimeEditorView() {
 						/>
 					</p>
 					<p className="text-[11px] text-text-sub-600 leading-relaxed dark:text-white/70">
-						Every send still goes through the same React Email pipeline, so what
-						you preview is what lands in the inbox. Reply to this email if you
-						want a walkthrough of the new editor, or jump in from the dashboard
-						and open any template to try it.
-					</p>
-					<p className="text-[11px] text-text-sub-600 leading-relaxed dark:text-white/70">
-						— Maya, on behalf of Reloop
+						— Maya, still in the file
 					</p>
 				</div>
 			</div>
@@ -1072,212 +1061,360 @@ function RealtimeEditorView() {
 	);
 }
 
-/* --- Scene 3: Version History View (Single Focused Widget Block) --- */
+/* --- Scene 3: Version History View (Interactive with Cursor & Restore) --- */
 function VersionHistoryView() {
-	const [showChanges, setShowChanges] = useState(true);
-	const [selectedVersion, setSelectedVersion] = useState("v1");
+	const shouldReduceMotion = useReducedMotion();
+	const [selectedId, setSelectedId] = useState("v5");
+	const [hoveredId, setHoveredId] = useState<string | null>("v5");
+	const [restoredNotification, setRestoredNotification] = useState<
+		string | null
+	>(null);
+	const [isUserInteracting, setIsUserInteracting] = useState(false);
 
-	const VERSIONS = [
+	// Automated cursor state
+	const [cursorPos, setCursorPos] = useState({ x: 220, y: 110 });
+	const [isCursorClicking, setIsCursorClicking] = useState(false);
+	const [cursorVisible, setCursorVisible] = useState(true);
+
+	const [versions, setVersions] = useState([
 		{
-			id: "v1",
-			time: "11:12:10",
-			title: "Button Block was added",
-			author: "Maya Chen",
-			authorColor: "bg-emerald-500",
-			changes: "12 Changes",
-			icon: "modules" as const,
-		},
-		{
-			id: "v2",
-			time: "11:12:08",
-			title: "Subject Line updated",
-			author: "Sarah Jenkins",
-			authorColor: "bg-amber-400",
-			changes: "2 Changes",
-			icon: "file-code" as const,
-		},
-		{
-			id: "v3",
-			time: "11:12:05",
-			title: "Header props modified",
-			author: "Alex Rivera",
-			authorColor: "bg-sky-500",
-			changes: "4 Changes",
-			icon: "user" as const,
-		},
-		{
-			id: "v4",
-			time: "11:12:02",
-			title: "Greeting & Intro tuned",
-			author: "Noah Patel",
-			authorColor: "bg-indigo-500",
-			changes: "6 Changes",
-			icon: "sparkling" as const,
+			id: "v6",
+			version: "v6.0",
+			isCurrent: false,
+			title: "Added two new lessons",
+			author: "Dakshi Khatri",
+			avatarBg: "bg-purple-100 dark:bg-purple-950/70",
+			avatarText: "text-purple-700 dark:text-purple-300",
+			timestamp: "1 hour ago",
 		},
 		{
 			id: "v5",
-			time: "11:11:59",
-			title: "Template scaffold created",
-			author: "Maya Chen",
-			authorColor: "bg-emerald-500",
-			changes: "Initial",
-			icon: "layout" as const,
+			version: "v5.0",
+			isCurrent: true,
+			title:
+				"New images added to Lesson 2. Quiz and Survey added to Lesson 3,4,5 & 6",
+			author: "Mukul Joshi",
+			avatarBg: "bg-sky-100 dark:bg-sky-950/70",
+			avatarText: "text-sky-700 dark:text-sky-300",
+			timestamp: "14 hours ago",
 		},
-	];
+		{
+			id: "v4",
+			version: "v4.0",
+			isCurrent: false,
+			title: "New images added to Lesson 2",
+			author: "Shuchit Gandhi",
+			avatarBg: "bg-amber-100 dark:bg-amber-950/70",
+			avatarText: "text-amber-700 dark:text-amber-300",
+			timestamp: "Yesterday",
+		},
+		{
+			id: "v-quiz",
+			isCurrent: false,
+			title: "Updated new quiz questions",
+			author: "Suhani Ashok",
+			avatarBg: "bg-emerald-100 dark:bg-emerald-950/70",
+			avatarText: "text-emerald-700 dark:text-emerald-300",
+			timestamp: "3 days ago",
+		},
+		{
+			id: "v-lesson10",
+			isCurrent: false,
+			title: "Lesson 10 updated",
+			author: "Suhani Ashok",
+			avatarBg: "bg-emerald-100 dark:bg-emerald-950/70",
+			avatarText: "text-emerald-700 dark:text-emerald-300",
+			timestamp: "5 days ago",
+		},
+		{
+			id: "v3",
+			version: "v3.0",
+			isCurrent: false,
+			title: "Updated examples in introduction",
+			author: "Sarvesh Pansare",
+			avatarBg: "bg-rose-100 dark:bg-rose-950/70",
+			avatarText: "text-rose-700 dark:text-rose-300",
+			timestamp: "3 Mar, 2022",
+		},
+	]);
+
+	const handleRestore = (id: string) => {
+		const target = versions.find((v) => v.id === id);
+		if (!target) return;
+		setSelectedId(id);
+		setVersions((prev) =>
+			prev.map((v) => ({
+				...v,
+				isCurrent: v.id === id,
+			})),
+		);
+		setRestoredNotification(
+			`Restored to ${target.version ? target.version : "snapshot"}`,
+		);
+		setTimeout(() => {
+			setRestoredNotification(null);
+		}, 2400);
+	};
+
+	// Automated cursor sequence loop
+	useEffect(() => {
+		if (shouldReduceMotion || isUserInteracting) {
+			setCursorVisible(false);
+			return;
+		}
+
+		setCursorVisible(true);
+		let cancelled = false;
+
+		const wait = (ms: number) =>
+			new Promise<void>((resolve) => {
+				const t = setTimeout(() => {
+					resolve();
+				}, ms);
+				return () => clearTimeout(t);
+			});
+
+		const runSequence = async () => {
+			while (!cancelled) {
+				// Step 1: Move to v4
+				setCursorPos({ x: 220, y: 190 });
+				setHoveredId("v4");
+				await wait(900);
+				if (cancelled) return;
+
+				// Step 2: Click to select v4
+				setIsCursorClicking(true);
+				setSelectedId("v4");
+				await wait(180);
+				setIsCursorClicking(false);
+				if (cancelled) return;
+
+				// Step 3: Move cursor to Restore button on v4
+				setCursorPos({ x: 395, y: 190 });
+				await wait(600);
+				if (cancelled) return;
+
+				// Step 4: Click Restore button
+				setIsCursorClicking(true);
+				handleRestore("v4");
+				await wait(220);
+				setIsCursorClicking(false);
+				if (cancelled) return;
+
+				// Step 5: Park cursor down and wait
+				setCursorPos({ x: 370, y: 320 });
+				setHoveredId(null);
+				await wait(2600);
+				if (cancelled) return;
+
+				// Step 6: Move to v5
+				setCursorPos({ x: 220, y: 110 });
+				setHoveredId("v5");
+				await wait(900);
+				if (cancelled) return;
+
+				// Step 7: Click to select v5
+				setIsCursorClicking(true);
+				setSelectedId("v5");
+				await wait(180);
+				setIsCursorClicking(false);
+				if (cancelled) return;
+
+				// Step 8: Move cursor to Restore button on v5
+				setCursorPos({ x: 395, y: 110 });
+				await wait(600);
+				if (cancelled) return;
+
+				// Step 9: Click Restore on v5
+				setIsCursorClicking(true);
+				handleRestore("v5");
+				await wait(220);
+				setIsCursorClicking(false);
+				if (cancelled) return;
+
+				// Park and wait before restart
+				setCursorPos({ x: 370, y: 320 });
+				setHoveredId(null);
+				await wait(3000);
+			}
+		};
+
+		runSequence();
+
+		return () => {
+			cancelled = true;
+		};
+	}, [shouldReduceMotion, isUserInteracting]);
 
 	return (
-		<div className="relative mx-auto w-full max-w-xl">
-			{/* Top Bar with Logo & Restore Button */}
-			<div className="mb-3 flex items-center justify-between">
-				<div className="flex items-center gap-2">
-					<div className="flex size-7 items-center justify-center rounded-lg border border-stroke-soft-200 bg-bg-white-0 shadow-2xs dark:border-white/10 dark:bg-white/5">
-						<Icon
-							name="sparkling"
-							className="size-3.5 text-text-strong-950 dark:text-white"
-						/>
-					</div>
-					<button
-						type="button"
-						className="flex size-7 items-center justify-center rounded-lg border border-stroke-soft-200 bg-bg-white-0 text-text-sub-600 shadow-2xs transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-white/10 dark:bg-white/5 dark:text-white/70 dark:hover:bg-white/10"
+		<div
+			onMouseEnter={() => setIsUserInteracting(true)}
+			onMouseLeave={() => setIsUserInteracting(false)}
+			className="relative mx-auto w-full max-w-[480px]"
+		>
+			{/* Presence Cursor */}
+			<AnimatePresence>
+				{cursorVisible && !isUserInteracting && (
+					<motion.div
+						aria-hidden
+						className="pointer-events-none absolute z-30 flex flex-col"
+						initial={{ opacity: 0, scale: 0.8 }}
+						animate={{
+							x: cursorPos.x,
+							y: cursorPos.y,
+							scale: isCursorClicking ? 0.82 : 1,
+							opacity: 1,
+						}}
+						exit={{ opacity: 0 }}
+						transition={{
+							duration: 0.38,
+							ease: EASE_OUT,
+						}}
+						style={{ transformOrigin: "2px 2px" }}
 					>
-						<span className="text-xs">←</span>
-					</button>
-				</div>
+						<Icon
+							name="cursor"
+							className="size-4 drop-shadow-[0_1px_2px_rgba(0,0,0,0.35)]"
+							style={{ color: "#10b981" }}
+						/>
+						<span
+							className="absolute top-[14px] left-[12px] whitespace-nowrap rounded-md px-1.5 py-[3px] font-semibold text-[10px] leading-none text-white shadow-[0_1px_2px_rgba(0,0,0,0.18)]"
+							style={{ backgroundColor: "#10b981" }}
+						>
+							Maya
+						</span>
+					</motion.div>
+				)}
+			</AnimatePresence>
 
-				{/* Signature Reloop UI FancyButton Root */}
-				<FancyButton.Root
-					variant="neutral"
-					size="xsmall"
-					className="rounded-full! px-3.5!"
-				>
-					<Icon name="history" className="size-3" />
-					<span>Restore this version</span>
-				</FancyButton.Root>
-			</div>
-
-			{/* Main Single Block: Version History Widget */}
-			<div className="relative overflow-visible rounded-2xl border border-stroke-soft-200 bg-bg-white-0 shadow-sm dark:border-white/10 dark:bg-[#0c0c0e]">
-				{/* Card Header */}
-				<div className="flex items-center justify-between border-stroke-soft-100 border-b px-5 py-3 dark:border-white/10">
-					<h3 className="font-medium text-text-strong-950 text-xs tracking-tight dark:text-white">
+			{/* Version History Card */}
+			<div className="relative rounded-2xl border border-neutral-200/80 bg-white p-7 sm:p-8 shadow-[0_10px_35px_-4px_rgba(0,0,0,0.06)] dark:border-white/10 dark:bg-[#111114] dark:shadow-none">
+				{/* Header */}
+				<div className="mb-7 flex items-center justify-between">
+					<h3 className="font-bold text-[19px] tracking-tight text-neutral-900 dark:text-white">
 						Version History
 					</h3>
-					<span className="text-text-soft-400 text-xs dark:text-white/40">
-						🔍
+					<span className="text-[11px] font-normal text-neutral-400 dark:text-neutral-500">
+						Hover to restore
 					</span>
 				</div>
 
-				{/* Timeline Content */}
-				<div className="relative p-4 sm:p-5">
-					<div className="mb-2 font-normal text-[11px] text-text-soft-400 dark:text-white/40">
-						Today
-					</div>
+				{/* Timeline Container */}
+				<div className="relative">
+					{/* Vertical Timeline Connecting Line */}
+					<div className="absolute top-2.5 bottom-2.5 left-[23px] w-[1px] -translate-x-1/2 bg-neutral-200 dark:bg-white/10" />
 
-					{/* Vertical Timeline Rail & Items */}
-					<div className="relative space-y-1.5">
-						{/* Vertical Connecting Line */}
-						<div className="absolute top-3 bottom-3 left-[15px] w-px bg-stroke-soft-200 dark:bg-white/10" />
-
-						{VERSIONS.map((v) => {
-							const isSelected = selectedVersion === v.id;
+					{/* Version Items */}
+					<div className="space-y-4">
+						{versions.map((item) => {
+							const isHovered = hoveredId === item.id;
+							const isSelected = selectedId === item.id;
 
 							return (
-								<div key={v.id} className="relative flex items-center gap-3">
-									{/* Timeline Icon Node */}
-									<div
-										className={cn(
-											"relative z-10 flex size-8 shrink-0 items-center justify-center rounded-lg border text-xs transition-colors",
-											isSelected
-												? "border-stroke-soft-300 bg-bg-weak-50 text-text-strong-950 dark:border-white/20 dark:bg-white/10 dark:text-white"
-												: "border-stroke-soft-200 bg-bg-white-0 text-text-sub-600 dark:border-white/10 dark:bg-[#121215] dark:text-white/60",
+								<div
+									key={item.id}
+									onClick={() => {
+										setSelectedId(item.id);
+										setHoveredId(item.id);
+									}}
+									onMouseEnter={() => {
+										setHoveredId(item.id);
+									}}
+									className={cn(
+										"group relative flex cursor-pointer items-start gap-4 rounded-xl p-1.5 -mx-1.5 transition-all duration-200",
+										isSelected
+											? "bg-neutral-100/70 dark:bg-white/[0.04]"
+											: "hover:bg-neutral-50 dark:hover:bg-white/[0.02]",
+									)}
+								>
+									{/* Timeline Node (Badge or Dot) */}
+									<div className="flex w-[46px] shrink-0 items-center justify-center pt-[1px]">
+										{item.version ? (
+											item.isCurrent ? (
+												<span className="relative z-10 inline-flex items-center justify-center rounded-full bg-neutral-950 px-2.5 py-[2.5px] font-semibold text-[10.5px] tracking-tight text-white dark:bg-white dark:text-neutral-950">
+													{item.version}
+												</span>
+											) : (
+												<span className="relative z-10 inline-flex items-center justify-center rounded-full bg-[#f1f2f5] px-2.5 py-[2.5px] font-medium text-[10.5px] tracking-tight text-[#8c8c97] dark:bg-white/10 dark:text-neutral-400">
+													{item.version}
+												</span>
+											)
+										) : (
+											<div className="relative z-10 my-1.5 size-[7px] rounded-full bg-[#b8b8c2] ring-4 ring-white dark:bg-neutral-500 dark:ring-[#111114]" />
 										)}
-									>
-										<Icon name={v.icon} className="size-3.5" />
 									</div>
 
-									{/* Snapshot Card */}
-									<div
-										onClick={() => setSelectedVersion(v.id)}
-										className={cn(
-											"group flex flex-1 cursor-pointer items-center justify-between rounded-xl border p-2.5 transition-all",
-											isSelected
-												? "border-stroke-soft-200 bg-bg-weak-50/60 shadow-2xs dark:border-white/10 dark:bg-white/[0.02]"
-												: "border-transparent bg-transparent hover:border-stroke-soft-200 hover:bg-bg-weak-50/50 dark:hover:border-white/10 dark:hover:bg-white/[0.02]",
-										)}
-									>
-										<div className="space-y-0.5">
-											<div className="flex items-center gap-2">
-												<span className="font-mono text-[10.5px] text-text-soft-400 dark:text-white/40">
-													{v.time}
-												</span>
-												<span className="font-normal text-text-strong-950 text-xs dark:text-white">
-													{v.title}
-												</span>
-											</div>
-											<div className="flex items-center gap-1.5 text-[10.5px]">
-												<span
-													className={cn("size-1.5 rounded-full", v.authorColor)}
-												/>
-												<span className="text-text-sub-600 dark:text-white/60">
-													{v.author}
-												</span>
-												<span className="text-text-soft-400 dark:text-white/30">
-													·
-												</span>
-												<span className="text-text-soft-400 dark:text-white/50">
-													{v.changes} {isSelected && "▾"}
-												</span>
-											</div>
-										</div>
+									{/* Content */}
+									<div className="min-w-0 flex-1">
+										<h4 className="font-medium text-[13.5px] leading-[1.38] text-neutral-800 dark:text-neutral-100">
+											{item.title}
+										</h4>
+										<p className="mt-1 flex items-center gap-1.5 text-[12px] text-neutral-500 dark:text-neutral-400">
+											<span
+												className={cn(
+													"flex size-4 shrink-0 items-center justify-center rounded-full font-semibold text-[9px] leading-none select-none",
+													item.avatarBg,
+													item.avatarText,
+												)}
+											>
+												{item.author[0]}
+											</span>
+											<span>{item.author}</span>
+											<span className="text-neutral-400 dark:text-neutral-500">
+												•
+											</span>
+											<span>{item.timestamp}</span>
+										</p>
+									</div>
 
-										<span className="text-text-soft-400 text-xs opacity-0 transition-opacity group-hover:opacity-100 dark:text-white/40">
-											•••
-										</span>
+									{/* Restore Action Button */}
+									<div className="shrink-0 pt-0.5">
+										{item.isCurrent ? (
+											<span className="inline-flex items-center rounded-md bg-emerald-50 px-2 py-0.5 text-[10.5px] font-medium text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400">
+												Current
+											</span>
+										) : (
+											<button
+												type="button"
+												onClick={(e) => {
+													e.stopPropagation();
+													handleRestore(item.id);
+												}}
+												className={cn(
+													"inline-flex items-center gap-1 rounded-lg border border-neutral-200/80 bg-white px-2.5 py-1 text-[11px] font-medium text-neutral-800 shadow-2xs transition-all hover:bg-neutral-50 dark:border-white/10 dark:bg-white/10 dark:text-white dark:hover:bg-white/15",
+													isHovered || isSelected
+														? "opacity-100 scale-100 pointer-events-auto"
+														: "opacity-0 scale-95 pointer-events-none sm:group-hover:opacity-100 sm:group-hover:scale-100 sm:group-hover:pointer-events-auto",
+												)}
+											>
+												<Icon name="history" className="size-3" />
+												<span>Restore</span>
+											</button>
+										)}
 									</div>
 								</div>
 							);
 						})}
-
-						{/* Floating Action Menu Popover */}
-						<div className="-right-4 absolute top-2 z-30 hidden w-44 rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-1.5 shadow-xl sm:block dark:border-white/15 dark:bg-[#151518]">
-							<div className="space-y-0.5 text-[11px]">
-								<FancyButton.Root
-									variant="neutral"
-									size="xsmall"
-									className="w-full justify-start rounded-lg! px-2.5! font-normal"
-								>
-									<Icon name="history" className="size-3" />
-									<span>Restore</span>
-								</FancyButton.Root>
-								{[
-									{ label: "Restore as new", badge: "Soon" },
-									{ label: "Preview snapshot", badge: "Soon" },
-									{ label: "Add a Name", badge: "Soon" },
-									{ label: "Add a Tag", badge: "Soon" },
-									{ label: "Export React Email", badge: "Soon" },
-								].map((item) => (
-									<div
-										key={item.label}
-										className="flex cursor-pointer items-center justify-between rounded-lg px-2.5 py-1.5 font-normal text-text-sub-600 hover:bg-bg-weak-50 hover:text-text-strong-950 dark:text-white/70 dark:hover:bg-white/5 dark:hover:text-white"
-									>
-										<span>{item.label}</span>
-										<span className="rounded border border-stroke-soft-200 bg-bg-weak-50 px-1.5 py-0.2 font-medium text-[8.5px] text-text-soft-400 dark:border-white/10 dark:bg-white/5 dark:text-white/40">
-											{item.badge}
-										</span>
-									</div>
-								))}
-							</div>
-						</div>
 					</div>
 				</div>
 
-				{/* Card Footer with Reloop UI Switch */}
-				<div className="flex items-center justify-between border-stroke-soft-100 border-t px-5 py-3 dark:border-white/10">
-					<span className="font-medium text-text-sub-600 text-xs dark:text-white/70">
-						Show Changes
-					</span>
-					<Switch.Root checked={showChanges} onCheckedChange={setShowChanges} />
-				</div>
+				{/* Restored Toast Banner */}
+				<AnimatePresence>
+					{restoredNotification && (
+						<motion.div
+							initial={{ opacity: 0, y: 12, scale: 0.95 }}
+							animate={{ opacity: 1, y: 0, scale: 1 }}
+							exit={{ opacity: 0, y: 8, scale: 0.95 }}
+							transition={{ duration: 0.22, ease: "easeOut" }}
+							className="absolute bottom-4 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 rounded-full border border-neutral-200/80 bg-white/95 px-3.5 py-1.5 text-[11.5px] font-medium text-neutral-900 shadow-lg backdrop-blur-sm dark:border-white/10 dark:bg-neutral-900/95 dark:text-white"
+						>
+							<span className="flex size-4 items-center justify-center rounded-full bg-emerald-500 text-[10px] text-white">
+								✓
+							</span>
+							<span>{restoredNotification}</span>
+						</motion.div>
+					)}
+				</AnimatePresence>
 			</div>
 		</div>
 	);
