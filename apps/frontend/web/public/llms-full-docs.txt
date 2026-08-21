@@ -254,7 +254,7 @@ Markdown: https://reloop.sh/docs/learn/ai/api-keys.go.md
 
 `POST /api/api-key/v1/`
 
-```go
+```go
 
 client, _ := reloop.NewClient(reloop.ClientOptions{
     APIKey: "rl_123456789",
@@ -269,7 +269,7 @@ apiKey, _ := client.ApiKeys.Create(reloop.CreateApiKeyParams{
 
 `GET /api/api-key/v1/`
 
-```go
+```go
 
 client, _ := reloop.NewClient(reloop.ClientOptions{
     APIKey: "rl_123456789",
@@ -285,7 +285,7 @@ apiKeys, _ := client.ApiKeys.List(&reloop.ApiKeyListParams{
 
 `GET /api/api-key/v1/:api_key_id`
 
-```go
+```go
 
 client, _ := reloop.NewClient(reloop.ClientOptions{
     APIKey: "rl_123456789",
@@ -298,7 +298,7 @@ _, _ = client.ApiKeys.Get("key_123456789")
 
 `PATCH /api/api-key/v1/:api_key_id`
 
-```go
+```go
 
 client, _ := reloop.NewClient(reloop.ClientOptions{
     APIKey: "rl_123456789",
@@ -313,7 +313,7 @@ apiKey, _ := client.ApiKeys.Update("key_123456789", reloop.UpdateApiKeyParams{
 
 `POST /api/api-key/v1/rotate/:api_key_id`
 
-```go
+```go
 
 client, _ := reloop.NewClient(reloop.ClientOptions{
     APIKey: "rl_123456789",
@@ -326,7 +326,7 @@ _, _ = client.ApiKeys.Rotate("key_123456789")
 
 `POST /api/api-key/v1/disable/:api_key_id`
 
-```go
+```go
 
 client, _ := reloop.NewClient(reloop.ClientOptions{
     APIKey: "rl_123456789",
@@ -339,7 +339,7 @@ _, _ = client.ApiKeys.Disable("key_123456789")
 
 `POST /api/api-key/v1/enable/:api_key_id`
 
-```go
+```go
 
 client, _ := reloop.NewClient(reloop.ClientOptions{
     APIKey: "rl_123456789",
@@ -352,7 +352,7 @@ _, _ = client.ApiKeys.Enable("key_123456789")
 
 `DELETE /api/api-key/v1/:api_key_id`
 
-```go
+```go
 
 client, _ := reloop.NewClient(reloop.ClientOptions{
     APIKey: "rl_123456789",
@@ -381,8 +381,7 @@ Markdown: https://reloop.sh/docs/learn/ai/api-keys.java.md
 
 `POST /api/api-key/v1/`
 
-```java
-
+```java
 ReloopClient reloop = new ReloopClient("rl_123456789");
 
 CreateApiKeyParams params = new CreateApiKeyParams();
@@ -395,8 +394,7 @@ System.out.println(apiKey.id + " " + apiKey.key);
 
 `GET /api/api-key/v1/`
 
-```java
-
+```java
 ReloopClient reloop = new ReloopClient("rl_123456789");
 
 ApiKeyListParams params = new ApiKeyListParams();
@@ -411,7 +409,7 @@ System.out.println(apiKeys.total + " " + apiKeys.apiKeys);
 
 `GET /api/api-key/v1/:api_key_id`
 
-```java
+```java
 
 ReloopClient reloop = new ReloopClient("rl_123456789");
 
@@ -423,8 +421,7 @@ System.out.println(apiKey.id + " " + apiKey.name + " " + apiKey.enabled);
 
 `PATCH /api/api-key/v1/:api_key_id`
 
-```java
-
+```java
 ReloopClient reloop = new ReloopClient("rl_123456789");
 
 UpdateApiKeyParams params = new UpdateApiKeyParams();
@@ -437,7 +434,7 @@ System.out.println(apiKey.id + " " + apiKey.name);
 
 `POST /api/api-key/v1/rotate/:api_key_id`
 
-```java
+```java
 
 ReloopClient reloop = new ReloopClient("rl_123456789");
 
@@ -449,7 +446,7 @@ System.out.println(apiKey.id + " " + apiKey.key);
 
 `POST /api/api-key/v1/disable/:api_key_id`
 
-```java
+```java
 
 ReloopClient reloop = new ReloopClient("rl_123456789");
 
@@ -461,7 +458,7 @@ System.out.println(apiKey.id + " " + apiKey.enabled);
 
 `POST /api/api-key/v1/enable/:api_key_id`
 
-```java
+```java
 
 ReloopClient reloop = new ReloopClient("rl_123456789");
 
@@ -473,7 +470,7 @@ System.out.println(apiKey.id + " " + apiKey.enabled);
 
 `DELETE /api/api-key/v1/:api_key_id`
 
-```java
+```java
 
 ReloopClient reloop = new ReloopClient("rl_123456789");
 
@@ -557,7 +554,7 @@ Markdown: https://reloop.sh/docs/learn/ai/api-keys.node.md
 
 `POST /api/api-key/v1/`
 
-```javascript
+```javascript
 
 const reloop = new Reloop({ apiKey: "rl_123456789" });
 
@@ -574,7 +571,7 @@ console.log(apiKey.id, apiKey.key);
 
 `GET /api/api-key/v1/`
 
-```javascript
+```javascript
 
 const reloop = new Reloop({ apiKey: "rl_123456789" });
 
@@ -593,7 +590,7 @@ console.log(apiKeys.total, apiKeys.apiKeys);
 
 `GET /api/api-key/v1/:api_key_id`
 
-```javascript
+```javascript
 
 const reloop = new Reloop({ apiKey: "rl_123456789" });
 
@@ -608,7 +605,7 @@ console.log(apiKey.id, apiKey.name, apiKey.enabled);
 
 `PATCH /api/api-key/v1/:api_key_id`
 
-```javascript
+```javascript
 
 const reloop = new Reloop({ apiKey: "rl_123456789" });
 
@@ -625,7 +622,7 @@ console.log(apiKey.id, apiKey.name);
 
 `POST /api/api-key/v1/rotate/:api_key_id`
 
-```javascript
+```javascript
 
 const reloop = new Reloop({ apiKey: "rl_123456789" });
 
@@ -640,7 +637,7 @@ console.log(apiKey.id, apiKey.key);
 
 `POST /api/api-key/v1/disable/:api_key_id`
 
-```javascript
+```javascript
 
 const reloop = new Reloop({ apiKey: "rl_123456789" });
 
@@ -655,7 +652,7 @@ console.log(apiKey.id, apiKey.enabled);
 
 `POST /api/api-key/v1/enable/:api_key_id`
 
-```javascript
+```javascript
 
 const reloop = new Reloop({ apiKey: "rl_123456789" });
 
@@ -670,7 +667,7 @@ console.log(apiKey.id, apiKey.enabled);
 
 `DELETE /api/api-key/v1/:api_key_id`
 
-```javascript
+```javascript
 
 const reloop = new Reloop({ apiKey: "rl_123456789" });
 
@@ -1302,6 +1299,7 @@ Markdown: https://reloop.sh/docs/learn/api-keys.md
     4. Update the key name and click **Save changes** (or press `Enter`)
     <Video src="/docs/images/docs/api-keys/edit-api-key.mp4" autoPlay loop muted playsInline />
 
+
     ## Rotate an API key
 
     <Info>
@@ -1383,6 +1381,7 @@ Markdown: https://reloop.sh/docs/learn/api-keys.md
     <ApiKeyCodeSamples id="apiKey.delete" />
   </Tab>
 </Tabs>
+
 
 ## FAQ
 
@@ -4033,8 +4032,7 @@ Webhooks are "user-defined HTTP callbacks". They are usually triggered by some e
 
 Set up a URL on your server that can receive HTTP POST requests.
 
-```javascript
-
+```javascript
   if (req.method === 'POST') {
     const event = req.body;
     console.log(event);
@@ -4082,8 +4080,7 @@ Headers include `Reloop-Id`, `Reloop-Timestamp`, and `Reloop-Signature` for veri
 
 Once you've tested your logic, update your endpoint to handle specific event types and deploy it to your production server.
 
-```javascript
-
+```javascript
   if (req.method === 'POST') {
     const event = req.body;
     if (event.type === "email.bounced") {
@@ -4393,8 +4390,7 @@ Every delivery includes:
 4. Compare the hex digest to the `v1=` value with a constant-time compare.
 5. Reject if the timestamp is older than ~5 minutes (replay protection).
 
-```typescript
-
+```typescript
   secret: string;
   rawBody: string;
   signatureHeader: string;
@@ -4870,8 +4866,7 @@ Follow the [Local Development](#local-development) steps above first.
 ### Using Stdio Transport
 
 1. Set your API key:
-    ```bash
-
+    ```bash
     ```
 
 2. Start the inspector:
@@ -4996,7 +4991,7 @@ Let's add a webhook to Reloop using the server you just built. Use the email.rec
 **Test receiving an email:**
 
 <CodeBlock title="Webhook Handler Example">
-```typescript
+```typescript
 
 const reloop = new Reloop(process.env.RELOOP_API_KEY);
 
@@ -5285,6 +5280,7 @@ Markdown: https://reloop.sh/docs/resources/sdks.md
   </Card>
 </CardGroup>
 
+
 ## Missing your language?
 
 We're actively expanding our SDK coverage. If your language or framework isn't listed above, you can:
@@ -5330,8 +5326,7 @@ go get github.com/reloop-labs/reloop-go
 ## Sending an Email
 
 ```go
-package main
-
+package main
 	"context"
 	"net/http"
 	"os"
@@ -5553,7 +5548,7 @@ RELOOP_API_KEY=re_your_api_key_here
 
 Here is an example of an Express route that sends an email:
 
-```typescript
+```typescript
 
 const app = express();
 const reloop = new Reloop({ apiKey: process.env.RELOOP_API_KEY });
@@ -5602,8 +5597,7 @@ RELOOP_API_KEY=rl_your_api_key_here
 ## Shared client
 
 ```typescript
-// lib/reloop.ts
-
+// lib/reloop.ts
   apiKey: process.env.RELOOP_API_KEY!,
 });
 ```
@@ -5611,8 +5605,7 @@ RELOOP_API_KEY=rl_your_api_key_here
 ## Route Handler
 
 ```typescript
-// app/api/send-email/route.ts
-
+// app/api/send-email/route.ts
   try {
     const { to, subject, html, text } = await request.json();
 
@@ -5639,8 +5632,7 @@ RELOOP_API_KEY=rl_your_api_key_here
 
 ```typescript
 // app/actions/send-email.ts
-"use server";
-
+"use server";
   const { response, emailError } = await reloop.mail.send({
     from: "Acme <onboarding@mail.yourdomain.com>",
     to: email,
@@ -5736,7 +5728,7 @@ pip install reloop-email
 Add your API key to your settings:
 
 ```python
-# settings.py
+# settings.py
 
 RELOOP_API_KEY = os.environ.get("RELOOP_API_KEY", "re_your_api_key_here")
 ```
@@ -5787,16 +5779,14 @@ pip install reloop-email
 
 Add your API key to your environment:
 
-```bash
-
+```bash
 ```
 
 ## Sending an Email
 
 Here is a simple FastAPI route that sends an email:
 
-```python
-
+```python
 from fastapi import FastAPI, HTTPException
 from reloop_email import Reloop
 
@@ -5834,8 +5824,7 @@ pip install reloop-email
 
 ## Sending an Email
 
-```python
-
+```python
 from flask import Flask, jsonify
 from reloop_email import Reloop
 
@@ -5886,8 +5875,7 @@ bundle install
 
 Set your API key in your environment variables:
 
-```bash
-
+```bash
 ```
 
 ## Sending an Email
@@ -5979,8 +5967,7 @@ Markdown: https://reloop.sh/docs/examples/smtp/go.md
 ## Code Example
 
 ```go
-package main
-
+package main
 	"crypto/tls"
 	"fmt"
 	"net/smtp"
@@ -6253,8 +6240,7 @@ Markdown: https://reloop.sh/docs/examples/smtp/python.md
 
 ## Code Example
 
-```python
-
+```python
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
@@ -7804,6 +7790,7 @@ Never create a second SPF TXT on the same host. Merge `include:reloop.sh` into t
 - DreamHost uses `@` or blank for the root host depending on the screen.
 - Confirm you are editing the zone that matches public nameservers.
 
+
 ## Receiving emails
 
 **Email Receiving** is on by default for new domains. If it stays on, you must publish the inbound **MX** Reloop shows (typically `inbound.reloop.sh`). Turn Email Receiving off for send-only if this hostname must keep another inbox.
@@ -7920,6 +7907,7 @@ Never create a second SPF TXT on the same host. Merge `include:reloop.sh` into t
 - Gandi LiveDNS uses relative hostnames; omit the domain suffix.
 - If the domain uses external nameservers, edit that host instead.
 
+
 ## Receiving emails
 
 **Email Receiving** is on by default for new domains. If it stays on, you must publish the inbound **MX** Reloop shows (typically `inbound.reloop.sh`). Turn Email Receiving off for send-only if this hostname must keep another inbox.
@@ -8035,6 +8023,7 @@ Never create a second SPF TXT on the same host. Merge `include:reloop.sh` into t
 
 - Glauca Digital supports Domain Connect ([HexDNS](https://docs.glauca.digital/hexdns/domain-connect/)). Reloop’s template may become available after public registry sync — if Reloop does not show **Auto populate**, use manual setup.
 - Default HexDNS nameservers are `ns1`–`ns4.as207960.net`.
+
 
 ## Receiving emails
 
@@ -8269,6 +8258,7 @@ Never create a second SPF TXT on the same host. Merge `include:reloop.sh` into t
 - Use the Hetzner DNS Console for zones on Hetzner nameservers.
 - Merge SPF carefully — Hetzner may already have a default TXT.
 
+
 ## Receiving emails
 
 **Email Receiving** is on by default for new domains. If it stays on, you must publish the inbound **MX** Reloop shows (typically `inbound.reloop.sh`). Turn Email Receiving off for send-only if this hostname must keep another inbox.
@@ -8384,6 +8374,7 @@ Never create a second SPF TXT on the same host. Merge `include:reloop.sh` into t
 
 - Hostinger hPanel is the editor when nameservers point at Hostinger.
 - If you pointed NS at Cloudflare (or another host), edit that host instead.
+
 
 ## Receiving emails
 
@@ -8699,6 +8690,7 @@ Never create a second SPF TXT on the same host. Merge `include:reloop.sh` into t
 - Use Advanced DNS when Namecheap nameservers are active.
 - For apex hosts Namecheap often uses `@`.
 
+
 ## Receiving emails
 
 **Email Receiving** is on by default for new domains. If it stays on, you must publish the inbound **MX** Reloop shows (typically `inbound.reloop.sh`). Turn Email Receiving off for send-only if this hostname must keep another inbox.
@@ -8836,6 +8828,7 @@ Never create a second SPF TXT on the same host. Merge `include:reloop.sh` into t
 - NameSilo syncs Domain Connect templates from the public registry — prefer Auto-populate when offered.
 - Confirm you are editing DNS at NameSilo (not a different host pointed to by custom NS).
 
+
 ## Receiving emails
 
 **Email Receiving** is on by default for new domains. If it stays on, you must publish the inbound **MX** Reloop shows (typically `inbound.reloop.sh`). Turn Email Receiving off for send-only if this hostname must keep another inbox.
@@ -8953,6 +8946,7 @@ Never create a second SPF TXT on the same host. Merge `include:reloop.sh` into t
 - Plesk is often behind a hosting brand: open the panel that actually serves your public nameservers.
 - Login URL varies by host; Reloop cannot deep-link to a single Plesk URL.
 
+
 ## Receiving emails
 
 **Email Receiving** is on by default for new domains. If it stays on, you must publish the inbound **MX** Reloop shows (typically `inbound.reloop.sh`). Turn Email Receiving off for send-only if this hostname must keep another inbox.
@@ -9068,6 +9062,7 @@ Never create a second SPF TXT on the same host. Merge `include:reloop.sh` into t
 
 - Porkbun uses relative host fields; omit your domain suffix.
 - Confirm DNS is managed at Porkbun (not parked elsewhere).
+
 
 ## Receiving emails
 
@@ -9185,6 +9180,7 @@ Never create a second SPF TXT on the same host. Merge `include:reloop.sh` into t
 - Edit the hosted zone whose NS match the public nameservers (`awsdns-`).
 - For MX, set the Priority field separately from the Value.
 
+
 ## Receiving emails
 
 **Email Receiving** is on by default for new domains. If it stays on, you must publish the inbound **MX** Reloop shows (typically `inbound.reloop.sh`). Turn Email Receiving off for send-only if this hostname must keep another inbox.
@@ -9301,6 +9297,7 @@ Never create a second SPF TXT on the same host. Merge `include:reloop.sh` into t
 - Domains migrated from Google Domains often still show `googledomains.com` nameservers — manage them in Squarespace.
 - Use `@` for the root host when Squarespace requires it.
 
+
 ## Receiving emails
 
 **Email Receiving** is on by default for new domains. If it stays on, you must publish the inbound **MX** Reloop shows (typically `inbound.reloop.sh`). Turn Email Receiving off for send-only if this hostname must keep another inbox.
@@ -9416,6 +9413,7 @@ Never create a second SPF TXT on the same host. Merge `include:reloop.sh` into t
 
 - Strato’s DNS UI labels vary by language (DE/EN).
 - Confirm public NS match Strato before editing.
+
 
 ## Receiving emails
 
@@ -9720,6 +9718,7 @@ Never create a second SPF TXT on the same host. Merge `include:reloop.sh` into t
 
 - WordPress.com is listed as a Domain Connect DNS provider. Reloop’s template is **not** onboarded there yet — use manual setup unless Reloop shows **Auto populate**.
 - If the domain uses custom nameservers elsewhere, edit that host instead.
+
 
 ## Receiving emails
 
@@ -10948,7 +10947,7 @@ npm install @playwright/test reloop
 
 ## Example Test
 
-```typescript
+```typescript
 
 const reloop = new Reloop(process.env.RELOOP_API_KEY);
 
@@ -11268,7 +11267,7 @@ Reloop's inbound email feature can be used to forward received emails to another
   <Step title="Forward the email">
     In your webhook handler, use the Reloop API to send the email to the forwarding address:
 
-    ```typescript
+    ```typescript
 
     const reloop = new Reloop(process.env.RELOOP_API_KEY);
 
@@ -11498,34 +11497,34 @@ For detailed guidance on email deliverability, see our [Email Best Practices](/d
 Source: https://reloop.sh/docs/guides/pricing
 Markdown: https://reloop.sh/docs/guides/pricing.md
 
-Understanding Reloop pricing and plans.
+Reloop publishes **one** pricing source of truth: the marketing [pricing page](https://reloop.sh/pricing) and its markdown twin [pricing.md](https://reloop.sh/pricing.md) (generated from `@reloop/pricing`).
 
-## Overview
+This docs page exists so agents and the docs MCP do not invent plans. Do not cite “Essentials $9” or “Free has no daily limit.”
 
-Manage your Reloop account settings effectively to ensure smooth operation.
+## Reloop Cloud (hosted)
 
-## Steps
+| Plan | Price | Included volume | Daily limit | Overage |
+|------|-------|-----------------|-------------|---------|
+| Free | $0 | 3,000 emails / month | 200 / day | None (sending pauses) |
+| Individual | $10 / month | 25,000 emails / month | None | $0.80 / 1,000 |
+| Startup | $20 / month | 50,000 emails / month | None | $0.80 / 1,000 |
+| Enterprise | Custom | Custom | None | Custom |
 
-<Steps>
-  <Step title="Access your settings">
-    Navigate to the [Account Settings](https://app.reloop.sh/settings) page in your Reloop dashboard.
-  </Step>
-  <Step title="Make your changes">
-    Follow the on-screen instructions to update your account configuration.
-  </Step>
-  <Step title="Confirm changes">
-    Review and confirm your changes. Some changes may require email verification.
-  </Step>
-</Steps>
+No credit card is required for Free. Data retention on published tiers is 45 days.
 
-<Note>
-If you need assistance with account changes, contact [Reloop support](https://reloop.sh/help).
-</Note>
+## Self-host
 
-## Learn More
+Self-hosting Reloop is Apache 2.0 software with Reloop Labs use restrictions. There is **no Reloop SaaS fee** and **no hosted-tier SKU** for running the stack yourself. You pay your own servers, IPs, and operations. See [self-host](https://reloop.sh/self-host) and [license](https://reloop.sh/license).
 
+## Quotas in the product
+
+Plan limits are enforced on Reloop Cloud. Dashboard usage: [Account settings](https://reloop.sh/dashboard/settings). Sending guides: [Account quotas](/docs/guides/account-quotas-limits), [Sending](/docs/learn/sending).
+
+## Learn more
+
+- [pricing.md](https://reloop.sh/pricing.md) — canonical agent-readable plans
+- [Compare Reloop](https://reloop.sh/compare.md)
 - [Handling API Keys](/docs/guides/handling-api-keys)
-- [Account Quotas and Limits](/docs/guides/account-quotas-limits)
 
 ---
 
@@ -12092,8 +12091,7 @@ When prompted, input your Reloop API key starting with `rl_`.
 
 Send emails with a standard POST request inside your Worker:
 
-```typescript
-
+```typescript
   async fetch(request, env) {
     const response = await fetch('https://api.reloop.sh/v1/emails', {
       method: 'POST',
@@ -12742,10 +12740,9 @@ Markdown: https://reloop.sh/docs/integrations/netlify.md
 
 Retrieve the variable inside a Netlify Serverless Function:
 
-```typescript
+```typescript
 
-const reloop = new Reloop(process.env.RELOOP_API_KEY);
-
+const reloop = new Reloop(process.env.RELOOP_API_KEY);
   const result = await reloop.mail.send({
     from: 'hello@yourdomain.com',
     to: 'customer@example.com',
@@ -12825,7 +12822,7 @@ Replit automatically injects secrets as environment variables.
 
 Send an email in Node.js on Replit:
 
-```javascript
+```javascript
 
 const reloop = new Reloop(process.env.RELOOP_API_KEY);
 
@@ -12948,10 +12945,9 @@ Copy the generated code into your Next.js project.
 
 In your Next.js project, create `/app/api/send/route.ts` to process the form using Reloop:
 
-```typescript
+```typescript
 
-const reloop = new Reloop(process.env.RELOOP_API_KEY);
-
+const reloop = new Reloop(process.env.RELOOP_API_KEY);
   const { name, email, message } = await req.json();
 
   const data = await reloop.mail.send({
@@ -12993,10 +12989,9 @@ To allow your serverless functions or Next.js API routes to authenticate with Re
 
 Use the official Node.js SDK to send emails in your serverless code:
 
-```typescript
+```typescript
 
-const reloop = new Reloop(process.env.RELOOP_API_KEY);
-
+const reloop = new Reloop(process.env.RELOOP_API_KEY);
   const data = await reloop.mail.send({
     from: 'onboarding@yourdomain.com',
     to: 'user@example.com',
@@ -13642,6 +13637,7 @@ Markdown: https://reloop.sh/docs/learn/contacts.md
     4. Update the fields and click **Update** (or press `Enter`)
     <Video src="/docs/images/docs/contacts/overview/edit-contact.mp4" autoPlay loop muted playsInline />
 
+
     ## Subscribe or unsubscribe a contact
 
     <Info>
@@ -13699,6 +13695,7 @@ Markdown: https://reloop.sh/docs/learn/contacts.md
   </Tab>
 </Tabs>
 
+
 ## FAQ
 
 <AccordionGroup>
@@ -13752,6 +13749,7 @@ Markdown: https://reloop.sh/docs/learn/contacts.md
     Per-topic subscription preferences.
   </Card>
 </CardGroup>
+
 
 ## API reference
 
@@ -14072,6 +14070,7 @@ Markdown: https://reloop.sh/docs/learn/domain.md
   </Tab>
 </Tabs>
 
+
 ## FAQ
 
 <AccordionGroup>
@@ -14117,6 +14116,7 @@ Markdown: https://reloop.sh/docs/learn/domain.md
     Authenticate REST and SMTP with API keys.
   </Card>
 </CardGroup>
+
 
 ## API reference
 
@@ -14422,6 +14422,7 @@ Markdown: https://reloop.sh/docs/self-host/services.md
 
 Reloop is built using a highly modular microservice architecture. This separation allows you to scale specific components (such as mail queues or logs processing) depending on your server workload.
 
+
 ## Component Breakdown
 
 The Reloop stack consists of **19 application services** (3 frontends, 16 backends) and **9 external backing systems**.
@@ -14488,6 +14489,7 @@ Generation, hashing, validation, and revocation of developer API keys.
 Run [`bun setup`](/docs/setup) once from the monorepo root. Env files come from `bun setup` / `bun env:setup`.
 </Tip>
 
+
 ## Overview
 
 | Property | Value |
@@ -14498,6 +14500,7 @@ Run [`bun setup`](/docs/setup) once from the monorepo root. Env files come from 
 | **Swagger UI** | [https://local.reloop.sh/api/api-key/openapi](https://local.reloop.sh/api/api-key/openapi) |
 | **Stack** | ElysiaJS · Better Auth API Key · PostgreSQL · Redis · NATS |
 
+
 ## Quick start
 
 ```bash
@@ -14505,6 +14508,7 @@ bun be:api-key:dev
 ```
 
 Or `bun backend:dev` / `bun dev`.
+
 
 ## Environment
 
@@ -14527,6 +14531,7 @@ NODE_ENV=development
 | `BASE_URL` | **YES** | `https://local.reloop.sh` |
 | `NATS_URL` | **YES** | `nats://localhost:4222` |
 
+
 ## Commands
 
 | Command | Description |
@@ -14536,6 +14541,7 @@ NODE_ENV=development
 | `bun run --filter=be-api-key start` | Run compiled production build |
 | `bun run --filter=be-api-key check-types` | TypeScript type-check |
 
+
 ## Architecture
 
 | Layer | Detail |
@@ -14544,6 +14550,7 @@ NODE_ENV=development
 | **Caching** | Validated keys are cached in Redis for fast lookups |
 | **Events** | Key lifecycle events published to NATS under `api-key.*` |
 | **Schema** | `apikey` table in `packages/db/src/schema/api-key.ts` |
+
 
 ## Next
 
@@ -14575,6 +14582,7 @@ User signup, login, sessions, organizations, and workspace membership via **Bett
 Run [`bun setup`](/docs/setup) once from the monorepo root (Postgres + Redis via Docker). Env files come from `bun setup` / `bun env:setup`.
 </Tip>
 
+
 ## Overview
 
 | Property | Value |
@@ -14584,6 +14592,7 @@ Run [`bun setup`](/docs/setup) once from the monorepo root (Postgres + Redis via
 | **Local URL** | [https://local.reloop.sh/api/auth](https://local.reloop.sh/api/auth) |
 | **Swagger UI** | [https://local.reloop.sh/api/auth/openapi](https://local.reloop.sh/api/auth/openapi) |
 | **Stack** | ElysiaJS · Better Auth · PostgreSQL · Redis · NATS |
+
 
 ## Quick start
 
@@ -14596,6 +14605,7 @@ Or start every backend: `bun backend:dev` / `bun dev`.
 <Warning>
 Open the dashboard at [https://local.reloop.sh/dashboard](https://local.reloop.sh/dashboard), not `localhost:3001`. Session cookies are scoped to `local.reloop.sh`. Local OTP is `888888`.
 </Warning>
+
 
 ## Environment
 
@@ -14637,6 +14647,7 @@ GITHUB_CLIENT_SECRET=
 | `DEFAULT_OTP` | No | `888888` | Dev OTP bypass |
 | `DISABLE_SIGNUP` | No | `false` | Set `true` after creating an admin |
 
+
 ## Commands
 
 | Command | Description |
@@ -14646,6 +14657,7 @@ GITHUB_CLIENT_SECRET=
 | `bun run --filter=be-auth start` | Run compiled production build |
 | `bun run --filter=be-auth check-types` | TypeScript type-check |
 
+
 ## Architecture
 
 | Layer | Detail |
@@ -14654,6 +14666,7 @@ GITHUB_CLIENT_SECRET=
 | **Multi-tenancy** | Users belong to organizations through `member` (`packages/db/src/schema/auth.ts`) |
 | **Events** | Auth lifecycle events published to NATS under `auth.*` |
 | **First login** | Use OTP `888888` locally when `DEFAULT_OTP` is set |
+
 
 ## Next
 
@@ -14685,6 +14698,7 @@ Subscriber profiles, groups, channels, custom properties, and suppression lists.
 Run [`bun setup`](/docs/setup) once from the monorepo root. Env files come from `bun setup` / `bun env:setup`.
 </Tip>
 
+
 ## Overview
 
 | Property | Value |
@@ -14695,6 +14709,7 @@ Run [`bun setup`](/docs/setup) once from the monorepo root. Env files come from 
 | **Swagger UI** | [https://local.reloop.sh/api/contacts/openapi](https://local.reloop.sh/api/contacts/openapi) |
 | **Stack** | ElysiaJS · PostgreSQL · Redis · NATS |
 
+
 ## Quick start
 
 ```bash
@@ -14702,6 +14717,7 @@ bun be:contacts:dev
 ```
 
 Or `bun backend:dev` / `bun dev`.
+
 
 ## Environment
 
@@ -14728,6 +14744,7 @@ NODE_ENV=development
 | `NATS_URL` | **YES** | `nats://localhost:4222` |
 | `PREFERENCES_SECRET` | Prod only | Dev default in `.env.dev` |
 
+
 ## Commands
 
 | Command | Description |
@@ -14737,6 +14754,7 @@ NODE_ENV=development
 | `bun run --filter=be-contacts start` | Run compiled production build |
 | `bun run --filter=be-contacts check-types` | TypeScript type-check |
 
+
 ## Architecture
 
 | Layer | Detail |
@@ -14745,6 +14763,7 @@ NODE_ENV=development
 | **Preferences** | Powers the [Links](/docs/setup/frontend/links) preference center |
 | **Events** | Lifecycle events published to NATS under `contacts.*` |
 | **Schema** | `contact`, `channel`, `group` in `packages/db/src/schema/` |
+
 
 ## Next
 
@@ -14776,6 +14795,7 @@ Subscription tiers, credit balances, usage tracking, and Stripe billing integrat
 Run [`bun setup`](/docs/setup) once from the monorepo root. Env files come from `bun setup` / `bun env:setup`.
 </Tip>
 
+
 ## Overview
 
 | Property | Value |
@@ -14786,6 +14806,7 @@ Run [`bun setup`](/docs/setup) once from the monorepo root. Env files come from 
 | **Swagger UI** | [https://local.reloop.sh/api/credits/openapi](https://local.reloop.sh/api/credits/openapi) |
 | **Stack** | ElysiaJS · PostgreSQL · NATS |
 
+
 ## Quick start
 
 ```bash
@@ -14793,6 +14814,7 @@ bun be:credits:dev
 ```
 
 Or `bun backend:dev` / `bun dev`.
+
 
 ## Environment
 
@@ -14811,6 +14833,7 @@ NATS_URL=nats://localhost:4222
 | `INITIAL_CREDITS` | **YES** | `100` |
 | `NATS_URL` | **YES** | `nats://localhost:4222` |
 
+
 ## Commands
 
 | Command | Description |
@@ -14820,6 +14843,7 @@ NATS_URL=nats://localhost:4222
 | `bun run --filter=be-credits start` | Run compiled production build |
 | `bun run --filter=be-credits check-types` | TypeScript type-check |
 
+
 ## Architecture
 
 | Layer | Detail |
@@ -14828,6 +14852,7 @@ NATS_URL=nats://localhost:4222
 | **Stripe** | Manages subscriptions, invoices, and billing webhooks |
 | **Events** | Publishes `billing.quota-warning` and related NATS subjects |
 | **Schema** | `plan`, `subscription`, `credit_ledger` in `packages/db/src/schema/billing.ts` |
+
 
 ## Next
 
@@ -14859,6 +14884,7 @@ Custom sending domains, DKIM keys, DNS verification, and tracking subdomain setu
 Run [`bun setup`](/docs/setup) once from the monorepo root. Env files come from `bun setup` / `bun env:setup`.
 </Tip>
 
+
 ## Overview
 
 | Property | Value |
@@ -14869,6 +14895,7 @@ Run [`bun setup`](/docs/setup) once from the monorepo root. Env files come from 
 | **Swagger UI** | [https://local.reloop.sh/api/domain/openapi](https://local.reloop.sh/api/domain/openapi) |
 | **Stack** | ElysiaJS · PostgreSQL · Redis · NATS |
 
+
 ## Quick start
 
 ```bash
@@ -14876,6 +14903,7 @@ bun be:domain:dev
 ```
 
 Or `bun backend:dev` / `bun dev`.
+
 
 ## Environment
 
@@ -14902,6 +14930,7 @@ NODE_ENV=development
 | `DKIM_SELECTOR` | **YES** | `reloop` |
 | `NATS_URL` | **YES** | `nats://localhost:4222` |
 
+
 ## Commands
 
 | Command | Description |
@@ -14911,6 +14940,7 @@ NODE_ENV=development
 | `bun run --filter=be-domain start` | Run compiled production build |
 | `bun run --filter=be-domain check-types` | TypeScript type-check |
 
+
 ## Architecture
 
 | Layer | Detail |
@@ -14919,6 +14949,7 @@ NODE_ENV=development
 | **Inbound validation** | Used by [inbound](/docs/setup/backend/inbound) to verify recipient addresses |
 | **Schema** | `domain` and `domain_dns_record` in `packages/db/src/schema/domain.ts` |
 | **Events** | Publishes domain lifecycle events to NATS |
+
 
 ## Next
 
@@ -14954,6 +14985,7 @@ Run [`bun setup`](/docs/setup) once from the monorepo root. Env files come from 
 **Email** ≠ **Mail**. Email sends platform notifications to Reloop users (invites, password resets). [Mail](/docs/setup/backend/mail) is the customer-facing send API for their audiences.
 </Warning>
 
+
 ## Overview
 
 | Property | Value |
@@ -14964,6 +14996,7 @@ Run [`bun setup`](/docs/setup) once from the monorepo root. Env files come from 
 | **Swagger UI** | [https://local.reloop.sh/api/email/openapi](https://local.reloop.sh/api/email/openapi) |
 | **Stack** | ElysiaJS · Redis · NATS |
 
+
 ## Quick start
 
 ```bash
@@ -14971,6 +15004,7 @@ bun be:email:dev
 ```
 
 Or `bun backend:dev` / `bun dev`. Locally, when `RELOOP_API_KEY` is unset, mail falls back to Mailpit SMTP (`localhost:1025`).
+
 
 ## Environment
 
@@ -14996,6 +15030,7 @@ NODE_ENV=development
 | `RELOOP_SENDER_DOMAIN` | Prod | — | System product mail From domain (auth, billing, invites) |
 | `ONBOARDING_TEST_DOMAIN` | Prod | — | Onboarding “Send email” From domain only (can differ) |
 
+
 ## Commands
 
 | Command | Description |
@@ -15005,6 +15040,7 @@ NODE_ENV=development
 | `bun run --filter=be-email start` | Run compiled production build |
 | `bun run --filter=be-email check-types` | TypeScript type-check |
 
+
 ## Architecture
 
 | Layer | Detail |
@@ -15012,6 +15048,7 @@ NODE_ENV=development
 | **Triggers** | Subscribes to NATS subjects (`auth.*`, `billing.*`, etc.) |
 | **Delivery** | Sends via the [mail](/docs/setup/backend/mail) pipeline using `RELOOP_API_KEY` when set |
 | **Schema** | `email_log` in `packages/db/src/schema/email.ts` |
+
 
 ## Next
 
@@ -15043,6 +15080,7 @@ Inbound KumoMTA MX receiver — accepts external mail, scans with [spam](/docs/s
 Run [`bun setup`](/docs/setup) or `bun docker:up` from the monorepo root. Inbound needs free port `25`.
 </Tip>
 
+
 ## Overview
 
 | Property | Value |
@@ -15053,6 +15091,7 @@ Run [`bun setup`](/docs/setup) or `bun docker:up` from the monorepo root. Inboun
 | **HTTP port** | `8030` (health check) |
 | **Stack** | KumoMTA · Lua · [spam](/docs/setup/backend/spam) |
 
+
 ## Quick start
 
 ```bash
@@ -15060,6 +15099,7 @@ bun docker:up
 ```
 
 Health check: [http://localhost:8030/health](http://localhost:8030/health).
+
 
 ## Configuration
 
@@ -15072,6 +15112,7 @@ Key variables in `local/docker-compose.yml`:
 | `KUMOMTA_RSPAMD_URL` | `http://reloop-spam:11333/checkv2` |
 | `KUMOMTA_CHECK_RECIPIENT_URL` | `http://host.docker.internal:8011/api/domain` |
 
+
 ## Commands
 
 | Command | Description |
@@ -15080,6 +15121,7 @@ Key variables in `local/docker-compose.yml`:
 | `docker compose -f local/docker-compose.yml up -d inbound` | Start inbound only |
 | `docker logs -f reloop-inbound` | Stream logs |
 | `curl http://localhost:8030/health` | Health check |
+
 
 ## Architecture
 
@@ -15095,6 +15137,7 @@ External Sender → Port 25 → Recipient Check → Spam (Rspamd) → NATS → I
 | **Spam scan** | [spam](/docs/setup/backend/spam) backend scores mail via `/checkv2` |
 | **Forwarding** | Accepted messages published to NATS for inbox, then assigned to the `null` queue |
 | **Receive-only** | No SMTP AUTH, no HTTP inject, no outbound delivery — submission is [smtp](/docs/setup/backend/smtp) only |
+
 
 ## Next
 
@@ -15129,6 +15172,7 @@ Agent Inbox API — mailboxes, threads, and messages from inbound email via NATS
 Run [`bun setup`](/docs/setup) once from the monorepo root. That starts Docker including [inbound](/docs/setup/backend/inbound) for live MX on port `25`.
 </Tip>
 
+
 ## Overview
 
 | Property | Value |
@@ -15139,6 +15183,7 @@ Run [`bun setup`](/docs/setup) once from the monorepo root. That starts Docker i
 | **Swagger UI** | [https://local.reloop.sh/api/inbox/openapi](https://local.reloop.sh/api/inbox/openapi) |
 | **Stack** | ElysiaJS · PostgreSQL · Redis · NATS |
 
+
 ## Quick start
 
 ```bash
@@ -15146,6 +15191,7 @@ bun be:inbox:dev
 ```
 
 Or `bun backend:dev` / `bun dev`.
+
 
 ## Environment
 
@@ -15167,6 +15213,7 @@ NODE_ENV=development
 | `PORT` | **YES** | `8021` |
 | `NATS_URL` | **YES** | `nats://localhost:4222` |
 
+
 ## Commands
 
 | Command | Description |
@@ -15176,6 +15223,7 @@ NODE_ENV=development
 | `bun run --filter=be-inbox start` | Run compiled production build |
 | `bun run --filter=be-inbox check-types` | TypeScript type-check |
 
+
 ## Architecture
 
 | Layer | Detail |
@@ -15183,6 +15231,7 @@ NODE_ENV=development
 | **Inbound flow** | [inbound](/docs/setup/backend/inbound) MTA → NATS → inbox persistence |
 | **Attachments** | File storage via [upload](/docs/setup/backend/upload) (no direct S3 config on inbox) |
 | **Dashboard API** | Mailboxes, threads, and messages at `/api/inbox` |
+
 
 ## Next
 
@@ -15214,6 +15263,7 @@ Event logging and analytics — activity logs and email delivery data in Postgre
 Run [`bun setup`](/docs/setup) once so Postgres is up (`bun docker:up`). Env files come from `bun setup` / `bun env:setup`.
 </Tip>
 
+
 ## Overview
 
 | Property | Value |
@@ -15224,6 +15274,7 @@ Run [`bun setup`](/docs/setup) once so Postgres is up (`bun docker:up`). Env fil
 | **Swagger UI** | [https://local.reloop.sh/api/logs/openapi](https://local.reloop.sh/api/logs/openapi) |
 | **Stack** | ElysiaJS · PostgreSQL · Redis · NATS |
 
+
 ## Quick start
 
 ```bash
@@ -15231,6 +15282,7 @@ bun run --filter=be-logs dev
 ```
 
 Or `bun backend:dev` / `bun dev`.
+
 
 ## Environment
 
@@ -15252,6 +15304,7 @@ NODE_ENV=development
 | `PORT` | **YES** | `8016` |
 | `NATS_URL` | **YES** | `nats://localhost:4222` |
 
+
 ## Commands
 
 | Command | Description |
@@ -15261,6 +15314,7 @@ NODE_ENV=development
 | `bun run --filter=be-logs start` | Run compiled production build |
 | `bun run --filter=be-logs check-types` | TypeScript type-check |
 
+
 ## Architecture
 
 | Layer | Detail |
@@ -15269,6 +15323,7 @@ NODE_ENV=development
 | **Storage** | Writes activity logs to Postgres `activity_log`; email delivery to `email_log` |
 | **Query API** | Powers dashboard activity logs and email delivery analytics |
 | **Schema** | Defined in `packages/db/src/schema/activity-log.ts` |
+
 
 ## Next
 
@@ -15300,6 +15355,7 @@ Outbound transactional email API — send requests, template compilation, tracki
 Run [`bun setup`](/docs/setup) once from the monorepo root. That starts Docker including [SMTP](/docs/setup/backend/smtp). Mailpit captures local outbound mail at [http://localhost:8025](http://localhost:8025).
 </Tip>
 
+
 ## Overview
 
 | Property | Value |
@@ -15310,6 +15366,7 @@ Run [`bun setup`](/docs/setup) once from the monorepo root. That starts Docker i
 | **Swagger UI** | [https://local.reloop.sh/api/mail/openapi](https://local.reloop.sh/api/mail/openapi) |
 | **Stack** | ElysiaJS · PostgreSQL · Redis · NATS · BullMQ |
 
+
 ## Quick start
 
 ```bash
@@ -15317,6 +15374,7 @@ bun be:mail:dev
 ```
 
 Or `bun backend:dev` / `bun dev`.
+
 
 ## Environment
 
@@ -15342,6 +15400,7 @@ NODE_ENV=development
 | `TRACKING_SECRET` | No | Signs tracked link and open-pixel tokens |
 | `NATS_URL` | **YES** | `nats://localhost:4222` |
 
+
 ## Commands
 
 | Command | Description |
@@ -15351,6 +15410,7 @@ NODE_ENV=development
 | `bun run --filter=be-mail start` | Run compiled production build |
 | `bun run --filter=be-mail check-types` | TypeScript type-check |
 
+
 ## Architecture
 
 | Layer | Detail |
@@ -15359,6 +15419,7 @@ NODE_ENV=development
 | **Queues** | BullMQ workers dispatch via Redis (`mail-queue`, `mail-retry-queue`) |
 | **MTA handoff** | Delivers to the [SMTP](/docs/setup/backend/smtp) engine on port `8020` |
 | **Schema** | `email_log` in `packages/db/src/schema/email.ts` |
+
 
 ## Next
 
@@ -15390,6 +15451,7 @@ Outbound KumoMTA engine — accepts mail from [mail](/docs/setup/backend/mail) a
 Run [`bun setup`](/docs/setup) or `bun docker:up` from the monorepo root. SMTP needs free ports `465` / `587`.
 </Tip>
 
+
 ## Overview
 
 | Property | Value |
@@ -15400,6 +15462,7 @@ Run [`bun setup`](/docs/setup) or `bun docker:up` from the monorepo root. SMTP n
 | **HTTP port** | `8020` |
 | **Stack** | KumoMTA · Lua |
 
+
 ## Quick start
 
 ```bash
@@ -15407,6 +15470,7 @@ bun docker:up
 ```
 
 View captured mail at [http://localhost:8025](http://localhost:8025) (Mailpit).
+
 
 ## Configuration
 
@@ -15417,6 +15481,7 @@ Key variables in `local/docker-compose.yml`:
 | `BASE_URL` | `https://local.reloop.sh` |
 | `NATS_URL` | `reloop-nats:4222` |
 
+
 ## Commands
 
 | Command | Description |
@@ -15426,6 +15491,7 @@ Key variables in `local/docker-compose.yml`:
 | `docker logs -f reloop-smtp` | Stream logs |
 | `docker compose -f local/docker-compose.yml stop smtp` | Stop container |
 
+
 ## Architecture
 
 | Layer | Detail |
@@ -15434,6 +15500,7 @@ Key variables in `local/docker-compose.yml`:
 | **Policies** | Lua scripts in `apps/backend/smtp/policy/` handle routing and DKIM |
 | **Local delivery** | Captured by Mailpit at [http://localhost:8025](http://localhost:8025) |
 | **Inbound** | Port `25` MX is handled by [inbound](/docs/setup/backend/inbound), not this service |
+
 
 ## Next
 
@@ -15465,6 +15532,7 @@ Rspamd spam scanner — scores inbound mail for the [inbound](/docs/setup/backen
 Run [`bun setup`](/docs/setup) or `bun docker:up` from the monorepo root. Spam starts with the Compose stack because inbound depends on it.
 </Tip>
 
+
 ## Overview
 
 | Property | Value |
@@ -15474,6 +15542,7 @@ Run [`bun setup`](/docs/setup) or `bun docker:up` from the monorepo root. Spam s
 | **Scan ports** | `11332`, `11333` |
 | **Web UI** | `11334` |
 | **Stack** | Rspamd · Redis |
+
 
 ## Quick start
 
@@ -15488,6 +15557,7 @@ docker compose -f local/docker-compose.yml up -d --build reloop-spam
 ```
 
 Controller / scan endpoint: [http://localhost:11333](http://localhost:11333).
+
 
 ## Configuration
 
@@ -15506,6 +15576,7 @@ Inbound wires to this service with:
 | :--- | :--- |
 | `KUMOMTA_RSPAMD_URL` | `http://reloop-spam:11333/checkv2` |
 
+
 ## Commands
 
 | Command | Description |
@@ -15514,6 +15585,7 @@ Inbound wires to this service with:
 | `docker compose -f local/docker-compose.yml up -d --build reloop-spam` | Rebuild and start spam only |
 | `docker logs -f reloop-spam` | Stream logs |
 | `docker compose -f local/docker-compose.yml stop reloop-spam` | Stop container |
+
 
 ## Architecture
 
@@ -15527,6 +15599,7 @@ Inbound (KumoMTA) → HTTP POST /checkv2 → Spam (Rspamd) → score / action / 
 | **Headers** | Inbound injects `X-Spam-*` from the response for [inbox](/docs/setup/backend/inbox) |
 | **State** | Uses [Redis](/docs/setup) (`reloop-redis`) for learning / fuzzy storage |
 | **Separate deploy** | Not baked into the inbound image — own Dockerfile and CI (`be-spam`) |
+
 
 ## Next
 
@@ -15558,6 +15631,7 @@ Email template CRUD, visual builder storage, and HTML compilation for outbound s
 Run [`bun setup`](/docs/setup) once from the monorepo root. Env files come from `bun setup` / `bun env:setup`.
 </Tip>
 
+
 ## Overview
 
 | Property | Value |
@@ -15568,6 +15642,7 @@ Run [`bun setup`](/docs/setup) once from the monorepo root. Env files come from 
 | **Swagger UI** | [https://local.reloop.sh/api/template/openapi](https://local.reloop.sh/api/template/openapi) |
 | **Stack** | ElysiaJS · PostgreSQL · Redis · NATS |
 
+
 ## Quick start
 
 ```bash
@@ -15575,6 +15650,7 @@ bun be:template:dev
 ```
 
 Or `bun backend:dev` / `bun dev`.
+
 
 ## Environment
 
@@ -15597,6 +15673,7 @@ NODE_ENV=development
 | `BASE_URL` | **YES** | `https://local.reloop.sh` |
 | `NATS_URL` | **YES** | `nats://localhost:4222` |
 
+
 ## Commands
 
 | Command | Description |
@@ -15606,6 +15683,7 @@ NODE_ENV=development
 | `bun run --filter=be-template start` | Run compiled production build |
 | `bun run --filter=be-template check-types` | TypeScript type-check |
 
+
 ## Architecture
 
 | Layer | Detail |
@@ -15613,6 +15691,7 @@ NODE_ENV=development
 | **Builder** | Stores drag-and-drop block JSON from the dashboard editor |
 | **Compilation** | Renders HTML with merge tags for the [mail](/docs/setup/backend/mail) service |
 | **Schema** | `template` and revisions in `packages/db/src/schema/template.ts` |
+
 
 ## Next
 
@@ -15644,6 +15723,7 @@ File uploads — logos, attachments, and assets stored in MinIO/S3.
 Run [`bun setup`](/docs/setup) once so MinIO is up (`bun docker:up`). Env files come from `bun setup` / `bun env:setup`. Console: [http://localhost:9001](http://localhost:9001) (`reloop` / `reloop123`).
 </Tip>
 
+
 ## Overview
 
 | Property | Value |
@@ -15654,6 +15734,7 @@ Run [`bun setup`](/docs/setup) once so MinIO is up (`bun docker:up`). Env files 
 | **Swagger UI** | [https://local.reloop.sh/api/upload/openapi](https://local.reloop.sh/api/upload/openapi) |
 | **Stack** | ElysiaJS · PostgreSQL · MinIO/S3 · NATS |
 
+
 ## Quick start
 
 ```bash
@@ -15661,6 +15742,7 @@ bun be:upload:dev
 ```
 
 Or `bun backend:dev` / `bun dev`.
+
 
 ## Environment
 
@@ -15690,6 +15772,7 @@ NODE_ENV=development
 | `S3_BUCKET` | **YES** | `reloop-uploads` |
 | `PORT` | **YES** | `8018` |
 
+
 ## Commands
 
 | Command | Description |
@@ -15699,6 +15782,7 @@ NODE_ENV=development
 | `bun run --filter=be-upload start` | Run compiled production build |
 | `bun run --filter=be-upload check-types` | TypeScript type-check |
 
+
 ## Architecture
 
 | Layer | Detail |
@@ -15706,6 +15790,7 @@ NODE_ENV=development
 | **Storage** | Files uploaded to MinIO locally (`localhost:9010`), S3 in production |
 | **Metadata** | File index stored in Postgres (`upload` table) |
 | **Signed URLs** | Generates presigned upload/download URLs for the dashboard |
+
 
 ## Next
 
@@ -15737,6 +15822,7 @@ Outbound event webhooks — subscription management, HMAC signing, delivery, and
 Run [`bun setup`](/docs/setup) once from the monorepo root. Env files come from `bun setup` / `bun env:setup`.
 </Tip>
 
+
 ## Overview
 
 | Property | Value |
@@ -15747,6 +15833,7 @@ Run [`bun setup`](/docs/setup) once from the monorepo root. Env files come from 
 | **Swagger UI** | [https://local.reloop.sh/api/webhook/openapi](https://local.reloop.sh/api/webhook/openapi) |
 | **Stack** | ElysiaJS · PostgreSQL · Redis · NATS · BullMQ |
 
+
 ## Quick start
 
 ```bash
@@ -15754,6 +15841,7 @@ bun be:webhook:dev
 ```
 
 Or `bun backend:dev` / `bun dev`.
+
 
 ## Environment
 
@@ -15780,6 +15868,7 @@ NODE_ENV=development
 | `BASE_URL` | **YES** | `https://local.reloop.sh` |
 | `NATS_URL` | **YES** | `nats://localhost:4222` |
 
+
 ## Commands
 
 | Command | Description |
@@ -15788,6 +15877,7 @@ NODE_ENV=development
 | `bun run --filter=be-webhook build` | Compile production bundle |
 | `bun run --filter=be-webhook start` | Run compiled production build |
 | `bun run --filter=be-webhook check-types` | TypeScript type-check |
+
 
 ## Architecture
 
@@ -15799,6 +15889,7 @@ NODE_ENV=development
 | **Retries** | Fixed 7-attempt schedule (5s → 5m → 30m → 2h → 5h → 10h) |
 | **Helpers** | `@reloop/webhook-delivery` (envelope, HMAC, SSRF client) |
 | **Schema** | `packages/db/src/schema/webhook.ts` |
+
 
 ## Next
 
@@ -15830,6 +15921,7 @@ Marketing automation — drip campaigns, delays, and multi-step journeys via Bul
 Run [`bun setup`](/docs/setup) once from the monorepo root. Env files come from `bun setup` / `bun env:setup`.
 </Tip>
 
+
 ## Overview
 
 | Property | Value |
@@ -15841,6 +15933,7 @@ Run [`bun setup`](/docs/setup) once from the monorepo root. Env files come from 
 | **Workbench** | [https://local.reloop.sh/api/workflow/jobs](https://local.reloop.sh/api/workflow/jobs) |
 | **Stack** | ElysiaJS · PostgreSQL · Redis · NATS · BullMQ |
 
+
 ## Quick start
 
 ```bash
@@ -15848,6 +15941,7 @@ bun be:workflow:dev
 ```
 
 Or `bun backend:dev` / `bun dev`.
+
 
 ## Environment
 
@@ -15875,6 +15969,7 @@ NODE_ENV=development
 | `WORKBENCH_USER` | No | empty (open in dev) |
 | `WORKBENCH_PASS` | No | empty (open in dev) |
 
+
 ## Commands
 
 | Command | Description |
@@ -15884,6 +15979,7 @@ NODE_ENV=development
 | `bun run --filter=be-workflow start` | Run compiled production build |
 | `bun run --filter=be-workflow check-types` | TypeScript type-check |
 
+
 ## Architecture
 
 | Layer | Detail |
@@ -15892,6 +15988,7 @@ NODE_ENV=development
 | **Execution** | BullMQ `workflow-queue` handles delayed steps and transitions |
 | **Integrations** | Reads contacts/templates and triggers sends via [mail](/docs/setup/backend/mail) |
 | **Monitoring** | [Workbench](https://getworkbench.dev) UI at `/api/workflow/jobs` |
+
 
 ## Next
 
@@ -15923,6 +16020,7 @@ Main workspace app — campaigns, contacts, templates, analytics, and settings.
 Run [`bun setup`](/docs/setup) once from the monorepo root before starting individual apps. The dashboard needs [auth](/docs/setup/backend/auth) (and usually the rest of `bun backend:dev` or `bun dev`).
 </Tip>
 
+
 ## Overview
 
 | Property | Value |
@@ -15932,6 +16030,7 @@ Run [`bun setup`](/docs/setup) once from the monorepo root before starting indiv
 | **Local URL** | [https://local.reloop.sh/dashboard](https://local.reloop.sh/dashboard) |
 | **Direct URL** | [http://localhost:3001/dashboard](http://localhost:3001/dashboard) |
 | **Stack** | TanStack Start · Vite · React 19 · Tailwind CSS |
+
 
 ## Quick start
 
@@ -15952,6 +16051,7 @@ Vite HMR serves the app on port `3001` with base path `/dashboard`.
 <Warning>
 Open [https://local.reloop.sh/dashboard](https://local.reloop.sh/dashboard), not `localhost:3001`, so session cookies work with [auth](/docs/setup/backend/auth). Local OTP is `888888`.
 </Warning>
+
 
 ## Environment
 
@@ -15977,6 +16077,7 @@ Auth (`@reloop/auth/client`) resolves the public origin as: `NEXT_PUBLIC_URL` / 
 | `NEXT_PUBLIC_URL` / `VITE_PUBLIC_URL` | No | Browser origin (`window.location.origin`) |
 | `NEXT_PUBLIC_WS_URL` | No | Current host (template collaboration WebSocket) |
 
+
 ## Commands
 
 | Command | Description |
@@ -15986,6 +16087,7 @@ Auth (`@reloop/auth/client`) resolves the public origin as: `NEXT_PUBLIC_URL` / 
 | `bun run --filter=fe-dashboard preview` | Preview production build |
 | `bun run --filter=fe-dashboard typecheck` | Run TypeScript checks |
 | `bun run --filter=fe-dashboard test` | Run Vitest |
+
 
 ## Next
 
@@ -16017,6 +16119,7 @@ This documentation site — MDX guides, API reference, and local setup docs.
 Run [`bun setup`](/docs/setup) once from the monorepo root before starting individual apps.
 </Tip>
 
+
 ## Overview
 
 | Property | Value |
@@ -16026,6 +16129,7 @@ Run [`bun setup`](/docs/setup) once from the monorepo root before starting indiv
 | **Local URL** | [https://local.reloop.sh/docs](https://local.reloop.sh/docs) |
 | **Direct URL** | [http://localhost:3003](http://localhost:3003) |
 | **Stack** | Next.js · MDX · Tailwind CSS |
+
 
 ## Quick start
 
@@ -16043,6 +16147,7 @@ bun frontend:dev
 
 Turbopack serves the app on port `3003`. Prefer [https://local.reloop.sh/docs](https://local.reloop.sh/docs) when Caddy is running.
 
+
 ## Environment
 
 Committed local defaults live in `apps/frontend/docs/.env` (and `.env.dev`). Fresh clones already have them; `bun env:setup` / `bun setup` recreate or merge missing keys.
@@ -16055,6 +16160,7 @@ NEXT_PUBLIC_URL=https://local.reloop.sh
 | :--- | :--- | :--- |
 | `NEXT_PUBLIC_URL` | No | `https://reloop.sh` — canonical URLs, OG metadata, and public origin |
 
+
 ## Content structure
 
 | Path | Purpose |
@@ -16062,6 +16168,7 @@ NEXT_PUBLIC_URL=https://local.reloop.sh
 | `content/docs/setup/` | Local development setup guides (this section) |
 | `content/docs/api/` | Auto-generated API reference |
 | `content/docs/**/meta.json` | Sidebar navigation and ordering |
+
 
 ## Commands
 
@@ -16071,6 +16178,7 @@ NEXT_PUBLIC_URL=https://local.reloop.sh
 | `bun run --filter=fe-docs build` | Build and validate all MDX pages |
 | `bun run --filter=fe-docs start` | Run production build |
 | `bun run --filter=fe-docs generate:api-docs` | Regenerate API docs from OpenAPI specs |
+
 
 ## Next
 
@@ -16102,6 +16210,7 @@ Contact preference center, tracked link redirects, and open-tracking pixel proxy
 Run [`bun setup`](/docs/setup) once from the monorepo root before starting individual apps. Preferences need [contacts](/docs/setup/backend/contacts) and [mail](/docs/setup/backend/mail) running (`bun dev` or `bun backend:dev`).
 </Tip>
 
+
 ## Overview
 
 | Property | Value |
@@ -16112,6 +16221,7 @@ Run [`bun setup`](/docs/setup) once from the monorepo root before starting indiv
 | **Redirect** | [https://local.reloop.sh/redirect](https://local.reloop.sh/redirect) |
 | **Open tracking** | [https://local.reloop.sh/api/mail/v1/track/open](https://local.reloop.sh/api/mail/v1/track/open) |
 | **Stack** | Next.js · React 19 · Tailwind CSS |
+
 
 ## Quick start
 
@@ -16132,6 +16242,7 @@ Turbopack serves the app on port `3005`. Prefer the `local.reloop.sh` URLs above
 <Warning>
 Use `https://local.reloop.sh/...`, not `localhost:3005`, so redirects and cookies match production-style hosts.
 </Warning>
+
 
 ## Environment
 
@@ -16158,6 +16269,7 @@ Preferences call [contacts](/docs/setup/backend/contacts) via `INTERNAL_API_URL`
 | `INTERNAL_API_URL` | No | `http://localhost:8014/api/contacts` |
 | `INTERNAL_MAIL_API_URL` | No | Falls back to `{NEXT_PUBLIC_URL}/api/mail` |
 
+
 ## Routes
 
 | Route | Purpose |
@@ -16165,6 +16277,7 @@ Preferences call [contacts](/docs/setup/backend/contacts) via `INTERNAL_API_URL`
 | `/preferences/[token]` | Manage subscription topics and unsubscribe |
 | `/redirect/[token]` | Track clicks and redirect to destination URL |
 | `/api/mail/v1/track/open/[token]` | Proxy open-tracking pixels to the mail service |
+
 
 ## Architecture
 
@@ -16175,6 +16288,7 @@ Preferences call [contacts](/docs/setup/backend/contacts) via `INTERNAL_API_URL`
 | **Open-tracking proxy** | Custom tracking domains CNAME here; pixels proxy to mail when `/api/mail` is not on the tracking host |
 | **Caddy** | Routes `/preferences*` and `/redirect*` to port `3005` |
 
+
 ## Commands
 
 | Command | Description |
@@ -16183,6 +16297,7 @@ Preferences call [contacts](/docs/setup/backend/contacts) via `INTERNAL_API_URL`
 | `bun run --filter=fe-links build` | Compile production bundle |
 | `bun run --filter=fe-links start` | Run production build |
 | `bun run --filter=fe-links lint` | Run ESLint checks |
+
 
 ## Next
 
@@ -16214,6 +16329,7 @@ Public marketing site — landing pages, pricing, and product content.
 Run [`bun setup`](/docs/setup) once from the monorepo root before starting individual apps.
 </Tip>
 
+
 ## Overview
 
 | Property | Value |
@@ -16223,6 +16339,7 @@ Run [`bun setup`](/docs/setup) once from the monorepo root before starting indiv
 | **Local URL** | [https://local.reloop.sh](https://local.reloop.sh) |
 | **Direct URL** | [http://localhost:3000](http://localhost:3000) |
 | **Stack** | Next.js · React 19 · Tailwind CSS |
+
 
 ## Quick start
 
@@ -16244,6 +16361,7 @@ Turbopack serves the app on port `3000`. Prefer [https://local.reloop.sh](https:
 Use `https://local.reloop.sh`, not `localhost:3000`, when testing flows that share cookies or link into the dashboard.
 </Warning>
 
+
 ## Environment
 
 Committed local defaults live in `apps/frontend/web/.env` (and `.env.dev`). Fresh clones already have them; `bun env:setup` / `bun setup` recreate or merge missing keys.
@@ -16259,6 +16377,7 @@ REDIRECT_SECRET=reloop_tracking_secret_default_123
 | `NEXT_PUBLIC_URL` | No | `https://reloop.sh` — canonical site URL for metadata and OG tags |
 | `REDIRECT_SECRET` | No | Shared redirect/tracking secret for local mail links |
 
+
 ## Commands
 
 | Command | Description |
@@ -16267,6 +16386,7 @@ REDIRECT_SECRET=reloop_tracking_secret_default_123
 | `bun run --filter=fe-web build` | Compile production bundle |
 | `bun run --filter=fe-web start` | Run production build |
 | `bun run --filter=fe-web lint` | Run ESLint checks |
+
 
 ## Next
 
@@ -16288,6 +16408,7 @@ Markdown: https://reloop.sh/docs/setup.md
 
 One command from the monorepo root. Full stack at [https://local.reloop.sh](https://local.reloop.sh).
 
+
 ## Prerequisites
 
 | Tool | Notes |
@@ -16296,6 +16417,7 @@ One command from the monorepo root. Full stack at [https://local.reloop.sh](http
 | [Docker Desktop](https://www.docker.com/products/docker-desktop/) | Postgres, Redis, Caddy, NATS, Mailpit |
 | [mkcert](https://github.com/FiloSottile/mkcert) | Local TLS (`brew install mkcert` on macOS) |
 | Git | Clone the repository |
+
 
 ## Quick start
 
@@ -16318,6 +16440,7 @@ bun dev
 </Tabs>
 
 `bun setup` only pauses for sudo (hosts / mkcert trust) or a missing tool.
+
 
 ## After setup
 
@@ -16343,6 +16466,7 @@ Sign up with any email. Local OTP is always `888888`.
 <Warning>
 Open `https://local.reloop.sh` (not `localhost`) so auth cookies work across services.
 </Warning>
+
 
 ## What `bun setup` does
 
@@ -16370,6 +16494,7 @@ Open `https://local.reloop.sh` (not `localhost`) so auth cookies work across ser
   </Step>
 </Steps>
 
+
 ## Flags
 
 | Flag | Effect |
@@ -16379,6 +16504,7 @@ Open `https://local.reloop.sh` (not `localhost`) so auth cookies work across ser
 | `--skip-docker` | Skip Docker and `db:push` |
 | `--skip-hosts` | Skip the `/etc/hosts` entry |
 | `--skip-tls` | Skip cert generation (existing PEMs required) |
+
 
 ## Manual setup
 
@@ -16460,6 +16586,7 @@ bun backend:dev    # backends only
   </Step>
 </Steps>
 
+
 ## Commands
 
 | Command | Description |
@@ -16475,6 +16602,7 @@ bun backend:dev    # backends only
 | `bun db:push` | Apply Drizzle schema |
 | `bun db:studio` | Open Drizzle Studio |
 | `bun run check` | Lint and format |
+
 
 ## Next
 
@@ -16504,6 +16632,7 @@ Reloop is a Bun monorepo — Next.js frontends, ElysiaJS microservices, shared p
 
 Local URL: [https://local.reloop.sh](https://local.reloop.sh). Bootstrap with [`bun setup`](/docs/setup).
 
+
 ## Structure
 
 ```
@@ -16521,6 +16650,7 @@ reloop/
 | `apps/backend/*` | HTTP APIs and mail edge |
 | `packages/*` | Shared libraries |
 | `local/` | Compose stack, Caddy, [`bun setup`](/docs/setup) |
+
 
 ## Frontend apps
 
@@ -16540,6 +16670,7 @@ reloop/
 </CardGroup>
 
 Stack: [Next.js](https://nextjs.org/), [Tailwind CSS](https://tailwindcss.com/), [Radix UI](https://www.radix-ui.com/) via `@reloop/ui`, [SWR](https://swr.vercel.app/).
+
 
 ## Backend services
 
@@ -16593,6 +16724,7 @@ Stack: [Next.js](https://nextjs.org/), [Tailwind CSS](https://tailwindcss.com/),
 
 Stack: [ElysiaJS](https://elysiajs.com/), [Better Auth](https://www.better-auth.com/), [KumoMTA](https://kumomta.com/) for smtp/inbound.
 
+
 ## Data & infrastructure
 
 Started by `bun docker:up` (Postgres, Redis, Caddy, Mailpit, MinIO, NATS, spam, SMTP, inbound).
@@ -16621,6 +16753,7 @@ Started by `bun docker:up` (Postgres, Redis, Caddy, Mailpit, MinIO, NATS, spam, 
   </Card>
 </CardGroup>
 
+
 ## Tooling
 
 <CardGroup cols={2}>
@@ -16638,6 +16771,7 @@ Started by `bun docker:up` (Postgres, Redis, Caddy, Mailpit, MinIO, NATS, spam, 
   </Card>
 </CardGroup>
 
+
 ## Shared packages
 
 | Package | Purpose |
@@ -16651,6 +16785,7 @@ Started by `bun docker:up` (Postgres, Redis, Caddy, Mailpit, MinIO, NATS, spam, 
 | `@reloop/webhook-events` | Webhook event types |
 | `@reloop/tailwind` | Shared Tailwind config |
 | `@reloop/tsconfig` | Shared TypeScript config |
+
 
 ## Next
 
@@ -16688,6 +16823,7 @@ Stop anything already bound before `bun docker:up`.
 Free mail ports (`25`, `465`, `587`) if host mail or another MTA is already bound there.
 </Tip>
 
+
 ## Unified Gateway
 
 | Route | Service | Port |
@@ -16712,6 +16848,7 @@ Free mail ports (`25`, `465`, `587`) if host mail or another MTA is already boun
 | [https://local.reloop.sh/api/credits](https://local.reloop.sh/api/credits) | [Credits](/docs/setup/backend/credits) | `8023` |
 | [https://local.reloop.sh/api/admin](https://local.reloop.sh/api/admin) | Admin | `8024` |
 
+
 ## Frontend
 
 | App | Direct URL | Port |
@@ -16721,6 +16858,7 @@ Free mail ports (`25`, `465`, `587`) if host mail or another MTA is already boun
 | Console | [http://localhost:3002](http://localhost:3002) | `3002` |
 | [Docs](/docs/setup/frontend/docs) | [http://localhost:3003](http://localhost:3003) | `3003` |
 | [Links](/docs/setup/frontend/links) | [http://localhost:3005](http://localhost:3005) | `3005` |
+
 
 ## Backend APIs
 
@@ -16741,6 +16879,7 @@ Free mail ports (`25`, `465`, `587`) if host mail or another MTA is already boun
 | [Credits](/docs/setup/backend/credits) | [`/api/credits`](https://local.reloop.sh/api/credits) | `8023` |
 | Admin | [`/api/admin`](https://local.reloop.sh/api/admin) | `8024` |
 
+
 ## Docker & Mail
 
 | Service | Port | Notes |
@@ -16749,6 +16888,7 @@ Free mail ports (`25`, `465`, `587`) if host mail or another MTA is already boun
 | Mailpit | `8025` | [http://localhost:8025](http://localhost:8025) — captured outbound mail |
 | [SMTP](/docs/setup/backend/smtp) (outbound) | `465`, `587`, `2025`, `2465`, `2587`, `8020` | KumoMTA |
 | [Inbound](/docs/setup/backend/inbound) (MX) | `25`, `8030` | KumoMTA |
+
 
 ## Infrastructure
 

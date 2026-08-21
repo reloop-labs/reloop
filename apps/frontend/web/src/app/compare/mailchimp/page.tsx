@@ -1,8 +1,13 @@
 import { FaqSection } from "@reloop/web/components/faq-section";
 import { PageSection, SectionHeading } from "@reloop/web/components/page-shell";
+import {
+	getComparePage,
+	mailchimpFeatures,
+} from "@reloop/web/lib/compare-content";
 import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ComparePageJsonLd } from "../components/compare-json-ld";
 import { CompareOtherLinks } from "../components/compare-other-links";
 import { ComparisonPageShell } from "../components/comparison-page-shell";
 import { ComparisonTable } from "../components/comparison-table";
@@ -43,12 +48,15 @@ export const metadata: Metadata = {
 };
 
 const MailchimpComparisonPage = () => {
+	const compare = getComparePage("mailchimp");
 	return (
-		<ComparisonPageShell
-			pagePath={pagePath}
-			titleLines={["Reloop vs Mailchimp"]}
-			description="Learn how Reloop compares to Mailchimp and why Reloop is the best Mailchimp alternative for all your product and marketing email needs."
-		>
+		<>
+			<ComparePageJsonLd slug="mailchimp" />
+			<ComparisonPageShell
+				pagePath={pagePath}
+				titleLines={["Reloop vs Mailchimp"]}
+				description="Learn how Reloop compares to Mailchimp and why Reloop is the best Mailchimp alternative for all your product and marketing email needs."
+			>
 			<PageSection flushTop narrow>
 				<div className="mx-auto max-w-3xl space-y-6 text-[15px] text-text-sub-600 leading-7 sm:text-[17px] dark:text-white/50">
 					<p>
@@ -91,9 +99,9 @@ const MailchimpComparisonPage = () => {
 							Reloop model
 						</h3>
 						<p className="mt-3 text-[14px] text-text-sub-600 leading-relaxed dark:text-white/60">
-							3,000 emails free, then tiers by monthly sends (50k, 250k,
-							custom). Store contacts for segmentation without audience-based
-							surcharges. See{" "}
+							3,000 emails free (200/day), then Individual $10/mo (25,000),
+							Startup $20/mo (50,000), Enterprise custom. Store contacts for
+							segmentation without audience-based surcharges. See{" "}
 							<Link href="/pricing" className="font-semibold text-primary-base">
 								pricing details
 							</Link>
@@ -106,41 +114,7 @@ const MailchimpComparisonPage = () => {
 			<PageSection alt>
 				<ComparisonTable
 					competitorName="Mailchimp"
-					features={[
-						{
-							label: "Open-source codebase",
-							reloop: "Yes (Apache 2.0)",
-							competitor: "No",
-						},
-						{ label: "Self-hostable", reloop: "Yes", competitor: "No" },
-						{
-							label: "Newsletter / campaigns",
-							reloop: "Yes",
-							competitor: "Yes (primary)",
-						},
-						{
-							label: "Transactional API",
-							reloop: "Yes",
-							competitor: "Separate product path",
-						},
-						{ label: "SMTP relay", reloop: "Yes", competitor: "Limited" },
-						{
-							label: "Developer API focus",
-							reloop: "Primary",
-							competitor: "Secondary",
-						},
-						{
-							label: "Visual drag-and-drop editor",
-							reloop: "Yes",
-							competitor: "Yes (advanced)",
-						},
-						{ label: "Agent inbox", reloop: "Yes", competitor: "No" },
-						{
-							label: "Pricing basis",
-							reloop: "Emails sent",
-							competitor: "Contacts stored",
-						},
-					]}
+					features={mailchimpFeatures}
 				/>
 			</PageSection>
 
@@ -178,18 +152,7 @@ const MailchimpComparisonPage = () => {
 			<FaqSection
 				id="compare-mailchimp-faq"
 				title="Mailchimp vs Reloop FAQ"
-				items={[
-					{
-						question: "Can non-technical teammates still send campaigns?",
-						answer:
-							"Yes. Reloop includes a campaign builder and template editor. Mailchimp's visual editor is more mature for pure marketer workflows—evaluate with your marketing lead.",
-					},
-					{
-						question: "Is Reloop only for developers?",
-						answer:
-							"Reloop is developer-first but not developer-only. Teams that want API control and marketer-friendly campaigns fit best.",
-					},
-				]}
+				items={compare?.faqs ?? []}
 				compact
 			/>
 
@@ -197,6 +160,7 @@ const MailchimpComparisonPage = () => {
 				<CompareOtherLinks currentHref={pagePath} />
 			</PageSection>
 		</ComparisonPageShell>
+		</>
 	);
 };
 

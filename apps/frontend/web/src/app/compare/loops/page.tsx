@@ -1,9 +1,11 @@
 import { FaqSection } from "@reloop/web/components/faq-section";
+import { getComparePage } from "@reloop/web/lib/compare-content";
 import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { competitorBrands } from "../competitor-brands";
 import { CompareHeroStatStrip } from "../components/compare-hero-stat-strip";
+import { ComparePageJsonLd } from "../components/compare-json-ld";
 import { CompareMigrate } from "../components/compare-migrate";
 import { CompareOtherLinks } from "../components/compare-other-links";
 import { CompareSection } from "../components/compare-section";
@@ -73,21 +75,24 @@ const loopsStats = [
 
 const LoopsComparisonPage = () => {
 	const loopsBrand = competitorBrands.find((b) => b.name === "Loops");
+	const compare = getComparePage("loops");
 
 	return (
-		<ComparisonPageShell
-			pagePath={pagePath}
-			titleLines={["Reloop vs Loops"]}
-			description="Loops is great for simple onboarding loops—until engineering needs password resets, billing receipts, and raw API sends. Reloop unifies product email and transactional infrastructure into one open-source platform."
-			primaryCta={{
-				label: "Get Started ",
-				href: "/dashboard/signup",
-			}}
-			secondaryCta={{
-				label: "Migrate from Loops",
-				href: "/compare/loops#migrate",
-			}}
-		>
+		<>
+			<ComparePageJsonLd slug="loops" />
+			<ComparisonPageShell
+				pagePath={pagePath}
+				titleLines={["Reloop vs Loops"]}
+				description="Loops is great for simple onboarding loops—until engineering needs password resets, billing receipts, and raw API sends. Reloop unifies product email and transactional infrastructure into one open-source platform."
+				primaryCta={{
+					label: "Get Started ",
+					href: "/dashboard/signup",
+				}}
+				secondaryCta={{
+					label: "Migrate from Loops",
+					href: "/compare/loops#migrate",
+				}}
+			>
 			{/* Metric Stat Strip */}
 			<CompareSection flushTop maxWidth="full">
 				<CompareHeroStatStrip stats={loopsStats} />
@@ -210,25 +215,7 @@ const LoopsComparisonPage = () => {
 				<FaqSection
 					id="compare-loops-faq"
 					title="Loops vs Reloop FAQ"
-					items={[
-						{
-							question:
-								"Why should we choose send-based pricing over contact-based pricing?",
-							answer:
-								"Contact-based pricing charges you for inactive leads and users who never open your emails. Reloop's send-based pricing ensures you only pay when emails are delivered.",
-						},
-						{
-							question:
-								"Can Reloop handle both marketing campaigns and transactional APIs?",
-							answer:
-								"Yes! Reloop includes transactional API endpoints, SMTP relays, drag-and-drop/JSX email template builders, broadcast campaigns, and AI agent inboxes under one unified platform.",
-						},
-						{
-							question: "Can we self-host Reloop while migrating from Loops?",
-							answer:
-								"Absolutely. Reloop is 100% open source (KumoMTA engine). You can deploy Reloop on your own Kubernetes or Docker infrastructure with $0 software license fees.",
-						},
-					]}
+					items={compare?.faqs ?? []}
 					compact
 				/>
 			</CompareSection>
@@ -237,6 +224,7 @@ const LoopsComparisonPage = () => {
 				<CompareOtherLinks currentHref={pagePath} />
 			</CompareSection>
 		</ComparisonPageShell>
+		</>
 	);
 };
 

@@ -270,6 +270,7 @@ export function buildPublicDiscoveryMarkdown(
 		"## Markdown twins",
 		"",
 		`- Site index pages: \`${origin}/index.md\`, \`${origin}/about.md\`, \`${origin}/developers.md\`, \`${origin}/pricing.md\``,
+		`- Compare pages: \`${origin}/compare.md\`, \`${origin}/compare/<vendor>.md\``,
 		`- Blog posts: \`${origin}/blog/<slug>.md\``,
 		`- Docs pages: \`${origin}/docs/<path>.md\``,
 		"- Docs content negotiation: `Accept: text/markdown` on `/docs/*` HTML routes",

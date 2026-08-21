@@ -53,7 +53,7 @@ const CATEGORY_VARIANTS: Record<string, CategoryVariant> = {
 	},
 	"Open Source": {
 		headline: "Ready to contribute?",
-		sub: "Reloop is MIT-licensed, community-driven, and free to self-host. Star us on GitHub or start on the hosted tier.",
+		sub: "Reloop is Apache 2.0, community-driven, and free to self-host. Star us on GitHub or start on the hosted tier.",
 		primaryLabel: "Get started free",
 	},
 	Migration: {

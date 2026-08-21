@@ -4,6 +4,7 @@ import { cn } from "@reloop/ui/cn";
 import { Logo } from "@reloop/ui/logo";
 import Link from "next/link";
 import { useState } from "react";
+import { hostedMonthlyUsdForVolume } from "@reloop/web/lib/pricing";
 import { competitorBrands } from "../competitor-brands";
 import { BrandIcon } from "./brand-icon";
 
@@ -35,9 +36,7 @@ interface CostsResult {
 }
 
 function calculateTransactionalCost(emails: number): CostsResult {
-	// Reloop Cloud ($0 up to 10k, $0.10 per 1,000 emails after)
-	const reloopCloud =
-		emails <= 10000 ? 0 : Math.round(((emails - 10000) / 1000) * 0.1);
+	const reloopCloud = hostedMonthlyUsdForVolume(emails);
 	const reloopSelfHosted = 0;
 
 	// Resend Transactional Tiers
@@ -84,11 +83,7 @@ function calculateMarketingCost(contacts: number): CostsResult {
 	// Average sending cadence: ~2 broadcasts/mo to the audience contact list
 	const monthlySends = contacts * 2;
 
-	// Reloop charges $0 contact storage fee. Pure pay-per-send ($0.10/1k sends)
-	const reloopCloud =
-		monthlySends <= 10000
-			? 0
-			: Math.round(((monthlySends - 10000) / 1000) * 0.1);
+	const reloopCloud = hostedMonthlyUsdForVolume(monthlySends);
 	const reloopSelfHosted = 0;
 
 	// Resend Audiences & Contacts Tiered Pricing

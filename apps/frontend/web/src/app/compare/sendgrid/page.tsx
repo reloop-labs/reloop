@@ -1,7 +1,9 @@
 import { FaqSection } from "@reloop/web/components/faq-section";
 import { PageSection, SectionHeading } from "@reloop/web/components/page-shell";
+import { sendgridFeatures, getComparePage } from "@reloop/web/lib/compare-content";
 import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
+import { ComparePageJsonLd } from "../components/compare-json-ld";
 import { CompareOtherLinks } from "../components/compare-other-links";
 import { ComparisonPageShell } from "../components/comparison-page-shell";
 import { ComparisonTable } from "../components/comparison-table";
@@ -42,12 +44,15 @@ export const metadata: Metadata = {
 };
 
 const SendGridComparisonPage = () => {
+	const compare = getComparePage("sendgrid");
 	return (
-		<ComparisonPageShell
-			pagePath={pagePath}
-			titleLines={["Reloop vs SendGrid"]}
-			description="Learn how Reloop compares to SendGrid and why Reloop is the best SendGrid alternative for all your transactional and marketing email needs."
-		>
+		<>
+			<ComparePageJsonLd slug="sendgrid" />
+			<ComparisonPageShell
+				pagePath={pagePath}
+				titleLines={["Reloop vs SendGrid"]}
+				description="Learn how Reloop compares to SendGrid and why Reloop is the best SendGrid alternative for all your transactional and marketing email needs."
+			>
 			<PageSection flushTop narrow>
 				<p className="mx-auto max-w-3xl text-center text-[15px] text-text-sub-600 leading-7 sm:text-[17px] dark:text-white/50">
 					SendGrid bundles transactional APIs, marketing campaigns, templates,
@@ -113,29 +118,7 @@ const SendGridComparisonPage = () => {
 				<SectionHeading title="SendGrid vs Reloop" compact />
 				<ComparisonTable
 					competitorName="SendGrid"
-					features={[
-						{
-							label: "Open-source codebase",
-							reloop: "Yes (Apache 2.0)",
-							competitor: "No",
-						},
-						{ label: "Self-hostable", reloop: "Yes", competitor: "No" },
-						{ label: "Transactional API", reloop: "Yes", competitor: "Yes" },
-						{ label: "Marketing campaigns", reloop: "Yes", competitor: "Yes" },
-						{ label: "Template editor", reloop: "Yes", competitor: "Yes" },
-						{ label: "SMTP relay", reloop: "Yes", competitor: "Yes" },
-						{ label: "Webhooks", reloop: "Yes", competitor: "Yes" },
-						{
-							label: "Agent inbox",
-							reloop: "Built-in",
-							competitor: "Not included",
-						},
-						{
-							label: "Contract flexibility",
-							reloop: "Monthly tiers + self-host",
-							competitor: "Often annual enterprise",
-						},
-					]}
+					features={sendgridFeatures}
 				/>
 			</PageSection>
 
@@ -172,18 +155,7 @@ const SendGridComparisonPage = () => {
 			<FaqSection
 				id="compare-sendgrid-faq"
 				title="SendGrid vs Reloop FAQ"
-				items={[
-					{
-						question: "Can Reloop handle SendGrid-scale volume?",
-						answer:
-							"Yes. Hosted Individual, Startup, and Enterprise tiers target high throughput; self-hosted Reloop scales with your Kubernetes or bare-metal footprint.",
-					},
-					{
-						question: "What about dedicated IPs?",
-						answer:
-							"Enterprise Reloop supports dedicated IP requirements. Self-hosted deployments can attach your own IPs directly to your MTA layer.",
-					},
-				]}
+				items={compare?.faqs ?? []}
 				compact
 			/>
 
@@ -191,6 +163,7 @@ const SendGridComparisonPage = () => {
 				<CompareOtherLinks currentHref={pagePath} />
 			</PageSection>
 		</ComparisonPageShell>
+		</>
 	);
 };
 
