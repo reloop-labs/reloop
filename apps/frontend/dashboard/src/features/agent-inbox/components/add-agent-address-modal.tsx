@@ -9,6 +9,7 @@ import * as Label from "@reloop/ui/label";
 import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
 import { AnimatePresence, motion } from "framer-motion";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Resolver } from "react-hook-form";
@@ -244,17 +245,15 @@ export const AddAgentAddressModal = ({
 								Add and verify a domain to create inbox addresses.
 							</p>
 							<FancyButton.Root
-								type="button"
+								asChild
 								variant="blue"
 								size="small"
-								onClick={() => {
-									onClose();
-									router.push("/domain/add");
-								}}
 								className="gap-1.5 rounded-xl"
 							>
-								<Icon name="plus" className="h-4 w-4" />
-								Add domain
+								<Link href="/domain/add">
+									<Icon name="plus" className="h-4 w-4" />
+									Add domain
+								</Link>
 							</FancyButton.Root>
 						</div>
 					) : (
@@ -434,19 +433,16 @@ export const AddAgentAddressModal = ({
 									{missingCapabilities.length === 2
 										? "Enable sending and receiving on this domain to create an inbox."
 										: `Enable ${missingCapabilities[0]} on this domain. Both sending and receiving are required.`}{" "}
-									<button
-										type="button"
+									<Link
+										href={
+											selectedDomain
+												? `/domain/${selectedDomain.id}`
+												: "/domain"
+										}
 										className="relative z-10 inline cursor-pointer font-medium underline underline-offset-2 hover:opacity-80"
-										onClick={() => {
-											if (selectedDomain) {
-												router.push(`/domain/${selectedDomain.id}`);
-											} else {
-												router.push("/domain");
-											}
-										}}
 									>
 										Domain settings
-									</button>
+									</Link>
 								</div>
 							)}
 						</form>
