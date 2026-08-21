@@ -4,7 +4,7 @@ import { ensureAbsoluteUrl } from "#/utils/absolute-url";
 export function DomainPreview({
 	domain,
 	logoUrl,
-	variant = "onboarding",
+	variant = "domain",
 }: {
 	domain?: string;
 	logoUrl?: string;

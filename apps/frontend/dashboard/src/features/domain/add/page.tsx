@@ -14,12 +14,12 @@ import type { Resolver } from "react-hook-form";
 import { useForm } from "react-hook-form";
 import { useHotkeys } from "react-hotkeys-hook";
 import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
-import { DomainPreview } from "#/features/onboarding/domain-preview";
 import { useInvalidateDomains } from "../hooks/use-domains-query";
 import type { DomainListResponse, DomainResponse } from "../types";
 import { AddDomainHeader } from "./components/add-domain-header";
 import { AdvancedOptions } from "./components/advanced-options";
 import { DomainInputField } from "./components/domain-input-field";
+import { DomainPreview } from "./components/domain-preview";
 import type { DomainFormValues } from "./schema";
 import { domainSchema } from "./schema";
 
