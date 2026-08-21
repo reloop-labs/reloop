@@ -50,6 +50,7 @@ import {
 	type ComposeBodyEditorHandle,
 } from "./compose-body-editor";
 import { ScheduleSendPicker } from "./schedule-send-picker";
+import { showEmailSentToast } from "./email-sent-toast";
 import { showUndoSendToast } from "./undo-send-toast";
 
 const actionKbdOnBlueClassName =
@@ -637,17 +638,12 @@ export const ComposeModal = ({
 					},
 				});
 			} else {
-				toast.success(scheduleAt ? "Email scheduled" : "Email sent", {
-					description: scheduleAt
-						? "It will send at the scheduled time. Find it in Sent."
-						: "Find it in Sent — Inbox only shows mail you receive.",
-					action: {
-						label: "View Sent",
-						onClick: () => {
-							router.push(`/inbox/${mailbox.id}/sent`);
-						},
+				showEmailSentToast({
+					scheduled: Boolean(scheduleAt),
+					to: data.to,
+					onViewSent: () => {
+						router.push(`/inbox/${mailbox.id}/sent`);
 					},
-					duration: 6000,
 				});
 			}
 
@@ -1150,10 +1146,12 @@ export const ComposeModal = ({
 									onModEnter={() => submitRef.current()}
 								/>
 								<div className="mt-auto flex items-center justify-between gap-3 px-5 py-2">
-									<p className="min-w-0 truncate text-[11px] text-mail-muted">
-										Type{" "}
-										<ActionKbd className="w-auto min-w-4 px-1">/</ActionKbd> for
-										formatting commands
+									<p className="flex items-center gap-1 text-[11px] text-mail-muted">
+										<span>Type</span>
+										<ActionKbd className="inline-flex! w-auto min-w-4 px-1 font-mono text-[10px]">
+											/
+										</ActionKbd>
+										<span>for formatting commands</span>
 									</p>
 								{aiActive ? (
 									<AiComposerSlot

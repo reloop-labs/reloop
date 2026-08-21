@@ -801,9 +801,12 @@ export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
 							}}
 						/>
 						<div className="mt-auto flex items-center justify-between gap-3 px-4 pb-2">
-							<p className="min-w-0 truncate text-[11px] text-mail-muted">
-								Type <ActionKbd className="w-auto min-w-4 px-1">/</ActionKbd>{" "}
-								for formatting commands
+							<p className="flex items-center gap-1 text-[11px] text-mail-muted">
+								<span>Type</span>
+								<ActionKbd className="inline-flex! w-auto min-w-4 px-1 font-mono text-[10px]">
+									/
+								</ActionKbd>
+								<span>for formatting commands</span>
 							</p>
 							{aiActive ? (
 								<AiComposerSlot
