@@ -63,6 +63,18 @@ const isSendReceiveReady = (d: Domain) =>
 const pickPreferredDomain = (domains: Domain[]) =>
 	domains.find(isSendReceiveReady) ?? domains[0];
 
+const slugifyEmailPrefix = (name: string): string => {
+	return name
+		.toLowerCase()
+		.trim()
+		.replace(/\s+/g, "-")
+		.replace(/[^a-z0-9.-]/g, "")
+		.replace(/\.{2,}/g, ".")
+		.replace(/^-+|-+$/g, "")
+		.replace(/^\.+|\.+$/g, "")
+		.slice(0, 64);
+};
+
 export const AddAgentAddressModal = ({
 	isOpen,
 	onClose,
@@ -75,6 +87,8 @@ export const AddAgentAddressModal = ({
 	const router = useRouter();
 	const { addMailbox, mailboxes } = useAgentInbox();
 	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [isLocalPartManuallyEdited, setIsLocalPartManuallyEdited] =
+		useState(false);
 
 	const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
@@ -154,6 +168,7 @@ export const AddAgentAddressModal = ({
 		if (!isOpen) {
 			const timer = setTimeout(() => {
 				form.reset();
+				setIsLocalPartManuallyEdited(false);
 				if (verifiedDomains.length > 0) {
 					const preferred = pickPreferredDomain(verifiedDomains);
 					form.setValue("domain", preferred?.domain ?? "");
@@ -204,6 +219,7 @@ export const AddAgentAddressModal = ({
 			});
 			toast.success(`Address ${mailbox.email} created`);
 			form.reset();
+			setIsLocalPartManuallyEdited(false);
 			onClose();
 			onCreated?.(mailbox);
 			router.push(`/inbox/${mailbox.id}`);
@@ -312,7 +328,19 @@ export const AddAgentAddressModal = ({
 											id="agent-label"
 											placeholder="e.g. Support"
 											autoFocus
-											{...form.register("label")}
+											{...form.register("label", {
+												onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+													if (!isLocalPartManuallyEdited) {
+														form.setValue(
+															"localPart",
+															slugifyEmailPrefix(e.target.value),
+															{
+																shouldValidate: form.formState.isSubmitted,
+															},
+														);
+													}
+												},
+											})}
 											disabled={isSubmitting}
 										/>
 									</Input.Wrapper>
@@ -347,7 +375,11 @@ export const AddAgentAddressModal = ({
 												autoComplete="off"
 												spellCheck={false}
 												maxLength={64}
-												{...form.register("localPart")}
+												{...form.register("localPart", {
+													onChange: () => {
+														setIsLocalPartManuallyEdited(true);
+													},
+												})}
 												disabled={isSubmitting}
 											/>
 										</Input.Wrapper>
