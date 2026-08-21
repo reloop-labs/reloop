@@ -10,7 +10,6 @@ import {
 	FileText,
 	Image as ImageIcon,
 	Paperclip,
-	Sparkles,
 	X as XIcon,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -35,6 +34,11 @@ import { useAgentInbox } from "../agent-inbox-provider";
 import { EmailPillsInput, validateEmail } from "../shared/email-pills-input";
 import { LoadingDot } from "../shared/loading-dot";
 import { AiComposerSlot } from "./ai-composer-slot";
+import {
+	type AiComposeTone,
+	AiPromptPopover,
+	TONE_PROMPTS,
+} from "./ai-prompt-popover";
 import {
 	type AiDraftPhase,
 	isAiDraftActive,
@@ -186,6 +190,7 @@ export const ComposeModal = ({
 	const [editorContent, setEditorContent] = useState("");
 	const [editorKey, setEditorKey] = useState(0);
 	const [aiPhase, setAiPhase] = useState<AiDraftPhase>("idle");
+	const [aiPromptOpen, setAiPromptOpen] = useState(false);
 	const aiAbortRef = useRef<AbortController | null>(null);
 	const aiRestoreRef = useRef<{ html: string; text: string } | null>(null);
 	const reviewArmedRef = useRef(false);
@@ -280,6 +285,7 @@ export const ComposeModal = ({
 		setHtmlBody("");
 		setTextBody("");
 		setAiPhase("idle");
+		setAiPromptOpen(false);
 		aiRestoreRef.current = null;
 		setToError(null);
 		currentDraftId.current = null;
@@ -685,12 +691,19 @@ export const ComposeModal = ({
 		}
 	};
 
-	const generateBody = async () => {
-		const prompt = editorRef.current?.editor?.getText() || textRef.current;
-		if (!prompt.trim()) {
+	const generateBody = async (opts?: {
+		promptOverride?: string;
+		tone?: AiComposeTone;
+	}) => {
+		const editorDraft = (
+			editorRef.current?.editor?.getText() || textRef.current
+		).trim();
+		const prompt = opts?.promptOverride ?? editorDraft;
+		if (!prompt.trim() && !subject.trim() && to.length === 0) {
 			toast.error("Write a prompt or draft first");
 			return;
 		}
+		const tonePrompt = opts?.tone ? TONE_PROMPTS[opts.tone] : undefined;
 		aiAbortRef.current?.abort();
 		const abort = new AbortController();
 		aiAbortRef.current = abort;
@@ -705,16 +718,20 @@ export const ComposeModal = ({
 		setAiPhase("thinking");
 
 		try {
-			if (!subject.trim()) await generateSubject(prompt);
+			if (!subject.trim() && prompt.trim()) await generateSubject(prompt);
 
 			const res = await apiFetch("/api/inbox/v1/ai/compose", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				signal: abort.signal,
 				body: JSON.stringify({
-					prompt,
+					...(prompt.trim() ? { prompt } : {}),
 					subject: watch("subject"),
 					to,
+					cc,
+					bcc,
+					tone: tonePrompt,
+					from: { email: mailbox.email, name: mailbox.label },
 				}),
 			});
 			if (!res.ok) throw new Error("Failed");
@@ -1117,21 +1134,39 @@ export const ComposeModal = ({
 										<ActionKbd className="w-auto min-w-4 px-1">/</ActionKbd> for
 										formatting commands
 									</p>
-									{aiActive ? (
-										<AiComposerSlot
-											loading={aiBusy}
-											hasStreamText={aiPhase === "streaming"}
-											onUndo={rejectAiDraft}
-										/>
-									) : (
+								{aiActive ? (
+									<AiComposerSlot
+										loading={aiBusy}
+										hasStreamText={aiPhase === "streaming"}
+										onUndo={rejectAiDraft}
+									/>
+								) : (
+									<AiPromptPopover
+										open={aiPromptOpen}
+										onOpenChange={setAiPromptOpen}
+										hasContext={Boolean(subject.trim() || to.length > 0)}
+										onSubmit={({ prompt, tone }) => {
+											void generateBody({
+												promptOverride: prompt || undefined,
+												tone,
+											});
+										}}
+									>
 										<AiSparkleButton
-											onClick={() => void generateBody()}
-											disabled={isSending || !textBody.trim()}
+											onClick={() => {
+												if (textBody.trim()) {
+													void generateBody();
+												} else {
+													setAiPromptOpen((prev) => !prev);
+												}
+											}}
+											disabled={isSending}
 											variant="pill"
 											label="Write with AI"
 											title="Write email body with AI"
 										/>
-									)}
+									</AiPromptPopover>
+								)}
 								</div>
 							</div>
 						</div>

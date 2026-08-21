@@ -39,12 +39,16 @@ function heuristicSubject(text: string) {
 	return firstLine.slice(0, 80);
 }
 
-function heuristicComposeText(prompt: string) {
-	const paragraphs = prompt
+function heuristicComposeText(prompt: string, subject?: string) {
+	const source = prompt.trim() || subject?.trim();
+	if (!source) {
+		return "Hello,\n\nI wanted to reach out regarding this matter. Looking forward to your response.\n\nBest regards.";
+	}
+	const paragraphs = source
 		.split(/\n\s*\n/)
 		.map((p) => p.trim())
 		.filter(Boolean);
-	const blocks = paragraphs.length > 0 ? paragraphs : [prompt.trim()];
+	const blocks = paragraphs.length > 0 ? paragraphs : [source];
 	return blocks.join("\n\n");
 }
 
@@ -81,6 +85,12 @@ type HydratedThreadMessage = {
 type MailboxIdentity = {
 	email: string;
 	displayName: string | null;
+};
+
+/** Sender identity supplied by the compose client (mailbox being written from). */
+type ComposeFromIdentity = {
+	email?: string | null;
+	name?: string | null;
 };
 
 function formatPerson(name?: string | null, email?: string | null): string {
@@ -202,88 +212,21 @@ function chunkedPlainTextStream(text: string, delayMs = 14) {
 	});
 }
 
-async function callGemmaOllama(prompt: string): Promise<string | null> {
+async function callOpenRouterText(prompt: string): Promise<string | null> {
+	const openrouter = getOpenRouter();
+	if (!openrouter) return null;
 	try {
-		const baseUrl = inboxConfig.OLLAMA_BASE_URL.replace(/\/$/, "");
-		const res = await fetch(`${baseUrl}/api/generate`, {
-			method: "POST",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({
-				model: inboxConfig.GEMMA_MODEL,
-				prompt: prompt,
-				stream: false,
-			}),
+		const { text } = await generateText({
+			model: openrouter(inboxConfig.OPENROUTER_MODEL),
+			prompt,
 		});
-		if (!res.ok) return null;
-		const data = (await res.json()) as { response?: string };
-		return data.response ? data.response.trim() : null;
-	} catch {
-		return null;
-	}
-}
-
-/** Stream Ollama /api/generate NDJSON into a plain-text byte stream. */
-async function streamGemmaOllama(
-	prompt: string,
-): Promise<ReadableStream<Uint8Array> | null> {
-	try {
-		const baseUrl = inboxConfig.OLLAMA_BASE_URL.replace(/\/$/, "");
-		const res = await fetch(`${baseUrl}/api/generate`, {
-			method: "POST",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({
-				model: inboxConfig.GEMMA_MODEL,
-				prompt,
-				stream: true,
-			}),
-		});
-		if (!res.ok || !res.body) return null;
-
-		const encoder = new TextEncoder();
-		const decoder = new TextDecoder();
-		const reader = res.body.getReader();
-		let buffer = "";
-
-		return new ReadableStream<Uint8Array>({
-			async pull(controller) {
-				while (true) {
-					const { done, value } = await reader.read();
-					if (done) {
-						controller.close();
-						return;
-					}
-					buffer += decoder.decode(value, { stream: true });
-					const lines = buffer.split("\n");
-					buffer = lines.pop() ?? "";
-					let enqueued = false;
-					for (const line of lines) {
-						const trimmed = line.trim();
-						if (!trimmed) continue;
-						try {
-							const parsed = JSON.parse(trimmed) as {
-								response?: string;
-								done?: boolean;
-							};
-							if (parsed.response) {
-								controller.enqueue(encoder.encode(parsed.response));
-								enqueued = true;
-							}
-							if (parsed.done) {
-								controller.close();
-								return;
-							}
-						} catch {
-							// skip malformed NDJSON lines
-						}
-					}
-					if (enqueued) return;
-				}
-			},
-			cancel() {
-				void reader.cancel();
-			},
-		});
-	} catch {
+		return text.trim() || null;
+	} catch (error) {
+		useLogger().warn(
+			`[AI] OpenRouter request failed: ${
+				error instanceof Error ? error.message : String(error)
+			}`,
+		);
 		return null;
 	}
 }
@@ -294,12 +237,12 @@ async function streamPlainTextFromPrompt(
 ): Promise<Response> {
 	const log = useLogger();
 
-	// Prefer OpenRouter streaming for low time-to-first-token when configured.
+	// OpenRouter streaming for low time-to-first-token when configured.
 	const openrouter = getOpenRouter();
 	if (openrouter) {
 		try {
 			const result = streamText({
-				model: openrouter("openai/gpt-4o-mini"),
+				model: openrouter(inboxConfig.OPENROUTER_MODEL),
 				prompt,
 			});
 			return result.toTextStreamResponse();
@@ -312,16 +255,10 @@ async function streamPlainTextFromPrompt(
 		}
 	}
 
-	const ollamaStream = await streamGemmaOllama(prompt);
-	if (ollamaStream) {
-		return plainTextStreamResponse(ollamaStream);
-	}
-
 	return plainTextStreamResponse(chunkedPlainTextStream(fallbackText));
 }
 
 export async function generateSubjectController(input: { text: string }) {
-	const log = useLogger();
 	const text = input.text.trim();
 
 	if (!text) {
@@ -333,68 +270,103 @@ export async function generateSubjectController(input: { text: string }) {
 		});
 	}
 
-	const gemmaPrompt = `Write a concise email subject line (max 80 characters) for the following email body. Return ONLY the subject line text (no quotes, no "Subject:" prefix, no conversational text):\n\n${text}`;
-	const gemmaResult = await callGemmaOllama(gemmaPrompt);
-	if (gemmaResult) {
+	const subject = await callOpenRouterText(
+		`Write a concise email subject line (max 80 characters) for the following email body. Return only the subject text (no quotes, no "Subject:" prefix, no conversational text):\n\n${text}`,
+	);
+	if (subject) {
 		return {
-			subject: gemmaResult
+			subject: subject
 				.replace(/^Subject:\s*/i, "")
 				.replace(/^["']|["']$/g, "")
 				.slice(0, 120),
 		};
 	}
 
-	const openrouter = getOpenRouter();
-	if (openrouter) {
-		try {
-			const { text: subject } = await generateText({
-				model: openrouter("openai/gpt-4o-mini"),
-				prompt: `Write a concise email subject line (max 80 characters) for the following email body. Return only the subject text (no quotes, no "Subject:" prefix).\n\n${text}`,
-			});
-			return {
-				subject: subject
-					.trim()
-					.replace(/^Subject:\s*/i, "")
-					.replace(/^["']|["']$/g, "")
-					.slice(0, 120),
-			};
-		} catch (error) {
-			log.warn(
-				`[AI] Subject generation failed, using fallback: ${
-					error instanceof Error ? error.message : String(error)
-				}`,
-			);
-		}
-	}
-
 	return { subject: heuristicSubject(text).replace(/^Subject:\s*/i, "") };
 }
 
-export async function generateComposeController(input: {
-	prompt: string;
+function buildComposeSystemPrompt(input: {
+	prompt?: string;
 	subject?: string;
 	to?: string[];
-}) {
-	const prompt = input.prompt.trim();
+	cc?: string[];
+	bcc?: string[];
+	tone?: string;
+	from?: ComposeFromIdentity | null;
+}): { fullPrompt: string; hasContext: boolean } {
+	const tone = input.tone?.trim();
+	const writingAs =
+		input.from?.email || input.from?.name
+			? formatPerson(input.from?.name ?? null, input.from?.email ?? null)
+			: null;
 
-	if (!prompt) {
+	const contextParts = [
+		writingAs ? `Writing as: ${writingAs}` : null,
+		input.to?.length ? `To: ${input.to.join(", ")}` : null,
+		input.cc?.length ? `Cc: ${input.cc.join(", ")}` : null,
+		input.bcc?.length ? `Bcc: ${input.bcc.join(", ")}` : null,
+		input.subject?.trim() ? `Subject: ${input.subject.trim()}` : null,
+	].filter((part): part is string => part !== null);
+
+	const instruction = input.prompt?.trim();
+
+	if (!instruction && contextParts.length === 0) {
+		return { fullPrompt: "", hasContext: false };
+	}
+
+	const lines = [
+		"Compose a new email for the mailbox owner.",
+		writingAs
+			? `Write in the first person as ${writingAs}. Use their name when signing if a sign-off is appropriate.`
+			: null,
+		contextParts.length > 0
+			? "Use the context below to determine the recipients, topic, and content."
+			: null,
+		instruction
+			? `The sender described what they want: ${instruction}`
+			: "No explicit instruction was given — infer the intent from the subject and recipients and write an appropriate outreach email.",
+		"Do not invent facts, commitments, dates, or links that were not provided.",
+		"Return plain text only (no markdown fences, no subject line, no commentary).",
+		"Use short paragraphs.",
+		tone ? `Tone: ${tone}.` : null,
+	]
+		.filter((line): line is string => line !== null)
+		.join("\n");
+
+	return {
+		fullPrompt: `${lines}\n\n${contextParts.join("\n") || "(no additional context)"}`,
+		hasContext: true,
+	};
+}
+
+export async function generateComposeController(input: {
+	prompt?: string;
+	subject?: string;
+	to?: string[];
+	cc?: string[];
+	bcc?: string[];
+	tone?: string;
+	from?: ComposeFromIdentity | null;
+}) {
+	const prompt = (input.prompt ?? "").trim();
+	const subject = input.subject?.trim() ?? "";
+	const hasRecipients = Boolean(input.to?.length || input.cc?.length);
+
+	if (!prompt && !subject && !hasRecipients) {
 		throw createError({
 			status: 400,
 			message: "Prompt is required",
-			why: "Request body prompt was empty",
-			fix: "Provide a prompt describing the email to compose",
+			why: "Request body prompt, subject, and recipients were all empty",
+			fix: "Provide a prompt describing the email, or a subject/recipients for auto-generation",
 		});
 	}
 
-	const contextParts = [
-		input.subject ? `Subject: ${input.subject}` : null,
-		input.to?.length ? `To: ${input.to.join(", ")}` : null,
-		`Prompt: ${prompt}`,
-	].filter(Boolean);
+	const { fullPrompt } = buildComposeSystemPrompt(input);
 
-	const fullPrompt = `Compose a professional email body based on the following context. Return plain text ONLY (no markdown fences, no "Subject:" line, no commentary). Use short paragraphs:\n\n${contextParts.join("\n")}`;
-
-	return streamPlainTextFromPrompt(fullPrompt, heuristicComposeText(prompt));
+	return streamPlainTextFromPrompt(
+		fullPrompt,
+		heuristicComposeText(prompt, subject),
+	);
 }
 
 function buildReplySystemPrompt(input: {

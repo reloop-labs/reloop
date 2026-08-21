@@ -1,6 +1,6 @@
 import { cn } from "@reloop/ui/cn";
+import { Icon } from "@reloop/ui/icon";
 import { motion, useReducedMotion } from "framer-motion";
-import { Sparkles } from "lucide-react";
 
 interface AiSparkleButtonProps {
 	onClick: () => void;
@@ -15,7 +15,7 @@ interface AiSparkleButtonProps {
 
 /**
  * Quiet composer action to request an AI draft.
- * Loading state is shown in the preview panel — this button stays sparkle + label only.
+ * Loading state is shown in the preview panel — this button stays magic-wand + label only.
  */
 export const AiSparkleButton = ({
 	onClick,
@@ -53,7 +53,10 @@ export const AiSparkleButton = ({
 			)}
 		>
 			<span className="flex items-center gap-1.5 tracking-tight">
-				<Sparkles className="h-3.5 w-3.5 shrink-0 text-mail-foreground/70" />
+				<Icon
+					name="magic-wand"
+					className="h-3.5 w-3.5 shrink-0 text-mail-foreground/70"
+				/>
 				{variant === "pill" ? (
 					<span className="text-mail-foreground/70">{label}</span>
 				) : null}

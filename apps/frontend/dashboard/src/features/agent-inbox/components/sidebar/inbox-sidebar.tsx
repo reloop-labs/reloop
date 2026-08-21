@@ -1,5 +1,6 @@
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import { Pencil, Plus, Star } from "lucide-react";
@@ -278,26 +279,26 @@ export const InboxSidebar = ({
 					collapsed ? "w-14 items-center px-0" : "w-60 px-2",
 				)}
 			>
-				{/* Compose — outline / light */}
+				{/* Compose — fancy button */}
 				<div className={cn(collapsed && "flex justify-center")}>
-					<Button.Root
+					<FancyButton.Root
 						type="button"
-						mode="lighter"
+						variant="blue"
+						size="medium"
 						onClick={() => {
 							if (!mailboxReady) return;
 							setIsComposeOpen(true);
 						}}
-						size="xsmall"
 						disabled={!mailboxReady}
 						title="Compose"
-						className={collapsed ? "h-8 w-8 px-0" : "w-full"}
+						className={collapsed ? "h-10 w-10 px-0" : "w-full gap-2"}
 					>
 						<Pencil
-							className="h-4 w-4 shrink-0 opacity-80"
+							className="h-4 w-4 shrink-0"
 							strokeWidth={1.75}
 						/>
 						{!collapsed && <span>Compose</span>}
-					</Button.Root>
+					</FancyButton.Root>
 				</div>
 
 				<div

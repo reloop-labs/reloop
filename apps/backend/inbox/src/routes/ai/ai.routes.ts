@@ -44,9 +44,18 @@ export const aiRoutes = new Elysia({
 		{
 			auth: true,
 			body: t.Object({
-				prompt: t.String({ minLength: 1 }),
+				prompt: t.Optional(t.String()),
 				subject: t.Optional(t.String()),
 				to: t.Optional(t.Array(t.String())),
+				cc: t.Optional(t.Array(t.String())),
+				bcc: t.Optional(t.Array(t.String())),
+				tone: t.Optional(t.String()),
+				from: t.Optional(
+					t.Object({
+						email: t.Optional(t.String()),
+						name: t.Optional(t.String()),
+					}),
+				),
 			}),
 			// Streaming text/plain Response — no JSON 200 schema.
 			response: {
@@ -59,7 +68,7 @@ export const aiRoutes = new Elysia({
 				tags: ["AI"],
 				summary: "Generate Compose (stream)",
 				description:
-					"Stream a plain-text email body draft from a prompt (text/plain)",
+					"Stream a plain-text email body draft from a prompt and compose context — sender identity, recipients, subject, tone. Prompt optional when subject/recipients are present (text/plain)",
 			},
 		},
 	)
