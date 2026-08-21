@@ -75,8 +75,8 @@ export function EmailSentToast({
 	};
 
 	return (
-		<div className="flex w-[min(100vw-2rem,25rem)] items-center gap-3 rounded-2xl border border-neutral-200/80 bg-white/95 p-3 text-neutral-900 shadow-[0_8px_30px_rgb(0,0,0,0.08)] backdrop-blur-md dark:border-neutral-700/80 dark:bg-neutral-900/95 dark:text-white dark:shadow-[0_8px_30px_rgb(0,0,0,0.35)]">
-			<div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400">
+		<div className="flex w-[min(100vw-2rem,25rem)] items-center gap-3 rounded-full bg-white/95 p-2.5 pr-3 text-neutral-900 shadow-[0_8px_30px_rgb(0,0,0,0.12)] backdrop-blur-md dark:bg-neutral-900/95 dark:text-white dark:shadow-[0_8px_30px_rgb(0,0,0,0.45)]">
+			<div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400">
 				{scheduled ? (
 					<Icon name="calendar" className="size-4" />
 				) : (
@@ -100,7 +100,7 @@ export function EmailSentToast({
 						disabled={busy}
 						aria-label={isCountingDown ? "Undo send" : "View sent"}
 						onClick={() => void handleAction()}
-						className="relative inline-flex min-w-[58px] items-center justify-center overflow-hidden rounded-lg border border-neutral-200/80 bg-neutral-100 px-3 py-1.5 font-medium text-neutral-900 text-xs transition-all hover:bg-neutral-200/70 active:scale-[0.97] dark:border-neutral-700/80 dark:bg-neutral-800 dark:text-white dark:hover:bg-neutral-700"
+						className="relative inline-flex min-w-[58px] items-center justify-center overflow-hidden rounded-full bg-neutral-100 px-3.5 py-1.5 font-medium text-neutral-900 text-xs transition-all hover:bg-neutral-200/70 active:scale-[0.97] dark:bg-neutral-800 dark:text-white dark:hover:bg-neutral-700"
 					>
 						{/* Smooth continuous progress fill inside the button during countdown */}
 						{isCountingDown && (
