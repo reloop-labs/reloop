@@ -254,4 +254,21 @@ export namespace MailModel {
 		),
 	});
 	export type TooManyRequests = typeof tooManyRequests.static;
+
+	export const paymentRequired = t.Object({
+		message: t.String({
+			description: "Email quota exceeded",
+		}),
+		why: t.Optional(
+			t.String({
+				description: "Why the send was blocked",
+			}),
+		),
+		fix: t.Optional(
+			t.String({
+				description: "How to resolve the quota issue",
+			}),
+		),
+	});
+	export type PaymentRequired = typeof paymentRequired.static;
 }

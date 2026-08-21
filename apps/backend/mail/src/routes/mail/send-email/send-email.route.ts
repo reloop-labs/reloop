@@ -72,6 +72,7 @@ export const sendEmailRoute = new Elysia()
 				401: MailModel.unauthorized,
 				403: MailModel.forbidden,
 				400: MailModel.badRequest,
+				402: MailModel.paymentRequired,
 				429: MailModel.tooManyRequests,
 				500: MailModel.internalServerError,
 			},

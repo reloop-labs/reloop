@@ -1,3 +1,4 @@
+import { assertHasCredits } from "@reloop/be-mail/lib/credits-gate";
 import { MailErrors } from "@reloop/be-mail/lib/errors";
 import type { MailModel } from "@reloop/be-mail/model/mail.model";
 import { db } from "@reloop/db/client";
@@ -47,6 +48,9 @@ export async function sendEmailController({
 		to: body.to,
 	});
 	log.info("server", "Initiating email send process");
+
+	// Fail closed before DNS/log/Kumo work when the monthly meter is empty.
+	await assertHasCredits({ organizationId, body });
 
 	const { domainName } = parseFromAddress_step1(body.from);
 

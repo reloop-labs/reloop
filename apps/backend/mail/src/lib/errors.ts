@@ -160,6 +160,21 @@ export const MailErrors = {
 			why: "Neither 'html' nor 'text' body was provided, and the referenced template has no rendered content",
 			fix: "Provide at least one of 'html' or 'text' in the request body, or ensure the template has rendered HTML",
 		}),
+	quotaExceeded: ({
+		remaining,
+		required,
+		monthlyCredits,
+	}: {
+		remaining: number;
+		required: number;
+		monthlyCredits: number;
+	}) =>
+		createError({
+			status: 402,
+			message: "Email quota exceeded",
+			why: `This send needs ${required} credit${required === 1 ? "" : "s"}, but only ${remaining} remain of ${monthlyCredits} this period`,
+			fix: "Upgrade your plan, wait for the monthly reset, or reduce recipients for this send",
+		}),
 };
 
 export const RateLimitErrors = {
