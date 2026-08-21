@@ -3,11 +3,11 @@ import {
 	siComposer,
 	siGnubash,
 	siGo,
-	siNodedotjs,
 	siNpm,
 	siPhp,
 	siPnpm,
 	siPython,
+	siTypescript,
 	siYarn,
 } from "simple-icons";
 import { useSessionQuery } from "#/features/auth/session-query";
@@ -26,7 +26,7 @@ import {
 import type { LanguageCode, PackageManager } from "./types";
 
 const langIcons = {
-	nodejs: siNodedotjs,
+	nodejs: siTypescript,
 	python: siPython,
 	go: siGo,
 	php: siPhp,
