@@ -1,6 +1,7 @@
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { motion, useReducedMotion } from "framer-motion";
+import { LoadingDot } from "../shared/loading-dot";
 
 interface AiSparkleButtonProps {
 	onClick: () => void;
@@ -14,8 +15,8 @@ interface AiSparkleButtonProps {
 }
 
 /**
- * Quiet composer action to request an AI draft.
- * Loading state is shown in the preview panel — this button stays magic-wand + label only.
+ * Quiet composer action to request an AI draft or subject suggestion.
+ * Shows square dot matrix loader when generating.
  */
 export const AiSparkleButton = ({
 	onClick,
@@ -45,6 +46,7 @@ export const AiSparkleButton = ({
 				"hover:bg-[var(--inbox-hover)] hover:text-mail-foreground",
 				"focus-visible:ring-2 focus-visible:ring-mail-foreground/20",
 				"disabled:pointer-events-none disabled:opacity-40",
+				loading && "opacity-100!",
 				variant === "pill" && ["h-7 gap-1.5 rounded-md px-2 text-[12px]"],
 				variant === "icon" && [
 					size === "sm" ? "h-7 w-7 rounded-md" : "h-8 w-8 rounded-lg",
@@ -53,10 +55,14 @@ export const AiSparkleButton = ({
 			)}
 		>
 			<span className="flex items-center gap-1.5 tracking-tight">
-				<Icon
-					name="magic-wand"
-					className="h-3.5 w-3.5 shrink-0 text-mail-foreground/70"
-				/>
+				{loading ? (
+					<LoadingDot size={13} dotSize={2} />
+				) : (
+					<Icon
+						name="magic-wand"
+						className="h-3.5 w-3.5 shrink-0 text-mail-foreground/70"
+					/>
+				)}
 				{variant === "pill" ? (
 					<span className="text-mail-foreground/70">{label}</span>
 				) : null}
