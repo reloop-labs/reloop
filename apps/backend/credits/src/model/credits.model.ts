@@ -17,6 +17,8 @@ export namespace CreditsModel {
 			status: t.String(),
 			creditsUsed: t.Number(),
 			creditsRemaining: t.Number(),
+			creditsSent: t.Number(),
+			creditsReceived: t.Number(),
 			currentPeriodStart: t.String(),
 			currentPeriodEnd: t.String(),
 		}),

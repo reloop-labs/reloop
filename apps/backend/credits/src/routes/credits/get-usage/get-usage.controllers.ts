@@ -1,5 +1,8 @@
 import { CreditErrors } from "@reloop/credits/error/credits.error-response";
 import { getOrProvisionCredits } from "@reloop/credits/utils/credits";
+import { db } from "@reloop/db/client";
+import { emailSend, inboundEmail } from "@reloop/db/schema";
+import { and, count, eq, gte, ne } from "drizzle-orm";
 
 export const getUsageController = async ({
 	organizationId,
@@ -11,6 +14,31 @@ export const getUsageController = async ({
 	try {
 		// 1. Get or provision credits
 		const activeCredits = await getOrProvisionCredits(orgId);
+
+		// 2. Count sent / received emails within the current billing period
+		const periodStart = activeCredits.currentPeriodStart;
+
+		const [sentRows, receivedRows] = await Promise.all([
+			db
+				.select({ value: count() })
+				.from(emailSend)
+				.where(
+					and(
+						eq(emailSend.organizationId, orgId),
+						gte(emailSend.sentAt, periodStart),
+					),
+				),
+			db
+				.select({ value: count() })
+				.from(inboundEmail)
+				.where(
+					and(
+						eq(inboundEmail.organizationId, orgId),
+						gte(inboundEmail.createdAt, periodStart),
+						ne(inboundEmail.status, "spam"),
+					),
+				),
+		]);
 
 		return {
 			plan: {
@@ -28,6 +56,8 @@ export const getUsageController = async ({
 				status: activeCredits.status,
 				creditsUsed: activeCredits.creditsUsed,
 				creditsRemaining: activeCredits.creditsRemaining,
+				creditsSent: sentRows[0]?.value ?? 0,
+				creditsReceived: receivedRows[0]?.value ?? 0,
 				currentPeriodStart: activeCredits.currentPeriodStart.toISOString(),
 				currentPeriodEnd: activeCredits.currentPeriodEnd.toISOString(),
 			},
