@@ -1,3 +1,4 @@
+import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
@@ -210,6 +211,7 @@ function classifyError(msg: string): ErrorClassification {
 interface EmailDetailProps {
 	email?: {
 		id: string;
+		status?: string;
 		fromEmail: string;
 		fromName: string | null;
 		toEmails: string[];
@@ -236,6 +238,8 @@ interface EmailDetailProps {
 		}[];
 	};
 	isLoading: boolean;
+	onResend?: () => void;
+	isResending?: boolean;
 }
 
 const SMTP_EVENT_TYPES = new Set([
@@ -402,7 +406,15 @@ function CopyButton({ value, label }: { value: string; label?: string }) {
 	);
 }
 
-function ErrorDetailsPanel({ errorMessage }: { errorMessage: string }) {
+function ErrorDetailsPanel({
+	errorMessage,
+	onResend,
+	isResending,
+}: {
+	errorMessage: string;
+	onResend?: () => void;
+	isResending?: boolean;
+}) {
 	const { summary } = classifyError(errorMessage);
 
 	return (
@@ -425,7 +437,28 @@ function ErrorDetailsPanel({ errorMessage }: { errorMessage: string }) {
 							{summary}
 						</span>
 					</div>
-					<CopyButton value={errorMessage} label="Error details" />
+					<div className="flex items-center gap-2">
+						{onResend && (
+							<Button.Root
+								size="xsmall"
+								variant="neutral"
+								mode="stroke"
+								disabled={isResending}
+								onClick={onResend}
+								className="h-7 shrink-0 gap-1.5 rounded-lg px-2.5 font-medium text-[12px]"
+							>
+								<Icon
+									name={isResending ? "loader-2" : "send-2"}
+									className={cn(
+										"h-3.5 w-3.5 shrink-0",
+										isResending && "animate-spin",
+									)}
+								/>
+								<span>{isResending ? "Resending…" : "Resend email"}</span>
+							</Button.Root>
+						)}
+						<CopyButton value={errorMessage} label="Error details" />
+					</div>
 				</div>
 
 				{/* Error details content - always visible */}
@@ -817,7 +850,12 @@ function EmailInsightsPanel({
 	);
 }
 
-export const EmailDetail = ({ email, isLoading }: EmailDetailProps) => {
+export const EmailDetail = ({
+	email,
+	isLoading,
+	onResend,
+	isResending,
+}: EmailDetailProps) => {
 	const [activeTab, setActiveTab] = useState<string>("preview");
 	const [hoveredIdx, setHoveredIdx] = useState<number | undefined>(undefined);
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
@@ -1064,7 +1102,11 @@ export const EmailDetail = ({ email, isLoading }: EmailDetailProps) => {
 			</section>
 
 			{!isLoading && email?.errorMessage && (
-				<ErrorDetailsPanel errorMessage={email.errorMessage} />
+				<ErrorDetailsPanel
+					errorMessage={email.errorMessage}
+					onResend={onResend}
+					isResending={isResending}
+				/>
 			)}
 
 			<SmtpResponseDrawer

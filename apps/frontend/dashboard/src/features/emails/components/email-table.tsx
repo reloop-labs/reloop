@@ -40,6 +40,7 @@ import { TableFooter } from "#/features/api-keys/table/table-footer";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import { getAvatarGradient, getAvatarInitial } from "#/utils/avatar";
 import { formatRelativeTime } from "#/utils/format-relative-time";
+import { useResendEmail } from "../hooks/use-resend-email";
 import { EmailsEmptyState } from "./emails-empty-state";
 
 export interface EmailLogData {
@@ -133,7 +134,12 @@ const getEmailStatusLabel = (status: string): string => {
 	}
 };
 
-type MenuItemId = "view" | "copy_id" | "copy_recipient" | "copy_subject";
+type MenuItemId =
+	| "view"
+	| "resend"
+	| "copy_id"
+	| "copy_recipient"
+	| "copy_subject";
 
 type EmailActionsHandlers = {
 	onViewDetails: (log: EmailLogData) => void;
@@ -150,35 +156,65 @@ function useEmailActionsMenu(
 	const [copiedItem, setCopiedItem] = useState<
 		"id" | "recipient" | "subject" | null
 	>(null);
+	const [isResendCompleted, setIsResendCompleted] = useState(false);
 	const buttonRefs = useRef<HTMLElement[]>([]);
 	const keepOpenRef = useRef(false);
 
-	const menuItems = [
-		{
-			id: "view" as const,
-			label: "View details",
-			icon: "info-outline" as const,
-			isDanger: false,
-		},
-		{
-			id: "copy_id" as const,
-			label: "Copy email ID",
-			icon: "copy" as const,
-			isDanger: false,
-		},
-		{
-			id: "copy_recipient" as const,
-			label: "Copy recipient",
-			icon: "copy" as const,
-			isDanger: false,
-		},
-		{
-			id: "copy_subject" as const,
-			label: "Copy subject",
-			icon: "file-text" as const,
-			isDanger: false,
-		},
-	];
+	const resendEmailMutation = useResendEmail();
+	const isResending = resendEmailMutation.isPending;
+
+	const isFailed = useMemo(() => {
+		const s = log.status.toLowerCase();
+		return s === "failed" || s === "bounced" || s === "spam";
+	}, [log.status]);
+
+	const menuItems = useMemo(() => {
+		const items: {
+			id: MenuItemId;
+			label: string;
+			icon: string;
+			isDanger: boolean;
+		}[] = [
+			{
+				id: "view" as const,
+				label: "View details",
+				icon: "info-outline",
+				isDanger: false,
+			},
+		];
+
+		if (isFailed) {
+			items.push({
+				id: "resend" as const,
+				label: "Resend email",
+				icon: "send-2",
+				isDanger: false,
+			});
+		}
+
+		items.push(
+			{
+				id: "copy_id" as const,
+				label: "Copy email ID",
+				icon: "copy",
+				isDanger: false,
+			},
+			{
+				id: "copy_recipient" as const,
+				label: "Copy recipient",
+				icon: "copy",
+				isDanger: false,
+			},
+			{
+				id: "copy_subject" as const,
+				label: "Copy subject",
+				icon: "file-text",
+				isDanger: false,
+			},
+		);
+
+		return items;
+	}, [isFailed]);
 
 	const currentTab = buttonRefs.current[hoverIdx ?? -1];
 	const currentRect = currentTab?.getBoundingClientRect();
@@ -190,6 +226,7 @@ function useEmailActionsMenu(
 			setOpen(next);
 			if (!next) {
 				setHoverIdx(undefined);
+				setIsResendCompleted(false);
 			}
 			handlers.onOpenChange(next, log.id);
 		},
@@ -227,6 +264,22 @@ function useEmailActionsMenu(
 		if (id === "view") {
 			handlers.onViewDetails(log);
 			dismissMenu();
+		} else if (id === "resend") {
+			keepOpenRef.current = true;
+			try {
+				await resendEmailMutation.mutateAsync({
+					emailId: log.id,
+					recipient: log.toEmails.join(", "),
+				});
+				setIsResendCompleted(true);
+				setTimeout(() => {
+					setIsResendCompleted(false);
+					keepOpenRef.current = false;
+					dismissMenu();
+				}, 900);
+			} catch {
+				keepOpenRef.current = false;
+			}
 		} else if (id === "copy_id") {
 			void copyToClipboard(log.id, "id", "Email ID copied to clipboard");
 		} else if (id === "copy_recipient") {
@@ -256,6 +309,8 @@ function useEmailActionsMenu(
 		currentRect,
 		isDanger,
 		copiedItem,
+		isResending,
+		isResendCompleted,
 		log,
 		handleItemClick,
 	};
@@ -264,13 +319,69 @@ function useEmailActionsMenu(
 function MenuItemLabel({
 	item,
 	copiedItem,
+	isResending,
+	isResendCompleted,
 }: {
 	item: ReturnType<typeof useEmailActionsMenu>["menuItems"][number];
 	copiedItem: "id" | "recipient" | "subject" | null;
+	isResending?: boolean;
+	isResendCompleted?: boolean;
 }) {
 	const isCopyId = item.id === "copy_id";
 	const isCopyRecipient = item.id === "copy_recipient";
 	const isCopySubject = item.id === "copy_subject";
+	const isResendItem = item.id === "resend";
+
+	if (isResendItem) {
+		const resendStateKey = isResendCompleted
+			? "completed"
+			: isResending
+				? "loading"
+				: "idle";
+
+		return (
+			<AnimatePresence mode="popLayout" initial={false}>
+				<motion.div
+					key={resendStateKey}
+					transition={{
+						type: "spring",
+						duration: 0.25,
+						bounce: 0,
+					}}
+					initial={{ opacity: 0, y: -14 }}
+					animate={{ opacity: 1, y: 0 }}
+					exit={{ opacity: 0, y: 14 }}
+					className="flex items-center gap-2"
+				>
+					{isResendCompleted ? (
+						<>
+							<Icon
+								name="check-circle"
+								className="h-3.5 w-3.5 shrink-0 text-success-base"
+							/>
+							<span className="text-success-base">Resent email!</span>
+						</>
+					) : isResending ? (
+						<>
+							<Icon
+								name="loader-2"
+								className="h-3.5 w-3.5 shrink-0 animate-spin text-text-sub-600"
+							/>
+							<span>Resending...</span>
+						</>
+					) : (
+						<>
+							<Icon
+								name={item.icon}
+								className="h-3.5 w-3.5 shrink-0 text-text-sub-600"
+							/>
+							<span>{item.label}</span>
+						</>
+					)}
+				</motion.div>
+			</AnimatePresence>
+		);
+	}
 
 	const isThisCopied =
 		(isCopyId && copiedItem === "id") ||
@@ -343,6 +454,8 @@ function EmailActionsMenuItems({
 		currentRect,
 		isDanger,
 		copiedItem,
+		isResending,
+		isResendCompleted,
 		handleItemClick,
 	} = menu;
 
@@ -355,15 +468,30 @@ function EmailActionsMenuItems({
 				(item.isDanger ? "bg-red-alpha-10" : "bg-neutral-alpha-10"),
 			variant === "context" &&
 				"data-[disabled]:pointer-events-none data-[highlighted]:bg-transparent",
+			item.id === "resend" &&
+				(isResending || isResendCompleted) &&
+				"cursor-not-allowed opacity-90",
 		);
 
 	const keepsMenuOpen = (id: MenuItemId) =>
-		id === "copy_id" || id === "copy_recipient" || id === "copy_subject";
+		id === "copy_id" ||
+		id === "copy_recipient" ||
+		id === "copy_subject" ||
+		id === "resend";
 
 	return (
 		<div className="relative">
 			{menuItems.map((item, idx) => {
-				const label = <MenuItemLabel item={item} copiedItem={copiedItem} />;
+				const label = (
+					<MenuItemLabel
+						item={item}
+						copiedItem={copiedItem}
+						isResending={item.id === "resend" ? isResending : undefined}
+						isResendCompleted={
+							item.id === "resend" ? isResendCompleted : undefined
+						}
+					/>
+				);
 
 				if (variant === "context") {
 					return (
@@ -374,6 +502,9 @@ function EmailActionsMenuItems({
 							}}
 							onPointerEnter={() => setHoverIdx(idx)}
 							onPointerLeave={() => setHoverIdx(undefined)}
+							disabled={
+								item.id === "resend" && (isResending || isResendCompleted)
+							}
 							onSelect={(event) => {
 								if (keepsMenuOpen(item.id)) {
 									event.preventDefault();
@@ -394,6 +525,7 @@ function EmailActionsMenuItems({
 							if (el) buttonRefs.current[idx] = el;
 						}}
 						type="button"
+						disabled={item.id === "resend" && (isResending || isResendCompleted)}
 						onPointerEnter={() => setHoverIdx(idx)}
 						onPointerLeave={() => setHoverIdx(undefined)}
 						onClick={() => handleItemClick(item.id)}
@@ -494,11 +626,21 @@ function EmailSelectionActionBar({
 	selectedRowIds: Record<string, boolean>;
 	onClearSelection: () => void;
 }) {
+	const resendEmailMutation = useResendEmail();
 	const selectedLogs = useMemo(
 		() => logs.filter((l) => selectedRowIds[l.id]),
 		[logs, selectedRowIds],
 	);
 	const selectedCount = selectedLogs.length;
+
+	const failedLogs = useMemo(
+		() =>
+			selectedLogs.filter((l) => {
+				const s = l.status.toLowerCase();
+				return s === "failed" || s === "bounced" || s === "spam";
+			}),
+		[selectedLogs],
+	);
 
 	const handleCopyIds = async () => {
 		const ids = selectedLogs.map((l) => l.id).join("\n");
@@ -516,6 +658,21 @@ function EmailSelectionActionBar({
 		toast.success(
 			`Copied recipients for ${selectedCount} email${selectedCount === 1 ? "" : "s"}`,
 		);
+	};
+
+	const handleResendFailed = async () => {
+		if (failedLogs.length === 0) return;
+		try {
+			for (const log of failedLogs) {
+				await resendEmailMutation.mutateAsync({
+					emailId: log.id,
+					recipient: log.toEmails.join(", "),
+				});
+			}
+			onClearSelection();
+		} catch {
+			// error toasted by useResendEmail
+		}
 	};
 
 	return (
@@ -537,6 +694,23 @@ function EmailSelectionActionBar({
 			<ActionBarSeparator />
 
 			<ActionBarGroup>
+				{failedLogs.length > 0 && (
+					<ActionBarItem
+						onClick={() => void handleResendFailed()}
+						disabled={resendEmailMutation.isPending}
+					>
+						<Icon
+							name={resendEmailMutation.isPending ? "loader-2" : "send-2"}
+							className={cn(
+								"size-3.5",
+								resendEmailMutation.isPending && "animate-spin",
+							)}
+						/>
+						{resendEmailMutation.isPending
+							? "Resending…"
+							: `Resend Failed (${failedLogs.length})`}
+					</ActionBarItem>
+				)}
 				<ActionBarItem onClick={() => void handleCopyIds()}>
 					<Icon name="copy" className="size-3.5" />
 					Copy IDs
