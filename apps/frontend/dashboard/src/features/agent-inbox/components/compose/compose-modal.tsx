@@ -759,7 +759,7 @@ export const ComposeModal = ({
 			window.setTimeout(() => {
 				reviewArmedRef.current = true;
 			}, 120);
-		} catch {
+		} catch (error) {
 			if (abort.signal.aborted) {
 				const restore = aiRestoreRef.current;
 				if (restore) restoreEditor(restore);
@@ -768,6 +768,7 @@ export const ComposeModal = ({
 				setAiPhase("idle");
 				return;
 			}
+			console.error("[AI Compose] Failed to generate email:", error);
 			toast.error("Failed to generate email");
 			restoreEditor(previous);
 			aiRestoreRef.current = null;

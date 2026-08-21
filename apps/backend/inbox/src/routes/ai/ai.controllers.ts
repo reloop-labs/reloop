@@ -219,6 +219,7 @@ async function callOpenRouterText(prompt: string): Promise<string | null> {
 		const { text } = await generateText({
 			model: openrouter(inboxConfig.OPENROUTER_MODEL),
 			prompt,
+			maxOutputTokens: 128,
 		});
 		return text.trim() || null;
 	} catch (error) {
@@ -244,6 +245,7 @@ async function streamPlainTextFromPrompt(
 			const result = streamText({
 				model: openrouter(inboxConfig.OPENROUTER_MODEL),
 				prompt,
+				maxOutputTokens: 1024,
 			});
 			return result.toTextStreamResponse();
 		} catch (error) {

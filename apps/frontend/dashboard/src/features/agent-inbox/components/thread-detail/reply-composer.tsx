@@ -399,7 +399,7 @@ export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
 				window.setTimeout(() => {
 					reviewArmedRef.current = true;
 				}, 120);
-			} catch {
+			} catch (error) {
 				if (abort.signal.aborted) {
 					const restore = aiRestoreRef.current;
 					if (restore) remountEditor(restore.html || "");
@@ -408,6 +408,7 @@ export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
 					setAiPhase("idle");
 					return;
 				}
+				console.error("[AI Reply] Failed to generate reply:", error);
 				toast.error("Failed to generate reply");
 				remountEditor(previous.html || "");
 				aiRestoreRef.current = null;
