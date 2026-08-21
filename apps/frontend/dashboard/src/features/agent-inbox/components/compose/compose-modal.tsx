@@ -1380,7 +1380,7 @@ export const ComposeModal = ({
 								type="button"
 								variant="neutral"
 								mode="stroke"
-								size="xsmall"
+								size="small"
 								disabled={isSending}
 								onClick={requestClose}
 								className="gap-1.5"
@@ -1391,6 +1391,7 @@ export const ComposeModal = ({
 							<FancyButton.Root
 								type="submit"
 								variant="blue"
+								size="small"
 								disabled={isSending || attachments.some((a) => a.isUploading)}
 								className="gap-1.5"
 							>
