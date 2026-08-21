@@ -31,6 +31,7 @@ import { plainToHtml } from "../../lib/plain-to-html";
 import { readAiTextStreamAfterThink } from "../../lib/read-ai-text-stream-after-think";
 import type { AgentMailbox } from "../../types";
 import { useAgentInbox } from "../agent-inbox-provider";
+import { useInboxSidebar } from "../sidebar/inbox-sidebar-context";
 import { EmailPillsInput, validateEmail } from "../shared/email-pills-input";
 import { LoadingDot } from "../shared/loading-dot";
 import { AiComposerSlot } from "./ai-composer-slot";
@@ -130,6 +131,7 @@ export const ComposeModal = ({
 	mailbox,
 }: ComposeModalProps) => {
 	const router = useRouter();
+	const { openCompose } = useInboxSidebar();
 	const {
 		sendMessage,
 		removeOptimisticOutbound,
@@ -576,6 +578,7 @@ export const ComposeModal = ({
 
 		setIsSending(true);
 		try {
+			const undoSeconds = scheduleAt ? SCHEDULE_UNDO_SECONDS : 3;
 			const result = await sendMessage({
 				mailboxId: mailbox.id,
 				to: data.to,
@@ -592,8 +595,7 @@ export const ComposeModal = ({
 						content_type: att.content_type,
 					})),
 				scheduledAt: scheduleAt,
-				// Immediate send — no Gmail-style undo delay.
-				undoWindowSeconds: 0,
+				undoWindowSeconds: undoSeconds,
 			});
 
 			if (currentDraftId.current) {
@@ -604,7 +606,7 @@ export const ComposeModal = ({
 				}
 			}
 
-			if (scheduleAt && result?.pending && result.id) {
+			if (result?.pending && result.id) {
 				const pendingId = result.id;
 				const restorePayload = {
 					to: data.to,
@@ -614,9 +616,13 @@ export const ComposeModal = ({
 					html: exported.html || htmlBody,
 					text: exported.text || textBody,
 				};
-				showUndoSendToast({
-					variant: "schedule",
-					seconds: SCHEDULE_UNDO_SECONDS,
+				showEmailSentToast({
+					scheduled: Boolean(scheduleAt),
+					seconds: undoSeconds,
+					to: data.to,
+					onViewSent: () => {
+						router.push(`/inbox/${mailbox.id}/sent`);
+					},
 					onUndo: async () => {
 						try {
 							const cancelRes = await apiFetch(
@@ -631,6 +637,7 @@ export const ComposeModal = ({
 								UNDO_STORAGE_KEY,
 								JSON.stringify(restorePayload),
 							);
+							openCompose();
 							toast.success("Send cancelled");
 						} catch {
 							toast.error("Failed to undo send");
