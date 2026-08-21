@@ -893,14 +893,24 @@ export const ComposeModal = ({
 					</AnimatePresence>
 
 					{/* Header */}
-					<div className="shrink-0 border-mail-border/40 border-b px-5 pt-5 pb-3">
-						<div className="mb-3 flex items-center gap-2.5">
-							<Icon name="pencil" className="h-4 w-4 text-mail-foreground" />
-							<Modal.Title asChild>
-								<h2 className="font-semibold text-label-md text-mail-foreground">
-									New email
-								</h2>
-							</Modal.Title>
+					<div className="shrink-0 border-mail-border/40 border-b px-5 pt-4 pb-3">
+						<div className="flex items-center justify-between">
+							<div className="flex items-center gap-2.5">
+								<Icon name="pencil" className="h-4 w-4 text-mail-foreground" />
+								<Modal.Title asChild>
+									<h2 className="font-semibold text-label-md text-mail-foreground">
+										New email
+									</h2>
+								</Modal.Title>
+							</div>
+							<button
+								type="button"
+								onClick={requestClose}
+								aria-label="Close"
+								className="flex size-7 items-center justify-center rounded-lg border border-stroke-soft-200 bg-bg-white-0 text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 active:scale-[0.95] dark:border-stroke-soft-100/40 dark:bg-panel-dark dark:text-mail-muted dark:hover:text-mail-foreground"
+							>
+								<Icon name="cross" className="size-3.5" />
+							</button>
 						</div>
 					</div>
 
