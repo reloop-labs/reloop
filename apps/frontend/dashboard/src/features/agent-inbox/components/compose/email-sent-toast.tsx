@@ -26,23 +26,22 @@ export function EmailSentToast({
 	onViewSent,
 	onUndo,
 }: EmailSentToastProps) {
-	const [remaining, setRemaining] = useState(seconds);
+	const [progress, setProgress] = useState(1);
 	const [busy, setBusy] = useState(false);
-	const isCountingDown = onUndo && remaining > 0;
+	const isCountingDown = onUndo && progress > 0;
 
 	useEffect(() => {
 		if (!onUndo || seconds <= 0) return;
+		const totalMs = seconds * 1000;
 		const started = Date.now();
 		const id = window.setInterval(() => {
-			const left = Math.max(
-				0,
-				seconds - Math.floor((Date.now() - started) / 1000),
-			);
-			setRemaining(left);
-			if (left <= 0) {
+			const elapsed = Date.now() - started;
+			const p = Math.max(0, 1 - elapsed / totalMs);
+			setProgress(p);
+			if (p <= 0) {
 				window.clearInterval(id);
 			}
-		}, 100);
+		}, 30);
 		return () => window.clearInterval(id);
 	}, [seconds, onUndo]);
 
@@ -58,8 +57,6 @@ export function EmailSentToast({
 		(scheduled
 			? "Scheduled for delivery. Available in Sent."
 			: recipientText);
-
-	const progressPercent = seconds > 0 ? (remaining / seconds) * 100 : 0;
 
 	return (
 		<div className="flex w-[min(100vw-2rem,25rem)] items-center gap-3 rounded-2xl border border-neutral-200/80 bg-white/95 p-3 text-neutral-900 shadow-[0_8px_30px_rgb(0,0,0,0.08)] backdrop-blur-md dark:border-neutral-700/80 dark:bg-neutral-900/95 dark:text-white dark:shadow-[0_8px_30px_rgb(0,0,0,0.35)]">
@@ -85,7 +82,7 @@ export function EmailSentToast({
 					<button
 						type="button"
 						disabled={busy}
-						aria-label={`Undo send, ${remaining} seconds remaining`}
+						aria-label="Undo send"
 						onClick={async () => {
 							setBusy(true);
 							try {
@@ -95,20 +92,16 @@ export function EmailSentToast({
 								setBusy(false);
 							}
 						}}
-						className="relative inline-flex items-center gap-1.5 overflow-hidden rounded-lg bg-neutral-900 px-3 py-1.5 font-medium text-white text-xs transition-transform active:scale-[0.97] dark:bg-white dark:text-neutral-900"
+						className="relative inline-flex items-center justify-center overflow-hidden rounded-lg border border-neutral-200/80 bg-neutral-100 px-3 py-1.5 font-medium text-neutral-900 text-xs transition-all hover:bg-neutral-200/70 active:scale-[0.97] dark:border-neutral-700/80 dark:bg-neutral-800 dark:text-white dark:hover:bg-neutral-700"
 					>
-						{/* Progress fill bar inside the button */}
+						{/* Smooth continuous progress fill inside the button */}
 						<span
-							className="pointer-events-none absolute inset-0 bg-white/20 transition-all ease-linear dark:bg-neutral-900/15"
+							className="pointer-events-none absolute inset-0 origin-left bg-neutral-900/10 dark:bg-white/15"
 							style={{
-								width: `${progressPercent}%`,
-								transitionDuration: "100ms",
+								width: `${progress * 100}%`,
 							}}
 						/>
 						<span className="relative z-10">{busy ? "…" : "Undo"}</span>
-						<span className="relative z-10 flex h-4 min-w-4 items-center justify-center rounded bg-white/25 px-1 font-mono font-semibold text-[10px] tabular-nums text-white dark:bg-neutral-900/20 dark:text-neutral-900">
-							{remaining}
-						</span>
 					</button>
 				) : (
 					onViewSent && (
