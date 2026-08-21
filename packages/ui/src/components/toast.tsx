@@ -90,7 +90,7 @@ const Toaster = (props: ToasterProps) => {
 	return (
 		<SonnerToaster
 			className="group/toast"
-			position="bottom-right"
+			position="bottom-center"
 			icons={{
 				loading: <Spinner size={16} color="currentColor" />,
 				success: <CheckIcon className="h-5 w-5 shrink-0 text-success-base" />,

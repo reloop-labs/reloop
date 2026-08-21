@@ -37,7 +37,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
 						</Suspense>
 						<KeyboardShortcutsRevealListener />
 						<LazyIconsSprite />
-						<Toaster />
+						<Toaster position="bottom-center" />
 					</Tooltip.Provider>
 				</ThemeProvider>
 			</QueryClientProvider>
