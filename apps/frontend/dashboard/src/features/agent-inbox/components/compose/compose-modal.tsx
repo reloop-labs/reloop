@@ -666,8 +666,13 @@ export const ComposeModal = ({
 	};
 
 	const generateSubject = async (fromText?: string) => {
-		const text = fromText ?? editorRef.current?.editor?.getText() ?? textBody;
-		if (!text.trim()) {
+		const text = (
+			fromText ??
+			editorRef.current?.editor?.getText() ??
+			textBody ??
+			""
+		).trim();
+		if (!text) {
 			toast.error("Write some content first");
 			return;
 		}
@@ -678,13 +683,17 @@ export const ComposeModal = ({
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({ text }),
 			});
-			if (!res.ok) throw new Error("Failed");
+			if (!res.ok) {
+				const errorData = await res.json().catch(() => null);
+				throw new Error(errorData?.message || "Failed to generate subject");
+			}
 			const data = (await res.json()) as { subject?: string };
 			if (data.subject) {
 				const cleaned = data.subject.replace(/^Subject:\s*/i, "").trim();
-				setValue("subject", cleaned);
+				setValue("subject", cleaned, { shouldDirty: true, shouldTouch: true });
 			}
-		} catch {
+		} catch (error) {
+			console.error("[AI Subject] Failed to generate subject:", error);
 			toast.error("Failed to generate subject");
 		} finally {
 			setSubjectGenerating(false);
@@ -1085,11 +1094,18 @@ export const ComposeModal = ({
 									className="h-8 w-full min-w-0 bg-transparent font-medium text-[13px] text-mail-foreground outline-none placeholder:text-mail-muted"
 									placeholder="What’s this about?"
 									disabled={isSending}
-									{...register("subject")}
+									value={subject}
+									onChange={(e) =>
+										setValue("subject", e.target.value, { shouldDirty: true })
+									}
 								/>
 								<AiSparkleButton
 									onClick={() => void generateSubject()}
-									disabled={isSending || subjectGenerating || !textBody.trim()}
+									disabled={
+										isSending ||
+										subjectGenerating ||
+										!(editorRef.current?.editor?.getText() || textBody).trim()
+									}
 									loading={subjectGenerating}
 									variant="icon"
 									size="sm"
