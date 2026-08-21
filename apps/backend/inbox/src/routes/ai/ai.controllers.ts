@@ -232,7 +232,7 @@ async function callOpenRouterText(prompt: string): Promise<string | null> {
 		const { text } = await generateText({
 			model: openrouter(inboxConfig.OPENROUTER_MODEL),
 			prompt,
-			maxOutputTokens: 128,
+			maxOutputTokens: 2048,
 		});
 		return text.trim() || null;
 	} catch (error) {
@@ -258,7 +258,7 @@ async function streamPlainTextFromPrompt(
 			const result = streamText({
 				model: openrouter(inboxConfig.OPENROUTER_MODEL),
 				prompt,
-				maxOutputTokens: 1024,
+				maxOutputTokens: 2048,
 			});
 			return result.toTextStreamResponse();
 		} catch (error) {
@@ -271,6 +271,23 @@ async function streamPlainTextFromPrompt(
 	}
 
 	return plainTextStreamResponse(chunkedPlainTextStream(fallbackText));
+}
+
+function cleanGeneratedSubject(raw: string): string {
+	let text = raw.trim();
+	const match = text.match(/(?:\*\*Subject:\*\*|Subject:)\s*([^\r\n]+)/i);
+	if (match?.[1]) {
+		text = match[1];
+	} else {
+		const firstLine = text.split(/\r?\n/).map((l) => l.trim()).filter(Boolean)[0];
+		if (firstLine) text = firstLine;
+	}
+	return text
+		.replace(/^["'`*]+|["'`*]+$/g, "")
+		.replace(/^Subject:\s*/i, "")
+		.replace(/^["'`*]+|["'`*]+$/g, "")
+		.trim()
+		.slice(0, 100);
 }
 
 export async function generateSubjectController(input: {
@@ -301,18 +318,14 @@ ${text}`;
 
 	const subject = await callOpenRouterText(prompt);
 	if (subject) {
-		const cleaned = subject
-			.replace(/^Subject:\s*/i, "")
-			.replace(/^["']|["']$/g, "")
-			.trim()
-			.slice(0, 100);
+		const cleaned = cleanGeneratedSubject(subject);
 		if (cleaned) {
 			return { subject: cleaned };
 		}
 	}
 
 	return {
-		subject: heuristicSubject(text).replace(/^Subject:\s*/i, "").trim(),
+		subject: cleanGeneratedSubject(heuristicSubject(text)),
 	};
 }
 
