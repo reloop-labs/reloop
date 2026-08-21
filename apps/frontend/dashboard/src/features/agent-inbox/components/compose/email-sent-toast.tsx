@@ -2,7 +2,7 @@
 
 import { Icon } from "@reloop/ui/icon";
 import { toast } from "@reloop/ui/toast";
-import { ArrowRight, X } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { useEffect, useState } from "react";
 
 type EmailSentToastProps = {
@@ -51,19 +51,12 @@ export function EmailSentToast({
 		: "Available in Sent folder";
 
 	const currentTitle =
-		title ||
-		(isCountingDown
-			? scheduled
-				? "Scheduling email…"
-				: "Sending email…"
-			: scheduled
-				? "Email scheduled"
-				: "Email sent");
+		title || (scheduled ? "Email scheduled" : "Email sent");
 
 	const currentSubtitle =
 		description ||
-		(isCountingDown
-			? `Sending in ${remaining}s — you can still undo`
+		(scheduled
+			? "Scheduled for delivery. Available in Sent."
 			: recipientText);
 
 	const progressPercent = seconds > 0 ? (remaining / seconds) * 100 : 0;
@@ -132,15 +125,6 @@ export function EmailSentToast({
 						</button>
 					)
 				)}
-
-				<button
-					type="button"
-					onClick={() => toast.dismiss(toastId)}
-					aria-label="Dismiss toast"
-					className="rounded-md p-1 text-neutral-400 transition-colors hover:text-neutral-600 dark:hover:text-neutral-200"
-				>
-					<X className="size-3.5" />
-				</button>
 			</div>
 		</div>
 	);
