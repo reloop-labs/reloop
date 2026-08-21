@@ -16,6 +16,7 @@ import { DomainsSummaryCard } from "./components/domains-summary-card";
 import { InboxSummaryCard } from "./components/inbox-summary-card";
 import { OverviewHeader } from "./components/overview-header";
 import { RecentEmailsCard } from "./components/recent-emails-card";
+import { WorkflowsCard } from "./components/workflows-card";
 import {
 	SendHealthCard,
 	useSendHealthTotals,
@@ -117,6 +118,7 @@ export function HomePage() {
 				<div className="flex flex-col gap-6">
 					<DomainsSummaryCard enabled={orgReady} />
 					<InboxSummaryCard enabled={orgReady} />
+					<WorkflowsCard enabled={orgReady} />
 				</div>
 			</div>
 		</div>

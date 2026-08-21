@@ -1,6 +1,6 @@
 "use client";
 
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
 	createContext,
 	type ReactNode,
@@ -14,11 +14,11 @@ import {
 	activateAutomation,
 	createAutomation,
 	deleteAutomation,
-	listAutomations,
 	mapAutomationToWorkflow,
 	pauseAutomation,
 	updateAutomation,
 } from "../hooks/use-automations-api";
+import { useWorkflowsList } from "../hooks/use-workflows-list";
 import type {
 	CreateWorkflowInput,
 	Workflow,
@@ -57,18 +57,10 @@ export const WorkflowsProvider = ({ children }: { children: ReactNode }) => {
 	const orgId = activeOrganization?.id ?? "";
 	const queryClient = useQueryClient();
 
-	const listQuery = useQuery({
-		queryKey: queryKeys.workflows.list(orgId),
-		queryFn: async () => {
-			const res = await listAutomations(100);
-			return res.automations.map(mapAutomationToWorkflow);
-		},
-		enabled: !!orgId,
-	});
-
-	const workflows = listQuery.data ?? [];
-	const isHydrated = !listQuery.isLoading || !orgId;
-	const isLoading = listQuery.isLoading && !!orgId;
+	const listQuery = useWorkflowsList({ enabled: !!orgId });
+	const workflows = listQuery.workflows;
+	const isHydrated = listQuery.isHydrated;
+	const isLoading = listQuery.isLoading;
 
 	const invalidate = useCallback(() => {
 		void queryClient.invalidateQueries({
@@ -183,7 +175,7 @@ export const WorkflowsProvider = ({ children }: { children: ReactNode }) => {
 			workflows,
 			isHydrated,
 			isLoading,
-			error: listQuery.error,
+			error: (listQuery.error as Error | null) ?? null,
 			getWorkflow,
 			createWorkflow,
 			updateWorkflow,

@@ -59,13 +59,13 @@ export const mainNavigation: MainNavigationItem[] = [
 		shortcut: { label: "G T", keys: ["g t", "g+t"] },
 		section: "Messaging",
 	},
-	// Hidden for now — routes still exist at /workflows
-	// {
-	// 	label: "Workflows",
-	// 	path: "/workflows",
-	// 	iconName: "workflow",
-	// 	section: "Messaging",
-	// },
+	{
+		label: "Workflows",
+		path: "/workflows",
+		iconName: "workflow",
+		shortcut: { label: "G F", keys: ["g f", "g+f"] },
+		section: "Messaging",
+	},
 	{
 		label: "Metrics",
 		path: "/metrics",
