@@ -2,7 +2,7 @@
 
 import { Icon } from "@reloop/ui/icon";
 import { toast } from "@reloop/ui/toast";
-import { ArrowRight } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 
 type EmailSentToastProps = {
@@ -28,7 +28,7 @@ export function EmailSentToast({
 }: EmailSentToastProps) {
 	const [progress, setProgress] = useState(1);
 	const [busy, setBusy] = useState(false);
-	const isCountingDown = onUndo && progress > 0;
+	const isCountingDown = Boolean(onUndo && progress > 0);
 
 	useEffect(() => {
 		if (!onUndo || seconds <= 0) return;
@@ -58,6 +58,22 @@ export function EmailSentToast({
 			? "Scheduled for delivery. Available in Sent."
 			: recipientText);
 
+	const handleAction = async () => {
+		if (isCountingDown) {
+			if (!onUndo) return;
+			setBusy(true);
+			try {
+				await onUndo();
+				toast.dismiss(toastId);
+			} finally {
+				setBusy(false);
+			}
+		} else if (onViewSent) {
+			onViewSent();
+			toast.dismiss(toastId);
+		}
+	};
+
 	return (
 		<div className="flex w-[min(100vw-2rem,25rem)] items-center gap-3 rounded-2xl border border-neutral-200/80 bg-white/95 p-3 text-neutral-900 shadow-[0_8px_30px_rgb(0,0,0,0.08)] backdrop-blur-md dark:border-neutral-700/80 dark:bg-neutral-900/95 dark:text-white dark:shadow-[0_8px_30px_rgb(0,0,0,0.35)]">
 			<div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400">
@@ -78,45 +94,50 @@ export function EmailSentToast({
 			</div>
 
 			<div className="flex shrink-0 items-center gap-1.5">
-				{isCountingDown ? (
+				{(onUndo || onViewSent) && (
 					<button
 						type="button"
 						disabled={busy}
-						aria-label="Undo send"
-						onClick={async () => {
-							setBusy(true);
-							try {
-								await onUndo();
-								toast.dismiss(toastId);
-							} finally {
-								setBusy(false);
-							}
-						}}
-						className="relative inline-flex items-center justify-center overflow-hidden rounded-lg border border-neutral-200/80 bg-neutral-100 px-3 py-1.5 font-medium text-neutral-900 text-xs transition-all hover:bg-neutral-200/70 active:scale-[0.97] dark:border-neutral-700/80 dark:bg-neutral-800 dark:text-white dark:hover:bg-neutral-700"
+						aria-label={isCountingDown ? "Undo send" : "View sent"}
+						onClick={() => void handleAction()}
+						className="relative inline-flex min-w-[58px] items-center justify-center overflow-hidden rounded-lg border border-neutral-200/80 bg-neutral-100 px-3 py-1.5 font-medium text-neutral-900 text-xs transition-all hover:bg-neutral-200/70 active:scale-[0.97] dark:border-neutral-700/80 dark:bg-neutral-800 dark:text-white dark:hover:bg-neutral-700"
 					>
-						{/* Smooth continuous progress fill inside the button */}
-						<span
-							className="pointer-events-none absolute inset-0 origin-left bg-neutral-900/10 dark:bg-white/15"
-							style={{
-								width: `${progress * 100}%`,
-							}}
-						/>
-						<span className="relative z-10">{busy ? "…" : "Undo"}</span>
+						{/* Smooth continuous progress fill inside the button during countdown */}
+						{isCountingDown && (
+							<span
+								className="pointer-events-none absolute inset-0 origin-left bg-neutral-900/10 dark:bg-white/15"
+								style={{
+									width: `${progress * 100}%`,
+								}}
+							/>
+						)}
+
+						<AnimatePresence mode="popLayout" initial={false}>
+							<motion.span
+								key={isCountingDown ? "undo" : "view"}
+								transition={{
+									type: "spring",
+									duration: 0.28,
+									bounce: 0,
+								}}
+								initial={{
+									opacity: 0,
+									y: -10,
+								}}
+								animate={{
+									opacity: 1,
+									y: 0,
+								}}
+								exit={{
+									opacity: 0,
+									y: 10,
+								}}
+								className="relative z-10 inline-flex items-center justify-center"
+							>
+								{isCountingDown ? (busy ? "…" : "Undo") : "View"}
+							</motion.span>
+						</AnimatePresence>
 					</button>
-				) : (
-					onViewSent && (
-						<button
-							type="button"
-							onClick={() => {
-								onViewSent();
-								toast.dismiss(toastId);
-							}}
-							className="inline-flex items-center gap-1 rounded-lg bg-neutral-100 px-2.5 py-1.5 font-medium text-neutral-900 text-xs transition-all hover:bg-neutral-200 active:scale-[0.97] dark:bg-neutral-800 dark:text-white dark:hover:bg-neutral-700"
-						>
-							View Sent
-							<ArrowRight className="size-3 text-neutral-400 dark:text-neutral-500" />
-						</button>
-					)
 				)}
 			</div>
 		</div>
