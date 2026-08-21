@@ -678,10 +678,14 @@ export const ComposeModal = ({
 		}
 		setSubjectGenerating(true);
 		try {
-			const res = await apiFetch("/api/inbox/v1/ai/subject", {
+			const res = await apiFetch("/api/inbox/v1/ai/update-subject", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ text }),
+				body: JSON.stringify({
+					body: text,
+					text,
+					currentSubject: subject || undefined,
+				}),
 			});
 			if (!res.ok) {
 				const errorData = await res.json().catch(() => null);

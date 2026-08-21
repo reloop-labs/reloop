@@ -31,12 +31,25 @@ function plainTextToHtml(body: string) {
 }
 
 function heuristicSubject(text: string) {
-	const firstLine =
-		text
-			.split(/\r?\n/)
-			.map((line) => line.trim())
-			.find((line) => line.length > 0) ?? "Untitled";
-	return firstLine.slice(0, 80);
+	const greetingRegex =
+		/^(hi|hello|hey|dear|greetings|good morning|good afternoon|good evening)\b[^\n]*/i;
+	const signoffRegex =
+		/^(best|thanks|thank you|regards|cheers|sincerely|warmly)\b[^\n]*/i;
+	const meaningfulLines = text
+		.split(/\r?\n/)
+		.map((line) => line.trim())
+		.filter(
+			(line) =>
+				line.length > 0 &&
+				!greetingRegex.test(line) &&
+				!signoffRegex.test(line),
+		);
+
+	const firstMeaningful =
+		meaningfulLines[0] ??
+		text.split(/\r?\n/).find((l) => l.trim().length > 0) ??
+		"Untitled";
+	return firstMeaningful.slice(0, 80);
 }
 
 function heuristicComposeText(prompt: string, subject?: string) {
@@ -260,31 +273,47 @@ async function streamPlainTextFromPrompt(
 	return plainTextStreamResponse(chunkedPlainTextStream(fallbackText));
 }
 
-export async function generateSubjectController(input: { text: string }) {
-	const text = input.text.trim();
+export async function generateSubjectController(input: {
+	text?: string;
+	body?: string;
+	currentSubject?: string;
+}) {
+	const raw = input.body ?? input.text ?? "";
+	const text = raw.trim();
 
 	if (!text) {
 		throw createError({
 			status: 400,
-			message: "Text is required",
+			message: "Text or body is required",
 			why: "Request body text was empty",
 			fix: "Provide email body text to generate a subject",
 		});
 	}
 
-	const subject = await callOpenRouterText(
-		`Write a concise email subject line (max 80 characters) for the following email body. Return only the subject text (no quotes, no "Subject:" prefix, no conversational text):\n\n${text}`,
-	);
+	const prompt = `You are crafting an email subject line for an email with the following body content.
+Generate a concise, professional, and relevant subject line (maximum 60 characters).
+Do NOT use generic greetings like "Hi", "Hello", "Inquiry", or raw conversation quotes.
+Extract the key topic or purpose of the email.
+Return ONLY the subject text without quotes, punctuation at the end, or "Subject:" prefix.
+
+Email Body:
+${text}`;
+
+	const subject = await callOpenRouterText(prompt);
 	if (subject) {
-		return {
-			subject: subject
-				.replace(/^Subject:\s*/i, "")
-				.replace(/^["']|["']$/g, "")
-				.slice(0, 120),
-		};
+		const cleaned = subject
+			.replace(/^Subject:\s*/i, "")
+			.replace(/^["']|["']$/g, "")
+			.trim()
+			.slice(0, 100);
+		if (cleaned) {
+			return { subject: cleaned };
+		}
 	}
 
-	return { subject: heuristicSubject(text).replace(/^Subject:\s*/i, "") };
+	return {
+		subject: heuristicSubject(text).replace(/^Subject:\s*/i, "").trim(),
+	};
 }
 
 function buildComposeSystemPrompt(input: {

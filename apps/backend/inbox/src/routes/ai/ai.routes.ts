@@ -20,7 +20,9 @@ export const aiRoutes = new Elysia({
 		{
 			auth: true,
 			body: t.Object({
-				text: t.String({ minLength: 1 }),
+				text: t.Optional(t.String()),
+				body: t.Optional(t.String()),
+				currentSubject: t.Optional(t.String()),
 			}),
 			response: {
 				200: MailModel.aiSubjectResponse,
@@ -33,6 +35,32 @@ export const aiRoutes = new Elysia({
 				tags: ["AI"],
 				summary: "Generate Subject",
 				description: "Generate an email subject line from body text",
+			},
+		},
+	)
+	.post(
+		"/update-subject",
+		async ({ body }) => {
+			return generateSubjectController(body);
+		},
+		{
+			auth: true,
+			body: t.Object({
+				text: t.Optional(t.String()),
+				body: t.Optional(t.String()),
+				currentSubject: t.Optional(t.String()),
+			}),
+			response: {
+				200: MailModel.aiSubjectResponse,
+				400: MailModel.ErrorResponseSchema,
+				401: MailModel.ErrorResponseSchema,
+				403: MailModel.ErrorResponseSchema,
+				500: MailModel.ErrorResponseSchema,
+			},
+			detail: {
+				tags: ["AI"],
+				summary: "Update Subject From Body",
+				description: "Update and generate a subject line based on the email body",
 			},
 		},
 	)
