@@ -68,13 +68,14 @@ describe("deriveSetupProgress", () => {
 		expect(progress.completedCount).toBe(0);
 		expect(progress.allComplete).toBe(false);
 		expect(progress.steps.map((s) => s.id)).toEqual([
+			"apiKey",
 			"domain",
 			"send",
-			"apiKey",
 		]);
-		expect(progress.steps[0]?.href).toBe("/domain/add");
-		expect(progress.steps[1]?.cta).toBe("Add a domain first");
-		expect(progress.steps[1]?.action).toBeUndefined();
+		expect(progress.steps[0]?.href).toBe("/api-keys?modal=create-api-key");
+		expect(progress.steps[1]?.href).toBe("/domain/add");
+		expect(progress.steps[2]?.cta).toBe("Send Email");
+		expect(progress.steps[2]?.disabled).toBe(true);
 	});
 
 	it("marks add-domain done when a pending domain exists and points send at DNS", () => {
@@ -84,12 +85,15 @@ describe("deriveSetupProgress", () => {
 			sentFromOwnDomain: false,
 		});
 		expect(progress.steps[0]?.complete).toBe(true);
-		expect(progress.steps[0]?.cta).toBe("Finish DNS");
-		expect(progress.steps[1]?.complete).toBe(false);
-		expect(progress.steps[1]?.cta).toBe("Verify DNS");
-		expect(progress.steps[1]?.href).toBe("/domain/d1");
-		expect(progress.steps[1]?.action).toBeUndefined();
-		expect(progress.steps[2]?.complete).toBe(true);
+		expect(progress.steps[0]?.id).toBe("apiKey");
+		expect(progress.steps[1]?.id).toBe("domain");
+		expect(progress.steps[1]?.complete).toBe(true);
+		expect(progress.steps[1]?.cta).toBe("Finish DNS");
+		expect(progress.steps[2]?.id).toBe("send");
+		expect(progress.steps[2]?.complete).toBe(false);
+		expect(progress.steps[2]?.cta).toBe("Verify DNS");
+		expect(progress.steps[2]?.href).toBe("/domain/d1");
+		expect(progress.steps[2]?.action).toBeUndefined();
 		expect(progress.completedCount).toBe(2);
 	});
 
@@ -100,9 +104,9 @@ describe("deriveSetupProgress", () => {
 			sentFromOwnDomain: false,
 		});
 		expect(progress.activeDomain?.domain).toBe("acme.com");
-		expect(progress.steps[1]?.action).toBe("send");
-		expect(progress.steps[1]?.cta).toBe("Send test");
-		expect(progress.steps[1]?.description).toContain("hello@acme.com");
+		expect(progress.steps[2]?.action).toBe("send");
+		expect(progress.steps[2]?.cta).toBe("Send test");
+		expect(progress.steps[2]?.description).toContain("hello@acme.com");
 	});
 
 	it("is complete when all three steps are done", () => {

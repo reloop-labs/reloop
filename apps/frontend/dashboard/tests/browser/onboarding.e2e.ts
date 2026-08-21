@@ -8,7 +8,6 @@ import {
 	completeOnboardingSkipDomain,
 	expectDashboardHome,
 	signUpToOnboarding,
-	skipDomainStep,
 } from "./onboarding/flows";
 import { dashboardURL } from "./runtime";
 
@@ -33,7 +32,7 @@ test.describe("onboarding — new account", () => {
 		).toBeDisabled();
 	});
 
-	test("Create organization advances to add-domain step", async ({ page }) => {
+	test("Create organization advances to API key step", async ({ page }) => {
 		const { companyName } = await signUpToOnboarding(page);
 		await completeCreateWorkspace(page, companyName);
 
@@ -43,20 +42,6 @@ test.describe("onboarding — new account", () => {
 				url.searchParams.get("step") === "2"
 			);
 		});
-		await expect(
-			page.getByRole("heading", { name: "Add Domain" }),
-		).toBeVisible();
-		await expect(page.getByRole("button", { name: "Skip" })).toBeVisible();
-		await expect(
-			page.getByRole("button", { name: "Add Domain" }),
-		).toBeVisible();
-	});
-
-	test("skip domain jumps to API key step", async ({ page }) => {
-		const { companyName } = await signUpToOnboarding(page);
-		await completeCreateWorkspace(page, companyName);
-		await skipDomainStep(page);
-
 		await expect(
 			page.getByRole("heading", { name: "Generate API key" }),
 		).toBeVisible();

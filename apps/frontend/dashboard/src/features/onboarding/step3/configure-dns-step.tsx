@@ -5,7 +5,6 @@ import { useHotkeys } from "react-hotkeys-hook";
 import { isForwardRecordsSequence } from "#/features/domain/add/setup/components/forward-records-shortcut";
 import { DNS_RECORD_DOCS } from "#/features/domain/dns-provider";
 import { useDomainConnectCallback } from "#/features/domain/hooks/use-domain-connect-callback";
-import { onboardingStepParser } from "../onboarding-step";
 import { ConfigureDnsActions } from "./configure-dns-actions";
 import { DnsAutoConnectBanner } from "./dns-auto-connect-banner";
 import { DnsFeatureSection } from "./dns-feature-section";
@@ -38,14 +37,14 @@ function TwitterVerifiedIcon({ className }: { className?: string }) {
 
 export function ConfigureDnsStep() {
 	const [domainId] = useQueryState("domainId", parseAsString.withDefault(""));
-	const [, setStep] = useQueryState("step", onboardingStepParser);
 	const { data: domainData, isLoading } = useDomainQuery(domainId);
 	const { handleUpdateDomain } = useUpdateDomain(domainId, domainData);
-	const { isVerifying, verifyDns, skip } = useVerifyDns(domainId);
+	const { isVerifying, verifyDns, skip, finishOnboarding } =
+		useVerifyDns(domainId);
 
 	useDomainConnectCallback({
 		onSuccess: () => {
-			void setStep(4);
+			void finishOnboarding();
 		},
 	});
 

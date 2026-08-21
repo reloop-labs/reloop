@@ -1,15 +1,14 @@
 import { useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { useQueryState } from "nuqs";
 import { useState } from "react";
 import { toast } from "sonner";
 import { queryKeys } from "#/lib/query-keys";
 import { toastApiError } from "#/lib/rate-limit-toast";
-import { onboardingStepParser } from "../onboarding-step";
+import { useFinishOnboarding } from "../use-finish-onboarding";
 
 export function useVerifyDns(domainId: string) {
 	const queryClient = useQueryClient();
-	const [, setStep] = useQueryState("step", onboardingStepParser);
+	const { finishOnboarding, isFinishing } = useFinishOnboarding();
 	const [isVerifying, setIsVerifying] = useState(false);
 
 	const verifyDns = async () => {
@@ -32,7 +31,7 @@ export function useVerifyDns(domainId: string) {
 			toast.success(
 				"DNS verification started! Verification will continue in the background.",
 			);
-			setStep(4);
+			await finishOnboarding();
 		} catch (error) {
 			toastApiError(error, "Failed to start DNS verification");
 		} finally {
@@ -40,9 +39,15 @@ export function useVerifyDns(domainId: string) {
 		}
 	};
 
-	const skip = () => {
-		setStep(4);
+	const skip = async () => {
+		await finishOnboarding();
 	};
 
-	return { isVerifying, verifyDns, skip };
+	return {
+		isVerifying: isVerifying || isFinishing,
+		verifyDns,
+		skip,
+		finishOnboarding,
+	};
 }
+

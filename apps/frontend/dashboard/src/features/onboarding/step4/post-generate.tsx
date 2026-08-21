@@ -61,6 +61,8 @@ export function PostGenerate({
 	apiKey,
 	choice,
 	onChoiceChange,
+	onContinue,
+	onSkip,
 	onDone,
 	finishing = false,
 	onSendTest,
@@ -72,8 +74,10 @@ export function PostGenerate({
 	apiKey: string;
 	choice: LanguageCode;
 	onChoiceChange: (choice: LanguageCode) => void;
-	onDone: () => void;
-	/** True while preparing session/orgs and navigating to the dashboard. */
+	onContinue?: () => void;
+	onSkip?: () => void;
+	onDone?: () => void;
+	/** True while preparing session/orgs and navigating. */
 	finishing?: boolean;
 	onSendTest?: () => void;
 	testStatus?: PlatformTestStatus;
@@ -81,31 +85,33 @@ export function PostGenerate({
 	testTo?: string | null;
 	testFrom?: string | null;
 }) {
+	const handleContinue = onContinue ?? onDone ?? (() => {});
+	const handleSkip = onSkip ?? handleContinue;
 	const testSending = testStatus === "sending";
 	const testSent = testStatus === "sent";
 	const provider = inboxProvider(testTo);
 
-	// Enter — send test email, or go to dashboard after a successful send.
+	// Enter — send test email, or continue to next step after a successful send.
 	useHotkeys(
 		"enter",
 		(e) => {
 			e.preventDefault();
-			if (testSent && !finishing) onDone();
+			if (testSent && !finishing) handleContinue();
 			else if (!testSent && !testSending && onSendTest) onSendTest();
 		},
 		{ enableOnFormTags: true, preventDefault: true },
-		[onDone, onSendTest, finishing, testSent, testSending],
+		[handleContinue, onSendTest, finishing, testSent, testSending],
 	);
 
-	// ⌥S — skip the test send and open the dashboard.
+	// ⌥S — skip the test send and continue to next step.
 	useHotkeys(
 		"alt+s",
 		(e) => {
 			e.preventDefault();
-			if (!finishing && !testSending && !testSent) onDone();
+			if (!finishing && !testSending && !testSent) handleSkip();
 		},
 		{ enableOnFormTags: true },
-		[onDone, finishing, testSending, testSent],
+		[handleSkip, finishing, testSending, testSent],
 	);
 
 	// O — open Gmail / Outlook / etc. after a successful test send.
@@ -241,7 +247,7 @@ export function PostGenerate({
 							variant="neutral"
 							mode="lighter"
 							size="small"
-							onClick={onDone}
+							onClick={handleSkip}
 							disabled={finishing || testSending}
 							className="shrink-0 gap-1.5 rounded-xl"
 						>
@@ -304,7 +310,7 @@ export function PostGenerate({
 										"min-w-[170px] justify-center overflow-visible whitespace-nowrap rounded-xl transition-all duration-200",
 										finishing && "pointer-events-none opacity-90",
 									)}
-									onClick={onDone}
+									onClick={handleContinue}
 									disabled={finishing}
 									aria-busy={finishing}
 								>

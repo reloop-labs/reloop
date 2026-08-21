@@ -4,24 +4,22 @@ import { useCallback, useRef, useState } from "react";
 import type { UseFormSetError } from "react-hook-form";
 import { toast } from "sonner";
 import { onboardingStepParser } from "../onboarding-step";
+import { useFinishOnboarding } from "../use-finish-onboarding";
 import type { DomainListResponse, DomainResponse } from "./domain-types";
 import type { DomainFormValues } from "./schema";
 
 export function useAddDomain(setError: UseFormSetError<DomainFormValues>) {
 	const [status, setStatus] = useState<"idle" | "loading">("idle");
 	const inFlightRef = useRef(false);
+	const { finishOnboarding, isFinishing } = useFinishOnboarding();
 	const [, setStep] = useQueryState("step", onboardingStepParser);
 	const [, setDomainId] = useQueryState(
 		"domainId",
 		parseAsString.withDefault(""),
 	);
-	const [, setSkippedDns] = useQueryState(
-		"skippedDns",
-		parseAsString.withDefault(""),
-	);
 
 	const advanceStep = useCallback(async () => {
-		await setStep((current) => (current ?? 1) + 1);
+		await setStep(4);
 	}, [setStep]);
 
 	const submitDomain = useCallback(
@@ -87,15 +85,17 @@ export function useAddDomain(setError: UseFormSetError<DomainFormValues>) {
 		[advanceStep, setDomainId, setError],
 	);
 
-	const skipDns = useCallback(() => {
-		void setSkippedDns("true");
-		void setStep(4);
-	}, [setSkippedDns, setStep]);
+	const skipDomain = useCallback(async () => {
+		await finishOnboarding();
+	}, [finishOnboarding]);
 
 	return {
 		status,
-		isLoading: status === "loading",
+		isLoading: status === "loading" || isFinishing,
+		isFinishing,
 		submitDomain,
-		skipDns,
+		skipDns: skipDomain,
+		skipDomain,
 	};
 }
+

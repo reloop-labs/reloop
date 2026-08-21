@@ -6,13 +6,10 @@ import type React from "react";
 import { useEffect, useRef } from "react";
 import { AuthSessionLoader } from "#/features/auth/auth-session-loader";
 import { useSessionQuery } from "#/features/auth/session-query";
-import { DomainPreview } from "./domain-preview";
 import { onboardingStepParser } from "./onboarding-step";
 import { SidebarPreview } from "./sidebar-preview";
 import { SplitLayout } from "./split-layout";
 import { CreateOrgStep } from "./step1/create-org-step";
-import { AddDomainStep } from "./step2/add-domain-step";
-import { ConfigureDnsStep } from "./step3/configure-dns-step";
 import { GenerateApiKeyStep } from "./step4/generate-api-key-step";
 
 export function OnboardingPage() {
@@ -21,20 +18,8 @@ export function OnboardingPage() {
 	const [step] = useQueryState("step", onboardingStepParser);
 	const [name] = useQueryState("name", parseAsString.withDefault(""));
 	const [logoUrl] = useQueryState("logoUrl", parseAsString.withDefault(""));
-	const [domain, setDomain] = useQueryState(
-		"domain",
-		parseAsString.withDefault(""),
-	);
-	const [, setDomainId] = useQueryState(
-		"domainId",
-		parseAsString.withDefault(""),
-	);
 	const [, setApiKey] = useQueryState("apiKey", parseAsString.withDefault(""));
 	const [, setLang] = useQueryState("lang", parseAsString.withDefault(""));
-	const [, setSkippedDns] = useQueryState(
-		"skippedDns",
-		parseAsString.withDefault(""),
-	);
 
 	useEffect(() => {
 		if (isPending) return;
@@ -49,23 +34,17 @@ export function OnboardingPage() {
 		const prev = prevStepRef.current;
 		if (step < prev) {
 			if (prev === 2) {
-				void setDomain(null);
-				void setDomainId(null);
-			} else if (prev === 3) {
-				void setDomainId(null);
-			} else if (prev === 4) {
 				void setApiKey(null);
 				void setLang(null);
-				void setSkippedDns(null);
 			}
 		}
 		prevStepRef.current = step;
-	}, [step, setDomain, setDomainId, setApiKey, setLang, setSkippedDns]);
+	}, [step, setApiKey, setLang]);
 
 	if (isPending) {
 		return (
 			<SplitLayout
-				stepIndicator="Step 1 of 4"
+				stepIndicator="Step 1 of 2"
 				previewContent={
 					<div className="flex h-full flex-col gap-4 p-8">
 						<Skeleton className="h-8 w-1/3 rounded-lg" />
@@ -113,26 +92,13 @@ export function OnboardingPage() {
 		}
 	> = {
 		1: {
-			stepIndicator: "Step 1 of 4",
+			stepIndicator: "Step 1 of 2",
 			component: <CreateOrgStep />,
 			preview: <SidebarPreview name={name} logo={logoUrl || null} />,
 			fullWidth: false,
 		},
 		2: {
-			stepIndicator: "Step 2 of 4",
-			component: <AddDomainStep />,
-			preview: <DomainPreview domain={domain} logoUrl={logoUrl || undefined} />,
-			fullWidth: false,
-		},
-		3: {
-			stepIndicator: "Step 3 of 4",
-			component: <ConfigureDnsStep />,
-			preview: null,
-			fullWidth: true,
-			maxWidth: "3xl",
-		},
-		4: {
-			stepIndicator: "Step 4 of 4",
+			stepIndicator: "Step 2 of 2",
 			component: <GenerateApiKeyStep />,
 			preview: null,
 			fullWidth: true,
@@ -160,3 +126,4 @@ export function OnboardingPage() {
 		</SplitLayout>
 	);
 }
+

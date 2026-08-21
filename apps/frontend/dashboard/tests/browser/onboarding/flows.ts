@@ -41,6 +41,7 @@ export async function signUpToOnboarding(
 
 /**
  * Step 1 — Create organization (company name is required; referral is optional).
+ * Advances to step 2 (API key).
  */
 export async function completeCreateWorkspace(page: Page, companyName: string) {
 	await page.getByPlaceholder("e.g. Acme Corp").fill(companyName);
@@ -49,7 +50,9 @@ export async function completeCreateWorkspace(page: Page, companyName: string) {
 	await expect(create).toBeEnabled({ timeout: 5_000 });
 	await create.click({ force: true });
 
-	await expect(page.getByRole("heading", { name: "Add Domain" })).toBeVisible({
+	await expect(
+		page.getByRole("heading", { name: "Generate API key" }),
+	).toBeVisible({
 		timeout: 30_000,
 	});
 	await expect(page).toHaveURL((url) => url.searchParams.get("step") === "2", {
@@ -58,28 +61,7 @@ export async function completeCreateWorkspace(page: Page, companyName: string) {
 }
 
 /**
- * Step 2 skip → jumps to step 4 (API key). Avoids depending on domain service.
- */
-export async function skipDomainStep(page: Page) {
-	await page.getByRole("button", { name: "Skip" }).click({ force: true });
-
-	await expect(
-		page.getByRole("heading", { name: "Generate API key" }),
-	).toBeVisible({ timeout: 15_000 });
-	await expect(page).toHaveURL((url) => {
-		return (
-			url.pathname.includes("/onboarding") &&
-			url.searchParams.get("step") === "4" &&
-			url.searchParams.get("skippedDns") === "true"
-		);
-	});
-}
-
-/**
- * Step 4 — generate key then leave onboarding for the dashboard home.
- *
- * FancyButton + Framer Motion re-mount the label; force-click avoids
- * "element is not stable / detached" flakes on the CTA.
+ * Step 2 — Generate API key and go to Dashboard.
  */
 export async function completeApiKeyAndGoToDashboard(
 	page: Page,
@@ -136,15 +118,14 @@ export async function completeApiKeyAndGoToDashboard(
 }
 
 /**
- * Full happy path for a new account: auth → onboarding (skip DNS) → home.
+ * Full happy path for a new account: auth → onboarding (create org → API key) → home.
  */
-export async function completeOnboardingSkipDomain(
+export async function completeOnboarding(
 	page: Page,
 	options?: { email?: string },
 ): Promise<OnboardingWorkspace> {
 	const workspace = await signUpToOnboarding(page, options);
 	await completeCreateWorkspace(page, workspace.companyName);
-	await skipDomainStep(page);
 	await completeApiKeyAndGoToDashboard(
 		page,
 		workspace.companyName,
@@ -152,6 +133,8 @@ export async function completeOnboardingSkipDomain(
 	);
 	return workspace;
 }
+
+export const completeOnboardingSkipDomain = completeOnboarding;
 
 /** Assert we are on dashboard home (completed onboarding), not onboarding. */
 export async function expectDashboardHome(

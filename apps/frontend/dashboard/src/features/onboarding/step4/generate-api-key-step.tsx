@@ -10,7 +10,8 @@ export function GenerateApiKeyStep() {
 		choice,
 		setChoice,
 		generateKey,
-		finishOnboarding,
+		advanceStep,
+		skipStep,
 		sendPlatformTestEmail,
 		testStatus,
 		testError,
@@ -35,8 +36,11 @@ export function GenerateApiKeyStep() {
 			choice={choice}
 			onChoiceChange={setChoice}
 			finishing={finishing}
-			onDone={() => {
-				void finishOnboarding();
+			onContinue={() => {
+				void advanceStep();
+			}}
+			onSkip={() => {
+				void skipStep();
 			}}
 			onSendTest={() => {
 				void sendPlatformTestEmail();
@@ -48,3 +52,4 @@ export function GenerateApiKeyStep() {
 		/>
 	);
 }
+

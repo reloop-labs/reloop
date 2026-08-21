@@ -1,13 +1,10 @@
-import { authClient } from "@reloop/auth/client";
 import { useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { useRouter } from "next/navigation";
 import { parseAsString, useQueryState } from "nuqs";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useState } from "react";
 import { toast } from "sonner";
-import { organizationsQueryOptions } from "#/features/auth/organizations-query";
-import { sessionQueryOptions } from "#/features/auth/session-query";
-import { queryKeys } from "#/lib/query-keys";
+import { onboardingStepParser } from "../onboarding-step";
+import { useFinishOnboarding } from "../use-finish-onboarding";
 import type { LanguageCode } from "./types";
 
 const languageCodes: LanguageCode[] = ["nodejs", "python", "go", "php"];
@@ -20,28 +17,12 @@ function parseChoice(value: string): LanguageCode {
 	return "nodejs";
 }
 
-async function wait(ms: number) {
-	await new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-/**
- * Load organizations from the network (bypass staleTime) so Home does not
- * briefly see `[]` and bounce the user back to /onboarding.
- */
-async function fetchOrganizationsFresh(
-	queryClient: ReturnType<typeof useQueryClient>,
-) {
-	return queryClient.fetchQuery({
-		...organizationsQueryOptions(),
-		staleTime: 0,
-	});
-}
-
 export type PlatformTestStatus = "idle" | "sending" | "sent" | "error";
 
 export function useGenerateApiKey() {
 	const queryClient = useQueryClient();
-	const router = useRouter();
+	const { finishOnboarding, isFinishing: finishing } = useFinishOnboarding();
+	const [, setStep] = useQueryState("step", onboardingStepParser);
 	const [apiKey, setApiKey] = useQueryState(
 		"apiKey",
 		parseAsString.withDefault(""),
@@ -51,15 +32,20 @@ export function useGenerateApiKey() {
 		parseAsString.withDefault("nodejs"),
 	);
 	const [loading, setLoading] = useState(false);
-	/** True from "Go to Dashboard" until navigation (or error). */
-	const [finishing, setFinishing] = useState(false);
-	const finishingRef = useRef(false);
 	const [testStatus, setTestStatus] = useState<PlatformTestStatus>("idle");
 	const [testError, setTestError] = useState<string | null>(null);
 	const [testTo, setTestTo] = useState<string | null>(null);
 	const [testFrom, setTestFrom] = useState<string | null>(null);
 
 	const choice = parseChoice(choiceParam);
+
+	const advanceStep = useCallback(async () => {
+		await finishOnboarding();
+	}, [finishOnboarding]);
+
+	const skipStep = useCallback(async () => {
+		await finishOnboarding();
+	}, [finishOnboarding]);
 
 	const generateKey = async () => {
 		setLoading(true);
@@ -124,67 +110,6 @@ export function useGenerateApiKey() {
 		}
 	}, [apiKey, testStatus]);
 
-	const finishOnboarding = useCallback(async () => {
-		// Guard double-clicks (button + mod+enter) before React re-renders.
-		if (finishingRef.current) return;
-		finishingRef.current = true;
-		setFinishing(true);
-
-		try {
-			// Reassign platform onboarding email_log → customer org + API key.
-			// Best-effort: never block navigation if attribution fails.
-			if (apiKey.trim()) {
-				try {
-					await axios.post(
-						"/api/email/v1/onboarding/dashboard",
-						{ apiKey },
-						{ withCredentials: true },
-					);
-				} catch (attrError) {
-					console.warn("Failed to attribute onboarding email log", attrError);
-				}
-			}
-
-			// Warm session + org list so ActiveOrganization / Home never treat
-			// this user as orgless on first paint after navigation.
-			await authClient.getSession();
-			await queryClient.invalidateQueries({
-				queryKey: queryKeys.auth.session(),
-			});
-			await queryClient.fetchQuery(sessionQueryOptions());
-
-			let organizations = await fetchOrganizationsFresh(queryClient);
-
-			// Membership can lag setActive briefly after workspace creation.
-			if (!organizations?.length) {
-				await wait(400);
-				organizations = await fetchOrganizationsFresh(queryClient);
-			}
-
-			if (!organizations?.length) {
-				toast.error(
-					"Your workspace is still setting up. Please try again in a moment.",
-				);
-				finishingRef.current = false;
-				setFinishing(false);
-				return;
-			}
-
-			// Pin a non-empty list into the cache before leaving onboarding.
-			queryClient.setQueryData(queryKeys.auth.organizations(), organizations);
-
-			// replace so Back does not return to a half-finished onboarding URL.
-			router.replace("/");
-			// Keep `finishing` true — the route unmounts this step; avoid a
-			// flash of the API-key UI if navigation is slow.
-		} catch (error) {
-			console.error("Failed to finish onboarding", error);
-			toast.error("Could not open the dashboard. Please try again.");
-			finishingRef.current = false;
-			setFinishing(false);
-		}
-	}, [apiKey, queryClient, router]);
-
 	const setChoice = useCallback(
 		(next: LanguageCode) => {
 			void setChoiceParam(next);
@@ -199,6 +124,8 @@ export function useGenerateApiKey() {
 		choice,
 		setChoice,
 		generateKey,
+		advanceStep,
+		skipStep,
 		finishOnboarding,
 		sendPlatformTestEmail,
 		testStatus,
@@ -207,3 +134,4 @@ export function useGenerateApiKey() {
 		testFrom,
 	};
 }
+
