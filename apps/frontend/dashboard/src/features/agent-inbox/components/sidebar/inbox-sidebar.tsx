@@ -307,7 +307,7 @@ export const InboxSidebar = ({
 		<>
 			<aside
 				className={cn(
-					"flex h-full shrink-0 select-none flex-col border-mail-border border-r bg-sidebar transition-[width] duration-200 ease-in-out",
+					"flex h-full shrink-0 select-none flex-col border-mail-border border-r bg-panel-light transition-[width] duration-200 ease-in-out dark:bg-panel-dark",
 					collapsed ? "w-14 items-center" : "w-60",
 				)}
 			>
@@ -321,7 +321,7 @@ export const InboxSidebar = ({
 					{!collapsed ? (
 						<div
 							onClick={handleCopyEmail}
-							className="relative flex h-7 w-full cursor-pointer items-center justify-between gap-1.5 rounded-lg border border-mail-border/60 bg-transparent px-2"
+							className="relative flex h-7 w-full cursor-pointer items-center justify-between gap-1.5 rounded-lg border border-mail-border/60 bg-[var(--inbox-control)] px-2"
 							title="Click to copy email address"
 						>
 							<span className="min-w-0 flex-1 truncate font-medium text-[12px] text-mail-foreground/80 leading-none">
@@ -345,7 +345,7 @@ export const InboxSidebar = ({
 							type="button"
 							onClick={handleCopyEmail}
 							title={`Copy ${mailbox.email || "mailbox email"}`}
-							className="flex size-7 items-center justify-center rounded-lg border border-mail-border/60 bg-transparent text-mail-muted"
+							className="flex size-7 items-center justify-center rounded-lg border border-mail-border/60 bg-[var(--inbox-control)] text-mail-muted"
 						>
 							{emailCopied ? (
 								<Check className="h-3.5 w-3.5 text-emerald-500" />
