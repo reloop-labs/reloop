@@ -12,9 +12,8 @@
 		"composite": false,
 		"declaration": false,
 		"declarationMap": false,
-		"baseUrl": "./src",
 		"paths": {
-			"@be/tools/*": ["./*"]
+			"@be/tools/*": ["./src/*"]
 		}
 	},
 	"include": ["src", "test"]

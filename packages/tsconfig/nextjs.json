@@ -9,7 +9,6 @@
 		"allowJs": true,
 		"jsx": "preserve",
 		"noEmit": true,
-		"baseUrl": ".",
 		"paths": {
 			"@reloop/ui": ["../../packages/ui/src/*"],
 			"@reloop/auth": ["../../packages/auth/src/*"],

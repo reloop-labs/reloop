@@ -10,7 +10,6 @@
 		"outDir": "./dist",
 		"types": ["bun"],
 		"composite": false,
-		"declarationMap": false,
-		"baseUrl": "."
+		"declarationMap": false
 	}
 }

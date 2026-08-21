@@ -12,9 +12,8 @@
 		"composite": false,
 		"declaration": false,
 		"declarationMap": false,
-		"baseUrl": "./src",
 		"paths": {
-			"@be/contacts/*": ["./*"]
+			"@be/contacts/*": ["./src/*"]
 		}
 	},
 	"include": ["src/**/*"],

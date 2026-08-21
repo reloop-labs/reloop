@@ -1,8 +1,5 @@
 {
 	"extends": "@reloop/tsconfig/base.json",
 	"include": ["src", "test"],
-	"exclude": ["node_modules"],
-	"compilerOptions": {
-		"baseUrl": "."
-	}
+	"exclude": ["node_modules"]
 }

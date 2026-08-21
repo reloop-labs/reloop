@@ -13,7 +13,6 @@
 		"jsx": "react-jsx",
 		"declaration": false,
 		"declarationMap": false,
-		"baseUrl": ".",
 		"rootDir": "./src",
 		"paths": {
 			"@reloop/credits/*": ["./src/*"]

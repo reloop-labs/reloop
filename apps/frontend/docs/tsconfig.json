@@ -15,7 +15,6 @@
 		"isolatedModules": true,
 		"jsx": "preserve",
 		"incremental": true,
-		"baseUrl": ".",
 		"paths": {
 			"@reloop/fe-docs/*": ["./src/*"],
 			"@reloop/fe-docs/.source": [".source"],

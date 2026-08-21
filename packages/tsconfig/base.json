@@ -14,7 +14,6 @@
 		"skipLibCheck": true,
 		"strict": true,
 		"target": "ES2022",
-		"baseUrl": ".",
 		"paths": {
 			"@reloop/db": ["../../packages/db/src/*"],
 			"@reloop/cache": ["../../packages/cache/src/*"],
