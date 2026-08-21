@@ -3,7 +3,7 @@ import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
-import { Pencil, Plus, Star } from "lucide-react";
+import { Check, Copy, Pencil, Plus, Star } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
@@ -19,7 +19,12 @@ import { useInboxFolderStats } from "#/features/agent-inbox/hooks/use-inbox-fold
 import { useInboxLabels } from "#/features/agent-inbox/hooks/use-inbox-labels";
 import { resolveLabelColor } from "#/features/agent-inbox/lib/label-colors";
 import type { AgentMailbox } from "#/features/agent-inbox/types";
+import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
+
+/** Light keycap for blue FancyButton fill */
+const actionKbdOnBlueClassName =
+	"border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]";
 
 const DraftIcon = (props: Omit<React.ComponentProps<typeof Icon>, "name">) => (
 	<Icon name="draft" {...props} />
@@ -167,6 +172,20 @@ export const InboxSidebar = ({
 
 	const [isComposeOpen, setIsComposeOpen] = useState(false);
 	const [isLabelDialogOpen, setIsLabelDialogOpen] = useState(false);
+	const [emailCopied, setEmailCopied] = useState(false);
+
+	const handleCopyEmail = async (e?: React.MouseEvent) => {
+		e?.stopPropagation();
+		if (!mailbox.email) return;
+		try {
+			await navigator.clipboard.writeText(mailbox.email);
+			setEmailCopied(true);
+			toast.success("Email address copied");
+			setTimeout(() => setEmailCopied(false), 2000);
+		} catch {
+			toast.error("Failed to copy email");
+		}
+	};
 
 	const [hoveredEl, setHoveredEl] = useState<HTMLAnchorElement | undefined>(
 		undefined,
@@ -201,9 +220,22 @@ export const InboxSidebar = ({
 		registerOpenCompose(() => setIsComposeOpen(true));
 	}, [registerOpenCompose]);
 
+	useHotkeys(
+		"c",
+		(e) => {
+			e.preventDefault();
+			if (mailboxReady) {
+				setIsComposeOpen(true);
+			}
+		},
+		{ enableOnFormTags: false, preventDefault: true },
+	);
+
 	useHotkeys("alt+n", (e) => {
 		e.preventDefault();
-		setIsComposeOpen(true);
+		if (mailboxReady) {
+			setIsComposeOpen(true);
+		}
 	});
 
 	useHotkeys("alt+l", (e) => {
@@ -275,12 +307,62 @@ export const InboxSidebar = ({
 		<>
 			<aside
 				className={cn(
-					"flex h-full shrink-0 select-none flex-col border-mail-border border-r bg-sidebar py-2 transition-[width] duration-200 ease-in-out",
-					collapsed ? "w-14 items-center px-0" : "w-60 px-2",
+					"flex h-full shrink-0 select-none flex-col border-mail-border border-r bg-sidebar transition-[width] duration-200 ease-in-out",
+					collapsed ? "w-14 items-center" : "w-60",
 				)}
 			>
-				{/* Compose — fancy button */}
-				<div className={cn(collapsed && "flex justify-center")}>
+				{/* Top header row — aligns with middle pane h-11 toolbar */}
+				<div
+					className={cn(
+						"flex h-11 shrink-0 items-center border-mail-border/50 border-b",
+						collapsed ? "w-full justify-center px-2" : "w-full px-2.5",
+					)}
+				>
+					{!collapsed ? (
+						<div
+							onClick={handleCopyEmail}
+							className="relative flex h-7 w-full cursor-pointer items-center justify-between gap-1.5 rounded-lg border border-mail-border/60 bg-transparent px-2"
+							title="Click to copy email address"
+						>
+							<span className="min-w-0 flex-1 truncate font-medium text-[12px] text-mail-foreground/80 leading-none">
+								{mailbox.email || "Mailbox"}
+							</span>
+							<button
+								type="button"
+								onClick={handleCopyEmail}
+								aria-label="Copy email"
+								className="flex size-4 shrink-0 items-center justify-center rounded text-mail-muted transition-colors hover:text-mail-foreground"
+							>
+								{emailCopied ? (
+									<Check className="h-3 w-3 text-emerald-500" />
+								) : (
+									<Copy className="h-3 w-3 opacity-70" />
+								)}
+							</button>
+						</div>
+					) : (
+						<button
+							type="button"
+							onClick={handleCopyEmail}
+							title={`Copy ${mailbox.email || "mailbox email"}`}
+							className="flex size-7 items-center justify-center rounded-lg border border-mail-border/60 bg-transparent text-mail-muted"
+						>
+							{emailCopied ? (
+								<Check className="h-3.5 w-3.5 text-emerald-500" />
+							) : (
+								<Copy className="h-3.5 w-3.5" />
+							)}
+						</button>
+					)}
+				</div>
+
+				{/* Compose — aligns with category tabs */}
+				<div
+					className={cn(
+						"flex h-[54px] shrink-0 items-center border-mail-border/50 border-b",
+						collapsed ? "w-full justify-center px-2" : "w-full px-2",
+					)}
+				>
 					<FancyButton.Root
 						type="button"
 						variant="blue"
@@ -290,20 +372,30 @@ export const InboxSidebar = ({
 							setIsComposeOpen(true);
 						}}
 						disabled={!mailboxReady}
-						title="Compose"
-						className={collapsed ? "h-10 w-10 px-0" : "w-full gap-2"}
+						title="Compose (C)"
+						aria-keyshortcuts="c"
+						className={
+							collapsed
+								? "h-10 w-10 px-0"
+								: "w-full justify-between gap-2 px-3"
+						}
 					>
-						<Pencil
-							className="h-4 w-4 shrink-0"
-							strokeWidth={1.75}
-						/>
-						{!collapsed && <span>Compose</span>}
+						<div className="flex items-center gap-2">
+							<Pencil className="h-4 w-4 shrink-0" strokeWidth={1.75} />
+							{!collapsed && <span>Compose</span>}
+						</div>
+						{!collapsed && (
+							<ActionKbd className={actionKbdOnBlueClassName}>C</ActionKbd>
+						)}
 					</FancyButton.Root>
 				</div>
 
 				<div
 					onPointerLeave={() => setHoveredEl(undefined)}
-					className="relative mt-2 min-h-0 w-full flex-1 overflow-y-auto overflow-x-hidden"
+					className={cn(
+						"relative min-h-0 w-full flex-1 overflow-y-auto overflow-x-hidden",
+						collapsed ? "px-0 py-2" : "px-2 py-2",
+					)}
 				>
 					{/* Mail folders — no section header */}
 					<div className={cn("flex flex-col", collapsed && "items-center")}>
