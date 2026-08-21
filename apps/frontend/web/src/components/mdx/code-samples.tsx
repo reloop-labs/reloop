@@ -4,6 +4,7 @@ import { sendEmailXCodeSamples } from "@reloop/code-samples/mail";
 import type { CodeSample } from "@reloop/code-samples/types";
 import { CopyCodeBlock } from "@reloop/ui/copy-code-block";
 import { JAVA_ICON } from "@reloop/ui/icons/java";
+import { apiSnippets } from "@reloop/web/app/tools/temp-email-checker/content";
 import { useMemo, useState } from "react";
 import {
 	siDotnet,
@@ -88,12 +89,22 @@ function orderSamples(samples: readonly CodeSample[]): CodeSample[] {
 	return ordered;
 }
 
-export function CodeSamples({ samples }: { samples: readonly CodeSample[] }) {
-	const ordered = useMemo(() => orderSamples(samples), [samples]);
+export function CodeSamples({
+	samples,
+	preserveOrder = false,
+}: {
+	samples: readonly CodeSample[];
+	preserveOrder?: boolean;
+}) {
+	const ordered = useMemo(
+		() => (preserveOrder ? [...samples] : orderSamples(samples)),
+		[preserveOrder, samples],
+	);
 	const firstSample = ordered[0];
-	const defaultId = ordered.some((sample) => sample.id === "node")
-		? "node"
-		: (firstSample?.id ?? "node");
+	const defaultId =
+		!preserveOrder && ordered.some((sample) => sample.id === "node")
+			? "node"
+			: (firstSample?.id ?? "node");
 	const [activeTab, setActiveTab] = useState(defaultId);
 
 	if (!firstSample || ordered.length === 0) return null;
@@ -129,4 +140,29 @@ export function CodeSamples({ samples }: { samples: readonly CodeSample[] }) {
 /** Multi-language send-email samples (same source as dashboard API details). */
 export function SendEmailCodeSamples() {
 	return <CodeSamples samples={sendEmailXCodeSamples} />;
+}
+
+const TEMP_EMAIL_CHECKER_META: Record<string, { lang: string; label: string }> =
+	{
+		curl: { lang: "bash", label: "cURL" },
+		node: { lang: "javascript", label: "JavaScript" },
+		python: { lang: "python", label: "Python" },
+	};
+
+const tempEmailCheckerSamples: CodeSample[] = apiSnippets.flatMap((snippet) => {
+	const meta = TEMP_EMAIL_CHECKER_META[snippet.id];
+	if (!meta) return [];
+	return [
+		{
+			id: snippet.id,
+			lang: meta.lang,
+			label: meta.label,
+			source: snippet.code,
+		},
+	];
+});
+
+/** Curl / JavaScript / Python samples for the public temp-email-checker endpoint. */
+export function TempEmailCheckerCodeSamples() {
+	return <CodeSamples samples={tempEmailCheckerSamples} preserveOrder />;
 }
