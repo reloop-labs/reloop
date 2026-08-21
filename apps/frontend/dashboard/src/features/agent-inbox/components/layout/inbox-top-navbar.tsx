@@ -68,7 +68,7 @@ export function InboxTopNavbar({ mailbox }: { mailbox: AgentMailbox }) {
 				{/* Logo column — same width as sidebar so search lines up with content */}
 				<div
 					className={cn(
-						"flex h-full shrink-0 items-center border-mail-border border-r bg-sidebar transition-[width] duration-200 ease-in-out",
+						"flex h-full shrink-0 items-center border-mail-border border-r bg-panel-light transition-[width] duration-200 ease-in-out dark:bg-panel-dark",
 						collapsed ? "w-14 justify-center px-0" : "w-60 px-3",
 					)}
 				>

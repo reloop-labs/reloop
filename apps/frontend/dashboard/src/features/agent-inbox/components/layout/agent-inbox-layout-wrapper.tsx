@@ -13,7 +13,7 @@ export const AgentInboxLayoutWrapper = ({
 	children: React.ReactNode;
 }) => {
 	return (
-		<div className="flex h-full min-h-0 w-full flex-col overflow-hidden bg-sidebar text-mail-foreground">
+		<div className="flex h-full min-h-0 w-full flex-col overflow-hidden bg-panel-light text-mail-foreground dark:bg-panel-dark">
 			<InboxTopNavbar mailbox={mailbox} />
 			<div className="flex min-h-0 min-w-0 flex-1 overflow-hidden">
 				<InboxSidebar mailbox={mailbox} folder={folder} />

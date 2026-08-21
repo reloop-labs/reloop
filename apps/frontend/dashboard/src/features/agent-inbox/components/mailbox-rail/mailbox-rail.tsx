@@ -112,7 +112,7 @@ export function MailboxRail({
 	return (
 		<nav
 			aria-label="Mailboxes"
-			className="flex h-full w-[52px] shrink-0 flex-col items-center overflow-hidden border-stroke-soft-200/60 border-r bg-sidebar pt-3.5 pb-3 dark:border-white/5"
+			className="flex h-full w-[52px] shrink-0 flex-col items-center overflow-hidden border-stroke-soft-200/60 border-r bg-panel-light pt-3.5 pb-3 dark:border-white/5 dark:bg-panel-dark"
 		>
 			<Link
 				href="/"
