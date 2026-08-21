@@ -21,6 +21,7 @@ import { useSWR } from "#/features/agent-inbox/lib/use-swr-compat";
 import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import type { Domain, DomainListResponse } from "#/features/domain/types";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
+import { getAvatarGradient, getAvatarInitial } from "#/utils/avatar";
 import type { AgentMailbox } from "../types";
 import { useAgentInbox } from "./agent-inbox-provider";
 
@@ -106,7 +107,18 @@ export const AddAgentAddressModal = ({
 		},
 	});
 
+	const labelValue = form.watch("label");
+	const localPartValue = form.watch("localPart");
 	const selectedDomainName = form.watch("domain");
+
+	const previewName = labelValue?.trim() || "Support";
+	const previewEmail = `${localPartValue?.trim() || "support"}@${selectedDomainName || "domain.com"}`;
+	const previewInitial = getAvatarInitial(
+		labelValue?.trim() || null,
+		previewEmail,
+	);
+	const previewGradient = getAvatarGradient(previewEmail || previewName);
+
 	const selectedDomain = useMemo(
 		() => verifiedDomains.find((d) => d.domain === selectedDomainName),
 		[verifiedDomains, selectedDomainName],
@@ -261,6 +273,31 @@ export const AddAgentAddressModal = ({
 							onSubmit={form.handleSubmit(onSubmit)}
 							className="mt-5 space-y-4"
 						>
+							{/* Live preview */}
+							<div className="flex items-center gap-3 rounded-xl border border-stroke-soft-100 bg-bg-weak-50/50 p-3 dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/20">
+								<div
+									className={cn(
+										"grid size-9 shrink-0 place-items-center rounded-full font-semibold text-[13px] text-white shadow-sm transition-all duration-200",
+										previewGradient,
+									)}
+								>
+									{previewInitial}
+								</div>
+								<div className="min-w-0 flex-1">
+									<div className="flex items-center gap-2">
+										<p className="truncate font-semibold text-[13px] text-text-strong-950">
+											{previewName}
+										</p>
+										<span className="shrink-0 rounded bg-bg-soft-200 px-1.5 py-0.25 font-medium text-[10px] text-text-sub-600 dark:bg-white/[0.08]">
+											Preview
+										</span>
+									</div>
+									<p className="truncate font-medium text-[12px] text-text-sub-600">
+										{previewEmail}
+									</p>
+								</div>
+							</div>
+
 							<div className="space-y-2">
 								<Label.Root htmlFor="agent-label">
 									Name
