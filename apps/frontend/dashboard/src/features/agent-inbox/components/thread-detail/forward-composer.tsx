@@ -569,7 +569,7 @@ export const ForwardComposer = forwardRef<HTMLDivElement, ForwardComposerProps>(
 							</button>
 							<FancyButton.Root
 								type="button"
-								variant="neutral"
+								variant="blue"
 								size="xsmall"
 								disabled={!canSend}
 								onClick={() => void handleSubmit(submit)()}

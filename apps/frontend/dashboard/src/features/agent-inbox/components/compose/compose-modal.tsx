@@ -31,27 +31,27 @@ import { plainToHtml } from "../../lib/plain-to-html";
 import { readAiTextStreamAfterThink } from "../../lib/read-ai-text-stream-after-think";
 import type { AgentMailbox } from "../../types";
 import { useAgentInbox } from "../agent-inbox-provider";
-import { useInboxSidebar } from "../sidebar/inbox-sidebar-context";
 import { EmailPillsInput, validateEmail } from "../shared/email-pills-input";
 import { LoadingDot } from "../shared/loading-dot";
+import { useInboxSidebar } from "../sidebar/inbox-sidebar-context";
 import { AiComposerSlot } from "./ai-composer-slot";
-import {
-	type AiComposeTone,
-	AiPromptPopover,
-	TONE_PROMPTS,
-} from "./ai-prompt-popover";
 import {
 	type AiDraftPhase,
 	isAiDraftActive,
 	isAiDraftBusy,
 } from "./ai-draft-phase";
+import {
+	type AiComposeTone,
+	AiPromptPopover,
+	TONE_PROMPTS,
+} from "./ai-prompt-popover";
 import { AiSparkleButton } from "./ai-sparkle-button";
 import {
 	ComposeBodyEditor,
 	type ComposeBodyEditorHandle,
 } from "./compose-body-editor";
-import { ScheduleSendPicker } from "./schedule-send-picker";
 import { showEmailSentToast } from "./email-sent-toast";
+import { ScheduleSendPicker } from "./schedule-send-picker";
 import { showUndoSendToast } from "./undo-send-toast";
 
 const actionKbdOnBlueClassName =
@@ -1160,39 +1160,39 @@ export const ComposeModal = ({
 										</ActionKbd>
 										<span>for formatting commands</span>
 									</p>
-								{aiActive ? (
-									<AiComposerSlot
-										loading={aiBusy}
-										hasStreamText={aiPhase === "streaming"}
-										onUndo={rejectAiDraft}
-									/>
-								) : (
-									<AiPromptPopover
-										open={aiPromptOpen}
-										onOpenChange={setAiPromptOpen}
-										hasContext={Boolean(subject.trim() || to.length > 0)}
-										onSubmit={({ prompt, tone }) => {
-											void generateBody({
-												promptOverride: prompt || undefined,
-												tone,
-											});
-										}}
-									>
-										<AiSparkleButton
-											onClick={() => {
-												if (textBody.trim()) {
-													void generateBody();
-												} else {
-													setAiPromptOpen((prev) => !prev);
-												}
-											}}
-											disabled={isSending}
-											variant="pill"
-											label="Write with AI"
-											title="Write email body with AI"
+									{aiActive ? (
+										<AiComposerSlot
+											loading={aiBusy}
+											hasStreamText={aiPhase === "streaming"}
+											onUndo={rejectAiDraft}
 										/>
-									</AiPromptPopover>
-								)}
+									) : (
+										<AiPromptPopover
+											open={aiPromptOpen}
+											onOpenChange={setAiPromptOpen}
+											hasContext={Boolean(subject.trim() || to.length > 0)}
+											onSubmit={({ prompt, tone }) => {
+												void generateBody({
+													promptOverride: prompt || undefined,
+													tone,
+												});
+											}}
+										>
+											<AiSparkleButton
+												onClick={() => {
+													if (textBody.trim()) {
+														void generateBody();
+													} else {
+														setAiPromptOpen((prev) => !prev);
+													}
+												}}
+												disabled={isSending}
+												variant="pill"
+												label="Write with AI"
+												title="Write email body with AI"
+											/>
+										</AiPromptPopover>
+									)}
 								</div>
 							</div>
 						</div>
@@ -1390,8 +1390,7 @@ export const ComposeModal = ({
 							</Button.Root>
 							<FancyButton.Root
 								type="submit"
-								variant="neutral"
-								size="xsmall"
+								variant="blue"
 								disabled={isSending || attachments.some((a) => a.isUploading)}
 								className="gap-1.5"
 							>
