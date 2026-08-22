@@ -621,7 +621,9 @@ export const ComposeModal = ({
 					seconds: undoSeconds,
 					to: data.to,
 					onViewSent: () => {
-						router.push(`/inbox/${mailbox.id}/sent`);
+						router.push(
+							`/inbox?mailboxId=${encodeURIComponent(mailbox.id)}&folder=sent`,
+						);
 					},
 					onUndo: async () => {
 						try {
@@ -649,7 +651,9 @@ export const ComposeModal = ({
 					scheduled: Boolean(scheduleAt),
 					to: data.to,
 					onViewSent: () => {
-						router.push(`/inbox/${mailbox.id}/sent`);
+						router.push(
+							`/inbox?mailboxId=${encodeURIComponent(mailbox.id)}&folder=sent`,
+						);
 					},
 				});
 			}
