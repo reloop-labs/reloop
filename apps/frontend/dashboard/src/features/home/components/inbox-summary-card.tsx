@@ -54,7 +54,7 @@ export function InboxSummaryCard({ enabled }: { enabled: boolean }) {
 						{mailboxes.slice(0, 5).map((mb) => (
 							<li key={mb.id}>
 								<Link
-									href={`/inbox/${mb.id}`}
+									href={`/inbox?mailboxId=${mb.id}`}
 									className="group flex items-center gap-2.5 border-stroke-soft-100 border-b py-3 last:border-b-0 dark:border-stroke-soft-100/40"
 								>
 									<span className="h-1.5 w-1.5 shrink-0 rounded-full bg-success-base" />

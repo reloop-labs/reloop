@@ -108,12 +108,7 @@ type FolderJump = {
 	label: string;
 	keywords: string;
 	icon: UiIconName;
-	to:
-		| "/inbox/$mailboxId"
-		| "/inbox/$mailboxId/agent"
-		| "/inbox/$mailboxId/sent"
-		| "/inbox/$mailboxId/drafts"
-		| "/inbox/$mailboxId/archive";
+	folder: string;
 	/** Optional filter applied after navigation */
 	filter?: InboxFilterChip;
 };
@@ -124,42 +119,42 @@ const FOLDER_JUMPS: FolderJump[] = [
 		label: "Inbox",
 		keywords: "inbox mail home",
 		icon: "inbox",
-		to: "/inbox/$mailboxId",
+		folder: "inbox",
 	},
 	{
 		id: "agent",
 		label: "Agent",
 		keywords: "agent ai",
 		icon: "agent",
-		to: "/inbox/$mailboxId/agent",
+		folder: "agent",
 	},
 	{
 		id: "sent",
 		label: "Sent",
 		keywords: "sent outbound",
 		icon: "sent",
-		to: "/inbox/$mailboxId/sent",
+		folder: "sent",
 	},
 	{
 		id: "drafts",
 		label: "Drafts",
 		keywords: "drafts compose",
 		icon: "draft",
-		to: "/inbox/$mailboxId/drafts",
+		folder: "drafts",
 	},
 	{
 		id: "archive",
 		label: "Archive",
 		keywords: "archive",
 		icon: "archive",
-		to: "/inbox/$mailboxId/archive",
+		folder: "archive",
 	},
 	{
 		id: "needs-approval",
 		label: "Needs approval",
 		keywords: "needs approval pending review",
 		icon: "alert-triangle",
-		to: "/inbox/$mailboxId",
+		folder: "inbox",
 		filter: "needs_approval",
 	},
 ];
@@ -305,9 +300,9 @@ export const InboxCommandPalette = ({
 
 	const goToFolder = useCallback(
 		(jump: FolderJump) => {
-			if (!mailboxId) return;
+			const targetMailbox = mailboxId || "";
 			router.push(
-				jump.to.replace(/\$mailboxId/g, encodeURIComponent(mailboxId)),
+				`/inbox?mailboxId=${encodeURIComponent(targetMailbox)}&folder=${encodeURIComponent(jump.folder)}`,
 			);
 			if (jump.filter) {
 				void setFilterParam(jump.filter);

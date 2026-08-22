@@ -12,21 +12,27 @@ export function useFolderMailbox(): {
 	mailbox: AgentMailbox | undefined;
 	mailboxReady: boolean;
 } {
-	const mailboxId = useMailboxId();
-	const { getMailbox, isLoadingMailboxes, mailboxesError } = useAgentInbox();
-	const resolved = mailboxId ? getMailbox(mailboxId) : undefined;
+	const routeMailboxId = useMailboxId();
+	const { mailboxes, getMailbox, isLoadingMailboxes, mailboxesError } =
+		useAgentInbox();
+	const activeMailboxId = routeMailboxId || mailboxes[0]?.id;
+	const resolved = activeMailboxId ? getMailbox(activeMailboxId) : undefined;
 
-	if (!mailboxId) {
+	if (!activeMailboxId) {
 		return { mailboxId: undefined, mailbox: undefined, mailboxReady: false };
 	}
 
 	if (!resolved && !isLoadingMailboxes && !mailboxesError) {
-		return { mailboxId, mailbox: undefined, mailboxReady: false };
+		return {
+			mailboxId: activeMailboxId,
+			mailbox: undefined,
+			mailboxReady: false,
+		};
 	}
 
 	return {
-		mailboxId,
-		mailbox: resolved ?? stubMailbox(mailboxId),
+		mailboxId: activeMailboxId,
+		mailbox: resolved ?? stubMailbox(activeMailboxId),
 		mailboxReady: !!resolved,
 	};
 }

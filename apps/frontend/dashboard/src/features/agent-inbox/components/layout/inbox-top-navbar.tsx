@@ -2,9 +2,7 @@
 
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import { Logo } from "@reloop/ui/logo";
 import { Search } from "lucide-react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { parseAsString, useQueryState } from "nuqs";
 import { useState } from "react";
@@ -65,40 +63,29 @@ export function InboxTopNavbar({ mailbox }: { mailbox: AgentMailbox }) {
 	return (
 		<>
 			<header className="flex h-11 shrink-0 items-center border-mail-border/60 border-b">
-				{/* Logo column — same width as sidebar so search lines up with content */}
+				{/* Sidebar header column — matches inbox folder sidebar width */}
 				<div
 					className={cn(
 						"flex h-full shrink-0 items-center border-mail-border border-r bg-panel-light transition-[width] duration-200 ease-in-out dark:bg-panel-dark",
-						collapsed ? "w-14 justify-center px-0" : "w-60 px-3",
+						collapsed ? "w-14 justify-center px-0" : "w-60 gap-2 px-3",
 					)}
 				>
-					<Link
-						href="/"
-						className={cn(
-							"flex min-w-0 items-center transition-opacity hover:opacity-90",
-							collapsed ? "justify-center" : "gap-2 pl-1",
-						)}
-						title="Back to dashboard"
-					>
-						{collapsed ? (
-							<Logo className="h-8 w-8 shrink-0" />
-						) : (
-							<div className="flex min-w-0 items-center gap-2">
-								<Logo className="-ml-1 w-10 shrink-0" />
-								<p className="-ml-2 font-semibold text-mail-foreground">
-									Reloop
-								</p>
-								<span className="inline-flex items-center rounded-full bg-[var(--inbox-control)] px-2 py-0.5 font-bold text-[8px] text-mail-muted uppercase tracking-wide dark:bg-white/[0.06]">
-									Beta
-								</span>
-							</div>
-						)}
-					</Link>
+					<InboxSidebarToggle onClick={toggleSidebar} collapsed={collapsed} />
+					{!collapsed && (
+						<div className="flex min-w-0 flex-1 items-center gap-1.5 overflow-hidden">
+							<Icon
+								name="inbox"
+								className="h-4 w-4 shrink-0 text-text-sub-600"
+							/>
+							<span className="truncate font-semibold text-[13px] text-mail-foreground">
+								{mailbox.label || "Inbox"}
+							</span>
+						</div>
+					)}
 				</div>
 
-				{/* Content column: compact search + actions, padded like the dashboard header */}
+				{/* Content column: compact search + actions */}
 				<div className="flex h-full min-w-0 flex-1 items-center gap-2 bg-panel-light px-3 dark:bg-panel-dark">
-					<InboxSidebarToggle onClick={toggleSidebar} collapsed={collapsed} />
 					<button
 						type="button"
 						onClick={openSearch}
@@ -199,7 +186,7 @@ export function InboxTopNavbar({ mailbox }: { mailbox: AgentMailbox }) {
 				onClose={() => setIsAddMailboxOpen(false)}
 				onCreated={(created) => {
 					toast.success("Mailbox added");
-					router.push(`/inbox/${created.id}`);
+					router.push(`/inbox?mailboxId=${encodeURIComponent(created.id)}`);
 				}}
 			/>
 		</>

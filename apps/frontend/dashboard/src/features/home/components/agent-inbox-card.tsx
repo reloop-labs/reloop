@@ -73,7 +73,7 @@ const MailboxActionsDropdown = ({
 	const handleClick = (itemId: string, e: React.MouseEvent) => {
 		e.stopPropagation();
 		handleOpenChange(false);
-		if (itemId === "view") router.push(`/inbox/${mailbox.id}`);
+		if (itemId === "view") router.push(`/inbox?mailboxId=${mailbox.id}`);
 		else if (itemId === "copy-email") {
 			navigator.clipboard.writeText(mailbox.email);
 			toast.success("Email address copied");
@@ -182,7 +182,7 @@ export function AgentInboxCard() {
 							>
 								{/* Left: status dot + label (only this navigates) */}
 								<Link
-									href={`/inbox/${mb.id}`}
+									href={`/inbox?mailboxId=${mb.id}`}
 									className="flex min-w-0 flex-1 items-center gap-2 no-underline"
 								>
 									<span

@@ -29,13 +29,13 @@ async function resendEmail({
 		},
 	});
 
-	const payload = (await res
-		.json()
-		.catch(() => ({}))) as ResendEmailResult;
+	const payload = (await res.json().catch(() => ({}))) as ResendEmailResult;
 
 	if (!res.ok) {
 		const err = new Error(
-			payload.message || payload.why || `Failed to resend email (${res.status})`,
+			payload.message ||
+				payload.why ||
+				`Failed to resend email (${res.status})`,
 		) as Error & { why?: string; fix?: string };
 		err.why = payload.why;
 		err.fix = payload.fix;

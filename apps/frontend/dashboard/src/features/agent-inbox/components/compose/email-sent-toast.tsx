@@ -49,14 +49,11 @@ export function EmailSentToast({
 		? `Sent to ${to[0]}${to.length > 1 ? ` +${to.length - 1} more` : ""}`
 		: "Available in Sent folder";
 
-	const currentTitle =
-		title || (scheduled ? "Email scheduled" : "Email sent");
+	const currentTitle = title || (scheduled ? "Email scheduled" : "Email sent");
 
 	const currentSubtitle =
 		description ||
-		(scheduled
-			? "Scheduled for delivery. Available in Sent."
-			: recipientText);
+		(scheduled ? "Scheduled for delivery. Available in Sent." : recipientText);
 
 	const handleAction = async () => {
 		if (isCountingDown) {

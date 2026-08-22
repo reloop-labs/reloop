@@ -1,12 +1,12 @@
-import { beforeEach, describe, expect, mock, test } from "bun:test";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 describe("useResendEmail API contract", () => {
 	beforeEach(() => {
-		mock.restore();
+		vi.restoreAllMocks();
 	});
 
 	test("calls POST /api/mail/v1/resend/:id with credentials", async () => {
-		const fetchMock = mock((url: string, init?: RequestInit) => {
+		const fetchMock = vi.fn((url: string, init?: RequestInit) => {
 			expect(url).toBe("/api/mail/v1/resend/em_test123");
 			expect(init?.method).toBe("POST");
 			expect(init?.credentials).toBe("include");
@@ -39,7 +39,7 @@ describe("useResendEmail API contract", () => {
 	});
 
 	test("extracts why and fix on error response", async () => {
-		const fetchMock = mock((_url: string, _init?: RequestInit) => {
+		const fetchMock = vi.fn((_url: string, _init?: RequestInit) => {
 			return Promise.resolve(
 				new Response(
 					JSON.stringify({

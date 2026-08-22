@@ -525,7 +525,9 @@ function EmailActionsMenuItems({
 							if (el) buttonRefs.current[idx] = el;
 						}}
 						type="button"
-						disabled={item.id === "resend" && (isResending || isResendCompleted)}
+						disabled={
+							item.id === "resend" && (isResending || isResendCompleted)
+						}
 						onPointerEnter={() => setHoverIdx(idx)}
 						onPointerLeave={() => setHoverIdx(undefined)}
 						onClick={() => handleItemClick(item.id)}

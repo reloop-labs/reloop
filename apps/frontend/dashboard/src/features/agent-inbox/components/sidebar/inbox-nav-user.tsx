@@ -217,7 +217,9 @@ export const InboxNavUser = ({
 											onPointerEnter={() => setHoverIdx(idx)}
 											onClick={() => {
 												setSwitcherOpen(false);
-												router.push(`/inbox/${m.id}`);
+												router.push(
+													`/inbox?mailboxId=${encodeURIComponent(m.id)}`,
+												);
 											}}
 											className={cn(
 												"relative z-10 flex w-full cursor-pointer items-center gap-3 rounded-lg px-2.5 py-2.5 text-left",

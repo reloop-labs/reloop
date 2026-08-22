@@ -222,7 +222,7 @@ export const AddAgentAddressModal = ({
 			setIsLocalPartManuallyEdited(false);
 			onClose();
 			onCreated?.(mailbox);
-			router.push(`/inbox/${mailbox.id}`);
+			router.push(`/inbox?mailboxId=${encodeURIComponent(mailbox.id)}`);
 		} catch (error) {
 			const errMsg =
 				error instanceof Error ? error.message : "Failed to create address";

@@ -24,7 +24,10 @@ export default function AgentInboxSectionLayout({
 
 	return (
 		<div
-			className={cn("inbox-zero-theme fixed inset-0 z-40", isDark && "dark")}
+			className={cn(
+				"inbox-zero-theme flex h-full min-h-0 w-full flex-1 flex-col overflow-hidden",
+				isDark && "dark",
+			)}
 		>
 			<AgentInboxProvider>
 				<JotaiProvider>

@@ -25,13 +25,10 @@ describe("App Router provider lifetimes", () => {
 		expect(dashboardLayout).not.toContain("ActiveOrganizationProvider");
 	});
 
-	it("keeps special full-screen command-menu ownership separate for agent mailbox", () => {
-		const inboxLayout = read(
-			"./(protected)/(fullscreen)/inbox/layout-client.tsx",
-		);
+	it("mounts AgentInboxSectionLayout in dashboard inbox client", () => {
+		const inboxClient = read("./(protected)/(dashboard)/inbox/client.tsx");
 
-		expect(inboxLayout).not.toContain("CommandMenuGlobal");
-		expect(inboxLayout).toContain("<AgentInboxSectionLayout>");
+		expect(inboxClient).toContain("<AgentInboxSectionLayout>");
 	});
 
 	it("installs the Next App Router Nuqs adapter once at the root", () => {

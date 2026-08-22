@@ -209,8 +209,13 @@ export function NeedsApprovalFolderPage() {
 	);
 }
 
-export function LabelFolderPage() {
-	const { labelId } = useParams() as { labelId?: string };
+export function LabelFolderPage({
+	labelId: propLabelId,
+}: {
+	labelId?: string;
+} = {}) {
+	const params = useParams() as { labelId?: string };
+	const labelId = propLabelId ?? params.labelId;
 	const { mailbox, mailboxId } = useFolderMailbox();
 	const { threads } = useAgentInbox();
 	const { threadIds } = useLabelThreadIds(labelId ?? "");
@@ -272,14 +277,17 @@ export function DraftsFolderPage() {
 		const compose = draftComposeParam(d.kind);
 		if (compose && d.threadId) {
 			const qs = new URLSearchParams({
+				mailboxId,
 				threadId: d.threadId,
 				draftId: d.id,
 				compose,
 			});
-			router.push(`/inbox/${mailboxId}?${qs}`);
+			router.push(`/inbox?${qs.toString()}`);
 			return;
 		}
-		router.push(`/inbox/${mailboxId}?draftId=${encodeURIComponent(d.id)}`);
+		router.push(
+			`/inbox?mailboxId=${encodeURIComponent(mailboxId)}&draftId=${encodeURIComponent(d.id)}`,
+		);
 		openCompose();
 	};
 

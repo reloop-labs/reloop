@@ -66,5 +66,3 @@ export const CopyableDnsValue = React.forwardRef<
 		</button>
 	);
 });
-
-

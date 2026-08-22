@@ -106,7 +106,7 @@ function AgentMailboxActionsDropdown({
 		} else if (itemId === "delete") {
 			onDelete(mailbox.id);
 		} else if (itemId === "view") {
-			router.push(`/inbox/${mailbox.id}`);
+			router.push(`/inbox?mailboxId=${encodeURIComponent(mailbox.id)}`);
 		} else if (itemId === "copy") {
 			void navigator.clipboard.writeText(mailbox.email);
 			toast.success("Email copied to clipboard");
@@ -350,7 +350,7 @@ export const AgentMailboxList = () => {
 	};
 
 	const goToMailbox = (id: string) => {
-		router.push(`/inbox/${id}`);
+		router.push(`/inbox?mailboxId=${encodeURIComponent(id)}`);
 	};
 
 	const clearFilters = () => {

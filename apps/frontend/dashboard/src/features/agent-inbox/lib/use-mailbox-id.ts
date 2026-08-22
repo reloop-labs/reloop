@@ -1,6 +1,7 @@
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 
 export function useMailboxId(): string {
 	const params = useParams() as { mailboxId?: string };
-	return params.mailboxId ?? "";
+	const searchParams = useSearchParams();
+	return params.mailboxId ?? searchParams?.get("mailboxId") ?? "";
 }

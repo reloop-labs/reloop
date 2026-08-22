@@ -255,48 +255,48 @@ export const InboxSidebar = ({
 		{
 			id: "starred",
 			label: "Starred",
-			href: `/inbox/${mailboxId}/starred`,
+			href: `/inbox?mailboxId=${mailboxId}&folder=starred`,
 			icon: (props) => <Star {...props} />,
 			showCount: true,
 		},
 		{
 			id: "drafts",
 			label: "Drafts",
-			href: `/inbox/${mailboxId}/drafts`,
+			href: `/inbox?mailboxId=${mailboxId}&folder=drafts`,
 			icon: DraftIcon,
 			showCount: true,
 		},
 		{
 			id: "sent",
 			label: "Sent",
-			href: `/inbox/${mailboxId}/sent`,
+			href: `/inbox?mailboxId=${mailboxId}&folder=sent`,
 			icon: SentIcon,
 		},
 		{
 			id: "agent",
 			label: "Agent",
-			href: `/inbox/${mailboxId}/agent`,
+			href: `/inbox?mailboxId=${mailboxId}&folder=agent`,
 			icon: AgentIcon,
 			showCount: true,
 		},
 		{
 			id: "archive",
 			label: "Archive",
-			href: `/inbox/${mailboxId}/archive`,
+			href: `/inbox?mailboxId=${mailboxId}&folder=archive`,
 			icon: ArchiveIcon,
 			showCount: true,
 		},
 		{
 			id: "spam",
 			label: "Spam",
-			href: `/inbox/${mailboxId}/spam`,
+			href: `/inbox?mailboxId=${mailboxId}&folder=spam`,
 			icon: AlertIcon,
 			showCount: true,
 		},
 		{
 			id: "trash",
 			label: "Trash",
-			href: `/inbox/${mailboxId}/trash`,
+			href: `/inbox?mailboxId=${mailboxId}&folder=trash`,
 			icon: TrashIcon,
 		},
 	];
@@ -375,9 +375,7 @@ export const InboxSidebar = ({
 						title="Compose (C)"
 						aria-keyshortcuts="c"
 						className={
-							collapsed
-								? "h-10 w-10 px-0"
-								: "w-full justify-between gap-2 px-3"
+							collapsed ? "h-10 w-10 px-0" : "w-full justify-between gap-2 px-3"
 						}
 					>
 						<div className="flex items-center gap-2">
@@ -404,7 +402,7 @@ export const InboxSidebar = ({
 							item={{
 								id: "inbox",
 								label: "Inbox",
-								href: `/inbox/${mailboxId}`,
+								href: `/inbox?mailboxId=${mailboxId}&folder=inbox`,
 								icon: (props) => <Icon name="inbox" {...props} />,
 								showCount: true,
 							}}
@@ -478,7 +476,7 @@ export const InboxSidebar = ({
 									const swatch = resolveLabelColor(label.color);
 									return (
 										<Link
-											href={`/inbox/${mailboxId}/label/${label.id}`}
+											href={`/inbox?mailboxId=${mailboxId}&folder=label:${label.id}`}
 											key={label.id}
 											ref={(el) => {
 												if (el) navRefs.current[labelKey] = el;

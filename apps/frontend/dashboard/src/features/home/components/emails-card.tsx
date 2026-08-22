@@ -302,7 +302,7 @@ export function EmailsCard() {
 						<div>
 							{messagesData.slice(0, 6).map((d) => (
 								<Link
-									href={`/inbox/${d.mailboxId}`}
+									href={`/inbox?mailboxId=${d.mailboxId}`}
 									className="group/row flex items-center justify-between border-stroke-soft-100 border-b py-2.5 transition-colors last:border-b-0 hover:bg-bg-weak-50/50 dark:border-white/5 dark:hover:bg-white/[0.01]"
 									key={d.id}
 								>
