@@ -772,13 +772,7 @@ export const AgentInboxContent = ({
 					{isThreadOpen ? detailPane : listPane}
 				</div>
 
-				{isDesktop && aiOpen && (
-					<AiSidebar
-						open={aiOpen}
-						onClose={() => setAiOpen(false)}
-						thread={selectedThread}
-					/>
-				)}
+				<AiSidebar open={true} thread={selectedThread} />
 			</div>
 		</>
 	);

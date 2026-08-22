@@ -1,12 +1,9 @@
-import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
-import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
-import { Check, Copy, Pencil, Plus, Star } from "lucide-react";
-import Link from "next/link";
+import { Pencil, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import { useAgentInbox } from "#/features/agent-inbox/components/agent-inbox-provider";
@@ -19,108 +16,21 @@ import { useInboxLabels } from "#/features/agent-inbox/hooks/use-inbox-labels";
 import { resolveLabelColor } from "#/features/agent-inbox/lib/label-colors";
 import type { AgentMailbox } from "#/features/agent-inbox/types";
 import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import { SidebarNavIcon } from "#/features/dashboard/sidebar/sidebar-nav-icon";
+import { SidebarNavLink } from "#/features/dashboard/sidebar/sidebar-nav-link";
+import { useSidebarHoverBox } from "#/features/dashboard/sidebar/use-sidebar-hover-box";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 
 /** Light keycap for blue FancyButton fill */
 const actionKbdOnBlueClassName =
 	"border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]";
 
-const DraftIcon = (props: Omit<React.ComponentProps<typeof Icon>, "name">) => (
-	<Icon name="draft" {...props} />
-);
-
-const SentIcon = (props: Omit<React.ComponentProps<typeof Icon>, "name">) => (
-	<Icon name="sent" {...props} />
-);
-
-const ArchiveIcon = (
-	props: Omit<React.ComponentProps<typeof Icon>, "name">,
-) => <Icon name="archive" {...props} />;
-
-const AlertIcon = (props: Omit<React.ComponentProps<typeof Icon>, "name">) => (
-	<Icon name="alert" {...props} />
-);
-
-const AgentIcon = (props: Omit<React.ComponentProps<typeof Icon>, "name">) => (
-	<Icon name="agent" {...props} />
-);
-
-const TrashIcon = (props: Omit<React.ComponentProps<typeof Icon>, "name">) => (
-	<Icon name="trash" {...props} />
-);
-
 type NavItem = {
 	id: string;
 	label: string;
 	href: string;
-	icon: React.ComponentType<{ className?: string }>;
+	iconName: string;
 	showCount?: boolean;
-};
-
-const NavLink = ({
-	item,
-	active,
-	count,
-	countLoading = false,
-	collapsed,
-	refCallback,
-	onPointerEnter,
-}: {
-	item: NavItem;
-	active: boolean;
-	count?: number;
-	countLoading?: boolean;
-	collapsed: boolean;
-	refCallback?: (el: HTMLAnchorElement | null) => void;
-	onPointerEnter?: () => void;
-}) => {
-	const className = cn(
-		"group relative z-10 flex h-8 items-center rounded-lg font-medium text-[13px] leading-5",
-		active
-			? "bg-[var(--inbox-selected)] text-mail-foreground"
-			: "text-[var(--inbox-sidebar-text-inactive)] hover:text-mail-foreground",
-		collapsed ? "w-8 justify-center px-0" : "w-full gap-2.5 px-2.5",
-	);
-
-	const content = (
-		<>
-			<item.icon
-				className={cn(
-					"h-4 w-4 shrink-0",
-					active
-						? "text-mail-foreground"
-						: "text-[var(--inbox-sidebar-icon)] group-hover:text-mail-foreground",
-				)}
-			/>
-			{!collapsed && (
-				<>
-					<span className="min-w-0 flex-1 truncate text-left">
-						{item.label}
-					</span>
-					{item.showCount &&
-						(countLoading ? (
-							<Skeleton className="h-3 w-5 shrink-0 rounded-sm bg-[var(--inbox-skeleton)]" />
-						) : count !== undefined && count > 0 ? (
-							<span className="ml-auto shrink-0 font-medium text-[12px] text-[var(--inbox-sidebar-text-inactive)] tabular-nums">
-								{count.toLocaleString()}
-							</span>
-						) : null)}
-				</>
-			)}
-		</>
-	);
-
-	return (
-		<Link
-			href={item.href}
-			ref={refCallback}
-			onPointerEnter={onPointerEnter}
-			className={className}
-			title={collapsed ? item.label : undefined}
-		>
-			{content}
-		</Link>
-	);
 };
 
 const SectionHeader = ({
@@ -133,12 +43,14 @@ const SectionHeader = ({
 	isFirst?: boolean;
 }) => {
 	if (collapsed) {
-		return <div className="mx-2 mt-1 mb-2 h-px bg-[var(--inbox-muted-bg)]" />;
+		return (
+			<div className="my-2 h-[1px] w-6 self-center bg-stroke-soft-200 dark:bg-white/10" />
+		);
 	}
 	return (
 		<div
 			className={cn(
-				"px-2.5 pt-4 pb-1.5 font-semibold text-[10px] text-mail-muted uppercase tracking-[0.06em]",
+				"px-2.5 pt-4 pb-1.5 font-semibold text-[10px] text-text-soft-400 uppercase tracking-[0.06em]",
 				isFirst && "pt-2",
 			)}
 		>
@@ -171,49 +83,22 @@ export const InboxSidebar = ({
 
 	const [isComposeOpen, setIsComposeOpen] = useState(false);
 	const [isLabelDialogOpen, setIsLabelDialogOpen] = useState(false);
-	const [emailCopied, setEmailCopied] = useState(false);
-
-	const handleCopyEmail = async (e?: React.MouseEvent) => {
-		e?.stopPropagation();
-		if (!mailbox.email) return;
-		try {
-			await navigator.clipboard.writeText(mailbox.email);
-			setEmailCopied(true);
-			toast.success("Email address copied");
-			setTimeout(() => setEmailCopied(false), 2000);
-		} catch {
-			toast.error("Failed to copy email");
-		}
-	};
 
 	const [hoveredEl, setHoveredEl] = useState<HTMLAnchorElement | undefined>(
 		undefined,
 	);
-	const [rect, setRect] = useState<DOMRect | undefined>(undefined);
+	const [containerEl, setContainerEl] = useState<HTMLDivElement | null>(null);
 	const navRefs = useRef<Record<string, HTMLAnchorElement>>({});
 
-	const activeEl = navRefs.current[folder];
+	const activeLabelId = folder.startsWith("label:") ? folder.slice(6) : null;
+	const activeFolderKey = activeLabelId ? `label:${activeLabelId}` : folder;
+	const activeEl = navRefs.current[activeFolderKey];
 	const currentEl = hoveredEl ?? activeEl;
-
-	useLayoutEffect(() => {
-		if (!currentEl) {
-			setRect(undefined);
-			return;
-		}
-		const next = currentEl.getBoundingClientRect();
-		setRect((prev) => {
-			if (
-				prev &&
-				prev.top === next.top &&
-				prev.left === next.left &&
-				prev.width === next.width &&
-				prev.height === next.height
-			) {
-				return prev;
-			}
-			return next;
-		});
-	}, [currentEl]);
+	const hoverBox = useSidebarHoverBox(
+		currentEl,
+		containerEl,
+		`${collapsed}:${activeFolderKey}`,
+	);
 
 	useEffect(() => {
 		registerOpenCompose(() => setIsComposeOpen(true));
@@ -243,7 +128,6 @@ export const InboxSidebar = ({
 	});
 
 	useHotkeys("meta+k, ctrl+k", (e) => {
-		// Search is handled by command palette elsewhere; this is a soft affordance.
 		e.preventDefault();
 		window.dispatchEvent(new CustomEvent("inbox:open-search"));
 	});
@@ -252,55 +136,58 @@ export const InboxSidebar = ({
 
 	const mailItems: NavItem[] = [
 		{
+			id: "inbox",
+			label: "Inbox",
+			href: `/inbox?mailboxId=${mailboxId}&folder=inbox`,
+			iconName: "inbox",
+			showCount: true,
+		},
+		{
 			id: "starred",
 			label: "Starred",
 			href: `/inbox?mailboxId=${mailboxId}&folder=starred`,
-			icon: (props) => <Star {...props} />,
+			iconName: "star",
 			showCount: true,
 		},
 		{
 			id: "drafts",
 			label: "Drafts",
 			href: `/inbox?mailboxId=${mailboxId}&folder=drafts`,
-			icon: DraftIcon,
+			iconName: "draft",
 			showCount: true,
 		},
 		{
 			id: "sent",
 			label: "Sent",
 			href: `/inbox?mailboxId=${mailboxId}&folder=sent`,
-			icon: SentIcon,
+			iconName: "mail-send",
 		},
 		{
 			id: "agent",
 			label: "Agent",
 			href: `/inbox?mailboxId=${mailboxId}&folder=agent`,
-			icon: AgentIcon,
+			iconName: "agent",
 			showCount: true,
 		},
 		{
 			id: "archive",
 			label: "Archive",
 			href: `/inbox?mailboxId=${mailboxId}&folder=archive`,
-			icon: ArchiveIcon,
-			showCount: true,
+			iconName: "archive",
 		},
 		{
 			id: "spam",
 			label: "Spam",
 			href: `/inbox?mailboxId=${mailboxId}&folder=spam`,
-			icon: AlertIcon,
-			showCount: true,
+			iconName: "alert",
 		},
 		{
 			id: "trash",
 			label: "Trash",
 			href: `/inbox?mailboxId=${mailboxId}&folder=trash`,
-			icon: TrashIcon,
+			iconName: "trash",
 		},
 	];
-
-	const activeLabelId = folder.startsWith("label:") ? folder.slice(6) : null;
 
 	return (
 		<>
@@ -310,56 +197,11 @@ export const InboxSidebar = ({
 					collapsed ? "w-14 items-center" : "w-60",
 				)}
 			>
-				{/* Top header row — aligns with middle pane h-11 toolbar */}
+				{/* Compose button */}
 				<div
 					className={cn(
 						"flex h-11 shrink-0 items-center border-stroke-soft-100 border-b dark:border-white/10",
 						collapsed ? "w-full justify-center px-2" : "w-full px-2.5",
-					)}
-				>
-					{!collapsed ? (
-						<div
-							onClick={handleCopyEmail}
-							className="relative flex h-7 w-full cursor-pointer items-center justify-between gap-1.5 rounded-lg border border-stroke-soft-200 bg-bg-weak-50 px-2 dark:border-white/15 dark:bg-white/[0.06]"
-							title="Click to copy email address"
-						>
-							<span className="min-w-0 flex-1 truncate font-medium text-[12px] text-text-strong-950/80 leading-none">
-								{mailbox.email || "Mailbox"}
-							</span>
-							<button
-								type="button"
-								onClick={handleCopyEmail}
-								aria-label="Copy email"
-								className="flex size-4 shrink-0 items-center justify-center rounded text-mail-muted transition-colors hover:text-mail-foreground"
-							>
-								{emailCopied ? (
-									<Check className="h-3 w-3 text-emerald-500" />
-								) : (
-									<Copy className="h-3 w-3 opacity-70" />
-								)}
-							</button>
-						</div>
-					) : (
-						<button
-							type="button"
-							onClick={handleCopyEmail}
-							title={`Copy ${mailbox.email || "mailbox email"}`}
-							className="flex size-7 items-center justify-center rounded-lg border border-mail-border/60 bg-[var(--inbox-control)] text-mail-muted"
-						>
-							{emailCopied ? (
-								<Check className="h-3.5 w-3.5 text-emerald-500" />
-							) : (
-								<Copy className="h-3.5 w-3.5" />
-							)}
-						</button>
-					)}
-				</div>
-
-				{/* Compose — aligns with category tabs */}
-				<div
-					className={cn(
-						"flex h-[54px] shrink-0 items-center border-mail-border/50 border-b",
-						collapsed ? "w-full justify-center px-2" : "w-full px-2",
 					)}
 				>
 					<FancyButton.Root
@@ -374,12 +216,14 @@ export const InboxSidebar = ({
 						title="Compose (C)"
 						aria-keyshortcuts="c"
 						className={
-							collapsed ? "h-10 w-10 px-0" : "w-full justify-between gap-2 px-3"
+							collapsed
+								? "h-8 w-8 px-0"
+								: "h-8 w-full justify-between gap-2 px-2.5"
 						}
 					>
 						<div className="flex items-center gap-2">
-							<Pencil className="h-4 w-4 shrink-0" strokeWidth={1.75} />
-							{!collapsed && <span>Compose</span>}
+							<Pencil className="h-3.5 w-3.5 shrink-0" strokeWidth={1.75} />
+							{!collapsed && <span className="text-xs">Compose</span>}
 						</div>
 						{!collapsed && (
 							<ActionKbd className={actionKbdOnBlueClassName}>C</ActionKbd>
@@ -388,51 +232,87 @@ export const InboxSidebar = ({
 				</div>
 
 				<div
+					ref={setContainerEl}
 					onPointerLeave={() => setHoveredEl(undefined)}
 					className={cn(
 						"relative min-h-0 w-full flex-1 overflow-y-auto overflow-x-hidden",
 						collapsed ? "px-0 py-2" : "px-2 py-2",
 					)}
 				>
-					{/* Mail folders — no section header */}
+					{/* Mail folders */}
 					<div className={cn("flex flex-col", collapsed && "items-center")}>
-						{/* All (inbox) with inbox icon */}
-						<NavLink
-							item={{
-								id: "inbox",
-								label: "Inbox",
-								href: `/inbox?mailboxId=${mailboxId}&folder=inbox`,
-								icon: (props) => <Icon name="inbox" {...props} />,
-								showCount: true,
-							}}
-							active={folder === "inbox"}
-							count={stats.inbox}
-							countLoading={countsLoading}
-							collapsed={collapsed}
-							refCallback={(el) => {
-								if (el) navRefs.current.inbox = el;
-							}}
-							onPointerEnter={() => setHoveredEl(navRefs.current.inbox)}
-						/>
-						{mailItems.map((item) => (
-							<NavLink
-								key={item.id}
-								item={item}
-								active={folder === item.id}
-								count={
-									stats[item.id as keyof typeof stats] as number | undefined
-								}
-								countLoading={countsLoading}
-								collapsed={collapsed}
-								refCallback={(el) => {
-									if (el) navRefs.current[item.id] = el;
-								}}
-								onPointerEnter={() => setHoveredEl(navRefs.current[item.id])}
-							/>
-						))}
+						{mailItems.map((item) => {
+							const isActive = folder === item.id;
+							const count =
+								item.id === "inbox"
+									? stats.inbox
+									: (stats[item.id as keyof typeof stats] as
+											| number
+											| undefined);
+
+							return (
+								<SidebarNavLink
+									key={item.id}
+									href={item.href}
+									ref={(el) => {
+										if (el) navRefs.current[item.id] = el;
+									}}
+									onPointerEnter={() => setHoveredEl(navRefs.current[item.id])}
+									className={cn(
+										"relative z-10 flex h-8 items-center rounded-lg transition-all",
+										collapsed
+											? "h-8 w-8 justify-center px-0"
+											: "w-full gap-2.5 px-2.5 justify-start",
+									)}
+									title={collapsed ? item.label : undefined}
+								>
+									<span
+										className={cn(
+											"flex min-w-0 items-center",
+											collapsed
+												? "justify-center"
+												: "flex-1 justify-between gap-2.5",
+										)}
+									>
+										<span
+											className={cn(
+												"flex min-w-0 items-center",
+												!collapsed && "gap-2.5",
+											)}
+										>
+											<SidebarNavIcon
+												name={item.iconName}
+												isActive={isActive}
+											/>
+											{!collapsed && (
+												<span
+													className={cn(
+														"truncate font-medium text-[13px] transition-colors",
+														isActive
+															? "text-text-strong-950"
+															: "text-text-sub-600 group-hover:text-text-strong-950",
+													)}
+												>
+													{item.label}
+												</span>
+											)}
+										</span>
+										{!collapsed &&
+											item.showCount &&
+											(countsLoading ? (
+												<Skeleton className="h-3 w-5 shrink-0 rounded-sm bg-neutral-alpha-10" />
+											) : count !== undefined && count > 0 ? (
+												<span className="ml-auto shrink-0 font-medium text-[12px] text-text-sub-600 tabular-nums">
+													{count.toLocaleString()}
+												</span>
+											) : null)}
+									</span>
+								</SidebarNavLink>
+							);
+						})}
 					</div>
 
-					{/* Labels below Mail */}
+					{/* Labels */}
 					<SectionHeader title="Labels" collapsed={collapsed} />
 					<div className={cn("flex flex-col", collapsed && "items-center")}>
 						{!collapsed &&
@@ -450,8 +330,8 @@ export const InboxSidebar = ({
 											key={id}
 											className="flex h-8 items-center gap-2.5 px-2"
 										>
-											<Skeleton className="size-2.5 shrink-0 rounded-full bg-[var(--inbox-skeleton)]" />
-											<Skeleton className="h-3 flex-1 rounded-sm bg-[var(--inbox-skeleton)]" />
+											<Skeleton className="size-2.5 shrink-0 rounded-full bg-neutral-alpha-10" />
+											<Skeleton className="h-3 flex-1 rounded-sm bg-neutral-alpha-10" />
 										</div>
 									))}
 								</div>
@@ -459,22 +339,22 @@ export const InboxSidebar = ({
 								<button
 									type="button"
 									onClick={() => setIsLabelDialogOpen(true)}
-									className="flex flex-col items-start gap-0.5 rounded-lg px-2 py-2 text-left hover:bg-[var(--inbox-row-hover)]"
+									className="flex flex-col items-start gap-0.5 rounded-lg px-2.5 py-2 text-left hover:bg-neutral-alpha-10"
 								>
-									<span className="font-medium text-[12px] text-mail-muted">
+									<span className="font-medium text-[12px] text-text-sub-600">
 										No labels yet
 									</span>
-									<span className="text-[11px] text-mail-muted opacity-70">
+									<span className="text-[11px] text-text-soft-400">
 										Create one to organize mail
 									</span>
 								</button>
 							) : (
 								labels.map((label) => {
 									const labelKey = `label:${label.id}`;
-									const active = activeLabelId === label.id;
+									const isActive = activeLabelId === label.id;
 									const swatch = resolveLabelColor(label.color);
 									return (
-										<Link
+										<SidebarNavLink
 											href={`/inbox?mailboxId=${mailboxId}&folder=label:${label.id}`}
 											key={label.id}
 											ref={(el) => {
@@ -484,21 +364,37 @@ export const InboxSidebar = ({
 												setHoveredEl(navRefs.current[labelKey])
 											}
 											className={cn(
-												"relative z-10 flex h-8 items-center justify-between rounded-lg px-2.5 font-medium text-[13px] leading-5",
-												active
-													? "bg-[var(--inbox-selected)] text-mail-foreground"
-													: "text-[var(--inbox-sidebar-text-inactive)] hover:text-mail-foreground",
+												"relative z-10 flex h-8 items-center rounded-lg transition-all",
+												collapsed
+													? "h-8 w-8 justify-center px-0"
+													: "w-full gap-2.5 px-2.5 justify-start",
 											)}
 										>
-											<span className="flex min-w-0 items-center gap-2">
+											<span
+												className={cn(
+													"flex min-w-0 items-center",
+													collapsed ? "justify-center" : "gap-2.5",
+												)}
+											>
 												<span
 													className="size-2 shrink-0 rounded-full ring-1 ring-black/5 dark:ring-white/10"
 													style={{ backgroundColor: swatch }}
 													aria-hidden
 												/>
-												<span className="truncate">{label.name}</span>
+												{!collapsed && (
+													<span
+														className={cn(
+															"truncate font-medium text-[13px] transition-colors",
+															isActive
+																? "text-text-strong-950"
+																: "text-text-sub-600 group-hover:text-text-strong-950",
+														)}
+													>
+														{label.name}
+													</span>
+												)}
 											</span>
-										</Link>
+										</SidebarNavLink>
 									);
 								})
 							))}
@@ -508,7 +404,7 @@ export const InboxSidebar = ({
 								type="button"
 								onClick={() => setIsLabelDialogOpen(true)}
 								disabled={!mailboxReady}
-								className="mt-0.5 flex h-8 items-center gap-2 rounded-lg px-2.5 text-[13px] text-mail-muted opacity-70 hover:bg-[var(--inbox-row-hover)] hover:opacity-100 disabled:opacity-40"
+								className="mt-0.5 flex h-8 items-center gap-2 rounded-lg px-2.5 font-medium text-[13px] text-text-sub-600 opacity-70 transition-colors hover:bg-neutral-alpha-10 hover:opacity-100 hover:text-text-strong-950 disabled:opacity-40"
 								aria-label="Create label (⌥L)"
 								title="Create label (⌥L)"
 							>
@@ -519,9 +415,8 @@ export const InboxSidebar = ({
 					</div>
 
 					<AnimatedHoverBackground
-						rect={rect}
-						tabElement={currentEl}
-						className="!bg-transparent"
+						box={hoverBox}
+						className="!bg-neutral-alpha-10"
 					/>
 				</div>
 			</aside>
