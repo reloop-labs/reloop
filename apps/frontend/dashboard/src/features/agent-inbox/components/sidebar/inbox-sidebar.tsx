@@ -224,19 +224,15 @@ export const InboxSidebar = ({
 							type="button"
 							onClick={handleCopyEmail}
 							title={`Click to copy ${mailbox.email || "email"}`}
-							className="group/copy flex min-w-0 flex-1 cursor-pointer items-center gap-2 overflow-hidden rounded-md text-left transition-opacity hover:opacity-80"
+							className="flex min-w-0 flex-1 cursor-pointer items-center gap-2 overflow-hidden rounded-md text-left transition-opacity hover:opacity-80"
 						>
-							<Icon
-								name="inbox"
-								className="h-4 w-4 shrink-0 text-text-sub-600"
-							/>
 							<span className="truncate font-semibold text-[13px] text-text-strong-950">
 								{mailbox.email || mailbox.label || "Inbox"}
 							</span>
 							{emailCopied ? (
 								<Check className="size-3 shrink-0 text-emerald-500" />
 							) : (
-								<Copy className="size-3 shrink-0 text-text-sub-600 opacity-0 transition-opacity group-hover/copy:opacity-100" />
+								<Copy className="size-3 shrink-0 text-text-sub-600 transition-opacity" />
 							)}
 						</button>
 					) : (
@@ -464,7 +460,7 @@ export const InboxSidebar = ({
 								type="button"
 								onClick={() => setIsLabelDialogOpen(true)}
 								disabled={!mailboxReady}
-								className="mt-0.5 flex h-8 items-center gap-2 rounded-lg px-2.5 font-medium text-[13px] text-text-sub-600 opacity-70 transition-colors hover:bg-neutral-alpha-10 hover:opacity-100 hover:text-text-strong-950 disabled:opacity-40"
+								className="mt-0.5 flex h-8 items-center gap-2 rounded-lg px-2.5 font-medium text-[13px] text-text-sub-600 opacity-70 transition-colors hover:bg-neutral-alpha-10 hover:text-text-strong-950 hover:opacity-100 disabled:opacity-40"
 								aria-label="Create label (⌥L)"
 								title="Create label (⌥L)"
 							>

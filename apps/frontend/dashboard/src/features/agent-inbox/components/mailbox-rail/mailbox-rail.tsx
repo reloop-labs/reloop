@@ -1,13 +1,14 @@
 "use client";
 
 import { cn } from "@reloop/ui/cn";
+import { Icon } from "@reloop/ui/icon";
 import { Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useMemo } from "react";
 import { useAgentInbox } from "#/features/agent-inbox/components/agent-inbox-provider";
+import { SectionError } from "#/features/agent-inbox/components/shared/section-error";
 import type { AgentMailbox } from "#/features/agent-inbox/types";
 import { getAvatarGradient, getAvatarInitial } from "#/utils/avatar";
-import { SectionError } from "../shared/section-error";
 import { MailboxRailSkeleton } from "./mailbox-rail-skeleton";
 
 function mailboxSortKey(m: AgentMailbox) {
@@ -59,7 +60,7 @@ const RailMailboxAvatar = ({
 			{/* Left active/hover indicator pill */}
 			<div
 				className={cn(
-					"absolute -left-0.5 w-1 rounded-r-full bg-zero-blue transition-all duration-200",
+					"-left-0.5 absolute w-1 rounded-r-full bg-zero-blue transition-all duration-200",
 					active
 						? "h-6 opacity-100"
 						: "h-2 opacity-0 group-hover:h-4 group-hover:opacity-60",
@@ -76,7 +77,7 @@ const RailMailboxAvatar = ({
 			>
 				<div
 					className={cn(
-						"relative transition-transform duration-150 group-hover:scale-105 active:scale-95",
+						"relative transition-transform duration-150 active:scale-95 group-hover:scale-105",
 					)}
 				>
 					<div
@@ -84,8 +85,8 @@ const RailMailboxAvatar = ({
 							"flex size-9 items-center justify-center rounded-xl font-bold text-white text-xs uppercase shadow-sm transition-all",
 							getAvatarGradient(mailbox.email || displayName),
 							active
-								? "ring-2 ring-zero-blue ring-offset-2 ring-offset-panel-light dark:ring-white dark:ring-offset-panel-dark"
-								: "ring-1 ring-black/10 dark:ring-white/10 hover:ring-black/20 dark:hover:ring-white/30",
+								? "ring-2 ring-zero-blue ring-offset-2 ring-offset-bg-white-0 dark:ring-white dark:ring-offset-black"
+								: "ring-1 ring-black/10 hover:ring-black/20 dark:ring-white/10 dark:hover:ring-white/30",
 						)}
 					>
 						{getAvatarInitial(mailbox.label, mailbox.email)}
@@ -132,9 +133,14 @@ export function MailboxRail({
 	return (
 		<nav
 			aria-label="Mailboxes"
-			className="flex h-full w-[54px] shrink-0 flex-col items-center border-stroke-soft-100 border-r bg-bg-white-0 py-3 dark:border-stroke-soft-100/40 dark:bg-black"
+			className="flex h-full w-[54px] shrink-0 flex-col items-center border-stroke-soft-100 border-r bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-black"
 		>
-			<div className="flex min-h-0 w-full flex-1 flex-col items-center gap-3 overflow-y-auto overflow-x-hidden pt-0.5">
+			{/* Top header row — aligns with email address & top navbar */}
+			<div className="flex h-11 w-full shrink-0 items-center justify-center border-stroke-soft-100 border-b dark:border-stroke-soft-100/40">
+				<Icon name="inbox" className="h-4 w-4 text-text-sub-600" />
+			</div>
+
+			<div className="flex min-h-0 w-full flex-1 flex-col items-center gap-2.5 overflow-y-auto overflow-x-hidden pt-2 pb-3">
 				{mailboxesError ? (
 					<SectionError
 						compact
@@ -155,16 +161,16 @@ export function MailboxRail({
 							/>
 						))}
 
-						<div className="w-6 border-stroke-soft-100 border-t my-0.5 dark:border-stroke-soft-100/40" />
+						<div className="my-0.5 w-6 border-stroke-soft-100 border-t dark:border-stroke-soft-100/40" />
 
 						<button
 							type="button"
 							onClick={onAddMailbox}
 							title="Add inbox address"
 							aria-label="Add inbox address"
-							className="group flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-xl border border-stroke-soft-200 border-dashed bg-bg-weak-50/50 text-text-sub-600 transition-all duration-150 hover:border-text-strong-950 hover:bg-bg-weak-50 hover:text-text-strong-950 hover:scale-105 active:scale-95 focus:outline-none dark:border-white/20 dark:bg-white/[0.04] dark:hover:border-white/50 dark:hover:bg-white/[0.08] dark:hover:text-white"
+							className="group flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-xl border border-stroke-soft-200 border-dashed bg-bg-weak-50/50 text-text-sub-600 transition-all duration-150 hover:scale-105 hover:border-text-strong-950 hover:bg-bg-weak-50 hover:text-text-strong-950 focus:outline-none active:scale-95 dark:border-white/20 dark:bg-white/[0.04] dark:hover:border-white/50 dark:hover:bg-white/[0.08] dark:hover:text-white"
 						>
-							<Plus className="size-4 transition-transform group-hover:rotate-90 duration-200" />
+							<Plus className="size-4 transition-transform duration-200 group-hover:rotate-90" />
 						</button>
 					</>
 				)}
