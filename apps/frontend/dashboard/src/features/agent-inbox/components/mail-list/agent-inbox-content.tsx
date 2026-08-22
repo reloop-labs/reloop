@@ -538,7 +538,7 @@ export const AgentInboxContent = ({
 
 	const listPane = (
 		<div className="flex min-h-0 flex-1 flex-col">
-			<div className="sticky top-0 z-15 shrink-0 bg-panel-light dark:bg-panel-dark">
+			<div className="sticky top-0 z-15 shrink-0 bg-bg-white-0 dark:bg-black">
 				<div className="flex h-11 items-center pr-6 pl-4">
 					<span className="ml-1 flex w-5 shrink-0 items-center justify-center">
 						<button
@@ -768,7 +768,7 @@ export const AgentInboxContent = ({
 			/>
 			{/* Gmail-style: list OR detail fills the main pane (not side-by-side). */}
 			<div className="relative flex min-h-0 min-w-0 flex-1 p-0">
-				<div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-panel-light dark:bg-panel-dark">
+				<div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-bg-white-0 dark:bg-black">
 					{isThreadOpen ? detailPane : listPane}
 				</div>
 

@@ -9,7 +9,7 @@ export function ListPanelSkeleton({ className }: { className?: string }) {
 	return (
 		<div
 			className={cn(
-				"flex h-full min-h-0 flex-1 flex-col bg-panel-light dark:bg-panel-dark",
+				"flex h-full min-h-0 flex-1 flex-col bg-bg-white-0 dark:bg-black",
 				className,
 			)}
 			aria-busy="true"

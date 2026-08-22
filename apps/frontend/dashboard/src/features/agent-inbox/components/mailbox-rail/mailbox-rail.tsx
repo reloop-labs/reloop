@@ -132,7 +132,7 @@ export function MailboxRail({
 	return (
 		<nav
 			aria-label="Mailboxes"
-			className="flex h-full w-[54px] shrink-0 flex-col items-center border-mail-border border-r bg-panel-light/70 py-3 backdrop-blur-sm dark:bg-panel-dark/70"
+			className="flex h-full w-[54px] shrink-0 flex-col items-center border-stroke-soft-100 border-r bg-bg-white-0 py-3 dark:border-white/10 dark:bg-black"
 		>
 			<div className="flex min-h-0 w-full flex-1 flex-col items-center gap-3 overflow-y-auto overflow-x-hidden pt-0.5">
 				{mailboxesError ? (
@@ -155,14 +155,14 @@ export function MailboxRail({
 							/>
 						))}
 
-						<div className="w-6 border-mail-border/60 border-t my-0.5" />
+						<div className="w-6 border-stroke-soft-100 border-t my-0.5 dark:border-white/10" />
 
 						<button
 							type="button"
 							onClick={onAddMailbox}
 							title="Add inbox address"
 							aria-label="Add inbox address"
-							className="group flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-xl border border-mail-border border-dashed bg-bg-weak-50/50 text-mail-muted transition-all duration-150 hover:border-mail-foreground/60 hover:bg-[var(--inbox-hover)] hover:text-mail-foreground hover:scale-105 active:scale-95 focus:outline-none dark:bg-white/[0.04]"
+							className="group flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-xl border border-stroke-soft-200 border-dashed bg-bg-weak-50/50 text-text-sub-600 transition-all duration-150 hover:border-text-strong-950 hover:bg-bg-weak-50 hover:text-text-strong-950 hover:scale-105 active:scale-95 focus:outline-none dark:border-white/20 dark:bg-white/[0.04] dark:hover:border-white/50 dark:hover:bg-white/[0.08] dark:hover:text-white"
 						>
 							<Plus className="size-4 transition-transform group-hover:rotate-90 duration-200" />
 						</button>

@@ -118,14 +118,14 @@ interface ThreadDetailProps {
 }
 
 const EmptyState = () => (
-	<div className="flex min-h-[400px] flex-col items-center justify-center gap-1.5 bg-offset-light/10 p-8 text-center dark:bg-transparent">
-		<div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-mail-border/40 bg-panel-light shadow-sm dark:bg-panel-dark">
-			<Icon name="inbox" className="h-5 w-5 text-mail-muted" />
+	<div className="flex min-h-[400px] flex-col items-center justify-center gap-1.5 p-8 text-center">
+		<div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-stroke-soft-200 bg-bg-white-0 shadow-sm dark:border-white/10 dark:bg-white/[0.04]">
+			<Icon name="inbox" className="h-5 w-5 text-text-sub-600" />
 		</div>
-		<h3 className="font-semibold text-base text-mail-foreground">
+		<h3 className="font-semibold text-base text-text-strong-950">
 			Select a conversation
 		</h3>
-		<p className="mx-auto max-w-sm text-mail-muted text-xs">
+		<p className="mx-auto max-w-sm text-text-sub-600 text-xs">
 			Choose a message from the list to read and reply.
 		</p>
 	</div>
@@ -1283,7 +1283,7 @@ export const ThreadDetail = ({
 	);
 
 	return (
-		<div className="relative flex h-full min-h-0 flex-col bg-panel-light dark:bg-panel-dark">
+		<div className="relative flex h-full min-h-0 flex-col bg-bg-white-0 dark:bg-black">
 			<ZeroThreadToolbar
 				isUnread={!!thread.unread}
 				folder={folder}

@@ -23,7 +23,7 @@ export const AgentInboxLayoutWrapper = ({
 	const [isAddOpen, setIsAddOpen] = useState(false);
 
 	return (
-		<div className="flex h-full min-h-0 w-full flex-col overflow-hidden bg-panel-light text-mail-foreground dark:bg-panel-dark">
+		<div className="flex h-full min-h-0 w-full flex-col overflow-hidden bg-bg-white-0 text-text-strong-950 dark:bg-black">
 			<InboxTopNavbar mailbox={mailbox} />
 			<div className="flex min-h-0 min-w-0 flex-1 overflow-hidden">
 				<MailboxRail

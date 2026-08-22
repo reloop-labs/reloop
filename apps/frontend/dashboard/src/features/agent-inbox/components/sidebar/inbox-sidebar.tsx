@@ -306,24 +306,24 @@ export const InboxSidebar = ({
 		<>
 			<aside
 				className={cn(
-					"flex h-full shrink-0 select-none flex-col border-mail-border border-r bg-panel-light transition-[width] duration-200 ease-in-out dark:bg-panel-dark",
+					"flex h-full shrink-0 select-none flex-col border-stroke-soft-100 border-r bg-bg-white-0 transition-[width] duration-200 ease-in-out dark:border-white/10 dark:bg-black",
 					collapsed ? "w-14 items-center" : "w-60",
 				)}
 			>
 				{/* Top header row — aligns with middle pane h-11 toolbar */}
 				<div
 					className={cn(
-						"flex h-11 shrink-0 items-center border-mail-border/50 border-b",
+						"flex h-11 shrink-0 items-center border-stroke-soft-100 border-b dark:border-white/10",
 						collapsed ? "w-full justify-center px-2" : "w-full px-2.5",
 					)}
 				>
 					{!collapsed ? (
 						<div
 							onClick={handleCopyEmail}
-							className="relative flex h-7 w-full cursor-pointer items-center justify-between gap-1.5 rounded-lg border border-mail-border/60 bg-[var(--inbox-control)] px-2"
+							className="relative flex h-7 w-full cursor-pointer items-center justify-between gap-1.5 rounded-lg border border-stroke-soft-200 bg-bg-weak-50 px-2 dark:border-white/15 dark:bg-white/[0.06]"
 							title="Click to copy email address"
 						>
-							<span className="min-w-0 flex-1 truncate font-medium text-[12px] text-mail-foreground/80 leading-none">
+							<span className="min-w-0 flex-1 truncate font-medium text-[12px] text-text-strong-950/80 leading-none">
 								{mailbox.email || "Mailbox"}
 							</span>
 							<button

@@ -62,11 +62,11 @@ export function InboxTopNavbar({ mailbox }: { mailbox: AgentMailbox }) {
 
 	return (
 		<>
-			<header className="flex h-11 shrink-0 items-center border-mail-border/60 border-b">
+			<header className="flex h-11 shrink-0 items-center border-stroke-soft-100 border-b bg-bg-white-0 dark:border-white/10 dark:bg-black">
 				{/* Sidebar header column — matches inbox folder sidebar width */}
 				<div
 					className={cn(
-						"flex h-full shrink-0 items-center border-mail-border border-r bg-panel-light transition-[width] duration-200 ease-in-out dark:bg-panel-dark",
+						"flex h-full shrink-0 items-center border-stroke-soft-100 border-r transition-[width] duration-200 ease-in-out dark:border-white/10",
 						collapsed
 							? "w-[110px] justify-center px-0"
 							: "w-[294px] gap-2 px-3",
@@ -79,7 +79,7 @@ export function InboxTopNavbar({ mailbox }: { mailbox: AgentMailbox }) {
 								name="inbox"
 								className="h-4 w-4 shrink-0 text-text-sub-600"
 							/>
-							<span className="truncate font-semibold text-[13px] text-mail-foreground">
+							<span className="truncate font-semibold text-[13px] text-text-strong-950">
 								{mailbox.label || "Inbox"}
 							</span>
 						</div>
@@ -87,7 +87,7 @@ export function InboxTopNavbar({ mailbox }: { mailbox: AgentMailbox }) {
 				</div>
 
 				{/* Content column: compact search + actions */}
-				<div className="flex h-full min-w-0 flex-1 items-center gap-2 bg-panel-light px-3 dark:bg-panel-dark">
+				<div className="flex h-full min-w-0 flex-1 items-center gap-2 px-3">
 					<button
 						type="button"
 						onClick={openSearch}
