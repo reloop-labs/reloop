@@ -6,7 +6,7 @@ import { AgentInboxCommonUseCasesSidebar } from "./common-use-cases-sidebar";
 import { useAgentInbox } from "./components/agent-inbox-provider";
 import { CreateInboxInlineCard } from "./components/create-inbox-inline-card";
 import { AgentInboxLayoutWrapper } from "./components/layout/agent-inbox-layout-wrapper";
-import { ListPanelSkeleton } from "./components/mail-list/list-panel-skeleton";
+import { AgentInboxContent } from "./components/mail-list/agent-inbox-content";
 import { SectionError } from "./components/shared/section-error";
 import { AgentMailboxListHeader } from "./list/agent-mailbox-list-header";
 import {
@@ -22,6 +22,16 @@ import {
 	TrashFolderPage,
 	YouFolderPage,
 } from "./pages/mailbox-folder-pages";
+import type { AgentMailbox } from "./types";
+
+const PLACEHOLDER_MAILBOX: AgentMailbox = {
+	id: "loading",
+	email: "",
+	label: "",
+	status: "active",
+	securityLevel: 1,
+	createdAt: "",
+};
 
 export function AgentInboxPage() {
 	const { mailboxes, isLoadingMailboxes, mailboxesError, retryMailboxes } =
@@ -44,11 +54,19 @@ export function AgentInboxPage() {
 		return mailboxes[0];
 	}, [mailboxes, mailboxIdParam]);
 
+	// Always maintain layout during initial mailbox loading
 	if (isLoadingMailboxes && (!mailboxes || mailboxes.length === 0)) {
 		return (
-			<div className="flex h-full min-h-0 flex-1 flex-col overflow-hidden p-4">
-				<ListPanelSkeleton className="min-h-0 flex-1 shadow-none" />
-			</div>
+			<AgentInboxLayoutWrapper
+				mailbox={PLACEHOLDER_MAILBOX}
+				folder={folderParam}
+			>
+				<AgentInboxContent
+					mailbox={PLACEHOLDER_MAILBOX}
+					folder={folderParam}
+					threads={[]}
+				/>
+			</AgentInboxLayoutWrapper>
 		);
 	}
 
@@ -83,7 +101,7 @@ export function AgentInboxPage() {
 		);
 	}
 
-	if (!activeMailbox) return null;
+	const currentMailbox = activeMailbox ?? PLACEHOLDER_MAILBOX;
 
 	const renderFolderContent = () => {
 		if (folderParam === "drafts") {
@@ -120,7 +138,7 @@ export function AgentInboxPage() {
 	};
 
 	return (
-		<AgentInboxLayoutWrapper mailbox={activeMailbox} folder={folderParam}>
+		<AgentInboxLayoutWrapper mailbox={currentMailbox} folder={folderParam}>
 			{renderFolderContent()}
 		</AgentInboxLayoutWrapper>
 	);

@@ -220,21 +220,25 @@ export const InboxSidebar = ({
 					)}
 				>
 					{!collapsed ? (
-						<button
-							type="button"
-							onClick={handleCopyEmail}
-							title={`Click to copy ${mailbox.email || "email"}`}
-							className="flex min-w-0 flex-1 cursor-pointer items-center gap-2 overflow-hidden rounded-md text-left transition-opacity hover:opacity-80"
-						>
-							<span className="truncate font-semibold text-[13px] text-text-strong-950">
-								{mailbox.email || mailbox.label || "Inbox"}
-							</span>
-							{emailCopied ? (
-								<Check className="size-3 shrink-0 text-emerald-500" />
-							) : (
-								<Copy className="size-3 shrink-0 text-text-sub-600 transition-opacity" />
-							)}
-						</button>
+						mailbox.email ? (
+							<button
+								type="button"
+								onClick={handleCopyEmail}
+								title={`Click to copy ${mailbox.email}`}
+								className="flex min-w-0 flex-1 cursor-pointer items-center gap-2 overflow-hidden rounded-md text-left transition-opacity hover:opacity-80"
+							>
+								<span className="truncate font-semibold text-[13px] text-text-strong-950">
+									{mailbox.email || mailbox.label || "Inbox"}
+								</span>
+								{emailCopied ? (
+									<Check className="size-3 shrink-0 text-emerald-500" />
+								) : (
+									<Copy className="size-3 shrink-0 text-text-sub-600 transition-opacity" />
+								)}
+							</button>
+						) : (
+							<Skeleton className="h-4 w-36 rounded" />
+						)
 					) : (
 						<button
 							type="button"

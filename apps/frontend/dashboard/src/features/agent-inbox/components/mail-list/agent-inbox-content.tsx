@@ -17,6 +17,7 @@ import {
 	useInboxActiveFilterCount,
 } from "#/features/agent-inbox/components/mail-list/inbox-command-palette";
 import { InboxEmptyState } from "#/features/agent-inbox/components/mail-list/inbox-empty-state";
+import { MailListSkeleton } from "#/features/agent-inbox/components/mail-list/mail-list-skeleton";
 import {
 	ThreadList,
 	useInboxNavigation,
@@ -709,7 +710,10 @@ export const AgentInboxContent = ({
 						onRetry={() => void retryThreads()}
 						className="flex-1"
 					/>
-				) : filteredThreads.length === 0 && !listLoading && !threadsError ? (
+				) : (listLoading || isLoadingMailboxes) &&
+					filteredThreads.length === 0 ? (
+					<MailListSkeleton />
+				) : filteredThreads.length === 0 && !threadsError ? (
 					<div className="flex min-h-0 flex-1 items-center justify-center p-6">
 						<InboxEmptyState
 							title={

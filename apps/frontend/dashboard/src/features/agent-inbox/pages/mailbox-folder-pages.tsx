@@ -5,7 +5,7 @@ import { useMemo } from "react";
 import { toast } from "sonner";
 import { useAgentInbox } from "#/features/agent-inbox/components/agent-inbox-provider";
 import { AgentInboxContent } from "#/features/agent-inbox/components/mail-list/agent-inbox-content";
-import { ListPanelSkeleton } from "#/features/agent-inbox/components/mail-list/list-panel-skeleton";
+import { MailListSkeleton } from "#/features/agent-inbox/components/mail-list/mail-list-skeleton";
 import { useInboxSidebar } from "#/features/agent-inbox/components/sidebar/inbox-sidebar-context";
 import { useComposeDrafts } from "#/features/agent-inbox/hooks/use-compose-drafts";
 import { useLabelThreadIds } from "#/features/agent-inbox/hooks/use-inbox-labels";
@@ -303,7 +303,7 @@ export function DraftsFolderPage() {
 			</div>
 
 			{isLoading ? (
-				<ListPanelSkeleton className="min-h-0 flex-1 shadow-none" />
+				<MailListSkeleton className="min-h-0 flex-1" />
 			) : drafts.length === 0 ? (
 				<div className="flex flex-1 flex-col items-center justify-center gap-2 text-center">
 					<FileText className="h-8 w-8 text-mail-muted" />
