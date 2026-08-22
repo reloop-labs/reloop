@@ -8,7 +8,6 @@ export const InboxEmptyState = ({
 	title?: string;
 	description?: string;
 	onCompose?: () => void;
-	onOpenAi?: () => void;
 	showComposeAction?: boolean;
 }) => (
 	<div className="flex h-full w-full items-center justify-center">

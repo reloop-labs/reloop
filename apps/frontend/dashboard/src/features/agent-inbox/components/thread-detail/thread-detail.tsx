@@ -114,7 +114,6 @@ interface ThreadDetailProps {
 	folder?: string;
 	onBack?: () => void;
 	showBack?: boolean;
-	onToggleAi?: () => void;
 }
 
 const EmptyState = () => (

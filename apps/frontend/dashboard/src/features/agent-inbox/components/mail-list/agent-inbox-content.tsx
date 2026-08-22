@@ -4,12 +4,7 @@ import { parseAsString, useQueryState } from "nuqs";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
-import { useMediaQuery } from "usehooks-ts";
 import { useAgentInbox } from "#/features/agent-inbox/components/agent-inbox-provider";
-import {
-	AiSidebar,
-	useAiSidebar,
-} from "#/features/agent-inbox/components/ai-sidebar";
 import { InboxCategoryNavbar } from "#/features/agent-inbox/components/mail-list/inbox-category-navbar";
 import {
 	applyInboxFilters,
@@ -111,12 +106,6 @@ export const AgentInboxContent = ({
 	const { openCompose } = useInboxSidebar();
 	const { pushBatchUndo, undo } = useInboxUndo();
 	const [mail, setMail] = useInboxMail();
-	const isDesktop = useMediaQuery("(min-width: 1024px)");
-	const {
-		open: aiOpen,
-		setOpen: setAiOpen,
-		toggle: toggleAi,
-	} = useAiSidebar({ defaultOpen: true });
 	const listContainerRef = useRef<HTMLDivElement>(null);
 	const [paletteOpen, setPaletteOpen] = useState(false);
 	const [isRefreshing, setIsRefreshing] = useState(false);
@@ -494,7 +483,6 @@ export const AgentInboxContent = ({
 			folder={folder}
 			onBack={handleCloseThread}
 			showBack
-			onToggleAi={toggleAi}
 		/>
 	) : selectedThreadId && threadsError ? (
 		<div className="flex h-full min-h-0 flex-col">
@@ -733,7 +721,6 @@ export const AgentInboxContent = ({
 											: "Choose an email to view details"
 							}
 							onCompose={openCompose}
-							onOpenAi={toggleAi}
 						/>
 					</div>
 				) : (
@@ -775,8 +762,6 @@ export const AgentInboxContent = ({
 				<div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-bg-white-0 dark:bg-black">
 					{isThreadOpen ? detailPane : listPane}
 				</div>
-
-				<AiSidebar open={true} thread={selectedThread} />
 			</div>
 		</>
 	);
