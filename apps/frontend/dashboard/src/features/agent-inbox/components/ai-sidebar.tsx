@@ -96,11 +96,11 @@ export const AiSidebar = ({
 	return (
 		<aside
 			className={cn(
-				"flex h-full w-[320px] shrink-0 flex-col overflow-hidden border-stroke-soft-100 border-l bg-bg-white-0 text-text-strong-950 dark:border-white/10 dark:bg-black",
+				"flex h-full w-[320px] shrink-0 flex-col overflow-hidden border-stroke-soft-100 border-l bg-bg-white-0 text-text-strong-950 dark:border-stroke-soft-100/40 dark:bg-black",
 			)}
 		>
 			{/* Top Header */}
-			<div className="flex h-11 shrink-0 items-center justify-between border-stroke-soft-100 border-b px-3 dark:border-white/10">
+			<div className="flex h-11 shrink-0 items-center justify-between border-stroke-soft-100 border-b px-3 dark:border-stroke-soft-100/40">
 				<div className="flex items-center gap-2">
 					<div className="flex size-6 items-center justify-center rounded-lg bg-bg-weak-50 text-text-strong-950 dark:bg-white/[0.06]">
 						<Icon name="agent" className="size-3.5 text-text-strong-950" />
@@ -131,7 +131,7 @@ export const AiSidebar = ({
 				{messages.length === 0 ? (
 					<div className="mt-auto flex flex-col gap-2.5">
 						{thread && (
-							<div className="rounded-xl border border-stroke-soft-200 bg-bg-weak-50/70 p-3 dark:border-white/10 dark:bg-white/[0.04]">
+							<div className="rounded-xl border border-stroke-soft-200 bg-bg-weak-50/70 p-3 dark:border-stroke-soft-100/40 dark:bg-white/[0.04]">
 								<p className="mb-1 font-semibold text-[10px] text-text-soft-400 uppercase tracking-wider">
 									Active Context
 								</p>
@@ -148,7 +148,7 @@ export const AiSidebar = ({
 								key={s}
 								type="button"
 								onClick={() => send(s)}
-								className="w-full rounded-xl border border-stroke-soft-200 bg-bg-white-0 px-3 py-2.5 text-left font-medium text-text-sub-600 text-xs transition-all hover:border-stroke-soft-300 hover:bg-bg-weak-50 hover:text-text-strong-950 active:scale-[0.99] dark:border-white/10 dark:bg-white/[0.03] dark:hover:bg-white/[0.07] dark:hover:text-white"
+								className="w-full rounded-xl border border-stroke-soft-200 bg-bg-white-0 px-3 py-2.5 text-left font-medium text-text-sub-600 text-xs transition-all hover:border-stroke-soft-300 hover:bg-bg-weak-50 hover:text-text-strong-950 active:scale-[0.99] dark:border-stroke-soft-100/40 dark:bg-white/[0.03] dark:hover:bg-white/[0.07] dark:hover:text-white"
 							>
 								{s}
 							</button>
@@ -167,7 +167,7 @@ export const AiSidebar = ({
 							) : (
 								<div
 									key={m.id}
-									className="rounded-2xl border border-stroke-soft-100 bg-bg-white-0 p-3 text-[13px] text-text-strong-950 leading-relaxed dark:border-white/10 dark:bg-white/[0.02]"
+									className="rounded-2xl border border-stroke-soft-100 bg-bg-white-0 p-3 text-[13px] text-text-strong-950 leading-relaxed dark:border-stroke-soft-100/40 dark:bg-white/[0.02]"
 								>
 									{m.content}
 								</div>
@@ -181,7 +181,7 @@ export const AiSidebar = ({
 			<div className="p-3 pt-0" data-focal="ai">
 				<form
 					onSubmit={handleSubmit}
-					className="overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-white-0 shadow-xs focus-within:border-stroke-strong-950 dark:border-white/15 dark:bg-white/[0.04] dark:focus-within:border-white/30"
+					className="overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-white-0 shadow-xs focus-within:border-stroke-strong-950 dark:border-stroke-soft-100/40 dark:bg-white/[0.04] dark:focus-within:border-white/30"
 				>
 					<textarea
 						ref={inputRef}
@@ -237,7 +237,7 @@ export const AiSidebarToggle = ({
 		type="button"
 		onClick={onClick}
 		className={cn(
-			"inline-flex h-7 items-center justify-center gap-1 rounded-lg border border-stroke-soft-200 bg-bg-weak-50 px-2 text-xs transition-colors hover:bg-bg-soft-200 dark:border-white/15 dark:bg-white/[0.06]",
+			"inline-flex h-7 items-center justify-center gap-1 rounded-lg border border-stroke-soft-200 bg-bg-weak-50 px-2 text-xs transition-colors hover:bg-bg-soft-200 dark:border-stroke-soft-100/40 dark:bg-white/[0.06]",
 			active && "ring-1 ring-blue-500",
 		)}
 	>

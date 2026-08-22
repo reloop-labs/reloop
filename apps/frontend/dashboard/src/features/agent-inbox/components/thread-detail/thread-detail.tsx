@@ -119,7 +119,7 @@ interface ThreadDetailProps {
 
 const EmptyState = () => (
 	<div className="flex min-h-[400px] flex-col items-center justify-center gap-1.5 p-8 text-center">
-		<div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-stroke-soft-200 bg-bg-white-0 shadow-sm dark:border-white/10 dark:bg-white/[0.04]">
+		<div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-stroke-soft-200 bg-bg-white-0 shadow-sm dark:border-stroke-soft-100/40 dark:bg-white/[0.04]">
 			<Icon name="inbox" className="h-5 w-5 text-text-sub-600" />
 		</div>
 		<h3 className="font-semibold text-base text-text-strong-950">

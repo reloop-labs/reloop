@@ -193,14 +193,14 @@ export const InboxSidebar = ({
 		<>
 			<aside
 				className={cn(
-					"flex h-full shrink-0 select-none flex-col border-stroke-soft-100 border-r bg-bg-white-0 transition-[width] duration-200 ease-in-out dark:border-white/10 dark:bg-black",
+					"flex h-full shrink-0 select-none flex-col border-stroke-soft-100 border-r bg-bg-white-0 transition-[width] duration-200 ease-in-out dark:border-stroke-soft-100/40 dark:bg-black",
 					collapsed ? "w-14 items-center" : "w-60",
 				)}
 			>
 				{/* Compose button */}
 				<div
 					className={cn(
-						"flex h-11 shrink-0 items-center border-stroke-soft-100 border-b dark:border-white/10",
+						"flex h-11 shrink-0 items-center border-stroke-soft-100 border-b dark:border-stroke-soft-100/40",
 						collapsed ? "w-full justify-center px-2" : "w-full px-2.5",
 					)}
 				>

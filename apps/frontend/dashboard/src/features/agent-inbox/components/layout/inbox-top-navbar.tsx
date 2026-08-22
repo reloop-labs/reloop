@@ -35,11 +35,11 @@ export function InboxTopNavbar({ mailbox }: { mailbox: AgentMailbox }) {
 	};
 
 	return (
-		<header className="flex h-11 shrink-0 items-center border-stroke-soft-100 border-b bg-bg-white-0 dark:border-white/10 dark:bg-black">
+		<header className="flex h-11 shrink-0 items-center border-stroke-soft-100 border-b bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-black">
 			{/* Sidebar header column — matches inbox folder sidebar width */}
 			<div
 				className={cn(
-					"flex h-full shrink-0 items-center border-stroke-soft-100 border-r transition-[width] duration-200 ease-in-out dark:border-white/10",
+					"flex h-full shrink-0 items-center border-stroke-soft-100 border-r transition-[width] duration-200 ease-in-out dark:border-stroke-soft-100/40",
 					collapsed ? "w-[110px] justify-center px-0" : "w-[294px] gap-2 px-3",
 				)}
 			>

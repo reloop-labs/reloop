@@ -132,7 +132,7 @@ export function MailboxRail({
 	return (
 		<nav
 			aria-label="Mailboxes"
-			className="flex h-full w-[54px] shrink-0 flex-col items-center border-stroke-soft-100 border-r bg-bg-white-0 py-3 dark:border-white/10 dark:bg-black"
+			className="flex h-full w-[54px] shrink-0 flex-col items-center border-stroke-soft-100 border-r bg-bg-white-0 py-3 dark:border-stroke-soft-100/40 dark:bg-black"
 		>
 			<div className="flex min-h-0 w-full flex-1 flex-col items-center gap-3 overflow-y-auto overflow-x-hidden pt-0.5">
 				{mailboxesError ? (
@@ -155,7 +155,7 @@ export function MailboxRail({
 							/>
 						))}
 
-						<div className="w-6 border-stroke-soft-100 border-t my-0.5 dark:border-white/10" />
+						<div className="w-6 border-stroke-soft-100 border-t my-0.5 dark:border-stroke-soft-100/40" />
 
 						<button
 							type="button"
