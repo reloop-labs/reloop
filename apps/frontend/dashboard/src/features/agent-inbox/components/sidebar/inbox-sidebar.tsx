@@ -254,7 +254,7 @@ export const InboxSidebar = ({
 				{/* Compose button */}
 				<div
 					className={cn(
-						"flex h-11 shrink-0 items-center border-stroke-soft-100 border-b dark:border-stroke-soft-100/40",
+						"flex h-11.25 shrink-0 items-center border-stroke-soft-100 border-b dark:border-stroke-soft-100/40",
 						collapsed ? "w-full justify-center px-2" : "w-full px-2.5",
 					)}
 				>
