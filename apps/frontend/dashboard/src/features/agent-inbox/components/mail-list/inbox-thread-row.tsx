@@ -128,7 +128,7 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 				onMouseEnter={() => onMouseEnter(listId)}
 				className={cn(
 					"group flex cursor-pointer items-center border-b pt-2.5 pr-6 pb-2.5 pl-4 text-left",
-					"border-stroke-soft-100 bg-transparent",
+					"border-stroke-soft-100 bg-transparent dark:border-stroke-soft-100/40",
 					"hover:bg-neutral-alpha-10",
 					(isSelected || isBulkSelected || isKeyboardFocused) &&
 						"bg-neutral-alpha-10",
