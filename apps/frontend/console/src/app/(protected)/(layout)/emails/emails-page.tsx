@@ -59,7 +59,7 @@ export default function EmailsPage() {
 		<PageFrame>
 			<PageHeading
 				title="Emails"
-				description="Cross-org delivery investigation. Prefer the organization hub emails tab for day-to-day debugging."
+				description="Every email sent across the platform, regardless of organization. Use org filters to narrow down."
 				meta={
 					<span className="rounded-full bg-bg-weak-50 px-2.5 py-1 font-medium text-[12px] text-text-sub-600 tabular-nums dark:bg-white/[0.06]">
 						{data?.total ?? 0} matching

@@ -11,7 +11,7 @@ export type NavGroup = {
 };
 
 /**
- * Primary console nav. Domain / email / credit ledgers live inside org hubs
+ * Primary console nav. Domain / credit ledgers live inside org hubs
  * (utility routes still exist for deep links from Overview / hubs).
  */
 export const ADMIN_NAV_GROUPS: NavGroup[] = [
@@ -29,6 +29,12 @@ export const ADMIN_NAV_GROUPS: NavGroup[] = [
 				label: "Support",
 				iconName: "comment-text",
 				description: "Live customer inbox",
+			},
+			{
+				href: "/emails",
+				label: "Emails",
+				iconName: "mail",
+				description: "All emails across orgs",
 			},
 			{
 				href: "/audit",
