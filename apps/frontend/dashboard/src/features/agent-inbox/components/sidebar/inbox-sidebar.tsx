@@ -1,7 +1,8 @@
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
+import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
-import { Pencil, Plus } from "lucide-react";
+import { Check, Copy, Pencil, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
@@ -44,7 +45,7 @@ const SectionHeader = ({
 }) => {
 	if (collapsed) {
 		return (
-			<div className="my-2 h-[1px] w-6 self-center bg-stroke-soft-200 dark:bg-white/10" />
+			<div className="my-2 h-[1px] w-6 self-center bg-stroke-soft-200 dark:bg-stroke-soft-100/40" />
 		);
 	}
 	return (
@@ -83,6 +84,20 @@ export const InboxSidebar = ({
 
 	const [isComposeOpen, setIsComposeOpen] = useState(false);
 	const [isLabelDialogOpen, setIsLabelDialogOpen] = useState(false);
+	const [emailCopied, setEmailCopied] = useState(false);
+
+	const handleCopyEmail = async (e?: React.MouseEvent) => {
+		e?.stopPropagation();
+		if (!mailbox.email) return;
+		try {
+			await navigator.clipboard.writeText(mailbox.email);
+			setEmailCopied(true);
+			toast.success("Email address copied");
+			setTimeout(() => setEmailCopied(false), 2000);
+		} catch {
+			toast.error("Failed to copy email");
+		}
+	};
 
 	const [hoveredEl, setHoveredEl] = useState<HTMLAnchorElement | undefined>(
 		undefined,
@@ -197,6 +212,49 @@ export const InboxSidebar = ({
 					collapsed ? "w-14 items-center" : "w-60",
 				)}
 			>
+				{/* Email address top header above compose */}
+				<div
+					className={cn(
+						"flex h-11 shrink-0 items-center border-stroke-soft-100 border-b dark:border-stroke-soft-100/40",
+						collapsed ? "w-full justify-center px-0" : "w-full px-3",
+					)}
+				>
+					{!collapsed ? (
+						<button
+							type="button"
+							onClick={handleCopyEmail}
+							title={`Click to copy ${mailbox.email || "email"}`}
+							className="group/copy flex min-w-0 flex-1 cursor-pointer items-center gap-2 overflow-hidden rounded-md text-left transition-opacity hover:opacity-80"
+						>
+							<Icon
+								name="inbox"
+								className="h-4 w-4 shrink-0 text-text-sub-600"
+							/>
+							<span className="truncate font-semibold text-[13px] text-text-strong-950">
+								{mailbox.email || mailbox.label || "Inbox"}
+							</span>
+							{emailCopied ? (
+								<Check className="size-3 shrink-0 text-emerald-500" />
+							) : (
+								<Copy className="size-3 shrink-0 text-text-sub-600 opacity-0 transition-opacity group-hover/copy:opacity-100" />
+							)}
+						</button>
+					) : (
+						<button
+							type="button"
+							onClick={handleCopyEmail}
+							title={`Click to copy ${mailbox.email || "email"}`}
+							className="flex size-7 items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:hover:bg-white/5"
+						>
+							{emailCopied ? (
+								<Check className="size-3.5 text-emerald-500" />
+							) : (
+								<Icon name="inbox" className="h-4 w-4" />
+							)}
+						</button>
+					)}
+				</div>
+
 				{/* Compose button */}
 				<div
 					className={cn(
@@ -217,13 +275,15 @@ export const InboxSidebar = ({
 						aria-keyshortcuts="c"
 						className={
 							collapsed
-								? "h-8 w-8 px-0"
-								: "h-8 w-full justify-between gap-2 px-2.5"
+								? "h-8 w-8 rounded-xl p-0"
+								: "h-8.5 w-full justify-between gap-2.5 rounded-xl px-3"
 						}
 					>
-						<div className="flex items-center gap-2">
-							<Pencil className="h-3.5 w-3.5 shrink-0" strokeWidth={1.75} />
-							{!collapsed && <span className="text-xs">Compose</span>}
+						<div className="flex items-center gap-2.5">
+							<Pencil className="h-4 w-4 shrink-0" strokeWidth={1.8} />
+							{!collapsed && (
+								<span className="font-medium text-[13.5px]">Compose</span>
+							)}
 						</div>
 						{!collapsed && (
 							<ActionKbd className={actionKbdOnBlueClassName}>C</ActionKbd>
@@ -236,7 +296,7 @@ export const InboxSidebar = ({
 					onPointerLeave={() => setHoveredEl(undefined)}
 					className={cn(
 						"relative min-h-0 w-full flex-1 overflow-y-auto overflow-x-hidden",
-						collapsed ? "px-0 py-2" : "px-2 py-2",
+						collapsed ? "px-0 py-1" : "px-2 py-1",
 					)}
 				>
 					{/* Mail folders */}
@@ -262,7 +322,7 @@ export const InboxSidebar = ({
 										"relative z-10 flex h-8 items-center rounded-lg transition-all",
 										collapsed
 											? "h-8 w-8 justify-center px-0"
-											: "w-full gap-2.5 px-2.5 justify-start",
+											: "w-full justify-start gap-2.5 px-2.5",
 									)}
 									title={collapsed ? item.label : undefined}
 								>
@@ -367,7 +427,7 @@ export const InboxSidebar = ({
 												"relative z-10 flex h-8 items-center rounded-lg transition-all",
 												collapsed
 													? "h-8 w-8 justify-center px-0"
-													: "w-full gap-2.5 px-2.5 justify-start",
+													: "w-full justify-start gap-2.5 px-2.5",
 											)}
 										>
 											<span

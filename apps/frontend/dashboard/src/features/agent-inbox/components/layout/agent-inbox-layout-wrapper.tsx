@@ -23,20 +23,20 @@ export const AgentInboxLayoutWrapper = ({
 	const [isAddOpen, setIsAddOpen] = useState(false);
 
 	return (
-		<div className="flex h-full min-h-0 w-full flex-col overflow-hidden bg-bg-white-0 text-text-strong-950 dark:bg-black">
-			<InboxTopNavbar mailbox={mailbox} />
-			<div className="flex min-h-0 min-w-0 flex-1 overflow-hidden">
-				<MailboxRail
-					activeMailboxId={mailbox.id}
-					currentFolder={folder}
-					onAddMailbox={() => setIsAddOpen(true)}
-				/>
-				<InboxSidebar mailbox={mailbox} folder={folder} />
+		<div className="flex h-full min-h-0 w-full overflow-hidden bg-bg-white-0 text-text-strong-950 dark:bg-black">
+			<MailboxRail
+				activeMailboxId={mailbox.id}
+				currentFolder={folder}
+				onAddMailbox={() => setIsAddOpen(true)}
+			/>
+			<InboxSidebar mailbox={mailbox} folder={folder} />
+			<div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+				<InboxTopNavbar mailbox={mailbox} />
 				<div className="relative z-[5] flex min-h-0 min-w-0 flex-1 overflow-hidden">
 					{children}
 				</div>
-				<InboxSupportPanel />
 			</div>
+			<InboxSupportPanel />
 
 			<AddAgentAddressModal
 				isOpen={isAddOpen}
