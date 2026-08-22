@@ -18,7 +18,7 @@ export function InboxCategoryNavbar({
 	return (
 		<nav
 			className={cn(
-				"grid h-11 w-full shrink-0 grid-cols-4 border-stroke-soft-100 border-y dark:border-stroke-soft-100/40",
+				"grid h-12 w-full shrink-0 grid-cols-4 border-stroke-soft-100 border-y dark:border-stroke-soft-100/40",
 				className,
 			)}
 			aria-label="Inbox views"
