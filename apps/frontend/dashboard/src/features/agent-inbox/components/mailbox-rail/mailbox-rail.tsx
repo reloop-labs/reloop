@@ -57,36 +57,19 @@ const RailMailboxAvatar = ({
 
 	return (
 		<div className="group relative flex w-full items-center justify-center">
-			{/* Left active/hover indicator pill */}
-			<div
-				className={cn(
-					"-left-0.5 absolute w-1 rounded-r-full bg-zero-blue transition-all duration-200",
-					active
-						? "h-6 opacity-100"
-						: "h-2 opacity-0 group-hover:h-4 group-hover:opacity-60",
-				)}
-			/>
-
 			<button
 				type="button"
 				onClick={onClick}
 				title={`${displayName} (${mailbox.email})`}
 				aria-label={`${displayName} (${mailbox.email})`}
 				aria-current={active ? "true" : undefined}
-				className="relative flex shrink-0 cursor-pointer items-center justify-center p-0.5 focus:outline-none"
+				className="relative flex shrink-0 cursor-pointer items-center justify-center p-0.5 transition-transform duration-150 ease-out active:scale-[0.96] focus:outline-none"
 			>
-				<div
-					className={cn(
-						"relative transition-transform duration-150 active:scale-95 group-hover:scale-105",
-					)}
-				>
+				<div className="relative">
 					<div
 						className={cn(
-							"flex size-9 items-center justify-center rounded-xl font-bold text-white text-xs uppercase shadow-sm transition-all",
+							"flex size-9 items-center justify-center rounded-xl font-bold text-white text-xs uppercase transition-all",
 							getAvatarGradient(mailbox.email || displayName),
-							active
-								? "ring-2 ring-zero-blue ring-offset-2 ring-offset-bg-white-0 dark:ring-white dark:ring-offset-black"
-								: "ring-1 ring-black/10 hover:ring-black/20 dark:ring-white/10 dark:hover:ring-white/30",
 						)}
 					>
 						{getAvatarInitial(mailbox.label, mailbox.email)}
@@ -168,7 +151,7 @@ export function MailboxRail({
 							onClick={onAddMailbox}
 							title="Add inbox address"
 							aria-label="Add inbox address"
-							className="group flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-xl border border-stroke-soft-200 border-dashed bg-bg-weak-50/50 text-text-sub-600 transition-all duration-150 hover:scale-105 hover:border-text-strong-950 hover:bg-bg-weak-50 hover:text-text-strong-950 focus:outline-none active:scale-95 dark:border-white/20 dark:bg-white/[0.04] dark:hover:border-white/50 dark:hover:bg-white/[0.08] dark:hover:text-white"
+							className="group flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-xl border border-stroke-soft-200 border-dashed bg-bg-weak-50/50 text-text-sub-600 transition-all duration-150 hover:border-text-strong-950 hover:bg-bg-weak-50 hover:text-text-strong-950 focus:outline-none active:scale-[0.96] dark:border-white/20 dark:bg-white/[0.04] dark:hover:border-white/50 dark:hover:bg-white/[0.08] dark:hover:text-white"
 						>
 							<Plus className="size-4 transition-transform duration-200 group-hover:rotate-90" />
 						</button>
