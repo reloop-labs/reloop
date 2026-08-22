@@ -490,12 +490,12 @@ export const AgentInboxContent = ({
 				<button
 					type="button"
 					onClick={handleCloseThread}
-					className="inline-flex size-8 items-center justify-center rounded-lg text-mail-muted hover:bg-[var(--inbox-row-hover)] hover:text-mail-foreground"
+					className="inline-flex size-8 items-center justify-center rounded-lg text-text-sub-600 hover:bg-bg-weak-50 hover:text-text-strong-950"
 					aria-label="Back to list"
 				>
 					<Icon name="arrow-left" className="h-4 w-4" />
 				</button>
-				<span className="text-mail-muted text-sm">Back</span>
+				<span className="text-text-sub-600 text-sm">Back</span>
 			</div>
 			<SectionError
 				message="Couldn't load this conversation"
@@ -507,18 +507,18 @@ export const AgentInboxContent = ({
 		<div className="flex h-full min-h-0 flex-col items-center justify-center">
 			<LoadingDot
 				label="Loading conversation"
-				className="text-mail-muted"
+				className="text-text-sub-600"
 				size={28}
 				dotSize={3}
 			/>
 		</div>
 	) : selectedThreadId ? (
 		<div className="flex h-full min-h-0 flex-col items-center justify-center gap-3 p-6">
-			<p className="text-mail-muted text-sm">Conversation not found</p>
+			<p className="text-text-sub-600 text-sm">Conversation not found</p>
 			<button
 				type="button"
 				onClick={handleCloseThread}
-				className="rounded-lg bg-[var(--inbox-control)] px-3 py-1.5 text-mail-foreground text-sm hover:bg-[var(--inbox-control-hover)]"
+				className="rounded-lg bg-bg-weak-50 px-3 py-1.5 text-text-strong-950 text-sm hover:bg-bg-soft-200"
 			>
 				Back to list
 			</button>
@@ -527,7 +527,7 @@ export const AgentInboxContent = ({
 
 	const listPane = (
 		<div className="flex min-h-0 flex-1 flex-col">
-			<div className="sticky top-0 z-15 shrink-0 bg-bg-white-0 dark:bg-black">
+			<div className="sticky top-0 z-15 shrink-0 bg-bg-white-0">
 				<div className="flex h-11 items-center pr-6 pl-4">
 					<span className="ml-1 flex w-5 shrink-0 items-center justify-center">
 						<button
@@ -544,7 +544,7 @@ export const AgentInboxContent = ({
 								"flex size-4 items-center justify-center rounded border transition-colors disabled:opacity-40",
 								allVisibleSelected || mail.bulkSelected.length > 0
 									? "border-zero-blue bg-zero-blue text-white"
-									: "border-mail-border bg-transparent hover:border-mail-foreground/40",
+									: "border-stroke-soft-200 bg-transparent hover:border-stroke-sub-300",
 							)}
 						>
 							{(allVisibleSelected || mail.bulkSelected.length > 0) && (
@@ -558,13 +558,13 @@ export const AgentInboxContent = ({
 					{!showInboxTabs ? (
 						<>
 							<span className="w-3 shrink-0" aria-hidden="true" />
-							<h1 className="min-w-0 truncate font-semibold text-[18px] text-mail-foreground">
+							<h1 className="min-w-0 truncate font-semibold text-[18px] text-text-strong-950">
 								{folderTitle}
 							</h1>
 						</>
 					) : null}
 					{mail.bulkSelected.length === 0 ? (
-						<div className="flex items-center gap-1 text-mail-muted">
+						<div className="flex items-center gap-1 text-text-sub-600">
 							{activeFilterCount > 0 && (
 								<span className="mr-1 rounded-full bg-zero-blue/15 px-1.5 py-0.5 font-medium text-[11px] text-zero-blue tabular-nums">
 									{activeFilterCount}
@@ -576,16 +576,16 @@ export const AgentInboxContent = ({
 								disabled={isRefreshing}
 								title="Refresh"
 								aria-label="Refresh"
-								className="inline-flex size-8 items-center justify-center rounded-lg transition-colors hover:bg-[var(--inbox-row-hover)] disabled:opacity-50"
+								className="inline-flex size-8 items-center justify-center rounded-lg hover:bg-bg-weak-50 disabled:opacity-50"
 							>
 								{isRefreshing ? (
 									<LoadingDot
 										label="Refreshing"
-										className="text-mail-muted"
+										className="text-text-sub-600"
 										style={{ fontSize: 12 }}
 									/>
 								) : (
-									<Icon name="refresh-cw" className="h-4 w-4 text-mail-muted" />
+									<Icon name="refresh-cw" className="h-4 w-4 text-text-sub-600" />
 								)}
 							</button>
 						</div>
@@ -598,20 +598,20 @@ export const AgentInboxContent = ({
 									onClick={() =>
 										void runBulkAction("restore", "Moved to inbox")
 									}
-									className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--inbox-control)] hover:bg-[var(--inbox-control-hover)]"
+									className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-bg-weak-50 hover:bg-bg-soft-200"
 								>
-									<Icon name="inbox" className="h-3.5 w-3.5 text-mail-muted" />
+									<Icon name="inbox" className="h-3.5 w-3.5 text-text-sub-600" />
 								</button>
 							) : (
 								<button
 									type="button"
 									title="Archive"
 									onClick={() => void runBulkAction("archive", "Archived")}
-									className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--inbox-control)] hover:bg-[var(--inbox-control-hover)]"
+									className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-bg-weak-50 hover:bg-bg-soft-200"
 								>
 									<Icon
 										name="archive"
-										className="h-3.5 w-3.5 text-mail-muted"
+										className="h-3.5 w-3.5 text-text-sub-600"
 									/>
 								</button>
 							)}
@@ -619,49 +619,49 @@ export const AgentInboxContent = ({
 								type="button"
 								title="Trash"
 								onClick={() => void runBulkAction("trash", "Moved to trash")}
-								className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--inbox-control)] hover:bg-[var(--inbox-control-hover)]"
+								className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-bg-weak-50 hover:bg-bg-soft-200"
 							>
-								<Icon name="trash" className="h-3.5 w-3.5 text-mail-muted" />
+								<Icon name="trash" className="h-3.5 w-3.5 text-text-sub-600" />
 							</button>
 							<button
 								type="button"
 								title="Spam"
 								onClick={() => void runBulkAction("spam", "Moved to spam")}
-								className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--inbox-control)] hover:bg-[var(--inbox-control-hover)]"
+								className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-bg-weak-50 hover:bg-bg-soft-200"
 							>
-								<Icon name="alert" className="h-3.5 w-3.5 text-mail-muted" />
+								<Icon name="alert" className="h-3.5 w-3.5 text-text-sub-600" />
 							</button>
 							<button
 								type="button"
 								title="Star"
 								onClick={() => void runBulkAction("star", "Starred")}
-								className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--inbox-control)] hover:bg-[var(--inbox-control-hover)]"
+								className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-bg-weak-50 hover:bg-bg-soft-200"
 							>
-								<Icon name="star" className="h-3.5 w-3.5 text-mail-muted" />
+								<Icon name="star" className="h-3.5 w-3.5 text-text-sub-600" />
 							</button>
 							<button
 								type="button"
 								title="Pin"
 								onClick={() => void runBulkAction("pin", "Pinned")}
-								className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--inbox-control)] hover:bg-[var(--inbox-control-hover)]"
+								className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-bg-weak-50 hover:bg-bg-soft-200"
 							>
-								<Icon name="pin" className="h-3.5 w-3.5 text-mail-muted" />
+								<Icon name="pin" className="h-3.5 w-3.5 text-text-sub-600" />
 							</button>
 							<button
 								type="button"
 								title="Mark read"
 								onClick={() => void runBulkAction("read", "Marked as read")}
-								className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--inbox-control)] hover:bg-[var(--inbox-control-hover)]"
+								className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-bg-weak-50 hover:bg-bg-soft-200"
 							>
-								<Icon name="mail" className="h-3.5 w-3.5 text-mail-muted" />
+								<Icon name="mail" className="h-3.5 w-3.5 text-text-sub-600" />
 							</button>
 							<button
 								type="button"
 								onClick={handleToggleSelectAll}
 								title={allVisibleSelected ? "Deselect all" : "Select all"}
-								className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-[var(--inbox-control)] px-2 text-mail-muted text-xs hover:bg-[var(--inbox-control-hover)]"
+								className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-bg-weak-50 px-2 text-text-sub-600 text-xs hover:bg-bg-soft-200"
 							>
-								<span className="font-medium text-mail-foreground tabular-nums">
+								<span className="font-medium text-text-strong-950 tabular-nums">
 									{mail.bulkSelected.length}
 								</span>
 								selected
@@ -690,7 +690,7 @@ export const AgentInboxContent = ({
 
 			<div
 				ref={listContainerRef}
-				className="relative z-1 flex min-h-0 flex-1 flex-col overflow-hidden"
+				className="relative z-1 flex min-h-0 flex-1 flex-col overflow-hidden bg-bg-white-0"
 			>
 				{threadsError && filteredThreads.length === 0 ? (
 					<SectionError
@@ -759,7 +759,7 @@ export const AgentInboxContent = ({
 			/>
 			{/* Gmail-style: list OR detail fills the main pane (not side-by-side). */}
 			<div className="relative flex min-h-0 min-w-0 flex-1 p-0">
-				<div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-bg-white-0 dark:bg-black">
+				<div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-bg-white-0">
 					{isThreadOpen ? detailPane : listPane}
 				</div>
 			</div>

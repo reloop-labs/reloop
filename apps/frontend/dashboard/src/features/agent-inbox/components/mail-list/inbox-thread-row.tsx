@@ -127,10 +127,11 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 				onClick={(e) => onSelect(listId, e)}
 				onMouseEnter={() => onMouseEnter(listId)}
 				className={cn(
-					"group flex cursor-pointer items-center border-b pt-2.5 pr-6 pb-2.5 pl-4 text-left transition-colors duration-150",
-					"border-stroke-soft-100 hover:bg-(--inbox-row-hover) dark:border-stroke-soft-100/40",
+					"group flex cursor-pointer items-center border-b pt-2.5 pr-6 pb-2.5 pl-4 text-left",
+					"border-stroke-soft-100 bg-transparent",
+					"hover:bg-neutral-alpha-10",
 					(isSelected || isBulkSelected || isKeyboardFocused) &&
-						"bg-(--inbox-row-focused)",
+						"bg-neutral-alpha-10",
 				)}
 			>
 				{/* Bulk select checkbox */}
@@ -144,10 +145,10 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 							onToggleBulk(listId, e);
 						}}
 						className={cn(
-							"flex size-4 items-center justify-center rounded border transition-colors",
+							"flex size-4 items-center justify-center rounded border",
 							isBulkSelected
 								? "border-zero-blue bg-zero-blue text-white"
-								: "border-mail-border bg-transparent hover:border-mail-foreground/60",
+								: "border-stroke-soft-200 bg-transparent hover:border-stroke-sub-300 dark:border-stroke-soft-100/60",
 						)}
 					>
 						{isBulkSelected && (
@@ -165,15 +166,15 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 							e.stopPropagation();
 							onToggleStar(thread.messageId ?? thread.id, !thread.isStarred);
 						}}
-						className="flex size-5 items-center justify-center transition-colors"
+						className="flex size-5 items-center justify-center"
 					>
 						<Icon
 							name={thread.isStarred ? "star-filled" : "star"}
 							className={cn(
-								"h-4 w-4 transition-colors",
+								"h-4 w-4",
 								thread.isStarred
-									? "text-amber-400 fill-amber-400"
-									: "text-mail-muted/40 group-hover:text-mail-muted",
+									? "fill-amber-400 text-amber-400"
+									: "text-text-soft-400/60 group-hover:text-text-soft-400",
 							)}
 						/>
 					</button>
@@ -188,14 +189,14 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 						className={cn(
 							"truncate text-[14px] leading-5",
 							isUnread
-								? "font-semibold text-mail-foreground"
-								: "font-normal text-mail-foreground/85",
+								? "font-semibold text-text-strong-950"
+								: "font-normal text-text-sub-600",
 						)}
 					>
 						{highlightMatches(displayName, searchQuery)}
 					</span>
 					{messageCount > 1 && (
-						<span className="shrink-0 text-[13px] text-mail-muted">
+						<span className="shrink-0 text-[13px] text-text-soft-400">
 							{messageCount}
 						</span>
 					)}
@@ -205,7 +206,7 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 				<div className="flex min-w-0 flex-1 items-center gap-1.5 overflow-hidden pr-3">
 					{primaryLabel && (
 						<span
-							className="mr-1 flex h-5 max-w-30 shrink-0 items-center truncate rounded-[6px] border px-1.5 text-[11px] font-medium"
+							className="mr-1 flex h-5 max-w-30 shrink-0 items-center truncate rounded-[6px] border px-1.5 font-medium text-[11px]"
 							style={{
 								background: chipBackground(primaryLabel.color),
 								color: "var(--inbox-chip-fg)",
@@ -219,16 +220,16 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 						<span
 							className={cn(
 								isUnread
-									? "font-semibold text-mail-foreground"
-									: "font-normal text-mail-foreground/90",
+									? "font-semibold text-text-strong-950"
+									: "font-normal text-text-sub-600",
 							)}
 						>
 							{highlightMatches(subject, searchQuery)}
 						</span>
 						{preview && (
 							<>
-								<span className="mx-1 text-mail-muted/60">-</span>
-								<span className="font-normal text-[13px] text-mail-muted">
+								<span className="mx-1 text-text-soft-400/60">-</span>
+								<span className="font-normal text-[13px] text-text-soft-400">
 									{highlightMatches(preview, searchQuery)}
 								</span>
 							</>
@@ -239,7 +240,7 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 				{/* Hover actions */}
 				<span
 					className={cn(
-						"ml-2 flex shrink-0 items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100",
+						"ml-2 flex shrink-0 items-center gap-1 opacity-0 group-hover:opacity-100",
 						isSelectMode && "pointer-events-none opacity-0",
 					)}
 				>
@@ -255,9 +256,9 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 									onArchive(listId);
 								}
 							}}
-							className="flex size-7 items-center justify-center rounded-md hover:bg-(--inbox-control-hover)"
+							className="flex size-7 items-center justify-center rounded-md hover:bg-bg-soft-200 dark:hover:bg-neutral-alpha-16"
 						>
-							<Icon name="inbox" className="h-3.5 w-3.5 text-mail-muted" />
+							<Icon name="inbox" className="h-3.5 w-3.5 text-text-sub-600" />
 						</button>
 					) : (
 						<button
@@ -267,9 +268,9 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 								e.stopPropagation();
 								onArchive(listId);
 							}}
-							className="flex size-7 items-center justify-center rounded-md hover:bg-(--inbox-control-hover)"
+							className="flex size-7 items-center justify-center rounded-md hover:bg-bg-soft-200 dark:hover:bg-neutral-alpha-16"
 						>
-							<Icon name="archive" className="h-3.5 w-3.5 text-mail-muted" />
+							<Icon name="archive" className="h-3.5 w-3.5 text-text-sub-600" />
 						</button>
 					)}
 					<button
@@ -286,7 +287,7 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 				</span>
 
 				{/* Date/Time */}
-				<span className="ml-2 w-18 shrink-0 text-right text-[12.5px] font-normal tabular-nums whitespace-nowrap text-mail-muted">
+				<span className="ml-2 w-18 shrink-0 whitespace-nowrap text-right font-normal text-[12.5px] text-text-soft-400 tabular-nums">
 					{formatReceivedAt(thread.receivedAt)}
 				</span>
 			</div>
@@ -295,4 +296,3 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 );
 
 InboxThreadRow.displayName = "InboxThreadRow";
-

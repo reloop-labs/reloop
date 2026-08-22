@@ -236,7 +236,10 @@ export const ThreadList = ({
 	}
 
 	return (
-		<div ref={containerRef} className="flex h-full min-h-0 flex-1 flex-col">
+		<div
+			ref={containerRef}
+			className="flex h-full min-h-0 flex-1 flex-col bg-bg-white-0"
+		>
 			<div
 				className="relative min-h-0 flex-1 overflow-hidden"
 				id="mail-list-scroll"
