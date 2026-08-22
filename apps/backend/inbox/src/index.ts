@@ -21,6 +21,7 @@ import { mailboxRoutes } from "./routes/mailbox/mailbox.routes";
 import { messagesRoutes } from "./routes/messages/messages.routes";
 import { notesRoutes } from "./routes/notes/notes.routes";
 import { threadsRoutes } from "./routes/threads/threads.routes";
+import { webhooksRoutes } from "./routes/webhooks/webhooks.routes";
 import { loader } from "./utils/loader";
 
 const parseOtlpHeaders = (
@@ -94,6 +95,7 @@ const inboxService = new Elysia({
 	.use(mailboxRoutes)
 	.use(messagesRoutes)
 	.use(threadsRoutes)
+	.use(webhooksRoutes)
 	.use(labelsRoutes)
 	.use(notesRoutes)
 	.use(draftsRoutes)
