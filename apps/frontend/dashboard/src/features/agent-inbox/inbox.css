@@ -1,129 +1,5 @@
 /**
- * Zero mail inbox shell — scoped theme overrides.
- * Color utilities are registered in @reloop/tailwind/style.css.
- *
- * Light is the default for `.inbox-zero-theme`.
- * Dark tokens apply when `.dark` is present on the shell (synced via next-themes).
- */
-.inbox-zero-theme {
-	isolation: isolate;
-	height: 100dvh;
-	width: 100vw;
-	overflow: hidden;
-	font-family: var(--font-geist-sans, var(--font-sans));
-
-	/* Light mode (default) — mirrors Zero panelLight surfaces */
-	--sidebar-background: hsl(0 0% 98%);
-	--mail-background: var(--bg-white-0);
-	--mail-foreground: var(--text-strong-950);
-	--mail-muted: var(--text-sub-600);
-	--mail-border: var(--stroke-soft-100);
-	--mail-primary: var(--text-strong-950);
-	--mail-accent: var(--bg-weak-50);
-	--panel-light: var(--bg-white-0);
-	--panel-dark: var(--bg-weak-50);
-	--offset-light: var(--bg-weak-50);
-	--offset-dark: var(--bg-soft-200);
-	--zero-blue: #006ffe;
-	--zero-blue-hover: #0056cc;
-
-	/* Semantic controls (theme-aware replacements for hardcoded hex) */
-	--inbox-control: var(--bg-weak-50);
-	--inbox-control-hover: var(--bg-soft-200);
-	--inbox-hover: var(--bg-weak-50);
-	--inbox-active: var(--inbox-hover);
-	--inbox-menu: var(--bg-white-0);
-	--inbox-muted-bg: var(--bg-weak-50);
-	/* Contrasts on both sidebar (weak-50) and panel (white) — muted-bg does not. */
-	--inbox-skeleton: var(--bg-soft-200);
-	--inbox-danger-bg: #fff1f2;
-	--inbox-danger-border: #fecdd3;
-	--inbox-danger-fg: #e11d48;
-	--inbox-compose-bar: var(--bg-weak-50);
-
-	/* Superhuman-style list / nav density */
-	--inbox-row-hover: var(--bg-weak-50);
-	--inbox-row-focused: var(--bg-soft-200);
-	--inbox-selected: var(--bg-soft-200);
-	--inbox-divider: var(--stroke-soft-100);
-	--inbox-unread: var(--zero-blue);
-	--inbox-chip-bg: var(--bg-weak-50);
-	--inbox-chip-fg: var(--text-sub-600);
-	--inbox-chip-border: var(--stroke-soft-100);
-	--inbox-star: #f5b400;
-	--inbox-sidebar-icon: var(--text-sub-600);
-	--inbox-sidebar-text-inactive: var(--text-sub-600);
-
-	background-color: var(--sidebar-background);
-	color: var(--mail-foreground);
-	color-scheme: light;
-}
-
-.inbox-zero-theme.dark {
-	--sidebar-background: hsl(240 3.9% 7%);
-	--mail-background: #0a0a0a;
-	--mail-foreground: var(--text-strong-950);
-	--mail-muted: var(--text-sub-600);
-	--mail-border: var(--stroke-soft-100);
-	--mail-primary: var(--text-strong-950);
-	--mail-accent: rgba(255, 255, 255, 0.04);
-	--panel-light: rgba(255, 255, 255, 0.02);
-	--panel-dark: #0a0a0a;
-	--offset-light: rgba(255, 255, 255, 0.02);
-	--offset-dark: #000000;
-	--zero-blue: #006ffe;
-	--zero-blue-hover: #0056cc;
-
-	--inbox-control: rgba(255, 255, 255, 0.04);
-	--inbox-control-hover: rgba(255, 255, 255, 0.08);
-	--inbox-hover: rgba(255, 255, 255, 0.04);
-	--inbox-active: var(--inbox-hover);
-	--inbox-menu: #0a0a0a;
-	--inbox-muted-bg: rgba(255, 255, 255, 0.03);
-	/* Visible on black sidebar and near-black panel surfaces. */
-	--inbox-skeleton: rgba(255, 255, 255, 0.1);
-	--inbox-danger-bg: #411d23;
-	--inbox-danger-border: #6e2532;
-	--inbox-danger-fg: #f43f5e;
-	--inbox-compose-bar: rgba(255, 255, 255, 0.02);
-
-	/* Superhuman-style list / nav density */
-	--inbox-row-hover: rgba(255, 255, 255, 0.04);
-	--inbox-row-focused: rgba(255, 255, 255, 0.08);
-	--inbox-selected: rgba(255, 255, 255, 0.08);
-	--inbox-divider: rgba(255, 255, 255, 0.06);
-	--inbox-unread: var(--zero-blue);
-	--inbox-chip-bg: rgba(255, 255, 255, 0.06);
-	--inbox-chip-fg: rgba(255, 255, 255, 0.75);
-	--inbox-chip-border: rgba(255, 255, 255, 0.1);
-	--inbox-star: #f5b400;
-	--inbox-sidebar-icon: rgba(255, 255, 255, 0.45);
-	--inbox-sidebar-text-inactive: rgba(255, 255, 255, 0.5);
-
-	color-scheme: dark;
-}
-
-/* Shared interactive helpers */
-.inbox-zero-theme .inbox-control {
-	background-color: var(--inbox-control);
-	transition: background-color 0.15s ease;
-}
-.inbox-zero-theme .inbox-control:hover {
-	background-color: var(--inbox-control-hover);
-}
-.inbox-zero-theme .inbox-hover:hover {
-	background-color: var(--inbox-hover);
-}
-.inbox-zero-theme .inbox-menu-surface {
-	background-color: var(--inbox-menu);
-}
-.inbox-zero-theme .inbox-muted-surface {
-	background-color: var(--inbox-muted-bg);
-}
-
-/**
- * Thinking phase: shimmer the existing editor text for a beat,
- * then replace it when streaming starts.
+ * AI thinking animation utilities for the compose editor.
  */
 @keyframes ai-body-shimmer {
 	0% {
@@ -134,26 +10,26 @@
 	}
 }
 
-.inbox-zero-theme .ai-body-thinking {
+.ai-body-thinking {
 	isolation: isolate;
 }
 
-.inbox-zero-theme .ai-body-thinking .ProseMirror,
-.inbox-zero-theme .ai-body-thinking .ProseMirror p,
-.inbox-zero-theme .ai-body-thinking .ProseMirror li,
-.inbox-zero-theme .ai-body-thinking .ProseMirror h1,
-.inbox-zero-theme .ai-body-thinking .ProseMirror h2,
-.inbox-zero-theme .ai-body-thinking .ProseMirror h3,
-.inbox-zero-theme .ai-body-thinking .ProseMirror h4 {
+.ai-body-thinking .ProseMirror,
+.ai-body-thinking .ProseMirror p,
+.ai-body-thinking .ProseMirror li,
+.ai-body-thinking .ProseMirror h1,
+.ai-body-thinking .ProseMirror h2,
+.ai-body-thinking .ProseMirror h3,
+.ai-body-thinking .ProseMirror h4 {
 	color: transparent !important;
 	-webkit-text-fill-color: transparent;
 	background-image: linear-gradient(
 		110deg,
-		var(--mail-muted) 0%,
-		var(--mail-muted) 38%,
-		var(--mail-foreground) 50%,
-		var(--mail-muted) 62%,
-		var(--mail-muted) 100%
+		var(--text-sub-600) 0%,
+		var(--text-sub-600) 38%,
+		var(--text-strong-950) 50%,
+		var(--text-sub-600) 62%,
+		var(--text-sub-600) 100%
 	);
 	background-size: 220% 100%;
 	-webkit-background-clip: text;
@@ -161,26 +37,26 @@
 	animation: ai-body-shimmer 1.8s linear infinite;
 }
 
-.inbox-zero-theme .ai-body-thinking .ProseMirror strong,
-.inbox-zero-theme .ai-body-thinking .ProseMirror em,
-.inbox-zero-theme .ai-body-thinking .ProseMirror a,
-.inbox-zero-theme .ai-body-thinking .ProseMirror span {
+.ai-body-thinking .ProseMirror strong,
+.ai-body-thinking .ProseMirror em,
+.ai-body-thinking .ProseMirror a,
+.ai-body-thinking .ProseMirror span {
 	color: inherit !important;
 	-webkit-text-fill-color: inherit;
 	background: none !important;
 }
 
 @media (prefers-reduced-motion: reduce) {
-	.inbox-zero-theme .ai-body-thinking .ProseMirror,
-	.inbox-zero-theme .ai-body-thinking .ProseMirror p,
-	.inbox-zero-theme .ai-body-thinking .ProseMirror li,
-	.inbox-zero-theme .ai-body-thinking .ProseMirror h1,
-	.inbox-zero-theme .ai-body-thinking .ProseMirror h2,
-	.inbox-zero-theme .ai-body-thinking .ProseMirror h3,
-	.inbox-zero-theme .ai-body-thinking .ProseMirror h4 {
+	.ai-body-thinking .ProseMirror,
+	.ai-body-thinking .ProseMirror p,
+	.ai-body-thinking .ProseMirror li,
+	.ai-body-thinking .ProseMirror h1,
+	.ai-body-thinking .ProseMirror h2,
+	.ai-body-thinking .ProseMirror h3,
+	.ai-body-thinking .ProseMirror h4 {
 		animation: none;
-		color: var(--mail-muted) !important;
-		-webkit-text-fill-color: var(--mail-muted);
+		color: var(--text-sub-600) !important;
+		-webkit-text-fill-color: var(--text-sub-600);
 		background-image: none;
 	}
 }

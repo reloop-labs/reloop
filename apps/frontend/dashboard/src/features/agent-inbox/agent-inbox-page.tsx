@@ -1,13 +1,14 @@
 "use client";
 
 import { parseAsString, useQueryState } from "nuqs";
-import { useMemo, useState } from "react";
-import { AddAgentAddressModal } from "./components/add-agent-address-modal";
+import { useMemo } from "react";
+import { AgentInboxCommonUseCasesSidebar } from "./common-use-cases-sidebar";
 import { useAgentInbox } from "./components/agent-inbox-provider";
+import { CreateInboxInlineCard } from "./components/create-inbox-inline-card";
 import { AgentInboxLayoutWrapper } from "./components/layout/agent-inbox-layout-wrapper";
 import { ListPanelSkeleton } from "./components/mail-list/list-panel-skeleton";
-import { AgentInboxEmptyState } from "./components/shared/empty-state";
 import { SectionError } from "./components/shared/section-error";
+import { AgentMailboxListHeader } from "./list/agent-mailbox-list-header";
 import {
 	AgentFolderPage,
 	ArchiveFolderPage,
@@ -33,7 +34,6 @@ export function AgentInboxPage() {
 		"folder",
 		parseAsString.withDefault("inbox"),
 	);
-	const [isAddOpen, setIsAddOpen] = useState(false);
 
 	const activeMailbox = useMemo(() => {
 		if (!mailboxes || mailboxes.length === 0) return undefined;
@@ -46,7 +46,7 @@ export function AgentInboxPage() {
 
 	if (isLoadingMailboxes && (!mailboxes || mailboxes.length === 0)) {
 		return (
-			<div className="flex h-full min-h-0 flex-1 flex-col overflow-hidden bg-panel-light p-4 dark:bg-panel-dark">
+			<div className="flex h-full min-h-0 flex-1 flex-col overflow-hidden p-4">
 				<ListPanelSkeleton className="min-h-0 flex-1 shadow-none" />
 			</div>
 		);
@@ -54,7 +54,7 @@ export function AgentInboxPage() {
 
 	if (mailboxesError && (!mailboxes || mailboxes.length === 0)) {
 		return (
-			<div className="flex h-full min-h-0 flex-1 items-center justify-center p-6 bg-panel-light dark:bg-panel-dark">
+			<div className="flex h-full min-h-0 flex-1 items-center justify-center p-6">
 				<SectionError
 					message="Couldn't load mailboxes"
 					onRetry={() => void retryMailboxes()}
@@ -65,12 +65,20 @@ export function AgentInboxPage() {
 
 	if (!isLoadingMailboxes && (!mailboxes || mailboxes.length === 0)) {
 		return (
-			<div className="flex h-full min-h-0 flex-1 items-center justify-center p-6 bg-panel-light dark:bg-panel-dark">
-				<AgentInboxEmptyState onAddClick={() => setIsAddOpen(true)} />
-				<AddAgentAddressModal
-					isOpen={isAddOpen}
-					onClose={() => setIsAddOpen(false)}
-				/>
+			<div className="h-full flex-1 overflow-y-auto">
+				<div className="mx-auto max-w-6xl space-y-6 p-6 lg:p-8">
+					<AgentMailboxListHeader />
+
+					<div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
+						<div className="lg:col-span-7 xl:col-span-7">
+							<CreateInboxInlineCard />
+						</div>
+
+						<div className="lg:col-span-5 xl:col-span-5">
+							<AgentInboxCommonUseCasesSidebar />
+						</div>
+					</div>
+				</div>
 			</div>
 		);
 	}

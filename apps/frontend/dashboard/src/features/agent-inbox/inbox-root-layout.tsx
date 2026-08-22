@@ -1,8 +1,5 @@
-import { cn } from "@reloop/ui/cn";
 import { Provider as JotaiProvider } from "jotai";
-import { useTheme } from "next-themes";
 import type { ReactNode } from "react";
-import { useEffect, useState } from "react";
 import { AgentInboxProvider } from "./components/agent-inbox-provider";
 import { InboxHotkeysProvider } from "./components/inbox-hotkeys-provider";
 import { InboxSidebarProvider } from "./components/sidebar/inbox-sidebar-context";
@@ -13,22 +10,8 @@ export default function AgentInboxSectionLayout({
 }: {
 	children: ReactNode;
 }) {
-	const { resolvedTheme } = useTheme();
-	const [mounted, setMounted] = useState(false);
-
-	useEffect(() => {
-		setMounted(true);
-	}, []);
-
-	const isDark = mounted ? resolvedTheme === "dark" : true;
-
 	return (
-		<div
-			className={cn(
-				"inbox-zero-theme flex h-full min-h-0 w-full flex-1 flex-col overflow-hidden",
-				isDark && "dark",
-			)}
-		>
+		<div className="flex h-full min-h-0 w-full flex-1 flex-col overflow-hidden">
 			<AgentInboxProvider>
 				<JotaiProvider>
 					<InboxSidebarProvider>
