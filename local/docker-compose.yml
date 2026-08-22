@@ -88,6 +88,7 @@ services:
       - ../docker-data/kumomta/meta:/var/spool/kumomta/meta
       - ../apps/backend/smtp/init.lua:/opt/kumomta/etc/policy/init.lua
       - ../apps/backend/smtp/policy:/opt/kumomta/etc/policy/policy
+      - /data/coolify/proxy:/traefik:ro
     environment:
       - BASE_URL=${BASE_URL:-https://local.reloop.sh}
       - NATS_URL=${NATS_URL:-reloop-nats:4222}
