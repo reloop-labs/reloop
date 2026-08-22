@@ -18,7 +18,7 @@ export function InboxCategoryNavbar({
 	return (
 		<nav
 			className={cn(
-				"grid w-full grid-cols-4 overflow-x-auto border-mail-border/50 border-y [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
+				"flex overflow-x-auto border-mail-border/50 border-y [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
 				className,
 			)}
 			aria-label="Inbox views"
@@ -32,7 +32,7 @@ export function InboxCategoryNavbar({
 						type="button"
 						onClick={() => onViewChange(view.id)}
 						className={cn(
-							"relative flex items-center gap-2.5 border-mail-border/50 border-l px-4 py-4 text-left first:border-l-0 first:pr-4 first:pl-4 sm:px-5 sm:first:pl-4",
+							"relative flex w-[160px] items-center gap-2.5 border-mail-border/50 border-l px-4 py-4 text-left first:border-l-0 sm:px-5",
 							isActive
 								? "bg-transparent"
 								: "bg-transparent hover:bg-[var(--inbox-row-hover)]",
