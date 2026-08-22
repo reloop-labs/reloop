@@ -1,12 +1,10 @@
 import { cn } from "@reloop/ui/cn";
 import { Skeleton } from "@reloop/ui/skeleton";
 
-const sk = "bg-[var(--inbox-skeleton)]";
-
 const NAME_WIDTHS = [
-	"w-20",
-	"w-28",
 	"w-24",
+	"w-28",
+	"w-20",
 	"w-32",
 	"w-16",
 	"w-28",
@@ -35,38 +33,52 @@ const PREVIEW_WIDTHS = [
 ];
 
 const MailListRowSkeleton = ({ index }: { index: number }) => (
-	<div className="flex items-center border-[var(--inbox-divider)] border-b pt-[10px] pr-6 pb-[10px] pl-4">
+	<div className="flex h-11 items-center border-stroke-soft-100 border-b pr-6 pl-4 transition-colors dark:border-stroke-soft-100/40">
+		{/* Checkbox */}
 		<span className="ml-1 flex w-5 shrink-0 justify-center">
-			<span className="size-2 rounded-full bg-[var(--inbox-skeleton)] opacity-40" />
+			<Skeleton className="size-4 rounded" />
 		</span>
+
+		{/* Unread indicator */}
+		<span className="flex w-3 shrink-0 items-center justify-center">
+			{index % 3 === 0 && <Skeleton className="size-1.5 rounded-full" />}
+		</span>
+
+		{/* Sender */}
 		<span
 			className="ml-1.5 flex items-center pr-3"
 			style={{ width: "clamp(80px, 22%, 176px)" }}
 		>
 			<Skeleton
-				className={cn("h-3.5", NAME_WIDTHS[index % NAME_WIDTHS.length], sk)}
+				className={cn("h-3.5 rounded", NAME_WIDTHS[index % NAME_WIDTHS.length])}
 			/>
 		</span>
+
+		{/* Subject & Preview */}
 		<span className="mr-3 flex min-w-0 flex-1 items-center gap-2">
 			<Skeleton
 				className={cn(
-					"h-3.5 shrink-0",
+					"h-3.5 shrink-0 rounded",
 					SUBJECT_WIDTHS[index % SUBJECT_WIDTHS.length],
-					sk,
 				)}
 			/>
 			<Skeleton
-				className={cn("h-3", PREVIEW_WIDTHS[index % PREVIEW_WIDTHS.length], sk)}
+				className={cn(
+					"h-3 rounded opacity-60",
+					PREVIEW_WIDTHS[index % PREVIEW_WIDTHS.length],
+				)}
 			/>
 		</span>
-		<Skeleton className={cn("ml-1 h-3 w-[48px] shrink-0", sk)} />
+
+		{/* Date */}
+		<Skeleton className="ml-1 h-3 w-[44px] shrink-0 rounded" />
 	</div>
 );
 
 /** Thread list placeholder — mirrors dense Superhuman-style InboxThreadRow. */
 export const MailListSkeleton = ({
 	className,
-	rows = 12,
+	rows = 14,
 }: {
 	className?: string;
 	rows?: number;
