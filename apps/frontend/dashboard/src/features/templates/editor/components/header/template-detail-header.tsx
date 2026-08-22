@@ -1,4 +1,5 @@
 import { cn } from "@reloop/ui/cn";
+import { AnimatedBackButton } from "#/features/dashboard/animated-back-button";
 import { AnimatedSidebarToggleIcon } from "#/features/dashboard/sidebar/animated-sidebar-toggle-icon";
 import { usePlayAnimationOnHover } from "#/features/dashboard/sidebar/use-play-animation-on-hover";
 import { useSidebarCollapse } from "#/features/dashboard/sidebar/use-sidebar-collapse";
@@ -50,8 +51,9 @@ export function TemplateDetailHeader({
 }: TemplateDetailHeaderProps) {
 	return (
 		<div className="relative flex shrink-0 items-center justify-between border-stroke-soft-200 border-b bg-bg-white-0 px-4 py-2.5 dark:border-stroke-soft-100/40 dark:bg-black">
-			<div className="flex min-w-0 flex-1 items-center gap-3">
+			<div className="flex min-w-0 flex-1 items-center gap-2">
 				<SidebarToggleButton />
+				<AnimatedBackButton href="/templates" shortcut="mod+backspace" />
 				<CenterNav />
 			</div>
 			<div className="pointer-events-none absolute inset-0 flex items-center justify-center">

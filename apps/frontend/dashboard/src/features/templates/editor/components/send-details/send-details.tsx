@@ -3,7 +3,7 @@ import { Icon } from "@reloop/ui/icon";
 import * as Tooltip from "@reloop/ui/tooltip";
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import type { DomainListResponse } from "#/features/domain/types";
 import { useEditorStore } from "#/features/templates/editor/hooks/use-editor-store";
@@ -13,13 +13,20 @@ const fetcher = (url: string) =>
 	fetch(url, { credentials: "include" }).then((res) => res.json());
 
 interface FieldRowProps {
+	id?: string;
 	label: string;
 	children: React.ReactNode;
 	hideBorder?: boolean;
 	required?: boolean;
 }
 
-const FieldRow = ({ label, children, hideBorder, required }: FieldRowProps) => {
+const FieldRow = ({
+	id,
+	label,
+	children,
+	hideBorder,
+	required,
+}: FieldRowProps) => {
 	return (
 		<div
 			className={cn(
@@ -28,8 +35,8 @@ const FieldRow = ({ label, children, hideBorder, required }: FieldRowProps) => {
 			)}
 		>
 			<label
-				htmlFor={label}
-				className="w-20 shrink-0 text-label-sm text-text-sub-600"
+				htmlFor={id}
+				className="w-20 shrink-0 text-label-sm text-text-sub-600 select-none"
 			>
 				{label}
 				{required && (
@@ -95,19 +102,12 @@ export const SendDetails = () => {
 	const setSubject = useEditorStore((s) => s.setSubject);
 
 	const [showReplyTo, setShowReplyTo] = useState(false);
-	const replyToInputRef = useRef<HTMLInputElement>(null);
 
 	useEffect(() => {
 		if (replyTo) {
 			setShowReplyTo(true);
 		}
 	}, [replyTo]);
-
-	useEffect(() => {
-		if (showReplyTo) {
-			replyToInputRef.current?.focus();
-		}
-	}, [showReplyTo]);
 
 	const { activeOrganization } = useActiveOrganization();
 	const { data: domainData } = useSWR<DomainListResponse>(
@@ -175,9 +175,10 @@ export const SendDetails = () => {
 	return (
 		<div className="mx-auto mt-4 w-full max-w-160 overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/40">
 			{/* From Row */}
-			<FieldRow label="From" required>
+			<FieldRow id="send-details-from" label="From" required>
 				<div className="relative flex w-full flex-1 items-center justify-between gap-2 text-label-sm text-text-sub-600">
 					<input
+						id="send-details-from"
 						value={fromEmail}
 						onChange={(e) => setFromEmail(e.target.value)}
 						placeholder="Acme <acme@example.com>"
@@ -226,10 +227,10 @@ export const SendDetails = () => {
 						transition={{ duration: 0.2, ease: "easeInOut" }}
 						className="overflow-hidden"
 					>
-						<FieldRow label="Reply-To">
+						<FieldRow id="send-details-reply-to" label="Reply-To">
 							<div className="relative flex w-full flex-1 items-center justify-between gap-2 text-label-sm text-text-sub-600">
 								<input
-									ref={replyToInputRef}
+									id="send-details-reply-to"
 									value={replyTo}
 									onChange={(e) => setReplyTo(e.target.value)}
 									onBlur={() => {
@@ -266,8 +267,9 @@ export const SendDetails = () => {
 			</AnimatePresence>
 
 			{/* Preview Row */}
-			<FieldRow label="Preview" required>
+			<FieldRow id="send-details-preview" label="Preview" required>
 				<input
+					id="send-details-preview"
 					value={previewText}
 					onChange={(e) => setPreviewText(e.target.value)}
 					placeholder="Preview text"
@@ -275,8 +277,9 @@ export const SendDetails = () => {
 				/>
 			</FieldRow>
 
-			<FieldRow label="Subject" required hideBorder>
+			<FieldRow id="send-details-subject" label="Subject" required hideBorder>
 				<input
+					id="send-details-subject"
 					value={subject}
 					onChange={(e) => setSubject(e.target.value)}
 					placeholder="Subject"
