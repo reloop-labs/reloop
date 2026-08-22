@@ -12,19 +12,18 @@ import {
 import { createPortal } from "react-dom";
 
 const iconBtnBase = cn(
-	"inline-flex h-7 w-7 cursor-pointer items-center justify-center overflow-hidden rounded-lg",
-	"bg-transparent transition-[transform,color] duration-150 ease-out",
+	"inline-flex size-8 cursor-pointer items-center justify-center rounded-full",
+	"bg-transparent transition duration-200 ease-out hover:bg-bg-weak-50",
 	"active:scale-[0.97]",
 );
 
 type ActionTone = "neutral" | "archive" | "spam" | "danger";
 
 const toneClass: Record<ActionTone, string> = {
-	neutral: "text-mail-muted hover:text-mail-foreground",
-	archive: "text-mail-muted hover:text-sky-600 dark:hover:text-sky-300",
-	spam: "text-mail-muted hover:text-rose-600 dark:hover:text-rose-300",
-	danger:
-		"text-[var(--inbox-danger-fg)] hover:text-red-600 dark:hover:text-red-300",
+	neutral: "text-text-sub-600 hover:text-text-strong-950",
+	archive: "text-text-sub-600 hover:text-information-base",
+	spam: "text-text-sub-600 hover:text-warning-base",
+	danger: "text-text-sub-600 hover:text-error-base",
 };
 
 type TipState = {
@@ -42,7 +41,7 @@ function ToolbarTip({ tip }: { tip: TipState | null }) {
 	return createPortal(
 		<div
 			role="tooltip"
-			className="-translate-x-1/2 pointer-events-none fixed z-[9999] rounded bg-neutral-900 px-2 py-1 font-medium text-[11px] text-white shadow-md dark:bg-neutral-100 dark:text-neutral-900"
+			className="pointer-events-none fixed z-[9999] -translate-x-1/2 rounded bg-bg-strong-950 px-2 py-1 font-medium text-paragraph-xs text-text-white-0 shadow-regular-sm"
 			style={{ left: tip.x, top: tip.y }}
 		>
 			{tip.label}
@@ -78,7 +77,7 @@ const ActionButton = ({
 		onFocus={(e) => onShowTip(label, e.currentTarget)}
 		onBlur={onHideTip}
 	>
-		<span className="relative flex h-3.5 w-3.5 items-center justify-center text-current [&_svg]:h-3.5 [&_svg]:w-3.5">
+		<span className="relative flex size-4 items-center justify-center text-current [&_svg]:size-4">
 			{children}
 		</span>
 	</button>
