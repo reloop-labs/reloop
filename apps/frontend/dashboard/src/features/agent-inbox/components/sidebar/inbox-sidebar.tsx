@@ -296,7 +296,9 @@ export const InboxSidebar = ({
 					)}
 				>
 					{/* Mail folders */}
-					<div className={cn("flex flex-col", collapsed && "items-center")}>
+					<div
+						className={cn("flex flex-col pt-1", collapsed && "items-center")}
+					>
 						{mailItems.map((item) => {
 							const isActive = folder === item.id;
 							const count =
