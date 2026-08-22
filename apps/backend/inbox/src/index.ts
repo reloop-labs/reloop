@@ -22,6 +22,7 @@ import { messagesRoutes } from "./routes/messages/messages.routes";
 import { notesRoutes } from "./routes/notes/notes.routes";
 import { threadsRoutes } from "./routes/threads/threads.routes";
 import { webhooksRoutes } from "./routes/webhooks/webhooks.routes";
+import { inboxWsRoute } from "./routes/ws/inbox.ws";
 import { loader } from "./utils/loader";
 
 const parseOtlpHeaders = (
@@ -100,6 +101,7 @@ const inboxService = new Elysia({
 	.use(notesRoutes)
 	.use(draftsRoutes)
 	.use(aiRoutes)
+	.use(inboxWsRoute)
 	.use(pendingOutboundCron)
 	.onStart(async () => {
 		await loader();

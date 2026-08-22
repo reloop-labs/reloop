@@ -13,9 +13,14 @@ import {
 import { apiFetch } from "#/features/agent-inbox/lib/api-fetch";
 import { useMailboxId } from "#/features/agent-inbox/lib/use-mailbox-id";
 import { useSWR } from "#/features/agent-inbox/lib/use-swr-compat";
+import { toast } from "sonner";
+import { useInboxSocket, type InboxServerEvent } from "../hooks/use-inbox-socket";
 import { extractBareEmail, extractDisplayName } from "../lib/email-address";
 import type {
 	AgentMailbox,
+	BackendAttachment,
+	BackendMessage,
+	BackendThread,
 	BatchThreadAction,
 	ComposeDraft,
 	ComposeDraftKind,
@@ -110,48 +115,6 @@ interface BackendMailbox {
 	createdAt: string | Date;
 }
 
-interface BackendAttachment {
-	id: string;
-	inboundEmailId: string;
-	filename: string;
-	contentType: string;
-	size: number;
-	storagePath: string;
-	contentDisposition: string | null;
-	contentId: string | null;
-	createdAt: string | Date;
-}
-
-interface BackendMessage {
-	id: string;
-	mailboxId: string;
-	organizationId: string;
-	fromEmail: string;
-	fromName: string | null;
-	toEmails: string[];
-	ccEmails?: string[] | null;
-	bccEmails?: string[] | null;
-	replyTo: string | null;
-	subject: string | null;
-	textBody: string | null;
-	htmlBody: string | null;
-	snippet: string | null;
-	size: number;
-	status: string;
-	isRead: boolean;
-	isStarred: boolean;
-	isSpam: boolean;
-	spamScore: number | null;
-	messageId: string | null;
-	threadId: string | null;
-	inReplyTo: string | null;
-	references?: string[] | null;
-	headers?: Record<string, string> | null;
-	date: string | Date | null;
-	createdAt: string | Date;
-	attachments?: BackendAttachment[];
-}
-
 interface BackendSentMessage {
 	id: string;
 	messageId: string;
@@ -169,27 +132,6 @@ interface BackendSentMessage {
 	createdAt: string | Date;
 	threadId?: string | null;
 	isStarred?: boolean;
-}
-
-interface BackendThread {
-	id: string;
-	mailboxId: string | null;
-	organizationId: string;
-	subject: string | null;
-	lastMessagePreview: string | null;
-	lastMessageAt: string | Date;
-	status: string;
-	messageCount: number;
-	participants: string[];
-	isRead: boolean;
-	isStarred: boolean;
-	isImportant?: boolean;
-	isPinned?: boolean;
-	pinnedAt?: string | Date | null;
-	labels?: { id: string; name: string; color: string }[];
-	deletedAt?: string | Date | null;
-	createdAt: string | Date;
-	updatedAt: string | Date;
 }
 
 interface AgentInboxContextValue {
@@ -326,7 +268,9 @@ const mapMessageToThread = (msg: BackendMessage): InboundThread => {
 	const createdAtStr =
 		typeof msg.createdAt === "string"
 			? msg.createdAt
-			: msg.createdAt.toISOString();
+			: msg.createdAt
+				? msg.createdAt.toISOString()
+				: receivedAt;
 
 	return {
 		id: msg.id,
@@ -526,6 +470,84 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 	const retryThreads = useCallback(async () => {
 		await Promise.all([mutateMessages(), mutateSentMessages()]);
 	}, [mutateMessages, mutateSentMessages]);
+
+	const handleInboxEvent = useCallback(
+		(event: InboxServerEvent) => {
+			if (event.type === "inbound_email_received") {
+				const { email, thread } = event.data;
+
+				if (email) {
+					mutateMessages((prev) => {
+						const list = prev || [];
+						if (list.some((m) => m.id === email.id)) return list;
+						return [email, ...list];
+					});
+				}
+
+				if (thread) {
+					mutateThreads((prev) => {
+						const list = prev || [];
+						const filtered = list.filter((t) => t.id !== thread.id);
+						return [thread, ...filtered];
+					});
+				}
+
+				// Invalidate all inbox queries so thread lists, counters, and open conversations update
+				queryClient.invalidateQueries({
+					predicate: (query) => {
+						const key = query.queryKey[0];
+						return key === "agent-inbox";
+					},
+				});
+
+				if (email) {
+					const sender = email.fromName || email.fromEmail || "Unknown";
+					const subj = email.subject || "(No Subject)";
+					toast.info(`New email from ${sender}`, {
+						description: subj,
+						id: `inbox-email-${email.id}`,
+						duration: 4000,
+					});
+				}
+			} else if (event.type === "message_updated") {
+				const { id, isRead, isStarred, isSpam } = event.data;
+				mutateMessages((prev) => {
+					if (!prev) return prev;
+					return prev.map((m) =>
+						m.id === id
+							? {
+									...m,
+									...(isRead !== undefined ? { isRead } : {}),
+									...(isStarred !== undefined ? { isStarred } : {}),
+									...(isSpam !== undefined ? { isSpam } : {}),
+								}
+							: m,
+					);
+				});
+				queryClient.invalidateQueries({
+					predicate: (query) => query.queryKey[0] === "agent-inbox",
+				});
+			} else if (event.type === "thread_updated") {
+				const { thread } = event.data;
+				if (thread) {
+					mutateThreads((prev) => {
+						if (!prev) return prev;
+						return prev.map((t) => (t.id === thread.id ? thread : t));
+					});
+				}
+				queryClient.invalidateQueries({
+					predicate: (query) => query.queryKey[0] === "agent-inbox",
+				});
+			}
+		},
+		[mutateMessages, mutateThreads, queryClient],
+	);
+
+	useInboxSocket({
+		enabled: true,
+		mailboxId: routeMailboxId,
+		onEvent: handleInboxEvent,
+	});
 
 	const removeOptimisticOutbound = useCallback((pendingId: string) => {
 		setOptimisticOutbound((prev) => prev.filter((t) => t.id !== pendingId));

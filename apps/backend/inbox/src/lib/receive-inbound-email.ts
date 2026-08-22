@@ -1,8 +1,14 @@
 import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
-import { inboundAttachment, inboundEmail, mailbox } from "@reloop/db/schema";
+import {
+	emailThread,
+	inboundAttachment,
+	inboundEmail,
+	mailbox,
+} from "@reloop/db/schema";
 import { and, eq } from "drizzle-orm";
 import { createError, log as evlog } from "evlog";
+import { broadcastToOrg } from "../rooms/inbox.rooms";
 
 const log = {
 	info: (msg: string) => evlog.info("inbox", msg),
@@ -273,6 +279,46 @@ export async function receiveInboundEmailController(rawMessage: string) {
 			hasAttachments: (parsed.attachments?.length || 0) > 0,
 			isSpam,
 		});
+
+		try {
+			const emailRecord = await db.query.inboundEmail.findFirst({
+				where: eq(inboundEmail.id, insertedId),
+				with: { attachments: true },
+			});
+			const threadRecord = await db.query.emailThread.findFirst({
+				where: eq(emailThread.id, threadResult.threadId),
+			});
+
+			if (emailRecord) {
+				const fullMessage = {
+					...emailRecord,
+					threadId: threadResult.threadId,
+				};
+				const fullThread = threadRecord
+					? {
+							...threadRecord,
+							participants: threadRecord.participants || [],
+							labels: [],
+						}
+					: null;
+
+				broadcastToOrg(
+					mailboxRecord.organizationId,
+					{
+						type: "inbound_email_received",
+						data: {
+							email: fullMessage,
+							thread: fullThread,
+							mailboxId: mailboxRecord.id,
+							threadId: threadResult.threadId,
+						},
+					},
+					mailboxRecord.id,
+				);
+			}
+		} catch (broadcastErr) {
+			log.warn(`[INBOX] Failed to broadcast websocket event: ${broadcastErr}`);
+		}
 
 		log.info(
 			`[INBOX] Successfully saved email for ${recipientEmail} with id ${insertedId} (thread: ${threadResult.threadId}, new: ${threadResult.isNew}, attachments: ${parsed.attachments?.length || 0}, spam: ${isSpam})`,

@@ -148,6 +148,69 @@ export type SaveComposeDraftInput = {
 	attachments?: ComposeDraftAttachment[];
 };
 
+export interface BackendAttachment {
+	id: string;
+	inboundEmailId: string;
+	filename: string;
+	contentType: string;
+	size: number;
+	storagePath?: string;
+	contentDisposition?: string | null;
+	contentId?: string | null;
+	createdAt?: string | Date;
+}
+
+export interface BackendMessage {
+	id: string;
+	mailboxId: string;
+	organizationId: string;
+	fromEmail: string;
+	fromName: string | null;
+	toEmails: string[];
+	ccEmails?: string[] | null;
+	bccEmails?: string[] | null;
+	replyTo?: string | null;
+	subject: string | null;
+	textBody: string | null;
+	htmlBody: string | null;
+	snippet: string | null;
+	size?: number;
+	status?: string;
+	isRead?: boolean;
+	isStarred?: boolean;
+	isSpam?: boolean;
+	spamScore?: number | null;
+	messageId?: string | null;
+	threadId?: string | null;
+	inReplyTo?: string | null;
+	references?: string[] | null;
+	headers?: Record<string, string> | null;
+	date?: string | Date | null;
+	createdAt?: string | Date;
+	attachments?: BackendAttachment[];
+}
+
+export interface BackendThread {
+	id: string;
+	mailboxId: string | null;
+	organizationId: string;
+	subject: string | null;
+	lastMessagePreview: string | null;
+	lastMessageAt: string | Date;
+	status: string;
+	messageCount: number;
+	participants: string[];
+	isRead: boolean;
+	isStarred: boolean;
+	isImportant?: boolean;
+	isPinned?: boolean;
+	pinnedAt?: string | Date | null;
+	labels?: { id: string; name: string; color: string }[];
+	deletedAt?: string | Date | null;
+	createdAt?: string | Date;
+	updatedAt?: string | Date;
+}
+
 export const INBOX_VIEWS: {
 	id: InboxView;
 	label: string;

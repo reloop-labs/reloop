@@ -3,6 +3,7 @@ import { emailThread, inboundEmail, threadMessage } from "@reloop/db/schema";
 import { and, eq, inArray } from "drizzle-orm";
 import { createError } from "evlog";
 import { useLogger } from "evlog/elysia";
+import { broadcastToOrg } from "../../../rooms/inbox.rooms";
 
 export async function updateMessageController(
 	id: string,
@@ -107,6 +108,19 @@ export async function updateMessageController(
 			.update(inboundEmail)
 			.set(updateData)
 			.where(eq(inboundEmail.id, id));
+	}
+
+	try {
+		broadcastToOrg(
+			organizationId,
+			{
+				type: "message_updated",
+				data: { id, threadId: canonicalThreadId, ...updateData },
+			},
+			msg.mailboxId,
+		);
+	} catch {
+		// Non-blocking broadcast
 	}
 
 	log.info(`[INBOX] Updated message ${id}: ${JSON.stringify(updateData)}`);
