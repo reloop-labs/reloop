@@ -6,7 +6,6 @@ import { Skeleton } from "@reloop/ui/skeleton";
 import { Check, Copy, Pencil, Plus, Star } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useTheme } from "next-themes";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
@@ -525,15 +524,6 @@ export const InboxSidebar = ({
 						className="!bg-transparent"
 					/>
 				</div>
-
-				<div
-					className={cn(
-						"mt-auto flex w-full py-2",
-						collapsed && "justify-center",
-					)}
-				>
-					{!collapsed ? <FooterThemeToggle /> : <CollapsedThemeToggle />}
-				</div>
 			</aside>
 
 			<ComposeModal
@@ -548,7 +538,9 @@ export const InboxSidebar = ({
 					const id = await addLabel(name, color);
 					if (id) {
 						toast.success(`Label "${name}" created`);
-						router.push(`/inbox/${mailbox.id}/label/${id}`);
+						router.push(
+							`/inbox?mailboxId=${encodeURIComponent(mailbox.id)}&folder=label:${encodeURIComponent(id)}`,
+						);
 					} else {
 						toast.error("Failed to create label");
 						throw new Error("Failed to create label");
@@ -556,83 +548,5 @@ export const InboxSidebar = ({
 				}}
 			/>
 		</>
-	);
-};
-
-const FooterThemeToggle = () => {
-	const { theme, setTheme, resolvedTheme } = useTheme();
-	const [mounted, setMounted] = useState(false);
-
-	useEffect(() => {
-		setMounted(true);
-	}, []);
-
-	return (
-		<div className="inline-flex items-center rounded-full border border-stroke-soft-200 p-0.5 dark:border-stroke-soft-100/40">
-			<button
-				type="button"
-				onClick={() => setTheme("system")}
-				className={`flex items-center rounded-full px-1.5 py-1.5 font-semibold text-[12px] transition-all duration-200 ${
-					mounted && theme === "system"
-						? resolvedTheme === "dark"
-							? "bg-[#1A1A1A] text-white"
-							: "bg-white text-black"
-						: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/55 dark:hover:text-white/80"
-				}`}
-				aria-label="System theme"
-			>
-				<Icon className="size-3.5" name="laptop" />
-			</button>
-			<button
-				type="button"
-				onClick={() => setTheme("light")}
-				className={`flex items-center rounded-full px-1.5 py-1.5 font-semibold text-[12px] transition-all duration-200 ${
-					mounted && theme === "light"
-						? "bg-white text-black dark:bg-white dark:text-black"
-						: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/55 dark:hover:text-white/80"
-				}`}
-				aria-label="Light mode"
-			>
-				<Icon className="size-3.5" name="sun" />
-			</button>
-			<button
-				type="button"
-				onClick={() => setTheme("dark")}
-				className={`flex items-center rounded-full px-1.5 py-1.5 font-semibold text-[12px] transition-all duration-200 ${
-					mounted && theme === "dark"
-						? "bg-[#1A1A1A] text-white"
-						: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/55 dark:hover:text-white/80"
-				}`}
-				aria-label="Dark mode"
-			>
-				<Icon className="size-3.5" name="moon" />
-			</button>
-		</div>
-	);
-};
-
-const CollapsedThemeToggle = () => {
-	const { setTheme, resolvedTheme } = useTheme();
-	const [mounted, setMounted] = useState(false);
-
-	useEffect(() => {
-		setMounted(true);
-	}, []);
-
-	if (!mounted) return null;
-
-	const nextTheme = resolvedTheme === "dark" ? "light" : "dark";
-	return (
-		<button
-			type="button"
-			onClick={() => setTheme(nextTheme)}
-			className="flex size-7 items-center justify-center rounded-lg text-mail-muted transition-colors hover:bg-[var(--inbox-hover)] hover:text-mail-foreground"
-			title={`Switch to ${nextTheme} theme`}
-		>
-			<Icon
-				name={resolvedTheme === "dark" ? "sun" : "moon"}
-				className="h-4 w-4"
-			/>
-		</button>
 	);
 };

@@ -122,7 +122,10 @@ export function MailboxRail({
 
 	const switchMailbox = (id: string) => {
 		if (id === activeMailboxId) return;
-		const folderParam = currentFolder && currentFolder !== "inbox" ? `&folder=${encodeURIComponent(currentFolder)}` : "";
+		const folderParam =
+			currentFolder && currentFolder !== "inbox"
+				? `&folder=${encodeURIComponent(currentFolder)}`
+				: "";
 		router.push(`/inbox?mailboxId=${encodeURIComponent(id)}${folderParam}`);
 	};
 
