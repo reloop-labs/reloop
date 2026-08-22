@@ -67,12 +67,11 @@ kumo.on('init', function()
     kumo.start_esmtp_listener {
       listen = '0.0.0.0:' .. tostring(port),
       hostname = constants.hostname,
-      relay_hosts = constants.trusted_hosts,
     }
   end
 
   kumo.start_http_listener {
     listen = '0.0.0.0:8000',
-    trusted_hosts = constants.trusted_hosts,
+    trusted_hosts = { '127.0.0.1', '::1', '10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16' },
   }
 end)
