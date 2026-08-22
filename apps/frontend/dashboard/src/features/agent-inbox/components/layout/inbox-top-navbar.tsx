@@ -67,7 +67,7 @@ export function InboxTopNavbar({ mailbox }: { mailbox: AgentMailbox }) {
 				<div
 					className={cn(
 						"flex h-full shrink-0 items-center border-mail-border border-r bg-panel-light transition-[width] duration-200 ease-in-out dark:bg-panel-dark",
-						collapsed ? "w-14 justify-center px-0" : "w-60 gap-2 px-3",
+						collapsed ? "w-[110px] justify-center px-0" : "w-[294px] gap-2 px-3",
 					)}
 				>
 					<InboxSidebarToggle onClick={toggleSidebar} collapsed={collapsed} />

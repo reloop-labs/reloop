@@ -1,7 +1,7 @@
+"use client";
+
 import { cn } from "@reloop/ui/cn";
-import { Icon } from "@reloop/ui/icon";
 import { Plus } from "lucide-react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo } from "react";
 import { useAgentInbox } from "#/features/agent-inbox/components/agent-inbox-provider";
@@ -14,11 +14,11 @@ function mailboxSortKey(m: AgentMailbox) {
 	return (m.label || m.email).toLocaleLowerCase();
 }
 
-/** Active mailbox badge — black fill, white check, thin white border. */
+/** Active mailbox badge */
 const CircleCheckBadge = ({ className }: { className?: string }) => (
 	<svg
-		width="16"
-		height="16"
+		width="14"
+		height="14"
 		viewBox="0 0 20 20"
 		fill="none"
 		xmlns="http://www.w3.org/2000/svg"
@@ -29,14 +29,14 @@ const CircleCheckBadge = ({ className }: { className?: string }) => (
 			cx="10"
 			cy="10"
 			r="8.25"
-			fill="#000000"
+			fill="#1868DF"
 			stroke="#ffffff"
 			strokeWidth="1.5"
 		/>
 		<path
 			d="M6.4 10.15L8.85 12.55L13.6 7.45"
 			stroke="#ffffff"
-			strokeWidth="1.75"
+			strokeWidth="2"
 			strokeLinecap="round"
 			strokeLinejoin="round"
 		/>
@@ -52,44 +52,60 @@ const RailMailboxAvatar = ({
 	active: boolean;
 	onClick: () => void;
 }) => {
-	const displayName = mailbox.label || mailbox.email;
+	const displayName = mailbox.label || mailbox.email.split("@")[0] || "Inbox";
 
 	return (
-		<button
-			type="button"
-			onClick={onClick}
-			title={displayName}
-			aria-label={displayName}
-			aria-current={active ? "true" : undefined}
-			className="relative flex shrink-0 cursor-pointer items-center justify-center overflow-visible pb-1.5 focus:outline-none"
-		>
+		<div className="group relative flex w-full items-center justify-center">
+			{/* Left active/hover indicator pill */}
 			<div
 				className={cn(
-					"relative rounded-lg",
-					active && "ring-2 ring-black ring-offset-0",
+					"absolute -left-0.5 w-1 rounded-r-full bg-zero-blue transition-all duration-200",
+					active
+						? "h-6 opacity-100"
+						: "h-2 opacity-0 group-hover:h-4 group-hover:opacity-60",
 				)}
+			/>
+
+			<button
+				type="button"
+				onClick={onClick}
+				title={`${displayName} (${mailbox.email})`}
+				aria-label={`${displayName} (${mailbox.email})`}
+				aria-current={active ? "true" : undefined}
+				className="relative flex shrink-0 cursor-pointer items-center justify-center p-0.5 focus:outline-none"
 			>
 				<div
 					className={cn(
-						"flex size-7 items-center justify-center rounded-lg font-semibold text-white text-xs uppercase",
-						getAvatarGradient(displayName),
+						"relative transition-transform duration-150 group-hover:scale-105 active:scale-95",
 					)}
 				>
-					{getAvatarInitial(mailbox.label, mailbox.email)}
+					<div
+						className={cn(
+							"flex size-9 items-center justify-center rounded-xl font-bold text-white text-xs uppercase shadow-sm transition-all",
+							getAvatarGradient(mailbox.email || displayName),
+							active
+								? "ring-2 ring-zero-blue ring-offset-2 ring-offset-panel-light dark:ring-white dark:ring-offset-panel-dark"
+								: "ring-1 ring-black/10 dark:ring-white/10 hover:ring-black/20 dark:hover:ring-white/30",
+						)}
+					>
+						{getAvatarInitial(mailbox.label, mailbox.email)}
+					</div>
+					{active && (
+						<CircleCheckBadge className="-right-1 -bottom-1 absolute z-10 size-3.5" />
+					)}
 				</div>
-				{active && (
-					<CircleCheckBadge className="-right-1.5 -bottom-2 absolute z-10 size-4" />
-				)}
-			</div>
-		</button>
+			</button>
+		</div>
 	);
 };
 
 export function MailboxRail({
 	activeMailboxId,
+	currentFolder = "inbox",
 	onAddMailbox,
 }: {
 	activeMailboxId: string;
+	currentFolder?: string;
 	onAddMailbox: () => void;
 }) {
 	const router = useRouter();
@@ -106,33 +122,25 @@ export function MailboxRail({
 
 	const switchMailbox = (id: string) => {
 		if (id === activeMailboxId) return;
-		router.push(`/inbox/${id}`);
+		const folderParam = currentFolder && currentFolder !== "inbox" ? `&folder=${encodeURIComponent(currentFolder)}` : "";
+		router.push(`/inbox?mailboxId=${encodeURIComponent(id)}${folderParam}`);
 	};
 
 	return (
 		<nav
 			aria-label="Mailboxes"
-			className="flex h-full w-[52px] shrink-0 flex-col items-center overflow-hidden border-stroke-soft-200/60 border-r bg-panel-light pt-3.5 pb-3 dark:border-white/5 dark:bg-panel-dark"
+			className="flex h-full w-[54px] shrink-0 flex-col items-center border-mail-border border-r bg-panel-light/70 py-3 backdrop-blur-sm dark:bg-panel-dark/70"
 		>
-			<Link
-				href="/"
-				title="Back to dashboard"
-				aria-label="Back to dashboard"
-				className="mb-3 flex size-8 shrink-0 items-center justify-center rounded-lg text-mail-muted hover:bg-[var(--inbox-hover)] hover:text-mail-foreground"
-			>
-				<Icon name="arrow-left" className="h-4 w-4" />
-			</Link>
-
-			<div className="flex min-h-0 w-full flex-1 flex-col items-center gap-2 overflow-y-auto overflow-x-hidden pt-0.5">
+			<div className="flex min-h-0 w-full flex-1 flex-col items-center gap-3 overflow-y-auto overflow-x-hidden pt-0.5">
 				{mailboxesError ? (
 					<SectionError
 						compact
-						message="Failed to load"
+						message="Failed"
 						onRetry={() => void retryMailboxes()}
 						className="px-1"
 					/>
 				) : isLoadingMailboxes && sortedMailboxes.length === 0 ? (
-					<MailboxRailSkeleton />
+					<MailboxRailSkeleton count={3} />
 				) : (
 					<>
 						{sortedMailboxes.map((m) => (
@@ -143,13 +151,17 @@ export function MailboxRail({
 								onClick={() => switchMailbox(m.id)}
 							/>
 						))}
+
+						<div className="w-6 border-mail-border/60 border-t my-0.5" />
+
 						<button
 							type="button"
 							onClick={onAddMailbox}
-							className="flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-lg border border-[#929292]/50 border-dashed bg-transparent text-[#929292] hover:bg-[var(--inbox-hover)] hover:text-mail-foreground focus:outline-none active:scale-[0.97]"
-							aria-label="Add mailbox"
+							title="Add inbox address"
+							aria-label="Add inbox address"
+							className="group flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-xl border border-mail-border border-dashed bg-bg-weak-50/50 text-mail-muted transition-all duration-150 hover:border-mail-foreground/60 hover:bg-[var(--inbox-hover)] hover:text-mail-foreground hover:scale-105 active:scale-95 focus:outline-none dark:bg-white/[0.04]"
 						>
-							<Plus className="size-4" />
+							<Plus className="size-4 transition-transform group-hover:rotate-90 duration-200" />
 						</button>
 					</>
 				)}
