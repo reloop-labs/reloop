@@ -43,7 +43,7 @@ export const ThreadHeader = ({
 	const showMetaRow = realLabels.length > 0 || showPeople;
 
 	return (
-		<div className="border-mail-border/40 border-b px-4 py-4 pl-17">
+		<div className="px-4 py-4 pl-17">
 			<h1 className="font-semibold text-[22px] text-mail-foreground leading-snug tracking-tight">
 				{subject}
 				{messageCount > 1 && (

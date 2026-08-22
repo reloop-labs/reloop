@@ -84,10 +84,6 @@ const ActionButton = ({
 	</button>
 );
 
-const ToolbarDivider = () => (
-	<span className="mx-0.5 h-4 w-px shrink-0 bg-mail-border/60" aria-hidden />
-);
-
 export const ZeroThreadToolbar = ({
 	isUnread,
 	folder,
@@ -155,7 +151,7 @@ export const ZeroThreadToolbar = ({
 	return (
 		<div className="flex h-11 shrink-0 items-center gap-1 px-3">
 			{(showBack || onClose) && (
-				<>
+				<div className="mr-2 ml-0">
 					<ActionButton
 						label={showBack ? "Back to list" : "Close"}
 						onClick={onClose}
@@ -166,8 +162,7 @@ export const ZeroThreadToolbar = ({
 					>
 						<Icon name={showBack ? "arrow-left" : "cross"} />
 					</ActionButton>
-					<ToolbarDivider />
-				</>
+				</div>
 			)}
 
 			{/* Gmail primary actions: archive · spam · trash */}
@@ -216,8 +211,6 @@ export const ZeroThreadToolbar = ({
 			</ActionButton>
 
 			{/* Secondary: mark read/unread · move (Gmail order) */}
-			<ToolbarDivider />
-
 			{(onMarkUnread || onMarkRead) && (
 				<ActionButton
 					label={readLabel}
@@ -229,16 +222,6 @@ export const ZeroThreadToolbar = ({
 					<Icon name="mail" />
 				</ActionButton>
 			)}
-
-			<ActionButton
-				label="Move to"
-				onClick={onLabels}
-				tone="neutral"
-				onShowTip={showTip}
-				onHideTip={hideTip}
-			>
-				<Icon name="folder-move" />
-			</ActionButton>
 
 			<ToolbarTip tip={tip} />
 		</div>
