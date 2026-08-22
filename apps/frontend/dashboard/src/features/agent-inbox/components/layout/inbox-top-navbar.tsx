@@ -7,9 +7,9 @@ import { parseAsString, useQueryState } from "nuqs";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useInboxSidebar } from "#/features/agent-inbox/components/sidebar/inbox-sidebar-context";
-import { InboxSidebarToggle } from "#/features/agent-inbox/components/sidebar/inbox-sidebar-toggle";
 import type { AgentMailbox } from "#/features/agent-inbox/types";
 import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import { AnimatedSidebarToggleIcon } from "#/features/dashboard/sidebar/animated-sidebar-toggle-icon";
 
 export function InboxTopNavbar({ mailbox }: { mailbox: AgentMailbox }) {
 	const { collapsed, toggleSidebar } = useInboxSidebar();
@@ -36,20 +36,19 @@ export function InboxTopNavbar({ mailbox }: { mailbox: AgentMailbox }) {
 
 	return (
 		<header className="flex h-11 shrink-0 items-center border-stroke-soft-100 border-b bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-black">
-			{/* Sidebar header column — matches inbox folder sidebar width */}
+			{/* Sidebar header column — matches inbox folder sidebar width, sits above Compose */}
 			<div
 				className={cn(
-					"flex h-full shrink-0 items-center border-stroke-soft-100 border-r transition-[width] duration-200 ease-in-out dark:border-stroke-soft-100/40",
-					collapsed ? "w-[110px] justify-center px-0" : "w-[294px] gap-2 px-3",
+					"flex h-full shrink-0 items-center border-stroke-soft-100 border-r px-3 transition-[width] duration-200 ease-in-out dark:border-stroke-soft-100/40",
+					collapsed ? "w-[110px] justify-center px-0" : "w-[294px]",
 				)}
 			>
-				<InboxSidebarToggle onClick={toggleSidebar} collapsed={collapsed} />
 				{!collapsed && (
 					<button
 						type="button"
 						onClick={handleCopyEmail}
 						title={`Click to copy ${mailbox.email || "email"}`}
-						className="group/copy flex min-w-0 flex-1 cursor-pointer items-center gap-1.5 overflow-hidden rounded-md text-left transition-opacity hover:opacity-80"
+						className="group/copy flex min-w-0 flex-1 cursor-pointer items-center gap-2 overflow-hidden rounded-md text-left transition-opacity hover:opacity-80"
 					>
 						<Icon name="inbox" className="h-4 w-4 shrink-0 text-text-sub-600" />
 						<span className="truncate font-semibold text-[13px] text-text-strong-950">
@@ -64,8 +63,22 @@ export function InboxTopNavbar({ mailbox }: { mailbox: AgentMailbox }) {
 				)}
 			</div>
 
-			{/* Content column: compact search */}
+			{/* Content column: sidebar toggle on left + compact search */}
 			<div className="flex h-full min-w-0 flex-1 items-center gap-2 px-3">
+				<button
+					type="button"
+					onClick={toggleSidebar}
+					title="Toggle sidebar (⌘B)"
+					className={cn(
+						"group flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-text-sub-600 transition-colors",
+						"hover:bg-bg-weak-50 hover:text-text-strong-950 dark:hover:bg-white/5",
+					)}
+				>
+					<AnimatedSidebarToggleIcon
+						className={cn("h-4 w-4", collapsed && "rotate-180")}
+					/>
+				</button>
+
 				<button
 					type="button"
 					onClick={openSearch}

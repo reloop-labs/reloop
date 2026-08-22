@@ -60,7 +60,7 @@ export function MainSidebar() {
 						mass: 0.8,
 					}}
 					onMouseLeave={() => setIsHoverOpen(false)}
-					className="fixed top-0 bottom-0 left-0 z-50 flex h-screen w-60 flex-col overflow-hidden border-stroke-soft-100 border-r bg-bg-white-0 shadow-2xl dark:border-white/10 dark:bg-black"
+					className="fixed top-0 bottom-0 left-0 z-50 flex h-screen w-60 flex-col overflow-hidden border-stroke-soft-100 border-r bg-bg-white-0 shadow-2xl dark:border-stroke-soft-100/40 dark:bg-black"
 				>
 					<div className="flex h-12 items-center justify-start px-3">
 						<div className="flex items-center gap-2">
@@ -146,7 +146,7 @@ export function MainSidebar() {
 			{renderFloatingPeek}
 			<div
 				className={cn(
-					"sticky top-0 z-10 flex h-screen select-none flex-col overflow-hidden border-stroke-soft-100 border-r bg-transparent transition-[width] duration-200 ease-in-out dark:border-white/10",
+					"sticky top-0 z-10 flex h-screen select-none flex-col overflow-hidden border-stroke-soft-100 border-r bg-transparent transition-[width] duration-200 ease-in-out dark:border-stroke-soft-100/40",
 					getWidthClass(),
 				)}
 			>

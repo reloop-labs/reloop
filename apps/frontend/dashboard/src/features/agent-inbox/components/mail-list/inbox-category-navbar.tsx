@@ -18,7 +18,7 @@ export function InboxCategoryNavbar({
 	return (
 		<nav
 			className={cn(
-				"flex overflow-x-auto border-mail-border/50 border-y [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
+				"flex overflow-x-auto border-stroke-soft-100 border-y dark:border-stroke-soft-100/40 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
 				className,
 			)}
 			aria-label="Inbox views"
@@ -32,10 +32,10 @@ export function InboxCategoryNavbar({
 						type="button"
 						onClick={() => onViewChange(view.id)}
 						className={cn(
-							"relative flex w-[160px] items-center gap-2.5 border-mail-border/50 border-l px-4 py-4 text-left first:border-l-0 sm:px-5",
+							"group relative flex w-[160px] cursor-pointer items-center gap-2.5 border-stroke-soft-100 border-l px-4 py-3.5 text-left transition-colors first:border-l-0 sm:px-5 dark:border-stroke-soft-100/40",
 							isActive
 								? "bg-transparent"
-								: "bg-transparent hover:bg-[var(--inbox-row-hover)]",
+								: "bg-transparent hover:bg-neutral-alpha-10",
 						)}
 						aria-current={isActive ? "page" : undefined}
 					>
@@ -48,22 +48,26 @@ export function InboxCategoryNavbar({
 							<Icon
 								name={view.icon}
 								className={cn(
-									"h-4 w-4 shrink-0",
-									isActive ? "text-mail-foreground" : "text-mail-muted",
+									"h-4 w-4 shrink-0 transition-colors",
+									isActive
+										? "text-text-strong-950"
+										: "text-text-sub-600 opacity-70 group-hover:text-text-strong-950 group-hover:opacity-100",
 								)}
 								aria-hidden
 							/>
 						</span>
 						<span
 							className={cn(
-								"truncate font-medium text-[14px] tracking-[-0.01em] sm:text-[15px]",
-								isActive ? "text-mail-foreground" : "text-mail-muted",
+								"truncate font-medium text-[13px] tracking-[-0.01em] transition-colors sm:text-[14px]",
+								isActive
+									? "text-text-strong-950"
+									: "text-text-sub-600 group-hover:text-text-strong-950",
 							)}
 						>
 							{view.label}
 						</span>
 						{isActive ? (
-							<span className="absolute inset-x-0 bottom-0 h-[2px] bg-mail-foreground" />
+							<span className="absolute inset-x-0 bottom-0 h-[2px] bg-text-strong-950" />
 						) : null}
 					</button>
 				);

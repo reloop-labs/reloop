@@ -23,11 +23,11 @@ export function ListPanelSkeleton({ className }: { className?: string }) {
 					<div className="flex-1" />
 					<Skeleton className={cn("size-8 shrink-0 rounded-lg", sk)} />
 				</div>
-				<div className="grid grid-cols-4 border-mail-border/50 border-y">
+				<div className="grid grid-cols-4 border-stroke-soft-100 border-y dark:border-stroke-soft-100/40">
 					{["a", "b", "c", "d"].map((id, index) => (
 						<div
 							key={id}
-							className="flex items-center gap-2.5 border-mail-border/50 border-l px-4 py-4 first:border-l-0 first:pl-4"
+							className="flex items-center gap-2.5 border-stroke-soft-100 border-l px-4 py-4 first:border-l-0 first:pl-4 dark:border-stroke-soft-100/40"
 						>
 							<span
 								className={cn(
