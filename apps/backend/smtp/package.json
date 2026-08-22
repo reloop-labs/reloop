@@ -1,5 +1,8 @@
 {
 	"name": "be-smtp",
 	"version": "1.0.0",
-	"private": true
+	"private": true,
+	"scripts": {
+		"test": "bun test test/"
+	}
 }

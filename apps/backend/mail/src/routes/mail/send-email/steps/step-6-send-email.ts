@@ -14,6 +14,7 @@ export async function sendEmail_step6({
 	domainId,
 	emailLogId,
 	apiKey,
+	tlsMode,
 	useInternalInject = false,
 }: {
 	body: MailModel.SendEmailBody;
@@ -24,6 +25,7 @@ export async function sendEmail_step6({
 	domainId: string;
 	emailLogId: string;
 	apiKey: string;
+	tlsMode: "opportunistic" | "enforced";
 	useInternalInject?: boolean;
 }) {
 	try {
@@ -55,6 +57,7 @@ export async function sendEmail_step6({
 				// Never put the internal secret into outbound message headers.
 				...(useInternalInject ? {} : { "X-Api-Key": apiKey }),
 				...(body.headers || {}),
+				"X-Reloop-TLS-Mode": tlsMode,
 			},
 		});
 	} catch (error) {
