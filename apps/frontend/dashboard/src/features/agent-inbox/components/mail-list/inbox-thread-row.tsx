@@ -18,17 +18,16 @@ function formatRecipientLabel(addresses: string[] | undefined): string {
 		.join(", ");
 }
 
-const formatReceivedAt = (dateStr: string, isFirstToday: boolean) => {
+const formatReceivedAt = (dateStr: string) => {
 	const date = dayjs(dateStr);
 	const now = dayjs();
 	if (date.isSame(now, "day")) {
-		return isFirstToday
-			? `Today, ${date.format("h:mm A")}`
-			: date.format("h:mm A");
+		return date.format("h:mm A");
 	}
-	if (date.isSame(now.subtract(1, "day"), "day")) return "Yesterday";
-	if (date.isAfter(now.subtract(7, "day"))) return date.format("ddd");
-	return date.format("MMM D");
+	if (date.isSame(now, "year")) {
+		return date.format("MMM D");
+	}
+	return date.format("MMM D, YYYY");
 };
 
 const highlightMatches = (text: string, query?: string): ReactNode => {
@@ -74,7 +73,7 @@ export interface InboxThreadRowProps {
 	isSelected: boolean;
 	isKeyboardFocused: boolean;
 	isBulkSelected: boolean;
-	isFirstToday: boolean;
+	isFirstToday?: boolean;
 	index: number;
 	searchQuery?: string;
 	onSelect: (id: string, event?: React.MouseEvent) => void;
@@ -94,7 +93,6 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 			isSelected,
 			isKeyboardFocused,
 			isBulkSelected,
-			isFirstToday,
 			searchQuery,
 			onSelect,
 			onMouseEnter,
@@ -121,7 +119,6 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 		const subject = (thread.subject || "").trim() || "(No Subject)";
 		const preview = (thread.preview || "").trim().replace(/\s+/g, " ");
 		const primaryLabel = thread.labels?.[0];
-		const weight = isUnread ? 600 : 400;
 
 		return (
 			<div
@@ -130,14 +127,14 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 				onClick={(e) => onSelect(listId, e)}
 				onMouseEnter={() => onMouseEnter(listId)}
 				className={cn(
-					"group flex cursor-pointer items-center border-b pt-2.5 pr-6 pb-2.5 pl-4 text-left transition-colors duration-200",
+					"group flex cursor-pointer items-center border-b pt-2.5 pr-6 pb-2.5 pl-4 text-left transition-colors duration-150",
 					"border-stroke-soft-100 hover:bg-(--inbox-row-hover) dark:border-stroke-soft-100/40",
 					(isSelected || isBulkSelected || isKeyboardFocused) &&
 						"bg-(--inbox-row-focused)",
 				)}
 			>
-				{/* Bulk select gutter — always visible like Gmail */}
-				<span className="ml-1 flex w-5 shrink-0 items-center justify-center">
+				{/* Bulk select checkbox */}
+				<span className="flex w-5 shrink-0 items-center justify-center">
 					<button
 						type="button"
 						aria-label={isBulkSelected ? "Deselect thread" : "Select thread"}
@@ -150,7 +147,7 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 							"flex size-4 items-center justify-center rounded border transition-colors",
 							isBulkSelected
 								? "border-zero-blue bg-zero-blue text-white"
-								: "border-mail-border bg-transparent hover:border-mail-foreground/40",
+								: "border-mail-border bg-transparent hover:border-mail-foreground/60",
 						)}
 					>
 						{isBulkSelected && (
@@ -159,55 +156,56 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 					</button>
 				</span>
 
-				{/* Unread marker */}
-				<span className="flex w-3 shrink-0 items-center justify-center">
-					{isUnread ? (
-						<span
-							className="size-1.5 rounded-full"
-							style={{ background: "var(--inbox-unread)" }}
-							title="Unread"
+				{/* Star button */}
+				<span className="ml-1.5 flex w-5 shrink-0 items-center justify-center">
+					<button
+						type="button"
+						title={thread.isStarred ? "Unstar" : "Star"}
+						onClick={(e) => {
+							e.stopPropagation();
+							onToggleStar(thread.messageId ?? thread.id, !thread.isStarred);
+						}}
+						className="flex size-5 items-center justify-center transition-colors"
+					>
+						<Icon
+							name={thread.isStarred ? "star-filled" : "star"}
+							className={cn(
+								"h-4 w-4 transition-colors",
+								thread.isStarred
+									? "text-amber-400 fill-amber-400"
+									: "text-mail-muted/40 group-hover:text-mail-muted",
+							)}
 						/>
-					) : null}
+					</button>
 				</span>
 
 				{/* Sender */}
 				<span
-					className="ml-1.5 flex items-center gap-1.5 truncate pr-3"
-					style={{ width: "clamp(80px, 22%, 176px)" }}
+					className="ml-3 flex shrink-0 items-center gap-1.5 truncate pr-4"
+					style={{ width: "clamp(120px, 20%, 180px)" }}
 				>
 					<span
-						className="truncate text-[14px] text-mail-foreground leading-5"
-						style={{ fontWeight: weight }}
+						className={cn(
+							"truncate text-[14px] leading-5",
+							isUnread
+								? "font-semibold text-mail-foreground"
+								: "font-normal text-mail-foreground/85",
+						)}
 					>
 						{highlightMatches(displayName, searchQuery)}
 					</span>
 					{messageCount > 1 && (
-						<span className="shrink-0 text-[14px] text-mail-muted">
+						<span className="shrink-0 text-[13px] text-mail-muted">
 							{messageCount}
 						</span>
 					)}
 				</span>
 
 				{/* Subject + preview */}
-				<span className="mr-3 flex min-w-0 flex-1 items-baseline gap-2">
-					<span
-						className="shrink-0 truncate text-[14px] text-mail-foreground leading-5"
-						style={{ fontWeight: weight, maxWidth: 300 }}
-					>
-						{highlightMatches(subject, searchQuery)}
-					</span>
-					{preview && preview.toLowerCase() !== subject.toLowerCase() && (
-						<span className="min-w-0 flex-1 truncate text-[13px] text-mail-muted">
-							{highlightMatches(preview, searchQuery)}
-						</span>
-					)}
-				</span>
-
-				{/* Label chip */}
-				{primaryLabel && (
-					<span className="flex shrink-0 items-center gap-2">
+				<div className="flex min-w-0 flex-1 items-center gap-1.5 overflow-hidden pr-3">
+					{primaryLabel && (
 						<span
-							className="flex h-5 max-w-30 items-center truncate rounded-[7px] border px-1.5 text-[12px]"
+							className="mr-1 flex h-5 max-w-30 shrink-0 items-center truncate rounded-[6px] border px-1.5 text-[11px] font-medium"
 							style={{
 								background: chipBackground(primaryLabel.color),
 								color: "var(--inbox-chip-fg)",
@@ -216,39 +214,32 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 						>
 							{primaryLabel.name}
 						</span>
-					</span>
-				)}
-
-				{/* Star */}
-				<span className="ml-2 flex w-5 justify-center">
-					<button
-						type="button"
-						title={thread.isStarred ? "Unstar" : "Star"}
-						onClick={(e) => {
-							e.stopPropagation();
-							onToggleStar(thread.messageId ?? thread.id, !thread.isStarred);
-						}}
-						className={cn(
-							"flex items-center justify-center transition-opacity",
-							thread.isStarred
-								? "opacity-100"
-								: "opacity-0 group-hover:opacity-100",
-						)}
-					>
-						<Icon
-							name={thread.isStarred ? "star-filled" : "star"}
+					)}
+					<span className="truncate text-[14px] leading-5">
+						<span
 							className={cn(
-								"h-4 w-4",
-								thread.isStarred ? "text-(--inbox-star)" : "text-mail-muted",
+								isUnread
+									? "font-semibold text-mail-foreground"
+									: "font-normal text-mail-foreground/90",
 							)}
-						/>
-					</button>
-				</span>
+						>
+							{highlightMatches(subject, searchQuery)}
+						</span>
+						{preview && (
+							<>
+								<span className="mx-1 text-mail-muted/60">-</span>
+								<span className="font-normal text-[13px] text-mail-muted">
+									{highlightMatches(preview, searchQuery)}
+								</span>
+							</>
+						)}
+					</span>
+				</div>
 
 				{/* Hover actions */}
 				<span
 					className={cn(
-						"ml-1 flex shrink-0 items-center gap-0.5 opacity-0 transition-opacity group-hover:opacity-100",
+						"ml-2 flex shrink-0 items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100",
 						isSelectMode && "pointer-events-none opacity-0",
 					)}
 				>
@@ -264,7 +255,7 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 									onArchive(listId);
 								}
 							}}
-							className="flex size-6 items-center justify-center rounded-md hover:bg-(--inbox-control-hover)"
+							className="flex size-7 items-center justify-center rounded-md hover:bg-(--inbox-control-hover)"
 						>
 							<Icon name="inbox" className="h-3.5 w-3.5 text-mail-muted" />
 						</button>
@@ -276,7 +267,7 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 								e.stopPropagation();
 								onArchive(listId);
 							}}
-							className="flex size-6 items-center justify-center rounded-md hover:bg-(--inbox-control-hover)"
+							className="flex size-7 items-center justify-center rounded-md hover:bg-(--inbox-control-hover)"
 						>
 							<Icon name="archive" className="h-3.5 w-3.5 text-mail-muted" />
 						</button>
@@ -288,15 +279,15 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 							e.stopPropagation();
 							onDelete(listId);
 						}}
-						className="flex size-6 items-center justify-center rounded-md hover:bg-red-50 dark:hover:bg-red-950/30"
+						className="flex size-7 items-center justify-center rounded-md hover:bg-red-50 dark:hover:bg-red-950/30"
 					>
 						<Icon name="trash" className="h-3.5 w-3.5 text-red-500" />
 					</button>
 				</span>
 
-				{/* Time */}
-				<span className="ml-1 w-15 shrink-0 text-right text-[13px] text-mail-muted tabular-nums">
-					{formatReceivedAt(thread.receivedAt, isFirstToday)}
+				{/* Date/Time */}
+				<span className="ml-2 w-18 shrink-0 text-right text-[12.5px] font-normal tabular-nums whitespace-nowrap text-mail-muted">
+					{formatReceivedAt(thread.receivedAt)}
 				</span>
 			</div>
 		);
@@ -304,3 +295,4 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 );
 
 InboxThreadRow.displayName = "InboxThreadRow";
+

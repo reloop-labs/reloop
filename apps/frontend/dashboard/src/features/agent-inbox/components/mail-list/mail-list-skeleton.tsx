@@ -35,19 +35,19 @@ const PREVIEW_WIDTHS = [
 const MailListRowSkeleton = ({ index }: { index: number }) => (
 	<div className="flex h-11 items-center border-stroke-soft-100 border-b pr-6 pl-4 transition-colors dark:border-stroke-soft-100/40">
 		{/* Checkbox */}
-		<span className="ml-1 flex w-5 shrink-0 justify-center">
+		<span className="flex w-5 shrink-0 justify-center">
 			<Skeleton className="size-4 rounded" />
 		</span>
 
-		{/* Unread indicator */}
-		<span className="flex w-3 shrink-0 items-center justify-center">
-			{index % 3 === 0 && <Skeleton className="size-1.5 rounded-full" />}
+		{/* Star */}
+		<span className="ml-1.5 flex w-5 shrink-0 justify-center">
+			<Skeleton className="size-3.5 rounded" />
 		</span>
 
 		{/* Sender */}
 		<span
-			className="ml-1.5 flex items-center pr-3"
-			style={{ width: "clamp(80px, 22%, 176px)" }}
+			className="ml-3 flex items-center pr-4"
+			style={{ width: "clamp(120px, 20%, 180px)" }}
 		>
 			<Skeleton
 				className={cn("h-3.5 rounded", NAME_WIDTHS[index % NAME_WIDTHS.length])}
@@ -55,7 +55,7 @@ const MailListRowSkeleton = ({ index }: { index: number }) => (
 		</span>
 
 		{/* Subject & Preview */}
-		<span className="mr-3 flex min-w-0 flex-1 items-center gap-2">
+		<div className="flex min-w-0 flex-1 items-center gap-2 pr-3">
 			<Skeleton
 				className={cn(
 					"h-3.5 shrink-0 rounded",
@@ -68,10 +68,10 @@ const MailListRowSkeleton = ({ index }: { index: number }) => (
 					PREVIEW_WIDTHS[index % PREVIEW_WIDTHS.length],
 				)}
 			/>
-		</span>
+		</div>
 
 		{/* Date */}
-		<Skeleton className="ml-1 h-3 w-[44px] shrink-0 rounded" />
+		<Skeleton className="ml-2 h-3 w-14 shrink-0 rounded" />
 	</div>
 );
 
