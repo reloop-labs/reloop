@@ -48,6 +48,60 @@ end
 local min_free_space = parse_min_free_space(os.getenv("KUMOMTA_MIN_FREE_SPACE"))
 local min_free_inodes = tonumber(os.getenv("KUMOMTA_MIN_FREE_INODES")) or 0
 
+local function file_exists(name)
+  if not name or name == "" then return false end
+  local f = io.open(name, "r")
+  if f ~= nil then
+    io.close(f)
+    return true
+  else
+    return false
+  end
+end
+
+local function setup_tls_certs()
+  local cert_path = os.getenv("KUMOMTA_TLS_CERT")
+  local key_path = os.getenv("KUMOMTA_TLS_KEY")
+
+  local cert_data = os.getenv("KUMOMTA_TLS_CERT_DATA")
+  local key_data = os.getenv("KUMOMTA_TLS_KEY_DATA")
+
+  if cert_data and cert_data ~= "" and key_data and key_data ~= "" then
+    os.execute("mkdir -p /opt/kumomta/etc/certs")
+    local fc = io.open("/opt/kumomta/etc/certs/fullchain.pem", "w")
+    if fc then
+      fc:write(cert_data)
+      fc:close()
+      cert_path = "/opt/kumomta/etc/certs/fullchain.pem"
+    end
+    local fk = io.open("/opt/kumomta/etc/certs/privkey.pem", "w")
+    if fk then
+      fk:write(key_data)
+      fk:close()
+      key_path = "/opt/kumomta/etc/certs/privkey.pem"
+    end
+  end
+
+  local candidate_paths = {
+    { cert = cert_path, key = key_path },
+    { cert = "/certs/fullchain.pem", key = "/certs/privkey.pem" },
+    { cert = "/opt/kumomta/etc/certs/fullchain.pem", key = "/opt/kumomta/etc/certs/privkey.pem" },
+    { cert = "/etc/letsencrypt/live/" .. constants.hostname .. "/fullchain.pem", key = "/etc/letsencrypt/live/" .. constants.hostname .. "/privkey.pem" },
+  }
+
+  for _, candidate in ipairs(candidate_paths) do
+    if file_exists(candidate.cert) and file_exists(candidate.key) then
+      print("[TLS] Using TLS certificate: " .. candidate.cert .. " and key: " .. candidate.key)
+      return candidate.cert, candidate.key
+    end
+  end
+
+  print("[TLS] No external TLS certificate found; KumoMTA will generate dynamic self-signed certificate.")
+  return nil, nil
+end
+
+local tls_cert_path, tls_key_path = setup_tls_certs()
+
 kumo.on('init', function()
   kumo.define_spool {
     name = 'data',
@@ -64,10 +118,15 @@ kumo.on('init', function()
   }
 
   for _, port in ipairs(SUBMISSION_PORTS) do
-    kumo.start_esmtp_listener {
+    local listener_config = {
       listen = '0.0.0.0:' .. tostring(port),
       hostname = constants.hostname,
     }
+    if tls_cert_path and tls_key_path then
+      listener_config.tls_certificate = tls_cert_path
+      listener_config.tls_private_key = tls_key_path
+    end
+    kumo.start_esmtp_listener(listener_config)
   end
 
   kumo.start_http_listener {
