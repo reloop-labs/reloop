@@ -5,7 +5,6 @@ import {
 	useQuery,
 	useQueryClient,
 } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
 
 import { useCallback } from "react";
 import { queryKeys } from "#/lib/query-keys";
@@ -65,24 +64,19 @@ export function clearClientAuthState(queryClient: QueryClient) {
 	queryClient.clear();
 }
 
-/**
- * Sign out via Better Auth, wipe the client cache, then go to login.
- * Shared by the user menu and command palette.
- */
+/** Full-page nav to `/` so we leave dashboard `basePath`. */
 export async function signOutAndClearSession(
 	queryClient: QueryClient,
-	router: { push: (href: string) => void },
+	navigate: (href: string) => void = (href) => {
+		window.location.href = href;
+	},
 ) {
 	await authClient.signOut();
 	clearClientAuthState(queryClient);
-	router.push("/login");
+	navigate("/");
 }
 
 export function useSignOut() {
 	const queryClient = useQueryClient();
-	const router = useRouter();
-	return useCallback(
-		() => signOutAndClearSession(queryClient, router),
-		[queryClient, router],
-	);
+	return useCallback(() => signOutAndClearSession(queryClient), [queryClient]);
 }
