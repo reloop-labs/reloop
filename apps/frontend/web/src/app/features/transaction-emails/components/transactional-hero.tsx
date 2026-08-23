@@ -15,8 +15,6 @@ import { TransactionalEmailsAtmosphere } from "./transactional-atmosphere";
 export function TransactionalHero() {
 	return (
 		<div className="relative w-full overflow-hidden">
-			<TransactionalEmailsAtmosphere />
-
 			{/* Hero Header */}
 			<header className="relative z-10 flex w-full flex-col items-center px-6 pt-28 pb-14 text-center sm:px-8 sm:pt-32 sm:pb-16 lg:px-12 lg:pt-36 lg:pb-20">
 				<div className="mb-6 flex items-center justify-center gap-2 sm:mb-8">
