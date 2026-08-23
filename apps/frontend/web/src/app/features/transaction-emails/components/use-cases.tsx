@@ -93,7 +93,7 @@ export function UseCases() {
 				</div>
 				<h2
 					id="use-cases-heading"
-					className="mt-3.5 max-w-3xl font-medium text-4xl text-text-strong-950 text-balance leading-[1.05] tracking-tighter sm:text-5xl dark:text-white"
+					className="mt-3.5 max-w-3xl text-balance font-medium text-4xl text-text-strong-950 leading-[1.05] tracking-tighter sm:text-5xl dark:text-white"
 				>
 					Built for every critical email.
 				</h2>

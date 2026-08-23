@@ -94,7 +94,7 @@ export function FeatureHighlightsGrid({
 				<div
 					key={tab.id}
 					className={cn(
-						"flex flex-col border-stroke-soft-200 border-r border-b px-6 py-7 lg:px-7 lg:py-8 dark:border-white/10",
+						"flex flex-col border-stroke-soft-200 border-r border-b p-6 sm:p-7 lg:p-8 dark:border-white/10",
 						stacked
 							? "gap-4 py-8 sm:py-9 lg:py-10"
 							: "min-h-[13.5rem] justify-between sm:min-h-[15rem]",
