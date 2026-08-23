@@ -1,4 +1,5 @@
 import { SectionSeparator } from "../../(home)/components/section-separator";
+import { AiNativeSection } from "./components/ai-native-section";
 import { FrameworksStack } from "./components/frameworks-stack";
 import { TransactionalCta } from "./components/transactional-cta";
 import { TransactionalHero } from "./components/transactional-hero";
@@ -12,6 +13,8 @@ const TransactionEmailsPage = () => {
 			<TransactionalPreviewSection />
 			<div className="relative mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-200 border-x md:max-w-7xl dark:border-white/10">
 				<SectionSeparator />
+				<AiNativeSection />
+				<SectionSeparator />
 				<FrameworksStack />
 				<SectionSeparator />
 				<UseCases />
@@ -23,3 +26,4 @@ const TransactionEmailsPage = () => {
 };
 
 export default TransactionEmailsPage;
+
