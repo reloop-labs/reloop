@@ -38,23 +38,22 @@ export function TransactionalPreviewSection() {
 									Developer First
 								</span>
 							</div>
-							<h3 className="font-semibold text-2xl text-text-strong-950 tracking-tight sm:text-3xl dark:text-white">
+							<h3 className="font-semibold text-xl text-text-strong-950 tracking-tight sm:text-2xl lg:text-[23px] xl:text-[26px] dark:text-white">
 								Send email from your favorite framework.
 							</h3>
-							<p className="mt-2.5 max-w-md text-[15px] text-text-sub-600 leading-relaxed sm:text-[16px] dark:text-white/60">
-								Official SDKs and native libraries for Node.js, Python, Go, PHP,
-								Ruby, Java, .NET, and Elixir.
+							<p className="mt-2 text-[14px] text-text-sub-600 leading-relaxed sm:text-[14.5px] lg:text-[15px] dark:text-white/60">
+								Official SDKs and native libraries for Node.js, Python, Go, PHP, Ruby, Java, .NET, and Elixir.
 							</p>
 						</div>
 
-						<div className="mt-6 grid max-w-sm grid-cols-4 items-center gap-x-4 gap-y-4 sm:max-w-md sm:gap-x-5 sm:gap-y-5">
+						<div className="mt-6 flex max-w-lg flex-wrap items-center gap-3.5 sm:gap-4">
 							{frameworks.map((fw) => (
 								<Link
 									key={fw.slug}
 									href={`/frameworks/${fw.slug}`}
 									title={`Send email with ${fw.name}`}
 									aria-label={`Send email with ${fw.name}`}
-									className="group flex cursor-pointer items-center justify-center transition-transform duration-150 hover:scale-110"
+									className="group flex cursor-pointer items-center justify-center p-1 transition-transform duration-150 hover:scale-115"
 								>
 									<span
 										className="flex items-center justify-center"
@@ -62,7 +61,7 @@ export function TransactionalPreviewSection() {
 									>
 										<LanguageIcon
 											icon={fw.icon}
-											className="size-10 sm:size-12"
+											className="size-7 sm:size-8"
 										/>
 									</span>
 								</Link>
@@ -116,12 +115,11 @@ export function TransactionalPreviewSection() {
 									Templates
 								</span>
 							</div>
-							<h3 className="font-semibold text-2xl text-text-strong-950 tracking-tight sm:text-3xl dark:text-white">
+							<h3 className="font-semibold text-xl text-text-strong-950 tracking-tight sm:text-2xl lg:text-[23px] xl:text-[26px] dark:text-white">
 								Readymade templates to send.
 							</h3>
-							<p className="mt-2.5 max-w-md text-[15px] text-text-sub-600 leading-relaxed sm:text-[16px] dark:text-white/60">
-								Drop-in responsive templates for OTP verification, password
-								resets, welcome sequences, and workspace invites.
+							<p className="mt-2 text-[14px] text-text-sub-600 leading-relaxed sm:text-[14.5px] lg:text-[15px] dark:text-white/60">
+								Drop-in responsive templates for OTP verification, password resets, welcome sequences, and workspace invites.
 							</p>
 						</div>
 
