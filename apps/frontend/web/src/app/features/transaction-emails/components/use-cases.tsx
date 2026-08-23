@@ -1,8 +1,8 @@
+import { Icon } from "@reloop/ui/icon";
 import {
 	type FeatureHighlight,
 	FeatureHighlightsGrid,
 } from "@reloop/web/components/landing/feature-highlights";
-import { SceneGlyph } from "../../../(home)/components/_shared/scene-header";
 
 const transactionalUseCases: FeatureHighlight[] = [
 	{
@@ -85,9 +85,9 @@ export function UseCases() {
 			className="w-full bg-bg-white-0 dark:bg-black"
 		>
 			<div className="border-stroke-soft-200 border-b px-4 py-16 sm:px-6 sm:py-20 lg:px-12 lg:py-24 dark:border-white/10">
-				<div className="flex items-center gap-2">
-					<SceneGlyph icon="shapes" color="orange" />
-					<span className="font-medium text-[13.5px] text-text-strong-950 tracking-tight dark:text-white">
+				<div className="mb-3.5">
+					<span className="inline-flex items-center gap-1.5 rounded-[10px] bg-blue-50 px-2.5 py-1 font-medium text-[13px] text-blue-600 dark:bg-blue-500/10 dark:text-blue-400">
+						<Icon name="shapes" className="size-3.5" />
 						Use Cases
 					</span>
 				</div>

@@ -1,4 +1,6 @@
+import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
+import * as Divider from "@reloop/ui/divider";
 import { Icon } from "@reloop/ui/icon";
 import Link from "next/link";
 import type { SimpleIcon } from "simple-icons";
@@ -18,7 +20,6 @@ import {
 	siWordpress,
 	siZapier,
 } from "simple-icons";
-import { SceneHeader } from "../../../(home)/components/_shared/scene-header";
 import {
 	AlignedIconBand,
 	SectionFrame,
@@ -107,16 +108,38 @@ export function FrameworksStack() {
 	return (
 		<SectionFrame id="integrations" framed={false} showTopRule={false}>
 			<div className="px-4 pt-12 sm:px-8 sm:pt-14 lg:px-12">
-				<SceneHeader
-					icon="shapes"
-					color="orange"
-					badge="Integrations"
-					title="Connect easily with any service."
-					description="No extra setup — plug Reloop into the mailer or platform you already use."
-					ctaLabel="Explore all integrations"
-					ctaHref="/docs/integrations"
-					withDivider={true}
-				/>
+				<div>
+					<div className="mb-3.5">
+						<span className="inline-flex items-center gap-1.5 rounded-[10px] bg-blue-50 px-2.5 py-1 font-medium text-[13px] text-blue-600 dark:bg-blue-500/10 dark:text-blue-400">
+							<Icon name="shapes" className="size-3.5" />
+							Integrations
+						</span>
+					</div>
+
+					<h3 className="font-semibold text-[2rem] text-text-strong-950 leading-[1.12] tracking-tight sm:text-[2.4rem] lg:text-[2.65rem] dark:text-white">
+						Connect easily with any service.
+					</h3>
+
+					<p className="mt-3 max-w-2xl text-[15px] text-text-sub-600 leading-relaxed sm:text-base dark:text-white/60">
+						No extra setup — plug Reloop into the mailer or platform you already
+						use.
+					</p>
+
+					<div className="mt-6">
+						<Button.Root variant="neutral" mode="stroke" size="small" asChild>
+							<Link href="/docs/integrations">
+								Explore all integrations
+								<Icon
+									name="arrow-right"
+									className="size-3.5 transition-transform duration-200 group-hover:translate-x-0.5"
+									aria-hidden="true"
+								/>
+							</Link>
+						</Button.Root>
+					</div>
+
+					<Divider.Root className="mt-8 -mx-4 sm:-mx-8 lg:-mx-12 !w-auto dark:before:bg-white/10" />
+				</div>
 			</div>
 
 			{/* Hatched side gutters align icon columns with the title padding above */}

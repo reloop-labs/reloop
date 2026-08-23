@@ -81,7 +81,7 @@ export function TransactionalHero() {
 				<div className="mt-8 flex flex-wrap items-center justify-center gap-3.5 sm:mt-9 sm:gap-4">
 					<FancyButton.Root
 						asChild
-						variant="neutral"
+						variant="primary"
 						size="medium"
 						className="h-11 rounded-xl px-6 font-medium text-[15.5px]"
 					>
