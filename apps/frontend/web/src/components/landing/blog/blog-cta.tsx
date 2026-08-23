@@ -162,6 +162,7 @@ export function BlogCta({
 	align = "split",
 	pill = true,
 	showTopRule = true,
+	primaryVariant = "neutral",
 }: {
 	category?: string;
 	headline?: ReactNode;
@@ -169,6 +170,7 @@ export function BlogCta({
 	primaryLabel?: string;
 	primaryHref?: string;
 	primaryExternal?: boolean;
+	primaryVariant?: "neutral" | "primary";
 	secondaryLabel?: string;
 	secondaryHref?: string;
 	secondaryExternal?: boolean;
@@ -278,7 +280,7 @@ export function BlogCta({
 							href={primaryHref}
 							external={primaryExternal}
 							filled
-							variant="neutral"
+							variant={primaryVariant}
 							pill={pill}
 						/>
 						{variant.secondaryLabel && (

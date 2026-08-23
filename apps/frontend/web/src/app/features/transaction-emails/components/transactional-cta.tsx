@@ -18,6 +18,7 @@ export function TransactionalCta() {
 			secondaryHref="/pricing"
 			accentHex="#2563eb"
 			accentColor="blue"
+			primaryVariant="primary"
 			align="center"
 			flush
 			pill={false}
