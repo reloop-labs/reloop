@@ -31,13 +31,13 @@ export const featureHighlights: FeatureHighlight[] = [
 	},
 	{
 		id: "developer-experience",
-		icon: "message-body",
+		icon: "code",
 		title: "Developer Experience",
 		description: "React email templates, TypeScript SDKs, & clean APIs.",
 	},
 	{
 		id: "agent-inboxes",
-		icon: "headset",
+		icon: "robot",
 		title: "Agent Inboxes",
 		description: "Built-in AI agent parsing, webhooks & MCP.",
 	},

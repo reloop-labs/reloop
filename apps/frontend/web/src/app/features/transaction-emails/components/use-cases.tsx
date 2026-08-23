@@ -7,56 +7,56 @@ import {
 const transactionalUseCases: FeatureHighlight[] = [
 	{
 		id: "auth-otp",
-		icon: "key",
+		icon: "key-new",
 		title: "Auth & OTP codes",
 		description:
 			"Deliver time-critical one-time passwords and verification links in sub-seconds.",
 	},
 	{
 		id: "magic-links",
-		icon: "zap",
+		icon: "magic-wand",
 		title: "Passwordless login",
 		description:
 			"Instant authentication magic links that reliably land in the primary inbox.",
 	},
 	{
 		id: "security-alerts",
-		icon: "shield",
+		icon: "shield-check",
 		title: "Security notifications",
 		description:
 			"Immediate alerts for new logins, password updates, and 2FA credential changes.",
 	},
 	{
 		id: "invoices-receipts",
-		icon: "lock",
+		icon: "invoice",
 		title: "Billing & invoices",
 		description:
 			"Payment confirmations, subscription renewal receipts, and automated PDF delivery.",
 	},
 	{
 		id: "welcome-onboarding",
-		icon: "send-2",
+		icon: "rocket",
 		title: "Welcome onboarding",
 		description:
 			"Trigger automated welcome sequences the moment a user creates an account.",
 	},
 	{
 		id: "team-invites",
-		icon: "verified",
+		icon: "user-plus",
 		title: "Team invitations",
 		description:
-			"Collaborative organization invites with customized permission roles and expiry rules.",
+			"Collaborative organization invites with customized permission rules and expiry rules.",
 	},
 	{
 		id: "system-alerts",
-		icon: "activity",
+		icon: "alert-triangle",
 		title: "System & cron alerts",
 		description:
 			"Real-time developer alerts for pipeline anomalies, quota limits, and webhook events.",
 	},
 	{
 		id: "activity-digests",
-		icon: "layout",
+		icon: "calendar",
 		title: "Activity digests",
 		description:
 			"Scheduled daily and weekly summaries of product engagement and team activity.",
@@ -70,7 +70,7 @@ const transactionalUseCases: FeatureHighlight[] = [
 	},
 	{
 		id: "lifecycle-events",
-		icon: "server",
+		icon: "refresh-cw",
 		title: "Account lifecycle",
 		description:
 			"Data export downloads, compliance requests, and organization updates.",
