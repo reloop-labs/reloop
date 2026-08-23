@@ -9,9 +9,21 @@ import {
 	getBrandColorStyle,
 	LanguageIcon,
 } from "../../../sdk/components/language-icon";
+import { SdkCodeBlock } from "../../../sdk/components/sdk-code-block";
 import { frameworks } from "../../../sdk/frameworks";
 
 const EMAIL_CYCLE = ["otp", "reset", "welcome", "invite"] as const;
+
+const SEND_CODE_TS = `import Reloop from 'reloop-email';
+
+const reloop = new Reloop(process.env.RELOOP_API_KEY);
+
+await reloop.emails.send({
+  from: 'Acme <onboarding@yourdomain.com>',
+  to: ['maya@northwind.io'],
+  subject: 'Welcome to Acme',
+  html: '<strong>Your workspace is ready.</strong>',
+});`;
 
 export function TransactionalPreviewSection() {
 	const [emailIndex, setEmailIndex] = useState(0);
@@ -66,6 +78,14 @@ export function TransactionalPreviewSection() {
 									</span>
 								</Link>
 							))}
+						</div>
+
+						<div className="mt-6 w-full">
+							<SdkCodeBlock
+								slug="nodejs"
+								code={SEND_CODE_TS}
+								path="send.ts"
+							/>
 						</div>
 					</div>
 
