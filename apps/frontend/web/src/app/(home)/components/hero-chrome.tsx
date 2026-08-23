@@ -31,7 +31,7 @@ export function HeroWindowChrome({
 	action?: ReactNode;
 }) {
 	return (
-		<div className="relative flex min-h-0 flex-1 flex-col overflow-hidden rounded-[20px] bg-[#F5F6F8] p-[7px] pt-8 sm:rounded-[24px] sm:p-2 sm:pt-9 dark:bg-[#1C1C1E] dark:ring-1 dark:ring-white/10">
+		<div className="relative flex min-h-0 flex-1 flex-col overflow-hidden rounded-[20px] border border-stroke-soft-200 bg-bg-weak-50 p-[7px] pt-8 sm:rounded-[24px] sm:p-2 sm:pt-9 dark:border-white/10 dark:bg-white/[0.06]">
 			<div
 				aria-hidden
 				className="absolute top-[11px] left-3.5 flex items-center gap-[7px] sm:top-3 sm:left-4"
@@ -45,7 +45,7 @@ export function HeroWindowChrome({
 					{action}
 				</div>
 			) : null}
-			<div className="relative min-h-0 flex-1 overflow-hidden rounded-[13px] bg-bg-white-0 sm:rounded-[16px] dark:bg-black">
+			<div className="relative min-h-0 flex-1 overflow-hidden rounded-[13px] border border-stroke-soft-200 bg-bg-white-0 sm:rounded-[16px] dark:border-white/10 dark:bg-black">
 				{children}
 			</div>
 		</div>
