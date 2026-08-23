@@ -39,7 +39,7 @@ export function TransactionalPreviewSection() {
 			<div className="relative mx-auto w-full max-w-5xl border-stroke-soft-200 border-x md:max-w-7xl dark:border-white/10">
 				<div className="grid grid-cols-1 divide-y divide-stroke-soft-200 lg:grid-cols-2 lg:divide-x lg:divide-y-0 dark:divide-white/10">
 					{/* Left Panel: Frameworks */}
-					<div className="flex flex-col p-8 sm:p-10 lg:p-12">
+					<div className="flex flex-col justify-between p-8 sm:p-10 lg:p-12">
 						<div>
 							<div className="mb-4">
 								<span className="inline-flex items-center gap-1.5 rounded-[10px] bg-blue-50 px-2.5 py-1 font-medium text-[13px] text-blue-600 dark:bg-blue-500/10 dark:text-blue-400">
@@ -54,75 +54,76 @@ export function TransactionalPreviewSection() {
 								Official SDKs and native libraries for Node.js, Python, Go, PHP,
 								Ruby, Java, .NET, and Elixir.
 							</p>
+
+							<div className="mt-7 flex max-w-lg flex-wrap items-center gap-4 sm:gap-4.5">
+								{frameworks.map((fw) => (
+									<Link
+										key={fw.slug}
+										href={`/frameworks/${fw.slug}`}
+										title={`Send email with ${fw.name}`}
+										aria-label={`Send email with ${fw.name}`}
+										className="group flex cursor-pointer items-center justify-center p-1 text-text-strong-950 transition-transform duration-150 hover:scale-115 dark:text-white"
+									>
+										<span className="flex items-center justify-center">
+											<LanguageIcon icon={fw.icon} className="size-7 sm:size-8" />
+										</span>
+									</Link>
+								))}
+							</div>
 						</div>
 
-						<div className="mt-7 flex max-w-lg flex-wrap items-center gap-4 sm:gap-4.5">
-							{frameworks.map((fw) => (
-								<Link
-									key={fw.slug}
-									href={`/frameworks/${fw.slug}`}
-									title={`Send email with ${fw.name}`}
-									aria-label={`Send email with ${fw.name}`}
-									className="group flex cursor-pointer items-center justify-center p-1 text-text-strong-950 transition-transform duration-150 hover:scale-115 dark:text-white"
-								>
-									<span className="flex items-center justify-center">
-										<LanguageIcon icon={fw.icon} className="size-7 sm:size-8" />
-									</span>
-								</Link>
-							))}
-						</div>
-
-						<div className="mt-7 w-full">
+						<div className="mt-8 w-full">
 							<SdkCodeBlock slug="nodejs" code={SEND_CODE_TS} path="send.ts" />
 						</div>
 					</div>
 
 					{/* Right Panel: Email Preview */}
-					<div className="relative flex flex-col p-8 sm:p-10 lg:p-12">
-						{/* Top Right Progress Indicator */}
-						<div className="absolute top-8 right-8 z-20 flex items-center gap-2 rounded-full border border-stroke-soft-200 bg-bg-white-0/90 px-2.5 py-1 backdrop-blur-md dark:border-white/10 dark:bg-white/[0.04]">
-							{/* Circular progress ring */}
-							<div className="relative flex size-3 items-center justify-center">
-								<svg className="-rotate-90 size-3" viewBox="0 0 24 24">
-									<circle
-										cx="12"
-										cy="12"
-										r="10"
-										stroke="currentColor"
-										strokeWidth="3.5"
-										className="text-stroke-soft-200 dark:text-white/15"
-										fill="none"
-									/>
-									<motion.circle
-										key={emailIndex}
-										cx="12"
-										cy="12"
-										r="10"
-										stroke="currentColor"
-										strokeWidth="3.5"
-										strokeLinecap="round"
-										className="text-orange-500 dark:text-orange-400"
-										fill="none"
-										strokeDasharray="62.83"
-										initial={{ strokeDashoffset: 62.83 }}
-										animate={{ strokeDashoffset: 0 }}
-										transition={{ duration: 3, ease: "linear" }}
-									/>
-								</svg>
-							</div>
-
-							<span className="font-medium font-mono text-[11px] text-text-sub-600 dark:text-white/70">
-								{emailIndex + 1}/{EMAIL_CYCLE.length}
-							</span>
-						</div>
-
+					<div className="relative flex flex-col justify-between p-8 sm:p-10 lg:p-12">
 						<div>
-							<div className="mb-4">
+							<div className="mb-4 flex items-center justify-between gap-3">
 								<span className="inline-flex items-center gap-1.5 rounded-[10px] bg-blue-50 px-2.5 py-1 font-medium text-[13px] text-blue-600 dark:bg-blue-500/10 dark:text-blue-400">
 									<Icon name="layout" className="size-3.5" />
 									Templates
 								</span>
+
+								{/* Progress Indicator */}
+								<div className="flex items-center gap-2 rounded-full border border-stroke-soft-200 bg-bg-white-0/90 px-2.5 py-1 backdrop-blur-md dark:border-white/10 dark:bg-white/[0.04]">
+									{/* Circular progress ring */}
+									<div className="relative flex size-3 items-center justify-center">
+										<svg className="-rotate-90 size-3" viewBox="0 0 24 24">
+											<circle
+												cx="12"
+												cy="12"
+												r="10"
+												stroke="currentColor"
+												strokeWidth="3.5"
+												className="text-stroke-soft-200 dark:text-white/15"
+												fill="none"
+											/>
+											<motion.circle
+												key={emailIndex}
+												cx="12"
+												cy="12"
+												r="10"
+												stroke="currentColor"
+												strokeWidth="3.5"
+												strokeLinecap="round"
+												className="text-blue-500 dark:text-blue-400"
+												fill="none"
+												strokeDasharray="62.83"
+												initial={{ strokeDashoffset: 62.83 }}
+												animate={{ strokeDashoffset: 0 }}
+												transition={{ duration: 3, ease: "linear" }}
+											/>
+										</svg>
+									</div>
+
+									<span className="font-medium font-mono text-[11px] text-text-sub-600 dark:text-white/70">
+										{emailIndex + 1}/{EMAIL_CYCLE.length}
+									</span>
+								</div>
 							</div>
+
 							<h3 className="font-semibold text-text-strong-950 text-xl tracking-tight sm:text-2xl lg:text-[23px] xl:text-[26px] dark:text-white">
 								Readymade templates to send.
 							</h3>
@@ -132,7 +133,7 @@ export function TransactionalPreviewSection() {
 							</p>
 						</div>
 
-						<div className="relative mx-auto mt-12 max-h-[380px] w-full max-w-sm overflow-hidden rounded-[20px] sm:mt-14 sm:max-h-[400px]">
+						<div className="relative mx-auto mt-8 max-h-[380px] w-full max-w-sm overflow-hidden rounded-[20px] sm:max-h-[400px]">
 							<div className="relative overflow-hidden rounded-[22px] [-webkit-mask-image:linear-gradient(to_bottom,black_60%,transparent_98%)] [mask-image:linear-gradient(to_bottom,black_60%,transparent_98%)]">
 								<EmailStack activeId={activeEmailId} />
 							</div>
