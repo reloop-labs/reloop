@@ -22,7 +22,7 @@ export function EmailStack({ activeId = "otp" }: { activeId?: string }) {
 	const email = EMAILS.find((e) => e.id === activeId) ?? EMAILS[0]!;
 
 	return (
-		<div className="relative mx-auto h-[32rem] w-full">
+		<div className="relative mx-auto h-[30rem] w-full">
 			<article
 				className={cn(
 					"absolute inset-0 overflow-hidden rounded-[22px] border bg-bg-white-0 dark:bg-[#141414]",
