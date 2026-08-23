@@ -23,7 +23,7 @@ export function EmailAnalyticsSection({
 					title="See exactly what happens to every email."
 					description="Get a complete view of delivery, engagement, reputation, and failures, from the moment you hit send."
 					ctaLabel="Explore Analytics"
-					ctaHref="/docs/analytics"
+					ctaHref="/features/email-analytics"
 				/>
 			</div>
 

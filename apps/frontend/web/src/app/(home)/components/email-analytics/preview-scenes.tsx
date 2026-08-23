@@ -15,7 +15,7 @@ export const ANALYTICS_TABS: {
 		title: "Metrics",
 		description:
 			"Track deliverability, reputation, and sent volume with clear domain-level insights.",
-		href: "/docs/analytics",
+		href: "/features/email-analytics",
 	},
 	{
 		id: "engagement",
@@ -23,7 +23,7 @@ export const ANALYTICS_TABS: {
 		title: "Engagement & clicks",
 		description:
 			"Monitor opens, clicks, and recipient behavior with live engagement analytics.",
-		href: "/docs/analytics/engagement",
+		href: "/features/email-analytics",
 	},
 	{
 		id: "bounces",
@@ -31,6 +31,6 @@ export const ANALYTICS_TABS: {
 		title: "Bounces & Diagnostics",
 		description:
 			"Inspect bounce causes, spam complaints, and raw SMTP responses to debug issues.",
-		href: "/docs/analytics/deliverability",
+		href: "/features/email-analytics",
 	},
 ];
