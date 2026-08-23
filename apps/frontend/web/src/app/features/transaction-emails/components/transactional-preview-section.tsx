@@ -1,7 +1,7 @@
 "use client";
 
-import { SdkCodeBlock } from "@reloop/web/app/sdk/components/sdk-code-block";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { SceneGlyph } from "../../../(home)/components/_shared/scene-header";
 import { EmailStack } from "../../../(home)/components/transactional-email/email-stack";
 import {
@@ -9,80 +9,80 @@ import {
 	LanguageIcon,
 } from "../../../sdk/components/language-icon";
 import { frameworks } from "../../../sdk/frameworks";
-import { languages } from "../../../sdk/languages";
 
-const nodejsLanguage =
-	languages.find((l) => l.slug === "nodejs") ?? languages[0]!;
+const EMAIL_CYCLE = ["otp", "reset", "welcome", "invite"] as const;
 
 export function TransactionalPreviewSection() {
+	const [emailIndex, setEmailIndex] = useState(0);
+
+	useEffect(() => {
+		const interval = setInterval(() => {
+			setEmailIndex((prev) => (prev + 1) % EMAIL_CYCLE.length);
+		}, 3000);
+		return () => clearInterval(interval);
+	}, []);
+
+	const activeEmailId = EMAIL_CYCLE[emailIndex];
+
 	return (
-		<section className="w-full bg-bg-white-0 dark:bg-black">
-			{/* Interactive Code & Live Email Preview */}
-			<div className="relative overflow-hidden">
-				<div className="relative mx-auto flex flex-col gap-10 px-4 pt-24 pb-12 sm:px-8 sm:pt-28 sm:pb-14 lg:h-[43rem] lg:flex-row lg:items-start lg:gap-8 lg:px-12 lg:pt-36 lg:pb-16">
-					{/* Left Column: Title + All Framework Icons linking to framework pages */}
-					<div className="flex w-full shrink-0 flex-col gap-6 lg:w-[34%] lg:max-w-sm xl:w-[36%]">
-						<div className="flex flex-col gap-3">
-							<div className="flex items-center gap-2">
-								<SceneGlyph icon="code" color="orange" />
-								<span className="font-medium text-[13.5px] text-text-strong-950 tracking-tight dark:text-white">
-									Developer First
-								</span>
-							</div>
-							<h3 className="text-balance font-medium text-4xl text-text-strong-950 leading-[1.05] tracking-tighter sm:text-5xl dark:text-white">
-								Send email from your favorite framework
-							</h3>
+		<section className="w-full border-stroke-soft-200 border-t bg-bg-white-0 dark:border-white/10 dark:bg-black">
+			<div className="relative mx-auto w-full max-w-5xl border-stroke-soft-200 border-x md:max-w-7xl dark:border-white/10">
+				<div className="grid grid-cols-1 divide-y divide-stroke-soft-200 lg:grid-cols-2 lg:divide-y-0 lg:divide-x dark:divide-white/10">
+				{/* Left Panel: Frameworks */}
+				<div className="flex flex-col justify-between p-8 sm:p-12 lg:p-14">
+					<div>
+						<div className="mb-4 flex items-center gap-2">
+							<SceneGlyph icon="code" color="orange" />
+							<span className="font-medium text-[13.5px] text-text-strong-950 tracking-tight dark:text-white">
+								Developer First
+							</span>
 						</div>
+						<h3 className="font-semibold text-2xl text-text-strong-950 tracking-tight sm:text-3xl dark:text-white">
+							Send email from your favorite framework.
+						</h3>
+						<p className="mt-2.5 max-w-md text-[15px] text-text-sub-600 leading-relaxed sm:text-[16px] dark:text-white/60">
+							Official SDKs and native libraries for Node.js, Python, Go, PHP,
+							Ruby, Java, .NET, and Elixir.
+						</p>
+					</div>
 
-						{/* All Framework Icons Grid (with links to /frameworks/[slug]) */}
-						<div className="flex flex-wrap items-center gap-3">
-							{frameworks.map((fw) => (
-								<Link
-									key={fw.slug}
-									href={`/frameworks/${fw.slug}`}
-									title={`Send email with ${fw.name}`}
-									aria-label={`Send email with ${fw.name}`}
-									className="group flex size-12 cursor-pointer items-center justify-center rounded-2xl bg-transparent transition-transform duration-150 hover:scale-105 sm:size-14"
+					<div className="mt-10 flex flex-wrap items-center gap-3">
+						{frameworks.map((fw) => (
+							<Link
+								key={fw.slug}
+								href={`/frameworks/${fw.slug}`}
+								title={`Send email with ${fw.name}`}
+								aria-label={`Send email with ${fw.name}`}
+								className="group flex size-12 cursor-pointer items-center justify-center rounded-2xl border border-stroke-soft-200 bg-bg-white-0 transition-transform duration-150 hover:scale-105 sm:size-14 dark:border-white/10 dark:bg-white/[0.04]"
+							>
+								<span
+									className="flex size-8 items-center justify-center sm:size-9"
+									style={getBrandColorStyle(fw.icon.hex)}
 								>
-									<span
-										className="flex size-9 items-center justify-center sm:size-10"
-										style={getBrandColorStyle(fw.icon.hex)}
-									>
-										<LanguageIcon
-											icon={fw.icon}
-											className="size-9 sm:size-10"
-										/>
-									</span>
-								</Link>
-							))}
-						</div>
-					</div>
-
-					{/* Right Column: Code block with Overlapping Live Email preview */}
-					<div className="relative w-full min-w-0 flex-1">
-						<div className="w-full max-w-xl lg:max-w-[31rem] xl:max-w-[34rem]">
-							<SdkCodeBlock code={nodejsLanguage.sendCode} slug="nodejs" />
-						</div>
-						<div className="lg:-right-12 xl:-right-16 relative z-10 mt-6 w-full max-w-sm lg:absolute lg:top-4">
-							<EmailStack activeId="otp" />
-						</div>
+									<LanguageIcon
+										icon={fw.icon}
+										className="size-8 sm:size-9"
+									/>
+								</span>
+							</Link>
+						))}
 					</div>
 				</div>
 
-				{/* Right-side blur & fade overlay for overflowing email */}
-				<div
-					aria-hidden
-					className="pointer-events-none absolute inset-y-0 right-0 z-20 w-24 sm:w-36 lg:w-48"
-				>
-					<div className="absolute inset-0 backdrop-blur-[8px] [mask-image:linear-gradient(to_right,transparent,black_70%)]" />
-					<div className="absolute inset-0 bg-gradient-to-l from-15% from-bg-white-0 via-bg-white-0/80 to-transparent dark:from-black dark:via-black/80" />
+				{/* Right Panel: Email Preview */}
+				<div className="flex items-center justify-center p-8 sm:p-12 lg:p-14">
+					<div className="relative w-full max-w-sm">
+						<div className="relative [mask-image:linear-gradient(to_bottom,black_52%,transparent_96%)] [-webkit-mask-image:linear-gradient(to_bottom,black_52%,transparent_96%)]">
+							<EmailStack activeId={activeEmailId} />
+						</div>
+						{/* Gradient fade to section background */}
+						<div
+							aria-hidden
+							className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-40 bg-gradient-to-t from-bg-white-0 via-bg-white-0/60 to-transparent dark:from-black dark:via-black/60"
+						/>
+					</div>
 				</div>
-
-				{/* Bottom fade */}
-				<div
-					aria-hidden
-					className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-44 bg-gradient-to-t from-15% from-bg-white-0 via-bg-white-0/80 to-transparent dark:from-black dark:via-black/80"
-				/>
+			</div>
 			</div>
 		</section>
 	);

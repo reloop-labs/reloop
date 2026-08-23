@@ -134,7 +134,7 @@ export function TransactionalHero() {
 			</header>
 
 			{/* Overview Window Demo */}
-			<section className="relative z-10 w-full px-3 pt-6 pb-14 sm:px-6 sm:pt-8 sm:pb-16 lg:px-8 lg:pb-20">
+			<section className="relative z-10 w-full px-3 pt-6 sm:px-6 sm:pt-8 sm:pb-16 lg:px-8 lg:pb-20">
 				<div className="mx-auto flex h-[34rem] w-full max-w-5xl flex-col sm:h-[42rem] md:max-w-7xl lg:h-[48rem]">
 					<HeroDemoPlaybackProvider started={true}>
 						<HeroWindowChrome action={<HeroDemoPlaybackButton />}>
