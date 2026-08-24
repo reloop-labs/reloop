@@ -1,4 +1,5 @@
 local constants = require 'policy.constants'
+local tls = require 'policy.tls'
 
 local utils = {}
 
@@ -164,6 +165,20 @@ function utils.inject_tracking(data, email_log_id, tracking_domain, click_tracki
   end)
 
   return data
+end
+
+function utils.normalize_tls_mode(mode)
+  return tls.normalize_tls_mode(mode)
+end
+
+--- Stamp TLS policy on the message so get_queue_config can pick an egress pool.
+--- Tenant is the KumoMTA queue dimension that flows into egress_source.
+function utils.apply_tls_mode(msg, mode)
+  local tls_mode = tls.normalize_tls_mode(mode)
+  msg:set_meta('tls_mode', tls_mode)
+  msg:set_meta('tenant', tls_mode)
+  print("[TLS] [" .. msg:id() .. "] mode=" .. tls_mode)
+  return tls_mode
 end
 
 return utils

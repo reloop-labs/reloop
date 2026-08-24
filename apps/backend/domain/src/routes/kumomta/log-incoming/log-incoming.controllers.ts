@@ -34,6 +34,7 @@ export async function logIncomingController({
 	trackingDomain: string | null;
 	clickTracking: boolean;
 	openTracking: boolean;
+	tls: "opportunistic" | "enforced";
 }> {
 	const log = useLogger();
 	let textBody = body.textBody || "";
@@ -81,6 +82,7 @@ export async function logIncomingController({
 			trackingSubdomain: true,
 			domain: true,
 			systemVerified: true,
+			tls: true,
 		},
 	});
 
@@ -163,5 +165,6 @@ export async function logIncomingController({
 		trackingDomain,
 		clickTracking: domainRecord.isClickTrackingEnabled,
 		openTracking: domainRecord.isOpenTrackingEnabled,
+		tls: domainRecord.tls ?? "opportunistic",
 	};
 }

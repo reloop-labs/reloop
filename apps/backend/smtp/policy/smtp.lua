@@ -15,6 +15,8 @@ local function apply_reloop_logic(msg, api_key)
     print("[LOG-INCOMING] [" .. msg_id .. "] Found X-Api-Key header: using it as api_key")
   end
   msg:remove_all_named_headers('X-Api-Key')
+  local header_tls_mode = msg:get_first_named_header_value('X-Reloop-TLS-Mode')
+  msg:remove_all_named_headers('X-Reloop-TLS-Mode')
   local sender = msg:sender()
   local domain = ""
   local from_email = ""
@@ -131,8 +133,10 @@ local function apply_reloop_logic(msg, api_key)
           msg:set_data(new_data)
           print("[TRACKING] [" .. msg_id .. "] injected tracking into message (domain: " .. tostring(body.trackingDomain) .. ")")
         end
+        utils.apply_tls_mode(msg, body.tls or header_tls_mode)
       else
         print("[LOG-INCOMING] [" .. msg_id .. "] ERROR: backend returned 200 but no ID found")
+        utils.apply_tls_mode(msg, header_tls_mode)
       end
     elseif code == 401 then
       print("[LOG-INCOMING] [" .. msg_id .. "] REJECTED: Invalid API key")
@@ -154,6 +158,7 @@ local function apply_reloop_logic(msg, api_key)
   else
     msg:set_meta('X-Email-Log-ID', existing_log_id)
     print("[LOG-INCOMING] [" .. msg_id .. "] Skipped log-incoming, already logged with ID=" .. existing_log_id)
+    utils.apply_tls_mode(msg, header_tls_mode)
   end
 
   -- Ensure mandatory headers for deliverability
