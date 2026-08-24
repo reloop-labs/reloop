@@ -244,7 +244,7 @@ export function ApiSection() {
 			</div>
 
 			{/* Language Switcher & Action Bar */}
-			<div className="flex items-center justify-between gap-3 border-stroke-soft-200 border-b pr-4 sm:pr-5 dark:border-white/10">
+			<div className="flex items-center justify-between gap-3 border-stroke-soft-200 border-b pr-4 sm:pr-8 lg:pr-12 dark:border-white/10">
 				<LanguagePills
 					tabs={PILL_TABS}
 					activeId={activeId}
@@ -252,7 +252,7 @@ export function ApiSection() {
 					ariaLabel="Code language"
 					idPrefix="check-api"
 					controls={PANEL_ID}
-					className="min-w-0 flex-1 px-4 py-3 sm:px-5 md:px-6"
+					className="min-w-0 flex-1 px-4 py-3 sm:px-8 lg:px-12"
 				/>
 
 				<div className="flex items-center gap-2.5">
@@ -285,14 +285,14 @@ export function ApiSection() {
 				aria-labelledby={`check-api-tab-${activeId}`}
 				className="grid lg:grid-cols-2"
 			>
-				<div className="overflow-x-auto px-5 py-6 sm:px-6 md:px-8">
+				<div className="overflow-x-auto px-4 py-6 sm:px-8 lg:px-12">
 					<pre className="font-mono text-[12.5px] text-text-strong-950 leading-[1.75] sm:text-[13px] dark:text-white/80">
 						<code>{highlightCode(currentCode)}</code>
 					</pre>
 				</div>
 
 				<div className="border-stroke-soft-200 border-t lg:border-t-0 lg:border-l dark:border-white/10">
-					<div className="flex items-center gap-3 border-stroke-soft-200 border-b px-5 py-3 sm:px-6 dark:border-white/10">
+					<div className="flex items-center gap-3 border-stroke-soft-200 border-b px-4 py-3 sm:px-6 lg:px-8 dark:border-white/10">
 						<WindowDots />
 						<div className="ml-auto flex items-center gap-2 font-mono text-[11px] text-text-soft-400 uppercase tracking-[0.14em] dark:text-white/30">
 							<span className="inline-flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400">
@@ -305,7 +305,7 @@ export function ApiSection() {
 							<span>· json</span>
 						</div>
 					</div>
-					<div className="overflow-x-auto px-5 py-6 sm:px-6">
+					<div className="overflow-x-auto px-4 py-6 sm:px-6 lg:px-8">
 						<AnimatePresence mode="wait">
 							<motion.pre
 								key={jsonResult}

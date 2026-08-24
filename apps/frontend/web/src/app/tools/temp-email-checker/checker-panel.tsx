@@ -6,7 +6,13 @@ import { Icon, type IconName } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { type FormEvent, useEffect, useLayoutEffect, useRef, useState } from "react";
+import {
+	type FormEvent,
+	useEffect,
+	useLayoutEffect,
+	useRef,
+	useState,
+} from "react";
 import { CheckRequestError, runCheck } from "./check-api";
 import {
 	type CheckResult,
@@ -143,22 +149,31 @@ function SignalItem({
 					? "bg-emerald-500"
 					: "bg-neutral-400";
 
-	const valueClass =
+	const badgeStyles =
 		status === "fail"
-			? "text-rose-500 dark:text-rose-400 font-medium"
+			? "border-rose-500/20 bg-rose-500/[0.08] text-rose-600 dark:border-rose-500/30 dark:bg-rose-500/15 dark:text-rose-400"
 			: status === "warn"
-				? "text-amber-500 dark:text-amber-400 font-medium"
+				? "border-amber-500/20 bg-amber-500/[0.08] text-amber-600 dark:border-amber-500/30 dark:bg-amber-500/15 dark:text-amber-400"
 				: status === "pass"
-					? "text-emerald-600 dark:text-emerald-400 font-medium"
-					: "text-text-sub-600 dark:text-white/50";
+					? "border-emerald-500/20 bg-emerald-500/[0.08] text-emerald-600 dark:border-emerald-500/30 dark:bg-emerald-500/15 dark:text-emerald-400"
+					: "border-stroke-soft-200 bg-bg-white-0 text-text-sub-600 dark:border-white/10 dark:bg-[#0b0b0b] dark:text-white/70";
 
 	return (
-		<div className="flex items-center justify-between py-2 text-[14px]">
-			<div className="flex items-center gap-3">
+		<div className="flex items-center justify-between py-2.5">
+			<div className="flex items-center gap-2.5">
 				<span className={cn("size-2 rounded-full", dotColor)} />
-				<span className="text-text-strong-950 dark:text-white/90">{label}</span>
+				<span className="font-medium text-text-strong-950 text-xs dark:text-white">
+					{label}
+				</span>
 			</div>
-			<span className={cn("text-[13.5px]", valueClass)}>{value}</span>
+			<code
+				className={cn(
+					"rounded-md border px-2 py-0.5 font-medium font-mono text-[11px] tracking-tight",
+					badgeStyles,
+				)}
+			>
+				{value}
+			</code>
 		</div>
 	);
 }
@@ -178,11 +193,11 @@ function ResultCardDetailed({
 	const isValidSyntax = result.verdict !== "invalid";
 
 	return (
-		<div className="space-y-3 text-xs">
+		<div className="space-y-3.5 text-xs">
 			{/* Verdict Hero Card */}
 			<div
 				className={cn(
-					"rounded-xl border p-3.5 sm:p-4 transition-colors",
+					"rounded-xl border p-4 transition-colors sm:p-4.5",
 					theme.badgeBg,
 					theme.badgeBorder,
 				)}
@@ -192,14 +207,14 @@ function ResultCardDetailed({
 						<span className={cn("size-2 rounded-full", theme.dotColor)} />
 						<span
 							className={cn(
-								"font-bold font-mono text-[13px] tracking-wider uppercase",
+								"font-bold font-mono text-[13px] uppercase tracking-wider",
 								theme.titleClass,
 							)}
 						>
 							{theme.title}
 						</span>
 						<span className="text-text-sub-600 dark:text-white/40">·</span>
-						<span className="text-text-strong-950 font-medium text-xs dark:text-white">
+						<span className="font-medium text-text-strong-950 text-xs dark:text-white">
 							{theme.subtitle}
 						</span>
 					</div>
@@ -214,17 +229,18 @@ function ResultCardDetailed({
 			</div>
 
 			{/* Signals */}
-			<div className="rounded-xl border border-stroke-soft-200 bg-bg-weak-50/50 p-3.5 dark:border-white/10 dark:bg-white/[0.02]">
-				<div className="flex items-center justify-between">
+			<div className="space-y-3 rounded-xl border border-stroke-soft-200 bg-bg-weak-50/50 p-4 text-xs sm:p-4.5 dark:border-white/10 dark:bg-white/[0.02]">
+				<div className="flex items-center justify-between pb-0.5">
 					<p className="font-mono font-semibold text-[11px] text-text-strong-950 uppercase tracking-wider dark:text-white">
 						Signals & Detection
 					</p>
-					<span className="font-mono text-[11px] text-emerald-600 dark:text-emerald-400">
-						Live Check
+					<span className="inline-flex items-center gap-1 font-mono text-[11px] text-emerald-600 dark:text-emerald-400">
+						<span className="size-1.5 rounded-full bg-emerald-500" />
+						Live Scanner
 					</span>
 				</div>
 
-				<div className="mt-2 divide-y divide-stroke-soft-200/50 dark:divide-white/5">
+				<div className="divide-y divide-stroke-soft-200/50 pt-0.5 dark:divide-white/5">
 					<SignalItem
 						label="Disposable provider"
 						value={isDisposable ? "Detected" : "Clean"}
@@ -257,14 +273,10 @@ function ResultCardDetailed({
 			{/* Recommendation */}
 			<div className="flex items-start gap-2.5 rounded-xl border border-stroke-soft-200 bg-bg-weak-50/30 p-3 dark:border-white/10 dark:bg-white/[0.02]">
 				<Icon
-					name={
-						isDisposable || isRole ? "alert-triangle" : "check-circle"
-					}
+					name={isDisposable || isRole ? "alert-triangle" : "check-circle"}
 					className={cn(
 						"mt-0.5 size-4 shrink-0",
-						isDisposable || isRole
-							? "text-amber-500"
-							: "text-emerald-500",
+						isDisposable || isRole ? "text-amber-500" : "text-emerald-500",
 					)}
 				/>
 				<div className="space-y-0.5">
@@ -289,7 +301,7 @@ function ResultCardDetailed({
 				<button
 					type="button"
 					onClick={onReset}
-					className="cursor-pointer font-medium text-xs text-primary-base hover:underline"
+					className="cursor-pointer font-medium text-primary-base text-xs hover:underline"
 				>
 					Clear result
 				</button>
@@ -412,16 +424,17 @@ export function CheckerPanel() {
 	};
 
 	return (
-		<div className="mx-auto w-full max-w-2xl">
-			{/* Dashboard Modal / Card Container with navbar-style height morphing */}
-			<div className="overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-weak-50 p-1.5 sm:rounded-[20px] dark:border-white/10 dark:bg-white/[0.04]">
-				<div className="rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-5 sm:p-6 dark:border-white/10 dark:bg-[#070707]">
+		<div className="mx-auto w-full max-w-2xl font-sans">
+			{/* Dashboard Modal / Card Container matching Login Card architecture */}
+			<div className="overflow-hidden rounded-[20px] border border-stroke-soft-200 bg-bg-weak-50 p-1 sm:rounded-[20px] dark:border-white/10 dark:bg-white/[0.03]">
+				{/* Top White Card: Input + Results with dynamic height morphing */}
+				<div className="rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-5 sm:p-6 dark:border-white/10 dark:bg-[#0c0c0c]">
 					{/* Input Check Zone */}
 					<form onSubmit={onSubmit} noValidate className="space-y-4">
 						<div className="space-y-2">
 							<Label.Root
 								htmlFor="checker-input"
-								className="font-medium text-xs text-text-strong-950 dark:text-white"
+								className="font-medium text-text-strong-950 text-xs dark:text-white"
 							>
 								Email or domain
 								<Label.Asterisk />
@@ -431,7 +444,7 @@ export function CheckerPanel() {
 								size="medium"
 								className="!shadow-none has-[input:focus]:!shadow-button-primary-focus has-[input:focus]:before:!ring-primary-base w-full rounded-xl"
 							>
-								<Input.Wrapper className="h-11 pl-3.5 pr-1.5 dark:bg-[#070707]">
+								<Input.Wrapper className="h-11 pr-1.5 pl-3.5 dark:bg-[#0c0c0c]">
 									<Input.Icon>
 										<Icon name="mail-single" className="size-4" />
 									</Input.Icon>
@@ -483,7 +496,7 @@ export function CheckerPanel() {
 							</Input.Root>
 						</div>
 
-						{/* Smooth Height Morphing Shell */}
+						{/* Result / Error Zone inside the white card */}
 						<motion.div
 							initial={false}
 							animate={{
@@ -493,9 +506,7 @@ export function CheckerPanel() {
 										: dynamicHeight,
 							}}
 							transition={
-								shouldReduceMotion
-									? { duration: 0 }
-									: SPRING_TRANSITION
+								shouldReduceMotion ? { duration: 0 } : SPRING_TRANSITION
 							}
 							style={{ overflow: "hidden" }}
 						>
@@ -508,13 +519,13 @@ export function CheckerPanel() {
 											animate={{ opacity: 1 }}
 											exit={{ opacity: 0 }}
 											transition={{ duration: 0.2 }}
-											className="flex items-start gap-2.5 rounded-xl border border-rose-500/20 bg-rose-500/5 p-3.5 text-xs text-text-sub-600 dark:text-white/60"
+											className="flex items-start gap-2.5 rounded-xl border border-rose-500/20 bg-rose-500/5 p-3.5 text-text-sub-600 text-xs dark:text-white/60"
 										>
 											<Icon
 												name="alert-triangle"
 												className="mt-0.5 size-4 shrink-0 text-rose-500"
 											/>
-											<p className="leading-relaxed text-rose-600 dark:text-rose-400">
+											<p className="text-rose-600 leading-relaxed dark:text-rose-400">
 												{error}
 											</p>
 										</motion.div>
@@ -526,89 +537,96 @@ export function CheckerPanel() {
 											exit={{ opacity: 0 }}
 											transition={{ duration: 0.22, ease: "easeOut" }}
 										>
-											<ResultCardDetailed result={result} onReset={handleReset} />
+											<ResultCardDetailed
+												result={result}
+												onReset={handleReset}
+											/>
 										</motion.div>
-									) : (
-										<motion.div
-											key="how-it-works"
-											initial={{ opacity: 0 }}
-											animate={{ opacity: 1 }}
-											exit={{ opacity: 0 }}
-											transition={{ duration: 0.2 }}
-										>
-											{/* How It Works - Vertical Stepper */}
-											<div className="space-y-3.5 rounded-xl border border-stroke-soft-200 bg-bg-weak-50/50 p-4 sm:p-4.5 text-xs dark:border-white/10 dark:bg-white/[0.02]">
-												<div className="flex items-center justify-between pb-0.5">
-													<p className="font-mono font-semibold text-[11px] text-text-strong-950 uppercase tracking-wider dark:text-white">
-														How It Works
-													</p>
-													<span className="inline-flex items-center gap-1 font-mono text-[11px] text-emerald-600 dark:text-emerald-400">
-														<span className="size-1.5 rounded-full bg-emerald-500" />
-														Live Scanner
-													</span>
-												</div>
-
-												<div className="relative pt-1 pl-0.5">
-													{/* Step 1 */}
-													<div className="relative flex items-center gap-3.5 pb-4.5">
-														{/* Vertical connecting line */}
-														<div className="absolute top-5 left-[12px] h-full w-px bg-stroke-soft-200 dark:bg-white/10" />
-														{/* Number node */}
-														<div className="relative z-10 flex size-6 shrink-0 items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-white-0 font-mono font-semibold text-[11px] text-text-strong-950 dark:border-white/12 dark:bg-[#111] dark:text-white">
-															1
-														</div>
-														<div className="flex flex-1 items-center justify-between">
-															<span className="font-medium text-text-strong-950 text-xs dark:text-white">
-																Enter email
-															</span>
-															<code className="rounded-md border border-stroke-soft-200 bg-bg-white-0 px-2 py-0.5 font-mono text-[11px] text-text-sub-600 dark:border-white/10 dark:bg-[#0b0b0b] dark:text-white/70">
-																Email
-															</code>
-														</div>
-													</div>
-
-													{/* Step 2 */}
-													<div className="relative flex items-center gap-3.5 pb-4.5">
-														{/* Vertical connecting line */}
-														<div className="absolute top-5 left-[12px] h-full w-px bg-stroke-soft-200 dark:bg-white/10" />
-														{/* Number node */}
-														<div className="relative z-10 flex size-6 shrink-0 items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-white-0 font-mono font-semibold text-[11px] text-text-strong-950 dark:border-white/12 dark:bg-[#111] dark:text-white">
-															2
-														</div>
-														<div className="flex flex-1 items-center justify-between">
-															<span className="font-medium text-text-strong-950 text-xs dark:text-white">
-																Analyze domain
-															</span>
-															<code className="rounded-md border border-stroke-soft-200 bg-bg-white-0 px-2 py-0.5 font-mono text-[11px] text-text-sub-600 dark:border-white/10 dark:bg-[#0b0b0b] dark:text-white/70">
-																Signals
-															</code>
-														</div>
-													</div>
-
-													{/* Step 3 */}
-													<div className="relative flex items-center gap-3.5">
-														{/* Number node */}
-														<div className="relative z-10 flex size-6 shrink-0 items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-white-0 font-mono font-semibold text-[11px] text-text-strong-950 dark:border-white/12 dark:bg-[#111] dark:text-white">
-															3
-														</div>
-														<div className="flex flex-1 items-center justify-between">
-															<span className="font-medium text-text-strong-950 text-xs dark:text-white">
-																Get result
-															</span>
-															<code className="rounded-md border border-stroke-soft-200 bg-bg-white-0 px-2 py-0.5 font-mono text-[11px] text-text-sub-600 dark:border-white/10 dark:bg-[#0b0b0b] dark:text-white/70">
-																Risk Result
-															</code>
-														</div>
-													</div>
-												</div>
-											</div>
-										</motion.div>
-									)}
+									) : null}
 								</AnimatePresence>
 							</div>
 						</motion.div>
 					</form>
 				</div>
+
+				{/* Bottom Soft Strip (Matching Login Card Footer) */}
+				<AnimatePresence>
+					{!result && (
+						<motion.div
+							initial={{ opacity: 0, height: 0 }}
+							animate={{ opacity: 1, height: "auto" }}
+							exit={{ opacity: 0, height: 0 }}
+							transition={SPRING_TRANSITION}
+							className="overflow-hidden"
+						>
+							<div className="space-y-3 px-4 pt-3.5 pb-2 text-xs sm:px-5 sm:pt-4 sm:pb-3">
+								<div className="flex items-center justify-between pb-0.5">
+									<p className="font-mono font-semibold text-[11px] text-text-strong-950 uppercase tracking-wider dark:text-white">
+										How It Works
+									</p>
+									<span className="inline-flex items-center gap-1 font-mono text-[11px] text-emerald-600 dark:text-emerald-400">
+										<span className="size-1.5 rounded-full bg-emerald-500" />
+										Live Scanner
+									</span>
+								</div>
+
+								<div className="relative pt-0.5 pl-0.5">
+									{/* Step 1 */}
+									<div className="relative flex items-center gap-3.5 pb-4">
+										{/* Vertical connecting line */}
+										<div className="absolute top-5 left-[12px] h-full w-px bg-stroke-soft-200 dark:bg-white/10" />
+										{/* Number node */}
+										<div className="relative z-10 flex size-6 shrink-0 items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-white-0 font-mono font-semibold text-[11px] text-text-strong-950 dark:border-white/12 dark:bg-[#111] dark:text-white">
+											1
+										</div>
+										<div className="flex flex-1 items-center justify-between">
+											<span className="font-medium text-text-strong-950 text-xs dark:text-white">
+												Enter email
+											</span>
+											<code className="rounded-md border border-stroke-soft-200 bg-bg-white-0 px-2 py-0.5 font-mono text-[11px] text-text-sub-600 dark:border-white/10 dark:bg-[#0b0b0b] dark:text-white/70">
+												Email
+											</code>
+										</div>
+									</div>
+
+									{/* Step 2 */}
+									<div className="relative flex items-center gap-3.5 pb-4">
+										{/* Vertical connecting line */}
+										<div className="absolute top-5 left-[12px] h-full w-px bg-stroke-soft-200 dark:bg-white/10" />
+										{/* Number node */}
+										<div className="relative z-10 flex size-6 shrink-0 items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-white-0 font-mono font-semibold text-[11px] text-text-strong-950 dark:border-white/12 dark:bg-[#111] dark:text-white">
+											2
+										</div>
+										<div className="flex flex-1 items-center justify-between">
+											<span className="font-medium text-text-strong-950 text-xs dark:text-white">
+												Analyze domain
+											</span>
+											<code className="rounded-md border border-stroke-soft-200 bg-bg-white-0 px-2 py-0.5 font-mono text-[11px] text-text-sub-600 dark:border-white/10 dark:bg-[#0b0b0b] dark:text-white/70">
+												Signals
+											</code>
+										</div>
+									</div>
+
+									{/* Step 3 */}
+									<div className="relative flex items-center gap-3.5">
+										{/* Number node */}
+										<div className="relative z-10 flex size-6 shrink-0 items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-white-0 font-mono font-semibold text-[11px] text-text-strong-950 dark:border-white/12 dark:bg-[#111] dark:text-white">
+											3
+										</div>
+										<div className="flex flex-1 items-center justify-between">
+											<span className="font-medium text-text-strong-950 text-xs dark:text-white">
+												Get result
+											</span>
+											<code className="rounded-md border border-stroke-soft-200 bg-bg-white-0 px-2 py-0.5 font-mono text-[11px] text-text-sub-600 dark:border-white/10 dark:bg-[#0b0b0b] dark:text-white/70">
+												Risk Result
+											</code>
+										</div>
+									</div>
+								</div>
+							</div>
+						</motion.div>
+					)}
+				</AnimatePresence>
 			</div>
 		</div>
 	);
