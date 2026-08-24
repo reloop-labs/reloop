@@ -528,7 +528,7 @@ export function CheckerPanel() {
 							<div className="space-y-1.5">
 								<Label.Root
 									htmlFor="checker-input"
-									className="font-medium text-xs text-text-strong-950 dark:text-white ml-2"
+									className="ml-2 font-medium text-text-strong-950 text-xs dark:text-white"
 								>
 									Email or domain
 									<Label.Asterisk />
@@ -538,58 +538,58 @@ export function CheckerPanel() {
 									size="medium"
 									className="!shadow-none has-[input:focus]:!shadow-button-primary-focus has-[input:focus]:before:!ring-primary-base w-full rounded-xl"
 								>
-								<Input.Wrapper className="h-10.5 pl-3 pr-1.5 dark:bg-[#070707]">
-									<Input.Icon>
-										<Icon name="mail-single" className="size-4" />
-									</Input.Icon>
-									<Input.Input
-										id="checker-input"
-										ref={inputRef}
-										type="text"
-										inputMode="email"
-										autoComplete="off"
-										autoCapitalize="none"
-										spellCheck={false}
-										value={value}
-										onChange={(e) => setValue(e.target.value)}
-										placeholder="you@example.com or domain.com"
-										className="font-medium text-[14.5px]"
-									/>
-									{value ? (
-										<button
-											type="button"
-											onClick={(e) => {
-												e.stopPropagation();
-												setValue("");
-												inputRef.current?.focus();
-											}}
-											className="flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:text-white/45 dark:hover:bg-white/10 dark:hover:text-white"
-											aria-label="Clear input"
+									<Input.Wrapper className="h-10.5 pr-1.5 pl-3 dark:bg-[#070707]">
+										<Input.Icon>
+											<Icon name="mail-single" className="size-4" />
+										</Input.Icon>
+										<Input.Input
+											id="checker-input"
+											ref={inputRef}
+											type="text"
+											inputMode="email"
+											autoComplete="off"
+											autoCapitalize="none"
+											spellCheck={false}
+											value={value}
+											onChange={(e) => setValue(e.target.value)}
+											placeholder="you@example.com or domain.com"
+											className="font-medium text-[14.5px]"
+										/>
+										{value ? (
+											<button
+												type="button"
+												onClick={(e) => {
+													e.stopPropagation();
+													setValue("");
+													inputRef.current?.focus();
+												}}
+												className="flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:text-white/45 dark:hover:bg-white/10 dark:hover:text-white"
+												aria-label="Clear input"
+											>
+												<Icon name="close" className="size-3.5" />
+											</button>
+										) : null}
+										<FancyButton.Root
+											type="submit"
+											variant="primary"
+											size="xsmall"
+											className="!p-0 flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-lg"
+											aria-label="Verify email or domain"
 										>
-											<Icon name="close" className="size-3.5" />
-										</button>
-									) : null}
-									<FancyButton.Root
-										type="submit"
-										variant="primary"
-										size="xsmall"
-										className="!p-0 flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-lg"
-										aria-label="Verify email or domain"
-									>
-										{isPending ? (
-											<span className="size-3 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-										) : (
-											<FancyButton.Icon className="mx-0 size-3.5">
-												<Icon name="arrow-right" className="size-3.5" />
-											</FancyButton.Icon>
-										)}
-									</FancyButton.Root>
-								</Input.Wrapper>
-							</Input.Root>
-						</div>
+											{isPending ? (
+												<span className="size-3 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+											) : (
+												<FancyButton.Icon className="mx-0 size-3.5">
+													<Icon name="arrow-right" className="size-3.5" />
+												</FancyButton.Icon>
+											)}
+										</FancyButton.Root>
+									</Input.Wrapper>
+								</Input.Root>
+							</div>
 
 							{/* How It Works - Vertical Stepper */}
-							<div className="mt-3.5 space-y-2.5 px-0.5 text-xs">
+							<div className="mt-3.5 space-y-3 rounded-xl border border-stroke-soft-200 bg-bg-weak-50/50 p-3.5 text-xs dark:border-white/10 dark:bg-white/[0.02]">
 								<div className="flex items-center justify-between">
 									<p className="font-mono font-semibold text-[11px] text-text-strong-950 uppercase tracking-wider dark:text-white">
 										How It Works
@@ -604,7 +604,7 @@ export function CheckerPanel() {
 									{/* Step 1 */}
 									<div className="relative flex items-center gap-3 pb-3.5">
 										{/* Vertical connecting line */}
-										<div className="absolute top-5 left-[11px] h-full w-px bg-stroke-soft-200 dark:bg-white/10" />
+										<div className="absolute top-5 left-[12px] h-full w-px bg-stroke-soft-200 dark:bg-white/10" />
 										{/* Number node */}
 										<div className="relative z-10 flex size-6 shrink-0 items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-white-0 font-mono font-semibold text-[11px] text-text-strong-950 dark:border-white/12 dark:bg-[#111] dark:text-white">
 											1
@@ -622,7 +622,7 @@ export function CheckerPanel() {
 									{/* Step 2 */}
 									<div className="relative flex items-center gap-3 pb-3.5">
 										{/* Vertical connecting line */}
-										<div className="absolute top-5 left-[11px] h-full w-px bg-stroke-soft-200 dark:bg-white/10" />
+										<div className="absolute top-5 left-[12px] h-full w-px bg-stroke-soft-200 dark:bg-white/10" />
 										{/* Number node */}
 										<div className="relative z-10 flex size-6 shrink-0 items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-white-0 font-mono font-semibold text-[11px] text-text-strong-950 dark:border-white/12 dark:bg-[#111] dark:text-white">
 											2
