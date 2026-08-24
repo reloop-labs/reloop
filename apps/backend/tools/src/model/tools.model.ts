@@ -164,6 +164,57 @@ export namespace ToolsModel {
 		recommendations: t.Array(t.String()),
 	});
 
+	export const blocklistCheckBody = t.Object({
+		target: t.String({
+			minLength: 1,
+			maxLength: 255,
+			description:
+				"Domain name (e.g. example.com) or IPv4 address (e.g. 198.51.100.1).",
+			examples: ["reloop.sh", "1.1.1.1"],
+		}),
+	});
+
+	export const blocklistCheckQuery = t.Object({
+		target: t.String({
+			minLength: 1,
+			maxLength: 255,
+			description: "Domain name or IPv4 address.",
+		}),
+	});
+
+	export const blocklistCheckResponse = t.Object({
+		target: t.String(),
+		inputType: t.Union([t.Literal("domain"), t.Literal("ip")]),
+		resolvedIp: t.Union([t.String(), t.Null()]),
+		hostname: t.Union([t.String(), t.Null()]),
+		isClean: t.Boolean(),
+		totalChecked: t.Number(),
+		listedCount: t.Number(),
+		cleanCount: t.Number(),
+		scanDurationMs: t.Number(),
+		results: t.Array(
+			t.Object({
+				id: t.String(),
+				name: t.String(),
+				host: t.String(),
+				category: t.Union([
+					t.Literal("reputation"),
+					t.Literal("spam"),
+					t.Literal("phishing"),
+					t.Literal("malware"),
+					t.Literal("open_relay"),
+				]),
+				isListed: t.Boolean(),
+				responseCodes: t.Array(t.String()),
+				responseTimeMs: t.Number(),
+				delistUrl: t.String(),
+				description: t.String(),
+				error: t.Optional(t.String()),
+			}),
+		),
+		recommendations: t.Array(t.String()),
+	});
+
 	export const errorResponse = t.Object({
 		message: t.String(),
 		why: t.Optional(t.String()),
@@ -175,4 +226,6 @@ export namespace ToolsModel {
 	export type CheckResponse = typeof checkResponse.static;
 	export type SpamCheckBody = typeof spamCheckBody.static;
 	export type SpamCheckResponse = typeof spamCheckResponse.static;
+	export type BlocklistCheckBody = typeof blocklistCheckBody.static;
+	export type BlocklistCheckResponse = typeof blocklistCheckResponse.static;
 }

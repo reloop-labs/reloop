@@ -426,13 +426,13 @@ export function CheckerPanel() {
 								{copied ? "Report Copied!" : "Copy Report"}
 							</button>
 
-							<Link
+							<a
 								href="/dashboard/signup"
 								className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-bg-strong-950 px-3.5 py-2.5 font-medium text-[13px] text-text-white-0 transition-colors hover:bg-bg-surface-800 dark:bg-white dark:text-black dark:hover:bg-white/90"
 							>
 								<span>Send with Reloop</span>
 								<Icon name="arrow-right" className="size-3.5" />
-							</Link>
+							</a>
 						</div>
 					</div>
 				</div>

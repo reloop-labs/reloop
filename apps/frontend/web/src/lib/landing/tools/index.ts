@@ -1,4 +1,5 @@
 import { config as auth_checker } from "./auth-checker";
+import { config as blocklist_checker } from "./blocklist-checker";
 import { config as deliverability_tester } from "./deliverability-tester";
 import { config as email_validator } from "./email-validator";
 import { config as mobile_preview } from "./mobile-preview";
@@ -9,6 +10,7 @@ import { config as template_generator } from "./template-generator";
 
 export const toolConfigs = [
 	spam_score_checker,
+	blocklist_checker,
 	temp_email_checker,
 	email_validator,
 	deliverability_tester,

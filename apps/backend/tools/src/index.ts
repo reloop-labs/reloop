@@ -64,6 +64,7 @@ const toolsService = new Elysia({
 				// built to be called from other people's applications.
 				"/v1/check",
 				"/v1/spam-check",
+				"/v1/blocklist-check",
 			],
 		}),
 	)

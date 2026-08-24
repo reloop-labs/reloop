@@ -1,5 +1,6 @@
-import { tempEmailCheckerRoute } from "@be/tools/routes/tools/temp-email-checker/temp-email-checker.route";
+import { blocklistCheckRoute } from "@be/tools/routes/tools/blocklist-check/blocklist-check.route";
 import { spamCheckRoute } from "@be/tools/routes/tools/spam-check/spam-check.route";
+import { tempEmailCheckerRoute } from "@be/tools/routes/tools/temp-email-checker/temp-email-checker.route";
 import { Elysia } from "elysia";
 
 export const toolsRoutes = new Elysia({
@@ -7,4 +8,5 @@ export const toolsRoutes = new Elysia({
 	name: "ToolsRoutes",
 })
 	.use(tempEmailCheckerRoute)
-	.use(spamCheckRoute);
+	.use(spamCheckRoute)
+	.use(blocklistCheckRoute);
