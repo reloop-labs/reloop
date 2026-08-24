@@ -2,7 +2,9 @@
 
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon, type IconName } from "@reloop/ui/icon";
+import * as Input from "@reloop/ui/input";
 import { AnimatePresence, motion } from "framer-motion";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import { CheckRequestError, runCheck } from "./check-api";
@@ -459,6 +461,7 @@ export function CheckerPanel() {
 	const run = async (raw: string) => {
 		const query = raw.trim();
 		if (!query) {
+			inputRef.current?.focus();
 			setResult(null);
 			setError(null);
 			return;
@@ -509,8 +512,6 @@ export function CheckerPanel() {
 		setTimeout(() => inputRef.current?.focus(), 50);
 	};
 
-	const canSubmit = value.trim().length > 0 && !isPending;
-
 	return (
 		<div className="mx-auto w-full max-w-2xl">
 			{!result ? (
@@ -523,21 +524,24 @@ export function CheckerPanel() {
 								Email address or domain to check
 							</label>
 
-							<div className="relative flex items-center">
-								<input
-									id="checker-input"
-									ref={inputRef}
-									type="text"
-									inputMode="email"
-									autoComplete="off"
-									autoCapitalize="none"
-									spellCheck={false}
-									value={value}
-									onChange={(e) => setValue(e.target.value)}
-									placeholder="you@example.com or domain.com"
-									className="h-11 w-full rounded-xl border border-stroke-soft-200 bg-bg-white-0 pl-3.5 pr-28 text-left text-[14.5px] font-medium text-text-strong-950 outline-none transition-colors placeholder:text-text-soft-400 focus:border-primary-base dark:border-white/10 dark:bg-black dark:text-white dark:placeholder:text-white/25"
-								/>
-								<div className="absolute right-1.5 flex items-center gap-1">
+							<Input.Root size="medium" className="w-full rounded-xl">
+								<Input.Wrapper className="h-11 px-3 dark:bg-[#070707]">
+									<Input.Icon>
+										<Icon name="mail-single" className="size-4" />
+									</Input.Icon>
+									<Input.Input
+										id="checker-input"
+										ref={inputRef}
+										type="text"
+										inputMode="email"
+										autoComplete="off"
+										autoCapitalize="none"
+										spellCheck={false}
+										value={value}
+										onChange={(e) => setValue(e.target.value)}
+										placeholder="you@example.com or domain.com"
+										className="text-[14.5px] font-medium"
+									/>
 									{value ? (
 										<button
 											type="button"
@@ -546,31 +550,29 @@ export function CheckerPanel() {
 												setValue("");
 												inputRef.current?.focus();
 											}}
-											className="flex size-7 cursor-pointer items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:text-white/45 dark:hover:bg-white/10 dark:hover:text-white"
+											className="flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:text-white/45 dark:hover:bg-white/10 dark:hover:text-white"
 											aria-label="Clear input"
 										>
 											<Icon name="close" className="size-3.5" />
 										</button>
 									) : null}
-
-									<Button.Root
+									<FancyButton.Root
 										type="submit"
 										variant="primary"
-										size="small"
-										disabled={!canSubmit}
-										className="h-8 cursor-pointer rounded-lg px-3 font-medium text-xs disabled:opacity-35"
+										size="xsmall"
+										className="flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-lg !p-0"
+										aria-label="Verify email or domain"
 									>
 										{isPending ? (
 											<span className="size-3 animate-spin rounded-full border-2 border-white/30 border-t-white" />
 										) : (
-											<>
-												<span>Verify</span>
-												<Icon name="arrow-right" className="size-3" />
-											</>
+											<FancyButton.Icon>
+												<Icon name="arrow-right" className="size-3.5" />
+											</FancyButton.Icon>
 										)}
-									</Button.Root>
-								</div>
-							</div>
+									</FancyButton.Root>
+								</Input.Wrapper>
+							</Input.Root>
 
 							{/* Specifications / Capabilities Box */}
 							<div className="mt-4 space-y-2 rounded-2xl border border-stroke-soft-200 bg-bg-weak-50/40 p-4 text-text-sub-600 text-xs dark:border-white/10 dark:bg-white/[0.02] dark:text-white/50">
