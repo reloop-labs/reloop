@@ -19,6 +19,7 @@ const DISPOSABLE_DOMAINS = new Set([
 	"tempmail.com",
 	"throwaway.email",
 	"yopmail.com",
+	"prodbits.com",
 ]);
 
 const ROLE_LOCAL_PARTS = new Set([

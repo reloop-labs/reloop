@@ -41,7 +41,10 @@ export function loadCatalogue(): Catalogue {
 	if (cached) return cached;
 
 	cached = {
-		disposable: new Set(readList("upstream/domains.txt")),
+		disposable: new Set([
+			...readList("upstream/domains.txt"),
+			...readList("local/domains.txt"),
+		]),
 		wildcards: new Set(
 			[
 				...readList("upstream/wildcards.txt"),

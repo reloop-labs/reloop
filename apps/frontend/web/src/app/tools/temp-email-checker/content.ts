@@ -105,7 +105,7 @@ export const reasons: {
 	},
 ];
 
-export const apiEndpoint = `${productionSiteUrl}/api/tools/v1/check`;
+export const apiEndpoint = `${productionSiteUrl}/api/tools/v1/temp-email-checker`;
 
 export type ApiSnippet = {
 	id: string;

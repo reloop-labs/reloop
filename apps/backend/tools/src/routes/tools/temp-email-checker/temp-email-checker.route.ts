@@ -3,12 +3,12 @@ import { ToolsModel } from "@be/tools/model/tools.model";
 import { Elysia } from "elysia";
 import { log } from "evlog";
 import { evlog, useLogger } from "evlog/elysia";
-import { checkEmailController } from "./check-email.controllers";
+import { tempEmailCheckerController } from "./temp-email-checker.controllers";
 
 // Domain and verdict only — never the local part. The tool page promises
 // addresses are checked and discarded.
 function check(input: string) {
-	const result = checkEmailController(input);
+	const result = tempEmailCheckerController(input);
 	useLogger().set({ domain: result.domain, verdict: result.verdict });
 	log.info("check", "Evaluated address");
 	return result;
@@ -21,10 +21,10 @@ const detail = {
 		"Reports whether an email address or bare domain is disposable, a role address, or from a free consumer provider. Public and unauthenticated; rate limited per IP. Nothing is stored.",
 };
 
-export const checkEmailRoute = new Elysia()
+export const tempEmailCheckerRoute = new Elysia()
 	.use(evlog())
 	.use(rateLimitPlugin)
-	.post("/check", ({ body }) => check(body.email), {
+	.post("/temp-email-checker", ({ body }) => check(body.email), {
 		body: ToolsModel.checkBody,
 		response: {
 			200: ToolsModel.checkResponse,
@@ -34,7 +34,7 @@ export const checkEmailRoute = new Elysia()
 		rateLimit: true,
 		detail,
 	})
-	.get("/check", ({ query }) => check(query.email), {
+	.get("/temp-email-checker", ({ query }) => check(query.email), {
 		query: ToolsModel.checkQuery,
 		response: {
 			200: ToolsModel.checkResponse,

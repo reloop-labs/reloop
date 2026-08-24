@@ -3,7 +3,9 @@ import type { ToolsModel } from "@be/tools/model/tools.model";
 import { toolsConfig } from "@be/tools/tools.config";
 import { evaluate } from "@reloop/email-validation";
 
-export function checkEmailController(input: string): ToolsModel.CheckResponse {
+export function tempEmailCheckerController(
+	input: string,
+): ToolsModel.CheckResponse {
 	const trimmed = input.trim();
 
 	if (trimmed.length === 0) throw ToolsErrors.emptyInput();

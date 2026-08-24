@@ -5,8 +5,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import type { SimpleIcon } from "simple-icons";
 
-/** Ported from `app/sdk/components/language-explorer.tsx` — keep the two in sync. */
-
 export type PillTab = {
 	id: string;
 	label: string;
@@ -22,12 +20,24 @@ type PillBox = {
 
 const PILL_EASE = [0.23, 1, 0.32, 1] as const;
 
-function hexToRgba(hex: string, alpha: number) {
+function hexToRgb(hex: string) {
 	const value = hex.replace("#", "");
-	const r = Number.parseInt(value.slice(0, 2), 16);
-	const g = Number.parseInt(value.slice(2, 4), 16);
-	const b = Number.parseInt(value.slice(4, 6), 16);
+	return {
+		r: Number.parseInt(value.slice(0, 2), 16),
+		g: Number.parseInt(value.slice(2, 4), 16),
+		b: Number.parseInt(value.slice(4, 6), 16),
+	};
+}
+
+function hexToRgba(hex: string, alpha: number) {
+	const { r, g, b } = hexToRgb(hex);
 	return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+/** Darker lip under the face — same extrusion as SceneGlyph / LanguageExplorer. */
+function darkenHex(hex: string, amount: number) {
+	const { r, g, b } = hexToRgb(hex);
+	return `rgb(${Math.round(r * amount)}, ${Math.round(g * amount)}, ${Math.round(b * amount)})`;
 }
 
 function isDarkBrandColor(hex: string): boolean {
@@ -104,7 +114,8 @@ export function LanguagePills({
 	const hoveredTab = hoveredIdx === undefined ? undefined : tabs[hoveredIdx];
 	const hoverBrandColor =
 		isHoveringOther && hoveredTab ? `#${hoveredTab.icon.hex}` : undefined;
-	const activeBrandColor = `#${(tabs[activeIndex] ?? tabs[0])?.icon.hex}`;
+	const active = tabs[activeIndex] ?? tabs[0];
+	const activeBrandColor = `#${active?.icon.hex ?? "2563eb"}`;
 
 	useEffect(() => {
 		if (!mounted) {
@@ -145,13 +156,14 @@ export function LanguagePills({
 			aria-label={ariaLabel}
 			onPointerLeave={() => setHoveredIdx(undefined)}
 			className={cn(
-				"scrollbar-none relative flex gap-1 overflow-x-auto",
+				"scrollbar-none relative flex items-center gap-1 overflow-x-auto",
 				className,
 			)}
 			style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
 		>
 			{tabs.map((tab, index) => {
 				const isActive = tab.id === activeId;
+				const tabBrandColor = `#${tab.icon.hex}`;
 				const showActiveLabel = isActive && Boolean(activePill || !mounted);
 				const isTabDark = isDarkBrandColor(tab.icon.hex);
 
@@ -171,7 +183,7 @@ export function LanguagePills({
 						className={cn(
 							"relative z-10 inline-flex shrink-0 items-center gap-2 rounded-full px-3.5 py-2 font-medium text-xs transition-colors duration-150 ease-[cubic-bezier(0.23,1,0.32,1)]",
 							!mounted && isActive
-								? "bg-text-strong-950 text-white dark:bg-white dark:text-black"
+								? "bg-text-strong-950 text-white shadow-[0_1.5px_0_0_#1a1a1a,inset_0_0.5px_0_0_rgba(255,255,255,0.45)] dark:bg-white dark:text-black dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.55),0_0_0_0.5px_rgba(255,255,255,0.08),inset_0_0.5px_0_0_rgba(255,255,255,0.28)]"
 								: showActiveLabel
 									? "text-white"
 									: "text-text-sub-600 dark:text-white/60",
@@ -189,16 +201,17 @@ export function LanguagePills({
 									? "#ffffff"
 									: isTabDark
 										? undefined
-										: `#${tab.icon.hex}`,
+										: tabBrandColor,
 							}}
 						>
-							<BrandIcon icon={tab.icon} />
+							<BrandIcon icon={tab.icon} className="size-3.5" />
 						</span>
 						{tab.label}
 					</button>
 				);
 			})}
 
+			{/* Soft Hover Pill */}
 			<AnimatePresence>
 				{hoverPill && hoverBrandColor ? (
 					<motion.div
@@ -213,17 +226,23 @@ export function LanguagePills({
 				) : null}
 			</AnimatePresence>
 
+			{/* 3D Extrusion Active Pill */}
 			<AnimatePresence>
 				{activePill ? (
 					<motion.div
 						key="active-pill"
-						className="pointer-events-none absolute top-0 left-0 rounded-full"
-						style={{ backgroundColor: activeBrandColor }}
+						className="pointer-events-none absolute top-0 left-0 rounded-full p-px pb-[2px]"
+						style={{ backgroundColor: darkenHex(activeBrandColor, 0.55) }}
 						initial={{ ...activePill, opacity: 0 }}
 						animate={{ ...activePill, opacity: 1 }}
 						exit={{ ...activePill, opacity: 0 }}
 						transition={{ duration: 0.2, ease: PILL_EASE }}
-					/>
+					>
+						<div
+							className="size-full rounded-full shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.45)] dark:shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.28),0_0_0_0.5px_rgba(255,255,255,0.08)]"
+							style={{ backgroundColor: activeBrandColor }}
+						/>
+					</motion.div>
 				) : null}
 			</AnimatePresence>
 		</div>
