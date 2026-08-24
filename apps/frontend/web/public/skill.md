@@ -83,6 +83,17 @@ Base URL: `https://reloop.sh`
 - Webhooks for delivery and engagement events
 - Templates for reusable content
 
+### Free developer & deliverability tools
+
+Web-based utilities for developers and email senders:
+- **Email Content & Spam Score Checker**: https://reloop.sh/tools/spam-score-checker
+- **Temp / Disposable Email Checker**: https://reloop.sh/tools/temp-email-checker
+- **DNS Auth & SPF/DKIM/DMARC Checker**: https://reloop.sh/tools/auth-checker
+- **Deliverability & Spam Tester**: https://reloop.sh/tools/deliverability-tester
+- **Responsive Template Generator**: https://reloop.sh/tools/template-generator
+- **Subject Line Tester**: https://reloop.sh/tools/subject-tester
+- **Mobile Email Previewer**: https://reloop.sh/tools/mobile-preview
+
 See the API reference and learn sections in llms-docs.txt.
 
 ### Product MCP (API actions)

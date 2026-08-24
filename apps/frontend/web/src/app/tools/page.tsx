@@ -32,6 +32,30 @@ interface ToolVisualMeta {
 }
 
 const TOOL_VISUAL_MAP: Record<string, ToolVisualMeta> = {
+	"spam-score-checker": {
+		icon: "shield-check",
+		badge: "Deliverability",
+		badgeColor:
+			"bg-orange-500/10 text-orange-700 dark:text-orange-400 border-orange-500/20",
+		glowColor: "group-hover:border-orange-500/40",
+		features: [
+			"Spam trigger keyword scanner",
+			"0–100 score & grade breakdown",
+			"Link safety & shortener audit",
+		],
+	},
+	"temp-email-checker": {
+		icon: "shield-cross",
+		badge: "Protection",
+		badgeColor:
+			"bg-rose-500/10 text-rose-700 dark:text-rose-400 border-rose-500/20",
+		glowColor: "group-hover:border-rose-500/40",
+		features: [
+			"Disposable mailbox detection",
+			"Wildcard domain matching",
+			"Real-time validation API",
+		],
+	},
 	"email-validator": {
 		icon: "mail-check",
 		badge: "Validation",

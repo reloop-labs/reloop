@@ -63,6 +63,7 @@ const toolsService = new Elysia({
 				// undici and Bun send no User-Agent by default, and this endpoint is
 				// built to be called from other people's applications.
 				"/v1/check",
+				"/v1/spam-check",
 			],
 		}),
 	)

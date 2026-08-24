@@ -8,6 +8,14 @@ const signalStatus = t.Union([
 	t.Literal("neutral"),
 ]);
 
+const triggerCategory = t.Union([
+	t.Literal("urgency"),
+	t.Literal("shady"),
+	t.Literal("overpromise"),
+	t.Literal("money"),
+	t.Literal("outreach"),
+]);
+
 export namespace ToolsModel {
 	export const checkBody = t.Object({
 		email: t.String({
@@ -69,6 +77,93 @@ export namespace ToolsModel {
 		}),
 	});
 
+	export const spamCheckBody = t.Object({
+		subject: t.Optional(
+			t.String({
+				maxLength: 1000,
+				description: "Email subject line to evaluate.",
+				examples: ["Your monthly analytics report is ready"],
+			}),
+		),
+		body: t.Optional(
+			t.String({
+				maxLength: 50000,
+				description: "Email body text or copy to evaluate.",
+				examples: ["Hi Alex, your weekly report has been generated..."],
+			}),
+		),
+	});
+
+	export const spamCheckQuery = t.Object({
+		subject: t.Optional(t.String({ maxLength: 1000 })),
+		body: t.Optional(t.String({ maxLength: 50000 })),
+	});
+
+	export const spamCheckResponse = t.Object({
+		score: t.Number({
+			description: "Overall spam/deliverability score from 0 to 100.",
+		}),
+		grade: t.String({ description: "Letter grade (A+, A, B, C, D, F)." }),
+		verdict: t.Union([
+			t.Literal("inbox_ready"),
+			t.Literal("needs_review"),
+			t.Literal("high_risk"),
+		]),
+		verdictLabel: t.String(),
+		breakdown: t.Object({
+			subjectScore: t.Number(),
+			contentScore: t.Number(),
+			linkScore: t.Number(),
+			formattingScore: t.Number(),
+		}),
+		metrics: t.Object({
+			wordCount: t.Number(),
+			charCount: t.Number(),
+			subjectLength: t.Number(),
+			linkCount: t.Number(),
+			triggerWordCount: t.Number(),
+			capsPercentage: t.Number(),
+			readingTimeSec: t.Number(),
+		}),
+		categoryCounts: t.Record(triggerCategory, t.Number()),
+		detectedTriggers: t.Array(
+			t.Object({
+				word: t.String(),
+				originalMatch: t.String(),
+				category: triggerCategory,
+				categoryLabel: t.String(),
+				severity: t.Union([
+					t.Literal("high"),
+					t.Literal("medium"),
+					t.Literal("low"),
+				]),
+				startIndex: t.Number(),
+				endIndex: t.Number(),
+				context: t.Union([t.Literal("subject"), t.Literal("body")]),
+			}),
+		),
+		issues: t.Array(
+			t.Object({
+				category: t.Union([
+					t.Literal("trigger_word"),
+					t.Literal("subject"),
+					t.Literal("link"),
+					t.Literal("formatting"),
+					t.Literal("compliance"),
+				]),
+				severity: t.Union([
+					t.Literal("high"),
+					t.Literal("medium"),
+					t.Literal("low"),
+				]),
+				title: t.String(),
+				detail: t.String(),
+				recommendation: t.Optional(t.String()),
+			}),
+		),
+		recommendations: t.Array(t.String()),
+	});
+
 	export const errorResponse = t.Object({
 		message: t.String(),
 		why: t.Optional(t.String()),
@@ -78,4 +173,6 @@ export namespace ToolsModel {
 
 	export type CheckBody = typeof checkBody.static;
 	export type CheckResponse = typeof checkResponse.static;
+	export type SpamCheckBody = typeof spamCheckBody.static;
+	export type SpamCheckResponse = typeof spamCheckResponse.static;
 }
