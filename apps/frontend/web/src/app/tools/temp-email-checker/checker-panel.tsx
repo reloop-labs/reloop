@@ -566,7 +566,7 @@ export function CheckerPanel() {
 										{isPending ? (
 											<span className="size-3 animate-spin rounded-full border-2 border-white/30 border-t-white" />
 										) : (
-											<FancyButton.Icon>
+											<FancyButton.Icon className="mx-0 size-3.5">
 												<Icon name="arrow-right" className="size-3.5" />
 											</FancyButton.Icon>
 										)}
