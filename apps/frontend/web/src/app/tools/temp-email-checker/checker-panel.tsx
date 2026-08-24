@@ -227,10 +227,9 @@ function ResultCardDetailed({
 					{result.summary}
 				</p>
 			</div>
-
 			{/* Signals */}
-			<div className="space-y-3 rounded-xl border border-stroke-soft-200 bg-bg-weak-50/50 p-4 text-xs sm:p-4.5 dark:border-white/10 dark:bg-white/[0.02]">
-				<div className="flex items-center justify-between pb-0.5">
+			<div className="overflow-hidden rounded-[14px] border border-stroke-soft-200 bg-bg-weak-50 p-0.5 dark:border-white/10 dark:bg-white/[0.03]">
+				<div className="flex items-center justify-between px-3 pt-2 pb-2.5">
 					<p className="font-mono font-semibold text-[11px] text-text-strong-950 uppercase tracking-wider dark:text-white">
 						Signals & Detection
 					</p>
@@ -240,7 +239,7 @@ function ResultCardDetailed({
 					</span>
 				</div>
 
-				<div className="divide-y divide-stroke-soft-200/50 pt-0.5 dark:divide-white/5">
+				<div className="rounded-xl border border-stroke-soft-200 bg-bg-white-0 px-4 py-1 divide-y divide-stroke-soft-200/50 dark:border-white/10 dark:bg-[#070707] dark:divide-white/5">
 					<SignalItem
 						label="Disposable provider"
 						value={isDisposable ? "Detected" : "Clean"}
@@ -271,7 +270,7 @@ function ResultCardDetailed({
 			</div>
 
 			{/* Recommendation */}
-			<div className="flex items-start gap-2.5 rounded-xl border border-stroke-soft-200 bg-bg-weak-50/30 p-3 dark:border-white/10 dark:bg-white/[0.02]">
+			<div className="flex items-start gap-3 rounded-xl border border-stroke-soft-200 bg-bg-weak-50/50 p-3.5 sm:p-4 dark:border-white/10 dark:bg-white/[0.02]">
 				<Icon
 					name={isDisposable || isRole ? "alert-triangle" : "check-circle"}
 					className={cn(
@@ -301,7 +300,7 @@ function ResultCardDetailed({
 				<button
 					type="button"
 					onClick={onReset}
-					className="cursor-pointer font-medium text-primary-base text-xs hover:underline"
+					className="cursor-pointer font-medium text-xs text-primary-base hover:underline"
 				>
 					Clear result
 				</button>
@@ -425,8 +424,8 @@ export function CheckerPanel() {
 
 	return (
 		<div className="mx-auto w-full max-w-2xl font-sans">
-			{/* Dashboard Modal / Card Container matching Login Card architecture */}
-			<div className="overflow-hidden rounded-[20px] border border-stroke-soft-200 bg-bg-weak-50 p-1 sm:rounded-[20px] dark:border-white/10 dark:bg-white/[0.03]">
+			{/* Dashboard Modal / Card Container */}
+			<div className="overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-weak-50 p-0.5 dark:border-white/10 dark:bg-white/[0.03]">
 				{/* Top White Card: Input + Results with dynamic height morphing */}
 				<div className="rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-5 sm:p-6 dark:border-white/10 dark:bg-[#0c0c0c]">
 					{/* Input Check Zone */}
@@ -434,7 +433,7 @@ export function CheckerPanel() {
 						<div className="space-y-2">
 							<Label.Root
 								htmlFor="checker-input"
-								className="font-medium text-text-strong-950 text-xs dark:text-white"
+								className="font-medium text-xs text-text-strong-950 dark:text-white"
 							>
 								Email or domain
 								<Label.Asterisk />
@@ -444,7 +443,7 @@ export function CheckerPanel() {
 								size="medium"
 								className="!shadow-none has-[input:focus]:!shadow-button-primary-focus has-[input:focus]:before:!ring-primary-base w-full rounded-xl"
 							>
-								<Input.Wrapper className="h-11 pr-1.5 pl-3.5 dark:bg-[#0c0c0c]">
+								<Input.Wrapper className="h-11 pl-3.5 pr-1.5 dark:bg-[#0c0c0c]">
 									<Input.Icon>
 										<Icon name="mail-single" className="size-4" />
 									</Input.Icon>
@@ -506,7 +505,9 @@ export function CheckerPanel() {
 										: dynamicHeight,
 							}}
 							transition={
-								shouldReduceMotion ? { duration: 0 } : SPRING_TRANSITION
+								shouldReduceMotion
+									? { duration: 0 }
+									: SPRING_TRANSITION
 							}
 							style={{ overflow: "hidden" }}
 						>
@@ -519,13 +520,13 @@ export function CheckerPanel() {
 											animate={{ opacity: 1 }}
 											exit={{ opacity: 0 }}
 											transition={{ duration: 0.2 }}
-											className="flex items-start gap-2.5 rounded-xl border border-rose-500/20 bg-rose-500/5 p-3.5 text-text-sub-600 text-xs dark:text-white/60"
+											className="flex items-start gap-2.5 rounded-xl border border-rose-500/20 bg-rose-500/5 p-3.5 text-xs text-text-sub-600 dark:text-white/60"
 										>
 											<Icon
 												name="alert-triangle"
 												className="mt-0.5 size-4 shrink-0 text-rose-500"
 											/>
-											<p className="text-rose-600 leading-relaxed dark:text-rose-400">
+											<p className="leading-relaxed text-rose-600 dark:text-rose-400">
 												{error}
 											</p>
 										</motion.div>
@@ -537,10 +538,7 @@ export function CheckerPanel() {
 											exit={{ opacity: 0 }}
 											transition={{ duration: 0.22, ease: "easeOut" }}
 										>
-											<ResultCardDetailed
-												result={result}
-												onReset={handleReset}
-											/>
+											<ResultCardDetailed result={result} onReset={handleReset} />
 										</motion.div>
 									) : null}
 								</AnimatePresence>
@@ -549,7 +547,7 @@ export function CheckerPanel() {
 					</form>
 				</div>
 
-				{/* Bottom Soft Strip (Matching Login Card Footer) */}
+				{/* How It Works on the Outer Soft Container */}
 				<AnimatePresence>
 					{!result && (
 						<motion.div
@@ -559,7 +557,7 @@ export function CheckerPanel() {
 							transition={SPRING_TRANSITION}
 							className="overflow-hidden"
 						>
-							<div className="space-y-3 px-4 pt-3.5 pb-2 text-xs sm:px-5 sm:pt-4 sm:pb-3">
+							<div className="space-y-3 px-4 pt-3.5 pb-2.5 sm:px-5 sm:pt-4 sm:pb-3 text-xs">
 								<div className="flex items-center justify-between pb-0.5">
 									<p className="font-mono font-semibold text-[11px] text-text-strong-950 uppercase tracking-wider dark:text-white">
 										How It Works
