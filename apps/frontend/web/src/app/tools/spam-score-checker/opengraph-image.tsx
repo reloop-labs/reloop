@@ -28,13 +28,12 @@ export default function OpenGraphImage() {
 					flexDirection: "column",
 					justifyContent: "space-between",
 					maxWidth: "680px",
-					zIndex: 1,
 				}}
 			>
 				<div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
 					<span
 						style={{
-							display: "inline-block",
+							display: "flex",
 							width: "8px",
 							height: "8px",
 							borderRadius: "50%",

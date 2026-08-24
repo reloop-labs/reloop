@@ -11,7 +11,6 @@ import {
 	type ReactNode,
 	useEffect,
 	useId,
-	useLayoutEffect,
 	useRef,
 	useState,
 } from "react";
@@ -73,7 +72,7 @@ function MorphSlot({
 		setCanAnimate(true);
 	}, []);
 
-	useLayoutEffect(() => {
+	useEffect(() => {
 		if (!activeKey) {
 			setHeight(0);
 			return;
@@ -87,6 +86,7 @@ function MorphSlot({
 		};
 
 		update();
+		if (typeof ResizeObserver === "undefined") return;
 		const ro = new ResizeObserver(update);
 		ro.observe(el);
 		return () => ro.disconnect();

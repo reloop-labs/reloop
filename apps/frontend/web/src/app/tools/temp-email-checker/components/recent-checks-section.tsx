@@ -2,6 +2,7 @@
 
 import { cn } from "@reloop/ui/cn";
 import { AnimatePresence, motion } from "framer-motion";
+import { useEffect, useState } from "react";
 import {
 	type TestedEmailRecord,
 	useTestedEmails,
@@ -53,6 +54,14 @@ function getVerdictConfig(verdict: TestedEmailRecord["verdict"]) {
 
 export function RecentChecksSection() {
 	const { list } = useTestedEmails();
+	const [mounted, setMounted] = useState(false);
+
+	useEffect(() => {
+		setMounted(true);
+	}, []);
+
+	if (!mounted) return null;
+
 	const displayedList = list.slice(0, 10);
 
 	if (displayedList.length === 0) return null;
