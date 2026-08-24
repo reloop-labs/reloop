@@ -2,6 +2,16 @@ export type ApiSignalStatus = "pass" | "fail" | "warn" | "neutral";
 
 export type ApiVerdict = "invalid" | "disposable" | "risky" | "deliverable";
 
+export type ApiCheckFlag =
+	| "INVALID_SYNTAX"
+	| "DISPOSABLE_DOMAIN"
+	| "WILDCARD_DISPOSABLE"
+	| "PUBLIC_INBOX_DETECTED"
+	| "ROLE_BASED_PREFIX"
+	| "FREE_PROVIDER"
+	| "ALLOWLISTED"
+	| "NO_MX_RECORDS";
+
 export type ApiCheckResponse = {
 	input: string;
 	kind: "email" | "domain" | null;
@@ -25,6 +35,10 @@ export type ApiCheckResponse = {
 		role: ApiSignalStatus;
 		freeProvider: ApiSignalStatus;
 	};
+	mxRecords: string[];
+	confidence: number;
+	riskScore: number;
+	flags: ApiCheckFlag[];
 };
 
 const CHECK_URL = `${(process.env.NEXT_PUBLIC_URL || "").trim().replace(/\/$/, "")}/api/tools/v1/temp-email-checker`;

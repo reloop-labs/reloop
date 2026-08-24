@@ -11,6 +11,7 @@ import { siCurl, siGo, siNodedotjs, siPython } from "simple-icons";
 import { runCheck } from "./check-api";
 import { WindowDots } from "./grid";
 import { LanguagePills, type PillTab } from "./language-pills";
+import { toPublicPayload } from "./presenter";
 
 const PANEL_ID = "check-api-panel";
 const TEST_EMAIL = "koxow38027@prodbits.com";
@@ -186,30 +187,17 @@ export function ApiSection() {
 			const res = await runCheck(TEST_EMAIL);
 			const elapsed = Math.max(Math.round(performance.now() - start), 32);
 			setLatency(elapsed);
-			setJsonResult(JSON.stringify(res, null, 2));
+			setJsonResult(JSON.stringify(toPublicPayload(res), null, 2));
 		} catch {
-			// Fallback in-browser computation
-			const domain = "prodbits.com";
 			const fallbackData = {
 				input: TEST_EMAIL,
-				kind: "email",
-				domain: domain,
+				domain: "prodbits.com",
 				verdict: "disposable",
-				isValidSyntax: true,
 				isDisposable: true,
-				disposableMatch: {
-					kind: "exact",
-					domain: domain,
-				},
-				isAllowlisted: false,
-				isRoleAddress: false,
-				isFreeProvider: false,
-				signals: {
-					syntax: "pass",
-					disposable: "fail",
-					role: "pass",
-					freeProvider: "pass",
-				},
+				mxRecords: [] as string[],
+				confidence: 0.98,
+				riskScore: 0.94,
+				flags: ["DISPOSABLE_DOMAIN", "PUBLIC_INBOX_DETECTED"],
 			};
 
 			const elapsed = Math.max(Math.round(performance.now() - start) + 40, 42);
@@ -299,9 +287,7 @@ export function ApiSection() {
 								<span className="size-1.5 rounded-full bg-emerald-500" />
 								200 OK
 							</span>
-							{latency !== null && (
-								<span>· {latency}ms</span>
-							)}
+							{latency !== null && <span>· {latency}ms</span>}
 							<span>· json</span>
 						</div>
 					</div>

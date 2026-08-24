@@ -20,6 +20,7 @@ import "./checker-field.css";
 import {
 	type CheckResult,
 	type CheckVerdict,
+	type RecommendationTone,
 	type SignalStatus,
 	toCheckResult,
 } from "./presenter";
@@ -192,76 +193,52 @@ const VERDICT_THEME: Record<
 	CheckVerdict,
 	{
 		title: string;
-		subtitle: string;
-		confidence: string;
-		icon: IconName;
 		dotColor: string;
 		titleClass: string;
 		badgeBg: string;
 		badgeBorder: string;
-		recommendation: string;
-		recommendationIcon: string;
-		whyResult: string;
 	}
 > = {
 	disposable: {
 		title: "TEMPORARY EMAIL",
-		subtitle: "Disposable email",
-		confidence: "98% confidence",
-		icon: "shield-cross",
 		dotColor: "bg-rose-500",
 		titleClass: "text-rose-500 dark:text-rose-400",
 		badgeBg: "bg-rose-500/[0.04] dark:bg-rose-500/[0.08]",
 		badgeBorder: "border-rose-500/20 dark:border-rose-500/30",
-		recommendation: "Treat this address as disposable when verifying identity.",
-		recommendationIcon: "alert-triangle",
-		whyResult:
-			"We found multiple signals associated with temporary email services. The strongest signal is the domain classification matching known throwaway mailboxes.",
 	},
 	risky: {
 		title: "RISKY",
-		subtitle: "Role-based or shared mailbox",
-		confidence: "Medium Confidence",
-		icon: "alert-triangle",
 		dotColor: "bg-amber-500",
 		titleClass: "text-amber-500 dark:text-amber-400",
 		badgeBg: "bg-amber-500/[0.04] dark:bg-amber-500/[0.08]",
 		badgeBorder: "border-amber-500/20 dark:border-amber-500/30",
-		recommendation:
-			"Accept with caution. Verify individual recipient identity if access control requires single-user ownership.",
-		recommendationIcon: "shield-alert",
-		whyResult:
-			"This mailbox uses a shared or role-based prefix (such as admin@, support@, or billing@). Multiple users may access this inbox, making deliverability and accountability unpredictable.",
 	},
 	deliverable: {
 		title: "SAFE",
-		subtitle: "Standard mailbox with valid records",
-		confidence: "High Confidence",
-		icon: "check-circle",
 		dotColor: "bg-emerald-500",
 		titleClass: "text-emerald-600 dark:text-emerald-400",
 		badgeBg: "bg-emerald-500/[0.04] dark:bg-emerald-500/[0.08]",
 		badgeBorder: "border-emerald-500/20 dark:border-emerald-500/30",
-		recommendation:
-			"Safe to accept and send. Domain has valid MX records and no flags for disposable providers.",
-		recommendationIcon: "check-circle",
-		whyResult:
-			"The domain possesses legitimate mail exchanger (MX) infrastructure with no history of temporary mailbox provisioning. Deliverability indicators are standard.",
 	},
 	invalid: {
 		title: "INVALID",
-		subtitle: "Malformed address or hostname",
-		confidence: "Syntax Error",
-		icon: "cross-circle",
 		dotColor: "bg-neutral-400",
 		titleClass: "text-neutral-500 dark:text-white/60",
 		badgeBg: "bg-neutral-500/[0.04] dark:bg-white/[0.04]",
 		badgeBorder: "border-neutral-500/20 dark:border-white/15",
-		recommendation:
-			"Prompt user to correct syntax errors before accepting submission.",
-		recommendationIcon: "cross-circle",
-		whyResult:
-			"Input failed basic RFC 5322 syntax validation. The format does not represent a deliverable email address or hostname.",
+	},
+};
+
+const REC_TONE: Record<
+	RecommendationTone,
+	{ icon: IconName; iconClass: string }
+> = {
+	fail: { icon: "alert-triangle", iconClass: "text-rose-500" },
+	warn: { icon: "shield-alert", iconClass: "text-amber-500" },
+	pass: { icon: "check-circle", iconClass: "text-emerald-500" },
+	neutral: {
+		icon: "cross-circle",
+		iconClass: "text-text-sub-600 dark:text-white/50",
 	},
 };
 
@@ -320,11 +297,8 @@ function ResultCardDetailed({
 	onReset: () => void;
 }) {
 	const theme = VERDICT_THEME[result.verdict];
+	const recTone = REC_TONE[result.recommendationTone];
 	const [showEvidence, setShowEvidence] = useState(false);
-
-	const isDisposable = result.verdict === "disposable";
-	const isRole = result.verdict === "risky";
-	const isValidSyntax = result.verdict !== "invalid";
 
 	return (
 		<div className="space-y-3.5 text-xs">
@@ -349,11 +323,11 @@ function ResultCardDetailed({
 						</span>
 						<span className="text-text-sub-600 dark:text-white/40">·</span>
 						<span className="font-medium text-text-strong-950 text-xs dark:text-white">
-							{theme.subtitle}
+							{result.subtitle}
 						</span>
 					</div>
 					<span className="font-mono text-[11px] text-text-soft-400 dark:text-white/40">
-						{theme.confidence}
+						{result.confidenceLabel}
 					</span>
 				</div>
 			</div>
@@ -366,50 +340,29 @@ function ResultCardDetailed({
 				</div>
 
 				<div className="divide-y divide-stroke-soft-200/50 rounded-xl border border-stroke-soft-200 bg-bg-white-0 px-4 py-1 dark:divide-white/5 dark:border-white/10 dark:bg-[#070707]">
-					<SignalItem
-						label="Disposable provider"
-						value={isDisposable ? "Detected" : "Clean"}
-						status={isDisposable ? "fail" : "pass"}
-					/>
-					<SignalItem
-						label="Domain reputation"
-						value={isDisposable ? "Suspicious" : "Valid"}
-						status={isDisposable ? "warn" : "pass"}
-					/>
-					<SignalItem
-						label="Mailbox pattern"
-						value={
-							isDisposable
-								? "Random / Burner"
-								: isRole
-									? "Shared Role"
-									: "Standard"
-						}
-						status={isDisposable ? "warn" : isRole ? "warn" : "pass"}
-					/>
-					<SignalItem
-						label="Email syntax"
-						value={isValidSyntax ? "Valid" : "Malformed"}
-						status={isValidSyntax ? "pass" : "fail"}
-					/>
+					{result.displaySignals.map((item) => (
+						<SignalItem
+							key={item.label}
+							label={item.label}
+							value={item.value}
+							status={item.status}
+						/>
+					))}
 				</div>
 			</div>
 
 			{/* Recommendation */}
 			<div className="flex items-start gap-3 rounded-xl border border-stroke-soft-200 bg-bg-weak-50/50 p-3.5 sm:p-4 dark:border-white/10 dark:bg-white/[0.02]">
 				<Icon
-					name={isDisposable || isRole ? "alert-triangle" : "check-circle"}
-					className={cn(
-						"mt-0.5 size-4 shrink-0",
-						isDisposable || isRole ? "text-amber-500" : "text-emerald-500",
-					)}
+					name={recTone.icon}
+					className={cn("mt-0.5 size-4 shrink-0", recTone.iconClass)}
 				/>
 				<div className="space-y-0.5">
 					<p className="font-medium text-text-strong-950 text-xs dark:text-white">
 						Recommendation
 					</p>
 					<p className="text-text-sub-600 text-xs leading-relaxed dark:text-white/60">
-						{theme.recommendation}
+						{result.recommendation}
 					</p>
 				</div>
 			</div>
@@ -443,21 +396,7 @@ function ResultCardDetailed({
 					>
 						<div className="rounded-xl border border-stroke-soft-200 bg-neutral-950 p-3 font-mono text-[11px] text-emerald-400 dark:border-white/10">
 							<pre className="overflow-x-auto whitespace-pre-wrap">
-								{JSON.stringify(
-									{
-										input: result.input,
-										domain: result.domain,
-										verdict: result.verdict,
-										signals: result.signals.map((s) => ({
-											id: s.id,
-											label: s.label,
-											status: s.status,
-											detail: s.detail,
-										})),
-									},
-									null,
-									2,
-								)}
+								{JSON.stringify(result.rawJson, null, 2)}
 							</pre>
 						</div>
 					</motion.div>
@@ -650,7 +589,11 @@ export function CheckerPanel() {
 												aria-label="Verify email or domain"
 											>
 												{isPending ? (
-													<LoadingDot size={13} dotSize={2} className="text-white" />
+													<LoadingDot
+														size={13}
+														dotSize={2}
+														className="text-white"
+													/>
 												) : (
 													<FancyButton.Icon className="mx-0 size-3.5">
 														<Icon name="arrow-right" className="size-3.5" />

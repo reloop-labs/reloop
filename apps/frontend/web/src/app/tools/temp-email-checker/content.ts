@@ -164,25 +164,20 @@ res, err := http.Post(
 ];
 
 export const apiResponseSample = `{
-  "input": "you@mailinator.com",
-  "kind": "email",
-  "domain": "mailinator.com",
+  "input": "alex.hunter@temp-mail.org",
+  "domain": "temp-mail.org",
   "verdict": "disposable",
-  "isValidSyntax": true,
   "isDisposable": true,
-  "disposableMatch": {
-    "kind": "exact",
-    "domain": "mailinator.com"
-  },
-  "isAllowlisted": false,
-  "isRoleAddress": false,
-  "isFreeProvider": false,
-  "signals": {
-    "syntax": "pass",
-    "disposable": "fail",
-    "role": "pass",
-    "freeProvider": "pass"
-  }
+  "mxRecords": [
+    "mx1.temp-mail.org",
+    "mx2.temp-mail.org"
+  ],
+  "confidence": 0.98,
+  "riskScore": 0.94,
+  "flags": [
+    "DISPOSABLE_DOMAIN",
+    "PUBLIC_INBOX_DETECTED"
+  ]
 }`;
 
 export const apiNotes: {
@@ -203,7 +198,7 @@ export const apiNotes: {
 		tag: "One round trip",
 		title: "Nothing to wait on",
 		description:
-			"Matching runs in memory against the loaded domain catalogue — no DNS lookup, no SMTP probe, no third-party call behind the scenes.",
+			"Catalogue matching is in-memory. MX hosts are resolved at request time. There is still no SMTP probe, and nothing is stored.",
 	},
 ];
 

@@ -56,10 +56,14 @@ const { domain, isValidSyntax } = parse(input);
 		lang: "json",
 		fileName: "verdict.json",
 		code: `{
-  "input": "user@mailinator.com",
+  "input": "alex.hunter@temp-mail.org",
+  "domain": "temp-mail.org",
   "verdict": "disposable",
   "isDisposable": true,
-  "action": "block_signup"
+  "mxRecords": ["mx1.temp-mail.org", "mx2.temp-mail.org"],
+  "confidence": 0.98,
+  "riskScore": 0.94,
+  "flags": ["DISPOSABLE_DOMAIN", "PUBLIC_INBOX_DETECTED"]
 }`,
 	},
 ];
@@ -109,7 +113,7 @@ export function HowItWorksSection() {
 							<div
 								aria-hidden
 								className={cn(
-									"pointer-events-none absolute -top-12 -left-12 size-48 rounded-full blur-[70px]",
+									"-top-12 -left-12 pointer-events-none absolute size-48 rounded-full blur-[70px]",
 									card.glowClass,
 								)}
 							/>

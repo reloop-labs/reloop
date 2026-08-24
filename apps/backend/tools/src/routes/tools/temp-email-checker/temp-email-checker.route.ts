@@ -7,9 +7,13 @@ import { tempEmailCheckerController } from "./temp-email-checker.controllers";
 
 // Domain and verdict only — never the local part. The tool page promises
 // addresses are checked and discarded.
-function check(input: string) {
-	const result = tempEmailCheckerController(input);
-	useLogger().set({ domain: result.domain, verdict: result.verdict });
+async function check(input: string) {
+	const result = await tempEmailCheckerController(input);
+	useLogger().set({
+		domain: result.domain,
+		verdict: result.verdict,
+		mxCount: result.mxRecords.length,
+	});
 	log.info("check", "Evaluated address");
 	return result;
 }
@@ -64,4 +68,3 @@ export const tempEmailCheckerRoute = new Elysia()
 		rateLimit: true,
 		detail,
 	});
-

@@ -28,21 +28,25 @@ curl -X POST https://local.reloop.sh/api/tools/v1/check \
 
 ```json
 {
-  "input": "you@mailinator.com",
-  "kind": "email",
-  "domain": "mailinator.com",
+  "input": "alex.hunter@temp-mail.org",
+  "domain": "temp-mail.org",
   "verdict": "disposable",
   "isDisposable": true,
-  "disposableMatch": { "kind": "exact", "domain": "mailinator.com" },
-  "isRoleAddress": false,
-  "isFreeProvider": false,
-  "signals": { "syntax": "pass", "disposable": "fail", "role": "pass", "freeProvider": "pass" }
+  "mxRecords": ["mx1.temp-mail.org", "mx2.temp-mail.org"],
+  "confidence": 0.98,
+  "riskScore": 0.94,
+  "flags": ["DISPOSABLE_DOMAIN", "PUBLIC_INBOX_DETECTED"]
 }
 ```
 
+The response also includes the catalogue facts (`kind`, `signals`,
+`disposableMatch`, role / free-provider bits) used to derive those scores.
+
 Verdicts are `invalid`, `disposable`, `risky` (a real but shared team inbox) or
-`deliverable`. Detection logic and the domain catalogue live in
-[`@reloop/email-validation`](../../../packages/email-validation).
+`deliverable`. Catalogue lookups live in
+[`@reloop/email-validation`](../../../packages/email-validation); MX is
+resolved at request time and omitted (empty array) when the input is invalid
+or DNS does not answer.
 
 ## How it differs from the other services
 

@@ -75,6 +75,36 @@ export namespace ToolsModel {
 			role: signalStatus,
 			freeProvider: signalStatus,
 		}),
+		mxRecords: t.Array(t.String(), {
+			description:
+				"MX hosts for the domain, lowest priority first. Empty when the input is invalid, the domain has no MX, or DNS did not answer.",
+		}),
+		confidence: t.Number({
+			minimum: 0,
+			maximum: 1,
+			description: "How sure the engine is of the verdict, from 0 to 1.",
+		}),
+		riskScore: t.Number({
+			minimum: 0,
+			maximum: 1,
+			description:
+				"Signup / list-quality risk, from 0 (safe) to 1 (throwaway).",
+		}),
+		flags: t.Array(
+			t.Union([
+				t.Literal("INVALID_SYNTAX"),
+				t.Literal("DISPOSABLE_DOMAIN"),
+				t.Literal("WILDCARD_DISPOSABLE"),
+				t.Literal("PUBLIC_INBOX_DETECTED"),
+				t.Literal("ROLE_BASED_PREFIX"),
+				t.Literal("FREE_PROVIDER"),
+				t.Literal("ALLOWLISTED"),
+				t.Literal("NO_MX_RECORDS"),
+			]),
+			{
+				description: "Machine-readable reasons behind the verdict and scores.",
+			},
+		),
 	});
 
 	export const spamCheckBody = t.Object({

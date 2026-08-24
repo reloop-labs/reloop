@@ -2,10 +2,17 @@ import { ToolsErrors } from "@be/tools/error/tools.error-response";
 import type { ToolsModel } from "@be/tools/model/tools.model";
 import { toolsConfig } from "@be/tools/tools.config";
 import { evaluate } from "@reloop/email-validation";
+import { scoreCheck } from "./check-score";
+import { lookupMxRecords, type MxLookupResult } from "./mx-lookup";
 
-export function tempEmailCheckerController(
+export type TempEmailCheckerDeps = {
+	lookupMx?: (domain: string) => Promise<MxLookupResult>;
+};
+
+export async function tempEmailCheckerController(
 	input: string,
-): ToolsModel.CheckResponse {
+	deps: TempEmailCheckerDeps = {},
+): Promise<ToolsModel.CheckResponse> {
 	const trimmed = input.trim();
 
 	if (trimmed.length === 0) throw ToolsErrors.emptyInput();
@@ -14,6 +21,22 @@ export function tempEmailCheckerController(
 	}
 
 	const result = evaluate(trimmed);
+	const lookupMx = deps.lookupMx ?? lookupMxRecords;
+
+	const mx: MxLookupResult | { status: "skipped"; records: [] } =
+		result.domain === null
+			? { status: "skipped", records: [] }
+			: await lookupMx(result.domain);
+
+	const score = scoreCheck({
+		isValidSyntax: result.isValidSyntax,
+		isDisposable: result.isDisposable,
+		disposableMatch: result.disposableMatch,
+		isAllowlisted: result.isAllowlisted,
+		isRoleAddress: result.isRoleAddress,
+		isFreeProvider: result.isFreeProvider,
+		mxStatus: mx.status,
+	});
 
 	return {
 		input: result.input,
@@ -37,5 +60,9 @@ export function tempEmailCheckerController(
 		isRoleAddress: result.isRoleAddress,
 		isFreeProvider: result.isFreeProvider,
 		signals: result.signals,
+		mxRecords: mx.records,
+		confidence: score.confidence,
+		riskScore: score.riskScore,
+		flags: score.flags,
 	};
 }
