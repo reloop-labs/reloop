@@ -70,17 +70,25 @@ export function SectionIntro({
 	lead,
 	accent,
 	description,
+	align = "center",
 }: {
 	eyebrow?: string;
 	eyebrowIcon?: string;
 	lead: string;
 	accent?: string;
 	description?: string;
+	align?: "center" | "left";
 }) {
+	const isLeft = align === "left";
 	return (
-		<div className="px-5 py-16 text-center sm:px-6 sm:py-20 md:px-8">
+		<div
+			className={cn(
+				"px-5 py-10 sm:px-6 sm:py-12 md:px-8",
+				isLeft ? "text-left" : "text-center",
+			)}
+		>
 			{eyebrow && (
-				<p className="mb-6 inline-flex items-center gap-2 font-mono text-[11px] text-text-sub-600 uppercase tracking-[0.14em] dark:text-white/45">
+				<p className="mb-4 inline-flex items-center gap-2 font-mono text-[11px] text-text-sub-600 uppercase tracking-[0.14em] dark:text-white/45">
 					<span className="text-text-soft-400 dark:text-white/20">{"//"}</span>
 					{eyebrowIcon && (
 						<Icon name={eyebrowIcon} className="size-3.5 text-primary-base" />
@@ -91,7 +99,12 @@ export function SectionIntro({
 					</span>
 				</p>
 			)}
-			<h2 className="mx-auto max-w-3xl font-semibold text-[2rem] text-text-strong-950 leading-[1.08] tracking-[-1px] sm:text-[2.6rem] dark:text-white">
+			<h2
+				className={cn(
+					"font-semibold text-[2rem] text-text-strong-950 leading-[1.08] tracking-[-1px] sm:text-[2.4rem] dark:text-white",
+					!isLeft && "mx-auto max-w-3xl",
+				)}
+			>
 				{lead}
 				{accent && (
 					<>
@@ -101,7 +114,12 @@ export function SectionIntro({
 				)}
 			</h2>
 			{description && (
-				<p className="mx-auto mt-4 max-w-xl text-[15px] text-text-sub-600 leading-relaxed sm:text-[16px] dark:text-white/50">
+				<p
+					className={cn(
+						"mt-4 max-w-xl text-[15px] text-text-sub-600 leading-relaxed sm:text-[16px] dark:text-white/50",
+						!isLeft && "mx-auto",
+					)}
+				>
 					{description}
 				</p>
 			)}

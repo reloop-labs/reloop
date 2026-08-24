@@ -3,6 +3,7 @@ import { BlogCta } from "@reloop/web/components/landing/blog/blog-cta";
 import { createPageMetadata } from "@reloop/web/lib/metadata";
 import { getSiteUrl } from "@reloop/web/lib/site";
 import { SectionSeparator } from "../../(home)/components/section-separator";
+import { AiAgentsSection } from "./components/ai-agents-section";
 import { ApiSection } from "./api-section";
 import { TempEmailHero } from "./components/temp-email-hero";
 import {
@@ -96,9 +97,15 @@ export default function TempEmailCheckerPage() {
 
 			<div className="relative mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-200 border-x md:max-w-7xl dark:border-white/10">
 				<SectionSeparator />
+				<AiAgentsSection />
+				<SectionSeparator />
 			</div>
 			<Band>
-				<SectionIntro lead="Frequently asked" accent="questions" />
+				<SectionIntro
+					lead="Frequently asked"
+					accent="questions"
+					align="left"
+				/>
 				<FaqGrid groups={faqGroups} />
 			</Band>
 

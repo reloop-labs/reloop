@@ -133,16 +133,12 @@ export function ApiSection() {
 		<>
 			<Band>
 				<div className="px-5 py-8 sm:px-6 sm:py-10 md:px-8">
-					<p className="mb-3 inline-flex items-center gap-2 font-mono text-[11px] text-text-sub-600 uppercase tracking-[0.14em] dark:text-white/45">
-						<span className="text-text-soft-400 dark:text-white/20">
-							{"//"}
+					<div className="mb-4">
+						<span className="inline-flex items-center gap-1.5 rounded-[10px] bg-blue-50 px-2.5 py-1 font-medium text-[13px] text-blue-600 dark:bg-blue-500/10 dark:text-blue-400">
+							<Icon name="code" className="size-3.5" />
+							Developer First
 						</span>
-						<Icon name="terminal" className="size-3.5 text-primary-base" />
-						Developer First
-						<span className="text-text-soft-400 dark:text-white/20">
-							{"\\\\"}
-						</span>
-					</p>
+					</div>
 					<h2 className="max-w-2xl font-semibold text-2xl text-text-strong-950 tracking-tight sm:text-3xl lg:text-[32px] dark:text-white">
 						Run the check{" "}
 						<span className="text-primary-base">from your code</span>
