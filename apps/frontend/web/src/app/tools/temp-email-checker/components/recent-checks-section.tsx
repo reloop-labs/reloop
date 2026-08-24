@@ -54,73 +54,69 @@ function getVerdictConfig(verdict: TestedEmailRecord["verdict"]) {
 export function RecentChecksSection() {
 	const { list } = useTestedEmails();
 
+	if (list.length === 0) return null;
+
 	return (
-		<section id="recent-checks-section" className="w-full">
-			{/* Section Header */}
-			<div className="mx-auto max-w-xl px-4 pt-10 pb-6 text-center sm:px-6 md:px-8 sm:pt-14 sm:pb-8">
-				<h2 className="mx-auto font-semibold text-3xl text-text-strong-950 tracking-tight sm:text-4xl lg:text-[2.65rem] lg:leading-[1.12] dark:text-white">
-					Recently tested emails
-				</h2>
-			</div>
+		<section
+			id="recent-checks-section"
+			className="relative z-10 w-full px-5 pb-16 sm:px-6 sm:pb-20 md:px-8 lg:pb-24"
+		>
+			{/* Contained Card Matching Signals & Detection / CheckerPanel */}
+			<div className="mx-auto w-full max-w-xl">
+				<div className="overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-weak-50 p-0.5 dark:border-white/10 dark:bg-white/[0.03]">
+					<div className="px-3 pt-2 pb-2.5 sm:px-4 sm:pt-2.5">
+						<p className="font-mono font-semibold text-[11px] text-text-strong-950 uppercase tracking-wider dark:text-white">
+							Recent Checks
+						</p>
+					</div>
 
-			{/* Contained Card Matching Signals & Detection */}
-			{list.length > 0 && (
-				<div className="mx-auto max-w-xl px-4 pb-12 sm:px-6 md:px-8 sm:pb-16">
-					<div className="overflow-hidden rounded-[14px] border border-stroke-soft-200 bg-bg-weak-50 p-0.5 dark:border-white/10 dark:bg-white/[0.03]">
-						<div className="px-3 pt-2 pb-2.5 sm:px-4 sm:pt-2.5">
-							<p className="font-mono font-semibold text-[11px] text-text-strong-950 uppercase tracking-wider dark:text-white">
-								Recent Checks
-							</p>
-						</div>
+					<div className="rounded-2xl border border-stroke-soft-200 bg-bg-white-0 px-4 py-1 divide-y divide-stroke-soft-200/50 dark:border-white/10 dark:bg-[#070707] dark:divide-white/5">
+						<AnimatePresence initial={false}>
+							{list.map((item) => {
+								const config = getVerdictConfig(item.verdict);
+								return (
+									<motion.div
+										key={item.id}
+										initial={{ opacity: 0, y: -4 }}
+										animate={{ opacity: 1, y: 0 }}
+										exit={{ opacity: 0, height: 0 }}
+										transition={{ duration: 0.15 }}
+										className="flex items-center justify-between py-2.5 transition-colors hover:bg-bg-weak-50/50 dark:hover:bg-white/[0.02]"
+									>
+										{/* Left: Colored Dot + Email */}
+										<div className="flex min-w-0 items-center gap-2.5 pr-3">
+											<span
+												className={cn(
+													"size-2 shrink-0 rounded-full",
+													config.dotColor,
+												)}
+											/>
+											<span className="truncate font-medium text-text-strong-950 text-xs sm:text-[13px] dark:text-white">
+												{item.email}
+											</span>
+										</div>
 
-						<div className="rounded-xl border border-stroke-soft-200 bg-bg-white-0 px-4 py-1 divide-y divide-stroke-soft-200/50 dark:border-white/10 dark:bg-[#070707] dark:divide-white/5">
-							<AnimatePresence initial={false}>
-								{list.map((item) => {
-									const config = getVerdictConfig(item.verdict);
-									return (
-										<motion.div
-											key={item.id}
-											initial={{ opacity: 0, y: -4 }}
-											animate={{ opacity: 1, y: 0 }}
-											exit={{ opacity: 0, height: 0 }}
-											transition={{ duration: 0.15 }}
-											className="flex items-center justify-between py-2.5 transition-colors hover:bg-bg-weak-50/50 dark:hover:bg-white/[0.02]"
-										>
-											{/* Left: Colored Dot + Email */}
-											<div className="flex min-w-0 items-center gap-2.5 pr-3">
-												<span
-													className={cn(
-														"size-2 shrink-0 rounded-full",
-														config.dotColor,
-													)}
-												/>
-												<span className="truncate font-medium text-text-strong-950 text-xs sm:text-[13px] dark:text-white">
-													{item.email}
-												</span>
-											</div>
-
-											{/* Right: Timestamp & Status Badge */}
-											<div className="flex shrink-0 items-center gap-3">
-												<span className="hidden font-mono text-[11px] text-text-soft-400 sm:inline-block dark:text-white/40">
-													{formatRelativeTime(item.timestamp)}
-												</span>
-												<code
-													className={cn(
-														"rounded-md border px-2 py-0.5 font-medium font-mono text-[11px] tracking-tight",
-														config.badgeStyles,
-													)}
-												>
-													{config.label}
-												</code>
-											</div>
-										</motion.div>
-									);
-								})}
-							</AnimatePresence>
-						</div>
+										{/* Right: Timestamp & Status Badge */}
+										<div className="flex shrink-0 items-center gap-3">
+											<span className="hidden font-mono text-[11px] text-text-soft-400 sm:inline-block dark:text-white/40">
+												{formatRelativeTime(item.timestamp)}
+											</span>
+											<code
+												className={cn(
+													"rounded-md border px-2 py-0.5 font-medium font-mono text-[11px] tracking-tight",
+													config.badgeStyles,
+												)}
+											>
+												{config.label}
+											</code>
+										</div>
+									</motion.div>
+								);
+							})}
+						</AnimatePresence>
 					</div>
 				</div>
-			)}
+			</div>
 		</section>
 	);
 }
