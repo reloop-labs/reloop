@@ -71,7 +71,7 @@ const VERDICT_THEME: Record<
 	}
 > = {
 	disposable: {
-		title: "TEMPORARY",
+		title: "TEMPORARY EMAIL",
 		subtitle: "Disposable email",
 		confidence: "98% confidence",
 		icon: "shield-cross",
@@ -222,21 +222,13 @@ function ResultCardDetailed({
 						{theme.confidence}
 					</span>
 				</div>
-
-				<p className="mt-2 text-text-sub-600 text-xs leading-relaxed dark:text-white/70">
-					{result.summary}
-				</p>
 			</div>
 			{/* Signals */}
 			<div className="overflow-hidden rounded-[14px] border border-stroke-soft-200 bg-bg-weak-50 p-0.5 dark:border-white/10 dark:bg-white/[0.03]">
-				<div className="flex items-center justify-between px-3 pt-2 pb-2.5">
+				<div className="px-3 pt-2 pb-2.5">
 					<p className="font-mono font-semibold text-[11px] text-text-strong-950 uppercase tracking-wider dark:text-white">
 						Signals & Detection
 					</p>
-					<span className="inline-flex items-center gap-1 font-mono text-[11px] text-emerald-600 dark:text-emerald-400">
-						<span className="size-1.5 rounded-full bg-emerald-500" />
-						Live Scanner
-					</span>
 				</div>
 
 				<div className="rounded-xl border border-stroke-soft-200 bg-bg-white-0 px-4 py-1 divide-y divide-stroke-soft-200/50 dark:border-white/10 dark:bg-[#070707] dark:divide-white/5">
@@ -558,14 +550,10 @@ export function CheckerPanel() {
 							className="overflow-hidden"
 						>
 							<div className="space-y-3 px-4 pt-3.5 pb-2.5 sm:px-5 sm:pt-4 sm:pb-3 text-xs">
-								<div className="flex items-center justify-between pb-0.5">
+								<div className="pb-0.5">
 									<p className="font-mono font-semibold text-[11px] text-text-strong-950 uppercase tracking-wider dark:text-white">
 										How It Works
 									</p>
-									<span className="inline-flex items-center gap-1 font-mono text-[11px] text-emerald-600 dark:text-emerald-400">
-										<span className="size-1.5 rounded-full bg-emerald-500" />
-										Live Scanner
-									</span>
 								</div>
 
 								<div className="relative pt-0.5 pl-0.5">
