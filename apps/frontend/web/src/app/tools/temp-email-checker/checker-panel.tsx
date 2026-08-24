@@ -124,9 +124,7 @@ function SignalItem({
 		<div className="flex items-center justify-between py-2 text-[14px]">
 			<div className="flex items-center gap-3">
 				<span className={cn("size-2 rounded-full", dotColor)} />
-				<span className="text-text-strong-950 dark:text-white/90">
-					{label}
-				</span>
+				<span className="text-text-strong-950 dark:text-white/90">{label}</span>
 			</div>
 			<span className={cn("text-[13.5px]", valueClass)}>{value}</span>
 		</div>
@@ -163,7 +161,7 @@ function ResultCardDetailed({
 				>
 					<Icon
 						name="arrow-left"
-						className="size-3.5 transition-transform group-hover:-translate-x-0.5"
+						className="group-hover:-translate-x-0.5 size-3.5 transition-transform"
 					/>
 					<span>New Check</span>
 				</button>
@@ -243,7 +241,13 @@ function ResultCardDetailed({
 					/>
 					<SignalItem
 						label="Mailbox pattern"
-						value={isDisposable ? "Random / Burner" : isRole ? "Shared Role" : "Standard"}
+						value={
+							isDisposable
+								? "Random / Burner"
+								: isRole
+									? "Shared Role"
+									: "Standard"
+						}
 						status={isDisposable ? "warn" : isRole ? "warn" : "pass"}
 					/>
 					<SignalItem
@@ -365,10 +369,10 @@ function ResultCardDetailed({
 					{/* Confidence Progress Bar */}
 					<div className="mt-5">
 						<div className="flex items-center justify-between text-[12px]">
-							<span className="font-mono uppercase tracking-wider text-text-soft-400 dark:text-white/40">
+							<span className="font-mono text-text-soft-400 uppercase tracking-wider dark:text-white/40">
 								Confidence
 							</span>
-							<span className="font-mono font-medium text-text-strong-950 dark:text-white">
+							<span className="font-medium font-mono text-text-strong-950 dark:text-white">
 								{isDisposable ? "96%" : isRole ? "88%" : "99%"}
 							</span>
 						</div>
@@ -516,16 +520,19 @@ export function CheckerPanel() {
 		<div className="mx-auto w-full max-w-2xl">
 			{!result ? (
 				/* Dashboard Modal / Card Container */
-				<div className="overflow-hidden rounded-[20px] border border-stroke-soft-200 bg-bg-weak-50 p-2 sm:rounded-[24px] dark:border-white/10 dark:bg-white/[0.04]">
-					<div className="rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-6 dark:border-white/10 dark:bg-[#070707]">
+				<div className="overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-weak-50 p-0.5 sm:rounded-[20px] dark:border-white/10 dark:bg-white/[0.04]">
+					<div className="rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-4 sm:p-4.5 dark:border-white/10 dark:bg-[#070707]">
 						{/* Input Check Zone */}
-						<form onSubmit={onSubmit} noValidate className="space-y-4">
+						<form onSubmit={onSubmit} noValidate className="space-y-3.5">
 							<label htmlFor="checker-input" className="sr-only">
 								Email address or domain to check
 							</label>
 
-							<Input.Root size="medium" className="w-full rounded-xl">
-								<Input.Wrapper className="h-11 px-3 dark:bg-[#070707]">
+							<Input.Root
+								size="medium"
+								className="!shadow-none has-[input:focus]:!shadow-button-primary-focus has-[input:focus]:before:!ring-primary-base w-full rounded-xl"
+							>
+								<Input.Wrapper className="h-10.5 px-3 dark:bg-[#070707]">
 									<Input.Icon>
 										<Icon name="mail-single" className="size-4" />
 									</Input.Icon>
@@ -540,7 +547,7 @@ export function CheckerPanel() {
 										value={value}
 										onChange={(e) => setValue(e.target.value)}
 										placeholder="you@example.com or domain.com"
-										className="text-[14.5px] font-medium"
+										className="font-medium text-[14.5px]"
 									/>
 									{value ? (
 										<button
@@ -560,7 +567,7 @@ export function CheckerPanel() {
 										type="submit"
 										variant="primary"
 										size="xsmall"
-										className="flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-lg !p-0"
+										className="!p-0 flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-lg"
 										aria-label="Verify email or domain"
 									>
 										{isPending ? (
@@ -574,42 +581,71 @@ export function CheckerPanel() {
 								</Input.Wrapper>
 							</Input.Root>
 
-							{/* Specifications / Capabilities Box */}
-							<div className="mt-4 space-y-2 rounded-2xl border border-stroke-soft-200 bg-bg-weak-50/40 p-4 text-text-sub-600 text-xs dark:border-white/10 dark:bg-white/[0.02] dark:text-white/50">
+							{/* How It Works - Vertical Stepper */}
+							<div className="mt-3.5 space-y-2.5 px-0.5 text-xs">
 								<div className="flex items-center justify-between">
-									<p className="font-medium text-text-strong-950 dark:text-white">
-										Detection Capabilities:
+									<p className="font-mono font-semibold text-[11px] text-text-strong-950 uppercase tracking-wider dark:text-white">
+										How It Works
 									</p>
 									<span className="inline-flex items-center gap-1 font-mono text-[11px] text-emerald-600 dark:text-emerald-400">
 										<span className="size-1.5 rounded-full bg-emerald-500" />
 										Live Scanner
 									</span>
 								</div>
-								<ul className="list-inside list-disc space-y-1 leading-relaxed">
-									<li>
-										Matches against{" "}
-										<code className="rounded border border-stroke-soft-200 bg-bg-white-0 px-1 py-0.5 font-mono text-[11px] text-text-strong-950 dark:border-white/10 dark:bg-black dark:text-white">
-											100,000+
-										</code>{" "}
-										known disposable & temporary domain databases.
-									</li>
-									<li>
-										Analyzes{" "}
-										<code className="rounded border border-stroke-soft-200 bg-bg-white-0 px-1 py-0.5 font-mono text-[11px] text-text-strong-950 dark:border-white/10 dark:bg-black dark:text-white">
-											wildcards
-										</code>
-										,{" "}
-										<code className="rounded border border-stroke-soft-200 bg-bg-white-0 px-1 py-0.5 font-mono text-[11px] text-text-strong-950 dark:border-white/10 dark:bg-black dark:text-white">
-											subdomains
-										</code>
-										, and{" "}
-										<code className="rounded border border-stroke-soft-200 bg-bg-white-0 px-1 py-0.5 font-mono text-[11px] text-text-strong-950 dark:border-white/10 dark:bg-black dark:text-white">
-											role inboxes
-										</code>
-										.
-									</li>
-									<li>Addresses are verified in memory and discarded immediately.</li>
-								</ul>
+
+								<div className="relative pt-0.5 pl-0.5">
+									{/* Step 1 */}
+									<div className="relative flex items-center gap-3 pb-3.5">
+										{/* Vertical connecting line */}
+										<div className="absolute top-5 left-[11px] h-full w-px bg-stroke-soft-200 dark:bg-white/10" />
+										{/* Number node */}
+										<div className="relative z-10 flex size-6 shrink-0 items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-white-0 font-mono font-semibold text-[11px] text-text-strong-950 dark:border-white/12 dark:bg-[#111] dark:text-white">
+											1
+										</div>
+										<div className="flex flex-1 items-center justify-between">
+											<span className="font-medium text-text-strong-950 text-xs dark:text-white">
+												Enter email
+											</span>
+											<code className="rounded-md border border-stroke-soft-200 bg-bg-white-0 px-2 py-0.5 font-mono text-[11px] text-text-sub-600 dark:border-white/10 dark:bg-[#0b0b0b] dark:text-white/70">
+												Email
+											</code>
+										</div>
+									</div>
+
+									{/* Step 2 */}
+									<div className="relative flex items-center gap-3 pb-3.5">
+										{/* Vertical connecting line */}
+										<div className="absolute top-5 left-[11px] h-full w-px bg-stroke-soft-200 dark:bg-white/10" />
+										{/* Number node */}
+										<div className="relative z-10 flex size-6 shrink-0 items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-white-0 font-mono font-semibold text-[11px] text-text-strong-950 dark:border-white/12 dark:bg-[#111] dark:text-white">
+											2
+										</div>
+										<div className="flex flex-1 items-center justify-between">
+											<span className="font-medium text-text-strong-950 text-xs dark:text-white">
+												Analyze domain
+											</span>
+											<code className="rounded-md border border-stroke-soft-200 bg-bg-white-0 px-2 py-0.5 font-mono text-[11px] text-text-sub-600 dark:border-white/10 dark:bg-[#0b0b0b] dark:text-white/70">
+												Signals
+											</code>
+										</div>
+									</div>
+
+									{/* Step 3 */}
+									<div className="relative flex items-center gap-3">
+										{/* Number node */}
+										<div className="relative z-10 flex size-6 shrink-0 items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-white-0 font-mono font-semibold text-[11px] text-text-strong-950 dark:border-white/12 dark:bg-[#111] dark:text-white">
+											3
+										</div>
+										<div className="flex flex-1 items-center justify-between">
+											<span className="font-medium text-text-strong-950 text-xs dark:text-white">
+												Get result
+											</span>
+											<code className="rounded-md border border-stroke-soft-200 bg-bg-white-0 px-2 py-0.5 font-mono text-[11px] text-text-sub-600 dark:border-white/10 dark:bg-[#0b0b0b] dark:text-white/70">
+												Risk Result
+											</code>
+										</div>
+									</div>
+								</div>
 							</div>
 						</form>
 					</div>
