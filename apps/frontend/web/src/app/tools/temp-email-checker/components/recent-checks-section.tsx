@@ -33,7 +33,7 @@ function getVerdictConfig(verdict: TestedEmailRecord["verdict"]) {
 			};
 		case "deliverable":
 			return {
-				label: "Deliverable",
+				label: "Clear",
 				dotColor: "bg-emerald-500",
 				badgeStyles:
 					"border-emerald-500/20 bg-emerald-500/[0.08] text-emerald-600 dark:border-emerald-500/30 dark:bg-emerald-500/15 dark:text-emerald-400",

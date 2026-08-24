@@ -19,7 +19,8 @@ export function TempEmailHero() {
 					</h1>
 
 					<p className="mt-5 max-w-[46rem] text-balance text-center text-[16.5px] text-text-sub-600 leading-relaxed sm:mt-6 sm:text-[18.5px] lg:text-[20px] dark:text-white/60">
-						Find out if an email is temporary, disposable, or trustworthy.
+						Check syntax, known disposable providers, role prefixes, and MX
+						records. We do not probe the mailbox.
 					</p>
 				</header>
 

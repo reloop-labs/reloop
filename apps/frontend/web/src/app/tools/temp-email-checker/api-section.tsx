@@ -226,8 +226,8 @@ export function ApiSection() {
 					Check Temp email from code
 				</h2>
 				<p className="mt-3 max-w-2xl text-[14.5px] text-text-sub-600 leading-relaxed sm:text-base dark:text-white/60">
-					Point your signup flow directly at the public endpoint to reject
-					burner addresses in real time.
+					Call the public endpoint from signup. You get a verdict, MX hosts,
+					and flags — not an SMTP mailbox probe.
 				</p>
 			</div>
 

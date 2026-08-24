@@ -6,7 +6,7 @@ export const config: ToolDefinition = {
 	toolType: "temp-email-checker",
 	titleLines: ["Temp & Disposable", "Email Checker"],
 	description:
-		"Check whether an email address comes from a disposable or temporary mailbox provider before it lands in your database.",
+		"Check syntax, known disposable providers, role prefixes, and MX records before an address hits your database. We do not probe the mailbox.",
 	keywords: [
 		"temp email checker",
 		"disposable email checker",

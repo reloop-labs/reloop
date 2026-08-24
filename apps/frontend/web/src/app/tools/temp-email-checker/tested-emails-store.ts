@@ -33,7 +33,7 @@ export const INITIAL_TESTED_EMAILS: TestedEmailRecord[] = [
 		domain: "gmail.com",
 		verdict: "deliverable",
 		isDisposable: false,
-		summary: "Valid MX records with persistent consumer provider.",
+		summary: "Not on the disposable list. Consumer provider with MX records.",
 		timestamp: Date.now() - 1000 * 60 * 14,
 	},
 	{
@@ -52,7 +52,7 @@ export const INITIAL_TESTED_EMAILS: TestedEmailRecord[] = [
 		domain: "mailinator.com",
 		verdict: "disposable",
 		isDisposable: true,
-		summary: "Known public temporary burner service.",
+		summary: "Domain is on the disposable catalogue.",
 		timestamp: Date.now() - 1000 * 60 * 75,
 	},
 	{
@@ -61,7 +61,7 @@ export const INITIAL_TESTED_EMAILS: TestedEmailRecord[] = [
 		domain: "reloop.sh",
 		verdict: "deliverable",
 		isDisposable: false,
-		summary: "Legitimate custom domain with active MX infrastructure.",
+		summary: "Not on the disposable list. Domain published MX records.",
 		timestamp: Date.now() - 1000 * 60 * 120,
 	},
 ];

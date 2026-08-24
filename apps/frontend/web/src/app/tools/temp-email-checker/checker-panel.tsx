@@ -148,10 +148,10 @@ function HowItWorksSteps() {
 					</div>
 					<div className="flex flex-1 items-center justify-between">
 						<span className="font-medium text-text-strong-950 text-xs dark:text-white">
-							Enter email
+							RFC 5322 syntax
 						</span>
 						<code className="rounded-md border border-stroke-soft-200 bg-bg-white-0 px-2 py-0.5 font-mono text-[11px] text-text-sub-600 dark:border-white/10 dark:bg-[#0b0b0b] dark:text-white/70">
-							Email
+							Format
 						</code>
 					</div>
 				</div>
@@ -163,10 +163,10 @@ function HowItWorksSteps() {
 					</div>
 					<div className="flex flex-1 items-center justify-between">
 						<span className="font-medium text-text-strong-950 text-xs dark:text-white">
-							Analyze domain
+							Catalogue and MX lookup
 						</span>
 						<code className="rounded-md border border-stroke-soft-200 bg-bg-white-0 px-2 py-0.5 font-mono text-[11px] text-text-sub-600 dark:border-white/10 dark:bg-[#0b0b0b] dark:text-white/70">
-							Signals
+							Domain & MX
 						</code>
 					</div>
 				</div>
@@ -177,10 +177,10 @@ function HowItWorksSteps() {
 					</div>
 					<div className="flex flex-1 items-center justify-between">
 						<span className="font-medium text-text-strong-950 text-xs dark:text-white">
-							Get result
+							Verdict, score, and flags
 						</span>
 						<code className="rounded-md border border-stroke-soft-200 bg-bg-white-0 px-2 py-0.5 font-mono text-[11px] text-text-sub-600 dark:border-white/10 dark:bg-[#0b0b0b] dark:text-white/70">
-							Risk Result
+							Decision
 						</code>
 					</div>
 				</div>
@@ -214,7 +214,7 @@ const VERDICT_THEME: Record<
 		badgeBorder: "border-amber-500/20 dark:border-amber-500/30",
 	},
 	deliverable: {
-		title: "SAFE",
+		title: "CLEAR",
 		dotColor: "bg-emerald-500",
 		titleClass: "text-emerald-600 dark:text-emerald-400",
 		badgeBg: "bg-emerald-500/[0.04] dark:bg-emerald-500/[0.08]",

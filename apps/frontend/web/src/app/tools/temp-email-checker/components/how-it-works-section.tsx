@@ -18,9 +18,9 @@ type HowItWorksCard = {
 const HOW_IT_WORKS_CARDS: HowItWorksCard[] = [
 	{
 		step: "01",
-		title: "Enter email",
+		title: "Parse the address",
 		description:
-			"Provide any raw email address or domain. Local-part syntax, illegal characters, and domain structures are validated against RFC 5322 specs instantly.",
+			"Paste an email or a bare domain. We check RFC 5322 shape first. Invalid input never hits the catalogue or DNS.",
 		dotColor: "#06b6d4",
 		glowClass: "bg-cyan-500/15 dark:bg-cyan-500/20",
 		lang: "typescript",
@@ -33,24 +33,24 @@ const { domain, isValidSyntax } = parse(input);
 	},
 	{
 		step: "02",
-		title: "Analyze domain",
+		title: "Catalogue and MX",
 		description:
-			"The domain is cross-referenced against 100,000+ continuously refreshed disposable mailbox providers, wildcard subdomain families, and role address lists.",
+			"We look the domain up in a ~210k disposable catalogue, apply wildcard suffixes and role prefixes, then resolve MX records over DNS.",
 		dotColor: "#10b981",
 		glowClass: "bg-emerald-500/15 dark:bg-emerald-500/20",
 		lang: "bash",
 		fileName: "signals.sh",
-		code: `# 2. Multi-layer signal match
+		code: `# 2. What we actually check
 ✓ Disposable catalogue match
-✓ Wildcard subdomain regex
-✓ Role & free mail classification
-✓ MX infrastructure check`,
+✓ Wildcard suffix (label boundary)
+✓ Role prefix & free provider
+✓ MX hosts via DNS (no SMTP)`,
 	},
 	{
 		step: "03",
-		title: "Get result",
+		title: "Verdict and flags",
 		description:
-			"Receive an instant verdict with transparent risk signals, allowlist exemptions, and delivery flags so you can block burner signups with confidence.",
+			"You get a verdict, confidence, risk score, MX hosts, and flags. That is not a delivery guarantee and not a mailbox probe.",
 		dotColor: "#ec4899",
 		glowClass: "bg-pink-500/15 dark:bg-pink-500/20",
 		lang: "json",

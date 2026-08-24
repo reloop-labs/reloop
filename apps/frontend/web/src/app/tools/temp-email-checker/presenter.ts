@@ -106,16 +106,8 @@ function displaySignals(
 				value: "Skipped",
 				status: "neutral",
 			},
-			{
-				label: "Domain reputation",
-				value: "Skipped",
-				status: "neutral",
-			},
-			{
-				label: "Mailbox pattern",
-				value: "Skipped",
-				status: "neutral",
-			},
+			{ label: "MX records", value: "Skipped", status: "neutral" },
+			{ label: "Role prefix", value: "Skipped", status: "neutral" },
 			{ label: "Email syntax", value: "Malformed", status: "fail" },
 		];
 	}
@@ -123,6 +115,9 @@ function displaySignals(
 	const disposable = hasFlag(flags, "DISPOSABLE_DOMAIN");
 	const role = hasFlag(flags, "ROLE_BASED_PREFIX");
 	const noMx = hasFlag(flags, "NO_MX_RECORDS");
+	const mxUnknown =
+		!noMx && (!Array.isArray(api.mxRecords) || api.mxRecords.length === 0);
+	const isAddress = api.kind === "email";
 
 	return [
 		{
@@ -131,14 +126,14 @@ function displaySignals(
 			status: disposable ? "fail" : "pass",
 		},
 		{
-			label: "Domain reputation",
-			value: disposable ? "Suspicious" : noMx ? "No MX" : "Valid",
-			status: disposable || noMx ? "warn" : "pass",
+			label: "MX records",
+			value: noMx ? "None" : mxUnknown ? "Unknown" : "Found",
+			status: noMx ? "warn" : mxUnknown ? "neutral" : "pass",
 		},
 		{
-			label: "Mailbox pattern",
-			value: disposable ? "Random / Burner" : role ? "Shared Role" : "Standard",
-			status: disposable || role ? "warn" : "pass",
+			label: "Role prefix",
+			value: !isAddress ? "No local-part" : role ? "Shared" : "None",
+			status: !isAddress ? "neutral" : role ? "warn" : "pass",
 		},
 		{ label: "Email syntax", value: "Valid", status: "pass" },
 	];
@@ -155,60 +150,74 @@ function copyFor(
 		const detail = syntaxMessage(api.syntaxFailure);
 		return {
 			headline: "Not a valid address",
-			subtitle: "Malformed address or hostname",
-			summary: `${detail}. Nothing was looked up, so there is no verdict to give — fix the address and check it again.`,
-			recommendation:
-				"Prompt the user to correct the syntax before accepting this submission.",
+			subtitle: "Failed syntax check",
+			summary: `${detail}. Catalogue and MX lookups were skipped.`,
+			recommendation: "Ask for a real email or domain and check it again.",
 			recommendationTone: "neutral",
 		};
 	}
 
 	if (api.isDisposable) {
 		return {
-			headline: "Disposable address",
-			subtitle: "Disposable email",
+			headline: "Known disposable provider",
+			subtitle: "On the throwaway-domain list",
 			summary:
-				"This domain is on the disposable list. Providers like it typically hand out mailboxes that are discarded within minutes or hours, so mail sent here risks bouncing, and bounces count against your sending domain.",
+				"This domain is in the disposable catalogue. Providers like it hand out short-lived mailboxes, so later sends often hard-bounce. We did not probe the mailbox itself.",
 			recommendation:
-				"Treat this address as disposable when verifying identity. Block from signups.",
+				"Treat this as a throwaway address. Block it at signup if you need a durable identity.",
 			recommendationTone: "fail",
 		};
 	}
 
 	if (api.isRoleAddress) {
 		return {
-			headline: "Real, but shared",
-			subtitle: "Role-based or shared mailbox",
+			headline: "Shared role inbox",
+			subtitle: "Role-based local-part",
 			summary:
-				"Nothing suggests this is a throwaway address, but it points at a shared team inbox rather than a person. Expect lower engagement and a higher chance of complaints on marketing sends.",
+				"The domain is not on the disposable list, but the local-part is a shared prefix such as billing@ or support@. That is a team inbox, not a person. We did not probe the mailbox itself.",
 			recommendation:
-				"Accept with caution. Verify individual recipient identity if access control requires single-user ownership.",
+				"Accept it only if a shared inbox is fine. If you need a single owner, ask for a personal address.",
 			recommendationTone: "warn",
 		};
 	}
 
 	const noMx = hasFlag(flags, "NO_MX_RECORDS");
+	const mxUnknown =
+		!noMx && (!Array.isArray(api.mxRecords) || api.mxRecords.length === 0);
 	const domain = api.domain ?? "this domain";
 
 	if (noMx) {
 		return {
-			headline: "No disposable signals",
-			subtitle: "No mail exchanger records",
-			summary: `${domain} is not on the disposable list, but it published no MX records. ${DELIVERY_LIMIT}`,
+			headline: "No disposable match",
+			subtitle: "No MX records published",
+			summary: `${domain} is not on the disposable list, but DNS returned no MX records. Mail cannot be routed to a domain with no exchanger. ${DELIVERY_LIMIT}`,
 			recommendation:
-				"No throwaway provider matched, but confirm the domain before you send — there are no MX records to deliver to.",
+				"Do not send yet. Confirm the domain is supposed to receive mail.",
+			recommendationTone: "warn",
+		};
+	}
+
+	if (mxUnknown) {
+		return {
+			headline: "No disposable match",
+			subtitle: "MX lookup did not return hosts",
+			summary: `${domain} is not on the disposable list. MX lookup did not return hosts, so mail routing is unconfirmed. ${DELIVERY_LIMIT}`,
+			recommendation:
+				"No throwaway match. Retry the check before you treat MX as present or missing.",
 			recommendationTone: "warn",
 		};
 	}
 
 	return {
-		headline: "No disposable signals",
-		subtitle: "Standard mailbox with valid records",
+		headline: "No disposable match",
+		subtitle: api.isFreeProvider
+			? "Consumer mailbox provider"
+			: "Not on the disposable list",
 		summary: api.isFreeProvider
-			? `${domain} is a mainstream consumer mailbox provider rather than a company domain, and it is not on the disposable list. ${DELIVERY_LIMIT}`
-			: `This domain isn't on the known disposable list and shows no throwaway signals. ${DELIVERY_LIMIT}`,
+			? `${domain} is a consumer mailbox provider, not a company domain, and it is not on the disposable list. MX records were found. ${DELIVERY_LIMIT}`
+			: `Not on the known disposable list, and the domain published MX records. ${DELIVERY_LIMIT}`,
 		recommendation:
-			"Safe to accept and send. Domain has valid MX records and no flags for disposable providers.",
+			"No throwaway match, and MX records exist for the domain. That is not proof the mailbox exists.",
 		recommendationTone: "pass",
 	};
 }

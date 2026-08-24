@@ -6,7 +6,7 @@ export const toolPath = "/tools/temp-email-checker";
 export const toolTitle = "Temp Email Checker";
 
 export const toolDescription =
-	"Check whether an email address comes from a disposable or temporary mailbox provider — before it lands in your database and burns your sender reputation.";
+	"Check syntax, known disposable providers, role prefixes, and MX records. This does not prove the mailbox exists.";
 
 export const toolKeywords = [
 	"temp email checker",
@@ -30,42 +30,42 @@ export const signals: {
 		tag: "Syntax",
 		title: "Address syntax",
 		description:
-			"The local part and domain are parsed against RFC 5322 shape rules, so malformed input is rejected before anything else runs.",
+			"The local-part and domain are parsed against RFC 5322 shape rules. Malformed input never reaches the catalogue or DNS.",
 	},
 	{
 		icon: "shield-cross",
 		tag: "Domain list",
 		title: "Disposable domains",
 		description:
-			"The domain is matched against a large, continuously refreshed catalogue of known throwaway mailbox providers.",
+			"The domain is matched against a vendored catalogue of about 210,000 known throwaway mailbox providers.",
 	},
 	{
 		icon: "route",
 		tag: "Wildcards",
-		title: "Wildcard patterns",
+		title: "Wildcard suffixes",
 		description:
-			"Providers spin up endless subdomains. Suffix patterns catch the whole family instead of one host at a time.",
+			"Some providers mint endless subdomains. We match on label boundaries (*.temp.example), not a free-form regex.",
 	},
 	{
 		icon: "shield-check",
 		tag: "Allowlist",
 		title: "Exception list",
 		description:
-			"Legitimate domains that share infrastructure with throwaway services stay whitelisted, so real customers are never blocked.",
+			"A local exception list overrides the upstream catalogue when a real domain is wrongly listed as disposable.",
 	},
 	{
 		icon: "user-circle",
 		tag: "Role",
-		title: "Role addresses",
+		title: "Role prefixes",
 		description:
-			"Shared inboxes like info@, billing@ and support@ are flagged separately — they are real, but they behave differently.",
+			"Local-parts like info@, billing@, and support@ are flagged as shared inboxes. They are not treated as disposable.",
 	},
 	{
 		icon: "globe",
-		tag: "Free mail",
-		title: "Free providers",
+		tag: "MX",
+		title: "MX records",
 		description:
-			"Consumer mailboxes are called out on their own, so you can treat them differently from throwaway addresses.",
+			"We look up MX hosts for the domain. That confirms mail can be routed to the domain, not that the mailbox exists.",
 	},
 ];
 
@@ -196,9 +196,9 @@ export const apiNotes: {
 	{
 		icon: "zap",
 		tag: "One round trip",
-		title: "Nothing to wait on",
+		title: "Catalogue plus DNS",
 		description:
-			"Catalogue matching is in-memory. MX hosts are resolved at request time. There is still no SMTP probe, and nothing is stored.",
+			"Disposable matching is in-memory. MX is a DNS lookup with a short timeout. We never open an SMTP session, and we do not store addresses.",
 	},
 ];
 
@@ -244,7 +244,7 @@ export const faqGroups: { title: string; items: FaqItem[] }[] = [
 			{
 				question: "Does this store the addresses I check?",
 				answer:
-					"No. Addresses are checked and discarded — nothing is written to a database, added to a list, or used for marketing. The tool is free and needs no account.",
+					"Nothing is written to a database, added to a list, or used for marketing. Request logs may include the domain and verdict, never the mailbox name. The tool is free and needs no account.",
 			},
 			{
 				question: "Can I run this check from my own application?",

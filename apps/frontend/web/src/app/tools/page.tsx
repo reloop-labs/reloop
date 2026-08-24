@@ -67,9 +67,9 @@ const TOOL_VISUAL_MAP: Record<string, ToolVisualMeta> = {
 			"bg-rose-500/10 text-rose-700 dark:text-rose-400 border-rose-500/20",
 		glowColor: "group-hover:border-rose-500/40",
 		features: [
-			"Disposable mailbox detection",
-			"Wildcard domain matching",
-			"Real-time validation API",
+			"Syntax, catalogue, and MX lookup",
+			"Role-prefix and free-provider flags",
+			"Confidence and risk score — no SMTP probe",
 		],
 	},
 	"email-validator": {
