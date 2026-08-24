@@ -11,40 +11,19 @@ import matter from "gray-matter";
 import yaml from "js-yaml";
 import { injectMarkdownAgentDirective } from "./agent-directive";
 
-function getWebRootCandidates(): string[] {
-	return [process.cwd(), join(process.cwd(), "apps/frontend/web"), "/app"];
-}
+const blogDir = join(process.cwd(), "content", "blog");
+const agentContentDir = join(process.cwd(), "content", "agent");
 
 export function readWebAppFile(filename: string): string | null {
-	// Prefer public/ (static agent discovery files live there)
-	for (const root of getWebRootCandidates()) {
-		for (const p of [join(root, "public", filename), join(root, filename)]) {
-			if (existsSync(p)) {
-				try {
-					return readFileSync(p, "utf-8");
-				} catch {
-					/* continue */
-				}
-			}
-		}
+	const publicPath = join(process.cwd(), "public", filename);
+	if (!existsSync(publicPath)) {
+		return null;
 	}
-	return null;
-}
-
-function getBlogDir(): string {
-	const paths = getWebRootCandidates().map((r) => join(r, "content/blog"));
-	for (const p of paths) {
-		if (existsSync(p)) return p;
+	try {
+		return readFileSync(publicPath, "utf-8");
+	} catch {
+		return null;
 	}
-	return paths[0]!;
-}
-
-function getAgentContentDir(): string {
-	const paths = getWebRootCandidates().map((r) => join(r, "content/agent"));
-	for (const p of paths) {
-		if (existsSync(p)) return p;
-	}
-	return paths[0]!;
 }
 
 function stripFrontmatter(content: string): string {
@@ -53,10 +32,26 @@ function stripFrontmatter(content: string): string {
 	return match ? content.slice(match[0].length) : content;
 }
 
+function isMdxRuntimeLine(line: string): boolean {
+	const trimmed = line.trimStart();
+	return trimmed.startsWith("import ") || trimmed.startsWith("export ");
+}
+
+function firstHeading(body: string): string | undefined {
+	for (const line of body.split("\n")) {
+		const trimmed = line.trim();
+		if (trimmed.startsWith("# ")) {
+			return trimmed.slice(2).trim();
+		}
+	}
+	return undefined;
+}
+
 function mdxBody(content: string): string {
 	return stripFrontmatter(content)
-		.replace(/^\s*import\s+.*$/gm, "")
-		.replace(/^\s*export\s+.*$/gm, "")
+		.split("\n")
+		.filter((line) => !isMdxRuntimeLine(line))
+		.join("\n")
 		.replace(/\n{3,}/g, "\n\n")
 		.trim();
 }
@@ -70,7 +65,6 @@ type BlogMeta = {
 };
 
 function listBlogPosts(): BlogMeta[] {
-	const blogDir = getBlogDir();
 	if (!existsSync(blogDir)) return [];
 
 	const includeDrafts = process.env.NODE_ENV === "development";
@@ -78,7 +72,7 @@ function listBlogPosts(): BlogMeta[] {
 	return readdirSync(blogDir)
 		.filter((f) => f.endsWith(".mdx"))
 		.map((file) => {
-			const slug = file.replace(/\.mdx$/, "");
+			const slug = file.endsWith(".mdx") ? file.slice(0, -4) : file;
 			const raw = readFileSync(join(blogDir, file), "utf-8");
 			const { data } = matter(raw, {
 				engines: {
@@ -132,7 +126,7 @@ export function resolveMarketingMarkdown(path: string): string | null {
 	const blogMatch = normalized.match(/^\/?blog\/([^/]+)$/);
 	if (blogMatch?.[1]) {
 		const slug = blogMatch[1];
-		const file = join(getBlogDir(), `${slug}.mdx`);
+		const file = join(blogDir, `${slug}.mdx`);
 		if (!existsSync(file)) return null;
 		const raw = readFileSync(file, "utf-8");
 		const { data, content } = matter(raw, {
@@ -189,8 +183,7 @@ export function resolveMarketingMarkdown(path: string): string | null {
 }
 
 function readAgentPage(name: string): string | null {
-	const dir = getAgentContentDir();
-	const p = join(dir, name);
+	const p = join(agentContentDir, name);
 	if (!existsSync(p)) return null;
 	return readFileSync(p, "utf-8");
 }
@@ -247,25 +240,22 @@ export function loadMarketingCorpus(): SearchablePage[] {
 	const home = readAgentPage("home.md") ?? buildHomeMarkdown();
 	pages.push({ title: siteName, path: "/", body: home });
 
-	const agentDir = getAgentContentDir();
-	if (existsSync(agentDir)) {
-		for (const name of readdirSync(agentDir)) {
+	if (existsSync(agentContentDir)) {
+		for (const name of readdirSync(agentContentDir)) {
 			if (!name.endsWith(".md")) continue;
-			const full = join(agentDir, name);
+			const full = join(agentContentDir, name);
 			if (!statSync(full).isFile()) continue;
-			const slug = name.replace(/\.md$/, "");
+			const slug = name.endsWith(".md") ? name.slice(0, -3) : name;
 			if (slug === "home") continue;
 			const body = readFileSync(full, "utf-8");
-			const titleMatch = body.match(/^#\s+(.+)$/m);
 			pages.push({
-				title: titleMatch?.[1]?.trim() || slug,
+				title: firstHeading(body) || slug,
 				path: `/${slug}`,
 				body,
 			});
 		}
 	}
 
-	const blogDir = getBlogDir();
 	for (const post of listBlogPosts()) {
 		const file = join(blogDir, `${post.slug}.mdx`);
 		if (!existsSync(file)) continue;

@@ -4,16 +4,7 @@ import matter from "gray-matter";
 import yaml from "js-yaml";
 import type { ChangelogRelease } from "./changelog-types";
 
-function getChangelogDir(): string {
-	const primary = path.join(
-		process.cwd(),
-		"apps/frontend/web/content/changelog",
-	);
-	if (fs.existsSync(primary)) {
-		return primary;
-	}
-	return path.join(process.cwd(), "content/changelog");
-}
+const changelogDir = path.join(process.cwd(), "content", "changelog");
 
 function getAllMdxFiles(dirPath: string): string[] {
 	if (!fs.existsSync(dirPath)) return [];
@@ -34,8 +25,7 @@ export function loadChangelogReleases(): Omit<
 	ChangelogRelease,
 	"preview" | "code"
 >[] {
-	const dirPath = getChangelogDir();
-	const files = getAllMdxFiles(dirPath);
+	const files = getAllMdxFiles(changelogDir);
 
 	const releases: Omit<ChangelogRelease, "preview" | "code">[] = [];
 

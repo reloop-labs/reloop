@@ -7,6 +7,9 @@ const agentCache = "public, max-age=300, s-maxage=3600, must-revalidate";
 const nextConfig: NextConfig = {
 	serverExternalPackages: ["next-mdx-remote", "next-mdx-remote/rsc"],
 	output: "standalone",
+	outputFileTracingIncludes: {
+		"/**": ["./content/**/*"],
+	},
 	allowedDevOrigins: ["local.reloop.sh", "*.local.reloop.sh"],
 	cacheComponents: true,
 	experimental: {

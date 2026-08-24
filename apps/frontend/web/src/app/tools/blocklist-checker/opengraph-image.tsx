@@ -62,6 +62,7 @@ export default function OpenGraphImage() {
 				<div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
 					<div
 						style={{
+							display: "flex",
 							fontSize: "52px",
 							fontWeight: 700,
 							color: "#ffffff",
@@ -73,21 +74,21 @@ export default function OpenGraphImage() {
 					</div>
 					<div
 						style={{
+							display: "flex",
 							fontSize: "20px",
 							color: "#ffffff",
 							opacity: 0.7,
 							lineHeight: 1.5,
 						}}
 					>
-						{publicBlocklistCount} public DNS blocklists: {ipBlocklistCount} for
-						sending IPs, {domainBlocklistCount} URI lists for domain names. Not
-						a website scan.
+						{`${publicBlocklistCount} public DNS blocklists: ${ipBlocklistCount} for sending IPs, ${domainBlocklistCount} URI lists for domain names. Not a website scan.`}
 					</div>
 				</div>
 
 				<div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
 					<div
 						style={{
+							display: "flex",
 							padding: "6px 14px",
 							borderRadius: "999px",
 							backgroundColor: "rgba(14, 165, 233, 0.15)",
@@ -101,6 +102,7 @@ export default function OpenGraphImage() {
 					</div>
 					<div
 						style={{
+							display: "flex",
 							padding: "6px 14px",
 							borderRadius: "999px",
 							backgroundColor: "rgba(255, 255, 255, 0.05)",
@@ -147,6 +149,7 @@ export default function OpenGraphImage() {
 					>
 						<div
 							style={{
+								display: "flex",
 								width: "10px",
 								height: "10px",
 								borderRadius: "50%",
@@ -166,5 +169,8 @@ export default function OpenGraphImage() {
 				))}
 			</div>
 		</div>,
+		{
+			...size,
+		},
 	);
 }

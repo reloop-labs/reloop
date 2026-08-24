@@ -25,22 +25,7 @@ export type BlogPostPage = BlogPostDefinition & {
 	toc: BlogTocItem[];
 };
 
-function getBlogDir(): string {
-	const paths = [
-		path.join(process.cwd(), "content/blog"),
-		path.join(process.cwd(), "apps/frontend/web/content/blog"),
-	];
-
-	for (const dir of paths) {
-		if (fs.existsSync(dir)) {
-			return dir;
-		}
-	}
-
-	return paths[0]!;
-}
-
-const blogDir = getBlogDir();
+const blogDir = path.join(process.cwd(), "content", "blog");
 
 if (process.env.NODE_ENV === "development") {
 	setupDevWatcher();

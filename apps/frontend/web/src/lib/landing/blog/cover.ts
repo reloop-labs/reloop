@@ -15,13 +15,8 @@ export type BlogCoverFile = {
 	byteLength: number;
 };
 
-function publicFileCandidates(publicPath: string) {
-	const relative = publicPath.replace(/^\//, "");
-
-	return [
-		path.join(process.cwd(), "public", relative),
-		path.join(process.cwd(), "apps/frontend/web/public", relative),
-	];
+function publicFilePath(publicPath: string) {
+	return path.join(process.cwd(), "public", publicPath.replace(/^\//, ""));
 }
 
 export function blogCoverContentType(publicPath: string) {
@@ -30,16 +25,13 @@ export function blogCoverContentType(publicPath: string) {
 }
 
 async function resolvePublicFilePath(publicPath: string) {
-	for (const filePath of publicFileCandidates(publicPath)) {
-		try {
-			await access(filePath);
-			return filePath;
-		} catch {
-			// try the next layout (local app cwd vs monorepo cwd)
-		}
+	const filePath = publicFilePath(publicPath);
+	try {
+		await access(filePath);
+		return filePath;
+	} catch {
+		return null;
 	}
-
-	return null;
 }
 
 export async function readBlogCoverFile(
