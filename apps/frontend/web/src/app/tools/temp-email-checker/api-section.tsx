@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "@reloop/ui/cn";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { AnimatePresence, motion } from "framer-motion";
 import type React from "react";
@@ -151,14 +152,20 @@ function CopyButton({ value }: { value: string }) {
 	};
 
 	return (
-		<button
+		<FancyButton.Root
 			type="button"
+			variant="basic"
+			size="xsmall"
 			onClick={copy}
-			className="inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-stroke-soft-200 px-3.5 py-1.5 font-mono text-[11px] text-text-sub-600 uppercase tracking-[0.1em] transition-colors hover:border-text-strong-950/25 hover:text-text-strong-950 dark:border-white/12 dark:text-white/45 dark:hover:border-white/30 dark:hover:text-white"
+			className="px-3.5!"
 		>
-			<Icon name={copied ? "check" : "copy"} className="size-3.5" />
-			{copied ? "Copied" : "Copy prompt"}
-		</button>
+			<FancyButton.Icon
+				as={Icon}
+				name={copied ? "check" : "copy"}
+				className="size-3.5"
+			/>
+			<span>{copied ? "Copied" : "Copy prompt"}</span>
+		</FancyButton.Root>
 	);
 }
 
@@ -251,41 +258,23 @@ export function ApiSection() {
 				<div className="flex items-center gap-2.5">
 					<CopyButton value={currentCode} />
 
-					<button
+					<FancyButton.Root
 						type="button"
+						variant="primary"
+						size="xsmall"
 						onClick={executeCheck}
 						disabled={isRunning}
-						className={cn(
-							"group relative inline-flex cursor-pointer items-center justify-center overflow-hidden rounded-full p-px pb-[2px] font-mono text-[11px] font-semibold uppercase tracking-[0.08em] transition-all duration-200 active:scale-[0.97] active:translate-y-px disabled:pointer-events-none disabled:opacity-50",
-							"bg-[#1d4ed8] shadow-[0_2px_8px_rgba(37,99,235,0.35)] hover:shadow-[0_0_16px_rgba(37,99,235,0.55)] dark:bg-[#172554] dark:shadow-[0_2px_10px_rgba(0,0,0,0.6)]",
-						)}
+						className="px-3.5!"
 					>
-						<span
-							className={cn(
-								"relative flex items-center gap-1.5 overflow-hidden rounded-full px-4 py-1.5 text-white transition-all duration-200",
-								"bg-gradient-to-b from-[#3b82f6] to-[#2563eb] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.45)] dark:from-[#2563eb] dark:to-[#1d4ed8] dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.35),0_0_0_0.5px_rgba(255,255,255,0.1)]",
-								"group-hover:brightness-108",
-							)}
-						>
-							{/* Shimmer sweep */}
-							<span
-								aria-hidden
-								className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/25 to-transparent transition-transform duration-700 ease-out group-hover:translate-x-full"
-							/>
-
-							{isRunning ? (
+						{isRunning ? (
+							<>
 								<span className="size-3 animate-spin rounded-full border border-white/50 border-t-white" />
-							) : (
-								<Icon
-									name="play"
-									className="size-3 fill-current text-white drop-shadow-xs"
-								/>
-							)}
-							<span className="relative z-10">
-								{isRunning ? "Testing..." : "Test Request"}
-							</span>
-						</span>
-					</button>
+								<span>Testing...</span>
+							</>
+						) : (
+							<span>Test Request</span>
+						)}
+					</FancyButton.Root>
 				</div>
 			</div>
 
