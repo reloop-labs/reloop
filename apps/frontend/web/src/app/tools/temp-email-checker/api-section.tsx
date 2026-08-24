@@ -7,7 +7,6 @@ import { useState } from "react";
 import type { SimpleIcon } from "simple-icons";
 import { siCurl, siGo, siNodedotjs, siPython } from "simple-icons";
 import {
-	apiEndpoint,
 	apiResponseSample,
 	apiSnippets,
 } from "./content";
@@ -133,33 +132,24 @@ export function ApiSection() {
 	return (
 		<>
 			<Band>
-				<div className="px-5 py-16 sm:px-6 sm:py-20 md:px-8">
-					<p className="mb-6 inline-flex items-center gap-2 font-mono text-[11px] text-text-sub-600 uppercase tracking-[0.14em] dark:text-white/45">
+				<div className="px-5 py-8 sm:px-6 sm:py-10 md:px-8">
+					<p className="mb-3 inline-flex items-center gap-2 font-mono text-[11px] text-text-sub-600 uppercase tracking-[0.14em] dark:text-white/45">
 						<span className="text-text-soft-400 dark:text-white/20">
 							{"//"}
 						</span>
 						<Icon name="terminal" className="size-3.5 text-primary-base" />
-						Developer first
+						Developer First
 						<span className="text-text-soft-400 dark:text-white/20">
 							{"\\\\"}
 						</span>
 					</p>
-					<h2 className="max-w-3xl font-semibold text-[2rem] text-text-strong-950 leading-[1.08] tracking-[-1px] sm:text-[2.6rem] dark:text-white">
-						Run the same check{" "}
+					<h2 className="max-w-2xl font-semibold text-2xl text-text-strong-950 tracking-tight sm:text-3xl lg:text-[32px] dark:text-white">
+						Run the check{" "}
 						<span className="text-primary-base">from your code</span>
 					</h2>
-					<p className="mt-4 max-w-xl text-[15px] text-text-sub-600 leading-relaxed sm:text-[16px] dark:text-white/50">
-						This page is a thin wrapper over one public endpoint. Point your
-						signup flow at it and reject burner addresses before the account is
-						created.
-					</p>
-					<p className="mt-6 inline-flex max-w-full items-center gap-2 overflow-x-auto rounded-full border border-stroke-soft-200 px-4 py-2 font-mono text-[12px] dark:border-white/12">
-						<span className="shrink-0 font-semibold text-primary-base">
-							POST
-						</span>
-						<span className="whitespace-nowrap text-text-sub-600 dark:text-white/50">
-							{apiEndpoint}
-						</span>
+					<p className="mt-2.5 max-w-lg text-[14px] text-text-sub-600 leading-relaxed sm:text-[14.5px] dark:text-white/50">
+						Point your signup flow directly at the public endpoint to reject
+						burner addresses in real time.
 					</p>
 				</div>
 			</Band>
