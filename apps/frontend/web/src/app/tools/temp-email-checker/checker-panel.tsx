@@ -5,6 +5,7 @@ import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon, type IconName } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
+import * as Label from "@reloop/ui/label";
 import { AnimatePresence, motion } from "framer-motion";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import { CheckRequestError, runCheck } from "./check-api";
@@ -524,15 +525,20 @@ export function CheckerPanel() {
 					<div className="rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-4 sm:p-4.5 dark:border-white/10 dark:bg-[#070707]">
 						{/* Input Check Zone */}
 						<form onSubmit={onSubmit} noValidate className="space-y-3.5">
-							<label htmlFor="checker-input" className="sr-only">
-								Email address or domain to check
-							</label>
+							<div className="space-y-1.5">
+								<Label.Root
+									htmlFor="checker-input"
+									className="font-medium text-xs text-text-strong-950 dark:text-white"
+								>
+									Email or domain
+									<Label.Asterisk />
+								</Label.Root>
 
-							<Input.Root
-								size="medium"
-								className="!shadow-none has-[input:focus]:!shadow-button-primary-focus has-[input:focus]:before:!ring-primary-base w-full rounded-xl"
-							>
-								<Input.Wrapper className="h-10.5 px-3 dark:bg-[#070707]">
+								<Input.Root
+									size="medium"
+									className="!shadow-none has-[input:focus]:!shadow-button-primary-focus has-[input:focus]:before:!ring-primary-base w-full rounded-xl"
+								>
+								<Input.Wrapper className="h-10.5 pl-3 pr-1.5 dark:bg-[#070707]">
 									<Input.Icon>
 										<Icon name="mail-single" className="size-4" />
 									</Input.Icon>
@@ -580,6 +586,7 @@ export function CheckerPanel() {
 									</FancyButton.Root>
 								</Input.Wrapper>
 							</Input.Root>
+						</div>
 
 							{/* How It Works - Vertical Stepper */}
 							<div className="mt-3.5 space-y-2.5 px-0.5 text-xs">
