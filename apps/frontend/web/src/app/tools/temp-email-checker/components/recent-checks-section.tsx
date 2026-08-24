@@ -53,8 +53,9 @@ function getVerdictConfig(verdict: TestedEmailRecord["verdict"]) {
 
 export function RecentChecksSection() {
 	const { list } = useTestedEmails();
+	const displayedList = list.slice(0, 10);
 
-	if (list.length === 0) return null;
+	if (displayedList.length === 0) return null;
 
 	return (
 		<section
@@ -72,7 +73,7 @@ export function RecentChecksSection() {
 
 					<div className="rounded-2xl border border-stroke-soft-200 bg-bg-white-0 px-4 py-1 divide-y divide-stroke-soft-200/50 dark:border-white/10 dark:bg-[#070707] dark:divide-white/5">
 						<AnimatePresence initial={false}>
-							{list.map((item) => {
+							{displayedList.map((item) => {
 								const config = getVerdictConfig(item.verdict);
 								return (
 									<motion.div

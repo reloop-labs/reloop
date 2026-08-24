@@ -93,7 +93,7 @@ export function saveTestedEmail(
 			id: `test-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
 			timestamp: Date.now(),
 		};
-		const updated = [newRecord, ...filtered].slice(0, 30);
+		const updated = [newRecord, ...filtered].slice(0, 10);
 		localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
 		window.dispatchEvent(
 			new CustomEvent(CHECK_EVENT_NAME, { detail: updated }),
