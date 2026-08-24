@@ -57,7 +57,7 @@ export function RecentChecksSection() {
 	return (
 		<section id="recent-checks-section" className="w-full">
 			{/* Section Header */}
-			<div className="mx-auto max-w-2xl px-4 pt-10 pb-6 text-center sm:px-6 md:px-8 sm:pt-14 sm:pb-8">
+			<div className="mx-auto max-w-xl px-4 pt-10 pb-6 text-center sm:px-6 md:px-8 sm:pt-14 sm:pb-8">
 				<h2 className="mx-auto font-semibold text-3xl text-text-strong-950 tracking-tight sm:text-4xl lg:text-[2.65rem] lg:leading-[1.12] dark:text-white">
 					Recently tested emails
 				</h2>
@@ -65,7 +65,7 @@ export function RecentChecksSection() {
 
 			{/* Contained Card Matching Signals & Detection */}
 			{list.length > 0 && (
-				<div className="mx-auto max-w-2xl px-4 pb-12 sm:px-6 md:px-8 sm:pb-16">
+				<div className="mx-auto max-w-xl px-4 pb-12 sm:px-6 md:px-8 sm:pb-16">
 					<div className="overflow-hidden rounded-[14px] border border-stroke-soft-200 bg-bg-weak-50 p-0.5 dark:border-white/10 dark:bg-white/[0.03]">
 						<div className="px-3 pt-2 pb-2.5 sm:px-4 sm:pt-2.5">
 							<p className="font-mono font-semibold text-[11px] text-text-strong-950 uppercase tracking-wider dark:text-white">

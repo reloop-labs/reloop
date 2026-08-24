@@ -25,7 +25,7 @@ export function TempEmailHero() {
 
 				{/* Interactive Checker Panel */}
 				<section className="relative z-10 w-full px-5 pb-16 sm:px-6 sm:pb-20 md:px-8 lg:pb-24">
-					<div className="mx-auto w-full max-w-2xl">
+					<div className="mx-auto w-full max-w-xl">
 						<CheckerPanel />
 					</div>
 				</section>

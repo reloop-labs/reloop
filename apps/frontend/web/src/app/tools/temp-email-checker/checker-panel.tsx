@@ -62,7 +62,16 @@ function MorphSlot({
 	children: ReactNode;
 }) {
 	const [height, setHeight] = useState<number | "auto">("auto");
-	const innerRef = useRef<HTMLDivElement>(null);
+	const [canAnimate, setCanAnimate] = useState(false);
+	const innerRef = useRef<HTMLDivElement | null>(null);
+
+	const setInnerRef = (node: HTMLDivElement | null) => {
+		if (node) innerRef.current = node;
+	};
+
+	useEffect(() => {
+		setCanAnimate(true);
+	}, []);
 
 	useLayoutEffect(() => {
 		if (!activeKey) {
@@ -87,16 +96,14 @@ function MorphSlot({
 		<motion.div
 			initial={false}
 			animate={{ height: reduceMotion ? "auto" : height }}
-			transition={reduceMotion ? { duration: 0 } : HEIGHT_MORPH}
+			transition={reduceMotion || !canAnimate ? { duration: 0 } : HEIGHT_MORPH}
 			className="relative overflow-hidden"
 		>
 			<AnimatePresence initial={false} mode="sync">
 				{activeKey ? (
 					<motion.div
 						key={activeKey}
-						initial={
-							reduceMotion ? false : { opacity: 0, filter: "blur(2px)" }
-						}
+						initial={reduceMotion ? false : { opacity: 0, filter: "blur(2px)" }}
 						animate={{
 							opacity: 1,
 							filter: "blur(0px)",
@@ -114,7 +121,7 @@ function MorphSlot({
 						transition={reduceMotion ? { duration: 0 } : CROSSFADE}
 						className="absolute inset-x-0 top-0"
 					>
-						<div ref={innerRef}>{children}</div>
+						<div ref={setInnerRef}>{children}</div>
 					</motion.div>
 				) : null}
 			</AnimatePresence>
@@ -357,7 +364,7 @@ function ResultCardDetailed({
 					</p>
 				</div>
 
-				<div className="rounded-xl border border-stroke-soft-200 bg-bg-white-0 px-4 py-1 divide-y divide-stroke-soft-200/50 dark:border-white/10 dark:bg-[#070707] dark:divide-white/5">
+				<div className="divide-y divide-stroke-soft-200/50 rounded-xl border border-stroke-soft-200 bg-bg-white-0 px-4 py-1 dark:divide-white/5 dark:border-white/10 dark:bg-[#070707]">
 					<SignalItem
 						label="Disposable provider"
 						value={isDisposable ? "Detected" : "Clean"}
@@ -418,7 +425,7 @@ function ResultCardDetailed({
 				<button
 					type="button"
 					onClick={onReset}
-					className="cursor-pointer font-medium text-xs text-primary-base hover:underline"
+					className="cursor-pointer font-medium text-primary-base text-xs hover:underline"
 				>
 					Clear result
 				</button>
@@ -562,7 +569,7 @@ export function CheckerPanel() {
 	};
 
 	return (
-		<div className="mx-auto w-full max-w-2xl font-sans">
+		<div className="mx-auto w-full max-w-xl font-sans">
 			{/* Dashboard Modal / Card Container */}
 			<div className="overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-weak-50 p-0.5 dark:border-white/10 dark:bg-white/[0.03]">
 				{/* Top White Card: Input + Results with dynamic height morphing */}
@@ -572,7 +579,7 @@ export function CheckerPanel() {
 						<div className="space-y-2">
 							<Label.Root
 								htmlFor="checker-input"
-								className="font-medium text-xs text-text-strong-950 dark:text-white"
+								className="font-medium text-text-strong-950 text-xs dark:text-white"
 							>
 								Email or domain
 								<Label.Asterisk />
@@ -593,7 +600,7 @@ export function CheckerPanel() {
 												: "has-[input:focus]:before:!ring-primary-base has-[input:focus]:!shadow-button-primary-focus",
 										)}
 									>
-										<Input.Wrapper className="h-11 pl-3.5 pr-1.5 dark:bg-[#0c0c0c]">
+										<Input.Wrapper className="h-11 pr-1.5 pl-3.5 dark:bg-[#0c0c0c]">
 											<Input.Icon>
 												<Icon name="mail-single" className="size-4" />
 											</Input.Icon>
@@ -677,10 +684,7 @@ export function CheckerPanel() {
 									</p>
 								</div>
 							) : result ? (
-								<ResultCardDetailed
-									result={result}
-									onReset={handleReset}
-								/>
+								<ResultCardDetailed result={result} onReset={handleReset} />
 							) : null}
 						</MorphSlot>
 					</form>
