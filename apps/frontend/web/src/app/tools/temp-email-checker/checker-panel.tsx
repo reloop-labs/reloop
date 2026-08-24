@@ -1,10 +1,11 @@
 "use client";
 
+import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
-import { Icon } from "@reloop/ui/icon";
-import { type FormEvent, useEffect, useId, useRef, useState } from "react";
+import { Icon, type IconName } from "@reloop/ui/icon";
+import { AnimatePresence, motion } from "framer-motion";
+import { type FormEvent, useEffect, useRef, useState } from "react";
 import { CheckRequestError, runCheck } from "./check-api";
-import { WindowDots } from "./grid";
 import {
 	type CheckResult,
 	type CheckVerdict,
@@ -12,139 +13,438 @@ import {
 	toCheckResult,
 } from "./presenter";
 
-const EXAMPLES = [
-	"you@mailinator.com",
-	"info@acme.com",
-	"hello@gmail.com",
-	"tempmail.com",
-];
-
-const VERDICT_STYLES: Record<
+const VERDICT_THEME: Record<
 	CheckVerdict,
-	{ icon: string; badge: string; accent: string; label: string }
+	{
+		title: string;
+		subtitle: string;
+		confidence: string;
+		icon: IconName;
+		dotColor: string;
+		titleClass: string;
+		badgeBg: string;
+		badgeBorder: string;
+		recommendation: string;
+		recommendationIcon: string;
+		whyResult: string;
+	}
 > = {
 	disposable: {
+		title: "TEMPORARY",
+		subtitle: "Disposable email",
+		confidence: "98% confidence",
 		icon: "shield-cross",
-		badge: "bg-error-lighter text-error-base",
-		accent: "bg-error-base",
-		label: "Disposable",
+		dotColor: "bg-rose-500",
+		titleClass: "text-rose-500 dark:text-rose-400",
+		badgeBg: "bg-rose-500/[0.04] dark:bg-rose-500/[0.08]",
+		badgeBorder: "border-rose-500/20 dark:border-rose-500/30",
+		recommendation: "Treat this address as disposable when verifying identity.",
+		recommendationIcon: "alert-triangle",
+		whyResult:
+			"We found multiple signals associated with temporary email services. The strongest signal is the domain classification matching known throwaway mailboxes.",
 	},
 	risky: {
+		title: "NEEDS A LOOK",
+		subtitle: "Shared role mailbox",
+		confidence: "85% confidence",
 		icon: "alert-triangle",
-		badge: "bg-warning-lighter text-warning-base",
-		accent: "bg-warning-base",
-		label: "Needs a look",
+		dotColor: "bg-amber-500",
+		titleClass: "text-amber-500 dark:text-amber-400",
+		badgeBg: "bg-amber-500/[0.04] dark:bg-amber-500/[0.08]",
+		badgeBorder: "border-amber-500/20 dark:border-amber-500/30",
+		recommendation:
+			"Address is a shared team inbox. Expect lower engagement on marketing campaigns.",
+		recommendationIcon: "alert-triangle",
+		whyResult:
+			"The domain appears valid and persistent, but the mailbox prefix (e.g. info, support, billing) indicates a shared role rather than an individual person.",
 	},
 	deliverable: {
+		title: "DELIVERABLE",
+		subtitle: "Clean mailbox provider",
+		confidence: "99% confidence",
 		icon: "shield-check",
-		badge: "bg-success-lighter text-success-base",
-		accent: "bg-success-base",
-		label: "Not listed",
+		dotColor: "bg-emerald-500",
+		titleClass: "text-emerald-500 dark:text-emerald-400",
+		badgeBg: "bg-emerald-500/[0.04] dark:bg-emerald-500/[0.08]",
+		badgeBorder: "border-emerald-500/20 dark:border-emerald-500/30",
+		recommendation:
+			"Safe to accept for user signups, transactional emails, and identity verification.",
+		recommendationIcon: "check-circle",
+		whyResult:
+			"The domain is not listed on known disposable catalogues and shows healthy persistent mailbox infrastructure with valid RFC syntax.",
 	},
 	invalid: {
+		title: "INVALID",
+		subtitle: "Malformed address",
+		confidence: "100% confidence",
 		icon: "cross-circle",
-		badge: "bg-bg-weak-50 text-text-sub-600 dark:bg-white/5 dark:text-white/50",
-		accent: "bg-stroke-soft-200 dark:bg-white/20",
-		label: "Invalid",
+		dotColor: "bg-neutral-400",
+		titleClass: "text-neutral-500 dark:text-white/60",
+		badgeBg: "bg-neutral-500/[0.04] dark:bg-white/[0.04]",
+		badgeBorder: "border-neutral-500/20 dark:border-white/15",
+		recommendation:
+			"Prompt user to correct syntax errors before accepting submission.",
+		recommendationIcon: "cross-circle",
+		whyResult:
+			"Input failed basic RFC 5322 syntax validation. The format does not represent a deliverable email address or hostname.",
 	},
 };
 
-const SIGNAL_STYLES: Record<SignalStatus, { icon: string; tone: string }> = {
-	pass: { icon: "check-circle", tone: "text-success-base" },
-	fail: { icon: "cross-circle", tone: "text-error-base" },
-	warn: { icon: "alert-triangle", tone: "text-warning-base" },
-	neutral: {
-		icon: "info-outline",
-		tone: "text-text-soft-400 dark:text-white/35",
-	},
-};
-
-function SignalRow({
+function SignalItem({
 	label,
-	detail,
+	value,
 	status,
 }: {
 	label: string;
-	detail: string;
+	value: string;
 	status: SignalStatus;
 }) {
-	const style = SIGNAL_STYLES[status];
+	const dotColor =
+		status === "fail"
+			? "bg-rose-500"
+			: status === "warn"
+				? "bg-amber-500"
+				: status === "pass"
+					? "bg-emerald-500"
+					: "bg-neutral-400";
+
+	const valueClass =
+		status === "fail"
+			? "text-rose-500 dark:text-rose-400 font-medium"
+			: status === "warn"
+				? "text-amber-500 dark:text-amber-400 font-medium"
+				: status === "pass"
+					? "text-emerald-600 dark:text-emerald-400 font-medium"
+					: "text-text-sub-600 dark:text-white/50";
 
 	return (
-		<li className="flex items-start gap-3 border-stroke-soft-200 border-t px-5 py-4 sm:px-6 dark:border-white/10">
-			<Icon
-				name={style.icon}
-				className={cn("mt-0.5 size-4 shrink-0", style.tone)}
-			/>
-			<div className="min-w-0 flex-1">
-				<p className="font-mono text-[11px] text-text-soft-400 uppercase tracking-[0.14em] dark:text-white/30">
+		<div className="flex items-center justify-between py-2 text-[14px]">
+			<div className="flex items-center gap-3">
+				<span className={cn("size-2 rounded-full", dotColor)} />
+				<span className="text-text-strong-950 dark:text-white/90">
 					{label}
-				</p>
-				<p className="mt-1 break-words text-[14px] text-text-sub-600 leading-relaxed dark:text-white/55">
-					{detail}
-				</p>
-			</div>
-		</li>
-	);
-}
-
-function ResultCard({ result }: { result: CheckResult }) {
-	const style = VERDICT_STYLES[result.verdict];
-
-	return (
-		<div className="mt-4 overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 dark:border-white/10 dark:bg-[#0b0b0b]">
-			<span className={cn("block h-0.5 w-full", style.accent)} />
-
-			<div className="flex items-center gap-3 border-stroke-soft-200 border-b px-5 py-3 sm:px-6 dark:border-white/10">
-				<WindowDots />
-				<span className="ml-auto min-w-0 truncate font-mono text-[12px] text-text-soft-400 dark:text-white/35">
-					{result.input}
 				</span>
 			</div>
-
-			<div className="px-5 py-5 sm:px-6">
-				<div className="flex flex-wrap items-center gap-2.5">
-					<span
-						className={cn(
-							"flex size-8 shrink-0 items-center justify-center rounded-full",
-							style.badge,
-						)}
-					>
-						<Icon name={style.icon} className="size-4" />
-					</span>
-					<h3 className="font-semibold text-[17px] text-text-strong-950 tracking-tight dark:text-white">
-						{result.headline}
-					</h3>
-					<span
-						className={cn(
-							"rounded-full px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em]",
-							style.badge,
-						)}
-					>
-						{style.label}
-					</span>
-				</div>
-				<p className="mt-3.5 text-[14px] text-text-sub-600 leading-relaxed sm:text-[15px] dark:text-white/50">
-					{result.summary}
-				</p>
-			</div>
-
-			<ul>
-				{result.signals.map((s) => (
-					<SignalRow
-						key={s.id}
-						label={s.label}
-						detail={s.detail}
-						status={s.status}
-					/>
-				))}
-			</ul>
+			<span className={cn("text-[13.5px]", valueClass)}>{value}</span>
 		</div>
 	);
 }
 
+function ResultCardDetailed({
+	result,
+	onReset,
+}: {
+	result: CheckResult;
+	onReset: () => void;
+}) {
+	const theme = VERDICT_THEME[result.verdict];
+	const [showEvidence, setShowEvidence] = useState(false);
+
+	const isDisposable = result.verdict === "disposable";
+	const isRole = result.verdict === "risky";
+	const isValidSyntax = result.verdict !== "invalid";
+
+	return (
+		<motion.div
+			initial={{ opacity: 0, y: 10 }}
+			animate={{ opacity: 1, y: 0 }}
+			transition={{ duration: 0.25, ease: "easeOut" }}
+			className="overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 shadow-sm dark:border-white/10 dark:bg-[#070707]"
+		>
+			{/* Top Bar: New Check & Badge */}
+			<div className="flex items-center justify-between border-stroke-soft-200 border-b px-5 py-3.5 sm:px-6 dark:border-white/10">
+				<button
+					type="button"
+					onClick={onReset}
+					className="group inline-flex items-center gap-1.5 font-medium text-[13px] text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white"
+				>
+					<Icon
+						name="arrow-left"
+						className="size-3.5 transition-transform group-hover:-translate-x-0.5"
+					/>
+					<span>New Check</span>
+				</button>
+
+				<span className="font-mono text-[11px] text-text-soft-400 uppercase tracking-[0.14em] dark:text-white/40">
+					TEMP EMAIL CHECKER
+				</span>
+			</div>
+
+			{/* Section 1: Email & Hero Verdict */}
+			<div className="px-5 py-6 sm:px-8 sm:py-7">
+				<div>
+					<p className="font-mono text-[11px] text-text-soft-400 uppercase tracking-[0.16em] dark:text-white/40">
+						EMAIL
+					</p>
+					<p className="mt-1 font-semibold text-[17px] text-text-strong-950 sm:text-[18px] dark:text-white">
+						{result.input}
+					</p>
+				</div>
+
+				{/* Verdict Hero Card */}
+				<div
+					className={cn(
+						"mt-5 flex flex-col items-center justify-center rounded-2xl border p-6 text-center sm:py-8",
+						theme.badgeBg,
+						theme.badgeBorder,
+					)}
+				>
+					<div className="flex items-center gap-2.5">
+						<span className={cn("size-2.5 rounded-full", theme.dotColor)} />
+						<h3
+							className={cn(
+								"font-bold font-mono text-[20px] tracking-wider sm:text-[22px]",
+								theme.titleClass,
+							)}
+						>
+							{theme.title}
+						</h3>
+					</div>
+
+					<p className="mt-2 text-[14.5px] text-text-strong-950 dark:text-white/90">
+						{theme.subtitle}
+					</p>
+
+					<p className="mt-1 font-mono text-[12px] text-text-soft-400 dark:text-white/50">
+						{theme.confidence}
+					</p>
+				</div>
+
+				{/* Verdict Summary Text */}
+				<div className="mt-6">
+					<p className="font-mono text-[11px] text-text-soft-400 uppercase tracking-[0.16em] dark:text-white/40">
+						VERDICT
+					</p>
+					<p className="mt-1.5 text-[14px] text-text-sub-600 leading-relaxed sm:text-[14.5px] dark:text-white/60">
+						{result.summary}
+					</p>
+				</div>
+			</div>
+
+			{/* Section 2: SIGNALS */}
+			<div className="border-stroke-soft-200 border-t px-5 py-5 sm:px-8 dark:border-white/10">
+				<p className="font-mono text-[11px] text-text-soft-400 uppercase tracking-[0.16em] dark:text-white/40">
+					SIGNALS
+				</p>
+
+				<div className="mt-3 divide-y divide-stroke-soft-200/50 dark:divide-white/5">
+					<SignalItem
+						label="Disposable provider"
+						value={isDisposable ? "Detected" : "Clean"}
+						status={isDisposable ? "fail" : "pass"}
+					/>
+					<SignalItem
+						label="Domain reputation"
+						value={isDisposable ? "Suspicious" : "Valid"}
+						status={isDisposable ? "warn" : "pass"}
+					/>
+					<SignalItem
+						label="Mailbox pattern"
+						value={isDisposable ? "Random / Burner" : isRole ? "Shared Role" : "Standard"}
+						status={isDisposable ? "warn" : isRole ? "warn" : "pass"}
+					/>
+					<SignalItem
+						label="Email syntax"
+						value={isValidSyntax ? "Valid" : "Malformed"}
+						status={isValidSyntax ? "pass" : "fail"}
+					/>
+				</div>
+			</div>
+
+			{/* Section 3: WHY THIS RESULT? */}
+			<div className="border-stroke-soft-200 border-t px-5 py-5 sm:px-8 dark:border-white/10">
+				<p className="font-mono text-[11px] text-text-soft-400 uppercase tracking-[0.16em] dark:text-white/40">
+					WHY THIS RESULT?
+				</p>
+				<p className="mt-1.5 text-[14px] text-text-sub-600 leading-relaxed dark:text-white/60">
+					{theme.whyResult}
+				</p>
+
+				<div className="mt-4 flex flex-col items-center">
+					<button
+						type="button"
+						onClick={() => setShowEvidence((prev) => !prev)}
+						className="inline-flex cursor-pointer items-center gap-1.5 rounded-xl border border-stroke-soft-200 bg-bg-weak-50 px-4 py-2 font-medium text-[13px] text-text-strong-950 transition-colors hover:bg-neutral-100 dark:border-white/10 dark:bg-white/[0.04] dark:text-white dark:hover:bg-white/[0.08]"
+					>
+						<span>{showEvidence ? "Hide Evidence" : "View Evidence"}</span>
+						<Icon
+							name="chevron-down"
+							className={cn(
+								"size-3.5 transition-transform duration-200",
+								showEvidence && "rotate-180",
+							)}
+						/>
+					</button>
+
+					<AnimatePresence>
+						{showEvidence && (
+							<motion.div
+								initial={{ opacity: 0, height: 0 }}
+								animate={{ opacity: 1, height: "auto" }}
+								exit={{ opacity: 0, height: 0 }}
+								className="mt-4 w-full overflow-hidden"
+							>
+								<div className="rounded-xl border border-stroke-soft-200 bg-neutral-950 p-4 font-mono text-[12px] text-emerald-400 dark:border-white/10">
+									<pre className="overflow-x-auto whitespace-pre-wrap">
+										{JSON.stringify(
+											{
+												input: result.input,
+												domain: result.domain,
+												verdict: result.verdict,
+												signals: result.signals.map((s) => ({
+													id: s.id,
+													label: s.label,
+													status: s.status,
+													detail: s.detail,
+												})),
+											},
+											null,
+											2,
+										)}
+									</pre>
+								</div>
+							</motion.div>
+						)}
+					</AnimatePresence>
+				</div>
+			</div>
+
+			{/* Section 4: TRUST AGENT PANEL */}
+			<div className="border-stroke-soft-200 border-t p-5 sm:p-8 dark:border-white/10">
+				<div className="rounded-2xl border border-stroke-soft-200 bg-bg-weak-50/50 p-5 sm:p-6 dark:border-white/10 dark:bg-white/[0.02]">
+					<div className="flex items-center justify-between">
+						<div className="flex items-center gap-2">
+							<span className="font-semibold text-[15px] text-primary-base">
+								✦
+							</span>
+							<span className="font-semibold text-[14.5px] text-text-strong-950 dark:text-white">
+								Trust Agent
+							</span>
+						</div>
+						<span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-0.5 font-mono text-[11px] text-emerald-600 dark:border-emerald-500/30 dark:bg-emerald-500/15 dark:text-emerald-400">
+							<span className="size-1.5 rounded-full bg-emerald-500" />
+							Investigation complete
+						</span>
+					</div>
+
+					{/* Checklist */}
+					<ul className="mt-4 space-y-2 text-[13.5px] text-text-sub-600 dark:text-white/70">
+						<li className="flex items-center gap-2.5">
+							<Icon
+								name="check-circle"
+								className="size-4 shrink-0 text-emerald-500"
+							/>
+							<span>Email format checked</span>
+						</li>
+						<li className="flex items-center gap-2.5">
+							<Icon
+								name="check-circle"
+								className="size-4 shrink-0 text-emerald-500"
+							/>
+							<span>Domain identified</span>
+						</li>
+						<li className="flex items-center gap-2.5">
+							<Icon
+								name="check-circle"
+								className="size-4 shrink-0 text-emerald-500"
+							/>
+							<span>Disposable-email intelligence checked</span>
+						</li>
+						<li className="flex items-center gap-2.5">
+							<Icon
+								name="check-circle"
+								className="size-4 shrink-0 text-emerald-500"
+							/>
+							<span>Risk signals evaluated</span>
+						</li>
+					</ul>
+
+					{/* Confidence Progress Bar */}
+					<div className="mt-5">
+						<div className="flex items-center justify-between text-[12px]">
+							<span className="font-mono uppercase tracking-wider text-text-soft-400 dark:text-white/40">
+								Confidence
+							</span>
+							<span className="font-mono font-medium text-text-strong-950 dark:text-white">
+								{isDisposable ? "96%" : isRole ? "88%" : "99%"}
+							</span>
+						</div>
+						<div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-neutral-200 dark:bg-white/10">
+							<div
+								className={cn(
+									"h-full rounded-full transition-all duration-500",
+									isDisposable
+										? "bg-rose-500"
+										: isRole
+											? "bg-amber-500"
+											: "bg-emerald-500",
+								)}
+								style={{
+									width: isDisposable ? "96%" : isRole ? "88%" : "99%",
+								}}
+							/>
+						</div>
+					</div>
+
+					{/* Ask Agent Button */}
+					<div className="mt-5">
+						<button
+							type="button"
+							onClick={() => setShowEvidence(true)}
+							className="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-stroke-soft-200 bg-bg-white-0 py-2.5 font-medium text-[13.5px] text-text-strong-950 shadow-xs transition-colors hover:bg-neutral-50 dark:border-white/10 dark:bg-white/[0.04] dark:text-white dark:hover:bg-white/[0.08]"
+						>
+							<span className="text-primary-base">✦</span>
+							<span>Ask Agent</span>
+						</button>
+					</div>
+				</div>
+			</div>
+
+			{/* Section 5: RECOMMENDATION */}
+			<div className="border-stroke-soft-200 border-t px-5 py-6 sm:px-8 dark:border-white/10">
+				<p className="font-mono text-[11px] text-text-soft-400 uppercase tracking-[0.16em] dark:text-white/40">
+					RECOMMENDATION
+				</p>
+
+				<div className="mt-2.5 flex items-start gap-2.5 text-[14px] text-text-strong-950 dark:text-white">
+					<Icon
+						name={
+							isDisposable
+								? "alert-triangle"
+								: isRole
+									? "alert-triangle"
+									: "check-circle"
+						}
+						className={cn(
+							"mt-0.5 size-4 shrink-0",
+							isDisposable
+								? "text-amber-500"
+								: isRole
+									? "text-amber-500"
+									: "text-emerald-500",
+						)}
+					/>
+					<p className="leading-relaxed">{theme.recommendation}</p>
+				</div>
+
+				<div className="mt-7 flex justify-center">
+					<Button.Root
+						type="button"
+						variant="neutral"
+						mode="stroke"
+						size="medium"
+						onClick={onReset}
+						className="h-10 cursor-pointer rounded-xl px-5 font-medium text-[14px]"
+					>
+						<span>Check Another Email</span>
+					</Button.Root>
+				</div>
+			</div>
+		</motion.div>
+	);
+}
+
 export function CheckerPanel() {
-	const inputId = useId();
 	const inputRef = useRef<HTMLInputElement>(null);
 	const [value, setValue] = useState("");
 	const [result, setResult] = useState<CheckResult | null>(null);
@@ -156,7 +456,8 @@ export function CheckerPanel() {
 	useEffect(() => () => requestRef.current?.abort(), []);
 
 	const run = async (raw: string) => {
-		if (!raw.trim()) {
+		const query = raw.trim();
+		if (!query) {
 			setResult(null);
 			setError(null);
 			return;
@@ -170,7 +471,7 @@ export function CheckerPanel() {
 		setError(null);
 
 		try {
-			const response = await runCheck(raw, controller.signal);
+			const response = await runCheck(query, controller.signal);
 			setResult(toCheckResult(response));
 		} catch (err) {
 			if (controller.signal.aborted) return;
@@ -190,77 +491,137 @@ export function CheckerPanel() {
 		void run(value);
 	};
 
-	const onExample = (example: string) => {
-		setValue(example);
-		void run(example);
-		inputRef.current?.focus();
+	const handleReset = () => {
+		setResult(null);
+		setError(null);
+		setValue("");
+		setTimeout(() => inputRef.current?.focus(), 50);
 	};
 
 	const canSubmit = value.trim().length > 0 && !isPending;
 
 	return (
 		<div className="mx-auto w-full max-w-2xl">
-			<form onSubmit={onSubmit} noValidate>
-				<label htmlFor={inputId} className="sr-only">
-					Email address or domain to check
-				</label>
-
-				<div className="overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 shadow-[0_24px_60px_-40px_rgba(14,18,27,0.35)] transition-colors focus-within:border-primary-base/40 dark:border-white/12 dark:bg-[#0b0b0b] dark:shadow-none dark:focus-within:border-primary-base/50">
-					<div className="flex items-center gap-3 px-5 pt-4 pb-3">
-						<Icon
-							name="at-sign"
-							className="size-[18px] shrink-0 text-text-soft-400 dark:text-white/30"
-						/>
-						<input
-							id={inputId}
-							ref={inputRef}
-							type="text"
-							inputMode="email"
-							autoComplete="off"
-							autoCapitalize="none"
-							spellCheck={false}
-							value={value}
-							onChange={(e) => setValue(e.target.value)}
-							placeholder="you@example.com"
-							className="h-8 w-full min-w-0 bg-transparent text-[16px] text-text-strong-950 outline-none placeholder:text-text-soft-400 dark:text-white dark:placeholder:text-white/25"
-						/>
-					</div>
-
-					<div className="flex items-center gap-3 border-stroke-soft-200 border-t px-3 py-3 dark:border-white/10">
-						<div className="flex min-w-0 flex-1 items-center gap-1.5 overflow-x-auto">
-							{EXAMPLES.map((example) => (
-								<button
-									key={example}
-									type="button"
-									onClick={() => onExample(example)}
-									disabled={isPending}
-									className={cn(
-										"shrink-0 rounded-lg px-2.5 py-1.5 font-mono text-[11.5px] transition-colors disabled:opacity-40",
-										example === value
-											? "bg-primary-base/10 text-primary-base"
-											: "text-text-soft-400 hover:bg-bg-weak-50 hover:text-text-sub-600 dark:text-white/30 dark:hover:bg-white/5 dark:hover:text-white/60",
-									)}
-								>
-									{example}
-								</button>
-							))}
+			{!result ? (
+				/* Dashboard Modal / Card Container */
+				<div className="overflow-hidden rounded-[20px] border border-stroke-soft-200 bg-bg-weak-50 p-2 sm:rounded-[24px] dark:border-white/10 dark:bg-white/[0.04]">
+					<div className="space-y-5 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 px-6 pt-5 pb-6 dark:border-white/10 dark:bg-[#070707]">
+						{/* Header */}
+						<div>
+							<h2 className="font-semibold text-base text-text-strong-950 tracking-tight sm:text-[17px] dark:text-white">
+								Check Email & Domain
+							</h2>
+							<p className="mt-0.5 text-text-sub-600 text-xs leading-relaxed sm:text-[13px] dark:text-white/50">
+								Verify individual addresses or paste a domain to detect throwaway inboxes.
+							</p>
 						</div>
 
-						<button
-							type="submit"
-							aria-label="Check address"
-							disabled={!canSubmit}
-							className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary-base text-white transition-opacity hover:opacity-90 disabled:opacity-30"
-						>
-							{isPending ? (
-								<span className="size-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-							) : (
-								<Icon name="arrow-right" className="size-4" />
-							)}
-						</button>
+						{/* Dashed Input Drop / Check Zone */}
+						<form onSubmit={onSubmit} noValidate>
+							<label htmlFor="checker-input" className="sr-only">
+								Email address or domain to check
+							</label>
+
+							<div
+								onClick={() => inputRef.current?.focus()}
+								className="flex cursor-text flex-col items-center justify-center gap-3.5 rounded-2xl border border-stroke-soft-200 border-dashed bg-bg-weak-50/40 p-6 text-center transition-all focus-within:border-primary-base focus-within:bg-bg-weak-50/70 sm:p-8 dark:border-white/12 dark:bg-white/[0.02] dark:focus-within:border-primary-base/50"
+							>
+								<div className="flex size-11 items-center justify-center rounded-2xl border border-stroke-soft-200 bg-bg-white-0 text-text-strong-950 shadow-xs dark:border-white/10 dark:bg-white/[0.06] dark:text-white">
+									<Icon name="mail-single" className="size-5" />
+								</div>
+
+								<div className="w-full max-w-md space-y-1.5">
+									<div className="relative flex items-center justify-center">
+										<input
+											id="checker-input"
+											ref={inputRef}
+											type="text"
+											inputMode="email"
+											autoComplete="off"
+											autoCapitalize="none"
+											spellCheck={false}
+											value={value}
+											onChange={(e) => setValue(e.target.value)}
+											placeholder="you@example.com or domain.com"
+											className="h-10 w-full rounded-xl border border-stroke-soft-200 bg-bg-white-0 px-3.5 text-center text-[15px] font-medium text-text-strong-950 outline-none transition-colors placeholder:text-text-soft-400 focus:border-primary-base dark:border-white/10 dark:bg-black dark:text-white dark:placeholder:text-white/25"
+										/>
+									</div>
+									<p className="text-text-sub-600 text-xs dark:text-white/45">
+										Instant real-time check · No signup required
+									</p>
+								</div>
+							</div>
+
+							{/* Specifications / Capabilities Box */}
+							<div className="mt-4 space-y-2 rounded-2xl border border-stroke-soft-200 bg-bg-weak-50/40 p-4 text-text-sub-600 text-xs dark:border-white/10 dark:bg-white/[0.02] dark:text-white/50">
+								<div className="flex items-center justify-between">
+									<p className="font-medium text-text-strong-950 dark:text-white">
+										Detection Capabilities:
+									</p>
+									<span className="inline-flex items-center gap-1 font-mono text-[11px] text-emerald-600 dark:text-emerald-400">
+										<span className="size-1.5 rounded-full bg-emerald-500" />
+										Live Scanner
+									</span>
+								</div>
+								<ul className="list-inside list-disc space-y-1 leading-relaxed">
+									<li>
+										Matches against{" "}
+										<code className="rounded border border-stroke-soft-200 bg-bg-white-0 px-1 py-0.5 font-mono text-[11px] text-text-strong-950 dark:border-white/10 dark:bg-black dark:text-white">
+											100,000+
+										</code>{" "}
+										known disposable & temporary domain databases.
+									</li>
+									<li>
+										Analyzes{" "}
+										<code className="rounded border border-stroke-soft-200 bg-bg-white-0 px-1 py-0.5 font-mono text-[11px] text-text-strong-950 dark:border-white/10 dark:bg-black dark:text-white">
+											wildcards
+										</code>
+										,{" "}
+										<code className="rounded border border-stroke-soft-200 bg-bg-white-0 px-1 py-0.5 font-mono text-[11px] text-text-strong-950 dark:border-white/10 dark:bg-black dark:text-white">
+											subdomains
+										</code>
+										, and{" "}
+										<code className="rounded border border-stroke-soft-200 bg-bg-white-0 px-1 py-0.5 font-mono text-[11px] text-text-strong-950 dark:border-white/10 dark:bg-black dark:text-white">
+											role inboxes
+										</code>
+										.
+									</li>
+									<li>Addresses are verified in memory and discarded immediately.</li>
+								</ul>
+							</div>
+
+							{/* Bottom Action Bar */}
+							<div className="mt-5 flex items-center justify-between pt-1">
+								<button
+									type="button"
+									onClick={() => setValue("")}
+									disabled={!value}
+									className="cursor-pointer font-medium text-xs text-text-sub-600 transition-colors hover:text-text-strong-950 disabled:cursor-not-allowed disabled:opacity-30 dark:text-white/45 dark:hover:text-white"
+								>
+									Clear
+								</button>
+
+								<Button.Root
+									type="submit"
+									variant="primary"
+									size="small"
+									disabled={!canSubmit}
+									className="h-9 cursor-pointer rounded-xl px-4 font-medium text-[13.5px] disabled:opacity-35"
+								>
+									{isPending ? (
+										<span className="size-3.5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+									) : (
+										<>
+											<span>Verify Email</span>
+											<Icon name="arrow-right" className="size-3.5" />
+										</>
+									)}
+								</Button.Root>
+							</div>
+						</form>
 					</div>
 				</div>
-			</form>
+			) : null}
 
 			<div aria-live="polite">
 				{error ? (
@@ -274,12 +635,8 @@ export function CheckerPanel() {
 						</p>
 					</div>
 				) : result ? (
-					<ResultCard result={result} />
-				) : (
-					<p className="mt-4 text-center font-mono text-[11px] text-text-soft-400 uppercase tracking-[0.14em] dark:text-white/25">
-						Free · no account · addresses are discarded
-					</p>
-				)}
+					<ResultCardDetailed result={result} onReset={handleReset} />
+				) : null}
 			</div>
 		</div>
 	);

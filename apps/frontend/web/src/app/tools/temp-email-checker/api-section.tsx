@@ -8,19 +8,10 @@ import type { SimpleIcon } from "simple-icons";
 import { siCurl, siGo, siNodedotjs, siPython } from "simple-icons";
 import {
 	apiEndpoint,
-	apiNotes,
 	apiResponseSample,
 	apiSnippets,
 } from "./content";
-import {
-	Band,
-	Cell,
-	CellCopy,
-	CellGrid,
-	CellLabel,
-	hairline,
-	WindowDots,
-} from "./grid";
+import { Band, hairline, WindowDots } from "./grid";
 import { LanguagePills, type PillTab } from "./language-pills";
 
 const PANEL_ID = "check-api-panel";
@@ -228,15 +219,6 @@ export function ApiSection() {
 						</div>
 					</div>
 				</div>
-
-				<CellGrid columns={2}>
-					{apiNotes.map((note) => (
-						<Cell key={note.title}>
-							<CellLabel icon={note.icon} label={note.tag} />
-							<CellCopy title={note.title} description={note.description} />
-						</Cell>
-					))}
-				</CellGrid>
 			</Band>
 		</>
 	);

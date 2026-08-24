@@ -1907,7 +1907,7 @@ export const Header = () => {
 						{mounted && session ? (
 							<FancyButton.Root
 								asChild
-								variant="neutral"
+								variant="primary"
 								size="xsmall"
 								className="px-3.5!"
 							>
@@ -2173,7 +2173,7 @@ export const Header = () => {
 									{mounted && session ? (
 										<FancyButton.Root
 											asChild
-											variant="neutral"
+											variant="primary"
 											size="medium"
 											className="w-full!"
 										>
