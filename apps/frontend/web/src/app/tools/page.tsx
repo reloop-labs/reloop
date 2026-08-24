@@ -3,6 +3,10 @@ import { BlogCta } from "@reloop/web/components/landing/blog/blog-cta";
 import { createLandingMetadata } from "@reloop/web/lib/landing/metadata";
 import { toolConfigs } from "@reloop/web/lib/landing/tools";
 import Link from "next/link";
+import {
+	domainBlocklistCount,
+	ipBlocklistCount,
+} from "./blocklist-checker/content";
 
 export const instant = false;
 
@@ -42,6 +46,18 @@ const TOOL_VISUAL_MAP: Record<string, ToolVisualMeta> = {
 			"Spam trigger keyword scanner",
 			"0–100 score & grade breakdown",
 			"Link safety & shortener audit",
+		],
+	},
+	"blocklist-checker": {
+		icon: "shield-check",
+		badge: "Deliverability",
+		badgeColor:
+			"bg-sky-500/10 text-sky-700 dark:text-sky-400 border-sky-500/20",
+		glowColor: "group-hover:border-sky-500/40",
+		features: [
+			`${ipBlocklistCount} IP DNS blocklists (ZEN, Barracuda, SpamCop)`,
+			`${domainBlocklistCount} domain URI lists (DBL, URIBL, SURBL)`,
+			"Failed queries reported as errors, not clean",
 		],
 	},
 	"temp-email-checker": {

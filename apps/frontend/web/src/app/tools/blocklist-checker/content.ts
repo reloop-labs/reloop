@@ -1,118 +1,162 @@
 import type { FaqItem } from "@reloop/web/components/faq-section";
 
-export const siteTitle = "Email Domain & IP Blocklist Checker — Free DNSBL Lookup";
-export const metaTitle = "Email Domain & IP Blocklist Checker | Reloop";
-export const metaDescription =
-	"Check if your domain or sending IP address is blacklisted on 50+ major anti-spam DNSBL databases (Spamhaus, Barracuda, SpamCop, SORBS). Free real-time deliverability diagnostic.";
+export const toolPath = "/tools/blocklist-checker";
 
-export const toolDescription =
-	"Query 50+ major global anti-spam DNSBL databases in real-time. Verify whether your sending domain or mail server IP is blacklisted, identify listing reasons, and get direct removal links.";
+/** Display names — keep in sync with `dnsbl-providers.ts`. */
+export const ipBlocklistNames = [
+	"Spamhaus ZEN",
+	"Barracuda BRBL",
+	"SpamCop SCBL",
+	"SORBS Aggregate",
+	"PSBL (Surriel)",
+	"NiX Spam (Manitu)",
+	"Mailspike BL",
+	"HostKarma Blacklist",
+	"GBUdb Truncate",
+	"SpamRATS! All",
+	"Spam Eating Monkey Black",
+	"NordSpam",
+	"UCEPROTECT Level 1",
+	"0Spam Project",
+	"Backscatterer",
+	"WPBL",
+	"SPFBL",
+] as const;
+
+export const domainBlocklistNames = [
+	"Spamhaus DBL",
+	"URIBL Multi",
+	"SURBL Multi",
+	"SORBS RHSBL",
+	"NordSpam DBL",
+	"Spam Eating Monkey URIBL",
+] as const;
+
+export const ipBlocklistCount = ipBlocklistNames.length;
+export const domainBlocklistCount = domainBlocklistNames.length;
+export const publicBlocklistCount = ipBlocklistCount + domainBlocklistCount;
+
+export const siteTitle = "IP & Domain DNS Blocklist Checker";
+export const metaTitle = "IP & Domain DNS Blocklist Checker";
+export const metaDescription = `Look up a sending IP or a domain name against ${publicBlocklistCount} public DNS blocklists (${ipBlocklistCount} IP lists, ${domainBlocklistCount} domain URI lists). Failed queries are errors, not a clean pass.`;
+
+export const toolDescription = `Queries ${publicBlocklistCount} public DNS blocklists — ${ipBlocklistCount} for sending IPs, ${domainBlocklistCount} for the domain name itself (DBL, URIBL, SURBL, and similar). This is a DNS lookup, not a website scan, and not Gmail or Microsoft reputation.`;
+
+export const toolKeywords = [
+	"email blocklist checker",
+	"dnsbl lookup",
+	"ip blacklist checker",
+	"spamhaus check",
+	"barracuda rbl check",
+	"rbl lookup",
+	"uribl surbl dbl",
+];
 
 export const reasons = [
 	{
 		icon: "shield-check",
-		title: "50+ Global DNSBL Networks",
+		title: `${ipBlocklistCount} IP DNS blocklists`,
 		description:
-			"Spamhaus, Barracuda, SpamCop, and SORBS aggregate databases queried concurrently in real-time.",
+			"Sending IPs are looked up on public zones such as Spamhaus ZEN, Barracuda BRBL, and SpamCop. These are DNS lists, not websites we crawl.",
+	},
+	{
+		icon: "globe",
+		title: `${domainBlocklistCount} domain URI lists`,
+		description:
+			"A domain name is checked on DBL, URIBL, SURBL, and similar URI lists. We do not treat your website or MX host as the sending IP.",
 	},
 	{
 		icon: "alert-triangle",
-		title: "Zero-Latency Delist Links",
+		title: "Failed queries are not ‘clean’",
 		description:
-			"Direct links to official removal forms so you can resolve false-positive listings immediately.",
-	},
-	{
-		icon: "mail",
-		title: "Automated MX & A Resolution",
-		description:
-			"Enter a bare domain (e.g. yourcompany.com) and the tool automatically locates your mail server IP.",
+			"Timeouts, SERVFAIL, and refused Spamhaus replies show as errors. Green means the lists that answered returned no hit.",
 	},
 	{
 		icon: "lock",
-		title: "100% Stateless & Private",
+		title: "No result store",
 		description:
-			"Searches are evaluated entirely in memory and discarded. No queries or domains are ever logged.",
+			"Lookups are not saved to a database. The IP or domain and the verdict are written to application logs for abuse control.",
 	},
 ];
 
 export const faqs: FaqItem[] = [
 	{
-		question: "What is an email blocklist (DNSBL / RBL)?",
-		answer:
-			"A DNS-based Blackhole List (DNSBL) or Real-time Blackhole List (RBL) is a public database of IP addresses and domains suspected of sending spam, hosting malware, or running open mail relays. Mail providers like Gmail, Microsoft 365, and Yahoo query these lists during SMTP connections to reject incoming spam.",
+		question: "What does this tool actually check?",
+		answer: `It queries ${publicBlocklistCount} public DNS blocklists (DNSBLs): ${ipBlocklistCount} IP lists and ${domainBlocklistCount} domain URI lists. A DNSBL is a DNS zone, not a website. Gmail, Microsoft, and Yahoo keep private reputation we cannot see.`,
 	},
 	{
-		question: "Why did my domain or IP get blacklisted?",
+		question: "If I enter a domain, are you scanning my website?",
 		answer:
-			"Common reasons for blocklisting include sudden spikes in email volume, sending to spam traps (unverified email addresses), compromised email accounts sending malware, high spam complaint rates (>0.1%), or missing authentication (SPF, DKIM, and DMARC).",
+			"No. The domain string is looked up on URI/domain blocklists (Spamhaus DBL, URIBL, SURBL, and similar). If SPF publishes dedicated ip4:/ip6: addresses, those sending IPs are also checked. We do not crawl the site or use the MX host as “your mail server.”",
+	},
+	{
+		question: "Why did my IP or domain get listed?",
+		answer:
+			"Common causes are spam-trap hits, a compromised host, open relays, or a sudden volume spike. A listing is a symptom. Fix the cause before asking a list to remove the entry.",
 	},
 	{
 		question: "How do I get removed from a blocklist?",
 		answer:
-			"First, fix the root cause (clean your contact list, verify DKIM/SPF, and eliminate spam triggers). Then, visit the official delist URL provided in the diagnostic report and submit a removal request. Most providers delist within 12–48 hours once verified.",
+			"Stop whatever caused the listing, then use that list’s own removal form (linked from a hit in this report). Reloop cannot delist you.",
 	},
 	{
-		question: "Which blocklists matter the most for email deliverability?",
+		question: "Which of these lists matter for deliverability?",
 		answer:
-			"The most impactful lists are Spamhaus (SBL, XBL, PBL), Barracuda BRBL, and SpamCop SCBL. Being listed on Spamhaus or Barracuda can cause immediate 80–100% email delivery failure across major consumer inboxes.",
+			"Spamhaus ZEN (IP) and DBL (domain), Barracuda BRBL, and SpamCop are the public lists most often cited in bounce text. A hit on a low-impact list is not the same as “mail will not send.”",
 	},
 	{
-		question: "Can I check both domain names and IP addresses?",
+		question: "Can I automate this via API?",
 		answer:
-			"Yes. You can enter a domain name (e.g. acme.com) or a raw IPv4 address (e.g. 198.51.100.1). When entering a domain name, the tool automatically queries your MX and A records to test the active sending mail server.",
-	},
-	{
-		question: "Can I automate blocklist monitoring via API?",
-		answer:
-			"Yes. Reloop exposes the blocklist verification engine as a public HTTP API (`POST https://api.reloop.sh/api/tools/v1/blocklist-check`), allowing engineering teams to run automated health checks in CI/CD and staging environments.",
+			'Yes. POST https://reloop.sh/api/tools/v1/blocklist-check with JSON {"target":"203.0.113.10"}. No API key. Rate limited to 60 requests per minute per IP.',
 	},
 ];
 
 export const faqGroups = [
 	{
-		title: "Blocklists & Reputation",
+		title: "What is checked",
 		items: faqs.slice(0, 3),
 	},
 	{
-		title: "Remediation & API Integration",
+		title: "Remediation & API",
 		items: faqs.slice(3, 6),
 	},
 ];
 
 export const apiResponseSample = `{
-  "target": "reloop.sh",
-  "input_type": "domain",
-  "resolved_ip": "76.76.21.21",
-  "hostname": "reloop.sh",
-  "is_clean": true,
-  "total_checked": 20,
-  "listed_count": 0,
-  "clean_count": 20,
-  "scan_duration_ms": 340,
+  "target": "203.0.113.10",
+  "inputType": "ip",
+  "ipVersion": "ipv4",
+  "resolvedIp": "203.0.113.10",
+  "hostname": null,
+  "checkedIps": [{ "ip": "203.0.113.10", "source": "input", "version": "ipv4" }],
+  "spfIncludes": [],
+  "spfRanges": [],
+  "ipNote": null,
+  "verdict": "clean",
+  "isClean": true,
+  "totalChecked": ${publicBlocklistCount},
+  "listedCount": 0,
+  "cleanCount": ${ipBlocklistCount},
+  "errorCount": 0,
+  "skippedCount": ${domainBlocklistCount},
+  "scanDurationMs": 340,
   "results": [
     {
       "id": "spamhaus-zen",
       "name": "Spamhaus ZEN",
       "host": "zen.spamhaus.org",
+      "listType": "ip",
       "category": "reputation",
-      "is_listed": false,
-      "response_codes": [],
-      "response_time_ms": 85,
-      "delist_url": "https://check.spamhaus.org"
-    },
-    {
-      "id": "barracuda",
-      "name": "Barracuda BRBL",
-      "host": "b.barracudacentral.org",
-      "category": "spam",
-      "is_listed": false,
-      "response_codes": [],
-      "response_time_ms": 112,
-      "delist_url": "https://www.barracudacentral.org/rbl/removal-request"
+      "impact": "high",
+      "status": "not_listed",
+      "isListed": false,
+      "responseCodes": [],
+      "responseTimeMs": 85,
+      "delistUrl": "https://check.spamhaus.org",
+      "listedTargets": []
     }
   ],
   "recommendations": [
-    "Your sending IP and domain are clean across all tested global blocklists.",
-    "Maintain strict SPF, DKIM, and DMARC enforcement to preserve reputation."
+    "No listings on the lists that returned a definitive answer. This is not a guarantee of inbox placement; Gmail, Microsoft, and Yahoo keep private reputation data."
   ]
 }`;

@@ -1,741 +1,266 @@
-import dns from "node:dns/promises";
 import net from "node:net";
+import { ToolsErrors } from "@be/tools/error/tools.error-response";
+import {
+	type CheckedIp,
+	type IpVersion,
+	isPlausibleDomain,
+	isPrivateOrReservedIpv4,
+	lookupSpf,
+	parseTarget,
+	reverseHostname,
+} from "./blocklist-input";
+import {
+	DNSBL_PROVIDERS,
+	DOMAIN_DNSBL_PROVIDERS,
+	IP_DNSBL_PROVIDERS,
+} from "./dnsbl-providers";
+import {
+	aggregateVerdict,
+	type BlocklistVerdict,
+	type DnsblItemResult,
+	mergeIpListResults,
+	querySingleDnsbl,
+	reverseIpForDnsbl,
+	skippedResult,
+} from "./dnsbl-query";
 
-export interface DnsblProvider {
-	id: string;
-	name: string;
-	host: string;
-	category: "reputation" | "spam" | "phishing" | "malware" | "open_relay";
-	delistUrl: string;
-	description: string;
-}
+export type { DnsblProvider } from "./dnsbl-providers";
+export { DNSBL_PROVIDERS, IP_DNSBL_PROVIDERS, DOMAIN_DNSBL_PROVIDERS };
 
-export interface DnsblCheckItemResult {
-	id: string;
-	name: string;
-	host: string;
-	category: "reputation" | "spam" | "phishing" | "malware" | "open_relay";
-	isListed: boolean;
-	responseCodes: string[];
-	responseTimeMs: number;
-	delistUrl: string;
-	description: string;
-	txtRecord?: string;
-	error?: string;
-}
+export type { DnsblItemResult, BlocklistVerdict };
 
 export interface BlocklistCheckResult {
 	target: string;
 	inputType: "domain" | "ip";
+	ipVersion: IpVersion | null;
 	resolvedIp: string | null;
 	hostname: string | null;
+	checkedIps: CheckedIp[];
+	spfIncludes: string[];
+	spfRanges: string[];
+	ipNote: string | null;
+	verdict: BlocklistVerdict;
 	isClean: boolean;
 	totalChecked: number;
 	listedCount: number;
 	cleanCount: number;
+	errorCount: number;
+	skippedCount: number;
 	scanDurationMs: number;
-	results: DnsblCheckItemResult[];
+	results: DnsblItemResult[];
 	recommendations: string[];
 }
 
-export const DNSBL_PROVIDERS: DnsblProvider[] = [
-	{
-		id: "spamhaus-zen",
-		name: "Spamhaus ZEN",
-		host: "zen.spamhaus.org",
-		category: "reputation",
-		delistUrl: "https://check.spamhaus.org",
-		description:
-			"Spamhaus ZEN combines SBL, CSS, XBL, and PBL data into a single query zone.",
-	},
-	{
-		id: "spamhaus-sbl",
-		name: "Spamhaus SBL",
-		host: "sbl.spamhaus.org",
-		category: "spam",
-		delistUrl: "https://check.spamhaus.org",
-		description: "Spamhaus verified spam origins and known spam operations.",
-	},
-	{
-		id: "spamhaus-xbl",
-		name: "Spamhaus XBL",
-		host: "xbl.spamhaus.org",
-		category: "malware",
-		delistUrl: "https://check.spamhaus.org",
-		description: "Spamhaus exploits, botnets, and worm-infected zombie machines.",
-	},
-	{
-		id: "spamhaus-pbl",
-		name: "Spamhaus PBL",
-		host: "pbl.spamhaus.org",
-		category: "open_relay",
-		delistUrl: "https://check.spamhaus.org",
-		description: "End-user dynamic IP space that should not send direct-to-MX email.",
-	},
-	{
-		id: "barracuda",
-		name: "Barracuda BRBL",
-		host: "b.barracudacentral.org",
-		category: "spam",
-		delistUrl: "https://www.barracudacentral.org/rbl/removal-request",
-		description:
-			"Barracuda Reputation Block List tracks spam and malware sending sources.",
-	},
-	{
-		id: "spamcop",
-		name: "SpamCop SCBL",
-		host: "bl.spamcop.net",
-		category: "spam",
-		delistUrl: "https://www.spamcop.net/bl.shtml",
-		description:
-			"SpamCop Blocking List based on real-time automated user spam reporting.",
-	},
-	{
-		id: "sorbs-dnsbl",
-		name: "SORBS Aggregate",
-		host: "dnsbl.sorbs.net",
-		category: "reputation",
-		delistUrl: "http://www.sorbs.net/delisting",
-		description: "Spam and Open Relay Blocking System aggregate database.",
-	},
-	{
-		id: "sorbs-spam",
-		name: "SORBS Spam",
-		host: "spam.dnsbl.sorbs.net",
-		category: "spam",
-		delistUrl: "http://www.sorbs.net/delisting",
-		description: "SORBS verified spam source hosts and repeat offenders.",
-	},
-	{
-		id: "sorbs-socks",
-		name: "SORBS SOCKS",
-		host: "socks.dnsbl.sorbs.net",
-		category: "open_relay",
-		delistUrl: "http://www.sorbs.net/delisting",
-		description: "Open SOCKS proxies vulnerable to unauthorized mail relaying.",
-	},
-	{
-		id: "sorbs-http",
-		name: "SORBS HTTP Proxy",
-		host: "http.dnsbl.sorbs.net",
-		category: "open_relay",
-		delistUrl: "http://www.sorbs.net/delisting",
-		description: "Open HTTP CONNECT proxies tested for spam relaying.",
-	},
-	{
-		id: "sorbs-misc",
-		name: "SORBS Misc",
-		host: "misc.dnsbl.sorbs.net",
-		category: "open_relay",
-		delistUrl: "http://www.sorbs.net/delisting",
-		description: "Miscellaneous open proxy and vulnerable relay servers.",
-	},
-	{
-		id: "sorbs-smtp",
-		name: "SORBS Open SMTP",
-		host: "smtp.dnsbl.sorbs.net",
-		category: "open_relay",
-		delistUrl: "http://www.sorbs.net/delisting",
-		description: "Open mail servers that relay unauthenticated outbound mail.",
-	},
-	{
-		id: "abuseat-cbl",
-		name: "Abuseat CBL",
-		host: "cbl.abuseat.org",
-		category: "malware",
-		delistUrl: "https://www.abuseat.org/lookup.cgi",
-		description:
-			"Composite Blocking List tracking infected botnet and spammer IPs.",
-	},
-	{
-		id: "backscatterer",
-		name: "Backscatterer",
-		host: "ips.backscatterer.org",
-		category: "reputation",
-		delistUrl: "http://www.backscatterer.org/?target=removal",
-		description:
-			"Identifies servers sending misdirected bounces and autoresponders.",
-	},
-	{
-		id: "mailspike-bl",
-		name: "Mailspike BL",
-		host: "bl.mailspike.net",
-		category: "spam",
-		delistUrl: "https://mailspike.org/iplookup.html",
-		description: "Mailspike zero-hour real-time IP blackhole list.",
-	},
-	{
-		id: "mailspike-rep",
-		name: "Mailspike Reputation",
-		host: "rep.mailspike.net",
-		category: "reputation",
-		delistUrl: "https://mailspike.org/iplookup.html",
-		description: "Mailspike distributed IP reputation classifier.",
-	},
-	{
-		id: "uceprotect-1",
-		name: "UCEPROTECT Level 1",
-		host: "dnsbl-1.uceprotect.net",
-		category: "spam",
-		delistUrl: "http://www.uceprotect.net/en/index.php?m=7",
-		description: "Direct spam source IP addresses within the last 7 days.",
-	},
-	{
-		id: "uceprotect-2",
-		name: "UCEPROTECT Level 2",
-		host: "dnsbl-2.uceprotect.net",
-		category: "spam",
-		delistUrl: "http://www.uceprotect.net/en/index.php?m=7",
-		description: "Subnets and allocations with high spam density.",
-	},
-	{
-		id: "uceprotect-3",
-		name: "UCEPROTECT Level 3",
-		host: "dnsbl-3.uceprotect.net",
-		category: "reputation",
-		delistUrl: "http://www.uceprotect.net/en/index.php?m=7",
-		description: "Entire autonomous systems (ASNs) with persistent spam issues.",
-	},
-	{
-		id: "dronebl",
-		name: "DroneBL",
-		host: "dnsbl.dronebl.org",
-		category: "open_relay",
-		delistUrl: "https://dronebl.org/lookup",
-		description:
-			"Real-time blocklist for open proxies, botnets, and worm infected hosts.",
-	},
-	{
-		id: "nordspam",
-		name: "NordSpam",
-		host: "bl.nordspam.com",
-		category: "spam",
-		delistUrl: "https://www.nordspam.com/delisting",
-		description: "Nordic spam detection engine and real-time blocklist.",
-	},
-	{
-		id: "blocklist-de",
-		name: "Blocklist.de",
-		host: "bl.blocklist.de",
-		category: "malware",
-		delistUrl: "https://www.blocklist.de/en/search.html",
-		description: "Automated Fail2ban intrusion and attack reporting database.",
-	},
-	{
-		id: "gbudb-truncate",
-		name: "GBUdb Truncate",
-		host: "truncate.gbudb.net",
-		category: "reputation",
-		delistUrl: "http://www.gbudb.com/truncate",
-		description: "Statistical IP reputation database updated in real-time.",
-	},
-	{
-		id: "psbl",
-		name: "PSBL (Surriel)",
-		host: "psbl.surriel.com",
-		category: "spam",
-		delistUrl: "https://psbl.surriel.com/remove",
-		description:
-			"Passive Spam Block List focused exclusively on pure spam sources.",
-	},
-	{
-		id: "spamrats-all",
-		name: "SpamRATS! All",
-		host: "all.spamrats.com",
-		category: "spam",
-		delistUrl: "https://www.spamrats.com/lookup.php",
-		description: "Real-time threat engine tracking brute-force bots and spam origins.",
-	},
-	{
-		id: "sem-black",
-		name: "Spam Eating Monkey Black",
-		host: "bl.spameatingmonkey.net",
-		category: "spam",
-		delistUrl: "https://spameatingmonkey.com/lookup",
-		description: "Monitors senders sending to trap mailboxes in real-time.",
-	},
-	{
-		id: "sem-net",
-		name: "Spam Eating Monkey Net",
-		host: "netbl.spameatingmonkey.net",
-		category: "reputation",
-		delistUrl: "https://spameatingmonkey.com/lookup",
-		description: "Network-wide reputation tracking for spam-heavy subnets.",
-	},
-	{
-		id: "hostkarma",
-		name: "HostKarma Blacklist",
-		host: "hostkarma.junkemailfilter.com",
-		category: "reputation",
-		delistUrl: "http://wiki.junkemailfilter.com/index.php/Hostkarma",
-		description: "Automated real-time IP reputation tracking.",
-	},
-	{
-		id: "wpbl",
-		name: "WPBL (Weighted Private)",
-		host: "db.wpbl.info",
-		category: "reputation",
-		delistUrl: "https://wpbl.info",
-		description:
-			"Weighted reputation list based on confirmed spam delivery reports.",
-	},
-	{
-		id: "interserver",
-		name: "InterServer RBL",
-		host: "rbl.interserver.net",
-		category: "spam",
-		delistUrl: "https://rbl.interserver.net",
-		description: "Real-time blacklist maintained across web hosting clusters.",
-	},
-	{
-		id: "fabel",
-		name: "Fabel SpamSources",
-		host: "spamsources.fabel.dk",
-		category: "spam",
-		delistUrl: "http://www.fabel.dk/spam",
-		description: "Monitors verified spam origins and automated email scanners.",
-	},
-	{
-		id: "s5h-all",
-		name: "S5h All-in-One",
-		host: "all.s5h.net",
-		category: "reputation",
-		delistUrl: "http://www.s5h.net",
-		description: "Combined real-time DNSBL zone tracking spam and open relays.",
-	},
-	{
-		id: "zapbl",
-		name: "ZapBL DNSBL",
-		host: "dnsbl.zapbl.net",
-		category: "spam",
-		delistUrl: "https://zapbl.net",
-		description: "Aggressive real-time anti-spam and malicious bot network tracker.",
-	},
-	{
-		id: "kempt",
-		name: "Kempt DNSBL",
-		host: "dnsbl.kempt.net",
-		category: "spam",
-		delistUrl: "http://kempt.net/dnsbl",
-		description: "Real-time tracker for automated commercial spam engines.",
-	},
-	{
-		id: "suomispam",
-		name: "SuomiSpam BL",
-		host: "bl.suomispam.net",
-		category: "spam",
-		delistUrl: "https://suomispam.net/delist",
-		description: "Automated real-time spam reporter and trap monitoring network.",
-	},
-	{
-		id: "nixspam",
-		name: "NiX Spam (Manitu)",
-		host: "ix.dnsbl.manitu.net",
-		category: "spam",
-		delistUrl: "http://www.dnsbl.manitu.net",
-		description: "German real-time DNSBL monitoring high-volume spam operations.",
-	},
-	{
-		id: "virbl",
-		name: "VirBL Antivirus",
-		host: "virbl.dnsbl.bit.nl",
-		category: "malware",
-		delistUrl: "http://virbl.bit.nl",
-		description: "IP addresses observed sending infected attachments and viruses.",
-	},
-	{
-		id: "dan-tor",
-		name: "Dan.me.uk Tor Exits",
-		host: "tor.dan.me.uk",
-		category: "open_relay",
-		delistUrl: "https://www.dan.me.uk/torlist",
-		description: "Live list of active Tor network exit nodes.",
-	},
-	{
-		id: "efnet-rbl",
-		name: "EFnet RBL",
-		host: "rbl.efnetrbl.org",
-		category: "open_relay",
-		delistUrl: "http://rbl.efnetrbl.org",
-		description: "Tracks open proxies, infected hosts, and botnets across IRC.",
-	},
-	{
-		id: "calivent",
-		name: "Calivent DNSBL",
-		host: "dnsbl.calivent.com.pe",
-		category: "spam",
-		delistUrl: "http://dnsbl.calivent.com.pe",
-		description: "Latin American and global spam source tracking network.",
-	},
-	{
-		id: "imp-spam",
-		name: "IMP Spam RBL",
-		host: "spamrbl.imp.ch",
-		category: "spam",
-		delistUrl: "http://www.imp.ch",
-		description: "Swiss internet provider real-time anti-spam database.",
-	},
-	{
-		id: "imp-worm",
-		name: "IMP Worm RBL",
-		host: "wormrbl.imp.ch",
-		category: "malware",
-		delistUrl: "http://www.imp.ch",
-		description: "IP addresses propagating worms and malicious automated scripts.",
-	},
-	{
-		id: "megarbl",
-		name: "MegaRBL",
-		host: "rbl.megarbl.net",
-		category: "spam",
-		delistUrl: "http://www.megarbl.net",
-		description: "Real-time blocklist tracking aggressive spam networks.",
-	},
-	{
-		id: "0spam",
-		name: "0Spam Project",
-		host: "0spam.fusionzero.com",
-		category: "spam",
-		delistUrl: "https://0spam.org",
-		description: "Community-driven real-time blocklist for fraudulent senders.",
-	},
-	{
-		id: "swinog",
-		name: "SwinOG RBL",
-		host: "dnsrbl.swinog.ch",
-		category: "spam",
-		delistUrl: "http://swinog.ch",
-		description: "Swiss Network Operators Group distributed anti-spam RBL.",
-	},
-	{
-		id: "tiopan",
-		name: "Tiopan Spam Filter",
-		host: "bl.tiopan.com",
-		category: "spam",
-		delistUrl: "http://www.tiopan.com",
-		description: "Real-time reputation filter tracking unsolicited mail sources.",
-	},
-	{
-		id: "drmx",
-		name: "DRMX Filter",
-		host: "bl.drmx.org",
-		category: "spam",
-		delistUrl: "http://www.drmx.org",
-		description: "Automated honeypot detection for high-velocity spam.",
-	},
-	{
-		id: "rvsoft",
-		name: "RV-Soft DNSBL",
-		host: "dnsbl.rv-soft.info",
-		category: "spam",
-		delistUrl: "http://www.rv-soft.info",
-		description: "European anti-spam and security scanning database.",
-	},
-	{
-		id: "redhawk",
-		name: "Redhawk Access",
-		host: "access.redhawk.org",
-		category: "reputation",
-		delistUrl: "http://access.redhawk.org",
-		description: "Real-time access reputation database for email sending servers.",
-	},
-	{
-		id: "rbldns-ru",
-		name: "RBLDNS Network",
-		host: "rbl.rbldns.ru",
-		category: "spam",
-		delistUrl: "http://rbldns.ru",
-		description: "Eastern European and global spam trap monitoring network.",
-	},
-];
+function ipVersionOf(ip: string): IpVersion {
+	return net.isIPv6(ip) ? "ipv6" : "ipv4";
+}
 
-const resolver = new dns.Resolver();
-resolver.setServers(["1.1.1.1", "1.0.0.1", "8.8.8.8", "8.8.4.4"]);
+function uniqueIps(ips: string[]): string[] {
+	return [...new Set(ips)];
+}
 
-function withTimeout<T>(
-	promise: Promise<T>,
-	ms: number,
-	errorMsg = "DNS query timeout",
-): Promise<T> {
-	return Promise.race([
-		promise,
-		new Promise<never>((_, reject) =>
-			setTimeout(() => reject(new Error(errorMsg)), ms),
+function buildRecommendations(result: {
+	verdict: BlocklistVerdict;
+	listedCount: number;
+	errorCount: number;
+	inputType: "domain" | "ip";
+	checkedIps: CheckedIp[];
+	spfIncludes: string[];
+	ipNote: string | null;
+}): string[] {
+	const lines: string[] = [];
+
+	if (result.verdict === "listed") {
+		lines.push(
+			`Listed on ${result.listedCount} list(s). Fix the cause (traps, compromised hosts, unauthenticated mail), then use the list's own removal form.`,
+		);
+	} else if (result.verdict === "inconclusive") {
+		lines.push(
+			"No confirmed listings, but at least one high-impact list did not answer. That is not a clean bill of health — retry, or query that list from a dedicated resolver.",
+		);
+	} else {
+		lines.push(
+			"No listings on the lists that returned a definitive answer. This is not a guarantee of inbox placement; Gmail, Microsoft, and Yahoo keep private reputation data.",
+		);
+	}
+
+	if (result.errorCount > 0) {
+		lines.push(
+			`${result.errorCount} list(s) timed out, refused the query, or returned an error. Failed queries are reported as errors, not as clean.`,
+		);
+	}
+
+	if (result.ipNote) {
+		lines.push(result.ipNote);
+	} else if (result.inputType === "domain" && result.checkedIps.length === 0) {
+		lines.push(
+			"No dedicated ip4:/ip6: sending addresses were found on this domain's SPF record. Enter the SMTP IP from a bounce or your ESP dashboard to check IP lists. include: mechanisms (Google, Microsoft, Amazon, and other ESPs) were not expanded.",
+		);
+	}
+
+	if (result.spfIncludes.length > 0 && result.checkedIps.length === 0) {
+		lines.push(
+			`SPF delegates sending via include: (${result.spfIncludes.slice(0, 4).join(", ")}). Shared provider IPs are not checked here.`,
+		);
+	}
+
+	return lines;
+}
+
+async function queryIpProviders(
+	checkedIps: CheckedIp[],
+): Promise<DnsblItemResult[]> {
+	if (checkedIps.length === 0) {
+		return IP_DNSBL_PROVIDERS.map((provider) =>
+			skippedResult(
+				provider,
+				"No sending IP to query. Enter an IP, or publish ip4:/ip6: in SPF.",
+			),
+		);
+	}
+
+	return Promise.all(
+		IP_DNSBL_PROVIDERS.map(async (provider) => {
+			const parts = await Promise.all(
+				checkedIps.map((item) => {
+					const supported =
+						item.version === "ipv6"
+							? provider.supportsIpv6
+							: provider.supportsIpv4;
+					if (!supported) {
+						return skippedResult(
+							provider,
+							item.version === "ipv6"
+								? "This list does not publish an IPv6 zone."
+								: "This list does not publish an IPv4 zone.",
+						);
+					}
+					const reversed = reverseIpForDnsbl(item.ip);
+					return querySingleDnsbl({
+						queryName: `${reversed}.${provider.host}`,
+						targetLabel: item.ip,
+						provider,
+					});
+				}),
+			);
+			return mergeIpListResults(provider, parts);
+		}),
+	);
+}
+
+async function queryDomainProviders(
+	domain: string,
+): Promise<DnsblItemResult[]> {
+	return Promise.all(
+		DOMAIN_DNSBL_PROVIDERS.map((provider) =>
+			querySingleDnsbl({
+				queryName: `${domain}.${provider.host}`,
+				targetLabel: domain,
+				provider,
+			}),
 		),
-	]);
+	);
 }
 
-/**
- * Reverses an IPv4 address for DNSBL querying.
- * Example: "192.0.2.1" -> "1.2.0.192"
- */
-export function reverseIpv4(ip: string): string {
-	const parts = ip.split(".");
-	if (parts.length !== 4) return ip;
-	return parts.reverse().join(".");
-}
-
-/**
- * Evaluates whether DNS response codes represent a true listing or a query error / refusal.
- * Handles RFC 5782 refused codes (127.255.255.x) and provider-specific return ranges.
- */
-function evaluateListingStatus(
-	providerId: string,
-	addresses: string[] | null | undefined,
-): { isListed: boolean; validCodes: string[] } {
-	if (!addresses || addresses.length === 0) {
-		return { isListed: false, validCodes: [] };
-	}
-
-	// Filter out RFC 5782 error / refused codes (e.g. 127.255.255.254 returned by Spamhaus on public resolvers)
-	const nonRefusedCodes = addresses.filter((code) => {
-		if (code.startsWith("127.255.255.")) return false;
-		if (code === "127.0.0.255") return false;
-		return true;
-	});
-
-	if (nonRefusedCodes.length === 0) {
-		return { isListed: false, validCodes: [] };
-	}
-
-	// Spamhaus (zen, sbl, xbl, pbl)
-	if (providerId.startsWith("spamhaus-")) {
-		const validSpamhaus = nonRefusedCodes.filter((code) => {
-			const parts = code.split(".");
-			if (
-				parts.length === 4 &&
-				parts[0] === "127" &&
-				parts[1] === "0" &&
-				parts[2] === "0"
-			) {
-				const last = Number.parseInt(parts[3] || "0", 10);
-				return last >= 2 && last <= 11;
-			}
-			return false;
-		});
-		return { isListed: validSpamhaus.length > 0, validCodes: validSpamhaus };
-	}
-
-	// HostKarma: 127.0.0.1 = Whitelist (Clean), 127.0.0.2-4 = Black/Yellow/Brown
-	if (providerId === "hostkarma") {
-		const blacklisted = nonRefusedCodes.filter(
-			(a) => a === "127.0.0.2" || a === "127.0.0.3" || a === "127.0.0.4",
-		);
-		return { isListed: blacklisted.length > 0, validCodes: blacklisted };
-	}
-
-	// DroneBL: Ignore 127.0.0.1 (not listed) and 127.0.0.13 (testing)
-	if (providerId === "dronebl") {
-		const blacklisted = nonRefusedCodes.filter(
-			(a) => a !== "127.0.0.1" && a !== "127.0.0.13",
-		);
-		return { isListed: blacklisted.length > 0, validCodes: blacklisted };
-	}
-
-	return { isListed: nonRefusedCodes.length > 0, validCodes: nonRefusedCodes };
-}
-
-/**
- * Queries a single DNSBL zone for a reversed IP address.
- */
-async function querySingleDnsbl(
-	reversedIp: string,
-	provider: DnsblProvider,
-	timeoutMs = 2500,
-): Promise<DnsblCheckItemResult> {
-	const queryHost = `${reversedIp}.${provider.host}`;
-	const start = Date.now();
-
-	try {
-		const addresses = await withTimeout(
-			resolver.resolve4(queryHost),
-			timeoutMs,
-		);
-		const elapsed = Date.now() - start;
-
-		const { isListed, validCodes } = evaluateListingStatus(
-			provider.id,
-			addresses,
-		);
-
-		let txtRecord: string | undefined;
-		if (isListed) {
-			try {
-				const txts = await withTimeout(
-					resolver.resolveTxt(queryHost),
-					1200,
-				);
-				if (txts && txts.length > 0) {
-					txtRecord = txts.flat().join(" ").trim();
-				}
-			} catch {
-				// TXT lookup optional
-			}
-		}
-
-		return {
-			id: provider.id,
-			name: provider.name,
-			host: provider.host,
-			category: provider.category,
-			isListed,
-			responseCodes: validCodes,
-			responseTimeMs: elapsed,
-			delistUrl: provider.delistUrl,
-			description: provider.description,
-			txtRecord,
-		};
-	} catch (error) {
-		const elapsed = Date.now() - start;
-		const code = (error as { code?: string })?.code;
-		const message = (error as Error).message;
-
-		// ENOTFOUND / ENODATA / ESERVFAIL means not listed
-		const isClean = code === "ENOTFOUND" || code === "ENODATA" || code === "ESERVFAIL";
-
-		return {
-			id: provider.id,
-			name: provider.name,
-			host: provider.host,
-			category: provider.category,
-			isListed: false,
-			responseCodes: [],
-			responseTimeMs: elapsed,
-			delistUrl: provider.delistUrl,
-			description: provider.description,
-			error: isClean ? undefined : message,
-		};
-	}
-}
-
-/**
- * Main Controller for Blocklist Check
- */
 export async function checkBlocklistController(
 	rawInput: string,
 ): Promise<BlocklistCheckResult> {
 	const startTime = Date.now();
-	const cleaned = (rawInput || "")
-		.trim()
-		.toLowerCase()
-		.replace(/^https?:\/\//i, "")
-		.replace(/\/.*$/, "");
+	const parsed = parseTarget(rawInput);
 
-	if (!cleaned) {
-		throw new Error("Domain or IP address is required.");
+	if (!parsed.target) {
+		throw ToolsErrors.blocklistEmptyInput();
 	}
 
-	let inputType: "domain" | "ip" = "domain";
-	let targetIp = cleaned;
-	let resolvedHostname: string | null = null;
+	if (parsed.inputType === "domain" && !isPlausibleDomain(parsed.target)) {
+		throw ToolsErrors.blocklistInvalidTarget();
+	}
 
-	if (net.isIPv4(cleaned)) {
-		inputType = "ip";
-		targetIp = cleaned;
-		try {
-			const hostnames = await withTimeout(resolver.reverse(cleaned), 1500);
-			if (hostnames && hostnames.length > 0) {
-				resolvedHostname = hostnames[0] ?? null;
-			}
-		} catch {
-			resolvedHostname = null;
+	const checkedIps: CheckedIp[] = [];
+	let hostname: string | null = null;
+	let spfIncludes: string[] = [];
+	let spfRanges: string[] = [];
+	let ipNote: string | null = null;
+
+	if (parsed.inputType === "ip") {
+		checkedIps.push({
+			ip: parsed.target,
+			source: "input",
+			version: parsed.ipVersion ?? ipVersionOf(parsed.target),
+		});
+		hostname = await reverseHostname(parsed.target);
+		if (parsed.ipVersion === "ipv4" && isPrivateOrReservedIpv4(parsed.target)) {
+			ipNote =
+				"This address is private or reserved. DNSBL hits on RFC1918 space are not meaningful for public mail delivery. 127.0.0.2 is the RFC 5782 test listing and is expected to be listed.";
 		}
 	} else {
-		inputType = "domain";
-		resolvedHostname = cleaned;
-		let resolved = false;
-
-		// 1. Try MX resolution first to check sending mail server IP
-		try {
-			const mxRecords = await withTimeout(resolver.resolveMx(cleaned), 1500);
-			if (mxRecords && mxRecords.length > 0) {
-				mxRecords.sort((a, b) => a.priority - b.priority);
-				const primaryMx = mxRecords[0]?.exchange;
-				if (primaryMx) {
-					const ips = await withTimeout(resolver.resolve4(primaryMx), 1500);
-					if (ips && ips.length > 0 && ips[0]) {
-						targetIp = ips[0];
-						resolved = true;
-					}
-				}
-			}
-		} catch {
-			// MX failed or not found, fall back to A record
+		hostname = parsed.target;
+		const spf = await lookupSpf(parsed.target);
+		spfIncludes = spf.includes;
+		spfRanges = spf.ranges;
+		for (const ip of uniqueIps(spf.ips).slice(0, 5)) {
+			checkedIps.push({
+				ip,
+				source: "spf",
+				version: ipVersionOf(ip),
+			});
 		}
-
-		// 2. Fallback to domain A record with custom public DNS (Cloudflare/Google)
-		if (!resolved) {
-			try {
-				const ips = await withTimeout(resolver.resolve4(cleaned), 1500);
-				if (ips && ips.length > 0 && ips[0]) {
-					targetIp = ips[0];
-					resolved = true;
-				}
-			} catch {
-				// Custom DNS failed
-			}
-		}
-
-		// 3. Fallback to system DNS resolver
-		if (!resolved) {
-			try {
-				const ips = await withTimeout(dns.resolve4(cleaned), 1500);
-				if (ips && ips.length > 0 && ips[0]) {
-					targetIp = ips[0];
-					resolved = true;
-				}
-			} catch {
-				// Failed
-			}
-		}
-
-		if (!resolved) {
-			throw new Error(
-				`Could not resolve DNS records for "${cleaned}". Please verify the domain or IP address.`,
-			);
+		if (spf.ranges.length > 0 && checkedIps.length === 0) {
+			ipNote = `SPF publishes CIDR ranges (${spf.ranges.slice(0, 3).join(", ")}) rather than single sending IPs. Enter a specific SMTP IP to check IP lists.`;
 		}
 	}
 
-	const reversed = reverseIpv4(targetIp);
+	const ipResultsPromise = queryIpProviders(checkedIps);
+	const domainResultsPromise =
+		parsed.inputType === "domain"
+			? queryDomainProviders(parsed.target)
+			: Promise.resolve(
+					DOMAIN_DNSBL_PROVIDERS.map((provider) =>
+						skippedResult(
+							provider,
+							"Domain URI lists are not queried for a raw IP address.",
+						),
+					),
+				);
 
-	// Execute all DNSBL checks concurrently
-	const results = await Promise.all(
-		DNSBL_PROVIDERS.map((provider) => querySingleDnsbl(reversed, provider)),
-	);
+	const [ipResults, domainResults] = await Promise.all([
+		ipResultsPromise,
+		domainResultsPromise,
+	]);
 
-	const listedCount = results.filter((r) => r.isListed).length;
-	const cleanCount = results.length - listedCount;
-	const isClean = listedCount === 0;
-	const scanDurationMs = Date.now() - startTime;
+	const results = [...ipResults, ...domainResults];
+	const stats = aggregateVerdict(results);
+	const resolvedIp = checkedIps[0]?.ip ?? null;
 
-	const recommendations: string[] = [];
-	if (isClean) {
-		recommendations.push(
-			"Your sending IP and domain are clean across all tested global blocklists.",
-		);
-		recommendations.push(
-			"Maintain strict SPF, DKIM, and DMARC enforcement to preserve reputation.",
-		);
-	} else {
-		recommendations.push(
-			`Identified ${listedCount} active listing(s). Visit the official delist links to request removal.`,
-		);
-		recommendations.push(
-			"Investigate recent spam complaint spikes or unauthenticated outbound mail activity.",
-		);
-	}
+	const payload = {
+		verdict: stats.verdict,
+		listedCount: stats.listedCount,
+		errorCount: stats.errorCount,
+		inputType: parsed.inputType,
+		checkedIps,
+		spfIncludes,
+		ipNote,
+	};
 
 	return {
-		target: cleaned,
-		inputType,
-		resolvedIp: targetIp,
-		hostname: resolvedHostname,
-		isClean,
+		target: parsed.target,
+		inputType: parsed.inputType,
+		ipVersion: parsed.ipVersion,
+		resolvedIp,
+		hostname,
+		checkedIps,
+		spfIncludes,
+		spfRanges,
+		ipNote,
+		verdict: stats.verdict,
+		isClean: stats.isClean,
 		totalChecked: results.length,
-		listedCount,
-		cleanCount,
-		scanDurationMs,
+		listedCount: stats.listedCount,
+		cleanCount: stats.cleanCount,
+		errorCount: stats.errorCount,
+		skippedCount: stats.skippedCount,
+		scanDurationMs: Date.now() - startTime,
 		results,
-		recommendations,
+		recommendations: buildRecommendations(payload),
 	};
 }

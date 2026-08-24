@@ -169,8 +169,8 @@ export namespace ToolsModel {
 			minLength: 1,
 			maxLength: 255,
 			description:
-				"Domain name (e.g. example.com) or IPv4 address (e.g. 198.51.100.1).",
-			examples: ["reloop.sh", "1.1.1.1"],
+				"Domain name, IPv4 address, or IPv6 address (e.g. example.com, 198.51.100.1).",
+			examples: ["reloop.sh", "1.1.1.1", "2001:4860:4860::8888"],
 		}),
 	});
 
@@ -178,37 +178,70 @@ export namespace ToolsModel {
 		target: t.String({
 			minLength: 1,
 			maxLength: 255,
-			description: "Domain name or IPv4 address.",
+			description: "Domain name, IPv4 address, or IPv6 address.",
 		}),
 	});
+
+	const listingStatus = t.Union([
+		t.Literal("listed"),
+		t.Literal("not_listed"),
+		t.Literal("error"),
+		t.Literal("skipped"),
+	]);
 
 	export const blocklistCheckResponse = t.Object({
 		target: t.String(),
 		inputType: t.Union([t.Literal("domain"), t.Literal("ip")]),
+		ipVersion: t.Union([t.Literal("ipv4"), t.Literal("ipv6"), t.Null()]),
 		resolvedIp: t.Union([t.String(), t.Null()]),
 		hostname: t.Union([t.String(), t.Null()]),
+		checkedIps: t.Array(
+			t.Object({
+				ip: t.String(),
+				source: t.Union([t.Literal("input"), t.Literal("spf")]),
+				version: t.Union([t.Literal("ipv4"), t.Literal("ipv6")]),
+			}),
+		),
+		spfIncludes: t.Array(t.String()),
+		spfRanges: t.Array(t.String()),
+		ipNote: t.Union([t.String(), t.Null()]),
+		verdict: t.Union([
+			t.Literal("clean"),
+			t.Literal("listed"),
+			t.Literal("inconclusive"),
+		]),
 		isClean: t.Boolean(),
 		totalChecked: t.Number(),
 		listedCount: t.Number(),
 		cleanCount: t.Number(),
+		errorCount: t.Number(),
+		skippedCount: t.Number(),
 		scanDurationMs: t.Number(),
 		results: t.Array(
 			t.Object({
 				id: t.String(),
 				name: t.String(),
 				host: t.String(),
+				listType: t.Union([t.Literal("ip"), t.Literal("domain")]),
 				category: t.Union([
 					t.Literal("reputation"),
 					t.Literal("spam"),
-					t.Literal("phishing"),
 					t.Literal("malware"),
-					t.Literal("open_relay"),
+					t.Literal("domain"),
 				]),
+				impact: t.Union([
+					t.Literal("high"),
+					t.Literal("medium"),
+					t.Literal("low"),
+				]),
+				status: listingStatus,
 				isListed: t.Boolean(),
 				responseCodes: t.Array(t.String()),
 				responseTimeMs: t.Number(),
 				delistUrl: t.String(),
 				description: t.String(),
+				listedTargets: t.Array(t.String()),
+				txtRecord: t.Optional(t.String()),
 				error: t.Optional(t.String()),
 			}),
 		),

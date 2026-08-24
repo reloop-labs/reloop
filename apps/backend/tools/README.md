@@ -17,7 +17,7 @@ consumer providers. Powers the [temp email checker](https://reloop.sh/tools/temp
 | `GET` | `/api/tools/v1/check?email=…` | Same, for links and `curl` |
 | `POST` | `/api/tools/v1/spam-check` | Check email subject & copy spam score |
 | `GET` | `/api/tools/v1/spam-check?subject=…&body=…` | Same, for links and `curl` |
-| `POST` | `/api/tools/v1/blocklist-check` | Check domain or IP across 20+ DNSBL blocklists |
+| `POST` | `/api/tools/v1/blocklist-check` | Look up an IP or domain name on 23 public DNS blocklists |
 | `GET` | `/api/tools/v1/blocklist-check?target=…` | Same, for links and `curl` |
 
 ```bash
@@ -55,9 +55,9 @@ Verdicts are `invalid`, `disposable`, `risky` (a real but shared team inbox) or
   no UA by default and this endpoint is meant to be called from other people's
   applications.
 - **Stateless.** No Postgres, no NATS. Redis backs rate limiting only.
-- **Nothing is stored.** Addresses are never written anywhere, and only the
-  domain and verdict reach the logs — never the local part. The tool page
-  promises this, so keep it true when adding code here.
+- **Nothing is stored.** Addresses are never written to a database. Application
+  logs record the domain or IP and the verdict — never an email local-part.
+  The public pages must not claim that queries are unlogged.
 
 ## Dev
 

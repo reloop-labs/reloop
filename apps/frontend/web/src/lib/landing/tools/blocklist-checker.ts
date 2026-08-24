@@ -1,12 +1,16 @@
+import {
+	domainBlocklistCount,
+	ipBlocklistCount,
+	publicBlocklistCount,
+} from "@reloop/web/app/tools/blocklist-checker/content";
 import type { ToolDefinition } from "../types";
 
 export const config: ToolDefinition = {
 	slug: "blocklist-checker",
 	path: "/tools/blocklist-checker",
 	toolType: "blocklist-checker",
-	titleLines: ["Email Domain & IP", "Blocklist Checker"],
-	description:
-		"Query 20+ major anti-spam DNSBL databases in real time to verify whether your domain or IP is blacklisted, with direct removal links.",
+	titleLines: ["IP & Domain DNS", "Blocklist Checker"],
+	description: `Look up a sending IP or domain name against ${publicBlocklistCount} public DNS blocklists (${ipBlocklistCount} IP lists, ${domainBlocklistCount} domain URI lists). Failed queries are errors, not clean.`,
 	keywords: [
 		"email blocklist checker",
 		"dnsbl lookup",
@@ -25,22 +29,22 @@ export const config: ToolDefinition = {
 	},
 	sections: [
 		{
-			title: "Comprehensive Blocklist Inspection",
+			title: "What the checker queries",
 			items: [
 				{
-					title: "Spamhaus ZEN",
+					title: `${ipBlocklistCount} IP DNS blocklists`,
 					description:
-						"Checks SBL, XBL, CSS, and PBL aggregate records for compromised IPs and spam operations.",
+						"Spamhaus ZEN, Barracuda, SpamCop, and other public IP zones. One Spamhaus query (ZEN) covers SBL, CSS, XBL, and PBL.",
 				},
 				{
-					title: "Barracuda BRBL",
+					title: `${domainBlocklistCount} domain URI lists`,
 					description:
-						"Monitors real-time spam traps and automated attack origins across the Barracuda network.",
+						"The domain name is looked up on DBL, URIBL, SURBL, and similar lists. This is not a website crawl and not an MX lookup.",
 				},
 				{
-					title: "SpamCop SCBL",
+					title: "Failed queries stay failed",
 					description:
-						"Automated user-reported spam scoring updated dynamically every 15 minutes.",
+						"Timeouts and refused replies are reported as errors. They are never counted as clean.",
 				},
 			],
 		},

@@ -1,13 +1,26 @@
+export type ListingStatus = "listed" | "not_listed" | "error" | "skipped";
+export type BlocklistVerdict = "clean" | "listed" | "inconclusive";
+
+export interface CheckedIp {
+	ip: string;
+	source: "input" | "spf";
+	version: "ipv4" | "ipv6";
+}
+
 export interface DnsblCheckItemResult {
 	id: string;
 	name: string;
 	host: string;
-	category: "reputation" | "spam" | "phishing" | "malware" | "open_relay";
+	listType: "ip" | "domain";
+	category: "reputation" | "spam" | "malware" | "domain";
+	impact: "high" | "medium" | "low";
+	status: ListingStatus;
 	isListed: boolean;
 	responseCodes: string[];
 	responseTimeMs: number;
 	delistUrl: string;
 	description: string;
+	listedTargets: string[];
 	txtRecord?: string;
 	error?: string;
 }
@@ -15,12 +28,20 @@ export interface DnsblCheckItemResult {
 export interface BlocklistCheckResponse {
 	target: string;
 	inputType: "domain" | "ip";
+	ipVersion: "ipv4" | "ipv6" | null;
 	resolvedIp: string | null;
 	hostname: string | null;
+	checkedIps: CheckedIp[];
+	spfIncludes: string[];
+	spfRanges: string[];
+	ipNote: string | null;
+	verdict: BlocklistVerdict;
 	isClean: boolean;
 	totalChecked: number;
 	listedCount: number;
 	cleanCount: number;
+	errorCount: number;
+	skippedCount: number;
 	scanDurationMs: number;
 	results: DnsblCheckItemResult[];
 	recommendations: string[];
@@ -40,7 +61,7 @@ export class BlocklistRequestError extends Error {
 }
 
 /**
- * Executes a live DNSBL blocklist scan against the backend tools service.
+ * Runs a DNSBL lookup against the tools service (via the Next.js BFF).
  */
 export async function runBlocklistCheck(
 	target: string,
@@ -59,28 +80,32 @@ export async function runBlocklistCheck(
 		if (error instanceof DOMException && error.name === "AbortError") {
 			throw error;
 		}
-		// Fallback to local Next.js route
-		try {
-			response = await fetch("/api/tools/v1/blocklist-check", {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ target }),
-				signal,
-			});
-		} catch (innerError) {
-			if (innerError instanceof DOMException && innerError.name === "AbortError") {
-				throw innerError;
-			}
-			throw new BlocklistRequestError(
-				"Could not connect to the blocklist verification service. Check your connection.",
-			);
-		}
+		throw new BlocklistRequestError(
+			"Could not reach the blocklist checker. Check your connection and try again.",
+		);
+	}
+
+	if (response.status === 429) {
+		throw new BlocklistRequestError(
+			"Too many checks from this network. Wait a moment and try again.",
+			429,
+		);
 	}
 
 	if (!response.ok) {
-		const json = await response.json().catch(() => ({}));
+		let detail: string | undefined;
+		try {
+			const body = (await response.json()) as {
+				why?: string;
+				message?: string;
+				error?: string;
+			};
+			detail = body.why || body.message || body.error;
+		} catch {
+			// ignore parse failures
+		}
 		throw new BlocklistRequestError(
-			json.error || `Scan returned status ${response.status}`,
+			detail || "Something went wrong running that check.",
 			response.status,
 		);
 	}

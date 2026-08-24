@@ -99,8 +99,8 @@ const toolsService = new Elysia({
 			set.status = 400;
 			return {
 				message: "Invalid request",
-				why: `Expected an "email" field holding an address or domain of 1–${toolsConfig.constants.maxInputLength} characters.`,
-				fix: 'Send {"email": "you@example.com"} as JSON, or use GET /v1/check?email=you@example.com',
+				why: "The query or JSON body did not match the schema for this endpoint.",
+				fix: "Check the OpenAPI spec for the required fields (email, subject/body, or target).",
 			};
 		}
 
