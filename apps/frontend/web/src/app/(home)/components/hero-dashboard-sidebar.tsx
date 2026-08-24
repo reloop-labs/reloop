@@ -115,13 +115,13 @@ export function HeroDashboardSidebar({
 											{active && (
 												<motion.div
 													layoutId={
-														reduceMotion ? undefined : "sidebar-active-indicator"
+														reduceMotion
+															? undefined
+															: "sidebar-active-indicator"
 													}
 													className="absolute inset-0 rounded-lg bg-bg-weak-50 dark:bg-white/[0.06]"
 													transition={
-														reduceMotion
-															? { duration: 0 }
-															: CRISP_TRANSITION
+														reduceMotion ? { duration: 0 } : CRISP_TRANSITION
 													}
 												/>
 											)}
@@ -140,9 +140,7 @@ export function HeroDashboardSidebar({
 														animate={{ opacity: 1 }}
 														exit={{ opacity: 0 }}
 														transition={
-															reduceMotion
-																? { duration: 0 }
-																: CRISP_TRANSITION
+															reduceMotion ? { duration: 0 } : CRISP_TRANSITION
 														}
 													/>
 												)}

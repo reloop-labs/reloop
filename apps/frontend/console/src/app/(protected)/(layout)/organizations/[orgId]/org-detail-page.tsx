@@ -1,5 +1,6 @@
 "use client";
 
+import { EmailDetailDrawer } from "@fe/console/components/email-detail-drawer";
 import { InlineActionPanel } from "@fe/console/components/inline-action-panel";
 import { EntityTabs } from "@fe/console/components/ui/entity-tabs";
 import { MetricGrid } from "@fe/console/components/ui/metric-grid";
@@ -21,6 +22,7 @@ import {
 	truncateId,
 } from "@fe/console/lib/format";
 import * as Button from "@reloop/ui/button";
+import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -161,6 +163,7 @@ export default function OrganizationDetailPage() {
 	const [tab, setTab] = useState<TabId>("overview");
 	const [suspendOpen, setSuspendOpen] = useState(false);
 	const [topupOpen, setTopupOpen] = useState(false);
+	const [selectedEmailId, setSelectedEmailId] = useState<string | null>(null);
 	const [topupAmount, setTopupAmount] = useState("1000");
 	const [topupReason, setTopupReason] = useState("");
 
@@ -568,16 +571,36 @@ export default function OrganizationDetailPage() {
 					>
 						<div className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/40">
 							{data.recentEmails.slice(0, 6).map((e) => (
-								<div key={e.id} className="px-4 py-3">
-									<div className="flex items-center justify-between gap-2">
-										<p className="truncate font-medium text-[13px]">
-											{e.subject || "(no subject)"}
+								<div
+									key={e.id}
+									className="group flex items-center justify-between gap-3 px-4 py-3 transition-colors hover:bg-bg-weak-50/50 dark:hover:bg-white/[0.02]"
+								>
+									<div className="min-w-0 flex-1">
+										<div className="flex items-center gap-2">
+											<button
+												type="button"
+												onClick={() => setSelectedEmailId(e.id)}
+												className="truncate text-left font-medium text-[13px] text-text-strong-950 transition-colors hover:text-primary-base hover:underline"
+											>
+												{e.subject || "(no subject)"}
+											</button>
+											<StatusPill status={e.status} />
+										</div>
+										<p className="mt-0.5 truncate text-[12px] text-text-sub-600">
+											{e.fromEmail} · {formatRelativeTime(e.createdAt)}
 										</p>
-										<StatusPill status={e.status} />
 									</div>
-									<p className="mt-0.5 truncate text-[12px] text-text-sub-600">
-										{e.fromEmail} · {formatRelativeTime(e.createdAt)}
-									</p>
+									<Button.Root
+										type="button"
+										size="xsmall"
+										variant="neutral"
+										mode="stroke"
+										onClick={() => setSelectedEmailId(e.id)}
+										className="shrink-0 gap-1 opacity-0 transition-opacity group-hover:opacity-100"
+									>
+										<Icon name="eye" className="h-3 w-3" />
+										Details
+									</Button.Root>
 								</div>
 							))}
 							{data.recentEmails.length === 0 ? (
@@ -777,27 +800,46 @@ export default function OrganizationDetailPage() {
 					}
 				>
 					<DataTable
-						headers={["When", "From", "To", "Subject", "Status"]}
-						colSpan={5}
+						headers={["When", "From", "To", "Subject", "Status", ""]}
+						colSpan={6}
 						empty={data.recentEmails.length === 0}
 					>
 						{data.recentEmails.map((e) => (
 							<tr
 								key={e.id}
-								className="border-stroke-soft-100 border-t dark:border-stroke-soft-100/40"
+								className="group border-stroke-soft-100 border-t transition-colors hover:bg-bg-weak-50/50 dark:border-stroke-soft-100/40 dark:hover:bg-white/[0.02]"
 							>
 								<td className="whitespace-nowrap px-4 py-3 text-text-sub-600">
 									{formatRelativeTime(e.createdAt)}
 								</td>
-								<td className="px-4 py-3">{e.fromEmail}</td>
+								<td className="px-4 py-3 font-medium">{e.fromEmail}</td>
 								<td className="max-w-[160px] truncate px-4 py-3 text-text-sub-600">
 									{formatRecipients(e.toEmails)}
 								</td>
 								<td className="max-w-[220px] truncate px-4 py-3">
-									{e.subject}
+									<button
+										type="button"
+										onClick={() => setSelectedEmailId(e.id)}
+										className="truncate text-left font-medium text-text-strong-950 transition-colors hover:text-primary-base hover:underline"
+									>
+										{e.subject || "(no subject)"}
+									</button>
 								</td>
 								<td className="px-4 py-3">
 									<StatusPill status={e.status} />
+								</td>
+								<td className="px-4 py-3 text-right">
+									<Button.Root
+										type="button"
+										size="xsmall"
+										variant="neutral"
+										mode="stroke"
+										onClick={() => setSelectedEmailId(e.id)}
+										className="gap-1"
+									>
+										<Icon name="eye" className="h-3 w-3" />
+										Details
+									</Button.Root>
 								</td>
 							</tr>
 						))}
@@ -914,6 +956,12 @@ export default function OrganizationDetailPage() {
 					</DataTable>
 				</SectionCard>
 			) : null}
+
+			<EmailDetailDrawer
+				emailId={selectedEmailId}
+				open={Boolean(selectedEmailId)}
+				onOpenChange={(open) => !open && setSelectedEmailId(null)}
+			/>
 		</PageFrame>
 	);
 }

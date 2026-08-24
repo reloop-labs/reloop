@@ -2,9 +2,9 @@
 
 import { cn } from "@reloop/ui/cn";
 import { Logo } from "@reloop/ui/logo";
+import { hostedMonthlyUsdForVolume } from "@reloop/web/lib/pricing";
 import Link from "next/link";
 import { useState } from "react";
-import { hostedMonthlyUsdForVolume } from "@reloop/web/lib/pricing";
 import { competitorBrands } from "../competitor-brands";
 import { BrandIcon } from "./brand-icon";
 

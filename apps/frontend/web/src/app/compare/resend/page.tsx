@@ -69,71 +69,71 @@ const ResendComparisonPage = () => {
 					href: "/compare/resend#migrate",
 				}}
 			>
-			{/* Feature matrix */}
-			<CompareSection maxWidth="full" flushX>
-				<div className="mb-10 text-center">
-					<h2 className="mt-3 font-serif text-[2rem] text-text-strong-950 leading-[1.1] tracking-tighter sm:text-[2.4rem] lg:text-[2.8rem] dark:text-white">
-						Reloop &nbsp;&nbsp;vs&nbsp;&nbsp;&nbsp;{resendBrand?.name}
-					</h2>
-					<p className="mx-auto mt-3 max-w-xl font-medium text-[15px] text-text-sub-600 leading-7 sm:text-[17px] dark:text-white/50">
-						Reloop is the #1 open-source alternative to{" "}
-						{resendBrand?.name || "Resend"}.
-						<br /> With Reloop, get everything you need sending, receiving, AI
-						templates, and agent inboxes at a fraction of the cost.
-					</p>
-				</div>
-				<ComparisonMatrix
-					competitorName="Resend"
-					categories={resendComparisonCategories}
-				/>
-				<p className="mt-6 text-center text-[13px] text-text-sub-600 dark:text-white/40">
-					Seen something inaccurate?{" "}
-					<Link href="/contact" className="font-semibold text-primary-base">
-						Tell us
-					</Link>
-					—we correct comparison pages when the facts change.
-				</p>
-			</CompareSection>
-
-			{/* Migration — Dub-style 3-step cards */}
-			<CompareSection maxWidth="full">
-				{resendBrand ? (
-					<CompareMigrate
+				{/* Feature matrix */}
+				<CompareSection maxWidth="full" flushX>
+					<div className="mb-10 text-center">
+						<h2 className="mt-3 font-serif text-[2rem] text-text-strong-950 leading-[1.1] tracking-tighter sm:text-[2.4rem] lg:text-[2.8rem] dark:text-white">
+							Reloop &nbsp;&nbsp;vs&nbsp;&nbsp;&nbsp;{resendBrand?.name}
+						</h2>
+						<p className="mx-auto mt-3 max-w-xl font-medium text-[15px] text-text-sub-600 leading-7 sm:text-[17px] dark:text-white/50">
+							Reloop is the #1 open-source alternative to{" "}
+							{resendBrand?.name || "Resend"}.
+							<br /> With Reloop, get everything you need sending, receiving, AI
+							templates, and agent inboxes at a fraction of the cost.
+						</p>
+					</div>
+					<ComparisonMatrix
 						competitorName="Resend"
-						competitorIcon={resendBrand.icon}
-						primaryHref="/dashboard/signup"
-						guideHref="/docs"
+						categories={resendComparisonCategories}
 					/>
-				) : null}
-				<p className="mx-auto mt-10 max-w-2xl px-4 text-center text-[14px] text-text-sub-600 dark:text-white/50">
-					Details in the{" "}
-					<Link href="/docs" className="font-semibold text-primary-base">
-						API docs
-					</Link>{" "}
-					and{" "}
-					<Link
-						href="/features/smtp"
-						className="font-semibold text-primary-base"
-					>
-						SMTP guide
-					</Link>
-					. Reloop is not a drop-in Resend proxy—plan a small client adapter.
-				</p>
-			</CompareSection>
+					<p className="mt-6 text-center text-[13px] text-text-sub-600 dark:text-white/40">
+						Seen something inaccurate?{" "}
+						<Link href="/contact" className="font-semibold text-primary-base">
+							Tell us
+						</Link>
+						—we correct comparison pages when the facts change.
+					</p>
+				</CompareSection>
 
-			<CompareSection maxWidth="3xl">
-				<FaqSection
-					id="compare-resend-faq"
-					title="Reloop vs Resend FAQ"
-					items={compare?.faqs ?? []}
-					compact
-				/>
-			</CompareSection>
+				{/* Migration — Dub-style 3-step cards */}
+				<CompareSection maxWidth="full">
+					{resendBrand ? (
+						<CompareMigrate
+							competitorName="Resend"
+							competitorIcon={resendBrand.icon}
+							primaryHref="/dashboard/signup"
+							guideHref="/docs"
+						/>
+					) : null}
+					<p className="mx-auto mt-10 max-w-2xl px-4 text-center text-[14px] text-text-sub-600 dark:text-white/50">
+						Details in the{" "}
+						<Link href="/docs" className="font-semibold text-primary-base">
+							API docs
+						</Link>{" "}
+						and{" "}
+						<Link
+							href="/features/smtp"
+							className="font-semibold text-primary-base"
+						>
+							SMTP guide
+						</Link>
+						. Reloop is not a drop-in Resend proxy—plan a small client adapter.
+					</p>
+				</CompareSection>
 
-			<CompareSection maxWidth="full" noDivider>
-				<CompareOtherLinks currentHref={pagePath} />
-			</CompareSection>
-		</ComparisonPageShell>
+				<CompareSection maxWidth="3xl">
+					<FaqSection
+						id="compare-resend-faq"
+						title="Reloop vs Resend FAQ"
+						items={compare?.faqs ?? []}
+						compact
+					/>
+				</CompareSection>
+
+				<CompareSection maxWidth="full" noDivider>
+					<CompareOtherLinks currentHref={pagePath} />
+				</CompareSection>
+			</ComparisonPageShell>
 		</>
 	);
 };

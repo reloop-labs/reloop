@@ -1,9 +1,9 @@
-import { SceneGlyph } from "./_shared/scene-header";
 import {
 	type FeatureHighlight,
 	FeatureHighlightsGrid,
 } from "@reloop/web/components/landing/feature-highlights";
 import Link from "next/link";
+import { SceneGlyph } from "./_shared/scene-header";
 
 function Term({ href, children }: { href: string; children: React.ReactNode }) {
 	return (
@@ -90,11 +90,7 @@ const deliverabilityHighlights: FeatureHighlight[] = [
 		id: "suppression",
 		icon: "list",
 		title: "Dynamic suppression list",
-		description: (
-			<>
-				Never mail bounces, complaints, or unsubs.
-			</>
-		),
+		description: <>Never mail bounces, complaints, or unsubs.</>,
 	},
 	{
 		id: "monitoring",
@@ -149,15 +145,12 @@ export default function Highlights() {
 				</div>
 				<h2
 					id="highlights-heading"
-					className="mt-3.5 max-w-3xl font-medium text-4xl text-text-strong-950 text-balance leading-[1.05] tracking-tighter sm:text-5xl dark:text-white"
+					className="mt-3.5 max-w-3xl text-balance font-medium text-4xl text-text-strong-950 leading-[1.05] tracking-tighter sm:text-5xl dark:text-white"
 				>
 					Built to land in the inbox.
 				</h2>
 			</div>
-			<FeatureHighlightsGrid
-				items={deliverabilityHighlights}
-				columns={5}
-			/>
+			<FeatureHighlightsGrid items={deliverabilityHighlights} columns={5} />
 		</section>
 	);
 }

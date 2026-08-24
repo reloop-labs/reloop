@@ -2,8 +2,8 @@
 
 import { cn } from "@reloop/ui/cn";
 import { Logo } from "@reloop/ui/logo";
-import { useState } from "react";
 import { hostedMonthlyUsdForVolume } from "@reloop/web/lib/pricing";
+import { useState } from "react";
 import { competitorBrands } from "../competitor-brands";
 import { BrandIcon } from "../components/brand-icon";
 

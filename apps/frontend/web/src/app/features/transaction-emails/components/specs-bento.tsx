@@ -81,8 +81,8 @@ export function SpecsBento() {
 								99.99% Global Uptime
 							</h3>
 							<p className="text-[14px] text-text-sub-600 leading-[1.7] dark:text-white/60">
-								Reloop routes requests through distributed edge nodes. Built
-								for failover safety during cloud zone anomalies.
+								Reloop routes requests through distributed edge nodes. Built for
+								failover safety during cloud zone anomalies.
 							</p>
 						</div>
 						<div className="mt-12 flex items-end justify-between">
@@ -124,9 +124,8 @@ export function SpecsBento() {
 								Auto-SPF/DKIM Signing
 							</h3>
 							<p className="text-[14px] text-text-sub-600 leading-[1.7] dark:text-white/60">
-								We analyze your domains dynamically and automatically apply
-								SPF alignments, custom DKIM signing keys, and DMARC
-								validations.
+								We analyze your domains dynamically and automatically apply SPF
+								alignments, custom DKIM signing keys, and DMARC validations.
 							</p>
 						</div>
 						<div className="mt-12 flex flex-wrap gap-2">

@@ -63,7 +63,7 @@ export default function Metrics() {
 							</p>
 						</div>
 						<div className="flex items-center gap-2 font-mono text-emerald-600 text-xs dark:text-emerald-400">
-							<span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
+							<span className="size-2 animate-pulse rounded-full bg-emerald-500" />
 							All Major ISPs Green
 						</div>
 					</div>

@@ -82,7 +82,7 @@ export function EmailSentToast({
 			</div>
 
 			<div className="min-w-0 flex-1">
-				<p className="truncate font-medium text-[13px] leading-5 tracking-tight text-neutral-900 dark:text-white">
+				<p className="truncate font-medium text-[13px] text-neutral-900 leading-5 tracking-tight dark:text-white">
 					{currentTitle}
 				</p>
 				<p className="truncate text-neutral-500 text-xs leading-4 dark:text-neutral-400">

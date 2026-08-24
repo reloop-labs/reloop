@@ -19,10 +19,7 @@ import {
 	toolTitle,
 } from "./content";
 import { FaqGrid } from "./faq-grid";
-import {
-	Band,
-	SectionIntro,
-} from "./grid";
+import { Band, SectionIntro } from "./grid";
 
 export const instant = false;
 
@@ -130,7 +127,7 @@ export default function BlocklistCheckerPage() {
 					description="They are public DNS zones of IPs and domain names, not websites we crawl. A clean result on these lists is not a promise that Gmail or Microsoft will accept the mail."
 				/>
 
-				<div className="grid grid-cols-1 border-t border-stroke-soft-200 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-stroke-soft-200 dark:border-white/10 dark:divide-white/10">
+				<div className="grid grid-cols-1 divide-y divide-stroke-soft-200 border-stroke-soft-200 border-t sm:grid-cols-2 sm:divide-x sm:divide-y-0 lg:grid-cols-4 dark:divide-white/10 dark:border-white/10">
 					{reasons.map((reason) => (
 						<div
 							key={reason.title}

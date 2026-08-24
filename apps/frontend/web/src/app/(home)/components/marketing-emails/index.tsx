@@ -1,6 +1,6 @@
-import type { MarketingTabId } from "./preview-scenes";
 import { SceneHeader } from "../_shared/scene-header";
 import { MarketingEmailsPreview } from "./preview";
+import type { MarketingTabId } from "./preview-scenes";
 
 export function MarketingEmailsSection({
 	activeTab,

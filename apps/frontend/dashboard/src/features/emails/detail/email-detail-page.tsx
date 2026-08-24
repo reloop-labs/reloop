@@ -6,8 +6,8 @@ import { Icon } from "@reloop/ui/icon";
 import { useRouter } from "next/navigation";
 import { useCallback, useMemo } from "react";
 import { AnimatedBackButton } from "#/features/dashboard/animated-back-button";
-import { useResendEmail } from "#/features/emails/hooks/use-resend-email";
 import { useEmailDetailQuery } from "#/features/emails/hooks/use-emails-query";
+import { useResendEmail } from "#/features/emails/hooks/use-resend-email";
 
 import { EmailDetail } from "./email-detail";
 import { EmailNotFound } from "./email-not-found";

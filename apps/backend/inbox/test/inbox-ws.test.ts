@@ -2,12 +2,12 @@ import { describe, expect, it } from "bun:test";
 import {
 	broadcastToOrg,
 	getConnectedClientCount,
+	type InboxWsClient,
 	joinOrgRoom,
 	leaveOrgRoom,
 	removeClient,
 	subscribeMailbox,
 	unsubscribeMailbox,
-	type InboxWsClient,
 } from "../src/rooms/inbox.rooms";
 
 describe("Inbox WebSocket Rooms", () => {

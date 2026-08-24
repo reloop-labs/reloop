@@ -1,4 +1,4 @@
-import { pricingPlans, type PricingPlan } from "@reloop/pricing";
+import { type PricingPlan, pricingPlans } from "@reloop/pricing";
 import { getSiteUrl, siteDescription, siteName } from "@reloop/web/lib/site";
 
 export type FaqEntry = {

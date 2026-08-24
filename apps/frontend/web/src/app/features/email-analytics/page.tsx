@@ -49,7 +49,7 @@ export const metadata: Metadata = {
 
 export default function EmailAnalyticsPage() {
 	return (
-		<div className="relative min-h-screen overflow-x-hidden bg-bg-white-0 font-sans text-text-strong-950 selection:bg-neutral-200 dark:selection:bg-neutral-800 dark:bg-black dark:text-white">
+		<div className="relative min-h-screen overflow-x-hidden bg-bg-white-0 font-sans text-text-strong-950 selection:bg-neutral-200 dark:bg-black dark:text-white dark:selection:bg-neutral-800">
 			<Hero />
 			<Sandbox />
 			<Bento />

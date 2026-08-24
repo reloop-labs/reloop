@@ -97,7 +97,10 @@ export const inboxWsRoute = new Elysia({ prefix: "/v1" })
 				organizationId,
 			});
 
-			log.info("inbox-ws", `Client connected for org: ${organizationId} (user: ${userId})`);
+			log.info(
+				"inbox-ws",
+				`Client connected for org: ${organizationId} (user: ${userId})`,
+			);
 		},
 		async message(ws, message) {
 			const client = getOrCreateClient(ws);

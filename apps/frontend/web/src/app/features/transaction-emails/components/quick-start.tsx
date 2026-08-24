@@ -11,8 +11,7 @@ export function QuickStart() {
 						Setup in 5 Minutes
 					</h2>
 					<p className="mx-auto mt-4 max-w-xl text-[15px] text-text-sub-600 leading-relaxed sm:text-base dark:text-white/50">
-						No sales calls or enterprise agreements. Build and send
-						immediately.
+						No sales calls or enterprise agreements. Build and send immediately.
 					</p>
 				</div>
 

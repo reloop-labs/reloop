@@ -265,7 +265,7 @@ export function CreateInboxInlineCard({
 											Preview
 										</span>
 									</div>
-									<p className="truncate font-medium text-xs text-text-sub-600">
+									<p className="truncate font-medium text-text-sub-600 text-xs">
 										{previewEmail}
 									</p>
 								</div>

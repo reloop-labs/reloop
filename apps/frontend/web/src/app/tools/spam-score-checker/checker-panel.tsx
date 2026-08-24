@@ -3,12 +3,13 @@
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import Link from "next/link";
-import React, { useMemo, useRef, useState } from "react";
+import type React from "react";
+import { useMemo, useRef, useState } from "react";
 import {
-	type DetectedTrigger,
-	type TriggerCategory,
 	CATEGORY_META,
 	calculateSpamScore,
+	type DetectedTrigger,
+	type TriggerCategory,
 } from "./check-api";
 
 const PRESETS = [
@@ -25,25 +26,28 @@ const PRESETS = [
 	{
 		label: "Phishing / Scam Sample",
 		subject: "Confidential investment proposal",
-		body: `Dear friend,\n\nI am a Financial Consultant in control of privately owned funds placed for long term investments.\n\nMy client intends to invest these funds in projects. I am willing to finance projects at a guaranteed 5% ROI per annum for projects ranging from 2 years term and above but not exceeding 12 years.\n\nPlease answer ASAP.`,
+		body: "Dear friend,\n\nI am a Financial Consultant in control of privately owned funds placed for long term investments.\n\nMy client intends to invest these funds in projects. I am willing to finance projects at a guaranteed 5% ROI per annum for projects ranging from 2 years term and above but not exceeding 12 years.\n\nPlease answer ASAP.",
 	},
 ];
 
 const VERDICT_STYLES = {
 	inbox_ready: {
-		badge: "bg-success-lighter text-success-base dark:bg-emerald-500/10 dark:text-emerald-400",
+		badge:
+			"bg-success-lighter text-success-base dark:bg-emerald-500/10 dark:text-emerald-400",
 		accent: "bg-success-base",
 		icon: "shield-check",
 		ratingLabel: "Excellent",
 	},
 	needs_review: {
-		badge: "bg-warning-lighter text-warning-base dark:bg-amber-500/10 dark:text-amber-400",
+		badge:
+			"bg-warning-lighter text-warning-base dark:bg-amber-500/10 dark:text-amber-400",
 		accent: "bg-warning-base",
 		icon: "alert-triangle",
 		ratingLabel: "Needs Review",
 	},
 	high_risk: {
-		badge: "bg-error-lighter text-error-base dark:bg-rose-500/10 dark:text-rose-400",
+		badge:
+			"bg-error-lighter text-error-base dark:bg-rose-500/10 dark:text-rose-400",
 		accent: "bg-error-base",
 		icon: "cross-circle",
 		ratingLabel: "Poor (Spam Risk)",
@@ -63,7 +67,9 @@ function buildBackdropNodes(
 		return text ? <span>{text}</span> : null;
 	}
 
-	const sorted = [...relevantTriggers].sort((a, b) => a.startIndex - b.startIndex);
+	const sorted = [...relevantTriggers].sort(
+		(a, b) => a.startIndex - b.startIndex,
+	);
 	const nodes: React.ReactNode[] = [];
 	let lastIndex = 0;
 
@@ -79,12 +85,16 @@ function buildBackdropNodes(
 			<mark
 				key={`m-${context}-${i}-${trigger.startIndex}`}
 				className={cn(
-					"rounded-sm text-transparent py-0.5",
-					trigger.category === "urgency" && "bg-rose-500/25 dark:bg-rose-500/40",
+					"rounded-sm py-0.5 text-transparent",
+					trigger.category === "urgency" &&
+						"bg-rose-500/25 dark:bg-rose-500/40",
 					trigger.category === "shady" && "bg-rose-500/25 dark:bg-rose-500/40",
-					trigger.category === "overpromise" && "bg-amber-500/25 dark:bg-amber-500/40",
-					trigger.category === "money" && "bg-purple-500/25 dark:bg-purple-500/40",
-					trigger.category === "outreach" && "bg-slate-500/25 dark:bg-slate-500/40",
+					trigger.category === "overpromise" &&
+						"bg-amber-500/25 dark:bg-amber-500/40",
+					trigger.category === "money" &&
+						"bg-purple-500/25 dark:bg-purple-500/40",
+					trigger.category === "outreach" &&
+						"bg-slate-500/25 dark:bg-slate-500/40",
 				)}
 			>
 				{trigger.word}
@@ -117,7 +127,8 @@ export function CheckerPanel() {
 		return calculateSpamScore(subject, body);
 	}, [subject, body]);
 
-	const verdictStyle = VERDICT_STYLES[analysis.verdict] || VERDICT_STYLES.inbox_ready;
+	const verdictStyle =
+		VERDICT_STYLES[analysis.verdict] || VERDICT_STYLES.inbox_ready;
 
 	const handleCopyReport = () => {
 		const reportText = `[Reloop Spam Score Report]\nScore: ${analysis.score}/100 (Grade ${analysis.grade})\nVerdict: ${analysis.verdictLabel}\nSubject: "${subject}"\nWord Count: ${analysis.metrics.wordCount} words\nSpam Triggers Detected: ${analysis.detectedTriggers.length}\nIssues: ${analysis.issues.length > 0 ? analysis.issues.map((i) => i.title).join(", ") : "None"}\nTested free at https://reloop.sh/tools/spam-score-checker`;
@@ -170,7 +181,7 @@ export function CheckerPanel() {
 							className={cn(
 								"rounded-lg border px-3 py-1 font-mono text-[12px] transition-colors",
 								subject === preset.subject
-									? "border-text-strong-950 bg-bg-weak-50 text-text-strong-950 font-medium dark:border-white dark:bg-white/10 dark:text-white"
+									? "border-text-strong-950 bg-bg-weak-50 font-medium text-text-strong-950 dark:border-white dark:bg-white/10 dark:text-white"
 									: "border-stroke-soft-200 bg-bg-white-0 text-text-sub-600 hover:border-text-strong-950 hover:text-text-strong-950 dark:border-white/10 dark:bg-white/5 dark:text-white/60 dark:hover:border-white dark:hover:text-white",
 							)}
 						>
@@ -185,7 +196,7 @@ export function CheckerPanel() {
 						type="button"
 						onClick={handleAiFix}
 						disabled={isFixing}
-						className="inline-flex items-center gap-2 rounded-xl bg-bg-strong-950 px-3.5 py-1.5 font-mono text-[12px] font-medium text-white shadow-xs transition-colors hover:bg-bg-surface-800 disabled:opacity-50 dark:bg-white dark:text-black dark:hover:bg-white/90"
+						className="inline-flex items-center gap-2 rounded-xl bg-bg-strong-950 px-3.5 py-1.5 font-medium font-mono text-[12px] text-white shadow-xs transition-colors hover:bg-bg-surface-800 disabled:opacity-50 dark:bg-white dark:text-black dark:hover:bg-white/90"
 					>
 						<Icon name="magic-wand" className="size-3.5" />
 						{isFixing ? "Rewriting with AI..." : "Fix Copy with AI"}
@@ -224,9 +235,13 @@ export function CheckerPanel() {
 								<div
 									ref={subjectBackdropRef}
 									aria-hidden="true"
-									className="pointer-events-none absolute inset-0 flex items-center overflow-hidden px-4 font-sans text-[14px] leading-normal text-transparent select-none whitespace-pre"
+									className="pointer-events-none absolute inset-0 flex select-none items-center overflow-hidden whitespace-pre px-4 font-sans text-[14px] text-transparent leading-normal"
 								>
-									{buildBackdropNodes(subject, analysis.detectedTriggers, "subject")}
+									{buildBackdropNodes(
+										subject,
+										analysis.detectedTriggers,
+										"subject",
+									)}
 								</div>
 
 								{/* Real editable input on top */}
@@ -238,11 +253,12 @@ export function CheckerPanel() {
 									onChange={(e) => setSubject(e.target.value)}
 									onScroll={(e) => {
 										if (subjectBackdropRef.current) {
-											subjectBackdropRef.current.scrollLeft = e.currentTarget.scrollLeft;
+											subjectBackdropRef.current.scrollLeft =
+												e.currentTarget.scrollLeft;
 										}
 									}}
 									placeholder="e.g. Your monthly analytics report is ready"
-									className="relative z-10 block h-11 w-full bg-transparent px-4 font-sans text-[14px] leading-normal text-text-strong-950 outline-none placeholder:text-text-soft-400 dark:text-white dark:placeholder:text-white/30"
+									className="relative z-10 block h-11 w-full bg-transparent px-4 font-sans text-[14px] text-text-strong-950 leading-normal outline-none placeholder:text-text-soft-400 dark:text-white dark:placeholder:text-white/30"
 								/>
 							</div>
 						</div>
@@ -257,7 +273,8 @@ export function CheckerPanel() {
 									Email Body Copy
 								</label>
 								<span className="font-mono text-[11px] text-text-soft-400 dark:text-white/35">
-									{analysis.metrics.wordCount} words · {analysis.metrics.linkCount} link(s)
+									{analysis.metrics.wordCount} words ·{" "}
+									{analysis.metrics.linkCount} link(s)
 								</span>
 							</div>
 
@@ -266,7 +283,7 @@ export function CheckerPanel() {
 								<div
 									ref={bodyBackdropRef}
 									aria-hidden="true"
-									className="pointer-events-none absolute inset-0 overflow-hidden p-4 font-sans text-[14px] leading-[1.65] text-transparent select-none whitespace-pre-wrap break-words"
+									className="pointer-events-none absolute inset-0 select-none overflow-hidden whitespace-pre-wrap break-words p-4 font-sans text-[14px] text-transparent leading-[1.65]"
 								>
 									{buildBackdropNodes(body, analysis.detectedTriggers, "body")}
 								</div>
@@ -280,17 +297,18 @@ export function CheckerPanel() {
 									onChange={(e) => setBody(e.target.value)}
 									onScroll={(e) => {
 										if (bodyBackdropRef.current) {
-											bodyBackdropRef.current.scrollTop = e.currentTarget.scrollTop;
+											bodyBackdropRef.current.scrollTop =
+												e.currentTarget.scrollTop;
 										}
 									}}
 									placeholder="Paste your email copy here to scan for spam trigger phrases..."
-									className="relative z-10 block min-h-[220px] w-full resize-y bg-transparent p-4 font-sans text-[14px] leading-[1.65] text-text-strong-950 outline-none placeholder:text-text-soft-400 dark:text-white dark:placeholder:text-white/30"
+									className="relative z-10 block min-h-[220px] w-full resize-y bg-transparent p-4 font-sans text-[14px] text-text-strong-950 leading-[1.65] outline-none placeholder:text-text-soft-400 dark:text-white dark:placeholder:text-white/30"
 								/>
 							</div>
 						</div>
 
 						{/* Footer Helper */}
-						<div className="flex items-center justify-between border-t border-stroke-soft-200/60 pt-3 dark:border-white/10">
+						<div className="flex items-center justify-between border-stroke-soft-200/60 border-t pt-3 dark:border-white/10">
 							<button
 								type="button"
 								onClick={() => {
@@ -337,7 +355,7 @@ export function CheckerPanel() {
 
 							<div
 								className={cn(
-									"inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[12px] font-medium",
+									"inline-flex items-center gap-1.5 rounded-full px-3 py-1 font-medium text-[12px]",
 									verdictStyle.badge,
 								)}
 							>
@@ -353,34 +371,40 @@ export function CheckerPanel() {
 							</span>
 
 							<div className="space-y-1.5">
-								{(Object.keys(CATEGORY_META) as TriggerCategory[]).map((cat) => {
-									const meta = CATEGORY_META[cat];
-									const count = analysis.categoryCounts[cat] || 0;
+								{(Object.keys(CATEGORY_META) as TriggerCategory[]).map(
+									(cat) => {
+										const meta = CATEGORY_META[cat];
+										const count = analysis.categoryCounts[cat] || 0;
 
-									return (
-										<div
-											key={cat}
-											className={cn(
-												"flex items-center justify-between rounded-xl border px-3.5 py-2.5 text-[13px] transition-colors",
-												count > 0
-													? "border-stroke-soft-200 bg-bg-weak-50 font-medium text-text-strong-950 dark:border-white/15 dark:bg-white/10 dark:text-white"
-													: "border-stroke-soft-200/40 bg-transparent text-text-soft-400 dark:border-white/5 dark:text-white/25",
-											)}
-										>
-											<div className="flex items-center gap-2.5">
-												<Icon
-													name={meta.icon}
-													className={cn(
-														"size-4 shrink-0",
-														count > 0 ? "text-text-strong-950 dark:text-white" : "text-text-soft-400 dark:text-white/20",
-													)}
-												/>
-												<span>{meta.label}</span>
+										return (
+											<div
+												key={cat}
+												className={cn(
+													"flex items-center justify-between rounded-xl border px-3.5 py-2.5 text-[13px] transition-colors",
+													count > 0
+														? "border-stroke-soft-200 bg-bg-weak-50 font-medium text-text-strong-950 dark:border-white/15 dark:bg-white/10 dark:text-white"
+														: "border-stroke-soft-200/40 bg-transparent text-text-soft-400 dark:border-white/5 dark:text-white/25",
+												)}
+											>
+												<div className="flex items-center gap-2.5">
+													<Icon
+														name={meta.icon}
+														className={cn(
+															"size-4 shrink-0",
+															count > 0
+																? "text-text-strong-950 dark:text-white"
+																: "text-text-soft-400 dark:text-white/20",
+														)}
+													/>
+													<span>{meta.label}</span>
+												</div>
+												<span className="font-mono font-semibold">
+													({count})
+												</span>
 											</div>
-											<span className="font-mono font-semibold">({count})</span>
-										</div>
-									);
-								})}
+										);
+									},
+								)}
 							</div>
 						</div>
 
@@ -393,8 +417,10 @@ export function CheckerPanel() {
 								</div>
 								<div className="h-1.5 w-full overflow-hidden rounded-full bg-bg-weak-50 dark:bg-white/10">
 									<div
-										className="h-full rounded-full bg-text-strong-950 dark:bg-white transition-all duration-300"
-										style={{ width: `${(analysis.breakdown.subjectScore / 25) * 100}%` }}
+										className="h-full rounded-full bg-text-strong-950 transition-all duration-300 dark:bg-white"
+										style={{
+											width: `${(analysis.breakdown.subjectScore / 25) * 100}%`,
+										}}
 									/>
 								</div>
 							</div>
@@ -406,8 +432,10 @@ export function CheckerPanel() {
 								</div>
 								<div className="h-1.5 w-full overflow-hidden rounded-full bg-bg-weak-50 dark:bg-white/10">
 									<div
-										className="h-full rounded-full bg-text-strong-950 dark:bg-white transition-all duration-300"
-										style={{ width: `${(analysis.breakdown.contentScore / 35) * 100}%` }}
+										className="h-full rounded-full bg-text-strong-950 transition-all duration-300 dark:bg-white"
+										style={{
+											width: `${(analysis.breakdown.contentScore / 35) * 100}%`,
+										}}
 									/>
 								</div>
 							</div>

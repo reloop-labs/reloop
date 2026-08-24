@@ -1,7 +1,7 @@
 "use client";
 
-import { HeroAnalyticsPreview } from "./hero-analytics-preview";
 import { HeroAgentsPreview } from "./hero-agents-preview";
+import { HeroAnalyticsPreview } from "./hero-analytics-preview";
 import { HeroCloudPreview } from "./hero-cloud-preview";
 import { HeroDomainPreview } from "./hero-domain-preview";
 import { HeroEmailsPreview } from "./hero-emails-preview";

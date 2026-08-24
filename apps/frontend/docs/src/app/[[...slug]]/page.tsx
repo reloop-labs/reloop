@@ -313,9 +313,7 @@ export default async function Page(props: {
 			>
 				<div
 					className={`relative w-full flex-col ${
-						hideToc
-							? "max-w-none"
-							: "w-full xl:grid xl:grid-cols-[1fr_260px]"
+						hideToc ? "max-w-none" : "w-full xl:grid xl:grid-cols-[1fr_260px]"
 					}`}
 				>
 					{/* Agent discovery — top of main content, outside nav */}

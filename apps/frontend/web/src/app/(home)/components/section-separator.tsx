@@ -24,7 +24,7 @@ export function SectionSeparator({
 				shouldHideTop && shouldHideBottom
 					? "border-y-0"
 					: shouldHideTop
-						? "border-b border-t-0"
+						? "border-t-0 border-b"
 						: shouldHideBottom
 							? "border-t border-b-0"
 							: "border-y",

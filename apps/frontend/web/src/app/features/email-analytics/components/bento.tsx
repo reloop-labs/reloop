@@ -7,15 +7,18 @@ const cardClassName =
 
 export default function Bento() {
 	return (
-		<section id="capabilities" className="relative w-full py-16 sm:py-20 lg:py-24">
+		<section
+			id="capabilities"
+			className="relative w-full py-16 sm:py-20 lg:py-24"
+		>
 			<div className="mx-auto max-w-[1320px] px-4 sm:px-6 lg:px-8">
 				<div className="text-center">
 					<h2 className="font-serif text-[2.6rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[3.4rem] lg:text-[4.2rem] dark:text-white">
 						Engineered for Absolute Clarity
 					</h2>
 					<p className="mx-auto mt-4 max-w-xl text-base text-text-sub-600 dark:text-white/50">
-						From raw MTA handshake logs to high-level domain health, Reloop provides
-						complete email observability without compromise.
+						From raw MTA handshake logs to high-level domain health, Reloop
+						provides complete email observability without compromise.
 					</p>
 				</div>
 
@@ -33,9 +36,9 @@ export default function Bento() {
 								Sub-Second Event Ingestion Pipeline
 							</h3>
 							<p className="max-w-md text-[14px] text-text-sub-600 leading-[1.7] dark:text-white/50">
-								High-throughput event streaming engine processes deliveries, opens, clicks,
-								and bounces in under 25ms. Never wait for daily batch jobs to discover
-								delivery issues.
+								High-throughput event streaming engine processes deliveries,
+								opens, clicks, and bounces in under 25ms. Never wait for daily
+								batch jobs to discover delivery issues.
 							</p>
 						</div>
 
@@ -78,8 +81,9 @@ export default function Bento() {
 								Apple MPP & Bot Filtering
 							</h3>
 							<p className="text-[14px] text-text-sub-600 leading-[1.7] dark:text-white/50">
-								Automatically identify Apple Mail Privacy Protection (MPP) proxy pre-fetches
-								and machine scanners to give you genuine human engagement statistics.
+								Automatically identify Apple Mail Privacy Protection (MPP) proxy
+								pre-fetches and machine scanners to give you genuine human
+								engagement statistics.
 							</p>
 						</div>
 						<div className="mt-12 flex items-end justify-between">
@@ -110,9 +114,9 @@ export default function Bento() {
 								ISP Postmaster Sync
 							</h3>
 							<p className="text-[14px] text-text-sub-600 leading-[1.7] dark:text-white/50">
-								Direct integration with Google Workspace and Yahoo Postmaster APIs to track
-								domain reputation, IP reputation, and spam rates before they hurt your inbox
-								placement.
+								Direct integration with Google Workspace and Yahoo Postmaster
+								APIs to track domain reputation, IP reputation, and spam rates
+								before they hurt your inbox placement.
 							</p>
 						</div>
 						<div className="mt-8 rounded-xl border border-stroke-soft-200 bg-bg-soft-50 p-3.5 font-mono text-xs dark:border-white/10">
@@ -140,13 +144,15 @@ export default function Bento() {
 								Custom Tags & Dimensions
 							</h3>
 							<p className="text-[14px] text-text-sub-600 leading-[1.7] dark:text-white/50">
-								Attach arbitrary metadata to your send payloads. Slice and dice metrics by
-								tenant ID, user plan, campaign cohort, or template version in real time.
+								Attach arbitrary metadata to your send payloads. Slice and dice
+								metrics by tenant ID, user plan, campaign cohort, or template
+								version in real time.
 							</p>
 						</div>
 						<div className="mt-8 rounded-xl border border-stroke-soft-200 bg-[#0a0a0a] p-3 font-mono text-[11px] text-text-sub-600">
 							<code className="text-emerald-400">
-								tags: &#123; tenant: &quot;enterprise_9&quot;, env: &quot;prod&quot; &#125;
+								tags: &#123; tenant: &quot;enterprise_9&quot;, env:
+								&quot;prod&quot; &#125;
 							</code>
 						</div>
 					</div>
@@ -164,8 +170,9 @@ export default function Bento() {
 								Data Warehouse Sync
 							</h3>
 							<p className="text-[14px] text-text-sub-600 leading-[1.7] dark:text-white/50">
-								Export raw events continuously to your Snowflake, BigQuery, ClickHouse, or AWS
-								S3 buckets. Build custom BI dashboards on top of your own data warehouse.
+								Export raw events continuously to your Snowflake, BigQuery,
+								ClickHouse, or AWS S3 buckets. Build custom BI dashboards on top
+								of your own data warehouse.
 							</p>
 						</div>
 						<div className="mt-8 flex flex-wrap gap-2 font-mono text-[11px]">

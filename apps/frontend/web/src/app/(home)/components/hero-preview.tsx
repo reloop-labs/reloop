@@ -1,10 +1,7 @@
 "use client";
 
 import { HeroDashboardShell } from "./hero-dashboard-shell";
-import {
-	HeroPreviewContent,
-	type HeroTabId,
-} from "./hero-preview-content";
+import { HeroPreviewContent, type HeroTabId } from "./hero-preview-content";
 
 export { HeroPreviewContent, type HeroTabId };
 

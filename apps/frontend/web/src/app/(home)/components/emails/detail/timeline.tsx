@@ -127,8 +127,8 @@ export function EmailTimeline({
 			className={cn(
 				"relative flex w-full items-center justify-center overflow-hidden bg-bg-weak-50 transition-all dark:bg-white/[0.04]",
 				compact
-					? "h-[96px] rounded-xl px-3 sm:px-5 pt-2 pb-1.5"
-					: "h-[160px] sm:h-[176px] rounded-3xl px-3 sm:px-6 md:px-8 pt-5 sm:pt-6 pb-4 sm:pb-5",
+					? "h-[96px] rounded-xl px-3 pt-2 pb-1.5 sm:px-5"
+					: "h-[160px] rounded-3xl px-3 pt-5 pb-4 sm:h-[176px] sm:px-6 sm:pt-6 sm:pb-5 md:px-8",
 			)}
 		>
 			<div
@@ -213,15 +213,13 @@ export function EmailTimeline({
 									"flex shrink-0 items-center justify-center border transition-all duration-300",
 									compact
 										? "size-7 rounded-md"
-										: "size-8 sm:size-10 rounded-lg sm:rounded-[10px]",
+										: "size-8 rounded-lg sm:size-10 sm:rounded-[10px]",
 									getIconStyles(),
 								)}
 							>
 								<Icon
 									name={step.icon}
-									className={
-										compact ? "size-3.5" : "size-4 sm:size-5"
-									}
+									className={compact ? "size-3.5" : "size-4 sm:size-5"}
 								/>
 							</div>
 
@@ -231,7 +229,7 @@ export function EmailTimeline({
 										"font-semibold transition-colors duration-300",
 										compact
 											? "rounded px-1 py-0 text-[9.5px] sm:text-[10px]"
-											: "rounded-md px-1.5 sm:px-2 py-0.5 sm:py-1 text-[11px] sm:text-xs",
+											: "rounded-md px-1.5 py-0.5 text-[11px] sm:px-2 sm:py-1 sm:text-xs",
 										getBadgeStyles(),
 									)}
 								>
@@ -257,7 +255,7 @@ export function EmailTimeline({
 												"whitespace-nowrap font-medium text-text-soft-400",
 												compact
 													? "text-[8.5px] sm:text-[9.5px]"
-													: "text-[10px] sm:text-[11px] md:text-xs tracking-tight",
+													: "text-[10px] tracking-tight sm:text-[11px] md:text-xs",
 											)}
 										>
 											{timestamp}
@@ -293,7 +291,7 @@ export function EmailTimeline({
 							{index < steps.length - 1 && (
 								<motion.div
 									className={cn(
-										"h-0 flex-1 min-w-[8px] sm:min-w-[16px] origin-left border-stroke-soft-100 border-t-[1.5px] border-dashed dark:border-neutral-800",
+										"h-0 min-w-[8px] flex-1 origin-left border-stroke-soft-100 border-t-[1.5px] border-dashed sm:min-w-[16px] dark:border-neutral-800",
 										compact ? "mt-3.5" : "mt-4 sm:mt-5",
 									)}
 									initial={reduceMotion ? false : { opacity: 0, scaleX: 0.4 }}

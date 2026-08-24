@@ -60,7 +60,8 @@ export const aiRoutes = new Elysia({
 			detail: {
 				tags: ["AI"],
 				summary: "Update Subject From Body",
-				description: "Update and generate a subject line based on the email body",
+				description:
+					"Update and generate a subject line based on the email body",
 			},
 		},
 	)

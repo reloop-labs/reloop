@@ -259,272 +259,273 @@ export function DocsHome() {
 			<div className="space-y-12 px-6 py-8 md:px-10 md:py-10">
 				{/* ── AI agents ── */}
 				<section>
-				<SoftWell>
-					<div className="grid overflow-hidden rounded-[16px] md:grid-cols-2">
-						<div className="border-stroke-soft-100/70 border-b p-6 md:border-r md:border-b-0 md:p-8 dark:border-stroke-soft-100/15">
-							<SectionLabel>AI Agents</SectionLabel>
-							<h2 className="font-semibold text-lg text-text-strong-950 tracking-tight dark:text-white">
-								Get started with your AI agent
-							</h2>
-							<p className="mt-2 max-w-md text-[14.5px] text-text-sub-600 leading-relaxed">
-								Copy this prompt into Cursor, Claude, or any agent to install
-								Reloop, verify a domain, and send a test email.
-							</p>
-							<Link
-								href="/integrations/ai-tools/mcp-server"
-								className="mt-5 inline-flex items-center gap-1.5 font-medium text-[13.5px] text-primary-base transition-colors hover:text-primary-dark"
-							>
-								MCP server guide
-								<Icon name="arrow-right" className="size-3.5" />
-							</Link>
+					<SoftWell>
+						<div className="grid overflow-hidden rounded-[16px] md:grid-cols-2">
+							<div className="border-stroke-soft-100/70 border-b p-6 md:border-r md:border-b-0 md:p-8 dark:border-stroke-soft-100/15">
+								<SectionLabel>AI Agents</SectionLabel>
+								<h2 className="font-semibold text-lg text-text-strong-950 tracking-tight dark:text-white">
+									Get started with your AI agent
+								</h2>
+								<p className="mt-2 max-w-md text-[14.5px] text-text-sub-600 leading-relaxed">
+									Copy this prompt into Cursor, Claude, or any agent to install
+									Reloop, verify a domain, and send a test email.
+								</p>
+								<Link
+									href="/integrations/ai-tools/mcp-server"
+									className="mt-5 inline-flex items-center gap-1.5 font-medium text-[13.5px] text-primary-base transition-colors hover:text-primary-dark"
+								>
+									MCP server guide
+									<Icon name="arrow-right" className="size-3.5" />
+								</Link>
+							</div>
+							<div className="bg-bg-white-0 p-6 md:p-8 dark:bg-zinc-950">
+								<PromptCard />
+							</div>
 						</div>
-						<div className="bg-bg-white-0 p-6 md:p-8 dark:bg-zinc-950">
-							<PromptCard />
-						</div>
+					</SoftWell>
+				</section>
+
+				{/* ── Get started ── */}
+				<section>
+					<SectionHeading
+						title="Get started"
+						description="Pick a path and ship your first message in minutes."
+					/>
+					<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+						<NavCard
+							href="/api/mail/post-api-mail-v1send"
+							icon="mail-send"
+							title="Send email"
+							description="POST /mail and deliver your first message."
+						/>
+						<NavCard
+							href="/learn/domain"
+							icon="globe"
+							title="Verify a domain"
+							description="SPF, DKIM, and DMARC setup for deliverability."
+						/>
+						<NavCard
+							href="/learn/api-keys"
+							icon="key-new"
+							title="API keys"
+							description="Create, rotate, and scope credentials."
+						/>
+						<NavCard
+							href="/resources/sdks"
+							icon="code"
+							title="Install an SDK"
+							description="Node, Python, Go, Rust, PHP, and more."
+						/>
 					</div>
-				</SoftWell>
-			</section>
+				</section>
 
-			{/* ── Get started ── */}
-			<section>
-				<SectionHeading
-					title="Get started"
-					description="Pick a path and ship your first message in minutes."
-				/>
-				<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-					<NavCard
-						href="/api/mail/post-api-mail-v1send"
-						icon="mail-send"
-						title="Send email"
-						description="POST /mail and deliver your first message."
+				{/* ── Product guides ── */}
+				<section>
+					<SectionHeading
+						title="Product guides"
+						description="Deep dives into Reloop’s core features."
+						action={{ label: "View all", href: "/docs/learn" }}
 					/>
-					<NavCard
-						href="/learn/domain"
-						icon="globe"
-						title="Verify a domain"
-						description="SPF, DKIM, and DMARC setup for deliverability."
-					/>
-					<NavCard
-						href="/learn/api-keys"
-						icon="key-new"
-						title="API keys"
-						description="Create, rotate, and scope credentials."
-					/>
-					<NavCard
-						href="/resources/sdks"
-						icon="code"
-						title="Install an SDK"
-						description="Node, Python, Go, Rust, PHP, and more."
-					/>
-				</div>
-			</section>
+					<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+						<NavCard
+							href="/learn/emails"
+							icon="mail-single"
+							title="Emails"
+							description="Transactional sending, SMTP, and delivery."
+						/>
+						<NavCard
+							href="/learn/templates"
+							icon="file-code"
+							title="Templates"
+							description="Design, version, and send dynamic HTML."
+						/>
+						<NavCard
+							href="/learn/contacts"
+							icon="contacts"
+							title="Contacts"
+							description="Audiences, groups, channels, and properties."
+						/>
+						<NavCard
+							href="/learn/agent-inbox"
+							icon="inbox"
+							title="Agent Inbox"
+							description="Receive and reply to inbound mail."
+						/>
+						<NavCard
+							href="/learn/workflows"
+							icon="workflow"
+							title="Workflows"
+							description="Automate multi-step email sequences."
+						/>
+					</div>
+				</section>
 
-			{/* ── Product guides ── */}
-			<section>
-				<SectionHeading
-					title="Product guides"
-					description="Deep dives into Reloop’s core features."
-					action={{ label: "View all", href: "/docs/learn" }}
-				/>
-				<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-					<NavCard
-						href="/learn/emails"
-						icon="mail-single"
-						title="Emails"
-						description="Transactional sending, SMTP, and delivery."
+				{/* ── API modules ── */}
+				<section>
+					<SectionHeading
+						title="API modules"
+						description="Full reference for every resource."
+						action={{ label: "Open API Reference", href: "/docs/api" }}
 					/>
-					<NavCard
-						href="/learn/templates"
-						icon="file-code"
-						title="Templates"
-						description="Design, version, and send dynamic HTML."
-					/>
-					<NavCard
-						href="/learn/contacts"
-						icon="contacts"
-						title="Contacts"
-						description="Audiences, groups, channels, and properties."
-					/>
-					<NavCard
-						href="/learn/agent-inbox"
-						icon="inbox"
-						title="Agent Inbox"
-						description="Receive and reply to inbound mail."
-					/>
-					<NavCard
-						href="/learn/workflows"
-						icon="workflow"
-						title="Workflows"
-						description="Automate multi-step email sequences."
-					/>
-				</div>
-			</section>
+					<div className="grid gap-4 lg:grid-cols-3">
+						<SoftWell>
+							<SoftPanel className="h-full p-5">
+								<SectionLabel>Sending</SectionLabel>
+								<div className="flex flex-col gap-0.5">
+									<CompactLink
+										href="/api/mail/post-api-mail-v1send"
+										icon="mail-send"
+										title="Mail"
+										description="Send transactional and marketing email"
+									/>
+									<CompactLink
+										href="/api/template"
+										icon="file-code"
+										title="Templates"
+										description="Create, version, and test templates"
+									/>
+									<CompactLink
+										href="/api/domain"
+										icon="globe"
+										title="Domains"
+										description="Verify DNS and manage sending domains"
+									/>
+								</div>
+							</SoftPanel>
+						</SoftWell>
+						<SoftWell>
+							<SoftPanel className="h-full p-5">
+								<SectionLabel>Audience</SectionLabel>
+								<div className="flex flex-col gap-0.5">
+									<CompactLink
+										href="/api/contacts"
+										icon="contacts"
+										title="Contacts"
+										description="Contacts, groups, and properties"
+									/>
+									<CompactLink
+										href="/api/api-key"
+										icon="key-new"
+										title="API Keys"
+										description="Create, rotate, and scope keys"
+									/>
+									<CompactLink
+										href="/api/webhook"
+										icon="webhook"
+										title="Webhooks"
+										description="Endpoints, deliveries, and retries"
+									/>
+								</div>
+							</SoftPanel>
+						</SoftWell>
+						<SoftWell>
+							<SoftPanel className="h-full p-5">
+								<SectionLabel>Observability</SectionLabel>
+								<div className="flex flex-col gap-0.5">
+									<CompactLink
+										href="/api/logs"
+										icon="file-text"
+										title="Logs"
+										description="Email logs, stats, and activity"
+									/>
+									<CompactLink
+										href="/api/inbox"
+										icon="inbox"
+										title="Inbox"
+										description="Mailboxes, threads, and messages"
+									/>
+									<CompactLink
+										href="/api/upload"
+										icon="file-upload"
+										title="Upload"
+										description="Attach files to outbound email"
+									/>
+								</div>
+							</SoftPanel>
+						</SoftWell>
+					</div>
+				</section>
 
-			{/* ── API modules ── */}
-			<section>
-				<SectionHeading
-					title="API modules"
-					description="Full reference for every resource."
-					action={{ label: "Open API Reference", href: "/docs/api" }}
-				/>
-				<div className="grid gap-4 lg:grid-cols-3">
+				{/* ── Bottom row ── */}
+				<section className="grid gap-4 lg:grid-cols-3">
 					<SoftWell>
 						<SoftPanel className="h-full p-5">
-							<SectionLabel>Sending</SectionLabel>
+							<SectionLabel>Examples</SectionLabel>
 							<div className="flex flex-col gap-0.5">
 								<CompactLink
-									href="/api/mail/post-api-mail-v1send"
-									icon="mail-send"
-									title="Mail"
-									description="Send transactional and marketing email"
+									href="/examples/nodejs/nextjs"
+									icon="code"
+									title="Next.js"
+									description="App Router + Reloop SDK"
 								/>
 								<CompactLink
-									href="/api/template"
-									icon="file-code"
-									title="Templates"
-									description="Create, version, and test templates"
+									href="/examples/python/fastapi"
+									icon="code"
+									title="FastAPI"
+									description="Python SDK integration"
 								/>
 								<CompactLink
-									href="/api/domain"
-									icon="globe"
-									title="Domains"
-									description="Verify DNS and manage sending domains"
+									href="/examples/smtp/introduction"
+									icon="server"
+									title="SMTP"
+									description="Relay via any SMTP client"
 								/>
 							</div>
 						</SoftPanel>
 					</SoftWell>
 					<SoftWell>
 						<SoftPanel className="h-full p-5">
-							<SectionLabel>Audience</SectionLabel>
+							<SectionLabel>Resources</SectionLabel>
 							<div className="flex flex-col gap-0.5">
 								<CompactLink
-									href="/api/contacts"
-									icon="contacts"
-									title="Contacts"
-									description="Contacts, groups, and properties"
+									href="/resources/sdks"
+									icon="box"
+									title="SDKs"
+									description="Official client libraries"
 								/>
 								<CompactLink
-									href="/api/api-key"
-									icon="key-new"
-									title="API Keys"
-									description="Create, rotate, and scope keys"
+									href="/resources/cli"
+									icon="terminal"
+									title="CLI"
+									description="Command-line tooling"
 								/>
 								<CompactLink
-									href="/api/webhook"
-									icon="webhook"
-									title="Webhooks"
-									description="Endpoints, deliveries, and retries"
+									href="/resources/security"
+									icon="shield-check"
+									title="Security"
+									description="Auth, secrets, and best practices"
 								/>
 							</div>
 						</SoftPanel>
 					</SoftWell>
 					<SoftWell>
-						<SoftPanel className="h-full p-5">
-							<SectionLabel>Observability</SectionLabel>
-							<div className="flex flex-col gap-0.5">
-								<CompactLink
-									href="/api/logs"
-									icon="file-text"
-									title="Logs"
-									description="Email logs, stats, and activity"
-								/>
-								<CompactLink
-									href="/api/inbox"
-									icon="inbox"
-									title="Inbox"
-									description="Mailboxes, threads, and messages"
-								/>
-								<CompactLink
-									href="/api/upload"
-									icon="file-upload"
-									title="Upload"
-									description="Attach files to outbound email"
-								/>
+						<SoftPanel className="flex h-full flex-col justify-between gap-4 p-5">
+							<div>
+								<p className="font-semibold text-[15px] text-text-strong-950 tracking-tight dark:text-white">
+									Self-host Reloop
+								</p>
+								<p className="mt-2 text-[13.5px] text-text-sub-600 leading-relaxed">
+									Run the full stack on Vercel, Railway, Docker, or your own
+									VPS.
+								</p>
+							</div>
+							<div className="flex flex-wrap gap-2">
+								<Link
+									href="/self-host"
+									className="inline-flex h-8 items-center rounded-lg border border-stroke-soft-100 bg-bg-white-0 px-3 font-medium text-[13px] text-text-strong-950 transition-colors hover:bg-bg-weak-50 dark:border-stroke-soft-100/40 dark:bg-zinc-950 dark:text-white dark:hover:bg-white/5"
+								>
+									Self-host guide
+								</Link>
+								<Link
+									href="/integrations"
+									className="inline-flex h-8 items-center rounded-lg border border-stroke-soft-100 bg-bg-white-0 px-3 font-medium text-[13px] text-text-strong-950 transition-colors hover:bg-bg-weak-50 dark:border-stroke-soft-100/40 dark:bg-zinc-950 dark:text-white dark:hover:bg-white/5"
+								>
+									Integrations
+								</Link>
 							</div>
 						</SoftPanel>
 					</SoftWell>
-				</div>
-			</section>
-
-			{/* ── Bottom row ── */}
-			<section className="grid gap-4 lg:grid-cols-3">
-				<SoftWell>
-					<SoftPanel className="h-full p-5">
-						<SectionLabel>Examples</SectionLabel>
-						<div className="flex flex-col gap-0.5">
-							<CompactLink
-								href="/examples/nodejs/nextjs"
-								icon="code"
-								title="Next.js"
-								description="App Router + Reloop SDK"
-							/>
-							<CompactLink
-								href="/examples/python/fastapi"
-								icon="code"
-								title="FastAPI"
-								description="Python SDK integration"
-							/>
-							<CompactLink
-								href="/examples/smtp/introduction"
-								icon="server"
-								title="SMTP"
-								description="Relay via any SMTP client"
-							/>
-						</div>
-					</SoftPanel>
-				</SoftWell>
-				<SoftWell>
-					<SoftPanel className="h-full p-5">
-						<SectionLabel>Resources</SectionLabel>
-						<div className="flex flex-col gap-0.5">
-							<CompactLink
-								href="/resources/sdks"
-								icon="box"
-								title="SDKs"
-								description="Official client libraries"
-							/>
-							<CompactLink
-								href="/resources/cli"
-								icon="terminal"
-								title="CLI"
-								description="Command-line tooling"
-							/>
-							<CompactLink
-								href="/resources/security"
-								icon="shield-check"
-								title="Security"
-								description="Auth, secrets, and best practices"
-							/>
-						</div>
-					</SoftPanel>
-				</SoftWell>
-				<SoftWell>
-					<SoftPanel className="flex h-full flex-col justify-between gap-4 p-5">
-						<div>
-							<p className="font-semibold text-[15px] text-text-strong-950 tracking-tight dark:text-white">
-								Self-host Reloop
-							</p>
-							<p className="mt-2 text-[13.5px] text-text-sub-600 leading-relaxed">
-								Run the full stack on Vercel, Railway, Docker, or your own VPS.
-							</p>
-						</div>
-						<div className="flex flex-wrap gap-2">
-							<Link
-								href="/self-host"
-								className="inline-flex h-8 items-center rounded-lg border border-stroke-soft-100 bg-bg-white-0 px-3 font-medium text-[13px] text-text-strong-950 transition-colors hover:bg-bg-weak-50 dark:border-stroke-soft-100/40 dark:bg-zinc-950 dark:text-white dark:hover:bg-white/5"
-							>
-								Self-host guide
-							</Link>
-							<Link
-								href="/integrations"
-								className="inline-flex h-8 items-center rounded-lg border border-stroke-soft-100 bg-bg-white-0 px-3 font-medium text-[13px] text-text-strong-950 transition-colors hover:bg-bg-weak-50 dark:border-stroke-soft-100/40 dark:bg-zinc-950 dark:text-white dark:hover:bg-white/5"
-							>
-								Integrations
-							</Link>
-						</div>
-					</SoftPanel>
-				</SoftWell>
-			</section>
+				</section>
 			</div>
 
 			{/* Footer */}

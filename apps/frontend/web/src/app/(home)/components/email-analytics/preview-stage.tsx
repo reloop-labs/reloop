@@ -706,7 +706,8 @@ export function PreviewStage({
 	onTabChange?: (id: AnalyticsTabId) => void;
 } = {}) {
 	const shouldReduceMotion = useReducedMotion();
-	const [internalActive, setInternalActive] = useState<AnalyticsTabId>("metrics");
+	const [internalActive, setInternalActive] =
+		useState<AnalyticsTabId>("metrics");
 	const active = externalActive ?? internalActive;
 	const [direction, setDirection] = useState(0);
 

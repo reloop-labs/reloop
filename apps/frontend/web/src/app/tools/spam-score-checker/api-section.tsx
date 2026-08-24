@@ -2,21 +2,6 @@
 
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import { AnimatePresence, motion } from "framer-motion";
-import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
-import type { SimpleIcon } from "simple-icons";
-import {
-	siCurl,
-	siDotnet,
-	siElixir,
-	siGo,
-	siNodedotjs,
-	siOpenjdk,
-	siPhp,
-	siPython,
-	siRuby,
-	siRust,
-} from "simple-icons";
 import { AnimatedHoverBackground } from "@reloop/web/app/sdk/components/animated-hover-background";
 import {
 	getBrandColorStyle,
@@ -30,6 +15,22 @@ import {
 } from "@reloop/web/app/sdk/components/node-install-block";
 import { SdkCodeBlock } from "@reloop/web/app/sdk/components/sdk-code-block";
 import { useSidebarHoverBox } from "@reloop/web/app/sdk/components/use-sidebar-hover-box";
+import { AnimatePresence, motion } from "framer-motion";
+import type React from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import type { SimpleIcon } from "simple-icons";
+import {
+	siCurl,
+	siDotnet,
+	siElixir,
+	siGo,
+	siNodedotjs,
+	siOpenjdk,
+	siPhp,
+	siPython,
+	siRuby,
+	siRust,
+} from "simple-icons";
 import { apiResponseSample } from "./content";
 
 export interface ToolLanguage {
@@ -38,7 +39,13 @@ export interface ToolLanguage {
 	packageName: string;
 	icon: SimpleIcon;
 	installCommand: string;
-	frameworks: { slug: string; name: string; icon: SimpleIcon; code: string; installCommand?: string }[];
+	frameworks: {
+		slug: string;
+		name: string;
+		icon: SimpleIcon;
+		code: string;
+		installCommand?: string;
+	}[];
 	checkCode: string;
 	fileName: string;
 }
@@ -370,7 +377,9 @@ function StepItem({
 				)}
 			</div>
 
-			<div className={`flex min-w-0 flex-1 flex-col gap-2.5 ${isLast ? "" : "pb-6"}`}>
+			<div
+				className={`flex min-w-0 flex-1 flex-col gap-2.5 ${isLast ? "" : "pb-6"}`}
+			>
 				<h4 className="mt-0.5 font-medium text-[13.5px] text-text-strong-950 dark:text-white">
 					{title}
 				</h4>
@@ -383,7 +392,9 @@ function StepItem({
 export function ApiSection() {
 	const [activeSlug, setActiveSlug] = useState("nodejs");
 	const [pkgManager, setPkgManager] = useState<PackageManager>("npm");
-	const [hoveredTabIdx, setHoveredTabIdx] = useState<number | undefined>(undefined);
+	const [hoveredTabIdx, setHoveredTabIdx] = useState<number | undefined>(
+		undefined,
+	);
 	const [mounted, setMounted] = useState(false);
 	const [activePill, setActivePill] = useState<PillBox | null>(null);
 	const [hoverPill, setHoverPill] = useState<PillBox | null>(null);
@@ -395,19 +406,29 @@ export function ApiSection() {
 	}, []);
 
 	const activeTabIndex = TOOL_LANGUAGES.findIndex((l) => l.slug === activeSlug);
-	const isHoveringOther = hoveredTabIdx !== undefined && hoveredTabIdx !== activeTabIndex;
+	const isHoveringOther =
+		hoveredTabIdx !== undefined && hoveredTabIdx !== activeTabIndex;
 	const hoverBrandColor =
 		isHoveringOther && hoveredTabIdx !== undefined
 			? `#${TOOL_LANGUAGES[hoveredTabIdx]!.icon.hex}`
 			: undefined;
 
-	const active = TOOL_LANGUAGES.find((l) => l.slug === activeSlug) ?? TOOL_LANGUAGES[0]!;
+	const active =
+		TOOL_LANGUAGES.find((l) => l.slug === activeSlug) ?? TOOL_LANGUAGES[0]!;
 	const brandColor = `#${active.icon.hex}`;
 
-	const [selectedFrameworkSlug, setSelectedFrameworkSlug] = useState<string | null>(null);
-	const [hoveredFwEl, setHoveredFwEl] = useState<HTMLElement | undefined>(undefined);
-	const [activeFwEl, setActiveFwEl] = useState<HTMLElement | undefined>(undefined);
-	const [fwContainerEl, setFwContainerEl] = useState<HTMLDivElement | null>(null);
+	const [selectedFrameworkSlug, setSelectedFrameworkSlug] = useState<
+		string | null
+	>(null);
+	const [hoveredFwEl, setHoveredFwEl] = useState<HTMLElement | undefined>(
+		undefined,
+	);
+	const [activeFwEl, setActiveFwEl] = useState<HTMLElement | undefined>(
+		undefined,
+	);
+	const [fwContainerEl, setFwContainerEl] = useState<HTMLDivElement | null>(
+		null,
+	);
 	const fwRefs = useRef<(HTMLElement | null)[]>([]);
 
 	useEffect(() => {
@@ -416,7 +437,8 @@ export function ApiSection() {
 	}, [activeSlug]);
 
 	const activeFramework = selectedFrameworkSlug
-		? (active.frameworks.find((fw) => fw.slug === selectedFrameworkSlug) ?? null)
+		? (active.frameworks.find((fw) => fw.slug === selectedFrameworkSlug) ??
+			null)
 		: null;
 
 	const isLanguageSelected = activeFramework === null;
@@ -432,7 +454,9 @@ export function ApiSection() {
 		setActiveFwEl(selected ?? undefined);
 	}, [fwContainerEl, selectedFrameworkSlug, activeSlug]);
 
-	const isHoveringOtherFw = Boolean(hoveredFwEl && activeFwEl && hoveredFwEl !== activeFwEl);
+	const isHoveringOtherFw = Boolean(
+		hoveredFwEl && activeFwEl && hoveredFwEl !== activeFwEl,
+	);
 
 	const fwActiveBox = useSidebarHoverBox(
 		activeFwEl,
@@ -526,7 +550,9 @@ export function ApiSection() {
 								<span
 									className={cn(
 										"inline-flex items-center",
-										!showActiveLabel && isTabLangDark && "text-text-strong-950 dark:text-white",
+										!showActiveLabel &&
+											isTabLangDark &&
+											"text-text-strong-950 dark:text-white",
 									)}
 									style={{
 										color: showActiveLabel
@@ -579,7 +605,7 @@ export function ApiSection() {
 			</div>
 
 			{/* Content: left meta + right code steps */}
-			<div className="grid grid-cols-1 lg:grid-cols-12 border-b border-stroke-soft-200 dark:border-white/10">
+			<div className="grid grid-cols-1 border-stroke-soft-200 border-b lg:grid-cols-12 dark:border-white/10">
 				{/* Left meta & frameworks rail */}
 				<aside className="border-stroke-soft-200 border-b bg-transparent lg:col-span-3 lg:border-r lg:border-b-0 dark:border-white/10">
 					<div className="flex flex-col gap-4 px-6 py-6 sm:px-10 sm:py-7 lg:sticky lg:top-16 lg:py-8 lg:pr-5 lg:pl-12">
@@ -587,7 +613,8 @@ export function ApiSection() {
 							<div
 								className={cn(
 									"inline-flex size-10 items-center justify-center rounded-xl border border-stroke-soft-200 bg-bg-white-0 dark:border-white/10 dark:bg-black",
-									isDarkBrandColor(active.icon.hex) && "text-text-strong-950 dark:text-white",
+									isDarkBrandColor(active.icon.hex) &&
+										"text-text-strong-950 dark:text-white",
 								)}
 								style={getBrandColorStyle(active.icon.hex)}
 							>
@@ -622,14 +649,17 @@ export function ApiSection() {
 									type="button"
 									role="tab"
 									aria-selected={isLanguageSelected}
-									onPointerEnter={() => setHoveredFwEl(fwRefs.current[0] ?? undefined)}
+									onPointerEnter={() =>
+										setHoveredFwEl(fwRefs.current[0] ?? undefined)
+									}
 									onClick={() => setSelectedFrameworkSlug(null)}
 									className="group relative z-10 flex h-8 w-full cursor-pointer items-center gap-2.5 rounded-lg px-2.5 text-left transition-colors"
 								>
 									<span
 										className={cn(
 											"flex size-4 shrink-0 items-center justify-center",
-											isDarkBrandColor(active.icon.hex) && "text-text-strong-950 dark:text-white",
+											isDarkBrandColor(active.icon.hex) &&
+												"text-text-strong-950 dark:text-white",
 										)}
 										style={getBrandColorStyle(active.icon.hex)}
 									>
@@ -652,7 +682,7 @@ export function ApiSection() {
 						</div>
 
 						{/* Prerequisites */}
-						<div className="mt-4 border-t border-stroke-soft-200/60 pt-4 dark:border-white/10">
+						<div className="mt-4 border-stroke-soft-200/60 border-t pt-4 dark:border-white/10">
 							<span className="block font-semibold text-[10px] text-text-soft-400 uppercase tracking-[0.06em] dark:text-white/45">
 								Prerequisites
 							</span>
@@ -662,7 +692,10 @@ export function ApiSection() {
 										href="/docs/learn/api-keys"
 										className="group flex items-center gap-2 text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white"
 									>
-										<Icon name="key" className="size-3.5 text-text-soft-400 dark:text-white/40" />
+										<Icon
+											name="key"
+											className="size-3.5 text-text-soft-400 dark:text-white/40"
+										/>
 										<span>Get an API key</span>
 									</a>
 								</li>
@@ -671,7 +704,10 @@ export function ApiSection() {
 										href="/docs/setup/backend/tools"
 										className="group flex items-center gap-2 text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white"
 									>
-										<Icon name="globe-02" className="size-3.5 text-text-soft-400 dark:text-white/40" />
+										<Icon
+											name="globe-02"
+											className="size-3.5 text-text-soft-400 dark:text-white/40"
+										/>
 										<span>API documentation</span>
 									</a>
 								</li>
@@ -682,24 +718,19 @@ export function ApiSection() {
 
 				{/* Right: Installation & Code Sample Steps */}
 				<div className="px-6 py-6 sm:px-10 sm:py-7 lg:col-span-9 lg:px-12 lg:py-8">
-					<StepItem
-						number={1}
-						title={`Install the ${active.name} package`}
-					>
+					<StepItem number={1} title={`Install the ${active.name} package`}>
 						{active.slug === "nodejs" ? (
 							<SdkCodeBlock
 								code={installCode}
 								slug={active.slug}
 								tabs={NODE_PKG_TABS}
 								activeTab={pkgManager}
-								onTabChange={(tab: string) => setPkgManager(tab as PackageManager)}
+								onTabChange={(tab: string) =>
+									setPkgManager(tab as PackageManager)
+								}
 							/>
 						) : (
-							<SdkCodeBlock
-								code={installCode}
-								slug={active.slug}
-								lang="bash"
-							/>
+							<SdkCodeBlock code={installCode} slug={active.slug} lang="bash" />
 						)}
 					</StepItem>
 

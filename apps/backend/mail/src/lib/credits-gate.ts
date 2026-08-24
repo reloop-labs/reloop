@@ -58,7 +58,9 @@ async function ensureActiveCredits(organizationId: string) {
 					),
 			});
 			if (!activeCredits) {
-				throw new Error("Failed to retrieve organization credits after provision");
+				throw new Error(
+					"Failed to retrieve organization credits after provision",
+				);
 			}
 			return activeCredits;
 		}

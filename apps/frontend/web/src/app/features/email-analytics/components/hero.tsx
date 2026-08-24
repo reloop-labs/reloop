@@ -6,9 +6,9 @@ import { hostedSignupHref } from "@reloop/web/lib/site";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useMemo, useState } from "react";
 import { SceneGlyph } from "../../../(home)/components/_shared/scene-header";
+import { HeroAnalyticsPreview } from "../../../(home)/components/hero-analytics-preview";
 import { HeroWindowChrome } from "../../../(home)/components/hero-chrome";
 import { HeroDashboardShell } from "../../../(home)/components/hero-dashboard-shell";
-import { HeroAnalyticsPreview } from "../../../(home)/components/hero-analytics-preview";
 
 const ANALYTICS_AI_PROMPT = `Track email delivery, engagement, and bounce events with Reloop.
 
@@ -58,8 +58,9 @@ export default function Hero() {
 					See Exactly What Happens to Every Email
 				</h1>
 				<p className="mt-5 max-w-[46rem] text-balance text-center text-[16.5px] text-text-sub-600 leading-relaxed sm:mt-6 sm:text-[18.5px] lg:text-[20px] dark:text-white/60">
-					Real-time delivery observability, engagement tracking, bounce diagnostics, and
-					domain reputation metrics—from the moment you hit send.
+					Real-time delivery observability, engagement tracking, bounce
+					diagnostics, and domain reputation metrics—from the moment you hit
+					send.
 				</p>
 				<div className="mt-8 flex flex-wrap items-center justify-center gap-3.5 sm:mt-9 sm:gap-4">
 					<FancyButton.Root

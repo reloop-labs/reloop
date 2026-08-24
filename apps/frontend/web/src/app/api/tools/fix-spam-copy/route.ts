@@ -14,7 +14,10 @@ function localDeliverabilityFix(subject: string, body: string) {
 	let newBody = body;
 
 	newSubject = newSubject
-		.replace(/confidential\s*investment\s*proposal/gi, "Investment inquiry and project overview")
+		.replace(
+			/confidential\s*investment\s*proposal/gi,
+			"Investment inquiry and project overview",
+		)
 		.replace(/100%\s*free/gi, "Complimentary")
 		.replace(/free\s*clothes/gi, "Apparel selection")
 		.replace(/free/gi, "Welcome")
@@ -35,12 +38,21 @@ function localDeliverabilityFix(subject: string, body: string) {
 		.replace(/financial\s*consultant/gi, "representative")
 		.replace(/privately\s*owned\s*funds/gi, "capital assets")
 		.replace(/finance\s*projects/gi, "support new ventures")
-		.replace(/guaranteed\s*\d+%\s*roi\s*per\s*annum/gi, "standard target returns")
+		.replace(
+			/guaranteed\s*\d+%\s*roi\s*per\s*annum/gi,
+			"standard target returns",
+		)
 		.replace(/guaranteed\s*\d+%/gi, "target returns")
 		.replace(/guaranteed/gi, "verified")
-		.replace(/please\s*answer\s*asap/gi, "Feel free to let me know if you would like to discuss further")
+		.replace(
+			/please\s*answer\s*asap/gi,
+			"Feel free to let me know if you would like to discuss further",
+		)
 		.replace(/asap|urgent/gi, "at your convenience")
-		.replace(/click\s*the\s*below\s*button\s*to\s*get\s*free\s*clothes/gi, "You can select your apparel package online")
+		.replace(
+			/click\s*the\s*below\s*button\s*to\s*get\s*free\s*clothes/gi,
+			"You can select your apparel package online",
+		)
 		.replace(/click\s*the\s*below\s*button|click\s*below/gi, "view online")
 		.replace(/click\s*here|click\s*the\s*link/gi, "review details")
 		.replace(/100%\s*free/gi, "included")
@@ -80,34 +92,37 @@ export async function POST(req: Request) {
 		// 1. If OpenAI API key is available
 		if (openaiApiKey) {
 			try {
-				const response = await fetch("https://api.openai.com/v1/chat/completions", {
-					method: "POST",
-					headers: {
-						"Content-Type": "application/json",
-						Authorization: `Bearer ${openaiApiKey}`,
-					},
-					body: JSON.stringify({
-						model: process.env.OPENAI_MODEL || "gpt-4o-mini",
-						temperature: 0.3,
-						response_format: { type: "json_object" },
-						messages: [
-							{
-								role: "system",
-								content: `You are an expert email deliverability and anti-spam engineer for Reloop.
+				const response = await fetch(
+					"https://api.openai.com/v1/chat/completions",
+					{
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json",
+							Authorization: `Bearer ${openaiApiKey}`,
+						},
+						body: JSON.stringify({
+							model: process.env.OPENAI_MODEL || "gpt-4o-mini",
+							temperature: 0.3,
+							response_format: { type: "json_object" },
+							messages: [
+								{
+									role: "system",
+									content: `You are an expert email deliverability and anti-spam engineer for Reloop.
 Rewrite the user's email subject line and body copy to eliminate 100% of spam trigger words, false urgency, exaggerated financial promises, and phishing phrases while preserving the core message, professional tone, and intent.
 Always return valid JSON strictly matching:
 {
   "subject": "Rewritten inbox-ready subject line",
   "body": "Rewritten inbox-ready body copy"
 }`,
-							},
-							{
-								role: "user",
-								content: JSON.stringify({ subject, body }),
-							},
-						],
-					}),
-				});
+								},
+								{
+									role: "user",
+									content: JSON.stringify({ subject, body }),
+								},
+							],
+						}),
+					},
+				);
 
 				if (response.ok) {
 					const json = await response.json();
@@ -131,27 +146,30 @@ Always return valid JSON strictly matching:
 		// 2. If OpenRouter API key is available
 		if (openrouterApiKey) {
 			try {
-				const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-					method: "POST",
-					headers: {
-						"Content-Type": "application/json",
-						Authorization: `Bearer ${openrouterApiKey}`,
+				const response = await fetch(
+					"https://openrouter.ai/api/v1/chat/completions",
+					{
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json",
+							Authorization: `Bearer ${openrouterApiKey}`,
+						},
+						body: JSON.stringify({
+							model: process.env.OPENROUTER_MODEL || "openai/gpt-4o-mini",
+							temperature: 0.3,
+							messages: [
+								{
+									role: "system",
+									content: `You are an email deliverability engineer. Rewrite the subject and body to eliminate spam triggers and ensure inbox placement. Return JSON with keys "subject" and "body".`,
+								},
+								{
+									role: "user",
+									content: JSON.stringify({ subject, body }),
+								},
+							],
+						}),
 					},
-					body: JSON.stringify({
-						model: process.env.OPENROUTER_MODEL || "openai/gpt-4o-mini",
-						temperature: 0.3,
-						messages: [
-							{
-								role: "system",
-								content: `You are an email deliverability engineer. Rewrite the subject and body to eliminate spam triggers and ensure inbox placement. Return JSON with keys "subject" and "body".`,
-							},
-							{
-								role: "user",
-								content: JSON.stringify({ subject, body }),
-							},
-						],
-					}),
-				});
+				);
 
 				if (response.ok) {
 					const json = await response.json();

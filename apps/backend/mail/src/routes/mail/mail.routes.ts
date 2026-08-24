@@ -10,4 +10,3 @@ export const mailRoutes = new Elysia({
 	.use(trackRoute)
 	.use(sendEmailRoute)
 	.use(resendEmailRoute);
-

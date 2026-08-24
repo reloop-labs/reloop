@@ -53,8 +53,11 @@ export function SectionRule({
 				<div className="flex flex-1 items-center gap-3 py-4 pl-5 sm:pl-6 md:pl-8">
 					<span className="h-3.5 w-0.5 shrink-0 bg-text-strong-950 dark:bg-white" />
 					<span className="font-mono text-[10px] text-text-soft-400 uppercase tracking-[0.18em] sm:text-[11px] dark:text-white/30">
-						[ <span className="text-text-strong-950 dark:text-white">{index}</span> / {total} ]
-						<span className="px-2">·</span>
+						[{" "}
+						<span className="text-text-strong-950 dark:text-white">
+							{index}
+						</span>{" "}
+						/ {total} ]<span className="px-2">·</span>
 						{label}
 					</span>
 				</div>
@@ -83,7 +86,10 @@ export function SectionIntro({
 				<p className="mb-6 inline-flex items-center gap-2 font-mono text-[11px] text-text-sub-600 uppercase tracking-[0.14em] dark:text-white/45">
 					<span className="text-text-soft-400 dark:text-white/20">{"//"}</span>
 					{eyebrowIcon && (
-						<Icon name={eyebrowIcon} className="size-3.5 text-text-strong-950 dark:text-white" />
+						<Icon
+							name={eyebrowIcon}
+							className="size-3.5 text-text-strong-950 dark:text-white"
+						/>
 					)}
 					{eyebrow}
 					<span className="text-text-soft-400 dark:text-white/20">
@@ -96,7 +102,9 @@ export function SectionIntro({
 				{accent && (
 					<>
 						{" "}
-						<span className="text-text-strong-950 dark:text-white">{accent}</span>
+						<span className="text-text-strong-950 dark:text-white">
+							{accent}
+						</span>
 					</>
 				)}
 			</h2>
@@ -157,13 +165,7 @@ export function Cell({
 	);
 }
 
-export function CellLabel({
-	tag,
-	icon,
-}: {
-	tag?: string;
-	icon?: string;
-}) {
+export function CellLabel({ tag, icon }: { tag?: string; icon?: string }) {
 	return (
 		<div className="mb-6 flex items-center justify-between gap-3">
 			{tag ? (

@@ -6,11 +6,12 @@ import { useState } from "react";
 
 type LangId = "typescript" | "python" | "go" | "curl";
 
-const SNIPPETS: Record<LangId, { label: string; file: string; code: string }> = {
-	typescript: {
-		label: "TypeScript",
-		file: "analytics.ts",
-		code: `import Reloop from 'reloop-email';
+const SNIPPETS: Record<LangId, { label: string; file: string; code: string }> =
+	{
+		typescript: {
+			label: "TypeScript",
+			file: "analytics.ts",
+			code: `import Reloop from 'reloop-email';
 
 const reloop = new Reloop(process.env.RELOOP_API_KEY);
 
@@ -29,11 +30,11 @@ const events = await reloop.events.list({
   type: 'email.bounced',
   limit: 20
 });`,
-	},
-	python: {
-		label: "Python",
-		file: "analytics.py",
-		code: `import os
+		},
+		python: {
+			label: "Python",
+			file: "analytics.py",
+			code: `import os
 from reloop import Reloop
 
 reloop = Reloop(api_key=os.environ["RELOOP_API_KEY"])
@@ -50,11 +51,11 @@ print(f"Unique opens: {stats.unique_opens}")
 
 # 2. Inspect bounce diagnostic logs
 bounces = reloop.events.list(event_type="email.bounced", limit=20)`,
-	},
-	go: {
-		label: "Go",
-		file: "analytics.go",
-		code: `package main
+		},
+		go: {
+			label: "Go",
+			file: "analytics.go",
+			code: `package main
 
 import (
 	"context"
@@ -77,15 +78,15 @@ func main() {
 
 	fmt.Printf("Delivery Rate: %.2f%%\\n", stats.DeliverabilityRate)
 }`,
-	},
-	curl: {
-		label: "cURL / REST",
-		file: "request.sh",
-		code: `curl -X GET "https://api.reloop.sh/v1/analytics/metrics?timeframe=30d&groupBy=domain" \\
+		},
+		curl: {
+			label: "cURL / REST",
+			file: "request.sh",
+			code: `curl -X GET "https://api.reloop.sh/v1/analytics/metrics?timeframe=30d&groupBy=domain" \\
   -H "Authorization: Bearer $RELOOP_API_KEY" \\
   -H "Content-Type: application/json"`,
-	},
-};
+		},
+	};
 
 export default function Guide() {
 	const [activeLang, setActiveLang] = useState<LangId>("typescript");
@@ -111,14 +112,14 @@ export default function Guide() {
 						Query Analytics in 3 Lines of Code
 					</h2>
 					<p className="mx-auto mt-4 max-w-xl text-base text-text-sub-600 dark:text-white/50">
-						Full programmatic access to your email metrics. Query time-series analytics,
-						track delivery SLAs, and fetch raw diagnostic payloads.
+						Full programmatic access to your email metrics. Query time-series
+						analytics, track delivery SLAs, and fetch raw diagnostic payloads.
 					</p>
 				</div>
 
 				<div className="mt-12 overflow-hidden rounded-3xl border border-stroke-soft-200 bg-[#0c0d0e] shadow-xl dark:border-white/10">
 					{/* Header bar */}
-					<div className="flex flex-wrap items-center justify-between border-b border-white/10 bg-white/[0.03] px-6 py-3">
+					<div className="flex flex-wrap items-center justify-between border-white/10 border-b bg-white/[0.03] px-6 py-3">
 						<div className="flex items-center gap-2">
 							{(Object.keys(SNIPPETS) as LangId[]).map((lang) => (
 								<button
@@ -138,7 +139,9 @@ export default function Guide() {
 						</div>
 
 						<div className="flex items-center gap-3">
-							<span className="font-mono text-white/40 text-xs">{activeSnippet.file}</span>
+							<span className="font-mono text-white/40 text-xs">
+								{activeSnippet.file}
+							</span>
 							<button
 								type="button"
 								onClick={handleCopy}

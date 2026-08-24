@@ -87,7 +87,9 @@ export function HeroTemplatesPreview() {
 							<span className="font-mono text-purple-600 dark:text-purple-400">
 								{"{{ cta.url }}"}
 							</span>
-							<p className="text-[10px] text-text-soft-400">https://app.reloop.sh</p>
+							<p className="text-[10px] text-text-soft-400">
+								https://app.reloop.sh
+							</p>
 						</div>
 					</div>
 
@@ -96,13 +98,16 @@ export function HeroTemplatesPreview() {
 					</p>
 					<div className="mt-2 space-y-1 text-[11px]">
 						<div className="flex items-center gap-2 rounded-md p-1.5 text-text-sub-600 dark:text-white/60">
-							<span className="size-2 rounded-full bg-blue-500" /> Header with Logo
+							<span className="size-2 rounded-full bg-blue-500" /> Header with
+							Logo
 						</div>
 						<div className="flex items-center gap-2 rounded-md p-1.5 text-text-sub-600 dark:text-white/60">
-							<span className="size-2 rounded-full bg-purple-500" /> Dynamic Hero Button
+							<span className="size-2 rounded-full bg-purple-500" /> Dynamic
+							Hero Button
 						</div>
 						<div className="flex items-center gap-2 rounded-md p-1.5 text-text-sub-600 dark:text-white/60">
-							<span className="size-2 rounded-full bg-emerald-500" /> One-Click Footer
+							<span className="size-2 rounded-full bg-emerald-500" /> One-Click
+							Footer
 						</div>
 					</div>
 				</div>
@@ -154,7 +159,9 @@ export function HeroTemplatesPreview() {
 						{/* Email Footer */}
 						<div className="border-stroke-soft-200 border-t pt-4 text-[11px] text-text-soft-400 dark:border-white/10 dark:text-white/40">
 							<p>Reloop Labs · 100% open-source email infrastructure</p>
-							<p className="mt-1">Unsubscribe or manage notification settings</p>
+							<p className="mt-1">
+								Unsubscribe or manage notification settings
+							</p>
 						</div>
 					</div>
 				</div>

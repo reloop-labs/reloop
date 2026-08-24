@@ -10,11 +10,14 @@ import {
 	useRef,
 	useState,
 } from "react";
+import { toast } from "sonner";
 import { apiFetch } from "#/features/agent-inbox/lib/api-fetch";
 import { useMailboxId } from "#/features/agent-inbox/lib/use-mailbox-id";
 import { useSWR } from "#/features/agent-inbox/lib/use-swr-compat";
-import { toast } from "sonner";
-import { useInboxSocket, type InboxServerEvent } from "../hooks/use-inbox-socket";
+import {
+	type InboxServerEvent,
+	useInboxSocket,
+} from "../hooks/use-inbox-socket";
 import { extractBareEmail, extractDisplayName } from "../lib/email-address";
 import type {
 	AgentMailbox,

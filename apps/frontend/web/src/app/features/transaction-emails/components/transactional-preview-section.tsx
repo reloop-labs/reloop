@@ -65,7 +65,10 @@ export function TransactionalPreviewSection() {
 										className="group flex cursor-pointer items-center justify-center p-1 text-text-strong-950 transition-transform duration-150 hover:scale-115 dark:text-white"
 									>
 										<span className="flex items-center justify-center">
-											<LanguageIcon icon={fw.icon} className="size-7 sm:size-8" />
+											<LanguageIcon
+												icon={fw.icon}
+												className="size-7 sm:size-8"
+											/>
 										</span>
 									</Link>
 								))}

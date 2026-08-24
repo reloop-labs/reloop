@@ -190,7 +190,8 @@ const values = [
 	{
 		icon: "graph-up",
 		title: "Cost Efficiency",
-		description: "Send-based hosted pricing from $10/month for 25k emails/month; $0.80 per 1k emails.",
+		description:
+			"Send-based hosted pricing from $10/month for 25k emails/month; $0.80 per 1k emails.",
 		widget: <MicroCost />,
 	},
 	{

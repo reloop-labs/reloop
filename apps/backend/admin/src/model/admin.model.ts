@@ -392,6 +392,47 @@ export namespace AdminModel {
 		sentAt: t.Union([t.Date(), t.Null()]),
 	});
 
+	export const emailEvent = t.Object({
+		id: t.String(),
+		type: t.String(),
+		metadata: t.Union([t.Any(), t.Null()]),
+		createdAt: t.Date(),
+	});
+
+	export const emailDetail = t.Object({
+		id: t.String(),
+		messageId: t.String(),
+		organizationId: t.String(),
+		organizationName: t.Union([t.String(), t.Null()]),
+		domainId: t.String(),
+		domainName: t.Union([t.String(), t.Null()]),
+		userId: t.Union([t.String(), t.Null()]),
+		apikeyId: t.Union([t.String(), t.Null()]),
+		fromEmail: t.String(),
+		fromName: t.Union([t.String(), t.Null()]),
+		toEmails: t.Any(),
+		ccEmails: t.Union([t.Any(), t.Null()]),
+		bccEmails: t.Union([t.Any(), t.Null()]),
+		replyTo: t.Union([t.String(), t.Null()]),
+		subject: t.String(),
+		textBody: t.Union([t.String(), t.Null()]),
+		htmlBody: t.Union([t.String(), t.Null()]),
+		rawMessage: t.Optional(t.Union([t.String(), t.Null()])),
+		status: t.String(),
+		priority: t.String(),
+		errorMessage: t.Union([t.String(), t.Null()]),
+		provider: t.String(),
+		providerMessageId: t.Union([t.String(), t.Null()]),
+		size: t.Number(),
+		headers: t.Union([t.Record(t.String(), t.String()), t.Null()]),
+		sentAt: t.Union([t.Date(), t.Null()]),
+		deliveredAt: t.Union([t.Date(), t.Null()]),
+		failedAt: t.Union([t.Date(), t.Null()]),
+		createdAt: t.Date(),
+		updatedAt: t.Date(),
+		events: t.Array(emailEvent),
+	});
+
 	export const emailsResponse = t.Object({
 		items: t.Array(emailItem),
 		total: t.Number(),

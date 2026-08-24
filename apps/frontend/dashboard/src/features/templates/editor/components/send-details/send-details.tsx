@@ -36,7 +36,7 @@ const FieldRow = ({
 		>
 			<label
 				htmlFor={id}
-				className="w-20 shrink-0 text-label-sm text-text-sub-600 select-none"
+				className="w-20 shrink-0 select-none text-label-sm text-text-sub-600"
 			>
 				{label}
 				{required && (

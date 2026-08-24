@@ -1,5 +1,6 @@
 "use client";
 
+import { EmailDetailDrawer } from "@fe/console/components/email-detail-drawer";
 import {
 	DataTable,
 	PageFrame,
@@ -9,6 +10,7 @@ import { StatusPill } from "@fe/console/components/ui/status-pill";
 import { adminGet } from "@fe/console/lib/admin-api";
 import { formatRecipients, formatRelativeTime } from "@fe/console/lib/format";
 import * as Button from "@reloop/ui/button";
+import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import Link from "next/link";
 import { parseAsString, useQueryState } from "nuqs";
@@ -36,6 +38,10 @@ export default function EmailsPage() {
 	);
 	const [organizationId, setOrganizationId] = useQueryState(
 		"organizationId",
+		parseAsString.withDefault(""),
+	);
+	const [selectedEmailId, setSelectedEmailId] = useQueryState(
+		"emailId",
 		parseAsString.withDefault(""),
 	);
 	const [draftQ, setDraftQ] = useState(q);
@@ -127,25 +133,31 @@ export default function EmailsPage() {
 
 			<div className="overflow-hidden rounded-2xl border border-stroke-soft-100 dark:border-stroke-soft-100/40">
 				<DataTable
-					headers={["When", "From", "To", "Subject", "Status", "Org"]}
-					colSpan={6}
+					headers={["When", "From", "To", "Subject", "Status", "Org", ""]}
+					colSpan={7}
 					loading={isLoading}
 					empty={!isLoading && !data?.items.length}
 				>
 					{data?.items.map((email) => (
 						<tr
 							key={email.id}
-							className="border-stroke-soft-100 border-t dark:border-stroke-soft-100/40"
+							className="group border-stroke-soft-100 border-t transition-colors hover:bg-bg-weak-50/50 dark:border-stroke-soft-100/40 dark:hover:bg-white/[0.02]"
 						>
 							<td className="whitespace-nowrap px-4 py-3 text-text-sub-600">
 								{formatRelativeTime(email.createdAt)}
 							</td>
-							<td className="px-4 py-3">{email.fromEmail}</td>
+							<td className="px-4 py-3 font-medium">{email.fromEmail}</td>
 							<td className="max-w-[160px] truncate px-4 py-3 text-text-sub-600">
 								{formatRecipients(email.toEmails)}
 							</td>
-							<td className="max-w-[220px] truncate px-4 py-3">
-								{email.subject}
+							<td className="max-w-[240px] truncate px-4 py-3">
+								<button
+									type="button"
+									onClick={() => setSelectedEmailId(email.id)}
+									className="truncate text-left font-medium text-text-strong-950 transition-colors hover:text-primary-base hover:underline"
+								>
+									{email.subject || "(no subject)"}
+								</button>
 							</td>
 							<td className="px-4 py-3">
 								<StatusPill status={email.status} />
@@ -162,10 +174,31 @@ export default function EmailsPage() {
 									</Link>
 								</Button.Root>
 							</td>
+							<td className="px-4 py-3 text-right">
+								<Button.Root
+									type="button"
+									size="xsmall"
+									variant="neutral"
+									mode="stroke"
+									onClick={() => setSelectedEmailId(email.id)}
+									className="gap-1"
+								>
+									<Icon name="eye" className="h-3 w-3" />
+									Details
+								</Button.Root>
+							</td>
 						</tr>
 					))}
 				</DataTable>
 			</div>
+
+			<EmailDetailDrawer
+				emailId={selectedEmailId || null}
+				open={Boolean(selectedEmailId)}
+				onOpenChange={(open) =>
+					setSelectedEmailId(open ? selectedEmailId : null)
+				}
+			/>
 		</PageFrame>
 	);
 }

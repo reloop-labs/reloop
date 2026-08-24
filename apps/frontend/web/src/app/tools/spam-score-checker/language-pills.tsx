@@ -112,7 +112,9 @@ export function LanguagePills({
 							icon={tab.icon}
 							className={cn(
 								"size-3.5",
-								isActive ? "text-text-strong-950 dark:text-white" : "text-text-soft-400 dark:text-white/40",
+								isActive
+									? "text-text-strong-950 dark:text-white"
+									: "text-text-soft-400 dark:text-white/40",
 							)}
 						/>
 						{tab.label}

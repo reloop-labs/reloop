@@ -63,7 +63,7 @@ const RailMailboxAvatar = ({
 				title={`${displayName} (${mailbox.email})`}
 				aria-label={`${displayName} (${mailbox.email})`}
 				aria-current={active ? "true" : undefined}
-				className="relative flex shrink-0 cursor-pointer items-center justify-center p-0.5 transition-transform duration-150 ease-out active:scale-[0.96] focus:outline-none"
+				className="relative flex shrink-0 cursor-pointer items-center justify-center p-0.5 transition-transform duration-150 ease-out focus:outline-none active:scale-[0.96]"
 			>
 				<div className="relative">
 					<div

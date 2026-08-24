@@ -6,10 +6,6 @@ export function countEmailRecipients(body: {
 }): number {
 	const to = Array.isArray(body.to) ? body.to : [body.to];
 	const cc = body.cc ? (Array.isArray(body.cc) ? body.cc : [body.cc]) : [];
-	const bcc = body.bcc
-		? Array.isArray(body.bcc)
-			? body.bcc
-			: [body.bcc]
-		: [];
+	const bcc = body.bcc ? (Array.isArray(body.bcc) ? body.bcc : [body.bcc]) : [];
 	return to.length + cc.length + bcc.length;
 }

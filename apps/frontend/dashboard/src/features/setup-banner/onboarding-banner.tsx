@@ -104,7 +104,7 @@ function StepRow({
 				</p>
 			</div>
 			{step.complete ? (
-				<span className="flex h-5 shrink-0 self-center items-center font-medium text-label-xs text-success-base">
+				<span className="flex h-5 shrink-0 items-center self-center font-medium text-label-xs text-success-base">
 					Done
 				</span>
 			) : step.action === "send" ? (
@@ -113,7 +113,7 @@ function StepRow({
 					variant="neutral"
 					mode="stroke"
 					size="xxsmall"
-					className="self-center shrink-0 gap-1.5 rounded-xl"
+					className="shrink-0 gap-1.5 self-center rounded-xl"
 					disabled={ctaDisabled}
 					onClick={onSend}
 				>
@@ -135,7 +135,7 @@ function StepRow({
 					variant="neutral"
 					mode="stroke"
 					size="xxsmall"
-					className="self-center shrink-0 gap-1.5 rounded-xl"
+					className="shrink-0 gap-1.5 self-center rounded-xl"
 					onClick={() => onNavigate(step.href ?? "/")}
 				>
 					{step.cta}
@@ -185,7 +185,7 @@ function ExpandedTrigger({
 			onClick={onOpen}
 			className="relative w-full overflow-visible rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-2.5 text-left transition-[background-color,transform] duration-150 ease-out hover:bg-bg-weak-50 active:scale-[0.99] dark:border-stroke-soft-100/40 dark:bg-white/[0.03] dark:hover:bg-white/[0.06]"
 		>
-			<span className="pointer-events-none absolute -top-0.75 -right-0.75 z-10">
+			<span className="-top-0.75 -right-0.75 pointer-events-none absolute z-10">
 				<GlowingBlueDot />
 			</span>
 			<div className="flex items-center justify-between gap-2">

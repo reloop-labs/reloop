@@ -169,7 +169,10 @@ const SPOTLIGHT_DATA: Record<string, ProviderSnapshot> = {
 			"No self-hosting or data sovereignty options",
 			"Gets expensive quickly for high contact volume",
 		],
-		freeTier: { reloop: "3,000 / mo · 200 / day", competitor: "1,000 contacts" },
+		freeTier: {
+			reloop: "3,000 / mo · 200 / day",
+			competitor: "1,000 contacts",
+		},
 		openSource: { reloop: "Yes (KumoMTA Engine)", competitor: "No" },
 		inboundAi: { reloop: "Built-in Agent Inbox", competitor: "No" },
 	},

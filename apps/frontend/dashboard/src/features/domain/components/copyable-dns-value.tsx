@@ -27,7 +27,7 @@ export const CopyableDnsValue = React.forwardRef<
 			aria-label={copied ? "Copied" : `Copy ${value}`}
 			className={cn(
 				"group relative flex h-8 w-full min-w-0 cursor-pointer select-none items-center justify-between gap-1.5 overflow-hidden rounded-lg bg-bg-white-0 px-2.5 text-left shadow-regular-xs outline-none transition duration-200 ease-out",
-				"before:pointer-events-none before:absolute before:inset-0 before:rounded-[inherit] before:ring-1 before:ring-inset before:ring-stroke-soft-100 dark:before:ring-stroke-soft-100/40",
+				"before:pointer-events-none before:absolute before:inset-0 before:rounded-[inherit] before:ring-1 before:ring-stroke-soft-100 before:ring-inset dark:before:ring-stroke-soft-100/40",
 				"hover:bg-bg-weak-50 dark:bg-bg-weak-50/30 dark:hover:bg-bg-weak-50/50",
 				"focus:outline-none focus-visible:outline-none",
 				copied && "bg-success-lighter/10 before:ring-success-base",
@@ -36,7 +36,7 @@ export const CopyableDnsValue = React.forwardRef<
 		>
 			<span
 				className={cn(
-					"min-w-0 flex-1 truncate text-xs select-none transition-colors duration-150 ease-out",
+					"min-w-0 flex-1 select-none truncate text-xs transition-colors duration-150 ease-out",
 					mono ? "font-mono" : "font-medium",
 					copied
 						? "text-success-dark"

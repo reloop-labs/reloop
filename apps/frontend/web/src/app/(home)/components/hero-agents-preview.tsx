@@ -8,11 +8,7 @@ export function HeroAgentsPreview() {
 					Inbox
 				</p>
 				<div className="mt-3 space-y-1">
-					<InboxItem
-						active
-						from="Alex Smith"
-						preview="Invoice charged twice"
-					/>
+					<InboxItem active from="Alex Smith" preview="Invoice charged twice" />
 					<InboxItem from="Maya Chen" preview="Can we move onboarding?" />
 					<InboxItem from="Orbit" preview="Weekly usage report" />
 				</div>

@@ -410,7 +410,12 @@ export function Steps({
 	className?: string;
 }) {
 	return (
-		<div className={cn("my-6 ml-3 flex flex-col border-stroke-soft-100 border-l pl-5 dark:border-stroke-soft-100/40", className)}>
+		<div
+			className={cn(
+				"my-6 ml-3 flex flex-col border-stroke-soft-100 border-l pl-5 dark:border-stroke-soft-100/40",
+				className,
+			)}
+		>
 			{children}
 		</div>
 	);
@@ -435,7 +440,7 @@ export function Step({
 					{title}
 				</h4>
 			)}
-			<div className="text-[14px] text-text-sub-600 leading-relaxed [&>p:first-child]:mt-0 [&>p:last-child]:mb-0 dark:text-white/80">
+			<div className="text-[14px] text-text-sub-600 leading-relaxed dark:text-white/80 [&>p:first-child]:mt-0 [&>p:last-child]:mb-0">
 				{children}
 			</div>
 		</div>
@@ -482,7 +487,7 @@ export const Card = React.forwardRef<
 				</h3>
 			)}
 			{children && (
-				<div className="text-[13.5px] text-text-sub-600 leading-relaxed [&>p:first-child]:mt-0 [&>p:last-child]:mb-0 dark:text-white/60">
+				<div className="text-[13.5px] text-text-sub-600 leading-relaxed dark:text-white/60 [&>p:first-child]:mt-0 [&>p:last-child]:mb-0">
 					{children}
 				</div>
 			)}

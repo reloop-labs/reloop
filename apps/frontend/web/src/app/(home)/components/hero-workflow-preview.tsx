@@ -122,7 +122,8 @@ export function HeroWorkflowPreview() {
 										2. Send Email
 									</p>
 									<p className="text-[11px] text-text-sub-600 dark:text-white/50">
-										Template: <code className="font-mono">welcome_onboarding</code>{" "}
+										Template:{" "}
+										<code className="font-mono">welcome_onboarding</code>{" "}
 										(Instant)
 									</p>
 								</div>
@@ -155,7 +156,8 @@ export function HeroWorkflowPreview() {
 										3. Check Engagement
 									</p>
 									<p className="text-[11px] text-text-sub-600 dark:text-white/50">
-										Condition: <code className="font-mono">email.clicked === true</code>{" "}
+										Condition:{" "}
+										<code className="font-mono">email.clicked === true</code>{" "}
 										within 24h
 									</p>
 								</div>

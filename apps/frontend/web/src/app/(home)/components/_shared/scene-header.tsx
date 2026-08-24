@@ -34,7 +34,13 @@ const GLYPH: Record<SceneColor, { shell: string; face: string }> = {
 	},
 };
 
-export function SceneGlyph({ icon, color }: { icon: IconName; color: SceneColor }) {
+export function SceneGlyph({
+	icon,
+	color,
+}: {
+	icon: IconName;
+	color: SceneColor;
+}) {
 	const glyph = GLYPH[color];
 
 	return (
@@ -88,7 +94,9 @@ export function SceneHeader({
 
 	return (
 		<div className={cn(isCenter && "text-center", className)}>
-			<div className={cn("flex items-center gap-2", isCenter && "justify-center")}>
+			<div
+				className={cn("flex items-center gap-2", isCenter && "justify-center")}
+			>
 				<SceneGlyph icon={icon} color={color} />
 				<span className="font-medium text-[13.5px] text-text-strong-950 tracking-tight dark:text-white">
 					{badge}
@@ -109,7 +117,9 @@ export function SceneHeader({
 			</p>
 
 			{action ? (
-				<div className={cn("mt-6", isCenter && "flex justify-center")}>{action}</div>
+				<div className={cn("mt-6", isCenter && "flex justify-center")}>
+					{action}
+				</div>
 			) : ctaLabel ? (
 				<div className={cn("mt-6", isCenter && "flex justify-center")}>
 					<Button.Root variant="neutral" mode="stroke" size="small" asChild>
@@ -126,7 +136,7 @@ export function SceneHeader({
 			) : null}
 
 			{withDivider && (
-				<Divider.Root className="mt-8 -mx-4 sm:-mx-8 lg:-mx-12 !w-auto dark:before:bg-white/10" />
+				<Divider.Root className="-mx-4 sm:-mx-8 lg:-mx-12 !w-auto mt-8 dark:before:bg-white/10" />
 			)}
 		</div>
 	);

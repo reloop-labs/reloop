@@ -93,137 +93,137 @@ const LoopsComparisonPage = () => {
 					href: "/compare/loops#migrate",
 				}}
 			>
-			{/* Metric Stat Strip */}
-			<CompareSection flushTop maxWidth="full">
-				<CompareHeroStatStrip stats={loopsStats} />
-			</CompareSection>
+				{/* Metric Stat Strip */}
+				<CompareSection flushTop maxWidth="full">
+					<CompareHeroStatStrip stats={loopsStats} />
+				</CompareSection>
 
-			{/* The Two-Vendor Problem Section */}
-			<CompareSection maxWidth="full">
-				<div className="mx-auto max-w-3xl space-y-6 text-center">
-					<span className="font-bold text-[12px] text-text-sub-600 uppercase tracking-widest dark:text-white/50">
-						The Two-Vendor Problem
-					</span>
-					<h2 className="font-serif text-[2rem] text-text-strong-950 leading-tight tracking-tight sm:text-[2.5rem] dark:text-white">
-						Stop managing split email services
-					</h2>
-					<p className="text-[16px] text-text-sub-600 leading-relaxed dark:text-white/60">
-						Many SaaS teams start with Loops for product onboarding loops, then
-						quickly realize they still need Resend or Postmark for auth emails,
-						invoices, and transactional webhooks. Reloop unifies both under one
-						API key.
-					</p>
+				{/* The Two-Vendor Problem Section */}
+				<CompareSection maxWidth="full">
+					<div className="mx-auto max-w-3xl space-y-6 text-center">
+						<span className="font-bold text-[12px] text-text-sub-600 uppercase tracking-widest dark:text-white/50">
+							The Two-Vendor Problem
+						</span>
+						<h2 className="font-serif text-[2rem] text-text-strong-950 leading-tight tracking-tight sm:text-[2.5rem] dark:text-white">
+							Stop managing split email services
+						</h2>
+						<p className="text-[16px] text-text-sub-600 leading-relaxed dark:text-white/60">
+							Many SaaS teams start with Loops for product onboarding loops,
+							then quickly realize they still need Resend or Postmark for auth
+							emails, invoices, and transactional webhooks. Reloop unifies both
+							under one API key.
+						</p>
 
-					{/* Visual Stack Comparison */}
-					<div className="mt-8 grid grid-cols-1 gap-4 text-left sm:grid-cols-2">
-						<div className="rounded-2xl border border-stroke-soft-200/80 bg-bg-weak-50/50 p-6 dark:border-white/10 dark:bg-white/[0.02]">
-							<span className="font-bold text-[12px] text-text-sub-600 uppercase tracking-wider dark:text-white/40">
-								Fragmented Stack (Loops + 2nd API)
-							</span>
-							<ul className="mt-3 space-y-2 font-mono text-[13px] text-text-sub-600 dark:text-white/60">
-								<li className="flex items-center gap-2">
-									<span className="text-red-500">✕</span> Loops → Onboarding
-									&amp; Newsletters
-								</li>
-								<li className="flex items-center gap-2">
-									<span className="text-red-500">✕</span> Resend / Postmark →
-									Auth &amp; Receipts
-								</li>
-								<li className="flex items-center gap-2">
-									<span className="text-red-500">✕</span> 2 Domain Reputation
-									Pools
-								</li>
-								<li className="flex items-center gap-2">
-									<span className="text-red-500">✕</span> 2 Separate Monthly
-									Bills
-								</li>
-							</ul>
-						</div>
+						{/* Visual Stack Comparison */}
+						<div className="mt-8 grid grid-cols-1 gap-4 text-left sm:grid-cols-2">
+							<div className="rounded-2xl border border-stroke-soft-200/80 bg-bg-weak-50/50 p-6 dark:border-white/10 dark:bg-white/[0.02]">
+								<span className="font-bold text-[12px] text-text-sub-600 uppercase tracking-wider dark:text-white/40">
+									Fragmented Stack (Loops + 2nd API)
+								</span>
+								<ul className="mt-3 space-y-2 font-mono text-[13px] text-text-sub-600 dark:text-white/60">
+									<li className="flex items-center gap-2">
+										<span className="text-red-500">✕</span> Loops → Onboarding
+										&amp; Newsletters
+									</li>
+									<li className="flex items-center gap-2">
+										<span className="text-red-500">✕</span> Resend / Postmark →
+										Auth &amp; Receipts
+									</li>
+									<li className="flex items-center gap-2">
+										<span className="text-red-500">✕</span> 2 Domain Reputation
+										Pools
+									</li>
+									<li className="flex items-center gap-2">
+										<span className="text-red-500">✕</span> 2 Separate Monthly
+										Bills
+									</li>
+								</ul>
+							</div>
 
-						<div className="rounded-2xl border border-stroke-soft-200/80 bg-bg-white-0 p-6 shadow-sm dark:border-white/10 dark:bg-white/[0.03]">
-							<span className="font-bold text-[12px] text-primary-base uppercase tracking-wider">
-								Unified Stack (Reloop)
-							</span>
-							<ul className="mt-3 space-y-2 font-mono text-[13px] text-text-strong-950 dark:text-white">
-								<li className="flex items-center gap-2">
-									<span className="text-emerald-500">✓</span> Reloop →
-									Onboarding &amp; Newsletters
-								</li>
-								<li className="flex items-center gap-2">
-									<span className="text-emerald-500">✓</span> Reloop → Auth,
-									Billing &amp; Receipts
-								</li>
-								<li className="flex items-center gap-2">
-									<span className="text-emerald-500">✓</span> Reloop → Inbound
-									AI Agent Inbox
-								</li>
-								<li className="flex items-center gap-2">
-									<span className="text-emerald-500">✓</span> 1 Domain
-									Reputation Pool
-								</li>
-							</ul>
+							<div className="rounded-2xl border border-stroke-soft-200/80 bg-bg-white-0 p-6 shadow-sm dark:border-white/10 dark:bg-white/[0.03]">
+								<span className="font-bold text-[12px] text-primary-base uppercase tracking-wider">
+									Unified Stack (Reloop)
+								</span>
+								<ul className="mt-3 space-y-2 font-mono text-[13px] text-text-strong-950 dark:text-white">
+									<li className="flex items-center gap-2">
+										<span className="text-emerald-500">✓</span> Reloop →
+										Onboarding &amp; Newsletters
+									</li>
+									<li className="flex items-center gap-2">
+										<span className="text-emerald-500">✓</span> Reloop → Auth,
+										Billing &amp; Receipts
+									</li>
+									<li className="flex items-center gap-2">
+										<span className="text-emerald-500">✓</span> Reloop → Inbound
+										AI Agent Inbox
+									</li>
+									<li className="flex items-center gap-2">
+										<span className="text-emerald-500">✓</span> 1 Domain
+										Reputation Pool
+									</li>
+								</ul>
+							</div>
 						</div>
 					</div>
-				</div>
-			</CompareSection>
+				</CompareSection>
 
-			{/* Interactive Contact Calculator */}
-			<CompareSection maxWidth="full">
-				<LoopsCostCalculator />
-			</CompareSection>
+				{/* Interactive Contact Calculator */}
+				<CompareSection maxWidth="full">
+					<LoopsCostCalculator />
+				</CompareSection>
 
-			{/* Feature Comparison Matrix */}
-			<CompareSection maxWidth="full" flushX>
-				<div className="mb-10 text-center">
-					<h2 className="mt-3 font-serif text-[2rem] text-text-strong-950 leading-[1.1] tracking-tighter sm:text-[2.4rem] lg:text-[2.8rem] dark:text-white">
-						Reloop &nbsp;&nbsp;vs&nbsp;&nbsp;&nbsp;Loops
-					</h2>
-					<p className="mx-auto mt-3 max-w-xl font-medium text-[15px] text-text-sub-600 leading-7 sm:text-[17px] dark:text-white/50">
-						Compare capabilities, sending mechanisms, and open-source data
-						ownership.
-					</p>
-				</div>
+				{/* Feature Comparison Matrix */}
+				<CompareSection maxWidth="full" flushX>
+					<div className="mb-10 text-center">
+						<h2 className="mt-3 font-serif text-[2rem] text-text-strong-950 leading-[1.1] tracking-tighter sm:text-[2.4rem] lg:text-[2.8rem] dark:text-white">
+							Reloop &nbsp;&nbsp;vs&nbsp;&nbsp;&nbsp;Loops
+						</h2>
+						<p className="mx-auto mt-3 max-w-xl font-medium text-[15px] text-text-sub-600 leading-7 sm:text-[17px] dark:text-white/50">
+							Compare capabilities, sending mechanisms, and open-source data
+							ownership.
+						</p>
+					</div>
 
-				<ComparisonMatrix
-					competitorName="Loops"
-					categories={loopsComparisonCategories}
-				/>
-
-				<p className="mt-6 text-center text-[13px] text-text-sub-600 dark:text-white/40">
-					Seen something inaccurate?{" "}
-					<Link href="/contact" className="font-semibold text-primary-base">
-						Tell us
-					</Link>
-					—we correct comparison pages when public features change.
-				</p>
-			</CompareSection>
-
-			{/* Migration Section */}
-			<CompareSection maxWidth="full">
-				{loopsBrand ? (
-					<CompareMigrate
+					<ComparisonMatrix
 						competitorName="Loops"
-						competitorIcon={loopsBrand.icon}
-						primaryHref="/dashboard/signup"
-						guideHref="/docs"
+						categories={loopsComparisonCategories}
 					/>
-				) : null}
-			</CompareSection>
 
-			{/* FAQ Section */}
-			<CompareSection maxWidth="3xl">
-				<FaqSection
-					id="compare-loops-faq"
-					title="Loops vs Reloop FAQ"
-					items={compare?.faqs ?? []}
-					compact
-				/>
-			</CompareSection>
+					<p className="mt-6 text-center text-[13px] text-text-sub-600 dark:text-white/40">
+						Seen something inaccurate?{" "}
+						<Link href="/contact" className="font-semibold text-primary-base">
+							Tell us
+						</Link>
+						—we correct comparison pages when public features change.
+					</p>
+				</CompareSection>
 
-			<CompareSection maxWidth="full" noDivider>
-				<CompareOtherLinks currentHref={pagePath} />
-			</CompareSection>
-		</ComparisonPageShell>
+				{/* Migration Section */}
+				<CompareSection maxWidth="full">
+					{loopsBrand ? (
+						<CompareMigrate
+							competitorName="Loops"
+							competitorIcon={loopsBrand.icon}
+							primaryHref="/dashboard/signup"
+							guideHref="/docs"
+						/>
+					) : null}
+				</CompareSection>
+
+				{/* FAQ Section */}
+				<CompareSection maxWidth="3xl">
+					<FaqSection
+						id="compare-loops-faq"
+						title="Loops vs Reloop FAQ"
+						items={compare?.faqs ?? []}
+						compact
+					/>
+				</CompareSection>
+
+				<CompareSection maxWidth="full" noDivider>
+					<CompareOtherLinks currentHref={pagePath} />
+				</CompareSection>
+			</ComparisonPageShell>
 		</>
 	);
 };

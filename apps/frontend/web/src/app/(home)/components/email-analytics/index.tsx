@@ -1,6 +1,6 @@
-import type { AnalyticsTabId } from "./preview-scenes";
 import { SceneHeader } from "../_shared/scene-header";
 import { EmailAnalyticsPreview } from "./preview";
+import type { AnalyticsTabId } from "./preview-scenes";
 
 export function EmailAnalyticsSection({
 	activeTab,

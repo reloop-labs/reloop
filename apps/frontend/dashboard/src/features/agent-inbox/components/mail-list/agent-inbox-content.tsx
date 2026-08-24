@@ -495,7 +495,7 @@ export const AgentInboxContent = ({
 				>
 					<Icon name="arrow-left" className="h-4 w-4" />
 				</button>
-				<span className="text-text-sub-600 text-sm">Back</span>
+				<span className="text-sm text-text-sub-600">Back</span>
 			</div>
 			<SectionError
 				message="Couldn't load this conversation"
@@ -514,11 +514,11 @@ export const AgentInboxContent = ({
 		</div>
 	) : selectedThreadId ? (
 		<div className="flex h-full min-h-0 flex-col items-center justify-center gap-3 p-6">
-			<p className="text-text-sub-600 text-sm">Conversation not found</p>
+			<p className="text-sm text-text-sub-600">Conversation not found</p>
 			<button
 				type="button"
 				onClick={handleCloseThread}
-				className="rounded-lg bg-bg-weak-50 px-3 py-1.5 text-text-strong-950 text-sm hover:bg-bg-soft-200"
+				className="rounded-lg bg-bg-weak-50 px-3 py-1.5 text-sm text-text-strong-950 hover:bg-bg-soft-200"
 			>
 				Back to list
 			</button>
@@ -585,7 +585,10 @@ export const AgentInboxContent = ({
 										style={{ fontSize: 12 }}
 									/>
 								) : (
-									<Icon name="refresh-cw" className="h-4 w-4 text-text-sub-600" />
+									<Icon
+										name="refresh-cw"
+										className="h-4 w-4 text-text-sub-600"
+									/>
 								)}
 							</button>
 						</div>
@@ -600,7 +603,10 @@ export const AgentInboxContent = ({
 									}
 									className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-bg-weak-50 hover:bg-bg-soft-200"
 								>
-									<Icon name="inbox" className="h-3.5 w-3.5 text-text-sub-600" />
+									<Icon
+										name="inbox"
+										className="h-3.5 w-3.5 text-text-sub-600"
+									/>
 								</button>
 							) : (
 								<button

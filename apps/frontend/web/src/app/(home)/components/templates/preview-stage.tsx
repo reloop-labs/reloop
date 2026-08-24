@@ -142,8 +142,6 @@ function AiTemplatesView() {
 	const startGenerateRef = useRef(startGenerate);
 	startGenerateRef.current = startGenerate;
 
-
-
 	useEffect(() => {
 		if (phase !== "pending") return;
 		const timer = window.setTimeout(() => {
@@ -500,7 +498,7 @@ function AiPromptBar({
 				}}
 				placeholder="Generate a Reloop login OTP email…"
 				aria-label="Generate an email template"
-				className="min-h-7 max-h-24 min-w-0 flex-1 resize-none overflow-hidden bg-transparent py-1 text-[13px] text-text-strong-950 leading-5 caret-[#FF5722] outline-none placeholder:text-text-soft-400 disabled:opacity-70 dark:text-white dark:caret-[#FF6E40] dark:placeholder:text-white/40"
+				className="max-h-24 min-h-7 min-w-0 flex-1 resize-none overflow-hidden bg-transparent py-1 text-[13px] text-text-strong-950 leading-5 caret-[#FF5722] outline-none placeholder:text-text-soft-400 disabled:opacity-70 dark:text-white dark:caret-[#FF6E40] dark:placeholder:text-white/40"
 			/>
 			<button
 				type="submit"

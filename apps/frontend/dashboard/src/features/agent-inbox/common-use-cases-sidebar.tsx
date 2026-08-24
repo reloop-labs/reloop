@@ -37,7 +37,7 @@ export function AgentInboxCommonUseCasesSidebar() {
 				<h2 className="font-semibold text-lg text-text-strong-950 tracking-tight">
 					Inbox resources
 				</h2>
-				<p className="mt-1 text-text-sub-600 text-sm leading-relaxed">
+				<p className="mt-1 text-sm text-text-sub-600 leading-relaxed">
 					Guides & documentation for inbox management.
 				</p>
 			</div>
@@ -60,7 +60,7 @@ export function AgentInboxCommonUseCasesSidebar() {
 								className="mt-0.5 h-4 w-4 shrink-0 text-text-soft-400 transition-transform duration-150 ease-out group-hover:translate-x-0.5 group-hover:text-text-sub-600"
 							/>
 						</div>
-						<p className="mt-1.5 text-text-sub-600 text-sm leading-relaxed">
+						<p className="mt-1.5 text-sm text-text-sub-600 leading-relaxed">
 							{item.description}
 						</p>
 					</a>

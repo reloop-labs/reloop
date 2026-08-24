@@ -41,7 +41,7 @@ function ToolbarTip({ tip }: { tip: TipState | null }) {
 	return createPortal(
 		<div
 			role="tooltip"
-			className="pointer-events-none fixed z-[9999] -translate-x-1/2 rounded bg-bg-strong-950 px-2 py-1 font-medium text-paragraph-xs text-text-white-0 shadow-regular-sm"
+			className="-translate-x-1/2 pointer-events-none fixed z-[9999] rounded bg-bg-strong-950 px-2 py-1 font-medium text-paragraph-xs text-text-white-0 shadow-regular-sm"
 			style={{ left: tip.x, top: tip.y }}
 		>
 			{tip.label}

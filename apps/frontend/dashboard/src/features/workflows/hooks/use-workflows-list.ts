@@ -1,11 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import { queryKeys } from "#/lib/query-keys";
+import type { Workflow } from "../workflow-types";
 import {
 	listAutomations,
 	mapAutomationToWorkflow,
 } from "./use-automations-api";
-import type { Workflow } from "../workflow-types";
 
 type UseWorkflowsListOptions = {
 	limit?: number;

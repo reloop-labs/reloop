@@ -15,15 +15,15 @@ export const metadata: Metadata = {
 	},
 };
 
+import { MacintoshSceneLazy } from "./components/macintosh-scene-lazy";
+
 export default function TwitterPage() {
 	return (
 		<div
 			data-standalone="true"
-			className="flex min-h-screen items-center justify-center p-4"
+			className="relative h-dvh w-full overflow-hidden bg-[#5a5a5a]"
 		>
-			<p className="font-medium text-base text-text-strong-950 dark:text-white">
-				hello world
-			</p>
+			<MacintoshSceneLazy />
 		</div>
 	);
 }

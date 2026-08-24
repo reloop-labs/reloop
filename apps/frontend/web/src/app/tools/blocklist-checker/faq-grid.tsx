@@ -13,9 +13,7 @@ export function FaqGrid({
 	id?: string;
 }) {
 	// Flatten all FAQs into a single unified list matching the docs style
-	const allItems: FaqItem[] = groups
-		? groups.flatMap((g) => g.items)
-		: [];
+	const allItems: FaqItem[] = groups ? groups.flatMap((g) => g.items) : [];
 
 	const [openIndex, setOpenIndex] = useState<number | null>(null);
 
@@ -24,8 +22,11 @@ export function FaqGrid({
 	};
 
 	return (
-		<div id={id} className="mx-auto max-w-4xl px-5 sm:px-6 md:px-8 py-8 sm:py-12">
-			<div className="overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 divide-y divide-stroke-soft-200 shadow-xs dark:border-white/10 dark:divide-white/10 dark:bg-[#0b0b0b]">
+		<div
+			id={id}
+			className="mx-auto max-w-4xl px-5 py-8 sm:px-6 sm:py-12 md:px-8"
+		>
+			<div className="divide-y divide-stroke-soft-200 overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 shadow-xs dark:divide-white/10 dark:border-white/10 dark:bg-[#0b0b0b]">
 				{allItems.map((faq, index) => {
 					const isOpen = openIndex === index;
 
@@ -35,7 +36,7 @@ export function FaqGrid({
 								type="button"
 								onClick={() => toggle(index)}
 								aria-expanded={isOpen}
-								className="flex w-full items-center gap-3 px-6 py-4 text-left font-medium text-text-strong-950 text-[15px] transition-colors hover:bg-bg-weak-50/60 dark:text-white dark:hover:bg-white/[0.03]"
+								className="flex w-full items-center gap-3 px-6 py-4 text-left font-medium text-[15px] text-text-strong-950 transition-colors hover:bg-bg-weak-50/60 dark:text-white dark:hover:bg-white/[0.03]"
 							>
 								<svg
 									className={cn(

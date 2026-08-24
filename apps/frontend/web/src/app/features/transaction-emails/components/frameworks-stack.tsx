@@ -138,7 +138,7 @@ export function FrameworksStack() {
 						</Button.Root>
 					</div>
 
-					<Divider.Root className="mt-8 -mx-4 sm:-mx-8 lg:-mx-12 !w-auto dark:before:bg-white/10" />
+					<Divider.Root className="-mx-4 sm:-mx-8 lg:-mx-12 !w-auto mt-8 dark:before:bg-white/10" />
 				</div>
 			</div>
 
@@ -149,7 +149,7 @@ export function FrameworksStack() {
 						<Link
 							key={item.label}
 							href={item.href}
-							className="group flex flex-col items-start gap-2 bg-white p-4 transition-colors duration-200 hover:bg-[#f7f7f7] sm:p-5 dark:bg-black dark:hover:!bg-[#0A0A0A]"
+							className="group dark:hover:!bg-[#0A0A0A] flex flex-col items-start gap-2 bg-white p-4 transition-colors duration-200 hover:bg-[#f7f7f7] sm:p-5 dark:bg-black"
 						>
 							<div className="flex w-full items-start justify-between gap-2">
 								<span
@@ -180,8 +180,3 @@ export function FrameworksStack() {
 		</SectionFrame>
 	);
 }
-
-
-
-
-

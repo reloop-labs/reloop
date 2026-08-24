@@ -279,7 +279,10 @@ function cleanGeneratedSubject(raw: string): string {
 	if (match?.[1]) {
 		text = match[1];
 	} else {
-		const firstLine = text.split(/\r?\n/).map((l) => l.trim()).filter(Boolean)[0];
+		const firstLine = text
+			.split(/\r?\n/)
+			.map((l) => l.trim())
+			.filter(Boolean)[0];
 		if (firstLine) text = firstLine;
 	}
 	return text

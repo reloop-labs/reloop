@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "@reloop/ui/cn";
+import { Icon, type IconName } from "@reloop/ui/icon";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
 	useCallback,
@@ -9,10 +10,9 @@ import {
 	useRef,
 	useState,
 } from "react";
-import { Icon, type IconName } from "@reloop/ui/icon";
+import { SceneGlyph } from "./_shared/scene-header";
 import { EmailAnalyticsSection } from "./email-analytics";
 import type { AnalyticsTabId } from "./email-analytics/preview-scenes";
-import { SceneGlyph } from "./_shared/scene-header";
 import { TemplatesSection } from "./templates";
 import type { TemplateTabId } from "./templates/preview-scenes";
 import { TransactionalEmailSection } from "./transactional-email";
@@ -30,20 +30,8 @@ function ReactEmailIcon({ className }: { className?: string }) {
 			aria-hidden="true"
 		>
 			<ellipse cx="12" cy="12" rx="10" ry="4.5" />
-			<ellipse
-				cx="12"
-				cy="12"
-				rx="10"
-				ry="4.5"
-				transform="rotate(60 12 12)"
-			/>
-			<ellipse
-				cx="12"
-				cy="12"
-				rx="10"
-				ry="4.5"
-				transform="rotate(120 12 12)"
-			/>
+			<ellipse cx="12" cy="12" rx="10" ry="4.5" transform="rotate(60 12 12)" />
+			<ellipse cx="12" cy="12" rx="10" ry="4.5" transform="rotate(120 12 12)" />
 			<circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none" />
 		</svg>
 	);
@@ -151,8 +139,7 @@ export default function EmailSystem() {
 	const [transactionalTab, setTransactionalTab] =
 		useState<PreviewTabId>("send");
 	const [analyticsTab, setAnalyticsTab] = useState<AnalyticsTabId>("metrics");
-	const [templateTab, setTemplateTab] =
-		useState<TemplateTabId>("ai-templates");
+	const [templateTab, setTemplateTab] = useState<TemplateTabId>("ai-templates");
 
 	const reduceMotion = useReducedMotion();
 	const panelRefs = useRef<Record<string, HTMLElement | null>>({});
@@ -272,7 +259,7 @@ export default function EmailSystem() {
 				</div>
 				<h2
 					id="email-system-heading"
-					className="mt-3.5 max-w-3xl font-medium text-4xl text-text-strong-950 text-balance leading-[1.05] tracking-tighter sm:text-5xl dark:text-white"
+					className="mt-3.5 max-w-3xl text-balance font-medium text-4xl text-text-strong-950 leading-[1.05] tracking-tighter sm:text-5xl dark:text-white"
 				>
 					Convert your email stream into revenue.
 				</h2>
@@ -288,8 +275,7 @@ export default function EmailSystem() {
 						>
 							{SECTIONS.map((section) => {
 								const selected = section.id === active;
-								const hasSubItems =
-									"subItems" in section && section.subItems;
+								const hasSubItems = "subItems" in section && section.subItems;
 								const theme = SECTION_THEMES[section.id] ?? {
 									indicator: "bg-primary-base",
 									activeStroke: "stroke-[#9ca3af] dark:stroke-[#66666e]",
@@ -326,7 +312,7 @@ export default function EmailSystem() {
 												<motion.span
 													layoutId="email-system-active-indicator"
 													className={cn(
-														"pointer-events-none absolute -left-[1.5px] top-1.5 bottom-1.5 hidden w-0.5 lg:block transition-colors duration-150",
+														"-left-[1.5px] pointer-events-none absolute top-1.5 bottom-1.5 hidden w-0.5 transition-colors duration-150 lg:block",
 														theme.indicator,
 													)}
 													transition={
@@ -354,9 +340,9 @@ export default function EmailSystem() {
 														height: { duration: 0.28, ease: [0.16, 1, 0.3, 1] },
 														opacity: { duration: 0.18, ease: "easeInOut" },
 													}}
-													className="relative ml-8 overflow-hidden hidden flex-col lg:flex"
+													className="relative ml-8 hidden flex-col overflow-hidden lg:flex"
 												>
-													<div className="relative py-1.5 flex flex-col">
+													<div className="relative flex flex-col py-1.5">
 														{(() => {
 															const currentTabId =
 																section.id === "transactional"
@@ -372,7 +358,8 @@ export default function EmailSystem() {
 															const theme = SECTION_THEMES[section.id] ?? {
 																activeStroke:
 																	"stroke-[#9ca3af] dark:stroke-[#66666e]",
-																iconActive: "text-text-strong-950 dark:text-white",
+																iconActive:
+																	"text-text-strong-950 dark:text-white",
 																iconInactive:
 																	"text-text-soft-400 group-hover:text-text-sub-600 dark:text-white/40 dark:group-hover:text-white/70",
 															};
@@ -382,7 +369,7 @@ export default function EmailSystem() {
 																	{/* SVG Vector Tree Connector: Mathematically continuous, zero gaps, zero alpha-intersection dots */}
 																	<svg
 																		aria-hidden="true"
-																		className="pointer-events-none absolute left-0 top-1.5 h-full w-5 overflow-visible"
+																		className="pointer-events-none absolute top-1.5 left-0 h-full w-5 overflow-visible"
 																		width="20"
 																		height={totalHeight}
 																		viewBox={`0 0 20 ${totalHeight}`}
@@ -423,9 +410,13 @@ export default function EmailSystem() {
 
 																		const handleSubClick = () => {
 																			if (section.id === "transactional") {
-																				setTransactionalTab(sub.id as PreviewTabId);
+																				setTransactionalTab(
+																					sub.id as PreviewTabId,
+																				);
 																			} else if (section.id === "analytics") {
-																				setAnalyticsTab(sub.id as AnalyticsTabId);
+																				setAnalyticsTab(
+																					sub.id as AnalyticsTabId,
+																				);
 																			} else if (section.id === "templates") {
 																				setTemplateTab(sub.id as TemplateTabId);
 																			}
@@ -438,7 +429,7 @@ export default function EmailSystem() {
 																				type="button"
 																				onClick={handleSubClick}
 																				className={cn(
-																					"group relative flex h-[34px] w-full items-center pl-6 pr-3 text-left text-[13.5px] transition-colors duration-150 focus:outline-hidden",
+																					"group relative flex h-[34px] w-full items-center pr-3 pl-6 text-left text-[13.5px] transition-colors duration-150 focus:outline-hidden",
 																					isSubActive
 																						? "font-semibold text-text-strong-950 dark:text-white"
 																						: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/50 dark:hover:text-white",
@@ -454,7 +445,9 @@ export default function EmailSystem() {
 																							: theme.iconInactive,
 																					)}
 																				/>
-																				<span className="truncate">{sub.label}</span>
+																				<span className="truncate">
+																					{sub.label}
+																				</span>
 																			</button>
 																		);
 																	})}

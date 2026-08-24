@@ -74,7 +74,8 @@ export default function OpenGraphImage() {
 							lineHeight: 1.5,
 						}}
 					>
-						Scan email subject lines, copy, and link density in real time to avoid spam filters and reach the inbox.
+						Scan email subject lines, copy, and link density in real time to
+						avoid spam filters and reach the inbox.
 					</div>
 				</div>
 

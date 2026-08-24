@@ -1,6 +1,9 @@
 import { FaqSection } from "@reloop/web/components/faq-section";
 import { PageSection, SectionHeading } from "@reloop/web/components/page-shell";
-import { awsSesFeatures, getComparePage } from "@reloop/web/lib/compare-content";
+import {
+	awsSesFeatures,
+	getComparePage,
+} from "@reloop/web/lib/compare-content";
 import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -54,101 +57,95 @@ const AwsSesComparisonPage = () => {
 				titleLines={["Reloop vs AWS SES"]}
 				description="Learn how Reloop compares to Amazon SES and why Reloop is the best SES alternative for all your email delivery and platform needs."
 			>
-			<PageSection flushTop narrow>
-				<div className="mx-auto max-w-3xl space-y-6 text-[15px] text-text-sub-600 leading-7 sm:text-[17px] dark:text-white/50">
-					<p>
-						SES wins spreadsheet comparisons at millions of messages per month.
-						What spreadsheets miss is everything around SES: SNS wiring for
-						bounces, CloudWatch dashboards, template storage, campaign UI,
-						support contacts, and the engineering time to glue it together.
-					</p>
-					<p>
-						Reloop is the opposite trade: a{" "}
-						<strong className="text-text-strong-950 dark:text-white">
-							complete email product
-						</strong>{" "}
-						with APIs, campaigns, analytics, and webhooks—hosted by Reloop Labs
-						or self-hosted on your AWS account if you want SES-adjacent control
-						without assembling fifteen services.
-					</p>
-				</div>
-			</PageSection>
+				<PageSection flushTop narrow>
+					<div className="mx-auto max-w-3xl space-y-6 text-[15px] text-text-sub-600 leading-7 sm:text-[17px] dark:text-white/50">
+						<p>
+							SES wins spreadsheet comparisons at millions of messages per
+							month. What spreadsheets miss is everything around SES: SNS wiring
+							for bounces, CloudWatch dashboards, template storage, campaign UI,
+							support contacts, and the engineering time to glue it together.
+						</p>
+						<p>
+							Reloop is the opposite trade: a{" "}
+							<strong className="text-text-strong-950 dark:text-white">
+								complete email product
+							</strong>{" "}
+							with APIs, campaigns, analytics, and webhooks—hosted by Reloop
+							Labs or self-hosted on your AWS account if you want SES-adjacent
+							control without assembling fifteen services.
+						</p>
+					</div>
+				</PageSection>
 
-			<PageSection>
-				<SectionHeading
-					title="Total cost of ownership"
-					description="SES line item vs platform line item."
+				<PageSection>
+					<SectionHeading
+						title="Total cost of ownership"
+						description="SES line item vs platform line item."
+						compact
+					/>
+					<div className="grid gap-6 lg:grid-cols-2">
+						<div className="rounded-3xl border border-stroke-soft-200 p-6 dark:border-white/10">
+							<h3 className="font-semibold text-lg text-text-strong-950 dark:text-white">
+								AWS SES stack (typical)
+							</h3>
+							<ul className="mt-4 space-y-2 text-[14px] text-text-sub-600 dark:text-white/50">
+								<li>SES send charges + data transfer</li>
+								<li>SNS topics + Lambda consumers for events</li>
+								<li>S3 for template assets or logs</li>
+								<li>Custom admin UI or spreadsheet ops</li>
+								<li>Separate tool for marketing campaigns</li>
+								<li>Engineering maintenance ongoing</li>
+							</ul>
+						</div>
+						<div className="rounded-3xl border border-primary-base/30 bg-primary-base/5 p-6">
+							<h3 className="font-semibold text-lg text-text-strong-950 dark:text-white">
+								Reloop stack
+							</h3>
+							<ul className="mt-4 space-y-2 text-[14px] text-text-sub-600 dark:text-white/60">
+								<li>Tiered platform pricing or self-host infra only</li>
+								<li>Built-in webhooks and delivery analytics</li>
+								<li>Template editor and campaign builder included</li>
+								<li>Agent inbox for support and AI workflows</li>
+								<li>Single dashboard for ops and developers</li>
+								<li>Open-source—extend instead of fork-lifting glue code</li>
+							</ul>
+						</div>
+					</div>
+				</PageSection>
+
+				<PageSection alt>
+					<SectionHeading title="SES vs Reloop capabilities" compact />
+					<ComparisonTable competitorName="AWS SES" features={awsSesFeatures} />
+				</PageSection>
+
+				<PageSection narrow>
+					<SectionHeading
+						title="Running Reloop on AWS"
+						description="Keep data in your account without building the product yourself."
+						compact
+					/>
+					<p className="mx-auto max-w-2xl text-center text-[15px] text-text-sub-600 leading-7 dark:text-white/50">
+						Many SES teams already run on AWS. Reloop deploys via Docker
+						Compose, EKS, or ECS—see our{" "}
+						<Link href="/self-host" className="font-semibold text-primary-base">
+							self-hosting guide
+						</Link>{" "}
+						for wiring Postgres, Redis, and outbound SMTP alongside your
+						existing VPC patterns.
+					</p>
+				</PageSection>
+
+				<FaqSection
+					id="compare-aws-ses-faq"
+					title="AWS SES vs Reloop FAQ"
+					items={compare?.faqs ?? []}
 					compact
 				/>
-				<div className="grid gap-6 lg:grid-cols-2">
-					<div className="rounded-3xl border border-stroke-soft-200 p-6 dark:border-white/10">
-						<h3 className="font-semibold text-lg text-text-strong-950 dark:text-white">
-							AWS SES stack (typical)
-						</h3>
-						<ul className="mt-4 space-y-2 text-[14px] text-text-sub-600 dark:text-white/50">
-							<li>SES send charges + data transfer</li>
-							<li>SNS topics + Lambda consumers for events</li>
-							<li>S3 for template assets or logs</li>
-							<li>Custom admin UI or spreadsheet ops</li>
-							<li>Separate tool for marketing campaigns</li>
-							<li>Engineering maintenance ongoing</li>
-						</ul>
-					</div>
-					<div className="rounded-3xl border border-primary-base/30 bg-primary-base/5 p-6">
-						<h3 className="font-semibold text-lg text-text-strong-950 dark:text-white">
-							Reloop stack
-						</h3>
-						<ul className="mt-4 space-y-2 text-[14px] text-text-sub-600 dark:text-white/60">
-							<li>Tiered platform pricing or self-host infra only</li>
-							<li>Built-in webhooks and delivery analytics</li>
-							<li>Template editor and campaign builder included</li>
-							<li>Agent inbox for support and AI workflows</li>
-							<li>Single dashboard for ops and developers</li>
-							<li>Open-source—extend instead of fork-lifting glue code</li>
-						</ul>
-					</div>
-				</div>
-			</PageSection>
 
-			<PageSection alt>
-				<SectionHeading title="SES vs Reloop capabilities" compact />
-				<ComparisonTable
-					competitorName="AWS SES"
-					features={awsSesFeatures}
-				/>
-			</PageSection>
-
-			<PageSection narrow>
-				<SectionHeading
-					title="Running Reloop on AWS"
-					description="Keep data in your account without building the product yourself."
-					compact
-				/>
-				<p className="mx-auto max-w-2xl text-center text-[15px] text-text-sub-600 leading-7 dark:text-white/50">
-					Many SES teams already run on AWS. Reloop deploys via Docker Compose,
-					EKS, or ECS—see our{" "}
-					<Link
-						href="/self-host"
-						className="font-semibold text-primary-base"
-					>
-						self-hosting guide
-					</Link>{" "}
-					for wiring Postgres, Redis, and outbound SMTP alongside your existing
-					VPC patterns.
-				</p>
-			</PageSection>
-
-			<FaqSection
-				id="compare-aws-ses-faq"
-				title="AWS SES vs Reloop FAQ"
-				items={compare?.faqs ?? []}
-				compact
-			/>
-
-			<PageSection>
-				<CompareOtherLinks currentHref={pagePath} />
-			</PageSection>
-		</ComparisonPageShell>
+				<PageSection>
+					<CompareOtherLinks currentHref={pagePath} />
+				</PageSection>
+			</ComparisonPageShell>
 		</>
 	);
 };

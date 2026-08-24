@@ -1,15 +1,15 @@
-import { resendComparisonCategories } from "@reloop/web/app/compare/resend/comparison-data";
-import { loopsComparisonCategories } from "@reloop/web/app/compare/loops/comparison-data";
 import {
-	comparisonCellText,
 	type ComparisonCategory,
 	type ComparisonFeatureRow,
+	comparisonCellText,
 } from "@reloop/web/app/compare/compare-types";
+import { loopsComparisonCategories } from "@reloop/web/app/compare/loops/comparison-data";
+import { resendComparisonCategories } from "@reloop/web/app/compare/resend/comparison-data";
 import { pricingFaqItems } from "@reloop/web/lib/pricing-faq";
 import {
+	type FaqEntry,
 	faqPageJsonLd,
 	pricingProductJsonLd,
-	type FaqEntry,
 } from "@reloop/web/lib/schema";
 import { getSiteUrl } from "@reloop/web/lib/site";
 
@@ -495,4 +495,10 @@ export function buildCompareJsonLd(page: ComparePageContent) {
 	return graph;
 }
 
-export { sendgridFeatures, mailgunFeatures, awsSesFeatures, postmarkFeatures, mailchimpFeatures };
+export {
+	sendgridFeatures,
+	mailgunFeatures,
+	awsSesFeatures,
+	postmarkFeatures,
+	mailchimpFeatures,
+};

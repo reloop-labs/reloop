@@ -37,8 +37,8 @@ export default function FAQ() {
 						Frequently Asked Questions
 					</h2>
 					<p className="mx-auto mt-3 max-w-xl text-[15px] text-text-sub-600 dark:text-white/50">
-						Everything you need to know about Reloop email analytics and deliverability
-						monitoring.
+						Everything you need to know about Reloop email analytics and
+						deliverability monitoring.
 					</p>
 				</div>
 
@@ -64,7 +64,7 @@ export default function FAQ() {
 									/>
 								</button>
 								{isOpen && (
-									<div className="border-stroke-soft-200 border-t px-5 pb-5 pt-3 text-[14px] text-text-sub-600 leading-relaxed sm:px-6 sm:pb-6 dark:border-white/10 dark:text-white/60">
+									<div className="border-stroke-soft-200 border-t px-5 pt-3 pb-5 text-[14px] text-text-sub-600 leading-relaxed sm:px-6 sm:pb-6 dark:border-white/10 dark:text-white/60">
 										{faq.a}
 									</div>
 								)}

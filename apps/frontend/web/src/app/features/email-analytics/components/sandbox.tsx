@@ -7,7 +7,12 @@ import { useState } from "react";
 
 type AnalyticsTab = "deliverability" | "engagement" | "bounces" | "events";
 
-const TABS: { id: AnalyticsTab; label: string; icon: IconName; description: string }[] = [
+const TABS: {
+	id: AnalyticsTab;
+	label: string;
+	icon: IconName;
+	description: string;
+}[] = [
 	{
 		id: "deliverability",
 		label: "Deliverability Funnel",
@@ -169,7 +174,10 @@ export default function Sandbox() {
 	const reduceMotion = useReducedMotion();
 
 	return (
-		<section id="interactive-analytics" className="relative w-full py-16 sm:py-24">
+		<section
+			id="interactive-analytics"
+			className="relative w-full py-16 sm:py-24"
+		>
 			<div className="mx-auto max-w-[1320px] px-4 sm:px-6 lg:px-8">
 				<div className="text-center">
 					<div className="inline-flex items-center gap-2 rounded-full border border-blue-500/20 bg-blue-500/10 px-3 py-1 font-medium text-blue-600 text-xs dark:text-blue-400">
@@ -180,8 +188,9 @@ export default function Sandbox() {
 						Explore Deep Email Telemetry
 					</h2>
 					<p className="mx-auto mt-4 max-w-2xl text-[15px] text-text-sub-600 leading-relaxed sm:text-base dark:text-white/60">
-						Interact with live deliverability waterfalls, link attribution matrices, raw
-						SMTP bounce codes, and real-time event ingestion feeds.
+						Interact with live deliverability waterfalls, link attribution
+						matrices, raw SMTP bounce codes, and real-time event ingestion
+						feeds.
 					</p>
 				</div>
 
@@ -206,7 +215,11 @@ export default function Sandbox() {
 										<motion.div
 											layoutId="analytics-tab-indicator"
 											className="absolute inset-0 rounded-xl bg-white shadow-xs dark:bg-white/10"
-											transition={{ type: "spring", bounce: 0.15, duration: 0.4 }}
+											transition={{
+												type: "spring",
+												bounce: 0.15,
+												duration: 0.4,
+											}}
 										/>
 									)}
 									<Icon name={tab.icon} className="relative z-10 size-4" />
@@ -222,7 +235,7 @@ export default function Sandbox() {
 					<div className="border-stroke-soft-200 border-b bg-bg-weak-50/60 px-6 py-4 dark:border-white/10 dark:bg-white/[0.02]">
 						<div className="flex flex-wrap items-center justify-between gap-4">
 							<div className="flex items-center gap-3">
-								<span className="size-2.5 rounded-full bg-emerald-500 animate-pulse" />
+								<span className="size-2.5 animate-pulse rounded-full bg-emerald-500" />
 								<span className="font-semibold text-[14px] text-text-strong-950 dark:text-white">
 									{TABS.find((t) => t.id === activeTab)?.label}
 								</span>
@@ -243,7 +256,9 @@ export default function Sandbox() {
 							{activeTab === "deliverability" && (
 								<motion.div
 									key="deliverability"
-									initial={reduceMotion ? { opacity: 1 } : { opacity: 0, y: 10 }}
+									initial={
+										reduceMotion ? { opacity: 1 } : { opacity: 0, y: 10 }
+									}
 									animate={{ opacity: 1, y: 0 }}
 									exit={{ opacity: 0, y: -10 }}
 									transition={{ duration: 0.25 }}
@@ -363,7 +378,9 @@ export default function Sandbox() {
 							{activeTab === "engagement" && (
 								<motion.div
 									key="engagement"
-									initial={reduceMotion ? { opacity: 1 } : { opacity: 0, y: 10 }}
+									initial={
+										reduceMotion ? { opacity: 1 } : { opacity: 0, y: 10 }
+									}
 									animate={{ opacity: 1, y: 0 }}
 									exit={{ opacity: 0, y: -10 }}
 									transition={{ duration: 0.25 }}
@@ -447,7 +464,9 @@ export default function Sandbox() {
 							{activeTab === "bounces" && (
 								<motion.div
 									key="bounces"
-									initial={reduceMotion ? { opacity: 1 } : { opacity: 0, y: 10 }}
+									initial={
+										reduceMotion ? { opacity: 1 } : { opacity: 0, y: 10 }
+									}
 									animate={{ opacity: 1, y: 0 }}
 									exit={{ opacity: 0, y: -10 }}
 									transition={{ duration: 0.25 }}
@@ -511,7 +530,9 @@ export default function Sandbox() {
 							{activeTab === "events" && (
 								<motion.div
 									key="events"
-									initial={reduceMotion ? { opacity: 1 } : { opacity: 0, y: 10 }}
+									initial={
+										reduceMotion ? { opacity: 1 } : { opacity: 0, y: 10 }
+									}
 									animate={{ opacity: 1, y: 0 }}
 									exit={{ opacity: 0, y: -10 }}
 									transition={{ duration: 0.25 }}
@@ -522,7 +543,7 @@ export default function Sandbox() {
 											Live Webhook & WebSocket Event Ticker
 										</h4>
 										<span className="inline-flex items-center gap-1.5 font-mono text-emerald-600 text-xs dark:text-emerald-400">
-											<span className="size-1.5 rounded-full bg-emerald-500 animate-ping" />
+											<span className="size-1.5 animate-ping rounded-full bg-emerald-500" />
 											Streaming events
 										</span>
 									</div>

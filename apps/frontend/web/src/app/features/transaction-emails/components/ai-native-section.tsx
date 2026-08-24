@@ -111,7 +111,7 @@ export function AiNativeSection() {
 							<div
 								aria-hidden
 								className={cn(
-									"pointer-events-none absolute -top-12 -left-12 size-48 rounded-full blur-[70px]",
+									"-top-12 -left-12 pointer-events-none absolute size-48 rounded-full blur-[70px]",
 									card.glowClass,
 								)}
 							/>
@@ -132,7 +132,7 @@ export function AiNativeSection() {
 										title={card.fileName}
 										si={si}
 										hideLineNumbers={false}
-										className="h-full flex flex-col justify-between"
+										className="flex h-full flex-col justify-between"
 									/>
 								</div>
 
@@ -143,7 +143,7 @@ export function AiNativeSection() {
 							</div>
 
 							{/* Footer Link */}
-							<div className="relative z-10 mt-8 pt-4 border-stroke-soft-200 border-t dark:border-white/10">
+							<div className="relative z-10 mt-8 border-stroke-soft-200 border-t pt-4 dark:border-white/10">
 								<Link
 									href={card.href}
 									className="group inline-flex items-center gap-1.5 font-medium text-[13px] text-text-strong-950 transition-colors hover:text-blue-600 dark:text-white dark:hover:text-blue-400"

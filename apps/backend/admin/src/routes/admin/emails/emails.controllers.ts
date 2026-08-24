@@ -72,3 +72,48 @@ export async function listEmailsController({
 		total: totalRow?.value ?? 0,
 	};
 }
+
+export async function getEmailController(emailId: string) {
+	const email = await db.query.emailLog.findFirst({
+		where: eq(emailLog.id, emailId),
+		with: {
+			events: {
+				orderBy: (events, { asc }) => [asc(events.createdAt)],
+			},
+			organization: {
+				columns: {
+					id: true,
+					name: true,
+				},
+			},
+			domain: {
+				columns: {
+					id: true,
+					domain: true,
+				},
+			},
+		},
+	});
+
+	if (!email) {
+		const { createError } = await import("evlog");
+		throw createError({
+			status: 404,
+			message: "Email not found",
+			why: `No email log with id ${emailId}`,
+			fix: "Check the email id and try again",
+		});
+	}
+
+	return {
+		...email,
+		organizationName: email.organization?.name ?? null,
+		domainName: email.domain?.domain ?? null,
+		events: (email.events || []).map((ev) => ({
+			id: ev.id,
+			type: ev.type,
+			metadata: ev.metadata ?? null,
+			createdAt: ev.createdAt,
+		})),
+	};
+}

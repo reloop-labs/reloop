@@ -1,6 +1,9 @@
 import { FaqSection } from "@reloop/web/components/faq-section";
 import { PageSection, SectionHeading } from "@reloop/web/components/page-shell";
-import { getComparePage, postmarkFeatures } from "@reloop/web/lib/compare-content";
+import {
+	getComparePage,
+	postmarkFeatures,
+} from "@reloop/web/lib/compare-content";
 import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 import { ComparePageJsonLd } from "../components/compare-json-ld";
@@ -53,87 +56,87 @@ const PostmarkComparisonPage = () => {
 				titleLines={["Reloop vs Postmark"]}
 				description="Learn how Reloop compares to Postmark and why Reloop is the best Postmark alternative for all your transactional email needs."
 			>
-			<PageSection flushTop narrow>
-				<p className="mx-auto max-w-3xl text-center text-[15px] text-text-sub-600 leading-7 sm:text-[17px] dark:text-white/50">
-					Postmark is deliberately focused: transactional messages, excellent
-					delivery stats, message streams, and a reputation for reliability.
-					They are not trying to be a marketing automation suite—which is fine
-					if that is all you need. Reloop serves teams that want{" "}
-					<strong className="text-text-strong-950 dark:text-white">
-						transactional rigor plus growth features
-					</strong>{" "}
-					without bolting on Mailchimp or a second API vendor.
-				</p>
-			</PageSection>
+				<PageSection flushTop narrow>
+					<p className="mx-auto max-w-3xl text-center text-[15px] text-text-sub-600 leading-7 sm:text-[17px] dark:text-white/50">
+						Postmark is deliberately focused: transactional messages, excellent
+						delivery stats, message streams, and a reputation for reliability.
+						They are not trying to be a marketing automation suite—which is fine
+						if that is all you need. Reloop serves teams that want{" "}
+						<strong className="text-text-strong-950 dark:text-white">
+							transactional rigor plus growth features
+						</strong>{" "}
+						without bolting on Mailchimp or a second API vendor.
+					</p>
+				</PageSection>
 
-			<PageSection>
-				<div className="flex flex-col gap-8 lg:flex-row lg:items-start">
-					<div className="lg:w-1/2">
-						<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em]">
-							Postmark&apos;s edge
-						</p>
-						<h2 className="mt-3 font-serif text-[2rem] tracking-tighter sm:text-[2.4rem] dark:text-white">
-							Transactional{" "}
-							<span className="text-primary-base">precision.</span>
-						</h2>
-						<p className="mt-4 text-[15px] text-text-sub-600 leading-relaxed dark:text-white/60">
-							Separate message streams for transactional vs broadcast traffic,
-							detailed bounce categorization, and a product team that refuses
-							feature bloat. If your only job is password resets and receipts at
-							high trust, Postmark is a credible choice.
-						</p>
+				<PageSection>
+					<div className="flex flex-col gap-8 lg:flex-row lg:items-start">
+						<div className="lg:w-1/2">
+							<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em]">
+								Postmark&apos;s edge
+							</p>
+							<h2 className="mt-3 font-serif text-[2rem] tracking-tighter sm:text-[2.4rem] dark:text-white">
+								Transactional{" "}
+								<span className="text-primary-base">precision.</span>
+							</h2>
+							<p className="mt-4 text-[15px] text-text-sub-600 leading-relaxed dark:text-white/60">
+								Separate message streams for transactional vs broadcast traffic,
+								detailed bounce categorization, and a product team that refuses
+								feature bloat. If your only job is password resets and receipts
+								at high trust, Postmark is a credible choice.
+							</p>
+						</div>
+						<div className="lg:w-1/2">
+							<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em]">
+								Reloop&apos;s edge
+							</p>
+							<h2 className="mt-3 font-serif text-[2rem] tracking-tighter sm:text-[2.4rem] dark:text-white">
+								Platform <span className="text-primary-base">breadth.</span>
+							</h2>
+							<p className="mt-4 text-[15px] text-text-sub-600 leading-relaxed dark:text-white/60">
+								When product-led growth teams need onboarding campaigns, SMTP
+								for legacy services, and agent inbox triage on the same domains
+								you use for transactional mail, Reloop keeps it in one auditable
+								stack.
+							</p>
+						</div>
 					</div>
-					<div className="lg:w-1/2">
-						<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em]">
-							Reloop&apos;s edge
-						</p>
-						<h2 className="mt-3 font-serif text-[2rem] tracking-tighter sm:text-[2.4rem] dark:text-white">
-							Platform <span className="text-primary-base">breadth.</span>
-						</h2>
-						<p className="mt-4 text-[15px] text-text-sub-600 leading-relaxed dark:text-white/60">
-							When product-led growth teams need onboarding campaigns, SMTP for
-							legacy services, and agent inbox triage on the same domains you
-							use for transactional mail, Reloop keeps it in one auditable
-							stack.
-						</p>
-					</div>
-				</div>
-			</PageSection>
+				</PageSection>
 
-			<PageSection alt>
-				<ComparisonTable
-					competitorName="Postmark"
-					features={postmarkFeatures}
-				/>
-			</PageSection>
+				<PageSection alt>
+					<ComparisonTable
+						competitorName="Postmark"
+						features={postmarkFeatures}
+					/>
+				</PageSection>
 
-			<PageSection narrow>
-				<SectionHeading
-					title="From Postmark servers to Reloop"
-					description="Preserve stream separation while you migrate."
+				<PageSection narrow>
+					<SectionHeading
+						title="From Postmark servers to Reloop"
+						description="Preserve stream separation while you migrate."
+						compact
+					/>
+					<p className="mx-auto max-w-2xl text-[15px] text-text-sub-600 leading-relaxed dark:text-white/60">
+						Map each Postmark server (transactional vs broadcast) to Reloop
+						domains or campaign types. Export templates via API, recreate
+						suppression preferences, and run dual-send in staging until bounce
+						rates match baseline. Postmark&apos;s bounce taxonomy maps to Reloop
+						webhook event types—your handlers need label updates, not
+						architecture rewrites.
+					</p>
+				</PageSection>
+
+				<FaqSection
+					id="compare-postmark-faq"
+					title="Postmark vs Reloop FAQ"
+					items={compare?.faqs ?? []}
 					compact
 				/>
-				<p className="mx-auto max-w-2xl text-[15px] text-text-sub-600 leading-relaxed dark:text-white/60">
-					Map each Postmark server (transactional vs broadcast) to Reloop
-					domains or campaign types. Export templates via API, recreate
-					suppression preferences, and run dual-send in staging until bounce
-					rates match baseline. Postmark&apos;s bounce taxonomy maps to Reloop
-					webhook event types—your handlers need label updates, not architecture
-					rewrites.
-				</p>
-			</PageSection>
 
-			<FaqSection
-				id="compare-postmark-faq"
-				title="Postmark vs Reloop FAQ"
-				items={compare?.faqs ?? []}
-				compact
-			/>
-
-			<PageSection>
-				<CompareOtherLinks currentHref={pagePath} />
-			</PageSection>
-		</ComparisonPageShell>
+				<PageSection>
+					<CompareOtherLinks currentHref={pagePath} />
+				</PageSection>
+			</ComparisonPageShell>
 		</>
 	);
 };

@@ -16,11 +16,11 @@ import { DomainsSummaryCard } from "./components/domains-summary-card";
 import { InboxSummaryCard } from "./components/inbox-summary-card";
 import { OverviewHeader } from "./components/overview-header";
 import { RecentEmailsCard } from "./components/recent-emails-card";
-import { WorkflowsCard } from "./components/workflows-card";
 import {
 	SendHealthCard,
 	useSendHealthTotals,
 } from "./components/send-health-card";
+import { WorkflowsCard } from "./components/workflows-card";
 
 /**
  * Dashboard overview — health, attention, and recent activity.

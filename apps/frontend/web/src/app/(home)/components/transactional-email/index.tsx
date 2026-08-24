@@ -1,6 +1,6 @@
-import type { PreviewTabId } from "./preview-scenes";
 import { SceneHeader } from "../_shared/scene-header";
 import { TransactionalEmailPreview } from "./preview";
+import type { PreviewTabId } from "./preview-scenes";
 
 export function TransactionalEmailSection({
 	activeTab,

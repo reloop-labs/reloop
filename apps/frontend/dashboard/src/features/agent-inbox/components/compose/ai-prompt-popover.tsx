@@ -105,7 +105,7 @@ export const AiPromptPopover = ({
 								type="button"
 								onClick={() => setTone(option.value)}
 								className={cn(
-									"h-6 rounded-md px-2 text-[11px] font-medium transition-colors duration-150 ease-out",
+									"h-6 rounded-md px-2 font-medium text-[11px] transition-colors duration-150 ease-out",
 									tone === option.value
 										? "bg-mail-foreground text-panel-light dark:bg-panel-light dark:text-mail-foreground"
 										: "text-mail-muted hover:bg-[var(--inbox-hover)] hover:text-mail-foreground",
@@ -119,7 +119,7 @@ export const AiPromptPopover = ({
 						type="button"
 						onClick={submit}
 						disabled={!canSubmit}
-						className="inline-flex h-7 items-center gap-1.5 rounded-lg bg-mail-foreground px-2.5 text-[12px] font-medium text-panel-light transition-transform duration-150 ease-out hover:opacity-90 active:scale-[0.97] disabled:pointer-events-none disabled:opacity-40 dark:bg-panel-light dark:text-mail-foreground"
+						className="inline-flex h-7 items-center gap-1.5 rounded-lg bg-mail-foreground px-2.5 font-medium text-[12px] text-panel-light transition-transform duration-150 ease-out hover:opacity-90 active:scale-[0.97] disabled:pointer-events-none disabled:opacity-40 dark:bg-panel-light dark:text-mail-foreground"
 					>
 						<Icon name="magic-wand" className="h-3 w-3 shrink-0" />
 						Generate

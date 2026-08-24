@@ -28,14 +28,13 @@ export function HeroDashboardShell({
 }) {
 	return (
 		<div className="flex h-full min-h-0 bg-bg-white-0 dark:bg-black">
-			<HeroDashboardSidebar
-				activeItem={activeItem}
-				onItemClick={onItemClick}
-			/>
+			<HeroDashboardSidebar activeItem={activeItem} onItemClick={onItemClick} />
 
 			<div className="flex min-w-0 flex-1 flex-col">
 				<HeroDashboardHeader />
-				<div className="relative min-h-0 flex-1 overflow-hidden">{children}</div>
+				<div className="relative min-h-0 flex-1 overflow-hidden">
+					{children}
+				</div>
 			</div>
 		</div>
 	);
