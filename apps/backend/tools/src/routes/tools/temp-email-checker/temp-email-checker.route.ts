@@ -43,4 +43,25 @@ export const tempEmailCheckerRoute = new Elysia()
 		},
 		rateLimit: true,
 		detail,
+	})
+	.post("/check", ({ body }) => check(body.email), {
+		body: ToolsModel.checkBody,
+		response: {
+			200: ToolsModel.checkResponse,
+			400: ToolsModel.errorResponse,
+			429: ToolsModel.errorResponse,
+		},
+		rateLimit: true,
+		detail,
+	})
+	.get("/check", ({ query }) => check(query.email), {
+		query: ToolsModel.checkQuery,
+		response: {
+			200: ToolsModel.checkResponse,
+			400: ToolsModel.errorResponse,
+			429: ToolsModel.errorResponse,
+		},
+		rateLimit: true,
+		detail,
 	});
+

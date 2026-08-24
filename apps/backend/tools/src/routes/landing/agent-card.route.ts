@@ -31,7 +31,7 @@ export const agentCardRoute = new Elysia().get("/agent-card.json", () => ({
 			description:
 				"Report whether an email address or bare domain is disposable, a role address, or from a free consumer provider.",
 			method: "POST",
-			path: "/api/tools/v1/check",
+			path: "/api/tools/v1/temp-email-checker",
 			tags: ["tools"],
 			inputSchema: {
 				email: {
