@@ -16,7 +16,7 @@ function tls.egress_pool(tenant)
 end
 
 function tls.is_development(env)
-  return env == 'development' or env == 'dev'
+  return env == 'development' or env == 'dev' or env == 'local'
 end
 
 -- OpportunisticInsecure: STARTTLS when advertised, skip cert checks, fall

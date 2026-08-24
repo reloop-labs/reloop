@@ -21,7 +21,7 @@ function tlsEgressPool(tenant: string): "tls_enforced" | "tls_opportunistic" {
 }
 
 function isDevelopment(env: string): boolean {
-	return env === "development" || env === "dev";
+	return env === "development" || env === "dev" || env === "local";
 }
 
 function enableTls(
@@ -77,6 +77,7 @@ describe("enableTls", () => {
 			"OpportunisticInsecure",
 		);
 		expect(enableTls("dev", "tls_enforced")).toBe("OpportunisticInsecure");
+		expect(enableTls("local", "tls_enforced")).toBe("OpportunisticInsecure");
 	});
 });
 
