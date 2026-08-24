@@ -528,7 +528,7 @@ export function CheckerPanel() {
 							<div className="space-y-1.5">
 								<Label.Root
 									htmlFor="checker-input"
-									className="font-medium text-xs text-text-strong-950 dark:text-white"
+									className="font-medium text-xs text-text-strong-950 dark:text-white ml-2"
 								>
 									Email or domain
 									<Label.Asterisk />
