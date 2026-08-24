@@ -18,7 +18,7 @@ describe("checkEmailController", () => {
 	});
 
 	test("reports a clean address as deliverable", () => {
-		expect(checkEmailController("farhan@reloop.sh").verdict).toBe(
+		expect(checkEmailController("alex@reloop.sh").verdict).toBe(
 			"deliverable",
 		);
 	});

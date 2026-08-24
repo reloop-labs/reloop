@@ -157,7 +157,7 @@ describe("role addresses", () => {
 	});
 
 	test("leaves a personal address alone", () => {
-		const result = evaluate("farhan@reloop.sh");
+		const result = evaluate("alex@reloop.sh");
 		expect(result.isRoleAddress).toBe(false);
 		expect(result.verdict).toBe("deliverable");
 	});
