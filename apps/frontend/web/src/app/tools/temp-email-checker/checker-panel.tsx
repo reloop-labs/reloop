@@ -5,8 +5,8 @@ import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon, type IconName } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
-import { AnimatePresence, motion } from "framer-motion";
-import { type FormEvent, useEffect, useRef, useState } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { type FormEvent, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { CheckRequestError, runCheck } from "./check-api";
 import {
 	type CheckResult,
@@ -15,6 +15,38 @@ import {
 	toCheckResult,
 } from "./presenter";
 import { saveTestedEmail } from "./tested-emails-store";
+
+const SPRING_TRANSITION = {
+	type: "spring" as const,
+	bounce: 0,
+	duration: 0.36,
+};
+
+const resultContainerVariants = {
+	hidden: { opacity: 0 },
+	show: {
+		opacity: 1,
+		transition: {
+			staggerChildren: 0.05,
+			delayChildren: 0.02,
+		},
+	},
+	exit: {
+		opacity: 0,
+		scale: 0.98,
+		transition: { duration: 0.15 },
+	},
+};
+
+const resultItemVariants = {
+	hidden: { opacity: 0, y: 7, scale: 0.99 },
+	show: {
+		opacity: 1,
+		y: 0,
+		scale: 1,
+		transition: { type: "spring" as const, bounce: 0, duration: 0.32 },
+	},
+};
 
 const VERDICT_THEME: Record<
 	CheckVerdict,
@@ -47,39 +79,39 @@ const VERDICT_THEME: Record<
 			"We found multiple signals associated with temporary email services. The strongest signal is the domain classification matching known throwaway mailboxes.",
 	},
 	risky: {
-		title: "NEEDS A LOOK",
-		subtitle: "Shared role mailbox",
-		confidence: "85% confidence",
+		title: "RISKY",
+		subtitle: "Role-based or shared mailbox",
+		confidence: "Medium Confidence",
 		icon: "alert-triangle",
 		dotColor: "bg-amber-500",
 		titleClass: "text-amber-500 dark:text-amber-400",
 		badgeBg: "bg-amber-500/[0.04] dark:bg-amber-500/[0.08]",
 		badgeBorder: "border-amber-500/20 dark:border-amber-500/30",
 		recommendation:
-			"Address is a shared team inbox. Expect lower engagement on marketing campaigns.",
-		recommendationIcon: "alert-triangle",
+			"Accept with caution. Verify individual recipient identity if access control requires single-user ownership.",
+		recommendationIcon: "shield-alert",
 		whyResult:
-			"The domain appears valid and persistent, but the mailbox prefix (e.g. info, support, billing) indicates a shared role rather than an individual person.",
+			"This mailbox uses a shared or role-based prefix (such as admin@, support@, or billing@). Multiple users may access this inbox, making deliverability and accountability unpredictable.",
 	},
 	deliverable: {
-		title: "DELIVERABLE",
-		subtitle: "Clean mailbox provider",
-		confidence: "99% confidence",
-		icon: "shield-check",
+		title: "SAFE",
+		subtitle: "Standard mailbox with valid records",
+		confidence: "High Confidence",
+		icon: "check-circle",
 		dotColor: "bg-emerald-500",
-		titleClass: "text-emerald-500 dark:text-emerald-400",
+		titleClass: "text-emerald-600 dark:text-emerald-400",
 		badgeBg: "bg-emerald-500/[0.04] dark:bg-emerald-500/[0.08]",
 		badgeBorder: "border-emerald-500/20 dark:border-emerald-500/30",
 		recommendation:
-			"Safe to accept for user signups, transactional emails, and identity verification.",
+			"Safe to accept and send. Domain has valid MX records and no flags for disposable providers.",
 		recommendationIcon: "check-circle",
 		whyResult:
-			"The domain is not listed on known disposable catalogues and shows healthy persistent mailbox infrastructure with valid RFC syntax.",
+			"The domain possesses legitimate mail exchanger (MX) infrastructure with no history of temporary mailbox provisioning. Deliverability indicators are standard.",
 	},
 	invalid: {
 		title: "INVALID",
-		subtitle: "Malformed address",
-		confidence: "100% confidence",
+		subtitle: "Malformed address or hostname",
+		confidence: "Syntax Error",
 		icon: "cross-circle",
 		dotColor: "bg-neutral-400",
 		titleClass: "text-neutral-500 dark:text-white/60",
@@ -146,11 +178,11 @@ function ResultCardDetailed({
 	const isValidSyntax = result.verdict !== "invalid";
 
 	return (
-		<div className="mt-3.5 space-y-3 text-xs">
+		<div className="space-y-3 text-xs">
 			{/* Verdict Hero Card */}
 			<div
 				className={cn(
-					"rounded-xl border p-3.5 sm:p-4",
+					"rounded-xl border p-3.5 sm:p-4 transition-colors",
 					theme.badgeBg,
 					theme.badgeBorder,
 				)}
@@ -269,6 +301,7 @@ function ResultCardDetailed({
 						initial={{ opacity: 0, height: 0 }}
 						animate={{ opacity: 1, height: "auto" }}
 						exit={{ opacity: 0, height: 0 }}
+						transition={SPRING_TRANSITION}
 						className="overflow-hidden"
 					>
 						<div className="rounded-xl border border-stroke-soft-200 bg-neutral-950 p-3 font-mono text-[11px] text-emerald-400 dark:border-white/10">
@@ -298,15 +331,36 @@ function ResultCardDetailed({
 }
 
 export function CheckerPanel() {
-	const inputRef = useRef<HTMLInputElement>(null);
 	const [value, setValue] = useState("");
+	const [isPending, setIsPending] = useState(false);
 	const [result, setResult] = useState<CheckResult | null>(null);
 	const [error, setError] = useState<string | null>(null);
-	const [isPending, setIsPending] = useState(false);
+	const inputRef = useRef<HTMLInputElement>(null);
+	const shouldReduceMotion = useReducedMotion();
 
-	const requestRef = useRef<AbortController | null>(null);
+	const dynamicAreaRef = useRef<HTMLDivElement>(null);
+	const [dynamicHeight, setDynamicHeight] = useState<number | "auto">("auto");
 
-	useEffect(() => () => requestRef.current?.abort(), []);
+	// Measure content height whenever active state changes (matching navbar mega-menu morph)
+	useLayoutEffect(() => {
+		if (!dynamicAreaRef.current) return;
+		const el = dynamicAreaRef.current;
+
+		const updateHeight = () => {
+			if (el) {
+				const rect = el.getBoundingClientRect();
+				setDynamicHeight(Math.ceil(rect.height));
+			}
+		};
+
+		updateHeight();
+
+		const ro = new ResizeObserver(() => {
+			updateHeight();
+		});
+		ro.observe(el);
+		return () => ro.disconnect();
+	}, [result, error]);
 
 	const run = async (raw: string) => {
 		const query = raw.trim();
@@ -317,15 +371,11 @@ export function CheckerPanel() {
 			return;
 		}
 
-		requestRef.current?.abort();
-		const controller = new AbortController();
-		requestRef.current = controller;
-
 		setIsPending(true);
 		setError(null);
 
 		try {
-			const response = await runCheck(query, controller.signal);
+			const response = await runCheck(query);
 			const checkRes = toCheckResult(response);
 			setResult(checkRes);
 			saveTestedEmail({
@@ -338,7 +388,6 @@ export function CheckerPanel() {
 				summary: checkRes.summary,
 			});
 		} catch (err) {
-			if (controller.signal.aborted) return;
 			setResult(null);
 			setError(
 				err instanceof CheckRequestError
@@ -346,7 +395,7 @@ export function CheckerPanel() {
 					: "Something went wrong running that check.",
 			);
 		} finally {
-			if (!controller.signal.aborted) setIsPending(false);
+			setIsPending(false);
 		}
 	};
 
@@ -364,12 +413,12 @@ export function CheckerPanel() {
 
 	return (
 		<div className="mx-auto w-full max-w-2xl">
-			{/* Dashboard Modal / Card Container */}
+			{/* Dashboard Modal / Card Container with navbar-style height morphing */}
 			<div className="overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-weak-50 p-1.5 sm:rounded-[20px] dark:border-white/10 dark:bg-white/[0.04]">
-				<div className="rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-4 sm:p-4.5 dark:border-white/10 dark:bg-[#070707]">
+				<div className="rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-5 sm:p-6 dark:border-white/10 dark:bg-[#070707]">
 					{/* Input Check Zone */}
-					<form onSubmit={onSubmit} noValidate className="space-y-3.5">
-						<div className="space-y-1.5">
+					<form onSubmit={onSubmit} noValidate className="space-y-4">
+						<div className="space-y-2">
 							<Label.Root
 								htmlFor="checker-input"
 								className="font-medium text-xs text-text-strong-950 dark:text-white"
@@ -382,7 +431,7 @@ export function CheckerPanel() {
 								size="medium"
 								className="!shadow-none has-[input:focus]:!shadow-button-primary-focus has-[input:focus]:before:!ring-primary-base w-full rounded-xl"
 							>
-								<Input.Wrapper className="h-10.5 pl-3 pr-1.5 dark:bg-[#070707]">
+								<Input.Wrapper className="h-11 pl-3.5 pr-1.5 dark:bg-[#070707]">
 									<Input.Icon>
 										<Icon name="mail-single" className="size-4" />
 									</Input.Icon>
@@ -419,11 +468,11 @@ export function CheckerPanel() {
 										type="submit"
 										variant="primary"
 										size="xsmall"
-										className="!p-0 flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-lg"
+										className="!p-0 flex size-7.5 shrink-0 cursor-pointer items-center justify-center rounded-lg"
 										aria-label="Verify email or domain"
 									>
 										{isPending ? (
-											<span className="size-3 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+											<span className="size-3.5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
 										) : (
 											<FancyButton.Icon className="mx-0 size-3.5">
 												<Icon name="arrow-right" className="size-3.5" />
@@ -434,110 +483,130 @@ export function CheckerPanel() {
 							</Input.Root>
 						</div>
 
-						{/* Content below input: Error, Result, or How It Works Stepper */}
-						<AnimatePresence mode="wait">
-							{error ? (
-								<motion.div
-									key="error"
-									initial={{ opacity: 0, y: 4 }}
-									animate={{ opacity: 1, y: 0 }}
-									exit={{ opacity: 0, y: -4 }}
-									className="flex items-start gap-2.5 rounded-xl border border-rose-500/20 bg-rose-500/5 p-3 text-xs text-text-sub-600 dark:text-white/60"
-								>
-									<Icon
-										name="alert-triangle"
-										className="mt-0.5 size-4 shrink-0 text-rose-500"
-									/>
-									<p className="leading-relaxed text-rose-600 dark:text-rose-400">
-										{error}
-									</p>
-								</motion.div>
-							) : result ? (
-								<motion.div
-									key="result"
-									initial={{ opacity: 0, y: 6 }}
-									animate={{ opacity: 1, y: 0 }}
-									exit={{ opacity: 0, y: -6 }}
-									transition={{ duration: 0.2 }}
-								>
-									<ResultCardDetailed result={result} onReset={handleReset} />
-								</motion.div>
-							) : (
-								<motion.div
-									key="how-it-works"
-									initial={{ opacity: 0 }}
-									animate={{ opacity: 1 }}
-									exit={{ opacity: 0 }}
-								>
-									{/* How It Works - Vertical Stepper */}
-									<div className="mt-3.5 space-y-3 rounded-xl border border-stroke-soft-200 bg-bg-weak-50/50 p-3.5 text-xs dark:border-white/10 dark:bg-white/[0.02]">
-										<div className="flex items-center justify-between">
-											<p className="font-mono font-semibold text-[11px] text-text-strong-950 uppercase tracking-wider dark:text-white">
-												How It Works
+						{/* Smooth Height Morphing Shell */}
+						<motion.div
+							initial={false}
+							animate={{
+								height:
+									shouldReduceMotion || dynamicHeight === "auto"
+										? "auto"
+										: dynamicHeight,
+							}}
+							transition={
+								shouldReduceMotion
+									? { duration: 0 }
+									: SPRING_TRANSITION
+							}
+							style={{ overflow: "hidden" }}
+						>
+							<div ref={dynamicAreaRef} className="pt-0.5">
+								<AnimatePresence mode="wait" initial={false}>
+									{error ? (
+										<motion.div
+											key="error"
+											initial={{ opacity: 0 }}
+											animate={{ opacity: 1 }}
+											exit={{ opacity: 0 }}
+											transition={{ duration: 0.2 }}
+											className="flex items-start gap-2.5 rounded-xl border border-rose-500/20 bg-rose-500/5 p-3.5 text-xs text-text-sub-600 dark:text-white/60"
+										>
+											<Icon
+												name="alert-triangle"
+												className="mt-0.5 size-4 shrink-0 text-rose-500"
+											/>
+											<p className="leading-relaxed text-rose-600 dark:text-rose-400">
+												{error}
 											</p>
-											<span className="inline-flex items-center gap-1 font-mono text-[11px] text-emerald-600 dark:text-emerald-400">
-												<span className="size-1.5 rounded-full bg-emerald-500" />
-												Live Scanner
-											</span>
-										</div>
-
-										<div className="relative pt-0.5 pl-0.5">
-											{/* Step 1 */}
-											<div className="relative flex items-center gap-3 pb-3.5">
-												{/* Vertical connecting line */}
-												<div className="absolute top-5 left-[12px] h-full w-px bg-stroke-soft-200 dark:bg-white/10" />
-												{/* Number node */}
-												<div className="relative z-10 flex size-6 shrink-0 items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-white-0 font-mono font-semibold text-[11px] text-text-strong-950 dark:border-white/12 dark:bg-[#111] dark:text-white">
-													1
-												</div>
-												<div className="flex flex-1 items-center justify-between">
-													<span className="font-medium text-text-strong-950 text-xs dark:text-white">
-														Enter email
+										</motion.div>
+									) : result ? (
+										<motion.div
+											key="result"
+											initial={{ opacity: 0 }}
+											animate={{ opacity: 1 }}
+											exit={{ opacity: 0 }}
+											transition={{ duration: 0.22, ease: "easeOut" }}
+										>
+											<ResultCardDetailed result={result} onReset={handleReset} />
+										</motion.div>
+									) : (
+										<motion.div
+											key="how-it-works"
+											initial={{ opacity: 0 }}
+											animate={{ opacity: 1 }}
+											exit={{ opacity: 0 }}
+											transition={{ duration: 0.2 }}
+										>
+											{/* How It Works - Vertical Stepper */}
+											<div className="space-y-3.5 rounded-xl border border-stroke-soft-200 bg-bg-weak-50/50 p-4 sm:p-4.5 text-xs dark:border-white/10 dark:bg-white/[0.02]">
+												<div className="flex items-center justify-between pb-0.5">
+													<p className="font-mono font-semibold text-[11px] text-text-strong-950 uppercase tracking-wider dark:text-white">
+														How It Works
+													</p>
+													<span className="inline-flex items-center gap-1 font-mono text-[11px] text-emerald-600 dark:text-emerald-400">
+														<span className="size-1.5 rounded-full bg-emerald-500" />
+														Live Scanner
 													</span>
-													<code className="rounded-md border border-stroke-soft-200 bg-bg-white-0 px-2 py-0.5 font-mono text-[11px] text-text-sub-600 dark:border-white/10 dark:bg-[#0b0b0b] dark:text-white/70">
-														Email
-													</code>
+												</div>
+
+												<div className="relative pt-1 pl-0.5">
+													{/* Step 1 */}
+													<div className="relative flex items-center gap-3.5 pb-4.5">
+														{/* Vertical connecting line */}
+														<div className="absolute top-5 left-[12px] h-full w-px bg-stroke-soft-200 dark:bg-white/10" />
+														{/* Number node */}
+														<div className="relative z-10 flex size-6 shrink-0 items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-white-0 font-mono font-semibold text-[11px] text-text-strong-950 dark:border-white/12 dark:bg-[#111] dark:text-white">
+															1
+														</div>
+														<div className="flex flex-1 items-center justify-between">
+															<span className="font-medium text-text-strong-950 text-xs dark:text-white">
+																Enter email
+															</span>
+															<code className="rounded-md border border-stroke-soft-200 bg-bg-white-0 px-2 py-0.5 font-mono text-[11px] text-text-sub-600 dark:border-white/10 dark:bg-[#0b0b0b] dark:text-white/70">
+																Email
+															</code>
+														</div>
+													</div>
+
+													{/* Step 2 */}
+													<div className="relative flex items-center gap-3.5 pb-4.5">
+														{/* Vertical connecting line */}
+														<div className="absolute top-5 left-[12px] h-full w-px bg-stroke-soft-200 dark:bg-white/10" />
+														{/* Number node */}
+														<div className="relative z-10 flex size-6 shrink-0 items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-white-0 font-mono font-semibold text-[11px] text-text-strong-950 dark:border-white/12 dark:bg-[#111] dark:text-white">
+															2
+														</div>
+														<div className="flex flex-1 items-center justify-between">
+															<span className="font-medium text-text-strong-950 text-xs dark:text-white">
+																Analyze domain
+															</span>
+															<code className="rounded-md border border-stroke-soft-200 bg-bg-white-0 px-2 py-0.5 font-mono text-[11px] text-text-sub-600 dark:border-white/10 dark:bg-[#0b0b0b] dark:text-white/70">
+																Signals
+															</code>
+														</div>
+													</div>
+
+													{/* Step 3 */}
+													<div className="relative flex items-center gap-3.5">
+														{/* Number node */}
+														<div className="relative z-10 flex size-6 shrink-0 items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-white-0 font-mono font-semibold text-[11px] text-text-strong-950 dark:border-white/12 dark:bg-[#111] dark:text-white">
+															3
+														</div>
+														<div className="flex flex-1 items-center justify-between">
+															<span className="font-medium text-text-strong-950 text-xs dark:text-white">
+																Get result
+															</span>
+															<code className="rounded-md border border-stroke-soft-200 bg-bg-white-0 px-2 py-0.5 font-mono text-[11px] text-text-sub-600 dark:border-white/10 dark:bg-[#0b0b0b] dark:text-white/70">
+																Risk Result
+															</code>
+														</div>
+													</div>
 												</div>
 											</div>
-
-											{/* Step 2 */}
-											<div className="relative flex items-center gap-3 pb-3.5">
-												{/* Vertical connecting line */}
-												<div className="absolute top-5 left-[12px] h-full w-px bg-stroke-soft-200 dark:bg-white/10" />
-												{/* Number node */}
-												<div className="relative z-10 flex size-6 shrink-0 items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-white-0 font-mono font-semibold text-[11px] text-text-strong-950 dark:border-white/12 dark:bg-[#111] dark:text-white">
-													2
-												</div>
-												<div className="flex flex-1 items-center justify-between">
-													<span className="font-medium text-text-strong-950 text-xs dark:text-white">
-														Analyze domain
-													</span>
-													<code className="rounded-md border border-stroke-soft-200 bg-bg-white-0 px-2 py-0.5 font-mono text-[11px] text-text-sub-600 dark:border-white/10 dark:bg-[#0b0b0b] dark:text-white/70">
-														Signals
-													</code>
-												</div>
-											</div>
-
-											{/* Step 3 */}
-											<div className="relative flex items-center gap-3">
-												{/* Number node */}
-												<div className="relative z-10 flex size-6 shrink-0 items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-white-0 font-mono font-semibold text-[11px] text-text-strong-950 dark:border-white/12 dark:bg-[#111] dark:text-white">
-													3
-												</div>
-												<div className="flex flex-1 items-center justify-between">
-													<span className="font-medium text-text-strong-950 text-xs dark:text-white">
-														Get result
-													</span>
-													<code className="rounded-md border border-stroke-soft-200 bg-bg-white-0 px-2 py-0.5 font-mono text-[11px] text-text-sub-600 dark:border-white/10 dark:bg-[#0b0b0b] dark:text-white/70">
-														Risk Result
-													</code>
-												</div>
-											</div>
-										</div>
-									</div>
-								</motion.div>
-							)}
-						</AnimatePresence>
+										</motion.div>
+									)}
+								</AnimatePresence>
+							</div>
+						</motion.div>
 					</form>
 				</div>
 			</div>
