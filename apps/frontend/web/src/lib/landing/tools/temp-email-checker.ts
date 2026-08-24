@@ -33,16 +33,16 @@ export const config: ToolDefinition = {
 				{
 					title: "Protect Signups & Fraud",
 					description:
-						"Block automated bot signups and free-tier abuse by detecting throwaway domains in real time.",
+						"Block throwaway domains at signup using the catalogue, role prefixes, and MX lookup — not an SMTP mailbox probe.",
 				},
 			],
 		},
 	],
 	cta: {
-		title: "Validate emails in real time",
+		title: "Check throwaway domains first",
 		titleMuted: "Start free today.",
 		description:
-			"Use Reloop's validation API to protect your signup forms and import lists.",
+			"Use the public checker API on signup. You get a verdict, MX hosts, and flags — not a mailbox existence check.",
 		primary: {
 			label: "Get started free",
 			href: "/dashboard/signup",

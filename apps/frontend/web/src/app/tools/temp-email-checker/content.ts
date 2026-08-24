@@ -229,12 +229,22 @@ export const faqGroups: { title: string; items: FaqItem[] }[] = [
 			{
 				question: "How accurate is the check?",
 				answer:
-					"Domain matching is exact by nature: a domain is either on the list or it isn't. The lists themselves are community maintained and refreshed continuously, but new providers appear constantly, so treat a clean result as 'not currently known to be disposable' rather than a guarantee.",
+					"Disposable matching is a list lookup: the domain is on the catalogue or it isn't. We also classify role prefixes and look up MX records. New temp-mail providers appear constantly, so a clear result means 'not currently known to be disposable' — not a guarantee.",
+			},
+			{
+				question: "Does this prove the mailbox exists?",
+				answer:
+					"No. We never open an SMTP session or check whether the local-part has a mailbox. MX records only show that the domain publishes a mail exchanger.",
+			},
+			{
+				question: "What does a clear verdict mean?",
+				answer:
+					"The address parsed, the domain is not on the disposable list, and it is not a shared role prefix. If MX records were found, mail can theoretically be routed to that domain. It is not proof of delivery.",
 			},
 			{
 				question: "Is a Gmail or Outlook address disposable?",
 				answer:
-					"No. Consumer mailboxes from Gmail, Outlook, Yahoo and similar providers are free, but they are persistent and real. They are reported as a separate signal so you can apply your own policy to them — many products happily accept them.",
+					"No. Consumer mailboxes from Gmail, Outlook, Yahoo and similar providers are free, but they are persistent. They are flagged as free providers so you can apply your own policy — they are not treated as throwaway.",
 			},
 		],
 	},

@@ -7,6 +7,7 @@ import { Icon } from "@reloop/ui/icon";
 import { Logo } from "@reloop/ui/logo";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import type { CSSProperties, ReactNode } from "react";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
@@ -1585,6 +1586,10 @@ function getMegaPanelWidthPx(item: NavItem | undefined): number {
 }
 
 export const Header = () => {
+	const pathname = usePathname();
+	if (pathname === "/twitter" || pathname?.startsWith("/twitter/")) {
+		return null;
+	}
 	const { useSession } = authClient;
 	const { data: session } = useSession();
 	const shouldReduceMotion = useReducedMotion();

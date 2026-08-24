@@ -1,6 +1,5 @@
 "use client";
 
-import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { AnimatePresence, motion } from "framer-motion";
@@ -10,6 +9,7 @@ import type { SimpleIcon } from "simple-icons";
 import { siCurl, siGo, siNodedotjs, siPython } from "simple-icons";
 import { runCheck } from "./check-api";
 import { WindowDots } from "./grid";
+import { highlightJson } from "./json-highlight";
 import { LanguagePills, type PillTab } from "./language-pills";
 import { toPublicPayload } from "./presenter";
 
@@ -94,40 +94,6 @@ function highlightCode(code: string): React.ReactNode[] {
 							? "text-text-soft-400 dark:text-white/30"
 							: undefined
 				}
-			>
-				{text}
-			</span>,
-		);
-		last = start + text.length;
-	}
-
-	if (last < code.length) out.push(code.slice(last));
-	return out;
-}
-
-const JSON_TOKEN =
-	/("(?:\\.|[^"\\])*")(\s*:)?|\b(true|false|null)\b|(-?\d+(?:\.\d+)?)/g;
-
-function highlightJson(code: string): React.ReactNode[] {
-	const out: React.ReactNode[] = [];
-	let last = 0;
-	let key = 0;
-
-	for (const match of code.matchAll(JSON_TOKEN)) {
-		const start = match.index ?? 0;
-		if (start > last) out.push(code.slice(last, start));
-
-		const [text, str, colon, literal] = match;
-		const isKey = Boolean(str && colon);
-
-		out.push(
-			<span
-				key={`j${key++}`}
-				className={cn(
-					isKey && "text-text-strong-950 dark:text-white",
-					!isKey && str && "text-primary-base",
-					literal && "text-text-sub-600 dark:text-white/55",
-				)}
 			>
 				{text}
 			</span>,
@@ -226,8 +192,8 @@ export function ApiSection() {
 					Check Temp email from code
 				</h2>
 				<p className="mt-3 max-w-2xl text-[14.5px] text-text-sub-600 leading-relaxed sm:text-base dark:text-white/60">
-					Call the public endpoint from signup. You get a verdict, MX hosts,
-					and flags — not an SMTP mailbox probe.
+					Call the public endpoint from signup. You get a verdict, MX hosts, and
+					flags — not an SMTP mailbox probe.
 				</p>
 			</div>
 
@@ -291,14 +257,14 @@ export function ApiSection() {
 							<span>· json</span>
 						</div>
 					</div>
-					<div className="overflow-x-auto px-4 py-6 sm:px-6 lg:px-8">
+					<div className="overflow-x-auto bg-black px-4 py-6 sm:px-6 lg:px-8">
 						<AnimatePresence mode="wait">
 							<motion.pre
 								key={jsonResult}
 								initial={{ opacity: 0.6 }}
 								animate={{ opacity: 1 }}
 								transition={{ duration: 0.15 }}
-								className="font-mono text-[12.5px] text-text-sub-600 leading-[1.75] sm:text-[13px] dark:text-white/45"
+								className="font-mono text-[13px] text-white/70 leading-[1.7]"
 							>
 								<code>{highlightJson(jsonResult)}</code>
 							</motion.pre>

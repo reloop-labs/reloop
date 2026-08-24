@@ -3,9 +3,9 @@ import { BlogCta } from "@reloop/web/components/landing/blog/blog-cta";
 import { createPageMetadata } from "@reloop/web/lib/metadata";
 import { getSiteUrl } from "@reloop/web/lib/site";
 import { SectionSeparator } from "../../(home)/components/section-separator";
+import { ApiSection } from "./api-section";
 import { AiAgentsSection } from "./components/ai-agents-section";
 import { RecentChecksSection } from "./components/recent-checks-section";
-import { ApiSection } from "./api-section";
 import { TempEmailHero } from "./components/temp-email-hero";
 import {
 	faqGroups,
@@ -34,7 +34,7 @@ export default function TempEmailCheckerPage() {
 	const siteUrl = getSiteUrl();
 
 	return (
-		<div className="relative min-h-screen overflow-x-hidden bg-bg-white-0 font-sans text-text-strong-950 selection:bg-neutral-200 dark:selection:bg-neutral-800 dark:bg-black dark:text-white">
+		<div className="relative min-h-screen overflow-x-hidden bg-bg-white-0 font-sans text-text-strong-950 selection:bg-neutral-200 dark:bg-black dark:text-white dark:selection:bg-neutral-800">
 			<JsonLd
 				data={[
 					{
@@ -99,10 +99,7 @@ export default function TempEmailCheckerPage() {
 				<AiAgentsSection />
 				<SectionSeparator />
 				<section id="faq-section" className="w-full">
-					<SectionIntro
-						lead="Frequently asked questions"
-						align="left"
-					/>
+					<SectionIntro lead="Frequently asked questions" align="left" />
 					<FaqGrid groups={faqGroups} />
 				</section>
 				<SectionSeparator />

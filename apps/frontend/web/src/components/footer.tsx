@@ -4,6 +4,7 @@
 import { Icon } from "@reloop/ui/icon";
 import { Logo } from "@reloop/ui/logo";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 
@@ -152,6 +153,10 @@ function FooterLinkItem({ link }: { link: FooterLink }) {
 }
 
 export const Footer = () => {
+	const pathname = usePathname();
+	if (pathname === "/twitter" || pathname?.startsWith("/twitter/")) {
+		return null;
+	}
 	const { theme, setTheme } = useTheme();
 	const [mounted, setMounted] = useState(false);
 

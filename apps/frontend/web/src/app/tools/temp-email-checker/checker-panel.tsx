@@ -17,6 +17,7 @@ import {
 } from "react";
 import { CheckRequestError, runCheck } from "./check-api";
 import "./checker-field.css";
+import { RawJsonBlock } from "./json-highlight";
 import {
 	type CheckResult,
 	type CheckVerdict,
@@ -394,11 +395,7 @@ function ResultCardDetailed({
 						transition={SPRING_TRANSITION}
 						className="overflow-hidden"
 					>
-						<div className="rounded-xl border border-stroke-soft-200 bg-neutral-950 p-3 font-mono text-[11px] text-emerald-400 dark:border-white/10">
-							<pre className="overflow-x-auto whitespace-pre-wrap">
-								{JSON.stringify(result.rawJson, null, 2)}
-							</pre>
-						</div>
+						<RawJsonBlock value={result.rawJson} />
 					</motion.div>
 				)}
 			</AnimatePresence>

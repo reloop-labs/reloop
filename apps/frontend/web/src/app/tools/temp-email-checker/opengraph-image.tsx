@@ -446,8 +446,8 @@ export default function OpenGraphImage() {
 							marginTop: "16px",
 						}}
 					>
-						Find out if an email address comes from a disposable or temporary
-						mailbox provider.
+						Check syntax, known disposable providers, role prefixes, and MX
+						records. We do not probe the mailbox.
 					</div>
 				</div>
 

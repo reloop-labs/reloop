@@ -82,8 +82,8 @@ describe("toCheckResult", () => {
 		expect(result.confidenceLabel).toBe("98% confidence");
 		expect(result.displaySignals).toEqual([
 			{ label: "Disposable provider", value: "Detected", status: "fail" },
-			{ label: "Domain reputation", value: "Suspicious", status: "warn" },
-			{ label: "Mailbox pattern", value: "Random / Burner", status: "warn" },
+			{ label: "MX records", value: "Found", status: "pass" },
+			{ label: "Role prefix", value: "None", status: "pass" },
 			{ label: "Email syntax", value: "Valid", status: "pass" },
 		]);
 		expect(result.rawJson.flags).toEqual([
@@ -109,8 +109,8 @@ describe("toCheckResult", () => {
 		expect(result.confidenceLabel).toBe("85% confidence");
 		expect(result.displaySignals).toEqual([
 			{ label: "Disposable provider", value: "Clean", status: "pass" },
-			{ label: "Domain reputation", value: "Valid", status: "pass" },
-			{ label: "Mailbox pattern", value: "Shared Role", status: "warn" },
+			{ label: "MX records", value: "Found", status: "pass" },
+			{ label: "Role prefix", value: "Shared", status: "warn" },
 			{ label: "Email syntax", value: "Valid", status: "pass" },
 		]);
 	});
@@ -128,12 +128,33 @@ describe("toCheckResult", () => {
 			}),
 		);
 
-		expect(result.subtitle).toBe("No mail exchanger records");
+		expect(result.subtitle).toBe("No MX records published");
 		expect(result.recommendationTone).toBe("warn");
 		expect(result.displaySignals[1]).toEqual({
-			label: "Domain reputation",
-			value: "No MX",
+			label: "MX records",
+			value: "None",
 			status: "warn",
+		});
+	});
+
+	test("marks MX as unknown when lookup returned no hosts and no empty flag", () => {
+		const result = toCheckResult(
+			api({
+				input: "alex@reloop.sh",
+				domain: "reloop.sh",
+				verdict: "deliverable",
+				confidence: 0.99,
+				riskScore: 0.02,
+				mxRecords: [],
+				flags: [],
+			}),
+		);
+
+		expect(result.subtitle).toBe("MX lookup did not return hosts");
+		expect(result.displaySignals[1]).toEqual({
+			label: "MX records",
+			value: "Unknown",
+			status: "neutral",
 		});
 	});
 
