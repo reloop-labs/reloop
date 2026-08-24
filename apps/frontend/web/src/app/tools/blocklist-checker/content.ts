@@ -36,8 +36,9 @@ export const ipBlocklistCount = ipBlocklistNames.length;
 export const domainBlocklistCount = domainBlocklistNames.length;
 export const publicBlocklistCount = ipBlocklistCount + domainBlocklistCount;
 
-export const siteTitle = "IP & Domain DNS Blocklist Checker";
-export const metaTitle = "IP & Domain DNS Blocklist Checker";
+export const toolTitle = "IP & Domain DNS Blocklist Checker";
+export const siteTitle = toolTitle;
+export const metaTitle = toolTitle;
 export const metaDescription = `Look up a sending IP or a domain name against ${publicBlocklistCount} public DNS blocklists (${ipBlocklistCount} IP lists, ${domainBlocklistCount} domain URI lists). Failed queries are errors, not a clean pass.`;
 
 export const toolDescription = `Queries ${publicBlocklistCount} public DNS blocklists — ${ipBlocklistCount} for sending IPs, ${domainBlocklistCount} for the domain name itself (DBL, URIBL, SURBL, and similar). This is a DNS lookup, not a website scan, and not Gmail or Microsoft reputation.`;
