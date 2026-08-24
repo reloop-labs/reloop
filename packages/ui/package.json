@@ -98,7 +98,8 @@
 		"./horizontal-stepper": "./src/components/horizontal-stepper.tsx",
 		"./vertical-stepper": "./src/components/vertical-stepper.tsx",
 		"./digit-input": "./src/components/digit-input.tsx",
-		"./not-found-illustration": "./src/components/not-found-illustration.tsx"
+		"./not-found-illustration": "./src/components/not-found-illustration.tsx",
+		"./loading-dot": "./src/components/loading-dot.tsx"
 	},
 	"dependencies": {
 		"@radix-ui/react-accordion": "catalog:ui",

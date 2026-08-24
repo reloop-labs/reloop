@@ -5,6 +5,7 @@ import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon, type IconName } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
+import { LoadingDot } from "@reloop/ui/loading-dot";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
 	type FormEvent,
@@ -414,7 +415,7 @@ function ResultCardDetailed({
 			</div>
 
 			{/* Actions Footer */}
-			<div className="flex items-center justify-between pt-0.5">
+			<div className="flex items-center justify-between px-2 py-3">
 				<button
 					type="button"
 					onClick={() => setShowEvidence((prev) => !prev)}
@@ -649,7 +650,7 @@ export function CheckerPanel() {
 												aria-label="Verify email or domain"
 											>
 												{isPending ? (
-													<span className="size-3.5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+													<LoadingDot size={13} dotSize={2} className="text-white" />
 												) : (
 													<FancyButton.Icon className="mx-0 size-3.5">
 														<Icon name="arrow-right" className="size-3.5" />
