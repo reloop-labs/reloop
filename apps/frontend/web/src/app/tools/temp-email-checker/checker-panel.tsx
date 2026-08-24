@@ -8,19 +8,33 @@ import * as Label from "@reloop/ui/label";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
 	type FormEvent,
+	type ReactNode,
 	useEffect,
+	useId,
 	useLayoutEffect,
 	useRef,
 	useState,
 } from "react";
 import { CheckRequestError, runCheck } from "./check-api";
+import "./checker-field.css";
 import {
 	type CheckResult,
 	type CheckVerdict,
 	type SignalStatus,
 	toCheckResult,
 } from "./presenter";
+import { FIELD_ERROR_MESSAGE, validateCheckerInput } from "./syntax";
 import { saveTestedEmail } from "./tested-emails-store";
+
+function readShakeMs(): number {
+	if (typeof window === "undefined") return 280;
+	const cs = getComputedStyle(document.documentElement);
+	const ms = (name: string, fallback: number) => {
+		const v = Number.parseFloat(cs.getPropertyValue(name));
+		return Number.isFinite(v) ? v : fallback;
+	};
+	return ms("--shake-dur-a", 80) * 2 + ms("--shake-dur-b", 60) * 2;
+}
 
 const SPRING_TRANSITION = {
 	type: "spring" as const,
@@ -28,31 +42,143 @@ const SPRING_TRANSITION = {
 	duration: 0.36,
 };
 
-const resultContainerVariants = {
-	hidden: { opacity: 0 },
-	show: {
-		opacity: 1,
-		transition: {
-			staggerChildren: 0.05,
-			delayChildren: 0.02,
-		},
-	},
-	exit: {
-		opacity: 0,
-		scale: 0.98,
-		transition: { duration: 0.15 },
-	},
+const HEIGHT_MORPH = {
+	duration: 0.28,
+	ease: [0.22, 1, 0.36, 1] as const,
 };
 
-const resultItemVariants = {
-	hidden: { opacity: 0, y: 7, scale: 0.99 },
-	show: {
-		opacity: 1,
-		y: 0,
-		scale: 1,
-		transition: { type: "spring" as const, bounce: 0, duration: 0.32 },
-	},
+const CROSSFADE = {
+	duration: 0.22,
+	ease: [0.22, 1, 0.36, 1] as const,
 };
+
+function MorphSlot({
+	activeKey,
+	reduceMotion,
+	children,
+}: {
+	activeKey: string | null;
+	reduceMotion: boolean | null;
+	children: ReactNode;
+}) {
+	const [height, setHeight] = useState<number | "auto">("auto");
+	const innerRef = useRef<HTMLDivElement>(null);
+
+	useLayoutEffect(() => {
+		if (!activeKey) {
+			setHeight(0);
+			return;
+		}
+
+		const el = innerRef.current;
+		if (!el) return;
+
+		const update = () => {
+			setHeight(Math.ceil(el.getBoundingClientRect().height));
+		};
+
+		update();
+		const ro = new ResizeObserver(update);
+		ro.observe(el);
+		return () => ro.disconnect();
+	}, [activeKey]);
+
+	return (
+		<motion.div
+			initial={false}
+			animate={{ height: reduceMotion ? "auto" : height }}
+			transition={reduceMotion ? { duration: 0 } : HEIGHT_MORPH}
+			className="relative overflow-hidden"
+		>
+			<AnimatePresence initial={false} mode="sync">
+				{activeKey ? (
+					<motion.div
+						key={activeKey}
+						initial={
+							reduceMotion ? false : { opacity: 0, filter: "blur(2px)" }
+						}
+						animate={{
+							opacity: 1,
+							filter: "blur(0px)",
+							pointerEvents: "auto",
+						}}
+						exit={
+							reduceMotion
+								? { opacity: 0, pointerEvents: "none" }
+								: {
+										opacity: 0,
+										filter: "blur(2px)",
+										pointerEvents: "none",
+									}
+						}
+						transition={reduceMotion ? { duration: 0 } : CROSSFADE}
+						className="absolute inset-x-0 top-0"
+					>
+						<div ref={innerRef}>{children}</div>
+					</motion.div>
+				) : null}
+			</AnimatePresence>
+		</motion.div>
+	);
+}
+
+function HowItWorksSteps() {
+	return (
+		<div className="space-y-3 px-4 pt-3.5 pb-2.5 text-xs sm:px-5 sm:pt-4 sm:pb-3">
+			<div className="pb-0.5">
+				<p className="font-mono font-semibold text-[11px] text-text-strong-950 uppercase tracking-wider dark:text-white">
+					How It Works
+				</p>
+			</div>
+
+			<div className="relative pt-0.5 pl-0.5">
+				<div className="relative flex items-center gap-3.5 pb-4">
+					<div className="absolute top-5 left-[12px] h-full w-px bg-stroke-soft-200 dark:bg-white/10" />
+					<div className="relative z-10 flex size-6 shrink-0 items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-white-0 font-mono font-semibold text-[11px] text-text-strong-950 dark:border-white/12 dark:bg-[#111] dark:text-white">
+						1
+					</div>
+					<div className="flex flex-1 items-center justify-between">
+						<span className="font-medium text-text-strong-950 text-xs dark:text-white">
+							Enter email
+						</span>
+						<code className="rounded-md border border-stroke-soft-200 bg-bg-white-0 px-2 py-0.5 font-mono text-[11px] text-text-sub-600 dark:border-white/10 dark:bg-[#0b0b0b] dark:text-white/70">
+							Email
+						</code>
+					</div>
+				</div>
+
+				<div className="relative flex items-center gap-3.5 pb-4">
+					<div className="absolute top-5 left-[12px] h-full w-px bg-stroke-soft-200 dark:bg-white/10" />
+					<div className="relative z-10 flex size-6 shrink-0 items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-white-0 font-mono font-semibold text-[11px] text-text-strong-950 dark:border-white/12 dark:bg-[#111] dark:text-white">
+						2
+					</div>
+					<div className="flex flex-1 items-center justify-between">
+						<span className="font-medium text-text-strong-950 text-xs dark:text-white">
+							Analyze domain
+						</span>
+						<code className="rounded-md border border-stroke-soft-200 bg-bg-white-0 px-2 py-0.5 font-mono text-[11px] text-text-sub-600 dark:border-white/10 dark:bg-[#0b0b0b] dark:text-white/70">
+							Signals
+						</code>
+					</div>
+				</div>
+
+				<div className="relative flex items-center gap-3.5">
+					<div className="relative z-10 flex size-6 shrink-0 items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-white-0 font-mono font-semibold text-[11px] text-text-strong-950 dark:border-white/12 dark:bg-[#111] dark:text-white">
+						3
+					</div>
+					<div className="flex flex-1 items-center justify-between">
+						<span className="font-medium text-text-strong-950 text-xs dark:text-white">
+							Get result
+						</span>
+						<code className="rounded-md border border-stroke-soft-200 bg-bg-white-0 px-2 py-0.5 font-mono text-[11px] text-text-sub-600 dark:border-white/10 dark:bg-[#0b0b0b] dark:text-white/70">
+							Risk Result
+						</code>
+					</div>
+				</div>
+			</div>
+		</div>
+	);
+}
 
 const VERDICT_THEME: Record<
 	CheckVerdict,
@@ -338,41 +464,61 @@ export function CheckerPanel() {
 	const [isPending, setIsPending] = useState(false);
 	const [result, setResult] = useState<CheckResult | null>(null);
 	const [error, setError] = useState<string | null>(null);
+	const [fieldError, setFieldError] = useState<string | null>(null);
+	const [fieldErrorCopy, setFieldErrorCopy] = useState("");
 	const inputRef = useRef<HTMLInputElement>(null);
+	const fieldRef = useRef<HTMLDivElement>(null);
+	const shakeTimerRef = useRef<number | null>(null);
+	const fieldErrorId = useId();
 	const shouldReduceMotion = useReducedMotion();
+	const hasFieldError = fieldError !== null;
 
-	const dynamicAreaRef = useRef<HTMLDivElement>(null);
-	const [dynamicHeight, setDynamicHeight] = useState<number | "auto">("auto");
-
-	// Measure content height whenever active state changes (matching navbar mega-menu morph)
-	useLayoutEffect(() => {
-		if (!dynamicAreaRef.current) return;
-		const el = dynamicAreaRef.current;
-
-		const updateHeight = () => {
-			if (el) {
-				const rect = el.getBoundingClientRect();
-				setDynamicHeight(Math.ceil(rect.height));
+	useEffect(() => {
+		return () => {
+			if (shakeTimerRef.current !== null) {
+				window.clearTimeout(shakeTimerRef.current);
 			}
 		};
+	}, []);
 
-		updateHeight();
+	const clearFieldError = () => {
+		setFieldError(null);
+		const field = fieldRef.current;
+		if (field) field.classList.remove("is-shaking");
+	};
 
-		const ro = new ResizeObserver(() => {
-			updateHeight();
-		});
-		ro.observe(el);
-		return () => ro.disconnect();
-	}, [result, error]);
+	const showFieldError = (message: string) => {
+		setFieldError(message);
+		setFieldErrorCopy(message);
+		setResult(null);
+		setError(null);
+		inputRef.current?.focus();
+
+		const field = fieldRef.current;
+		if (!field || shouldReduceMotion) return;
+
+		field.classList.remove("is-shaking");
+		void field.offsetWidth;
+		field.classList.add("is-shaking");
+
+		if (shakeTimerRef.current !== null) {
+			window.clearTimeout(shakeTimerRef.current);
+		}
+		shakeTimerRef.current = window.setTimeout(() => {
+			field.classList.remove("is-shaking");
+			shakeTimerRef.current = null;
+		}, readShakeMs() + 20);
+	};
 
 	const run = async (raw: string) => {
-		const query = raw.trim();
-		if (!query) {
-			inputRef.current?.focus();
-			setResult(null);
-			setError(null);
+		const validity = validateCheckerInput(raw);
+		if (!validity.ok) {
+			showFieldError(FIELD_ERROR_MESSAGE);
 			return;
 		}
+
+		clearFieldError();
+		const query = raw.trim();
 
 		setIsPending(true);
 		setError(null);
@@ -410,6 +556,7 @@ export function CheckerPanel() {
 	const handleReset = () => {
 		setResult(null);
 		setError(null);
+		clearFieldError();
 		setValue("");
 		setTimeout(() => inputRef.current?.focus(), 50);
 	};
@@ -431,188 +578,120 @@ export function CheckerPanel() {
 								<Label.Asterisk />
 							</Label.Root>
 
-							<Input.Root
-								size="medium"
-								className="!shadow-none has-[input:focus]:!shadow-button-primary-focus has-[input:focus]:before:!ring-primary-base w-full rounded-xl"
-							>
-								<Input.Wrapper className="h-11 pl-3.5 pr-1.5 dark:bg-[#0c0c0c]">
-									<Input.Icon>
-										<Icon name="mail-single" className="size-4" />
-									</Input.Icon>
-									<Input.Input
-										id="checker-input"
-										ref={inputRef}
-										type="text"
-										inputMode="email"
-										autoComplete="off"
-										autoCapitalize="none"
-										spellCheck={false}
-										value={value}
-										onChange={(e) => setValue(e.target.value)}
-										placeholder="you@example.com or domain.com"
-										className="font-medium text-[14.5px]"
-									/>
-									{value ? (
-										<button
-											type="button"
-											onClick={(e) => {
-												e.stopPropagation();
-												setValue("");
-												setResult(null);
-												setError(null);
-												inputRef.current?.focus();
-											}}
-											className="flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:text-white/45 dark:hover:bg-white/10 dark:hover:text-white"
-											aria-label="Clear input"
-										>
-											<Icon name="close" className="size-3.5" />
-										</button>
-									) : null}
-									<FancyButton.Root
-										type="submit"
-										variant="primary"
-										size="xsmall"
-										className="!p-0 flex size-7.5 shrink-0 cursor-pointer items-center justify-center rounded-lg"
-										aria-label="Verify email or domain"
-									>
-										{isPending ? (
-											<span className="size-3.5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-										) : (
-											<FancyButton.Icon className="mx-0 size-3.5">
-												<Icon name="arrow-right" className="size-3.5" />
-											</FancyButton.Icon>
+							<div className={cn("t-input-wrap", hasFieldError && "is-error")}>
+								<div
+									ref={fieldRef}
+									className={cn("t-input w-full", hasFieldError && "is-error")}
+								>
+									<Input.Root
+										size="medium"
+										hasError={hasFieldError}
+										className={cn(
+											"!shadow-none w-full rounded-xl",
+											hasFieldError
+												? "has-[input:focus]:!shadow-button-error-focus has-[input:focus]:before:!ring-error-base"
+												: "has-[input:focus]:before:!ring-primary-base has-[input:focus]:!shadow-button-primary-focus",
 										)}
-									</FancyButton.Root>
-								</Input.Wrapper>
-							</Input.Root>
+									>
+										<Input.Wrapper className="h-11 pl-3.5 pr-1.5 dark:bg-[#0c0c0c]">
+											<Input.Icon>
+												<Icon name="mail-single" className="size-4" />
+											</Input.Icon>
+											<Input.Input
+												id="checker-input"
+												ref={inputRef}
+												type="text"
+												inputMode="email"
+												autoComplete="off"
+												autoCapitalize="none"
+												spellCheck={false}
+												value={value}
+												aria-invalid={hasFieldError}
+												aria-describedby={
+													hasFieldError ? fieldErrorId : undefined
+												}
+												onChange={(e) => {
+													setValue(e.target.value);
+													if (fieldError) clearFieldError();
+												}}
+												placeholder="you@example.com or domain.com"
+												className="font-medium text-[14.5px]"
+											/>
+											{value ? (
+												<button
+													type="button"
+													onClick={(e) => {
+														e.stopPropagation();
+														setValue("");
+														setResult(null);
+														setError(null);
+														clearFieldError();
+														inputRef.current?.focus();
+													}}
+													className="flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:text-white/45 dark:hover:bg-white/10 dark:hover:text-white"
+													aria-label="Clear input"
+												>
+													<Icon name="close" className="size-3.5" />
+												</button>
+											) : null}
+											<FancyButton.Root
+												type="submit"
+												variant="primary"
+												size="xsmall"
+												className="!p-0 flex size-7.5 shrink-0 cursor-pointer items-center justify-center rounded-lg"
+												aria-label="Verify email or domain"
+											>
+												{isPending ? (
+													<span className="size-3.5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+												) : (
+													<FancyButton.Icon className="mx-0 size-3.5">
+														<Icon name="arrow-right" className="size-3.5" />
+													</FancyButton.Icon>
+												)}
+											</FancyButton.Root>
+										</Input.Wrapper>
+									</Input.Root>
+								</div>
+								<p
+									id={fieldErrorId}
+									role="alert"
+									className="t-error-msg text-error-base text-xs leading-relaxed"
+								>
+									{fieldErrorCopy}
+								</p>
+							</div>
 						</div>
 
-						{/* Result / Error Zone inside the white card */}
-						<motion.div
-							initial={false}
-							animate={{
-								height:
-									shouldReduceMotion || dynamicHeight === "auto"
-										? "auto"
-										: dynamicHeight,
-							}}
-							transition={
-								shouldReduceMotion
-									? { duration: 0 }
-									: SPRING_TRANSITION
-							}
-							style={{ overflow: "hidden" }}
+						<MorphSlot
+							activeKey={error ? "error" : result ? "result" : null}
+							reduceMotion={shouldReduceMotion}
 						>
-							<div ref={dynamicAreaRef} className="pt-0.5">
-								<AnimatePresence mode="wait" initial={false}>
-									{error ? (
-										<motion.div
-											key="error"
-											initial={{ opacity: 0 }}
-											animate={{ opacity: 1 }}
-											exit={{ opacity: 0 }}
-											transition={{ duration: 0.2 }}
-											className="flex items-start gap-2.5 rounded-xl border border-rose-500/20 bg-rose-500/5 p-3.5 text-xs text-text-sub-600 dark:text-white/60"
-										>
-											<Icon
-												name="alert-triangle"
-												className="mt-0.5 size-4 shrink-0 text-rose-500"
-											/>
-											<p className="leading-relaxed text-rose-600 dark:text-rose-400">
-												{error}
-											</p>
-										</motion.div>
-									) : result ? (
-										<motion.div
-											key="result"
-											initial={{ opacity: 0 }}
-											animate={{ opacity: 1 }}
-											exit={{ opacity: 0 }}
-											transition={{ duration: 0.22, ease: "easeOut" }}
-										>
-											<ResultCardDetailed result={result} onReset={handleReset} />
-										</motion.div>
-									) : null}
-								</AnimatePresence>
-							</div>
-						</motion.div>
+							{error ? (
+								<div className="flex items-start gap-2.5 rounded-xl border border-rose-500/20 bg-rose-500/5 p-3.5 text-text-sub-600 text-xs dark:text-white/60">
+									<Icon
+										name="alert-triangle"
+										className="mt-0.5 size-4 shrink-0 text-rose-500"
+									/>
+									<p className="text-rose-600 leading-relaxed dark:text-rose-400">
+										{error}
+									</p>
+								</div>
+							) : result ? (
+								<ResultCardDetailed
+									result={result}
+									onReset={handleReset}
+								/>
+							) : null}
+						</MorphSlot>
 					</form>
 				</div>
 
-				{/* How It Works on the Outer Soft Container */}
-				<AnimatePresence>
-					{!result && (
-						<motion.div
-							initial={{ opacity: 0, height: 0 }}
-							animate={{ opacity: 1, height: "auto" }}
-							exit={{ opacity: 0, height: 0 }}
-							transition={SPRING_TRANSITION}
-							className="overflow-hidden"
-						>
-							<div className="space-y-3 px-4 pt-3.5 pb-2.5 sm:px-5 sm:pt-4 sm:pb-3 text-xs">
-								<div className="pb-0.5">
-									<p className="font-mono font-semibold text-[11px] text-text-strong-950 uppercase tracking-wider dark:text-white">
-										How It Works
-									</p>
-								</div>
-
-								<div className="relative pt-0.5 pl-0.5">
-									{/* Step 1 */}
-									<div className="relative flex items-center gap-3.5 pb-4">
-										{/* Vertical connecting line */}
-										<div className="absolute top-5 left-[12px] h-full w-px bg-stroke-soft-200 dark:bg-white/10" />
-										{/* Number node */}
-										<div className="relative z-10 flex size-6 shrink-0 items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-white-0 font-mono font-semibold text-[11px] text-text-strong-950 dark:border-white/12 dark:bg-[#111] dark:text-white">
-											1
-										</div>
-										<div className="flex flex-1 items-center justify-between">
-											<span className="font-medium text-text-strong-950 text-xs dark:text-white">
-												Enter email
-											</span>
-											<code className="rounded-md border border-stroke-soft-200 bg-bg-white-0 px-2 py-0.5 font-mono text-[11px] text-text-sub-600 dark:border-white/10 dark:bg-[#0b0b0b] dark:text-white/70">
-												Email
-											</code>
-										</div>
-									</div>
-
-									{/* Step 2 */}
-									<div className="relative flex items-center gap-3.5 pb-4">
-										{/* Vertical connecting line */}
-										<div className="absolute top-5 left-[12px] h-full w-px bg-stroke-soft-200 dark:bg-white/10" />
-										{/* Number node */}
-										<div className="relative z-10 flex size-6 shrink-0 items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-white-0 font-mono font-semibold text-[11px] text-text-strong-950 dark:border-white/12 dark:bg-[#111] dark:text-white">
-											2
-										</div>
-										<div className="flex flex-1 items-center justify-between">
-											<span className="font-medium text-text-strong-950 text-xs dark:text-white">
-												Analyze domain
-											</span>
-											<code className="rounded-md border border-stroke-soft-200 bg-bg-white-0 px-2 py-0.5 font-mono text-[11px] text-text-sub-600 dark:border-white/10 dark:bg-[#0b0b0b] dark:text-white/70">
-												Signals
-											</code>
-										</div>
-									</div>
-
-									{/* Step 3 */}
-									<div className="relative flex items-center gap-3.5">
-										{/* Number node */}
-										<div className="relative z-10 flex size-6 shrink-0 items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-white-0 font-mono font-semibold text-[11px] text-text-strong-950 dark:border-white/12 dark:bg-[#111] dark:text-white">
-											3
-										</div>
-										<div className="flex flex-1 items-center justify-between">
-											<span className="font-medium text-text-strong-950 text-xs dark:text-white">
-												Get result
-											</span>
-											<code className="rounded-md border border-stroke-soft-200 bg-bg-white-0 px-2 py-0.5 font-mono text-[11px] text-text-sub-600 dark:border-white/10 dark:bg-[#0b0b0b] dark:text-white/70">
-												Risk Result
-											</code>
-										</div>
-									</div>
-								</div>
-							</div>
-						</motion.div>
-					)}
-				</AnimatePresence>
+				<MorphSlot
+					activeKey={result || error ? null : "idle"}
+					reduceMotion={shouldReduceMotion}
+				>
+					<HowItWorksSteps />
+				</MorphSlot>
 			</div>
 		</div>
 	);

@@ -1,4 +1,5 @@
 import type { ApiCheckResponse } from "./check-api";
+import { syntaxMessage } from "./syntax";
 
 export type SignalStatus = "pass" | "fail" | "warn" | "neutral";
 
@@ -20,24 +21,6 @@ export type CheckResult = {
 	signals: CheckSignal[];
 };
 
-const SYNTAX_DETAIL: Record<string, string> = {
-	empty: "There is nothing to check",
-	"no-domain": "Nothing after the @ — the domain is missing",
-	"multiple-at": "An address can only contain one @",
-	"local-part-empty": "Nothing before the @ — the mailbox name is missing",
-	"local-part-too-long": "The part before the @ is longer than 64 characters",
-	"local-part-invalid":
-		"The part before the @ contains a stray dot or an illegal character",
-	"domain-too-long": "The domain is longer than 253 characters",
-	"domain-invalid": "The domain contains characters that cannot appear in one",
-	"domain-single-label": "Missing a top-level domain, such as .com",
-	"domain-label-empty": "The domain has an empty part — check for a double dot",
-	"domain-label-too-long":
-		"One part of the domain is longer than 63 characters",
-	"domain-label-hyphen": "A part of the domain starts or ends with a hyphen",
-	"tld-invalid": "The ending does not look like a real top-level domain",
-};
-
 // The check never contacts a mail server — no copy here may promise delivery.
 const DELIVERY_LIMIT =
 	"Nothing here confirms the mailbox exists or that mail would be delivered.";
@@ -52,9 +35,7 @@ function signal(
 }
 
 function invalidResult(api: ApiCheckResponse): CheckResult {
-	const detail =
-		(api.syntaxFailure && SYNTAX_DETAIL[api.syntaxFailure]) ??
-		"Does not parse as an email address or a domain";
+	const detail = syntaxMessage(api.syntaxFailure);
 
 	return {
 		input: api.input,
