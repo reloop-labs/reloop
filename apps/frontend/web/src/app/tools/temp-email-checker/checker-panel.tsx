@@ -1,6 +1,5 @@
 "use client";
 
-import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon, type IconName } from "@reloop/ui/icon";
@@ -147,89 +146,53 @@ function ResultCardDetailed({
 	const isValidSyntax = result.verdict !== "invalid";
 
 	return (
-		<motion.div
-			initial={{ opacity: 0, y: 10 }}
-			animate={{ opacity: 1, y: 0 }}
-			transition={{ duration: 0.25, ease: "easeOut" }}
-			className="overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 shadow-sm dark:border-white/10 dark:bg-[#070707]"
-		>
-			{/* Top Bar: New Check & Badge */}
-			<div className="flex items-center justify-between border-stroke-soft-200 border-b px-5 py-3.5 sm:px-6 dark:border-white/10">
-				<button
-					type="button"
-					onClick={onReset}
-					className="group inline-flex items-center gap-1.5 font-medium text-[13px] text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white"
-				>
-					<Icon
-						name="arrow-left"
-						className="group-hover:-translate-x-0.5 size-3.5 transition-transform"
-					/>
-					<span>New Check</span>
-				</button>
-
-				<span className="font-mono text-[11px] text-text-soft-400 uppercase tracking-[0.14em] dark:text-white/40">
-					TEMP EMAIL CHECKER
-				</span>
-			</div>
-
-			{/* Section 1: Email & Hero Verdict */}
-			<div className="px-5 py-6 sm:px-8 sm:py-7">
-				<div>
-					<p className="font-mono text-[11px] text-text-soft-400 uppercase tracking-[0.16em] dark:text-white/40">
-						EMAIL
-					</p>
-					<p className="mt-1 font-semibold text-[17px] text-text-strong-950 sm:text-[18px] dark:text-white">
-						{result.input}
-					</p>
-				</div>
-
-				{/* Verdict Hero Card */}
-				<div
-					className={cn(
-						"mt-5 flex flex-col items-center justify-center rounded-2xl border p-6 text-center sm:py-8",
-						theme.badgeBg,
-						theme.badgeBorder,
-					)}
-				>
-					<div className="flex items-center gap-2.5">
-						<span className={cn("size-2.5 rounded-full", theme.dotColor)} />
-						<h3
+		<div className="mt-3.5 space-y-3 text-xs">
+			{/* Verdict Hero Card */}
+			<div
+				className={cn(
+					"rounded-xl border p-3.5 sm:p-4",
+					theme.badgeBg,
+					theme.badgeBorder,
+				)}
+			>
+				<div className="flex items-center justify-between">
+					<div className="flex items-center gap-2">
+						<span className={cn("size-2 rounded-full", theme.dotColor)} />
+						<span
 							className={cn(
-								"font-bold font-mono text-[20px] tracking-wider sm:text-[22px]",
+								"font-bold font-mono text-[13px] tracking-wider uppercase",
 								theme.titleClass,
 							)}
 						>
 							{theme.title}
-						</h3>
+						</span>
+						<span className="text-text-sub-600 dark:text-white/40">·</span>
+						<span className="text-text-strong-950 font-medium text-xs dark:text-white">
+							{theme.subtitle}
+						</span>
 					</div>
-
-					<p className="mt-2 text-[14.5px] text-text-strong-950 dark:text-white/90">
-						{theme.subtitle}
-					</p>
-
-					<p className="mt-1 font-mono text-[12px] text-text-soft-400 dark:text-white/50">
+					<span className="font-mono text-[11px] text-text-soft-400 dark:text-white/40">
 						{theme.confidence}
-					</p>
+					</span>
 				</div>
 
-				{/* Verdict Summary Text */}
-				<div className="mt-6">
-					<p className="font-mono text-[11px] text-text-soft-400 uppercase tracking-[0.16em] dark:text-white/40">
-						VERDICT
-					</p>
-					<p className="mt-1.5 text-[14px] text-text-sub-600 leading-relaxed sm:text-[14.5px] dark:text-white/60">
-						{result.summary}
-					</p>
-				</div>
+				<p className="mt-2 text-text-sub-600 text-xs leading-relaxed dark:text-white/70">
+					{result.summary}
+				</p>
 			</div>
 
-			{/* Section 2: SIGNALS */}
-			<div className="border-stroke-soft-200 border-t px-5 py-5 sm:px-8 dark:border-white/10">
-				<p className="font-mono text-[11px] text-text-soft-400 uppercase tracking-[0.16em] dark:text-white/40">
-					SIGNALS
-				</p>
+			{/* Signals */}
+			<div className="rounded-xl border border-stroke-soft-200 bg-bg-weak-50/50 p-3.5 dark:border-white/10 dark:bg-white/[0.02]">
+				<div className="flex items-center justify-between">
+					<p className="font-mono font-semibold text-[11px] text-text-strong-950 uppercase tracking-wider dark:text-white">
+						Signals & Detection
+					</p>
+					<span className="font-mono text-[11px] text-emerald-600 dark:text-emerald-400">
+						Live Check
+					</span>
+				</div>
 
-				<div className="mt-3 divide-y divide-stroke-soft-200/50 dark:divide-white/5">
+				<div className="mt-2 divide-y divide-stroke-soft-200/50 dark:divide-white/5">
 					<SignalItem
 						label="Disposable provider"
 						value={isDisposable ? "Detected" : "Clean"}
@@ -259,196 +222,78 @@ function ResultCardDetailed({
 				</div>
 			</div>
 
-			{/* Section 3: WHY THIS RESULT? */}
-			<div className="border-stroke-soft-200 border-t px-5 py-5 sm:px-8 dark:border-white/10">
-				<p className="font-mono text-[11px] text-text-soft-400 uppercase tracking-[0.16em] dark:text-white/40">
-					WHY THIS RESULT?
-				</p>
-				<p className="mt-1.5 text-[14px] text-text-sub-600 leading-relaxed dark:text-white/60">
-					{theme.whyResult}
-				</p>
-
-				<div className="mt-4 flex flex-col items-center">
-					<button
-						type="button"
-						onClick={() => setShowEvidence((prev) => !prev)}
-						className="inline-flex cursor-pointer items-center gap-1.5 rounded-xl border border-stroke-soft-200 bg-bg-weak-50 px-4 py-2 font-medium text-[13px] text-text-strong-950 transition-colors hover:bg-neutral-100 dark:border-white/10 dark:bg-white/[0.04] dark:text-white dark:hover:bg-white/[0.08]"
-					>
-						<span>{showEvidence ? "Hide Evidence" : "View Evidence"}</span>
-						<Icon
-							name="chevron-down"
-							className={cn(
-								"size-3.5 transition-transform duration-200",
-								showEvidence && "rotate-180",
-							)}
-						/>
-					</button>
-
-					<AnimatePresence>
-						{showEvidence && (
-							<motion.div
-								initial={{ opacity: 0, height: 0 }}
-								animate={{ opacity: 1, height: "auto" }}
-								exit={{ opacity: 0, height: 0 }}
-								className="mt-4 w-full overflow-hidden"
-							>
-								<div className="rounded-xl border border-stroke-soft-200 bg-neutral-950 p-4 font-mono text-[12px] text-emerald-400 dark:border-white/10">
-									<pre className="overflow-x-auto whitespace-pre-wrap">
-										{JSON.stringify(
-											{
-												input: result.input,
-												domain: result.domain,
-												verdict: result.verdict,
-												signals: result.signals.map((s) => ({
-													id: s.id,
-													label: s.label,
-													status: s.status,
-													detail: s.detail,
-												})),
-											},
-											null,
-											2,
-										)}
-									</pre>
-								</div>
-							</motion.div>
-						)}
-					</AnimatePresence>
+			{/* Recommendation */}
+			<div className="flex items-start gap-2.5 rounded-xl border border-stroke-soft-200 bg-bg-weak-50/30 p-3 dark:border-white/10 dark:bg-white/[0.02]">
+				<Icon
+					name={
+						isDisposable || isRole ? "alert-triangle" : "check-circle"
+					}
+					className={cn(
+						"mt-0.5 size-4 shrink-0",
+						isDisposable || isRole
+							? "text-amber-500"
+							: "text-emerald-500",
+					)}
+				/>
+				<div className="space-y-0.5">
+					<p className="font-medium text-text-strong-950 text-xs dark:text-white">
+						Recommendation
+					</p>
+					<p className="text-text-sub-600 text-xs leading-relaxed dark:text-white/60">
+						{theme.recommendation}
+					</p>
 				</div>
 			</div>
 
-			{/* Section 4: TRUST AGENT PANEL */}
-			<div className="border-stroke-soft-200 border-t p-5 sm:p-8 dark:border-white/10">
-				<div className="rounded-2xl border border-stroke-soft-200 bg-bg-weak-50/50 p-5 sm:p-6 dark:border-white/10 dark:bg-white/[0.02]">
-					<div className="flex items-center justify-between">
-						<div className="flex items-center gap-2">
-							<span className="font-semibold text-[15px] text-primary-base">
-								✦
-							</span>
-							<span className="font-semibold text-[14.5px] text-text-strong-950 dark:text-white">
-								Trust Agent
-							</span>
-						</div>
-						<span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-0.5 font-mono text-[11px] text-emerald-600 dark:border-emerald-500/30 dark:bg-emerald-500/15 dark:text-emerald-400">
-							<span className="size-1.5 rounded-full bg-emerald-500" />
-							Investigation complete
-						</span>
-					</div>
+			{/* Actions Footer */}
+			<div className="flex items-center justify-between pt-0.5">
+				<button
+					type="button"
+					onClick={() => setShowEvidence((prev) => !prev)}
+					className="cursor-pointer font-mono text-[11px] text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/50 dark:hover:text-white"
+				>
+					{showEvidence ? "Hide Raw Data" : "View Raw Data"}
+				</button>
+				<button
+					type="button"
+					onClick={onReset}
+					className="cursor-pointer font-medium text-xs text-primary-base hover:underline"
+				>
+					Clear result
+				</button>
+			</div>
 
-					{/* Checklist */}
-					<ul className="mt-4 space-y-2 text-[13.5px] text-text-sub-600 dark:text-white/70">
-						<li className="flex items-center gap-2.5">
-							<Icon
-								name="check-circle"
-								className="size-4 shrink-0 text-emerald-500"
-							/>
-							<span>Email format checked</span>
-						</li>
-						<li className="flex items-center gap-2.5">
-							<Icon
-								name="check-circle"
-								className="size-4 shrink-0 text-emerald-500"
-							/>
-							<span>Domain identified</span>
-						</li>
-						<li className="flex items-center gap-2.5">
-							<Icon
-								name="check-circle"
-								className="size-4 shrink-0 text-emerald-500"
-							/>
-							<span>Disposable-email intelligence checked</span>
-						</li>
-						<li className="flex items-center gap-2.5">
-							<Icon
-								name="check-circle"
-								className="size-4 shrink-0 text-emerald-500"
-							/>
-							<span>Risk signals evaluated</span>
-						</li>
-					</ul>
-
-					{/* Confidence Progress Bar */}
-					<div className="mt-5">
-						<div className="flex items-center justify-between text-[12px]">
-							<span className="font-mono text-text-soft-400 uppercase tracking-wider dark:text-white/40">
-								Confidence
-							</span>
-							<span className="font-medium font-mono text-text-strong-950 dark:text-white">
-								{isDisposable ? "96%" : isRole ? "88%" : "99%"}
-							</span>
-						</div>
-						<div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-neutral-200 dark:bg-white/10">
-							<div
-								className={cn(
-									"h-full rounded-full transition-all duration-500",
-									isDisposable
-										? "bg-rose-500"
-										: isRole
-											? "bg-amber-500"
-											: "bg-emerald-500",
+			<AnimatePresence>
+				{showEvidence && (
+					<motion.div
+						initial={{ opacity: 0, height: 0 }}
+						animate={{ opacity: 1, height: "auto" }}
+						exit={{ opacity: 0, height: 0 }}
+						className="overflow-hidden"
+					>
+						<div className="rounded-xl border border-stroke-soft-200 bg-neutral-950 p-3 font-mono text-[11px] text-emerald-400 dark:border-white/10">
+							<pre className="overflow-x-auto whitespace-pre-wrap">
+								{JSON.stringify(
+									{
+										input: result.input,
+										domain: result.domain,
+										verdict: result.verdict,
+										signals: result.signals.map((s) => ({
+											id: s.id,
+											label: s.label,
+											status: s.status,
+											detail: s.detail,
+										})),
+									},
+									null,
+									2,
 								)}
-								style={{
-									width: isDisposable ? "96%" : isRole ? "88%" : "99%",
-								}}
-							/>
+							</pre>
 						</div>
-					</div>
-
-					{/* Ask Agent Button */}
-					<div className="mt-5">
-						<button
-							type="button"
-							onClick={() => setShowEvidence(true)}
-							className="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-stroke-soft-200 bg-bg-white-0 py-2.5 font-medium text-[13.5px] text-text-strong-950 shadow-xs transition-colors hover:bg-neutral-50 dark:border-white/10 dark:bg-white/[0.04] dark:text-white dark:hover:bg-white/[0.08]"
-						>
-							<span className="text-primary-base">✦</span>
-							<span>Ask Agent</span>
-						</button>
-					</div>
-				</div>
-			</div>
-
-			{/* Section 5: RECOMMENDATION */}
-			<div className="border-stroke-soft-200 border-t px-5 py-6 sm:px-8 dark:border-white/10">
-				<p className="font-mono text-[11px] text-text-soft-400 uppercase tracking-[0.16em] dark:text-white/40">
-					RECOMMENDATION
-				</p>
-
-				<div className="mt-2.5 flex items-start gap-2.5 text-[14px] text-text-strong-950 dark:text-white">
-					<Icon
-						name={
-							isDisposable
-								? "alert-triangle"
-								: isRole
-									? "alert-triangle"
-									: "check-circle"
-						}
-						className={cn(
-							"mt-0.5 size-4 shrink-0",
-							isDisposable
-								? "text-amber-500"
-								: isRole
-									? "text-amber-500"
-									: "text-emerald-500",
-						)}
-					/>
-					<p className="leading-relaxed">{theme.recommendation}</p>
-				</div>
-
-				<div className="mt-7 flex justify-center">
-					<Button.Root
-						type="button"
-						variant="neutral"
-						mode="stroke"
-						size="medium"
-						onClick={onReset}
-						className="h-10 cursor-pointer rounded-xl px-5 font-medium text-[14px]"
-					>
-						<span>Check Another Email</span>
-					</Button.Root>
-				</div>
-			</div>
-		</motion.div>
+					</motion.div>
+				)}
+			</AnimatePresence>
+		</div>
 	);
 }
 
@@ -519,160 +364,182 @@ export function CheckerPanel() {
 
 	return (
 		<div className="mx-auto w-full max-w-2xl">
-			{!result ? (
-				/* Dashboard Modal / Card Container */
-				<div className="overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-weak-50 p-0.5 sm:rounded-[20px] dark:border-white/10 dark:bg-white/[0.04]">
-					<div className="rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-4 sm:p-4.5 dark:border-white/10 dark:bg-[#070707]">
-						{/* Input Check Zone */}
-						<form onSubmit={onSubmit} noValidate className="space-y-3.5">
-							<div className="space-y-1.5">
-								<Label.Root
-									htmlFor="checker-input"
-									className="ml-2 font-medium text-text-strong-950 text-xs dark:text-white"
-								>
-									Email or domain
-									<Label.Asterisk />
-								</Label.Root>
+			{/* Dashboard Modal / Card Container */}
+			<div className="overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-weak-50 p-1.5 sm:rounded-[20px] dark:border-white/10 dark:bg-white/[0.04]">
+				<div className="rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-4 sm:p-4.5 dark:border-white/10 dark:bg-[#070707]">
+					{/* Input Check Zone */}
+					<form onSubmit={onSubmit} noValidate className="space-y-3.5">
+						<div className="space-y-1.5">
+							<Label.Root
+								htmlFor="checker-input"
+								className="font-medium text-xs text-text-strong-950 dark:text-white"
+							>
+								Email or domain
+								<Label.Asterisk />
+							</Label.Root>
 
-								<Input.Root
-									size="medium"
-									className="!shadow-none has-[input:focus]:!shadow-button-primary-focus has-[input:focus]:before:!ring-primary-base w-full rounded-xl"
-								>
-									<Input.Wrapper className="h-10.5 pr-1.5 pl-3 dark:bg-[#070707]">
-										<Input.Icon>
-											<Icon name="mail-single" className="size-4" />
-										</Input.Icon>
-										<Input.Input
-											id="checker-input"
-											ref={inputRef}
-											type="text"
-											inputMode="email"
-											autoComplete="off"
-											autoCapitalize="none"
-											spellCheck={false}
-											value={value}
-											onChange={(e) => setValue(e.target.value)}
-											placeholder="you@example.com or domain.com"
-											className="font-medium text-[14.5px]"
-										/>
-										{value ? (
-											<button
-												type="button"
-												onClick={(e) => {
-													e.stopPropagation();
-													setValue("");
-													inputRef.current?.focus();
-												}}
-												className="flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:text-white/45 dark:hover:bg-white/10 dark:hover:text-white"
-												aria-label="Clear input"
-											>
-												<Icon name="close" className="size-3.5" />
-											</button>
-										) : null}
-										<FancyButton.Root
-											type="submit"
-											variant="primary"
-											size="xsmall"
-											className="!p-0 flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-lg"
-											aria-label="Verify email or domain"
+							<Input.Root
+								size="medium"
+								className="!shadow-none has-[input:focus]:!shadow-button-primary-focus has-[input:focus]:before:!ring-primary-base w-full rounded-xl"
+							>
+								<Input.Wrapper className="h-10.5 pl-3 pr-1.5 dark:bg-[#070707]">
+									<Input.Icon>
+										<Icon name="mail-single" className="size-4" />
+									</Input.Icon>
+									<Input.Input
+										id="checker-input"
+										ref={inputRef}
+										type="text"
+										inputMode="email"
+										autoComplete="off"
+										autoCapitalize="none"
+										spellCheck={false}
+										value={value}
+										onChange={(e) => setValue(e.target.value)}
+										placeholder="you@example.com or domain.com"
+										className="font-medium text-[14.5px]"
+									/>
+									{value ? (
+										<button
+											type="button"
+											onClick={(e) => {
+												e.stopPropagation();
+												setValue("");
+												setResult(null);
+												setError(null);
+												inputRef.current?.focus();
+											}}
+											className="flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:text-white/45 dark:hover:bg-white/10 dark:hover:text-white"
+											aria-label="Clear input"
 										>
-											{isPending ? (
-												<span className="size-3 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-											) : (
-												<FancyButton.Icon className="mx-0 size-3.5">
-													<Icon name="arrow-right" className="size-3.5" />
-												</FancyButton.Icon>
-											)}
-										</FancyButton.Root>
-									</Input.Wrapper>
-								</Input.Root>
-							</div>
+											<Icon name="close" className="size-3.5" />
+										</button>
+									) : null}
+									<FancyButton.Root
+										type="submit"
+										variant="primary"
+										size="xsmall"
+										className="!p-0 flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-lg"
+										aria-label="Verify email or domain"
+									>
+										{isPending ? (
+											<span className="size-3 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+										) : (
+											<FancyButton.Icon className="mx-0 size-3.5">
+												<Icon name="arrow-right" className="size-3.5" />
+											</FancyButton.Icon>
+										)}
+									</FancyButton.Root>
+								</Input.Wrapper>
+							</Input.Root>
+						</div>
 
-							{/* How It Works - Vertical Stepper */}
-							<div className="mt-3.5 space-y-3 rounded-xl border border-stroke-soft-200 bg-bg-weak-50/50 p-3.5 text-xs dark:border-white/10 dark:bg-white/[0.02]">
-								<div className="flex items-center justify-between">
-									<p className="font-mono font-semibold text-[11px] text-text-strong-950 uppercase tracking-wider dark:text-white">
-										How It Works
+						{/* Content below input: Error, Result, or How It Works Stepper */}
+						<AnimatePresence mode="wait">
+							{error ? (
+								<motion.div
+									key="error"
+									initial={{ opacity: 0, y: 4 }}
+									animate={{ opacity: 1, y: 0 }}
+									exit={{ opacity: 0, y: -4 }}
+									className="flex items-start gap-2.5 rounded-xl border border-rose-500/20 bg-rose-500/5 p-3 text-xs text-text-sub-600 dark:text-white/60"
+								>
+									<Icon
+										name="alert-triangle"
+										className="mt-0.5 size-4 shrink-0 text-rose-500"
+									/>
+									<p className="leading-relaxed text-rose-600 dark:text-rose-400">
+										{error}
 									</p>
-									<span className="inline-flex items-center gap-1 font-mono text-[11px] text-emerald-600 dark:text-emerald-400">
-										<span className="size-1.5 rounded-full bg-emerald-500" />
-										Live Scanner
-									</span>
-								</div>
-
-								<div className="relative pt-0.5 pl-0.5">
-									{/* Step 1 */}
-									<div className="relative flex items-center gap-3 pb-3.5">
-										{/* Vertical connecting line */}
-										<div className="absolute top-5 left-[12px] h-full w-px bg-stroke-soft-200 dark:bg-white/10" />
-										{/* Number node */}
-										<div className="relative z-10 flex size-6 shrink-0 items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-white-0 font-mono font-semibold text-[11px] text-text-strong-950 dark:border-white/12 dark:bg-[#111] dark:text-white">
-											1
-										</div>
-										<div className="flex flex-1 items-center justify-between">
-											<span className="font-medium text-text-strong-950 text-xs dark:text-white">
-												Enter email
+								</motion.div>
+							) : result ? (
+								<motion.div
+									key="result"
+									initial={{ opacity: 0, y: 6 }}
+									animate={{ opacity: 1, y: 0 }}
+									exit={{ opacity: 0, y: -6 }}
+									transition={{ duration: 0.2 }}
+								>
+									<ResultCardDetailed result={result} onReset={handleReset} />
+								</motion.div>
+							) : (
+								<motion.div
+									key="how-it-works"
+									initial={{ opacity: 0 }}
+									animate={{ opacity: 1 }}
+									exit={{ opacity: 0 }}
+								>
+									{/* How It Works - Vertical Stepper */}
+									<div className="mt-3.5 space-y-3 rounded-xl border border-stroke-soft-200 bg-bg-weak-50/50 p-3.5 text-xs dark:border-white/10 dark:bg-white/[0.02]">
+										<div className="flex items-center justify-between">
+											<p className="font-mono font-semibold text-[11px] text-text-strong-950 uppercase tracking-wider dark:text-white">
+												How It Works
+											</p>
+											<span className="inline-flex items-center gap-1 font-mono text-[11px] text-emerald-600 dark:text-emerald-400">
+												<span className="size-1.5 rounded-full bg-emerald-500" />
+												Live Scanner
 											</span>
-											<code className="rounded-md border border-stroke-soft-200 bg-bg-white-0 px-2 py-0.5 font-mono text-[11px] text-text-sub-600 dark:border-white/10 dark:bg-[#0b0b0b] dark:text-white/70">
-												Email
-											</code>
+										</div>
+
+										<div className="relative pt-0.5 pl-0.5">
+											{/* Step 1 */}
+											<div className="relative flex items-center gap-3 pb-3.5">
+												{/* Vertical connecting line */}
+												<div className="absolute top-5 left-[12px] h-full w-px bg-stroke-soft-200 dark:bg-white/10" />
+												{/* Number node */}
+												<div className="relative z-10 flex size-6 shrink-0 items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-white-0 font-mono font-semibold text-[11px] text-text-strong-950 dark:border-white/12 dark:bg-[#111] dark:text-white">
+													1
+												</div>
+												<div className="flex flex-1 items-center justify-between">
+													<span className="font-medium text-text-strong-950 text-xs dark:text-white">
+														Enter email
+													</span>
+													<code className="rounded-md border border-stroke-soft-200 bg-bg-white-0 px-2 py-0.5 font-mono text-[11px] text-text-sub-600 dark:border-white/10 dark:bg-[#0b0b0b] dark:text-white/70">
+														Email
+													</code>
+												</div>
+											</div>
+
+											{/* Step 2 */}
+											<div className="relative flex items-center gap-3 pb-3.5">
+												{/* Vertical connecting line */}
+												<div className="absolute top-5 left-[12px] h-full w-px bg-stroke-soft-200 dark:bg-white/10" />
+												{/* Number node */}
+												<div className="relative z-10 flex size-6 shrink-0 items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-white-0 font-mono font-semibold text-[11px] text-text-strong-950 dark:border-white/12 dark:bg-[#111] dark:text-white">
+													2
+												</div>
+												<div className="flex flex-1 items-center justify-between">
+													<span className="font-medium text-text-strong-950 text-xs dark:text-white">
+														Analyze domain
+													</span>
+													<code className="rounded-md border border-stroke-soft-200 bg-bg-white-0 px-2 py-0.5 font-mono text-[11px] text-text-sub-600 dark:border-white/10 dark:bg-[#0b0b0b] dark:text-white/70">
+														Signals
+													</code>
+												</div>
+											</div>
+
+											{/* Step 3 */}
+											<div className="relative flex items-center gap-3">
+												{/* Number node */}
+												<div className="relative z-10 flex size-6 shrink-0 items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-white-0 font-mono font-semibold text-[11px] text-text-strong-950 dark:border-white/12 dark:bg-[#111] dark:text-white">
+													3
+												</div>
+												<div className="flex flex-1 items-center justify-between">
+													<span className="font-medium text-text-strong-950 text-xs dark:text-white">
+														Get result
+													</span>
+													<code className="rounded-md border border-stroke-soft-200 bg-bg-white-0 px-2 py-0.5 font-mono text-[11px] text-text-sub-600 dark:border-white/10 dark:bg-[#0b0b0b] dark:text-white/70">
+														Risk Result
+													</code>
+												</div>
+											</div>
 										</div>
 									</div>
-
-									{/* Step 2 */}
-									<div className="relative flex items-center gap-3 pb-3.5">
-										{/* Vertical connecting line */}
-										<div className="absolute top-5 left-[12px] h-full w-px bg-stroke-soft-200 dark:bg-white/10" />
-										{/* Number node */}
-										<div className="relative z-10 flex size-6 shrink-0 items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-white-0 font-mono font-semibold text-[11px] text-text-strong-950 dark:border-white/12 dark:bg-[#111] dark:text-white">
-											2
-										</div>
-										<div className="flex flex-1 items-center justify-between">
-											<span className="font-medium text-text-strong-950 text-xs dark:text-white">
-												Analyze domain
-											</span>
-											<code className="rounded-md border border-stroke-soft-200 bg-bg-white-0 px-2 py-0.5 font-mono text-[11px] text-text-sub-600 dark:border-white/10 dark:bg-[#0b0b0b] dark:text-white/70">
-												Signals
-											</code>
-										</div>
-									</div>
-
-									{/* Step 3 */}
-									<div className="relative flex items-center gap-3">
-										{/* Number node */}
-										<div className="relative z-10 flex size-6 shrink-0 items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-white-0 font-mono font-semibold text-[11px] text-text-strong-950 dark:border-white/12 dark:bg-[#111] dark:text-white">
-											3
-										</div>
-										<div className="flex flex-1 items-center justify-between">
-											<span className="font-medium text-text-strong-950 text-xs dark:text-white">
-												Get result
-											</span>
-											<code className="rounded-md border border-stroke-soft-200 bg-bg-white-0 px-2 py-0.5 font-mono text-[11px] text-text-sub-600 dark:border-white/10 dark:bg-[#0b0b0b] dark:text-white/70">
-												Risk Result
-											</code>
-										</div>
-									</div>
-								</div>
-							</div>
-						</form>
-					</div>
+								</motion.div>
+							)}
+						</AnimatePresence>
+					</form>
 				</div>
-			) : null}
-
-			<div aria-live="polite">
-				{error ? (
-					<div className="mt-4 flex items-start gap-3 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 px-5 py-4 dark:border-white/10 dark:bg-[#0b0b0b]">
-						<Icon
-							name="alert-triangle"
-							className="mt-0.5 size-4 shrink-0 text-warning-base"
-						/>
-						<p className="text-[14px] text-text-sub-600 leading-relaxed dark:text-white/50">
-							{error}
-						</p>
-					</div>
-				) : result ? (
-					<ResultCardDetailed result={result} onReset={handleReset} />
-				) : null}
 			</div>
 		</div>
 	);
