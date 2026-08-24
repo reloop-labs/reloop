@@ -365,7 +365,7 @@ export function CheckerPanel() {
 												</span>
 											</div>
 											<p className="mt-0.5 truncate text-[12.5px] text-text-sub-600 dark:text-white/50">
-												{item.description}
+												{item.txtRecord || item.description}
 											</p>
 										</div>
 									</div>

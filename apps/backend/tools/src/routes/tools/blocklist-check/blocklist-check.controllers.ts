@@ -20,6 +20,7 @@ export interface DnsblCheckItemResult {
 	responseTimeMs: number;
 	delistUrl: string;
 	description: string;
+	txtRecord?: string;
 	error?: string;
 }
 
@@ -448,15 +449,94 @@ export const DNSBL_PROVIDERS: DnsblProvider[] = [
 	},
 ];
 
-/**
- * Reverse an IPv4 string: "192.0.2.1" -> "1.2.0.192"
- */
-function reverseIpv4(ip: string): string {
-	return ip.split(".").reverse().join(".");
+const resolver = new dns.Resolver();
+resolver.setServers(["1.1.1.1", "1.0.0.1", "8.8.8.8", "8.8.4.4"]);
+
+function withTimeout<T>(
+	promise: Promise<T>,
+	ms: number,
+	errorMsg = "DNS query timeout",
+): Promise<T> {
+	return Promise.race([
+		promise,
+		new Promise<never>((_, reject) =>
+			setTimeout(() => reject(new Error(errorMsg)), ms),
+		),
+	]);
 }
 
 /**
- * Perform a single DNSBL query with strict timeout
+ * Reverses an IPv4 address for DNSBL querying.
+ * Example: "192.0.2.1" -> "1.2.0.192"
+ */
+export function reverseIpv4(ip: string): string {
+	const parts = ip.split(".");
+	if (parts.length !== 4) return ip;
+	return parts.reverse().join(".");
+}
+
+/**
+ * Evaluates whether DNS response codes represent a true listing or a query error / refusal.
+ * Handles RFC 5782 refused codes (127.255.255.x) and provider-specific return ranges.
+ */
+function evaluateListingStatus(
+	providerId: string,
+	addresses: string[] | null | undefined,
+): { isListed: boolean; validCodes: string[] } {
+	if (!addresses || addresses.length === 0) {
+		return { isListed: false, validCodes: [] };
+	}
+
+	// Filter out RFC 5782 error / refused codes (e.g. 127.255.255.254 returned by Spamhaus on public resolvers)
+	const nonRefusedCodes = addresses.filter((code) => {
+		if (code.startsWith("127.255.255.")) return false;
+		if (code === "127.0.0.255") return false;
+		return true;
+	});
+
+	if (nonRefusedCodes.length === 0) {
+		return { isListed: false, validCodes: [] };
+	}
+
+	// Spamhaus (zen, sbl, xbl, pbl)
+	if (providerId.startsWith("spamhaus-")) {
+		const validSpamhaus = nonRefusedCodes.filter((code) => {
+			const parts = code.split(".");
+			if (
+				parts.length === 4 &&
+				parts[0] === "127" &&
+				parts[1] === "0" &&
+				parts[2] === "0"
+			) {
+				const last = Number.parseInt(parts[3] || "0", 10);
+				return last >= 2 && last <= 11;
+			}
+			return false;
+		});
+		return { isListed: validSpamhaus.length > 0, validCodes: validSpamhaus };
+	}
+
+	// HostKarma: 127.0.0.1 = Whitelist (Clean), 127.0.0.2-4 = Black/Yellow/Brown
+	if (providerId === "hostkarma") {
+		const blacklisted = nonRefusedCodes.filter(
+			(a) => a === "127.0.0.2" || a === "127.0.0.3" || a === "127.0.0.4",
+		);
+		return { isListed: blacklisted.length > 0, validCodes: blacklisted };
+	}
+
+	// DroneBL: Ignore 127.0.0.1 (not listed) and 127.0.0.13 (testing)
+	if (providerId === "dronebl") {
+		const blacklisted = nonRefusedCodes.filter(
+			(a) => a !== "127.0.0.1" && a !== "127.0.0.13",
+		);
+		return { isListed: blacklisted.length > 0, validCodes: blacklisted };
+	}
+
+	return { isListed: nonRefusedCodes.length > 0, validCodes: nonRefusedCodes };
+}
+
+/**
+ * Queries a single DNSBL zone for a reversed IP address.
  */
 async function querySingleDnsbl(
 	reversedIp: string,
@@ -467,28 +547,30 @@ async function querySingleDnsbl(
 	const start = Date.now();
 
 	try {
-		const queryPromise = dns.resolve4(queryHost);
-		const timeoutPromise = new Promise<never>((_, reject) =>
-			setTimeout(() => reject(new Error("DNS query timeout")), timeoutMs),
+		const addresses = await withTimeout(
+			resolver.resolve4(queryHost),
+			timeoutMs,
 		);
-
-		const addresses = await Promise.race([queryPromise, timeoutPromise]);
 		const elapsed = Date.now() - start;
 
-		let isListed = Array.isArray(addresses) && addresses.length > 0;
+		const { isListed, validCodes } = evaluateListingStatus(
+			provider.id,
+			addresses,
+		);
 
-		// HostKarma: 127.0.0.1 is Whitelist (clean), 127.0.0.2 is Blacklist
-		if (provider.id === "hostkarma" && addresses) {
-			isListed = addresses.some(
-				(a) => a === "127.0.0.2" || a === "127.0.0.3" || a === "127.0.0.4",
-			);
-		}
-
-		// DroneBL: Ignore 127.0.0.1 and 127.0.0.13
-		if (provider.id === "dronebl" && addresses) {
-			isListed = addresses.some(
-				(a) => a !== "127.0.0.1" && a !== "127.0.0.13",
-			);
+		let txtRecord: string | undefined;
+		if (isListed) {
+			try {
+				const txts = await withTimeout(
+					resolver.resolveTxt(queryHost),
+					1200,
+				);
+				if (txts && txts.length > 0) {
+					txtRecord = txts.flat().join(" ").trim();
+				}
+			} catch {
+				// TXT lookup optional
+			}
 		}
 
 		return {
@@ -497,10 +579,11 @@ async function querySingleDnsbl(
 			host: provider.host,
 			category: provider.category,
 			isListed,
-			responseCodes: addresses || [],
+			responseCodes: validCodes,
 			responseTimeMs: elapsed,
 			delistUrl: provider.delistUrl,
 			description: provider.description,
+			txtRecord,
 		};
 	} catch (error) {
 		const elapsed = Date.now() - start;
@@ -550,8 +633,8 @@ export async function checkBlocklistController(
 		inputType = "ip";
 		targetIp = cleaned;
 		try {
-			const hostnames = await dns.reverse(cleaned);
-			if (hostnames.length > 0) {
+			const hostnames = await withTimeout(resolver.reverse(cleaned), 1500);
+			if (hostnames && hostnames.length > 0) {
 				resolvedHostname = hostnames[0] ?? null;
 			}
 		} catch {
@@ -560,36 +643,56 @@ export async function checkBlocklistController(
 	} else {
 		inputType = "domain";
 		resolvedHostname = cleaned;
+		let resolved = false;
+
+		// 1. Try MX resolution first to check sending mail server IP
 		try {
-			// First try resolving MX records to check the actual mail server IP
-			const mxRecords = await dns.resolveMx(cleaned);
+			const mxRecords = await withTimeout(resolver.resolveMx(cleaned), 1500);
 			if (mxRecords && mxRecords.length > 0) {
 				mxRecords.sort((a, b) => a.priority - b.priority);
 				const primaryMx = mxRecords[0]?.exchange;
 				if (primaryMx) {
-					const ips = await dns.resolve4(primaryMx);
+					const ips = await withTimeout(resolver.resolve4(primaryMx), 1500);
 					if (ips && ips.length > 0 && ips[0]) {
 						targetIp = ips[0];
+						resolved = true;
 					}
-				}
-			} else {
-				// Fallback to domain A record
-				const ips = await dns.resolve4(cleaned);
-				if (ips && ips.length > 0 && ips[0]) {
-					targetIp = ips[0];
 				}
 			}
 		} catch {
+			// MX failed or not found, fall back to A record
+		}
+
+		// 2. Fallback to domain A record with custom public DNS (Cloudflare/Google)
+		if (!resolved) {
 			try {
-				const ips = await dns.resolve4(cleaned);
+				const ips = await withTimeout(resolver.resolve4(cleaned), 1500);
 				if (ips && ips.length > 0 && ips[0]) {
 					targetIp = ips[0];
+					resolved = true;
 				}
 			} catch {
-				throw new Error(
-					`Could not resolve DNS records for "${cleaned}". Please verify the domain or IP address.`,
-				);
+				// Custom DNS failed
 			}
+		}
+
+		// 3. Fallback to system DNS resolver
+		if (!resolved) {
+			try {
+				const ips = await withTimeout(dns.resolve4(cleaned), 1500);
+				if (ips && ips.length > 0 && ips[0]) {
+					targetIp = ips[0];
+					resolved = true;
+				}
+			} catch {
+				// Failed
+			}
+		}
+
+		if (!resolved) {
+			throw new Error(
+				`Could not resolve DNS records for "${cleaned}". Please verify the domain or IP address.`,
+			);
 		}
 	}
 

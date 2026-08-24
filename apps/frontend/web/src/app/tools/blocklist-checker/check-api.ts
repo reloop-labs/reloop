@@ -8,6 +8,7 @@ export interface DnsblCheckItemResult {
 	responseTimeMs: number;
 	delistUrl: string;
 	description: string;
+	txtRecord?: string;
 	error?: string;
 }
 
