@@ -15,7 +15,7 @@ import {
 	toolTitle,
 } from "./content";
 import { FaqGrid } from "./faq-grid";
-import { Band, SectionIntro } from "./grid";
+import { SectionIntro } from "./grid";
 
 // TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
 // See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
@@ -92,24 +92,17 @@ export default function TempEmailCheckerPage() {
 
 			<div className="relative mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-200 border-x md:max-w-7xl dark:border-white/10">
 				<SectionSeparator />
-			</div>
-			<ApiSection />
-
-			<div className="relative mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-200 border-x md:max-w-7xl dark:border-white/10">
+				<ApiSection />
 				<SectionSeparator />
 				<AiAgentsSection />
 				<SectionSeparator />
-			</div>
-			<Band>
-				<SectionIntro
-					lead="Frequently asked"
-					accent="questions"
-					align="left"
-				/>
-				<FaqGrid groups={faqGroups} />
-			</Band>
-
-			<div className="relative mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-200 border-x md:max-w-7xl dark:border-white/10">
+				<section id="faq-section" className="w-full">
+					<SectionIntro
+						lead="Frequently asked questions"
+						align="left"
+					/>
+					<FaqGrid groups={faqGroups} />
+				</section>
 				<SectionSeparator />
 				<BlogCta
 					headline={

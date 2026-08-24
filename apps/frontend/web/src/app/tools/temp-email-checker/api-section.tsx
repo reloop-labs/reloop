@@ -6,11 +6,8 @@ import type React from "react";
 import { useState } from "react";
 import type { SimpleIcon } from "simple-icons";
 import { siCurl, siGo, siNodedotjs, siPython } from "simple-icons";
-import {
-	apiResponseSample,
-	apiSnippets,
-} from "./content";
-import { Band, hairline, WindowDots } from "./grid";
+import { apiResponseSample, apiSnippets } from "./content";
+import { WindowDots } from "./grid";
 import { LanguagePills, type PillTab } from "./language-pills";
 
 const PANEL_ID = "check-api-panel";
@@ -130,82 +127,65 @@ export function ApiSection() {
 	const active = apiSnippets.find((s) => s.id === activeId) ?? apiSnippets[0];
 
 	return (
-		<>
-			<Band>
-				<div className="px-5 py-8 sm:px-6 sm:py-10 md:px-8">
-					<div className="mb-4">
-						<span className="inline-flex items-center gap-1.5 rounded-[10px] bg-blue-50 px-2.5 py-1 font-medium text-[13px] text-blue-600 dark:bg-blue-500/10 dark:text-blue-400">
-							<Icon name="code" className="size-3.5" />
-							Developer First
+		<section id="api-section" className="w-full">
+			{/* Section Header */}
+			<div className="border-stroke-soft-200 border-b px-4 py-8 sm:px-8 sm:py-10 lg:px-12 dark:border-white/10">
+				<div className="mb-4">
+					<span className="inline-flex items-center gap-1.5 rounded-[10px] bg-blue-50 px-2.5 py-1 font-medium text-[13px] text-blue-600 dark:bg-blue-500/10 dark:text-blue-400">
+						<Icon name="code" className="size-3.5" />
+						Developer First
+					</span>
+				</div>
+				<h2 className="font-semibold text-3xl text-text-strong-950 tracking-tight sm:text-4xl lg:text-[2.65rem] lg:leading-[1.12] dark:text-white">
+					Check temp email from code
+				</h2>
+				<p className="mt-3 max-w-2xl text-[14.5px] text-text-sub-600 leading-relaxed sm:text-base dark:text-white/60">
+					Point your signup flow directly at the public endpoint to reject
+					burner addresses in real time.
+				</p>
+			</div>
+
+			{/* Language Switcher Bar */}
+			<div className="flex items-center justify-between gap-3 border-stroke-soft-200 border-b pr-4 sm:pr-5 dark:border-white/10">
+				<LanguagePills
+					tabs={PILL_TABS}
+					activeId={activeId}
+					onChange={setActiveId}
+					ariaLabel="Code language"
+					idPrefix="check-api"
+					controls={PANEL_ID}
+					className="min-w-0 flex-1 px-4 py-3 sm:px-5 md:px-6"
+				/>
+				<CopyButton value={active.code} />
+			</div>
+
+			{/* Code & JSON Output Panel */}
+			<div
+				id={PANEL_ID}
+				role="tabpanel"
+				aria-labelledby={`check-api-tab-${active.id}`}
+				className="grid lg:grid-cols-2"
+			>
+				<div className="overflow-x-auto px-5 py-6 sm:px-6 md:px-8">
+					<pre className="font-mono text-[12.5px] text-text-strong-950 leading-[1.75] sm:text-[13px] dark:text-white/80">
+						<code>{highlightCode(active.code)}</code>
+					</pre>
+				</div>
+
+				<div className="border-stroke-soft-200 border-t bg-bg-weak-50 lg:border-t-0 lg:border-l dark:border-white/10 dark:bg-white/[0.02]">
+					<div className="flex items-center gap-3 border-stroke-soft-200 border-b px-5 py-3 sm:px-6 dark:border-white/10">
+						<WindowDots />
+						<span className="ml-auto font-mono text-[11px] text-text-soft-400 uppercase tracking-[0.14em] dark:text-white/30">
+							[ 200 · json ]
 						</span>
 					</div>
-					<h2 className="max-w-2xl font-semibold text-2xl text-text-strong-950 tracking-tight sm:text-3xl lg:text-[32px] dark:text-white">
-						Run the check{" "}
-						<span className="text-primary-base">from your code</span>
-					</h2>
-					<p className="mt-2.5 max-w-lg text-[14px] text-text-sub-600 leading-relaxed sm:text-[14.5px] dark:text-white/50">
-						Point your signup flow directly at the public endpoint to reject
-						burner addresses in real time.
-					</p>
-				</div>
-			</Band>
-
-			<Band>
-				<div
-					className={cn(
-						"flex items-center justify-between gap-3 border-b pr-4 sm:pr-5",
-						hairline,
-					)}
-				>
-					<LanguagePills
-						tabs={PILL_TABS}
-						activeId={activeId}
-						onChange={setActiveId}
-						ariaLabel="Code language"
-						idPrefix="check-api"
-						controls={PANEL_ID}
-						className="min-w-0 flex-1 px-4 py-3 sm:px-5 md:px-6"
-					/>
-					<CopyButton value={active.code} />
-				</div>
-
-				<div
-					id={PANEL_ID}
-					role="tabpanel"
-					aria-labelledby={`check-api-tab-${active.id}`}
-					className="grid lg:grid-cols-2"
-				>
-					<div className="overflow-x-auto px-5 py-6 sm:px-6 md:px-8">
-						<pre className="font-mono text-[12.5px] text-text-strong-950 leading-[1.75] sm:text-[13px] dark:text-white/80">
-							<code>{highlightCode(active.code)}</code>
+					<div className="overflow-x-auto px-5 py-6 sm:px-6">
+						<pre className="font-mono text-[12.5px] text-text-sub-600 leading-[1.75] sm:text-[13px] dark:text-white/45">
+							<code>{highlightJson(apiResponseSample)}</code>
 						</pre>
 					</div>
-
-					<div
-						className={cn(
-							"border-t bg-bg-weak-50 lg:border-t-0 lg:border-l dark:bg-white/[0.02]",
-							hairline,
-						)}
-					>
-						<div
-							className={cn(
-								"flex items-center gap-3 border-b px-5 py-3 sm:px-6",
-								hairline,
-							)}
-						>
-							<WindowDots />
-							<span className="ml-auto font-mono text-[11px] text-text-soft-400 uppercase tracking-[0.14em] dark:text-white/30">
-								[ 200 · json ]
-							</span>
-						</div>
-						<div className="overflow-x-auto px-5 py-6 sm:px-6">
-							<pre className="font-mono text-[12.5px] text-text-sub-600 leading-[1.75] sm:text-[13px] dark:text-white/45">
-								<code>{highlightJson(apiResponseSample)}</code>
-							</pre>
-						</div>
-					</div>
 				</div>
-			</Band>
-		</>
+			</div>
+		</section>
 	);
 }

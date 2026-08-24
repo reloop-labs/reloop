@@ -66,6 +66,12 @@ export function AiAgentsSection() {
 		>
 			{/* Section Header */}
 			<div className="border-stroke-soft-200 border-b px-4 py-8 sm:px-8 sm:py-10 lg:px-12 dark:border-white/10">
+				<div className="mb-4">
+					<span className="inline-flex items-center gap-1.5 rounded-[10px] bg-blue-50 px-2.5 py-1 font-medium text-[13px] text-blue-600 dark:bg-blue-500/10 dark:text-blue-400">
+						<Icon name="robot" className="size-3.5" />
+						Agent Ready
+					</span>
+				</div>
 				<h2
 					id="ai-agents-heading"
 					className="font-semibold text-3xl text-text-strong-950 tracking-tight sm:text-4xl lg:text-[2.65rem] lg:leading-[1.12] dark:text-white"
