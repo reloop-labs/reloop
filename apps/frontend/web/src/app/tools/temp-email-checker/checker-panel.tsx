@@ -12,6 +12,7 @@ import {
 	type SignalStatus,
 	toCheckResult,
 } from "./presenter";
+import { saveTestedEmail } from "./tested-emails-store";
 
 const VERDICT_THEME: Record<
 	CheckVerdict,
@@ -472,7 +473,17 @@ export function CheckerPanel() {
 
 		try {
 			const response = await runCheck(query, controller.signal);
-			setResult(toCheckResult(response));
+			const checkRes = toCheckResult(response);
+			setResult(checkRes);
+			saveTestedEmail({
+				email: response.input,
+				domain: response.domain || query,
+				verdict: response.verdict,
+				isDisposable: response.isDisposable,
+				isAllowlisted: response.isAllowlisted,
+				isRole: response.isRoleAddress,
+				summary: checkRes.summary,
+			});
 		} catch (err) {
 			if (controller.signal.aborted) return;
 			setResult(null);
@@ -505,50 +516,59 @@ export function CheckerPanel() {
 			{!result ? (
 				/* Dashboard Modal / Card Container */
 				<div className="overflow-hidden rounded-[20px] border border-stroke-soft-200 bg-bg-weak-50 p-2 sm:rounded-[24px] dark:border-white/10 dark:bg-white/[0.04]">
-					<div className="space-y-5 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 px-6 pt-5 pb-6 dark:border-white/10 dark:bg-[#070707]">
-						{/* Header */}
-						<div>
-							<h2 className="font-semibold text-base text-text-strong-950 tracking-tight sm:text-[17px] dark:text-white">
-								Check Email & Domain
-							</h2>
-							<p className="mt-0.5 text-text-sub-600 text-xs leading-relaxed sm:text-[13px] dark:text-white/50">
-								Verify individual addresses or paste a domain to detect throwaway inboxes.
-							</p>
-						</div>
-
-						{/* Dashed Input Drop / Check Zone */}
-						<form onSubmit={onSubmit} noValidate>
+					<div className="rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-6 dark:border-white/10 dark:bg-[#070707]">
+						{/* Input Check Zone */}
+						<form onSubmit={onSubmit} noValidate className="space-y-4">
 							<label htmlFor="checker-input" className="sr-only">
 								Email address or domain to check
 							</label>
 
-							<div
-								onClick={() => inputRef.current?.focus()}
-								className="flex cursor-text flex-col items-center justify-center gap-3.5 rounded-2xl border border-stroke-soft-200 border-dashed bg-bg-weak-50/40 p-6 text-center transition-all focus-within:border-primary-base focus-within:bg-bg-weak-50/70 sm:p-8 dark:border-white/12 dark:bg-white/[0.02] dark:focus-within:border-primary-base/50"
-							>
-								<div className="flex size-11 items-center justify-center rounded-2xl border border-stroke-soft-200 bg-bg-white-0 text-text-strong-950 shadow-xs dark:border-white/10 dark:bg-white/[0.06] dark:text-white">
-									<Icon name="mail-single" className="size-5" />
-								</div>
+							<div className="relative flex items-center">
+								<input
+									id="checker-input"
+									ref={inputRef}
+									type="text"
+									inputMode="email"
+									autoComplete="off"
+									autoCapitalize="none"
+									spellCheck={false}
+									value={value}
+									onChange={(e) => setValue(e.target.value)}
+									placeholder="you@example.com or domain.com"
+									className="h-11 w-full rounded-xl border border-stroke-soft-200 bg-bg-white-0 pl-3.5 pr-28 text-left text-[14.5px] font-medium text-text-strong-950 outline-none transition-colors placeholder:text-text-soft-400 focus:border-primary-base dark:border-white/10 dark:bg-black dark:text-white dark:placeholder:text-white/25"
+								/>
+								<div className="absolute right-1.5 flex items-center gap-1">
+									{value ? (
+										<button
+											type="button"
+											onClick={(e) => {
+												e.stopPropagation();
+												setValue("");
+												inputRef.current?.focus();
+											}}
+											className="flex size-7 cursor-pointer items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:text-white/45 dark:hover:bg-white/10 dark:hover:text-white"
+											aria-label="Clear input"
+										>
+											<Icon name="close" className="size-3.5" />
+										</button>
+									) : null}
 
-								<div className="w-full max-w-md space-y-1.5">
-									<div className="relative flex items-center justify-center">
-										<input
-											id="checker-input"
-											ref={inputRef}
-											type="text"
-											inputMode="email"
-											autoComplete="off"
-											autoCapitalize="none"
-											spellCheck={false}
-											value={value}
-											onChange={(e) => setValue(e.target.value)}
-											placeholder="you@example.com or domain.com"
-											className="h-10 w-full rounded-xl border border-stroke-soft-200 bg-bg-white-0 px-3.5 text-center text-[15px] font-medium text-text-strong-950 outline-none transition-colors placeholder:text-text-soft-400 focus:border-primary-base dark:border-white/10 dark:bg-black dark:text-white dark:placeholder:text-white/25"
-										/>
-									</div>
-									<p className="text-text-sub-600 text-xs dark:text-white/45">
-										Instant real-time check · No signup required
-									</p>
+									<Button.Root
+										type="submit"
+										variant="primary"
+										size="small"
+										disabled={!canSubmit}
+										className="h-8 cursor-pointer rounded-lg px-3 font-medium text-xs disabled:opacity-35"
+									>
+										{isPending ? (
+											<span className="size-3 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+										) : (
+											<>
+												<span>Verify</span>
+												<Icon name="arrow-right" className="size-3" />
+											</>
+										)}
+									</Button.Root>
 								</div>
 							</div>
 
@@ -588,35 +608,6 @@ export function CheckerPanel() {
 									</li>
 									<li>Addresses are verified in memory and discarded immediately.</li>
 								</ul>
-							</div>
-
-							{/* Bottom Action Bar */}
-							<div className="mt-5 flex items-center justify-between pt-1">
-								<button
-									type="button"
-									onClick={() => setValue("")}
-									disabled={!value}
-									className="cursor-pointer font-medium text-xs text-text-sub-600 transition-colors hover:text-text-strong-950 disabled:cursor-not-allowed disabled:opacity-30 dark:text-white/45 dark:hover:text-white"
-								>
-									Clear
-								</button>
-
-								<Button.Root
-									type="submit"
-									variant="primary"
-									size="small"
-									disabled={!canSubmit}
-									className="h-9 cursor-pointer rounded-xl px-4 font-medium text-[13.5px] disabled:opacity-35"
-								>
-									{isPending ? (
-										<span className="size-3.5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-									) : (
-										<>
-											<span>Verify Email</span>
-											<Icon name="arrow-right" className="size-3.5" />
-										</>
-									)}
-								</Button.Root>
 							</div>
 						</form>
 					</div>
