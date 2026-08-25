@@ -70,16 +70,47 @@ export function TesterPanel() {
 	);
 
 	// 1. Initialize session on mount
-	const initSession = async () => {
+	const initSession = async (overrideToken?: string) => {
 		setStatus("loading");
 		setErrorMessage("");
 		setNoEmailFoundAlert(false);
 		try {
+			// Check if token in URL search params (e.g. ?token=test-cb92657a)
+			const urlParams =
+				typeof window !== "undefined"
+					? new URLSearchParams(window.location.search)
+					: null;
+			const queryToken = overrideToken || urlParams?.get("token");
+
+			if (queryToken) {
+				const checkRes = await pollDeliverabilitySession(queryToken);
+				if (checkRes.status === "received" && checkRes.report) {
+					setToken(checkRes.token);
+					setAddress(checkRes.address);
+					setExpiresAt(checkRes.expiresAt);
+					setReport(checkRes.report);
+					setStatus("ready");
+					return;
+				}
+				if (checkRes.status === "pending") {
+					setToken(checkRes.token);
+					setAddress(checkRes.address);
+					setExpiresAt(checkRes.expiresAt);
+					setStatus("waiting");
+					return;
+				}
+			}
+
 			const res = await createDeliverabilitySession();
 			setToken(res.token);
 			setAddress(res.address);
 			setExpiresAt(res.expiresAt);
 			setStatus("waiting");
+
+			if (typeof window !== "undefined" && window.history?.replaceState) {
+				const newUrl = `${window.location.pathname}?token=${res.token}`;
+				window.history.replaceState(null, "", newUrl);
+			}
 		} catch (err: unknown) {
 			setStatus("error");
 			setErrorMessage(
