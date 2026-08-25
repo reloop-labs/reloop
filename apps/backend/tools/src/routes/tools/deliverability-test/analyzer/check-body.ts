@@ -27,9 +27,14 @@ export function checkBody(email: ParsedEmailData): BodyCheckResult {
 			title: "Missing plain text version (HTML only)",
 			mark: penalty,
 			status: "warn",
-			description: "The message contains an HTML body but lacks an accompanying text/plain multipart alternative.",
-			details: ["Spam filters penalize HTML-only emails because legitimate newsletters almost always provide a text version."],
-			recommendations: ["Include a clean plain-text fallback in your multipart MIME message."],
+			description:
+				"The message contains an HTML body but lacks an accompanying text/plain multipart alternative.",
+			details: [
+				"Spam filters penalize HTML-only emails because legitimate newsletters almost always provide a text version.",
+			],
+			recommendations: [
+				"Include a clean plain-text fallback in your multipart MIME message.",
+			],
 		});
 	} else if (hasHtml && hasText) {
 		items.push({
@@ -37,7 +42,8 @@ export function checkBody(email: ParsedEmailData): BodyCheckResult {
 			title: "Multipart MIME structure (HTML + Plain Text)",
 			mark: 0,
 			status: "pass",
-			description: "Message includes both HTML and plain text alternative versions.",
+			description:
+				"Message includes both HTML and plain text alternative versions.",
 		});
 	} else if (hasText && !hasHtml) {
 		items.push({
@@ -53,8 +59,12 @@ export function checkBody(email: ParsedEmailData): BodyCheckResult {
 	let textToHtmlRatio = 1.0;
 	if (hasHtml) {
 		const rawHtmlLength = email.html.length;
-		const cleanTextLength = email.text.length || email.html.replace(/<[^>]+>/g, "").trim().length;
-		textToHtmlRatio = rawHtmlLength > 0 ? Number.parseFloat((cleanTextLength / rawHtmlLength).toFixed(2)) : 1.0;
+		const cleanTextLength =
+			email.text.length || email.html.replace(/<[^>]+>/g, "").trim().length;
+		textToHtmlRatio =
+			rawHtmlLength > 0
+				? Number.parseFloat((cleanTextLength / rawHtmlLength).toFixed(2))
+				: 1.0;
 
 		if (rawHtmlLength > 2000 && textToHtmlRatio < 0.15) {
 			const penalty = -0.5;
@@ -64,8 +74,11 @@ export function checkBody(email: ParsedEmailData): BodyCheckResult {
 				title: `Low text-to-code ratio (${Math.round(textToHtmlRatio * 100)}%)`,
 				mark: penalty,
 				status: "warn",
-				description: "The email has a large amount of HTML tags and formatting compared to actual text content.",
-				recommendations: ["Simplify inline CSS styles and ensure your email contains sufficient readable copy."],
+				description:
+					"The email has a large amount of HTML tags and formatting compared to actual text content.",
+				recommendations: [
+					"Simplify inline CSS styles and ensure your email contains sufficient readable copy.",
+				],
 			});
 		}
 	}
@@ -94,7 +107,9 @@ export function checkBody(email: ParsedEmailData): BodyCheckResult {
 					mark: penalty,
 					status: "warn",
 					description: `${missingAltCount} out of ${imageCount} images lack descriptive alt tags, hurting accessibility and spam scoring.`,
-					recommendations: ['Add descriptive alt="..." text to every <img> tag.'],
+					recommendations: [
+						'Add descriptive alt="..." text to every <img> tag.',
+					],
 				});
 			} else {
 				items.push({
@@ -114,7 +129,8 @@ export function checkBody(email: ParsedEmailData): BodyCheckResult {
 		if (/<script\b[^>]*>/i.test(email.html)) riskyElements.push("<script>");
 		if (/<form\b[^>]*>/i.test(email.html)) riskyElements.push("<form>");
 		if (/<iframe\b[^>]*>/i.test(email.html)) riskyElements.push("<iframe>");
-		if (/<object\b|<embed\b/i.test(email.html)) riskyElements.push("<object>/<embed>");
+		if (/<object\b|<embed\b/i.test(email.html))
+			riskyElements.push("<object>/<embed>");
 
 		if (riskyElements.length > 0) {
 			const penalty = -2.0;
@@ -125,7 +141,9 @@ export function checkBody(email: ParsedEmailData): BodyCheckResult {
 				mark: penalty,
 				status: "fail",
 				description: `Email contains forbidden or high-risk tags (${riskyElements.join(", ")}). Spam filters and webmail clients immediately quarantine these messages.`,
-				recommendations: ["Remove interactive forms, scripts, and embedded frames from your HTML template."],
+				recommendations: [
+					"Remove interactive forms, scripts, and embedded frames from your HTML template.",
+				],
 			});
 		}
 	}
@@ -141,10 +159,13 @@ export function checkBody(email: ParsedEmailData): BodyCheckResult {
 			title: "List-Unsubscribe header present",
 			mark: 0,
 			status: "pass",
-			description: "Message includes RFC 8058 one-click List-Unsubscribe headers (required by Gmail & Yahoo for bulk senders).",
+			description:
+				"Message includes RFC 8058 one-click List-Unsubscribe headers (required by Gmail & Yahoo for bulk senders).",
 			details: [
 				`List-Unsubscribe: ${listUnsubscribe}`,
-				listUnsubscribePost ? `List-Unsubscribe-Post: ${listUnsubscribePost}` : "",
+				listUnsubscribePost
+					? `List-Unsubscribe-Post: ${listUnsubscribePost}`
+					: "",
 			].filter(Boolean),
 		});
 	} else {
@@ -154,7 +175,8 @@ export function checkBody(email: ParsedEmailData): BodyCheckResult {
 			title: "List-Unsubscribe header missing",
 			mark: 0,
 			status: "info",
-			description: "No List-Unsubscribe header found. If you send marketing or bulk newsletters, Google and Yahoo mandate this header.",
+			description:
+				"No List-Unsubscribe header found. If you send marketing or bulk newsletters, Google and Yahoo mandate this header.",
 			recommendations: [
 				'Add "List-Unsubscribe: <https://your-domain.com/unsubscribe>, <mailto:unsubscribe@your-domain.com>"',
 			],

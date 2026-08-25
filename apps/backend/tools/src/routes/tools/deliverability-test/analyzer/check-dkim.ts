@@ -43,7 +43,11 @@ function parseDkimHeader(rawHeader: string): ParsedDkimTag {
 async function fetchDkimPublicKey(
 	selector: string,
 	domain: string,
-): Promise<{ record: string | null; publicKey: string | null; error?: string }> {
+): Promise<{
+	record: string | null;
+	publicKey: string | null;
+	error?: string;
+}> {
 	const queryHost = `${selector}._domainkey.${domain}`;
 	try {
 		const txtRecords = await withDeadline(
@@ -61,13 +65,20 @@ async function fetchDkimPublicKey(
 		return { record: flat, publicKey };
 	} catch (e: unknown) {
 		const err = e as { code?: string };
-		return { record: null, publicKey: null, error: err.code || "DNS lookup failed" };
+		return {
+			record: null,
+			publicKey: null,
+			error: err.code || "DNS lookup failed",
+		};
 	}
 }
 
-export async function checkDkim(email: ParsedEmailData): Promise<DkimCheckResult> {
+export async function checkDkim(
+	email: ParsedEmailData,
+): Promise<DkimCheckResult> {
 	// 1. Check if DKIM-Signature header exists
-	const rawSignature = email.dkimSignatures[0] || email.headers["dkim-signature"];
+	const rawSignature =
+		email.dkimSignatures[0] || email.headers["dkim-signature"];
 
 	if (!rawSignature) {
 		// Check if Authentication-Results or Rspamd had any DKIM indicator
@@ -79,8 +90,11 @@ export async function checkDkim(email: ParsedEmailData): Promise<DkimCheckResult
 					title: "DKIM (DomainKeys Identified Mail)",
 					mark: 0,
 					status: "pass",
-					description: "Message was cryptographically verified via DKIM signature.",
-					details: ["MTA Authentication-Results verified valid DKIM signature."],
+					description:
+						"Message was cryptographically verified via DKIM signature.",
+					details: [
+						"MTA Authentication-Results verified valid DKIM signature.",
+					],
 				},
 				hasDkim: true,
 				selector: null,
@@ -127,7 +141,8 @@ export async function checkDkim(email: ParsedEmailData): Promise<DkimCheckResult
 				title: "DKIM (DomainKeys Identified Mail)",
 				mark: -2.0,
 				status: "fail",
-				description: "Malformed DKIM-Signature header: missing required selector (s=) or domain (d=) tags.",
+				description:
+					"Malformed DKIM-Signature header: missing required selector (s=) or domain (d=) tags.",
 				details: [`Raw signature: ${rawSignature.slice(0, 100)}...`],
 				recommendations: ["Check your MTA's DKIM signing configuration."],
 			},
@@ -141,10 +156,11 @@ export async function checkDkim(email: ParsedEmailData): Promise<DkimCheckResult
 	}
 
 	// 2. Fetch public key from DNS: <selector>._domainkey.<domain>
-	const { record: pubKeyRecord, publicKey, error: dnsError } = await fetchDkimPublicKey(
-		selector,
-		dkimDomain,
-	);
+	const {
+		record: pubKeyRecord,
+		publicKey,
+		error: dnsError,
+	} = await fetchDkimPublicKey(selector, dkimDomain);
 
 	// Check alignment with From domain
 	const isAligned =
@@ -155,8 +171,12 @@ export async function checkDkim(email: ParsedEmailData): Promise<DkimCheckResult
 	const authResults = email.headers["authentication-results"] || "";
 	const dkimPassInHeader = /dkim=pass/i.test(authResults);
 	const dkimFailInHeader = /dkim=fail/i.test(authResults);
-	const rspamdDkimPass = email.rspamdSymbols.some((s) => s.includes("DKIM_ALLOW") || s.includes("R_DKIM_ALLOW"));
-	const rspamdDkimFail = email.rspamdSymbols.some((s) => s.includes("DKIM_REJECT") || s.includes("R_DKIM_REJECT"));
+	const rspamdDkimPass = email.rspamdSymbols.some(
+		(s) => s.includes("DKIM_ALLOW") || s.includes("R_DKIM_ALLOW"),
+	);
+	const rspamdDkimFail = email.rspamdSymbols.some(
+		(s) => s.includes("DKIM_REJECT") || s.includes("R_DKIM_REJECT"),
+	);
 
 	if (dkimFailInHeader || rspamdDkimFail) {
 		return {
@@ -226,10 +246,14 @@ export async function checkDkim(email: ParsedEmailData): Promise<DkimCheckResult
 				`Domain: ${dkimDomain}`,
 				`Algorithm: ${tags.a || "rsa-sha256"}`,
 				`Public key published: ${selector}._domainkey.${dkimDomain}`,
-				isAligned ? "Identifier Alignment: Aligned with From domain" : `Identifier Alignment: Unaligned (signed by ${dkimDomain}, From is ${email.from.domain})`,
+				isAligned
+					? "Identifier Alignment: Aligned with From domain"
+					: `Identifier Alignment: Unaligned (signed by ${dkimDomain}, From is ${email.from.domain})`,
 			],
 			recommendations: !isAligned
-				? [`For strict DMARC alignment, sign with a key for "${email.from.domain}" directly.`]
+				? [
+						`For strict DMARC alignment, sign with a key for "${email.from.domain}" directly.`,
+					]
 				: undefined,
 		},
 		hasDkim: true,

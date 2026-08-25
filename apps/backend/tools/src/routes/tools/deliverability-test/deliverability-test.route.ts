@@ -53,7 +53,8 @@ export const deliverabilityTestRoute = new Elysia()
 		{
 			params: t.Object({
 				token: t.String({
-					description: "The unique session token returned when the test address was created.",
+					description:
+						"The unique session token returned when the test address was created.",
 				}),
 			}),
 			detail: {

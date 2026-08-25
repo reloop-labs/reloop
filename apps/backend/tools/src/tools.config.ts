@@ -7,6 +7,7 @@ export const toolsConfig = {
 	NODE_ENV: process.env.NODE_ENV || "development",
 	OTEL_EXPORTER_OTLP_ENDPOINT: process.env.OTEL_EXPORTER_OTLP_ENDPOINT || "",
 	OTEL_EXPORTER_OTLP_HEADERS: process.env.OTEL_EXPORTER_OTLP_HEADERS || "",
+	TOOLS_GEMINI_API_KEY: process.env.TOOLS_GEMINI_API_KEY || "",
 
 	constants: {
 		maxInputLength: 400,

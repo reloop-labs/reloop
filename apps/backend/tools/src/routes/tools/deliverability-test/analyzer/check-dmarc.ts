@@ -2,8 +2,8 @@ import dns from "node:dns/promises";
 import { withDeadline } from "@be/tools/utils/deadline";
 import type { CheckItem } from "../deliverability-test.types";
 import type { DkimCheckResult } from "./check-dkim";
-import type { ParsedEmailData } from "./parse-mime";
 import type { SpfCheckResult } from "./check-spf";
+import type { ParsedEmailData } from "./parse-mime";
 
 export interface DmarcCheckResult {
 	item: CheckItem;
@@ -57,7 +57,9 @@ async function fetchDmarcRecord(
 			2000,
 			`DMARC TXT lookup for ${queryHost}`,
 		);
-		const flat = txtRecords.map((r) => r.join("")).filter((r) => r.trim().startsWith("v=DMARC1"));
+		const flat = txtRecords
+			.map((r) => r.join(""))
+			.filter((r) => r.trim().startsWith("v=DMARC1"));
 		if (flat.length > 0 && flat[0]) {
 			return { record: flat[0], queryHost };
 		}
@@ -73,7 +75,9 @@ async function fetchDmarcRecord(
 				2000,
 				`DMARC org domain lookup for ${orgQueryHost}`,
 			);
-			const flat = txtRecords.map((r) => r.join("")).filter((r) => r.trim().startsWith("v=DMARC1"));
+			const flat = txtRecords
+				.map((r) => r.join(""))
+				.filter((r) => r.trim().startsWith("v=DMARC1"));
 			if (flat.length > 0 && flat[0]) {
 				return { record: flat[0], queryHost: orgQueryHost };
 			}
@@ -98,7 +102,9 @@ export async function checkDmarc(
 				mark: -2.0,
 				status: "fail",
 				description: "No sender domain found in From header to check DMARC.",
-				recommendations: ["Ensure email has a valid From: address with domain."],
+				recommendations: [
+					"Ensure email has a valid From: address with domain.",
+				],
 			},
 			hasDmarc: false,
 			dmarcRecord: null,
@@ -158,7 +164,9 @@ export async function checkDmarc(
 	const dkimMatchesFrom =
 		dkimDomain === fromDomain ||
 		fromDomain.endsWith(`.${dkimDomain}`) ||
-		(dkimDomain ? getOrgDomain(dkimDomain) === getOrgDomain(fromDomain) : false);
+		(dkimDomain
+			? getOrgDomain(dkimDomain) === getOrgDomain(fromDomain)
+			: false);
 	const dkimAligned = dkimResult.result === "pass" && dkimMatchesFrom;
 
 	// DMARC passes if at least one is aligned and authenticated
@@ -215,7 +223,9 @@ export async function checkDmarc(
 			],
 			recommendations:
 				policy === "none"
-					? ["Once your aligned authentication is stable, consider upgrading your policy to 'p=quarantine' or 'p=reject'."]
+					? [
+							"Once your aligned authentication is stable, consider upgrading your policy to 'p=quarantine' or 'p=reject'.",
+						]
 					: undefined,
 		},
 		hasDmarc: true,

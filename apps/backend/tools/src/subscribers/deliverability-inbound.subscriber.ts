@@ -7,7 +7,10 @@ const subscriberContext = new AsyncLocalStorage();
 const processedMessages = new Set<string>();
 
 export async function initDeliverabilityInboundSubscriber() {
-	log.info("subscribers", "Initializing Deliverability Tester inbound email subscriber");
+	log.info(
+		"subscribers",
+		"Initializing Deliverability Tester inbound email subscriber",
+	);
 
 	try {
 		await bus.subscribe(
@@ -27,7 +30,8 @@ export async function initDeliverabilityInboundSubscriber() {
 				}
 
 				const match = raw.match(/Message-ID:\s*(<[^>]+>)/i);
-				const messageKey = match && match[1] ? match[1].trim() : raw.substring(0, 300);
+				const messageKey =
+					match && match[1] ? match[1].trim() : raw.substring(0, 300);
 
 				if (processedMessages.has(messageKey)) {
 					return;

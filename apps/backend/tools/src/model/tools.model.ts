@@ -129,6 +129,17 @@ export namespace ToolsModel {
 		body: t.Optional(t.String({ maxLength: 50000 })),
 	});
 
+	export const spamRewriteBody = t.Object({
+		subject: t.Optional(t.String({ maxLength: 1000 })),
+		body: t.Optional(t.String({ maxLength: 50000 })),
+	});
+
+	export const spamRewriteResponse = t.Object({
+		subject: t.String(),
+		body: t.String(),
+		provider: t.String(),
+	});
+
 	export const spamCheckResponse = t.Object({
 		score: t.Number({
 			description: "Overall spam/deliverability score from 0 to 100.",

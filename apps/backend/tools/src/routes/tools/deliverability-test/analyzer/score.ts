@@ -14,7 +14,9 @@ export interface AggregateScoreInput {
 	linksCategory: CategoryResult;
 }
 
-export function computeDeliverabilityScore(input: AggregateScoreInput): DeliverabilityReport {
+export function computeDeliverabilityScore(
+	input: AggregateScoreInput,
+): DeliverabilityReport {
 	const {
 		email,
 		signatureCategory,
@@ -33,7 +35,9 @@ export function computeDeliverabilityScore(input: AggregateScoreInput): Delivera
 		linksCategory.mark;
 
 	const rawScore = 10.0 + totalDeductions;
-	const finalScore = Number.parseFloat(Math.max(0.0, Math.min(10.0, rawScore)).toFixed(1));
+	const finalScore = Number.parseFloat(
+		Math.max(0.0, Math.min(10.0, rawScore)).toFixed(1),
+	);
 
 	let grade: string;
 	let verdict: "inbox_ready" | "needs_review" | "high_risk";

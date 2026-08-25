@@ -1,4 +1,4 @@
-import { simpleParser, type ParsedMail, type HeaderValue } from "mailparser";
+import { type HeaderValue, type ParsedMail, simpleParser } from "mailparser";
 
 export interface ParsedEmailData {
 	from: {
@@ -102,24 +102,32 @@ export async function parseMime(rawMime: string): Promise<ParsedEmailData> {
 
 	// Extract Return-Path
 	const returnPathHeader = headersRecord["return-path"] || "";
-	const returnPathMatch = returnPathHeader.match(/<([^>]+)>/) || [null, returnPathHeader];
+	const returnPathMatch = returnPathHeader.match(/<([^>]+)>/) || [
+		null,
+		returnPathHeader,
+	];
 	const returnPath = (returnPathMatch[1] || "").trim() || null;
 
 	// Extract From
 	const fromAddress = parsed.from?.value?.[0]?.address || "";
 	const fromName = parsed.from?.value?.[0]?.name || "";
-	const fromDomain = fromAddress.includes("@") ? (fromAddress.split("@")[1] || "").toLowerCase() : "";
+	const fromDomain = fromAddress.includes("@")
+		? (fromAddress.split("@")[1] || "").toLowerCase()
+		: "";
 
 	// Extract To
 	const toAddress =
-		(Array.isArray(parsed.to) ? parsed.to[0]?.value?.[0]?.address : parsed.to?.value?.[0]?.address) ||
-		"";
+		(Array.isArray(parsed.to)
+			? parsed.to[0]?.value?.[0]?.address
+			: parsed.to?.value?.[0]?.address) || "";
 	const toName =
-		(Array.isArray(parsed.to) ? parsed.to[0]?.value?.[0]?.name : parsed.to?.value?.[0]?.name) ||
-		"";
+		(Array.isArray(parsed.to)
+			? parsed.to[0]?.value?.[0]?.name
+			: parsed.to?.value?.[0]?.name) || "";
 
 	// Extract Connecting IP and HELO
-	const { ip: connectingIp, helo: heloDomain } = extractConnectingIp(receivedHeaders);
+	const { ip: connectingIp, helo: heloDomain } =
+		extractConnectingIp(receivedHeaders);
 
 	// Extract Rspamd info injected by KumoMTA
 	const rawSpamScore = headersRecord["x-spam-score"];
@@ -128,9 +136,13 @@ export async function parseMime(rawMime: string): Promise<ParsedEmailData> {
 
 	const rspamdStatus = headersRecord["x-spam-status"] || "";
 	const symbolsMatch = rspamdStatus.match(/tests=([^\s]+)/);
-	const rspamdSymbols = symbolsMatch && symbolsMatch[1]
-		? symbolsMatch[1].split(",").map((s) => s.trim()).filter(Boolean)
-		: [];
+	const rspamdSymbols =
+		symbolsMatch && symbolsMatch[1]
+			? symbolsMatch[1]
+					.split(",")
+					.map((s) => s.trim())
+					.filter(Boolean)
+			: [];
 
 	const attachments = (parsed.attachments || []).map((att) => ({
 		filename: att.filename,

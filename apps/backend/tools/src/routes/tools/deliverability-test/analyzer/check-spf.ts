@@ -8,13 +8,13 @@ export interface SpfCheckResult {
 	spfDomain: string;
 	spfRecord: string | null;
 	result:
-	| "pass"
-	| "neutral"
-	| "softfail"
-	| "fail"
-	| "none"
-	| "temperror"
-	| "permerror";
+		| "pass"
+		| "neutral"
+		| "softfail"
+		| "fail"
+		| "none"
+		| "temperror"
+		| "permerror";
 }
 
 async function fetchSpfRecord(
@@ -239,8 +239,8 @@ export async function checkSpf(
 			details: [`Domain: ${spfDomain}`, `Record: ${spfRecord}`],
 			recommendations: !hasStrictOrSoft
 				? [
-					"We recommend ending your SPF record with '~all' or '-all' rather than '?all' or '+all'.",
-				]
+						"We recommend ending your SPF record with '~all' or '-all' rather than '?all' or '+all'.",
+					]
 				: undefined,
 		},
 	};
