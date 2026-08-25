@@ -25,8 +25,8 @@ import { generatePlanarUVs } from "./three/uv";
 const MODEL_URL = "/models/Macintosh.glb";
 
 const VIEW_PRESET_INITIAL = {
-	modelX: 0.04574,
-	modelY: 0.14474,
+	modelX: 0,
+	modelY: 0,
 	rotX: 6,
 	rotY: 1,
 	rotZ: 0,
@@ -190,7 +190,7 @@ export class MacintoshRenderer {
 		this.controls.enablePan = false;
 		this.controls.enableZoom = false;
 		this.controls.autoRotate = true;
-		this.controls.autoRotateSpeed = 1.2;
+		this.controls.autoRotateSpeed = -1.2;
 
 		this.loadModel();
 		this.bindEvents();
