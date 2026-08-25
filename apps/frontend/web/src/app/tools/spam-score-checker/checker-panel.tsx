@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "@reloop/ui/cn";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import Link from "next/link";
 import type React from "react";
@@ -49,7 +50,7 @@ const VERDICT_STYLES = {
 		badge:
 			"bg-error-lighter text-error-base dark:bg-rose-500/10 dark:text-rose-400",
 		accent: "bg-error-base",
-		icon: "cross-circle",
+		icon: "minus-circle",
 		ratingLabel: "Poor (Spam Risk)",
 	},
 };
@@ -108,41 +109,41 @@ function buildBackdropNodes(
 		nodes.push(text.slice(lastIndex));
 	}
 
-	return nodes;
+	return <>{nodes}</>;
 }
 
 export function CheckerPanel() {
-	const [subject, setSubject] = useState(PRESETS[2]!.subject);
-	const [body, setBody] = useState(PRESETS[2]!.body);
+	const [subject, setSubject] = useState(PRESETS[2]?.subject ?? "");
+	const [body, setBody] = useState(PRESETS[2]?.body ?? "");
 	const [copied, setCopied] = useState(false);
 	const [isFixing, setIsFixing] = useState(false);
 
-	const bodyBackdropRef = useRef<HTMLDivElement>(null);
+	const subjectInputRef = useRef<HTMLInputElement>(null);
 	const bodyTextareaRef = useRef<HTMLTextAreaElement>(null);
 	const subjectBackdropRef = useRef<HTMLDivElement>(null);
-	const subjectInputRef = useRef<HTMLInputElement>(null);
+	const bodyBackdropRef = useRef<HTMLDivElement>(null);
 
-	// Synchronously calculate spam score and detected triggers
-	const analysis = useMemo(() => {
-		return calculateSpamScore(subject, body);
-	}, [subject, body]);
+	const analysis = useMemo(
+		() => calculateSpamScore(subject, body),
+		[subject, body],
+	);
 
-	const verdictStyle =
-		VERDICT_STYLES[analysis.verdict] || VERDICT_STYLES.inbox_ready;
+	const verdictStyle = VERDICT_STYLES[analysis.verdict];
 
-	const handleCopyReport = () => {
-		const reportText = `[Reloop Spam Score Report]\nScore: ${analysis.score}/100 (Grade ${analysis.grade})\nVerdict: ${analysis.verdictLabel}\nSubject: "${subject}"\nWord Count: ${analysis.metrics.wordCount} words\nSpam Triggers Detected: ${analysis.detectedTriggers.length}\nIssues: ${analysis.issues.length > 0 ? analysis.issues.map((i) => i.title).join(", ") : "None"}\nTested free at https://reloop.sh/tools/spam-score-checker`;
-
-		navigator.clipboard.writeText(reportText).then(() => {
+	const handleCopyReport = async () => {
+		try {
+			const reportText = `Reloop Spam Score Report\nScore: ${analysis.score}/100 (Grade: ${analysis.grade})\nVerdict: ${analysis.verdict}\nSubject: ${subject}\nTriggers Found: ${analysis.detectedTriggers.length}\nChecked via https://reloop.sh/tools/spam-score-checker`;
+			await navigator.clipboard.writeText(reportText);
 			setCopied(true);
-			setTimeout(() => setCopied(false), 2500);
-		});
+			setTimeout(() => setCopied(false), 2000);
+		} catch {}
 	};
 
 	const handleAiFix = async () => {
+		if (isFixing || analysis.detectedTriggers.length === 0) return;
 		setIsFixing(true);
 		try {
-			const res = await fetch("/api/tools/fix-spam-copy", {
+			const res = await fetch("/api/tools/v1/spam-score/rewrite", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({
@@ -164,7 +165,7 @@ export function CheckerPanel() {
 
 	return (
 		<div className="mx-auto max-w-5xl">
-			{/* Preset buttons */}
+			{/* Preset buttons & AI Action */}
 			<div className="mb-4 flex flex-wrap items-center justify-between gap-3">
 				<div className="flex flex-wrap items-center gap-2">
 					<span className="font-mono text-[11px] text-text-soft-400 uppercase tracking-[0.14em] dark:text-white/35">
@@ -179,10 +180,10 @@ export function CheckerPanel() {
 								setBody(preset.body);
 							}}
 							className={cn(
-								"rounded-lg border px-3 py-1 font-mono text-[12px] transition-colors",
+								"rounded-lg px-2.5 py-1 font-mono text-[11.5px] transition-colors",
 								subject === preset.subject
-									? "border-text-strong-950 bg-bg-weak-50 font-medium text-text-strong-950 dark:border-white dark:bg-white/10 dark:text-white"
-									: "border-stroke-soft-200 bg-bg-white-0 text-text-sub-600 hover:border-text-strong-950 hover:text-text-strong-950 dark:border-white/10 dark:bg-white/5 dark:text-white/60 dark:hover:border-white dark:hover:text-white",
+									? "bg-text-strong-950 font-medium text-white shadow-xs dark:bg-white dark:text-black"
+									: "border border-stroke-soft-200 bg-bg-white-0 text-text-sub-600 hover:border-text-strong-950 hover:text-text-strong-950 dark:border-white/10 dark:bg-white/5 dark:text-white/60 dark:hover:border-white dark:hover:text-white",
 							)}
 						>
 							{preset.label}
@@ -192,15 +193,16 @@ export function CheckerPanel() {
 
 				{/* AI Fix button */}
 				{analysis.detectedTriggers.length > 0 && (
-					<button
+					<FancyButton.Root
 						type="button"
+						variant="neutral"
+						size="xsmall"
 						onClick={handleAiFix}
 						disabled={isFixing}
-						className="inline-flex items-center gap-2 rounded-xl bg-bg-strong-950 px-3.5 py-1.5 font-medium font-mono text-[12px] text-white shadow-xs transition-colors hover:bg-bg-surface-800 disabled:opacity-50 dark:bg-white dark:text-black dark:hover:bg-white/90"
 					>
-						<Icon name="magic-wand" className="size-3.5" />
+						<FancyButton.Icon as={Icon} name="sparkling" />
 						{isFixing ? "Rewriting with AI..." : "Fix Copy with AI"}
-					</button>
+					</FancyButton.Root>
 				)}
 			</div>
 
@@ -251,19 +253,13 @@ export function CheckerPanel() {
 									type="text"
 									value={subject}
 									onChange={(e) => setSubject(e.target.value)}
-									onScroll={(e) => {
-										if (subjectBackdropRef.current) {
-											subjectBackdropRef.current.scrollLeft =
-												e.currentTarget.scrollLeft;
-										}
-									}}
-									placeholder="e.g. Your monthly analytics report is ready"
-									className="relative z-10 block h-11 w-full bg-transparent px-4 font-sans text-[14px] text-text-strong-950 leading-normal outline-none placeholder:text-text-soft-400 dark:text-white dark:placeholder:text-white/30"
+									placeholder="e.g. Action required: Update your payment information"
+									className="relative z-10 block w-full bg-transparent px-4 py-2.5 font-sans text-[14px] text-text-strong-950 outline-none placeholder:text-text-soft-400 dark:text-white dark:placeholder:text-white/30"
 								/>
 							</div>
 						</div>
 
-						{/* Email Body Textarea with Synchronized Inline Highlights */}
+						{/* Body Input with Synchronized Scrollable Highlights */}
 						<div>
 							<div className="mb-1.5 flex items-center justify-between">
 								<label
@@ -393,12 +389,12 @@ export function CheckerPanel() {
 															"size-4 shrink-0",
 															count > 0
 																? "text-text-strong-950 dark:text-white"
-																: "text-text-soft-400 dark:text-white/20",
+																: "text-text-soft-400 dark:text-white/25",
 														)}
 													/>
 													<span>{meta.label}</span>
 												</div>
-												<span className="font-mono font-semibold">
+												<span className="font-mono font-semibold text-[12px]">
 													({count})
 												</span>
 											</div>
@@ -445,22 +441,28 @@ export function CheckerPanel() {
 					{/* Action Buttons */}
 					<div className="p-5 sm:p-6">
 						<div className="flex items-center gap-3">
-							<button
+							<FancyButton.Root
 								type="button"
+								variant="basic"
+								size="small"
 								onClick={handleCopyReport}
-								className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl border border-stroke-soft-200 bg-bg-white-0 px-3.5 py-2.5 font-medium text-[13px] text-text-strong-950 transition-colors hover:bg-bg-weak-50 dark:border-white/10 dark:bg-white/5 dark:text-white dark:hover:bg-white/10"
+								className="flex-1"
 							>
-								<Icon name={copied ? "check" : "copy"} className="size-3.5" />
-								{copied ? "Report Copied!" : "Copy Report"}
-							</button>
+								<FancyButton.Icon as={Icon} name={copied ? "check" : "copy"} />
+								{copied ? "Report Copied" : "Copy Report"}
+							</FancyButton.Root>
 
-							<a
-								href="/dashboard/signup"
-								className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-bg-strong-950 px-3.5 py-2.5 font-medium text-[13px] text-text-white-0 transition-colors hover:bg-bg-surface-800 dark:bg-white dark:text-black dark:hover:bg-white/90"
+							<FancyButton.Root
+								variant="neutral"
+								size="small"
+								asChild
+								className="flex-1"
 							>
-								<span>Send with Reloop</span>
-								<Icon name="arrow-right" className="size-3.5" />
-							</a>
+								<Link href="/dashboard/signup">
+									Send with Reloop
+									<FancyButton.Icon as={Icon} name="arrow-right" />
+								</Link>
+							</FancyButton.Root>
 						</div>
 					</div>
 				</div>

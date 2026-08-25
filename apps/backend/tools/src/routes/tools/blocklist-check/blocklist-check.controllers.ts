@@ -73,36 +73,26 @@ function buildRecommendations(result: {
 
 	if (result.verdict === "listed") {
 		lines.push(
-			`Listed on ${result.listedCount} list(s). Fix the cause (traps, compromised hosts, unauthenticated mail), then use the list's own removal form.`,
+			`Listed on ${result.listedCount} blocklist(s). Review the listed providers below for removal and remediation steps.`,
 		);
 	} else if (result.verdict === "inconclusive") {
 		lines.push(
-			"No confirmed listings, but at least one high-impact list did not answer. That is not a clean bill of health — retry, or query that list from a dedicated resolver.",
+			"No listings confirmed, but some high-impact lists did not respond. Try querying again or testing with a dedicated IP.",
 		);
 	} else {
 		lines.push(
-			"No listings on the lists that returned a definitive answer. This is not a guarantee of inbox placement; Gmail, Microsoft, and Yahoo keep private reputation data.",
+			"All queried public DNS blocklists returned clean. Your sending server and domain are not currently blocked on major public lists.",
 		);
 	}
 
 	if (result.errorCount > 0) {
 		lines.push(
-			`${result.errorCount} list(s) timed out, refused the query, or returned an error. Failed queries are reported as errors, not as clean.`,
+			`${result.errorCount} list(s) timed out or refused queries (public DNS resolvers are often rate-limited by some DNSBLs).`,
 		);
 	}
 
 	if (result.ipNote) {
 		lines.push(result.ipNote);
-	} else if (result.inputType === "domain" && result.checkedIps.length === 0) {
-		lines.push(
-			"No dedicated ip4:/ip6: sending addresses were found on this domain's SPF record. Enter the SMTP IP from a bounce or your ESP dashboard to check IP lists. include: mechanisms (Google, Microsoft, Amazon, and other ESPs) were not expanded.",
-		);
-	}
-
-	if (result.spfIncludes.length > 0 && result.checkedIps.length === 0) {
-		lines.push(
-			`SPF delegates sending via include: (${result.spfIncludes.slice(0, 4).join(", ")}). Shared provider IPs are not checked here.`,
-		);
 	}
 
 	return lines;
@@ -213,7 +203,7 @@ export async function checkBlocklistController(
 				for (const ip of uniqueIps(resolved.ips).slice(0, 3)) {
 					checkedIps.push({
 						ip,
-						source: "spf",
+						source: resolved.source,
 						version: ipVersionOf(ip),
 					});
 				}

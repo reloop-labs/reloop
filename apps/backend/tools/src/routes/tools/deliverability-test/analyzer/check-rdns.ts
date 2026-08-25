@@ -1,5 +1,7 @@
 import dns from "node:dns/promises";
 import net from "node:net";
+import { isPrivateOrReservedIpv4 } from "../../blocklist-check/blocklist-input";
+import { withDeadline } from "@be/tools/utils/deadline";
 import type { CheckItem } from "../deliverability-test.types";
 import type { ParsedEmailData } from "./parse-mime";
 
@@ -14,14 +16,20 @@ export interface RdnsCheckResult {
 export async function checkRdns(email: ParsedEmailData): Promise<RdnsCheckResult> {
 	const ip = email.connectingIp;
 
-	if (!ip || ip.startsWith("127.") || ip === "::1" || ip === "0.0.0.0") {
+	if (
+		!ip ||
+		ip.startsWith("127.") ||
+		ip === "::1" ||
+		ip === "0.0.0.0" ||
+		isPrivateOrReservedIpv4(ip)
+	) {
 		return {
 			rdnsItem: {
 				id: "auth-rdns",
 				title: "Reverse DNS (PTR & FCrDNS)",
 				mark: 0,
 				status: "info",
-				description: "Sending IP is local or private; rDNS check was skipped.",
+				description: "Sending IP is local, documentation, or private; rDNS check was skipped.",
 				details: [ip ? `Connecting IP: ${ip}` : "No connecting IP detected"],
 			},
 			heloItem: {
@@ -44,7 +52,11 @@ export async function checkRdns(email: ParsedEmailData): Promise<RdnsCheckResult
 	let fcRdnsPassed = false;
 
 	try {
-		const hostnames = await dns.reverse(ip);
+		const hostnames = await withDeadline(
+			dns.reverse(ip),
+			2000,
+			`Reverse DNS lookup for ${ip}`,
+		);
 		if (hostnames.length > 0 && hostnames[0]) {
 			const resolvedHost = hostnames[0];
 			ptrHostname = resolvedHost;
@@ -53,10 +65,18 @@ export async function checkRdns(email: ParsedEmailData): Promise<RdnsCheckResult
 			try {
 				const isV6 = net.isIPv6(ip);
 				if (isV6) {
-					const resolvedV6 = await dns.resolve6(resolvedHost);
+					const resolvedV6 = await withDeadline(
+						dns.resolve6(resolvedHost),
+						2000,
+						`FCrDNS IPv6 lookup for ${resolvedHost}`,
+					);
 					fcRdnsPassed = resolvedV6.includes(ip);
 				} else {
-					const resolvedV4 = await dns.resolve4(resolvedHost);
+					const resolvedV4 = await withDeadline(
+						dns.resolve4(resolvedHost),
+						2000,
+						`FCrDNS IPv4 lookup for ${resolvedHost}`,
+					);
 					fcRdnsPassed = resolvedV4.includes(ip);
 				}
 			} catch {

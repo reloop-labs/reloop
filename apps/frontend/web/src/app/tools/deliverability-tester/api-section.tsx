@@ -2,8 +2,22 @@
 
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
+import { AnimatedHoverBackground } from "@reloop/web/app/sdk/components/animated-hover-background";
+import {
+	getBrandColorStyle,
+	isDarkBrandColor,
+	LanguageIcon,
+} from "@reloop/web/app/sdk/components/language-icon";
+import {
+	NODE_PKG_TABS,
+	nodeInstallCommands,
+	type PackageManager,
+} from "@reloop/web/app/sdk/components/node-install-block";
+import { SdkCodeBlock } from "@reloop/web/app/sdk/components/sdk-code-block";
+import { useSidebarHoverBox } from "@reloop/web/app/sdk/components/use-sidebar-hover-box";
 import { AnimatePresence, motion } from "framer-motion";
-import React, { useState } from "react";
+import type React from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { SimpleIcon } from "simple-icons";
 import {
 	siCurl,
@@ -11,272 +25,659 @@ import {
 	siElixir,
 	siGo,
 	siNodedotjs,
+	siOpenjdk,
 	siPhp,
 	siPython,
 	siRuby,
 	siRust,
 } from "simple-icons";
-import { LanguageIcon } from "@reloop/web/app/sdk/components/language-icon";
-import { SdkCodeBlock } from "@reloop/web/app/sdk/components/sdk-code-block";
 import { apiResponseSample } from "./content";
 
 export interface ToolLanguage {
 	slug: string;
 	name: string;
+	packageName: string;
 	icon: SimpleIcon;
+	installCommand: string;
+	frameworks: {
+		slug: string;
+		name: string;
+		icon: SimpleIcon;
+		code: string;
+		installCommand?: string;
+	}[];
+	checkCode: string;
 	fileName: string;
-	code: string;
 }
 
 const TOOL_LANGUAGES: ToolLanguage[] = [
 	{
-		slug: "curl",
-		name: "cURL",
-		icon: siCurl,
-		fileName: "terminal.sh",
-		code: `# 1. Create a temporary test address
-curl -X POST https://reloop.sh/api/tools/v1/deliverability-test
-
-# Response:
-# {
-#   "token": "test-8f3b2c1a",
-#   "address": "test-8f3b2c1a@mail-test.reloop.email",
-#   "pollUrl": "https://reloop.sh/api/tools/v1/deliverability-test/test-8f3b2c1a"
-# }
-
-# 2. Send your email to the address, then poll for results:
-curl https://reloop.sh/api/tools/v1/deliverability-test/test-8f3b2c1a`,
-	},
-	{
 		slug: "nodejs",
 		name: "Node.js",
+		packageName: "reloop-email",
 		icon: siNodedotjs,
-		fileName: "test-deliverability.ts",
-		code: `// 1. Create test session
-const createRes = await fetch("https://reloop.sh/api/tools/v1/deliverability-test", {
-  method: "POST"
+		installCommand: "npm install reloop-email",
+		fileName: "test_deliverability.ts",
+		checkCode: `import { Reloop } from "reloop-email";
+
+const client = new Reloop({
+  apiKey: process.env.RELOOP_API_KEY,
 });
-const { token, address } = await createRes.json();
 
-console.log(\`Send test email to: \${address}\`);
+// 1. Create a temporary test inbox session
+const session = await client.tools.deliverability.createSession();
+console.log(\`Send your test email to: \${session.address}\`);
 
-// 2. Poll for incoming test report
-const pollInterval = setInterval(async () => {
-  const res = await fetch(\`https://reloop.sh/api/tools/v1/deliverability-test/\${token}\`);
-  const data = await res.json();
-  
-  if (data.status === "received") {
-    clearInterval(pollInterval);
-    console.log(\`Score: \${data.report.score}/10 (Grade: \${data.report.grade})\`);
-    console.log(\`Verdict: \${data.report.verdictLabel}\`);
-  }
-}, 3000);`,
+// 2. Poll for incoming test results
+const report = await client.tools.deliverability.pollSession(session.token, {
+  timeoutMs: 30000,
+});
+
+console.log(\`Deliverability score: \${report.score}/10 (\${report.grade})\`);
+console.log(\`Verdict: \${report.verdictLabel}\`);`,
+		frameworks: [],
 	},
 	{
 		slug: "python",
 		name: "Python",
+		packageName: "reloop",
 		icon: siPython,
+		installCommand: "pip install reloop",
 		fileName: "test_deliverability.py",
-		code: `import requests
-import time
+		checkCode: `import os
+from reloop import Reloop
 
-# 1. Create test session
-res = requests.post("https://reloop.sh/api/tools/v1/deliverability-test").json()
-token = res["token"]
-address = res["address"]
+client = Reloop(api_key=os.environ["RELOOP_API_KEY"])
 
-print(f"Send test email to: {address}")
+# 1. Create a temporary test inbox session
+session = client.tools.deliverability.create_session()
+print(f"Send your test email to: {session.address}")
 
-# 2. Poll for report
-while True:
-    time.sleep(3)
-    data = requests.get(f"https://reloop.sh/api/tools/v1/deliverability-test/{token}").json()
-    if data.get("status") == "received":
-        report = data["report"]
-        print(f"Score: {report['score']}/10 ({report['grade']})")
-        print(f"Verdict: {report['verdictLabel']}")
-        break`,
+# 2. Poll for incoming test results
+report = client.tools.deliverability.poll_session(session.token)
+print(f"Deliverability score: {report.score}/10 ({report.grade})")
+print(f"Verdict: {report.verdict_label}")`,
+		frameworks: [],
 	},
 	{
 		slug: "go",
 		name: "Go",
+		packageName: "github.com/reloop-labs/reloop-go/v2",
 		icon: siGo,
-		fileName: "main.go",
-		code: `package main
+		installCommand: "go get github.com/reloop-labs/reloop-go/v2",
+		fileName: "test_deliverability.go",
+		checkCode: `package main
 
 import (
-	"encoding/json"
+	"context"
 	"fmt"
-	"net/http"
-	"time"
+	"os"
+	"github.com/reloop-labs/reloop-go/v2"
 )
 
-type SessionResponse struct {
-	Token   string \`json:"token"\`
-	Address string \`json:"address"\`
-	Status  string \`json:"status"\`
-}
-
 func main() {
-	resp, _ := http.Post("https://reloop.sh/api/tools/v1/deliverability-test", "application/json", nil)
-	defer resp.Body.Close()
+	client := reloop.New(reloop.WithAPIKey(os.Getenv("RELOOP_API_KEY")))
 
-	var session SessionResponse
-	json.NewDecoder(resp.Body).Decode(&session)
+	session, err := client.Tools.Deliverability.CreateSession(context.Background())
+	if err != nil {
+		panic(err)
+	}
+
 	fmt.Printf("Send test email to: %s\\n", session.Address)
 }`,
+		frameworks: [],
 	},
 	{
 		slug: "php",
 		name: "PHP",
+		packageName: "reloop/reloop-php",
 		icon: siPhp,
-		fileName: "test.php",
-		code: `<?php
-$ch = curl_init("https://reloop.sh/api/tools/v1/deliverability-test");
-curl_setopt($ch, CURLOPT_POST, 1);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-$res = json_decode(curl_exec($ch), true);
-curl_close($ch);
+		installCommand: "composer require reloop/reloop-php",
+		fileName: "test_deliverability.php",
+		checkCode: `<?php
+require 'vendor/autoload.php';
 
-echo "Send test email to: " . $res['address'] . "\\n";
-?>`,
+use Reloop\\Reloop;
+
+$client = new Reloop(getenv('RELOOP_API_KEY'));
+
+$session = $client->tools->deliverability->createSession();
+echo "Send test email to: " . $session->address . "\\n";`,
+		frameworks: [],
 	},
 	{
 		slug: "ruby",
 		name: "Ruby",
+		packageName: "reloop",
 		icon: siRuby,
-		fileName: "deliverability.rb",
-		code: `require 'net/http'
-require 'json'
-require 'uri'
+		installCommand: "gem install reloop",
+		fileName: "test_deliverability.rb",
+		checkCode: `require 'reloop'
 
-uri = URI('https://reloop.sh/api/tools/v1/deliverability-test')
-res = Net::HTTP.post(uri, '')
-session = JSON.parse(res.body)
+client = Reloop::Client.new(api_key: ENV['RELOOP_API_KEY'])
 
-puts "Send test email to: #{session['address']}"`,
+session = client.tools.deliverability.create_session
+puts "Send test email to: #{session.address}"`,
+		frameworks: [],
+	},
+	{
+		slug: "java",
+		name: "Java",
+		packageName: "com.reloop:reloop-java",
+		icon: siOpenjdk,
+		installCommand:
+			"mvn dependency:get -Dartifact=com.reloop:reloop-java:1.0.0",
+		fileName: "TestDeliverability.java",
+		checkCode: `import com.reloop.Reloop;
+import com.reloop.models.DeliverabilitySession;
+
+public class TestDeliverability {
+    public static void main(String[] args) {
+        Reloop client = new Reloop(System.getenv("RELOOP_API_KEY"));
+        DeliverabilitySession session = client.tools().deliverability().createSession();
+        System.out.println("Send test email to: " + session.getAddress());
+    }
+}`,
+		frameworks: [],
 	},
 	{
 		slug: "dotnet",
 		name: ".NET",
+		packageName: "Reloop.Net",
 		icon: siDotnet,
+		installCommand: "dotnet add package Reloop.Net",
 		fileName: "Program.cs",
-		code: `using System.Net.Http.Json;
+		checkCode: `using Reloop;
 
-using var client = new HttpClient();
-var session = await client.PostAsJsonAsync("https://reloop.sh/api/tools/v1/deliverability-test", new { });
-var data = await session.Content.ReadFromJsonAsync<Dictionary<string, string>>();
+var client = new ReloopClient(Environment.GetEnvironmentVariable("RELOOP_API_KEY")!);
 
-Console.WriteLine($"Send test email to: {data?["address"]}");`,
+var session = await client.Tools.Deliverability.CreateSessionAsync();
+Console.WriteLine($"Send test email to: {session.Address}");`,
+		frameworks: [],
 	},
 	{
 		slug: "rust",
 		name: "Rust",
+		packageName: "reloop",
 		icon: siRust,
+		installCommand: "cargo add reloop",
 		fileName: "main.rs",
-		code: `use reqwest;
-use serde_json::Value;
+		checkCode: `use reloop::Reloop;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let client = reqwest::Client::new();
-    let res: Value = client.post("https://reloop.sh/api/tools/v1/deliverability-test")
-        .send()
-        .await?
-        .json()
-        .await?;
-
-    println!("Send test email to: {}", res["address"]);
+    let client = Reloop::new(std::env::var("RELOOP_API_KEY")?);
+    let session = client.tools().deliverability().create_session().await?;
+    println!("Send test email to: {}", session.address);
     Ok(())
 }`,
+		frameworks: [],
 	},
 	{
 		slug: "elixir",
 		name: "Elixir",
+		packageName: "reloop",
 		icon: siElixir,
+		installCommand: "mix hex.install reloop",
 		fileName: "deliverability.exs",
-		code: `{:ok, response} = Req.post("https://reloop.sh/api/tools/v1/deliverability-test")
-address = response.body["address"]
+		checkCode: `client = Reloop.client(System.get_env("RELOOP_API_KEY"))
+{:ok, session} = Reloop.Tools.Deliverability.create_session(client)
+IO.puts("Send test email to: #{session.address}")`,
+		frameworks: [],
+	},
+	{
+		slug: "curl",
+		name: "cURL",
+		packageName: "cURL",
+		icon: siCurl,
+		installCommand: "# Built-in to macOS / Linux / Windows 10+",
+		fileName: "test_deliverability.sh",
+		checkCode: `# 1. Create a temporary test inbox session
+curl -X POST https://reloop.sh/api/tools/v1/deliverability-test
 
-IO.puts("Send test email to: #{address}")`,
+# 2. Send your email to the generated address, then poll:
+curl https://reloop.sh/api/tools/v1/deliverability-test/test-8f3b2c1a`,
+		frameworks: [],
 	},
 ];
 
-export function ApiSection() {
-	const [activeTab, setActiveTab] = useState<string>("nodejs");
-	const [copied, setCopied] = useState(false);
+type PillBox = {
+	width: number;
+	height: number;
+	left: number;
+	top: number;
+};
 
-	const activeLang =
-		TOOL_LANGUAGES.find((l) => l.slug === activeTab) ?? TOOL_LANGUAGES[0]!;
+const PILL_EASE = [0.23, 1, 0.32, 1] as const;
 
-	const handleCopy = async () => {
-		try {
-			await navigator.clipboard.writeText(activeLang.code);
-			setCopied(true);
-			setTimeout(() => setCopied(false), 2000);
-		} catch {}
+function hexToRgba(hex: string, alpha: number) {
+	const value = hex.replace("#", "");
+	const r = Number.parseInt(value.slice(0, 2), 16);
+	const g = Number.parseInt(value.slice(2, 4), 16);
+	const b = Number.parseInt(value.slice(4, 6), 16);
+	return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+function darkenHex(hex: string, amount: number) {
+	const value = hex.replace("#", "");
+	const r = Number.parseInt(value.slice(0, 2), 16);
+	const g = Number.parseInt(value.slice(2, 4), 16);
+	const b = Number.parseInt(value.slice(4, 6), 16);
+	return `rgb(${Math.round(r * amount)}, ${Math.round(g * amount)}, ${Math.round(b * amount)})`;
+}
+
+function measureTab(button: HTMLButtonElement | null): PillBox | null {
+	if (!button) return null;
+	return {
+		width: button.offsetWidth,
+		height: button.offsetHeight,
+		left: button.offsetLeft,
+		top: button.offsetTop,
 	};
+}
+
+function StepItem({
+	number,
+	title,
+	isLast = false,
+	children,
+}: {
+	number: number;
+	title: string;
+	isLast?: boolean;
+	children: React.ReactNode;
+}) {
+	return (
+		<div className="flex gap-3.5">
+			<div className="flex flex-col items-center">
+				<div className="flex size-6 shrink-0 items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-weak-50 font-mono font-semibold text-[11px] text-text-sub-600 dark:border-white/10 dark:bg-white/[0.06] dark:text-white/75">
+					{number}
+				</div>
+				{!isLast && (
+					<div className="my-1.5 w-px flex-1 bg-stroke-soft-200 dark:bg-white/10" />
+				)}
+			</div>
+
+			<div
+				className={`flex min-w-0 flex-1 flex-col gap-2.5 ${isLast ? "" : "pb-6"}`}
+			>
+				<h4 className="mt-0.5 font-medium text-[13.5px] text-text-strong-950 dark:text-white">
+					{title}
+				</h4>
+				<div className="w-full min-w-0">{children}</div>
+			</div>
+		</div>
+	);
+}
+
+export function ApiSection() {
+	const [activeSlug, setActiveSlug] = useState("nodejs");
+	const [pkgManager, setPkgManager] = useState<PackageManager>("npm");
+	const [hoveredTabIdx, setHoveredTabIdx] = useState<number | undefined>(
+		undefined,
+	);
+	const [mounted, setMounted] = useState(false);
+	const [activePill, setActivePill] = useState<PillBox | null>(null);
+	const [hoverPill, setHoverPill] = useState<PillBox | null>(null);
+	const tabButtonRefs = useRef<(HTMLButtonElement | null)[]>([]);
+	const containerRef = useRef<HTMLDivElement>(null);
+
+	useEffect(() => {
+		setMounted(true);
+	}, []);
+
+	const activeTabIndex = TOOL_LANGUAGES.findIndex((l) => l.slug === activeSlug);
+	const isHoveringOther =
+		hoveredTabIdx !== undefined && hoveredTabIdx !== activeTabIndex;
+	const hoverBrandColor =
+		isHoveringOther && hoveredTabIdx !== undefined
+			? `#${TOOL_LANGUAGES[hoveredTabIdx]!.icon.hex}`
+			: undefined;
+
+	const active =
+		TOOL_LANGUAGES.find((l) => l.slug === activeSlug) ?? TOOL_LANGUAGES[0]!;
+	const brandColor = `#${active.icon.hex}`;
+
+	const [selectedFrameworkSlug, setSelectedFrameworkSlug] = useState<
+		string | null
+	>(null);
+	const [hoveredFwEl, setHoveredFwEl] = useState<HTMLElement | undefined>(
+		undefined,
+	);
+	const [activeFwEl, setActiveFwEl] = useState<HTMLElement | undefined>(
+		undefined,
+	);
+	const [fwContainerEl, setFwContainerEl] = useState<HTMLDivElement | null>(
+		null,
+	);
+	const fwRefs = useRef<(HTMLElement | null)[]>([]);
+
+	useEffect(() => {
+		setSelectedFrameworkSlug(null);
+		setHoveredFwEl(undefined);
+	}, [activeSlug]);
+
+	const activeFramework = selectedFrameworkSlug
+		? (active.frameworks.find((fw) => fw.slug === selectedFrameworkSlug) ??
+			null)
+		: null;
+
+	const isLanguageSelected = activeFramework === null;
+
+	useLayoutEffect(() => {
+		if (!fwContainerEl) {
+			setActiveFwEl(undefined);
+			return;
+		}
+		const selected = fwContainerEl.querySelector<HTMLElement>(
+			'[role="tab"][aria-selected="true"]',
+		);
+		setActiveFwEl(selected ?? undefined);
+	}, [fwContainerEl, selectedFrameworkSlug, activeSlug]);
+
+	const isHoveringOtherFw = Boolean(
+		hoveredFwEl && activeFwEl && hoveredFwEl !== activeFwEl,
+	);
+
+	const fwActiveBox = useSidebarHoverBox(
+		activeFwEl,
+		fwContainerEl,
+		`${active.slug}:${activeFramework?.slug}`,
+	);
+	const fwHoverBox = useSidebarHoverBox(
+		isHoveringOtherFw ? hoveredFwEl : undefined,
+		fwContainerEl,
+		`${active.slug}:hover:${activeFramework?.slug}`,
+	);
+
+	const installCode =
+		active.slug === "nodejs"
+			? nodeInstallCommands[pkgManager]
+			: active.installCommand;
+
+	const sendCode = activeFramework ? activeFramework.code : active.checkCode;
+
+	useEffect(() => {
+		if (!mounted) {
+			setActivePill(null);
+			setHoverPill(null);
+			return;
+		}
+
+		const updatePosition = () => {
+			setActivePill(measureTab(tabButtonRefs.current[activeTabIndex] ?? null));
+			setHoverPill(
+				isHoveringOther && hoveredTabIdx !== undefined
+					? measureTab(tabButtonRefs.current[hoveredTabIdx] ?? null)
+					: null,
+			);
+		};
+
+		const handle = requestAnimationFrame(updatePosition);
+		const container = containerRef.current;
+		let observer: ResizeObserver | null = null;
+		if (container) {
+			observer = new ResizeObserver(updatePosition);
+			observer.observe(container);
+		}
+		window.addEventListener("resize", updatePosition);
+
+		return () => {
+			cancelAnimationFrame(handle);
+			observer?.disconnect();
+			window.removeEventListener("resize", updatePosition);
+		};
+	}, [activeTabIndex, hoveredTabIdx, isHoveringOther, mounted, activeSlug]);
 
 	return (
-		<div className="grid grid-cols-1 gap-6 border-t border-stroke-soft-200 p-6 sm:p-8 lg:grid-cols-2 dark:border-white/10">
-			{/* Left Column: Request Code */}
-			<div className="flex flex-col overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 shadow-sm dark:border-white/10 dark:bg-[#121212]">
-				{/* Language Selector Bar */}
-				<div className="flex items-center justify-between border-b border-stroke-soft-200 bg-bg-weak-50/70 px-4 py-2.5 dark:border-white/10 dark:bg-white/[0.02]">
-					<div className="flex flex-wrap items-center gap-1.5 overflow-x-auto">
-						{TOOL_LANGUAGES.map((lang) => {
-							const isActive = lang.slug === activeTab;
-							return (
-								<button
-									key={lang.slug}
-									type="button"
-									onClick={() => setActiveTab(lang.slug)}
+		<div className="w-full">
+			{/* Language tabs */}
+			<div className="border-stroke-soft-200 border-b dark:border-white/10">
+				<div
+					ref={containerRef}
+					role="tablist"
+					aria-label="Deliverability tester SDK languages"
+					onPointerLeave={() => setHoveredTabIdx(undefined)}
+					className="scrollbar-none relative flex gap-1 overflow-x-auto px-6 py-3 sm:px-10 sm:py-3.5 lg:px-12"
+					style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+				>
+					{TOOL_LANGUAGES.map((lang, index) => {
+						const isActive = lang.slug === activeSlug;
+						const langBrandColor = `#${lang.icon.hex}`;
+						const showActiveLabel = isActive && Boolean(activePill || !mounted);
+						const isTabLangDark = isDarkBrandColor(lang.icon.hex);
+
+						return (
+							<button
+								key={lang.slug}
+								ref={(el) => {
+									tabButtonRefs.current[index] = el;
+								}}
+								type="button"
+								role="tab"
+								aria-selected={isActive}
+								id={`deliverability-tab-${lang.slug}`}
+								onClick={() => setActiveSlug(lang.slug)}
+								onPointerEnter={() => setHoveredTabIdx(index)}
+								className={cn(
+									"relative z-10 inline-flex shrink-0 items-center gap-2 rounded-full px-3.5 py-2 font-medium text-xs transition-colors duration-150 ease-[cubic-bezier(0.23,1,0.32,1)]",
+									!mounted && isActive
+										? "bg-text-strong-950 text-white shadow-[0_1.5px_0_0_#1a1a1a,inset_0_0.5px_0_0_rgba(255,255,255,0.45)] dark:bg-white dark:text-black dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.55),0_0_0_0.5px_rgba(255,255,255,0.08),inset_0_0.5px_0_0_rgba(255,255,255,0.28)]"
+										: showActiveLabel
+											? "text-white"
+											: "text-text-sub-600 dark:text-white/60",
+								)}
+							>
+								<span
 									className={cn(
-										"flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-[12px] transition-colors",
-										isActive
-											? "bg-bg-white-0 font-medium text-text-strong-950 shadow-sm dark:bg-white/10 dark:text-white"
-											: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/50 dark:hover:text-white",
+										"inline-flex items-center",
+										!showActiveLabel &&
+											isTabLangDark &&
+											"text-text-strong-950 dark:text-white",
 									)}
+									style={{
+										color: showActiveLabel
+											? "#ffffff"
+											: isTabLangDark
+												? undefined
+												: langBrandColor,
+									}}
 								>
 									<LanguageIcon icon={lang.icon} className="size-3.5" />
-									{lang.name}
-								</button>
-							);
-						})}
-					</div>
+								</span>
+								{lang.name}
+							</button>
+						);
+					})}
 
-					<button
-						type="button"
-						onClick={handleCopy}
-						className="flex items-center gap-1 text-[12px] text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/40 dark:hover:text-white"
-					>
-						<Icon name={copied ? "check" : "copy-01"} className="size-3.5" />
-						{copied ? "Copied" : "Copy"}
-					</button>
-				</div>
+					<AnimatePresence>
+						{hoverPill && hoverBrandColor ? (
+							<motion.div
+								key="hover-pill"
+								className="pointer-events-none absolute top-0 left-0 rounded-full"
+								style={{ backgroundColor: hexToRgba(hoverBrandColor, 0.14) }}
+								initial={{ ...hoverPill, opacity: 0 }}
+								animate={{ ...hoverPill, opacity: 1 }}
+								exit={{ ...hoverPill, opacity: 0 }}
+								transition={{ duration: 0.16, ease: PILL_EASE }}
+							/>
+						) : null}
+					</AnimatePresence>
 
-				<div className="flex-1 p-4 font-mono text-[13px]">
-					<SdkCodeBlock
-						code={activeLang.code}
-						slug={activeLang.slug === "curl" ? "bash" : activeLang.slug}
-						path={activeLang.fileName}
-					/>
+					<AnimatePresence>
+						{activePill ? (
+							<motion.div
+								key="active-pill"
+								className="pointer-events-none absolute top-0 left-0 rounded-full p-px pb-[2px]"
+								style={{ backgroundColor: darkenHex(brandColor, 0.55) }}
+								initial={{ ...activePill, opacity: 0 }}
+								animate={{ ...activePill, opacity: 1 }}
+								exit={{ ...activePill, opacity: 0 }}
+								transition={{ duration: 0.2, ease: PILL_EASE }}
+							>
+								<div
+									className="size-full rounded-full shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.45)] dark:shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.28),0_0_0_0.5px_rgba(255,255,255,0.08)]"
+									style={{ backgroundColor: brandColor }}
+								/>
+							</motion.div>
+						) : null}
+					</AnimatePresence>
 				</div>
 			</div>
 
-			{/* Right Column: Sample JSON Response */}
-			<div className="flex flex-col overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 shadow-sm dark:border-white/10 dark:bg-[#121212]">
-				<div className="flex items-center justify-between border-b border-stroke-soft-200 bg-bg-weak-50/70 px-4 py-2.5 dark:border-white/10 dark:bg-white/[0.02]">
-					<span className="font-mono text-[12px] text-text-sub-600 dark:text-white/45">
-						JSON Response (200 OK)
-					</span>
-					<span className="inline-flex items-center gap-1 rounded bg-emerald-500/10 px-1.5 py-0.5 font-mono text-[11px] text-emerald-600 dark:text-emerald-400">
-						Unauthenticated
-					</span>
-				</div>
+			{/* Content: left meta + right code steps */}
+			<div className="grid grid-cols-1 border-stroke-soft-200 border-b lg:grid-cols-12 dark:border-white/10">
+				{/* Left meta & frameworks rail */}
+				<aside className="border-stroke-soft-200 border-b bg-transparent lg:col-span-3 lg:border-r lg:border-b-0 dark:border-white/10">
+					<div className="flex flex-col gap-4 px-6 py-6 sm:px-10 sm:py-7 lg:sticky lg:top-16 lg:py-8 lg:pr-5 lg:pl-12">
+						<div className="flex items-center gap-3">
+							<div
+								className={cn(
+									"inline-flex size-10 items-center justify-center rounded-xl border border-stroke-soft-200 bg-bg-white-0 dark:border-white/10 dark:bg-black",
+									isDarkBrandColor(active.icon.hex) &&
+										"text-text-strong-950 dark:text-white",
+								)}
+								style={getBrandColorStyle(active.icon.hex)}
+							>
+								<LanguageIcon icon={active.icon} className="size-4.5" />
+							</div>
+							<div className="min-w-0">
+								<h3 className="font-semibold text-base text-text-strong-950 tracking-tight dark:text-white">
+									{active.name}
+								</h3>
+								<p className="truncate font-mono text-[11px] text-text-sub-600 dark:text-white/45">
+									{active.packageName}
+								</p>
+							</div>
+						</div>
 
-				<div className="flex-1 p-4 font-mono text-[12px]">
-					<SdkCodeBlock code={apiResponseSample} slug="json" path="response.json" />
+						{/* Frameworks / SDK selector */}
+						<div className="-ml-2.5 mt-3 flex flex-col">
+							<div className="px-2.5 pb-1.5 font-semibold text-[10px] text-text-soft-400 uppercase tracking-[0.06em] dark:text-white/45">
+								{active.frameworks.length > 0 ? "Frameworks" : "Integration"}
+							</div>
+							<div
+								ref={setFwContainerEl}
+								role="tablist"
+								aria-label={`${active.name} options`}
+								className="relative flex w-full flex-col"
+								onPointerLeave={() => setHoveredFwEl(undefined)}
+							>
+								<button
+									ref={(el) => {
+										if (el) fwRefs.current[0] = el;
+									}}
+									type="button"
+									role="tab"
+									aria-selected={isLanguageSelected}
+									onPointerEnter={() =>
+										setHoveredFwEl(fwRefs.current[0] ?? undefined)
+									}
+									onClick={() => setSelectedFrameworkSlug(null)}
+									className="group relative z-10 flex h-8 w-full cursor-pointer items-center gap-2.5 rounded-lg px-2.5 text-left transition-colors"
+								>
+									<span
+										className={cn(
+											"flex size-4 shrink-0 items-center justify-center",
+											isDarkBrandColor(active.icon.hex) &&
+												"text-text-strong-950 dark:text-white",
+										)}
+										style={getBrandColorStyle(active.icon.hex)}
+									>
+										<LanguageIcon icon={active.icon} className="size-3.5" />
+									</span>
+									<span
+										className={cn(
+											"truncate font-medium text-[13px] transition-colors",
+											isLanguageSelected
+												? "text-text-strong-950 dark:text-white"
+												: "text-text-sub-600 group-hover:text-text-strong-950 dark:text-white/60 dark:group-hover:text-white",
+										)}
+									>
+										{active.name} SDK
+									</span>
+								</button>
+
+								<AnimatedHoverBackground box={fwHoverBox ?? fwActiveBox} />
+							</div>
+						</div>
+
+						{/* Prerequisites */}
+						<div className="mt-4 border-stroke-soft-200/60 border-t pt-4 dark:border-white/10">
+							<span className="block font-semibold text-[10px] text-text-soft-400 uppercase tracking-[0.06em] dark:text-white/45">
+								Prerequisites
+							</span>
+							<ul className="mt-2.5 space-y-2 text-[12.5px]">
+								<li>
+									<a
+										href="/docs/learn/api-keys"
+										className="group flex items-center gap-2 text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white"
+									>
+										<Icon
+											name="key"
+											className="size-3.5 text-text-soft-400 dark:text-white/40"
+										/>
+										<span>Get an API key</span>
+									</a>
+								</li>
+								<li>
+									<a
+										href="/docs/setup/backend/tools"
+										className="group flex items-center gap-2 text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white"
+									>
+										<Icon
+											name="globe-02"
+											className="size-3.5 text-text-soft-400 dark:text-white/40"
+										/>
+										<span>API documentation</span>
+									</a>
+								</li>
+							</ul>
+						</div>
+					</div>
+				</aside>
+
+				{/* Right: Installation & Code Sample Steps */}
+				<div className="px-6 py-6 sm:px-10 sm:py-7 lg:col-span-9 lg:px-12 lg:py-8">
+					<StepItem number={1} title={`Install the ${active.name} package`}>
+						{active.slug === "nodejs" ? (
+							<SdkCodeBlock
+								code={installCode}
+								slug={active.slug}
+								tabs={NODE_PKG_TABS}
+								activeTab={pkgManager}
+								onTabChange={(tab: string) =>
+									setPkgManager(tab as PackageManager)
+								}
+							/>
+						) : (
+							<SdkCodeBlock code={installCode} slug={active.slug} lang="bash" />
+						)}
+					</StepItem>
+
+					<StepItem
+						number={2}
+						title={`Test deliverability with ${active.name}`}
+						isLast={false}
+					>
+						<SdkCodeBlock
+							code={sendCode}
+							slug={active.slug}
+							path={active.fileName}
+						/>
+					</StepItem>
+
+					<StepItem
+						number={3}
+						title="Inspect JSON deliverability report (200 OK)"
+						isLast={true}
+					>
+						<SdkCodeBlock
+							code={apiResponseSample}
+							slug="json"
+							path="response.json"
+						/>
+					</StepItem>
 				</div>
 			</div>
 		</div>

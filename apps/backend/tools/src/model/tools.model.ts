@@ -228,7 +228,12 @@ export namespace ToolsModel {
 		checkedIps: t.Array(
 			t.Object({
 				ip: t.String(),
-				source: t.Union([t.Literal("input"), t.Literal("spf")]),
+				source: t.Union([
+					t.Literal("input"),
+					t.Literal("spf"),
+					t.Literal("mx"),
+					t.Literal("a"),
+				]),
 				version: t.Union([t.Literal("ipv4"), t.Literal("ipv6")]),
 			}),
 		),

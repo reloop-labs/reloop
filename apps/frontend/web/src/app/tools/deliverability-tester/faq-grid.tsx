@@ -20,8 +20,11 @@ export function FaqGrid({
 	};
 
 	return (
-		<div id={id} className="mx-auto max-w-4xl px-5 py-8 sm:px-6 sm:py-12 md:px-8">
-			<div className="overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 divide-y divide-stroke-soft-200 shadow-xs dark:border-white/10 dark:divide-white/10 dark:bg-[#0b0b0b]">
+		<div
+			id={id}
+			className="mx-auto max-w-4xl px-5 py-8 sm:px-6 sm:py-12 md:px-8"
+		>
+			<div className="divide-y divide-stroke-soft-200 overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 shadow-xs dark:divide-white/10 dark:border-white/10 dark:bg-[#0b0b0b]">
 				{allItems.map((faq, index) => {
 					const isOpen = openIndex === index;
 

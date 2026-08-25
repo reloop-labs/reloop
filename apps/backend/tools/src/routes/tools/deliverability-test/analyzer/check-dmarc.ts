@@ -1,4 +1,5 @@
 import dns from "node:dns/promises";
+import { withDeadline } from "@be/tools/utils/deadline";
 import type { CheckItem } from "../deliverability-test.types";
 import type { DkimCheckResult } from "./check-dkim";
 import type { ParsedEmailData } from "./parse-mime";
@@ -51,7 +52,11 @@ async function fetchDmarcRecord(
 ): Promise<{ record: string | null; queryHost: string }> {
 	const queryHost = `_dmarc.${domain}`;
 	try {
-		const txtRecords = await dns.resolveTxt(queryHost);
+		const txtRecords = await withDeadline(
+			dns.resolveTxt(queryHost),
+			2000,
+			`DMARC TXT lookup for ${queryHost}`,
+		);
 		const flat = txtRecords.map((r) => r.join("")).filter((r) => r.trim().startsWith("v=DMARC1"));
 		if (flat.length > 0 && flat[0]) {
 			return { record: flat[0], queryHost };
@@ -63,7 +68,11 @@ async function fetchDmarcRecord(
 	if (orgDomain !== domain) {
 		const orgQueryHost = `_dmarc.${orgDomain}`;
 		try {
-			const txtRecords = await dns.resolveTxt(orgQueryHost);
+			const txtRecords = await withDeadline(
+				dns.resolveTxt(orgQueryHost),
+				2000,
+				`DMARC org domain lookup for ${orgQueryHost}`,
+			);
 			const flat = txtRecords.map((r) => r.join("")).filter((r) => r.trim().startsWith("v=DMARC1"));
 			if (flat.length > 0 && flat[0]) {
 				return { record: flat[0], queryHost: orgQueryHost };

@@ -106,7 +106,7 @@ export default function DeliverabilityTesterPage() {
 							Free tool — no sign-up required
 						</span>
 
-						<h1 className="mt-6 font-semibold text-[2.4rem] text-text-strong-950 leading-[1.05] tracking-[-1.4px] sm:text-[3.4rem] text-balance dark:text-white">
+						<h1 className="mt-6 text-balance font-semibold text-[2.4rem] text-text-strong-950 leading-[1.05] tracking-[-1.4px] sm:text-[3.4rem] dark:text-white">
 							Email Deliverability &amp; Spam Tester
 						</h1>
 
@@ -128,7 +128,7 @@ export default function DeliverabilityTesterPage() {
 					description="Evaluate technical mail server compliance, cryptographic signatures, and spam filter heuristics before sending campaigns to real customers."
 				/>
 
-				<div className="grid grid-cols-1 border-t border-stroke-soft-200 divide-y divide-stroke-soft-200 sm:grid-cols-2 sm:divide-y-0 sm:divide-x lg:grid-cols-4 dark:border-white/10 dark:divide-white/10">
+				<div className="grid grid-cols-1 divide-y divide-stroke-soft-200 border-stroke-soft-200 border-t sm:grid-cols-2 sm:divide-x sm:divide-y-0 lg:grid-cols-4 dark:divide-white/10 dark:border-white/10">
 					{reasons.map((reason) => (
 						<div
 							key={reason.title}

@@ -1,4 +1,5 @@
 import dns from "node:dns/promises";
+import { withDeadline } from "@be/tools/utils/deadline";
 import type { CheckItem } from "../deliverability-test.types";
 import type { ParsedEmailData } from "./parse-mime";
 
@@ -6,12 +7,25 @@ export interface SpfCheckResult {
 	item: CheckItem;
 	spfDomain: string;
 	spfRecord: string | null;
-	result: "pass" | "neutral" | "softfail" | "fail" | "none" | "temperror" | "permerror";
+	result:
+	| "pass"
+	| "neutral"
+	| "softfail"
+	| "fail"
+	| "none"
+	| "temperror"
+	| "permerror";
 }
 
-async function fetchSpfRecord(domain: string): Promise<{ record: string | null; error?: string }> {
+async function fetchSpfRecord(
+	domain: string,
+): Promise<{ record: string | null; error?: string }> {
 	try {
-		const txtRecords = await dns.resolveTxt(domain);
+		const txtRecords = await withDeadline(
+			dns.resolveTxt(domain),
+			2000,
+			`SPF TXT lookup for ${domain}`,
+		);
 		const flatRecords = txtRecords.map((r) => r.join(""));
 		const spfRecords = flatRecords.filter((r) => r.trim().startsWith("v=spf1"));
 
@@ -19,7 +33,10 @@ async function fetchSpfRecord(domain: string): Promise<{ record: string | null; 
 			return { record: null };
 		}
 		if (spfRecords.length > 1) {
-			return { record: spfRecords[0], error: "Multiple SPF records found (RFC 7208 violation)" };
+			return {
+				record: spfRecords[0],
+				error: "Multiple SPF records found (RFC 7208 violation)",
+			};
 		}
 		return { record: spfRecords[0] };
 	} catch (e: unknown) {
@@ -31,7 +48,9 @@ async function fetchSpfRecord(domain: string): Promise<{ record: string | null; 
 	}
 }
 
-export async function checkSpf(email: ParsedEmailData): Promise<SpfCheckResult> {
+export async function checkSpf(
+	email: ParsedEmailData,
+): Promise<SpfCheckResult> {
 	// Determine the domain for SPF evaluation (Return-Path is primary, fallback to From domain)
 	let spfDomain = email.from.domain;
 	if (email.returnPath && email.returnPath.includes("@")) {
@@ -50,7 +69,9 @@ export async function checkSpf(email: ParsedEmailData): Promise<SpfCheckResult> 
 				mark: -2.0,
 				status: "fail",
 				description: "No sender domain found to evaluate SPF.",
-				recommendations: ["Ensure your email includes a valid Return-Path or From address."],
+				recommendations: [
+					"Ensure your email includes a valid Return-Path or From address.",
+				],
 			},
 		};
 	}
@@ -59,7 +80,8 @@ export async function checkSpf(email: ParsedEmailData): Promise<SpfCheckResult> 
 	const receivedSpf = email.headers["received-spf"] || "";
 	const authResults = email.headers["authentication-results"] || "";
 
-	let headerVerdict: "pass" | "neutral" | "softfail" | "fail" | "none" | null = null;
+	let headerVerdict: "pass" | "neutral" | "softfail" | "fail" | "none" | null =
+		null;
 	if (receivedSpf) {
 		const lower = receivedSpf.toLowerCase();
 		if (lower.startsWith("pass")) headerVerdict = "pass";
@@ -72,13 +94,19 @@ export async function checkSpf(email: ParsedEmailData): Promise<SpfCheckResult> 
 		if (match && match[1]) {
 			const res = match[1].toLowerCase();
 			if (["pass", "neutral", "softfail", "fail", "none"].includes(res)) {
-				headerVerdict = res as "pass" | "neutral" | "softfail" | "fail" | "none";
+				headerVerdict = res as
+					| "pass"
+					| "neutral"
+					| "softfail"
+					| "fail"
+					| "none";
 			}
 		}
 	}
 
 	// 2. Query DNS for the SPF record
-	const { record: spfRecord, error: dnsError } = await fetchSpfRecord(spfDomain);
+	const { record: spfRecord, error: dnsError } =
+		await fetchSpfRecord(spfDomain);
 
 	if (dnsError && dnsError.includes("Multiple SPF records")) {
 		return {
@@ -139,7 +167,9 @@ export async function checkSpf(email: ParsedEmailData): Promise<SpfCheckResult> 
 				details: [
 					`Domain: ${spfDomain}`,
 					`Record: ${spfRecord}`,
-					email.connectingIp ? `Connecting IP: ${email.connectingIp}` : "Sender IP authorized",
+					email.connectingIp
+						? `Connecting IP: ${email.connectingIp}`
+						: "Sender IP authorized",
 				],
 			},
 		};
@@ -155,7 +185,8 @@ export async function checkSpf(email: ParsedEmailData): Promise<SpfCheckResult> 
 				title: "SPF (Sender Policy Framework)",
 				mark: -1.0,
 				status: "warn",
-				description: `SPF resulted in SoftFail (~all). The sending IP is not explicitly authorized.`,
+				description:
+					"SPF resulted in SoftFail (~all). The sending IP is not explicitly authorized.",
 				details: [
 					`Domain: ${spfDomain}`,
 					`Record: ${spfRecord}`,
@@ -178,7 +209,8 @@ export async function checkSpf(email: ParsedEmailData): Promise<SpfCheckResult> 
 				title: "SPF (Sender Policy Framework)",
 				mark: -2.0,
 				status: "fail",
-				description: `SPF resulted in Hard Fail (-all). The sending IP is explicitly unauthorized.`,
+				description:
+					"SPF resulted in Hard Fail (-all). The sending IP is explicitly unauthorized.",
 				details: [
 					`Domain: ${spfDomain}`,
 					`Record: ${spfRecord}`,
@@ -192,7 +224,8 @@ export async function checkSpf(email: ParsedEmailData): Promise<SpfCheckResult> 
 	}
 
 	// Default fallback when SPF record exists
-	const hasStrictOrSoft = spfRecord.includes("-all") || spfRecord.includes("~all");
+	const hasStrictOrSoft =
+		spfRecord.includes("-all") || spfRecord.includes("~all");
 	return {
 		spfDomain,
 		spfRecord,
@@ -203,12 +236,11 @@ export async function checkSpf(email: ParsedEmailData): Promise<SpfCheckResult> 
 			mark: hasStrictOrSoft ? 0 : -0.5,
 			status: hasStrictOrSoft ? "pass" : "warn",
 			description: `SPF record found for "${spfDomain}".`,
-			details: [
-				`Domain: ${spfDomain}`,
-				`Record: ${spfRecord}`,
-			],
+			details: [`Domain: ${spfDomain}`, `Record: ${spfRecord}`],
 			recommendations: !hasStrictOrSoft
-				? ["We recommend ending your SPF record with '~all' or '-all' rather than '?all' or '+all'."]
+				? [
+					"We recommend ending your SPF record with '~all' or '-all' rather than '?all' or '+all'.",
+				]
 				: undefined,
 		},
 	};

@@ -10,7 +10,7 @@ const RESOLVE_TIMEOUT_MS = 1500;
 
 export type InputType = "domain" | "ip";
 export type IpVersion = "ipv4" | "ipv6";
-export type CheckedIpSource = "input" | "spf";
+export type CheckedIpSource = "input" | "spf" | "mx" | "a";
 
 export interface CheckedIp {
 	ip: string;

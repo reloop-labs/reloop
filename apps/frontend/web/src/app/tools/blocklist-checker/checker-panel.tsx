@@ -5,11 +5,11 @@ import * as Badge from "@reloop/ui/badge";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as CompactButton from "@reloop/ui/compact-button";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import { KbdKey } from "@reloop/ui/kbd-key";
 import * as LinkButton from "@reloop/ui/link-button";
-import * as Select from "@reloop/ui/select";
 import Spinner from "@reloop/ui/spinner";
 import Link from "next/link";
 import { type FormEvent, useEffect, useRef, useState } from "react";
@@ -21,6 +21,7 @@ import {
 	runBlocklistCheck,
 } from "./check-api";
 import { domainBlocklistCount, ipBlocklistCount } from "./content";
+import { TableFooter } from "./table-footer";
 
 const PRESETS = [
 	{ label: "reloop.sh", value: "reloop.sh" },
@@ -50,20 +51,43 @@ const kbdClassName = cn(
 	"dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.55),0_0_0_0.5px_rgba(255,255,255,0.06),inset_0_0.5px_0_0_rgba(255,255,255,0.08)]",
 );
 
-function verdictCopy(verdict: BlocklistVerdict): {
+function verdictCopy(
+	verdict: BlocklistVerdict,
+	listedCount = 0,
+): {
 	title: string;
+	badgeLabel: string;
 	icon: "shield-check" | "alert-triangle" | "info-outline";
 } {
 	if (verdict === "listed") {
-		return { title: "Listings found", icon: "alert-triangle" };
+		return {
+			title:
+				listedCount === 1
+					? "Listed on 1 Blocklist"
+					: `Listed on ${listedCount} Blocklists`,
+			badgeLabel: `${listedCount} Listed`,
+			icon: "alert-triangle",
+		};
 	}
 	if (verdict === "inconclusive") {
 		return {
-			title: "Incomplete — some lists did not answer",
+			title: "Inconclusive — Some Lists Did Not Respond",
+			badgeLabel: "Inconclusive",
 			icon: "info-outline",
 		};
 	}
-	return { title: "No listings on lists that answered", icon: "shield-check" };
+	return {
+		title: "Clean — No Blocklist Listings Found",
+		badgeLabel: "Clean",
+		icon: "shield-check",
+	};
+}
+
+function formatIpSource(source: string): string {
+	if (source === "mx") return "via MX";
+	if (source === "spf") return "via SPF";
+	if (source === "a") return "via A record";
+	return "";
 }
 
 function statusLabel(item: DnsblCheckItemResult): string {
@@ -201,7 +225,9 @@ https://reloop.sh/tools/blocklist-checker`;
 		page * pageSize,
 	);
 
-	const headline = result ? verdictCopy(result.verdict) : null;
+	const headline = result
+		? verdictCopy(result.verdict, result.listedCount)
+		: null;
 
 	return (
 		<div className="mx-auto max-w-5xl">
@@ -210,36 +236,41 @@ https://reloop.sh/tools/blocklist-checker`;
 					onSubmit={handleSubmit}
 					className="flex flex-col gap-2.5 sm:flex-row sm:items-center"
 				>
-					<Input.Root className="flex-1">
+					<Input.Root size="small" className="flex-1">
 						<Input.Wrapper>
 							<Input.Input
 								value={input}
 								onChange={(e) => setInput(e.target.value)}
-								placeholder="Sending IP or domain name — e.g. 203.0.113.10 or example.com"
-								className="font-mono"
+								placeholder="Enter an IP address (e.g. 198.51.100.42) or domain (e.g. stripe.com)"
+								disabled={isLoading}
 							/>
 						</Input.Wrapper>
 					</Input.Root>
 
-					<Button.Root
+					<FancyButton.Root
 						type="submit"
-						variant="neutral"
-						mode="filled"
-						size="medium"
+						variant="primary"
+						size="small"
 						disabled={isLoading || !input.trim()}
-						className="shrink-0"
 					>
 						{isLoading ? (
-							<Spinner size={14} color="currentColor" />
+							<>
+								<Spinner size={18} />
+								<span>Checking...</span>
+							</>
 						) : (
-							<Button.Icon as={Icon} name="search" />
+							<>
+								<FancyButton.Icon>
+									<Icon name="search" className="size-4" />
+								</FancyButton.Icon>
+								<span>Check Blocklists</span>
+							</>
 						)}
-						{isLoading ? "Querying lists…" : "Check blocklists"}
-					</Button.Root>
+					</FancyButton.Root>
 				</form>
 
-				<div className="mt-3.5 flex flex-wrap items-center gap-1.5 border-stroke-soft-200/50 border-t pt-3 dark:border-white/10">
-					<span className="font-mono text-[11px] text-text-soft-400 uppercase tracking-[0.12em] dark:text-white/35">
+				<div className="mt-3.5 flex flex-wrap items-center gap-1.5 text-[12px] text-text-sub-600 dark:text-white/45">
+					<span className="mr-1 font-mono text-[11px] uppercase tracking-wider">
 						Try sample:
 					</span>
 					{PRESETS.map((preset) => (
@@ -305,7 +336,7 @@ https://reloop.sh/tools/blocklist-checker`;
 									/>
 								</div>
 
-								<div>
+								<div className="min-w-0 flex-1">
 									<div className="flex flex-wrap items-center gap-2">
 										<h2 className="font-semibold text-[17px] text-text-strong-950 tracking-tight sm:text-[19px] dark:text-white">
 											{headline?.title}
@@ -315,66 +346,80 @@ https://reloop.sh/tools/blocklist-checker`;
 											variant="lighter"
 											color={verdictBadgeColor(result.verdict)}
 										>
-											{result.listedCount} listed
+											<Badge.Dot />
+											{headline?.badgeLabel}
 										</Badge.Root>
 									</div>
 
-									<p className="mt-1 text-[12.5px] text-text-sub-600 dark:text-white/50">
-										Target:{" "}
-										<span className="font-medium font-mono text-text-strong-950 dark:text-white">
-											{result.target}
+									<div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px] text-text-sub-600 dark:text-white/60">
+										<span>
+											Target:{" "}
+											<strong className="font-mono font-semibold text-text-strong-950 dark:text-white">
+												{result.target}
+											</strong>
 										</span>
 										{result.checkedIps.length > 0 && (
-											<>
-												{" "}
-												· IPs:{" "}
-												<span className="font-medium font-mono text-text-strong-950 dark:text-white">
+											<span>
+												· Mail Server IP:{" "}
+												<strong className="font-mono font-semibold text-text-strong-950 dark:text-white">
 													{result.checkedIps
-														.map((item) => `${item.ip} (${item.source})`)
+														.map((item) => {
+															const src = formatIpSource(item.source);
+															return src ? `${item.ip} (${src})` : item.ip;
+														})
 														.join(", ")}
-												</span>
-											</>
-										)}{" "}
-										· {result.scanDurationMs}ms
-									</p>
-									{result.ipNote && (
-										<p className="mt-1.5 text-[12.5px] text-text-sub-600 dark:text-white/50">
-											{result.ipNote}
-										</p>
-									)}
+												</strong>
+											</span>
+										)}
+										<span>
+											· Scan Time:{" "}
+											<span className="font-mono">
+												{result.scanDurationMs}ms
+											</span>
+										</span>
+									</div>
+
 									{result.recommendations[0] && (
-										<p className="mt-1.5 text-[12.5px] text-text-sub-600 dark:text-white/50">
+										<p className="mt-2 text-[13px] text-text-sub-600 leading-relaxed dark:text-white/70">
 											{result.recommendations[0]}
 										</p>
 									)}
+
+									<p className="mt-1.5 text-[11.5px] text-text-sub-600/80 dark:text-white/40">
+										Note: Major mailbox providers (Gmail, Outlook, Yahoo) also
+										track internal private sender reputation not published on
+										public DNSBLs.
+									</p>
 								</div>
 							</div>
 
 							<div className="flex shrink-0 items-center gap-2">
-								<Button.Root
+								<FancyButton.Root
 									type="button"
-									variant="neutral"
-									mode="stroke"
+									variant="basic"
 									size="small"
 									onClick={handleCopyReport}
 									className="shrink-0"
 								>
-									<Button.Icon as={Icon} name={copied ? "check" : "copy"} />
+									<FancyButton.Icon>
+										<Icon name={copied ? "check" : "copy"} className="size-4" />
+									</FancyButton.Icon>
 									{copied ? "Copied" : "Copy report"}
-								</Button.Root>
+								</FancyButton.Root>
 
-								<Button.Root
+								<FancyButton.Root
 									variant="neutral"
-									mode="filled"
 									size="small"
 									asChild
 									className="shrink-0"
 								>
 									<Link href="/dashboard/signup">
 										Send with Reloop
-										<Button.Icon as={Icon} name="arrow-right" />
+										<FancyButton.Icon>
+											<Icon name="arrow-right" className="size-4" />
+										</FancyButton.Icon>
 									</Link>
-								</Button.Root>
+								</FancyButton.Root>
 							</div>
 						</div>
 					</div>
@@ -417,7 +462,7 @@ https://reloop.sh/tools/blocklist-checker`;
 								/>
 								<CompactButton.Root
 									variant="ghost"
-									size="large"
+									size="medium"
 									type="button"
 									tabIndex={-1}
 									aria-label="Focus search"
@@ -522,67 +567,19 @@ https://reloop.sh/tools/blocklist-checker`;
 							)}
 						</div>
 
-						{filteredResults.length > 0 && (
-							<div className="flex flex-col items-center justify-between gap-3 border-stroke-soft-200 border-t px-4 py-3 text-label-xs text-text-sub-600 sm:flex-row sm:px-6 dark:border-white/10 dark:text-white/60">
-								<div className="flex items-center gap-3">
-									<span>
-										Showing{" "}
-										{Math.min(
-											filteredResults.length,
-											(page - 1) * pageSize + 1,
-										)}
-										–{Math.min(filteredResults.length, page * pageSize)} of{" "}
-										{filteredResults.length} lists
-									</span>
-									<Select.Root
-										size="xsmall"
-										variant="compact"
-										value={String(pageSize)}
-										onValueChange={(value) => {
-											setPageSize(Number(value));
-											setCurrentPage(1);
-										}}
-									>
-										<Select.Trigger>
-											<Select.Value />
-										</Select.Trigger>
-										<Select.Content>
-											<Select.Item value="10">10</Select.Item>
-											<Select.Item value="20">20</Select.Item>
-											<Select.Item value="50">50</Select.Item>
-										</Select.Content>
-									</Select.Root>
-								</div>
-
-								<div className="flex items-center gap-1">
-									<Button.Root
-										type="button"
-										variant="neutral"
-										mode="stroke"
-										size="xxsmall"
-										onClick={() => setCurrentPage(page - 1)}
-										disabled={page <= 1}
-										className="size-7 p-0"
-									>
-										<Icon name="chevron-left" className="size-3.5" />
-									</Button.Root>
-									<span className="px-2 text-text-sub-600 text-xs dark:text-white/60">
-										Page {page} of {totalPages}
-									</span>
-									<Button.Root
-										type="button"
-										variant="neutral"
-										mode="stroke"
-										size="xxsmall"
-										onClick={() => setCurrentPage(page + 1)}
-										disabled={page >= totalPages}
-										className="size-7 p-0"
-									>
-										<Icon name="chevron-right" className="size-3.5" />
-									</Button.Root>
-								</div>
-							</div>
-						)}
+						<TableFooter
+							total={filteredResults.length}
+							selectedCount={0}
+							pageRowCount={paginatedResults.length}
+							currentPage={page}
+							pageSize={pageSize}
+							onPageChange={(newPage) => setCurrentPage(newPage)}
+							onPageSizeChange={(newSize) => {
+								setPageSize(newSize);
+								setCurrentPage(1);
+							}}
+							label="row(s)"
+						/>
 					</div>
 				</div>
 			)}

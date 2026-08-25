@@ -1,14 +1,13 @@
 "use client";
 
 import * as Badge from "@reloop/ui/badge";
-import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import type {
 	CategoryResult,
-	CheckItem,
 	CheckStatus,
 	DeliverabilityReport,
 } from "./check-api";
@@ -50,15 +49,29 @@ function scoreColor(score: number): {
 
 function statusIcon(status: CheckStatus) {
 	if (status === "pass") {
-		return <Icon name="check" className="size-4 text-emerald-500" />;
+		return (
+			<Icon
+				name="check-circle"
+				className="size-3.5 shrink-0 text-emerald-500"
+			/>
+		);
 	}
 	if (status === "warn") {
-		return <Icon name="alert-triangle" className="size-4 text-amber-500" />;
+		return (
+			<Icon
+				name="alert-triangle"
+				className="size-3.5 shrink-0 text-amber-500"
+			/>
+		);
 	}
 	if (status === "fail") {
-		return <Icon name="x" className="size-4 text-rose-500" />;
+		return (
+			<Icon name="cross-circle" className="size-3.5 shrink-0 text-rose-500" />
+		);
 	}
-	return <Icon name="info-outline" className="size-4 text-blue-500" />;
+	return (
+		<Icon name="alert-circle" className="size-3.5 shrink-0 text-blue-500" />
+	);
 }
 
 function categoryIcon(catId: string) {
@@ -68,32 +81,46 @@ function categoryIcon(catId: string) {
 		case "blacklists":
 			return "alert-triangle";
 		case "content":
-			return "sliders";
+			return "sparkling";
 		case "body":
-			return "align-left";
+			return "mail";
 		case "links":
-			return "link-01";
+			return "link";
 		default:
-			return "file-text";
+			return "shield";
 	}
 }
 
 export function ReportView({ report, onReset }: ReportViewProps) {
 	const colors = scoreColor(report.score);
-	const [openAccordions, setOpenAccordions] = useState<Record<string, boolean>>({
-		signature: true,
-		blacklists: report.categories.blacklists.status !== "pass",
-		content: report.categories.content.status !== "pass",
-		body: report.categories.body.status !== "pass",
-		links: report.categories.links.status !== "pass",
-	});
+	const [openAccordions, setOpenAccordions] = useState<Record<string, boolean>>(
+		{
+			signature: true,
+			blacklists: report.categories.blacklists.status !== "pass",
+			content: report.categories.content.status !== "pass",
+			body: report.categories.body.status !== "pass",
+			links: report.categories.links.status !== "pass",
+		},
+	);
 	const [showHeaders, setShowHeaders] = useState(false);
+	const [headersCopied, setHeadersCopied] = useState(false);
 
 	const toggleAccordion = (catId: string) => {
 		setOpenAccordions((prev) => ({
 			...prev,
 			[catId]: !prev[catId],
 		}));
+	};
+
+	const handleCopyHeaders = async () => {
+		try {
+			const formatted = Object.entries(report.headers)
+				.map(([k, v]) => `${k}: ${v}`)
+				.join("\n");
+			await navigator.clipboard.writeText(formatted);
+			setHeadersCopied(true);
+			setTimeout(() => setHeadersCopied(false), 2000);
+		} catch {}
 	};
 
 	const categoriesList: CategoryResult[] = [
@@ -105,106 +132,158 @@ export function ReportView({ report, onReset }: ReportViewProps) {
 	];
 
 	return (
-		<div className="space-y-6">
+		<div className="space-y-4">
 			{/* Top Score Banner */}
-			<div className="rounded-3xl border border-stroke-soft-200 bg-bg-white-0 p-6 shadow-sm sm:p-8 dark:border-white/10 dark:bg-[#121212]">
-				<div className="flex flex-col items-center justify-between gap-6 sm:flex-row">
-					<div className="flex flex-col items-center gap-5 sm:flex-row">
+			<div className="rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-4 shadow-xs sm:p-5 dark:border-white/10 dark:bg-[#121212]">
+				<div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
+					<div className="flex flex-col items-center gap-3.5 sm:flex-row">
 						{/* Score circular badge */}
 						<div
 							className={cn(
-								"flex size-24 flex-col items-center justify-center rounded-2xl border text-center shadow-inner sm:size-28",
+								"flex size-16 shrink-0 flex-col items-center justify-center rounded-xl border text-center shadow-inner sm:size-18",
 								colors.bg,
 								colors.border,
 							)}
 						>
-							<span className={cn("font-bold font-mono text-3xl sm:text-4xl tracking-tight", colors.text)}>
+							<span
+								className={cn(
+									"font-bold font-mono text-xl leading-none tracking-tight sm:text-2xl",
+									colors.text,
+								)}
+							>
 								{report.score.toFixed(1)}
 							</span>
-							<span className="font-medium text-[11px] text-text-sub-600 dark:text-white/40">
+							<span className="mt-0.5 font-mono text-[9.5px] text-text-sub-600 dark:text-white/40">
 								out of 10
 							</span>
 						</div>
 
 						<div className="text-center sm:text-left">
-							<div className="flex flex-wrap items-center justify-center gap-2.5 sm:justify-start">
-								<Badge.Root color={colors.badge} size="medium">
-									{report.grade} Grade
+							<div className="flex flex-wrap items-center justify-center gap-1.5 sm:justify-start">
+								<Badge.Root
+									variant="lighter"
+									color={colors.badge}
+									size="medium"
+									className="h-5 px-2 font-medium text-[11.5px]"
+								>
+									<Badge.Dot />
+									<span>{report.grade} Grade</span>
 								</Badge.Root>
-								<Badge.Root color={colors.badge} size="medium">
-									{report.verdictLabel}
+								<Badge.Root
+									variant="lighter"
+									color={colors.badge}
+									size="medium"
+									className="h-5 px-2 font-medium text-[11.5px]"
+								>
+									<Badge.Dot />
+									<span>{report.verdictLabel}</span>
 								</Badge.Root>
 							</div>
 
-							<h2 className="mt-2 font-semibold text-lg text-text-strong-950 sm:text-xl dark:text-white">
+							<h2 className="mt-1.5 font-semibold text-[14.5px] text-text-strong-950 tracking-tight sm:text-[15px] dark:text-white">
 								{report.subject}
 							</h2>
-							<p className="mt-1 max-w-xl text-[14px] text-text-sub-600 leading-relaxed dark:text-white/50">
+							<p className="mt-0.5 max-w-lg text-[12px] text-text-sub-600 leading-relaxed dark:text-white/55">
 								{report.summary}
 							</p>
 						</div>
 					</div>
 
-					<div className="flex w-full flex-col gap-2 sm:w-auto">
-						<Button.Root
-							variant="neutral"
-							mode="stroke"
-							size="medium"
+					<div className="flex w-full flex-col gap-1.5 sm:w-auto">
+						<FancyButton.Root
+							variant="basic"
+							size="xsmall"
 							onClick={onReset}
 							className="w-full sm:w-auto"
 						>
-							<Icon name="arrow-refresh" className="size-4" />
-							Test Another Email
-						</Button.Root>
-						<Button.Root
-							variant="neutral"
-							mode="ghost"
-							size="small"
+							<FancyButton.Icon
+								as={Icon}
+								name="refresh-cw"
+								className="size-3"
+							/>
+							<span>Test Another Email</span>
+						</FancyButton.Root>
+						<FancyButton.Root
+							variant="ghost"
+							size="xsmall"
 							onClick={() => setShowHeaders(!showHeaders)}
-							className="text-[13px]"
+							className="w-full text-[11.5px] sm:w-auto"
 						>
-							{showHeaders ? "Hide Headers" : "View Raw Headers"}
-						</Button.Root>
+							<FancyButton.Icon
+								as={Icon}
+								name={showHeaders ? "eye-slash-outline" : "eye-outline"}
+								className="size-3"
+							/>
+							<span>{showHeaders ? "Hide Headers" : "View Raw Headers"}</span>
+						</FancyButton.Root>
 					</div>
 				</div>
 
-				{/* Metadata bar */}
-				<div className="mt-6 grid grid-cols-2 gap-3 border-t border-stroke-soft-200 pt-5 sm:grid-cols-4 dark:border-white/10">
-					<div>
-						<span className="text-[11px] text-text-sub-600 uppercase tracking-wider dark:text-white/40">
-							From
-						</span>
-						<p className="truncate font-mono text-[13px] text-text-strong-950 dark:text-white">
-							{report.from.address || "Unknown"}
-						</p>
+				{/* Metadata Stats Grid */}
+				<div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">
+					<div className="flex items-center gap-2.5 rounded-xl border border-stroke-soft-200 bg-bg-weak-50/50 p-2.5 dark:border-white/10 dark:bg-white/[0.02]">
+						<div className="flex size-7 shrink-0 items-center justify-center rounded-lg border border-stroke-soft-200 bg-bg-white-0 text-text-sub-600 dark:border-white/10 dark:bg-white/5 dark:text-white/60">
+							<Icon name="mail" className="size-3.5" />
+						</div>
+						<div className="min-w-0 flex-1">
+							<span className="block font-mono text-[9.5px] text-text-sub-600 uppercase tracking-wider dark:text-white/40">
+								From
+							</span>
+							<p
+								className="truncate font-medium font-mono text-[11.5px] text-text-strong-950 dark:text-white"
+								title={report.from.address}
+							>
+								{report.from.address || "Unknown"}
+							</p>
+						</div>
 					</div>
-					<div>
-						<span className="text-[11px] text-text-sub-600 uppercase tracking-wider dark:text-white/40">
-							Connecting IP
-						</span>
-						<p className="font-mono text-[13px] text-text-strong-950 dark:text-white">
-							{report.connectingIp || "127.0.0.1"}
-						</p>
+
+					<div className="flex items-center gap-2.5 rounded-xl border border-stroke-soft-200 bg-bg-weak-50/50 p-2.5 dark:border-white/10 dark:bg-white/[0.02]">
+						<div className="flex size-7 shrink-0 items-center justify-center rounded-lg border border-stroke-soft-200 bg-bg-white-0 text-text-sub-600 dark:border-white/10 dark:bg-white/5 dark:text-white/60">
+							<Icon name="ip" className="size-3.5" />
+						</div>
+						<div className="min-w-0 flex-1">
+							<span className="block font-mono text-[9.5px] text-text-sub-600 uppercase tracking-wider dark:text-white/40">
+								Connecting IP
+							</span>
+							<p className="truncate font-medium font-mono text-[11.5px] text-text-strong-950 dark:text-white">
+								{report.connectingIp || "127.0.0.1"}
+							</p>
+						</div>
 					</div>
-					<div>
-						<span className="text-[11px] text-text-sub-600 uppercase tracking-wider dark:text-white/40">
-							Rspamd Score
-						</span>
-						<p className="font-mono text-[13px] text-text-strong-950 dark:text-white">
-							{report.categories.content.items[0]?.mark ? `${report.categories.content.items[0].mark}` : "Clean"}
-						</p>
+
+					<div className="flex items-center gap-2.5 rounded-xl border border-stroke-soft-200 bg-bg-weak-50/50 p-2.5 dark:border-white/10 dark:bg-white/[0.02]">
+						<div className="flex size-7 shrink-0 items-center justify-center rounded-lg border border-stroke-soft-200 bg-bg-white-0 text-text-sub-600 dark:border-white/10 dark:bg-white/5 dark:text-white/60">
+							<Icon name="sparkling" className="size-3.5" />
+						</div>
+						<div className="min-w-0 flex-1">
+							<span className="block font-mono text-[9.5px] text-text-sub-600 uppercase tracking-wider dark:text-white/40">
+								Rspamd Score
+							</span>
+							<p className="truncate font-medium font-mono text-[11.5px] text-text-strong-950 dark:text-white">
+								{report.categories.content.items[0]?.mark
+									? `${report.categories.content.items[0].mark}`
+									: "Clean"}
+							</p>
+						</div>
 					</div>
-					<div>
-						<span className="text-[11px] text-text-sub-600 uppercase tracking-wider dark:text-white/40">
-							Received At
-						</span>
-						<p className="font-mono text-[13px] text-text-strong-950 dark:text-white">
-							{new Date(report.receivedAt).toLocaleTimeString([], {
-								hour: "2-digit",
-								minute: "2-digit",
-								second: "2-digit",
-							})}
-						</p>
+
+					<div className="flex items-center gap-2.5 rounded-xl border border-stroke-soft-200 bg-bg-weak-50/50 p-2.5 dark:border-white/10 dark:bg-white/[0.02]">
+						<div className="flex size-7 shrink-0 items-center justify-center rounded-lg border border-stroke-soft-200 bg-bg-white-0 text-text-sub-600 dark:border-white/10 dark:bg-white/5 dark:text-white/60">
+							<Icon name="clock" className="size-3.5" />
+						</div>
+						<div className="min-w-0 flex-1">
+							<span className="block font-mono text-[9.5px] text-text-sub-600 uppercase tracking-wider dark:text-white/40">
+								Received At
+							</span>
+							<p className="truncate font-medium font-mono text-[11.5px] text-text-strong-950 dark:text-white">
+								{new Date(report.receivedAt).toLocaleTimeString([], {
+									hour: "2-digit",
+									minute: "2-digit",
+									second: "2-digit",
+								})}
+							</p>
+						</div>
 					</div>
 				</div>
 
@@ -215,19 +294,49 @@ export function ReportView({ report, onReset }: ReportViewProps) {
 							initial={{ opacity: 0, height: 0 }}
 							animate={{ opacity: 1, height: "auto" }}
 							exit={{ opacity: 0, height: 0 }}
-							className="mt-4 overflow-hidden"
+							className="mt-3.5 overflow-hidden"
 						>
-							<div className="rounded-xl border border-stroke-soft-200 bg-bg-weak-50 p-4 font-mono text-[12px] text-text-sub-600 dark:border-white/10 dark:bg-black/50 dark:text-white/60">
-								<p className="font-semibold text-text-strong-950 dark:text-white">
-									Message Headers:
-								</p>
-								<div className="mt-2 max-h-60 space-y-1 overflow-y-auto pr-2">
+							<div className="overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-weak-50/70 dark:border-white/10 dark:bg-black/60">
+								{/* Header Bar */}
+								<div className="flex items-center justify-between border-stroke-soft-200 border-b bg-bg-white-0/80 px-3.5 py-2 dark:border-white/10 dark:bg-white/[0.03]">
+									<div className="flex items-center gap-2">
+										<span className="font-medium font-mono text-[11.5px] text-text-strong-950 dark:text-white">
+											Raw Message Headers
+										</span>
+										<span className="rounded-md bg-bg-weak-50 px-1.5 py-0.5 font-mono text-[10px] text-text-sub-600 dark:bg-white/10 dark:text-white/50">
+											{Object.keys(report.headers).length} fields
+										</span>
+									</div>
+
+									<FancyButton.Root
+										variant="basic"
+										size="xsmall"
+										onClick={handleCopyHeaders}
+									>
+										<FancyButton.Icon
+											as={Icon}
+											name={headersCopied ? "check" : "copy"}
+											className="size-3"
+										/>
+										<span className="text-[11px]">
+											{headersCopied ? "Copied" : "Copy"}
+										</span>
+									</FancyButton.Root>
+								</div>
+
+								{/* Header Rows */}
+								<div className="max-h-64 space-y-1 overflow-y-auto p-3 font-mono text-[11px]">
 									{Object.entries(report.headers).map(([k, v]) => (
-										<div key={k} className="flex gap-2">
-											<span className="font-semibold text-text-strong-950 dark:text-white/80">
+										<div
+											key={k}
+											className="flex flex-col gap-0.5 rounded-lg border border-stroke-soft-200/40 bg-bg-white-0/60 p-1.5 sm:flex-row sm:items-start sm:gap-2.5 dark:border-white/5 dark:bg-white/[0.02]"
+										>
+											<span className="shrink-0 font-medium text-text-sub-600 sm:w-40 dark:text-white/60">
 												{k}:
 											</span>
-											<span className="break-all">{v}</span>
+											<span className="flex-1 select-all break-all text-text-strong-950 dark:text-white/90">
+												{v}
+											</span>
 										</div>
 									))}
 								</div>
@@ -238,7 +347,7 @@ export function ReportView({ report, onReset }: ReportViewProps) {
 			</div>
 
 			{/* Category Accordions */}
-			<div className="space-y-4">
+			<div className="space-y-2.5">
 				{categoriesList.map((category) => {
 					const isOpen = openAccordions[category.id] ?? false;
 					const iconName = categoryIcon(category.id);
@@ -247,18 +356,18 @@ export function ReportView({ report, onReset }: ReportViewProps) {
 					return (
 						<div
 							key={category.id}
-							className="overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 shadow-sm transition-colors dark:border-white/10 dark:bg-[#121212]"
+							className="overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-white-0 shadow-xs transition-colors dark:border-white/10 dark:bg-[#121212]"
 						>
 							{/* Accordion Header */}
 							<button
 								type="button"
 								onClick={() => toggleAccordion(category.id)}
-								className="flex w-full items-center justify-between p-5 text-left transition-colors hover:bg-bg-weak-50/50 sm:px-6 dark:hover:bg-white/[0.02]"
+								className="flex w-full items-center justify-between p-3.5 text-left transition-colors hover:bg-bg-weak-50/50 sm:px-4.5 dark:hover:bg-white/[0.02]"
 							>
-								<div className="flex items-center gap-3.5">
+								<div className="flex items-center gap-2.5">
 									<div
 										className={cn(
-											"flex size-9 items-center justify-center rounded-lg border",
+											"flex size-7 items-center justify-center rounded-lg border",
 											category.status === "pass"
 												? "border-emerald-500/20 bg-emerald-500/10 text-emerald-500"
 												: category.status === "warn"
@@ -266,40 +375,42 @@ export function ReportView({ report, onReset }: ReportViewProps) {
 													: "border-rose-500/20 bg-rose-500/10 text-rose-500",
 										)}
 									>
-										<Icon name={iconName} className="size-4.5" />
+										<Icon name={iconName} className="size-3.5" />
 									</div>
 
 									<div>
-										<h3 className="font-semibold text-[15px] text-text-strong-950 sm:text-base dark:text-white">
+										<h3 className="font-semibold text-[13.5px] text-text-strong-950 dark:text-white">
 											{category.title}
 										</h3>
-										<p className="text-[12px] text-text-sub-600 dark:text-white/40">
+										<p className="text-[11px] text-text-sub-600 dark:text-white/40">
 											{category.items.length} diagnostic checks
 										</p>
 									</div>
 								</div>
 
-								<div className="flex items-center gap-3">
+								<div className="flex items-center gap-2.5">
 									<span
 										className={cn(
-											"font-mono font-semibold text-[13px]",
+											"font-mono font-semibold text-[11.5px]",
 											hasPenalties
 												? "text-rose-500 dark:text-rose-400"
 												: "text-emerald-500 dark:text-emerald-400",
 										)}
 									>
-										{hasPenalties ? `${category.mark.toFixed(1)} pts` : "0.0 pts"}
+										{hasPenalties
+											? `${category.mark.toFixed(1)} pts`
+											: "0.0 pts"}
 									</span>
 
 									<div
 										className={cn(
-											"flex size-6 items-center justify-center rounded-full transition-transform duration-200",
+											"flex size-5 items-center justify-center rounded-full transition-transform duration-200",
 											isOpen && "rotate-180",
 										)}
 									>
 										<Icon
 											name="chevron-down"
-											className="size-4 text-text-sub-600 dark:text-white/40"
+											className="size-3 text-text-sub-600 dark:text-white/40"
 										/>
 									</div>
 								</div>
@@ -314,12 +425,12 @@ export function ReportView({ report, onReset }: ReportViewProps) {
 										exit={{ opacity: 0, height: 0 }}
 										transition={{ duration: 0.2 }}
 									>
-										<div className="space-y-3 border-t border-stroke-soft-200 p-5 sm:p-6 dark:border-white/10">
+										<div className="space-y-2 border-stroke-soft-200 border-t p-3.5 sm:p-4.5 dark:border-white/10">
 											{category.items.map((item) => (
 												<div
 													key={item.id}
 													className={cn(
-														"rounded-xl border p-4 transition-colors",
+														"rounded-lg border p-3 transition-colors",
 														item.status === "pass"
 															? "border-emerald-500/20 bg-emerald-500/[0.03] dark:border-emerald-500/10 dark:bg-emerald-500/[0.02]"
 															: item.status === "warn"
@@ -329,10 +440,10 @@ export function ReportView({ report, onReset }: ReportViewProps) {
 																	: "border-stroke-soft-200 bg-bg-weak-50/50 dark:border-white/10 dark:bg-white/[0.01]",
 													)}
 												>
-													<div className="flex items-start justify-between gap-3">
-														<div className="flex items-center gap-2.5">
+													<div className="flex items-start justify-between gap-2.5">
+														<div className="flex items-center gap-2">
 															{statusIcon(item.status)}
-															<span className="font-semibold text-[14px] text-text-strong-950 dark:text-white">
+															<span className="font-medium text-[12.5px] text-text-strong-950 dark:text-white">
 																{item.title}
 															</span>
 														</div>
@@ -340,7 +451,7 @@ export function ReportView({ report, onReset }: ReportViewProps) {
 														{item.mark !== 0 && (
 															<span
 																className={cn(
-																	"font-mono font-semibold text-[12px]",
+																	"font-mono font-semibold text-[11px]",
 																	item.mark < 0
 																		? "text-rose-500 dark:text-rose-400"
 																		: "text-emerald-500 dark:text-emerald-400",
@@ -351,12 +462,12 @@ export function ReportView({ report, onReset }: ReportViewProps) {
 														)}
 													</div>
 
-													<p className="mt-1.5 pl-6.5 text-[13px] text-text-sub-600 leading-relaxed dark:text-white/60">
+													<p className="mt-0.5 pl-5.5 text-[11.5px] text-text-sub-600 leading-normal dark:text-white/60">
 														{item.description}
 													</p>
 
 													{item.details && item.details.length > 0 && (
-														<ul className="mt-2.5 space-y-1 border-t border-black/5 pl-6.5 pt-2 font-mono text-[12px] text-text-sub-600 dark:border-white/5 dark:text-white/40">
+														<ul className="mt-1.5 space-y-0.5 border-black/5 border-t pt-1 pl-5.5 font-mono text-[11px] text-text-sub-600 dark:border-white/5 dark:text-white/40">
 															{item.details.map((d) => (
 																<li key={d} className="break-all">
 																	{d}
@@ -365,18 +476,19 @@ export function ReportView({ report, onReset }: ReportViewProps) {
 														</ul>
 													)}
 
-													{item.recommendations && item.recommendations.length > 0 && (
-														<div className="mt-3 rounded-lg border border-amber-500/20 bg-amber-500/5 p-3 pl-4 dark:border-amber-500/10 dark:bg-amber-500/[0.04]">
-															<p className="font-semibold text-[12px] text-amber-600 dark:text-amber-400">
-																Recommendation:
-															</p>
-															<ul className="mt-1 space-y-1 text-[12px] text-text-sub-600 dark:text-white/60">
-																{item.recommendations.map((r) => (
-																	<li key={r}>• {r}</li>
-																))}
-															</ul>
-														</div>
-													)}
+													{item.recommendations &&
+														item.recommendations.length > 0 && (
+															<div className="mt-2 rounded-lg border border-amber-500/20 bg-amber-500/5 p-2 pl-3 dark:border-amber-500/10 dark:bg-amber-500/[0.04]">
+																<p className="font-semibold text-[11px] text-amber-600 dark:text-amber-400">
+																	Recommendation:
+																</p>
+																<ul className="mt-0.5 space-y-0.5 text-[11px] text-text-sub-600 dark:text-white/60">
+																	{item.recommendations.map((r) => (
+																		<li key={r}>• {r}</li>
+																	))}
+																</ul>
+															</div>
+														)}
 												</div>
 											))}
 										</div>

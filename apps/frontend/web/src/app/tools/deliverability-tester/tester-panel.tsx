@@ -1,17 +1,14 @@
 "use client";
 
 import * as Alert from "@reloop/ui/alert";
-import * as Badge from "@reloop/ui/badge";
-import * as Button from "@reloop/ui/button";
-import { cn } from "@reloop/ui/cn";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import Spinner from "@reloop/ui/spinner";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import {
 	createDeliverabilitySession,
 	type DeliverabilityReport,
-	type DeliverabilitySessionResponse,
 	injectTestMime,
 	pollDeliverabilitySession,
 } from "./check-api";
@@ -57,68 +54,68 @@ export function TesterPanel() {
 	const [address, setAddress] = useState<string>("");
 	const [expiresAt, setExpiresAt] = useState<string>("");
 	const [report, setReport] = useState<DeliverabilityReport | null>(null);
-	const [status, setStatus] = useState<"loading" | "waiting" | "analyzing" | "ready" | "error">(
-		"loading",
-	);
-	const [errorMessage, setErrorMessage] = useState<string | null>(null);
+	const [status, setStatus] = useState<
+		"loading" | "waiting" | "analyzing" | "ready" | "error"
+	>("loading");
+	const [errorMessage, setErrorMessage] = useState<string>("");
 	const [copied, setCopied] = useState(false);
-	const [timeLeft, setTimeLeft] = useState<string>("24:00:00");
-	const [isInjectingSample, setIsInjectingSample] = useState(false);
-
-	// "Then check your score" active checking state
+	const [timeLeft, setTimeLeft] = useState<string>("");
 	const [isChecking, setIsChecking] = useState(false);
 	const [checkingSecondsLeft, setCheckingSecondsLeft] = useState(30);
+	const [isInjectingSample, setIsInjectingSample] = useState(false);
 	const [noEmailFoundAlert, setNoEmailFoundAlert] = useState(false);
 
-	const checkingIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+	const checkingIntervalRef = useRef<ReturnType<typeof setInterval> | null>(
+		null,
+	);
 
 	// 1. Initialize session on mount
 	const initSession = async () => {
 		setStatus("loading");
-		setErrorMessage(null);
-		setReport(null);
-		setIsChecking(false);
+		setErrorMessage("");
 		setNoEmailFoundAlert(false);
-
 		try {
 			const res = await createDeliverabilitySession();
 			setToken(res.token);
 			setAddress(res.address);
 			setExpiresAt(res.expiresAt);
 			setStatus("waiting");
-		} catch (e) {
+		} catch (err: unknown) {
 			setStatus("error");
-			setErrorMessage(e instanceof Error ? e.message : "Failed to initialize test address.");
+			setErrorMessage(
+				err instanceof Error
+					? err.message
+					: "Failed to initialize test session. Please try again.",
+			);
 		}
 	};
 
 	useEffect(() => {
 		initSession();
 		return () => {
-			if (checkingIntervalRef.current) clearInterval(checkingIntervalRef.current);
+			if (checkingIntervalRef.current)
+				clearInterval(checkingIntervalRef.current);
 		};
 	}, []);
 
-	// 2. Countdown timer for 24h address expiry
+	// 2. Countdown timer for session expiration
 	useEffect(() => {
 		if (!expiresAt) return;
-
-		const updateClock = () => {
+		const updateTimer = () => {
 			const diff = new Date(expiresAt).getTime() - Date.now();
 			if (diff <= 0) {
 				setTimeLeft("Expired");
 				return;
 			}
 			const hours = Math.floor(diff / (1000 * 60 * 60));
-			const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-			const secs = Math.floor((diff % (1000 * 60)) / 1000);
+			const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+			const seconds = Math.floor((diff % (1000 * 60)) / 1000);
 			setTimeLeft(
-				`${hours.toString().padStart(2, "0")}:${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`,
+				`${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`,
 			);
 		};
-
-		updateClock();
-		const interval = setInterval(updateClock, 1000);
+		updateTimer();
+		const interval = setInterval(updateTimer, 1000);
 		return () => clearInterval(interval);
 	}, [expiresAt]);
 
@@ -131,19 +128,18 @@ export function TesterPanel() {
 		} catch {}
 	};
 
-	// 3. "Then check your score" click handler (Mail-Tester flow)
+	// 3. User clicks "Check Deliverability Score"
 	const handleCheckScore = async () => {
 		if (!token || isChecking) return;
-
-		setNoEmailFoundAlert(false);
 		setIsChecking(true);
 		setCheckingSecondsLeft(30);
+		setNoEmailFoundAlert(false);
 
-		// Check immediately first
+		// First immediate check
 		try {
-			const immediateRes = await pollDeliverabilitySession(token);
-			if (immediateRes.status === "received" && immediateRes.report) {
-				setReport(immediateRes.report);
+			const checkRes = await pollDeliverabilitySession(token);
+			if (checkRes.status === "received" && checkRes.report) {
+				setReport(checkRes.report);
 				setStatus("ready");
 				setIsChecking(false);
 				return;
@@ -161,7 +157,8 @@ export function TesterPanel() {
 			try {
 				const checkRes = await pollDeliverabilitySession(token);
 				if (checkRes.status === "received" && checkRes.report) {
-					if (checkingIntervalRef.current) clearInterval(checkingIntervalRef.current);
+					if (checkingIntervalRef.current)
+						clearInterval(checkingIntervalRef.current);
 					setReport(checkRes.report);
 					setStatus("ready");
 					setIsChecking(false);
@@ -170,7 +167,8 @@ export function TesterPanel() {
 			} catch {}
 
 			if (secondsRemaining <= 0) {
-				if (checkingIntervalRef.current) clearInterval(checkingIntervalRef.current);
+				if (checkingIntervalRef.current)
+					clearInterval(checkingIntervalRef.current);
 				setIsChecking(false);
 				setNoEmailFoundAlert(true);
 			}
@@ -183,7 +181,10 @@ export function TesterPanel() {
 		setIsInjectingSample(true);
 		setNoEmailFoundAlert(false);
 		try {
-			const preparedMime = SAMPLE_TEST_MIME.replace("RECIPIENT_PLACEHOLDER", address);
+			const preparedMime = SAMPLE_TEST_MIME.replace(
+				"RECIPIENT_PLACEHOLDER",
+				address,
+			);
 			const injectRes = await injectTestMime(preparedMime);
 			if (injectRes.success) {
 				const checkRes = await pollDeliverabilitySession(token);
@@ -193,7 +194,7 @@ export function TesterPanel() {
 					return;
 				}
 			}
-		} catch (e) {
+		} catch {
 			setErrorMessage("Sample test injection failed.");
 		} finally {
 			setIsInjectingSample(false);
@@ -214,86 +215,98 @@ export function TesterPanel() {
 							<div className="font-medium text-label-sm">Session Error</div>
 							<p className="mt-0.5 text-paragraph-sm">{errorMessage}</p>
 						</div>
-						<Button.Root variant="neutral" mode="stroke" size="small" onClick={initSession}>
+						<FancyButton.Root
+							variant="basic"
+							size="small"
+							onClick={initSession}
+						>
 							Try Again
-						</Button.Root>
+						</FancyButton.Root>
 					</Alert.Root>
 				</div>
 			)}
 
-			<div className="relative overflow-hidden rounded-3xl border border-stroke-soft-200 bg-bg-white-0 p-6 shadow-sm sm:p-9 dark:border-white/10 dark:bg-[#121212]">
+			<div className="relative overflow-hidden rounded-3xl border border-stroke-soft-200 bg-bg-white-0 p-6 shadow-sm sm:p-8 dark:border-white/10 dark:bg-[#121212]">
 				{/* Step 1 Header */}
 				<div className="flex items-center justify-between">
-					<span className="inline-flex items-center gap-1.5 font-mono text-[12px] text-text-sub-600 uppercase tracking-wider dark:text-white/45">
-						<span className="size-2 rounded-full bg-primary-base" />
+					<span className="inline-flex items-center gap-2 rounded-full border border-stroke-soft-200 bg-bg-weak-50/80 px-3 py-1 font-mono text-[11px] text-text-sub-600 uppercase tracking-[0.1em] dark:border-white/12 dark:bg-white/[0.05] dark:text-white/60">
+						<span className="size-1.5 animate-pulse rounded-full bg-emerald-500" />
 						Step 1: Send Your Test Email
 					</span>
 
 					{expiresAt && (
 						<span className="font-mono text-[12px] text-text-sub-600 dark:text-white/40">
-							Expires in: <strong className="text-text-strong-950 dark:text-white">{timeLeft}</strong>
+							Expires in:{" "}
+							<strong className="font-semibold text-text-strong-950 dark:text-white">
+								{timeLeft}
+							</strong>
 						</span>
 					)}
 				</div>
 
-				<h2 className="mt-4 font-semibold text-xl text-text-strong-950 sm:text-2xl dark:text-white">
+				<h2 className="mt-5 font-semibold text-2xl text-text-strong-950 tracking-tight sm:text-3xl dark:text-white">
 					Send an email to this address
 				</h2>
-				<p className="mt-1.5 text-[14px] text-text-sub-600 leading-relaxed dark:text-white/55">
-					Copy this temporary inbox address into your ESP (or email client) and send your campaign.
+				<p className="mt-2 text-[14.5px] text-text-sub-600 leading-relaxed dark:text-white/60">
+					Copy this temporary inbox address into your ESP (or email client) and
+					send your campaign.
 				</p>
 
 				{/* Big Address Copy Box */}
 				<div className="mt-6">
-					<div className="relative flex flex-col gap-2 rounded-2xl border border-stroke-soft-200 bg-bg-weak-50 p-2 sm:flex-row sm:items-center sm:gap-0 dark:border-white/10 dark:bg-black/60">
-						<div className="flex flex-1 items-center px-3 py-2">
+					<div className="relative flex flex-col gap-2 rounded-2xl border border-stroke-soft-200 bg-bg-weak-50/70 p-2 sm:flex-row sm:items-center dark:border-white/10 dark:bg-white/[0.03]">
+						<div className="flex min-w-0 flex-1 items-center px-3 py-2">
 							<Icon
 								name="mail"
-								className="mr-3 size-5 text-text-sub-600 dark:text-white/40"
+								className="mr-3 size-4 shrink-0 text-text-sub-600 dark:text-white/40"
 							/>
 							<input
 								readOnly
 								value={address || "Generating address..."}
 								onClick={handleCopy}
-								className="w-full cursor-pointer bg-transparent font-mono font-medium text-[15px] text-text-strong-950 outline-none select-all sm:text-base dark:text-white"
+								className="w-full cursor-pointer select-all truncate bg-transparent font-medium font-mono text-[14px] text-text-strong-950 outline-none sm:text-[14px] dark:text-white"
 							/>
 						</div>
 
-						<Button.Root
-							variant="neutral"
-							mode="stroke"
-							size="medium"
+						<FancyButton.Root
+							variant="basic"
+							size="small"
 							onClick={handleCopy}
 							disabled={!address}
 							className="shrink-0"
 						>
-							<Icon name={copied ? "check" : "copy-01"} className="size-4" />
+							<Icon
+								name="copy"
+								className="size-4 shrink-0 text-text-sub-600 dark:text-white/40"
+							/>
 							{copied ? "Copied!" : "Copy Address"}
-						</Button.Root>
+						</FancyButton.Root>
 					</div>
 				</div>
 
-				{/* Step 2: "Then check your score" Button (Mail-Tester flow) */}
-				<div className="mt-6">
-					<Button.Root
+				{/* Step 2: "Check Deliverability Score" Button */}
+				<div className="mt-5">
+					<FancyButton.Root
 						variant="primary"
 						size="medium"
 						onClick={handleCheckScore}
 						disabled={status === "loading" || isChecking || !token}
-						className="w-full justify-center gap-2 py-4 text-base font-semibold shadow-md transition-all hover:shadow-primary-base/20"
+						className="w-full"
 					>
 						{isChecking ? (
 							<>
-								<Spinner size={20} />
-								<span>Checking for incoming email ({checkingSecondsLeft}s)...</span>
+								<Spinner size={18} />
+								<span>
+									Checking for incoming email ({checkingSecondsLeft}s)...
+								</span>
 							</>
 						) : (
 							<>
-								<span>Then check your score</span>
-								<Icon name="arrow-narrow-right" className="size-5" />
+								<FancyButton.Icon as={Icon} name="shield-check" />
+								<span>Check Deliverability Score</span>
 							</>
 						)}
-					</Button.Root>
+					</FancyButton.Root>
 				</div>
 
 				{/* Active Radar / Checking State */}
@@ -314,7 +327,8 @@ export function TesterPanel() {
 							Listening for incoming message ({checkingSecondsLeft}s)...
 						</p>
 						<p className="mt-1 max-w-sm text-[12px] text-text-sub-600 dark:text-white/50">
-							Most email servers deliver within 5–15 seconds. As soon as your message lands, your deliverability report will open automatically.
+							Most email servers deliver within 5–15 seconds. As soon as your
+							message lands, your deliverability report will open automatically.
 						</p>
 					</motion.div>
 				)}
@@ -329,9 +343,14 @@ export function TesterPanel() {
 						<Alert.Root variant="lighter" status="warning" size="large">
 							<Alert.Icon as={Icon} name="help-circle" />
 							<div className="flex-1">
-								<div className="font-medium text-label-sm">No email received yet</div>
+								<div className="font-medium text-label-sm">
+									No email received yet
+								</div>
 								<p className="mt-0.5 text-paragraph-sm">
-									We haven't received a message sent to <strong className="font-mono">{address}</strong> yet. Make sure your ESP has completed sending and click <strong>Then check your score</strong> again.
+									We haven't received a message sent to{" "}
+									<strong className="font-mono">{address}</strong> yet. Make
+									sure your ESP has completed sending and click{" "}
+									<strong>Check Deliverability Score</strong> again.
 								</p>
 							</div>
 						</Alert.Root>
@@ -339,15 +358,21 @@ export function TesterPanel() {
 				)}
 
 				{/* Quick sample injection helper */}
-				<div className="mt-6 flex items-center justify-between border-t border-stroke-soft-200 pt-5 text-[12px] text-text-sub-600 dark:border-white/10 dark:text-white/40">
+				<div className="mt-6 flex flex-wrap items-center justify-between gap-2 border-stroke-soft-200/60 border-t pt-4 text-[12.5px] text-text-sub-600 dark:border-white/10 dark:text-white/45">
 					<span>Want to test without opening your mail client?</span>
 					<button
 						type="button"
 						onClick={handleInjectSample}
 						disabled={!address || isInjectingSample || isChecking}
-						className="font-medium text-primary-base transition-colors hover:underline disabled:opacity-50"
+						className="group inline-flex items-center gap-1 font-medium text-text-strong-950 transition-colors hover:text-primary-base disabled:opacity-50 dark:text-white dark:hover:text-primary-base"
 					>
-						{isInjectingSample ? "Injecting sample..." : "Send sample test email →"}
+						{isInjectingSample
+							? "Injecting sample..."
+							: "Send sample test email"}
+						<Icon
+							name="arrow-right"
+							className="size-3 transition-transform group-hover:translate-x-0.5"
+						/>
 					</button>
 				</div>
 			</div>

@@ -56,7 +56,8 @@ export const faqs: FaqItem[] = [
 			"It analyzes technical deliverability: cryptographic DKIM verification, SPF and DMARC alignment, reverse DNS (PTR/FCrDNS), 23+ IP and domain DNSBL blocklists, Rspamd spam scoring and symbols, multipart MIME balance, and link health. It starts at a perfect 10.0 score and applies deductions for every detected issue.",
 	},
 	{
-		question: "Is this the same as multi-provider inbox placement (seed list testing)?",
+		question:
+			"Is this the same as multi-provider inbox placement (seed list testing)?",
 		answer:
 			"No. This tool tests technical compliance and server configuration—exactly like mail-tester.com. It does not maintain a farm of seed mailboxes on Gmail, Outlook, or Yahoo to test tab placement (e.g. Primary vs Promotions vs Spam tab).",
 	},

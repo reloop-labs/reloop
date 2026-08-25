@@ -1,5 +1,6 @@
 import crypto from "node:crypto";
 import dns from "node:dns/promises";
+import { withDeadline } from "@be/tools/utils/deadline";
 import type { CheckItem } from "../deliverability-test.types";
 import type { ParsedEmailData } from "./parse-mime";
 
@@ -45,7 +46,11 @@ async function fetchDkimPublicKey(
 ): Promise<{ record: string | null; publicKey: string | null; error?: string }> {
 	const queryHost = `${selector}._domainkey.${domain}`;
 	try {
-		const txtRecords = await dns.resolveTxt(queryHost);
+		const txtRecords = await withDeadline(
+			dns.resolveTxt(queryHost),
+			2000,
+			`DKIM TXT lookup for ${queryHost}`,
+		);
 		const flat = txtRecords.map((r) => r.join("")).join("");
 		if (!flat) return { record: null, publicKey: null };
 

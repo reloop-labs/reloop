@@ -32,9 +32,9 @@ function extractLinks(email: ParsedEmailData): ExtractedLink[] {
 
 	// Extract from HTML <a href="...">text</a>
 	if (email.html) {
-		const anchorRegex = /<a\s+(?:[^>]*?\s+)?href=["']([^"']+)["'][^>]*>(.*?)<\/a>/gi;
-		let match: RegExpExecArray | null;
-		while ((match = anchorRegex.exec(email.html)) !== null) {
+		const anchorRegex =
+			/<a\s+(?:[^>]*?\s+)?href=["']([^"']+)["'][^>]*>(.*?)<\/a>/gi;
+		for (const match of email.html.matchAll(anchorRegex)) {
 			const href = (match[1] || "").trim();
 			const text = (match[2] || "").replace(/<[^>]+>/g, "").trim();
 			if (href.startsWith("http://") || href.startsWith("https://")) {
@@ -61,16 +61,19 @@ function extractLinks(email: ParsedEmailData): ExtractedLink[] {
 	return links;
 }
 
-async function probeUrl(url: string): Promise<{ status: number | null; ok: boolean; error?: string }> {
+async function probeUrl(
+	url: string,
+): Promise<{ status: number | null; ok: boolean; error?: string }> {
 	try {
 		const controller = new AbortController();
-		const timeoutId = setTimeout(() => controller.abort(), 3000);
+		const timeoutId = setTimeout(() => controller.abort(), 1500);
 
 		const resp = await fetch(url, {
 			method: "HEAD",
 			signal: controller.signal,
 			headers: {
-				"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+				"User-Agent":
+					"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
 			},
 			redirect: "follow",
 		});
@@ -85,12 +88,17 @@ async function probeUrl(url: string): Promise<{ status: number | null; ok: boole
 		return {
 			status: null,
 			ok: false,
-			error: err.name === "AbortError" ? "Timeout" : err.message || "Connection failed",
+			error:
+				err.name === "AbortError"
+					? "Timeout"
+					: err.message || "Connection failed",
 		};
 	}
 }
 
-export async function checkLinks(email: ParsedEmailData): Promise<LinksCheckResult> {
+export async function checkLinks(
+	email: ParsedEmailData,
+): Promise<LinksCheckResult> {
 	const items: CheckItem[] = [];
 	let totalDeduction = 0;
 
@@ -138,7 +146,8 @@ export async function checkLinks(email: ParsedEmailData): Promise<LinksCheckResu
 			title: "Mismatched link display URL (Phishing Indicator)",
 			mark: penalty,
 			status: "fail",
-			description: "Link text displays a URL that points to a completely different domain.",
+			description:
+				"Link text displays a URL that points to a completely different domain.",
 			details: deceptiveLinks.map(
 				(d) => `• Display text: "${d.text}" points to "${d.href}"`,
 			),
@@ -157,9 +166,12 @@ export async function checkLinks(email: ParsedEmailData): Promise<LinksCheckResu
 			title: `Generic URL Shortener detected (${shorteners.join(", ")})`,
 			mark: penalty,
 			status: "fail",
-			description: "Spam filters heavily penalize link shorteners because they hide the true destination.",
+			description:
+				"Spam filters heavily penalize link shorteners because they hide the true destination.",
 			details: shorteners.map((s) => `• Detected shortener domain: ${s}`),
-			recommendations: ["Use direct branded domain links instead of generic URL shorteners."],
+			recommendations: [
+				"Use direct branded domain links instead of generic URL shorteners.",
+			],
 		});
 	}
 
@@ -201,9 +213,12 @@ export async function checkLinks(email: ParsedEmailData): Promise<LinksCheckResu
 			title: `Unreachable or broken links (${brokenLinks.length})`,
 			mark: penalty,
 			status: "warn",
-			description: "Some links in the email returned HTTP error codes or timed out during verification.",
+			description:
+				"Some links in the email returned HTTP error codes or timed out during verification.",
 			details: brokenLinks.map((b) => `• ${b}`),
-			recommendations: ["Verify that all links in your campaign lead to live, accessible web pages."],
+			recommendations: [
+				"Verify that all links in your campaign lead to live, accessible web pages.",
+			],
 		});
 	}
 
