@@ -4,7 +4,7 @@ import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import { useRouter } from "next/navigation";
-import { useRef, useState } from "react";
+import { type ReactNode, useRef, useState } from "react";
 import { toast } from "sonner";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import type { Template } from "#/features/templates/hooks/use-templates-query";
@@ -148,6 +148,47 @@ const TemplateDropdown = ({
 /** Soft inset so the email sits in a padded “stage” like the mockup. */
 const PAPER_INSET = 16;
 
+const previewPaperStyle = {
+	paddingTop: `${PAPER_INSET}px`,
+	paddingRight: `${PAPER_INSET}px`,
+	paddingBottom: 0,
+	paddingLeft: `${PAPER_INSET}px`,
+} as const;
+
+const previewCardClassName =
+	"relative aspect-[5/4] w-full overflow-hidden rounded-[28px] bg-gradient-to-b from-bg-white-0 to-bg-weak-50 shadow-[0_0_0_1px_rgba(0,0,0,0.04),0_12px_40px_rgba(0,0,0,0.08)] dark:from-black dark:to-black dark:shadow-[0_0_0_1px_rgba(255,255,255,0.06),0_0_48px_rgba(255,255,255,0.06),0_16px_48px_rgba(0,0,0,0.45)]";
+
+/** Email-shaped bars that stay visible on the dark card (bg-weak-50 is near-black). */
+const EmailPaperSkeleton = () => (
+	<div className="flex h-full flex-col gap-2.5 p-5" aria-hidden>
+		<Skeleton className="h-3 w-1/3 rounded dark:bg-bg-soft-200" />
+		<Skeleton className="h-2.5 w-full rounded dark:bg-bg-soft-200" />
+		<Skeleton className="h-2.5 w-[88%] rounded dark:bg-bg-soft-200" />
+		<Skeleton className="mt-1 h-28 w-full shrink-0 rounded-xl dark:bg-bg-soft-200" />
+		<Skeleton className="h-2.5 w-2/3 rounded dark:bg-bg-soft-200" />
+		<Skeleton className="h-2.5 w-1/2 rounded dark:bg-bg-soft-200" />
+	</div>
+);
+
+const TemplatePreviewPaper = ({ children }: { children: ReactNode }) => (
+	<div
+		className="pointer-events-none absolute inset-0 select-none overflow-hidden"
+		style={previewPaperStyle}
+	>
+		<div className="relative h-full w-full overflow-hidden rounded-t-2xl bg-bg-white-0 shadow-regular-xs dark:bg-bg-weak-50">
+			{children}
+			<div
+				aria-hidden
+				className={cn(
+					"pointer-events-none absolute inset-0 rounded-t-2xl",
+					"shadow-[inset_0_0_0_1px_rgba(0,0,0,0.06),inset_0_8px_20px_rgba(0,0,0,0.08)]",
+					"dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.08),inset_0_8px_20px_rgba(255,255,255,0.04)]",
+				)}
+			/>
+		</div>
+	</div>
+);
+
 function templateThumbnailSrc(template: Template): string {
 	const bust = template.updatedAt
 		? `?t=${encodeURIComponent(template.updatedAt)}`
@@ -158,39 +199,37 @@ function templateThumbnailSrc(template: Template): string {
 
 const TemplatePreviewThumbnail = ({ template }: { template: Template }) => {
 	const [failed, setFailed] = useState(false);
+	const [loaded, setLoaded] = useState(false);
 	const src = templateThumbnailSrc(template);
-
-	if (failed) return null;
+	const showSkeleton = !loaded && !failed;
 
 	return (
-		<div
-			className="pointer-events-none absolute inset-0 select-none overflow-hidden"
-			style={{
-				paddingTop: `${PAPER_INSET}px`,
-				paddingRight: `${PAPER_INSET}px`,
-				paddingBottom: 0,
-				paddingLeft: `${PAPER_INSET}px`,
-			}}
-		>
-			<div className="relative h-full w-full overflow-hidden rounded-t-2xl bg-bg-white-0 dark:bg-black">
+		<TemplatePreviewPaper>
+			{showSkeleton ? (
+				<div className="absolute inset-0">
+					<EmailPaperSkeleton />
+				</div>
+			) : null}
+			{failed ? null : (
 				<img
 					src={src}
 					alt={`Preview of ${template.name}`}
-					className="h-full w-full rounded-t-2xl object-cover object-top"
+					className={cn(
+						"h-full w-full rounded-t-2xl object-cover object-top transition-opacity duration-300",
+						loaded ? "opacity-100" : "opacity-0",
+					)}
 					loading="lazy"
 					decoding="async"
-					onError={() => setFailed(true)}
+					onLoad={(event) => {
+						if (event.currentTarget.naturalWidth > 0) setLoaded(true);
+					}}
+					onError={() => {
+						setFailed(true);
+						setLoaded(false);
+					}}
 				/>
-				<div
-					aria-hidden
-					className={cn(
-						"pointer-events-none absolute inset-0 rounded-t-2xl",
-						"shadow-[inset_0_0_0_1px_rgba(0,0,0,0.06),inset_0_8px_20px_rgba(0,0,0,0.08)]",
-						"dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.08),inset_0_8px_20px_rgba(255,255,255,0.04)]",
-					)}
-				/>
-			</div>
-		</div>
+			)}
+		</TemplatePreviewPaper>
 	);
 };
 
@@ -220,21 +259,22 @@ function TemplateStatusBadge({ status }: { status: Template["status"] }) {
 }
 
 const TemplateSkeleton = () => (
-	<div className="group relative flex flex-col gap-3.5">
-		<div
-			className={cn(
-				"relative aspect-[5/4] w-full overflow-hidden rounded-[28px]",
-				"bg-bg-weak-50 dark:bg-black",
-				"shadow-[0_0_0_1px_rgba(0,0,0,0.03),0_8px_32px_rgba(0,0,0,0.06)]",
-				"dark:shadow-[0_0_40px_rgba(255,255,255,0.04),0_8px_32px_rgba(0,0,0,0.4)]",
-			)}
-		/>
+	<div className="group relative flex flex-col gap-3.5" aria-busy="true">
+		<div className={previewCardClassName}>
+			<div
+				aria-hidden
+				className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_40%,rgba(0,0,0,0.03)_100%)] dark:bg-[radial-gradient(ellipse_at_center,transparent_35%,rgba(0,0,0,0.35)_100%)]"
+			/>
+			<TemplatePreviewPaper>
+				<EmailPaperSkeleton />
+			</TemplatePreviewPaper>
+		</div>
 		<div className="flex items-start justify-between gap-3 px-1">
-			<div className="flex flex-1 flex-col gap-1.5">
-				<Skeleton className="h-4 w-3/4 rounded" />
-				<Skeleton className="h-3 w-1/2 rounded" />
+			<div className="ml-2 flex flex-1 flex-col gap-1.5">
+				<Skeleton className="h-4 w-3/4 rounded dark:bg-bg-soft-200" />
+				<Skeleton className="h-3 w-1/2 rounded dark:bg-bg-soft-200" />
 			</div>
-			<Skeleton className="h-6 w-14 rounded-full" />
+			<Skeleton className="mr-4 h-6 w-14 rounded-full dark:bg-bg-soft-200" />
 		</div>
 	</div>
 );
@@ -313,12 +353,8 @@ export const TemplateGrid = ({
 									{/* Preview stage — soft rounded card with ambient glow */}
 									<div
 										className={cn(
-											"relative aspect-[5/4] w-full overflow-hidden rounded-[28px] transition-shadow duration-300",
-											// Soft light fill + ambient glow (mockup)
-											"bg-gradient-to-b from-bg-white-0 to-bg-weak-50",
-											"dark:from-black dark:to-black",
-											"shadow-[0_0_0_1px_rgba(0,0,0,0.04),0_12px_40px_rgba(0,0,0,0.08)]",
-											"dark:shadow-[0_0_0_1px_rgba(255,255,255,0.06),0_0_48px_rgba(255,255,255,0.06),0_16px_48px_rgba(0,0,0,0.45)]",
+											previewCardClassName,
+											"transition-shadow duration-300",
 											isCardActive &&
 												"shadow-[0_0_0_1px_rgba(0,0,0,0.06),0_16px_48px_rgba(0,0,0,0.12)] dark:shadow-[0_0_0_1px_rgba(255,255,255,0.1),0_0_56px_rgba(255,255,255,0.1),0_20px_56px_rgba(0,0,0,0.5)]",
 											!isCardActive &&
