@@ -1,6 +1,7 @@
 import { BusEvent, bus, type KumomtaLogRecordPayload } from "@reloop/bus";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
+import { broadcastEmailLogLive } from "@reloop/logs/lib/broadcast-email-log";
 import { eq } from "drizzle-orm";
 import { log } from "evlog";
 
@@ -176,6 +177,7 @@ export async function initKumomtaSubscriber() {
 						responseCode: event.response?.code,
 						message: `Stored ${eventType ?? "unmapped"} event (no status change)`,
 					});
+					await broadcastEmailLogLive(emailLogId);
 					return;
 				}
 
@@ -227,6 +229,7 @@ export async function initKumomtaSubscriber() {
 					responseCode: event.response?.code,
 					message: `Email status updated to ${newStatus}; SMTP response stored on email_event`,
 				});
+				await broadcastEmailLogLive(emailLogId);
 			} catch (error) {
 				log.error({
 					error: error instanceof Error ? error.message : String(error),

@@ -17,6 +17,7 @@ import { agentCardRoute } from "./routes/landing/agent-card.route";
 import { healthRoute } from "./routes/landing/health.route";
 import { landingRoute } from "./routes/landing/landing.route";
 import { logsRoutes } from "./routes/logs/logs.routes";
+import { logsWsRoute } from "./routes/ws/logs.ws";
 
 const parseOtlpHeaders = (
 	headersStr?: string,
@@ -88,6 +89,7 @@ const logsService = new Elysia({
 	.use(healthRoute)
 	.use(agentCardRoute)
 	.use(logsRoutes)
+	.use(logsWsRoute)
 	.use(logCleanupCron)
 	.onStart(async () => {
 		await loader();

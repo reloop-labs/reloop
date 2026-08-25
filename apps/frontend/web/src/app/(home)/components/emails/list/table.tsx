@@ -161,7 +161,7 @@ export function EmailsListTable({
 									onClick={() => onRowClick?.(email)}
 									style={emailGridStyle}
 									className={cn(
-										"group/row grid w-full cursor-pointer items-center px-4 py-2 text-left transition-all duration-200 hover:bg-bg-weak-50",
+										"group/row grid w-full cursor-pointer items-center px-4 py-2 text-left hover:bg-bg-weak-50",
 										"first:rounded-t-xl",
 										isHighlighted && "bg-neutral-100/90 dark:bg-white/[0.06]",
 										isTargetRow &&

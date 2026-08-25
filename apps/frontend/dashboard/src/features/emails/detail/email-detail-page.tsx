@@ -6,6 +6,7 @@ import { Icon } from "@reloop/ui/icon";
 import { useRouter } from "next/navigation";
 import { useCallback, useMemo } from "react";
 import { AnimatedBackButton } from "#/features/dashboard/animated-back-button";
+import { useEmailsLive } from "#/features/emails/hooks/use-emails-live";
 import { useEmailDetailQuery } from "#/features/emails/hooks/use-emails-query";
 import { useResendEmail } from "#/features/emails/hooks/use-resend-email";
 
@@ -15,6 +16,7 @@ import { EmailNotFound } from "./email-not-found";
 export function EmailDetailPage({ emailId }: { emailId: string }) {
 	const router = useRouter();
 	const { data, error, isPending, isFetching } = useEmailDetailQuery(emailId);
+	useEmailsLive({ received: false });
 	const resendEmailMutation = useResendEmail();
 	const isResending = resendEmailMutation.isPending;
 

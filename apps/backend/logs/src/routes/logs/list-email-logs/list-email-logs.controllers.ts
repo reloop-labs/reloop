@@ -1,5 +1,6 @@
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
+import { deriveDisplayStatus } from "@reloop/logs/lib/email-log-display-status";
 import type { LogsModel } from "@reloop/logs/model/logs.model";
 import {
 	and,
@@ -17,25 +18,6 @@ import {
 import { useLogger } from "evlog/elysia";
 
 type EmailStatus = (typeof schema.emailStatusEnum.enumValues)[number];
-
-/**
- * Delivery lifecycle status for the list UI.
- * Open/click live on email_event only — email_log.status stays delivered.
- * Prefer engagement (clicked > opened) over the stored delivery status.
- */
-function deriveDisplayStatus(
-	status: string,
-	eventTypes: Iterable<string>,
-): string {
-	// Terminal failure states are never overridden by engagement.
-	if (status === "failed" || status === "bounced" || status === "spam") {
-		return status;
-	}
-	const types = eventTypes instanceof Set ? eventTypes : new Set(eventTypes);
-	if (types.has("clicked")) return "clicked";
-	if (types.has("opened")) return "opened";
-	return status;
-}
 
 function hasEventType(type: "opened" | "clicked"): SQL {
 	return exists(
