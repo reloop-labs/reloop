@@ -1,10 +1,38 @@
-import { describe, expect, it } from "bun:test";
+import { describe, expect, it, mock } from "bun:test";
 import { checkBody } from "../src/routes/tools/deliverability-test/analyzer/check-body";
 import { checkLinks } from "../src/routes/tools/deliverability-test/analyzer/check-links";
 import { checkRspamdAndContent } from "../src/routes/tools/deliverability-test/analyzer/check-rspamd";
 import { parseMime } from "../src/routes/tools/deliverability-test/analyzer/parse-mime";
 import { computeDeliverabilityScore } from "../src/routes/tools/deliverability-test/analyzer/score";
 import type { CategoryResult } from "../src/routes/tools/deliverability-test/deliverability-test.types";
+
+const stubFetch = (async () =>
+	new Response("", { status: 200 })) as typeof fetch;
+
+// CI has no Redis. The real client waits up to 15s to connect, so session
+// create/get/inject hang until bun kills the test. Same seam as rate-limit.test.ts.
+const sessionStore = new Map<string, unknown>();
+const sessionCounters = new Map<string, number>();
+
+mock.module("@be/tools/utils/loader", () => ({
+	redis: {
+		set: async (key: string, value: unknown, _seconds?: number) => {
+			sessionStore.set(key, value);
+		},
+		get: async <T>(key: string): Promise<T | null> => {
+			return (sessionStore.get(key) as T) ?? null;
+		},
+		increment: async (key: string): Promise<number> => {
+			const next = (sessionCounters.get(key) ?? 0) + 1;
+			sessionCounters.set(key, next);
+			return next;
+		},
+		expire: async (_key: string, _seconds: number): Promise<void> => {},
+		ttl: async (_key: string): Promise<number> => -1,
+		healthCheck: async (): Promise<boolean> => true,
+	},
+	loader: async () => {},
+}));
 
 describe("Deliverability Tester Analyzer", () => {
 	const sampleMime = `From: "Reloop Notifications" <support@reloop.sh>
@@ -90,8 +118,7 @@ Content-Type: text/html
 
 	it("detects link shorteners and mismatched display text", async () => {
 		const originalFetch = globalThis.fetch;
-		// @ts-ignore
-		globalThis.fetch = async () => new Response("", { status: 200 });
+		globalThis.fetch = stubFetch;
 
 		try {
 			const phishingMime = `From: info@test.com
@@ -212,8 +239,7 @@ Content-Type: text/html
 
 	it("handles session lifecycle: create -> inject sample -> retrieve report", async () => {
 		const originalFetch = globalThis.fetch;
-		// @ts-ignore
-		globalThis.fetch = async () => new Response("", { status: 200 });
+		globalThis.fetch = stubFetch;
 
 		try {
 			const {
