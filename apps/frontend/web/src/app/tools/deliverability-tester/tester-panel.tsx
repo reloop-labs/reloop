@@ -70,7 +70,7 @@ export function TesterPanel() {
 	);
 
 	// 1. Initialize session on mount
-	const initSession = async (overrideToken?: string) => {
+	const initSession = async (overrideToken?: string, forceNew = false) => {
 		setStatus("loading");
 		setErrorMessage("");
 		setNoEmailFoundAlert(false);
@@ -80,7 +80,8 @@ export function TesterPanel() {
 				typeof window !== "undefined"
 					? new URLSearchParams(window.location.search)
 					: null;
-			const queryToken = overrideToken || urlParams?.get("token");
+			const queryToken =
+				overrideToken || (forceNew ? null : urlParams?.get("token"));
 
 			if (queryToken) {
 				const checkRes = await pollDeliverabilitySession(queryToken);
@@ -233,7 +234,12 @@ export function TesterPanel() {
 	};
 
 	if (status === "ready" && report) {
-		return <ReportView report={report} onReset={initSession} />;
+		return (
+			<ReportView
+				report={report}
+				onReset={() => initSession(undefined, true)}
+			/>
+		);
 	}
 
 	return (
@@ -249,7 +255,7 @@ export function TesterPanel() {
 						<FancyButton.Root
 							variant="basic"
 							size="small"
-							onClick={initSession}
+							onClick={() => initSession()}
 						>
 							Try Again
 						</FancyButton.Root>
