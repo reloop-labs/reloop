@@ -137,7 +137,7 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 				onClick={(e) => onSelect(listId, e)}
 				onMouseEnter={() => onMouseEnter(listId)}
 				className={cn(
-					"group flex cursor-pointer items-center border-b pt-2.5 pr-6 pb-2.5 pl-4 text-left",
+					"group flex cursor-pointer items-start border-b pt-2.5 pr-6 pb-2.5 pl-4 text-left",
 					"border-stroke-soft-100 bg-transparent dark:border-stroke-soft-100/40",
 					"hover:bg-neutral-alpha-10",
 					(isSelected || isBulkSelected || isKeyboardFocused) &&
@@ -145,7 +145,7 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 				)}
 			>
 				{/* Bulk select checkbox */}
-				<span className="flex w-5 shrink-0 items-center justify-center">
+				<span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center">
 					<button
 						type="button"
 						aria-label={isBulkSelected ? "Deselect thread" : "Select thread"}
@@ -168,7 +168,7 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 				</span>
 
 				{/* Star button */}
-				<span className="ml-1.5 flex w-5 shrink-0 items-center justify-center">
+				<span className="mt-0.5 ml-1.5 flex h-5 w-5 shrink-0 items-center justify-center">
 					<button
 						type="button"
 						title={thread.isStarred ? "Unstar" : "Star"}
@@ -192,7 +192,7 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 
 				{/* Sender */}
 				<span
-					className="ml-3 flex shrink-0 items-center gap-1.5 truncate pr-4"
+					className="mt-0.5 ml-3 flex h-5 shrink-0 items-center gap-1.5 truncate pr-4"
 					style={{ width: "clamp(120px, 20%, 180px)" }}
 				>
 					<span
@@ -213,7 +213,7 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 				</span>
 
 				{/* Subject + preview */}
-				<div className="flex min-w-0 flex-1 flex-col justify-center gap-1 overflow-hidden pr-3">
+				<div className="flex min-w-0 flex-1 flex-col justify-start gap-1 overflow-hidden pr-3">
 					<div className="flex min-w-0 items-center gap-1.5">
 						{primaryLabel ? (
 							<span
@@ -253,7 +253,6 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 								<ListAttachmentChip
 									key={`${att.name}-${index}`}
 									filename={att.name}
-									contentType={att.contentType}
 								/>
 							))}
 							{visibleAttachments.length > 2 ? (
@@ -268,7 +267,7 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 				{/* Hover actions */}
 				<span
 					className={cn(
-						"ml-2 flex shrink-0 items-center gap-1 opacity-0 group-hover:opacity-100",
+						"mt-0.5 ml-2 flex shrink-0 items-center gap-1 opacity-0 group-hover:opacity-100",
 						isSelectMode && "pointer-events-none opacity-0",
 					)}
 				>
@@ -315,15 +314,15 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 				</span>
 
 				{/* Failed label on right-hand side */}
-				{isFailed && (
-					<span className="ml-2 inline-flex shrink-0 items-center gap-1 rounded-[5px] bg-red-500/10 px-1.5 py-0.5 font-medium text-[11px] text-red-600 ring-1 ring-red-500/25 ring-inset dark:bg-red-950/40 dark:text-red-400 dark:ring-red-500/30">
+				{isFailed ? (
+					<span className="mt-0.5 ml-2 inline-flex h-5 shrink-0 items-center gap-1 rounded-[5px] bg-red-500/10 px-1.5 py-0.5 font-medium text-[11px] text-red-600 ring-1 ring-red-500/25 ring-inset dark:bg-red-950/40 dark:text-red-400 dark:ring-red-500/30">
 						<span className="size-1.5 shrink-0 rounded-full bg-red-500" />
 						Failed
 					</span>
-				)}
+				) : null}
 
 				{/* Date/Time */}
-				<span className="ml-2 w-18 shrink-0 whitespace-nowrap text-right font-normal text-[12.5px] text-text-soft-400 tabular-nums">
+				<span className="mt-0.5 ml-2 w-18 shrink-0 whitespace-nowrap text-right font-normal text-[12.5px] text-text-soft-400 tabular-nums leading-5">
 					{formatReceivedAt(thread.receivedAt)}
 				</span>
 			</div>

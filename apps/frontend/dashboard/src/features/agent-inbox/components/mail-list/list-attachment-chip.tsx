@@ -1,38 +1,18 @@
 import { cn } from "@reloop/ui/cn";
-import {
-	ATTACHMENT_KIND_ACCENT,
-	attachmentFileKind,
-	attachmentKindLabel,
-} from "../thread-detail/attachment-file-kind";
+import { FileTypeIcon } from "../thread-detail/file-type-icon";
 
-export function ListAttachmentChip({
-	filename,
-	contentType,
-}: {
-	filename: string;
-	contentType?: string;
-}) {
-	const kind = attachmentFileKind(filename, contentType);
-	const label = attachmentKindLabel(kind);
-
+export function ListAttachmentChip({ filename }: { filename: string }) {
 	return (
 		<span
 			className={cn(
 				"inline-flex max-w-[200px] items-center gap-1.5",
-				"rounded-full border border-black/8 bg-white py-[3px] pr-2.5 pl-1",
-				"shadow-[0_1px_1px_rgba(15,23,42,0.04)]",
+				"h-[22px] rounded-full border border-stroke-soft-200 bg-bg-white-0 py-0 pr-2 pl-1",
 				"dark:border-white/10 dark:bg-[#1c1c1c]",
 			)}
 			title={filename}
 		>
-			<span
-				aria-hidden
-				className="flex h-4 w-4 shrink-0 items-center justify-center rounded-[3px] font-bold text-[6.5px] text-white tracking-tight"
-				style={{ background: ATTACHMENT_KIND_ACCENT[kind] }}
-			>
-				{label.slice(0, 3)}
-			</span>
-			<span className="min-w-0 truncate text-[12.5px] text-text-sub-600 dark:text-white/70">
+			<FileTypeIcon filename={filename} />
+			<span className="min-w-0 truncate text-[12.5px] text-text-sub-600 leading-none dark:text-white/70">
 				{filename}
 			</span>
 		</span>

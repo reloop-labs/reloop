@@ -1,11 +1,7 @@
 import { cn } from "@reloop/ui/cn";
+import { HardDriveDownload } from "lucide-react";
 import { apiFetch } from "#/features/agent-inbox/lib/api-fetch";
-import {
-	ATTACHMENT_KIND_ACCENT,
-	type AttachmentFileKind,
-	attachmentFileKind,
-	attachmentKindLabel,
-} from "./attachment-file-kind";
+import { FileTypeIcon } from "./file-type-icon";
 
 export interface AttachmentItem {
 	id?: string;
@@ -28,27 +24,15 @@ interface MessageAttachmentsProps {
 	className?: string;
 }
 
-function FileKindGlyph({ kind }: { kind: AttachmentFileKind }) {
-	return (
-		<span
-			aria-hidden
-			className="flex h-4 w-4 shrink-0 items-center justify-center rounded-[3px] font-bold text-[6.5px] text-white tracking-tight"
-			style={{ background: ATTACHMENT_KIND_ACCENT[kind] }}
-		>
-			{attachmentKindLabel(kind).slice(0, 3)}
-		</span>
-	);
-}
-
-function previewUrlFor(file: AttachmentItem): string | null {
-	const path = file.storagePath?.trim();
-	if (!path) return null;
-	if (path.startsWith("http://") || path.startsWith("https://")) return path;
-	if (path.startsWith("uploads/")) {
-		return `/api/upload/v1/files/content?path=${encodeURIComponent(path)}`;
+const formatFileSize = (size: string | number) => {
+	if (typeof size === "number") {
+		const mb = size / (1024 * 1024);
+		if (mb >= 0.01) return `${mb.toFixed(1)} MB`;
+		const kb = size / 1024;
+		return `${kb.toFixed(1)} KB`;
 	}
-	return null;
-}
+	return size;
+};
 
 function triggerDownload(href: string, filename: string, revoke?: string) {
 	const a = document.createElement("a");
@@ -114,77 +98,8 @@ export const downloadAttachment = async (
 	triggerDownload(url, meta.filename || file.name);
 };
 
-function AttachmentCard({
-	file,
-	onDownload,
-}: {
-	file: AttachmentItem;
-	onDownload: (file: AttachmentItem) => void;
-}) {
-	const kind = attachmentFileKind(file.name, file.contentType);
-	const label = attachmentKindLabel(kind);
-	const previewUrl = kind === "img" ? previewUrlFor(file) : null;
-
-	return (
-		<div className="relative w-[168px] shrink-0">
-			<button
-				type="button"
-				onClick={() => onDownload(file)}
-				aria-label={`Download ${file.name}`}
-				title={file.name}
-				className={cn(
-					"relative flex w-full flex-col overflow-hidden rounded-[10px] bg-white text-left",
-					"shadow-[0_1px_2px_rgba(15,23,42,0.06)] ring-1 ring-black/8",
-					"transition-[box-shadow,transform] duration-150 ease-out",
-					"hover:shadow-[0_6px_16px_rgba(15,23,42,0.1)]",
-					"active:scale-[0.97]",
-					"focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-strong-950",
-					"dark:bg-[#1c1c1c] dark:ring-white/10",
-				)}
-				style={{
-					clipPath:
-						"polygon(0 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%)",
-				}}
-			>
-				<div className="relative flex h-[92px] items-center justify-center bg-white dark:bg-[#222]">
-					{previewUrl ? (
-						<img
-							src={previewUrl}
-							alt=""
-							className="h-full w-full object-cover"
-						/>
-					) : (
-						<span className="rounded-md bg-[#E8E8E8] px-2.5 py-1 font-semibold text-[#9A9A9A] text-[13px] tracking-wide dark:bg-white/10 dark:text-white/40">
-							{label}
-						</span>
-					)}
-				</div>
-				<div className="flex h-[36px] items-center gap-1.5 border-black/6 border-t bg-[#F3F3F3] px-2.5 dark:border-white/8 dark:bg-[#2a2a2a]">
-					<FileKindGlyph kind={kind} />
-					<span className="min-w-0 truncate font-medium text-[#3C4043] text-[12.5px] dark:text-white/80">
-						{file.name}
-					</span>
-				</div>
-			</button>
-			<span
-				aria-hidden
-				className="pointer-events-none absolute right-0 bottom-0 size-[14px]"
-			>
-				<svg viewBox="0 0 14 14" className="size-full" aria-hidden>
-					<path d="M14 0v14H0z" fill="#E24B3A" />
-					<path
-						d="M14 0 0 14"
-						stroke="rgba(255,255,255,0.35)"
-						strokeWidth="0.6"
-					/>
-				</svg>
-			</span>
-		</div>
-	);
-}
-
 /**
- * Gmail-style document preview cards for attachments on a message.
+ * Horizontal attachment chips with file-type icons.
  */
 export const MessageAttachments = ({
 	attachments,
@@ -208,19 +123,48 @@ export const MessageAttachments = ({
 	return (
 		<div className={cn("w-full", className)}>
 			{showLabel ? (
-				<div className="mb-2.5 flex items-center gap-2">
+				<div className="mb-2 flex items-center gap-2">
 					<span className="font-medium text-mail-foreground text-sm">
 						{label} <span className="text-[#8D8D8D]">[{visible.length}]</span>
 					</span>
 				</div>
 			) : null}
-			<div className="flex flex-wrap items-start gap-3">
+			<div className="flex flex-wrap items-center gap-2">
 				{visible.map((file, index) => (
-					<AttachmentCard
+					<div
 						key={file.id || `${file.name}-${index}`}
-						file={file}
-						onDownload={(item) => void handleDownload(item)}
-					/>
+						className="flex items-center"
+					>
+						<button
+							type="button"
+							onClick={() => void handleDownload(file)}
+							className="flex cursor-pointer items-center gap-1.5 rounded-[5px] bg-[#FAFAFA] px-1.5 py-1 font-medium text-sm transition-colors hover:bg-[#F0F0F0] dark:bg-[#262626] dark:hover:bg-[#303030]"
+						>
+							<FileTypeIcon filename={file.name} />
+							<span
+								className="max-w-[15ch] truncate text-mail-foreground text-sm"
+								title={file.name}
+							>
+								{file.name}
+							</span>
+							{file.size ? (
+								<span className="whitespace-nowrap text-[#929292] text-sm">
+									{formatFileSize(file.size)}
+								</span>
+							) : null}
+						</button>
+						<button
+							type="button"
+							onClick={() => void handleDownload(file)}
+							className="flex cursor-pointer items-center gap-1 rounded-[5px] px-1.5 py-1 text-sm"
+							aria-label={`Download ${file.name}`}
+						>
+							<HardDriveDownload className="h-4 w-4 text-[#929292]" />
+						</button>
+						{index < visible.length - 1 ? (
+							<div className="mx-0.5 h-2 w-px bg-[#E0E0E0] dark:bg-[#424242]" />
+						) : null}
+					</div>
 				))}
 			</div>
 		</div>

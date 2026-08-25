@@ -69,13 +69,3 @@ export function attachmentKindLabel(kind: AttachmentFileKind): string {
 			return "FILE";
 	}
 }
-
-export const ATTACHMENT_KIND_ACCENT: Record<AttachmentFileKind, string> = {
-	pdf: "#E53935",
-	doc: "#1A73E8",
-	xls: "#188038",
-	ppt: "#E8710A",
-	img: "#8B5CF6",
-	zip: "#5F6368",
-	file: "#5F6368",
-};
