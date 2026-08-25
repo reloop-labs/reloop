@@ -5,29 +5,18 @@ import {
 	CSS3DObject,
 	CSS3DRenderer,
 } from "three/examples/jsm/renderers/CSS3DRenderer.js";
-import { playMacClick } from "./audio/macClick";
 import {
 	createModelLoadingOverlay,
 	type ModelLoadingOverlayController,
 } from "./components/ModelLoadingOverlay";
 import {
 	consumeUiDirty,
-	drawMacUI,
 	finishBootSequence,
 	getVideoViewportRect,
-	getWindowRect,
-	hitTestDesktop,
-	hitTestGrowBox,
-	hitTestTrashGrowBox,
-	hitTestTrashIcon,
-	hitTestTrashWindow,
-	hitTestTrashWindowClose,
-	hitTestTrashWindowItem,
 	setBootProgress,
 	startBootSequence,
 	state,
 	uiCanvas,
-	uvToCanvas,
 } from "./mac-ui";
 import { applyRainbowToMesh } from "./three/rainbowApple";
 import { generatePlanarUVs } from "./three/uv";
@@ -40,27 +29,53 @@ const VIEW_PRESET_INITIAL = {
 	rotX: 6,
 	rotY: 1,
 	rotZ: 0,
-	zoom: 0.96,
-};
-
-const VIEW_PRESET_SCREEN_ZOOM = {
-	modelX: 0.14474,
-	modelY: -0.2502,
-	rotX: 6,
-	rotY: 1,
-	rotZ: 0,
-	zoom: 0.42,
+	zoom: 1.0,
 };
 
 const WINDOW_RESIZE_DRAG_THROTTLE_MS = 40;
 const WINDOW_RESIZE_RELEASE_DELAY_MS = 80;
 
-function easeInOutCubic(t: number): number {
-	return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-}
-
 export interface MacintoshRendererOptions {
 	transparent?: boolean;
+}
+
+function isKeyboardOrMouse(name?: string): boolean {
+	if (!name) return false;
+	if (
+		name === "Circle" ||
+		name === "BézierCurve" ||
+		name === "Base" ||
+		name === "Apple_Logo"
+	)
+		return true;
+	if (name.startsWith("Text.") || name.startsWith("Text")) {
+		const num = Number.parseInt(name.replace("Text.", "").replace("Text", ""));
+		if (!isNaN(num) && num >= 11) return true;
+	}
+	if (name.startsWith("Cube.034") || name.startsWith("Cube034")) return true;
+	if (name.startsWith("Cube.008") || name.startsWith("Cube008")) return true;
+	if (name.startsWith("Cube.018") || name.startsWith("Cube018")) return true;
+	if (name.startsWith("Cube.023") || name.startsWith("Cube023")) return true;
+	if (name.startsWith("Cube.027") || name.startsWith("Cube027")) return true;
+	if (name.startsWith("Cube.028") || name.startsWith("Cube028")) return true;
+	if (name.startsWith("Cube.029") || name.startsWith("Cube029")) return true;
+	if (name.startsWith("Cube.030") || name.startsWith("Cube030")) return true;
+	if (name.startsWith("Cube.054") || name.startsWith("Cube054")) return true;
+	if (name.startsWith("Cube.002") || name.startsWith("Cube002")) return true;
+	if (name.startsWith("Cube.017") || name.startsWith("Cube017")) return true;
+	if (name === "Cube" || name === "Cube_1" || name === "Cube_2") return true;
+	if (name.startsWith("Cube.016") || name.startsWith("Cube016")) return true;
+	if (name.startsWith("Cube.001") || name.startsWith("Cube001")) return true;
+	if (name.startsWith("Cube.003") || name.startsWith("Cube003")) return true;
+	if (name.startsWith("Cube.019") || name.startsWith("Cube019")) return true;
+	if (name.startsWith("Cube.020") || name.startsWith("Cube020")) return true;
+	if (name.startsWith("Cylinder.002") || name.startsWith("Cylinder002"))
+		return true;
+	if (name.startsWith("Cylinder.007") || name.startsWith("Cylinder007"))
+		return true;
+	if (name.startsWith("Cylinder.008") || name.startsWith("Cylinder008"))
+		return true;
+	return false;
 }
 
 export class MacintoshRenderer {
@@ -86,40 +101,9 @@ export class MacintoshRenderer {
 	private videoLayer: HTMLDivElement | null = null;
 	private videoIframe: HTMLIFrameElement | null = null;
 	private videoEmbedUrl: string | null = null;
-
-	private modelRaycastMeshes: THREE.Mesh[] = [];
-	private raycaster = new THREE.Raycaster();
-	private mouse = new THREE.Vector2();
-
-	private suppressNextClick = false;
-	private isResizingWindow = false;
-	private resizeTarget: "main" | "trash" = "main";
-	private resizePointerId: number | null = null;
-	private resizeStart: {
-		canvasX: number;
-		canvasY: number;
-		windowWidth: number;
-		windowHeight: number;
-	} | null = null;
-	private controlsEnabledBeforeResize = true;
-
-	private hasZoomedToScreen = false;
-	private screenZoomAnim: {
-		startMs: number;
-		durationMs: number;
-		from: typeof VIEW_PRESET_INITIAL;
-		to: typeof VIEW_PRESET_SCREEN_ZOOM;
-		controlsEnabledBefore: boolean;
-	} | null = null;
-
-	private zoomOutMaxDistance: number | null = null;
-	private zoomInMinDistance: number | null = null;
 	private screenFrontSign = 1;
-
-	private resizeDragRedrawTimeoutId: ReturnType<typeof setTimeout> | null =
-		null;
-	private resizeReleaseRedrawTimeoutId: ReturnType<typeof setTimeout> | null =
-		null;
+	private isHovered = false;
+	private isUserInteracting = false;
 
 	private clock = new THREE.Clock();
 	private raf = 0;
@@ -137,65 +121,73 @@ export class MacintoshRenderer {
 
 	constructor(host: HTMLElement, options: MacintoshRendererOptions = {}) {
 		this.host = host;
-		this.transparent = options.transparent ?? true;
+		this.transparent = !!options.transparent;
 	}
 
 	mount(): boolean {
+		if (this.disposed) return false;
+
 		const { clientWidth: w, clientHeight: h } = this.host;
-		const width = Math.max(1, w);
-		const height = Math.max(1, h);
-		const dpr = Math.min(window.devicePixelRatio || 1, 2);
+		if (w === 0 || h === 0) return false;
 
-		this.host.style.position = "relative";
-		this.host.style.overflow = "hidden";
-
-		this.modelLoadingOverlay = createModelLoadingOverlay(this.host);
-		this.modelLoadingOverlay.start();
-		startBootSequence();
-
-		this.camera = new THREE.PerspectiveCamera(60, width / height, 0.01, 100);
+		this.scene = new THREE.Scene();
+		this.camera = new THREE.PerspectiveCamera(45, w / h, 0.1, 1000);
 
 		this.renderer = new THREE.WebGLRenderer({
 			antialias: true,
 			alpha: this.transparent,
 			powerPreference: "high-performance",
 		});
-		this.renderer.setPixelRatio(dpr);
-		this.renderer.setSize(width, height);
-		this.renderer.outputColorSpace = THREE.SRGBColorSpace;
+		this.renderer.setSize(w, h);
+		this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
 		this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-		this.renderer.toneMappingExposure = 1.2;
+		this.renderer.toneMappingExposure = 1.0;
 		if (this.transparent) {
 			this.renderer.setClearColor(0x000000, 0);
-			this.scene.background = null;
 		} else {
-			this.renderer.setClearColor(0xe7e7e7, 1);
-			this.scene.background = new THREE.Color(0xe7e7e7);
+			this.renderer.setClearColor(0xf6f6f6, 1);
 		}
+		this.host.style.position = "relative";
+		this.host.style.overflow = "hidden";
+		this.host.style.touchAction = "none";
+		this.host.style.userSelect = "none";
+
 		this.renderer.domElement.style.position = "absolute";
-		this.renderer.domElement.style.inset = "0";
+		this.renderer.domElement.style.top = "0";
+		this.renderer.domElement.style.left = "0";
 		this.renderer.domElement.style.width = "100%";
 		this.renderer.domElement.style.height = "100%";
+		this.renderer.domElement.style.zIndex = "1";
 		this.renderer.domElement.style.visibility = "hidden";
 		this.renderer.domElement.style.touchAction = "none";
 		this.host.appendChild(this.renderer.domElement);
 
+		this.modelLoadingOverlay = createModelLoadingOverlay(this.host);
+
 		this.cssRenderer = new CSS3DRenderer();
-		this.cssRenderer.setSize(width, height);
+		this.cssRenderer.setSize(w, h);
 		this.cssRenderer.domElement.style.position = "absolute";
-		this.cssRenderer.domElement.style.inset = "0";
+		this.cssRenderer.domElement.style.top = "0";
+		this.cssRenderer.domElement.style.left = "0";
 		this.cssRenderer.domElement.style.width = "100%";
 		this.cssRenderer.domElement.style.height = "100%";
 		this.cssRenderer.domElement.style.pointerEvents = "none";
 		this.cssRenderer.domElement.style.zIndex = "2";
 		this.cssRenderer.domElement.style.visibility = "hidden";
+		this.cssRenderer.domElement.style.touchAction = "none";
 		this.host.appendChild(this.cssRenderer.domElement);
 
 		this.setupLighting();
 
-		this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+		this.controls = new OrbitControls(this.camera, this.host);
+		this.controls.enableRotate = true;
+		this.controls.rotateSpeed = 0.9;
 		this.controls.enableDamping = true;
+		this.controls.dampingFactor = 0.05;
 		this.controls.enablePan = false;
+		this.controls.enableZoom = false;
+		this.controls.autoRotate = true;
+		this.controls.autoRotateSpeed = 1.2;
 
 		this.loadModel();
 		this.bindEvents();
@@ -223,6 +215,16 @@ export class MacintoshRenderer {
 				if (this.disposed) return;
 				const model = gltf.scene;
 				this.modelRoot = model;
+
+				const toRemove: THREE.Object3D[] = [];
+				model.traverse((child) => {
+					if (isKeyboardOrMouse(child.name)) {
+						toRemove.push(child);
+					}
+				});
+				for (const obj of toRemove) {
+					if (obj.parent) obj.parent.remove(obj);
+				}
 
 				model.traverse((child) => {
 					if (!(child instanceof THREE.Mesh)) return;
@@ -274,9 +276,7 @@ export class MacintoshRenderer {
 
 				model.traverse((o) => {
 					if (!(o instanceof THREE.Mesh)) return;
-					const mats = Array.isArray(o.material)
-						? o.material
-						: [o.material];
+					const mats = Array.isArray(o.material) ? o.material : [o.material];
 					if (
 						mats.some(
 							(m) =>
@@ -322,7 +322,7 @@ export class MacintoshRenderer {
 				const fov = THREE.MathUtils.degToRad(this.camera.fov);
 				const dist = maxDim / (2 * Math.tan(fov / 2));
 
-				this.camera.position.set(0, 0, dist * 1.5);
+				this.camera.position.set(0, 0, dist * 1.8);
 				this.camera.lookAt(0, 0, 0);
 				this.camera.near = dist / 100;
 				this.camera.far = dist * 10;
@@ -343,16 +343,6 @@ export class MacintoshRenderer {
 					this.screenFrontSign = dot >= 0 ? 1 : -1;
 				}
 
-				this.zoomOutMaxDistance = this.camera.position.distanceTo(
-					this.controls.target,
-				);
-				this.applyOrbitZoomLimits();
-
-				this.modelRaycastMeshes = [];
-				model.traverse(
-					(o) => o instanceof THREE.Mesh && this.modelRaycastMeshes.push(o),
-				);
-
 				this.modelLoadingOverlay?.finish().then(() => {
 					if (this.disposed) return;
 					this.renderer.domElement.style.visibility = "visible";
@@ -363,11 +353,7 @@ export class MacintoshRenderer {
 			(xhr) => {
 				const total = xhr?.total;
 				const loaded = xhr?.loaded;
-				if (
-					Number.isFinite(total) &&
-					total > 0 &&
-					Number.isFinite(loaded)
-				) {
+				if (Number.isFinite(total) && total > 0 && Number.isFinite(loaded)) {
 					const frac = loaded / total;
 					this.modelLoadingOverlay?.setProgress(frac);
 					setBootProgress(frac);
@@ -411,28 +397,9 @@ export class MacintoshRenderer {
 		if (dir.lengthSq() < 1e-8) dir.set(0, 0, 1);
 		dir.normalize();
 
-		const dist = Math.max(
-			0.02,
-			this.baseCameraDistance * this.viewParams.zoom,
-		);
+		const dist = Math.max(0.02, this.baseCameraDistance * this.viewParams.zoom);
 		this.camera.position.copy(target).addScaledVector(dir, dist);
 		this.controls.update();
-	}
-
-	private applyOrbitZoomLimits() {
-		if (Number.isFinite(this.zoomOutMaxDistance))
-			this.controls.maxDistance = this.zoomOutMaxDistance!;
-		if (Number.isFinite(this.zoomInMinDistance))
-			this.controls.minDistance = this.zoomInMinDistance!;
-		if (
-			Number.isFinite(this.controls.minDistance) &&
-			Number.isFinite(this.controls.maxDistance) &&
-			this.controls.minDistance > this.controls.maxDistance
-		) {
-			const tmp = this.controls.maxDistance;
-			this.controls.maxDistance = this.controls.minDistance;
-			this.controls.minDistance = tmp;
-		}
 	}
 
 	private getScreenFacingDot(): number {
@@ -444,7 +411,10 @@ export class MacintoshRenderer {
 			.applyQuaternion(this._tmpScreenQuat)
 			.normalize()
 			.multiplyScalar(this.screenFrontSign);
-		this._tmpToCam.copy(this.camera.position).sub(this._tmpScreenPos).normalize();
+		this._tmpToCam
+			.copy(this.camera.position)
+			.sub(this._tmpScreenPos)
+			.normalize();
 		return this._tmpScreenNormal.dot(this._tmpToCam);
 	}
 
@@ -546,297 +516,49 @@ export class MacintoshRenderer {
 		this.videoLayer.style.display = isFacingCamera ? "block" : "none";
 		this.videoLayer.style.pointerEvents = isFacingCamera ? "auto" : "none";
 
-		const nextEmbed = `https://www.youtube.com/embed/2zfqw8nhUwA?autoplay=0&rel=0&playsinline=1&modestbranding=1`;
+		const nextEmbed =
+			"https://www.youtube.com/embed/2zfqw8nhUwA?autoplay=0&rel=0&playsinline=1&modestbranding=1";
 		if (this.videoEmbedUrl !== nextEmbed) {
 			this.videoEmbedUrl = nextEmbed;
 			this.videoIframe.src = nextEmbed;
 		}
 	}
 
-	private startInitialScreenZoom() {
-		if (this.hasZoomedToScreen || !this.screenMesh) return;
-
-		this.hasZoomedToScreen = true;
-
-		this.screenZoomAnim = {
-			startMs: performance.now(),
-			durationMs: 700,
-			from: {
-				modelX: this.viewParams.modelX,
-				modelY: this.viewParams.modelY,
-				rotX: this.viewParams.rotX,
-				rotY: this.viewParams.rotY,
-				rotZ: this.viewParams.rotZ,
-				zoom: this.viewParams.zoom,
-			},
-			to: VIEW_PRESET_SCREEN_ZOOM,
-			controlsEnabledBefore: this.controls.enabled,
-		};
-
-		this.controls.enabled = false;
-	}
-
-	private getScreenHitCanvasPoint(e: PointerEvent | MouseEvent) {
-		if (!this.screenMesh || !this.renderer) return null;
-		const rect = this.renderer.domElement.getBoundingClientRect();
-		this.mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-		this.mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
-		this.raycaster.setFromCamera(this.mouse, this.camera);
-		const hits = this.modelRaycastMeshes.length
-			? this.raycaster.intersectObjects(this.modelRaycastMeshes, true)
-			: this.raycaster.intersectObject(this.screenMesh);
-		if (!hits.length || !hits[0] || hits[0].object !== this.screenMesh) return null;
-		const uv = hits[0].uv;
-		if (!uv) return null;
-		const { x: canvasX, y: canvasY } = uvToCanvas(uv);
-		return { canvasX, canvasY, uv };
-	}
-
-	private cancelResizeDragRedraw() {
-		if (!this.resizeDragRedrawTimeoutId) return;
-		clearTimeout(this.resizeDragRedrawTimeoutId);
-		this.resizeDragRedrawTimeoutId = null;
-	}
-
-	private cancelResizeReleaseRedraw() {
-		if (!this.resizeReleaseRedrawTimeoutId) return;
-		clearTimeout(this.resizeReleaseRedrawTimeoutId);
-		this.resizeReleaseRedrawTimeoutId = null;
-	}
-
-	private scheduleResizeDragRedraw() {
-		this.cancelResizeReleaseRedraw();
-		if (this.resizeDragRedrawTimeoutId) return;
-		this.resizeDragRedrawTimeoutId = setTimeout(() => {
-			this.resizeDragRedrawTimeoutId = null;
-			drawMacUI();
-			if (this.screenTexture) this.screenTexture.needsUpdate = true;
-		}, WINDOW_RESIZE_DRAG_THROTTLE_MS);
-	}
-
-	private scheduleResizeReleaseRedraw() {
-		this.cancelResizeReleaseRedraw();
-		this.resizeReleaseRedrawTimeoutId = setTimeout(() => {
-			this.resizeReleaseRedrawTimeoutId = null;
-			drawMacUI();
-			if (this.screenTexture) this.screenTexture.needsUpdate = true;
-		}, WINDOW_RESIZE_RELEASE_DELAY_MS);
-	}
-
 	private bindEvents() {
-		const dom = this.renderer.domElement;
+		const onPointerEnter = () => {
+			this.isHovered = true;
+			this.controls.autoRotate = false;
+		};
 
-		const onPointerDown = (e: PointerEvent) => {
-			const hit = this.getScreenHitCanvasPoint(e);
-			if (!hit) return;
-
-			if (this.screenZoomAnim) return;
-
-			if (!this.hasZoomedToScreen) {
-				playMacClick();
-				this.startInitialScreenZoom();
-				this.suppressNextClick = true;
-				e.preventDefault();
-				return;
-			}
-
-			if (state.bootState?.stage && state.bootState.stage !== "desktop") return;
-
-			if (
-				state.currentWindow === "desktop" &&
-				state.trashWindowOpen &&
-				hitTestTrashGrowBox(hit.canvasX, hit.canvasY)
-			) {
-				playMacClick();
-				this.suppressNextClick = true;
-
-				const r = state.trashWindowRect;
-				if (!r) return;
-
-				this.resizeTarget = "trash";
-				this.isResizingWindow = true;
-				this.resizePointerId = e.pointerId;
-				this.resizeStart = {
-					canvasX: hit.canvasX,
-					canvasY: hit.canvasY,
-					windowWidth: r.width,
-					windowHeight: r.height,
-				};
-
-				this.controlsEnabledBeforeResize = this.controls.enabled;
-				this.controls.enabled = false;
-				this.cancelResizeReleaseRedraw();
-				dom.setPointerCapture?.(e.pointerId);
-				e.preventDefault();
-				return;
-			}
-
-			if (
-				state.currentWindow === "desktop" &&
-				state.trashWindowOpen &&
-				hitTestTrashWindow(hit.canvasX, hit.canvasY)
-			) {
-				return;
-			}
-
-			if (hitTestGrowBox(hit.canvasX, hit.canvasY)) {
-				playMacClick();
-				this.suppressNextClick = true;
-
-				const { windowWidth, windowHeight } = getWindowRect();
-				this.resizeTarget = "main";
-				this.isResizingWindow = true;
-				this.resizePointerId = e.pointerId;
-				this.resizeStart = {
-					canvasX: hit.canvasX,
-					canvasY: hit.canvasY,
-					windowWidth,
-					windowHeight,
-				};
-
-				this.controlsEnabledBeforeResize = this.controls.enabled;
-				this.controls.enabled = false;
-				this.cancelResizeReleaseRedraw();
-				dom.setPointerCapture?.(e.pointerId);
-				e.preventDefault();
+		const onPointerLeave = () => {
+			this.isHovered = false;
+			if (!this.isUserInteracting) {
+				this.controls.autoRotate = true;
 			}
 		};
 
-		const onPointerMove = (e: PointerEvent) => {
-			if (
-				!this.isResizingWindow ||
-				e.pointerId !== this.resizePointerId ||
-				!this.resizeStart
-			)
-				return;
-			const hit = this.getScreenHitCanvasPoint(e);
-			if (!hit) return;
-
-			const dx = hit.canvasX - this.resizeStart.canvasX;
-			const dy = hit.canvasY - this.resizeStart.canvasY;
-
-			if (this.resizeTarget === "trash") {
-				if (!state.trashWindowRect) return;
-				state.trashWindowRect.width = Math.round(
-					this.resizeStart.windowWidth + dx,
-				);
-				state.trashWindowRect.height = Math.round(
-					this.resizeStart.windowHeight + dy,
-				);
-			} else {
-				if (state.windowRect) {
-					state.windowRect.width = Math.round(
-						this.resizeStart.windowWidth + dx,
-					);
-					state.windowRect.height = Math.round(
-						this.resizeStart.windowHeight + dy,
-					);
-				}
-			}
-
-			this.scheduleResizeDragRedraw();
-			e.preventDefault();
+		const onControlsStart = () => {
+			this.isUserInteracting = true;
+			this.controls.autoRotate = false;
 		};
 
-		const endWindowResize = (e: PointerEvent) => {
-			if (!this.isResizingWindow || e.pointerId !== this.resizePointerId) return;
-			this.isResizingWindow = false;
-			this.resizePointerId = null;
-			this.resizeStart = null;
-			this.controls.enabled = this.controlsEnabledBeforeResize;
-			dom.releasePointerCapture?.(e.pointerId);
-			this.cancelResizeDragRedraw();
-			this.scheduleResizeReleaseRedraw();
-			e.preventDefault();
+		const onControlsEnd = () => {
+			this.isUserInteracting = false;
+			if (!this.isHovered) {
+				this.controls.autoRotate = true;
+			}
 		};
 
-		const onClick = (e: MouseEvent) => {
-			const hit = this.getScreenHitCanvasPoint(e);
-			if (!hit) return;
-
-			if (this.suppressNextClick) {
-				this.suppressNextClick = false;
-				return;
-			}
-
-			if (this.screenZoomAnim) return;
-
-			if (
-				this.hasZoomedToScreen &&
-				state.bootState?.stage &&
-				state.bootState.stage !== "desktop"
-			)
-				return;
-
-			playMacClick();
-
-			const { canvasX, canvasY } = hit;
-
-			if (state.currentWindow === "desktop") {
-				if (state.trashWindowOpen) {
-					if (hitTestTrashWindowClose(canvasX, canvasY)) {
-						state.trashWindowOpen = false;
-						state.trashVideoOpen = false;
-						drawMacUI();
-						if (this.screenTexture) this.screenTexture.needsUpdate = true;
-						this.updateVideoOverlay();
-						return;
-					}
-
-					const item = hitTestTrashWindowItem(canvasX, canvasY);
-					if (item) {
-						state.trashVideoOpen = true;
-						this.ensureScreenDomOverlay();
-						this.updateVideoOverlay();
-						drawMacUI();
-						if (this.screenTexture) this.screenTexture.needsUpdate = true;
-						return;
-					}
-
-					if (hitTestTrashWindow(canvasX, canvasY)) {
-						return;
-					}
-				}
-
-				const { windowX, windowY, windowWidth, windowHeight } =
-					getWindowRect();
-				const inWindow =
-					canvasX >= windowX &&
-					canvasX <= windowX + windowWidth &&
-					canvasY >= windowY &&
-					canvasY <= windowY + windowHeight;
-
-				if (!inWindow && hitTestTrashIcon(canvasX, canvasY)) {
-					state.trashWindowOpen = !state.trashWindowOpen;
-					if (!state.trashWindowOpen) state.trashVideoOpen = false;
-				}
-
-				const target = hitTestDesktop(canvasX, canvasY);
-				if (target) {
-					state.currentWindow = target;
-				}
-			} else {
-				state.currentWindow = "desktop";
-			}
-
-			drawMacUI();
-			if (this.screenTexture) this.screenTexture.needsUpdate = true;
-			this.ensureScreenDomOverlay();
-			this.updateVideoOverlay();
-		};
-
-		dom.addEventListener("pointerdown", onPointerDown, { passive: false });
-		dom.addEventListener("pointermove", onPointerMove, { passive: false });
-		dom.addEventListener("pointerup", endWindowResize, { passive: false });
-		dom.addEventListener("pointercancel", endWindowResize, { passive: false });
-		dom.addEventListener("click", onClick);
+		this.host.addEventListener("pointerenter", onPointerEnter);
+		this.host.addEventListener("pointerleave", onPointerLeave);
+		this.controls.addEventListener("start", onControlsStart);
+		this.controls.addEventListener("end", onControlsEnd);
 
 		this.cleanupFns.push(() => {
-			dom.removeEventListener("pointerdown", onPointerDown);
-			dom.removeEventListener("pointermove", onPointerMove);
-			dom.removeEventListener("pointerup", endWindowResize);
-			dom.removeEventListener("pointercancel", endWindowResize);
-			dom.removeEventListener("click", onClick);
+			this.host.removeEventListener("pointerenter", onPointerEnter);
+			this.host.removeEventListener("pointerleave", onPointerLeave);
+			this.controls.removeEventListener("start", onControlsStart);
+			this.controls.removeEventListener("end", onControlsEnd);
 		});
 
 		this.ro = new ResizeObserver(() => this.resize());
@@ -903,41 +625,6 @@ export class MacintoshRenderer {
 			this.screenTexture.needsUpdate = true;
 		}
 
-		if (this.screenZoomAnim) {
-			const tRaw =
-				(performance.now() - this.screenZoomAnim.startMs) /
-				Math.max(1, this.screenZoomAnim.durationMs);
-			const t = Math.min(1, Math.max(0, tRaw));
-			const k = easeInOutCubic(t);
-
-			const lerp = (a: number, b: number) => a + (b - a) * k;
-			const from = this.screenZoomAnim.from;
-			const to = this.screenZoomAnim.to;
-
-			this.viewParams.modelX = lerp(from.modelX, to.modelX);
-			this.viewParams.modelY = lerp(from.modelY, to.modelY);
-			this.viewParams.rotX = lerp(from.rotX, to.rotX);
-			this.viewParams.rotY = lerp(from.rotY, to.rotY);
-			this.viewParams.rotZ = lerp(from.rotZ, to.rotZ);
-			this.viewParams.zoom = lerp(from.zoom, to.zoom);
-
-			this.applyModelOffset();
-			this.applyModelRotation();
-			this.applyZoom();
-
-			if (t >= 1) {
-				if (!Number.isFinite(this.zoomInMinDistance)) {
-					this.zoomInMinDistance = this.camera.position.distanceTo(
-						this.controls.target,
-					);
-					this.applyOrbitZoomLimits();
-				}
-				this.controls.enabled =
-					this.screenZoomAnim.controlsEnabledBefore;
-				this.screenZoomAnim = null;
-			}
-		}
-
 		this.controls.update();
 		this.renderer.render(this.scene, this.camera);
 		this.cssRenderer.render(this.scene, this.camera);
@@ -947,8 +634,6 @@ export class MacintoshRenderer {
 	dispose() {
 		this.disposed = true;
 		this.stop();
-		this.cancelResizeDragRedraw();
-		this.cancelResizeReleaseRedraw();
 		this.modelLoadingOverlay?.dispose();
 
 		for (const fn of this.cleanupFns) fn();
@@ -971,9 +656,7 @@ export class MacintoshRenderer {
 		this.renderer?.dispose();
 		this.renderer?.forceContextLoss?.();
 		if (this.renderer?.domElement?.parentNode) {
-			this.renderer.domElement.parentNode.removeChild(
-				this.renderer.domElement,
-			);
+			this.renderer.domElement.parentNode.removeChild(this.renderer.domElement);
 		}
 		if (this.cssRenderer?.domElement?.parentNode) {
 			this.cssRenderer.domElement.parentNode.removeChild(
