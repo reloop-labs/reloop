@@ -1,13 +1,24 @@
+import { cn } from "@reloop/ui/cn";
 import { FileText, Image as ImageIcon } from "lucide-react";
 import { extensionOf } from "./attachment-file-kind";
 
-export function FileTypeIcon({ filename }: { filename: string }) {
+export function FileTypeIcon({
+	filename,
+	className,
+}: {
+	filename: string;
+	className?: string;
+}) {
 	const extension = extensionOf(filename);
 
 	switch (extension) {
 		case "pdf":
 			return (
-				<svg viewBox="0 0 16 16" className="h-4 w-4 shrink-0" aria-hidden>
+				<svg
+					viewBox="0 0 16 16"
+					className={cn("h-4 w-4 shrink-0", className)}
+					aria-hidden
+				>
 					<title>PDF</title>
 					<path
 						fill="#F43F5E"
@@ -18,7 +29,11 @@ export function FileTypeIcon({ filename }: { filename: string }) {
 		case "doc":
 		case "docx":
 			return (
-				<svg viewBox="0 0 16 16" className="h-4 w-4 shrink-0" aria-hidden>
+				<svg
+					viewBox="0 0 16 16"
+					className={cn("h-4 w-4 shrink-0", className)}
+					aria-hidden
+				>
 					<title>Word</title>
 					<path
 						fill="#3B82F6"
@@ -30,7 +45,11 @@ export function FileTypeIcon({ filename }: { filename: string }) {
 		case "xlsx":
 		case "csv":
 			return (
-				<svg viewBox="0 0 16 16" className="h-4 w-4 shrink-0" aria-hidden>
+				<svg
+					viewBox="0 0 16 16"
+					className={cn("h-4 w-4 shrink-0", className)}
+					aria-hidden
+				>
 					<title>Spreadsheet</title>
 					<path
 						fill="#188038"
@@ -41,7 +60,11 @@ export function FileTypeIcon({ filename }: { filename: string }) {
 		case "fig":
 		case "figma":
 			return (
-				<svg viewBox="0 0 16 16" className="h-4 w-4 shrink-0" aria-hidden>
+				<svg
+					viewBox="0 0 16 16"
+					className={cn("h-4 w-4 shrink-0", className)}
+					aria-hidden
+				>
 					<title>Figma</title>
 					<path
 						fill="#F97316"
@@ -57,8 +80,16 @@ export function FileTypeIcon({ filename }: { filename: string }) {
 		case "gif":
 		case "webp":
 		case "svg":
-			return <ImageIcon className="h-4 w-4 shrink-0 text-[#8B5CF6]" />;
+			return (
+				<ImageIcon
+					className={cn("h-4 w-4 shrink-0 text-[#8B5CF6]", className)}
+				/>
+			);
 		default:
-			return <FileText className="h-4 w-4 shrink-0 text-[#8B5CF6]" />;
+			return (
+				<FileText
+					className={cn("h-4 w-4 shrink-0 text-[#8B5CF6]", className)}
+				/>
+			);
 	}
 }

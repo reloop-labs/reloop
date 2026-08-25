@@ -527,7 +527,13 @@ export const AgentInboxContent = ({
 
 	const listPane = (
 		<div className="flex min-h-0 flex-1 flex-col">
-			<div className="sticky top-0 z-15 shrink-0 bg-bg-white-0">
+			<div
+				className={cn(
+					"sticky top-0 z-15 shrink-0 bg-bg-white-0",
+					!showInboxTabs &&
+						"border-b border-stroke-soft-100 dark:border-stroke-soft-100/40",
+				)}
+			>
 				<div className="flex h-11 items-center pr-6 pl-4">
 					<span className="ml-1 flex w-5 shrink-0 items-center justify-center">
 						<button
