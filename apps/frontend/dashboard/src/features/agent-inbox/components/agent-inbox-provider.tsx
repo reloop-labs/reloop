@@ -21,12 +21,12 @@ import {
 import { extractBareEmail, extractDisplayName } from "../lib/email-address";
 import type {
 	AgentMailbox,
-	BackendAttachment,
 	BackendMessage,
 	BackendThread,
 	BatchThreadAction,
 	ComposeDraft,
 	ComposeDraftKind,
+	InboundAttachment,
 	InboundThread,
 	SaveComposeDraftInput,
 } from "../types";
@@ -55,6 +55,39 @@ const toEmailList = (value: string | string[] | undefined): string[] => {
 		.filter(Boolean);
 };
 
+function mapOutboundAttachments(
+	attachments:
+		| Array<{
+				id?: string;
+				filename?: string;
+				name?: string;
+				contentType?: string;
+				content_type?: string;
+				size?: number | string;
+				contentDisposition?: string | null;
+				contentId?: string | null;
+				isInline?: boolean;
+		  }>
+		| undefined,
+): InboundAttachment[] {
+	if (!attachments?.length) return [];
+	return attachments.map((att) => {
+		const size =
+			typeof att.size === "number"
+				? `${(att.size / 1024).toFixed(1)} KB`
+				: att.size || "";
+		return {
+			name: att.filename || att.name || "Attachment",
+			size,
+			contentType: att.contentType || att.content_type,
+			isInline:
+				att.isInline ||
+				att.contentDisposition === "inline" ||
+				Boolean(att.contentId),
+		};
+	});
+}
+
 function buildOptimisticOutboundThread(input: {
 	pendingId: string;
 	mailboxId: string;
@@ -64,6 +97,11 @@ function buildOptimisticOutboundThread(input: {
 	subject: string;
 	text?: string;
 	html?: string;
+	attachments?: Array<{
+		filename?: string;
+		path?: string;
+		content_type?: string;
+	}>;
 }): InboundThread {
 	const toEmails = toEmailList(input.to);
 	const now = new Date().toISOString();
@@ -93,7 +131,7 @@ function buildOptimisticOutboundThread(input: {
 		isTrashed: false,
 		direction: "outbound",
 		toEmails,
-		attachments: [],
+		attachments: mapOutboundAttachments(input.attachments),
 		timeline: [
 			{ label: "Email composed", at: now, state: "done" },
 			{ label: "Sending…", at: now, state: "active" },
@@ -136,6 +174,17 @@ interface BackendSentMessage {
 	createdAt: string | Date;
 	threadId?: string | null;
 	isStarred?: boolean;
+	attachments?: Array<{
+		id?: string;
+		filename?: string;
+		name?: string;
+		contentType?: string;
+		content_type?: string;
+		size?: number | string;
+		contentDisposition?: string | null;
+		contentId?: string | null;
+		isInline?: boolean;
+	}>;
 }
 
 interface AgentInboxContextValue {
@@ -724,7 +773,7 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 							toEmails: msg.toEmails,
 							ccEmails: msg.ccEmails ?? [],
 							bccEmails: msg.bccEmails ?? [],
-							attachments: [],
+							attachments: mapOutboundAttachments(msg.attachments),
 							errorMessage: msg.errorMessage ?? null,
 							timeline: [
 								{
@@ -1408,6 +1457,7 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 					subject: input.subject,
 					text: input.text,
 					html: input.html,
+					attachments: input.attachments,
 				});
 				setOptimisticOutbound((prev) => [
 					optimistic,

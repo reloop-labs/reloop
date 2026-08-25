@@ -8,6 +8,7 @@ export type EmailLogData = {
 	toEmails: string[];
 	status: string;
 	createdAt: string;
+	hasAttachments?: boolean;
 };
 
 export type EmailListResponse = {
@@ -127,6 +128,15 @@ export type EmailDetailData = {
 	failedAt: string | null;
 	createdAt: string;
 	updatedAt: string;
+	attachments?: Array<{
+		id: string;
+		filename: string;
+		contentType: string;
+		size: number;
+		storagePath: string;
+		contentDisposition?: string | null;
+		contentId?: string | null;
+	}>;
 	events?: {
 		id: string;
 		type: string;

@@ -77,6 +77,21 @@ export const emailLog = pgTable(
 		htmlBody: text("html_body"),
 		/** Full SMTP MIME blob when available (KumoMTA log-incoming). */
 		rawMessage: text("raw_message"),
+		/** Outbound file metadata (filename + storage path). Bytes live in the upload store. */
+		attachments: jsonb("attachments")
+			.$type<
+				Array<{
+					id: string;
+					filename: string;
+					contentType: string;
+					size: number;
+					storagePath: string;
+					contentDisposition?: string | null;
+					contentId?: string | null;
+				}>
+			>()
+			.notNull()
+			.default([]),
 		status: emailStatusEnum("status").notNull().default("pending"),
 		priority: emailPriorityEnum("priority").notNull().default("normal"),
 		errorMessage: text("error_message"),

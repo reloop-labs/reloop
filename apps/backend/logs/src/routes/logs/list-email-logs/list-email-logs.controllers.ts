@@ -169,6 +169,9 @@ export async function listEmailLogsController({
 					(entry.events ?? []).map((e) => e.type),
 				),
 				createdAt: entry.createdAt.toISOString(),
+				hasAttachments: Array.isArray(entry.attachments)
+					? entry.attachments.length > 0
+					: false,
 			})),
 			total,
 			page,

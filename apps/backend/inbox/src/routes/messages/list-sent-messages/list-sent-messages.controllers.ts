@@ -6,6 +6,7 @@ import {
 	threadMessage,
 } from "@reloop/db/schema";
 import { and, eq, inArray, or, sql } from "drizzle-orm";
+import { mapEmailLogAttachments } from "../../../lib/outbound-attachments";
 
 function bareEmail(value: string): string {
 	const match = value.match(/<([^>]+)>/);
@@ -95,6 +96,7 @@ export async function getSentMessagesController(
 			...email,
 			threadId: threadId ?? null,
 			isStarred: threadId ? Boolean(starredByThread.get(threadId)) : false,
+			attachments: mapEmailLogAttachments(email.attachments),
 		};
 	});
 }

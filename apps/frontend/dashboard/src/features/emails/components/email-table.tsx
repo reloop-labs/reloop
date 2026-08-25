@@ -50,6 +50,7 @@ export interface EmailLogData {
 	toEmails: string[];
 	status: string;
 	createdAt: string;
+	hasAttachments?: boolean;
 }
 
 interface EmailTableProps {
@@ -805,13 +806,19 @@ const emailColumns: ColumnDef<EmailLogData>[] = [
 			</div>
 		),
 		cell: ({ row }) => (
-			<div className="min-w-0 truncate pr-4">
+			<div className="flex min-w-0 items-center gap-1.5 pr-4">
 				<Link
 					href={`/emails/${row.original.id}`}
 					className="truncate font-medium text-label-sm text-text-strong-950 underline decoration-dotted underline-offset-2 transition-colors hover:text-[#1868DF] dark:hover:text-blue-400"
 				>
 					{row.original.subject || "(No Subject)"}
 				</Link>
+				{row.original.hasAttachments && (
+					<Icon
+						name="paperclip"
+						className="h-3.5 w-3.5 shrink-0 text-text-soft-400"
+					/>
+				)}
 			</div>
 		),
 	},

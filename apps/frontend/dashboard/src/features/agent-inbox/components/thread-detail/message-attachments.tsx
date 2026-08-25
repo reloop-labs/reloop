@@ -109,6 +109,21 @@ export const downloadAttachment = async (
 		return;
 	}
 
+	if (meta.storagePath?.startsWith("uploads/")) {
+		const fileRes = await apiFetch(
+			`/api/upload/v1/files/content?path=${encodeURIComponent(meta.storagePath)}`,
+		);
+		if (!fileRes.ok) return;
+		const blob = await fileRes.blob();
+		const objectUrl = URL.createObjectURL(blob);
+		const a = document.createElement("a");
+		a.href = objectUrl;
+		a.download = meta.filename || file.name;
+		a.click();
+		URL.revokeObjectURL(objectUrl);
+		return;
+	}
+
 	const a = document.createElement("a");
 	a.href = url;
 	a.download = meta.filename || file.name;

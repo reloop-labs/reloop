@@ -7,6 +7,7 @@ import {
 } from "@reloop/db/schema";
 import { and, desc, eq, or } from "drizzle-orm";
 import { createError } from "evlog";
+import { mapEmailLogAttachments } from "../../../lib/outbound-attachments";
 
 function asIso(value: Date | string | null | undefined): string {
 	if (!value) return new Date(0).toISOString();
@@ -137,6 +138,7 @@ export async function getThreadController(id: string, organizationId: string) {
 									errorMessage: email.errorMessage,
 									sentAt: email.sentAt,
 									createdAt: email.createdAt,
+									attachments: mapEmailLogAttachments(email.attachments),
 								}
 							: null,
 					};
@@ -291,6 +293,7 @@ export async function getThreadController(id: string, organizationId: string) {
 						errorMessage: standaloneLog.errorMessage,
 						sentAt: standaloneLog.sentAt ? asIso(standaloneLog.sentAt) : null,
 						createdAt,
+						attachments: mapEmailLogAttachments(standaloneLog.attachments),
 					},
 				},
 			],

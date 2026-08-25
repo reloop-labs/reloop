@@ -35,9 +35,23 @@ export const listSentMessagesRoute = new Elysia().use(authMiddleware).get(
 					textBody: t.Union([t.String(), t.Null()]),
 					htmlBody: t.Union([t.String(), t.Null()]),
 					status: t.String(),
+					errorMessage: t.Optional(t.Union([t.String(), t.Null()])),
 					createdAt: t.Union([t.Date(), t.String()]),
 					threadId: t.Optional(t.Union([t.String(), t.Null()])),
 					isStarred: t.Optional(t.Boolean()),
+					attachments: t.Optional(
+						t.Array(
+							t.Object({
+								id: t.String(),
+								filename: t.String(),
+								contentType: t.String(),
+								size: t.Number(),
+								storagePath: t.String(),
+								contentDisposition: t.Union([t.String(), t.Null()]),
+								contentId: t.Union([t.String(), t.Null()]),
+							}),
+						),
+					),
 				}),
 			),
 			401: MailModel.ErrorResponseSchema,

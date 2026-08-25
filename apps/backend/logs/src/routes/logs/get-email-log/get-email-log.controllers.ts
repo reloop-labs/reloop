@@ -40,6 +40,7 @@ export async function getEmailLogController({
 			failedAt: emailLogEntry.failedAt?.toISOString() || null,
 			createdAt: emailLogEntry.createdAt.toISOString(),
 			updatedAt: emailLogEntry.updatedAt.toISOString(),
+			attachments: emailLogEntry.attachments ?? [],
 			events: (emailLogEntry.events || []).map((event) => ({
 				id: event.id,
 				type: event.type as string,

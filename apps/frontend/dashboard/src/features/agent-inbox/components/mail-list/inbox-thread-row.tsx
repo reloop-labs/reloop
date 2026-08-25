@@ -1,6 +1,7 @@
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import dayjs from "dayjs";
+import { Paperclip } from "lucide-react";
 import { forwardRef, type ReactNode } from "react";
 import { parseEmail } from "#/features/agent-inbox/lib/email-address";
 import { resolveLabelColor } from "#/features/agent-inbox/lib/label-colors";
@@ -291,6 +292,16 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 						<Icon name="trash" className="h-3.5 w-3.5 text-red-500" />
 					</button>
 				</span>
+
+				{/* Attachment indicator */}
+				{(thread.attachments ?? []).some((a) => !a.isInline) && (
+					<span
+						className="ml-1 flex w-4 shrink-0 items-center justify-center text-text-soft-400"
+						title="Has attachment"
+					>
+						<Paperclip className="h-3.5 w-3.5" />
+					</span>
+				)}
 
 				{/* Failed label on right-hand side */}
 				{isFailed && (

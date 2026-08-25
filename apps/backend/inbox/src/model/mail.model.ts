@@ -514,6 +514,19 @@ export namespace MailModel {
 		errorMessage: t.Union([t.String(), t.Null(), t.Undefined()]),
 		sentAt: t.Union([t.Date(), t.String(), t.Null()]),
 		createdAt: t.Union([t.Date(), t.String()]),
+		attachments: t.Optional(
+			t.Array(
+				t.Object({
+					id: t.String(),
+					filename: t.String(),
+					contentType: t.String(),
+					size: t.Number(),
+					storagePath: t.String(),
+					contentDisposition: t.Union([t.String(), t.Null()]),
+					contentId: t.Union([t.String(), t.Null()]),
+				}),
+			),
+		),
 	});
 
 	export const threadMessageItem = t.Object({

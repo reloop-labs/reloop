@@ -12,6 +12,7 @@ import {
 	type EmailTheme,
 	processEmailHtmlForDisplay,
 } from "#/features/agent-inbox/components/thread-detail/email-html";
+import { MessageAttachments } from "#/features/agent-inbox/components/thread-detail/message-attachments";
 import { ShortcutHint } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { CopyCodeBlock } from "#/features/onboarding/step4/copy-code-block";
 import { type SmtpDetailRow, SmtpResponseDrawer } from "./smtp-response-drawer";
@@ -247,6 +248,15 @@ interface EmailDetailProps {
 		failedAt?: string | null;
 		createdAt: string;
 		updatedAt?: string;
+		attachments?: Array<{
+			id: string;
+			filename: string;
+			contentType: string;
+			size: number;
+			storagePath: string;
+			contentDisposition?: string | null;
+			contentId?: string | null;
+		}>;
 		events?: {
 			id: string;
 			type: string;
@@ -1100,6 +1110,31 @@ export const EmailDetail = ({
 							)}
 						</span>
 					</div>
+					{!isLoading &&
+						email?.attachments &&
+						email.attachments.filter((a) => a.contentDisposition !== "inline")
+							.length > 0 && (
+							<div className="flex items-start gap-4">
+								<span className="w-16 flex-shrink-0 pt-0.5 font-medium text-paragraph-sm text-text-sub-600">
+									Files
+								</span>
+								<div className="min-w-0 flex-1">
+									<MessageAttachments
+										attachments={email.attachments
+											.filter((a) => a.contentDisposition !== "inline")
+											.map((a) => ({
+												id: a.id,
+												name: a.filename,
+												size:
+													a.size > 0 ? `${(a.size / 1024).toFixed(1)} KB` : "",
+												contentType: a.contentType,
+												messageId: email.id,
+											}))}
+										messageId={email.id}
+									/>
+								</div>
+							</div>
+						)}
 				</div>
 			</section>
 

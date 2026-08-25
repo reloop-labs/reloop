@@ -71,6 +71,13 @@
 			"when": 1785800000000,
 			"tag": "0009_activity_log_resource_idx",
 			"breakpoints": true
+		},
+		{
+			"idx": 10,
+			"version": "7",
+			"when": 1785800000001,
+			"tag": "0010_email_log_attachments",
+			"breakpoints": true
 		}
 	]
 }
