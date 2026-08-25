@@ -542,6 +542,7 @@ export const ThreadDetail = ({
 							? `${(att.size / 1024).toFixed(1)} KB`
 							: att.size || "Unknown size",
 					contentType: att.contentType,
+					storagePath: att.storagePath,
 					isInline: att.isInline,
 					inboundEmailId:
 						att.inboundEmailId || msg.email?.id || msg.inboundEmailId,

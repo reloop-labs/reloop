@@ -1128,6 +1128,7 @@ export const EmailDetail = ({
 												size:
 													a.size > 0 ? `${(a.size / 1024).toFixed(1)} KB` : "",
 												contentType: a.contentType,
+												storagePath: a.storagePath,
 												messageId: email.id,
 											}))}
 										messageId={email.id}

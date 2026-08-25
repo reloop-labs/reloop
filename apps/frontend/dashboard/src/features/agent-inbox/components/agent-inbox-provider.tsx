@@ -26,11 +26,11 @@ import type {
 	BatchThreadAction,
 	ComposeDraft,
 	ComposeDraftKind,
-	InboundAttachment,
 	InboundThread,
 	SaveComposeDraftInput,
 } from "../types";
 import { findComposeDraft } from "../utils/find-compose-draft";
+import { mapOutboundAttachments } from "../utils/map-outbound-attachments";
 import {
 	parseComposeDraft,
 	parseComposeDraftsList,
@@ -54,39 +54,6 @@ const toEmailList = (value: string | string[] | undefined): string[] => {
 		.map((e) => e.trim())
 		.filter(Boolean);
 };
-
-function mapOutboundAttachments(
-	attachments:
-		| Array<{
-				id?: string;
-				filename?: string;
-				name?: string;
-				contentType?: string;
-				content_type?: string;
-				size?: number | string;
-				contentDisposition?: string | null;
-				contentId?: string | null;
-				isInline?: boolean;
-		  }>
-		| undefined,
-): InboundAttachment[] {
-	if (!attachments?.length) return [];
-	return attachments.map((att) => {
-		const size =
-			typeof att.size === "number"
-				? `${(att.size / 1024).toFixed(1)} KB`
-				: att.size || "";
-		return {
-			name: att.filename || att.name || "Attachment",
-			size,
-			contentType: att.contentType || att.content_type,
-			isInline:
-				att.isInline ||
-				att.contentDisposition === "inline" ||
-				Boolean(att.contentId),
-		};
-	});
-}
 
 function buildOptimisticOutboundThread(input: {
 	pendingId: string;

@@ -1,6 +1,10 @@
 import { cn } from "@reloop/ui/cn";
-import { FileText, HardDriveDownload, Image as ImageIcon } from "lucide-react";
 import { apiFetch } from "#/features/agent-inbox/lib/api-fetch";
+import {
+	type AttachmentFileKind,
+	attachmentFileKind,
+	attachmentKindLabel,
+} from "./attachment-file-kind";
 
 export interface AttachmentItem {
 	id?: string;
@@ -9,6 +13,7 @@ export interface AttachmentItem {
 	contentType?: string;
 	inboundEmailId?: string;
 	messageId?: string;
+	storagePath?: string;
 	isInline?: boolean;
 }
 
@@ -22,70 +27,92 @@ interface MessageAttachmentsProps {
 	className?: string;
 }
 
-const formatFileSize = (size: string | number) => {
-	if (typeof size === "number") {
-		const mb = size / (1024 * 1024);
-		if (mb >= 0.01) return `${mb.toFixed(1)} MB`;
-		const kb = size / 1024;
-		return `${kb.toFixed(1)} KB`;
-	}
-	return size;
+const KIND_ACCENT: Record<AttachmentFileKind, string> = {
+	pdf: "#E53935",
+	doc: "#1A73E8",
+	xls: "#188038",
+	ppt: "#E8710A",
+	img: "#8B5CF6",
+	zip: "#5F6368",
+	file: "#5F6368",
 };
 
-const FileTypeIcon = ({ filename }: { filename: string }) => {
-	const extension = filename.split(".").pop()?.toLowerCase();
+function FileKindGlyph({
+	kind,
+	className,
+}: {
+	kind: AttachmentFileKind;
+	className?: string;
+}) {
+	const fill = KIND_ACCENT[kind];
+	return (
+		<svg
+			viewBox="0 0 16 16"
+			className={cn("h-4 w-4 shrink-0", className)}
+			aria-hidden
+		>
+			<title>{attachmentKindLabel(kind)}</title>
+			<path
+				fill={fill}
+				d="M4 0h5.5L14 4.5V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2zm5 1.5V5h3.5L9 1.5z"
+			/>
+			<text
+				x="8"
+				y="12.2"
+				textAnchor="middle"
+				fill="white"
+				fontSize="4.2"
+				fontWeight="700"
+				fontFamily="ui-sans-serif, system-ui, sans-serif"
+			>
+				{attachmentKindLabel(kind).slice(0, 3)}
+			</text>
+		</svg>
+	);
+}
 
-	switch (extension) {
-		case "pdf":
-			return (
-				<svg viewBox="0 0 16 16" className="h-4 w-4 shrink-0" aria-hidden>
-					<title>PDF</title>
-					<path
-						fill="#F43F5E"
-						d="M4 0h5.5L14 4.5V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2zm5 1.5V5h3.5L9 1.5zM5.5 9.5c.4 0 .7.1.9.3.3.2.4.5.4.9 0 .3-.1.6-.3.8-.2.2-.5.3-.9.3H4.8v1.2H3.7V9.5h1.8zm0 1.5c.15 0 .25-.04.32-.1.07-.07.1-.16.1-.28 0-.12-.03-.2-.1-.27-.07-.06-.17-.1-.32-.1H4.8v.75h.7zm3.2-1.5c.5 0 .9.12 1.15.35.26.23.4.56.4.98 0 .43-.13.77-.4 1-.26.24-.65.36-1.15.36H7.5V9.5h1.2zm0 2.1c.22 0 .4-.05.52-.16.12-.1.18-.27.18-.48 0-.2-.06-.36-.18-.47-.12-.1-.3-.16-.52-.16H8.6v1.27h.1zm3.3-2.1v.85h1.4v.7h-1.4v1.55h-1.1V9.5h2.5z"
-					/>
-				</svg>
-			);
-		case "doc":
-		case "docx":
-			return (
-				<svg viewBox="0 0 16 16" className="h-4 w-4 shrink-0" aria-hidden>
-					<title>Word</title>
-					<path
-						fill="#3B82F6"
-						d="M4 0h5.5L14 4.5V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2zm5 1.5V5h3.5L9 1.5zM4.2 9.2l1.1 4.3h1.1l.85-3.2.85 3.2h1.1l1.1-4.3h-1.15l-.6 2.7-.75-2.7H7.1l-.75 2.7-.6-2.7H4.2z"
-					/>
-				</svg>
-			);
-		case "fig":
-		case "figma":
-			return (
-				<svg viewBox="0 0 16 16" className="h-4 w-4 shrink-0" aria-hidden>
-					<title>Figma</title>
-					<path
-						fill="#F97316"
-						d="M5.5 1A2.5 2.5 0 0 0 3 3.5v1A2.5 2.5 0 0 0 5.5 7H8V1H5.5zm2.5 6H5.5A2.5 2.5 0 0 0 3 9.5v0A2.5 2.5 0 0 0 5.5 12H8V7zm0 5H5.5A2.5 2.5 0 0 0 3 14.5 2.5 2.5 0 0 0 5.5 17H8v-5zm0-5h2.5A2.5 2.5 0 0 1 13 9.5 2.5 2.5 0 0 1 10.5 7H8v0z"
-						transform="scale(0.85) translate(1, -0.5)"
-					/>
-					<circle cx="11" cy="9.5" r="2.5" fill="#A855F7" />
-				</svg>
-			);
-		case "jpg":
-		case "jpeg":
-		case "png":
-		case "gif":
-		case "webp":
-		case "svg":
-			return <ImageIcon className="h-4 w-4 shrink-0 text-[#8B5CF6]" />;
-		default:
-			return <FileText className="h-4 w-4 shrink-0 text-[#8B5CF6]" />;
+function previewUrlFor(file: AttachmentItem): string | null {
+	const path = file.storagePath?.trim();
+	if (!path) return null;
+	if (path.startsWith("http://") || path.startsWith("https://")) return path;
+	if (path.startsWith("uploads/")) {
+		return `/api/upload/v1/files/content?path=${encodeURIComponent(path)}`;
 	}
-};
+	return null;
+}
+
+function triggerDownload(href: string, filename: string, revoke?: string) {
+	const a = document.createElement("a");
+	a.href = href;
+	a.download = filename;
+	if (href.startsWith("http")) {
+		a.target = "_blank";
+		a.rel = "noopener noreferrer";
+	}
+	a.click();
+	if (revoke) URL.revokeObjectURL(revoke);
+}
 
 export const downloadAttachment = async (
 	file: AttachmentItem,
 	messageId?: string,
 ) => {
+	const path = file.storagePath?.trim();
+	if (path?.startsWith("http://") || path?.startsWith("https://")) {
+		triggerDownload(path, file.name);
+		return;
+	}
+	if (path?.startsWith("uploads/")) {
+		const fileRes = await apiFetch(
+			`/api/upload/v1/files/content?path=${encodeURIComponent(path)}`,
+		);
+		if (!fileRes.ok) return;
+		const blob = await fileRes.blob();
+		const objectUrl = URL.createObjectURL(blob);
+		triggerDownload(objectUrl, file.name, objectUrl);
+		return;
+	}
+
 	const msgId = messageId || file.messageId || file.inboundEmailId;
 	if (!msgId || !file.id) return;
 
@@ -100,12 +127,7 @@ export const downloadAttachment = async (
 	};
 
 	if (meta.storagePath?.startsWith("http")) {
-		const a = document.createElement("a");
-		a.href = meta.storagePath;
-		a.download = meta.filename || file.name;
-		a.target = "_blank";
-		a.rel = "noopener noreferrer";
-		a.click();
+		triggerDownload(meta.storagePath, meta.filename || file.name);
 		return;
 	}
 
@@ -116,22 +138,84 @@ export const downloadAttachment = async (
 		if (!fileRes.ok) return;
 		const blob = await fileRes.blob();
 		const objectUrl = URL.createObjectURL(blob);
-		const a = document.createElement("a");
-		a.href = objectUrl;
-		a.download = meta.filename || file.name;
-		a.click();
-		URL.revokeObjectURL(objectUrl);
+		triggerDownload(objectUrl, meta.filename || file.name, objectUrl);
 		return;
 	}
 
-	const a = document.createElement("a");
-	a.href = url;
-	a.download = meta.filename || file.name;
-	a.click();
+	triggerDownload(url, meta.filename || file.name);
 };
 
+function AttachmentCard({
+	file,
+	onDownload,
+}: {
+	file: AttachmentItem;
+	onDownload: (file: AttachmentItem) => void;
+}) {
+	const kind = attachmentFileKind(file.name, file.contentType);
+	const label = attachmentKindLabel(kind);
+	const previewUrl = kind === "img" ? previewUrlFor(file) : null;
+
+	return (
+		<div className="relative w-[168px] shrink-0">
+			<button
+				type="button"
+				onClick={() => onDownload(file)}
+				aria-label={`Download ${file.name}`}
+				title={file.name}
+				className={cn(
+					"relative flex w-full flex-col overflow-hidden rounded-[10px] bg-white text-left",
+					"shadow-[0_1px_2px_rgba(15,23,42,0.06)] ring-1 ring-black/8",
+					"transition-[box-shadow,transform] duration-150 ease-out",
+					"hover:shadow-[0_6px_16px_rgba(15,23,42,0.1)]",
+					"active:scale-[0.97]",
+					"focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-strong-950",
+					"dark:bg-[#1c1c1c] dark:ring-white/10",
+				)}
+				style={{
+					clipPath:
+						"polygon(0 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%)",
+				}}
+			>
+				<div className="relative flex h-[92px] items-center justify-center bg-white dark:bg-[#222]">
+					{previewUrl ? (
+						<img
+							src={previewUrl}
+							alt=""
+							className="h-full w-full object-cover"
+						/>
+					) : (
+						<span className="rounded-md bg-[#E8E8E8] px-2.5 py-1 font-semibold text-[#9A9A9A] text-[13px] tracking-wide dark:bg-white/10 dark:text-white/40">
+							{label}
+						</span>
+					)}
+				</div>
+				<div className="flex h-[36px] items-center gap-1.5 border-black/6 border-t bg-[#F3F3F3] px-2.5 dark:border-white/8 dark:bg-[#2a2a2a]">
+					<FileKindGlyph kind={kind} />
+					<span className="min-w-0 truncate font-medium text-[#3C4043] text-[12.5px] dark:text-white/80">
+						{file.name}
+					</span>
+				</div>
+			</button>
+			<span
+				aria-hidden
+				className="pointer-events-none absolute right-0 bottom-0 size-[14px]"
+			>
+				<svg viewBox="0 0 14 14" className="size-full" aria-hidden>
+					<path d="M14 0v14H0z" fill="#E24B3A" />
+					<path
+						d="M14 0 0 14"
+						stroke="rgba(255,255,255,0.35)"
+						strokeWidth="0.6"
+					/>
+				</svg>
+			</span>
+		</div>
+	);
+}
+
 /**
- * Zero-style horizontal attachment chips with file-type icons.
+ * Gmail-style document preview cards for attachments on a message.
  */
 export const MessageAttachments = ({
 	attachments,
@@ -154,47 +238,20 @@ export const MessageAttachments = ({
 
 	return (
 		<div className={cn("w-full", className)}>
-			{showLabel && (
-				<div className="mb-2 flex items-center gap-2">
+			{showLabel ? (
+				<div className="mb-2.5 flex items-center gap-2">
 					<span className="font-medium text-mail-foreground text-sm">
 						{label} <span className="text-[#8D8D8D]">[{visible.length}]</span>
 					</span>
 				</div>
-			)}
-			<div className="flex flex-wrap items-center gap-2">
+			) : null}
+			<div className="flex flex-wrap items-start gap-3">
 				{visible.map((file, index) => (
-					<div
+					<AttachmentCard
 						key={file.id || `${file.name}-${index}`}
-						className="flex items-center"
-					>
-						<button
-							type="button"
-							onClick={() => void handleDownload(file)}
-							className="flex cursor-pointer items-center gap-1.5 rounded-[5px] bg-[#FAFAFA] px-1.5 py-1 font-medium text-sm transition-colors hover:bg-[#F0F0F0] dark:bg-[#262626] dark:hover:bg-[#303030]"
-						>
-							<FileTypeIcon filename={file.name} />
-							<span
-								className="max-w-[15ch] truncate text-mail-foreground text-sm"
-								title={file.name}
-							>
-								{file.name}
-							</span>
-							<span className="whitespace-nowrap text-[#929292] text-sm">
-								{formatFileSize(file.size)}
-							</span>
-						</button>
-						<button
-							type="button"
-							onClick={() => void handleDownload(file)}
-							className="flex cursor-pointer items-center gap-1 rounded-[5px] px-1.5 py-1 text-sm"
-							aria-label={`Download ${file.name}`}
-						>
-							<HardDriveDownload className="h-4 w-4 text-[#929292]" />
-						</button>
-						{index < visible.length - 1 && (
-							<div className="mx-0.5 h-2 w-px bg-[#E0E0E0] dark:bg-[#424242]" />
-						)}
-					</div>
+						file={file}
+						onDownload={(item) => void handleDownload(item)}
+					/>
 				))}
 			</div>
 		</div>

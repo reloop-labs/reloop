@@ -6,6 +6,7 @@ import { forwardRef, type ReactNode } from "react";
 import { parseEmail } from "#/features/agent-inbox/lib/email-address";
 import { resolveLabelColor } from "#/features/agent-inbox/lib/label-colors";
 import type { InboundThread } from "../../types";
+import { hasVisibleAttachments } from "../../utils/map-outbound-attachments";
 import { useInboxMail } from "./use-inbox-mail";
 
 function formatRecipientLabel(addresses: string[] | undefined): string {
@@ -294,7 +295,7 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 				</span>
 
 				{/* Attachment indicator */}
-				{(thread.attachments ?? []).some((a) => !a.isInline) && (
+				{hasVisibleAttachments(thread.attachments) && (
 					<span
 						className="ml-1 flex w-4 shrink-0 items-center justify-center text-text-soft-400"
 						title="Has attachment"
