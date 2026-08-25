@@ -89,6 +89,7 @@ export class MacintoshRenderer {
 	private controls!: OrbitControls;
 	private modelLoadingOverlay: ModelLoadingOverlayController | null = null;
 	private themeObserver: MutationObserver | null = null;
+	private caseMeshes: THREE.Mesh[] = [];
 
 	private modelRoot: THREE.Group | null = null;
 	private modelBasePos = new THREE.Vector3(0, 0, 0);
@@ -199,10 +200,7 @@ export class MacintoshRenderer {
 			typeof MutationObserver !== "undefined"
 		) {
 			this.themeObserver = new MutationObserver(() => {
-				drawMacUI();
-				if (this.screenTexture) {
-					this.screenTexture.needsUpdate = true;
-				}
+				this.updateModelTheme();
 			});
 			this.themeObserver.observe(document.documentElement, {
 				attributes: true,
@@ -211,6 +209,39 @@ export class MacintoshRenderer {
 		}
 
 		return true;
+	}
+
+	private updateModelTheme() {
+		const isDark =
+			typeof document !== "undefined" &&
+			document.documentElement.classList.contains("dark");
+
+		for (const mesh of this.caseMeshes) {
+			const mats = Array.isArray(mesh.material)
+				? mesh.material
+				: [mesh.material];
+			for (const mat of mats) {
+				if (mat instanceof THREE.MeshStandardMaterial) {
+					if (!mat.userData.origColor) {
+						mat.userData.origColor = mat.color.clone();
+						mat.userData.origRoughness = mat.roughness;
+					}
+					if (isDark) {
+						mat.color.setHex(0x232428);
+						mat.roughness = 0.85;
+					} else {
+						mat.color.copy(mat.userData.origColor);
+						mat.roughness = mat.userData.origRoughness ?? 0.9;
+					}
+					mat.needsUpdate = true;
+				}
+			}
+		}
+
+		drawMacUI();
+		if (this.screenTexture) {
+			this.screenTexture.needsUpdate = true;
+		}
 	}
 
 	private setupLighting() {
@@ -322,6 +353,19 @@ export class MacintoshRenderer {
 				for (const mesh of rainbowMeshes) {
 					applyRainbowToMesh(mesh);
 				}
+
+				this.caseMeshes = [];
+				model.traverse((o) => {
+					if (
+						o instanceof THREE.Mesh &&
+						o !== this.screenMesh &&
+						!rainbowMeshes.includes(o)
+					) {
+						this.caseMeshes.push(o);
+					}
+				});
+
+				this.updateModelTheme();
 
 				this.scene.add(model);
 
