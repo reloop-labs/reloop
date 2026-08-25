@@ -73,12 +73,19 @@ export function buildDisplayMessages({
 								? msg.email.toEmails
 								: (thread.toEmails ?? msg.email.toEmails ?? []),
 						errorMessage:
-							msg.email.errorMessage ?? msg.errorMessage ?? thread.errorMessage ?? null,
+							msg.email.errorMessage ??
+							msg.errorMessage ??
+							thread.errorMessage ??
+							null,
 					}
 				: msg.email;
 			const next = {
 				...msg,
-				errorMessage: msg.errorMessage ?? email?.errorMessage ?? thread.errorMessage ?? null,
+				errorMessage:
+					msg.errorMessage ??
+					email?.errorMessage ??
+					thread.errorMessage ??
+					null,
 				email,
 			};
 			if (msg.inboundEmailId === thread.id || msg.id === thread.id) {

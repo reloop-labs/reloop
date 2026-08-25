@@ -58,6 +58,11 @@ const productFeatures = [
 		description: "Low-latency transactional delivery for developers.",
 	},
 	{
+		title: "Domain Authentication",
+		href: "/features/domain",
+		description: "SPF, DKIM, DMARC, and custom sending domain management.",
+	},
+	{
 		title: "Email Templates",
 		href: "/features/email-templates",
 		description: "Design and manage reusable email templates.",

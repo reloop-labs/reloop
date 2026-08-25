@@ -69,7 +69,8 @@ function classifyError(raw: string): ErrorClassification {
 	) {
 		return {
 			category: "Mailbox Rejected",
-			summary: "Receiving server rejected the address — the inbox may not exist or is inactive.",
+			summary:
+				"Receiving server rejected the address — the inbox may not exist or is inactive.",
 			fixes: [
 				"Confirm the recipient email address is valid",
 				"Verify sender authentication (SPF, DKIM, DMARC)",
@@ -90,7 +91,8 @@ function classifyError(raw: string): ErrorClassification {
 	) {
 		return {
 			category: "Spam / Policy Block",
-			summary: "A spam filter or security policy on the receiving server blocked delivery.",
+			summary:
+				"A spam filter or security policy on the receiving server blocked delivery.",
 			fixes: [
 				"Ensure your sending domain is not listed on DNS blocklists",
 				"Configure SPF, DKIM and DMARC properly",
@@ -111,7 +113,8 @@ function classifyError(raw: string): ErrorClassification {
 	) {
 		return {
 			category: "Rate Limit Exceeded",
-			summary: "Sending quota was exceeded on your provider or the recipient server.",
+			summary:
+				"Sending quota was exceeded on your provider or the recipient server.",
 			fixes: [
 				"Reduce message sending velocity",
 				"Upgrade sending tier or quota",
@@ -151,7 +154,8 @@ function classifyError(raw: string): ErrorClassification {
 	) {
 		return {
 			category: "Connection Error",
-			summary: "Could not establish a connection to the destination mail server.",
+			summary:
+				"Could not establish a connection to the destination mail server.",
 			fixes: [
 				"Check network routing and firewall rules",
 				"Verify recipient mail server is online",
@@ -169,7 +173,8 @@ function classifyError(raw: string): ErrorClassification {
 	) {
 		return {
 			category: "Message Too Large",
-			summary: "Email exceeds the maximum message size permitted by the destination server.",
+			summary:
+				"Email exceeds the maximum message size permitted by the destination server.",
 			fixes: [
 				"Remove or compress large attachments",
 				"Host large files via secure download links",
@@ -203,7 +208,9 @@ export function MessageDeliveryError({
 	const [copied, setCopied] = useState(false);
 
 	const rawError = (errorMessage || "").trim();
-	const displayError = rawError || (status === "failed" ? "Email delivery failed" : "Message not sent");
+	const displayError =
+		rawError ||
+		(status === "failed" ? "Email delivery failed" : "Message not sent");
 	const { category, summary, fixes } = classifyError(displayError);
 
 	const handleCopy = (e: React.MouseEvent) => {

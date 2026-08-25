@@ -6,6 +6,6 @@ export const MacintoshSceneLazy = dynamic(
 	() => import("./macintosh-scene").then((m) => m.MacintoshScene),
 	{
 		ssr: false,
-		loading: () => <div className="size-full bg-[#5a5a5a]" />,
+		loading: () => <div className="size-full bg-[#434b57]" />,
 	},
 );

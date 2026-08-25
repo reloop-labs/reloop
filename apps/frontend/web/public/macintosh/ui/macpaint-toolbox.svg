@@ -1,0 +1,142 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="34" height="162" viewBox="0 0 34 162" shape-rendering="crispEdges">
+  <!-- Background + border -->
+  <rect width="34" height="162" fill="#FFFFFF" />
+  <rect x="0" y="0" width="34" height="162" fill="none" stroke="#000" stroke-width="1" />
+
+  <!-- Grid lines -->
+  <rect x="17" y="0" width="1" height="162" fill="#000" />
+  <rect x="0" y="17" width="34" height="1" fill="#000" />
+  <rect x="0" y="33" width="34" height="1" fill="#000" />
+  <rect x="0" y="49" width="34" height="1" fill="#000" />
+  <rect x="0" y="65" width="34" height="1" fill="#000" />
+  <rect x="0" y="81" width="34" height="1" fill="#000" />
+  <rect x="0" y="97" width="34" height="1" fill="#000" />
+  <rect x="0" y="113" width="34" height="1" fill="#000" />
+  <rect x="0" y="129" width="34" height="1" fill="#000" />
+  <rect x="0" y="145" width="34" height="1" fill="#000" />
+
+  <!-- Icons (2 cols x 10 rows, base cell = 16) -->
+  <!-- row 0 -->
+  <g transform="translate(1 1)">
+    <ellipse cx="7" cy="7" rx="4" ry="3" fill="none" stroke="#000" stroke-width="1" />
+    <line x1="10" y1="9" x2="13" y2="13" stroke="#000" stroke-width="1" />
+  </g>
+  <g transform="translate(17 1)">
+    <rect x="3" y="3" width="10" height="10" fill="none" stroke="#000" stroke-width="1" />
+    <rect x="3" y="3" width="1" height="1" fill="#000" />
+    <rect x="5" y="3" width="1" height="1" fill="#000" />
+    <rect x="7" y="3" width="1" height="1" fill="#000" />
+    <rect x="9" y="3" width="1" height="1" fill="#000" />
+    <rect x="11" y="3" width="1" height="1" fill="#000" />
+    <rect x="3" y="13" width="1" height="1" fill="#000" />
+    <rect x="5" y="13" width="1" height="1" fill="#000" />
+    <rect x="7" y="13" width="1" height="1" fill="#000" />
+    <rect x="9" y="13" width="1" height="1" fill="#000" />
+    <rect x="11" y="13" width="1" height="1" fill="#000" />
+    <rect x="3" y="5" width="1" height="1" fill="#000" />
+    <rect x="3" y="7" width="1" height="1" fill="#000" />
+    <rect x="3" y="9" width="1" height="1" fill="#000" />
+    <rect x="13" y="5" width="1" height="1" fill="#000" />
+    <rect x="13" y="7" width="1" height="1" fill="#000" />
+    <rect x="13" y="9" width="1" height="1" fill="#000" />
+  </g>
+
+  <!-- row 1 -->
+  <g transform="translate(1 17)">
+    <path
+      d="M6 12V6l1-1 1 1V4l1-1 1 1v2l1-1 1 1v4l-2 3H8Z"
+      fill="none"
+      stroke="#000"
+      stroke-width="1"
+    />
+  </g>
+  <g transform="translate(17 17)">
+    <rect x="5" y="4" width="1" height="8" fill="#000" />
+    <rect x="9" y="4" width="1" height="8" fill="#000" />
+    <rect x="4" y="4" width="3" height="1" fill="#000" />
+    <rect x="8" y="4" width="3" height="1" fill="#000" />
+    <rect x="4" y="8" width="4" height="1" fill="#000" />
+    <rect x="7" y="8" width="4" height="1" fill="#000" />
+  </g>
+
+  <!-- row 2 -->
+  <g transform="translate(1 33)">
+    <rect x="5" y="5" width="6" height="6" fill="none" stroke="#000" stroke-width="1" />
+    <path d="M5 5l2-2h6l-2 2" fill="none" stroke="#000" stroke-width="1" />
+  </g>
+  <g transform="translate(17 33)">
+    <line x1="4" y1="12" x2="12" y2="4" stroke="#000" stroke-width="1" />
+    <rect x="11" y="3" width="2" height="2" fill="#000" />
+  </g>
+
+  <!-- row 3 -->
+  <g transform="translate(1 49)">
+    <line x1="4" y1="11" x2="12" y2="3" stroke="#000" stroke-width="1" />
+    <rect x="3" y="10" width="4" height="3" fill="#000" />
+  </g>
+  <g transform="translate(17 49)">
+    <rect x="5" y="5" width="1" height="1" fill="#000" />
+    <rect x="8" y="4" width="1" height="1" fill="#000" />
+    <rect x="10" y="6" width="1" height="1" fill="#000" />
+    <rect x="6" y="8" width="1" height="1" fill="#000" />
+    <rect x="9" y="9" width="1" height="1" fill="#000" />
+    <rect x="12" y="8" width="1" height="1" fill="#000" />
+    <rect x="4" y="10" width="1" height="1" fill="#000" />
+    <rect x="7" y="12" width="1" height="1" fill="#000" />
+    <rect x="11" y="12" width="1" height="1" fill="#000" />
+  </g>
+
+  <!-- row 4 -->
+  <g transform="translate(1 65)">
+    <line x1="3" y1="12" x2="12" y2="4" stroke="#000" stroke-width="1" />
+  </g>
+  <g transform="translate(17 65)">
+    <ellipse cx="8" cy="8" rx="5" ry="4" fill="none" stroke="#000" stroke-width="1" />
+  </g>
+
+  <!-- row 5 -->
+  <g transform="translate(1 81)">
+    <rect x="4" y="4" width="8" height="8" fill="none" stroke="#000" stroke-width="1" />
+  </g>
+  <g transform="translate(17 81)">
+    <rect x="4" y="4" width="8" height="8" fill="#000" />
+  </g>
+
+  <!-- row 6 -->
+  <g transform="translate(1 97)">
+    <ellipse cx="8" cy="8" rx="5" ry="4" fill="none" stroke="#000" stroke-width="1" />
+  </g>
+  <g transform="translate(17 97)">
+    <ellipse cx="8" cy="8" rx="5" ry="4" fill="#000" />
+  </g>
+
+  <!-- row 7 -->
+  <g transform="translate(1 113)">
+    <path
+      d="M8 12s-4-2.3-4-5a2.4 2.4 0 0 1 4-1.6A2.4 2.4 0 0 1 12 7c0 2.7-4 5-4 5Z"
+      fill="none"
+      stroke="#000"
+      stroke-width="1"
+    />
+  </g>
+  <g transform="translate(17 113)">
+    <path d="M8 12s-4-2.3-4-5a2.4 2.4 0 0 1 4-1.6A2.4 2.4 0 0 1 12 7c0 2.7-4 5-4 5Z" fill="#000" />
+  </g>
+
+  <!-- row 8 -->
+  <g transform="translate(1 129)">
+    <circle cx="7" cy="7" r="4" fill="none" stroke="#000" stroke-width="1" />
+    <line x1="10" y1="10" x2="13" y2="13" stroke="#000" stroke-width="1" />
+  </g>
+  <g transform="translate(17 129)">
+    <line x1="3" y1="12" x2="12" y2="4" stroke="#000" stroke-width="1" />
+  </g>
+
+  <!-- row 9 -->
+  <g transform="translate(1 145)">
+    <rect x="4" y="4" width="8" height="8" fill="none" stroke="#000" stroke-width="1" />
+  </g>
+  <g transform="translate(17 145)">
+    <rect x="4" y="4" width="8" height="8" fill="#000" />
+  </g>
+</svg>

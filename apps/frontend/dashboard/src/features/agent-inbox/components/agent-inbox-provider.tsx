@@ -705,7 +705,9 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 							bodyHtml: msg.htmlBody || undefined,
 							receivedAt,
 							status:
-								msg.status === "failed" || msg.status === "bounced" || Boolean(msg.errorMessage)
+								msg.status === "failed" ||
+								msg.status === "bounced" ||
+								Boolean(msg.errorMessage)
 									? ("failed" as const)
 									: ("handled" as const),
 							deliveryStatus: msg.status,
