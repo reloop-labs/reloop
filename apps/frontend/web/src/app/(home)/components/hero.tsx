@@ -289,7 +289,8 @@ export function Hero({ variant = "default" }: HeroProps) {
 							</FancyButton.Root>
 						</div>
 					</div>
-					<div className="relative h-[320px] w-full sm:h-[400px] lg:h-[470px]">
+					{/* Optical offset: the CRT's 3/4 mass sits right and high of the bounding-box center. */}
+					<div className="lg:-translate-x-16 relative h-[320px] w-full sm:h-[400px] lg:h-[470px] lg:translate-y-4">
 						<MacintoshHeroMonitorLazy />
 					</div>
 				</div>
