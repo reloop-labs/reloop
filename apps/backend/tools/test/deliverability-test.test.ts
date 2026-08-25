@@ -89,7 +89,12 @@ Content-Type: text/html
 	});
 
 	it("detects link shorteners and mismatched display text", async () => {
-		const phishingMime = `From: info@test.com
+		const originalFetch = globalThis.fetch;
+		// @ts-ignore
+		globalThis.fetch = async () => new Response("", { status: 200 });
+
+		try {
+			const phishingMime = `From: info@test.com
 To: test@test.com
 Subject: Update Account
 Content-Type: text/html
@@ -99,17 +104,20 @@ Content-Type: text/html
   <a href="https://evil-site.com/login">https://paypal.com/security</a>
 </body></html>`;
 
-		const parsed = await parseMime(phishingMime);
-		const linksRes = await checkLinks(parsed);
+			const parsed = await parseMime(phishingMime);
+			const linksRes = await checkLinks(parsed);
 
-		expect(linksRes.category.status).toBe("fail");
-		expect(linksRes.shorteners).toContain("bit.ly");
-		expect(
-			linksRes.category.items.some((i) => i.id === "links-deceptive"),
-		).toBe(true);
-		expect(
-			linksRes.category.items.some((i) => i.id === "links-shortener"),
-		).toBe(true);
+			expect(linksRes.category.status).toBe("fail");
+			expect(linksRes.shorteners).toContain("bit.ly");
+			expect(
+				linksRes.category.items.some((i) => i.id === "links-deceptive"),
+			).toBe(true);
+			expect(
+				linksRes.category.items.some((i) => i.id === "links-shortener"),
+			).toBe(true);
+		} finally {
+			globalThis.fetch = originalFetch;
+		}
 	});
 
 	it("evaluates Rspamd clean scores and content heuristics", async () => {
@@ -163,7 +171,7 @@ Content-Type: text/html
 			items: [],
 		};
 
-		const perfectReport = computeDeliverabilityScore({
+		const report = computeDeliverabilityScore({
 			email: parsed,
 			signatureCategory: mockSignature,
 			blacklistsCategory: mockBlacklists,
@@ -172,11 +180,11 @@ Content-Type: text/html
 			linksCategory: mockLinks,
 		});
 
-		expect(perfectReport.score).toBe(10.0);
-		expect(perfectReport.grade).toBe("A+");
-		expect(perfectReport.verdict).toBe("inbox_ready");
+		expect(report.score).toBe(10);
+		expect(report.grade).toBe("A+");
+		expect(report.verdict).toBe("inbox_ready");
 
-		// Test with deductions
+		// Test penalties
 		const degradedSignature: CategoryResult = {
 			...mockSignature,
 			mark: -2.5,
@@ -203,35 +211,43 @@ Content-Type: text/html
 	});
 
 	it("handles session lifecycle: create -> inject sample -> retrieve report", async () => {
-		const {
-			createDeliverabilityTestSession,
-			getDeliverabilityTestSession,
-			processInboundTesterEmail,
-		} = await import(
-			"../src/routes/tools/deliverability-test/deliverability-test.controllers"
-		);
+		const originalFetch = globalThis.fetch;
+		// @ts-ignore
+		globalThis.fetch = async () => new Response("", { status: 200 });
 
-		const session = await createDeliverabilityTestSession("127.0.0.1");
-		expect(session.token).toMatch(/^test-[a-f0-9]+$/);
-		expect(session.address).toContain("@");
+		try {
+			const {
+				createDeliverabilityTestSession,
+				getDeliverabilityTestSession,
+				processInboundTesterEmail,
+			} = await import(
+				"../src/routes/tools/deliverability-test/deliverability-test.controllers"
+			);
 
-		// Pending initially
-		const pendingRes = await getDeliverabilityTestSession(session.token);
-		expect(pendingRes.status).toBe("pending");
-		expect(pendingRes.report).toBeUndefined();
+			const session = await createDeliverabilityTestSession("127.0.0.1");
+			expect(session.token).toMatch(/^test-[a-f0-9]+$/);
+			expect(session.address).toContain("@");
 
-		// Inject test email targeting this session address
-		const mimeToSend = sampleMime.replace(
-			"test-a1b2c3@mail-test.reloop.email",
-			session.address,
-		);
-		const injectResult = await processInboundTesterEmail(mimeToSend);
-		expect(injectResult.success).toBe(true);
+			// Pending initially
+			const pendingRes = await getDeliverabilityTestSession(session.token);
+			expect(pendingRes.status).toBe("pending");
+			expect(pendingRes.report).toBeUndefined();
 
-		// Now retrieve report
-		const completedRes = await getDeliverabilityTestSession(session.token);
-		expect(completedRes.status).toBe("received");
-		expect(completedRes.report).toBeDefined();
-		expect(completedRes.report?.score).toBeGreaterThan(0);
+			// Inject test email targeting this session address
+			const mimeToSend = sampleMime.replace(
+				"test-a1b2c3@mail-test.reloop.email",
+				session.address,
+			);
+			const injectResult = await processInboundTesterEmail(mimeToSend);
+			expect(injectResult.success).toBe(true);
+
+			// Now retrieve report
+			const completedRes = await getDeliverabilityTestSession(session.token);
+			expect(completedRes.status).toBe("received");
+			expect(completedRes.report).toBeDefined();
+			expect(completedRes.report?.score).toBeGreaterThan(0);
+		} finally {
+			globalThis.fetch = originalFetch;
+		}
 	}, 15_000);
 });
