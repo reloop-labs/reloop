@@ -1,12 +1,11 @@
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import dayjs from "dayjs";
-import { Paperclip } from "lucide-react";
 import { forwardRef, type ReactNode } from "react";
 import { parseEmail } from "#/features/agent-inbox/lib/email-address";
 import { resolveLabelColor } from "#/features/agent-inbox/lib/label-colors";
 import type { InboundThread } from "../../types";
-import { hasVisibleAttachments } from "../../utils/map-outbound-attachments";
+import { ListAttachmentChip } from "./list-attachment-chip";
 import { useInboxMail } from "./use-inbox-mail";
 
 function formatRecipientLabel(addresses: string[] | undefined): string {
@@ -121,6 +120,9 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 		const subject = (thread.subject || "").trim() || "(No Subject)";
 		const preview = (thread.preview || "").trim().replace(/\s+/g, " ");
 		const primaryLabel = thread.labels?.[0];
+		const visibleAttachments = (thread.attachments ?? []).filter(
+			(att) => att.isInline !== true,
+		);
 		const isFailed =
 			thread.status === "failed" ||
 			thread.status === "bounced" ||
@@ -211,38 +213,56 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 				</span>
 
 				{/* Subject + preview */}
-				<div className="flex min-w-0 flex-1 items-center gap-1.5 overflow-hidden pr-3">
-					{primaryLabel && (
-						<span
-							className="mr-1 flex h-5 max-w-30 shrink-0 items-center truncate rounded-[6px] border px-1.5 font-medium text-[11px]"
-							style={{
-								background: chipBackground(primaryLabel.color),
-								color: "var(--inbox-chip-fg)",
-								borderColor: "var(--inbox-chip-border)",
-							}}
-						>
-							{primaryLabel.name}
+				<div className="flex min-w-0 flex-1 flex-col justify-center gap-1 overflow-hidden pr-3">
+					<div className="flex min-w-0 items-center gap-1.5">
+						{primaryLabel ? (
+							<span
+								className="mr-1 flex h-5 max-w-30 shrink-0 items-center truncate rounded-[6px] border px-1.5 font-medium text-[11px]"
+								style={{
+									background: chipBackground(primaryLabel.color),
+									color: "var(--inbox-chip-fg)",
+									borderColor: "var(--inbox-chip-border)",
+								}}
+							>
+								{primaryLabel.name}
+							</span>
+						) : null}
+						<span className="truncate text-[14px] leading-5">
+							<span
+								className={cn(
+									isUnread
+										? "font-semibold text-text-strong-950"
+										: "font-normal text-text-sub-600",
+								)}
+							>
+								{highlightMatches(subject, searchQuery)}
+							</span>
+							{preview ? (
+								<>
+									<span className="mx-1 text-text-soft-400/60">-</span>
+									<span className="font-normal text-[13px] text-text-soft-400">
+										{highlightMatches(preview, searchQuery)}
+									</span>
+								</>
+							) : null}
 						</span>
-					)}
-					<span className="truncate text-[14px] leading-5">
-						<span
-							className={cn(
-								isUnread
-									? "font-semibold text-text-strong-950"
-									: "font-normal text-text-sub-600",
-							)}
-						>
-							{highlightMatches(subject, searchQuery)}
-						</span>
-						{preview && (
-							<>
-								<span className="mx-1 text-text-soft-400/60">-</span>
-								<span className="font-normal text-[13px] text-text-soft-400">
-									{highlightMatches(preview, searchQuery)}
+					</div>
+					{visibleAttachments.length > 0 ? (
+						<div className="flex min-w-0 items-center gap-1.5">
+							{visibleAttachments.slice(0, 2).map((att, index) => (
+								<ListAttachmentChip
+									key={`${att.name}-${index}`}
+									filename={att.name}
+									contentType={att.contentType}
+								/>
+							))}
+							{visibleAttachments.length > 2 ? (
+								<span className="shrink-0 text-[12px] text-text-soft-400">
+									+{visibleAttachments.length - 2}
 								</span>
-							</>
-						)}
-					</span>
+							) : null}
+						</div>
+					) : null}
 				</div>
 
 				{/* Hover actions */}
@@ -293,16 +313,6 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 						<Icon name="trash" className="h-3.5 w-3.5 text-red-500" />
 					</button>
 				</span>
-
-				{/* Attachment indicator */}
-				{hasVisibleAttachments(thread.attachments) && (
-					<span
-						className="ml-1 flex w-4 shrink-0 items-center justify-center text-text-soft-400"
-						title="Has attachment"
-					>
-						<Paperclip className="h-3.5 w-3.5" />
-					</span>
-				)}
 
 				{/* Failed label on right-hand side */}
 				{isFailed && (
