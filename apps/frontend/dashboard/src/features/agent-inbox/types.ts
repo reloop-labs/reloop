@@ -3,7 +3,9 @@ export type InboundThreadStatus =
 	| "parsing"
 	| "needs_approval"
 	| "handled"
-	| "blocked";
+	| "blocked"
+	| "failed"
+	| "bounced";
 
 export type InboxView = "all" | "unread" | "needs_approval" | "starred";
 
@@ -85,6 +87,8 @@ export interface InboundThread {
 	bccEmails?: string[];
 	attachments?: InboundAttachment[];
 	parsed?: Record<string, unknown>;
+	errorMessage?: string | null;
+	deliveryStatus?: string;
 	timeline: InboundTimelineStep[];
 }
 
@@ -176,6 +180,7 @@ export interface BackendMessage {
 	snippet: string | null;
 	size?: number;
 	status?: string;
+	errorMessage?: string | null;
 	isRead?: boolean;
 	isStarred?: boolean;
 	isSpam?: boolean;

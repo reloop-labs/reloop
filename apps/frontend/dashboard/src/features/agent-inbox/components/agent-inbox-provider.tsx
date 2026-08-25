@@ -132,6 +132,7 @@ interface BackendSentMessage {
 	textBody: string | null;
 	htmlBody: string | null;
 	status: string;
+	errorMessage?: string | null;
 	createdAt: string | Date;
 	threadId?: string | null;
 	isStarred?: boolean;
@@ -703,7 +704,11 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 							bodyText: msg.textBody || "",
 							bodyHtml: msg.htmlBody || undefined,
 							receivedAt,
-							status: "handled" as const,
+							status:
+								msg.status === "failed" || msg.status === "bounced" || Boolean(msg.errorMessage)
+									? ("failed" as const)
+									: ("handled" as const),
+							deliveryStatus: msg.status,
 							securityLevel: 5 as const,
 							unread: false,
 							isStarred: Boolean(msg.isStarred || meta?.isStarred),
@@ -718,6 +723,7 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 							ccEmails: msg.ccEmails ?? [],
 							bccEmails: msg.bccEmails ?? [],
 							attachments: [],
+							errorMessage: msg.errorMessage ?? null,
 							timeline: [
 								{
 									label: "Email composed",

@@ -15,6 +15,7 @@ import { MessageActionBar } from "./message-action-bar";
 import { MessageActionsDropdown } from "./message-actions-dropdown";
 import { MessageAttachments } from "./message-attachments";
 import { MessageBody } from "./message-body";
+import { MessageDeliveryError } from "./message-delivery-error";
 import { MessageDraftActions } from "./message-draft-actions";
 import { MessageDraftBanner } from "./message-draft-banner";
 import { MessageParsedData } from "./message-parsed-data";
@@ -99,6 +100,17 @@ export const ZeroMailDisplay = ({
 	const isApproval = msg.status === "needs_approval";
 
 	const email = msg.email;
+	const isFailed =
+		msg.status === "failed" ||
+		msg.status === "bounced" ||
+		email?.status === "failed" ||
+		email?.status === "bounced" ||
+		Boolean(msg.errorMessage || email?.errorMessage);
+	const errorMessage =
+		msg.errorMessage ||
+		email?.errorMessage ||
+		(isFailed ? "Email delivery failed" : null);
+
 	const rawFrom = msg.fromEmail || email?.fromEmail || "";
 	const senderEmail = extractBareEmail(rawFrom);
 	const rawFromName = String(msg.fromName || email?.fromName || "").trim();
@@ -260,6 +272,12 @@ export const ZeroMailDisplay = ({
 										{isOutbound ? "me" : realFromName || senderName}
 									</span>
 									{isOutbound && <YouBadge />}
+									{isFailed && (
+										<span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-red-500/10 px-1.5 py-0.5 font-semibold text-[10px] text-red-600 ring-1 ring-red-500/30 ring-inset dark:text-red-400">
+											<span className="size-1.5 shrink-0 rounded-full bg-red-500" />
+											Failed to send
+										</span>
+									)}
 									{senderEmail && !isOutbound && (
 										<span className="truncate text-[13px] text-mail-muted leading-5">
 											&lt;{senderEmail}&gt;
@@ -504,6 +522,15 @@ export const ZeroMailDisplay = ({
 										parsed={msg.parsed}
 										isExpanded={parsedExpanded}
 										onToggle={onToggleParsed}
+									/>
+								</div>
+							)}
+
+							{isFailed && (
+								<div className="mt-4">
+									<MessageDeliveryError
+										errorMessage={errorMessage}
+										status={email?.status || msg.status}
 									/>
 								</div>
 							)}

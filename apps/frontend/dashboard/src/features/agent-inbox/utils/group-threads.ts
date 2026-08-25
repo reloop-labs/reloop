@@ -28,6 +28,12 @@ export function groupThreadsByConversation(
 					...existing,
 					isPinned: existing.isPinned || thread.isPinned,
 					isImportant: existing.isImportant || thread.isImportant,
+					deliveryStatus: existing.deliveryStatus || thread.deliveryStatus,
+					errorMessage: existing.errorMessage || thread.errorMessage,
+					status:
+						existing.status === "failed" || thread.status === "failed"
+							? "failed"
+							: existing.status,
 					labels:
 						(existing.labels?.length ?? 0) > 0
 							? existing.labels

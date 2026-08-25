@@ -511,6 +511,7 @@ export namespace MailModel {
 		textBody: t.Union([t.String(), t.Null()]),
 		htmlBody: t.Union([t.String(), t.Null()]),
 		status: t.String(),
+		errorMessage: t.Union([t.String(), t.Null(), t.Undefined()]),
 		sentAt: t.Union([t.Date(), t.String(), t.Null()]),
 		createdAt: t.Union([t.Date(), t.String()]),
 	});
@@ -526,6 +527,7 @@ export namespace MailModel {
 		subject: t.Union([t.String(), t.Null()]),
 		preview: t.Union([t.String(), t.Null()]),
 		messageAt: t.Union([t.Date(), t.String()]),
+		errorMessage: t.Union([t.String(), t.Null(), t.Undefined()]),
 		rfc822MessageId: t.Union([t.String(), t.Null()]),
 		inReplyTo: t.Union([t.String(), t.Null()]),
 		createdAt: t.Union([t.Date(), t.String()]),

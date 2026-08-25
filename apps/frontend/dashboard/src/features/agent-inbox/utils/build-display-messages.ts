@@ -10,6 +10,8 @@ export type DisplayMessageThread = {
 	id: string;
 	threadId?: string | null;
 	direction?: string;
+	status?: string;
+	errorMessage?: string | null;
 	from: { email: string; name?: string | null };
 	subject: string;
 	receivedAt: string;
@@ -70,9 +72,15 @@ export function buildDisplayMessages({
 							msg.email.toEmails?.length > 0
 								? msg.email.toEmails
 								: (thread.toEmails ?? msg.email.toEmails ?? []),
+						errorMessage:
+							msg.email.errorMessage ?? msg.errorMessage ?? thread.errorMessage ?? null,
 					}
 				: msg.email;
-			const next = { ...msg, email };
+			const next = {
+				...msg,
+				errorMessage: msg.errorMessage ?? email?.errorMessage ?? thread.errorMessage ?? null,
+				email,
+			};
 			if (msg.inboundEmailId === thread.id || msg.id === thread.id) {
 				return { ...next, parsed: thread.parsed || msg.parsed };
 			}
@@ -90,6 +98,8 @@ export function buildDisplayMessages({
 				fromName: thread.from.name || null,
 				messageAt: thread.receivedAt,
 				subject: thread.subject,
+				status: thread.status,
+				errorMessage: thread.errorMessage ?? null,
 				email: {
 					id: thread.id,
 					fromEmail: thread.from.email,
@@ -99,6 +109,8 @@ export function buildDisplayMessages({
 					subject: thread.subject,
 					textBody: thread.bodyText,
 					htmlBody: thread.bodyHtml,
+					status: thread.status,
+					errorMessage: thread.errorMessage ?? null,
 					attachments: thread.attachments || [],
 					createdAt: thread.receivedAt,
 				},

@@ -87,4 +87,35 @@ describe("buildDisplayMessages", () => {
 		});
 		expect(messages.map((m) => m.id)).toEqual(["opt-1"]);
 	});
+
+	it("preserves errorMessage and failed status on outbound messages", () => {
+		const messages = buildDisplayMessages({
+			thread: {
+				...listThread,
+				status: "failed",
+				errorMessage: "550 5.1.1 User unknown",
+			},
+			threadDataMatches: true,
+			isLoadingThread: false,
+			threadData: {
+				messages: [
+					{
+						id: "outbound-failed",
+						direction: "outbound",
+						messageAt: "2026-07-18T10:05:00.000Z",
+						fromEmail: "agent@example.com",
+						errorMessage: "550 5.1.1 User unknown",
+						email: {
+							id: "eml_123",
+							status: "failed",
+							errorMessage: "550 5.1.1 User unknown",
+						},
+					},
+				],
+			},
+		});
+		expect(messages[0].errorMessage).toBe("550 5.1.1 User unknown");
+		expect(messages[0].email.errorMessage).toBe("550 5.1.1 User unknown");
+		expect(messages[0].email.status).toBe("failed");
+	});
 });

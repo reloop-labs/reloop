@@ -121,6 +121,7 @@ export async function getThreadController(id: string, organizationId: string) {
 					});
 					return {
 						...msg,
+						errorMessage: email?.errorMessage ?? null,
 						email: email
 							? {
 									id: email.id,
@@ -133,6 +134,7 @@ export async function getThreadController(id: string, organizationId: string) {
 									textBody: email.textBody,
 									htmlBody: email.htmlBody,
 									status: email.status,
+									errorMessage: email.errorMessage,
 									sentAt: email.sentAt,
 									createdAt: email.createdAt,
 								}
@@ -271,6 +273,7 @@ export async function getThreadController(id: string, organizationId: string) {
 					subject: standaloneLog.subject,
 					preview: (standaloneLog.textBody || "").toString().slice(0, 200),
 					messageAt: createdAt,
+					errorMessage: standaloneLog.errorMessage ?? null,
 					rfc822MessageId: standaloneLog.messageId ?? null,
 					inReplyTo: null,
 					createdAt,
@@ -285,6 +288,7 @@ export async function getThreadController(id: string, organizationId: string) {
 						textBody: standaloneLog.textBody,
 						htmlBody: standaloneLog.htmlBody,
 						status: standaloneLog.status,
+						errorMessage: standaloneLog.errorMessage,
 						sentAt: standaloneLog.sentAt ? asIso(standaloneLog.sentAt) : null,
 						createdAt,
 					},

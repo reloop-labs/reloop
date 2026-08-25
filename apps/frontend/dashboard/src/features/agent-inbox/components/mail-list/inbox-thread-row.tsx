@@ -119,6 +119,12 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 		const subject = (thread.subject || "").trim() || "(No Subject)";
 		const preview = (thread.preview || "").trim().replace(/\s+/g, " ");
 		const primaryLabel = thread.labels?.[0];
+		const isFailed =
+			thread.status === "failed" ||
+			thread.status === "bounced" ||
+			thread.deliveryStatus === "failed" ||
+			thread.deliveryStatus === "bounced" ||
+			Boolean(thread.errorMessage);
 
 		return (
 			<div
@@ -285,6 +291,14 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 						<Icon name="trash" className="h-3.5 w-3.5 text-red-500" />
 					</button>
 				</span>
+
+				{/* Failed label on right-hand side */}
+				{isFailed && (
+					<span className="ml-2 inline-flex shrink-0 items-center gap-1 rounded-[5px] bg-red-500/10 px-1.5 py-0.5 font-medium text-[11px] text-red-600 ring-1 ring-red-500/25 ring-inset dark:bg-red-950/40 dark:text-red-400 dark:ring-red-500/30">
+						<span className="size-1.5 shrink-0 rounded-full bg-red-500" />
+						Failed
+					</span>
+				)}
 
 				{/* Date/Time */}
 				<span className="ml-2 w-18 shrink-0 whitespace-nowrap text-right font-normal text-[12.5px] text-text-soft-400 tabular-nums">
