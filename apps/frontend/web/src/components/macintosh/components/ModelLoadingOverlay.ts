@@ -187,6 +187,33 @@ export function createModelLoadingOverlay(
 	message.style.textAlign = "center";
 	message.style.maxWidth = "280px";
 
+	const applyTheme = () => {
+		const isDark =
+			typeof document !== "undefined" &&
+			document.documentElement.classList.contains("dark");
+
+		icon.style.filter = isDark ? "invert(1) brightness(1.2)" : "none";
+		barOuter.style.border = isDark
+			? "1px solid rgba(255, 255, 255, 0.9)"
+			: "1px solid #000000";
+		barFill.style.background = isDark ? "#ffffff" : "#000000";
+		percent.style.color = isDark ? "#ffffff" : "#000000";
+		message.style.color = isDark ? "#ffffff" : "#000000";
+	};
+
+	applyTheme();
+
+	let observer: MutationObserver | null = null;
+	if (typeof document !== "undefined" && typeof MutationObserver !== "undefined") {
+		observer = new MutationObserver(() => {
+			if (!disposed) applyTheme();
+		});
+		observer.observe(document.documentElement, {
+			attributes: true,
+			attributeFilter: ["class"],
+		});
+	}
+
 	panel.append(icon, barOuter, percent, message);
 	overlay.appendChild(panel);
 
@@ -235,6 +262,8 @@ export function createModelLoadingOverlay(
 
 	const removeOverlay = () => {
 		disposed = true;
+		observer?.disconnect();
+		observer = null;
 		clearFinishCheck();
 		clearProgressAnimator();
 		window.removeEventListener("resize", updateScale);
