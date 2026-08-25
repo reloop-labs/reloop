@@ -22,6 +22,7 @@ export const loader = async () => {
 	try {
 		await bus.connect(toolsConfig.NATS_URL);
 		log.info("NATS", "Connected");
+		await bus.ensureStream("kumomta-inbound", ["kumomta.inbound_received"]);
 		await initDeliverabilityInboundSubscriber();
 	} catch (e) {
 		log.warn({
