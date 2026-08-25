@@ -35,10 +35,13 @@ export async function uploadComposeFile(file: File): Promise<{
 
 export function toSendAttachments(attachments: ComposeAttachment[]) {
 	return attachments
-		.filter((a) => !a.isUploading && a.path)
+		.filter((a) => !a.isUploading && (a.url || a.path))
 		.map((a) => ({
 			filename: a.name,
-			path: a.path,
+			// Prefer the public object URL. The S3 key (`uploads/…`) is not a
+			// file on the mail server — sending it as `path` makes nodemailer
+			// ENOENT (`open '/app/uploads/…'`).
+			path: a.url || a.path,
 			content_type: a.content_type,
 		}));
 }

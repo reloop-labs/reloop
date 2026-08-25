@@ -12,6 +12,8 @@ export async function resendEmailController({
 	apiKey,
 	apiKeyId,
 	userId,
+	cookie,
+	requestApiKey,
 	useInternalInject = false,
 }: {
 	emailId: string;
@@ -19,6 +21,8 @@ export async function resendEmailController({
 	apiKey: string;
 	apiKeyId?: string;
 	userId?: string;
+	cookie?: string | null;
+	requestApiKey?: string | null;
 	useInternalInject?: boolean;
 }): Promise<MailModel.SendEmailResponse> {
 	const log = useLogger();
@@ -63,6 +67,8 @@ export async function resendEmailController({
 		apiKey,
 		apiKeyId: apiKeyId || emailLogEntry.apikeyId || undefined,
 		userId: userId || emailLogEntry.userId || undefined,
+		cookie,
+		requestApiKey,
 		useInternalInject,
 	});
 }

@@ -164,6 +164,24 @@ function classifyError(raw: string): ErrorClassification {
 		};
 	}
 
+	// Missing attachment (S3 key treated as a local path, expired object, …)
+	if (
+		m.includes("enoent") ||
+		m.includes("no such file") ||
+		m.includes("could not be loaded") ||
+		m.includes("attachment could not")
+	) {
+		return {
+			category: "Missing Attachment",
+			summary: "The attached file could not be found when sending.",
+			fixes: [
+				"Remove the file and upload it again",
+				"Wait until the upload finishes, then send",
+				"Send without the attachment if the file is no longer needed",
+			],
+		};
+	}
+
 	// Attachment / size
 	if (
 		m.includes("message too large") ||

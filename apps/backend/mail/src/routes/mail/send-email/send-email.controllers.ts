@@ -32,6 +32,8 @@ export async function sendEmailController({
 	apiKey,
 	apiKeyId,
 	userId,
+	cookie,
+	requestApiKey,
 	useInternalInject = false,
 }: {
 	organizationId: string;
@@ -39,6 +41,8 @@ export async function sendEmailController({
 	apiKey: string;
 	apiKeyId?: string;
 	userId?: string;
+	cookie?: string | null;
+	requestApiKey?: string | null;
 	useInternalInject?: boolean;
 }): Promise<MailModel.SendEmailResponse> {
 	const logger = useLogger();
@@ -145,6 +149,8 @@ export async function sendEmailController({
 		emailLogId,
 		apiKey,
 		tlsMode: currentDomain.tls ?? "opportunistic",
+		cookie,
+		requestApiKey,
 		useInternalInject,
 	});
 

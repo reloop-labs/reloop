@@ -15,6 +15,8 @@ export async function sendEmail_step6({
 	emailLogId,
 	apiKey,
 	tlsMode,
+	cookie,
+	requestApiKey,
 	useInternalInject = false,
 }: {
 	body: MailModel.SendEmailBody;
@@ -26,6 +28,8 @@ export async function sendEmail_step6({
 	emailLogId: string;
 	apiKey: string;
 	tlsMode: "opportunistic" | "enforced";
+	cookie?: string | null;
+	requestApiKey?: string | null;
 	useInternalInject?: boolean;
 }) {
 	try {
@@ -50,6 +54,8 @@ export async function sendEmail_step6({
 				content_id: att.content_id,
 			})),
 			apiKey,
+			cookie,
+			requestApiKey,
 			customHeaders: {
 				"X-Org-ID": organizationId,
 				"X-Domain-ID": domainId,

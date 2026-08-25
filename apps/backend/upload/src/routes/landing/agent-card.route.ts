@@ -35,6 +35,27 @@ export const agentCardRoute = new Elysia().get(
 				examples: [],
 			},
 			{
+				id: "get_file_content",
+				name: "Get File Content",
+				description:
+					"Fetch the raw bytes of an uploaded file by storage key. Same session cookie or API key as upload.",
+				method: "GET",
+				path: "/api/upload/v1/files/content",
+				tags: ["upload"],
+				inputSchema: {
+					path: {
+						type: "string",
+						required: true,
+						description: "Upload object key or public URL",
+					},
+				},
+				outputSchema: {
+					body: { type: "binary" },
+				},
+				errorCodes: [{ status: 404, meaning: "File not found" }],
+				examples: [],
+			},
+			{
 				id: "delete_file",
 				name: "Delete File",
 				description: "Permanently delete a file from S3 storage and database.",

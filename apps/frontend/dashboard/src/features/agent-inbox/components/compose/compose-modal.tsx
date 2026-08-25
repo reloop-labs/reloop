@@ -47,6 +47,11 @@ import {
 } from "./ai-prompt-popover";
 import { AiSparkleButton } from "./ai-sparkle-button";
 import {
+	type ComposeAttachment,
+	formatBytes,
+	toSendAttachments,
+} from "./compose-attachments";
+import {
 	ComposeBodyEditor,
 	type ComposeBodyEditorHandle,
 } from "./compose-body-editor";
@@ -87,28 +92,11 @@ interface ComposeFormValues {
 	bcc: string[];
 }
 
-type AttachmentItem = {
-	id: string;
-	name: string;
-	size: string;
-	url: string;
-	path: string;
-	content_type: string;
-	isUploading?: boolean;
-};
+type AttachmentItem = ComposeAttachment;
 
 const UNDO_STORAGE_KEY = "reloop-inbox-undo-compose";
 /** Brief window to cancel a scheduled send from the toast (not used for immediate send). */
 const SCHEDULE_UNDO_SECONDS = 15;
-
-const formatBytes = (bytes: number, decimals = 1) => {
-	if (!bytes) return "0 Bytes";
-	const k = 1024;
-	const dm = decimals < 0 ? 0 : decimals;
-	const sizes = ["Bytes", "KB", "MB", "GB"];
-	const i = Math.floor(Math.log(bytes) / Math.log(k));
-	return `${Number.parseFloat((bytes / k ** i).toFixed(dm))} ${sizes[i]}`;
-};
 
 const AttachmentGlyph = ({ contentType }: { contentType: string }) => {
 	if (contentType.startsWith("image/")) {
@@ -587,13 +575,7 @@ export const ComposeModal = ({
 				html: exported.html || htmlBody,
 				cc: data.cc.length > 0 ? data.cc : undefined,
 				bcc: data.bcc.length > 0 ? data.bcc : undefined,
-				attachments: attachments
-					.filter((att) => !att.isUploading && (att.path || att.url))
-					.map((att) => ({
-						filename: att.name,
-						path: att.path || att.url,
-						content_type: att.content_type,
-					})),
+				attachments: toSendAttachments(attachments),
 				scheduledAt: scheduleAt,
 				undoWindowSeconds: undoSeconds,
 			});

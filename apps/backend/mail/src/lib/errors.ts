@@ -139,6 +139,13 @@ export const MailErrors = {
 			why: `The attachment with ID ${attachmentId} was not found`,
 			fix: "Verify the attachment ID and ensure it exists for the given email",
 		}),
+	attachmentLoadFailed: (path: string, reason: string) =>
+		createError({
+			status: 400,
+			message: "Attachment could not be loaded",
+			why: `Could not read attachment '${path}': ${reason}`,
+			fix: "Re-upload the file and send again. Attachments are loaded from the upload service, not from the mail server disk.",
+		}),
 	invalidTrackingUrl: (url: string) =>
 		createError({
 			status: 400,

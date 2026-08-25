@@ -2,6 +2,10 @@ import { log } from "evlog";
 import MailComposer from "nodemailer/lib/mail-composer";
 import { mailConfig } from "../mail.config";
 import { MailErrors } from "./errors";
+import {
+	createUploadServiceStore,
+	materializeAttachments,
+} from "./resolve-attachments";
 
 export interface KumomtaHttpConfig {
 	baseUrl: string;
@@ -22,6 +26,8 @@ export interface SendEmailOptions {
 	customHeaders?: Record<string, string>;
 	scheduled_at?: string;
 	channel_id?: string;
+	cookie?: string | null;
+	requestApiKey?: string | null;
 	attachments?: Array<{
 		content?: string | Buffer | import("stream").Readable;
 		filename?: string;
@@ -244,6 +250,16 @@ export class KumomtaClient {
  * only handles MIME composition.
  */
 async function buildRfcMessage(options: SendEmailOptions): Promise<string> {
+	const attachments = options.attachments?.length
+		? await materializeAttachments(
+				options.attachments,
+				createUploadServiceStore({
+					cookie: options.cookie,
+					apiKey: options.requestApiKey,
+				}),
+			)
+		: undefined;
+
 	const mailOptions: import("nodemailer/lib/mailer").Options = {
 		from: options.fromName
 			? `${options.fromName} <${options.from}>`
@@ -256,13 +272,7 @@ async function buildRfcMessage(options: SendEmailOptions): Promise<string> {
 		cc: options.cc,
 		bcc: options.bcc,
 		headers: options.customHeaders,
-		attachments: options.attachments?.map((att) => ({
-			filename: att.filename,
-			content: att.content,
-			path: att.path,
-			contentType: att.content_type,
-			cid: att.content_id,
-		})),
+		attachments,
 	};
 
 	const composer = new MailComposer(mailOptions);
