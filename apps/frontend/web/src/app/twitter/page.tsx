@@ -21,7 +21,7 @@ export default function TwitterPage() {
 	return (
 		<div
 			data-standalone="true"
-			className="relative h-dvh w-full overflow-hidden bg-[#5a5a5a]"
+			className="relative h-dvh w-full overflow-hidden bg-[#434b57]"
 		>
 			<MacintoshSceneLazy />
 		</div>

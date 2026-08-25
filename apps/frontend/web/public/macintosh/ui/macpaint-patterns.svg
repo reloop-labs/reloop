@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="60" height="24" viewBox="0 0 60 24" shape-rendering="crispEdges">
+  <defs>
+    <pattern id="p1" width="2" height="2" patternUnits="userSpaceOnUse">
+      <rect x="0" y="0" width="1" height="1" fill="#000" />
+    </pattern>
+    <pattern id="p2" width="2" height="2" patternUnits="userSpaceOnUse">
+      <rect x="0" y="0" width="1" height="1" fill="#000" />
+      <rect x="1" y="1" width="1" height="1" fill="#000" />
+    </pattern>
+    <pattern id="p4" width="1" height="3" patternUnits="userSpaceOnUse">
+      <rect x="0" y="0" width="1" height="1" fill="#000" />
+    </pattern>
+    <pattern id="p5" width="3" height="1" patternUnits="userSpaceOnUse">
+      <rect x="0" y="0" width="1" height="1" fill="#000" />
+    </pattern>
+    <pattern id="p6" width="4" height="4" patternUnits="userSpaceOnUse">
+      <rect x="0" y="0" width="1" height="1" fill="#000" />
+      <rect x="1" y="3" width="1" height="1" fill="#000" />
+      <rect x="2" y="2" width="1" height="1" fill="#000" />
+      <rect x="3" y="1" width="1" height="1" fill="#000" />
+    </pattern>
+    <pattern id="p7" width="4" height="4" patternUnits="userSpaceOnUse">
+      <rect x="0" y="0" width="1" height="4" fill="#000" />
+      <rect x="0" y="0" width="4" height="1" fill="#000" />
+    </pattern>
+    <pattern id="p8" width="4" height="4" patternUnits="userSpaceOnUse">
+      <rect x="1" y="1" width="1" height="1" fill="#000" />
+    </pattern>
+    <pattern id="p9-mask" width="2" height="2" patternUnits="userSpaceOnUse">
+      <rect x="1" y="1" width="1" height="1" fill="#FFF" />
+    </pattern>
+    <pattern id="p3-dots" width="2" height="2" patternUnits="userSpaceOnUse">
+      <rect x="0" y="0" width="1" height="1" fill="#FFF" />
+    </pattern>
+  </defs>
+
+  <!-- Row 0: patterns 0..4 -->
+  <!-- 0: blank -->
+  <rect x="0" y="0" width="12" height="12" fill="#FFF" />
+  <!-- 1 -->
+  <rect x="12" y="0" width="12" height="12" fill="#FFF" />
+  <rect x="12" y="0" width="12" height="12" fill="url(#p1)" />
+  <!-- 2 -->
+  <rect x="24" y="0" width="12" height="12" fill="#FFF" />
+  <rect x="24" y="0" width="12" height="12" fill="url(#p2)" />
+  <!-- 3: black + white dots -->
+  <rect x="36" y="0" width="12" height="12" fill="#000" />
+  <rect x="36" y="0" width="12" height="12" fill="url(#p3-dots)" />
+  <!-- 4 -->
+  <rect x="48" y="0" width="12" height="12" fill="#FFF" />
+  <rect x="48" y="0" width="12" height="12" fill="url(#p4)" />
+
+  <!-- Row 1: patterns 5..9 -->
+  <!-- 5 -->
+  <rect x="0" y="12" width="12" height="12" fill="#FFF" />
+  <rect x="0" y="12" width="12" height="12" fill="url(#p5)" />
+  <!-- 6 -->
+  <rect x="12" y="12" width="12" height="12" fill="#FFF" />
+  <rect x="12" y="12" width="12" height="12" fill="url(#p6)" />
+  <!-- 7 -->
+  <rect x="24" y="12" width="12" height="12" fill="#FFF" />
+  <rect x="24" y="12" width="12" height="12" fill="url(#p7)" />
+  <!-- 8 -->
+  <rect x="36" y="12" width="12" height="12" fill="#FFF" />
+  <rect x="36" y="12" width="12" height="12" fill="url(#p8)" />
+  <!-- 9: black with white bottom-right -->
+  <rect x="48" y="12" width="12" height="12" fill="#000" />
+  <rect x="48" y="12" width="12" height="12" fill="url(#p9-mask)" />
+</svg>
+
