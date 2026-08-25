@@ -49,6 +49,8 @@ export async function correlateInboundThread({
 	inboundEmailId,
 	fromEmail,
 	fromName,
+	toEmails = [],
+	ccEmails = [],
 	subject,
 	textBody,
 	messageId,
@@ -61,6 +63,8 @@ export async function correlateInboundThread({
 	inboundEmailId: string;
 	fromEmail: string;
 	fromName?: string;
+	toEmails?: string[];
+	ccEmails?: string[];
 	subject: string;
 	textBody: string;
 	messageId: string;
@@ -100,6 +104,8 @@ export async function correlateInboundThread({
 		}
 	}
 
+	const newParticipants = uniqueParticipants([fromEmail], toEmails, ccEmails);
+
 	if (existingThreadId) {
 		// ─── Append to existing thread ─────────────────────────────
 		await db.insert(threadMessage).values({
@@ -125,11 +131,14 @@ export async function correlateInboundThread({
 				isRead: false, // New message → unread
 				status: "active", // New message → unarchive thread to inbox
 				participants: sql`
-					CASE
-						WHEN ${emailThread.participants}::jsonb ? ${fromEmail}
-						THEN ${emailThread.participants}
-						ELSE ${emailThread.participants}::jsonb || to_jsonb(${fromEmail}::text)
-					END
+					(
+						SELECT jsonb_agg(DISTINCT elem)
+						FROM (
+							SELECT jsonb_array_elements_text(COALESCE(${emailThread.participants}::jsonb, '[]'::jsonb)) AS elem
+							UNION
+							SELECT jsonb_array_elements_text(${JSON.stringify(newParticipants)}::jsonb) AS elem
+						) s
+					)
 				`,
 			})
 			.where(eq(emailThread.id, existingThreadId));
@@ -148,7 +157,7 @@ export async function correlateInboundThread({
 			lastMessagePreview: preview,
 			lastMessageAt: receivedAt,
 			messageCount: 1,
-			participants: [fromEmail],
+			participants: newParticipants,
 			isRead: false,
 		})
 		.returning({ id: emailThread.id });

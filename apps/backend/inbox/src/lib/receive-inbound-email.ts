@@ -153,12 +153,28 @@ export async function receiveInboundEmailController(rawMessage: string) {
 		const date = parsed.date || undefined;
 		const size = rawMessage.length;
 
-		const mailboxRecord = await db.query.mailbox.findFirst({
+		const normalizedRecipient = recipientEmail.toLowerCase().trim();
+		let mailboxRecord = await db.query.mailbox.findFirst({
 			where: and(
-				eq(mailbox.email, recipientEmail),
+				eq(mailbox.email, normalizedRecipient),
 				eq(mailbox.status, "active"),
 			),
 		});
+
+		// Fallback: If recipient is plus-addressed (e.g. user+alias@domain.com), try base email
+		if (!mailboxRecord && normalizedRecipient.includes("+")) {
+			const [localPart, domainPart] = normalizedRecipient.split("@");
+			if (localPart && domainPart) {
+				const baseLocalPart = localPart.split("+")[0];
+				const baseEmail = `${baseLocalPart}@${domainPart}`;
+				mailboxRecord = await db.query.mailbox.findFirst({
+					where: and(
+						eq(mailbox.email, baseEmail),
+						eq(mailbox.status, "active"),
+					),
+				});
+			}
+		}
 
 		if (!mailboxRecord) {
 			log.warn(`[INBOX] Mailbox not found or inactive for: ${recipientEmail}`);
@@ -248,6 +264,8 @@ export async function receiveInboundEmailController(rawMessage: string) {
 			inboundEmailId: insertedId,
 			fromEmail,
 			fromName,
+			toEmails,
+			ccEmails,
 			subject,
 			textBody,
 			messageId,
