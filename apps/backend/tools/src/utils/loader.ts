@@ -1,5 +1,7 @@
+import { initDeliverabilityInboundSubscriber } from "@be/tools/subscribers/deliverability-inbound.subscriber";
 import { toolsConfig } from "@be/tools/tools.config";
 import { withDeadline } from "@be/tools/utils/deadline";
+import { bus } from "@reloop/bus";
 import { RedisCache } from "@reloop/cache/redis-client";
 import { warmCatalogue } from "@reloop/email-validation";
 import { log } from "evlog";
@@ -13,6 +15,17 @@ export const loader = async () => {
 	} catch (e) {
 		log.error({
 			message: "Redis unavailable — rate limiting will fail open",
+			error: e instanceof Error ? e.message : String(e),
+		});
+	}
+
+	try {
+		await bus.connect(toolsConfig.NATS_URL);
+		log.info("NATS", "Connected");
+		await initDeliverabilityInboundSubscriber();
+	} catch (e) {
+		log.warn({
+			message: "NATS connection skipped or unavailable for tools service",
 			error: e instanceof Error ? e.message : String(e),
 		});
 	}

@@ -1,6 +1,5 @@
 {
   "lockfileVersion": 1,
-  "configVersion": 0,
   "workspaces": {
     "": {
       "name": "reloop",
@@ -481,15 +480,18 @@
         "@opentelemetry/exporter-trace-otlp-proto": "catalog:backend",
         "@opentelemetry/sdk-trace-node": "catalog:backend",
         "@reloop/auth": "workspace:*",
+        "@reloop/bus": "workspace:*",
         "@reloop/cache": "workspace:*",
         "@reloop/email-validation": "workspace:*",
         "dotenv": "catalog:backend",
         "elysia": "catalog:backend",
         "evlog": "catalog:backend",
+        "mailparser": "catalog:backend",
       },
       "devDependencies": {
         "@reloop/tsconfig": "workspace:*",
         "@types/bun": "catalog:backend",
+        "@types/mailparser": "catalog:backend",
         "tsdown": "catalog:backend",
         "typescript": "catalog:",
       },

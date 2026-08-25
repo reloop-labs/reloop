@@ -7,6 +7,7 @@ import {
 	isPrivateOrReservedIpv4,
 	lookupSpf,
 	parseTarget,
+	resolveDomainMailIps,
 	reverseHostname,
 } from "./blocklist-input";
 import {
@@ -205,8 +206,23 @@ export async function checkBlocklistController(
 				version: ipVersionOf(ip),
 			});
 		}
-		if (spf.ranges.length > 0 && checkedIps.length === 0) {
-			ipNote = `SPF publishes CIDR ranges (${spf.ranges.slice(0, 3).join(", ")}) rather than single sending IPs. Enter a specific SMTP IP to check IP lists.`;
+
+		if (checkedIps.length === 0) {
+			const resolved = await resolveDomainMailIps(parsed.target);
+			if (resolved.ips.length > 0) {
+				for (const ip of uniqueIps(resolved.ips).slice(0, 3)) {
+					checkedIps.push({
+						ip,
+						source: "spf",
+						version: ipVersionOf(ip),
+					});
+				}
+				if (resolved.source === "mx") {
+					ipNote = `Queried MX mail server IP (${resolved.ips[0]}) for IP blocklists.`;
+				}
+			} else if (spf.ranges.length > 0) {
+				ipNote = `SPF publishes CIDR ranges (${spf.ranges.slice(0, 3).join(", ")}) rather than single sending IPs. Enter a specific SMTP IP to check IP lists.`;
+			}
 		}
 	}
 

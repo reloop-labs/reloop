@@ -1,7 +1,8 @@
-import { beforeEach, describe, expect, mock, test } from "bun:test";
+import { afterAll, beforeEach, describe, expect, mock, test } from "bun:test";
 
 class MemoryRedis {
 	private counters = new Map<string, number>();
+	private storage = new Map<string, unknown>();
 	private expiries = new Map<string, number>();
 	private now = 0;
 
@@ -9,8 +10,21 @@ class MemoryRedis {
 		const expiresAt = this.expiries.get(key);
 		if (expiresAt !== undefined && this.now >= expiresAt) {
 			this.counters.delete(key);
+			this.storage.delete(key);
 			this.expiries.delete(key);
 		}
+	}
+
+	async set(key: string, value: unknown, seconds?: number): Promise<void> {
+		this.storage.set(key, value);
+		if (seconds) {
+			this.expiries.set(key, this.now + seconds);
+		}
+	}
+
+	async get<T>(key: string): Promise<T | null> {
+		this.sweep(key);
+		return (this.storage.get(key) as T) ?? null;
 	}
 
 	async increment(key: string): Promise<number> {
@@ -27,7 +41,7 @@ class MemoryRedis {
 	// Redis reports -1 for a key with no expiry and -2 for one that is gone.
 	async ttl(key: string): Promise<number> {
 		this.sweep(key);
-		if (!this.counters.has(key)) return -2;
+		if (!this.counters.has(key) && !this.storage.has(key)) return -2;
 		const expiresAt = this.expiries.get(key);
 		return expiresAt === undefined ? -1 : expiresAt - this.now;
 	}
@@ -46,12 +60,19 @@ class MemoryRedis {
 
 	reset(): void {
 		this.counters.clear();
+		this.storage.clear();
 		this.expiries.clear();
 		this.now = 0;
 	}
 }
 
 class HangingRedis {
+	async set(_key: string, _value: unknown, _seconds?: number): Promise<void> {
+		return new Promise<never>(() => {});
+	}
+	async get<T>(_key: string): Promise<T | null> {
+		return new Promise<never>(() => {});
+	}
 	async increment(_key: string): Promise<number> {
 		return new Promise<never>(() => {});
 	}
@@ -75,6 +96,9 @@ let activeRedis: MemoryRedis | HangingRedis = memoryRedis;
 // invisible and the "unreachable Redis" tests would quietly exercise the
 // working fake instead.
 const redisDelegate = {
+	set: (key: string, value: unknown, seconds?: number) =>
+		activeRedis.set(key, value, seconds),
+	get: <T>(key: string) => activeRedis.get<T>(key),
 	increment: (key: string) => activeRedis.increment(key),
 	expire: (key: string, seconds: number) => activeRedis.expire(key, seconds),
 	ttl: (key: string) => activeRedis.ttl(key),
@@ -195,5 +219,9 @@ describe("when Redis is unreachable", () => {
 		expect(response.headers.get("ratelimit-remaining")).toBe(
 			String(rateLimitMax),
 		);
+	});
+
+	afterAll(() => {
+		activeRedis = memoryRedis;
 	});
 });

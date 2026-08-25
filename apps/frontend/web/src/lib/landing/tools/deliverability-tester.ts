@@ -6,40 +6,48 @@ export const config: ToolDefinition = {
 	toolType: "deliverability-tester",
 	titleLines: ["Email Deliverability", "Tester"],
 	description:
-		"Analyze your email content for spam signals, authentication gaps, and inbox placement risk.",
+		"Send a test email to get a full 0–10 score and diagnostic report: SPF, DKIM, DMARC alignment, DNSBL blacklists, Rspamd spam filters, MIME structure, and link reachability.",
 	keywords: [
+		"mail tester",
 		"email deliverability test",
 		"spam score checker",
-		"inbox placement test",
-		"email spam analyzer",
-		"deliverability checker",
+		"email spam test",
+		"dkim tester",
+		"spf dmarc checker",
+		"deliverability diagnostic",
+		"inbound email spam check",
 	],
 	primaryCta: {
 		label: "Get started free",
 		href: "/dashboard/signup",
 	},
 	secondaryCta: {
-		label: "Deliverability tools",
+		label: "Deliverability features",
 		href: "/features/deliverability",
 	},
 	sections: [
 		{
-			title: "What we analyze",
+			title: "Diagnostic categories",
 			items: [
 				{
-					title: "Spam triggers",
+					title: "Authentication & Identity",
 					description:
-						"Flag risky words, excessive links, and HTML patterns that spam filters penalize.",
+						"Verify cryptographic DKIM signatures, SPF return-path alignment, DMARC policy enforcement, and reverse DNS (FCrDNS).",
 				},
 				{
-					title: "Content balance",
+					title: "IP & Domain Blacklists",
 					description:
-						"Check text-to-image ratio and link density for healthier inbox placement.",
+						"Scan sending IP and domains across major DNSBLs (Spamhaus ZEN/DBL, Barracuda, SpamCop, URIBL, and SURBL).",
 				},
 				{
-					title: "Authentication hints",
+					title: "Rspamd & Content Filters",
 					description:
-						"Reminders to set up SPF, DKIM, and DMARC for your sending domain.",
+						"Evaluate incoming spam score, triggered heuristic symbols, deceptive trigger keywords, and excessive uppercase formatting.",
+				},
+				{
+					title: "MIME & Link Structure",
+					description:
+						"Inspect multipart HTML/plain-text balance, image alt attributes, RFC 8058 List-Unsubscribe headers, and link reachability.",
 				},
 			],
 		},
@@ -48,7 +56,7 @@ export const config: ToolDefinition = {
 		title: "Monitor deliverability in production",
 		titleMuted: "Start free today.",
 		description:
-			"Reloop includes spam testing, reputation monitoring, and auth setup guides.",
+			"Reloop provides continuous reputation monitoring, dedicated IPs, automated warm-up, and real-time bounce analytics.",
 		primary: {
 			label: "Get started free",
 			href: "/dashboard/signup",
@@ -60,12 +68,16 @@ export const config: ToolDefinition = {
 	},
 	relatedLinks: [
 		{
-			label: "Deliverability feature",
-			href: "/features/deliverability",
+			label: "Blocklist checker",
+			href: "/tools/blocklist-checker",
 		},
 		{
 			label: "Auth checker",
 			href: "/tools/auth-checker",
+		},
+		{
+			label: "Spam score checker",
+			href: "/tools/spam-score-checker",
 		},
 	],
 };

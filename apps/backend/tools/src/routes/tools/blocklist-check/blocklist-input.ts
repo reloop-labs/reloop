@@ -38,6 +38,9 @@ const PRIVATE_V4 = [
 	/^172\.(1[6-9]|2\d|3[0-1])\./,
 	/^0\./,
 	/^100\.(6[4-9]|[7-9]\d|1[0-2]\d)\./,
+	/^198\.51\.100\./,
+	/^203\.0\.113\./,
+	/^192\.0\.2\./,
 ];
 
 export function isRfc5782TestAddress(ip: string): boolean {
@@ -218,4 +221,52 @@ export async function reverseHostname(
 	} catch {
 		return null;
 	}
+}
+
+export async function resolveDomainMailIps(
+	domain: string,
+	resolver: dns.Resolver = publicResolver,
+): Promise<{ ips: string[]; source: "spf" | "mx" | "a" }> {
+	// 1. Try SPF first
+	const spf = await lookupSpf(domain, resolver);
+	if (spf.ips.length > 0) {
+		return { ips: spf.ips, source: "spf" };
+	}
+
+	// 2. Try MX records
+	try {
+		const mxRecords = await withDeadline(
+			resolver.resolveMx(domain),
+			RESOLVE_TIMEOUT_MS,
+			"MX lookup",
+		);
+		if (mxRecords && mxRecords.length > 0) {
+			const sorted = mxRecords.sort((a, b) => a.priority - b.priority);
+			const topHost = sorted[0]?.exchange;
+			if (topHost) {
+				const aRecords = await withDeadline(
+					resolver.resolve4(topHost),
+					RESOLVE_TIMEOUT_MS,
+					"MX A lookup",
+				);
+				if (aRecords && aRecords.length > 0) {
+					return { ips: aRecords.slice(0, 3), source: "mx" };
+				}
+			}
+		}
+	} catch {}
+
+	// 3. Try domain A records
+	try {
+		const aRecords = await withDeadline(
+			resolver.resolve4(domain),
+			RESOLVE_TIMEOUT_MS,
+			"A lookup",
+		);
+		if (aRecords && aRecords.length > 0) {
+			return { ips: aRecords.slice(0, 2), source: "a" };
+		}
+	} catch {}
+
+	return { ips: [], source: "spf" };
 }
