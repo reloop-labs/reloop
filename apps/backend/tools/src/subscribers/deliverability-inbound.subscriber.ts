@@ -1,6 +1,7 @@
 import { AsyncLocalStorage } from "node:async_hooks";
 import { BusEvent, bus } from "@reloop/bus";
 import { createLogger, log } from "evlog";
+import { toolsConfig } from "@be/tools/tools.config";
 import { processInboundTesterEmail } from "../routes/tools/deliverability-test/deliverability-test.controllers";
 
 const subscriberContext = new AsyncLocalStorage();
@@ -20,12 +21,15 @@ export async function initDeliverabilityInboundSubscriber() {
 				if (!raw) return;
 
 				// Fast filter: only handle messages destined for tester addresses
-				if (
-					!raw.includes("mail-test.") &&
-					!raw.includes("@mail-test.") &&
-					!raw.includes("mailtest.") &&
-					!raw.includes("@mailtest.")
-				) {
+				const testerDomain = toolsConfig.TESTER_DOMAIN;
+				const testerUser = toolsConfig.TESTER_EMAIL?.split("@")[0] || "";
+				const matchesTester =
+					(testerDomain && raw.includes(testerDomain)) ||
+					(testerUser && raw.includes(testerUser)) ||
+					raw.includes("mail-test.") ||
+					raw.includes("mailtest.");
+
+				if (!matchesTester) {
 					return;
 				}
 

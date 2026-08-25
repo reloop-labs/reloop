@@ -13,11 +13,20 @@ function generateToken(): string {
 	return crypto.randomBytes(4).toString("hex");
 }
 
+function buildTesterAddress(token: string): string {
+	const [user, domain] = toolsConfig.TESTER_EMAIL.split("@");
+	return `${user}+${token}@${domain}`;
+}
+
 function normalizeToken(raw: string): string {
-	return raw
-		.trim()
-		.toLowerCase()
-		.replace(/^test[-_]/, "");
+	let cleaned = raw.trim().toLowerCase();
+	if (cleaned.includes("@")) {
+		cleaned = cleaned.split("@")[0] || cleaned;
+	}
+	if (cleaned.includes("+")) {
+		cleaned = cleaned.split("+")[1] || cleaned;
+	}
+	return cleaned.replace(/^test[-_]/, "");
 }
 
 export async function createDeliverabilityTestSession(
@@ -44,7 +53,7 @@ export async function createDeliverabilityTestSession(
 
 	const rawToken = generateToken();
 	const token = `test-${rawToken}`;
-	const address = `${token}@${toolsConfig.TESTER_DOMAIN}`;
+	const address = buildTesterAddress(token);
 	const now = new Date();
 	const expiresAt = new Date(
 		now.getTime() + toolsConfig.constants.testSessionTtlSeconds * 1000,
@@ -96,7 +105,7 @@ export async function getDeliverabilityTestSession(
 		// Session expired or not found
 		return {
 			token: tokenParam,
-			address: `test-${rawToken}@${toolsConfig.TESTER_DOMAIN}`,
+			address: buildTesterAddress(`test-${rawToken}`),
 			status: "expired",
 			createdAt: new Date().toISOString(),
 			expiresAt: new Date().toISOString(),
@@ -133,9 +142,9 @@ function extractRecipientAddress(rawMime: string): string | null {
 		}
 	}
 
-	// 2. Fallback: search header block for any test-* email address
+	// 2. Fallback: search header block for any email address with +tag or test-
 	const fallbackMatch = headerBlock.match(
-		/\b(test-[a-zA-Z0-9_-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})\b/i,
+		/\b([a-zA-Z0-9._-]+(?:\+[a-zA-Z0-9._-]+)?@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})\b/i,
 	);
 	if (fallbackMatch && fallbackMatch[1]) {
 		return fallbackMatch[1].toLowerCase().trim();
