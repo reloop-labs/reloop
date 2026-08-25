@@ -1,6 +1,7 @@
 import { cn } from "@reloop/ui/cn";
 import { apiFetch } from "#/features/agent-inbox/lib/api-fetch";
 import {
+	ATTACHMENT_KIND_ACCENT,
 	type AttachmentFileKind,
 	attachmentFileKind,
 	attachmentKindLabel,
@@ -27,22 +28,12 @@ interface MessageAttachmentsProps {
 	className?: string;
 }
 
-const KIND_ACCENT: Record<AttachmentFileKind, string> = {
-	pdf: "#E53935",
-	doc: "#1A73E8",
-	xls: "#188038",
-	ppt: "#E8710A",
-	img: "#8B5CF6",
-	zip: "#5F6368",
-	file: "#5F6368",
-};
-
 function FileKindGlyph({ kind }: { kind: AttachmentFileKind }) {
 	return (
 		<span
 			aria-hidden
 			className="flex h-4 w-4 shrink-0 items-center justify-center rounded-[3px] font-bold text-[6.5px] text-white tracking-tight"
-			style={{ background: KIND_ACCENT[kind] }}
+			style={{ background: ATTACHMENT_KIND_ACCENT[kind] }}
 		>
 			{attachmentKindLabel(kind).slice(0, 3)}
 		</span>
