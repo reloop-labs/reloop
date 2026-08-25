@@ -14,8 +14,12 @@ function generateToken(): string {
 }
 
 function buildTesterAddress(token: string): string {
-	const [user, domain] = toolsConfig.TESTER_EMAIL.split("@");
-	return `${user}+${token}@${domain}`;
+	if (toolsConfig.TESTER_EMAIL && toolsConfig.TESTER_EMAIL.includes("@")) {
+		const [user, domain] = toolsConfig.TESTER_EMAIL.split("@");
+		return `${user}+${token}@${domain}`;
+	}
+	const domain = toolsConfig.TESTER_DOMAIN || "mail-test.reloop.email";
+	return `${token}@${domain}`;
 }
 
 function normalizeToken(raw: string): string {
