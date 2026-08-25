@@ -276,4 +276,89 @@ Content-Type: text/html
 			globalThis.fetch = originalFetch;
 		}
 	}, 15_000);
+
+	it("ingests plus-addressed aliases of the tester mailbox", async () => {
+		const originalFetch = globalThis.fetch;
+		globalThis.fetch = stubFetch;
+		const { toolsConfig } = await import("../src/tools.config");
+		const originalTesterEmail = toolsConfig.TESTER_EMAIL;
+		toolsConfig.TESTER_EMAIL = "pluto@mail-test.reloop.email";
+
+		try {
+			const {
+				createDeliverabilityTestSession,
+				getDeliverabilityTestSession,
+				processInboundTesterEmail,
+			} = await import(
+				"../src/routes/tools/deliverability-test/deliverability-test.controllers"
+			);
+
+			const session = await createDeliverabilityTestSession("127.0.0.1");
+			expect(session.address).toBe(
+				`pluto+${session.token}@mail-test.reloop.email`,
+			);
+
+			const mimeToSend = `From: send@support.reloop.sh
+To: ${session.address}
+Subject: Email six
+Message-ID: <email-six@support.reloop.sh>
+Content-Type: text/plain
+
+Email six`;
+
+			const injectResult = await processInboundTesterEmail(mimeToSend);
+			expect(injectResult.success).toBe(true);
+
+			const completedRes = await getDeliverabilityTestSession(session.token);
+			expect(completedRes.status).toBe("received");
+			expect(completedRes.report).toBeDefined();
+		} finally {
+			toolsConfig.TESTER_EMAIL = originalTesterEmail;
+			globalThis.fetch = originalFetch;
+		}
+	}, 15_000);
+
+	it("recovers the test token when To is the base mailbox but the plus-tag remains in the MIME", async () => {
+		const originalFetch = globalThis.fetch;
+		globalThis.fetch = stubFetch;
+		const { toolsConfig } = await import("../src/tools.config");
+		const originalTesterEmail = toolsConfig.TESTER_EMAIL;
+		toolsConfig.TESTER_EMAIL = "pluto@mail-test.reloop.email";
+
+		try {
+			const {
+				createDeliverabilityTestSession,
+				getDeliverabilityTestSession,
+				processInboundTesterEmail,
+			} = await import(
+				"../src/routes/tools/deliverability-test/deliverability-test.controllers"
+			);
+
+			const session = await createDeliverabilityTestSession("127.0.0.1");
+
+			// Reloop inbound delivers plus-aliases to the base mailbox. Some hops
+			// rewrite To: to that canonical address while leaving the original
+			// envelope recipient in Received / X-Original-To.
+			const mimeToSend = `From: send@support.reloop.sh
+To: pluto@mail-test.reloop.email
+X-Original-To: ${session.address}
+Received: from smtp.reloop.sh by inbound.reloop.sh for <${session.address}>; Wed, 26 Aug 2026 02:05:00 +0000
+Subject: Email six
+Message-ID: <email-six-rewritten@support.reloop.sh>
+Content-Type: text/plain
+
+Email six`;
+
+			const injectResult = await processInboundTesterEmail(mimeToSend);
+			expect(injectResult.success).toBe(true);
+			expect(injectResult.token).toBe(session.token);
+
+			const completedRes = await getDeliverabilityTestSession(session.token);
+			expect(completedRes.status).toBe("received");
+			expect(completedRes.report).toBeDefined();
+		} finally {
+			toolsConfig.TESTER_EMAIL = originalTesterEmail;
+			globalThis.fetch = originalFetch;
+		}
+	}, 15_000);
 });

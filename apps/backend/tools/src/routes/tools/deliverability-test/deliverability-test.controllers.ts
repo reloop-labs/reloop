@@ -9,12 +9,18 @@ import type {
 	GetSessionResponse,
 } from "./deliverability-test.types";
 
+type IngestResult = {
+	success: boolean;
+	token?: string;
+	error?: string;
+};
+
 function generateToken(): string {
 	return crypto.randomBytes(4).toString("hex");
 }
 
 function buildTesterAddress(token: string): string {
-	if (toolsConfig.TESTER_EMAIL && toolsConfig.TESTER_EMAIL.includes("@")) {
+	if (toolsConfig.TESTER_EMAIL?.includes("@")) {
 		const [user, domain] = toolsConfig.TESTER_EMAIL.split("@");
 		return `${user}+${token}@${domain}`;
 	}
@@ -36,7 +42,6 @@ function normalizeToken(raw: string): string {
 export async function createDeliverabilityTestSession(
 	clientIp: string,
 ): Promise<CreateSessionResponse> {
-	// IP rate limiting: max 30 tests per hour per IP
 	const rateLimitKey = `rate-limit:deliverability-session:${clientIp}`;
 	try {
 		const current = await redis.increment(rateLimitKey);
@@ -50,9 +55,8 @@ export async function createDeliverabilityTestSession(
 				fix: "Wait a few minutes or reuse your active test address.",
 			});
 		}
-	} catch (e) {
-		if ((e as { status?: number }).status === 429) throw e;
-		// If redis fails, fail-open for session creation
+	} catch (error) {
+		if ((error as { status?: number }).status === 429) throw error;
 	}
 
 	const rawToken = generateToken();
@@ -72,7 +76,6 @@ export async function createDeliverabilityTestSession(
 	};
 
 	const sessionKey = `deliverability-test:${rawToken}`;
-	// Store with token key and raw token key for reliable lookup
 	await redis.set(
 		sessionKey,
 		session,
@@ -102,11 +105,9 @@ export async function getDeliverabilityTestSession(
 ): Promise<GetSessionResponse> {
 	const rawToken = normalizeToken(tokenParam);
 	const sessionKey = `deliverability-test:${rawToken}`;
-
 	const session = await redis.get<DeliverabilitySession>(sessionKey);
 
 	if (!session) {
-		// Session expired or not found
 		return {
 			token: tokenParam,
 			address: buildTesterAddress(`test-${rawToken}`),
@@ -131,14 +132,12 @@ export async function getDeliverabilityTestSession(
 
 function extractRecipientAddress(rawMime: string): string | null {
 	const headerBlock = rawMime.split(/\r?\n\r?\n/)[0] || rawMime;
-
-	// 1. Look in recipient headers: To, Delivered-To, Envelope-To, X-Original-To
 	const recipientHeaderMatch = headerBlock.match(
-		/(?:^|\n)(?:To|Delivered-To|Envelope-To|X-Original-To|X-Forwarded-To):\s*([^\r\n]+)/i,
+		/(?:^|\n)(?:X-Original-To|X-Forwarded-To|Envelope-To|Delivered-To|To):\s*([^\r\n]+)/i,
 	);
-
-	if (recipientHeaderMatch && recipientHeaderMatch[1]) {
-		const emailMatch = recipientHeaderMatch[1].match(
+	const recipientHeaderValue = recipientHeaderMatch?.[1];
+	if (recipientHeaderValue) {
+		const emailMatch = recipientHeaderValue.match(
 			/<([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})>|([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/,
 		);
 		if (emailMatch) {
@@ -146,103 +145,169 @@ function extractRecipientAddress(rawMime: string): string | null {
 		}
 	}
 
-	// 2. Fallback: search header block for any email address with +tag or test-
 	const fallbackMatch = headerBlock.match(
 		/\b([a-zA-Z0-9._-]+(?:\+[a-zA-Z0-9._-]+)?@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})\b/i,
 	);
-	if (fallbackMatch && fallbackMatch[1]) {
-		return fallbackMatch[1].toLowerCase().trim();
+	const fallbackAddress = fallbackMatch?.[1];
+	if (fallbackAddress) {
+		return fallbackAddress.toLowerCase().trim();
 	}
 
 	return null;
 }
 
-/**
- * Ingest and process an incoming MIME message for the deliverability tester
- */
-export async function processInboundTesterEmail(
+function collectTesterTokenCandidates(
 	rawMime: string,
-): Promise<{ success: boolean; token?: string; error?: string }> {
-	try {
-		let recipient = extractRecipientAddress(rawMime);
+	recipient: string | null,
+): string[] {
+	const candidates: string[] = [];
+	const seen = new Set<string>();
 
-		if (!recipient) {
-			try {
-				const { parseMime } = await import("./analyzer/parse-mime");
-				const parsed = await parseMime(rawMime);
-				recipient = parsed.to.address;
-			} catch {}
-		}
+	const add = (value: string | undefined) => {
+		if (!value) return;
+		const token = normalizeToken(value);
+		if (!token || seen.has(token)) return;
+		seen.add(token);
+		candidates.push(token);
+	};
 
-		if (!recipient) {
-			log.warn(
-				"DeliverabilityTest",
-				"Could not extract recipient from inbound MIME",
-			);
-			return { success: false, error: "Recipient header missing in MIME" };
-		}
+	if (recipient) {
+		add(recipient.split("@")[0] || recipient);
+	}
 
-		const [localPart, domainPart] = recipient.split("@");
+	const headerBlock = rawMime.split(/\r?\n\r?\n/)[0] || rawMime;
+	for (const match of headerBlock.matchAll(/\+test-([a-f0-9]+)/gi)) {
+		add(match[1]);
+	}
+	for (const match of headerBlock.matchAll(/(?:^|[\s<])test-([a-f0-9]+)@/gim)) {
+		add(match[1]);
+	}
 
-		if (!domainPart || !localPart) {
-			return { success: false, error: "Invalid recipient format" };
-		}
+	return candidates;
+}
 
-		const rawToken = normalizeToken(localPart);
-		const sessionKey = `deliverability-test:${rawToken}`;
-
-		const session = await redis.get<DeliverabilitySession>(sessionKey);
-		if (!session) {
-			log.warn(
-				"DeliverabilityTest",
-				`No active test session found for recipient ${recipient}`,
-			);
-			return {
-				success: false,
-				error: `Session not found for token ${rawToken}`,
-			};
-		}
-
-		log.info(
-			"DeliverabilityTest",
-			`Running analyzer suite for token=${session.token} address=${recipient}`,
+async function findSessionForInboundMime(
+	rawMime: string,
+	recipient: string | null,
+): Promise<{ session: DeliverabilitySession; rawToken: string } | null> {
+	for (const rawToken of collectTesterTokenCandidates(rawMime, recipient)) {
+		const session = await redis.get<DeliverabilitySession>(
+			`deliverability-test:${rawToken}`,
 		);
+		if (session) {
+			return { session, rawToken };
+		}
+	}
+	return null;
+}
 
-		// Run analyzer
+async function recipientFromParsedMime(
+	rawMime: string,
+): Promise<string | null> {
+	try {
+		const { parseMime } = await import("./analyzer/parse-mime");
+		const parsed = await parseMime(rawMime);
+		return parsed.to.address || null;
+	} catch (parseError) {
+		log.warn(
+			"DeliverabilityTest",
+			`MIME parse fallback failed: ${parseError instanceof Error ? parseError.message : String(parseError)}`,
+		);
+		return null;
+	}
+}
+
+async function persistSession(
+	session: DeliverabilitySession,
+	rawToken: string,
+	patch: Partial<DeliverabilitySession>,
+): Promise<DeliverabilitySession> {
+	const updatedSession: DeliverabilitySession = {
+		...session,
+		...patch,
+	};
+	await redis.set(
+		`deliverability-test:${rawToken}`,
+		updatedSession,
+		toolsConfig.constants.testSessionTtlSeconds,
+	);
+	await redis.set(
+		`deliverability-test:${session.token}`,
+		updatedSession,
+		toolsConfig.constants.testSessionTtlSeconds,
+	);
+	return updatedSession;
+}
+
+async function completeTesterAnalysis(
+	session: DeliverabilitySession,
+	rawToken: string,
+	rawMime: string,
+): Promise<IngestResult> {
+	try {
 		const report = await analyzeInboundEmail(rawMime);
-
-		// Update session in Redis
-		const updatedSession: DeliverabilitySession = {
-			...session,
+		await persistSession(session, rawToken, {
 			status: "received",
 			report,
-		};
-
-		await redis.set(
-			sessionKey,
-			updatedSession,
-			toolsConfig.constants.testSessionTtlSeconds,
-		);
-		await redis.set(
-			`deliverability-test:${session.token}`,
-			updatedSession,
-			toolsConfig.constants.testSessionTtlSeconds,
-		);
-
+		});
 		log.info(
 			"DeliverabilityTest",
 			`Completed test for token=${session.token} score=${report.score}/10 verdict=${report.verdict}`,
 		);
-
 		return { success: true, token: session.token };
-	} catch (e) {
+	} catch (analyzeError) {
+		const message =
+			analyzeError instanceof Error
+				? analyzeError.message
+				: String(analyzeError);
+		await persistSession(session, rawToken, {
+			status: "error",
+			error: message,
+		});
+		log.error({
+			message: "Error analyzing inbound tester email",
+			error: message,
+		});
+		return { success: false, token: session.token, error: message };
+	}
+}
+
+export async function processInboundTesterEmail(
+	rawMime: string,
+): Promise<IngestResult> {
+	try {
+		const recipient =
+			extractRecipientAddress(rawMime) ??
+			(await recipientFromParsedMime(rawMime));
+
+		const found = await findSessionForInboundMime(rawMime, recipient);
+		if (!found) {
+			log.warn(
+				"DeliverabilityTest",
+				`No active test session found for recipient ${recipient ?? "(none)"}`,
+			);
+			return {
+				success: false,
+				error: recipient
+					? `Session not found for recipient ${recipient}`
+					: "Recipient header missing in MIME",
+			};
+		}
+
+		const { session, rawToken } = found;
+		log.info(
+			"DeliverabilityTest",
+			`Running analyzer suite for token=${session.token} address=${recipient ?? session.address}`,
+		);
+		return await completeTesterAnalysis(session, rawToken, rawMime);
+	} catch (error) {
 		log.error({
 			message: "Error processing inbound tester email",
-			error: e instanceof Error ? e.message : String(e),
+			error: error instanceof Error ? error.message : String(error),
 		});
 		return {
 			success: false,
-			error: e instanceof Error ? e.message : String(e),
+			error: error instanceof Error ? error.message : String(error),
 		};
 	}
 }

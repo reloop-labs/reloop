@@ -17,6 +17,7 @@ const log = {
 };
 
 import { simpleParser } from "mailparser";
+import { maybeForwardToDeliverabilityTester } from "./deliverability-tester";
 import { correlateInboundThread } from "./thread-correlation";
 
 function extractAddresses(
@@ -341,6 +342,17 @@ export async function receiveInboundEmailController(rawMessage: string) {
 		log.info(
 			`[INBOX] Successfully saved email for ${recipientEmail} with id ${insertedId} (thread: ${threadResult.threadId}, new: ${threadResult.isNew}, attachments: ${parsed.attachments?.length || 0}, spam: ${isSpam})`,
 		);
+
+		// Tester addresses are plus-aliases of a real mailbox, so they land
+		// here even when the tools NATS subscriber missed the inbound event.
+		void maybeForwardToDeliverabilityTester(rawMessage, [
+			...toEmails,
+			...ccEmails,
+			normalizedRecipient,
+		]).catch((forwardErr) => {
+			log.warn(`[INBOX] Deliverability tester forward failed: ${forwardErr}`);
+		});
+
 		return { success: true, id: insertedId, threadId: threadResult.threadId };
 	} catch (err) {
 		if (err && typeof err === "object" && "status" in err) {
