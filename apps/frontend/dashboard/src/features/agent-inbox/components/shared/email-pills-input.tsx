@@ -329,9 +329,11 @@ export const EmailPillsInput = ({
 							left: dropdownPos.left,
 							width: dropdownPos.width,
 							zIndex: 260,
+							pointerEvents: "auto",
 						}}
 						className={cn(
-							"overflow-hidden rounded-xl border border-mail-border/60 bg-panel-light shadow-[0_12px_40px_rgba(0,0,0,0.12)]",
+							// Portaled to body; Radix Dialog sets pointer-events: none on body.
+							"pointer-events-auto overflow-hidden rounded-xl border border-mail-border/60 bg-panel-light shadow-[0_12px_40px_rgba(0,0,0,0.12)]",
 							"dark:border-mail-border/50 dark:bg-panel-dark dark:shadow-[0_12px_40px_rgba(0,0,0,0.45)]",
 						)}
 					>
