@@ -263,6 +263,28 @@ describe("createAuthPlugin — session macros", () => {
 		expect(res.status).toBe(401);
 	});
 
+	test("authNoOrg: allows internal service auth", async () => {
+		const redis = new MemoryRedis();
+		const secret = "upload-internal-secret";
+		const res = await mountApp(redis, { internalSecret: secret }).handle(
+			new Request("http://localhost/auth-no-org", {
+				headers: {
+					"x-internal-secret": secret,
+					"x-user-id": "user_internal",
+					"x-organization-id": "org_internal",
+				},
+			}),
+		);
+		expect(res.status).toBe(200);
+		const body = (await res.json()) as AuthContext;
+		expect(body).toEqual({
+			userId: "user_internal",
+			organizationId: "org_internal",
+			platformRole: null,
+			authType: "internal",
+		});
+	});
+
 	test("authNoOrg: allows session without organization", async () => {
 		const redis = new MemoryRedis();
 		const token = "tok-no-org-ok";

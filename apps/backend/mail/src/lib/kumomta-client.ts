@@ -28,6 +28,8 @@ export interface SendEmailOptions {
 	channel_id?: string;
 	cookie?: string | null;
 	requestApiKey?: string | null;
+	userId?: string | null;
+	organizationId?: string | null;
 	attachments?: Array<{
 		content?: string | Buffer | import("stream").Readable;
 		filename?: string;
@@ -256,6 +258,9 @@ async function buildRfcMessage(options: SendEmailOptions): Promise<string> {
 				createUploadServiceStore({
 					cookie: options.cookie,
 					apiKey: options.requestApiKey,
+					internalSecret: mailConfig.RELOOP_INTERNAL_SECRET,
+					userId: options.userId,
+					organizationId: options.organizationId,
 				}),
 			)
 		: undefined;

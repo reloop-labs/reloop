@@ -17,6 +17,7 @@ export async function sendEmail_step6({
 	tlsMode,
 	cookie,
 	requestApiKey,
+	userId,
 	useInternalInject = false,
 }: {
 	body: MailModel.SendEmailBody;
@@ -30,6 +31,7 @@ export async function sendEmail_step6({
 	tlsMode: "opportunistic" | "enforced";
 	cookie?: string | null;
 	requestApiKey?: string | null;
+	userId?: string | null;
 	useInternalInject?: boolean;
 }) {
 	try {
@@ -56,6 +58,8 @@ export async function sendEmail_step6({
 			apiKey,
 			cookie,
 			requestApiKey,
+			userId,
+			organizationId,
 			customHeaders: {
 				"X-Org-ID": organizationId,
 				"X-Domain-ID": domainId,

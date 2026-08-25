@@ -65,6 +65,15 @@ export function createAuthPlugin(config: AuthMiddlewareConfig) {
 
 		authNoOrg: {
 			async resolve({ status, request: { headers } }) {
+				const internal = resolveInternalAuth(headers, deps);
+				if (internal) {
+					return {
+						userId: internal.userId,
+						organizationId: internal.organizationId,
+						platformRole: internal.platformRole,
+						authType: internal.authType,
+					};
+				}
 				const ctx = await resolveSessionOrApiKey(headers, deps, {
 					requireOrg: false,
 				});

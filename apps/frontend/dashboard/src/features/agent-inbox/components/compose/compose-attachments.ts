@@ -33,15 +33,32 @@ export async function uploadComposeFile(file: File): Promise<{
 	return (await res.json()) as { url: string; path: string };
 }
 
+/** Handle mail can load: object key locally, public S3 URL in production. */
+export function attachmentRefForSend(attachment: ComposeAttachment): string {
+	const url = attachment.url.trim();
+	if (url.startsWith("https://")) {
+		try {
+			const host = new URL(url).hostname.toLowerCase();
+			if (
+				host !== "localhost" &&
+				host !== "127.0.0.1" &&
+				!host.endsWith(".localhost")
+			) {
+				return url;
+			}
+		} catch {
+			/* use the storage key */
+		}
+	}
+	return attachment.path || url;
+}
+
 export function toSendAttachments(attachments: ComposeAttachment[]) {
 	return attachments
 		.filter((a) => !a.isUploading && (a.url || a.path))
 		.map((a) => ({
 			filename: a.name,
-			// Prefer the public object URL. The S3 key (`uploads/…`) is not a
-			// file on the mail server — sending it as `path` makes nodemailer
-			// ENOENT (`open '/app/uploads/…'`).
-			path: a.url || a.path,
+			path: attachmentRefForSend(a),
 			content_type: a.content_type,
 		}));
 }

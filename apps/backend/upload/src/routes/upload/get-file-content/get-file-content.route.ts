@@ -5,8 +5,14 @@ import { Elysia, t } from "elysia";
 
 export const getFileContentRoute = new Elysia().use(authMiddleware).get(
 	"/files/content",
-	async ({ query, set, userId }) => {
-		const { bytes, mimeType } = await getFileContentHandler(query.path, userId);
+	async ({ query, set, userId, authType }) => {
+		const { bytes, mimeType } = await getFileContentHandler(
+			query.path,
+			userId,
+			{
+				anyUser: authType === "internal",
+			},
+		);
 		set.headers["content-type"] = mimeType;
 		set.headers["content-length"] = String(bytes.byteLength);
 		set.headers["cache-control"] = "private, max-age=60";

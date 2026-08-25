@@ -14,5 +14,6 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" })
 			baseUrl: uploadConfig.BASE_URL,
 			redisUrl: uploadConfig.REDIS_URL,
 			ttl: 5,
+			internalSecret: uploadConfig.RELOOP_INTERNAL_SECRET,
 		}),
 	);

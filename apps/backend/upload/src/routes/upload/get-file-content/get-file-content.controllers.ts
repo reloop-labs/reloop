@@ -30,7 +30,7 @@ export async function getFileContentByPath(
 	return { bytes, mimeType: record.mimeType };
 }
 
-async function findLiveUploadByPath(key: string, userId: string) {
+async function findLiveUploadByPath(key: string, userId?: string) {
 	const rows = await db
 		.select({
 			path: schema.upload.path,
@@ -40,7 +40,7 @@ async function findLiveUploadByPath(key: string, userId: string) {
 		.where(
 			and(
 				eq(schema.upload.path, key),
-				eq(schema.upload.userId, userId),
+				...(userId ? [eq(schema.upload.userId, userId)] : []),
 				isNull(schema.upload.deletedAt),
 			),
 		)
@@ -48,9 +48,17 @@ async function findLiveUploadByPath(key: string, userId: string) {
 	return rows[0] ?? null;
 }
 
-export async function getFileContentHandler(rawPath: string, userId: string) {
+export async function getFileContentHandler(
+	rawPath: string,
+	userId: string,
+	opts?: { anyUser?: boolean },
+) {
 	return getFileContentByPath(rawPath, {
-		findByPath: (key) => findLiveUploadByPath(key, userId),
+		findByPath: async (key) => {
+			const owned = await findLiveUploadByPath(key, userId);
+			if (owned || !opts?.anyUser) return owned;
+			return findLiveUploadByPath(key);
+		},
 		download: (key) => storage.download(key),
 	});
 }

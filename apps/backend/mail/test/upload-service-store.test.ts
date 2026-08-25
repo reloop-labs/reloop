@@ -33,6 +33,27 @@ describe("createUploadServiceStore", () => {
 		expect(fetchMock).toHaveBeenCalledTimes(1);
 	});
 
+	test("forwards internal service auth when there is no cookie", async () => {
+		const fetchMock = mock(
+			async (_input: RequestInfo | URL, init?: RequestInit) => {
+				const headers = new Headers(init?.headers);
+				expect(headers.get("x-internal-secret")).toBe("reloop-internal");
+				expect(headers.get("x-user-id")).toBe("user_1");
+				expect(headers.get("x-organization-id")).toBe("org_1");
+				expect(headers.get("cookie")).toBeNull();
+				return new Response(PDF_BYTES, { status: 200 });
+			},
+		);
+		const store = createUploadServiceStore({
+			internalSecret: "reloop-internal",
+			userId: "user_1",
+			organizationId: "org_1",
+			baseUrl: "http://upload.internal/api/upload",
+			fetchImpl: fetchMock,
+		});
+		await expect(store.get(KEY)).resolves.toEqual(PDF_BYTES);
+	});
+
 	test("forwards the API key when there is no cookie", async () => {
 		const fetchMock = mock(
 			async (_input: RequestInfo | URL, init?: RequestInit) => {

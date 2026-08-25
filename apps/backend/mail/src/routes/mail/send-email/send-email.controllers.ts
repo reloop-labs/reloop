@@ -151,6 +151,7 @@ export async function sendEmailController({
 		tlsMode: currentDomain.tls ?? "opportunistic",
 		cookie,
 		requestApiKey,
+		userId,
 		useInternalInject,
 	});
 

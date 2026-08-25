@@ -29,6 +29,9 @@ export type RemoteAttachmentStore = {
 export type UploadServiceStoreOptions = {
 	cookie?: string | null;
 	apiKey?: string | null;
+	internalSecret?: string | null;
+	userId?: string | null;
+	organizationId?: string | null;
 	/** Test override. Production uses `${BASE_URL}/api/upload`. */
 	baseUrl?: string;
 	fetchImpl?: typeof fetch;
@@ -43,6 +46,30 @@ export function s3KeyFromAttachmentPath(path: string): string | null {
 
 function isHttpUrl(value: string): boolean {
 	return /^https?:\/\//i.test(value.trim());
+}
+
+/** Public HTTPS hosts only — never fetch local MinIO / Docker URLs. */
+export function isPublicAttachmentUrl(value: string): boolean {
+	if (!isHttpUrl(value)) return false;
+	try {
+		const host = new URL(value).hostname.toLowerCase();
+		if (
+			host === "localhost" ||
+			host === "127.0.0.1" ||
+			host === "0.0.0.0" ||
+			host === "::1" ||
+			host.endsWith(".local") ||
+			host.endsWith(".internal") ||
+			host === "minio" ||
+			host === "reloop-minio" ||
+			host.endsWith(".localhost")
+		) {
+			return false;
+		}
+		return true;
+	} catch {
+		return false;
+	}
 }
 
 async function fetchBytes(
@@ -78,10 +105,14 @@ export function createUploadServiceStore(
 	const fetchImpl = opts.fetchImpl ?? fetch;
 	const cookie = opts.cookie?.trim() || "";
 	const apiKey = opts.apiKey?.trim() || "";
+	const internalSecret = opts.internalSecret?.trim() || "";
+	const userId = opts.userId?.trim() || "";
+	const organizationId = opts.organizationId?.trim() || "";
+	const hasInternalAuth = Boolean(internalSecret && userId && organizationId);
 
 	return {
 		async get(key: string) {
-			if (!cookie && !apiKey) {
+			if (!cookie && !apiKey && !hasInternalAuth) {
 				throw new Error(
 					"Upload service request is missing the session cookie (or API key)",
 				);
@@ -90,6 +121,13 @@ export function createUploadServiceStore(
 			return fetchBytes(url, fetchImpl, {
 				...(cookie ? { cookie } : {}),
 				...(apiKey ? { "x-api-key": apiKey } : {}),
+				...(hasInternalAuth
+					? {
+							"x-internal-secret": internalSecret,
+							"x-user-id": userId,
+							"x-organization-id": organizationId,
+						}
+					: {}),
 			});
 		},
 	};
@@ -108,14 +146,14 @@ async function loadPathBytes(
 		try {
 			return await store.get(key);
 		} catch (error) {
-			if (isHttpUrl(path)) {
+			if (isPublicAttachmentUrl(path)) {
 				return fetchBytes(path);
 			}
 			throw error;
 		}
 	}
 
-	if (isHttpUrl(path)) {
+	if (isPublicAttachmentUrl(path)) {
 		return fetchBytes(path);
 	}
 

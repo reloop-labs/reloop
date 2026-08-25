@@ -4,11 +4,38 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import MailComposer from "nodemailer/lib/mail-composer";
 import {
+	isPublicAttachmentUrl,
 	materializeAttachments,
 	s3KeyFromAttachmentPath,
 } from "../src/lib/resolve-attachments";
 
 const PDF_BYTES = Buffer.from("%PDF-1.4 test attachment");
+
+describe("isPublicAttachmentUrl", () => {
+	test("rejects local MinIO and Docker hosts", () => {
+		expect(
+			isPublicAttachmentUrl(
+				"http://localhost:9010/reloop-uploads/uploads/2026/08/a.png",
+			),
+		).toBe(false);
+		expect(
+			isPublicAttachmentUrl("http://127.0.0.1:9010/reloop-uploads/a.png"),
+		).toBe(false);
+		expect(
+			isPublicAttachmentUrl(
+				"http://minio:9000/reloop-uploads/uploads/2026/08/a.png",
+			),
+		).toBe(false);
+	});
+
+	test("allows public object URLs", () => {
+		expect(
+			isPublicAttachmentUrl(
+				"https://s3.reloop.sh/reloop/uploads/2026/08/a.png",
+			),
+		).toBe(true);
+	});
+});
 
 describe("s3KeyFromAttachmentPath", () => {
 	test("extracts upload keys from relative, docker, and public URLs", () => {
@@ -110,6 +137,25 @@ describe("materializeAttachments", () => {
 		} finally {
 			rmSync(dir, { recursive: true, force: true });
 		}
+	});
+
+	test("does not fetch local MinIO URLs when the upload store fails", async () => {
+		const key = "uploads/2026/08/ny98eiiwx0rri30is799mkxk.png";
+		const localUrl = `http://localhost:9010/reloop-uploads/${key}`;
+		await expect(
+			materializeAttachments(
+				[{ filename: "photo.png", path: localUrl, content_type: "image/png" }],
+				{
+					get: async () => {
+						throw new Error(
+							"Upload service request is missing the session cookie (or API key)",
+						);
+					},
+				},
+			),
+		).rejects.toMatchObject({
+			message: "Attachment could not be loaded",
+		});
 	});
 
 	test("throws a load error instead of raw ENOENT when the object is missing", async () => {
