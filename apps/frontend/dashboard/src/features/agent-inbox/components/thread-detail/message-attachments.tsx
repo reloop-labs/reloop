@@ -37,37 +37,15 @@ const KIND_ACCENT: Record<AttachmentFileKind, string> = {
 	file: "#5F6368",
 };
 
-function FileKindGlyph({
-	kind,
-	className,
-}: {
-	kind: AttachmentFileKind;
-	className?: string;
-}) {
-	const fill = KIND_ACCENT[kind];
+function FileKindGlyph({ kind }: { kind: AttachmentFileKind }) {
 	return (
-		<svg
-			viewBox="0 0 16 16"
-			className={cn("h-4 w-4 shrink-0", className)}
+		<span
 			aria-hidden
+			className="flex h-4 w-4 shrink-0 items-center justify-center rounded-[3px] font-bold text-[6.5px] text-white tracking-tight"
+			style={{ background: KIND_ACCENT[kind] }}
 		>
-			<title>{attachmentKindLabel(kind)}</title>
-			<path
-				fill={fill}
-				d="M4 0h5.5L14 4.5V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2zm5 1.5V5h3.5L9 1.5z"
-			/>
-			<text
-				x="8"
-				y="12.2"
-				textAnchor="middle"
-				fill="white"
-				fontSize="4.2"
-				fontWeight="700"
-				fontFamily="ui-sans-serif, system-ui, sans-serif"
-			>
-				{attachmentKindLabel(kind).slice(0, 3)}
-			</text>
-		</svg>
+			{attachmentKindLabel(kind).slice(0, 3)}
+		</span>
 	);
 }
 
