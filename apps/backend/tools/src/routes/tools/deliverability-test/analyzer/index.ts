@@ -1,4 +1,7 @@
-import type { CategoryResult, DeliverabilityReport } from "../deliverability-test.types";
+import type {
+	CategoryResult,
+	DeliverabilityReport,
+} from "../deliverability-test.types";
 import { checkBlacklists } from "./check-blacklists";
 import { checkBody } from "./check-body";
 import { checkDkim } from "./check-dkim";
@@ -10,7 +13,9 @@ import { checkSpf } from "./check-spf";
 import { parseMime } from "./parse-mime";
 import { computeDeliverabilityScore } from "./score";
 
-export async function analyzeInboundEmail(rawMime: string): Promise<DeliverabilityReport> {
+export async function analyzeInboundEmail(
+	rawMime: string,
+): Promise<DeliverabilityReport> {
 	// 1. Parse MIME structure and headers
 	const email = await parseMime(rawMime);
 
@@ -33,13 +38,15 @@ export async function analyzeInboundEmail(rawMime: string): Promise<Deliverabili
 		rdnsResult.heloItem,
 	];
 
-	const signatureMark = signatureItems.reduce((sum, item) => sum + (item.mark || 0), 0);
-	const signatureStatus =
-		signatureItems.some((i) => i.status === "fail")
-			? "fail"
-			: signatureItems.some((i) => i.status === "warn")
-				? "warn"
-				: "pass";
+	const signatureMark = signatureItems.reduce(
+		(sum, item) => sum + (item.mark || 0),
+		0,
+	);
+	const signatureStatus = signatureItems.some((i) => i.status === "fail")
+		? "fail"
+		: signatureItems.some((i) => i.status === "warn")
+			? "warn"
+			: "pass";
 
 	const signatureCategory: CategoryResult = {
 		id: "signature",
@@ -70,13 +77,13 @@ export async function analyzeInboundEmail(rawMime: string): Promise<Deliverabili
 	return report;
 }
 
-export * from "./parse-mime";
-export * from "./check-spf";
+export * from "./check-blacklists";
+export * from "./check-body";
 export * from "./check-dkim";
 export * from "./check-dmarc";
-export * from "./check-rdns";
-export * from "./check-blacklists";
-export * from "./check-rspamd";
-export * from "./check-body";
 export * from "./check-links";
+export * from "./check-rdns";
+export * from "./check-rspamd";
+export * from "./check-spf";
+export * from "./parse-mime";
 export * from "./score";

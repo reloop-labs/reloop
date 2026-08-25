@@ -75,7 +75,9 @@ const COMMON_RSPAMD_SYMBOLS: Record<string, { title: string; desc: string }> = {
 	},
 };
 
-export async function checkRspamdAndContent(email: ParsedEmailData): Promise<ContentCheckResult> {
+export async function checkRspamdAndContent(
+	email: ParsedEmailData,
+): Promise<ContentCheckResult> {
 	const items: CheckItem[] = [];
 	let totalDeduction = 0;
 
@@ -98,7 +100,10 @@ export async function checkRspamdAndContent(email: ParsedEmailData): Promise<Con
 			});
 		} else {
 			// Deduct based on Rspamd score (up to -4.0 max)
-			const mark = -Math.min(4.0, Number.parseFloat((rspamdScore * 0.6).toFixed(1)));
+			const mark = -Math.min(
+				4.0,
+				Number.parseFloat((rspamdScore * 0.6).toFixed(1)),
+			);
 			totalDeduction += mark;
 
 			items.push({
@@ -120,7 +125,13 @@ export async function checkRspamdAndContent(email: ParsedEmailData): Promise<Con
 		// Add symbol items for notable symbols
 		for (const sym of email.rspamdSymbols) {
 			const info = COMMON_RSPAMD_SYMBOLS[sym];
-			if (info && (sym.includes("FAIL") || sym.includes("SPAM") || sym.includes("CAPS") || sym.includes("EXCLAIM"))) {
+			if (
+				info &&
+				(sym.includes("FAIL") ||
+					sym.includes("SPAM") ||
+					sym.includes("CAPS") ||
+					sym.includes("EXCLAIM"))
+			) {
 				items.push({
 					id: `symbol-${sym.toLowerCase()}`,
 					title: `Symbol: ${sym}`,
@@ -133,11 +144,17 @@ export async function checkRspamdAndContent(email: ParsedEmailData): Promise<Con
 	}
 
 	// 2. Reloop Content spam check (heuristics & trigger words)
-	const spamCheckResult = checkSpamController(email.subject, email.text || email.html);
+	const spamCheckResult = checkSpamController(
+		email.subject,
+		email.text || email.html,
+	);
 
 	if (spamCheckResult.detectedTriggers.length > 0) {
 		const triggerList = spamCheckResult.detectedTriggers.slice(0, 6);
-		const penalty = -Math.min(2.5, Number.parseFloat((triggerList.length * 0.4).toFixed(1)));
+		const penalty = -Math.min(
+			2.5,
+			Number.parseFloat((triggerList.length * 0.4).toFixed(1)),
+		);
 		totalDeduction += penalty;
 
 		items.push({
@@ -145,7 +162,8 @@ export async function checkRspamdAndContent(email: ParsedEmailData): Promise<Con
 			title: `Spam Trigger Keywords (${spamCheckResult.detectedTriggers.length} found)`,
 			mark: penalty,
 			status: triggerList.length > 3 ? "fail" : "warn",
-			description: `Found words or phrases commonly associated with spam in the subject or body.`,
+			description:
+				"Found words or phrases commonly associated with spam in the subject or body.",
 			details: triggerList.map(
 				(t) => `• "${t.word}" (${t.categoryLabel}, ${t.context})`,
 			),
@@ -157,7 +175,8 @@ export async function checkRspamdAndContent(email: ParsedEmailData): Promise<Con
 			title: "Spam Trigger Keywords (Clean)",
 			mark: 0,
 			status: "pass",
-			description: "No common high-risk spam keywords or deceptive phrases were detected.",
+			description:
+				"No common high-risk spam keywords or deceptive phrases were detected.",
 		});
 	}
 
@@ -170,7 +189,8 @@ export async function checkRspamdAndContent(email: ParsedEmailData): Promise<Con
 			title: `Excessive Capital Letters (${spamCheckResult.metrics.capsPercentage}%)`,
 			mark: penalty,
 			status: "warn",
-			description: "High ratio of uppercase letters triggers SpamAssassin and Rspamd ALL_CAPS rules.",
+			description:
+				"High ratio of uppercase letters triggers SpamAssassin and Rspamd ALL_CAPS rules.",
 			recommendations: ["Use standard sentence case."],
 		});
 	}

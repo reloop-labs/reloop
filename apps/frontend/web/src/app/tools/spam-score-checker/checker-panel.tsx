@@ -1,15 +1,19 @@
 "use client";
 
+import * as Alert from "@reloop/ui/alert";
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import Link from "next/link";
 import type React from "react";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
 	CATEGORY_META,
-	calculateSpamScore,
 	type DetectedTrigger,
+	INITIAL_EMPTY_RESPONSE,
+	rewriteSpamWithAi,
+	runSpamCheck,
+	type SpamCheckResponse,
 	type TriggerCategory,
 } from "./check-api";
 
@@ -75,8 +79,8 @@ function buildBackdropNodes(
 	let lastIndex = 0;
 
 	for (let i = 0; i < sorted.length; i++) {
-		const trigger = sorted[i]!;
-		if (trigger.startIndex < lastIndex) continue;
+		const trigger = sorted[i];
+		if (!trigger || trigger.startIndex < lastIndex) continue;
 
 		if (trigger.startIndex > lastIndex) {
 			nodes.push(text.slice(lastIndex, trigger.startIndex));
@@ -115,18 +119,49 @@ function buildBackdropNodes(
 export function CheckerPanel() {
 	const [subject, setSubject] = useState(PRESETS[2]?.subject ?? "");
 	const [body, setBody] = useState(PRESETS[2]?.body ?? "");
+	const [analysis, setAnalysis] = useState<SpamCheckResponse>(
+		INITIAL_EMPTY_RESPONSE,
+	);
+	const [_isAnalyzing, setIsAnalyzing] = useState(false);
 	const [copied, setCopied] = useState(false);
 	const [isFixing, setIsFixing] = useState(false);
+	const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
 	const subjectInputRef = useRef<HTMLInputElement>(null);
 	const bodyTextareaRef = useRef<HTMLTextAreaElement>(null);
 	const subjectBackdropRef = useRef<HTMLDivElement>(null);
 	const bodyBackdropRef = useRef<HTMLDivElement>(null);
 
-	const analysis = useMemo(
-		() => calculateSpamScore(subject, body),
-		[subject, body],
-	);
+	// Run spam check against backend API whenever subject or body changes
+	useEffect(() => {
+		const abortController = new AbortController();
+		const timeoutId = setTimeout(async () => {
+			setIsAnalyzing(true);
+			try {
+				const result = await runSpamCheck(
+					subject,
+					body,
+					abortController.signal,
+				);
+				setAnalysis(result);
+			} catch (err: unknown) {
+				if (err instanceof DOMException && err.name === "AbortError") return;
+				// Maintain last valid analysis or initial baseline
+			} finally {
+				setIsAnalyzing(false);
+			}
+		}, 150);
+
+		return () => {
+			clearTimeout(timeoutId);
+			abortController.abort();
+		};
+	}, [subject, body]);
+
+	const wordCount = body.trim() ? body.trim().split(/\s+/).length : 0;
+	const linkCount = (body.match(/https?:\/\/[^\s"'<>]+/gi) || []).length;
+	const readingTimeSec =
+		wordCount > 0 ? Math.max(1, Math.round(wordCount / 3.5)) : 0;
 
 	const verdictStyle = VERDICT_STYLES[analysis.verdict];
 
@@ -140,24 +175,19 @@ export function CheckerPanel() {
 	};
 
 	const handleAiFix = async () => {
-		if (isFixing || analysis.detectedTriggers.length === 0) return;
+		if (isFixing || (!subject.trim() && !body.trim())) return;
 		setIsFixing(true);
+		setErrorMessage(null);
 		try {
-			const res = await fetch("/api/tools/v1/spam-score/rewrite", {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({
-					subject,
-					body,
-					triggers: analysis.detectedTriggers.map((t) => t.word),
-				}),
-			});
-
-			if (res.ok) {
-				const data = await res.json();
-				if (data.subject) setSubject(data.subject);
-				if (data.body) setBody(data.body);
-			}
+			const rewritten = await rewriteSpamWithAi(subject, body);
+			if (rewritten.subject) setSubject(rewritten.subject);
+			if (rewritten.body) setBody(rewritten.body);
+		} catch (err: unknown) {
+			setErrorMessage(
+				err instanceof Error
+					? err.message
+					: "AI rewrite service failed. Please try again.",
+			);
 		} finally {
 			setIsFixing(false);
 		}
@@ -165,6 +195,26 @@ export function CheckerPanel() {
 
 	return (
 		<div className="mx-auto max-w-5xl">
+			{/* Error Alert */}
+			{errorMessage && (
+				<div className="mb-4">
+					<Alert.Root variant="lighter" status="error" size="large">
+						<Alert.Icon as={Icon} name="alert-triangle" />
+						<div className="flex-1">
+							<div className="font-medium text-label-sm">AI Rewrite Error</div>
+							<p className="mt-0.5 text-paragraph-sm">{errorMessage}</p>
+						</div>
+						<button
+							type="button"
+							onClick={() => setErrorMessage(null)}
+							className="text-text-sub-600 hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white"
+						>
+							<Icon name="x" className="size-4" />
+						</button>
+					</Alert.Root>
+				</div>
+			)}
+
 			{/* Preset buttons & AI Action */}
 			<div className="mb-4 flex flex-wrap items-center justify-between gap-3">
 				<div className="flex flex-wrap items-center gap-2">
@@ -178,6 +228,7 @@ export function CheckerPanel() {
 							onClick={() => {
 								setSubject(preset.subject);
 								setBody(preset.body);
+								setErrorMessage(null);
 							}}
 							className={cn(
 								"rounded-lg px-2.5 py-1 font-mono text-[11.5px] transition-colors",
@@ -192,18 +243,16 @@ export function CheckerPanel() {
 				</div>
 
 				{/* AI Fix button */}
-				{analysis.detectedTriggers.length > 0 && (
-					<FancyButton.Root
-						type="button"
-						variant="neutral"
-						size="xsmall"
-						onClick={handleAiFix}
-						disabled={isFixing}
-					>
-						<FancyButton.Icon as={Icon} name="sparkling" />
-						{isFixing ? "Rewriting with AI..." : "Fix Copy with AI"}
-					</FancyButton.Root>
-				)}
+				<FancyButton.Root
+					type="button"
+					variant="neutral"
+					size="xsmall"
+					onClick={handleAiFix}
+					disabled={isFixing || (!subject.trim() && !body.trim())}
+				>
+					<FancyButton.Icon as={Icon} name="sparkling" />
+					{isFixing ? "Rewriting with AI..." : "Fix Copy with AI"}
+				</FancyButton.Root>
 			</div>
 
 			{/* Main Grid: Live Inline Highlighted Editor on Left, Scores & Categories on Right */}
@@ -252,7 +301,10 @@ export function CheckerPanel() {
 									ref={subjectInputRef}
 									type="text"
 									value={subject}
-									onChange={(e) => setSubject(e.target.value)}
+									onChange={(e) => {
+										setSubject(e.target.value);
+										setErrorMessage(null);
+									}}
 									placeholder="e.g. Action required: Update your payment information"
 									className="relative z-10 block w-full bg-transparent px-4 py-2.5 font-sans text-[14px] text-text-strong-950 outline-none placeholder:text-text-soft-400 dark:text-white dark:placeholder:text-white/30"
 								/>
@@ -269,8 +321,7 @@ export function CheckerPanel() {
 									Email Body Copy
 								</label>
 								<span className="font-mono text-[11px] text-text-soft-400 dark:text-white/35">
-									{analysis.metrics.wordCount} words ·{" "}
-									{analysis.metrics.linkCount} link(s)
+									{wordCount} words · {linkCount} link(s)
 								</span>
 							</div>
 
@@ -290,7 +341,10 @@ export function CheckerPanel() {
 									ref={bodyTextareaRef}
 									rows={9}
 									value={body}
-									onChange={(e) => setBody(e.target.value)}
+									onChange={(e) => {
+										setBody(e.target.value);
+										setErrorMessage(null);
+									}}
 									onScroll={(e) => {
 										if (bodyBackdropRef.current) {
 											bodyBackdropRef.current.scrollTop =
@@ -310,6 +364,7 @@ export function CheckerPanel() {
 								onClick={() => {
 									setSubject("");
 									setBody("");
+									setErrorMessage(null);
 								}}
 								className="font-mono text-[11px] text-text-soft-400 transition-colors hover:text-text-strong-950 dark:text-white/35 dark:hover:text-white"
 							>
@@ -321,7 +376,7 @@ export function CheckerPanel() {
 									{analysis.detectedTriggers.length} trigger(s) highlighted
 								</span>
 								<span>·</span>
-								<span>Est. read time: ~{analysis.metrics.readingTimeSec}s</span>
+								<span>Est. read time: ~{readingTimeSec}s</span>
 							</div>
 						</div>
 					</div>

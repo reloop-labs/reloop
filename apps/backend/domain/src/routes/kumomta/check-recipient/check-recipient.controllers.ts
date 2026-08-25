@@ -1,56 +1,53 @@
-import { RedisCache } from "@reloop/cache/redis-client";
 import { db } from "@reloop/db/client";
 import { mailbox } from "@reloop/db/schema";
 import { and, eq } from "drizzle-orm";
-import { createError } from "evlog";
+import { createError, log as evlog } from "evlog";
 import { useLogger } from "evlog/elysia";
-import { domainConfig } from "@reloop/domain/domain.config";
 
-const toolsRedis = new RedisCache("tools", 86400, domainConfig.REDIS_URL);
-const TESTER_DOMAINS = [
-	"mail-test.reloop.email",
-	"mailtest.reloop.sh",
-	"mailtest.local",
-	"mailtest.reloop.local",
-];
+function getLogger() {
+	try {
+		return useLogger();
+	} catch {
+		return {
+			info: (msg: string) => evlog.info("domain", msg),
+			error: (msg: string) => evlog.error("domain", msg),
+			warn: (msg: string) => evlog.warn("domain", msg),
+		};
+	}
+}
 
 export async function checkRecipientController(
 	email: string,
 ): Promise<{ allowed: boolean }> {
-	const log = useLogger();
+	const log = getLogger();
 	log.info(`[CHECK-RECIPIENT] Checking recipient: ${email}`);
 
 	try {
 		const normalizedEmail = email.toLowerCase().trim();
-		const [localPart, domainPart] = normalizedEmail.split("@");
 
-		if (domainPart && localPart && TESTER_DOMAINS.includes(domainPart)) {
-			// Extract token from test-<token> or raw <token>
-			const token = localPart.replace(/^test[-_]/, "");
-			if (token) {
-				const session = await toolsRedis.get<{ status?: string }>(
-					`deliverability-test:${token}`,
-				);
-				if (session && session.status !== "expired") {
-					log.info(
-						`[CHECK-RECIPIENT] Allowed tester token recipient: ${email} (status: ${session.status})`,
-					);
-					return { allowed: true };
-				}
-			}
-			log.warn(
-				`[CHECK-RECIPIENT] Rejected tester recipient (no active session): ${email}`,
-			);
-			return { allowed: false };
-		}
-
-		const mailboxRecord = await db.query.mailbox.findFirst({
+		let mailboxRecord = await db.query.mailbox.findFirst({
 			where: and(
 				eq(mailbox.email, normalizedEmail),
 				eq(mailbox.status, "active"),
 			),
 			columns: { id: true },
 		});
+
+		// Fallback: If recipient is plus-addressed (e.g. user+alias@domain.com), try base email
+		if (!mailboxRecord && normalizedEmail.includes("+")) {
+			const [localPart, domainPart] = normalizedEmail.split("@");
+			if (localPart && domainPart) {
+				const baseLocalPart = localPart.split("+")[0];
+				const baseEmail = `${baseLocalPart}@${domainPart}`;
+				mailboxRecord = await db.query.mailbox.findFirst({
+					where: and(
+						eq(mailbox.email, baseEmail),
+						eq(mailbox.status, "active"),
+					),
+					columns: { id: true },
+				});
+			}
+		}
 
 		const allowed = !!mailboxRecord;
 		log.info(

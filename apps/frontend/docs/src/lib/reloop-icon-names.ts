@@ -144,6 +144,7 @@ export const RELOOP_ICON_NAMES = new Set<string>([
 	"mouse",
 	"notification-indicator",
 	"open-source",
+	"overpromise",
 	"padding-x",
 	"panel-left",
 	"pause",

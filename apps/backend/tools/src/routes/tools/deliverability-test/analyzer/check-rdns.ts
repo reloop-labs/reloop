@@ -1,7 +1,7 @@
 import dns from "node:dns/promises";
 import net from "node:net";
-import { isPrivateOrReservedIpv4 } from "../../blocklist-check/blocklist-input";
 import { withDeadline } from "@be/tools/utils/deadline";
+import { isPrivateOrReservedIpv4 } from "../../blocklist-check/blocklist-input";
 import type { CheckItem } from "../deliverability-test.types";
 import type { ParsedEmailData } from "./parse-mime";
 
@@ -13,7 +13,9 @@ export interface RdnsCheckResult {
 	fcRdnsPassed: boolean;
 }
 
-export async function checkRdns(email: ParsedEmailData): Promise<RdnsCheckResult> {
+export async function checkRdns(
+	email: ParsedEmailData,
+): Promise<RdnsCheckResult> {
 	const ip = email.connectingIp;
 
 	if (
@@ -29,7 +31,8 @@ export async function checkRdns(email: ParsedEmailData): Promise<RdnsCheckResult
 				title: "Reverse DNS (PTR & FCrDNS)",
 				mark: 0,
 				status: "info",
-				description: "Sending IP is local, documentation, or private; rDNS check was skipped.",
+				description:
+					"Sending IP is local, documentation, or private; rDNS check was skipped.",
 				details: [ip ? `Connecting IP: ${ip}` : "No connecting IP detected"],
 			},
 			heloItem: {
@@ -146,7 +149,11 @@ export async function checkRdns(email: ParsedEmailData): Promise<RdnsCheckResult
 			status: "info",
 			description: "HELO/EHLO banner was not recorded.",
 		};
-	} else if (helo.toLowerCase() === "localhost" || helo === "127.0.0.1" || helo.includes("localdomain")) {
+	} else if (
+		helo.toLowerCase() === "localhost" ||
+		helo === "127.0.0.1" ||
+		helo.includes("localdomain")
+	) {
 		heloItem = {
 			id: "auth-helo",
 			title: "HELO/EHLO Hostname",

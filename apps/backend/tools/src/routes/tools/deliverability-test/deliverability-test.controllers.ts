@@ -14,7 +14,10 @@ function generateToken(): string {
 }
 
 function normalizeToken(raw: string): string {
-	return raw.trim().toLowerCase().replace(/^test[-_]/, "");
+	return raw
+		.trim()
+		.toLowerCase()
+		.replace(/^test[-_]/, "");
 }
 
 export async function createDeliverabilityTestSession(
@@ -57,14 +60,21 @@ export async function createDeliverabilityTestSession(
 
 	const sessionKey = `deliverability-test:${rawToken}`;
 	// Store with token key and raw token key for reliable lookup
-	await redis.set(sessionKey, session, toolsConfig.constants.testSessionTtlSeconds);
+	await redis.set(
+		sessionKey,
+		session,
+		toolsConfig.constants.testSessionTtlSeconds,
+	);
 	await redis.set(
 		`deliverability-test:${token}`,
 		session,
 		toolsConfig.constants.testSessionTtlSeconds,
 	);
 
-	log.info("DeliverabilityTest", `Created session token=${token} address=${address} for ip=${clientIp}`);
+	log.info(
+		"DeliverabilityTest",
+		`Created session token=${token} address=${address} for ip=${clientIp}`,
+	);
 
 	return {
 		token,
@@ -90,7 +100,8 @@ export async function getDeliverabilityTestSession(
 			status: "expired",
 			createdAt: new Date().toISOString(),
 			expiresAt: new Date().toISOString(),
-			error: "Test session not found or has expired. Tests are automatically deleted after 24 hours.",
+			error:
+				"Test session not found or has expired. Tests are automatically deleted after 24 hours.",
 		};
 	}
 
@@ -143,7 +154,10 @@ export async function processInboundTesterEmail(
 		const recipient = extractRecipientAddress(rawMime);
 
 		if (!recipient) {
-			log.warn("DeliverabilityTest", "Could not extract recipient from inbound MIME");
+			log.warn(
+				"DeliverabilityTest",
+				"Could not extract recipient from inbound MIME",
+			);
 			return { success: false, error: "Recipient header missing in MIME" };
 		}
 
@@ -158,11 +172,20 @@ export async function processInboundTesterEmail(
 
 		const session = await redis.get<DeliverabilitySession>(sessionKey);
 		if (!session) {
-			log.warn("DeliverabilityTest", `No active test session found for recipient ${recipient}`);
-			return { success: false, error: `Session not found for token ${rawToken}` };
+			log.warn(
+				"DeliverabilityTest",
+				`No active test session found for recipient ${recipient}`,
+			);
+			return {
+				success: false,
+				error: `Session not found for token ${rawToken}`,
+			};
 		}
 
-		log.info("DeliverabilityTest", `Running analyzer suite for token=${session.token} address=${recipient}`);
+		log.info(
+			"DeliverabilityTest",
+			`Running analyzer suite for token=${session.token} address=${recipient}`,
+		);
 
 		// Run analyzer
 		const report = await analyzeInboundEmail(rawMime);
@@ -174,7 +197,11 @@ export async function processInboundTesterEmail(
 			report,
 		};
 
-		await redis.set(sessionKey, updatedSession, toolsConfig.constants.testSessionTtlSeconds);
+		await redis.set(
+			sessionKey,
+			updatedSession,
+			toolsConfig.constants.testSessionTtlSeconds,
+		);
 		await redis.set(
 			`deliverability-test:${session.token}`,
 			updatedSession,
@@ -192,6 +219,9 @@ export async function processInboundTesterEmail(
 			message: "Error processing inbound tester email",
 			error: e instanceof Error ? e.message : String(e),
 		});
-		return { success: false, error: e instanceof Error ? e.message : String(e) };
+		return {
+			success: false,
+			error: e instanceof Error ? e.message : String(e),
+		};
 	}
 }

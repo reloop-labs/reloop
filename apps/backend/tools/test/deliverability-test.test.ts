@@ -82,7 +82,9 @@ Content-Type: text/html
 
 		expect(bodyRes.category.status).toBe("fail");
 		expect(bodyRes.category.mark).toBeLessThan(-1.0);
-		expect(bodyRes.category.items.some((i) => i.id === "body-risky-html")).toBe(true);
+		expect(bodyRes.category.items.some((i) => i.id === "body-risky-html")).toBe(
+			true,
+		);
 		expect(bodyRes.missingAltCount).toBe(1);
 	});
 
@@ -102,8 +104,12 @@ Content-Type: text/html
 
 		expect(linksRes.category.status).toBe("fail");
 		expect(linksRes.shorteners).toContain("bit.ly");
-		expect(linksRes.category.items.some((i) => i.id === "links-deceptive")).toBe(true);
-		expect(linksRes.category.items.some((i) => i.id === "links-shortener")).toBe(true);
+		expect(
+			linksRes.category.items.some((i) => i.id === "links-deceptive"),
+		).toBe(true);
+		expect(
+			linksRes.category.items.some((i) => i.id === "links-shortener"),
+		).toBe(true);
 	});
 
 	it("evaluates Rspamd clean scores and content heuristics", async () => {
@@ -171,8 +177,16 @@ Content-Type: text/html
 		expect(perfectReport.verdict).toBe("inbox_ready");
 
 		// Test with deductions
-		const degradedSignature: CategoryResult = { ...mockSignature, mark: -2.5, status: "fail" };
-		const degradedBlacklist: CategoryResult = { ...mockBlacklists, mark: -2.0, status: "fail" };
+		const degradedSignature: CategoryResult = {
+			...mockSignature,
+			mark: -2.5,
+			status: "fail",
+		};
+		const degradedBlacklist: CategoryResult = {
+			...mockBlacklists,
+			mark: -2.0,
+			status: "fail",
+		};
 
 		const degradedReport = computeDeliverabilityScore({
 			email: parsed,
@@ -188,10 +202,12 @@ Content-Type: text/html
 		expect(degradedReport.verdict).toBe("needs_review");
 	});
 
-	it(
-		"handles session lifecycle: create -> inject sample -> retrieve report",
-		async () => {
-		const { createDeliverabilityTestSession, getDeliverabilityTestSession, processInboundTesterEmail } = await import(
+	it("handles session lifecycle: create -> inject sample -> retrieve report", async () => {
+		const {
+			createDeliverabilityTestSession,
+			getDeliverabilityTestSession,
+			processInboundTesterEmail,
+		} = await import(
 			"../src/routes/tools/deliverability-test/deliverability-test.controllers"
 		);
 
