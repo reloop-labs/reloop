@@ -164,7 +164,15 @@ export async function processInboundTesterEmail(
 	rawMime: string,
 ): Promise<{ success: boolean; token?: string; error?: string }> {
 	try {
-		const recipient = extractRecipientAddress(rawMime);
+		let recipient = extractRecipientAddress(rawMime);
+
+		if (!recipient) {
+			try {
+				const { parseMime } = await import("./analyzer/parse-mime");
+				const parsed = await parseMime(rawMime);
+				recipient = parsed.to.address;
+			} catch {}
+		}
 
 		if (!recipient) {
 			log.warn(
