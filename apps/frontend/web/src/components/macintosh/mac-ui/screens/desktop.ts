@@ -3,6 +3,7 @@ import type { UiState } from "../boot";
 import type { Chrome } from "../chrome";
 import type { RectManager } from "../rects";
 import type * as text from "../text";
+import { getThemeTokens } from "../theme";
 import type { ViewportHelpers } from "../viewports";
 
 export interface TrashIconLayout {
@@ -150,10 +151,13 @@ export function createDesktopScreen({
 			labelH,
 		} = layout;
 
+		const { isDark, windowBg, windowText } = getThemeTokens();
+
 		ctx2.save();
 		ctx2.imageSmoothingEnabled = false;
 		ctx2.font = "bold 10px Chicago, Monaco, monospace";
 
+		if (isDark) ctx2.filter = "invert(1)";
 		assets.drawSprite(
 			ctx2,
 			assets.images.trashIcon,
@@ -162,10 +166,11 @@ export function createDesktopScreen({
 			layout.canW,
 			layout.canH,
 		);
+		if (isDark) ctx2.filter = "none";
 
-		ctx2.fillStyle = "#FFFFFF";
+		ctx2.fillStyle = windowBg;
 		ctx2.fillRect(labelX, labelY, labelW, labelH);
-		ctx2.fillStyle = "#000000";
+		ctx2.fillStyle = windowText;
 		ctx2.textAlign = "center";
 		ctx2.textBaseline = "alphabetic";
 		ctx2.fillText(labelText, labelCenterX, labelBaselineY);
@@ -236,10 +241,11 @@ export function createDesktopScreen({
 		const lines = String(textValue).split("\n");
 		const lineHeight = fontPx + 2;
 		const bottomPad = 4;
+		const { windowText } = getThemeTokens();
 
 		ctx2.save();
 		ctx2.font = `${fontPx}px Chicago, Monaco, monospace`;
-		ctx2.fillStyle = "#000000";
+		ctx2.fillStyle = windowText;
 		ctx2.textAlign = "center";
 		ctx2.beginPath();
 		ctx2.rect(
@@ -263,7 +269,11 @@ export function createDesktopScreen({
 		x: number,
 		y: number,
 	) {
+		const { isDark } = getThemeTokens();
+		ctx2.save();
+		if (isDark) ctx2.filter = "invert(1)";
 		assets.drawSprite(ctx2, img, x, y, 32, 32);
+		ctx2.restore();
 		drawIconLabel(ctx2, label, x + 16, y + 52, 44);
 	}
 
@@ -274,13 +284,15 @@ export function createDesktopScreen({
 		windowWidth: number,
 		windowHeight: number,
 	) {
+		const { headerInfoBg, headerInfoBorder, windowText } = getThemeTokens();
 		const contentWidth = windowWidth - 17;
-		ctx2.fillStyle = "#FFFFFF";
+		ctx2.fillStyle = headerInfoBg;
 		ctx2.fillRect(windowX + 1, windowY + 20, contentWidth, 18);
-		ctx2.fillStyle = "#000000";
+		ctx2.fillStyle = headerInfoBorder;
 		ctx2.fillRect(windowX + 1, windowY + 38, contentWidth, 1);
 		ctx2.fillRect(windowX + 1, windowY + 40, contentWidth, 1);
 		ctx2.font = "bold 8px Chicago, Monaco, monospace";
+		ctx2.fillStyle = windowText;
 
 		const infoY = windowY + 33;
 		const leftText = "3\u2009items";
@@ -401,13 +413,15 @@ export function createDesktopScreen({
 		windowWidth: number,
 		windowHeight: number,
 	) {
+		const { headerInfoBg, headerInfoBorder, windowText } = getThemeTokens();
 		const contentWidth = Math.max(0, windowWidth - 17);
-		ctx2.fillStyle = "#FFFFFF";
+		ctx2.fillStyle = headerInfoBg;
 		ctx2.fillRect(windowX + 1, windowY + 20, contentWidth, 18);
-		ctx2.fillStyle = "#000000";
+		ctx2.fillStyle = headerInfoBorder;
 		ctx2.fillRect(windowX + 1, windowY + 38, contentWidth, 1);
 		ctx2.fillRect(windowX + 1, windowY + 40, contentWidth, 1);
 		ctx2.font = "bold 8px Chicago, Monaco, monospace";
+		ctx2.fillStyle = windowText;
 
 		const infoY = windowY + 33;
 		const leftText = "1\u2009item";

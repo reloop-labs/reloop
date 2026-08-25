@@ -11,6 +11,7 @@ import {
 } from "./components/ModelLoadingOverlay";
 import {
 	consumeUiDirty,
+	drawMacUI,
 	finishBootSequence,
 	getVideoViewportRect,
 	setBootProgress,
@@ -87,6 +88,7 @@ export class MacintoshRenderer {
 	private camera!: THREE.PerspectiveCamera;
 	private controls!: OrbitControls;
 	private modelLoadingOverlay: ModelLoadingOverlayController | null = null;
+	private themeObserver: MutationObserver | null = null;
 
 	private modelRoot: THREE.Group | null = null;
 	private modelBasePos = new THREE.Vector3(0, 0, 0);
@@ -191,6 +193,22 @@ export class MacintoshRenderer {
 
 		this.loadModel();
 		this.bindEvents();
+
+		if (
+			typeof document !== "undefined" &&
+			typeof MutationObserver !== "undefined"
+		) {
+			this.themeObserver = new MutationObserver(() => {
+				drawMacUI();
+				if (this.screenTexture) {
+					this.screenTexture.needsUpdate = true;
+				}
+			});
+			this.themeObserver.observe(document.documentElement, {
+				attributes: true,
+				attributeFilter: ["class"],
+			});
+		}
 
 		return true;
 	}
@@ -635,6 +653,8 @@ export class MacintoshRenderer {
 		this.disposed = true;
 		this.stop();
 		this.modelLoadingOverlay?.dispose();
+		this.themeObserver?.disconnect();
+		this.themeObserver = null;
 
 		for (const fn of this.cleanupFns) fn();
 		this.io?.disconnect();

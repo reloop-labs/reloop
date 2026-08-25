@@ -1,3 +1,5 @@
+import { isDarkMode } from "./theme";
+
 export type BootStage = "off" | "startup" | "happyMac" | "welcome" | "desktop";
 
 export interface BootState {
@@ -267,7 +269,8 @@ export function createBootController({
 		height: number,
 		progress = 0.7,
 	) {
-		ctx.fillStyle = "#e7e7e7";
+		const isDark = isDarkMode();
+		ctx.fillStyle = isDark ? "#121212" : "#e7e7e7";
 		ctx.fillRect(0, 0, width, height);
 
 		const wantsIcon = true;
@@ -293,26 +296,30 @@ export function createBootController({
 		if (wantsIcon) {
 			const iconX = Math.round(width / 2 - iconW / 2);
 			const iconY = cursorY;
-			if (iconReady && loadingIconImage)
+			if (iconReady && loadingIconImage) {
+				ctx.save();
+				if (isDark) ctx.filter = "invert(1)";
 				ctx.drawImage(loadingIconImage, iconX, iconY, iconW, iconH);
+				ctx.restore();
+			}
 			cursorY += iconH + iconGap;
 		}
 
 		const barX = Math.round(width / 2 - barW / 2);
 		const barY = cursorY;
 
-		ctx.strokeStyle = "#000000";
+		ctx.strokeStyle = isDark ? "#ffffff" : "#000000";
 		ctx.lineWidth = 1;
 		ctx.strokeRect(barX, barY, barW, barH);
 
 		const fillFrac = clamp(progress, 0, 1);
 		const innerW = Math.max(0, Math.round((barW - 4) * fillFrac));
-		ctx.fillStyle = "#000000";
+		ctx.fillStyle = isDark ? "#ffffff" : "#000000";
 		ctx.fillRect(barX + 2, barY + 2, innerW, barH - 4);
 
 		const pct = Math.round(fillFrac * 100);
 		ctx.save();
-		ctx.fillStyle = "#000000";
+		ctx.fillStyle = isDark ? "#ffffff" : "#000000";
 		ctx.font = 'bold 12px Chicago, Monaco, "Courier New", monospace';
 		ctx.textAlign = "center";
 		ctx.textBaseline = "alphabetic";

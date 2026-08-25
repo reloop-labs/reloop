@@ -1,4 +1,5 @@
 import type { UiAssets } from "./assets";
+import { getThemeTokens } from "./theme";
 
 export interface ChromeConstants {
 	CANVAS_SCALE: number;
@@ -49,6 +50,7 @@ export function createChrome({
 		width: number,
 		height: number,
 	) {
+		const { isDark, desktopBg, desktopDither } = getThemeTokens();
 		const pattern = assets.getDesktopPattern();
 		if (pattern) {
 			const img = assets?.images?.desktopPattern;
@@ -58,6 +60,7 @@ export function createChrome({
 					: 1;
 
 			ctx.save();
+			if (isDark) ctx.filter = "invert(0.9) brightness(0.4)";
 			if (scale !== 1) ctx.scale(scale, scale);
 			ctx.fillStyle = pattern;
 			ctx.fillRect(0, 0, width / scale, height / scale);
@@ -65,9 +68,9 @@ export function createChrome({
 			return;
 		}
 
-		ctx.fillStyle = "#A8A8A8";
+		ctx.fillStyle = desktopBg;
 		ctx.fillRect(0, 0, width, height);
-		ctx.fillStyle = "#FFFFFF";
+		ctx.fillStyle = desktopDither;
 		for (let y = 0; y < height; y += 2) {
 			for (let x = y % 4 === 0 ? 0 : 2; x < width; x += 4) {
 				ctx.fillRect(x, y, 1, 1);
@@ -80,6 +83,7 @@ export function createChrome({
 		width: number,
 		menu: string[] | string | null = null,
 	) {
+		const { menuBg, menuText, menuBorder } = getThemeTokens();
 		const y = TOP_INSET;
 		const x = LEFT_INSET;
 		const barBaseH = 16;
@@ -88,12 +92,12 @@ export function createChrome({
 		const barY = y - extraTop;
 		const barH = barBaseH + extraTop;
 
-		ctx.fillStyle = "#FFFFFF";
+		ctx.fillStyle = menuBg;
 		ctx.fillRect(x, barY, width - x, barH);
-		ctx.fillStyle = "#000000";
+		ctx.fillStyle = menuBorder;
 		ctx.fillRect(x, y + barBaseH - 1, width - x, 1);
 		ctx.font = "bold 10px Chicago, Monaco, monospace";
-		ctx.fillStyle = "#000000";
+		ctx.fillStyle = menuText;
 		ctx.fillText("\uF8FF", x + 8, y + 13 - textLift);
 
 		const menuItems = Array.isArray(menu)
@@ -115,6 +119,7 @@ export function createChrome({
 		y: number,
 		direction: "up" | "down" | "left" | "right",
 	) {
+		const { isDark } = getThemeTokens();
 		const arrowImg = assets?.images?.arrow;
 		if (arrowImg && assets.isImageReady?.(arrowImg)) {
 			const angleByDir = {
@@ -136,6 +141,7 @@ export function createChrome({
 			ctx.save();
 			ctx.translate(Math.round(x), Math.round(y));
 			ctx.rotate(angle);
+			if (isDark) ctx.filter = "invert(1)";
 			ctx.imageSmoothingEnabled = false;
 			ctx.drawImage(
 				arrowImg,
@@ -212,6 +218,7 @@ export function createChrome({
 		width: number,
 		height: number,
 	) {
+		const { isDark, scrollTrack, scrollThumb, scrollBorder } = getThemeTokens();
 		const scrollWidth = 16;
 
 		// Vertical scrollbar
@@ -220,11 +227,12 @@ export function createChrome({
 		const vW = scrollWidth;
 		const vH = height - 36;
 
-		ctx.fillStyle = "#FFFFFF";
+		ctx.fillStyle = scrollTrack;
 		ctx.fillRect(vX, vY, vW, vH);
+		ctx.strokeStyle = scrollBorder;
 		ctx.strokeRect(vX, vY, vW, vH);
 
-		ctx.fillStyle = "#000000";
+		ctx.fillStyle = scrollBorder;
 		ctx.fillRect(vX, vY + scrollWidth, vW, 1);
 		ctx.fillRect(vX, vY + vH - scrollWidth, vW, 1);
 
@@ -246,21 +254,22 @@ export function createChrome({
 		const vThumbSize = vTrackW;
 		const vThumbX = vTrackX;
 		const vThumbY = vTrackY;
-		ctx.fillStyle = "#FFFFFF";
+		ctx.fillStyle = scrollThumb;
 		ctx.fillRect(vThumbX, vThumbY, vThumbSize, vThumbSize);
-		ctx.strokeStyle = "#000000";
+		ctx.strokeStyle = scrollBorder;
 		ctx.strokeRect(vThumbX, vThumbY, vThumbSize, vThumbSize);
 
 		// Horizontal scrollbar
-		ctx.fillStyle = "#FFFFFF";
+		ctx.fillStyle = scrollTrack;
 		const hX = x;
 		const hY = y + height - scrollWidth;
 		const hW = width - scrollWidth;
 		const hH = scrollWidth;
 		ctx.fillRect(hX, hY, hW, hH);
+		ctx.strokeStyle = scrollBorder;
 		ctx.strokeRect(hX, hY, hW, hH);
 
-		ctx.fillStyle = "#000000";
+		ctx.fillStyle = scrollBorder;
 		ctx.fillRect(hX + scrollWidth, hY, 1, hH);
 		ctx.fillRect(hX + hW - scrollWidth, hY, 1, hH);
 
@@ -276,13 +285,13 @@ export function createChrome({
 		const thumbSize = trackH;
 		const thumbX = trackX;
 		const thumbY = trackY;
-		ctx.fillStyle = "#FFFFFF";
+		ctx.fillStyle = scrollThumb;
 		ctx.fillRect(thumbX, thumbY, thumbSize, thumbSize);
-		ctx.strokeStyle = "#000000";
+		ctx.strokeStyle = scrollBorder;
 		ctx.strokeRect(thumbX, thumbY, thumbSize, thumbSize);
 
 		// Grow box
-		ctx.fillStyle = "#FFFFFF";
+		ctx.fillStyle = scrollTrack;
 		const gbX = x + width - scrollWidth;
 		const gbY = y + height - scrollWidth;
 		ctx.fillRect(gbX, gbY, scrollWidth, scrollWidth);
@@ -293,6 +302,7 @@ export function createChrome({
 			const iw = Math.max(0, scrollWidth - pad * 2);
 			const ih = Math.max(0, scrollWidth - pad * 2);
 			ctx.save();
+			if (isDark) ctx.filter = "invert(1)";
 			ctx.imageSmoothingEnabled = false;
 			ctx.drawImage(
 				resizeImg,
@@ -303,13 +313,14 @@ export function createChrome({
 			);
 			ctx.restore();
 		} else {
-			ctx.fillStyle = "#000000";
+			ctx.fillStyle = scrollBorder;
 			for (let i = 0; i < 4; i++) {
 				ctx.fillRect(x + width - 12 + i * 2, y + height - 4, 1, 1);
 				ctx.fillRect(x + width - 4, y + height - 12 + i * 2, 1, 1);
 			}
 		}
 
+		ctx.strokeStyle = scrollBorder;
 		ctx.strokeRect(gbX, gbY, scrollWidth, scrollWidth);
 	}
 
@@ -322,16 +333,18 @@ export function createChrome({
 		title: string,
 		options: { scrollbars?: boolean } = {},
 	) {
-		ctx.fillStyle = "#000000";
+		const { windowBg, windowText, windowBorder, windowShadow } =
+			getThemeTokens();
+		ctx.fillStyle = windowShadow;
 		ctx.fillRect(x + 2, y + 2, width, height);
-		ctx.fillStyle = "#FFFFFF";
+		ctx.fillStyle = windowBg;
 		ctx.fillRect(x, y, width, height);
-		ctx.strokeStyle = "#000000";
+		ctx.strokeStyle = windowBorder;
 		ctx.lineWidth = 1;
 		ctx.strokeRect(x, y, width, height);
-		ctx.fillStyle = "#FFFFFF";
+		ctx.fillStyle = windowBg;
 		ctx.fillRect(x + 1, y + 1, width - 2, 18);
-		ctx.fillStyle = "#000000";
+		ctx.fillStyle = windowBorder;
 		const stripesX = x + 24;
 		const stripesW = Math.max(0, width - 28);
 		for (let yy = y + 2; yy <= y + 17; yy += 2) {
@@ -343,14 +356,14 @@ export function createChrome({
 		ctx.save();
 		ctx.font = "bold 13px Chicago, Monaco, monospace";
 		const titleWidth = ctx.measureText(title).width;
-		ctx.fillStyle = "#FFFFFF";
+		ctx.fillStyle = windowBg;
 		ctx.fillRect(
 			x + width / 2 - titleWidth / 2 - 8,
 			y + 1,
 			titleWidth + 16,
 			18,
 		);
-		ctx.fillStyle = "#000000";
+		ctx.fillStyle = windowText;
 		ctx.textAlign = "center";
 		ctx.textBaseline = "middle";
 		ctx.fillText(title, x + width / 2, y + 10);
