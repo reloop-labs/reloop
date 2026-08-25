@@ -2,20 +2,17 @@ import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
+import * as Input from "@reloop/ui/input";
+import * as Label from "@reloop/ui/label";
 import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
-import {
-	AnimatePresence,
-	type AnimationPlaybackControls,
-	animate,
-	motion,
-	useMotionValue,
-} from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 
-const actionKbdOnDestructiveClassName =
+/** Light keycap so it reads on the red/destructive FancyButton fill. */
+const actionKbdOnBlueClassName =
 	"border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]";
 
 type DeleteState = "idle" | "deleting" | "success";
@@ -25,6 +22,7 @@ interface DeleteTemplateModalProps {
 	onClose: () => void;
 	onConfirm: () => Promise<void> | void;
 	templateName: string;
+	onDeleted?: () => void;
 }
 
 export const DeleteTemplateModal = ({
@@ -32,12 +30,16 @@ export const DeleteTemplateModal = ({
 	onClose,
 	onConfirm,
 	templateName,
+	onDeleted,
 }: DeleteTemplateModalProps) => {
+	const [confirmationText, setConfirmationText] = useState("");
 	const [deleteState, setDeleteState] = useState<DeleteState>("idle");
-	const [isHolding, setIsHolding] = useState(false);
-	const holdProgress = useMotionValue(0);
-	const animationRef = useRef<AnimationPlaybackControls | null>(null);
+	const [nameCopied, setNameCopied] = useState(false);
+	const inputRef = useRef<HTMLInputElement | null>(null);
 	const deleteStateRef = useRef(deleteState);
+
+	const displayName = templateName.trim() || "Untitled";
+	const canDelete = confirmationText === displayName && deleteState === "idle";
 
 	useEffect(() => {
 		deleteStateRef.current = deleteState;
@@ -47,98 +49,98 @@ export const DeleteTemplateModal = ({
 		if (!isOpen) {
 			const timer = setTimeout(() => {
 				setDeleteState("idle");
-				holdProgress.set(0);
+				setConfirmationText("");
+				setNameCopied(false);
 			}, 300);
 			return () => clearTimeout(timer);
 		}
-	}, [isOpen, holdProgress]);
+	}, [isOpen]);
+
+	const handleCopyName = async () => {
+		try {
+			await navigator.clipboard.writeText(displayName);
+			setNameCopied(true);
+			setTimeout(() => setNameCopied(false), 1500);
+		} catch {
+			// silently fail
+		}
+	};
 
 	const handleDelete = async () => {
-		if (deleteState !== "idle") return;
+		if (!canDelete) return;
 		try {
 			setDeleteState("deleting");
 			await onConfirm();
 			setDeleteState("success");
 			setTimeout(() => {
+				onDeleted?.();
 				onClose();
-				setTimeout(() => setDeleteState("idle"), 300);
-			}, 900);
+				setTimeout(() => {
+					setDeleteState("idle");
+					setConfirmationText("");
+				}, 300);
+			}, 300);
 		} catch {
 			setDeleteState("idle");
 		}
 	};
 
-	const startHold = () => {
-		if (deleteState !== "idle") return;
-		setIsHolding(true);
-		holdProgress.set(0);
-		animationRef.current = animate(holdProgress, 1, {
-			duration: 1.2,
-			ease: "linear",
-			onComplete: () => {
-				setIsHolding(false);
-				holdProgress.set(0);
-				void handleDelete();
-			},
-		});
-	};
-
-	const cancelHold = () => {
-		if (!isHolding && holdProgress.get() === 0) return;
-		setIsHolding(false);
-		animationRef.current?.stop();
-		animate(holdProgress, 0, {
-			duration: 0.2,
-			ease: "easeOut",
-		});
-	};
-
 	useHotkeys(
-		"enter",
+		["enter", "mod+enter"],
 		(e) => {
 			e.preventDefault();
-			if (deleteState === "idle") {
+			if (canDelete) {
 				void handleDelete();
 			}
 		},
-		{ enabled: isOpen },
+		{ enableOnFormTags: ["INPUT"], enabled: isOpen },
 	);
 
 	useHotkeys(
 		"escape",
 		() => {
 			if (deleteState === "idle") {
-				cancelHold();
 				onClose();
 			}
 		},
-		{ enabled: isOpen },
+		{ enableOnFormTags: ["INPUT"], enabled: isOpen },
 	);
 
 	return (
 		<Modal.Root
 			open={isOpen}
 			onOpenChange={(open) => {
-				if (!open) {
-					cancelHold();
-					if (deleteStateRef.current !== "deleting") {
-						onClose();
-					}
+				if (!open && deleteStateRef.current !== "deleting") {
+					onClose();
 				}
 			}}
 		>
 			<Modal.Content
 				className="overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 p-6 sm:max-w-[460px] dark:border-stroke-soft-100/40"
-				showClose={true}
+				showClose={false}
+				onOpenAutoFocus={(e) => {
+					e.preventDefault();
+					setTimeout(() => {
+						inputRef.current?.focus();
+					}, 0);
+				}}
 			>
-				<div className="pr-6">
+				<div>
 					<Modal.Title className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
 						Delete template
 					</Modal.Title>
-					<p className="mt-2 text-sm text-text-sub-600 leading-relaxed">
+					<Modal.Description className="text-sm text-text-sub-600 leading-relaxed">
 						Are you sure you want to delete this template? This action cannot be
 						undone.
-					</p>
+					</Modal.Description>
+				</div>
+
+				<div className="mt-4 rounded-xl border border-red-200 bg-red-50 p-4 text-red-700 text-xs leading-relaxed dark:border-red-800/40 dark:bg-red-950/30 dark:text-red-300">
+					<span className="font-bold text-red-800 dark:text-red-200">
+						Warning:
+					</span>{" "}
+					Deleting this template permanently removes it and its versions. Any
+					sends that referenced this template will no longer use this design.
 				</div>
 
 				<div className="mt-5 space-y-3 rounded-xl border border-stroke-soft-100 bg-bg-weak-50/50 p-4 dark:border-stroke-soft-100/40">
@@ -146,18 +148,67 @@ export const DeleteTemplateModal = ({
 						<p className="font-normal text-text-sub-600 text-xs">
 							Template name
 						</p>
-						<p className="mt-0.5 truncate font-medium text-sm text-text-strong-950">
-							{templateName || "Untitled"}
-						</p>
+						<div className="mt-1 flex items-center">
+							<span className="font-medium text-sm text-text-strong-950">
+								{displayName}
+							</span>
+						</div>
 					</div>
 				</div>
 
-				<div className="mt-4 rounded-xl border border-[#FBE3B5] bg-[#FEF6E6] p-4 text-[#8A5300] text-xs leading-relaxed dark:border-amber-800/40 dark:bg-amber-950/30 dark:text-amber-200">
-					<span className="font-bold text-[#6D4000] dark:text-amber-100">
-						Warning:
-					</span>{" "}
-					Deleting this template permanently removes it and its versions. Any
-					sends that referenced this template will no longer use this design.
+				<div className="mt-4 space-y-2">
+					<Label.Root
+						htmlFor="delete-template-confirmation"
+						className="flex flex-wrap items-center gap-1.5"
+					>
+						<span>Type</span>
+						<span className="inline-flex items-center gap-1 rounded-md bg-bg-weak-50 px-1.5 py-0.5 font-medium text-[12px] text-text-strong-950 dark:bg-bg-weak-50/20">
+							{displayName}
+							<button
+								type="button"
+								onClick={(e) => {
+									e.preventDefault();
+									void handleCopyName();
+								}}
+								className="-mr-0.5 inline-flex h-4 w-4 shrink-0 items-center justify-center rounded transition-colors"
+								aria-label={`Copy ${displayName}`}
+								title="Copy name"
+							>
+								<AnimatePresence mode="popLayout" initial={false}>
+									<motion.span
+										key={nameCopied ? "check" : "copy"}
+										initial={{ opacity: 0, scale: 0.6 }}
+										animate={{ opacity: 1, scale: 1 }}
+										exit={{ opacity: 0, scale: 0.6 }}
+										transition={{ type: "spring", duration: 0.2, bounce: 0.3 }}
+										className="flex items-center justify-center"
+									>
+										<Icon
+											name={nameCopied ? "check" : "copy"}
+											className={cn(
+												"h-3 w-3",
+												nameCopied ? "text-green-500" : "text-text-sub-600",
+											)}
+										/>
+									</motion.span>
+								</AnimatePresence>
+							</button>
+						</span>
+						<span>to confirm</span>
+					</Label.Root>
+					<Input.Root size="medium">
+						<Input.Wrapper>
+							<Input.Input
+								ref={inputRef}
+								id="delete-template-confirmation"
+								value={confirmationText}
+								onChange={(e) => setConfirmationText(e.target.value)}
+								placeholder={displayName}
+								disabled={deleteState !== "idle"}
+								autoComplete="off"
+							/>
+						</Input.Wrapper>
+					</Input.Root>
 				</div>
 
 				<div className="mt-6 flex items-center justify-end gap-3">
@@ -168,7 +219,6 @@ export const DeleteTemplateModal = ({
 						size="small"
 						onClick={() => {
 							if (deleteState === "idle") {
-								cancelHold();
 								onClose();
 							}
 						}}
@@ -186,26 +236,33 @@ export const DeleteTemplateModal = ({
 						type="button"
 						variant="destructive"
 						size="small"
-						onPointerDown={startHold}
-						onPointerUp={cancelHold}
-						onPointerLeave={cancelHold}
-						onPointerCancel={cancelHold}
+						disabled={!canDelete}
+						onClick={() => void handleDelete()}
 						className={cn(
 							"relative min-w-[134px] select-none justify-center overflow-hidden transition-all duration-200",
 							deleteState !== "idle" && "pointer-events-none opacity-90",
 						)}
 					>
-						<motion.div
-							className="pointer-events-none absolute inset-0 origin-left bg-white/25"
-							style={{ scaleX: holdProgress }}
-						/>
 						<AnimatePresence mode="popLayout" initial={false}>
 							<motion.span
 								key={deleteState}
-								transition={{ type: "spring", duration: 0.25, bounce: 0 }}
-								initial={{ opacity: 0, y: -14 }}
-								animate={{ opacity: 1, y: 0 }}
-								exit={{ opacity: 0, y: 14 }}
+								transition={{
+									type: "spring",
+									duration: 0.25,
+									bounce: 0,
+								}}
+								initial={{
+									opacity: 0,
+									y: -14,
+								}}
+								animate={{
+									opacity: 1,
+									y: 0,
+								}}
+								exit={{
+									opacity: 0,
+									y: 14,
+								}}
 								className="relative z-10 flex items-center justify-center gap-1.5"
 							>
 								{deleteState === "deleting" ? (
@@ -223,8 +280,8 @@ export const DeleteTemplateModal = ({
 									</>
 								) : (
 									<>
-										<span>Hold to delete</span>
-										<ActionKbd className={actionKbdOnDestructiveClassName}>
+										Delete template
+										<ActionKbd className={actionKbdOnBlueClassName}>
 											↵
 										</ActionKbd>
 									</>

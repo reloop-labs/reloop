@@ -9,6 +9,7 @@ import { parseAsStringLiteral, useQueryState } from "nuqs";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
+import { DeleteTemplateModal } from "#/features/templates/components/delete-template-modal";
 import { useAutoSaveDraft } from "#/features/templates/editor/hooks/use-auto-save-draft";
 import { useEditorStore } from "#/features/templates/editor/hooks/use-editor-store";
 import { useSWR } from "#/features/templates/editor/hooks/use-swr-compat";
@@ -17,7 +18,6 @@ import { getRenderedEmailHtml } from "#/features/templates/editor/utils/get-rend
 import { CollabPresence } from "../../collobration/Collabpresence";
 import type { ConnectionStatus as ConnectionStatusType } from "../../collobration/hooks/useCollaboration";
 import { TestEmailModal } from "../panels/test/test-email-modal";
-import { DeleteTemplateModal } from "./delete-template-modal";
 import { PublishTemplateModal } from "./publish-template-modal";
 
 const viewModes = ["visual", "code", "history", "variables"] as const;
@@ -116,6 +116,10 @@ export const HeaderActions = ({
 		templateId ? `/api/template/v1/${templateId}/versions` : null,
 		fetcher,
 	);
+	const { data: template } = useSWR<{ name?: string }>(
+		templateId ? `/api/template/v1/${templateId}` : null,
+		fetcher,
+	);
 	const latestPublished = versions?.find((v) => v.isMajor) ?? null;
 
 	const handlePublish = async (description?: string) => {
@@ -181,14 +185,15 @@ export const HeaderActions = ({
 		if (!templateId) return;
 
 		try {
-			await fetch(`/api/template/v1/${templateId}`, {
+			const res = await fetch(`/api/template/v1/${templateId}`, {
 				method: "DELETE",
 				credentials: "include",
 			});
-			router.push("/templates");
+			if (!res.ok) throw new Error("delete failed");
 		} catch (error) {
 			console.error("Failed to delete template:", error);
 			toast.error("Failed to delete template.");
+			throw error;
 		}
 	};
 
@@ -309,6 +314,8 @@ export const HeaderActions = ({
 				isOpen={isDeleteModalOpen}
 				onClose={() => setIsDeleteModalOpen(false)}
 				onConfirm={handleDelete}
+				templateName={template?.name || "Untitled"}
+				onDeleted={() => router.push("/templates")}
 			/>
 
 			{/* Publish Confirmation Modal */}
