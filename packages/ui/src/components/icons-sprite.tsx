@@ -2765,6 +2765,27 @@ export const IconsSprite = () => (
 				<path d="M2.586 17.414A2 2 0 0 0 2 18.828V21a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h1a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h.172a2 2 0 0 0 1.414-.586l.814-.814a6.5 6.5 0 1 0-4-4z" />
 				<circle cx="16.5" cy="7.5" r={0.5} fill="currentColor" />
 			</symbol>
+			<symbol
+				id="overpromise"
+				viewBox="0 0 24 24"
+				fill="none"
+				xmlns="http://www.w3.org/2000/svg"
+			>
+				<path
+					opacity="0.12"
+					fillRule="evenodd"
+					clipRule="evenodd"
+					d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 10a2 2 0 00-2 2v2a2 2 0 104 0v-2a2 2 0 00-2-2z"
+					fill="currentColor"
+				/>
+				<path
+					d="M9.5 9a.5.5 0 01-1 0m1 0a.5.5 0 00-1 0m1 0h-1m7 0a.5.5 0 01-1 0m1 0a.5.5 0 00-1 0m1 0h-1M12 18a2 2 0 01-2-2v-2a2 2 0 114 0v2a2 2 0 01-2 2zm0 4C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"
+					stroke="currentColor"
+					strokeWidth={1.5}
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				/>
+			</symbol>
 			<symbol id="element-5" viewBox="0 0 24 24">
 				<path
 					opacity="0.12"

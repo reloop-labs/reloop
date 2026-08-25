@@ -56,7 +56,7 @@ export const CATEGORY_META: Record<
 > = {
 	urgency: { label: "Urgency", icon: "alert-triangle" },
 	shady: { label: "Shady", icon: "shield-cross" },
-	overpromise: { label: "Overpromise", icon: "sparkles" },
+	overpromise: { label: "Overpromise", icon: "overpromise" },
 	money: { label: "Financial & Money", icon: "lock" },
 	outreach: { label: "Cold Outreach", icon: "user-circle" },
 };
