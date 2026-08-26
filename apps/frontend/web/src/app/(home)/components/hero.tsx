@@ -210,35 +210,15 @@ export function Hero({ variant = "default" }: HeroProps) {
 				</div>
 			) : (
 				<div className="relative mx-auto grid w-full max-w-5xl items-center gap-10 border-stroke-soft-200 border-x px-6 pt-24 pb-14 sm:px-8 sm:pt-28 sm:pb-16 md:max-w-7xl lg:grid-cols-[1.1fr_1fr] lg:gap-6 lg:px-12 lg:pt-32 lg:pb-20 dark:border-white/10">
-					<div className="flex flex-col items-start text-left">
-						<Link
-							href="/compare/resend"
-							className="group mb-6 inline-flex items-center gap-0 overflow-hidden rounded-full border border-stroke-soft-200 bg-bg-white-0 text-[13px] shadow-[0_1px_2px_rgba(0,0,0,0.04)] transition-all duration-200 hover:border-stroke-strong-950/20 sm:mb-8 sm:text-[13.5px] dark:border-white/10 dark:bg-white/[0.04] dark:shadow-none dark:hover:border-white/25"
-						>
-							<span className="px-3.5 py-1.5 font-medium text-text-sub-600 dark:text-white/70">
-								An open-source alternative to Resend
-							</span>
-							<span
-								className="h-3.5 w-px bg-stroke-soft-200 dark:bg-white/10"
-								aria-hidden="true"
-							/>
-							<span className="inline-flex items-center gap-1 px-3 py-1.5 font-medium text-text-strong-950 transition-colors group-hover:text-blue-600 dark:text-white dark:group-hover:text-blue-400">
-								<span>Read more</span>
-								<Icon
-									name="arrow-up-right"
-									className="group-hover:-translate-y-0.5 size-3.5 transition-transform duration-200 group-hover:translate-x-0.5"
-									aria-hidden="true"
-								/>
-							</span>
-						</Link>
-						<h1 className="max-w-xl text-left font-semibold text-[2.5rem] text-text-strong-950 leading-[1.06] tracking-[-0.04em] sm:text-[3.5rem] lg:text-[4.25rem] dark:text-white">
+					<div className="order-2 flex flex-col items-center text-center lg:order-1 lg:items-start lg:text-left">
+						<h1 className="max-w-xl text-center font-semibold text-[2.5rem] text-text-strong-950 leading-[1.06] tracking-[-0.04em] sm:text-[3.5rem] lg:text-left lg:text-[4.25rem] dark:text-white">
 							Email API for Developers
 						</h1>
-						<p className="mt-5 max-w-[30rem] text-balance text-left text-[16.5px] text-text-sub-600 leading-relaxed sm:mt-6 sm:text-[18.5px] lg:text-[20px] dark:text-white/60">
+						<p className="mt-5 max-w-[30rem] text-balance text-center text-[16.5px] text-text-sub-600 leading-relaxed sm:mt-6 sm:text-[18.5px] lg:text-left lg:text-[20px] dark:text-white/60">
 							Reloop is the open-source email platform for transactional mail,
 							agent inboxes, and automated workflows.
 						</p>
-						<div className="mt-8 flex flex-wrap items-center justify-start gap-3.5 sm:mt-9 sm:gap-4">
+						<div className="mt-8 flex flex-wrap items-center justify-center gap-3.5 sm:mt-9 sm:gap-4 lg:justify-start">
 							<FancyButton.Root
 								asChild
 								variant="primary"
@@ -290,7 +270,7 @@ export function Hero({ variant = "default" }: HeroProps) {
 						</div>
 					</div>
 					{/* Optical offset: the CRT's 3/4 mass sits right and high of the bounding-box center. */}
-					<div className="lg:-translate-x-16 relative h-[320px] w-full sm:h-[400px] lg:h-[470px] lg:translate-y-4">
+					<div className="lg:-translate-x-16 order-1 relative h-[320px] w-full sm:h-[400px] lg:order-2 lg:h-[470px] lg:translate-y-4">
 						<MacintoshHeroMonitorLazy />
 					</div>
 				</div>
