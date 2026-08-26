@@ -68,9 +68,11 @@ export function createBootController({
 				stopBootProgressAnimator();
 				return;
 			}
-			bootDisplayPercent = Math.min(bootTargetPercent, bootDisplayPercent + 1);
+			const diff = bootTargetPercent - bootDisplayPercent;
+			const step = diff > 10 ? Math.ceil(diff / 5) : 1;
+			bootDisplayPercent = Math.min(bootTargetPercent, bootDisplayPercent + step);
 			setBootState({ progress: bootDisplayPercent / 100 });
-		}, 18);
+		}, 16);
 	}
 
 	function stopStartupFlicker() {

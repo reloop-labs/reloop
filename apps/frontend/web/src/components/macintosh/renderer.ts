@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+import { MeshoptDecoder } from "three/examples/jsm/libs/meshopt_decoder.module.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import {
 	CSS3DObject,
@@ -38,45 +39,6 @@ const WINDOW_RESIZE_RELEASE_DELAY_MS = 80;
 
 export interface MacintoshRendererOptions {
 	transparent?: boolean;
-}
-
-function isKeyboardOrMouse(name?: string): boolean {
-	if (!name) return false;
-	if (
-		name === "Circle" ||
-		name === "BézierCurve" ||
-		name === "Base" ||
-		name === "Apple_Logo"
-	)
-		return true;
-	if (name.startsWith("Text.") || name.startsWith("Text")) {
-		const num = Number.parseInt(name.replace("Text.", "").replace("Text", ""));
-		if (!isNaN(num) && num >= 11) return true;
-	}
-	if (name.startsWith("Cube.034") || name.startsWith("Cube034")) return true;
-	if (name.startsWith("Cube.008") || name.startsWith("Cube008")) return true;
-	if (name.startsWith("Cube.018") || name.startsWith("Cube018")) return true;
-	if (name.startsWith("Cube.023") || name.startsWith("Cube023")) return true;
-	if (name.startsWith("Cube.027") || name.startsWith("Cube027")) return true;
-	if (name.startsWith("Cube.028") || name.startsWith("Cube028")) return true;
-	if (name.startsWith("Cube.029") || name.startsWith("Cube029")) return true;
-	if (name.startsWith("Cube.030") || name.startsWith("Cube030")) return true;
-	if (name.startsWith("Cube.054") || name.startsWith("Cube054")) return true;
-	if (name.startsWith("Cube.002") || name.startsWith("Cube002")) return true;
-	if (name.startsWith("Cube.017") || name.startsWith("Cube017")) return true;
-	if (name === "Cube" || name === "Cube_1" || name === "Cube_2") return true;
-	if (name.startsWith("Cube.016") || name.startsWith("Cube016")) return true;
-	if (name.startsWith("Cube.001") || name.startsWith("Cube001")) return true;
-	if (name.startsWith("Cube.003") || name.startsWith("Cube003")) return true;
-	if (name.startsWith("Cube.019") || name.startsWith("Cube019")) return true;
-	if (name.startsWith("Cube.020") || name.startsWith("Cube020")) return true;
-	if (name.startsWith("Cylinder.002") || name.startsWith("Cylinder002"))
-		return true;
-	if (name.startsWith("Cylinder.007") || name.startsWith("Cylinder007"))
-		return true;
-	if (name.startsWith("Cylinder.008") || name.startsWith("Cylinder008"))
-		return true;
-	return false;
 }
 
 export class MacintoshRenderer {
@@ -258,22 +220,12 @@ export class MacintoshRenderer {
 	}
 
 	private loadModel() {
-		new GLTFLoader().load(
+		new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).load(
 			MODEL_URL,
 			(gltf) => {
 				if (this.disposed) return;
 				const model = gltf.scene;
 				this.modelRoot = model;
-
-				const toRemove: THREE.Object3D[] = [];
-				model.traverse((child) => {
-					if (isKeyboardOrMouse(child.name)) {
-						toRemove.push(child);
-					}
-				});
-				for (const obj of toRemove) {
-					if (obj.parent) obj.parent.remove(obj);
-				}
 
 				model.traverse((child) => {
 					if (!(child instanceof THREE.Mesh)) return;
@@ -409,7 +361,7 @@ export class MacintoshRenderer {
 					if (this.disposed) return;
 					this.renderer.domElement.style.visibility = "visible";
 					this.cssRenderer.domElement.style.visibility = "visible";
-					finishBootSequence({ delayMs: 900 });
+					finishBootSequence({ delayMs: 150 });
 				});
 			},
 			(xhr) => {

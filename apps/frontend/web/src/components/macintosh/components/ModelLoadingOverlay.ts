@@ -3,7 +3,7 @@ import { svgToDataUrl } from "../lib/svg";
 
 const LOADER_REF_W = 512;
 const LOADER_REF_H = 342;
-const MIN_BOOT_MS = 2000;
+const MIN_BOOT_MS = 200;
 
 export const LOADING_ICON_SVG = `<svg width="100" height="128" viewBox="0 0 100 128" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path d="M8 0H92V4H8V0Z" fill="#212121"/>
@@ -316,10 +316,11 @@ export function createModelLoadingOverlay(
 				return;
 			}
 
-			displayPercent = Math.min(targetPercent, displayPercent + 1);
+			const step = finishRequested ? 5 : 1;
+			displayPercent = Math.min(targetPercent, displayPercent + step);
 			render();
 			maybeFinish();
-		}, 18);
+		}, 16);
 	};
 
 	const start = () => {
