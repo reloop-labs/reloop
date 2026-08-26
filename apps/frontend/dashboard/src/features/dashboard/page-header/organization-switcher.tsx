@@ -72,6 +72,7 @@ export function OrganizationSwitcher({
 	const [isOpen, setIsOpen] = useState(false);
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
+	const scrollContainerRef = useRef<HTMLDivElement>(null);
 	const router = useRouter();
 
 	const activeIndex = activeOrganization
@@ -124,7 +125,7 @@ export function OrganizationSwitcher({
 			</Dropdown.Trigger>
 			<Dropdown.Content
 				sideOffset={2}
-				className="w-60 p-0"
+				className="w-[380px] p-0"
 				side={side}
 				align="start"
 			>
@@ -134,7 +135,10 @@ export function OrganizationSwitcher({
 							Organizations
 						</span>
 					</div>
-					<div className="relative">
+					<div
+						ref={scrollContainerRef}
+						className="relative max-h-[300px] min-h-[190px] space-y-0.5 overflow-y-auto"
+					>
 						{(organizations ?? []).map((organization, idx) => (
 							<button
 								type="button"
@@ -147,7 +151,7 @@ export function OrganizationSwitcher({
 								onPointerEnter={() => setHoverIdx(idx)}
 								onPointerLeave={() => setHoverIdx(undefined)}
 								className={cn(
-									"flex w-full cursor-pointer items-center justify-between gap-2.5 rounded-lg px-2 py-1.5 font-normal",
+									"flex w-full cursor-pointer items-center justify-between gap-2.5 rounded-lg px-2.5 py-2 font-normal",
 									!currentRect && currentIdx === idx && "bg-neutral-alpha-10",
 								)}
 								onClick={() => handleSelectOrganization(organization)}
@@ -166,40 +170,39 @@ export function OrganizationSwitcher({
 								)}
 							</button>
 						))}
-
-						<div className="mx-2 mt-1.5 border-stroke-soft-100 border-t dark:border-stroke-soft-100/40" />
-
-						<button
-							onPointerEnter={() => setHoverIdx(organizations?.length ?? 0)}
-							onPointerLeave={() => setHoverIdx(undefined)}
-							ref={(el) => {
-								if (el) {
-									buttonRefs.current[organizations?.length ?? 0] = el;
-								}
-							}}
-							key="create-organization"
-							type="button"
-							className={cn(
-								"flex w-full cursor-pointer items-center justify-start gap-2.5 rounded-lg px-2 py-2 font-normal",
-								!currentRect &&
-									currentIdx === (organizations?.length ?? 0) &&
-									"bg-neutral-alpha-10",
-							)}
-							onClick={handleCreateOrganization}
-						>
-							<div className="flex h-6 w-6 items-center justify-center rounded-[6px] border border-stroke-soft-200 border-dashed bg-bg-weak-50 dark:border-stroke-soft-100/50 dark:bg-bg-weak-50/50">
-								<Icon name="plus" className="h-3.5 w-3.5 text-text-sub-600" />
+						{(!organizations || organizations.length === 0) && (
+							<div className="flex min-h-[170px] flex-col items-center justify-center gap-1 px-3 py-4 text-center">
+								<p className="font-medium text-sm text-text-sub-600">
+									No organizations
+								</p>
+								<p className="text-text-soft-400 text-xs">
+									Create one below to get started
+								</p>
 							</div>
-							<span className="font-medium text-sm text-text-strong-950">
-								Create organization
-							</span>
-						</button>
+						)}
 						<AnimatedHoverBackground
 							rect={currentRect}
 							tabElement={currentTab}
+							containerElement={scrollContainerRef.current}
 							className="rounded-lg"
 						/>
 					</div>
+
+					<div className="mx-1 my-1 border-stroke-soft-100 border-t dark:border-stroke-soft-100/40" />
+
+					<button
+						key="create-organization"
+						type="button"
+						className="flex w-full cursor-pointer items-center justify-start gap-2.5 rounded-lg px-2.5 py-2 font-normal transition-colors hover:bg-neutral-alpha-10"
+						onClick={handleCreateOrganization}
+					>
+						<div className="flex h-6 w-6 items-center justify-center rounded-[6px] border border-stroke-soft-200 border-dashed bg-bg-weak-50 dark:border-stroke-soft-100/50 dark:bg-bg-weak-50/50">
+							<Icon name="plus" className="h-3.5 w-3.5 text-text-sub-600" />
+						</div>
+						<span className="font-medium text-sm text-text-strong-950">
+							Create organization
+						</span>
+					</button>
 				</div>
 			</Dropdown.Content>
 		</Dropdown.Root>
