@@ -6,7 +6,6 @@ import { AnimatedSidebarToggleIcon } from "#/features/dashboard/sidebar/animated
 import { usePlayAnimationOnHover } from "#/features/dashboard/sidebar/use-play-animation-on-hover";
 import { useSidebarCollapse } from "#/features/dashboard/sidebar/use-sidebar-collapse";
 import { useUIStore } from "#/store/use-ui-store";
-import { CopyPromptButton } from "./copy-prompt-button";
 import { OrganizationSwitcher } from "./organization-switcher";
 import { useActiveOrganization } from "./use-active-organization";
 import { UserDropdown } from "./user-dropdown";
@@ -48,7 +47,6 @@ function SidebarToggleButton() {
  * Matches the Next dashboard PageHeader chrome (without settings gear).
  *
  * Ask AI entry is hidden until the assistant API is wired up.
- * Copy prompt is always available for Claude / ChatGPT / Cursor / etc.
  */
 export function PageHeader() {
 	const { user, organizations, activeOrganization, onOrganizationChange } =
@@ -76,8 +74,6 @@ export function PageHeader() {
 			</div>
 
 			<div className="flex items-center gap-2">
-				<CopyPromptButton />
-
 				<Button.Root
 					variant="neutral"
 					mode="ghost"
