@@ -22,7 +22,13 @@ export default function ForbiddenPage() {
 
 	return (
 		<div className="flex h-dvh flex-col items-center justify-center gap-4 p-6 text-center">
-			<Logo className="h-12" />
+			<a
+				href="/home"
+				aria-label="Reloop home"
+				className="transition-opacity hover:opacity-80"
+			>
+				<Logo className="h-12" />
+			</a>
 			<h1 className="font-semibold text-text-strong-950 text-title-h4">
 				Console access required
 			</h1>

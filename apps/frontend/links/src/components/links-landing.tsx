@@ -19,7 +19,7 @@ export function LinksLanding() {
 				{/* Brand */}
 				<header className="flex shrink-0 flex-col items-center gap-2 px-6 pt-7 sm:pt-8">
 					<a
-						href={socialProfiles.main}
+						href={`${socialProfiles.main}/home`}
 						className="links-poster-brand flex items-center gap-2.5 transition-opacity hover:opacity-75"
 						aria-label="Reloop"
 					>

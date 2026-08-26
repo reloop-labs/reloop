@@ -1713,7 +1713,7 @@ export const Header = () => {
 					{/* Left — brand + main nav */}
 					<div className="flex items-center gap-6">
 						<Link
-							href="/"
+							href="/home"
 							className="relative z-10 flex shrink-0 items-center gap-2.5"
 							aria-label="Reloop home"
 						>

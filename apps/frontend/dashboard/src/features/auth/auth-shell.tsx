@@ -79,7 +79,7 @@ export function AuthShell({
 						<div className="mb-2 flex items-center justify-center">
 							{/* Plain <a> so we leave /dashboard basePath and hit the marketing site root. */}
 							<a
-								href="/"
+								href="/home"
 								aria-label="Reloop home"
 								className="rounded-lg transition-opacity hover:opacity-80"
 							>

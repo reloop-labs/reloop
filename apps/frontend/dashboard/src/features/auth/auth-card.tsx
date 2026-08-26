@@ -104,7 +104,7 @@ export function AuthCard({
 						{showBrandMark ? (
 							// Plain <a> so we leave /dashboard basePath and hit the marketing site root.
 							<a
-								href="/"
+								href="/home"
 								aria-label="Reloop home"
 								className="block w-fit overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-soft-50 transition-opacity hover:opacity-80 dark:border-stroke-soft-100/40 dark:bg-white/[0.03]"
 							>

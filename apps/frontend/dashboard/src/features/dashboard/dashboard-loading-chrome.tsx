@@ -13,13 +13,17 @@ export function DashboardLoadingChrome() {
 		<div className="flex h-screen overflow-hidden bg-bg-white-0 dark:bg-black">
 			<div className="sticky top-0 z-10 flex h-screen w-60 flex-col border-stroke-soft-100 border-r dark:border-white/10">
 				<div className="flex h-12 items-center justify-between pr-3 pl-3">
-					<div className="flex items-center gap-2">
+					<a
+						href="/home"
+						aria-label="Reloop home"
+						className="flex items-center gap-2"
+					>
 						<Logo className="-ml-1 w-10" />
 						<p className="-ml-2 font-semibold text-text-strong-950">Reloop</p>
 						<span className="inline-flex items-center rounded-full bg-bg-weak-50 px-2 py-0.5 font-bold text-[8px] text-text-sub-600 uppercase tracking-wide dark:bg-white/[0.06]">
 							Beta
 						</span>
-					</div>
+					</a>
 				</div>
 				<div className="flex flex-1 flex-col gap-2 px-4 py-3">
 					<div className="h-8 w-full animate-pulse rounded-lg bg-bg-weak-50 dark:bg-white/[0.04]" />

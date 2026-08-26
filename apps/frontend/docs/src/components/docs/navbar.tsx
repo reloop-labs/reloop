@@ -85,7 +85,7 @@ export function Navbar({
 				>
 					<Icon name="menu-2" className="h-4 w-4" />
 				</button>
-				<a href="/" className="flex items-center gap-2">
+				<a href="/home" className="flex items-center gap-2">
 					<Logo className="-ml-1 w-10 shrink-0" />
 					<p className="-ml-2 font-semibold text-text-strong-950 dark:text-white">
 						Reloop

@@ -1,5 +1,5 @@
 import type * as React from "react";
-import { Img, Section } from "react-email";
+import { Img, Link, Section } from "react-email";
 
 interface WrapperProps {
 	children: React.ReactNode;
@@ -18,13 +18,15 @@ export const Wrapper = ({
 		<Section className="mx-auto mt-[40px] mb-[40px] max-w-[600px] px-6">
 			{/* Logo */}
 			<Section className="mb-6">
-				<Img
-					src={`${baseUrl}/web-app-manifest-192x192.png`}
-					width="52"
-					height="52"
-					alt="Reloop Logo"
-					className={isDark ? "invert" : "-ml-2.5"}
-				/>
+				<Link href={`${baseUrl}/home`}>
+					<Img
+						src={`${baseUrl}/web-app-manifest-192x192.png`}
+						width="52"
+						height="52"
+						alt="Reloop Logo"
+						className={isDark ? "invert" : "-ml-2.5"}
+					/>
+				</Link>
 			</Section>
 			{children}
 		</Section>

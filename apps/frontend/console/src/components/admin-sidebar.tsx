@@ -86,7 +86,11 @@ export function AdminSidebar() {
 					</button>
 				) : (
 					<>
-						<div className="flex min-w-0 items-center gap-2">
+						<a
+							href="/home"
+							aria-label="Reloop home"
+							className="flex min-w-0 items-center gap-2 transition-opacity hover:opacity-80"
+						>
 							<Logo className="h-8 w-8 shrink-0" />
 							<div className="min-w-0">
 								<p className="truncate font-semibold text-[13px] text-text-strong-950 leading-tight">
@@ -96,7 +100,7 @@ export function AdminSidebar() {
 									Platform console
 								</p>
 							</div>
-						</div>
+						</a>
 						<button
 							type="button"
 							onClick={toggle}

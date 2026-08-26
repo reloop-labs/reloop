@@ -51,7 +51,7 @@ export function DocsLayout({ children, tree, pathname }: DocsLayoutProps) {
 				<div className="mx-auto flex h-full w-full max-w-5xl border-stroke-soft-100 border-x md:max-w-7xl dark:border-stroke-soft-100/40">
 					{/* Desktop Logo Area — match dashboard brand lockup with right border */}
 					<div className="hidden shrink-0 items-center border-stroke-soft-100 border-r px-3 lg:flex lg:w-[270px] dark:border-stroke-soft-100/40">
-						<a href="/" className="flex items-center gap-2">
+						<a href="/home" className="flex items-center gap-2">
 							<Logo className="-ml-1 w-10 shrink-0" />
 							<p className="-ml-2 font-semibold text-text-strong-950 dark:text-white">
 								Reloop
@@ -130,7 +130,7 @@ export function DocsLayout({ children, tree, pathname }: DocsLayoutProps) {
 			>
 				<div className="flex h-12 items-center border-stroke-soft-100 border-b bg-bg-white-0 px-3 dark:border-stroke-soft-100/40 dark:bg-black">
 					<a
-						href="/"
+						href="/home"
 						className="flex items-center gap-2"
 						onClick={() => setOpen(false)}
 					>

@@ -165,12 +165,16 @@ export function SplitLayout({
 					transition: "max-width 0.28s cubic-bezier(0.23, 1, 0.32, 1)",
 				}}
 			>
-				<div className="-translate-x-1/2 absolute top-5 left-1/2 z-50 flex items-center space-x-2">
+				<a
+					href="/home"
+					aria-label="Reloop home"
+					className="-translate-x-1/2 absolute top-5 left-1/2 z-50 flex items-center space-x-2 transition-opacity hover:opacity-80"
+				>
 					<Logo className="h-10 w-10 lg:h-11 lg:w-11" />
 					<span className="-ml-3 font-semibold text-text-strong-950 text-xl">
 						Reloop
 					</span>
-				</div>
+				</a>
 				<div
 					className={cn(
 						"flex w-full flex-1 flex-col",

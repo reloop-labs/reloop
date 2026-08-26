@@ -120,7 +120,13 @@ export function InvitePage() {
 			<div className="flex h-dvh flex-col items-center justify-center">
 				<div className="w-full max-w-sm p-5 md:p-8">
 					<div className="mb-4 flex items-center justify-center">
-						<Logo className="h-16" />
+						<a
+							href="/home"
+							aria-label="Reloop home"
+							className="transition-opacity hover:opacity-80"
+						>
+							<Logo className="h-16" />
+						</a>
 					</div>
 					<div className="space-y-1 pb-6 text-center">
 						<Skeleton className="mx-auto h-5 w-48 rounded-lg" />
@@ -144,7 +150,13 @@ export function InvitePage() {
 			<div className="flex h-dvh flex-col items-center justify-center">
 				<div className="w-full max-w-sm p-5 md:p-8">
 					<div className="mb-4 flex justify-center">
-						<Logo className="h-16" />
+						<a
+							href="/home"
+							aria-label="Reloop home"
+							className="transition-opacity hover:opacity-80"
+						>
+							<Logo className="h-16" />
+						</a>
 					</div>
 					<div className="space-y-1 pb-6 text-center">
 						<h2 className="font-medium text-label-lg text-text-strong-950">
@@ -187,7 +199,13 @@ export function InvitePage() {
 			<AnimatePresence mode="wait">
 				<div className="w-full max-w-sm p-5 md:p-8">
 					<motion.div layout className="mb-4 flex items-center justify-center">
-						<Logo className="h-16" />
+						<a
+							href="/home"
+							aria-label="Reloop home"
+							className="transition-opacity hover:opacity-80"
+						>
+							<Logo className="h-16" />
+						</a>
 					</motion.div>
 					<motion.div
 						key="invite-content"

@@ -178,7 +178,13 @@ export function PreferencesContent({
 				<div className="relative overflow-hidden">
 					{/* Logo Section */}
 					<div className="mb-8 flex justify-center">
-						<Logo className="h-20" />
+						<a
+							href="https://reloop.sh/home"
+							aria-label="Reloop home"
+							className="transition-opacity hover:opacity-80"
+						>
+							<Logo className="h-20" />
+						</a>
 					</div>
 					{/* Heading */}
 					<div className="mb-8 text-center">
@@ -297,7 +303,11 @@ export function PreferencesContent({
 
 					{/* Footer */}
 					<div className="mt-10 flex flex-col items-center gap-4">
-						<div className="flex items-center justify-center gap-2">
+						<a
+							href="https://reloop.sh/home"
+							aria-label="Reloop home"
+							className="flex items-center justify-center gap-2 transition-opacity hover:opacity-80"
+						>
 							<span className="text-[11px] text-white/25">Powered by</span>
 							<div className="flex h-5 w-5 items-center justify-center rounded-lg bg-white/5 shadow-inner">
 								<Logo className="h-3 w-3" />
@@ -305,7 +315,7 @@ export function PreferencesContent({
 							<span className="font-semibold text-[11px] text-white/40 tracking-tight">
 								Reloop
 							</span>
-						</div>
+						</a>
 						<p className="text-center text-[11px] text-white/20 leading-relaxed">
 							Managing preferences for
 							<br />

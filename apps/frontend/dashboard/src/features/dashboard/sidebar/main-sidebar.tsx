@@ -63,13 +63,17 @@ export function MainSidebar() {
 					className="fixed top-0 bottom-0 left-0 z-50 flex h-screen w-60 flex-col overflow-hidden border-stroke-soft-100 border-r bg-bg-white-0 shadow-2xl dark:border-stroke-soft-100/40 dark:bg-black"
 				>
 					<div className="flex h-12 items-center justify-start px-3">
-						<div className="flex items-center gap-2">
+						<a
+							href="/home"
+							aria-label="Reloop home"
+							className="flex items-center gap-2"
+						>
 							<Logo className="-ml-1 h-8 w-8 shrink-0" />
 							<p className="font-semibold text-text-strong-950">Reloop</p>
 							<span className="inline-flex items-center rounded-full bg-bg-weak-50 px-2 py-0.5 font-bold text-[8px] text-text-sub-600 uppercase tracking-wide dark:bg-white/[0.06]">
 								Beta
 							</span>
-						</div>
+						</a>
 					</div>
 
 					<div className="relative flex-1 overflow-hidden px-2 py-2">
@@ -160,15 +164,25 @@ export function MainSidebar() {
 						)}
 					>
 						{!isTemplateEditor && isCollapsed ? (
-							<Logo className="h-7 w-7 shrink-0" />
+							<a
+								href="/home"
+								aria-label="Reloop home"
+								className="flex items-center justify-center"
+							>
+								<Logo className="h-7 w-7 shrink-0" />
+							</a>
 						) : (
-							<div className="flex items-center gap-2 overflow-hidden whitespace-nowrap">
+							<a
+								href="/home"
+								aria-label="Reloop home"
+								className="flex items-center gap-2 overflow-hidden whitespace-nowrap"
+							>
 								<Logo className="-ml-1 h-8 w-8 shrink-0" />
 								<p className="font-semibold text-text-strong-950">Reloop</p>
 								<span className="inline-flex items-center rounded-full bg-bg-weak-50 px-2 py-0.5 font-bold text-[8px] text-text-sub-600 uppercase tracking-wide dark:bg-white/[0.06]">
 									Beta
 								</span>
-							</div>
+							</a>
 						)}
 					</div>
 

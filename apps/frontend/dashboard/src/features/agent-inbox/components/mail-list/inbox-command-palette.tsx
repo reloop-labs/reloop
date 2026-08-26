@@ -653,7 +653,13 @@ export const InboxCommandPalette = ({
 
 			{/* Footer — logo left; labels then keycaps right (Raycast order) */}
 			<div className="flex h-10 shrink-0 items-center gap-3 border-black/[0.07] border-t px-3.5 text-[12px] text-mail-muted dark:border-white/[0.08]">
-				<Logo className="w-10 shrink-0" />
+				<a
+					href="/home"
+					aria-label="Reloop home"
+					className="transition-opacity hover:opacity-80"
+				>
+					<Logo className="w-10 shrink-0" />
+				</a>
 				<div className="ml-auto flex items-center gap-2.5">
 					<span className="inline-flex items-center gap-1.5">
 						<span>Open</span>

@@ -163,7 +163,7 @@ export function Footer() {
 						<div className="flex shrink-0 lg:w-40">
 							<div className="-ml-2 -mt-2 flex shrink-0 flex-col">
 								<a
-									href="/"
+									href="/home"
 									className="inline-flex shrink-0 items-center gap-2 sm:gap-2.5"
 									aria-label="Reloop home"
 								>
