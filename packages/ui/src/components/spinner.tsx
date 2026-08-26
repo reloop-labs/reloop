@@ -1,53 +1,26 @@
 import React from "react";
+import { LoadingDot } from "./dotmatrix/loading-dot";
 
 const Spinner = ({
 	size = 20,
-	color = "#000",
+	color,
+	className,
 }: {
 	size?: number;
 	color?: string;
+	className?: string;
 }) => {
-	const bars = Array.from({ length: 12 });
+	const dotSize = Math.max(1.8, Math.round(size * 0.125 * 10) / 10);
 
 	return (
-		<div
-			className="relative opacity-50"
-			style={{
-				height: size,
-				width: size,
-			}}
-		>
-			<div
-				className="absolute"
-				style={{
-					height: size,
-					width: size,
-					top: "50%",
-					left: "50%",
-				}}
-			>
-				{bars.map((_, i) => {
-					const deg = i * 30;
-					const delay = -(1.2 - i * 0.1);
-					return (
-						<div
-							key={i}
-							className="absolute animate-spinnerFade rounded-[6px] opacity-15"
-							style={{
-								height: "8%",
-								width: "24%",
-								backgroundColor: color || "var(--text-strong-950)",
-								top: "-3.9%",
-								left: "-10%",
-								transform: `rotate(${deg}deg) translate(146%)`,
-								animationDelay: `${delay}s`,
-							}}
-						/>
-					);
-				})}
-			</div>
-		</div>
+		<LoadingDot
+			size={size}
+			dotSize={dotSize}
+			color={color}
+			className={className}
+		/>
 	);
 };
 
 export default Spinner;
+export { Spinner, LoadingDot };

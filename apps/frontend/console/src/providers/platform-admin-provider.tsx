@@ -1,8 +1,8 @@
 "use client";
 
-import { Loader } from "@dot-loaders/react";
 import { authClient } from "@reloop/auth/client";
 import { PLATFORM_ADMIN_ROLE } from "@reloop/auth/roles";
+import Spinner from "@reloop/ui/spinner";
 import { useRouter } from "next/navigation";
 import { createContext, useContext, useEffect, useMemo, useRef } from "react";
 
@@ -82,7 +82,7 @@ export function PlatformAdminProvider({
 		<PlatformAdminContext.Provider value={value}>
 			{!isReady ? (
 				<div className="fixed inset-0 z-50 flex items-center justify-center bg-bg-white-0">
-					<Loader loader="pulse" />
+					<Spinner size={24} />
 				</div>
 			) : null}
 			{children}

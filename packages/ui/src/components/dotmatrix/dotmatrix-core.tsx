@@ -99,139 +99,92 @@ function buildSpiralInwardOrderToIndexMap(): number[] {
 	let t = 0;
 
 	while (top <= bottom && left <= right) {
-		for (let col = left; col <= right; col += 1) {
-			order[rowMajorIndex(top, col)] = t;
-			t += 1;
+		for (let c = left; c <= right; c++) {
+			order[t++] = rowMajorIndex(top, c);
 		}
-
-		for (let row = top + 1; row <= bottom; row += 1) {
-			order[rowMajorIndex(row, right)] = t;
-			t += 1;
+		top++;
+		for (let r = top; r <= bottom; r++) {
+			order[t++] = rowMajorIndex(r, right);
 		}
-
-		if (top < bottom) {
-			for (let col = right - 1; col >= left; col -= 1) {
-				order[rowMajorIndex(bottom, col)] = t;
-				t += 1;
+		right--;
+		if (top <= bottom) {
+			for (let c = right; c >= left; c--) {
+				order[t++] = rowMajorIndex(bottom, c);
 			}
+			bottom--;
 		}
-
-		if (left < right) {
-			for (let row = bottom - 1; row > top; row -= 1) {
-				order[rowMajorIndex(row, left)] = t;
-				t += 1;
+		if (left <= right) {
+			for (let r = bottom; r >= top; r--) {
+				order[t++] = rowMajorIndex(r, left);
 			}
+			left++;
 		}
-
-		top += 1;
-		bottom -= 1;
-		left += 1;
-		right += 1;
 	}
-
 	return order;
 }
 
-const SPIRAL_INWARD_ORDER: readonly number[] =
-	buildSpiralInwardOrderToIndexMap();
+export const SPIRAL_INWARD_ORDER_TO_INDEX = buildSpiralInwardOrderToIndexMap();
 
-export function spiralInwardNormFromIndex(index: number): number {
-	return SPIRAL_INWARD_ORDER[index]! / (MATRIX_SIZE * MATRIX_SIZE - 1);
+export const SPIRAL_INWARD_INDEX_TO_ORDER = new Array<number>(
+	MATRIX_SIZE * MATRIX_SIZE,
+);
+for (let order = 0; order < SPIRAL_INWARD_ORDER_TO_INDEX.length; order++) {
+	const index = SPIRAL_INWARD_ORDER_TO_INDEX[order];
+	if (index !== undefined) {
+		SPIRAL_INWARD_INDEX_TO_ORDER[index] = order;
+	}
 }
 
 export function spiralInwardOrderValue(index: number): number {
-	return SPIRAL_INWARD_ORDER[index]!;
+	return SPIRAL_INWARD_INDEX_TO_ORDER[index] ?? 0;
 }
 
-interface DotMatrixBaseProps extends DotMatrixCommonProps {
-	phase: DotMatrixPhase;
-	reducedMotion?: boolean;
-	onMouseEnter?: () => void;
-	onMouseLeave?: () => void;
-	animationResolver?: DotAnimationResolver;
+export function spiralInwardNormFromIndex(index: number): number {
+	const order = SPIRAL_INWARD_INDEX_TO_ORDER[index] ?? 0;
+	return order / (MATRIX_SIZE * MATRIX_SIZE - 1);
 }
 
 export function DotMatrixBase({
 	size = 24,
 	dotSize = 3,
-	color = "currentColor",
+	color,
 	speed = 1,
-	ariaLabel = "Loading",
+	ariaLabel,
 	className,
+	dotClassName,
 	dotShape = "circle",
 	muted = false,
 	bloom = false,
-	halo = 0,
-	dotClassName,
-	phase,
-	reducedMotion = false,
+	halo,
+	opacityBase = 0.16,
+	opacityMid = 0.32,
+	opacityPeak = 1,
+	phase = "running",
 	onMouseEnter,
 	onMouseLeave,
+	reducedMotion = false,
 	animationResolver,
-	cellPadding,
-}: DotMatrixBaseProps) {
-	const safeSpeed = speed > 0 ? speed : 1;
-	const speedScale = 1 / safeSpeed;
-	const gap =
-		cellPadding ??
-		Math.max(1, Math.floor((size - dotSize * MATRIX_SIZE) / (MATRIX_SIZE - 1)));
-	const matrixSpan = dotSize * MATRIX_SIZE + gap * (MATRIX_SIZE - 1);
-
-	const dmxVarStyle = {
-		width: matrixSpan,
-		height: matrixSpan,
-		"--dmx-speed": speedScale,
-		["--dmx-dot-size" as const]: `${dotSize}px`,
-		["--dmx-halo-level" as const]: halo,
-		["--dmx-dot-fill" as const]: color,
-		color,
-	} as unknown as CSSProperties;
-
-	const dots = Array.from({ length: MATRIX_SIZE * MATRIX_SIZE }).map(
-		(_, index) => {
-			const { row, col } = indexToCoord(index);
-			const isActive = true;
-			const distance = Math.hypot(row - CENTER, col - CENTER);
-			const angle = Math.atan2(row - CENTER, col - CENTER);
-			const radiusNormalizedValue = distance / Math.hypot(CENTER, CENTER);
-			const manhattan = Math.abs(row - CENTER) + Math.abs(col - CENTER);
-
-			const animationState = animationResolver
-				? animationResolver({
-						index,
-						row,
-						col,
-						distanceFromCenter: distance,
-						angleFromCenter: angle,
-						radiusNormalized: radiusNormalizedValue,
-						manhattanDistance: manhattan,
-						phase,
-						isActive,
-						reducedMotion,
-					})
-				: {};
-
-			const dotStyle = {
-				width: dotSize,
-				height: dotSize,
-				...animationState.style,
-			} as CSSProperties;
-
-			return (
-				<span
-					key={index}
-					aria-hidden="true"
-					className={cx("dmx-dot", dotClassName, animationState.className)}
-					style={dotStyle}
-				/>
-			);
-		},
-	);
+}: DotMatrixCommonProps & {
+	phase?: DotMatrixPhase;
+	onMouseEnter?: () => void;
+	onMouseLeave?: () => void;
+	reducedMotion?: boolean;
+	animationResolver: DotAnimationResolver;
+}) {
+	const rootStyle = {
+		width: size,
+		height: size,
+		"--dmx-speed": speed,
+		"--dmx-opacity-base": opacityBase,
+		"--dmx-opacity-mid": opacityMid,
+		"--dmx-opacity-peak": opacityPeak,
+		...(color ? { "--dmx-dot-fill": color } : {}),
+		...(halo !== undefined ? { "--dmx-halo-level": halo } : {}),
+	} as CSSProperties;
 
 	return (
-		<div
+		<span
 			role="status"
-			aria-live="polite"
 			aria-label={ariaLabel}
 			className={cx(
 				"dmx-root",
@@ -240,13 +193,51 @@ export function DotMatrixBase({
 				bloom && "dmx-bloom",
 				className,
 			)}
-			style={dmxVarStyle}
+			style={rootStyle}
 			onMouseEnter={onMouseEnter}
 			onMouseLeave={onMouseLeave}
 		>
-			<div className="dmx-grid" style={{ gap }}>
-				{dots}
-			</div>
-		</div>
+			<span className="dmx-grid" style={{ width: size, height: size }}>
+				{FULL_INDEXES.map((index) => {
+					const { row, col } = indexToCoord(index);
+					const distanceFromCenter = Math.hypot(row - CENTER, col - CENTER);
+					const angleFromCenter = Math.atan2(row - CENTER, col - CENTER);
+					const radiusNormalized = distanceFromCenter / (Math.SQRT2 * CENTER);
+					const manhattanDistance = Math.abs(row - CENTER) + Math.abs(col - CENTER);
+
+					const ctx: DotAnimationContext = {
+						index,
+						row,
+						col,
+						distanceFromCenter,
+						angleFromCenter,
+						radiusNormalized,
+						manhattanDistance,
+						phase,
+						isActive: true,
+						reducedMotion,
+					};
+
+					const anim = animationResolver(ctx);
+
+					return (
+						<span
+							key={index}
+							className="flex items-center justify-center"
+							style={{ width: size / MATRIX_SIZE, height: size / MATRIX_SIZE }}
+						>
+							<span
+								className={cx("dmx-dot", anim.className, dotClassName)}
+								style={{
+									width: dotSize,
+									height: dotSize,
+									...anim.style,
+								}}
+							/>
+						</span>
+					);
+				})}
+			</span>
+		</span>
 	);
 }

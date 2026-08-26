@@ -1,108 +1,66 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
-export type DotMatrixPhase =
-	| "idle"
-	| "collapse"
-	| "hoverRipple"
-	| "loadingRipple";
+export type DotMatrixPhase = "idle" | "running";
 
-export function usePrefersReducedMotion(): boolean {
-	const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
-
-	useEffect(() => {
-		const query = window.matchMedia("(prefers-reduced-motion: reduce)");
-
-		const update = () => {
-			setPrefersReducedMotion(query.matches);
-		};
-
-		update();
-		query.addEventListener("change", update);
-
-		return () => {
-			query.removeEventListener("change", update);
-		};
-	}, []);
-
-	return prefersReducedMotion;
-}
-
-interface UseDotMatrixPhasesOptions {
+export interface DotMatrixPhaseOptions {
 	animated?: boolean;
 	hoverAnimated?: boolean;
 	speed?: number;
 }
 
-interface DotMatrixPhasesResult {
-	phase: DotMatrixPhase;
-	onMouseEnter: () => void;
-	onMouseLeave: () => void;
+export function usePrefersReducedMotion(): boolean {
+	const [reduced, setReduced] = useState(false);
+
+	useEffect(() => {
+		if (typeof window === "undefined" || !window.matchMedia) {
+			return;
+		}
+		const mql = window.matchMedia("(prefers-reduced-motion: reduce)");
+		setReduced(mql.matches);
+
+		const handler = (event: MediaQueryListEvent) => {
+			setReduced(event.matches);
+		};
+
+		mql.addEventListener("change", handler);
+		return () => mql.removeEventListener("change", handler);
+	}, []);
+
+	return reduced;
 }
 
 export function useDotMatrixPhases({
-	animated = false,
+	animated = true,
 	hoverAnimated = false,
-	speed = 1,
-}: UseDotMatrixPhasesOptions): DotMatrixPhasesResult {
-	const safeSpeed = speed > 0 ? speed : 1;
-	const autoRun = Boolean(animated && !hoverAnimated);
-	const [hoverPhase, setHoverPhase] = useState<DotMatrixPhase>("idle");
-	const timeouts = useRef<number[]>([]);
-	const hoverGen = useRef(0);
-
-	const clearTimers = useCallback(() => {
-		for (let i = 0; i < timeouts.current.length; i += 1) {
-			window.clearTimeout(timeouts.current[i]!);
-		}
-		timeouts.current = [];
-	}, []);
+}: DotMatrixPhaseOptions = {}) {
+	const [isHovered, setIsHovered] = useState(false);
+	const [isMounted, setIsMounted] = useState(false);
 
 	useEffect(() => {
-		hoverGen.current += 1;
-		clearTimers();
-		return clearTimers;
-	}, [autoRun, hoverAnimated, clearTimers]);
+		setIsMounted(true);
+	}, []);
 
-	const onMouseEnter = useCallback(() => {
-		if (!hoverAnimated || autoRun) {
-			return;
+	const phase: DotMatrixPhase =
+		animated || (hoverAnimated && isHovered) ? "running" : "idle";
+
+	const onMouseEnter = () => {
+		if (hoverAnimated) {
+			setIsHovered(true);
 		}
-		clearTimers();
-		const gen = ++hoverGen.current;
-		setHoverPhase("collapse");
-		const collapseMs = Math.max(1, Math.round(300 / safeSpeed));
-		const id = window.setTimeout(() => {
-			if (hoverGen.current !== gen) {
-				return;
-			}
-			setHoverPhase("hoverRipple");
-		}, collapseMs);
-		timeouts.current.push(id);
-	}, [hoverAnimated, autoRun, safeSpeed, clearTimers]);
+	};
 
-	const onMouseLeave = useCallback(() => {
-		if (!hoverAnimated || autoRun) {
-			return;
+	const onMouseLeave = () => {
+		if (hoverAnimated) {
+			setIsHovered(false);
 		}
-		hoverGen.current += 1;
-		clearTimers();
-		setHoverPhase("idle");
-	}, [hoverAnimated, autoRun, clearTimers]);
+	};
 
-	const phase: DotMatrixPhase = autoRun
-		? "loadingRipple"
-		: hoverAnimated
-			? hoverPhase
-			: "idle";
-
-	return useMemo(
-		() => ({
-			phase,
-			onMouseEnter,
-			onMouseLeave,
-		}),
-		[phase, onMouseEnter, onMouseLeave],
-	);
+	return {
+		phase: isMounted ? phase : "idle",
+		isHovered,
+		onMouseEnter,
+		onMouseLeave,
+	};
 }

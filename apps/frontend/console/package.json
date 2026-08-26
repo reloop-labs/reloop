@@ -9,7 +9,6 @@
 		"lint": "next lint"
 	},
 	"dependencies": {
-		"@dot-loaders/react": "catalog:ui",
 		"@hookform/resolvers": "catalog:ui",
 		"@reloop/auth": "workspace:*",
 		"@reloop/tailwind": "workspace:*",
