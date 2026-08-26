@@ -74,14 +74,14 @@ const TOOL_VISUAL_MAP: Record<string, ToolVisualMeta> = {
 	},
 	"email-validator": {
 		icon: "mail-check",
-		badge: "Validation",
+		badge: "Deliverability",
 		badgeColor:
 			"bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/20",
 		glowColor: "group-hover:border-emerald-500/40",
 		features: [
-			"Syntax & format verification",
-			"Disposable provider detection",
-			"DNS MX record lookups",
+			"Single email & bulk CSV upload (up to 1,000)",
+			"Disposable, role & free-provider detection",
+			"Live MX DNS lookups & list health %",
 		],
 	},
 	"deliverability-tester": {

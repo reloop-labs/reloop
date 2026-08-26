@@ -294,6 +294,133 @@ export namespace ToolsModel {
 		recommendations: t.Array(t.String()),
 	});
 
+	export const emailHealthState = t.Union([
+		t.Literal("deliverable"),
+		t.Literal("undeliverable"),
+		t.Literal("risky"),
+		t.Literal("unknown"),
+	]);
+
+	export const emailHealthReason = t.Union([
+		t.Literal("accepted_email"),
+		t.Literal("rejected_email"),
+		t.Literal("no_mx_records"),
+		t.Literal("disposable_domain"),
+		t.Literal("invalid_syntax"),
+		t.Literal("role_based"),
+		t.Literal("low_deliverability"),
+	]);
+
+	export const emailHealthAttributes = t.Object({
+		free: t.Boolean(),
+		role: t.Boolean(),
+		disposable: t.Boolean(),
+		acceptAll: t.Boolean(),
+		tag: t.Boolean(),
+		numericalCharacters: t.Number(),
+		alphabeticalCharacters: t.Number(),
+		unicodeSymbols: t.Number(),
+		mailboxFull: t.Boolean(),
+		noReply: t.Boolean(),
+		secureEmailGateway: t.Boolean(),
+	});
+
+	export const emailHealthMailServer = t.Object({
+		smtpProvider: t.Union([t.String(), t.Null()]),
+		mxRecord: t.Union([t.String(), t.Null()]),
+		mxRecords: t.Array(t.String()),
+		implicitMxRecord: t.Boolean(),
+		hasMx: t.Boolean(),
+	});
+
+	export const healthPresentation = t.Object({
+		status: t.Union([t.Literal("pass"), t.Literal("fail"), t.Literal("warn")]),
+		summary: t.String({
+			description: "One-line health summary derived from verdict and flags.",
+		}),
+		state: emailHealthState,
+		score: t.Number({ minimum: 0, maximum: 100 }),
+		reason: emailHealthReason,
+		user: t.String(),
+		domain: t.Union([t.String(), t.Null()]),
+		tag: t.Union([t.String(), t.Null()]),
+		attributes: emailHealthAttributes,
+		mailServer: emailHealthMailServer,
+	});
+
+	export const emailHealthCheckBody = checkBody;
+	export const emailHealthCheckQuery = checkQuery;
+
+	export const emailHealthCheckResponse = t.Composite([
+		checkResponse,
+		t.Object({
+			health: healthPresentation,
+		}),
+	]);
+
+	export const batchCreateBody = t.Object({
+		emails: t.Optional(t.Array(t.String())),
+		file: t.Optional(t.Any()),
+	});
+
+	export const batchCreateResponse = t.Object({
+		token: t.String(),
+		status: t.Literal("queued"),
+		pollUrl: t.String(),
+	});
+
+	export const batchRowResult = t.Object({
+		email: t.String(),
+		rowNumber: t.Number(),
+		domain: t.Union([t.String(), t.Null()]),
+		verdict: t.Union([
+			t.Literal("invalid"),
+			t.Literal("disposable"),
+			t.Literal("risky"),
+			t.Literal("deliverable"),
+		]),
+		isValidSyntax: t.Boolean(),
+		isDisposable: t.Boolean(),
+		isRoleAddress: t.Boolean(),
+		isFreeProvider: t.Boolean(),
+		mxRecords: t.Array(t.String()),
+		confidence: t.Number(),
+		riskScore: t.Number(),
+		flags: t.Array(t.String()),
+		health: healthPresentation,
+	});
+
+	export const batchSummary = t.Object({
+		totalUploaded: t.Number(),
+		totalUnique: t.Number(),
+		duplicatesRemoved: t.Number(),
+		deliverableCount: t.Number(),
+		riskyCount: t.Number(),
+		disposableCount: t.Number(),
+		invalidCount: t.Number(),
+		noMxCount: t.Number(),
+		avgRiskScore: t.Number(),
+		healthyPct: t.Number(),
+	});
+
+	export const batchPollResponse = t.Object({
+		token: t.String(),
+		status: t.Union([
+			t.Literal("queued"),
+			t.Literal("running"),
+			t.Literal("done"),
+			t.Literal("failed"),
+		]),
+		createdAt: t.String(),
+		completedAt: t.Union([t.String(), t.Null()]),
+		totalUploaded: t.Number(),
+		totalUnique: t.Number(),
+		duplicatesRemoved: t.Number(),
+		results: t.Array(batchRowResult),
+		summary: t.Union([batchSummary, t.Null()]),
+		error: t.Union([t.String(), t.Null()]),
+	});
+
 	export const errorResponse = t.Object({
 		message: t.String(),
 		why: t.Optional(t.String()),
@@ -303,6 +430,12 @@ export namespace ToolsModel {
 
 	export type CheckBody = typeof checkBody.static;
 	export type CheckResponse = typeof checkResponse.static;
+	export type HealthPresentation = typeof healthPresentation.static;
+	export type EmailHealthCheckResponse = typeof emailHealthCheckResponse.static;
+	export type BatchCreateResponse = typeof batchCreateResponse.static;
+	export type BatchPollResponse = typeof batchPollResponse.static;
+	export type BatchRowResult = typeof batchRowResult.static;
+	export type BatchSummary = typeof batchSummary.static;
 	export type SpamCheckBody = typeof spamCheckBody.static;
 	export type SpamCheckResponse = typeof spamCheckResponse.static;
 	export type BlocklistCheckBody = typeof blocklistCheckBody.static;

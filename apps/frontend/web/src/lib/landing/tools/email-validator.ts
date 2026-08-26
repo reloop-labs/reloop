@@ -6,12 +6,14 @@ export const config: ToolDefinition = {
 	toolType: "email-validator",
 	titleLines: ["Free Email", "Validator"],
 	description:
-		"Validate email addresses instantly. Check syntax, domain format, and common typos before you send.",
+		"Check email deliverability health instantly. Verify syntax, disposable domains, role addresses, and active MX records for single addresses or upload up to 1,000 emails via CSV.",
 	keywords: [
+		"email health checker",
 		"email validator",
-		"verify email address",
-		"email validation tool",
-		"check email format",
+		"verify email list",
+		"disposable email detector",
+		"bulk email verifier",
+		"check mx records",
 		"free email checker",
 	],
 	primaryCta: {

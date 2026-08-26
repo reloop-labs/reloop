@@ -16,5 +16,9 @@ export const toolsConfig = {
 		rateLimitWindowSeconds: 60,
 		testSessionTtlSeconds: 86400, // 24 hours
 		maxSessionPerIpPerHour: 30,
+		maxBatchAddresses: 1000,
+		maxBatchCsvBytes: 512 * 1024, // 512 KB
+		batchJobTtlSeconds: 3600, // 1 hour
+		maxBatchJobsPerIpPerHour: 5,
 	},
 };

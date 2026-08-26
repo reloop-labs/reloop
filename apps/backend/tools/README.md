@@ -15,6 +15,10 @@ consumer providers. Powers the [temp email checker](https://reloop.sh/tools/temp
 |---|---|---|
 | `POST` | `/api/tools/v1/check` | Check an address or bare domain |
 | `GET` | `/api/tools/v1/check?email=…` | Same, for links and `curl` |
+| `POST` | `/api/tools/v1/email-health-check` | Check single email deliverability health |
+| `GET` | `/api/tools/v1/email-health-check?email=…` | Same, for links and `curl` |
+| `POST` | `/api/tools/v1/email-health-check/batch` | Submit async batch email health check (up to 1,000 addresses) |
+| `GET` | `/api/tools/v1/email-health-check/batch/:token` | Poll batch job status and results |
 | `POST` | `/api/tools/v1/spam-check` | Check email subject & copy spam score |
 | `GET` | `/api/tools/v1/spam-check?subject=…&body=…` | Same, for links and `curl` |
 | `POST` | `/api/tools/v1/blocklist-check` | Look up an IP or domain name on 23 public DNS blocklists |

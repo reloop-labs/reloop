@@ -59,3 +59,50 @@ export async function lookupMxRecords(domain: string): Promise<MxLookupResult> {
 		return { status: "error", records: [] };
 	}
 }
+
+export async function checkImplicitMx(domain: string): Promise<boolean> {
+	try {
+		const ips = await withDeadline(publicResolver.resolve4(domain), 1000, "A");
+		return Array.isArray(ips) && ips.length > 0;
+	} catch {
+		return false;
+	}
+}
+
+export function detectSmtpProvider(mxRecords: string[]): string | null {
+	if (mxRecords.length === 0) return null;
+	const joined = mxRecords.join(" ").toLowerCase();
+	if (
+		joined.includes("google") ||
+		joined.includes("googlemail") ||
+		joined.includes("aspmx")
+	) {
+		return "Google Workspace";
+	}
+	if (
+		joined.includes("outlook") ||
+		joined.includes("microsoft") ||
+		joined.includes("office365")
+	) {
+		return "Microsoft 365";
+	}
+	if (joined.includes("protonmail") || joined.includes("proton.me")) {
+		return "Proton Mail";
+	}
+	if (joined.includes("zoho")) {
+		return "Zoho Mail";
+	}
+	if (joined.includes("icloud") || joined.includes("apple")) {
+		return "Apple iCloud";
+	}
+	if (joined.includes("yahoo") || joined.includes("yahoodns")) {
+		return "Yahoo Mail";
+	}
+	if (joined.includes("fastmail")) {
+		return "Fastmail";
+	}
+	if (joined.includes("inbound.reloop.sh")) {
+		return "Reloop";
+	}
+	return null;
+}

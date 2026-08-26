@@ -67,6 +67,8 @@ const toolsService = new Elysia({
 				"/v1/blocklist-check",
 				"/v1/deliverability-test",
 				"/v1/deliverability-test/inject",
+				"/v1/email-health-check",
+				"/v1/email-health-check/batch",
 			],
 		}),
 	)

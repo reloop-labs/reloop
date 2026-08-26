@@ -36,7 +36,7 @@ export const reasons = [
 			"Queries sending IPs on Spamhaus ZEN, Barracuda, and SpamCop, and sender domains on Spamhaus DBL, URIBL, and SURBL.",
 	},
 	{
-		icon: "sliders" as const,
+		icon: "sliders-horiz-2" as const,
 		title: "Rspamd & Content Heuristics",
 		description:
 			"Extracts live Rspamd spam symbols, score deductions, deceptive trigger keywords, and uppercase formatting penalties.",
