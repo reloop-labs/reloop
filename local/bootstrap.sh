@@ -17,6 +17,7 @@ FORCE=0
 SKIP_DOCKER=0
 SKIP_HOSTS=0
 SKIP_TLS=0
+SKIP_ONBOARD=0
 
 for arg in "$@"; do
   case "$arg" in
@@ -25,6 +26,7 @@ for arg in "$@"; do
     --skip-docker) SKIP_DOCKER=1 ;;
     --skip-hosts) SKIP_HOSTS=1 ;;
     --skip-tls) SKIP_TLS=1 ;;
+    --skip-onboard) SKIP_ONBOARD=1 ;;
     -h|--help)
       cat <<'EOF'
 Reloop local setup
@@ -246,6 +248,26 @@ if [ "$SKIP_DOCKER" -eq 1 ]; then
 else
   bun db:push
   ok "Schema applied"
+fi
+
+# ---------------------------------------------------------------------------
+# Optional: run local onboarding helper (if present)
+# ---------------------------------------------------------------------------
+ONBOARD_SCRIPT="$ROOT/local/onboarding.sh"
+if [ "$SKIP_ONBOARD" -eq 0 ] && [ -f "$ONBOARD_SCRIPT" ]; then
+  if [ -n "${AUTO_ONBOARD-}" ]; then
+    info "AUTO_ONBOARD is set; running local/onboarding.sh"
+    bash "$ONBOARD_SCRIPT"
+  else
+    echo ""
+    read -r -p "Run local/onboarding.sh now to start services and write local/.env? [Y/n] " run_onboard
+    run_onboard=${run_onboard:-Y}
+    if [[ "$run_onboard" =~ ^([yY]) ]]; then
+      bash "$ONBOARD_SCRIPT"
+    else
+      info "Skipped running local/onboarding.sh"
+    fi
+  fi
 fi
 
 # ---------------------------------------------------------------------------
