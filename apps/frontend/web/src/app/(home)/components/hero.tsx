@@ -176,7 +176,7 @@ export function Hero({ variant = "default" }: HeroProps) {
 			className="relative flex min-h-dvh flex-col bg-transparent"
 		>
 			{variant === "self-host" ? (
-				<div className="relative mx-auto flex w-full max-w-5xl flex-col items-center px-6 pt-36 pb-20 text-center sm:px-8 sm:pt-44 sm:pb-24 md:max-w-7xl lg:px-12 lg:pt-52 lg:pb-28">
+				<div className="relative mx-auto flex w-full max-w-5xl flex-col items-center border-stroke-soft-200 border-x px-6 pt-36 pb-20 text-center sm:px-8 sm:pt-44 sm:pb-24 md:max-w-7xl lg:px-12 lg:pt-52 lg:pb-28 dark:border-white/10">
 					<h1 className="max-w-4xl text-center font-semibold text-[2.5rem] text-text-strong-950 leading-[1.06] tracking-[-0.04em] sm:text-[3.5rem] lg:text-[4.25rem] dark:text-white">
 						Self-Host Reloop
 						<br />
@@ -209,7 +209,7 @@ export function Hero({ variant = "default" }: HeroProps) {
 					</div>
 				</div>
 			) : (
-				<div className="relative mx-auto grid w-full max-w-5xl items-center gap-10 px-6 pt-24 pb-14 sm:px-8 sm:pt-28 sm:pb-16 md:max-w-7xl lg:grid-cols-[1.1fr_1fr] lg:gap-6 lg:px-12 lg:pt-32 lg:pb-20">
+				<div className="relative mx-auto grid w-full max-w-5xl items-center gap-10 border-stroke-soft-200 border-x px-6 pt-24 pb-14 sm:px-8 sm:pt-28 sm:pb-16 md:max-w-7xl lg:grid-cols-[1.1fr_1fr] lg:gap-6 lg:px-12 lg:pt-32 lg:pb-20 dark:border-white/10">
 					<div className="flex flex-col items-start text-left">
 						<Link
 							href="/compare/resend"
@@ -299,7 +299,7 @@ export function Hero({ variant = "default" }: HeroProps) {
 			<div className="relative w-full flex-1 overflow-hidden bg-bg-white-0 dark:bg-black">
 				<div
 					ref={panelRef}
-					className="relative z-10 mx-auto flex h-dvh w-full max-w-5xl flex-col px-3 pt-10 pb-10 sm:px-6 sm:pt-14 sm:pb-14 md:max-w-7xl lg:px-8 lg:pt-20 lg:pb-16"
+					className="relative z-10 mx-auto flex h-dvh w-full max-w-5xl flex-col border-stroke-soft-200 border-x px-3 pt-10 pb-10 sm:px-6 sm:pt-14 sm:pb-14 md:max-w-7xl lg:px-8 lg:pt-20 lg:pb-16 dark:border-white/10"
 				>
 					<HeroDemoPlaybackProvider started={isScrolledHalf}>
 						<HeroWindowChrome

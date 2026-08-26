@@ -47,6 +47,7 @@ export default function Home() {
 			<JsonLd data={homeSchema} />
 			<Hero />
 			<div className="relative mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-200 border-x md:max-w-7xl dark:border-white/10">
+				<SectionSeparator />
 				<LanguageExplorer
 					framed={false}
 					showTopRule={false}
