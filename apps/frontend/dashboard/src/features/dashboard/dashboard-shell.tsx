@@ -7,6 +7,7 @@ import { CommandMenuProvider } from "#/features/dashboard/command-menu-context";
 import { AiPanel } from "#/features/dashboard/layout/ai-panel";
 import { OpenSupportFromQuery } from "#/features/dashboard/open-support-from-query";
 import { useUIStore } from "#/store/use-ui-store";
+import { FloatingSupportButton } from "./floating-support-button";
 import { PageHeader } from "./page-header/page-header";
 import { MainSidebar } from "./sidebar/main-sidebar";
 
@@ -37,6 +38,7 @@ export function DashboardShell({ children }: { children: ReactNode }) {
 					<main className="relative flex min-w-0 flex-1 flex-col overflow-hidden">
 						{children}
 					</main>
+					<FloatingSupportButton />
 					<CommandMenuGlobal />
 				</div>
 			</CommandMenuProvider>
@@ -66,6 +68,7 @@ export function DashboardShell({ children }: { children: ReactNode }) {
 						{isAiPanelOpen ? <AiPanel /> : null}
 					</AnimatePresence>
 				</main>
+				<FloatingSupportButton />
 				<CommandMenuGlobal />
 			</div>
 		</CommandMenuProvider>
