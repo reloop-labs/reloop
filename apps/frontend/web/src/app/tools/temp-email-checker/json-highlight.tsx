@@ -20,10 +20,10 @@ export function highlightJson(code: string): ReactNode[] {
 			<span
 				key={`j${key++}`}
 				className={cn(
-					isKey && "text-white",
-					!isKey && str && "text-[#4ea1ff]",
-					literal && "text-white/45",
-					number && "text-[#4ea1ff]",
+					isKey && "text-text-strong-950 dark:text-white",
+					!isKey && str && "text-primary-base dark:text-[#4ea1ff]",
+					literal && "text-text-soft-400 dark:text-white/45",
+					number && "text-primary-base dark:text-[#4ea1ff]",
 				)}
 			>
 				{text}
@@ -47,8 +47,13 @@ export function RawJsonBlock({
 		typeof value === "string" ? value : JSON.stringify(value, null, 2);
 
 	return (
-		<div className={cn("overflow-hidden rounded-xl bg-black", className)}>
-			<pre className="overflow-x-auto p-4 font-mono text-[13px] text-white/70 leading-[1.7] sm:p-5">
+		<div
+			className={cn(
+				"overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-sub-300/50 dark:border-white/10 dark:bg-black",
+				className,
+			)}
+		>
+			<pre className="overflow-x-auto p-4 font-mono text-[13px] text-text-strong-950 leading-[1.7] sm:p-5 dark:text-white/70">
 				<code>{highlightJson(code)}</code>
 			</pre>
 		</div>

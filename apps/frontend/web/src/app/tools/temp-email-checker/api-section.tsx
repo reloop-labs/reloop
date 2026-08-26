@@ -257,14 +257,14 @@ export function ApiSection() {
 							<span>· json</span>
 						</div>
 					</div>
-					<div className="overflow-x-auto bg-black px-4 py-6 sm:px-6 lg:px-8">
+					<div className="overflow-x-auto px-4 py-6 sm:px-6 lg:px-8">
 						<AnimatePresence mode="wait">
 							<motion.pre
 								key={jsonResult}
 								initial={{ opacity: 0.6 }}
 								animate={{ opacity: 1 }}
 								transition={{ duration: 0.15 }}
-								className="font-mono text-[13px] text-white/70 leading-[1.7]"
+								className="font-mono text-[13px] text-text-strong-950 leading-[1.7] dark:text-white/70"
 							>
 								<code>{highlightJson(jsonResult)}</code>
 							</motion.pre>
