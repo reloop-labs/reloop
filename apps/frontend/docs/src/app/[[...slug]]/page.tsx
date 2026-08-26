@@ -409,7 +409,7 @@ export default async function Page(props: {
 					{/* Right sidebar - Table of Contents (hidden on full-width API pages) */}
 					{!hideToc && (
 						<aside className="hidden border-stroke-soft-100 border-l xl:block dark:border-stroke-soft-100/40">
-							<div className="sticky top-0 h-[calc(100vh-3rem)] overflow-y-auto pt-8 pr-6 pl-6 md:pr-10">
+							<div className="scrollbar-thin [scrollbar-color:--alpha(var(--foreground)/20%)_transparent] [scrollbar-width:thin] sticky top-0 h-[calc(100vh-3rem)] overflow-y-auto pt-8 pr-6 pl-6 md:pr-10">
 								<TableOfContents items={page.data.toc as TOCItem[]} />
 							</div>
 						</aside>

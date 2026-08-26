@@ -172,7 +172,7 @@ export function SearchDialog({ open, onOpenChange, tree }: SearchDialogProps) {
 									</div>
 
 									{/* Results Area */}
-									<div className="max-h-[60vh] overflow-y-auto p-2">
+									<div className="scrollbar-thin [scrollbar-color:--alpha(var(--foreground)/20%)_transparent] [scrollbar-width:thin] max-h-[60vh] overflow-y-auto p-2">
 										{query === "" ? (
 											<div className="px-4 py-12 text-center">
 												<div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-bg-weak-50 dark:bg-white/5">

@@ -77,7 +77,7 @@ export function DocsLayout({ children, tree, pathname }: DocsLayoutProps) {
 				<main className="relative order-2 flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-bg-white-0 dark:bg-black">
 					<div
 						id="nd-page"
-						className="flex-1 overflow-y-auto overflow-x-hidden"
+						className="scrollbar-thin [scrollbar-color:--alpha(var(--foreground)/20%)_transparent] [scrollbar-width:thin] flex-1 overflow-y-auto overflow-x-hidden"
 					>
 						<div
 							className="min-h-full w-full border-stroke-soft-100 border-r transition-all duration-300 max-lg:border-l dark:border-stroke-soft-100/40"
@@ -143,7 +143,7 @@ export function DocsLayout({ children, tree, pathname }: DocsLayoutProps) {
 						</span>
 					</a>
 				</div>
-				<div className="h-[calc(100vh-3rem)] overflow-y-auto">
+				<div className="scrollbar-thin [scrollbar-color:--alpha(var(--foreground)/20%)_transparent] [scrollbar-width:thin] h-[calc(100vh-3rem)] overflow-y-auto">
 					<Sidebar
 						tree={tree}
 						isMobile

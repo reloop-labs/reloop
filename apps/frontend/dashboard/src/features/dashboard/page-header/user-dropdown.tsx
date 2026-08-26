@@ -2,9 +2,9 @@ import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useTheme } from "next-themes";
-import { useMemo, useRef, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { forwardRef, useMemo, useRef, useState } from "react";
 import { useSignOut } from "#/features/auth/session-query";
 import {
 	filterSettingsNavigation,
@@ -23,41 +23,41 @@ type HeaderUser = {
 	image?: string | null;
 };
 
-function UserDropdownItem({
-	itemRef,
-	onHoverEnter,
-	onHoverLeave,
-	className,
-	children,
-	...props
-}: React.ComponentPropsWithoutRef<typeof Dropdown.Item> & {
-	itemRef?: (el: HTMLElement | null) => void;
+interface UserDropdownItemProps
+	extends React.ComponentPropsWithoutRef<typeof Dropdown.Item> {
 	onHoverEnter?: () => void;
 	onHoverLeave?: () => void;
-}) {
-	const { groupProps } = usePlayAnimationOnHover();
-
-	return (
-		<Dropdown.Item
-			ref={itemRef}
-			className={cn("group", className)}
-			{...groupProps}
-			onPointerEnter={(e) => {
-				groupProps.onPointerEnter();
-				onHoverEnter?.();
-				props.onPointerEnter?.(e);
-			}}
-			onPointerLeave={(e) => {
-				groupProps.onPointerLeave();
-				onHoverLeave?.();
-				props.onPointerLeave?.(e);
-			}}
-			{...props}
-		>
-			{children}
-		</Dropdown.Item>
-	);
 }
+
+const UserDropdownItem = forwardRef<HTMLDivElement, UserDropdownItemProps>(
+	function UserDropdownItem(
+		{ onHoverEnter, onHoverLeave, className, children, ...props },
+		ref,
+	) {
+		const { groupProps } = usePlayAnimationOnHover();
+
+		return (
+			<Dropdown.Item
+				ref={ref}
+				className={cn("group", className)}
+				{...groupProps}
+				onPointerEnter={(e) => {
+					groupProps.onPointerEnter();
+					onHoverEnter?.();
+					props.onPointerEnter?.(e);
+				}}
+				onPointerLeave={(e) => {
+					groupProps.onPointerLeave();
+					onHoverLeave?.();
+					props.onPointerLeave?.(e);
+				}}
+				{...props}
+			>
+				{children}
+			</Dropdown.Item>
+		);
+	},
+);
 
 export function UserDropdown({ user }: { user: HeaderUser | null }) {
 	const { theme } = useTheme();
@@ -146,7 +146,6 @@ export function UserDropdown({ user }: { user: HeaderUser | null }) {
 				className="w-[275px] rounded-[22px] border border-stroke-soft-200 bg-bg-white-0 p-2 shadow-[0_12px_36px_rgba(0,0,0,0.12)] ring-0 dark:border-white/10 dark:bg-[#141415] dark:shadow-[0_12px_36px_rgba(0,0,0,0.4)]"
 				side="bottom"
 				align="end"
-				onOpenAutoFocus={(e) => e.preventDefault()}
 			>
 				{/* Top user header card */}
 				<div className="flex items-center justify-between rounded-[18px] border border-stroke-soft-200/80 bg-bg-weak-50/70 p-3 dark:border-white/[0.08] dark:bg-white/[0.04]">
@@ -187,7 +186,7 @@ export function UserDropdown({ user }: { user: HeaderUser | null }) {
 									return (
 										<UserDropdownItem
 											key={item.path}
-											itemRef={(el) => {
+											ref={(el) => {
 												if (el) itemRefs.current[index] = el;
 											}}
 											onHoverEnter={() => setHoverIdx(index)}
@@ -220,7 +219,7 @@ export function UserDropdown({ user }: { user: HeaderUser | null }) {
 							return (
 								<UserDropdownItem
 									key={item.path}
-									itemRef={(el) => {
+									ref={(el) => {
 										if (el) itemRefs.current[idx] = el;
 									}}
 									onHoverEnter={() => setHoverIdx(idx)}
@@ -251,7 +250,7 @@ export function UserDropdown({ user }: { user: HeaderUser | null }) {
 						})}
 
 						<UserDropdownItem
-							itemRef={(el) => {
+							ref={(el) => {
 								if (el) itemRefs.current[homeHoverIdx] = el;
 							}}
 							onHoverEnter={() => setHoverIdx(homeHoverIdx)}
@@ -293,7 +292,7 @@ export function UserDropdown({ user }: { user: HeaderUser | null }) {
 
 					<Dropdown.Group className="gap-0">
 						<UserDropdownItem
-							itemRef={(el) => {
+							ref={(el) => {
 								if (el) itemRefs.current[logoutHoverIdx] = el;
 							}}
 							onHoverEnter={() => setHoverIdx(logoutHoverIdx)}

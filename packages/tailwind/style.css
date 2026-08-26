@@ -1156,25 +1156,63 @@
  * while macOS trackpads already have momentum scrolling built in.
  */
 @layer base {
+	:root {
+		--foreground: #171717;
+	}
+
+	.dark,
+	[data-theme="dark"] {
+		--foreground: #ffffff;
+	}
+
+	* {
+		scrollbar-width: thin;
+		scrollbar-color: color-mix(in srgb, var(--foreground, currentColor) 20%, transparent) transparent;
+	}
+
 	html {
 		scroll-behavior: auto;
 		scrollbar-gutter: stable;
 		overscroll-behavior-y: none;
+		scrollbar-width: thin;
+		scrollbar-color: color-mix(in srgb, var(--foreground, currentColor) 20%, transparent) transparent;
 	}
 
 	body {
 		overscroll-behavior-y: none;
 	}
 
-	/*
-	 * Removed scroll-behavior: smooth from html:focus-within.
-	 * On Windows, CSS smooth-scroll makes wheel/trackpad scrolling feel
-	 * delayed and "heavy" because the browser interpolates every frame.
-	 * For anchor-link smooth scrolling, use element.scrollIntoView({ behavior: 'smooth' }) in JS instead.
-	 */
+	/* Webkit scrollbar styling */
+	::-webkit-scrollbar {
+		width: 6px;
+		height: 6px;
+	}
+
+	::-webkit-scrollbar-track {
+		background: transparent;
+	}
+
+	::-webkit-scrollbar-thumb {
+		background: color-mix(in srgb, var(--foreground, currentColor) 20%, transparent);
+		border-radius: 9999px;
+	}
+
+	::-webkit-scrollbar-thumb:hover {
+		background: color-mix(in srgb, var(--foreground, currentColor) 35%, transparent);
+	}
 }
 
 @layer utilities {
+	.scrollbar-thin {
+		scrollbar-width: thin;
+		scrollbar-color: color-mix(in srgb, var(--foreground, currentColor) 20%, transparent) transparent;
+	}
+
+	.scrollbar-custom {
+		scrollbar-width: thin;
+		scrollbar-color: color-mix(in srgb, var(--foreground, currentColor) 20%, transparent) transparent;
+	}
+
 	.scroll-native {
 		scroll-behavior: auto;
 		overscroll-behavior-y: none;

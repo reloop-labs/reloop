@@ -372,7 +372,7 @@ export function Sidebar({
 			{/* Navigation tree */}
 			<nav
 				ref={navRef}
-				className="scrollbar-thin relative flex-1 overflow-y-auto pt-0 pr-1.5 pb-0 pl-1"
+				className="scrollbar-thin [scrollbar-color:--alpha(var(--foreground)/20%)_transparent] [scrollbar-width:thin] relative flex-1 overflow-y-auto pt-0 pr-1.5 pb-0 pl-1"
 				onPointerLeave={() => setHoveredEl(null)}
 				onScroll={() => {
 					if (navRef.current) {
