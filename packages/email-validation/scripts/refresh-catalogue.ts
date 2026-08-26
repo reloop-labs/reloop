@@ -1,23 +1,23 @@
-/**
- * Rewrites `data/upstream/` only. Reloop's curation in `data/local/` is never
- * touched: a refresh must never silently drop an allowlist entry we added for
- * a real customer.
- */
 import { readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
-const UPSTREAM =
-	"https://raw.githubusercontent.com/BillionVerify/disposable/main/data";
+const DOMAIN_SOURCES = [
+	"https://raw.githubusercontent.com/BillionVerify/disposable/main/data/domains.txt",
+	"https://raw.githubusercontent.com/kslr/disposable-email-domains/master/list.txt",
+	"https://raw.githubusercontent.com/wesbos/burner-email-providers/master/emails.txt",
+	"https://raw.githubusercontent.com/disposable-email-domains/disposable-email-domains/master/disposable_email_blocklist.conf",
+];
 
-const FILES = ["domains.txt", "wildcards.txt", "exceptions.txt"] as const;
+const WILDCARD_SOURCES = [
+	"https://raw.githubusercontent.com/BillionVerify/disposable/main/data/wildcards.txt",
+];
 
-const REQUEST_TIMEOUT_MS = 15_000;
+const EXCEPTION_SOURCES = [
+	"https://raw.githubusercontent.com/BillionVerify/disposable/main/data/exceptions.txt",
+];
 
-const MIN_LINES: Record<(typeof FILES)[number], number> = {
-	"domains.txt": 100_000,
-	"wildcards.txt": 0,
-	"exceptions.txt": 0,
-};
+const REQUEST_TIMEOUT_MS = 20_000;
+const MIN_DOMAINS_THRESHOLD = 150_000;
 
 const dryRun = process.argv.includes("--dry-run");
 
@@ -25,20 +25,59 @@ function localPath(name: string): string {
 	return fileURLToPath(new URL(`../data/upstream/${name}`, import.meta.url));
 }
 
-function entriesOf(contents: string): Set<string> {
+function normalizeEntry(line: string): string {
+	let entry = line.trim().toLowerCase();
+	if (entry.startsWith("@")) entry = entry.slice(1);
+	return entry;
+}
+
+async function fetchSource(url: string): Promise<Set<string>> {
 	const entries = new Set<string>();
-	for (const line of contents.split("\n")) {
-		const trimmed = line.trim().toLowerCase();
-		if (trimmed.length > 0 && !trimmed.startsWith("#")) entries.add(trimmed);
+	try {
+		const response = await fetch(url, {
+			signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+		});
+
+		if (!response.ok) {
+			console.warn(`⚠️ ${url}: HTTP ${response.status}`);
+			return entries;
+		}
+
+		const contents = await response.text();
+		for (const line of contents.split("\n")) {
+			const entry = normalizeEntry(line);
+			if (entry.length > 0 && !entry.startsWith("#")) {
+				entries.add(entry);
+			}
+		}
+	} catch (error) {
+		console.warn(`⚠️ ${url}: request failed — ${String(error)}`);
 	}
 	return entries;
 }
 
-function readExisting(name: string): string {
+async function aggregateSources(urls: string[]): Promise<Set<string>> {
+	const combined = new Set<string>();
+	const results = await Promise.all(urls.map((u) => fetchSource(u)));
+	for (const set of results) {
+		for (const item of set) {
+			combined.add(item);
+		}
+	}
+	return combined;
+}
+
+function readExisting(name: string): Set<string> {
 	try {
-		return readFileSync(localPath(name), "utf8");
+		const contents = readFileSync(localPath(name), "utf8");
+		const entries = new Set<string>();
+		for (const line of contents.split("\n")) {
+			const entry = normalizeEntry(line);
+			if (entry.length > 0 && !entry.startsWith("#")) entries.add(entry);
+		}
+		return entries;
 	} catch {
-		return "";
+		return new Set();
 	}
 }
 
@@ -49,43 +88,60 @@ function sample(values: string[], limit = 5): string {
 		: shown;
 }
 
-let failed = false;
+console.log("Fetching and aggregating multi-source disposable datasets...");
+
+const [nextDomains, nextWildcards, nextExceptions] = await Promise.all([
+	aggregateSources(DOMAIN_SOURCES),
+	aggregateSources(WILDCARD_SOURCES),
+	aggregateSources(EXCEPTION_SOURCES),
+]);
+
+if (nextDomains.size < MIN_DOMAINS_THRESHOLD) {
+	console.error(
+		`\n✗ domains.txt: only ${nextDomains.size} entries, expected at least ${MIN_DOMAINS_THRESHOLD} — refusing to overwrite`,
+	);
+	process.exit(1);
+}
+
+function localDataPath(name: string): string {
+	return fileURLToPath(new URL(`../data/local/${name}`, import.meta.url));
+}
+
+function readLocalList(name: string): Set<string> {
+	try {
+		const contents = readFileSync(localDataPath(name), "utf8");
+		const entries = new Set<string>();
+		for (const line of contents.split("\n")) {
+			const entry = normalizeEntry(line);
+			if (entry.length > 0 && !entry.startsWith("#")) entries.add(entry);
+		}
+		return entries;
+	} catch {
+		return new Set();
+	}
+}
+
+const localExceptions = readLocalList("exceptions.txt");
+const localFreeProviders = readLocalList("free-providers.txt");
+
+// Filter out known free providers and local exceptions from disposable domains
+for (const domain of localFreeProviders) {
+	nextDomains.delete(domain);
+}
+for (const domain of localExceptions) {
+	nextDomains.delete(domain);
+}
+
+const datasets = [
+	{ name: "domains.txt", next: nextDomains },
+	{ name: "wildcards.txt", next: nextWildcards },
+	{ name: "exceptions.txt", next: nextExceptions },
+] as const;
+
 let changed = false;
 
-for (const name of FILES) {
-	const url = `${UPSTREAM}/${name}`;
-
-	// The signal covers the body read, so text() must stay inside this try.
-	let contents: string;
-	try {
-		const response = await fetch(url, {
-			signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
-		});
-
-		if (!response.ok) {
-			console.error(`✗ ${name}: HTTP ${response.status} from ${url}`);
-			failed = true;
-			continue;
-		}
-
-		contents = await response.text();
-	} catch (error) {
-		console.error(`✗ ${name}: request failed — ${String(error)}`);
-		failed = true;
-		continue;
-	}
-
-	const next = entriesOf(contents);
-
-	if (next.size < MIN_LINES[name]) {
-		console.error(
-			`✗ ${name}: only ${next.size} entries, expected at least ${MIN_LINES[name]} — refusing to overwrite`,
-		);
-		failed = true;
-		continue;
-	}
-
-	const previous = entriesOf(readExisting(name));
+for (const { name, next } of datasets) {
+	const previous = readExisting(name);
 	const added = [...next].filter((entry) => !previous.has(entry)).sort();
 	const removed = [...previous].filter((entry) => !next.has(entry)).sort();
 
@@ -101,12 +157,10 @@ for (const name of FILES) {
 	if (added.length > 0) console.log(`    added:   ${sample(added)}`);
 	if (removed.length > 0) console.log(`    removed: ${sample(removed)}`);
 
-	if (!dryRun) writeFileSync(localPath(name), contents, "utf8");
-}
-
-if (failed) {
-	console.error("\nRefresh incomplete — some files were left untouched.");
-	process.exit(1);
+	if (!dryRun) {
+		const sortedList = [...next].sort().join("\n") + "\n";
+		writeFileSync(localPath(name), sortedList, "utf8");
+	}
 }
 
 if (dryRun) {

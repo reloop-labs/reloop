@@ -6,3 +6,4 @@
 # persistent services with paid tiers and business customers.
 zoho.com
 hushmail.com
+outlook.de
