@@ -3,7 +3,6 @@ import { cn } from "@reloop/ui/cn";
 import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-
 import { useTheme } from "next-themes";
 import { useMemo, useRef, useState } from "react";
 import { useSignOut } from "#/features/auth/session-query";
@@ -11,6 +10,8 @@ import {
 	filterSettingsNavigation,
 	settingsNavigation,
 } from "#/features/dashboard/navigation";
+import { SidebarNavIcon } from "#/features/dashboard/sidebar/sidebar-nav-icon";
+import { usePlayAnimationOnHover } from "#/features/dashboard/sidebar/use-play-animation-on-hover";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import { useOrgPermissions } from "#/features/settings/use-org-permissions";
 import { ThemeToggle } from "./theme-toggle";
@@ -21,6 +22,42 @@ type HeaderUser = {
 	email: string;
 	image?: string | null;
 };
+
+function UserDropdownItem({
+	itemRef,
+	onHoverEnter,
+	onHoverLeave,
+	className,
+	children,
+	...props
+}: React.ComponentPropsWithoutRef<typeof Dropdown.Item> & {
+	itemRef?: (el: HTMLElement | null) => void;
+	onHoverEnter?: () => void;
+	onHoverLeave?: () => void;
+}) {
+	const { groupProps } = usePlayAnimationOnHover();
+
+	return (
+		<Dropdown.Item
+			ref={itemRef}
+			className={cn("group", className)}
+			{...groupProps}
+			onPointerEnter={(e) => {
+				groupProps.onPointerEnter();
+				onHoverEnter?.();
+				props.onPointerEnter?.(e);
+			}}
+			onPointerLeave={(e) => {
+				groupProps.onPointerLeave();
+				onHoverLeave?.();
+				props.onPointerLeave?.(e);
+			}}
+			{...props}
+		>
+			{children}
+		</Dropdown.Item>
+	);
+}
 
 export function UserDropdown({ user }: { user: HeaderUser | null }) {
 	const { theme } = useTheme();
@@ -106,67 +143,89 @@ export function UserDropdown({ user }: { user: HeaderUser | null }) {
 			</Dropdown.Trigger>
 			<Dropdown.Content
 				sideOffset={8}
-				className="w-56"
+				className="w-[275px] rounded-[22px] border border-stroke-soft-200 bg-bg-white-0 p-2 shadow-[0_12px_36px_rgba(0,0,0,0.12)] ring-0 dark:border-white/10 dark:bg-[#141415] dark:shadow-[0_12px_36px_rgba(0,0,0,0.4)]"
 				side="bottom"
 				align="end"
+				onOpenAutoFocus={(e) => e.preventDefault()}
 			>
-				<div className="px-2.5 py-2 pb-1.5">
-					<p className="truncate font-medium text-text-sub-600 text-xs">
-						{user.email}
-					</p>
+				{/* Top user header card */}
+				<div className="flex items-center justify-between rounded-[18px] border border-stroke-soft-200/80 bg-bg-weak-50/70 p-3 dark:border-white/[0.08] dark:bg-white/[0.04]">
+					<div className="min-w-0 flex-1 pr-2">
+						<p className="truncate font-semibold text-[14.5px] text-text-strong-950 leading-tight dark:text-white">
+							{user.name || "User"}
+						</p>
+						<p className="mt-0.5 truncate font-normal text-[12.5px] text-text-sub-600 dark:text-white/55">
+							{user.email}
+						</p>
+					</div>
+					<div className="relative shrink-0 rounded-full bg-gradient-to-tr from-[#f43f5e] via-[#c084fc] to-[#38bdf8] p-[2.5px] shadow-sm">
+						<div className="rounded-full bg-bg-white-0 p-0.5 dark:bg-[#141415]">
+							<UserAvatar
+								name={user.name}
+								email={user.email}
+								image={user.image}
+								size="32"
+								className="size-9 rounded-full"
+								initialsClassName="text-[12px]"
+							/>
+						</div>
+					</div>
 				</div>
-				<div className="h-px bg-stroke-soft-100 dark:bg-stroke-soft-100/40" />
-				<div className="relative">
+
+				<div
+					className="relative mt-2 flex flex-col gap-0.5"
+					onPointerLeave={() => setHoverIdx(undefined)}
+				>
 					{workspaceItems.length > 0 ? (
 						<>
-							<Dropdown.Label className="px-2.5 pt-2 pb-1 font-semibold text-[10px] text-text-soft-400 uppercase tracking-wider">
+							<Dropdown.Label className="px-2.5 pt-1.5 pb-1 font-semibold text-[10px] text-text-soft-400 uppercase tracking-wider">
 								Organization
 							</Dropdown.Label>
-							<Dropdown.Group className="gap-0">
+							<Dropdown.Group className="gap-0.5">
 								{workspaceItems.map((item, index) => {
 									const isTeams = item.path === "/settings/teams";
 									return (
-										<Dropdown.Item
+										<UserDropdownItem
 											key={item.path}
-											ref={(el) => {
+											itemRef={(el) => {
 												if (el) itemRefs.current[index] = el;
 											}}
-											className="gap-2 px-2 py-1.5 data-[highlighted]:bg-transparent!"
-											onPointerEnter={() => setHoverIdx(index)}
-											onPointerLeave={() => setHoverIdx(undefined)}
+											onHoverEnter={() => setHoverIdx(index)}
+											onHoverLeave={() => setHoverIdx(undefined)}
+											className="relative z-10 gap-2.5 rounded-xl px-2.5 py-2 font-medium text-[13.5px] text-text-sub-600 outline-none transition-colors hover:text-text-strong-950 data-[highlighted]:bg-transparent! dark:text-white/70 dark:hover:text-white"
 											onClick={() => goToSettings(item.path)}
 										>
-											<Icon
+											<SidebarNavIcon
 												name={item.iconName}
-												className="h-4 w-4 text-text-sub-600"
+												className="h-4 w-4 shrink-0 text-text-sub-600 transition-colors group-hover:text-text-strong-950 dark:text-white/70 dark:group-hover:text-white"
 											/>
-											<span className="flex-1 truncate text-sm">
+											<span className="flex-1 truncate">
 												{isTeams ? "Invite user" : item.label}
 											</span>
-										</Dropdown.Item>
+										</UserDropdownItem>
 									);
 								})}
 							</Dropdown.Group>
-							<div className="my-1.5 h-px bg-stroke-soft-100 dark:bg-stroke-soft-100/40" />
+							<div className="my-1.5 h-px bg-stroke-soft-100 dark:bg-white/10" />
 						</>
 					) : null}
 
 					<Dropdown.Label className="px-2.5 pt-1.5 pb-1 font-semibold text-[10px] text-text-soft-400 uppercase tracking-wider">
 						Account
 					</Dropdown.Label>
-					<Dropdown.Group className="gap-0">
+					<Dropdown.Group className="gap-0.5">
 						{accountItems.map((item, index) => {
 							const idx = workspaceItems.length + index;
 							const isProfile = item.path === "/settings/profile";
 							return (
-								<Dropdown.Item
+								<UserDropdownItem
 									key={item.path}
-									ref={(el) => {
+									itemRef={(el) => {
 										if (el) itemRefs.current[idx] = el;
 									}}
-									className="gap-2 px-2 py-1.5 data-[highlighted]:bg-transparent!"
-									onPointerEnter={() => setHoverIdx(idx)}
-									onPointerLeave={() => setHoverIdx(undefined)}
+									onHoverEnter={() => setHoverIdx(idx)}
+									onHoverLeave={() => setHoverIdx(undefined)}
+									className="relative z-10 gap-2.5 rounded-xl px-2.5 py-2 font-medium text-[13.5px] text-text-sub-600 outline-none transition-colors hover:text-text-strong-950 data-[highlighted]:bg-transparent! dark:text-white/70 dark:hover:text-white"
 									onClick={() => goToSettings(item.path)}
 								>
 									{isProfile ? (
@@ -179,36 +238,39 @@ export function UserDropdown({ user }: { user: HeaderUser | null }) {
 											initialsClassName="text-[8px]"
 										/>
 									) : (
-										<Icon
+										<SidebarNavIcon
 											name={item.iconName}
-											className="h-4 w-4 text-text-sub-600"
+											className="h-4 w-4 shrink-0 text-text-sub-600 transition-colors group-hover:text-text-strong-950 dark:text-white/70 dark:group-hover:text-white"
 										/>
 									)}
-									<span className="flex-1 truncate text-sm">
+									<span className="flex-1 truncate">
 										{isProfile ? "My profile" : item.label}
 									</span>
-								</Dropdown.Item>
+								</UserDropdownItem>
 							);
 						})}
 
-						<Dropdown.Item
-							ref={(el) => {
+						<UserDropdownItem
+							itemRef={(el) => {
 								if (el) itemRefs.current[homeHoverIdx] = el;
 							}}
-							className="gap-2 px-2 py-1.5 data-[highlighted]:bg-transparent!"
-							onPointerEnter={() => setHoverIdx(homeHoverIdx)}
-							onPointerLeave={() => setHoverIdx(undefined)}
+							onHoverEnter={() => setHoverIdx(homeHoverIdx)}
+							onHoverLeave={() => setHoverIdx(undefined)}
+							className="relative z-10 gap-2.5 rounded-xl px-2.5 py-2 font-medium text-[13.5px] text-text-sub-600 outline-none transition-colors hover:text-text-strong-950 data-[highlighted]:bg-transparent! dark:text-white/70 dark:hover:text-white"
 							onClick={() => {
 								setIsOpen(false);
 								window.location.href = "/home";
 							}}
 						>
-							<Icon name="home" className="h-4 w-4 text-text-sub-600" />
-							<span className="flex-1 truncate text-sm">Home</span>
-						</Dropdown.Item>
+							<SidebarNavIcon
+								name="home"
+								className="h-4 w-4 shrink-0 text-text-sub-600 transition-colors group-hover:text-text-strong-950 dark:text-white/70 dark:group-hover:text-white"
+							/>
+							<span className="flex-1 truncate">Home</span>
+						</UserDropdownItem>
 
-						<div className="flex items-center justify-between px-2.5 py-1.5">
-							<div className="flex items-center gap-2">
+						<div className="flex items-center justify-between rounded-xl px-2.5 py-2">
+							<div className="flex items-center gap-2.5">
 								<Icon
 									name={
 										theme === "system"
@@ -217,9 +279,9 @@ export function UserDropdown({ user }: { user: HeaderUser | null }) {
 												? "moon"
 												: "sun"
 									}
-									className="h-4 w-4 text-text-sub-600"
+									className="h-4 w-4 text-text-sub-600 dark:text-white/70"
 								/>
-								<span className="font-medium text-sm text-text-sub-600">
+								<span className="font-medium text-[13.5px] text-text-sub-600 dark:text-white/70">
 									Theme
 								</span>
 							</div>
@@ -227,31 +289,31 @@ export function UserDropdown({ user }: { user: HeaderUser | null }) {
 						</div>
 					</Dropdown.Group>
 
-					<div className="my-1.5 h-px bg-stroke-soft-100 dark:bg-stroke-soft-100/40" />
+					<div className="my-1.5 h-px bg-stroke-soft-100 dark:bg-white/10" />
 
 					<Dropdown.Group className="gap-0">
-						<Dropdown.Item
-							ref={(el) => {
+						<UserDropdownItem
+							itemRef={(el) => {
 								if (el) itemRefs.current[logoutHoverIdx] = el;
 							}}
-							className="gap-2 px-2 py-1.5 text-red-500 data-[highlighted]:bg-transparent!"
-							onPointerEnter={() => setHoverIdx(logoutHoverIdx)}
-							onPointerLeave={() => setHoverIdx(undefined)}
+							onHoverEnter={() => setHoverIdx(logoutHoverIdx)}
+							onHoverLeave={() => setHoverIdx(undefined)}
+							className="relative z-10 gap-2.5 rounded-xl px-2.5 py-2 font-medium text-[13.5px] text-red-500 outline-none transition-colors hover:text-red-600 data-[highlighted]:bg-transparent! dark:hover:text-red-400"
 							onClick={() => void handleSignOut()}
 						>
 							<Icon
 								name="arrow-right-rec"
-								className="h-3.5 w-3.5 text-red-500"
+								className="h-3.5 w-3.5 text-red-500 transition-transform duration-200 group-hover:translate-x-0.5"
 							/>
-							<span className="flex-1 truncate text-sm">Log out</span>
-						</Dropdown.Item>
+							<span className="flex-1 truncate">Log out</span>
+						</UserDropdownItem>
 					</Dropdown.Group>
 
 					<AnimatedHoverBackground
 						rect={currentRect}
 						tabElement={currentTab}
 						isDanger={hoverIdx === logoutHoverIdx}
-						className="rounded-[10px]"
+						className="rounded-xl"
 					/>
 				</div>
 			</Dropdown.Content>
