@@ -216,7 +216,7 @@ export function LoginPage() {
 							>
 								{ctaLoading && <Spinner size={14} color="currentColor" />}
 								{ctaSuccess && (
-									<Icon name="check" className="h-4 w-4 shrink-0" />
+									<Icon name="check-circle" className="h-4 w-4 shrink-0" />
 								)}
 								<span>
 									{ctaSuccess

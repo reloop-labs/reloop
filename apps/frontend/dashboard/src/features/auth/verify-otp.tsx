@@ -266,7 +266,7 @@ export function VerifyOTP({
 							<DigitInput.Slot
 								key={index}
 								index={index}
-								className="size-11 shrink rounded-xl border-stroke-soft-200 bg-bg-white-0 text-base data-[active=true]:border-primary-base data-[active=true]:ring-primary-base/30 sm:size-12 sm:text-lg md:size-13"
+								className="size-11 shrink rounded-xl border-stroke-soft-200 bg-bg-white-0 text-base transition-colors duration-200 data-[active=true]:border-primary-base data-[active=true]:ring-primary-base/30 data-[success=true]:border-success-base! data-[success=true]:bg-success-lighter! data-[success=true]:text-success-base! data-[success=true]:ring-0! sm:size-12 sm:text-lg md:size-13"
 							/>
 						))}
 					</DigitInput.Group>

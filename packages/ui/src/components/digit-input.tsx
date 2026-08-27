@@ -104,19 +104,19 @@ export function InputOTPSlot({
 				aria-invalid={hasError}
 				data-success={isSuccess}
 				className={cn(
-					"group relative flex h-11 w-10 items-center justify-center rounded-[10px] border border-stroke-soft-200 bg-bg-weak-50 font-medium text-base",
+					"group relative flex h-11 w-10 items-center justify-center rounded-[10px] border border-stroke-soft-200 bg-bg-weak-50 font-medium text-base transition-colors duration-200",
 					"aria-invalid:border-error-base aria-invalid:bg-error-lighter data-[active=true]:aria-invalid:border-error-base data-[active=true]:aria-invalid:ring-2 data-[active=true]:aria-invalid:ring-error-base",
-					"data-[success=true]:border-success-base data-[success=true]:bg-success-lighter",
+					"data-[success=true]:border-success-base! data-[success=true]:bg-success-lighter! data-[success=true]:text-success-base!",
 					className,
 				)}
 				{...props}
 			>
 				{char && <InputOTPAnimatedNumber value={char} />}
 
-				{hasFakeCaret && <FakeCaret />}
+				{hasFakeCaret && !isSuccess && <FakeCaret />}
 
 				<AnimatePresence mode="wait">
-					{isActive && (
+					{isActive && !isSuccess && (
 						<motion.div
 							key={`${isActive}-${isMultiSelect}`}
 							layoutId={isMultiSelect ? `indicator-${index}` : "indicator"}
