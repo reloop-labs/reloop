@@ -32,6 +32,10 @@ export type ToolDefinition = LandingPageDefinition & {
 		| "deliverability-tester"
 		| "template-generator"
 		| "auth-checker"
+		| "bimi-checker"
+		| "spf-generator"
+		| "dkim-generator"
+		| "dmarc-generator"
 		| "subject-tester"
 		| "mobile-preview";
 };

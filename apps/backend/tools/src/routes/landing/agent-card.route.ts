@@ -70,5 +70,83 @@ export const agentCardRoute = new Elysia().get("/agent-card.json", () => ({
 				},
 			],
 		},
+		{
+			id: "bimi_check",
+			name: "BIMI Check",
+			description:
+				"Look up default._bimi for a domain, validate the BIMI record and logo URL, and confirm DMARC is at enforcement.",
+			method: "POST",
+			path: "/api/tools/v1/bimi-check",
+			tags: ["tools"],
+			inputSchema: {
+				domain: {
+					type: "string",
+					required: true,
+					description: "Domain name, e.g. example.com",
+				},
+			},
+			outputSchema: {
+				verdict: { type: "string", description: "pass | warn | fail" },
+				bimiRecord: { type: "string" },
+				dmarcEnforced: { type: "boolean" },
+			},
+			errorCodes: [400, 429],
+			examples: [
+				{
+					input: { domain: "example.com" },
+					output: { verdict: "fail", dmarcEnforced: false },
+				},
+			],
+		},
+		{
+			id: "spf_generate",
+			name: "SPF Record Generator",
+			description:
+				"Build a v=spf1 TXT record from IPs, includes, and a policy.",
+			method: "POST",
+			path: "/api/tools/v1/spf-generate",
+			tags: ["tools"],
+			inputSchema: {
+				domain: { type: "string", required: true },
+			},
+			outputSchema: { record: { type: "string" } },
+			errorCodes: [400, 429],
+			examples: [],
+		},
+		{
+			id: "dkim_generate",
+			name: "DKIM Record Generator",
+			description:
+				"Generate a 2048-bit RSA DKIM key pair. The private key is returned once and not stored.",
+			method: "POST",
+			path: "/api/tools/v1/dkim-generate",
+			tags: ["tools"],
+			inputSchema: {
+				domain: { type: "string", required: true },
+				selector: { type: "string", required: false },
+			},
+			outputSchema: {
+				dnsName: { type: "string" },
+				record: { type: "string" },
+			},
+			errorCodes: [400, 429],
+			examples: [],
+		},
+		{
+			id: "dmarc_generate",
+			name: "DMARC Record Generator",
+			description:
+				"Build a _dmarc TXT record from policy, rua/ruf, and alignment.",
+			method: "POST",
+			path: "/api/tools/v1/dmarc-generate",
+			tags: ["tools"],
+			inputSchema: {
+				domain: { type: "string", required: true },
+				policy: { type: "string", required: false },
+			},
+			outputSchema: { record: { type: "string" } },
+			errorCodes: [400, 429],
+			examples: [],
+		},
 	],
 }));

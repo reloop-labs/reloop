@@ -25,5 +25,5 @@ SPF alone does not protect the visible From header. That is why DMARC exists. Re
 			title: "Envelope",
 		},
 	],
-	relatedFeatureHref: "/tools/auth-checker",
+	relatedFeatureHref: "/tools/spf-generator",
 };

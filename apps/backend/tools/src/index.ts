@@ -69,6 +69,10 @@ const toolsService = new Elysia({
 				"/v1/deliverability-test/inject",
 				"/v1/email-health-check",
 				"/v1/email-health-check/batch",
+				"/v1/bimi-check",
+				"/v1/spf-generate",
+				"/v1/dkim-generate",
+				"/v1/dmarc-generate",
 			],
 		}),
 	)
@@ -104,7 +108,7 @@ const toolsService = new Elysia({
 			return {
 				message: "Invalid request",
 				why: "The query or JSON body did not match the schema for this endpoint.",
-				fix: "Check the OpenAPI spec for the required fields (email, subject/body, or target).",
+				fix: "Check the OpenAPI spec for the required fields for this endpoint.",
 			};
 		}
 

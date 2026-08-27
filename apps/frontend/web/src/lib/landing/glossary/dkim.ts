@@ -27,5 +27,5 @@ Reloop generates DKIM keys when you verify a domain and shows the DNS record to 
 			title: "Authentication",
 		},
 	],
-	relatedFeatureHref: "/tools/auth-checker",
+	relatedFeatureHref: "/tools/dkim-generator",
 };

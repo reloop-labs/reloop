@@ -23,6 +23,11 @@ consumer providers. Powers the [temp email checker](https://reloop.sh/tools/temp
 | `GET` | `/api/tools/v1/spam-check?subject=…&body=…` | Same, for links and `curl` |
 | `POST` | `/api/tools/v1/blocklist-check` | Look up an IP or domain name on 23 public DNS blocklists |
 | `GET` | `/api/tools/v1/blocklist-check?target=…` | Same, for links and `curl` |
+| `POST` | `/api/tools/v1/bimi-check` | Look up BIMI (`default._bimi`) and DMARC enforcement |
+| `GET` | `/api/tools/v1/bimi-check?domain=…` | Same, for links and `curl` |
+| `POST` | `/api/tools/v1/spf-generate` | Build a copy-pasteable SPF TXT record |
+| `POST` | `/api/tools/v1/dkim-generate` | Generate a 2048-bit DKIM key pair and TXT record |
+| `POST` | `/api/tools/v1/dmarc-generate` | Build a `_dmarc` TXT record |
 
 ```bash
 curl -X POST https://local.reloop.sh/api/tools/v1/check \

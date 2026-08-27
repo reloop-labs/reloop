@@ -421,6 +421,174 @@ export namespace ToolsModel {
 		error: t.Union([t.String(), t.Null()]),
 	});
 
+	const checkStatus = t.Union([
+		t.Literal("pass"),
+		t.Literal("warn"),
+		t.Literal("fail"),
+	]);
+
+	const recordWarning = t.Object({
+		severity: t.Union([t.Literal("warn"), t.Literal("fail")]),
+		code: t.String(),
+		detail: t.String(),
+		fix: t.String(),
+	});
+
+	export const bimiCheckBody = t.Object({
+		domain: t.String({
+			minLength: 1,
+			maxLength: 255,
+			description: "Domain to look up default._bimi and _dmarc for.",
+			examples: ["paypal.com", "example.com"],
+		}),
+	});
+
+	export const bimiCheckQuery = bimiCheckBody;
+
+	export const bimiCheckResponse = t.Object({
+		domain: t.String(),
+		queryName: t.String(),
+		verdict: checkStatus,
+		bimiRecord: t.Union([t.String(), t.Null()]),
+		logoUrl: t.Union([t.String(), t.Null()]),
+		authorityUrl: t.Union([t.String(), t.Null()]),
+		dmarcRecord: t.Union([t.String(), t.Null()]),
+		dmarcPolicy: t.Union([t.String(), t.Null()]),
+		dmarcPct: t.Union([t.Number(), t.Null()]),
+		dmarcEnforced: t.Boolean(),
+		logo: t.Object({
+			fetched: t.Boolean(),
+			contentType: t.Union([t.String(), t.Null()]),
+			tinyPsOk: t.Union([t.Boolean(), t.Null()]),
+			issues: t.Array(
+				t.Object({
+					status: checkStatus,
+					detail: t.String(),
+					fix: t.Optional(t.String()),
+				}),
+			),
+		}),
+		checks: t.Array(
+			t.Object({
+				id: t.String(),
+				label: t.String(),
+				status: checkStatus,
+				detail: t.String(),
+				record: t.Optional(t.String()),
+				fix: t.Optional(t.String()),
+			}),
+		),
+		recommendations: t.Array(t.String()),
+	});
+
+	export const spfGenerateBody = t.Object({
+		domain: t.String({
+			minLength: 1,
+			maxLength: 255,
+			examples: ["example.com"],
+		}),
+		ipv4: t.Optional(t.Array(t.String({ maxLength: 64 }), { maxItems: 20 })),
+		ipv6: t.Optional(t.Array(t.String({ maxLength: 64 }), { maxItems: 20 })),
+		includes: t.Optional(
+			t.Array(t.String({ maxLength: 255 }), { maxItems: 20 }),
+		),
+		a: t.Optional(t.Boolean()),
+		mx: t.Optional(t.Boolean()),
+		aHosts: t.Optional(t.Array(t.String({ maxLength: 255 }), { maxItems: 10 })),
+		mxHosts: t.Optional(
+			t.Array(t.String({ maxLength: 255 }), { maxItems: 10 }),
+		),
+		policy: t.Optional(
+			t.Union([
+				t.Literal("~all"),
+				t.Literal("-all"),
+				t.Literal("?all"),
+				t.Literal("+all"),
+			]),
+		),
+	});
+
+	export const spfGenerateResponse = t.Object({
+		domain: t.String(),
+		dnsName: t.String(),
+		record: t.String(),
+		lookupCount: t.Number(),
+		lookupLimit: t.Number(),
+		policy: t.Union([
+			t.Literal("~all"),
+			t.Literal("-all"),
+			t.Literal("?all"),
+			t.Literal("+all"),
+		]),
+		existingRecord: t.Union([t.String(), t.Null()]),
+		warnings: t.Array(recordWarning),
+	});
+
+	export const dkimGenerateBody = t.Object({
+		domain: t.String({
+			minLength: 1,
+			maxLength: 255,
+			examples: ["example.com"],
+		}),
+		selector: t.Optional(
+			t.String({
+				minLength: 1,
+				maxLength: 63,
+				examples: ["default", "reloop"],
+			}),
+		),
+	});
+
+	export const dkimGenerateResponse = t.Object({
+		domain: t.String(),
+		selector: t.String(),
+		dnsName: t.String(),
+		record: t.String(),
+		publicKey: t.String(),
+		privateKey: t.String(),
+		keyType: t.Literal("rsa"),
+		bits: t.Literal(2048),
+	});
+
+	export const dmarcGenerateBody = t.Object({
+		domain: t.String({
+			minLength: 1,
+			maxLength: 255,
+			examples: ["example.com"],
+		}),
+		policy: t.Optional(
+			t.Union([
+				t.Literal("none"),
+				t.Literal("quarantine"),
+				t.Literal("reject"),
+			]),
+		),
+		rua: t.Optional(t.String({ maxLength: 500 })),
+		ruf: t.Optional(t.String({ maxLength: 500 })),
+		aspf: t.Optional(t.Union([t.Literal("r"), t.Literal("s")])),
+		adkim: t.Optional(t.Union([t.Literal("r"), t.Literal("s")])),
+		pct: t.Optional(t.Integer({ minimum: 0, maximum: 100 })),
+		sp: t.Optional(
+			t.Union([
+				t.Literal("none"),
+				t.Literal("quarantine"),
+				t.Literal("reject"),
+			]),
+		),
+	});
+
+	export const dmarcGenerateResponse = t.Object({
+		domain: t.String(),
+		dnsName: t.String(),
+		record: t.String(),
+		policy: t.Union([
+			t.Literal("none"),
+			t.Literal("quarantine"),
+			t.Literal("reject"),
+		]),
+		warnings: t.Array(recordWarning),
+	});
+
 	export const errorResponse = t.Object({
 		message: t.String(),
 		why: t.Optional(t.String()),
@@ -440,4 +608,11 @@ export namespace ToolsModel {
 	export type SpamCheckResponse = typeof spamCheckResponse.static;
 	export type BlocklistCheckBody = typeof blocklistCheckBody.static;
 	export type BlocklistCheckResponse = typeof blocklistCheckResponse.static;
+	export type BimiCheckResponse = typeof bimiCheckResponse.static;
+	export type SpfGenerateBody = typeof spfGenerateBody.static;
+	export type SpfGenerateResponse = typeof spfGenerateResponse.static;
+	export type DkimGenerateBody = typeof dkimGenerateBody.static;
+	export type DkimGenerateResponse = typeof dkimGenerateResponse.static;
+	export type DmarcGenerateBody = typeof dmarcGenerateBody.static;
+	export type DmarcGenerateResponse = typeof dmarcGenerateResponse.static;
 }

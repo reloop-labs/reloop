@@ -27,5 +27,5 @@ Reloop's auth tooling helps you verify records as you tighten policy.`,
 			title: "BIMI",
 		},
 	],
-	relatedFeatureHref: "/tools/auth-checker",
+	relatedFeatureHref: "/tools/dmarc-generator",
 };

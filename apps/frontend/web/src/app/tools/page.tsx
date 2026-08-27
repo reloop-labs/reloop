@@ -12,12 +12,16 @@ export const instant = false;
 
 export const metadata = createLandingMetadata(
 	"Free Email & Developer Tools",
-	"Zero-setup online utilities to validate email addresses, analyze deliverability, test subject lines, check SPF/DKIM/DMARC DNS records, generate responsive templates, and preview mobile rendering.",
+	"Zero-setup online utilities to validate email addresses, analyze deliverability, check BIMI, generate SPF/DKIM/DMARC records, test subject lines, and preview mobile rendering.",
 	"/tools",
 	[
 		"free email tools",
 		"email validator",
 		"deliverability tester",
+		"BIMI checker",
+		"SPF generator",
+		"DKIM generator",
+		"DMARC generator",
 		"SPF checker",
 		"DKIM checker",
 		"DMARC lookup",
@@ -118,6 +122,54 @@ const TOOL_VISUAL_MAP: Record<string, ToolVisualMeta> = {
 			"SPF policy record check",
 			"DKIM signature verification",
 			"DMARC enforcement status",
+		],
+	},
+	"bimi-checker": {
+		icon: "globe",
+		badge: "DNS & Auth",
+		badgeColor:
+			"bg-teal-500/10 text-teal-700 dark:text-teal-400 border-teal-500/20",
+		glowColor: "group-hover:border-teal-500/40",
+		features: [
+			"default._bimi TXT lookup",
+			"HTTPS SVG Tiny PS check",
+			"DMARC enforcement required",
+		],
+	},
+	"spf-generator": {
+		icon: "file-text",
+		badge: "DNS & Auth",
+		badgeColor:
+			"bg-lime-500/10 text-lime-700 dark:text-lime-400 border-lime-500/20",
+		glowColor: "group-hover:border-lime-500/40",
+		features: [
+			"ip4 / ip6 / include / a / mx",
+			"10-lookup limit warnings",
+			"Copy-paste TXT record",
+		],
+	},
+	"dkim-generator": {
+		icon: "key",
+		badge: "DNS & Auth",
+		badgeColor:
+			"bg-cyan-500/10 text-cyan-700 dark:text-cyan-400 border-cyan-500/20",
+		glowColor: "group-hover:border-cyan-500/40",
+		features: [
+			"2048-bit RSA key pair",
+			"{selector}._domainkey name",
+			"Private key returned once",
+		],
+	},
+	"dmarc-generator": {
+		icon: "lock",
+		badge: "DNS & Auth",
+		badgeColor:
+			"bg-fuchsia-500/10 text-fuchsia-700 dark:text-fuchsia-400 border-fuchsia-500/20",
+		glowColor: "group-hover:border-fuchsia-500/40",
+		features: [
+			"p= none / quarantine / reject",
+			"rua / ruf / pct / alignment",
+			"_dmarc TXT ready to publish",
 		],
 	},
 	"subject-tester": {

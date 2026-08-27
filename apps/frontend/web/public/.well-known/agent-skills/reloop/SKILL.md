@@ -89,6 +89,10 @@ Web-based utilities for developers and email senders:
 - **Email Content & Spam Score Checker**: https://reloop.sh/tools/spam-score-checker
 - **Temp / Disposable Email Checker**: https://reloop.sh/tools/temp-email-checker
 - **DNS Auth & SPF/DKIM/DMARC Checker**: https://reloop.sh/tools/auth-checker
+- **BIMI Checker**: https://reloop.sh/tools/bimi-checker
+- **SPF Record Generator**: https://reloop.sh/tools/spf-generator
+- **DKIM Record Generator**: https://reloop.sh/tools/dkim-generator
+- **DMARC Record Generator**: https://reloop.sh/tools/dmarc-generator
 - **Deliverability & Spam Tester**: https://reloop.sh/tools/deliverability-tester
 - **Responsive Template Generator**: https://reloop.sh/tools/template-generator
 - **Subject Line Tester**: https://reloop.sh/tools/subject-tester

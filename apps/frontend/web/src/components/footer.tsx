@@ -61,6 +61,10 @@ const columns: FooterColumn[] = [
 				href: "/tools/deliverability-tester",
 			},
 			{ title: "Auth Checker", href: "/tools/auth-checker" },
+			{ title: "BIMI Checker", href: "/tools/bimi-checker" },
+			{ title: "SPF Generator", href: "/tools/spf-generator" },
+			{ title: "DKIM Generator", href: "/tools/dkim-generator" },
+			{ title: "DMARC Generator", href: "/tools/dmarc-generator" },
 		],
 	},
 	{
