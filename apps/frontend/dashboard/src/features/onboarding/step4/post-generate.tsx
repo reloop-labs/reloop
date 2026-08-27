@@ -171,17 +171,17 @@ export function PostGenerate({
 							transition={{ type: "spring", duration: 0.35, bounce: 0 }}
 							className="overflow-hidden"
 						>
-							<div className="flex flex-col gap-3 rounded-2xl border border-green-200 bg-green-50 px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between">
+							<div className="flex flex-col gap-3 rounded-2xl border border-success-light bg-success-lighter px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between">
 								<div className="flex min-w-0 items-start gap-2.5">
 									<Icon
 										name="check-circle"
-										className="mt-0.5 h-4 w-4 shrink-0 text-green-700"
+										className="mt-0.5 h-4 w-4 shrink-0 text-success-base"
 									/>
 									<div className="min-w-0 space-y-0.5">
-										<p className="font-medium text-green-950 text-sm">
+										<p className="font-medium text-sm text-success-dark">
 											Email sent — check your inbox
 										</p>
-										<p className="text-green-900/85 text-paragraph-sm leading-relaxed">
+										<p className="text-paragraph-sm text-success-dark/80 leading-relaxed">
 											{testTo ? (
 												<>
 													We sent a message to{" "}
@@ -217,12 +217,13 @@ export function PostGenerate({
 										aria-keyshortcuts="o"
 										className={cn(
 											"inline-flex shrink-0 items-center justify-center gap-1.5 self-start rounded-xl",
-											"border border-green-300 bg-white px-3 py-2",
-											"font-medium text-green-900 text-sm",
-											"transition-colors hover:bg-green-100/80",
+											"border border-success-light bg-bg-white-0 px-3 py-2",
+											"font-medium text-sm text-success-dark",
+											"transition-colors hover:bg-success-lighter",
+											"dark:bg-white/5 dark:hover:bg-white/10",
 										)}
 									>
-										<ActionKbd className="w-auto min-w-0 border-green-300/80 bg-green-50 px-1 text-green-900 shadow-[0_1.5px_0_0_rgba(21,128,61,0.2)]">
+										<ActionKbd className="w-auto min-w-0 border-success-light bg-success-lighter px-1 text-success-dark shadow-[0_1.5px_0_0_rgba(21,128,61,0.2)] dark:bg-white/5 dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.4)]">
 											O
 										</ActionKbd>
 										<span>{provider.label}</span>
