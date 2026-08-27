@@ -130,10 +130,8 @@ export function DashboardShell({ children }: { children: ReactNode }) {
 							{children}
 						</div>
 					</div>
-					<AnimatePresence>
-						{isAiPanelOpen ? <AiPanel /> : null}
-					</AnimatePresence>
 				</main>
+				<AnimatePresence>{isAiPanelOpen ? <AiPanel /> : null}</AnimatePresence>
 				<FloatingSupportButton />
 				<CommandMenuGlobal />
 			</div>
