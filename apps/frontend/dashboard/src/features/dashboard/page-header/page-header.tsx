@@ -7,8 +7,51 @@ import { OrganizationSwitcher } from "./organization-switcher";
 import { useActiveOrganization } from "./use-active-organization";
 import { UserDropdown } from "./user-dropdown";
 
+function HamburgerIcon({ open }: { open: boolean }) {
+	return (
+		<svg
+			viewBox="0 0 16 16"
+			fill="none"
+			aria-hidden
+			className="h-4 w-4"
+		>
+			<path
+				d="M2.5 4h11"
+				stroke="currentColor"
+				strokeWidth="1.5"
+				strokeLinecap="round"
+				className={cn(
+					"origin-center transition-transform duration-200",
+					open && "translate-y-[4px] rotate-45",
+				)}
+			/>
+			<path
+				d="M2.5 8h11"
+				stroke="currentColor"
+				strokeWidth="1.5"
+				strokeLinecap="round"
+				className={cn(
+					"origin-center transition-opacity duration-200",
+					open && "opacity-0",
+				)}
+			/>
+			<path
+				d="M2.5 12h11"
+				stroke="currentColor"
+				strokeWidth="1.5"
+				strokeLinecap="round"
+				className={cn(
+					"origin-center transition-transform duration-200",
+					open && "-translate-y-[4px] -rotate-45",
+				)}
+			/>
+		</svg>
+	);
+}
+
 function SidebarToggleButton() {
 	const { isCollapsed, toggle } = useSidebarCollapse();
+	const isMobileNavOpen = useUIStore((s) => s.isMobileNavOpen);
 	const toggleMobileNav = useUIStore((s) => s.toggleMobileNav);
 	const {
 		isAnimating,
@@ -18,31 +61,39 @@ function SidebarToggleButton() {
 		onAnimationEnd,
 	} = usePlayAnimationOnHover(500);
 
+	const btnClass = cn(
+		"group flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-text-sub-600 transition-colors",
+		"hover:bg-bg-weak-50 hover:text-text-strong-950 dark:hover:bg-white/5",
+	);
+
 	return (
-		<button
-			type="button"
-			onClick={() => {
-				if (window.matchMedia("(min-width: 1024px)").matches) {
-					toggle();
-				} else {
-					toggleMobileNav();
-				}
-			}}
-			title="Toggle Sidebar (⌘B)"
-			data-animating={isAnimating || undefined}
-			onPointerEnter={onPointerEnter}
-			onPointerLeave={onPointerLeave}
-			onAnimationStart={onAnimationStart}
-			onAnimationEnd={onAnimationEnd}
-			className={cn(
-				"group flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-text-sub-600 transition-colors",
-				"hover:bg-bg-weak-50 hover:text-text-strong-950 dark:hover:bg-white/5",
-			)}
-		>
-			<AnimatedSidebarToggleIcon
-				className={cn("h-4 w-4", isCollapsed && "rotate-180")}
-			/>
-		</button>
+		<>
+			<button
+				type="button"
+				onClick={toggleMobileNav}
+				title="Open menu"
+				aria-label={isMobileNavOpen ? "Close menu" : "Open menu"}
+				aria-expanded={isMobileNavOpen}
+				className={cn(btnClass, "lg:hidden")}
+			>
+				<HamburgerIcon open={isMobileNavOpen} />
+			</button>
+			<button
+				type="button"
+				onClick={toggle}
+				title="Toggle Sidebar (⌘B)"
+				data-animating={isAnimating || undefined}
+				onPointerEnter={onPointerEnter}
+				onPointerLeave={onPointerLeave}
+				onAnimationStart={onAnimationStart}
+				onAnimationEnd={onAnimationEnd}
+				className={cn(btnClass, "hidden lg:flex")}
+			>
+				<AnimatedSidebarToggleIcon
+					className={cn("h-4 w-4", isCollapsed && "rotate-180")}
+				/>
+			</button>
+		</>
 	);
 }
 
@@ -55,7 +106,7 @@ export function PageHeader() {
 		useActiveOrganization();
 
 	return (
-		<div className="sticky top-0 z-10 flex h-11 shrink-0 items-center justify-between border-stroke-soft-100 border-b pr-3 pl-3 dark:border-stroke-soft-100/40">
+		<div className="sticky top-0 z-[80] flex h-11 shrink-0 items-center justify-between border-stroke-soft-100 border-b bg-bg-white-0 pr-3 pl-3 dark:border-stroke-soft-100/40 dark:bg-black">
 			<div className="flex items-center gap-1">
 				<SidebarToggleButton />
 				<OrganizationSwitcher

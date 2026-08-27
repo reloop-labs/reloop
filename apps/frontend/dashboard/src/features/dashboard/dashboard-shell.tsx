@@ -1,5 +1,5 @@
 import { cn } from "@reloop/ui/cn";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
 import { usePathname } from "next/navigation";
 import { type ReactNode, useEffect } from "react";
 import { CommandMenuGlobal } from "#/features/dashboard/command-menu";
@@ -10,6 +10,7 @@ import { useUIStore } from "#/store/use-ui-store";
 import { FloatingSupportButton } from "./floating-support-button";
 import { PageHeader } from "./page-header/page-header";
 import { MainSidebar } from "./sidebar/main-sidebar";
+import { MobileSidebarSheet } from "./sidebar/mobile-sidebar-sheet";
 
 function useIsTemplateEditor() {
 	const pathname = usePathname();
@@ -23,8 +24,6 @@ function useIsTemplateEditor() {
  * Support slide-in panel mounts beside the main content.
  * (Ask AI is hidden until assistant API integration.)
  */
-const DRAWER_EASE: [number, number, number, number] = [0.32, 0.72, 0, 1];
-
 function SidebarChrome({
 	isMobileNavOpen,
 	onCloseMobileNav,
@@ -32,47 +31,12 @@ function SidebarChrome({
 	isMobileNavOpen: boolean;
 	onCloseMobileNav: () => void;
 }) {
-	const shouldReduceMotion = useReducedMotion();
-	const reduce = Boolean(shouldReduceMotion);
-
 	return (
 		<>
 			<div className="hidden lg:flex">
 				<MainSidebar />
 			</div>
-			<AnimatePresence>
-				{isMobileNavOpen ? (
-					<motion.button
-						key="mobile-nav-backdrop"
-						type="button"
-						aria-label="Close navigation"
-						className="fixed inset-0 z-50 bg-black/50 lg:hidden"
-						onClick={onCloseMobileNav}
-						initial={{ opacity: 0 }}
-						animate={{ opacity: 1 }}
-						exit={{ opacity: 0 }}
-						transition={
-							reduce ? { duration: 0 } : { duration: 0.2, ease: DRAWER_EASE }
-						}
-					/>
-				) : null}
-				{isMobileNavOpen ? (
-					<motion.div
-						key="mobile-nav-drawer"
-						className="fixed inset-y-0 left-0 z-[60] flex h-dvh w-3/4 border-stroke-soft-100 border-r bg-bg-white-0 lg:hidden dark:border-stroke-soft-100/40 dark:bg-black"
-						initial={reduce ? { x: 0 } : { x: "-100%" }}
-						animate={{ x: 0 }}
-						exit={reduce ? { x: 0 } : { x: "-100%" }}
-						transition={
-							reduce
-								? { duration: 0 }
-								: { type: "spring", bounce: 0, duration: 0.32 }
-						}
-					>
-						<MainSidebar forceExpanded />
-					</motion.div>
-				) : null}
-			</AnimatePresence>
+			<MobileSidebarSheet isOpen={isMobileNavOpen} onClose={onCloseMobileNav} />
 		</>
 	);
 }

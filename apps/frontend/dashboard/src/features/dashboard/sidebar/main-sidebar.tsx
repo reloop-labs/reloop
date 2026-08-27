@@ -12,13 +12,8 @@ import { SettingsSidebarItems } from "./settings-sidebar-items";
 import { SidebarItems } from "./sidebar-items";
 import { useSidebarCollapse } from "./use-sidebar-collapse";
 
-export function MainSidebar({
-	forceExpanded = false,
-}: {
-	forceExpanded?: boolean;
-}) {
-	const { isCollapsed: collapsedPref, toggle } = useSidebarCollapse();
-	const isCollapsed = forceExpanded ? false : collapsedPref;
+export function MainSidebar() {
+	const { isCollapsed, toggle } = useSidebarCollapse();
 	const [isHoverOpen, setIsHoverOpen] = useState(false);
 	const pathname = usePathname();
 	const pathWithoutSlug = pathname.replace(/^\/dashboard/, "") || "/";
@@ -173,9 +168,6 @@ export function MainSidebar({
 			return isCollapsed
 				? "w-0 border-r-0 opacity-0 pointer-events-none"
 				: "w-60 border-r opacity-100";
-		}
-		if (forceExpanded) {
-			return "w-full border-r-0 px-0";
 		}
 		return isCollapsed ? "w-14 items-center px-0" : "w-60 px-0";
 	};

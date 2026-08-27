@@ -40,7 +40,7 @@ export function FloatingSupportButton() {
 					transition={{ type: "spring", stiffness: 400, damping: 28 }}
 					title="Open Support"
 					aria-label="Open human customer support chat"
-					className="fixed right-5 bottom-5 z-40 flex cursor-pointer items-center gap-2 rounded-full border border-stroke-soft-100 bg-bg-white-0/95 px-3.5 py-2 font-medium text-text-strong-950 text-xs backdrop-blur-sm dark:border-stroke-soft-100/50 dark:bg-[#141416]/95 dark:text-white"
+					className="fixed right-5 bottom-5 z-40 hidden cursor-pointer items-center gap-2 rounded-full border border-stroke-soft-100 bg-bg-white-0/95 px-3.5 py-2 font-medium text-text-strong-950 text-xs backdrop-blur-sm lg:flex dark:border-stroke-soft-100/50 dark:bg-[#141416]/95 dark:text-white"
 				>
 					<span className="relative flex items-center justify-center">
 						<Headset className="h-4 w-4 text-text-sub-600 dark:text-white/80" />
