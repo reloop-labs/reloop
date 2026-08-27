@@ -173,10 +173,12 @@ export function SignupPage() {
 					<FancyButton.Root
 						type={isOtpStep ? "button" : "submit"}
 						form={isOtpStep ? undefined : SIGNUP_EMAIL_FORM_ID}
-						variant="blue"
+						variant={ctaSuccess ? "success" : "blue"}
 						size="medium"
 						disabled={ctaDisabled}
-						className="h-11 w-full justify-center gap-2 overflow-hidden rounded-xl font-medium text-sm"
+						className={`h-11 w-full justify-center gap-2 overflow-hidden rounded-xl font-medium text-sm transition-colors duration-200 ${
+							ctaSuccess ? "cursor-default pointer-events-none" : ""
+						}`}
 						onClick={() => {
 							if (!isOtpStep || ctaSuccess || ctaLoading) return;
 							verifyOtpRef.current?.();
@@ -193,11 +195,11 @@ export function SignupPage() {
 							>
 								{ctaLoading && <Spinner size={14} color="currentColor" />}
 								{ctaSuccess && (
-									<Icon name="check-circle" className="h-4 w-4 shrink-0" />
+									<Icon name="check" className="h-4 w-4 shrink-0" />
 								)}
 								<span>
 									{ctaSuccess
-										? "Verified successfully!"
+										? "Sign up successful! Redirecting…"
 										: ctaLoading
 											? isOtpStep
 												? "Creating…"

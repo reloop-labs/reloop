@@ -182,10 +182,12 @@ export function LoginPage() {
 					<FancyButton.Root
 						type={isOtpStep ? "button" : "submit"}
 						form={isOtpStep ? undefined : LOGIN_EMAIL_FORM_ID}
-						variant="blue"
+						variant={ctaSuccess ? "success" : "blue"}
 						size="medium"
 						disabled={ctaDisabled}
-						className="h-11 w-full justify-center gap-2 overflow-hidden rounded-xl font-medium text-sm"
+						className={`h-11 w-full justify-center gap-2 overflow-hidden rounded-xl font-medium text-sm transition-colors duration-200 ${
+							ctaSuccess ? "cursor-default pointer-events-none" : ""
+						}`}
 						onClick={() => {
 							if (!isOtpStep || ctaSuccess || ctaLoading) return;
 							verifyOtpRef.current?.();
@@ -202,11 +204,11 @@ export function LoginPage() {
 							>
 								{ctaLoading && <Spinner size={14} color="currentColor" />}
 								{ctaSuccess && (
-									<Icon name="check-circle" className="h-4 w-4 shrink-0" />
+									<Icon name="check" className="h-4 w-4 shrink-0" />
 								)}
 								<span>
 									{ctaSuccess
-										? "Verified successfully!"
+										? "Login successful! Redirecting…"
 										: ctaLoading
 											? "Logging in…"
 											: "Login"}
