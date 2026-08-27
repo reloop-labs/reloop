@@ -9,19 +9,17 @@ API_HEALTH=(
 	"mail|Mail|http://mail:8015/api/mail/health"
 	"logs|Logs|http://logs:8016/api/logs/health"
 	"workflow|Workflows|http://workflow:8017/api/workflow/health"
-	"upload|Uploads|http://upload:8018/api/upload/health"
 	"template|Templates|http://template:8019/api/template/health"
 	"inbox|Inbox|http://inbox:8021/api/inbox/health"
 	"email|Email|http://email:8022/api/email/health"
-	"credits|Credits|http://credits:8023/api/credits/health"
-	"admin|Admin|http://admin:8024/api/admin/health"
-	"tools|Tools|http://tools:8026/api/tools/health"
+)
+
+STORAGE_HEALTH=(
+	"upload|Uploads|http://upload:8018/api/upload/health"
 )
 
 WEB_HEALTH=(
 	"dashboard|Dashboard|http://dashboard:3000/dashboard/healthz"
-	"docs|Documentation|http://docs:3000/docs"
-	"console|Console|http://console:3002/console"
 	"links|Links|http://links:3005/"
 )
 
@@ -129,6 +127,9 @@ verify_deployment() {
 	fi
 
 	check_group API_HEALTH 1
+	if [ "$STORAGE_ENABLED" = "yes" ]; then
+		check_group STORAGE_HEALTH 1
+	fi
 	check_group WEB_HEALTH 0
 	check_mail_transport
 	check_restart_loops || true

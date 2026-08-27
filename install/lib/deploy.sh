@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
-INFRA_SERVICES=(postgres redis nats minio)
+INFRA_SERVICES=(postgres redis nats)
 
 pull_images() {
 	step "Downloading Reloop ${RELOOP_VERSION} container images..."
-	info "About 28 GB on a first install — this is the slowest step."
+	info "About 20 GB on a first install — this is the slowest step."
 
 	local log total pid pulled status
 	log="$(mktemp -t reloop-pull.XXXXXX)"
@@ -53,7 +53,6 @@ start_infrastructure() {
 	ok "PostgreSQL ready"
 	ok "Redis ready"
 	ok "NATS ready"
-	ok "Object storage ready"
 }
 
 database_has_tables() {

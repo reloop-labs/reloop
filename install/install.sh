@@ -15,6 +15,12 @@ RELOOP_PUBLIC_IP="${RELOOP_PUBLIC_IP:-}"
 RELOOP_HTTPS="${RELOOP_HTTPS:-}"
 POSTGRES_DB="${RELOOP_DB_NAME:-}"
 POSTGRES_USER="${RELOOP_DB_USER:-}"
+RELOOP_S3="${RELOOP_S3:-}"
+S3_ENDPOINT="${RELOOP_S3_ENDPOINT:-}"
+S3_ACCESS_KEY="${RELOOP_S3_ACCESS_KEY:-}"
+S3_SECRET_KEY="${RELOOP_S3_SECRET_KEY:-}"
+S3_BUCKET="${RELOOP_S3_BUCKET:-}"
+S3_REGION="${RELOOP_S3_REGION:-}"
 
 NONINTERACTIVE=0
 case "${RELOOP_NONINTERACTIVE:-}" in
@@ -179,6 +185,13 @@ print_summary() {
 	printf '  reloop restart         restart the stack\n'
 	printf '  reloop update          pull new images and redeploy\n'
 	printf '\n  Configuration: %s/.env (root-only, holds every secret)\n' "$INSTALL_DIR"
+
+	if [ "$STORAGE_ENABLED" != "yes" ]; then
+		printf '\n  File uploads are off: no S3 storage was configured. Set the S3_*\n'
+		printf '  values and COMPOSE_PROFILES=storage in %s/.env, then run\n' "$INSTALL_DIR"
+		printf '  "reloop restart" to turn them on.\n'
+	fi
+
 	printf '\n'
 }
 

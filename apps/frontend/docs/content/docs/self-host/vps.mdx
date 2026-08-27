@@ -20,12 +20,12 @@ curl -fsSL https://reloop.sh/install.sh | sudo bash
 | **Architecture** | x86_64 |
 | **CPU** | 2 vCPUs minimum, 4+ recommended |
 | **RAM** | 4 GB minimum, 8 GB recommended |
-| **Disk** | 45 GB minimum, 60 GB recommended |
+| **Disk** | 35 GB minimum, 50 GB recommended |
 | **Ports** | `80`, `443`, `25`, `465`, `587` free |
 | **Access** | root or sudo |
 
 > [!NOTE]
-> The container images are roughly 28 GB in total, which is why the disk floor is higher than for a source install. The installer refuses to continue on a smaller disk rather than failing halfway through the download.
+> The container images are roughly 22 GB in total, which is why the disk floor is higher than for a source install. The installer refuses to continue on a smaller disk rather than failing halfway through the download.
 
 Many providers block outbound port `25` by default. Reloop still sends through the submission ports, but inbound mail needs `25` open in both directions — ask your provider to unblock it if you plan to receive mail.
 
@@ -40,8 +40,9 @@ Many providers block outbound port `25` by default. Reloop still sends through t
 | Database name | PostgreSQL database | `reloop` |
 | Database user | PostgreSQL role | `reloop` |
 | Configure automatic HTTPS | Let Caddy obtain and renew certificates | `yes` |
+| Configure object storage | S3-compatible storage for file uploads | `no` |
 
-Everything else is generated: database and Redis passwords, the Better Auth secret, the internal service secret, the tracking and preferences secrets, the webhook encryption key, and the object storage credentials. They are written to `/opt/reloop/.env` with mode `0600`.
+Everything else is generated: database and Redis passwords, the Better Auth secret, the internal service secret, the tracking and preferences secrets, and the webhook encryption key. They are written to `/opt/reloop/.env` with mode `0600`.
 
 Enter the domain as a bare hostname — `reloop.example.com`, not `https://reloop.example.com` and not `reloop.example.com/admin`.
 
@@ -57,7 +58,9 @@ Enter the domain as a bare hostname — `reloop.example.com`, not `https://reloo
 └── backups/             automatic database dumps taken before schema changes
 ```
 
-The stack runs 27 containers: 18 Reloop backend services, 4 frontends (dashboard, docs, console, links), PostgreSQL, Redis, NATS, MinIO, and Caddy. Only Caddy (`80`, `443`) and the two mail transports (`25` inbound, `465`/`587` submission) publish host ports — the databases, object storage and event bus stay on the internal Docker network.
+The stack runs 20 containers: 14 Reloop backend services, 2 frontends (dashboard, links), PostgreSQL, Redis, NATS and Caddy. Only Caddy (`80`, `443`) and the two mail transports (`25` inbound, `465`/`587` submission) publish host ports — the database and event bus stay on the internal Docker network.
+
+A self-hosted install deliberately leaves out the parts of Reloop that only make sense for the hosted service: the public documentation site (`/docs` redirects to reloop.sh), the credits and quota service, the public email-validation tools, the operator console, and bundled object storage. Sending is not metered.
 
 A `reloop` command is installed alongside it:
 
@@ -67,6 +70,19 @@ reloop logs [service]    # follow logs
 reloop restart           # restart the stack
 reloop update            # pull the configured version and redeploy
 ```
+
+---
+
+## File uploads
+
+Reloop stores template images and attachments in S3-compatible object storage. The installer does not bundle a storage server — point it at whichever provider you already use (AWS S3, Cloudflare R2, Hetzner Object Storage, Backblaze B2, a MinIO box of your own).
+
+Answer yes to the storage prompt and supply the endpoint, access key, secret key, bucket and region. The `upload` service is then deployed alongside the rest of the stack.
+
+Answer no and file uploads stay off. To turn them on later, set the `S3_*` values and `COMPOSE_PROFILES=storage` in `/opt/reloop/.env`, then run `reloop restart`.
+
+> [!NOTE]
+> The bucket must serve objects publicly over HTTP. Reloop hands out file URLs as `{S3_ENDPOINT}/{S3_BUCKET}/{path}`, so anything the dashboard uploads has to be readable at that address.
 
 ---
 
@@ -130,6 +146,9 @@ curl -fsSL https://reloop.sh/install.sh | sudo \
 | `RELOOP_ADMIN_EMAIL` | Administrator email |
 | `RELOOP_DB_NAME` / `RELOOP_DB_USER` | Database name and role |
 | `RELOOP_HTTPS` | `yes` or `no` |
+| `RELOOP_S3` | `yes` to configure object storage, `no` to disable file uploads |
+| `RELOOP_S3_ENDPOINT` / `RELOOP_S3_ACCESS_KEY` / `RELOOP_S3_SECRET_KEY` | Object storage credentials |
+| `RELOOP_S3_BUCKET` / `RELOOP_S3_REGION` | Bucket and region |
 | `RELOOP_PUBLIC_IP` | Skip public address detection |
 | `RELOOP_VERSION` | Image tag to deploy (default `latest`) |
 | `RELOOP_EXISTING` | `abort`, `reconfigure` or `continue` for a re-run |

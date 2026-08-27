@@ -8,11 +8,8 @@
 	handle /dashboard* {
 		reverse_proxy dashboard:3000
 	}
-	handle /console* {
-		reverse_proxy console:3002
-	}
 	handle /docs* {
-		reverse_proxy docs:3000
+		redir https://reloop.sh{uri} 302
 	}
 	handle /preferences* {
 		reverse_proxy links:3005
@@ -57,14 +54,10 @@
 	handle /api/email* {
 		reverse_proxy email:8022
 	}
-	handle /api/credits* {
-		reverse_proxy credits:8023
-	}
-	handle /api/admin* {
-		reverse_proxy admin:8024
-	}
-	handle /api/tool* {
-		reverse_proxy tools:8026
+
+	@removed path /api/credits* /api/tool* /api/admin*
+	handle @removed {
+		respond 404
 	}
 
 	handle {

@@ -50,7 +50,8 @@ load_existing_values() {
 	for key in RELOOP_VERSION RELOOP_DOMAIN RELOOP_ADMIN_EMAIL RELOOP_PUBLIC_IP \
 		RELOOP_HTTPS POSTGRES_DB POSTGRES_USER POSTGRES_PASSWORD REDIS_PASSWORD \
 		BETTER_AUTH_SECRET RELOOP_INTERNAL_SECRET TRACKING_SECRET PREFERENCES_SECRET \
-		WEBHOOK_ENCRYPTION_KEY S3_ACCESS_KEY S3_SECRET_KEY DEFAULT_OTP; do
+		WEBHOOK_ENCRYPTION_KEY S3_ENDPOINT S3_ACCESS_KEY S3_SECRET_KEY \
+		S3_BUCKET S3_REGION DEFAULT_OTP; do
 		local value
 		value="$(env_get "$key" "$ENV_FILE" || true)"
 		if [ -n "$value" ]; then
@@ -69,7 +70,50 @@ preserved_or_new() {
 	fi
 }
 
+collect_storage() {
+	local fallback=no
+	[ -n "${PRESERVED_S3_ENDPOINT:-}" ] && fallback=yes
+
+	ask_yes_no RELOOP_S3 \
+		"Configure S3-compatible object storage (needed for file uploads)" "$fallback"
+
+	if [ "$RELOOP_S3" != "yes" ]; then
+		STORAGE_ENABLED=no
+		COMPOSE_PROFILES=""
+		S3_ENDPOINT=""
+		S3_ACCESS_KEY=""
+		S3_SECRET_KEY=""
+		S3_BUCKET=""
+		S3_REGION=""
+		return 0
+	fi
+
+	STORAGE_ENABLED=yes
+	COMPOSE_PROFILES=storage
+
+	ask S3_ENDPOINT "S3 endpoint URL" \
+		"e.g. https://s3.eu-central-1.amazonaws.com" \
+		"${PRESERVED_S3_ENDPOINT:-}" valid_url \
+		"Enter a full URL including https://"
+	ask S3_ACCESS_KEY "S3 access key" "" \
+		"${PRESERVED_S3_ACCESS_KEY:-}" valid_any ""
+	ask S3_SECRET_KEY "S3 secret key" "" \
+		"${PRESERVED_S3_SECRET_KEY:-}" valid_any ""
+	ask S3_BUCKET "S3 bucket" "" \
+		"${PRESERVED_S3_BUCKET:-reloop-uploads}" valid_any ""
+	ask S3_REGION "S3 region" "" \
+		"${PRESERVED_S3_REGION:-us-east-1}" valid_any ""
+}
+
 collect_configuration() {
+	STORAGE_ENABLED=no
+	COMPOSE_PROFILES=""
+	S3_ENDPOINT="${S3_ENDPOINT:-}"
+	S3_ACCESS_KEY="${S3_ACCESS_KEY:-}"
+	S3_SECRET_KEY="${S3_SECRET_KEY:-}"
+	S3_BUCKET="${S3_BUCKET:-}"
+	S3_REGION="${S3_REGION:-}"
+
 	if [ "$EXISTING_INSTALL" = "1" ]; then
 		load_existing_values
 	fi
@@ -77,10 +121,15 @@ collect_configuration() {
 	if [ "$REUSE_CONFIG" = "1" ]; then
 		local key
 		for key in RELOOP_DOMAIN RELOOP_ADMIN_EMAIL RELOOP_HTTPS RELOOP_PUBLIC_IP \
-			POSTGRES_DB POSTGRES_USER; do
+			POSTGRES_DB POSTGRES_USER S3_ENDPOINT S3_ACCESS_KEY S3_SECRET_KEY \
+			S3_BUCKET S3_REGION; do
 			local ref="PRESERVED_$key"
 			[ -n "${!ref-}" ] && printf -v "$key" '%s' "${!ref}"
 		done
+		if [ -n "$S3_ENDPOINT" ]; then
+			STORAGE_ENABLED=yes
+			COMPOSE_PROFILES=storage
+		fi
 		step "Using the existing configuration"
 		ok "Domain: $RELOOP_DOMAIN"
 		ok "Administrator email: $RELOOP_ADMIN_EMAIL"
@@ -106,6 +155,8 @@ collect_configuration() {
 			"Use lowercase letters, digits and underscores, starting with a letter."
 
 		ask_yes_no RELOOP_HTTPS "Configure automatic HTTPS" "${PRESERVED_RELOOP_HTTPS:-yes}"
+
+		collect_storage
 	fi
 
 	if [ "$EXISTING_INSTALL" = "1" ] && [ -n "${PRESERVED_POSTGRES_USER:-}" ] &&
@@ -137,8 +188,6 @@ collect_configuration() {
 	preserved_or_new TRACKING_SECRET gen_secret 48
 	preserved_or_new PREFERENCES_SECRET gen_secret 48
 	preserved_or_new WEBHOOK_ENCRYPTION_KEY gen_hex 32
-	preserved_or_new S3_ACCESS_KEY gen_secret 20
-	preserved_or_new S3_SECRET_KEY gen_secret 40
 	preserved_or_new DEFAULT_OTP gen_digits 6
 }
 
@@ -184,11 +233,12 @@ REDIS_URL=redis://:$REDIS_PASSWORD@redis:6379
 
 NATS_URL=nats://nats:4222
 
-S3_ENDPOINT=http://minio:9000
+COMPOSE_PROFILES=$COMPOSE_PROFILES
+S3_ENDPOINT=$S3_ENDPOINT
 S3_ACCESS_KEY=$S3_ACCESS_KEY
 S3_SECRET_KEY=$S3_SECRET_KEY
-S3_BUCKET=reloop-uploads
-S3_REGION=us-east-1
+S3_BUCKET=$S3_BUCKET
+S3_REGION=$S3_REGION
 S3_FORCE_PATH_STYLE=true
 
 BETTER_AUTH_SECRET=$BETTER_AUTH_SECRET

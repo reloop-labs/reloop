@@ -157,3 +157,14 @@ valid_ipv4() {
 	done
 	return 0
 }
+
+valid_url() {
+	case "$1" in
+	https://*.* | http://*.*) return 0 ;;
+	*) return 1 ;;
+	esac
+}
+
+valid_any() {
+	[ -n "$1" ]
+}

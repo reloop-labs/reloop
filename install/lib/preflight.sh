@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 MIN_RAM_MB=3800
-MIN_DISK_GB=45
+MIN_DISK_GB=35
 
 OS_ID=""
 OS_VERSION_ID=""
@@ -78,7 +78,7 @@ check_arch() {
 	aarch64 | arm64)
 		die "arm64 is not supported yet." \
 			"Reloop publishes arm64 images for the backend services but the" \
-			"dashboard, docs and links images are amd64-only, so the stack" \
+			"dashboard, console and links images are amd64-only, so the stack" \
 			"cannot start on this machine. Use an x86_64 server."
 		;;
 	*) die "Unsupported CPU architecture: $arch (Reloop needs x86_64)." ;;
@@ -108,12 +108,12 @@ check_disk() {
 	fi
 	if [ "$avail_gb" -lt "$MIN_DISK_GB" ]; then
 		die "Not enough disk space: ${avail_gb} GB free, ${MIN_DISK_GB} GB required." \
-			"The Reloop container images alone are about 28 GB; 60 GB is recommended" \
+			"The Reloop container images alone are about 22 GB; 50 GB is recommended" \
 			"so there is room for the database, object storage and mail spools."
 	fi
 	ok "Disk space: ${avail_gb} GB free"
-	if [ "$avail_gb" -lt 60 ]; then
-		warn "60 GB is recommended once the database and mail spools grow"
+	if [ "$avail_gb" -lt 50 ]; then
+		warn "50 GB is recommended once the database and mail spools grow"
 	fi
 }
 
