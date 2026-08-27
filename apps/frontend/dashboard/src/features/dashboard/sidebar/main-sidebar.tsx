@@ -22,8 +22,29 @@ export function MainSidebar({
 	const [isHoverOpen, setIsHoverOpen] = useState(false);
 	const pathname = usePathname();
 	const pathWithoutSlug = pathname.replace(/^\/dashboard/, "") || "/";
-	const isSettings = pathWithoutSlug.startsWith("/settings");
+	const isSettingsRoute = pathWithoutSlug.startsWith("/settings");
+	const [settingsPeek, setSettingsPeek] = useState(false);
+	const [settingsNavDismissed, setSettingsNavDismissed] = useState(false);
+	const showSettingsNav = settingsNavDismissed
+		? false
+		: settingsPeek || isSettingsRoute;
 	const isTemplateEditor = Boolean(pathname.match(/\/templates\/[^/]+/));
+
+	const openSettingsNav = () => {
+		setSettingsNavDismissed(false);
+		setSettingsPeek(true);
+	};
+	const closeSettingsNav = () => {
+		setSettingsPeek(false);
+		setSettingsNavDismissed(true);
+	};
+
+	useEffect(() => {
+		if (!isSettingsRoute) {
+			setSettingsNavDismissed(false);
+			setSettingsPeek(false);
+		}
+	}, [isSettingsRoute]);
 	const shouldReduceMotion = useReducedMotion();
 
 	useHotkeys("meta+b", (e) => {
@@ -83,7 +104,7 @@ export function MainSidebar({
 
 					<div className="relative flex-1 overflow-hidden px-2 py-2">
 						<AnimatePresence mode="popLayout" initial={false}>
-							{isSettings ? (
+							{showSettingsNav ? (
 								<motion.div
 									key="settings"
 									initial={{
@@ -102,7 +123,10 @@ export function MainSidebar({
 									transition={{ duration: 0.28, ease: [0.32, 0.72, 0, 1] }}
 									className="absolute inset-0 overflow-y-auto overflow-x-hidden px-2 py-2"
 								>
-									<SettingsSidebarItems isCollapsed={false} />
+									<SettingsSidebarItems
+										isCollapsed={false}
+										onCloseSettings={closeSettingsNav}
+									/>
 								</motion.div>
 							) : (
 								<motion.div
@@ -123,7 +147,10 @@ export function MainSidebar({
 									transition={{ duration: 0.28, ease: [0.32, 0.72, 0, 1] }}
 									className="absolute inset-0 overflow-y-auto overflow-x-hidden px-2 py-2"
 								>
-									<SidebarItems isCollapsed={false} />
+									<SidebarItems
+										isCollapsed={false}
+										onOpenSettings={openSettingsNav}
+									/>
 								</motion.div>
 							)}
 						</AnimatePresence>
@@ -202,7 +229,7 @@ export function MainSidebar({
 						)}
 					>
 						<AnimatePresence mode="popLayout" initial={false}>
-							{isSettings ? (
+							{showSettingsNav ? (
 								<motion.div
 									key="settings"
 									initial={{
@@ -229,6 +256,7 @@ export function MainSidebar({
 								>
 									<SettingsSidebarItems
 										isCollapsed={!isTemplateEditor && isCollapsed}
+										onCloseSettings={closeSettingsNav}
 									/>
 								</motion.div>
 							) : (
@@ -258,6 +286,7 @@ export function MainSidebar({
 								>
 									<SidebarItems
 										isCollapsed={!isTemplateEditor && isCollapsed}
+										onOpenSettings={openSettingsNav}
 									/>
 								</motion.div>
 							)}

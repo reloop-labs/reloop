@@ -1,39 +1,32 @@
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useMemo, useRef, useState } from "react";
 import { ShortcutHint } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import { useOrgPermissions } from "#/features/settings/use-org-permissions";
 import { filterSettingsNavigation, settingsNavigation } from "../navigation";
 import { SidebarNavIcon } from "./sidebar-nav-icon";
-import { SidebarNavLink } from "./sidebar-nav-link";
+import { SidebarNavButton, SidebarNavLink } from "./sidebar-nav-link";
 import { useSidebarHoverBox } from "./use-sidebar-hover-box";
 
 export function SettingsSidebarItems({
 	isCollapsed = false,
+	onCloseSettings,
 }: {
 	isCollapsed?: boolean;
+	onCloseSettings?: () => void;
 }) {
-	const [hoveredEl, setHoveredEl] = useState<HTMLAnchorElement | undefined>(
+	const [hoveredEl, setHoveredEl] = useState<HTMLElement | undefined>(
 		undefined,
 	);
 	const [containerEl, setContainerEl] = useState<HTMLDivElement | null>(null);
 
-	const backNavRef = useRef<HTMLAnchorElement>(null);
+	const backNavRef = useRef<HTMLButtonElement>(null);
 	const itemRefs = useRef<HTMLAnchorElement[]>([]);
 
 	const pathname = usePathname();
-	const searchParams = useSearchParams();
-	const search = Object.fromEntries(searchParams.entries());
 	const pathWithoutSlug = pathname.replace(/^\/dashboard/, "") || "/";
-
-	// `from` is preserved when opening settings from the main app.
-	const fromParam =
-		typeof (search as { from?: unknown }).from === "string"
-			? (search as { from: string }).from
-			: null;
-	const backHref = fromParam || "/";
 
 	const { isOrgAdmin, canManageTeam } = useOrgPermissions();
 
@@ -75,11 +68,11 @@ export function SettingsSidebarItems({
 			)}
 			onPointerLeave={() => setHoveredEl(undefined)}
 		>
-			{/* Back to app */}
-			<SidebarNavLink
-				href={backHref}
+			{/* Back to main sidebar — does not change the page */}
+			<SidebarNavButton
 				ref={backNavRef}
 				onPointerEnter={() => setHoveredEl(backNavRef.current ?? undefined)}
+				onClick={() => onCloseSettings?.()}
 				className={cn(
 					"relative z-10 mb-4 flex h-8 items-center rounded-lg transition-all",
 					isCollapsed
@@ -96,7 +89,7 @@ export function SettingsSidebarItems({
 				>
 					<Icon
 						name="arrow-left"
-						className="group-hover:-translate-x-0.5 h-4 w-4 shrink-0 text-text-sub-600 opacity-70 transition-all duration-200 group-hover:text-text-strong-950 group-hover:opacity-100"
+						className="h-4 w-4 shrink-0 text-text-sub-600 opacity-70 transition-all duration-200 group-hover:-translate-x-0.5 group-hover:text-text-strong-950 group-hover:opacity-100"
 					/>
 					{!isCollapsed && (
 						<span className="font-medium text-[13px] text-text-sub-600 transition-colors group-hover:text-text-strong-950">
@@ -104,7 +97,7 @@ export function SettingsSidebarItems({
 						</span>
 					)}
 				</span>
-			</SidebarNavLink>
+			</SidebarNavButton>
 
 			{filteredSettingsNavigation.map((section, sectionIdx) => (
 				<div

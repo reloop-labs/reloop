@@ -61,3 +61,59 @@ export const SidebarNavLink = forwardRef<
 		</Link>
 	);
 });
+
+type SidebarNavButtonProps = ComponentPropsWithoutRef<"button">;
+
+/** Same hover-animation chrome as `SidebarNavLink`, for in-sidebar swaps. */
+export const SidebarNavButton = forwardRef<
+	HTMLButtonElement,
+	SidebarNavButtonProps
+>(function SidebarNavButton(
+	{
+		className,
+		onPointerEnter,
+		onPointerLeave,
+		onAnimationStart,
+		onAnimationEnd,
+		type = "button",
+		children,
+		...rest
+	},
+	ref,
+) {
+	const {
+		isAnimating,
+		onPointerEnter: onHoverEnter,
+		onPointerLeave: onHoverLeave,
+		onAnimationStart: onAnimStart,
+		onAnimationEnd: onAnimEnd,
+	} = usePlayAnimationOnHover();
+
+	return (
+		<button
+			ref={ref}
+			type={type}
+			data-animating={isAnimating || undefined}
+			className={cn("group", className)}
+			onPointerEnter={(e) => {
+				onHoverEnter();
+				onPointerEnter?.(e);
+			}}
+			onPointerLeave={(e) => {
+				onHoverLeave();
+				onPointerLeave?.(e);
+			}}
+			onAnimationStart={(e) => {
+				onAnimStart();
+				onAnimationStart?.(e);
+			}}
+			onAnimationEnd={(e) => {
+				onAnimEnd();
+				onAnimationEnd?.(e);
+			}}
+			{...rest}
+		>
+			{children}
+		</button>
+	);
+});
