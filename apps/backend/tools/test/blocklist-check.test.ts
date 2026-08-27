@@ -172,25 +172,23 @@ describe("DNSBL catalog", () => {
 
 	it("includes domain URI lists separately from IP lists", () => {
 		const ids = DOMAIN_DNSBL_PROVIDERS.map((provider) => provider.id);
-		expect(ids).toEqual([
-			"spamhaus-dbl",
-			"uribl-multi",
-			"surbl-multi",
-			"sorbs-rhsbl",
-			"nordspam-dbl",
-			"sem-uribl",
-		]);
+		expect(ids).toContain("spamhaus-dbl");
+		expect(ids).toContain("uribl-multi");
+		expect(ids).toContain("surbl-multi");
+		expect(ids).toContain("sem-fresh");
+		expect(ids).toContain("sem-urired");
 	});
 
-	it("keeps a fixed public catalog of IP and domain DNSBLs", () => {
-		expect(IP_DNSBL_PROVIDERS).toHaveLength(17);
-		expect(DOMAIN_DNSBL_PROVIDERS).toHaveLength(6);
+	it("keeps a comprehensive catalog of active IP and domain DNSBLs", () => {
+		expect(IP_DNSBL_PROVIDERS).toHaveLength(35);
+		expect(DOMAIN_DNSBL_PROVIDERS).toHaveLength(7);
 	});
 
 	it("includes companion URI lists and independent IP lists of the same class", () => {
 		const ipIds = IP_DNSBL_PROVIDERS.map((provider) => provider.id);
 		const domainIds = DOMAIN_DNSBL_PROVIDERS.map((provider) => provider.id);
-		expect(ipIds).toContain("wpbl");
+		expect(ipIds).toContain("blocklist-de");
+		expect(ipIds).toContain("dronebl");
 		expect(ipIds).toContain("spfbl");
 		expect(domainIds).toContain("nordspam-dbl");
 		expect(domainIds).toContain("sem-uribl");

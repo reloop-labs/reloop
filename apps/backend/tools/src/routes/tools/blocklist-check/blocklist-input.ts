@@ -223,17 +223,10 @@ export async function reverseHostname(
 	}
 }
 
-export async function resolveDomainMailIps(
+export async function resolveDomainMxIps(
 	domain: string,
 	resolver: dns.Resolver = publicResolver,
-): Promise<{ ips: string[]; source: "spf" | "mx" | "a" }> {
-	// 1. Try SPF first
-	const spf = await lookupSpf(domain, resolver);
-	if (spf.ips.length > 0) {
-		return { ips: spf.ips, source: "spf" };
-	}
-
-	// 2. Try MX records
+): Promise<string[]> {
 	try {
 		const mxRecords = await withDeadline(
 			resolver.resolveMx(domain),
@@ -250,13 +243,18 @@ export async function resolveDomainMailIps(
 					"MX A lookup",
 				);
 				if (aRecords && aRecords.length > 0) {
-					return { ips: aRecords.slice(0, 3), source: "mx" };
+					return aRecords.slice(0, 3);
 				}
 			}
 		}
 	} catch {}
+	return [];
+}
 
-	// 3. Try domain A records
+export async function resolveDomainWebIps(
+	domain: string,
+	resolver: dns.Resolver = publicResolver,
+): Promise<string[]> {
 	try {
 		const aRecords = await withDeadline(
 			resolver.resolve4(domain),
@@ -264,9 +262,33 @@ export async function resolveDomainMailIps(
 			"A lookup",
 		);
 		if (aRecords && aRecords.length > 0) {
-			return { ips: aRecords.slice(0, 2), source: "a" };
+			return aRecords.slice(0, 2);
 		}
 	} catch {}
+	return [];
+}
+
+export async function resolveDomainMailIps(
+	domain: string,
+	resolver: dns.Resolver = publicResolver,
+): Promise<{ ips: string[]; source: "spf" | "mx" | "a" }> {
+	// 1. Try SPF first
+	const spf = await lookupSpf(domain, resolver);
+	if (spf.ips.length > 0) {
+		return { ips: spf.ips, source: "spf" };
+	}
+
+	// 2. Try MX records
+	const mxIps = await resolveDomainMxIps(domain, resolver);
+	if (mxIps.length > 0) {
+		return { ips: mxIps, source: "mx" };
+	}
+
+	// 3. Try domain A records
+	const webIps = await resolveDomainWebIps(domain, resolver);
+	if (webIps.length > 0) {
+		return { ips: webIps, source: "a" };
+	}
 
 	return { ips: [], source: "spf" };
 }

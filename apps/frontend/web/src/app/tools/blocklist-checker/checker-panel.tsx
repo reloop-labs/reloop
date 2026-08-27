@@ -5,7 +5,6 @@ import * as Badge from "@reloop/ui/badge";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as CompactButton from "@reloop/ui/compact-button";
-import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import { KbdKey } from "@reloop/ui/kbd-key";
@@ -44,9 +43,7 @@ const CATEGORY_LABELS: Record<string, string> = {
 };
 
 const kbdClassName = cn(
-	"inline-flex h-4 w-4 min-w-4 items-center justify-center rounded-[5px] px-0 font-medium font-mono text-[10px] leading-none",
-	"border border-stroke-soft-200 bg-bg-weak-50 text-text-sub-600",
-	"shadow-[0_1.5px_0_0_var(--color-stroke-soft-200)]",
+	"inline-flex h-5 items-center justify-center rounded border border-stroke-soft-200 bg-bg-weak-50 px-1 font-mono text-[10px] text-text-sub-600 shadow-xs",
 	"dark:border-white/[0.14] dark:bg-white/[0.07] dark:text-white/70",
 	"dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.55),0_0_0_0.5px_rgba(255,255,255,0.06),inset_0_0.5px_0_0_rgba(255,255,255,0.08)]",
 );
@@ -112,20 +109,22 @@ function statusTone(status: ListingStatus): string {
 
 function verdictBadgeColor(
 	verdict: BlocklistVerdict,
-): "green" | "red" | "orange" {
+): "green" | "red" | "orange" | "gray" {
+	if (verdict === "clean") return "green";
 	if (verdict === "listed") return "red";
 	if (verdict === "inconclusive") return "orange";
-	return "green";
+	return "gray";
 }
 
 export function CheckerPanel() {
 	const [input, setInput] = useState("");
+	const [isLoading, setIsLoading] = useState(false);
+	const [error, setError] = useState<string | null>(null);
+	const [result, setResult] = useState<BlocklistCheckResponse | null>(null);
 	const [activeCategory, setActiveCategory] = useState<string>("all");
 	const [searchQuery, setSearchQuery] = useState("");
-	const [isLoading, setIsLoading] = useState(false);
-	const [result, setResult] = useState<BlocklistCheckResponse | null>(null);
-	const [error, setError] = useState<string | null>(null);
 	const [copied, setCopied] = useState(false);
+
 	const searchInputRef = useRef<HTMLInputElement>(null);
 	const abortRef = useRef<AbortController | null>(null);
 
@@ -247,26 +246,26 @@ https://reloop.sh/tools/blocklist-checker`;
 						</Input.Wrapper>
 					</Input.Root>
 
-					<FancyButton.Root
+					<Button.Root
 						type="submit"
 						variant="primary"
+						mode="filled"
 						size="small"
 						disabled={isLoading || !input.trim()}
+						className="shrink-0"
 					>
 						{isLoading ? (
 							<>
-								<Spinner size={18} />
+								<Spinner size={14} />
 								<span>Checking...</span>
 							</>
 						) : (
 							<>
-								<FancyButton.Icon>
-									<Icon name="search" className="size-4" />
-								</FancyButton.Icon>
+								<Button.Icon as={Icon} name="search" className="size-3.5" />
 								<span>Check Blocklists</span>
 							</>
 						)}
-					</FancyButton.Root>
+					</Button.Root>
 				</form>
 
 				<div className="mt-3.5 flex flex-wrap items-center gap-1.5 text-[12px] text-text-sub-600 dark:text-white/45">
@@ -317,12 +316,12 @@ https://reloop.sh/tools/blocklist-checker`;
 
 			{result && !error && (
 				<div className="mt-4 space-y-3.5">
-					<div className="overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-5 shadow-xs sm:p-6 dark:border-white/10 dark:bg-[#0b0b0b]">
-						<div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-							<div className="flex min-w-0 flex-1 items-start gap-3.5">
+					<div className="overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-4 shadow-xs sm:p-5 dark:border-white/10 dark:bg-[#0b0b0b]">
+						<div className="flex flex-col gap-3.5 sm:flex-row sm:items-start sm:justify-between">
+							<div className="flex min-w-0 flex-1 items-start gap-3">
 								<div
 									className={cn(
-										"flex size-11 shrink-0 items-center justify-center rounded-2xl",
+										"flex size-9 shrink-0 items-center justify-center rounded-xl",
 										result.verdict === "clean"
 											? "bg-success-lighter text-success-base dark:bg-emerald-500/10 dark:text-emerald-400"
 											: result.verdict === "listed"
@@ -332,17 +331,17 @@ https://reloop.sh/tools/blocklist-checker`;
 								>
 									<Icon
 										name={headline?.icon || "shield-check"}
-										className="size-5.5"
+										className="size-4.5"
 									/>
 								</div>
 
 								<div className="min-w-0 flex-1">
 									<div className="flex flex-wrap items-center gap-2">
-										<h2 className="font-semibold text-[17px] text-text-strong-950 tracking-tight sm:text-[19px] dark:text-white">
+										<h2 className="font-semibold text-sm text-text-strong-950 tracking-tight sm:text-base dark:text-white">
 											{headline?.title}
 										</h2>
 										<Badge.Root
-											size="medium"
+											size="small"
 											variant="lighter"
 											color={verdictBadgeColor(result.verdict)}
 										>
@@ -351,7 +350,7 @@ https://reloop.sh/tools/blocklist-checker`;
 										</Badge.Root>
 									</div>
 
-									<div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px] text-text-sub-600 dark:text-white/60">
+									<div className="mt-1.5 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-xs text-text-sub-600 dark:text-white/60">
 										<span>
 											Target:{" "}
 											<strong className="font-mono font-semibold text-text-strong-950 dark:text-white">
@@ -360,7 +359,7 @@ https://reloop.sh/tools/blocklist-checker`;
 										</span>
 										{result.checkedIps.length > 0 && (
 											<span>
-												· Mail Server IP:{" "}
+												· Queried IP(s):{" "}
 												<strong className="font-mono font-semibold text-text-strong-950 dark:text-white">
 													{result.checkedIps
 														.map((item) => {
@@ -380,12 +379,12 @@ https://reloop.sh/tools/blocklist-checker`;
 									</div>
 
 									{result.recommendations[0] && (
-										<p className="mt-2 text-[13px] text-text-sub-600 leading-relaxed dark:text-white/70">
+										<p className="mt-1.5 text-xs text-text-sub-600 leading-relaxed dark:text-white/70">
 											{result.recommendations[0]}
 										</p>
 									)}
 
-									<p className="mt-1.5 text-[11.5px] text-text-sub-600/80 dark:text-white/40">
+									<p className="mt-1 text-[11px] text-text-soft-400 dark:text-white/35">
 										Note: Major mailbox providers (Gmail, Outlook, Yahoo) also
 										track internal private sender reputation not published on
 										public DNSBLs.
@@ -393,33 +392,35 @@ https://reloop.sh/tools/blocklist-checker`;
 								</div>
 							</div>
 
-							<div className="flex shrink-0 items-center gap-2">
-								<FancyButton.Root
+							<div className="flex shrink-0 items-center gap-1.5">
+								<Button.Root
 									type="button"
-									variant="basic"
-									size="small"
+									variant="neutral"
+									mode="stroke"
+									size="xsmall"
 									onClick={handleCopyReport}
 									className="shrink-0"
 								>
-									<FancyButton.Icon>
-										<Icon name={copied ? "check" : "copy"} className="size-4" />
-									</FancyButton.Icon>
+									<Button.Icon
+										as={Icon}
+										name={copied ? "check" : "copy"}
+										className="size-3.5"
+									/>
 									{copied ? "Copied" : "Copy report"}
-								</FancyButton.Root>
+								</Button.Root>
 
-								<FancyButton.Root
+								<Button.Root
 									variant="neutral"
-									size="small"
+									mode="filled"
+									size="xsmall"
 									asChild
 									className="shrink-0"
 								>
 									<Link href="/dashboard/signup">
 										Send with Reloop
-										<FancyButton.Icon>
-											<Icon name="arrow-right" className="size-4" />
-										</FancyButton.Icon>
+										<Button.Icon as={Icon} name="arrow-right" className="size-3.5" />
 									</Link>
-								</FancyButton.Root>
+								</Button.Root>
 							</div>
 						</div>
 					</div>
