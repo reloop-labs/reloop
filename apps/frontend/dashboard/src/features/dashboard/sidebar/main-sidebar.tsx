@@ -12,8 +12,13 @@ import { SettingsSidebarItems } from "./settings-sidebar-items";
 import { SidebarItems } from "./sidebar-items";
 import { useSidebarCollapse } from "./use-sidebar-collapse";
 
-export function MainSidebar() {
-	const { isCollapsed, toggle } = useSidebarCollapse();
+export function MainSidebar({
+	forceExpanded = false,
+}: {
+	forceExpanded?: boolean;
+}) {
+	const { isCollapsed: collapsedPref, toggle } = useSidebarCollapse();
+	const isCollapsed = forceExpanded ? false : collapsedPref;
 	const [isHoverOpen, setIsHoverOpen] = useState(false);
 	const pathname = usePathname();
 	const pathWithoutSlug = pathname.replace(/^\/dashboard/, "") || "/";
@@ -142,6 +147,9 @@ export function MainSidebar() {
 				? "w-0 border-r-0 opacity-0 pointer-events-none"
 				: "w-60 border-r opacity-100";
 		}
+		if (forceExpanded) {
+			return "w-full border-r-0 px-0";
+		}
 		return isCollapsed ? "w-14 items-center px-0" : "w-60 px-0";
 	};
 
@@ -150,7 +158,7 @@ export function MainSidebar() {
 			{renderFloatingPeek}
 			<div
 				className={cn(
-					"sticky top-0 z-10 flex h-screen select-none flex-col overflow-hidden border-stroke-soft-100 border-r bg-transparent transition-[width] duration-200 ease-in-out dark:border-stroke-soft-100/40",
+					"sticky top-0 z-10 flex h-screen select-none flex-col overflow-hidden border-stroke-soft-100 border-r bg-bg-white-0 transition-[width] duration-200 ease-in-out dark:border-stroke-soft-100/40 dark:bg-black",
 					getWidthClass(),
 				)}
 			>

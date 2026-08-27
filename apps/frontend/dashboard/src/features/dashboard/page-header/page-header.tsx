@@ -2,12 +2,14 @@ import { cn } from "@reloop/ui/cn";
 import { AnimatedSidebarToggleIcon } from "#/features/dashboard/sidebar/animated-sidebar-toggle-icon";
 import { usePlayAnimationOnHover } from "#/features/dashboard/sidebar/use-play-animation-on-hover";
 import { useSidebarCollapse } from "#/features/dashboard/sidebar/use-sidebar-collapse";
+import { useUIStore } from "#/store/use-ui-store";
 import { OrganizationSwitcher } from "./organization-switcher";
 import { useActiveOrganization } from "./use-active-organization";
 import { UserDropdown } from "./user-dropdown";
 
 function SidebarToggleButton() {
 	const { isCollapsed, toggle } = useSidebarCollapse();
+	const toggleMobileNav = useUIStore((s) => s.toggleMobileNav);
 	const {
 		isAnimating,
 		onPointerEnter,
@@ -19,7 +21,13 @@ function SidebarToggleButton() {
 	return (
 		<button
 			type="button"
-			onClick={toggle}
+			onClick={() => {
+				if (window.matchMedia("(min-width: 1024px)").matches) {
+					toggle();
+				} else {
+					toggleMobileNav();
+				}
+			}}
 			title="Toggle Sidebar (⌘B)"
 			data-animating={isAnimating || undefined}
 			onPointerEnter={onPointerEnter}

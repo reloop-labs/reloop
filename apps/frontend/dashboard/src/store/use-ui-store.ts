@@ -21,6 +21,10 @@ interface UIState {
 	 */
 	isShortcutsRevealed: boolean;
 	setShortcutsRevealed: (value: boolean) => void;
+	/** Phone/tablet overlay nav — not persisted. */
+	isMobileNavOpen: boolean;
+	setMobileNavOpen: (value: boolean) => void;
+	toggleMobileNav: () => void;
 }
 
 export const useUIStore = create<UIState>((set) => ({
@@ -54,4 +58,8 @@ export const useUIStore = create<UIState>((set) => ({
 	setPendingSupportMessage: (value) => set({ pendingSupportMessage: value }),
 	isShortcutsRevealed: false,
 	setShortcutsRevealed: (value) => set({ isShortcutsRevealed: value }),
+	isMobileNavOpen: false,
+	setMobileNavOpen: (value) => set({ isMobileNavOpen: value }),
+	toggleMobileNav: () =>
+		set((state) => ({ isMobileNavOpen: !state.isMobileNavOpen })),
 }));
