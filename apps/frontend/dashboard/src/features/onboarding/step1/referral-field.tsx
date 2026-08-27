@@ -88,7 +88,7 @@ export function ReferralField() {
 								placeholder="Search sources..."
 								value={searchQuery}
 								onChange={(e) => setSearchQuery(e.target.value)}
-								className="w-full bg-transparent font-medium text-sm text-text-strong-950 outline-none placeholder:text-text-soft-400"
+								className="w-full bg-transparent font-medium text-[16px] text-text-strong-950 outline-none placeholder:text-text-soft-400 max-sm:!text-[16px] sm:text-sm"
 								// biome-ignore lint/a11y/noAutofocus: match existing onboarding UX
 								autoFocus
 							/>

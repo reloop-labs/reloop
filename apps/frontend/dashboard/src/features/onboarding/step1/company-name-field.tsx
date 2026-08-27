@@ -19,7 +19,7 @@ export function CompanyNameField() {
 						id="company-name"
 						type="text"
 						value={name}
-						className="font-medium"
+						className="font-medium text-[16px] max-sm:!text-[16px]"
 						maxLength={ORGANIZATION_NAME_MAX_LENGTH}
 						onChange={(e) => {
 							setName(e.target.value.slice(0, ORGANIZATION_NAME_MAX_LENGTH));

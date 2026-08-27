@@ -41,8 +41,8 @@ export const inputVariants = tv({
 			"has-[input:disabled]:pointer-events-none has-[input:disabled]:bg-bg-weak-50",
 		],
 		input: [
-			// base
-			"w-full bg-transparent bg-none paragraph-sm text-text-strong-950 outline-none",
+			// 16px on small viewports so iOS never zooms; sm+ keeps paragraph-sm.
+			"w-full bg-transparent bg-none text-[16px] text-text-strong-950 outline-none max-sm:!text-[16px] sm:paragraph-sm",
 			"transition duration-200 ease-out",
 			// placeholder
 			"placeholder:select-none placeholder:text-text-soft-400 placeholder:transition placeholder:duration-200 placeholder:ease-out",
