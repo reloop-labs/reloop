@@ -49,16 +49,8 @@ export function OnboardingShell({
 	const direction = directionRef.current;
 
 	const targetWidth = step === 2 ? STEP_WIDTH_PX[2] : STEP_WIDTH_PX[1];
-	const [viewportCap, setViewportCap] = useState(targetWidth);
 	const contentRef = useRef<HTMLDivElement>(null);
 	const [bandHeight, setBandHeight] = useState<number | "auto">("auto");
-
-	useLayoutEffect(() => {
-		const sync = () => setViewportCap(window.innerWidth);
-		sync();
-		window.addEventListener("resize", sync);
-		return () => window.removeEventListener("resize", sync);
-	}, []);
 
 	useLayoutEffect(() => {
 		const el = contentRef.current;
@@ -70,8 +62,6 @@ export function OnboardingShell({
 		return () => ro.disconnect();
 	}, [step]);
 
-	const shellWidth = Math.min(targetWidth, viewportCap);
-
 	return (
 		<div className="relative flex min-h-screen w-full flex-col items-center overflow-x-clip">
 			<div className="fixed right-5 bottom-5 z-50 sm:right-6 sm:bottom-6">
@@ -79,9 +69,9 @@ export function OnboardingShell({
 			</div>
 			<motion.div
 				initial={false}
-				animate={{ width: shellWidth }}
+				animate={{ width: targetWidth }}
 				transition={reduce ? { duration: 0 } : SHELL_SPRING}
-				className="relative flex min-h-screen w-full flex-col border-stroke-soft-100 border-x dark:border-stroke-soft-100/40"
+				className="relative flex min-h-screen w-full max-w-full flex-col border-stroke-soft-100 border-x dark:border-stroke-soft-100/40"
 			>
 				<a
 					href="/home"
