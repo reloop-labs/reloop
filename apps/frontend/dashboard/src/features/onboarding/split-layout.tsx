@@ -1,50 +1,33 @@
 import NumberFlow from "@number-flow/react";
 import { cn } from "@reloop/ui/cn";
 import { Logo } from "@reloop/ui/logo";
-
-import type { Variants } from "framer-motion";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useQueryState } from "nuqs";
 import type React from "react";
-import { useEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { ThemeToggle } from "#/features/dashboard/page-header/theme-toggle";
 import { onboardingStepParser } from "./onboarding-step";
 
-const AnimatedHeight = ({ children }: { children: React.ReactNode }) => {
-	const innerRef = useRef<HTMLDivElement>(null);
-	const [height, setHeight] = useState<number | "auto">("auto");
+/** Same motion as the landing-page mega menu (`header.tsx`). */
+const EASE_DEFAULT: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
+const SLIDE_PX = 200;
+const SLIDE_S = 0.25;
+const SHELL_SPRING = { type: "spring", bounce: 0, duration: 0.32 } as const;
 
-	useEffect(() => {
-		if (!innerRef.current) return;
-		// Snapshot the initial height synchronously so the first render
-		// doesn't animate from 0.
-		setHeight(innerRef.current.offsetHeight);
-		const ro = new ResizeObserver(() => {
-			if (innerRef.current) {
-				setHeight(innerRef.current.offsetHeight);
-			}
-		});
-		ro.observe(innerRef.current);
-		return () => ro.disconnect();
-	}, []);
-
-	return (
-		<motion.div
-			animate={{ height }}
-			transition={
-				height === "auto"
-					? { duration: 0 }
-					: { duration: 0.32, ease: [0.23, 1, 0.32, 1] }
-			}
-			// Clip vertical overflow for height animation only — keep action rows visible.
-			className="min-w-0 overflow-y-hidden overflow-x-visible"
-		>
-			<div ref={innerRef} className="min-w-0 p-1.5">
-				{children}
-			</div>
-		</motion.div>
-	);
+const contentVariants = {
+	enter: (dir: number) => ({
+		opacity: 0,
+		x: dir > 0 ? SLIDE_PX : dir < 0 ? -SLIDE_PX : 0,
+	}),
+	center: {
+		opacity: 1,
+		x: 0,
+	},
+	exit: (dir: number) => ({
+		opacity: 0,
+		x: dir > 0 ? -SLIDE_PX : dir < 0 ? SLIDE_PX : 0,
+	}),
 };
 
 interface SplitLayoutProps {
@@ -58,58 +41,11 @@ interface SplitLayoutProps {
 	verticalAlign?: "center" | "start";
 }
 
-const contentVariants: Variants = {
-	initial: (dir: number) => ({
-		opacity: 0,
-		filter: "blur(8px)",
-		transform: `translateX(${dir * 14}px)`,
-	}),
-	animate: {
-		opacity: 1,
-		filter: "blur(0px)",
-		transform: "translateX(0px)",
-		transition: {
-			duration: 0.28,
-			ease: [0.23, 1, 0.32, 1] as const,
-		},
-	},
-	exit: (dir: number) => ({
-		opacity: 0,
-		filter: "blur(6px)",
-		transform: `translateX(${dir * -14}px)`,
-		transition: {
-			duration: 0.18,
-			ease: [0.23, 1, 0.32, 1] as const,
-		},
-	}),
-};
-
-const previewVariants: Variants = {
-	initial: (dir: number) => ({
-		opacity: 0,
-		filter: "blur(8px)",
-		transform: `translateY(${dir * 12}px)`,
-	}),
-	animate: {
-		opacity: 1,
-		filter: "blur(0px)",
-		transform: "translateY(0px)",
-		transition: {
-			duration: 0.3,
-			ease: [0.23, 1, 0.32, 1] as const,
-			delay: 0.05,
-		},
-	},
-	exit: (dir: number) => ({
-		opacity: 0,
-		filter: "blur(6px)",
-		transform: `translateY(${dir * -12}px)`,
-		transition: {
-			duration: 0.18,
-			ease: [0.23, 1, 0.32, 1] as const,
-		},
-	}),
-};
+function desktopWidthPx(maxWidth: "3xl" | "4xl" | "5xl"): number {
+	if (maxWidth === "3xl") return 768;
+	if (maxWidth === "4xl") return 896;
+	return 1024;
+}
 
 export function SplitLayout({
 	stepIndicator,
@@ -121,6 +57,7 @@ export function SplitLayout({
 	verticalAlign = "center",
 }: SplitLayoutProps) {
 	const [step] = useQueryState("step", onboardingStepParser);
+	const shouldReduceMotion = useReducedMotion();
 
 	const prevStepRef = useRef(0);
 	const directionRef = useRef<1 | -1>(1);
@@ -132,7 +69,46 @@ export function SplitLayout({
 	}
 	const direction = directionRef.current;
 
-	// Browser back / Esc use history — step advances push entries (see onboardingStepParser).
+	const [isLg, setIsLg] = useState(false);
+	const [viewportCap, setViewportCap] = useState(1024);
+	const contentRef = useRef<HTMLDivElement>(null);
+	const [shellHeight, setShellHeight] = useState<number | "auto">("auto");
+
+	useLayoutEffect(() => {
+		const mq = window.matchMedia("(min-width: 1024px)");
+		const sync = () => {
+			setIsLg(mq.matches);
+			setViewportCap(window.innerWidth - 32);
+		};
+		sync();
+		mq.addEventListener("change", sync);
+		window.addEventListener("resize", sync);
+		return () => {
+			mq.removeEventListener("change", sync);
+			window.removeEventListener("resize", sync);
+		};
+	}, []);
+
+	const showPreview = Boolean(previewContent) && !fullWidth;
+	const targetWidth = isLg
+		? desktopWidthPx(maxWidth)
+		: fullWidth
+			? 576
+			: 512;
+	const shellWidth = Math.min(targetWidth, viewportCap);
+
+	useLayoutEffect(() => {
+		const el = contentRef.current;
+		if (!el) return;
+		const measure = () => {
+			setShellHeight(el.offsetHeight);
+		};
+		measure();
+		const ro = new ResizeObserver(measure);
+		ro.observe(el);
+		return () => ro.disconnect();
+	}, [step, children, previewContent, shellWidth]);
+
 	useHotkeys(
 		"escape",
 		() => {
@@ -147,129 +123,115 @@ export function SplitLayout({
 	const currentStep = stepMatch ? Number(stepMatch[1]) : null;
 	const totalSteps = stepMatch ? Number(stepMatch[2]) : null;
 
+	const reduce = Boolean(shouldReduceMotion);
+
 	return (
-		<div className="relative flex min-h-screen w-full flex-col items-center">
-			{/* Quiet corner control so users can switch theme without hunting settings. */}
+		<div className="relative flex min-h-screen w-full flex-col items-center overflow-x-clip">
 			<div className="fixed right-5 bottom-5 z-50 sm:right-6 sm:bottom-6">
 				<ThemeToggle />
 			</div>
-			<div
-				className="relative flex min-h-screen w-full flex-col border-stroke-soft-100 border-r border-l dark:border-stroke-soft-100/40"
-				style={{
-					maxWidth:
-						maxWidth === "3xl"
-							? "48rem"
-							: maxWidth === "4xl"
-								? "56rem"
-								: "64rem",
-					transition: "max-width 0.28s cubic-bezier(0.23, 1, 0.32, 1)",
-				}}
+			<a
+				href="/home"
+				aria-label="Reloop home"
+				className="-translate-x-1/2 absolute top-5 left-1/2 z-50 flex items-center space-x-2 transition-opacity hover:opacity-80"
 			>
-				<a
-					href="/home"
-					aria-label="Reloop home"
-					className="-translate-x-1/2 absolute top-5 left-1/2 z-50 flex items-center space-x-2 transition-opacity hover:opacity-80"
+				<Logo className="h-10 w-10 lg:h-11 lg:w-11" />
+				<span className="-ml-3 font-semibold text-text-strong-950 text-xl">
+					Reloop
+				</span>
+			</a>
+			<div
+				className={cn(
+					"flex w-full flex-1 flex-col items-center px-4",
+					verticalAlign === "center"
+						? "justify-center pt-24 pb-16"
+						: "justify-start pt-24 pb-20",
+				)}
+			>
+				<motion.div
+					initial={false}
+					animate={{
+						width: shellWidth,
+						height: reduce || shellHeight === "auto" ? "auto" : shellHeight,
+					}}
+					transition={reduce ? { duration: 0 } : SHELL_SPRING}
+					className="relative border-stroke-soft-100 border-x border-t border-b bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-bg-white-0"
+					style={{
+						overflow: "hidden",
+						maxWidth: "calc(100vw - 2rem)",
+					}}
 				>
-					<Logo className="h-10 w-10 lg:h-11 lg:w-11" />
-					<span className="-ml-3 font-semibold text-text-strong-950 text-xl">
-						Reloop
-					</span>
-				</a>
-				<div
-					className={cn(
-						"flex w-full flex-1 flex-col",
-						verticalAlign === "center"
-							? "justify-center"
-							: "justify-start pt-24 pb-20",
-					)}
-				>
-					<div className="w-full border-stroke-soft-100 border-t border-b dark:border-stroke-soft-100/40">
-						<div
-							className="mx-auto grid w-full"
-							style={{
-								gridTemplateColumns: fullWidth
-									? "1fr 0px"
-									: previewSize === "small"
-										? "1.2fr 0.8fr"
-										: "1fr 1fr",
-								transition:
-									"grid-template-columns 0.28s cubic-bezier(0.23, 1, 0.32, 1)",
-							}}
-						>
-							<div className="flex min-w-0 flex-col gap-1 px-6 pt-10 pb-10 sm:px-10 md:px-12">
-								<div className="font-medium text-text-soft-400 text-xs">
-									{currentStep !== null && totalSteps !== null ? (
-										<span className="inline-flex items-center gap-1 px-1.5">
-											Step
-											<NumberFlow
-												value={currentStep}
-												className="tabular-nums"
-												transformTiming={{
-													duration: 400,
-													easing: "ease-out",
-												}}
-											/>
-											of
-											<NumberFlow
-												value={totalSteps}
-												className="tabular-nums"
-												transformTiming={{
-													duration: 400,
-													easing: "ease-out",
-												}}
-											/>
-										</span>
-									) : (
-										stepIndicator
-									)}
-								</div>
-
-								<AnimatedHeight>
-									<AnimatePresence
-										mode="wait"
-										initial={true}
-										custom={direction}
-									>
-										<motion.div
-											key={step}
-											custom={direction}
-											variants={contentVariants}
-											initial="initial"
-											animate="animate"
-											exit="exit"
-											className="flex flex-col gap-4"
-										>
-											{children}
-										</motion.div>
-									</AnimatePresence>
-								</AnimatedHeight>
-							</div>
-
-							<div
-								className="relative hidden overflow-hidden border-stroke-soft-100 border-l lg:flex dark:border-stroke-soft-100/40"
-								style={{
-									opacity: fullWidth || !previewContent ? 0 : 1,
-									pointerEvents: fullWidth || !previewContent ? "none" : "auto",
-									transition: "opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
-								}}
-							>
-								<AnimatePresence mode="wait" initial={true} custom={direction}>
-									<motion.div
-										key={step}
-										custom={direction}
-										variants={previewVariants}
-										initial="initial"
-										animate="animate"
-										exit="exit"
-										className="relative z-10 w-full"
-									>
-										{previewContent}
-									</motion.div>
-								</AnimatePresence>
+					<div ref={contentRef} className="relative w-full">
+						<div className="px-5 pt-8 sm:px-8 lg:px-12">
+							<div className="font-medium text-text-soft-400 text-xs">
+								{currentStep !== null && totalSteps !== null ? (
+									<span className="inline-flex items-center gap-1 px-1.5">
+										Step
+										<NumberFlow
+											value={currentStep}
+											className="tabular-nums"
+											transformTiming={{
+												duration: 400,
+												easing: "ease-out",
+											}}
+										/>
+										of
+										<NumberFlow
+											value={totalSteps}
+											className="tabular-nums"
+											transformTiming={{
+												duration: 400,
+												easing: "ease-out",
+											}}
+										/>
+									</span>
+								) : (
+									stepIndicator
+								)}
 							</div>
 						</div>
+
+						<AnimatePresence
+							initial={false}
+							custom={direction}
+							mode="popLayout"
+						>
+							<motion.div
+								key={step}
+								custom={direction}
+								variants={contentVariants}
+								initial={reduce ? false : "enter"}
+								animate="center"
+								exit={reduce ? undefined : "exit"}
+								transition={
+									reduce
+										? { duration: 0 }
+										: { duration: SLIDE_S, ease: EASE_DEFAULT }
+								}
+								className="w-full"
+							>
+								<div
+									className={cn(
+										"grid w-full grid-cols-1",
+										showPreview &&
+											(previewSize === "small"
+												? "lg:grid-cols-[1.2fr_0.8fr]"
+												: "lg:grid-cols-2"),
+									)}
+								>
+									<div className="flex min-w-0 flex-col gap-4 px-5 pt-2 pb-8 sm:px-8 sm:pb-10 lg:px-12">
+										{children}
+									</div>
+									{showPreview ? (
+										<div className="relative hidden min-h-[28rem] min-w-0 overflow-hidden border-stroke-soft-100 border-l lg:block dark:border-stroke-soft-100/40">
+											{previewContent}
+										</div>
+									) : null}
+								</div>
+							</motion.div>
+						</AnimatePresence>
 					</div>
-				</div>
+				</motion.div>
 			</div>
 		</div>
 	);

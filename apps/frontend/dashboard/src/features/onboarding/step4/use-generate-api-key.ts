@@ -1,13 +1,43 @@
-import { useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { parseAsString, useQueryState } from "nuqs";
-import { useCallback, useState } from "react";
+import { useCallback, useLayoutEffect, useState } from "react";
 import { toast } from "sonner";
-import { onboardingStepParser } from "../onboarding-step";
 import { useFinishOnboarding } from "../use-finish-onboarding";
 import type { LanguageCode } from "./types";
 
 const languageCodes: LanguageCode[] = ["nodejs", "python", "go", "php"];
+
+/** Session-only flag — never stores the secret, only that one was shown. */
+const API_KEY_ISSUED_FLAG = "reloop.onboarding.apiKeyIssued";
+
+function readIssuedFlag() {
+	if (typeof window === "undefined") return false;
+	try {
+		return sessionStorage.getItem(API_KEY_ISSUED_FLAG) === "1";
+	} catch {
+		return false;
+	}
+}
+
+function markIssued() {
+	try {
+		sessionStorage.setItem(API_KEY_ISSUED_FLAG, "1");
+	} catch {
+		// Ignore quota / private-mode failures.
+	}
+}
+
+function stripApiKeyFromUrl() {
+	const url = new URL(window.location.href);
+	if (!url.searchParams.has("apiKey")) return;
+	url.searchParams.delete("apiKey");
+	const qs = url.searchParams.toString();
+	window.history.replaceState(
+		null,
+		"",
+		`${url.pathname}${qs ? `?${qs}` : ""}${url.hash}`,
+	);
+}
 
 function parseChoice(value: string): LanguageCode {
 	// Legacy ?lang=ai URLs map to Node.js (AI is no longer a tab).
@@ -19,14 +49,20 @@ function parseChoice(value: string): LanguageCode {
 
 export type PlatformTestStatus = "idle" | "sending" | "sent" | "error";
 
+/** Survives step unmount, not a full reload. Never written to the URL. */
+let inMemoryApiKey = "";
+
 export function useGenerateApiKey() {
-	const queryClient = useQueryClient();
 	const { finishOnboarding, isFinishing: finishing } = useFinishOnboarding();
-	const [, setStep] = useQueryState("step", onboardingStepParser);
-	const [apiKey, setApiKey] = useQueryState(
-		"apiKey",
-		parseAsString.withDefault(""),
+	const [apiKey, setApiKeyState] = useState(inMemoryApiKey);
+	const [mustRegenerate, setMustRegenerate] = useState(
+		() => !inMemoryApiKey && readIssuedFlag(),
 	);
+
+	const setApiKey = (key: string) => {
+		inMemoryApiKey = key;
+		setApiKeyState(key);
+	};
 	const [choiceParam, setChoiceParam] = useQueryState(
 		"lang",
 		parseAsString.withDefault("nodejs"),
@@ -39,13 +75,17 @@ export function useGenerateApiKey() {
 
 	const choice = parseChoice(choiceParam);
 
+	useLayoutEffect(() => {
+		stripApiKeyFromUrl();
+	}, []);
+
 	const advanceStep = useCallback(async () => {
-		await finishOnboarding();
-	}, [finishOnboarding]);
+		await finishOnboarding(apiKey);
+	}, [finishOnboarding, apiKey]);
 
 	const skipStep = useCallback(async () => {
-		await finishOnboarding();
-	}, [finishOnboarding]);
+		await finishOnboarding(apiKey);
+	}, [finishOnboarding, apiKey]);
 
 	const generateKey = async () => {
 		setLoading(true);
@@ -56,6 +96,8 @@ export function useGenerateApiKey() {
 				{ withCredentials: true },
 			);
 			setApiKey(response.data.key);
+			markIssued();
+			setMustRegenerate(false);
 			setTestStatus("idle");
 			setTestError(null);
 			setTestTo(null);
@@ -119,6 +161,7 @@ export function useGenerateApiKey() {
 
 	return {
 		apiKey,
+		mustRegenerate,
 		loading,
 		finishing,
 		choice,

@@ -209,7 +209,9 @@ export function ActionKbd({
 	className?: string;
 }) {
 	return (
-		<KbdKey className={cn(shortcutKbdClassName, className)}>{children}</KbdKey>
+		<KbdKey className={cn(shortcutKbdClassName, "max-sm:hidden", className)}>
+			{children}
+		</KbdKey>
 	);
 }
 
@@ -344,7 +346,7 @@ export function ShortcutHint({
 					// -my keeps the nav row height unchanged. Nudge up for optical align.
 					// justify-start so if width is briefly short we clip the trailing key,
 					// never the leading "G" of a sequence.
-					className="-my-0.5 -translate-y-px inline-flex shrink-0 items-center justify-start overflow-hidden py-0.5"
+					className="-my-0.5 -translate-y-px inline-flex max-sm:hidden shrink-0 items-center justify-start overflow-hidden py-0.5"
 				>
 					<span
 						ref={innerRef}

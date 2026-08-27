@@ -1,24 +1,20 @@
-import { Skeleton } from "@reloop/ui/skeleton";
 import { useRouter } from "next/navigation";
-
 import { parseAsString, useQueryState } from "nuqs";
-import type React from "react";
 import { useEffect, useRef } from "react";
+import { useHotkeys } from "react-hotkeys-hook";
 import { AuthSessionLoader } from "#/features/auth/auth-session-loader";
 import { useSessionQuery } from "#/features/auth/session-query";
+import { OnboardingShell } from "./onboarding-shell";
 import { onboardingStepParser } from "./onboarding-step";
-import { SidebarPreview } from "./sidebar-preview";
-import { SplitLayout } from "./split-layout";
-import { CreateOrgStep } from "./step1/create-org-step";
-import { GenerateApiKeyStep } from "./step4/generate-api-key-step";
+import { StepOne } from "./step1/step-one";
+import { StepOneSkeleton } from "./step1/step-one-skeleton";
+import { StepTwo } from "./step4/step-two";
+import { StepTwoSkeleton } from "./step4/step-two-skeleton";
 
 export function OnboardingPage() {
 	const router = useRouter();
 	const { data: session, isPending } = useSessionQuery();
 	const [step] = useQueryState("step", onboardingStepParser);
-	const [name] = useQueryState("name", parseAsString.withDefault(""));
-	const [logoUrl] = useQueryState("logoUrl", parseAsString.withDefault(""));
-	const [, setApiKey] = useQueryState("apiKey", parseAsString.withDefault(""));
 	const [, setLang] = useQueryState("lang", parseAsString.withDefault(""));
 
 	useEffect(() => {
@@ -28,101 +24,44 @@ export function OnboardingPage() {
 		}
 	}, [session, isPending, router]);
 
-	// Clear step-local URL state when the user navigates back (browser back / Esc).
 	const prevStepRef = useRef(step);
 	useEffect(() => {
 		const prev = prevStepRef.current;
 		if (step < prev) {
 			if (prev === 2) {
-				void setApiKey(null);
 				void setLang(null);
 			}
 		}
 		prevStepRef.current = step;
-	}, [step, setApiKey, setLang]);
+	}, [step, setLang]);
 
-	if (isPending) {
-		return (
-			<SplitLayout
-				stepIndicator="Step 1 of 2"
-				previewContent={
-					<div className="flex h-full flex-col gap-4 p-8">
-						<Skeleton className="h-8 w-1/3 rounded-lg" />
-						<Skeleton className="h-full w-full rounded-2xl" />
-					</div>
-				}
-			>
-				<div className="space-y-6">
-					<div className="flex items-center gap-4">
-						<Skeleton className="h-[72px] w-[72px] rounded-xl" />
-						<div className="space-y-2">
-							<Skeleton className="h-4 w-32 rounded" />
-							<Skeleton className="h-3 w-48 rounded" />
-						</div>
-					</div>
-					<div className="space-y-3.5 pt-6">
-						<div className="flex flex-col gap-1">
-							<Skeleton className="h-4 w-24 rounded" />
-							<Skeleton className="h-10 w-full rounded-lg" />
-						</div>
-						<div className="flex flex-col gap-1">
-							<Skeleton className="h-4 w-32 rounded" />
-							<Skeleton className="h-10 w-full rounded-lg" />
-						</div>
-					</div>
-					<Skeleton className="mt-6 h-11 w-full rounded-xl" />
-				</div>
-			</SplitLayout>
-		);
-	}
+	useHotkeys(
+		"escape",
+		() => {
+			if (step > 1) {
+				window.history.back();
+			}
+		},
+		{ enabled: step > 1 },
+	);
 
-	if (!session) {
+	if (!isPending && !session) {
 		return <AuthSessionLoader />;
 	}
 
-	const stepsConfig: Record<
-		number,
-		{
-			stepIndicator: string;
-			component: React.ReactNode;
-			preview: React.ReactNode;
-			fullWidth: boolean;
-			maxWidth?: "3xl" | "4xl" | "5xl";
-			verticalAlign?: "center" | "start";
-		}
-	> = {
-		1: {
-			stepIndicator: "Step 1 of 2",
-			component: <CreateOrgStep />,
-			preview: <SidebarPreview name={name} logo={logoUrl || null} />,
-			fullWidth: false,
-		},
-		2: {
-			stepIndicator: "Step 2 of 2",
-			component: <GenerateApiKeyStep />,
-			preview: null,
-			fullWidth: true,
-			maxWidth: "3xl",
-			verticalAlign: "start",
-		},
-	};
-
-	const currentConfig = stepsConfig[step as keyof typeof stepsConfig];
-
-	if (!currentConfig) {
-		return null;
-	}
-
 	return (
-		<SplitLayout
-			stepIndicator={currentConfig.stepIndicator}
-			previewContent={currentConfig.preview}
-			fullWidth={currentConfig.fullWidth}
-			previewSize="medium"
-			maxWidth={currentConfig.maxWidth}
-			verticalAlign={currentConfig.verticalAlign}
-		>
-			{currentConfig.component}
-		</SplitLayout>
+		<OnboardingShell step={step}>
+			{isPending ? (
+				step === 2 ? (
+					<StepTwoSkeleton />
+				) : (
+					<StepOneSkeleton />
+				)
+			) : step === 2 ? (
+				<StepTwo />
+			) : (
+				<StepOne />
+			)}
+		</OnboardingShell>
 	);
 }

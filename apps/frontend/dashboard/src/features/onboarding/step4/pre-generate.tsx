@@ -13,9 +13,11 @@ const actionKbdOnBlueClassName =
 export function PreGenerate({
 	loading,
 	onGenerate,
+	mustRegenerate = false,
 }: {
 	loading: boolean;
 	onGenerate: () => void;
+	mustRegenerate?: boolean;
 }) {
 	useHotkeys(
 		"enter",
@@ -33,11 +35,12 @@ export function PreGenerate({
 				<Icon name="key-new" className="h-10 w-10 text-text-sub-600" />
 			</div>
 			<h3 className="mb-2 font-semibold text-text-strong-950 text-xl">
-				Create your API key
+				{mustRegenerate ? "Generate a new API key" : "Create your API key"}
 			</h3>
 			<p className="mx-auto mb-6 max-w-lg text-balance font-medium text-[12px] text-text-sub-600">
-				This key lets your app send emails through Reloop. Copy it now — for
-				security, we won&apos;t show it again.
+				{mustRegenerate
+					? "This page was reloaded, so the previous key is no longer shown. Generate a new one to continue."
+					: "This key lets your app send emails through Reloop. Copy it now — for security, we won't show it again."}
 			</p>
 			<div className="flex items-center gap-3">
 				<FancyButton.Root
@@ -80,7 +83,9 @@ export function PreGenerate({
 							) : (
 								<>
 									<Icon name="key-new" className="h-4 w-4 shrink-0" />
-									<span>Create API key</span>
+									<span>
+										{mustRegenerate ? "Generate new key" : "Create API key"}
+									</span>
 									<ActionKbd className={actionKbdOnBlueClassName}>↵</ActionKbd>
 								</>
 							)}
