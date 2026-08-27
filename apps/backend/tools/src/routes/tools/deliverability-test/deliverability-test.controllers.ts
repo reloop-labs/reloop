@@ -1,5 +1,6 @@
 import crypto from "node:crypto";
 import { toolsConfig } from "@be/tools/tools.config";
+import { withDeadline } from "@be/tools/utils/deadline";
 import { redis } from "@be/tools/utils/loader";
 import { createError, log } from "evlog";
 import { analyzeInboundEmail } from "./analyzer";
@@ -8,6 +9,7 @@ import type {
 	DeliverabilitySession,
 	GetSessionResponse,
 } from "./deliverability-test.types";
+import { getSession, setSession } from "./session-store";
 
 type IngestResult = {
 	success: boolean;
@@ -44,7 +46,11 @@ export async function createDeliverabilityTestSession(
 ): Promise<CreateSessionResponse> {
 	const rateLimitKey = `rate-limit:deliverability-session:${clientIp}`;
 	try {
-		const current = await redis.increment(rateLimitKey);
+		const current = await withDeadline(
+			redis.increment(rateLimitKey),
+			250,
+			"Redis increment",
+		);
 		if (current === 1) {
 			await redis.expire(rateLimitKey, 3600);
 		} else if (current > toolsConfig.constants.maxSessionPerIpPerHour) {
@@ -76,16 +82,11 @@ export async function createDeliverabilityTestSession(
 	};
 
 	const sessionKey = `deliverability-test:${rawToken}`;
-	await redis.set(
-		sessionKey,
-		session,
-		toolsConfig.constants.testSessionTtlSeconds,
-	);
-	await redis.set(
-		`deliverability-test:${token}`,
-		session,
-		toolsConfig.constants.testSessionTtlSeconds,
-	);
+	const ttl = toolsConfig.constants.testSessionTtlSeconds;
+	await Promise.all([
+		setSession(sessionKey, session, ttl),
+		setSession(`deliverability-test:${token}`, session, ttl),
+	]);
 
 	log.info(
 		"DeliverabilityTest",
@@ -105,7 +106,7 @@ export async function getDeliverabilityTestSession(
 ): Promise<GetSessionResponse> {
 	const rawToken = normalizeToken(tokenParam);
 	const sessionKey = `deliverability-test:${rawToken}`;
-	const session = await redis.get<DeliverabilitySession>(sessionKey);
+	const session = await getSession<DeliverabilitySession>(sessionKey);
 
 	if (!session) {
 		return {
@@ -191,7 +192,7 @@ async function findSessionForInboundMime(
 	recipient: string | null,
 ): Promise<{ session: DeliverabilitySession; rawToken: string } | null> {
 	for (const rawToken of collectTesterTokenCandidates(rawMime, recipient)) {
-		const session = await redis.get<DeliverabilitySession>(
+		const session = await getSession<DeliverabilitySession>(
 			`deliverability-test:${rawToken}`,
 		);
 		if (session) {
@@ -226,16 +227,11 @@ async function persistSession(
 		...session,
 		...patch,
 	};
-	await redis.set(
-		`deliverability-test:${rawToken}`,
-		updatedSession,
-		toolsConfig.constants.testSessionTtlSeconds,
-	);
-	await redis.set(
-		`deliverability-test:${session.token}`,
-		updatedSession,
-		toolsConfig.constants.testSessionTtlSeconds,
-	);
+	const ttl = toolsConfig.constants.testSessionTtlSeconds;
+	await Promise.all([
+		setSession(`deliverability-test:${rawToken}`, updatedSession, ttl),
+		setSession(`deliverability-test:${session.token}`, updatedSession, ttl),
+	]);
 	return updatedSession;
 }
 
