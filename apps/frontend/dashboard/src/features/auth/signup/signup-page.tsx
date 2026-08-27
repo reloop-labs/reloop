@@ -89,7 +89,9 @@ export function SignupPage() {
 
 	const ctaLoading = isOtpStep ? otpUi.isLoading : emailLoading;
 	const ctaSuccess = isOtpStep && otpUi.isSuccess;
-	const ctaDisabled = ctaLoading;
+	const ctaDisabled = isOtpStep
+		? !otpUi.canSubmit || ctaLoading
+		: !emailCanSubmit || ctaLoading;
 
 	return (
 		// Shell stays static; step animation lives inside the card only.
@@ -186,7 +188,17 @@ export function SignupPage() {
 					>
 						<AnimatePresence mode="popLayout" initial={false}>
 							<motion.span
-								key={ctaSuccess ? "success" : ctaLoading ? "loading" : "idle"}
+								key={
+									ctaSuccess
+										? "success"
+										: ctaLoading
+											? isOtpStep
+												? "verifying"
+												: "sending"
+											: isOtpStep
+												? "verify-otp"
+												: "create-account"
+								}
 								transition={{ type: "spring", duration: 0.25, bounce: 0 }}
 								initial={{ opacity: 0, y: -14 }}
 								animate={{ opacity: 1, y: 0 }}
@@ -202,9 +214,11 @@ export function SignupPage() {
 										? "Sign up successful! Redirecting…"
 										: ctaLoading
 											? isOtpStep
-												? "Creating…"
-												: "Creating…"
-											: "Create account"}
+												? "Verifying…"
+												: "Sending code…"
+											: isOtpStep
+												? "Verify OTP"
+												: "Create account"}
 								</span>
 							</motion.span>
 						</AnimatePresence>

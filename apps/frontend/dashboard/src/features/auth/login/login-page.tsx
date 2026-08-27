@@ -98,7 +98,9 @@ export function LoginPage() {
 
 	const ctaLoading = isOtpStep ? otpUi.isLoading : emailLoading;
 	const ctaSuccess = isOtpStep && otpUi.isSuccess;
-	const ctaDisabled = ctaLoading;
+	const ctaDisabled = isOtpStep
+		? !otpUi.canSubmit || ctaLoading
+		: !emailCanSubmit || ctaLoading;
 
 	return (
 		<AuthShell direction={direction} hideLogo>
@@ -195,7 +197,17 @@ export function LoginPage() {
 					>
 						<AnimatePresence mode="popLayout" initial={false}>
 							<motion.span
-								key={ctaSuccess ? "success" : ctaLoading ? "loading" : "idle"}
+								key={
+									ctaSuccess
+										? "success"
+										: ctaLoading
+											? isOtpStep
+												? "verifying"
+												: "sending"
+											: isOtpStep
+												? "verify-otp"
+												: "login"
+								}
 								transition={{ type: "spring", duration: 0.25, bounce: 0 }}
 								initial={{ opacity: 0, y: -14 }}
 								animate={{ opacity: 1, y: 0 }}
@@ -210,8 +222,12 @@ export function LoginPage() {
 									{ctaSuccess
 										? "Login successful! Redirecting…"
 										: ctaLoading
-											? "Logging in…"
-											: "Login"}
+											? isOtpStep
+												? "Verifying…"
+												: "Sending code…"
+											: isOtpStep
+												? "Verify OTP"
+												: "Login"}
 								</span>
 							</motion.span>
 						</AnimatePresence>

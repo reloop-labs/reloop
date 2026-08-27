@@ -247,12 +247,14 @@ export function VerifyOTP({
 				<DigitInput.Root
 					value={otpValue}
 					onChange={(val) => {
+						const digitsOnly = val.replace(/\D/g, "");
 						setError({ name: "email", error: null });
 						setIsSuccess(false);
-						setOtpValue(val);
+						setOtpValue(digitsOnly);
 					}}
 					onComplete={handleVerify}
 					inputMode="numeric"
+					pattern={DigitInput.REGEXP_ONLY_DIGITS}
 					maxLength={6}
 					autoFocus
 					hasError={!!error.error}

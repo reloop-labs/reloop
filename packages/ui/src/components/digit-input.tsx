@@ -2,7 +2,7 @@
 
 import { cn } from "@reloop/ui/cn";
 
-import { OTPInput, OTPInputContext } from "input-otp";
+import { OTPInput, OTPInputContext, REGEXP_ONLY_DIGITS } from "input-otp";
 import { AnimatePresence, MotionConfig, motion } from "motion/react";
 import { createContext, useContext } from "react";
 
@@ -21,12 +21,14 @@ export function InputOTP({
 	className,
 	hasError,
 	isSuccess,
+	pattern = REGEXP_ONLY_DIGITS,
 	...props
 }: InputOTPProps) {
 	return (
 		<DigitInputContext.Provider value={{ hasError, isSuccess }}>
 			<OTPInput
 				data-slot="input-otp"
+				pattern={pattern}
 				containerClassName={cn(
 					"flex items-center gap-2 has-disabled:opacity-50",
 					containerClassName,
@@ -160,4 +162,5 @@ export {
 	InputOTPGroup as Group,
 	InputOTPSlot as Slot,
 	InputOTPSeparator as Separator,
+	REGEXP_ONLY_DIGITS,
 };
