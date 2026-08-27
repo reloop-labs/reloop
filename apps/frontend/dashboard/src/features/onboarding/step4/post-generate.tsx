@@ -300,13 +300,13 @@ export function PostGenerate({
 								animate={{ opacity: 1, y: 0 }}
 								exit={{ opacity: 0, y: -8 }}
 								transition={{ type: "spring", duration: 0.25, bounce: 0 }}
-								className="min-w-0 flex-1"
+								className="w-full sm:ml-auto sm:w-auto"
 							>
 								<FancyButton.Root
 									variant="blue"
 									size="medium"
 									className={cn(
-										"h-10 w-full justify-center overflow-visible whitespace-nowrap rounded-xl font-medium text-sm transition-all duration-200",
+										"h-10 w-full justify-center overflow-visible whitespace-nowrap rounded-xl font-medium text-sm transition-all duration-200 sm:w-auto sm:min-w-[170px]",
 										finishing && "pointer-events-none opacity-90",
 									)}
 									onClick={handleContinue}
