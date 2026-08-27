@@ -1,0 +1,102 @@
+{
+	email {$RELOOP_ACME_EMAIL}
+	on_demand_tls {
+		ask http://domain:8011/api/domain/v1/caddy/ask
+	}
+}
+
+(reloop_app) {
+	encode zstd gzip
+
+	handle /dashboard* {
+		reverse_proxy dashboard:3000
+	}
+	handle /console* {
+		reverse_proxy console:3002
+	}
+	handle /docs* {
+		reverse_proxy docs:3000
+	}
+	handle /preferences* {
+		reverse_proxy links:3005
+	}
+	handle /redirect* {
+		reverse_proxy links:3005
+	}
+
+	handle /api/auth* {
+		reverse_proxy auth:8000
+	}
+	handle /api/domain* {
+		reverse_proxy domain:8011
+	}
+	handle /api/api-key* {
+		reverse_proxy api-key:8012
+	}
+	handle /api/webhook* {
+		reverse_proxy webhook:8013
+	}
+	handle /api/contacts* {
+		reverse_proxy contacts:8014
+	}
+	handle /api/mail* {
+		reverse_proxy mail:8015
+	}
+	handle /api/logs* {
+		reverse_proxy logs:8016
+	}
+	handle /api/workflow* {
+		reverse_proxy workflow:8017
+	}
+	handle /api/upload* {
+		reverse_proxy upload:8018
+	}
+	handle /api/template* {
+		reverse_proxy template:8019
+	}
+	handle /api/inbox* {
+		reverse_proxy inbox:8021
+	}
+	handle /api/email* {
+		reverse_proxy email:8022
+	}
+	handle /api/credits* {
+		reverse_proxy credits:8023
+	}
+	handle /api/admin* {
+		reverse_proxy admin:8024
+	}
+	handle /api/tool* {
+		reverse_proxy tools:8026
+	}
+
+	handle {
+		redir /* /dashboard 302
+	}
+}
+
+(reloop_tracking) {
+	encode zstd gzip
+
+	handle /api/mail* {
+		reverse_proxy mail:8015
+	}
+	handle {
+		reverse_proxy links:3005
+	}
+}
+
+{$RELOOP_SITE_ADDRESS} {
+	import reloop_app
+}
+
+{$RELOOP_TRACKING_SITE_ADDRESS} {
+	import reloop_tracking
+}
+
+https:// {
+	tls {
+		on_demand
+	}
+	import reloop_tracking
+}

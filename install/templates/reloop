@@ -1,0 +1,102 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+INSTALL_DIR="${RELOOP_INSTALL_DIR:-/opt/reloop}"
+
+if [ ! -f "$INSTALL_DIR/docker-compose.yml" ]; then
+	printf 'No Reloop installation found at %s\n' "$INSTALL_DIR" >&2
+	exit 1
+fi
+
+if [ "$(id -u)" -ne 0 ]; then
+	printf 'reloop must run as root (the configuration is root-only).\n' >&2
+	exit 1
+fi
+
+compose() {
+	docker compose --project-directory "$INSTALL_DIR" \
+		-f "$INSTALL_DIR/docker-compose.yml" "$@"
+}
+
+backup_database() {
+	local dir="$INSTALL_DIR/backups" file user db
+	user="$(sed -n 's/^POSTGRES_USER=//p' "$INSTALL_DIR/.env" | tail -1)"
+	db="$(sed -n 's/^POSTGRES_DB=//p' "$INSTALL_DIR/.env" | tail -1)"
+	[ -n "$user" ] && [ -n "$db" ] || return 0
+	install -d -m 0700 -o root -g root "$dir"
+	file="$dir/pre-migration-$(date +%Y%m%d%H%M%S).sql.gz"
+	if compose exec -T postgres pg_dump -U "$user" -d "$db" | gzip >"$file"; then
+		chmod 600 "$file"
+		printf 'Database backed up to %s\n' "$file"
+	else
+		rm -f "$file"
+		printf 'Database backup failed; refusing to change the schema.\n' >&2
+		exit 1
+	fi
+}
+
+usage() {
+	cat <<'EOF'
+Usage: reloop <command> [service...]
+
+  status            Show every container and its health
+  logs [service]    Follow logs (all services, or one)
+  start             Start the stack
+  stop              Stop the stack (data is kept)
+  restart [service] Restart the stack or one service
+  update            Pull the configured image version and redeploy
+  migrate           Re-apply the database schema
+  backup            Dump the database to <install>/backups
+  config            Print the installation paths
+EOF
+}
+
+cmd="${1:-}"
+[ "$#" -gt 0 ] && shift || true
+
+case "$cmd" in
+status | ps)
+	compose ps
+	;;
+logs)
+	compose logs -f --tail 100 "$@"
+	;;
+start | up)
+	compose up -d
+	;;
+stop | down)
+	compose stop
+	;;
+restart)
+	compose restart "$@"
+	;;
+update)
+	compose pull
+	backup_database
+	compose --profile tools run --rm migrate
+	compose up -d --remove-orphans
+	compose ps
+	;;
+migrate)
+	backup_database
+	compose --profile tools run --rm migrate
+	;;
+backup)
+	backup_database
+	;;
+config)
+	printf 'Install directory: %s\n' "$INSTALL_DIR"
+	printf 'Configuration:     %s/.env\n' "$INSTALL_DIR"
+	printf 'Compose file:      %s/docker-compose.yml\n' "$INSTALL_DIR"
+	printf 'Reverse proxy:     %s/Caddyfile\n' "$INSTALL_DIR"
+	printf 'Backups:           %s/backups\n' "$INSTALL_DIR"
+	;;
+"" | -h | --help | help)
+	usage
+	;;
+*)
+	printf 'Unknown command: %s\n\n' "$cmd" >&2
+	usage >&2
+	exit 1
+	;;
+esac

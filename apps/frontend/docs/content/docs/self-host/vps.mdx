@@ -1,7 +1,136 @@
 ---
 title: Deploy on VPS
-description: Learn how to self-host Reloop on a VPS / Virtual Private Server.
+description: Install the full Reloop stack on a fresh Ubuntu or Debian server with one command.
 icon: server
 ---
 
-Coming Soon
+The Reloop self-host installer takes a fresh VPS and turns it into a running Reloop deployment: it installs Docker, generates production secrets, writes the Compose stack, applies the database schema, starts every service, verifies it is healthy, and prints the DNS records you need to add.
+
+```bash
+curl -fsSL https://reloop.sh/install.sh | sudo bash
+```
+
+---
+
+## Before you start
+
+| Requirement | Value |
+| :--- | :--- |
+| **Operating system** | Ubuntu 22.04 LTS, Ubuntu 24.04 LTS, Debian 12, Debian 13 |
+| **Architecture** | x86_64 |
+| **CPU** | 2 vCPUs minimum, 4+ recommended |
+| **RAM** | 4 GB minimum, 8 GB recommended |
+| **Disk** | 45 GB minimum, 60 GB recommended |
+| **Ports** | `80`, `443`, `25`, `465`, `587` free |
+| **Access** | root or sudo |
+
+> [!NOTE]
+> The container images are roughly 28 GB in total, which is why the disk floor is higher than for a source install. The installer refuses to continue on a smaller disk rather than failing halfway through the download.
+
+Many providers block outbound port `25` by default. Reloop still sends through the submission ports, but inbound mail needs `25` open in both directions — ask your provider to unblock it if you plan to receive mail.
+
+---
+
+## What the installer asks
+
+| Prompt | Purpose | Default |
+| :--- | :--- | :--- |
+| Primary Reloop domain | The hostname the dashboard and API are served on | — |
+| Administrator email | Let's Encrypt contact and your first Reloop account | — |
+| Database name | PostgreSQL database | `reloop` |
+| Database user | PostgreSQL role | `reloop` |
+| Configure automatic HTTPS | Let Caddy obtain and renew certificates | `yes` |
+
+Everything else is generated: database and Redis passwords, the Better Auth secret, the internal service secret, the tracking and preferences secrets, the webhook encryption key, and the object storage credentials. They are written to `/opt/reloop/.env` with mode `0600`.
+
+Enter the domain as a bare hostname — `reloop.example.com`, not `https://reloop.example.com` and not `reloop.example.com/admin`.
+
+---
+
+## What gets installed
+
+```text
+/opt/reloop/
+├── .env                 production configuration and secrets (0600, root)
+├── docker-compose.yml   the production stack
+├── Caddyfile            reverse proxy and TLS
+└── backups/             automatic database dumps taken before schema changes
+```
+
+The stack runs 27 containers: 18 Reloop backend services, 4 frontends (dashboard, docs, console, links), PostgreSQL, Redis, NATS, MinIO, and Caddy. Only Caddy (`80`, `443`) and the two mail transports (`25` inbound, `465`/`587` submission) publish host ports — the databases, object storage and event bus stay on the internal Docker network.
+
+A `reloop` command is installed alongside it:
+
+```bash
+reloop status            # container health
+reloop logs [service]    # follow logs
+reloop restart           # restart the stack
+reloop update            # pull the configured version and redeploy
+```
+
+---
+
+## DNS
+
+When the installer finishes it prints the records for the installation itself:
+
+```text
+reloop.example.com            A    203.0.113.10
+link.reloop.example.com       A    203.0.113.10
+inbound.reloop.example.com    A    203.0.113.10
+reloop.example.com            TXT  "v=spf1 ip4:203.0.113.10 -all"
+```
+
+- The apex record serves the dashboard, the API and the Let's Encrypt HTTP challenge.
+- `link.` serves click and open tracking plus the unsubscribe pages, and is the CNAME target for customer tracking domains.
+- `inbound.` is the MX target for mail your verified domains receive.
+- The SPF record authorises the server to send for the host domain, which is what the `include:` in each sending domain's SPF resolves to.
+
+These are separate from the SPF, DKIM, DMARC and MX records for the domains you send from. Those are generated per domain by Reloop — add a domain under **Domains** in the dashboard and it shows the exact records. See [Connect a domain](/docs/guides/connect-domain).
+
+You can run the installer before adding DNS. Caddy keeps retrying certificate issuance in the background and HTTPS starts working on its own once the records resolve. Follow it with `reloop logs proxy`.
+
+---
+
+## First sign-in
+
+Reloop sends one-time codes through its own mail pipeline, which needs a verified sending domain — so a fresh installation has no way to email you the first code. The installer generates a bootstrap code, writes it to `DEFAULT_OTP` in `/opt/reloop/.env`, and prints it once.
+
+1. Open `https://your-domain/dashboard`
+2. Sign up with the administrator email
+3. Enter the printed code
+
+Once one of your domains is verified and sending, remove the `DEFAULT_OTP` line from `/opt/reloop/.env` and run `reloop restart auth`. Set `DISABLE_SIGNUP=true` in the same file if you do not want anyone else creating accounts.
+
+---
+
+## Running it again
+
+Re-running the installer is safe. It detects the existing installation and offers to abort, reconfigure (re-ask the domain and HTTPS settings while keeping data and secrets), or redeploy with the existing configuration. Secrets, volumes and the database are never regenerated or dropped, and a database dump is taken before any schema change.
+
+---
+
+## Unattended installs
+
+Every prompt has an environment variable, so the installer can run without a terminal:
+
+```bash
+curl -fsSL https://reloop.sh/install.sh | sudo \
+  RELOOP_NONINTERACTIVE=true \
+  RELOOP_DOMAIN=reloop.example.com \
+  RELOOP_ADMIN_EMAIL=admin@example.com \
+  RELOOP_PUBLIC_IP=203.0.113.10 \
+  bash
+```
+
+| Variable | Purpose |
+| :--- | :--- |
+| `RELOOP_NONINTERACTIVE` | Never prompt; fail if a required value is missing |
+| `RELOOP_DOMAIN` | Primary hostname |
+| `RELOOP_ADMIN_EMAIL` | Administrator email |
+| `RELOOP_DB_NAME` / `RELOOP_DB_USER` | Database name and role |
+| `RELOOP_HTTPS` | `yes` or `no` |
+| `RELOOP_PUBLIC_IP` | Skip public address detection |
+| `RELOOP_VERSION` | Image tag to deploy (default `latest`) |
+| `RELOOP_EXISTING` | `abort`, `reconfigure` or `continue` for a re-run |
+| `RELOOP_INSTALL_DIR` | Installation directory (default `/opt/reloop`) |
