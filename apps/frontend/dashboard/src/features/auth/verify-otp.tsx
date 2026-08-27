@@ -257,14 +257,14 @@ export function VerifyOTP({
 					autoFocus
 					hasError={!!error.error}
 					isSuccess={isSuccess}
-					containerClassName="w-full justify-start gap-2.5"
+					containerClassName="w-full justify-start gap-1.5 sm:gap-2.5"
 				>
-					<DigitInput.Group className="w-full justify-center gap-2.5">
+					<DigitInput.Group className="w-full justify-between gap-1.5 sm:justify-center sm:gap-2.5">
 						{[0, 1, 2, 3, 4, 5].map((index) => (
 							<DigitInput.Slot
 								key={index}
 								index={index}
-								className="size-13 shrink-0 rounded-xl border-stroke-soft-200 bg-bg-white-0 text-lg data-[active=true]:border-primary-base data-[active=true]:ring-primary-base/30"
+								className="size-11 shrink rounded-xl border-stroke-soft-200 bg-bg-white-0 text-base data-[active=true]:border-primary-base data-[active=true]:ring-primary-base/30 sm:size-12 sm:text-lg md:size-13"
 							/>
 						))}
 					</DigitInput.Group>

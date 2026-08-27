@@ -36,12 +36,11 @@ export function FloatingSupportButton() {
 					initial={{ scale: 0.85, opacity: 0, y: 12 }}
 					animate={{ scale: 1, opacity: 1, y: 0 }}
 					exit={{ scale: 0.85, opacity: 0, y: 12 }}
-					whileHover={{ scale: 1.03, y: -1 }}
 					whileTap={{ scale: 0.97 }}
 					transition={{ type: "spring", stiffness: 400, damping: 28 }}
 					title="Open Support"
 					aria-label="Open human customer support chat"
-					className="fixed right-5 bottom-5 z-40 flex cursor-pointer items-center gap-2 rounded-full border border-stroke-soft-100 bg-bg-white-0/95 px-3.5 py-2 font-medium text-text-strong-950 text-xs shadow-lg shadow-black/5 backdrop-blur-sm transition-colors hover:border-stroke-soft-200 hover:bg-bg-weak-50 dark:border-stroke-soft-100/50 dark:bg-[#141416]/95 dark:text-white dark:shadow-black/50 dark:hover:border-white/20 dark:hover:bg-[#1c1c1f]"
+					className="fixed right-5 bottom-5 z-40 flex cursor-pointer items-center gap-2 rounded-full border border-stroke-soft-100 bg-bg-white-0/95 px-3.5 py-2 font-medium text-text-strong-950 text-xs backdrop-blur-sm dark:border-stroke-soft-100/50 dark:bg-[#141416]/95 dark:text-white"
 				>
 					<span className="relative flex items-center justify-center">
 						<Headset className="h-4 w-4 text-text-sub-600 dark:text-white/80" />

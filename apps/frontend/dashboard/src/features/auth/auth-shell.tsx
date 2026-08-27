@@ -42,7 +42,7 @@ function AuthStepFrame({
 /** Fixed corner control — matches onboarding so theme is always reachable. */
 function AuthThemeToggle() {
 	return (
-		<div className="fixed right-5 bottom-5 z-50 sm:right-6 sm:bottom-6">
+		<div className="fixed right-4 bottom-4 z-50 sm:right-6 sm:bottom-6">
 			<ThemeToggle />
 		</div>
 	);
@@ -63,14 +63,9 @@ export function AuthShell({
 	hideLogo?: boolean;
 }) {
 	return (
-		<div className="relative flex h-dvh flex-col items-center justify-center">
+		<div className="relative flex min-h-dvh flex-col items-center justify-center overflow-y-auto px-4 py-8 sm:px-6 sm:py-12">
 			<AuthThemeToggle />
-			<div
-				className={
-					// AuthCard needs enough width for the terms line + social row without clipping.
-					hideLogo ? "w-full max-w-lg p-5 md:p-8" : "w-full max-w-sm p-5 md:p-8"
-				}
-			>
+			<div className={hideLogo ? "w-full max-w-[420px]" : "w-full max-w-sm"}>
 				{!hideLogo ? (
 					<motion.div
 						layout

@@ -100,7 +100,7 @@ export function AuthCard({
 			<div className="overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-soft-50 dark:border-stroke-soft-100/40 dark:bg-white/[0.03]">
 				{/* White panel height-animates alone */}
 				<AnimatedHeight>
-					<div className="space-y-6 overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 px-6 pt-5 pb-7 dark:border-stroke-soft-100/40 dark:bg-[#0c0c0c]">
+					<div className="space-y-6 overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 px-5 pt-5 pb-6 sm:px-6 sm:pb-7 dark:border-stroke-soft-100/40 dark:bg-[#0c0c0c]">
 						{showBrandMark ? (
 							// Plain <a> so we leave /dashboard basePath and hit the marketing site root.
 							<a
@@ -120,7 +120,7 @@ export function AuthCard({
 
 				{/* Footer strip — same L/R slide as the card body steps */}
 				{footer != null ? (
-					<div className="relative min-h-12 overflow-hidden px-6 pt-3.5 pb-4 font-medium text-[13px] text-text-sub-600">
+					<div className="relative min-h-12 overflow-hidden px-5 pt-3.5 pb-4 font-medium text-[13px] text-text-sub-600 sm:px-6">
 						<AnimatePresence mode="sync" custom={direction} initial={false}>
 							<motion.div
 								key={footerKey}

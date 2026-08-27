@@ -89,9 +89,7 @@ export function SignupPage() {
 
 	const ctaLoading = isOtpStep ? otpUi.isLoading : emailLoading;
 	const ctaSuccess = isOtpStep && otpUi.isSuccess;
-	const ctaDisabled = isOtpStep
-		? (!otpUi.canSubmit && !otpUi.isSuccess) || otpUi.isLoading
-		: !emailCanSubmit || emailLoading;
+	const ctaDisabled = ctaLoading;
 
 	return (
 		// Shell stays static; step animation lives inside the card only.
@@ -158,7 +156,7 @@ export function SignupPage() {
 							>
 								<AuthCardHeader
 									title="Create an account"
-									description="Start free — no card required"
+									description="Start free. No card required."
 								/>
 								<SocialSignup
 									inviteId={inviteId}
@@ -216,14 +214,14 @@ export function SignupPage() {
 							By continuing, you agree to our{" "}
 							<a
 								href="/terms-and-conditions"
-								className="text-text-sub-600 underline decoration-current/30 decoration-dotted underline-offset-[3px]"
+								className="text-text-sub-600 underline decoration-current/30 decoration-dotted underline-offset-[3px] hover:text-text-strong-950"
 							>
 								Terms
 							</a>{" "}
 							and{" "}
 							<a
 								href="/privacy"
-								className="text-text-sub-600 underline decoration-current/30 decoration-dotted underline-offset-[3px]"
+								className="inline-block text-text-sub-600 underline decoration-current/30 decoration-dotted underline-offset-[3px] hover:text-text-strong-950"
 							>
 								Privacy Policy
 							</a>

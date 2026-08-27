@@ -98,9 +98,7 @@ export function LoginPage() {
 
 	const ctaLoading = isOtpStep ? otpUi.isLoading : emailLoading;
 	const ctaSuccess = isOtpStep && otpUi.isSuccess;
-	const ctaDisabled = isOtpStep
-		? (!otpUi.canSubmit && !otpUi.isSuccess) || otpUi.isLoading
-		: !emailCanSubmit || emailLoading;
+	const ctaDisabled = ctaLoading;
 
 	return (
 		<AuthShell direction={direction} hideLogo>
@@ -166,7 +164,7 @@ export function LoginPage() {
 							>
 								<AuthCardHeader
 									title="Login to Reloop"
-									description="Welcome back — continue where you left off"
+									description="Welcome back. Continue where you left off"
 								/>
 								<SocialLogin
 									inviteId={inviteId}
