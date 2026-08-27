@@ -1,6 +1,6 @@
 /**
- * Dashboard CopyCodeBlock — same card chrome as `@reloop/ui/copy-code-block`
- * with rounded-full tab pills (npm / pnpm / yarn / bun).
+ * Dashboard CopyCodeBlock — same card chrome and tab hover/active as
+ * `@reloop/ui/copy-code-block`.
  */
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
@@ -119,6 +119,10 @@ export function CopyCodeBlock({
 		undefined,
 	);
 	const [mounted, setMounted] = useState(false);
+	const [activeTabPos, setActiveTabPos] = useState<{
+		width: number;
+		left: number;
+	} | null>(null);
 	const tabButtonRefs = useRef<(HTMLButtonElement | null)[]>([]);
 	const containerRef = useRef<HTMLDivElement>(null);
 	const isFirstScrollRef = useRef(true);
@@ -131,6 +135,34 @@ export function CopyCodeBlock({
 	const activeTabIndex = hasTabs
 		? (tabs?.findIndex((tab) => tab.id === activeTab) ?? -1)
 		: -1;
+
+	useEffect(() => {
+		if (!mounted) return;
+		const updateActivePos = () => {
+			const activeBtn = tabButtonRefs.current[activeTabIndex];
+			if (activeBtn) {
+				setActiveTabPos({
+					width: activeBtn.offsetWidth,
+					left: activeBtn.offsetLeft,
+				});
+			} else {
+				setActiveTabPos(null);
+			}
+		};
+
+		updateActivePos();
+		const container = containerRef.current;
+		let observer: ResizeObserver | null = null;
+		if (container) {
+			observer = new ResizeObserver(updateActivePos);
+			observer.observe(container);
+		}
+		window.addEventListener("resize", updateActivePos);
+		return () => {
+			observer?.disconnect();
+			window.removeEventListener("resize", updateActivePos);
+		};
+	}, [activeTabIndex, mounted]);
 
 	useEffect(() => {
 		if (!mounted) return;
@@ -196,6 +228,10 @@ export function CopyCodeBlock({
 	const highlightedBrandColor =
 		highlightedTabIndex >= 0 && tabs
 			? `#${tabs[highlightedTabIndex]?.si.hex}`
+			: undefined;
+	const activeTabBrandColor =
+		activeTabIndex >= 0 && tabs
+			? `#${tabs[activeTabIndex]?.si.hex}`
 			: undefined;
 
 	const getTabPosition = (button: HTMLButtonElement | null | undefined) => {
@@ -290,7 +326,6 @@ export function CopyCodeBlock({
 					>
 						{tabs?.map((tab, index) => {
 							const isActive = tab.id === activeTab;
-							const brandColor = `#${tab.si.hex}`;
 							return (
 								<button
 									key={tab.id}
@@ -316,11 +351,10 @@ export function CopyCodeBlock({
 								</button>
 							);
 						})}
-						{/* Hover + active pill (npm / pnpm / yarn / bun) — rounded-full */}
 						<AnimatePresence>
 							{highlightedPillPosition && highlightedTabIndex !== -1 ? (
 								<motion.div
-									className="pointer-events-none absolute top-0 left-0 rounded-full"
+									className="pointer-events-none absolute top-0 left-0 rounded-lg"
 									style={{
 										backgroundColor: highlightedBrandColor
 											? `color-mix(in srgb, ${highlightedBrandColor} 14%, transparent)`
@@ -342,6 +376,20 @@ export function CopyCodeBlock({
 								/>
 							) : null}
 						</AnimatePresence>
+						{activeTabPos && activeTabIndex !== -1 ? (
+							<motion.div
+								className="pointer-events-none absolute bottom-0 left-0 h-[2px] rounded-full"
+								style={{ backgroundColor: activeTabBrandColor }}
+								initial={false}
+								animate={{
+									width: activeTabPos.width,
+									left: activeTabPos.left,
+									backgroundColor: activeTabBrandColor,
+									opacity: 1,
+								}}
+								transition={{ duration: 0.15, ease: "easeOut" }}
+							/>
+						) : null}
 					</div>
 					{copyButton}
 				</div>

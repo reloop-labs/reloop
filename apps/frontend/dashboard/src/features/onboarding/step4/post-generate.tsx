@@ -240,23 +240,21 @@ export function PostGenerate({
 					</p>
 				) : null}
 
-				<div className="flex w-full min-w-0 flex-wrap items-center justify-between gap-3">
+				<div className="flex w-full min-w-0 items-center gap-3">
 					{!testSent ? (
 						<Button.Root
 							type="button"
 							variant="neutral"
 							mode="lighter"
-							size="small"
+							size="medium"
 							onClick={handleSkip}
 							disabled={finishing || testSending}
-							className="shrink-0 gap-1.5 rounded-xl"
+							className="h-10 shrink-0 gap-1.5 rounded-xl font-medium text-sm"
 						>
 							Skip
 							<ActionKbd className="w-auto min-w-0 px-1">⌥S</ActionKbd>
 						</Button.Root>
-					) : (
-						<div />
-					)}
+					) : null}
 					<AnimatePresence mode="wait" initial={false}>
 						{!testSent ? (
 							<motion.div
@@ -265,13 +263,13 @@ export function PostGenerate({
 								animate={{ opacity: 1, y: 0 }}
 								exit={{ opacity: 0, y: -8 }}
 								transition={{ type: "spring", duration: 0.25, bounce: 0 }}
-								className="ml-auto"
+								className="min-w-0 flex-1"
 							>
 								<FancyButton.Root
 									variant="blue"
-									size="small"
+									size="medium"
 									className={cn(
-										"min-w-[190px] justify-center overflow-visible whitespace-nowrap rounded-xl",
+										"h-10 w-full justify-center overflow-visible whitespace-nowrap rounded-xl font-medium text-sm",
 										testSending && "pointer-events-none opacity-90",
 									)}
 									onClick={onSendTest}
@@ -301,13 +299,13 @@ export function PostGenerate({
 								animate={{ opacity: 1, y: 0 }}
 								exit={{ opacity: 0, y: -8 }}
 								transition={{ type: "spring", duration: 0.25, bounce: 0 }}
-								className="ml-auto"
+								className="min-w-0 flex-1"
 							>
 								<FancyButton.Root
 									variant="blue"
-									size="small"
+									size="medium"
 									className={cn(
-										"min-w-[170px] justify-center overflow-visible whitespace-nowrap rounded-xl transition-all duration-200",
+										"h-10 w-full justify-center overflow-visible whitespace-nowrap rounded-xl font-medium text-sm transition-all duration-200",
 										finishing && "pointer-events-none opacity-90",
 									)}
 									onClick={handleContinue}

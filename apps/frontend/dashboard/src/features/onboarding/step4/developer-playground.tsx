@@ -12,8 +12,8 @@ import {
 } from "simple-icons";
 import { useSessionQuery } from "#/features/auth/session-query";
 import { bunIcon } from "./bun-icon";
+import { CopyAgentPromptButton } from "./copy-agent-prompt-button";
 import { CopyCodeBlock } from "./copy-code-block";
-import { CopyForAiButton } from "./copy-for-ai-button";
 import { IntegrationLanguagePills } from "./integration-language-pills";
 import {
 	buildAiPrompt,
@@ -80,7 +80,7 @@ export function DeveloperPlayground({
 				<SectionLabel>Choose your language</SectionLabel>
 				<div className="flex flex-wrap items-center justify-between gap-2 pt-1">
 					<IntegrationLanguagePills value={choice} onChange={onChoiceChange} />
-					<CopyForAiButton prompt={aiPrompt} />
+					<CopyAgentPromptButton prompt={aiPrompt} />
 				</div>
 			</div>
 
