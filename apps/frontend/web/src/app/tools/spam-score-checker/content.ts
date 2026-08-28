@@ -3,7 +3,7 @@ import type { FeatureHighlight } from "@reloop/web/components/landing/feature-hi
 
 export const toolPath = "/tools/spam-score-checker";
 
-export const toolTitle = "Email Content & Spam Score Checker";
+export const toolTitle = "Email Spam Words Checker";
 
 export const toolDescription =
 	"Free online spam score calculator. Test your email subject line, copy, and links in real time to avoid spam filters (SpamAssassin, Gmail AI, Outlook) and reach the inbox.";

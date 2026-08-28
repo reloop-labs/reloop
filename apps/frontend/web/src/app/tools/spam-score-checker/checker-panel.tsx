@@ -28,8 +28,8 @@ import {
 } from "./check-api";
 
 const TOTAL_BARS = 48;
-const BLOCK_THRESHOLD = 40;
-const BLOCK_BAR_INDEX = Math.round((BLOCK_THRESHOLD / 100) * TOTAL_BARS);
+const SPAM_THRESHOLD = 40;
+const SPAM_BAR_INDEX = Math.round((SPAM_THRESHOLD / 100) * TOTAL_BARS);
 
 const HEIGHT_MORPH = {
 	duration: 0.28,
@@ -229,15 +229,15 @@ export function CheckerPanel() {
 			{/* Dashboard Container with Outer Shell */}
 			<div className="overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-weak-50 p-0.5 dark:border-white/10 dark:bg-white/[0.03]">
 				{/* Top Header: Title & Status - Outside white card, inside grey frame */}
-				<div className="flex items-center justify-between px-4 pt-3.5 pb-3 sm:px-5 sm:pt-4">
-					<h3 className="font-semibold text-[17px] text-text-strong-950 tracking-tight sm:text-[18px] dark:text-white">
-						Spam Score Checker
+				<div className="flex items-center justify-between px-4 py-3 sm:px-5 sm:py-3.5">
+					<h3 className="font-semibold text-[13.5px] text-text-strong-950 tracking-tight sm:text-[14px] dark:text-white">
+						Email Spam Words Checker
 					</h3>
 
-					<div className="flex items-center gap-1.5 rounded-full border border-stroke-soft-200 bg-bg-white-0 px-3 py-1 font-medium text-[12px] text-text-sub-600 dark:border-white/10 dark:bg-white/5 dark:text-white/60">
+					<div className="flex items-center gap-1.5 rounded-full border border-stroke-soft-200 bg-bg-white-0 px-2.5 py-0.5 font-medium text-[11.5px] text-text-sub-600 dark:border-white/10 dark:bg-white/5 dark:text-white/60">
 						<span
 							className={cn(
-								"size-2 rounded-full",
+								"size-1.5 rounded-full",
 								!analysis &&
 									!isAnalyzing &&
 									"bg-neutral-400 dark:bg-white/40",
@@ -507,7 +507,7 @@ export function CheckerPanel() {
 						<div className="rounded-xl border border-stroke-soft-200 bg-bg-weak-50/50 p-4 dark:border-white/10 dark:bg-white/[0.02]">
 							<div className="mb-2 flex items-center justify-between">
 								<span className="font-mono text-[12px] text-text-sub-600 dark:text-white/60">
-									risk{" "}
+									spam risk{" "}
 									<strong className="font-bold text-[14px] text-text-strong-950 dark:text-white">
 										{riskScore}
 									</strong>
@@ -522,18 +522,18 @@ export function CheckerPanel() {
 							{/* Vertical Tick Bars Barcode Graph */}
 							<div className="relative flex items-center justify-between gap-[3px] py-1 sm:gap-1">
 								{Array.from({ length: TOTAL_BARS }).map((_, i) => {
-									const isPastBlockZone = i >= BLOCK_BAR_INDEX;
-									const isBlockDivider = i === BLOCK_BAR_INDEX;
+									const isPastSpamZone = i >= SPAM_BAR_INDEX;
+									const isThresholdDivider = i === SPAM_BAR_INDEX;
 									const isActive = Boolean(analysis && i < activeBarCount);
 
 									let barColorClass = "bg-neutral-200/80 dark:bg-white/10";
 
-									if (isPastBlockZone) {
+									if (isPastSpamZone) {
 										barColorClass = "bg-rose-500/15 dark:bg-rose-500/20";
 									}
 
 									if (isActive) {
-										if (isPastBlockZone || riskScore >= BLOCK_THRESHOLD) {
+										if (isPastSpamZone || riskScore >= SPAM_THRESHOLD) {
 											barColorClass = "bg-rose-500";
 										} else {
 											barColorClass = "bg-emerald-500";
@@ -545,7 +545,7 @@ export function CheckerPanel() {
 											key={`bar-${i}`}
 											className="relative flex flex-col items-center"
 										>
-											{isBlockDivider && (
+											{isThresholdDivider && (
 												<div
 													className="-top-1.5 absolute h-9 w-[1.5px] bg-neutral-400 dark:bg-white/40"
 													aria-hidden
@@ -564,12 +564,12 @@ export function CheckerPanel() {
 
 							{/* Scale Labels */}
 							<div className="mt-1 flex items-center justify-between font-mono text-[11px] text-text-soft-400 dark:text-white/35">
-								<span>safe</span>
+								<span>inbox safe</span>
 								<span className="text-text-sub-600 dark:text-white/50">
-									block at 40
+									spam threshold (40)
 								</span>
 								<span className="text-rose-500/90 dark:text-rose-400/90">
-									blocked
+									spam folder
 								</span>
 							</div>
 						</div>
