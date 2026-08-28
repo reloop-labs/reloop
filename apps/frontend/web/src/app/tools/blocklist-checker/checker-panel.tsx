@@ -1,10 +1,10 @@
 "use client";
 
 import * as Alert from "@reloop/ui/alert";
-import * as Badge from "@reloop/ui/badge";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as CompactButton from "@reloop/ui/compact-button";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import { KbdKey } from "@reloop/ui/kbd-key";
@@ -37,9 +37,9 @@ const CATEGORY_LABELS: Record<string, string> = {
 	listed: "Listed",
 	not_listed: "Not listed",
 	error: "Errors",
+	domain: "URI lists",
 	spam: "Spam",
 	reputation: "Reputation",
-	domain: "URI lists",
 };
 
 const kbdClassName = cn(
@@ -105,15 +105,6 @@ function statusTone(status: ListingStatus): string {
 		return "bg-bg-weak-50 text-text-sub-600 dark:bg-white/10 dark:text-white/50";
 	}
 	return "bg-success-lighter text-success-base dark:bg-emerald-500/10 dark:text-emerald-400";
-}
-
-function verdictBadgeColor(
-	verdict: BlocklistVerdict,
-): "green" | "red" | "orange" | "gray" {
-	if (verdict === "clean") return "green";
-	if (verdict === "listed") return "red";
-	if (verdict === "inconclusive") return "orange";
-	return "gray";
 }
 
 export function CheckerPanel() {
@@ -230,6 +221,46 @@ https://reloop.sh/tools/blocklist-checker`;
 
 	return (
 		<div className="mx-auto max-w-5xl">
+			{/* Preset Bar & CTA */}
+			<div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+				<div className="flex flex-wrap items-center gap-2">
+					<span className="font-mono text-[11px] text-text-soft-400 uppercase tracking-[0.14em] dark:text-white/35">
+						Try Presets:
+					</span>
+					{PRESETS.map((preset) => (
+						<button
+							key={preset.value}
+							type="button"
+							onClick={() => {
+								setInput(preset.value);
+								executeCheck(preset.value);
+							}}
+							className={cn(
+								"rounded-lg px-2.5 py-1 font-mono text-[11.5px] transition-colors",
+								input === preset.value
+									? "bg-text-strong-950 font-medium text-white shadow-xs dark:bg-white dark:text-black"
+									: "border border-stroke-soft-200 bg-bg-white-0 text-text-sub-600 hover:border-text-strong-950 hover:text-text-strong-950 dark:border-white/10 dark:bg-white/5 dark:text-white/60 dark:hover:border-white dark:hover:text-white",
+							)}
+						>
+							{preset.label}
+						</button>
+					))}
+				</div>
+
+				<FancyButton.Root
+					type="button"
+					variant="neutral"
+					size="xsmall"
+					onClick={() => executeCheck(input)}
+					disabled={isLoading || !input.trim()}
+					className="shrink-0"
+				>
+					<FancyButton.Icon as={Icon} name="sparkles" />
+					<span>Instant Scan</span>
+				</FancyButton.Root>
+			</div>
+
+			{/* Search Input Box */}
 			<div className="rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-4 shadow-xs sm:p-5 dark:border-white/10 dark:bg-[#0b0b0b]">
 				<form
 					onSubmit={handleSubmit}
@@ -267,30 +298,9 @@ https://reloop.sh/tools/blocklist-checker`;
 						)}
 					</Button.Root>
 				</form>
-
-				<div className="mt-3.5 flex flex-wrap items-center gap-1.5 text-[12px] text-text-sub-600 dark:text-white/45">
-					<span className="mr-1 font-mono text-[11px] uppercase tracking-wider">
-						Try sample:
-					</span>
-					{PRESETS.map((preset) => (
-						<Button.Root
-							key={preset.value}
-							type="button"
-							variant="neutral"
-							mode={input === preset.value ? "filled" : "stroke"}
-							size="xxsmall"
-							onClick={() => {
-								setInput(preset.value);
-								executeCheck(preset.value);
-							}}
-							className="font-mono"
-						>
-							{preset.label}
-						</Button.Root>
-					))}
-				</div>
 			</div>
 
+			{/* Error State */}
 			{error && (
 				<Alert.Root
 					variant="lighter"
@@ -316,6 +326,7 @@ https://reloop.sh/tools/blocklist-checker`;
 
 			{result && !error && (
 				<div className="mt-4 space-y-3.5">
+					{/* Summary Header Card with Capsule Badges */}
 					<div className="overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-4 shadow-xs sm:p-5 dark:border-white/10 dark:bg-[#0b0b0b]">
 						<div className="flex flex-col gap-3.5 sm:flex-row sm:items-start sm:justify-between">
 							<div className="flex min-w-0 flex-1 items-start gap-3">
@@ -336,18 +347,30 @@ https://reloop.sh/tools/blocklist-checker`;
 								</div>
 
 								<div className="min-w-0 flex-1">
-									<div className="flex flex-wrap items-center gap-2">
+									<div className="flex flex-wrap items-center gap-2.5">
 										<h2 className="font-semibold text-sm text-text-strong-950 tracking-tight sm:text-base dark:text-white">
 											{headline?.title}
 										</h2>
-										<Badge.Root
-											size="small"
-											variant="lighter"
-											color={verdictBadgeColor(result.verdict)}
-										>
-											<Badge.Dot />
-											{headline?.badgeLabel}
-										</Badge.Root>
+
+										{/* Capsule Badge with Icon matching Spam Score Checker */}
+										{result.verdict === "clean" && (
+											<div className="inline-flex items-center gap-1.5 rounded-full bg-success-lighter px-2.5 py-0.5 font-medium text-[12px] text-success-base dark:bg-emerald-500/10 dark:text-emerald-400">
+												<Icon name="shield-check" className="size-3.5 shrink-0" />
+												<span>Clean</span>
+											</div>
+										)}
+										{result.verdict === "listed" && (
+											<div className="inline-flex items-center gap-1.5 rounded-full bg-error-lighter px-2.5 py-0.5 font-medium text-[12px] text-error-base dark:bg-rose-500/10 dark:text-rose-400">
+												<Icon name="minus-circle" className="size-3.5 shrink-0" />
+												<span>{result.listedCount} Listed</span>
+											</div>
+										)}
+										{result.verdict === "inconclusive" && (
+											<div className="inline-flex items-center gap-1.5 rounded-full bg-warning-lighter px-2.5 py-0.5 font-medium text-[12px] text-warning-base dark:bg-amber-500/10 dark:text-amber-400">
+												<Icon name="alert-triangle" className="size-3.5 shrink-0" />
+												<span>Inconclusive</span>
+											</div>
+										)}
 									</div>
 
 									<div className="mt-1.5 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-xs text-text-sub-600 dark:text-white/60">
@@ -425,8 +448,9 @@ https://reloop.sh/tools/blocklist-checker`;
 						</div>
 					</div>
 
+					{/* Category Tabs & Search Filter */}
 					<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-						<div className="flex flex-wrap items-center gap-1.5">
+						<div className="flex flex-wrap items-center gap-1">
 							{[
 								"all",
 								"listed",
@@ -435,46 +459,81 @@ https://reloop.sh/tools/blocklist-checker`;
 								"domain",
 								"spam",
 								"reputation",
-							].map((cat) => (
-								<Button.Root
-									key={cat}
-									type="button"
-									variant="neutral"
-									mode={activeCategory === cat ? "filled" : "stroke"}
-									size="xxsmall"
-									onClick={() => {
-										setActiveCategory(cat);
-										setCurrentPage(1);
-									}}
-								>
-									{CATEGORY_LABELS[cat] || cat}
-								</Button.Root>
-							))}
+							].map((cat) => {
+								const count =
+									cat === "all"
+										? result.results.length
+										: cat === "listed"
+											? result.listedCount
+											: cat === "not_listed"
+												? result.cleanCount
+												: cat === "error"
+													? result.errorCount
+													: result.results.filter(
+															(r) => r.category === cat || r.listType === cat,
+														).length;
+
+								const isActive = activeCategory === cat;
+								return (
+									<button
+										key={cat}
+										type="button"
+										onClick={() => {
+											setActiveCategory(cat);
+											setCurrentPage(1);
+										}}
+										className={cn(
+											"flex items-center gap-1.5 rounded-lg px-2.5 py-1 font-mono text-[12px] transition-colors",
+											isActive
+												? "bg-text-strong-950 font-medium text-white dark:bg-white dark:text-black"
+												: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/50 dark:hover:text-white",
+										)}
+									>
+										<span>{CATEGORY_LABELS[cat] || cat}</span>
+										<span
+											className={cn(
+												"rounded-full px-1.5 py-0.2 text-[10px]",
+												isActive
+													? "bg-white/20 text-white dark:bg-black/20 dark:text-black"
+													: "bg-bg-weak-50 text-text-sub-600 dark:bg-white/10 dark:text-white/40",
+											)}
+										>
+											{count}
+										</span>
+									</button>
+								);
+							})}
 						</div>
 
-						<Input.Root size="small" className="w-full rounded-xl sm:w-72">
-							<Input.Wrapper className="h-9">
-								<Input.Icon as={Icon} name="search" size="small" />
-								<Input.Input
-									ref={searchInputRef}
-									value={searchQuery}
-									onChange={(e) => setSearchQuery(e.target.value)}
-									placeholder="Search list name or zone…"
-								/>
-								<CompactButton.Root
-									variant="ghost"
-									size="medium"
-									type="button"
-									tabIndex={-1}
-									aria-label="Focus search"
-									onClick={() => searchInputRef.current?.focus()}
-								>
-									<KbdKey className={kbdClassName}>/</KbdKey>
-								</CompactButton.Root>
-							</Input.Wrapper>
-						</Input.Root>
+						<div className="relative w-full sm:w-72">
+							<Input.Root size="small">
+								<Input.Wrapper className="h-9">
+									<Input.Icon as={Icon} name="search" size="small" />
+									<Input.Input
+										ref={searchInputRef}
+										value={searchQuery}
+										onChange={(e) => {
+											setSearchQuery(e.target.value);
+											setCurrentPage(1);
+										}}
+										placeholder="Search list name or zone…"
+									/>
+									<CompactButton.Root
+										variant="ghost"
+										size="medium"
+										type="button"
+										tabIndex={-1}
+										aria-label="Focus search"
+										onClick={() => searchInputRef.current?.focus()}
+									>
+										<KbdKey className={kbdClassName}>/</KbdKey>
+									</CompactButton.Root>
+								</Input.Wrapper>
+							</Input.Root>
+						</div>
 					</div>
 
+					{/* Results Table Card with Status Capsules */}
 					<div className="overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 shadow-xs dark:border-white/10 dark:bg-[#0b0b0b]">
 						<div className="divide-y divide-stroke-soft-200 dark:divide-white/10">
 							{paginatedResults.map((item) => (
@@ -511,7 +570,7 @@ https://reloop.sh/tools/blocklist-checker`;
 												<code className="font-mono text-[11px] text-text-soft-400 dark:text-white/35">
 													{item.host}
 												</code>
-												<span className="rounded-md bg-bg-weak-50 px-2 py-0.5 font-mono text-[10.5px] text-text-sub-600 uppercase dark:bg-white/10 dark:text-white/60">
+												<span className="inline-flex items-center rounded-full bg-bg-weak-50 px-2.5 py-0.5 font-mono text-[10px] font-medium text-text-sub-600 uppercase dark:bg-white/10 dark:text-white/60">
 													{item.listType === "domain" ? "URI" : "IP"} ·{" "}
 													{item.impact}
 												</span>
@@ -528,34 +587,41 @@ https://reloop.sh/tools/blocklist-checker`;
 										</span>
 
 										{item.status === "listed" ? (
-											<LinkButton.Root
-												variant="error"
-												size="small"
-												asChild
-												underline
-											>
-												<Link
-													href={item.delistUrl}
-													target="_blank"
-													rel="noopener noreferrer"
+											<div className="flex items-center gap-2">
+												<div className="inline-flex items-center gap-1.5 rounded-full bg-error-lighter px-2.5 py-0.5 font-medium text-[12px] text-error-base dark:bg-rose-500/10 dark:text-rose-400">
+													<Icon name="minus-circle" className="size-3.5 shrink-0" />
+													<span>Listed</span>
+												</div>
+												<LinkButton.Root
+													variant="error"
+													size="small"
+													asChild
+													underline
 												>
-													Delist Form
-													<LinkButton.Icon as={Icon} name="arrow-up-right" />
-												</Link>
-											</LinkButton.Root>
+													<Link
+														href={item.delistUrl}
+														target="_blank"
+														rel="noopener noreferrer"
+													>
+														Delist Form
+														<LinkButton.Icon as={Icon} name="arrow-up-right" />
+													</Link>
+												</LinkButton.Root>
+											</div>
+										) : item.status === "not_listed" ? (
+											<div className="inline-flex items-center gap-1.5 rounded-full bg-success-lighter px-2.5 py-0.5 font-medium text-[12px] text-success-base dark:bg-emerald-500/10 dark:text-emerald-400">
+												<Icon name="check-circle" className="size-3.5 shrink-0" />
+												<span>Not listed</span>
+											</div>
+										) : item.status === "error" ? (
+											<div className="inline-flex items-center gap-1.5 rounded-full bg-warning-lighter px-2.5 py-0.5 font-medium text-[12px] text-warning-base dark:bg-amber-500/10 dark:text-amber-400">
+												<Icon name="alert-triangle" className="size-3.5 shrink-0" />
+												<span>Couldn't query</span>
+											</div>
 										) : (
-											<span
-												className={cn(
-													"inline-flex items-center font-medium font-mono text-[12px]",
-													item.status === "not_listed"
-														? "text-success-base dark:text-emerald-400"
-														: item.status === "error"
-															? "text-warning-base dark:text-amber-400"
-															: "text-text-sub-600 dark:text-white/50",
-												)}
-											>
-												{statusLabel(item)}
-											</span>
+											<div className="inline-flex items-center gap-1.5 rounded-full bg-bg-weak-50 px-2.5 py-0.5 font-medium text-[12px] text-text-sub-600 dark:bg-white/10 dark:text-white/60">
+												<span>Skipped</span>
+											</div>
 										)}
 									</div>
 								</div>

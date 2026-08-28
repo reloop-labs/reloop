@@ -23,6 +23,9 @@ consumer providers. Powers the [temp email checker](https://reloop.sh/tools/temp
 | `GET` | `/api/tools/v1/spam-check?subject=…&body=…` | Same, for links and `curl` |
 | `POST` | `/api/tools/v1/blocklist-check` | Look up an IP or domain name on 23 public DNS blocklists |
 | `GET` | `/api/tools/v1/blocklist-check?target=…` | Same, for links and `curl` |
+| `POST` | `/api/tools/v1/dns-lookup` | Query DNS records (A, AAAA, MX, TXT, CNAME, NS, SOA, CAA, PTR), detect DNS provider & SPF/DMARC health |
+| `GET` | `/api/tools/v1/dns-lookup?domain=…&recordType=…` | Same, for links and `curl` |
+
 
 ```bash
 curl -X POST https://local.reloop.sh/api/tools/v1/check \

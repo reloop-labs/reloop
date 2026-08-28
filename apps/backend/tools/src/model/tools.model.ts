@@ -421,6 +421,122 @@ export namespace ToolsModel {
 		error: t.Union([t.String(), t.Null()]),
 	});
 
+	export const dnsLookupBody = t.Object({
+		domain: t.String({
+			minLength: 1,
+			maxLength: 255,
+			description:
+				"Domain name, hostname, IP address, or query with prefix (e.g. ohraya.com, a:ohraya.com, mx:ohraya.com).",
+			examples: ["ohraya.com", "a:ohraya.com", "mx:google.com", "txt:_dmarc.apple.com"],
+		}),
+		recordType: t.Optional(
+			t.Union([
+				t.Literal("ANY"),
+				t.Literal("A"),
+				t.Literal("AAAA"),
+				t.Literal("MX"),
+				t.Literal("TXT"),
+				t.Literal("CNAME"),
+				t.Literal("NS"),
+				t.Literal("SOA"),
+				t.Literal("CAA"),
+				t.Literal("PTR"),
+				t.Literal("SRV"),
+			]),
+		),
+	});
+
+	export const dnsLookupQuery = t.Object({
+		domain: t.String({
+			minLength: 1,
+			maxLength: 255,
+			description: "Domain name, hostname, IP address, or query with prefix.",
+		}),
+		recordType: t.Optional(
+			t.Union([
+				t.Literal("ANY"),
+				t.Literal("A"),
+				t.Literal("AAAA"),
+				t.Literal("MX"),
+				t.Literal("TXT"),
+				t.Literal("CNAME"),
+				t.Literal("NS"),
+				t.Literal("SOA"),
+				t.Literal("CAA"),
+				t.Literal("PTR"),
+				t.Literal("SRV"),
+			]),
+		),
+	});
+
+	export const dnsLookupRecord = t.Object({
+		type: t.String(),
+		name: t.String(),
+		value: t.String(),
+		ttl: t.Union([t.Number(), t.Null()]),
+		priority: t.Optional(t.Number()),
+		details: t.Optional(t.Record(t.String(), t.Any())),
+	});
+
+	export const dnsLookupDiagnostic = t.Object({
+		id: t.String(),
+		name: t.String(),
+		category: t.Union([
+			t.Literal("dns"),
+			t.Literal("email_auth"),
+			t.Literal("security"),
+			t.Literal("web"),
+		]),
+		status: t.Union([
+			t.Literal("pass"),
+			t.Literal("warn"),
+			t.Literal("fail"),
+			t.Literal("info"),
+		]),
+		message: t.String(),
+		details: t.Optional(t.String()),
+	});
+
+	export const dnsLookupProvider = t.Object({
+		id: t.String(),
+		name: t.String(),
+		website: t.String(),
+		category: t.Union([
+			t.Literal("managed_dns"),
+			t.Literal("cloud"),
+			t.Literal("registrar"),
+			t.Literal("cdn"),
+			t.Literal("hosting"),
+		]),
+		description: t.String(),
+	});
+
+	export const dnsLookupResponse = t.Object({
+		query: t.String(),
+		domain: t.String(),
+		recordType: t.String(),
+		resolvedAt: t.String(),
+		responseTimeMs: t.Number(),
+		nameserver: t.Union([t.String(), t.Null()]),
+		provider: t.Union([dnsLookupProvider, t.Null()]),
+		records: t.Array(dnsLookupRecord),
+		diagnostics: t.Array(dnsLookupDiagnostic),
+		summary: t.Object({
+			totalRecords: t.Number(),
+			hasA: t.Boolean(),
+			hasAaaa: t.Boolean(),
+			hasMx: t.Boolean(),
+			hasTxt: t.Boolean(),
+			hasCname: t.Boolean(),
+			hasNs: t.Boolean(),
+			hasSoa: t.Boolean(),
+			hasDmarc: t.Boolean(),
+			hasSpf: t.Boolean(),
+			dmarcPolicy: t.Union([t.String(), t.Null()]),
+			spfRecord: t.Union([t.String(), t.Null()]),
+		}),
+	});
+
 	export const errorResponse = t.Object({
 		message: t.String(),
 		why: t.Optional(t.String()),
@@ -440,4 +556,7 @@ export namespace ToolsModel {
 	export type SpamCheckResponse = typeof spamCheckResponse.static;
 	export type BlocklistCheckBody = typeof blocklistCheckBody.static;
 	export type BlocklistCheckResponse = typeof blocklistCheckResponse.static;
+	export type DnsLookupBody = typeof dnsLookupBody.static;
+	export type DnsLookupResponse = typeof dnsLookupResponse.static;
 }
+

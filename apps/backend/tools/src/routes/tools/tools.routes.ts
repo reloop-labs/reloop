@@ -1,5 +1,6 @@
 import { blocklistCheckRoute } from "@be/tools/routes/tools/blocklist-check/blocklist-check.route";
 import { deliverabilityTestRoute } from "@be/tools/routes/tools/deliverability-test/deliverability-test.route";
+import { dnsLookupRoute } from "@be/tools/routes/tools/dns-lookup/dns-lookup.route";
 import { emailHealthCheckRoute } from "@be/tools/routes/tools/email-health-check/email-health-check.route";
 import { spamCheckRoute } from "@be/tools/routes/tools/spam-check/spam-check.route";
 import { tempEmailCheckerRoute } from "@be/tools/routes/tools/temp-email-checker/temp-email-checker.route";
@@ -13,4 +14,6 @@ export const toolsRoutes = new Elysia({
 	.use(spamCheckRoute)
 	.use(blocklistCheckRoute)
 	.use(deliverabilityTestRoute)
-	.use(emailHealthCheckRoute);
+	.use(emailHealthCheckRoute)
+	.use(dnsLookupRoute);
+

@@ -25,6 +25,7 @@ export type LandingPageDefinition = {
 
 export type ToolDefinition = LandingPageDefinition & {
 	toolType:
+		| "dns-lookup"
 		| "spam-score-checker"
 		| "blocklist-checker"
 		| "temp-email-checker"

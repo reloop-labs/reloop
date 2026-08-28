@@ -1,6 +1,7 @@
 import { config as auth_checker } from "./auth-checker";
 import { config as blocklist_checker } from "./blocklist-checker";
 import { config as deliverability_tester } from "./deliverability-tester";
+import { config as dns_lookup } from "./dns-lookup";
 import { config as email_validator } from "./email-validator";
 import { config as mobile_preview } from "./mobile-preview";
 import { config as spam_score_checker } from "./spam-score-checker";
@@ -9,6 +10,7 @@ import { config as temp_email_checker } from "./temp-email-checker";
 import { config as template_generator } from "./template-generator";
 
 export const toolConfigs = [
+	dns_lookup,
 	spam_score_checker,
 	blocklist_checker,
 	temp_email_checker,
@@ -19,3 +21,4 @@ export const toolConfigs = [
 	subject_tester,
 	mobile_preview,
 ];
+
