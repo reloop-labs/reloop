@@ -22,12 +22,10 @@ import {
 	CATEGORY_META,
 	type DetectedTrigger,
 	INITIAL_EMPTY_RESPONSE,
-	rewriteSpamWithAi,
 	runSpamCheck,
 	type SpamCheckResponse,
 	type TriggerCategory,
 } from "./check-api";
-import { RawJsonBlock } from "./json-highlight";
 
 const TOTAL_BARS = 48;
 const BLOCK_THRESHOLD = 40;
@@ -121,34 +119,8 @@ function MorphSlot({
 	);
 }
 
-const VERDICT_THEME = {
-	inbox_ready: {
-		title: "INBOX READY",
-		dotColor: "bg-emerald-500",
-		titleClass: "text-emerald-600 dark:text-emerald-400",
-		badgeBg: "bg-emerald-500/[0.04] dark:bg-emerald-500/[0.08]",
-		badgeBorder: "border-emerald-500/20 dark:border-emerald-500/30",
-		ratingLabel: "Low Risk",
-	},
-	needs_review: {
-		title: "NEEDS REVIEW",
-		dotColor: "bg-amber-500",
-		titleClass: "text-amber-500 dark:text-amber-400",
-		badgeBg: "bg-amber-500/[0.04] dark:bg-amber-500/[0.08]",
-		badgeBorder: "border-amber-500/20 dark:border-amber-500/30",
-		ratingLabel: "Moderate Risk",
-	},
-	high_risk: {
-		title: "HIGH SPAM RISK",
-		dotColor: "bg-rose-500",
-		titleClass: "text-rose-500 dark:text-rose-400",
-		badgeBg: "bg-rose-500/[0.04] dark:bg-rose-500/[0.08]",
-		badgeBorder: "border-rose-500/20 dark:border-rose-500/30",
-		ratingLabel: "High Risk",
-	},
-};
 
-function buildBackdropNodes(
+function buildHighlightedContent(
 	text: string,
 	triggers: DetectedTrigger[],
 	context: "subject" | "body",
@@ -175,18 +147,7 @@ function buildBackdropNodes(
 		nodes.push(
 			<mark
 				key={`m-${context}-${i}-${trigger.startIndex}`}
-				className={cn(
-					"rounded-sm py-0.5 text-transparent",
-					trigger.category === "urgency" &&
-						"bg-rose-500/25 dark:bg-rose-500/40",
-					trigger.category === "shady" && "bg-rose-500/25 dark:bg-rose-500/40",
-					trigger.category === "overpromise" &&
-						"bg-amber-500/25 dark:bg-amber-500/40",
-					trigger.category === "money" &&
-						"bg-purple-500/25 dark:bg-purple-500/40",
-					trigger.category === "outreach" &&
-						"bg-blue-500/25 dark:bg-blue-500/40",
-				)}
+				className="rounded-[3px] bg-rose-500/15 px-0.5 text-inherit underline decoration-rose-500 decoration-wavy underline-offset-4 dark:bg-rose-500/25 dark:decoration-rose-400"
 			>
 				{trigger.word}
 			</mark>,
@@ -207,27 +168,34 @@ export function CheckerPanel() {
 	const [body, setBody] = useState("");
 	const [analysis, setAnalysis] = useState<SpamCheckResponse | null>(null);
 	const [isAnalyzing, setIsAnalyzing] = useState(false);
-	const [copied, setCopied] = useState(false);
-	const [isFixing, setIsFixing] = useState(false);
+	const [scanKey, setScanKey] = useState(0);
 	const [errorMessage, setErrorMessage] = useState<string | null>(null);
-	const [showRawData, setShowRawData] = useState(false);
 
 	const subjectInputRef = useRef<HTMLInputElement>(null);
 	const bodyTextareaRef = useRef<HTMLTextAreaElement>(null);
-	const subjectBackdropRef = useRef<HTMLDivElement>(null);
-	const bodyBackdropRef = useRef<HTMLDivElement>(null);
 	const shouldReduceMotion = useReducedMotion();
 
 	const hasContent = Boolean(subject.trim() || body.trim());
+
+	// Auto-grow textarea height as content expands
+	useEffect(() => {
+		const textarea = bodyTextareaRef.current;
+		if (!textarea) return;
+		textarea.style.height = "auto";
+		textarea.style.height = `${Math.max(88, textarea.scrollHeight)}px`;
+	}, [body, analysis]);
 
 	const handleScan = async (e?: FormEvent) => {
 		if (e) e.preventDefault();
 		if (!hasContent) return;
 
 		setIsAnalyzing(true);
+		setErrorMessage(null);
 		try {
 			const result = await runSpamCheck(subject, body);
 			setAnalysis(result);
+			setScanKey((k) => k + 1);
+			await new Promise((resolve) => setTimeout(resolve, 1400));
 		} catch (err: unknown) {
 			setErrorMessage(
 				err instanceof Error
@@ -248,51 +216,11 @@ export function CheckerPanel() {
 		? Math.max(1, Math.round((riskScore / 100) * TOTAL_BARS))
 		: 0;
 
-	const theme =
-		analysis && (VERDICT_THEME[analysis.verdict] || VERDICT_THEME.inbox_ready);
-
-	const handleCopyReport = async () => {
-		if (!analysis) return;
-		try {
-			const reportText = `Reloop Spam Score Report\nScore: ${analysis.score}/100 (Grade: ${analysis.grade})\nVerdict: ${analysis.verdict}\nSubject: ${subject}\nTriggers Found: ${analysis.detectedTriggers.length}\nChecked via https://reloop.sh/tools/spam-score-checker`;
-			await navigator.clipboard.writeText(reportText);
-			setCopied(true);
-			setTimeout(() => setCopied(false), 2000);
-		} catch {}
-	};
-
-	const handleAiFix = async () => {
-		if (isFixing || !hasContent) return;
-		setIsFixing(true);
-		setErrorMessage(null);
-		try {
-			const rewritten = await rewriteSpamWithAi(subject, body);
-			if (rewritten.subject) setSubject(rewritten.subject);
-			if (rewritten.body) setBody(rewritten.body);
-			if (rewritten.subject || rewritten.body) {
-				const result = await runSpamCheck(
-					rewritten.subject || subject,
-					rewritten.body || body,
-				);
-				setAnalysis(result);
-			}
-		} catch (err: unknown) {
-			setErrorMessage(
-				err instanceof Error
-					? err.message
-					: "AI rewrite service failed. Please try again.",
-			);
-		} finally {
-			setIsFixing(false);
-		}
-	};
-
 	const handleReset = () => {
 		setSubject("");
 		setBody("");
 		setAnalysis(null);
 		setErrorMessage(null);
-		setShowRawData(false);
 		setTimeout(() => subjectInputRef.current?.focus(), 50);
 	};
 
@@ -312,9 +240,8 @@ export function CheckerPanel() {
 								"size-2 rounded-full",
 								!analysis &&
 									!isAnalyzing &&
-									!isFixing &&
 									"bg-neutral-400 dark:bg-white/40",
-								(isAnalyzing || isFixing) && "animate-pulse bg-blue-500",
+								isAnalyzing && "animate-pulse bg-blue-500",
 								analysis?.verdict === "inbox_ready" && "bg-emerald-500",
 								analysis?.verdict === "needs_review" && "bg-amber-500",
 								analysis?.verdict === "high_risk" && "bg-rose-500",
@@ -323,15 +250,13 @@ export function CheckerPanel() {
 						<span>
 							{isAnalyzing
 								? "Scanning..."
-								: isFixing
-									? "Rewriting..."
-									: !analysis
-										? "Unscanned"
-										: analysis.verdict === "inbox_ready"
-											? "Inbox Ready"
-											: analysis.verdict === "needs_review"
-												? "Needs Review"
-												: `High Risk (${analysis.score}/100)`}
+								: !analysis
+									? "Unscanned"
+									: analysis.verdict === "inbox_ready"
+										? "Inbox Ready"
+										: analysis.verdict === "needs_review"
+											? "Needs Review"
+											: `High Risk (${analysis.score}/100)`}
 						</span>
 					</div>
 				</div>
@@ -387,31 +312,93 @@ export function CheckerPanel() {
 								</span>
 							</div>
 
-							<Input.Root size="medium">
-								<Input.Wrapper>
-									<div ref={subjectBackdropRef} aria-hidden="true">
+							{analysis || isAnalyzing ? (
+								<div className="relative w-full overflow-hidden rounded-xl bg-bg-weak-50/50 dark:bg-white/[0.03]">
+									{/* Layer 1: Normal Plain Text Layer (Right of laser line - Unscanned) */}
+									<motion.div
+										key={`subject-plain-${scanKey}`}
+										initial={{
+											clipPath: isAnalyzing
+												? "inset(0 0 0 0%)"
+												: "inset(0 0 0 100%)",
+										}}
+										animate={{ clipPath: "inset(0 0 0 100%)" }}
+										transition={
+											isAnalyzing
+												? { duration: 1.4, ease: [0.25, 0.1, 0.25, 1] }
+												: { duration: 0 }
+										}
+										className="px-3.5 py-2.5 font-sans text-[14px] leading-5 text-text-strong-950 select-text dark:text-white"
+									>
+										{subject}
+									</motion.div>
+
+									{/* Layer 2: Highlighted Underline Layer (Left of laser line - Scanned) */}
+									<motion.div
+										key={`subject-reveal-${scanKey}`}
+										initial={{
+											clipPath: isAnalyzing
+												? "inset(0 100% 0 0)"
+												: "inset(0 0% 0 0)",
+										}}
+										animate={{ clipPath: "inset(0 0% 0 0)" }}
+										transition={
+											isAnalyzing
+												? { duration: 1.4, ease: [0.25, 0.1, 0.25, 1] }
+												: { duration: 0 }
+										}
+										className="absolute inset-0 z-10 overflow-hidden px-3.5 py-2.5 font-sans text-[14px] leading-5 text-text-strong-950 select-text dark:text-white"
+									>
 										{analysis
-											? buildBackdropNodes(
+											? buildHighlightedContent(
 													subject,
 													analysis.detectedTriggers,
 													"subject",
 												)
-											: null}
-									</div>
+											: subject}
+									</motion.div>
 
-									<Input.Input
-										id="subject-input"
-										ref={subjectInputRef}
-										type="text"
-										value={subject}
-										onChange={(e) => {
-											setSubject(e.target.value);
-											setErrorMessage(null);
-										}}
-										placeholder="e.g. Action required: Update your payment information"
-									/>
-								</Input.Wrapper>
-							</Input.Root>
+									{/* Synchronized Scanning Laser Beam */}
+									<AnimatePresence>
+										{isAnalyzing && (
+											<motion.div
+												key={`subject-laser-${scanKey}`}
+												initial={{ left: "0%", opacity: 1 }}
+												animate={{ left: "100%" }}
+												exit={{ opacity: 0, transition: { duration: 0.2 } }}
+												transition={{
+													duration: 1.4,
+													ease: [0.25, 0.1, 0.25, 1],
+												}}
+												className="pointer-events-none absolute inset-y-0 z-20 flex w-28 -translate-x-full"
+											>
+												<div className="h-full w-full bg-gradient-to-r from-transparent via-rose-500/10 to-rose-500/35" />
+												<div className="h-full w-[2px] shrink-0 bg-rose-500 shadow-[0_0_12px_rgba(244,63,94,0.9),0_0_3px_#ffffff]" />
+											</motion.div>
+										)}
+									</AnimatePresence>
+								</div>
+							) : (
+								<Input.Root
+									size="medium"
+									className="has-[input:focus]:before:!ring-primary-base has-[input:focus]:!shadow-button-primary-focus"
+								>
+									<Input.Wrapper>
+										<Input.Input
+											id="subject-input"
+											ref={subjectInputRef}
+											type="text"
+											value={subject}
+											onChange={(e) => {
+												setSubject(e.target.value);
+												setErrorMessage(null);
+											}}
+											placeholder="e.g. Action required: Update your payment information"
+											className="font-sans text-[14px] leading-5"
+										/>
+									</Input.Wrapper>
+								</Input.Root>
+							)}
 						</div>
 
 						{/* Email Body Copy */}
@@ -431,21 +418,73 @@ export function CheckerPanel() {
 								</div>
 							</div>
 
-							<div className="relative w-full rounded-xl">
-								<div
-									ref={bodyBackdropRef}
-									aria-hidden="true"
-									className="pointer-events-none absolute inset-0 select-none overflow-hidden whitespace-pre-wrap break-words p-3.5 font-sans text-[13.5px] text-transparent leading-[1.65]"
-								>
-									{analysis
-										? buildBackdropNodes(
-												body,
-												analysis.detectedTriggers,
-												"body",
-											)
-										: null}
-								</div>
+							{analysis || isAnalyzing ? (
+								<div className="relative w-full overflow-hidden rounded-xl bg-bg-weak-50/50 dark:bg-white/[0.03]">
+									{/* Layer 1: Normal Plain Text Layer (Right of laser line - Unscanned) */}
+									<motion.div
+										key={`body-plain-${scanKey}`}
+										initial={{
+											clipPath: isAnalyzing
+												? "inset(0 0 0 0%)"
+												: "inset(0 0 0 100%)",
+										}}
+										animate={{ clipPath: "inset(0 0 0 100%)" }}
+										transition={
+											isAnalyzing
+												? { duration: 1.4, ease: [0.25, 0.1, 0.25, 1] }
+												: { duration: 0 }
+										}
+										className="min-h-24 whitespace-pre-wrap break-words p-3.5 font-sans text-paragraph-xs leading-relaxed text-text-strong-950 select-text dark:text-white"
+									>
+										{body}
+									</motion.div>
 
+									{/* Layer 2: Highlighted Underline Layer (Left of laser line - Scanned) */}
+									<motion.div
+										key={`body-reveal-${scanKey}`}
+										initial={{
+											clipPath: isAnalyzing
+												? "inset(0 100% 0 0)"
+												: "inset(0 0% 0 0)",
+										}}
+										animate={{ clipPath: "inset(0 0% 0 0)" }}
+										transition={
+											isAnalyzing
+												? { duration: 1.4, ease: [0.25, 0.1, 0.25, 1] }
+												: { duration: 0 }
+										}
+										className="absolute inset-0 z-10 overflow-hidden whitespace-pre-wrap break-words p-3.5 font-sans text-paragraph-xs leading-relaxed text-text-strong-950 select-text dark:text-white"
+									>
+										{analysis
+											? buildHighlightedContent(
+													body,
+													analysis.detectedTriggers,
+													"body",
+												)
+											: body}
+									</motion.div>
+
+									{/* Synchronized Horizontal Scanning Laser Beam */}
+									<AnimatePresence>
+										{isAnalyzing && (
+											<motion.div
+												key={`body-laser-${scanKey}`}
+												initial={{ left: "0%", opacity: 1 }}
+												animate={{ left: "100%" }}
+												exit={{ opacity: 0, transition: { duration: 0.2 } }}
+												transition={{
+													duration: 1.4,
+													ease: [0.25, 0.1, 0.25, 1],
+												}}
+												className="pointer-events-none absolute inset-y-0 z-20 flex w-28 -translate-x-full"
+											>
+												<div className="h-full w-full bg-gradient-to-r from-transparent via-rose-500/10 to-rose-500/35" />
+												<div className="h-full w-[2px] shrink-0 bg-rose-500 shadow-[0_0_12px_rgba(244,63,94,0.9),0_0_3px_#ffffff]" />
+											</motion.div>
+										)}
+									</AnimatePresence>
+								</div>
+							) : (
 								<Textarea.Root
 									simple
 									id="body-input"
@@ -455,16 +494,13 @@ export function CheckerPanel() {
 									onChange={(e) => {
 										setBody(e.target.value);
 										setErrorMessage(null);
-									}}
-									onScroll={(e) => {
-										if (bodyBackdropRef.current) {
-											bodyBackdropRef.current.scrollTop =
-												e.currentTarget.scrollTop;
-										}
+										e.target.style.height = "auto";
+										e.target.style.height = `${Math.max(88, e.target.scrollHeight)}px`;
 									}}
 									placeholder="Paste your email copy here to scan for spam trigger phrases..."
+									className="!min-h-[88px] resize-none overflow-hidden text-paragraph-xs leading-normal focus:!ring-primary-base focus:!shadow-button-primary-focus"
 								/>
-							</div>
+							)}
 						</div>
 
 						{/* Risk Meter Visualizer Card */}
@@ -538,90 +574,13 @@ export function CheckerPanel() {
 							</div>
 						</div>
 
-						{/* Status Banner Card */}
-						{!analysis ? (
-							<div className="rounded-xl border border-stroke-soft-200 bg-bg-white-0 px-4 py-3.5 text-center font-medium text-text-sub-600 text-xs dark:border-white/10 dark:bg-[#070707] dark:text-white/60">
-								Run a scan to check this prompt
-							</div>
-						) : (
-							<div
-								className={cn(
-									"flex items-center gap-2 rounded-xl border p-3.5 font-medium text-xs",
-									analysis.verdict === "inbox_ready"
-										? "border-emerald-500/20 bg-emerald-500/[0.08] text-emerald-600 dark:text-emerald-400"
-										: analysis.verdict === "needs_review"
-											? "border-amber-500/20 bg-amber-500/[0.08] text-amber-600 dark:text-amber-400"
-											: "border-rose-500/20 bg-rose-500/[0.08] text-rose-600 dark:text-rose-400",
-								)}
-							>
-								<Icon
-									name={
-										analysis.verdict === "inbox_ready"
-											? "check-circle"
-											: "alert-triangle"
-									}
-									className="size-4 shrink-0"
-								/>
-								<span>
-									{analysis.verdict === "inbox_ready"
-										? "Content is clean — 0 high-risk spam triggers found."
-										: analysis.verdict === "needs_review"
-											? `Needs Review: ${analysis.detectedTriggers.length} trigger phrase(s) detected.`
-											: `High Spam Risk: ${analysis.detectedTriggers.length} aggressive trigger(s) flagged.`}
-								</span>
-							</div>
-						)}
-
 						{/* Results Morph Slot */}
 						<MorphSlot
 							activeKey={analysis ? "result" : null}
 							reduceMotion={shouldReduceMotion}
 						>
-							{analysis && theme ? (
+							{analysis ? (
 								<div className="space-y-3.5 border-stroke-soft-200 border-t pt-2 text-xs dark:border-white/10">
-									{/* Verdict Hero Card */}
-									<div
-										className={cn(
-											"rounded-xl border p-4 transition-colors sm:p-4.5",
-											theme.badgeBg,
-											theme.badgeBorder,
-										)}
-									>
-										<div className="flex items-center justify-between">
-											<div className="flex items-center gap-2">
-												<span
-													className={cn("size-2 rounded-full", theme.dotColor)}
-												/>
-												<span
-													className={cn(
-														"font-bold font-mono text-[13px] uppercase tracking-wider",
-														theme.titleClass,
-													)}
-												>
-													{theme.title}
-												</span>
-												<span className="text-text-sub-600 dark:text-white/40">
-													·
-												</span>
-												<span className="font-medium text-text-strong-950 text-xs dark:text-white">
-													{theme.ratingLabel}
-												</span>
-											</div>
-
-											<div className="flex items-baseline gap-1 font-mono">
-												<span className="font-bold text-[22px] text-text-strong-950 leading-none dark:text-white">
-													{analysis.score}
-												</span>
-												<span className="text-[12px] text-text-soft-400 dark:text-white/40">
-													/100
-												</span>
-												<span className="ml-1 rounded bg-bg-white-0 px-1.5 py-0.2 font-mono font-semibold text-[11px] text-text-strong-950 dark:bg-white/10 dark:text-white">
-													{analysis.grade}
-												</span>
-											</div>
-										</div>
-									</div>
-
 									{/* Detected Categories */}
 									<div className="overflow-hidden rounded-[14px] border border-stroke-soft-200 bg-bg-weak-50 p-0.5 dark:border-white/10 dark:bg-white/[0.03]">
 										<div className="px-3 pt-2 pb-2">
@@ -691,40 +650,6 @@ export function CheckerPanel() {
 											</p>
 										</div>
 									)}
-
-									{/* Actions */}
-									<div className="flex items-center justify-between pt-2">
-										<button
-											type="button"
-											onClick={() => setShowRawData((prev) => !prev)}
-											className="cursor-pointer font-mono text-[11px] text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/50 dark:hover:text-white"
-										>
-											{showRawData ? "Hide Raw JSON" : "View Raw JSON"}
-										</button>
-
-										<button
-											type="button"
-											onClick={handleCopyReport}
-											className="cursor-pointer font-medium text-primary-base text-xs hover:underline"
-										>
-											{copied ? "Report Copied" : "Copy Report"}
-										</button>
-									</div>
-
-									{/* Raw JSON Block */}
-									<AnimatePresence>
-										{showRawData && (
-											<motion.div
-												initial={{ opacity: 0, height: 0 }}
-												animate={{ opacity: 1, height: "auto" }}
-												exit={{ opacity: 0, height: 0 }}
-												transition={{ duration: 0.2 }}
-												className="overflow-hidden pt-2"
-											>
-												<RawJsonBlock value={analysis} />
-											</motion.div>
-										)}
-									</AnimatePresence>
 								</div>
 							) : null}
 						</MorphSlot>
@@ -734,13 +659,27 @@ export function CheckerPanel() {
 				{/* Bottom Action Footer - Outside white card, inside grey frame */}
 				<div className="flex items-center justify-between px-4 py-3 sm:px-5">
 					{hasContent ? (
-						<button
-							type="button"
-							onClick={handleReset}
-							className="cursor-pointer font-medium text-primary-base text-xs hover:underline"
-						>
-							Clear inputs
-						</button>
+						<div className="flex items-center gap-3">
+							{analysis && !isAnalyzing ? (
+								<button
+									type="button"
+									onClick={() => {
+										setAnalysis(null);
+										setTimeout(() => subjectInputRef.current?.focus(), 50);
+									}}
+									className="cursor-pointer font-medium text-primary-base text-xs hover:underline"
+								>
+									Edit copy
+								</button>
+							) : null}
+							<button
+								type="button"
+								onClick={handleReset}
+								className="cursor-pointer font-medium text-text-sub-600 text-xs transition-colors hover:text-text-strong-950 dark:text-white/50 dark:hover:text-white"
+							>
+								{analysis ? "Clear" : "Clear inputs"}
+							</button>
+						</div>
 					) : (
 						<span className="font-mono text-[12px] text-text-sub-600 dark:text-white/50">
 							Pre-send deliverability check
@@ -748,24 +687,6 @@ export function CheckerPanel() {
 					)}
 
 					<div className="flex items-center gap-2">
-						{hasContent && (
-							<FancyButton.Root
-								type="button"
-								variant="neutral"
-								size="xsmall"
-								onClick={handleAiFix}
-								disabled={isFixing || !hasContent}
-								className="h-8 px-3 text-[12px]!"
-							>
-								<FancyButton.Icon
-									as={Icon}
-									name="sparkling"
-									className="size-3.5"
-								/>
-								<span>{isFixing ? "Rewriting..." : "Fix with AI"}</span>
-							</FancyButton.Root>
-						)}
-
 						<FancyButton.Root
 							type="submit"
 							form="spam-checker-form"
@@ -775,15 +696,18 @@ export function CheckerPanel() {
 							className="h-8 px-3.5 text-[12px]!"
 						>
 							{isAnalyzing ? (
-								<LoadingDot size={13} dotSize={2} className="text-white" />
+								<div className="flex items-center gap-1.5">
+									<LoadingDot size={13} dotSize={2} className="text-white" />
+									<span>Scanning...</span>
+								</div>
 							) : (
 								<>
-									<span>Calculate Score</span>
 									<FancyButton.Icon
 										as={Icon}
-										name="arrow-right"
+										name={analysis ? "arrow-right" : "search"}
 										className="size-3.5"
 									/>
+									<span>{analysis ? "Calculate Score" : "Start Scan"}</span>
 								</>
 							)}
 						</FancyButton.Root>
