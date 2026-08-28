@@ -31,6 +31,10 @@ const TOTAL_BARS = 48;
 const SPAM_THRESHOLD = 40;
 const SPAM_BAR_INDEX = Math.round((SPAM_THRESHOLD / 100) * TOTAL_BARS);
 
+const SCAN_DURATION_SEC = 2.6;
+const SCAN_DURATION_MS = 2600;
+const SCAN_EASING = [0.25, 0.1, 0.25, 1] as const;
+
 const HEIGHT_MORPH = {
 	duration: 0.28,
 	ease: [0.22, 1, 0.36, 1] as const,
@@ -147,7 +151,7 @@ function buildHighlightedContent(
 		nodes.push(
 			<mark
 				key={`m-${context}-${i}-${trigger.startIndex}`}
-				className="rounded-[3px] bg-rose-500/15 px-0.5 text-inherit underline decoration-rose-500 decoration-wavy underline-offset-4 dark:bg-rose-500/25 dark:decoration-rose-400"
+				className="rounded-[3px] bg-rose-500/10 px-1 py-0.5 font-mono text-rose-600 underline decoration-rose-500 decoration-wavy underline-offset-4 dark:bg-rose-500/20 dark:text-rose-400 dark:decoration-rose-400"
 			>
 				{trigger.word}
 			</mark>,
@@ -195,7 +199,7 @@ export function CheckerPanel() {
 			const result = await runSpamCheck(subject, body);
 			setAnalysis(result);
 			setScanKey((k) => k + 1);
-			await new Promise((resolve) => setTimeout(resolve, 1400));
+			await new Promise((resolve) => setTimeout(resolve, SCAN_DURATION_MS));
 		} catch (err: unknown) {
 			setErrorMessage(
 				err instanceof Error
@@ -210,11 +214,17 @@ export function CheckerPanel() {
 	const wordCount = body.trim() ? body.trim().split(/\s+/).length : 0;
 	const linkCount = (body.match(/https?:\/\/[^\s"'<>]+/gi) || []).length;
 
-	// Calculate risk score: 100 - deliverability score when analyzed, 0 when unscanned
-	const riskScore = analysis ? Math.max(0, 100 - analysis.score) : 0;
-	const activeBarCount = analysis
-		? Math.max(1, Math.round((riskScore / 100) * TOTAL_BARS))
-		: 0;
+	// Calculate risk score: 100 - deliverability score when analyzed, 0 when unscanned or scanning
+	const displayedRiskScore = isAnalyzing
+		? 0
+		: analysis
+			? Math.max(0, 100 - analysis.score)
+			: 0;
+	const activeBarCount = isAnalyzing
+		? 0
+		: analysis
+			? Math.max(1, Math.round((displayedRiskScore / 100) * TOTAL_BARS))
+			: 0;
 
 	const handleReset = () => {
 		setSubject("");
@@ -222,6 +232,17 @@ export function CheckerPanel() {
 		setAnalysis(null);
 		setErrorMessage(null);
 		setTimeout(() => subjectInputRef.current?.focus(), 50);
+	};
+
+	const handleLoadSample = () => {
+		setSubject(
+			"Urgent: Claim your 100% free bonus before it expires tonight!",
+		);
+		setBody(
+			"Hey there,\n\nThis is a confidential investment proposal exclusively for you. Act now to claim your risk-free payout with zero obligation.\n\nClick here immediately to secure your spot: https://example.com/claim-bonus\n\nDon't miss out on this once in a lifetime offer!\n\nBest regards,\nThe Growth Team",
+		);
+		setAnalysis(null);
+		setErrorMessage(null);
 	};
 
 	return (
@@ -234,22 +255,38 @@ export function CheckerPanel() {
 						Email Spam Words Checker
 					</h3>
 
-					<div className="flex items-center gap-1.5 rounded-full border border-stroke-soft-200 bg-bg-white-0 px-2.5 py-0.5 font-medium text-[11.5px] text-text-sub-600 dark:border-white/10 dark:bg-white/5 dark:text-white/60">
-						<span
-							className={cn(
-								"size-1.5 rounded-full",
-								!analysis &&
-									!isAnalyzing &&
-									"bg-neutral-400 dark:bg-white/40",
-								isAnalyzing && "animate-pulse bg-blue-500",
-								analysis?.verdict === "inbox_ready" && "bg-emerald-500",
-								analysis?.verdict === "needs_review" && "bg-amber-500",
-								analysis?.verdict === "high_risk" && "bg-rose-500",
+					<div
+						className={cn(
+							"flex items-center gap-1.5 rounded-full px-2.5 py-0.5 font-medium text-[11.5px] transition-colors",
+							isAnalyzing
+								? "border border-rose-500/25 bg-rose-500/10 text-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.15)]"
+								: "border border-stroke-soft-200 bg-bg-white-0 text-text-sub-600 dark:border-white/10 dark:bg-white/5 dark:text-white/60",
+						)}
+					>
+						<span className="relative flex size-2 items-center justify-center">
+							{isAnalyzing && (
+								<span className="absolute inline-flex size-full rounded-full bg-rose-500 opacity-75 motion-safe:animate-ping" />
 							)}
-						/>
+							<span
+								className={cn(
+									"relative inline-flex size-1.5 rounded-full",
+									isAnalyzing && "bg-rose-500 shadow-[0_0_6px_rgba(244,63,94,0.9)]",
+									!isAnalyzing && !analysis && "bg-neutral-400 dark:bg-white/40",
+									!isAnalyzing &&
+										analysis?.verdict === "inbox_ready" &&
+										"bg-emerald-500",
+									!isAnalyzing &&
+										analysis?.verdict === "needs_review" &&
+										"bg-amber-500",
+									!isAnalyzing &&
+										analysis?.verdict === "high_risk" &&
+										"bg-rose-500",
+								)}
+							/>
+						</span>
 						<span>
 							{isAnalyzing
-								? "Scanning..."
+								? "Scanning"
 								: !analysis
 									? "Unscanned"
 									: analysis.verdict === "inbox_ready"
@@ -325,10 +362,10 @@ export function CheckerPanel() {
 										animate={{ clipPath: "inset(0 0 0 100%)" }}
 										transition={
 											isAnalyzing
-												? { duration: 1.4, ease: [0.25, 0.1, 0.25, 1] }
+												? { duration: SCAN_DURATION_SEC, ease: SCAN_EASING }
 												: { duration: 0 }
 										}
-										className="px-3.5 py-2.5 font-sans text-[14px] leading-5 text-text-strong-950 select-text dark:text-white"
+										className="px-3.5 py-2.5 font-mono text-[13px] leading-5 text-text-strong-950 select-text dark:text-white"
 									>
 										{subject}
 									</motion.div>
@@ -344,10 +381,10 @@ export function CheckerPanel() {
 										animate={{ clipPath: "inset(0 0% 0 0)" }}
 										transition={
 											isAnalyzing
-												? { duration: 1.4, ease: [0.25, 0.1, 0.25, 1] }
+												? { duration: SCAN_DURATION_SEC, ease: SCAN_EASING }
 												: { duration: 0 }
 										}
-										className="absolute inset-0 z-10 overflow-hidden px-3.5 py-2.5 font-sans text-[14px] leading-5 text-text-strong-950 select-text dark:text-white"
+										className="absolute inset-0 z-10 overflow-hidden px-3.5 py-2.5 font-mono text-[13px] leading-5 text-text-strong-950 select-text dark:text-white"
 									>
 										{analysis
 											? buildHighlightedContent(
@@ -367,8 +404,8 @@ export function CheckerPanel() {
 												animate={{ left: "100%" }}
 												exit={{ opacity: 0, transition: { duration: 0.2 } }}
 												transition={{
-													duration: 1.4,
-													ease: [0.25, 0.1, 0.25, 1],
+													duration: SCAN_DURATION_SEC,
+													ease: SCAN_EASING,
 												}}
 												className="pointer-events-none absolute inset-y-0 z-20 flex w-28 -translate-x-full"
 											>
@@ -431,10 +468,10 @@ export function CheckerPanel() {
 										animate={{ clipPath: "inset(0 0 0 100%)" }}
 										transition={
 											isAnalyzing
-												? { duration: 1.4, ease: [0.25, 0.1, 0.25, 1] }
+												? { duration: SCAN_DURATION_SEC, ease: SCAN_EASING }
 												: { duration: 0 }
 										}
-										className="min-h-24 whitespace-pre-wrap break-words p-3.5 font-sans text-paragraph-xs leading-relaxed text-text-strong-950 select-text dark:text-white"
+										className="min-h-24 whitespace-pre-wrap break-words p-3.5 font-mono text-[13px] leading-[1.65] text-text-strong-950 select-text dark:text-white"
 									>
 										{body}
 									</motion.div>
@@ -450,10 +487,10 @@ export function CheckerPanel() {
 										animate={{ clipPath: "inset(0 0% 0 0)" }}
 										transition={
 											isAnalyzing
-												? { duration: 1.4, ease: [0.25, 0.1, 0.25, 1] }
+												? { duration: SCAN_DURATION_SEC, ease: SCAN_EASING }
 												: { duration: 0 }
 										}
-										className="absolute inset-0 z-10 overflow-hidden whitespace-pre-wrap break-words p-3.5 font-sans text-paragraph-xs leading-relaxed text-text-strong-950 select-text dark:text-white"
+										className="absolute inset-0 z-10 overflow-hidden whitespace-pre-wrap break-words p-3.5 font-mono text-[13px] leading-[1.65] text-text-strong-950 select-text dark:text-white"
 									>
 										{analysis
 											? buildHighlightedContent(
@@ -473,8 +510,8 @@ export function CheckerPanel() {
 												animate={{ left: "100%" }}
 												exit={{ opacity: 0, transition: { duration: 0.2 } }}
 												transition={{
-													duration: 1.4,
-													ease: [0.25, 0.1, 0.25, 1],
+													duration: SCAN_DURATION_SEC,
+													ease: SCAN_EASING,
 												}}
 												className="pointer-events-none absolute inset-y-0 z-20 flex w-28 -translate-x-full"
 											>
@@ -509,14 +546,9 @@ export function CheckerPanel() {
 								<span className="font-mono text-[12px] text-text-sub-600 dark:text-white/60">
 									spam risk{" "}
 									<strong className="font-bold text-[14px] text-text-strong-950 dark:text-white">
-										{riskScore}
+										{displayedRiskScore}
 									</strong>
 								</span>
-								{analysis && analysis.detectedTriggers.length > 0 && (
-									<span className="font-mono text-[11px] text-rose-500 dark:text-rose-400">
-										{analysis.detectedTriggers.length} trigger(s) flagged
-									</span>
-								)}
 							</div>
 
 							{/* Vertical Tick Bars Barcode Graph */}
@@ -533,7 +565,7 @@ export function CheckerPanel() {
 									}
 
 									if (isActive) {
-										if (isPastSpamZone || riskScore >= SPAM_THRESHOLD) {
+										if (isPastSpamZone || displayedRiskScore >= SPAM_THRESHOLD) {
 											barColorClass = "bg-rose-500";
 										} else {
 											barColorClass = "bg-emerald-500";
@@ -576,80 +608,104 @@ export function CheckerPanel() {
 
 						{/* Results Morph Slot */}
 						<MorphSlot
-							activeKey={analysis ? "result" : null}
+							activeKey={analysis && !isAnalyzing ? "result" : null}
 							reduceMotion={shouldReduceMotion}
 						>
-							{analysis ? (
-								<div className="space-y-3.5 border-stroke-soft-200 border-t pt-2 text-xs dark:border-white/10">
+							{analysis && !isAnalyzing ? (
+								<div className="space-y-3.5 text-xs">
 									{/* Detected Categories */}
 									<div className="overflow-hidden rounded-[14px] border border-stroke-soft-200 bg-bg-weak-50 p-0.5 dark:border-white/10 dark:bg-white/[0.03]">
-										<div className="px-3 pt-2 pb-2">
+										<div className="flex items-center justify-between px-3 pt-2 pb-2">
 											<p className="font-mono font-semibold text-[11px] text-text-strong-950 uppercase tracking-wider dark:text-white">
 												Detected Spam Categories
 											</p>
+											{analysis &&
+												!isAnalyzing &&
+												analysis.detectedTriggers.length > 0 && (
+													<span className="font-mono text-[11px] text-rose-500 dark:text-rose-400">
+														{analysis.detectedTriggers.length} trigger(s) flagged
+													</span>
+												)}
 										</div>
 
 										<div className="divide-y divide-stroke-soft-200/50 rounded-xl border border-stroke-soft-200 bg-bg-white-0 px-3.5 py-1 dark:divide-white/5 dark:border-white/10 dark:bg-[#070707]">
-											{(Object.keys(CATEGORY_META) as TriggerCategory[]).map(
-												(cat) => {
-													const meta = CATEGORY_META[cat];
-													const count = analysis.categoryCounts[cat] || 0;
+											{(() => {
+												const flaggedCategories = (
+													Object.keys(CATEGORY_META) as TriggerCategory[]
+												).filter((cat) => {
+													const matchingTriggers =
+														analysis.detectedTriggers.filter(
+															(t) => t.category === cat,
+														);
+													const count =
+														analysis.categoryCounts[cat] ||
+														matchingTriggers.length;
+													return count > 0;
+												});
 
+												if (flaggedCategories.length === 0) {
 													return (
-														<div
-															key={cat}
-															className="flex items-center justify-between py-2"
-														>
-															<div className="flex items-center gap-2">
-																<Icon
-																	name={meta.icon}
-																	className={cn(
-																		"size-3.5 shrink-0",
-																		count > 0
-																			? "text-text-strong-950 dark:text-white"
-																			: "text-text-soft-400 dark:text-white/30",
-																	)}
-																/>
-																<span
-																	className={cn(
-																		"text-xs",
-																		count > 0
-																			? "font-medium text-text-strong-950 dark:text-white"
-																			: "text-text-sub-600 dark:text-white/40",
-																	)}
-																>
-																	{meta.label}
-																</span>
-															</div>
-															<code
-																className={cn(
-																	"rounded-md border px-2 py-0.5 font-medium font-mono text-[11px] tracking-tight",
-																	count > 0
-																		? "border-rose-500/20 bg-rose-500/[0.08] text-rose-600 dark:border-rose-500/30 dark:bg-rose-500/15 dark:text-rose-400"
-																		: "border-stroke-soft-200 bg-bg-white-0 text-text-soft-400 dark:border-white/10 dark:bg-[#0b0b0b] dark:text-white/40",
-																)}
-															>
-																{count}
-															</code>
+														<div className="flex items-center gap-2 py-3 text-emerald-600 dark:text-emerald-400">
+															<Icon
+																name="check-circle"
+																className="size-4 shrink-0 text-emerald-500"
+															/>
+															<span className="font-medium text-xs">
+																No spam trigger words detected — content is
+																clean!
+															</span>
 														</div>
 													);
-												},
-											)}
+												}
+
+												return flaggedCategories.map((cat) => {
+													const meta = CATEGORY_META[cat];
+													const matchingTriggers =
+														analysis.detectedTriggers.filter(
+															(t) => t.category === cat,
+														);
+													const count =
+														analysis.categoryCounts[cat] ||
+														matchingTriggers.length;
+													const uniqueWords = Array.from(
+														new Set(matchingTriggers.map((t) => t.word)),
+													);
+
+													return (
+														<div key={cat} className="py-2.5">
+															<div className="flex items-center justify-between">
+																<div className="flex items-center gap-2">
+																	<Icon
+																		name={meta.icon}
+																		className="size-3.5 shrink-0 text-text-strong-950 dark:text-white"
+																	/>
+																	<span className="font-medium text-text-strong-950 text-xs dark:text-white">
+																		{meta.label}
+																	</span>
+																</div>
+																<code className="rounded-md border border-rose-500/20 bg-rose-500/[0.08] px-2 py-0.5 font-medium font-mono text-[11px] text-rose-600 tracking-tight dark:border-rose-500/30 dark:bg-rose-500/15 dark:text-rose-400">
+																	{count}
+																</code>
+															</div>
+
+															{uniqueWords.length > 0 && (
+																<div className="mt-2 flex flex-wrap gap-1.5 pl-5.5">
+																	{uniqueWords.map((word, wIdx) => (
+																		<span
+																			key={`${cat}-${word}-${wIdx}`}
+																			className="rounded-[4px] border border-rose-500/20 bg-rose-500/[0.08] px-2 py-0.5 font-mono text-[11px] text-rose-600 dark:border-rose-500/30 dark:bg-rose-500/15 dark:text-rose-400"
+																		>
+																			{word}
+																		</span>
+																	))}
+																</div>
+															)}
+														</div>
+													);
+												});
+											})()}
 										</div>
 									</div>
-
-									{/* Recommendation */}
-									{analysis.recommendations.length > 0 && (
-										<div className="flex items-start gap-2.5 rounded-xl border border-stroke-soft-200 bg-bg-weak-50/50 p-3 text-xs dark:border-white/10 dark:bg-white/[0.02]">
-											<Icon
-												name="check-circle"
-												className="mt-0.5 size-3.5 shrink-0 text-emerald-500"
-											/>
-											<p className="text-text-sub-600 text-xs leading-relaxed dark:text-white/60">
-												{analysis.recommendations[0]}
-											</p>
-										</div>
-									)}
 								</div>
 							) : null}
 						</MorphSlot>
@@ -658,20 +714,20 @@ export function CheckerPanel() {
 
 				{/* Bottom Action Footer - Outside white card, inside grey frame */}
 				<div className="flex items-center justify-between px-4 py-3 sm:px-5">
-					{hasContent ? (
-						<div className="flex items-center gap-3">
-							{analysis && !isAnalyzing ? (
-								<button
-									type="button"
-									onClick={() => {
-										setAnalysis(null);
-										setTimeout(() => subjectInputRef.current?.focus(), 50);
-									}}
-									className="cursor-pointer font-medium text-primary-base text-xs hover:underline"
-								>
-									Edit copy
-								</button>
-							) : null}
+					<div className="flex items-center gap-3">
+						{analysis && !isAnalyzing ? (
+							<button
+								type="button"
+								onClick={() => {
+									setAnalysis(null);
+									setTimeout(() => subjectInputRef.current?.focus(), 50);
+								}}
+								className="cursor-pointer font-medium text-primary-base text-xs hover:underline"
+							>
+								Edit copy
+							</button>
+						) : null}
+						{hasContent ? (
 							<button
 								type="button"
 								onClick={handleReset}
@@ -679,38 +735,65 @@ export function CheckerPanel() {
 							>
 								{analysis ? "Clear" : "Clear inputs"}
 							</button>
-						</div>
-					) : (
-						<span className="font-mono text-[12px] text-text-sub-600 dark:text-white/50">
-							Pre-send deliverability check
-						</span>
-					)}
+						) : null}
+					</div>
 
-					<div className="flex items-center gap-2">
-						<FancyButton.Root
-							type="submit"
-							form="spam-checker-form"
-							variant="primary"
-							size="xsmall"
-							disabled={isAnalyzing || !hasContent}
-							className="h-8 px-3.5 text-[12px]!"
-						>
-							{isAnalyzing ? (
-								<div className="flex items-center gap-1.5">
-									<LoadingDot size={13} dotSize={2} className="text-white" />
-									<span>Scanning...</span>
-								</div>
-							) : (
-								<>
+					<div className="flex items-center gap-3">
+						{!analysis && !isAnalyzing && (
+							<button
+								type="button"
+								onClick={handleLoadSample}
+								className="cursor-pointer font-medium text-text-sub-600 text-xs transition-colors hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white"
+							>
+								Load a sample
+							</button>
+						)}
+						{analysis && !isAnalyzing ? (
+							<FancyButton.Root
+								asChild
+								variant="primary"
+								size="xsmall"
+								className="h-8 px-3.5 text-[12px]!"
+							>
+								<a
+									href="https://cal.com/pranavp/30"
+									target="_blank"
+									rel="noopener noreferrer"
+								>
+									<span>Schedule call</span>
 									<FancyButton.Icon
 										as={Icon}
-										name={analysis ? "arrow-right" : "search"}
+										name="arrow-right"
 										className="size-3.5"
 									/>
-									<span>{analysis ? "Calculate Score" : "Start Scan"}</span>
-								</>
-							)}
-						</FancyButton.Root>
+								</a>
+							</FancyButton.Root>
+						) : (
+							<FancyButton.Root
+								type="submit"
+								form="spam-checker-form"
+								variant="primary"
+								size="xsmall"
+								disabled={isAnalyzing || !hasContent}
+								className="h-8 px-3.5 text-[12px]!"
+							>
+								{isAnalyzing ? (
+									<div className="flex items-center gap-1.5">
+										<LoadingDot size={13} dotSize={2} className="text-white" />
+										<span>Scanning...</span>
+									</div>
+								) : (
+									<>
+										<FancyButton.Icon
+											as={Icon}
+											name="search"
+											className="size-3.5"
+										/>
+										<span>Start Scan</span>
+									</>
+								)}
+							</FancyButton.Root>
+						)}
 					</div>
 				</div>
 			</div>
