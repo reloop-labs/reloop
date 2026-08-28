@@ -1,22 +1,25 @@
-import { Icon } from "@reloop/ui/icon";
 import { JsonLd } from "@reloop/web/components/json-ld";
 import { BlogCta } from "@reloop/web/components/landing/blog/blog-cta";
 import { createPageMetadata } from "@reloop/web/lib/metadata";
 import { getSiteUrl } from "@reloop/web/lib/site";
+import { SectionSeparator } from "../../(home)/components/section-separator";
 import { ApiSection } from "./api-section";
-import { CheckerPanel } from "./checker-panel";
+import { AiAgentsSection } from "./components/ai-agents-section";
+import { HowItWorksSection } from "./components/how-it-works-section";
+import { SpamScoreHero } from "./components/spam-score-hero";
 import {
 	faqGroups,
 	faqs,
-	reasons,
 	toolDescription,
 	toolKeywords,
 	toolPath,
 	toolTitle,
 } from "./content";
 import { FaqGrid } from "./faq-grid";
-import { Band, SectionIntro } from "./grid";
+import { SectionIntro } from "./grid";
 
+// TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
+// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
 export const instant = false;
 
 export const metadata = createPageMetadata({
@@ -31,7 +34,7 @@ export default function SpamScoreCheckerPage() {
 	const siteUrl = getSiteUrl();
 
 	return (
-		<>
+		<div className="relative min-h-screen overflow-x-hidden bg-bg-white-0 font-sans text-text-strong-950 selection:bg-neutral-200 dark:bg-black dark:text-white dark:selection:bg-neutral-800">
 			<JsonLd
 				data={[
 					{
@@ -86,84 +89,41 @@ export default function SpamScoreCheckerPage() {
 				]}
 			/>
 
-			{/* Hero / Interactive Tool Section */}
-			<Band className="relative overflow-hidden pt-16">
-				<div className="relative px-5 pt-14 pb-16 sm:px-6 sm:pt-16 md:px-8 lg:pb-20">
-					<div className="mx-auto max-w-3xl text-center">
-						<span className="inline-flex items-center gap-2 rounded-full border border-stroke-soft-200 bg-bg-white-0 px-3 py-1 font-mono text-[11px] text-text-sub-600 uppercase tracking-[0.12em] dark:border-white/12 dark:bg-black dark:text-white/45">
-							<span className="size-1.5 rounded-full bg-text-strong-950 dark:bg-white" />
-							Free tool — no account
-						</span>
+			<SpamScoreHero />
 
-						<h1 className="mt-6 font-semibold text-[2.4rem] text-text-strong-950 leading-[1.05] tracking-[-1.4px] sm:text-[3.4rem] dark:text-white">
-							Email Content &amp; Spam Score Checker
-						</h1>
-
-						<p className="mx-auto mt-5 max-w-xl text-[15px] text-text-sub-600 leading-relaxed sm:text-[17px] dark:text-white/50">
-							{toolDescription}
-						</p>
-					</div>
-
-					<div className="mt-10">
-						<CheckerPanel />
-					</div>
-				</div>
-			</Band>
-
-			{/* Section: Why Spam Score Matters - styled exactly like landing page highlight cards */}
-			<Band id="why-it-matters">
-				<SectionIntro
-					lead="Why checking before sending saves your domain."
-					description="Poor content formatting and blacklisted words lower inbox placement for all future emails sent from your domain."
-				/>
-
-				<div className="grid grid-cols-1 divide-y divide-stroke-soft-200 border-stroke-soft-200 border-t sm:grid-cols-2 sm:divide-x sm:divide-y-0 lg:grid-cols-4 dark:divide-white/10 dark:border-white/10">
-					{reasons.map((reason) => (
-						<div
-							key={reason.title}
-							className="flex min-h-[14rem] flex-col justify-between p-6 sm:p-7 lg:p-8"
-						>
-							<Icon
-								name={reason.icon}
-								className="size-5 text-text-sub-600 dark:text-white/40"
-							/>
-							<div>
-								<p className="font-semibold text-[15px] text-text-strong-950 tracking-tight dark:text-white">
-									{reason.title}
-								</p>
-								<p className="mt-1.5 text-[13px] text-text-sub-600 leading-relaxed dark:text-white/50">
-									{reason.description}
-								</p>
-							</div>
-						</div>
-					))}
-				</div>
-			</Band>
-
-			{/* Section: Programmatic API Integration */}
-			<Band id="api">
-				<SectionIntro
-					lead="Validate content via code."
-					description="Integrate automated spam checks into your CI/CD pipelines, email generation workflows, and signup systems."
-				/>
-
+			<div className="relative mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-200 border-x md:max-w-7xl dark:border-white/10">
+				<HowItWorksSection />
+				<SectionSeparator />
 				<ApiSection />
-			</Band>
-
-			{/* Section: FAQs */}
-			<Band id="faq">
-				<SectionIntro
-					lead="Frequently asked questions."
-					description="Answers to common questions regarding email spam scores, deliverability filters, and inbox placement."
+				<SectionSeparator />
+				<AiAgentsSection />
+				<SectionSeparator />
+				<section id="faq-section" className="w-full">
+					<SectionIntro lead="Frequently asked questions" align="left" />
+					<FaqGrid groups={faqGroups} />
+				</section>
+				<SectionSeparator />
+				<BlogCta
+					headline={
+						<>
+							Email API
+							<br />
+							for Developers
+						</>
+					}
+					sub="Free plan: 3,000 emails a month. No credit card."
+					primaryLabel="Get started free"
+					primaryHref="/dashboard/signup"
+					primaryVariant="primary"
+					secondaryLabel="Contact us"
+					secondaryHref="/contact"
+					accentColor="primary"
+					flush
+					align="center"
+					pill={false}
+					showTopRule={false}
 				/>
-
-				<FaqGrid groups={faqGroups} />
-			</Band>
-
-			{/* Bottom CTA to sign up */}
-			<Band className="border-b-0">
-				<BlogCta />
-			</Band>
-		</>
+			</div>
+		</div>
 	);
 }

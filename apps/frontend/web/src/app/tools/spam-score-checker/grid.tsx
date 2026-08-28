@@ -51,13 +51,10 @@ export function SectionRule({
 		<Band>
 			<div className="flex items-stretch">
 				<div className="flex flex-1 items-center gap-3 py-4 pl-5 sm:pl-6 md:pl-8">
-					<span className="h-3.5 w-0.5 shrink-0 bg-text-strong-950 dark:bg-white" />
+					<span className="h-3.5 w-0.5 shrink-0 bg-primary-base" />
 					<span className="font-mono text-[10px] text-text-soft-400 uppercase tracking-[0.18em] sm:text-[11px] dark:text-white/30">
-						[{" "}
-						<span className="text-text-strong-950 dark:text-white">
-							{index}
-						</span>{" "}
-						/ {total} ]<span className="px-2">·</span>
+						[ <span className="text-primary-base">{index}</span> / {total} ]
+						<span className="px-2">·</span>
 						{label}
 					</span>
 				</div>
@@ -73,23 +70,28 @@ export function SectionIntro({
 	lead,
 	accent,
 	description,
+	align = "center",
 }: {
 	eyebrow?: string;
 	eyebrowIcon?: string;
 	lead: string;
 	accent?: string;
 	description?: string;
+	align?: "center" | "left";
 }) {
+	const isLeft = align === "left";
 	return (
-		<div className="px-5 py-16 text-center sm:px-6 sm:py-20 md:px-8">
+		<div
+			className={cn(
+				"px-5 py-10 sm:px-6 sm:py-12 md:px-8",
+				isLeft ? "text-left" : "text-center",
+			)}
+		>
 			{eyebrow && (
-				<p className="mb-6 inline-flex items-center gap-2 font-mono text-[11px] text-text-sub-600 uppercase tracking-[0.14em] dark:text-white/45">
+				<p className="mb-4 inline-flex items-center gap-2 font-mono text-[11px] text-text-sub-600 uppercase tracking-[0.14em] dark:text-white/45">
 					<span className="text-text-soft-400 dark:text-white/20">{"//"}</span>
 					{eyebrowIcon && (
-						<Icon
-							name={eyebrowIcon}
-							className="size-3.5 text-text-strong-950 dark:text-white"
-						/>
+						<Icon name={eyebrowIcon} className="size-3.5 text-primary-base" />
 					)}
 					{eyebrow}
 					<span className="text-text-soft-400 dark:text-white/20">
@@ -97,19 +99,27 @@ export function SectionIntro({
 					</span>
 				</p>
 			)}
-			<h2 className="mx-auto max-w-3xl font-semibold text-[2rem] text-text-strong-950 leading-[1.08] tracking-[-1px] sm:text-[2.6rem] dark:text-white">
+			<h2
+				className={cn(
+					"font-semibold text-[2rem] text-text-strong-950 leading-[1.08] tracking-[-1px] sm:text-[2.4rem] dark:text-white",
+					!isLeft && "mx-auto max-w-3xl",
+				)}
+			>
 				{lead}
 				{accent && (
 					<>
 						{" "}
-						<span className="text-text-strong-950 dark:text-white">
-							{accent}
-						</span>
+						<span className="text-primary-base">{accent}</span>
 					</>
 				)}
 			</h2>
 			{description && (
-				<p className="mx-auto mt-5 max-w-2xl text-[15px] text-text-sub-600 leading-relaxed sm:text-[17px] dark:text-white/55">
+				<p
+					className={cn(
+						"mt-4 max-w-xl text-[15px] text-text-sub-600 leading-relaxed sm:text-[16px] dark:text-white/50",
+						!isLeft && "mx-auto",
+					)}
+				>
 					{description}
 				</p>
 			)}
@@ -117,28 +127,27 @@ export function SectionIntro({
 	);
 }
 
+/**
+ * Cells share hairlines instead of floating as separate cards: the grid gap is
+ * one pixel of rule colour showing through from behind.
+ */
 export function CellGrid({
+	columns = 2,
 	children,
-	cols = 3,
-	className,
 }: {
+	columns?: 2 | 3 | 4;
 	children: React.ReactNode;
-	cols?: 2 | 3 | 4;
-	className?: string;
 }) {
-	const colClass = {
-		2: "md:grid-cols-2",
-		3: "sm:grid-cols-2 lg:grid-cols-3",
-		4: "sm:grid-cols-2 lg:grid-cols-4",
-	}[cols];
-
 	return (
 		<div
 			className={cn(
-				"grid divide-y md:divide-x md:divide-y-0",
-				colClass,
+				"grid gap-px border-t bg-stroke-soft-200 dark:bg-white/10",
 				hairline,
-				className,
+				columns === 4
+					? "sm:grid-cols-2 lg:grid-cols-4"
+					: columns === 3
+						? "sm:grid-cols-2 lg:grid-cols-3"
+						: "sm:grid-cols-2",
 			)}
 		>
 			{children}
@@ -156,7 +165,7 @@ export function Cell({
 	return (
 		<div
 			className={cn(
-				"flex flex-col justify-between p-6 sm:p-7 md:p-8",
+				"bg-bg-white-0 px-5 py-8 sm:px-6 md:px-8 md:py-10 dark:bg-black",
 				className,
 			)}
 		>
@@ -165,22 +174,13 @@ export function Cell({
 	);
 }
 
-export function CellLabel({ tag, icon }: { tag?: string; icon?: string }) {
+export function CellLabel({ icon, label }: { icon?: string; label: string }) {
 	return (
-		<div className="mb-6 flex items-center justify-between gap-3">
-			{tag ? (
-				<span className="font-mono text-[11px] text-text-sub-600 uppercase tracking-[0.14em] dark:text-white/50">
-					{tag}
-				</span>
-			) : (
-				<span />
-			)}
-			{icon && (
-				<Icon
-					name={icon}
-					className="size-4 text-text-soft-400 dark:text-white/30"
-				/>
-			)}
+		<div className="flex items-center gap-2 text-text-soft-400 dark:text-white/35">
+			{icon && <Icon name={icon} className="size-[15px] shrink-0" />}
+			<span className="font-mono text-[11px] uppercase tracking-[0.14em]">
+				{label}
+			</span>
 		</div>
 	);
 }
@@ -193,23 +193,23 @@ export function CellCopy({
 	description: string;
 }) {
 	return (
-		<div>
-			<h3 className="font-semibold text-[17px] text-text-strong-950 tracking-tight sm:text-[18px] dark:text-white">
-				{title}
-			</h3>
-			<p className="mt-2 text-[14px] text-text-sub-600 leading-relaxed dark:text-white/50">
+		<p className="mt-5 text-[15px] leading-relaxed sm:text-[16px]">
+			<span className="font-semibold text-text-strong-950 dark:text-white">
+				{title}.
+			</span>{" "}
+			<span className="text-text-sub-600 dark:text-white/50">
 				{description}
-			</p>
-		</div>
+			</span>
+		</p>
 	);
 }
 
 export function WindowDots() {
 	return (
-		<span className="flex items-center gap-1.5" aria-hidden>
-			<span className="size-2 rounded-full bg-[#ff5f56]" />
-			<span className="size-2 rounded-full bg-[#ffbd2e]" />
-			<span className="size-2 rounded-full bg-[#27c93f]" />
+		<span className="flex shrink-0 items-center gap-1.5">
+			<span className="size-2 rounded-full bg-stroke-soft-200 dark:bg-white/15" />
+			<span className="size-2 rounded-full bg-stroke-soft-200 dark:bg-white/15" />
+			<span className="size-2 rounded-full bg-stroke-soft-200 dark:bg-white/15" />
 		</span>
 	);
 }
