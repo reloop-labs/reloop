@@ -872,20 +872,18 @@ Instructions:
 												return (
 													<div
 														key={`sugg-${trigger.word}-${idx}`}
-														className="flex items-center justify-between py-2 text-xs"
+														className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 py-2 text-xs"
 													>
-														<span className="rounded-[4px] border border-rose-500/20 bg-rose-500/[0.08] px-2 py-0.5 font-mono text-[11.5px] text-rose-600 line-through dark:border-rose-500/30 dark:bg-rose-500/15 dark:text-rose-400">
+														<span className="justify-self-start truncate rounded-[4px] border border-rose-500/20 bg-rose-500/[0.08] px-2 py-0.5 font-mono text-[11.5px] text-rose-600 line-through dark:border-rose-500/30 dark:bg-rose-500/15 dark:text-rose-400">
 															{trigger.word}
 														</span>
-														<div className="flex items-center gap-1.5 font-mono text-[11.5px]">
-															<Icon
-																name="arrow-right"
-																className="size-3 text-text-soft-400 dark:text-white/40"
-															/>
-															<span className="rounded-[4px] border border-emerald-500/20 bg-emerald-500/[0.08] px-2 py-0.5 font-medium text-emerald-600 dark:border-emerald-500/30 dark:bg-emerald-500/15 dark:text-emerald-400">
-																{suggestion}
-															</span>
-														</div>
+														<Icon
+															name="arrow-right"
+															className="size-3 shrink-0 text-text-soft-400 dark:text-white/40"
+														/>
+														<span className="justify-self-end truncate rounded-[4px] border border-emerald-500/20 bg-emerald-500/[0.08] px-2 py-0.5 font-mono font-medium text-[11.5px] text-emerald-600 dark:border-emerald-500/30 dark:bg-emerald-500/15 dark:text-emerald-400">
+															{suggestion}
+														</span>
 													</div>
 												);
 											});
