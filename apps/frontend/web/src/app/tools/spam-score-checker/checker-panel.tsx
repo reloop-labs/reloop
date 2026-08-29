@@ -45,6 +45,62 @@ const CROSSFADE = {
 	ease: [0.22, 1, 0.36, 1] as const,
 };
 
+const SPAM_SUGGESTIONS: Record<string, string> = {
+	urgent: "time-sensitive",
+	"expires tonight": "available today",
+	"act now": "learn more",
+	immediately: "when convenient",
+	hurry: "take a look",
+	"last chance": "final reminder",
+	"final notice": "follow-up notice",
+	"final warning": "important update",
+	asap: "soon",
+	"as soon as possible": "at your convenience",
+	claim: "access",
+	"confidential investment proposal": "partnership overview",
+	"click here": "view the details",
+	"100% free": "complimentary",
+	"risk-free": "worry-free",
+	free: "included",
+	payout: "disbursement",
+	bonus: "reward",
+	"money back": "guarantee",
+	guaranteed: "assured",
+	"no obligation": "no commitment",
+	"once in a lifetime": "special offer",
+	"limited time": "current window",
+	winner: "selected participant",
+	congratulations: "great news",
+	"earn money": "generate revenue",
+	income: "earnings",
+	cash: "funds",
+	prize: "award",
+	cheap: "affordable",
+	"lowest price": "competitive rate",
+	"save big": "optimize costs",
+};
+
+function getSafeSuggestion(word: string, category: TriggerCategory): string {
+	const lower = word.toLowerCase().trim();
+	if (SPAM_SUGGESTIONS[lower]) {
+		return SPAM_SUGGESTIONS[lower];
+	}
+	switch (category) {
+		case "urgency":
+			return "time-sensitive";
+		case "shady":
+			return "learn more";
+		case "overpromise":
+			return "verified";
+		case "money":
+			return "account balance";
+		case "outreach":
+			return "introduction";
+		default:
+			return "neutral phrasing";
+	}
+}
+
 function MorphSlot({
 	activeKey,
 	reduceMotion,
@@ -246,7 +302,7 @@ export function CheckerPanel() {
 	};
 
 	return (
-		<div className="mx-auto w-full max-w-xl font-sans">
+		<div className="mx-auto w-full max-w-4xl font-sans">
 			{/* Dashboard Container with Outer Shell */}
 			<div className="overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-weak-50 p-0.5 dark:border-white/10 dark:bg-white/[0.03]">
 				{/* Top Header: Title & Status - Outside white card, inside grey frame */}
@@ -325,390 +381,391 @@ export function CheckerPanel() {
 						id="spam-checker-form"
 						onSubmit={handleScan}
 						noValidate
-						className="space-y-4"
+						className="grid grid-cols-1 gap-5 lg:grid-cols-2 lg:items-start"
 					>
-						{/* Subject Line */}
-						<div className="space-y-2">
-							<div className="flex items-center justify-between">
-								<Label.Root
-									htmlFor="subject-input"
-									className="font-medium text-text-strong-950 text-xs dark:text-white"
-								>
-									Subject Line
-									<Label.Asterisk />
-								</Label.Root>
-								<span
-									className={cn(
-										"font-mono text-[11px]",
-										subject.length > 60
-											? "text-warning-base"
-											: "text-text-soft-400 dark:text-white/35",
-									)}
-								>
-									{subject.length}/60 chars
-								</span>
+						{/* Left Column: Email Subject & Body */}
+						<div className="space-y-4">
+							{/* Subject Line */}
+							<div className="space-y-2">
+								<div className="flex items-center justify-between">
+									<Label.Root
+										htmlFor="subject-input"
+										className="font-medium text-text-strong-950 text-xs dark:text-white"
+									>
+										Subject Line
+										<Label.Asterisk />
+									</Label.Root>
+									<span className="font-mono text-[11px] text-text-soft-400 dark:text-white/35">
+										{subject.length}/60 chars
+									</span>
+								</div>
+
+								{analysis || isAnalyzing ? (
+									<div className="relative w-full overflow-hidden rounded-xl bg-bg-weak-50/50 dark:bg-white/[0.03]">
+										{/* Layer 1: Normal Plain Text Layer (Right of laser line - Unscanned) */}
+										<motion.div
+											key={`subject-plain-${scanKey}`}
+											initial={{
+												clipPath: isAnalyzing
+													? "inset(0 0 0 0%)"
+													: "inset(0 0 0 100%)",
+											}}
+											animate={{ clipPath: "inset(0 0 0 100%)" }}
+											transition={
+												isAnalyzing
+													? { duration: SCAN_DURATION_SEC, ease: SCAN_EASING }
+													: { duration: 0 }
+											}
+											className="px-3.5 py-2.5 font-mono text-[13px] leading-5 text-text-strong-950 select-text dark:text-white"
+										>
+											{subject}
+										</motion.div>
+
+										{/* Layer 2: Highlighted Underline Layer (Left of laser line - Scanned) */}
+										<motion.div
+											key={`subject-reveal-${scanKey}`}
+											initial={{
+												clipPath: isAnalyzing
+													? "inset(0 100% 0 0)"
+													: "inset(0 0% 0 0)",
+											}}
+											animate={{ clipPath: "inset(0 0% 0 0)" }}
+											transition={
+												isAnalyzing
+													? { duration: SCAN_DURATION_SEC, ease: SCAN_EASING }
+													: { duration: 0 }
+											}
+											className="absolute inset-0 z-10 overflow-hidden px-3.5 py-2.5 font-mono text-[13px] leading-5 text-text-strong-950 select-text dark:text-white"
+										>
+											{analysis
+												? buildHighlightedContent(
+														subject,
+														analysis.detectedTriggers,
+														"subject",
+													)
+												: subject}
+										</motion.div>
+
+										{/* Synchronized Scanning Laser Beam */}
+										<AnimatePresence>
+											{isAnalyzing && (
+												<motion.div
+													key={`subject-laser-${scanKey}`}
+													initial={{ left: "0%", opacity: 1 }}
+													animate={{ left: "100%" }}
+													exit={{ opacity: 0, transition: { duration: 0.2 } }}
+													transition={{
+														duration: SCAN_DURATION_SEC,
+														ease: SCAN_EASING,
+													}}
+													className="pointer-events-none absolute inset-y-0 z-20 flex w-28 -translate-x-full"
+												>
+													<div className="h-full w-full bg-gradient-to-r from-transparent via-rose-500/10 to-rose-500/35" />
+													<div className="h-full w-[2px] shrink-0 bg-rose-500 shadow-[0_0_12px_rgba(244,63,94,0.9),0_0_3px_#ffffff]" />
+												</motion.div>
+											)}
+										</AnimatePresence>
+									</div>
+								) : (
+									<Input.Root
+										size="medium"
+										className="has-[input:focus]:before:!ring-primary-base has-[input:focus]:!shadow-button-primary-focus"
+									>
+										<Input.Wrapper>
+											<Input.Input
+												id="subject-input"
+												ref={subjectInputRef}
+												type="text"
+												value={subject}
+												onChange={(e) => {
+													setSubject(e.target.value);
+													setErrorMessage(null);
+												}}
+												placeholder="e.g. Action required: Update your payment information"
+												className="font-sans text-[14px] leading-5"
+											/>
+										</Input.Wrapper>
+									</Input.Root>
+								)}
 							</div>
 
-							{analysis || isAnalyzing ? (
-								<div className="relative w-full overflow-hidden rounded-xl bg-bg-weak-50/50 dark:bg-white/[0.03]">
-									{/* Layer 1: Normal Plain Text Layer (Right of laser line - Unscanned) */}
-									<motion.div
-										key={`subject-plain-${scanKey}`}
-										initial={{
-											clipPath: isAnalyzing
-												? "inset(0 0 0 0%)"
-												: "inset(0 0 0 100%)",
-										}}
-										animate={{ clipPath: "inset(0 0 0 100%)" }}
-										transition={
-											isAnalyzing
-												? { duration: SCAN_DURATION_SEC, ease: SCAN_EASING }
-												: { duration: 0 }
-										}
-										className="px-3.5 py-2.5 font-mono text-[13px] leading-5 text-text-strong-950 select-text dark:text-white"
+							{/* Email Body Copy */}
+							<div className="space-y-2">
+								<div className="flex items-center justify-between">
+									<Label.Root
+										htmlFor="body-input"
+										className="font-medium text-text-strong-950 text-xs dark:text-white"
 									>
-										{subject}
-									</motion.div>
-
-									{/* Layer 2: Highlighted Underline Layer (Left of laser line - Scanned) */}
-									<motion.div
-										key={`subject-reveal-${scanKey}`}
-										initial={{
-											clipPath: isAnalyzing
-												? "inset(0 100% 0 0)"
-												: "inset(0 0% 0 0)",
-										}}
-										animate={{ clipPath: "inset(0 0% 0 0)" }}
-										transition={
-											isAnalyzing
-												? { duration: SCAN_DURATION_SEC, ease: SCAN_EASING }
-												: { duration: 0 }
-										}
-										className="absolute inset-0 z-10 overflow-hidden px-3.5 py-2.5 font-mono text-[13px] leading-5 text-text-strong-950 select-text dark:text-white"
-									>
-										{analysis
-											? buildHighlightedContent(
-													subject,
-													analysis.detectedTriggers,
-													"subject",
-												)
-											: subject}
-									</motion.div>
-
-									{/* Synchronized Scanning Laser Beam */}
-									<AnimatePresence>
-										{isAnalyzing && (
-											<motion.div
-												key={`subject-laser-${scanKey}`}
-												initial={{ left: "0%", opacity: 1 }}
-												animate={{ left: "100%" }}
-												exit={{ opacity: 0, transition: { duration: 0.2 } }}
-												transition={{
-													duration: SCAN_DURATION_SEC,
-													ease: SCAN_EASING,
-												}}
-												className="pointer-events-none absolute inset-y-0 z-20 flex w-28 -translate-x-full"
-											>
-												<div className="h-full w-full bg-gradient-to-r from-transparent via-rose-500/10 to-rose-500/35" />
-												<div className="h-full w-[2px] shrink-0 bg-rose-500 shadow-[0_0_12px_rgba(244,63,94,0.9),0_0_3px_#ffffff]" />
-											</motion.div>
-										)}
-									</AnimatePresence>
+										Email Body Copy
+										<Label.Asterisk />
+									</Label.Root>
+									<div className="flex items-center gap-2">
+										<span className="font-mono text-[11px] text-text-soft-400 dark:text-white/35">
+											{wordCount} words · {linkCount} link(s)
+										</span>
+									</div>
 								</div>
-							) : (
-								<Input.Root
-									size="medium"
-									className="has-[input:focus]:before:!ring-primary-base has-[input:focus]:!shadow-button-primary-focus"
-								>
-									<Input.Wrapper>
-										<Input.Input
-											id="subject-input"
-											ref={subjectInputRef}
-											type="text"
-											value={subject}
-											onChange={(e) => {
-												setSubject(e.target.value);
-												setErrorMessage(null);
+
+								{analysis || isAnalyzing ? (
+									<div className="relative w-full overflow-hidden rounded-xl bg-bg-weak-50/50 dark:bg-white/[0.03]">
+										{/* Layer 1: Normal Plain Text Layer (Right of laser line - Unscanned) */}
+										<motion.div
+											key={`body-plain-${scanKey}`}
+											initial={{
+												clipPath: isAnalyzing
+													? "inset(0 0 0 0%)"
+													: "inset(0 0 0 100%)",
 											}}
-											placeholder="e.g. Action required: Update your payment information"
-											className="font-sans text-[14px] leading-5"
-										/>
-									</Input.Wrapper>
-								</Input.Root>
-							)}
+											animate={{ clipPath: "inset(0 0 0 100%)" }}
+											transition={
+												isAnalyzing
+													? { duration: SCAN_DURATION_SEC, ease: SCAN_EASING }
+													: { duration: 0 }
+											}
+											className="min-h-24 whitespace-pre-wrap break-words p-3.5 font-mono text-[13px] leading-[1.65] text-text-strong-950 select-text dark:text-white"
+										>
+											{body}
+										</motion.div>
+
+										{/* Layer 2: Highlighted Underline Layer (Left of laser line - Scanned) */}
+										<motion.div
+											key={`body-reveal-${scanKey}`}
+											initial={{
+												clipPath: isAnalyzing
+													? "inset(0 100% 0 0)"
+													: "inset(0 0% 0 0)",
+											}}
+											animate={{ clipPath: "inset(0 0% 0 0)" }}
+											transition={
+												isAnalyzing
+													? { duration: SCAN_DURATION_SEC, ease: SCAN_EASING }
+													: { duration: 0 }
+											}
+											className="absolute inset-0 z-10 overflow-hidden whitespace-pre-wrap break-words p-3.5 font-mono text-[13px] leading-[1.65] text-text-strong-950 select-text dark:text-white"
+										>
+											{analysis
+												? buildHighlightedContent(
+														body,
+														analysis.detectedTriggers,
+														"body",
+													)
+												: body}
+										</motion.div>
+
+										{/* Synchronized Horizontal Scanning Laser Beam */}
+										<AnimatePresence>
+											{isAnalyzing && (
+												<motion.div
+													key={`body-laser-${scanKey}`}
+													initial={{ left: "0%", opacity: 1 }}
+													animate={{ left: "100%" }}
+													exit={{ opacity: 0, transition: { duration: 0.2 } }}
+													transition={{
+														duration: SCAN_DURATION_SEC,
+														ease: SCAN_EASING,
+													}}
+													className="pointer-events-none absolute inset-y-0 z-20 flex w-28 -translate-x-full"
+												>
+													<div className="h-full w-full bg-gradient-to-r from-transparent via-rose-500/10 to-rose-500/35" />
+													<div className="h-full w-[2px] shrink-0 bg-rose-500 shadow-[0_0_12px_rgba(244,63,94,0.9),0_0_3px_#ffffff]" />
+												</motion.div>
+											)}
+										</AnimatePresence>
+									</div>
+								) : (
+									<Textarea.Root
+										simple
+										id="body-input"
+										ref={bodyTextareaRef}
+										rows={4}
+										value={body}
+										onChange={(e) => {
+											setBody(e.target.value);
+											setErrorMessage(null);
+											e.target.style.height = "auto";
+											e.target.style.height = `${Math.max(88, e.target.scrollHeight)}px`;
+										}}
+										placeholder="Paste your email copy here to scan for spam trigger phrases..."
+										className="!min-h-[110px] resize-none overflow-hidden text-paragraph-xs leading-normal focus:!ring-primary-base focus:!shadow-button-primary-focus"
+									/>
+								)}
+							</div>
 						</div>
 
-						{/* Email Body Copy */}
-						<div className="space-y-2">
-							<div className="flex items-center justify-between">
-								<Label.Root
-									htmlFor="body-input"
-									className="font-medium text-text-strong-950 text-xs dark:text-white"
-								>
-									Email Body Copy
-									<Label.Asterisk />
-								</Label.Root>
-								<div className="flex items-center gap-2">
-									<span className="font-mono text-[11px] text-text-soft-400 dark:text-white/35">
-										{wordCount} words · {linkCount} link(s)
+						{/* Right Column: Risk Meter & Detected Spam Categories */}
+						<div className="space-y-4">
+							{/* Risk Meter Visualizer Card */}
+							<div className="rounded-xl border border-stroke-soft-200 bg-bg-weak-50/50 p-4 dark:border-white/10 dark:bg-white/[0.02]">
+								<div className="mb-2 flex items-center justify-between">
+									<span className="font-mono text-[12px] text-text-sub-600 dark:text-white/60">
+										spam risk{" "}
+										<strong className="font-bold text-[14px] text-text-strong-950 dark:text-white">
+											{displayedRiskScore}
+										</strong>
+									</span>
+								</div>
+
+								{/* Vertical Tick Bars Barcode Graph */}
+								<div className="relative flex items-center justify-between gap-[3px] py-1 sm:gap-1">
+									{Array.from({ length: TOTAL_BARS }).map((_, i) => {
+										const isPastSpamZone = i >= SPAM_BAR_INDEX;
+										const isThresholdDivider = i === SPAM_BAR_INDEX;
+										const isActive = Boolean(analysis && !isAnalyzing && i < activeBarCount);
+
+										let barColorClass = "bg-neutral-200/80 dark:bg-white/10";
+
+										if (isPastSpamZone) {
+											barColorClass = "bg-rose-500/15 dark:bg-rose-500/20";
+										}
+
+										if (isActive) {
+											if (
+												isPastSpamZone ||
+												displayedRiskScore >= SPAM_THRESHOLD
+											) {
+												barColorClass = "bg-rose-500";
+											} else {
+												barColorClass = "bg-emerald-500";
+											}
+										}
+
+										return (
+											<div
+												key={`bar-${i}`}
+												className="relative flex flex-col items-center"
+											>
+												{isThresholdDivider && (
+													<div
+														className="-top-1.5 absolute h-9 w-[1.5px] bg-neutral-400 dark:bg-white/40"
+														aria-hidden
+													/>
+												)}
+												<span
+													className={cn(
+														"h-7 w-[3.5px] rounded-full transition-colors duration-150 sm:w-[4px]",
+														barColorClass,
+													)}
+												/>
+											</div>
+										);
+									})}
+								</div>
+
+								{/* Scale Labels */}
+								<div className="mt-1 flex items-center justify-between font-mono text-[11px] text-text-soft-400 dark:text-white/35">
+									<span>inbox safe</span>
+									<span className="text-text-sub-600 dark:text-white/50">
+										spam threshold (40)
+									</span>
+									<span className="text-rose-500/90 dark:text-rose-400/90">
+										spam folder
 									</span>
 								</div>
 							</div>
 
-							{analysis || isAnalyzing ? (
-								<div className="relative w-full overflow-hidden rounded-xl bg-bg-weak-50/50 dark:bg-white/[0.03]">
-									{/* Layer 1: Normal Plain Text Layer (Right of laser line - Unscanned) */}
-									<motion.div
-										key={`body-plain-${scanKey}`}
-										initial={{
-											clipPath: isAnalyzing
-												? "inset(0 0 0 0%)"
-												: "inset(0 0 0 100%)",
-										}}
-										animate={{ clipPath: "inset(0 0 0 100%)" }}
-										transition={
-											isAnalyzing
-												? { duration: SCAN_DURATION_SEC, ease: SCAN_EASING }
-												: { duration: 0 }
-										}
-										className="min-h-24 whitespace-pre-wrap break-words p-3.5 font-mono text-[13px] leading-[1.65] text-text-strong-950 select-text dark:text-white"
-									>
-										{body}
-									</motion.div>
-
-									{/* Layer 2: Highlighted Underline Layer (Left of laser line - Scanned) */}
-									<motion.div
-										key={`body-reveal-${scanKey}`}
-										initial={{
-											clipPath: isAnalyzing
-												? "inset(0 100% 0 0)"
-												: "inset(0 0% 0 0)",
-										}}
-										animate={{ clipPath: "inset(0 0% 0 0)" }}
-										transition={
-											isAnalyzing
-												? { duration: SCAN_DURATION_SEC, ease: SCAN_EASING }
-												: { duration: 0 }
-										}
-										className="absolute inset-0 z-10 overflow-hidden whitespace-pre-wrap break-words p-3.5 font-mono text-[13px] leading-[1.65] text-text-strong-950 select-text dark:text-white"
-									>
-										{analysis
-											? buildHighlightedContent(
-													body,
-													analysis.detectedTriggers,
-													"body",
-												)
-											: body}
-									</motion.div>
-
-									{/* Synchronized Horizontal Scanning Laser Beam */}
-									<AnimatePresence>
-										{isAnalyzing && (
-											<motion.div
-												key={`body-laser-${scanKey}`}
-												initial={{ left: "0%", opacity: 1 }}
-												animate={{ left: "100%" }}
-												exit={{ opacity: 0, transition: { duration: 0.2 } }}
-												transition={{
-													duration: SCAN_DURATION_SEC,
-													ease: SCAN_EASING,
-												}}
-												className="pointer-events-none absolute inset-y-0 z-20 flex w-28 -translate-x-full"
-											>
-												<div className="h-full w-full bg-gradient-to-r from-transparent via-rose-500/10 to-rose-500/35" />
-												<div className="h-full w-[2px] shrink-0 bg-rose-500 shadow-[0_0_12px_rgba(244,63,94,0.9),0_0_3px_#ffffff]" />
-											</motion.div>
+							{/* Suggested Replacements Card */}
+							<div className="overflow-hidden rounded-[14px] border border-stroke-soft-200 bg-bg-weak-50 p-0.5 dark:border-white/10 dark:bg-white/[0.03]">
+								<div className="flex items-center justify-between px-3 pt-2 pb-2">
+									<p className="font-mono font-semibold text-[11px] text-text-strong-950 uppercase tracking-wider dark:text-white">
+										Suggested Replacements
+									</p>
+									{analysis &&
+										!isAnalyzing &&
+										analysis.detectedTriggers.length > 0 && (
+											<span className="font-mono text-[11px] text-rose-500 dark:text-rose-400">
+												{
+													Array.from(
+														new Set(
+															analysis.detectedTriggers.map((t) =>
+																t.word.toLowerCase(),
+															),
+														),
+													).length
+												}{" "}
+												suggestion(s)
+											</span>
 										)}
-									</AnimatePresence>
 								</div>
-							) : (
-								<Textarea.Root
-									simple
-									id="body-input"
-									ref={bodyTextareaRef}
-									rows={3}
-									value={body}
-									onChange={(e) => {
-										setBody(e.target.value);
-										setErrorMessage(null);
-										e.target.style.height = "auto";
-										e.target.style.height = `${Math.max(88, e.target.scrollHeight)}px`;
-									}}
-									placeholder="Paste your email copy here to scan for spam trigger phrases..."
-									className="!min-h-[88px] resize-none overflow-hidden text-paragraph-xs leading-normal focus:!ring-primary-base focus:!shadow-button-primary-focus"
-								/>
-							)}
-						</div>
 
-						{/* Risk Meter Visualizer Card */}
-						<div className="rounded-xl border border-stroke-soft-200 bg-bg-weak-50/50 p-4 dark:border-white/10 dark:bg-white/[0.02]">
-							<div className="mb-2 flex items-center justify-between">
-								<span className="font-mono text-[12px] text-text-sub-600 dark:text-white/60">
-									spam risk{" "}
-									<strong className="font-bold text-[14px] text-text-strong-950 dark:text-white">
-										{displayedRiskScore}
-									</strong>
-								</span>
-							</div>
-
-							{/* Vertical Tick Bars Barcode Graph */}
-							<div className="relative flex items-center justify-between gap-[3px] py-1 sm:gap-1">
-								{Array.from({ length: TOTAL_BARS }).map((_, i) => {
-									const isPastSpamZone = i >= SPAM_BAR_INDEX;
-									const isThresholdDivider = i === SPAM_BAR_INDEX;
-									const isActive = Boolean(analysis && i < activeBarCount);
-
-									let barColorClass = "bg-neutral-200/80 dark:bg-white/10";
-
-									if (isPastSpamZone) {
-										barColorClass = "bg-rose-500/15 dark:bg-rose-500/20";
-									}
-
-									if (isActive) {
-										if (isPastSpamZone || displayedRiskScore >= SPAM_THRESHOLD) {
-											barColorClass = "bg-rose-500";
-										} else {
-											barColorClass = "bg-emerald-500";
-										}
-									}
-
-									return (
-										<div
-											key={`bar-${i}`}
-											className="relative flex flex-col items-center"
-										>
-											{isThresholdDivider && (
-												<div
-													className="-top-1.5 absolute h-9 w-[1.5px] bg-neutral-400 dark:bg-white/40"
-													aria-hidden
-												/>
-											)}
-											<span
-												className={cn(
-													"h-7 w-[3.5px] rounded-full transition-colors duration-150 sm:w-[4px]",
-													barColorClass,
-												)}
+								<div className="divide-y divide-stroke-soft-200/50 rounded-xl border border-stroke-soft-200 bg-bg-white-0 px-3.5 py-1 dark:divide-white/5 dark:border-white/10 dark:bg-[#070707]">
+									{isAnalyzing ? (
+										<div className="flex items-center gap-2.5 py-3.5 text-rose-500 dark:text-rose-400">
+											<LoadingDot
+												size={13}
+												dotSize={2}
+												className="text-rose-500"
 											/>
+											<span className="font-medium text-xs">
+												Analyzing copy for spam trigger phrases...
+											</span>
 										</div>
-									);
-								})}
-							</div>
+									) : analysis ? (
+										(() => {
+											const uniqueTriggers = Array.from(
+												new Map(
+													analysis.detectedTriggers.map((t) => [
+														t.word.toLowerCase(),
+														t,
+													]),
+												).values(),
+											);
 
-							{/* Scale Labels */}
-							<div className="mt-1 flex items-center justify-between font-mono text-[11px] text-text-soft-400 dark:text-white/35">
-								<span>inbox safe</span>
-								<span className="text-text-sub-600 dark:text-white/50">
-									spam threshold (40)
-								</span>
-								<span className="text-rose-500/90 dark:text-rose-400/90">
-									spam folder
-								</span>
-							</div>
-						</div>
+											if (uniqueTriggers.length === 0) {
+												return (
+													<div className="flex items-center gap-2 py-3 text-emerald-600 dark:text-emerald-400">
+														<Icon
+															name="check-circle"
+															className="size-4 shrink-0 text-emerald-500"
+														/>
+														<span className="font-medium text-xs">
+															No spam trigger words detected — content is
+															clean!
+														</span>
+													</div>
+												);
+											}
 
-						{/* Results Morph Slot */}
-						<MorphSlot
-							activeKey={analysis && !isAnalyzing ? "result" : null}
-							reduceMotion={shouldReduceMotion}
-						>
-							{analysis && !isAnalyzing ? (
-								<div className="space-y-3.5 text-xs">
-									{/* Detected Categories */}
-									<div className="overflow-hidden rounded-[14px] border border-stroke-soft-200 bg-bg-weak-50 p-0.5 dark:border-white/10 dark:bg-white/[0.03]">
-										<div className="flex items-center justify-between px-3 pt-2 pb-2">
-											<p className="font-mono font-semibold text-[11px] text-text-strong-950 uppercase tracking-wider dark:text-white">
-												Detected Spam Categories
-											</p>
-											{analysis &&
-												!isAnalyzing &&
-												analysis.detectedTriggers.length > 0 && (
-													<span className="font-mono text-[11px] text-rose-500 dark:text-rose-400">
-														{analysis.detectedTriggers.length} trigger(s) flagged
-													</span>
-												)}
-										</div>
+											return uniqueTriggers.map((trigger, idx) => {
+												const suggestion = getSafeSuggestion(
+													trigger.word,
+													trigger.category,
+												);
 
-										<div className="divide-y divide-stroke-soft-200/50 rounded-xl border border-stroke-soft-200 bg-bg-white-0 px-3.5 py-1 dark:divide-white/5 dark:border-white/10 dark:bg-[#070707]">
-											{(() => {
-												const flaggedCategories = (
-													Object.keys(CATEGORY_META) as TriggerCategory[]
-												).filter((cat) => {
-													const matchingTriggers =
-														analysis.detectedTriggers.filter(
-															(t) => t.category === cat,
-														);
-													const count =
-														analysis.categoryCounts[cat] ||
-														matchingTriggers.length;
-													return count > 0;
-												});
-
-												if (flaggedCategories.length === 0) {
-													return (
-														<div className="flex items-center gap-2 py-3 text-emerald-600 dark:text-emerald-400">
+												return (
+													<div
+														key={`sugg-${trigger.word}-${idx}`}
+														className="flex items-center justify-between py-2 text-xs"
+													>
+														<span className="rounded-[4px] border border-rose-500/20 bg-rose-500/[0.08] px-2 py-0.5 font-mono text-[11.5px] text-rose-600 line-through dark:border-rose-500/30 dark:bg-rose-500/15 dark:text-rose-400">
+															{trigger.word}
+														</span>
+														<div className="flex items-center gap-1.5 font-mono text-[11.5px]">
 															<Icon
-																name="check-circle"
-																className="size-4 shrink-0 text-emerald-500"
+																name="arrow-right"
+																className="size-3 text-text-soft-400 dark:text-white/40"
 															/>
-															<span className="font-medium text-xs">
-																No spam trigger words detected — content is
-																clean!
+															<span className="rounded-[4px] border border-emerald-500/20 bg-emerald-500/[0.08] px-2 py-0.5 font-medium text-emerald-600 dark:border-emerald-500/30 dark:bg-emerald-500/15 dark:text-emerald-400">
+																{suggestion}
 															</span>
 														</div>
-													);
-												}
-
-												return flaggedCategories.map((cat) => {
-													const meta = CATEGORY_META[cat];
-													const matchingTriggers =
-														analysis.detectedTriggers.filter(
-															(t) => t.category === cat,
-														);
-													const count =
-														analysis.categoryCounts[cat] ||
-														matchingTriggers.length;
-													const uniqueWords = Array.from(
-														new Set(matchingTriggers.map((t) => t.word)),
-													);
-
-													return (
-														<div key={cat} className="py-2.5">
-															<div className="flex items-center justify-between">
-																<div className="flex items-center gap-2">
-																	<Icon
-																		name={meta.icon}
-																		className="size-3.5 shrink-0 text-text-strong-950 dark:text-white"
-																	/>
-																	<span className="font-medium text-text-strong-950 text-xs dark:text-white">
-																		{meta.label}
-																	</span>
-																</div>
-																<code className="rounded-md border border-rose-500/20 bg-rose-500/[0.08] px-2 py-0.5 font-medium font-mono text-[11px] text-rose-600 tracking-tight dark:border-rose-500/30 dark:bg-rose-500/15 dark:text-rose-400">
-																	{count}
-																</code>
-															</div>
-
-															{uniqueWords.length > 0 && (
-																<div className="mt-2 flex flex-wrap gap-1.5 pl-5.5">
-																	{uniqueWords.map((word, wIdx) => (
-																		<span
-																			key={`${cat}-${word}-${wIdx}`}
-																			className="rounded-[4px] border border-rose-500/20 bg-rose-500/[0.08] px-2 py-0.5 font-mono text-[11px] text-rose-600 dark:border-rose-500/30 dark:bg-rose-500/15 dark:text-rose-400"
-																		>
-																			{word}
-																		</span>
-																	))}
-																</div>
-															)}
-														</div>
-													);
-												});
-											})()}
+													</div>
+												);
+											});
+										})()
+									) : (
+										<div className="flex items-center gap-2.5 py-3.5 text-text-sub-600 dark:text-white/50">
+											<Icon
+												name="search"
+												className="size-3.5 shrink-0 text-text-soft-400 dark:text-white/30"
+											/>
+											<span className="text-xs">
+												Run a scan to view suggested safe replacements.
+											</span>
 										</div>
-									</div>
+									)}
 								</div>
-							) : null}
-						</MorphSlot>
+							</div>
+						</div>
 					</form>
 				</div>
 
