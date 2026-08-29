@@ -315,7 +315,7 @@ export function ApiSection() {
 								<button
 									type="button"
 									onClick={() => setIsJsonExpanded(true)}
-									className="pointer-events-auto group flex cursor-pointer items-center gap-1.5 rounded-full border border-stroke-soft-200 bg-bg-white-0 px-3.5 py-1.5 font-mono font-medium text-[11.5px] text-text-strong-950 shadow-sm backdrop-blur-md transition-all hover:border-stroke-soft-200/80 hover:bg-bg-weak-50 active:scale-[0.98] dark:border-white/15 dark:bg-white/10 dark:text-white dark:hover:bg-white/15"
+									className="pointer-events-auto group flex cursor-pointer items-center gap-1.5 rounded-full border border-stroke-soft-200 bg-bg-white-0 px-3.5 py-1.5 font-mono font-medium text-[11.5px] text-text-strong-950 backdrop-blur-md transition-all hover:border-stroke-soft-200/80 hover:bg-bg-weak-50 active:scale-[0.98] dark:border-white/15 dark:bg-white/10 dark:text-white dark:hover:bg-white/15"
 								>
 									<span>Show full response</span>
 									<Icon
@@ -329,7 +329,7 @@ export function ApiSection() {
 								<button
 									type="button"
 									onClick={() => setIsJsonExpanded(false)}
-									className="group flex cursor-pointer items-center gap-1.5 rounded-full border border-stroke-soft-200 bg-bg-white-0 px-3.5 py-1.5 font-mono font-medium text-[11.5px] text-text-sub-600 shadow-sm transition-all hover:bg-bg-weak-50 hover:text-text-strong-950 active:scale-[0.98] dark:border-white/15 dark:bg-white/5 dark:text-white/70 dark:hover:bg-white/10 dark:hover:text-white"
+									className="group flex cursor-pointer items-center gap-1.5 rounded-full border border-stroke-soft-200 bg-bg-white-0 px-3.5 py-1.5 font-mono font-medium text-[11.5px] text-text-sub-600 transition-all hover:bg-bg-weak-50 hover:text-text-strong-950 active:scale-[0.98] dark:border-white/15 dark:bg-white/5 dark:text-white/70 dark:hover:bg-white/10 dark:hover:text-white"
 								>
 									<span>Collapse response</span>
 									<Icon
