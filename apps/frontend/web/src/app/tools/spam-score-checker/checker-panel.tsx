@@ -8,7 +8,7 @@ import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
 import { LoadingDot } from "@reloop/ui/loading-dot";
 import * as Textarea from "@reloop/ui/textarea";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, animate, motion, useReducedMotion } from "framer-motion";
 import Link from "next/link";
 import type React from "react";
 import {
@@ -228,6 +228,7 @@ export function CheckerPanel() {
 	const [body, setBody] = useState("");
 	const [analysis, setAnalysis] = useState<SpamCheckResponse | null>(null);
 	const [isAnalyzing, setIsAnalyzing] = useState(false);
+	const [animatedRiskScore, setAnimatedRiskScore] = useState(0);
 	const [scanKey, setScanKey] = useState(0);
 	const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -251,10 +252,25 @@ export function CheckerPanel() {
 
 		setIsAnalyzing(true);
 		setErrorMessage(null);
+		setAnimatedRiskScore(0);
 		try {
 			const result = await runSpamCheck(subject, body);
+			const targetRisk = Math.max(0, 100 - result.score);
 			setAnalysis(result);
 			setScanKey((k) => k + 1);
+
+			if (shouldReduceMotion) {
+				setAnimatedRiskScore(targetRisk);
+			} else {
+				animate(0, targetRisk, {
+					duration: SCAN_DURATION_SEC,
+					ease: SCAN_EASING,
+					onUpdate: (latest) => {
+						setAnimatedRiskScore(Math.round(latest));
+					},
+				});
+			}
+
 			await new Promise((resolve) => setTimeout(resolve, SCAN_DURATION_MS));
 		} catch (err: unknown) {
 			setErrorMessage(
@@ -270,22 +286,25 @@ export function CheckerPanel() {
 	const wordCount = body.trim() ? body.trim().split(/\s+/).length : 0;
 	const linkCount = (body.match(/https?:\/\/[^\s"'<>]+/gi) || []).length;
 
-	// Calculate risk score: 100 - deliverability score when analyzed, 0 when unscanned or scanning
+	// Calculate target risk score: 100 - deliverability score when analyzed
+	const targetRiskScore = analysis ? Math.max(0, 100 - analysis.score) : 0;
 	const displayedRiskScore = isAnalyzing
-		? 0
+		? animatedRiskScore
 		: analysis
-			? Math.max(0, 100 - analysis.score)
+			? targetRiskScore
 			: 0;
-	const activeBarCount = isAnalyzing
-		? 0
-		: analysis
-			? Math.max(1, Math.round((displayedRiskScore / 100) * TOTAL_BARS))
-			: 0;
+	const activeBarCount = analysis
+		? Math.max(
+				targetRiskScore > 0 ? 1 : 0,
+				Math.round((targetRiskScore / 100) * TOTAL_BARS),
+			)
+		: 0;
 
 	const handleReset = () => {
 		setSubject("");
 		setBody("");
 		setAnalysis(null);
+		setAnimatedRiskScore(0);
 		setErrorMessage(null);
 		setTimeout(() => subjectInputRef.current?.focus(), 50);
 	};
@@ -298,6 +317,7 @@ export function CheckerPanel() {
 			"Hey there,\n\nThis is a confidential investment proposal exclusively for you. Act now to claim your risk-free payout with zero obligation.\n\nClick here immediately to secure your spot: https://example.com/claim-bonus\n\nDon't miss out on this once in a lifetime offer!\n\nBest regards,\nThe Growth Team",
 		);
 		setAnalysis(null);
+		setAnimatedRiskScore(0);
 		setErrorMessage(null);
 	};
 
@@ -596,67 +616,90 @@ export function CheckerPanel() {
 						<div className="space-y-4">
 							{/* Risk Meter Visualizer Card */}
 							<div className="rounded-xl border border-stroke-soft-200 bg-bg-weak-50/50 p-4 dark:border-white/10 dark:bg-white/[0.02]">
-								<div className="mb-2 flex items-center justify-between">
-									<span className="font-mono text-[12px] text-text-sub-600 dark:text-white/60">
+								<div className="relative mb-2.5 h-5 w-full">
+									<div
+										className="absolute top-0 flex items-center whitespace-nowrap font-mono text-[12px] text-text-sub-600 dark:text-white/60"
+										style={{
+											left: `${displayedRiskScore}%`,
+											transform: `translateX(-${displayedRiskScore}%)`,
+										}}
+									>
 										spam risk{" "}
-										<strong className="font-bold text-[14px] text-text-strong-950 dark:text-white">
+										<strong className="ml-1 font-bold text-[14px] text-text-strong-950 dark:text-white">
 											{displayedRiskScore}
 										</strong>
-									</span>
+									</div>
 								</div>
 
 								{/* Vertical Tick Bars Barcode Graph */}
 								<div className="relative flex items-center justify-between gap-[3px] py-1 sm:gap-1">
+									{/* Base Unfilled Layer */}
 									{Array.from({ length: TOTAL_BARS }).map((_, i) => {
 										const isPastSpamZone = i >= SPAM_BAR_INDEX;
-										const isThresholdDivider = i === SPAM_BAR_INDEX;
-										const isActive = Boolean(analysis && !isAnalyzing && i < activeBarCount);
-
-										let barColorClass = "bg-neutral-200/80 dark:bg-white/10";
-
-										if (isPastSpamZone) {
-											barColorClass = "bg-rose-500/15 dark:bg-rose-500/20";
-										}
-
-										if (isActive) {
-											if (
-												isPastSpamZone ||
-												displayedRiskScore >= SPAM_THRESHOLD
-											) {
-												barColorClass = "bg-rose-500";
-											} else {
-												barColorClass = "bg-emerald-500";
-											}
-										}
-
 										return (
-											<div
-												key={`bar-${i}`}
-												className="relative flex flex-col items-center"
-											>
-												{isThresholdDivider && (
-													<div
-														className="-top-1.5 absolute h-9 w-[1.5px] bg-neutral-400 dark:bg-white/40"
-														aria-hidden
-													/>
+											<span
+												key={`base-bar-${i}`}
+												className={cn(
+													"h-7 w-[3.5px] rounded-full transition-colors duration-150 sm:w-[4px]",
+													isPastSpamZone
+														? "bg-rose-500/15 dark:bg-rose-500/20"
+														: "bg-neutral-200/80 dark:bg-white/10",
 												)}
-												<span
-													className={cn(
-														"h-7 w-[3.5px] rounded-full transition-colors duration-150 sm:w-[4px]",
-														barColorClass,
-													)}
-												/>
-											</div>
+											/>
 										);
 									})}
+
+									{/* Active Revealed Layer: Sweeps left to right in sync with row scan */}
+									{(analysis || isAnalyzing) && targetRiskScore > 0 && (
+										<motion.div
+											key={`active-bars-${scanKey}`}
+											initial={{
+												clipPath: isAnalyzing
+													? "inset(0 100% 0 0)"
+													: "inset(0 0% 0 0)",
+											}}
+											animate={{ clipPath: "inset(0 0% 0 0)" }}
+											transition={
+												isAnalyzing
+													? { duration: SCAN_DURATION_SEC, ease: SCAN_EASING }
+													: { duration: 0 }
+											}
+											className="pointer-events-none absolute inset-0 flex items-center justify-between gap-[3px] overflow-hidden py-1 sm:gap-1"
+										>
+											{Array.from({ length: TOTAL_BARS }).map((_, i) => {
+												const isPastSpamZone = i >= SPAM_BAR_INDEX;
+												const isActive = i < activeBarCount;
+												let barColorClass = "opacity-0";
+
+												if (isActive) {
+													if (
+														isPastSpamZone ||
+														targetRiskScore >= SPAM_THRESHOLD
+													) {
+														barColorClass = "bg-rose-500";
+													} else {
+														barColorClass = "bg-emerald-500";
+													}
+												}
+
+												return (
+													<span
+														key={`active-bar-${i}`}
+														className={cn(
+															"h-7 w-[3.5px] rounded-full sm:w-[4px]",
+															barColorClass,
+														)}
+													/>
+												);
+											})}
+										</motion.div>
+									)}
+
 								</div>
 
 								{/* Scale Labels */}
 								<div className="mt-1 flex items-center justify-between font-mono text-[11px] text-text-soft-400 dark:text-white/35">
 									<span>inbox safe</span>
-									<span className="text-text-sub-600 dark:text-white/50">
-										spam threshold (40)
-									</span>
 									<span className="text-rose-500/90 dark:text-rose-400/90">
 										spam folder
 									</span>
