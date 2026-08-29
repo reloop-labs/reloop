@@ -65,8 +65,8 @@ export const config: ToolDefinition = {
 	},
 	relatedLinks: [
 		{
-			label: "Spam score checker",
-			href: "/tools/spam-score-checker",
+			label: "Email spam words checker",
+			href: "/tools/email-spam-words-checker",
 		},
 		{
 			label: "All free tools",

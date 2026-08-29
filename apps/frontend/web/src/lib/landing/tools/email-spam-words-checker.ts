@@ -1,10 +1,10 @@
 import type { ToolDefinition } from "../types";
 
 export const config: ToolDefinition = {
-	slug: "spam-score-checker",
-	path: "/tools/spam-score-checker",
-	toolType: "spam-score-checker",
-	titleLines: ["Email Spam", "Score Checker"],
+	slug: "email-spam-words-checker",
+	path: "/tools/email-spam-words-checker",
+	toolType: "email-spam-words-checker",
+	titleLines: ["Email Spam", "Words Checker"],
 	description:
 		"Scan email subject lines, copy, and link density in real time to calculate spam risk and reach the primary inbox.",
 	keywords: [

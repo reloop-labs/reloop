@@ -1,7 +1,7 @@
 import type { FaqItem } from "@reloop/web/components/faq-section";
 import type { FeatureHighlight } from "@reloop/web/components/landing/feature-highlights";
 
-export const toolPath = "/tools/spam-score-checker";
+export const toolPath = "/tools/email-spam-words-checker";
 
 export const toolTitle = "Email Spam Words Checker";
 

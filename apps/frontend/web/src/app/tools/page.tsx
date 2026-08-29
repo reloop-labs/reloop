@@ -48,7 +48,7 @@ const TOOL_VISUAL_MAP: Record<string, ToolVisualMeta> = {
 			"SPF and DMARC deliverability health audit",
 		],
 	},
-	"spam-score-checker": {
+	"email-spam-words-checker": {
 		icon: "shield-check",
 		badge: "Deliverability",
 		badgeColor:
