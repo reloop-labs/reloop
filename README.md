@@ -82,6 +82,18 @@ For full setup instructions — prerequisites, environment config, Docker servic
 
 ---
 
+## Self-Host
+
+Deploy the whole stack on a fresh Ubuntu 22.04/24.04 or Debian 12/13 server with one command:
+
+```bash
+curl -fsSL https://reloop.sh/install.sh | sudo bash
+```
+
+The installer runs preflight checks, installs Docker, prompts for your domain, generates production secrets, deploys every service, verifies health, and prints the DNS records to add. See the **[VPS guide →](https://reloop.sh/docs/self-host/vps)**
+
+---
+
 ## Hosted Service
 
 Reloop is also available as a fully managed hosted service from Reloop Labs — same codebase, zero infrastructure to run. [Sign up at reloop.sh](https://reloop.sh/dashboard/signup).

@@ -40,3 +40,20 @@ The Reloop stack consists of **19 application services** (3 frontends, 16 backen
 * **NATS JetStream**: Real-time event broker.
 * **Mailpit**: SMTP sandbox mail catcher.
 * **Caddy**: High-performance reverse proxy and automatic SSL manager.
+
+---
+
+## What the VPS installer deploys
+
+The [one-command VPS installer](/docs/self-host/vps) deploys a reduced set — 20 containers instead of the full platform. It leaves out the pieces that only exist for the hosted service:
+
+| Left out | Why |
+| :--- | :--- |
+| `web`, `docs` | Public marketing site and documentation; `/docs` redirects to reloop.sh |
+| `credits` | Billing and quota metering; self-hosted sending is not metered |
+| `tools` | Public email-validation tools |
+| `admin`, `console` | Operator tooling for the hosted platform |
+| MinIO | Point `upload` at any S3-compatible provider instead |
+| Mailpit | Development mail catcher, never used in production |
+
+`upload` is deployed only when you configure S3 storage during install.
