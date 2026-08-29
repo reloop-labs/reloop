@@ -78,7 +78,7 @@ function useNavigationShortcuts(router: ReturnType<typeof useRouter>) {
 			g: "/contacts/groups",
 			h: "/contacts/channels",
 			t: "/templates",
-			f: "/workflows",
+			f: "/automation",
 			a: "/campaigns",
 			m: "/metrics",
 			l: "/logs",

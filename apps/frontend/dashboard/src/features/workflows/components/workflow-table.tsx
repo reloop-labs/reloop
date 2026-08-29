@@ -66,7 +66,7 @@ export const WorkflowTable = ({
 				const { eventLabel, stepCount } = getWorkflowSummary(workflow);
 				return (
 					<Link
-						href={`/workflows/${workflow.id}`}
+						href={`/automation/${workflow.id}`}
 						key={workflow.id}
 						className="group flex items-center gap-4 border-stroke-soft-100 border-b px-4 py-3 transition-colors hover:bg-bg-weak-50 dark:border-stroke-soft-100/50"
 					>

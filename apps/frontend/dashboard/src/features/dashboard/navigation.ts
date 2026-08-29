@@ -67,8 +67,8 @@ export const mainNavigation: MainNavigationItem[] = [
 		section: "Messaging",
 	},
 	{
-		label: "Workflows",
-		path: "/workflows",
+		label: "Automation",
+		path: "/automation",
 		iconName: "workflow",
 		shortcut: { label: "G F", keys: ["g f", "g+f"] },
 		section: "Messaging",

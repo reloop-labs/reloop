@@ -43,7 +43,7 @@ export const CreateWorkflowModal = ({
 				description: description.trim() || undefined,
 			});
 			handleClose();
-			router.push(`/workflows/${workflow.id}`);
+			router.push(`/automation/${workflow.id}`);
 		} catch (e) {
 			toast.error(e instanceof Error ? e.message : "Failed to create workflow");
 		} finally {
