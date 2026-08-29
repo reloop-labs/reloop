@@ -31,8 +31,8 @@ const TOTAL_BARS = 48;
 const SPAM_THRESHOLD = 40;
 const SPAM_BAR_INDEX = Math.round((SPAM_THRESHOLD / 100) * TOTAL_BARS);
 
-const SCAN_DURATION_SEC = 2.6;
-const SCAN_DURATION_MS = 2600;
+const SCAN_DURATION_SEC = 1.1;
+const SCAN_DURATION_MS = 1100;
 const SCAN_EASING = [0.25, 0.1, 0.25, 1] as const;
 
 const HEIGHT_MORPH = {
@@ -184,6 +184,7 @@ function buildHighlightedContent(
 	text: string,
 	triggers: DetectedTrigger[],
 	context: "subject" | "body",
+	isPlain = false,
 ) {
 	const relevantTriggers = triggers.filter((t) => t.context === context);
 	if (relevantTriggers.length === 0) {
@@ -204,14 +205,25 @@ function buildHighlightedContent(
 			nodes.push(text.slice(lastIndex, trigger.startIndex));
 		}
 
-		nodes.push(
-			<mark
-				key={`m-${context}-${i}-${trigger.startIndex}`}
-				className="rounded-[3px] bg-rose-500/10 px-1 py-0.5 font-mono text-rose-600 underline decoration-rose-500 decoration-wavy underline-offset-4 dark:bg-rose-500/20 dark:text-rose-400 dark:decoration-rose-400"
-			>
-				{trigger.word}
-			</mark>,
-		);
+		if (isPlain) {
+			nodes.push(
+				<span
+					key={`m-plain-${context}-${i}-${trigger.startIndex}`}
+					className="px-0.5 font-mono text-text-strong-950 dark:text-white"
+				>
+					{trigger.word}
+				</span>,
+			);
+		} else {
+			nodes.push(
+				<mark
+					key={`m-${context}-${i}-${trigger.startIndex}`}
+					className="box-decoration-clone rounded-[3px] bg-rose-500/10 px-0.5 font-mono text-rose-600 underline decoration-rose-500 decoration-wavy underline-offset-4 dark:bg-rose-500/20 dark:text-rose-400 dark:decoration-rose-400"
+				>
+					{trigger.word}
+				</mark>,
+			);
+		}
 
 		lastIndex = trigger.endIndex;
 	}
@@ -421,7 +433,7 @@ export function CheckerPanel() {
 								</div>
 
 								{analysis || isAnalyzing ? (
-									<div className="relative w-full overflow-hidden rounded-xl bg-bg-weak-50/50 dark:bg-white/[0.03]">
+									<div className="relative w-full overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-weak-50/50 dark:border-white/10 dark:bg-white/[0.03]">
 										{/* Layer 1: Normal Plain Text Layer (Right of laser line - Unscanned) */}
 										<motion.div
 											key={`subject-plain-${scanKey}`}
@@ -436,9 +448,16 @@ export function CheckerPanel() {
 													? { duration: SCAN_DURATION_SEC, ease: SCAN_EASING }
 													: { duration: 0 }
 											}
-											className="px-3.5 py-2.5 font-mono text-[13px] leading-5 text-text-strong-950 select-text dark:text-white"
+											className="whitespace-pre-wrap break-words px-3.5 py-2.5 font-mono text-[13px] leading-6 text-text-strong-950 select-text dark:text-white"
 										>
-											{subject}
+											{analysis
+												? buildHighlightedContent(
+														subject,
+														analysis.detectedTriggers,
+														"subject",
+														true,
+													)
+												: subject}
 										</motion.div>
 
 										{/* Layer 2: Highlighted Underline Layer (Left of laser line - Scanned) */}
@@ -455,13 +474,14 @@ export function CheckerPanel() {
 													? { duration: SCAN_DURATION_SEC, ease: SCAN_EASING }
 													: { duration: 0 }
 											}
-											className="absolute inset-0 z-10 overflow-hidden px-3.5 py-2.5 font-mono text-[13px] leading-5 text-text-strong-950 select-text dark:text-white"
+											className="absolute inset-0 z-10 overflow-hidden whitespace-pre-wrap break-words px-3.5 py-2.5 font-mono text-[13px] leading-6 text-text-strong-950 select-text dark:text-white"
 										>
 											{analysis
 												? buildHighlightedContent(
 														subject,
 														analysis.detectedTriggers,
 														"subject",
+														false,
 													)
 												: subject}
 										</motion.div>
@@ -527,7 +547,7 @@ export function CheckerPanel() {
 								</div>
 
 								{analysis || isAnalyzing ? (
-									<div className="relative w-full overflow-hidden rounded-xl bg-bg-weak-50/50 dark:bg-white/[0.03]">
+									<div className="relative w-full overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-weak-50/50 dark:border-white/10 dark:bg-white/[0.03]">
 										{/* Layer 1: Normal Plain Text Layer (Right of laser line - Unscanned) */}
 										<motion.div
 											key={`body-plain-${scanKey}`}
@@ -542,9 +562,16 @@ export function CheckerPanel() {
 													? { duration: SCAN_DURATION_SEC, ease: SCAN_EASING }
 													: { duration: 0 }
 											}
-											className="min-h-24 whitespace-pre-wrap break-words p-3.5 font-mono text-[13px] leading-[1.65] text-text-strong-950 select-text dark:text-white"
+											className="min-h-24 whitespace-pre-wrap break-words p-3.5 pb-6 font-mono text-[13px] leading-6 text-text-strong-950 select-text dark:text-white"
 										>
-											{body}
+											{analysis
+												? buildHighlightedContent(
+														body,
+														analysis.detectedTriggers,
+														"body",
+														true,
+													)
+												: body}
 										</motion.div>
 
 										{/* Layer 2: Highlighted Underline Layer (Left of laser line - Scanned) */}
@@ -561,13 +588,14 @@ export function CheckerPanel() {
 													? { duration: SCAN_DURATION_SEC, ease: SCAN_EASING }
 													: { duration: 0 }
 											}
-											className="absolute inset-0 z-10 overflow-hidden whitespace-pre-wrap break-words p-3.5 font-mono text-[13px] leading-[1.65] text-text-strong-950 select-text dark:text-white"
+											className="absolute inset-0 z-10 overflow-hidden whitespace-pre-wrap break-words p-3.5 pb-6 font-mono text-[13px] leading-6 text-text-strong-950 select-text dark:text-white"
 										>
 											{analysis
 												? buildHighlightedContent(
 														body,
 														analysis.detectedTriggers,
 														"body",
+														false,
 													)
 												: body}
 										</motion.div>
@@ -615,24 +643,43 @@ export function CheckerPanel() {
 						{/* Right Column: Risk Meter & Detected Spam Categories */}
 						<div className="space-y-4">
 							{/* Risk Meter Visualizer Card */}
-							<div className="rounded-xl border border-stroke-soft-200 bg-bg-weak-50/50 p-4 dark:border-white/10 dark:bg-white/[0.02]">
-								<div className="relative mb-2.5 h-5 w-full">
-									<div
-										className="absolute top-0 flex items-center whitespace-nowrap font-mono text-[12px] text-text-sub-600 dark:text-white/60"
-										style={{
-											left: `${displayedRiskScore}%`,
-											transform: `translateX(-${displayedRiskScore}%)`,
+							<div className="rounded-xl border border-stroke-soft-200 bg-bg-weak-50/50 p-3 sm:p-3.5 dark:border-white/10 dark:bg-white/[0.02]">
+								<div className="relative mb-1 h-5 w-full">
+									<motion.div
+										key={`risk-label-${scanKey}`}
+										initial={{
+											left: isAnalyzing ? "0%" : `${targetRiskScore}%`,
+											x: isAnalyzing ? "0%" : `-${targetRiskScore}%`,
 										}}
+										animate={{
+											left: `${targetRiskScore}%`,
+											x: `-${targetRiskScore}%`,
+										}}
+										transition={
+											isAnalyzing
+												? { duration: SCAN_DURATION_SEC, ease: SCAN_EASING }
+												: { duration: 0 }
+										}
+										className="absolute top-0 flex items-baseline whitespace-nowrap font-mono text-[12px] text-text-sub-600 dark:text-white/60"
 									>
-										spam risk{" "}
-										<strong className="ml-1 font-bold text-[14px] text-text-strong-950 dark:text-white">
+										risk{" "}
+										<strong
+											className={cn(
+												"ml-1 font-bold text-[16px] leading-none transition-colors duration-150",
+												analysis || isAnalyzing
+													? displayedRiskScore >= SPAM_THRESHOLD
+														? "text-rose-500 dark:text-rose-400"
+														: "text-emerald-500 dark:text-emerald-400"
+													: "text-text-strong-950 dark:text-white",
+											)}
+										>
 											{displayedRiskScore}
 										</strong>
-									</div>
+									</motion.div>
 								</div>
 
 								{/* Vertical Tick Bars Barcode Graph */}
-								<div className="relative flex items-center justify-between gap-[3px] py-1 sm:gap-1">
+								<div className="relative flex items-center justify-between gap-[3px] py-0.5 sm:gap-1">
 									{/* Base Unfilled Layer */}
 									{Array.from({ length: TOTAL_BARS }).map((_, i) => {
 										const isPastSpamZone = i >= SPAM_BAR_INDEX;
@@ -649,16 +696,18 @@ export function CheckerPanel() {
 										);
 									})}
 
-									{/* Active Revealed Layer: Sweeps left to right in sync with row scan */}
+									{/* Active Revealed Layer: Sweeps in exact sync with top score position */}
 									{(analysis || isAnalyzing) && targetRiskScore > 0 && (
 										<motion.div
 											key={`active-bars-${scanKey}`}
 											initial={{
 												clipPath: isAnalyzing
 													? "inset(0 100% 0 0)"
-													: "inset(0 0% 0 0)",
+													: `inset(0 ${Math.max(0, 100 - targetRiskScore)}% 0 0)`,
 											}}
-											animate={{ clipPath: "inset(0 0% 0 0)" }}
+											animate={{
+												clipPath: `inset(0 ${Math.max(0, 100 - targetRiskScore)}% 0 0)`,
+											}}
 											transition={
 												isAnalyzing
 													? { duration: SCAN_DURATION_SEC, ease: SCAN_EASING }
