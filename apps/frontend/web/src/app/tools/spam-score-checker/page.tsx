@@ -5,7 +5,6 @@ import { getSiteUrl } from "@reloop/web/lib/site";
 import { SectionSeparator } from "../../(home)/components/section-separator";
 import { ApiSection } from "./api-section";
 import { AiAgentsSection } from "./components/ai-agents-section";
-import { HowItWorksSection } from "./components/how-it-works-section";
 import { SpamScoreHero } from "./components/spam-score-hero";
 import {
 	faqGroups,
@@ -92,8 +91,6 @@ export default function SpamScoreCheckerPage() {
 			<SpamScoreHero />
 
 			<div className="relative mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-200 border-x md:max-w-7xl dark:border-white/10">
-				<HowItWorksSection />
-				<SectionSeparator />
 				<ApiSection />
 				<SectionSeparator />
 				<AiAgentsSection />
