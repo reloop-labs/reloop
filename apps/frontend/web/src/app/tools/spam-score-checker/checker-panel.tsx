@@ -906,8 +906,8 @@ Instructions:
 				</div>
 
 				{/* Bottom Action Footer - Outside white card, inside grey frame */}
-				<div className="flex items-center justify-between px-4 py-3 sm:px-5">
-					<div className="flex items-center gap-3">
+				<div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-5">
+					<div className="flex shrink-0 items-center gap-3 whitespace-nowrap">
 						{analysis && !isAnalyzing ? (
 							<button
 								type="button"
@@ -915,7 +915,7 @@ Instructions:
 									setAnalysis(null);
 									setTimeout(() => subjectInputRef.current?.focus(), 50);
 								}}
-								className="cursor-pointer font-medium text-primary-base text-xs hover:underline"
+								className="cursor-pointer whitespace-nowrap font-medium text-primary-base text-xs hover:underline"
 							>
 								Edit copy
 							</button>
@@ -924,31 +924,31 @@ Instructions:
 							<button
 								type="button"
 								onClick={handleReset}
-								className="cursor-pointer font-medium text-text-sub-600 text-xs transition-colors hover:text-text-strong-950 dark:text-white/50 dark:hover:text-white"
+								className="cursor-pointer whitespace-nowrap font-medium text-text-sub-600 text-xs transition-colors hover:text-text-strong-950 dark:text-white/50 dark:hover:text-white"
 							>
 								{analysis ? "Clear" : "Clear inputs"}
 							</button>
 						) : null}
 					</div>
 
-					<div className="flex items-center gap-3">
+					<div className="flex shrink-0 items-center gap-2.5">
 						{!analysis && !isAnalyzing && (
 							<button
 								type="button"
 								onClick={handleLoadSample}
-								className="cursor-pointer font-medium text-text-sub-600 text-xs transition-colors hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white"
+								className="cursor-pointer whitespace-nowrap font-medium text-text-sub-600 text-xs transition-colors hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white"
 							>
 								Load a sample
 							</button>
 						)}
 						{analysis && !isAnalyzing ? (
-							<div className="flex items-center gap-2">
+							<div className="flex shrink-0 items-center gap-2">
 								<FancyButton.Root
 									type="button"
 									variant="basic"
 									size="xsmall"
 									onClick={handleCopyPrompt}
-									className="h-8 px-3 text-[12px]!"
+									className="h-8 shrink-0 px-3 text-[12px]!"
 								>
 									<FancyButton.Icon
 										as={Icon}
@@ -958,7 +958,7 @@ Instructions:
 											copiedPrompt && "text-emerald-500",
 										)}
 									/>
-									<span>
+									<span className="whitespace-nowrap">
 										{copiedPrompt
 											? "Prompt copied!"
 											: "Copy prompt to fix it"}
@@ -969,12 +969,13 @@ Instructions:
 									asChild
 									variant="primary"
 									size="xsmall"
-									className="h-8 px-3.5 text-[12px]!"
+									className="h-8 shrink-0 px-3.5 text-[12px]!"
 								>
 									<a
 										href="https://cal.com/pranavp/30"
 										target="_blank"
 										rel="noopener noreferrer"
+										className="whitespace-nowrap"
 									>
 										<span>Schedule call</span>
 										<FancyButton.Icon
@@ -992,10 +993,10 @@ Instructions:
 								variant="primary"
 								size="xsmall"
 								disabled={isAnalyzing || !hasContent}
-								className="h-8 px-3.5 text-[12px]!"
+								className="h-8 shrink-0 px-3.5 text-[12px]!"
 							>
 								{isAnalyzing ? (
-									<div className="flex items-center gap-1.5">
+									<div className="flex items-center gap-1.5 whitespace-nowrap">
 										<LoadingDot size={13} dotSize={2} className="text-white" />
 										<span>Scanning...</span>
 									</div>
@@ -1006,7 +1007,7 @@ Instructions:
 											name="search"
 											className="size-3.5"
 										/>
-										<span>Start Scan</span>
+										<span className="whitespace-nowrap">Start Scan</span>
 									</>
 								)}
 							</FancyButton.Root>

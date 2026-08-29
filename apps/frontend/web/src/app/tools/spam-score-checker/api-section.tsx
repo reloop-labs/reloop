@@ -148,6 +148,7 @@ export function ApiSection() {
 	const [isRunning, setIsRunning] = useState(false);
 	const [latency, setLatency] = useState<number | null>(42);
 	const [jsonResult, setJsonResult] = useState<string>("");
+	const [isJsonExpanded, setIsJsonExpanded] = useState(false);
 
 	const currentCode = getSnippetCode(activeId, TEST_SUBJECT, TEST_BODY);
 
@@ -287,18 +288,57 @@ export function ApiSection() {
 							<span>· json</span>
 						</div>
 					</div>
-					<div className="overflow-x-auto px-4 py-6 sm:px-6 lg:px-8">
-						<AnimatePresence mode="wait">
-							<motion.pre
-								key={jsonResult}
-								initial={{ opacity: 0.6 }}
-								animate={{ opacity: 1 }}
-								transition={{ duration: 0.15 }}
-								className="font-mono text-[13px] text-text-strong-950 leading-[1.7] dark:text-white/70"
-							>
-								<code>{highlightJson(jsonResult)}</code>
-							</motion.pre>
-						</AnimatePresence>
+					<div className="relative">
+						<div
+							className={`overflow-x-auto px-4 py-6 transition-all duration-300 sm:px-6 lg:px-8 ${
+								!isJsonExpanded
+									? "max-h-[290px] overflow-hidden"
+									: "max-h-none"
+							}`}
+						>
+							<AnimatePresence mode="wait">
+								<motion.pre
+									key={jsonResult}
+									initial={{ opacity: 0.6 }}
+									animate={{ opacity: 1 }}
+									transition={{ duration: 0.15 }}
+									className="font-mono text-[13px] text-text-strong-950 leading-[1.7] dark:text-white/70"
+								>
+									<code>{highlightJson(jsonResult)}</code>
+								</motion.pre>
+							</AnimatePresence>
+						</div>
+
+						{/* Stripe-style Fade Overlay & Expand / Load More Button */}
+						{!isJsonExpanded ? (
+							<div className="pointer-events-none absolute inset-x-0 bottom-0 flex h-32 items-end justify-center bg-gradient-to-t from-bg-white-0 via-bg-white-0/90 to-transparent pb-4 dark:from-black dark:via-black/90">
+								<button
+									type="button"
+									onClick={() => setIsJsonExpanded(true)}
+									className="pointer-events-auto group flex cursor-pointer items-center gap-1.5 rounded-full border border-stroke-soft-200 bg-bg-white-0 px-3.5 py-1.5 font-mono font-medium text-[11.5px] text-text-strong-950 shadow-sm backdrop-blur-md transition-all hover:border-stroke-soft-200/80 hover:bg-bg-weak-50 active:scale-[0.98] dark:border-white/15 dark:bg-white/10 dark:text-white dark:hover:bg-white/15"
+								>
+									<span>Show full response</span>
+									<Icon
+										name="chevron-down"
+										className="size-3.5 text-text-sub-600 transition-transform duration-200 group-hover:translate-y-0.5 dark:text-white/60"
+									/>
+								</button>
+							</div>
+						) : (
+							<div className="flex justify-center border-stroke-soft-200/60 border-t py-3 dark:border-white/10">
+								<button
+									type="button"
+									onClick={() => setIsJsonExpanded(false)}
+									className="group flex cursor-pointer items-center gap-1.5 rounded-full border border-stroke-soft-200 bg-bg-white-0 px-3.5 py-1.5 font-mono font-medium text-[11.5px] text-text-sub-600 shadow-sm transition-all hover:bg-bg-weak-50 hover:text-text-strong-950 active:scale-[0.98] dark:border-white/15 dark:bg-white/5 dark:text-white/70 dark:hover:bg-white/10 dark:hover:text-white"
+								>
+									<span>Collapse response</span>
+									<Icon
+										name="chevron-up"
+										className="size-3.5 text-text-soft-400 transition-transform duration-200 group-hover:-translate-y-0.5 dark:text-white/50"
+									/>
+								</button>
+							</div>
+						)}
 					</div>
 				</div>
 			</div>
