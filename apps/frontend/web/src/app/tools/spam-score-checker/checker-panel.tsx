@@ -243,6 +243,7 @@ export function CheckerPanel() {
 	const [animatedRiskScore, setAnimatedRiskScore] = useState(0);
 	const [scanKey, setScanKey] = useState(0);
 	const [errorMessage, setErrorMessage] = useState<string | null>(null);
+	const [copiedPrompt, setCopiedPrompt] = useState(false);
 
 	const subjectInputRef = useRef<HTMLInputElement>(null);
 	const bodyTextareaRef = useRef<HTMLTextAreaElement>(null);
@@ -333,6 +334,40 @@ export function CheckerPanel() {
 		setErrorMessage(null);
 	};
 
+	const handleCopyPrompt = async () => {
+		const detectedWords = analysis?.detectedTriggers?.length
+			? Array.from(
+					new Set(analysis.detectedTriggers.map((t) => `"${t.word}"`)),
+				).join(", ")
+			: "detected spam trigger phrases";
+
+		const promptText = `Please rewrite and optimize this email copy to achieve 100% inbox deliverability and remove all spam triggers.
+
+Issues detected:
+- Spam trigger words/phrases: ${detectedWords}
+- Spam risk score: ${displayedRiskScore}/100
+
+Original Subject Line:
+${subject}
+
+Original Email Body:
+${body}
+
+Instructions:
+1. Rewrite both the subject line and email body to sound natural, compelling, and human-written.
+2. Replace all spam triggers and high-pressure phrasing with safe, high-deliverability alternatives.
+3. Keep the core messaging, value proposition, and call to action clear.
+4. Output the revised Subject Line and revised Email Body.`;
+
+		try {
+			await navigator.clipboard.writeText(promptText);
+			setCopiedPrompt(true);
+			setTimeout(() => setCopiedPrompt(false), 2000);
+		} catch (e) {
+			console.error("Failed to copy prompt:", e);
+		}
+	};
+
 	return (
 		<div className="mx-auto w-full max-w-4xl font-sans">
 			{/* Dashboard Container with Outer Shell */}
@@ -346,9 +381,20 @@ export function CheckerPanel() {
 					<div
 						className={cn(
 							"flex items-center gap-1.5 rounded-full px-2.5 py-0.5 font-medium text-[11.5px] transition-colors",
-							isAnalyzing
-								? "border border-rose-500/25 bg-rose-500/10 text-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.15)]"
-								: "border border-stroke-soft-200 bg-bg-white-0 text-text-sub-600 dark:border-white/10 dark:bg-white/5 dark:text-white/60",
+							isAnalyzing &&
+								"border border-rose-500/25 bg-rose-500/10 text-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.15)]",
+							!isAnalyzing &&
+								!analysis &&
+								"border border-stroke-soft-200 bg-bg-white-0 text-text-sub-600 dark:border-white/10 dark:bg-white/5 dark:text-white/60",
+							!isAnalyzing &&
+								analysis?.verdict === "inbox_ready" &&
+								"border border-emerald-500/25 bg-emerald-500/10 text-emerald-600 shadow-[0_0_8px_rgba(16,185,129,0.12)] dark:border-emerald-500/30 dark:bg-emerald-500/15 dark:text-emerald-400",
+							!isAnalyzing &&
+								analysis?.verdict === "needs_review" &&
+								"border border-amber-500/25 bg-amber-500/10 text-amber-600 shadow-[0_0_8px_rgba(245,158,11,0.12)] dark:border-amber-500/30 dark:bg-amber-500/15 dark:text-amber-400",
+							!isAnalyzing &&
+								analysis?.verdict === "high_risk" &&
+								"border border-rose-500/25 bg-rose-500/10 text-rose-600 shadow-[0_0_8px_rgba(244,63,94,0.12)] dark:border-rose-500/30 dark:bg-rose-500/15 dark:text-rose-400",
 						)}
 					>
 						<span className="relative flex size-2 items-center justify-center">
@@ -380,8 +426,8 @@ export function CheckerPanel() {
 									: analysis.verdict === "inbox_ready"
 										? "Inbox Ready"
 										: analysis.verdict === "needs_review"
-											? "Needs Review"
-											: `High Risk (${analysis.score}/100)`}
+											? `Needs Review (${displayedRiskScore}/100)`
+											: `High Risk (${displayedRiskScore}/100)`}
 						</span>
 					</div>
 				</div>
@@ -898,25 +944,49 @@ export function CheckerPanel() {
 							</button>
 						)}
 						{analysis && !isAnalyzing ? (
-							<FancyButton.Root
-								asChild
-								variant="primary"
-								size="xsmall"
-								className="h-8 px-3.5 text-[12px]!"
-							>
-								<a
-									href="https://cal.com/pranavp/30"
-									target="_blank"
-									rel="noopener noreferrer"
+							<div className="flex items-center gap-2">
+								<FancyButton.Root
+									type="button"
+									variant="basic"
+									size="xsmall"
+									onClick={handleCopyPrompt}
+									className="h-8 px-3 text-[12px]!"
 								>
-									<span>Schedule call</span>
 									<FancyButton.Icon
 										as={Icon}
-										name="arrow-right"
-										className="size-3.5"
+										name={copiedPrompt ? "check" : "copy"}
+										className={cn(
+											"size-3.5",
+											copiedPrompt && "text-emerald-500",
+										)}
 									/>
-								</a>
-							</FancyButton.Root>
+									<span>
+										{copiedPrompt
+											? "Prompt copied!"
+											: "Copy prompt to fix it"}
+									</span>
+								</FancyButton.Root>
+
+								<FancyButton.Root
+									asChild
+									variant="primary"
+									size="xsmall"
+									className="h-8 px-3.5 text-[12px]!"
+								>
+									<a
+										href="https://cal.com/pranavp/30"
+										target="_blank"
+										rel="noopener noreferrer"
+									>
+										<span>Schedule call</span>
+										<FancyButton.Icon
+											as={Icon}
+											name="arrow-right"
+											className="size-3.5"
+										/>
+									</a>
+								</FancyButton.Root>
+							</div>
 						) : (
 							<FancyButton.Root
 								type="submit"
