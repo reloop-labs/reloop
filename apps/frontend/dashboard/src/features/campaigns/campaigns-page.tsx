@@ -1,6 +1,7 @@
 "use client";
 
 import { Icon } from "@reloop/ui/icon";
+import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import type { CommandAction } from "#/features/dashboard/command-menu";
 import { useRegisterCommandActions } from "#/features/dashboard/command-menu-context";
@@ -8,11 +9,10 @@ import { CampaignsListHeader } from "./campaigns-list-header";
 import { CampaignsProvider, useCampaigns } from "./campaigns-provider";
 import { CampaignStatsCards } from "./components/campaign-stats";
 import { CampaignTable } from "./components/campaign-table";
-import { CreateCampaignModal } from "./components/create-campaign-modal";
 
 function CampaignsPageContent() {
+	const router = useRouter();
 	const { campaigns, stats, isLoading, isHydrated } = useCampaigns();
-	const [createOpen, setCreateOpen] = useState(false);
 	const [searchQuery, setSearchQuery] = useState("");
 	const [selectedStatus, setSelectedStatus] = useState<string>("all");
 
@@ -34,7 +34,7 @@ function CampaignsPageContent() {
 	const isTotalEmpty = isHydrated && !isLoading && campaigns.length === 0;
 
 	const handleCreate = () => {
-		setCreateOpen(true);
+		router.push("/campaigns/create");
 	};
 
 	const actions = useMemo<CommandAction[]>(
@@ -44,7 +44,7 @@ function CampaignsPageContent() {
 				label: "Create Campaign",
 				icon: "plus",
 				shortcut: { label: "C", keys: ["c"] },
-				onSelect: () => handleCreate(),
+				onSelect: () => router.push("/campaigns/create"),
 			},
 			{
 				id: "go-to-docs",
@@ -55,7 +55,7 @@ function CampaignsPageContent() {
 					window.open("https://reloop.sh/docs/learn/emails", "_blank"),
 			},
 		],
-		[],
+		[router],
 	);
 
 	useRegisterCommandActions("campaigns", "Campaigns", actions);
@@ -99,7 +99,7 @@ function CampaignsPageContent() {
 									key={tab.id}
 									type="button"
 									onClick={() => setSelectedStatus(tab.id)}
-									className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+									className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 font-medium text-xs transition-colors ${
 										active
 											? "bg-bg-white-0 text-text-strong-950 shadow-xs dark:bg-bg-weak-100"
 											: "text-text-sub-600 hover:text-text-strong-950"
@@ -110,7 +110,7 @@ function CampaignsPageContent() {
 										<span
 											className={`rounded-full px-1.5 py-0.2 text-[10px] ${
 												active
-													? "bg-bg-weak-50 text-text-strong-950 font-semibold"
+													? "bg-bg-weak-50 font-semibold text-text-strong-950"
 													: "bg-bg-weak-50/60 text-text-sub-600"
 											}`}
 										>
@@ -126,14 +126,14 @@ function CampaignsPageContent() {
 					<div className="relative w-full sm:w-64">
 						<Icon
 							name="search"
-							className="-translate-y-1/2 pointer-events-none absolute top-1/2 left-3 h-4 w-4 text-text-sub-600"
+							className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-text-sub-600"
 						/>
 						<input
 							type="search"
 							placeholder="Search campaigns..."
 							value={searchQuery}
 							onChange={(e) => setSearchQuery(e.target.value)}
-							className="w-full rounded-lg border border-stroke-soft-100 bg-bg-white-0 py-1.5 pr-3 pl-9 text-xs text-text-strong-950 outline-none focus:border-stroke-strong-950 dark:border-stroke-soft-100/50"
+							className="w-full rounded-lg border border-stroke-soft-100 bg-bg-white-0 py-1.5 pr-3 pl-9 text-text-strong-950 text-xs outline-none focus:border-stroke-strong-950 dark:border-stroke-soft-100/50"
 						/>
 					</div>
 				</div>
@@ -148,9 +148,6 @@ function CampaignsPageContent() {
 					onCreate={handleCreate}
 				/>
 			</div>
-
-			{/* Composer Modal */}
-			<CreateCampaignModal open={createOpen} onOpenChange={setCreateOpen} />
 		</div>
 	);
 }
