@@ -5,7 +5,7 @@ export type CampaignStatus =
 	| "sent"
 	| "cancelled";
 
-export type AudienceTargetType = "all" | "channel" | "group";
+export type AudienceTargetType = "all" | "channel" | "group" | "csv";
 
 export type Campaign = {
 	id: string;

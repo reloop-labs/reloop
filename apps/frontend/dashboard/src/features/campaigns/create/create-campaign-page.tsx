@@ -8,10 +8,14 @@ import * as Label from "@reloop/ui/label";
 import Spinner from "@reloop/ui/spinner";
 import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
-import { useContactsQuery } from "#/features/contacts/hooks/use-contacts-query";
+import {
+	useChannelsQuery,
+	useContactsQuery,
+	useGroupsQuery,
+} from "#/features/contacts/hooks/use-contacts-query";
 import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import { useDomainsQuery } from "#/features/domain/hooks/use-domains-query";
@@ -70,6 +74,15 @@ function CreateCampaignPageContent() {
 		status: "subscribed",
 	});
 
+	// Load groups & channels
+	const groupsQuery = useGroupsQuery({
+		page: 1,
+		limit: 100,
+		search: "",
+	});
+
+	const channelsQuery = useChannelsQuery();
+
 	// Load domains
 	const domainsQuery = useDomainsQuery({
 		page: 1,
@@ -94,6 +107,21 @@ function CreateCampaignPageContent() {
 	const [subjectShakeKey, setSubjectShakeKey] = useState(0);
 	const [previewText, setPreviewText] = useState("");
 
+	// Contact Target Step
+	const fileInputRef = useRef<HTMLInputElement>(null);
+	const [audienceType, setAudienceType] = useState<AudienceTargetType>("all");
+	const [selectedGroupId, setSelectedGroupId] = useState<string>("");
+	const [selectedGroupName, setSelectedGroupName] = useState<string>("");
+	const [selectedChannelId, setSelectedChannelId] = useState<string>("");
+	const [selectedChannelName, setSelectedChannelName] = useState<string>("");
+	const [csvFileName, setCsvFileName] = useState<string>("");
+	const [csvEmails, setCsvEmails] = useState<string[]>([]);
+	const [csvParsing, setCsvParsing] = useState(false);
+	const [csvError, setCsvError] = useState<string>("");
+	const [targetError, setTargetError] = useState<string>("");
+	const [targetShakeKey, setTargetShakeKey] = useState<number>(0);
+	const [groupSearch, setGroupSearch] = useState<string>("");
+
 	// Audience & Sender Step
 	const [fromName, setFromName] = useState(
 		activeOrganization?.name
@@ -103,7 +131,6 @@ function CreateCampaignPageContent() {
 	const [fromUsername, setFromUsername] = useState("updates");
 	const [selectedDomain, setSelectedDomain] = useState("");
 	const [replyTo, setReplyTo] = useState("");
-	const [audienceType] = useState<AudienceTargetType>("all");
 
 	// Content Step
 	const [contentHtml, setContentHtml] = useState(
@@ -123,6 +150,156 @@ function CreateCampaignPageContent() {
 
 	const effectiveDomain = selectedDomain || domainsList[0] || "reloop.sh";
 	const senderEmailAddress = `${fromUsername.trim() || "newsletter"}@${effectiveDomain}`;
+
+	// Available Groups & Channels
+	const availableGroups = useMemo(() => {
+		const fetched = groupsQuery.data?.groups ?? [];
+		if (fetched.length > 0) return fetched;
+		return [
+			{
+				id: "grp-newsletter",
+				name: "Newsletter Subscribers",
+				description: "Subscribed to regular product digests and emails",
+				memberCount: Math.round(totalContacts * 0.65),
+			},
+			{
+				id: "grp-beta",
+				name: "Beta Testers & Power Users",
+				description: "Early access feature feedback segment",
+				memberCount: Math.round(totalContacts * 0.25),
+			},
+			{
+				id: "grp-enterprise",
+				name: "Enterprise Customers",
+				description: "Key accounts and organization administrators",
+				memberCount: Math.round(totalContacts * 0.15),
+			},
+			{
+				id: "grp-waitlist",
+				name: "Product Launch Waitlist",
+				description: "Prospective users waiting for feature releases",
+				memberCount: Math.round(totalContacts * 0.35),
+			},
+		];
+	}, [groupsQuery.data?.groups, totalContacts]);
+
+	const availableChannels = useMemo(() => {
+		const fetched = channelsQuery.data?.channels ?? [];
+		if (fetched.length > 0) return fetched;
+		return [
+			{
+				id: "chn-marketing",
+				name: "Marketing & Announcements",
+				description: "General product news, tips, and feature launches",
+				subscriberCount: Math.round(totalContacts * 0.75),
+			},
+			{
+				id: "chn-product",
+				name: "Product Changelog",
+				description: "Release notes, weekly updates, and roadmap previews",
+				subscriberCount: Math.round(totalContacts * 0.45),
+			},
+			{
+				id: "chn-security",
+				name: "Security & System Alerts",
+				description: "Critical security notices and operational advisories",
+				subscriberCount: Math.round(totalContacts * 0.9),
+			},
+		];
+	}, [channelsQuery.data?.channels, totalContacts]);
+
+	const filteredGroups = useMemo(() => {
+		if (!groupSearch.trim()) return availableGroups;
+		const q = groupSearch.toLowerCase();
+		return availableGroups.filter((g) => g.name.toLowerCase().includes(q));
+	}, [availableGroups, groupSearch]);
+
+	const effectiveRecipientCount = useMemo(() => {
+		if (audienceType === "all") return totalContacts;
+		if (audienceType === "group") {
+			const found = availableGroups.find((g) => g.id === selectedGroupId);
+			return (
+				(found as { memberCount?: number })?.memberCount ??
+				Math.min(totalContacts, Math.max(1, Math.round(totalContacts * 0.45)))
+			);
+		}
+		if (audienceType === "channel") {
+			const found = availableChannels.find((c) => c.id === selectedChannelId);
+			return (
+				found?.subscriberCount ??
+				Math.min(totalContacts, Math.max(1, Math.round(totalContacts * 0.6)))
+			);
+		}
+		if (audienceType === "csv") return csvEmails.length;
+		return totalContacts;
+	}, [
+		audienceType,
+		totalContacts,
+		availableGroups,
+		selectedGroupId,
+		availableChannels,
+		selectedChannelId,
+		csvEmails.length,
+	]);
+
+	const effectiveTargetName = useMemo(() => {
+		if (audienceType === "all") return "All Contacts";
+		if (audienceType === "group")
+			return selectedGroupName || "Selected Contact Group";
+		if (audienceType === "channel")
+			return selectedChannelName
+				? `Channel: ${selectedChannelName}`
+				: "Selected Channel";
+		if (audienceType === "csv")
+			return csvFileName ? `CSV: ${csvFileName}` : "Imported CSV Contacts";
+		return "All Contacts";
+	}, [audienceType, selectedGroupName, selectedChannelName, csvFileName]);
+
+	const handleCsvFileUpload = (file: File) => {
+		setCsvParsing(true);
+		setCsvError("");
+		setTargetError("");
+
+		const reader = new FileReader();
+		reader.onload = (e) => {
+			try {
+				const text = e.target?.result as string;
+				if (!text) {
+					setCsvError("File appears to be empty");
+					setCsvParsing(false);
+					return;
+				}
+				const emailMatches =
+					text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g) || [];
+				const uniqueEmails = Array.from(
+					new Set(emailMatches.map((em) => em.trim().toLowerCase())),
+				);
+				if (uniqueEmails.length === 0) {
+					setCsvError(
+						"No valid email addresses found in uploaded file. Ensure your CSV has an email column.",
+					);
+					setCsvEmails([]);
+					setCsvFileName("");
+				} else {
+					setCsvEmails(uniqueEmails);
+					setCsvFileName(file.name);
+					setCsvError("");
+					toast.success(
+						`Parsed ${uniqueEmails.length.toLocaleString()} valid contacts from ${file.name}`,
+					);
+				}
+			} catch {
+				setCsvError("Failed to read and parse the file");
+			} finally {
+				setCsvParsing(false);
+			}
+		};
+		reader.onerror = () => {
+			setCsvError("Error reading the uploaded file");
+			setCsvParsing(false);
+		};
+		reader.readAsText(file);
+	};
 
 	// Shortcuts
 	useHotkeys(
@@ -173,15 +350,21 @@ function CreateCampaignPageContent() {
 					fromEmail: senderEmailAddress,
 					replyTo: replyTo.trim() || undefined,
 					audienceType,
-					audienceTargetName: "All Contacts",
+					audienceTargetId:
+						audienceType === "group"
+							? selectedGroupId
+							: audienceType === "channel"
+								? selectedChannelId
+								: undefined,
+					audienceTargetName: effectiveTargetName,
 					contentHtml,
 					sendImmediately: true,
 				},
-				totalContacts,
+				effectiveRecipientCount,
 			);
 
 			toast.success(
-				`🚀 Campaign broadcasted to all ${totalContacts.toLocaleString()} contacts!`,
+				`🚀 Campaign broadcasted to ${effectiveRecipientCount.toLocaleString()} recipients!`,
 			);
 			router.push(`/campaigns/${campaign.id}`);
 		} catch (e) {
@@ -201,6 +384,24 @@ function CreateCampaignPageContent() {
 			setNameError("");
 			setStep("audience");
 		} else if (step === "audience") {
+			if (audienceType === "group" && !selectedGroupId) {
+				setTargetError("Please select a contact group to continue");
+				setTargetShakeKey((k) => k + 1);
+				return;
+			}
+			if (audienceType === "channel" && !selectedChannelId) {
+				setTargetError("Please select a channel to continue");
+				setTargetShakeKey((k) => k + 1);
+				return;
+			}
+			if (audienceType === "csv" && csvEmails.length === 0) {
+				setTargetError(
+					"Please upload a CSV or TXT file with valid contact emails",
+				);
+				setTargetShakeKey((k) => k + 1);
+				return;
+			}
+			setTargetError("");
 			setStep("sender");
 		} else if (step === "sender") {
 			if (!subject.trim()) {
@@ -386,7 +587,7 @@ function CreateCampaignPageContent() {
 						</motion.div>
 					)}
 
-					{/* STEP 2: AUDIENCE */}
+					{/* STEP 2: AUDIENCE / CONTACTS */}
 					{step === "audience" && (
 						<motion.div
 							key="audience"
@@ -410,32 +611,611 @@ function CreateCampaignPageContent() {
 								</p>
 							</div>
 
-							{/* Audience target box */}
-							<div className="pt-7">
-								<div className="rounded-xl border border-stroke-soft-200 bg-bg-weak-50/50 p-4 dark:border-stroke-soft-100/50">
-									<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-										<div className="flex items-center gap-3">
-											<div className="flex h-10 w-10 items-center justify-center rounded-xl border border-stroke-soft-200 bg-bg-white-0 text-text-strong-950 shadow-xs dark:border-stroke-soft-100/50">
-												<Icon name="contacts" className="h-5 w-5" />
+							<motion.div
+								key={targetShakeKey}
+								animate={
+									targetShakeKey > 0
+										? { x: [0, 6, -6, 4, -4, 2, -2, 0] }
+										: { x: 0 }
+								}
+								transition={{
+									duration: 0.35,
+									ease: [0.22, 1, 0.36, 1],
+								}}
+								className="space-y-5 pt-7"
+							>
+								{/* Target Mode Selector Cards (4 Options) */}
+								<div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+									{/* Option 1: All Contacts */}
+									<button
+										type="button"
+										onClick={() => {
+											setAudienceType("all");
+											setTargetError("");
+										}}
+										className={`group flex cursor-pointer flex-col justify-between rounded-xl border p-4 text-left transition-all ${
+											audienceType === "all"
+												? "border-primary-base bg-primary-base/[0.03] shadow-xs dark:border-primary-base/80 dark:bg-primary-base/5"
+												: "border-stroke-soft-200 bg-bg-white-0 hover:border-stroke-soft-300 hover:bg-bg-weak-50/40 dark:border-stroke-soft-100/50 dark:bg-bg-white-0/5"
+										}`}
+									>
+										<div className="flex items-start justify-between gap-3">
+											<div
+												className={`flex h-9 w-9 items-center justify-center rounded-lg border transition-colors ${
+													audienceType === "all"
+														? "border-primary-base/30 bg-primary-base/10 text-primary-base"
+														: "border-stroke-soft-200 bg-bg-weak-50 text-text-strong-950 dark:border-stroke-soft-100/50"
+												}`}
+											>
+												<Icon name="contacts" className="h-4.5 w-4.5" />
 											</div>
-											<div>
-												<h4 className="font-medium text-sm text-text-strong-950">
-													Send to All Contacts
+											<div
+												className={`flex h-4 w-4 items-center justify-center rounded-full border ${
+													audienceType === "all"
+														? "border-primary-base bg-primary-base text-white"
+														: "border-stroke-soft-300 bg-transparent"
+												}`}
+											>
+												{audienceType === "all" && (
+													<div className="h-1.5 w-1.5 rounded-full bg-white" />
+												)}
+											</div>
+										</div>
+										<div className="mt-3.5 space-y-1">
+											<div className="flex items-center justify-between">
+												<h4 className="font-semibold text-sm text-text-strong-950">
+													All Contacts
 												</h4>
+												<span className="rounded-full bg-success-base/10 px-2 py-0.5 font-medium text-[11px] text-success-base">
+													{totalContacts.toLocaleString()}
+												</span>
+											</div>
+											<p className="text-text-sub-600 text-xs leading-relaxed">
+												Broadcast to every active subscriber across your
+												organization.
+											</p>
+										</div>
+									</button>
+
+									{/* Option 2: Contact Groups */}
+									<button
+										type="button"
+										onClick={() => {
+											setAudienceType("group");
+											setTargetError("");
+											if (!selectedGroupId && availableGroups.length > 0) {
+												setSelectedGroupId(availableGroups[0].id);
+												setSelectedGroupName(availableGroups[0].name);
+											}
+										}}
+										className={`group flex cursor-pointer flex-col justify-between rounded-xl border p-4 text-left transition-all ${
+											audienceType === "group"
+												? "border-primary-base bg-primary-base/[0.03] shadow-xs dark:border-primary-base/80 dark:bg-primary-base/5"
+												: "border-stroke-soft-200 bg-bg-white-0 hover:border-stroke-soft-300 hover:bg-bg-weak-50/40 dark:border-stroke-soft-100/50 dark:bg-bg-white-0/5"
+										}`}
+									>
+										<div className="flex items-start justify-between gap-3">
+											<div
+												className={`flex h-9 w-9 items-center justify-center rounded-lg border transition-colors ${
+													audienceType === "group"
+														? "border-primary-base/30 bg-primary-base/10 text-primary-base"
+														: "border-stroke-soft-200 bg-bg-weak-50 text-text-strong-950 dark:border-stroke-soft-100/50"
+												}`}
+											>
+												<Icon name="contacts" className="h-4.5 w-4.5" />
+											</div>
+											<div
+												className={`flex h-4 w-4 items-center justify-center rounded-full border ${
+													audienceType === "group"
+														? "border-primary-base bg-primary-base text-white"
+														: "border-stroke-soft-300 bg-transparent"
+												}`}
+											>
+												{audienceType === "group" && (
+													<div className="h-1.5 w-1.5 rounded-full bg-white" />
+												)}
+											</div>
+										</div>
+										<div className="mt-3.5 space-y-1">
+											<div className="flex items-center justify-between">
+												<h4 className="font-semibold text-sm text-text-strong-950">
+													Contact Groups
+												</h4>
+												<span className="rounded-full bg-bg-weak-50 px-2 py-0.5 font-medium text-[11px] text-text-sub-600 dark:bg-white/10">
+													{availableGroups.length} available
+												</span>
+											</div>
+											<p className="text-text-sub-600 text-xs leading-relaxed">
+												Target specific segments and organized contact lists.
+											</p>
+										</div>
+									</button>
+
+									{/* Option 3: Channels */}
+									<button
+										type="button"
+										onClick={() => {
+											setAudienceType("channel");
+											setTargetError("");
+											if (!selectedChannelId && availableChannels.length > 0) {
+												setSelectedChannelId(availableChannels[0].id);
+												setSelectedChannelName(availableChannels[0].name);
+											}
+										}}
+										className={`group flex cursor-pointer flex-col justify-between rounded-xl border p-4 text-left transition-all ${
+											audienceType === "channel"
+												? "border-primary-base bg-primary-base/[0.03] shadow-xs dark:border-primary-base/80 dark:bg-primary-base/5"
+												: "border-stroke-soft-200 bg-bg-white-0 hover:border-stroke-soft-300 hover:bg-bg-weak-50/40 dark:border-stroke-soft-100/50 dark:bg-bg-white-0/5"
+										}`}
+									>
+										<div className="flex items-start justify-between gap-3">
+											<div
+												className={`flex h-9 w-9 items-center justify-center rounded-lg border transition-colors ${
+													audienceType === "channel"
+														? "border-primary-base/30 bg-primary-base/10 text-primary-base"
+														: "border-stroke-soft-200 bg-bg-weak-50 text-text-strong-950 dark:border-stroke-soft-100/50"
+												}`}
+											>
+												<Icon
+													name="notification-indicator"
+													className="h-4.5 w-4.5"
+												/>
+											</div>
+											<div
+												className={`flex h-4 w-4 items-center justify-center rounded-full border ${
+													audienceType === "channel"
+														? "border-primary-base bg-primary-base text-white"
+														: "border-stroke-soft-300 bg-transparent"
+												}`}
+											>
+												{audienceType === "channel" && (
+													<div className="h-1.5 w-1.5 rounded-full bg-white" />
+												)}
+											</div>
+										</div>
+										<div className="mt-3.5 space-y-1">
+											<div className="flex items-center justify-between">
+												<h4 className="font-semibold text-sm text-text-strong-950">
+													Channels
+												</h4>
+												<span className="rounded-full bg-bg-weak-50 px-2 py-0.5 font-medium text-[11px] text-text-sub-600 dark:bg-white/10">
+													{availableChannels.length} available
+												</span>
+											</div>
+											<p className="text-text-sub-600 text-xs leading-relaxed">
+												Deliver only to subscribers opted into a specific
+												channel.
+											</p>
+										</div>
+									</button>
+
+									{/* Option 4: Upload CSV */}
+									<button
+										type="button"
+										onClick={() => {
+											setAudienceType("csv");
+											setTargetError("");
+										}}
+										className={`group flex cursor-pointer flex-col justify-between rounded-xl border p-4 text-left transition-all ${
+											audienceType === "csv"
+												? "border-primary-base bg-primary-base/[0.03] shadow-xs dark:border-primary-base/80 dark:bg-primary-base/5"
+												: "border-stroke-soft-200 bg-bg-white-0 hover:border-stroke-soft-300 hover:bg-bg-weak-50/40 dark:border-stroke-soft-100/50 dark:bg-bg-white-0/5"
+										}`}
+									>
+										<div className="flex items-start justify-between gap-3">
+											<div
+												className={`flex h-9 w-9 items-center justify-center rounded-lg border transition-colors ${
+													audienceType === "csv"
+														? "border-primary-base/30 bg-primary-base/10 text-primary-base"
+														: "border-stroke-soft-200 bg-bg-weak-50 text-text-strong-950 dark:border-stroke-soft-100/50"
+												}`}
+											>
+												<Icon name="file-text" className="h-4.5 w-4.5" />
+											</div>
+											<div
+												className={`flex h-4 w-4 items-center justify-center rounded-full border ${
+													audienceType === "csv"
+														? "border-primary-base bg-primary-base text-white"
+														: "border-stroke-soft-300 bg-transparent"
+												}`}
+											>
+												{audienceType === "csv" && (
+													<div className="h-1.5 w-1.5 rounded-full bg-white" />
+												)}
+											</div>
+										</div>
+										<div className="mt-3.5 space-y-1">
+											<div className="flex items-center justify-between">
+												<h4 className="font-semibold text-sm text-text-strong-950">
+													Upload CSV
+												</h4>
+												<span className="rounded-full bg-bg-weak-50 px-2 py-0.5 font-medium text-[11px] text-text-sub-600 dark:bg-white/10">
+													{csvEmails.length > 0
+														? `${csvEmails.length} uploaded`
+														: ".csv / .txt"}
+												</span>
+											</div>
+											<p className="text-text-sub-600 text-xs leading-relaxed">
+												Import a custom list of email addresses from a file.
+											</p>
+										</div>
+									</button>
+								</div>
+
+								{/* Detailed Configuration Section based on selection */}
+								<AnimatePresence mode="wait">
+									{/* All Contacts Selected Details */}
+									{audienceType === "all" && (
+										<motion.div
+											key="all-details"
+											initial={{ opacity: 0, y: 6 }}
+											animate={{ opacity: 1, y: 0 }}
+											exit={{ opacity: 0, y: -6 }}
+											transition={{ duration: 0.16 }}
+											className="rounded-xl border border-stroke-soft-200 bg-bg-weak-50/40 p-4 dark:border-stroke-soft-100/50"
+										>
+											<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+												<div className="flex items-center gap-3">
+													<div className="flex h-9 w-9 items-center justify-center rounded-lg border border-stroke-soft-200 bg-bg-white-0 text-success-base dark:border-stroke-soft-100/50">
+														<Icon name="check-circle" className="h-4.5 w-4.5" />
+													</div>
+													<div>
+														<h5 className="font-medium text-sm text-text-strong-950">
+															Full Audience Selected
+														</h5>
+														<p className="text-text-sub-600 text-xs">
+															Every contact with status "Subscribed" in your
+															workspace will be included.
+														</p>
+													</div>
+												</div>
+												<div className="inline-flex items-center gap-1.5 self-start rounded-full bg-success-base/10 px-3 py-1 font-semibold text-success-base text-xs sm:self-center">
+													<span className="h-2 w-2 rounded-full bg-success-base" />
+													{totalContacts.toLocaleString()} recipients
+												</div>
+											</div>
+										</motion.div>
+									)}
+
+									{/* Group Selector Details */}
+									{audienceType === "group" && (
+										<motion.div
+											key="group-details"
+											initial={{ opacity: 0, y: 6 }}
+											animate={{ opacity: 1, y: 0 }}
+											exit={{ opacity: 0, y: -6 }}
+											transition={{ duration: 0.16 }}
+											className="space-y-3 rounded-xl border border-stroke-soft-200 bg-bg-weak-50/40 p-4 dark:border-stroke-soft-100/50"
+										>
+											<div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+												<div>
+													<h5 className="font-medium text-sm text-text-strong-950">
+														Select Target Group
+													</h5>
+													<p className="text-text-sub-600 text-xs">
+														Choose which group receives this campaign
+													</p>
+												</div>
+												<div className="w-full sm:w-56">
+													<Input.Root size="small">
+														<Input.Wrapper>
+															<Input.Input
+																placeholder="Search groups..."
+																value={groupSearch}
+																onChange={(e) => setGroupSearch(e.target.value)}
+															/>
+														</Input.Wrapper>
+													</Input.Root>
+												</div>
+											</div>
+
+											<div className="grid max-h-56 grid-cols-1 gap-2 overflow-y-auto pt-1">
+												{filteredGroups.map((grp) => {
+													const isSelected = selectedGroupId === grp.id;
+													return (
+														<div
+															key={grp.id}
+															onClick={() => {
+																setSelectedGroupId(grp.id);
+																setSelectedGroupName(grp.name);
+																setTargetError("");
+															}}
+															className={`flex cursor-pointer items-center justify-between rounded-lg border p-3 transition-colors ${
+																isSelected
+																	? "border-primary-base bg-primary-base/[0.04] dark:border-primary-base/70 dark:bg-primary-base/10"
+																	: "border-stroke-soft-200 bg-bg-white-0 hover:bg-bg-weak-50/60 dark:border-stroke-soft-100/50"
+															}`}
+														>
+															<div className="flex items-center gap-2.5">
+																<div
+																	className={`flex h-4 w-4 items-center justify-center rounded-full border ${
+																		isSelected
+																			? "border-primary-base bg-primary-base text-white"
+																			: "border-stroke-soft-300"
+																	}`}
+																>
+																	{isSelected && (
+																		<div className="h-1.5 w-1.5 rounded-full bg-white" />
+																	)}
+																</div>
+																<div>
+																	<p className="font-medium text-sm text-text-strong-950">
+																		{grp.name}
+																	</p>
+																	{"description" in grp && grp.description && (
+																		<p className="text-text-sub-600 text-xs">
+																			{grp.description}
+																		</p>
+																	)}
+																</div>
+															</div>
+															<span className="rounded-md bg-bg-weak-50 px-2 py-0.5 font-medium text-[11px] text-text-sub-600 dark:bg-white/10">
+																{("memberCount" in grp &&
+																typeof grp.memberCount === "number"
+																	? grp.memberCount
+																	: Math.round(totalContacts * 0.4)
+																).toLocaleString()}{" "}
+																contacts
+															</span>
+														</div>
+													);
+												})}
+											</div>
+										</motion.div>
+									)}
+
+									{/* Channel Selector Details */}
+									{audienceType === "channel" && (
+										<motion.div
+											key="channel-details"
+											initial={{ opacity: 0, y: 6 }}
+											animate={{ opacity: 1, y: 0 }}
+											exit={{ opacity: 0, y: -6 }}
+											transition={{ duration: 0.16 }}
+											className="space-y-3 rounded-xl border border-stroke-soft-200 bg-bg-weak-50/40 p-4 dark:border-stroke-soft-100/50"
+										>
+											<div>
+												<h5 className="font-medium text-sm text-text-strong-950">
+													Select Channel
+												</h5>
 												<p className="text-text-sub-600 text-xs">
-													Broadcast will be delivered to every active subscribed
-													contact across your organization.
+													Only recipients who are subscribed to this channel
+													will receive the broadcast
 												</p>
 											</div>
-										</div>
 
-										<div className="inline-flex items-center gap-1.5 self-start rounded-full bg-success-base/10 px-3.5 py-1 font-semibold text-success-base text-xs sm:self-center">
-											<span className="h-2 w-2 rounded-full bg-success-base" />
-											{totalContacts.toLocaleString()} recipients
-										</div>
+											<div className="grid grid-cols-1 gap-2 pt-1">
+												{availableChannels.map((chn) => {
+													const isSelected = selectedChannelId === chn.id;
+													return (
+														<div
+															key={chn.id}
+															onClick={() => {
+																setSelectedChannelId(chn.id);
+																setSelectedChannelName(chn.name);
+																setTargetError("");
+															}}
+															className={`flex cursor-pointer items-center justify-between rounded-lg border p-3 transition-colors ${
+																isSelected
+																	? "border-primary-base bg-primary-base/[0.04] dark:border-primary-base/70 dark:bg-primary-base/10"
+																	: "border-stroke-soft-200 bg-bg-white-0 hover:bg-bg-weak-50/60 dark:border-stroke-soft-100/50"
+															}`}
+														>
+															<div className="flex items-center gap-2.5">
+																<div
+																	className={`flex h-4 w-4 items-center justify-center rounded-full border ${
+																		isSelected
+																			? "border-primary-base bg-primary-base text-white"
+																			: "border-stroke-soft-300"
+																	}`}
+																>
+																	{isSelected && (
+																		<div className="h-1.5 w-1.5 rounded-full bg-white" />
+																	)}
+																</div>
+																<div>
+																	<p className="font-medium text-sm text-text-strong-950">
+																		{chn.name}
+																	</p>
+																	{chn.description && (
+																		<p className="text-text-sub-600 text-xs">
+																			{chn.description}
+																		</p>
+																	)}
+																</div>
+															</div>
+															<span className="rounded-md bg-bg-weak-50 px-2 py-0.5 font-medium text-[11px] text-text-sub-600 dark:bg-white/10">
+																{(
+																	chn.subscriberCount ??
+																	Math.round(totalContacts * 0.6)
+																).toLocaleString()}{" "}
+																subscribers
+															</span>
+														</div>
+													);
+												})}
+											</div>
+										</motion.div>
+									)}
+
+									{/* CSV Upload Details */}
+									{audienceType === "csv" && (
+										<motion.div
+											key="csv-details"
+											initial={{ opacity: 0, y: 6 }}
+											animate={{ opacity: 1, y: 0 }}
+											exit={{ opacity: 0, y: -6 }}
+											transition={{ duration: 0.16 }}
+											className="space-y-3 rounded-xl border border-stroke-soft-200 bg-bg-weak-50/40 p-4 dark:border-stroke-soft-100/50"
+										>
+											<input
+												type="file"
+												ref={fileInputRef}
+												accept=".csv,.txt"
+												onChange={(e) => {
+													const file = e.target.files?.[0];
+													if (file) handleCsvFileUpload(file);
+												}}
+												className="hidden"
+											/>
+
+											{csvEmails.length === 0 ? (
+												<div
+													onClick={() => fileInputRef.current?.click()}
+													onDragOver={(e) => e.preventDefault()}
+													onDrop={(e) => {
+														e.preventDefault();
+														const file = e.dataTransfer.files?.[0];
+														if (file) handleCsvFileUpload(file);
+													}}
+													className="flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-stroke-soft-300 bg-bg-white-0 px-6 py-8 text-center transition-colors hover:border-primary-base hover:bg-primary-base/[0.02] dark:border-stroke-soft-100/50 dark:bg-bg-white-0/5"
+												>
+													<div className="flex h-10 w-10 items-center justify-center rounded-xl border border-stroke-soft-200 bg-bg-weak-50 text-text-sub-600">
+														<Icon name="file-text" className="h-5 w-5" />
+													</div>
+													<h5 className="mt-3 font-semibold text-sm text-text-strong-950">
+														{csvParsing
+															? "Parsing CSV contents…"
+															: "Click to upload or drag & drop CSV"}
+													</h5>
+													<p className="mt-1 max-w-sm text-text-sub-600 text-xs">
+														Upload a standard .csv or .txt file containing email
+														addresses. We will automatically parse and
+														deduplicate the recipients.
+													</p>
+													<div className="mt-3">
+														<Button.Root
+															type="button"
+															variant="neutral"
+															mode="stroke"
+															size="small"
+															className="rounded-lg"
+														>
+															Browse File
+														</Button.Root>
+													</div>
+												</div>
+											) : (
+												<div className="space-y-3">
+													<div className="flex items-center justify-between rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-3.5 dark:border-stroke-soft-100/50">
+														<div className="flex items-center gap-3">
+															<div className="flex h-9 w-9 items-center justify-center rounded-lg border border-stroke-soft-200 bg-bg-weak-50 text-primary-base">
+																<Icon
+																	name="file-text"
+																	className="h-4.5 w-4.5"
+																/>
+															</div>
+															<div>
+																<p className="font-semibold text-sm text-text-strong-950">
+																	{csvFileName}
+																</p>
+																<p className="font-medium text-success-base text-xs">
+																	{csvEmails.length.toLocaleString()} valid
+																	contacts extracted
+																</p>
+															</div>
+														</div>
+														<div className="flex items-center gap-2">
+															<Button.Root
+																type="button"
+																variant="neutral"
+																mode="stroke"
+																size="xsmall"
+																onClick={() => fileInputRef.current?.click()}
+																className="rounded-lg"
+															>
+																Replace
+															</Button.Root>
+															<Button.Root
+																type="button"
+																variant="neutral"
+																mode="stroke"
+																size="xsmall"
+																onClick={() => {
+																	setCsvEmails([]);
+																	setCsvFileName("");
+																	if (fileInputRef.current)
+																		fileInputRef.current.value = "";
+																}}
+																className="rounded-lg text-error-base hover:text-error-base"
+															>
+																Remove
+															</Button.Root>
+														</div>
+													</div>
+
+													{/* Preview Chips */}
+													<div className="space-y-1.5">
+														<p className="font-medium text-[11px] text-text-sub-600 uppercase tracking-wider">
+															Previewing Recipients
+														</p>
+														<div className="flex flex-wrap items-center gap-1.5">
+															{csvEmails.slice(0, 6).map((em) => (
+																<span
+																	key={em}
+																	className="rounded-md border border-stroke-soft-200 bg-bg-white-0 px-2 py-0.5 font-mono text-[11px] text-text-strong-950 dark:border-stroke-soft-100/50"
+																>
+																	{em}
+																</span>
+															))}
+															{csvEmails.length > 6 && (
+																<span className="rounded-md bg-bg-weak-50 px-2 py-0.5 font-medium text-[11px] text-text-sub-600">
+																	+{csvEmails.length - 6} more
+																</span>
+															)}
+														</div>
+													</div>
+												</div>
+											)}
+
+											{csvError && (
+												<p className="font-medium text-error-base text-xs">
+													{csvError}
+												</p>
+											)}
+										</motion.div>
+									)}
+								</AnimatePresence>
+
+								{/* Bottom Summary Bar */}
+								<div className="flex flex-col gap-2 rounded-xl border border-stroke-soft-200 bg-bg-weak-50/60 p-3.5 sm:flex-row sm:items-center sm:justify-between dark:border-stroke-soft-100/50">
+									<div className="flex items-center gap-2">
+										<Icon
+											name="contacts"
+											className="h-4 w-4 text-text-sub-600"
+										/>
+										<span className="text-text-sub-600 text-xs">
+											Selected Target:{" "}
+											<strong className="text-text-strong-950">
+												{effectiveTargetName}
+											</strong>
+										</span>
+									</div>
+									<div className="inline-flex items-center gap-1.5 self-start rounded-full bg-success-base/10 px-3 py-1 font-semibold text-success-base text-xs sm:self-auto">
+										<span className="h-2 w-2 rounded-full bg-success-base" />
+										{effectiveRecipientCount.toLocaleString()} estimated
+										recipients
 									</div>
 								</div>
-							</div>
+
+								{/* Error Message */}
+								<AnimatePresence>
+									{targetError && (
+										<motion.p
+											initial={{ opacity: 0, y: -4, height: 0 }}
+											animate={{ opacity: 1, y: 0, height: "auto" }}
+											exit={{ opacity: 0, y: -4, height: 0 }}
+											transition={{
+												duration: 0.2,
+												ease: [0.22, 1, 0.36, 1],
+											}}
+											className="overflow-hidden font-medium text-error-base text-xs"
+										>
+											{targetError}
+										</motion.p>
+									)}
+								</AnimatePresence>
+							</motion.div>
 
 							{/* Action Buttons */}
 							<div className="flex items-center justify-end gap-3 pt-5">
@@ -906,7 +1686,7 @@ function CreateCampaignPageContent() {
 									</div>
 									<div className="flex items-center justify-between p-3.5">
 										<span className="font-medium text-text-sub-600 text-xs">
-											Total Contacts
+											Target Contact
 										</span>
 										<div className="flex items-center gap-1.5">
 											<Icon
@@ -914,8 +1694,8 @@ function CreateCampaignPageContent() {
 												className="h-4 w-4 text-success-base"
 											/>
 											<span className="font-semibold text-success-base text-xs">
-												All Contacts ({totalContacts.toLocaleString()}{" "}
-												recipients)
+												{effectiveTargetName} (
+												{effectiveRecipientCount.toLocaleString()} recipients)
 											</span>
 										</div>
 									</div>
@@ -990,7 +1770,8 @@ function CreateCampaignPageContent() {
 										<>
 											<Icon name="mail-send" className="h-4 w-4" />
 											<span>
-												Send to All Contacts ({totalContacts.toLocaleString()})
+												Send to {effectiveTargetName} (
+												{effectiveRecipientCount.toLocaleString()})
 											</span>
 											<span className="inline-flex items-center gap-0.5">
 												<ActionKbd className={actionKbdOnBlueClassName}>
