@@ -25,7 +25,7 @@ const STEPS: { id: Step; label: string; description: string; icon: string }[] =
 			id: "setup",
 			label: "General Information",
 			description: "Campaign name",
-			icon: "file-text",
+			icon: "mega-phone",
 		},
 		{
 			id: "audience",
@@ -276,7 +276,7 @@ function CreateCampaignPageContent() {
 								{/* Header Section */}
 								<div>
 									<Icon
-										name="file-text"
+										name="mega-phone"
 										className="mb-3 h-6 w-6 text-text-strong-950"
 									/>
 									<h1 className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
