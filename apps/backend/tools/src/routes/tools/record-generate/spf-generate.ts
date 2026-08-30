@@ -208,6 +208,19 @@ export function generateSpfRecord(input: SpfGenerateInput): SpfGenerateResult {
 	const built = buildSpfRecord(input);
 	const record = built.parts.join(" ");
 	const lookupCount = countSpfLookups(built.parts);
+	const warnings = [...built.warnings];
+	if (
+		built.parts.some(
+			(part) => part.startsWith("include:") || part.startsWith("redirect="),
+		)
+	) {
+		warnings.push({
+			severity: "warn",
+			code: "nested-lookups-unexpanded",
+			detail: `lookupCount (${lookupCount}) is a lower bound until nested include:/redirect= records are resolved.`,
+			fix: "Each include: can add more DNS lookups. Reloop expands published includes after generation.",
+		});
+	}
 
 	return {
 		domain: built.domain,
@@ -217,7 +230,7 @@ export function generateSpfRecord(input: SpfGenerateInput): SpfGenerateResult {
 		lookupLimit: LOOKUP_LIMIT,
 		policy: built.policy,
 		existingRecord: null,
-		warnings: built.warnings,
+		warnings,
 	};
 }
 
@@ -251,4 +264,87 @@ export async function attachExistingSpf(
 		existingRecord: existing[0] ?? null,
 		warnings,
 	};
+}
+
+const EXPAND_DEADLINE_MS = 2500;
+const EXPAND_MAX_DEPTH = 10;
+
+function lookupTermsFromRecord(record: string): string[] {
+	return record.split(/\s+/).filter(Boolean);
+}
+
+export async function expandSpfLookups(
+	result: SpfGenerateResult,
+	lookup: TxtLookup,
+): Promise<SpfGenerateResult> {
+	const deadline = Date.now() + EXPAND_DEADLINE_MS;
+	const visited = new Set<string>();
+	let incomplete = false;
+
+	const walk = async (parts: string[], depth: number): Promise<number> => {
+		let count = countSpfLookups(parts);
+		if (depth >= EXPAND_MAX_DEPTH || Date.now() > deadline) {
+			incomplete = true;
+			return count;
+		}
+
+		for (const part of parts) {
+			let nestedDomain: string | null = null;
+			if (part.startsWith("include:"))
+				nestedDomain = part.slice("include:".length);
+			else if (part.startsWith("redirect=")) {
+				nestedDomain = part.slice("redirect=".length);
+			}
+			if (!nestedDomain || !isPlausibleDomain(nestedDomain)) continue;
+			if (visited.has(nestedDomain)) continue;
+			visited.add(nestedDomain);
+			if (Date.now() > deadline) {
+				incomplete = true;
+				break;
+			}
+			const txts = await lookup(nestedDomain);
+			const nested = findRecordsByPrefix(txts, "v=spf1");
+			if (nested.length === 0) {
+				incomplete = true;
+				continue;
+			}
+			count += await walk(lookupTermsFromRecord(nested[0] ?? ""), depth + 1);
+		}
+		return count;
+	};
+
+	const lookupCount = await walk(lookupTermsFromRecord(result.record), 0);
+	const warnings = result.warnings.filter(
+		(warning) =>
+			warning.code !== "lookup-limit" &&
+			warning.code !== "lookup-near-limit" &&
+			warning.code !== "nested-lookups-unexpanded",
+	);
+
+	if (lookupCount > LOOKUP_LIMIT) {
+		warnings.push({
+			severity: "fail",
+			code: "lookup-limit",
+			detail: `This record causes ${lookupCount} DNS lookups after expanding include: targets. SPF allows at most ${LOOKUP_LIMIT}.`,
+			fix: "Remove include:/a/mx/ptr/exists mechanisms, or flatten vendor IPs carefully.",
+		});
+	} else if (lookupCount >= 8) {
+		warnings.push({
+			severity: "warn",
+			code: "lookup-near-limit",
+			detail: `This record uses ${lookupCount} of ${LOOKUP_LIMIT} DNS lookups, including nested includes.`,
+			fix: "Leave headroom. Each include: can hide several more lookups.",
+		});
+	}
+
+	if (incomplete) {
+		warnings.push({
+			severity: "warn",
+			code: "nested-lookups-unexpanded",
+			detail: `lookupCount (${lookupCount}) is a lower bound. Some include: targets could not be fully expanded.`,
+			fix: "Publish fewer nested includes, or confirm each include: hostname answers with a single v=spf1 record.",
+		});
+	}
+
+	return { ...result, lookupCount, warnings };
 }

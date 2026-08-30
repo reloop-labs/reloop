@@ -42,7 +42,10 @@ export function parseBimiRecord(raw: string): BimiParsed {
 	};
 }
 
-export function evaluateDmarcForBimi(record: string | null): DmarcForBimi {
+export function evaluateDmarcForBimi(
+	record: string | null,
+	options: { inherited?: boolean } = {},
+): DmarcForBimi {
 	if (!record) {
 		return {
 			present: false,
@@ -54,18 +57,28 @@ export function evaluateDmarcForBimi(record: string | null): DmarcForBimi {
 	}
 
 	const tags = parseTxtTags(record);
-	const policy = (tags.p || "").toLowerCase();
-	const pct = tags.pct === undefined ? 100 : Number.parseInt(tags.pct, 10);
-	const pctOk = Number.isFinite(pct) && pct === 100;
+	const publishedPolicy = (tags.p || "").toLowerCase();
+	const subdomainPolicy = (tags.sp || "").toLowerCase();
+	const policy = (
+		options.inherited ? subdomainPolicy || publishedPolicy : publishedPolicy
+	).toLowerCase();
+	const pct = parseDmarcPct(tags.pct);
+	const pctOk = pct === 100;
 	const policyOk = policy === "quarantine" || policy === "reject";
 
 	return {
 		present: true,
 		record,
 		policy: policy || null,
-		pct: Number.isFinite(pct) ? pct : null,
+		pct,
 		enforced: policyOk && pctOk,
 	};
+}
+
+export function parseDmarcPct(raw: string | undefined): number | null {
+	if (raw === undefined || raw === "") return 100;
+	if (!/^(?:100|[1-9]?\d)$/.test(raw)) return null;
+	return Number(raw);
 }
 
 export function httpsUrlIssue(

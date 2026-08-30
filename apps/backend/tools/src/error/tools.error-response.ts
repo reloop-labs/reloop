@@ -35,7 +35,7 @@ export const ToolsErrors = {
 			status: 400,
 			message: "No domain provided",
 			why: "The request did not include a domain to look up BIMI for.",
-			fix: 'Send {"domain": "example.com"} as JSON, or GET /v1/bimi-check?domain=example.com',
+			fix: 'Send {"domain": "example.com"} as JSON, or GET /api/tools/v1/bimi-check?domain=example.com',
 		}),
 	bimiInvalidDomain: () =>
 		createError({

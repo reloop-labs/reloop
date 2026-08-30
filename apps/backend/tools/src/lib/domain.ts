@@ -23,11 +23,17 @@ export function normalizeDomain(rawInput: string): string {
 
 export function isPlausibleDomain(domain: string): boolean {
 	if (!domain || domain.length > 253) return false;
-	if (!domain.includes(".")) return false;
 	if (/\s/.test(domain)) return false;
-	if (domain.startsWith("-") || domain.endsWith("-")) return false;
-	if (domain.startsWith(".") || domain.includes("..")) return false;
-	return /^[a-z0-9._-]+$/i.test(domain);
+	if (domain.startsWith(".") || domain.endsWith(".") || domain.includes("..")) {
+		return false;
+	}
+	const labels = domain.split(".");
+	if (labels.length < 2) return false;
+	for (const label of labels) {
+		if (label.length < 1 || label.length > 63) return false;
+		if (!/^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/i.test(label)) return false;
+	}
+	return true;
 }
 
 export function isPlausibleSelector(selector: string): boolean {

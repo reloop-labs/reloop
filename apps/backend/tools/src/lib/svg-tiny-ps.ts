@@ -98,13 +98,20 @@ export function inspectSvgTinyPs(svg: string): SvgTinyPsResult {
 		}
 	}
 
-	if (/(?:xlink:)?href\s*=\s*["']https?:\/\//i.test(trimmed)) {
-		issues.push({
-			status: "fail",
-			code: "external-ref",
-			detail: "SVG references an external HTTP(S) resource.",
-			fix: "Embed all graphics inline. BIMI logos may not load remote assets.",
-		});
+	const hrefPattern = /(?:xlink:)?href\s*=\s*["']([^"']*)["']/gi;
+	let hrefMatch: RegExpExecArray | null = hrefPattern.exec(trimmed);
+	while (hrefMatch) {
+		const href = (hrefMatch[1] || "").trim();
+		if (!href.startsWith("#")) {
+			issues.push({
+				status: "fail",
+				code: "external-ref",
+				detail: "SVG references an external resource.",
+				fix: "Embed all graphics inline. BIMI logos may not load remote assets.",
+			});
+			break;
+		}
+		hrefMatch = hrefPattern.exec(trimmed);
 	}
 
 	const viewBox = extractAttr(trimmed, "viewBox");

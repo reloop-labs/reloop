@@ -118,6 +118,7 @@ export function CheckerPanel() {
 								disabled={isLoading}
 								autoComplete="off"
 								spellCheck={false}
+								aria-label="Domain to check"
 							/>
 						</Input.Wrapper>
 					</Input.Root>

@@ -6,7 +6,7 @@ export const metaTitle = "DKIM Key & Record Generator";
 export const metaDescription =
 	"Generate a 2048-bit DKIM key pair and a copy-pasteable TXT record at {selector}._domainkey.{domain}. The private key is shown once and never stored.";
 export const toolDescription =
-	"Create a 2048-bit RSA DKIM key pair in the browser session. Publish the public TXT record; keep the private key on your sending server.";
+	"Generate a 2048-bit RSA DKIM key pair. The public TXT record and private key are returned once; Reloop does not store them. Publish the public record and keep the private key on your sending server.";
 
 export const toolKeywords = [
 	"DKIM generator",

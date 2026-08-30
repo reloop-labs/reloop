@@ -21,12 +21,14 @@ mock.module("@be/tools/utils/loader", () => ({
 			if (redisMode === "swallow") return undefined;
 			return (redisStore.get(key) as T) ?? undefined;
 		},
-		increment: async (_key: string): Promise<number> => {
+		incrementAndExpireIfFirst: async (
+			key: string,
+			_seconds: number,
+		): Promise<number> => {
 			if (redisMode === "ok") return 1;
 			if (redisMode === "hang") return new Promise(() => {});
 			throw new Error("ECONNREFUSED");
 		},
-		expire: async (_key: string, _seconds: number): Promise<void> => {},
 		ttl: async (_key: string): Promise<number> => -1,
 		healthCheck: async (): Promise<boolean> => true,
 	},

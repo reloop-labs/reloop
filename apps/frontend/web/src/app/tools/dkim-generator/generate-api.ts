@@ -5,6 +5,8 @@ export type DkimGenerateResponse = {
 	selector: string;
 	dnsName: string;
 	record: string;
+	recordChunks: string[];
+	recordZone: string;
 	publicKey: string;
 	privateKey: string;
 	keyType: "rsa";

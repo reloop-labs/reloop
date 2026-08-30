@@ -49,6 +49,36 @@ const defaultDeps: BimiCheckDeps = {
 	fetchLogo: true,
 };
 
+const MAX_DMARC_WALK = 8;
+
+function parentDomain(domain: string): string | null {
+	const labels = domain.split(".");
+	if (labels.length <= 2) return null;
+	return labels.slice(1).join(".");
+}
+
+export async function discoverDmarc(
+	domain: string,
+	lookup: TxtLookup,
+): Promise<{ records: string[]; at: string; inherited: boolean }> {
+	let current: string | null = domain;
+	for (let hop = 0; hop < MAX_DMARC_WALK && current; hop++) {
+		const matches = findRecordsByPrefix(
+			await lookup(`_dmarc.${current}`),
+			"v=dmarc1",
+		);
+		if (matches.length > 0) {
+			return {
+				records: matches,
+				at: current,
+				inherited: current !== domain,
+			};
+		}
+		current = parentDomain(current);
+	}
+	return { records: [], at: domain, inherited: false };
+}
+
 function recommendationsFrom(checks: BimiCheckItem[]): string[] {
 	const lines: string[] = [];
 	for (const check of checks) {
@@ -129,16 +159,18 @@ export async function checkBimiController(
 	if (!isPlausibleDomain(domain)) throw ToolsErrors.bimiInvalidDomain();
 
 	const queryName = `default._bimi.${domain}`;
-	const [bimiTxts, dmarcTxts] = await Promise.all([
+	const [bimiTxts, dmarcDiscovery] = await Promise.all([
 		resolveTxt(queryName),
-		resolveTxt(`_dmarc.${domain}`),
+		discoverDmarc(domain, resolveTxt),
 	]);
 
 	const bimiMatches = findRecordsByPrefix(bimiTxts, "v=bimi1");
-	const dmarcMatches = findRecordsByPrefix(dmarcTxts, "v=dmarc1");
+	const dmarcMatches = dmarcDiscovery.records;
 	const bimiRaw = bimiMatches[0] ?? null;
-	const dmarcRaw = dmarcMatches[0] ?? null;
-	const dmarc = evaluateDmarcForBimi(dmarcRaw);
+	const dmarcRaw = dmarcMatches.length === 1 ? (dmarcMatches[0] ?? null) : null;
+	const dmarc = evaluateDmarcForBimi(dmarcRaw, {
+		inherited: dmarcDiscovery.inherited,
+	});
 
 	const checks: BimiCheckItem[] = [];
 
@@ -228,12 +260,20 @@ export async function checkBimiController(
 		}
 	}
 
-	if (!dmarc.present) {
+	if (dmarcMatches.length > 1) {
 		checks.push({
 			id: "dmarc",
 			label: "DMARC enforcement",
 			status: "fail",
-			detail: `No DMARC record at _dmarc.${domain}. BIMI requires DMARC at enforcement.`,
+			detail: `Found ${dmarcMatches.length} DMARC TXT records at _dmarc.${dmarcDiscovery.at}. Multiple DMARC records must be discarded.`,
+			fix: "Keep a single v=DMARC1 TXT record at that name.",
+		});
+	} else if (!dmarc.present) {
+		checks.push({
+			id: "dmarc",
+			label: "DMARC enforcement",
+			status: "fail",
+			detail: `No DMARC record at _dmarc.${domain} or a parent domain. BIMI requires DMARC at enforcement.`,
 			fix: `Publish _dmarc.${domain} with v=DMARC1; p=quarantine or p=reject and pct=100 (or omit pct).`,
 		});
 	} else if (!dmarc.enforced) {

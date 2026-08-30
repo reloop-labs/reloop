@@ -60,6 +60,18 @@ describe("evaluateDmarcForBimi", () => {
 			pct: 50,
 		});
 
+		expect(evaluateDmarcForBimi("v=DMARC1; p=reject; pct=100x")).toMatchObject({
+			enforced: false,
+			pct: null,
+		});
+
+		expect(
+			evaluateDmarcForBimi("v=DMARC1; p=reject; sp=none", { inherited: true }),
+		).toMatchObject({
+			enforced: false,
+			policy: "none",
+		});
+
 		expect(evaluateDmarcForBimi(null)).toMatchObject({
 			present: false,
 			enforced: false,
@@ -90,6 +102,13 @@ describe("inspectSvgTinyPs", () => {
 		expect(result.issues.some((i) => i.code === "script")).toBe(true);
 		expect(result.issues.some((i) => i.code === "baseProfile")).toBe(true);
 		expect(result.issues.some((i) => i.code === "not-square")).toBe(true);
+	});
+
+	test("rejects protocol-relative hrefs", () => {
+		const svg = `<svg version="1.2" baseProfile="tiny-ps" viewBox="0 0 128 128" href="//cdn.example/logo.png"></svg>`;
+		const result = inspectSvgTinyPs(svg);
+		expect(result.ok).toBe(false);
+		expect(result.issues.some((i) => i.code === "external-ref")).toBe(true);
 	});
 });
 
@@ -155,5 +174,42 @@ describe("checkBimiController", () => {
 		expect(checkBimiController("nodot", { fetchLogo: false })).rejects.toThrow(
 			"Invalid domain",
 		);
+	});
+
+	test("inherits an enforcing parent DMARC policy for a subdomain", async () => {
+		const result = await checkBimiController("mail.brand.example", {
+			lookupTxt: async (name) => {
+				if (name.startsWith("default._bimi.")) {
+					return [
+						"v=BIMI1; l=https://cdn.brand.example/bimi.svg; a=https://cdn.brand.example/vmc.pem",
+					];
+				}
+				if (name === "_dmarc.brand.example") {
+					return ["v=DMARC1; p=reject; sp=quarantine"];
+				}
+				return [];
+			},
+			fetchLogo: false,
+		});
+		expect(result.dmarcEnforced).toBe(true);
+		expect(result.dmarcPolicy).toBe("quarantine");
+		expect(result.verdict).toBe("pass");
+	});
+
+	test("fails when a lookup name publishes multiple DMARC records", async () => {
+		const result = await checkBimiController("brand.example", {
+			lookupTxt: async (name) => {
+				if (name.startsWith("default._bimi.")) {
+					return ["v=BIMI1; l=https://cdn.brand.example/bimi.svg"];
+				}
+				if (name === "_dmarc.brand.example") {
+					return ["v=DMARC1; p=reject", "v=DMARC1; p=none"];
+				}
+				return [];
+			},
+			fetchLogo: false,
+		});
+		expect(result.dmarcEnforced).toBe(false);
+		expect(result.checks.find((c) => c.id === "dmarc")?.status).toBe("fail");
 	});
 });

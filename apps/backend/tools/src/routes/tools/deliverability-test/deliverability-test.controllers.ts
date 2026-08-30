@@ -47,13 +47,11 @@ export async function createDeliverabilityTestSession(
 	const rateLimitKey = `rate-limit:deliverability-session:${clientIp}`;
 	try {
 		const current = await withDeadline(
-			redis.increment(rateLimitKey),
+			redis.incrementAndExpireIfFirst(rateLimitKey, 3600),
 			250,
 			"Redis increment",
 		);
-		if (current === 1) {
-			await redis.expire(rateLimitKey, 3600);
-		} else if (current > toolsConfig.constants.maxSessionPerIpPerHour) {
+		if (current > toolsConfig.constants.maxSessionPerIpPerHour) {
 			throw createError({
 				status: 429,
 				message: "Rate limit exceeded",

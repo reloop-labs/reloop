@@ -1,6 +1,8 @@
 import { describe, expect, test } from "bun:test";
+import { isPlausibleDomain } from "../src/lib/domain";
 import {
 	buildDkimRecord,
+	chunkDnsTxt,
 	dkimDnsName,
 	generateDkimRecord,
 	pemToDkimPublicKey,
@@ -9,6 +11,7 @@ import { generateDmarcRecord } from "../src/routes/tools/record-generate/dmarc-g
 import {
 	attachExistingSpf,
 	countSpfLookups,
+	expandSpfLookups,
 	generateSpfRecord,
 } from "../src/routes/tools/record-generate/spf-generate";
 
@@ -70,6 +73,44 @@ describe("generateSpfRecord", () => {
 			true,
 		);
 	});
+
+	test("rejects hostnames with underscores, hyphenated label edges, or long labels", () => {
+		expect(isPlausibleDomain("bad_host.example.com")).toBe(false);
+		expect(isPlausibleDomain("bad-.example.com")).toBe(false);
+		expect(isPlausibleDomain("-bad.example.com")).toBe(false);
+		expect(isPlausibleDomain(`${"a".repeat(64)}.example.com`)).toBe(false);
+		expect(isPlausibleDomain("mail.example.com")).toBe(true);
+		expect(() =>
+			generateSpfRecord({
+				domain: "bad_host.example.com",
+				ipv4: ["192.0.2.1"],
+			}),
+		).toThrow("Invalid domain");
+	});
+
+	test("counts nested include: lookups", async () => {
+		const generated = generateSpfRecord({
+			domain: "example.com",
+			includes: ["esp.example.net"],
+			policy: "-all",
+		});
+		expect(generated.lookupCount).toBe(1);
+		const expanded = await expandSpfLookups(generated, async (name) => {
+			if (name === "esp.example.net") {
+				return ["v=spf1 include:a.example.net include:b.example.net -all"];
+			}
+			if (name === "a.example.net") return ["v=spf1 ip4:192.0.2.1 -all"];
+			if (name === "b.example.net") return ["v=spf1 mx -all"];
+			return [];
+		});
+		expect(expanded.lookupCount).toBe(4);
+		expect(expanded.warnings.some((w) => w.code === "lookup-limit")).toBe(
+			false,
+		);
+		expect(
+			expanded.warnings.some((w) => w.code === "nested-lookups-unexpanded"),
+		).toBe(false);
+	});
 });
 
 describe("generateDkimRecord", () => {
@@ -80,6 +121,11 @@ describe("generateDkimRecord", () => {
 		});
 		expect(result.dnsName).toBe(dkimDnsName("reloop", "example.com"));
 		expect(result.record).toBe(buildDkimRecord(result.publicKey));
+		expect(result.recordChunks.join("")).toBe(result.record);
+		expect(result.recordChunks.every((chunk) => chunk.length <= 255)).toBe(
+			true,
+		);
+		expect(chunkDnsTxt(result.record).join("")).toBe(result.record);
 		expect(result.record.startsWith("v=DKIM1; k=rsa; p=")).toBe(true);
 		expect(result.publicKey.length).toBeGreaterThan(300);
 		expect(result.privateKey).toContain("BEGIN PRIVATE KEY");

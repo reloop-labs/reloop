@@ -87,7 +87,7 @@ export const agentCardRoute = new Elysia().get("/agent-card.json", () => ({
 			},
 			outputSchema: {
 				verdict: { type: "string", description: "pass | warn | fail" },
-				bimiRecord: { type: "string" },
+				bimiRecord: { type: "string", nullable: true },
 				dmarcEnforced: { type: "boolean" },
 			},
 			errorCodes: [400, 429],

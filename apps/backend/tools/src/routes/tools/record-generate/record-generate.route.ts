@@ -6,11 +6,16 @@ import { log } from "evlog";
 import { evlog, useLogger } from "evlog/elysia";
 import { generateDkimRecord } from "./dkim-generate";
 import { generateDmarcRecord } from "./dmarc-generate";
-import { attachExistingSpf, generateSpfRecord } from "./spf-generate";
+import {
+	attachExistingSpf,
+	expandSpfLookups,
+	generateSpfRecord,
+} from "./spf-generate";
 
 async function runSpf(body: ToolsModel.SpfGenerateBody) {
 	const generated = generateSpfRecord(body);
-	const result = await attachExistingSpf(generated, lookupTxt);
+	const expanded = await expandSpfLookups(generated, lookupTxt);
+	const result = await attachExistingSpf(expanded, lookupTxt);
 	useLogger().set({
 		domain: result.domain,
 		lookupCount: result.lookupCount,

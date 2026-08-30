@@ -59,12 +59,16 @@ export function GeneratorPanel() {
 				className="space-y-4 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-5 shadow-xs sm:p-6 dark:border-white/10 dark:bg-[#0b0b0b]"
 			>
 				<div className="block">
-					<p className="mb-1.5 font-medium text-[13px] text-text-strong-950 dark:text-white">
+					<label
+						htmlFor="dmarc-domain"
+						className="mb-1.5 block font-medium text-[13px] text-text-strong-950 dark:text-white"
+					>
 						Domain
-					</p>
+					</label>
 					<Input.Root size="small">
 						<Input.Wrapper>
 							<Input.Input
+								id="dmarc-domain"
 								value={domain}
 								onChange={(e) => setDomain(e.target.value)}
 								placeholder="example.com"
@@ -170,12 +174,16 @@ export function GeneratorPanel() {
 						</select>
 					</label>
 					<div className="block">
-						<p className="mb-1.5 font-medium text-[13px] text-text-strong-950 dark:text-white">
+						<label
+							htmlFor="dmarc-pct"
+							className="mb-1.5 block font-medium text-[13px] text-text-strong-950 dark:text-white"
+						>
 							pct
-						</p>
+						</label>
 						<Input.Root size="small">
 							<Input.Wrapper>
 								<Input.Input
+									id="dmarc-pct"
 									type="number"
 									min={0}
 									max={100}

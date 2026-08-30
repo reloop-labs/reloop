@@ -37,12 +37,16 @@ export function GeneratorPanel() {
 				className="space-y-4 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-5 shadow-xs sm:p-6 dark:border-white/10 dark:bg-[#0b0b0b]"
 			>
 				<div className="block">
-					<p className="mb-1.5 font-medium text-[13px] text-text-strong-950 dark:text-white">
+					<label
+						htmlFor="dkim-domain"
+						className="mb-1.5 block font-medium text-[13px] text-text-strong-950 dark:text-white"
+					>
 						Domain
-					</p>
+					</label>
 					<Input.Root size="small">
 						<Input.Wrapper>
 							<Input.Input
+								id="dkim-domain"
 								value={domain}
 								onChange={(e) => setDomain(e.target.value)}
 								placeholder="example.com"
@@ -55,12 +59,16 @@ export function GeneratorPanel() {
 				</div>
 
 				<div className="block">
-					<p className="mb-1.5 font-medium text-[13px] text-text-strong-950 dark:text-white">
+					<label
+						htmlFor="dkim-selector"
+						className="mb-1.5 block font-medium text-[13px] text-text-strong-950 dark:text-white"
+					>
 						Selector
-					</p>
+					</label>
 					<Input.Root size="small">
 						<Input.Wrapper>
 							<Input.Input
+								id="dkim-selector"
 								value={selector}
 								onChange={(e) => setSelector(e.target.value)}
 								placeholder="default"
@@ -110,6 +118,13 @@ export function GeneratorPanel() {
 				<div className="mt-5 space-y-4 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-5 sm:p-6 dark:border-white/10 dark:bg-[#0b0b0b]">
 					<CopyField label="DNS name" value={result.dnsName} />
 					<CopyField label="TXT value" value={result.record} multiline />
+					{result.recordChunks.length > 1 && (
+						<CopyField
+							label="TXT value as quoted 255-octet chunks"
+							value={result.recordZone}
+							multiline
+						/>
+					)}
 					<CopyField
 						label="Private key (shown once — not stored)"
 						value={result.privateKey}

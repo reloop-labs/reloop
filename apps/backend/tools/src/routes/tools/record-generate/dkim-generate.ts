@@ -19,6 +19,8 @@ export type DkimGenerateResult = {
 	selector: string;
 	dnsName: string;
 	record: string;
+	recordChunks: string[];
+	recordZone: string;
 	publicKey: string;
 	privateKey: string;
 	keyType: "rsa";
@@ -32,6 +34,26 @@ export function pemToDkimPublicKey(pem: string): string {
 		.replace(/-----BEGIN PUBLIC KEY-----/g, "")
 		.replace(/-----END PUBLIC KEY-----/g, "")
 		.replace(/\s+/g, "");
+}
+
+export const DNS_TXT_CHAR_LIMIT = 255;
+
+export function chunkDnsTxt(
+	value: string,
+	limit = DNS_TXT_CHAR_LIMIT,
+): string[] {
+	if (!value) return [""];
+	const chunks: string[] = [];
+	for (let i = 0; i < value.length; i += limit) {
+		chunks.push(value.slice(i, i + limit));
+	}
+	return chunks;
+}
+
+export function formatDnsTxtZone(chunks: string[]): string {
+	return chunks
+		.map((chunk) => `"${chunk.replace(/\\/g, "\\\\").replace(/"/g, '\\"')}"`)
+		.join(" ");
 }
 
 export function buildDkimRecord(publicKey: string): string {
@@ -61,12 +83,16 @@ export async function generateDkimRecord(
 	});
 
 	const cleanPublic = pemToDkimPublicKey(publicKey);
+	const record = buildDkimRecord(cleanPublic);
+	const recordChunks = chunkDnsTxt(record);
 
 	return {
 		domain,
 		selector,
 		dnsName: dkimDnsName(selector, domain),
-		record: buildDkimRecord(cleanPublic),
+		record,
+		recordChunks,
+		recordZone: formatDnsTxtZone(recordChunks),
 		publicKey: cleanPublic,
 		privateKey,
 		keyType: "rsa",

@@ -202,6 +202,36 @@ export class RedisCache {
 	}
 
 	/**
+	 * INCR the key and, if this created it, set TTL in the same Lua script so a
+	 * cancelled caller cannot leave a counter without expiry.
+	 */
+	async incrementAndExpireIfFirst(
+		rawKey: string,
+		ttlSeconds: number,
+	): Promise<number> {
+		try {
+			const redis = await this.getRedisClient();
+			const result = await redis.eval(
+				`local n = redis.call('INCR', KEYS[1])
+if n == 1 then redis.call('EXPIRE', KEYS[1], ARGV[1]) end
+return n`,
+				{
+					keys: [rawKey],
+					arguments: [String(ttlSeconds)],
+				},
+			);
+			return Number(result);
+		} catch (error) {
+			console.error(
+				`Redis incrementAndExpireIfFirst error for key "${rawKey}":`,
+				error,
+			);
+			this.redis = null;
+			throw error;
+		}
+	}
+
+	/**
 	 * Atomically increment a key's value by 1.
 	 * If the key does not exist, it is initialized to 0 before incrementing.
 	 * Uses the raw key (no prefix) — caller is responsible for namespacing.

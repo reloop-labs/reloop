@@ -544,6 +544,8 @@ export namespace ToolsModel {
 		selector: t.String(),
 		dnsName: t.String(),
 		record: t.String(),
+		recordChunks: t.Array(t.String()),
+		recordZone: t.String(),
 		publicKey: t.String(),
 		privateKey: t.String(),
 		keyType: t.Literal("rsa"),

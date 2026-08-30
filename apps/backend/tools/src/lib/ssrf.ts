@@ -74,12 +74,17 @@ export function isBlockedHostname(hostname: string): boolean {
 	return false;
 }
 
+export type HostnameLookup = (
+	hostname: string,
+) => Promise<ReadonlyArray<{ address: string; family?: number }>>;
+
 export async function hostnameResolvesPublic(
 	hostname: string,
+	lookup: HostnameLookup = (name) => dns.promises.lookup(name, { all: true }),
 ): Promise<boolean> {
 	if (net.isIP(hostname)) return !isPrivateOrBlockedIP(hostname);
 
-	const results = await dns.promises.lookup(hostname, { all: true });
+	const results = await lookup(hostname);
 	if (results.length === 0) return false;
 	return results.every((entry) => !isPrivateOrBlockedIP(entry.address));
 }
