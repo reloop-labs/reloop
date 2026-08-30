@@ -19,33 +19,39 @@ import { CampaignsProvider, useCampaigns } from "../campaigns-provider";
 
 type Step = "setup" | "audience" | "sender" | "content" | "review";
 
-const STEPS: { id: Step; label: string; description: string }[] = [
-	{
-		id: "setup",
-		label: "General Information",
-		description: "Campaign name",
-	},
-	{
-		id: "audience",
-		label: "Audience",
-		description: "Target recipients",
-	},
-	{
-		id: "sender",
-		label: "Sender",
-		description: "Identity & subject line",
-	},
-	{
-		id: "content",
-		label: "Email Content",
-		description: "Design & preview",
-	},
-	{
-		id: "review",
-		label: "Summary",
-		description: "Final checklist",
-	},
-];
+const STEPS: { id: Step; label: string; description: string; icon: string }[] =
+	[
+		{
+			id: "setup",
+			label: "General Information",
+			description: "Campaign name",
+			icon: "file-text",
+		},
+		{
+			id: "audience",
+			label: "Audience",
+			description: "Target recipients",
+			icon: "contacts",
+		},
+		{
+			id: "sender",
+			label: "Sender",
+			description: "Identity & subject line",
+			icon: "mail-send",
+		},
+		{
+			id: "content",
+			label: "Email Content",
+			description: "Design & preview",
+			icon: "layout",
+		},
+		{
+			id: "review",
+			label: "Summary",
+			description: "Final checklist",
+			icon: "check-circle",
+		},
+	];
 
 function CreateCampaignPageContent() {
 	const router = useRouter();
@@ -77,7 +83,9 @@ function CreateCampaignPageContent() {
 
 	// Setup Step
 	const [name, setName] = useState("");
+	const [nameError, setNameError] = useState("");
 	const [subject, setSubject] = useState("");
+	const [subjectError, setSubjectError] = useState("");
 	const [previewText, setPreviewText] = useState("");
 
 	// Audience & Sender Step
@@ -167,17 +175,19 @@ function CreateCampaignPageContent() {
 	const handleContinue = () => {
 		if (step === "setup") {
 			if (!name.trim()) {
-				toast.error("Please enter a campaign name");
+				setNameError("Please enter a campaign name");
 				return;
 			}
+			setNameError("");
 			setStep("audience");
 		} else if (step === "audience") {
 			setStep("sender");
 		} else if (step === "sender") {
 			if (!subject.trim()) {
-				toast.error("Please enter a subject line");
+				setSubjectError("Please enter a subject line");
 				return;
 			}
+			setSubjectError("");
 			setStep("content");
 		} else if (step === "content") {
 			setStep("review");
@@ -253,63 +263,75 @@ function CreateCampaignPageContent() {
 							exit={{ opacity: 0, y: -8 }}
 							transition={{ duration: 0.18 }}
 						>
-							{/* Header Section */}
-							<div>
-								<h1 className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
-									Campaign Details
-								</h1>
-								<p className="text-paragraph-md text-text-sub-600 leading-relaxed">
-									Give your campaign a title to identify and track it in your
-									analytics.
-								</p>
-							</div>
+							<form
+								onSubmit={(e) => {
+									e.preventDefault();
+									handleContinue();
+								}}
+							>
+								{/* Header Section */}
+								<div>
+									<Icon
+										name="file-text"
+										className="mb-3 h-6 w-6 text-text-strong-950"
+									/>
+									<h1 className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
+										Campaign Details
+									</h1>
+									<p className="text-paragraph-md text-text-sub-600 leading-relaxed">
+										Give your campaign a title to identify and track it in your
+										analytics.
+									</p>
+								</div>
 
-							{/* Field */}
-							<div className="space-y-2 pt-7">
-								<Label.Root htmlFor="campaign-name">
-									Campaign Name
-									<Label.Asterisk />
-								</Label.Root>
-								<Input.Root size="medium">
-									<Input.Wrapper>
-										<Input.Input
-											id="campaign-name"
-											placeholder="e.g. August 2026 Product Launch & Community Update"
-											value={name}
-											onChange={(e) => setName(e.target.value)}
-											autoFocus
-										/>
-									</Input.Wrapper>
-								</Input.Root>
-								<p className="text-[11px] text-text-sub-600">
-									Internal title used for tracking in your dashboard and
-									analytics.
-								</p>
-							</div>
+								{/* Field */}
+								<div className="space-y-2 pt-7">
+									<Label.Root htmlFor="campaign-name">
+										Campaign Name
+										<Label.Asterisk />
+									</Label.Root>
+									<Input.Root size="medium" hasError={Boolean(nameError)}>
+										<Input.Wrapper>
+											<Input.Input
+												id="campaign-name"
+												placeholder="e.g. August 2026 Product Launch & Community Update"
+												value={name}
+												onChange={(e) => {
+													setName(e.target.value);
+													if (nameError) setNameError("");
+												}}
+												autoFocus
+											/>
+										</Input.Wrapper>
+									</Input.Root>
+									{nameError && (
+										<p className="text-error-base text-xs">{nameError}</p>
+									)}
+								</div>
 
-							{/* Action Buttons */}
-							<div className="flex items-center justify-end gap-3 pt-5">
-								<Button.Root
-									type="button"
-									variant="neutral"
-									mode="stroke"
-									size="small"
-									onClick={handleBack}
-									disabled={isSendingBroadcast}
-									className="rounded-xl"
-								>
-									Cancel
-								</Button.Root>
-								<FancyButton.Root
-									type="button"
-									variant="blue"
-									size="small"
-									onClick={handleContinue}
-									className="min-w-[134px] justify-center overflow-hidden rounded-xl"
-								>
-									Continue
-								</FancyButton.Root>
-							</div>
+								{/* Action Buttons */}
+								<div className="flex items-center justify-end gap-3 pt-5">
+									<Button.Root
+										type="button"
+										variant="neutral"
+										mode="stroke"
+										size="small"
+										onClick={handleBack}
+										disabled={isSendingBroadcast}
+										className="rounded-xl"
+									>
+										Cancel
+									</Button.Root>
+									<FancyButton.Root
+										type="submit"
+										variant="blue"
+										size="small"
+										className="min-w-[134px] justify-center overflow-hidden rounded-xl"
+									>
+										Continue
+									</FancyButton.Root>
+								</div>
+							</form>
 						</motion.div>
 					)}
 
@@ -324,6 +346,10 @@ function CreateCampaignPageContent() {
 						>
 							{/* Header Section */}
 							<div>
+								<Icon
+									name="contacts"
+									className="mb-3 h-6 w-6 text-text-strong-950"
+								/>
 								<h1 className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
 									Target Audience
 								</h1>
@@ -395,40 +421,143 @@ function CreateCampaignPageContent() {
 							exit={{ opacity: 0, y: -8 }}
 							transition={{ duration: 0.18 }}
 						>
-							{/* Header Section */}
-							<div>
-								<h1 className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
-									Sender & Subject Details
-								</h1>
-								<p className="text-paragraph-md text-text-sub-600 leading-relaxed">
-									Configure your sender profile, email address, subject line,
-									and preheader.
-								</p>
-							</div>
+							<form
+								onSubmit={(e) => {
+									e.preventDefault();
+									handleContinue();
+								}}
+							>
+								{/* Header Section */}
+								<div>
+									<Icon
+										name="mail-send"
+										className="mb-3 h-6 w-6 text-text-strong-950"
+									/>
+									<h1 className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
+										Sender & Subject Details
+									</h1>
+									<p className="text-paragraph-md text-text-sub-600 leading-relaxed">
+										Configure your sender profile, email address, subject line,
+										and preheader.
+									</p>
+								</div>
 
-							<div className="space-y-4 pt-7">
-								{/* Sender Name & Reply-To */}
-								<div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+								<div className="space-y-4 pt-7">
+									{/* Sender Name & Reply-To */}
+									<div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+										<div className="space-y-1.5">
+											<Label.Root htmlFor="from-name">From Name</Label.Root>
+											<Input.Root size="medium">
+												<Input.Wrapper>
+													<Input.Input
+														id="from-name"
+														placeholder="e.g. Reloop Announcements"
+														value={fromName}
+														onChange={(e) => setFromName(e.target.value)}
+													/>
+												</Input.Wrapper>
+											</Input.Root>
+											<p className="text-[11px] text-text-sub-600">
+												The display name recipients will see.
+											</p>
+										</div>
+
+										<div className="space-y-1.5">
+											<Label.Root htmlFor="reply-to">
+												Reply-To Email{" "}
+												<span className="font-normal text-text-sub-600">
+													(optional)
+												</span>
+											</Label.Root>
+											<Input.Root size="medium">
+												<Input.Wrapper>
+													<Input.Input
+														id="reply-to"
+														placeholder="e.g. support@reloop.sh"
+														value={replyTo}
+														onChange={(e) => setReplyTo(e.target.value)}
+													/>
+												</Input.Wrapper>
+											</Input.Root>
+											<p className="text-[11px] text-text-sub-600">
+												Direct replies to a specific support or team address.
+											</p>
+										</div>
+									</div>
+
+									{/* Sender Email with Domain Selector */}
 									<div className="space-y-1.5">
-										<Label.Root htmlFor="from-name">From Name</Label.Root>
-										<Input.Root size="medium">
-											<Input.Wrapper>
-												<Input.Input
-													id="from-name"
-													placeholder="e.g. Reloop Announcements"
-													value={fromName}
-													onChange={(e) => setFromName(e.target.value)}
-												/>
-											</Input.Wrapper>
-										</Input.Root>
+										<Label.Root>From Email Address</Label.Root>
+										<div className="flex items-center gap-2">
+											<div className="flex-1">
+												<Input.Root size="medium">
+													<Input.Wrapper>
+														<Input.Input
+															placeholder="newsletter"
+															value={fromUsername}
+															onChange={(e) => setFromUsername(e.target.value)}
+														/>
+													</Input.Wrapper>
+												</Input.Root>
+											</div>
+											<span className="font-medium text-sm text-text-sub-600">
+												@
+											</span>
+											<div className="w-56">
+												<select
+													value={effectiveDomain}
+													onChange={(e) => setSelectedDomain(e.target.value)}
+													className="h-10 w-full rounded-lg border border-stroke-soft-200 bg-bg-white-0 px-3 text-text-strong-950 text-xs outline-none focus:border-stroke-strong-950 dark:border-stroke-soft-100/50"
+												>
+													{domainsList.map((d) => (
+														<option key={d} value={d}>
+															{d}
+														</option>
+													))}
+												</select>
+											</div>
+										</div>
 										<p className="text-[11px] text-text-sub-600">
-											The display name recipients will see.
+											Sending as:{" "}
+											<span className="font-medium font-mono text-text-strong-950">
+												{senderEmailAddress}
+											</span>
 										</p>
 									</div>
 
+									{/* Subject Line */}
+									<div className="space-y-1.5 pt-1">
+										<Label.Root htmlFor="campaign-subject">
+											Subject Line <Label.Asterisk />
+										</Label.Root>
+										<Input.Root size="medium" hasError={Boolean(subjectError)}>
+											<Input.Wrapper>
+												<Input.Input
+													id="campaign-subject"
+													placeholder="e.g. 🚀 Reloop 2.0 is live: Check out what's new"
+													value={subject}
+													onChange={(e) => {
+														setSubject(e.target.value);
+														if (subjectError) setSubjectError("");
+													}}
+												/>
+											</Input.Wrapper>
+										</Input.Root>
+										{subjectError && (
+											<p className="text-error-base text-xs">{subjectError}</p>
+										)}
+										{!subjectError && (
+											<p className="text-[11px] text-text-sub-600">
+												The primary headline subscribers will see in their
+												inboxes.
+											</p>
+										)}
+									</div>
+
+									{/* Preview Text / Preheader */}
 									<div className="space-y-1.5">
-										<Label.Root htmlFor="reply-to">
-											Reply-To Email{" "}
+										<Label.Root htmlFor="campaign-preview">
+											Preview Text / Preheader{" "}
 											<span className="font-normal text-text-sub-600">
 												(optional)
 											</span>
@@ -436,127 +565,43 @@ function CreateCampaignPageContent() {
 										<Input.Root size="medium">
 											<Input.Wrapper>
 												<Input.Input
-													id="reply-to"
-													placeholder="e.g. support@reloop.sh"
-													value={replyTo}
-													onChange={(e) => setReplyTo(e.target.value)}
+													id="campaign-preview"
+													placeholder="Snippet displayed in inboxes right after the subject..."
+													value={previewText}
+													onChange={(e) => setPreviewText(e.target.value)}
 												/>
 											</Input.Wrapper>
 										</Input.Root>
 										<p className="text-[11px] text-text-sub-600">
-											Direct replies to a specific support or team address.
+											Secondary text shown alongside the subject line in email
+											clients.
 										</p>
 									</div>
 								</div>
 
-								{/* Sender Email with Domain Selector */}
-								<div className="space-y-1.5">
-									<Label.Root>From Email Address</Label.Root>
-									<div className="flex items-center gap-2">
-										<div className="flex-1">
-											<Input.Root size="medium">
-												<Input.Wrapper>
-													<Input.Input
-														placeholder="newsletter"
-														value={fromUsername}
-														onChange={(e) => setFromUsername(e.target.value)}
-													/>
-												</Input.Wrapper>
-											</Input.Root>
-										</div>
-										<span className="font-medium text-sm text-text-sub-600">
-											@
-										</span>
-										<div className="w-56">
-											<select
-												value={effectiveDomain}
-												onChange={(e) => setSelectedDomain(e.target.value)}
-												className="h-10 w-full rounded-lg border border-stroke-soft-200 bg-bg-white-0 px-3 text-text-strong-950 text-xs outline-none focus:border-stroke-strong-950 dark:border-stroke-soft-100/50"
-											>
-												{domainsList.map((d) => (
-													<option key={d} value={d}>
-														{d}
-													</option>
-												))}
-											</select>
-										</div>
-									</div>
-									<p className="text-[11px] text-text-sub-600">
-										Sending as:{" "}
-										<span className="font-medium font-mono text-text-strong-950">
-											{senderEmailAddress}
-										</span>
-									</p>
+								{/* Action Buttons */}
+								<div className="flex items-center justify-end gap-3 pt-5">
+									<Button.Root
+										type="button"
+										variant="neutral"
+										mode="stroke"
+										size="small"
+										onClick={handleBack}
+										disabled={isSendingBroadcast}
+										className="rounded-xl"
+									>
+										Back
+									</Button.Root>
+									<FancyButton.Root
+										type="submit"
+										variant="blue"
+										size="small"
+										className="min-w-[134px] justify-center overflow-hidden rounded-xl"
+									>
+										Continue
+									</FancyButton.Root>
 								</div>
-
-								{/* Subject Line */}
-								<div className="space-y-1.5 pt-1">
-									<Label.Root htmlFor="campaign-subject">
-										Subject Line <Label.Asterisk />
-									</Label.Root>
-									<Input.Root size="medium">
-										<Input.Wrapper>
-											<Input.Input
-												id="campaign-subject"
-												placeholder="e.g. 🚀 Reloop 2.0 is live: Check out what's new"
-												value={subject}
-												onChange={(e) => setSubject(e.target.value)}
-											/>
-										</Input.Wrapper>
-									</Input.Root>
-									<p className="text-[11px] text-text-sub-600">
-										The primary headline subscribers will see in their inboxes.
-									</p>
-								</div>
-
-								{/* Preview Text / Preheader */}
-								<div className="space-y-1.5">
-									<Label.Root htmlFor="campaign-preview">
-										Preview Text / Preheader{" "}
-										<span className="font-normal text-text-sub-600">
-											(optional)
-										</span>
-									</Label.Root>
-									<Input.Root size="medium">
-										<Input.Wrapper>
-											<Input.Input
-												id="campaign-preview"
-												placeholder="Snippet displayed in inboxes right after the subject..."
-												value={previewText}
-												onChange={(e) => setPreviewText(e.target.value)}
-											/>
-										</Input.Wrapper>
-									</Input.Root>
-									<p className="text-[11px] text-text-sub-600">
-										Secondary text shown alongside the subject line in email
-										clients.
-									</p>
-								</div>
-							</div>
-
-							{/* Action Buttons */}
-							<div className="flex items-center justify-end gap-3 pt-5">
-								<Button.Root
-									type="button"
-									variant="neutral"
-									mode="stroke"
-									size="small"
-									onClick={handleBack}
-									disabled={isSendingBroadcast}
-									className="rounded-xl"
-								>
-									Back
-								</Button.Root>
-								<FancyButton.Root
-									type="button"
-									variant="blue"
-									size="small"
-									onClick={handleContinue}
-									className="min-w-[134px] justify-center overflow-hidden rounded-xl"
-								>
-									Continue
-								</FancyButton.Root>
-							</div>
+							</form>
 						</motion.div>
 					)}
 
@@ -572,6 +617,10 @@ function CreateCampaignPageContent() {
 							{/* Header Section */}
 							<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
 								<div>
+									<Icon
+										name="layout"
+										className="mb-3 h-6 w-6 text-text-strong-950"
+									/>
 									<h1 className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
 										Design & Message Content
 									</h1>
@@ -728,6 +777,10 @@ function CreateCampaignPageContent() {
 						>
 							{/* Header Section */}
 							<div>
+								<Icon
+									name="check-circle"
+									className="mb-3 h-6 w-6 text-text-strong-950"
+								/>
 								<h1 className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
 									Review & Send
 								</h1>
