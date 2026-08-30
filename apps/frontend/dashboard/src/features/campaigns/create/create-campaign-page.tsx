@@ -84,8 +84,10 @@ function CreateCampaignPageContent() {
 	// Setup Step
 	const [name, setName] = useState("");
 	const [nameError, setNameError] = useState("");
+	const [nameShakeKey, setNameShakeKey] = useState(0);
 	const [subject, setSubject] = useState("");
 	const [subjectError, setSubjectError] = useState("");
+	const [subjectShakeKey, setSubjectShakeKey] = useState(0);
 	const [previewText, setPreviewText] = useState("");
 
 	// Audience & Sender Step
@@ -176,6 +178,7 @@ function CreateCampaignPageContent() {
 		if (step === "setup") {
 			if (!name.trim()) {
 				setNameError("Please enter a campaign name");
+				setNameShakeKey((k) => k + 1);
 				return;
 			}
 			setNameError("");
@@ -185,6 +188,7 @@ function CreateCampaignPageContent() {
 		} else if (step === "sender") {
 			if (!subject.trim()) {
 				setSubjectError("Please enter a subject line");
+				setSubjectShakeKey((k) => k + 1);
 				return;
 			}
 			setSubjectError("");
@@ -290,23 +294,49 @@ function CreateCampaignPageContent() {
 										Campaign Name
 										<Label.Asterisk />
 									</Label.Root>
-									<Input.Root size="medium" hasError={Boolean(nameError)}>
-										<Input.Wrapper>
-											<Input.Input
-												id="campaign-name"
-												placeholder="e.g. August 2026 Product Launch & Community Update"
-												value={name}
-												onChange={(e) => {
-													setName(e.target.value);
-													if (nameError) setNameError("");
+									<motion.div
+										key={nameShakeKey}
+										animate={
+											nameShakeKey > 0
+												? { x: [0, 6, -6, 4, -4, 2, -2, 0] }
+												: { x: 0 }
+										}
+										transition={{
+											duration: 0.35,
+											ease: [0.22, 1, 0.36, 1],
+										}}
+									>
+										<Input.Root size="medium" hasError={Boolean(nameError)}>
+											<Input.Wrapper>
+												<Input.Input
+													id="campaign-name"
+													placeholder="e.g. August 2026 Product Launch & Community Update"
+													value={name}
+													onChange={(e) => {
+														setName(e.target.value);
+														if (nameError) setNameError("");
+													}}
+													autoFocus
+												/>
+											</Input.Wrapper>
+										</Input.Root>
+									</motion.div>
+									<AnimatePresence>
+										{nameError && (
+											<motion.p
+												initial={{ opacity: 0, y: -4, height: 0 }}
+												animate={{ opacity: 1, y: 0, height: "auto" }}
+												exit={{ opacity: 0, y: -4, height: 0 }}
+												transition={{
+													duration: 0.2,
+													ease: [0.22, 1, 0.36, 1],
 												}}
-												autoFocus
-											/>
-										</Input.Wrapper>
-									</Input.Root>
-									{nameError && (
-										<p className="text-error-base text-xs">{nameError}</p>
-									)}
+												className="overflow-hidden font-medium text-error-base text-xs"
+											>
+												{nameError}
+											</motion.p>
+										)}
+									</AnimatePresence>
 								</div>
 
 								{/* Action Buttons */}
@@ -530,28 +560,56 @@ function CreateCampaignPageContent() {
 										<Label.Root htmlFor="campaign-subject">
 											Subject Line <Label.Asterisk />
 										</Label.Root>
-										<Input.Root size="medium" hasError={Boolean(subjectError)}>
-											<Input.Wrapper>
-												<Input.Input
-													id="campaign-subject"
-													placeholder="e.g. 🚀 Reloop 2.0 is live: Check out what's new"
-													value={subject}
-													onChange={(e) => {
-														setSubject(e.target.value);
-														if (subjectError) setSubjectError("");
+										<motion.div
+											key={subjectShakeKey}
+											animate={
+												subjectShakeKey > 0
+													? { x: [0, 6, -6, 4, -4, 2, -2, 0] }
+													: { x: 0 }
+											}
+											transition={{
+												duration: 0.35,
+												ease: [0.22, 1, 0.36, 1],
+											}}
+										>
+											<Input.Root
+												size="medium"
+												hasError={Boolean(subjectError)}
+											>
+												<Input.Wrapper>
+													<Input.Input
+														id="campaign-subject"
+														placeholder="e.g. 🚀 Reloop 2.0 is live: Check out what's new"
+														value={subject}
+														onChange={(e) => {
+															setSubject(e.target.value);
+															if (subjectError) setSubjectError("");
+														}}
+													/>
+												</Input.Wrapper>
+											</Input.Root>
+										</motion.div>
+										<AnimatePresence>
+											{subjectError ? (
+												<motion.p
+													initial={{ opacity: 0, y: -4, height: 0 }}
+													animate={{ opacity: 1, y: 0, height: "auto" }}
+													exit={{ opacity: 0, y: -4, height: 0 }}
+													transition={{
+														duration: 0.2,
+														ease: [0.22, 1, 0.36, 1],
 													}}
-												/>
-											</Input.Wrapper>
-										</Input.Root>
-										{subjectError && (
-											<p className="text-error-base text-xs">{subjectError}</p>
-										)}
-										{!subjectError && (
-											<p className="text-[11px] text-text-sub-600">
-												The primary headline subscribers will see in their
-												inboxes.
-											</p>
-										)}
+													className="overflow-hidden font-medium text-error-base text-xs"
+												>
+													{subjectError}
+												</motion.p>
+											) : (
+												<p className="text-[11px] text-text-sub-600">
+													The primary headline subscribers will see in their
+													inboxes.
+												</p>
+											)}
+										</AnimatePresence>
 									</div>
 
 									{/* Preview Text / Preheader */}
