@@ -85,7 +85,7 @@ const TOOL_VISUAL_MAP: Record<string, ToolVisualMeta> = {
 		],
 	},
 	"email-validator": {
-		icon: "mail-check",
+		icon: "mail",
 		badge: "Deliverability",
 		badgeColor:
 			"bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/20",
@@ -145,7 +145,7 @@ const TOOL_VISUAL_MAP: Record<string, ToolVisualMeta> = {
 		],
 	},
 	"mobile-preview": {
-		icon: "device-mobile",
+		icon: "smartphone",
 		badge: "Preview",
 		badgeColor:
 			"bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 border-indigo-500/20",

@@ -4,7 +4,6 @@ import * as Alert from "@reloop/ui/alert";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as CompactButton from "@reloop/ui/compact-button";
-import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import Spinner from "@reloop/ui/spinner";
@@ -185,42 +184,29 @@ https://reloop.sh/tools/dns-lookup`;
 
 	return (
 		<div className="mx-auto max-w-5xl">
-			{/* Preset Bar & CTA */}
-			<div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-				<div className="flex flex-wrap items-center gap-2">
-					<span className="font-mono text-[11px] text-text-soft-400 uppercase tracking-[0.14em] dark:text-white/35">
-						Try Presets:
-					</span>
-					{PRESETS.map((preset) => (
-						<button
-							key={preset.label}
-							type="button"
-							onClick={() => {
-								setInput(preset.value);
-								executeLookup(preset.value);
-							}}
-							className={cn(
-								"rounded-lg px-2.5 py-1 font-mono text-[11.5px] transition-colors",
-								input === preset.value
-									? "bg-text-strong-950 font-medium text-white shadow-xs dark:bg-white dark:text-black"
-									: "border border-stroke-soft-200 bg-bg-white-0 text-text-sub-600 hover:border-text-strong-950 hover:text-text-strong-950 dark:border-white/10 dark:bg-white/5 dark:text-white/60 dark:hover:border-white dark:hover:text-white",
-							)}
-						>
-							{preset.label}
-						</button>
-					))}
-				</div>
-
-				<FancyButton.Root
-					type="button"
-					variant="neutral"
-					size="xsmall"
-					onClick={() => executeLookup(input)}
-					className="shrink-0"
-				>
-					<FancyButton.Icon as={Icon} name="sparkles" />
-					<span>Instant Lookup</span>
-				</FancyButton.Root>
+			{/* Preset Bar */}
+			<div className="mb-4 flex flex-wrap items-center gap-2">
+				<span className="font-mono text-[11px] text-text-soft-400 uppercase tracking-[0.14em] dark:text-white/35">
+					Try Presets:
+				</span>
+				{PRESETS.map((preset) => (
+					<button
+						key={preset.label}
+						type="button"
+						onClick={() => {
+							setInput(preset.value);
+							executeLookup(preset.value);
+						}}
+						className={cn(
+							"rounded-lg px-2.5 py-1 font-mono text-[11.5px] transition-colors",
+							input === preset.value
+								? "bg-text-strong-950 font-medium text-white shadow-xs dark:bg-white dark:text-black"
+								: "border border-stroke-soft-200 bg-bg-white-0 text-text-sub-600 hover:border-text-strong-950 hover:text-text-strong-950 dark:border-white/10 dark:bg-white/5 dark:text-white/60 dark:hover:border-white dark:hover:text-white",
+						)}
+					>
+						{preset.label}
+					</button>
+				))}
 			</div>
 
 			{/* Search Input Box */}
