@@ -12,10 +12,14 @@ import { useMemo, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import { useContactsQuery } from "#/features/contacts/hooks/use-contacts-query";
+import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import { useDomainsQuery } from "#/features/domain/hooks/use-domains-query";
 import type { AudienceTargetType } from "../campaign-types";
 import { CampaignsProvider, useCampaigns } from "../campaigns-provider";
+
+const actionKbdOnBlueClassName =
+	"w-auto min-w-4 border-white/25 bg-white/15 px-1 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]";
 
 type Step = "setup" | "audience" | "sender" | "content" | "review";
 
@@ -29,7 +33,7 @@ const STEPS: { id: Step; label: string; description: string; icon: string }[] =
 		},
 		{
 			id: "audience",
-			label: "Audience",
+			label: "Contact",
 			description: "Target recipients",
 			icon: "contacts",
 		},
@@ -125,9 +129,22 @@ function CreateCampaignPageContent() {
 		"esc",
 		(e) => {
 			e.preventDefault();
-			router.push("/campaigns");
+			handleBack();
 		},
-		{ enableOnFormTags: false },
+		{ enableOnFormTags: true },
+	);
+
+	useHotkeys(
+		["mod+enter", "meta+enter", "ctrl+enter"],
+		(e) => {
+			e.preventDefault();
+			if (step === "review") {
+				handleBroadcastNow();
+			} else {
+				handleContinue();
+			}
+		},
+		{ enableOnFormTags: true },
 	);
 
 	const handleSendTestEmail = () => {
@@ -348,17 +365,21 @@ function CreateCampaignPageContent() {
 										size="small"
 										onClick={handleBack}
 										disabled={isSendingBroadcast}
-										className="rounded-xl"
+										className="gap-1.5 rounded-xl"
 									>
 										Cancel
+										<ActionKbd className="w-auto min-w-4 px-1">esc</ActionKbd>
 									</Button.Root>
 									<FancyButton.Root
 										type="submit"
 										variant="blue"
 										size="small"
-										className="min-w-[134px] justify-center overflow-hidden rounded-xl"
+										className="min-w-[134px] justify-center gap-1.5 overflow-hidden rounded-xl"
 									>
 										Continue
+										<ActionKbd className={actionKbdOnBlueClassName}>
+											↵
+										</ActionKbd>
 									</FancyButton.Root>
 								</div>
 							</form>
@@ -381,7 +402,7 @@ function CreateCampaignPageContent() {
 									className="mb-3 h-6 w-6 text-text-strong-950"
 								/>
 								<h1 className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
-									Target Audience
+									Target Contact
 								</h1>
 								<p className="text-paragraph-md text-text-sub-600 leading-relaxed">
 									Define who receives this broadcast and review your total
@@ -425,18 +446,20 @@ function CreateCampaignPageContent() {
 									size="small"
 									onClick={handleBack}
 									disabled={isSendingBroadcast}
-									className="rounded-xl"
+									className="gap-1.5 rounded-xl"
 								>
 									Back
+									<ActionKbd className="w-auto min-w-4 px-1">esc</ActionKbd>
 								</Button.Root>
 								<FancyButton.Root
 									type="button"
 									variant="blue"
 									size="small"
 									onClick={handleContinue}
-									className="min-w-[134px] justify-center overflow-hidden rounded-xl"
+									className="min-w-[134px] justify-center gap-1.5 overflow-hidden rounded-xl"
 								>
 									Continue
+									<ActionKbd className={actionKbdOnBlueClassName}>↵</ActionKbd>
 								</FancyButton.Root>
 							</div>
 						</motion.div>
@@ -646,17 +669,21 @@ function CreateCampaignPageContent() {
 										size="small"
 										onClick={handleBack}
 										disabled={isSendingBroadcast}
-										className="rounded-xl"
+										className="gap-1.5 rounded-xl"
 									>
 										Back
+										<ActionKbd className="w-auto min-w-4 px-1">esc</ActionKbd>
 									</Button.Root>
 									<FancyButton.Root
 										type="submit"
 										variant="blue"
 										size="small"
-										className="min-w-[134px] justify-center overflow-hidden rounded-xl"
+										className="min-w-[134px] justify-center gap-1.5 overflow-hidden rounded-xl"
 									>
 										Continue
+										<ActionKbd className={actionKbdOnBlueClassName}>
+											↵
+										</ActionKbd>
 									</FancyButton.Root>
 								</div>
 							</form>
@@ -807,18 +834,20 @@ function CreateCampaignPageContent() {
 									size="small"
 									onClick={handleBack}
 									disabled={isSendingBroadcast}
-									className="rounded-xl"
+									className="gap-1.5 rounded-xl"
 								>
 									Back
+									<ActionKbd className="w-auto min-w-4 px-1">esc</ActionKbd>
 								</Button.Root>
 								<FancyButton.Root
 									type="button"
 									variant="blue"
 									size="small"
 									onClick={handleContinue}
-									className="min-w-[134px] justify-center overflow-hidden rounded-xl"
+									className="min-w-[134px] justify-center gap-1.5 overflow-hidden rounded-xl"
 								>
 									Continue
+									<ActionKbd className={actionKbdOnBlueClassName}>↵</ActionKbd>
 								</FancyButton.Root>
 							</div>
 						</motion.div>
@@ -877,7 +906,7 @@ function CreateCampaignPageContent() {
 									</div>
 									<div className="flex items-center justify-between p-3.5">
 										<span className="font-medium text-text-sub-600 text-xs">
-											Total Audience
+											Total Contacts
 										</span>
 										<div className="flex items-center gap-1.5">
 											<Icon
@@ -937,9 +966,10 @@ function CreateCampaignPageContent() {
 									size="small"
 									onClick={handleBack}
 									disabled={isSendingBroadcast}
-									className="rounded-xl"
+									className="gap-1.5 rounded-xl"
 								>
 									Back
+									<ActionKbd className="w-auto min-w-4 px-1">esc</ActionKbd>
 								</Button.Root>
 								<FancyButton.Root
 									type="button"
@@ -949,7 +979,7 @@ function CreateCampaignPageContent() {
 									disabled={
 										isSendingBroadcast || !name.trim() || !subject.trim()
 									}
-									className="min-w-[180px] justify-center overflow-hidden rounded-xl"
+									className="min-w-[180px] justify-center gap-1.5 overflow-hidden rounded-xl"
 								>
 									{isSendingBroadcast ? (
 										<>
@@ -961,6 +991,14 @@ function CreateCampaignPageContent() {
 											<Icon name="mail-send" className="h-4 w-4" />
 											<span>
 												Send to All Contacts ({totalContacts.toLocaleString()})
+											</span>
+											<span className="inline-flex items-center gap-0.5">
+												<ActionKbd className={actionKbdOnBlueClassName}>
+													⌘
+												</ActionKbd>
+												<ActionKbd className={actionKbdOnBlueClassName}>
+													↵
+												</ActionKbd>
 											</span>
 										</>
 									)}
