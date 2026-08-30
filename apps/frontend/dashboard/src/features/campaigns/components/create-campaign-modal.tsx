@@ -51,7 +51,8 @@ export const CreateCampaignModal = ({
 	// Load templates
 	const templatesQuery = useTemplatesQuery();
 
-	const totalContacts = contactsQuery.data?.total ?? contactsQuery.data?.totalContacts ?? 1280;
+	const totalContacts =
+		contactsQuery.data?.total ?? contactsQuery.data?.totalContacts ?? 1280;
 
 	// Form State
 	const [step, setStep] = useState<Step>("setup");
@@ -65,7 +66,9 @@ export const CreateCampaignModal = ({
 
 	// Audience & Sender Step
 	const [fromName, setFromName] = useState(
-		activeOrganization?.name ? `${activeOrganization.name} Team` : "Reloop Team",
+		activeOrganization?.name
+			? `${activeOrganization.name} Team`
+			: "Reloop Team",
 	);
 	const [fromUsername, setFromUsername] = useState("updates");
 	const [selectedDomain, setSelectedDomain] = useState("");
@@ -73,11 +76,14 @@ export const CreateCampaignModal = ({
 	const [audienceType, setAudienceType] = useState<AudienceTargetType>("all");
 
 	// Content Step
-	const [selectedTemplateId, setSelectedTemplateId] = useState<string>("custom");
+	const [selectedTemplateId, setSelectedTemplateId] =
+		useState<string>("custom");
 	const [contentHtml, setContentHtml] = useState(
 		`<h2>Hi {{firstName | default: "there"}},</h2>\n<p>We are thrilled to announce our latest updates and features built to help you grow.</p>\n<p>Here is what is new:</p>\n<ul>\n  <li>Ultra-fast global email dispatch</li>\n  <li>Deep delivery & engagement analytics</li>\n  <li>Automated workflow triggers</li>\n</ul>\n<p>Check out the full changelog on our dashboard.</p>\n<p>Best regards,<br />The Team</p>`,
 	);
-	const [previewDevice, setPreviewDevice] = useState<"desktop" | "mobile">("desktop");
+	const [previewDevice, setPreviewDevice] = useState<"desktop" | "mobile">(
+		"desktop",
+	);
 	const [testEmailAddress, setTestEmailAddress] = useState("");
 
 	// Compute verified domains list
@@ -193,24 +199,26 @@ export const CreateCampaignModal = ({
 
 						{/* Step indicator pills */}
 						<div className="hidden items-center gap-1 sm:flex">
-							{(["setup", "audience", "content", "review"] as Step[]).map((s, idx) => {
-								const labels = ["Details", "Audience", "Content", "Review"];
-								const active = step === s;
-								return (
-									<button
-										key={s}
-										type="button"
-										onClick={() => setStep(s)}
-										className={`rounded-full px-2.5 py-0.5 text-xs font-medium transition-colors ${
-											active
-												? "bg-bg-strong-950 text-text-white-0 dark:bg-bg-white-0 dark:text-text-strong-950"
-												: "bg-bg-weak-50 text-text-sub-600 hover:text-text-strong-950"
-										}`}
-									>
-										{idx + 1}. {labels[idx]}
-									</button>
-								);
-							})}
+							{(["setup", "audience", "content", "review"] as Step[]).map(
+								(s, idx) => {
+									const labels = ["Details", "Audience", "Content", "Review"];
+									const active = step === s;
+									return (
+										<button
+											key={s}
+											type="button"
+											onClick={() => setStep(s)}
+											className={`rounded-full px-2.5 py-0.5 text-xs font-medium transition-colors ${
+												active
+													? "bg-bg-strong-950 text-text-white-0 dark:bg-bg-white-0 dark:text-text-strong-950"
+													: "bg-bg-weak-50 text-text-sub-600 hover:text-text-strong-950"
+											}`}
+										>
+											{idx + 1}. {labels[idx]}
+										</button>
+									);
+								},
+							)}
 						</div>
 					</div>
 				</Modal.Header>
@@ -257,7 +265,9 @@ export const CreateCampaignModal = ({
 							<div className="space-y-1.5">
 								<Label.Root htmlFor="campaign-preview">
 									Preview Text / Preheader{" "}
-									<span className="font-normal text-text-sub-600">(optional)</span>
+									<span className="font-normal text-text-sub-600">
+										(optional)
+									</span>
 								</Label.Root>
 								<Input.Root>
 									<Input.Wrapper>
@@ -288,7 +298,8 @@ export const CreateCampaignModal = ({
 												Send to All Contacts
 											</h4>
 											<p className="text-text-sub-600 text-xs">
-												Broadcast will be delivered to every active subscribed contact.
+												Broadcast will be delivered to every active subscribed
+												contact.
 											</p>
 										</div>
 									</div>
@@ -316,7 +327,9 @@ export const CreateCampaignModal = ({
 								</div>
 
 								<div className="space-y-1.5">
-									<Label.Root htmlFor="reply-to">Reply-To (Optional)</Label.Root>
+									<Label.Root htmlFor="reply-to">
+										Reply-To (Optional)
+									</Label.Root>
 									<Input.Root>
 										<Input.Wrapper>
 											<Input.Input
@@ -361,7 +374,10 @@ export const CreateCampaignModal = ({
 									</div>
 								</div>
 								<p className="text-[11px] text-text-sub-600">
-									Sending as <span className="font-mono text-text-strong-950">{senderEmailAddress}</span>
+									Sending as{" "}
+									<span className="font-mono text-text-strong-950">
+										{senderEmailAddress}
+									</span>
 								</p>
 							</div>
 						</div>
@@ -419,7 +435,9 @@ export const CreateCampaignModal = ({
 							<div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
 								{/* Editor Area */}
 								<div className="space-y-1.5">
-									<Label.Root htmlFor="email-body">Email HTML / Content</Label.Root>
+									<Label.Root htmlFor="email-body">
+										Email HTML / Content
+									</Label.Root>
 									<textarea
 										id="email-body"
 										value={contentHtml}
@@ -435,7 +453,9 @@ export const CreateCampaignModal = ({
 									<Label.Root>Live Preview</Label.Root>
 									<div
 										className={`flex flex-col overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 shadow-sm transition-all duration-200 dark:border-stroke-soft-100/50 ${
-											previewDevice === "mobile" ? "mx-auto max-w-[280px]" : "w-full"
+											previewDevice === "mobile"
+												? "mx-auto max-w-[280px]"
+												: "w-full"
 										}`}
 									>
 										{/* Mock email client header */}
@@ -501,7 +521,10 @@ export const CreateCampaignModal = ({
 										Recipients
 									</span>
 									<div className="flex items-center gap-1.5">
-										<Icon name="contacts" className="h-3.5 w-3.5 text-success-base" />
+										<Icon
+											name="contacts"
+											className="h-3.5 w-3.5 text-success-base"
+										/>
 										<span className="font-semibold text-success-base text-xs">
 											All Contacts ({totalContacts.toLocaleString()} recipients)
 										</span>
@@ -515,7 +538,8 @@ export const CreateCampaignModal = ({
 									Send test email
 								</h5>
 								<p className="mt-0.5 text-text-sub-600 text-xs">
-									Send a test copy to verify rendering in your own inbox before broadcasting.
+									Send a test copy to verify rendering in your own inbox before
+									broadcasting.
 								</p>
 
 								<div className="mt-3 flex items-center gap-2">
@@ -591,7 +615,9 @@ export const CreateCampaignModal = ({
 								onClick={() => {
 									if (step === "setup") {
 										if (!name.trim() || !subject.trim()) {
-											toast.error("Please enter a campaign name and subject line");
+											toast.error(
+												"Please enter a campaign name and subject line",
+											);
 											return;
 										}
 										setStep("audience");

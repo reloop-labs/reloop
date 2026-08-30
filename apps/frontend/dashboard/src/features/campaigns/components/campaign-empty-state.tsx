@@ -14,11 +14,13 @@ const steps = [
 	},
 	{
 		title: "Design or choose template",
-		description: "Compose rich HTML, pick a pre-built template, or write custom text.",
+		description:
+			"Compose rich HTML, pick a pre-built template, or write custom text.",
 	},
 	{
 		title: "Broadcast instantly",
-		description: "Preview across mobile/desktop and send to all contacts with one click.",
+		description:
+			"Preview across mobile/desktop and send to all contacts with one click.",
 	},
 ];
 
@@ -26,17 +28,20 @@ const features = [
 	{
 		icon: "contacts",
 		title: "Direct contact sync",
-		description: "Broadcasts automatically reach every active subscriber in your audience.",
+		description:
+			"Broadcasts automatically reach every active subscriber in your audience.",
 	},
 	{
 		icon: "sparkling",
 		title: "Real-time deliverability",
-		description: "Powered by Reloop's high-speed SMTP routing with DKIM & SPF authentication.",
+		description:
+			"Powered by Reloop's high-speed SMTP routing with DKIM & SPF authentication.",
 	},
 	{
 		icon: "fat-row",
 		title: "Deep analytics",
-		description: "Track deliveries, opens, and link clicks in real-time as emails land.",
+		description:
+			"Track deliveries, opens, and link clicks in real-time as emails land.",
 	},
 ];
 
@@ -51,7 +56,8 @@ export const CampaignEmptyState = ({ onCreate }: CampaignEmptyStateProps) => {
 					No campaigns created yet
 				</h3>
 				<p className="mx-auto mb-6 max-w-[340px] text-balance font-medium text-[13px] text-text-sub-600">
-					Broadcast announcements, product updates, and newsletters directly to all your contacts with rich analytics.
+					Broadcast announcements, product updates, and newsletters directly to
+					all your contacts with rich analytics.
 				</p>
 				<div className="flex items-center gap-3">
 					<Button.Root

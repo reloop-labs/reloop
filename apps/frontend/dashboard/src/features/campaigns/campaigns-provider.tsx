@@ -23,7 +23,10 @@ interface CampaignsContextValue {
 	isHydrated: boolean;
 	stats: CampaignStats;
 	getCampaign: (id: string) => Campaign | undefined;
-	createCampaign: (input: CreateCampaignInput, recipientCount: number) => Promise<Campaign>;
+	createCampaign: (
+		input: CreateCampaignInput,
+		recipientCount: number,
+	) => Promise<Campaign>;
 	sendCampaign: (id: string) => Promise<void>;
 	scheduleCampaign: (id: string, scheduledAt: string) => Promise<void>;
 	duplicateCampaign: (id: string) => Promise<Campaign>;
@@ -41,8 +44,10 @@ function generateSampleCampaigns(orgId: string): Campaign[] {
 			id: "cmp_product_update_2026",
 			organizationId: orgId,
 			name: "August 2026 Product Release Notes",
-			subject: "🚀 What's new in Reloop: AI Workflows, Better Deliverability & More",
-			previewText: "Check out our latest speed improvements and real-time email logs.",
+			subject:
+				"🚀 What's new in Reloop: AI Workflows, Better Deliverability & More",
+			previewText:
+				"Check out our latest speed improvements and real-time email logs.",
 			fromName: "Pranav from Reloop",
 			fromEmail: "updates@reloop.sh",
 			replyTo: "support@reloop.sh",
@@ -65,7 +70,8 @@ function generateSampleCampaigns(orgId: string): Campaign[] {
 			organizationId: orgId,
 			name: "Community Newsletter #14",
 			subject: "Tips for 99.9% email inbox placement in 2026",
-			previewText: "Avoid the spam folder with DMARC, DKIM, and warming strategies.",
+			previewText:
+				"Avoid the spam folder with DMARC, DKIM, and warming strategies.",
 			fromName: "Reloop Growth",
 			fromEmail: "newsletter@reloop.sh",
 			replyTo: "help@reloop.sh",
@@ -154,13 +160,26 @@ export function CampaignsProvider({ children }: { children: ReactNode }) {
 	const stats = useMemo<CampaignStats>(() => {
 		const sentCampaigns = campaigns.filter((c) => c.status === "sent");
 		const totalCampaigns = campaigns.length;
-		const totalDelivered = sentCampaigns.reduce((acc, c) => acc + c.deliveredCount, 0);
+		const totalDelivered = sentCampaigns.reduce(
+			(acc, c) => acc + c.deliveredCount,
+			0,
+		);
 		const totalSent = sentCampaigns.reduce((acc, c) => acc + c.sentCount, 0);
-		const totalOpened = sentCampaigns.reduce((acc, c) => acc + c.openedCount, 0);
-		const totalClicked = sentCampaigns.reduce((acc, c) => acc + c.clickedCount, 0);
+		const totalOpened = sentCampaigns.reduce(
+			(acc, c) => acc + c.openedCount,
+			0,
+		);
+		const totalClicked = sentCampaigns.reduce(
+			(acc, c) => acc + c.clickedCount,
+			0,
+		);
 
-		const avgOpenRate = totalDelivered > 0 ? Math.round((totalOpened / totalDelivered) * 100) : 0;
-		const avgClickRate = totalDelivered > 0 ? Math.round((totalClicked / totalDelivered) * 100) : 0;
+		const avgOpenRate =
+			totalDelivered > 0 ? Math.round((totalOpened / totalDelivered) * 100) : 0;
+		const avgClickRate =
+			totalDelivered > 0
+				? Math.round((totalClicked / totalDelivered) * 100)
+				: 0;
 
 		return {
 			totalCampaigns,
@@ -176,15 +195,20 @@ export function CampaignsProvider({ children }: { children: ReactNode }) {
 	);
 
 	const createCampaign = useCallback(
-		async (input: CreateCampaignInput, recipientCount: number): Promise<Campaign> => {
+		async (
+			input: CreateCampaignInput,
+			recipientCount: number,
+		): Promise<Campaign> => {
 			const now = new Date().toISOString();
 			const id = `cmp_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
-			
+
 			const isImmediate = input.sendImmediately;
 			const isScheduled = !!input.scheduledAt && !isImmediate;
 
 			const targetRecipients = recipientCount > 0 ? recipientCount : 1;
-			const deliveredEstimate = isImmediate ? Math.max(1, Math.round(targetRecipients * 0.99)) : 0;
+			const deliveredEstimate = isImmediate
+				? Math.max(1, Math.round(targetRecipients * 0.99))
+				: 0;
 
 			const newCampaign: Campaign = {
 				id,
@@ -227,7 +251,8 @@ export function CampaignsProvider({ children }: { children: ReactNode }) {
 			if (!existing) throw new Error("Campaign not found");
 
 			const now = new Date().toISOString();
-			const targetRecipients = existing.recipientCount > 0 ? existing.recipientCount : 1;
+			const targetRecipients =
+				existing.recipientCount > 0 ? existing.recipientCount : 1;
 			const delivered = Math.max(1, Math.round(targetRecipients * 0.99));
 
 			const updated = campaigns.map((c) =>
@@ -267,7 +292,9 @@ export function CampaignsProvider({ children }: { children: ReactNode }) {
 			);
 
 			saveCampaigns(updated);
-			toast.success(`Campaign scheduled for ${new Date(scheduledAt).toLocaleString()}`);
+			toast.success(
+				`Campaign scheduled for ${new Date(scheduledAt).toLocaleString()}`,
+			);
 		},
 		[campaigns, saveCampaigns],
 	);
@@ -307,7 +334,9 @@ export function CampaignsProvider({ children }: { children: ReactNode }) {
 			const existing = campaigns.find((c) => c.id === id);
 			const updated = campaigns.filter((c) => c.id !== id);
 			saveCampaigns(updated);
-			toast.success(existing ? `Deleted "${existing.name}"` : "Campaign deleted");
+			toast.success(
+				existing ? `Deleted "${existing.name}"` : "Campaign deleted",
+			);
 		},
 		[campaigns, saveCampaigns],
 	);

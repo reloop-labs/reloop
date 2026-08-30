@@ -7,7 +7,10 @@ interface CampaignStatsCardsProps {
 	isLoading?: boolean;
 }
 
-export function CampaignStatsCards({ stats, isLoading }: CampaignStatsCardsProps) {
+export function CampaignStatsCards({
+	stats,
+	isLoading,
+}: CampaignStatsCardsProps) {
 	const items = [
 		{
 			label: "Total Campaigns",
@@ -47,7 +50,10 @@ export function CampaignStatsCards({ stats, isLoading }: CampaignStatsCardsProps
 							{item.label}
 						</span>
 						<div className="flex h-7 w-7 items-center justify-center rounded-lg border border-stroke-soft-100 bg-bg-weak-50 dark:border-stroke-soft-100/40">
-							<Icon name={item.icon} className="h-3.5 w-3.5 text-text-sub-600" />
+							<Icon
+								name={item.icon}
+								className="h-3.5 w-3.5 text-text-sub-600"
+							/>
 						</div>
 					</div>
 

@@ -12,8 +12,13 @@ function CampaignDetailContent() {
 	const params = useParams();
 	const router = useRouter();
 	const campaignId = params?.campaignId as string;
-	const { getCampaign, sendCampaign, duplicateCampaign, deleteCampaign, isHydrated } =
-		useCampaigns();
+	const {
+		getCampaign,
+		sendCampaign,
+		duplicateCampaign,
+		deleteCampaign,
+		isHydrated,
+	} = useCampaigns();
 
 	const [activeTab, setActiveTab] = useState<"preview" | "raw">("preview");
 	const [actionPending, setActionPending] = useState(false);
@@ -38,16 +43,13 @@ function CampaignDetailContent() {
 				<div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-weak-50">
 					<Icon name="alert-triangle" className="h-6 w-6 text-warning-base" />
 				</div>
-				<h2 className="font-semibold text-lg text-text-strong-950">Campaign Not Found</h2>
+				<h2 className="font-semibold text-lg text-text-strong-950">
+					Campaign Not Found
+				</h2>
 				<p className="mt-1 text-text-sub-600 text-sm">
 					The requested campaign could not be located in your workspace.
 				</p>
-				<Button.Root
-					variant="neutral"
-					size="small"
-					asChild
-					className="mt-6"
-				>
+				<Button.Root variant="neutral" size="small" asChild className="mt-6">
 					<Link href="/campaigns">Return to Campaigns</Link>
 				</Button.Root>
 			</div>
@@ -122,9 +124,7 @@ function CampaignDetailContent() {
 							{campaign.status}
 						</span>
 					</div>
-					<p className="mt-1 text-text-sub-600 text-sm">
-						{campaign.subject}
-					</p>
+					<p className="mt-1 text-text-sub-600 text-sm">{campaign.subject}</p>
 				</div>
 
 				<div className="flex items-center gap-2 self-start sm:self-center">
@@ -174,7 +174,8 @@ function CampaignDetailContent() {
 							{campaign.sentCount.toLocaleString()}
 						</p>
 						<p className="mt-0.5 text-text-sub-600 text-xs">
-							Broadcasted {campaign.sentAt ? formatRelativeTime(campaign.sentAt) : ""}
+							Broadcasted{" "}
+							{campaign.sentAt ? formatRelativeTime(campaign.sentAt) : ""}
 						</p>
 					</div>
 
@@ -197,7 +198,9 @@ function CampaignDetailContent() {
 						<p className="mt-2 font-semibold text-2xl text-text-strong-950 tabular-nums">
 							{campaign.openedCount.toLocaleString()}
 						</p>
-						<p className="mt-0.5 text-text-sub-600 text-xs">Verified pixel loads</p>
+						<p className="mt-0.5 text-text-sub-600 text-xs">
+							Verified pixel loads
+						</p>
 					</div>
 
 					<div className="rounded-xl border border-stroke-soft-100 bg-bg-white-0 p-4 dark:border-stroke-soft-100/50">
@@ -207,7 +210,9 @@ function CampaignDetailContent() {
 						<p className="mt-2 font-semibold text-2xl text-text-strong-950 tabular-nums">
 							{campaign.clickedCount.toLocaleString()}
 						</p>
-						<p className="mt-0.5 text-text-sub-600 text-xs">Link interactions</p>
+						<p className="mt-0.5 text-text-sub-600 text-xs">
+							Link interactions
+						</p>
 					</div>
 				</div>
 			)}
@@ -223,7 +228,8 @@ function CampaignDetailContent() {
 				<div>
 					<p className="font-medium text-xs text-text-sub-600">Audience</p>
 					<p className="mt-1 font-medium text-text-strong-950 text-xs">
-						{campaign.audienceTargetName || "All Contacts"} ({campaign.recipientCount.toLocaleString()} recipients)
+						{campaign.audienceTargetName || "All Contacts"} (
+						{campaign.recipientCount.toLocaleString()} recipients)
 					</p>
 				</div>
 				<div>
@@ -237,7 +243,9 @@ function CampaignDetailContent() {
 			{/* Message Preview Container */}
 			<div className="overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/50">
 				<div className="flex items-center justify-between border-stroke-soft-100 border-b p-3 bg-bg-weak-50/50 dark:border-stroke-soft-100/50">
-					<span className="font-medium text-xs text-text-strong-950">Email Content Preview</span>
+					<span className="font-medium text-xs text-text-strong-950">
+						Email Content Preview
+					</span>
 					<div className="flex items-center gap-1 rounded-lg border border-stroke-soft-100 p-0.5">
 						<button
 							type="button"

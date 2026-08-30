@@ -1,20 +1,16 @@
 "use client";
 
-import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import { useMemo, useState } from "react";
-import { useHotkeys } from "react-hotkeys-hook";
 import type { CommandAction } from "#/features/dashboard/command-menu";
 import { useRegisterCommandActions } from "#/features/dashboard/command-menu-context";
-import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
-import type { CampaignStatus } from "./campaign-types";
+import { CampaignsListHeader } from "./campaigns-list-header";
 import { CampaignsProvider, useCampaigns } from "./campaigns-provider";
 import { CampaignStatsCards } from "./components/campaign-stats";
 import { CampaignTable } from "./components/campaign-table";
 import { CreateCampaignModal } from "./components/create-campaign-modal";
 
 function CampaignsPageContent() {
-	const { activeOrganization } = useActiveOrganization();
 	const { campaigns, stats, isLoading, isHydrated } = useCampaigns();
 	const [createOpen, setCreateOpen] = useState(false);
 	const [searchQuery, setSearchQuery] = useState("");
@@ -64,24 +60,6 @@ function CampaignsPageContent() {
 
 	useRegisterCommandActions("campaigns", "Campaigns", actions);
 
-	useHotkeys(
-		"c",
-		(e) => {
-			e.preventDefault();
-			handleCreate();
-		},
-		{ enableOnFormTags: false, preventDefault: true },
-	);
-
-	useHotkeys(
-		"d",
-		(e) => {
-			e.preventDefault();
-			window.open("https://reloop.sh/docs/learn/emails", "_blank");
-		},
-		{ enableOnFormTags: false, preventDefault: true },
-	);
-
 	const statusTabs: { id: string; label: string; count?: number }[] = [
 		{ id: "all", label: "All Campaigns", count: campaigns.length },
 		{
@@ -102,50 +80,9 @@ function CampaignsPageContent() {
 	];
 
 	return (
-		<div className="mx-auto max-w-5xl space-y-6 p-6 lg:p-8">
+		<div className="mx-auto max-w-6xl space-y-6 p-6 lg:p-8">
 			{/* Page Header */}
-			<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-				<div>
-					<h1 className="font-semibold text-2xl text-text-strong-950">Campaigns</h1>
-					<p className="mt-1 text-text-sub-600 text-sm">
-						Broadcast newsletters and email updates directly to all your contacts.
-					</p>
-				</div>
-
-				<div className="flex items-center gap-2 self-start sm:self-center">
-					<Button.Root
-						variant="neutral"
-						mode="stroke"
-						size="xsmall"
-						asChild
-						className="gap-2"
-					>
-						<a
-							href="https://reloop.sh/docs/learn/emails"
-							target="_blank"
-							rel="noopener noreferrer"
-						>
-							<Icon name="book-open" className="h-3.5 w-3.5" />
-							Docs
-						</a>
-					</Button.Root>
-
-					<Button.Root
-						variant="neutral"
-						size="xsmall"
-						onClick={handleCreate}
-						className="gap-2"
-					>
-						<Icon name="plus" className="h-4 w-4" />
-						Create campaign
-						<span className="inline-flex items-center gap-0.5">
-							<span className="flex h-4 w-4 items-center justify-center rounded-sm border border-stroke-soft-100/30 p-px font-medium text-[10px] uppercase">
-								C
-							</span>
-						</span>
-					</Button.Root>
-				</div>
-			</div>
+			<CampaignsListHeader onCreate={handleCreate} />
 
 			{/* Top Metric Cards */}
 			<CampaignStatsCards stats={stats} isLoading={!isHydrated || isLoading} />

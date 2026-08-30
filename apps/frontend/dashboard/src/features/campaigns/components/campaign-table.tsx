@@ -117,7 +117,9 @@ export const CampaignTable = ({
 						: 0;
 				const clickRate =
 					campaign.deliveredCount > 0
-						? Math.round((campaign.clickedCount / campaign.deliveredCount) * 100)
+						? Math.round(
+								(campaign.clickedCount / campaign.deliveredCount) * 100,
+							)
 						: 0;
 
 				return (
@@ -153,7 +155,9 @@ export const CampaignTable = ({
 									</span>
 								</div>
 								<p className="mt-0.5 truncate text-text-sub-600 text-xs">
-									<span className="font-medium text-text-sub-600">Subject:</span>{" "}
+									<span className="font-medium text-text-sub-600">
+										Subject:
+									</span>{" "}
 									{campaign.subject}
 								</p>
 							</div>
@@ -210,7 +214,10 @@ export const CampaignTable = ({
 						</div>
 
 						{/* Action Menu */}
-						<div className="flex shrink-0 items-center gap-1" onClick={(e) => e.stopPropagation()}>
+						<div
+							className="flex shrink-0 items-center gap-1"
+							onClick={(e) => e.stopPropagation()}
+						>
 							{campaign.status === "draft" && (
 								<button
 									type="button"
@@ -244,7 +251,12 @@ export const CampaignTable = ({
 
 									{campaign.status === "draft" && (
 										<Dropdown.Item
-											onClick={(e) => void handleSendNow(e as unknown as React.MouseEvent, campaign.id)}
+											onClick={(e) =>
+												void handleSendNow(
+													e as unknown as React.MouseEvent,
+													campaign.id,
+												)
+											}
 											className="gap-2"
 										>
 											<Icon name="mail-send" className="h-3.5 w-3.5" />
@@ -253,7 +265,12 @@ export const CampaignTable = ({
 									)}
 
 									<Dropdown.Item
-										onClick={(e) => void handleDuplicate(e as unknown as React.MouseEvent, campaign.id)}
+										onClick={(e) =>
+											void handleDuplicate(
+												e as unknown as React.MouseEvent,
+												campaign.id,
+											)
+										}
 										className="gap-2"
 									>
 										<Icon name="copy" className="h-3.5 w-3.5" />
@@ -263,7 +280,12 @@ export const CampaignTable = ({
 									<Dropdown.Separator />
 
 									<Dropdown.Item
-										onClick={(e) => void handleDelete(e as unknown as React.MouseEvent, campaign.id)}
+										onClick={(e) =>
+											void handleDelete(
+												e as unknown as React.MouseEvent,
+												campaign.id,
+											)
+										}
 										className="gap-2 text-error-base hover:text-error-base"
 									>
 										<Icon name="trash" className="h-3.5 w-3.5" />

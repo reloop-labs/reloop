@@ -1,4 +1,9 @@
-export type CampaignStatus = "draft" | "scheduled" | "sending" | "sent" | "cancelled";
+export type CampaignStatus =
+	| "draft"
+	| "scheduled"
+	| "sending"
+	| "sent"
+	| "cancelled";
 
 export type AudienceTargetType = "all" | "channel" | "group";
 
