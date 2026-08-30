@@ -683,9 +683,10 @@ function CreateCampaignPageContent() {
 										onClick={() => {
 											setAudienceType("group");
 											setTargetError("");
-											if (!selectedGroupId && availableGroups.length > 0) {
-												setSelectedGroupId(availableGroups[0].id);
-												setSelectedGroupName(availableGroups[0].name);
+											const firstGroup = availableGroups[0];
+											if (!selectedGroupId && firstGroup) {
+												setSelectedGroupId(firstGroup.id);
+												setSelectedGroupName(firstGroup.name);
 											}
 										}}
 										className={`group flex cursor-pointer flex-col justify-between rounded-xl border p-4 text-left transition-all ${
@@ -737,9 +738,10 @@ function CreateCampaignPageContent() {
 										onClick={() => {
 											setAudienceType("channel");
 											setTargetError("");
-											if (!selectedChannelId && availableChannels.length > 0) {
-												setSelectedChannelId(availableChannels[0].id);
-												setSelectedChannelName(availableChannels[0].name);
+											const firstChannel = availableChannels[0];
+											if (!selectedChannelId && firstChannel) {
+												setSelectedChannelId(firstChannel.id);
+												setSelectedChannelName(firstChannel.name);
 											}
 										}}
 										className={`group flex cursor-pointer flex-col justify-between rounded-xl border p-4 text-left transition-all ${
@@ -1068,7 +1070,7 @@ function CreateCampaignPageContent() {
 														const file = e.dataTransfer.files?.[0];
 														if (file) handleCsvFileUpload(file);
 													}}
-													className="flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-stroke-soft-300 bg-bg-white-0 px-6 py-8 text-center transition-colors hover:border-primary-base hover:bg-primary-base/[0.02] dark:border-stroke-soft-100/50 dark:bg-bg-white-0/5"
+													className="flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-stroke-soft-300 border-dashed bg-bg-white-0 px-6 py-8 text-center transition-colors hover:border-primary-base hover:bg-primary-base/[0.02] dark:border-stroke-soft-100/50 dark:bg-bg-white-0/5"
 												>
 													<div className="flex h-10 w-10 items-center justify-center rounded-xl border border-stroke-soft-200 bg-bg-weak-50 text-text-sub-600">
 														<Icon name="file-text" className="h-5 w-5" />
