@@ -22,7 +22,7 @@ interface CreateCampaignModalProps {
 	onOpenChange: (open: boolean) => void;
 }
 
-type Step = "setup" | "audience" | "content" | "review";
+type Step = "setup" | "audience" | "sender" | "content" | "review";
 
 export const CreateCampaignModal = ({
 	open,
@@ -199,26 +199,32 @@ export const CreateCampaignModal = ({
 
 						{/* Step indicator pills */}
 						<div className="hidden items-center gap-1 sm:flex">
-							{(["setup", "audience", "content", "review"] as Step[]).map(
-								(s, idx) => {
-									const labels = ["Details", "Audience", "Content", "Review"];
-									const active = step === s;
-									return (
-										<button
-											key={s}
-											type="button"
-											onClick={() => setStep(s)}
-											className={`rounded-full px-2.5 py-0.5 text-xs font-medium transition-colors ${
-												active
-													? "bg-bg-strong-950 text-text-white-0 dark:bg-bg-white-0 dark:text-text-strong-950"
-													: "bg-bg-weak-50 text-text-sub-600 hover:text-text-strong-950"
-											}`}
-										>
-											{idx + 1}. {labels[idx]}
-										</button>
-									);
-								},
-							)}
+							{(
+								["setup", "audience", "sender", "content", "review"] as Step[]
+							).map((s, idx) => {
+								const labels = [
+									"Details",
+									"Audience",
+									"Sender",
+									"Content",
+									"Review",
+								];
+								const active = step === s;
+								return (
+									<button
+										key={s}
+										type="button"
+										onClick={() => setStep(s)}
+										className={`rounded-full px-2.5 py-0.5 font-medium text-xs transition-colors ${
+											active
+												? "bg-bg-strong-950 text-text-white-0 dark:bg-bg-white-0 dark:text-text-strong-950"
+												: "bg-bg-weak-50 text-text-sub-600 hover:text-text-strong-950"
+										}`}
+									>
+										{idx + 1}. {labels[idx]}
+									</button>
+								);
+							})}
 						</div>
 					</div>
 				</Modal.Header>
@@ -245,45 +251,10 @@ export const CreateCampaignModal = ({
 									Internal title used for tracking in your dashboard.
 								</p>
 							</div>
-
-							<div className="space-y-1.5">
-								<Label.Root htmlFor="campaign-subject">
-									Subject Line <span className="text-error-base">*</span>
-								</Label.Root>
-								<Input.Root>
-									<Input.Wrapper>
-										<Input.Input
-											id="campaign-subject"
-											placeholder="e.g. 🚀 Reloop 2.0 is live: Check out what's new"
-											value={subject}
-											onChange={(e) => setSubject(e.target.value)}
-										/>
-									</Input.Wrapper>
-								</Input.Root>
-							</div>
-
-							<div className="space-y-1.5">
-								<Label.Root htmlFor="campaign-preview">
-									Preview Text / Preheader{" "}
-									<span className="font-normal text-text-sub-600">
-										(optional)
-									</span>
-								</Label.Root>
-								<Input.Root>
-									<Input.Wrapper>
-										<Input.Input
-											id="campaign-preview"
-											placeholder="Snippet displayed in inboxes right after the subject..."
-											value={previewText}
-											onChange={(e) => setPreviewText(e.target.value)}
-										/>
-									</Input.Wrapper>
-								</Input.Root>
-							</div>
 						</div>
 					)}
 
-					{/* STEP 2: AUDIENCE & SENDER */}
+					{/* STEP 2: AUDIENCE */}
 					{step === "audience" && (
 						<div className="space-y-5">
 							{/* Audience target box */}
@@ -309,7 +280,12 @@ export const CreateCampaignModal = ({
 									</div>
 								</div>
 							</div>
+						</div>
+					)}
 
+					{/* STEP 3: SENDER */}
+					{step === "sender" && (
+						<div className="space-y-5">
 							{/* Sender Name & From Address */}
 							<div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
 								<div className="space-y-1.5">
@@ -358,7 +334,7 @@ export const CreateCampaignModal = ({
 											</Input.Wrapper>
 										</Input.Root>
 									</div>
-									<span className="text-text-sub-600 text-sm">@</span>
+									<span className="text-sm text-text-sub-600">@</span>
 									<div className="w-48">
 										<select
 											value={effectiveDomain}
@@ -380,15 +356,55 @@ export const CreateCampaignModal = ({
 									</span>
 								</p>
 							</div>
+
+							{/* Subject Line */}
+							<div className="space-y-1.5 pt-1">
+								<Label.Root htmlFor="campaign-subject">
+									Subject Line <span className="text-error-base">*</span>
+								</Label.Root>
+								<Input.Root>
+									<Input.Wrapper>
+										<Input.Input
+											id="campaign-subject"
+											placeholder="e.g. 🚀 Reloop 2.0 is live: Check out what's new"
+											value={subject}
+											onChange={(e) => setSubject(e.target.value)}
+										/>
+									</Input.Wrapper>
+								</Input.Root>
+								<p className="text-[11px] text-text-sub-600">
+									The primary subject line subscribers see in their inboxes.
+								</p>
+							</div>
+
+							{/* Preview Text */}
+							<div className="space-y-1.5">
+								<Label.Root htmlFor="campaign-preview">
+									Preview Text (Optional)
+								</Label.Root>
+								<Input.Root>
+									<Input.Wrapper>
+										<Input.Input
+											id="campaign-preview"
+											placeholder="Snippet displayed in inboxes right after the subject..."
+											value={previewText}
+											onChange={(e) => setPreviewText(e.target.value)}
+										/>
+									</Input.Wrapper>
+								</Input.Root>
+								<p className="text-[11px] text-text-sub-600">
+									Secondary preview line displayed in email clients.
+								</p>
+							</div>
 						</div>
 					)}
 
-					{/* STEP 3: CONTENT & PREVIEW */}
+					{/* STEP 4: CONTENT & PREVIEW */}
 					{step === "content" && (
 						<div className="space-y-4">
 							<div className="flex items-center justify-between">
 								<div className="flex items-center gap-2">
-									<span className="font-medium text-xs text-text-sub-600">
+									<span className="font-medium text-text-sub-600 text-xs">
 										Merge tags:
 									</span>
 									{["{{firstName}}", "{{email}}", "{{company}}"].map((tag) => (
@@ -443,7 +459,7 @@ export const CreateCampaignModal = ({
 										value={contentHtml}
 										onChange={(e) => setContentHtml(e.target.value)}
 										rows={12}
-										className="w-full rounded-xl border border-stroke-soft-100 bg-bg-white-0 p-3 font-mono text-xs text-text-strong-950 outline-none focus:border-stroke-strong-950 dark:border-stroke-soft-100/50"
+										className="w-full rounded-xl border border-stroke-soft-100 bg-bg-white-0 p-3 font-mono text-text-strong-950 text-xs outline-none focus:border-stroke-strong-950 dark:border-stroke-soft-100/50"
 										placeholder="Write HTML or plain text message..."
 									/>
 								</div>
@@ -460,17 +476,17 @@ export const CreateCampaignModal = ({
 									>
 										{/* Mock email client header */}
 										<div className="border-stroke-soft-100 border-b bg-bg-weak-50/50 p-2.5 text-xs dark:border-stroke-soft-100/50">
-											<p className="font-semibold text-text-strong-950 truncate">
+											<p className="truncate font-semibold text-text-strong-950">
 												{subject || "Subject line..."}
 											</p>
-											<p className="text-[11px] text-text-sub-600 truncate">
+											<p className="truncate text-[11px] text-text-sub-600">
 												From: {fromName} &lt;{senderEmailAddress}&gt;
 											</p>
 										</div>
 
 										{/* Rendered HTML */}
 										<div
-											className="prose prose-sm max-h-56 overflow-y-auto p-3 text-text-strong-950 text-xs dark:prose-invert"
+											className="prose prose-sm dark:prose-invert max-h-56 overflow-y-auto p-3 text-text-strong-950 text-xs"
 											dangerouslySetInnerHTML={{
 												__html: contentHtml
 													.replace(/\{\{firstName.*?\}\}/g, "Pranav")
@@ -502,7 +518,7 @@ export const CreateCampaignModal = ({
 									<span className="font-medium text-text-sub-600 text-xs">
 										Subject Line
 									</span>
-									<span className="font-medium text-text-strong-950 text-xs text-right max-w-[280px] truncate">
+									<span className="max-w-[280px] truncate text-right font-medium text-text-strong-950 text-xs">
 										{subject || "No subject specified"}
 									</span>
 								</div>
@@ -587,7 +603,8 @@ export const CreateCampaignModal = ({
 							size="small"
 							onClick={() => {
 								if (step === "audience") setStep("setup");
-								if (step === "content") setStep("audience");
+								if (step === "sender") setStep("audience");
+								if (step === "content") setStep("sender");
 								if (step === "review") setStep("content");
 							}}
 							disabled={busy || isSendingBroadcast}
@@ -614,14 +631,18 @@ export const CreateCampaignModal = ({
 								size="small"
 								onClick={() => {
 									if (step === "setup") {
-										if (!name.trim() || !subject.trim()) {
-											toast.error(
-												"Please enter a campaign name and subject line",
-											);
+										if (!name.trim()) {
+											toast.error("Please enter a campaign name");
 											return;
 										}
 										setStep("audience");
 									} else if (step === "audience") {
+										setStep("sender");
+									} else if (step === "sender") {
+										if (!subject.trim()) {
+											toast.error("Please enter a subject line");
+											return;
+										}
 										setStep("content");
 									} else if (step === "content") {
 										setStep("review");
