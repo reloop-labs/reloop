@@ -53,6 +53,13 @@ export const mainNavigation: MainNavigationItem[] = [
 		],
 	},
 	{
+		label: "Campaigns",
+		path: "/campaigns",
+		iconName: "mega-phone",
+		shortcut: { label: "G A", keys: ["g a", "g+a"] },
+		section: "Messaging",
+	},
+	{
 		label: "Templates",
 		path: "/templates",
 		iconName: "layout",
@@ -60,8 +67,8 @@ export const mainNavigation: MainNavigationItem[] = [
 		section: "Messaging",
 	},
 	{
-		label: "Workflows",
-		path: "/workflows",
+		label: "Automation",
+		path: "/automation",
 		iconName: "workflow",
 		shortcut: { label: "G F", keys: ["g f", "g+f"] },
 		section: "Messaging",

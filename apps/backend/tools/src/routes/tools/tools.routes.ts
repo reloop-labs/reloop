@@ -1,6 +1,7 @@
 import { bimiCheckRoute } from "@be/tools/routes/tools/bimi-check/bimi-check.route";
 import { blocklistCheckRoute } from "@be/tools/routes/tools/blocklist-check/blocklist-check.route";
 import { deliverabilityTestRoute } from "@be/tools/routes/tools/deliverability-test/deliverability-test.route";
+import { dnsLookupRoute } from "@be/tools/routes/tools/dns-lookup/dns-lookup.route";
 import { emailHealthCheckRoute } from "@be/tools/routes/tools/email-health-check/email-health-check.route";
 import { recordGenerateRoute } from "@be/tools/routes/tools/record-generate/record-generate.route";
 import { spamCheckRoute } from "@be/tools/routes/tools/spam-check/spam-check.route";
@@ -16,5 +17,6 @@ export const toolsRoutes = new Elysia({
 	.use(blocklistCheckRoute)
 	.use(deliverabilityTestRoute)
 	.use(emailHealthCheckRoute)
+	.use(dnsLookupRoute)
 	.use(bimiCheckRoute)
 	.use(recordGenerateRoute);

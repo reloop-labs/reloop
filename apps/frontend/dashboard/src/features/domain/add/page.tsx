@@ -127,7 +127,7 @@ export function AddDomainPage() {
 	);
 
 	return (
-		<div className="flex h-[calc(100dvh-200px)] items-center">
+		<div className="flex min-h-[calc(100dvh-200px)] w-full items-start justify-center pt-8 pb-16 sm:pt-16 lg:pt-20">
 			<div className="mx-auto grid w-full max-w-5xl lg:grid-cols-2">
 				{/* Left: form column */}
 				<div className="mx-auto w-full max-w-md px-6 py-12 lg:px-8">
@@ -275,10 +275,8 @@ export function AddDomainPage() {
 				</div>
 
 				{/* Right: email preview */}
-				<div className="hidden h-full items-center justify-center overflow-hidden lg:flex">
-					<div className="relative h-full w-full">
-						<DomainPreview domain={watchedDomain} variant="domain" />
-					</div>
+				<div className="relative hidden overflow-hidden lg:block">
+					<DomainPreview domain={watchedDomain} variant="domain" />
 				</div>
 			</div>
 		</div>

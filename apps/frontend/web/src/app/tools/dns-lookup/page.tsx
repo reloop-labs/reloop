@@ -4,10 +4,10 @@ import { BlogCta } from "@reloop/web/components/landing/blog/blog-cta";
 import { createPageMetadata } from "@reloop/web/lib/metadata";
 import { getSiteUrl } from "@reloop/web/lib/site";
 import { ApiSection } from "./api-section";
-import { CheckerPanel } from "./checker-panel";
 import {
 	faqGroups,
 	faqs,
+	metaDescription,
 	reasons,
 	toolDescription,
 	toolKeywords,
@@ -16,18 +16,19 @@ import {
 } from "./content";
 import { FaqGrid } from "./faq-grid";
 import { Band, SectionIntro } from "./grid";
+import { LookupPanel } from "./lookup-panel";
 
 export const instant = false;
 
 export const metadata = createPageMetadata({
 	title: toolTitle,
-	description: toolDescription,
+	description: metaDescription,
 	path: toolPath,
 	keywords: toolKeywords,
 	ogImage: false,
 });
 
-export default function SpamScoreCheckerPage() {
+export default function DnsLookupPage() {
 	const siteUrl = getSiteUrl();
 
 	return (
@@ -39,7 +40,7 @@ export default function SpamScoreCheckerPage() {
 						"@type": "WebApplication",
 						name: `${toolTitle} | Reloop`,
 						url: `${siteUrl}${toolPath}`,
-						description: toolDescription,
+						description: metaDescription,
 						applicationCategory: "DeveloperApplication",
 						operatingSystem: "Any",
 						offers: {
@@ -47,6 +48,12 @@ export default function SpamScoreCheckerPage() {
 							price: "0",
 							priceCurrency: "USD",
 						},
+						featureList: [
+							"A, AAAA, MX, TXT, CNAME, NS, SOA, CAA, PTR record lookups",
+							"DNS hosting provider detection (Cloudflare, Route 53, etc.)",
+							"SPF and DMARC spoof protection diagnostics",
+							"Public HTTP API, rate limited per IP",
+						],
 						publisher: {
 							"@type": "Organization",
 							name: "Reloop",
@@ -91,12 +98,12 @@ export default function SpamScoreCheckerPage() {
 				<div className="relative px-5 pt-14 pb-16 sm:px-6 sm:pt-16 md:px-8 lg:pb-20">
 					<div className="mx-auto max-w-3xl text-center">
 						<span className="inline-flex items-center gap-2 rounded-full border border-stroke-soft-200 bg-bg-white-0 px-3 py-1 font-mono text-[11px] text-text-sub-600 uppercase tracking-[0.12em] dark:border-white/12 dark:bg-black dark:text-white/45">
-							<span className="size-1.5 rounded-full bg-text-strong-950 dark:bg-white" />
-							Free tool — no account
+							<span className="size-1.5 rounded-full bg-emerald-500" />
+							Free DNS &amp; SuperTool Utility
 						</span>
 
 						<h1 className="mt-6 font-semibold text-[2.4rem] text-text-strong-950 leading-[1.05] tracking-[-1.4px] sm:text-[3.4rem] dark:text-white">
-							Email Content &amp; Spam Score Checker
+							DNS Lookup &amp; Record Analyzer
 						</h1>
 
 						<p className="mx-auto mt-5 max-w-xl text-[15px] text-text-sub-600 leading-relaxed sm:text-[17px] dark:text-white/50">
@@ -105,16 +112,16 @@ export default function SpamScoreCheckerPage() {
 					</div>
 
 					<div className="mt-10">
-						<CheckerPanel />
+						<LookupPanel />
 					</div>
 				</div>
 			</Band>
 
-			{/* Section: Why Spam Score Matters - styled exactly like landing page highlight cards */}
+			{/* Section: Why DNS Records Matter */}
 			<Band id="why-it-matters">
 				<SectionIntro
-					lead="Why checking before sending saves your domain."
-					description="Poor content formatting and blacklisted words lower inbox placement for all future emails sent from your domain."
+					lead="Why fast and accurate DNS matters."
+					description="DNS is the backbone of your domain's web presence and email reputation. Broken or unconfigured records lead directly to spam filtering and delivery outages."
 				/>
 
 				<div className="grid grid-cols-1 divide-y divide-stroke-soft-200 border-stroke-soft-200 border-t sm:grid-cols-2 sm:divide-x sm:divide-y-0 lg:grid-cols-4 dark:divide-white/10 dark:border-white/10">
@@ -143,8 +150,8 @@ export default function SpamScoreCheckerPage() {
 			{/* Section: Programmatic API Integration */}
 			<Band id="api">
 				<SectionIntro
-					lead="Validate content via code."
-					description="Integrate automated spam checks into your CI/CD pipelines, email generation workflows, and signup systems."
+					lead="Query DNS records programmatically."
+					description="POST a domain or IP to the public DNS endpoint. Zero authentication required with full JSON responses in milliseconds."
 				/>
 
 				<ApiSection />
@@ -154,7 +161,7 @@ export default function SpamScoreCheckerPage() {
 			<Band id="faq">
 				<SectionIntro
 					lead="Frequently asked questions."
-					description="Answers to common questions regarding email spam scores, deliverability filters, and inbox placement."
+					description="Everything you need to know about DNS records, email authentication, nameservers, and TTL propagation."
 				/>
 
 				<FaqGrid groups={faqGroups} />

@@ -31,7 +31,7 @@ export const NAV_SECTIONS: NavGroup[] = [
 		items: [
 			{ id: "contacts", label: "Contacts", icon: "contacts" },
 			{ id: "templates", label: "Templates", icon: "layout" },
-			{ id: "workflow", label: "Workflows", icon: "workflow" },
+			{ id: "workflow", label: "Automation", icon: "workflow" },
 		],
 	},
 	{

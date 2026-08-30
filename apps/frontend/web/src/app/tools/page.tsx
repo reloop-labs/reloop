@@ -40,7 +40,19 @@ interface ToolVisualMeta {
 }
 
 const TOOL_VISUAL_MAP: Record<string, ToolVisualMeta> = {
-	"spam-score-checker": {
+	"dns-lookup": {
+		icon: "globe",
+		badge: "DNS & SuperTool",
+		badgeColor:
+			"bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/20",
+		glowColor: "group-hover:border-blue-500/40",
+		features: [
+			"A, AAAA, MX, TXT, CNAME, NS, SOA, CAA, PTR",
+			"Automatic DNS hosting provider detection",
+			"SPF and DMARC deliverability health audit",
+		],
+	},
+	"email-spam-words-checker": {
 		icon: "shield-check",
 		badge: "Deliverability",
 		badgeColor:

@@ -7,7 +7,8 @@ import {
 	isPrivateOrReservedIpv4,
 	lookupSpf,
 	parseTarget,
-	resolveDomainMailIps,
+	resolveDomainMxIps,
+	resolveDomainWebIps,
 	reverseHostname,
 } from "./blocklist-input";
 import {
@@ -197,22 +198,44 @@ export async function checkBlocklistController(
 			});
 		}
 
-		if (checkedIps.length === 0) {
-			const resolved = await resolveDomainMailIps(parsed.target);
-			if (resolved.ips.length > 0) {
-				for (const ip of uniqueIps(resolved.ips).slice(0, 3)) {
-					checkedIps.push({
-						ip,
-						source: resolved.source,
-						version: ipVersionOf(ip),
-					});
-				}
-				if (resolved.source === "mx") {
-					ipNote = `Queried MX mail server IP (${resolved.ips[0]}) for IP blocklists.`;
-				}
-			} else if (spf.ranges.length > 0) {
-				ipNote = `SPF publishes CIDR ranges (${spf.ranges.slice(0, 3).join(", ")}) rather than single sending IPs. Enter a specific SMTP IP to check IP lists.`;
+		const [mxIps, webIps] = await Promise.all([
+			resolveDomainMxIps(parsed.target),
+			resolveDomainWebIps(parsed.target),
+		]);
+
+		// Add MX mail server IPs
+		for (const ip of uniqueIps(mxIps).slice(0, 3)) {
+			if (!checkedIps.some((c) => c.ip === ip)) {
+				checkedIps.push({
+					ip,
+					source: "mx",
+					version: ipVersionOf(ip),
+				});
 			}
+		}
+
+		// Also add domain web hosting IP (A record)
+		for (const ip of uniqueIps(webIps).slice(0, 2)) {
+			if (!checkedIps.some((c) => c.ip === ip)) {
+				checkedIps.push({
+					ip,
+					source: "a",
+					version: ipVersionOf(ip),
+				});
+			}
+		}
+
+		if (checkedIps.length > 0) {
+			const sources = [...new Set(checkedIps.map((c) => c.source))];
+			const labels = sources.map((s) => {
+				if (s === "spf") return "SPF dedicated IPs";
+				if (s === "mx") return "MX mail server IP";
+				if (s === "a") return "website hosting IP";
+				return "IP";
+			});
+			ipNote = `Queried ${labels.join(" and ")} for IP blocklists.`;
+		} else if (spf.ranges.length > 0) {
+			ipNote = `SPF publishes CIDR ranges (${spf.ranges.slice(0, 3).join(", ")}) rather than single sending IPs. Enter a specific SMTP IP to check IP lists.`;
 		}
 	}
 

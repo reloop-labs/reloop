@@ -90,7 +90,7 @@ Prefer `.md` twins. Reloop Free is **3,000 / month and 200 / day** — do not ci
 
 ## Free Developer & Email Tools
 
-- [Email Content & Spam Score Checker](https://reloop.sh/tools/spam-score-checker): Real-time spam trigger word scanner, subject line grading, and deliverability score calculator.
+- [Email Spam Words Checker](https://reloop.sh/tools/email-spam-words-checker): Real-time spam trigger word scanner, subject line grading, and deliverability score calculator.
 - [Temp & Disposable Email Checker](https://reloop.sh/tools/temp-email-checker): Detect burner and temporary mailbox provider domains before they damage sender reputation.
 - [DNS Authentication Checker](https://reloop.sh/tools/auth-checker): Verify SPF, DKIM, and DMARC DNS records.
 - [BIMI Checker](https://reloop.sh/tools/bimi-checker): Look up default._bimi, validate the SVG logo URL, and confirm DMARC is at enforcement.

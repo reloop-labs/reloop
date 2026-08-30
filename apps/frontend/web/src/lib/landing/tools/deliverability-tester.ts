@@ -76,8 +76,8 @@ export const config: ToolDefinition = {
 			href: "/tools/auth-checker",
 		},
 		{
-			label: "Spam score checker",
-			href: "/tools/spam-score-checker",
+			label: "Email spam words checker",
+			href: "/tools/email-spam-words-checker",
 		},
 	],
 };

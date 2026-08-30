@@ -86,7 +86,7 @@ Base URL: `https://reloop.sh`
 ### Free developer & deliverability tools
 
 Web-based utilities for developers and email senders:
-- **Email Content & Spam Score Checker**: https://reloop.sh/tools/spam-score-checker
+- **Email Spam Words Checker**: https://reloop.sh/tools/email-spam-words-checker
 - **Temp / Disposable Email Checker**: https://reloop.sh/tools/temp-email-checker
 - **DNS Auth & SPF/DKIM/DMARC Checker**: https://reloop.sh/tools/auth-checker
 - **BIMI Checker**: https://reloop.sh/tools/bimi-checker

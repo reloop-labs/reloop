@@ -137,9 +137,6 @@ export function useGenerateApiKey() {
 			setTestTo(data.to ?? null);
 			setTestFrom(data.from ?? null);
 			setTestStatus("sent");
-			toast.success(
-				data.to ? `Email sent to ${data.to}` : "Email sent — check your inbox",
-			);
 		} catch (error) {
 			const errorMessage = axios.isAxiosError(error)
 				? error.response?.data?.message ||

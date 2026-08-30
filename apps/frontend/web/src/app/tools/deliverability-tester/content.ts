@@ -9,7 +9,7 @@ export const metaDescription =
 	"Send a real email to get an instant 0–10 deliverability score. Comprehensive diagnostics for SPF, DKIM, DMARC alignment, IP DNSBL blacklists, Rspamd spam symbols, and MIME structure.";
 
 export const toolDescription =
-	"Send a test email from your ESP, SMTP server, or client to get a complete 0–10 deliverability report. Tests SPF, DKIM, DMARC alignment, reverse DNS, 23+ blocklists, Rspamd spam filters, and link reachability.";
+	"Send a test email from your ESP, SMTP server, or client to get a complete 0–10 deliverability report. Tests SPF, DKIM, DMARC alignment, reverse DNS, 40+ blocklists, Rspamd spam filters, and link reachability.";
 
 export const toolKeywords = [
 	"email deliverability test",
@@ -31,9 +31,9 @@ export const reasons = [
 	},
 	{
 		icon: "alert-triangle" as const,
-		title: "23+ Public DNS Blocklists",
+		title: "40+ Public DNS Blocklists",
 		description:
-			"Queries sending IPs on Spamhaus ZEN, Barracuda, and SpamCop, and sender domains on Spamhaus DBL, URIBL, and SURBL.",
+			"Queries sending IPs on Spamhaus ZEN, Barracuda, SpamCop, SEM, UCEPROTECT, and sender domains on Spamhaus DBL, URIBL, and SURBL.",
 	},
 	{
 		icon: "sliders-horiz-2" as const,
@@ -53,7 +53,7 @@ export const faqs: FaqItem[] = [
 	{
 		question: "What does this deliverability tester evaluate?",
 		answer:
-			"It analyzes technical deliverability: cryptographic DKIM verification, SPF and DMARC alignment, reverse DNS (PTR/FCrDNS), 23+ IP and domain DNSBL blocklists, Rspamd spam scoring and symbols, multipart MIME balance, and link health. It starts at a perfect 10.0 score and applies deductions for every detected issue.",
+			"It analyzes technical deliverability: cryptographic DKIM verification, SPF and DMARC alignment, reverse DNS (PTR/FCrDNS), 40+ IP and domain DNSBL blocklists, Rspamd spam scoring and symbols, multipart MIME balance, and link health. It starts at a perfect 10.0 score and applies deductions for every detected issue.",
 	},
 	{
 		question:

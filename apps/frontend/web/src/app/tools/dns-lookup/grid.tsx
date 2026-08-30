@@ -3,7 +3,6 @@ import { Icon } from "@reloop/ui/icon";
 import type React from "react";
 
 export const hairline = "border-stroke-soft-200 dark:border-white/10";
-
 const railWidth = "mx-auto w-full max-w-5xl md:max-w-7xl";
 
 export function Rails({
@@ -113,93 +112,6 @@ export function SectionIntro({
 					{description}
 				</p>
 			)}
-		</div>
-	);
-}
-
-export function CellGrid({
-	children,
-	cols = 3,
-	className,
-}: {
-	children: React.ReactNode;
-	cols?: 2 | 3 | 4;
-	className?: string;
-}) {
-	const colClass = {
-		2: "md:grid-cols-2",
-		3: "sm:grid-cols-2 lg:grid-cols-3",
-		4: "sm:grid-cols-2 lg:grid-cols-4",
-	}[cols];
-
-	return (
-		<div
-			className={cn(
-				"grid divide-y md:divide-x md:divide-y-0",
-				colClass,
-				hairline,
-				className,
-			)}
-		>
-			{children}
-		</div>
-	);
-}
-
-export function Cell({
-	children,
-	className,
-}: {
-	children: React.ReactNode;
-	className?: string;
-}) {
-	return (
-		<div
-			className={cn(
-				"flex flex-col justify-between p-6 sm:p-7 md:p-8",
-				className,
-			)}
-		>
-			{children}
-		</div>
-	);
-}
-
-export function CellLabel({ tag, icon }: { tag?: string; icon?: string }) {
-	return (
-		<div className="mb-6 flex items-center justify-between gap-3">
-			{tag ? (
-				<span className="font-mono text-[11px] text-text-sub-600 uppercase tracking-[0.14em] dark:text-white/50">
-					{tag}
-				</span>
-			) : (
-				<span />
-			)}
-			{icon && (
-				<Icon
-					name={icon}
-					className="size-4 text-text-soft-400 dark:text-white/30"
-				/>
-			)}
-		</div>
-	);
-}
-
-export function CellCopy({
-	title,
-	description,
-}: {
-	title: string;
-	description: string;
-}) {
-	return (
-		<div>
-			<h3 className="font-semibold text-[17px] text-text-strong-950 tracking-tight sm:text-[18px] dark:text-white">
-				{title}
-			</h3>
-			<p className="mt-2 text-[14px] text-text-sub-600 leading-relaxed dark:text-white/50">
-				{description}
-			</p>
 		</div>
 	);
 }

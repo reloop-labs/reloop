@@ -57,18 +57,19 @@ const TOOL_LANGUAGES: ToolLanguage[] = [
 		packageName: "reloop-email",
 		icon: siNodedotjs,
 		installCommand: "npm install reloop-email",
-		fileName: "check_spam.ts",
+		fileName: "lookup_dns.ts",
 		checkCode: `import Reloop from 'reloop-email';
 
 const reloop = new Reloop(process.env.RELOOP_API_KEY);
 
-const analysis = await reloop.tools.checkSpamScore({
-  subject: 'Your monthly analytics report is ready',
-  body: 'Hi Alex, your weekly report has been generated. View your metrics online: https://reloop.sh/analytics',
+const result = await reloop.tools.dnsLookup({
+  domain: 'stripe.com',
+  recordType: 'ANY', // or 'A', 'MX', 'TXT', 'CNAME'
 });
 
-console.log(\`Score: \${analysis.score}/100 (\${analysis.verdict})\`);
-console.log('Detected Triggers:', analysis.detectedTriggers);`,
+console.log(\`Provider: \${result.provider?.name} (Latency: \${result.responseTimeMs}ms)\`);
+console.log(\`Records: \${result.records.length} found\`);
+console.log(\`DMARC Policy: \${result.summary.dmarcPolicy}\`);`,
 		frameworks: [
 			{
 				slug: "nodejs",
@@ -78,12 +79,11 @@ console.log('Detected Triggers:', analysis.detectedTriggers);`,
 
 const reloop = new Reloop(process.env.RELOOP_API_KEY);
 
-const analysis = await reloop.tools.checkSpamScore({
-  subject: 'Your monthly analytics report is ready',
-  body: 'Hi Alex, your weekly report has been generated. View your metrics online: https://reloop.sh/analytics',
+const result = await reloop.tools.dnsLookup({
+  domain: 'stripe.com',
 });
 
-console.log(\`Score: \${analysis.score}/100 (\${analysis.verdict})\`);`,
+console.log(\`Provider: \${result.provider?.name}\`);`,
 			},
 		],
 	},
@@ -93,19 +93,19 @@ console.log(\`Score: \${analysis.score}/100 (\${analysis.verdict})\`);`,
 		packageName: "reloop-email",
 		icon: siPython,
 		installCommand: "pip install reloop-email",
-		fileName: "check_spam.py",
+		fileName: "lookup_dns.py",
 		checkCode: `import os
 from reloop import Reloop
 
 client = Reloop(api_key=os.environ["RELOOP_API_KEY"])
 
-analysis = client.tools.check_spam_score(
-    subject="Your monthly analytics report is ready",
-    body="Hi Alex, your weekly report has been generated. View your metrics online: https://reloop.sh/analytics"
+report = client.tools.dns_lookup(
+    domain="stripe.com",
+    record_type="ANY"
 )
 
-print(f"Score: {analysis.score}/100 ({analysis.verdict})")
-print(f"Trigger Words: {analysis.detected_triggers}")`,
+print(f"Provider: {report.provider.name} (Records: {len(report.records)})")
+print(f"DMARC Policy: {report.summary.dmarc_policy}")`,
 		frameworks: [
 			{
 				slug: "python",
@@ -116,12 +116,11 @@ from reloop import Reloop
 
 client = Reloop(api_key=os.environ["RELOOP_API_KEY"])
 
-analysis = client.tools.check_spam_score(
-    subject="Your monthly analytics report is ready",
-    body="Hi Alex, your weekly report has been generated."
+report = client.tools.dns_lookup(
+    domain="stripe.com"
 )
 
-print(f"Score: {analysis.score}/100 ({analysis.verdict})")`,
+print(f"Records: {len(report.records)}")`,
 			},
 		],
 	},
@@ -131,7 +130,7 @@ print(f"Score: {analysis.score}/100 ({analysis.verdict})")`,
 		packageName: "github.com/reloop-labs/reloop-go/v2",
 		icon: siGo,
 		installCommand: "go get github.com/reloop-labs/reloop-go/v2",
-		fileName: "check_spam.go",
+		fileName: "lookup_dns.go",
 		checkCode: `package main
 
 import (
@@ -144,15 +143,15 @@ import (
 func main() {
 	client := reloop.NewClient(os.Getenv("RELOOP_API_KEY"))
 
-	res, err := client.Tools.CheckSpamScore(context.Background(), &reloop.SpamCheckRequest{
-		Subject: "Your monthly analytics report is ready",
-		Body:    "Hi Alex, your weekly report has been generated. View your metrics online: https://reloop.sh/analytics",
+	res, err := client.Tools.DnsLookup(context.Background(), &reloop.DnsLookupRequest{
+		Domain:     "stripe.com",
+		RecordType: "ANY",
 	})
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Printf("Score: %d/100 (%s)\\n", res.Score, res.Verdict)
+	fmt.Printf("Provider: %s (Records: %d)\\n", res.Provider.Name, len(res.Records))
 }`,
 		frameworks: [
 			{
@@ -171,12 +170,11 @@ import (
 func main() {
 	client := reloop.NewClient(os.Getenv("RELOOP_API_KEY"))
 
-	res, _ := client.Tools.CheckSpamScore(context.Background(), &reloop.SpamCheckRequest{
-		Subject: "Your monthly analytics report is ready",
-		Body:    "Hi Alex, your weekly report has been generated.",
+	res, _ := client.Tools.DnsLookup(context.Background(), &reloop.DnsLookupRequest{
+		Domain: "stripe.com",
 	})
 
-	fmt.Printf("Score: %d/100 (%s)\\n", res.Score, res.Verdict)
+	fmt.Printf("Records: %d\\n", len(res.Records))
 }`,
 			},
 		],
@@ -187,19 +185,19 @@ func main() {
 		packageName: "reloop",
 		icon: siRust,
 		installCommand: "cargo add reloop",
-		fileName: "check_spam.rs",
-		checkCode: `use reloop::{Client, SpamCheckRequest};
+		fileName: "lookup_dns.rs",
+		checkCode: `use reloop::{Client, DnsLookupRequest};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let client = Client::from_env()?;
 
-    let analysis = client.tools().check_spam_score(&SpamCheckRequest {
-        subject: "Your monthly analytics report is ready".into(),
-        body: "Hi Alex, your weekly report has been generated.".into(),
+    let report = client.tools().dns_lookup(&DnsLookupRequest {
+        domain: "stripe.com".into(),
+        record_type: Some("ANY".into()),
     }).await?;
 
-    println!("Score: {}/100 ({})", analysis.score, analysis.verdict);
+    println!("Provider: {:?} (Records: {})", report.provider.map(|p| p.name), report.records.len());
     Ok(())
 }`,
 		frameworks: [],
@@ -210,18 +208,18 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 		packageName: "reloop/reloop-email",
 		icon: siPhp,
 		installCommand: "composer require reloop/reloop-email",
-		fileName: "check_spam.php",
+		fileName: "lookup_dns.php",
 		checkCode: `<?php
 use Reloop\\Reloop;
 
 $reloop = new Reloop(getenv('RELOOP_API_KEY'));
 
-$analysis = $reloop->tools->checkSpamScore([
-    'subject' => 'Your monthly analytics report is ready',
-    'body' => 'Hi Alex, your weekly report has been generated. View online: https://reloop.sh/analytics',
+$report = $reloop->tools->dnsLookup([
+    'domain' => 'stripe.com',
+    'recordType' => 'ANY',
 ]);
 
-echo "Score: {$analysis->score}/100 ({$analysis->verdict})\\n";`,
+echo "Records found: " . count($report->records) . "\\n";`,
 		frameworks: [],
 	},
 	{
@@ -230,17 +228,17 @@ echo "Score: {$analysis->score}/100 ({$analysis->verdict})\\n";`,
 		packageName: "reloop-email",
 		icon: siRuby,
 		installCommand: "gem install reloop-email",
-		fileName: "check_spam.rb",
+		fileName: "lookup_dns.rb",
 		checkCode: `require 'reloop'
 
 client = Reloop::Client.new(api_key: ENV['RELOOP_API_KEY'])
 
-analysis = client.tools.check_spam_score(
-  subject: 'Your monthly analytics report is ready',
-  body: 'Hi Alex, your weekly report has been generated. View online: https://reloop.sh/analytics'
+report = client.tools.dns_lookup(
+  domain: 'stripe.com',
+  record_type: 'ANY'
 )
 
-puts "Score: #{analysis.score}/100 (#{analysis.verdict})"`,
+puts "Provider: #{report.provider&.name} (Records: #{report.records.length})"`,
 		frameworks: [],
 	},
 	{
@@ -249,13 +247,13 @@ puts "Score: #{analysis.score}/100 (#{analysis.verdict})"`,
 		packageName: "reloop",
 		icon: siElixir,
 		installCommand: "mix deps.get",
-		fileName: "check_spam.exs",
-		checkCode: `analysis = Reloop.Tools.check_spam_score(%{
-  subject: "Your monthly analytics report is ready",
-  body: "Hi Alex, your weekly report has been generated. View online: https://reloop.sh/analytics"
+		fileName: "lookup_dns.exs",
+		checkCode: `report = Reloop.Tools.dns_lookup(%{
+  domain: "stripe.com",
+  record_type: "ANY"
 })
 
-IO.puts("Score: #{analysis.score}/100 (#{analysis.verdict})")`,
+IO.puts("Records found: #{length(report.records)}")`,
 		frameworks: [],
 	},
 	{
@@ -264,22 +262,22 @@ IO.puts("Score: #{analysis.score}/100 (#{analysis.verdict})")`,
 		packageName: "sh.reloop:reloop-email",
 		icon: siOpenjdk,
 		installCommand: "implementation 'sh.reloop:reloop-email:1.0.0'",
-		fileName: "CheckSpam.java",
+		fileName: "LookupDns.java",
 		checkCode: `import sh.reloop.Reloop;
-import sh.reloop.models.SpamCheckRequest;
+import sh.reloop.models.DnsLookupRequest;
 
 public class App {
     public static void main(String[] args) {
         var reloop = new Reloop(System.getenv("RELOOP_API_KEY"));
 
-        var analysis = reloop.tools().checkSpamScore(
-            SpamCheckRequest.builder()
-                .subject("Your monthly analytics report is ready")
-                .body("Hi Alex, your weekly report has been generated.")
+        var report = reloop.tools().dnsLookup(
+            DnsLookupRequest.builder()
+                .domain("stripe.com")
+                .recordType("ANY")
                 .build()
         );
 
-        System.out.println("Score: " + analysis.getScore() + "/100");
+        System.out.println("Records: " + report.getRecords().size());
     }
 }`,
 		frameworks: [],
@@ -290,17 +288,17 @@ public class App {
 		packageName: "Reloop.Email",
 		icon: siDotnet,
 		installCommand: "dotnet add package Reloop.Email",
-		fileName: "CheckSpam.cs",
+		fileName: "LookupDns.cs",
 		checkCode: `using Reloop;
 
 var client = new ReloopClient(Environment.GetEnvironmentVariable("RELOOP_API_KEY")!);
 
-var analysis = await client.Tools.CheckSpamScoreAsync(new SpamCheckRequest {
-    Subject = "Your monthly analytics report is ready",
-    Body = "Hi Alex, your weekly report has been generated."
+var report = await client.Tools.DnsLookupAsync(new DnsLookupRequest {
+    Domain = "stripe.com",
+    RecordType = "ANY"
 });
 
-Console.WriteLine("Score: " + analysis.Score + "/100 (" + analysis.Verdict + ")");`,
+Console.WriteLine($"Provider: {report.Provider?.Name} (Records: {report.Records.Count})");`,
 		frameworks: [],
 	},
 	{
@@ -309,12 +307,12 @@ Console.WriteLine("Score: " + analysis.Score + "/100 (" + analysis.Verdict + ")"
 		packageName: "REST API",
 		icon: siCurl,
 		installCommand: "curl --version",
-		fileName: "check_spam.sh",
-		checkCode: `curl -X POST https://api.reloop.sh/api/tools/v1/spam-check \\
+		fileName: "lookup_dns.sh",
+		checkCode: `curl -X POST https://reloop.sh/api/tools/v1/dns-lookup \\
   -H "Content-Type: application/json" \\
   -d '{
-    "subject": "Your monthly analytics report is ready",
-    "body": "Hi Alex, your weekly report has been generated. View your metrics online: https://reloop.sh/analytics"
+    "domain": "stripe.com",
+    "recordType": "ANY"
   }'`,
 		frameworks: [],
 	},
@@ -335,14 +333,6 @@ function hexToRgba(hex: string, alpha: number) {
 	const g = Number.parseInt(value.slice(2, 4), 16);
 	const b = Number.parseInt(value.slice(4, 6), 16);
 	return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-}
-
-function darkenHex(hex: string, amount: number) {
-	const value = hex.replace("#", "");
-	const r = Number.parseInt(value.slice(0, 2), 16);
-	const g = Number.parseInt(value.slice(2, 4), 16);
-	const b = Number.parseInt(value.slice(4, 6), 16);
-	return `rgb(${Math.round(r * amount)}, ${Math.round(g * amount)}, ${Math.round(b * amount)})`;
 }
 
 function measureTab(button: HTMLButtonElement | null): PillBox | null {
@@ -511,97 +501,95 @@ export function ApiSection() {
 	return (
 		<div className="w-full">
 			{/* Language tabs */}
-			<div className="border-stroke-soft-200 border-b dark:border-white/10">
-				<div
-					ref={containerRef}
-					role="tablist"
-					aria-label="Spam checker SDK languages"
-					onPointerLeave={() => setHoveredTabIdx(undefined)}
-					className="scrollbar-none relative flex gap-1 overflow-x-auto px-6 py-3 sm:px-10 sm:py-3.5 lg:px-12"
-					style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-				>
-					{TOOL_LANGUAGES.map((lang, index) => {
-						const isActive = lang.slug === activeSlug;
-						const langBrandColor = `#${lang.icon.hex}`;
-						const showActiveLabel = isActive && Boolean(activePill || !mounted);
-						const isTabLangDark = isDarkBrandColor(lang.icon.hex);
+			<div
+				ref={containerRef}
+				className="relative flex items-center gap-1 overflow-x-auto border-stroke-soft-200 border-b px-5 py-3 sm:px-6 md:px-8 dark:border-white/10"
+			>
+				{mounted && activePill && (
+					<motion.div
+						className="pointer-events-none absolute z-0 rounded-full"
+						initial={false}
+						animate={{
+							width: activePill.width,
+							height: activePill.height,
+							left: activePill.left,
+							top: activePill.top,
+						}}
+						transition={{
+							type: "spring",
+							stiffness: 380,
+							damping: 30,
+						}}
+					>
+						<span
+							className="block size-full rounded-full border"
+							style={{
+								backgroundColor: hexToRgba(brandColor, 0.12),
+								borderColor: hexToRgba(brandColor, 0.35),
+							}}
+						/>
+					</motion.div>
+				)}
 
-						return (
-							<button
-								key={lang.slug}
-								ref={(el) => {
-									tabButtonRefs.current[index] = el;
-								}}
-								type="button"
-								role="tab"
-								aria-selected={isActive}
-								id={`spam-tab-${lang.slug}`}
-								onClick={() => setActiveSlug(lang.slug)}
-								onPointerEnter={() => setHoveredTabIdx(index)}
+				{mounted && hoverPill && hoverBrandColor && (
+					<motion.div
+						className="pointer-events-none absolute z-0 rounded-full"
+						initial={{ opacity: 0 }}
+						animate={{
+							opacity: 1,
+							width: hoverPill.width,
+							height: hoverPill.height,
+							left: hoverPill.left,
+							top: hoverPill.top,
+						}}
+						exit={{ opacity: 0 }}
+						transition={{
+							duration: 0.15,
+							ease: PILL_EASE,
+						}}
+					>
+						<span
+							className="block size-full rounded-full"
+							style={{
+								backgroundColor: hexToRgba(hoverBrandColor, 0.07),
+							}}
+						/>
+					</motion.div>
+				)}
+
+				{TOOL_LANGUAGES.map((lang, index) => {
+					const isActive = lang.slug === activeSlug;
+					return (
+						<button
+							key={lang.slug}
+							ref={(el) => {
+								tabButtonRefs.current[index] = el;
+							}}
+							type="button"
+							onClick={() => setActiveSlug(lang.slug)}
+							onMouseEnter={() => setHoveredTabIdx(index)}
+							onMouseLeave={() => setHoveredTabIdx(undefined)}
+							className={cn(
+								"relative z-10 flex shrink-0 items-center gap-2 rounded-full px-3.5 py-1.5 font-mono text-[12px] transition-colors",
+								isActive
+									? "font-medium text-text-strong-950 dark:text-white"
+									: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/45 dark:hover:text-white",
+							)}
+						>
+							<span
 								className={cn(
-									"relative z-10 inline-flex shrink-0 items-center gap-2 rounded-full px-3.5 py-2 font-medium text-xs transition-colors duration-150 ease-[cubic-bezier(0.23,1,0.32,1)]",
-									!mounted && isActive
-										? "bg-text-strong-950 text-white shadow-[0_1.5px_0_0_#1a1a1a,inset_0_0.5px_0_0_rgba(255,255,255,0.45)] dark:bg-white dark:text-black dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.55),0_0_0_0.5px_rgba(255,255,255,0.08),inset_0_0.5px_0_0_rgba(255,255,255,0.28)]"
-										: showActiveLabel
-											? "text-white"
-											: "text-text-sub-600 dark:text-white/60",
+									"flex size-4 shrink-0 items-center justify-center transition-colors",
+									isDarkBrandColor(lang.icon.hex) &&
+										"text-text-strong-950 dark:text-white",
 								)}
+								style={getBrandColorStyle(lang.icon.hex)}
 							>
-								<span
-									className={cn(
-										"inline-flex items-center",
-										!showActiveLabel &&
-											isTabLangDark &&
-											"text-text-strong-950 dark:text-white",
-									)}
-									style={{
-										color: showActiveLabel
-											? "#ffffff"
-											: isTabLangDark
-												? undefined
-												: langBrandColor,
-									}}
-								>
-									<LanguageIcon icon={lang.icon} className="size-3.5" />
-								</span>
-								{lang.name}
-							</button>
-						);
-					})}
-
-					<AnimatePresence>
-						{hoverPill && hoverBrandColor ? (
-							<motion.div
-								key="hover-pill"
-								className="pointer-events-none absolute top-0 left-0 rounded-full"
-								style={{ backgroundColor: hexToRgba(hoverBrandColor, 0.14) }}
-								initial={{ ...hoverPill, opacity: 0 }}
-								animate={{ ...hoverPill, opacity: 1 }}
-								exit={{ ...hoverPill, opacity: 0 }}
-								transition={{ duration: 0.16, ease: PILL_EASE }}
-							/>
-						) : null}
-					</AnimatePresence>
-
-					<AnimatePresence>
-						{activePill ? (
-							<motion.div
-								key="active-pill"
-								className="pointer-events-none absolute top-0 left-0 rounded-full p-px pb-[2px]"
-								style={{ backgroundColor: darkenHex(brandColor, 0.55) }}
-								initial={{ ...activePill, opacity: 0 }}
-								animate={{ ...activePill, opacity: 1 }}
-								exit={{ ...activePill, opacity: 0 }}
-								transition={{ duration: 0.2, ease: PILL_EASE }}
-							>
-								<div
-									className="size-full rounded-full shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.45)] dark:shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.28),0_0_0_0.5px_rgba(255,255,255,0.08)]"
-									style={{ backgroundColor: brandColor }}
-								/>
-							</motion.div>
-						) : null}
-					</AnimatePresence>
-				</div>
+								<LanguageIcon icon={lang.icon} className="size-3.5" />
+							</span>
+							<span>{lang.name}</span>
+						</button>
+					);
+				})}
 			</div>
 
 			{/* Content: left meta + right code steps */}
@@ -736,7 +724,7 @@ export function ApiSection() {
 
 					<StepItem
 						number={2}
-						title={`Check spam score with ${active.name}`}
+						title={`Query DNS records with ${active.name}`}
 						isLast={false}
 					>
 						<SdkCodeBlock
@@ -748,7 +736,7 @@ export function ApiSection() {
 
 					<StepItem
 						number={3}
-						title="Inspect JSON deliverability report (200 OK)"
+						title="Inspect JSON DNS response (200 OK)"
 						isLast={true}
 					>
 						<SdkCodeBlock

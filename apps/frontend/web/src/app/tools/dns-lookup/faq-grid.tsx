@@ -1,20 +1,18 @@
 "use client";
 
 import { cn } from "@reloop/ui/cn";
-import type { FaqItem } from "@reloop/web/components/faq-section";
-import React, { useState } from "react";
+import { useState } from "react";
+import type { FaqGroup, FaqItem } from "./content";
 
 export function FaqGrid({
 	groups,
 	id = "faq",
 }: {
-	groups?: { title: string; items: FaqItem[] }[];
+	groups?: FaqGroup[];
 	items?: FaqItem[];
 	id?: string;
 }) {
-	// Flatten all FAQs into a single unified list matching the docs style
 	const allItems: FaqItem[] = groups ? groups.flatMap((g) => g.items) : [];
-
 	const [openIndex, setOpenIndex] = useState<number | null>(null);
 
 	const toggle = (index: number) => {

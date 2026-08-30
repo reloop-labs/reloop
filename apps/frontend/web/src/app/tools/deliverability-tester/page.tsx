@@ -52,7 +52,7 @@ export default function DeliverabilityTesterPage() {
 							"Cryptographic DKIM signature verification",
 							"SPF and DMARC identifier alignment check",
 							"Forward-Confirmed Reverse DNS (FCrDNS) lookup",
-							"23+ public IP and domain DNSBL blocklists",
+							"40+ public IP and domain DNSBL blocklists",
 							"Live Rspamd spam scoring and symbol breakdown",
 							"Multipart HTML/plain text balance and image alt tag checks",
 							"Link shortener detection and URL reachability verification",

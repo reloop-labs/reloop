@@ -1,0 +1,317 @@
+name: reloop
+
+x-logging: &logging
+  logging:
+    driver: json-file
+    options:
+      max-size: "10m"
+      max-file: "3"
+
+x-infra-ready: &infra-ready
+  postgres:
+    condition: service_healthy
+  redis:
+    condition: service_healthy
+  nats:
+    condition: service_healthy
+
+x-backend: &backend
+  restart: unless-stopped
+  env_file:
+    - .env
+  depends_on: *infra-ready
+  networks:
+    - reloop
+  <<: *logging
+
+x-frontend: &frontend
+  restart: unless-stopped
+  environment:
+    NODE_ENV: production
+  networks:
+    - reloop
+  <<: *logging
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: reloop-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+    networks:
+      - reloop
+    <<: *logging
+
+  redis:
+    image: redis:7-alpine
+    container_name: reloop-redis
+    restart: unless-stopped
+    command:
+      - redis-server
+      - --requirepass
+      - ${REDIS_PASSWORD}
+      - --appendonly
+      - "yes"
+      - --dir
+      - /data
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli --no-auth-warning -a \"$$REDIS_PASSWORD\" ping | grep -q PONG"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    networks:
+      - reloop
+    <<: *logging
+
+  nats:
+    image: nats:2.10-alpine
+    container_name: reloop-nats
+    restart: unless-stopped
+    command: ["-js", "-sd", "/data", "-m", "8222"]
+    volumes:
+      - nats-data:/data
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1:8222/healthz"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+    networks:
+      - reloop
+    <<: *logging
+
+  proxy:
+    image: caddy:2-alpine
+    container_name: reloop-proxy
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1:2019/config/"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+    networks:
+      reloop:
+        aliases:
+          - ${RELOOP_DOMAIN}
+          - ${RELOOP_TRACKING_HOST}
+    <<: *logging
+
+  auth:
+    <<: *backend
+    image: reloopsh/be-auth:${RELOOP_VERSION}
+    container_name: reloop-auth
+    environment:
+      PORT: 8000
+
+  domain:
+    <<: *backend
+    image: reloopsh/be-domain:${RELOOP_VERSION}
+    container_name: reloop-domain
+    environment:
+      PORT: 8011
+
+  api-key:
+    <<: *backend
+    image: reloopsh/be-api-key:${RELOOP_VERSION}
+    container_name: reloop-api-key
+    environment:
+      PORT: 8012
+
+  webhook:
+    <<: *backend
+    image: reloopsh/be-webhook:${RELOOP_VERSION}
+    container_name: reloop-webhook
+    environment:
+      PORT: 8013
+
+  contacts:
+    <<: *backend
+    image: reloopsh/be-contacts:${RELOOP_VERSION}
+    container_name: reloop-contacts
+    environment:
+      PORT: 8014
+
+  mail:
+    <<: *backend
+    image: reloopsh/be-mail:${RELOOP_VERSION}
+    container_name: reloop-mail
+    environment:
+      PORT: 8015
+      KUMOMTA_HTTP_URL: http://smtp:8000
+
+  logs:
+    <<: *backend
+    image: reloopsh/be-logs:${RELOOP_VERSION}
+    container_name: reloop-logs
+    environment:
+      PORT: 8016
+
+  workflow:
+    <<: *backend
+    image: reloopsh/be-workflow:${RELOOP_VERSION}
+    container_name: reloop-workflow
+    environment:
+      PORT: 8017
+
+  upload:
+    <<: *backend
+    image: reloopsh/be-upload:${RELOOP_VERSION}
+    container_name: reloop-upload
+    profiles:
+      - storage
+    environment:
+      PORT: 8018
+
+  template:
+    <<: *backend
+    image: reloopsh/be-template:${RELOOP_VERSION}
+    container_name: reloop-template
+    environment:
+      PORT: 8019
+
+  inbox:
+    <<: *backend
+    image: reloopsh/be-inbox:${RELOOP_VERSION}
+    container_name: reloop-inbox
+    environment:
+      PORT: 8021
+
+  email:
+    <<: *backend
+    image: reloopsh/be-email:${RELOOP_VERSION}
+    container_name: reloop-email
+    environment:
+      PORT: 8022
+
+  spam:
+    image: reloopsh/be-spam:${RELOOP_VERSION}
+    container_name: reloop-spam
+    restart: unless-stopped
+    environment:
+      RSPAMD_REDIS_SERVERS: redis:6379
+      RSPAMD_REDIS_PASSWORD: ${REDIS_PASSWORD}
+    volumes:
+      - rspamd-data:/var/lib/rspamd
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - reloop
+    <<: *logging
+
+  smtp:
+    image: reloopsh/be-smtp:${RELOOP_VERSION}
+    container_name: reloop-smtp
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      HOSTNAME: ${RELOOP_DOMAIN}
+    ports:
+      - "465:465"
+      - "587:587"
+    volumes:
+      - smtp-data:/var/spool/kumomta/data
+      - smtp-meta:/var/spool/kumomta/meta
+    depends_on:
+      nats:
+        condition: service_healthy
+    networks:
+      - reloop
+    <<: *logging
+
+  inbound:
+    image: reloopsh/be-inbound:${RELOOP_VERSION}
+    container_name: reloop-inbound
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      HOSTNAME: ${RELOOP_INBOUND_HOST}
+    ports:
+      - "25:25"
+    volumes:
+      - inbound-data:/var/spool/kumomta/data
+      - inbound-meta:/var/spool/kumomta/meta
+    depends_on:
+      nats:
+        condition: service_healthy
+      spam:
+        condition: service_started
+    networks:
+      - reloop
+    <<: *logging
+
+  dashboard:
+    <<: *frontend
+    image: reloopsh/fe-dashboard:${RELOOP_VERSION}
+    container_name: reloop-dashboard
+
+  links:
+    <<: *frontend
+    image: reloopsh/fe-links:${RELOOP_VERSION}
+    container_name: reloop-links
+    environment:
+      NODE_ENV: production
+      NEXT_PUBLIC_URL: ${TRACKING_BASE_URL}
+      INTERNAL_API_URL: http://contacts:8014/api/contacts
+      INTERNAL_MAIL_API_URL: http://mail:8015/api/mail
+
+  migrate:
+    image: reloopsh/be-auth:${RELOOP_VERSION}
+    profiles:
+      - tools
+    working_dir: /app/packages/db
+    entrypoint: ["/app/node_modules/.bin/drizzle-kit"]
+    command: ["push", "--force"]
+    env_file:
+      - .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - reloop
+    <<: *logging
+
+networks:
+  reloop:
+    name: reloop
+
+volumes:
+  postgres-data:
+  redis-data:
+  nats-data:
+  caddy-data:
+  caddy-config:
+  rspamd-data:
+  smtp-data:
+  smtp-meta:
+  inbound-data:
+  inbound-meta:
