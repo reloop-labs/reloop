@@ -2,6 +2,7 @@
 
 import { cn } from "@reloop/ui/cn";
 import { cx } from "class-variance-authority";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import {
 	type ReactNode,
 	type RefObject,
@@ -11,6 +12,12 @@ import {
 	useRef,
 	useState,
 } from "react";
+
+const CAPTION_TRANSITION = {
+	type: "spring" as const,
+	duration: 0.25,
+	bounce: 0,
+};
 
 export function readShakeMs(): number {
 	if (typeof window === "undefined") return 280;
@@ -127,6 +134,10 @@ export function FieldError({
 	hintClassName?: string;
 	messageClassName?: string;
 }) {
+	const reduceMotion = useReducedMotion();
+	const captionKey = field.hasError ? "error" : hint ? "hint" : null;
+	const caption = field.hasError ? field.message : hint;
+
 	return (
 		<div
 			className={cn("t-input-wrap", field.hasError && "is-error", className)}
@@ -137,26 +148,29 @@ export function FieldError({
 			>
 				{children}
 			</div>
-			{hint ? (
-				<p
-					className={cx(
-						"t-hint text-paragraph-xs text-text-sub-600",
-						hintClassName,
-					)}
-				>
-					{hint}
-				</p>
-			) : null}
-			<p
-				id={field.errorId}
-				role="alert"
-				className={cx(
-					"t-error-msg text-error-base text-paragraph-xs",
-					messageClassName,
-				)}
-			>
-				{field.message}
-			</p>
+			<div className="t-caption relative overflow-hidden">
+				<AnimatePresence mode="popLayout" initial={false}>
+					{captionKey ? (
+						<motion.p
+							key={captionKey}
+							id={field.hasError ? field.errorId : undefined}
+							role={field.hasError ? "alert" : undefined}
+							transition={reduceMotion ? { duration: 0 } : CAPTION_TRANSITION}
+							initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -14 }}
+							animate={{ opacity: 1, y: 0 }}
+							exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 14 }}
+							className={cx(
+								"mt-1.5 text-paragraph-xs",
+								field.hasError
+									? cx("text-error-base", messageClassName)
+									: cx("text-text-sub-600", hintClassName),
+							)}
+						>
+							{caption}
+						</motion.p>
+					) : null}
+				</AnimatePresence>
+			</div>
 		</div>
 	);
 }
