@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "@reloop/ui/cn";
+import { cx } from "class-variance-authority";
 import {
 	type ReactNode,
 	type RefObject,
@@ -138,7 +139,7 @@ export function FieldError({
 			</div>
 			{hint ? (
 				<p
-					className={cn(
+					className={cx(
 						"t-hint text-paragraph-xs text-text-sub-600",
 						hintClassName,
 					)}
@@ -149,7 +150,7 @@ export function FieldError({
 			<p
 				id={field.errorId}
 				role="alert"
-				className={cn(
+				className={cx(
 					"t-error-msg text-error-base text-paragraph-xs",
 					messageClassName,
 				)}
