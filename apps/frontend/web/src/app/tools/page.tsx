@@ -132,18 +132,6 @@ const TOOL_VISUAL_MAP: Record<string, ToolVisualMeta> = {
 			"Real-time deliverability score",
 		],
 	},
-	"template-generator": {
-		icon: "layout",
-		badge: "Templates",
-		badgeColor:
-			"bg-violet-500/10 text-violet-700 dark:text-violet-400 border-violet-500/20",
-		glowColor: "group-hover:border-violet-500/40",
-		features: [
-			"Table-based responsive HTML",
-			"Outlook & Gmail compatible",
-			"Ready-to-copy code snippets",
-		],
-	},
 	"auth-checker": {
 		icon: "lock",
 		badge: "DNS & Auth",
@@ -154,30 +142,6 @@ const TOOL_VISUAL_MAP: Record<string, ToolVisualMeta> = {
 			"SPF policy record check",
 			"DKIM signature verification",
 			"DMARC enforcement status",
-		],
-	},
-	"subject-tester": {
-		icon: "sparkles",
-		badge: "Optimization",
-		badgeColor:
-			"bg-rose-500/10 text-rose-700 dark:text-rose-400 border-rose-500/20",
-		glowColor: "group-hover:border-rose-500/40",
-		features: [
-			"Character & word count grading",
-			"Mobile inbox preview length",
-			"Spam & urgency signal audit",
-		],
-	},
-	"mobile-preview": {
-		icon: "smartphone",
-		badge: "Preview",
-		badgeColor:
-			"bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 border-indigo-500/20",
-		glowColor: "group-hover:border-indigo-500/40",
-		features: [
-			"iPhone & Android device frames",
-			"Live interactive HTML editor",
-			"Instant responsive rendering",
 		],
 	},
 };

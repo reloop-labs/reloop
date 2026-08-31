@@ -33,10 +33,7 @@ export type ToolDefinition = LandingPageDefinition & {
 		| "temp-email-checker"
 		| "email-validator"
 		| "deliverability-tester"
-		| "template-generator"
-		| "auth-checker"
-		| "subject-tester"
-		| "mobile-preview";
+		| "auth-checker";
 };
 
 export type AlternativeDefinition = LandingPageDefinition & {

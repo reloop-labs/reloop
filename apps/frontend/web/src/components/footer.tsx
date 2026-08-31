@@ -54,8 +54,8 @@ const columns: FooterColumn[] = [
 		items: [
 			{ title: "Free Tools", href: "/tools" },
 			{ title: "Email Validator", href: "/tools/email-validator" },
-			{ title: "Subject Tester", href: "/tools/subject-tester" },
-			{ title: "Template Generator", href: "/tools/template-generator" },
+			{ title: "Spoof Checker", href: "/tools/spoof-checker" },
+			{ title: "Who Sends", href: "/tools/who-sends" },
 			{
 				title: "Deliverability Tester",
 				href: "/tools/deliverability-tester",
