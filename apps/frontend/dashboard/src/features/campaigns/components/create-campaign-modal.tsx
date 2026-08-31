@@ -123,11 +123,11 @@ export function CreateCampaignModal({
 	return (
 		<Modal.Root open={open} onOpenChange={(next) => !next && handleClose()}>
 			<Modal.Content
-				className="overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-soft-50 p-0 shadow-regular-md sm:max-w-[460px] dark:border-stroke-soft-100/40 dark:bg-white/[0.03]"
+				className="overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-soft-50 p-0 sm:max-w-[460px] dark:border-stroke-soft-100/40 dark:bg-white/[0.03]"
 				showClose={false}
 			>
 				<form onSubmit={(e) => void handleSubmit(e)}>
-					<div className="relative m-0.5 space-y-5 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 px-6 pt-5 pb-6 dark:border-stroke-soft-100/40 dark:bg-[#0c0c0c]">
+					<div className="relative m-0.5 space-y-5 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 px-6 pt-5 pb-7 dark:border-stroke-soft-100/40 dark:bg-[#0c0c0c]">
 						<div>
 							<Modal.Title className="font-semibold text-base text-text-strong-950 tracking-tight">
 								Create campaign
@@ -170,7 +170,7 @@ export function CreateCampaignModal({
 							)}
 						</div>
 					</div>
-					<div className="items-center justify-between">
+					<div className="relative flex items-center justify-between gap-3 px-3 pt-2 pb-3">
 						<Button.Root
 							type="button"
 							variant="neutral"
