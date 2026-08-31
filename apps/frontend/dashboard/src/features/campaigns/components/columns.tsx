@@ -60,7 +60,11 @@ export const campaignColumns: ColumnDef<Campaign>[] = [
 			return (
 				<div className="flex min-w-0 items-center pr-3">
 					<Link
-						href={`/campaigns/${campaign.id}`}
+						href={
+							campaign.status === "draft"
+								? `/campaigns/${campaign.id}/edit`
+								: `/campaigns/${campaign.id}`
+						}
 						className="truncate font-semibold text-label-sm text-text-strong-950 underline decoration-dotted underline-offset-2 transition-colors hover:text-[#1868DF] dark:hover:text-blue-400"
 					>
 						{campaign.name}

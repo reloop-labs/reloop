@@ -23,7 +23,9 @@ export function MainSidebar() {
 	const showSettingsNav = settingsNavDismissed
 		? false
 		: settingsPeek || isSettingsRoute;
-	const isTemplateEditor = Boolean(pathname.match(/\/templates\/[^/]+/));
+	const isTemplateEditor =
+		Boolean(pathname.match(/\/templates\/[^/]+/)) ||
+		Boolean(pathname.match(/\/campaigns\/[^/]+\/edit/));
 
 	const openSettingsNav = () => {
 		setSettingsNavDismissed(false);

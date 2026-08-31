@@ -83,7 +83,7 @@ export function CreateCampaignModal({
 				setName("");
 				nameField.clear();
 				setStatus("idle");
-				router.push(`/campaigns/create?id=${encodeURIComponent(campaign.id)}`);
+				router.push(`/campaigns/${encodeURIComponent(campaign.id)}/edit`);
 			}, 450);
 		} catch (err) {
 			setStatus("idle");

@@ -17,7 +17,7 @@ export type CampaignActionsHandlers = {
 	onOpenChange: (open: boolean, id: string) => void;
 };
 
-type MenuItemId = "view" | "send" | "duplicate" | "copy_id" | "delete";
+type MenuItemId = "edit" | "view" | "send" | "duplicate" | "copy_id" | "delete";
 
 function useCampaignActionsMenu(
 	campaign: Campaign,
@@ -35,16 +35,26 @@ function useCampaignActionsMenu(
 		const items: {
 			id: MenuItemId;
 			label: string;
-			icon: "info-outline" | "mail-send" | "copy" | "trash";
+			icon: "pencil" | "info-outline" | "mail-send" | "copy" | "trash";
 			isDanger: boolean;
-		}[] = [
-			{
-				id: "view",
-				label: "View details",
-				icon: "info-outline",
+		}[] = [];
+
+		if (campaign.status === "draft") {
+			items.push({
+				id: "edit",
+				label: "Edit draft",
+				icon: "pencil",
 				isDanger: false,
-			},
-		];
+			});
+		}
+
+		items.push({
+			id: "view",
+			label: "View details",
+			icon: "info-outline",
+			isDanger: false,
+		});
+
 		if (campaign.status === "draft") {
 			items.push({
 				id: "send",
@@ -113,7 +123,10 @@ function useCampaignActionsMenu(
 	};
 
 	const handleItemClick = async (id: MenuItemId) => {
-		if (id === "view") {
+		if (id === "edit") {
+			router.push(`/campaigns/${campaign.id}/edit`);
+			dismissMenu();
+		} else if (id === "view") {
 			router.push(`/campaigns/${campaign.id}`);
 			dismissMenu();
 		} else if (id === "send") {
