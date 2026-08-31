@@ -537,6 +537,166 @@ export namespace ToolsModel {
 		}),
 	});
 
+	export const authCheckerBody = t.Object({
+		domain: t.String({
+			minLength: 1,
+			maxLength: 255,
+			description: "The sending domain name to check email authentication for.",
+			examples: ["stripe.com", "google.com"],
+		}),
+		selector: t.Optional(
+			t.String({
+				maxLength: 100,
+				description: "Optional DKIM selector (e.g. s1, google, default, k1).",
+				examples: ["s1", "google", "default"],
+			}),
+		),
+	});
+
+	export const authCheckerQuery = t.Object({
+		domain: t.Optional(t.String({ minLength: 1, maxLength: 255 })),
+		selector: t.Optional(t.String({ maxLength: 100 })),
+	});
+
+	export const authSpfDetails = t.Object({
+		status: t.Union([
+			t.Literal("pass"),
+			t.Literal("warn"),
+			t.Literal("fail"),
+			t.Literal("info"),
+		]),
+		published: t.Boolean(),
+		rawRecord: t.Union([t.String(), t.Null()]),
+		qualifier: t.Union([t.String(), t.Null()]),
+		lookupCount: t.Number(),
+		mechanisms: t.Array(t.String()),
+		includes: t.Array(t.String()),
+		ip4: t.Array(t.String()),
+		ip6: t.Array(t.String()),
+		warnings: t.Array(t.String()),
+	});
+
+	export const authDkimDetails = t.Object({
+		status: t.Union([
+			t.Literal("pass"),
+			t.Literal("warn"),
+			t.Literal("fail"),
+			t.Literal("info"),
+		]),
+		published: t.Boolean(),
+		selector: t.Union([t.String(), t.Null()]),
+		rawRecord: t.Union([t.String(), t.Null()]),
+		publicKey: t.Union([t.String(), t.Null()]),
+		keyLength: t.Union([t.Number(), t.Null()]),
+		algorithm: t.Union([t.String(), t.Null()]),
+		testedSelectors: t.Array(t.String()),
+		warnings: t.Array(t.String()),
+	});
+
+	export const authDmarcDetails = t.Object({
+		status: t.Union([
+			t.Literal("pass"),
+			t.Literal("warn"),
+			t.Literal("fail"),
+			t.Literal("info"),
+		]),
+		published: t.Boolean(),
+		rawRecord: t.Union([t.String(), t.Null()]),
+		policy: t.Union([t.String(), t.Null()]),
+		subdomainPolicy: t.Union([t.String(), t.Null()]),
+		percentage: t.Union([t.Number(), t.Null()]),
+		rua: t.Array(t.String()),
+		ruf: t.Array(t.String()),
+		dkimAlignment: t.Union([t.String(), t.Null()]),
+		spfAlignment: t.Union([t.String(), t.Null()]),
+		warnings: t.Array(t.String()),
+	});
+
+	export const authMxRecord = t.Object({
+		exchange: t.String(),
+		priority: t.Number(),
+	});
+
+	export const authMxDetails = t.Object({
+		status: t.Union([
+			t.Literal("pass"),
+			t.Literal("warn"),
+			t.Literal("fail"),
+			t.Literal("info"),
+		]),
+		published: t.Boolean(),
+		provider: t.Union([t.String(), t.Null()]),
+		records: t.Array(authMxRecord),
+		warnings: t.Array(t.String()),
+	});
+
+	export const authBimiDetails = t.Object({
+		status: t.Union([
+			t.Literal("pass"),
+			t.Literal("warn"),
+			t.Literal("fail"),
+			t.Literal("info"),
+		]),
+		published: t.Boolean(),
+		rawRecord: t.Union([t.String(), t.Null()]),
+		svgUrl: t.Union([t.String(), t.Null()]),
+		vmcUrl: t.Union([t.String(), t.Null()]),
+	});
+
+	export const authMtaStsDetails = t.Object({
+		status: t.Union([
+			t.Literal("pass"),
+			t.Literal("warn"),
+			t.Literal("fail"),
+			t.Literal("info"),
+		]),
+		published: t.Boolean(),
+		rawRecord: t.Union([t.String(), t.Null()]),
+		mode: t.Union([t.String(), t.Null()]),
+	});
+
+	export const authDiagnostic = t.Object({
+		id: t.String(),
+		name: t.String(),
+		category: t.Union([
+			t.Literal("spf"),
+			t.Literal("dkim"),
+			t.Literal("dmarc"),
+			t.Literal("mx"),
+			t.Literal("security"),
+		]),
+		status: t.Union([
+			t.Literal("pass"),
+			t.Literal("warn"),
+			t.Literal("fail"),
+			t.Literal("info"),
+		]),
+		message: t.String(),
+		details: t.Optional(t.String()),
+	});
+
+	export const authCheckerResponse = t.Object({
+		domain: t.String(),
+		resolvedAt: t.String(),
+		responseTimeMs: t.Number(),
+		score: t.Number(),
+		grade: t.String(),
+		verdict: t.Union([
+			t.Literal("fully_aligned"),
+			t.Literal("partially_aligned"),
+			t.Literal("misconfigured"),
+			t.Literal("vulnerable"),
+		]),
+		verdictLabel: t.String(),
+		spf: authSpfDetails,
+		dkim: authDkimDetails,
+		dmarc: authDmarcDetails,
+		mx: authMxDetails,
+		bimi: authBimiDetails,
+		mtaSts: authMtaStsDetails,
+		diagnostics: t.Array(authDiagnostic),
+	});
+
 	export const errorResponse = t.Object({
 		message: t.String(),
 		why: t.Optional(t.String()),
@@ -558,5 +718,7 @@ export namespace ToolsModel {
 	export type BlocklistCheckResponse = typeof blocklistCheckResponse.static;
 	export type DnsLookupBody = typeof dnsLookupBody.static;
 	export type DnsLookupResponse = typeof dnsLookupResponse.static;
+	export type AuthCheckerBody = typeof authCheckerBody.static;
+	export type AuthCheckerResponse = typeof authCheckerResponse.static;
 }
 

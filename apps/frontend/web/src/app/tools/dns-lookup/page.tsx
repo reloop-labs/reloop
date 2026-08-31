@@ -15,7 +15,7 @@ import {
 	toolTitle,
 } from "./content";
 import { FaqGrid } from "./faq-grid";
-import { Band, SectionIntro } from "./grid";
+import { Band, SectionIntro } from "../blocklist-checker/grid";
 import { LookupPanel } from "./lookup-panel";
 
 export const instant = false;

@@ -1,3 +1,4 @@
+import { authCheckerRoute } from "@be/tools/routes/tools/auth-checker/auth-checker.route";
 import { blocklistCheckRoute } from "@be/tools/routes/tools/blocklist-check/blocklist-check.route";
 import { deliverabilityTestRoute } from "@be/tools/routes/tools/deliverability-test/deliverability-test.route";
 import { dnsLookupRoute } from "@be/tools/routes/tools/dns-lookup/dns-lookup.route";
@@ -15,5 +16,7 @@ export const toolsRoutes = new Elysia({
 	.use(blocklistCheckRoute)
 	.use(deliverabilityTestRoute)
 	.use(emailHealthCheckRoute)
-	.use(dnsLookupRoute);
+	.use(dnsLookupRoute)
+	.use(authCheckerRoute);
+
 

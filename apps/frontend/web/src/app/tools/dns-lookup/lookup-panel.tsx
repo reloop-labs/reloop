@@ -288,12 +288,12 @@ https://reloop.sh/tools/dns-lookup`;
 							</p>
 						</div>
 
-						<Link href="/dashboard/signup" className="shrink-0">
-							<Button.Root variant="primary" mode="filled" size="small">
+						<Button.Root asChild variant="primary" mode="filled" size="small" className="shrink-0">
+							<a href="/dashboard/signup">
 								<span>Start Free Trial</span>
 								<Button.Icon as={Icon} name="arrow-right" />
-							</Button.Root>
-						</Link>
+							</a>
+						</Button.Root>
 					</div>
 
 					{/* Summary Header Card */}
