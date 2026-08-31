@@ -610,581 +610,699 @@ function CreateCampaignPageContent() {
 									duration: 0.35,
 									ease: [0.22, 1, 0.36, 1],
 								}}
-								className="space-y-5 pt-7"
+								className="space-y-4 pt-7"
 							>
-								{/* Target Mode Selector Cards (4 Options) */}
-								<div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-									{/* Option 1: All Contacts */}
-									<button
-										type="button"
-										onClick={() => {
-											setAudienceType("all");
-											setTargetError("");
-										}}
-										className={`group flex cursor-pointer flex-col justify-between rounded-xl border p-4 text-left transition-all ${
+								{/* Target Mode Selector Accordion Items */}
+								<div className="space-y-2.5">
+									{/* ACCORDION ITEM 1: ALL CONTACTS */}
+									<div
+										className={`overflow-hidden rounded-xl border transition-all duration-200 ${
 											audienceType === "all"
-												? "border-primary-base bg-primary-base/[0.03] shadow-xs dark:border-primary-base/80 dark:bg-primary-base/5"
+												? "border-primary-base bg-primary-base/[0.02] shadow-xs dark:border-primary-base/70 dark:bg-primary-base/5"
 												: "border-stroke-soft-200 bg-bg-white-0 hover:border-stroke-soft-300 hover:bg-bg-weak-50/40 dark:border-stroke-soft-100/50 dark:bg-bg-white-0/5"
 										}`}
 									>
-										<div className="flex items-start justify-between gap-3">
-											<div
-												className={`flex h-9 w-9 items-center justify-center rounded-lg border transition-colors ${
-													audienceType === "all"
-														? "border-primary-base/30 bg-primary-base/10 text-primary-base"
-														: "border-stroke-soft-200 bg-bg-weak-50 text-text-strong-950 dark:border-stroke-soft-100/50"
-												}`}
-											>
-												<Icon name="contacts" className="h-4.5 w-4.5" />
+										<button
+											type="button"
+											onClick={() => {
+												setAudienceType("all");
+												setTargetError("");
+											}}
+											className="flex w-full cursor-pointer items-center justify-between p-3.5 text-left transition-colors"
+										>
+											<div className="flex min-w-0 items-center gap-3">
+												<div
+													className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border transition-colors ${
+														audienceType === "all"
+															? "border-primary-base/30 bg-primary-base/10 text-primary-base"
+															: "border-stroke-soft-200 bg-bg-weak-50 text-text-strong-950 dark:border-stroke-soft-100/50"
+													}`}
+												>
+													<Icon name="contacts" className="h-4.5 w-4.5" />
+												</div>
+												<div className="min-w-0">
+													<div className="flex items-center gap-2">
+														<h4 className="font-semibold text-sm text-text-strong-950">
+															All Contacts
+														</h4>
+														<span className="rounded-full bg-success-base/10 px-2 py-0.5 font-medium text-[11px] text-success-base">
+															{totalContacts.toLocaleString()}
+														</span>
+													</div>
+													<p className="truncate text-text-sub-600 text-xs leading-normal">
+														Broadcast to every active subscriber across your
+														organization.
+													</p>
+												</div>
 											</div>
-											<div
-												className={`flex h-4 w-4 items-center justify-center rounded-full border ${
-													audienceType === "all"
-														? "border-primary-base bg-primary-base text-white"
-														: "border-stroke-soft-300 bg-transparent"
-												}`}
-											>
-												{audienceType === "all" && (
-													<div className="h-1.5 w-1.5 rounded-full bg-white" />
-												)}
-											</div>
-										</div>
-										<div className="mt-3.5 space-y-1">
-											<div className="flex items-center justify-between">
-												<h4 className="font-semibold text-sm text-text-strong-950">
-													All Contacts
-												</h4>
-												<span className="rounded-full bg-success-base/10 px-2 py-0.5 font-medium text-[11px] text-success-base">
-													{totalContacts.toLocaleString()}
-												</span>
-											</div>
-											<p className="text-text-sub-600 text-xs leading-relaxed">
-												Broadcast to every active subscriber across your
-												organization.
-											</p>
-										</div>
-									</button>
 
-									{/* Option 2: Contact Groups */}
-									<button
-										type="button"
-										onClick={() => {
-											setAudienceType("group");
-											setTargetError("");
-											const firstGroup = availableGroups[0];
-											if (!selectedGroupId && firstGroup) {
-												setSelectedGroupId(firstGroup.id);
-												setSelectedGroupName(firstGroup.name);
-											}
-										}}
-										className={`group flex cursor-pointer flex-col justify-between rounded-xl border p-4 text-left transition-all ${
-											audienceType === "group"
-												? "border-primary-base bg-primary-base/[0.03] shadow-xs dark:border-primary-base/80 dark:bg-primary-base/5"
-												: "border-stroke-soft-200 bg-bg-white-0 hover:border-stroke-soft-300 hover:bg-bg-weak-50/40 dark:border-stroke-soft-100/50 dark:bg-bg-white-0/5"
-										}`}
-									>
-										<div className="flex items-start justify-between gap-3">
-											<div
-												className={`flex h-9 w-9 items-center justify-center rounded-lg border transition-colors ${
-													audienceType === "group"
-														? "border-primary-base/30 bg-primary-base/10 text-primary-base"
-														: "border-stroke-soft-200 bg-bg-weak-50 text-text-strong-950 dark:border-stroke-soft-100/50"
-												}`}
-											>
-												<Icon name="contacts" className="h-4.5 w-4.5" />
-											</div>
-											<div
-												className={`flex h-4 w-4 items-center justify-center rounded-full border ${
-													audienceType === "group"
-														? "border-primary-base bg-primary-base text-white"
-														: "border-stroke-soft-300 bg-transparent"
-												}`}
-											>
-												{audienceType === "group" && (
-													<div className="h-1.5 w-1.5 rounded-full bg-white" />
-												)}
-											</div>
-										</div>
-										<div className="mt-3.5 space-y-1">
-											<div className="flex items-center justify-between">
-												<h4 className="font-semibold text-sm text-text-strong-950">
-													Contact Groups
-												</h4>
-												<span className="rounded-full bg-bg-weak-50 px-2 py-0.5 font-medium text-[11px] text-text-sub-600 dark:bg-white/10">
-													{availableGroups.length} available
-												</span>
-											</div>
-											<p className="text-text-sub-600 text-xs leading-relaxed">
-												Target specific segments and organized contact lists.
-											</p>
-										</div>
-									</button>
-
-									{/* Option 3: Channels */}
-									<button
-										type="button"
-										onClick={() => {
-											setAudienceType("channel");
-											setTargetError("");
-											const firstChannel = availableChannels[0];
-											if (!selectedChannelId && firstChannel) {
-												setSelectedChannelId(firstChannel.id);
-												setSelectedChannelName(firstChannel.name);
-											}
-										}}
-										className={`group flex cursor-pointer flex-col justify-between rounded-xl border p-4 text-left transition-all ${
-											audienceType === "channel"
-												? "border-primary-base bg-primary-base/[0.03] shadow-xs dark:border-primary-base/80 dark:bg-primary-base/5"
-												: "border-stroke-soft-200 bg-bg-white-0 hover:border-stroke-soft-300 hover:bg-bg-weak-50/40 dark:border-stroke-soft-100/50 dark:bg-bg-white-0/5"
-										}`}
-									>
-										<div className="flex items-start justify-between gap-3">
-											<div
-												className={`flex h-9 w-9 items-center justify-center rounded-lg border transition-colors ${
-													audienceType === "channel"
-														? "border-primary-base/30 bg-primary-base/10 text-primary-base"
-														: "border-stroke-soft-200 bg-bg-weak-50 text-text-strong-950 dark:border-stroke-soft-100/50"
-												}`}
-											>
+											<div className="flex shrink-0 items-center gap-2.5 pl-2">
+												<div
+													className={`flex h-4 w-4 items-center justify-center rounded-full border ${
+														audienceType === "all"
+															? "border-primary-base bg-primary-base text-white"
+															: "border-stroke-soft-300 bg-transparent"
+													}`}
+												>
+													{audienceType === "all" && (
+														<div className="h-1.5 w-1.5 rounded-full bg-white" />
+													)}
+												</div>
 												<Icon
-													name="notification-indicator"
-													className="h-4.5 w-4.5"
+													name="chevron-down"
+													className={`h-4 w-4 text-text-sub-600 transition-transform duration-200 ${
+														audienceType === "all"
+															? "rotate-180 text-primary-base"
+															: ""
+													}`}
 												/>
 											</div>
-											<div
-												className={`flex h-4 w-4 items-center justify-center rounded-full border ${
-													audienceType === "channel"
-														? "border-primary-base bg-primary-base text-white"
-														: "border-stroke-soft-300 bg-transparent"
-												}`}
-											>
-												{audienceType === "channel" && (
-													<div className="h-1.5 w-1.5 rounded-full bg-white" />
-												)}
-											</div>
-										</div>
-										<div className="mt-3.5 space-y-1">
-											<div className="flex items-center justify-between">
-												<h4 className="font-semibold text-sm text-text-strong-950">
-													Channels
-												</h4>
-												<span className="rounded-full bg-bg-weak-50 px-2 py-0.5 font-medium text-[11px] text-text-sub-600 dark:bg-white/10">
-													{availableChannels.length} available
-												</span>
-											</div>
-											<p className="text-text-sub-600 text-xs leading-relaxed">
-												Deliver only to subscribers opted into a specific
-												channel.
-											</p>
-										</div>
-									</button>
+										</button>
 
-									{/* Option 4: Upload CSV */}
-									<button
-										type="button"
-										onClick={() => {
-											setAudienceType("csv");
-											setTargetError("");
-										}}
-										className={`group flex cursor-pointer flex-col justify-between rounded-xl border p-4 text-left transition-all ${
-											audienceType === "csv"
-												? "border-primary-base bg-primary-base/[0.03] shadow-xs dark:border-primary-base/80 dark:bg-primary-base/5"
+										<AnimatePresence initial={false}>
+											{audienceType === "all" && (
+												<motion.div
+													key="all-details"
+													initial={{ height: 0, opacity: 0 }}
+													animate={{
+														height: "auto",
+														opacity: 1,
+														transition: {
+															height: {
+																duration: 0.22,
+																ease: [0.04, 0.62, 0.23, 0.98],
+															},
+															opacity: { duration: 0.18, delay: 0.04 },
+														},
+													}}
+													exit={{
+														height: 0,
+														opacity: 0,
+														transition: {
+															height: {
+																duration: 0.18,
+																ease: [0.04, 0.62, 0.23, 0.98],
+															},
+															opacity: { duration: 0.12 },
+														},
+													}}
+													className="overflow-hidden"
+												>
+													<div className="border-stroke-soft-200/70 border-t p-3.5 pt-3 dark:border-stroke-soft-100/40">
+														<div className="flex items-center gap-3 rounded-lg bg-success-base/[0.06] p-3 text-success-base">
+															<Icon
+																name="check-circle"
+																className="h-4.5 w-4.5 shrink-0 text-success-base"
+															/>
+															<div className="text-xs">
+																<p className="font-semibold text-text-strong-950">
+																	Full Workspace Audience Selected
+																</p>
+																<p className="text-text-sub-600">
+																	Every contact with status
+																	&quot;Subscribed&quot; will be included (
+																	{totalContacts.toLocaleString()} recipients).
+																</p>
+															</div>
+														</div>
+													</div>
+												</motion.div>
+											)}
+										</AnimatePresence>
+									</div>
+
+									{/* ACCORDION ITEM 2: CONTACT GROUPS */}
+									<div
+										className={`overflow-hidden rounded-xl border transition-all duration-200 ${
+											audienceType === "group"
+												? "border-primary-base bg-primary-base/[0.02] shadow-xs dark:border-primary-base/70 dark:bg-primary-base/5"
 												: "border-stroke-soft-200 bg-bg-white-0 hover:border-stroke-soft-300 hover:bg-bg-weak-50/40 dark:border-stroke-soft-100/50 dark:bg-bg-white-0/5"
 										}`}
 									>
-										<div className="flex items-start justify-between gap-3">
-											<div
-												className={`flex h-9 w-9 items-center justify-center rounded-lg border transition-colors ${
-													audienceType === "csv"
-														? "border-primary-base/30 bg-primary-base/10 text-primary-base"
-														: "border-stroke-soft-200 bg-bg-weak-50 text-text-strong-950 dark:border-stroke-soft-100/50"
-												}`}
-											>
-												<Icon name="file-text" className="h-4.5 w-4.5" />
-											</div>
-											<div
-												className={`flex h-4 w-4 items-center justify-center rounded-full border ${
-													audienceType === "csv"
-														? "border-primary-base bg-primary-base text-white"
-														: "border-stroke-soft-300 bg-transparent"
-												}`}
-											>
-												{audienceType === "csv" && (
-													<div className="h-1.5 w-1.5 rounded-full bg-white" />
-												)}
-											</div>
-										</div>
-										<div className="mt-3.5 space-y-1">
-											<div className="flex items-center justify-between">
-												<h4 className="font-semibold text-sm text-text-strong-950">
-													Upload CSV
-												</h4>
-												<span className="rounded-full bg-bg-weak-50 px-2 py-0.5 font-medium text-[11px] text-text-sub-600 dark:bg-white/10">
-													{csvEmails.length > 0
-														? `${csvEmails.length} uploaded`
-														: ".csv / .txt"}
-												</span>
-											</div>
-											<p className="text-text-sub-600 text-xs leading-relaxed">
-												Import a custom list of email addresses from a file.
-											</p>
-										</div>
-									</button>
-								</div>
-
-								{/* Detailed Configuration Section based on selection */}
-								<AnimatePresence mode="wait">
-									{/* All Contacts Selected Details */}
-									{audienceType === "all" && (
-										<motion.div
-											key="all-details"
-											initial={{ opacity: 0, y: 6 }}
-											animate={{ opacity: 1, y: 0 }}
-											exit={{ opacity: 0, y: -6 }}
-											transition={{ duration: 0.16 }}
-											className="rounded-xl border border-stroke-soft-200 bg-bg-weak-50/40 p-4 dark:border-stroke-soft-100/50"
+										<button
+											type="button"
+											onClick={() => {
+												setAudienceType("group");
+												setTargetError("");
+												const firstGroup = availableGroups[0];
+												if (!selectedGroupId && firstGroup) {
+													setSelectedGroupId(firstGroup.id);
+													setSelectedGroupName(firstGroup.name);
+												}
+											}}
+											className="flex w-full cursor-pointer items-center justify-between p-3.5 text-left transition-colors"
 										>
-											<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-												<div className="flex items-center gap-3">
-													<div className="flex h-9 w-9 items-center justify-center rounded-lg border border-stroke-soft-200 bg-bg-white-0 text-success-base dark:border-stroke-soft-100/50">
-														<Icon name="check-circle" className="h-4.5 w-4.5" />
-													</div>
-													<div>
-														<h5 className="font-medium text-sm text-text-strong-950">
-															Full Audience Selected
-														</h5>
-														<p className="text-text-sub-600 text-xs">
-															Every contact with status "Subscribed" in your
-															workspace will be included.
-														</p>
-													</div>
-												</div>
-												<div className="inline-flex items-center gap-1.5 self-start rounded-full bg-success-base/10 px-3 py-1 font-semibold text-success-base text-xs sm:self-center">
-													<span className="h-2 w-2 rounded-full bg-success-base" />
-													{totalContacts.toLocaleString()} recipients
-												</div>
-											</div>
-										</motion.div>
-									)}
-
-									{/* Group Selector Details */}
-									{audienceType === "group" && (
-										<motion.div
-											key="group-details"
-											initial={{ opacity: 0, y: 6 }}
-											animate={{ opacity: 1, y: 0 }}
-											exit={{ opacity: 0, y: -6 }}
-											transition={{ duration: 0.16 }}
-											className="space-y-3 rounded-xl border border-stroke-soft-200 bg-bg-weak-50/40 p-4 dark:border-stroke-soft-100/50"
-										>
-											<div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-												<div>
-													<h5 className="font-medium text-sm text-text-strong-950">
-														Select Target Group
-													</h5>
-													<p className="text-text-sub-600 text-xs">
-														Choose which group receives this campaign
-													</p>
-												</div>
-												<div className="w-full sm:w-56">
-													<Input.Root size="small">
-														<Input.Wrapper>
-															<Input.Input
-																placeholder="Search groups..."
-																value={groupSearch}
-																onChange={(e) => setGroupSearch(e.target.value)}
-															/>
-														</Input.Wrapper>
-													</Input.Root>
-												</div>
-											</div>
-
-											<div className="grid max-h-56 grid-cols-1 gap-2 overflow-y-auto pt-1">
-												{filteredGroups.map((grp) => {
-													const isSelected = selectedGroupId === grp.id;
-													return (
-														<div
-															key={grp.id}
-															onClick={() => {
-																setSelectedGroupId(grp.id);
-																setSelectedGroupName(grp.name);
-																setTargetError("");
-															}}
-															className={`flex cursor-pointer items-center justify-between rounded-lg border p-3 transition-colors ${
-																isSelected
-																	? "border-primary-base bg-primary-base/[0.04] dark:border-primary-base/70 dark:bg-primary-base/10"
-																	: "border-stroke-soft-200 bg-bg-white-0 hover:bg-bg-weak-50/60 dark:border-stroke-soft-100/50"
-															}`}
-														>
-															<div className="flex items-center gap-2.5">
-																<div
-																	className={`flex h-4 w-4 items-center justify-center rounded-full border ${
-																		isSelected
-																			? "border-primary-base bg-primary-base text-white"
-																			: "border-stroke-soft-300"
-																	}`}
-																>
-																	{isSelected && (
-																		<div className="h-1.5 w-1.5 rounded-full bg-white" />
-																	)}
-																</div>
-																<div>
-																	<p className="font-medium text-sm text-text-strong-950">
-																		{grp.name}
-																	</p>
-																	{"description" in grp && grp.description && (
-																		<p className="text-text-sub-600 text-xs">
-																			{grp.description}
-																		</p>
-																	)}
-																</div>
-															</div>
-															<span className="rounded-md bg-bg-weak-50 px-2 py-0.5 font-medium text-[11px] text-text-sub-600 dark:bg-white/10">
-																{("memberCount" in grp &&
-																typeof grp.memberCount === "number"
-																	? grp.memberCount
-																	: Math.round(totalContacts * 0.4)
-																).toLocaleString()}{" "}
-																contacts
-															</span>
-														</div>
-													);
-												})}
-											</div>
-										</motion.div>
-									)}
-
-									{/* Channel Selector Details */}
-									{audienceType === "channel" && (
-										<motion.div
-											key="channel-details"
-											initial={{ opacity: 0, y: 6 }}
-											animate={{ opacity: 1, y: 0 }}
-											exit={{ opacity: 0, y: -6 }}
-											transition={{ duration: 0.16 }}
-											className="space-y-3 rounded-xl border border-stroke-soft-200 bg-bg-weak-50/40 p-4 dark:border-stroke-soft-100/50"
-										>
-											<div>
-												<h5 className="font-medium text-sm text-text-strong-950">
-													Select Channel
-												</h5>
-												<p className="text-text-sub-600 text-xs">
-													Only recipients who are subscribed to this channel
-													will receive the broadcast
-												</p>
-											</div>
-
-											<div className="grid grid-cols-1 gap-2 pt-1">
-												{availableChannels.map((chn) => {
-													const isSelected = selectedChannelId === chn.id;
-													return (
-														<div
-															key={chn.id}
-															onClick={() => {
-																setSelectedChannelId(chn.id);
-																setSelectedChannelName(chn.name);
-																setTargetError("");
-															}}
-															className={`flex cursor-pointer items-center justify-between rounded-lg border p-3 transition-colors ${
-																isSelected
-																	? "border-primary-base bg-primary-base/[0.04] dark:border-primary-base/70 dark:bg-primary-base/10"
-																	: "border-stroke-soft-200 bg-bg-white-0 hover:bg-bg-weak-50/60 dark:border-stroke-soft-100/50"
-															}`}
-														>
-															<div className="flex items-center gap-2.5">
-																<div
-																	className={`flex h-4 w-4 items-center justify-center rounded-full border ${
-																		isSelected
-																			? "border-primary-base bg-primary-base text-white"
-																			: "border-stroke-soft-300"
-																	}`}
-																>
-																	{isSelected && (
-																		<div className="h-1.5 w-1.5 rounded-full bg-white" />
-																	)}
-																</div>
-																<div>
-																	<p className="font-medium text-sm text-text-strong-950">
-																		{chn.name}
-																	</p>
-																	{chn.description && (
-																		<p className="text-text-sub-600 text-xs">
-																			{chn.description}
-																		</p>
-																	)}
-																</div>
-															</div>
-															<span className="rounded-md bg-bg-weak-50 px-2 py-0.5 font-medium text-[11px] text-text-sub-600 dark:bg-white/10">
-																{(
-																	chn.subscriberCount ??
-																	Math.round(totalContacts * 0.6)
-																).toLocaleString()}{" "}
-																subscribers
-															</span>
-														</div>
-													);
-												})}
-											</div>
-										</motion.div>
-									)}
-
-									{/* CSV Upload Details */}
-									{audienceType === "csv" && (
-										<motion.div
-											key="csv-details"
-											initial={{ opacity: 0, y: 6 }}
-											animate={{ opacity: 1, y: 0 }}
-											exit={{ opacity: 0, y: -6 }}
-											transition={{ duration: 0.16 }}
-											className="space-y-3 rounded-xl border border-stroke-soft-200 bg-bg-weak-50/40 p-4 dark:border-stroke-soft-100/50"
-										>
-											<input
-												type="file"
-												ref={fileInputRef}
-												accept=".csv,.txt"
-												onChange={(e) => {
-													const file = e.target.files?.[0];
-													if (file) handleCsvFileUpload(file);
-												}}
-												className="hidden"
-											/>
-
-											{csvEmails.length === 0 ? (
+											<div className="flex min-w-0 items-center gap-3">
 												<div
-													onClick={() => fileInputRef.current?.click()}
-													onDragOver={(e) => e.preventDefault()}
-													onDrop={(e) => {
-														e.preventDefault();
-														const file = e.dataTransfer.files?.[0];
-														if (file) handleCsvFileUpload(file);
-													}}
-													className="flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-stroke-soft-300 border-dashed bg-bg-white-0 px-6 py-8 text-center transition-colors hover:border-primary-base hover:bg-primary-base/[0.02] dark:border-stroke-soft-100/50 dark:bg-bg-white-0/5"
+													className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border transition-colors ${
+														audienceType === "group"
+															? "border-primary-base/30 bg-primary-base/10 text-primary-base"
+															: "border-stroke-soft-200 bg-bg-weak-50 text-text-strong-950 dark:border-stroke-soft-100/50"
+													}`}
 												>
-													<div className="flex h-10 w-10 items-center justify-center rounded-xl border border-stroke-soft-200 bg-bg-weak-50 text-text-sub-600">
-														<Icon name="file-text" className="h-5 w-5" />
+													<Icon name="contacts" className="h-4.5 w-4.5" />
+												</div>
+												<div className="min-w-0">
+													<div className="flex items-center gap-2">
+														<h4 className="font-semibold text-sm text-text-strong-950">
+															Contact Groups
+														</h4>
+														<span className="rounded-full bg-bg-weak-50 px-2 py-0.5 font-medium text-[11px] text-text-sub-600 dark:bg-white/10">
+															{availableGroups.length} available
+														</span>
 													</div>
-													<h5 className="mt-3 font-semibold text-sm text-text-strong-950">
-														{csvParsing
-															? "Parsing CSV contents…"
-															: "Click to upload or drag & drop CSV"}
-													</h5>
-													<p className="mt-1 max-w-sm text-text-sub-600 text-xs">
-														Upload a standard .csv or .txt file containing email
-														addresses. We will automatically parse and
-														deduplicate the recipients.
+													<p className="truncate text-text-sub-600 text-xs leading-normal">
+														Target specific segments and organized contact
+														lists.
 													</p>
-													<div className="mt-3">
-														<Button.Root
-															type="button"
-															variant="neutral"
-															mode="stroke"
-															size="small"
-															className="rounded-lg"
-														>
-															Browse File
-														</Button.Root>
-													</div>
 												</div>
-											) : (
-												<div className="space-y-3">
-													<div className="flex items-center justify-between rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-3.5 dark:border-stroke-soft-100/50">
-														<div className="flex items-center gap-3">
-															<div className="flex h-9 w-9 items-center justify-center rounded-lg border border-stroke-soft-200 bg-bg-weak-50 text-primary-base">
-																<Icon
-																	name="file-text"
-																	className="h-4.5 w-4.5"
-																/>
-															</div>
-															<div>
-																<p className="font-semibold text-sm text-text-strong-950">
-																	{csvFileName}
-																</p>
-																<p className="font-medium text-success-base text-xs">
-																	{csvEmails.length.toLocaleString()} valid
-																	contacts extracted
-																</p>
-															</div>
-														</div>
-														<div className="flex items-center gap-2">
-															<Button.Root
-																type="button"
-																variant="neutral"
-																mode="stroke"
-																size="xsmall"
-																onClick={() => fileInputRef.current?.click()}
-																className="rounded-lg"
-															>
-																Replace
-															</Button.Root>
-															<Button.Root
-																type="button"
-																variant="neutral"
-																mode="stroke"
-																size="xsmall"
-																onClick={() => {
-																	setCsvEmails([]);
-																	setCsvFileName("");
-																	if (fileInputRef.current)
-																		fileInputRef.current.value = "";
-																}}
-																className="rounded-lg text-error-base hover:text-error-base"
-															>
-																Remove
-															</Button.Root>
-														</div>
-													</div>
+											</div>
 
-													{/* Preview Chips */}
-													<div className="space-y-1.5">
-														<p className="font-medium text-[11px] text-text-sub-600 uppercase tracking-wider">
-															Previewing Recipients
-														</p>
-														<div className="flex flex-wrap items-center gap-1.5">
-															{csvEmails.slice(0, 6).map((em) => (
-																<span
-																	key={em}
-																	className="rounded-md border border-stroke-soft-200 bg-bg-white-0 px-2 py-0.5 font-mono text-[11px] text-text-strong-950 dark:border-stroke-soft-100/50"
-																>
-																	{em}
-																</span>
-															))}
-															{csvEmails.length > 6 && (
-																<span className="rounded-md bg-bg-weak-50 px-2 py-0.5 font-medium text-[11px] text-text-sub-600">
-																	+{csvEmails.length - 6} more
-																</span>
-															)}
-														</div>
-													</div>
+											<div className="flex shrink-0 items-center gap-2.5 pl-2">
+												<div
+													className={`flex h-4 w-4 items-center justify-center rounded-full border ${
+														audienceType === "group"
+															? "border-primary-base bg-primary-base text-white"
+															: "border-stroke-soft-300 bg-transparent"
+													}`}
+												>
+													{audienceType === "group" && (
+														<div className="h-1.5 w-1.5 rounded-full bg-white" />
+													)}
 												</div>
-											)}
+												<Icon
+													name="chevron-down"
+													className={`h-4 w-4 text-text-sub-600 transition-transform duration-200 ${
+														audienceType === "group"
+															? "rotate-180 text-primary-base"
+															: ""
+													}`}
+												/>
+											</div>
+										</button>
 
-											{csvError && (
-												<p className="font-medium text-error-base text-xs">
-													{csvError}
-												</p>
-											)}
-										</motion.div>
-									)}
-								</AnimatePresence>
+										<AnimatePresence initial={false}>
+											{audienceType === "group" && (
+												<motion.div
+													key="group-details"
+													initial={{ height: 0, opacity: 0 }}
+													animate={{
+														height: "auto",
+														opacity: 1,
+														transition: {
+															height: {
+																duration: 0.22,
+																ease: [0.04, 0.62, 0.23, 0.98],
+															},
+															opacity: { duration: 0.18, delay: 0.04 },
+														},
+													}}
+													exit={{
+														height: 0,
+														opacity: 0,
+														transition: {
+															height: {
+																duration: 0.18,
+																ease: [0.04, 0.62, 0.23, 0.98],
+															},
+															opacity: { duration: 0.12 },
+														},
+													}}
+													className="overflow-hidden"
+												>
+													<div className="space-y-2.5 border-stroke-soft-200/70 border-t p-3.5 pt-3 dark:border-stroke-soft-100/40">
+														<div className="flex items-center justify-between gap-2">
+															<span className="font-medium text-text-sub-600 text-xs">
+																Select group:
+															</span>
+															<div className="w-44">
+																<Input.Root size="small">
+																	<Input.Wrapper>
+																		<Input.Input
+																			placeholder="Search groups..."
+																			value={groupSearch}
+																			onChange={(e) =>
+																				setGroupSearch(e.target.value)
+																			}
+																		/>
+																	</Input.Wrapper>
+																</Input.Root>
+															</div>
+														</div>
 
-								{/* Bottom Summary Bar */}
-								<div className="flex flex-col gap-2 rounded-xl border border-stroke-soft-200 bg-bg-weak-50/60 p-3.5 sm:flex-row sm:items-center sm:justify-between dark:border-stroke-soft-100/50">
-									<div className="flex items-center gap-2">
-										<Icon
-											name="contacts"
-											className="h-4 w-4 text-text-sub-600"
-										/>
-										<span className="text-text-sub-600 text-xs">
-											Selected Target:{" "}
-											<strong className="text-text-strong-950">
-												{effectiveTargetName}
-											</strong>
-										</span>
+														<div className="grid max-h-48 grid-cols-1 gap-1.5 overflow-y-auto pt-0.5">
+															{filteredGroups.map((grp) => {
+																const isGrpSelected =
+																	selectedGroupId === grp.id;
+																return (
+																	<div
+																		key={grp.id}
+																		onClick={() => {
+																			setSelectedGroupId(grp.id);
+																			setSelectedGroupName(grp.name);
+																			setTargetError("");
+																		}}
+																		className={`flex cursor-pointer items-center justify-between rounded-lg border p-2.5 transition-colors ${
+																			isGrpSelected
+																				? "border-primary-base bg-primary-base/[0.04] dark:border-primary-base/70 dark:bg-primary-base/10"
+																				: "border-stroke-soft-200 bg-bg-white-0 hover:bg-bg-weak-50/60 dark:border-stroke-soft-100/50"
+																		}`}
+																	>
+																		<div className="flex min-w-0 items-center gap-2">
+																			<div
+																				className={`flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full border ${
+																					isGrpSelected
+																						? "border-primary-base bg-primary-base text-white"
+																						: "border-stroke-soft-300"
+																				}`}
+																			>
+																				{isGrpSelected && (
+																					<div className="h-1 w-1 rounded-full bg-white" />
+																				)}
+																			</div>
+																			<div className="min-w-0">
+																				<p className="truncate font-medium text-text-strong-950 text-xs">
+																					{grp.name}
+																				</p>
+																				{"description" in grp &&
+																					grp.description && (
+																						<p className="truncate text-[11px] text-text-sub-600">
+																							{grp.description}
+																						</p>
+																					)}
+																			</div>
+																		</div>
+																		<span className="shrink-0 rounded-md bg-bg-weak-50 px-1.5 py-0.5 font-medium text-[11px] text-text-sub-600 dark:bg-white/10">
+																			{("memberCount" in grp &&
+																			typeof grp.memberCount === "number"
+																				? grp.memberCount
+																				: Math.round(totalContacts * 0.4)
+																			).toLocaleString()}{" "}
+																			contacts
+																		</span>
+																	</div>
+																);
+															})}
+														</div>
+													</div>
+												</motion.div>
+											)}
+										</AnimatePresence>
 									</div>
-									<div className="inline-flex items-center gap-1.5 self-start rounded-full bg-success-base/10 px-3 py-1 font-semibold text-success-base text-xs sm:self-auto">
-										<span className="h-2 w-2 rounded-full bg-success-base" />
-										{effectiveRecipientCount.toLocaleString()} estimated
-										recipients
+
+									{/* ACCORDION ITEM 3: CHANNELS */}
+									<div
+										className={`overflow-hidden rounded-xl border transition-all duration-200 ${
+											audienceType === "channel"
+												? "border-primary-base bg-primary-base/[0.02] shadow-xs dark:border-primary-base/70 dark:bg-primary-base/5"
+												: "border-stroke-soft-200 bg-bg-white-0 hover:border-stroke-soft-300 hover:bg-bg-weak-50/40 dark:border-stroke-soft-100/50 dark:bg-bg-white-0/5"
+										}`}
+									>
+										<button
+											type="button"
+											onClick={() => {
+												setAudienceType("channel");
+												setTargetError("");
+												const firstChannel = availableChannels[0];
+												if (!selectedChannelId && firstChannel) {
+													setSelectedChannelId(firstChannel.id);
+													setSelectedChannelName(firstChannel.name);
+												}
+											}}
+											className="flex w-full cursor-pointer items-center justify-between p-3.5 text-left transition-colors"
+										>
+											<div className="flex min-w-0 items-center gap-3">
+												<div
+													className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border transition-colors ${
+														audienceType === "channel"
+															? "border-primary-base/30 bg-primary-base/10 text-primary-base"
+															: "border-stroke-soft-200 bg-bg-weak-50 text-text-strong-950 dark:border-stroke-soft-100/50"
+													}`}
+												>
+													<Icon
+														name="notification-indicator"
+														className="h-4.5 w-4.5"
+													/>
+												</div>
+												<div className="min-w-0">
+													<div className="flex items-center gap-2">
+														<h4 className="font-semibold text-sm text-text-strong-950">
+															Channels
+														</h4>
+														<span className="rounded-full bg-bg-weak-50 px-2 py-0.5 font-medium text-[11px] text-text-sub-600 dark:bg-white/10">
+															{availableChannels.length} available
+														</span>
+													</div>
+													<p className="truncate text-text-sub-600 text-xs leading-normal">
+														Deliver only to subscribers opted into a specific
+														channel.
+													</p>
+												</div>
+											</div>
+
+											<div className="flex shrink-0 items-center gap-2.5 pl-2">
+												<div
+													className={`flex h-4 w-4 items-center justify-center rounded-full border ${
+														audienceType === "channel"
+															? "border-primary-base bg-primary-base text-white"
+															: "border-stroke-soft-300 bg-transparent"
+													}`}
+												>
+													{audienceType === "channel" && (
+														<div className="h-1.5 w-1.5 rounded-full bg-white" />
+													)}
+												</div>
+												<Icon
+													name="chevron-down"
+													className={`h-4 w-4 text-text-sub-600 transition-transform duration-200 ${
+														audienceType === "channel"
+															? "rotate-180 text-primary-base"
+															: ""
+													}`}
+												/>
+											</div>
+										</button>
+
+										<AnimatePresence initial={false}>
+											{audienceType === "channel" && (
+												<motion.div
+													key="channel-details"
+													initial={{ height: 0, opacity: 0 }}
+													animate={{
+														height: "auto",
+														opacity: 1,
+														transition: {
+															height: {
+																duration: 0.22,
+																ease: [0.04, 0.62, 0.23, 0.98],
+															},
+															opacity: { duration: 0.18, delay: 0.04 },
+														},
+													}}
+													exit={{
+														height: 0,
+														opacity: 0,
+														transition: {
+															height: {
+																duration: 0.18,
+																ease: [0.04, 0.62, 0.23, 0.98],
+															},
+															opacity: { duration: 0.12 },
+														},
+													}}
+													className="overflow-hidden"
+												>
+													<div className="space-y-2 border-stroke-soft-200/70 border-t p-3.5 pt-3 dark:border-stroke-soft-100/40">
+														<p className="text-text-sub-600 text-xs">
+															Choose channel to broadcast to:
+														</p>
+														<div className="grid max-h-48 grid-cols-1 gap-1.5 overflow-y-auto">
+															{availableChannels.map((chn) => {
+																const isChnSelected =
+																	selectedChannelId === chn.id;
+																return (
+																	<div
+																		key={chn.id}
+																		onClick={() => {
+																			setSelectedChannelId(chn.id);
+																			setSelectedChannelName(chn.name);
+																			setTargetError("");
+																		}}
+																		className={`flex cursor-pointer items-center justify-between rounded-lg border p-2.5 transition-colors ${
+																			isChnSelected
+																				? "border-primary-base bg-primary-base/[0.04] dark:border-primary-base/70 dark:bg-primary-base/10"
+																				: "border-stroke-soft-200 bg-bg-white-0 hover:bg-bg-weak-50/60 dark:border-stroke-soft-100/50"
+																		}`}
+																	>
+																		<div className="flex min-w-0 items-center gap-2">
+																			<div
+																				className={`flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full border ${
+																					isChnSelected
+																						? "border-primary-base bg-primary-base text-white"
+																						: "border-stroke-soft-300"
+																				}`}
+																			>
+																				{isChnSelected && (
+																					<div className="h-1 w-1 rounded-full bg-white" />
+																				)}
+																			</div>
+																			<div className="min-w-0">
+																				<p className="truncate font-medium text-text-strong-950 text-xs">
+																					{chn.name}
+																				</p>
+																				{chn.description && (
+																					<p className="truncate text-[11px] text-text-sub-600">
+																						{chn.description}
+																					</p>
+																				)}
+																			</div>
+																		</div>
+																		<span className="shrink-0 rounded-md bg-bg-weak-50 px-1.5 py-0.5 font-medium text-[11px] text-text-sub-600 dark:bg-white/10">
+																			{(
+																				chn.subscriberCount ??
+																				Math.round(totalContacts * 0.6)
+																			).toLocaleString()}{" "}
+																			subs
+																		</span>
+																	</div>
+																);
+															})}
+														</div>
+													</div>
+												</motion.div>
+											)}
+										</AnimatePresence>
+									</div>
+
+									{/* ACCORDION ITEM 4: UPLOAD CSV */}
+									<div
+										className={`overflow-hidden rounded-xl border transition-all duration-200 ${
+											audienceType === "csv"
+												? "border-primary-base bg-primary-base/[0.02] shadow-xs dark:border-primary-base/70 dark:bg-primary-base/5"
+												: "border-stroke-soft-200 bg-bg-white-0 hover:border-stroke-soft-300 hover:bg-bg-weak-50/40 dark:border-stroke-soft-100/50 dark:bg-bg-white-0/5"
+										}`}
+									>
+										<button
+											type="button"
+											onClick={() => {
+												setAudienceType("csv");
+												setTargetError("");
+											}}
+											className="flex w-full cursor-pointer items-center justify-between p-3.5 text-left transition-colors"
+										>
+											<div className="flex min-w-0 items-center gap-3">
+												<div
+													className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border transition-colors ${
+														audienceType === "csv"
+															? "border-primary-base/30 bg-primary-base/10 text-primary-base"
+															: "border-stroke-soft-200 bg-bg-weak-50 text-text-strong-950 dark:border-stroke-soft-100/50"
+													}`}
+												>
+													<Icon name="file-text" className="h-4.5 w-4.5" />
+												</div>
+												<div className="min-w-0">
+													<div className="flex items-center gap-2">
+														<h4 className="font-semibold text-sm text-text-strong-950">
+															Upload CSV
+														</h4>
+														<span className="rounded-full bg-bg-weak-50 px-2 py-0.5 font-medium text-[11px] text-text-sub-600 dark:bg-white/10">
+															{csvEmails.length > 0
+																? `${csvEmails.length} uploaded`
+																: ".csv / .txt"}
+														</span>
+													</div>
+													<p className="truncate text-text-sub-600 text-xs leading-normal">
+														Import a custom list of email addresses from a file.
+													</p>
+												</div>
+											</div>
+
+											<div className="flex shrink-0 items-center gap-2.5 pl-2">
+												<div
+													className={`flex h-4 w-4 items-center justify-center rounded-full border ${
+														audienceType === "csv"
+															? "border-primary-base bg-primary-base text-white"
+															: "border-stroke-soft-300 bg-transparent"
+													}`}
+												>
+													{audienceType === "csv" && (
+														<div className="h-1.5 w-1.5 rounded-full bg-white" />
+													)}
+												</div>
+												<Icon
+													name="chevron-down"
+													className={`h-4 w-4 text-text-sub-600 transition-transform duration-200 ${
+														audienceType === "csv"
+															? "rotate-180 text-primary-base"
+															: ""
+													}`}
+												/>
+											</div>
+										</button>
+
+										<AnimatePresence initial={false}>
+											{audienceType === "csv" && (
+												<motion.div
+													key="csv-details"
+													initial={{ height: 0, opacity: 0 }}
+													animate={{
+														height: "auto",
+														opacity: 1,
+														transition: {
+															height: {
+																duration: 0.22,
+																ease: [0.04, 0.62, 0.23, 0.98],
+															},
+															opacity: { duration: 0.18, delay: 0.04 },
+														},
+													}}
+													exit={{
+														height: 0,
+														opacity: 0,
+														transition: {
+															height: {
+																duration: 0.18,
+																ease: [0.04, 0.62, 0.23, 0.98],
+															},
+															opacity: { duration: 0.12 },
+														},
+													}}
+													className="overflow-hidden"
+												>
+													<div className="space-y-3 border-stroke-soft-200/70 border-t p-3.5 pt-3 dark:border-stroke-soft-100/40">
+														<input
+															type="file"
+															ref={fileInputRef}
+															accept=".csv,.txt"
+															onChange={(e) => {
+																const file = e.target.files?.[0];
+																if (file) handleCsvFileUpload(file);
+															}}
+															className="hidden"
+														/>
+
+														{csvEmails.length === 0 ? (
+															<div
+																onClick={() => fileInputRef.current?.click()}
+																onDragOver={(e) => e.preventDefault()}
+																onDrop={(e) => {
+																	e.preventDefault();
+																	const file = e.dataTransfer.files?.[0];
+																	if (file) handleCsvFileUpload(file);
+																}}
+																className="flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-stroke-soft-300 border-dashed bg-bg-white-0 px-4 py-6 text-center transition-colors hover:border-primary-base hover:bg-primary-base/[0.02] dark:border-stroke-soft-100/50 dark:bg-bg-white-0/5"
+															>
+																<div className="flex h-9 w-9 items-center justify-center rounded-xl border border-stroke-soft-200 bg-bg-weak-50 text-text-sub-600">
+																	<Icon
+																		name="file-text"
+																		className="h-4.5 w-4.5"
+																	/>
+																</div>
+																<h5 className="mt-2.5 font-semibold text-text-strong-950 text-xs">
+																	{csvParsing
+																		? "Parsing CSV contents…"
+																		: "Click to upload or drag & drop CSV"}
+																</h5>
+																<p className="mt-1 max-w-xs text-[11px] text-text-sub-600">
+																	Upload .csv or .txt file containing email
+																	addresses.
+																</p>
+																<div className="mt-2.5">
+																	<Button.Root
+																		type="button"
+																		variant="neutral"
+																		mode="stroke"
+																		size="xsmall"
+																		className="rounded-lg"
+																	>
+																		Browse File
+																	</Button.Root>
+																</div>
+															</div>
+														) : (
+															<div className="space-y-2.5">
+																<div className="flex items-center justify-between rounded-lg border border-stroke-soft-200 bg-bg-white-0 p-2.5 dark:border-stroke-soft-100/50">
+																	<div className="flex min-w-0 items-center gap-2.5">
+																		<div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-stroke-soft-200 bg-bg-weak-50 text-primary-base">
+																			<Icon
+																				name="file-text"
+																				className="h-4 w-4"
+																			/>
+																		</div>
+																		<div className="min-w-0">
+																			<p className="truncate font-semibold text-text-strong-950 text-xs">
+																				{csvFileName}
+																			</p>
+																			<p className="font-medium text-[11px] text-success-base">
+																				{csvEmails.length.toLocaleString()}{" "}
+																				valid contacts
+																			</p>
+																		</div>
+																	</div>
+																	<div className="flex shrink-0 items-center gap-1.5">
+																		<Button.Root
+																			type="button"
+																			variant="neutral"
+																			mode="stroke"
+																			size="xsmall"
+																			onClick={() =>
+																				fileInputRef.current?.click()
+																			}
+																			className="rounded-lg"
+																		>
+																			Replace
+																		</Button.Root>
+																		<Button.Root
+																			type="button"
+																			variant="neutral"
+																			mode="stroke"
+																			size="xsmall"
+																			onClick={() => {
+																				setCsvEmails([]);
+																				setCsvFileName("");
+																				if (fileInputRef.current)
+																					fileInputRef.current.value = "";
+																			}}
+																			className="rounded-lg text-error-base hover:text-error-base"
+																		>
+																			Remove
+																		</Button.Root>
+																	</div>
+																</div>
+
+																{/* Preview Chips */}
+																<div className="space-y-1">
+																	<p className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
+																		Preview Recipients
+																	</p>
+																	<div className="flex flex-wrap items-center gap-1">
+																		{csvEmails.slice(0, 5).map((em) => (
+																			<span
+																				key={em}
+																				className="rounded-md border border-stroke-soft-200 bg-bg-white-0 px-1.5 py-0.5 font-mono text-[10px] text-text-strong-950 dark:border-stroke-soft-100/50"
+																			>
+																				{em}
+																			</span>
+																		))}
+																		{csvEmails.length > 5 && (
+																			<span className="rounded-md bg-bg-weak-50 px-1.5 py-0.5 font-medium text-[10px] text-text-sub-600">
+																				+{csvEmails.length - 5} more
+																			</span>
+																		)}
+																	</div>
+																</div>
+															</div>
+														)}
+
+														{csvError && (
+															<p className="font-medium text-error-base text-xs">
+																{csvError}
+															</p>
+														)}
+													</div>
+												</motion.div>
+											)}
+										</AnimatePresence>
 									</div>
 								</div>
 
