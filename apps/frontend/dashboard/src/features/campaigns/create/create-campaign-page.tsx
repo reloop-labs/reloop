@@ -499,94 +499,113 @@ function CreateCampaignPageContent() {
 							animate={{ opacity: 1, y: 0 }}
 							exit={{ opacity: 0, y: -8 }}
 							transition={{ duration: 0.18 }}
+							className="space-y-6"
 						>
-							<form
-								onSubmit={(e) => {
-									e.preventDefault();
-									handleContinue();
-								}}
-							>
-								{/* Header Section */}
-								<div>
-									<Icon
-										name="mega-phone"
-										className="mb-3 h-6 w-6 text-text-strong-950"
-									/>
-									<h1 className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
-										Campaign Details
-									</h1>
-									<p className="text-paragraph-md text-text-sub-600 leading-relaxed">
-										Give your campaign a title to identify and track it in your
-										analytics.
-									</p>
-								</div>
+							{/* Header Section */}
+							<div>
+								<Icon
+									name="mega-phone"
+									className="mb-3 h-6 w-6 text-text-strong-950"
+								/>
+								<h1 className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
+									Campaign Details
+								</h1>
+								<p className="text-paragraph-md text-text-sub-600 leading-relaxed">
+									Give your campaign a title to identify and track it in your
+									analytics.
+								</p>
+							</div>
 
-								{/* Field */}
-								<div className="space-y-2 pt-7">
-									<Label.Root htmlFor="campaign-name">
-										Campaign Name
-										<Label.Asterisk />
-									</Label.Root>
-									<motion.div
-										key={nameShakeKey}
-										animate={
-											nameShakeKey > 0
-												? { x: [0, 6, -6, 4, -4, 2, -2, 0] }
-												: { x: 0 }
-										}
-										transition={{
-											duration: 0.35,
-											ease: [0.22, 1, 0.36, 1],
-										}}
-									>
-										<Input.Root size="medium" hasError={Boolean(nameError)}>
-											<Input.Wrapper>
-												<Input.Input
-													id="campaign-name"
-													placeholder="e.g. August 2026 Product Launch & Community Update"
-													value={name}
-													onChange={(e) => {
-														setName(e.target.value);
-														if (nameError) setNameError("");
-													}}
-													autoFocus
-												/>
-											</Input.Wrapper>
-										</Input.Root>
-									</motion.div>
-									<AnimatePresence>
-										{nameError && (
-											<motion.p
-												initial={{ opacity: 0, y: -4, height: 0 }}
-												animate={{ opacity: 1, y: 0, height: "auto" }}
-												exit={{ opacity: 0, y: -4, height: 0 }}
+							{/* Main Card Container */}
+							<div className="overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-soft-50">
+								<form
+									onSubmit={(e) => {
+										e.preventDefault();
+										handleContinue();
+									}}
+								>
+									{/* Top Padded Content Area */}
+									<div className="m-0.5 space-y-5 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-6">
+										<div>
+											<h2 className="font-semibold text-base text-text-strong-950 tracking-tight">
+												General Information
+											</h2>
+											<p className="mt-1 text-text-sub-600 text-xs leading-relaxed">
+												Name your broadcast campaign for organization and
+												performance tracking.
+											</p>
+										</div>
+
+										<div className="space-y-2">
+											<Label.Root
+												htmlFor="campaign-name"
+												className="font-medium text-text-strong-950 text-xs"
+											>
+												Campaign Name
+												<Label.Asterisk />
+											</Label.Root>
+											<motion.div
+												key={nameShakeKey}
+												animate={
+													nameShakeKey > 0
+														? { x: [0, 6, -6, 4, -4, 2, -2, 0] }
+														: { x: 0 }
+												}
 												transition={{
-													duration: 0.2,
+													duration: 0.35,
 													ease: [0.22, 1, 0.36, 1],
 												}}
-												className="overflow-hidden font-medium text-error-base text-xs"
 											>
-												{nameError}
-											</motion.p>
-										)}
-									</AnimatePresence>
-								</div>
+												<Input.Root size="medium" hasError={Boolean(nameError)}>
+													<Input.Wrapper>
+														<Input.Input
+															id="campaign-name"
+															placeholder="e.g. August 2026 Product Launch & Community Update"
+															value={name}
+															onChange={(e) => {
+																setName(e.target.value);
+																if (nameError) setNameError("");
+															}}
+															autoFocus
+														/>
+													</Input.Wrapper>
+												</Input.Root>
+											</motion.div>
+											<AnimatePresence>
+												{nameError && (
+													<motion.p
+														initial={{ opacity: 0, y: -4, height: 0 }}
+														animate={{ opacity: 1, y: 0, height: "auto" }}
+														exit={{ opacity: 0, y: -4, height: 0 }}
+														transition={{
+															duration: 0.2,
+															ease: [0.22, 1, 0.36, 1],
+														}}
+														className="overflow-hidden font-medium text-error-base text-xs"
+													>
+														{nameError}
+													</motion.p>
+												)}
+											</AnimatePresence>
+										</div>
+									</div>
 
-								{/* Action Buttons */}
-								<div className="pt-6">
-									<FancyButton.Root
-										type="submit"
-										variant="blue"
-										size="medium"
-										className="h-10 w-full justify-center gap-1.5 overflow-hidden rounded-xl font-medium text-sm"
-									>
-										Continue
-										<ActionKbd className={actionKbdOnBlueClassName}>
-											↵
-										</ActionKbd>
-									</FancyButton.Root>
-								</div>
-							</form>
+									{/* Bottom Footer / Action Bar (Inside the 2 borders) */}
+									<div className="flex items-center justify-end px-6 pt-3 pb-3.5 dark:bg-bg-weak-50/40">
+										<FancyButton.Root
+											type="submit"
+											variant="blue"
+											size="small"
+											className="min-w-[134px] justify-center gap-1.5 overflow-hidden rounded-xl font-medium text-sm"
+										>
+											Continue
+											<ActionKbd className={actionKbdOnBlueClassName}>
+												↵
+											</ActionKbd>
+										</FancyButton.Root>
+									</div>
+								</form>
+							</div>
 						</motion.div>
 					)}
 
@@ -778,22 +797,24 @@ function CreateCampaignPageContent() {
 												</button>
 											</div>
 										</div>
-									</div>
 
-									{/* Action Button: Back to Setup */}
-									<div className="flex items-center justify-start pt-2">
-										<Button.Root
-											type="button"
-											variant="neutral"
-											mode="stroke"
-											size="small"
-											onClick={handleBack}
-											disabled={isSendingBroadcast}
-											className="gap-1.5 rounded-xl"
-										>
-											Back
-											<ActionKbd className="w-auto min-w-4 px-1">esc</ActionKbd>
-										</Button.Root>
+										{/* Bottom Footer / Action Bar (Inside the 2 borders) */}
+										<div className="flex items-center justify-start px-6 pt-3 pb-3.5 dark:bg-bg-weak-50/40">
+											<Button.Root
+												type="button"
+												variant="neutral"
+												mode="stroke"
+												size="small"
+												onClick={handleBack}
+												disabled={isSendingBroadcast}
+												className="gap-1.5 rounded-xl"
+											>
+												Back
+												<ActionKbd className="w-auto min-w-4 px-1">
+													esc
+												</ActionKbd>
+											</Button.Root>
+										</div>
 									</div>
 								</motion.div>
 							) : (
@@ -1175,55 +1196,55 @@ function CreateCampaignPageContent() {
 														</div>
 													</div>
 												)}
+
+												{/* Error Message */}
+												<AnimatePresence>
+													{targetError && (
+														<motion.p
+															initial={{ opacity: 0, y: -4, height: 0 }}
+															animate={{ opacity: 1, y: 0, height: "auto" }}
+															exit={{ opacity: 0, y: -4, height: 0 }}
+															transition={{
+																duration: 0.2,
+																ease: [0.22, 1, 0.36, 1],
+															}}
+															className="overflow-hidden font-medium text-error-base text-xs"
+														>
+															{targetError}
+														</motion.p>
+													)}
+												</AnimatePresence>
 											</div>
-										</div>
 
-										{/* Error Message */}
-										<AnimatePresence>
-											{targetError && (
-												<motion.p
-													initial={{ opacity: 0, y: -4, height: 0 }}
-													animate={{ opacity: 1, y: 0, height: "auto" }}
-													exit={{ opacity: 0, y: -4, height: 0 }}
-													transition={{
-														duration: 0.2,
-														ease: [0.22, 1, 0.36, 1],
-													}}
-													className="overflow-hidden font-medium text-error-base text-xs"
+											{/* Bottom Footer / Action Bar (Inside the 2 borders) */}
+											<div className="flex items-center justify-between px-6 pt-3 pb-3.5 dark:bg-bg-weak-50/40">
+												<Button.Root
+													type="button"
+													variant="neutral"
+													mode="stroke"
+													size="small"
+													onClick={handleBack}
+													disabled={isSendingBroadcast}
+													className="gap-1.5 rounded-xl"
 												>
-													{targetError}
-												</motion.p>
-											)}
-										</AnimatePresence>
-
-										{/* Action Buttons */}
-										<div className="flex items-center justify-end gap-3 pt-3">
-											<Button.Root
-												type="button"
-												variant="neutral"
-												mode="stroke"
-												size="small"
-												onClick={handleBack}
-												disabled={isSendingBroadcast}
-												className="gap-1.5 rounded-xl"
-											>
-												Back
-												<ActionKbd className="w-auto min-w-4 px-1">
-													esc
-												</ActionKbd>
-											</Button.Root>
-											<FancyButton.Root
-												type="button"
-												variant="blue"
-												size="small"
-												onClick={handleContinue}
-												className="min-w-[134px] justify-center gap-1.5 overflow-hidden rounded-xl"
-											>
-												Continue
-												<ActionKbd className={actionKbdOnBlueClassName}>
-													↵
-												</ActionKbd>
-											</FancyButton.Root>
+													Back
+													<ActionKbd className="w-auto min-w-4 px-1">
+														esc
+													</ActionKbd>
+												</Button.Root>
+												<FancyButton.Root
+													type="button"
+													variant="blue"
+													size="small"
+													onClick={handleContinue}
+													className="min-w-[134px] justify-center gap-1.5 overflow-hidden rounded-xl font-medium text-sm"
+												>
+													Continue
+													<ActionKbd className={actionKbdOnBlueClassName}>
+														↵
+													</ActionKbd>
+												</FancyButton.Root>
+											</div>
 										</div>
 									</motion.div>
 								</motion.div>
