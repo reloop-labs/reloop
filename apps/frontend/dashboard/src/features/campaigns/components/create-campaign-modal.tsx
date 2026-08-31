@@ -129,12 +129,14 @@ export function CreateCampaignModal({
 			>
 				<form onSubmit={(e) => void handleSubmit(e)}>
 					<div className="relative m-0.5 space-y-5 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 pt-5 dark:border-stroke-soft-100/40 dark:bg-[#0c0c0c]">
-						<div className="flex items-center justify-between border-stroke-soft-200 border-b px-6 pb-4 dark:border-stroke-soft-100/40">
-							<div className="flex items-center gap-2">
-								<Icon name="mega-phone" className="size-4" />
-								<Modal.Title className="font-medium text-text-strong-950 text-xl tracking-tight">
-									Create campaign
-								</Modal.Title>
+						<div className="flex items-start justify-between px-6 dark:border-stroke-soft-100/40">
+							<div className="space-y-1">
+								<div className="flex items-center gap-2">
+									<Icon name="mega-phone" className="size-4" />
+									<Modal.Title className="font-medium text-text-strong-950 text-xl tracking-tight">
+										Create campaign
+									</Modal.Title>
+								</div>
 							</div>
 							<button
 								type="button"
