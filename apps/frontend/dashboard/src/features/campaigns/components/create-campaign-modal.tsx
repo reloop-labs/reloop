@@ -9,6 +9,7 @@ import * as Label from "@reloop/ui/label";
 import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
 import { AnimatePresence, motion } from "framer-motion";
+import { X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
@@ -127,15 +128,26 @@ export function CreateCampaignModal({
 				showClose={false}
 			>
 				<form onSubmit={(e) => void handleSubmit(e)}>
-					<div className="relative m-0.5 space-y-5 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 px-6 pt-5 pb-7 dark:border-stroke-soft-100/40 dark:bg-[#0c0c0c]">
-						<div className="flex items-center gap-2">
-							<Icon name="mega-phone" className="size-4" />
-							<Modal.Title className="font-semibold text-base text-text-strong-950 tracking-tight">
-								Create campaign
-							</Modal.Title>
+					<div className="relative m-0.5 space-y-5 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 pt-5 dark:border-stroke-soft-100/40 dark:bg-[#0c0c0c]">
+						<div className="flex items-center justify-between border-stroke-soft-200 border-b px-6 pb-4 dark:border-stroke-soft-100/40">
+							<div className="flex items-center gap-2">
+								<Icon name="mega-phone" className="size-4" />
+								<Modal.Title className="font-medium text-text-strong-950 text-xl tracking-tight">
+									Create campaign
+								</Modal.Title>
+							</div>
+							<button
+								type="button"
+								onClick={handleClose}
+								aria-label="Close"
+								disabled={status !== "idle"}
+								className="flex h-7 w-7 items-center justify-center rounded-lg bg-bg-white-0 text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 active:scale-[0.95] disabled:opacity-50 dark:border-stroke-soft-100/40 dark:bg-transparent dark:hover:bg-white/[0.05]"
+							>
+								<X className="size-3.5" strokeWidth={2.25} />
+							</button>
 						</div>
 
-						<div className="space-y-1.5">
+						<div className="space-y-1.5 px-6 pb-7">
 							<Label.Root
 								htmlFor="campaign-name"
 								className="font-medium text-text-strong-950 text-xs"
