@@ -51,6 +51,30 @@
 		margin-top var(--revert-dur, 280ms) ease-out;
 }
 
+.t-hint {
+	margin-top: 0.375rem;
+	max-height: 4rem;
+	overflow: hidden;
+	opacity: 1;
+	visibility: visible;
+	transition:
+		opacity var(--revert-dur, 280ms) ease-out,
+		visibility 0s linear 0s,
+		max-height var(--revert-dur, 280ms) ease-out,
+		margin-top var(--revert-dur, 280ms) ease-out;
+}
+.t-input-wrap.is-error .t-hint {
+	margin-top: 0;
+	max-height: 0;
+	opacity: 0;
+	visibility: hidden;
+	transition:
+		opacity var(--revert-dur, 280ms) ease-out,
+		visibility 0s linear var(--revert-dur, 280ms),
+		max-height var(--revert-dur, 280ms) ease-out,
+		margin-top var(--revert-dur, 280ms) ease-out;
+}
+
 /* Multi-segment keyframe with per-stop easing so each leg
    of the shake follows its own cubic-bezier independently.
    %-stops are cumulative durations as a fraction of the

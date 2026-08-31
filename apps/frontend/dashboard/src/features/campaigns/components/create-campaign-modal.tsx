@@ -3,6 +3,7 @@
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
+import { FieldError, useFieldError } from "@reloop/ui/field-error";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
@@ -17,6 +18,8 @@ import { toast } from "sonner";
 import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import { useCampaigns } from "../campaigns-provider";
+
+const EMPTY_NAME_ERROR = "Please enter a campaign name.";
 
 const actionKbdOnBlueClassName =
 	"border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]";
@@ -34,23 +37,29 @@ export function CreateCampaignModal({
 	const { activeOrganization } = useActiveOrganization();
 	const { createCampaign } = useCampaigns();
 	const [name, setName] = useState("");
-	const [error, setError] = useState<string | null>(null);
 	const [status, setStatus] = useState<"idle" | "creating" | "success">("idle");
+	const nameField = useFieldError();
+	const clearNameError = nameField.clear;
 
 	const handleClose = () => {
 		if (status !== "idle") return;
 		setName("");
-		setError(null);
+		nameField.clear();
 		setStatus("idle");
 		onOpenChange(false);
 	};
 
 	const handleSubmit = async (e?: React.FormEvent) => {
 		e?.preventDefault();
-		const trimmed = name.trim();
-		if (!trimmed || status !== "idle") return;
+		if (status !== "idle") return;
 
-		setError(null);
+		const trimmed = name.trim();
+		if (!trimmed) {
+			nameField.show(EMPTY_NAME_ERROR);
+			return;
+		}
+
+		nameField.clear();
 		setStatus("creating");
 		try {
 			const campaign = await createCampaign(
@@ -72,18 +81,16 @@ export function CreateCampaignModal({
 			setTimeout(() => {
 				onOpenChange(false);
 				setName("");
-				setError(null);
+				nameField.clear();
 				setStatus("idle");
 				router.push(`/campaigns/create?id=${encodeURIComponent(campaign.id)}`);
 			}, 450);
 		} catch (err) {
 			setStatus("idle");
-			setError(
-				err instanceof Error ? err.message : "Failed to create campaign",
-			);
-			toast.error(
-				err instanceof Error ? err.message : "Failed to create campaign",
-			);
+			const message =
+				err instanceof Error ? err.message : "Failed to create campaign";
+			nameField.show(message);
+			toast.error(message);
 		}
 	};
 
@@ -91,7 +98,7 @@ export function CreateCampaignModal({
 		"enter",
 		(e) => {
 			e.preventDefault();
-			if (open && status === "idle" && name.trim()) {
+			if (open && status === "idle") {
 				void handleSubmit();
 			}
 		},
@@ -114,12 +121,12 @@ export function CreateCampaignModal({
 		if (!open) {
 			const timer = setTimeout(() => {
 				setName("");
-				setError(null);
+				clearNameError();
 				setStatus("idle");
 			}, 300);
 			return () => clearTimeout(timer);
 		}
-	}, [open]);
+	}, [open, clearNameError]);
 
 	return (
 		<Modal.Root open={open} onOpenChange={(next) => !next && handleClose()}>
@@ -127,7 +134,7 @@ export function CreateCampaignModal({
 				className="overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-soft-50 p-0 sm:max-w-[460px] dark:border-stroke-soft-100/40 dark:bg-white/[0.03]"
 				showClose={false}
 			>
-				<form onSubmit={(e) => void handleSubmit(e)}>
+				<form onSubmit={(e) => void handleSubmit(e)} noValidate>
 					<div className="relative m-0.5 space-y-5 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 pt-5 dark:border-stroke-soft-100/40 dark:bg-[#0c0c0c]">
 						<div className="flex items-start justify-between px-6 dark:border-stroke-soft-100/40">
 							<div className="space-y-1">
@@ -157,28 +164,27 @@ export function CreateCampaignModal({
 								Campaign name
 								<Label.Asterisk />
 							</Label.Root>
-							<Input.Root size="medium" hasError={Boolean(error)}>
-								<Input.Wrapper>
-									<Input.Input
-										id="campaign-name"
-										placeholder="e.g. April product update"
-										value={name}
-										onChange={(e) => {
-											setName(e.target.value);
-											if (error) setError(null);
-										}}
-										autoFocus
-										disabled={status !== "idle"}
-									/>
-								</Input.Wrapper>
-							</Input.Root>
-							{error ? (
-								<p className="text-error-base text-paragraph-xs">{error}</p>
-							) : (
-								<p className="text-paragraph-xs text-text-sub-600">
-									Used internally to find this campaign in your list.
-								</p>
-							)}
+							<FieldError
+								field={nameField}
+								hint="Used internally to find this campaign in your list."
+							>
+								<Input.Root size="medium" hasError={nameField.hasError}>
+									<Input.Wrapper>
+										<Input.Input
+											id="campaign-name"
+											{...nameField.controlProps}
+											placeholder="e.g. April product update"
+											value={name}
+											onChange={(e) => {
+												setName(e.target.value);
+												if (nameField.hasError) nameField.clear();
+											}}
+											autoFocus
+											disabled={status !== "idle"}
+										/>
+									</Input.Wrapper>
+								</Input.Root>
+							</FieldError>
 						</div>
 					</div>
 					<div className="relative flex items-center justify-between gap-3 px-3 pt-2 pb-3">
@@ -203,9 +209,7 @@ export function CreateCampaignModal({
 							type="submit"
 							variant={status === "success" ? "success" : "blue"}
 							size="small"
-							disabled={
-								status === "creating" || (status === "idle" && !name.trim())
-							}
+							disabled={status !== "idle"}
 							className={cn(
 								"min-w-[168px] justify-center overflow-hidden transition-all duration-200",
 								status !== "idle" && "pointer-events-none",
