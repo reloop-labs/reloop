@@ -1,7 +1,4 @@
-import type {
-	Campaign,
-	CreateCampaignInput,
-} from "./campaign-types";
+import type { Campaign, CreateCampaignInput } from "./campaign-types";
 
 const BASE = "/api/campaigns/v1";
 

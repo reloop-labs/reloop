@@ -1,40 +1,66 @@
 "use client";
 
-import { Icon } from "@reloop/ui/icon";
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import {
+	parseAsArrayOf,
+	parseAsInteger,
+	parseAsString,
+	useQueryState,
+} from "nuqs";
+import { useEffect, useMemo } from "react";
 import type { CommandAction } from "#/features/dashboard/command-menu";
 import { useRegisterCommandActions } from "#/features/dashboard/command-menu-context";
 import { CampaignsListHeader } from "./campaigns-list-header";
 import { CampaignsProvider, useCampaigns } from "./campaigns-provider";
+import { CampaignErrorState } from "./components/campaign-error-state";
+import { CampaignListToolbar } from "./components/campaign-list-toolbar";
 import { CampaignTable } from "./components/campaign-table";
+import { useCampaignColumnVisibility } from "./hooks/use-campaign-column-visibility";
 
 function CampaignsPageContent() {
 	const router = useRouter();
-	const { campaigns, isLoading, isHydrated } = useCampaigns();
-	const [searchQuery, setSearchQuery] = useState("");
-	const [selectedStatus, setSelectedStatus] = useState<string>("all");
+	const { campaigns, isLoading, isHydrated, isError } = useCampaigns();
+	const [statusFilters] = useQueryState(
+		"status",
+		parseAsArrayOf(parseAsString).withDefault([]),
+	);
+	const [searchQuery] = useQueryState("q", parseAsString.withDefault(""));
+	const [currentPage, setCurrentPage] = useQueryState(
+		"page",
+		parseAsInteger.withDefault(1),
+	);
+	const [pageSize] = useQueryState("limit", parseAsInteger.withDefault(10));
+	const { columnVisibility, setColumnVisible } = useCampaignColumnVisibility();
 
 	const filtered = useMemo(() => {
 		let list = campaigns;
-		if (selectedStatus !== "all") {
-			list = list.filter((c) => c.status === selectedStatus);
+		if (statusFilters.length > 0) {
+			const allowed = new Set(statusFilters);
+			list = list.filter((campaign) => allowed.has(campaign.status));
 		}
 		const q = searchQuery.toLowerCase().trim();
 		if (!q) return list;
 		return list.filter(
-			(c) =>
-				c.name.toLowerCase().includes(q) ||
-				c.subject.toLowerCase().includes(q) ||
-				(c.audienceTargetName?.toLowerCase().includes(q) ?? false),
+			(campaign) =>
+				campaign.name.toLowerCase().includes(q) ||
+				campaign.subject.toLowerCase().includes(q) ||
+				(campaign.audienceTargetName?.toLowerCase().includes(q) ?? false),
 		);
-	}, [campaigns, selectedStatus, searchQuery]);
+	}, [campaigns, statusFilters, searchQuery]);
 
-	const isTotalEmpty = isHydrated && !isLoading && campaigns.length === 0;
+	const limit = pageSize ?? 10;
+	const page = currentPage ?? 1;
+	const paged = useMemo(() => {
+		const start = (page - 1) * limit;
+		return filtered.slice(start, start + limit);
+	}, [filtered, page, limit]);
 
-	const handleCreate = () => {
-		router.push("/campaigns/create");
-	};
+	useEffect(() => {
+		const totalPages = Math.max(1, Math.ceil(filtered.length / limit));
+		if (page > totalPages) {
+			void setCurrentPage(totalPages);
+		}
+	}, [filtered.length, limit, page, setCurrentPage]);
 
 	const actions = useMemo<CommandAction[]>(
 		() => [
@@ -53,97 +79,42 @@ function CampaignsPageContent() {
 				onSelect: () =>
 					window.open("https://reloop.sh/docs/learn/emails", "_blank"),
 			},
+			{
+				id: "select-all",
+				label: "Select All",
+				icon: "check-square",
+				shortcut: { label: "⌘A", keys: ["mod+a"] },
+				onSelect: () =>
+					window.dispatchEvent(new CustomEvent("campaigns:select-all")),
+			},
 		],
 		[router],
 	);
 
 	useRegisterCommandActions("campaigns", "Campaigns", actions);
 
-	const statusTabs: { id: string; label: string; count?: number }[] = [
-		{ id: "all", label: "All Campaigns", count: campaigns.length },
-		{
-			id: "sent",
-			label: "Sent",
-			count: campaigns.filter((c) => c.status === "sent").length,
-		},
-		{
-			id: "scheduled",
-			label: "Scheduled",
-			count: campaigns.filter((c) => c.status === "scheduled").length,
-		},
-		{
-			id: "draft",
-			label: "Drafts",
-			count: campaigns.filter((c) => c.status === "draft").length,
-		},
-	];
+	const showLoading = !isHydrated || isLoading;
 
 	return (
 		<div className="mx-auto max-w-6xl space-y-6 p-6 lg:p-8">
-			{/* Page Header */}
-			<CampaignsListHeader onCreate={handleCreate} />
+			<CampaignsListHeader />
 
-			{/* Filters & Search Toolbar */}
-			{!isTotalEmpty && (
-				<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-					{/* Status Tabs */}
-					<div className="flex items-center gap-1 overflow-x-auto rounded-lg border border-stroke-soft-100 p-1 dark:border-stroke-soft-100/50">
-						{statusTabs.map((tab) => {
-							const active = selectedStatus === tab.id;
-							return (
-								<button
-									key={tab.id}
-									type="button"
-									onClick={() => setSelectedStatus(tab.id)}
-									className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 font-medium text-xs transition-colors ${
-										active
-											? "bg-bg-white-0 text-text-strong-950 shadow-xs dark:bg-bg-weak-100"
-											: "text-text-sub-600 hover:text-text-strong-950"
-									}`}
-								>
-									<span>{tab.label}</span>
-									{tab.count !== undefined && (
-										<span
-											className={`rounded-full px-1.5 py-0.2 text-[10px] ${
-												active
-													? "bg-bg-weak-50 font-semibold text-text-strong-950"
-													: "bg-bg-weak-50/60 text-text-sub-600"
-											}`}
-										>
-											{tab.count}
-										</span>
-									)}
-								</button>
-							);
-						})}
-					</div>
-
-					{/* Search input */}
-					<div className="relative w-full sm:w-64">
-						<Icon
-							name="search"
-							className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-text-sub-600"
-						/>
-						<input
-							type="search"
-							placeholder="Search campaigns..."
-							value={searchQuery}
-							onChange={(e) => setSearchQuery(e.target.value)}
-							className="w-full rounded-lg border border-stroke-soft-100 bg-bg-white-0 py-1.5 pr-3 pl-9 text-text-strong-950 text-xs outline-none focus:border-stroke-strong-950 dark:border-stroke-soft-100/50"
-						/>
-					</div>
+			{isError ? (
+				<CampaignErrorState />
+			) : (
+				<div className="space-y-4">
+					<CampaignListToolbar
+						columnVisibility={columnVisibility}
+						onColumnVisibleChange={setColumnVisible}
+					/>
+					<CampaignTable
+						campaigns={paged}
+						total={filtered.length}
+						columnVisibility={columnVisibility}
+						isLoading={showLoading}
+					/>
 				</div>
 			)}
-
-			{/* Main Table Container */}
-			<div className="overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 shadow-xs dark:border-stroke-soft-100/50">
-				<CampaignTable
-					campaigns={filtered}
-					isLoading={!isHydrated || isLoading}
-					isTotalEmpty={isTotalEmpty}
-					onCreate={handleCreate}
-				/>
-			</div>
 		</div>
 	);
 }

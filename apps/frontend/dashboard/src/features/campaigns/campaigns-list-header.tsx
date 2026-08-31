@@ -3,19 +3,15 @@
 import * as Button from "@reloop/ui/button";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
+import { useRouter } from "next/navigation";
 import { useHotkeys } from "react-hotkeys-hook";
 import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 
 const DOCS_URL = "https://reloop.sh/docs/learn/emails";
 
-const actionKbdOnSolidClassName =
-	"border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]";
-
-interface CampaignsListHeaderProps {
-	onCreate: () => void;
-}
-
-export function CampaignsListHeader({ onCreate }: CampaignsListHeaderProps) {
+export function CampaignsListHeader() {
+	const router = useRouter();
+	const openCreate = () => router.push("/campaigns/create");
 	const openDocs = () => window.open(DOCS_URL, "_blank");
 
 	useHotkeys(
@@ -31,7 +27,7 @@ export function CampaignsListHeader({ onCreate }: CampaignsListHeaderProps) {
 		"c",
 		(e) => {
 			e.preventDefault();
-			onCreate();
+			openCreate();
 		},
 		{ enableOnFormTags: false, preventDefault: true },
 	);
@@ -70,13 +66,15 @@ export function CampaignsListHeader({ onCreate }: CampaignsListHeaderProps) {
 					type="button"
 					variant="blue"
 					size="small"
-					onClick={onCreate}
+					onClick={openCreate}
 					className="gap-1.5 rounded-xl"
 					aria-keyshortcuts="c"
 				>
 					<Icon name="plus" className="h-4 w-4" />
 					Create campaign
-					<ActionKbd className={actionKbdOnSolidClassName}>C</ActionKbd>
+					<ActionKbd className="border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]">
+						C
+					</ActionKbd>
 				</FancyButton.Root>
 			</div>
 		</div>

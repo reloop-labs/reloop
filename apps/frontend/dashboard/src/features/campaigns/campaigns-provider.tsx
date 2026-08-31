@@ -11,10 +11,7 @@ import {
 import { toast } from "sonner";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import { queryKeys } from "#/lib/query-keys";
-import type {
-	Campaign,
-	CreateCampaignInput,
-} from "./campaign-types";
+import type { Campaign, CreateCampaignInput } from "./campaign-types";
 import {
 	createCampaignRequest,
 	deleteCampaignRequest,
@@ -29,6 +26,7 @@ interface CampaignsContextValue {
 	campaigns: Campaign[];
 	isLoading: boolean;
 	isHydrated: boolean;
+	isError: boolean;
 	getCampaign: (id: string) => Campaign | undefined;
 	createCampaign: (
 		input: CreateCampaignInput,
@@ -130,6 +128,7 @@ export function CampaignsProvider({ children }: { children: ReactNode }) {
 			campaigns,
 			isLoading: listQuery.isLoading,
 			isHydrated: listQuery.isFetched || listQuery.isError,
+			isError: listQuery.isError,
 			getCampaign,
 			createCampaign,
 			sendCampaign,
@@ -164,6 +163,12 @@ export function useCampaigns() {
 		throw new Error("useCampaigns must be used within a CampaignsProvider");
 	}
 	return context;
+}
+
+export function useInvalidateCampaigns() {
+	const queryClient = useQueryClient();
+	return () =>
+		queryClient.invalidateQueries({ queryKey: queryKeys.campaigns.all });
 }
 
 export function useCampaignQuery(id: string | undefined) {
