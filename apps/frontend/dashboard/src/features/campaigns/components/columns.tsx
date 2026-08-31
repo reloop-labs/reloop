@@ -58,18 +58,13 @@ export const campaignColumns: ColumnDef<Campaign>[] = [
 		cell: ({ row }) => {
 			const campaign = row.original;
 			return (
-				<div className="flex min-w-0 flex-col gap-0.5 pr-3">
+				<div className="flex min-w-0 items-center pr-3">
 					<Link
 						href={`/campaigns/${campaign.id}`}
 						className="truncate font-semibold text-label-sm text-text-strong-950 underline decoration-dotted underline-offset-2 transition-colors hover:text-[#1868DF] dark:hover:text-blue-400"
 					>
 						{campaign.name}
 					</Link>
-					{campaign.subject ? (
-						<p className="truncate text-[12px] text-text-sub-600">
-							{campaign.subject}
-						</p>
-					) : null}
 				</div>
 			);
 		},
