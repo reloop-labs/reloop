@@ -4,31 +4,27 @@ import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { formatRelativeTime } from "#/utils/format-relative-time";
-import { CampaignsProvider, useCampaigns } from "./campaigns-provider";
+import {
+	CampaignsProvider,
+	useCampaignQuery,
+	useCampaigns,
+} from "./campaigns-provider";
 
 function CampaignDetailContent() {
 	const params = useParams();
 	const router = useRouter();
 	const campaignId = params?.campaignId as string;
-	const {
-		getCampaign,
-		sendCampaign,
-		duplicateCampaign,
-		deleteCampaign,
-		isHydrated,
-	} = useCampaigns();
+	const { sendCampaign, duplicateCampaign, deleteCampaign } = useCampaigns();
+	const campaignQuery = useCampaignQuery(campaignId);
 
 	const [activeTab, setActiveTab] = useState<"preview" | "raw">("preview");
 	const [actionPending, setActionPending] = useState(false);
 
-	const campaign = useMemo(
-		() => (campaignId ? getCampaign(campaignId) : undefined),
-		[campaignId, getCampaign, isHydrated],
-	);
+	const campaign = campaignQuery.data;
 
-	if (!isHydrated) {
+	if (campaignQuery.isLoading) {
 		return (
 			<div className="mx-auto max-w-4xl space-y-6 p-6 lg:p-8">
 				<div className="h-8 w-48 animate-pulse rounded-lg bg-bg-weak-100" />
@@ -46,7 +42,7 @@ function CampaignDetailContent() {
 				<h2 className="font-semibold text-lg text-text-strong-950">
 					Campaign Not Found
 				</h2>
-				<p className="mt-1 text-text-sub-600 text-sm">
+				<p className="mt-1 text-sm text-text-sub-600">
 					The requested campaign could not be located in your workspace.
 				</p>
 				<Button.Root variant="neutral" size="small" asChild className="mt-6">
@@ -120,11 +116,11 @@ function CampaignDetailContent() {
 						<h1 className="font-semibold text-2xl text-text-strong-950">
 							{campaign.name}
 						</h1>
-						<span className="rounded-full border border-stroke-soft-100 bg-bg-weak-50 px-2.5 py-0.5 text-xs capitalize text-text-strong-950 font-medium">
+						<span className="rounded-full border border-stroke-soft-100 bg-bg-weak-50 px-2.5 py-0.5 font-medium text-text-strong-950 text-xs capitalize">
 							{campaign.status}
 						</span>
 					</div>
-					<p className="mt-1 text-text-sub-600 text-sm">{campaign.subject}</p>
+					<p className="mt-1 text-sm text-text-sub-600">{campaign.subject}</p>
 				</div>
 
 				<div className="flex items-center gap-2 self-start sm:self-center">
@@ -220,20 +216,20 @@ function CampaignDetailContent() {
 			{/* Metadata Details Grid */}
 			<div className="grid grid-cols-1 gap-4 rounded-xl border border-stroke-soft-100 bg-bg-white-0 p-5 sm:grid-cols-3 dark:border-stroke-soft-100/50">
 				<div>
-					<p className="font-medium text-xs text-text-sub-600">Sender</p>
+					<p className="font-medium text-text-sub-600 text-xs">Sender</p>
 					<p className="mt-1 font-mono text-text-strong-950 text-xs">
 						{campaign.fromName} &lt;{campaign.fromEmail}&gt;
 					</p>
 				</div>
 				<div>
-					<p className="font-medium text-xs text-text-sub-600">Audience</p>
+					<p className="font-medium text-text-sub-600 text-xs">Audience</p>
 					<p className="mt-1 font-medium text-text-strong-950 text-xs">
 						{campaign.audienceTargetName || "All Contacts"} (
 						{campaign.recipientCount.toLocaleString()} recipients)
 					</p>
 				</div>
 				<div>
-					<p className="font-medium text-xs text-text-sub-600">Created</p>
+					<p className="font-medium text-text-sub-600 text-xs">Created</p>
 					<p className="mt-1 text-text-strong-950 text-xs">
 						{new Date(campaign.createdAt).toLocaleString()}
 					</p>
@@ -242,15 +238,15 @@ function CampaignDetailContent() {
 
 			{/* Message Preview Container */}
 			<div className="overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/50">
-				<div className="flex items-center justify-between border-stroke-soft-100 border-b p-3 bg-bg-weak-50/50 dark:border-stroke-soft-100/50">
-					<span className="font-medium text-xs text-text-strong-950">
+				<div className="flex items-center justify-between border-stroke-soft-100 border-b bg-bg-weak-50/50 p-3 dark:border-stroke-soft-100/50">
+					<span className="font-medium text-text-strong-950 text-xs">
 						Email Content Preview
 					</span>
 					<div className="flex items-center gap-1 rounded-lg border border-stroke-soft-100 p-0.5">
 						<button
 							type="button"
 							onClick={() => setActiveTab("preview")}
-							className={`rounded px-2 py-1 text-xs font-medium ${
+							className={`rounded px-2 py-1 font-medium text-xs ${
 								activeTab === "preview"
 									? "bg-bg-weak-100 text-text-strong-950"
 									: "text-text-sub-600 hover:text-text-strong-950"
@@ -261,7 +257,7 @@ function CampaignDetailContent() {
 						<button
 							type="button"
 							onClick={() => setActiveTab("raw")}
-							className={`rounded px-2 py-1 text-xs font-medium ${
+							className={`rounded px-2 py-1 font-medium text-xs ${
 								activeTab === "raw"
 									? "bg-bg-weak-100 text-text-strong-950"
 									: "text-text-sub-600 hover:text-text-strong-950"
@@ -275,11 +271,11 @@ function CampaignDetailContent() {
 				<div className="p-6">
 					{activeTab === "preview" ? (
 						<div
-							className="prose prose-sm max-w-none text-text-strong-950 dark:prose-invert"
+							className="prose prose-sm dark:prose-invert max-w-none text-text-strong-950"
 							dangerouslySetInnerHTML={{ __html: campaign.contentHtml }}
 						/>
 					) : (
-						<pre className="overflow-x-auto rounded-lg bg-bg-weak-50 p-4 font-mono text-xs text-text-strong-950">
+						<pre className="overflow-x-auto rounded-lg bg-bg-weak-50 p-4 font-mono text-text-strong-950 text-xs">
 							{campaign.contentHtml}
 						</pre>
 					)}

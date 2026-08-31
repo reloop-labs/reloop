@@ -154,9 +154,6 @@ export const CreateCampaignModal = ({
 
 		setIsSendingBroadcast(true);
 		try {
-			// Simulate broadcast dispatch
-			await new Promise((resolve) => setTimeout(resolve, 800));
-
 			const campaign = await createCampaign(
 				{
 					name: name.trim(),

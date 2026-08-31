@@ -48,6 +48,7 @@ export type CreateCampaignInput = {
 	templateId?: string;
 	templateName?: string;
 	contentHtml: string;
+	csvEmails?: string[];
 	scheduledAt?: string;
 	sendImmediately?: boolean;
 };

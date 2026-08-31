@@ -343,8 +343,6 @@ function CreateCampaignPageContent() {
 
 		setIsSendingBroadcast(true);
 		try {
-			await new Promise((resolve) => setTimeout(resolve, 800));
-
 			const campaign = await createCampaign(
 				{
 					name: campaignName,
@@ -362,6 +360,7 @@ function CreateCampaignPageContent() {
 								: undefined,
 					audienceTargetName: effectiveTargetName,
 					contentHtml,
+					csvEmails: audienceType === "csv" ? csvEmails : undefined,
 					sendImmediately: true,
 				},
 				effectiveRecipientCount,
@@ -526,16 +525,6 @@ function CreateCampaignPageContent() {
 								>
 									{/* Top Padded Content Area */}
 									<div className="m-0.5 space-y-5 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-6">
-										<div>
-											<h2 className="font-semibold text-base text-text-strong-950 tracking-tight">
-												General Information
-											</h2>
-											<p className="mt-1 text-text-sub-600 text-xs leading-relaxed">
-												Name your broadcast campaign for organization and
-												performance tracking.
-											</p>
-										</div>
-
 										<div className="space-y-2">
 											<Label.Root
 												htmlFor="campaign-name"

@@ -1,5 +1,6 @@
 {
   "lockfileVersion": 1,
+  "configVersion": 0,
   "workspaces": {
     "": {
       "name": "reloop",
@@ -445,6 +446,7 @@
         "@reloop/db": "workspace:*",
         "ai": "catalog:backend",
         "better-auth": "catalog:",
+        "bullmq": "catalog:backend",
         "dotenv": "catalog:backend",
         "drizzle-orm": "catalog:db",
         "drizzle-typebox": "catalog:db",

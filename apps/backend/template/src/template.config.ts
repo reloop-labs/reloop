@@ -40,6 +40,9 @@ export const templateConfig = {
 	},
 	/** Override Playwright’s Chromium when using a system install (Alpine Docker). */
 	CHROMIUM_PATH: process.env.CHROMIUM_PATH || "",
+	/** Shared secret for service-to-service calls (mail send). */
+	RELOOP_INTERNAL_SECRET:
+		process.env.RELOOP_INTERNAL_SECRET || "reloop_internal_secret_default_123",
 	S3: {
 		ENDPOINT: process.env.S3_ENDPOINT || "http://localhost:9010",
 		ACCESS_KEY: process.env.S3_ACCESS_KEY || "reloop",

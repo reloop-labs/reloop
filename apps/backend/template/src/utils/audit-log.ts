@@ -1,7 +1,7 @@
 import { BusEvent, bus } from "@reloop/bus";
 
 interface AuditLogHookOptions {
-	resourceType: "template" | "template_version";
+	resourceType: "template" | "template_version" | "campaign";
 	action: string;
 	successStatus?: number;
 }

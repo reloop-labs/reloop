@@ -147,4 +147,12 @@ export const queryKeys = {
 		detail: (id: string) => [...queryKeys.workflows.all, "detail", id] as const,
 		events: () => [...queryKeys.workflows.all, "events"] as const,
 	},
+	campaigns: {
+		all: ["campaigns"] as const,
+		list: (orgId: string) =>
+			[...queryKeys.campaigns.all, "list", orgId] as const,
+		detail: (id: string) => [...queryKeys.campaigns.all, "detail", id] as const,
+		stats: (orgId: string) =>
+			[...queryKeys.campaigns.all, "stats", orgId] as const,
+	},
 } as const;

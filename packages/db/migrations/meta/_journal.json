@@ -78,6 +78,13 @@
 			"when": 1785800000001,
 			"tag": "0010_email_log_attachments",
 			"breakpoints": true
+		},
+		{
+			"idx": 11,
+			"version": "7",
+			"when": 1785900000000,
+			"tag": "0011_campaigns",
+			"breakpoints": true
 		}
 	]
 }
