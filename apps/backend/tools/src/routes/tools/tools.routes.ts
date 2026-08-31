@@ -2,6 +2,7 @@ import { authCheckerRoute } from "@be/tools/routes/tools/auth-checker/auth-check
 import { blocklistCheckRoute } from "@be/tools/routes/tools/blocklist-check/blocklist-check.route";
 import { deliverabilityTestRoute } from "@be/tools/routes/tools/deliverability-test/deliverability-test.route";
 import { dnsLookupRoute } from "@be/tools/routes/tools/dns-lookup/dns-lookup.route";
+import { domainAgeRoute } from "@be/tools/routes/tools/domain-age/domain-age.route";
 import { emailHealthCheckRoute } from "@be/tools/routes/tools/email-health-check/email-health-check.route";
 import { spamCheckRoute } from "@be/tools/routes/tools/spam-check/spam-check.route";
 import { spoofCheckerRoute } from "@be/tools/routes/tools/spoof-checker/spoof-checker.route";
@@ -21,7 +22,8 @@ export const toolsRoutes = new Elysia({
 	.use(dnsLookupRoute)
 	.use(authCheckerRoute)
 	.use(spoofCheckerRoute)
-	.use(whoSendsRoute);
+	.use(whoSendsRoute)
+	.use(domainAgeRoute);
 
 
 

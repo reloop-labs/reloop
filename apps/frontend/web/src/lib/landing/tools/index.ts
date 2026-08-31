@@ -2,6 +2,7 @@ import { config as auth_checker } from "./auth-checker";
 import { config as blocklist_checker } from "./blocklist-checker";
 import { config as deliverability_tester } from "./deliverability-tester";
 import { config as dns_lookup } from "./dns-lookup";
+import { config as domain_age } from "./domain-age";
 import { config as email_spam_words_checker } from "./email-spam-words-checker";
 import { config as email_validator } from "./email-validator";
 import { config as spoof_checker } from "./spoof-checker";
@@ -12,6 +13,7 @@ export const toolConfigs = [
 	dns_lookup,
 	spoof_checker,
 	who_sends,
+	domain_age,
 	email_spam_words_checker,
 	blocklist_checker,
 	temp_email_checker,
@@ -19,6 +21,7 @@ export const toolConfigs = [
 	deliverability_tester,
 	auth_checker,
 ];
+
 
 
 

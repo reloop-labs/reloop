@@ -15,10 +15,10 @@
 		"test": "bun test test/"
 	},
 	"dependencies": {
+		"@elysia/opentelemetry": "catalog:backend",
 		"@elysiajs/cors": "catalog:backend",
 		"@elysiajs/openapi": "catalog:backend",
 		"@elysiajs/server-timing": "catalog:backend",
-		"@elysia/opentelemetry": "catalog:backend",
 		"@opentelemetry/exporter-trace-otlp-http": "catalog:backend",
 		"@opentelemetry/exporter-trace-otlp-proto": "catalog:backend",
 		"@opentelemetry/sdk-trace-node": "catalog:backend",
@@ -29,7 +29,8 @@
 		"dotenv": "catalog:backend",
 		"elysia": "catalog:backend",
 		"evlog": "catalog:backend",
-		"mailparser": "catalog:backend"
+		"mailparser": "catalog:backend",
+		"tldts": "^7.4.11"
 	},
 	"devDependencies": {
 		"@reloop/tsconfig": "workspace:*",

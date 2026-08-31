@@ -860,6 +860,74 @@ export namespace ToolsModel {
 		subdomainNote: t.Optional(t.Union([t.String(), t.Null()])),
 	});
 
+	export const domainAgeBody = t.Object({
+		domain: t.String({
+			minLength: 1,
+			maxLength: 255,
+			description: "The domain name or URL to check registration age and email readiness for.",
+			examples: ["google.com", "github.com", "reloop.sh"],
+		}),
+	});
+
+	export const domainAgeQuery = t.Object({
+		domain: t.Optional(t.String({ minLength: 1, maxLength: 255 })),
+	});
+
+	export const domainAgeNextStep = t.Object({
+		title: t.String(),
+		body: t.String(),
+		href: t.String(),
+	});
+
+	export const domainAgeResponse = t.Object({
+		domain: t.String(),
+		registrableDomain: t.String(),
+		resolvedAt: t.String(),
+		responseTimeMs: t.Number(),
+		verdict: t.Union([
+			t.Literal("too_new"),
+			t.Literal("cold"),
+			t.Literal("warming"),
+			t.Literal("established"),
+			t.Literal("mature"),
+			t.Literal("unknown_age"),
+			t.Literal("not_registered"),
+			t.Literal("held"),
+		]),
+		headline: t.String(),
+		summary: t.String(),
+		disclaimer: t.String(),
+		age: t.Object({
+			createdAt: t.Union([t.String(), t.Null()]),
+			ageDays: t.Union([t.Number(), t.Null()]),
+			expiresAt: t.Union([t.String(), t.Null()]),
+			source: t.Union([t.Literal("rdap"), t.Literal("none")]),
+		}),
+		registry: t.Object({
+			registrar: t.Union([t.String(), t.Null()]),
+			status: t.Array(t.String()),
+			tld: t.Union([t.String(), t.Null()]),
+		}),
+		nameservers: t.Object({
+			hosts: t.Array(t.String()),
+			provider: t.Union([t.String(), t.Null()]),
+			kind: t.Union([
+				t.Literal("production"),
+				t.Literal("registrar_default"),
+				t.Literal("parking"),
+				t.Literal("unknown"),
+			]),
+		}),
+		emailSetup: t.Object({
+			spf: t.Boolean(),
+			dmarc: t.Boolean(),
+			dmarcPolicy: t.Union([t.String(), t.Null()]),
+			mx: t.Boolean(),
+		}),
+		nextStep: domainAgeNextStep,
+		warnings: t.Array(t.String()),
+	});
+
 	export const errorResponse = t.Object({
 		message: t.String(),
 		why: t.Optional(t.String()),
@@ -887,5 +955,7 @@ export namespace ToolsModel {
 	export type SpoofCheckerResponse = typeof spoofCheckerResponse.static;
 	export type WhoSendsBody = typeof whoSendsBody.static;
 	export type WhoSendsResponse = typeof whoSendsResponse.static;
+	export type DomainAgeBody = typeof domainAgeBody.static;
+	export type DomainAgeResponse = typeof domainAgeResponse.static;
 }
 

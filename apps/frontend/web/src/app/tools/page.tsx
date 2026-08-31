@@ -72,6 +72,18 @@ const TOOL_VISUAL_MAP: Record<string, ToolVisualMeta> = {
 			"Recursive nested SPF unrolling (depth 2)",
 		],
 	},
+	"domain-age": {
+		icon: "globe",
+		badge: "Warmup & Age",
+		badgeColor:
+			"bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/20",
+		glowColor: "group-hover:border-emerald-500/40",
+		features: [
+			"Official RDAP domain creation date check",
+			"Newly registered domain (NRD) spam filter audit",
+			"Visual 4-stage domain warmup timeline",
+		],
+	},
 	"email-spam-words-checker": {
 		icon: "shield-check",
 		badge: "Deliverability",
