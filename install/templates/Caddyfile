@@ -51,6 +51,9 @@
 	handle /api/template* {
 		reverse_proxy template:8019
 	}
+	handle /api/campaigns* {
+		reverse_proxy campaigns:8027
+	}
 	handle /api/inbox* {
 		reverse_proxy inbox:8021
 	}

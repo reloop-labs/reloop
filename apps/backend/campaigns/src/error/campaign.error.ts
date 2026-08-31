@@ -1,4 +1,17 @@
+import { t } from "elysia";
 import { createError } from "evlog";
+
+export const ErrorResponseSchema = t.Object(
+	{
+		message: t.String(),
+		why: t.Optional(t.String()),
+		fix: t.Optional(t.String()),
+		link: t.Optional(t.String()),
+	},
+	{
+		description: "Standard error response format",
+	},
+);
 
 export const CampaignErrors = {
 	notFound: (id: string) =>

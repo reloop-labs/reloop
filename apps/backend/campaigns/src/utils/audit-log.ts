@@ -1,7 +1,7 @@
 import { BusEvent, bus } from "@reloop/bus";
 
 interface AuditLogHookOptions {
-	resourceType: "template" | "template_version";
+	resourceType: "campaign";
 	action: string;
 	successStatus?: number;
 }
@@ -43,14 +43,9 @@ export function auditLogHook(opts: AuditLogHookOptions) {
 
 		const finalOrganizationId = organizationId ?? activeOrganizationId;
 
-		// Capture request body
 		let requestBody: Record<string, unknown> | null = null;
-		try {
-			if (body && typeof body === "object") {
-				requestBody = body as Record<string, unknown>;
-			}
-		} catch {
-			// Silently ignore body capture failures
+		if (body && typeof body === "object") {
+			requestBody = body as Record<string, unknown>;
 		}
 
 		let level: "info" | "warn" | "error" = "info";
@@ -63,21 +58,12 @@ export function auditLogHook(opts: AuditLogHookOptions) {
 			(Number(status) >= 200 && Number(status) < 300);
 
 		if (isSuccess) {
-			level = "info";
-			const result = response as
-				| { id?: string; name?: string; roomName?: string }
-				| undefined;
-			if (result && typeof result === "object" && result !== null) {
-				if ("id" in result) {
-					resourceId = result.id;
-				} else if ("roomName" in result) {
-					resourceId = result.roomName;
-				}
+			const result = response as { id?: string } | undefined;
+			if (result && typeof result === "object" && result.id) {
+				resourceId = result.id;
 				metadata = { ...result };
 			} else {
-				metadata = {
-					status,
-				};
+				metadata = { status };
 			}
 		} else if (status === 429) {
 			level = "warn";
@@ -99,9 +85,8 @@ export function auditLogHook(opts: AuditLogHookOptions) {
 			};
 		}
 
-		// Fallback: extract resourceId from URL if not found in response body
 		if (!resourceId) {
-			const idMatch = request.url.match(/\/(tplv?|ver)_[a-zA-Z0-9]+/);
+			const idMatch = request.url.match(/\/cmp_[a-zA-Z0-9]+/);
 			if (idMatch) {
 				resourceId = idMatch[0].replace("/", "");
 			}
@@ -123,7 +108,7 @@ export function auditLogHook(opts: AuditLogHookOptions) {
 				user_id: userId,
 				resource_type: resourceType,
 				resource_id: resourceId,
-				service: "template",
+				service: "campaigns",
 				action,
 				ip_address: ipAddress,
 				user_agent: userAgent,

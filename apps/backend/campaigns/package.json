@@ -1,5 +1,5 @@
 {
-	"name": "be-template",
+	"name": "be-campaigns",
 	"main": "src/index.ts",
 	"type": "module",
 	"scripts": {
@@ -16,6 +16,7 @@
 	"dependencies": {
 		"@elysiajs/cors": "catalog:backend",
 		"@elysiajs/cron": "catalog:backend",
+		"@elysiajs/openapi": "catalog:backend",
 		"@elysiajs/opentelemetry": "catalog:backend",
 		"@elysiajs/server-timing": "catalog:backend",
 		"@elysiajs/swagger": "catalog:backend",
@@ -27,39 +28,27 @@
 		"@opentelemetry/sdk-trace-node": "catalog:backend",
 		"@opentelemetry/semantic-conventions": "catalog:backend",
 		"@paralleldrive/cuid2": "catalog:backend",
+		"@reloop/auth": "workspace:*",
+		"@reloop/bus": "workspace:*",
+		"@reloop/cache": "workspace:*",
+		"@reloop/db": "workspace:*",
 		"better-auth": "catalog:",
+		"bullmq": "catalog:backend",
 		"dotenv": "catalog:backend",
 		"drizzle-orm": "catalog:db",
 		"drizzle-typebox": "catalog:db",
 		"elysia": "catalog:backend",
-		"lib0": "catalog:backend",
-		"yjs": "catalog:backend",
-		"y-protocols": "catalog:backend",
+		"evlog": "catalog:backend",
 		"pg": "catalog:db",
 		"redis": "catalog:db",
-		"zod": "catalog:ui",
-		"@reloop/db": "workspace:*",
-		"@reloop/cache": "workspace:*",
-		"@reloop/auth": "workspace:*",
-		"@reloop/bus": "workspace:*",
-		"@elysiajs/openapi": "catalog:backend",
-		"evlog": "catalog:backend",
-		"ai": "catalog:backend",
-		"@ai-sdk/openai": "catalog:backend",
-		"@ai-sdk/google": "catalog:backend",
-		"@openrouter/ai-sdk-provider": "catalog:backend",
-		"@aws-sdk/client-s3": "catalog:backend",
-		"@aws-sdk/lib-storage": "catalog:backend",
-		"@reloop/code-samples": "workspace:*",
-		"playwright": "1.61.1"
+		"zod": "catalog:ui"
 	},
 	"devDependencies": {
 		"@reloop/tsconfig": "workspace:*",
-		"tsdown": "catalog:backend",
-		"typescript": "catalog:",
 		"@types/bun": "catalog:backend",
-		"drizzle-kit": "catalog:db",
 		"@types/pg": "catalog:db",
-		"@better-auth/cli": "catalog:backend"
+		"drizzle-kit": "catalog:db",
+		"tsdown": "catalog:backend",
+		"typescript": "catalog:"
 	}
 }

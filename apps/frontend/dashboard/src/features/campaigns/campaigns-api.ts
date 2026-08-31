@@ -4,7 +4,7 @@ import type {
 	CreateCampaignInput,
 } from "./campaign-types";
 
-const BASE = "/api/template/v1/campaigns";
+const BASE = "/api/campaigns/v1";
 
 async function parseError(res: Response): Promise<string> {
 	try {

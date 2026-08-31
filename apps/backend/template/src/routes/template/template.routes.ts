@@ -1,5 +1,4 @@
 import { authMiddleware } from "@be/template/middleware/auth";
-import { campaignRoutes } from "@be/template/routes/campaign/campaign.routes";
 import { agentRoute } from "@be/template/routes/template/ai/agent/agent.route";
 import { aiRoute } from "@be/template/routes/template/ai/ai.route";
 import { createTemplateRoute } from "@be/template/routes/template/create-template/create-template.route";
@@ -22,7 +21,6 @@ export const templateRoutes = new Elysia({
 	name: "TemplateRoutes",
 })
 	.use(authMiddleware)
-	.use(campaignRoutes)
 	.use(createTemplateRoute)
 	.use(htmlToImageRoute)
 	.use(createVersionRoute)

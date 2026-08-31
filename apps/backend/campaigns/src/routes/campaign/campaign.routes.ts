@@ -1,4 +1,4 @@
-import { ErrorResponseSchema } from "@be/campaigns/error/campaigns.error";
+import { ErrorResponseSchema } from "@be/campaigns/error/campaign.error";
 import { authMiddleware } from "@be/campaigns/middleware/auth";
 import {
 	campaignListQuery,
@@ -37,7 +37,7 @@ const errorResponses = {
 };
 
 export const campaignRoutes = new Elysia({
-	prefix: "/campaigns",
+	prefix: "/v1",
 	name: "CampaignRoutes",
 })
 	.use(authMiddleware)

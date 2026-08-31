@@ -1,10 +1,10 @@
+import { campaignsConfig } from "@be/campaigns/campaigns.config";
 import { startCampaignSend } from "@be/campaigns/lib/campaign/dispatch";
 import { sendCampaignRecipient } from "@be/campaigns/lib/campaign/send-recipient";
 import {
 	CAMPAIGN_QUEUE,
 	type CampaignJobData,
 } from "@be/campaigns/queues/campaign.queue";
-import { campaignsConfig } from "@be/campaigns/campaigns.config";
 import { Worker } from "bullmq";
 import { EvlogError, log } from "evlog";
 

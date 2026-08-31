@@ -1,3 +1,4 @@
+import { campaignsConfig } from "@be/campaigns/campaigns.config";
 import { CampaignErrors } from "@be/campaigns/error/campaign.error";
 import {
 	htmlToText,
@@ -26,7 +27,6 @@ import {
 	toCampaignResponse,
 	toRecipientResponse,
 } from "@be/campaigns/routes/campaign/campaign.mappers";
-import { campaignsConfig } from "@be/campaigns/campaigns.config";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import {

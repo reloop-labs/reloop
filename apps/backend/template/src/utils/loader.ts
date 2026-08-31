@@ -1,5 +1,3 @@
-import { startCampaignWorker } from "@be/template/queues/campaign.worker";
-import { initCampaignSubscribers } from "@be/template/subscribers/campaign.subscriber";
 import { bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
 import { log } from "evlog";
@@ -12,8 +10,6 @@ export const loader = async () => {
 		log.info("server", "Database connection verified");
 		await bus.connect(templateConfig.NATS_URL);
 		log.info("server", "NATS connected");
-		await initCampaignSubscribers();
-		startCampaignWorker();
 	} catch (error) {
 		log.error({ ...{ error }, message: "Failed to connect to database" });
 		throw error;
