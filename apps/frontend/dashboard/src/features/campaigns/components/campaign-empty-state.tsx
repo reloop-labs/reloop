@@ -3,7 +3,6 @@
 import * as Button from "@reloop/ui/button";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
-import { useRouter } from "next/navigation";
 import {
 	parseAsArrayOf,
 	parseAsInteger,
@@ -13,7 +12,7 @@ import {
 import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 
 export function CampaignEmptyState() {
-	const router = useRouter();
+	const [, setModal] = useQueryState("modal");
 	const [statusFilters, setStatusFilters] = useQueryState(
 		"status",
 		parseAsArrayOf(parseAsString).withDefault([]),
@@ -35,7 +34,7 @@ export function CampaignEmptyState() {
 		void setCurrentPage(1);
 	};
 
-	const openCreate = () => router.push("/campaigns/create");
+	const openCreate = () => void setModal("create-campaign");
 
 	return (
 		<div className="flex flex-col items-center px-6 py-12 text-center dark:bg-bg-weak-50/30">

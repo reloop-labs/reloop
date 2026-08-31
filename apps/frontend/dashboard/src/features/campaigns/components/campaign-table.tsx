@@ -117,27 +117,37 @@ export function CampaignTable({
 		table.resetRowSelection();
 	}, [table]);
 
+	const showEmptyState = !isLoading && rows.length === 0;
+	const showHeader = !showEmptyState;
+
 	return (
 		<>
 			<div className="w-full text-paragraph-sm">
-				<div
-					style={gridStyle}
-					className="grid items-center rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-4 pt-2.5 pb-5 font-medium text-text-sub-600 text-xs dark:border-[#101010] dark:bg-bg-weak-50/40"
-				>
-					{headerGroup?.headers.map((header) => (
-						<div key={header.id} className="flex items-center gap-1">
-							{header.isPlaceholder
-								? null
-								: flexRender(
-										header.column.columnDef.header,
-										header.getContext(),
-									)}
-						</div>
-					))}
-					<div />
-				</div>
+				{showHeader ? (
+					<div
+						style={gridStyle}
+						className="grid items-center rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-4 pt-2.5 pb-5 font-medium text-text-sub-600 text-xs dark:border-[#101010] dark:bg-bg-weak-50/40"
+					>
+						{headerGroup?.headers.map((header) => (
+							<div key={header.id} className="flex items-center gap-1">
+								{header.isPlaceholder
+									? null
+									: flexRender(
+											header.column.columnDef.header,
+											header.getContext(),
+										)}
+							</div>
+						))}
+						<div />
+					</div>
+				) : null}
 
-				<div className="-mt-2.5 divide-y divide-stroke-soft-100 overflow-visible rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:divide-stroke-soft-100/50 dark:border-stroke-soft-100/40">
+				<div
+					className={cn(
+						"divide-y divide-stroke-soft-100 overflow-visible rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:divide-stroke-soft-100/50 dark:border-stroke-soft-100/40",
+						showHeader && "-mt-2.5",
+					)}
+				>
 					{isLoading && campaigns.length === 0 ? (
 						<CampaignSkeleton
 							rows={loadingRows}

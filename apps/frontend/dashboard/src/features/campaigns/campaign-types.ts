@@ -52,3 +52,19 @@ export type CreateCampaignInput = {
 	scheduledAt?: string;
 	sendImmediately?: boolean;
 };
+
+export type UpdateCampaignInput = {
+	name?: string;
+	subject?: string;
+	previewText?: string;
+	fromName?: string;
+	fromEmail?: string;
+	replyTo?: string;
+	audienceType?: AudienceTargetType;
+	audienceTargetId?: string;
+	audienceTargetName?: string;
+	templateId?: string;
+	templateName?: string;
+	contentHtml?: string;
+	csvEmails?: string[];
+};

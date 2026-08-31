@@ -9,7 +9,8 @@ import * as Label from "@reloop/ui/label";
 import Spinner from "@reloop/ui/spinner";
 import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { useMemo, useRef, useState } from "react";
+import { parseAsString, useQueryState } from "nuqs";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import {
@@ -21,7 +22,11 @@ import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import { useDomainsQuery } from "#/features/domain/hooks/use-domains-query";
 import type { AudienceTargetType } from "../campaign-types";
-import { CampaignsProvider, useCampaigns } from "../campaigns-provider";
+import {
+	CampaignsProvider,
+	useCampaignQuery,
+	useCampaigns,
+} from "../campaigns-provider";
 
 const actionKbdOnBlueClassName =
 	"w-auto min-w-4 border-white/25 bg-white/15 px-1 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]";
@@ -65,7 +70,10 @@ const STEPS: { id: Step; label: string; description: string; icon: string }[] =
 function CreateCampaignPageContent() {
 	const router = useRouter();
 	const { activeOrganization } = useActiveOrganization();
-	const { createCampaign } = useCampaigns();
+	const { createCampaign, updateCampaign, sendCampaign } = useCampaigns();
+	const [campaignId] = useQueryState("id", parseAsString);
+	const campaignQuery = useCampaignQuery(campaignId ?? undefined);
+	const hydratedIdRef = useRef<string | null>(null);
 
 	// Load audience contacts count
 	const contactsQuery = useContactsQuery({
@@ -259,6 +267,46 @@ function CreateCampaignPageContent() {
 		return "All Contacts";
 	}, [audienceType, selectedGroupName, selectedChannelName, csvFileName]);
 
+	useEffect(() => {
+		const campaign = campaignQuery.data;
+		if (!campaignId || !campaign) return;
+		if (hydratedIdRef.current === campaign.id) return;
+		hydratedIdRef.current = campaign.id;
+
+		if (campaign.status !== "draft") {
+			router.replace(`/campaigns/${campaign.id}`);
+			return;
+		}
+
+		setName(campaign.name);
+		setSubject(
+			campaign.subject && campaign.subject !== campaign.name
+				? campaign.subject
+				: "",
+		);
+		setPreviewText(campaign.previewText ?? "");
+		if (campaign.fromName) setFromName(campaign.fromName);
+		if (campaign.fromEmail?.includes("@")) {
+			const [user, domain] = campaign.fromEmail.split("@");
+			if (user) setFromUsername(user);
+			if (domain && domain !== "reloop.sh") setSelectedDomain(domain);
+		}
+		if (campaign.replyTo) setReplyTo(campaign.replyTo);
+		setAudienceType(campaign.audienceType);
+		if (campaign.audienceType === "group" && campaign.audienceTargetId) {
+			setSelectedGroupId(campaign.audienceTargetId);
+			setSelectedGroupName(campaign.audienceTargetName ?? "");
+		}
+		if (campaign.audienceType === "channel" && campaign.audienceTargetId) {
+			setSelectedChannelId(campaign.audienceTargetId);
+			setSelectedChannelName(
+				campaign.audienceTargetName?.replace(/^Channel:\s*/, "") ?? "",
+			);
+		}
+		if (campaign.contentHtml) setContentHtml(campaign.contentHtml);
+		setStep("audience");
+	}, [campaignId, campaignQuery.data, router]);
+
 	const handleCsvFileUpload = (file: File) => {
 		setCsvParsing(true);
 		setCsvError("");
@@ -340,34 +388,44 @@ function CreateCampaignPageContent() {
 	const handleBroadcastNow = async () => {
 		const campaignName = name.trim() || "Untitled Broadcast";
 		const campaignSubject = subject.trim() || "Announcements & Updates";
+		const payload = {
+			name: campaignName,
+			subject: campaignSubject,
+			previewText: previewText.trim() || undefined,
+			fromName: fromName.trim() || "Team",
+			fromEmail: senderEmailAddress,
+			replyTo: replyTo.trim() || undefined,
+			audienceType,
+			audienceTargetId:
+				audienceType === "group"
+					? selectedGroupId
+					: audienceType === "channel"
+						? selectedChannelId
+						: undefined,
+			audienceTargetName: effectiveTargetName,
+			contentHtml,
+			csvEmails: audienceType === "csv" ? csvEmails : undefined,
+		};
 
 		setIsSendingBroadcast(true);
 		try {
+			if (campaignId) {
+				await updateCampaign(campaignId, payload);
+				await sendCampaign(campaignId);
+				router.push(`/campaigns/${campaignId}`);
+				return;
+			}
+
 			const campaign = await createCampaign(
 				{
-					name: campaignName,
-					subject: campaignSubject,
-					previewText: previewText.trim() || undefined,
-					fromName: fromName.trim() || "Team",
-					fromEmail: senderEmailAddress,
-					replyTo: replyTo.trim() || undefined,
-					audienceType,
-					audienceTargetId:
-						audienceType === "group"
-							? selectedGroupId
-							: audienceType === "channel"
-								? selectedChannelId
-								: undefined,
-					audienceTargetName: effectiveTargetName,
-					contentHtml,
-					csvEmails: audienceType === "csv" ? csvEmails : undefined,
+					...payload,
 					sendImmediately: true,
 				},
 				effectiveRecipientCount,
 			);
 
 			toast.success(
-				`🚀 Campaign broadcasted to ${effectiveRecipientCount.toLocaleString()} recipients!`,
+				`Campaign broadcasted to ${effectiveRecipientCount.toLocaleString()} recipients!`,
 			);
 			router.push(`/campaigns/${campaign.id}`);
 		} catch (e) {
@@ -424,6 +482,8 @@ function CreateCampaignPageContent() {
 			if (audienceView === "detail") {
 				setAudienceView("select");
 				setTargetError("");
+			} else if (campaignId) {
+				router.push("/campaigns");
 			} else {
 				setStep("setup");
 			}
@@ -437,6 +497,14 @@ function CreateCampaignPageContent() {
 			router.push("/campaigns");
 		}
 	};
+
+	if (campaignId && campaignQuery.isLoading && !campaignQuery.data) {
+		return (
+			<div className="flex min-h-[calc(100vh-120px)] items-center justify-center">
+				<Spinner size={24} />
+			</div>
+		);
+	}
 
 	return (
 		<div className="relative mx-auto flex min-h-[calc(100vh-120px)] w-full items-start justify-center px-6 py-12">

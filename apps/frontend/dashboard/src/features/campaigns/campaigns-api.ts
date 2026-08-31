@@ -1,4 +1,8 @@
-import type { Campaign, CreateCampaignInput } from "./campaign-types";
+import type {
+	Campaign,
+	CreateCampaignInput,
+	UpdateCampaignInput,
+} from "./campaign-types";
 
 const BASE = "/api/campaigns/v1";
 
@@ -29,6 +33,20 @@ export async function createCampaignRequest(
 ): Promise<Campaign> {
 	const res = await fetch(`${BASE}/create`, {
 		method: "POST",
+		credentials: "include",
+		headers: { "content-type": "application/json" },
+		body: JSON.stringify(input),
+	});
+	if (!res.ok) throw new Error(await parseError(res));
+	return (await res.json()) as Campaign;
+}
+
+export async function updateCampaignRequest(
+	id: string,
+	input: UpdateCampaignInput,
+): Promise<Campaign> {
+	const res = await fetch(`${BASE}/${id}`, {
+		method: "PATCH",
 		credentials: "include",
 		headers: { "content-type": "application/json" },
 		body: JSON.stringify(input),

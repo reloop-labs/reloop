@@ -3,15 +3,15 @@
 import * as Button from "@reloop/ui/button";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
-import { useRouter } from "next/navigation";
+import { useQueryState } from "nuqs";
 import { useHotkeys } from "react-hotkeys-hook";
 import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 
 const DOCS_URL = "https://reloop.sh/docs/learn/emails";
 
 export function CampaignsListHeader() {
-	const router = useRouter();
-	const openCreate = () => router.push("/campaigns/create");
+	const [, setModal] = useQueryState("modal");
+	const openCreate = () => void setModal("create-campaign");
 	const openDocs = () => window.open(DOCS_URL, "_blank");
 
 	useHotkeys(

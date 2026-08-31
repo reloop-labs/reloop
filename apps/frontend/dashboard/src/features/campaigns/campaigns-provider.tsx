@@ -11,7 +11,11 @@ import {
 import { toast } from "sonner";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import { queryKeys } from "#/lib/query-keys";
-import type { Campaign, CreateCampaignInput } from "./campaign-types";
+import type {
+	Campaign,
+	CreateCampaignInput,
+	UpdateCampaignInput,
+} from "./campaign-types";
 import {
 	createCampaignRequest,
 	deleteCampaignRequest,
@@ -20,6 +24,7 @@ import {
 	listCampaigns,
 	scheduleCampaignRequest,
 	sendCampaignRequest,
+	updateCampaignRequest,
 } from "./campaigns-api";
 
 interface CampaignsContextValue {
@@ -32,6 +37,7 @@ interface CampaignsContextValue {
 		input: CreateCampaignInput,
 		recipientCount: number,
 	) => Promise<Campaign>;
+	updateCampaign: (id: string, input: UpdateCampaignInput) => Promise<Campaign>;
 	sendCampaign: (id: string) => Promise<void>;
 	scheduleCampaign: (id: string, scheduledAt: string) => Promise<void>;
 	duplicateCampaign: (id: string) => Promise<Campaign>;
@@ -71,6 +77,18 @@ export function CampaignsProvider({ children }: { children: ReactNode }) {
 			return created;
 		},
 		[invalidate],
+	);
+
+	const updateCampaign = useCallback(
+		async (id: string, input: UpdateCampaignInput) => {
+			const updated = await updateCampaignRequest(id, input);
+			await invalidate();
+			await queryClient.invalidateQueries({
+				queryKey: queryKeys.campaigns.detail(id),
+			});
+			return updated;
+		},
+		[invalidate, queryClient],
 	);
 
 	const sendCampaign = useCallback(
@@ -131,6 +149,7 @@ export function CampaignsProvider({ children }: { children: ReactNode }) {
 			isError: listQuery.isError,
 			getCampaign,
 			createCampaign,
+			updateCampaign,
 			sendCampaign,
 			scheduleCampaign,
 			duplicateCampaign,
@@ -143,6 +162,7 @@ export function CampaignsProvider({ children }: { children: ReactNode }) {
 			listQuery.isError,
 			getCampaign,
 			createCampaign,
+			updateCampaign,
 			sendCampaign,
 			scheduleCampaign,
 			duplicateCampaign,

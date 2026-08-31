@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import {
 	parseAsArrayOf,
 	parseAsInteger,
@@ -15,10 +14,10 @@ import { CampaignsProvider, useCampaigns } from "./campaigns-provider";
 import { CampaignErrorState } from "./components/campaign-error-state";
 import { CampaignListToolbar } from "./components/campaign-list-toolbar";
 import { CampaignTable } from "./components/campaign-table";
+import { CreateCampaignModal } from "./components/create-campaign-modal";
 import { useCampaignColumnVisibility } from "./hooks/use-campaign-column-visibility";
 
 function CampaignsPageContent() {
-	const router = useRouter();
 	const { campaigns, isLoading, isHydrated, isError } = useCampaigns();
 	const [statusFilters] = useQueryState(
 		"status",
@@ -30,6 +29,7 @@ function CampaignsPageContent() {
 		parseAsInteger.withDefault(1),
 	);
 	const [pageSize] = useQueryState("limit", parseAsInteger.withDefault(10));
+	const [modal, setModal] = useQueryState("modal");
 	const { columnVisibility, setColumnVisible } = useCampaignColumnVisibility();
 
 	const filtered = useMemo(() => {
@@ -69,7 +69,7 @@ function CampaignsPageContent() {
 				label: "Create Campaign",
 				icon: "plus",
 				shortcut: { label: "C", keys: ["c"] },
-				onSelect: () => router.push("/campaigns/create"),
+				onSelect: () => void setModal("create-campaign"),
 			},
 			{
 				id: "go-to-docs",
@@ -88,7 +88,7 @@ function CampaignsPageContent() {
 					window.dispatchEvent(new CustomEvent("campaigns:select-all")),
 			},
 		],
-		[router],
+		[setModal],
 	);
 
 	useRegisterCommandActions("campaigns", "Campaigns", actions);
@@ -115,6 +115,12 @@ function CampaignsPageContent() {
 					/>
 				</div>
 			)}
+			<CreateCampaignModal
+				open={modal === "create-campaign"}
+				onOpenChange={(open) => {
+					void setModal(open ? "create-campaign" : null);
+				}}
+			/>
 		</div>
 	);
 }
