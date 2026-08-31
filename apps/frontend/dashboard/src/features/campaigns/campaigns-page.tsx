@@ -7,12 +7,11 @@ import type { CommandAction } from "#/features/dashboard/command-menu";
 import { useRegisterCommandActions } from "#/features/dashboard/command-menu-context";
 import { CampaignsListHeader } from "./campaigns-list-header";
 import { CampaignsProvider, useCampaigns } from "./campaigns-provider";
-import { CampaignStatsCards } from "./components/campaign-stats";
 import { CampaignTable } from "./components/campaign-table";
 
 function CampaignsPageContent() {
 	const router = useRouter();
-	const { campaigns, stats, isLoading, isHydrated } = useCampaigns();
+	const { campaigns, isLoading, isHydrated } = useCampaigns();
 	const [searchQuery, setSearchQuery] = useState("");
 	const [selectedStatus, setSelectedStatus] = useState<string>("all");
 
@@ -83,9 +82,6 @@ function CampaignsPageContent() {
 		<div className="mx-auto max-w-6xl space-y-6 p-6 lg:p-8">
 			{/* Page Header */}
 			<CampaignsListHeader onCreate={handleCreate} />
-
-			{/* Top Metric Cards */}
-			<CampaignStatsCards stats={stats} isLoading={!isHydrated || isLoading} />
 
 			{/* Filters & Search Toolbar */}
 			{!isTotalEmpty && (
