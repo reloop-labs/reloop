@@ -48,6 +48,8 @@ export type AutomationGraph = {
 		id: string;
 		source: string;
 		target: string;
+		sourceHandle?: string | null;
+		targetHandle?: string | null;
 		type?: string;
 		data?: Record<string, unknown>;
 	}>;
@@ -143,6 +145,14 @@ export const automationEnrollment = pgTable(
 			.notNull()
 			.default("active"),
 		currentNodeId: text("current_node_id"),
+		/** Event payload captured at enroll time (for condition steps). */
+		context: jsonb("context")
+			.$type<{
+				eventKey?: string;
+				properties?: Record<string, unknown>;
+			}>()
+			.notNull()
+			.default({}),
 		enrolledAt: timestamp("enrolled_at").notNull().defaultNow(),
 		completedAt: timestamp("completed_at"),
 		cancelledAt: timestamp("cancelled_at"),

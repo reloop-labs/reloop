@@ -82,6 +82,8 @@ export namespace CustomEventModel {
 		}),
 		contactId: t.Optional(t.String()),
 		email: t.Optional(t.String({ format: "email" })),
+		firstName: t.Optional(t.String({ maxLength: 255 })),
+		lastName: t.Optional(t.String({ maxLength: 255 })),
 		properties: t.Optional(t.Record(t.String(), t.Unknown())),
 	});
 
@@ -90,6 +92,7 @@ export namespace CustomEventModel {
 		eventId: t.String(),
 		eventKey: t.String(),
 		contactId: t.String(),
+		contactCreated: t.Boolean(),
 		enrollments: t.Number(),
 		properties: t.Record(t.String(), t.Unknown()),
 	});

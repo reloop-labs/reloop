@@ -15,8 +15,13 @@ import {
 import "@xyflow/react/dist/style.css";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
-import { createDelayNode, createSendEmailNode } from "../mock-data";
 import {
+	createConditionNode,
+	createDelayNode,
+	createSendEmailNode,
+} from "../mock-data";
+import {
+	isConditionNode,
 	isDelayNode,
 	isSendEmailNode,
 	TRIGGER_NODE_ID,
@@ -26,6 +31,7 @@ import {
 	type WorkflowStatus,
 } from "../workflow-types";
 import { NodeConfigPanel } from "./node-config-panel";
+import { ConditionNode } from "./nodes/condition-node";
 import { DelayNode } from "./nodes/delay-node";
 import { FlowEdge } from "./nodes/flow-edge";
 import { GroupNode } from "./nodes/group-node";
@@ -38,6 +44,7 @@ const nodeTypes = {
 	trigger: TriggerNode,
 	send_email: SendEmailNode,
 	delay: DelayNode,
+	condition: ConditionNode,
 	group: GroupNode,
 };
 
@@ -117,12 +124,30 @@ const WorkflowEditorInner = ({
 
 	const onConnect = useCallback(
 		(connection: Connection) => {
-			setEdges((eds) =>
-				addEdge(
-					{ ...connection, type: "flow", data: { tone: "default" } },
-					eds,
-				),
-			);
+			const branch =
+				connection.sourceHandle === "yes" || connection.sourceHandle === "no"
+					? connection.sourceHandle
+					: undefined;
+			setEdges((eds) => {
+				const next = eds.filter(
+					(edge) =>
+						!(
+							edge.source === connection.source &&
+							(edge.sourceHandle ?? null) === (connection.sourceHandle ?? null)
+						),
+				);
+				return addEdge(
+					{
+						...connection,
+						type: "flow",
+						data: {
+							tone: branch === "yes" ? "accent" : "default",
+							branch,
+						},
+					},
+					next,
+				);
+			});
 		},
 		[setEdges],
 	);
@@ -156,6 +181,11 @@ const WorkflowEditorInner = ({
 	const handleAddDelay = useCallback(() => {
 		const delayCount = nodes.filter(isDelayNode).length;
 		appendNode(createDelayNode(delayCount, 0));
+	}, [nodes, appendNode]);
+
+	const handleAddCondition = useCallback(() => {
+		const conditionCount = nodes.filter(isConditionNode).length;
+		appendNode(createConditionNode(conditionCount, 0));
 	}, [nodes, appendNode]);
 
 	const handleDeleteNode = useCallback(
@@ -198,6 +228,7 @@ const WorkflowEditorInner = ({
 					<WorkflowNodePalette
 						onAddSendEmail={handleAddSendEmail}
 						onAddDelay={handleAddDelay}
+						onAddCondition={handleAddCondition}
 					/>
 					<ReactFlow
 						nodes={nodes}

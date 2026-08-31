@@ -1,3 +1,4 @@
+import { parseConditionData } from "@be/workflow/lib/automation/condition";
 import type { AutomationGraph } from "@reloop/db/schema";
 
 export const TRIGGER_NODE_ID = "trigger";
@@ -42,9 +43,7 @@ export function emptyGraph(): AutomationGraph {
 export function extractTriggerEvent(
 	graph: AutomationGraph,
 ): string | undefined {
-	const trigger = graph.nodes.find(
-		(n) => n.id === TRIGGER_NODE_ID || n.type === "trigger",
-	);
+	const trigger = findTriggerNode(graph);
 	const eventKey = trigger?.data?.eventKey;
 	if (typeof eventKey === "string" && eventKey.length > 0) return eventKey;
 	const eventId = trigger?.data?.eventId;
@@ -67,9 +66,17 @@ export function findNode(
 	return graph.nodes.find((n) => n.id === nodeId);
 }
 
+export function findTriggerNode(graph: AutomationGraph): GraphNode | undefined {
+	return graph.nodes.find(
+		(n) => n.id === TRIGGER_NODE_ID || n.type === "trigger",
+	);
+}
+
 /** First action node(s) after the trigger (linear sequences take the first edge). */
 export function getFirstActionNodeIds(graph: AutomationGraph): string[] {
-	return getOutgoingTargets(graph, TRIGGER_NODE_ID);
+	const trigger = findTriggerNode(graph);
+	if (!trigger) return [];
+	return getOutgoingTargets(graph, trigger.id);
 }
 
 export function parseDelayData(data: Record<string, unknown>): DelayNodeData {
@@ -104,9 +111,7 @@ export function validateAutomationGraph(
 	graph: AutomationGraph,
 ): GraphValidationResult {
 	const errors: string[] = [];
-	const trigger = graph.nodes.find(
-		(n) => n.id === TRIGGER_NODE_ID || n.type === "trigger",
-	);
+	const trigger = findTriggerNode(graph);
 
 	if (!trigger) {
 		errors.push("Workflow must include a trigger node.");
@@ -125,14 +130,15 @@ export function validateAutomationGraph(
 	}
 
 	const actionNodes = graph.nodes.filter(
-		(n) => n.type === "delay" || n.type === "send_email",
+		(n) =>
+			n.type === "delay" || n.type === "send_email" || n.type === "condition",
 	);
 	if (actionNodes.length === 0) {
-		errors.push("Add at least one Delay or Send email step.");
+		errors.push("Add at least one Delay, Condition, or Send email step.");
 	}
 
 	const reachable = new Set<string>();
-	const stack = [TRIGGER_NODE_ID];
+	const stack = [trigger.id];
 	const adjacency = new Map<string, string[]>();
 	for (const edge of graph.edges) {
 		const targets = adjacency.get(edge.source) ?? [];
@@ -166,9 +172,36 @@ export function validateAutomationGraph(
 		if (node.type === "send_email") {
 			const to = String(node.data?.to ?? "").trim();
 			const subject = String(node.data?.subject ?? "").trim();
+			const from = String(node.data?.from ?? "").trim();
 			if (!to) errors.push(`Send email step "${node.id}" needs a To address.`);
+			if (!from)
+				errors.push(`Send email step "${node.id}" needs a From address.`);
 			if (!subject)
 				errors.push(`Send email step "${node.id}" needs a Subject.`);
+		}
+		if (node.type === "condition") {
+			try {
+				parseConditionData(node.data ?? {});
+			} catch (e) {
+				errors.push(
+					`Condition step "${node.id}": ${e instanceof Error ? e.message : String(e)}`,
+				);
+			}
+			const yes = graph.edges.some(
+				(e) =>
+					e.source === node.id &&
+					(e.sourceHandle === "yes" || e.data?.branch === "yes"),
+			);
+			const no = graph.edges.some(
+				(e) =>
+					e.source === node.id &&
+					(e.sourceHandle === "no" || e.data?.branch === "no"),
+			);
+			if (!yes && !no) {
+				errors.push(
+					`Condition step "${node.id}" needs a Yes or No path connected.`,
+				);
+			}
 		}
 	}
 

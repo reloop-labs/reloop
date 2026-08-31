@@ -1,5 +1,10 @@
 import { sendAutomationEmail } from "@be/workflow/handlers/automation/send-email-step";
 import {
+	evaluateCondition,
+	getBranchTarget,
+	parseConditionData,
+} from "@be/workflow/lib/automation/condition";
+import {
 	delayToMs,
 	findNode,
 	getOutgoingTargets,
@@ -10,7 +15,7 @@ import { enqueueAutomationStep } from "@be/workflow/queues/automation.queue";
 import { db } from "@reloop/db/client";
 import type { AutomationGraph } from "@reloop/db/schema";
 import * as schema from "@reloop/db/schema";
-import { and, eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 import { log } from "evlog";
 
 export async function executeAutomationStep(params: {
@@ -121,6 +126,8 @@ export async function executeAutomationStep(params: {
 		.set({ status: "running", startedAt: now, updatedAt: now })
 		.where(eq(schema.automationStepRun.id, stepRunId));
 
+	let conditionBranch: "yes" | "no" | undefined;
+
 	try {
 		if (node.type === "delay") {
 			// Delay already waited via BullMQ delay; just complete and advance
@@ -153,6 +160,15 @@ export async function executeAutomationStep(params: {
 				status: "completed",
 				emailLogId: result.emailLogId,
 			});
+		} else if (node.type === "condition") {
+			const condition = parseConditionData(node.data ?? {});
+			const vars = await buildConditionVars({
+				contact,
+				enrollment,
+			});
+			const matched = evaluateCondition(condition, vars);
+			conditionBranch = matched ? "yes" : "no";
+			await markStep(stepRunId, { status: "completed" });
 		} else if (node.type === "trigger") {
 			await markStep(stepRunId, { status: "completed" });
 		} else {
@@ -169,13 +185,15 @@ export async function executeAutomationStep(params: {
 	}
 
 	// Advance to next node
-	const nextIds = getOutgoingTargets(graph, node.id);
-	if (nextIds.length === 0) {
+	const nextNodeId =
+		node.type === "condition" && conditionBranch
+			? getBranchTarget(graph, node.id, conditionBranch)
+			: getOutgoingTargets(graph, node.id)[0];
+	if (!nextNodeId) {
 		await completeEnrollment(enrollmentId, "completed");
 		return;
 	}
 
-	const nextNodeId = nextIds[0]!;
 	const nextNode = findNode(graph, nextNodeId);
 	if (!nextNode) {
 		await completeEnrollment(enrollmentId, "failed");
@@ -253,6 +271,49 @@ async function completeEnrollment(
 			updatedAt: now,
 		})
 		.where(eq(schema.automationEnrollment.id, enrollmentId));
+}
+
+async function buildConditionVars(params: {
+	contact: typeof schema.contact.$inferSelect;
+	enrollment: typeof schema.automationEnrollment.$inferSelect;
+}): Promise<Record<string, string | null | undefined>> {
+	const { contact, enrollment } = params;
+	const vars: Record<string, string | null | undefined> = {
+		email: contact.email,
+		firstName: contact.firstName,
+		lastName: contact.lastName,
+		status: contact.status,
+		"contact.email": contact.email,
+		"contact.firstName": contact.firstName,
+		"contact.lastName": contact.lastName,
+		"contact.status": contact.status,
+	};
+
+	const context = enrollment.context ?? {};
+	const properties = context.properties ?? {};
+	for (const [key, value] of Object.entries(properties)) {
+		if (value == null) continue;
+		vars[`event.${key}`] = String(value);
+	}
+
+	const values = await db.query.contactPropertyValue.findMany({
+		where: and(
+			eq(schema.contactPropertyValue.contactId, contact.id),
+			isNull(schema.contactPropertyValue.deletedAt),
+		),
+		with: {
+			property: {
+				columns: { propertyName: true },
+			},
+		},
+	});
+	for (const row of values) {
+		const name = row.property?.propertyName;
+		if (!name) continue;
+		vars[`property.${name}`] = row.value;
+	}
+
+	return vars;
 }
 
 /** Tag values may only contain [a-zA-Z0-9_-]. Strip other chars. */

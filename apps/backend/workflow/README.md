@@ -40,10 +40,13 @@ User-defined multi-step email workflows live in this service under
 | `custom_event` + properties | Org-defined triggers (**workflow-only**, not webhooks) |
 | `automation` tables | Definition, published versions, enrollments, step runs |
 | `automation-queue` | Delayed BullMQ jobs for wait / send steps |
-| `POST .../events/track` | Fire a custom event → enroll matching automations |
+| `POST .../events/track` | Fire a custom event → create contact if needed → enroll matching automations |
+| `POST .../automations/:id/enroll` | Enroll one contact in a specific active automation |
+| `GET .../automations/:id/enrollments` | List (and inspect) enrollments |
 | Mail send | Internal call to `/api/mail/v1/send` |
 
-**Nodes (v1):** `trigger` (custom event key) → `delay` → `send_email` (linear).
+**Nodes (v1):** `trigger` (custom event key) → `delay` → `condition` (yes/no) → `send_email`.
+Condition steps check contact fields, contact properties, or event properties from the track payload.
 Enrollments stick to the version published at activate time.
 
 Platform webhook events (`@reloop/webhook-events`) and outbound webhooks are

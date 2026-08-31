@@ -42,6 +42,20 @@ export const createDelayNode = (index: number, yOffset = 0): WorkflowNode => ({
 	},
 });
 
+export const createConditionNode = (
+	index: number,
+	yOffset = 0,
+): WorkflowNode => ({
+	id: `condition_${Date.now()}_${index}`,
+	type: "condition",
+	position: { x: COLUMN_X, y: 60 + ROW_GAP + yOffset * ROW_GAP },
+	data: {
+		field: "status",
+		operator: "eq",
+		value: "subscribed",
+	},
+});
+
 /** Local-only helper for optimistic UI before API round-trip. */
 export const createEmptyWorkflow = (input: CreateWorkflowInput): Workflow => {
 	const timestamp = now();

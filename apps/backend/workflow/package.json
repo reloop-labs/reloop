@@ -11,6 +11,7 @@
 		"fix-lint": "biome check --fix .",
 		"format": "biome format .",
 		"lint": "biome check .",
+		"test": "bun test src",
 		"start": "bun run dist/index.js"
 	},
 	"dependencies": {
