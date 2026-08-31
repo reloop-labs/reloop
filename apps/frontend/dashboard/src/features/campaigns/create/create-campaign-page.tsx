@@ -2,6 +2,7 @@
 
 import * as Button from "@reloop/ui/button";
 import * as FancyButton from "@reloop/ui/fancy-button";
+import * as FileFormatIcon from "@reloop/ui/file-format-icon";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
@@ -612,14 +613,14 @@ function CreateCampaignPageContent() {
 								}}
 								className="space-y-4 pt-7"
 							>
-								{/* Target Mode Selector Accordion Items */}
-								<div className="space-y-2.5">
-									{/* ACCORDION ITEM 1: ALL CONTACTS */}
+								{/* Target Mode Selector Table */}
+								<div className="divide-y divide-stroke-soft-200 overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 dark:divide-stroke-soft-100/50 dark:border-stroke-soft-100/50">
+									{/* OPTION 1: ALL CONTACTS */}
 									<div
-										className={`overflow-hidden rounded-xl border transition-all duration-200 ${
+										className={`transition-colors ${
 											audienceType === "all"
-												? "border-primary-base bg-primary-base/[0.02] shadow-xs dark:border-primary-base/70 dark:bg-primary-base/5"
-												: "border-stroke-soft-200 bg-bg-white-0 hover:border-stroke-soft-300 hover:bg-bg-weak-50/40 dark:border-stroke-soft-100/50 dark:bg-bg-white-0/5"
+												? "bg-primary-base/[0.015] dark:bg-primary-base/5"
+												: "hover:bg-bg-weak-50/60 dark:hover:bg-bg-white-0/5"
 										}`}
 									>
 										<button
@@ -628,55 +629,33 @@ function CreateCampaignPageContent() {
 												setAudienceType("all");
 												setTargetError("");
 											}}
-											className="flex w-full cursor-pointer items-center justify-between p-3.5 text-left transition-colors"
+											className="group flex w-full cursor-pointer items-center justify-between p-4 text-left transition-all"
 										>
-											<div className="flex min-w-0 items-center gap-3">
-												<div
-													className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border transition-colors ${
-														audienceType === "all"
-															? "border-primary-base/30 bg-primary-base/10 text-primary-base"
-															: "border-stroke-soft-200 bg-bg-weak-50 text-text-strong-950 dark:border-stroke-soft-100/50"
-													}`}
-												>
-													<Icon name="contacts" className="h-4.5 w-4.5" />
+											<div className="flex min-w-0 items-center gap-3.5">
+												<div className="relative flex h-10 w-10 shrink-0 items-center justify-center">
+													<Icon
+														name="contacts"
+														className="h-6 w-6 text-emerald-600 dark:text-emerald-400"
+													/>
 												</div>
 												<div className="min-w-0">
-													<div className="flex items-center gap-2">
-														<h4 className="font-semibold text-sm text-text-strong-950">
-															All Contacts
-														</h4>
-														<span className="rounded-full bg-success-base/10 px-2 py-0.5 font-medium text-[11px] text-success-base">
-															{totalContacts.toLocaleString()}
-														</span>
+													<div className="font-medium text-sm text-text-strong-950 group-hover:text-black dark:group-hover:text-white">
+														All Contacts
 													</div>
-													<p className="truncate text-text-sub-600 text-xs leading-normal">
+													<div className="mt-0.5 text-text-sub-600 text-xs">
 														Broadcast to every active subscriber across your
 														organization.
-													</p>
+													</div>
 												</div>
 											</div>
-
-											<div className="flex shrink-0 items-center gap-2.5 pl-2">
-												<div
-													className={`flex h-4 w-4 items-center justify-center rounded-full border ${
-														audienceType === "all"
-															? "border-primary-base bg-primary-base text-white"
-															: "border-stroke-soft-300 bg-transparent"
-													}`}
-												>
-													{audienceType === "all" && (
-														<div className="h-1.5 w-1.5 rounded-full bg-white" />
-													)}
-												</div>
-												<Icon
-													name="chevron-down"
-													className={`h-4 w-4 text-text-sub-600 transition-transform duration-200 ${
-														audienceType === "all"
-															? "rotate-180 text-primary-base"
-															: ""
-													}`}
-												/>
-											</div>
+											<Icon
+												name="arrow-right"
+												className={`h-4 w-4 shrink-0 text-text-soft-400 transition-all duration-200 group-hover:text-text-strong-950 ${
+													audienceType === "all"
+														? "rotate-90 text-primary-base"
+														: "group-hover:translate-x-0.5"
+												}`}
+											/>
 										</button>
 
 										<AnimatePresence initial={false}>
@@ -708,8 +687,8 @@ function CreateCampaignPageContent() {
 													}}
 													className="overflow-hidden"
 												>
-													<div className="border-stroke-soft-200/70 border-t p-3.5 pt-3 dark:border-stroke-soft-100/40">
-														<div className="flex items-center gap-3 rounded-lg bg-success-base/[0.06] p-3 text-success-base">
+													<div className="border-stroke-soft-200/60 border-t bg-bg-weak-50/40 p-4 dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/10">
+														<div className="flex items-center gap-3 rounded-xl bg-success-base/[0.06] p-3 text-success-base">
 															<Icon
 																name="check-circle"
 																className="h-4.5 w-4.5 shrink-0 text-success-base"
@@ -731,12 +710,12 @@ function CreateCampaignPageContent() {
 										</AnimatePresence>
 									</div>
 
-									{/* ACCORDION ITEM 2: CONTACT GROUPS */}
+									{/* OPTION 2: CONTACT GROUPS */}
 									<div
-										className={`overflow-hidden rounded-xl border transition-all duration-200 ${
+										className={`transition-colors ${
 											audienceType === "group"
-												? "border-primary-base bg-primary-base/[0.02] shadow-xs dark:border-primary-base/70 dark:bg-primary-base/5"
-												: "border-stroke-soft-200 bg-bg-white-0 hover:border-stroke-soft-300 hover:bg-bg-weak-50/40 dark:border-stroke-soft-100/50 dark:bg-bg-white-0/5"
+												? "bg-primary-base/[0.015] dark:bg-primary-base/5"
+												: "hover:bg-bg-weak-50/60 dark:hover:bg-bg-white-0/5"
 										}`}
 									>
 										<button
@@ -750,55 +729,33 @@ function CreateCampaignPageContent() {
 													setSelectedGroupName(firstGroup.name);
 												}
 											}}
-											className="flex w-full cursor-pointer items-center justify-between p-3.5 text-left transition-colors"
+											className="group flex w-full cursor-pointer items-center justify-between p-4 text-left transition-all"
 										>
-											<div className="flex min-w-0 items-center gap-3">
-												<div
-													className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border transition-colors ${
-														audienceType === "group"
-															? "border-primary-base/30 bg-primary-base/10 text-primary-base"
-															: "border-stroke-soft-200 bg-bg-weak-50 text-text-strong-950 dark:border-stroke-soft-100/50"
-													}`}
-												>
-													<Icon name="contacts" className="h-4.5 w-4.5" />
+											<div className="flex min-w-0 items-center gap-3.5">
+												<div className="relative flex h-10 w-10 shrink-0 items-center justify-center">
+													<Icon
+														name="contacts"
+														className="h-6 w-6 text-amber-500"
+													/>
 												</div>
 												<div className="min-w-0">
-													<div className="flex items-center gap-2">
-														<h4 className="font-semibold text-sm text-text-strong-950">
-															Contact Groups
-														</h4>
-														<span className="rounded-full bg-bg-weak-50 px-2 py-0.5 font-medium text-[11px] text-text-sub-600 dark:bg-white/10">
-															{availableGroups.length} available
-														</span>
+													<div className="font-medium text-sm text-text-strong-950 group-hover:text-black dark:group-hover:text-white">
+														Contact Groups
 													</div>
-													<p className="truncate text-text-sub-600 text-xs leading-normal">
+													<div className="mt-0.5 text-text-sub-600 text-xs">
 														Target specific segments and organized contact
 														lists.
-													</p>
+													</div>
 												</div>
 											</div>
-
-											<div className="flex shrink-0 items-center gap-2.5 pl-2">
-												<div
-													className={`flex h-4 w-4 items-center justify-center rounded-full border ${
-														audienceType === "group"
-															? "border-primary-base bg-primary-base text-white"
-															: "border-stroke-soft-300 bg-transparent"
-													}`}
-												>
-													{audienceType === "group" && (
-														<div className="h-1.5 w-1.5 rounded-full bg-white" />
-													)}
-												</div>
-												<Icon
-													name="chevron-down"
-													className={`h-4 w-4 text-text-sub-600 transition-transform duration-200 ${
-														audienceType === "group"
-															? "rotate-180 text-primary-base"
-															: ""
-													}`}
-												/>
-											</div>
+											<Icon
+												name="arrow-right"
+												className={`h-4 w-4 shrink-0 text-text-soft-400 transition-all duration-200 group-hover:text-text-strong-950 ${
+													audienceType === "group"
+														? "rotate-90 text-primary-base"
+														: "group-hover:translate-x-0.5"
+												}`}
+											/>
 										</button>
 
 										<AnimatePresence initial={false}>
@@ -830,7 +787,7 @@ function CreateCampaignPageContent() {
 													}}
 													className="overflow-hidden"
 												>
-													<div className="space-y-2.5 border-stroke-soft-200/70 border-t p-3.5 pt-3 dark:border-stroke-soft-100/40">
+													<div className="space-y-2.5 border-stroke-soft-200/60 border-t bg-bg-weak-50/40 p-4 dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/10">
 														<div className="flex items-center justify-between gap-2">
 															<span className="font-medium text-text-sub-600 text-xs">
 																Select group:
@@ -862,10 +819,10 @@ function CreateCampaignPageContent() {
 																			setSelectedGroupName(grp.name);
 																			setTargetError("");
 																		}}
-																		className={`flex cursor-pointer items-center justify-between rounded-lg border p-2.5 transition-colors ${
+																		className={`flex cursor-pointer items-center justify-between rounded-xl border p-2.5 transition-colors ${
 																			isGrpSelected
-																				? "border-primary-base bg-primary-base/[0.04] dark:border-primary-base/70 dark:bg-primary-base/10"
-																				: "border-stroke-soft-200 bg-bg-white-0 hover:bg-bg-weak-50/60 dark:border-stroke-soft-100/50"
+																				? "border-primary-base bg-bg-white-0 shadow-2xs dark:border-primary-base/70 dark:bg-bg-white-0/10"
+																				: "border-stroke-soft-200/70 bg-bg-white-0/80 hover:bg-bg-white-0 dark:border-stroke-soft-100/50 dark:bg-bg-white-0/5"
 																		}`}
 																	>
 																		<div className="flex min-w-0 items-center gap-2">
@@ -910,12 +867,12 @@ function CreateCampaignPageContent() {
 										</AnimatePresence>
 									</div>
 
-									{/* ACCORDION ITEM 3: CHANNELS */}
+									{/* OPTION 3: CHANNELS */}
 									<div
-										className={`overflow-hidden rounded-xl border transition-all duration-200 ${
+										className={`transition-colors ${
 											audienceType === "channel"
-												? "border-primary-base bg-primary-base/[0.02] shadow-xs dark:border-primary-base/70 dark:bg-primary-base/5"
-												: "border-stroke-soft-200 bg-bg-white-0 hover:border-stroke-soft-300 hover:bg-bg-weak-50/40 dark:border-stroke-soft-100/50 dark:bg-bg-white-0/5"
+												? "bg-primary-base/[0.015] dark:bg-primary-base/5"
+												: "hover:bg-bg-weak-50/60 dark:hover:bg-bg-white-0/5"
 										}`}
 									>
 										<button
@@ -929,58 +886,33 @@ function CreateCampaignPageContent() {
 													setSelectedChannelName(firstChannel.name);
 												}
 											}}
-											className="flex w-full cursor-pointer items-center justify-between p-3.5 text-left transition-colors"
+											className="group flex w-full cursor-pointer items-center justify-between p-4 text-left transition-all"
 										>
-											<div className="flex min-w-0 items-center gap-3">
-												<div
-													className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border transition-colors ${
-														audienceType === "channel"
-															? "border-primary-base/30 bg-primary-base/10 text-primary-base"
-															: "border-stroke-soft-200 bg-bg-weak-50 text-text-strong-950 dark:border-stroke-soft-100/50"
-													}`}
-												>
+											<div className="flex min-w-0 items-center gap-3.5">
+												<div className="relative flex h-10 w-10 shrink-0 items-center justify-center">
 													<Icon
 														name="notification-indicator"
-														className="h-4.5 w-4.5"
+														className="h-6 w-6 text-blue-600 dark:text-blue-400"
 													/>
 												</div>
 												<div className="min-w-0">
-													<div className="flex items-center gap-2">
-														<h4 className="font-semibold text-sm text-text-strong-950">
-															Channels
-														</h4>
-														<span className="rounded-full bg-bg-weak-50 px-2 py-0.5 font-medium text-[11px] text-text-sub-600 dark:bg-white/10">
-															{availableChannels.length} available
-														</span>
+													<div className="font-medium text-sm text-text-strong-950 group-hover:text-black dark:group-hover:text-white">
+														Channels
 													</div>
-													<p className="truncate text-text-sub-600 text-xs leading-normal">
+													<div className="mt-0.5 text-text-sub-600 text-xs">
 														Deliver only to subscribers opted into a specific
 														channel.
-													</p>
+													</div>
 												</div>
 											</div>
-
-											<div className="flex shrink-0 items-center gap-2.5 pl-2">
-												<div
-													className={`flex h-4 w-4 items-center justify-center rounded-full border ${
-														audienceType === "channel"
-															? "border-primary-base bg-primary-base text-white"
-															: "border-stroke-soft-300 bg-transparent"
-													}`}
-												>
-													{audienceType === "channel" && (
-														<div className="h-1.5 w-1.5 rounded-full bg-white" />
-													)}
-												</div>
-												<Icon
-													name="chevron-down"
-													className={`h-4 w-4 text-text-sub-600 transition-transform duration-200 ${
-														audienceType === "channel"
-															? "rotate-180 text-primary-base"
-															: ""
-													}`}
-												/>
-											</div>
+											<Icon
+												name="arrow-right"
+												className={`h-4 w-4 shrink-0 text-text-soft-400 transition-all duration-200 group-hover:text-text-strong-950 ${
+													audienceType === "channel"
+														? "rotate-90 text-primary-base"
+														: "group-hover:translate-x-0.5"
+												}`}
+											/>
 										</button>
 
 										<AnimatePresence initial={false}>
@@ -1012,7 +944,7 @@ function CreateCampaignPageContent() {
 													}}
 													className="overflow-hidden"
 												>
-													<div className="space-y-2 border-stroke-soft-200/70 border-t p-3.5 pt-3 dark:border-stroke-soft-100/40">
+													<div className="space-y-2 border-stroke-soft-200/60 border-t bg-bg-weak-50/40 p-4 dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/10">
 														<p className="text-text-sub-600 text-xs">
 															Choose channel to broadcast to:
 														</p>
@@ -1028,10 +960,10 @@ function CreateCampaignPageContent() {
 																			setSelectedChannelName(chn.name);
 																			setTargetError("");
 																		}}
-																		className={`flex cursor-pointer items-center justify-between rounded-lg border p-2.5 transition-colors ${
+																		className={`flex cursor-pointer items-center justify-between rounded-xl border p-2.5 transition-colors ${
 																			isChnSelected
-																				? "border-primary-base bg-primary-base/[0.04] dark:border-primary-base/70 dark:bg-primary-base/10"
-																				: "border-stroke-soft-200 bg-bg-white-0 hover:bg-bg-weak-50/60 dark:border-stroke-soft-100/50"
+																				? "border-primary-base bg-bg-white-0 shadow-2xs dark:border-primary-base/70 dark:bg-bg-white-0/10"
+																				: "border-stroke-soft-200/70 bg-bg-white-0/80 hover:bg-bg-white-0 dark:border-stroke-soft-100/50 dark:bg-bg-white-0/5"
 																		}`}
 																	>
 																		<div className="flex min-w-0 items-center gap-2">
@@ -1074,12 +1006,12 @@ function CreateCampaignPageContent() {
 										</AnimatePresence>
 									</div>
 
-									{/* ACCORDION ITEM 4: UPLOAD CSV */}
+									{/* OPTION 4: IMPORT CSV FILE */}
 									<div
-										className={`overflow-hidden rounded-xl border transition-all duration-200 ${
+										className={`transition-colors ${
 											audienceType === "csv"
-												? "border-primary-base bg-primary-base/[0.02] shadow-xs dark:border-primary-base/70 dark:bg-primary-base/5"
-												: "border-stroke-soft-200 bg-bg-white-0 hover:border-stroke-soft-300 hover:bg-bg-weak-50/40 dark:border-stroke-soft-100/50 dark:bg-bg-white-0/5"
+												? "bg-primary-base/[0.015] dark:bg-primary-base/5"
+												: "hover:bg-bg-weak-50/60 dark:hover:bg-bg-white-0/5"
 										}`}
 									>
 										<button
@@ -1088,56 +1020,35 @@ function CreateCampaignPageContent() {
 												setAudienceType("csv");
 												setTargetError("");
 											}}
-											className="flex w-full cursor-pointer items-center justify-between p-3.5 text-left transition-colors"
+											className="group flex w-full cursor-pointer items-center justify-between p-4 text-left transition-all"
 										>
-											<div className="flex min-w-0 items-center gap-3">
-												<div
-													className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border transition-colors ${
-														audienceType === "csv"
-															? "border-primary-base/30 bg-primary-base/10 text-primary-base"
-															: "border-stroke-soft-200 bg-bg-weak-50 text-text-strong-950 dark:border-stroke-soft-100/50"
-													}`}
-												>
-													<Icon name="file-text" className="h-4.5 w-4.5" />
+											<div className="flex min-w-0 items-center gap-3.5">
+												<div className="relative flex h-10 w-10 shrink-0 items-center justify-center">
+													<FileFormatIcon.Root
+														format="CSV"
+														color="green"
+														size="small"
+														className="h-6 w-6"
+													/>
 												</div>
 												<div className="min-w-0">
-													<div className="flex items-center gap-2">
-														<h4 className="font-semibold text-sm text-text-strong-950">
-															Upload CSV
-														</h4>
-														<span className="rounded-full bg-bg-weak-50 px-2 py-0.5 font-medium text-[11px] text-text-sub-600 dark:bg-white/10">
-															{csvEmails.length > 0
-																? `${csvEmails.length} uploaded`
-																: ".csv / .txt"}
-														</span>
+													<div className="font-medium text-sm text-text-strong-950 group-hover:text-black dark:group-hover:text-white">
+														Import CSV file
 													</div>
-													<p className="truncate text-text-sub-600 text-xs leading-normal">
-														Import a custom list of email addresses from a file.
-													</p>
+													<div className="mt-0.5 text-text-sub-600 text-xs">
+														Upload a spreadsheet file to bulk import
+														subscribers.
+													</div>
 												</div>
 											</div>
-
-											<div className="flex shrink-0 items-center gap-2.5 pl-2">
-												<div
-													className={`flex h-4 w-4 items-center justify-center rounded-full border ${
-														audienceType === "csv"
-															? "border-primary-base bg-primary-base text-white"
-															: "border-stroke-soft-300 bg-transparent"
-													}`}
-												>
-													{audienceType === "csv" && (
-														<div className="h-1.5 w-1.5 rounded-full bg-white" />
-													)}
-												</div>
-												<Icon
-													name="chevron-down"
-													className={`h-4 w-4 text-text-sub-600 transition-transform duration-200 ${
-														audienceType === "csv"
-															? "rotate-180 text-primary-base"
-															: ""
-													}`}
-												/>
-											</div>
+											<Icon
+												name="arrow-right"
+												className={`h-4 w-4 shrink-0 text-text-soft-400 transition-all duration-200 group-hover:text-text-strong-950 ${
+													audienceType === "csv"
+														? "rotate-90 text-primary-base"
+														: "group-hover:translate-x-0.5"
+												}`}
+											/>
 										</button>
 
 										<AnimatePresence initial={false}>
@@ -1169,7 +1080,7 @@ function CreateCampaignPageContent() {
 													}}
 													className="overflow-hidden"
 												>
-													<div className="space-y-3 border-stroke-soft-200/70 border-t p-3.5 pt-3 dark:border-stroke-soft-100/40">
+													<div className="space-y-3 border-stroke-soft-200/60 border-t bg-bg-weak-50/40 p-4 dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/10">
 														<input
 															type="file"
 															ref={fileInputRef}
@@ -1221,7 +1132,7 @@ function CreateCampaignPageContent() {
 															</div>
 														) : (
 															<div className="space-y-2.5">
-																<div className="flex items-center justify-between rounded-lg border border-stroke-soft-200 bg-bg-white-0 p-2.5 dark:border-stroke-soft-100/50">
+																<div className="flex items-center justify-between rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-2.5 dark:border-stroke-soft-100/50">
 																	<div className="flex min-w-0 items-center gap-2.5">
 																		<div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-stroke-soft-200 bg-bg-weak-50 text-primary-base">
 																			<Icon
@@ -1897,11 +1808,11 @@ function CreateCampaignPageContent() {
 					)}
 				</AnimatePresence>
 			</div>
-			{/* Balanced spacer so center content is horizontally centered */}
 			<div
 				className="hidden w-48 shrink-0 lg:block xl:w-56"
 				aria-hidden="true"
 			/>
+			;
 		</div>
 	);
 }
