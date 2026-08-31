@@ -13,14 +13,12 @@ import { useActiveOrganization } from "#/features/dashboard/page-header/use-acti
 import { queryKeys } from "#/lib/query-keys";
 import type {
 	Campaign,
-	CampaignStats,
 	CreateCampaignInput,
 } from "./campaign-types";
 import {
 	createCampaignRequest,
 	deleteCampaignRequest,
 	duplicateCampaignRequest,
-	fetchCampaignStats,
 	getCampaignById,
 	listCampaigns,
 	scheduleCampaignRequest,
@@ -31,7 +29,6 @@ interface CampaignsContextValue {
 	campaigns: Campaign[];
 	isLoading: boolean;
 	isHydrated: boolean;
-	stats: CampaignStats;
 	getCampaign: (id: string) => Campaign | undefined;
 	createCampaign: (
 		input: CreateCampaignInput,
@@ -45,13 +42,6 @@ interface CampaignsContextValue {
 
 const CampaignsContext = createContext<CampaignsContextValue | null>(null);
 
-const emptyStats: CampaignStats = {
-	totalCampaigns: 0,
-	totalDelivered: 0,
-	avgOpenRate: 0,
-	avgClickRate: 0,
-};
-
 export function CampaignsProvider({ children }: { children: ReactNode }) {
 	const { activeOrganization } = useActiveOrganization();
 	const orgId = activeOrganization?.id ?? "default_org";
@@ -63,24 +53,12 @@ export function CampaignsProvider({ children }: { children: ReactNode }) {
 		enabled: Boolean(activeOrganization?.id),
 	});
 
-	const statsQuery = useQuery({
-		queryKey: queryKeys.campaigns.stats(orgId),
-		queryFn: fetchCampaignStats,
-		enabled: Boolean(activeOrganization?.id),
-	});
-
 	const campaigns = listQuery.data ?? [];
-	const stats = statsQuery.data ?? emptyStats;
 
 	const invalidate = useCallback(async () => {
-		await Promise.all([
-			queryClient.invalidateQueries({
-				queryKey: queryKeys.campaigns.list(orgId),
-			}),
-			queryClient.invalidateQueries({
-				queryKey: queryKeys.campaigns.stats(orgId),
-			}),
-		]);
+		await queryClient.invalidateQueries({
+			queryKey: queryKeys.campaigns.list(orgId),
+		});
 	}, [orgId, queryClient]);
 
 	const getCampaign = useCallback(
@@ -152,7 +130,6 @@ export function CampaignsProvider({ children }: { children: ReactNode }) {
 			campaigns,
 			isLoading: listQuery.isLoading,
 			isHydrated: listQuery.isFetched || listQuery.isError,
-			stats,
 			getCampaign,
 			createCampaign,
 			sendCampaign,
@@ -165,7 +142,6 @@ export function CampaignsProvider({ children }: { children: ReactNode }) {
 			listQuery.isLoading,
 			listQuery.isFetched,
 			listQuery.isError,
-			stats,
 			getCampaign,
 			createCampaign,
 			sendCampaign,

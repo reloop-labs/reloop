@@ -1,6 +1,5 @@
 import type {
 	Campaign,
-	CampaignStats,
 	CreateCampaignInput,
 } from "./campaign-types";
 
@@ -26,12 +25,6 @@ export async function getCampaignById(id: string): Promise<Campaign> {
 	const res = await fetch(`${BASE}/${id}`, { credentials: "include" });
 	if (!res.ok) throw new Error(await parseError(res));
 	return (await res.json()) as Campaign;
-}
-
-export async function fetchCampaignStats(): Promise<CampaignStats> {
-	const res = await fetch(`${BASE}/stats`, { credentials: "include" });
-	if (!res.ok) throw new Error(await parseError(res));
-	return (await res.json()) as CampaignStats;
 }
 
 export async function createCampaignRequest(

@@ -4,7 +4,6 @@ import {
 	campaignListQuery,
 	campaignRecipientSchema,
 	campaignResponseSchema,
-	campaignStatsSchema,
 	createCampaignBody,
 	scheduleBody,
 	testSendBody,
@@ -13,7 +12,6 @@ import {
 import { auditLogHook } from "@be/campaigns/utils/audit-log";
 import { Elysia, t } from "elysia";
 import {
-	campaignStatsController,
 	cancelCampaignController,
 	createCampaignController,
 	deleteCampaignController,
@@ -92,20 +90,6 @@ export const campaignRoutes = new Elysia({
 			detail: {
 				tags: ["Campaigns"],
 				summary: "List campaigns",
-			},
-		},
-	)
-	.get(
-		"/stats",
-		async ({ organizationId }) => {
-			return await campaignStatsController({ organizationId });
-		},
-		{
-			auth: true,
-			response: { 200: campaignStatsSchema, ...errorResponses },
-			detail: {
-				tags: ["Campaigns"],
-				summary: "Campaign stats for the organization",
 			},
 		},
 	)

@@ -84,13 +84,6 @@ export const campaignListQuery = t.Object({
 	status: t.Optional(campaignStatusSchema),
 });
 
-export const campaignStatsSchema = t.Object({
-	totalCampaigns: t.Number(),
-	totalDelivered: t.Number(),
-	avgOpenRate: t.Number(),
-	avgClickRate: t.Number(),
-});
-
 export const scheduleBody = t.Object({
 	scheduledAt: t.String({ format: "date-time" }),
 });

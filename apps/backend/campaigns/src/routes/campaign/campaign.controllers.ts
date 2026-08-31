@@ -507,35 +507,3 @@ export async function listRecipientsController(params: {
 		limit,
 	};
 }
-
-export async function campaignStatsController(params: {
-	organizationId: string;
-}) {
-	const [row] = await db
-		.select({
-			totalCampaigns: sql<number>`count(*)`,
-			totalDelivered: sql<number>`coalesce(sum(${schema.campaign.deliveredCount}), 0)`,
-			totalOpened: sql<number>`coalesce(sum(${schema.campaign.openedCount}), 0)`,
-			totalClicked: sql<number>`coalesce(sum(${schema.campaign.clickedCount}), 0)`,
-		})
-		.from(schema.campaign)
-		.where(
-			and(
-				eq(schema.campaign.organizationId, params.organizationId),
-				isNull(schema.campaign.deletedAt),
-			),
-		);
-	const totalDelivered = Number(row?.totalDelivered ?? 0);
-	const totalOpened = Number(row?.totalOpened ?? 0);
-	const totalClicked = Number(row?.totalClicked ?? 0);
-	return {
-		totalCampaigns: Number(row?.totalCampaigns ?? 0),
-		totalDelivered,
-		avgOpenRate:
-			totalDelivered > 0 ? Math.round((totalOpened / totalDelivered) * 100) : 0,
-		avgClickRate:
-			totalDelivered > 0
-				? Math.round((totalClicked / totalDelivered) * 100)
-				: 0,
-	};
-}

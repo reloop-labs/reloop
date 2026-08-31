@@ -52,10 +52,3 @@ export type CreateCampaignInput = {
 	scheduledAt?: string;
 	sendImmediately?: boolean;
 };
-
-export type CampaignStats = {
-	totalCampaigns: number;
-	totalDelivered: number;
-	avgOpenRate: number;
-	avgClickRate: number;
-};

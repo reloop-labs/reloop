@@ -154,7 +154,5 @@ export const queryKeys = {
 		list: (orgId: string) =>
 			[...queryKeys.campaigns.all, "list", orgId] as const,
 		detail: (id: string) => [...queryKeys.campaigns.all, "detail", id] as const,
-		stats: (orgId: string) =>
-			[...queryKeys.campaigns.all, "stats", orgId] as const,
 	},
 } as const;
