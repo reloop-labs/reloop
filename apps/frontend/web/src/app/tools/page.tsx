@@ -60,6 +60,18 @@ const TOOL_VISUAL_MAP: Record<string, ToolVisualMeta> = {
 			"DMARC p=none & SPF loophole detection",
 		],
 	},
+	"who-sends": {
+		icon: "server",
+		badge: "Infrastructure",
+		badgeColor:
+			"bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/20",
+		glowColor: "group-hover:border-blue-500/40",
+		features: [
+			"Discover authorized third-party ESPs",
+			"Inbound mailbox vs. outbound sender separation",
+			"Recursive nested SPF unrolling (depth 2)",
+		],
+	},
 	"email-spam-words-checker": {
 		icon: "shield-check",
 		badge: "Deliverability",

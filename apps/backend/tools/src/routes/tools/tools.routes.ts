@@ -6,6 +6,7 @@ import { emailHealthCheckRoute } from "@be/tools/routes/tools/email-health-check
 import { spamCheckRoute } from "@be/tools/routes/tools/spam-check/spam-check.route";
 import { spoofCheckerRoute } from "@be/tools/routes/tools/spoof-checker/spoof-checker.route";
 import { tempEmailCheckerRoute } from "@be/tools/routes/tools/temp-email-checker/temp-email-checker.route";
+import { whoSendsRoute } from "@be/tools/routes/tools/who-sends/who-sends.route";
 import { Elysia } from "elysia";
 
 export const toolsRoutes = new Elysia({
@@ -19,7 +20,9 @@ export const toolsRoutes = new Elysia({
 	.use(emailHealthCheckRoute)
 	.use(dnsLookupRoute)
 	.use(authCheckerRoute)
-	.use(spoofCheckerRoute);
+	.use(spoofCheckerRoute)
+	.use(whoSendsRoute);
+
 
 
 

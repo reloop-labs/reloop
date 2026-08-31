@@ -772,6 +772,94 @@ export namespace ToolsModel {
 		subdomainNote: t.Optional(t.Union([t.String(), t.Null()])),
 	});
 
+	export const whoSendsBody = t.Object({
+		domain: t.String({
+			minLength: 1,
+			maxLength: 255,
+			description: "The sending domain name or URL to analyze sender permissions for.",
+			examples: ["stripe.com", "github.com", "reloop.sh"],
+		}),
+	});
+
+	export const whoSendsQuery = t.Object({
+		domain: t.Optional(t.String({ minLength: 1, maxLength: 255 })),
+	});
+
+	export const senderEvidence = t.Object({
+		type: t.Union([
+			t.Literal("spf_include"),
+			t.Literal("nested_spf_include"),
+			t.Literal("dkim_selector"),
+			t.Literal("mx_host"),
+			t.Literal("ip4"),
+			t.Literal("ip6"),
+		]),
+		value: t.String(),
+	});
+
+	export const senderItem = t.Object({
+		vendor: t.String(),
+		role: t.Union([
+			t.Literal("inbox_and_send"),
+			t.Literal("inbox_only"),
+			t.Literal("send"),
+			t.Literal("dkim_only"),
+		]),
+		confidence: t.Union([
+			t.Literal("high"),
+			t.Literal("medium"),
+			t.Literal("low"),
+		]),
+		leftover: t.Boolean(),
+		evidence: t.Array(senderEvidence),
+	});
+
+	export const inboxInfo = t.Object({
+		provider: t.Union([t.String(), t.Null()]),
+		exchanges: t.Array(t.String()),
+	});
+
+	export const unnamedSenders = t.Object({
+		ip4: t.Array(t.String()),
+		ip6: t.Array(t.String()),
+		includes: t.Array(t.String()),
+	});
+
+	export const whoSendsNextStep = t.Object({
+		title: t.String(),
+		body: t.String(),
+		href: t.String(),
+	});
+
+	export const whoSendsResponse = t.Object({
+		domain: t.String(),
+		resolvedAt: t.String(),
+		responseTimeMs: t.Number(),
+		verdict: t.Union([
+			t.Literal("single_stack"),
+			t.Literal("split_stack"),
+			t.Literal("crowded"),
+			t.Literal("send_only"),
+			t.Literal("opaque"),
+			t.Literal("unpublished"),
+			t.Literal("wide_open"),
+		]),
+		headline: t.String(),
+		summary: t.String(),
+		disclaimer: t.String(),
+		inbox: inboxInfo,
+		senders: t.Array(senderItem),
+		unnamed: unnamedSenders,
+		spf: t.Object({
+			published: t.Boolean(),
+			qualifier: t.Union([t.String(), t.Null()]),
+			lookupCount: t.Number(),
+			rawRecord: t.Union([t.String(), t.Null()]),
+		}),
+		nextStep: whoSendsNextStep,
+		subdomainNote: t.Optional(t.Union([t.String(), t.Null()])),
+	});
+
 	export const errorResponse = t.Object({
 		message: t.String(),
 		why: t.Optional(t.String()),
@@ -797,5 +885,7 @@ export namespace ToolsModel {
 	export type AuthCheckerResponse = typeof authCheckerResponse.static;
 	export type SpoofCheckerBody = typeof spoofCheckerBody.static;
 	export type SpoofCheckerResponse = typeof spoofCheckerResponse.static;
+	export type WhoSendsBody = typeof whoSendsBody.static;
+	export type WhoSendsResponse = typeof whoSendsResponse.static;
 }
 

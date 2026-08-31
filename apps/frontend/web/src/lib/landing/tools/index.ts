@@ -9,10 +9,12 @@ import { config as spoof_checker } from "./spoof-checker";
 import { config as subject_tester } from "./subject-tester";
 import { config as temp_email_checker } from "./temp-email-checker";
 import { config as template_generator } from "./template-generator";
+import { config as who_sends } from "./who-sends";
 
 export const toolConfigs = [
 	dns_lookup,
 	spoof_checker,
+	who_sends,
 	email_spam_words_checker,
 	blocklist_checker,
 	temp_email_checker,
@@ -23,5 +25,6 @@ export const toolConfigs = [
 	subject_tester,
 	mobile_preview,
 ];
+
 
 
