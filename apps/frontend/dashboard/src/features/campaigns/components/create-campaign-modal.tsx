@@ -123,120 +123,120 @@ export function CreateCampaignModal({
 	return (
 		<Modal.Root open={open} onOpenChange={(next) => !next && handleClose()}>
 			<Modal.Content
-				className="overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 sm:max-w-[460px] dark:border-stroke-soft-100/40"
+				className="overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-soft-50 p-0 shadow-regular-md sm:max-w-[460px] dark:border-stroke-soft-100/40 dark:bg-white/[0.03]"
 				showClose={false}
 			>
-				<motion.div
-					layout
-					transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
-				>
-					<div className="p-6">
-						<Modal.Title className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
-							Create campaign
-						</Modal.Title>
-						<Modal.Description className="mt-1 text-sm text-text-sub-600">
-							Give this broadcast a name. You can set audience, sender, and
-							content next.
-						</Modal.Description>
+				<form onSubmit={(e) => void handleSubmit(e)}>
+					<div className="relative m-0.5 space-y-5 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 px-6 pt-5 pb-6 dark:border-stroke-soft-100/40 dark:bg-[#0c0c0c]">
+						<div>
+							<Modal.Title className="font-semibold text-base text-text-strong-950 tracking-tight">
+								Create campaign
+							</Modal.Title>
+							<Modal.Description className="mt-1 text-text-sub-600 text-xs leading-relaxed">
+								Give this broadcast a name. You can set audience, sender, and
+								content next.
+							</Modal.Description>
+						</div>
 
-						<form onSubmit={(e) => void handleSubmit(e)} className="mt-5">
-							<div className="space-y-2">
-								<Label.Root htmlFor="campaign-name">
-									Campaign name
-									<Label.Asterisk />
-								</Label.Root>
-								<Input.Root size="medium" hasError={Boolean(error)}>
-									<Input.Wrapper>
-										<Input.Input
-											id="campaign-name"
-											placeholder="e.g. April product update"
-											value={name}
-											onChange={(e) => {
-												setName(e.target.value);
-												if (error) setError(null);
-											}}
-											autoFocus
-											disabled={status !== "idle"}
-										/>
-									</Input.Wrapper>
-								</Input.Root>
-								{error ? (
-									<p className="text-error-base text-paragraph-xs">{error}</p>
-								) : (
-									<p className="text-paragraph-xs text-text-sub-600">
-										Used internally to find this campaign in your list.
-									</p>
-								)}
-							</div>
-
-							<div className="mt-6 flex items-center justify-end gap-3">
-								<Button.Root
-									type="button"
-									variant="neutral"
-									mode="stroke"
-									size="small"
-									onClick={handleClose}
-									className={cn(
-										"gap-1.5 transition-opacity duration-200",
-										status !== "idle" && "pointer-events-none opacity-50",
-									)}
-								>
-									Cancel
-									<ActionKbd className="lowercase! w-auto min-w-0 px-1">
-										esc
-									</ActionKbd>
-								</Button.Root>
-								<FancyButton.Root
-									type="submit"
-									variant={status === "success" ? "success" : "blue"}
-									size="small"
-									disabled={
-										status === "creating" || (status === "idle" && !name.trim())
-									}
-									className={cn(
-										"min-w-[168px] justify-center overflow-hidden transition-all duration-200",
-										status !== "idle" && "pointer-events-none",
-										status === "creating" && "opacity-90",
-									)}
-								>
-									<AnimatePresence mode="popLayout" initial={false}>
-										<motion.span
-											key={status}
-											transition={{
-												type: "spring",
-												duration: 0.25,
-												bounce: 0,
-											}}
-											initial={{ opacity: 0, y: -14 }}
-											animate={{ opacity: 1, y: 0 }}
-											exit={{ opacity: 0, y: 14 }}
-											className="flex items-center justify-center gap-1.5"
-										>
-											{status === "creating" ? (
-												<>
-													<Spinner size={14} color="currentColor" />
-													<span>Creating...</span>
-												</>
-											) : status === "success" ? (
-												<>
-													<Icon name="check-circle" className="h-4 w-4" />
-													<span>Created</span>
-												</>
-											) : (
-												<>
-													Create campaign
-													<ActionKbd className={actionKbdOnBlueClassName}>
-														↵
-													</ActionKbd>
-												</>
-											)}
-										</motion.span>
-									</AnimatePresence>
-								</FancyButton.Root>
-							</div>
-						</form>
+						<div className="space-y-1.5">
+							<Label.Root
+								htmlFor="campaign-name"
+								className="font-medium text-text-strong-950 text-xs"
+							>
+								Campaign name
+								<Label.Asterisk />
+							</Label.Root>
+							<Input.Root size="medium" hasError={Boolean(error)}>
+								<Input.Wrapper>
+									<Input.Input
+										id="campaign-name"
+										placeholder="e.g. April product update"
+										value={name}
+										onChange={(e) => {
+											setName(e.target.value);
+											if (error) setError(null);
+										}}
+										autoFocus
+										disabled={status !== "idle"}
+									/>
+								</Input.Wrapper>
+							</Input.Root>
+							{error ? (
+								<p className="text-error-base text-paragraph-xs">{error}</p>
+							) : (
+								<p className="text-paragraph-xs text-text-sub-600">
+									Used internally to find this campaign in your list.
+								</p>
+							)}
+						</div>
 					</div>
-				</motion.div>
+					<div className="items-center justify-between">
+						<Button.Root
+							type="button"
+							variant="neutral"
+							mode="ghost"
+							size="small"
+							onClick={handleClose}
+							className={cn(
+								"gap-1.5 transition-opacity duration-200",
+								status !== "idle" && "pointer-events-none opacity-50",
+							)}
+						>
+							Cancel
+							<ActionKbd className="lowercase! w-auto min-w-0 px-1">
+								esc
+							</ActionKbd>
+						</Button.Root>
+
+						<FancyButton.Root
+							type="submit"
+							variant={status === "success" ? "success" : "blue"}
+							size="small"
+							disabled={
+								status === "creating" || (status === "idle" && !name.trim())
+							}
+							className={cn(
+								"min-w-[168px] justify-center overflow-hidden transition-all duration-200",
+								status !== "idle" && "pointer-events-none",
+								status === "creating" && "opacity-90",
+							)}
+						>
+							<AnimatePresence mode="popLayout" initial={false}>
+								<motion.span
+									key={status}
+									transition={{
+										type: "spring",
+										duration: 0.25,
+										bounce: 0,
+									}}
+									initial={{ opacity: 0, y: -14 }}
+									animate={{ opacity: 1, y: 0 }}
+									exit={{ opacity: 0, y: 14 }}
+									className="flex items-center justify-center gap-1.5"
+								>
+									{status === "creating" ? (
+										<>
+											<Spinner size={14} color="currentColor" />
+											<span>Creating...</span>
+										</>
+									) : status === "success" ? (
+										<>
+											<Icon name="check-circle" className="h-4 w-4" />
+											<span>Created</span>
+										</>
+									) : (
+										<>
+											Create campaign
+											<ActionKbd className={actionKbdOnBlueClassName}>
+												↵
+											</ActionKbd>
+										</>
+									)}
+								</motion.span>
+							</AnimatePresence>
+						</FancyButton.Root>
+					</div>
+				</form>
 			</Modal.Content>
 		</Modal.Root>
 	);
