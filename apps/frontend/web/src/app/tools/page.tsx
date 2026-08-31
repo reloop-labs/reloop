@@ -48,6 +48,18 @@ const TOOL_VISUAL_MAP: Record<string, ToolVisualMeta> = {
 			"SPF and DMARC deliverability health audit",
 		],
 	},
+	"spoof-checker": {
+		icon: "shield-check",
+		badge: "Security",
+		badgeColor:
+			"bg-rose-500/10 text-rose-700 dark:text-rose-400 border-rose-500/20",
+		glowColor: "group-hover:border-rose-500/40",
+		features: [
+			"Instant Yes / Sometimes / No spoof verdict",
+			"Simulated Gmail & Outlook CEO fraud mock",
+			"DMARC p=none & SPF loophole detection",
+		],
+	},
 	"email-spam-words-checker": {
 		icon: "shield-check",
 		badge: "Deliverability",

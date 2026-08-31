@@ -697,6 +697,81 @@ export namespace ToolsModel {
 		diagnostics: t.Array(authDiagnostic),
 	});
 
+	export const spoofCheckerBody = t.Object({
+		domain: t.String({
+			minLength: 1,
+			maxLength: 255,
+			description: "The sending domain name or URL to check spoofability for.",
+			examples: ["stripe.com", "github.com", "acme.com"],
+		}),
+	});
+
+	export const spoofCheckerQuery = t.Object({
+		domain: t.Optional(t.String({ minLength: 1, maxLength: 255 })),
+	});
+
+	export const spoofReason = t.Object({
+		id: t.String(),
+		severity: t.Union([
+			t.Literal("critical"),
+			t.Literal("warning"),
+			t.Literal("info"),
+			t.Literal("success"),
+		]),
+		title: t.String(),
+		detail: t.String(),
+	});
+
+	export const spoofNextStep = t.Object({
+		title: t.String(),
+		body: t.String(),
+		href: t.String(),
+	});
+
+	export const spoofCheckerResponse = t.Object({
+		domain: t.String(),
+		resolvedAt: t.String(),
+		responseTimeMs: t.Number(),
+		spoofable: t.Boolean(),
+		verdict: t.Union([
+			t.Literal("spoofable"),
+			t.Literal("partially_protected"),
+			t.Literal("protected"),
+		]),
+		headline: t.String(),
+		summary: t.String(),
+		inboxOutcome: t.Union([
+			t.Literal("delivered"),
+			t.Literal("spam"),
+			t.Literal("rejected"),
+		]),
+		dmarc: t.Object({
+			published: t.Boolean(),
+			policy: t.Union([t.String(), t.Null()]),
+			subdomainPolicy: t.Union([t.String(), t.Null()]),
+			percentage: t.Union([t.Number(), t.Null()]),
+			rawRecord: t.Union([t.String(), t.Null()]),
+		}),
+		spf: t.Object({
+			published: t.Boolean(),
+			qualifier: t.Union([t.String(), t.Null()]),
+			lookupCount: t.Number(),
+			rawRecord: t.Union([t.String(), t.Null()]),
+		}),
+		dkim: t.Object({
+			published: t.Boolean(),
+			selector: t.Union([t.String(), t.Null()]),
+			keyLength: t.Union([t.Number(), t.Null()]),
+		}),
+		mx: t.Object({
+			published: t.Boolean(),
+			provider: t.Union([t.String(), t.Null()]),
+		}),
+		reasons: t.Array(spoofReason),
+		nextStep: spoofNextStep,
+		subdomainNote: t.Optional(t.Union([t.String(), t.Null()])),
+	});
+
 	export const errorResponse = t.Object({
 		message: t.String(),
 		why: t.Optional(t.String()),
@@ -720,5 +795,7 @@ export namespace ToolsModel {
 	export type DnsLookupResponse = typeof dnsLookupResponse.static;
 	export type AuthCheckerBody = typeof authCheckerBody.static;
 	export type AuthCheckerResponse = typeof authCheckerResponse.static;
+	export type SpoofCheckerBody = typeof spoofCheckerBody.static;
+	export type SpoofCheckerResponse = typeof spoofCheckerResponse.static;
 }
 
