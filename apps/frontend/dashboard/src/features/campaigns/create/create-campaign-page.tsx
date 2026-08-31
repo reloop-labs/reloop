@@ -425,11 +425,11 @@ function CreateCampaignPageContent() {
 	};
 
 	return (
-		<div className="relative min-h-[calc(100vh-120px)] w-full px-6 py-12">
-			{/* Left Stepper Sidebar - Absolute on desktop */}
+		<div className="relative mx-auto flex min-h-[calc(100vh-120px)] w-full items-start justify-center px-6 py-12">
+			{/* Left Stepper Sidebar - Sticky on desktop */}
 			<aside
 				aria-label="Campaign creation progress"
-				className="hidden font-sans lg:absolute lg:top-12 lg:left-8 lg:block lg:w-48 xl:left-14"
+				className="sticky top-12 hidden w-48 shrink-0 font-sans lg:block xl:w-56"
 			>
 				<div className="space-y-2.5">
 					{STEPS.map((s, idx) => {
@@ -472,7 +472,7 @@ function CreateCampaignPageContent() {
 			{/* Center Content Container */}
 			<div
 				className={`mx-auto w-full font-sans transition-all duration-200 ${
-					step === "content" ? "max-w-3xl" : "max-w-xl"
+					step === "content" ? "max-w-3xl" : "max-w-md"
 				}`}
 			>
 				<AnimatePresence mode="wait">
@@ -558,24 +558,12 @@ function CreateCampaignPageContent() {
 								</div>
 
 								{/* Action Buttons */}
-								<div className="flex items-center justify-end gap-3 pt-5">
-									<Button.Root
-										type="button"
-										variant="neutral"
-										mode="stroke"
-										size="small"
-										onClick={handleBack}
-										disabled={isSendingBroadcast}
-										className="gap-1.5 rounded-xl"
-									>
-										Cancel
-										<ActionKbd className="w-auto min-w-4 px-1">esc</ActionKbd>
-									</Button.Root>
+								<div className="pt-6">
 									<FancyButton.Root
 										type="submit"
 										variant="blue"
-										size="small"
-										className="min-w-[134px] justify-center gap-1.5 overflow-hidden rounded-xl"
+										size="medium"
+										className="h-10 w-full justify-center gap-1.5 overflow-hidden rounded-xl font-medium text-sm"
 									>
 										Continue
 										<ActionKbd className={actionKbdOnBlueClassName}>
@@ -1791,6 +1779,11 @@ function CreateCampaignPageContent() {
 					)}
 				</AnimatePresence>
 			</div>
+			{/* Balanced spacer so center content is horizontally centered */}
+			<div
+				className="hidden w-48 shrink-0 lg:block xl:w-56"
+				aria-hidden="true"
+			/>
 		</div>
 	);
 }
