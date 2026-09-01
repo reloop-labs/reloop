@@ -2,6 +2,7 @@
 
 import {
 	BaseEdge,
+	EdgeLabelRenderer,
 	type EdgeProps,
 	getSmoothStepPath,
 	Position,
@@ -27,7 +28,7 @@ export const FlowEdge = ({
 	const tone: EdgeTone = data?.tone === "accent" ? "accent" : "default";
 	const color = TONE_COLOR[tone];
 
-	const [path] = getSmoothStepPath({
+	const [path, labelX, labelY] = getSmoothStepPath({
 		sourceX,
 		sourceY,
 		sourcePosition: sourcePosition ?? Position.Bottom,
@@ -36,6 +37,9 @@ export const FlowEdge = ({
 		targetPosition: targetPosition ?? Position.Top,
 		borderRadius: 12,
 	});
+
+	const branch =
+		data?.branch === "yes" || data?.branch === "no" ? data.branch : undefined;
 
 	return (
 		<>
@@ -60,6 +64,18 @@ export const FlowEdge = ({
 				stroke="var(--color-bg-white-0)"
 				strokeWidth={1.5}
 			/>
+			{branch ? (
+				<EdgeLabelRenderer>
+					<div
+						className="nodrag nopan pointer-events-none absolute rounded-full border border-stroke-soft-100 bg-bg-white-0 px-1.5 py-0.5 font-mono text-[10px] text-text-sub-600 dark:border-stroke-soft-100/50"
+						style={{
+							transform: `translate(-50%, -50%) translate(${labelX}px, ${labelY}px)`,
+						}}
+					>
+						{branch === "yes" ? "Yes" : "No"}
+					</div>
+				</EdgeLabelRenderer>
+			) : null}
 		</>
 	);
 };

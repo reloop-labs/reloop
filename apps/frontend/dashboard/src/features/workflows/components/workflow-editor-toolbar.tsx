@@ -8,8 +8,13 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import { AnimatedBackButton } from "#/features/dashboard/animated-back-button";
-import type { Workflow, WorkflowStatus } from "../workflow-types";
+import {
+	isTriggerNode,
+	type Workflow,
+	type WorkflowStatus,
+} from "../workflow-types";
 import { validateWorkflow } from "../workflow-validation";
+import { EnrollContactModal } from "./enroll-contact-modal";
 
 interface WorkflowEditorToolbarProps {
 	workflow: Workflow;
@@ -30,6 +35,13 @@ export const WorkflowEditorToolbar = ({
 	const validation = validateWorkflow(workflow);
 	const isActive = workflow.status === "active";
 	const [busy, setBusy] = useState(false);
+	const [enrollOpen, setEnrollOpen] = useState(false);
+	const triggerNode = workflow.nodes.find(isTriggerNode);
+	const triggerEvent =
+		workflow.triggerEvent ||
+		(typeof triggerNode?.data.eventKey === "string"
+			? triggerNode.data.eventKey
+			: null);
 
 	const handleToggleActive = async (checked: boolean) => {
 		if (busy) return;
@@ -99,6 +111,23 @@ export const WorkflowEditorToolbar = ({
 						variant="neutral"
 						mode="stroke"
 						size="xsmall"
+						onClick={() => {
+							if (!isActive) {
+								toast.error("Activate the workflow before enrolling contacts");
+								return;
+							}
+							setEnrollOpen(true);
+						}}
+						disabled={busy}
+						className="gap-1.5"
+					>
+						<Icon name="send" className="h-3.5 w-3.5" />
+						Enroll
+					</Button.Root>
+					<Button.Root
+						variant="neutral"
+						mode="stroke"
+						size="xsmall"
 						onClick={() => void handleSave()}
 						disabled={busy}
 					>
@@ -106,6 +135,12 @@ export const WorkflowEditorToolbar = ({
 					</Button.Root>
 				</div>
 			</div>
+			<EnrollContactModal
+				automationId={workflow.id}
+				triggerEvent={triggerEvent}
+				open={enrollOpen}
+				onOpenChange={setEnrollOpen}
+			/>
 			{validation.warnings.length > 0 && (
 				<div
 					className={cn(

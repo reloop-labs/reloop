@@ -5,16 +5,21 @@ import { config as deliverability_tester } from "./deliverability-tester";
 import { config as dkim_generator } from "./dkim-generator";
 import { config as dmarc_generator } from "./dmarc-generator";
 import { config as dns_lookup } from "./dns-lookup";
+import { config as domain_age } from "./domain-age";
 import { config as email_spam_words_checker } from "./email-spam-words-checker";
 import { config as email_validator } from "./email-validator";
-import { config as mobile_preview } from "./mobile-preview";
+import { config as lookalike_watch } from "./lookalike-watch";
 import { config as spf_generator } from "./spf-generator";
-import { config as subject_tester } from "./subject-tester";
+import { config as spoof_checker } from "./spoof-checker";
 import { config as temp_email_checker } from "./temp-email-checker";
-import { config as template_generator } from "./template-generator";
+import { config as who_sends } from "./who-sends";
 
 export const toolConfigs = [
 	dns_lookup,
+	spoof_checker,
+	who_sends,
+	domain_age,
+	lookalike_watch,
 	email_spam_words_checker,
 	blocklist_checker,
 	temp_email_checker,
@@ -25,7 +30,4 @@ export const toolConfigs = [
 	spf_generator,
 	dkim_generator,
 	dmarc_generator,
-	template_generator,
-	subject_tester,
-	mobile_preview,
 ];

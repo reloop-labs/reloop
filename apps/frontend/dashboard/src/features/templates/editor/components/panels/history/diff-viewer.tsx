@@ -18,7 +18,7 @@ export function DiffViewer({
 	return (
 		<div className="flex h-full flex-col bg-bg-weak-50 font-sans">
 			{/* Subject Diff Banner */}
-			<div className="border-stroke-soft-200 border-b bg-bg-white-0 p-4 dark:border-stroke-soft-100/40">
+			<div className="border-stroke-soft-100 border-b bg-bg-white-0 p-4 dark:border-stroke-soft-100/40">
 				<div className="flex flex-col gap-2">
 					<div className="flex items-center gap-2">
 						<Icon name="info-outline" className="size-4 text-text-sub-600" />
@@ -51,8 +51,8 @@ export function DiffViewer({
 			<div className="min-h-[300px] flex-1 p-4">
 				<div className="grid h-full grid-cols-1 gap-4 lg:grid-cols-2">
 					{/* Left Frame: Previous Published */}
-					<div className="flex h-full min-h-[250px] flex-col overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/40">
-						<div className="flex items-center justify-between border-stroke-soft-200 border-b bg-bg-weak-50 px-4 py-2 dark:border-stroke-soft-100/40">
+					<div className="flex h-full min-h-[250px] flex-col overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40">
+						<div className="flex items-center justify-between border-stroke-soft-100 border-b bg-bg-weak-50 px-4 py-2 dark:border-stroke-soft-100/40">
 							<span className="font-semibold text-label-xs text-text-sub-600">
 								Previously Published
 							</span>
@@ -78,8 +78,8 @@ export function DiffViewer({
 					</div>
 
 					{/* Right Frame: Current Edits */}
-					<div className="flex h-full min-h-[250px] flex-col overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/40">
-						<div className="flex items-center justify-between border-stroke-soft-200 border-b bg-bg-weak-50 px-4 py-2 dark:border-stroke-soft-100/40">
+					<div className="flex h-full min-h-[250px] flex-col overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40">
+						<div className="flex items-center justify-between border-stroke-soft-100 border-b bg-bg-weak-50 px-4 py-2 dark:border-stroke-soft-100/40">
 							<span className="font-semibold text-label-xs text-text-strong-950">
 								Current Edits (To Publish)
 							</span>

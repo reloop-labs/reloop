@@ -3,11 +3,13 @@
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import {
+	isConditionNode,
 	isDelayNode,
 	isSendEmailNode,
 	isTriggerNode,
 	type WorkflowNode,
 } from "../workflow-types";
+import { ConditionConfigForm } from "./condition-config-form";
 import { DelayConfigForm } from "./delay-config-form";
 import { SendEmailConfigForm } from "./send-email-config-form";
 import { TriggerConfigForm } from "./trigger-config-form";
@@ -33,21 +35,25 @@ export const NodeConfigPanel = ({
 					Select a node
 				</p>
 				<p className="mt-1 text-text-sub-600 text-xs">
-					Click a trigger, Delay, or Send email step to configure it.
+					Click a trigger, Delay, Condition, or Send email step to configure it.
 				</p>
 			</div>
 		);
 	}
 
 	const canDelete =
-		selectedNode.type === "send_email" || selectedNode.type === "delay";
+		selectedNode.type === "send_email" ||
+		selectedNode.type === "delay" ||
+		selectedNode.type === "condition";
 
 	const title =
 		selectedNode.type === "trigger"
 			? "Trigger"
 			: selectedNode.type === "delay"
 				? "Delay"
-				: "Send email";
+				: selectedNode.type === "condition"
+					? "Condition"
+					: "Send email";
 
 	return (
 		<div className="flex h-full flex-col border-stroke-soft-100 border-l bg-bg-white-0 dark:border-stroke-soft-100/50">
@@ -96,6 +102,12 @@ export const NodeConfigPanel = ({
 				)}
 				{isSendEmailNode(selectedNode) && (
 					<SendEmailConfigForm
+						value={selectedNode.data}
+						onChange={(data) => onUpdateNode(selectedNode.id, data)}
+					/>
+				)}
+				{isConditionNode(selectedNode) && (
+					<ConditionConfigForm
 						value={selectedNode.data}
 						onChange={(data) => onUpdateNode(selectedNode.id, data)}
 					/>

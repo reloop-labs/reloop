@@ -1,11 +1,16 @@
+import { authCheckerRoute } from "@be/tools/routes/tools/auth-checker/auth-checker.route";
 import { bimiCheckRoute } from "@be/tools/routes/tools/bimi-check/bimi-check.route";
 import { blocklistCheckRoute } from "@be/tools/routes/tools/blocklist-check/blocklist-check.route";
 import { deliverabilityTestRoute } from "@be/tools/routes/tools/deliverability-test/deliverability-test.route";
 import { dnsLookupRoute } from "@be/tools/routes/tools/dns-lookup/dns-lookup.route";
+import { domainAgeRoute } from "@be/tools/routes/tools/domain-age/domain-age.route";
 import { emailHealthCheckRoute } from "@be/tools/routes/tools/email-health-check/email-health-check.route";
+import { lookalikeWatchRoute } from "@be/tools/routes/tools/lookalike-watch/lookalike-watch.route";
 import { recordGenerateRoute } from "@be/tools/routes/tools/record-generate/record-generate.route";
 import { spamCheckRoute } from "@be/tools/routes/tools/spam-check/spam-check.route";
+import { spoofCheckerRoute } from "@be/tools/routes/tools/spoof-checker/spoof-checker.route";
 import { tempEmailCheckerRoute } from "@be/tools/routes/tools/temp-email-checker/temp-email-checker.route";
+import { whoSendsRoute } from "@be/tools/routes/tools/who-sends/who-sends.route";
 import { Elysia } from "elysia";
 
 export const toolsRoutes = new Elysia({
@@ -18,5 +23,10 @@ export const toolsRoutes = new Elysia({
 	.use(deliverabilityTestRoute)
 	.use(emailHealthCheckRoute)
 	.use(dnsLookupRoute)
+	.use(authCheckerRoute)
+	.use(spoofCheckerRoute)
+	.use(whoSendsRoute)
+	.use(domainAgeRoute)
+	.use(lookalikeWatchRoute)
 	.use(bimiCheckRoute)
 	.use(recordGenerateRoute);

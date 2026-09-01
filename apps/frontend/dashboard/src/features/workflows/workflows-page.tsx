@@ -120,7 +120,7 @@ export function WorkflowsPage() {
 					<div className="relative">
 						<Icon
 							name="search"
-							className="-translate-y-1/2 pointer-events-none absolute top-1/2 left-3 h-4 w-4 text-text-sub-600"
+							className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-text-sub-600"
 						/>
 						<input
 							type="search"

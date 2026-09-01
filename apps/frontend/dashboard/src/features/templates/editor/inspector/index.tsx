@@ -9,11 +9,16 @@ import { useCurrentEditor } from "@tiptap/react";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import {
+	useAllPropertiesQuery,
+	useInvalidateContacts,
+} from "#/features/contacts/hooks/use-contacts-query";
 import { useSWR } from "#/features/templates/editor/hooks/use-swr-compat";
 import { useTemplateId } from "#/features/templates/editor/hooks/use-template-id";
 import {
 	formatTemplateVariable,
 	mapTemplateVariables,
+	normalizeTemplateVariableName,
 } from "#/features/templates/lib/template-variables";
 import { DeleteTemplateVariableModal } from "../components/panels/variables/delete-variable-modal";
 import Breadcrumb from "./breadcrumb";
@@ -23,6 +28,7 @@ import { PropRow } from "./prop-row";
 import { ScrubRow } from "./scrub-field";
 import { SectionHeader } from "./section-header";
 import { SpacingControl } from "./spacing-control";
+import { AlignControls } from "./typography/align-controls";
 import { TypographyControls } from "./typography/typography-controls";
 import { UrlInput } from "./url-input";
 
@@ -63,7 +69,9 @@ function ColorRow({
 }) {
 	return (
 		<PropRow label={label}>
-			<ColorPicker value={value} onChange={onChange} />
+			<div className="w-28">
+				<ColorPicker value={value} onChange={onChange} />
+			</div>
 		</PropRow>
 	);
 }
@@ -71,18 +79,44 @@ function ColorRow({
 function VariableInspectorCard({ name }: { name: string }) {
 	const templateId = useTemplateId();
 	const { editor } = useCurrentEditor();
+	const invalidateContacts = useInvalidateContacts();
 
-	// Fetch variable meta config from DB to find type and default value
+	// Fetch variable meta config from DB if in template mode
 	const { data: templateData, mutate } = useSWR(
 		templateId ? `/api/template/v1/${templateId}` : null,
 		(url) => fetch(url, { credentials: "include" }).then((res) => res.json()),
 	);
 
-	const variables = mapTemplateVariables(templateData?.variables);
-	const matchedVar = variables.find((v) => v.name === name);
+	// Fetch contact properties if in campaign / no-template mode
+	const { data: propertiesData } = useAllPropertiesQuery(!templateId);
 
-	const varType = matchedVar?.type ?? "string";
-	const defaultValue = matchedVar?.defaultValue ?? "";
+	const templateVariables = mapTemplateVariables(templateData?.variables);
+	const contactProperties = propertiesData?.properties ?? [];
+
+	const normalizedTarget = normalizeTemplateVariableName(name);
+
+	const matchedVar = templateId
+		? templateVariables.find(
+				(v) => normalizeTemplateVariableName(v.name) === normalizedTarget,
+			)
+		: null;
+
+	const matchedProp = !templateId
+		? contactProperties.find(
+				(p) =>
+					normalizeTemplateVariableName(p.propertyName) === normalizedTarget,
+			)
+		: null;
+
+	const varType = templateId
+		? (matchedVar?.type ?? "string")
+		: matchedProp?.propertyType?.toLowerCase() === "number"
+			? "number"
+			: "string";
+
+	const defaultValue = templateId
+		? (matchedVar?.defaultValue ?? "")
+		: (matchedProp?.defaultValue ?? "");
 
 	const [localType, setLocalType] = useState(varType);
 	const [localDefaultValue, setLocalDefaultValue] = useState(defaultValue);
@@ -98,41 +132,82 @@ function VariableInspectorCard({ name }: { name: string }) {
 	}, [varType, defaultValue]);
 
 	const handleSave = async () => {
-		if (!templateId) return;
 		setIsSaving(true);
 		try {
-			const updatedVar = {
-				name,
-				type: localType,
-				defaultValue: localDefaultValue,
-			};
-			const updatedVariables = variables.map((v) =>
-				v.name === name ? updatedVar : v,
-			);
-
 			// Capture the selection before mutation
 			const selectionRange = editor
 				? { from: editor.state.selection.from, to: editor.state.selection.to }
 				: null;
 
-			const response = await fetch(`/api/template/v1/${templateId}`, {
-				method: "PUT",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				credentials: "include",
-				body: JSON.stringify({
-					variables: updatedVariables,
-				}),
-			});
+			if (templateId) {
+				const updatedVar = {
+					name,
+					type: localType,
+					defaultValue: localDefaultValue,
+				};
+				const updatedVariables = templateVariables.map((v) =>
+					normalizeTemplateVariableName(v.name) === normalizedTarget
+						? updatedVar
+						: v,
+				);
 
-			if (!response.ok) {
-				throw new Error("Failed to update variable properties");
+				const response = await fetch(`/api/template/v1/${templateId}`, {
+					method: "PUT",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					credentials: "include",
+					body: JSON.stringify({
+						variables: updatedVariables,
+					}),
+				});
+
+				if (!response.ok) {
+					throw new Error("Failed to update variable properties");
+				}
+
+				toast.success("Saved variable properties");
+				await mutate();
+			} else {
+				// Campaign mode -> Update contact property
+				if (matchedProp) {
+					const response = await fetch(
+						`/api/contacts/v1/properties/${matchedProp.id}`,
+						{
+							method: "PATCH",
+							headers: { "Content-Type": "application/json" },
+							body: JSON.stringify({
+								fallbackValue: localDefaultValue || null,
+							}),
+						},
+					);
+
+					if (!response.ok) {
+						throw new Error("Failed to update property");
+					}
+
+					toast.success("Saved variable properties");
+					void invalidateContacts();
+				} else {
+					// Create new contact property if not already existing
+					const response = await fetch("/api/contacts/v1/properties/create", {
+						method: "POST",
+						headers: { "Content-Type": "application/json" },
+						body: JSON.stringify({
+							name,
+							type: localType,
+							fallbackValue: localDefaultValue || undefined,
+						}),
+					});
+
+					if (!response.ok) {
+						throw new Error("Failed to create property");
+					}
+
+					toast.success(`Created property ${name}`);
+					void invalidateContacts();
+				}
 			}
-
-			toast.success("Saved variable properties");
-			// Trigger SWR mutation to update local caches
-			await mutate();
 
 			// Restore selection and focus to keep the inspector open on this variable node
 			if (editor && selectionRange) {
@@ -160,34 +235,52 @@ function VariableInspectorCard({ name }: { name: string }) {
 	};
 
 	const handleDelete = async () => {
-		if (!templateId) return;
 		setIsDeleting(true);
 		try {
-			const updatedVariables = variables.filter((v) => v.name !== name);
+			if (templateId) {
+				const updatedVariables = templateVariables.filter(
+					(v) => normalizeTemplateVariableName(v.name) !== normalizedTarget,
+				);
 
-			const response = await fetch(`/api/template/v1/${templateId}`, {
-				method: "PUT",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				credentials: "include",
-				body: JSON.stringify({
-					variables: updatedVariables,
-				}),
-			});
+				const response = await fetch(`/api/template/v1/${templateId}`, {
+					method: "PUT",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					credentials: "include",
+					body: JSON.stringify({
+						variables: updatedVariables,
+					}),
+				});
 
-			if (!response.ok) {
-				throw new Error("Failed to delete variable");
+				if (!response.ok) {
+					throw new Error("Failed to delete variable");
+				}
+
+				toast.success(`Deleted variable ${name}`);
+				mutate();
+			} else {
+				if (matchedProp) {
+					const response = await fetch(
+						`/api/contacts/v1/properties/${matchedProp.id}`,
+						{
+							method: "DELETE",
+						},
+					);
+
+					if (!response.ok) {
+						throw new Error("Failed to delete property");
+					}
+
+					toast.success(`Deleted variable ${name}`);
+					void invalidateContacts();
+				}
 			}
-
-			toast.success(`Deleted variable ${name}`);
 
 			// Delete the active variable node in the editor
 			if (editor) {
 				editor.commands.deleteSelection();
 			}
-
-			mutate();
 		} catch (error: any) {
 			toast.error(error.message || "Failed to delete variable");
 		} finally {
@@ -351,6 +444,8 @@ function VariableInspectorCard({ name }: { name: string }) {
 				isOpen={isDeleteModalOpen}
 				onClose={() => setIsDeleteModalOpen(false)}
 				variableName={name}
+				variableType={varType}
+				defaultValue={defaultValue}
 				onConfirm={handleDelete}
 				isSubmitting={isDeleting}
 			/>
@@ -469,7 +564,7 @@ export const EmailInspector = () => {
 			<Breadcrumb />
 
 			{/* ── All sections in one flat scroll container ── */}
-			<div className="flex flex-col divide-y divide-stroke-soft-200 pb-6">
+			<div className="flex flex-col divide-y divide-stroke-soft-100 pb-6">
 				{/* ── Text card (Handles both text selection and node selection) ── */}
 				<Inspector.Text>
 					{(textProps) => <TextSection {...textProps} />}
@@ -690,38 +785,302 @@ export const EmailInspector = () => {
 
 				{/* ── Document card ── */}
 				<Inspector.Document>
-					{({ findStyleValue, setGlobalStyle }) => (
-						<InspectorSection>
-							<SectionHeader label="Body" />
-							<ScrubRow
-								label="Container width"
-								value={findStyleValue("container", "width")}
-								onChange={(v) => setGlobalStyle("container", "width", v)}
-								min={200}
-								max={800}
-								suffix="px"
-							/>
-							<ScrubRow
-								label="Border radius"
-								value={findStyleValue("container", "borderRadius")}
-								onChange={(v) => setGlobalStyle("container", "borderRadius", v)}
-								min={0}
-								max={64}
-								suffix="px"
-							/>
-							<ScrubRow
-								label="Line height"
-								value={findStyleValue("body", "lineHeight")}
-								onChange={(v) => setGlobalStyle("body", "lineHeight", v)}
-								min={80}
-								max={300}
-							/>
-							<ColorRow
-								label="Text color"
-								value={String(findStyleValue("body", "color") ?? "")}
-								onChange={(v) => setGlobalStyle("body", "color", v)}
-							/>
-						</InspectorSection>
+					{({ findStyleValue, setGlobalStyle, batchSetGlobalStyle }) => (
+						<>
+							<InspectorSection>
+								<ColorRow
+									label="Background"
+									value={String(
+										findStyleValue("body", "backgroundColor") ?? "",
+									)}
+									onChange={(v) => setGlobalStyle("body", "backgroundColor", v)}
+								/>
+								<SpacingControl
+									label="Padding"
+									value={{
+										top:
+											(findStyleValue("body", "paddingTop") as number) ??
+											(findStyleValue("body", "padding") as number) ??
+											"",
+										right:
+											(findStyleValue("body", "paddingRight") as number) ??
+											(findStyleValue("body", "padding") as number) ??
+											"",
+										bottom:
+											(findStyleValue("body", "paddingBottom") as number) ??
+											(findStyleValue("body", "padding") as number) ??
+											"",
+										left:
+											(findStyleValue("body", "paddingLeft") as number) ??
+											(findStyleValue("body", "padding") as number) ??
+											"",
+									}}
+									onChange={({ top, right, bottom, left }) =>
+										batchSetGlobalStyle([
+											{
+												classReference: "body",
+												property: "paddingTop",
+												value: top as number,
+											},
+											{
+												classReference: "body",
+												property: "paddingRight",
+												value: right as number,
+											},
+											{
+												classReference: "body",
+												property: "paddingBottom",
+												value: bottom as number,
+											},
+											{
+												classReference: "body",
+												property: "paddingLeft",
+												value: left as number,
+											},
+										])
+									}
+								/>
+							</InspectorSection>
+
+							<InspectorSection>
+								<SectionHeader label="Body" />
+								<div className="px-4 pt-1 pb-2">
+									<AlignControls
+										alignment={
+											(findStyleValue("container", "align") as string) || "left"
+										}
+										setAlignment={(align) =>
+											setGlobalStyle("container", "align", align)
+										}
+									/>
+								</div>
+								<ColorRow
+									label="Text"
+									value={String(
+										findStyleValue("body", "color") ??
+											findStyleValue("container", "color") ??
+											"",
+									)}
+									onChange={(v) => {
+										setGlobalStyle("body", "color", v);
+										setGlobalStyle("container", "color", v);
+									}}
+								/>
+								<ColorRow
+									label="Background"
+									value={String(
+										findStyleValue("container", "backgroundColor") ?? "",
+									)}
+									onChange={(v) =>
+										setGlobalStyle("container", "backgroundColor", v)
+									}
+								/>
+								<ScrubRow
+									label="Width"
+									value={findStyleValue("container", "width")}
+									onChange={(v) => setGlobalStyle("container", "width", v)}
+									min={200}
+									max={1200}
+									suffix="px"
+								/>
+								<ScrubRow
+									label="Height"
+									value={findStyleValue("container", "height")}
+									onChange={(v) => setGlobalStyle("container", "height", v)}
+									min={0}
+									max={2000}
+									suffix="px"
+								/>
+								<SpacingControl
+									label="Padding"
+									value={{
+										top:
+											(findStyleValue("container", "paddingTop") as number) ??
+											(findStyleValue("container", "padding") as number) ??
+											"",
+										right:
+											(findStyleValue("container", "paddingRight") as number) ??
+											(findStyleValue("container", "padding") as number) ??
+											"",
+										bottom:
+											(findStyleValue(
+												"container",
+												"paddingBottom",
+											) as number) ??
+											(findStyleValue("container", "padding") as number) ??
+											"",
+										left:
+											(findStyleValue("container", "paddingLeft") as number) ??
+											(findStyleValue("container", "padding") as number) ??
+											"",
+									}}
+									onChange={({ top, right, bottom, left }) =>
+										batchSetGlobalStyle([
+											{
+												classReference: "container",
+												property: "paddingTop",
+												value: top as number,
+											},
+											{
+												classReference: "container",
+												property: "paddingRight",
+												value: right as number,
+											},
+											{
+												classReference: "container",
+												property: "paddingBottom",
+												value: bottom as number,
+											},
+											{
+												classReference: "container",
+												property: "paddingLeft",
+												value: left as number,
+											},
+										])
+									}
+								/>
+								<SpacingControl
+									label="Margin"
+									value={{
+										top:
+											(findStyleValue("container", "margin") as number) ?? "",
+										right:
+											(findStyleValue("container", "margin") as number) ?? "",
+										bottom:
+											(findStyleValue("container", "margin") as number) ?? "",
+										left:
+											(findStyleValue("container", "margin") as number) ?? "",
+									}}
+									onChange={({ top }) =>
+										setGlobalStyle("container", "margin", top as number)
+									}
+								/>
+								<SpacingControl
+									label="Corner radius"
+									variant="corners"
+									value={{
+										top:
+											(findStyleValue(
+												"container",
+												"borderTopLeftRadius",
+											) as number) ??
+											(findStyleValue("container", "borderRadius") as number) ??
+											"",
+										right:
+											(findStyleValue(
+												"container",
+												"borderTopRightRadius",
+											) as number) ??
+											(findStyleValue("container", "borderRadius") as number) ??
+											"",
+										bottom:
+											(findStyleValue(
+												"container",
+												"borderBottomRightRadius",
+											) as number) ??
+											(findStyleValue("container", "borderRadius") as number) ??
+											"",
+										left:
+											(findStyleValue(
+												"container",
+												"borderBottomLeftRadius",
+											) as number) ??
+											(findStyleValue("container", "borderRadius") as number) ??
+											"",
+									}}
+									onChange={({ top, right, bottom, left }) =>
+										batchSetGlobalStyle([
+											{
+												classReference: "container",
+												property: "borderTopLeftRadius",
+												value: top as number,
+											},
+											{
+												classReference: "container",
+												property: "borderTopRightRadius",
+												value: right as number,
+											},
+											{
+												classReference: "container",
+												property: "borderBottomRightRadius",
+												value: bottom as number,
+											},
+											{
+												classReference: "container",
+												property: "borderBottomLeftRadius",
+												value: left as number,
+											},
+										])
+									}
+								/>
+								<SpacingControl
+									label="Border"
+									value={{
+										top:
+											(findStyleValue(
+												"container",
+												"borderTopWidth",
+											) as number) ??
+											(findStyleValue("container", "borderWidth") as number) ??
+											"",
+										right:
+											(findStyleValue(
+												"container",
+												"borderRightWidth",
+											) as number) ??
+											(findStyleValue("container", "borderWidth") as number) ??
+											"",
+										bottom:
+											(findStyleValue(
+												"container",
+												"borderBottomWidth",
+											) as number) ??
+											(findStyleValue("container", "borderWidth") as number) ??
+											"",
+										left:
+											(findStyleValue(
+												"container",
+												"borderLeftWidth",
+											) as number) ??
+											(findStyleValue("container", "borderWidth") as number) ??
+											"",
+									}}
+									onChange={({ top, right, bottom, left }) =>
+										batchSetGlobalStyle([
+											{
+												classReference: "container",
+												property: "borderTopWidth",
+												value: top as number,
+											},
+											{
+												classReference: "container",
+												property: "borderRightWidth",
+												value: right as number,
+											},
+											{
+												classReference: "container",
+												property: "borderBottomWidth",
+												value: bottom as number,
+											},
+											{
+												classReference: "container",
+												property: "borderLeftWidth",
+												value: left as number,
+											},
+										])
+									}
+								/>
+								<ColorRow
+									label="Border color"
+									value={String(
+										findStyleValue("container", "borderColor") ?? "",
+									)}
+									onChange={(v) =>
+										setGlobalStyle("container", "borderColor", v)
+									}
+								/>
+							</InspectorSection>
+						</>
 					)}
 				</Inspector.Document>
 			</div>

@@ -8,7 +8,7 @@ Reloop is built using a highly modular microservice architecture. This separatio
 
 ## Component Breakdown
 
-The Reloop stack consists of **19 application services** (3 frontends, 16 backends) and **9 external backing systems**.
+The Reloop stack consists of **20 application services** (3 frontends, 17 backends) and **9 external backing systems**.
 
 ### 1. Frontend Services (3)
 * **`web`**: The main public landing page and landing website.
@@ -26,6 +26,7 @@ The Reloop stack consists of **19 application services** (3 frontends, 16 backen
 * **`workflow`**: Manages campaign automation workflows, timing wait steps, and drip actions.
 * **`upload`**: Manages file storage attachments and static image uploads.
 * **`template`**: Compiles dynamic template variables before mailing dispatch.
+* **`campaigns`**: Broadcast campaigns — audience snapshot, schedule, send, and engagement stats.
 * **`credits`**: Tracks account credit balances, billing cycles, and quotas.
 * **`email`**: The core API service mapping outbound HTTP sending requests to the queue processor.
 * **`inbox`**: Manages receiving inbox threads and incoming messages.

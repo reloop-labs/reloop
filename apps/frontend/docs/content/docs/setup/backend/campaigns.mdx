@@ -1,0 +1,45 @@
+---
+title: Campaigns
+icon: mega-phone
+description: Set up, configure, and run the Reloop campaigns microservice locally.
+---
+
+Broadcast email campaigns — audience targeting, scheduling, send, and engagement stats.
+
+<Tip>
+Run [`bun setup`](/docs/setup) once from the monorepo root. Env files come from `bun setup` / `bun env:setup`.
+</Tip>
+
+
+## Overview
+
+| Property | Value |
+| :--- | :--- |
+| **Directory** | `apps/backend/campaigns` |
+| **Port** | `8027` |
+| **Local URL** | [https://local.reloop.sh/api/campaigns](https://local.reloop.sh/api/campaigns) |
+| **Swagger UI** | [https://local.reloop.sh/api/campaigns/openapi](https://local.reloop.sh/api/campaigns/openapi) |
+| **Stack** | ElysiaJS · PostgreSQL · Redis · NATS · BullMQ |
+
+
+## Quick start
+
+```bash
+bun be:campaigns:dev
+```
+
+Or `bun backend:dev` / `bun dev`.
+
+
+## Environment
+
+`apps/backend/campaigns/.env` — from `bun setup` / `bun env:setup`.
+
+```bash
+PG_URL=postgresql://reloop:reloop123@localhost:5432/reloop
+REDIS_URL=redis://:reloop123@localhost:6379
+PORT=8027
+BASE_URL="https://local.reloop.sh"
+NATS_URL=nats://localhost:4222
+NODE_ENV=development
+```

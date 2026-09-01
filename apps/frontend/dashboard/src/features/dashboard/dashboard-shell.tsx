@@ -14,7 +14,10 @@ import { MobileSidebarSheet } from "./sidebar/mobile-sidebar-sheet";
 
 function useIsTemplateEditor() {
 	const pathname = usePathname();
-	return Boolean(pathname.match(/\/templates\/[^/]+/));
+	return (
+		Boolean(pathname.match(/\/templates\/[^/]+/)) ||
+		Boolean(pathname.match(/\/campaigns\/[^/]+\/edit/))
+	);
 }
 
 /**
@@ -57,7 +60,6 @@ export function DashboardShell({ children }: { children: ReactNode }) {
 		return (
 			<CommandMenuProvider>
 				<div className="flex h-screen overflow-hidden bg-bg-white-0 dark:bg-black">
-					<OpenSupportFromQuery />
 					<SidebarChrome
 						isMobileNavOpen={isMobileNavOpen}
 						onCloseMobileNav={() => setMobileNavOpen(false)}
@@ -65,7 +67,6 @@ export function DashboardShell({ children }: { children: ReactNode }) {
 					<main className="relative flex min-w-0 flex-1 flex-col overflow-hidden">
 						{children}
 					</main>
-					<FloatingSupportButton />
 					<CommandMenuGlobal />
 				</div>
 			</CommandMenuProvider>

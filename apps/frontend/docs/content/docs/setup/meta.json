@@ -23,6 +23,7 @@
 		"backend/workflow",
 		"backend/upload",
 		"backend/template",
+		"backend/campaigns",
 		"backend/inbox",
 		"backend/email",
 		"backend/credits",

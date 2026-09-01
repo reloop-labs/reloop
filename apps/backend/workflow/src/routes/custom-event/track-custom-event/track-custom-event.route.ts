@@ -12,6 +12,8 @@ export const trackCustomEventRoute = new Elysia().use(authMiddleware).post(
 			eventKey: body.event,
 			contactId: body.contactId,
 			email: body.email,
+			firstName: body.firstName,
+			lastName: body.lastName,
 			properties: body.properties as Record<string, unknown> | undefined,
 		});
 	},
@@ -28,7 +30,7 @@ export const trackCustomEventRoute = new Elysia().use(authMiddleware).post(
 			tags: ["Events"],
 			summary: "Track workflow event",
 			description:
-				"Fires a workflow-only custom event: validates properties and enrolls matching automations. Not related to outbound webhooks.",
+				"Fires a workflow-only custom event: validates properties and enrolls matching automations. Pass email to create the contact if it does not exist. Not related to outbound webhooks.",
 		},
 	},
 );

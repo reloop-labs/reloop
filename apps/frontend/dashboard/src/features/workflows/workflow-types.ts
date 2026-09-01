@@ -4,7 +4,21 @@ import type { GroupNodeData } from "./components/nodes/group-node";
 
 export type WorkflowStatus = "draft" | "active" | "paused";
 
-export type WorkflowNodeType = "trigger" | "send_email" | "delay" | "group";
+export type WorkflowNodeType =
+	| "trigger"
+	| "send_email"
+	| "delay"
+	| "condition"
+	| "group";
+
+export type ConditionOperator =
+	| "eq"
+	| "neq"
+	| "contains"
+	| "exists"
+	| "not_exists"
+	| "gt"
+	| "lt";
 
 export type DelayUnit = "minutes" | "hours" | "days";
 
@@ -44,16 +58,26 @@ export interface DelayNodeData extends NodeCardMeta {
 	[key: string]: unknown;
 }
 
+export interface ConditionNodeData extends NodeCardMeta {
+	/** `email` / `firstName` / `status` / `event.plan` / `property.plan` */
+	field: string;
+	operator: ConditionOperator;
+	value?: string;
+	[key: string]: unknown;
+}
+
 export type WorkflowNodeData =
 	| TriggerNodeData
 	| SendEmailNodeData
 	| DelayNodeData
+	| ConditionNodeData
 	| GroupNodeData;
 
 export type WorkflowNode = Node<WorkflowNodeData, WorkflowNodeType>;
 
 export interface WorkflowEdgeData extends Record<string, unknown> {
 	tone?: EdgeTone;
+	branch?: "yes" | "no";
 }
 
 export type WorkflowEdge = Edge<WorkflowEdgeData>;
@@ -91,3 +115,7 @@ export const isSendEmailNode = (
 export const isDelayNode = (
 	node: WorkflowNode,
 ): node is Node<DelayNodeData, "delay"> => node.type === "delay";
+
+export const isConditionNode = (
+	node: WorkflowNode,
+): node is Node<ConditionNodeData, "condition"> => node.type === "condition";

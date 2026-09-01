@@ -123,6 +123,47 @@
         "typescript": "catalog:",
       },
     },
+    "apps/backend/campaigns": {
+      "name": "be-campaigns",
+      "dependencies": {
+        "@elysiajs/cors": "catalog:backend",
+        "@elysiajs/cron": "catalog:backend",
+        "@elysiajs/openapi": "catalog:backend",
+        "@elysiajs/opentelemetry": "catalog:backend",
+        "@elysiajs/server-timing": "catalog:backend",
+        "@elysiajs/swagger": "catalog:backend",
+        "@opentelemetry/exporter-trace-otlp-http": "catalog:backend",
+        "@opentelemetry/exporter-trace-otlp-proto": "catalog:backend",
+        "@opentelemetry/instrumentation-express": "catalog:backend",
+        "@opentelemetry/instrumentation-http": "catalog:backend",
+        "@opentelemetry/resources": "catalog:backend",
+        "@opentelemetry/sdk-trace-node": "catalog:backend",
+        "@opentelemetry/semantic-conventions": "catalog:backend",
+        "@paralleldrive/cuid2": "catalog:backend",
+        "@reloop/auth": "workspace:*",
+        "@reloop/bus": "workspace:*",
+        "@reloop/cache": "workspace:*",
+        "@reloop/db": "workspace:*",
+        "better-auth": "catalog:",
+        "bullmq": "catalog:backend",
+        "dotenv": "catalog:backend",
+        "drizzle-orm": "catalog:db",
+        "drizzle-typebox": "catalog:db",
+        "elysia": "catalog:backend",
+        "evlog": "catalog:backend",
+        "pg": "catalog:db",
+        "redis": "catalog:db",
+        "zod": "catalog:ui",
+      },
+      "devDependencies": {
+        "@reloop/tsconfig": "workspace:*",
+        "@types/bun": "catalog:backend",
+        "@types/pg": "catalog:db",
+        "drizzle-kit": "catalog:db",
+        "tsdown": "catalog:backend",
+        "typescript": "catalog:",
+      },
+    },
     "apps/backend/contacts": {
       "name": "be-contacts",
       "dependencies": {
@@ -487,6 +528,7 @@
         "elysia": "catalog:backend",
         "evlog": "catalog:backend",
         "mailparser": "catalog:backend",
+        "tldts": "^7.4.11",
       },
       "devDependencies": {
         "@reloop/tsconfig": "workspace:*",
@@ -845,6 +887,7 @@
         "framer-motion": "catalog:ui",
         "gray-matter": "catalog:ui",
         "js-yaml": "catalog:ui",
+        "lucide-react": "catalog:ui",
         "motion": "catalog:ui",
         "next": "catalog:ui",
         "next-mdx-remote": "catalog:ui",
@@ -2704,6 +2747,8 @@
 
     "be-auth": ["be-auth@workspace:apps/backend/auth"],
 
+    "be-campaigns": ["be-campaigns@workspace:apps/backend/campaigns"],
+
     "be-contacts": ["be-contacts@workspace:apps/backend/contacts"],
 
     "be-credits": ["be-credits@workspace:apps/backend/credits"],
@@ -4002,9 +4047,9 @@
 
     "tlds": ["tlds@1.261.0", "", { "bin": { "tlds": "bin.js" } }, "sha512-QXqwfEl9ddlGBaRFXIvNKK6OhipSiLXuRuLJX5DErz0o0Q0rYxulWLdFryTkV5PkdZct5iMInwYEGe/eR++1AA=="],
 
-    "tldts": ["tldts@7.4.2", "", { "dependencies": { "tldts-core": "^7.4.2" }, "bin": { "tldts": "bin/cli.js" } }, "sha512-kCwffuaH8ntKtygnWe1b4BJKWiCUH30n5KfoTr6IchcXOwR7chAOFJxFrH3vjANafUYrIA4a7SDL+nn7SiR4Sw=="],
+    "tldts": ["tldts@7.4.11", "", { "dependencies": { "tldts-core": "^7.4.11" }, "bin": { "tldts": "bin/cli.js" } }, "sha512-aBiNayCfTQxuIJBm06M+xR14cYaYlDlSXZbgsnKzKNxDKUVq7KFwTjwBSsb7m9Y5xO8WfPnBc63WaYFMTGlvqw=="],
 
-    "tldts-core": ["tldts-core@7.4.2", "", {}, "sha512-nwEyF4vl4RSJjwSjBUmOSxc3BFPoIFdlRthJ6e+5v9P3bHNsoD06UjuqMUspqp7vsEZ1beaHi1km+optiE17yA=="],
+    "tldts-core": ["tldts-core@7.4.11", "", {}, "sha512-CW3WN2rIIE/Of21mulhgnGOwoDyEFNygyIBOONSdyAuSATgMMUCpLeUlB+E8sAwA5xRV9hYPl+kyZ9citHCaKg=="],
 
     "tm-grammars": ["tm-grammars@1.31.15", "", {}, "sha512-B0DZ06cAD3J/bW4TVDmrl/mYqCwuH9C/cf7IHiLcLkfktmjSf3t1faENrL4Im5/umH+SxTi6z9F/36mzXdf6pw=="],
 
@@ -4582,6 +4627,8 @@
 
     "tar-fs/chownr": ["chownr@1.1.4", "", {}, "sha512-jJ0bqzaylmJtVnNgzTeSOs8DPavpbYgEr/b0YL8/2GO3xJEhInFmhKMUnEJQjZumK7KXGFhUy89PrsJWlakBVg=="],
 
+    "tough-cookie/tldts": ["tldts@7.4.2", "", { "dependencies": { "tldts-core": "^7.4.2" }, "bin": { "tldts": "bin/cli.js" } }, "sha512-kCwffuaH8ntKtygnWe1b4BJKWiCUH30n5KfoTr6IchcXOwR7chAOFJxFrH3vjANafUYrIA4a7SDL+nn7SiR4Sw=="],
+
     "tsx/esbuild": ["esbuild@0.28.0", "", { "optionalDependencies": { "@esbuild/aix-ppc64": "0.28.0", "@esbuild/android-arm": "0.28.0", "@esbuild/android-arm64": "0.28.0", "@esbuild/android-x64": "0.28.0", "@esbuild/darwin-arm64": "0.28.0", "@esbuild/darwin-x64": "0.28.0", "@esbuild/freebsd-arm64": "0.28.0", "@esbuild/freebsd-x64": "0.28.0", "@esbuild/linux-arm": "0.28.0", "@esbuild/linux-arm64": "0.28.0", "@esbuild/linux-ia32": "0.28.0", "@esbuild/linux-loong64": "0.28.0", "@esbuild/linux-mips64el": "0.28.0", "@esbuild/linux-ppc64": "0.28.0", "@esbuild/linux-riscv64": "0.28.0", "@esbuild/linux-s390x": "0.28.0", "@esbuild/linux-x64": "0.28.0", "@esbuild/netbsd-arm64": "0.28.0", "@esbuild/netbsd-x64": "0.28.0", "@esbuild/openbsd-arm64": "0.28.0", "@esbuild/openbsd-x64": "0.28.0", "@esbuild/openharmony-arm64": "0.28.0", "@esbuild/sunos-x64": "0.28.0", "@esbuild/win32-arm64": "0.28.0", "@esbuild/win32-ia32": "0.28.0", "@esbuild/win32-x64": "0.28.0" }, "bin": { "esbuild": "bin/esbuild" } }, "sha512-sNR9MHpXSUV/XB4zmsFKN+QgVG82Cc7+/aaxJ8Adi8hyOac+EXptIp45QBPaVyX3N70664wRbTcLTOemCAnyqw=="],
 
     "tsx/fsevents": ["fsevents@2.3.3", "", { "os": "darwin" }, "sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw=="],
@@ -5053,6 +5100,8 @@
     "react-email/esbuild/@esbuild/win32-ia32": ["@esbuild/win32-ia32@0.28.0", "", { "os": "win32", "cpu": "ia32" }, "sha512-zF3ag/gfiCe6U2iczcRzSYJKH1DCI+ByzSENHlM2FcDbEeo5Zd2C86Aq0tKUYAJJ1obRP84ymxIAksZUcdztHA=="],
 
     "react-email/esbuild/@esbuild/win32-x64": ["@esbuild/win32-x64@0.28.0", "", { "os": "win32", "cpu": "x64" }, "sha512-pEl1bO9mfAmIC+tW5btTmrKaujg3zGtUmWNdCw/xs70FBjwAL3o9OEKNHvNmnyylD6ubxUERiEhdsL0xBQ9efw=="],
+
+    "tough-cookie/tldts/tldts-core": ["tldts-core@7.4.2", "", {}, "sha512-nwEyF4vl4RSJjwSjBUmOSxc3BFPoIFdlRthJ6e+5v9P3bHNsoD06UjuqMUspqp7vsEZ1beaHi1km+optiE17yA=="],
 
     "tsx/esbuild/@esbuild/aix-ppc64": ["@esbuild/aix-ppc64@0.28.0", "", { "os": "aix", "cpu": "ppc64" }, "sha512-lhRUCeuOyJQURhTxl4WkpFTjIsbDayJHih5kZC1giwE+MhIzAb7mEsQMqMf18rHLsrb5qI1tafG20mLxEWcWlA=="],
 

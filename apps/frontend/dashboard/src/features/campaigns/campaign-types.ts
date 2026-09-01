@@ -5,7 +5,7 @@ export type CampaignStatus =
 	| "sent"
 	| "cancelled";
 
-export type AudienceTargetType = "all" | "channel" | "group";
+export type AudienceTargetType = "all" | "channel" | "group" | "csv";
 
 export type Campaign = {
 	id: string;
@@ -48,13 +48,23 @@ export type CreateCampaignInput = {
 	templateId?: string;
 	templateName?: string;
 	contentHtml: string;
+	csvEmails?: string[];
 	scheduledAt?: string;
 	sendImmediately?: boolean;
 };
 
-export type CampaignStats = {
-	totalCampaigns: number;
-	totalDelivered: number;
-	avgOpenRate: number;
-	avgClickRate: number;
+export type UpdateCampaignInput = {
+	name?: string;
+	subject?: string;
+	previewText?: string;
+	fromName?: string;
+	fromEmail?: string;
+	replyTo?: string;
+	audienceType?: AudienceTargetType;
+	audienceTargetId?: string;
+	audienceTargetName?: string;
+	templateId?: string;
+	templateName?: string;
+	contentHtml?: string;
+	csvEmails?: string[];
 };

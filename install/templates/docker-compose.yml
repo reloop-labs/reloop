@@ -196,6 +196,13 @@ services:
     environment:
       PORT: 8019
 
+  campaigns:
+    <<: *backend
+    image: reloopsh/be-campaigns:${RELOOP_VERSION}
+    container_name: reloop-campaigns
+    environment:
+      PORT: 8027
+
   inbox:
     <<: *backend
     image: reloopsh/be-inbox:${RELOOP_VERSION}

@@ -86,17 +86,19 @@ Base URL: `https://reloop.sh`
 ### Free developer & deliverability tools
 
 Web-based utilities for developers and email senders:
+- **DNS Lookup SuperTool**: https://reloop.sh/tools/dns-lookup
+- **Can Anyone Spoof My Domain?**: https://reloop.sh/tools/spoof-checker
+- **Who Sends Email From This Domain?**: https://reloop.sh/tools/who-sends
 - **Email Spam Words Checker**: https://reloop.sh/tools/email-spam-words-checker
+- **Email Blocklist Checker**: https://reloop.sh/tools/blocklist-checker
 - **Temp / Disposable Email Checker**: https://reloop.sh/tools/temp-email-checker
+- **Email Address Validator**: https://reloop.sh/tools/email-validator
 - **DNS Auth & SPF/DKIM/DMARC Checker**: https://reloop.sh/tools/auth-checker
 - **BIMI Checker**: https://reloop.sh/tools/bimi-checker
 - **SPF Record Generator**: https://reloop.sh/tools/spf-generator
 - **DKIM Record Generator**: https://reloop.sh/tools/dkim-generator
 - **DMARC Record Generator**: https://reloop.sh/tools/dmarc-generator
 - **Deliverability & Spam Tester**: https://reloop.sh/tools/deliverability-tester
-- **Responsive Template Generator**: https://reloop.sh/tools/template-generator
-- **Subject Line Tester**: https://reloop.sh/tools/subject-tester
-- **Mobile Email Previewer**: https://reloop.sh/tools/mobile-preview
 
 See the API reference and learn sections in llms-docs.txt.
 

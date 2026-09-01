@@ -1,7 +1,7 @@
 import type React from "react";
 
 /* ------------------------------------------------------------------ */
-/* Property row: label left (fixed 80px), control right               */
+/* Property row: label left (flexible), control right (shrink-0)      */
 /* ------------------------------------------------------------------ */
 export function PropRow({
 	label,
@@ -11,11 +11,14 @@ export function PropRow({
 	children: React.ReactNode;
 }) {
 	return (
-		<div className="flex items-center gap-3 px-4 py-1">
-			<span className="w-1/2 shrink-0 text-sm">{label}</span>
-			<div className="flex w-1/2 min-w-0 items-center justify-end">
+		<div className="flex h-10 items-center justify-between gap-3 px-4">
+			<span className="min-w-0 flex-1 truncate font-normal text-sm text-text-sub-600 dark:text-text-soft-400">
+				{label}
+			</span>
+			<div className="flex shrink-0 items-center justify-end">
 				{children}
 			</div>
 		</div>
 	);
 }
+

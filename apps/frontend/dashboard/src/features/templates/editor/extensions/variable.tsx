@@ -3,6 +3,7 @@ import { Icon } from "@reloop/ui/icon";
 import { mergeAttributes, nodeInputRule, nodePasteRule } from "@tiptap/core";
 import { NodeViewWrapper, ReactNodeViewRenderer } from "@tiptap/react";
 import type React from "react";
+import { useAllPropertiesQuery } from "#/features/contacts/hooks/use-contacts-query";
 import { useSWR } from "#/features/templates/editor/hooks/use-swr-compat";
 import { useTemplateId } from "#/features/templates/editor/hooks/use-template-id";
 import { normalizeTemplateVariableName } from "#/features/templates/lib/template-variables";
@@ -26,20 +27,35 @@ export function VariableNodeView({
 		templateId ? `/api/template/v1/${templateId}` : null,
 		fetcher,
 	);
+	const { data: propertiesData } = useAllPropertiesQuery(!templateId);
 
-	const variables = templateData?.variables ?? [];
-	const matchedVar = variables.find((v: any) => {
-		if (typeof v === "string") {
-			return normalizeTemplateVariableName(v) === name;
-		}
-		return normalizeTemplateVariableName(v?.name ?? "") === name;
-	});
+	let hasDefaultValue = false;
 
-	const hasDefaultValue =
-		matchedVar &&
-		matchedVar.defaultValue !== undefined &&
-		matchedVar.defaultValue !== null &&
-		matchedVar.defaultValue !== "";
+	if (templateId) {
+		const variables = templateData?.variables ?? [];
+		const matchedVar = variables.find((v: any) => {
+			if (typeof v === "string") {
+				return normalizeTemplateVariableName(v) === name;
+			}
+			return normalizeTemplateVariableName(v?.name ?? "") === name;
+		});
+		hasDefaultValue =
+			!!matchedVar &&
+			matchedVar.defaultValue !== undefined &&
+			matchedVar.defaultValue !== null &&
+			matchedVar.defaultValue !== "";
+	} else {
+		const properties = propertiesData?.properties ?? [];
+		const normalizedTarget = normalizeTemplateVariableName(name);
+		const matchedProp = properties.find(
+			(p) => normalizeTemplateVariableName(p.propertyName) === normalizedTarget,
+		);
+		hasDefaultValue =
+			!!matchedProp &&
+			matchedProp.defaultValue !== undefined &&
+			matchedProp.defaultValue !== null &&
+			matchedProp.defaultValue !== "";
+	}
 
 	const handleClick = (e: React.MouseEvent) => {
 		e.preventDefault();

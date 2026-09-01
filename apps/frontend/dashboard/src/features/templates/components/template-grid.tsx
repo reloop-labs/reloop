@@ -93,7 +93,7 @@ const TemplateDropdown = ({
 					size="xxsmall"
 					aria-label={`Actions for ${templateName}`}
 					className={cn(
-						"h-8 w-8 rounded-lg border border-stroke-soft-100 bg-bg-white-0 p-1.5 shadow-regular-xs transition-all dark:border-stroke-soft-100/50",
+						"h-8 w-8 rounded-lg border border-stroke-soft-100 bg-bg-white-0 p-1.5 shadow-regular-xs transition-all dark:border-stroke-soft-100/40",
 						open ? "opacity-100" : "opacity-0 group-hover/card:opacity-100",
 					)}
 				>

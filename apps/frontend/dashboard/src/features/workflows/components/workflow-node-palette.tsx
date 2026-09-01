@@ -6,11 +6,13 @@ import { Icon } from "@reloop/ui/icon";
 interface WorkflowNodePaletteProps {
 	onAddSendEmail: () => void;
 	onAddDelay: () => void;
+	onAddCondition: () => void;
 }
 
 export const WorkflowNodePalette = ({
 	onAddSendEmail,
 	onAddDelay,
+	onAddCondition,
 }: WorkflowNodePaletteProps) => {
 	return (
 		<div className="absolute top-4 left-4 z-10 flex flex-col gap-2 rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-2 shadow-regular-sm dark:border-stroke-soft-100/60 dark:bg-bg-white-0/95">
@@ -26,6 +28,16 @@ export const WorkflowNodePalette = ({
 			>
 				<Icon name="clock" className="h-4 w-4" />
 				Delay
+			</Button.Root>
+			<Button.Root
+				variant="neutral"
+				mode="stroke"
+				size="xsmall"
+				className="justify-start gap-2"
+				onClick={onAddCondition}
+			>
+				<Icon name="filter" className="h-4 w-4" />
+				Condition
 			</Button.Root>
 			<Button.Root
 				variant="neutral"

@@ -45,7 +45,7 @@ function UploadDataView() {
 					<div className="flex size-6 items-center justify-center rounded-md bg-bg-weak-50 text-text-strong-950 dark:bg-white/10 dark:text-white">
 						<Icon name="file-code" className="size-3.5" />
 					</div>
-					<span className="font-medium text-text-strong-950 text-xs dark:text-white">
+					<span className="font-semibold text-sm text-text-strong-950 dark:text-white">
 						Import Contacts
 					</span>
 				</div>
@@ -244,7 +244,7 @@ function ManageFunnelsView() {
 					<div className="flex size-6 items-center justify-center rounded-md bg-bg-weak-50 text-text-strong-950 dark:bg-white/10 dark:text-white">
 						<Icon name="workflow" className="size-3.5" />
 					</div>
-					<span className="font-medium text-text-strong-950 text-xs dark:text-white">
+					<span className="font-semibold text-sm text-text-strong-950 dark:text-white">
 						Developer Onboarding Funnel
 					</span>
 				</div>
@@ -336,7 +336,7 @@ function AnalyticsView() {
 					<div className="flex size-6 items-center justify-center rounded-md bg-bg-weak-50 text-text-strong-950 dark:bg-white/10 dark:text-white">
 						<Icon name="graph-up" className="size-3.5" />
 					</div>
-					<span className="font-medium text-text-strong-950 text-xs dark:text-white">
+					<span className="font-semibold text-sm text-text-strong-950 dark:text-white">
 						Campaign: Summer Product Release Broadcast
 					</span>
 				</div>

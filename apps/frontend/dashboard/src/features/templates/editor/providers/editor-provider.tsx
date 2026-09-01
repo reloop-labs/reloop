@@ -173,7 +173,6 @@ export const EditorProvider = ({ children, roomId }: EditorProviderProps) => {
 				);
 			}
 
-			toast.success(`Variable ${name} created`);
 			await mutate();
 		} catch (error: any) {
 			toast.error(error.message || "Something went wrong");

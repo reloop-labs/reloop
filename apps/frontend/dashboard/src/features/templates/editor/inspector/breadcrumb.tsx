@@ -23,7 +23,7 @@ const getIconName = (type: string): string => {
 		case "row":
 			return "layout-grid";
 		case "body":
-			return "file-text";
+			return "layout";
 		case "variable":
 			return "brackets";
 		case "bulletlist":
@@ -36,15 +36,20 @@ const getIconName = (type: string): string => {
 	}
 };
 
+const getLabel = (type: string): string => {
+	if (type.toLowerCase() === "body") return "Page style";
+	return type;
+};
+
 const BreadCrumb = () => {
 	return (
-		<div className="sticky top-0 z-10 min-w-0 border-stroke-soft-200 border-b bg-bg-white-0 px-3 py-3 dark:border-stroke-soft-100/50 dark:bg-black">
+		<div className="sticky top-0 z-10 min-w-0 border-stroke-soft-100 border-b bg-bg-white-0 px-3 py-3 dark:border-stroke-soft-100/40 dark:bg-black">
 			<ol className="flex min-w-0 list-none items-center gap-1 overflow-hidden">
 				<Inspector.Breadcrumb>
 					{(segments) =>
 						segments.map((segment, i) => {
 							const type = segment.node?.nodeType ?? "Layout";
-							const label = type;
+							const label = getLabel(type);
 							const iconName = getIconName(type);
 
 							const isFirst = i === 0;

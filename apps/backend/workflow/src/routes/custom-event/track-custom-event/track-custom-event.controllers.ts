@@ -1,13 +1,15 @@
 import { CustomEventErrors } from "@be/workflow/error/custom-event.error-response";
 import { enrollContactInMatchingAutomations } from "@be/workflow/handlers/automation/enroll";
+import { resolveOrCreateContact } from "@be/workflow/lib/automation/resolve-contact";
 import { validateTrackProperties } from "@be/workflow/lib/custom-event/validate-properties";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import { and, count, eq, isNull } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 
 /**
  * Track a workflow-only custom event.
  * Does not touch webhooks — enrolls matching automations only.
+ * If only an email is provided, the contact is created (or restored) first.
  */
 export async function trackCustomEventController(params: {
 	organizationId: string;
@@ -15,6 +17,8 @@ export async function trackCustomEventController(params: {
 	eventKey: string;
 	contactId?: string;
 	email?: string;
+	firstName?: string;
+	lastName?: string;
 	properties?: Record<string, unknown>;
 }) {
 	const key = params.eventKey.trim().toLowerCase();
@@ -40,80 +44,35 @@ export async function trackCustomEventController(params: {
 		throw CustomEventErrors.invalidProperties(validated.error);
 	}
 
-	const contact = await resolveContact({
+	const resolved = await resolveOrCreateContact({
 		organizationId: params.organizationId,
+		userId: params.userId,
 		contactId: params.contactId,
 		email: params.email,
+		firstName: params.firstName,
+		lastName: params.lastName,
 	});
+	if (!resolved.ok) {
+		if (resolved.reason === "contact_required") {
+			throw CustomEventErrors.contactRequired();
+		}
+		throw CustomEventErrors.contactNotFound();
+	}
 
-	const before = await countActiveEnrollments(
-		params.organizationId,
-		contact.id,
-	);
-	await enrollContactInMatchingAutomations({
+	const enrollments = await enrollContactInMatchingAutomations({
 		organizationId: params.organizationId,
-		contactId: contact.id,
+		contactId: resolved.contact.id,
 		triggerEvent: eventDef.key,
+		properties: validated.normalized,
 	});
-	const after = await countActiveEnrollments(params.organizationId, contact.id);
-	const enrollments = Math.max(0, after - before);
 
 	return {
 		success: true,
 		eventId: eventDef.id,
 		eventKey: eventDef.key,
-		contactId: contact.id,
+		contactId: resolved.contact.id,
+		contactCreated: resolved.created,
 		enrollments,
 		properties: validated.normalized,
 	};
-}
-
-async function resolveContact(params: {
-	organizationId: string;
-	contactId?: string;
-	email?: string;
-}) {
-	if (!params.contactId && !params.email) {
-		throw CustomEventErrors.contactRequired();
-	}
-
-	if (params.contactId) {
-		const contact = await db.query.contact.findFirst({
-			where: and(
-				eq(schema.contact.id, params.contactId),
-				eq(schema.contact.organizationId, params.organizationId),
-				isNull(schema.contact.deletedAt),
-			),
-		});
-		if (!contact) throw CustomEventErrors.contactNotFound();
-		return contact;
-	}
-
-	const email = params.email!.trim().toLowerCase();
-	const contact = await db.query.contact.findFirst({
-		where: and(
-			eq(schema.contact.email, email),
-			eq(schema.contact.organizationId, params.organizationId),
-			isNull(schema.contact.deletedAt),
-		),
-	});
-	if (!contact) throw CustomEventErrors.contactNotFound();
-	return contact;
-}
-
-async function countActiveEnrollments(
-	organizationId: string,
-	contactId: string,
-): Promise<number> {
-	const [row] = await db
-		.select({ total: count() })
-		.from(schema.automationEnrollment)
-		.where(
-			and(
-				eq(schema.automationEnrollment.organizationId, organizationId),
-				eq(schema.automationEnrollment.contactId, contactId),
-				eq(schema.automationEnrollment.status, "active"),
-			),
-		);
-	return Number(row?.total ?? 0);
 }

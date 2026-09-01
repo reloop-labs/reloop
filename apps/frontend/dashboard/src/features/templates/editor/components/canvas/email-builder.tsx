@@ -22,7 +22,7 @@ export function FullEmailBuilder() {
 	if (!editor) return null;
 
 	return (
-		<div className="relative mx-auto w-full max-w-160">
+		<div className="relative min-h-full w-full">
 			<DragHandle
 				editor={editor}
 				nested={DRAG_NESTED_OPTIONS}
@@ -35,7 +35,10 @@ export function FullEmailBuilder() {
 					<Icon name="more-vertical" className="h-3.5 w-3.5" />
 				</div>
 			</DragHandle>
-			<EditorContent editor={editor} />
+			<EditorContent
+				editor={editor}
+				className="min-h-full w-full [&>.ProseMirror]:min-h-full [&>.ProseMirror]:w-full"
+			/>
 		</div>
 	);
 }

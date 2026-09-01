@@ -15,15 +15,8 @@ export const metadata: Metadata = {
 	},
 };
 
-import { MacintoshSceneLazy } from "./components/macintosh-scene-lazy";
+import { TwitterModalsShowcase } from "./components/twitter-modals-showcase";
 
 export default function TwitterPage() {
-	return (
-		<div
-			data-standalone="true"
-			className="relative h-dvh w-full overflow-hidden bg-[#434b57]"
-		>
-			<MacintoshSceneLazy />
-		</div>
-	);
+	return <TwitterModalsShowcase />;
 }

@@ -7,7 +7,7 @@
 > Product skill: https://reloop.sh/skill.md
 > Prefer per-page markdown: append `.md` under https://reloop.sh/docs/
 
-Generated from 333 source files.
+Generated from 334 source files.
 
 ---
 
@@ -14343,7 +14343,7 @@ Deployment templates and guides for popular cloud providers and self-hosted PaaS
     Easily deploy on your self-hosted Dokploy instance. (Coming Soon)
   </Card>
   <Card title="VPS" icon="server" href="/self-host/vps">
-    Standard VPS deployment guides for Ubuntu, Debian, and more. (Coming Soon)
+    One-command installer for a fresh Ubuntu or Debian server.
   </Card>
   <Card title="Vercel" icon="siVercel" href="/self-host/vercel">
     Deploy the frontend and serverless endpoints on Vercel. (Coming Soon)
@@ -14400,6 +14400,9 @@ Reloop's performance is highly dependent on database throughput and the speed of
 | **Storage** | 20 GB SSD | 50 GB+ NVMe SSD |
 
 > [!NOTE]
+> The Docker Compose deployment needs more disk than the numbers above: the container images alone are about 22 GB, so plan for 35 GB minimum and 50 GB comfortably. See [Deploy on VPS](/self-host/vps).
+
+> [!NOTE]
 > SSD/NVMe storage is highly recommended. PostgreSQL stores relational data and telemetry logs, which benefit from fast disk I/O speeds to prevent latency.
 
 ---
@@ -14424,7 +14427,7 @@ Reloop is built using a highly modular microservice architecture. This separatio
 
 ## Component Breakdown
 
-The Reloop stack consists of **19 application services** (3 frontends, 16 backends) and **9 external backing systems**.
+The Reloop stack consists of **20 application services** (3 frontends, 17 backends) and **9 external backing systems**.
 
 ### 1. Frontend Services (3)
 * **`web`**: The main public landing page and landing website.
@@ -14442,6 +14445,7 @@ The Reloop stack consists of **19 application services** (3 frontends, 16 backen
 * **`workflow`**: Manages campaign automation workflows, timing wait steps, and drip actions.
 * **`upload`**: Manages file storage attachments and static image uploads.
 * **`template`**: Compiles dynamic template variables before mailing dispatch.
+* **`campaigns`**: Broadcast campaigns — audience snapshot, schedule, send, and engagement stats.
 * **`credits`**: Tracks account credit balances, billing cycles, and quotas.
 * **`email`**: The core API service mapping outbound HTTP sending requests to the queue processor.
 * **`inbox`**: Manages receiving inbox threads and incoming messages.
@@ -14459,6 +14463,23 @@ The Reloop stack consists of **19 application services** (3 frontends, 16 backen
 
 ---
 
+## What the VPS installer deploys
+
+The [one-command VPS installer](/docs/self-host/vps) deploys a reduced set — 20 containers instead of the full platform. It leaves out the pieces that only exist for the hosted service:
+
+| Left out | Why |
+| :--- | :--- |
+| `web`, `docs` | Public marketing site and documentation; `/docs` redirects to reloop.sh |
+| `credits` | Billing and quota metering; self-hosted sending is not metered |
+| `tools` | Public email-validation tools |
+| `admin`, `console` | Operator tooling for the hosted platform |
+| MinIO | Point `upload` at any S3-compatible provider instead |
+| Mailpit | Development mail catcher, never used in production |
+
+`upload` is deployed only when you configure S3 storage during install.
+
+---
+
 # self-host/vercel.mdx
 
 Source: https://reloop.sh/docs/self-host/vercel
@@ -14473,7 +14494,155 @@ Coming Soon
 Source: https://reloop.sh/docs/self-host/vps
 Markdown: https://reloop.sh/docs/self-host/vps.md
 
-Coming Soon
+The Reloop self-host installer takes a fresh VPS and turns it into a running Reloop deployment: it installs Docker, generates production secrets, writes the Compose stack, applies the database schema, starts every service, verifies it is healthy, and prints the DNS records you need to add.
+
+```bash
+curl -fsSL https://reloop.sh/install.sh | sudo bash
+```
+
+---
+
+## Before you start
+
+| Requirement | Value |
+| :--- | :--- |
+| **Operating system** | Ubuntu 22.04 LTS, Ubuntu 24.04 LTS, Debian 12, Debian 13 |
+| **Architecture** | x86_64 |
+| **CPU** | 2 vCPUs minimum, 4+ recommended |
+| **RAM** | 4 GB minimum, 8 GB recommended |
+| **Disk** | 35 GB minimum, 50 GB recommended |
+| **Ports** | `80`, `443`, `25`, `465`, `587` free |
+| **Access** | root or sudo |
+
+> [!NOTE]
+> The container images are roughly 22 GB in total, which is why the disk floor is higher than for a source install. The installer refuses to continue on a smaller disk rather than failing halfway through the download.
+
+Many providers block outbound port `25` by default. Reloop still sends through the submission ports, but inbound mail needs `25` open in both directions — ask your provider to unblock it if you plan to receive mail.
+
+---
+
+## What the installer asks
+
+| Prompt | Purpose | Default |
+| :--- | :--- | :--- |
+| Primary Reloop domain | The hostname the dashboard and API are served on | — |
+| Administrator email | Let's Encrypt contact and your first Reloop account | — |
+| Database name | PostgreSQL database | `reloop` |
+| Database user | PostgreSQL role | `reloop` |
+| Configure automatic HTTPS | Let Caddy obtain and renew certificates | `yes` |
+| Configure object storage | S3-compatible storage for file uploads | `no` |
+
+Everything else is generated: database and Redis passwords, the Better Auth secret, the internal service secret, the tracking and preferences secrets, and the webhook encryption key. They are written to `/opt/reloop/.env` with mode `0600`.
+
+Enter the domain as a bare hostname — `reloop.example.com`, not `https://reloop.example.com` and not `reloop.example.com/admin`.
+
+---
+
+## What gets installed
+
+```text
+/opt/reloop/
+├── .env                 production configuration and secrets (0600, root)
+├── docker-compose.yml   the production stack
+├── Caddyfile            reverse proxy and TLS
+└── backups/             automatic database dumps taken before schema changes
+```
+
+The stack runs 20 containers: 14 Reloop backend services, 2 frontends (dashboard, links), PostgreSQL, Redis, NATS and Caddy. Only Caddy (`80`, `443`) and the two mail transports (`25` inbound, `465`/`587` submission) publish host ports — the database and event bus stay on the internal Docker network.
+
+A self-hosted install deliberately leaves out the parts of Reloop that only make sense for the hosted service: the public documentation site (`/docs` redirects to reloop.sh), the credits and quota service, the public email-validation tools, the operator console, and bundled object storage. Sending is not metered.
+
+A `reloop` command is installed alongside it:
+
+```bash
+reloop status            # container health
+reloop logs [service]    # follow logs
+reloop restart           # restart the stack
+reloop update            # pull the configured version and redeploy
+```
+
+---
+
+## File uploads
+
+Reloop stores template images and attachments in S3-compatible object storage. The installer does not bundle a storage server — point it at whichever provider you already use (AWS S3, Cloudflare R2, Hetzner Object Storage, Backblaze B2, a MinIO box of your own).
+
+Answer yes to the storage prompt and supply the endpoint, access key, secret key, bucket and region. The `upload` service is then deployed alongside the rest of the stack.
+
+Answer no and file uploads stay off. To turn them on later, set the `S3_*` values and `COMPOSE_PROFILES=storage` in `/opt/reloop/.env`, then run `reloop restart`.
+
+> [!NOTE]
+> The bucket must serve objects publicly over HTTP. Reloop hands out file URLs as `{S3_ENDPOINT}/{S3_BUCKET}/{path}`, so anything the dashboard uploads has to be readable at that address.
+
+---
+
+## DNS
+
+When the installer finishes it prints the records for the installation itself:
+
+```text
+reloop.example.com            A    203.0.113.10
+link.reloop.example.com       A    203.0.113.10
+inbound.reloop.example.com    A    203.0.113.10
+reloop.example.com            TXT  "v=spf1 ip4:203.0.113.10 -all"
+```
+
+- The apex record serves the dashboard, the API and the Let's Encrypt HTTP challenge.
+- `link.` serves click and open tracking plus the unsubscribe pages, and is the CNAME target for customer tracking domains.
+- `inbound.` is the MX target for mail your verified domains receive.
+- The SPF record authorises the server to send for the host domain, which is what the `include:` in each sending domain's SPF resolves to.
+
+These are separate from the SPF, DKIM, DMARC and MX records for the domains you send from. Those are generated per domain by Reloop — add a domain under **Domains** in the dashboard and it shows the exact records. See [Connect a domain](/docs/guides/connect-domain).
+
+You can run the installer before adding DNS. Caddy keeps retrying certificate issuance in the background and HTTPS starts working on its own once the records resolve. Follow it with `reloop logs proxy`.
+
+---
+
+## First sign-in
+
+Reloop sends one-time codes through its own mail pipeline, which needs a verified sending domain — so a fresh installation has no way to email you the first code. The installer generates a bootstrap code, writes it to `DEFAULT_OTP` in `/opt/reloop/.env`, and prints it once.
+
+1. Open `https://your-domain/dashboard`
+2. Sign up with the administrator email
+3. Enter the printed code
+
+Once one of your domains is verified and sending, remove the `DEFAULT_OTP` line from `/opt/reloop/.env` and run `reloop restart auth`. Set `DISABLE_SIGNUP=true` in the same file if you do not want anyone else creating accounts.
+
+---
+
+## Running it again
+
+Re-running the installer is safe. It detects the existing installation and offers to abort, reconfigure (re-ask the domain and HTTPS settings while keeping data and secrets), or redeploy with the existing configuration. Secrets, volumes and the database are never regenerated or dropped, and a database dump is taken before any schema change.
+
+---
+
+## Unattended installs
+
+Every prompt has an environment variable, so the installer can run without a terminal:
+
+```bash
+curl -fsSL https://reloop.sh/install.sh | sudo \
+  RELOOP_NONINTERACTIVE=true \
+  RELOOP_DOMAIN=reloop.example.com \
+  RELOOP_ADMIN_EMAIL=admin@example.com \
+  RELOOP_PUBLIC_IP=203.0.113.10 \
+  bash
+```
+
+| Variable | Purpose |
+| :--- | :--- |
+| `RELOOP_NONINTERACTIVE` | Never prompt; fail if a required value is missing |
+| `RELOOP_DOMAIN` | Primary hostname |
+| `RELOOP_ADMIN_EMAIL` | Administrator email |
+| `RELOOP_DB_NAME` / `RELOOP_DB_USER` | Database name and role |
+| `RELOOP_HTTPS` | `yes` or `no` |
+| `RELOOP_S3` | `yes` to configure object storage, `no` to disable file uploads |
+| `RELOOP_S3_ENDPOINT` / `RELOOP_S3_ACCESS_KEY` / `RELOOP_S3_SECRET_KEY` | Object storage credentials |
+| `RELOOP_S3_BUCKET` / `RELOOP_S3_REGION` | Bucket and region |
+| `RELOOP_PUBLIC_IP` | Skip public address detection |
+| `RELOOP_VERSION` | Image tag to deploy (default `latest`) |
+| `RELOOP_EXISTING` | `abort`, `reconfigure` or `continue` for a re-run |
+| `RELOOP_INSTALL_DIR` | Installation directory (default `/opt/reloop`) |
 
 ---
 
@@ -14671,6 +14840,50 @@ GITHUB_CLIENT_SECRET=
     Developer API keys
   </Card>
 </CardGroup>
+
+---
+
+# setup/backend/campaigns.mdx
+
+Source: https://reloop.sh/docs/setup/backend/campaigns
+Markdown: https://reloop.sh/docs/setup/backend/campaigns.md
+
+Broadcast email campaigns — audience targeting, scheduling, send, and engagement stats.
+
+<Tip>
+Run [`bun setup`](/docs/setup) once from the monorepo root. Env files come from `bun setup` / `bun env:setup`.
+</Tip>
+
+## Overview
+
+| Property | Value |
+| :--- | :--- |
+| **Directory** | `apps/backend/campaigns` |
+| **Port** | `8027` |
+| **Local URL** | [https://local.reloop.sh/api/campaigns](https://local.reloop.sh/api/campaigns) |
+| **Swagger UI** | [https://local.reloop.sh/api/campaigns/openapi](https://local.reloop.sh/api/campaigns/openapi) |
+| **Stack** | ElysiaJS · PostgreSQL · Redis · NATS · BullMQ |
+
+## Quick start
+
+```bash
+bun be:campaigns:dev
+```
+
+Or `bun backend:dev` / `bun dev`.
+
+## Environment
+
+`apps/backend/campaigns/.env` — from `bun setup` / `bun env:setup`.
+
+```bash
+PG_URL=postgresql://reloop:reloop123@localhost:5432/reloop
+REDIS_URL=redis://:reloop123@localhost:6379
+PORT=8027
+BASE_URL="https://local.reloop.sh"
+NATS_URL=nats://localhost:4222
+NODE_ENV=development
+```
 
 ---
 
@@ -16574,6 +16787,9 @@ Stack: [Next.js](https://nextjs.org/), [Tailwind CSS](https://tailwindcss.com/),
   <Card icon="layout" title="Template" href="/setup/backend/template">
     Templates — `8019`
   </Card>
+  <Card icon="mega-phone" title="Campaigns" href="/setup/backend/campaigns">
+    Broadcasts — `8027`
+  </Card>
   <Card icon="inbox" title="Inbox" href="/setup/backend/inbox">
     Inbound mail — `8021`
   </Card>
@@ -16707,6 +16923,7 @@ Free mail ports (`25`, `465`, `587`) if host mail or another MTA is already boun
 | [https://local.reloop.sh/api/workflow](https://local.reloop.sh/api/workflow) | [Workflow](/docs/setup/backend/workflow) | `8017` |
 | [https://local.reloop.sh/api/upload](https://local.reloop.sh/api/upload) | [Upload](/docs/setup/backend/upload) | `8018` |
 | [https://local.reloop.sh/api/template](https://local.reloop.sh/api/template) | [Template](/docs/setup/backend/template) | `8019` |
+| [https://local.reloop.sh/api/campaigns](https://local.reloop.sh/api/campaigns) | [Campaigns](/docs/setup/backend/campaigns) | `8027` |
 | [https://local.reloop.sh/api/inbox](https://local.reloop.sh/api/inbox) | [Inbox](/docs/setup/backend/inbox) | `8021` |
 | [https://local.reloop.sh/api/email](https://local.reloop.sh/api/email) | [Email](/docs/setup/backend/email) | `8022` |
 | [https://local.reloop.sh/api/credits](https://local.reloop.sh/api/credits) | [Credits](/docs/setup/backend/credits) | `8023` |
@@ -16736,6 +16953,7 @@ Free mail ports (`25`, `465`, `587`) if host mail or another MTA is already boun
 | [Workflow](/docs/setup/backend/workflow) | [`/api/workflow`](https://local.reloop.sh/api/workflow) | `8017` |
 | [Upload](/docs/setup/backend/upload) | [`/api/upload`](https://local.reloop.sh/api/upload) | `8018` |
 | [Template](/docs/setup/backend/template) | [`/api/template`](https://local.reloop.sh/api/template) | `8019` |
+| [Campaigns](/docs/setup/backend/campaigns) | [`/api/campaigns`](https://local.reloop.sh/api/campaigns) | `8027` |
 | [Inbox](/docs/setup/backend/inbox) | [`/api/inbox`](https://local.reloop.sh/api/inbox) | `8021` |
 | [Email](/docs/setup/backend/email) | [`/api/email`](https://local.reloop.sh/api/email) | `8022` |
 | [Credits](/docs/setup/backend/credits) | [`/api/credits`](https://local.reloop.sh/api/credits) | `8023` |

@@ -1,6 +1,6 @@
 export function SectionHeader({ label }: { label: string }) {
 	return (
-		<p className="px-4 pt-3 font-semibold text-label-xs text-text-sub-600 uppercase tracking-wide">
+		<p className="px-4 pt-3 pb-1 font-semibold text-sm text-text-strong-950">
 			{label}
 		</p>
 	);

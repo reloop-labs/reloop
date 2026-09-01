@@ -59,6 +59,7 @@
 		"./hover-card": "./src/components/hover-card.tsx",
 		"./icons-sprite": "./src/components/icons-sprite.tsx",
 		"./input": "./src/components/input.tsx",
+		"./field-error": "./src/components/field-error.tsx",
 		"./label": "./src/components/label.tsx",
 		"./navigation-menu": "./src/components/navigation-menu.tsx",
 		"./popover": "./src/components/popover.tsx",

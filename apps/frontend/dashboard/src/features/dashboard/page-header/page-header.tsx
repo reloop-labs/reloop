@@ -9,12 +9,7 @@ import { UserDropdown } from "./user-dropdown";
 
 function HamburgerIcon({ open }: { open: boolean }) {
 	return (
-		<svg
-			viewBox="0 0 16 16"
-			fill="none"
-			aria-hidden
-			className="h-4 w-4"
-		>
+		<svg viewBox="0 0 16 16" fill="none" aria-hidden className="h-4 w-4">
 			<path
 				d="M2.5 4h11"
 				stroke="currentColor"
@@ -106,7 +101,7 @@ export function PageHeader() {
 		useActiveOrganization();
 
 	return (
-		<div className="sticky top-0 z-[80] flex h-11 shrink-0 items-center justify-between border-stroke-soft-100 border-b bg-bg-white-0 pr-3 pl-3 dark:border-stroke-soft-100/40 dark:bg-black">
+		<div className="sticky top-0 flex h-11 shrink-0 items-center justify-between border-stroke-soft-100 border-b bg-bg-white-0 pr-3 pl-3 dark:border-stroke-soft-100/40 dark:bg-black">
 			<div className="flex items-center gap-1">
 				<SidebarToggleButton />
 				<OrganizationSwitcher

@@ -1,4 +1,5 @@
 import {
+	isConditionNode,
 	isDelayNode,
 	isSendEmailNode,
 	isTriggerNode,
@@ -58,10 +59,10 @@ export const validateWorkflow = (
 	}
 
 	const actionNodes = workflow.nodes.filter(
-		(n) => isSendEmailNode(n) || isDelayNode(n),
+		(n) => isSendEmailNode(n) || isDelayNode(n) || isConditionNode(n),
 	);
 	if (actionNodes.length === 0) {
-		warnings.push("Add at least one Delay or Send email step.");
+		warnings.push("Add at least one Delay, Condition, or Send email step.");
 	}
 
 	const sendEmailNodes = workflow.nodes.filter(isSendEmailNode);
@@ -94,6 +95,29 @@ export const validateWorkflow = (
 		warnings.push("Each Delay step needs a valid amount and unit.");
 	}
 
+	const conditionNodes = workflow.nodes.filter(isConditionNode);
+	const unconfiguredCondition = conditionNodes.filter((n) => {
+		const field = n.data.field?.trim();
+		const operator = n.data.operator;
+		if (!field || !operator) return true;
+		if (operator === "exists" || operator === "not_exists") return false;
+		return !n.data.value?.trim();
+	});
+	if (unconfiguredCondition.length > 0) {
+		warnings.push("Complete field, operator, and value for each Condition.");
+	}
+
+	const unconnectedCondition = conditionNodes.filter((n) => {
+		const branches = workflow.edges.filter((e) => e.source === n.id);
+		return !branches.some(
+			(e) =>
+				e.sourceHandle === "yes" || e.sourceHandle === "no" || e.data?.branch,
+		);
+	});
+	if (unconnectedCondition.length > 0) {
+		warnings.push("Connect a Yes or No path on each Condition.");
+	}
+
 	const isValid = warnings.length === 0;
 	return { isValid, warnings };
 };
@@ -109,7 +133,7 @@ export const getWorkflowSummary = (workflow: Workflow) => {
 	const eventLabel =
 		typeof eventKey === "string" && eventKey ? eventKey : "Not configured";
 	const stepCount = workflow.nodes.filter(
-		(n) => isSendEmailNode(n) || isDelayNode(n),
+		(n) => isSendEmailNode(n) || isDelayNode(n) || isConditionNode(n),
 	).length;
 
 	return { eventLabel, stepCount };

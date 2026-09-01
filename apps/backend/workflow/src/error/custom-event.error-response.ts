@@ -62,6 +62,6 @@ export const CustomEventErrors = {
 			status: 404,
 			message: "Contact not found",
 			why: "No matching contact was found for this organization.",
-			fix: "Create the contact first or pass a valid contactId/email.",
+			fix: "Pass a valid contactId, or send email to create the contact.",
 		}),
 };

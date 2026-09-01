@@ -1,5 +1,6 @@
 /** biome-ignore-all lint/correctness/noUnknownFunction: ignore */
 @import "tailwindcss";
+@import "../ui/src/components/field-error.css";
 
 @plugin 'tailwindcss-animate';
 @source '../ui';

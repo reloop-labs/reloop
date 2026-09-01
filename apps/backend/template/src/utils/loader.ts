@@ -5,7 +5,6 @@ import { log } from "evlog";
 import { templateConfig } from "../template.config";
 
 export const loader = async () => {
-	// Verify database connection
 	try {
 		await db.execute("SELECT 1");
 		log.info("server", "Database connection verified");

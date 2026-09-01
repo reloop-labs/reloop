@@ -133,3 +133,64 @@ export async function deleteAutomation(
 	});
 	return parseJson(res);
 }
+
+export type EnrollmentStatus = "active" | "completed" | "cancelled" | "failed";
+
+export type AutomationEnrollment = {
+	id: string;
+	automationId: string;
+	contactId: string;
+	contactEmail: string | null;
+	contactFirstName: string | null;
+	contactLastName: string | null;
+	status: EnrollmentStatus;
+	currentNodeId: string | null;
+	enrolledAt: string;
+	completedAt: string | null;
+	cancelledAt: string | null;
+};
+
+export type EnrollContactResponse = {
+	enrollment: AutomationEnrollment;
+	contactCreated: boolean;
+	delayMs: number;
+};
+
+export type EnrollmentListResponse = {
+	enrollments: AutomationEnrollment[];
+	total: number;
+	page: number;
+	limit: number;
+};
+
+export async function enrollContact(
+	automationId: string,
+	input: {
+		contactId?: string;
+		email?: string;
+		firstName?: string;
+		lastName?: string;
+	},
+): Promise<EnrollContactResponse> {
+	const res = await fetch(
+		`/api/workflow/v1/automations/${automationId}/enroll`,
+		{
+			method: "POST",
+			credentials: "include",
+			headers: { "content-type": "application/json" },
+			body: JSON.stringify(input),
+		},
+	);
+	return parseJson<EnrollContactResponse>(res);
+}
+
+export async function listEnrollments(
+	automationId: string,
+	limit = 50,
+): Promise<EnrollmentListResponse> {
+	const res = await fetch(
+		`/api/workflow/v1/automations/${automationId}/enrollments?limit=${limit}`,
+		{ credentials: "include" },
+	);
+	return parseJson<EnrollmentListResponse>(res);
+}

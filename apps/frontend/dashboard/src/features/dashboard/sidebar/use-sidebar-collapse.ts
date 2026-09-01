@@ -11,7 +11,9 @@ const STORAGE_KEY = "isSidebarCollapsed";
  */
 export function useSidebarCollapse() {
 	const pathname = usePathname();
-	const isTemplateEditor = Boolean(pathname.match(/\/templates\/[^/]+/));
+	const isTemplateEditor =
+		Boolean(pathname.match(/\/templates\/[^/]+/)) ||
+		Boolean(pathname.match(/\/campaigns\/[^/]+\/edit/));
 
 	const isDashboardCollapsed = useUIStore((s) => s.isSidebarCollapsed);
 	const setDashboardCollapsed = useUIStore((s) => s.setIsSidebarCollapsed);

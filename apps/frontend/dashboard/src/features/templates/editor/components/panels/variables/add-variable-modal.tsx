@@ -1,72 +1,54 @@
-import { valibotResolver } from "@hookform/resolvers/valibot";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
+import * as FancyButton from "@reloop/ui/fancy-button";
+import { FieldError, useFieldError } from "@reloop/ui/field-error";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
-import { KbdCommand } from "@reloop/ui/kbd-command";
-import { KbdEnter } from "@reloop/ui/kbd-enter";
-import { KbdEsc } from "@reloop/ui/kbd-esc";
 import * as Label from "@reloop/ui/label";
 import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
-import { AnimatePresence, motion } from "motion/react";
-import type { Resolver } from "react-hook-form";
-import { useForm } from "react-hook-form";
-import * as v from "valibot";
+import { AnimatePresence, motion } from "framer-motion";
+import { X } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useHotkeys } from "react-hotkeys-hook";
+import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 
-const TYPE_OPTIONS = [
+/** Light keycap so it reads on the blue FancyButton fill. */
+const actionKbdOnBlueClassName =
+	"border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]";
+
+type PropertyType = "string" | "number";
+
+const TYPE_OPTIONS: {
+	value: PropertyType;
+	label: string;
+	description: string;
+}[] = [
 	{
-		value: "string" as const,
+		value: "string",
 		label: "String",
-		description: "Plain text, name, email, etc.",
-		icon: "type",
-		color: "text-blue-500",
-		badgeColor: "blue" as const,
+		description: "Free-form text, names, or custom strings.",
 	},
 	{
-		value: "number" as const,
+		value: "number",
 		label: "Number",
-		description: "Integers, decimals, prices, etc.",
-		icon: "hash",
-		color: "text-purple-500",
-		badgeColor: "purple" as const,
+		description: "Integers, decimals, or numeric counts.",
 	},
 ];
 
-const slugify = (text: string) => {
-	return text
+const slugify = (value: string) =>
+	value
 		.toLowerCase()
-		.trim()
 		.replace(/\s+/g, "_")
 		.replace(/[^a-z0-9_]/g, "");
+
+const validateVariableName = (name: string): string => {
+	if (!name) return "";
+	if (!/^[a-zA-Z0-9_]*$/.test(name))
+		return "Only letters, numbers, and underscores";
+	if (!/^[a-zA-Z_]/.test(name)) return "Must start with a letter or underscore";
+	return "";
 };
-
-const addVariableSchema = v.pipe(
-	v.object({
-		variableName: v.pipe(
-			v.string(),
-			v.minLength(1, "Name is required"),
-			v.regex(
-				/^[a-zA-Z0-9_]*$/,
-				"Only letters, numbers, and underscores are allowed",
-			),
-			v.regex(/^[^0-9]/, "Variable name cannot start with a number"),
-		),
-		variableType: v.union([v.literal("string"), v.literal("number")]),
-		defaultValue: v.string(),
-	}),
-	v.forward(
-		v.check((input) => {
-			if (input.variableType === "number" && input.defaultValue.trim() !== "") {
-				return /^-?\d+(?:\.\d+)?$/.test(input.defaultValue.trim());
-			}
-			return true;
-		}, "Must be a valid number"),
-		["defaultValue"],
-	),
-);
-
-type VariableFormValues = v.InferInput<typeof addVariableSchema>;
 
 interface AddTemplateVariableModalProps {
 	open: boolean;
@@ -77,304 +59,371 @@ interface AddTemplateVariableModalProps {
 		defaultValue: string | null,
 	) => Promise<void>;
 	isSubmitting: boolean;
+	title?: string;
+	submitLabel?: string;
+	nameLabel?: string;
 }
 
 export const AddTemplateVariableModal = ({
 	open,
 	onOpenChange,
 	onAdd,
-	isSubmitting,
+	isSubmitting: _externalSubmitting,
+	title = "Create variable",
+	submitLabel = "Create variable",
+	nameLabel = "Variable name",
 }: AddTemplateVariableModalProps) => {
-	const {
-		register,
-		handleSubmit,
-		setValue,
-		watch,
-		reset,
-		getValues,
-		trigger,
-		formState: { errors, isValid },
-	} = useForm<VariableFormValues>({
-		resolver: valibotResolver(
-			addVariableSchema,
-		) as Resolver<VariableFormValues>,
-		defaultValues: {
-			variableName: "",
-			variableType: "string",
-			defaultValue: "",
-		},
-		mode: "onChange",
-	});
+	const [status, setStatus] = useState<"idle" | "creating" | "success">("idle");
+	const [variableName, setVariableName] = useState("");
+	const [variableType, setVariableType] = useState<PropertyType>("string");
+	const [defaultValue, setDefaultValue] = useState("");
+	const [isNameFocused, setIsNameFocused] = useState(false);
+	const nameField = useFieldError();
+	const clearNameError = nameField.clear;
 
-	const watchVariableType = watch("variableType");
-
-	const handleOpenChange = (isOpen: boolean) => {
-		if (!isOpen) {
-			reset({
-				variableName: "",
-				variableType: "string",
-				defaultValue: "",
-			});
-		}
-		onOpenChange(isOpen);
+	const handleClose = () => {
+		if (status !== "idle") return;
+		setVariableName("");
+		nameField.clear();
+		setVariableType("string");
+		setDefaultValue("");
+		setStatus("idle");
+		onOpenChange(false);
 	};
 
-	const handleFormSubmit = handleSubmit(async (data) => {
-		try {
-			await onAdd(
-				data.variableName,
-				data.variableType,
-				data.defaultValue.trim() || null,
-			);
-			handleOpenChange(false);
-		} catch {
-			// Keep modal open on failure; caller surfaces the error toast
+	useEffect(() => {
+		if (!open) {
+			const timer = setTimeout(() => {
+				setVariableName("");
+				clearNameError();
+				setVariableType("string");
+				setDefaultValue("");
+				setStatus("idle");
+			}, 300);
+			return () => clearTimeout(timer);
 		}
-	});
+	}, [open, clearNameError]);
 
-	const variableNameRegister = register("variableName");
+	const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const value = e.target.value;
+		setVariableName(value);
+		if (nameField.hasError) nameField.clear();
+	};
 
-	const canSubmit = isValid && !isSubmitting;
+	const handleSlugify = () => {
+		const slugged = slugify(variableName);
+		setVariableName(slugged);
+	};
+
+	const defaultValueError =
+		variableType === "number" &&
+		defaultValue !== "" &&
+		!/^-?\d+(?:\.\d+)?$/.test(defaultValue.trim())
+			? "Must be a valid number"
+			: "";
+
+	const handleSubmit = async (e?: React.FormEvent) => {
+		e?.preventDefault();
+		if (status !== "idle") return;
+
+		const trimmed = variableName.trim();
+		if (!trimmed) {
+			nameField.show(`Please enter a ${nameLabel.toLowerCase()}.`);
+			return;
+		}
+
+		const validationError = validateVariableName(trimmed);
+		if (validationError) {
+			nameField.show(validationError);
+			return;
+		}
+
+		if (defaultValueError) {
+			return;
+		}
+
+		nameField.clear();
+		setStatus("creating");
+		try {
+			await onAdd(trimmed, variableType, defaultValue.trim() || null);
+			setStatus("success");
+			setTimeout(() => {
+				setVariableName("");
+				nameField.clear();
+				setVariableType("string");
+				setDefaultValue("");
+				setStatus("idle");
+				onOpenChange(false);
+			}, 450);
+		} catch (error) {
+			console.error("Failed to create variable:", error);
+			const message =
+				error instanceof Error ? error.message : "Failed to create variable";
+			nameField.show(message);
+			setStatus("idle");
+		}
+	};
+
+	useHotkeys(
+		"enter",
+		(e) => {
+			e.preventDefault();
+			if (open && status === "idle") {
+				void handleSubmit();
+			}
+		},
+		{ enableOnFormTags: ["INPUT"], enabled: open },
+		[open, status, variableName, variableType, defaultValue, nameLabel],
+	);
+
+	useHotkeys(
+		"escape",
+		() => {
+			if (open && status === "idle") {
+				handleClose();
+			}
+		},
+		{ enableOnFormTags: ["INPUT"], enabled: open },
+		[open, status],
+	);
 
 	return (
-		<Modal.Root open={open} onOpenChange={handleOpenChange}>
+		<Modal.Root open={open} onOpenChange={(o) => !o && handleClose()}>
 			<Modal.Content
-				className="rounded-2xl border border-stroke-soft-100/50 p-0.5 sm:max-w-[480px]"
-				showClose={true}
+				className="overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-soft-50 p-0 sm:max-w-[460px] dark:border-stroke-soft-100/40 dark:bg-white/[0.03]"
+				showClose={false}
 			>
-				<div className="rounded-2xl border border-stroke-soft-100/50">
-					<Modal.Header className="before:border-stroke-soft-200/50">
-						<div className="flex items-center justify-center gap-1.5">
-							<Icon
-								name="brackets"
-								className="h-3.5 w-3.5 text-text-strong-950"
-							/>
-							<div className="flex-1">
-								<Modal.Title className="font-medium">
-									Create Variable
+				<form onSubmit={handleSubmit} noValidate>
+					<div className="relative m-0.5 space-y-5 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 pt-5 dark:border-stroke-soft-100/40 dark:bg-[#0c0c0c]">
+						{/* Header */}
+						<div className="flex items-center justify-between px-6 dark:border-stroke-soft-100/40">
+							<div className="flex items-center gap-2">
+								<Icon
+									name="variable"
+									className="size-4.5 text-text-strong-950 dark:text-white"
+								/>
+								<Modal.Title className="font-medium text-text-strong-950 text-xl tracking-tight dark:text-white">
+									{title}
 								</Modal.Title>
 							</div>
+							<button
+								type="button"
+								onClick={handleClose}
+								aria-label="Close"
+								disabled={status !== "idle"}
+								className="flex h-7 w-7 items-center justify-center rounded-lg bg-bg-white-0 text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 active:scale-[0.95] disabled:opacity-50 dark:border-stroke-soft-100/40 dark:bg-transparent dark:hover:bg-white/[0.05] dark:hover:text-white"
+							>
+								<X className="size-3.5" strokeWidth={2.25} />
+							</button>
 						</div>
-					</Modal.Header>
 
-					<form onSubmit={handleFormSubmit}>
-						<Modal.Body className="flex flex-col gap-5">
+						{/* Form Content */}
+						<div className="space-y-6 px-6 pb-6">
 							{/* Variable Name */}
-							<div className="flex flex-col gap-1.5">
-								<Label.Root htmlFor="variableName">
-									Name
+							<div className="space-y-1.5">
+								<Label.Root
+									htmlFor="templateVariableName"
+									className="font-semibold text-sm text-text-strong-950 dark:text-white"
+								>
+									{nameLabel}
 									<Label.Asterisk />
 								</Label.Root>
-								<Input.Root
-									size="small"
-									hasError={!!errors.variableName}
-									className="rounded-xl"
+								<FieldError
+									field={nameField}
+									hint="Letters, numbers, and underscores only — spaces auto-convert"
 								>
-									<Input.Wrapper>
-										<Input.InlineAffix className="font-semibold focus:text-text-strong-950!">
-											{"{{{"}
-										</Input.InlineAffix>
-										<Input.Input
-											id="variableName"
-											placeholder="variable_name"
-											disabled={isSubmitting}
-											autoComplete="off"
-											spellCheck={false}
-											{...variableNameRegister}
-											onBlur={(e) => {
-												variableNameRegister.onBlur(e);
-												const slugged = slugify(e.target.value);
-												setValue("variableName", slugged, {
-													shouldValidate: true,
-												});
-											}}
-										/>
-										<Input.InlineAffix className="font-semibold focus:text-text-strong-950!">
-											{"}}}"}
-										</Input.InlineAffix>
-									</Input.Wrapper>
-								</Input.Root>
-								{errors.variableName ? (
-									<p className="text-error-base text-xs">
-										{errors.variableName.message}
-									</p>
-								) : (
-									<p className="text-text-sub-600 text-xs">
-										Letters, numbers &amp; underscores — spaces auto-convert
-									</p>
-								)}
+									<Input.Root
+										size="medium"
+										hasError={nameField.hasError}
+										className="rounded-xl"
+									>
+										<Input.Wrapper className="cursor-text">
+											<div className="flex h-10 max-w-full items-center overflow-hidden font-mono text-xs">
+												<span className="shrink-0 select-none text-text-sub-600">
+													{"{{{"}
+												</span>
+												<div className="relative mx-1 inline-flex min-w-[2px] items-center">
+													<span
+														aria-hidden="true"
+														className="invisible select-none whitespace-pre font-mono text-xs"
+													>
+														{isNameFocused
+															? variableName || "\u200B"
+															: variableName || "variable_name"}
+													</span>
+													<input
+														id="templateVariableName"
+														{...nameField.controlProps}
+														placeholder={isNameFocused ? "" : "variable_name"}
+														value={variableName}
+														onChange={handleNameChange}
+														onFocus={() => setIsNameFocused(true)}
+														onBlur={() => {
+															setIsNameFocused(false);
+															handleSlugify();
+														}}
+														disabled={status !== "idle"}
+														autoComplete="off"
+														spellCheck={false}
+														className="absolute inset-0 h-full w-full bg-transparent p-0 font-mono text-text-strong-950 text-xs outline-none placeholder:text-text-soft-400 dark:text-white"
+													/>
+												</div>
+												<span className="shrink-0 select-none text-text-sub-600">
+													{"}}}"}
+												</span>
+											</div>
+										</Input.Wrapper>
+									</Input.Root>
+								</FieldError>
 							</div>
 
-							{/* Type — card picker */}
-							<div className="flex flex-col gap-2">
-								<Label.Root>
-									Type
-									<Label.Asterisk />
-								</Label.Root>
-								<div className="grid grid-cols-2 gap-2">
+							{/* Property Type Selector */}
+							<div className="space-y-1.5">
+								<div className="grid grid-cols-2 gap-2.5">
 									{TYPE_OPTIONS.map((opt) => {
-										const isSelected = watchVariableType === opt.value;
+										const isSelected = variableType === opt.value;
 										return (
-											<motion.button
-												whileTap={{ scale: 0.98 }}
+											<button
 												key={opt.value}
 												type="button"
-												onClick={() => {
-													setValue("variableType", opt.value, {
-														shouldValidate: true,
-													});
-													trigger("defaultValue");
-												}}
-												disabled={isSubmitting}
+												onClick={() => setVariableType(opt.value)}
+												disabled={status !== "idle"}
 												className={cn(
-													"flex flex-col items-start gap-2 rounded-xl border-2 p-3 text-left transition-all duration-150",
+													"group relative flex flex-col items-start gap-1 rounded-xl border p-3 text-left transition-all duration-150 active:scale-[0.98]",
 													isSelected
-														? "border-primary-base bg-primary-light/10"
-														: "border-stroke-soft-200 bg-bg-soft-200/20 hover:border-stroke-soft-300 hover:bg-bg-soft-200/40 dark:border-stroke-soft-100/40 dark:bg-bg-soft-200/10",
+														? "border-primary-base bg-bg-white-0 shadow-[0_0_0_1px_#0055FF] dark:border-primary-base dark:bg-white/[0.04] dark:shadow-[0_0_0_1px_#0055FF]"
+														: "border-stroke-soft-200 bg-bg-white-0 hover:border-stroke-sub-300 hover:bg-bg-weak-50/50 dark:border-stroke-soft-100/40 dark:bg-bg-soft-200/10 dark:hover:bg-white/[0.02]",
 												)}
 											>
-												<div className="flex w-full justify-between">
-													<div
-														className={cn(
-															"flex h-6 w-6 items-center justify-center rounded-lg border",
-															isSelected
-																? "border-primary-base/30 bg-primary-light/20"
-																: "border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/40",
-														)}
-													>
-														<Icon
-															name={
-																opt.icon as Parameters<typeof Icon>[0]["name"]
-															}
-															className={cn(
-																"h-3 w-3",
-																isSelected ? opt.color : "text-text-sub-600",
-															)}
-														/>
-													</div>
-													<AnimatePresence>
-														{isSelected && (
-															<motion.div
-																initial={{ scale: 0, opacity: 0 }}
-																animate={{ scale: 1, opacity: 1 }}
-																exit={{ scale: 0, opacity: 0 }}
-																transition={{
-																	type: "spring",
-																	stiffness: 500,
-																	damping: 30,
-																}}
-																className="flex h-3.5 w-3.5 items-center justify-center rounded-full bg-primary-base"
-															>
-																<Icon
-																	name="check"
-																	className="h-2 w-2 text-white"
-																/>
-															</motion.div>
-														)}
-													</AnimatePresence>
-												</div>
-												<div>
-													<p className="font-semibold text-text-strong-950 text-xs">
+												<div className="flex w-full items-center justify-between">
+													<p className="font-semibold text-sm text-text-strong-950 dark:text-white">
 														{opt.label}
 													</p>
-													<p className="text-[10px] text-text-sub-600 leading-tight">
-														{opt.description}
-													</p>
+													{isSelected ? (
+														<div className="flex size-4.5 items-center justify-center rounded-full bg-primary-base">
+															<div className="size-1.5 rounded-full bg-white" />
+														</div>
+													) : (
+														<div className="size-4.5 rounded-full border-2 border-stroke-soft-200 transition-colors group-hover:border-stroke-sub-300 dark:border-stroke-soft-100/60" />
+													)}
 												</div>
-											</motion.button>
+												<p className="text-[11px] text-text-sub-600 leading-snug dark:text-white/60">
+													{opt.description}
+												</p>
+											</button>
 										);
 									})}
 								</div>
 							</div>
 
 							{/* Default Value */}
-							<div className="flex flex-col gap-1.5">
-								<Label.Root htmlFor="defaultValue">Default Value</Label.Root>
+							<div className="space-y-1.5">
+								<Label.Root
+									htmlFor="templateDefaultValue"
+									className="font-semibold text-sm text-text-strong-950 dark:text-white"
+								>
+									Default Value
+								</Label.Root>
 								<Input.Root
-									size="small"
+									size="medium"
 									className="rounded-xl"
-									hasError={!!errors.defaultValue}
+									hasError={!!defaultValueError}
 								>
 									<Input.Wrapper>
 										<Input.Input
-											id="defaultValue"
-											placeholder={
-												watchVariableType === "number"
-													? "e.g., 0"
-													: "e.g., unknown"
-											}
-											disabled={isSubmitting}
-											inputMode={
-												watchVariableType === "number" ? "numeric" : "text"
-											}
-											{...register("defaultValue")}
+											id="templateDefaultValue"
+											placeholder="Fallback value when variable is not passed"
+											value={defaultValue}
 											onChange={(e) => {
 												const val = e.target.value;
-												if (watchVariableType === "number") {
+												if (variableType === "number") {
 													if (val === "" || /^-?\d*\.?\d*$/.test(val)) {
-														setValue("defaultValue", val, {
-															shouldValidate: true,
-														});
-													} else {
-														e.target.value = getValues("defaultValue") || "";
+														setDefaultValue(val);
 													}
 												} else {
-													setValue("defaultValue", val, {
-														shouldValidate: true,
-													});
+													setDefaultValue(val);
 												}
 											}}
+											disabled={status !== "idle"}
+											inputMode={variableType === "number" ? "numeric" : "text"}
 										/>
 									</Input.Wrapper>
 								</Input.Root>
-								{errors.defaultValue ? (
-									<p className="text-error-base text-xs">
-										{errors.defaultValue.message}
+								{defaultValueError ? (
+									<p className="text-[11px] text-error-base">
+										{defaultValueError}
 									</p>
-								) : (
-									<p className="text-text-sub-600 text-xs leading-normal">
-										Used when a contact doesn&apos;t have this variable set
-									</p>
-								)}
+								) : null}
 							</div>
-						</Modal.Body>
+						</div>
+					</div>
 
-						<Modal.Footer className="mt-2 flex items-center justify-end gap-3 border-stroke-soft-100/50">
-							<Button.Root
-								type="button"
-								variant="neutral"
-								mode="stroke"
-								size="xsmall"
-								onClick={() => handleOpenChange(false)}
-								disabled={isSubmitting}
-							>
-								Cancel
-								<KbdEsc />
-							</Button.Root>
-							<Button.Root
-								type="submit"
-								variant="neutral"
-								size="xsmall"
-								disabled={!canSubmit}
-							>
-								{isSubmitting ? (
-									<>
-										<Spinner size={14} color="currentColor" />
-										Creating…
-									</>
-								) : (
-									<>
-										Create Variable
-										<span className="inline-flex items-center gap-0.5">
-											<KbdCommand />
-											<KbdEnter />
-										</span>
-									</>
-								)}
-							</Button.Root>
-						</Modal.Footer>
-					</form>
-				</div>
+					{/* Actions / Footer */}
+					<div className="relative flex items-center justify-between gap-3 px-3 pt-2 pb-3">
+						<Button.Root
+							type="button"
+							variant="neutral"
+							mode="ghost"
+							size="small"
+							onClick={handleClose}
+							className={cn(
+								"gap-1.5 transition-opacity duration-200",
+								status !== "idle" && "pointer-events-none opacity-50",
+							)}
+						>
+							Cancel
+							<ActionKbd className="lowercase! w-auto min-w-0 px-1">
+								esc
+							</ActionKbd>
+						</Button.Root>
+
+						<FancyButton.Root
+							type="submit"
+							variant={status === "success" ? "success" : "blue"}
+							size="small"
+							disabled={status !== "idle"}
+							className={cn(
+								"min-w-[156px] justify-center overflow-hidden transition-all duration-200",
+								status !== "idle" && "pointer-events-none",
+								status === "creating" && "opacity-90",
+							)}
+						>
+							<AnimatePresence mode="popLayout" initial={false}>
+								<motion.span
+									key={status}
+									transition={{
+										type: "spring",
+										duration: 0.25,
+										bounce: 0,
+									}}
+									initial={{ opacity: 0, y: -14 }}
+									animate={{ opacity: 1, y: 0 }}
+									exit={{ opacity: 0, y: 14 }}
+									className="flex items-center justify-center gap-1.5"
+								>
+									{status === "creating" ? (
+										<>
+											<Spinner size={14} color="currentColor" />
+											<span>Creating...</span>
+										</>
+									) : status === "success" ? (
+										<>
+											<Icon name="check-circle" className="h-4 w-4" />
+											<span>Created</span>
+										</>
+									) : (
+										<>
+											{submitLabel}
+											<ActionKbd className={actionKbdOnBlueClassName}>
+												↵
+											</ActionKbd>
+										</>
+									)}
+								</motion.span>
+							</AnimatePresence>
+						</FancyButton.Root>
+					</div>
+				</form>
 			</Modal.Content>
 		</Modal.Root>
 	);

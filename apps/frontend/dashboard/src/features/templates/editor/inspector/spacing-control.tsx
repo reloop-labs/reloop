@@ -1,7 +1,14 @@
 "use client";
 
 import * as Button from "@reloop/ui/button";
-import { Icon } from "@reloop/ui/icon";
+import {
+	ArrowDown,
+	ArrowLeft,
+	ArrowRight,
+	ArrowUp,
+	Scan,
+	Square,
+} from "lucide-react";
 import { useState } from "react";
 import { ScrubField, ScrubHandle } from "./scrub-field";
 
@@ -24,37 +31,31 @@ function ModeToggle({
 	onToggle: (v: boolean) => void;
 }) {
 	return (
-		<div className="flex items-center gap-0.5 rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-0.5">
-			<Button.Root
+		<div className="flex h-8 items-center gap-0.5 rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-0.5 dark:border-stroke-soft-100/40 dark:bg-black">
+			<button
 				type="button"
-				variant="neutral"
-				mode={linked ? "lighter" : "ghost"}
-				size="xxsmall"
-				title="Uniform padding"
+				title="Uniform"
 				onClick={() => onToggle(true)}
-				className={`flex h-7 w-7 items-center justify-center rounded-lg outline-none ring-0 transition-all duration-150 ${
+				className={`flex size-6.5 cursor-pointer items-center justify-center rounded-[9px] transition-colors focus:outline-none ${
 					linked
-						? "bg-bg-soft-200 text-text-strong-950 shadow-regular-xs"
+						? "bg-bg-soft-200 text-text-strong-950 shadow-regular-xs dark:bg-bg-soft-200"
 						: "text-text-soft-400 hover:text-text-sub-600"
 				}`}
 			>
-				<Icon name="box" className="h-3.5 w-3.5" />
-			</Button.Root>
-			<Button.Root
+				<Square className="h-3.5 w-3.5 stroke-[1.75]" />
+			</button>
+			<button
 				type="button"
-				variant="neutral"
-				mode={!linked ? "lighter" : "ghost"}
-				size="xxsmall"
 				title="Individual sides"
 				onClick={() => onToggle(false)}
-				className={`flex h-7 w-7 items-center justify-center rounded-lg outline-none ring-0 transition-all duration-150 ${
+				className={`flex size-6.5 cursor-pointer items-center justify-center rounded-[9px] transition-colors focus:outline-none ${
 					!linked
-						? "bg-bg-soft-200 text-text-strong-950 shadow-regular-xs"
+						? "bg-bg-soft-200 text-text-strong-950 shadow-regular-xs dark:bg-bg-soft-200"
 						: "text-text-soft-400 hover:text-text-sub-600"
 				}`}
 			>
-				<Icon name="grid" className="h-3.5 w-3.5" />
-			</Button.Root>
+				<Scan className="h-3.5 w-3.5 stroke-[1.75]" />
+			</button>
 		</div>
 	);
 }
@@ -72,15 +73,17 @@ function PillInput({
 	label: string;
 }) {
 	return (
-		<ScrubField
-			label={label}
-			value={value}
-			onChange={onChange}
-			min={0}
-			max={200}
-			suffix="px"
-			prefix={icon}
-		/>
+		<div className="w-[70px]">
+			<ScrubField
+				label={label}
+				value={value}
+				onChange={onChange}
+				min={0}
+				max={200}
+				suffix="px"
+				prefix={icon}
+			/>
+		</div>
 	);
 }
 
@@ -115,16 +118,16 @@ export function SpacingControl({
 	/* ── Linked: single row ── */
 	if (linked) {
 		return (
-			<div className="flex min-h-9 items-center gap-3 px-4 py-1.5">
+			<div className="flex h-10 items-center justify-between gap-3 px-4">
 				<ScrubHandle
 					label={label}
 					value={value.top}
 					onChange={(v) => handleChange("top", v)}
 					min={0}
 					max={200}
-					className="w-1/3 min-w-0 shrink-0 text-label-sm text-text-sub-600 hover:text-text-strong-950"
+					className="min-w-0 flex-1 truncate font-normal text-sm text-text-sub-600 hover:text-text-strong-950 dark:text-text-soft-400"
 				/>
-				<div className="flex w-2/3 min-w-0 items-center justify-end gap-2">
+				<div className="flex shrink-0 items-center justify-end gap-1.5">
 					<PillInput
 						label={label}
 						value={value.top}
@@ -138,63 +141,77 @@ export function SpacingControl({
 
 	/* ── Individual: header row + 2×2 grid ── */
 	return (
-		<div className="flex flex-col gap-2 px-4 py-2">
-			{/* Header row */}
-			<div className="flex items-center justify-between">
-				<span className="text-label-sm text-text-sub-600">{label}</span>
+		<div className="flex flex-col px-4">
+			{/* Header row with exact same h-10 height as linked row to eliminate shift */}
+			<div className="flex h-10 items-center justify-between">
+				<span className="font-normal text-sm text-text-sub-600 dark:text-text-soft-400">
+					{label}
+				</span>
 				<ModeToggle linked={linked} onToggle={setLinked} />
 			</div>
 
 			{/* 2×2 grid */}
-			<div className="grid grid-cols-2 gap-2">
-				<PillInput
-					label={`${label} top`}
-					value={value.top}
-					onChange={(v) => handleChange("top", v)}
-					icon={
-						variant === "sides" ? (
-							<Icon name="arrow-top" className="h-3.5 w-3.5" />
-						) : (
-							<Icon name="box" className="h-3.5 w-3.5" />
-						)
-					}
-				/>
-				<PillInput
-					label={`${label} right`}
-					value={value.right}
-					onChange={(v) => handleChange("right", v)}
-					icon={
-						variant === "sides" ? (
-							<Icon name="arrow-right" className="h-3.5 w-3.5" />
-						) : (
-							<Icon name="box" className="h-3.5 w-3.5" />
-						)
-					}
-				/>
-				<PillInput
-					label={`${label} bottom`}
-					value={value.bottom}
-					onChange={(v) => handleChange("bottom", v)}
-					icon={
-						variant === "sides" ? (
-							<Icon name="arrow-down" className="h-3.5 w-3.5" />
-						) : (
-							<Icon name="box" className="h-3.5 w-3.5" />
-						)
-					}
-				/>
-				<PillInput
-					label={`${label} left`}
-					value={value.left}
-					onChange={(v) => handleChange("left", v)}
-					icon={
-						variant === "sides" ? (
-							<Icon name="arrow-left" className="h-3.5 w-3.5" />
-						) : (
-							<Icon name="box" className="h-3.5 w-3.5" />
-						)
-					}
-				/>
+			<div className="grid grid-cols-2 gap-2 pb-2">
+				<div className="w-full">
+					<ScrubField
+						label={`${label} top`}
+						value={value.top}
+						onChange={(v) => handleChange("top", v)}
+						suffix="px"
+						prefix={
+							variant === "sides" ? (
+								<ArrowUp className="size-3.5 shrink-0 stroke-[1.75] text-text-soft-400" />
+							) : (
+								<Square className="size-3.5 shrink-0 stroke-[1.75] text-text-soft-400" />
+							)
+						}
+					/>
+				</div>
+				<div className="w-full">
+					<ScrubField
+						label={`${label} right`}
+						value={value.right}
+						onChange={(v) => handleChange("right", v)}
+						suffix="px"
+						prefix={
+							variant === "sides" ? (
+								<ArrowRight className="size-3.5 shrink-0 stroke-[1.75] text-text-soft-400" />
+							) : (
+								<Square className="size-3.5 shrink-0 stroke-[1.75] text-text-soft-400" />
+							)
+						}
+					/>
+				</div>
+				<div className="w-full">
+					<ScrubField
+						label={`${label} bottom`}
+						value={value.bottom}
+						onChange={(v) => handleChange("bottom", v)}
+						suffix="px"
+						prefix={
+							variant === "sides" ? (
+								<ArrowDown className="size-3.5 shrink-0 stroke-[1.75] text-text-soft-400" />
+							) : (
+								<Square className="size-3.5 shrink-0 stroke-[1.75] text-text-soft-400" />
+							)
+						}
+					/>
+				</div>
+				<div className="w-full">
+					<ScrubField
+						label={`${label} left`}
+						value={value.left}
+						onChange={(v) => handleChange("left", v)}
+						suffix="px"
+						prefix={
+							variant === "sides" ? (
+								<ArrowLeft className="size-3.5 shrink-0 stroke-[1.75] text-text-soft-400" />
+							) : (
+								<Square className="size-3.5 shrink-0 stroke-[1.75] text-text-soft-400" />
+							)
+						}
+					/>
+				</div>
 			</div>
 		</div>
 	);

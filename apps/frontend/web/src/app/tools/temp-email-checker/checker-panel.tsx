@@ -2,6 +2,7 @@
 
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
+import { FieldError, useFieldError } from "@reloop/ui/field-error";
 import { Icon, type IconName } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
@@ -11,12 +12,10 @@ import {
 	type FormEvent,
 	type ReactNode,
 	useEffect,
-	useId,
 	useRef,
 	useState,
 } from "react";
 import { CheckRequestError, runCheck } from "./check-api";
-import "./checker-field.css";
 import { RawJsonBlock } from "./json-highlight";
 import {
 	type CheckResult,
@@ -27,16 +26,6 @@ import {
 } from "./presenter";
 import { FIELD_ERROR_MESSAGE, validateCheckerInput } from "./syntax";
 import { saveTestedEmail } from "./tested-emails-store";
-
-function readShakeMs(): number {
-	if (typeof window === "undefined") return 280;
-	const cs = getComputedStyle(document.documentElement);
-	const ms = (name: string, fallback: number) => {
-		const v = Number.parseFloat(cs.getPropertyValue(name));
-		return Number.isFinite(v) ? v : fallback;
-	};
-	return ms("--shake-dur-a", 80) * 2 + ms("--shake-dur-b", 60) * 2;
-}
 
 const SPRING_TRANSITION = {
 	type: "spring" as const,
@@ -148,7 +137,7 @@ function HowItWorksSteps() {
 						1
 					</div>
 					<div className="flex flex-1 items-center justify-between">
-						<span className="font-medium text-text-strong-950 text-xs dark:text-white">
+						<span className="font-semibold text-sm text-text-strong-950 dark:text-white">
 							RFC 5322 syntax
 						</span>
 						<code className="rounded-md border border-stroke-soft-200 bg-bg-white-0 px-2 py-0.5 font-mono text-[11px] text-text-sub-600 dark:border-white/10 dark:bg-[#0b0b0b] dark:text-white/70">
@@ -163,7 +152,7 @@ function HowItWorksSteps() {
 						2
 					</div>
 					<div className="flex flex-1 items-center justify-between">
-						<span className="font-medium text-text-strong-950 text-xs dark:text-white">
+						<span className="font-semibold text-sm text-text-strong-950 dark:text-white">
 							Catalogue and MX lookup
 						</span>
 						<code className="rounded-md border border-stroke-soft-200 bg-bg-white-0 px-2 py-0.5 font-mono text-[11px] text-text-sub-600 dark:border-white/10 dark:bg-[#0b0b0b] dark:text-white/70">
@@ -177,7 +166,7 @@ function HowItWorksSteps() {
 						3
 					</div>
 					<div className="flex flex-1 items-center justify-between">
-						<span className="font-medium text-text-strong-950 text-xs dark:text-white">
+						<span className="font-semibold text-sm text-text-strong-950 dark:text-white">
 							Verdict, score, and flags
 						</span>
 						<code className="rounded-md border border-stroke-soft-200 bg-bg-white-0 px-2 py-0.5 font-mono text-[11px] text-text-sub-600 dark:border-white/10 dark:bg-[#0b0b0b] dark:text-white/70">
@@ -274,7 +263,7 @@ function SignalItem({
 		<div className="flex items-center justify-between py-2.5">
 			<div className="flex items-center gap-2.5">
 				<span className={cn("size-2 rounded-full", dotColor)} />
-				<span className="font-medium text-text-strong-950 text-xs dark:text-white">
+				<span className="font-semibold text-sm text-text-strong-950 dark:text-white">
 					{label}
 				</span>
 			</div>
@@ -323,7 +312,7 @@ function ResultCardDetailed({
 							{theme.title}
 						</span>
 						<span className="text-text-sub-600 dark:text-white/40">·</span>
-						<span className="font-medium text-text-strong-950 text-xs dark:text-white">
+						<span className="font-semibold text-sm text-text-strong-950 dark:text-white">
 							{result.subtitle}
 						</span>
 					</div>
@@ -359,7 +348,7 @@ function ResultCardDetailed({
 					className={cn("mt-0.5 size-4 shrink-0", recTone.iconClass)}
 				/>
 				<div className="space-y-0.5">
-					<p className="font-medium text-text-strong-950 text-xs dark:text-white">
+					<p className="font-semibold text-sm text-text-strong-950 dark:text-white">
 						Recommendation
 					</p>
 					<p className="text-text-sub-600 text-xs leading-relaxed dark:text-white/60">
@@ -408,50 +397,14 @@ export function CheckerPanel() {
 	const [isPending, setIsPending] = useState(false);
 	const [result, setResult] = useState<CheckResult | null>(null);
 	const [error, setError] = useState<string | null>(null);
-	const [fieldError, setFieldError] = useState<string | null>(null);
-	const [fieldErrorCopy, setFieldErrorCopy] = useState("");
-	const inputRef = useRef<HTMLInputElement>(null);
-	const fieldRef = useRef<HTMLDivElement>(null);
-	const shakeTimerRef = useRef<number | null>(null);
-	const fieldErrorId = useId();
+	const field = useFieldError();
 	const shouldReduceMotion = useReducedMotion();
-	const hasFieldError = fieldError !== null;
-
-	useEffect(() => {
-		return () => {
-			if (shakeTimerRef.current !== null) {
-				window.clearTimeout(shakeTimerRef.current);
-			}
-		};
-	}, []);
-
-	const clearFieldError = () => {
-		setFieldError(null);
-		const field = fieldRef.current;
-		if (field) field.classList.remove("is-shaking");
-	};
+	const hasFieldError = field.hasError;
 
 	const showFieldError = (message: string) => {
-		setFieldError(message);
-		setFieldErrorCopy(message);
 		setResult(null);
 		setError(null);
-		inputRef.current?.focus();
-
-		const field = fieldRef.current;
-		if (!field || shouldReduceMotion) return;
-
-		field.classList.remove("is-shaking");
-		void field.offsetWidth;
-		field.classList.add("is-shaking");
-
-		if (shakeTimerRef.current !== null) {
-			window.clearTimeout(shakeTimerRef.current);
-		}
-		shakeTimerRef.current = window.setTimeout(() => {
-			field.classList.remove("is-shaking");
-			shakeTimerRef.current = null;
-		}, readShakeMs() + 20);
+		field.show(message);
 	};
 
 	const run = async (raw: string) => {
@@ -461,7 +414,7 @@ export function CheckerPanel() {
 			return;
 		}
 
-		clearFieldError();
+		field.clear();
 		const query = raw.trim();
 
 		setIsPending(true);
@@ -500,9 +453,9 @@ export function CheckerPanel() {
 	const handleReset = () => {
 		setResult(null);
 		setError(null);
-		clearFieldError();
+		field.clear();
 		setValue("");
-		setTimeout(() => inputRef.current?.focus(), 50);
+		setTimeout(() => field.inputRef.current?.focus(), 50);
 	};
 
 	return (
@@ -516,98 +469,85 @@ export function CheckerPanel() {
 						<div className="space-y-2">
 							<Label.Root
 								htmlFor="checker-input"
-								className="font-medium text-text-strong-950 text-xs dark:text-white"
+								className="font-semibold text-sm text-text-strong-950 dark:text-white"
 							>
 								Email or domain
 								<Label.Asterisk />
 							</Label.Root>
 
-							<div className={cn("t-input-wrap", hasFieldError && "is-error")}>
-								<div
-									ref={fieldRef}
-									className={cn("t-input w-full", hasFieldError && "is-error")}
+							<FieldError
+								field={field}
+								messageClassName="text-xs leading-relaxed"
+							>
+								<Input.Root
+									size="medium"
+									hasError={hasFieldError}
+									className={cn(
+										"!shadow-none w-full rounded-xl",
+										hasFieldError
+											? "has-[input:focus]:!shadow-button-error-focus has-[input:focus]:before:!ring-error-base"
+											: "has-[input:focus]:before:!ring-primary-base has-[input:focus]:!shadow-button-primary-focus",
+									)}
 								>
-									<Input.Root
-										size="medium"
-										hasError={hasFieldError}
-										className={cn(
-											"!shadow-none w-full rounded-xl",
-											hasFieldError
-												? "has-[input:focus]:!shadow-button-error-focus has-[input:focus]:before:!ring-error-base"
-												: "has-[input:focus]:before:!ring-primary-base has-[input:focus]:!shadow-button-primary-focus",
-										)}
-									>
-										<Input.Wrapper className="h-11 pr-1.5 pl-3.5 dark:bg-[#0c0c0c]">
-											<Input.Icon>
-												<Icon name="mail-single" className="size-4" />
-											</Input.Icon>
-											<Input.Input
-												id="checker-input"
-												ref={inputRef}
-												type="text"
-												inputMode="email"
-												autoComplete="off"
-												autoCapitalize="none"
-												spellCheck={false}
-												value={value}
-												aria-invalid={hasFieldError}
-												aria-describedby={
-													hasFieldError ? fieldErrorId : undefined
-												}
-												onChange={(e) => {
-													setValue(e.target.value);
-													if (fieldError) clearFieldError();
+									<Input.Wrapper className="h-11 pr-1.5 pl-3.5 dark:bg-[#0c0c0c]">
+										<Input.Icon>
+											<Icon name="mail-single" className="size-4" />
+										</Input.Icon>
+										<Input.Input
+											id="checker-input"
+											{...field.controlProps}
+											type="text"
+											inputMode="email"
+											autoComplete="off"
+											autoCapitalize="none"
+											spellCheck={false}
+											value={value}
+											onChange={(e) => {
+												setValue(e.target.value);
+												if (hasFieldError) field.clear();
+											}}
+											placeholder="you@example.com or domain.com"
+											className="font-medium text-[14.5px]"
+										/>
+										{value ? (
+											<button
+												type="button"
+												onClick={(e) => {
+													e.stopPropagation();
+													setValue("");
+													setResult(null);
+													setError(null);
+													field.clear();
+													field.inputRef.current?.focus();
 												}}
-												placeholder="you@example.com or domain.com"
-												className="font-medium text-[14.5px]"
-											/>
-											{value ? (
-												<button
-													type="button"
-													onClick={(e) => {
-														e.stopPropagation();
-														setValue("");
-														setResult(null);
-														setError(null);
-														clearFieldError();
-														inputRef.current?.focus();
-													}}
-													className="flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:text-white/45 dark:hover:bg-white/10 dark:hover:text-white"
-													aria-label="Clear input"
-												>
-													<Icon name="close" className="size-3.5" />
-												</button>
-											) : null}
-											<FancyButton.Root
-												type="submit"
-												variant="primary"
-												size="xsmall"
-												className="!p-0 flex size-7.5 shrink-0 cursor-pointer items-center justify-center rounded-lg"
-												aria-label="Verify email or domain"
+												className="flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:text-white/45 dark:hover:bg-white/10 dark:hover:text-white"
+												aria-label="Clear input"
 											>
-												{isPending ? (
-													<LoadingDot
-														size={13}
-														dotSize={2}
-														className="text-white"
-													/>
-												) : (
-													<FancyButton.Icon className="mx-0 size-3.5">
-														<Icon name="arrow-right" className="size-3.5" />
-													</FancyButton.Icon>
-												)}
-											</FancyButton.Root>
-										</Input.Wrapper>
-									</Input.Root>
-								</div>
-								<p
-									id={fieldErrorId}
-									role="alert"
-									className="t-error-msg text-error-base text-xs leading-relaxed"
-								>
-									{fieldErrorCopy}
-								</p>
-							</div>
+												<Icon name="close" className="size-3.5" />
+											</button>
+										) : null}
+										<FancyButton.Root
+											type="submit"
+											variant="primary"
+											size="xsmall"
+											className="!p-0 flex size-7.5 shrink-0 cursor-pointer items-center justify-center rounded-lg"
+											aria-label="Verify email or domain"
+										>
+											{isPending ? (
+												<LoadingDot
+													size={13}
+													dotSize={2}
+													className="text-white"
+												/>
+											) : (
+												<FancyButton.Icon className="mx-0 size-3.5">
+													<Icon name="arrow-right" className="size-3.5" />
+												</FancyButton.Icon>
+											)}
+										</FancyButton.Root>
+									</Input.Wrapper>
+								</Input.Root>
+							</FieldError>
 						</div>
 
 						<MorphSlot

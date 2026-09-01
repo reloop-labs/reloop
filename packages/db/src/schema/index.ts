@@ -4,6 +4,7 @@ export * from "./api-key";
 export * from "./auth";
 export * from "./automation";
 export * from "./billing";
+export * from "./campaign";
 export * from "./channel";
 export * from "./compose";
 export * from "./contact";

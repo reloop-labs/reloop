@@ -11,12 +11,30 @@ import * as schema from "@reloop/db/schema";
 import { and, eq, isNull } from "drizzle-orm";
 import { log } from "evlog";
 
+export type EnrollOutcome =
+	| {
+			status: "enrolled";
+			enrollmentId: string;
+			stepRunId: string;
+			delayMs: number;
+	  }
+	| {
+			status: "skipped";
+			reason:
+				| "missing_version"
+				| "already_enrolled"
+				| "no_steps"
+				| "missing_node";
+			existingEnrollmentId?: string;
+	  };
+
 export async function enrollContactInMatchingAutomations(params: {
 	organizationId: string;
 	contactId: string;
 	triggerEvent: string;
-}): Promise<void> {
-	const { organizationId, contactId, triggerEvent } = params;
+	properties?: Record<string, unknown>;
+}): Promise<number> {
+	const { organizationId, contactId, triggerEvent, properties } = params;
 
 	const automations = await db.query.automation.findMany({
 		where: and(
@@ -28,16 +46,22 @@ export async function enrollContactInMatchingAutomations(params: {
 	});
 
 	if (automations.length === 0) {
-		return;
+		return 0;
 	}
 
+	let enrolled = 0;
 	for (const auto of automations) {
 		try {
-			await enrollInAutomation({
+			const result = await enrollContactInAutomation({
 				automation: auto,
 				contactId,
 				organizationId,
+				context: {
+					eventKey: triggerEvent,
+					properties: properties ?? {},
+				},
 			});
+			if (result.status === "enrolled") enrolled += 1;
 		} catch (error) {
 			log.error({
 				message: "Failed to enroll contact in automation",
@@ -47,21 +71,26 @@ export async function enrollContactInMatchingAutomations(params: {
 			});
 		}
 	}
+	return enrolled;
 }
 
-async function enrollInAutomation(params: {
+export async function enrollContactInAutomation(params: {
 	automation: typeof schema.automation.$inferSelect;
 	contactId: string;
 	organizationId: string;
-}): Promise<void> {
-	const { automation: auto, contactId, organizationId } = params;
+	context?: {
+		eventKey?: string;
+		properties?: Record<string, unknown>;
+	};
+}): Promise<EnrollOutcome> {
+	const { automation: auto, contactId, organizationId, context } = params;
 
 	if (!auto.activeVersionId) {
 		log.warn({
 			message: "Active automation missing activeVersionId — skipped",
 			automationId: auto.id,
 		});
-		return;
+		return { status: "skipped", reason: "missing_version" };
 	}
 
 	const existing = await db.query.automationEnrollment.findFirst({
@@ -77,7 +106,11 @@ async function enrollInAutomation(params: {
 			automationId: auto.id,
 			contactId,
 		});
-		return;
+		return {
+			status: "skipped",
+			reason: "already_enrolled",
+			existingEnrollmentId: existing.id,
+		};
 	}
 
 	const version = await db.query.automationVersion.findFirst({
@@ -89,7 +122,7 @@ async function enrollInAutomation(params: {
 			automationId: auto.id,
 			versionId: auto.activeVersionId,
 		});
-		return;
+		return { status: "skipped", reason: "missing_version" };
 	}
 
 	const graph = version.graph as AutomationGraph;
@@ -99,11 +132,14 @@ async function enrollInAutomation(params: {
 			message: "Automation has no steps after trigger — skip",
 			automationId: auto.id,
 		});
-		return;
+		return { status: "skipped", reason: "no_steps" };
 	}
 
 	// v1 linear: take the first outgoing edge only
-	const firstNodeId = firstNodeIds[0]!;
+	const firstNodeId = firstNodeIds[0];
+	if (!firstNodeId) {
+		return { status: "skipped", reason: "no_steps" };
+	}
 	const firstNode = findNode(graph, firstNodeId);
 	if (!firstNode) {
 		log.warn({
@@ -111,7 +147,7 @@ async function enrollInAutomation(params: {
 			automationId: auto.id,
 			nodeId: firstNodeId,
 		});
-		return;
+		return { status: "skipped", reason: "missing_node" };
 	}
 
 	const now = new Date();
@@ -124,21 +160,42 @@ async function enrollInAutomation(params: {
 		scheduledFor = new Date(now.getTime() + delayMs);
 	}
 
-	const [enrollment] = await db
-		.insert(schema.automationEnrollment)
-		.values({
-			organizationId,
-			automationId: auto.id,
-			versionId: version.id,
-			contactId,
-			status: "active",
-			currentNodeId: firstNodeId,
-			enrolledAt: now,
-		})
-		.returning();
+	let enrollment: typeof schema.automationEnrollment.$inferSelect;
+	try {
+		const [row] = await db
+			.insert(schema.automationEnrollment)
+			.values({
+				organizationId,
+				automationId: auto.id,
+				versionId: version.id,
+				contactId,
+				status: "active",
+				currentNodeId: firstNodeId,
+				context: context ?? {},
+				enrolledAt: now,
+			})
+			.returning();
 
-	if (!enrollment) {
-		throw new Error("Failed to create enrollment");
+		if (!row) {
+			throw new Error("Failed to create enrollment");
+		}
+		enrollment = row;
+	} catch (error) {
+		if (isUniqueViolation(error)) {
+			const raced = await db.query.automationEnrollment.findFirst({
+				where: and(
+					eq(schema.automationEnrollment.automationId, auto.id),
+					eq(schema.automationEnrollment.contactId, contactId),
+				),
+				columns: { id: true },
+			});
+			return {
+				status: "skipped",
+				reason: "already_enrolled",
+				existingEnrollmentId: raced?.id,
+			};
+		}
+		throw error;
 	}
 
 	const [stepRun] = await db
@@ -172,6 +229,13 @@ async function enrollInAutomation(params: {
 		firstNodeId,
 		delayMs,
 	});
+
+	return {
+		status: "enrolled",
+		enrollmentId: enrollment.id,
+		stepRunId: stepRun.id,
+		delayMs,
+	};
 }
 
 export async function cancelEnrollmentsForContact(params: {
@@ -204,4 +268,13 @@ export async function cancelEnrollmentsForContact(params: {
 			reason: params.reason,
 		});
 	}
+}
+
+function isUniqueViolation(error: unknown): boolean {
+	return (
+		typeof error === "object" &&
+		error !== null &&
+		"code" in error &&
+		(error as { code: string }).code === "23505"
+	);
 }
