@@ -7,6 +7,7 @@ import * as Label from "@reloop/ui/label";
 import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
 import { AnimatePresence, motion } from "framer-motion";
+import { X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
@@ -25,6 +26,8 @@ interface AddPropertyModalProps {
 		type: PropertyType;
 		defaultValue?: string;
 	}) => void;
+	title?: string;
+	submitLabel?: string;
 }
 
 type PropertyType = "string" | "number";
@@ -70,6 +73,8 @@ export const AddPropertyModal = ({
 	open,
 	onOpenChange,
 	onSuccess,
+	title = "Add property",
+	submitLabel = "Add property",
 }: AddPropertyModalProps) => {
 	const invalidate = useInvalidateContacts();
 	const [status, setStatus] = useState<"idle" | "creating" | "success">("idle");
@@ -162,7 +167,7 @@ export const AddPropertyModal = ({
 				setDefaultValue("");
 				setStatus("idle");
 				onOpenChange(false);
-			}, 750);
+			}, 450);
 		} catch (error) {
 			console.error("Failed to create property:", error);
 			toast.error(
@@ -198,256 +203,263 @@ export const AddPropertyModal = ({
 	return (
 		<Modal.Root open={open} onOpenChange={(o) => !o && handleClose()}>
 			<Modal.Content
-				className="overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 sm:max-w-[460px] dark:border-stroke-soft-100/40"
+				className="overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-soft-50 p-0 sm:max-w-[460px] dark:border-stroke-soft-100/40 dark:bg-white/[0.03]"
 				showClose={false}
 			>
-				<motion.div
-					layout
-					transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
-				>
-					<div className="p-6">
-						<Modal.Title className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
-							Add property
-						</Modal.Title>
+				<form onSubmit={handleSubmit} noValidate>
+					<div className="relative m-0.5 space-y-4 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 pt-5 dark:border-stroke-soft-100/40 dark:bg-[#0c0c0c]">
+						{/* Header */}
+						<div className="flex items-start justify-between px-6 dark:border-stroke-soft-100/40">
+							<Modal.Title className="font-medium text-text-strong-950 text-xl tracking-tight">
+								{title}
+							</Modal.Title>
+							<button
+								type="button"
+								onClick={handleClose}
+								aria-label="Close"
+								disabled={status !== "idle"}
+								className="flex h-7 w-7 items-center justify-center rounded-lg bg-bg-white-0 text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 active:scale-[0.95] disabled:opacity-50 dark:border-stroke-soft-100/40 dark:bg-transparent dark:hover:bg-white/[0.05]"
+							>
+								<X className="size-3.5" strokeWidth={2.25} />
+							</button>
+						</div>
 
-						<form onSubmit={handleSubmit} className="mt-5">
-							<div className="space-y-4">
-								{/* Property Name */}
-								<div className="space-y-2">
-									<Label.Root htmlFor="propertyName">
-										Name
-										<Label.Asterisk />
-									</Label.Root>
-									<Input.Root
-										size="medium"
-										hasError={!!nameError}
-										className="rounded-xl"
-									>
-										<Input.Wrapper>
-											<Input.Icon
-												as={Icon}
-												name="tag"
-												size="small"
-												className="h-4 w-4"
-											/>
-											<Input.Input
-												ref={nameInputRef}
-												id="propertyName"
-												placeholder="e.g., first_name, company_plan"
-												value={propertyName}
-												onChange={handleNameChange}
-												onBlur={handleSlugify}
+						{/* Form Content */}
+						<div className="space-y-4 px-6 pb-6">
+							{/* Property Name */}
+							<div className="space-y-1.5">
+								<Label.Root
+									htmlFor="propertyName"
+									className="font-medium text-text-strong-950 text-xs"
+								>
+									Name
+									<Label.Asterisk />
+								</Label.Root>
+								<Input.Root
+									size="medium"
+									hasError={!!nameError}
+									className="rounded-xl"
+								>
+									<Input.Wrapper>
+										<Input.Input
+											ref={nameInputRef}
+											id="propertyName"
+											placeholder="e.g., first_name, company_plan"
+											value={propertyName}
+											onChange={handleNameChange}
+											onBlur={handleSlugify}
+											disabled={status !== "idle"}
+											autoComplete="off"
+											spellCheck={false}
+											autoFocus
+										/>
+									</Input.Wrapper>
+								</Input.Root>
+								{nameError ? (
+									<p className="text-error-base text-[11px]">{nameError}</p>
+								) : (
+									<p className="text-[11px] text-text-sub-600">
+										Letters, numbers &amp; underscores — spaces auto-convert
+									</p>
+								)}
+							</div>
+
+							{/* Property Type */}
+							<div className="space-y-1.5">
+								<Label.Root className="font-medium text-text-strong-950 text-xs">
+									Type
+									<Label.Asterisk />
+								</Label.Root>
+								<div className="grid grid-cols-2 gap-2.5">
+									{TYPE_OPTIONS.map((opt) => {
+										const isSelected = propertyType === opt.value;
+										return (
+											<button
+												key={opt.value}
+												type="button"
+												onClick={() => setPropertyType(opt.value)}
 												disabled={status !== "idle"}
-												autoComplete="off"
-												spellCheck={false}
-												autoFocus
-											/>
-										</Input.Wrapper>
-									</Input.Root>
-									{nameError ? (
-										<p className="text-error-base text-paragraph-xs">
-											{nameError}
-										</p>
-									) : (
-										<p className="text-paragraph-xs text-text-sub-600">
-											Letters, numbers &amp; underscores — spaces auto-convert
-										</p>
-									)}
-								</div>
-
-								{/* Property Type */}
-								<div className="space-y-2">
-									<Label.Root>
-										Type
-										<Label.Asterisk />
-									</Label.Root>
-									<div className="grid grid-cols-2 gap-2">
-										{TYPE_OPTIONS.map((opt) => {
-											const isSelected = propertyType === opt.value;
-											return (
-												<motion.button
-													whileTap={{ scale: 0.98 }}
-													key={opt.value}
-													type="button"
-													onClick={() => setPropertyType(opt.value)}
-													disabled={status !== "idle"}
-													className={cn(
-														"flex flex-col items-start gap-2 rounded-xl border-2 p-3 text-left transition-all duration-150",
-														isSelected
-															? "border-primary-base bg-primary-light/10"
-															: "border-stroke-soft-100 bg-bg-soft-200/20 hover:border-stroke-soft-200 hover:bg-bg-soft-200/40 dark:border-stroke-soft-100/40 dark:bg-bg-soft-200/10",
-													)}
-												>
-													<div className="flex w-full justify-between">
-														<div
+												className={cn(
+													"group relative flex flex-col items-start gap-2.5 rounded-xl border p-3 text-left transition-all duration-150 active:scale-[0.98]",
+													isSelected
+														? "border-primary-base bg-primary-light/10 shadow-[0_0_0_1px_rgba(0,85,255,1)] dark:border-primary-base dark:bg-primary-base/10"
+														: "border-stroke-soft-200 bg-bg-white-0 hover:border-stroke-soft-200 hover:bg-bg-weak-50 dark:border-stroke-soft-100/40 dark:bg-bg-soft-200/10 dark:hover:bg-white/[0.04]",
+												)}
+											>
+												<div className="flex w-full items-center justify-between">
+													<div
+														className={cn(
+															"flex h-6 w-6 items-center justify-center rounded-lg border",
+															isSelected
+																? "border-primary-base/30 bg-primary-light/20"
+																: "border-stroke-soft-200 bg-bg-soft-50 text-text-sub-600 dark:border-stroke-soft-100/40 dark:bg-white/[0.05]",
+														)}
+													>
+														<Icon
+															name={
+																opt.icon as Parameters<typeof Icon>[0]["name"]
+															}
 															className={cn(
-																"flex h-6 w-6 items-center justify-center rounded-lg border",
-																isSelected
-																	? "border-primary-base/30 bg-primary-light/20"
-																	: "border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40",
+																"h-3 w-3",
+																isSelected ? opt.color : "text-text-sub-600",
 															)}
-														>
-															<Icon
-																name={
-																	opt.icon as Parameters<typeof Icon>[0]["name"]
-																}
-																className={cn(
-																	"h-3 w-3",
-																	isSelected ? opt.color : "text-text-sub-600",
-																)}
-															/>
-														</div>
-														<AnimatePresence>
-															{isSelected && (
-																<motion.div
-																	initial={{ scale: 0, opacity: 0 }}
-																	animate={{ scale: 1, opacity: 1 }}
-																	exit={{ scale: 0, opacity: 0 }}
-																	transition={{
-																		type: "spring",
-																		stiffness: 500,
-																		damping: 30,
-																	}}
-																	className="flex h-3.5 w-3.5 items-center justify-center rounded-full bg-primary-base"
-																>
-																	<Icon
-																		name="check"
-																		className="h-2 w-2 text-white"
-																	/>
-																</motion.div>
-															)}
-														</AnimatePresence>
+														/>
 													</div>
-													<div>
-														<p className="font-semibold text-text-strong-950 text-xs">
-															{opt.label}
-														</p>
-														<p className="text-[10px] text-text-sub-600">
-															{opt.description}
-														</p>
-													</div>
-												</motion.button>
-											);
-										})}
-									</div>
+													<AnimatePresence>
+														{isSelected && (
+															<motion.div
+																initial={{ scale: 0, opacity: 0 }}
+																animate={{ scale: 1, opacity: 1 }}
+																exit={{ scale: 0, opacity: 0 }}
+																transition={{
+																	type: "spring",
+																	stiffness: 500,
+																	damping: 30,
+																}}
+																className="flex h-4 w-4 items-center justify-center rounded-full bg-primary-base"
+															>
+																<Icon
+																	name="check"
+																	className="h-2.5 w-2.5 text-white"
+																/>
+															</motion.div>
+														)}
+													</AnimatePresence>
+												</div>
+												<div>
+													<p className="font-semibold text-text-strong-950 text-xs">
+														{opt.label}
+													</p>
+													<p className="text-[11px] text-text-sub-600">
+														{opt.description}
+													</p>
+												</div>
+											</button>
+										);
+									})}
 								</div>
+							</div>
 
-								{/* Default Value */}
-								<div className="space-y-2">
-									<Label.Root htmlFor="defaultValue">Default Value</Label.Root>
-									<Input.Root
-										size="medium"
-										className="rounded-xl"
-										hasError={!!defaultValueError}
-									>
-										<Input.Wrapper>
-											<Input.Input
-												id="defaultValue"
-												placeholder={
-													propertyType === "number"
-														? "e.g., 0"
-														: "e.g., unknown"
-												}
-												value={defaultValue}
-												onChange={(e) => {
-													const val = e.target.value;
-													if (propertyType === "number") {
-														if (val === "" || /^-?\d*\.?\d*$/.test(val)) {
-															setDefaultValue(val);
-														}
-													} else {
+							{/* Default Value */}
+							<div className="space-y-1.5">
+								<Label.Root
+									htmlFor="defaultValue"
+									className="font-medium text-text-strong-950 text-xs"
+								>
+									Default Value
+								</Label.Root>
+								<Input.Root
+									size="medium"
+									className="rounded-xl"
+									hasError={!!defaultValueError}
+								>
+									<Input.Wrapper>
+										<Input.Input
+											id="defaultValue"
+											placeholder={
+												propertyType === "number"
+													? "e.g., 0"
+													: "e.g., unknown"
+											}
+											value={defaultValue}
+											onChange={(e) => {
+												const val = e.target.value;
+												if (propertyType === "number") {
+													if (val === "" || /^-?\d*\.?\d*$/.test(val)) {
 														setDefaultValue(val);
 													}
-												}}
-												disabled={status !== "idle"}
-												inputMode={
-													propertyType === "number" ? "numeric" : "text"
+												} else {
+													setDefaultValue(val);
 												}
-											/>
-										</Input.Wrapper>
-									</Input.Root>
-									{defaultValueError ? (
-										<p className="text-error-base text-paragraph-xs">
-											{defaultValueError}
-										</p>
-									) : (
-										<p className="text-paragraph-xs text-text-sub-600">
-											Used when a contact doesn&apos;t have this property set
-										</p>
-									)}
-								</div>
-							</div>
-
-							{/* Actions / Footer */}
-							<div className="mt-6 flex items-center justify-end gap-3">
-								<Button.Root
-									type="button"
-									variant="neutral"
-									mode="stroke"
-									size="small"
-									onClick={handleClose}
-									className={cn(
-										"gap-1.5 transition-opacity duration-200",
-										status !== "idle" && "pointer-events-none opacity-50",
-									)}
-								>
-									Cancel
-									<ActionKbd className="lowercase! w-auto min-w-0 px-1">
-										esc
-									</ActionKbd>
-								</Button.Root>
-
-								<FancyButton.Root
-									type="submit"
-									variant={status === "success" ? "success" : "blue"}
-									size="small"
-									disabled={
-										status === "creating" || (status === "idle" && !canSubmit)
-									}
-									className={cn(
-										"min-w-[156px] justify-center overflow-hidden transition-all duration-200",
-										status !== "idle" && "pointer-events-none",
-										status === "creating" && "opacity-90",
-									)}
-								>
-									<AnimatePresence mode="popLayout" initial={false}>
-										<motion.span
-											key={status}
-											transition={{
-												type: "spring",
-												duration: 0.25,
-												bounce: 0,
 											}}
-											initial={{ opacity: 0, y: -14 }}
-											animate={{ opacity: 1, y: 0 }}
-											exit={{ opacity: 0, y: 14 }}
-											className="flex items-center justify-center gap-1.5"
-										>
-											{status === "creating" ? (
-												<>
-													<Spinner size={14} color="currentColor" />
-													<span>Creating...</span>
-												</>
-											) : status === "success" ? (
-												<>
-													<Icon name="check-circle" className="h-4 w-4" />
-													<span>Property created</span>
-												</>
-											) : (
-												<>
-													Add property
-													<ActionKbd className={actionKbdOnBlueClassName}>
-														↵
-													</ActionKbd>
-												</>
-											)}
-										</motion.span>
-									</AnimatePresence>
-								</FancyButton.Root>
+											disabled={status !== "idle"}
+											inputMode={
+												propertyType === "number" ? "numeric" : "text"
+											}
+										/>
+									</Input.Wrapper>
+								</Input.Root>
+								{defaultValueError ? (
+									<p className="text-error-base text-[11px]">
+										{defaultValueError}
+									</p>
+								) : (
+									<p className="text-[11px] text-text-sub-600">
+										Used when a contact doesn&apos;t have this property set
+									</p>
+								)}
 							</div>
-						</form>
+						</div>
 					</div>
-				</motion.div>
+
+					{/* Actions / Footer */}
+					<div className="relative flex items-center justify-between gap-3 px-3 pt-2 pb-3">
+						<Button.Root
+							type="button"
+							variant="neutral"
+							mode="ghost"
+							size="small"
+							onClick={handleClose}
+							className={cn(
+								"gap-1.5 transition-opacity duration-200",
+								status !== "idle" && "pointer-events-none opacity-50",
+							)}
+						>
+							Cancel
+							<ActionKbd className="lowercase! w-auto min-w-0 px-1">
+								esc
+							</ActionKbd>
+						</Button.Root>
+
+						<FancyButton.Root
+							type="submit"
+							variant={status === "success" ? "success" : "blue"}
+							size="small"
+							disabled={
+								status === "creating" || (status === "idle" && !canSubmit)
+							}
+							className={cn(
+								"min-w-[156px] justify-center overflow-hidden transition-all duration-200",
+								status !== "idle" && "pointer-events-none",
+								status === "creating" && "opacity-90",
+							)}
+						>
+							<AnimatePresence mode="popLayout" initial={false}>
+								<motion.span
+									key={status}
+									transition={{
+										type: "spring",
+										duration: 0.25,
+										bounce: 0,
+									}}
+									initial={{ opacity: 0, y: -14 }}
+									animate={{ opacity: 1, y: 0 }}
+									exit={{ opacity: 0, y: 14 }}
+									className="flex items-center justify-center gap-1.5"
+								>
+									{status === "creating" ? (
+										<>
+											<Spinner size={14} color="currentColor" />
+											<span>Creating...</span>
+										</>
+									) : status === "success" ? (
+										<>
+											<Icon name="check-circle" className="h-4 w-4" />
+											<span>Created</span>
+										</>
+									) : (
+										<>
+											{submitLabel}
+											<ActionKbd className={actionKbdOnBlueClassName}>
+												↵
+											</ActionKbd>
+										</>
+									)}
+								</motion.span>
+							</AnimatePresence>
+						</FancyButton.Root>
+					</div>
+				</form>
 			</Modal.Content>
 		</Modal.Root>
 	);

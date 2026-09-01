@@ -1,5 +1,4 @@
 import * as Modal from "@reloop/ui/modal";
-import { motion } from "framer-motion";
 import { EditPropertyForm } from "./edit-property-form";
 
 interface Property {
@@ -18,6 +17,7 @@ interface EditPropertyModalProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 	onEditSuccess?: () => void;
+	title?: string;
 }
 
 export const EditPropertyModal = ({
@@ -25,35 +25,26 @@ export const EditPropertyModal = ({
 	open,
 	onOpenChange,
 	onEditSuccess,
+	title = "Edit property",
 }: EditPropertyModalProps) => {
 	if (!property) return null;
 
 	return (
 		<Modal.Root open={open} onOpenChange={onOpenChange}>
 			<Modal.Content
-				className="overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 sm:max-w-[460px] dark:border-stroke-soft-100/40"
+				className="overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-soft-50 p-0 sm:max-w-[460px] dark:border-stroke-soft-100/40 dark:bg-white/[0.03]"
 				showClose={false}
 			>
-				<motion.div
-					layout
-					transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
-				>
-					<div className="p-6">
-						<Modal.Title className="mb-5 font-semibold text-[26px] text-text-strong-950 tracking-tight">
-							Edit property
-						</Modal.Title>
-
-						<EditPropertyForm
-							property={property}
-							variant="modal"
-							onCancel={() => onOpenChange(false)}
-							onSuccess={() => {
-								onOpenChange(false);
-								onEditSuccess?.();
-							}}
-						/>
-					</div>
-				</motion.div>
+				<EditPropertyForm
+					property={property}
+					variant="modal"
+					title={title}
+					onCancel={() => onOpenChange(false)}
+					onSuccess={() => {
+						onOpenChange(false);
+						onEditSuccess?.();
+					}}
+				/>
 			</Modal.Content>
 		</Modal.Root>
 	);

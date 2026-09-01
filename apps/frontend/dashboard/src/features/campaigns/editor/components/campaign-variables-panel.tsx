@@ -282,11 +282,14 @@ export function CampaignVariablesPanel({
 			<AddPropertyModal
 				open={isCreateModalOpen}
 				onOpenChange={setIsCreateModalOpen}
+				title="Create variable"
+				submitLabel="Create variable"
 			/>
 
 			<EditPropertyModal
 				property={editingProperty}
 				open={!!editingProperty}
+				title="Edit variable"
 				onOpenChange={(isOpen) => {
 					if (!isOpen) setEditingProperty(null);
 				}}
