@@ -247,15 +247,23 @@ export const CampaignAudienceField = () => {
 					"Select the target audience, contact group, or topic to receive this campaign.",
 			}}
 		>
-			<div ref={containerRef} className="relative flex items-center text-label-sm">
+			<div
+				ref={containerRef}
+				onClick={() => setIsMenuOpen((prev) => !prev)}
+				className="relative flex w-full flex-1 cursor-pointer items-center text-label-sm"
+			>
 				{/* Clean Trigger Button without Badge Box Styling */}
 				<button
+					id="campaign-send-details-audience"
 					type="button"
-					onClick={() => setIsMenuOpen((prev) => !prev)}
+					onClick={(e) => {
+						e.stopPropagation();
+						setIsMenuOpen((prev) => !prev);
+					}}
 					aria-haspopup="listbox"
 					aria-expanded={isMenuOpen}
 					aria-controls={listboxId}
-					className="flex items-center gap-1.5 text-label-sm font-medium text-text-strong-950 hover:text-text-sub-600 outline-none"
+					className="flex items-center gap-1.5 text-label-sm font-medium text-text-strong-950 hover:text-text-sub-600 outline-none cursor-pointer"
 				>
 					<span>{displayLabel}</span>
 					<span className="font-normal text-text-soft-400">
@@ -277,11 +285,12 @@ export const CampaignAudienceField = () => {
 						<motion.div
 							id={listboxId}
 							role="listbox"
+							onClick={(e) => e.stopPropagation()}
 							initial={{ opacity: 0, y: -4, scale: 0.98 }}
 							animate={{ opacity: 1, y: 0, scale: 1 }}
 							exit={{ opacity: 0, y: -4, scale: 0.98 }}
 							transition={{ duration: 0.15, ease: "easeOut" }}
-							className="absolute top-full left-0 z-50 mt-2.5 w-full min-w-[320px] max-w-[420px] overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-1 dark:border-stroke-soft-100/40 dark:bg-bg-soft-200"
+							className="absolute top-full left-0 z-50 mt-2.5 w-full min-w-[320px] max-w-[420px] overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-1 dark:border-stroke-soft-100/40 dark:bg-bg-soft-200 cursor-default"
 						>
 							<div className="relative w-full">
 								<AnimatePresence initial={false} custom={direction} mode="popLayout">
