@@ -2,6 +2,7 @@ import * as Badge from "@reloop/ui/badge";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
+import { FieldError, useFieldError } from "@reloop/ui/field-error";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
@@ -51,7 +52,7 @@ export const DeleteTemplateVariableModal = ({
 	const [confirmationText, setConfirmationText] = useState("");
 	const [deleteState, setDeleteState] = useState<DeleteState>("idle");
 	const [nameCopied, setNameCopied] = useState(false);
-	const inputRef = useRef<HTMLInputElement | null>(null);
+	const confirmField = useFieldError();
 
 	// Cache details so they remain stable during exit animations
 	const cachedNameRef = useRef(variableName);
@@ -59,11 +60,6 @@ export const DeleteTemplateVariableModal = ({
 		cachedNameRef.current = variableName;
 	}
 	const displayName = variableName || cachedNameRef.current || "";
-
-	const canDelete =
-		confirmationText.trim() === displayName &&
-		deleteState === "idle" &&
-		!!displayName;
 
 	const handleCopyName = async () => {
 		try {
@@ -76,7 +72,12 @@ export const DeleteTemplateVariableModal = ({
 	};
 
 	const handleDelete = async () => {
-		if (!canDelete) return;
+		if (deleteState !== "idle") return;
+
+		if (confirmationText.trim() !== displayName) {
+			confirmField.show(`Please type "${displayName}" to confirm`);
+			return;
+		}
 
 		try {
 			setDeleteState("deleting");
@@ -88,6 +89,7 @@ export const DeleteTemplateVariableModal = ({
 				setTimeout(() => {
 					setDeleteState("idle");
 					setConfirmationText("");
+					confirmField.clear();
 				}, 300);
 			}, 450);
 		} catch (error) {
@@ -99,12 +101,12 @@ export const DeleteTemplateVariableModal = ({
 		"enter",
 		(e) => {
 			e.preventDefault();
-			if (isOpen && canDelete) {
+			if (isOpen && deleteState === "idle") {
 				void handleDelete();
 			}
 		},
-		{ enableOnFormTags: ["INPUT"], enabled: isOpen && canDelete },
-		[isOpen, canDelete, displayName, deleteState],
+		{ enableOnFormTags: ["INPUT"], enabled: isOpen },
+		[isOpen, confirmationText, displayName, deleteState],
 	);
 
 	useHotkeys(
@@ -123,6 +125,7 @@ export const DeleteTemplateVariableModal = ({
 			const timer = setTimeout(() => {
 				setDeleteState("idle");
 				setConfirmationText("");
+				confirmField.clear();
 			}, 300);
 			return () => clearTimeout(timer);
 		}
@@ -140,7 +143,7 @@ export const DeleteTemplateVariableModal = ({
 				showClose={false}
 				onOpenAutoFocus={(e) => {
 					e.preventDefault();
-					setTimeout(() => inputRef.current?.focus(), 0);
+					setTimeout(() => confirmField.inputRef.current?.focus(), 0);
 				}}
 			>
 				<div className="relative m-0.5 space-y-4 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 pt-5 dark:border-stroke-soft-100/40 dark:bg-[#0c0c0c]">
@@ -240,20 +243,34 @@ export const DeleteTemplateVariableModal = ({
 								</span>
 								<span>to confirm</span>
 							</Label.Root>
-							<Input.Root size="medium" className="rounded-xl">
-								<Input.Wrapper>
-									<Input.Input
-										id="delete-variable-confirmation"
-										ref={inputRef}
-										value={confirmationText}
-										onChange={(e) => setConfirmationText(e.target.value)}
-										placeholder={displayName}
-										autoComplete="off"
-										disabled={deleteState !== "idle"}
-										autoFocus
-									/>
-								</Input.Wrapper>
-							</Input.Root>
+							<FieldError field={confirmField}>
+								<Input.Root
+									size="medium"
+									className="rounded-xl"
+									hasError={confirmField.hasError}
+								>
+									<Input.Wrapper>
+										<Input.Input
+											id="delete-variable-confirmation"
+											{...confirmField.controlProps}
+											value={confirmationText}
+											onChange={(e) => {
+												setConfirmationText(e.target.value);
+												if (
+													confirmField.hasError &&
+													e.target.value.trim() === displayName
+												) {
+													confirmField.clear();
+												}
+											}}
+											placeholder={displayName}
+											autoComplete="off"
+											disabled={deleteState !== "idle"}
+											autoFocus
+										/>
+									</Input.Wrapper>
+								</Input.Root>
+							</FieldError>
 						</div>
 					</div>
 				</div>
@@ -281,7 +298,7 @@ export const DeleteTemplateVariableModal = ({
 						type="button"
 						variant={deleteState === "success" ? "success" : "destructive"}
 						size="small"
-						disabled={!canDelete || deleteState !== "idle"}
+						disabled={deleteState !== "idle"}
 						onClick={() => void handleDelete()}
 						className={cn(
 							"min-w-[110px] justify-center overflow-hidden transition-all duration-200",
