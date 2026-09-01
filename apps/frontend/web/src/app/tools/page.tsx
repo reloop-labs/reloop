@@ -84,6 +84,18 @@ const TOOL_VISUAL_MAP: Record<string, ToolVisualMeta> = {
 			"Visual 4-stage domain warmup timeline",
 		],
 	},
+	"lookalike-watch": {
+		icon: "alert-triangle",
+		badge: "Brand Defense",
+		badgeColor:
+			"bg-rose-500/10 text-rose-700 dark:text-rose-400 border-rose-500/20",
+		glowColor: "group-hover:border-rose-500/40",
+		features: [
+			"Phishing twin & typosquat candidate scan",
+			"Mail-ready capability check (MX & SPF)",
+			"Bypass & simulated From attack vector preview",
+		],
+	},
 	"email-spam-words-checker": {
 		icon: "shield-check",
 		badge: "Deliverability",

@@ -29,6 +29,7 @@ export type ToolDefinition = LandingPageDefinition & {
 		| "spoof-checker"
 		| "who-sends"
 		| "domain-age"
+		| "lookalike-watch"
 		| "email-spam-words-checker"
 		| "blocklist-checker"
 		| "temp-email-checker"

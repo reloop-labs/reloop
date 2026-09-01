@@ -928,6 +928,58 @@ export namespace ToolsModel {
 		warnings: t.Array(t.String()),
 	});
 
+	export const lookalikeWatchBody = t.Object({
+		domain: t.String({
+			minLength: 1,
+			maxLength: 255,
+			description: "The primary domain name or URL to scan for phishing lookalikes.",
+			examples: ["stripe.com", "github.com", "reloop.sh"],
+		}),
+	});
+
+	export const lookalikeWatchQuery = t.Object({
+		domain: t.Optional(t.String({ minLength: 1, maxLength: 255 })),
+	});
+
+	export const lookalikeHit = t.Object({
+		name: t.String(),
+		unicodeName: t.Union([t.String(), t.Null()]),
+		trick: t.Union([
+			t.Literal("tld"),
+			t.Literal("affix"),
+			t.Literal("typo"),
+			t.Literal("homoglyph"),
+		]),
+		registered: t.Boolean(),
+		mailCapable: t.Boolean(),
+		mx: t.Boolean(),
+		spf: t.Boolean(),
+	});
+
+	export const lookalikeNextStep = t.Object({
+		title: t.String(),
+		body: t.String(),
+		href: t.String(),
+	});
+
+	export const lookalikeWatchResponse = t.Object({
+		domain: t.String(),
+		registrableDomain: t.String(),
+		resolvedAt: t.String(),
+		responseTimeMs: t.Number(),
+		verdict: t.Union([
+			t.Literal("mail_twins"),
+			t.Literal("parked_twins"),
+			t.Literal("clear_scan"),
+		]),
+		headline: t.String(),
+		summary: t.String(),
+		disclaimer: t.String(),
+		scanned: t.Number(),
+		hits: t.Array(lookalikeHit),
+		nextStep: lookalikeNextStep,
+	});
+
 	export const errorResponse = t.Object({
 		message: t.String(),
 		why: t.Optional(t.String()),
@@ -957,5 +1009,7 @@ export namespace ToolsModel {
 	export type WhoSendsResponse = typeof whoSendsResponse.static;
 	export type DomainAgeBody = typeof domainAgeBody.static;
 	export type DomainAgeResponse = typeof domainAgeResponse.static;
+	export type LookalikeWatchBody = typeof lookalikeWatchBody.static;
+	export type LookalikeWatchResponse = typeof lookalikeWatchResponse.static;
 }
 
