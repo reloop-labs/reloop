@@ -245,10 +245,13 @@ export const EditTemplateVariableModal = ({
 										className="rounded-xl"
 									>
 										<Input.Wrapper>
+											<Input.InlineAffix className="font-mono text-xs text-text-sub-600 focus:text-text-strong-950!">
+												{"{{{"}
+											</Input.InlineAffix>
 											<Input.Input
 												id="editTemplateVariableName"
 												{...nameField.controlProps}
-												placeholder="first_name"
+												placeholder="variable_name"
 												value={variableName}
 												onChange={handleNameChange}
 												onBlur={handleSlugify}
@@ -256,6 +259,9 @@ export const EditTemplateVariableModal = ({
 												autoComplete="off"
 												spellCheck={false}
 											/>
+											<Input.InlineAffix className="font-mono text-xs text-text-sub-600 focus:text-text-strong-950!">
+												{"}}}"}
+											</Input.InlineAffix>
 										</Input.Wrapper>
 									</Input.Root>
 								</FieldError>

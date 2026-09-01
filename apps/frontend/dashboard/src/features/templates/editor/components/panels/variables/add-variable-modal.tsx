@@ -144,11 +144,7 @@ export const AddTemplateVariableModal = ({
 		nameField.clear();
 		setStatus("creating");
 		try {
-			await onAdd(
-				trimmed,
-				variableType,
-				defaultValue.trim() || null,
-			);
+			await onAdd(trimmed, variableType, defaultValue.trim() || null);
 			setStatus("success");
 			setTimeout(() => {
 				setVariableName("");
@@ -221,7 +217,7 @@ export const AddTemplateVariableModal = ({
 						</div>
 
 						{/* Form Content */}
-						<div className="space-y-4.5 px-6 pb-6">
+						<div className="space-y-6 px-6 pb-6">
 							{/* Variable Name */}
 							<div className="space-y-1.5">
 								<Label.Root
@@ -241,10 +237,13 @@ export const AddTemplateVariableModal = ({
 										className="rounded-xl"
 									>
 										<Input.Wrapper>
+											<Input.InlineAffix className="font-mono text-text-sub-600 text-xs focus:text-text-strong-950!">
+												{"{{{"}
+											</Input.InlineAffix>
 											<Input.Input
 												id="templateVariableName"
 												{...nameField.controlProps}
-												placeholder="first_name"
+												placeholder="variable_name"
 												value={variableName}
 												onChange={handleNameChange}
 												onBlur={handleSlugify}
@@ -253,6 +252,9 @@ export const AddTemplateVariableModal = ({
 												spellCheck={false}
 												autoFocus
 											/>
+											<Input.InlineAffix className="font-mono text-text-sub-600 text-xs focus:text-text-strong-950!">
+												{"}}}"}
+											</Input.InlineAffix>
 										</Input.Wrapper>
 									</Input.Root>
 								</FieldError>
@@ -260,10 +262,6 @@ export const AddTemplateVariableModal = ({
 
 							{/* Property Type Selector */}
 							<div className="space-y-1.5">
-								<Label.Root className="font-medium text-text-strong-950 text-xs dark:text-white">
-									Type
-									<Label.Asterisk />
-								</Label.Root>
 								<div className="grid grid-cols-2 gap-2.5">
 									{TYPE_OPTIONS.map((opt) => {
 										const isSelected = variableType === opt.value;
@@ -276,7 +274,7 @@ export const AddTemplateVariableModal = ({
 												className={cn(
 													"group relative flex flex-col items-start gap-1 rounded-xl border p-3 text-left transition-all duration-150 active:scale-[0.98]",
 													isSelected
-														? "border-primary-base shadow-[0_0_0_1px_#0055FF] bg-bg-white-0 dark:border-primary-base dark:shadow-[0_0_0_1px_#0055FF] dark:bg-white/[0.04]"
+														? "border-primary-base bg-bg-white-0 shadow-[0_0_0_1px_#0055FF] dark:border-primary-base dark:bg-white/[0.04] dark:shadow-[0_0_0_1px_#0055FF]"
 														: "border-stroke-soft-200 bg-bg-white-0 hover:border-stroke-sub-300 hover:bg-bg-weak-50/50 dark:border-stroke-soft-100/40 dark:bg-bg-soft-200/10 dark:hover:bg-white/[0.02]",
 												)}
 											>
