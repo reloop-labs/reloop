@@ -197,12 +197,18 @@ export const AddTemplateVariableModal = ({
 				showClose={false}
 			>
 				<form onSubmit={handleSubmit} noValidate>
-					<div className="relative m-0.5 space-y-4 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 pt-5 dark:border-stroke-soft-100/40 dark:bg-[#0c0c0c]">
+					<div className="relative m-0.5 space-y-5 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 pt-5 dark:border-stroke-soft-100/40 dark:bg-[#0c0c0c]">
 						{/* Header */}
-						<div className="flex items-start justify-between px-6 dark:border-stroke-soft-100/40">
-							<Modal.Title className="font-medium text-text-strong-950 text-xl tracking-tight dark:text-white">
-								{title}
-							</Modal.Title>
+						<div className="flex items-center justify-between px-6 dark:border-stroke-soft-100/40">
+							<div className="flex items-center gap-2">
+								<Icon
+									name="variable"
+									className="size-4.5 text-text-strong-950 dark:text-white"
+								/>
+								<Modal.Title className="font-medium text-text-strong-950 text-xl tracking-tight dark:text-white">
+									{title}
+								</Modal.Title>
+							</div>
 							<button
 								type="button"
 								onClick={handleClose}
@@ -215,7 +221,7 @@ export const AddTemplateVariableModal = ({
 						</div>
 
 						{/* Form Content */}
-						<div className="space-y-4 px-6 pb-6">
+						<div className="space-y-4.5 px-6 pb-6">
 							{/* Variable Name */}
 							<div className="space-y-1.5">
 								<Label.Root
@@ -253,40 +259,46 @@ export const AddTemplateVariableModal = ({
 							</div>
 
 							{/* Property Type Selector */}
-							<div className="grid grid-cols-2 gap-2.5">
-								{TYPE_OPTIONS.map((opt) => {
-									const isSelected = variableType === opt.value;
-									return (
-										<button
-											key={opt.value}
-											type="button"
-											onClick={() => setVariableType(opt.value)}
-											disabled={status !== "idle"}
-											className={cn(
-												"group relative flex flex-col items-start gap-1 rounded-xl border p-3 text-left transition-all duration-150 active:scale-[0.98]",
-												isSelected
-													? "border-primary-base shadow-[0_0_0_1px_#0055FF] bg-bg-white-0 dark:border-primary-base dark:shadow-[0_0_0_1px_#0055FF] dark:bg-white/[0.04]"
-													: "border-stroke-soft-200 bg-bg-white-0 hover:border-stroke-sub-300 hover:bg-bg-weak-50/50 dark:border-stroke-soft-100/40 dark:bg-bg-soft-200/10 dark:hover:bg-white/[0.02]",
-											)}
-										>
-											<div className="flex w-full items-center justify-between">
-												<p className="font-medium text-text-strong-950 text-xs dark:text-white">
-													{opt.label}
-												</p>
-												{isSelected ? (
-													<div className="flex size-4.5 items-center justify-center rounded-full bg-primary-base">
-														<div className="size-1.5 rounded-full bg-white" />
-													</div>
-												) : (
-													<div className="size-4.5 rounded-full border-2 border-stroke-soft-200 transition-colors group-hover:border-stroke-sub-300 dark:border-stroke-soft-100/60" />
+							<div className="space-y-1.5">
+								<Label.Root className="font-medium text-text-strong-950 text-xs dark:text-white">
+									Type
+									<Label.Asterisk />
+								</Label.Root>
+								<div className="grid grid-cols-2 gap-2.5">
+									{TYPE_OPTIONS.map((opt) => {
+										const isSelected = variableType === opt.value;
+										return (
+											<button
+												key={opt.value}
+												type="button"
+												onClick={() => setVariableType(opt.value)}
+												disabled={status !== "idle"}
+												className={cn(
+													"group relative flex flex-col items-start gap-1 rounded-xl border p-3 text-left transition-all duration-150 active:scale-[0.98]",
+													isSelected
+														? "border-primary-base shadow-[0_0_0_1px_#0055FF] bg-bg-white-0 dark:border-primary-base dark:shadow-[0_0_0_1px_#0055FF] dark:bg-white/[0.04]"
+														: "border-stroke-soft-200 bg-bg-white-0 hover:border-stroke-sub-300 hover:bg-bg-weak-50/50 dark:border-stroke-soft-100/40 dark:bg-bg-soft-200/10 dark:hover:bg-white/[0.02]",
 												)}
-											</div>
-											<p className="text-[11px] text-text-sub-600 leading-snug dark:text-white/60">
-												{opt.description}
-											</p>
-										</button>
-									);
-								})}
+											>
+												<div className="flex w-full items-center justify-between">
+													<p className="font-medium text-text-strong-950 text-xs dark:text-white">
+														{opt.label}
+													</p>
+													{isSelected ? (
+														<div className="flex size-4.5 items-center justify-center rounded-full bg-primary-base">
+															<div className="size-1.5 rounded-full bg-white" />
+														</div>
+													) : (
+														<div className="size-4.5 rounded-full border-2 border-stroke-soft-200 transition-colors group-hover:border-stroke-sub-300 dark:border-stroke-soft-100/60" />
+													)}
+												</div>
+												<p className="text-[11px] text-text-sub-600 leading-snug dark:text-white/60">
+													{opt.description}
+												</p>
+											</button>
+										);
+									})}
+								</div>
 							</div>
 
 							{/* Default Value */}
