@@ -90,17 +90,19 @@ Prefer `.md` twins. Reloop Free is **3,000 / month and 200 / day** — do not ci
 
 ## Free Developer & Email Tools
 
+- [DNS Lookup & Health SuperTool](https://reloop.sh/tools/dns-lookup): Comprehensive DNS record resolver with automatic provider detection and deliverability health checks.
+- [Can Anyone Spoof My Domain?](https://reloop.sh/tools/spoof-checker): Instant plain-English verdict on domain impersonation and DMARC enforcement.
+- [Who Sends Email From This Domain?](https://reloop.sh/tools/who-sends): Identify every ESP authorized to send email for a domain, with mailbox vs. sender separation.
 - [Email Spam Words Checker](https://reloop.sh/tools/email-spam-words-checker): Real-time spam trigger word scanner, subject line grading, and deliverability score calculator.
+- [Email Blocklist Checker](https://reloop.sh/tools/blocklist-checker): Multi-RBL and URIBL IP/domain reputation audit across major real-time blocklists.
 - [Temp & Disposable Email Checker](https://reloop.sh/tools/temp-email-checker): Detect burner and temporary mailbox provider domains before they damage sender reputation.
-- [DNS Authentication Checker](https://reloop.sh/tools/auth-checker): Verify SPF, DKIM, and DMARC DNS records.
+- [Email Address Validator](https://reloop.sh/tools/email-validator): RFC syntax, MX routing, disposable, and mailbox reachability verification.
+- [DNS Authentication Checker](https://reloop.sh/tools/auth-checker): Verify SPF, DKIM, and DMARC DNS records with actionable fix guides.
 - [BIMI Checker](https://reloop.sh/tools/bimi-checker): Look up default._bimi, validate the SVG logo URL, and confirm DMARC is at enforcement.
 - [SPF Record Generator](https://reloop.sh/tools/spf-generator): Build a v=spf1 TXT record with lookup-limit warnings.
 - [DKIM Record Generator](https://reloop.sh/tools/dkim-generator): Generate a 2048-bit DKIM key pair. Private key is returned once and not stored.
 - [DMARC Record Generator](https://reloop.sh/tools/dmarc-generator): Build a _dmarc TXT record from policy, rua/ruf, alignment, and pct.
-- [Email Deliverability Tester](https://reloop.sh/tools/deliverability-tester): Pre-send inbox placement and SpamAssassin heuristic test.
-- [Email Template Generator](https://reloop.sh/tools/template-generator): Responsive table-based transactional HTML generator.
-- [Subject Line Tester](https://reloop.sh/tools/subject-tester): Subject line length and urgency optimizer.
-- [Mobile Email Preview](https://reloop.sh/tools/mobile-preview): Mobile client rendering previewer.
+- [Email Deliverability Tester](https://reloop.sh/tools/deliverability-tester): Pre-send inbox placement and Rspamd/SpamAssassin heuristic test.
 
 ## Product documentation (HTML + .md under /docs)
 

@@ -421,6 +421,565 @@ export namespace ToolsModel {
 		error: t.Union([t.String(), t.Null()]),
 	});
 
+	export const dnsLookupBody = t.Object({
+		domain: t.String({
+			minLength: 1,
+			maxLength: 255,
+			description:
+				"Domain name, hostname, IP address, or query with prefix (e.g. ohraya.com, a:ohraya.com, mx:ohraya.com).",
+			examples: ["ohraya.com", "a:ohraya.com", "mx:google.com", "txt:_dmarc.apple.com"],
+		}),
+		recordType: t.Optional(
+			t.Union([
+				t.Literal("ANY"),
+				t.Literal("A"),
+				t.Literal("AAAA"),
+				t.Literal("MX"),
+				t.Literal("TXT"),
+				t.Literal("CNAME"),
+				t.Literal("NS"),
+				t.Literal("SOA"),
+				t.Literal("CAA"),
+				t.Literal("PTR"),
+				t.Literal("SRV"),
+			]),
+		),
+	});
+
+	export const dnsLookupQuery = t.Object({
+		domain: t.String({
+			minLength: 1,
+			maxLength: 255,
+			description: "Domain name, hostname, IP address, or query with prefix.",
+		}),
+		recordType: t.Optional(
+			t.Union([
+				t.Literal("ANY"),
+				t.Literal("A"),
+				t.Literal("AAAA"),
+				t.Literal("MX"),
+				t.Literal("TXT"),
+				t.Literal("CNAME"),
+				t.Literal("NS"),
+				t.Literal("SOA"),
+				t.Literal("CAA"),
+				t.Literal("PTR"),
+				t.Literal("SRV"),
+			]),
+		),
+	});
+
+	export const dnsLookupRecord = t.Object({
+		type: t.String(),
+		name: t.String(),
+		value: t.String(),
+		ttl: t.Union([t.Number(), t.Null()]),
+		priority: t.Optional(t.Number()),
+		details: t.Optional(t.Record(t.String(), t.Any())),
+	});
+
+	export const dnsLookupDiagnostic = t.Object({
+		id: t.String(),
+		name: t.String(),
+		category: t.Union([
+			t.Literal("dns"),
+			t.Literal("email_auth"),
+			t.Literal("security"),
+			t.Literal("web"),
+		]),
+		status: t.Union([
+			t.Literal("pass"),
+			t.Literal("warn"),
+			t.Literal("fail"),
+			t.Literal("info"),
+		]),
+		message: t.String(),
+		details: t.Optional(t.String()),
+	});
+
+	export const dnsLookupProvider = t.Object({
+		id: t.String(),
+		name: t.String(),
+		website: t.String(),
+		category: t.Union([
+			t.Literal("managed_dns"),
+			t.Literal("cloud"),
+			t.Literal("registrar"),
+			t.Literal("cdn"),
+			t.Literal("hosting"),
+		]),
+		description: t.String(),
+	});
+
+	export const dnsLookupResponse = t.Object({
+		query: t.String(),
+		domain: t.String(),
+		recordType: t.String(),
+		resolvedAt: t.String(),
+		responseTimeMs: t.Number(),
+		nameserver: t.Union([t.String(), t.Null()]),
+		provider: t.Union([dnsLookupProvider, t.Null()]),
+		records: t.Array(dnsLookupRecord),
+		diagnostics: t.Array(dnsLookupDiagnostic),
+		summary: t.Object({
+			totalRecords: t.Number(),
+			hasA: t.Boolean(),
+			hasAaaa: t.Boolean(),
+			hasMx: t.Boolean(),
+			hasTxt: t.Boolean(),
+			hasCname: t.Boolean(),
+			hasNs: t.Boolean(),
+			hasSoa: t.Boolean(),
+			hasDmarc: t.Boolean(),
+			hasSpf: t.Boolean(),
+			dmarcPolicy: t.Union([t.String(), t.Null()]),
+			spfRecord: t.Union([t.String(), t.Null()]),
+		}),
+	});
+
+	export const authCheckerBody = t.Object({
+		domain: t.String({
+			minLength: 1,
+			maxLength: 255,
+			description: "The sending domain name to check email authentication for.",
+			examples: ["stripe.com", "google.com"],
+		}),
+		selector: t.Optional(
+			t.String({
+				maxLength: 100,
+				description: "Optional DKIM selector (e.g. s1, google, default, k1).",
+				examples: ["s1", "google", "default"],
+			}),
+		),
+	});
+
+	export const authCheckerQuery = t.Object({
+		domain: t.Optional(t.String({ minLength: 1, maxLength: 255 })),
+		selector: t.Optional(t.String({ maxLength: 100 })),
+	});
+
+	export const authSpfDetails = t.Object({
+		status: t.Union([
+			t.Literal("pass"),
+			t.Literal("warn"),
+			t.Literal("fail"),
+			t.Literal("info"),
+		]),
+		published: t.Boolean(),
+		rawRecord: t.Union([t.String(), t.Null()]),
+		qualifier: t.Union([t.String(), t.Null()]),
+		lookupCount: t.Number(),
+		mechanisms: t.Array(t.String()),
+		includes: t.Array(t.String()),
+		ip4: t.Array(t.String()),
+		ip6: t.Array(t.String()),
+		warnings: t.Array(t.String()),
+	});
+
+	export const authDkimDetails = t.Object({
+		status: t.Union([
+			t.Literal("pass"),
+			t.Literal("warn"),
+			t.Literal("fail"),
+			t.Literal("info"),
+		]),
+		published: t.Boolean(),
+		selector: t.Union([t.String(), t.Null()]),
+		rawRecord: t.Union([t.String(), t.Null()]),
+		publicKey: t.Union([t.String(), t.Null()]),
+		keyLength: t.Union([t.Number(), t.Null()]),
+		algorithm: t.Union([t.String(), t.Null()]),
+		testedSelectors: t.Array(t.String()),
+		warnings: t.Array(t.String()),
+	});
+
+	export const authDmarcDetails = t.Object({
+		status: t.Union([
+			t.Literal("pass"),
+			t.Literal("warn"),
+			t.Literal("fail"),
+			t.Literal("info"),
+		]),
+		published: t.Boolean(),
+		rawRecord: t.Union([t.String(), t.Null()]),
+		policy: t.Union([t.String(), t.Null()]),
+		subdomainPolicy: t.Union([t.String(), t.Null()]),
+		percentage: t.Union([t.Number(), t.Null()]),
+		rua: t.Array(t.String()),
+		ruf: t.Array(t.String()),
+		dkimAlignment: t.Union([t.String(), t.Null()]),
+		spfAlignment: t.Union([t.String(), t.Null()]),
+		warnings: t.Array(t.String()),
+	});
+
+	export const authMxRecord = t.Object({
+		exchange: t.String(),
+		priority: t.Number(),
+	});
+
+	export const authMxDetails = t.Object({
+		status: t.Union([
+			t.Literal("pass"),
+			t.Literal("warn"),
+			t.Literal("fail"),
+			t.Literal("info"),
+		]),
+		published: t.Boolean(),
+		provider: t.Union([t.String(), t.Null()]),
+		records: t.Array(authMxRecord),
+		warnings: t.Array(t.String()),
+	});
+
+	export const authBimiDetails = t.Object({
+		status: t.Union([
+			t.Literal("pass"),
+			t.Literal("warn"),
+			t.Literal("fail"),
+			t.Literal("info"),
+		]),
+		published: t.Boolean(),
+		rawRecord: t.Union([t.String(), t.Null()]),
+		svgUrl: t.Union([t.String(), t.Null()]),
+		vmcUrl: t.Union([t.String(), t.Null()]),
+	});
+
+	export const authMtaStsDetails = t.Object({
+		status: t.Union([
+			t.Literal("pass"),
+			t.Literal("warn"),
+			t.Literal("fail"),
+			t.Literal("info"),
+		]),
+		published: t.Boolean(),
+		rawRecord: t.Union([t.String(), t.Null()]),
+		mode: t.Union([t.String(), t.Null()]),
+	});
+
+	export const authDiagnostic = t.Object({
+		id: t.String(),
+		name: t.String(),
+		category: t.Union([
+			t.Literal("spf"),
+			t.Literal("dkim"),
+			t.Literal("dmarc"),
+			t.Literal("mx"),
+			t.Literal("security"),
+		]),
+		status: t.Union([
+			t.Literal("pass"),
+			t.Literal("warn"),
+			t.Literal("fail"),
+			t.Literal("info"),
+		]),
+		message: t.String(),
+		details: t.Optional(t.String()),
+	});
+
+	export const authCheckerResponse = t.Object({
+		domain: t.String(),
+		resolvedAt: t.String(),
+		responseTimeMs: t.Number(),
+		score: t.Number(),
+		grade: t.String(),
+		verdict: t.Union([
+			t.Literal("fully_aligned"),
+			t.Literal("partially_aligned"),
+			t.Literal("misconfigured"),
+			t.Literal("vulnerable"),
+		]),
+		verdictLabel: t.String(),
+		spf: authSpfDetails,
+		dkim: authDkimDetails,
+		dmarc: authDmarcDetails,
+		mx: authMxDetails,
+		bimi: authBimiDetails,
+		mtaSts: authMtaStsDetails,
+		diagnostics: t.Array(authDiagnostic),
+	});
+
+	export const spoofCheckerBody = t.Object({
+		domain: t.String({
+			minLength: 1,
+			maxLength: 255,
+			description: "The sending domain name or URL to check spoofability for.",
+			examples: ["stripe.com", "github.com", "acme.com"],
+		}),
+	});
+
+	export const spoofCheckerQuery = t.Object({
+		domain: t.Optional(t.String({ minLength: 1, maxLength: 255 })),
+	});
+
+	export const spoofReason = t.Object({
+		id: t.String(),
+		severity: t.Union([
+			t.Literal("critical"),
+			t.Literal("warning"),
+			t.Literal("info"),
+			t.Literal("success"),
+		]),
+		title: t.String(),
+		detail: t.String(),
+	});
+
+	export const spoofNextStep = t.Object({
+		title: t.String(),
+		body: t.String(),
+		href: t.String(),
+	});
+
+	export const spoofCheckerResponse = t.Object({
+		domain: t.String(),
+		resolvedAt: t.String(),
+		responseTimeMs: t.Number(),
+		spoofable: t.Boolean(),
+		verdict: t.Union([
+			t.Literal("spoofable"),
+			t.Literal("partially_protected"),
+			t.Literal("protected"),
+		]),
+		headline: t.String(),
+		summary: t.String(),
+		inboxOutcome: t.Union([
+			t.Literal("delivered"),
+			t.Literal("spam"),
+			t.Literal("rejected"),
+		]),
+		dmarc: t.Object({
+			published: t.Boolean(),
+			policy: t.Union([t.String(), t.Null()]),
+			subdomainPolicy: t.Union([t.String(), t.Null()]),
+			percentage: t.Union([t.Number(), t.Null()]),
+			rawRecord: t.Union([t.String(), t.Null()]),
+		}),
+		spf: t.Object({
+			published: t.Boolean(),
+			qualifier: t.Union([t.String(), t.Null()]),
+			lookupCount: t.Number(),
+			rawRecord: t.Union([t.String(), t.Null()]),
+		}),
+		dkim: t.Object({
+			published: t.Boolean(),
+			selector: t.Union([t.String(), t.Null()]),
+			keyLength: t.Union([t.Number(), t.Null()]),
+		}),
+		mx: t.Object({
+			published: t.Boolean(),
+			provider: t.Union([t.String(), t.Null()]),
+		}),
+		reasons: t.Array(spoofReason),
+		nextStep: spoofNextStep,
+		subdomainNote: t.Optional(t.Union([t.String(), t.Null()])),
+	});
+
+	export const whoSendsBody = t.Object({
+		domain: t.String({
+			minLength: 1,
+			maxLength: 255,
+			description: "The sending domain name or URL to analyze sender permissions for.",
+			examples: ["stripe.com", "github.com", "reloop.sh"],
+		}),
+	});
+
+	export const whoSendsQuery = t.Object({
+		domain: t.Optional(t.String({ minLength: 1, maxLength: 255 })),
+	});
+
+	export const senderEvidence = t.Object({
+		type: t.Union([
+			t.Literal("spf_include"),
+			t.Literal("nested_spf_include"),
+			t.Literal("dkim_selector"),
+			t.Literal("mx_host"),
+			t.Literal("ip4"),
+			t.Literal("ip6"),
+		]),
+		value: t.String(),
+	});
+
+	export const senderItem = t.Object({
+		vendor: t.String(),
+		role: t.Union([
+			t.Literal("inbox_and_send"),
+			t.Literal("inbox_only"),
+			t.Literal("send"),
+			t.Literal("dkim_only"),
+		]),
+		confidence: t.Union([
+			t.Literal("high"),
+			t.Literal("medium"),
+			t.Literal("low"),
+		]),
+		leftover: t.Boolean(),
+		evidence: t.Array(senderEvidence),
+	});
+
+	export const inboxInfo = t.Object({
+		provider: t.Union([t.String(), t.Null()]),
+		exchanges: t.Array(t.String()),
+	});
+
+	export const unnamedSenders = t.Object({
+		ip4: t.Array(t.String()),
+		ip6: t.Array(t.String()),
+		includes: t.Array(t.String()),
+	});
+
+	export const whoSendsNextStep = t.Object({
+		title: t.String(),
+		body: t.String(),
+		href: t.String(),
+	});
+
+	export const whoSendsResponse = t.Object({
+		domain: t.String(),
+		resolvedAt: t.String(),
+		responseTimeMs: t.Number(),
+		verdict: t.Union([
+			t.Literal("single_stack"),
+			t.Literal("split_stack"),
+			t.Literal("crowded"),
+			t.Literal("send_only"),
+			t.Literal("opaque"),
+			t.Literal("unpublished"),
+			t.Literal("wide_open"),
+		]),
+		headline: t.String(),
+		summary: t.String(),
+		disclaimer: t.String(),
+		inbox: inboxInfo,
+		senders: t.Array(senderItem),
+		unnamed: unnamedSenders,
+		spf: t.Object({
+			published: t.Boolean(),
+			qualifier: t.Union([t.String(), t.Null()]),
+			lookupCount: t.Number(),
+			rawRecord: t.Union([t.String(), t.Null()]),
+		}),
+		nextStep: whoSendsNextStep,
+		subdomainNote: t.Optional(t.Union([t.String(), t.Null()])),
+	});
+
+	export const domainAgeBody = t.Object({
+		domain: t.String({
+			minLength: 1,
+			maxLength: 255,
+			description: "The domain name or URL to check registration age and email readiness for.",
+			examples: ["google.com", "github.com", "reloop.sh"],
+		}),
+	});
+
+	export const domainAgeQuery = t.Object({
+		domain: t.Optional(t.String({ minLength: 1, maxLength: 255 })),
+	});
+
+	export const domainAgeNextStep = t.Object({
+		title: t.String(),
+		body: t.String(),
+		href: t.String(),
+	});
+
+	export const domainAgeResponse = t.Object({
+		domain: t.String(),
+		registrableDomain: t.String(),
+		resolvedAt: t.String(),
+		responseTimeMs: t.Number(),
+		verdict: t.Union([
+			t.Literal("too_new"),
+			t.Literal("cold"),
+			t.Literal("warming"),
+			t.Literal("established"),
+			t.Literal("mature"),
+			t.Literal("unknown_age"),
+			t.Literal("not_registered"),
+			t.Literal("held"),
+		]),
+		headline: t.String(),
+		summary: t.String(),
+		disclaimer: t.String(),
+		age: t.Object({
+			createdAt: t.Union([t.String(), t.Null()]),
+			ageDays: t.Union([t.Number(), t.Null()]),
+			expiresAt: t.Union([t.String(), t.Null()]),
+			source: t.Union([t.Literal("rdap"), t.Literal("none")]),
+		}),
+		registry: t.Object({
+			registrar: t.Union([t.String(), t.Null()]),
+			status: t.Array(t.String()),
+			tld: t.Union([t.String(), t.Null()]),
+		}),
+		nameservers: t.Object({
+			hosts: t.Array(t.String()),
+			provider: t.Union([t.String(), t.Null()]),
+			kind: t.Union([
+				t.Literal("production"),
+				t.Literal("registrar_default"),
+				t.Literal("parking"),
+				t.Literal("unknown"),
+			]),
+		}),
+		emailSetup: t.Object({
+			spf: t.Boolean(),
+			dmarc: t.Boolean(),
+			dmarcPolicy: t.Union([t.String(), t.Null()]),
+			mx: t.Boolean(),
+		}),
+		nextStep: domainAgeNextStep,
+		warnings: t.Array(t.String()),
+	});
+
+	export const lookalikeWatchBody = t.Object({
+		domain: t.String({
+			minLength: 1,
+			maxLength: 255,
+			description: "The primary domain name or URL to scan for phishing lookalikes.",
+			examples: ["stripe.com", "github.com", "reloop.sh"],
+		}),
+	});
+
+	export const lookalikeWatchQuery = t.Object({
+		domain: t.Optional(t.String({ minLength: 1, maxLength: 255 })),
+	});
+
+	export const lookalikeHit = t.Object({
+		name: t.String(),
+		unicodeName: t.Union([t.String(), t.Null()]),
+		trick: t.Union([
+			t.Literal("tld"),
+			t.Literal("affix"),
+			t.Literal("typo"),
+			t.Literal("homoglyph"),
+		]),
+		registered: t.Boolean(),
+		mailCapable: t.Boolean(),
+		mx: t.Boolean(),
+		spf: t.Boolean(),
+	});
+
+	export const lookalikeNextStep = t.Object({
+		title: t.String(),
+		body: t.String(),
+		href: t.String(),
+	});
+
+	export const lookalikeWatchResponse = t.Object({
+		domain: t.String(),
+		registrableDomain: t.String(),
+		resolvedAt: t.String(),
+		responseTimeMs: t.Number(),
+		verdict: t.Union([
+			t.Literal("mail_twins"),
+			t.Literal("parked_twins"),
+			t.Literal("clear_scan"),
+		]),
+		headline: t.String(),
+		summary: t.String(),
+		disclaimer: t.String(),
+		scanned: t.Number(),
+		hits: t.Array(lookalikeHit),
+		nextStep: lookalikeNextStep,
+	});
+
 	const checkStatus = t.Union([
 		t.Literal("pass"),
 		t.Literal("warn"),
@@ -591,123 +1150,6 @@ export namespace ToolsModel {
 		warnings: t.Array(recordWarning),
 	});
 
-
-	export const dnsLookupBody = t.Object({
-		domain: t.String({
-			minLength: 1,
-			maxLength: 255,
-			description:
-				"Domain name, hostname, IP address, or query with prefix (e.g. ohraya.com, a:ohraya.com, mx:ohraya.com).",
-			examples: ["ohraya.com", "a:ohraya.com", "mx:google.com", "txt:_dmarc.apple.com"],
-		}),
-		recordType: t.Optional(
-			t.Union([
-				t.Literal("ANY"),
-				t.Literal("A"),
-				t.Literal("AAAA"),
-				t.Literal("MX"),
-				t.Literal("TXT"),
-				t.Literal("CNAME"),
-				t.Literal("NS"),
-				t.Literal("SOA"),
-				t.Literal("CAA"),
-				t.Literal("PTR"),
-				t.Literal("SRV"),
-			]),
-		),
-	});
-
-	export const dnsLookupQuery = t.Object({
-		domain: t.String({
-			minLength: 1,
-			maxLength: 255,
-			description: "Domain name, hostname, IP address, or query with prefix.",
-		}),
-		recordType: t.Optional(
-			t.Union([
-				t.Literal("ANY"),
-				t.Literal("A"),
-				t.Literal("AAAA"),
-				t.Literal("MX"),
-				t.Literal("TXT"),
-				t.Literal("CNAME"),
-				t.Literal("NS"),
-				t.Literal("SOA"),
-				t.Literal("CAA"),
-				t.Literal("PTR"),
-				t.Literal("SRV"),
-			]),
-		),
-	});
-
-	export const dnsLookupRecord = t.Object({
-		type: t.String(),
-		name: t.String(),
-		value: t.String(),
-		ttl: t.Union([t.Number(), t.Null()]),
-		priority: t.Optional(t.Number()),
-		details: t.Optional(t.Record(t.String(), t.Any())),
-	});
-
-	export const dnsLookupDiagnostic = t.Object({
-		id: t.String(),
-		name: t.String(),
-		category: t.Union([
-			t.Literal("dns"),
-			t.Literal("email_auth"),
-			t.Literal("security"),
-			t.Literal("web"),
-		]),
-		status: t.Union([
-			t.Literal("pass"),
-			t.Literal("warn"),
-			t.Literal("fail"),
-			t.Literal("info"),
-		]),
-		message: t.String(),
-		details: t.Optional(t.String()),
-	});
-
-	export const dnsLookupProvider = t.Object({
-		id: t.String(),
-		name: t.String(),
-		website: t.String(),
-		category: t.Union([
-			t.Literal("managed_dns"),
-			t.Literal("cloud"),
-			t.Literal("registrar"),
-			t.Literal("cdn"),
-			t.Literal("hosting"),
-		]),
-		description: t.String(),
-	});
-
-	export const dnsLookupResponse = t.Object({
-		query: t.String(),
-		domain: t.String(),
-		recordType: t.String(),
-		resolvedAt: t.String(),
-		responseTimeMs: t.Number(),
-		nameserver: t.Union([t.String(), t.Null()]),
-		provider: t.Union([dnsLookupProvider, t.Null()]),
-		records: t.Array(dnsLookupRecord),
-		diagnostics: t.Array(dnsLookupDiagnostic),
-		summary: t.Object({
-			totalRecords: t.Number(),
-			hasA: t.Boolean(),
-			hasAaaa: t.Boolean(),
-			hasMx: t.Boolean(),
-			hasTxt: t.Boolean(),
-			hasCname: t.Boolean(),
-			hasNs: t.Boolean(),
-			hasSoa: t.Boolean(),
-			hasDmarc: t.Boolean(),
-			hasSpf: t.Boolean(),
-			dmarcPolicy: t.Union([t.String(), t.Null()]),
-			spfRecord: t.Union([t.String(), t.Null()]),
-		}),
-	});
-
 	export const errorResponse = t.Object({
 		message: t.String(),
 		why: t.Optional(t.String()),
@@ -729,6 +1171,16 @@ export namespace ToolsModel {
 	export type BlocklistCheckResponse = typeof blocklistCheckResponse.static;
 	export type DnsLookupBody = typeof dnsLookupBody.static;
 	export type DnsLookupResponse = typeof dnsLookupResponse.static;
+	export type AuthCheckerBody = typeof authCheckerBody.static;
+	export type AuthCheckerResponse = typeof authCheckerResponse.static;
+	export type SpoofCheckerBody = typeof spoofCheckerBody.static;
+	export type SpoofCheckerResponse = typeof spoofCheckerResponse.static;
+	export type WhoSendsBody = typeof whoSendsBody.static;
+	export type WhoSendsResponse = typeof whoSendsResponse.static;
+	export type DomainAgeBody = typeof domainAgeBody.static;
+	export type DomainAgeResponse = typeof domainAgeResponse.static;
+	export type LookalikeWatchBody = typeof lookalikeWatchBody.static;
+	export type LookalikeWatchResponse = typeof lookalikeWatchResponse.static;
 	export type BimiCheckResponse = typeof bimiCheckResponse.static;
 	export type SpfGenerateBody = typeof spfGenerateBody.static;
 	export type SpfGenerateResponse = typeof spfGenerateResponse.static;
@@ -737,3 +1189,4 @@ export namespace ToolsModel {
 	export type DmarcGenerateBody = typeof dmarcGenerateBody.static;
 	export type DmarcGenerateResponse = typeof dmarcGenerateResponse.static;
 }
+

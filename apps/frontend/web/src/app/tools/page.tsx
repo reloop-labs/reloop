@@ -12,16 +12,12 @@ export const instant = false;
 
 export const metadata = createLandingMetadata(
 	"Free Email & Developer Tools",
-	"Zero-setup online utilities to validate email addresses, analyze deliverability, check BIMI, generate SPF/DKIM/DMARC records, test subject lines, and preview mobile rendering.",
+	"Zero-setup online utilities to validate email addresses, analyze deliverability, test subject lines, check SPF/DKIM/DMARC DNS records, generate responsive templates, and preview mobile rendering.",
 	"/tools",
 	[
 		"free email tools",
 		"email validator",
 		"deliverability tester",
-		"BIMI checker",
-		"SPF generator",
-		"DKIM generator",
-		"DMARC generator",
 		"SPF checker",
 		"DKIM checker",
 		"DMARC lookup",
@@ -50,6 +46,54 @@ const TOOL_VISUAL_MAP: Record<string, ToolVisualMeta> = {
 			"A, AAAA, MX, TXT, CNAME, NS, SOA, CAA, PTR",
 			"Automatic DNS hosting provider detection",
 			"SPF and DMARC deliverability health audit",
+		],
+	},
+	"spoof-checker": {
+		icon: "shield-check",
+		badge: "Security",
+		badgeColor:
+			"bg-rose-500/10 text-rose-700 dark:text-rose-400 border-rose-500/20",
+		glowColor: "group-hover:border-rose-500/40",
+		features: [
+			"Instant Yes / Sometimes / No spoof verdict",
+			"Simulated Gmail & Outlook CEO fraud mock",
+			"DMARC p=none & SPF loophole detection",
+		],
+	},
+	"who-sends": {
+		icon: "server",
+		badge: "Infrastructure",
+		badgeColor:
+			"bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/20",
+		glowColor: "group-hover:border-blue-500/40",
+		features: [
+			"Discover authorized third-party ESPs",
+			"Inbound mailbox vs. outbound sender separation",
+			"Recursive nested SPF unrolling (depth 2)",
+		],
+	},
+	"domain-age": {
+		icon: "globe",
+		badge: "Warmup & Age",
+		badgeColor:
+			"bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/20",
+		glowColor: "group-hover:border-emerald-500/40",
+		features: [
+			"Official RDAP domain creation date check",
+			"Newly registered domain (NRD) spam filter audit",
+			"Visual 4-stage domain warmup timeline",
+		],
+	},
+	"lookalike-watch": {
+		icon: "alert-triangle",
+		badge: "Brand Defense",
+		badgeColor:
+			"bg-rose-500/10 text-rose-700 dark:text-rose-400 border-rose-500/20",
+		glowColor: "group-hover:border-rose-500/40",
+		features: [
+			"Phishing twin & typosquat candidate scan",
+			"Mail-ready capability check (MX & SPF)",
+			"Bypass & simulated From attack vector preview",
 		],
 	},
 	"email-spam-words-checker": {
@@ -89,7 +133,7 @@ const TOOL_VISUAL_MAP: Record<string, ToolVisualMeta> = {
 		],
 	},
 	"email-validator": {
-		icon: "mail-check",
+		icon: "mail",
 		badge: "Deliverability",
 		badgeColor:
 			"bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/20",
@@ -110,18 +154,6 @@ const TOOL_VISUAL_MAP: Record<string, ToolVisualMeta> = {
 			"Spam trigger word analysis",
 			"Link density & formatting scan",
 			"Real-time deliverability score",
-		],
-	},
-	"template-generator": {
-		icon: "layout",
-		badge: "Templates",
-		badgeColor:
-			"bg-violet-500/10 text-violet-700 dark:text-violet-400 border-violet-500/20",
-		glowColor: "group-hover:border-violet-500/40",
-		features: [
-			"Table-based responsive HTML",
-			"Outlook & Gmail compatible",
-			"Ready-to-copy code snippets",
 		],
 	},
 	"auth-checker": {
@@ -182,30 +214,6 @@ const TOOL_VISUAL_MAP: Record<string, ToolVisualMeta> = {
 			"p= none / quarantine / reject",
 			"rua / ruf / pct / alignment",
 			"_dmarc TXT ready to publish",
-		],
-	},
-	"subject-tester": {
-		icon: "sparkles",
-		badge: "Optimization",
-		badgeColor:
-			"bg-rose-500/10 text-rose-700 dark:text-rose-400 border-rose-500/20",
-		glowColor: "group-hover:border-rose-500/40",
-		features: [
-			"Character & word count grading",
-			"Mobile inbox preview length",
-			"Spam & urgency signal audit",
-		],
-	},
-	"mobile-preview": {
-		icon: "device-mobile",
-		badge: "Preview",
-		badgeColor:
-			"bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 border-indigo-500/20",
-		glowColor: "group-hover:border-indigo-500/40",
-		features: [
-			"iPhone & Android device frames",
-			"Live interactive HTML editor",
-			"Instant responsive rendering",
 		],
 	},
 };

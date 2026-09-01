@@ -20,12 +20,12 @@ export const toolConfigs = [
 	temp_email_checker,
 	email_validator,
 	deliverability_tester,
+	auth_checker,
 	bimi_checker,
 	spf_generator,
 	dkim_generator,
 	dmarc_generator,
 	template_generator,
-	auth_checker,
 	subject_tester,
 	mobile_preview,
 ];
