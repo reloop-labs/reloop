@@ -4,6 +4,7 @@ import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { AnimatePresence, motion } from "motion/react";
 import React, { useEffect, useId, useMemo, useRef, useState } from "react";
+import type { Channel, Group } from "#/features/contacts/hooks/use-contacts-query";
 import {
 	useChannelsQuery,
 	useContactsQuery,
@@ -35,6 +36,88 @@ const contentVariants = {
 	}),
 };
 
+const AudienceGroupRow = ({
+	group,
+	isSelected,
+	onSelect,
+}: {
+	group: Group;
+	isSelected: boolean;
+	onSelect: () => void;
+}) => {
+	const countQuery = useGroupContactsCountQuery(group.id);
+	const count =
+		countQuery.data?.subscribedContacts ?? countQuery.data?.total ?? 0;
+
+	return (
+		<button
+			type="button"
+			role="option"
+			aria-selected={isSelected}
+			onClick={onSelect}
+			className={cn(
+				"flex w-full items-center justify-between gap-2 rounded-lg px-2.5 py-1.5 text-left text-label-xs transition-colors",
+				isSelected
+					? "bg-bg-weak-50 font-medium text-text-strong-950 dark:bg-bg-sub-300/40"
+					: "text-text-sub-600 hover:bg-bg-weak-50/70 dark:hover:bg-bg-sub-300/20",
+			)}
+		>
+			<span className="truncate">{group.name}</span>
+			<div className="flex items-center gap-1.5">
+				<span className="text-[11px] font-normal text-text-soft-400">
+					{count.toLocaleString()} contacts
+				</span>
+				{isSelected && (
+					<Icon
+						name="check"
+						className="h-3.5 w-3.5 shrink-0 text-primary-base"
+					/>
+				)}
+			</div>
+		</button>
+	);
+};
+
+const AudienceTopicRow = ({
+	channel,
+	isSelected,
+	onSelect,
+}: {
+	channel: Channel;
+	isSelected: boolean;
+	onSelect: () => void;
+}) => {
+	const count = channel.subscriberCount ?? 0;
+
+	return (
+		<button
+			type="button"
+			role="option"
+			aria-selected={isSelected}
+			onClick={onSelect}
+			className={cn(
+				"flex w-full items-center justify-between gap-2 rounded-lg px-2.5 py-1.5 text-left text-label-xs transition-colors",
+				isSelected
+					? "bg-bg-weak-50 font-medium text-text-strong-950 dark:bg-bg-sub-300/40"
+					: "text-text-sub-600 hover:bg-bg-weak-50/70 dark:hover:bg-bg-sub-300/20",
+			)}
+		>
+			<span className="truncate">{channel.name}</span>
+			<div className="flex items-center gap-1.5">
+				<span className="text-[11px] font-normal text-text-soft-400">
+					{count.toLocaleString()} contacts
+				</span>
+				{isSelected && (
+					<Icon
+						name="check"
+						className="h-3.5 w-3.5 shrink-0 text-primary-base"
+					/>
+				)}
+			</div>
+		</button>
+	);
+};
+
 export const CampaignAudienceField = () => {
 	const audienceType = useCampaignEditorStore((s) => s.audienceType);
 	const audienceTargetId = useCampaignEditorStore((s) => s.audienceTargetId);
@@ -50,13 +133,19 @@ export const CampaignAudienceField = () => {
 	const containerRef = useRef<HTMLDivElement>(null);
 	const listboxId = useId();
 
-	// Reset to root view when menu opens or closes
+	// Open directly into the active category view (groups, topics, or root)
 	useEffect(() => {
 		if (isMenuOpen) {
-			setMenuView("root");
+			if (audienceType === "group") {
+				setMenuView("groups");
+			} else if (audienceType === "channel") {
+				setMenuView("topics");
+			} else {
+				setMenuView("root");
+			}
 			setDirection(0);
 		}
-	}, [isMenuOpen]);
+	}, [isMenuOpen, audienceType]);
 
 	// Load contact counts and audience resources
 	const contactsQuery = useContactsQuery({
@@ -182,29 +271,19 @@ export const CampaignAudienceField = () => {
 					/>
 				</button>
 
-				{/* Animated Audience Dropdown Shell with Fluid Layout Animation */}
+				{/* Animated Audience Dropdown Shell with Fixed Grounded Height */}
 				<AnimatePresence>
 					{isMenuOpen && (
 						<motion.div
 							id={listboxId}
 							role="listbox"
-							layout
 							initial={{ opacity: 0, y: -4, scale: 0.98 }}
 							animate={{ opacity: 1, y: 0, scale: 1 }}
 							exit={{ opacity: 0, y: -4, scale: 0.98 }}
-							transition={{
-								layout: {
-									type: "spring",
-									bounce: 0,
-									duration: 0.28,
-								},
-								opacity: { duration: 0.15 },
-								scale: { duration: 0.15 },
-								y: { duration: 0.15 },
-							}}
-							className="absolute left-0 top-full z-50 mt-4 min-w-[250px] overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-1 dark:border-stroke-soft-100/40 dark:bg-bg-soft-200"
+							transition={{ duration: 0.15, ease: "easeOut" }}
+							className="absolute left-0 top-full z-50 mt-4 h-[148px] min-w-[260px] overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-1 dark:border-stroke-soft-100/40 dark:bg-bg-soft-200"
 						>
-							<div className="relative w-full">
+							<div className="relative h-full w-full">
 								<AnimatePresence initial={false} custom={direction} mode="popLayout">
 									{menuView === "root" && (
 										<motion.div
@@ -218,7 +297,7 @@ export const CampaignAudienceField = () => {
 												duration: SLIDE_MS,
 												ease: EASE_DEFAULT,
 											}}
-											className="flex w-full flex-col gap-0.5"
+											className="flex h-full w-full flex-col gap-0.5 overflow-y-auto overscroll-contain"
 										>
 											{/* All Contacts */}
 											<button
@@ -309,7 +388,7 @@ export const CampaignAudienceField = () => {
 												duration: SLIDE_MS,
 												ease: EASE_DEFAULT,
 											}}
-											className="flex w-full flex-col"
+											className="flex h-full w-full flex-col"
 										>
 											{/* Back Header */}
 											<button
@@ -318,7 +397,7 @@ export const CampaignAudienceField = () => {
 													setDirection(-1);
 													setMenuView("root");
 												}}
-												className="flex w-full items-center gap-1.5 rounded-lg px-2 py-1.5 text-left text-label-xs font-semibold text-text-strong-950 transition-colors hover:bg-bg-weak-50/70 dark:hover:bg-bg-sub-300/20"
+												className="flex w-full items-center gap-1.5 rounded-lg px-2 py-1 text-left text-label-xs font-semibold text-text-strong-950 transition-colors hover:bg-bg-weak-50/70 dark:hover:bg-bg-sub-300/20"
 											>
 												<Icon name="arrow-left" className="h-3.5 w-3.5 text-text-soft-400" />
 												<span>Groups</span>
@@ -326,42 +405,25 @@ export const CampaignAudienceField = () => {
 
 											<div className="border-stroke-soft-200 my-1 border-t dark:border-stroke-soft-100/40" />
 
-											<div className="max-h-48 overflow-y-auto">
+											<div className="flex-1 min-h-0 overflow-y-auto overscroll-contain">
 												{groups.length === 0 ? (
 													<div className="p-2.5 text-center text-paragraph-xs text-text-sub-600">
 														No groups found
 													</div>
 												) : (
-													groups.map((g) => {
-														const isSelected =
-															audienceType === "group" && audienceTargetId === g.id;
-														return (
-															<button
-																key={g.id}
-																type="button"
-																role="option"
-																aria-selected={isSelected}
-																onClick={() => {
-																	setAudience("group", g.id, g.name);
-																	setIsMenuOpen(false);
-																}}
-																className={cn(
-																	"flex w-full items-center justify-between gap-2 rounded-lg px-2.5 py-1.5 text-left text-label-xs transition-colors",
-																	isSelected
-																		? "bg-bg-weak-50 font-medium text-text-strong-950 dark:bg-bg-sub-300/40"
-																		: "text-text-sub-600 hover:bg-bg-weak-50/70 dark:hover:bg-bg-sub-300/20",
-																)}
-															>
-																<span className="truncate">{g.name}</span>
-																{isSelected && (
-																	<Icon
-																		name="check"
-																		className="h-3.5 w-3.5 shrink-0 text-primary-base"
-																	/>
-																)}
-															</button>
-														);
-													})
+													groups.map((g) => (
+														<AudienceGroupRow
+															key={g.id}
+															group={g}
+															isSelected={
+																audienceType === "group" && audienceTargetId === g.id
+															}
+															onSelect={() => {
+																setAudience("group", g.id, g.name);
+																setIsMenuOpen(false);
+															}}
+														/>
+													))
 												)}
 											</div>
 										</motion.div>
@@ -379,7 +441,7 @@ export const CampaignAudienceField = () => {
 												duration: SLIDE_MS,
 												ease: EASE_DEFAULT,
 											}}
-											className="flex w-full flex-col"
+											className="flex h-full w-full flex-col"
 										>
 											{/* Back Header */}
 											<button
@@ -388,7 +450,7 @@ export const CampaignAudienceField = () => {
 													setDirection(-1);
 													setMenuView("root");
 												}}
-												className="flex w-full items-center gap-1.5 rounded-lg px-2 py-1.5 text-left text-label-xs font-semibold text-text-strong-950 transition-colors hover:bg-bg-weak-50/70 dark:hover:bg-bg-sub-300/20"
+												className="flex w-full items-center gap-1.5 rounded-lg px-2 py-1 text-left text-label-xs font-semibold text-text-strong-950 transition-colors hover:bg-bg-weak-50/70 dark:hover:bg-bg-sub-300/20"
 											>
 												<Icon name="arrow-left" className="h-3.5 w-3.5 text-text-soft-400" />
 												<span>Topics</span>
@@ -396,49 +458,26 @@ export const CampaignAudienceField = () => {
 
 											<div className="border-stroke-soft-200 my-1 border-t dark:border-stroke-soft-100/40" />
 
-											<div className="max-h-48 overflow-y-auto">
+											<div className="flex-1 min-h-0 overflow-y-auto overscroll-contain">
 												{channels.length === 0 ? (
 													<div className="p-2.5 text-center text-paragraph-xs text-text-sub-600">
 														No topics found
 													</div>
 												) : (
-													channels.map((c) => {
-														const isSelected =
-															audienceType === "channel" && audienceTargetId === c.id;
-														return (
-															<button
-																key={c.id}
-																type="button"
-																role="option"
-																aria-selected={isSelected}
-																onClick={() => {
-																	setAudience("channel", c.id, c.name);
-																	setIsMenuOpen(false);
-																}}
-																className={cn(
-																	"flex w-full items-center justify-between gap-2 rounded-lg px-2.5 py-1.5 text-left text-label-xs transition-colors",
-																	isSelected
-																		? "bg-bg-weak-50 font-medium text-text-strong-950 dark:bg-bg-sub-300/40"
-																		: "text-text-sub-600 hover:bg-bg-weak-50/70 dark:hover:bg-bg-sub-300/20",
-																)}
-															>
-																<span className="truncate">{c.name}</span>
-																<div className="flex items-center gap-1.5">
-																	{typeof c.subscriberCount === "number" && (
-																		<span className="text-[11px] font-normal text-text-soft-400">
-																			{c.subscriberCount.toLocaleString()} contacts
-																		</span>
-																	)}
-																	{isSelected && (
-																		<Icon
-																			name="check"
-																			className="h-3.5 w-3.5 shrink-0 text-primary-base"
-																		/>
-																	)}
-																</div>
-															</button>
-														);
-													})
+													channels.map((c) => (
+														<AudienceTopicRow
+															key={c.id}
+															channel={c}
+															isSelected={
+																audienceType === "channel" &&
+																audienceTargetId === c.id
+															}
+															onSelect={() => {
+																setAudience("channel", c.id, c.name);
+																setIsMenuOpen(false);
+															}}
+														/>
+													))
 												)}
 											</div>
 										</motion.div>
