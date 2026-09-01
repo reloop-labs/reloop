@@ -7,11 +7,11 @@ import { FullEmailBuilder } from "#/features/templates/editor/components/canvas/
 import { GeneratingOverlay } from "#/features/templates/editor/components/canvas/generating-overlay";
 import { CodeEditor } from "#/features/templates/editor/components/panels/code/code-view";
 import { VersionSidebar } from "#/features/templates/editor/components/panels/history/version-sidebar";
-import { VariablesPanel } from "#/features/templates/editor/components/panels/variables/variables-panel";
 import { EmailInspector } from "#/features/templates/editor/inspector";
 import { CampaignsProvider } from "../campaigns-provider";
 import { CampaignEditorProvider } from "./campaign-editor-provider";
 import { CampaignSendDetails } from "./components/campaign-send-details";
+import { CampaignVariablesPanel } from "./components/campaign-variables-panel";
 
 const viewModes = ["visual", "code", "history", "variables"] as const;
 
@@ -30,7 +30,7 @@ export function CampaignEditorPage({ campaignId }: { campaignId: string }) {
 					<div className="flex h-full min-h-0 flex-1 overflow-hidden">
 						{/* Code Split view if in code mode */}
 						{isCodeSplit && (
-							<div className="relative flex shrink-0 flex-col overflow-hidden border-stroke-soft-200 border-r transition-all duration-300 dark:border-stroke-soft-100/40 w-1/2 min-w-[480px]">
+							<div className="relative flex w-1/2 min-w-[480px] shrink-0 flex-col overflow-hidden border-stroke-soft-200 border-r transition-all duration-300 dark:border-stroke-soft-100/40">
 								<CodeEditor onClose={() => void setViewMode("visual")} />
 							</div>
 						)}
@@ -66,7 +66,7 @@ export function CampaignEditorPage({ campaignId }: { campaignId: string }) {
 										<div className="h-full w-72 overflow-y-auto overflow-x-hidden">
 											{viewMode === "history" && <VersionSidebar />}
 											{viewMode === "variables" && (
-												<VariablesPanel
+												<CampaignVariablesPanel
 													onClose={() => void setViewMode("visual")}
 												/>
 											)}

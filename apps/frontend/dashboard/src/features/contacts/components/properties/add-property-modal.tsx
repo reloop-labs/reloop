@@ -20,6 +20,11 @@ const actionKbdOnBlueClassName =
 interface AddPropertyModalProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
+	onSuccess?: (created: {
+		name: string;
+		type: PropertyType;
+		defaultValue?: string;
+	}) => void;
 }
 
 type PropertyType = "string" | "number";
@@ -64,6 +69,7 @@ const validatePropertyName = (name: string): string => {
 export const AddPropertyModal = ({
 	open,
 	onOpenChange,
+	onSuccess,
 }: AddPropertyModalProps) => {
 	const invalidate = useInvalidateContacts();
 	const [status, setStatus] = useState<"idle" | "creating" | "success">("idle");
@@ -140,9 +146,16 @@ export const AddPropertyModal = ({
 				throw new Error(data.message || "Failed to create property");
 			}
 
+			const createdPayload = {
+				name: propertyName,
+				type: propertyType,
+				defaultValue: defaultValue || undefined,
+			};
+
 			setStatus("success");
 			setTimeout(() => {
 				void invalidate();
+				onSuccess?.(createdPayload);
 				setPropertyName("");
 				setNameError("");
 				setPropertyType("string");

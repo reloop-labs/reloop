@@ -9,11 +9,16 @@ import { useCurrentEditor } from "@tiptap/react";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import {
+	useAllPropertiesQuery,
+	useInvalidateContacts,
+} from "#/features/contacts/hooks/use-contacts-query";
 import { useSWR } from "#/features/templates/editor/hooks/use-swr-compat";
 import { useTemplateId } from "#/features/templates/editor/hooks/use-template-id";
 import {
 	formatTemplateVariable,
 	mapTemplateVariables,
+	normalizeTemplateVariableName,
 } from "#/features/templates/lib/template-variables";
 import { DeleteTemplateVariableModal } from "../components/panels/variables/delete-variable-modal";
 import Breadcrumb from "./breadcrumb";
@@ -71,18 +76,44 @@ function ColorRow({
 function VariableInspectorCard({ name }: { name: string }) {
 	const templateId = useTemplateId();
 	const { editor } = useCurrentEditor();
+	const invalidateContacts = useInvalidateContacts();
 
-	// Fetch variable meta config from DB to find type and default value
+	// Fetch variable meta config from DB if in template mode
 	const { data: templateData, mutate } = useSWR(
 		templateId ? `/api/template/v1/${templateId}` : null,
 		(url) => fetch(url, { credentials: "include" }).then((res) => res.json()),
 	);
 
-	const variables = mapTemplateVariables(templateData?.variables);
-	const matchedVar = variables.find((v) => v.name === name);
+	// Fetch contact properties if in campaign / no-template mode
+	const { data: propertiesData } = useAllPropertiesQuery(!templateId);
 
-	const varType = matchedVar?.type ?? "string";
-	const defaultValue = matchedVar?.defaultValue ?? "";
+	const templateVariables = mapTemplateVariables(templateData?.variables);
+	const contactProperties = propertiesData?.properties ?? [];
+
+	const normalizedTarget = normalizeTemplateVariableName(name);
+
+	const matchedVar = templateId
+		? templateVariables.find(
+				(v) => normalizeTemplateVariableName(v.name) === normalizedTarget,
+			)
+		: null;
+
+	const matchedProp = !templateId
+		? contactProperties.find(
+				(p) =>
+					normalizeTemplateVariableName(p.propertyName) === normalizedTarget,
+			)
+		: null;
+
+	const varType = templateId
+		? (matchedVar?.type ?? "string")
+		: matchedProp?.propertyType?.toLowerCase() === "number"
+			? "number"
+			: "string";
+
+	const defaultValue = templateId
+		? (matchedVar?.defaultValue ?? "")
+		: (matchedProp?.defaultValue ?? "");
 
 	const [localType, setLocalType] = useState(varType);
 	const [localDefaultValue, setLocalDefaultValue] = useState(defaultValue);
@@ -98,41 +129,82 @@ function VariableInspectorCard({ name }: { name: string }) {
 	}, [varType, defaultValue]);
 
 	const handleSave = async () => {
-		if (!templateId) return;
 		setIsSaving(true);
 		try {
-			const updatedVar = {
-				name,
-				type: localType,
-				defaultValue: localDefaultValue,
-			};
-			const updatedVariables = variables.map((v) =>
-				v.name === name ? updatedVar : v,
-			);
-
 			// Capture the selection before mutation
 			const selectionRange = editor
 				? { from: editor.state.selection.from, to: editor.state.selection.to }
 				: null;
 
-			const response = await fetch(`/api/template/v1/${templateId}`, {
-				method: "PUT",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				credentials: "include",
-				body: JSON.stringify({
-					variables: updatedVariables,
-				}),
-			});
+			if (templateId) {
+				const updatedVar = {
+					name,
+					type: localType,
+					defaultValue: localDefaultValue,
+				};
+				const updatedVariables = templateVariables.map((v) =>
+					normalizeTemplateVariableName(v.name) === normalizedTarget
+						? updatedVar
+						: v,
+				);
 
-			if (!response.ok) {
-				throw new Error("Failed to update variable properties");
+				const response = await fetch(`/api/template/v1/${templateId}`, {
+					method: "PUT",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					credentials: "include",
+					body: JSON.stringify({
+						variables: updatedVariables,
+					}),
+				});
+
+				if (!response.ok) {
+					throw new Error("Failed to update variable properties");
+				}
+
+				toast.success("Saved variable properties");
+				await mutate();
+			} else {
+				// Campaign mode -> Update contact property
+				if (matchedProp) {
+					const response = await fetch(
+						`/api/contacts/v1/properties/${matchedProp.id}`,
+						{
+							method: "PATCH",
+							headers: { "Content-Type": "application/json" },
+							body: JSON.stringify({
+								fallbackValue: localDefaultValue || null,
+							}),
+						},
+					);
+
+					if (!response.ok) {
+						throw new Error("Failed to update property");
+					}
+
+					toast.success("Saved variable properties");
+					void invalidateContacts();
+				} else {
+					// Create new contact property if not already existing
+					const response = await fetch("/api/contacts/v1/properties/create", {
+						method: "POST",
+						headers: { "Content-Type": "application/json" },
+						body: JSON.stringify({
+							name,
+							type: localType,
+							fallbackValue: localDefaultValue || undefined,
+						}),
+					});
+
+					if (!response.ok) {
+						throw new Error("Failed to create property");
+					}
+
+					toast.success(`Created property ${name}`);
+					void invalidateContacts();
+				}
 			}
-
-			toast.success("Saved variable properties");
-			// Trigger SWR mutation to update local caches
-			await mutate();
 
 			// Restore selection and focus to keep the inspector open on this variable node
 			if (editor && selectionRange) {
@@ -160,34 +232,52 @@ function VariableInspectorCard({ name }: { name: string }) {
 	};
 
 	const handleDelete = async () => {
-		if (!templateId) return;
 		setIsDeleting(true);
 		try {
-			const updatedVariables = variables.filter((v) => v.name !== name);
+			if (templateId) {
+				const updatedVariables = templateVariables.filter(
+					(v) => normalizeTemplateVariableName(v.name) !== normalizedTarget,
+				);
 
-			const response = await fetch(`/api/template/v1/${templateId}`, {
-				method: "PUT",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				credentials: "include",
-				body: JSON.stringify({
-					variables: updatedVariables,
-				}),
-			});
+				const response = await fetch(`/api/template/v1/${templateId}`, {
+					method: "PUT",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					credentials: "include",
+					body: JSON.stringify({
+						variables: updatedVariables,
+					}),
+				});
 
-			if (!response.ok) {
-				throw new Error("Failed to delete variable");
+				if (!response.ok) {
+					throw new Error("Failed to delete variable");
+				}
+
+				toast.success(`Deleted variable ${name}`);
+				mutate();
+			} else {
+				if (matchedProp) {
+					const response = await fetch(
+						`/api/contacts/v1/properties/${matchedProp.id}`,
+						{
+							method: "DELETE",
+						},
+					);
+
+					if (!response.ok) {
+						throw new Error("Failed to delete property");
+					}
+
+					toast.success(`Deleted variable ${name}`);
+					void invalidateContacts();
+				}
 			}
-
-			toast.success(`Deleted variable ${name}`);
 
 			// Delete the active variable node in the editor
 			if (editor) {
 				editor.commands.deleteSelection();
 			}
-
-			mutate();
 		} catch (error: any) {
 			toast.error(error.message || "Failed to delete variable");
 		} finally {

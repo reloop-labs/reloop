@@ -4,9 +4,11 @@ import { BubbleMenu, SlashCommand } from "@react-email/editor/ui";
 import { EditorContext } from "@tiptap/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import * as Y from "yjs";
+import { AddPropertyModal } from "#/features/contacts/components/properties/add-property-modal";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import { getRandomColor } from "#/features/templates/editor/collobration/hooks/useCollaboration";
 import { useEditorHook } from "#/features/templates/editor/hooks/use-editor-hooks";
+import { useEditorStore } from "#/features/templates/editor/hooks/use-editor-store";
 import { editorSlashCommands } from "#/features/templates/editor/lib/slash-commands";
 import { getRenderedEmailHtml } from "#/features/templates/editor/utils/get-rendered-email-html";
 import { updateCampaignRequest } from "../campaigns-api";
@@ -40,12 +42,12 @@ export function CampaignEditorProvider({
 	const [ydoc] = useState(() => new Y.Doc());
 	const editor = useEditorHook({ ydoc, provider: null, user: collabUser });
 
+	const isCreatingVar = useEditorStore((s) => s.isCreatingVar);
+	const setIsCreatingVar = useEditorStore((s) => s.setIsCreatingVar);
+
 	const setCampaignData = useCampaignEditorStore((s) => s.setCampaignData);
 	const setIsSaving = useCampaignEditorStore((s) => s.setIsSaving);
 	const setLastSaved = useCampaignEditorStore((s) => s.setLastSaved);
-	const setHasUnsavedChanges = useCampaignEditorStore(
-		(s) => s.setHasUnsavedChanges,
-	);
 
 	const isInitialHydrateRef = useRef(true);
 	const skipUntilRef = useRef(Date.now() + SKIP_HYDRATE_MS);
@@ -149,7 +151,8 @@ export function CampaignEditorProvider({
 	const audienceTargetId = useCampaignEditorStore((s) => s.audienceTargetId);
 
 	useEffect(() => {
-		if (isInitialHydrateRef.current || Date.now() < skipUntilRef.current) return;
+		if (isInitialHydrateRef.current || Date.now() < skipUntilRef.current)
+			return;
 		scheduleSave();
 	}, [
 		name,
@@ -162,6 +165,17 @@ export function CampaignEditorProvider({
 		audienceTargetId,
 		scheduleSave,
 	]);
+
+	// Periodic autosave every 15s if there are unsaved changes
+	useEffect(() => {
+		const interval = setInterval(() => {
+			const store = useCampaignEditorStore.getState();
+			if (store.hasUnsavedChanges) {
+				void saveRef.current();
+			}
+		}, 15000);
+		return () => clearInterval(interval);
+	}, []);
 
 	// Flush on page visibility change
 	useEffect(() => {
@@ -188,6 +202,22 @@ export function CampaignEditorProvider({
 				<BubbleMenu.ImageDefault />
 				<SlashCommand items={editorSlashCommands} />
 			</div>
+			<AddPropertyModal
+				open={isCreatingVar}
+				onOpenChange={setIsCreatingVar}
+				onSuccess={(created) => {
+					if (editor) {
+						editor
+							.chain()
+							.focus()
+							.insertContent({
+								type: "variable",
+								attrs: { name: created.name },
+							})
+							.run();
+					}
+				}}
+			/>
 		</EditorContext.Provider>
 	);
 }

@@ -1,6 +1,7 @@
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
+import { useAllPropertiesQuery } from "#/features/contacts/hooks/use-contacts-query";
 import { useEditorStore } from "#/features/templates/editor/hooks/use-editor-store";
 import { useSWR } from "#/features/templates/editor/hooks/use-swr-compat";
 import { useTemplateId } from "#/features/templates/editor/hooks/use-template-id";
@@ -26,9 +27,11 @@ export const VariablesDropdown = forwardRef(
 			fetcher,
 		);
 
-		const variables = mapTemplateVariables(templateData?.variables).map(
-			(v) => v.name,
-		);
+		const { data: propertiesData } = useAllPropertiesQuery(!templateId);
+
+		const variables = templateId
+			? mapTemplateVariables(templateData?.variables).map((v) => v.name)
+			: (propertiesData?.properties ?? []).map((p) => p.propertyName);
 
 		const [selectedIndex, setSelectedIndex] = useState(0);
 
