@@ -2,6 +2,7 @@
 
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
+import { Scan, Square } from "lucide-react";
 import { useState } from "react";
 import { ScrubField, ScrubHandle } from "./scrub-field";
 
@@ -24,21 +25,21 @@ function ModeToggle({
 	onToggle: (v: boolean) => void;
 }) {
 	return (
-		<div className="flex items-center gap-0.5 rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-0.5">
+		<div className="flex items-center gap-0.5 rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-0.5 dark:border-stroke-soft-100/40 dark:bg-black">
 			<Button.Root
 				type="button"
 				variant="neutral"
 				mode={linked ? "lighter" : "ghost"}
 				size="xxsmall"
-				title="Uniform padding"
+				title="Uniform"
 				onClick={() => onToggle(true)}
 				className={`flex h-7 w-7 items-center justify-center rounded-lg outline-none ring-0 transition-all duration-150 ${
 					linked
-						? "bg-bg-soft-200 text-text-strong-950 shadow-regular-xs"
+						? "bg-bg-soft-200 text-text-strong-950 shadow-regular-xs dark:bg-bg-soft-200"
 						: "text-text-soft-400 hover:text-text-sub-600"
 				}`}
 			>
-				<Icon name="box" className="h-3.5 w-3.5" />
+				<Square className="h-3.5 w-3.5 stroke-[1.75]" />
 			</Button.Root>
 			<Button.Root
 				type="button"
@@ -49,11 +50,11 @@ function ModeToggle({
 				onClick={() => onToggle(false)}
 				className={`flex h-7 w-7 items-center justify-center rounded-lg outline-none ring-0 transition-all duration-150 ${
 					!linked
-						? "bg-bg-soft-200 text-text-strong-950 shadow-regular-xs"
+						? "bg-bg-soft-200 text-text-strong-950 shadow-regular-xs dark:bg-bg-soft-200"
 						: "text-text-soft-400 hover:text-text-sub-600"
 				}`}
 			>
-				<Icon name="grid" className="h-3.5 w-3.5" />
+				<Scan className="h-3.5 w-3.5 stroke-[1.75]" />
 			</Button.Root>
 		</div>
 	);

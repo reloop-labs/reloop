@@ -58,6 +58,7 @@
 		"@uiw/react-codemirror": "^4.25.11",
 		"@xyflow/react": "^12.6.0",
 		"ai": "catalog:ui",
+		"react-colorful": "catalog:ui",
 		"axios": "catalog:",
 		"better-auth": "catalog:",
 		"bright": "catalog:ui",

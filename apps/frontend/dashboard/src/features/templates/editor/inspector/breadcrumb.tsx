@@ -36,6 +36,11 @@ const getIconName = (type: string): string => {
 	}
 };
 
+const getLabel = (type: string): string => {
+	if (type.toLowerCase() === "body") return "Page style";
+	return type;
+};
+
 const BreadCrumb = () => {
 	return (
 		<div className="sticky top-0 z-10 min-w-0 border-stroke-soft-200 border-b bg-bg-white-0 px-3 py-3 dark:border-stroke-soft-100/50 dark:bg-black">
@@ -44,7 +49,7 @@ const BreadCrumb = () => {
 					{(segments) =>
 						segments.map((segment, i) => {
 							const type = segment.node?.nodeType ?? "Layout";
-							const label = type;
+							const label = getLabel(type);
 							const iconName = getIconName(type);
 
 							const isFirst = i === 0;

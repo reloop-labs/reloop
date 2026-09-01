@@ -28,6 +28,7 @@ import { PropRow } from "./prop-row";
 import { ScrubRow } from "./scrub-field";
 import { SectionHeader } from "./section-header";
 import { SpacingControl } from "./spacing-control";
+import { AlignControls } from "./typography/align-controls";
 import { TypographyControls } from "./typography/typography-controls";
 import { UrlInput } from "./url-input";
 
@@ -782,29 +783,94 @@ export const EmailInspector = () => {
 
 				{/* ── Document card ── */}
 				<Inspector.Document>
-					{({ findStyleValue, setGlobalStyle }) => (
+					{({ findStyleValue, setGlobalStyle, batchSetGlobalStyle }) => (
 						<>
 							<InspectorSection>
-								<SectionHeader label="Background" />
 								<ColorRow
-									label="Color"
-									value={String(findStyleValue("body", "backgroundColor") ?? "")}
-									onChange={(v) => setGlobalStyle("body", "backgroundColor", v)}
+									label="Background"
+									value={String(
+										findStyleValue("body", "backgroundColor") ?? "",
+									)}
+									onChange={(v) =>
+										setGlobalStyle("body", "backgroundColor", v)
+									}
 								/>
-								<ScrubRow
+								<SpacingControl
 									label="Padding"
-									value={findStyleValue("body", "padding")}
-									onChange={(v) => setGlobalStyle("body", "padding", v)}
-									min={0}
-									max={128}
-									suffix="px"
+									value={{
+										top:
+											(findStyleValue("body", "paddingTop") as number) ??
+											(findStyleValue("body", "padding") as number) ??
+											"",
+										right:
+											(findStyleValue("body", "paddingRight") as number) ??
+											(findStyleValue("body", "padding") as number) ??
+											"",
+										bottom:
+											(findStyleValue("body", "paddingBottom") as number) ??
+											(findStyleValue("body", "padding") as number) ??
+											"",
+										left:
+											(findStyleValue("body", "paddingLeft") as number) ??
+											(findStyleValue("body", "padding") as number) ??
+											"",
+									}}
+									onChange={({ top, right, bottom, left }) =>
+										batchSetGlobalStyle([
+											{
+												classReference: "body",
+												property: "paddingTop",
+												value: top as number,
+											},
+											{
+												classReference: "body",
+												property: "paddingRight",
+												value: right as number,
+											},
+											{
+												classReference: "body",
+												property: "paddingBottom",
+												value: bottom as number,
+											},
+											{
+												classReference: "body",
+												property: "paddingLeft",
+												value: left as number,
+											},
+										])
+									}
 								/>
 							</InspectorSection>
 
 							<InspectorSection>
-								<SectionHeader label="Container" />
+								<SectionHeader label="Body" />
+								<div className="px-4 pt-1 pb-2">
+									<AlignControls
+										alignment={
+											(findStyleValue("container", "align") as string) ||
+											"left"
+										}
+										setAlignment={(align) =>
+											setGlobalStyle("container", "align", align)
+										}
+									/>
+								</div>
 								<ColorRow
-									label="Color"
+									label="Text"
+									value={
+										String(
+											findStyleValue("body", "color") ??
+												findStyleValue("container", "color") ??
+												"",
+										)
+									}
+									onChange={(v) => {
+										setGlobalStyle("body", "color", v);
+										setGlobalStyle("container", "color", v);
+									}}
+								/>
+								<ColorRow
+									label="Background"
 									value={String(
 										findStyleValue("container", "backgroundColor") ?? "",
 									)}
@@ -817,26 +883,225 @@ export const EmailInspector = () => {
 									value={findStyleValue("container", "width")}
 									onChange={(v) => setGlobalStyle("container", "width", v)}
 									min={200}
-									max={800}
+									max={1200}
 									suffix="px"
 								/>
 								<ScrubRow
+									label="Height"
+									value={findStyleValue("container", "height")}
+									onChange={(v) => setGlobalStyle("container", "height", v)}
+									min={0}
+									max={2000}
+									suffix="px"
+								/>
+								<SpacingControl
 									label="Padding"
-									value={findStyleValue("container", "padding")}
-									onChange={(v) => setGlobalStyle("container", "padding", v)}
-									min={0}
-									max={128}
-									suffix="px"
-								/>
-								<ScrubRow
-									label="Rounded"
-									value={findStyleValue("container", "borderRadius")}
-									onChange={(v) =>
-										setGlobalStyle("container", "borderRadius", v)
+									value={{
+										top:
+											(findStyleValue("container", "paddingTop") as number) ??
+											(findStyleValue("container", "padding") as number) ??
+											"",
+										right:
+											(findStyleValue("container", "paddingRight") as number) ??
+											(findStyleValue("container", "padding") as number) ??
+											"",
+										bottom:
+											(findStyleValue("container", "paddingBottom") as number) ??
+											(findStyleValue("container", "padding") as number) ??
+											"",
+										left:
+											(findStyleValue("container", "paddingLeft") as number) ??
+											(findStyleValue("container", "padding") as number) ??
+											"",
+									}}
+									onChange={({ top, right, bottom, left }) =>
+										batchSetGlobalStyle([
+											{
+												classReference: "container",
+												property: "paddingTop",
+												value: top as number,
+											},
+											{
+												classReference: "container",
+												property: "paddingRight",
+												value: right as number,
+											},
+											{
+												classReference: "container",
+												property: "paddingBottom",
+												value: bottom as number,
+											},
+											{
+												classReference: "container",
+												property: "paddingLeft",
+												value: left as number,
+											},
+										])
 									}
-									min={0}
-									max={64}
-									suffix="px"
+								/>
+								<SpacingControl
+									label="Margin"
+									value={{
+										top:
+											(findStyleValue("container", "margin") as number) ?? "",
+										right:
+											(findStyleValue("container", "margin") as number) ?? "",
+										bottom:
+											(findStyleValue("container", "margin") as number) ?? "",
+										left:
+											(findStyleValue("container", "margin") as number) ?? "",
+									}}
+									onChange={({ top }) =>
+										setGlobalStyle("container", "margin", top as number)
+									}
+								/>
+								<SpacingControl
+									label="Corner radius"
+									variant="corners"
+									value={{
+										top:
+											(findStyleValue(
+												"container",
+												"borderTopLeftRadius",
+											) as number) ??
+											(findStyleValue(
+												"container",
+												"borderRadius",
+											) as number) ??
+											"",
+										right:
+											(findStyleValue(
+												"container",
+												"borderTopRightRadius",
+											) as number) ??
+											(findStyleValue(
+												"container",
+												"borderRadius",
+											) as number) ??
+											"",
+										bottom:
+											(findStyleValue(
+												"container",
+												"borderBottomRightRadius",
+											) as number) ??
+											(findStyleValue(
+												"container",
+												"borderRadius",
+											) as number) ??
+											"",
+										left:
+											(findStyleValue(
+												"container",
+												"borderBottomLeftRadius",
+											) as number) ??
+											(findStyleValue(
+												"container",
+												"borderRadius",
+											) as number) ??
+											"",
+									}}
+									onChange={({ top, right, bottom, left }) =>
+										batchSetGlobalStyle([
+											{
+												classReference: "container",
+												property: "borderTopLeftRadius",
+												value: top as number,
+											},
+											{
+												classReference: "container",
+												property: "borderTopRightRadius",
+												value: right as number,
+											},
+											{
+												classReference: "container",
+												property: "borderBottomRightRadius",
+												value: bottom as number,
+											},
+											{
+												classReference: "container",
+												property: "borderBottomLeftRadius",
+												value: left as number,
+											},
+										])
+									}
+								/>
+								<SpacingControl
+									label="Border"
+									value={{
+										top:
+											(findStyleValue(
+												"container",
+												"borderTopWidth",
+											) as number) ??
+											(findStyleValue(
+												"container",
+												"borderWidth",
+											) as number) ??
+											"",
+										right:
+											(findStyleValue(
+												"container",
+												"borderRightWidth",
+											) as number) ??
+											(findStyleValue(
+												"container",
+												"borderWidth",
+											) as number) ??
+											"",
+										bottom:
+											(findStyleValue(
+												"container",
+												"borderBottomWidth",
+											) as number) ??
+											(findStyleValue(
+												"container",
+												"borderWidth",
+											) as number) ??
+											"",
+										left:
+											(findStyleValue(
+												"container",
+												"borderLeftWidth",
+											) as number) ??
+											(findStyleValue(
+												"container",
+												"borderWidth",
+											) as number) ??
+											"",
+									}}
+									onChange={({ top, right, bottom, left }) =>
+										batchSetGlobalStyle([
+											{
+												classReference: "container",
+												property: "borderTopWidth",
+												value: top as number,
+											},
+											{
+												classReference: "container",
+												property: "borderRightWidth",
+												value: right as number,
+											},
+											{
+												classReference: "container",
+												property: "borderBottomWidth",
+												value: bottom as number,
+											},
+											{
+												classReference: "container",
+												property: "borderLeftWidth",
+												value: left as number,
+											},
+										])
+									}
+								/>
+								<ColorRow
+									label="Border color"
+									value={String(
+										findStyleValue("container", "borderColor") ?? "",
+									)}
+									onChange={(v) =>
+										setGlobalStyle("container", "borderColor", v)
+									}
 								/>
 							</InspectorSection>
 						</>

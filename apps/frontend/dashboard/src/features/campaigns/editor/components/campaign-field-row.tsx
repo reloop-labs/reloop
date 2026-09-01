@@ -50,7 +50,7 @@ export const CampaignFieldRow = ({
 	return (
 		<div
 			className={cn(
-				"group relative flex items-center border-stroke-soft-200 border-b px-3 py-3 dark:border-stroke-soft-100/40",
+				"group relative flex items-center border-stroke-soft-200 border-b py-3 dark:border-stroke-soft-100/40",
 				hideBorder && "border-b-0",
 				className,
 			)}
