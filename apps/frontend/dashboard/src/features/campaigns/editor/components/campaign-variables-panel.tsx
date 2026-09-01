@@ -7,7 +7,6 @@ import * as Input from "@reloop/ui/input";
 import Spinner from "@reloop/ui/spinner";
 import { useCurrentEditor } from "@tiptap/react";
 import { useMemo, useState } from "react";
-import { toast } from "sonner";
 import { AddPropertyModal } from "#/features/contacts/components/properties/add-property-modal";
 import { DeletePropertyModal } from "#/features/contacts/components/properties/delete-property-modal";
 import { EditPropertyModal } from "#/features/contacts/components/properties/edit-property-modal";
@@ -50,7 +49,6 @@ export function CampaignVariablesPanel({
 		e.stopPropagation();
 		navigator.clipboard.writeText(key);
 		setCopiedKey(key);
-		toast.success(`Copied ${key}`, { duration: 1800 });
 		setTimeout(() => setCopiedKey(null), 2000);
 	};
 
@@ -64,11 +62,9 @@ export function CampaignVariablesPanel({
 					attrs: { name: propertyName },
 				})
 				.run();
-			toast.success(`Inserted {{{${propertyName}}}}`);
 		} else {
 			const placeholder = `{{{${propertyName}}}}`;
 			navigator.clipboard.writeText(placeholder);
-			toast.success(`Copied ${placeholder}`);
 		}
 	};
 
