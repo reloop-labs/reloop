@@ -3,21 +3,20 @@ import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
+import * as Input from "@reloop/ui/input";
+import * as Label from "@reloop/ui/label";
 import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
-import {
-	AnimatePresence,
-	type AnimationPlaybackControls,
-	animate,
-	motion,
-	useMotionValue,
-} from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import { useInvalidateContacts } from "#/features/contacts/hooks/use-contacts-query";
 import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
+
+const actionKbdOnDestructiveClassName =
+	"border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]";
 
 const getBadgeColor = (type: string) => {
 	switch (type?.toLowerCase()) {
@@ -56,10 +55,10 @@ export const DeletePropertyModal = ({
 	onOpenChange,
 	onDeleteSuccess,
 }: DeletePropertyModalProps) => {
+	const [confirmationText, setConfirmationText] = useState("");
 	const [deleteState, setDeleteState] = useState<DeleteState>("idle");
-	const [isHolding, setIsHolding] = useState(false);
-	const holdProgress = useMotionValue(0);
-	const animationRef = useRef<AnimationPlaybackControls | null>(null);
+	const [nameCopied, setNameCopied] = useState(false);
+	const inputRef = useRef<HTMLInputElement | null>(null);
 	const invalidate = useInvalidateContacts();
 
 	// Cache target property so details remain stable during deletion animations
@@ -68,9 +67,25 @@ export const DeletePropertyModal = ({
 		targetPropertyRef.current = property;
 	}
 	const propertyToDelete = property || targetPropertyRef.current;
+	const displayName = propertyToDelete?.propertyName || "";
+
+	const canDelete =
+		confirmationText.trim() === displayName &&
+		deleteState === "idle" &&
+		!!propertyToDelete;
+
+	const handleCopyName = async () => {
+		try {
+			await navigator.clipboard.writeText(displayName);
+			setNameCopied(true);
+			setTimeout(() => setNameCopied(false), 1500);
+		} catch {
+			// silently fail
+		}
+	};
 
 	const handleDelete = async () => {
-		if (!propertyToDelete || deleteState !== "idle") return;
+		if (!canDelete || !propertyToDelete) return;
 
 		try {
 			setDeleteState("deleting");
@@ -94,6 +109,7 @@ export const DeletePropertyModal = ({
 				onDeleteSuccess?.(deletedName);
 				setTimeout(() => {
 					setDeleteState("idle");
+					setConfirmationText("");
 					targetPropertyRef.current = null;
 				}, 300);
 			}, 450);
@@ -106,48 +122,34 @@ export const DeletePropertyModal = ({
 		}
 	};
 
-	const startHold = () => {
-		if (deleteState !== "idle") return;
-		setIsHolding(true);
-		holdProgress.set(0);
-		animationRef.current = animate(holdProgress, 1, {
-			duration: 1.2,
-			ease: "linear",
-			onComplete: () => {
-				setIsHolding(false);
-				holdProgress.set(0);
-				void handleDelete();
-			},
-		});
-	};
-
-	const cancelHold = () => {
-		if (!isHolding && holdProgress.get() === 0) return;
-		setIsHolding(false);
-		animationRef.current?.stop();
-		animate(holdProgress, 0, {
-			duration: 0.2,
-			ease: "easeOut",
-		});
-	};
-
 	useHotkeys(
 		"enter",
 		(e) => {
 			e.preventDefault();
-			if (open && propertyToDelete && deleteState === "idle") {
+			if (open && canDelete) {
 				void handleDelete();
 			}
 		},
-		{ enabled: open && !!propertyToDelete },
-		[open, propertyToDelete, deleteState],
+		{ enableOnFormTags: ["INPUT"], enabled: open && canDelete },
+		[open, canDelete, propertyToDelete, deleteState],
+	);
+
+	useHotkeys(
+		"escape",
+		() => {
+			if (open && deleteState === "idle") {
+				handleCancel();
+			}
+		},
+		{ enableOnFormTags: ["INPUT"], enabled: open },
+		[open, deleteState],
 	);
 
 	useEffect(() => {
 		if (!open) {
-			cancelHold();
 			const timer = setTimeout(() => {
 				setDeleteState("idle");
+				setConfirmationText("");
 				targetPropertyRef.current = null;
 			}, 300);
 			return () => clearTimeout(timer);
@@ -155,7 +157,7 @@ export const DeletePropertyModal = ({
 	}, [open]);
 
 	const handleCancel = () => {
-		cancelHold();
+		if (deleteState !== "idle") return;
 		onOpenChange(false);
 	};
 
@@ -164,6 +166,10 @@ export const DeletePropertyModal = ({
 			<Modal.Content
 				className="overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-soft-50 p-0 sm:max-w-[460px] dark:border-stroke-soft-100/40 dark:bg-white/[0.03]"
 				showClose={false}
+				onOpenAutoFocus={(e) => {
+					e.preventDefault();
+					setTimeout(() => inputRef.current?.focus(), 0);
+				}}
 			>
 				<div className="relative m-0.5 space-y-4 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 pt-5 dark:border-stroke-soft-100/40 dark:bg-[#0c0c0c]">
 					{/* Header */}
@@ -235,6 +241,49 @@ export const DeletePropertyModal = ({
 							Deleting this property will permanently remove it along with all its
 							values from all contacts across your organization.
 						</div>
+
+						{/* Confirmation Input */}
+						<div className="space-y-1.5 pt-1">
+							<Label.Root
+								htmlFor="delete-property-confirmation"
+								className="flex flex-wrap items-center gap-1.5 text-xs text-text-sub-600"
+							>
+								<span>Type</span>
+								<span className="inline-flex items-center gap-1 rounded-md bg-bg-weak-50 px-1.5 py-0.5 font-medium text-[12px] text-text-strong-950 dark:bg-bg-weak-50/20">
+									{displayName}
+									<button
+										type="button"
+										onClick={(e) => {
+											e.preventDefault();
+											void handleCopyName();
+										}}
+										className="-mr-0.5 inline-flex h-4 w-4 shrink-0 items-center justify-center rounded transition-colors hover:text-text-strong-950"
+										aria-label={`Copy ${displayName}`}
+										title="Copy name"
+									>
+										<Icon
+											name={nameCopied ? "check" : "copy"}
+											className="h-3 w-3 text-text-sub-600"
+										/>
+									</button>
+								</span>
+								<span>to confirm</span>
+							</Label.Root>
+							<Input.Root size="medium" className="rounded-xl">
+								<Input.Wrapper>
+									<Input.Input
+										id="delete-property-confirmation"
+										ref={inputRef}
+										value={confirmationText}
+										onChange={(e) => setConfirmationText(e.target.value)}
+										placeholder={displayName}
+										autoComplete="off"
+										disabled={deleteState !== "idle"}
+										autoFocus
+									/>
+								</Input.Wrapper>
+							</Input.Root>
+						</div>
 					</div>
 				</div>
 
@@ -261,21 +310,14 @@ export const DeletePropertyModal = ({
 						type="button"
 						variant={deleteState === "success" ? "success" : "destructive"}
 						size="small"
-						onPointerDown={startHold}
-						onPointerUp={cancelHold}
-						onPointerLeave={cancelHold}
-						onPointerCancel={cancelHold}
+						disabled={!canDelete || deleteState !== "idle"}
+						onClick={() => void handleDelete()}
 						className={cn(
-							"relative min-w-[134px] select-none justify-center overflow-hidden transition-all duration-200",
-							deleteState !== "idle" && "pointer-events-none opacity-90",
+							"min-w-[110px] justify-center overflow-hidden transition-all duration-200",
+							deleteState !== "idle" && "pointer-events-none",
+							deleteState === "deleting" && "opacity-90",
 						)}
 					>
-						{/* Hold progress overlay fill */}
-						<motion.div
-							className="pointer-events-none absolute inset-0 origin-left bg-white/25"
-							style={{ scaleX: holdProgress }}
-						/>
-
 						<AnimatePresence mode="popLayout" initial={false}>
 							<motion.span
 								key={deleteState}
@@ -303,7 +345,12 @@ export const DeletePropertyModal = ({
 										<span>Deleted</span>
 									</>
 								) : (
-									<span>Hold to delete</span>
+									<>
+										<span>Delete</span>
+										<ActionKbd className={actionKbdOnDestructiveClassName}>
+											↵
+										</ActionKbd>
+									</>
 								)}
 							</motion.span>
 						</AnimatePresence>
