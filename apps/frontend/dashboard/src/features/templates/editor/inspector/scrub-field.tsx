@@ -261,7 +261,7 @@ export function ScrubRow({
 	active,
 }: Omit<ScrubFieldProps, "className">) {
 	return (
-		<div className="flex min-h-9 items-center justify-between gap-3 px-4 py-1">
+		<div className="flex h-10 items-center justify-between gap-3 px-4">
 			<ScrubHandle
 				label={label}
 				value={value}

@@ -1,8 +1,14 @@
 "use client";
 
 import * as Button from "@reloop/ui/button";
-import { Icon } from "@reloop/ui/icon";
-import { Scan, Square } from "lucide-react";
+import {
+	ArrowDown,
+	ArrowLeft,
+	ArrowRight,
+	ArrowUp,
+	Scan,
+	Square,
+} from "lucide-react";
 import { useState } from "react";
 import { ScrubField, ScrubHandle } from "./scrub-field";
 
@@ -25,7 +31,7 @@ function ModeToggle({
 	onToggle: (v: boolean) => void;
 }) {
 	return (
-		<div className="flex items-center gap-0.5 rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-0.5 dark:border-stroke-soft-100/40 dark:bg-black">
+		<div className="flex h-8 items-center gap-0.5 rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-0.5 dark:border-stroke-soft-100/40 dark:bg-black">
 			<Button.Root
 				type="button"
 				variant="neutral"
@@ -118,7 +124,7 @@ export function SpacingControl({
 	/* ── Linked: single row ── */
 	if (linked) {
 		return (
-			<div className="flex min-h-9 items-center justify-between gap-3 px-4 py-1">
+			<div className="flex h-10 items-center justify-between gap-3 px-4">
 				<ScrubHandle
 					label={label}
 					value={value.top}
@@ -141,9 +147,9 @@ export function SpacingControl({
 
 	/* ── Individual: header row + 2×2 grid ── */
 	return (
-		<div className="flex flex-col gap-2 px-4 py-2">
-			{/* Header row */}
-			<div className="flex items-center justify-between">
+		<div className="flex flex-col px-4">
+			{/* Header row with exact same h-10 height as linked row to eliminate shift */}
+			<div className="flex h-10 items-center justify-between">
 				<span className="font-normal text-sm text-text-sub-600 dark:text-text-soft-400">
 					{label}
 				</span>
@@ -151,7 +157,7 @@ export function SpacingControl({
 			</div>
 
 			{/* 2×2 grid */}
-			<div className="grid grid-cols-2 gap-2">
+			<div className="grid grid-cols-2 gap-2 pb-2">
 				<div className="w-full">
 					<ScrubField
 						label={`${label} top`}
@@ -160,9 +166,9 @@ export function SpacingControl({
 						suffix="px"
 						prefix={
 							variant === "sides" ? (
-								<Icon name="arrow-top" className="h-3.5 w-3.5" />
+								<ArrowUp className="size-3.5 shrink-0 stroke-[1.75] text-text-soft-400" />
 							) : (
-								<Square className="h-3.5 w-3.5" />
+								<Square className="size-3.5 shrink-0 stroke-[1.75] text-text-soft-400" />
 							)
 						}
 					/>
@@ -175,9 +181,9 @@ export function SpacingControl({
 						suffix="px"
 						prefix={
 							variant === "sides" ? (
-								<Icon name="arrow-right" className="h-3.5 w-3.5" />
+								<ArrowRight className="size-3.5 shrink-0 stroke-[1.75] text-text-soft-400" />
 							) : (
-								<Square className="h-3.5 w-3.5" />
+								<Square className="size-3.5 shrink-0 stroke-[1.75] text-text-soft-400" />
 							)
 						}
 					/>
@@ -190,9 +196,9 @@ export function SpacingControl({
 						suffix="px"
 						prefix={
 							variant === "sides" ? (
-								<Icon name="arrow-down" className="h-3.5 w-3.5" />
+								<ArrowDown className="size-3.5 shrink-0 stroke-[1.75] text-text-soft-400" />
 							) : (
-								<Square className="h-3.5 w-3.5" />
+								<Square className="size-3.5 shrink-0 stroke-[1.75] text-text-soft-400" />
 							)
 						}
 					/>
@@ -205,9 +211,9 @@ export function SpacingControl({
 						suffix="px"
 						prefix={
 							variant === "sides" ? (
-								<Icon name="arrow-left" className="h-3.5 w-3.5" />
+								<ArrowLeft className="size-3.5 shrink-0 stroke-[1.75] text-text-soft-400" />
 							) : (
-								<Square className="h-3.5 w-3.5" />
+								<Square className="size-3.5 shrink-0 stroke-[1.75] text-text-soft-400" />
 							)
 						}
 					/>
@@ -216,3 +222,4 @@ export function SpacingControl({
 		</div>
 	);
 }
+
