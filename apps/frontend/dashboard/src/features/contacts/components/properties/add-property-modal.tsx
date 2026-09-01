@@ -1,6 +1,7 @@
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
+import { FieldError, useFieldError } from "@reloop/ui/field-error";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
@@ -8,7 +9,7 @@ import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
 import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import { useInvalidateContacts } from "#/features/contacts/hooks/use-contacts-query";
@@ -75,16 +76,15 @@ export const AddPropertyModal = ({
 	const invalidate = useInvalidateContacts();
 	const [status, setStatus] = useState<"idle" | "creating" | "success">("idle");
 	const [propertyName, setPropertyName] = useState("");
-	const [nameError, setNameError] = useState("");
 	const [propertyType, setPropertyType] = useState<PropertyType>("string");
 	const [defaultValue, setDefaultValue] = useState("");
-
-	const nameInputRef = useRef<HTMLInputElement>(null);
+	const nameField = useFieldError();
+	const clearNameError = nameField.clear;
 
 	const handleClose = () => {
 		if (status !== "idle") return;
 		setPropertyName("");
-		setNameError("");
+		nameField.clear();
 		setPropertyType("string");
 		setDefaultValue("");
 		setStatus("idle");
@@ -95,25 +95,24 @@ export const AddPropertyModal = ({
 		if (!open) {
 			const timer = setTimeout(() => {
 				setPropertyName("");
-				setNameError("");
+				clearNameError();
 				setPropertyType("string");
 				setDefaultValue("");
 				setStatus("idle");
 			}, 300);
 			return () => clearTimeout(timer);
 		}
-	}, [open]);
+	}, [open, clearNameError]);
 
 	const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const value = e.target.value;
 		setPropertyName(value);
-		setNameError(validatePropertyName(value));
+		if (nameField.hasError) nameField.clear();
 	};
 
 	const handleSlugify = () => {
 		const slugged = slugify(propertyName);
 		setPropertyName(slugged);
-		setNameError(validatePropertyName(slugged));
 	};
 
 	const defaultValueError =
@@ -129,15 +128,13 @@ export const AddPropertyModal = ({
 
 		const trimmed = propertyName.trim();
 		if (!trimmed) {
-			setNameError(`Please enter a ${nameLabel.toLowerCase()}`);
-			nameInputRef.current?.focus();
+			nameField.show(`Please enter a ${nameLabel.toLowerCase()}.`);
 			return;
 		}
 
 		const validationError = validatePropertyName(trimmed);
 		if (validationError) {
-			setNameError(validationError);
-			nameInputRef.current?.focus();
+			nameField.show(validationError);
 			return;
 		}
 
@@ -145,6 +142,7 @@ export const AddPropertyModal = ({
 			return;
 		}
 
+		nameField.clear();
 		setStatus("creating");
 		try {
 			const response = await fetch("/api/contacts/v1/properties/create", {
@@ -173,7 +171,7 @@ export const AddPropertyModal = ({
 				void invalidate();
 				onSuccess?.(createdPayload);
 				setPropertyName("");
-				setNameError("");
+				nameField.clear();
 				setPropertyType("string");
 				setDefaultValue("");
 				setStatus("idle");
@@ -181,9 +179,10 @@ export const AddPropertyModal = ({
 			}, 450);
 		} catch (error) {
 			console.error("Failed to create property:", error);
-			toast.error(
-				error instanceof Error ? error.message : "Failed to create property",
-			);
+			const message =
+				error instanceof Error ? error.message : "Failed to create property";
+			nameField.show(message);
+			toast.error(message);
 			setStatus("idle");
 		}
 	};
@@ -246,33 +245,31 @@ export const AddPropertyModal = ({
 									{nameLabel}
 									<Label.Asterisk />
 								</Label.Root>
-								<Input.Root
-									size="medium"
-									hasError={!!nameError}
-									className="rounded-xl"
+								<FieldError
+									field={nameField}
+									hint="Letters, numbers &amp; underscores — spaces auto-convert"
 								>
-									<Input.Wrapper>
-										<Input.Input
-											ref={nameInputRef}
-											id="propertyName"
-											placeholder="first_name"
-											value={propertyName}
-											onChange={handleNameChange}
-											onBlur={handleSlugify}
-											disabled={status !== "idle"}
-											autoComplete="off"
-											spellCheck={false}
-											autoFocus
-										/>
-									</Input.Wrapper>
-								</Input.Root>
-								{nameError ? (
-									<p className="text-[11px] text-error-base">{nameError}</p>
-								) : (
-									<p className="text-[11px] text-text-sub-600">
-										Letters, numbers &amp; underscores — spaces auto-convert
-									</p>
-								)}
+									<Input.Root
+										size="medium"
+										hasError={nameField.hasError}
+										className="rounded-xl"
+									>
+										<Input.Wrapper>
+											<Input.Input
+												id="propertyName"
+												{...nameField.controlProps}
+												placeholder="first_name"
+												value={propertyName}
+												onChange={handleNameChange}
+												onBlur={handleSlugify}
+												disabled={status !== "idle"}
+												autoComplete="off"
+												spellCheck={false}
+												autoFocus
+											/>
+										</Input.Wrapper>
+									</Input.Root>
+								</FieldError>
 							</div>
 
 							{/* Property Type Selector */}
@@ -288,34 +285,21 @@ export const AddPropertyModal = ({
 											className={cn(
 												"group relative flex flex-col items-start gap-1 rounded-xl border p-3 text-left transition-all duration-150 active:scale-[0.98]",
 												isSelected
-													? "border-primary-base bg-primary-light/10 shadow-[0_0_0_1px_rgba(0,85,255,1)] dark:border-primary-base dark:bg-primary-base/10"
-													: "border-stroke-soft-200 bg-bg-white-0 hover:border-stroke-soft-200 hover:bg-bg-weak-50 dark:border-stroke-soft-100/40 dark:bg-bg-soft-200/10 dark:hover:bg-white/[0.04]",
+													? "border-primary-base shadow-[0_0_0_1px_#0055FF] bg-bg-white-0 dark:border-primary-base dark:shadow-[0_0_0_1px_#0055FF] dark:bg-white/[0.04]"
+													: "border-stroke-soft-200 bg-bg-white-0 hover:border-stroke-sub-300 hover:bg-bg-weak-50/50 dark:border-stroke-soft-100/40 dark:bg-bg-soft-200/10 dark:hover:bg-white/[0.02]",
 											)}
 										>
 											<div className="flex w-full items-center justify-between">
-												<p className="font-semibold text-text-strong-950 text-xs">
+												<p className="font-medium text-text-strong-950 text-xs">
 													{opt.label}
 												</p>
-												<AnimatePresence>
-													{isSelected && (
-														<motion.div
-															initial={{ scale: 0, opacity: 0 }}
-															animate={{ scale: 1, opacity: 1 }}
-															exit={{ scale: 0, opacity: 0 }}
-															transition={{
-																type: "spring",
-																stiffness: 500,
-																damping: 30,
-															}}
-															className="flex h-4 w-4 items-center justify-center rounded-full bg-primary-base"
-														>
-															<Icon
-																name="check"
-																className="h-2.5 w-2.5 text-white"
-															/>
-														</motion.div>
-													)}
-												</AnimatePresence>
+												{isSelected ? (
+													<div className="flex size-4.5 items-center justify-center rounded-full bg-primary-base">
+														<div className="size-1.5 rounded-full bg-white" />
+													</div>
+												) : (
+													<div className="size-4.5 rounded-full border-2 border-stroke-soft-200 transition-colors group-hover:border-stroke-sub-300 dark:border-stroke-soft-100/60" />
+												)}
 											</div>
 											<p className="text-[11px] text-text-sub-600">
 												{opt.description}
