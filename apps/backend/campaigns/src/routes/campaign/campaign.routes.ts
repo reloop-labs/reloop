@@ -228,6 +228,7 @@ export const campaignRoutes = new Elysia({
 				id: params.id,
 				organizationId,
 				to: body.to,
+				variables: body.variables,
 			});
 		},
 		{

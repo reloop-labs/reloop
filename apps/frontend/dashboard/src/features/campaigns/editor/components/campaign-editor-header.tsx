@@ -141,17 +141,9 @@ function CampaignNameField() {
 
 export function CampaignEditorHeader() {
 	const { campaignId } = useCampaignEditorStore();
-	const [viewMode, setViewMode] = useQueryState(
-		"mode",
-		parseAsStringLiteral(viewModes).withDefault("visual"),
-	);
-
 	const [isTestModalOpen, setIsTestModalOpen] = useState(false);
 	const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
 	const [isSendModalOpen, setIsSendModalOpen] = useState(false);
-
-	const isVariablesActive = viewMode === "variables";
-	const isHistoryActive = viewMode === "history";
 
 	return (
 		<>
@@ -169,38 +161,8 @@ export function CampaignEditorHeader() {
 					</div>
 				</div>
 
-				{/* Right: Variables, History, Test email, and Review Buttons */}
+				{/* Right: Test email and Review Buttons */}
 				<div className="flex flex-1 items-center justify-end gap-2">
-					<Button.Root
-						type="button"
-						variant="neutral"
-						mode={isVariablesActive ? "filled" : "stroke"}
-						size="xsmall"
-						onClick={() =>
-							void setViewMode(isVariablesActive ? "visual" : "variables")
-						}
-						className="gap-1.5"
-						title="Toggle Variables panel"
-					>
-						<Icon name="brackets" className="h-3.5 w-3.5" />
-						Variables
-					</Button.Root>
-
-					<Button.Root
-						type="button"
-						variant="neutral"
-						mode={isHistoryActive ? "filled" : "stroke"}
-						size="xsmall"
-						onClick={() =>
-							void setViewMode(isHistoryActive ? "visual" : "history")
-						}
-						className="gap-1.5"
-						title="Version history"
-					>
-						<Icon name="history" className="h-3.5 w-3.5" />
-						History
-					</Button.Root>
-
 					<FancyButton.Root
 						variant="basic"
 						size="xsmall"

@@ -90,6 +90,7 @@ export const scheduleBody = t.Object({
 
 export const testSendBody = t.Object({
 	to: t.String(),
+	variables: t.Optional(t.Record(t.String(), t.Any())),
 });
 
 export const recipientStatusSchema = t.Union([

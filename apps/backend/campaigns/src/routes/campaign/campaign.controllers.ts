@@ -431,17 +431,21 @@ export async function testCampaignController(params: {
 	id: string;
 	organizationId: string;
 	to: string;
+	variables?: Record<string, any>;
 }) {
 	const row = await requireCampaign(params.id, params.organizationId);
 	if (!params.to.includes("@")) {
 		throw CampaignErrors.testFailed("A valid recipient email is required.");
 	}
 	await assertVerifiedFromDomain(params.organizationId, row.fromEmail);
-	const vars = campaignMergeVars({
-		email: params.to,
-		firstName: "there",
-		lastName: "",
-	});
+	const vars = {
+		...campaignMergeVars({
+			email: params.to,
+			firstName: "there",
+			lastName: "",
+		}),
+		...(params.variables ?? {}),
+	};
 	const html = interpolate(row.contentHtml, vars);
 	const subject = interpolate(row.subject, vars);
 	const from = `${row.fromName} <${row.fromEmail}>`;

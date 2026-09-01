@@ -1,6 +1,8 @@
 "use client";
 
 import { cn } from "@reloop/ui/cn";
+import { Icon } from "@reloop/ui/icon";
+import * as TabMenuHorizontal from "@reloop/ui/tab-menu-horizontal";
 import { AnimatePresence, motion } from "motion/react";
 import { parseAsStringLiteral, useQueryState } from "nuqs";
 import { FullEmailBuilder } from "#/features/templates/editor/components/canvas/email-builder";
@@ -61,9 +63,53 @@ export function CampaignEditorPage({ campaignId }: { campaignId: string }) {
 											damping: 33,
 											opacity: { duration: 0.2 },
 										}}
-										className="h-full shrink-0 overflow-hidden border-stroke-soft-200 border-l bg-transparent dark:border-stroke-soft-100/40"
+										className="flex h-full shrink-0 flex-col overflow-hidden border-stroke-soft-200 border-l bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-black"
 									>
-										<div className="h-full w-72 overflow-y-auto overflow-x-hidden">
+										{/* Top Tabs: Editor | Variables | History */}
+										<div className="sticky top-0 z-20 shrink-0 bg-bg-white-0 px-3 dark:bg-black">
+											<TabMenuHorizontal.Root
+												value={
+													viewMode === "variables"
+														? "variables"
+														: viewMode === "history"
+															? "history"
+															: "editor"
+												}
+												onValueChange={(val) => {
+													if (val === "editor") void setViewMode("visual");
+													else if (val === "variables")
+														void setViewMode("variables");
+													else if (val === "history")
+														void setViewMode("history");
+												}}
+											>
+												<TabMenuHorizontal.List className="h-10 gap-0 border-stroke-soft-200 border-b dark:border-stroke-soft-100/40">
+													<TabMenuHorizontal.Trigger
+														value="editor"
+														className="flex cursor-pointer items-center gap-1.5 px-3 font-medium text-xs text-text-sub-600 data-[state=active]:text-text-strong-950"
+													>
+														<Icon name="pencil" className="h-3.5 w-3.5" />
+														Editor
+													</TabMenuHorizontal.Trigger>
+													<TabMenuHorizontal.Trigger
+														value="variables"
+														className="flex cursor-pointer items-center gap-1.5 px-3 font-medium text-xs text-text-sub-600 data-[state=active]:text-text-strong-950"
+													>
+														<Icon name="brackets" className="h-3.5 w-3.5" />
+														Variables
+													</TabMenuHorizontal.Trigger>
+													<TabMenuHorizontal.Trigger
+														value="history"
+														className="flex cursor-pointer items-center gap-1.5 px-3 font-medium text-xs text-text-sub-600 data-[state=active]:text-text-strong-950"
+													>
+														<Icon name="history" className="h-3.5 w-3.5" />
+														History
+													</TabMenuHorizontal.Trigger>
+												</TabMenuHorizontal.List>
+											</TabMenuHorizontal.Root>
+										</div>
+
+										<div className="h-full w-72 flex-1 overflow-y-auto overflow-x-hidden">
 											{viewMode === "history" && <VersionSidebar />}
 											{viewMode === "variables" && (
 												<CampaignVariablesPanel

@@ -98,12 +98,13 @@ export async function deleteCampaignRequest(id: string): Promise<void> {
 export async function testCampaignRequest(
 	id: string,
 	to: string,
+	variables?: Record<string, string>,
 ): Promise<void> {
 	const res = await fetch(`${BASE}/${id}/test`, {
 		method: "POST",
 		credentials: "include",
 		headers: { "content-type": "application/json" },
-		body: JSON.stringify({ to }),
+		body: JSON.stringify({ to, variables }),
 	});
 	if (!res.ok) throw new Error(await parseError(res));
 }
