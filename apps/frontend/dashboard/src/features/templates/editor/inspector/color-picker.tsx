@@ -67,26 +67,26 @@ export function ColorPicker({
 					<button
 						type="button"
 						aria-label="Pick color"
-						className="relative size-4 shrink-0 cursor-pointer overflow-hidden rounded-md border border-stroke-soft-200 transition-transform duration-150 hover:scale-110 focus:outline-none dark:border-stroke-soft-100/40"
+						className="relative size-4 shrink-0 cursor-pointer overflow-hidden rounded-md border border-stroke-soft-200 focus:outline-none dark:border-stroke-soft-100/40"
 						style={{ backgroundColor: normalizedValue }}
 					/>
 				</Popover.Trigger>
 				<Popover.Content
 					side="bottom"
-					align="end"
-					sideOffset={8}
-					showArrow={false}
-					className="z-50 w-52 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-3 shadow-regular-md dark:border-stroke-soft-100/40 dark:bg-black"
+					align="center"
+					sideOffset={-4}
+					collisionPadding={12}
+					className="z-50 w-56 p-2"
 				>
 					<div className="flex flex-col gap-3">
 						<HexAlphaColorPicker
 							color={normalizedValue}
 							onChange={onChange}
-							className="custom-color-picker !h-36 !w-full overflow-hidden rounded-xl"
+							className="custom-color-picker"
 						/>
 
 						{/* On this document */}
-						<div className="flex flex-col gap-1.5 pt-0.5">
+						<div className="flex flex-col gap-1.5 border-stroke-soft-200 border-t pt-2 dark:border-stroke-soft-100/40">
 							<span className="text-text-sub-600 text-xs dark:text-text-soft-400">
 								On this document:
 							</span>
@@ -97,13 +97,41 @@ export function ColorPicker({
 										type="button"
 										onClick={() => onChange(c)}
 										style={{ backgroundColor: c }}
-										className="size-6 cursor-pointer rounded-md border border-stroke-soft-200 transition-transform duration-150 hover:scale-110 focus:outline-none dark:border-stroke-soft-100/40"
+										className="size-6 cursor-pointer rounded-md border border-stroke-soft-200 opacity-90 transition-opacity hover:opacity-100 focus:outline-none dark:border-stroke-soft-100/40"
 										title={c}
 									/>
 								))}
 							</div>
 						</div>
 					</div>
+					<style jsx global>{`
+						.custom-color-picker.react-colorful {
+							width: 100% !important;
+							height: auto !important;
+							gap: 8px;
+							position: relative;
+							box-sizing: border-box;
+						}
+						.custom-color-picker .react-colorful__saturation {
+							border-radius: 12px;
+							height: 120px;
+							border-bottom: none;
+							width: 100%;
+						}
+						.custom-color-picker .react-colorful__hue,
+						.custom-color-picker .react-colorful__alpha {
+							height: 14px;
+							border-radius: 9999px;
+							width: 100%;
+						}
+						.custom-color-picker .react-colorful__pointer {
+							width: 18px;
+							height: 18px;
+							border-width: 2px;
+							border-color: #ffffff;
+							box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+						}
+					`}</style>
 				</Popover.Content>
 			</Popover.Root>
 			<input
@@ -116,4 +144,3 @@ export function ColorPicker({
 		</div>
 	);
 }
-
