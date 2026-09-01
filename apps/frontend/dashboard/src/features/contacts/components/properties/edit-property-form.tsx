@@ -32,6 +32,7 @@ interface EditPropertyFormProps {
 	onSuccess?: () => void;
 	variant?: "modal" | "inline";
 	title?: string;
+	nameLabel?: string;
 }
 
 const getBadgeColor = (type: string) => {
@@ -51,6 +52,7 @@ export function EditPropertyForm({
 	onSuccess,
 	variant = "modal",
 	title = "Edit property",
+	nameLabel = "Property name",
 }: EditPropertyFormProps) {
 	const [fallbackValue, setFallbackValue] = useState(
 		property.defaultValue || "",
@@ -191,7 +193,7 @@ export function EditPropertyForm({
 									htmlFor={`property-name-${property.id}`}
 									className="font-medium text-text-strong-950 text-xs"
 								>
-									Name
+									{nameLabel}
 								</Label.Root>
 								<span className="font-normal text-text-sub-600 text-[11px]">
 									(Cannot be edited)

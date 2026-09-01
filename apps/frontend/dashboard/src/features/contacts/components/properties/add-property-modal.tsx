@@ -28,6 +28,7 @@ interface AddPropertyModalProps {
 	}) => void;
 	title?: string;
 	submitLabel?: string;
+	nameLabel?: string;
 }
 
 type PropertyType = "string" | "number";
@@ -35,23 +36,17 @@ type PropertyType = "string" | "number";
 const TYPE_OPTIONS: {
 	value: PropertyType;
 	label: string;
-	icon: string;
 	description: string;
-	color: string;
 }[] = [
 	{
 		value: "string",
 		label: "String",
-		icon: "text",
 		description: "Free-form text",
-		color: "text-primary-base",
 	},
 	{
 		value: "number",
 		label: "Number",
-		icon: "hash",
 		description: "Integer or decimal",
-		color: "text-primary-base",
 	},
 ];
 
@@ -75,6 +70,7 @@ export const AddPropertyModal = ({
 	onSuccess,
 	title = "Add property",
 	submitLabel = "Add property",
+	nameLabel = "Property name",
 }: AddPropertyModalProps) => {
 	const invalidate = useInvalidateContacts();
 	const [status, setStatus] = useState<"idle" | "creating" | "success">("idle");
@@ -232,7 +228,7 @@ export const AddPropertyModal = ({
 									htmlFor="propertyName"
 									className="font-medium text-text-strong-950 text-xs"
 								>
-									Name
+									{nameLabel}
 									<Label.Asterisk />
 								</Label.Root>
 								<Input.Root
@@ -264,80 +260,54 @@ export const AddPropertyModal = ({
 								)}
 							</div>
 
-							{/* Property Type */}
-							<div className="space-y-1.5">
-								<Label.Root className="font-medium text-text-strong-950 text-xs">
-									Type
-									<Label.Asterisk />
-								</Label.Root>
-								<div className="grid grid-cols-2 gap-2.5">
-									{TYPE_OPTIONS.map((opt) => {
-										const isSelected = propertyType === opt.value;
-										return (
-											<button
-												key={opt.value}
-												type="button"
-												onClick={() => setPropertyType(opt.value)}
-												disabled={status !== "idle"}
-												className={cn(
-													"group relative flex flex-col items-start gap-2.5 rounded-xl border p-3 text-left transition-all duration-150 active:scale-[0.98]",
-													isSelected
-														? "border-primary-base bg-primary-light/10 shadow-[0_0_0_1px_rgba(0,85,255,1)] dark:border-primary-base dark:bg-primary-base/10"
-														: "border-stroke-soft-200 bg-bg-white-0 hover:border-stroke-soft-200 hover:bg-bg-weak-50 dark:border-stroke-soft-100/40 dark:bg-bg-soft-200/10 dark:hover:bg-white/[0.04]",
-												)}
-											>
-												<div className="flex w-full items-center justify-between">
-													<div
-														className={cn(
-															"flex h-6 w-6 items-center justify-center rounded-lg border",
-															isSelected
-																? "border-primary-base/30 bg-primary-light/20"
-																: "border-stroke-soft-200 bg-bg-soft-50 text-text-sub-600 dark:border-stroke-soft-100/40 dark:bg-white/[0.05]",
-														)}
-													>
-														<Icon
-															name={
-																opt.icon as Parameters<typeof Icon>[0]["name"]
-															}
-															className={cn(
-																"h-3 w-3",
-																isSelected ? opt.color : "text-text-sub-600",
-															)}
-														/>
-													</div>
-													<AnimatePresence>
-														{isSelected && (
-															<motion.div
-																initial={{ scale: 0, opacity: 0 }}
-																animate={{ scale: 1, opacity: 1 }}
-																exit={{ scale: 0, opacity: 0 }}
-																transition={{
-																	type: "spring",
-																	stiffness: 500,
-																	damping: 30,
-																}}
-																className="flex h-4 w-4 items-center justify-center rounded-full bg-primary-base"
-															>
-																<Icon
-																	name="check"
-																	className="h-2.5 w-2.5 text-white"
-																/>
-															</motion.div>
-														)}
-													</AnimatePresence>
-												</div>
-												<div>
-													<p className="font-semibold text-text-strong-950 text-xs">
-														{opt.label}
-													</p>
-													<p className="text-[11px] text-text-sub-600">
-														{opt.description}
-													</p>
-												</div>
-											</button>
-										);
-									})}
-								</div>
+							{/* Property Type Selector */}
+							<div className="grid grid-cols-2 gap-2.5">
+								{TYPE_OPTIONS.map((opt) => {
+									const isSelected = propertyType === opt.value;
+									return (
+										<button
+											key={opt.value}
+											type="button"
+											onClick={() => setPropertyType(opt.value)}
+											disabled={status !== "idle"}
+											className={cn(
+												"group relative flex flex-col items-start gap-1 rounded-xl border p-3 text-left transition-all duration-150 active:scale-[0.98]",
+												isSelected
+													? "border-primary-base bg-primary-light/10 shadow-[0_0_0_1px_rgba(0,85,255,1)] dark:border-primary-base dark:bg-primary-base/10"
+													: "border-stroke-soft-200 bg-bg-white-0 hover:border-stroke-soft-200 hover:bg-bg-weak-50 dark:border-stroke-soft-100/40 dark:bg-bg-soft-200/10 dark:hover:bg-white/[0.04]",
+											)}
+										>
+											<div className="flex w-full items-center justify-between">
+												<p className="font-semibold text-text-strong-950 text-xs">
+													{opt.label}
+												</p>
+												<AnimatePresence>
+													{isSelected && (
+														<motion.div
+															initial={{ scale: 0, opacity: 0 }}
+															animate={{ scale: 1, opacity: 1 }}
+															exit={{ scale: 0, opacity: 0 }}
+															transition={{
+																type: "spring",
+																stiffness: 500,
+																damping: 30,
+															}}
+															className="flex h-4 w-4 items-center justify-center rounded-full bg-primary-base"
+														>
+															<Icon
+																name="check"
+																className="h-2.5 w-2.5 text-white"
+															/>
+														</motion.div>
+													)}
+												</AnimatePresence>
+											</div>
+											<p className="text-[11px] text-text-sub-600">
+												{opt.description}
+											</p>
+										</button>
+									);
+								})}
 							</div>
 
 							{/* Default Value */}

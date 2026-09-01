@@ -18,6 +18,7 @@ interface EditPropertyModalProps {
 	onOpenChange: (open: boolean) => void;
 	onEditSuccess?: () => void;
 	title?: string;
+	nameLabel?: string;
 }
 
 export const EditPropertyModal = ({
@@ -26,6 +27,7 @@ export const EditPropertyModal = ({
 	onOpenChange,
 	onEditSuccess,
 	title = "Edit property",
+	nameLabel = "Property name",
 }: EditPropertyModalProps) => {
 	if (!property) return null;
 
@@ -39,6 +41,7 @@ export const EditPropertyModal = ({
 					property={property}
 					variant="modal"
 					title={title}
+					nameLabel={nameLabel}
 					onCancel={() => onOpenChange(false)}
 					onSuccess={() => {
 						onOpenChange(false);
