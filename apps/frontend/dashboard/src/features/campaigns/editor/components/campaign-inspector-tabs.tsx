@@ -51,9 +51,9 @@ export function CampaignInspectorTabs({
 	const rect = tab?.getBoundingClientRect();
 
 	return (
-		<div className="sticky top-0 z-20 shrink-0 bg-bg-white-0 px-2 dark:bg-black">
+		<div className="sticky top-0 z-20 shrink-0 bg-bg-white-0 dark:bg-black">
 			<TabMenuHorizontal.Root value={effectiveTabValue}>
-				<TabMenuHorizontal.List className="relative h-11 gap-0 border-b! py-0">
+				<TabMenuHorizontal.List className="relative h-11 w-full gap-0 border-stroke-soft-200 border-b px-2 py-0 dark:border-stroke-soft-100/40">
 					{items.map(({ value, title, iconName }, index) => (
 						<TabMenuHorizontal.Trigger
 							ref={(el) => {
