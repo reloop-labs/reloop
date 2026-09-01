@@ -240,7 +240,7 @@ export const AddPropertyModal = ({
 										<Input.Input
 											ref={nameInputRef}
 											id="propertyName"
-											placeholder="e.g., first_name, company_plan"
+											placeholder="first_name"
 											value={propertyName}
 											onChange={handleNameChange}
 											onBlur={handleSlugify}
@@ -252,7 +252,7 @@ export const AddPropertyModal = ({
 									</Input.Wrapper>
 								</Input.Root>
 								{nameError ? (
-									<p className="text-error-base text-[11px]">{nameError}</p>
+									<p className="text-[11px] text-error-base">{nameError}</p>
 								) : (
 									<p className="text-[11px] text-text-sub-600">
 										Letters, numbers &amp; underscores — spaces auto-convert
@@ -326,11 +326,7 @@ export const AddPropertyModal = ({
 									<Input.Wrapper>
 										<Input.Input
 											id="defaultValue"
-											placeholder={
-												propertyType === "number"
-													? "e.g., 0"
-													: "e.g., unknown"
-											}
+											placeholder={propertyType === "number" ? "0" : "unknown"}
 											value={defaultValue}
 											onChange={(e) => {
 												const val = e.target.value;
@@ -343,14 +339,12 @@ export const AddPropertyModal = ({
 												}
 											}}
 											disabled={status !== "idle"}
-											inputMode={
-												propertyType === "number" ? "numeric" : "text"
-											}
+											inputMode={propertyType === "number" ? "numeric" : "text"}
 										/>
 									</Input.Wrapper>
 								</Input.Root>
 								{defaultValueError ? (
-									<p className="text-error-base text-[11px]">
+									<p className="text-[11px] text-error-base">
 										{defaultValueError}
 									</p>
 								) : (
@@ -363,11 +357,11 @@ export const AddPropertyModal = ({
 					</div>
 
 					{/* Actions / Footer */}
-					<div className="relative flex items-center justify-between gap-3 px-3 pt-2 pb-3">
+					<div className="relative flex items-center justify-end gap-2.5 px-3 pt-2 pb-3">
 						<Button.Root
 							type="button"
 							variant="neutral"
-							mode="ghost"
+							mode="stroke"
 							size="small"
 							onClick={handleClose}
 							className={cn(

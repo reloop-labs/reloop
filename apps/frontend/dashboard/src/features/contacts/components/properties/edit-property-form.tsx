@@ -274,7 +274,7 @@ export function EditPropertyForm({
 				{/* Actions / Footer */}
 				<div
 					className={cn(
-						"flex items-center justify-between gap-3",
+						"flex items-center justify-end gap-2.5",
 						isInline
 							? "px-6 pt-3 pb-3.5 dark:bg-bg-weak-50/40"
 							: "relative px-3 pt-2 pb-3",
@@ -283,7 +283,7 @@ export function EditPropertyForm({
 					<Button.Root
 						type="button"
 						variant="neutral"
-						mode="ghost"
+						mode="stroke"
 						size="small"
 						onClick={onCancel}
 						disabled={status !== "idle"}
