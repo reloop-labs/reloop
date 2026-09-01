@@ -13,11 +13,14 @@ import Spinner from "@reloop/ui/spinner";
 import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
 import type React from "react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import { useSessionQuery } from "#/features/auth/session-query";
-import { useAllPropertiesQuery } from "#/features/contacts/hooks/use-contacts-query";
+import {
+	type Property,
+	useAllPropertiesQuery,
+} from "#/features/contacts/hooks/use-contacts-query";
 import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { testCampaignRequest } from "../../campaigns-api";
 
@@ -25,6 +28,77 @@ import * as Textarea from "@reloop/ui/textarea";
 
 const actionKbdOnBlueClassName =
 	"border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]";
+
+interface VariableInputFieldProps {
+	property: Property;
+	value: string;
+	onChange: (val: string) => void;
+	disabled: boolean;
+	registerField: (
+		name: string,
+		controller: { show: (msg: string) => void; clear: () => void },
+	) => void;
+}
+
+function VariableInputField({
+	property,
+	value,
+	onChange,
+	disabled,
+	registerField,
+}: VariableInputFieldProps) {
+	const field = useFieldError();
+
+	useEffect(() => {
+		registerField(property.propertyName, field);
+	}, [property.propertyName, field, registerField]);
+
+	return (
+		<div className="space-y-1.5">
+			<Label.Root
+				htmlFor={`test-var-${property.propertyName}`}
+				className="flex items-center gap-0.5 font-medium text-text-strong-950 text-xs"
+			>
+				{property.propertyName}
+				<Label.Asterisk />
+			</Label.Root>
+			<FieldError field={field}>
+				<Input.Root
+					size="medium"
+					hasError={field.hasError}
+					className="rounded-xl"
+				>
+					<Input.Wrapper className="pr-2">
+						<Input.Input
+							id={`test-var-${property.propertyName}`}
+							{...field.controlProps}
+							type={property.propertyType === "number" ? "number" : "text"}
+							placeholder={
+								property.defaultValue
+									? `Default: ${property.defaultValue}`
+									: "Enter value"
+							}
+							value={value}
+							onChange={(e) => {
+								onChange(e.target.value);
+								if (field.hasError) field.clear();
+							}}
+							disabled={disabled}
+						/>
+						<Badge.Root
+							size="small"
+							variant="lighter"
+							color={property.propertyType === "number" ? "purple" : "blue"}
+							className="h-5 shrink-0 rounded-full px-1.5 font-semibold text-[10px] capitalize"
+						>
+							{property.propertyType}
+						</Badge.Root>
+					</Input.Wrapper>
+				</Input.Root>
+			</FieldError>
+		</div>
+	);
+}
 
 interface CampaignTestEmailModalProps {
 	open: boolean;
@@ -46,9 +120,20 @@ export function CampaignTestEmailModal({
 	const [variableValues, setVariableValues] = useState<Record<string, string>>(
 		{},
 	);
-	const [variableErrors, setVariableErrors] = useState<Record<string, string>>(
-		{},
+	const varFieldRefs = useRef<
+		Record<string, { show: (msg: string) => void; clear: () => void }>
+	>({});
+
+	const registerField = useCallback(
+		(
+			name: string,
+			controller: { show: (msg: string) => void; clear: () => void },
+		) => {
+			varFieldRefs.current[name] = controller;
+		},
+		[],
 	);
+
 	const emailField = useFieldError<HTMLTextAreaElement>();
 	const clearEmailError = emailField.clear;
 
@@ -66,17 +151,21 @@ export function CampaignTestEmailModal({
 		} else {
 			const timer = setTimeout(() => {
 				clearEmailError();
-				setVariableErrors({});
+				for (const ctrl of Object.values(varFieldRefs.current)) {
+					ctrl?.clear();
+				}
 				setStatus("idle");
 			}, 300);
 			return () => clearTimeout(timer);
 		}
-	}, [open, clearEmailError]);
+	}, [open, clearEmailError, properties]);
 
 	const handleClose = () => {
 		if (status !== "idle") return;
 		clearEmailError();
-		setVariableErrors({});
+		for (const ctrl of Object.values(varFieldRefs.current)) {
+			ctrl?.clear();
+		}
 		onOpenChange(false);
 	};
 
@@ -85,7 +174,6 @@ export function CampaignTestEmailModal({
 		if (status !== "idle") return;
 
 		let hasError = false;
-		const newVarErrors: Record<string, string> = {};
 
 		const emailList = email
 			.split(/[\n,;]+/)
@@ -108,19 +196,21 @@ export function CampaignTestEmailModal({
 		for (const p of properties) {
 			const val = variableValues[p.propertyName]?.trim();
 			if (!val) {
-				newVarErrors[p.propertyName] = `${p.propertyName} is required.`;
+				varFieldRefs.current[p.propertyName]?.show(
+					`${p.propertyName} is required.`,
+				);
 				hasError = true;
 			}
 		}
-
-		setVariableErrors(newVarErrors);
 
 		if (hasError) {
 			return;
 		}
 
 		emailField.clear();
-		setVariableErrors({});
+		for (const ctrl of Object.values(varFieldRefs.current)) {
+			ctrl?.clear();
+		}
 		setStatus("sending");
 		try {
 			for (const addr of emailList) {
@@ -240,82 +330,27 @@ export function CampaignTestEmailModal({
 
 							{/* Variables section */}
 							{properties.length > 0 && (
-								<div className="space-y-2.5 pt-1">
+								<div className="space-y-2 pt-1">
 									<div className="flex items-center justify-between">
 										<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-wide">
 											Variables
 										</p>
 									</div>
-									<div className="max-h-44 space-y-2.5 overflow-y-auto pr-1">
+									<div className="-mx-1.5 max-h-48 space-y-3 overflow-y-auto px-1.5 py-1">
 										{properties.map((p) => (
-											<div key={p.id} className="space-y-1.5">
-												<div className="flex items-center justify-between gap-2">
-													<Label.Root
-														htmlFor={`test-var-${p.propertyName}`}
-														className="font-medium text-text-strong-950 text-xs flex items-center gap-0.5"
-													>
-														{p.propertyName}
-														<Label.Asterisk />
-													</Label.Root>
-													<Badge.Root
-														size="small"
-														variant="lighter"
-														color={
-															p.propertyType === "number" ? "purple" : "blue"
-														}
-														className="h-[18px] rounded-full px-1.5 font-semibold text-[10px] capitalize"
-													>
-														{p.propertyType}
-													</Badge.Root>
-												</div>
-												<Input.Root
-													size="small"
-													hasError={Boolean(variableErrors[p.propertyName])}
-													className="rounded-xl"
-												>
-													<Input.Wrapper>
-														<Input.Input
-															id={`test-var-${p.propertyName}`}
-															type={
-																p.propertyType === "number" ? "number" : "text"
-															}
-															placeholder={
-																p.defaultValue
-																	? `Default: ${p.defaultValue}`
-																	: "Enter value"
-															}
-															value={variableValues[p.propertyName] ?? ""}
-															onChange={(e) => {
-																setVariableValues((prev) => ({
-																	...prev,
-																	[p.propertyName]: e.target.value,
-																}));
-																if (variableErrors[p.propertyName]) {
-																	setVariableErrors((prev) => {
-																		const copy = { ...prev };
-																		delete copy[p.propertyName];
-																		return copy;
-																	});
-																}
-															}}
-															disabled={status !== "idle"}
-														/>
-													</Input.Wrapper>
-												</Input.Root>
-												<AnimatePresence>
-													{variableErrors[p.propertyName] && (
-														<motion.p
-															initial={{ opacity: 0, y: -4 }}
-															animate={{ opacity: 1, y: 0 }}
-															exit={{ opacity: 0, y: -4 }}
-															transition={{ duration: 0.15 }}
-															className="text-error-base text-[11px]"
-														>
-															{variableErrors[p.propertyName]}
-														</motion.p>
-													)}
-												</AnimatePresence>
-											</div>
+											<VariableInputField
+												key={p.id}
+												property={p}
+												value={variableValues[p.propertyName] ?? ""}
+												onChange={(val) =>
+													setVariableValues((prev) => ({
+														...prev,
+														[p.propertyName]: val,
+													}))
+												}
+												disabled={status !== "idle"}
+												registerField={registerField}
+											/>
 										))}
 									</div>
 								</div>
