@@ -783,37 +783,63 @@ export const EmailInspector = () => {
 				{/* ── Document card ── */}
 				<Inspector.Document>
 					{({ findStyleValue, setGlobalStyle }) => (
-						<InspectorSection>
-							<SectionHeader label="Body" />
-							<ScrubRow
-								label="Container width"
-								value={findStyleValue("container", "width")}
-								onChange={(v) => setGlobalStyle("container", "width", v)}
-								min={200}
-								max={800}
-								suffix="px"
-							/>
-							<ScrubRow
-								label="Border radius"
-								value={findStyleValue("container", "borderRadius")}
-								onChange={(v) => setGlobalStyle("container", "borderRadius", v)}
-								min={0}
-								max={64}
-								suffix="px"
-							/>
-							<ScrubRow
-								label="Line height"
-								value={findStyleValue("body", "lineHeight")}
-								onChange={(v) => setGlobalStyle("body", "lineHeight", v)}
-								min={80}
-								max={300}
-							/>
-							<ColorRow
-								label="Text color"
-								value={String(findStyleValue("body", "color") ?? "")}
-								onChange={(v) => setGlobalStyle("body", "color", v)}
-							/>
-						</InspectorSection>
+						<>
+							<InspectorSection>
+								<SectionHeader label="Background" />
+								<ColorRow
+									label="Color"
+									value={String(findStyleValue("body", "backgroundColor") ?? "")}
+									onChange={(v) => setGlobalStyle("body", "backgroundColor", v)}
+								/>
+								<ScrubRow
+									label="Padding"
+									value={findStyleValue("body", "padding")}
+									onChange={(v) => setGlobalStyle("body", "padding", v)}
+									min={0}
+									max={128}
+									suffix="px"
+								/>
+							</InspectorSection>
+
+							<InspectorSection>
+								<SectionHeader label="Container" />
+								<ColorRow
+									label="Color"
+									value={String(
+										findStyleValue("container", "backgroundColor") ?? "",
+									)}
+									onChange={(v) =>
+										setGlobalStyle("container", "backgroundColor", v)
+									}
+								/>
+								<ScrubRow
+									label="Width"
+									value={findStyleValue("container", "width")}
+									onChange={(v) => setGlobalStyle("container", "width", v)}
+									min={200}
+									max={800}
+									suffix="px"
+								/>
+								<ScrubRow
+									label="Padding"
+									value={findStyleValue("container", "padding")}
+									onChange={(v) => setGlobalStyle("container", "padding", v)}
+									min={0}
+									max={128}
+									suffix="px"
+								/>
+								<ScrubRow
+									label="Rounded"
+									value={findStyleValue("container", "borderRadius")}
+									onChange={(v) =>
+										setGlobalStyle("container", "borderRadius", v)
+									}
+									min={0}
+									max={64}
+									suffix="px"
+								/>
+							</InspectorSection>
+						</>
 					)}
 				</Inspector.Document>
 			</div>

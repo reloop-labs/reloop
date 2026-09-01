@@ -23,7 +23,7 @@ const getIconName = (type: string): string => {
 		case "row":
 			return "layout-grid";
 		case "body":
-			return "file-text";
+			return "layout";
 		case "variable":
 			return "brackets";
 		case "bulletlist":

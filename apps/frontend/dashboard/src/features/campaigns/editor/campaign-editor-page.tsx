@@ -91,7 +91,7 @@ export function CampaignEditorPage({ campaignId }: { campaignId: string }) {
 								<CampaignSendDetails />
 								<GeneratingOverlay />
 								<ScrollAreaPrimitive.Root className="relative min-h-0 flex-1 overflow-hidden" type="auto">
-									<ScrollAreaPrimitive.Viewport className="size-full py-4 [&>div]:!block">
+									<ScrollAreaPrimitive.Viewport className="size-full [&>div]:!block [&>div]:!min-h-full [&>div]:!w-full">
 										<FullEmailBuilder />
 									</ScrollAreaPrimitive.Viewport>
 									<ScrollAreaPrimitive.Scrollbar
