@@ -56,6 +56,53 @@ const ErrorTooltipContent = ({ error }: ErrorTooltipContentProps) => {
 	);
 };
 
+const getAppropriateSenderName = (
+	handle: string,
+	userName?: string | null,
+	userEmail?: string | null,
+	explicitName?: string,
+) => {
+	if (explicitName && explicitName.trim()) {
+		return explicitName.trim();
+	}
+
+	const cleanHandle = handle.toLowerCase();
+	const userHandle = userEmail?.split("@")[0]?.toLowerCase();
+
+	if (userHandle && cleanHandle === userHandle) {
+		return (
+			userName || cleanHandle.charAt(0).toUpperCase() + cleanHandle.slice(1)
+		);
+	}
+
+	switch (cleanHandle) {
+		case "team":
+			return "Team";
+		case "support":
+		case "help":
+			return "Support";
+		case "notifications":
+		case "alerts":
+			return "Notifications";
+		case "newsletter":
+		case "news":
+		case "updates":
+			return "Newsletter";
+		case "hello":
+		case "hi":
+		case "contact":
+		case "info":
+			return "Hello";
+		case "billing":
+			return "Billing";
+		case "security":
+			return "Security";
+		default: {
+			return cleanHandle.charAt(0).toUpperCase() + cleanHandle.slice(1);
+		}
+	}
+};
+
 interface SuggestedSender {
 	name: string;
 	email: string;
@@ -72,7 +119,7 @@ export const TemplateFromField = () => {
 	const replyTo = useEditorStore((s) => s.replyTo);
 	const setReplyTo = useEditorStore((s) => s.setReplyTo);
 
-	const { user, activeOrganization } = useActiveOrganization();
+	const { user } = useActiveOrganization();
 
 	// Fetch organization domains
 	const domainsQuery = useDomainsQuery({
@@ -154,7 +201,7 @@ export const TemplateFromField = () => {
 			const isComplete = Boolean(trimmed.includes("."));
 			const [handlePart = "", domainPart = ""] = trimmed.split("@");
 			return {
-				name: senderName || "",
+				name: "",
 				email: trimmed,
 				handle: handlePart,
 				domain: domainPart,
@@ -164,26 +211,18 @@ export const TemplateFromField = () => {
 		}
 
 		return {
-			name: trimmed,
+			name: "",
 			email: "",
-			handle: "",
+			handle: trimmed,
 			domain: "",
 			isComplete: false,
-			query: "",
+			query: trimmed.toLowerCase(),
 		};
-	}, [inputValue, senderName]);
+	}, [inputValue]);
 
 	// Generate dynamic email suggestions based on verified sending domains
 	const suggestions = useMemo((): SuggestedSender[] => {
 		if (verifiedSendingDomains.length === 0) return [];
-
-		// Determine base sender name
-		const defaultName =
-			parsedInput.name ||
-			senderName ||
-			activeOrganization?.name ||
-			user?.name ||
-			"Team";
 
 		// Common handle prefixes
 		const standardHandles = [
@@ -210,12 +249,18 @@ export const TemplateFromField = () => {
 
 			// If user typed a custom handle that's not standard, suggest it
 			if (typedHandle && !standardHandles.includes(typedHandle)) {
+				const itemName = getAppropriateSenderName(
+					typedHandle,
+					user?.name,
+					user?.email,
+					parsedInput.name,
+				);
 				const customItem = {
-					name: defaultName,
+					name: itemName,
 					email: `${typedHandle}@${domainName}`,
 					handle: typedHandle,
 					domain: domainName,
-					formatted: `${defaultName} <${typedHandle}@${domainName}>`,
+					formatted: `${itemName} <${typedHandle}@${domainName}>`,
 				};
 				allDefaults.push(customItem);
 				if (!typedDomain || domainName.includes(typedDomain)) {
@@ -225,10 +270,16 @@ export const TemplateFromField = () => {
 
 			// Add standard suggestions
 			for (const handle of standardHandles) {
+				const itemName = getAppropriateSenderName(
+					handle,
+					user?.name,
+					user?.email,
+					parsedInput.name,
+				);
 				const email = `${handle}@${domainName}`;
-				const formatted = `${defaultName} <${email}>`;
+				const formatted = `${itemName} <${email}>`;
 				const standardItem = {
-					name: defaultName,
+					name: itemName,
 					email,
 					handle,
 					domain: domainName,
@@ -242,7 +293,7 @@ export const TemplateFromField = () => {
 					parsedInput.query &&
 					!email.includes(parsedInput.query) &&
 					!domainName.includes(parsedInput.query) &&
-					!defaultName.toLowerCase().includes(parsedInput.query)
+					!itemName.toLowerCase().includes(parsedInput.query)
 				) {
 					continue;
 				}
@@ -261,8 +312,6 @@ export const TemplateFromField = () => {
 	}, [
 		verifiedSendingDomains,
 		parsedInput,
-		senderName,
-		activeOrganization?.name,
 		user?.name,
 		user?.email,
 	]);
@@ -286,8 +335,14 @@ export const TemplateFromField = () => {
 		} else if (val.includes("@")) {
 			const email = val.trim();
 			setFromEmail(email);
-			if (!senderName && activeOrganization?.name) {
-				setSenderName(activeOrganization.name);
+			const handle = email.split("@")[0] || "";
+			if (!senderName) {
+				const derivedName = getAppropriateSenderName(
+					handle,
+					user?.name,
+					user?.email,
+				);
+				setSenderName(derivedName);
 			}
 		} else {
 			setSenderName(val.trim());
@@ -296,12 +351,7 @@ export const TemplateFromField = () => {
 
 	// Apply selected suggestion with auto-correction
 	const handleSelectSuggestion = (suggestion: SuggestedSender) => {
-		const resolvedName =
-			parsedInput.name ||
-			senderName ||
-			suggestion.name ||
-			activeOrganization?.name ||
-			"";
+		const resolvedName = suggestion.name;
 
 		const finalFormatted = resolvedName
 			? `${resolvedName} <${suggestion.email}>`

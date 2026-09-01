@@ -56,6 +56,53 @@ const ErrorTooltipContent = ({ error }: ErrorTooltipContentProps) => {
 	);
 };
 
+const getAppropriateSenderName = (
+	handle: string,
+	userName?: string | null,
+	userEmail?: string | null,
+	explicitName?: string,
+) => {
+	if (explicitName && explicitName.trim()) {
+		return explicitName.trim();
+	}
+
+	const cleanHandle = handle.toLowerCase();
+	const userHandle = userEmail?.split("@")[0]?.toLowerCase();
+
+	if (userHandle && cleanHandle === userHandle) {
+		return (
+			userName || cleanHandle.charAt(0).toUpperCase() + cleanHandle.slice(1)
+		);
+	}
+
+	switch (cleanHandle) {
+		case "team":
+			return "Team";
+		case "support":
+		case "help":
+			return "Support";
+		case "notifications":
+		case "alerts":
+			return "Notifications";
+		case "newsletter":
+		case "news":
+		case "updates":
+			return "Newsletter";
+		case "hello":
+		case "hi":
+		case "contact":
+		case "info":
+			return "Hello";
+		case "billing":
+			return "Billing";
+		case "security":
+			return "Security";
+		default: {
+			return cleanHandle.charAt(0).toUpperCase() + cleanHandle.slice(1);
+		}
+	}
+};
+
 interface SuggestedSender {
 	name: string;
 	email: string;
@@ -72,7 +119,7 @@ export const CampaignFromField = () => {
 	const replyTo = useCampaignEditorStore((s) => s.replyTo);
 	const setReplyTo = useCampaignEditorStore((s) => s.setReplyTo);
 
-	const { user, activeOrganization } = useActiveOrganization();
+	const { user } = useActiveOrganization();
 
 	// Fetch organization domains
 	const domainsQuery = useDomainsQuery({
@@ -122,7 +169,7 @@ export const CampaignFromField = () => {
 
 	const [inputValue, setInputValue] = useState(getDisplayValue);
 
-	// Sync input with external store changes when not focused
+	// biome-ignore lint/correctness/useExhaustiveDependencies: controlled syncing
 	useEffect(() => {
 		if (!isDropdownOpen) {
 			setInputValue(getDisplayValue());
@@ -152,7 +199,7 @@ export const CampaignFromField = () => {
 			const isComplete = Boolean(trimmed.includes("."));
 			const [handlePart = "", domainPart = ""] = trimmed.split("@");
 			return {
-				name: fromName || "",
+				name: "",
 				email: trimmed,
 				handle: handlePart,
 				domain: domainPart,
@@ -162,26 +209,18 @@ export const CampaignFromField = () => {
 		}
 
 		return {
-			name: trimmed,
+			name: "",
 			email: "",
-			handle: "",
+			handle: trimmed,
 			domain: "",
 			isComplete: false,
-			query: "",
+			query: trimmed.toLowerCase(),
 		};
-	}, [inputValue, fromName]);
+	}, [inputValue]);
 
 	// Generate dynamic email suggestions based on verified sending domains
 	const suggestions = useMemo((): SuggestedSender[] => {
 		if (verifiedSendingDomains.length === 0) return [];
-
-		// Determine base sender name
-		const defaultName =
-			parsedInput.name ||
-			fromName ||
-			activeOrganization?.name ||
-			user?.name ||
-			"Team";
 
 		// Common handle prefixes
 		const standardHandles = [
@@ -208,12 +247,18 @@ export const CampaignFromField = () => {
 
 			// If user typed a custom handle that's not standard, suggest it
 			if (typedHandle && !standardHandles.includes(typedHandle)) {
+				const itemName = getAppropriateSenderName(
+					typedHandle,
+					user?.name,
+					user?.email,
+					parsedInput.name,
+				);
 				const customItem = {
-					name: defaultName,
+					name: itemName,
 					email: `${typedHandle}@${domainName}`,
 					handle: typedHandle,
 					domain: domainName,
-					formatted: `${defaultName} <${typedHandle}@${domainName}>`,
+					formatted: `${itemName} <${typedHandle}@${domainName}>`,
 				};
 				allDefaults.push(customItem);
 				if (!typedDomain || domainName.includes(typedDomain)) {
@@ -223,10 +268,16 @@ export const CampaignFromField = () => {
 
 			// Add standard suggestions
 			for (const handle of standardHandles) {
+				const itemName = getAppropriateSenderName(
+					handle,
+					user?.name,
+					user?.email,
+					parsedInput.name,
+				);
 				const email = `${handle}@${domainName}`;
-				const formatted = `${defaultName} <${email}>`;
+				const formatted = `${itemName} <${email}>`;
 				const standardItem = {
-					name: defaultName,
+					name: itemName,
 					email,
 					handle,
 					domain: domainName,
@@ -240,7 +291,7 @@ export const CampaignFromField = () => {
 					parsedInput.query &&
 					!email.includes(parsedInput.query) &&
 					!domainName.includes(parsedInput.query) &&
-					!defaultName.toLowerCase().includes(parsedInput.query)
+					!itemName.toLowerCase().includes(parsedInput.query)
 				) {
 					continue;
 				}
@@ -259,8 +310,6 @@ export const CampaignFromField = () => {
 	}, [
 		verifiedSendingDomains,
 		parsedInput,
-		fromName,
-		activeOrganization?.name,
 		user?.name,
 		user?.email,
 	]);
@@ -284,8 +333,14 @@ export const CampaignFromField = () => {
 		} else if (val.includes("@")) {
 			const email = val.trim();
 			setFromEmail(email);
-			if (!fromName && activeOrganization?.name) {
-				setFromName(activeOrganization.name);
+			const handle = email.split("@")[0] || "";
+			if (!fromName) {
+				const derivedName = getAppropriateSenderName(
+					handle,
+					user?.name,
+					user?.email,
+				);
+				setFromName(derivedName);
 			}
 		} else {
 			setFromName(val.trim());
@@ -294,13 +349,7 @@ export const CampaignFromField = () => {
 
 	// Apply selected suggestion with auto-correction
 	const handleSelectSuggestion = (suggestion: SuggestedSender) => {
-		// Use user's typed name if provided, otherwise fallback to suggestion's name
-		const resolvedName =
-			parsedInput.name ||
-			fromName ||
-			suggestion.name ||
-			activeOrganization?.name ||
-			"";
+		const resolvedName = suggestion.name;
 
 		const finalFormatted = resolvedName
 			? `${resolvedName} <${suggestion.email}>`
