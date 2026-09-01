@@ -32,36 +32,30 @@ function ModeToggle({
 }) {
 	return (
 		<div className="flex h-8 items-center gap-0.5 rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-0.5 dark:border-stroke-soft-100/40 dark:bg-black">
-			<Button.Root
+			<button
 				type="button"
-				variant="neutral"
-				mode={linked ? "lighter" : "ghost"}
-				size="xxsmall"
 				title="Uniform"
 				onClick={() => onToggle(true)}
-				className={`flex h-7 w-7 items-center justify-center rounded-lg outline-none ring-0 transition-all duration-150 ${
+				className={`flex size-6.5 cursor-pointer items-center justify-center rounded-[9px] transition-colors focus:outline-none ${
 					linked
 						? "bg-bg-soft-200 text-text-strong-950 shadow-regular-xs dark:bg-bg-soft-200"
 						: "text-text-soft-400 hover:text-text-sub-600"
 				}`}
 			>
 				<Square className="h-3.5 w-3.5 stroke-[1.75]" />
-			</Button.Root>
-			<Button.Root
+			</button>
+			<button
 				type="button"
-				variant="neutral"
-				mode={!linked ? "lighter" : "ghost"}
-				size="xxsmall"
 				title="Individual sides"
 				onClick={() => onToggle(false)}
-				className={`flex h-7 w-7 items-center justify-center rounded-lg outline-none ring-0 transition-all duration-150 ${
+				className={`flex size-6.5 cursor-pointer items-center justify-center rounded-[9px] transition-colors focus:outline-none ${
 					!linked
 						? "bg-bg-soft-200 text-text-strong-950 shadow-regular-xs dark:bg-bg-soft-200"
 						: "text-text-soft-400 hover:text-text-sub-600"
 				}`}
 			>
 				<Scan className="h-3.5 w-3.5 stroke-[1.75]" />
-			</Button.Root>
+			</button>
 		</div>
 	);
 }
@@ -222,4 +216,3 @@ export function SpacingControl({
 		</div>
 	);
 }
-
