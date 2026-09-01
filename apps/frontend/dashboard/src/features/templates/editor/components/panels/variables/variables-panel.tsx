@@ -101,7 +101,6 @@ export function VariablesPanel({}: PanelProps = {}) {
 		e.stopPropagation();
 		navigator.clipboard.writeText(key);
 		setCopiedKey(key);
-		toast.success(`Copied ${key}`, { duration: 1800 });
 		setTimeout(() => setCopiedKey(null), 2000);
 	};
 

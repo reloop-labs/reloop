@@ -77,6 +77,7 @@ export const AddTemplateVariableModal = ({
 	const [variableName, setVariableName] = useState("");
 	const [variableType, setVariableType] = useState<PropertyType>("string");
 	const [defaultValue, setDefaultValue] = useState("");
+	const [isNameFocused, setIsNameFocused] = useState(false);
 	const nameField = useFieldError();
 	const clearNameError = nameField.clear;
 
@@ -236,25 +237,40 @@ export const AddTemplateVariableModal = ({
 										hasError={nameField.hasError}
 										className="rounded-xl"
 									>
-										<Input.Wrapper>
-											<Input.InlineAffix className="font-mono text-text-sub-600 text-xs focus:text-text-strong-950!">
-												{"{{{"}
-											</Input.InlineAffix>
-											<Input.Input
-												id="templateVariableName"
-												{...nameField.controlProps}
-												placeholder="variable_name"
-												value={variableName}
-												onChange={handleNameChange}
-												onBlur={handleSlugify}
-												disabled={status !== "idle"}
-												autoComplete="off"
-												spellCheck={false}
-												autoFocus
-											/>
-											<Input.InlineAffix className="font-mono text-text-sub-600 text-xs focus:text-text-strong-950!">
-												{"}}}"}
-											</Input.InlineAffix>
+										<Input.Wrapper className="cursor-text">
+											<div className="flex max-w-full items-center gap-1 overflow-hidden font-mono text-xs">
+												<span className="shrink-0 select-none text-text-sub-600">
+													{"{{{"}
+												</span>
+												<input
+													id="templateVariableName"
+													{...nameField.controlProps}
+													placeholder={isNameFocused ? "" : "variable_name"}
+													value={variableName}
+													onChange={handleNameChange}
+													onFocus={() => setIsNameFocused(true)}
+													onBlur={() => {
+														setIsNameFocused(false);
+														handleSlugify();
+													}}
+													disabled={status !== "idle"}
+													autoComplete="off"
+													spellCheck={false}
+													style={{
+														width: `${Math.max(
+															1,
+															(isNameFocused
+																? variableName
+																: variableName || "variable_name"
+															).length,
+														)}ch`,
+													}}
+													className="shrink-0 bg-transparent p-0 font-mono text-text-strong-950 text-xs outline-none placeholder:text-text-soft-400 dark:text-white"
+												/>
+												<span className="shrink-0 select-none text-text-sub-600">
+													{"}}}"}
+												</span>
+											</div>
 										</Input.Wrapper>
 									</Input.Root>
 								</FieldError>
