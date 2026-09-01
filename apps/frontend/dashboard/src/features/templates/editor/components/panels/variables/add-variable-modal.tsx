@@ -329,7 +329,7 @@ export const AddTemplateVariableModal = ({
 									<Input.Wrapper>
 										<Input.Input
 											id="templateDefaultValue"
-											placeholder={variableType === "number" ? "0" : "unknown"}
+											placeholder="Fallback value when variable is not passed"
 											value={defaultValue}
 											onChange={(e) => {
 												const val = e.target.value;
@@ -350,11 +350,7 @@ export const AddTemplateVariableModal = ({
 									<p className="text-[11px] text-error-base">
 										{defaultValueError}
 									</p>
-								) : (
-									<p className="text-[11px] text-text-sub-600 dark:text-white/60">
-										Fallback value used when a contact is missing this variable
-									</p>
-								)}
+								) : null}
 							</div>
 						</div>
 					</div>

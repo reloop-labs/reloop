@@ -351,11 +351,7 @@ function ModalStyleOne({ onClose }: { onClose?: () => void }) {
 								<Input.Wrapper>
 									<Input.Input
 										id="defaultValue"
-										placeholder={
-											watchVariableType === "number"
-												? "e.g., 0"
-												: "e.g., unknown"
-										}
+										placeholder="Fallback value when variable is not passed"
 										disabled={isSubmitting}
 										inputMode={
 											watchVariableType === "number" ? "numeric" : "text"
@@ -384,11 +380,7 @@ function ModalStyleOne({ onClose }: { onClose?: () => void }) {
 								<p className="text-error-base text-xs">
 									{errors.defaultValue.message}
 								</p>
-							) : (
-								<p className="text-text-sub-600 text-xs leading-normal dark:text-white/60">
-									Used when a contact doesn&apos;t have this variable set
-								</p>
-							)}
+							) : null}
 						</div>
 					</div>
 
@@ -695,7 +687,7 @@ function ModalStyleTwo({ onClose }: { onClose?: () => void }) {
 								<Input.Wrapper>
 									<Input.Input
 										id="default-value-style2"
-										placeholder={variableType === "number" ? "0" : "unknown"}
+										placeholder="Fallback value when variable is not passed"
 										value={defaultValue}
 										onChange={(e) => {
 											const val = e.target.value;
@@ -716,11 +708,7 @@ function ModalStyleTwo({ onClose }: { onClose?: () => void }) {
 								<p className="text-[11px] text-error-base">
 									{defaultValueError}
 								</p>
-							) : (
-								<p className="text-[11px] text-text-sub-600 dark:text-white/60">
-									Fallback value used when a contact is missing this variable
-								</p>
-							)}
+							) : null}
 						</div>
 					</div>
 				</div>
