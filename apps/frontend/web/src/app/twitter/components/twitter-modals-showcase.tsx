@@ -1,17 +1,24 @@
 "use client";
 
+import { valibotResolver } from "@hookform/resolvers/valibot";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { FieldError, useFieldError } from "@reloop/ui/field-error";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
+import { KbdCommand } from "@reloop/ui/kbd-command";
+import { KbdEnter } from "@reloop/ui/kbd-enter";
+import { KbdEsc } from "@reloop/ui/kbd-esc";
 import { KbdKey } from "@reloop/ui/kbd-key";
 import * as Label from "@reloop/ui/label";
 import Spinner from "@reloop/ui/spinner";
 import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import type { Resolver } from "react-hook-form";
+import { useForm } from "react-hook-form";
+import * as v from "valibot";
 
 /** Keycap shortcut style */
 const shortcutKbdClassName = cn(
@@ -40,40 +47,114 @@ const actionKbdOnBlueClassName =
 	"border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]";
 
 /* -------------------------------------------------------------------------- */
-/*                            MODAL 1 (CLEAN CARD)                            */
+/*                     MODAL 1 (TEMPLATE VARIABLE EDITOR)                     */
 /* -------------------------------------------------------------------------- */
 
+const TYPE_OPTIONS = [
+	{
+		value: "string" as const,
+		label: "String",
+		description: "Plain text, name, email, etc.",
+		icon: "type",
+		color: "text-blue-500",
+		badgeColor: "blue" as const,
+	},
+	{
+		value: "number" as const,
+		label: "Number",
+		description: "Integers, decimals, prices, etc.",
+		icon: "hash",
+		color: "text-purple-500",
+		badgeColor: "purple" as const,
+	},
+];
+
+const slugify = (text: string) => {
+	return text
+		.toLowerCase()
+		.trim()
+		.replace(/\s+/g, "_")
+		.replace(/[^a-z0-9_]/g, "");
+};
+
+const addVariableSchema = v.pipe(
+	v.object({
+		variableName: v.pipe(
+			v.string(),
+			v.minLength(1, "Name is required"),
+			v.regex(
+				/^[a-zA-Z0-9_]*$/,
+				"Only letters, numbers, and underscores are allowed",
+			),
+			v.regex(/^[^0-9]/, "Variable name cannot start with a number"),
+		),
+		variableType: v.union([v.literal("string"), v.literal("number")]),
+		defaultValue: v.string(),
+	}),
+	v.forward(
+		v.check((input) => {
+			if (input.variableType === "number" && input.defaultValue.trim() !== "") {
+				return /^-?\d+(?:\.\d+)?$/.test(input.defaultValue.trim());
+			}
+			return true;
+		}, "Must be a valid number"),
+		["defaultValue"],
+	),
+);
+
+type VariableFormValues = v.InferInput<typeof addVariableSchema>;
+
 function ModalStyleOne({ onClose }: { onClose: () => void }) {
-	const [name, setName] = useState("");
-	const [isLoading, setIsLoading] = useState(false);
-	const [isCreated, setIsCreated] = useState(false);
-	const [error, setError] = useState<string | null>(null);
+	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [isSuccess, setIsSuccess] = useState(false);
 
-	const step = isCreated ? "success" : "form";
+	const {
+		register,
+		handleSubmit,
+		setValue,
+		watch,
+		reset,
+		getValues,
+		trigger,
+		formState: { errors, isValid },
+	} = useForm<VariableFormValues>({
+		resolver: valibotResolver(
+			addVariableSchema,
+		) as Resolver<VariableFormValues>,
+		defaultValues: {
+			variableName: "",
+			variableType: "string",
+			defaultValue: "",
+		},
+		mode: "onChange",
+	});
 
-	const handleClose = () => {
-		setName("");
-		setError(null);
-		setIsLoading(false);
-		setIsCreated(false);
-		onClose();
-	};
+	const watchVariableType = watch("variableType");
 
-	const onSubmit = (e: React.FormEvent) => {
-		e.preventDefault();
-		if (isLoading) return;
-		const trimmed = name.trim();
-		if (!trimmed) {
-			setError("Name must be at least 1 character");
-			return;
-		}
-		setError(null);
-		setIsLoading(true);
+	useEffect(() => {
+		const handleKeyDown = (e: KeyboardEvent) => {
+			if (e.key === "Escape") {
+				onClose();
+			}
+		};
+		window.addEventListener("keydown", handleKeyDown);
+		return () => window.removeEventListener("keydown", handleKeyDown);
+	}, [onClose]);
+
+	const handleFormSubmit = handleSubmit(async () => {
+		setIsSubmitting(true);
+		await new Promise((resolve) => setTimeout(resolve, 600));
+		setIsSubmitting(false);
+		setIsSuccess(true);
 		setTimeout(() => {
-			setIsCreated(true);
-			setIsLoading(false);
-		}, 500);
-	};
+			setIsSuccess(false);
+			reset();
+			onClose();
+		}, 1000);
+	});
+
+	const variableNameRegister = register("variableName");
+	const canSubmit = isValid && !isSubmitting;
 
 	return (
 		<motion.div
@@ -81,160 +162,259 @@ function ModalStyleOne({ onClose }: { onClose: () => void }) {
 			animate={{ opacity: 1, scale: 1, y: 0 }}
 			exit={{ opacity: 0, scale: 0.96, y: 8 }}
 			transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-			className="w-full max-w-[460px] overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 sm:max-w-[460px] dark:border-stroke-soft-100/40 dark:bg-[#0c0c0c]"
+			className="w-full max-w-[480px] overflow-hidden rounded-2xl border border-stroke-soft-100/50 bg-bg-white-0 p-0.5 shadow-regular-md sm:max-w-[480px] dark:border-stroke-soft-100/40 dark:bg-[#0c0c0c]"
 		>
-			{/* Outer motion wrapper — animates height as content changes */}
-			<motion.div
-				layout="size"
-				transition={{ duration: 0.32, ease: [0.25, 0.46, 0.45, 0.94] }}
-			>
-				<div className="p-6">
-					{/* Header — title swaps instantly with the step */}
-					<div className="relative pr-10">
-						<h2 className="font-semibold text-[26px] text-text-strong-950 tracking-tight dark:text-white">
-							{step === "form" ? "Create campaign" : "Campaign created"}
-						</h2>
+			<div className="rounded-2xl border border-stroke-soft-100/50 dark:border-stroke-soft-100/40">
+				{/* Header */}
+				<div className="relative flex items-center gap-3.5 py-4 pr-14 pl-5 before:absolute before:inset-x-0 before:bottom-0 before:border-stroke-soft-200/50 before:border-b dark:before:border-stroke-soft-100/40">
+					<div className="flex items-center justify-center gap-1.5">
+						<Icon
+							name="brackets"
+							className="h-3.5 w-3.5 text-text-strong-950 dark:text-white"
+						/>
+						<div className="flex-1">
+							<h2 className="font-medium text-label-sm text-text-strong-950 dark:text-white">
+								Create Variable
+							</h2>
+						</div>
+					</div>
+					<button
+						type="button"
+						onClick={onClose}
+						aria-label="Close"
+						className="absolute top-4 right-4 z-20 flex h-7 w-7 items-center justify-center rounded-lg border border-stroke-soft-200 bg-bg-white-0 text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 active:scale-[0.95] dark:border-stroke-soft-100/40 dark:bg-transparent dark:text-white/60 dark:hover:bg-white/[0.05] dark:hover:text-white"
+					>
+						<X className="h-3.5 w-3.5" />
+					</button>
+				</div>
+
+				<form onSubmit={handleFormSubmit}>
+					<div className="flex flex-col gap-5 p-5">
+						{/* Variable Name */}
+						<div className="flex flex-col gap-1.5">
+							<Label.Root htmlFor="variableName">
+								Name
+								<Label.Asterisk />
+							</Label.Root>
+							<Input.Root
+								size="small"
+								hasError={!!errors.variableName}
+								className="rounded-xl"
+							>
+								<Input.Wrapper>
+									<Input.InlineAffix className="font-semibold focus:text-text-strong-950!">
+										{"{{{"}
+									</Input.InlineAffix>
+									<Input.Input
+										id="variableName"
+										placeholder="variable_name"
+										disabled={isSubmitting}
+										autoComplete="off"
+										spellCheck={false}
+										autoFocus
+										{...variableNameRegister}
+										onBlur={(e) => {
+											variableNameRegister.onBlur(e);
+											const slugged = slugify(e.target.value);
+											setValue("variableName", slugged, {
+												shouldValidate: true,
+											});
+										}}
+									/>
+									<Input.InlineAffix className="font-semibold focus:text-text-strong-950!">
+										{"}}}"}
+									</Input.InlineAffix>
+								</Input.Wrapper>
+							</Input.Root>
+							{errors.variableName ? (
+								<p className="text-error-base text-xs">
+									{errors.variableName.message}
+								</p>
+							) : (
+								<p className="text-text-sub-600 text-xs dark:text-white/60">
+									Letters, numbers &amp; underscores — spaces auto-convert
+								</p>
+							)}
+						</div>
+
+						{/* Type — card picker */}
+						<div className="flex flex-col gap-2">
+							<Label.Root>
+								Type
+								<Label.Asterisk />
+							</Label.Root>
+							<div className="grid grid-cols-2 gap-2">
+								{TYPE_OPTIONS.map((opt) => {
+									const isSelected = watchVariableType === opt.value;
+									return (
+										<motion.button
+											whileTap={{ scale: 0.98 }}
+											key={opt.value}
+											type="button"
+											onClick={() => {
+												setValue("variableType", opt.value, {
+													shouldValidate: true,
+												});
+												trigger("defaultValue");
+											}}
+											disabled={isSubmitting}
+											className={cn(
+												"flex flex-col items-start gap-2 rounded-xl border-2 p-3 text-left transition-all duration-150",
+												isSelected
+													? "border-primary-base bg-primary-light/10 dark:border-blue-500 dark:bg-blue-500/10"
+													: "border-stroke-soft-200 bg-bg-soft-200/20 hover:border-stroke-soft-300 hover:bg-bg-soft-200/40 dark:border-stroke-soft-100/40 dark:bg-bg-soft-200/10 dark:hover:border-stroke-soft-100/60",
+											)}
+										>
+											<div className="flex w-full justify-between">
+												<div
+													className={cn(
+														"flex h-6 w-6 items-center justify-center rounded-lg border",
+														isSelected
+															? "border-primary-base/30 bg-primary-light/20 dark:border-blue-500/30 dark:bg-blue-500/20"
+															: "border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-white/[0.04]",
+													)}
+												>
+													<Icon
+														name={
+															opt.icon as Parameters<typeof Icon>[0]["name"]
+														}
+														className={cn(
+															"h-3 w-3",
+															isSelected
+																? opt.color
+																: "text-text-sub-600 dark:text-white/60",
+														)}
+													/>
+												</div>
+												<AnimatePresence>
+													{isSelected && (
+														<motion.div
+															initial={{ scale: 0, opacity: 0 }}
+															animate={{ scale: 1, opacity: 1 }}
+															exit={{ scale: 0, opacity: 0 }}
+															transition={{
+																type: "spring",
+																stiffness: 500,
+																damping: 30,
+															}}
+															className="flex h-3.5 w-3.5 items-center justify-center rounded-full bg-primary-base"
+														>
+															<Icon
+																name="check"
+																className="h-2 w-2 text-white"
+															/>
+														</motion.div>
+													)}
+												</AnimatePresence>
+											</div>
+											<div>
+												<p className="font-semibold text-text-strong-950 text-xs dark:text-white">
+													{opt.label}
+												</p>
+												<p className="text-[10px] text-text-sub-600 leading-tight dark:text-white/60">
+													{opt.description}
+												</p>
+											</div>
+										</motion.button>
+									);
+								})}
+							</div>
+						</div>
+
+						{/* Default Value */}
+						<div className="flex flex-col gap-1.5">
+							<Label.Root htmlFor="defaultValue">Default Value</Label.Root>
+							<Input.Root
+								size="small"
+								className="rounded-xl"
+								hasError={!!errors.defaultValue}
+							>
+								<Input.Wrapper>
+									<Input.Input
+										id="defaultValue"
+										placeholder={
+											watchVariableType === "number"
+												? "e.g., 0"
+												: "e.g., unknown"
+										}
+										disabled={isSubmitting}
+										inputMode={
+											watchVariableType === "number" ? "numeric" : "text"
+										}
+										{...register("defaultValue")}
+										onChange={(e) => {
+											const val = e.target.value;
+											if (watchVariableType === "number") {
+												if (val === "" || /^-?\d*\.?\d*$/.test(val)) {
+													setValue("defaultValue", val, {
+														shouldValidate: true,
+													});
+												} else {
+													e.target.value = getValues("defaultValue") || "";
+												}
+											} else {
+												setValue("defaultValue", val, {
+													shouldValidate: true,
+												});
+											}
+										}}
+									/>
+								</Input.Wrapper>
+							</Input.Root>
+							{errors.defaultValue ? (
+								<p className="text-error-base text-xs">
+									{errors.defaultValue.message}
+								</p>
+							) : (
+								<p className="text-text-sub-600 text-xs leading-normal dark:text-white/60">
+									Used when a contact doesn&apos;t have this variable set
+								</p>
+							)}
+						</div>
 					</div>
 
-					{/* Center content only — animates on step change */}
-					<AnimatePresence mode="popLayout" initial={false}>
-						{step === "form" ? (
-							<motion.div
-								key="form"
-								initial={{ opacity: 0, filter: "blur(4px)" }}
-								animate={{ opacity: 1, filter: "blur(0px)" }}
-								exit={{ opacity: 0, filter: "blur(4px)" }}
-								transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-							>
-								<form id="create-campaign-form-1" onSubmit={onSubmit}>
-									<div className="mt-5 space-y-2">
-										<Label.Root htmlFor="campaign-name-style1">
-											Campaign name
-											<Label.Asterisk />
-										</Label.Root>
-										<Input.Root size="medium" hasError={!!error}>
-											<Input.Wrapper>
-												<Input.Input
-													id="campaign-name-style1"
-													placeholder="e.g. April product update"
-													value={name}
-													onChange={(e) => {
-														setName(e.target.value);
-														if (error) setError(null);
-													}}
-													disabled={isLoading}
-													autoFocus
-												/>
-											</Input.Wrapper>
-										</Input.Root>
-										{error ? (
-											<p className="text-error-base text-paragraph-xs">
-												{error}
-											</p>
-										) : (
-											<p className="text-paragraph-xs text-text-sub-600 dark:text-white/60">
-												Used internally to find this campaign in your list.
-											</p>
-										)}
-									</div>
-								</form>
-							</motion.div>
-						) : (
-							<motion.div
-								key="success"
-								initial={{ opacity: 0, filter: "blur(4px)", height: "94px" }}
-								animate={{
-									opacity: 1,
-									filter: "blur(0px)",
-									height: "auto",
-								}}
-								exit={{ opacity: 0, filter: "blur(4px)" }}
-								transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-							>
-								<div>
-									{/* Success Banner */}
-									<div className="mt-5 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-emerald-900 text-xs leading-relaxed dark:border-emerald-800/40 dark:bg-emerald-950/30 dark:text-emerald-200">
-										<span className="font-semibold">Campaign created:</span>{" "}
-										&quot;{name || "April product update"}&quot; is ready to
-										edit and schedule.
-									</div>
-								</div>
-							</motion.div>
-						)}
-					</AnimatePresence>
-
-					{/* Footer — outside animation, plain conditional */}
-					<motion.div
-						layout
-						className="mt-6 flex items-center justify-end gap-3"
-					>
+					{/* Footer */}
+					<div className="mt-2 flex items-center justify-end gap-3 border-stroke-soft-100/50 border-t px-5 py-4 dark:border-stroke-soft-100/40">
 						<Button.Root
 							type="button"
 							variant="neutral"
 							mode="stroke"
-							size="small"
-							onClick={handleClose}
-							className={cn(
-								"gap-1.5 transition-opacity duration-200",
-								isLoading && "pointer-events-none opacity-50",
-							)}
+							size="xsmall"
+							onClick={onClose}
+							disabled={isSubmitting}
 						>
 							Cancel
-							<ActionKbd className="lowercase! w-auto min-w-0 px-1">
-								esc
-							</ActionKbd>
+							<KbdEsc />
 						</Button.Root>
-						{step === "form" ? (
-							<FancyButton.Root
-								type="submit"
-								form="create-campaign-form-1"
-								variant="blue"
-								size="small"
-								disabled={isLoading}
-								className={cn(
-									"min-w-35 justify-center overflow-hidden transition-all duration-200",
-									isLoading && "pointer-events-none opacity-90",
-								)}
-							>
-								<AnimatePresence mode="popLayout" initial={false}>
-									<motion.span
-										key={isLoading ? "creating" : "idle"}
-										transition={{ type: "spring", duration: 0.25, bounce: 0 }}
-										initial={{ opacity: 0, y: -14 }}
-										animate={{ opacity: 1, y: 0 }}
-										exit={{ opacity: 0, y: 14 }}
-										className="flex items-center justify-center gap-1.5"
-									>
-										{isLoading ? (
-											<>
-												<Spinner size={14} color="currentColor" />
-												<span>Creating...</span>
-											</>
-										) : (
-											<>
-												Create campaign
-												<ActionKbd className={actionKbdOnBlueClassName}>
-													↵
-												</ActionKbd>
-											</>
-										)}
-									</motion.span>
-								</AnimatePresence>
-							</FancyButton.Root>
-						) : (
-							<FancyButton.Root
-								type="button"
-								variant="blue"
-								size="small"
-								onClick={handleClose}
-								className="min-w-35 justify-center overflow-hidden transition-all duration-200"
-							>
-								<span>Done</span>
-							</FancyButton.Root>
-						)}
-					</motion.div>
-				</div>
-			</motion.div>
+						<Button.Root
+							type="submit"
+							variant="neutral"
+							size="xsmall"
+							disabled={!canSubmit}
+						>
+							{isSubmitting ? (
+								<>
+									<Spinner size={14} color="currentColor" />
+									Creating…
+								</>
+							) : isSuccess ? (
+								<>
+									<Icon name="check-circle" className="h-3.5 w-3.5" />
+									Created
+								</>
+							) : (
+								<>
+									Create Variable
+									<span className="inline-flex items-center gap-0.5">
+										<KbdCommand />
+										<KbdEnter />
+									</span>
+								</>
+							)}
+						</Button.Root>
+					</div>
+				</form>
+			</div>
 		</motion.div>
 	);
 }
