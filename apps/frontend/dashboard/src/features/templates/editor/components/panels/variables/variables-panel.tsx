@@ -276,7 +276,7 @@ export function VariablesPanel({}: PanelProps = {}) {
 						No variables match "{searchQuery}"
 					</div>
 				) : (
-					<div className="space-y-1.5 px-4 pb-4">
+					<div className="space-y-1.5 pr-3 pb-4 pl-2.5">
 						{filteredVars.map((v) => {
 							const key = `{{{${v.name}}}}`;
 							const isNumber = v.type?.toLowerCase() === "number";

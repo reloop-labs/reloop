@@ -104,7 +104,7 @@ const addVariableSchema = v.pipe(
 
 type VariableFormValues = v.InferInput<typeof addVariableSchema>;
 
-function ModalStyleOne({ onClose }: { onClose: () => void }) {
+function ModalStyleOne({ onClose }: { onClose?: () => void }) {
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [isSuccess, setIsSuccess] = useState(false);
 
@@ -131,10 +131,15 @@ function ModalStyleOne({ onClose }: { onClose: () => void }) {
 
 	const watchVariableType = watch("variableType");
 
+	const handleClose = () => {
+		reset();
+		onClose?.();
+	};
+
 	useEffect(() => {
 		const handleKeyDown = (e: KeyboardEvent) => {
 			if (e.key === "Escape") {
-				onClose();
+				handleClose();
 			}
 		};
 		window.addEventListener("keydown", handleKeyDown);
@@ -149,7 +154,7 @@ function ModalStyleOne({ onClose }: { onClose: () => void }) {
 		setTimeout(() => {
 			setIsSuccess(false);
 			reset();
-			onClose();
+			onClose?.();
 		}, 1000);
 	});
 
@@ -180,7 +185,7 @@ function ModalStyleOne({ onClose }: { onClose: () => void }) {
 					</div>
 					<button
 						type="button"
-						onClick={onClose}
+						onClick={handleClose}
 						aria-label="Close"
 						className="absolute top-4 right-4 z-20 flex h-7 w-7 items-center justify-center rounded-lg border border-stroke-soft-200 bg-bg-white-0 text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 active:scale-[0.95] dark:border-stroke-soft-100/40 dark:bg-transparent dark:text-white/60 dark:hover:bg-white/[0.05] dark:hover:text-white"
 					>
@@ -380,7 +385,7 @@ function ModalStyleOne({ onClose }: { onClose: () => void }) {
 							variant="neutral"
 							mode="stroke"
 							size="xsmall"
-							onClick={onClose}
+							onClick={handleClose}
 							disabled={isSubmitting}
 						>
 							Cancel
@@ -450,7 +455,7 @@ const validateVariableNameStyleTwo = (name: string): string => {
 	return "";
 };
 
-function ModalStyleTwo({ onClose }: { onClose: () => void }) {
+function ModalStyleTwo({ onClose }: { onClose?: () => void }) {
 	const [status, setStatus] = useState<"idle" | "creating" | "success">("idle");
 	const [variableName, setVariableName] = useState("");
 	const [variableType, setVariableType] =
@@ -465,7 +470,7 @@ function ModalStyleTwo({ onClose }: { onClose: () => void }) {
 		setDefaultValue("");
 		setVariableType("string");
 		setStatus("idle");
-		onClose();
+		onClose?.();
 	};
 
 	const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -515,7 +520,7 @@ function ModalStyleTwo({ onClose }: { onClose: () => void }) {
 				setVariableName("");
 				setDefaultValue("");
 				setVariableType("string");
-				onClose();
+				onClose?.();
 			}, 1200);
 		}, 600);
 	};
@@ -766,75 +771,20 @@ function ModalStyleTwo({ onClose }: { onClose: () => void }) {
 /* -------------------------------------------------------------------------- */
 
 export function TwitterModalsShowcase() {
-	const [isLeftOpen, setIsLeftOpen] = useState(true);
-	const [isRightOpen, setIsRightOpen] = useState(true);
-
 	return (
 		<div
 			data-standalone="true"
 			className="relative flex min-h-dvh w-full items-center justify-center bg-white p-6 sm:p-10 dark:bg-[#080808]"
 		>
 			<div className="flex w-full max-w-6xl flex-col items-center justify-center gap-8 lg:flex-row lg:gap-16">
-				{/* LEFT MODAL */}
+				{/* LEFT CARD */}
 				<div className="flex w-full max-w-[480px] items-center justify-center">
-					<AnimatePresence mode="wait">
-						{isLeftOpen ? (
-							<ModalStyleOne
-								key="modal-1"
-								onClose={() => setIsLeftOpen(false)}
-							/>
-						) : (
-							<motion.div
-								key="trigger-1"
-								initial={{ opacity: 0, scale: 0.95 }}
-								animate={{ opacity: 1, scale: 1 }}
-								exit={{ opacity: 0, scale: 0.95 }}
-								transition={{ duration: 0.2 }}
-								className="flex flex-col items-center gap-3"
-							>
-								<FancyButton.Root
-									type="button"
-									variant="blue"
-									size="medium"
-									onClick={() => setIsLeftOpen(true)}
-									className="min-w-48 justify-center shadow-sm"
-								>
-									Open modal
-								</FancyButton.Root>
-							</motion.div>
-						)}
-					</AnimatePresence>
+					<ModalStyleOne />
 				</div>
 
-				{/* RIGHT MODAL */}
+				{/* RIGHT CARD */}
 				<div className="flex w-full max-w-[460px] items-center justify-center">
-					<AnimatePresence mode="wait">
-						{isRightOpen ? (
-							<ModalStyleTwo
-								key="modal-2"
-								onClose={() => setIsRightOpen(false)}
-							/>
-						) : (
-							<motion.div
-								key="trigger-2"
-								initial={{ opacity: 0, scale: 0.95 }}
-								animate={{ opacity: 1, scale: 1 }}
-								exit={{ opacity: 0, scale: 0.95 }}
-								transition={{ duration: 0.2 }}
-								className="flex flex-col items-center gap-3"
-							>
-								<FancyButton.Root
-									type="button"
-									variant="blue"
-									size="medium"
-									onClick={() => setIsRightOpen(true)}
-									className="min-w-48 justify-center shadow-sm"
-								>
-									Open modal
-								</FancyButton.Root>
-							</motion.div>
-						)}
-					</AnimatePresence>
+					<ModalStyleTwo />
 				</div>
 			</div>
 		</div>
