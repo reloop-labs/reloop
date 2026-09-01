@@ -261,7 +261,7 @@ export function ScrubRow({
 	active,
 }: Omit<ScrubFieldProps, "className">) {
 	return (
-		<div className="flex items-center gap-3 px-4 py-1">
+		<div className="flex min-h-9 items-center justify-between gap-3 px-4 py-1">
 			<ScrubHandle
 				label={label}
 				value={value}
@@ -269,20 +269,22 @@ export function ScrubRow({
 				min={min}
 				max={max}
 				step={step}
-				className="w-1/2 shrink-0 text-sm text-text-strong-950 hover:text-text-sub-600"
+				className="min-w-0 flex-1 truncate font-normal text-sm text-text-sub-600 hover:text-text-strong-950 dark:text-text-soft-400"
 			/>
-			<div className="flex w-1/2 min-w-0 items-center justify-end">
-				<ScrubField
-					label={label}
-					value={value}
-					onChange={onChange}
-					min={min}
-					max={max}
-					step={step}
-					suffix={suffix}
-					placeholder={placeholder}
-					active={active}
-				/>
+			<div className="flex shrink-0 items-center justify-end">
+				<div className="w-28">
+					<ScrubField
+						label={label}
+						value={value}
+						onChange={onChange}
+						min={min}
+						max={max}
+						step={step}
+						suffix={suffix}
+						placeholder={placeholder}
+						active={active}
+					/>
+				</div>
 			</div>
 		</div>
 	);

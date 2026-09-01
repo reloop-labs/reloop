@@ -15,7 +15,9 @@ export function ColorRow({
 }) {
 	return (
 		<PropRow label={label}>
-			<ColorPicker value={value} onChange={onChange} />
+			<div className="w-24">
+				<ColorPicker value={value} onChange={onChange} />
+			</div>
 		</PropRow>
 	);
 }
