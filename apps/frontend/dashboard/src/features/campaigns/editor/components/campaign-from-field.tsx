@@ -132,28 +132,32 @@ export const CampaignFromField = () => {
 	// Parse input into name, handle/prefix, and email query
 	const parsedInput = useMemo(() => {
 		const trimmed = inputValue.trim();
-		const angleMatch = trimmed.match(/^(.*?)\s*<([^>]*)$/);
+		const angleMatch = trimmed.match(/^(.*?)\s*<([^>]*)>?$/);
 		if (angleMatch) {
 			const namePart = angleMatch[1]?.trim() || "";
-			const emailPart = angleMatch[2]?.replace(/>$/, "").trim() || "";
+			const emailPart = angleMatch[2]?.trim() || "";
+			const isComplete = Boolean(emailPart.includes("@") && emailPart.includes("."));
 			const [handlePart = "", domainPart = ""] = emailPart.split("@");
 			return {
 				name: namePart,
 				email: emailPart,
 				handle: handlePart,
 				domain: domainPart,
-				query: emailPart.toLowerCase(),
+				isComplete,
+				query: isComplete ? "" : emailPart.toLowerCase(),
 			};
 		}
 
 		if (trimmed.includes("@")) {
+			const isComplete = Boolean(trimmed.includes("."));
 			const [handlePart = "", domainPart = ""] = trimmed.split("@");
 			return {
 				name: fromName || "",
 				email: trimmed,
 				handle: handlePart,
 				domain: domainPart,
-				query: trimmed.toLowerCase(),
+				isComplete,
+				query: isComplete ? "" : trimmed.toLowerCase(),
 			};
 		}
 
@@ -162,7 +166,8 @@ export const CampaignFromField = () => {
 			email: "",
 			handle: "",
 			domain: "",
-			query: trimmed.toLowerCase(),
+			isComplete: false,
+			query: "",
 		};
 	}, [inputValue, fromName]);
 
@@ -196,32 +201,41 @@ export const CampaignFromField = () => {
 		const typedDomain = parsedInput.domain.toLowerCase();
 
 		const result: SuggestedSender[] = [];
+		const allDefaults: SuggestedSender[] = [];
 
 		for (const domainObj of verifiedSendingDomains) {
 			const domainName = domainObj.domain.toLowerCase();
 
-			// If user typed a specific domain query, filter matching domains
-			if (typedDomain && !domainName.includes(typedDomain)) {
-				continue;
-			}
-
-			// If user typed a custom handle, place it as the top suggestion for this domain
+			// If user typed a custom handle that's not standard, suggest it
 			if (typedHandle && !standardHandles.includes(typedHandle)) {
-				result.push({
+				const customItem = {
 					name: defaultName,
 					email: `${typedHandle}@${domainName}`,
 					handle: typedHandle,
 					domain: domainName,
 					formatted: `${defaultName} <${typedHandle}@${domainName}>`,
-				});
+				};
+				allDefaults.push(customItem);
+				if (!typedDomain || domainName.includes(typedDomain)) {
+					result.push(customItem);
+				}
 			}
 
 			// Add standard suggestions
 			for (const handle of standardHandles) {
 				const email = `${handle}@${domainName}`;
 				const formatted = `${defaultName} <${email}>`;
+				const standardItem = {
+					name: defaultName,
+					email,
+					handle,
+					domain: domainName,
+					formatted,
+				};
 
-				// Filter by query if applicable
+				allDefaults.push(standardItem);
+
+				// Filter by query if user is actively searching
 				if (
 					parsedInput.query &&
 					!email.includes(parsedInput.query) &&
@@ -231,17 +245,17 @@ export const CampaignFromField = () => {
 					continue;
 				}
 
-				result.push({
-					name: defaultName,
-					email,
-					handle,
-					domain: domainName,
-					formatted,
-				});
+				if (typedDomain && !domainName.includes(typedDomain)) {
+					continue;
+				}
+
+				result.push(standardItem);
 			}
 		}
 
-		return result.slice(0, 8);
+		// If query filtered out everything, fallback to showing all default suggestions
+		const finalSuggestions = result.length > 0 ? result : allDefaults;
+		return finalSuggestions.slice(0, 8);
 	}, [
 		verifiedSendingDomains,
 		parsedInput,
@@ -511,10 +525,6 @@ export const CampaignFromField = () => {
 											You must have at least one verified domain with sending
 											enabled to dispatch campaigns.
 										</p>
-									</div>
-								) : suggestions.length === 0 ? (
-									<div className="p-3 text-center text-paragraph-xs text-text-sub-600">
-										No suggestions matching &ldquo;{inputValue}&rdquo;
 									</div>
 								) : (
 									<div className="max-h-56 overflow-y-auto">
