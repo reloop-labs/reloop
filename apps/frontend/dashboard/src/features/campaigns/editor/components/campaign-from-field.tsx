@@ -1,18 +1,16 @@
 "use client";
 
+import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
+import Spinner from "@reloop/ui/spinner";
 import * as Tooltip from "@reloop/ui/tooltip";
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import React, { useEffect, useId, useMemo, useRef, useState } from "react";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
-import type { DomainListResponse } from "#/features/domain/types";
-import { useSWR } from "#/features/templates/editor/hooks/use-swr-compat";
+import { useDomainsQuery } from "#/features/domain/hooks/use-domains-query";
 import { useCampaignEditorStore } from "../campaign-editor-store";
 import { CampaignFieldRow } from "./campaign-field-row";
-
-const fetcher = (url: string) =>
-	fetch(url, { credentials: "include" }).then((res) => res.json());
 
 interface ErrorDetails {
 	title: string;
@@ -57,6 +55,14 @@ const ErrorTooltipContent = ({ error }: ErrorTooltipContentProps) => {
 	);
 };
 
+interface SuggestedSender {
+	name: string;
+	email: string;
+	handle: string;
+	domain: string;
+	formatted: string;
+}
+
 export const CampaignFromField = () => {
 	const fromName = useCampaignEditorStore((s) => s.fromName);
 	const setFromName = useCampaignEditorStore((s) => s.setFromName);
@@ -65,7 +71,23 @@ export const CampaignFromField = () => {
 	const replyTo = useCampaignEditorStore((s) => s.replyTo);
 	const setReplyTo = useCampaignEditorStore((s) => s.setReplyTo);
 
+	const { user, activeOrganization } = useActiveOrganization();
+
+	// Fetch organization domains
+	const domainsQuery = useDomainsQuery({
+		page: 1,
+		limit: 100,
+		q: "",
+		status: [],
+	});
+
 	const [showReplyTo, setShowReplyTo] = useState(false);
+	const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+	const [highlightIndex, setHighlightIndex] = useState(0);
+
+	const containerRef = useRef<HTMLDivElement>(null);
+	const inputRef = useRef<HTMLInputElement>(null);
+	const listboxId = useId();
 
 	useEffect(() => {
 		if (replyTo) {
@@ -73,20 +95,261 @@ export const CampaignFromField = () => {
 		}
 	}, [replyTo]);
 
-	const { activeOrganization } = useActiveOrganization();
-	const { data: domainData } = useSWR<DomainListResponse>(
-		activeOrganization?.id
-			? `/api/domain/v1/list?organizationId=${activeOrganization.id}`
-			: null,
-		fetcher,
+	// Filter domains that have sending enabled & verified
+	const verifiedSendingDomains = useMemo(() => {
+		const list = domainsQuery.data?.domains || [];
+		return list.filter((d) => {
+			const isVerified =
+				d.status === "active" || d.systemVerified || d.userVerifiedDomain;
+			const isSending = d.isSendingEmailEnabled !== false;
+			return isVerified && isSending;
+		});
+	}, [domainsQuery.data?.domains]);
+
+	const verifiedDomainNames = useMemo(
+		() => verifiedSendingDomains.map((d) => d.domain.toLowerCase()),
+		[verifiedSendingDomains],
 	);
 
-	const verifiedDomains = (domainData?.domains || [])
-		.filter(
-			(d) => d.status === "active" || d.systemVerified || d.userVerifiedDomain,
-		)
-		.map((d) => d.domain.toLowerCase());
+	// Compute initial / controlled input value
+	const getDisplayValue = () => {
+		if (fromName && fromEmail && !fromEmail.includes("<")) {
+			return `${fromName} <${fromEmail}>`;
+		}
+		return fromEmail || fromName || "";
+	};
 
+	const [inputValue, setInputValue] = useState(getDisplayValue);
+
+	// Sync input with external store changes when not focused
+	useEffect(() => {
+		if (!isDropdownOpen) {
+			setInputValue(getDisplayValue());
+		}
+	}, [fromName, fromEmail, isDropdownOpen]);
+
+	// Parse input into name, handle/prefix, and email query
+	const parsedInput = useMemo(() => {
+		const trimmed = inputValue.trim();
+		const angleMatch = trimmed.match(/^(.*?)\s*<([^>]*)$/);
+		if (angleMatch) {
+			const namePart = angleMatch[1]?.trim() || "";
+			const emailPart = angleMatch[2]?.replace(/>$/, "").trim() || "";
+			const [handlePart = "", domainPart = ""] = emailPart.split("@");
+			return {
+				name: namePart,
+				email: emailPart,
+				handle: handlePart,
+				domain: domainPart,
+				query: emailPart.toLowerCase(),
+			};
+		}
+
+		if (trimmed.includes("@")) {
+			const [handlePart = "", domainPart = ""] = trimmed.split("@");
+			return {
+				name: fromName || "",
+				email: trimmed,
+				handle: handlePart,
+				domain: domainPart,
+				query: trimmed.toLowerCase(),
+			};
+		}
+
+		return {
+			name: trimmed,
+			email: "",
+			handle: "",
+			domain: "",
+			query: trimmed.toLowerCase(),
+		};
+	}, [inputValue, fromName]);
+
+	// Generate dynamic email suggestions based on verified sending domains
+	const suggestions = useMemo((): SuggestedSender[] => {
+		if (verifiedSendingDomains.length === 0) return [];
+
+		// Determine base sender name
+		const defaultName =
+			parsedInput.name ||
+			fromName ||
+			activeOrganization?.name ||
+			user?.name ||
+			"Team";
+
+		// Common handle prefixes
+		const standardHandles = [
+			"team",
+			"hello",
+			"newsletter",
+			"notifications",
+			"support",
+		];
+
+		const userHandle = user?.email?.split("@")[0]?.toLowerCase();
+		if (userHandle && !standardHandles.includes(userHandle)) {
+			standardHandles.unshift(userHandle);
+		}
+
+		const typedHandle = parsedInput.handle.toLowerCase();
+		const typedDomain = parsedInput.domain.toLowerCase();
+
+		const result: SuggestedSender[] = [];
+
+		for (const domainObj of verifiedSendingDomains) {
+			const domainName = domainObj.domain.toLowerCase();
+
+			// If user typed a specific domain query, filter matching domains
+			if (typedDomain && !domainName.includes(typedDomain)) {
+				continue;
+			}
+
+			// If user typed a custom handle, place it as the top suggestion for this domain
+			if (typedHandle && !standardHandles.includes(typedHandle)) {
+				result.push({
+					name: defaultName,
+					email: `${typedHandle}@${domainName}`,
+					handle: typedHandle,
+					domain: domainName,
+					formatted: `${defaultName} <${typedHandle}@${domainName}>`,
+				});
+			}
+
+			// Add standard suggestions
+			for (const handle of standardHandles) {
+				const email = `${handle}@${domainName}`;
+				const formatted = `${defaultName} <${email}>`;
+
+				// Filter by query if applicable
+				if (
+					parsedInput.query &&
+					!email.includes(parsedInput.query) &&
+					!domainName.includes(parsedInput.query) &&
+					!defaultName.toLowerCase().includes(parsedInput.query)
+				) {
+					continue;
+				}
+
+				result.push({
+					name: defaultName,
+					email,
+					handle,
+					domain: domainName,
+					formatted,
+				});
+			}
+		}
+
+		return result.slice(0, 8);
+	}, [
+		verifiedSendingDomains,
+		parsedInput,
+		fromName,
+		activeOrganization?.name,
+		user?.name,
+		user?.email,
+	]);
+
+	// Auto-correct & update store as the user types
+	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const val = e.target.value;
+		setInputValue(val);
+		setHighlightIndex(0);
+		if (!isDropdownOpen) {
+			setIsDropdownOpen(true);
+		}
+
+		// Real-time parsing and auto-correction into store
+		const match = val.match(/^(.*?)\s*<([^>]+)>?$/);
+		if (match) {
+			const name = match[1]?.trim() || "";
+			const email = match[2]?.replace(/>$/, "").trim() || "";
+			setFromName(name);
+			setFromEmail(email);
+		} else if (val.includes("@")) {
+			const email = val.trim();
+			setFromEmail(email);
+			if (!fromName && activeOrganization?.name) {
+				setFromName(activeOrganization.name);
+			}
+		} else {
+			setFromName(val.trim());
+		}
+	};
+
+	// Apply selected suggestion with auto-correction
+	const handleSelectSuggestion = (suggestion: SuggestedSender) => {
+		// Use user's typed name if provided, otherwise fallback to suggestion's name
+		const resolvedName =
+			parsedInput.name ||
+			fromName ||
+			suggestion.name ||
+			activeOrganization?.name ||
+			"";
+
+		const finalFormatted = resolvedName
+			? `${resolvedName} <${suggestion.email}>`
+			: suggestion.email;
+
+		setFromName(resolvedName);
+		setFromEmail(suggestion.email);
+		setInputValue(finalFormatted);
+		setIsDropdownOpen(false);
+		inputRef.current?.focus();
+	};
+
+	// Keyboard navigation
+	const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+		if (!isDropdownOpen) {
+			if (e.key === "ArrowDown" || e.key === "Enter") {
+				setIsDropdownOpen(true);
+				e.preventDefault();
+			}
+			return;
+		}
+
+		if (e.key === "ArrowDown") {
+			e.preventDefault();
+			setHighlightIndex((prev) =>
+				suggestions.length > 0 ? (prev + 1) % suggestions.length : 0,
+			);
+		} else if (e.key === "ArrowUp") {
+			e.preventDefault();
+			setHighlightIndex((prev) =>
+				suggestions.length > 0
+					? (prev - 1 + suggestions.length) % suggestions.length
+					: 0,
+			);
+		} else if (e.key === "Enter") {
+			if (suggestions.length > 0 && suggestions[highlightIndex]) {
+				e.preventDefault();
+				handleSelectSuggestion(suggestions[highlightIndex]);
+			}
+		} else if (e.key === "Escape") {
+			setIsDropdownOpen(false);
+		} else if (e.key === "Tab") {
+			setIsDropdownOpen(false);
+		}
+	};
+
+	// Close on click outside
+	useEffect(() => {
+		const handleClickOutside = (e: PointerEvent) => {
+			if (
+				containerRef.current &&
+				!containerRef.current.contains(e.target as Node)
+			) {
+				setIsDropdownOpen(false);
+			}
+		};
+
+		document.addEventListener("pointerdown", handleClickOutside);
+		return () => {
+			document.removeEventListener("pointerdown", handleClickOutside);
+		};
+	}, []);
+
+	// Validation
 	const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 	const parseFromEmail = (input: string | null | undefined) => {
@@ -105,7 +368,7 @@ export const CampaignFromField = () => {
 	const isFromDomainVerified =
 		!fromEmailAddress ||
 		!isFromEmailValid ||
-		verifiedDomains.includes(fromDomain);
+		verifiedDomainNames.includes(fromDomain);
 
 	let fromError: ErrorDetails | null = null;
 	if (fromEmail) {
@@ -115,7 +378,7 @@ export const CampaignFromField = () => {
 				description:
 					"Please enter a valid email address (e.g., sender@example.com).",
 			};
-		} else if (!isFromDomainVerified) {
+		} else if (!isFromDomainVerified && !domainsQuery.isLoading) {
 			fromError = {
 				title: "Domain Verification Required",
 				description:
@@ -126,21 +389,6 @@ export const CampaignFromField = () => {
 		}
 	}
 
-	let formattedFromValue = fromEmail;
-	if (fromName && fromEmail && !fromEmail.includes("<")) {
-		formattedFromValue = `${fromName} <${fromEmail}>`;
-	}
-
-	const handleFromChange = (value: string) => {
-		const match = value.match(/^(.*?)\s*<([^>]+)>$/);
-		if (match) {
-			setFromName(match[1]?.trim() || "");
-			setFromEmail(match[2]?.trim() || "");
-		} else {
-			setFromEmail(value);
-		}
-	};
-
 	const isReplyToValid = !replyTo || emailRegex.test(replyTo.trim());
 	let replyToError: ErrorDetails | null = null;
 	if (replyTo && !isReplyToValid) {
@@ -150,6 +398,9 @@ export const CampaignFromField = () => {
 				"Please enter a valid email address (e.g., replyto@example.com).",
 		};
 	}
+
+	const isLoadingDomains =
+		domainsQuery.isLoading || (isDropdownOpen && domainsQuery.isFetching);
 
 	return (
 		<>
@@ -164,15 +415,38 @@ export const CampaignFromField = () => {
 						"Sender name and email address that will be displayed in the recipient's inbox.",
 				}}
 			>
-				<div className="relative flex w-full flex-1 items-center justify-between gap-2 text-label-sm text-text-sub-600">
-					<input
-						id="campaign-send-details-from"
-						value={formattedFromValue}
-						onChange={(e) => handleFromChange(e.target.value)}
-						placeholder="Acme <acme@example.com>"
-						className="flex-1 bg-transparent text-text-strong-950 outline-none placeholder:text-text-soft-400"
-					/>
+				<div
+					ref={containerRef}
+					className="relative flex w-full flex-1 items-center justify-between gap-2 text-label-sm text-text-sub-600"
+				>
+					<div className="relative flex flex-1 items-center">
+						<input
+							ref={inputRef}
+							id="campaign-send-details-from"
+							value={inputValue}
+							onChange={handleInputChange}
+							onFocus={() => setIsDropdownOpen(true)}
+							onKeyDown={handleKeyDown}
+							placeholder="Acme <acme@example.com>"
+							autoComplete="off"
+							role="combobox"
+							aria-expanded={isDropdownOpen}
+							aria-controls={listboxId}
+							className="w-full bg-transparent text-text-strong-950 outline-none placeholder:text-text-soft-400"
+						/>
+					</div>
+
 					<div className="flex items-center gap-2">
+						{/* Loading indicator while fetching domains */}
+						{isLoadingDomains && (
+							<div
+								className="flex items-center justify-center text-text-soft-400 transition-opacity"
+								title="Loading sending domains..."
+							>
+								<Spinner size={14} />
+							</div>
+						)}
+
 						{fromError && (
 							<Tooltip.Provider delayDuration={0}>
 								<Tooltip.Root>
@@ -192,6 +466,7 @@ export const CampaignFromField = () => {
 								</Tooltip.Root>
 							</Tooltip.Provider>
 						)}
+
 						{!showReplyTo && (
 							<button
 								type="button"
@@ -202,6 +477,82 @@ export const CampaignFromField = () => {
 							</button>
 						)}
 					</div>
+
+					{/* Suggestions Dropdown */}
+					<AnimatePresence>
+						{isDropdownOpen && (
+							<motion.div
+								id={listboxId}
+								role="listbox"
+								initial={{ opacity: 0, y: -4, scale: 0.98 }}
+								animate={{ opacity: 1, y: 0, scale: 1 }}
+								exit={{ opacity: 0, y: -4, scale: 0.98 }}
+								transition={{ duration: 0.15, ease: "easeOut" }}
+								className="absolute left-0 top-full z-50 mt-2 w-full min-w-[320px] max-w-[420px] overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-1 dark:border-stroke-soft-100/40 dark:bg-bg-soft-200"
+							>
+								{isLoadingDomains && suggestions.length === 0 ? (
+									<div className="flex items-center justify-center gap-2.5 py-6 text-paragraph-xs text-text-sub-600">
+										<Spinner size={16} />
+										<span>Fetching verified sending domains...</span>
+									</div>
+								) : verifiedSendingDomains.length === 0 ? (
+									<div className="flex flex-col gap-2 p-3 text-left">
+										<div className="flex items-center gap-2 text-text-sub-600">
+											<Icon name="alert-circle" className="h-4 w-4 text-warning-base" />
+											<span className="font-medium text-label-xs text-text-strong-950">
+												No Sending Domains Found
+											</span>
+										</div>
+										<p className="text-paragraph-xs text-text-sub-600">
+											You must have at least one verified domain with sending
+											enabled to dispatch campaigns.
+										</p>
+									</div>
+								) : suggestions.length === 0 ? (
+									<div className="p-3 text-center text-paragraph-xs text-text-sub-600">
+										No suggestions matching &ldquo;{inputValue}&rdquo;
+									</div>
+								) : (
+									<div className="max-h-56 overflow-y-auto">
+											{suggestions.map((item, idx) => {
+												const isSelected = idx === highlightIndex;
+												const isExactMatch =
+													fromEmail.toLowerCase() === item.email.toLowerCase();
+
+												return (
+													<button
+														key={`${item.email}-${idx}`}
+														type="button"
+														role="option"
+														aria-selected={isSelected}
+														onMouseDown={(e) => {
+															e.preventDefault(); // Prevent input blur before click handler
+															handleSelectSuggestion(item);
+														}}
+														onMouseEnter={() => setHighlightIndex(idx)}
+														className={cn(
+															"flex w-full items-center justify-between gap-2.5 rounded-lg px-2.5 py-2 text-left",
+															isSelected
+																? "bg-bg-weak-50 text-text-strong-950 dark:bg-bg-sub-300/40"
+																: "text-text-sub-600 hover:bg-bg-weak-50/70 dark:hover:bg-bg-sub-300/20",
+														)}
+													>
+														<div className="flex min-w-0 flex-1 items-center gap-1.5 truncate text-label-xs">
+															<span className="shrink-0 font-medium text-text-strong-950">
+																{item.name}
+															</span>
+															<span className="truncate text-text-sub-600">
+																&lt;{item.email}&gt;
+															</span>
+														</div>
+													</button>
+												);
+											})}
+										</div>
+								)}
+							</motion.div>
+						)}
+					</AnimatePresence>
 				</div>
 			</CampaignFieldRow>
 
@@ -264,3 +615,4 @@ export const CampaignFromField = () => {
 		</>
 	);
 };
+
