@@ -123,12 +123,27 @@ export const AddPropertyModal = ({
 			? "Must be a valid number"
 			: "";
 
-	const canSubmit =
-		!!propertyName && !nameError && !defaultValueError && status === "idle";
-
 	const handleSubmit = async (e?: React.FormEvent) => {
 		e?.preventDefault();
-		if (!canSubmit || status !== "idle") return;
+		if (status !== "idle") return;
+
+		const trimmed = propertyName.trim();
+		if (!trimmed) {
+			setNameError(`Please enter a ${nameLabel.toLowerCase()}`);
+			nameInputRef.current?.focus();
+			return;
+		}
+
+		const validationError = validatePropertyName(trimmed);
+		if (validationError) {
+			setNameError(validationError);
+			nameInputRef.current?.focus();
+			return;
+		}
+
+		if (defaultValueError) {
+			return;
+		}
 
 		setStatus("creating");
 		try {
@@ -136,9 +151,9 @@ export const AddPropertyModal = ({
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({
-					name: propertyName,
+					name: trimmed,
 					type: propertyType,
-					fallbackValue: defaultValue || undefined,
+					fallbackValue: defaultValue.trim() || undefined,
 				}),
 			});
 
@@ -148,9 +163,9 @@ export const AddPropertyModal = ({
 			}
 
 			const createdPayload = {
-				name: propertyName,
+				name: trimmed,
 				type: propertyType,
-				defaultValue: defaultValue || undefined,
+				defaultValue: defaultValue.trim() || undefined,
 			};
 
 			setStatus("success");
@@ -177,12 +192,12 @@ export const AddPropertyModal = ({
 		"enter",
 		(e) => {
 			e.preventDefault();
-			if (open && canSubmit) {
+			if (open && status === "idle") {
 				void handleSubmit();
 			}
 		},
 		{ enableOnFormTags: ["INPUT"], enabled: open },
-		[open, canSubmit, propertyName, propertyType, defaultValue],
+		[open, status, propertyName, propertyType, defaultValue, nameLabel],
 	);
 
 	useHotkeys(
@@ -357,11 +372,11 @@ export const AddPropertyModal = ({
 					</div>
 
 					{/* Actions / Footer */}
-					<div className="relative flex items-center justify-end gap-2.5 px-3 pt-2 pb-3">
+					<div className="relative flex items-center justify-between gap-3 px-3 pt-2 pb-3">
 						<Button.Root
 							type="button"
 							variant="neutral"
-							mode="stroke"
+							mode="ghost"
 							size="small"
 							onClick={handleClose}
 							className={cn(
@@ -379,9 +394,7 @@ export const AddPropertyModal = ({
 							type="submit"
 							variant={status === "success" ? "success" : "blue"}
 							size="small"
-							disabled={
-								status === "creating" || (status === "idle" && !canSubmit)
-							}
+							disabled={status !== "idle"}
 							className={cn(
 								"min-w-[156px] justify-center overflow-hidden transition-all duration-200",
 								status !== "idle" && "pointer-events-none",

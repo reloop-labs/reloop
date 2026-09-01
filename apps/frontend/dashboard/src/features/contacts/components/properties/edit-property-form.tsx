@@ -82,7 +82,12 @@ export function EditPropertyForm({
 
 	const handleSubmit = async (e?: React.FormEvent) => {
 		e?.preventDefault();
-		if (!canSubmit || status !== "idle") return;
+		if (status !== "idle") return;
+		if (fallbackValueError) return;
+		if (fallbackValue === (property.defaultValue || "")) {
+			onCancel();
+			return;
+		}
 
 		try {
 			setStatus("submitting");
@@ -119,12 +124,12 @@ export function EditPropertyForm({
 		"enter",
 		(e) => {
 			e.preventDefault();
-			if (canSubmit) {
+			if (status === "idle") {
 				void handleSubmit();
 			}
 		},
 		{ enableOnFormTags: ["INPUT"] },
-		[canSubmit, fallbackValue, property],
+		[status, fallbackValue, property, fallbackValueError],
 	);
 
 	useHotkeys(
@@ -274,7 +279,7 @@ export function EditPropertyForm({
 				{/* Actions / Footer */}
 				<div
 					className={cn(
-						"flex items-center justify-end gap-2.5",
+						"flex items-center justify-between gap-3",
 						isInline
 							? "px-6 pt-3 pb-3.5 dark:bg-bg-weak-50/40"
 							: "relative px-3 pt-2 pb-3",
@@ -283,7 +288,7 @@ export function EditPropertyForm({
 					<Button.Root
 						type="button"
 						variant="neutral"
-						mode="stroke"
+						mode="ghost"
 						size="small"
 						onClick={onCancel}
 						disabled={status !== "idle"}
@@ -301,7 +306,7 @@ export function EditPropertyForm({
 						type="submit"
 						variant={status === "success" ? "success" : "blue"}
 						size="small"
-						disabled={!canSubmit || status !== "idle"}
+						disabled={status !== "idle"}
 						className={cn(
 							"min-w-[156px] justify-center overflow-hidden transition-all duration-200",
 							status !== "idle" && "pointer-events-none",

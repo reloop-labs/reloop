@@ -239,11 +239,11 @@ export const DeletePropertyModal = ({
 				</div>
 
 				{/* Actions / Footer */}
-				<div className="relative flex items-center justify-end gap-2.5 px-3 pt-2 pb-3">
+				<div className="relative flex items-center justify-between gap-3 px-3 pt-2 pb-3">
 					<Button.Root
 						type="button"
 						variant="neutral"
-						mode="stroke"
+						mode="ghost"
 						size="small"
 						onClick={handleCancel}
 						className={cn(
