@@ -13,7 +13,7 @@ export { CampaignSubjectField } from "./campaign-subject-field";
 
 export const CampaignSendDetails = () => {
 	return (
-		<div className="mx-auto mt-4 w-full max-w-160">
+		<div className="mx-auto mt-4 w-full max-w-[600px]">
 			<CampaignFromField />
 			<CampaignAudienceField />
 			<CampaignSubjectField />

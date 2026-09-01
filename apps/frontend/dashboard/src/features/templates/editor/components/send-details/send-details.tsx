@@ -7,7 +7,7 @@ export { TemplateSubjectField } from "./template-subject-field";
 
 export const SendDetails = () => {
 	return (
-		<div className="mx-auto mt-4 w-full max-w-160">
+		<div className="mx-auto mt-4 w-full max-w-[600px]">
 			<TemplateFromField />
 			<TemplateSubjectField />
 		</div>
