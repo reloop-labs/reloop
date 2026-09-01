@@ -42,12 +42,12 @@ const TYPE_OPTIONS: {
 	{
 		value: "string",
 		label: "String",
-		description: "Free-form text",
+		description: "Free-form text, names, or custom strings.",
 	},
 	{
 		value: "number",
 		label: "Number",
-		description: "Integer or decimal",
+		description: "Integers, decimals, or numeric counts.",
 	},
 ];
 
@@ -247,7 +247,7 @@ export const AddPropertyModal = ({
 								</Label.Root>
 								<FieldError
 									field={nameField}
-									hint="Letters, numbers &amp; underscores — spaces auto-convert"
+									hint="Letters, numbers, and underscores only — spaces auto-convert"
 								>
 									<Input.Root
 										size="medium"
@@ -301,7 +301,7 @@ export const AddPropertyModal = ({
 													<div className="size-4.5 rounded-full border-2 border-stroke-soft-200 transition-colors group-hover:border-stroke-sub-300 dark:border-stroke-soft-100/60" />
 												)}
 											</div>
-											<p className="text-[11px] text-text-sub-600">
+											<p className="text-[11px] text-text-sub-600 leading-snug">
 												{opt.description}
 											</p>
 										</button>
@@ -348,7 +348,10 @@ export const AddPropertyModal = ({
 									</p>
 								) : (
 									<p className="text-[11px] text-text-sub-600">
-										Used when a contact doesn&apos;t have this property set
+										Fallback value used when a contact is missing this{" "}
+										{nameLabel.toLowerCase().includes("variable")
+											? "variable"
+											: "property"}
 									</p>
 								)}
 							</div>

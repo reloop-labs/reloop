@@ -269,7 +269,10 @@ export function EditPropertyForm({
 								</p>
 							) : (
 								<p className="text-[11px] text-text-sub-600">
-									Used when a contact doesn&apos;t have this property set
+									Fallback value used when a contact is missing this{" "}
+									{nameLabel.toLowerCase().includes("variable")
+										? "variable"
+										: "property"}
 								</p>
 							)}
 						</div>
