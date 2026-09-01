@@ -43,7 +43,7 @@ const getLabel = (type: string): string => {
 
 const BreadCrumb = () => {
 	return (
-		<div className="sticky top-0 z-10 min-w-0 border-stroke-soft-200 border-b bg-bg-white-0 px-3 py-3 dark:border-stroke-soft-100/50 dark:bg-black">
+		<div className="sticky top-0 z-10 min-w-0 border-stroke-soft-100 border-b bg-bg-white-0 px-3 py-3 dark:border-stroke-soft-100/40 dark:bg-black">
 			<ol className="flex min-w-0 list-none items-center gap-1 overflow-hidden">
 				<Inspector.Breadcrumb>
 					{(segments) =>

@@ -564,7 +564,7 @@ export const EmailInspector = () => {
 			<Breadcrumb />
 
 			{/* ── All sections in one flat scroll container ── */}
-			<div className="flex flex-col divide-y divide-stroke-soft-200 pb-6">
+			<div className="flex flex-col divide-y divide-stroke-soft-100 pb-6">
 				{/* ── Text card (Handles both text selection and node selection) ── */}
 				<Inspector.Text>
 					{(textProps) => <TextSection {...textProps} />}
@@ -793,9 +793,7 @@ export const EmailInspector = () => {
 									value={String(
 										findStyleValue("body", "backgroundColor") ?? "",
 									)}
-									onChange={(v) =>
-										setGlobalStyle("body", "backgroundColor", v)
-									}
+									onChange={(v) => setGlobalStyle("body", "backgroundColor", v)}
 								/>
 								<SpacingControl
 									label="Padding"
@@ -849,8 +847,7 @@ export const EmailInspector = () => {
 								<div className="px-4 pt-1 pb-2">
 									<AlignControls
 										alignment={
-											(findStyleValue("container", "align") as string) ||
-											"left"
+											(findStyleValue("container", "align") as string) || "left"
 										}
 										setAlignment={(align) =>
 											setGlobalStyle("container", "align", align)
@@ -859,13 +856,11 @@ export const EmailInspector = () => {
 								</div>
 								<ColorRow
 									label="Text"
-									value={
-										String(
-											findStyleValue("body", "color") ??
-												findStyleValue("container", "color") ??
-												"",
-										)
-									}
+									value={String(
+										findStyleValue("body", "color") ??
+											findStyleValue("container", "color") ??
+											"",
+									)}
 									onChange={(v) => {
 										setGlobalStyle("body", "color", v);
 										setGlobalStyle("container", "color", v);
@@ -908,7 +903,10 @@ export const EmailInspector = () => {
 											(findStyleValue("container", "padding") as number) ??
 											"",
 										bottom:
-											(findStyleValue("container", "paddingBottom") as number) ??
+											(findStyleValue(
+												"container",
+												"paddingBottom",
+											) as number) ??
 											(findStyleValue("container", "padding") as number) ??
 											"",
 										left:
@@ -966,40 +964,28 @@ export const EmailInspector = () => {
 												"container",
 												"borderTopLeftRadius",
 											) as number) ??
-											(findStyleValue(
-												"container",
-												"borderRadius",
-											) as number) ??
+											(findStyleValue("container", "borderRadius") as number) ??
 											"",
 										right:
 											(findStyleValue(
 												"container",
 												"borderTopRightRadius",
 											) as number) ??
-											(findStyleValue(
-												"container",
-												"borderRadius",
-											) as number) ??
+											(findStyleValue("container", "borderRadius") as number) ??
 											"",
 										bottom:
 											(findStyleValue(
 												"container",
 												"borderBottomRightRadius",
 											) as number) ??
-											(findStyleValue(
-												"container",
-												"borderRadius",
-											) as number) ??
+											(findStyleValue("container", "borderRadius") as number) ??
 											"",
 										left:
 											(findStyleValue(
 												"container",
 												"borderBottomLeftRadius",
 											) as number) ??
-											(findStyleValue(
-												"container",
-												"borderRadius",
-											) as number) ??
+											(findStyleValue("container", "borderRadius") as number) ??
 											"",
 									}}
 									onChange={({ top, right, bottom, left }) =>
@@ -1035,40 +1021,28 @@ export const EmailInspector = () => {
 												"container",
 												"borderTopWidth",
 											) as number) ??
-											(findStyleValue(
-												"container",
-												"borderWidth",
-											) as number) ??
+											(findStyleValue("container", "borderWidth") as number) ??
 											"",
 										right:
 											(findStyleValue(
 												"container",
 												"borderRightWidth",
 											) as number) ??
-											(findStyleValue(
-												"container",
-												"borderWidth",
-											) as number) ??
+											(findStyleValue("container", "borderWidth") as number) ??
 											"",
 										bottom:
 											(findStyleValue(
 												"container",
 												"borderBottomWidth",
 											) as number) ??
-											(findStyleValue(
-												"container",
-												"borderWidth",
-											) as number) ??
+											(findStyleValue("container", "borderWidth") as number) ??
 											"",
 										left:
 											(findStyleValue(
 												"container",
 												"borderLeftWidth",
 											) as number) ??
-											(findStyleValue(
-												"container",
-												"borderWidth",
-											) as number) ??
+											(findStyleValue("container", "borderWidth") as number) ??
 											"",
 									}}
 									onChange={({ top, right, bottom, left }) =>
