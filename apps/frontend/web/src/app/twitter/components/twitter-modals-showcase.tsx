@@ -209,7 +209,7 @@ function ModalStyleOne({ onClose }: { onClose?: () => void }) {
 								className="rounded-xl"
 							>
 								<Input.Wrapper className="cursor-text">
-									<div className="flex max-w-full items-center gap-1 overflow-hidden font-mono text-xs">
+									<div className="flex h-9 max-w-full items-center gap-1 overflow-hidden font-mono text-xs">
 										<span className="shrink-0 select-none text-text-sub-600">
 											{"{{{"}
 										</span>
@@ -231,15 +231,13 @@ function ModalStyleOne({ onClose }: { onClose?: () => void }) {
 												});
 											}}
 											style={{
-												width: `${Math.max(
-													1,
-													(isNameFocused
-														? watchVariableName
-														: watchVariableName || "variable_name"
-													).length,
-												)}ch`,
+												width: isNameFocused
+													? watchVariableName
+														? `${watchVariableName.length}ch`
+														: "2px"
+													: `${(watchVariableName || "variable_name").length}ch`,
 											}}
-											className="shrink-0 bg-transparent p-0 font-mono text-text-strong-950 text-xs outline-none placeholder:text-text-soft-400 dark:text-white"
+											className="h-full shrink-0 bg-transparent p-0 font-mono text-text-strong-950 text-xs outline-none placeholder:text-text-soft-400 dark:text-white"
 										/>
 										<span className="shrink-0 select-none text-text-sub-600">
 											{"}}}"}
@@ -605,7 +603,7 @@ function ModalStyleTwo({ onClose }: { onClose?: () => void }) {
 									className="rounded-xl"
 								>
 									<Input.Wrapper className="cursor-text">
-										<div className="flex max-w-full items-center gap-1 overflow-hidden font-mono text-xs">
+										<div className="flex h-10 max-w-full items-center gap-1 overflow-hidden font-mono text-xs">
 											<span className="shrink-0 select-none text-text-sub-600">
 												{"{{{"}
 											</span>
@@ -625,15 +623,13 @@ function ModalStyleTwo({ onClose }: { onClose?: () => void }) {
 												spellCheck={false}
 												autoFocus
 												style={{
-													width: `${Math.max(
-														1,
-														(isNameFocused
-															? variableName
-															: variableName || "variable_name"
-														).length,
-													)}ch`,
+													width: isNameFocused
+														? variableName
+															? `${variableName.length}ch`
+															: "2px"
+														: `${(variableName || "variable_name").length}ch`,
 												}}
-												className="shrink-0 bg-transparent p-0 font-mono text-text-strong-950 text-xs outline-none placeholder:text-text-soft-400 dark:text-white"
+												className="h-full shrink-0 bg-transparent p-0 font-mono text-text-strong-950 text-xs outline-none placeholder:text-text-soft-400 dark:text-white"
 											/>
 											<span className="shrink-0 select-none text-text-sub-600">
 												{"}}}"}
