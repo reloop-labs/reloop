@@ -27,6 +27,7 @@
 		"framer-motion": "catalog:ui",
 		"gray-matter": "catalog:ui",
 		"js-yaml": "catalog:ui",
+		"lucide-react": "catalog:ui",
 		"motion": "catalog:ui",
 		"next": "catalog:ui",
 		"next-mdx-remote": "catalog:ui",
