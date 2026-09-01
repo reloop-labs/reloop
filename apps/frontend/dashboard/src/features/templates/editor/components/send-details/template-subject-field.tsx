@@ -3,14 +3,14 @@
 import { Icon } from "@reloop/ui/icon";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState } from "react";
-import { useCampaignEditorStore } from "../campaign-editor-store";
-import { CampaignFieldRow } from "./campaign-field-row";
+import { useEditorStore } from "../../hooks/use-editor-store";
+import { TemplateFieldRow } from "./template-field-row";
 
-export const CampaignSubjectField = () => {
-	const subject = useCampaignEditorStore((s) => s.subject);
-	const setSubject = useCampaignEditorStore((s) => s.setSubject);
-	const previewText = useCampaignEditorStore((s) => s.previewText);
-	const setPreviewText = useCampaignEditorStore((s) => s.setPreviewText);
+export const TemplateSubjectField = () => {
+	const subject = useEditorStore((s) => s.subject);
+	const setSubject = useEditorStore((s) => s.setSubject);
+	const previewText = useEditorStore((s) => s.previewText);
+	const setPreviewText = useEditorStore((s) => s.setPreviewText);
 
 	const [showPreview, setShowPreview] = useState(false);
 
@@ -23,8 +23,8 @@ export const CampaignSubjectField = () => {
 	return (
 		<>
 			{/* Subject Row */}
-			<CampaignFieldRow
-				id="campaign-send-details-subject"
+			<TemplateFieldRow
+				id="template-send-details-subject"
 				label="Subject"
 				required
 				infoTooltip={{
@@ -34,7 +34,7 @@ export const CampaignSubjectField = () => {
 			>
 				<div className="relative flex w-full flex-1 items-center justify-between gap-2 text-label-sm text-text-sub-600">
 					<input
-						id="campaign-send-details-subject"
+						id="template-send-details-subject"
 						value={subject}
 						onChange={(e) => setSubject(e.target.value)}
 						placeholder="Subject line..."
@@ -60,7 +60,7 @@ export const CampaignSubjectField = () => {
 						</button>
 					</div>
 				</div>
-			</CampaignFieldRow>
+			</TemplateFieldRow>
 
 			{/* Preview Row */}
 			<AnimatePresence initial={false}>
@@ -72,8 +72,8 @@ export const CampaignSubjectField = () => {
 						transition={{ duration: 0.2, ease: "easeInOut" }}
 						className="overflow-hidden"
 					>
-						<CampaignFieldRow
-							id="campaign-send-details-preview-text"
+						<TemplateFieldRow
+							id="template-send-details-preview-text"
 							label="Preview"
 							infoTooltip={{
 								title: "Preview Text",
@@ -83,7 +83,7 @@ export const CampaignSubjectField = () => {
 						>
 							<div className="relative flex w-full flex-1 items-center justify-between gap-2 text-label-sm text-text-sub-600">
 								<input
-									id="campaign-send-details-preview-text"
+									id="template-send-details-preview-text"
 									value={previewText}
 									onChange={(e) => setPreviewText(e.target.value)}
 									onBlur={() => {
@@ -105,7 +105,7 @@ export const CampaignSubjectField = () => {
 									</button>
 								</div>
 							</div>
-						</CampaignFieldRow>
+						</TemplateFieldRow>
 					</motion.div>
 				)}
 			</AnimatePresence>
