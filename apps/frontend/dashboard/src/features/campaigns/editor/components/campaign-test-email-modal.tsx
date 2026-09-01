@@ -46,35 +46,27 @@ export function CampaignTestEmailModal({
 	const [variableValues, setVariableValues] = useState<Record<string, string>>(
 		{},
 	);
+	const [variableErrors, setVariableErrors] = useState<Record<string, string>>(
+		{},
+	);
 	const emailField = useFieldError<HTMLTextAreaElement>();
 	const clearEmailError = emailField.clear;
 
-	// Pre-populate with current user's email when opened
+	// Initialize form once when modal opens
 	useEffect(() => {
-		if (open && !email && session?.user?.email) {
-			setEmail(session.user.email);
-		}
-	}, [open, session?.user?.email, email]);
-
-	// Pre-populate variable defaults
-	useEffect(() => {
-		if (open && properties.length > 0) {
-			setVariableValues((prev) => {
-				const next = { ...prev };
+		if (open) {
+			setEmail(session?.user?.email ?? "");
+			if (properties.length > 0) {
+				const initialVars: Record<string, string> = {};
 				for (const p of properties) {
-					if (next[p.propertyName] === undefined) {
-						next[p.propertyName] = p.defaultValue ?? "";
-					}
+					initialVars[p.propertyName] = p.defaultValue ?? "";
 				}
-				return next;
-			});
-		}
-	}, [open, properties]);
-
-	useEffect(() => {
-		if (!open) {
+				setVariableValues(initialVars);
+			}
+		} else {
 			const timer = setTimeout(() => {
 				clearEmailError();
+				setVariableErrors({});
 				setStatus("idle");
 			}, 300);
 			return () => clearTimeout(timer);
@@ -84,6 +76,7 @@ export function CampaignTestEmailModal({
 	const handleClose = () => {
 		if (status !== "idle") return;
 		clearEmailError();
+		setVariableErrors({});
 		onOpenChange(false);
 	};
 
@@ -91,25 +84,43 @@ export function CampaignTestEmailModal({
 		e?.preventDefault();
 		if (status !== "idle") return;
 
+		let hasError = false;
+		const newVarErrors: Record<string, string> = {};
+
 		const emailList = email
 			.split(/[\n,;]+/)
 			.map((addr) => addr.trim())
 			.filter(Boolean);
 
 		if (emailList.length === 0) {
-			emailField.show("Please enter at least one recipient email address.");
-			return;
+			emailField.show("Recipient email is required.");
+			hasError = true;
+		} else {
+			const invalidEmail = emailList.find(
+				(addr) => !addr.includes("@") || !addr.includes("."),
+			);
+			if (invalidEmail) {
+				emailField.show(`"${invalidEmail}" is not a valid email address.`);
+				hasError = true;
+			}
 		}
 
-		const invalidEmail = emailList.find(
-			(addr) => !addr.includes("@") || !addr.includes("."),
-		);
-		if (invalidEmail) {
-			emailField.show(`"${invalidEmail}" is not a valid email address.`);
+		for (const p of properties) {
+			const val = variableValues[p.propertyName]?.trim();
+			if (!val) {
+				newVarErrors[p.propertyName] = `${p.propertyName} is required.`;
+				hasError = true;
+			}
+		}
+
+		setVariableErrors(newVarErrors);
+
+		if (hasError) {
 			return;
 		}
 
 		emailField.clear();
+		setVariableErrors({});
 		setStatus("sending");
 		try {
 			for (const addr of emailList) {
@@ -145,7 +156,7 @@ export function CampaignTestEmailModal({
 			}
 		},
 		{ enableOnFormTags: ["INPUT"], enabled: open },
-		[open, status, email, variableValues],
+		[open, status, email, variableValues, properties],
 	);
 
 	useHotkeys(
@@ -157,7 +168,7 @@ export function CampaignTestEmailModal({
 			}
 		},
 		{ enableOnFormTags: ["INPUT", "TEXTAREA"], enabled: open },
-		[open, status, email, variableValues],
+		[open, status, email, variableValues, properties],
 	);
 
 	useHotkeys(
@@ -241,9 +252,10 @@ export function CampaignTestEmailModal({
 												<div className="flex items-center justify-between gap-2">
 													<Label.Root
 														htmlFor={`test-var-${p.propertyName}`}
-														className="font-medium text-text-strong-950 text-xs"
+														className="font-medium text-text-strong-950 text-xs flex items-center gap-0.5"
 													>
 														{p.propertyName}
+														<Label.Asterisk />
 													</Label.Root>
 													<Badge.Root
 														size="small"
@@ -256,7 +268,11 @@ export function CampaignTestEmailModal({
 														{p.propertyType}
 													</Badge.Root>
 												</div>
-												<Input.Root size="small" className="rounded-xl">
+												<Input.Root
+													size="small"
+													hasError={Boolean(variableErrors[p.propertyName])}
+													className="rounded-xl"
+												>
 													<Input.Wrapper>
 														<Input.Input
 															id={`test-var-${p.propertyName}`}
@@ -266,19 +282,39 @@ export function CampaignTestEmailModal({
 															placeholder={
 																p.defaultValue
 																	? `Default: ${p.defaultValue}`
-																	: "Enter sample value"
+																	: "Enter value"
 															}
 															value={variableValues[p.propertyName] ?? ""}
-															onChange={(e) =>
+															onChange={(e) => {
 																setVariableValues((prev) => ({
 																	...prev,
 																	[p.propertyName]: e.target.value,
-																}))
-															}
+																}));
+																if (variableErrors[p.propertyName]) {
+																	setVariableErrors((prev) => {
+																		const copy = { ...prev };
+																		delete copy[p.propertyName];
+																		return copy;
+																	});
+																}
+															}}
 															disabled={status !== "idle"}
 														/>
 													</Input.Wrapper>
 												</Input.Root>
+												<AnimatePresence>
+													{variableErrors[p.propertyName] && (
+														<motion.p
+															initial={{ opacity: 0, y: -4 }}
+															animate={{ opacity: 1, y: 0 }}
+															exit={{ opacity: 0, y: -4 }}
+															transition={{ duration: 0.15 }}
+															className="text-error-base text-[11px]"
+														>
+															{variableErrors[p.propertyName]}
+														</motion.p>
+													)}
+												</AnimatePresence>
 											</div>
 										))}
 									</div>
