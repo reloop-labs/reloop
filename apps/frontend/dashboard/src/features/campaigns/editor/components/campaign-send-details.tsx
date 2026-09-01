@@ -17,7 +17,6 @@ export const CampaignSendDetails = () => {
 			<CampaignFromField />
 			<CampaignAudienceField />
 			<CampaignSubjectField />
-			<CampaignPreviewField />
 		</div>
 	);
 };
