@@ -137,7 +137,7 @@ function HowItWorksSteps() {
 						1
 					</div>
 					<div className="flex flex-1 items-center justify-between">
-						<span className="font-medium text-text-strong-950 text-xs dark:text-white">
+						<span className="font-semibold text-sm text-text-strong-950 dark:text-white">
 							RFC 5322 syntax
 						</span>
 						<code className="rounded-md border border-stroke-soft-200 bg-bg-white-0 px-2 py-0.5 font-mono text-[11px] text-text-sub-600 dark:border-white/10 dark:bg-[#0b0b0b] dark:text-white/70">
@@ -152,7 +152,7 @@ function HowItWorksSteps() {
 						2
 					</div>
 					<div className="flex flex-1 items-center justify-between">
-						<span className="font-medium text-text-strong-950 text-xs dark:text-white">
+						<span className="font-semibold text-sm text-text-strong-950 dark:text-white">
 							Catalogue and MX lookup
 						</span>
 						<code className="rounded-md border border-stroke-soft-200 bg-bg-white-0 px-2 py-0.5 font-mono text-[11px] text-text-sub-600 dark:border-white/10 dark:bg-[#0b0b0b] dark:text-white/70">
@@ -166,7 +166,7 @@ function HowItWorksSteps() {
 						3
 					</div>
 					<div className="flex flex-1 items-center justify-between">
-						<span className="font-medium text-text-strong-950 text-xs dark:text-white">
+						<span className="font-semibold text-sm text-text-strong-950 dark:text-white">
 							Verdict, score, and flags
 						</span>
 						<code className="rounded-md border border-stroke-soft-200 bg-bg-white-0 px-2 py-0.5 font-mono text-[11px] text-text-sub-600 dark:border-white/10 dark:bg-[#0b0b0b] dark:text-white/70">
@@ -263,7 +263,7 @@ function SignalItem({
 		<div className="flex items-center justify-between py-2.5">
 			<div className="flex items-center gap-2.5">
 				<span className={cn("size-2 rounded-full", dotColor)} />
-				<span className="font-medium text-text-strong-950 text-xs dark:text-white">
+				<span className="font-semibold text-sm text-text-strong-950 dark:text-white">
 					{label}
 				</span>
 			</div>
@@ -312,7 +312,7 @@ function ResultCardDetailed({
 							{theme.title}
 						</span>
 						<span className="text-text-sub-600 dark:text-white/40">·</span>
-						<span className="font-medium text-text-strong-950 text-xs dark:text-white">
+						<span className="font-semibold text-sm text-text-strong-950 dark:text-white">
 							{result.subtitle}
 						</span>
 					</div>
@@ -348,7 +348,7 @@ function ResultCardDetailed({
 					className={cn("mt-0.5 size-4 shrink-0", recTone.iconClass)}
 				/>
 				<div className="space-y-0.5">
-					<p className="font-medium text-text-strong-950 text-xs dark:text-white">
+					<p className="font-semibold text-sm text-text-strong-950 dark:text-white">
 						Recommendation
 					</p>
 					<p className="text-text-sub-600 text-xs leading-relaxed dark:text-white/60">
@@ -469,7 +469,7 @@ export function CheckerPanel() {
 						<div className="space-y-2">
 							<Label.Root
 								htmlFor="checker-input"
-								className="font-medium text-text-strong-950 text-xs dark:text-white"
+								className="font-semibold text-sm text-text-strong-950 dark:text-white"
 							>
 								Email or domain
 								<Label.Asterisk />

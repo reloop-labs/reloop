@@ -8,7 +8,12 @@ import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
 import { LoadingDot } from "@reloop/ui/loading-dot";
 import * as Textarea from "@reloop/ui/textarea";
-import { AnimatePresence, animate, motion, useReducedMotion } from "framer-motion";
+import {
+	AnimatePresence,
+	animate,
+	motion,
+	useReducedMotion,
+} from "framer-motion";
 import Link from "next/link";
 import type React from "react";
 import {
@@ -179,7 +184,6 @@ function MorphSlot({
 	);
 }
 
-
 function buildHighlightedContent(
 	text: string,
 	triggers: DetectedTrigger[],
@@ -218,7 +222,7 @@ function buildHighlightedContent(
 			nodes.push(
 				<mark
 					key={`m-${context}-${i}-${trigger.startIndex}`}
-					className="box-decoration-clone rounded-[3px] bg-rose-500/10 px-0.5 font-mono text-rose-600 underline decoration-rose-500 decoration-wavy underline-offset-4 dark:bg-rose-500/20 dark:text-rose-400 dark:decoration-rose-400"
+					className="rounded-[3px] bg-rose-500/10 box-decoration-clone px-0.5 font-mono text-rose-600 underline decoration-rose-500 decoration-wavy underline-offset-4 dark:bg-rose-500/20 dark:text-rose-400 dark:decoration-rose-400"
 				>
 					{trigger.word}
 				</mark>,
@@ -323,9 +327,7 @@ export function CheckerPanel() {
 	};
 
 	const handleLoadSample = () => {
-		setSubject(
-			"Urgent: Claim your 100% free bonus before it expires tonight!",
-		);
+		setSubject("Urgent: Claim your 100% free bonus before it expires tonight!");
 		setBody(
 			"Hey there,\n\nThis is a confidential investment proposal exclusively for you. Act now to claim your risk-free payout with zero obligation.\n\nClick here immediately to secure your spot: https://example.com/claim-bonus\n\nDon't miss out on this once in a lifetime offer!\n\nBest regards,\nThe Growth Team",
 		);
@@ -404,8 +406,11 @@ Instructions:
 							<span
 								className={cn(
 									"relative inline-flex size-1.5 rounded-full",
-									isAnalyzing && "bg-rose-500 shadow-[0_0_6px_rgba(244,63,94,0.9)]",
-									!isAnalyzing && !analysis && "bg-neutral-400 dark:bg-white/40",
+									isAnalyzing &&
+										"bg-rose-500 shadow-[0_0_6px_rgba(244,63,94,0.9)]",
+									!isAnalyzing &&
+										!analysis &&
+										"bg-neutral-400 dark:bg-white/40",
 									!isAnalyzing &&
 										analysis?.verdict === "inbox_ready" &&
 										"bg-emerald-500",
@@ -468,7 +473,7 @@ Instructions:
 								<div className="flex items-center justify-between">
 									<Label.Root
 										htmlFor="subject-input"
-										className="font-medium text-text-strong-950 text-xs dark:text-white"
+										className="font-semibold text-sm text-text-strong-950 dark:text-white"
 									>
 										Subject Line
 										<Label.Asterisk />
@@ -494,7 +499,7 @@ Instructions:
 													? { duration: SCAN_DURATION_SEC, ease: SCAN_EASING }
 													: { duration: 0 }
 											}
-											className="whitespace-pre-wrap break-words px-3.5 py-2.5 font-mono text-[13px] leading-6 text-text-strong-950 select-text dark:text-white"
+											className="select-text whitespace-pre-wrap break-words px-3.5 py-2.5 font-mono text-[13px] text-text-strong-950 leading-6 dark:text-white"
 										>
 											{analysis
 												? buildHighlightedContent(
@@ -520,7 +525,7 @@ Instructions:
 													? { duration: SCAN_DURATION_SEC, ease: SCAN_EASING }
 													: { duration: 0 }
 											}
-											className="absolute inset-0 z-10 overflow-hidden whitespace-pre-wrap break-words px-3.5 py-2.5 font-mono text-[13px] leading-6 text-text-strong-950 select-text dark:text-white"
+											className="absolute inset-0 z-10 select-text overflow-hidden whitespace-pre-wrap break-words px-3.5 py-2.5 font-mono text-[13px] text-text-strong-950 leading-6 dark:text-white"
 										>
 											{analysis
 												? buildHighlightedContent(
@@ -544,7 +549,7 @@ Instructions:
 														duration: SCAN_DURATION_SEC,
 														ease: SCAN_EASING,
 													}}
-													className="pointer-events-none absolute inset-y-0 z-20 flex w-28 -translate-x-full"
+													className="-translate-x-full pointer-events-none absolute inset-y-0 z-20 flex w-28"
 												>
 													<div className="h-full w-full bg-gradient-to-r from-transparent via-rose-500/10 to-rose-500/35" />
 													<div className="h-full w-[2px] shrink-0 bg-rose-500 shadow-[0_0_12px_rgba(244,63,94,0.9),0_0_3px_#ffffff]" />
@@ -580,7 +585,7 @@ Instructions:
 								<div className="flex items-center justify-between">
 									<Label.Root
 										htmlFor="body-input"
-										className="font-medium text-text-strong-950 text-xs dark:text-white"
+										className="font-semibold text-sm text-text-strong-950 dark:text-white"
 									>
 										Email Body Copy
 										<Label.Asterisk />
@@ -608,7 +613,7 @@ Instructions:
 													? { duration: SCAN_DURATION_SEC, ease: SCAN_EASING }
 													: { duration: 0 }
 											}
-											className="min-h-24 whitespace-pre-wrap break-words p-3.5 pb-6 font-mono text-[13px] leading-6 text-text-strong-950 select-text dark:text-white"
+											className="min-h-24 select-text whitespace-pre-wrap break-words p-3.5 pb-6 font-mono text-[13px] text-text-strong-950 leading-6 dark:text-white"
 										>
 											{analysis
 												? buildHighlightedContent(
@@ -634,7 +639,7 @@ Instructions:
 													? { duration: SCAN_DURATION_SEC, ease: SCAN_EASING }
 													: { duration: 0 }
 											}
-											className="absolute inset-0 z-10 overflow-hidden whitespace-pre-wrap break-words p-3.5 pb-6 font-mono text-[13px] leading-6 text-text-strong-950 select-text dark:text-white"
+											className="absolute inset-0 z-10 select-text overflow-hidden whitespace-pre-wrap break-words p-3.5 pb-6 font-mono text-[13px] text-text-strong-950 leading-6 dark:text-white"
 										>
 											{analysis
 												? buildHighlightedContent(
@@ -658,7 +663,7 @@ Instructions:
 														duration: SCAN_DURATION_SEC,
 														ease: SCAN_EASING,
 													}}
-													className="pointer-events-none absolute inset-y-0 z-20 flex w-28 -translate-x-full"
+													className="-translate-x-full pointer-events-none absolute inset-y-0 z-20 flex w-28"
 												>
 													<div className="h-full w-full bg-gradient-to-r from-transparent via-rose-500/10 to-rose-500/35" />
 													<div className="h-full w-[2px] shrink-0 bg-rose-500 shadow-[0_0_12px_rgba(244,63,94,0.9),0_0_3px_#ffffff]" />
@@ -680,7 +685,7 @@ Instructions:
 											e.target.style.height = `${Math.max(88, e.target.scrollHeight)}px`;
 										}}
 										placeholder="Paste your email copy here to scan for spam trigger phrases..."
-										className="!min-h-[110px] resize-none overflow-hidden text-paragraph-xs leading-normal focus:!ring-primary-base focus:!shadow-button-primary-focus"
+										className="!min-h-[110px] focus:!ring-primary-base focus:!shadow-button-primary-focus resize-none overflow-hidden text-paragraph-xs leading-normal"
 									/>
 								)}
 							</div>
@@ -789,7 +794,6 @@ Instructions:
 											})}
 										</motion.div>
 									)}
-
 								</div>
 
 								{/* Scale Labels */}
@@ -856,8 +860,7 @@ Instructions:
 															className="size-4 shrink-0 text-emerald-500"
 														/>
 														<span className="font-medium text-xs">
-															No spam trigger words detected — content is
-															clean!
+															No spam trigger words detected — content is clean!
 														</span>
 													</div>
 												);
@@ -881,7 +884,7 @@ Instructions:
 															name="arrow-right"
 															className="size-3 shrink-0 text-text-soft-400 dark:text-white/40"
 														/>
-														<span className="justify-self-end truncate rounded-[4px] border border-emerald-500/20 bg-emerald-500/[0.08] px-2 py-0.5 font-mono font-medium text-[11.5px] text-emerald-600 dark:border-emerald-500/30 dark:bg-emerald-500/15 dark:text-emerald-400">
+														<span className="justify-self-end truncate rounded-[4px] border border-emerald-500/20 bg-emerald-500/[0.08] px-2 py-0.5 font-medium font-mono text-[11.5px] text-emerald-600 dark:border-emerald-500/30 dark:bg-emerald-500/15 dark:text-emerald-400">
 															{suggestion}
 														</span>
 													</div>
@@ -959,9 +962,7 @@ Instructions:
 										)}
 									/>
 									<span className="whitespace-nowrap">
-										{copiedPrompt
-											? "Prompt copied!"
-											: "Copy prompt to fix it"}
+										{copiedPrompt ? "Prompt copied!" : "Copy prompt to fix it"}
 									</span>
 								</FancyButton.Root>
 

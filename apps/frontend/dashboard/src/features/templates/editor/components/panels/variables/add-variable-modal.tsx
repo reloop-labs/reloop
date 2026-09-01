@@ -222,7 +222,7 @@ export const AddTemplateVariableModal = ({
 							<div className="space-y-1.5">
 								<Label.Root
 									htmlFor="templateVariableName"
-									className="font-medium text-text-strong-950 text-xs dark:text-white"
+									className="font-semibold text-sm text-text-strong-950 dark:text-white"
 								>
 									{nameLabel}
 									<Label.Asterisk />
@@ -279,7 +279,7 @@ export const AddTemplateVariableModal = ({
 												)}
 											>
 												<div className="flex w-full items-center justify-between">
-													<p className="font-medium text-text-strong-950 text-xs dark:text-white">
+													<p className="font-semibold text-sm text-text-strong-950 dark:text-white">
 														{opt.label}
 													</p>
 													{isSelected ? (
@@ -303,7 +303,7 @@ export const AddTemplateVariableModal = ({
 							<div className="space-y-1.5">
 								<Label.Root
 									htmlFor="templateDefaultValue"
-									className="font-medium text-text-strong-950 text-xs dark:text-white"
+									className="font-semibold text-sm text-text-strong-950 dark:text-white"
 								>
 									Default Value
 								</Label.Root>

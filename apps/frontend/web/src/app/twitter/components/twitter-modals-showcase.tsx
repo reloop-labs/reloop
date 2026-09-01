@@ -162,7 +162,7 @@ function ModalStyleOne({ onClose }: { onClose: () => void }) {
 			animate={{ opacity: 1, scale: 1, y: 0 }}
 			exit={{ opacity: 0, scale: 0.96, y: 8 }}
 			transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-			className="w-full max-w-[480px] overflow-hidden rounded-2xl border border-stroke-soft-100/50 bg-bg-white-0 p-0.5 shadow-regular-md sm:max-w-[480px] dark:border-stroke-soft-100/40 dark:bg-[#0c0c0c]"
+			className="w-full max-w-[480px] overflow-hidden rounded-2xl border border-stroke-soft-100/50 bg-bg-white-0 p-0.5 sm:max-w-[480px] dark:border-stroke-soft-100/40 dark:bg-[#0c0c0c]"
 		>
 			<div className="rounded-2xl border border-stroke-soft-100/50 dark:border-stroke-soft-100/40">
 				{/* Header */}
@@ -423,26 +423,86 @@ function ModalStyleOne({ onClose }: { onClose: () => void }) {
 /*                           MODAL 2 (NESTED CARD)                            */
 /* -------------------------------------------------------------------------- */
 
+type PropertyTypeStyleTwo = "string" | "number";
+
+const TYPE_OPTIONS_STYLE_TWO: {
+	value: PropertyTypeStyleTwo;
+	label: string;
+	description: string;
+}[] = [
+	{
+		value: "string",
+		label: "String",
+		description: "Free-form text, names, or custom strings.",
+	},
+	{
+		value: "number",
+		label: "Number",
+		description: "Integers, decimals, or numeric counts.",
+	},
+];
+
+const validateVariableNameStyleTwo = (name: string): string => {
+	if (!name) return "";
+	if (!/^[a-zA-Z0-9_]*$/.test(name))
+		return "Only letters, numbers, and underscores";
+	if (!/^[a-zA-Z_]/.test(name)) return "Must start with a letter or underscore";
+	return "";
+};
+
 function ModalStyleTwo({ onClose }: { onClose: () => void }) {
-	const [name, setName] = useState("");
 	const [status, setStatus] = useState<"idle" | "creating" | "success">("idle");
+	const [variableName, setVariableName] = useState("");
+	const [variableType, setVariableType] =
+		useState<PropertyTypeStyleTwo>("string");
+	const [defaultValue, setDefaultValue] = useState("");
 	const nameField = useFieldError();
 
 	const handleClose = () => {
 		if (status !== "idle") return;
-		setName("");
 		nameField.clear();
+		setVariableName("");
+		setDefaultValue("");
+		setVariableType("string");
 		setStatus("idle");
 		onClose();
 	};
+
+	const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const value = e.target.value;
+		setVariableName(value);
+		if (nameField.hasError) nameField.clear();
+	};
+
+	const handleSlugify = () => {
+		const slugged = slugify(variableName);
+		setVariableName(slugged);
+	};
+
+	const defaultValueError =
+		variableType === "number" &&
+		defaultValue !== "" &&
+		!/^-?\d+(?:\.\d+)?$/.test(defaultValue.trim())
+			? "Must be a valid number"
+			: "";
 
 	const handleSubmit = (e?: React.FormEvent) => {
 		e?.preventDefault();
 		if (status !== "idle") return;
 
-		const trimmed = name.trim();
+		const trimmed = variableName.trim();
 		if (!trimmed) {
-			nameField.show("Please enter a campaign name.");
+			nameField.show("Please enter a variable name.");
+			return;
+		}
+
+		const validationError = validateVariableNameStyleTwo(trimmed);
+		if (validationError) {
+			nameField.show(validationError);
+			return;
+		}
+
+		if (defaultValueError) {
 			return;
 		}
 
@@ -451,12 +511,24 @@ function ModalStyleTwo({ onClose }: { onClose: () => void }) {
 		setTimeout(() => {
 			setStatus("success");
 			setTimeout(() => {
-				setName("");
-				nameField.clear();
 				setStatus("idle");
-			}, 1500);
+				setVariableName("");
+				setDefaultValue("");
+				setVariableType("string");
+				onClose();
+			}, 1200);
 		}, 600);
 	};
+
+	useEffect(() => {
+		const handleKeyDown = (e: KeyboardEvent) => {
+			if (e.key === "Escape" && status === "idle") {
+				handleClose();
+			}
+		};
+		window.addEventListener("keydown", handleKeyDown);
+		return () => window.removeEventListener("keydown", handleKeyDown);
+	}, [status]);
 
 	return (
 		<motion.div
@@ -468,57 +540,158 @@ function ModalStyleTwo({ onClose }: { onClose: () => void }) {
 		>
 			<form onSubmit={(e) => void handleSubmit(e)} noValidate>
 				<div className="relative m-0.5 space-y-5 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 pt-5 dark:border-stroke-soft-100/40 dark:bg-[#0c0c0c]">
-					<div className="flex items-start justify-between px-6 dark:border-stroke-soft-100/40">
-						<div className="space-y-1">
-							<div className="flex items-center gap-2">
-								<Icon name="mega-phone" className="size-4" />
-								<h2 className="font-medium text-text-strong-950 text-xl tracking-tight dark:text-white">
-									Create campaign
-								</h2>
-							</div>
+					{/* Header */}
+					<div className="flex items-center justify-between px-6 dark:border-stroke-soft-100/40">
+						<div className="flex items-center gap-2">
+							<Icon
+								name="variable"
+								className="size-4.5 text-text-strong-950 dark:text-white"
+							/>
+							<h2 className="font-medium text-text-strong-950 text-xl tracking-tight dark:text-white">
+								Create variable
+							</h2>
 						</div>
 						<button
 							type="button"
 							onClick={handleClose}
 							aria-label="Close"
 							disabled={status !== "idle"}
-							className="flex h-7 w-7 items-center justify-center rounded-lg bg-bg-white-0 text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 active:scale-[0.95] disabled:opacity-50 dark:border-stroke-soft-100/40 dark:bg-transparent dark:hover:bg-white/[0.05]"
+							className="flex h-7 w-7 items-center justify-center rounded-lg bg-bg-white-0 text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 active:scale-[0.95] disabled:opacity-50 dark:border-stroke-soft-100/40 dark:bg-transparent dark:hover:bg-white/[0.05] dark:hover:text-white"
 						>
 							<X className="size-3.5" strokeWidth={2.25} />
 						</button>
 					</div>
 
-					<div className="space-y-1.5 px-6 pb-7">
-						<Label.Root
-							htmlFor="campaign-name-style2"
-							className="font-medium text-text-strong-950 text-xs dark:text-white"
-						>
-							Campaign name
-							<Label.Asterisk />
-						</Label.Root>
-						<FieldError
-							field={nameField}
-							hint="Used internally to find this campaign in your list."
-						>
-							<Input.Root size="medium" hasError={nameField.hasError}>
+					{/* Form Content */}
+					<div className="space-y-4.5 px-6 pb-6">
+						{/* Variable Name */}
+						<div className="space-y-1.5">
+							<Label.Root
+								htmlFor="variable-name-style2"
+								className="font-semibold text-text-strong-950 text-xs dark:text-white"
+							>
+								Variable name
+								<Label.Asterisk />
+							</Label.Root>
+							<FieldError
+								field={nameField}
+								hint="Letters, numbers, and underscores only — spaces auto-convert"
+							>
+								<Input.Root
+									size="medium"
+									hasError={nameField.hasError}
+									className="rounded-xl"
+								>
+									<Input.Wrapper>
+										<Input.InlineAffix className="font-mono text-text-sub-600 text-xs focus:text-text-strong-950!">
+											{"{{{"}
+										</Input.InlineAffix>
+										<Input.Input
+											id="variable-name-style2"
+											{...nameField.controlProps}
+											placeholder="variable_name"
+											value={variableName}
+											onChange={handleNameChange}
+											onBlur={handleSlugify}
+											disabled={status !== "idle"}
+											autoComplete="off"
+											spellCheck={false}
+											autoFocus
+										/>
+										<Input.InlineAffix className="font-mono text-text-sub-600 text-xs focus:text-text-strong-950!">
+											{"}}}"}
+										</Input.InlineAffix>
+									</Input.Wrapper>
+								</Input.Root>
+							</FieldError>
+						</div>
+
+						{/* Property Type Selector */}
+						<div className="space-y-1.5">
+							<div className="grid grid-cols-2 gap-2.5">
+								{TYPE_OPTIONS_STYLE_TWO.map((opt) => {
+									const isSelected = variableType === opt.value;
+									return (
+										<button
+											key={opt.value}
+											type="button"
+											onClick={() => setVariableType(opt.value)}
+											disabled={status !== "idle"}
+											className={cn(
+												"group relative flex flex-col items-start gap-1 rounded-xl border p-3 text-left transition-all duration-150 active:scale-[0.98]",
+												isSelected
+													? "border-primary-base bg-bg-white-0 shadow-[0_0_0_1px_#0055FF] dark:border-primary-base dark:bg-white/[0.04] dark:shadow-[0_0_0_1px_#0055FF]"
+													: "border-stroke-soft-200 bg-bg-white-0 hover:border-stroke-sub-300 hover:bg-bg-weak-50/50 dark:border-stroke-soft-100/40 dark:bg-bg-soft-200/10 dark:hover:bg-white/[0.02]",
+											)}
+										>
+											<div className="flex w-full items-center justify-between">
+												<p className="font-semibold text-sm text-text-strong-950 dark:text-white">
+													{opt.label}
+												</p>
+												{isSelected ? (
+													<div className="flex size-4.5 items-center justify-center rounded-full bg-primary-base">
+														<div className="size-1.5 rounded-full bg-white" />
+													</div>
+												) : (
+													<div className="size-4.5 rounded-full border-2 border-stroke-soft-200 transition-colors group-hover:border-stroke-sub-300 dark:border-stroke-soft-100/60" />
+												)}
+											</div>
+											<p className="text-[11px] text-text-sub-600 leading-snug dark:text-white/60">
+												{opt.description}
+											</p>
+										</button>
+									);
+								})}
+							</div>
+						</div>
+
+						{/* Default Value */}
+						<div className="space-y-1.5">
+							<Label.Root
+								htmlFor="default-value-style2"
+								className="font-semibold text-text-strong-950 text-xs dark:text-white"
+							>
+								Default Value
+							</Label.Root>
+							<Input.Root
+								size="medium"
+								className="rounded-xl"
+								hasError={!!defaultValueError}
+							>
 								<Input.Wrapper>
 									<Input.Input
-										id="campaign-name-style2"
-										{...nameField.controlProps}
-										placeholder="e.g. April product update"
-										value={name}
+										id="default-value-style2"
+										placeholder={variableType === "number" ? "0" : "unknown"}
+										value={defaultValue}
 										onChange={(e) => {
-											setName(e.target.value);
-											if (nameField.hasError) nameField.clear();
+											const val = e.target.value;
+											if (variableType === "number") {
+												if (val === "" || /^-?\d*\.?\d*$/.test(val)) {
+													setDefaultValue(val);
+												}
+											} else {
+												setDefaultValue(val);
+											}
 										}}
-										autoFocus
 										disabled={status !== "idle"}
+										inputMode={variableType === "number" ? "numeric" : "text"}
 									/>
 								</Input.Wrapper>
 							</Input.Root>
-						</FieldError>
+							{defaultValueError ? (
+								<p className="text-[11px] text-error-base">
+									{defaultValueError}
+								</p>
+							) : (
+								<p className="text-[11px] text-text-sub-600 dark:text-white/60">
+									Fallback value used when a contact is missing this variable
+								</p>
+							)}
+						</div>
 					</div>
 				</div>
+
+				{/* Actions / Footer */}
 				<div className="relative flex items-center justify-between gap-3 px-3 pt-2 pb-3">
 					<Button.Root
 						type="button"
@@ -543,7 +716,7 @@ function ModalStyleTwo({ onClose }: { onClose: () => void }) {
 						size="small"
 						disabled={status !== "idle"}
 						className={cn(
-							"min-w-[168px] justify-center overflow-hidden transition-all duration-200",
+							"min-w-[156px] justify-center overflow-hidden transition-all duration-200",
 							status !== "idle" && "pointer-events-none",
 							status === "creating" && "opacity-90",
 						)}
@@ -573,7 +746,7 @@ function ModalStyleTwo({ onClose }: { onClose: () => void }) {
 									</>
 								) : (
 									<>
-										Create campaign
+										Create variable
 										<ActionKbd className={actionKbdOnBlueClassName}>
 											↵
 										</ActionKbd>
@@ -599,65 +772,70 @@ export function TwitterModalsShowcase() {
 	return (
 		<div
 			data-standalone="true"
-			className="relative flex min-h-dvh w-full flex-col bg-white md:flex-row"
+			className="relative flex min-h-dvh w-full items-center justify-center bg-white p-6 sm:p-10 dark:bg-[#080808]"
 		>
-			{/* LEFT HALF SCREEN */}
-			<div className="relative flex flex-1 items-center justify-center border-stroke-soft-200 border-b p-6 md:border-r md:border-b-0 dark:border-stroke-soft-100/40">
-				<AnimatePresence mode="wait">
-					{isLeftOpen ? (
-						<ModalStyleOne key="modal-1" onClose={() => setIsLeftOpen(false)} />
-					) : (
-						<motion.div
-							key="trigger-1"
-							initial={{ opacity: 0, scale: 0.95 }}
-							animate={{ opacity: 1, scale: 1 }}
-							exit={{ opacity: 0, scale: 0.95 }}
-							transition={{ duration: 0.2 }}
-							className="flex flex-col items-center gap-3"
-						>
-							<FancyButton.Root
-								type="button"
-								variant="blue"
-								size="medium"
-								onClick={() => setIsLeftOpen(true)}
-								className="min-w-48 justify-center shadow-sm"
+			<div className="flex w-full max-w-6xl flex-col items-center justify-center gap-8 lg:flex-row lg:gap-16">
+				{/* LEFT MODAL */}
+				<div className="flex w-full max-w-[480px] items-center justify-center">
+					<AnimatePresence mode="wait">
+						{isLeftOpen ? (
+							<ModalStyleOne
+								key="modal-1"
+								onClose={() => setIsLeftOpen(false)}
+							/>
+						) : (
+							<motion.div
+								key="trigger-1"
+								initial={{ opacity: 0, scale: 0.95 }}
+								animate={{ opacity: 1, scale: 1 }}
+								exit={{ opacity: 0, scale: 0.95 }}
+								transition={{ duration: 0.2 }}
+								className="flex flex-col items-center gap-3"
 							>
-								Open modal
-							</FancyButton.Root>
-						</motion.div>
-					)}
-				</AnimatePresence>
-			</div>
+								<FancyButton.Root
+									type="button"
+									variant="blue"
+									size="medium"
+									onClick={() => setIsLeftOpen(true)}
+									className="min-w-48 justify-center shadow-sm"
+								>
+									Open modal
+								</FancyButton.Root>
+							</motion.div>
+						)}
+					</AnimatePresence>
+				</div>
 
-			{/* RIGHT HALF SCREEN */}
-			<div className="relative flex flex-1 items-center justify-center p-6">
-				<AnimatePresence mode="wait">
-					{isRightOpen ? (
-						<ModalStyleTwo
-							key="modal-2"
-							onClose={() => setIsRightOpen(false)}
-						/>
-					) : (
-						<motion.div
-							key="trigger-2"
-							initial={{ opacity: 0, scale: 0.95 }}
-							animate={{ opacity: 1, scale: 1 }}
-							exit={{ opacity: 0, scale: 0.95 }}
-							transition={{ duration: 0.2 }}
-							className="flex flex-col items-center gap-3"
-						>
-							<FancyButton.Root
-								type="button"
-								variant="blue"
-								size="medium"
-								onClick={() => setIsRightOpen(true)}
-								className="min-w-48 justify-center shadow-sm"
+				{/* RIGHT MODAL */}
+				<div className="flex w-full max-w-[460px] items-center justify-center">
+					<AnimatePresence mode="wait">
+						{isRightOpen ? (
+							<ModalStyleTwo
+								key="modal-2"
+								onClose={() => setIsRightOpen(false)}
+							/>
+						) : (
+							<motion.div
+								key="trigger-2"
+								initial={{ opacity: 0, scale: 0.95 }}
+								animate={{ opacity: 1, scale: 1 }}
+								exit={{ opacity: 0, scale: 0.95 }}
+								transition={{ duration: 0.2 }}
+								className="flex flex-col items-center gap-3"
 							>
-								Open modal
-							</FancyButton.Root>
-						</motion.div>
-					)}
-				</AnimatePresence>
+								<FancyButton.Root
+									type="button"
+									variant="blue"
+									size="medium"
+									onClick={() => setIsRightOpen(true)}
+									className="min-w-48 justify-center shadow-sm"
+								>
+									Open modal
+								</FancyButton.Root>
+							</motion.div>
+						)}
+					</AnimatePresence>
+				</div>
 			</div>
 		</div>
 	);

@@ -178,7 +178,15 @@ export const EditTemplateVariableModal = ({
 			}
 		},
 		{ enableOnFormTags: ["INPUT"], enabled: open },
-		[open, status, variable, variableName, variableType, defaultValue, nameLabel],
+		[
+			open,
+			status,
+			variable,
+			variableName,
+			variableType,
+			defaultValue,
+			nameLabel,
+		],
 	);
 
 	useHotkeys(
@@ -230,7 +238,7 @@ export const EditTemplateVariableModal = ({
 							<div className="space-y-1.5">
 								<Label.Root
 									htmlFor="editTemplateVariableName"
-									className="font-medium text-text-strong-950 text-xs dark:text-white"
+									className="font-semibold text-sm text-text-strong-950 dark:text-white"
 								>
 									{nameLabel}
 									<Label.Asterisk />
@@ -245,7 +253,7 @@ export const EditTemplateVariableModal = ({
 										className="rounded-xl"
 									>
 										<Input.Wrapper>
-											<Input.InlineAffix className="font-mono text-xs text-text-sub-600 focus:text-text-strong-950!">
+											<Input.InlineAffix className="font-mono text-text-sub-600 text-xs focus:text-text-strong-950!">
 												{"{{{"}
 											</Input.InlineAffix>
 											<Input.Input
@@ -259,7 +267,7 @@ export const EditTemplateVariableModal = ({
 												autoComplete="off"
 												spellCheck={false}
 											/>
-											<Input.InlineAffix className="font-mono text-xs text-text-sub-600 focus:text-text-strong-950!">
+											<Input.InlineAffix className="font-mono text-text-sub-600 text-xs focus:text-text-strong-950!">
 												{"}}}"}
 											</Input.InlineAffix>
 										</Input.Wrapper>
@@ -269,7 +277,7 @@ export const EditTemplateVariableModal = ({
 
 							{/* Property Type Selector */}
 							<div className="space-y-1.5">
-								<Label.Root className="font-medium text-text-strong-950 text-xs dark:text-white">
+								<Label.Root className="font-semibold text-sm text-text-strong-950 dark:text-white">
 									Type
 									<Label.Asterisk />
 								</Label.Root>
@@ -285,12 +293,12 @@ export const EditTemplateVariableModal = ({
 												className={cn(
 													"group relative flex flex-col items-start gap-1 rounded-xl border p-3 text-left transition-all duration-150 active:scale-[0.98]",
 													isSelected
-														? "border-primary-base shadow-[0_0_0_1px_#0055FF] bg-bg-white-0 dark:border-primary-base dark:shadow-[0_0_0_1px_#0055FF] dark:bg-white/[0.04]"
+														? "border-primary-base bg-bg-white-0 shadow-[0_0_0_1px_#0055FF] dark:border-primary-base dark:bg-white/[0.04] dark:shadow-[0_0_0_1px_#0055FF]"
 														: "border-stroke-soft-200 bg-bg-white-0 hover:border-stroke-sub-300 hover:bg-bg-weak-50/50 dark:border-stroke-soft-100/40 dark:bg-bg-soft-200/10 dark:hover:bg-white/[0.02]",
 												)}
 											>
 												<div className="flex w-full items-center justify-between">
-													<p className="font-medium text-text-strong-950 text-xs dark:text-white">
+													<p className="font-semibold text-sm text-text-strong-950 dark:text-white">
 														{opt.label}
 													</p>
 													{isSelected ? (
@@ -314,7 +322,7 @@ export const EditTemplateVariableModal = ({
 							<div className="space-y-1.5">
 								<Label.Root
 									htmlFor="editTemplateDefaultValue"
-									className="font-medium text-text-strong-950 text-xs dark:text-white"
+									className="font-semibold text-sm text-text-strong-950 dark:text-white"
 								>
 									Default Value
 								</Label.Root>
