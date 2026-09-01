@@ -56,7 +56,7 @@ const AudienceGroupRow = ({
 			aria-selected={isSelected}
 			onClick={onSelect}
 			className={cn(
-				"flex w-full items-center justify-between gap-2.5 rounded-lg px-2.5 py-2 text-left text-label-xs transition-colors",
+				"flex w-full items-center justify-between gap-2.5 rounded-lg px-2.5 py-2 text-left text-label-xs",
 				isSelected
 					? "bg-bg-weak-50 font-medium text-text-strong-950 dark:bg-bg-sub-300/40"
 					: "text-text-sub-600 hover:bg-bg-weak-50/70 dark:hover:bg-bg-sub-300/20",
@@ -96,7 +96,7 @@ const AudienceTopicRow = ({
 			aria-selected={isSelected}
 			onClick={onSelect}
 			className={cn(
-				"flex w-full items-center justify-between gap-2.5 rounded-lg px-2.5 py-2 text-left text-label-xs transition-colors",
+				"flex w-full items-center justify-between gap-2.5 rounded-lg px-2.5 py-2 text-left text-label-xs",
 				isSelected
 					? "bg-bg-weak-50 font-medium text-text-strong-950 dark:bg-bg-sub-300/40"
 					: "text-text-sub-600 hover:bg-bg-weak-50/70 dark:hover:bg-bg-sub-300/20",
@@ -255,7 +255,7 @@ export const CampaignAudienceField = () => {
 					aria-haspopup="listbox"
 					aria-expanded={isMenuOpen}
 					aria-controls={listboxId}
-					className="flex items-center gap-1.5 text-label-sm font-medium text-text-strong-950 transition-colors hover:text-text-sub-600 outline-none"
+					className="flex items-center gap-1.5 text-label-sm font-medium text-text-strong-950 hover:text-text-sub-600 outline-none"
 				>
 					<span>{displayLabel}</span>
 					<span className="font-normal text-text-soft-400">
@@ -309,7 +309,7 @@ export const CampaignAudienceField = () => {
 													setIsMenuOpen(false);
 												}}
 												className={cn(
-													"flex w-full items-center justify-between gap-2.5 rounded-lg px-2.5 py-2 text-left text-label-xs transition-colors",
+													"flex w-full items-center justify-between gap-2.5 rounded-lg px-2.5 py-2 text-left text-label-xs",
 													audienceType === "all"
 														? "bg-bg-weak-50 font-medium text-text-strong-950 dark:bg-bg-sub-300/40"
 														: "text-text-sub-600 hover:bg-bg-weak-50/70 dark:hover:bg-bg-sub-300/20",
@@ -335,7 +335,7 @@ export const CampaignAudienceField = () => {
 													setMenuView("groups");
 												}}
 												className={cn(
-													"flex w-full items-center justify-between gap-2.5 rounded-lg px-2.5 py-2 text-left text-label-xs transition-colors",
+													"flex w-full items-center justify-between gap-2.5 rounded-lg px-2.5 py-2 text-left text-label-xs",
 													audienceType === "group"
 														? "bg-bg-weak-50 font-medium text-text-strong-950 dark:bg-bg-sub-300/40"
 														: "text-text-sub-600 hover:bg-bg-weak-50/70 dark:hover:bg-bg-sub-300/20",
@@ -359,7 +359,7 @@ export const CampaignAudienceField = () => {
 													setMenuView("topics");
 												}}
 												className={cn(
-													"flex w-full items-center justify-between gap-2.5 rounded-lg px-2.5 py-2 text-left text-label-xs transition-colors",
+													"flex w-full items-center justify-between gap-2.5 rounded-lg px-2.5 py-2 text-left text-label-xs",
 													audienceType === "channel"
 														? "bg-bg-weak-50 font-medium text-text-strong-950 dark:bg-bg-sub-300/40"
 														: "text-text-sub-600 hover:bg-bg-weak-50/70 dark:hover:bg-bg-sub-300/20",
@@ -397,7 +397,7 @@ export const CampaignAudienceField = () => {
 													setDirection(-1);
 													setMenuView("root");
 												}}
-												className="flex w-full items-center gap-1.5 rounded-lg px-2 py-1.5 text-left text-label-xs font-semibold text-text-strong-950 transition-colors hover:bg-bg-weak-50/70 dark:hover:bg-bg-sub-300/20"
+												className="flex w-full items-center gap-1.5 rounded-lg px-2 py-1.5 text-left text-label-xs font-semibold text-text-strong-950 hover:bg-bg-weak-50/70 dark:hover:bg-bg-sub-300/20"
 											>
 												<Icon name="arrow-left" className="h-3.5 w-3.5 text-text-soft-400" />
 												<span>Groups</span>
@@ -449,8 +449,8 @@ export const CampaignAudienceField = () => {
 												onClick={() => {
 													setDirection(-1);
 													setMenuView("root");
-												}}
-												className="flex w-full items-center gap-1.5 rounded-lg px-2 py-1.5 text-left text-label-xs font-semibold text-text-strong-950 transition-colors hover:bg-bg-weak-50/70 dark:hover:bg-bg-sub-300/20"
+													}}
+												className="flex w-full items-center gap-1.5 rounded-lg px-2 py-1.5 text-left text-label-xs font-semibold text-text-strong-950 hover:bg-bg-weak-50/70 dark:hover:bg-bg-sub-300/20"
 											>
 												<Icon name="arrow-left" className="h-3.5 w-3.5 text-text-soft-400" />
 												<span>Topics</span>
