@@ -169,7 +169,7 @@ export function CodeEditor({ onClose }: { onClose?: () => void } = {}) {
 
 	return (
 		<div className="flex h-full w-full flex-col overflow-hidden bg-bg-white-0 dark:bg-black">
-			<div className="flex h-10 shrink-0 items-center justify-between border-stroke-soft-200 border-b px-3 dark:border-stroke-soft-100/40">
+			<div className="flex h-10 shrink-0 items-center justify-between border-stroke-soft-100 border-b px-3 dark:border-stroke-soft-100/40">
 				<div className="flex items-center gap-1.5 p-0">
 					<Icon name="code" className="h-3.5 w-3.5 text-text-sub-600" />
 					<span className="mr-1 font-semibold text-label-xs text-text-strong-950">

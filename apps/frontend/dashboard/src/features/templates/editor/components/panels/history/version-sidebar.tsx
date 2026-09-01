@@ -63,11 +63,11 @@ function DeleteVersionModal({
 	return (
 		<Modal.Root open={isOpen} onOpenChange={(open) => !open && onClose()}>
 			<Modal.Content
-				className="rounded-2xl border border-stroke-soft-100/50 p-0.5 font-sans sm:max-w-[400px]"
+				className="rounded-2xl border border-stroke-soft-100 p-0.5 font-sans sm:max-w-[400px] dark:border-stroke-soft-100/40"
 				showClose={true}
 			>
-				<div className="rounded-2xl border border-stroke-soft-100/50">
-					<Modal.Header className="before:border-stroke-soft-200/50">
+				<div className="rounded-2xl border border-stroke-soft-100 dark:border-stroke-soft-100/40">
+					<Modal.Header className="before:border-stroke-soft-100 dark:before:border-stroke-soft-100/40">
 						<div className="flex items-center justify-center">
 							<Icon name="trash" className="h-4 w-4" />
 						</div>
@@ -81,7 +81,7 @@ function DeleteVersionModal({
 							be undone.
 						</p>
 					</Modal.Body>
-					<Modal.Footer className="mt-4 flex items-center justify-end gap-3 border-stroke-soft-100/50">
+					<Modal.Footer className="mt-4 flex items-center justify-end gap-3 border-stroke-soft-100 dark:border-stroke-soft-100/40">
 						<Button.Root
 							type="button"
 							variant="neutral"
@@ -136,11 +136,11 @@ function PublishVersionModal({
 	return (
 		<Modal.Root open={isOpen} onOpenChange={(open) => !open && onClose()}>
 			<Modal.Content
-				className="rounded-2xl border border-stroke-soft-100/50 p-0.5 font-sans sm:max-w-[400px]"
+				className="rounded-2xl border border-stroke-soft-100 p-0.5 font-sans sm:max-w-[400px] dark:border-stroke-soft-100/40"
 				showClose={true}
 			>
-				<div className="rounded-2xl border border-stroke-soft-100/50">
-					<Modal.Header className="before:border-stroke-soft-200/50">
+				<div className="rounded-2xl border border-stroke-soft-100 dark:border-stroke-soft-100/40">
+					<Modal.Header className="before:border-stroke-soft-100 dark:before:border-stroke-soft-100/40">
 						<div className="flex items-center justify-center">
 							<Icon name="info-outline" className="h-4 w-4" />
 						</div>
@@ -163,12 +163,12 @@ function PublishVersionModal({
 									placeholder="Describe what changed in this version..."
 									value={description}
 									onChange={(e) => setDescription(e.target.value)}
-									className="h-20 w-full rounded-lg border border-stroke-soft-200 bg-bg-white-0 p-2 text-paragraph-xs text-text-strong-950 outline-none focus:border-stroke-soft-200 dark:border-stroke-soft-100/40"
+									className="h-20 w-full rounded-lg border border-stroke-soft-100 bg-bg-white-0 p-2 text-paragraph-xs text-text-strong-950 outline-none focus:border-stroke-soft-100 dark:border-stroke-soft-100/40"
 								/>
 							</div>
 						)}
 					</Modal.Body>
-					<Modal.Footer className="mt-4 flex items-center justify-end gap-3 border-stroke-soft-100/50">
+					<Modal.Footer className="mt-4 flex items-center justify-end gap-3 border-stroke-soft-100 dark:border-stroke-soft-100/40">
 						<Button.Root
 							type="button"
 							variant="neutral"

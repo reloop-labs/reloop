@@ -34,13 +34,13 @@ export function PublishTemplateModal({
 		<Modal.Root open={isOpen} onOpenChange={(open) => !open && onClose()}>
 			<Modal.Content
 				className={cn(
-					"rounded-2xl border border-stroke-soft-100/50 p-0.5 font-sans transition-all duration-300",
+					"rounded-2xl border border-stroke-soft-100 p-0.5 font-sans transition-all duration-300 dark:border-stroke-soft-100/40",
 					showDiff ? "h-[85vh] max-w-[80vw]" : "sm:max-w-[480px]",
 				)}
 				showClose={true}
 			>
-				<div className="flex h-full flex-col overflow-hidden rounded-2xl border border-stroke-soft-100/50">
-					<Modal.Header className="before:border-stroke-soft-200/50">
+				<div className="flex h-full flex-col overflow-hidden rounded-2xl border border-stroke-soft-100 dark:border-stroke-soft-100/40">
+					<Modal.Header className="before:border-stroke-soft-100 dark:before:border-stroke-soft-100/40">
 						<div className="flex items-center justify-center">
 							<Icon name="info-outline" className="h-4 w-4" />
 						</div>
@@ -69,7 +69,7 @@ export function PublishTemplateModal({
 						</div>
 
 						{/* Collapsible Visual Diff */}
-						<div className="overflow-hidden rounded-xl border border-stroke-soft-200 dark:border-stroke-soft-100/40">
+						<div className="overflow-hidden rounded-xl border border-stroke-soft-100 dark:border-stroke-soft-100/40">
 							<button
 								type="button"
 								onClick={() => setShowDiff((prev) => !prev)}
@@ -104,7 +104,7 @@ export function PublishTemplateModal({
 						</div>
 					</Modal.Body>
 
-					<Modal.Footer className="mt-4 flex items-center justify-end gap-3 border-stroke-soft-100/50">
+					<Modal.Footer className="mt-4 flex items-center justify-end gap-3 border-stroke-soft-100 dark:border-stroke-soft-100/40">
 						<Button.Root
 							type="button"
 							variant="neutral"

@@ -49,7 +49,7 @@ export function TemplateDetailHeader({
 	isSynced,
 }: TemplateDetailHeaderProps) {
 	return (
-		<div className="relative flex shrink-0 items-center justify-between border-stroke-soft-200 border-b bg-bg-white-0 px-4 py-2.5 dark:border-stroke-soft-100/40 dark:bg-black">
+		<div className="relative flex shrink-0 items-center justify-between border-stroke-soft-100 border-b bg-bg-white-0 px-4 py-2.5 dark:border-stroke-soft-100/40 dark:bg-black">
 			<div className="flex min-w-0 flex-1 items-center gap-2">
 				<SidebarToggleButton />
 				<CenterNav />

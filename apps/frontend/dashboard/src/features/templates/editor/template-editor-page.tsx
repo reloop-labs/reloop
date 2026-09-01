@@ -78,7 +78,7 @@ export function TemplateEditorPage({ templateId }: { templateId: string }) {
 				<div className="flex h-full min-h-0 flex-1 overflow-hidden">
 					{/* Code Split view if in code mode */}
 					{isCodeSplit && (
-						<div className="relative flex w-1/2 min-w-[480px] shrink-0 flex-col overflow-hidden border-stroke-soft-200 border-r transition-all duration-300 dark:border-stroke-soft-100/40">
+						<div className="relative flex w-1/2 min-w-[480px] shrink-0 flex-col overflow-hidden border-stroke-soft-100 border-r transition-all duration-300 dark:border-stroke-soft-100/40">
 							<CodeEditor onClose={() => void setViewMode("visual")} />
 						</div>
 					)}
@@ -115,7 +115,7 @@ export function TemplateEditorPage({ templateId }: { templateId: string }) {
 										damping: 33,
 										opacity: { duration: 0.2 },
 									}}
-									className="absolute inset-y-0 right-0 z-10 flex h-full shrink-0 flex-col overflow-hidden border-stroke-soft-200 border-l bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-black"
+									className="absolute inset-y-0 right-0 z-10 flex h-full shrink-0 flex-col overflow-hidden border-stroke-soft-100 border-l bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-black"
 								>
 									{/* Top Tabs: Editor | Variables | History */}
 									<TemplateInspectorTabs

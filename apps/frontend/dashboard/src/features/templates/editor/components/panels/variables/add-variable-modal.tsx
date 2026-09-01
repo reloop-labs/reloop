@@ -242,7 +242,7 @@ export const AddTemplateVariableModal = ({
 												<span className="shrink-0 select-none text-text-sub-600">
 													{"{{{"}
 												</span>
-												<div className="relative mx-1 inline-flex items-center min-w-[2px]">
+												<div className="relative mx-1 inline-flex min-w-[2px] items-center">
 													<span
 														aria-hidden="true"
 														className="invisible select-none whitespace-pre font-mono text-xs"
@@ -265,7 +265,6 @@ export const AddTemplateVariableModal = ({
 														disabled={status !== "idle"}
 														autoComplete="off"
 														spellCheck={false}
-														autoFocus
 														className="absolute inset-0 h-full w-full bg-transparent p-0 font-mono text-text-strong-950 text-xs outline-none placeholder:text-text-soft-400 dark:text-white"
 													/>
 												</div>
