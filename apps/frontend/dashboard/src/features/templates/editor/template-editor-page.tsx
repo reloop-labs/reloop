@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "@reloop/ui/cn";
+import * as ScrollAreaPrimitive from "@radix-ui/react-scroll-area";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { parseAsStringLiteral, useQueryState } from "nuqs";
 import { useState } from "react";
@@ -84,17 +85,23 @@ export function TemplateEditorPage({ templateId }: { templateId: string }) {
 
 					{/* Center/Right panel (Visual builder + inspector/history/variables) */}
 					<div className="relative flex min-h-0 flex-1 overflow-hidden bg-bg-white-0 dark:bg-black">
-						<main
-							className={cn(
-								"flex h-full flex-1 flex-col overflow-hidden transition-all duration-300",
-								!isCodeSplit && "lg:pl-72",
-							)}
-						>
+						<main className="flex h-full flex-1 flex-col overflow-hidden">
 							<SendDetails />
 							<GeneratingOverlay />
-							<div className="min-h-0 flex-1 overflow-y-auto py-4">
-								<FullEmailBuilder />
-							</div>
+							<ScrollAreaPrimitive.Root className="relative min-h-0 flex-1 overflow-hidden" type="auto">
+								<ScrollAreaPrimitive.Viewport className="size-full py-4 [&>div]:!block">
+									<FullEmailBuilder />
+								</ScrollAreaPrimitive.Viewport>
+								<ScrollAreaPrimitive.Scrollbar
+									orientation="vertical"
+									className={cn(
+										"absolute top-0 bottom-0 z-20 flex w-2.5 select-none touch-none p-0.5 transition-[right] duration-300",
+										!isCodeSplit ? "right-72" : "right-0",
+									)}
+								>
+									<ScrollAreaPrimitive.Thumb className="relative flex-1 rounded-full bg-stroke-soft-200 hover:bg-stroke-sub-300 dark:bg-stroke-soft-100/60" />
+								</ScrollAreaPrimitive.Scrollbar>
+							</ScrollAreaPrimitive.Root>
 						</main>
 						<AnimatePresence initial={false}>
 							{!isCodeSplit && (
@@ -108,7 +115,7 @@ export function TemplateEditorPage({ templateId }: { templateId: string }) {
 										damping: 33,
 										opacity: { duration: 0.2 },
 									}}
-									className="flex h-full shrink-0 flex-col overflow-hidden border-stroke-soft-200 border-l bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-black"
+									className="absolute inset-y-0 right-0 z-10 flex h-full shrink-0 flex-col overflow-hidden border-stroke-soft-200 border-l bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-black"
 								>
 									{/* Top Tabs: Editor | Variables | History */}
 									<TemplateInspectorTabs

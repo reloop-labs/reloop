@@ -31,6 +31,7 @@
 		"@hookform/resolvers": "catalog:ui",
 		"@number-flow/react": "catalog:ui",
 		"@radix-ui/react-checkbox": "catalog:ui",
+		"@radix-ui/react-scroll-area": "catalog:ui",
 		"@react-email/editor": "catalog:ui",
 		"@reloop/analytics": "workspace:*",
 		"@reloop/auth": "workspace:*",
