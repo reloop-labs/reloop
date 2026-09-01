@@ -209,36 +209,39 @@ function ModalStyleOne({ onClose }: { onClose?: () => void }) {
 								className="rounded-xl"
 							>
 								<Input.Wrapper className="cursor-text">
-									<div className="flex h-9 max-w-full items-center gap-1 overflow-hidden font-mono text-xs">
+									<div className="flex h-9 max-w-full items-center overflow-hidden font-mono text-xs">
 										<span className="shrink-0 select-none text-text-sub-600">
 											{"{{{"}
 										</span>
-										<input
-											id="variableName"
-											disabled={isSubmitting}
-											autoComplete="off"
-											spellCheck={false}
-											autoFocus
-											placeholder={isNameFocused ? "" : "variable_name"}
-											{...variableNameRegister}
-											onFocus={() => setIsNameFocused(true)}
-											onBlur={(e) => {
-												setIsNameFocused(false);
-												variableNameRegister.onBlur(e);
-												const slugged = slugify(e.target.value);
-												setValue("variableName", slugged, {
-													shouldValidate: true,
-												});
-											}}
-											style={{
-												width: isNameFocused
-													? watchVariableName
-														? `${watchVariableName.length}ch`
-														: "2px"
-													: `${(watchVariableName || "variable_name").length}ch`,
-											}}
-											className="h-full shrink-0 bg-transparent p-0 font-mono text-text-strong-950 text-xs outline-none placeholder:text-text-soft-400 dark:text-white"
-										/>
+										<div className="relative mx-1 inline-flex items-center min-w-[2px]">
+											<span
+												aria-hidden="true"
+												className="invisible select-none whitespace-pre font-mono text-xs"
+											>
+												{isNameFocused
+													? watchVariableName || "\u200B"
+													: watchVariableName || "variable_name"}
+											</span>
+											<input
+												id="variableName"
+												disabled={isSubmitting}
+												autoComplete="off"
+												spellCheck={false}
+												autoFocus
+												placeholder={isNameFocused ? "" : "variable_name"}
+												{...variableNameRegister}
+												onFocus={() => setIsNameFocused(true)}
+												onBlur={(e) => {
+													setIsNameFocused(false);
+													variableNameRegister.onBlur(e);
+													const slugged = slugify(e.target.value);
+													setValue("variableName", slugged, {
+														shouldValidate: true,
+													});
+												}}
+												className="absolute inset-0 h-full w-full bg-transparent p-0 font-mono text-text-strong-950 text-xs outline-none placeholder:text-text-soft-400 dark:text-white"
+											/>
+										</div>
 										<span className="shrink-0 select-none text-text-sub-600">
 											{"}}}"}
 										</span>
@@ -595,34 +598,37 @@ function ModalStyleTwo({ onClose }: { onClose?: () => void }) {
 									className="rounded-xl"
 								>
 									<Input.Wrapper className="cursor-text">
-										<div className="flex h-10 max-w-full items-center gap-1 overflow-hidden font-mono text-xs">
+										<div className="flex h-10 max-w-full items-center overflow-hidden font-mono text-xs">
 											<span className="shrink-0 select-none text-text-sub-600">
 												{"{{{"}
 											</span>
-											<input
-												id="variable-name-style2"
-												{...nameField.controlProps}
-												placeholder={isNameFocused ? "" : "variable_name"}
-												value={variableName}
-												onChange={handleNameChange}
-												onFocus={() => setIsNameFocused(true)}
-												onBlur={() => {
-													setIsNameFocused(false);
-													handleSlugify();
-												}}
-												disabled={status !== "idle"}
-												autoComplete="off"
-												spellCheck={false}
-												autoFocus
-												style={{
-													width: isNameFocused
-														? variableName
-															? `${variableName.length}ch`
-															: "2px"
-														: `${(variableName || "variable_name").length}ch`,
-												}}
-												className="h-full shrink-0 bg-transparent p-0 font-mono text-text-strong-950 text-xs outline-none placeholder:text-text-soft-400 dark:text-white"
-											/>
+											<div className="relative mx-1 inline-flex items-center min-w-[2px]">
+												<span
+													aria-hidden="true"
+													className="invisible select-none whitespace-pre font-mono text-xs"
+												>
+													{isNameFocused
+														? variableName || "\u200B"
+														: variableName || "variable_name"}
+												</span>
+												<input
+													id="variable-name-style2"
+													{...nameField.controlProps}
+													placeholder={isNameFocused ? "" : "variable_name"}
+													value={variableName}
+													onChange={handleNameChange}
+													onFocus={() => setIsNameFocused(true)}
+													onBlur={() => {
+														setIsNameFocused(false);
+														handleSlugify();
+													}}
+													disabled={status !== "idle"}
+													autoComplete="off"
+													spellCheck={false}
+													autoFocus
+													className="absolute inset-0 h-full w-full bg-transparent p-0 font-mono text-text-strong-950 text-xs outline-none placeholder:text-text-soft-400 dark:text-white"
+												/>
+											</div>
 											<span className="shrink-0 select-none text-text-sub-600">
 												{"}}}"}
 											</span>
