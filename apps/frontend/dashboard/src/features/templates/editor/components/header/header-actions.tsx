@@ -140,7 +140,7 @@ export const HeaderActions = ({
 				size="xsmall"
 				onClick={() => setIsTestModalOpen(true)}
 			>
-				Test
+				Test email
 			</FancyButton.Root>
 
 			{/* Publish Button */}

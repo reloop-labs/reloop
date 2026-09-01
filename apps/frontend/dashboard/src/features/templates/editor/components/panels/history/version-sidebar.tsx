@@ -477,46 +477,34 @@ export function VersionSidebar() {
 	};
 
 	return (
-		<div className="flex h-full w-full flex-col overflow-hidden bg-bg-white-0 dark:bg-black">
-			{/* Header */}
-			<div className="flex shrink-0 items-center justify-between pt-3 pr-4 pb-4 pl-6">
-				<h2 className="font-semibold text-label-lg text-text-strong-950">
+		<div className="flex h-full w-full flex-col overflow-hidden bg-bg-white-0 font-sans dark:bg-black">
+			{/* ── Header ── */}
+			<div className="flex shrink-0 items-center justify-between gap-2 py-2 pr-3 pl-2.5">
+				<h2 className="font-semibold text-label-sm text-text-strong-950">
 					Version History
 				</h2>
-				<button
-					type="button"
-					onClick={() => setViewMode("visual")}
-					className="rounded-lg p-1.5 text-text-soft-400 transition-all hover:bg-bg-weak-50 hover:text-text-strong-950"
-				>
-					<Icon name="cross" className="h-[18px] w-[18px]" />
-				</button>
 			</div>
 
-			{/* Version List */}
-			<div className="flex-1 overflow-y-auto px-4 pb-6">
+			{/* ── Scrollable Body ── */}
+			<div className="flex-1 overflow-y-auto">
 				{isLoading ? (
-					<div className="flex items-center justify-center py-12">
-						<Spinner size={18} />
+					<div className="flex items-center justify-center py-6">
+						<Spinner size={16} />
 					</div>
 				) : currentList.length === 0 ? (
-					<div className="space-y-3 px-4 py-12 text-center">
-						<div className="mx-auto flex size-10 items-center justify-center rounded-full bg-bg-soft-200">
-							<Icon
-								name="clock"
-								className="h-[18px] w-[18px] text-text-disabled-300"
-							/>
+					<div className="rounded-xl px-4 py-4 text-center">
+						<div className="mx-auto flex size-8 items-center justify-center rounded-xl bg-bg-soft-200 text-text-sub-600 dark:bg-bg-soft-200/50">
+							<Icon name="clock" className="h-3.5 w-3.5" />
 						</div>
-						<div className="space-y-1">
-							<p className="font-semibold text-text-strong-950 text-xs">
-								No versions yet
-							</p>
-							<p className="mx-auto max-w-[180px] text-[11px] text-text-soft-400 leading-normal">
-								Edits save automatically. Publish to record version history.
-							</p>
-						</div>
+						<p className="mt-2 font-semibold text-text-strong-950 text-xs">
+							No versions yet
+						</p>
+						<p className="mt-1 text-[11px] text-text-soft-400 leading-normal">
+							Edits save automatically. Publish to record version history.
+						</p>
 					</div>
 				) : (
-					<div className="relative flex flex-col">
+					<div className="relative flex flex-col px-2.5 pb-6">
 						{currentList.map((version, index) => {
 							const isDeleting = deletingId === version.id;
 
