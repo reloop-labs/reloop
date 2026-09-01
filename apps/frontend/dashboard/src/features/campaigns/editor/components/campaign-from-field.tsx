@@ -6,7 +6,8 @@ import Spinner from "@reloop/ui/spinner";
 import * as Tooltip from "@reloop/ui/tooltip";
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
-import React, { useEffect, useId, useMemo, useRef, useState } from "react";
+import type React from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import { useDomainsQuery } from "#/features/domain/hooks/use-domains-query";
 import { useCampaignEditorStore } from "../campaign-editor-store";
@@ -488,7 +489,7 @@ export const CampaignFromField = () => {
 								animate={{ opacity: 1, y: 0, scale: 1 }}
 								exit={{ opacity: 0, y: -4, scale: 0.98 }}
 								transition={{ duration: 0.15, ease: "easeOut" }}
-								className="absolute left-0 top-full z-50 mt-2 w-full min-w-[320px] max-w-[420px] overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-1 dark:border-stroke-soft-100/40 dark:bg-bg-soft-200"
+								className="absolute top-full left-0 z-50 mt-2.5 w-full min-w-[320px] max-w-[420px] overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-1 dark:border-stroke-soft-100/40 dark:bg-bg-soft-200"
 							>
 								{isLoadingDomains && suggestions.length === 0 ? (
 									<div className="flex items-center justify-center gap-2.5 py-6 text-paragraph-xs text-text-sub-600">
@@ -498,7 +499,10 @@ export const CampaignFromField = () => {
 								) : verifiedSendingDomains.length === 0 ? (
 									<div className="flex flex-col gap-2 p-3 text-left">
 										<div className="flex items-center gap-2 text-text-sub-600">
-											<Icon name="alert-circle" className="h-4 w-4 text-warning-base" />
+											<Icon
+												name="alert-circle"
+												className="h-4 w-4 text-warning-base"
+											/>
 											<span className="font-medium text-label-xs text-text-strong-950">
 												No Sending Domains Found
 											</span>
@@ -514,41 +518,41 @@ export const CampaignFromField = () => {
 									</div>
 								) : (
 									<div className="max-h-56 overflow-y-auto">
-											{suggestions.map((item, idx) => {
-												const isSelected = idx === highlightIndex;
-												const isExactMatch =
-													fromEmail.toLowerCase() === item.email.toLowerCase();
+										{suggestions.map((item, idx) => {
+											const isSelected = idx === highlightIndex;
+											const isExactMatch =
+												fromEmail.toLowerCase() === item.email.toLowerCase();
 
-												return (
-													<button
-														key={`${item.email}-${idx}`}
-														type="button"
-														role="option"
-														aria-selected={isSelected}
-														onMouseDown={(e) => {
-															e.preventDefault(); // Prevent input blur before click handler
-															handleSelectSuggestion(item);
-														}}
-														onMouseEnter={() => setHighlightIndex(idx)}
-														className={cn(
-															"flex w-full items-center justify-between gap-2.5 rounded-lg px-2.5 py-2 text-left",
-															isSelected
-																? "bg-bg-weak-50 text-text-strong-950 dark:bg-bg-sub-300/40"
-																: "text-text-sub-600 hover:bg-bg-weak-50/70 dark:hover:bg-bg-sub-300/20",
-														)}
-													>
-														<div className="flex min-w-0 flex-1 items-center gap-1.5 truncate text-label-xs">
-															<span className="shrink-0 font-medium text-text-strong-950">
-																{item.name}
-															</span>
-															<span className="truncate text-text-sub-600">
-																&lt;{item.email}&gt;
-															</span>
-														</div>
-													</button>
-												);
-											})}
-										</div>
+											return (
+												<button
+													key={`${item.email}-${idx}`}
+													type="button"
+													role="option"
+													aria-selected={isSelected}
+													onMouseDown={(e) => {
+														e.preventDefault(); // Prevent input blur before click handler
+														handleSelectSuggestion(item);
+													}}
+													onMouseEnter={() => setHighlightIndex(idx)}
+													className={cn(
+														"flex w-full items-center justify-between gap-2.5 rounded-lg px-2.5 py-2 text-left",
+														isSelected
+															? "bg-bg-weak-50 text-text-strong-950 dark:bg-bg-sub-300/40"
+															: "text-text-sub-600 hover:bg-bg-weak-50/70 dark:hover:bg-bg-sub-300/20",
+													)}
+												>
+													<div className="flex min-w-0 flex-1 items-center gap-1.5 truncate text-label-xs">
+														<span className="shrink-0 font-medium text-text-strong-950">
+															{item.name}
+														</span>
+														<span className="truncate text-text-sub-600">
+															&lt;{item.email}&gt;
+														</span>
+													</div>
+												</button>
+											);
+										})}
+									</div>
 								)}
 							</motion.div>
 						)}
@@ -615,4 +619,3 @@ export const CampaignFromField = () => {
 		</>
 	);
 };
-
