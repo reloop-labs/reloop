@@ -14,7 +14,6 @@ import {
 	type Property,
 	useAllPropertiesQuery,
 } from "#/features/contacts/hooks/use-contacts-query";
-import { VariableIcon } from "./variable-icon";
 
 interface CampaignVariablesPanelProps {
 	onClose: () => void;
@@ -145,7 +144,7 @@ export function CampaignVariablesPanel({
 				) : properties.length === 0 ? (
 					<div className="rounded-xl px-4 py-8 text-center">
 						<div className="mx-auto flex size-10 items-center justify-center rounded-xl bg-bg-soft-200 text-text-sub-600 dark:bg-bg-soft-200/50">
-							<VariableIcon className="h-4 w-4" />
+							<Icon name="variable" className="h-4 w-4" />
 						</div>
 						<p className="mt-3 font-semibold text-text-strong-950 text-xs">
 							No contact properties yet
