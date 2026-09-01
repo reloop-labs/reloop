@@ -80,22 +80,11 @@ export function VariablesPanel({}: PanelProps = {}) {
 
 	const { editor } = useCurrentEditor();
 
-	const [searchQuery, setSearchQuery] = useState("");
 	const [copiedKey, setCopiedKey] = useState<string | null>(null);
 	const setIsCreatingVar = useEditorStore((s) => s.setIsCreatingVar);
 	const [isSavingConfig, setIsSavingConfig] = useState(false);
 	const [editingVar, setEditingVar] = useState<MappedVariable | null>(null);
 	const [deletingVar, setDeletingVar] = useState<MappedVariable | null>(null);
-
-	const filteredVars = useMemo(() => {
-		if (!searchQuery.trim()) return detectedVars;
-		const q = searchQuery.toLowerCase().trim();
-		return detectedVars.filter(
-			(v) =>
-				v.name.toLowerCase().includes(q) ||
-				v.defaultValue?.toLowerCase().includes(q),
-		);
-	}, [detectedVars, searchQuery]);
 
 	const handleCopy = (key: string, e: React.MouseEvent) => {
 		e.stopPropagation();
@@ -209,37 +198,6 @@ export function VariablesPanel({}: PanelProps = {}) {
 				</Button.Root>
 			</div>
 
-			{/* ── Search Input (if multiple variables) ── */}
-			{detectedVars.length > 4 && (
-				<div className="px-4 pb-2">
-					<Input.Root size="small" className="rounded-xl">
-						<Input.Wrapper>
-							<Input.Icon
-								as={Icon}
-								name="search"
-								size="small"
-								className="h-3.5 w-3.5 text-text-soft-400"
-							/>
-							<Input.Input
-								placeholder="Search variables..."
-								value={searchQuery}
-								onChange={(e) => setSearchQuery(e.target.value)}
-								className="text-xs"
-							/>
-							{searchQuery && (
-								<button
-									type="button"
-									onClick={() => setSearchQuery("")}
-									className="text-text-soft-400 hover:text-text-strong-950"
-								>
-									<Icon name="cross" className="-mr-1 h-3 w-3" />
-								</button>
-							)}
-						</Input.Wrapper>
-					</Input.Root>
-				</div>
-			)}
-
 			{/* ── Scrollable Body ── */}
 			<div className="flex-1 overflow-y-auto">
 				{isLoading ? (
@@ -270,13 +228,9 @@ export function VariablesPanel({}: PanelProps = {}) {
 							</Button.Root>
 						</div>
 					</div>
-				) : filteredVars.length === 0 ? (
-					<div className="py-4 text-center text-text-soft-400 text-xs">
-						No variables match "{searchQuery}"
-					</div>
 				) : (
 					<div className="space-y-1.5 pr-3 pb-4 pl-2.5">
-						{filteredVars.map((v) => {
+						{detectedVars.map((v) => {
 							const key = `{{{${v.name}}}}`;
 							const isNumber = v.type?.toLowerCase() === "number";
 
@@ -396,6 +350,8 @@ export function VariablesPanel({}: PanelProps = {}) {
 				isOpen={!!deletingVar}
 				onClose={() => setDeletingVar(null)}
 				variableName={deletingVar?.name ?? ""}
+				variableType={deletingVar?.type ?? "string"}
+				defaultValue={deletingVar?.defaultValue ?? null}
 				onConfirm={async () => {
 					if (deletingVar) {
 						await handleDeleteVariable(deletingVar.name);

@@ -441,6 +441,8 @@ function VariableInspectorCard({ name }: { name: string }) {
 				isOpen={isDeleteModalOpen}
 				onClose={() => setIsDeleteModalOpen(false)}
 				variableName={name}
+				variableType={varType}
+				defaultValue={defaultValue}
 				onConfirm={handleDelete}
 				isSubmitting={isDeleting}
 			/>
