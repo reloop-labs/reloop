@@ -5,22 +5,23 @@ import { Icon } from "@reloop/ui/icon";
 import * as TabMenuHorizontal from "@reloop/ui/tab-menu-horizontal";
 import { AnimatePresence, motion } from "motion/react";
 import { useRef, useState } from "react";
+import { VariableIcon } from "./variable-icon";
 
 const items = [
 	{
 		title: "Editor",
 		value: "visual",
-		iconName: "pencil" as const,
+		icon: "pencil",
 	},
 	{
 		title: "Variables",
 		value: "variables",
-		iconName: "brackets" as const,
+		icon: "variable",
 	},
 	{
 		title: "History",
 		value: "history",
-		iconName: "history" as const,
+		icon: "history",
 	},
 ] as const;
 
@@ -54,7 +55,7 @@ export function CampaignInspectorTabs({
 		<div className="sticky top-0 z-20 shrink-0 bg-bg-white-0 dark:bg-black">
 			<TabMenuHorizontal.Root value={effectiveTabValue}>
 				<TabMenuHorizontal.List className="relative h-11 w-full gap-0 border-stroke-soft-200 border-b px-2 py-0 dark:border-stroke-soft-100/40">
-					{items.map(({ value, title, iconName }, index) => (
+					{items.map((item, index) => (
 						<TabMenuHorizontal.Trigger
 							ref={(el) => {
 								if (el) buttonRefs.current[index] = el;
@@ -67,12 +68,16 @@ export function CampaignInspectorTabs({
 									activeIndex === index &&
 									"text-text-strong-950",
 							)}
-							key={value}
-							value={value}
-							onClick={() => onSelectTab(value)}
+							key={item.value}
+							value={item.value}
+							onClick={() => onSelectTab(item.value)}
 						>
-							<Icon name={iconName} className="h-3.5 w-3.5" />
-							{title}
+							{item.icon === "variable" ? (
+								<VariableIcon className="h-3.5 w-3.5" />
+							) : (
+								<Icon name={item.icon} className="h-3.5 w-3.5" />
+							)}
+							{item.title}
 						</TabMenuHorizontal.Trigger>
 					))}
 
