@@ -1,5 +1,6 @@
 "use client";
 
+import { cn } from "@reloop/ui/cn";
 import { AnimatePresence, motion } from "motion/react";
 import { parseAsStringLiteral, useQueryState } from "nuqs";
 import { FullEmailBuilder } from "#/features/templates/editor/components/canvas/email-builder";
@@ -36,7 +37,12 @@ export function CampaignEditorPage({ campaignId }: { campaignId: string }) {
 
 						{/* Center/Right panel (Visual builder + inspector/history/variables) */}
 						<div className="relative flex min-h-0 flex-1 overflow-hidden bg-bg-white-0 dark:bg-black">
-							<main className="flex h-full flex-1 flex-col overflow-hidden">
+							<main
+								className={cn(
+									"flex h-full flex-1 flex-col overflow-hidden transition-all duration-300",
+									!isCodeSplit && "lg:pl-72",
+								)}
+							>
 								<CampaignSendDetails />
 								<GeneratingOverlay />
 								<div className="min-h-0 flex-1 overflow-y-auto py-4">

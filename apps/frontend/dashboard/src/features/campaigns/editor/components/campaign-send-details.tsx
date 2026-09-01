@@ -209,7 +209,7 @@ export const CampaignSendDetails = () => {
 	}
 
 	return (
-		<div className="mx-auto mt-4 w-full max-w-160 overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/40">
+		<div className="mx-auto mt-4 w-full max-w-160">
 			{/* From Row */}
 			<FieldRow id="campaign-send-details-from" label="From" required>
 				<div className="relative flex w-full flex-1 items-center justify-between gap-2 text-label-sm text-text-sub-600">
@@ -385,7 +385,6 @@ export const CampaignSendDetails = () => {
 			<FieldRow
 				id="campaign-send-details-preview-text"
 				label="Preview"
-				hideBorder
 			>
 				<input
 					id="campaign-send-details-preview-text"

@@ -157,10 +157,11 @@ export function CampaignEditorHeader() {
 	const [isSendModalOpen, setIsSendModalOpen] = useState(false);
 	const buttonRefs = useRef<HTMLElement[]>([]);
 
-	const [, setViewMode] = useQueryState(
+	const [viewMode, setViewMode] = useQueryState(
 		"mode",
 		parseAsStringLiteral(viewModes).withDefault("visual"),
 	);
+	const isCodeSplit = viewMode === "code";
 
 	const menuItems = useMemo(
 		() => [
