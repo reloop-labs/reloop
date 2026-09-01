@@ -58,6 +58,46 @@ function statusTone(status: CheckStatus): string {
 	return "bg-error-lighter text-error-base dark:bg-rose-500/10 dark:text-rose-400";
 }
 
+function isPreviewableLogoUrl(url: string | null): url is string {
+	if (!url) return false;
+	try {
+		return new URL(url).protocol === "https:";
+	} catch {
+		return false;
+	}
+}
+
+function LogoPreview({ url, domain }: { url: string; domain: string }) {
+	const [failed, setFailed] = useState(false);
+
+	useEffect(() => {
+		setFailed(false);
+	}, [url]);
+
+	return (
+		<div className="shrink-0 text-center">
+			<div className="flex size-20 items-center justify-center overflow-hidden rounded-2xl border border-stroke-soft-200 bg-white p-2 dark:border-white/10">
+				{failed ? (
+					<p className="px-1 font-mono text-[10px] text-text-sub-600 leading-snug dark:text-black/55">
+						Preview failed
+					</p>
+				) : (
+					<img
+						src={url}
+						alt={`BIMI logo for ${domain}`}
+						className="size-full object-contain"
+						referrerPolicy="no-referrer"
+						onError={() => setFailed(true)}
+					/>
+				)}
+			</div>
+			<p className="mt-1.5 font-mono text-[10px] text-text-sub-600 uppercase tracking-wider dark:text-white/40">
+				Published logo
+			</p>
+		</div>
+	);
+}
+
 export function CheckerPanel() {
 	const [input, setInput] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
@@ -186,7 +226,7 @@ export function CheckerPanel() {
 			{result && headline && !error && (
 				<div className="mt-4 space-y-3.5">
 					<div className="overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-5 shadow-xs sm:p-6 dark:border-white/10 dark:bg-[#0b0b0b]">
-						<div className="flex items-start gap-3.5">
+						<div className="flex flex-wrap items-start gap-3.5">
 							<div
 								className={cn(
 									"flex size-11 shrink-0 items-center justify-center rounded-2xl",
@@ -208,6 +248,9 @@ export function CheckerPanel() {
 									{result.queryName}
 								</p>
 							</div>
+							{isPreviewableLogoUrl(result.logoUrl) && (
+								<LogoPreview url={result.logoUrl} domain={result.domain} />
+							)}
 						</div>
 
 						<ul className="mt-5 divide-y divide-stroke-soft-200 dark:divide-white/10">
