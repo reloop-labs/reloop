@@ -1,4 +1,3 @@
-import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as Label from "@reloop/ui/label";
 import * as Modal from "@reloop/ui/modal";
@@ -16,7 +15,6 @@ import { Check, ChevronsRight, X } from "lucide-react";
 import type React from "react";
 import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
-import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 
 export interface SlideToPublishProps {
 	onPublish: () => void;
@@ -63,7 +61,10 @@ export function SlideToPublish({
 
 	const textOpacity = useTransform(x, [0, Math.max(1, maxDrag * 0.55)], [1, 0]);
 	const progressOpacity = useTransform(x, [0, 6], [0, 1]);
-	const progressWidth = useTransform(x, (curr) => curr + thumbSize + padding * 2);
+	const progressWidth = useTransform(
+		x,
+		(curr) => curr + thumbSize + padding * 2,
+	);
 
 	const handleDragEnd = (_: any, info: { velocity: { x: number } }) => {
 		if (disabled || isPublishing || isSuccess || maxDrag <= 0) return;
@@ -99,7 +100,7 @@ export function SlideToPublish({
 					? "border-emerald-500/30 bg-emerald-500/10 dark:border-emerald-500/30 dark:bg-emerald-500/15"
 					: isPublishing
 						? "border-primary-base/30 bg-primary-base/5 dark:border-primary-base/30 dark:bg-primary-base/10"
-						: "border-stroke-soft-200 bg-bg-white-0 shadow-xs dark:border-stroke-soft-100/40 dark:bg-[#0c0c0c]",
+						: "border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-[#0c0c0c]",
 				disabled && "pointer-events-none opacity-60",
 			)}
 		>
@@ -120,7 +121,7 @@ export function SlideToPublish({
 			{/* Center Text: Apple Slide Shimmer */}
 			<motion.div
 				style={{ opacity: textOpacity }}
-				className="pointer-events-none absolute inset-0 flex items-center justify-center gap-1.5 pl-7 pr-4 font-medium text-xs tracking-tight"
+				className="pointer-events-none absolute inset-0 flex items-center justify-center gap-1.5 pr-4 pl-7 font-medium text-xs tracking-tight"
 			>
 				<style>{`
 					@keyframes slide-shimmer {
@@ -173,7 +174,7 @@ export function SlideToPublish({
 							initial={{ opacity: 0, y: -8 }}
 							animate={{ opacity: 1, y: 0 }}
 							exit={{ opacity: 0, y: 8 }}
-							className="flex items-center gap-1.5 text-primary-base font-semibold"
+							className="flex items-center gap-1.5 font-semibold text-primary-base"
 						>
 							<Spinner size={13} color="currentColor" />
 							<span>Publishing...</span>
@@ -184,7 +185,7 @@ export function SlideToPublish({
 							initial={{ opacity: 0, scale: 0.9 }}
 							animate={{ opacity: 1, scale: 1 }}
 							exit={{ opacity: 0 }}
-							className="flex items-center gap-1 text-emerald-600 font-semibold dark:text-emerald-400"
+							className="flex items-center gap-1 font-semibold text-emerald-600 dark:text-emerald-400"
 						>
 							<Check className="size-3.5" strokeWidth={2.5} />
 							<span>Published</span>
@@ -198,7 +199,9 @@ export function SlideToPublish({
 							className="slide-shimmer-text font-medium text-xs tracking-tight"
 						>
 							<span>slide to publish</span>
-							<span className="font-mono text-sm leading-none tracking-tighter">››</span>
+							<span className="font-mono text-sm leading-none tracking-tighter">
+								››
+							</span>
 						</motion.span>
 					)}
 				</AnimatePresence>
@@ -215,10 +218,8 @@ export function SlideToPublish({
 				whileHover={!disabled && !isPublishing ? { scale: 1.04 } : undefined}
 				whileTap={!disabled && !isPublishing ? { scale: 0.96 } : undefined}
 				className={cn(
-					"relative z-10 flex size-9 cursor-grab items-center justify-center rounded-full text-white shadow-sm transition-shadow active:cursor-grabbing",
-					isSuccess
-						? "bg-emerald-600 shadow-emerald-500/30"
-						: "bg-primary-base shadow-primary-base/30 hover:shadow-md hover:shadow-primary-base/40",
+					"relative z-10 flex size-9 cursor-grab items-center justify-center rounded-full text-white active:cursor-grabbing",
+					isSuccess ? "bg-emerald-600" : "bg-primary-base",
 				)}
 			>
 				<AnimatePresence mode="popLayout" initial={false}>
@@ -274,7 +275,9 @@ export function PublishTemplateModal({
 	isPublishing = false,
 	title = "Publish template",
 }: PublishModalProps) {
-	const [status, setStatus] = useState<"idle" | "publishing" | "success">("idle");
+	const [status, setStatus] = useState<"idle" | "publishing" | "success">(
+		"idle",
+	);
 	const [description, setDescription] = useState("");
 
 	const isBusy = status === "publishing" || isPublishing;
@@ -340,7 +343,7 @@ export function PublishTemplateModal({
 	return (
 		<Modal.Root open={isOpen} onOpenChange={(o) => !o && handleClose()}>
 			<Modal.Content
-				className="overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-soft-50 p-0 sm:max-w-[460px] dark:border-stroke-soft-100/40 dark:bg-white/[0.03]"
+				className="overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-soft-50 p-0 sm:max-w-[400px] dark:border-stroke-soft-100/40 dark:bg-white/[0.03]"
 				showClose={false}
 			>
 				<div className="relative m-0.5 space-y-4.5 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 pt-5 dark:border-stroke-soft-100/40 dark:bg-[#0c0c0c]">
@@ -377,7 +380,7 @@ export function PublishTemplateModal({
 								value={description}
 								onChange={(e) => setDescription(e.target.value)}
 								disabled={isBusy}
-								className="min-h-[108px] resize-none rounded-xl text-xs text-text-strong-950 dark:text-white"
+								className="min-h-[108px] resize-none rounded-xl text-text-strong-950 text-xs dark:text-white"
 								autoFocus
 							/>
 						</div>
@@ -385,32 +388,13 @@ export function PublishTemplateModal({
 				</div>
 
 				{/* Actions / Footer with Slide to Confirm */}
-				<div className="relative flex items-center justify-between gap-3 px-3.5 pt-2.5 pb-3.5">
-					<Button.Root
-						type="button"
-						variant="neutral"
-						mode="ghost"
-						size="small"
-						onClick={handleClose}
-						className={cn(
-							"shrink-0 gap-1.5 transition-opacity duration-200",
-							isBusy && "pointer-events-none opacity-50",
-						)}
-					>
-						Cancel
-						<ActionKbd className="lowercase! w-auto min-w-0 px-1">
-							esc
-						</ActionKbd>
-					</Button.Root>
-
-					<div className="min-w-0 flex-1">
-						<SlideToPublish
-							onPublish={handlePublish}
-							isPublishing={isBusy}
-							isSuccess={status === "success"}
-							disabled={isBusy}
-						/>
-					</div>
+				<div className="relative p-2.5 pb-4">
+					<SlideToPublish
+						onPublish={handlePublish}
+						isPublishing={isBusy}
+						isSuccess={status === "success"}
+						disabled={isBusy}
+					/>
 				</div>
 			</Modal.Content>
 		</Modal.Root>

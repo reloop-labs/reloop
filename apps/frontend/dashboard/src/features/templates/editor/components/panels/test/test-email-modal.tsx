@@ -466,9 +466,14 @@ export function TestEmailModal({
 									) : (
 										<>
 											Send test
-											<ActionKbd className={actionKbdOnBlueClassName}>
-												↵
-											</ActionKbd>
+											<span className="inline-flex items-center gap-0.5">
+												<ActionKbd className={actionKbdOnBlueClassName}>
+													⌘
+												</ActionKbd>
+												<ActionKbd className={actionKbdOnBlueClassName}>
+													↵
+												</ActionKbd>
+											</span>
 										</>
 									)}
 								</motion.span>

@@ -185,7 +185,7 @@ function PublishVersionModal({
 	return (
 		<Modal.Root open={isOpen} onOpenChange={(open) => !open && handleClose()}>
 			<Modal.Content
-				className="overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-soft-50 p-0 sm:max-w-[460px] dark:border-stroke-soft-100/40 dark:bg-white/[0.03]"
+				className="overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-soft-50 p-0 sm:max-w-[400px] dark:border-stroke-soft-100/40 dark:bg-white/[0.03]"
 				showClose={false}
 			>
 				<div className="relative m-0.5 space-y-4.5 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 pt-5 dark:border-stroke-soft-100/40 dark:bg-[#0c0c0c]">
@@ -231,32 +231,13 @@ function PublishVersionModal({
 				</div>
 
 				{/* Actions / Footer with Slide to Confirm */}
-				<div className="relative flex items-center justify-between gap-3 px-3.5 pt-2.5 pb-3.5">
-					<Button.Root
-						type="button"
-						variant="neutral"
-						mode="ghost"
-						size="small"
-						onClick={handleClose}
-						className={cn(
-							"shrink-0 gap-1.5 transition-opacity duration-200",
-							isBusy && "pointer-events-none opacity-50",
-						)}
-					>
-						Cancel
-						<ActionKbd className="lowercase! w-auto min-w-0 px-1">
-							esc
-						</ActionKbd>
-					</Button.Root>
-
-					<div className="min-w-0 flex-1">
-						<SlideToPublish
-							onPublish={handlePublish}
-							isPublishing={isBusy}
-							isSuccess={status === "success"}
-							disabled={isBusy}
-						/>
-					</div>
+				<div className="relative p-2.5">
+					<SlideToPublish
+						onPublish={handlePublish}
+						isPublishing={isBusy}
+						isSuccess={status === "success"}
+						disabled={isBusy}
+					/>
 				</div>
 			</Modal.Content>
 		</Modal.Root>
