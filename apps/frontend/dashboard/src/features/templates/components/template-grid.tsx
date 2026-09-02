@@ -93,7 +93,7 @@ const TemplateDropdown = ({
 					size="xxsmall"
 					aria-label={`Actions for ${templateName}`}
 					className={cn(
-						"h-8 w-8 rounded-lg border border-stroke-soft-100 bg-bg-white-0 p-1.5 shadow-regular-xs transition-all dark:border-stroke-soft-100/40",
+						"h-8 w-8 rounded-lg border border-stroke-soft-100 bg-bg-white-0 p-1.5 transition-all dark:border-stroke-soft-100/40",
 						open ? "opacity-100" : "opacity-0 group-hover/card:opacity-100",
 					)}
 				>
@@ -156,7 +156,7 @@ const previewPaperStyle = {
 } as const;
 
 const previewCardClassName =
-	"relative aspect-[5/4] w-full overflow-hidden rounded-[28px] bg-gradient-to-b from-bg-white-0 to-bg-weak-50 shadow-[0_0_0_1px_rgba(0,0,0,0.04),0_12px_40px_rgba(0,0,0,0.08)] dark:from-black dark:to-black dark:shadow-[0_0_0_1px_rgba(255,255,255,0.06),0_0_48px_rgba(255,255,255,0.06),0_16px_48px_rgba(0,0,0,0.45)]";
+	"relative aspect-[5/4] w-full overflow-hidden rounded-[28px] border border-stroke-soft-100 bg-gradient-to-b from-bg-white-0 to-bg-weak-50 dark:border-stroke-soft-100/40 dark:from-black dark:to-black";
 
 /** Email-shaped bars that stay visible on the dark card (bg-weak-50 is near-black). */
 const EmailPaperSkeleton = () => (
@@ -175,16 +175,8 @@ const TemplatePreviewPaper = ({ children }: { children: ReactNode }) => (
 		className="pointer-events-none absolute inset-0 select-none overflow-hidden"
 		style={previewPaperStyle}
 	>
-		<div className="relative h-full w-full overflow-hidden rounded-t-2xl bg-bg-white-0 shadow-regular-xs dark:bg-bg-weak-50">
+		<div className="relative h-full w-full overflow-hidden rounded-t-2xl border-t border-x border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-bg-weak-50">
 			{children}
-			<div
-				aria-hidden
-				className={cn(
-					"pointer-events-none absolute inset-0 rounded-t-2xl",
-					"shadow-[inset_0_0_0_1px_rgba(0,0,0,0.06),inset_0_8px_20px_rgba(0,0,0,0.08)]",
-					"dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.08),inset_0_8px_20px_rgba(255,255,255,0.04)]",
-				)}
-			/>
 		</div>
 	</div>
 );
@@ -350,23 +342,14 @@ export const TemplateGrid = ({
 									key={template.id}
 									className="group/card relative flex cursor-pointer flex-col gap-3.5"
 								>
-									{/* Preview stage — soft rounded card with ambient glow */}
+									{/* Preview stage — clean rounded card without shadows */}
 									<div
 										className={cn(
 											previewCardClassName,
-											"transition-shadow duration-300",
-											isCardActive &&
-												"shadow-[0_0_0_1px_rgba(0,0,0,0.06),0_16px_48px_rgba(0,0,0,0.12)] dark:shadow-[0_0_0_1px_rgba(255,255,255,0.1),0_0_56px_rgba(255,255,255,0.1),0_20px_56px_rgba(0,0,0,0.5)]",
-											!isCardActive &&
-												"group-hover/card:shadow-[0_0_0_1px_rgba(0,0,0,0.06),0_16px_48px_rgba(0,0,0,0.1)] dark:group-hover/card:shadow-[0_0_0_1px_rgba(255,255,255,0.08),0_0_56px_rgba(255,255,255,0.08),0_20px_56px_rgba(0,0,0,0.5)]",
+											"transition-colors duration-200",
+											"hover:border-stroke-sub-300 dark:hover:border-stroke-soft-100/70",
 										)}
 									>
-										{/* Soft radial wash so the email floats in the middle */}
-										<div
-											aria-hidden
-											className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_40%,rgba(0,0,0,0.03)_100%)] dark:bg-[radial-gradient(ellipse_at_center,transparent_35%,rgba(0,0,0,0.35)_100%)]"
-										/>
-
 										<TemplatePreviewThumbnail
 											key={`${template.id}-${template.updatedAt}`}
 											template={template}

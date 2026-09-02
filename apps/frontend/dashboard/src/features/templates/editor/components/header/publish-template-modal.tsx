@@ -6,16 +6,15 @@ import { KbdEsc } from "@reloop/ui/kbd-esc";
 import * as Modal from "@reloop/ui/modal";
 import * as Textarea from "@reloop/ui/textarea";
 import { useState } from "react";
-import { DiffViewer } from "../panels/history/diff-viewer";
 
 interface PublishModalProps {
 	isOpen: boolean;
 	onClose: () => void;
 	onConfirm: (description: string) => Promise<void>;
 	isPublishing: boolean;
-	latestPublished: any;
-	currentHtml: string;
-	currentSubject: string;
+	latestPublished?: any;
+	currentHtml?: string;
+	currentSubject?: string;
 }
 
 export function PublishTemplateModal({
@@ -23,20 +22,13 @@ export function PublishTemplateModal({
 	onClose,
 	onConfirm,
 	isPublishing,
-	latestPublished,
-	currentHtml,
-	currentSubject,
 }: PublishModalProps) {
 	const [description, setDescription] = useState("");
-	const [showDiff, setShowDiff] = useState(false);
 
 	return (
 		<Modal.Root open={isOpen} onOpenChange={(open) => !open && onClose()}>
 			<Modal.Content
-				className={cn(
-					"rounded-2xl border border-stroke-soft-100 p-0.5 font-sans transition-all duration-300 dark:border-stroke-soft-100/40",
-					showDiff ? "h-[85vh] max-w-[80vw]" : "sm:max-w-[480px]",
-				)}
+				className="sm:max-w-[480px] rounded-2xl border border-stroke-soft-100 p-0.5 font-sans transition-all duration-300 dark:border-stroke-soft-100/40"
 				showClose={true}
 			>
 				<div className="flex h-full flex-col overflow-hidden rounded-2xl border border-stroke-soft-100 dark:border-stroke-soft-100/40">
@@ -66,41 +58,6 @@ export function PublishTemplateModal({
 								onChange={(e) => setDescription(e.target.value)}
 								className="h-24 text-xs"
 							/>
-						</div>
-
-						{/* Collapsible Visual Diff */}
-						<div className="overflow-hidden rounded-xl border border-stroke-soft-100 dark:border-stroke-soft-100/40">
-							<button
-								type="button"
-								onClick={() => setShowDiff((prev) => !prev)}
-								className="flex w-full items-center justify-between bg-bg-weak-50 px-4 py-2.5 transition-colors hover:bg-bg-soft-200"
-							>
-								<div className="flex items-center gap-2">
-									<Icon
-										name="refresh-cw"
-										className="size-4 text-text-sub-600"
-									/>
-									<span className="font-semibold text-label-xs text-text-strong-950">
-										Review changes before publishing
-									</span>
-								</div>
-								<Icon
-									name={showDiff ? "chevron-up" : "chevron-down"}
-									className="size-4 text-text-sub-600"
-								/>
-							</button>
-
-							{showDiff && (
-								<div className="h-[48vh] border-stroke-soft-100 border-t dark:border-stroke-soft-100/40">
-									<DiffViewer
-										oldHtml={latestPublished?.renderedHtml || ""}
-										newHtml={currentHtml}
-										oldSubject={latestPublished?.subject || ""}
-										newSubject={currentSubject}
-										viewportWidth="100%"
-									/>
-								</div>
-							)}
 						</div>
 					</Modal.Body>
 
