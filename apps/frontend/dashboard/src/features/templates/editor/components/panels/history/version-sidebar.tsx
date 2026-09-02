@@ -4,18 +4,25 @@ import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { KbdEsc } from "@reloop/ui/kbd-esc";
+import * as Label from "@reloop/ui/label";
 import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
+import * as Textarea from "@reloop/ui/textarea";
 import * as Tooltip from "@reloop/ui/tooltip";
 import { useCurrentEditor } from "@tiptap/react";
+import { play } from "cuelume";
+import { AnimatePresence, motion } from "framer-motion";
+import { X } from "lucide-react";
 import { parseAsStringLiteral, useQueryState } from "nuqs";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import { useEditorStore } from "#/features/templates/editor/hooks/use-editor-store";
 import { useSWR } from "#/features/templates/editor/hooks/use-swr-compat";
 import { useTemplateId } from "#/features/templates/editor/hooks/use-template-id";
 import { getAvatarGradient, getAvatarInitial } from "#/utils/avatar";
+import { SlideToPublish } from "../../header/publish-template-modal";
 import { PreviewModal } from "../../preview/preview-modal";
 
 const viewModes = ["visual", "code", "history", "variables", "test"] as const;
@@ -111,6 +118,10 @@ function DeleteVersionModal({
 	);
 }
 
+/** Light keycap so it reads on the blue FancyButton fill. */
+const actionKbdOnBlueClassName =
+	"border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]";
+
 /* ------------------------------------------------------------------ */
 /* Publish Version/Draft Confirmation Modal                          */
 /* ------------------------------------------------------------------ */
@@ -131,65 +142,121 @@ function PublishVersionModal({
 	versionLabel,
 	isAlreadyPublished,
 }: PublishVersionModalProps) {
+	const [status, setStatus] = useState<"idle" | "publishing" | "success">("idle");
 	const [description, setDescription] = useState("");
 
+	const isBusy = status === "publishing" || isPublishing;
+
+	const handleClose = () => {
+		if (isBusy) return;
+		setDescription("");
+		setStatus("idle");
+		onClose();
+	};
+
+	useEffect(() => {
+		if (!isOpen) {
+			const timer = setTimeout(() => {
+				setDescription("");
+				setStatus("idle");
+			}, 300);
+			return () => clearTimeout(timer);
+		}
+	}, [isOpen]);
+
+	const handlePublish = async () => {
+		if (isBusy) return;
+
+		setStatus("publishing");
+		try {
+			await onConfirm(description.trim());
+			setStatus("success");
+			setTimeout(() => {
+				setDescription("");
+				setStatus("idle");
+				onClose();
+			}, 500);
+		} catch (error) {
+			console.error("Failed to publish version:", error);
+			setStatus("idle");
+		}
+	};
+
 	return (
-		<Modal.Root open={isOpen} onOpenChange={(open) => !open && onClose()}>
+		<Modal.Root open={isOpen} onOpenChange={(open) => !open && handleClose()}>
 			<Modal.Content
-				className="rounded-2xl border border-stroke-soft-100 p-0.5 font-sans sm:max-w-[400px] dark:border-stroke-soft-100/40"
-				showClose={true}
+				className="overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-soft-50 p-0 sm:max-w-[460px] dark:border-stroke-soft-100/40 dark:bg-white/[0.03]"
+				showClose={false}
 			>
-				<div className="rounded-2xl border border-stroke-soft-100 dark:border-stroke-soft-100/40">
-					<Modal.Header className="before:border-stroke-soft-100 dark:before:border-stroke-soft-100/40">
-						<div className="flex items-center justify-center">
-							<Icon name="info-outline" className="h-4 w-4" />
-						</div>
-						<div className="flex-1">
-							<Modal.Title>Publish {versionLabel}</Modal.Title>
-						</div>
-					</Modal.Header>
-					<Modal.Body className="space-y-3">
-						<p className="text-paragraph-sm text-text-sub-600 leading-relaxed">
-							{isAlreadyPublished
-								? "This will make this previously published version the active version for transactional sends."
-								: "This will create a new major production version based on the content of this draft, making it the active version for sends."}
-						</p>
+				<div className="relative m-0.5 space-y-4.5 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 pt-5 dark:border-stroke-soft-100/40 dark:bg-[#0c0c0c]">
+					{/* Header without icon */}
+					<div className="flex items-center justify-between px-6 dark:border-stroke-soft-100/40">
+						<Modal.Title className="font-medium text-text-strong-950 text-xl tracking-tight dark:text-white">
+							Publish {versionLabel}
+						</Modal.Title>
+						<button
+							type="button"
+							onClick={handleClose}
+							aria-label="Close"
+							disabled={isBusy}
+							className="flex h-7 w-7 items-center justify-center rounded-lg bg-bg-white-0 text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 active:scale-[0.95] disabled:opacity-50 dark:border-stroke-soft-100/40 dark:bg-transparent dark:hover:bg-white/[0.05] dark:hover:text-white"
+						>
+							<X className="size-3.5" strokeWidth={2.25} />
+						</button>
+					</div>
+
+					{/* Form Content */}
+					<div className="space-y-4 px-6 pb-6">
 						{!isAlreadyPublished && (
-							<div className="space-y-1.5 pt-2">
-								<span className="block font-semibold text-text-strong-950 text-xs">
-									Release Description / Changelog (Optional)
-								</span>
-								<textarea
-									placeholder="Describe what changed in this version..."
+							<div className="space-y-1.5">
+								<Label.Root
+									htmlFor="versionChangelogDescription"
+									className="font-semibold text-sm text-text-strong-950 dark:text-white"
+								>
+									Release description
+								</Label.Root>
+								<Textarea.Root
+									id="versionChangelogDescription"
+									simple
+									placeholder="Describe what changed in this version (e.g. fixed layout issues, added welcome banner)..."
 									value={description}
 									onChange={(e) => setDescription(e.target.value)}
-									className="h-20 w-full rounded-lg border border-stroke-soft-100 bg-bg-white-0 p-2 text-paragraph-xs text-text-strong-950 outline-none focus:border-stroke-soft-100 dark:border-stroke-soft-100/40"
+									disabled={isBusy}
+									className="min-h-[108px] resize-none rounded-xl text-xs text-text-strong-950 dark:text-white"
+									autoFocus
 								/>
 							</div>
 						)}
-					</Modal.Body>
-					<Modal.Footer className="mt-4 flex items-center justify-end gap-3 border-stroke-soft-100 dark:border-stroke-soft-100/40">
-						<Button.Root
-							type="button"
-							variant="neutral"
-							mode="stroke"
-							size="xsmall"
-							onClick={onClose}
-							disabled={isPublishing}
-						>
-							Cancel
-							<KbdEsc />
-						</Button.Root>
-						<FancyButton.Root
-							type="button"
-							variant="neutral"
-							size="xsmall"
-							onClick={() => onConfirm(description)}
-							disabled={isPublishing}
-						>
-							{isPublishing ? "Publishing..." : "Confirm & Publish"}
-						</FancyButton.Root>
-					</Modal.Footer>
+					</div>
+				</div>
+
+				{/* Actions / Footer with Slide to Confirm */}
+				<div className="relative flex items-center justify-between gap-3 px-3.5 pt-2.5 pb-3.5">
+					<Button.Root
+						type="button"
+						variant="neutral"
+						mode="ghost"
+						size="small"
+						onClick={handleClose}
+						className={cn(
+							"shrink-0 gap-1.5 transition-opacity duration-200",
+							isBusy && "pointer-events-none opacity-50",
+						)}
+					>
+						Cancel
+						<ActionKbd className="lowercase! w-auto min-w-0 px-1">
+							esc
+						</ActionKbd>
+					</Button.Root>
+
+					<div className="min-w-0 flex-1">
+						<SlideToPublish
+							onPublish={handlePublish}
+							isPublishing={isBusy}
+							isSuccess={status === "success"}
+							disabled={isBusy}
+						/>
+					</div>
 				</div>
 			</Modal.Content>
 		</Modal.Root>

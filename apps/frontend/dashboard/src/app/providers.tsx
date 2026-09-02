@@ -4,8 +4,9 @@ import { PostHogProvider } from "@reloop/analytics";
 import { Toaster } from "@reloop/ui/toast";
 import * as Tooltip from "@reloop/ui/tooltip";
 import { QueryClientProvider } from "@tanstack/react-query";
+import { bind } from "cuelume";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { LazyIconsSprite } from "#/components/lazy-icons-sprite";
 import { KeyboardShortcutsRevealListener } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { createQueryClient } from "#/lib/query-client";
@@ -18,6 +19,10 @@ installAxiosRateLimitInterceptor();
 
 export function Providers({ children }: { children: React.ReactNode }) {
 	const [queryClient] = useState(createQueryClient);
+
+	useEffect(() => {
+		bind();
+	}, []);
 
 	return (
 		<PostHogProvider>
