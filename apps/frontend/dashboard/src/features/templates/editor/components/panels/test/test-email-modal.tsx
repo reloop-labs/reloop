@@ -182,12 +182,7 @@ export function TestEmailModal({
 	}, [isOpen, clearEmailError, session?.user?.email, templateData]);
 
 	const handleClose = () => {
-		if (status !== "idle") return;
-		clearEmailError();
-		for (const ctrl of Object.values(varFieldRefs.current)) {
-			ctrl?.clear();
-		}
-		setModalHeight(undefined);
+		if (status === "sending") return;
 		onClose();
 	};
 
@@ -286,9 +281,6 @@ export function TestEmailModal({
 			setStatus("success");
 
 			setTimeout(() => {
-				setStatus("idle");
-				setSentRecipientsSummary("");
-				setModalHeight(undefined);
 				onClose();
 			}, 1800);
 		} catch (err) {
@@ -343,7 +335,11 @@ export function TestEmailModal({
 				className="min-h-[270px] overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-soft-50 p-0 sm:max-w-[460px] dark:border-stroke-soft-100/40 dark:bg-white/[0.03]"
 				showClose={false}
 			>
-				<form onSubmit={handleSendTest} noValidate className="flex min-h-[270px] flex-col justify-between">
+				<form
+					onSubmit={handleSendTest}
+					noValidate
+					className="flex min-h-[270px] flex-col justify-between"
+				>
 					<div className="relative m-0.5 flex-1 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-[#0c0c0c]">
 						<AnimatePresence mode="popLayout">
 							{status === "success" ? (
@@ -427,10 +423,12 @@ export function TestEmailModal({
 													id="test-recipient-email"
 													simple
 													hasError={emailField.hasError}
-													className="min-h-[76px] resize-none text-xs text-text-strong-950"
+													className="min-h-[76px] resize-none text-text-strong-950 text-xs"
 													placeholder="you@company.com, team@company.com"
 													value={email}
-													onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
+													onChange={(
+														e: React.ChangeEvent<HTMLTextAreaElement>,
+													) => {
 														setEmail(e.target.value);
 														if (emailField.hasError) emailField.clear();
 													}}
@@ -525,7 +523,7 @@ export function TestEmailModal({
 											</>
 										) : (
 											<>
-												Send test
+												Send
 												<span className="inline-flex items-center gap-0.5">
 													<ActionKbd className={actionKbdOnBlueClassName}>
 														⌘

@@ -172,12 +172,7 @@ export function CampaignTestEmailModal({
 	}, [open, clearEmailError, session?.user?.email, properties]);
 
 	const handleClose = () => {
-		if (status !== "idle") return;
-		clearEmailError();
-		for (const ctrl of Object.values(varFieldRefs.current)) {
-			ctrl?.clear();
-		}
-		setModalHeight(undefined);
+		if (status === "sending") return;
 		onOpenChange(false);
 	};
 
@@ -246,9 +241,6 @@ export function CampaignTestEmailModal({
 			setStatus("success");
 
 			setTimeout(() => {
-				setStatus("idle");
-				setSentRecipientsSummary("");
-				setModalHeight(undefined);
 				onOpenChange(false);
 			}, 1800);
 		} catch (err) {
