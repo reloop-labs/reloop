@@ -76,7 +76,7 @@ export function CampaignEditorProvider({
 
 	// Autosave logic
 	saveRef.current = async () => {
-		if (!editor || !campaignId) return;
+		if (!editor || !campaignId || isInitialHydrateRef.current || !campaign) return;
 		const state = useCampaignEditorStore.getState();
 		if (Date.now() < skipUntilRef.current) return;
 
@@ -93,12 +93,15 @@ export function CampaignEditorProvider({
 				state.previewText,
 			);
 			await updateCampaignRequest(campaignId, {
-				name: state.name || "Untitled Campaign",
-				subject: state.subject,
-				previewText: state.previewText,
-				fromName: state.fromName,
-				fromEmail: state.fromEmail,
-				replyTo: state.replyTo || undefined,
+				name: state.name.trim() || "Untitled Campaign",
+				subject: state.subject.trim() || undefined,
+				previewText: state.previewText.trim() || undefined,
+				fromName: state.fromName.trim() || undefined,
+				fromEmail:
+					state.fromEmail.trim().length >= 3
+						? state.fromEmail.trim()
+						: undefined,
+				replyTo: state.replyTo.trim() || undefined,
 				audienceType: state.audienceType,
 				audienceTargetId: state.audienceTargetId || undefined,
 				audienceTargetName: state.audienceTargetName || undefined,
