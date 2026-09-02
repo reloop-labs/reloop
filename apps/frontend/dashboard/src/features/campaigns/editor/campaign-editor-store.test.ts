@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from "bun:test";
+import { beforeEach, describe, expect, it } from "vitest";
 import type { Campaign } from "../campaign-types";
 import { useCampaignEditorStore } from "./campaign-editor-store";
 

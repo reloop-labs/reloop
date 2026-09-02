@@ -4,17 +4,15 @@ import { BubbleMenu, SlashCommand } from "@react-email/editor/ui";
 import { EditorContext } from "@tiptap/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import * as Y from "yjs";
-import { AddPropertyModal } from "#/features/contacts/components/properties/add-property-modal";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import { getRandomColor } from "#/features/templates/editor/collobration/hooks/useCollaboration";
-import { useEditorHook } from "#/features/templates/editor/hooks/use-editor-hooks";
-import { useEditorStore } from "#/features/templates/editor/hooks/use-editor-store";
 import { editorSlashCommands } from "#/features/templates/editor/lib/slash-commands";
 import { getRenderedEmailHtml } from "#/features/templates/editor/utils/get-rendered-email-html";
 import { updateCampaignRequest } from "../campaigns-api";
 import { useCampaignQuery } from "../campaigns-provider";
 import { useCampaignEditorStore } from "./campaign-editor-store";
 import { CampaignEditorHeader } from "./components/campaign-editor-header";
+import { useCampaignEditorHook } from "./hooks/use-campaign-editor-hook";
 
 interface CampaignEditorProviderProps {
 	children: React.ReactNode;
@@ -40,10 +38,11 @@ export function CampaignEditorProvider({
 	};
 
 	const [ydoc] = useState(() => new Y.Doc());
-	const editor = useEditorHook({ ydoc, provider: null, user: collabUser });
-
-	const isCreatingVar = useEditorStore((s) => s.isCreatingVar);
-	const setIsCreatingVar = useEditorStore((s) => s.setIsCreatingVar);
+	const editor = useCampaignEditorHook({
+		ydoc,
+		provider: null,
+		user: collabUser,
+	});
 
 	const setCampaignData = useCampaignEditorStore((s) => s.setCampaignData);
 	const setIsSaving = useCampaignEditorStore((s) => s.setIsSaving);
@@ -202,22 +201,6 @@ export function CampaignEditorProvider({
 				<BubbleMenu.ImageDefault />
 				<SlashCommand items={editorSlashCommands} />
 			</div>
-			<AddPropertyModal
-				open={isCreatingVar}
-				onOpenChange={setIsCreatingVar}
-				onSuccess={(created) => {
-					if (editor) {
-						editor
-							.chain()
-							.focus()
-							.insertContent({
-								type: "variable",
-								attrs: { name: created.name },
-							})
-							.run();
-					}
-				}}
-			/>
 		</EditorContext.Provider>
 	);
 }

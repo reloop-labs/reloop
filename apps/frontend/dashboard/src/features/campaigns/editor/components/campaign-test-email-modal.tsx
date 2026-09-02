@@ -229,8 +229,16 @@ export function CampaignTestEmailModal({
 
 		setStatus("sending");
 		try {
+			const mappedVariables: Record<string, string> = {};
+			for (const [k, v] of Object.entries(variableValues)) {
+				mappedVariables[k] = v;
+				if (!k.startsWith("contact.")) {
+					mappedVariables[`contact.${k}`] = v;
+				}
+			}
+
 			for (const addr of emailList) {
-				await testCampaignRequest(campaignId, addr, variableValues);
+				await testCampaignRequest(campaignId, addr, mappedVariables);
 			}
 
 			const summary =

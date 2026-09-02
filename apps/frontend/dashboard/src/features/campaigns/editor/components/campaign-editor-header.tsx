@@ -15,7 +15,7 @@ import { CampaignScheduleModal } from "./campaign-schedule-modal";
 import { CampaignSendModal } from "./campaign-send-modal";
 import { CampaignTestEmailModal } from "./campaign-test-email-modal";
 
-const viewModes = ["visual", "code", "history", "variables"] as const;
+const viewModes = ["visual", "code"] as const;
 
 function SidebarToggleButton() {
 	const { isCollapsed, toggle } = useSidebarCollapse();

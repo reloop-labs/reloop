@@ -2,76 +2,25 @@
 
 import { cn } from "@reloop/ui/cn";
 import * as ScrollAreaPrimitive from "@radix-ui/react-scroll-area";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 import { parseAsStringLiteral, useQueryState } from "nuqs";
-import { useState } from "react";
 import { FullEmailBuilder } from "#/features/templates/editor/components/canvas/email-builder";
 import { GeneratingOverlay } from "#/features/templates/editor/components/canvas/generating-overlay";
 import { CodeEditor } from "#/features/templates/editor/components/panels/code/code-view";
-import { VersionSidebar } from "#/features/templates/editor/components/panels/history/version-sidebar";
 import { EmailInspector } from "#/features/templates/editor/inspector";
 import { CampaignsProvider } from "../campaigns-provider";
 import { CampaignEditorProvider } from "./campaign-editor-provider";
-import { CampaignInspectorTabs } from "./components/campaign-inspector-tabs";
 import { CampaignSendDetails } from "./components/campaign-send-details";
-import { CampaignVariablesPanel } from "./components/campaign-variables-panel";
 
-const viewModes = ["visual", "code", "history", "variables"] as const;
-
-const TAB_ORDER: Record<string, number> = {
-	visual: 0,
-	variables: 1,
-	history: 2,
-};
+const viewModes = ["visual", "code"] as const;
 
 export function CampaignEditorPage({ campaignId }: { campaignId: string }) {
-	const shouldReduceMotion = useReducedMotion();
 	const [viewMode, setViewMode] = useQueryState(
 		"mode",
 		parseAsStringLiteral(viewModes).withDefault("visual"),
 	);
 
 	const isCodeSplit = viewMode === "code";
-	const currentTab =
-		viewMode === "variables"
-			? "variables"
-			: viewMode === "history"
-				? "history"
-				: "visual";
-
-	const [prevTab, setPrevTab] = useState(currentTab);
-	const [direction, setDirection] = useState(1);
-
-	const handleSelectTab = (tab: "visual" | "variables" | "history") => {
-		const prevIndex = TAB_ORDER[currentTab] ?? 0;
-		const nextIndex = TAB_ORDER[tab] ?? 0;
-		setDirection(nextIndex >= prevIndex ? 1 : -1);
-		setPrevTab(currentTab);
-		void setViewMode(tab);
-	};
-
-	const slideVariants = {
-		enter: (dir: number) => ({
-			transform: shouldReduceMotion
-				? "translateX(0%)"
-				: dir > 0
-					? "translateX(20%)"
-					: "translateX(-20%)",
-			opacity: 0,
-		}),
-		center: {
-			transform: "translateX(0%)",
-			opacity: 1,
-		},
-		exit: (dir: number) => ({
-			transform: shouldReduceMotion
-				? "translateX(0%)"
-				: dir > 0
-					? "translateX(-20%)"
-					: "translateX(20%)",
-			opacity: 0,
-		}),
-	};
 
 	return (
 		<CampaignsProvider>
@@ -85,7 +34,7 @@ export function CampaignEditorPage({ campaignId }: { campaignId: string }) {
 							</div>
 						)}
 
-						{/* Center/Right panel (Visual builder + inspector/history/variables) */}
+						{/* Center/Right panel (Visual builder + inspector) */}
 						<div className="relative flex min-h-0 flex-1 overflow-hidden bg-bg-white-0 dark:bg-black">
 							<main className="flex h-full flex-1 flex-col overflow-hidden">
 								<CampaignSendDetails />
@@ -119,40 +68,8 @@ export function CampaignEditorPage({ campaignId }: { campaignId: string }) {
 										}}
 										className="absolute inset-y-0 right-0 z-10 flex h-full shrink-0 flex-col overflow-hidden border-stroke-soft-200 border-l bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-black"
 									>
-										{/* Top Tabs: Editor | Variables | History */}
-										<CampaignInspectorTabs
-											viewMode={viewMode}
-											onSelectTab={handleSelectTab}
-										/>
-
-										<div className="relative h-full w-72 flex-1 overflow-hidden">
-											<AnimatePresence
-												mode="popLayout"
-												custom={direction}
-												initial={false}
-											>
-												<motion.div
-													key={currentTab}
-													custom={direction}
-													variants={slideVariants}
-													initial="enter"
-													animate="center"
-													exit="exit"
-													transition={{
-														duration: 0.28,
-														ease: [0.32, 0.72, 0, 1],
-													}}
-													className="absolute inset-0 overflow-y-auto overflow-x-hidden"
-												>
-													{currentTab === "history" && <VersionSidebar />}
-													{currentTab === "variables" && (
-														<CampaignVariablesPanel
-															onClose={() => handleSelectTab("visual")}
-														/>
-													)}
-													{currentTab === "visual" && <EmailInspector />}
-												</motion.div>
-											</AnimatePresence>
+										<div className="relative h-full w-72 flex-1 overflow-y-auto overflow-x-hidden">
+											<EmailInspector />
 										</div>
 									</motion.div>
 								)}

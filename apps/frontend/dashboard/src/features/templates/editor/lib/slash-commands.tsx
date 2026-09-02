@@ -10,7 +10,7 @@ import type { Editor } from "@tiptap/core";
 export const variableSlashCommand: SlashCommandItem = {
 	title: "Variable",
 	description: "Create and insert a dynamic variable",
-	icon: <Icon name="brackets" className="h-5 w-5" />,
+	icon: <Icon name="variable" className="h-5 w-5" />,
 	category: "Variables",
 	searchTerms: ["variable", "dynamic", "custom", "tag", "bracket"],
 	command: ({ editor, range }) => {
