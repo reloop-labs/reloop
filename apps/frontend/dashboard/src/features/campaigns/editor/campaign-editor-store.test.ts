@@ -44,6 +44,12 @@ describe("useCampaignEditorStore", () => {
 			openedCount: 0,
 			clickedCount: 0,
 			failedCount: 0,
+			content: [
+				{
+					type: "paragraph",
+					content: [{ type: "text", text: "Welcome" }],
+				},
+			],
 			contentHtml: "<p>Welcome</p>",
 			createdAt: new Date().toISOString(),
 			updatedAt: new Date().toISOString(),

@@ -75,6 +75,7 @@ export async function createCampaignController(params: {
 		audienceTargetId?: string;
 		audienceTargetName?: string;
 		templateId?: string;
+		content?: unknown[];
 		contentHtml?: string;
 		csvEmails?: string[];
 		scheduledAt?: string;
@@ -132,6 +133,7 @@ export async function createCampaignController(params: {
 			audienceTargetName: body.audienceTargetName || null,
 			csvEmails,
 			templateId: body.templateId || null,
+			content: body.content ?? [],
 			contentHtml: body.contentHtml ?? "",
 			status: sendImmediately ? "sending" : scheduledAt ? "scheduled" : "draft",
 			scheduledAt: scheduledAt ?? null,
@@ -227,6 +229,7 @@ export async function updateCampaignController(params: {
 		audienceTargetId?: string;
 		audienceTargetName?: string;
 		templateId?: string;
+		content?: unknown[];
 		contentHtml?: string;
 		csvEmails?: string[];
 	};
@@ -270,6 +273,9 @@ export async function updateCampaignController(params: {
 				: {}),
 			...(params.body.templateId !== undefined
 				? { templateId: params.body.templateId || null }
+				: {}),
+			...(params.body.content !== undefined
+				? { content: params.body.content }
 				: {}),
 			...(params.body.contentHtml !== undefined
 				? { contentHtml: params.body.contentHtml }
@@ -404,6 +410,7 @@ export async function duplicateCampaignController(params: {
 			audienceTargetName: row.audienceTargetName,
 			csvEmails: row.csvEmails ?? [],
 			templateId: row.templateId,
+			content: Array.isArray(row.content) ? row.content : [],
 			contentHtml: row.contentHtml,
 			status: "draft",
 		})

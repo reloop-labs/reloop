@@ -76,6 +76,9 @@ export const campaign = pgTable(
 		templateId: text("template_id").references(() => template.id, {
 			onDelete: "set null",
 		}),
+		// TipTap JSON document for the visual editor. contentHtml is the
+		// composed sendable email and must not be round-tripped into TipTap.
+		content: jsonb("content").$type<unknown[]>().notNull().default([]),
 		contentHtml: text("content_html").notNull().default(""),
 		scheduledAt: timestamp("scheduled_at"),
 		startedAt: timestamp("started_at"),

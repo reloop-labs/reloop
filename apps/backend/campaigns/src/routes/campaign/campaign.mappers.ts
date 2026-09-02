@@ -30,6 +30,7 @@ export function toCampaignResponse(
 		skippedCount: row.skippedCount,
 		templateId: row.templateId ?? undefined,
 		templateName: templateName ?? undefined,
+		content: Array.isArray(row.content) ? row.content : [],
 		contentHtml: row.contentHtml,
 		scheduledAt: iso(row.scheduledAt),
 		sentAt: iso(row.sentAt),

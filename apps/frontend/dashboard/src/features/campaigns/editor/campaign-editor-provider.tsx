@@ -1,7 +1,8 @@
 "use client";
 
 import { BubbleMenu, SlashCommand } from "@react-email/editor/ui";
-import { EditorContext } from "@tiptap/react";
+import { generateJSON } from "@tiptap/html";
+import { type Editor, EditorContext } from "@tiptap/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import * as Y from "yjs";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
@@ -13,6 +14,10 @@ import { useCampaignQuery } from "../campaigns-provider";
 import { useCampaignEditorStore } from "./campaign-editor-store";
 import { CampaignEditorHeader } from "./components/campaign-editor-header";
 import { useCampaignEditorHook } from "./hooks/use-campaign-editor-hook";
+import {
+	prepareCampaignHtmlForEditor,
+	resolveCampaignEditorDocument,
+} from "./hydrate-campaign-editor-content";
 
 interface CampaignEditorProviderProps {
 	children: React.ReactNode;
@@ -29,6 +34,9 @@ export function CampaignEditorProvider({
 	const { user } = useActiveOrganization();
 	const campaignQuery = useCampaignQuery(campaignId);
 	const campaign = campaignQuery.data;
+	const campaignReady =
+		Boolean(campaign) &&
+		(campaignQuery.isFetched || !campaignQuery.isPlaceholderData);
 
 	const collabUser = {
 		name: user?.name || undefined,
@@ -49,6 +57,7 @@ export function CampaignEditorProvider({
 	const setLastSaved = useCampaignEditorStore((s) => s.setLastSaved);
 
 	const isInitialHydrateRef = useRef(true);
+	const hasHydratedEditorRef = useRef(false);
 	const skipUntilRef = useRef(Date.now() + SKIP_HYDRATE_MS);
 	const inFlightRef = useRef(false);
 	const pendingRef = useRef(false);
@@ -63,20 +72,27 @@ export function CampaignEditorProvider({
 		}
 	}, [campaign, setCampaignData]);
 
-	// Hydrate editor initial content if empty and campaign has contentHtml
+	// Load the visual document once from the detail payload. Never re-apply
+	// after autosave — composed email HTML would re-center blocks.
 	useEffect(() => {
-		if (editor && campaign?.contentHtml && editor.isEmpty) {
-			try {
-				editor.commands.setContent(campaign.contentHtml);
-			} catch (err) {
-				console.error("Failed to populate initial editor content:", err);
-			}
+		if (!editor || !campaign || !campaignReady || hasHydratedEditorRef.current)
+			return;
+		if (!editor.isEmpty) {
+			hasHydratedEditorRef.current = true;
+			return;
 		}
-	}, [editor, campaign?.contentHtml]);
+		try {
+			hydrateCampaignEditor(editor, campaign);
+		} catch (err) {
+			console.error("Failed to populate initial editor content:", err);
+		}
+		hasHydratedEditorRef.current = true;
+	}, [editor, campaign, campaignReady]);
 
 	// Autosave logic
 	saveRef.current = async () => {
-		if (!editor || !campaignId || isInitialHydrateRef.current || !campaign) return;
+		if (!editor || !campaignId || isInitialHydrateRef.current || !campaign)
+			return;
 		const state = useCampaignEditorStore.getState();
 		if (Date.now() < skipUntilRef.current) return;
 
@@ -105,6 +121,7 @@ export function CampaignEditorProvider({
 				audienceType: state.audienceType,
 				audienceTargetId: state.audienceTargetId || undefined,
 				audienceTargetName: state.audienceTargetName || undefined,
+				content: editor.getJSON().content ?? [],
 				contentHtml: renderedHtml,
 			});
 			setLastSaved(new Date());
@@ -206,4 +223,31 @@ export function CampaignEditorProvider({
 			</div>
 		</EditorContext.Provider>
 	);
+}
+
+function hydrateCampaignEditor(
+	editor: Editor,
+	campaign: { content?: unknown; contentHtml?: string | null },
+) {
+	const document = resolveCampaignEditorDocument(campaign);
+	if (!document) return;
+
+	if (document.kind === "json") {
+		editor.commands.setContent(
+			{ type: "doc", content: document.content },
+			{ emitUpdate: false },
+		);
+		return;
+	}
+
+	const html = prepareCampaignHtmlForEditor(document.html);
+	try {
+		const jsonDoc = generateJSON(
+			html,
+			editor.extensionManager.extensions as never,
+		);
+		editor.commands.setContent(jsonDoc, { emitUpdate: false });
+	} catch {
+		editor.commands.setContent(html, { emitUpdate: false });
+	}
 }

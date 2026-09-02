@@ -28,6 +28,7 @@ export type Campaign = {
 	failedCount: number;
 	templateId?: string;
 	templateName?: string;
+	content?: unknown[];
 	contentHtml: string;
 	scheduledAt?: string;
 	sentAt?: string;
@@ -47,6 +48,7 @@ export type CreateCampaignInput = {
 	audienceTargetName?: string;
 	templateId?: string;
 	templateName?: string;
+	content?: unknown[];
 	contentHtml: string;
 	csvEmails?: string[];
 	scheduledAt?: string;
@@ -65,6 +67,7 @@ export type UpdateCampaignInput = {
 	audienceTargetName?: string;
 	templateId?: string;
 	templateName?: string;
+	content?: unknown[];
 	contentHtml?: string;
 	csvEmails?: string[];
 };

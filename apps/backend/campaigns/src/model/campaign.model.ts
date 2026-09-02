@@ -37,6 +37,7 @@ export const campaignResponseSchema = t.Object({
 	skippedCount: t.Number(),
 	templateId: t.Optional(t.String()),
 	templateName: t.Optional(t.String()),
+	content: t.Array(t.Any()),
 	contentHtml: t.String(),
 	scheduledAt: t.Optional(t.String()),
 	sentAt: t.Optional(t.String()),
@@ -56,6 +57,7 @@ export const createCampaignBody = t.Object({
 	audienceTargetId: t.Optional(t.String()),
 	audienceTargetName: t.Optional(t.String()),
 	templateId: t.Optional(t.String()),
+	content: t.Optional(t.Array(t.Any())),
 	contentHtml: t.Optional(t.String()),
 	csvEmails: t.Optional(t.Array(t.String(), { maxItems: 50_000 })),
 	scheduledAt: t.Optional(t.String()),
@@ -73,6 +75,7 @@ export const updateCampaignBody = t.Object({
 	audienceTargetId: t.Optional(t.String()),
 	audienceTargetName: t.Optional(t.String()),
 	templateId: t.Optional(t.String()),
+	content: t.Optional(t.Array(t.Any())),
 	contentHtml: t.Optional(t.String()),
 	csvEmails: t.Optional(t.Array(t.String(), { maxItems: 50_000 })),
 });
