@@ -477,7 +477,7 @@ export function CampaignTestEmailModal({
 											</>
 										) : (
 											<>
-												Send test
+												Send
 												<span className="inline-flex items-center gap-0.5">
 													<ActionKbd className={actionKbdOnBlueClassName}>
 														⌘

@@ -102,15 +102,11 @@ export const HeaderActions = ({
 			const pubNum = result.publishNumber ?? null;
 			setLastSaved(null, new Date());
 			setHasUnsavedChanges(false);
-			toast.success(
-				pubNum ? `Published as v${pubNum}` : "Template published!",
-				{ duration: 3000 },
-			);
-			setIsPublishModalOpen(false);
 			mutate();
 		} catch (error) {
 			console.error("Failed to publish template:", error);
 			toast.error("Failed to publish template.");
+			throw error;
 		} finally {
 			setIsPublishing(false);
 		}
