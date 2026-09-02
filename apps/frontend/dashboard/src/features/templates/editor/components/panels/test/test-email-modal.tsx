@@ -123,10 +123,12 @@ export function TestEmailModal({
 
 	const [email, setEmail] = useState("");
 	const [status, setStatus] = useState<"idle" | "sending" | "success">("idle");
+	const [sentRecipientsSummary, setSentRecipientsSummary] = useState("");
+	const [modalHeight, setModalHeight] = useState<number | undefined>(undefined);
 	const [variableValues, setVariableValues] = useState<Record<string, string>>(
 		{},
 	);
-
+	const formContainerRef = useRef<HTMLFormElement>(null);
 	const varFieldRefs = useRef<
 		Record<string, { show: (msg: string) => void; clear: () => void }>
 	>({});
@@ -172,6 +174,8 @@ export function TestEmailModal({
 					ctrl?.clear();
 				}
 				setStatus("idle");
+				setSentRecipientsSummary("");
+				setModalHeight(undefined);
 			}, 300);
 			return () => clearTimeout(timer);
 		}
@@ -183,6 +187,7 @@ export function TestEmailModal({
 		for (const ctrl of Object.values(varFieldRefs.current)) {
 			ctrl?.clear();
 		}
+		setModalHeight(undefined);
 		onClose();
 	};
 
@@ -225,7 +230,8 @@ export function TestEmailModal({
 		for (const v of detectedVars) {
 			const val = variableValues[v.name]?.trim();
 			if (!val) {
-				varFieldRefs.current[v.name]?.show(`${v.name} is required.`);
+				const ctrl = varFieldRefs.current[v.name];
+				ctrl?.show(`${v.name} is required.`);
 				hasError = true;
 			}
 		}
@@ -238,6 +244,11 @@ export function TestEmailModal({
 		for (const ctrl of Object.values(varFieldRefs.current)) {
 			ctrl?.clear();
 		}
+
+		if (formContainerRef.current) {
+			setModalHeight(formContainerRef.current.offsetHeight);
+		}
+
 		setStatus("sending");
 
 		try {
@@ -267,17 +278,19 @@ export function TestEmailModal({
 				}
 			}
 
-			setStatus("success");
-			toast.success(
+			const summary =
 				emailList.length === 1
-					? `Test email sent to ${emailList[0]}`
-					: `Test emails sent to ${emailList.length} recipients`,
-			);
+					? (emailList[0] ?? "")
+					: `${emailList[0]} and ${emailList.length - 1} other${emailList.length > 2 ? "s" : ""}`;
+			setSentRecipientsSummary(summary);
+			setStatus("success");
 
 			setTimeout(() => {
 				setStatus("idle");
+				setSentRecipientsSummary("");
+				setModalHeight(undefined);
 				onClose();
-			}, 600);
+			}, 1800);
 		} catch (err) {
 			const message =
 				err instanceof Error ? err.message : "Failed to send test email";
@@ -330,156 +343,214 @@ export function TestEmailModal({
 				className="overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-soft-50 p-0 sm:max-w-[460px] dark:border-stroke-soft-100/40 dark:bg-white/[0.03]"
 				showClose={false}
 			>
-				<form onSubmit={handleSendTest} noValidate>
-					<div className="relative m-0.5 space-y-4 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 pt-5 dark:border-stroke-soft-100/40 dark:bg-[#0c0c0c]">
-						{/* Header */}
-						<div className="flex items-start justify-between px-6 dark:border-stroke-soft-100/40">
-							<Modal.Title className="font-medium text-text-strong-950 text-xl tracking-tight">
-								Send test email
-							</Modal.Title>
-							<button
-								type="button"
-								onClick={handleClose}
-								aria-label="Close"
-								disabled={status !== "idle"}
-								className="flex h-7 w-7 items-center justify-center rounded-lg bg-bg-white-0 text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 active:scale-[0.95] disabled:opacity-50 dark:border-stroke-soft-100/40 dark:bg-transparent dark:hover:bg-white/[0.05]"
-							>
-								<X className="size-3.5" strokeWidth={2.25} />
-							</button>
-						</div>
-
-						{/* Content */}
-						<div className="space-y-4 px-6 pb-6">
-							<div className="space-y-1.5">
-								<Label.Root
-									htmlFor="test-recipient-email"
-									className="font-medium text-text-strong-950 text-xs"
+				<form ref={formContainerRef} onSubmit={handleSendTest} noValidate>
+					<div className="relative m-0.5 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-[#0c0c0c]">
+						<AnimatePresence mode="wait">
+							{status === "success" ? (
+								<motion.div
+									key="success"
+									initial={{ opacity: 0, scale: 0.95 }}
+									animate={{ opacity: 1, scale: 1 }}
+									exit={{ opacity: 0, scale: 0.95 }}
+									transition={{ duration: 0.2 }}
+									style={{ minHeight: modalHeight ? `${modalHeight}px` : 260 }}
+									className="flex flex-col items-center justify-center p-6 text-center"
 								>
-									Recipient email
-									<Label.Asterisk />
-								</Label.Root>
-								<FieldError
-									field={emailField}
-									hint="Separate multiple emails with commas or new lines"
-								>
-									<Textarea.Root
-										id="test-recipient-email"
-										simple
-										hasError={emailField.hasError}
-										className="min-h-[76px] resize-none text-xs text-text-strong-950"
-										placeholder="you@company.com, team@company.com"
-										value={email}
-										onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
-											setEmail(e.target.value);
-											if (emailField.hasError) emailField.clear();
-										}}
-										autoFocus
-										disabled={status !== "idle"}
-										{...emailField.controlProps}
-									/>
-								</FieldError>
-							</div>
-
-							{/* Variables section */}
-							{detectedVars.length > 0 && (
-								<div className="space-y-2 pt-1">
-									<div className="flex items-center justify-between">
-										<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-wide">
-											Variables
-										</p>
-									</div>
-									<div className="-mx-1.5 max-h-48 space-y-3 overflow-y-auto px-1.5 py-1">
-										{detectedVars.map((v) => (
-											<VariableInputField
-												key={v.name}
-												variable={v}
-												value={variableValues[v.name] ?? ""}
-												onChange={(val) =>
-													setVariableValues((prev) => ({
-														...prev,
-														[v.name]: val,
-													}))
-												}
-												disabled={status !== "idle"}
-												registerField={registerField}
+									<div className="flex size-11 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400">
+										<svg
+											className="size-5.5"
+											fill="none"
+											viewBox="0 0 24 24"
+											stroke="currentColor"
+											strokeWidth={2.5}
+											strokeLinecap="round"
+											strokeLinejoin="round"
+										>
+											<motion.path
+												d="M5 13l4 4L19 7"
+												initial={{ pathLength: 0, opacity: 0 }}
+												animate={{ pathLength: 1, opacity: 1 }}
+												transition={{
+													pathLength: {
+														duration: 0.35,
+														ease: [0.65, 0, 0.35, 1],
+														delay: 0.1,
+													},
+													opacity: {
+														duration: 0.05,
+														delay: 0.1,
+													},
+												}}
 											/>
-										))}
+										</svg>
 									</div>
-								</div>
+									<p className="mt-3.5 font-medium text-base text-text-strong-950 dark:text-white">
+										Test email sent!
+									</p>
+									<p className="mt-1 text-text-sub-600 text-xs dark:text-text-sub-400">
+										Sent to{" "}
+										<span className="font-medium text-text-strong-950 dark:text-white">
+											{sentRecipientsSummary}
+										</span>
+									</p>
+								</motion.div>
+							) : (
+								<motion.div
+									key="form-fields"
+									initial={{ opacity: 0 }}
+									animate={{ opacity: 1 }}
+									exit={{ opacity: 0 }}
+									transition={{ duration: 0.15 }}
+									className="space-y-4 pt-5"
+								>
+									{/* Header */}
+									<div className="flex items-start justify-between px-6 dark:border-stroke-soft-100/40">
+										<Modal.Title className="font-medium text-text-strong-950 text-xl tracking-tight">
+											Send test email
+										</Modal.Title>
+										<button
+											type="button"
+											onClick={handleClose}
+											aria-label="Close"
+											disabled={status !== "idle"}
+											className="flex h-7 w-7 items-center justify-center rounded-lg bg-bg-white-0 text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 active:scale-[0.95] disabled:opacity-50 dark:border-stroke-soft-100/40 dark:bg-transparent dark:hover:bg-white/[0.05]"
+										>
+											<X className="size-3.5" strokeWidth={2.25} />
+										</button>
+									</div>
+
+									{/* Content */}
+									<div className="space-y-4 px-6 pb-6">
+										<div className="space-y-1.5">
+											<Label.Root
+												htmlFor="test-recipient-email"
+												className="font-medium text-text-strong-950 text-xs"
+											>
+												Recipient email
+												<Label.Asterisk />
+											</Label.Root>
+											<FieldError
+												field={emailField}
+												hint="Separate multiple emails with commas or new lines"
+											>
+												<Textarea.Root
+													id="test-recipient-email"
+													simple
+													hasError={emailField.hasError}
+													className="min-h-[76px] resize-none text-xs text-text-strong-950"
+													placeholder="you@company.com, team@company.com"
+													value={email}
+													onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
+														setEmail(e.target.value);
+														if (emailField.hasError) emailField.clear();
+													}}
+													autoFocus
+													disabled={status !== "idle"}
+													{...emailField.controlProps}
+												/>
+											</FieldError>
+										</div>
+
+										{/* Variables section */}
+										{detectedVars.length > 0 && (
+											<div className="space-y-2 pt-1">
+												<div className="flex items-center justify-between">
+													<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-wide">
+														Variables
+													</p>
+												</div>
+												<div className="-mx-1.5 max-h-48 space-y-3 overflow-y-auto px-1.5 py-1">
+													{detectedVars.map((v) => (
+														<VariableInputField
+															key={v.name}
+															variable={v}
+															value={variableValues[v.name] ?? ""}
+															onChange={(val) =>
+																setVariableValues((prev) => ({
+																	...prev,
+																	[v.name]: val,
+																}))
+															}
+															disabled={status !== "idle"}
+															registerField={registerField}
+														/>
+													))}
+												</div>
+											</div>
+										)}
+									</div>
+								</motion.div>
 							)}
-						</div>
+						</AnimatePresence>
 					</div>
 
 					{/* Actions / Footer */}
-					<div className="relative flex items-center justify-between gap-3 px-3 pt-2 pb-3">
-						<Button.Root
-							type="button"
-							variant="neutral"
-							mode="ghost"
-							size="small"
-							onClick={handleClose}
-							className={cn(
-								"gap-1.5 transition-opacity duration-200",
-								status !== "idle" && "pointer-events-none opacity-50",
-							)}
-						>
-							Cancel
-							<ActionKbd className="lowercase! w-auto min-w-0 px-1">
-								esc
-							</ActionKbd>
-						</Button.Root>
+					{status !== "success" && (
+						<div className="relative flex items-center justify-between gap-3 px-3 pt-2 pb-3">
+							<Button.Root
+								type="button"
+								variant="neutral"
+								mode="ghost"
+								size="small"
+								onClick={handleClose}
+								className={cn(
+									"gap-1.5 transition-opacity duration-200",
+									status !== "idle" && "pointer-events-none opacity-50",
+								)}
+							>
+								Cancel
+								<ActionKbd className="lowercase! w-auto min-w-0 px-1">
+									esc
+								</ActionKbd>
+							</Button.Root>
 
-						<FancyButton.Root
-							type="submit"
-							variant={status === "success" ? "success" : "blue"}
-							size="small"
-							disabled={status !== "idle"}
-							className={cn(
-								"min-w-[130px] justify-center overflow-hidden transition-all duration-200",
-								status !== "idle" && "pointer-events-none",
-								status === "sending" && "opacity-90",
-							)}
-						>
-							<AnimatePresence mode="popLayout" initial={false}>
-								<motion.span
-									key={status}
-									transition={{
-										type: "spring",
-										duration: 0.25,
-										bounce: 0,
-									}}
-									initial={{ opacity: 0, y: -14 }}
-									animate={{ opacity: 1, y: 0 }}
-									exit={{ opacity: 0, y: 14 }}
-									className="flex items-center justify-center gap-1.5"
-								>
-									{status === "sending" ? (
-										<>
-											<Spinner size={14} color="currentColor" />
-											<span>Sending...</span>
-										</>
-									) : status === "success" ? (
-										<>
-											<Icon name="check-circle" className="h-4 w-4" />
-											<span>Sent</span>
-										</>
-									) : (
-										<>
-											Send test
-											<span className="inline-flex items-center gap-0.5">
-												<ActionKbd className={actionKbdOnBlueClassName}>
-													⌘
-												</ActionKbd>
-												<ActionKbd className={actionKbdOnBlueClassName}>
-													↵
-												</ActionKbd>
-											</span>
-										</>
-									)}
-								</motion.span>
-							</AnimatePresence>
-						</FancyButton.Root>
-					</div>
+							<FancyButton.Root
+								type="submit"
+								variant="blue"
+								size="small"
+								disabled={status !== "idle"}
+								className={cn(
+									"min-w-[130px] justify-center overflow-hidden transition-all duration-200",
+									status !== "idle" && "pointer-events-none",
+									status === "sending" && "opacity-90",
+								)}
+							>
+								<AnimatePresence mode="popLayout" initial={false}>
+									<motion.span
+										key={status}
+										transition={{
+											type: "spring",
+											duration: 0.25,
+											bounce: 0,
+										}}
+										initial={{ opacity: 0, y: -14 }}
+										animate={{ opacity: 1, y: 0 }}
+										exit={{ opacity: 0, y: 14 }}
+										className="flex items-center justify-center gap-1.5"
+									>
+										{status === "sending" ? (
+											<>
+												<Spinner size={14} color="currentColor" />
+												<span>Sending...</span>
+											</>
+										) : (
+											<>
+												Send test
+												<span className="inline-flex items-center gap-0.5">
+													<ActionKbd className={actionKbdOnBlueClassName}>
+														⌘
+													</ActionKbd>
+													<ActionKbd className={actionKbdOnBlueClassName}>
+														↵
+													</ActionKbd>
+												</span>
+											</>
+										)}
+									</motion.span>
+								</AnimatePresence>
+							</FancyButton.Root>
+						</div>
+					)}
 				</form>
 			</Modal.Content>
 		</Modal.Root>
