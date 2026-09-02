@@ -85,3 +85,37 @@ export function sanitizePreviewHtml(rawHtml: string): string {
 		: "<!DOCTYPE html>";
 	return `${doctype}${doc.documentElement.outerHTML}`;
 }
+
+/**
+ * Drop attributes the in-canvas editor adds so persisting a keystroke
+ * does not rewrite the email's markup.
+ */
+export function withoutEditorChrome(rawHtml: string): string {
+	if (!rawHtml.trim()) return "";
+
+	const parser = new DOMParser();
+	const doc = parser.parseFromString(rawHtml, "text/html");
+	doc.documentElement.removeAttribute("contenteditable");
+	if (doc.body) {
+		doc.body.removeAttribute("contenteditable");
+		doc.body.removeAttribute("spellcheck");
+	}
+
+	const walker = doc.createTreeWalker(
+		doc.documentElement,
+		NodeFilter.SHOW_ELEMENT,
+	);
+	let node: Node | null = walker.currentNode;
+	while (node) {
+		if (node.nodeType === Node.ELEMENT_NODE) {
+			(node as Element).removeAttribute("contenteditable");
+			(node as Element).removeAttribute("spellcheck");
+		}
+		node = walker.nextNode();
+	}
+
+	const nextDoctype = doc.doctype
+		? `<!DOCTYPE ${doc.doctype.name}>`
+		: "<!DOCTYPE html>";
+	return `${nextDoctype}${doc.documentElement.outerHTML}`;
+}

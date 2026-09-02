@@ -10,10 +10,6 @@ export function applyImportedEmailCss(css: string): void {
 
 	let el = document.getElementById(STYLE_ID) as HTMLStyleElement | null;
 	const trimmed = css.trim();
-	if (!trimmed) {
-		el?.remove();
-		return;
-	}
 
 	if (!el) {
 		el = document.createElement("style");
@@ -21,7 +17,23 @@ export function applyImportedEmailCss(css: string): void {
 		document.head.appendChild(el);
 	}
 
-	el.textContent = `${trimmed}\n.ProseMirror .node-container{height:auto!important;}`;
+	el.textContent = `${trimmed}
+.tiptap.ProseMirror, .ProseMirror {
+	min-height: 100% !important;
+	width: 100% !important;
+	outline: none !important;
+}
+.tiptap.ProseMirror .node-container,
+.ProseMirror .node-container,
+div[data-type="container"] {
+	height: auto !important;
+	min-height: 0 !important;
+	max-height: none !important;
+	overflow: visible !important;
+	margin-left: auto !important;
+	margin-right: auto !important;
+	box-sizing: border-box !important;
+}`;
 }
 
 export function clearImportedEmailCss(): void {

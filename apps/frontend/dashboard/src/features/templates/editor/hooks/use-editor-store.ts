@@ -38,6 +38,8 @@ interface EditorState {
 	setCodeHtml: (html: string) => void;
 	htmlLocked: boolean;
 	setHtmlLocked: (locked: boolean) => void;
+	importedEmailCss: string;
+	setImportedEmailCss: (css: string) => void;
 }
 
 export const useEditorStore = create<EditorState>((set) => ({
@@ -95,4 +97,9 @@ export const useEditorStore = create<EditorState>((set) => ({
 	htmlLocked: false,
 	setHtmlLocked: (htmlLocked) =>
 		set((s) => (s.htmlLocked === htmlLocked ? s : { htmlLocked })),
+	importedEmailCss: "",
+	setImportedEmailCss: (importedEmailCss) =>
+		set((s) =>
+			s.importedEmailCss === importedEmailCss ? s : { importedEmailCss },
+		),
 }));

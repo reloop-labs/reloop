@@ -23,6 +23,7 @@ export function CodeEditor({ onClose }: { onClose?: () => void } = {}) {
 	const htmlCode = useEditorStore((s) => s.codeHtml);
 	const setHtmlCode = useEditorStore((s) => s.setCodeHtml);
 	const setHtmlLocked = useEditorStore((s) => s.setHtmlLocked);
+	const setImportedEmailCss = useEditorStore((s) => s.setImportedEmailCss);
 	const [isLoading, setIsLoading] = useState(false);
 	const [copied, setCopied] = useState(false);
 	const isSelfUpdatingRef = useRef(false);
@@ -102,6 +103,7 @@ export function CodeEditor({ onClose }: { onClose?: () => void } = {}) {
 
 								if (parsed.css) {
 									applyImportedEmailCss(parsed.css);
+									setImportedEmailCss(parsed.css);
 								}
 
 								const parsedBodyAndContainer =
@@ -166,6 +168,18 @@ export function CodeEditor({ onClose }: { onClose?: () => void } = {}) {
 									"height",
 									undefined,
 								);
+								mergedStyles = updateGlobalStyleValue(
+									mergedStyles,
+									"container",
+									"align",
+									"center",
+								);
+								mergedStyles = updateGlobalStyleValue(
+									mergedStyles,
+									"container",
+									"borderWidth",
+									0,
+								);
 
 								editor.commands.setGlobalContent("styles", mergedStyles);
 							} catch (err) {
@@ -181,7 +195,7 @@ export function CodeEditor({ onClose }: { onClose?: () => void } = {}) {
 				isSelfUpdatingRef.current = false;
 			}
 		},
-		[editor, setHtmlCode, setHtmlLocked],
+		[editor, setHtmlCode, setHtmlLocked, setImportedEmailCss],
 	);
 
 	const handleFormat = useCallback(() => {
@@ -1527,18 +1541,19 @@ function parseGlobalStylesFromHtml(html: string) {
 	// Rewrite `body` / `html` selectors to target the TipTap root instead.
 	// The visual builder renders inside a `.ProseMirror` element (not an iframe),
 	// so keeping `body { ... }` rules would do nothing, and using `&` is not valid
-	// plain CSS. Scoping to `.ProseMirror` preserves the original intent (fonts,
+	// plain CSS. Scoping to `.tiptap.ProseMirror` preserves the original intent (fonts,
 	// spacing, resets) without leaking styles across the app shell.
-	//
-	// We use `.ProseMirror.ProseMirror` (same element, higher specificity) to
-	// ensure these rules override the editor's default theme CSS.
 	cssString = cssString.replace(
 		/(?<![.#\-\w])body\b/g,
-		".ProseMirror.ProseMirror",
+		".tiptap.ProseMirror, .ProseMirror",
 	);
 	cssString = cssString.replace(
 		/(?<![.#\-\w])html\b/g,
-		".ProseMirror.ProseMirror",
+		".tiptap.ProseMirror, .ProseMirror",
+	);
+	cssString = cssString.replace(
+		/(^|[\s,{}])\*(?=[^{}]*\{)/g,
+		"$1.tiptap.ProseMirror *, $1.ProseMirror *",
 	);
 
 	// 2. Extract external stylesheet links (e.g. google fonts) so they can load in the head
@@ -1582,7 +1597,7 @@ function parseGlobalStylesFromHtml(html: string) {
 		const baseLetterSpacing = scratch.style.letterSpacing;
 
 		const proseMirrorBase = [
-			".ProseMirror.ProseMirror{",
+			".tiptap.ProseMirror, .ProseMirror{",
 			baseFontFamily ? `font-family:${baseFontFamily}!important;` : "",
 			baseFontSize ? `font-size:${baseFontSize}!important;` : "",
 			baseLineHeight ? `line-height:${baseLineHeight}!important;` : "",
@@ -1592,16 +1607,16 @@ function parseGlobalStylesFromHtml(html: string) {
 			baseLetterSpacing ? `letter-spacing:${baseLetterSpacing}!important;` : "",
 			"}",
 			// Email HTML relies on inline spacing; editor defaults add extra margins.
-			".ProseMirror.ProseMirror p{margin:0 !important;padding:0 !important;}",
-			".ProseMirror.ProseMirror h1,.ProseMirror.ProseMirror h2,.ProseMirror.ProseMirror h3{margin:0 !important;}",
+			".tiptap.ProseMirror p, .ProseMirror p{margin:0 !important;padding:0 !important;}",
+			".tiptap.ProseMirror h1, .tiptap.ProseMirror h2, .tiptap.ProseMirror h3, .ProseMirror h1, .ProseMirror h2, .ProseMirror h3{margin:0 !important;}",
 			// Match email-client link presentation (no underline unless explicitly styled).
 			// React Email demo previews generally show links without browser-default underlines.
-			".ProseMirror.ProseMirror a{text-decoration:none !important;color:inherit;}",
-			".ProseMirror.ProseMirror a *{text-decoration:none !important;}",
+			".tiptap.ProseMirror a, .ProseMirror a{text-decoration:none !important;color:inherit;}",
+			".tiptap.ProseMirror a *, .ProseMirror a *{text-decoration:none !important;}",
 			// Ensure emphasis renders as intended.
-			".ProseMirror.ProseMirror strong,.ProseMirror.ProseMirror b{font-weight:600 !important;}",
-			".ProseMirror.ProseMirror table{border-collapse:separate !important;}",
-			".ProseMirror.ProseMirror img{display:block;}",
+			".tiptap.ProseMirror strong, .tiptap.ProseMirror b, .ProseMirror strong, .ProseMirror b{font-weight:600 !important;}",
+			".tiptap.ProseMirror table, .ProseMirror table{border-collapse:separate !important;}",
+			".tiptap.ProseMirror img, .ProseMirror img{display:block;}",
 			"",
 		]
 			.filter(Boolean)
@@ -1705,3 +1720,13 @@ function updateGlobalStyleValue(
 		};
 	});
 }
+
+export {
+	parseGlobalStylesFromHtml,
+	extractThemingStylesFromHtml,
+	mergeParsedStyles,
+	updateGlobalStyleValue,
+	findStyleInputValue,
+	getGlobalStylesArray,
+	sanitizeEmailHtml,
+};

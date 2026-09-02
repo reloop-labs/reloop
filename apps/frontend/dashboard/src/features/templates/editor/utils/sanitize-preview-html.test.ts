@@ -1,7 +1,10 @@
 // @vitest-environment jsdom
 
 import { describe, expect, it } from "vitest";
-import { sanitizePreviewHtml } from "./sanitize-preview-html";
+import {
+	sanitizePreviewHtml,
+	withoutEditorChrome,
+} from "./sanitize-preview-html";
 
 const DITHER_SLICE = `<!DOCTYPE html>
 <html>
@@ -70,5 +73,16 @@ describe("sanitizePreviewHtml", () => {
 	it("returns empty string for blank input", () => {
 		expect(sanitizePreviewHtml("")).toBe("");
 		expect(sanitizePreviewHtml("   ")).toBe("");
+	});
+});
+
+describe("withoutEditorChrome", () => {
+	it("strips contenteditable without changing the email body", () => {
+		const raw = `<!DOCTYPE html><html contenteditable="true"><body contenteditable="true" spellcheck="false"><h1>WELCOME TO DITHER</h1></body></html>`;
+		const result = withoutEditorChrome(raw);
+
+		expect(result).toContain("WELCOME TO DITHER");
+		expect(result).not.toMatch(/contenteditable/i);
+		expect(result).not.toMatch(/spellcheck/i);
 	});
 });

@@ -1,12 +1,12 @@
 import { Icon } from "@reloop/ui/icon";
 import { DragHandle } from "@tiptap/extension-drag-handle-react";
 import { EditorContent, useCurrentEditor } from "@tiptap/react";
+import { useEffect } from "react";
+import { useEditorStore } from "#/features/templates/editor/hooks/use-editor-store";
+import { applyImportedEmailCss } from "#/features/templates/editor/utils/apply-imported-email-css";
 
 import "@react-email/editor/themes/default.css";
 
-// Stable module-level constants — defined outside the component so their
-// object references never change between renders, preventing the infinite
-// update loop that occurs when DragHandle's internal effect compares props.
 const DRAG_NESTED_OPTIONS = {
 	edgeDetection: { threshold: -16, edges: ["left" as const] },
 };
@@ -18,6 +18,11 @@ const DRAG_POSITION_CONFIG = {
 
 export function FullEmailBuilder() {
 	const { editor } = useCurrentEditor();
+	const importedEmailCss = useEditorStore((s) => s.importedEmailCss);
+
+	useEffect(() => {
+		if (importedEmailCss) applyImportedEmailCss(importedEmailCss);
+	}, [importedEmailCss]);
 
 	if (!editor) return null;
 
@@ -37,7 +42,7 @@ export function FullEmailBuilder() {
 			</DragHandle>
 			<EditorContent
 				editor={editor}
-				className="mx-auto min-h-full w-full max-w-150 [&>.ProseMirror]:min-h-full [&>.ProseMirror]:w-full"
+				className="min-h-full w-full [&>.ProseMirror]:min-h-full [&>.ProseMirror]:w-full [&>.ProseMirror]:px-4 [&>.ProseMirror]:py-6"
 			/>
 		</div>
 	);

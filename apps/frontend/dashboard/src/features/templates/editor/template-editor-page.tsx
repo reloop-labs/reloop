@@ -35,7 +35,7 @@ export function TemplateEditorPage({ templateId }: { templateId: string }) {
 	const isCodeSplit = viewMode === "code";
 	const htmlLocked = useEditorStore((s) => s.htmlLocked);
 	const codeHtml = useEditorStore((s) => s.codeHtml);
-	const showHtmlCanvas = htmlLocked && Boolean(codeHtml.trim());
+	const showHtmlCanvas = Boolean((htmlLocked || isCodeSplit) && codeHtml.trim());
 	const currentTab =
 		viewMode === "variables"
 			? "variables"
@@ -90,16 +90,16 @@ export function TemplateEditorPage({ templateId }: { templateId: string }) {
 
 					{/* Center/Right panel (Visual builder + inspector/history/variables) */}
 					<div className="relative flex min-h-0 flex-1 overflow-hidden bg-bg-white-0 dark:bg-black">
-						<main className="flex h-full flex-1 flex-col overflow-hidden">
+						<main
+							className={cn(
+								"flex h-full flex-1 flex-col overflow-hidden",
+								!isCodeSplit && "pr-72",
+							)}
+						>
 							<SendDetails />
 							<GeneratingOverlay />
 							{showHtmlCanvas ? (
-								<div
-									className={cn(
-										"relative min-h-0 flex-1",
-										!isCodeSplit && "pr-72",
-									)}
-								>
+								<div className="relative min-h-0 flex-1">
 									<HtmlEmailPreview editable={!isCodeSplit} />
 								</div>
 							) : (

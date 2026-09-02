@@ -92,6 +92,11 @@ export const useEditorHook = (collab: CollabOptions) => {
 
 	const editor = useEditor(
 		{
+			editorProps: {
+				attributes: {
+					class: "tiptap focus:outline-none",
+				},
+			},
 			extensions: [
 				StarterKit.configure({ UndoRedo: false }),
 				...baseExtensions,

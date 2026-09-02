@@ -7,7 +7,11 @@ import { useActiveOrganization } from "#/features/dashboard/page-header/use-acti
 import { useEditorHook } from "#/features/templates/editor/hooks/use-editor-hooks";
 import { useEditorStore } from "#/features/templates/editor/hooks/use-editor-store";
 import { useSWR } from "#/features/templates/editor/hooks/use-swr-compat";
-import { clearImportedEmailCss } from "#/features/templates/editor/utils/apply-imported-email-css";
+import {
+	applyImportedEmailCss,
+	clearImportedEmailCss,
+} from "#/features/templates/editor/utils/apply-imported-email-css";
+import { readableTextColor } from "#/features/templates/editor/utils/readable-text-color";
 import { mapTemplateVariables } from "#/features/templates/lib/template-variables";
 import {
 	getRandomColor,
@@ -15,6 +19,15 @@ import {
 } from "../collobration/hooks/useCollaboration";
 import { PresenceProvider } from "../collobration/PresenceProvider";
 import { TemplateDetailHeader } from "../components/header/template-detail-header";
+import {
+	extractThemingStylesFromHtml,
+	findStyleInputValue,
+	getGlobalStylesArray,
+	mergeParsedStyles,
+	parseGlobalStylesFromHtml,
+	sanitizeEmailHtml,
+	updateGlobalStyleValue,
+} from "../components/panels/code/code-view";
 import { AddTemplateVariableModal } from "../components/panels/variables/add-variable-modal";
 import { useMousePresence } from "../cursor/hooks/useMousePresence";
 import { useRemoteCursors } from "../cursor/hooks/useRemoteCursors";
@@ -114,6 +127,7 @@ export const EditorProvider = ({ children, roomId }: EditorProviderProps) => {
 	const setPreviewText = useEditorStore((s) => s.setPreviewText);
 	const setCodeHtml = useEditorStore((s) => s.setCodeHtml);
 	const setHtmlLocked = useEditorStore((s) => s.setHtmlLocked);
+	const setImportedEmailCss = useEditorStore((s) => s.setImportedEmailCss);
 
 	const isCreatingVar = useEditorStore((s) => s.isCreatingVar);
 	const setIsCreatingVar = useEditorStore((s) => s.setIsCreatingVar);
@@ -122,8 +136,9 @@ export const EditorProvider = ({ children, roomId }: EditorProviderProps) => {
 	useEffect(() => {
 		setCodeHtml("");
 		setHtmlLocked(false);
+		setImportedEmailCss("");
 		clearImportedEmailCss();
-	}, [setCodeHtml, setHtmlLocked]);
+	}, [setCodeHtml, setHtmlLocked, setImportedEmailCss]);
 
 	const handleCreateAndInsertVar = async (
 		name: string,
@@ -305,6 +320,11 @@ export const EditorProvider = ({ children, roomId }: EditorProviderProps) => {
 				sourceToLoad = template;
 			}
 
+			let htmlStringToProcess = "";
+			if (sourceToLoad?.renderedHtml && typeof sourceToLoad.renderedHtml === "string") {
+				htmlStringToProcess = sourceToLoad.renderedHtml;
+			}
+
 			if (sourceToLoad?.content && sourceToLoad.content.length > 0) {
 				const rawContent = sourceToLoad.content;
 				if (Array.isArray(rawContent)) {
@@ -315,11 +335,12 @@ export const EditorProvider = ({ children, roomId }: EditorProviderProps) => {
 						"html" in firstItem &&
 						typeof firstItem.html === "string"
 					) {
-						const safeHtml = firstItem.html;
+						htmlStringToProcess = htmlStringToProcess || firstItem.html;
+						const safeHtml = sanitizeEmailHtml(firstItem.html);
 						if (editor) {
 							const extensions = editor.extensionManager.extensions;
 							try {
-								const jsonDoc = generateJSON(safeHtml, extensions as any);
+								const jsonDoc = (generateJSON as any)(safeHtml, extensions);
 								editor.commands.setContent(jsonDoc);
 							} catch {
 								editor.commands.setContent(safeHtml);
@@ -332,13 +353,107 @@ export const EditorProvider = ({ children, roomId }: EditorProviderProps) => {
 						});
 					}
 				} else if (typeof rawContent === "string" && editor) {
+					htmlStringToProcess = htmlStringToProcess || rawContent;
+					const safeHtml = sanitizeEmailHtml(rawContent);
 					const extensions = editor.extensionManager.extensions;
 					try {
-						const jsonDoc = generateJSON(rawContent, extensions as any);
+						const jsonDoc = (generateJSON as any)(safeHtml, extensions);
 						editor.commands.setContent(jsonDoc);
 					} catch {
-						editor.commands.setContent(rawContent);
+						editor.commands.setContent(safeHtml);
 					}
+				}
+			}
+
+			if (htmlStringToProcess && editor) {
+				try {
+					setCodeHtml(htmlStringToProcess);
+					const parsed = parseGlobalStylesFromHtml(htmlStringToProcess);
+					if (parsed.css) {
+						applyImportedEmailCss(parsed.css);
+						setImportedEmailCss(parsed.css);
+					}
+					const existingAfterSeed = getGlobalStylesArray(editor);
+					const parsedBodyAndContainer =
+						extractThemingStylesFromHtml(htmlStringToProcess);
+					let mergedStyles = mergeParsedStyles(
+						existingAfterSeed,
+						parsedBodyAndContainer,
+					);
+
+					if (parsed.bodyBg) {
+						mergedStyles = updateGlobalStyleValue(
+							mergedStyles,
+							"body",
+							"backgroundColor",
+							parsed.bodyBg,
+						);
+						mergedStyles = updateGlobalStyleValue(
+							mergedStyles,
+							"container",
+							"backgroundColor",
+							parsed.bodyBg,
+						);
+					}
+
+					const containerBg =
+						parsed.bodyBg ||
+						findStyleInputValue(
+							mergedStyles,
+							"container",
+							"backgroundColor",
+						);
+					const extractedColor = findStyleInputValue(
+						mergedStyles,
+						"container",
+						"color",
+					);
+					const textColor = readableTextColor(
+						typeof containerBg === "string" ? containerBg : undefined,
+						typeof extractedColor === "string"
+							? extractedColor
+							: undefined,
+					);
+					if (textColor) {
+						mergedStyles = updateGlobalStyleValue(
+							mergedStyles,
+							"container",
+							"color",
+							textColor,
+						);
+						mergedStyles = updateGlobalStyleValue(
+							mergedStyles,
+							"body",
+							"color",
+							textColor,
+						);
+					}
+
+					mergedStyles = updateGlobalStyleValue(
+						mergedStyles,
+						"container",
+						"height",
+						undefined,
+					);
+					mergedStyles = updateGlobalStyleValue(
+						mergedStyles,
+						"container",
+						"align",
+						"center",
+					);
+					mergedStyles = updateGlobalStyleValue(
+						mergedStyles,
+						"container",
+						"borderWidth",
+						0,
+					);
+
+					editor.commands.setGlobalContent("styles", mergedStyles);
+				} catch (err) {
+					console.error(
+						"Failed to extract and apply global styles on template init:",
+						err,
+					);
 				}
 			}
 
@@ -364,6 +479,8 @@ export const EditorProvider = ({ children, roomId }: EditorProviderProps) => {
 			editor,
 			ydoc,
 			isSynced,
+			setCodeHtml,
+			setImportedEmailCss,
 			setSubject,
 			setFromEmail,
 			setReplyTo,
