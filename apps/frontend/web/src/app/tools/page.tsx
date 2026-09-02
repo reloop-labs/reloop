@@ -168,6 +168,18 @@ const TOOL_VISUAL_MAP: Record<string, ToolVisualMeta> = {
 			"DMARC enforcement status",
 		],
 	},
+	"bimi-checker": {
+		icon: "globe",
+		badge: "DNS & Auth",
+		badgeColor:
+			"bg-teal-500/10 text-teal-700 dark:text-teal-400 border-teal-500/20",
+		glowColor: "group-hover:border-teal-500/40",
+		features: [
+			"default._bimi TXT lookup",
+			"HTTPS SVG Tiny PS check",
+			"DMARC enforcement required",
+		],
+	},
 };
 
 export default function ToolsIndexPage() {

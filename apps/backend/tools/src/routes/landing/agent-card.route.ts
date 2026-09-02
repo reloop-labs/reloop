@@ -70,5 +70,33 @@ export const agentCardRoute = new Elysia().get("/agent-card.json", () => ({
 				},
 			],
 		},
+		{
+			id: "bimi_check",
+			name: "BIMI Check",
+			description:
+				"Look up default._bimi for a domain, validate the BIMI record and logo URL, and confirm DMARC is at enforcement.",
+			method: "POST",
+			path: "/api/tools/v1/bimi-check",
+			tags: ["tools"],
+			inputSchema: {
+				domain: {
+					type: "string",
+					required: true,
+					description: "Domain name, e.g. example.com",
+				},
+			},
+			outputSchema: {
+				verdict: { type: "string", description: "pass | warn | fail" },
+				bimiRecord: { type: "string", nullable: true },
+				dmarcEnforced: { type: "boolean" },
+			},
+			errorCodes: [400, 429],
+			examples: [
+				{
+					input: { domain: "example.com" },
+					output: { verdict: "fail", dmarcEnforced: false },
+				},
+			],
+		},
 	],
 }));

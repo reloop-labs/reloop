@@ -35,7 +35,8 @@ export type ToolDefinition = LandingPageDefinition & {
 		| "temp-email-checker"
 		| "email-validator"
 		| "deliverability-tester"
-		| "auth-checker";
+		| "auth-checker"
+		| "bimi-checker";
 };
 
 export type AlternativeDefinition = LandingPageDefinition & {

@@ -980,6 +980,59 @@ export namespace ToolsModel {
 		nextStep: lookalikeNextStep,
 	});
 
+	const checkStatus = t.Union([
+		t.Literal("pass"),
+		t.Literal("warn"),
+		t.Literal("fail"),
+	]);
+
+	export const bimiCheckBody = t.Object({
+		domain: t.String({
+			minLength: 1,
+			maxLength: 255,
+			description: "Domain to look up default._bimi and _dmarc for.",
+			examples: ["paypal.com", "example.com"],
+		}),
+	});
+
+	export const bimiCheckQuery = bimiCheckBody;
+
+	export const bimiCheckResponse = t.Object({
+		domain: t.String(),
+		queryName: t.String(),
+		verdict: checkStatus,
+		bimiRecord: t.Union([t.String(), t.Null()]),
+		logoUrl: t.Union([t.String(), t.Null()]),
+		authorityUrl: t.Union([t.String(), t.Null()]),
+		dmarcRecord: t.Union([t.String(), t.Null()]),
+		dmarcPolicy: t.Union([t.String(), t.Null()]),
+		dmarcPct: t.Union([t.Number(), t.Null()]),
+		dmarcEnforced: t.Boolean(),
+		logo: t.Object({
+			fetched: t.Boolean(),
+			contentType: t.Union([t.String(), t.Null()]),
+			tinyPsOk: t.Union([t.Boolean(), t.Null()]),
+			issues: t.Array(
+				t.Object({
+					status: checkStatus,
+					detail: t.String(),
+					fix: t.Optional(t.String()),
+				}),
+			),
+		}),
+		checks: t.Array(
+			t.Object({
+				id: t.String(),
+				label: t.String(),
+				status: checkStatus,
+				detail: t.String(),
+				record: t.Optional(t.String()),
+				fix: t.Optional(t.String()),
+			}),
+		),
+		recommendations: t.Array(t.String()),
+	});
+
 	export const errorResponse = t.Object({
 		message: t.String(),
 		why: t.Optional(t.String()),
@@ -1011,5 +1064,5 @@ export namespace ToolsModel {
 	export type DomainAgeResponse = typeof domainAgeResponse.static;
 	export type LookalikeWatchBody = typeof lookalikeWatchBody.static;
 	export type LookalikeWatchResponse = typeof lookalikeWatchResponse.static;
+	export type BimiCheckResponse = typeof bimiCheckResponse.static;
 }
-

@@ -1,4 +1,5 @@
 import { config as auth_checker } from "./auth-checker";
+import { config as bimi_checker } from "./bimi-checker";
 import { config as blocklist_checker } from "./blocklist-checker";
 import { config as deliverability_tester } from "./deliverability-tester";
 import { config as dns_lookup } from "./dns-lookup";
@@ -22,9 +23,5 @@ export const toolConfigs = [
 	email_validator,
 	deliverability_tester,
 	auth_checker,
+	bimi_checker,
 ];
-
-
-
-
-

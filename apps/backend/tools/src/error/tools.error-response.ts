@@ -30,4 +30,18 @@ export const ToolsErrors = {
 			why: "The value was not an IPv4 address, IPv6 address, or a domain with a dot.",
 			fix: "Enter a host like example.com, an IPv4 address, or an IPv6 address.",
 		}),
+	bimiEmptyInput: () =>
+		createError({
+			status: 400,
+			message: "No domain provided",
+			why: "The request did not include a domain to look up BIMI for.",
+			fix: 'Send {"domain": "example.com"} as JSON, or GET /api/tools/v1/bimi-check?domain=example.com',
+		}),
+	bimiInvalidDomain: () =>
+		createError({
+			status: 400,
+			message: "Invalid domain",
+			why: "The value was not a domain name with a dot.",
+			fix: "Enter a host like example.com — not an IP address or a URL path.",
+		}),
 };

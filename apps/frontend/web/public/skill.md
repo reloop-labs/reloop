@@ -94,6 +94,7 @@ Web-based utilities for developers and email senders:
 - **Temp / Disposable Email Checker**: https://reloop.sh/tools/temp-email-checker
 - **Email Address Validator**: https://reloop.sh/tools/email-validator
 - **DNS Auth & SPF/DKIM/DMARC Checker**: https://reloop.sh/tools/auth-checker
+- **BIMI Checker**: https://reloop.sh/tools/bimi-checker
 - **Deliverability & Spam Tester**: https://reloop.sh/tools/deliverability-tester
 
 See the API reference and learn sections in llms-docs.txt.
