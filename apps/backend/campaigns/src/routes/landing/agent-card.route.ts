@@ -51,4 +51,16 @@ export const agentCardRoute = new Elysia().get("/agent-card.json", () => ({
 			examples: [],
 		},
 	],
+	usage_guidelines:
+		"1. Create campaigns in draft or scheduled state.\n2. Ensure recipient segment or filter criteria is valid before scheduling.\n3. Cancel or pause campaigns prior to delivery queue processing.",
+	authentication: {
+		schemes: ["bearer", "cookie"],
+		headerName: "Authorization",
+		notes: "Bearer token or session cookie required.",
+	},
+	provider: {
+		organization: "Reloop labs",
+		contact: "https://reloop.sh/support",
+	},
 }));
+
