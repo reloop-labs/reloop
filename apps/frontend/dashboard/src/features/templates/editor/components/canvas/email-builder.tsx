@@ -37,7 +37,7 @@ export function FullEmailBuilder() {
 			</DragHandle>
 			<EditorContent
 				editor={editor}
-				className="min-h-full w-full [&>.ProseMirror]:min-h-full [&>.ProseMirror]:w-full"
+				className="mx-auto min-h-full w-full max-w-150 [&>.ProseMirror]:min-h-full [&>.ProseMirror]:w-full"
 			/>
 		</div>
 	);
