@@ -315,18 +315,10 @@ function formatRelativeTime(dateStr: string) {
 	const days = Math.floor(hours / 24);
 
 	if (seconds < 60) return "just now";
-	if (minutes < 60) {
-		return minutes === 1 ? "1 minute ago" : `${minutes} minutes ago`;
-	}
-	if (hours < 24) {
-		return hours === 1 ? "1 hour ago" : `${hours} hours ago`;
-	}
-	if (days === 1) {
-		return "Yesterday";
-	}
-	if (days < 7) {
-		return `${days} days ago`;
-	}
+	if (minutes < 60) return `${minutes}m ago`;
+	if (hours < 24) return `${hours}h ago`;
+	if (days === 1) return "1d ago";
+	if (days < 7) return `${days}d ago`;
 
 	const day = date.getDate();
 	const month = date.toLocaleDateString("en-US", { month: "short" });
@@ -589,7 +581,7 @@ export function VersionSidebar() {
 						</p>
 					</div>
 				) : (
-					<div className="relative flex flex-col px-2.5 pb-6">
+					<div className="relative flex flex-col px-1 pb-6">
 						{currentList.map((version, index) => {
 							const isDeleting = deletingId === version.id;
 
@@ -647,8 +639,17 @@ export function VersionSidebar() {
 									</div>
 
 									{/* Content Column */}
-									<div className="flex min-w-0 flex-1 flex-col justify-start pt-4 pr-[92px] pb-4 pl-4">
-										<h4 className="break-words font-medium text-label-sm text-text-strong-950 leading-snug">
+									<div className="flex min-w-0 flex-1 flex-col justify-start pt-3.5 pr-2 pb-3.5 pl-3">
+										<h4
+											title={
+												version.description ||
+												version.name ||
+												(version.isMajor
+													? "Published version"
+													: "Draft version")
+											}
+											className="truncate pr-16 font-medium text-label-sm text-text-strong-950 leading-snug transition-all group-hover:pr-20"
+										>
 											{version.description ||
 												version.name ||
 												(version.isMajor
@@ -686,8 +687,9 @@ export function VersionSidebar() {
 											</Avatar.Root>
 											<Tooltip.Root>
 												<Tooltip.Trigger asChild>
-													<span className="truncate">
+													<span className="max-w-[130px] truncate font-medium text-text-sub-600 dark:text-text-sub-400">
 														{version.createdBy?.name ||
+															version.createdBy?.email?.split("@")[0] ||
 															version.createdBy?.email ||
 															"Developer"}
 													</span>
@@ -732,15 +734,20 @@ export function VersionSidebar() {
 															</Avatar.Image>
 														</Avatar.Root>
 														<div className="flex min-w-0 flex-col gap-0.5">
-															<span className="break-all font-medium leading-tight">
+															{version.createdBy?.name && (
+																<span className="font-semibold text-text-strong-950 text-xs">
+																	{version.createdBy.name}
+																</span>
+															)}
+															<span className="break-all text-text-sub-600 text-xs leading-tight">
 																{version.createdBy.email}
 															</span>
 														</div>
 													</Tooltip.Content>
 												)}
 											</Tooltip.Root>
-											<span className="shrink-0">•</span>
-											<span className="shrink-0">
+											<span className="shrink-0 text-text-soft-400/60">•</span>
+											<span className="shrink-0 text-text-soft-400">
 												{formatRelativeTime(version.createdAt)}
 											</span>
 										</div>
