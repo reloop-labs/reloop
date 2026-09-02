@@ -1,11 +1,11 @@
 import { Icon } from "@reloop/ui/icon";
 import { JsonLd } from "@reloop/web/components/json-ld";
 import { BlogCta } from "@reloop/web/components/landing/blog/blog-cta";
-import { CompactApi } from "@reloop/web/components/landing/tools/compact-api";
 import { createPageMetadata } from "@reloop/web/lib/metadata";
 import { getSiteUrl } from "@reloop/web/lib/site";
 import { FaqGrid } from "../blocklist-checker/faq-grid";
 import { Band, SectionIntro } from "../blocklist-checker/grid";
+import { ApiSection } from "./api-section";
 import { CheckerPanel } from "./checker-panel";
 import {
 	faqGroups,
@@ -54,6 +54,7 @@ export default function BimiCheckerPage() {
 							"Validate v=BIMI1, l=, and a=",
 							"Confirm DMARC p=quarantine or p=reject with pct=100",
 							"Fetch HTTPS SVG Tiny PS heuristics",
+							"Public JSON API, rate limited per IP",
 						],
 						publisher: {
 							"@type": "Organization",
@@ -144,13 +145,10 @@ export default function BimiCheckerPage() {
 
 			<Band id="api">
 				<SectionIntro
-					lead="Check BIMI from curl."
-					description="POST a domain to the public tools endpoint. Same lookup as this page."
+					lead="Check BIMI programmatically."
+					description="Call the same lookup from Node, Python, Go, and the other SDKs — or POST a domain to the public tools endpoint."
 				/>
-				<CompactApi
-					path="/api/tools/v1/bimi-check"
-					body='{"domain":"paypal.com"}'
-				/>
+				<ApiSection />
 			</Band>
 
 			<Band id="faq">

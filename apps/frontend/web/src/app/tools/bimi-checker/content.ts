@@ -67,8 +67,62 @@ export const faqs: FaqItem[] = [
 	{
 		question: "Is there an API?",
 		answer:
-			'Yes. POST https://reloop.sh/api/tools/v1/bimi-check with JSON {"domain":"example.com"}. No API key. Rate limited to 60 requests per minute per IP.',
+			'Yes. POST https://reloop.sh/api/tools/v1/bimi-check with JSON {"domain":"example.com"}, or call reloop.tools.bimiCheck({ domain }) from the SDKs. No API key. Rate limited to 60 requests per minute per IP.',
 	},
 ];
 
 export const faqGroups = [{ title: "BIMI", items: faqs }];
+
+export const apiResponseSample = `{
+  "domain": "paypal.com",
+  "queryName": "default._bimi.paypal.com",
+  "verdict": "pass",
+  "bimiRecord": "v=BIMI1; l=https://www.paypalobjects.com/marketing/ua/logos/paypal-bimi.svg; a=https://www.paypalobjects.com/marketing/ua/certs/paypal-vmc.pem",
+  "logoUrl": "https://www.paypalobjects.com/marketing/ua/logos/paypal-bimi.svg",
+  "authorityUrl": "https://www.paypalobjects.com/marketing/ua/certs/paypal-vmc.pem",
+  "dmarcRecord": "v=DMARC1; p=reject; pct=100; rua=mailto:d@rua.agari.com",
+  "dmarcPolicy": "reject",
+  "dmarcPct": 100,
+  "dmarcEnforced": true,
+  "logo": {
+    "fetched": true,
+    "contentType": "image/svg+xml",
+    "tinyPsOk": true,
+    "issues": []
+  },
+  "checks": [
+    {
+      "id": "bimi-present",
+      "label": "BIMI TXT",
+      "status": "pass",
+      "detail": "Found BIMI record at default._bimi.paypal.com.",
+      "record": "v=BIMI1; l=https://www.paypalobjects.com/marketing/ua/logos/paypal-bimi.svg; a=https://www.paypalobjects.com/marketing/ua/certs/paypal-vmc.pem"
+    },
+    {
+      "id": "bimi-version",
+      "label": "v=BIMI1",
+      "status": "pass",
+      "detail": "Version tag is BIMI1."
+    },
+    {
+      "id": "bimi-logo",
+      "label": "Logo URL (l=)",
+      "status": "pass",
+      "detail": "logo URL is HTTPS. https://www.paypalobjects.com/marketing/ua/logos/paypal-bimi.svg"
+    },
+    {
+      "id": "bimi-authority",
+      "label": "VMC / CMC (a=)",
+      "status": "pass",
+      "detail": "authority certificate URL is HTTPS. https://www.paypalobjects.com/marketing/ua/certs/paypal-vmc.pem"
+    },
+    {
+      "id": "dmarc",
+      "label": "DMARC enforcement",
+      "status": "pass",
+      "detail": "DMARC is at enforcement (p=reject, pct=100).",
+      "record": "v=DMARC1; p=reject; pct=100; rua=mailto:d@rua.agari.com"
+    }
+  ],
+  "recommendations": []
+}`;
