@@ -60,6 +60,7 @@ const columns: FooterColumn[] = [
 				href: "/tools/deliverability-tester",
 			},
 			{ title: "Auth Checker", href: "/tools/auth-checker" },
+			{ title: "BIMI Checker", href: "/tools/bimi-checker" },
 		],
 	},
 	{

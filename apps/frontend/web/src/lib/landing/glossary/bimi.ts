@@ -25,5 +25,5 @@ If you want the logo, get DMARC to enforcement first, then add BIMI. Skipping th
 			title: "Authentication",
 		},
 	],
-	relatedFeatureHref: "/tools/auth-checker",
+	relatedFeatureHref: "/tools/bimi-checker",
 };

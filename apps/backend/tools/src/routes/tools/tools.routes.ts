@@ -1,4 +1,5 @@
 import { authCheckerRoute } from "@be/tools/routes/tools/auth-checker/auth-checker.route";
+import { bimiCheckRoute } from "@be/tools/routes/tools/bimi-check/bimi-check.route";
 import { blocklistCheckRoute } from "@be/tools/routes/tools/blocklist-check/blocklist-check.route";
 import { deliverabilityTestRoute } from "@be/tools/routes/tools/deliverability-test/deliverability-test.route";
 import { dnsLookupRoute } from "@be/tools/routes/tools/dns-lookup/dns-lookup.route";
@@ -25,8 +26,5 @@ export const toolsRoutes = new Elysia({
 	.use(spoofCheckerRoute)
 	.use(whoSendsRoute)
 	.use(domainAgeRoute)
-	.use(lookalikeWatchRoute);
-
-
-
-
+	.use(lookalikeWatchRoute)
+	.use(bimiCheckRoute);
