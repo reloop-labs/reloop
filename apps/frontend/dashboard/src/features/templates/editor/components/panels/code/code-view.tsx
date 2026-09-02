@@ -11,22 +11,30 @@ import CodeMirror from "@uiw/react-codemirror";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useEditorStore } from "#/features/templates/editor/hooks/use-editor-store";
+import { applyImportedEmailCss } from "#/features/templates/editor/utils/apply-imported-email-css";
+import { prettyPrintHtml } from "#/features/templates/editor/utils/pretty-print-html";
+import {
+	readableTextColor,
+	rewriteLowContrastInlineText,
+} from "#/features/templates/editor/utils/readable-text-color";
 
 export function CodeEditor({ onClose }: { onClose?: () => void } = {}) {
 	const { editor } = useCurrentEditor();
-	const [htmlCode, setHtmlCode] = useState<string>("");
+	const htmlCode = useEditorStore((s) => s.codeHtml);
+	const setHtmlCode = useEditorStore((s) => s.setCodeHtml);
+	const setHtmlLocked = useEditorStore((s) => s.setHtmlLocked);
 	const [isLoading, setIsLoading] = useState(false);
 	const [copied, setCopied] = useState(false);
-	const [isFocused, setIsFocused] = useState(false);
 	const isSelfUpdatingRef = useRef(false);
+	const skipNextCodeChangeRef = useRef(false);
 
-	// Fetch compiled email HTML
 	const updateHtmlCode = useCallback(async () => {
 		if (!editor || isSelfUpdatingRef.current) return;
+		if (useEditorStore.getState().htmlLocked) return;
 		setIsLoading(true);
 		try {
 			const result = await composeReactEmail({ editor });
-			if (!isSelfUpdatingRef.current) {
+			if (!isSelfUpdatingRef.current && !useEditorStore.getState().htmlLocked) {
 				setHtmlCode(result.html);
 			}
 		} catch (err) {
@@ -35,29 +43,14 @@ export function CodeEditor({ onClose }: { onClose?: () => void } = {}) {
 		} finally {
 			setIsLoading(false);
 		}
-	}, [editor]);
+	}, [editor, setHtmlCode]);
 
-	// 1. Initialize HTML code from editor
-	useEffect(() => {
-		if (editor && !htmlCode) {
-			updateHtmlCode();
-		}
-	}, [editor, htmlCode, updateHtmlCode]);
-
-	// 2. Sync editor updates (Visual -> Code)
 	useEffect(() => {
 		if (!editor) return;
-
-		const handleUpdate = () => {
-			if (isSelfUpdatingRef.current || isFocused) return;
-			updateHtmlCode();
-		};
-
-		editor.on("update", handleUpdate);
-		return () => {
-			editor.off("update", handleUpdate);
-		};
-	}, [editor, isFocused, updateHtmlCode]);
+		if (useEditorStore.getState().htmlLocked) return;
+		if (useEditorStore.getState().codeHtml) return;
+		void updateHtmlCode();
+	}, [editor, updateHtmlCode]);
 
 	// 3. Sync code changes (Code -> Visual)
 	//
@@ -73,6 +66,12 @@ export function CodeEditor({ onClose }: { onClose?: () => void } = {}) {
 	//   - body                                    →  body node
 	const handleCodeChange = useCallback(
 		(newVal: string) => {
+			if (skipNextCodeChangeRef.current) {
+				skipNextCodeChangeRef.current = false;
+				setHtmlCode(newVal);
+				return;
+			}
+			setHtmlLocked(true);
 			setHtmlCode(newVal);
 			if (editor) {
 				isSelfUpdatingRef.current = true;
@@ -83,9 +82,6 @@ export function CodeEditor({ onClose }: { onClose?: () => void } = {}) {
 						lowerVal.includes("<table") ||
 						lowerVal.includes("<html") ||
 						lowerVal.includes("<!doctype");
-
-					// Capture the existing styles before content replacement
-					const existingStyles = getGlobalStylesArray(editor);
 
 					if (isFullHtml) {
 						const safeHtml = sanitizeEmailHtml(newVal);
@@ -102,23 +98,20 @@ export function CodeEditor({ onClose }: { onClose?: () => void } = {}) {
 							isSelfUpdatingRef.current = true;
 							try {
 								const parsed = parseGlobalStylesFromHtml(newVal);
+								const existingAfterSeed = getGlobalStylesArray(editor);
 
-								// Update global CSS on the editor if found
 								if (parsed.css) {
-									editor.commands.setGlobalContent("css", parsed.css);
+									applyImportedEmailCss(parsed.css);
 								}
 
-								// Parse body and container theme styles from the HTML
 								const parsedBodyAndContainer =
 									extractThemingStylesFromHtml(newVal);
 
-								// Merge with existing styles to retain inputs configuration, falling back to parsed
 								let mergedStyles = mergeParsedStyles(
-									existingStyles,
+									existingAfterSeed,
 									parsedBodyAndContainer,
 								);
 
-								// Update body/container backgroundColor and width in the editor theme styles
 								if (parsed.bodyBg) {
 									mergedStyles = updateGlobalStyleValue(
 										mergedStyles,
@@ -133,7 +126,46 @@ export function CodeEditor({ onClose }: { onClose?: () => void } = {}) {
 										parsed.bodyBg,
 									);
 								}
-								// Remove redundant containerWidth override here since extractThemingStylesFromHtml resolves it correctly
+
+								const containerBg =
+									parsed.bodyBg ||
+									findStyleInputValue(
+										mergedStyles,
+										"container",
+										"backgroundColor",
+									);
+								const extractedColor = findStyleInputValue(
+									mergedStyles,
+									"container",
+									"color",
+								);
+								const textColor = readableTextColor(
+									typeof containerBg === "string" ? containerBg : undefined,
+									typeof extractedColor === "string"
+										? extractedColor
+										: undefined,
+								);
+								if (textColor) {
+									mergedStyles = updateGlobalStyleValue(
+										mergedStyles,
+										"container",
+										"color",
+										textColor,
+									);
+									mergedStyles = updateGlobalStyleValue(
+										mergedStyles,
+										"body",
+										"color",
+										textColor,
+									);
+								}
+
+								mergedStyles = updateGlobalStyleValue(
+									mergedStyles,
+									"container",
+									"height",
+									undefined,
+								);
 
 								editor.commands.setGlobalContent("styles", mergedStyles);
 							} catch (err) {
@@ -149,14 +181,15 @@ export function CodeEditor({ onClose }: { onClose?: () => void } = {}) {
 				isSelfUpdatingRef.current = false;
 			}
 		},
-		[editor],
+		[editor, setHtmlCode, setHtmlLocked],
 	);
 
-	// Format HTML (regenerate clean compiled HTML from visual editor state)
 	const handleFormat = useCallback(() => {
-		updateHtmlCode();
+		skipNextCodeChangeRef.current = true;
+		setHtmlLocked(true);
+		setHtmlCode(prettyPrintHtml(htmlCode));
 		toast.success("HTML formatted");
-	}, [updateHtmlCode]);
+	}, [htmlCode, setHtmlCode, setHtmlLocked]);
 
 	// Copy to clipboard
 	const handleCopy = useCallback(() => {
@@ -225,11 +258,6 @@ export function CodeEditor({ onClose }: { onClose?: () => void } = {}) {
 					theme={xcodeDark}
 					extensions={[html(), EditorView.lineWrapping]}
 					onChange={handleCodeChange}
-					onFocus={() => setIsFocused(true)}
-					onBlur={() => {
-						setIsFocused(false);
-						updateHtmlCode();
-					}}
 					style={{
 						fontSize: "12px",
 						height: "100%",
@@ -482,6 +510,24 @@ function sanitizeEmailHtml(rawHtml: string): string {
 	// CSSOM expands shorthands automatically when we set cssText, so we use
 	// that to produce explicit longhands on every element.
 	expandShorthandStyles(doc.body);
+
+	let canvasBg =
+		doc.body.style.backgroundColor || doc.body.getAttribute("bgcolor") || "";
+	if (!canvasBg) {
+		for (const table of Array.from(doc.querySelectorAll("table"))) {
+			const bg =
+				(table as HTMLElement).style.backgroundColor ||
+				table.getAttribute("bgcolor") ||
+				"";
+			if (bg) {
+				canvasBg = bg;
+				break;
+			}
+		}
+	}
+	if (canvasBg) {
+		rewriteLowContrastInlineText(doc.body, canvasBg);
+	}
 
 	return doc.body.innerHTML;
 }
@@ -912,7 +958,7 @@ function extractThemingStylesFromHtml(rawHtml: string): any[] {
 	}
 
 	let containerBg = "#ffffff";
-	let containerTextColor = "#000000";
+	let containerTextColor: string | undefined;
 	let containerWidth = 600;
 	let containerPaddingTop = 0;
 	let containerPaddingRight = 0;
@@ -1077,6 +1123,11 @@ function extractThemingStylesFromHtml(rawHtml: string): any[] {
 		}
 	}
 
+	const resolvedTextColor = readableTextColor(
+		containerBg && containerBg !== "#ffffff" ? containerBg : bodyBgColor,
+		containerTextColor,
+	);
+
 	return [
 		{
 			id: "body",
@@ -1159,7 +1210,7 @@ function extractThemingStylesFromHtml(rawHtml: string): any[] {
 				{
 					label: "Text",
 					type: "color",
-					value: containerTextColor,
+					value: resolvedTextColor,
 					prop: "color",
 					classReference: "container",
 				},
@@ -1628,6 +1679,11 @@ function getGlobalStylesArray(editor: any): any[] {
 		}
 	});
 	return globalContentNode?.attrs?.data?.styles || [];
+}
+
+function findStyleInputValue(styles: any[], componentId: string, prop: string) {
+	const group = styles?.find((g) => g.id === componentId);
+	return group?.inputs?.find((input: any) => input.prop === prop)?.value;
 }
 
 // Helper to update a specific property in the styles array

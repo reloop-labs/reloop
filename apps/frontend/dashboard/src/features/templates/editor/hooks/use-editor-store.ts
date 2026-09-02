@@ -32,6 +32,12 @@ interface EditorState {
 	// Global Variable creation state
 	isCreatingVar: boolean;
 	setIsCreatingVar: (open: boolean) => void;
+
+	// HTML currently shown in the code editor / HTML preview iframe
+	codeHtml: string;
+	setCodeHtml: (html: string) => void;
+	htmlLocked: boolean;
+	setHtmlLocked: (locked: boolean) => void;
 }
 
 export const useEditorStore = create<EditorState>((set) => ({
@@ -82,4 +88,11 @@ export const useEditorStore = create<EditorState>((set) => ({
 	// Global Variable creation
 	isCreatingVar: false,
 	setIsCreatingVar: (isCreatingVar) => set({ isCreatingVar }),
+
+	codeHtml: "",
+	setCodeHtml: (codeHtml) =>
+		set((s) => (s.codeHtml === codeHtml ? s : { codeHtml })),
+	htmlLocked: false,
+	setHtmlLocked: (htmlLocked) =>
+		set((s) => (s.htmlLocked === htmlLocked ? s : { htmlLocked })),
 }));

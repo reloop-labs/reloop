@@ -23,7 +23,10 @@ import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { useEditorStore } from "#/features/templates/editor/hooks/use-editor-store";
 import { useSWR } from "#/features/templates/editor/hooks/use-swr-compat";
 import { useTemplateId } from "#/features/templates/editor/hooks/use-template-id";
-import { getRenderedEmailHtml } from "#/features/templates/editor/utils/get-rendered-email-html";
+import {
+	getLockedSourceHtml,
+	getRenderedEmailHtml,
+} from "#/features/templates/editor/utils/get-rendered-email-html";
 import { mapTemplateVariables } from "#/features/templates/lib/template-variables";
 
 const actionKbdOnBlueClassName =
@@ -248,7 +251,8 @@ export function TestEmailModal({
 
 		try {
 			const html = editor
-				? await getRenderedEmailHtml(editor, previewText)
+				? (getLockedSourceHtml() ??
+					(await getRenderedEmailHtml(editor, previewText)))
 				: undefined;
 
 			for (const addr of emailList) {

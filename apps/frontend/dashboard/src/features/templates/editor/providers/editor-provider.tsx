@@ -7,6 +7,7 @@ import { useActiveOrganization } from "#/features/dashboard/page-header/use-acti
 import { useEditorHook } from "#/features/templates/editor/hooks/use-editor-hooks";
 import { useEditorStore } from "#/features/templates/editor/hooks/use-editor-store";
 import { useSWR } from "#/features/templates/editor/hooks/use-swr-compat";
+import { clearImportedEmailCss } from "#/features/templates/editor/utils/apply-imported-email-css";
 import { mapTemplateVariables } from "#/features/templates/lib/template-variables";
 import {
 	getRandomColor,
@@ -111,10 +112,18 @@ export const EditorProvider = ({ children, roomId }: EditorProviderProps) => {
 	const setFromEmail = useEditorStore((s) => s.setFromEmail);
 	const setReplyTo = useEditorStore((s) => s.setReplyTo);
 	const setPreviewText = useEditorStore((s) => s.setPreviewText);
+	const setCodeHtml = useEditorStore((s) => s.setCodeHtml);
+	const setHtmlLocked = useEditorStore((s) => s.setHtmlLocked);
 
 	const isCreatingVar = useEditorStore((s) => s.isCreatingVar);
 	const setIsCreatingVar = useEditorStore((s) => s.setIsCreatingVar);
 	const [isSavingConfig, setIsSavingConfig] = useState(false);
+
+	useEffect(() => {
+		setCodeHtml("");
+		setHtmlLocked(false);
+		clearImportedEmailCss();
+	}, [setCodeHtml, setHtmlLocked]);
 
 	const handleCreateAndInsertVar = async (
 		name: string,

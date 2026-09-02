@@ -8,7 +8,10 @@ import { useAutoSaveDraft } from "#/features/templates/editor/hooks/use-auto-sav
 import { useEditorStore } from "#/features/templates/editor/hooks/use-editor-store";
 import { useSWR } from "#/features/templates/editor/hooks/use-swr-compat";
 import { useTemplateId } from "#/features/templates/editor/hooks/use-template-id";
-import { getRenderedEmailHtml } from "#/features/templates/editor/utils/get-rendered-email-html";
+import {
+	getLockedSourceHtml,
+	getRenderedEmailHtml,
+} from "#/features/templates/editor/utils/get-rendered-email-html";
 import { CollabPresence } from "../../collobration/Collabpresence";
 import type { ConnectionStatus as ConnectionStatusType } from "../../collobration/hooks/useCollaboration";
 import { TestEmailModal } from "../panels/test/test-email-modal";
@@ -63,7 +66,9 @@ export const HeaderActions = ({
 
 		try {
 			const content = editor.getJSON().content ?? [];
-			const renderedHtml = await getRenderedEmailHtml(editor, previewText);
+			const renderedHtml =
+				getLockedSourceHtml() ??
+				(await getRenderedEmailHtml(editor, previewText));
 
 			// 1. Create the published version snapshot
 			const response = await fetch(`/api/template/v1/${templateId}/versions`, {
