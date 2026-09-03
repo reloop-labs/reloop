@@ -5,7 +5,7 @@ import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
-import { useCurrentEditor } from "@tiptap/react";
+import { useCurrentEditor, useEditorState } from "@tiptap/react";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -21,6 +21,11 @@ import {
 	normalizeTemplateVariableName,
 } from "#/features/templates/lib/template-variables";
 import { DeleteTemplateVariableModal } from "../components/panels/variables/delete-variable-modal";
+import {
+	getActiveLinkCss,
+	resolveInspectorTextStyle,
+	setInlineCssProp,
+} from "../utils/resolve-inspector-text-style";
 import Breadcrumb from "./breadcrumb";
 import { ColorPicker } from "./color-picker";
 import { ImageSrcControl } from "./image-src-control";
@@ -497,39 +502,96 @@ function TextSection({
 	setAlignment,
 	isLinkActive,
 	linkColor,
-	setLinkColor,
 }: TextSectionProps) {
+	const { editor } = useCurrentEditor();
+	const linkCss =
+		useEditorState({
+			editor,
+			selector: ({ editor: ed }) => getActiveLinkCss(ed),
+		}) ?? "";
+
+	const resolvedGetStyle = (name: InspectorStyleProperty) => {
+		if (
+			name === "color" ||
+			name === "fontSize" ||
+			name === "lineHeight" ||
+			name === "letterSpacing"
+		) {
+			return resolveInspectorTextStyle({
+				prop: name,
+				parentValue: getStyle(name),
+				linkCss: linkCss || undefined,
+			});
+		}
+		return getStyle(name);
+	};
+
+	const resolvedSetStyle = (
+		name: InspectorStyleProperty,
+		value: string | number,
+	) => {
+		if (
+			isLinkActive &&
+			editor &&
+			(name === "color" ||
+				name === "fontSize" ||
+				name === "lineHeight" ||
+				name === "letterSpacing")
+		) {
+			const next = setInlineCssProp(linkCss, name, value);
+			editor
+				.chain()
+				.focus()
+				.extendMarkRange("link")
+				.updateAttributes("link", { style: next })
+				.run();
+			return;
+		}
+		setStyle(name, value);
+	};
+
+	const resolvedLinkColor = linkCss
+		? String(
+				resolveInspectorTextStyle({
+					prop: "color",
+					parentValue: linkColor,
+					linkCss,
+				}) ?? linkColor,
+			)
+		: linkColor;
+
 	return (
 		<InspectorSection>
 			<SectionHeader label="Text" />
 
 			<ColorRow
 				label="Color"
-				value={String(getStyle("color") ?? "")}
-				onChange={(v) => setStyle("color", v)}
+				value={String(resolvedGetStyle("color") ?? "")}
+				onChange={(v) => resolvedSetStyle("color", v)}
 			/>
 			<ScrubRow
 				label="Font size"
-				value={getStyle("fontSize")}
-				onChange={(v) => setStyle("fontSize", v as number)}
+				value={resolvedGetStyle("fontSize")}
+				onChange={(v) => resolvedSetStyle("fontSize", v as number)}
 				min={8}
 				max={96}
 				suffix="px"
 			/>
 			<ScrubRow
 				label="Line height"
-				value={getStyle("lineHeight")}
-				onChange={(v) => setStyle("lineHeight", v as number)}
+				value={resolvedGetStyle("lineHeight")}
+				onChange={(v) => resolvedSetStyle("lineHeight", v as number)}
 				min={80}
 				max={300}
 				suffix="%"
 			/>
 			<ScrubRow
 				label="Tracking"
-				value={getStyle("letterSpacing")}
-				onChange={(v) => setStyle("letterSpacing", v as number)}
+				value={resolvedGetStyle("letterSpacing")}
+				onChange={(v) => resolvedSetStyle("letterSpacing", v as number)}
 				min={-20}
 				max={40}
+				step={0.025}
 				suffix="px"
 			/>
 
@@ -543,8 +605,8 @@ function TextSection({
 			{isLinkActive && (
 				<ColorRow
 					label="Link color"
-					value={linkColor}
-					onChange={setLinkColor}
+					value={resolvedLinkColor}
+					onChange={(v) => resolvedSetStyle("color", v)}
 				/>
 			)}
 		</InspectorSection>
@@ -847,7 +909,8 @@ export const EmailInspector = () => {
 								<div className="px-4 pt-1 pb-2">
 									<AlignControls
 										alignment={
-											(findStyleValue("container", "align") as string) || "left"
+											(findStyleValue("container", "align") as string) ||
+											"center"
 										}
 										setAlignment={(align) =>
 											setGlobalStyle("container", "align", align)

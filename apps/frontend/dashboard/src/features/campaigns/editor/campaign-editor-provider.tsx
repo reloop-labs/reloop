@@ -1,13 +1,17 @@
 "use client";
 
-import { BubbleMenu, SlashCommand } from "@react-email/editor/ui";
+import { BubbleMenu } from "@react-email/editor/ui";
 import { generateJSON } from "@tiptap/html";
 import { type Editor, EditorContext } from "@tiptap/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import * as Y from "yjs";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import { getRandomColor } from "#/features/templates/editor/collobration/hooks/useCollaboration";
-import { editorSlashCommands } from "#/features/templates/editor/lib/slash-commands";
+import { EmailSlashCommand } from "#/features/templates/editor/components/canvas/email-slash-command";
+import {
+	EMAIL_BUBBLE_HIDE_NODES,
+	emailTextBubbleTrigger,
+} from "#/features/templates/editor/utils/email-slash-command-plugin";
 import { getRenderedEmailHtml } from "#/features/templates/editor/utils/get-rendered-email-html";
 import { updateCampaignRequest } from "../campaigns-api";
 import { useCampaignQuery } from "../campaigns-provider";
@@ -213,13 +217,13 @@ export function CampaignEditorProvider({
 				<CampaignEditorHeader />
 				<div className="min-h-0 flex-1 overflow-hidden">{children}</div>
 				<BubbleMenu
-					hideWhenActiveNodes={["button", "image", "variable"]}
-					hideWhenActiveMarks={["link"]}
+					hideWhenActiveNodes={[...EMAIL_BUBBLE_HIDE_NODES]}
+					trigger={emailTextBubbleTrigger}
+					appendTo={() => document.body}
 				/>
-				<BubbleMenu.LinkDefault />
-				<BubbleMenu.ButtonDefault />
-				<BubbleMenu.ImageDefault />
-				<SlashCommand items={editorSlashCommands} />
+				<BubbleMenu.ButtonDefault appendTo={() => document.body} />
+				<BubbleMenu.ImageDefault appendTo={() => document.body} />
+				<EmailSlashCommand />
 			</div>
 		</EditorContext.Provider>
 	);

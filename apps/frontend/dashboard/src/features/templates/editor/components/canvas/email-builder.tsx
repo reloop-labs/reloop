@@ -1,11 +1,17 @@
+import { BubbleMenu } from "@react-email/editor/ui";
 import { Icon } from "@reloop/ui/icon";
 import { DragHandle } from "@tiptap/extension-drag-handle-react";
 import { EditorContent, useCurrentEditor } from "@tiptap/react";
 import { useEffect } from "react";
 import { useEditorStore } from "#/features/templates/editor/hooks/use-editor-store";
 import { applyImportedEmailCss } from "#/features/templates/editor/utils/apply-imported-email-css";
+import {
+	EMAIL_BUBBLE_HIDE_NODES,
+	emailTextBubbleTrigger,
+} from "#/features/templates/editor/utils/email-slash-command-plugin";
 
 import "@react-email/editor/themes/default.css";
+import "./email-canvas.css";
 
 const DRAG_NESTED_OPTIONS = {
 	edgeDetection: { threshold: -16, edges: ["left" as const] },
@@ -21,7 +27,7 @@ export function FullEmailBuilder() {
 	const importedEmailCss = useEditorStore((s) => s.importedEmailCss);
 
 	useEffect(() => {
-		if (importedEmailCss) applyImportedEmailCss(importedEmailCss);
+		applyImportedEmailCss(importedEmailCss);
 	}, [importedEmailCss]);
 
 	if (!editor) return null;
@@ -42,8 +48,15 @@ export function FullEmailBuilder() {
 			</DragHandle>
 			<EditorContent
 				editor={editor}
-				className="min-h-full w-full [&>.ProseMirror]:min-h-full [&>.ProseMirror]:w-full [&>.ProseMirror]:px-4 [&>.ProseMirror]:py-6"
+				className="min-h-full w-full [&>.ProseMirror]:min-h-full [&>.ProseMirror]:w-full"
 			/>
+			<BubbleMenu
+				hideWhenActiveNodes={[...EMAIL_BUBBLE_HIDE_NODES]}
+				trigger={emailTextBubbleTrigger}
+				appendTo={() => document.body}
+			/>
+			<BubbleMenu.ButtonDefault appendTo={() => document.body} />
+			<BubbleMenu.ImageDefault appendTo={() => document.body} />
 		</div>
 	);
 }

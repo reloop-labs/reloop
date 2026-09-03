@@ -22,6 +22,8 @@ export function applyImportedEmailCss(css: string): void {
 	min-height: 100% !important;
 	width: 100% !important;
 	outline: none !important;
+	padding-top: 0 !important;
+	padding-bottom: 0 !important;
 }
 .tiptap.ProseMirror .node-container,
 .ProseMirror .node-container,
@@ -33,6 +35,25 @@ div[data-type="container"] {
 	margin-left: auto !important;
 	margin-right: auto !important;
 	box-sizing: border-box !important;
+}
+.tiptap.ProseMirror .node-paragraph,
+.tiptap.ProseMirror .node-heading,
+.ProseMirror .node-paragraph,
+.ProseMirror .node-heading {
+	padding-top: 0 !important;
+	padding-bottom: 0 !important;
+}
+.tiptap.ProseMirror a:has(img),
+.ProseMirror a:has(img) {
+	text-decoration: none !important;
+}
+.tiptap.ProseMirror a[data-email-decoration="none"],
+.ProseMirror a[data-email-decoration="none"] {
+	text-decoration: none !important;
+}
+.tiptap.ProseMirror a[data-email-decoration="underline"],
+.ProseMirror a[data-email-decoration="underline"] {
+	text-decoration: underline !important;
 }`;
 }
 

@@ -1,7 +1,7 @@
 "use client";
 
-import { cn } from "@reloop/ui/cn";
 import * as ScrollAreaPrimitive from "@radix-ui/react-scroll-area";
+import { cn } from "@reloop/ui/cn";
 import { AnimatePresence, motion } from "motion/react";
 import { parseAsStringLiteral, useQueryState } from "nuqs";
 import { FullEmailBuilder } from "#/features/templates/editor/components/canvas/email-builder";
@@ -10,6 +10,7 @@ import { HtmlEmailPreview } from "#/features/templates/editor/components/canvas/
 import { CodeEditor } from "#/features/templates/editor/components/panels/code/code-view";
 import { useEditorStore } from "#/features/templates/editor/hooks/use-editor-store";
 import { EmailInspector } from "#/features/templates/editor/inspector";
+import { shouldShowSourceHtmlPreview } from "#/features/templates/editor/utils/should-show-source-html-preview";
 import { CampaignsProvider } from "../campaigns-provider";
 import { CampaignEditorProvider } from "./campaign-editor-provider";
 import { CampaignSendDetails } from "./components/campaign-send-details";
@@ -23,9 +24,11 @@ export function CampaignEditorPage({ campaignId }: { campaignId: string }) {
 	);
 
 	const isCodeSplit = viewMode === "code";
-	const htmlLocked = useEditorStore((s) => s.htmlLocked);
 	const codeHtml = useEditorStore((s) => s.codeHtml);
-	const showHtmlCanvas = Boolean((htmlLocked || isCodeSplit) && codeHtml.trim());
+	const showHtmlCanvas = shouldShowSourceHtmlPreview({
+		isCodeSplit,
+		codeHtml,
+	});
 
 	return (
 		<CampaignsProvider>
@@ -51,20 +54,20 @@ export function CampaignEditorPage({ campaignId }: { campaignId: string }) {
 								<GeneratingOverlay />
 								{showHtmlCanvas ? (
 									<div className="relative min-h-0 flex-1">
-										<HtmlEmailPreview editable={!isCodeSplit} />
+										<HtmlEmailPreview editable={false} />
 									</div>
 								) : (
 									<ScrollAreaPrimitive.Root
 										className="relative min-h-0 flex-1 overflow-hidden"
 										type="auto"
 									>
-										<ScrollAreaPrimitive.Viewport className="size-full [&>div]:!block [&>div]:!min-h-full [&>div]:!w-full">
+										<ScrollAreaPrimitive.Viewport className="[&>div]:!block [&>div]:!min-h-full [&>div]:!w-full size-full">
 											<FullEmailBuilder />
 										</ScrollAreaPrimitive.Viewport>
 										<ScrollAreaPrimitive.Scrollbar
 											orientation="vertical"
 											className={cn(
-												"absolute top-0 bottom-0 z-20 flex w-2.5 select-none touch-none p-0.5 transition-[right] duration-300",
+												"absolute top-0 bottom-0 z-20 flex w-2.5 touch-none select-none p-0.5 transition-[right] duration-300",
 												!isCodeSplit ? "right-72" : "right-0",
 											)}
 										>

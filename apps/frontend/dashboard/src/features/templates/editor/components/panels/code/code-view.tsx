@@ -12,11 +12,26 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useEditorStore } from "#/features/templates/editor/hooks/use-editor-store";
 import { applyImportedEmailCss } from "#/features/templates/editor/utils/apply-imported-email-css";
+import {
+	absolutizeEmailAssetUrls,
+	inlineEmailStylesheet,
+	scopeEmailCssForEditor,
+} from "#/features/templates/editor/utils/inline-email-stylesheet";
+import { preserveEmailLinkUnderlines } from "#/features/templates/editor/utils/preserve-email-link-underlines";
 import { prettyPrintHtml } from "#/features/templates/editor/utils/pretty-print-html";
+import {
+	flattenedIconRowMarginTop,
+	promoteCellTypographyToBlocks,
+	promoteTableSpacingToCells,
+} from "#/features/templates/editor/utils/promote-table-spacing";
 import {
 	readableTextColor,
 	rewriteLowContrastInlineText,
 } from "#/features/templates/editor/utils/readable-text-color";
+import {
+	findEmailContainerTable,
+	stripEmailCentering,
+} from "#/features/templates/editor/utils/strip-email-centering";
 
 export function CodeEditor({ onClose }: { onClose?: () => void } = {}) {
 	const { editor } = useCurrentEditor();
@@ -118,12 +133,6 @@ export function CodeEditor({ onClose }: { onClose?: () => void } = {}) {
 									mergedStyles = updateGlobalStyleValue(
 										mergedStyles,
 										"body",
-										"backgroundColor",
-										parsed.bodyBg,
-									);
-									mergedStyles = updateGlobalStyleValue(
-										mergedStyles,
-										"container",
 										"backgroundColor",
 										parsed.bodyBg,
 									);
@@ -318,6 +327,11 @@ function sanitizeEmailHtml(rawHtml: string): string {
 	const parser = new DOMParser();
 	const doc = parser.parseFromString(rawHtml, "text/html");
 
+	// Copy class-based padding/margin onto inline styles before we drop <style>
+	// and unwrap the container table. Otherwise TipTap keeps the class names
+	// but the heading sits flush to the canvas.
+	inlineEmailStylesheet(doc);
+
 	// 1. Extract and clean preview text
 	let previewText = "";
 	const divs = Array.from(doc.querySelectorAll("div"));
@@ -355,31 +369,10 @@ function sanitizeEmailHtml(rawHtml: string): string {
 		useEditorStore.getState().setSubject(previewText);
 	}
 
-	// 4. Find container table and convert to a container div, preserving styles and attributes.
-	let containerTable: Element | null = doc.querySelector(
-		'table[data-type="container"]',
-	);
-	if (!containerTable) {
-		// Look for any table that has container indicators (like max-width or class name)
-		const tables = Array.from(doc.body.getElementsByTagName("table"));
-		for (const table of tables) {
-			const style = table.getAttribute("style") || "";
-			const hasIndicator =
-				table.className.includes("container") ||
-				style.includes("max-width") ||
-				style.includes("maxWidth") ||
-				(/^\d+$/.test(table.getAttribute("width") || "") &&
-					table.getAttribute("width") !== "100%");
-			if (hasIndicator) {
-				containerTable = table;
-				break;
-			}
-		}
-		// Fallback to the first table if none found
-		if (!containerTable && tables.length > 0) {
-			containerTable = tables[0] || null;
-		}
-	}
+	// 4. Find the innermost ~640px column and convert only that wrapper to a
+	// container div. Inner 1×1 padded tables stay as tables so TipTap slash /
+	// bubble / inspector see Layout Table → Table Cell, like Resend.
+	const containerTable = findEmailContainerTable(doc.body);
 
 	if (containerTable) {
 		// Find the innermost cell of this container table that holds the content
@@ -398,8 +391,8 @@ function sanitizeEmailHtml(rawHtml: string): string {
 			const scratch = doc.createElement("div") as HTMLDivElement;
 			scratch.style.cssText = containerTable.getAttribute("style") || "";
 
-			// Copy standard attributes (id, class, align, width, height) if present
-			for (const attr of ["class", "id", "align", "width", "height"]) {
+			// Do not copy align="center" — TipTap would treat it as text-align.
+			for (const attr of ["class", "id", "width", "height"]) {
 				const val = containerTable.getAttribute(attr);
 				if (val) {
 					containerDiv.setAttribute(attr, val);
@@ -461,6 +454,14 @@ function sanitizeEmailHtml(rawHtml: string): string {
 				containerDiv.appendChild(node);
 			}
 
+			// Container parseHTML also matches inner max-width presentation tables.
+			// Drop role=presentation so they stay TipTap tables (Resend Layout Table).
+			for (const table of Array.from(containerDiv.querySelectorAll("table"))) {
+				if (table.getAttribute("role") === "presentation") {
+					table.removeAttribute("role");
+				}
+			}
+
 			// Replace the entire body contents with the containerDiv
 			doc.body.innerHTML = "";
 			doc.body.appendChild(containerDiv);
@@ -488,10 +489,9 @@ function sanitizeEmailHtml(rawHtml: string): string {
 	// BEFORE we convert/unwrap tables below.
 	stripReactEmailColumnMarkersForIconRows(doc.body);
 	replaceSocialIconTablesWithInlineRow(doc.body);
-	normalizeSkinCtaCardAlignment(doc.body);
 
-	// NEW: Convert layout section tables to <section> tags
-	convertSectionTablesToSections(doc.body);
+	// Keep layout / spacer tables as tables so the inspector can show
+	// Table Cell and slash/bubble operate on the same nodes as Resend.
 
 	// 5. Remove dangerous elements
 	for (const tag of FORBIDDEN_TAGS) {
@@ -507,15 +507,7 @@ function sanitizeEmailHtml(rawHtml: string): string {
 	//   style="text-align: center" on wrapper elements
 	stripEmailCentering(doc.body);
 
-	// 6.75 Normalize link styling for the visual editor.
-	//
-	// Many React Email demos set `text-decoration: underline` inline for links to
-	// match email-client conventions. In the visual builder, that often looks
-	// heavier than the demo preview and conflicts with our canvas reset.
-	//
-	// Since we're editing content (not rendering in an email client), we remove
-	// inline underline styles so the link appearance matches the demo preview.
-	normalizeAnchorStyles(doc.body);
+	preserveEmailLinkUnderlines(doc.body);
 
 	// 7. Expand CSS shorthand properties (padding, margin, border, border-radius)
 	// into their individual longhand equivalents. Email HTML often uses
@@ -524,6 +516,8 @@ function sanitizeEmailHtml(rawHtml: string): string {
 	// CSSOM expands shorthands automatically when we set cssText, so we use
 	// that to produce explicit longhands on every element.
 	expandShorthandStyles(doc.body);
+
+	absolutizeEmailAssetUrls(doc);
 
 	let canvasBg =
 		doc.body.style.backgroundColor || doc.body.getAttribute("bgcolor") || "";
@@ -543,40 +537,10 @@ function sanitizeEmailHtml(rawHtml: string): string {
 		rewriteLowContrastInlineText(doc.body, canvasBg);
 	}
 
+	promoteTableSpacingToCells(doc.body);
+	promoteCellTypographyToBlocks(doc.body);
+
 	return doc.body.innerHTML;
-}
-
-function normalizeAnchorStyles(root: Element): void {
-	const anchors = Array.from(root.getElementsByTagName("a"));
-	for (const a of anchors) {
-		const el = a as HTMLAnchorElement;
-		const style = el.style;
-		if (!style) continue;
-
-		const td = (style.textDecoration || "").toLowerCase();
-		const tdl = (style.textDecorationLine || "").toLowerCase();
-
-		if (td.includes("underline") || tdl.includes("underline")) {
-			// Strip explicit underline – the editor canvas should match the demo
-			// preview which generally does not underline links.
-			style.removeProperty("text-decoration");
-			style.removeProperty("text-decoration-line");
-		} else if (tdl === "none" || td === "none" || td.includes("none")) {
-			// Preserve explicit "none" so browser-default underline stays suppressed.
-			style.setProperty("text-decoration-line", "none");
-			style.removeProperty("text-decoration");
-		}
-
-		// If the anchor explicitly sets a browser-blue-ish color, drop it so it
-		// inherits the email's intended text color in the builder.
-		if (style.color) {
-			// Keep explicit themed colors (rgb/hex) but remove named defaults.
-			const c = style.color.trim().toLowerCase();
-			if (c === "blue" || c === "#00f" || c === "#0000ff") {
-				style.removeProperty("color");
-			}
-		}
-	}
 }
 
 function stripReactEmailColumnMarkersForIconRows(root: Element): void {
@@ -678,7 +642,11 @@ function replaceSocialIconTablesWithInlineRow(root: Element): void {
 
 		const doc = root.ownerDocument;
 		const p = doc.createElement("p");
-		p.setAttribute("style", "margin:0;padding:0;margin-top:2rem;line-height:1");
+		const marginTop = flattenedIconRowMarginTop(table);
+		p.setAttribute(
+			"style",
+			`margin:0;padding:0;margin-top:${marginTop};line-height:1`,
+		);
 
 		icons.forEach((icon, idx) => {
 			if (!icon) return;
@@ -694,101 +662,6 @@ function replaceSocialIconTablesWithInlineRow(root: Element): void {
 		});
 
 		table.parentNode?.replaceChild(p, table);
-	}
-}
-
-/**
- * The Skin welcome template includes a CTA card (light background) that is intended
- * to be centered (heading, copy, and link). In real email HTML this is commonly
- * achieved via table-cell alignment styles/attributes.
- *
- * When we transform the email into editor-friendly nodes, that alignment intent
- * can be lost, leaving the card left-aligned (as in the mismatch screenshot).
- *
- * This normalizes the CTA card to be centered by applying `text-align:center`
- * on the card container table/td when we detect the Skin CTA card pattern.
- */
-function normalizeSkinCtaCardAlignment(root: Element): void {
-	const tables = Array.from(root.querySelectorAll("table"));
-	for (const table of tables) {
-		const style = table.getAttribute("style") || "";
-		const isSkinCardBg =
-			style.includes("background-color:rgb(249, 249, 237)") ||
-			style.includes("background-color: rgb(249, 249, 237)") ||
-			style.includes("background-color:rgb(249,249,237)") ||
-			style.includes("background-color: rgb(249,249,237)");
-		if (!isSkinCardBg) continue;
-
-		const text = table.textContent || "";
-		if (!text.includes("Start Exploring")) continue;
-		if (!text.includes("Join us on the journey")) continue;
-
-		const td =
-			table.querySelector("tbody > tr > td") ||
-			table.querySelector("tr > td") ||
-			table.querySelector("td");
-		if (!td) continue;
-
-		// Mark this subtree so `stripEmailCentering()` doesn't undo it.
-		table.setAttribute("data-preserve-center", "true");
-		td.setAttribute("data-preserve-center", "true");
-
-		const applyCenter = (el: Element) => {
-			const existing = el.getAttribute("style") || "";
-			if (existing.includes("text-align:center")) return;
-			el.setAttribute(
-				"style",
-				existing
-					? `${existing.replace(/;?\s*$/, ";")}text-align:center`
-					: "text-align:center",
-			);
-		};
-
-		applyCenter(table);
-		applyCenter(td);
-	}
-}
-
-/**
- * Recursively walks the DOM and removes email-specific centering attributes/styles
- * that would bleed into the TipTap document as textAlign marks.
- */
-function stripEmailCentering(root: Element): void {
-	// Unwrap <center> → replace with its children in-place
-	for (const center of Array.from(root.getElementsByTagName("center"))) {
-		const parent = center.parentNode;
-		if (!parent) continue;
-		while (center.firstChild) {
-			parent.insertBefore(center.firstChild, center);
-		}
-		center.remove();
-	}
-
-	// Walk all remaining elements and strip centering attributes/styles
-	const walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT);
-	let node: Node | null = root;
-	while (node) {
-		const el = node as Element;
-
-		// Preserve intentional centering for specific components (e.g. Skin CTA card)
-		// that we mark during sanitization.
-		if (el.closest?.('[data-preserve-center="true"]')) {
-			node = walker.nextNode();
-			continue;
-		}
-
-		// Remove align="center" attribute (common on <table>, <td>, <div>)
-		if (el.getAttribute("align")?.toLowerCase() === "center") {
-			el.removeAttribute("align");
-		}
-
-		// Strip text-align: center from inline styles
-		const style = (el as HTMLElement).style;
-		if (style && style.textAlign?.toLowerCase() === "center") {
-			style.removeProperty("text-align");
-		}
-
-		node = walker.nextNode();
 	}
 }
 
@@ -947,29 +820,8 @@ function extractThemingStylesFromHtml(rawHtml: string): any[] {
 			"#ffffff";
 	}
 
-	// 2. Find container table/div
-	let containerTable: Element | null = doc.querySelector(
-		'table[data-type="container"]',
-	);
-	if (!containerTable) {
-		const tables = Array.from(doc.getElementsByTagName("table"));
-		for (const table of tables) {
-			const style = table.getAttribute("style") || "";
-			const hasIndicator =
-				table.className.includes("container") ||
-				style.includes("max-width") ||
-				style.includes("maxWidth") ||
-				(/^\d+$/.test(table.getAttribute("width") || "") &&
-					table.getAttribute("width") !== "100%");
-			if (hasIndicator) {
-				containerTable = table;
-				break;
-			}
-		}
-		if (!containerTable && tables.length > 0) {
-			containerTable = tables[0] || null;
-		}
-	}
+	// 2. Find the innermost email column table
+	const containerTable = findEmailContainerTable(doc);
 
 	let containerBg = "#ffffff";
 	let containerTextColor: string | undefined;
@@ -1530,6 +1382,7 @@ function convertSectionTablesToSections(root: Element): void {
 function parseGlobalStylesFromHtml(html: string) {
 	const parser = new DOMParser();
 	const doc = parser.parseFromString(html, "text/html");
+	absolutizeEmailAssetUrls(doc);
 
 	// 1. Extract style block contents
 	const styleTags = doc.querySelectorAll("style");
@@ -1543,18 +1396,7 @@ function parseGlobalStylesFromHtml(html: string) {
 	// so keeping `body { ... }` rules would do nothing, and using `&` is not valid
 	// plain CSS. Scoping to `.tiptap.ProseMirror` preserves the original intent (fonts,
 	// spacing, resets) without leaking styles across the app shell.
-	cssString = cssString.replace(
-		/(?<![.#\-\w])body\b/g,
-		".tiptap.ProseMirror, .ProseMirror",
-	);
-	cssString = cssString.replace(
-		/(?<![.#\-\w])html\b/g,
-		".tiptap.ProseMirror, .ProseMirror",
-	);
-	cssString = cssString.replace(
-		/(^|[\s,{}])\*(?=[^{}]*\{)/g,
-		"$1.tiptap.ProseMirror *, $1.ProseMirror *",
-	);
+	cssString = scopeEmailCssForEditor(cssString);
 
 	// 2. Extract external stylesheet links (e.g. google fonts) so they can load in the head
 	const links = doc.querySelectorAll(
@@ -1581,9 +1423,7 @@ function parseGlobalStylesFromHtml(html: string) {
 	// higher specificity to match React Email's preview more closely.
 	const wrapperTd =
 		doc.querySelector('td[style*="min-height:100%"]') ||
-		doc.querySelector('td[style*="min-height: 100%"]') ||
-		doc.querySelector('td[style*="line-height"]') ||
-		doc.querySelector("td");
+		doc.querySelector('td[style*="min-height: 100%"]');
 	if (wrapperTd) {
 		const scratch = doc.createElement("div") as HTMLDivElement;
 		scratch.style.cssText = wrapperTd.getAttribute("style") || "";
@@ -1596,23 +1436,24 @@ function parseGlobalStylesFromHtml(html: string) {
 		const baseFontWeight = scratch.style.fontWeight;
 		const baseLetterSpacing = scratch.style.letterSpacing;
 
+		// Defaults only — no !important. Pasted inline font-size / family on
+		// headings and footers must win over the wrapper td (15px body text
+		// must not paint a 13px / 320px footer at 15px).
 		const proseMirrorBase = [
 			".tiptap.ProseMirror, .ProseMirror{",
-			baseFontFamily ? `font-family:${baseFontFamily}!important;` : "",
-			baseFontSize ? `font-size:${baseFontSize}!important;` : "",
-			baseLineHeight ? `line-height:${baseLineHeight}!important;` : "",
-			baseColor ? `color:${baseColor}!important;` : "",
-			baseBg ? `background-color:${baseBg}!important;` : "",
-			baseFontWeight ? `font-weight:${baseFontWeight}!important;` : "",
-			baseLetterSpacing ? `letter-spacing:${baseLetterSpacing}!important;` : "",
+			baseFontFamily ? `font-family:${baseFontFamily};` : "",
+			baseFontSize ? `font-size:${baseFontSize};` : "",
+			baseLineHeight ? `line-height:${baseLineHeight};` : "",
+			baseColor ? `color:${baseColor};` : "",
+			baseBg ? `background-color:${baseBg};` : "",
+			baseFontWeight ? `font-weight:${baseFontWeight};` : "",
+			baseLetterSpacing ? `letter-spacing:${baseLetterSpacing};` : "",
 			"}",
-			// Email HTML relies on inline spacing; editor defaults add extra margins.
-			".tiptap.ProseMirror p, .ProseMirror p{margin:0 !important;padding:0 !important;}",
-			".tiptap.ProseMirror h1, .tiptap.ProseMirror h2, .tiptap.ProseMirror h3, .ProseMirror h1, .ProseMirror h2, .ProseMirror h3{margin:0 !important;}",
-			// Match email-client link presentation (no underline unless explicitly styled).
-			// React Email demo previews generally show links without browser-default underlines.
-			".tiptap.ProseMirror a, .ProseMirror a{text-decoration:none !important;color:inherit;}",
-			".tiptap.ProseMirror a *, .ProseMirror a *{text-decoration:none !important;}",
+			// Kill TipTap/EmailTheming block padding without !important on
+			// margin so pasted inline spacing (Dither 2.5rem) still wins.
+			".tiptap.ProseMirror p, .ProseMirror p{margin:0;}",
+			".tiptap.ProseMirror h1, .tiptap.ProseMirror h2, .tiptap.ProseMirror h3, .ProseMirror h1, .ProseMirror h2, .ProseMirror h3{margin:0;}",
+			".tiptap.ProseMirror .node-paragraph, .tiptap.ProseMirror .node-heading, .ProseMirror .node-paragraph, .ProseMirror .node-heading{padding-top:0!important;padding-bottom:0!important;}",
 			// Ensure emphasis renders as intended.
 			".tiptap.ProseMirror strong, .tiptap.ProseMirror b, .ProseMirror strong, .ProseMirror b{font-weight:600 !important;}",
 			".tiptap.ProseMirror table, .ProseMirror table{border-collapse:separate !important;}",
@@ -1625,43 +1466,11 @@ function parseGlobalStylesFromHtml(html: string) {
 		cssString = proseMirrorBase + cssString;
 	}
 
-	// 3. Find background colors
-	let bodyBg = "";
-	const tables = doc.querySelectorAll("table");
-
-	// Check outer tables first: React Email templates usually wrapper the actual background color
-	// on layout tables, leaving the <body> tag as a fallback or defaulting to white (#ffffff).
-	for (const table of Array.from(tables)) {
-		const bg = table.style.backgroundColor || table.getAttribute("bgcolor");
-		if (
-			bg &&
-			bg !== "#ffffff" &&
-			bg !== "white" &&
-			bg !== "rgb(255, 255, 255)"
-		) {
-			bodyBg = bg;
-			break;
-		}
-	}
-
-	// If no table background was found, check the body tag
-	if (!bodyBg) {
-		const body = doc.body;
-		if (body) {
-			bodyBg = body.style.backgroundColor || body.getAttribute("bgcolor") || "";
-		}
-	}
-
-	// Fallback to the first table's background color even if it is white/default
-	if (!bodyBg) {
-		const firstTable = tables[0];
-		if (firstTable) {
-			bodyBg =
-				firstTable.style.backgroundColor ||
-				firstTable.getAttribute("bgcolor") ||
-				"";
-		}
-	}
+	// Body canvas only. Do not steal an inner section color (Halo gray)
+	// or the footer, which sits on white, goes gray with the rest.
+	const body = doc.body;
+	const bodyBg =
+		body?.style.backgroundColor || body?.getAttribute("bgcolor") || "";
 
 	// 4. Find container width
 	let containerWidth: number | null = null;

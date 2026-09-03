@@ -16,6 +16,7 @@ import { TemplateInspectorTabs } from "./components/template-inspector-tabs";
 import { useEditorStore } from "./hooks/use-editor-store";
 import { EmailInspector } from "./inspector";
 import { EditorProvider } from "./providers/editor-provider";
+import { shouldShowSourceHtmlPreview } from "./utils/should-show-source-html-preview";
 
 const viewModes = ["visual", "code", "history", "variables"] as const;
 
@@ -33,9 +34,11 @@ export function TemplateEditorPage({ templateId }: { templateId: string }) {
 	);
 
 	const isCodeSplit = viewMode === "code";
-	const htmlLocked = useEditorStore((s) => s.htmlLocked);
 	const codeHtml = useEditorStore((s) => s.codeHtml);
-	const showHtmlCanvas = Boolean((htmlLocked || isCodeSplit) && codeHtml.trim());
+	const showHtmlCanvas = shouldShowSourceHtmlPreview({
+		isCodeSplit,
+		codeHtml,
+	});
 	const currentTab =
 		viewMode === "variables"
 			? "variables"
@@ -100,7 +103,7 @@ export function TemplateEditorPage({ templateId }: { templateId: string }) {
 							<GeneratingOverlay />
 							{showHtmlCanvas ? (
 								<div className="relative min-h-0 flex-1">
-									<HtmlEmailPreview editable={!isCodeSplit} />
+									<HtmlEmailPreview editable={false} />
 								</div>
 							) : (
 								<ScrollAreaPrimitive.Root

@@ -22,6 +22,8 @@ export async function getRenderedEmailHtml(
 	editor: Editor,
 	previewText?: string,
 ): Promise<string> {
+	const locked = getLockedSourceHtml();
+	if (locked) return locked;
 	const result = await composeReactEmail({
 		editor,
 		preview: previewText || undefined,

@@ -1,14 +1,15 @@
-import { StarterKit } from "@react-email/editor/extensions";
 import { EmailTheming, useEditorImage } from "@react-email/editor/plugins";
 import Collaboration from "@tiptap/extension-collaboration";
 import CollaborationCaret from "@tiptap/extension-collaboration-caret";
 import Placeholder from "@tiptap/extension-placeholder";
-import { useEditor } from "@tiptap/react";
-import { useCallback } from "react";
+import { type Editor, useEditor } from "@tiptap/react";
+import { useCallback, useRef } from "react";
 import type { WebsocketProvider } from "y-websocket";
 import type * as Y from "yjs";
 import { Variable } from "../extensions/variable";
 import { VariableSuggestion } from "../extensions/variable-suggestion";
+import { emailStarterKit } from "../utils/email-starter-kit";
+import { handleEmailHtmlPaste } from "../utils/load-html-into-editor";
 
 export interface CollabOptions {
 	ydoc: Y.Doc;
@@ -89,6 +90,7 @@ export const useEditorHook = (collab: CollabOptions) => {
 	}, []);
 
 	const imageExtension = useEditorImage({ uploadImage });
+	const editorRef = useRef<Editor | null>(null);
 
 	const editor = useEditor(
 		{
@@ -96,9 +98,11 @@ export const useEditorHook = (collab: CollabOptions) => {
 				attributes: {
 					class: "tiptap focus:outline-none",
 				},
+				handlePaste: (_view, event) =>
+					handleEmailHtmlPaste(editorRef.current, event),
 			},
 			extensions: [
-				StarterKit.configure({ UndoRedo: false }),
+				emailStarterKit(),
 				...baseExtensions,
 				Variable,
 				VariableSuggestion as any,
@@ -113,5 +117,6 @@ export const useEditorHook = (collab: CollabOptions) => {
 		[collab.provider, collab.ydoc],
 	);
 
+	editorRef.current = editor;
 	return editor;
 };

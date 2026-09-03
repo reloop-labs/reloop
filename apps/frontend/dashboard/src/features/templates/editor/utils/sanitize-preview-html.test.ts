@@ -74,6 +74,44 @@ describe("sanitizePreviewHtml", () => {
 		expect(sanitizePreviewHtml("")).toBe("");
 		expect(sanitizePreviewHtml("   ")).toBe("");
 	});
+
+	it("rewrites root-relative background urls so the iframe can load them", () => {
+		const html = `<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    .glow { background-image: url('/static/corner-glow.png'); }
+  </style>
+</head>
+<body>
+  <img src="https://cdn.example.com/static/logo.png" alt="logo" />
+  <table class="glow" width="600"><tr><td>Your magic link</td></tr></table>
+</body>
+</html>`;
+
+		const result = sanitizePreviewHtml(html);
+
+		expect(result).toMatch(
+			/https:\/\/cdn\.example\.com\/static\/corner-glow\.png/,
+		);
+		expect(result).not.toMatch(/url\(\s*['"]?\/static\/corner-glow/);
+	});
+
+	it("uses base href to resolve assets, then drops the base tag", () => {
+		const html = `<!DOCTYPE html>
+<html>
+<head>
+  <base href="https://assets.example.com/" />
+  <style>.glow { background-image: url('/static/glow.png'); }</style>
+</head>
+<body><p>Hi</p></body>
+</html>`;
+
+		const result = sanitizePreviewHtml(html);
+
+		expect(result).toMatch(/https:\/\/assets\.example\.com\/static\/glow\.png/);
+		expect(result).not.toMatch(/<base/i);
+	});
 });
 
 describe("withoutEditorChrome", () => {

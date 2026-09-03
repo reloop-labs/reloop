@@ -1,0 +1,92 @@
+.tiptap.ProseMirror table,
+.ProseMirror table {
+	border-collapse: separate;
+	border-spacing: 0;
+	width: 100%;
+}
+
+.tiptap.ProseMirror,
+.ProseMirror {
+	/* Email body background must meet the canvas edge. Chrome padding
+	 * here would show as a white strip above a gray section. */
+	padding-top: 0 !important;
+	padding-bottom: 0 !important;
+}
+
+.tiptap.ProseMirror td,
+.tiptap.ProseMirror th,
+.ProseMirror td,
+.ProseMirror th {
+	border: none;
+	vertical-align: top;
+}
+
+/* Table alignment=center is the email column (margin auto). Do not force
+ * text-align:start — Halo/Studio buttons and footers live in inner tables
+ * that also get alignment=center from source text-align:center. */
+.tiptap table[alignment="center"],
+.tiptap [alignment="center"]:is(table),
+.ProseMirror table[alignment="center"] {
+	margin-left: auto;
+	margin-right: auto;
+}
+
+/*
+ * Paste injects the same rules via applyImportedEmailCss, but that <style>
+ * tag lives in Zustand and is cleared on refresh. Keep the column centered
+ * here so Yjs rehydrate cannot slide the 640px container to the left.
+ */
+.tiptap.ProseMirror .node-container,
+.tiptap.ProseMirror [data-type="container"] {
+	box-sizing: border-box;
+	margin-left: auto;
+	margin-right: auto;
+	/* EmailTheming injects height: 400px with equal/higher specificity. */
+	height: auto !important;
+	max-height: none !important;
+	min-height: 0 !important;
+	overflow: visible !important;
+}
+
+/*
+ * EmailTheming RESET (basic) sets .node-paragraph padding 0.5em and
+ * .node-heading padding-top 0.389em. Those ems resolve against the node's
+ * font-size, so a 72px Arcane hero gains 36px extra on each side — stacked
+ * on the HTML's 80px/56px cell padding. Email spacing lives on cells and
+ * inline margin; do not !important margin (Dither's 2.5rem subtitle gap).
+ */
+.tiptap.ProseMirror .node-paragraph,
+.tiptap.ProseMirror .node-heading,
+.tiptap.ProseMirror p,
+.tiptap.ProseMirror h1,
+.tiptap.ProseMirror h2,
+.tiptap.ProseMirror h3 {
+	padding-top: 0 !important;
+	padding-bottom: 0 !important;
+}
+
+/*
+ * EmailTheming MERGE prepends text-decoration:underline onto every
+ * a.node-link. Do not blanket-none all links — that hides Dither CTAs
+ * once TipTap unwraps <u>. Paste stamps data-email-decoration from the
+ * source; only those rules use !important so theme merge cannot win.
+ */
+.tiptap.ProseMirror a:has(img),
+.ProseMirror a:has(img) {
+	text-decoration: none !important;
+}
+
+.tiptap.ProseMirror a[data-email-decoration="none"],
+.ProseMirror a[data-email-decoration="none"] {
+	text-decoration: none !important;
+}
+
+.tiptap.ProseMirror a[data-email-decoration="underline"],
+.ProseMirror a[data-email-decoration="underline"] {
+	text-decoration: underline !important;
+}
+
+[data-re-bubble-menu],
+[data-re-slash-command] {
+	z-index: 9999 !important;
+}

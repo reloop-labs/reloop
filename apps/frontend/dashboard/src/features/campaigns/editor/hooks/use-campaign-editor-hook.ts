@@ -1,12 +1,13 @@
-import { StarterKit } from "@react-email/editor/extensions";
 import { EmailTheming, useEditorImage } from "@react-email/editor/plugins";
 import Collaboration from "@tiptap/extension-collaboration";
 import CollaborationCaret from "@tiptap/extension-collaboration-caret";
 import Placeholder from "@tiptap/extension-placeholder";
-import { useEditor } from "@tiptap/react";
-import { useCallback } from "react";
+import { type Editor, useEditor } from "@tiptap/react";
+import { useCallback, useRef } from "react";
 import type { WebsocketProvider } from "y-websocket";
 import type * as Y from "yjs";
+import { emailStarterKit } from "#/features/templates/editor/utils/email-starter-kit";
+import { handleEmailHtmlPaste } from "#/features/templates/editor/utils/load-html-into-editor";
 import { CampaignVariable } from "../extensions/campaign-variable";
 import { CampaignVariableSuggestion } from "../extensions/campaign-variable-suggestion";
 
@@ -89,6 +90,7 @@ export const useCampaignEditorHook = (collab: CampaignCollabOptions) => {
 	}, []);
 
 	const imageExtension = useEditorImage({ uploadImage });
+	const editorRef = useRef<Editor | null>(null);
 
 	const editor = useEditor(
 		{
@@ -96,9 +98,11 @@ export const useCampaignEditorHook = (collab: CampaignCollabOptions) => {
 				attributes: {
 					class: "tiptap focus:outline-none",
 				},
+				handlePaste: (_view, event) =>
+					handleEmailHtmlPaste(editorRef.current, event),
 			},
 			extensions: [
-				StarterKit.configure({ UndoRedo: false }),
+				emailStarterKit(),
 				...baseExtensions,
 				CampaignVariable,
 				CampaignVariableSuggestion as any,
@@ -113,5 +117,6 @@ export const useCampaignEditorHook = (collab: CampaignCollabOptions) => {
 		[collab.provider, collab.ydoc],
 	);
 
+	editorRef.current = editor;
 	return editor;
 };

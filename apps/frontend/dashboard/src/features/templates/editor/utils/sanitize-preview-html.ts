@@ -1,3 +1,5 @@
+import { absolutizeEmailAssetUrls } from "./inline-email-stylesheet";
+
 /**
  * Sanitize HTML for a sandboxed email preview iframe.
  *
@@ -37,6 +39,10 @@ export function sanitizePreviewHtml(rawHtml: string): string {
 
 	const parser = new DOMParser();
 	const doc = parser.parseFromString(rawHtml, "text/html");
+
+	// Resolve /static/... against the paste origin before <base> is stripped.
+	// The iframe has no document base, so those backgrounds 404 on the app host.
+	absolutizeEmailAssetUrls(doc);
 
 	for (const tag of EXECUTABLE_TAGS) {
 		for (const el of Array.from(doc.querySelectorAll(tag))) {

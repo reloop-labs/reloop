@@ -1,0 +1,103 @@
+// @vitest-environment jsdom
+
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+import { generateHTML, generateJSON } from "@tiptap/html";
+import { describe, expect, it } from "vitest";
+import { emailStarterKit } from "./email-starter-kit";
+import {
+	EMAIL_DECORATION_ATTR,
+	preserveEmailLinkUnderlines,
+} from "./preserve-email-link-underlines";
+
+const DITHER_SETUP_LINK = `
+<p>
+  <a href="https://example.com/" style="color:rgb(255,255,255);text-decoration-line:none;text-decoration:underline;font-size:15px;font-weight:450">
+    <u>Complete Setup</u>
+  </a>
+</p>
+<p>visit our <a href="https://example.com/" style="color:rgb(74,74,74);text-decoration:underline"><u>Help Center</u></a>.</p>
+`;
+
+const ARCANE_LINKS = `
+<a href="https://example.com/" style="color:rgb(48,6,16);text-decoration-line:none;font-size:16px;font-weight:500">Start Exploring →</a>
+<p style="font-size:11px;max-width:169px">
+	<a href="https://example.com/" style="color:rgb(239,225,216);text-decoration-line:none">Unsubscribe</a>
+	from Skin marketing emails.
+</p>
+`;
+
+function roundTrip(html: string): string {
+	const doc = new DOMParser().parseFromString(html, "text/html");
+	preserveEmailLinkUnderlines(doc.body);
+	const json = generateJSON(doc.body.innerHTML, [emailStarterKit()] as never);
+	return generateHTML(json, [emailStarterKit()] as never);
+}
+
+describe("preserveEmailLinkUnderlines", () => {
+	it("keeps Dither CTA and Help Center underlines", () => {
+		const doc = new DOMParser().parseFromString(DITHER_SETUP_LINK, "text/html");
+		preserveEmailLinkUnderlines(doc.body);
+
+		const links = Array.from(doc.querySelectorAll("a"));
+		expect(links).toHaveLength(2);
+		for (const link of links) {
+			expect(link.style.textDecoration).toContain("underline");
+			expect(link.style.textDecorationLine).not.toBe("none");
+			expect(link.getAttribute(EMAIL_DECORATION_ATTR)).toBe("underline");
+		}
+	});
+
+	it("keeps the link mark and underline in the TipTap document", () => {
+		const html = roundTrip(DITHER_SETUP_LINK);
+
+		expect(html).toContain("Complete Setup");
+		expect(html).toContain("https://example.com/");
+		expect(html).toMatch(/data-email-decoration="underline"/);
+		expect(html).toMatch(/underline/i);
+	});
+
+	it("keeps Arcane Start Exploring and Unsubscribe without an underline", () => {
+		const doc = new DOMParser().parseFromString(ARCANE_LINKS, "text/html");
+		preserveEmailLinkUnderlines(doc.body);
+
+		for (const link of Array.from(doc.querySelectorAll("a"))) {
+			expect(link.style.textDecoration).toBe("none");
+			expect(link.getAttribute(EMAIL_DECORATION_ATTR)).toBe("none");
+		}
+
+		const html = roundTrip(ARCANE_LINKS);
+		expect(html).toContain("Start Exploring");
+		expect(html).toContain("Unsubscribe");
+		expect(html).toMatch(/data-email-decoration="none"/);
+		expect(html).not.toMatch(/data-email-decoration="underline"/);
+	});
+
+	it("does not underline image links", () => {
+		const html = `<a href="https://x.com/"><img width="20" height="20" alt="X" /></a>`;
+		const doc = new DOMParser().parseFromString(html, "text/html");
+		preserveEmailLinkUnderlines(doc.body);
+		const link = doc.querySelector("a");
+		expect(link?.getAttribute(EMAIL_DECORATION_ATTR)).toBe("none");
+		expect(link?.style.textDecoration).toBe("none");
+	});
+});
+
+describe("email canvas link decoration CSS", () => {
+	const css = readFileSync(
+		join(
+			dirname(fileURLToPath(import.meta.url)),
+			"../components/canvas/email-canvas.css",
+		),
+		"utf8",
+	).replace(/\/\*[\s\S]*?\*\//g, "");
+
+	it("stamps source underline/none instead of forcing every link to none", () => {
+		expect(css).toMatch(/\[data-email-decoration=["']underline["']\]/);
+		expect(css).toMatch(/\[data-email-decoration=["']none["']\]/);
+		expect(css).not.toMatch(
+			/\.node-link[\s,{][^}]*text-decoration:\s*none\s*!important/,
+		);
+	});
+});

@@ -1,4 +1,3 @@
-import { BubbleMenu, SlashCommand } from "@react-email/editor/ui";
 import { generateJSON } from "@tiptap/html";
 import { EditorContext } from "@tiptap/react";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -11,6 +10,10 @@ import {
 	applyImportedEmailCss,
 	clearImportedEmailCss,
 } from "#/features/templates/editor/utils/apply-imported-email-css";
+import {
+	pickSavedEmailHtml,
+	restoreImportedEmailCssFromHtml,
+} from "#/features/templates/editor/utils/load-html-into-editor";
 import { readableTextColor } from "#/features/templates/editor/utils/readable-text-color";
 import { mapTemplateVariables } from "#/features/templates/lib/template-variables";
 import {
@@ -18,6 +21,7 @@ import {
 	useCollaboration,
 } from "../collobration/hooks/useCollaboration";
 import { PresenceProvider } from "../collobration/PresenceProvider";
+import { EmailSlashCommand } from "../components/canvas/email-slash-command";
 import { TemplateDetailHeader } from "../components/header/template-detail-header";
 import {
 	extractThemingStylesFromHtml,
@@ -32,7 +36,6 @@ import { AddTemplateVariableModal } from "../components/panels/variables/add-var
 import { useMousePresence } from "../cursor/hooks/useMousePresence";
 import { useRemoteCursors } from "../cursor/hooks/useRemoteCursors";
 import { RemoteCursors } from "../cursor/RemoteCursors";
-import { editorSlashCommands } from "../lib/slash-commands";
 
 interface EditorProviderProps {
 	children: React.ReactNode;
@@ -297,6 +300,25 @@ export const EditorProvider = ({ children, roomId }: EditorProviderProps) => {
 				setFromEmail(resolveFromEmail(template, versionList));
 				setReplyTo(resolveReplyTo(template, versionList));
 				setPreviewText(resolvePreviewText(template, versionList));
+				restoreImportedEmailCssFromHtml(
+					pickSavedEmailHtml(template, versionList),
+				);
+				if (editor) {
+					let styles = getGlobalStylesArray(editor);
+					styles = updateGlobalStyleValue(
+						styles,
+						"container",
+						"align",
+						"center",
+					);
+					styles = updateGlobalStyleValue(
+						styles,
+						"container",
+						"height",
+						undefined,
+					);
+					editor.commands.setGlobalContent("styles", styles);
+				}
 				return;
 			}
 
@@ -321,7 +343,10 @@ export const EditorProvider = ({ children, roomId }: EditorProviderProps) => {
 			}
 
 			let htmlStringToProcess = "";
-			if (sourceToLoad?.renderedHtml && typeof sourceToLoad.renderedHtml === "string") {
+			if (
+				sourceToLoad?.renderedHtml &&
+				typeof sourceToLoad.renderedHtml === "string"
+			) {
 				htmlStringToProcess = sourceToLoad.renderedHtml;
 			}
 
@@ -388,21 +413,11 @@ export const EditorProvider = ({ children, roomId }: EditorProviderProps) => {
 							"backgroundColor",
 							parsed.bodyBg,
 						);
-						mergedStyles = updateGlobalStyleValue(
-							mergedStyles,
-							"container",
-							"backgroundColor",
-							parsed.bodyBg,
-						);
 					}
 
 					const containerBg =
 						parsed.bodyBg ||
-						findStyleInputValue(
-							mergedStyles,
-							"container",
-							"backgroundColor",
-						);
+						findStyleInputValue(mergedStyles, "container", "backgroundColor");
 					const extractedColor = findStyleInputValue(
 						mergedStyles,
 						"container",
@@ -410,9 +425,7 @@ export const EditorProvider = ({ children, roomId }: EditorProviderProps) => {
 					);
 					const textColor = readableTextColor(
 						typeof containerBg === "string" ? containerBg : undefined,
-						typeof extractedColor === "string"
-							? extractedColor
-							: undefined,
+						typeof extractedColor === "string" ? extractedColor : undefined,
 					);
 					if (textColor) {
 						mergedStyles = updateGlobalStyleValue(
@@ -523,14 +536,7 @@ export const EditorProvider = ({ children, roomId }: EditorProviderProps) => {
 					/>
 					<div className="min-h-0 flex-1 overflow-hidden">{children}</div>
 					<RemoteCursors cursors={remoteCursors} />
-					<BubbleMenu
-						hideWhenActiveNodes={["button", "image", "variable"]}
-						hideWhenActiveMarks={["link"]}
-					/>
-					<BubbleMenu.LinkDefault />
-					<BubbleMenu.ButtonDefault />
-					<BubbleMenu.ImageDefault />
-					<SlashCommand items={editorSlashCommands} />
+					<EmailSlashCommand />
 				</div>
 				<AddTemplateVariableModal
 					open={isCreatingVar}

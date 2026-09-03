@@ -1,5 +1,9 @@
 @import "@reloop/tailwind/style.css";
 
+/* Vitest files are not app UI. Scanning them can emit broken url() utilities. */
+@source not "./**/*.test.ts";
+@source not "./**/*.test.tsx";
+
 body {
 	font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI",
 		Roboto, sans-serif;
