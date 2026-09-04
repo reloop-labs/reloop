@@ -7,6 +7,7 @@ import type { CommandAction } from "#/features/dashboard/command-menu";
 import { useRegisterCommandActions } from "#/features/dashboard/command-menu-context";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import { queryKeys } from "#/lib/query-keys";
+import { AutomationFlowPreview } from "./components/automation-flow-preview";
 import { AutomationListToolbar } from "./components/automation-list-toolbar";
 import { EventsTable } from "./components/events-table";
 import { listCustomEvents } from "./hooks/use-custom-events-api";
@@ -28,15 +29,14 @@ export function EventsPage() {
 		const q = searchQuery.toLowerCase().trim();
 		if (!q) return events;
 		return events.filter(
-			(event) =>
-				event.name.toLowerCase().includes(q) ||
-				event.key.toLowerCase().includes(q),
+			(ev) =>
+				ev.name.toLowerCase().includes(q) ||
+				(ev.key?.toLowerCase().includes(q) ?? false),
 		);
 	}, [events, searchQuery]);
 
 	const isLoading = eventsQuery.isLoading;
-	const isTotalEmpty =
-		!eventsQuery.isLoading && eventsQuery.isSuccess && events.length === 0;
+	const isTotalEmpty = !eventsQuery.isLoading && events.length === 0;
 	const isFilteredEmpty =
 		!eventsQuery.isLoading && events.length > 0 && filtered.length === 0;
 
@@ -54,8 +54,8 @@ export function EventsPage() {
 				onSelect: () => handleCreate(),
 			},
 			{
-				id: "go-to-docs",
-				label: "Go to Docs",
+				id: "open-docs",
+				label: "Open Events Docs",
 				icon: "file-text",
 				shortcut: { label: "D", keys: ["d"] },
 				onSelect: () =>
@@ -68,25 +68,33 @@ export function EventsPage() {
 	useRegisterCommandActions("workflow-events", "Events", actions);
 
 	return (
-		<div className="space-y-4">
-			<AutomationListToolbar
-				searchQuery={searchQuery}
-				onSearchChange={setSearchQuery}
-				statusFilter={[]}
-				onStatusChange={() => {}}
-				onRefresh={() => void eventsQuery.refetch()}
-				searchPlaceholder="Search events..."
-				searchLabel="Search events"
-				showStatusFilter={false}
-			/>
+		<div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
+			<div className="min-w-0 space-y-4">
+				<AutomationListToolbar
+					searchQuery={searchQuery}
+					onSearchChange={setSearchQuery}
+					statusFilter={[]}
+					onStatusChange={() => {}}
+					onRefresh={() => void eventsQuery.refetch()}
+					searchPlaceholder="Search events..."
+					searchLabel="Search events"
+					showStatusFilter={false}
+				/>
 
-			<EventsTable
-				events={filtered}
-				isLoading={isLoading}
-				isTotalEmpty={isTotalEmpty}
-				isFilteredEmpty={isFilteredEmpty}
+				<EventsTable
+					events={filtered}
+					isLoading={isLoading}
+					isTotalEmpty={isTotalEmpty}
+					isFilteredEmpty={isFilteredEmpty}
+					onCreate={handleCreate}
+					onClearFilters={() => setSearchQuery("")}
+				/>
+			</div>
+
+			<AutomationFlowPreview
+				variant="events"
 				onCreate={handleCreate}
-				onClearFilters={() => setSearchQuery("")}
+				className="lg:sticky lg:top-6"
 			/>
 		</div>
 	);

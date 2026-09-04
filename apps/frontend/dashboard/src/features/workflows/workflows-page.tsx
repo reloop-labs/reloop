@@ -5,6 +5,7 @@ import { useQueryState } from "nuqs";
 import { useCallback, useMemo, useState } from "react";
 import type { CommandAction } from "#/features/dashboard/command-menu";
 import { useRegisterCommandActions } from "#/features/dashboard/command-menu-context";
+import { AutomationFlowPreview } from "./components/automation-flow-preview";
 import { AutomationListToolbar } from "./components/automation-list-toolbar";
 import { WorkflowTable } from "./components/workflow-table";
 import { useWorkflows } from "./components/workflows-provider";
@@ -59,8 +60,8 @@ export function WorkflowsPage() {
 				onSelect: () => handleCreate(),
 			},
 			{
-				id: "go-to-docs",
-				label: "Go to Docs",
+				id: "open-docs",
+				label: "Open Workflows Docs",
 				icon: "file-text",
 				shortcut: { label: "D", keys: ["d"] },
 				onSelect: () =>
@@ -81,27 +82,34 @@ export function WorkflowsPage() {
 	useRegisterCommandActions("workflows", "Automation", actions);
 
 	return (
-		<div className="space-y-4">
-			<AutomationListToolbar
-				searchQuery={searchQuery}
-				onSearchChange={setSearchQuery}
-				statusFilter={statusFilter}
-				onStatusChange={setStatusFilter}
-				onRefresh={() => refetch()}
-				columnVisibility={columnVisibility}
-				onColumnVisibleChange={(id, visible) =>
-					setColumnVisibility((prev) => ({ ...prev, [id]: visible }))
-				}
-			/>
+		<div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
+			<div className="min-w-0 space-y-4">
+				<AutomationListToolbar
+					searchQuery={searchQuery}
+					onSearchChange={setSearchQuery}
+					statusFilter={statusFilter}
+					onStatusChange={setStatusFilter}
+					onRefresh={() => refetch()}
+					columnVisibility={columnVisibility}
+					onColumnVisibleChange={(id, visible) =>
+						setColumnVisibility((prev) => ({ ...prev, [id]: visible }))
+					}
+				/>
 
-			<WorkflowTable
-				workflows={filtered}
-				columnVisibility={columnVisibility}
-				isLoading={isLoading}
-				isTotalEmpty={isTotalEmpty}
-				isFilteredEmpty={isFilteredEmpty}
+				<WorkflowTable
+					workflows={filtered}
+					columnVisibility={columnVisibility}
+					isLoading={isLoading}
+					isTotalEmpty={isTotalEmpty}
+					isFilteredEmpty={isFilteredEmpty}
+					onCreate={handleCreate}
+					onClearFilters={handleClearFilters}
+				/>
+			</div>
+
+			<AutomationFlowPreview
 				onCreate={handleCreate}
-				onClearFilters={handleClearFilters}
+				className="lg:sticky lg:top-6"
 			/>
 		</div>
 	);
