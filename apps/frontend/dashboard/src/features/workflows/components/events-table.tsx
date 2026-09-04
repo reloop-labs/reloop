@@ -36,7 +36,7 @@ export function EventsTable({
 				)}
 			>
 				<div className="flex items-center gap-1">
-					<Icon name="route" className="h-3 w-3" />
+					<Icon name="zap" className="h-3 w-3" />
 					<span>Name</span>
 				</div>
 				<span>Key</span>
@@ -56,14 +56,16 @@ export function EventsTable({
 					))
 				) : isTotalEmpty ? (
 					<WorkflowEmptyState
-						title="No events yet"
-						description="Create an event to use as a trigger on the canvas."
-						createLabel="Create event"
+						icon="zap"
+						title="No triggers yet"
+						description="Create a trigger to start automations on the canvas."
+						createLabel="Create trigger"
 						onCreate={onCreate}
 					/>
 				) : isFilteredEmpty || events.length === 0 ? (
 					<WorkflowEmptyState
-						title="No events found"
+						icon="zap"
+						title="No triggers found"
 						description="Try a different name or key."
 						isFiltered
 						onCreate={onCreate}

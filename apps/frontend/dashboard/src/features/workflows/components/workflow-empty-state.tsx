@@ -12,6 +12,7 @@ interface WorkflowEmptyStateProps {
 	title?: string;
 	description?: string;
 	createLabel?: string;
+	icon?: string;
 }
 
 export const WorkflowEmptyState = ({
@@ -21,14 +22,14 @@ export const WorkflowEmptyState = ({
 	title,
 	description,
 	createLabel = "Create automation",
+	icon,
 }: WorkflowEmptyStateProps) => {
+	const iconName = isFiltered ? "search" : (icon ?? "workflow");
+
 	return (
 		<div className="flex flex-col items-center px-6 py-12 text-center dark:bg-bg-weak-50/30">
 			<div className="mb-4 flex items-center justify-center">
-				<Icon
-					name={isFiltered ? "search" : "workflow"}
-					className="h-8 w-8 text-text-sub-600"
-				/>
+				<Icon name={iconName} className="h-8 w-8 text-text-sub-600" />
 			</div>
 			<h3 className="mb-2 font-semibold text-text-strong-950 text-xl">
 				{isFiltered

@@ -118,12 +118,12 @@ export function CreateEventModal({
 	return (
 		<AutomationModalFrame
 			open={open}
-			title="Create event"
-			icon="route"
+			title="Create trigger"
+			icon="zap"
 			status={status}
 			onSubmit={() => void handleSubmit()}
 			onClose={handleClose}
-			submitLabel="Create event"
+			submitLabel="Create trigger"
 			busyLabel="Creating..."
 			successLabel="Created"
 		>

@@ -18,9 +18,9 @@ const items = [
 		shortcut: "1",
 	},
 	{
-		title: "Events",
+		title: "Triggers",
 		value: "events",
-		iconName: "route" as const,
+		iconName: "zap" as const,
 		path: "/automation/events",
 		shortcut: "2",
 	},

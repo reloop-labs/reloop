@@ -3,7 +3,7 @@ export type WorkflowNodeTone = "trigger" | "delay" | "condition" | "send_email";
 export const nodeTone = {
 	trigger: {
 		label: "Trigger",
-		icon: "route",
+		icon: "zap",
 		well: "bg-blue-50 text-blue-600 dark:bg-blue-500/15 dark:text-blue-300",
 		selected: "border-blue-500 ring-2 ring-blue-500/15 dark:border-blue-400",
 		handleClass: "!border-[var(--color-bg-white-0)] !bg-blue-500",

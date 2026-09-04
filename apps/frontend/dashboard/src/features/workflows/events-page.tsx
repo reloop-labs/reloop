@@ -7,7 +7,6 @@ import type { CommandAction } from "#/features/dashboard/command-menu";
 import { useRegisterCommandActions } from "#/features/dashboard/command-menu-context";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import { queryKeys } from "#/lib/query-keys";
-import { AutomationFlowPreview } from "./components/automation-flow-preview";
 import { AutomationListToolbar } from "./components/automation-list-toolbar";
 import { EventsTable } from "./components/events-table";
 import { listCustomEvents } from "./hooks/use-custom-events-api";
@@ -48,14 +47,14 @@ export function EventsPage() {
 		() => [
 			{
 				id: "create-event",
-				label: "Create Event",
+				label: "Create Trigger",
 				icon: "plus",
 				shortcut: { label: "C", keys: ["c"] },
 				onSelect: () => handleCreate(),
 			},
 			{
 				id: "open-docs",
-				label: "Open Events Docs",
+				label: "Open Triggers Docs",
 				icon: "file-text",
 				shortcut: { label: "D", keys: ["d"] },
 				onSelect: () =>
@@ -65,33 +64,29 @@ export function EventsPage() {
 		[handleCreate],
 	);
 
-	useRegisterCommandActions("workflow-events", "Events", actions);
+	useRegisterCommandActions("workflow-events", "Triggers", actions);
 
 	return (
-		<div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
-			<div className="min-w-0 space-y-4">
-				<AutomationListToolbar
-					searchQuery={searchQuery}
-					onSearchChange={setSearchQuery}
-					statusFilter={[]}
-					onStatusChange={() => {}}
-					onRefresh={() => void eventsQuery.refetch()}
-					searchPlaceholder="Search events..."
-					searchLabel="Search events"
-					showStatusFilter={false}
-				/>
+		<div className="space-y-4">
+			<AutomationListToolbar
+				searchQuery={searchQuery}
+				onSearchChange={setSearchQuery}
+				statusFilter={[]}
+				onStatusChange={() => {}}
+				onRefresh={() => void eventsQuery.refetch()}
+				searchPlaceholder="Search triggers..."
+				searchLabel="Search triggers"
+				showStatusFilter={false}
+			/>
 
-				<EventsTable
-					events={filtered}
-					isLoading={isLoading}
-					isTotalEmpty={isTotalEmpty}
-					isFilteredEmpty={isFilteredEmpty}
-					onCreate={handleCreate}
-					onClearFilters={() => setSearchQuery("")}
-				/>
-			</div>
-
-			<AutomationFlowPreview variant="events" className="lg:sticky lg:top-6" />
+			<EventsTable
+				events={filtered}
+				isLoading={isLoading}
+				isTotalEmpty={isTotalEmpty}
+				isFilteredEmpty={isFilteredEmpty}
+				onCreate={handleCreate}
+				onClearFilters={() => setSearchQuery("")}
+			/>
 		</div>
 	);
 }

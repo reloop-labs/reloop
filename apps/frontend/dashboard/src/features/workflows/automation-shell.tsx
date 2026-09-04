@@ -44,14 +44,14 @@ export function AutomationShell({ children }: { children: ReactNode }) {
 		<div className="mx-auto max-w-6xl space-y-6 p-6 lg:p-8">
 			<AutomationListHeader
 				onCreate={handleCreate}
-				createLabel={isEventsPage ? "Create event" : "Create automation"}
-				title={isEventsPage ? "Events" : "Automation"}
+				createLabel={isEventsPage ? "Create trigger" : "Create automation"}
+				title={isEventsPage ? "Triggers" : "Automation"}
 				description={
 					isEventsPage
-						? "Custom events that start automations. Separate from webhooks."
+						? "Custom triggers that start automations. Separate from webhooks."
 						: "Trigger emails from events — delays, conditions, and sends."
 				}
-				icon={isEventsPage ? "route" : "workflow"}
+				icon={isEventsPage ? "zap" : "workflow"}
 			/>
 
 			<div className="space-y-4">

@@ -38,7 +38,7 @@ const VIEW_COLUMNS: DataTableViewColumn[] = [
 	{
 		id: "trigger",
 		label: "Trigger",
-		icon: <Icon name="route" className="h-3.5 w-3.5" />,
+		icon: <Icon name="zap" className="h-3.5 w-3.5" />,
 	},
 	{
 		id: "steps",

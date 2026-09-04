@@ -73,7 +73,7 @@ export const workflowColumns: ColumnDef<Workflow>[] = [
 		id: "trigger",
 		header: () => (
 			<div className="flex items-center gap-1">
-				<Icon name="route" className="h-3 w-3" />
+				<Icon name="zap" className="h-3 w-3" />
 				<span className="text-xs">Trigger</span>
 			</div>
 		),
