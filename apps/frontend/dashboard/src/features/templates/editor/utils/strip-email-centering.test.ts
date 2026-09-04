@@ -4,6 +4,7 @@ import { generateJSON } from "@tiptap/html";
 import { describe, expect, it } from "vitest";
 import { emailStarterKit } from "./email-starter-kit";
 import {
+	applyEmailColumnWidth,
 	findEmailContainerTable,
 	innerFullWidthBackground,
 	stripEmailCentering,
@@ -280,6 +281,76 @@ describe("structural centering for any pasted email", () => {
 			)?.style.textAlign,
 		).not.toBe("center");
 	});
+
+	it("does not invent text-align on a one-cell td that only has align=center", () => {
+		const doc = new DOMParser().parseFromString(
+			`<div data-type="container" style="max-width:640px">
+				<table width="100%">
+					<tr>
+						<td align="center">
+							<h1 style="font-size:56px;color:#fff">Meet a new way to work</h1>
+							<a href="https://example.com/" style="display:inline-block;background:#fff;color:#000">Explore</a>
+						</td>
+					</tr>
+				</table>
+			</div>`,
+			"text/html",
+		);
+		stripEmailCentering(doc.body);
+
+		const heading = doc.querySelector("h1");
+		const cell = doc.querySelector("td");
+		expect(cell?.style.textAlign).not.toBe("center");
+		expect(heading?.style.textAlign).not.toBe("center");
+		expect(heading?.closest("p")?.style.textAlign).not.toBe("center");
+
+		const json = JSON.stringify(
+			generateJSON(doc.body.innerHTML, [emailStarterKit()] as never),
+		);
+		expect(json).not.toMatch(/"alignment"\s*:\s*"center"/);
+		expect(json).toContain("Meet a new way to work");
+	});
+
+	it("keeps Column align=center as text-align in a two-cell row", () => {
+		const doc = new DOMParser().parseFromString(
+			`<table width="100%">
+				<tr>
+					<td align="center"><p>Centered col</p></td>
+					<td><p>Start col</p></td>
+				</tr>
+			</table>`,
+			"text/html",
+		);
+		stripEmailCentering(doc.body);
+		const cells = Array.from(doc.querySelectorAll("td"));
+		expect(cells[0]?.style.textAlign).toBe("center");
+		expect(cells[1]?.style.textAlign).not.toBe("center");
+	});
+
+	it("leaves a lone button in a full-width section start-aligned", () => {
+		const doc = new DOMParser().parseFromString(
+			`<div data-type="container" style="max-width:640px">
+				<table align="center" width="100%">
+					<tr><td><p>Meet your next favorite feature</p></td></tr>
+				</table>
+				<table align="center" width="100%">
+					<tr>
+						<td>
+							<a href="https://example.com/" style="display:inline-block;padding:12px 20px">Try it now</a>
+						</td>
+					</tr>
+				</table>
+			</div>`,
+			"text/html",
+		);
+		stripEmailCentering(doc.body);
+
+		const cta = Array.from(doc.querySelectorAll("a")).find(
+			(a) => a.textContent === "Try it now",
+		);
+		expect(cta?.closest("p")?.style.textAlign).not.toBe("center");
+		expect(cta?.closest("table")?.style.textAlign).not.toBe("center");
+	});
 });
 
 describe("Halo order-confirmation product and totals alignment", () => {
@@ -371,6 +442,22 @@ describe("findEmailContainerTable", () => {
 		expect(found?.textContent).toContain("Invite your team");
 	});
 
+	it("treats max-width in em as CSS pixels so a 37.5em container stays the column", () => {
+		const doc = new DOMParser().parseFromString(
+			`<table style="max-width:37.5em;background-color:rgb(19,19,19)">
+				<tr><td>
+					<table style="max-width:560px;background-color:#fff">
+						<tr><td><p>Inner card</p></td></tr>
+					</table>
+				</td></tr>
+			</table>`,
+			"text/html",
+		);
+		const found = findEmailContainerTable(doc.body);
+		expect(found?.getAttribute("style")).toMatch(/37\.5em/);
+		expect(found?.getAttribute("style")).toMatch(/19,\s*19,\s*19/);
+	});
+
 	it("does not replace a 640px wrapper with an inner 560px card", () => {
 		const doc = new DOMParser().parseFromString(
 			`<table style="max-width:640px;background-color:rgb(246,246,246)">
@@ -391,5 +478,62 @@ describe("findEmailContainerTable", () => {
 		expect(found?.getAttribute("style")).toMatch(/640px/);
 		expect(found?.textContent).toContain("Why your finger");
 		expect(found?.textContent).toContain("Shop Halo");
+	});
+});
+
+describe("applyEmailColumnWidth", () => {
+	it("keeps source max-width in em so width:100% cannot fill the editor", () => {
+		const doc = new DOMParser().parseFromString(
+			`<table width="100%" style="width:100%;max-width:37.5em">
+				<tr><td style="width:100%">Hi Alan</td></tr>
+			</table>`,
+			"text/html",
+		);
+		const table = doc.querySelector("table");
+		expect(table).toBeTruthy();
+		const el = doc.createElement("div");
+		el.style.cssText = table?.getAttribute("style") || "";
+		applyEmailColumnWidth(el, table as Element);
+
+		expect(el.style.maxWidth).toBe("37.5em");
+		expect(el.style.width).toBe("100%");
+
+		const json = JSON.stringify(
+			generateJSON(
+				`<div data-type="container" class="node-container" style="${el.getAttribute("style")}">Hi Alan</div>`,
+				[emailStarterKit()] as never,
+			),
+		);
+		expect(json).toMatch(/max-width:\s*37\.5em/i);
+	});
+
+	it("turns a numeric width attribute into max-width px", () => {
+		const doc = new DOMParser().parseFromString(
+			`<table width="600" style="width:100%"><tr><td>Hi</td></tr></table>`,
+			"text/html",
+		);
+		const table = doc.querySelector("table");
+		expect(table).toBeTruthy();
+		const el = doc.createElement("div");
+		el.style.cssText = table?.getAttribute("style") || "";
+		applyEmailColumnWidth(el, table as Element);
+
+		expect(el.style.maxWidth).toBe("600px");
+		expect(el.style.width).toBe("100%");
+	});
+
+	it("does not keep fluid height from the wrapper table", () => {
+		const doc = new DOMParser().parseFromString(
+			`<table style="width:100%;max-width:600px;height:100%"><tr><td>Hi</td></tr></table>`,
+			"text/html",
+		);
+		const table = doc.querySelector("table");
+		expect(table).toBeTruthy();
+		const el = doc.createElement("div");
+		el.style.cssText = table?.getAttribute("style") || "";
+		applyEmailColumnWidth(el, table as Element);
+
+		expect(el.style.maxWidth).toBe("600px");
+		expect(el.style.height).toBe("");
 	});
 });

@@ -74,6 +74,15 @@ describe("preserveEmailLinkUnderlines", () => {
 		expect(html).not.toMatch(/data-email-decoration="underline"/);
 	});
 
+	it("does not underline a filled button-like link", () => {
+		const html = `<a href="https://example.com/" style="display:inline-block;background-color:rgb(255,255,255);color:rgb(0,0,0);padding:12px 20px">Explore</a>`;
+		const doc = new DOMParser().parseFromString(html, "text/html");
+		preserveEmailLinkUnderlines(doc.body);
+		const link = doc.querySelector("a");
+		expect(link?.getAttribute(EMAIL_DECORATION_ATTR)).toBe("none");
+		expect(link?.style.textDecoration).toBe("none");
+	});
+
 	it("does not underline image links", () => {
 		const html = `<a href="https://x.com/"><img width="20" height="20" alt="X" /></a>`;
 		const doc = new DOMParser().parseFromString(html, "text/html");

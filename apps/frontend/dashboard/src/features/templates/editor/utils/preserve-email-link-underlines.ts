@@ -1,5 +1,18 @@
 export const EMAIL_DECORATION_ATTR = "data-email-decoration";
 
+function hasPaintedBackground(el: HTMLElement): boolean {
+	const bg = (el.style.backgroundColor || el.getAttribute("bgcolor") || "")
+		.replace(/\s/g, "")
+		.toLowerCase();
+	return Boolean(
+		bg &&
+			bg !== "transparent" &&
+			bg !== "rgba(0,0,0,0)" &&
+			bg !== "inherit" &&
+			bg !== "initial",
+	);
+}
+
 /**
  * React Email's Link.renderHTML prepends the theme's
  * `text-decoration: underline` onto every `a.node-link`. Canvas CSS must not
@@ -29,7 +42,7 @@ export function preserveEmailLinkUnderlines(root: Element): void {
 			continue;
 		}
 
-		if (hasImg || decoration.includes("none")) {
+		if (hasImg || decoration.includes("none") || hasPaintedBackground(el)) {
 			el.style.setProperty("text-decoration", "none");
 			el.setAttribute(EMAIL_DECORATION_ATTR, "none");
 		}

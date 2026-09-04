@@ -21,11 +21,68 @@ const EMAIL_COLUMN_MIN_PX = 560;
 
 function parseTableMaxWidthPx(table: Element): number | null {
 	const style = table.getAttribute("style") || "";
-	const fromStyle = style.match(/max-width\s*:\s*(\d+(?:\.\d+)?)/i);
-	if (fromStyle?.[1]) return Number(fromStyle[1]);
+	const fromStyle = style.match(
+		/max-width\s*:\s*(\d+(?:\.\d+)?)(px|em|rem|%)?/i,
+	);
+	if (fromStyle?.[1]) {
+		const unit = (fromStyle[2] || "px").toLowerCase();
+		if (unit === "%") return null;
+		const n = Number(fromStyle[1]);
+		if (unit === "em" || unit === "rem") return n * 16;
+		return n;
+	}
 	const width = table.getAttribute("width") || "";
 	if (/^\d+$/.test(width)) return Number(width);
 	return null;
+}
+
+function isFluidWidth(value: string): boolean {
+	return !value || /^100%$/i.test(value.trim());
+}
+
+/**
+ * React Email Container is `width: 100%; max-width: 37.5em` (600px). Copying
+ * `width: 100%` onto the editor container without max-width makes the column
+ * fill the dashboard. Keep the source max-width string (em stays em).
+ */
+export function emailColumnMaxWidthCss(table: Element): string | null {
+	const style = table.getAttribute("style") || "";
+	const max = style.match(/max-width\s*:\s*([^;]+)/i);
+	if (max?.[1] && !isFluidWidth(max[1])) return max[1].trim();
+	const widthCss = style.match(/(?:^|;)\s*width\s*:\s*([^;]+)/i);
+	if (widthCss?.[1] && !isFluidWidth(widthCss[1])) return widthCss[1].trim();
+	const attr = (table.getAttribute("width") || "").trim();
+	if (/^\d+$/.test(attr)) return `${attr}px`;
+	return null;
+}
+
+function emailColumnHeightCss(table: Element): string | null {
+	const style = table.getAttribute("style") || "";
+	const heightCss = style.match(/(?:^|;)\s*height\s*:\s*([^;]+)/i);
+	if (
+		heightCss?.[1] &&
+		!isFluidWidth(heightCss[1]) &&
+		!/^auto$/i.test(heightCss[1].trim())
+	) {
+		return heightCss[1].trim();
+	}
+	const attr = (table.getAttribute("height") || "").trim();
+	if (/^\d+$/.test(attr)) return `${attr}px`;
+	return null;
+}
+
+export function applyEmailColumnWidth(el: HTMLElement, table: Element): void {
+	const maxWidth = emailColumnMaxWidthCss(table);
+	el.style.removeProperty("width");
+	if (maxWidth) {
+		el.style.maxWidth = maxWidth;
+		el.style.width = "100%";
+	}
+	const height = emailColumnHeightCss(table);
+	el.style.removeProperty("height");
+	if (height) {
+		el.style.height = height;
+	}
 }
 
 /** Last ~640px match is the innermost column. Ignore inner 490px heading tables. */
@@ -53,6 +110,87 @@ export function findEmailContainerTable(root: ParentNode): Element | null {
 		if (isEmailContainerTable(table)) found = table;
 	}
 	return found ?? tables[0] ?? null;
+}
+
+/**
+ * React Email `<Heading><Text>` emits `<h1><p>…</p></h1>`. The browser
+ * closes the heading first, so the inner word ("Cubes") becomes a theme
+ * paragraph on a white canvas. Turn those nested paragraphs into spans
+ * before DOMParser splits them.
+ */
+export function liftNestedHeadingParagraphs(html: string): string {
+	return html.replace(
+		/<(h[1-6])(\b[^>]*)>([\s\S]*?)<\/\1>/gi,
+		(_full, tag: string, attrs: string, inner: string) => {
+			const lifted = inner
+				.replace(/<p(\s[^>]*)?>/gi, "<span$1>")
+				.replace(/<\/p>/gi, "</span>");
+			return `<${tag}${attrs}>${lifted}</${tag}>`;
+		},
+	);
+}
+
+function isSectionLikeSibling(node: Node): boolean {
+	if (node.nodeType === Node.TEXT_NODE) {
+		return Boolean(node.textContent?.trim());
+	}
+	if (!(node instanceof Element)) return false;
+	const tag = node.tagName.toLowerCase();
+	return (
+		tag === "table" ||
+		tag === "section" ||
+		tag === "img" ||
+		tag === "h1" ||
+		tag === "h2" ||
+		tag === "h3" ||
+		tag === "p" ||
+		tag === "div"
+	);
+}
+
+/**
+ * The ~640px Container is often not the whole email. A full-bleed header
+ * Section sits as a sibling above it. Taking only the container cell drops
+ * that chrome. Collect sibling sections, but never other cells in the same
+ * row (that would flatten a two-column grid).
+ */
+export function takeEmailColumnContents(
+	containerTable: Element,
+	contentCell: Element,
+): Node[] {
+	const before: Node[][] = [];
+	const after: Node[][] = [];
+	let current: Element | null = containerTable;
+	let parent = current.parentElement;
+
+	while (parent) {
+		const tag = parent.tagName;
+		if (tag === "TR" || tag === "TBODY" || tag === "THEAD" || tag === "TFOOT") {
+			current = parent;
+			parent = parent.parentElement;
+			continue;
+		}
+
+		const kids = Array.from(parent.childNodes);
+		const idx = kids.indexOf(current);
+		if (
+			idx >= 0 &&
+			(tag === "TD" || tag === "TH" || tag === "BODY" || tag === "DIV")
+		) {
+			before.unshift(kids.slice(0, idx).filter(isSectionLikeSibling));
+			after.push(kids.slice(idx + 1).filter(isSectionLikeSibling));
+		}
+
+		if (tag === "BODY" || tag === "HTML") break;
+		current = parent;
+		parent = parent.parentElement;
+	}
+
+	return [
+		...before.flat(),
+		...Array.from(contentCell.childNodes),
+		...after.flat(),
+	];
 }
 
 function isWhiteBackground(value: string): boolean {
@@ -112,6 +250,12 @@ export function stripEmailCentering(root: Element): void {
 			if (columnTable) {
 				el.style.marginLeft = el.style.marginLeft || "auto";
 				el.style.marginRight = el.style.marginRight || "auto";
+			} else if (tag === "td" || tag === "th") {
+				// One-cell Section/Column wrappers use align for layout.
+				// A two-or-more-cell row is a real Column align.
+				if (rowCellCount(el) >= 2 && !el.style.textAlign) {
+					el.style.textAlign = "center";
+				}
 			} else if (!isLayoutCenteredTable(el)) {
 				// Shrink-wrapped button / footer tables: keep content centered.
 				if (!el.style.textAlign) el.style.textAlign = "center";
@@ -156,8 +300,12 @@ function isCenteredElement(el: HTMLElement): boolean {
 	if (el.style.textAlign.toLowerCase() === "center") return true;
 	if (el.closest('[data-preserve-center="true"]')) return true;
 	if (el.getAttribute("align")?.toLowerCase() === "center") {
-		// ~640px wrappers use align to sit on the page, not to center copy.
-		if (el.tagName === "TABLE" && isColumnTable(el)) return false;
+		const tag = el.tagName.toLowerCase();
+		// Column / full-width Section/Row use align for layout, not copy.
+		if (tag === "table" && isLayoutCenteredTable(el)) return false;
+		// One-cell td align is the same layout attr. A lone CTA still wraps
+		// when an ancestor table is shrink-wrapped or has text-align:center.
+		if ((tag === "td" || tag === "th") && rowCellCount(el) < 2) return false;
 		return true;
 	}
 	return false;
@@ -209,6 +357,12 @@ function isColumnTable(el: HTMLElement): boolean {
 function firstRowCellCount(el: HTMLElement): number {
 	if (!(el instanceof HTMLTableElement)) return 0;
 	return el.rows[0]?.cells.length ?? 0;
+}
+
+function rowCellCount(cell: HTMLElement): number {
+	const row = cell.parentElement;
+	if (!(row instanceof HTMLTableRowElement)) return 0;
+	return row.cells.length;
 }
 
 function isFullWidthTable(el: HTMLElement): boolean {

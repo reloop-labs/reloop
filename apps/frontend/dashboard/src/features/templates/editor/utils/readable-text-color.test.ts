@@ -2,6 +2,7 @@
 
 import { describe, expect, it } from "vitest";
 import {
+	emailHasMixedBackgrounds,
 	readableTextColor,
 	rewriteLowContrastInlineText,
 } from "./readable-text-color";
@@ -41,5 +42,25 @@ describe("rewriteLowContrastInlineText", () => {
 			"rgb(196, 196, 196)",
 		);
 	});
-});
 
+	it("detects a newsletter with both dark and light section fills", () => {
+		const root = document.createElement("div");
+		root.innerHTML = `
+			<table style="background-color:rgb(0,0,0)"><tr><td>Header</td></tr></table>
+			<table><tr>
+				<td style="background-color:rgb(255,243,176)"><p>IDEAS!</p></td>
+			</tr></table>
+		`;
+		expect(emailHasMixedBackgrounds(root)).toBe(true);
+	});
+
+	it("keeps black text on a light button sitting on a dark canvas", () => {
+		const root = document.createElement("div");
+		root.innerHTML =
+			'<a href="#" style="background-color:rgb(255, 255, 255);color:rgb(0, 0, 0)">Explore Smart Tasks</a>';
+		rewriteLowContrastInlineText(root, "rgb(19, 19, 19)");
+		expect((root.firstElementChild as HTMLElement).style.color).toMatch(
+			/^(rgb\(\s*0\s*,\s*0\s*,\s*0\s*\)|#000000|#000)$/i,
+		);
+	});
+});

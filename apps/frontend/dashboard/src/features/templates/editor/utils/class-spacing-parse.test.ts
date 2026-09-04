@@ -84,6 +84,61 @@ describe("class-based email spacing", () => {
 		expect(json).toContain("WELCOME TO DITHER");
 	});
 
+	it("inlines Tailwind @layer utility color and size", () => {
+		const html = parseAndInline(`<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    @layer utilities {
+      .text-hero { color: rgb(255, 255, 255); font-size: 56px; font-weight: 500; }
+      .text-muted { color: rgb(196, 196, 196); }
+    }
+  </style>
+</head>
+<body>
+  <h1 class="text-hero">Welcome</h1>
+  <p class="text-muted">Invite your team</p>
+</body>
+</html>`);
+		expect(html).toMatch(/color:\s*rgb\(\s*255\s*,\s*255\s*,\s*255\s*\)/i);
+		expect(html).toMatch(/font-size:\s*56px/i);
+		expect(html).toMatch(/font-weight:\s*500/i);
+		expect(html).toMatch(/color:\s*rgb\(\s*196\s*,\s*196\s*,\s*196\s*\)/i);
+	});
+
+	it("does not inline prefers-color-scheme dark text onto a light column", () => {
+		const html = parseAndInline(`<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    p { color: rgb(51, 51, 51); }
+    @media (prefers-color-scheme: dark) {
+      p { color: rgb(255, 255, 255); }
+      body { background-color: rgb(34, 34, 34); }
+    }
+  </style>
+</head>
+<body>
+  <p>Your challenge</p>
+</body>
+</html>`);
+		expect(html).toMatch(/color:\s*rgb\(\s*51\s*,\s*51\s*,\s*51\s*\)/i);
+		expect(html).not.toMatch(/color:\s*rgb\(\s*255\s*,\s*255\s*,\s*255\s*\)/i);
+	});
+
+	it("drops dark color-scheme media from editor-scoped CSS", () => {
+		const scoped = scopeEmailCssForEditor(`
+			p { color: #333; }
+			@media (prefers-color-scheme: dark) {
+				p { color: #fff; }
+				body { background: #222; }
+			}
+		`);
+		expect(scoped).toMatch(/color:\s*#333/);
+		expect(scoped).not.toMatch(/prefers-color-scheme/);
+		expect(scoped).not.toMatch(/#fff/);
+	});
+
 	it("scopes a * reset so utility classes still win", () => {
 		const scoped = scopeEmailCssForEditor(
 			"* { margin:0;padding:0; } .mobile_pt-10 { padding-top: 3.5rem; }",

@@ -14,7 +14,10 @@ import {
 	pickSavedEmailHtml,
 	restoreImportedEmailCssFromHtml,
 } from "#/features/templates/editor/utils/load-html-into-editor";
-import { readableTextColor } from "#/features/templates/editor/utils/readable-text-color";
+import {
+	emailHasMixedBackgrounds,
+	readableTextColor,
+} from "#/features/templates/editor/utils/readable-text-color";
 import { mapTemplateVariables } from "#/features/templates/lib/template-variables";
 import {
 	getRandomColor,
@@ -308,12 +311,6 @@ export const EditorProvider = ({ children, roomId }: EditorProviderProps) => {
 					styles = updateGlobalStyleValue(
 						styles,
 						"container",
-						"align",
-						"center",
-					);
-					styles = updateGlobalStyleValue(
-						styles,
-						"container",
 						"height",
 						undefined,
 					);
@@ -423,10 +420,16 @@ export const EditorProvider = ({ children, roomId }: EditorProviderProps) => {
 						"container",
 						"color",
 					);
-					const textColor = readableTextColor(
-						typeof containerBg === "string" ? containerBg : undefined,
-						typeof extractedColor === "string" ? extractedColor : undefined,
+					const mixedSurfaces = emailHasMixedBackgrounds(
+						new DOMParser().parseFromString(htmlStringToProcess, "text/html")
+							.body,
 					);
+					const textColor = mixedSurfaces
+						? undefined
+						: readableTextColor(
+								typeof containerBg === "string" ? containerBg : undefined,
+								typeof extractedColor === "string" ? extractedColor : undefined,
+							);
 					if (textColor) {
 						mergedStyles = updateGlobalStyleValue(
 							mergedStyles,
@@ -447,12 +450,6 @@ export const EditorProvider = ({ children, roomId }: EditorProviderProps) => {
 						"container",
 						"height",
 						undefined,
-					);
-					mergedStyles = updateGlobalStyleValue(
-						mergedStyles,
-						"container",
-						"align",
-						"center",
 					);
 					mergedStyles = updateGlobalStyleValue(
 						mergedStyles,

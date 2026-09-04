@@ -11,6 +11,10 @@
 	 * here would show as a white strip above a gray section. */
 	padding-top: 0 !important;
 	padding-bottom: 0 !important;
+	/* Dashboard `html.dark` / OS dark must not activate email
+	 * `@media (prefers-color-scheme: dark)` or inherit chrome text color. */
+	color-scheme: light;
+	color: #000000;
 }
 
 .tiptap.ProseMirror td,
@@ -41,28 +45,13 @@
 	box-sizing: border-box;
 	margin-left: auto;
 	margin-right: auto;
+	/* Shrink to the canvas; inline max-width from the pasted HTML caps it. */
+	width: 100%;
 	/* EmailTheming injects height: 400px with equal/higher specificity. */
 	height: auto !important;
 	max-height: none !important;
 	min-height: 0 !important;
 	overflow: visible !important;
-}
-
-/*
- * EmailTheming RESET (basic) sets .node-paragraph padding 0.5em and
- * .node-heading padding-top 0.389em. Those ems resolve against the node's
- * font-size, so a 72px Arcane hero gains 36px extra on each side — stacked
- * on the HTML's 80px/56px cell padding. Email spacing lives on cells and
- * inline margin; do not !important margin (Dither's 2.5rem subtitle gap).
- */
-.tiptap.ProseMirror .node-paragraph,
-.tiptap.ProseMirror .node-heading,
-.tiptap.ProseMirror p,
-.tiptap.ProseMirror h1,
-.tiptap.ProseMirror h2,
-.tiptap.ProseMirror h3 {
-	padding-top: 0 !important;
-	padding-bottom: 0 !important;
 }
 
 /*
@@ -84,6 +73,24 @@
 .tiptap.ProseMirror a[data-email-decoration="underline"],
 .ProseMirror a[data-email-decoration="underline"] {
 	text-decoration: underline !important;
+}
+
+/* Social icon rows were flattened to a <p> with left alignment in
+ * older pastes. Keep the original table layout (50% right/left) and
+ * only center the row itself, not the whole cell — otherwise the
+ * cursor is trapped in the middle and the gap above the icons
+ * doubles (container 30px + 2rem). */
+.tiptap.ProseMirror p[data-icon-row],
+.ProseMirror p[data-icon-row] {
+	text-align: center !important;
+}
+.tiptap.ProseMirror table[data-icon-row],
+.ProseMirror table[data-icon-row] {
+	text-align: center !important;
+}
+.tiptap.ProseMirror p:has(> img + img),
+.ProseMirror p:has(> img + img) {
+	text-align: center !important;
 }
 
 [data-re-bubble-menu],

@@ -10,6 +10,7 @@ import { emailStarterKit } from "./email-starter-kit";
 import {
 	absolutizeEmailAssetUrls,
 	inlineEmailStylesheet,
+	readDocumentBodyBackground,
 } from "./inline-email-stylesheet";
 
 const CONTAINER_HTML = `
@@ -57,6 +58,7 @@ describe("email canvas container centering", () => {
 		expect(css).toMatch(/\.node-container/);
 		expect(css).toMatch(/margin-left:\s*auto/);
 		expect(css).toMatch(/margin-right:\s*auto/);
+		expect(css).toMatch(/\.node-container[^{]*\{[^}]*width:\s*100%/);
 		expect(css).not.toMatch(
 			/table\[alignment="center"\][^}]*text-align:\s*start\s*!important/,
 		);
@@ -82,6 +84,50 @@ describe("email canvas container centering", () => {
 		expect(css).toMatch(
 			/\.ProseMirror[^{]*\{[^}]*padding-top:\s*0\s*!important/,
 		);
+		expect(css).toMatch(/color-scheme:\s*light/);
+		expect(css).not.toMatch(
+			/\.node-heading[^{]*\{[^}]*padding-top:\s*0\s*!important/,
+		);
+		expect(css).not.toMatch(
+			/\.tiptap\.ProseMirror h1[^{]*\{[^}]*padding-top:\s*0\s*!important/,
+		);
+	});
+});
+
+describe("email page vs column background", () => {
+	it("reads body fill from a stylesheet when the column has no background", () => {
+		const html = `<!DOCTYPE html>
+<html>
+<head>
+  <style>body { background-color: rgb(244, 244, 244); }</style>
+</head>
+<body>
+  <table style="max-width:640px">
+    <tr><td>
+      <table style="background-color:rgb(255,255,255)"><tr><td><p>Intro</p></td></tr></table>
+    </td></tr>
+  </table>
+</body>
+</html>`;
+		const doc = new DOMParser().parseFromString(html, "text/html");
+		expect(readDocumentBodyBackground(doc).replace(/\s/g, "")).toMatch(
+			/244,244,244/,
+		);
+		const column = doc.querySelector("table");
+		expect(column?.style.backgroundColor).toBe("");
+	});
+
+	it("does not invent a white column background in the theme extractor", () => {
+		const source = readFileSync(
+			join(
+				dirname(fileURLToPath(import.meta.url)),
+				"../components/panels/code/code-view.tsx",
+			),
+			"utf8",
+		);
+		expect(source).toMatch(/containerBg\s*=\s*[\s\S]*\|\|\s*undefined/);
+		expect(source).not.toMatch(/containerBg\s*=\s*[\s\S]*\|\|\s*"#ffffff"/);
+		expect(source).toMatch(/prop\.startsWith\("background"\)/);
 	});
 });
 
@@ -97,9 +143,13 @@ describe("parseGlobalStylesFromHtml canvas defaults", () => {
 
 		expect(source).toMatch(/font-size:\$\{baseFontSize\};/);
 		expect(source).not.toMatch(/font-size:\$\{baseFontSize\}!important/);
+		expect(source).not.toMatch(/font-weight:600 !important/);
+		expect(source).not.toMatch(/\.node-heading\{padding-top:0!important/);
 		expect(source).not.toMatch(
 			/child\.style\.textAlign\.toLowerCase\(\) === "center"/,
 		);
+		expect(source).toMatch(/applyEmailColumnWidth\(/);
+		expect(source).toMatch(/emailColumnMaxWidthCss\(/);
 	});
 });
 

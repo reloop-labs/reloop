@@ -92,6 +92,49 @@ export function readableTextColor(
 	return undefined;
 }
 
+function isTransparentOrEmpty(cssColor: string): boolean {
+	const v = cssColor.replace(/\s/g, "").toLowerCase();
+	return !v || v === "transparent" || v === "rgba(0,0,0,0)";
+}
+
+/** The surface the text actually sits on — button fill, then ancestors, then canvas. */
+function nearestBackground(el: HTMLElement, fallback: string): string {
+	let current: HTMLElement | null = el;
+	while (current) {
+		const bg =
+			current.style.backgroundColor || current.getAttribute("bgcolor") || "";
+		if (bg && !isTransparentOrEmpty(bg)) return bg;
+		current = current.parentElement;
+	}
+	return fallback;
+}
+
+function normalizeBgKey(cssColor: string): string {
+	const rgb = parseRgb(cssColor);
+	if (!rgb) return cssColor.replace(/\s/g, "").toLowerCase();
+	return `${rgb.r},${rgb.g},${rgb.b}`;
+}
+
+/**
+ * Yellow hero + navy banner + pastel cards cannot share one canvas color.
+ * A global `#ffffff` then paints every card label white.
+ */
+export function emailHasMixedBackgrounds(root: Element): boolean {
+	const colors = new Set<string>();
+	const walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT);
+	let node: Node | null = walker.currentNode;
+	while (node) {
+		const el = node as HTMLElement;
+		const bg = el.style?.backgroundColor || el.getAttribute("bgcolor") || "";
+		if (bg && !isTransparentOrEmpty(bg)) {
+			colors.add(normalizeBgKey(bg));
+			if (colors.size >= 2) return true;
+		}
+		node = walker.nextNode();
+	}
+	return false;
+}
+
 /** Lift inline colors that would disappear on a dark email canvas. */
 export function rewriteLowContrastInlineText(
 	root: Element,
@@ -105,7 +148,10 @@ export function rewriteLowContrastInlineText(
 		const el = node as HTMLElement;
 		const current = el.style?.color;
 		if (current) {
-			const next = readableTextColor(canvasBackground, current);
+			const next = readableTextColor(
+				nearestBackground(el, canvasBackground),
+				current,
+			);
 			if (next && next !== current) {
 				el.style.color = next;
 			}

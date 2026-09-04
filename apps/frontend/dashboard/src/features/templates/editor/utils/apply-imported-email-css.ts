@@ -24,6 +24,8 @@ export function applyImportedEmailCss(css: string): void {
 	outline: none !important;
 	padding-top: 0 !important;
 	padding-bottom: 0 !important;
+	color-scheme: light;
+	color: #000000;
 }
 .tiptap.ProseMirror .node-container,
 .ProseMirror .node-container,
@@ -35,13 +37,6 @@ div[data-type="container"] {
 	margin-left: auto !important;
 	margin-right: auto !important;
 	box-sizing: border-box !important;
-}
-.tiptap.ProseMirror .node-paragraph,
-.tiptap.ProseMirror .node-heading,
-.ProseMirror .node-paragraph,
-.ProseMirror .node-heading {
-	padding-top: 0 !important;
-	padding-bottom: 0 !important;
 }
 .tiptap.ProseMirror a:has(img),
 .ProseMirror a:has(img) {

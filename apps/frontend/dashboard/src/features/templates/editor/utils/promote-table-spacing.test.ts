@@ -6,7 +6,9 @@ import { emailStarterKit } from "./email-starter-kit";
 import {
 	flattenedIconRowMarginTop,
 	promoteCellTypographyToBlocks,
+	promoteInheritedTypography,
 	promoteTableSpacingToCells,
+	stampThemeNeutralBlockPadding,
 } from "./promote-table-spacing";
 
 /** Logo + heading block from the pasted Dither source (inline table padding). */
@@ -36,6 +38,28 @@ describe("promoteTableSpacingToCells", () => {
 
 		const headingTable = doc.querySelectorAll("table")[1];
 		expect(headingTable?.style.paddingTop).toMatch(/^0/);
+	});
+
+	it("moves column table padding onto the cell before the wrapper is unwrapped", () => {
+		const doc = new DOMParser().parseFromString(
+			`<table style="max-width:640px;padding-top:20px;padding-right:20px;padding-bottom:20px;padding-left:20px">
+				<tr>
+					<td style="margin:0;padding:0">
+						<h1 style="background-color:rgb(244,211,94);padding-top:24px;padding-left:32px">This week: Cubes</h1>
+						<p>The Shape challenge continues!</p>
+					</td>
+				</tr>
+			</table>`,
+			"text/html",
+		);
+		promoteTableSpacingToCells(doc.body);
+		stampThemeNeutralBlockPadding(doc.body);
+		const cell = doc.querySelector("td") as HTMLElement;
+		const heading = doc.querySelector("h1") as HTMLElement;
+		expect(cell.style.paddingTop).toBe("20px");
+		expect(cell.style.paddingLeft).toBe("20px");
+		expect(heading.style.paddingTop).toBe("24px");
+		expect(heading.style.paddingLeft).toBe("32px");
 	});
 
 	it("keeps heading size, cell padding, and subtitle margin in TipTap JSON", () => {
@@ -102,6 +126,20 @@ describe("promoteCellTypographyToBlocks", () => {
 		expect(p.style.lineHeight).toBe("21px");
 	});
 
+	it("copies cell color onto a nested link that lacks it", () => {
+		const doc = new DOMParser().parseFromString(
+			`<table><tr>
+				<td style="color:rgb(196,196,196);font-size:15px">
+					<a href="#">Read more</a>
+				</td>
+			</tr></table>`,
+			"text/html",
+		);
+		promoteCellTypographyToBlocks(doc.body);
+		expect(doc.querySelector("a")?.style.color).toBe("rgb(196, 196, 196)");
+		expect(doc.querySelector("a")?.style.fontSize).toBe("15px");
+	});
+
 	it("does not overwrite a paragraph that already has font-size", () => {
 		const doc = new DOMParser().parseFromString(
 			`<td style="font-size:15px"><p style="font-size:56px">Hero</p></td>`,
@@ -109,5 +147,61 @@ describe("promoteCellTypographyToBlocks", () => {
 		);
 		promoteCellTypographyToBlocks(doc.body);
 		expect(doc.querySelector("p")?.style.fontSize).toBe("56px");
+	});
+});
+
+describe("promoteInheritedTypography", () => {
+	it("copies wrapper color and weight onto a heading that only has size", () => {
+		const doc = new DOMParser().parseFromString(
+			`<table><tr>
+				<td style="color:rgb(255,255,255);font-weight:500;font-size:15px">
+					<h1 style="font-size:56px">Welcome</h1>
+					<p>Body copy</p>
+				</td>
+			</tr></table>`,
+			"text/html",
+		);
+		promoteInheritedTypography(doc.body);
+		const heading = doc.querySelector("h1") as HTMLElement;
+		const body = doc.querySelector("p") as HTMLElement;
+		expect(heading.style.color).toBe("rgb(255, 255, 255)");
+		expect(heading.style.fontWeight).toBe("500");
+		expect(heading.style.fontSize).toBe("56px");
+		expect(body.style.color).toBe("rgb(255, 255, 255)");
+		expect(body.style.fontSize).toBe("15px");
+	});
+
+	it("does not paint a filled button with the canvas text color", () => {
+		const doc = new DOMParser().parseFromString(
+			`<table><tr>
+				<td style="color:rgb(255,255,255)">
+					<a href="#" style="background-color:rgb(255,255,255);color:rgb(0,0,0)">Explore</a>
+				</td>
+			</tr></table>`,
+			"text/html",
+		);
+		promoteInheritedTypography(doc.body);
+		expect(doc.querySelector("a")?.style.color).toMatch(
+			/^(rgb\(\s*0\s*,\s*0\s*,\s*0\s*\)|#000000|#000)$/i,
+		);
+	});
+});
+
+describe("stampThemeNeutralBlockPadding", () => {
+	it("keeps source heading padding and only fills missing sides with 0", () => {
+		const doc = new DOMParser().parseFromString(
+			`<div>
+				<h1 style="padding-top:24px;padding-right:32px;padding-bottom:24px;padding-left:32px">Cubes</h1>
+				<p>The Shape challenge continues!</p>
+			</div>`,
+			"text/html",
+		);
+		stampThemeNeutralBlockPadding(doc.body);
+		const heading = doc.querySelector("h1") as HTMLElement;
+		const body = doc.querySelector("p") as HTMLElement;
+		expect(heading.style.paddingTop).toBe("24px");
+		expect(heading.style.paddingLeft).toBe("32px");
+		expect(body.style.paddingTop).toMatch(/^0(px)?$/);
+		expect(body.style.paddingLeft).toMatch(/^0(px)?$/);
 	});
 });

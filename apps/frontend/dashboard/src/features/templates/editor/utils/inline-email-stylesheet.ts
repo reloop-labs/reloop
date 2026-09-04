@@ -39,13 +39,17 @@ function parseStyleRules(
 			const block = readBraceBlock(source, open);
 			if (
 				/^@media\b/i.test(prelude) &&
-				/max-width/i.test(prelude) &&
-				!/min-width/i.test(prelude)
+				(/prefers-color-scheme\s*:\s*dark/i.test(prelude) ||
+					(/max-width/i.test(prelude) && !/min-width/i.test(prelude)))
 			) {
+				// Dark-scheme and mobile-only rules must not become always-on
+				// inline styles (white text on a light column).
 				i = block.end;
 				continue;
 			}
-			if (/^@media\b/i.test(prelude)) {
+			// Tailwind v4 wraps utilities in @layer. Recurse so class colors
+			// and sizes become inline before TipTap / theme RESET can drop them.
+			if (/^@(?:media|layer|supports)\b/i.test(prelude)) {
 				rules.push(...parseStyleRules(block.body));
 			}
 			i = block.end;
@@ -161,11 +165,74 @@ export function inlineEmailStylesheet(doc: Document): void {
 }
 
 /**
- * Rewrite email `body` / `html` / `*` rules so they apply inside TipTap
- * without a `.ProseMirror *` reset beating utility classes.
+ * Reloop chrome dark ≠ email dark preview. `@media (prefers-color-scheme:
+ * dark)` would flip text to white while the column stays the light fill.
+ * The canvas always shows the authored (send) styles.
  */
+export function stripEmailColorSchemeMedia(css: string): string {
+	const source = stripCssComments(css);
+	let out = "";
+	let i = 0;
+	while (i < source.length) {
+		if (source[i] === "@") {
+			const open = source.indexOf("{", i);
+			if (open < 0) {
+				out += source.slice(i);
+				break;
+			}
+			const prelude = source.slice(i, open).trim();
+			const block = readBraceBlock(source, open);
+			if (
+				/^@media\b/i.test(prelude) &&
+				/prefers-color-scheme\s*:\s*dark/i.test(prelude)
+			) {
+				i = block.end;
+				continue;
+			}
+			out += source.slice(i, block.end);
+			i = block.end;
+			continue;
+		}
+		out += source[i];
+		i++;
+	}
+	return out;
+}
+
+function firstStylesheetBodyBackground(css: string): string {
+	const source = stripEmailColorSchemeMedia(css);
+	const match = source.match(
+		/(?:^|}|,)[\s]*body\b[^{]*\{([^}]*)\}/i,
+	);
+	if (!match?.[1]) return "";
+	const scratch =
+		typeof document !== "undefined"
+			? document.createElement("div")
+			: null;
+	if (!scratch) return "";
+	scratch.style.cssText = match[1];
+	return (
+		scratch.style.backgroundColor ||
+		scratch.style.background ||
+		""
+	);
+}
+
+/** Body fill from inline style, bgcolor, or a `body { }` rule — not an invented white. */
+export function readDocumentBodyBackground(doc: Document): string {
+	const body = doc.body;
+	const inline =
+		body?.style.backgroundColor || body?.getAttribute("bgcolor") || "";
+	if (inline) return inline;
+	const css = Array.from(doc.querySelectorAll("style"))
+		.map((el) => el.textContent ?? "")
+		.join("\n");
+	return firstStylesheetBodyBackground(css);
+}
+
+/** Rewrite `body` / `html` / `*` so they apply inside TipTap. */
 export function scopeEmailCssForEditor(css: string): string {
-	let scoped = css.replace(
+	let scoped = stripEmailColorSchemeMedia(css).replace(
 		/(?<![.#\-\w])body\b/g,
 		".tiptap.ProseMirror, .ProseMirror",
 	);

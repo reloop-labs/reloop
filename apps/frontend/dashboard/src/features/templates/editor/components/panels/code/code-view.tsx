@@ -15,6 +15,7 @@ import { applyImportedEmailCss } from "#/features/templates/editor/utils/apply-i
 import {
 	absolutizeEmailAssetUrls,
 	inlineEmailStylesheet,
+	readDocumentBodyBackground,
 	scopeEmailCssForEditor,
 } from "#/features/templates/editor/utils/inline-email-stylesheet";
 import { preserveEmailLinkUnderlines } from "#/features/templates/editor/utils/preserve-email-link-underlines";
@@ -22,15 +23,22 @@ import { prettyPrintHtml } from "#/features/templates/editor/utils/pretty-print-
 import {
 	flattenedIconRowMarginTop,
 	promoteCellTypographyToBlocks,
+	promoteInheritedTypography,
 	promoteTableSpacingToCells,
+	stampThemeNeutralBlockPadding,
 } from "#/features/templates/editor/utils/promote-table-spacing";
 import {
+	emailHasMixedBackgrounds,
 	readableTextColor,
 	rewriteLowContrastInlineText,
 } from "#/features/templates/editor/utils/readable-text-color";
 import {
+	applyEmailColumnWidth,
+	emailColumnMaxWidthCss,
 	findEmailContainerTable,
+	liftNestedHeadingParagraphs,
 	stripEmailCentering,
+	takeEmailColumnContents,
 } from "#/features/templates/editor/utils/strip-email-centering";
 
 export function CodeEditor({ onClose }: { onClose?: () => void } = {}) {
@@ -150,12 +158,17 @@ export function CodeEditor({ onClose }: { onClose?: () => void } = {}) {
 									"container",
 									"color",
 								);
-								const textColor = readableTextColor(
-									typeof containerBg === "string" ? containerBg : undefined,
-									typeof extractedColor === "string"
-										? extractedColor
-										: undefined,
+								const mixedSurfaces = emailHasMixedBackgrounds(
+									new DOMParser().parseFromString(newVal, "text/html").body,
 								);
+								const textColor = mixedSurfaces
+									? undefined
+									: readableTextColor(
+											typeof containerBg === "string" ? containerBg : undefined,
+											typeof extractedColor === "string"
+												? extractedColor
+												: undefined,
+										);
 								if (textColor) {
 									mergedStyles = updateGlobalStyleValue(
 										mergedStyles,
@@ -176,12 +189,6 @@ export function CodeEditor({ onClose }: { onClose?: () => void } = {}) {
 									"container",
 									"height",
 									undefined,
-								);
-								mergedStyles = updateGlobalStyleValue(
-									mergedStyles,
-									"container",
-									"align",
-									"center",
 								);
 								mergedStyles = updateGlobalStyleValue(
 									mergedStyles,
@@ -325,12 +332,18 @@ const FORBIDDEN_TAGS = new Set([
  */
 function sanitizeEmailHtml(rawHtml: string): string {
 	const parser = new DOMParser();
-	const doc = parser.parseFromString(rawHtml, "text/html");
+	const doc = parser.parseFromString(
+		liftNestedHeadingParagraphs(rawHtml),
+		"text/html",
+	);
 
 	// Copy class-based padding/margin onto inline styles before we drop <style>
 	// and unwrap the container table. Otherwise TipTap keeps the class names
 	// but the heading sits flush to the canvas.
 	inlineEmailStylesheet(doc);
+
+	expandShorthandStyles(doc.body);
+	promoteTableSpacingToCells(doc.body);
 
 	// 1. Extract and clean preview text
 	let previewText = "";
@@ -391,13 +404,16 @@ function sanitizeEmailHtml(rawHtml: string): string {
 			const scratch = doc.createElement("div") as HTMLDivElement;
 			scratch.style.cssText = containerTable.getAttribute("style") || "";
 
-			// Do not copy align="center" — TipTap would treat it as text-align.
-			for (const attr of ["class", "id", "width", "height"]) {
-				const val = containerTable.getAttribute(attr);
-				if (val) {
-					containerDiv.setAttribute(attr, val);
-				}
-			}
+			// Do not copy width="100%" / height="100%" — a div treats those
+			// as stretch-to-canvas. Keep node-container even when the table
+			// already has a class (glow, Tailwind utilities).
+			const tableClass = containerTable.getAttribute("class");
+			containerDiv.setAttribute(
+				"class",
+				["node-container", tableClass].filter(Boolean).join(" "),
+			);
+			const tableId = containerTable.getAttribute("id");
+			if (tableId) containerDiv.setAttribute("id", tableId);
 
 			// Merge contentCell style (like padding)
 			const cellStyleText = contentCell.getAttribute("style") || "";
@@ -406,7 +422,13 @@ function sanitizeEmailHtml(rawHtml: string): string {
 				cellScratch.style.cssText = cellStyleText;
 				for (let i = 0; i < cellScratch.style.length; i++) {
 					const prop = cellScratch.style[i];
-					if (!prop) continue;
+					if (
+						!prop ||
+						prop.startsWith("background") ||
+						prop === "width" ||
+						prop === "height"
+					)
+						continue;
 					const val = cellScratch.style.getPropertyValue(prop);
 					if (val) {
 						scratch.style.setProperty(prop, val);
@@ -432,8 +454,6 @@ function sanitizeEmailHtml(rawHtml: string): string {
 					"font-size",
 					"line-height",
 					"letter-spacing",
-					"font-weight",
-					"color",
 				];
 				for (const prop of TYPOGRAPHY_PROPS) {
 					const val = wrapperScratch.style.getPropertyValue(prop);
@@ -443,28 +463,114 @@ function sanitizeEmailHtml(rawHtml: string): string {
 				}
 			}
 
+			// Preserve the card's own background (white vs body gray). Previously
+			// background was skipped and relied solely on globalContent theming;
+			// if that theming is not yet hydrated the container renders transparent
+			// and the body gray bleeds through the whole canvas.
+			const tableBg =
+				(containerTable as HTMLElement).style.backgroundColor ||
+				containerTable.getAttribute("bgcolor") ||
+				"";
+			if (tableBg) {
+				const bgScratch = doc.createElement("div") as HTMLDivElement;
+				bgScratch.style.backgroundColor = tableBg;
+				const normalized = bgScratch.style.backgroundColor;
+				if (normalized) scratch.style.backgroundColor = normalized;
+			}
+			const tableBgImage = (containerTable as HTMLElement).style.backgroundImage;
+			if (tableBgImage) scratch.style.backgroundImage = tableBgImage;
+
+			applyEmailColumnWidth(scratch, containerTable);
+
 			const mergedStyle = scratch.style.cssText;
 			if (mergedStyle) {
 				containerDiv.setAttribute("style", mergedStyle);
 			}
 
-			// Move all children from contentCell to containerDiv
-			const contentNodes = Array.from(contentCell.childNodes);
-			for (const node of contentNodes) {
+			// Sibling Sections (full-bleed header, footer) must stay *outside*
+			// the white card so they keep the body background (gray) vs card
+			// background (white). Previously they were merged inside the card,
+			// which painted the Twitch footer white and made the whole canvas
+			// look gray-on-white vs the HTML preview's white-card-on-gray.
+			const isSectionLikeSiblingLocal = (node: Node): boolean => {
+				if (node.nodeType === Node.TEXT_NODE) {
+					return Boolean(node.textContent?.trim());
+				}
+				if (!(node instanceof Element)) return false;
+				const tag = node.tagName.toLowerCase();
+				return (
+					tag === "table" ||
+					tag === "section" ||
+					tag === "img" ||
+					tag === "h1" ||
+					tag === "h2" ||
+					tag === "h3" ||
+					tag === "p" ||
+					tag === "div"
+				);
+			};
+
+			const siblingBefore: Node[] = [];
+			const siblingAfter: Node[] = [];
+			{
+				let cur: Element | null = containerTable;
+				let par: Element | null = cur.parentElement;
+				while (par) {
+					const tag = par.tagName;
+					if (
+						tag === "TR" ||
+						tag === "TBODY" ||
+						tag === "THEAD" ||
+						tag === "TFOOT"
+					) {
+						cur = par;
+						par = par.parentElement;
+						continue;
+					}
+					const kids = Array.from(par.childNodes);
+					const idx = kids.indexOf(cur);
+					if (
+						idx >= 0 &&
+						(tag === "TD" ||
+							tag === "TH" ||
+							tag === "BODY" ||
+							tag === "DIV")
+					) {
+						const before = kids
+							.slice(0, idx)
+							.filter(isSectionLikeSiblingLocal);
+						const after = kids
+							.slice(idx + 1)
+							.filter(isSectionLikeSiblingLocal);
+						siblingBefore.unshift(...before);
+						siblingAfter.push(...after);
+					}
+					if (tag === "BODY" || tag === "HTML") break;
+					cur = par;
+					par = par.parentElement;
+				}
+			}
+
+			// Only the container cell's children go inside the white card.
+			for (const node of Array.from(contentCell.childNodes)) {
 				containerDiv.appendChild(node);
 			}
 
+			// Keep sibling chrome outside the card so their background stays
+			// body-driven (Twitch footer on gray). Rebuild body as
+			// before + card + after.
+			doc.body.innerHTML = "";
+			for (const n of siblingBefore) doc.body.appendChild(n);
+			doc.body.appendChild(containerDiv);
+			for (const n of siblingAfter) doc.body.appendChild(n);
+
 			// Container parseHTML also matches inner max-width presentation tables.
 			// Drop role=presentation so they stay TipTap tables (Resend Layout Table).
-			for (const table of Array.from(containerDiv.querySelectorAll("table"))) {
+			for (const table of Array.from(doc.body.querySelectorAll("table"))) {
 				if (table.getAttribute("role") === "presentation") {
 					table.removeAttribute("role");
 				}
 			}
-
-			// Replace the entire body contents with the containerDiv
-			doc.body.innerHTML = "";
-			doc.body.appendChild(containerDiv);
 		}
 	} else {
 		// If there are no tables at all, check if we need to wrap the body in a container div
@@ -533,12 +639,14 @@ function sanitizeEmailHtml(rawHtml: string): string {
 			}
 		}
 	}
-	if (canvasBg) {
+	if (canvasBg && !emailHasMixedBackgrounds(doc.body)) {
 		rewriteLowContrastInlineText(doc.body, canvasBg);
 	}
 
 	promoteTableSpacingToCells(doc.body);
 	promoteCellTypographyToBlocks(doc.body);
+	promoteInheritedTypography(doc.body);
+	stampThemeNeutralBlockPadding(doc.body);
 
 	return doc.body.innerHTML;
 }
@@ -594,12 +702,52 @@ function stripReactEmailColumnMarkersForIconRows(root: Element): void {
 	}
 }
 
+function shouldCenterIconRow(
+	table: HTMLElement,
+	root: HTMLElement,
+): boolean {
+	// Explicit align on the row itself.
+	if (table.getAttribute("align")?.toLowerCase() === "center") return true;
+	if (table.style.textAlign?.toLowerCase() === "center") return true;
+	if (
+		table.style.marginLeft === "auto" &&
+		table.style.marginRight === "auto"
+	)
+		return true;
+
+	// Walk ancestors: a React Email <Section mx-auto> or any centered wrapper
+	// means the icon row was authored centered (twitch footer). If any ancestor
+	// is centered we preserve that; otherwise we default to centered so a
+	// 2-icon footer never left-clips off the column edge.
+	let parent: HTMLElement | null = table.parentElement;
+	while (parent && parent !== root && parent !== root.ownerDocument.body) {
+		if (parent.getAttribute("align")?.toLowerCase() === "center")
+			return true;
+		if (parent.style.textAlign?.toLowerCase() === "center") return true;
+		if (
+			parent.style.marginLeft === "auto" &&
+			parent.style.marginRight === "auto"
+		)
+			return true;
+		// Tailwind `mx-auto` / `text-center` may still be class-based before
+		// inlineEmailStylesheet — check the raw attribute as fallback.
+		const cls = parent.getAttribute("class") || "";
+		if (/\bmx-auto\b/.test(cls) || /\btext-center\b/.test(cls)) return true;
+		parent = parent.parentElement;
+	}
+	// Most email footers are centered. Defaulting to true prevents the
+	// left-aligned / clipped bug from recurring on new templates.
+	return true;
+}
+
 /**
  * TipTap's schema tends to treat "multiple <td> in one row" as Columns-like layout,
  * which spreads icons across the whole width in the visual editor.
  *
  * For the common "social icons" footer pattern, replace the table with a simple
- * inline row of images so the editor renders it tightly left-aligned.
+ * inline row of images so the editor renders it tightly without spreading.
+ * The row is centered by default to match the React Email preview — a left-clipped
+ * row (see twitch-reset-password) happens when this falls back to start alignment.
  */
 function replaceSocialIconTablesWithInlineRow(root: Element): void {
 	const tables = Array.from(root.querySelectorAll("table"));
@@ -640,28 +788,39 @@ function replaceSocialIconTablesWithInlineRow(root: Element): void {
 		const hasNestedTables = directCells.some((td) => td.querySelector("table"));
 		if (hasNestedTables) continue;
 
-		const doc = root.ownerDocument;
-		const p = doc.createElement("p");
-		const marginTop = flattenedIconRowMarginTop(table);
-		p.setAttribute(
-			"style",
-			`margin:0;padding:0;margin-top:${marginTop};line-height:1`,
-		);
-
-		icons.forEach((icon, idx) => {
-			if (!icon) return;
-			const cloned = icon.cloneNode(true) as HTMLImageElement;
-			// Inline row spacing similar to the email (1.5rem gap).
-			cloned.setAttribute(
-				"style",
-				`${icon.getAttribute("style") || ""};display:inline-block;vertical-align:middle;${
-					idx < icons.length - 1 ? "margin-right:1.5rem;" : ""
-				}`,
-			);
-			p.appendChild(cloned);
-		});
-
-		table.parentNode?.replaceChild(p, table);
+		// Keep the table as a table (do not flatten to <p>) so TipTap
+		// keeps the 50%/50% right/left cell alignment that centers the
+		// pair (Twitch: Twitter right + Facebook left). Flattening to <p>
+		// lifted images out of the paragraph (image is block) and also
+		// forced the whole cell to center, trapping the cursor in the
+		// middle and adding 32px (2rem) on top of the container's 30px
+		// gap. Preserve the original table layout and just tag it.
+		table.setAttribute("data-icon-row", "true");
+		// Fix cell alignment and image display for TipTap: `align="right"`
+		// on a td does not reliably right-align a block `img{display:block}`.
+		// Convert to `text-align` + `display:inline-block` so the pair
+		// stays centered (right in left half, left in right half) in both
+		// new pastes and already-stored Yjs.
+		for (const td of directCells) {
+			const cell = td as HTMLElement;
+			const align = cell.getAttribute("align")?.toLowerCase();
+			if (align === "right" || align === "left") {
+				if (!cell.style.textAlign) cell.style.textAlign = align;
+			}
+			const img = cell.querySelector("img") as HTMLImageElement | null;
+			if (img) {
+				const cur = img.getAttribute("style") || "";
+				if (/display\s*:\s*block/i.test(cur)) {
+					img.setAttribute("style", cur.replace(/display\s*:\s*block/i, "display:inline-block") + ";vertical-align:middle");
+				} else if (!/display/i.test(cur)) {
+					img.setAttribute("style", `${cur};display:inline-block;vertical-align:middle`.replace(/^;/, ""));
+				}
+			}
+		}
+		// Do not inject extra margin — the white card already has
+		// margin-bottom:30px and the footer outer table has no gap.
+		// Adding 2rem here doubles the space vs the HTML/iframe preview.
+		// Cells keep their original align="right"/"left" and padding 8px.
 	}
 }
 
@@ -807,23 +966,14 @@ function extractThemingStylesFromHtml(rawHtml: string): any[] {
 	const parser = new DOMParser();
 	const doc = parser.parseFromString(rawHtml, "text/html");
 
-	// 1. Get body background color
-	const bodyEl = doc.querySelector("body");
-	let bodyBgColor = "#ffffff";
-	if (bodyEl) {
-		const style = bodyEl.getAttribute("style") || "";
-		const scratch = document.createElement("div");
-		scratch.style.cssText = style;
-		bodyBgColor =
-			scratch.style.backgroundColor ||
-			bodyEl.getAttribute("bgcolor") ||
-			"#ffffff";
-	}
+	// 1. Get body background color — do not invent #ffffff when the
+	// HTML leaves the page gray and paints white only on inner sections.
+	const bodyBgColor = readDocumentBodyBackground(doc) || undefined;
 
 	// 2. Find the innermost email column table
 	const containerTable = findEmailContainerTable(doc);
 
-	let containerBg = "#ffffff";
+	let containerBg: string | undefined;
 	let containerTextColor: string | undefined;
 	let containerWidth = 600;
 	let containerPaddingTop = 0;
@@ -847,20 +997,7 @@ function extractThemingStylesFromHtml(rawHtml: string): any[] {
 			containerAlign = alignAttr.toLowerCase();
 		}
 
-		// Width resolution prioritizing maxWidth/width style over width attribute = 100%
-		const styleMaxWidth = tableScratch.style.maxWidth;
-		const styleWidth = tableScratch.style.width;
-		const attrWidth = containerTable.getAttribute("width");
-
-		let widthVal: string | null = null;
-		if (styleMaxWidth && styleMaxWidth !== "100%") {
-			widthVal = styleMaxWidth;
-		} else if (styleWidth && styleWidth !== "100%") {
-			widthVal = styleWidth;
-		} else if (attrWidth && attrWidth !== "100%") {
-			widthVal = attrWidth;
-		}
-
+		const widthVal = emailColumnMaxWidthCss(containerTable);
 		if (widthVal) {
 			const parsedWidth = parseCssUnit(widthVal);
 			if (parsedWidth) containerWidth = parsedWidth;
@@ -869,7 +1006,7 @@ function extractThemingStylesFromHtml(rawHtml: string): any[] {
 		containerBg =
 			tableScratch.style.backgroundColor ||
 			containerTable.getAttribute("bgcolor") ||
-			"#ffffff";
+			undefined;
 
 		const radiusAttr = tableScratch.style.borderRadius;
 		if (radiusAttr) {
@@ -951,13 +1088,13 @@ function extractThemingStylesFromHtml(rawHtml: string): any[] {
 			const divScratch = document.createElement("div");
 			divScratch.style.cssText = divContainer.getAttribute("style") || "";
 
-			const widthAttr = divScratch.style.width || divScratch.style.maxWidth;
-			if (widthAttr) {
-				const parsedWidth = parseCssUnit(widthAttr);
+			const widthVal = emailColumnMaxWidthCss(divContainer);
+			if (widthVal) {
+				const parsedWidth = parseCssUnit(widthVal);
 				if (parsedWidth) containerWidth = parsedWidth;
 			}
 
-			containerBg = divScratch.style.backgroundColor || "#ffffff";
+			containerBg = divScratch.style.backgroundColor || undefined;
 
 			const radiusAttr = divScratch.style.borderRadius;
 			if (radiusAttr) {
@@ -989,10 +1126,13 @@ function extractThemingStylesFromHtml(rawHtml: string): any[] {
 		}
 	}
 
-	const resolvedTextColor = readableTextColor(
-		containerBg && containerBg !== "#ffffff" ? containerBg : bodyBgColor,
-		containerTextColor,
-	);
+	const mixedSurfaces = emailHasMixedBackgrounds(doc.body);
+	const resolvedTextColor = mixedSurfaces
+		? undefined
+		: readableTextColor(
+				containerBg && containerBg !== "#ffffff" ? containerBg : bodyBgColor,
+				containerTextColor,
+			);
 
 	return [
 		{
@@ -1433,8 +1573,8 @@ function parseGlobalStylesFromHtml(html: string) {
 		const baseLineHeight = scratch.style.lineHeight;
 		const baseColor = scratch.style.color;
 		const baseBg = scratch.style.backgroundColor;
-		const baseFontWeight = scratch.style.fontWeight;
 		const baseLetterSpacing = scratch.style.letterSpacing;
+		const mixedSurfaces = emailHasMixedBackgrounds(doc.body);
 
 		// Defaults only — no !important. Pasted inline font-size / family on
 		// headings and footers must win over the wrapper td (15px body text
@@ -1444,18 +1584,14 @@ function parseGlobalStylesFromHtml(html: string) {
 			baseFontFamily ? `font-family:${baseFontFamily};` : "",
 			baseFontSize ? `font-size:${baseFontSize};` : "",
 			baseLineHeight ? `line-height:${baseLineHeight};` : "",
-			baseColor ? `color:${baseColor};` : "",
-			baseBg ? `background-color:${baseBg};` : "",
-			baseFontWeight ? `font-weight:${baseFontWeight};` : "",
+			baseColor && !mixedSurfaces ? `color:${baseColor};` : "",
+			baseBg && !mixedSurfaces ? `background-color:${baseBg};` : "",
 			baseLetterSpacing ? `letter-spacing:${baseLetterSpacing};` : "",
 			"}",
 			// Kill TipTap/EmailTheming block padding without !important on
 			// margin so pasted inline spacing (Dither 2.5rem) still wins.
 			".tiptap.ProseMirror p, .ProseMirror p{margin:0;}",
 			".tiptap.ProseMirror h1, .tiptap.ProseMirror h2, .tiptap.ProseMirror h3, .ProseMirror h1, .ProseMirror h2, .ProseMirror h3{margin:0;}",
-			".tiptap.ProseMirror .node-paragraph, .tiptap.ProseMirror .node-heading, .ProseMirror .node-paragraph, .ProseMirror .node-heading{padding-top:0!important;padding-bottom:0!important;}",
-			// Ensure emphasis renders as intended.
-			".tiptap.ProseMirror strong, .tiptap.ProseMirror b, .ProseMirror strong, .ProseMirror b{font-weight:600 !important;}",
 			".tiptap.ProseMirror table, .ProseMirror table{border-collapse:separate !important;}",
 			".tiptap.ProseMirror img, .ProseMirror img{display:block;}",
 			"",
@@ -1468,22 +1604,35 @@ function parseGlobalStylesFromHtml(html: string) {
 
 	// Body canvas only. Do not steal an inner section color (Halo gray)
 	// or the footer, which sits on white, goes gray with the rest.
-	const body = doc.body;
-	const bodyBg =
-		body?.style.backgroundColor || body?.getAttribute("bgcolor") || "";
+	const bodyBg = readDocumentBodyBackground(doc);
 
-	// 4. Find container width
-	let containerWidth: number | null = null;
-	const firstTable = doc.querySelector("table");
-	if (firstTable) {
-		const widthAttr =
-			firstTable.getAttribute("width") || firstTable.style.width;
-		if (widthAttr && widthAttr !== "100%") {
-			const parsedWidth = Number.parseInt(widthAttr, 10);
-			if (!Number.isNaN(parsedWidth)) {
-				containerWidth = parsedWidth;
-			}
+	// Fallback: many React Email templates (e.g., Twitch) set body bg via
+	// `Body` inline style, not via the `min-height:100%` wrapper td. Without
+	// this, `cssString` has no ProseMirror background and the canvas flashes
+	// white until globalContent hydrates, making the whole email look grayish
+	// vs the iframe preview which already has body gray. Inject it globally
+	// here so visual == code preview for any template.
+	if (!wrapperTd && bodyBg) {
+		const scratch = doc.createElement("div") as HTMLDivElement;
+		scratch.style.backgroundColor = bodyBg;
+		const normalizedBg = scratch.style.backgroundColor;
+		if (normalizedBg) {
+			const bodyRule = `.tiptap.ProseMirror, .ProseMirror{background-color:${normalizedBg};}`;
+			// Prepend so container white (via node-container) can overlay.
+			cssString = bodyRule + cssString;
 		}
+	}
+
+	// Column width from the pasted wrapper — not the outer 100% body table.
+	// Stamp max-width onto the canvas container so `width: 100%` cannot
+	// fill the dashboard. Keep the source string (37.5em stays em).
+	let containerWidth: number | null = null;
+	const columnTable = findEmailContainerTable(doc.body);
+	const columnMax = columnTable ? emailColumnMaxWidthCss(columnTable) : null;
+	if (columnMax) {
+		const parsedWidth = parseCssUnit(columnMax);
+		if (parsedWidth) containerWidth = parsedWidth;
+		cssString += `.tiptap.ProseMirror .node-container,.tiptap.ProseMirror [data-type="container"],.ProseMirror .node-container,.ProseMirror [data-type="container"]{width:100%;max-width:${columnMax};}`;
 	}
 
 	return {
