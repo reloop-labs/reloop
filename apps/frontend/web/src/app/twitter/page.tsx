@@ -15,8 +15,8 @@ export const metadata: Metadata = {
 	},
 };
 
-import { TwitterModalsShowcase } from "./components/twitter-modals-showcase";
+import { TwitterAutomationShowcase } from "./components/twitter-automation-showcase";
 
 export default function TwitterPage() {
-	return <TwitterModalsShowcase />;
+	return <TwitterAutomationShowcase />;
 }
