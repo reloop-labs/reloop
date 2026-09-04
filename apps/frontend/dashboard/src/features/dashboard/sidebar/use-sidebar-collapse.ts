@@ -4,16 +4,23 @@ import { useUIStore } from "#/store/use-ui-store";
 
 const STORAGE_KEY = "isSidebarCollapsed";
 
+/** Full-viewport canvas editors: templates, campaign edit, automation builder. */
+export function isCanvasEditorPath(pathname: string): boolean {
+	return (
+		/\/templates\/[^/]+/.test(pathname) ||
+		/\/campaigns\/[^/]+\/edit/.test(pathname) ||
+		/\/automation\/(?!events(?:\/|$))[^/]+/.test(pathname)
+	);
+}
+
 /**
  * Shared sidebar collapse state (Zustand).
- * In the template editor, it manages `isEditorSidebarPinned` independently so
+ * In canvas editors, it manages `isEditorSidebarPinned` independently so
  * navigating into and out of the editor never corrupts the user's dashboard sidebar preference.
  */
 export function useSidebarCollapse() {
 	const pathname = usePathname();
-	const isTemplateEditor =
-		Boolean(pathname.match(/\/templates\/[^/]+/)) ||
-		Boolean(pathname.match(/\/campaigns\/[^/]+\/edit/));
+	const isTemplateEditor = isCanvasEditorPath(pathname);
 
 	const isDashboardCollapsed = useUIStore((s) => s.isSidebarCollapsed);
 	const setDashboardCollapsed = useUIStore((s) => s.setIsSidebarCollapsed);

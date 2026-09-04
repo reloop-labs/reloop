@@ -3,32 +3,37 @@
 import { FieldError, useFieldError } from "@reloop/ui/field-error";
 import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
-import * as Textarea from "@reloop/ui/textarea";
-import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
+import { queryKeys } from "#/lib/query-keys";
+import {
+	type CustomEvent,
+	createCustomEvent,
+} from "../hooks/use-custom-events-api";
 import {
 	AutomationModalFrame,
 	type AutomationModalStatus,
 } from "./automation-modal-frame";
-import { useWorkflows } from "./workflows-provider";
 
-const EMPTY_NAME_ERROR = "Please enter an automation name.";
+const EMPTY_NAME_ERROR = "Please enter an event name.";
 
-interface CreateWorkflowModalProps {
+interface CreateEventModalProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
+	onCreated?: (event: CustomEvent) => void;
 }
 
-export const CreateWorkflowModal = ({
+export function CreateEventModal({
 	open,
 	onOpenChange,
-}: CreateWorkflowModalProps) => {
-	const router = useRouter();
-	const { createWorkflow } = useWorkflows();
+	onCreated,
+}: CreateEventModalProps) {
+	const queryClient = useQueryClient();
 	const [name, setName] = useState("");
-	const [description, setDescription] = useState("");
+	const [key, setKey] = useState("");
+	const [propName, setPropName] = useState("");
 	const [status, setStatus] = useState<AutomationModalStatus>("idle");
 	const nameField = useFieldError();
 	const clearNameError = nameField.clear;
@@ -49,23 +54,30 @@ export const CreateWorkflowModal = ({
 		nameField.clear();
 		setStatus("busy");
 		try {
-			const workflow = await createWorkflow({
+			const created = await createCustomEvent({
 				name: trimmed,
-				description: description.trim() || undefined,
+				key: key.trim() || undefined,
+				properties: propName.trim()
+					? [{ name: propName.trim(), propertyType: "string" }]
+					: undefined,
+			});
+			await queryClient.invalidateQueries({
+				queryKey: queryKeys.workflows.events(),
 			});
 			setStatus("success");
 			setTimeout(() => {
+				onCreated?.(created);
 				onOpenChange(false);
 				setName("");
-				setDescription("");
+				setKey("");
+				setPropName("");
 				nameField.clear();
 				setStatus("idle");
-				router.push(`/automation/${workflow.id}`);
 			}, 450);
 		} catch (err) {
 			setStatus("idle");
 			const message =
-				err instanceof Error ? err.message : "Failed to create automation";
+				err instanceof Error ? err.message : "Failed to create event";
 			nameField.show(message);
 			toast.error(message);
 		}
@@ -78,7 +90,7 @@ export const CreateWorkflowModal = ({
 			if (open && status === "idle") void handleSubmit();
 		},
 		{ enableOnFormTags: ["INPUT"], enabled: open },
-		[open, status, name, description],
+		[open, status, name, key, propName],
 	);
 
 	useHotkeys(
@@ -86,7 +98,7 @@ export const CreateWorkflowModal = ({
 		() => {
 			if (open && status === "idle") handleClose();
 		},
-		{ enableOnFormTags: ["INPUT", "TEXTAREA"], enabled: open },
+		{ enableOnFormTags: ["INPUT"], enabled: open },
 		[open, status],
 	);
 
@@ -94,7 +106,8 @@ export const CreateWorkflowModal = ({
 		if (!open) {
 			const timer = setTimeout(() => {
 				setName("");
-				setDescription("");
+				setKey("");
+				setPropName("");
 				clearNameError();
 				setStatus("idle");
 			}, 300);
@@ -105,19 +118,19 @@ export const CreateWorkflowModal = ({
 	return (
 		<AutomationModalFrame
 			open={open}
-			title="Create automation"
-			icon="workflow"
+			title="Create event"
+			icon="route"
 			status={status}
 			onSubmit={() => void handleSubmit()}
 			onClose={handleClose}
-			submitLabel="Create automation"
+			submitLabel="Create event"
 			busyLabel="Creating..."
 			successLabel="Created"
 		>
 			<div className="space-y-4 px-6 pb-7">
 				<div className="space-y-1.5">
 					<Label.Root
-						htmlFor="automation-name"
+						htmlFor="evt-name"
 						className="font-medium text-text-strong-950 text-xs"
 					>
 						Name
@@ -125,14 +138,14 @@ export const CreateWorkflowModal = ({
 					</Label.Root>
 					<FieldError
 						field={nameField}
-						hint="Used internally to find this automation in your list."
+						hint="Shown on the trigger step. Use something you will recognize."
 					>
 						<Input.Root size="medium" hasError={nameField.hasError}>
 							<Input.Wrapper>
 								<Input.Input
-									id="automation-name"
+									id="evt-name"
 									{...nameField.controlProps}
-									placeholder="e.g. Welcome sequence"
+									placeholder="e.g. User signed up"
 									value={name}
 									onChange={(e) => {
 										setName(e.target.value);
@@ -147,24 +160,51 @@ export const CreateWorkflowModal = ({
 				</div>
 				<div className="space-y-1.5">
 					<Label.Root
-						htmlFor="automation-description"
+						htmlFor="evt-key"
 						className="font-medium text-text-strong-950 text-xs"
 					>
-						Description
+						Key
 						<Label.Sub className="ml-1 text-xs">(optional)</Label.Sub>
 					</Label.Root>
-					<Textarea.Root
-						id="automation-description"
-						simple
-						placeholder="What does this automation do?"
-						value={description}
-						onChange={(e) => setDescription(e.target.value)}
-						rows={3}
-						disabled={status !== "idle"}
-						className="min-h-[76px] resize-none text-text-strong-950 text-xs"
-					/>
+					<Input.Root size="medium">
+						<Input.Wrapper>
+							<Input.Input
+								id="evt-key"
+								placeholder="user.signed_up"
+								value={key}
+								onChange={(e) => setKey(e.target.value)}
+								disabled={status !== "idle"}
+							/>
+						</Input.Wrapper>
+					</Input.Root>
+					<p className="text-[11px] text-text-sub-600">
+						Defaults from the name if you leave this blank.
+					</p>
+				</div>
+				<div className="space-y-1.5">
+					<Label.Root
+						htmlFor="evt-prop"
+						className="font-medium text-text-strong-950 text-xs"
+					>
+						First property
+						<Label.Sub className="ml-1 text-xs">(optional)</Label.Sub>
+					</Label.Root>
+					<Input.Root size="medium">
+						<Input.Wrapper>
+							<Input.Input
+								id="evt-prop"
+								placeholder="plan"
+								value={propName}
+								onChange={(e) => setPropName(e.target.value)}
+								disabled={status !== "idle"}
+							/>
+						</Input.Wrapper>
+					</Input.Root>
+					<p className="text-[11px] text-text-sub-600">
+						You can add more properties later.
+					</p>
 				</div>
 			</div>
 		</AutomationModalFrame>
 	);
-};
+}

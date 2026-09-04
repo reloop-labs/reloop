@@ -1,9 +1,13 @@
 import {
+	type ConditionNodeData,
+	type DelayNodeData,
 	isConditionNode,
 	isDelayNode,
 	isSendEmailNode,
 	isTriggerNode,
+	type SendEmailNodeData,
 	TRIGGER_NODE_ID,
+	type TriggerNodeData,
 	type Workflow,
 	type WorkflowNode,
 } from "./workflow-types";
@@ -47,7 +51,7 @@ export const validateWorkflow = (
 	const trigger = workflow.nodes.find((n) => n.id === TRIGGER_NODE_ID);
 
 	if (!trigger || !isTriggerNode(trigger)) {
-		warnings.push("Workflow must include a trigger node.");
+		warnings.push("Automation must include a trigger node");
 		return { isValid: false, warnings };
 	}
 
@@ -55,14 +59,14 @@ export const validateWorkflow = (
 		(typeof trigger.data.eventKey === "string" && trigger.data.eventKey) ||
 		(typeof trigger.data.eventId === "string" ? trigger.data.eventId : "");
 	if (!eventKey) {
-		warnings.push("Select a workflow event as the trigger.");
+		warnings.push("Select an event as the trigger");
 	}
 
 	const actionNodes = workflow.nodes.filter(
 		(n) => isSendEmailNode(n) || isDelayNode(n) || isConditionNode(n),
 	);
 	if (actionNodes.length === 0) {
-		warnings.push("Add at least one Delay, Condition, or Send email step.");
+		warnings.push("Add at least one Delay, Condition, or Send email step");
 	}
 
 	const sendEmailNodes = workflow.nodes.filter(isSendEmailNode);
@@ -71,7 +75,7 @@ export const validateWorkflow = (
 	const reachable = getReachableNodeIds(workflow.nodes, workflow.edges);
 	const disconnected = actionNodes.filter((n) => !reachable.has(n.id));
 	if (disconnected.length > 0) {
-		warnings.push("Connect the trigger to every step.");
+		warnings.push("Connect the trigger to every step");
 	}
 
 	const unconfiguredSend = sendEmailNodes.filter(
@@ -79,7 +83,7 @@ export const validateWorkflow = (
 			!n.data.to?.trim() || !n.data.subject?.trim() || !n.data.from?.trim(),
 	);
 	if (unconfiguredSend.length > 0) {
-		warnings.push("Complete To, From, and Subject for each Send email step.");
+		warnings.push("Complete To, From, and Subject for each Send email step");
 	}
 
 	const badDelays = delayNodes.filter((n) => {
@@ -92,7 +96,7 @@ export const validateWorkflow = (
 		);
 	});
 	if (badDelays.length > 0) {
-		warnings.push("Each Delay step needs a valid amount and unit.");
+		warnings.push("Each Delay step needs a valid amount and unit");
 	}
 
 	const conditionNodes = workflow.nodes.filter(isConditionNode);
@@ -104,7 +108,7 @@ export const validateWorkflow = (
 		return !n.data.value?.trim();
 	});
 	if (unconfiguredCondition.length > 0) {
-		warnings.push("Complete field, operator, and value for each Condition.");
+		warnings.push("Complete field, operator, and value for each Condition");
 	}
 
 	const unconnectedCondition = conditionNodes.filter((n) => {
@@ -115,11 +119,58 @@ export const validateWorkflow = (
 		);
 	});
 	if (unconnectedCondition.length > 0) {
-		warnings.push("Connect a Yes or No path on each Condition.");
+		warnings.push("Connect a Yes or No path on each Condition");
 	}
 
 	const isValid = warnings.length === 0;
 	return { isValid, warnings };
+};
+
+export const getNodeIssue = (
+	node: Pick<WorkflowNode, "type" | "data">,
+): string | null => {
+	if (node.type === "trigger") {
+		const data = node.data as TriggerNodeData;
+		const eventKey =
+			(typeof data.eventKey === "string" && data.eventKey) ||
+			(typeof data.eventId === "string" ? data.eventId : "");
+		return eventKey ? null : "Select an event";
+	}
+
+	if (node.type === "delay") {
+		const data = node.data as DelayNodeData;
+		const amount = Number(data.amount);
+		const unit = data.unit;
+		if (
+			!Number.isFinite(amount) ||
+			amount < 0 ||
+			(unit !== "minutes" && unit !== "hours" && unit !== "days")
+		) {
+			return "Set a wait time";
+		}
+		return null;
+	}
+
+	if (node.type === "send_email") {
+		const data = node.data as SendEmailNodeData;
+		if (!data.to?.trim() || !data.subject?.trim() || !data.from?.trim()) {
+			return "Needs To, From, and Subject";
+		}
+		return null;
+	}
+
+	if (node.type === "condition") {
+		const data = node.data as ConditionNodeData;
+		const field = data.field?.trim();
+		const operator = data.operator;
+		if (!field || !operator) return "Set a condition";
+		if (operator !== "exists" && operator !== "not_exists") {
+			if (!data.value?.trim()) return "Set a value";
+		}
+		return null;
+	}
+
+	return null;
 };
 
 export const getWorkflowSummary = (workflow: Workflow) => {

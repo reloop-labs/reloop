@@ -1,12 +1,12 @@
 "use client";
 
-import * as Button from "@reloop/ui/button";
-import { cn } from "@reloop/ui/cn";
+import { FieldError, useFieldError } from "@reloop/ui/field-error";
 import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
-import * as Modal from "@reloop/ui/modal";
+import * as StatusBadge from "@reloop/ui/status-badge";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import { queryKeys } from "#/lib/query-keys";
 import { formatRelativeTime } from "#/utils/format-relative-time";
@@ -15,24 +15,33 @@ import {
 	enrollContact,
 	listEnrollments,
 } from "../hooks/use-automations-api";
+import {
+	AutomationModalFrame,
+	type AutomationModalStatus,
+} from "./automation-modal-frame";
 
 interface EnrollContactModalProps {
 	automationId: string;
 	triggerEvent: string | null | undefined;
+	canEnroll?: boolean;
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 }
 
-const statusClass: Record<AutomationEnrollment["status"], string> = {
-	active: "border-success-base bg-success-light/20 text-success-base",
-	completed: "border-stroke-soft-200 bg-bg-weak-50 text-text-sub-600",
-	cancelled: "border-warning-base bg-warning-light/20 text-warning-base",
-	failed: "border-error-base bg-error-light/20 text-error-base",
+const enrollmentBadge: Record<
+	AutomationEnrollment["status"],
+	"completed" | "pending" | "failed" | "disabled"
+> = {
+	active: "pending",
+	completed: "completed",
+	cancelled: "disabled",
+	failed: "failed",
 };
 
 export const EnrollContactModal = ({
 	automationId,
 	triggerEvent,
+	canEnroll = true,
 	open,
 	onOpenChange,
 }: EnrollContactModalProps) => {
@@ -40,6 +49,9 @@ export const EnrollContactModal = ({
 	const [email, setEmail] = useState("");
 	const [firstName, setFirstName] = useState("");
 	const [lastName, setLastName] = useState("");
+	const [status, setStatus] = useState<AutomationModalStatus>("idle");
+	const emailField = useFieldError();
+	const clearEmailError = emailField.clear;
 
 	const enrollmentsQuery = useQuery({
 		queryKey: queryKeys.workflows.enrollments(automationId),
@@ -54,176 +66,238 @@ export const EnrollContactModal = ({
 				firstName: firstName.trim() || undefined,
 				lastName: lastName.trim() || undefined,
 			}),
-		onSuccess: (result) => {
+	});
+
+	const handleClose = () => {
+		if (status !== "idle") return;
+		onOpenChange(false);
+	};
+
+	const handleSubmit = async () => {
+		if (status !== "idle") return;
+		if (!canEnroll) {
+			emailField.show("Activate the automation before enrolling contacts.");
+			return;
+		}
+		const trimmed = email.trim();
+		if (!trimmed.includes("@")) {
+			emailField.show("Enter a valid email address.");
+			return;
+		}
+
+		emailField.clear();
+		setStatus("busy");
+		try {
+			const result = await enrollMutation.mutateAsync();
+			await queryClient.invalidateQueries({
+				queryKey: queryKeys.workflows.enrollments(automationId),
+			});
+			setStatus("success");
 			toast.success(
 				result.contactCreated
 					? "Contact created and enrolled"
 					: "Contact enrolled",
 			);
-			setEmail("");
-			setFirstName("");
-			setLastName("");
-			void queryClient.invalidateQueries({
-				queryKey: queryKeys.workflows.enrollments(automationId),
-			});
-		},
-		onError: (e) => {
-			toast.error(e instanceof Error ? e.message : "Failed to enroll");
-		},
-	});
-
-	const handleClose = (next: boolean) => {
-		if (!next) {
-			setEmail("");
-			setFirstName("");
-			setLastName("");
+			setTimeout(() => {
+				setEmail("");
+				setFirstName("");
+				setLastName("");
+				setStatus("idle");
+			}, 450);
+		} catch (err) {
+			setStatus("idle");
+			const message = err instanceof Error ? err.message : "Failed to enroll";
+			emailField.show(message);
+			toast.error(message);
 		}
-		onOpenChange(next);
 	};
 
+	useHotkeys(
+		"enter",
+		(e) => {
+			e.preventDefault();
+			if (open && status === "idle") void handleSubmit();
+		},
+		{ enableOnFormTags: ["INPUT"], enabled: open },
+		[open, status, email, firstName, lastName],
+	);
+
+	useHotkeys(
+		"escape",
+		() => {
+			if (open && status === "idle") handleClose();
+		},
+		{ enableOnFormTags: ["INPUT"], enabled: open },
+		[open, status],
+	);
+
+	useEffect(() => {
+		if (!open) {
+			const timer = setTimeout(() => {
+				setEmail("");
+				setFirstName("");
+				setLastName("");
+				clearEmailError();
+				setStatus("idle");
+			}, 300);
+			return () => clearTimeout(timer);
+		}
+	}, [open, clearEmailError]);
+
 	const enrollments = enrollmentsQuery.data?.enrollments ?? [];
-	const canSubmit = email.trim().includes("@") && !enrollMutation.isPending;
 
 	return (
-		<Modal.Root open={open} onOpenChange={handleClose}>
-			<Modal.Content className="max-w-lg">
-				<Modal.Header>
-					<Modal.Title>Enroll a contact</Modal.Title>
-					<Modal.Description>
-						Start this drip for someone now. Your product can do the same by
-						tracking{" "}
-						<code className="font-mono text-text-strong-950">
-							{triggerEvent || "the trigger event"}
-						</code>{" "}
-						with their email.
-					</Modal.Description>
-				</Modal.Header>
-				<Modal.Body className="flex flex-col gap-5">
-					<form
-						className="flex flex-col gap-3"
-						onSubmit={(e) => {
-							e.preventDefault();
-							if (canSubmit) enrollMutation.mutate();
-						}}
-					>
-						<div className="space-y-1.5">
-							<Label.Root htmlFor="enroll-email">Email</Label.Root>
-							<Input.Root>
-								<Input.Wrapper>
-									<Input.Input
-										id="enroll-email"
-										type="email"
-										placeholder="ada@example.com"
-										value={email}
-										onChange={(e) => setEmail(e.target.value)}
-										autoComplete="off"
-									/>
-								</Input.Wrapper>
-							</Input.Root>
-						</div>
-						<div className="grid grid-cols-2 gap-3">
-							<div className="space-y-1.5">
-								<Label.Root htmlFor="enroll-first">
-									First name{" "}
-									<span className="font-normal text-text-sub-600">
-										(optional)
-									</span>
-								</Label.Root>
-								<Input.Root>
-									<Input.Wrapper>
-										<Input.Input
-											id="enroll-first"
-											placeholder="Ada"
-											value={firstName}
-											onChange={(e) => setFirstName(e.target.value)}
-										/>
-									</Input.Wrapper>
-								</Input.Root>
-							</div>
-							<div className="space-y-1.5">
-								<Label.Root htmlFor="enroll-last">
-									Last name{" "}
-									<span className="font-normal text-text-sub-600">
-										(optional)
-									</span>
-								</Label.Root>
-								<Input.Root>
-									<Input.Wrapper>
-										<Input.Input
-											id="enroll-last"
-											placeholder="Lovelace"
-											value={lastName}
-											onChange={(e) => setLastName(e.target.value)}
-										/>
-									</Input.Wrapper>
-								</Input.Root>
-							</div>
-						</div>
-						<div className="flex justify-end">
-							<Button.Root
-								type="submit"
-								variant="neutral"
-								size="small"
-								disabled={!canSubmit}
-							>
-								{enrollMutation.isPending ? "Enrolling…" : "Enroll"}
-							</Button.Root>
-						</div>
-					</form>
+		<AutomationModalFrame
+			open={open}
+			title="Enroll a contact"
+			icon="contacts"
+			status={status}
+			onSubmit={() => void handleSubmit()}
+			onClose={handleClose}
+			submitLabel="Enroll"
+			busyLabel="Enrolling..."
+			successLabel="Enrolled"
+			submitDisabled={!canEnroll}
+			contentClassName="sm:max-w-[480px]"
+		>
+			<div className="space-y-5 px-6 pb-6">
+				{!canEnroll ? (
+					<p className="rounded-xl border border-warning-base/20 bg-warning-lighter/60 px-3 py-2 text-warning-base text-xs leading-relaxed">
+						Activate this automation to enroll contacts.
+					</p>
+				) : null}
+				<p className="text-text-sub-600 text-xs leading-relaxed">
+					{triggerEvent ? (
+						<>
+							Start this automation now. Track{" "}
+							<code className="rounded-md bg-bg-weak-50 px-1 py-0.5 font-mono text-[11px] text-text-strong-950">
+								{triggerEvent}
+							</code>{" "}
+							from your product to enroll automatically.
+						</>
+					) : (
+						<>
+							Start this automation now. Choose a trigger event first so
+							enrollments know where to begin.
+						</>
+					)}
+				</p>
 
-					<div>
-						<p className="mb-2 font-medium text-text-sub-600 text-xs uppercase tracking-wide">
-							Recent enrollments
-							{typeof enrollmentsQuery.data?.total === "number"
-								? ` · ${enrollmentsQuery.data.total}`
-								: ""}
-						</p>
-						{enrollmentsQuery.isLoading ? (
-							<div className="h-16 animate-pulse rounded-lg bg-bg-weak-50" />
-						) : enrollments.length === 0 ? (
-							<p className="text-sm text-text-soft-400">
-								No one is in this workflow yet.
-							</p>
-						) : (
-							<ul className="max-h-56 space-y-1 overflow-y-auto">
-								{enrollments.map((row) => (
-									<li
-										key={row.id}
-										className="flex items-center justify-between gap-3 rounded-lg px-2 py-1.5"
-									>
-										<div className="min-w-0">
-											<p className="truncate text-sm text-text-strong-950">
-												{row.contactEmail ?? row.contactId}
-											</p>
-											<p className="text-text-sub-600 text-xs">
-												{formatRelativeTime(row.enrolledAt)}
-											</p>
-										</div>
-										<span
-											className={cn(
-												"shrink-0 rounded-full border px-2 py-0.5 font-medium text-[11px] capitalize",
-												statusClass[row.status],
-											)}
-										>
-											{row.status}
-										</span>
-									</li>
-								))}
-							</ul>
-						)}
-					</div>
-				</Modal.Body>
-				<Modal.Footer className="flex justify-end">
-					<Button.Root
-						variant="neutral"
-						mode="stroke"
-						size="small"
-						onClick={() => handleClose(false)}
+				<div className="space-y-1.5">
+					<Label.Root
+						htmlFor="enroll-email"
+						className="font-medium text-text-strong-950 text-xs"
 					>
-						Close
-					</Button.Root>
-				</Modal.Footer>
-			</Modal.Content>
-		</Modal.Root>
+						Email
+						<Label.Asterisk />
+					</Label.Root>
+					<FieldError field={emailField}>
+						<Input.Root size="medium" hasError={emailField.hasError}>
+							<Input.Wrapper>
+								<Input.Input
+									id="enroll-email"
+									type="email"
+									{...emailField.controlProps}
+									placeholder="ada@example.com"
+									value={email}
+									onChange={(e) => {
+										setEmail(e.target.value);
+										if (emailField.hasError) emailField.clear();
+									}}
+									autoComplete="off"
+									autoFocus
+									disabled={status !== "idle"}
+								/>
+							</Input.Wrapper>
+						</Input.Root>
+					</FieldError>
+				</div>
+
+				<div className="grid grid-cols-2 gap-3">
+					<div className="space-y-1.5">
+						<Label.Root
+							htmlFor="enroll-first"
+							className="font-medium text-text-strong-950 text-xs"
+						>
+							First name
+							<Label.Sub className="ml-1 text-xs">(optional)</Label.Sub>
+						</Label.Root>
+						<Input.Root size="medium">
+							<Input.Wrapper>
+								<Input.Input
+									id="enroll-first"
+									placeholder="Ada"
+									value={firstName}
+									onChange={(e) => setFirstName(e.target.value)}
+									disabled={status !== "idle"}
+								/>
+							</Input.Wrapper>
+						</Input.Root>
+					</div>
+					<div className="space-y-1.5">
+						<Label.Root
+							htmlFor="enroll-last"
+							className="font-medium text-text-strong-950 text-xs"
+						>
+							Last name
+							<Label.Sub className="ml-1 text-xs">(optional)</Label.Sub>
+						</Label.Root>
+						<Input.Root size="medium">
+							<Input.Wrapper>
+								<Input.Input
+									id="enroll-last"
+									placeholder="Lovelace"
+									value={lastName}
+									onChange={(e) => setLastName(e.target.value)}
+									disabled={status !== "idle"}
+								/>
+							</Input.Wrapper>
+						</Input.Root>
+					</div>
+				</div>
+
+				<div>
+					<p className="mb-2 font-medium text-[11px] text-text-sub-600 uppercase tracking-wide">
+						Recent enrollments
+						{typeof enrollmentsQuery.data?.total === "number"
+							? ` · ${enrollmentsQuery.data.total}`
+							: ""}
+					</p>
+					{enrollmentsQuery.isLoading ? (
+						<div className="h-16 animate-pulse rounded-xl bg-bg-weak-50" />
+					) : enrollments.length === 0 ? (
+						<p className="text-sm text-text-soft-400">
+							No one is in this automation yet.
+						</p>
+					) : (
+						<ul className="max-h-48 space-y-0.5 overflow-y-auto">
+							{enrollments.map((row) => (
+								<li
+									key={row.id}
+									className="flex items-center justify-between gap-3 rounded-lg px-2 py-1.5"
+								>
+									<div className="min-w-0">
+										<p className="truncate text-sm text-text-strong-950">
+											{row.contactEmail ?? row.contactId}
+										</p>
+										<p className="text-text-sub-600 text-xs">
+											{formatRelativeTime(row.enrolledAt)}
+										</p>
+									</div>
+									<StatusBadge.Root
+										variant="light"
+										status={enrollmentBadge[row.status]}
+										className="capitalize"
+									>
+										<StatusBadge.Dot />
+										{row.status}
+									</StatusBadge.Root>
+								</li>
+							))}
+						</ul>
+					)}
+				</div>
+			</div>
+		</AutomationModalFrame>
 	);
 };

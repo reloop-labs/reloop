@@ -11,13 +11,11 @@ import { FloatingSupportButton } from "./floating-support-button";
 import { PageHeader } from "./page-header/page-header";
 import { MainSidebar } from "./sidebar/main-sidebar";
 import { MobileSidebarSheet } from "./sidebar/mobile-sidebar-sheet";
+import { isCanvasEditorPath } from "./sidebar/use-sidebar-collapse";
 
-function useIsTemplateEditor() {
+function useIsCanvasEditor() {
 	const pathname = usePathname();
-	return (
-		Boolean(pathname.match(/\/templates\/[^/]+/)) ||
-		Boolean(pathname.match(/\/campaigns\/[^/]+\/edit/))
-	);
+	return isCanvasEditorPath(pathname);
 }
 
 /**
@@ -47,7 +45,7 @@ function SidebarChrome({
 export function DashboardShell({ children }: { children: ReactNode }) {
 	const pathname = usePathname();
 	const isInbox = pathname === "/inbox" || pathname.startsWith("/inbox");
-	const isTemplateEditor = useIsTemplateEditor();
+	const isTemplateEditor = useIsCanvasEditor();
 	const isAiPanelOpen = useUIStore((s) => s.isAiPanelOpen);
 	const isMobileNavOpen = useUIStore((s) => s.isMobileNavOpen);
 	const setMobileNavOpen = useUIStore((s) => s.setMobileNavOpen);

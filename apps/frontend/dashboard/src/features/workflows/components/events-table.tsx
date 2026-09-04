@@ -3,18 +3,15 @@
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
-import Link from "next/link";
 import { formatRelativeTime } from "#/utils/format-relative-time";
-import type { Workflow } from "../workflow-types";
-import { getWorkflowSummary } from "../workflow-validation";
+import type { CustomEvent } from "../hooks/use-custom-events-api";
 import { WorkflowEmptyState } from "./workflow-empty-state";
-import { WorkflowStatusBadge } from "./workflow-status-badge";
 
 const GRID =
-	"grid-cols-[minmax(0,1.2fr)_72px_88px] sm:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_72px_108px_88px]";
+	"grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_88px_108px] sm:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_88px_108px]";
 
-interface WorkflowTableProps {
-	workflows: Workflow[];
+interface EventsTableProps {
+	events: CustomEvent[];
 	isLoading?: boolean;
 	isTotalEmpty?: boolean;
 	isFilteredEmpty?: boolean;
@@ -22,14 +19,14 @@ interface WorkflowTableProps {
 	onClearFilters?: () => void;
 }
 
-export const WorkflowTable = ({
-	workflows,
+export function EventsTable({
+	events,
 	isLoading,
 	isTotalEmpty,
 	isFilteredEmpty,
 	onCreate,
 	onClearFilters,
-}: WorkflowTableProps) => {
+}: EventsTableProps) {
 	if (isLoading) {
 		return (
 			<div className="w-full text-paragraph-sm">
@@ -40,19 +37,17 @@ export const WorkflowTable = ({
 					)}
 				>
 					<span>Name</span>
-					<span className="hidden sm:inline">Trigger</span>
-					<span>Steps</span>
-					<span className="hidden sm:inline">Updated</span>
-					<span>Status</span>
+					<span>Key</span>
+					<span>Properties</span>
+					<span className="hidden sm:block">Updated</span>
 				</div>
 				<div className="-mt-2.5 divide-y divide-stroke-soft-100 overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:divide-stroke-soft-100/50 dark:border-stroke-soft-100/40">
 					{[1, 2, 3, 4].map((i) => (
 						<div key={i} className={cn("grid items-center px-4 py-3", GRID)}>
-							<Skeleton className="h-4 w-36" />
-							<Skeleton className="hidden h-4 w-24 sm:block" />
-							<Skeleton className="h-4 w-8" />
+							<Skeleton className="h-4 w-32" />
+							<Skeleton className="h-4 w-28" />
+							<Skeleton className="h-4 w-10" />
 							<Skeleton className="hidden h-4 w-16 sm:block" />
-							<Skeleton className="h-5 w-14 rounded-md" />
 						</div>
 					))}
 				</div>
@@ -61,14 +56,23 @@ export const WorkflowTable = ({
 	}
 
 	if (isTotalEmpty) {
-		return <WorkflowEmptyState onCreate={onCreate} />;
+		return (
+			<WorkflowEmptyState
+				title="No events yet"
+				description="Create an event to use as a trigger on the canvas."
+				createLabel="Create event"
+				onCreate={onCreate}
+			/>
+		);
 	}
 
 	if (isFilteredEmpty) {
 		return (
 			<WorkflowEmptyState
-				onCreate={onCreate}
+				title="No events found"
+				description="Try a different name or key."
 				isFiltered
+				onCreate={onCreate}
 				onClearFilters={onClearFilters}
 			/>
 		);
@@ -83,48 +87,34 @@ export const WorkflowTable = ({
 				)}
 			>
 				<div className="flex items-center gap-1">
-					<Icon name="workflow" className="h-3 w-3" />
+					<Icon name="route" className="h-3 w-3" />
 					<span>Name</span>
 				</div>
-				<div className="hidden items-center gap-1 sm:flex">
-					<Icon name="route" className="h-3 w-3" />
-					<span>Trigger</span>
-				</div>
-				<span>Steps</span>
+				<span>Key</span>
+				<span>Properties</span>
 				<span className="hidden sm:block">Updated</span>
-				<span>Status</span>
 			</div>
 			<div className="-mt-2.5 divide-y divide-stroke-soft-100 overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:divide-stroke-soft-100/50 dark:border-stroke-soft-100/40">
-				{workflows.map((workflow) => {
-					const { eventLabel, stepCount } = getWorkflowSummary(workflow);
-					return (
-						<Link
-							href={`/automation/${workflow.id}`}
-							key={workflow.id}
-							className={cn(
-								"group grid w-full items-center px-4 py-2.5 text-left transition-colors duration-150 ease-out hover:bg-bg-weak-50",
-								GRID,
-							)}
-						>
-							<p className="truncate font-semibold text-label-sm text-text-strong-950">
-								{workflow.name}
-							</p>
-							<p className="hidden truncate font-mono text-text-sub-600 text-xs sm:block">
-								{eventLabel}
-							</p>
-							<p className="text-text-sub-600 text-xs tabular-nums">
-								{stepCount}
-							</p>
-							<p className="hidden text-text-sub-600 text-xs sm:block">
-								{formatRelativeTime(workflow.updatedAt)}
-							</p>
-							<div>
-								<WorkflowStatusBadge status={workflow.status} />
-							</div>
-						</Link>
-					);
-				})}
+				{events.map((event) => (
+					<div
+						key={event.id}
+						className={cn("grid w-full items-center px-4 py-2.5", GRID)}
+					>
+						<p className="truncate font-semibold text-label-sm text-text-strong-950">
+							{event.name}
+						</p>
+						<p className="truncate font-mono text-text-sub-600 text-xs">
+							{event.key}
+						</p>
+						<p className="text-text-sub-600 text-xs tabular-nums">
+							{event.properties.length}
+						</p>
+						<p className="hidden text-text-sub-600 text-xs sm:block">
+							{formatRelativeTime(event.updatedAt)}
+						</p>
+					</div>
+				))}
 			</div>
 		</div>
 	);
-};
+}

@@ -2,6 +2,7 @@
 
 import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
+import * as Textarea from "@reloop/ui/textarea";
 import type { SendEmailNodeData } from "../workflow-types";
 
 interface SendEmailConfigFormProps {
@@ -68,13 +69,12 @@ export const SendEmailConfigForm = ({
 
 			<div className="space-y-1.5">
 				<Label.Root htmlFor="send-html">HTML body (optional)</Label.Root>
-				<textarea
+				<Textarea.Root
 					id="send-html"
 					placeholder="<p>Welcome…</p>"
 					value={value.html ?? ""}
 					onChange={(e) => update({ html: e.target.value })}
 					rows={4}
-					className="w-full rounded-lg border border-stroke-soft-100 bg-bg-white-0 px-3 py-2 text-sm outline-none focus:border-stroke-strong-950 dark:border-stroke-soft-100/50"
 				/>
 			</div>
 

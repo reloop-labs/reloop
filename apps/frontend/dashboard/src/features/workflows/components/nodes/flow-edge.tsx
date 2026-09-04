@@ -11,7 +11,7 @@ import {
 export type EdgeTone = "accent" | "default";
 
 const TONE_COLOR: Record<EdgeTone, string> = {
-	accent: "var(--color-orange-500)",
+	accent: "var(--color-green-600)",
 	default: "var(--color-stroke-sub-300)",
 };
 

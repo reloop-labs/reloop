@@ -82,7 +82,7 @@ export function WorkflowEditorPage({ workflowId }: { workflowId: string }) {
 
 	if (!isHydrated && !workflow && detailQuery.isLoading) {
 		return (
-			<div className="flex h-[calc(100vh-8rem)] items-center justify-center">
+			<div className="flex h-full items-center justify-center">
 				<div className="h-8 w-8 animate-pulse rounded-lg bg-bg-weak-50" />
 			</div>
 		);
@@ -94,7 +94,7 @@ export function WorkflowEditorPage({ workflowId }: { workflowId: string }) {
 
 	if (!workflow) {
 		return (
-			<div className="flex h-[calc(100vh-8rem)] items-center justify-center">
+			<div className="flex h-full items-center justify-center">
 				<div className="h-8 w-8 animate-pulse rounded-lg bg-bg-weak-50" />
 			</div>
 		);
@@ -108,7 +108,7 @@ export function WorkflowEditorPage({ workflowId }: { workflowId: string }) {
 	};
 
 	return (
-		<div className="-mx-2 flex h-[calc(100vh-7rem)] min-h-[480px] flex-col sm:-mx-0">
+		<div className="flex h-full min-h-0 flex-col">
 			<WorkflowEditor
 				workflow={editorWorkflow}
 				onNameChange={handleNameChange}

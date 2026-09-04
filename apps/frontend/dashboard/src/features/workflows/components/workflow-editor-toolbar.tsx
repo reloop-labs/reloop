@@ -1,13 +1,15 @@
 "use client";
 
-import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import * as Switch from "@reloop/ui/switch";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
-import { AnimatedBackButton } from "#/features/dashboard/animated-back-button";
+import { AnimatedSidebarToggleIcon } from "#/features/dashboard/sidebar/animated-sidebar-toggle-icon";
+import { usePlayAnimationOnHover } from "#/features/dashboard/sidebar/use-play-animation-on-hover";
+import { useSidebarCollapse } from "#/features/dashboard/sidebar/use-sidebar-collapse";
 import {
 	isTriggerNode,
 	type Workflow,
@@ -15,6 +17,7 @@ import {
 } from "../workflow-types";
 import { validateWorkflow } from "../workflow-validation";
 import { EnrollContactModal } from "./enroll-contact-modal";
+import { WorkflowStatusBadge } from "./workflow-status-badge";
 
 interface WorkflowEditorToolbarProps {
 	workflow: Workflow;
@@ -24,6 +27,38 @@ interface WorkflowEditorToolbarProps {
 	onSave: () => Promise<void> | void;
 }
 
+function SidebarToggleButton() {
+	const { isCollapsed, toggle } = useSidebarCollapse();
+	const {
+		isAnimating,
+		onPointerEnter,
+		onPointerLeave,
+		onAnimationStart,
+		onAnimationEnd,
+	} = usePlayAnimationOnHover(500);
+
+	return (
+		<button
+			type="button"
+			onClick={toggle}
+			title="Toggle Sidebar (⌘B)"
+			data-animating={isAnimating || undefined}
+			onPointerEnter={onPointerEnter}
+			onPointerLeave={onPointerLeave}
+			onAnimationStart={onAnimationStart}
+			onAnimationEnd={onAnimationEnd}
+			className={cn(
+				"group flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-text-sub-600 transition-colors",
+				"hover:bg-bg-weak-50 hover:text-text-strong-950 dark:hover:bg-white/5",
+			)}
+		>
+			<AnimatedSidebarToggleIcon
+				className={cn("h-4 w-4", isCollapsed && "rotate-180")}
+			/>
+		</button>
+	);
+}
+
 export const WorkflowEditorToolbar = ({
 	workflow,
 	name,
@@ -31,7 +66,6 @@ export const WorkflowEditorToolbar = ({
 	onStatusChange,
 	onSave,
 }: WorkflowEditorToolbarProps) => {
-	const router = useRouter();
 	const validation = validateWorkflow(workflow);
 	const isActive = workflow.status === "active";
 	const [busy, setBusy] = useState(false);
@@ -54,7 +88,7 @@ export const WorkflowEditorToolbar = ({
 		try {
 			await onSave();
 			await onStatusChange(checked ? "active" : "paused");
-			toast.success(checked ? "Workflow activated" : "Workflow paused");
+			toast.success(checked ? "Automation activated" : "Automation paused");
 		} catch (e) {
 			toast.error(
 				e instanceof Error
@@ -73,7 +107,7 @@ export const WorkflowEditorToolbar = ({
 		setBusy(true);
 		try {
 			await onSave();
-			toast.success("Workflow saved");
+			toast.success("Automation saved");
 		} catch (e) {
 			toast.error(e instanceof Error ? e.message : "Failed to save");
 		} finally {
@@ -82,62 +116,68 @@ export const WorkflowEditorToolbar = ({
 	};
 
 	return (
-		<div className="flex shrink-0 flex-col border-stroke-soft-100 border-b dark:border-stroke-soft-100/50">
-			<div className="flex items-center gap-3 px-4 py-3">
-				<AnimatedBackButton onClick={() => router.push("/automation")} />
-				<input
-					type="text"
-					value={name}
-					onChange={(e) => onNameChange(e.target.value)}
-					className="min-w-0 flex-1 border-none bg-transparent font-medium text-lg text-text-strong-950 outline-none focus:ring-0"
-					aria-label="Workflow name"
-				/>
-				<div className="flex items-center gap-3">
+		<div className="flex shrink-0 flex-col border-stroke-soft-200 border-b bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-black">
+			<div className="relative flex items-center justify-between px-4 py-2.5">
+				<div className="flex min-w-0 flex-1 items-center gap-2">
+					<SidebarToggleButton />
+					<div className="hidden items-center gap-1.5 sm:flex">
+						<Icon name="workflow" className="size-4 text-text-sub-600" />
+						<Link
+							href="/automation"
+							className="font-medium text-label-sm text-text-sub-600 hover:text-text-strong-950"
+						>
+							Automation
+						</Link>
+					</div>
+					<span className="hidden text-text-disabled-300 text-xs sm:inline">
+						/
+					</span>
+					<input
+						type="text"
+						value={name}
+						onChange={(e) => onNameChange(e.target.value)}
+						placeholder="Automation name"
+						className="min-w-0 max-w-[280px] rounded-md bg-transparent px-1.5 py-1 font-semibold text-label-sm text-text-strong-950 outline-none transition-colors placeholder:text-text-soft-400 hover:bg-bg-weak-50 focus:bg-bg-weak-50 focus:ring-0"
+						aria-label="Automation name"
+					/>
+				</div>
+
+				<div className="flex items-center gap-2.5">
+					<WorkflowStatusBadge status={workflow.status} />
 					<div className="flex items-center gap-2">
-						<span className="text-text-sub-600 text-xs">
-							{isActive
-								? "Active"
-								: workflow.status === "paused"
-									? "Paused"
-									: "Draft"}
+						<span className="hidden text-text-sub-600 text-xs sm:inline">
+							{isActive ? "On" : "Off"}
 						</span>
 						<Switch.Root
 							checked={isActive}
 							onCheckedChange={(v) => void handleToggleActive(v)}
 							disabled={busy || (!validation.isValid && !isActive)}
+							aria-label={isActive ? "Pause automation" : "Activate automation"}
 						/>
 					</div>
-					<Button.Root
-						variant="neutral"
-						mode="stroke"
-						size="xsmall"
-						onClick={() => {
-							if (!isActive) {
-								toast.error("Activate the workflow before enrolling contacts");
-								return;
-							}
-							setEnrollOpen(true);
-						}}
+					<button
+						type="button"
+						onClick={() => setEnrollOpen(true)}
 						disabled={busy}
-						className="gap-1.5"
+						className="inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 font-medium text-text-sub-600 text-xs transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 disabled:opacity-50"
 					>
 						<Icon name="send" className="h-3.5 w-3.5" />
 						Enroll
-					</Button.Root>
-					<Button.Root
-						variant="neutral"
-						mode="stroke"
+					</button>
+					<FancyButton.Root
+						variant="blue"
 						size="xsmall"
 						onClick={() => void handleSave()}
 						disabled={busy}
 					>
-						Save
-					</Button.Root>
+						{busy ? "Saving…" : "Save"}
+					</FancyButton.Root>
 				</div>
 			</div>
 			<EnrollContactModal
 				automationId={workflow.id}
 				triggerEvent={triggerEvent}
+				canEnroll={isActive}
 				open={enrollOpen}
 				onOpenChange={setEnrollOpen}
 			/>
@@ -146,16 +186,12 @@ export const WorkflowEditorToolbar = ({
 					className={cn(
 						"flex items-start gap-2 border-stroke-soft-100 border-t px-4 py-2 text-xs dark:border-stroke-soft-100/50",
 						validation.isValid
-							? "bg-success-light/10 text-success-base"
-							: "bg-warning-light/10 text-warning-base",
+							? "bg-success-lighter/60 text-success-base"
+							: "bg-warning-lighter/70 text-warning-base",
 					)}
 				>
 					<Icon name="info-outline" className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-					<ul className="list-inside list-disc">
-						{validation.warnings.map((w) => (
-							<li key={w}>{w}</li>
-						))}
-					</ul>
+					<p className="leading-relaxed">{validation.warnings.join(" · ")}</p>
 				</div>
 			)}
 		</div>

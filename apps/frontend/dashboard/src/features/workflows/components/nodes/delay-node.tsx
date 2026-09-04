@@ -2,6 +2,7 @@
 
 import type { NodeProps } from "@xyflow/react";
 import type { DelayNodeData, WorkflowNode } from "../../workflow-types";
+import { getNodeIssue } from "../../workflow-validation";
 import { FlowNodeCard } from "./flow-node-card";
 
 type DelayFlowNode = WorkflowNode & {
@@ -18,12 +19,18 @@ function formatDelay(data: DelayNodeData): string {
 	return `Wait ${amount} ${plural}`;
 }
 
-export const DelayNode = ({ data, selected }: NodeProps<DelayFlowNode>) => {
+export const DelayNode = ({
+	data,
+	selected,
+	type,
+}: NodeProps<DelayFlowNode>) => {
+	const issue = getNodeIssue({ type, data });
+
 	return (
 		<FlowNodeCard
-			category={data.category ?? "Wait · Delay"}
+			tone="delay"
 			title={formatDelay(data)}
-			icon="clock"
+			issue={issue}
 			selected={selected}
 			hasTarget
 			hasSource

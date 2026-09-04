@@ -5,12 +5,14 @@ import {
 	Background,
 	BackgroundVariant,
 	type Connection,
+	Controls,
 	type DefaultEdgeOptions,
 	ReactFlow,
 	ReactFlowProvider,
 	useEdgesState,
 	useNodesState,
 	useOnSelectionChange,
+	useReactFlow,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -88,6 +90,7 @@ const WorkflowEditorInner = ({
 	const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
 	const workflowIdRef = useRef(workflow.id);
 	const skipPersistRef = useRef(false);
+	const { fitView } = useReactFlow();
 
 	useEffect(() => {
 		if (workflowIdRef.current !== workflow.id) {
@@ -167,10 +170,26 @@ const WorkflowEditorInner = ({
 		(newNode: WorkflowNode) => {
 			const maxY = Math.max(...nodes.map((n) => n.position.y), 0);
 			newNode.position = { x: COLUMN_X, y: maxY + ROW_GAP };
-			setNodes((nds) => [...nds, newNode]);
+			newNode.selected = true;
+			setNodes((nds) => {
+				const next: WorkflowNode[] = nds.map((n) =>
+					n.selected ? { ...n, selected: false } : n,
+				);
+				next.push(newNode);
+				return next;
+			});
 			setSelectedNodeId(newNode.id);
+			const reduceMotion =
+				typeof window !== "undefined" &&
+				window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+			requestAnimationFrame(() => {
+				void fitView({
+					padding: 0.3,
+					duration: reduceMotion ? 0 : 220,
+				});
+			});
 		},
-		[nodes, setNodes],
+		[nodes, setNodes, fitView],
 	);
 
 	const handleAddSendEmail = useCallback(() => {
@@ -214,6 +233,13 @@ const WorkflowEditorInner = ({
 
 	const handleSave = () => onSave(nodes, edges);
 
+	const clearSelection = useCallback(() => {
+		setSelectedNodeId(null);
+		setNodes((nds) =>
+			nds.map((n) => (n.selected ? { ...n, selected: false } : n)),
+		);
+	}, [setNodes]);
+
 	return (
 		<div className="flex h-full min-h-0 flex-col">
 			<WorkflowEditorToolbar
@@ -223,7 +249,7 @@ const WorkflowEditorInner = ({
 				onStatusChange={onStatusChange}
 				onSave={handleSave}
 			/>
-			<div className="relative flex min-h-0 flex-1">
+			<div className="relative flex min-h-0 flex-1 overflow-hidden">
 				<div className="relative min-w-0 flex-1">
 					<WorkflowNodePalette
 						onAddSendEmail={handleAddSendEmail}
@@ -240,26 +266,33 @@ const WorkflowEditorInner = ({
 						edgeTypes={edgeTypes}
 						defaultEdgeOptions={defaultEdgeOptions}
 						fitView
-						fitViewOptions={{ padding: 0.3 }}
+						fitViewOptions={{ padding: 0.35 }}
 						proOptions={{ hideAttribution: true }}
-						onPaneClick={() => setSelectedNodeId(null)}
+						onPaneClick={clearSelection}
 						deleteKeyCode={null}
-						className="workflow-canvas bg-bg-weak-50/30"
+						className="workflow-canvas bg-bg-weak-50 dark:bg-black"
+						connectionLineStyle={{
+							stroke: "var(--color-stroke-sub-300)",
+							strokeWidth: 1.5,
+						}}
 					>
 						<Background
 							variant={BackgroundVariant.Dots}
-							gap={20}
-							size={1.5}
-							color="var(--color-stroke-sub-300)"
+							gap={22}
+							size={1.2}
+							color="var(--color-stroke-soft-200)"
+						/>
+						<Controls
+							showInteractive={false}
+							position="bottom-left"
+							className="workflow-controls !shadow-none"
 						/>
 					</ReactFlow>
-				</div>
-				<div className="w-[320px] shrink-0">
 					<NodeConfigPanel
 						selectedNode={selectedNode}
 						onUpdateNode={updateNodeData}
 						onDeleteNode={handleDeleteNode}
-						onClose={() => setSelectedNodeId(null)}
+						onClose={clearSelection}
 					/>
 				</div>
 			</div>

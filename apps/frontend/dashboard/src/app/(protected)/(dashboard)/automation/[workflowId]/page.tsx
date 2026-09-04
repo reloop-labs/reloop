@@ -1,9 +1,11 @@
 import { pageMetadata } from "#/app/_lib/page-metadata";
 import { WorkflowEditorPage } from "./client";
 
+export const instant = false;
+
 export const metadata = pageMetadata(
-	"Workflow Editor · Reloop",
-	"Design and activate an automation workflow.",
+	"Automation Editor · Reloop",
+	"Design and activate an automation.",
 );
 
 export default async function WorkflowEditorRoute({

@@ -4,18 +4,14 @@ import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
-import * as Input from "@reloop/ui/input";
-import * as Label from "@reloop/ui/label";
-import * as Modal from "@reloop/ui/modal";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { toast } from "sonner";
 import { queryKeys } from "#/lib/query-keys";
 import {
 	type CustomEvent,
-	createCustomEvent,
 	listCustomEvents,
 } from "../hooks/use-custom-events-api";
+import { CreateEventModal } from "./create-event-modal";
 
 interface TriggerConfigFormProps {
 	/** Custom event key stored on the trigger node */
@@ -30,14 +26,9 @@ export const TriggerConfigForm = ({
 	value,
 	onChange,
 }: TriggerConfigFormProps) => {
-	const queryClient = useQueryClient();
 	const [isOpen, setIsOpen] = useState(false);
 	const [searchQuery, setSearchQuery] = useState("");
 	const [createOpen, setCreateOpen] = useState(false);
-	const [newName, setNewName] = useState("");
-	const [newKey, setNewKey] = useState("");
-	const [newPropName, setNewPropName] = useState("");
-	const [busy, setBusy] = useState(false);
 
 	const eventsQuery = useQuery({
 		queryKey: queryKeys.workflows.events(),
@@ -64,44 +55,18 @@ export const TriggerConfigForm = ({
 		setIsOpen(false);
 	};
 
-	const handleCreate = async () => {
-		const name = newName.trim();
-		if (!name || busy) return;
-		setBusy(true);
-		try {
-			const props = newPropName.trim()
-				? [{ name: newPropName.trim(), propertyType: "string" as const }]
-				: undefined;
-			const created = await createCustomEvent({
-				name,
-				key: newKey.trim() || undefined,
-				properties: props,
-			});
-			await queryClient.invalidateQueries({
-				queryKey: queryKeys.workflows.events(),
-			});
-			onChange(created.key, { eventId: created.id, name: created.name });
-			setCreateOpen(false);
-			setNewName("");
-			setNewKey("");
-			setNewPropName("");
-			toast.success("Event created");
-		} catch (e) {
-			toast.error(e instanceof Error ? e.message : "Failed to create event");
-		} finally {
-			setBusy(false);
-		}
+	const handleCreated = (event: CustomEvent) => {
+		onChange(event.key, { eventId: event.id, name: event.name });
 	};
 
 	return (
 		<div className="flex flex-col gap-4">
 			<div>
 				<p className="mb-1 font-medium text-sm text-text-strong-950">
-					Workflow event
+					Trigger event
 				</p>
 				<p className="mb-3 text-text-sub-600 text-xs">
-					Choose a custom event you defined for workflows. These are separate
-					from webhooks.
+					This starts the automation. Custom events are separate from webhooks.
 				</p>
 				<Dropdown.Root open={isOpen} onOpenChange={setIsOpen}>
 					<Dropdown.Trigger asChild>
@@ -119,7 +84,7 @@ export const TriggerConfigForm = ({
 									? `${selected.name} (${selected.key})`
 									: value
 										? value
-										: "Select workflow event..."}
+										: "Select event..."}
 							</span>
 							<Icon
 								name="chevron-down"
@@ -217,87 +182,11 @@ export const TriggerConfigForm = ({
 				</div>
 			)}
 
-			<Modal.Root open={createOpen} onOpenChange={setCreateOpen}>
-				<Modal.Content className="max-w-md">
-					<Modal.Header>
-						<Modal.Title>Create workflow event</Modal.Title>
-						<Modal.Description>
-							Events are used only to start workflows. They are not webhook
-							events.
-						</Modal.Description>
-					</Modal.Header>
-					<Modal.Body className="flex flex-col gap-4">
-						<div className="space-y-1.5">
-							<Label.Root htmlFor="evt-name">Name</Label.Root>
-							<Input.Root>
-								<Input.Wrapper>
-									<Input.Input
-										id="evt-name"
-										placeholder="e.g. User signed up"
-										value={newName}
-										onChange={(e) => setNewName(e.target.value)}
-									/>
-								</Input.Wrapper>
-							</Input.Root>
-						</div>
-						<div className="space-y-1.5">
-							<Label.Root htmlFor="evt-key">
-								Key{" "}
-								<span className="font-normal text-text-sub-600">
-									(optional)
-								</span>
-							</Label.Root>
-							<Input.Root>
-								<Input.Wrapper>
-									<Input.Input
-										id="evt-key"
-										placeholder="user.signed_up"
-										value={newKey}
-										onChange={(e) => setNewKey(e.target.value)}
-									/>
-								</Input.Wrapper>
-							</Input.Root>
-						</div>
-						<div className="space-y-1.5">
-							<Label.Root htmlFor="evt-prop">
-								First property{" "}
-								<span className="font-normal text-text-sub-600">
-									(optional)
-								</span>
-							</Label.Root>
-							<Input.Root>
-								<Input.Wrapper>
-									<Input.Input
-										id="evt-prop"
-										placeholder="plan"
-										value={newPropName}
-										onChange={(e) => setNewPropName(e.target.value)}
-									/>
-								</Input.Wrapper>
-							</Input.Root>
-						</div>
-					</Modal.Body>
-					<Modal.Footer className="flex justify-end gap-3">
-						<Button.Root
-							variant="neutral"
-							mode="stroke"
-							size="small"
-							onClick={() => setCreateOpen(false)}
-							disabled={busy}
-						>
-							Cancel
-						</Button.Root>
-						<Button.Root
-							variant="neutral"
-							size="small"
-							onClick={() => void handleCreate()}
-							disabled={!newName.trim() || busy}
-						>
-							{busy ? "Creating…" : "Create"}
-						</Button.Root>
-					</Modal.Footer>
-				</Modal.Content>
-			</Modal.Root>
+			<CreateEventModal
+				open={createOpen}
+				onOpenChange={setCreateOpen}
+				onCreated={handleCreated}
+			/>
 		</div>
 	);
 };

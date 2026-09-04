@@ -2,6 +2,7 @@
 
 import type { NodeProps } from "@xyflow/react";
 import type { SendEmailNodeData, WorkflowNode } from "../../workflow-types";
+import { getNodeIssue } from "../../workflow-validation";
 import { FlowNodeCard } from "./flow-node-card";
 
 type SendEmailFlowNode = WorkflowNode & {
@@ -12,13 +13,16 @@ type SendEmailFlowNode = WorkflowNode & {
 export const SendEmailNode = ({
 	data,
 	selected,
+	type,
 }: NodeProps<SendEmailFlowNode>) => {
+	const issue = getNodeIssue({ type, data });
+
 	return (
 		<FlowNodeCard
-			category={data.category ?? "Action · Send email"}
+			tone="send_email"
 			title={data.subject?.trim() || "No subject"}
-			icon="mail-single"
-			optional={data.optional}
+			subtitle={data.to?.trim() || undefined}
+			issue={issue}
 			selected={selected}
 			hasTarget
 			hasSource

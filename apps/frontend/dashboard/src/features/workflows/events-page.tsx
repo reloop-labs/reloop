@@ -1,60 +1,55 @@
+import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import type { CommandAction } from "#/features/dashboard/command-menu";
 import { useRegisterCommandActions } from "#/features/dashboard/command-menu-context";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
+import { queryKeys } from "#/lib/query-keys";
 import { AutomationFlowPreview } from "./components/automation-flow-preview";
 import { AutomationListHeader } from "./components/automation-list-header";
 import { AutomationListToolbar } from "./components/automation-list-toolbar";
-import { CreateWorkflowModal } from "./components/create-workflow-modal";
-import { WorkflowTable } from "./components/workflow-table";
-import { useWorkflows } from "./components/workflows-provider";
-import type { WorkflowStatus } from "./workflow-types";
+import { CreateEventModal } from "./components/create-event-modal";
+import { EventsTable } from "./components/events-table";
+import { listCustomEvents } from "./hooks/use-custom-events-api";
 
-export function WorkflowsPage() {
+export function EventsPage() {
 	const { activeOrganization } = useActiveOrganization();
-	const {
-		workflows,
-		isHydrated,
-		isLoading: listLoading,
-		refetch,
-	} = useWorkflows();
 	const [createOpen, setCreateOpen] = useState(false);
 	const [searchQuery, setSearchQuery] = useState("");
-	const [statusFilter, setStatusFilter] = useState<string[]>([]);
+
+	const eventsQuery = useQuery({
+		queryKey: queryKeys.workflows.events(),
+		queryFn: () => listCustomEvents(100),
+		enabled: !!activeOrganization?.slug,
+	});
+
+	const events = eventsQuery.data?.events ?? [];
 
 	const filtered = useMemo(() => {
-		const allowed = statusFilter.length > 0 ? new Set(statusFilter) : null;
 		const q = searchQuery.toLowerCase().trim();
-		return workflows.filter((w) => {
-			if (allowed && !allowed.has(w.status as WorkflowStatus)) return false;
-			if (!q) return true;
-			return (
-				w.name.toLowerCase().includes(q) ||
-				(w.description?.toLowerCase().includes(q) ?? false)
-			);
-		});
-	}, [workflows, searchQuery, statusFilter]);
+		if (!q) return events;
+		return events.filter(
+			(event) =>
+				event.name.toLowerCase().includes(q) ||
+				event.key.toLowerCase().includes(q),
+		);
+	}, [events, searchQuery]);
 
-	const isLoading = !isHydrated || listLoading;
-	const isTotalEmpty = isHydrated && !listLoading && workflows.length === 0;
+	const isLoading = eventsQuery.isLoading;
+	const isTotalEmpty =
+		!eventsQuery.isLoading && eventsQuery.isSuccess && events.length === 0;
 	const isFilteredEmpty =
-		isHydrated && !listLoading && workflows.length > 0 && filtered.length === 0;
+		!eventsQuery.isLoading && events.length > 0 && filtered.length === 0;
 
 	const handleCreate = () => {
 		if (activeOrganization?.slug) setCreateOpen(true);
 	};
 
-	const handleClearFilters = () => {
-		setSearchQuery("");
-		setStatusFilter([]);
-	};
-
 	const actions = useMemo<CommandAction[]>(
 		() => [
 			{
-				id: "create-workflow",
-				label: "Create Automation",
+				id: "create-event",
+				label: "Create Event",
 				icon: "plus",
 				shortcut: { label: "C", keys: ["c"] },
 				onSelect: () => handleCreate(),
@@ -71,7 +66,7 @@ export function WorkflowsPage() {
 		[activeOrganization?.slug],
 	);
 
-	useRegisterCommandActions("workflows", "Automation", actions);
+	useRegisterCommandActions("workflow-events", "Events", actions);
 
 	useHotkeys(
 		"c",
@@ -84,35 +79,44 @@ export function WorkflowsPage() {
 
 	return (
 		<div className="mx-auto max-w-6xl space-y-6 p-6 lg:p-8">
-			<AutomationListHeader onCreate={handleCreate} />
+			<AutomationListHeader
+				onCreate={handleCreate}
+				createLabel="Create event"
+				title="Events"
+				description="Custom events that start automations. Separate from webhooks."
+				icon="route"
+			/>
 
 			<div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_240px]">
 				<div className="min-w-0 space-y-4">
 					<AutomationListToolbar
 						searchQuery={searchQuery}
 						onSearchChange={setSearchQuery}
-						statusFilter={statusFilter}
-						onStatusChange={setStatusFilter}
-						onRefresh={() => refetch()}
+						statusFilter={[]}
+						onStatusChange={() => {}}
+						onRefresh={() => void eventsQuery.refetch()}
+						searchPlaceholder="Search events..."
+						searchLabel="Search events"
+						showStatusFilter={false}
 					/>
 
-					<WorkflowTable
-						workflows={filtered}
+					<EventsTable
+						events={filtered}
 						isLoading={isLoading}
 						isTotalEmpty={isTotalEmpty}
 						isFilteredEmpty={isFilteredEmpty}
 						onCreate={handleCreate}
-						onClearFilters={handleClearFilters}
+						onClearFilters={() => setSearchQuery("")}
 					/>
 				</div>
 
 				<AutomationFlowPreview
 					className="lg:sticky lg:top-6"
-					caption="An event starts the path. Wait if you need to, then send."
+					caption="Events start the path. Create one, then use it as a trigger."
 				/>
 			</div>
 
-			<CreateWorkflowModal open={createOpen} onOpenChange={setCreateOpen} />
+			<CreateEventModal open={createOpen} onOpenChange={setCreateOpen} />
 		</div>
 	);
 }
