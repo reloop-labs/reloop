@@ -30,22 +30,25 @@ export function SlideToPublish({
 	disabled = false,
 }: SlideToPublishProps) {
 	const trackRef = useRef<HTMLDivElement>(null);
-	const [trackWidth, setTrackWidth] = useState(0);
+	const [trackWidth, setTrackWidth] = useState(360);
 	const x = useMotionValue(0);
 
-	const thumbSize = 36;
+	const thumbWidth = 56;
 	const padding = 4;
-	const maxDrag = Math.max(0, trackWidth - thumbSize - padding * 2);
+	const maxDrag = Math.max(0, trackWidth - thumbWidth - padding * 2);
 
 	useEffect(() => {
 		const updateWidth = () => {
-			if (trackRef.current) {
-				setTrackWidth(trackRef.current.offsetWidth);
-			}
+			if (trackRef.current) setTrackWidth(trackRef.current.offsetWidth);
 		};
 		updateWidth();
+		const ro = new ResizeObserver(updateWidth);
+		if (trackRef.current) ro.observe(trackRef.current);
 		window.addEventListener("resize", updateWidth);
-		return () => window.removeEventListener("resize", updateWidth);
+		return () => {
+			ro.disconnect();
+			window.removeEventListener("resize", updateWidth);
+		};
 	}, []);
 
 	// Keep thumb at the end if publishing or success
@@ -59,11 +62,15 @@ export function SlideToPublish({
 		}
 	}, [isPublishing, isSuccess, maxDrag, x]);
 
-	const textOpacity = useTransform(x, [0, Math.max(1, maxDrag * 0.55)], [1, 0]);
+	const idleTextOpacity = useTransform(
+		x,
+		[0, Math.max(1, maxDrag * 0.55)],
+		[1, 0],
+	);
 	const progressOpacity = useTransform(x, [0, 6], [0, 1]);
 	const progressWidth = useTransform(
 		x,
-		(curr) => curr + thumbSize + padding * 2,
+		(curr) => curr + thumbWidth + padding * 2,
 	);
 
 	const handleDragEnd = (_: any, info: { velocity: { x: number } }) => {
@@ -119,10 +126,7 @@ export function SlideToPublish({
 			/>
 
 			{/* Center Text: Apple Slide Shimmer */}
-			<motion.div
-				style={{ opacity: textOpacity }}
-				className="pointer-events-none absolute inset-0 flex items-center justify-center gap-1.5 pr-4 pl-7 font-medium text-xs tracking-tight"
-			>
+			<motion.div className="pointer-events-none absolute inset-0 flex items-center justify-center gap-1.5 pr-4 pl-7 font-medium text-xs tracking-tight">
 				<style>{`
 					@keyframes slide-shimmer {
 						0% {
@@ -168,18 +172,7 @@ export function SlideToPublish({
 					}
 				`}</style>
 				<AnimatePresence mode="popLayout" initial={false}>
-					{isPublishing ? (
-						<motion.span
-							key="publishing"
-							initial={{ opacity: 0, y: -8 }}
-							animate={{ opacity: 1, y: 0 }}
-							exit={{ opacity: 0, y: 8 }}
-							className="flex items-center gap-1.5 font-semibold text-primary-base"
-						>
-							<Spinner size={13} color="currentColor" />
-							<span>Publishing...</span>
-						</motion.span>
-					) : isSuccess ? (
+					{isPublishing ? null : isSuccess ? (
 						<motion.span
 							key="success"
 							initial={{ opacity: 0, scale: 0.9 }}
@@ -196,6 +189,7 @@ export function SlideToPublish({
 							initial={{ opacity: 0 }}
 							animate={{ opacity: 1 }}
 							exit={{ opacity: 0 }}
+							style={{ opacity: idleTextOpacity }}
 							className="slide-shimmer-text font-medium text-xs tracking-tight"
 						>
 							<span>Slide to publish »</span>
@@ -215,14 +209,17 @@ export function SlideToPublish({
 				whileHover={!disabled && !isPublishing ? { scale: 1.04 } : undefined}
 				whileTap={!disabled && !isPublishing ? { scale: 0.96 } : undefined}
 				className={cn(
-					"relative z-10 flex size-9 cursor-grab items-center justify-center rounded-full text-white active:cursor-grabbing",
-					isSuccess ? "bg-emerald-600" : "bg-primary-base",
+					"relative z-10 flex h-9 w-14 cursor-grab items-center justify-center rounded-full text-white active:cursor-grabbing",
+					isSuccess
+						? "bg-emerald-600"
+						: "bg-zero-blue shadow-[0_1px_2px_0_rgba(14,18,27,0.24),0_0_0_1px_#006ffe] before:pointer-events-none before:absolute before:inset-0 before:z-10 before:rounded-[inherit] before:bg-gradient-to-b before:from-white/[.12] before:to-transparent before:p-px after:pointer-events-none after:absolute after:inset-0 after:rounded-[inherit] after:bg-gradient-to-b after:from-white after:to-transparent after:opacity-[.16] hover:after:opacity-[.24] before:[mask-clip:content-box,border-box] before:[mask-composite:exclude] before:[mask-image:linear-gradient(#fff_0_0),linear-gradient(#fff_0_0)]",
 				)}
 			>
 				<AnimatePresence mode="popLayout" initial={false}>
 					{isPublishing ? (
 						<motion.div
 							key="publishing-thumb"
+							className="-mt-3.5"
 							initial={{ opacity: 0, scale: 0.7 }}
 							animate={{ opacity: 1, scale: 1 }}
 							exit={{ opacity: 0, scale: 0.7 }}
