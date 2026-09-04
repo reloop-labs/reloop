@@ -115,7 +115,7 @@ export const WebhookEventInlineSelector = ({
 									type="button"
 									onClick={() => setCategory(chip.id)}
 									className={cn(
-										"rounded-full px-3 py-1 font-medium text-[12px] transition-colors",
+										"rounded-full px-3 py-1 font-medium text-[12px]",
 										active
 											? "bg-text-strong-950 text-white dark:bg-white dark:text-black"
 											: "bg-bg-weak-50 text-text-sub-600 hover:bg-bg-soft-200 hover:text-text-strong-950 dark:bg-bg-weak-50/40",
@@ -146,7 +146,7 @@ export const WebhookEventInlineSelector = ({
 									type="button"
 									onClick={() => handleToggle(event.id)}
 									className={cn(
-										"flex w-full items-start gap-3 rounded-xl border px-3 py-2.5 text-left transition-all",
+										"flex w-full items-start gap-3 rounded-xl border px-3 py-2.5 text-left",
 										isChecked
 											? "border-stroke-soft-200 bg-bg-weak-50 shadow-regular-xs dark:border-stroke-soft-100/50 dark:bg-bg-weak-50/40"
 											: "border-transparent hover:border-stroke-soft-200 hover:bg-bg-weak-50/50 dark:hover:border-stroke-soft-100/40",
@@ -154,7 +154,7 @@ export const WebhookEventInlineSelector = ({
 								>
 									<span
 										className={cn(
-											"mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md border transition-colors",
+											"mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md border",
 											isChecked
 												? "border-text-strong-950 bg-text-strong-950 text-white dark:border-white dark:bg-white dark:text-black"
 												: "border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/50",
