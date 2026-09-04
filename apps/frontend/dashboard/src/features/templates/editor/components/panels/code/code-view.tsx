@@ -5,7 +5,7 @@ import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import Spinner from "@reloop/ui/spinner";
 import { generateJSON } from "@tiptap/html";
-import { useCurrentEditor } from "@tiptap/react";
+import { type Editor, useCurrentEditor } from "@tiptap/react";
 import { xcodeDark } from "@uiw/codemirror-theme-xcode";
 import CodeMirror from "@uiw/react-codemirror";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -21,11 +21,15 @@ import {
 import { preserveEmailLinkUnderlines } from "#/features/templates/editor/utils/preserve-email-link-underlines";
 import { prettyPrintHtml } from "#/features/templates/editor/utils/pretty-print-html";
 import {
-	flattenedIconRowMarginTop,
+	alignImageOnlyCells,
+	alignImageOnlyTableRows,
+	collapseEmptyLayoutCells,
+	isImageOnlySingleRowTable,
 	promoteCellTypographyToBlocks,
 	promoteInheritedTypography,
 	promoteTableSpacingToCells,
 	stampThemeNeutralBlockPadding,
+	unwrapLinkedImages,
 } from "#/features/templates/editor/utils/promote-table-spacing";
 import {
 	emailHasMixedBackgrounds,
@@ -36,9 +40,8 @@ import {
 	applyEmailColumnWidth,
 	emailColumnMaxWidthCss,
 	findEmailContainerTable,
-	liftNestedHeadingParagraphs,
+	prepareEmailHtmlForParse,
 	stripEmailCentering,
-	takeEmailColumnContents,
 } from "#/features/templates/editor/utils/strip-email-centering";
 
 export function CodeEditor({ onClose }: { onClose?: () => void } = {}) {
@@ -46,7 +49,6 @@ export function CodeEditor({ onClose }: { onClose?: () => void } = {}) {
 	const htmlCode = useEditorStore((s) => s.codeHtml);
 	const setHtmlCode = useEditorStore((s) => s.setCodeHtml);
 	const setHtmlLocked = useEditorStore((s) => s.setHtmlLocked);
-	const setImportedEmailCss = useEditorStore((s) => s.setImportedEmailCss);
 	const [isLoading, setIsLoading] = useState(false);
 	const [copied, setCopied] = useState(false);
 	const isSelfUpdatingRef = useRef(false);
@@ -117,93 +119,7 @@ export function CodeEditor({ onClose }: { onClose?: () => void } = {}) {
 					// Defer style extraction and settings application until the editor has settled
 					// and automatically seeded the globalContent node/styles array.
 					if (isFullHtml) {
-						setTimeout(() => {
-							if (!editor) return;
-							isSelfUpdatingRef.current = true;
-							try {
-								const parsed = parseGlobalStylesFromHtml(newVal);
-								const existingAfterSeed = getGlobalStylesArray(editor);
-
-								if (parsed.css) {
-									applyImportedEmailCss(parsed.css);
-									setImportedEmailCss(parsed.css);
-								}
-
-								const parsedBodyAndContainer =
-									extractThemingStylesFromHtml(newVal);
-
-								let mergedStyles = mergeParsedStyles(
-									existingAfterSeed,
-									parsedBodyAndContainer,
-								);
-
-								if (parsed.bodyBg) {
-									mergedStyles = updateGlobalStyleValue(
-										mergedStyles,
-										"body",
-										"backgroundColor",
-										parsed.bodyBg,
-									);
-								}
-
-								const containerBg =
-									parsed.bodyBg ||
-									findStyleInputValue(
-										mergedStyles,
-										"container",
-										"backgroundColor",
-									);
-								const extractedColor = findStyleInputValue(
-									mergedStyles,
-									"container",
-									"color",
-								);
-								const mixedSurfaces = emailHasMixedBackgrounds(
-									new DOMParser().parseFromString(newVal, "text/html").body,
-								);
-								const textColor = mixedSurfaces
-									? undefined
-									: readableTextColor(
-											typeof containerBg === "string" ? containerBg : undefined,
-											typeof extractedColor === "string"
-												? extractedColor
-												: undefined,
-										);
-								if (textColor) {
-									mergedStyles = updateGlobalStyleValue(
-										mergedStyles,
-										"container",
-										"color",
-										textColor,
-									);
-									mergedStyles = updateGlobalStyleValue(
-										mergedStyles,
-										"body",
-										"color",
-										textColor,
-									);
-								}
-
-								mergedStyles = updateGlobalStyleValue(
-									mergedStyles,
-									"container",
-									"height",
-									undefined,
-								);
-								mergedStyles = updateGlobalStyleValue(
-									mergedStyles,
-									"container",
-									"borderWidth",
-									0,
-								);
-
-								editor.commands.setGlobalContent("styles", mergedStyles);
-							} catch (err) {
-								console.error("Failed to apply global styles in timeout:", err);
-							} finally {
-								isSelfUpdatingRef.current = false;
-							}
-						}, 50);
+						applyPastedEmailTheme(editor, newVal);
 					}
 				} catch (err) {
 					console.error("Failed to set content from HTML code editor:", err);
@@ -211,7 +127,7 @@ export function CodeEditor({ onClose }: { onClose?: () => void } = {}) {
 				isSelfUpdatingRef.current = false;
 			}
 		},
-		[editor, setHtmlCode, setHtmlLocked, setImportedEmailCss],
+		[editor, setHtmlCode, setHtmlLocked],
 	);
 
 	const handleFormat = useCallback(() => {
@@ -333,7 +249,7 @@ const FORBIDDEN_TAGS = new Set([
 function sanitizeEmailHtml(rawHtml: string): string {
 	const parser = new DOMParser();
 	const doc = parser.parseFromString(
-		liftNestedHeadingParagraphs(rawHtml),
+		prepareEmailHtmlForParse(rawHtml),
 		"text/html",
 	);
 
@@ -477,7 +393,8 @@ function sanitizeEmailHtml(rawHtml: string): string {
 				const normalized = bgScratch.style.backgroundColor;
 				if (normalized) scratch.style.backgroundColor = normalized;
 			}
-			const tableBgImage = (containerTable as HTMLElement).style.backgroundImage;
+			const tableBgImage = (containerTable as HTMLElement).style
+				.backgroundImage;
 			if (tableBgImage) scratch.style.backgroundImage = tableBgImage;
 
 			applyEmailColumnWidth(scratch, containerTable);
@@ -531,17 +448,10 @@ function sanitizeEmailHtml(rawHtml: string): string {
 					const idx = kids.indexOf(cur);
 					if (
 						idx >= 0 &&
-						(tag === "TD" ||
-							tag === "TH" ||
-							tag === "BODY" ||
-							tag === "DIV")
+						(tag === "TD" || tag === "TH" || tag === "BODY" || tag === "DIV")
 					) {
-						const before = kids
-							.slice(0, idx)
-							.filter(isSectionLikeSiblingLocal);
-						const after = kids
-							.slice(idx + 1)
-							.filter(isSectionLikeSiblingLocal);
+						const before = kids.slice(0, idx).filter(isSectionLikeSiblingLocal);
+						const after = kids.slice(idx + 1).filter(isSectionLikeSiblingLocal);
 						siblingBefore.unshift(...before);
 						siblingAfter.push(...after);
 					}
@@ -611,6 +521,7 @@ function sanitizeEmailHtml(rawHtml: string): string {
 	//   <center>…</center>
 	//   <table align="center">…</table>
 	//   style="text-align: center" on wrapper elements
+	unwrapLinkedImages(doc.body);
 	stripEmailCentering(doc.body);
 
 	preserveEmailLinkUnderlines(doc.body);
@@ -647,6 +558,9 @@ function sanitizeEmailHtml(rawHtml: string): string {
 	promoteCellTypographyToBlocks(doc.body);
 	promoteInheritedTypography(doc.body);
 	stampThemeNeutralBlockPadding(doc.body);
+	alignImageOnlyTableRows(doc.body);
+	alignImageOnlyCells(doc.body);
+	collapseEmptyLayoutCells(doc.body);
 
 	return doc.body.innerHTML;
 }
@@ -677,67 +591,14 @@ function stripReactEmailColumnMarkersForIconRows(root: Element): void {
 			continue;
 		}
 
-		// Heuristic: icon rows are made of small cells containing a single <img>.
-		const looksLikeIconRow = directCells.every((td) => {
-			const imgs = td.querySelectorAll("img");
-			if (imgs.length !== 1) return false;
-			const hasOtherElements = Array.from(td.children).some(
-				(el) => el.tagName.toLowerCase() !== "img",
-			);
-			if (hasOtherElements) return false;
-
-			const widthAttr = td.getAttribute("width");
-			const widthNum = widthAttr ? Number.parseInt(widthAttr, 10) : undefined;
-			if (widthNum !== undefined && !Number.isNaN(widthNum) && widthNum > 48) {
-				return false;
-			}
-			return true;
-		});
-
-		if (!looksLikeIconRow) continue;
+		// Image-only rows (avatars or social icons) must stay tables. The
+		// Columns node spreads a 64px | 12px | 64px row and ignores td align.
+		if (!isImageOnlySingleRowTable(table)) continue;
 
 		for (const td of directCells) {
 			td.removeAttribute("data-id");
 		}
 	}
-}
-
-function shouldCenterIconRow(
-	table: HTMLElement,
-	root: HTMLElement,
-): boolean {
-	// Explicit align on the row itself.
-	if (table.getAttribute("align")?.toLowerCase() === "center") return true;
-	if (table.style.textAlign?.toLowerCase() === "center") return true;
-	if (
-		table.style.marginLeft === "auto" &&
-		table.style.marginRight === "auto"
-	)
-		return true;
-
-	// Walk ancestors: a React Email <Section mx-auto> or any centered wrapper
-	// means the icon row was authored centered (twitch footer). If any ancestor
-	// is centered we preserve that; otherwise we default to centered so a
-	// 2-icon footer never left-clips off the column edge.
-	let parent: HTMLElement | null = table.parentElement;
-	while (parent && parent !== root && parent !== root.ownerDocument.body) {
-		if (parent.getAttribute("align")?.toLowerCase() === "center")
-			return true;
-		if (parent.style.textAlign?.toLowerCase() === "center") return true;
-		if (
-			parent.style.marginLeft === "auto" &&
-			parent.style.marginRight === "auto"
-		)
-			return true;
-		// Tailwind `mx-auto` / `text-center` may still be class-based before
-		// inlineEmailStylesheet — check the raw attribute as fallback.
-		const cls = parent.getAttribute("class") || "";
-		if (/\bmx-auto\b/.test(cls) || /\btext-center\b/.test(cls)) return true;
-		parent = parent.parentElement;
-	}
-	// Most email footers are centered. Defaulting to true prevents the
-	// left-aligned / clipped bug from recurring on new templates.
-	return true;
 }
 
 /**
@@ -811,9 +672,19 @@ function replaceSocialIconTablesWithInlineRow(root: Element): void {
 			if (img) {
 				const cur = img.getAttribute("style") || "";
 				if (/display\s*:\s*block/i.test(cur)) {
-					img.setAttribute("style", cur.replace(/display\s*:\s*block/i, "display:inline-block") + ";vertical-align:middle");
+					img.setAttribute(
+						"style",
+						cur.replace(/display\s*:\s*block/i, "display:inline-block") +
+							";vertical-align:middle",
+					);
 				} else if (!/display/i.test(cur)) {
-					img.setAttribute("style", `${cur};display:inline-block;vertical-align:middle`.replace(/^;/, ""));
+					img.setAttribute(
+						"style",
+						`${cur};display:inline-block;vertical-align:middle`.replace(
+							/^;/,
+							"",
+						),
+					);
 				}
 			}
 		}
@@ -1359,165 +1230,6 @@ function mergeParsedStyles(
 	});
 }
 
-function convertSectionTablesToSections(root: Element): void {
-	const tables = Array.from(root.getElementsByTagName("table"));
-
-	for (const table of tables) {
-		if (
-			table.getAttribute("data-type") === "container" ||
-			table.className.includes("node-container")
-		) {
-			continue;
-		}
-
-		const rows = Array.from(table.querySelectorAll("tr")).filter(
-			(tr) => tr.closest("table") === table,
-		);
-		if (rows.length !== 1) continue;
-
-		const row = rows[0];
-		if (!row) continue;
-
-		const cells = Array.from(row.querySelectorAll("td")).filter(
-			(td) => td.closest("tr") === row,
-		);
-		if (cells.length !== 1) continue;
-
-		const cell = cells[0];
-		if (!cell) continue;
-
-		const tableScratch = root.ownerDocument.createElement("div");
-		tableScratch.style.cssText = table.getAttribute("style") || "";
-
-		const cellScratch = root.ownerDocument.createElement("div");
-		cellScratch.style.cssText = cell.getAttribute("style") || "";
-
-		// Determine if this is a styled section (with background, borders, or padding)
-		const bg = tableScratch.style.backgroundColor;
-		const hasBg =
-			bg &&
-			bg !== "transparent" &&
-			bg !== "rgba(0, 0, 0, 0)" &&
-			bg !== "rgb(0, 0, 0)";
-		const hasBorder =
-			tableScratch.style.borderWidth ||
-			tableScratch.style.border ||
-			tableScratch.style.borderStyle ||
-			cellScratch.style.borderWidth ||
-			cellScratch.style.border ||
-			cellScratch.style.borderStyle;
-
-		const pt =
-			cellScratch.style.paddingTop ||
-			cellScratch.style.padding ||
-			tableScratch.style.paddingTop ||
-			tableScratch.style.padding;
-		const pr =
-			cellScratch.style.paddingRight ||
-			cellScratch.style.padding ||
-			tableScratch.style.paddingRight ||
-			tableScratch.style.padding;
-		const pb =
-			cellScratch.style.paddingBottom ||
-			cellScratch.style.padding ||
-			tableScratch.style.paddingBottom ||
-			tableScratch.style.padding;
-		const pl =
-			cellScratch.style.paddingLeft ||
-			cellScratch.style.padding ||
-			tableScratch.style.paddingLeft ||
-			tableScratch.style.padding;
-		const hasPadding = pt || pr || pb || pl;
-
-		const isStyledSection = hasBg || hasBorder || hasPadding;
-
-		if (isStyledSection) {
-			const section = root.ownerDocument.createElement("section");
-			section.setAttribute("data-type", "section");
-
-			const tableClass = table.getAttribute("class");
-			if (tableClass) {
-				section.setAttribute("class", `${tableClass} node-section`);
-			} else {
-				section.setAttribute("class", "node-section");
-			}
-
-			const scratch = root.ownerDocument.createElement("div");
-			scratch.style.cssText = table.getAttribute("style") || "";
-
-			const cellStyle = cell.getAttribute("style");
-			if (cellStyle) {
-				const cellScratchEl = root.ownerDocument.createElement("div");
-				cellScratchEl.style.cssText = cellStyle;
-				for (let i = 0; i < cellScratchEl.style.length; i++) {
-					const prop = cellScratchEl.style[i];
-					if (!prop) continue;
-					const val = cellScratchEl.style.getPropertyValue(prop);
-					if (val) {
-						scratch.style.setProperty(prop, val);
-					}
-				}
-			}
-
-			const alignVal = table.getAttribute("align");
-			if (alignVal) {
-				scratch.style.textAlign = alignVal;
-			}
-
-			if (scratch.style.cssText) {
-				section.setAttribute("style", scratch.style.cssText);
-			}
-
-			const childNodes = Array.from(cell.childNodes);
-			for (const child of childNodes) {
-				section.appendChild(child);
-			}
-
-			table.parentNode?.replaceChild(section, table);
-		} else {
-			// Un-styled spacer table -> unwrap it!
-			const childNodes = Array.from(cell.childNodes);
-			const parent = table.parentNode;
-			if (parent) {
-				// If there's a single child element, copy table-level margin styles to it
-				const elementChildren = childNodes.filter(
-					(n) => n.nodeType === 1,
-				) as Element[];
-				if (elementChildren.length === 1) {
-					const singleChild = elementChildren[0];
-					const tableStyle = table.getAttribute("style");
-					if (tableStyle && singleChild) {
-						const childScratch = root.ownerDocument.createElement("div");
-						childScratch.style.cssText =
-							singleChild.getAttribute("style") || "";
-
-						const tableScratchEl = root.ownerDocument.createElement("div");
-						tableScratchEl.style.cssText = tableStyle;
-
-						// Copy margin styles from table to child
-						for (let i = 0; i < tableScratchEl.style.length; i++) {
-							const prop = tableScratchEl.style[i];
-							if (prop?.startsWith("margin")) {
-								const val = tableScratchEl.style.getPropertyValue(prop);
-								if (val) childScratch.style.setProperty(prop, val);
-							}
-						}
-
-						if (childScratch.style.cssText) {
-							singleChild.setAttribute("style", childScratch.style.cssText);
-						}
-					}
-				}
-
-				for (const child of childNodes) {
-					parent.insertBefore(child, table);
-				}
-				parent.removeChild(table);
-			}
-		}
-	}
-}
-
 // Helper to extract global theme styling details from custom pasted HTML
 function parseGlobalStylesFromHtml(html: string) {
 	const parser = new DOMParser();
@@ -1640,6 +1352,86 @@ function parseGlobalStylesFromHtml(html: string) {
 		bodyBg: bodyBg.trim(),
 		containerWidth,
 	};
+}
+
+/** Same theme pass the HTML editor runs after a full-email paste. */
+export function applyPastedEmailTheme(editor: Editor, rawHtml: string): void {
+	window.setTimeout(() => {
+		try {
+			const parsed = parseGlobalStylesFromHtml(rawHtml);
+			const existingAfterSeed = getGlobalStylesArray(editor);
+
+			if (parsed.css) {
+				applyImportedEmailCss(parsed.css);
+				useEditorStore.getState().setImportedEmailCss(parsed.css);
+			}
+
+			const parsedBodyAndContainer = extractThemingStylesFromHtml(rawHtml);
+
+			let mergedStyles = mergeParsedStyles(
+				existingAfterSeed,
+				parsedBodyAndContainer,
+			);
+
+			if (parsed.bodyBg) {
+				mergedStyles = updateGlobalStyleValue(
+					mergedStyles,
+					"body",
+					"backgroundColor",
+					parsed.bodyBg,
+				);
+			}
+
+			const containerBg =
+				parsed.bodyBg ||
+				findStyleInputValue(mergedStyles, "container", "backgroundColor");
+			const extractedColor = findStyleInputValue(
+				mergedStyles,
+				"container",
+				"color",
+			);
+			const mixedSurfaces = emailHasMixedBackgrounds(
+				new DOMParser().parseFromString(rawHtml, "text/html").body,
+			);
+			const textColor = mixedSurfaces
+				? undefined
+				: readableTextColor(
+						typeof containerBg === "string" ? containerBg : undefined,
+						typeof extractedColor === "string" ? extractedColor : undefined,
+					);
+			if (textColor) {
+				mergedStyles = updateGlobalStyleValue(
+					mergedStyles,
+					"container",
+					"color",
+					textColor,
+				);
+				mergedStyles = updateGlobalStyleValue(
+					mergedStyles,
+					"body",
+					"color",
+					textColor,
+				);
+			}
+
+			mergedStyles = updateGlobalStyleValue(
+				mergedStyles,
+				"container",
+				"height",
+				undefined,
+			);
+			mergedStyles = updateGlobalStyleValue(
+				mergedStyles,
+				"container",
+				"borderWidth",
+				0,
+			);
+
+			editor.commands.setGlobalContent("styles", mergedStyles);
+		} catch (err) {
+			console.error("Failed to apply pasted email theme:", err);
+		}
+	}, 50);
 }
 
 // Helper to retrieve the current styles array from the Tiptap document

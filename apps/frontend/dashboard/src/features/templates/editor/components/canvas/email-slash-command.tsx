@@ -6,7 +6,7 @@ import {
 	offset,
 	shift,
 	useFloating,
-} from "@floating-ui/react";
+} from "@floating-ui/react-dom";
 import type { SlashCommandItem } from "@react-email/editor/ui";
 import { useCurrentEditor } from "@tiptap/react";
 import { useCallback, useEffect, useRef, useState } from "react";

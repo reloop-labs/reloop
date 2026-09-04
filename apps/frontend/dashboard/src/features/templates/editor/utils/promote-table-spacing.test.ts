@@ -4,11 +4,16 @@ import { generateJSON } from "@tiptap/html";
 import { describe, expect, it } from "vitest";
 import { emailStarterKit } from "./email-starter-kit";
 import {
+	alignImageOnlyCellsInJson,
+	alignImageOnlyRowsInJson,
+	alignImageOnlyTableRows,
+	collapseEmptyLayoutCells,
 	flattenedIconRowMarginTop,
 	promoteCellTypographyToBlocks,
 	promoteInheritedTypography,
 	promoteTableSpacingToCells,
 	stampThemeNeutralBlockPadding,
+	unwrapLinkedImages,
 } from "./promote-table-spacing";
 
 /** Logo + heading block from the pasted Dither source (inline table padding). */
@@ -203,5 +208,267 @@ describe("stampThemeNeutralBlockPadding", () => {
 		expect(heading.style.paddingLeft).toBe("32px");
 		expect(body.style.paddingTop).toMatch(/^0(px)?$/);
 		expect(body.style.paddingLeft).toMatch(/^0(px)?$/);
+	});
+});
+
+describe("alignImageOnlyTableRows", () => {
+	const INVITE_ROW = `<table align="center" width="100%">
+		<tbody>
+			<tr>
+				<td data-id="__react-email-column" align="right">
+					<img alt="Alan" width="64" height="64" style="display:block" src="https://example.com/user.png" />
+				</td>
+				<td data-id="__react-email-column" align="center">
+					<img alt="" width="12" height="9" style="display:block" src="https://example.com/arrow.png" />
+				</td>
+				<td data-id="__react-email-column" align="left">
+					<img alt="Enigma" width="64" height="64" style="display:block" src="https://example.com/team.png" />
+				</td>
+			</tr>
+		</tbody>
+	</table>`;
+
+	it("middle-aligns a 64px avatar row and does not treat it as a social-icon footer", () => {
+		const doc = new DOMParser().parseFromString(INVITE_ROW, "text/html");
+		alignImageOnlyTableRows(doc.body);
+		const table = doc.querySelector("table") as HTMLTableElement;
+		const cells = Array.from(table.querySelectorAll("td"));
+		const images = Array.from(table.querySelectorAll("img"));
+
+		expect(table.getAttribute("data-icon-row")).toBeNull();
+		expect(table.getAttribute("data-image-row")).toBe("true");
+		expect(cells.map((td) => td.getAttribute("align"))).toEqual([
+			"right",
+			"center",
+			"left",
+		]);
+		expect(cells.map((td) => td.style.textAlign)).toEqual([
+			"right",
+			"center",
+			"left",
+		]);
+		for (const td of cells) {
+			expect(td.style.verticalAlign).toBe("middle");
+		}
+		for (const img of images) {
+			expect(img.style.display).toBe("inline-block");
+			expect(img.style.verticalAlign).toBe("middle");
+		}
+
+		const json = JSON.stringify(
+			generateJSON(doc.body.innerHTML, [emailStarterKit()] as never),
+		);
+		expect(json).toMatch(/vertical-align:\s*middle/i);
+		expect(json).toMatch(/text-align:\s*right/i);
+		expect(json).toMatch(/"data-image-row"\s*:\s*"true"/);
+		expect(json).not.toMatch(/"data-icon-row"\s*:\s*"true"/);
+	});
+
+	it("still tags a small social-icon row", () => {
+		const doc = new DOMParser().parseFromString(
+			`<table>
+				<tr>
+					<td align="right"><img width="20" height="20" src="https://example.com/twitter.png" /></td>
+					<td align="left"><img width="20" height="20" src="https://example.com/facebook.png" /></td>
+				</tr>
+			</table>`,
+			"text/html",
+		);
+		alignImageOnlyTableRows(doc.body);
+		const table = doc.querySelector("table") as HTMLTableElement;
+		expect(table.getAttribute("data-icon-row")).toBe("true");
+		expect(table.getAttribute("data-image-row")).toBeNull();
+	});
+
+	it("does not retag a product column that mixes an image with text", () => {
+		const doc = new DOMParser().parseFromString(
+			`<table>
+				<tr>
+					<td data-id="__react-email-column" style="width:64px">
+						<img alt="Halo Ring" width="48" height="48" />
+					</td>
+					<td data-id="__react-email-column">
+						<p>Halo Ring 1</p>
+					</td>
+				</tr>
+			</table>`,
+			"text/html",
+		);
+		alignImageOnlyTableRows(doc.body);
+		const table = doc.querySelector("table") as HTMLTableElement;
+		expect(table.getAttribute("data-icon-row")).toBeNull();
+		expect(table.getAttribute("data-image-row")).toBeNull();
+		expect(table.querySelector("td")?.getAttribute("data-id")).toBe(
+			"__react-email-column",
+		);
+	});
+
+	it("zeros TipTap wrapper paragraphs so theme 0.5em padding cannot drop the avatar", () => {
+		const json = {
+			type: "doc",
+			content: [
+				{
+					type: "table",
+					content: [
+						{
+							type: "tableRow",
+							content: [
+								{
+									type: "tableCell",
+									attrs: { align: "right" },
+									content: [
+										{
+											type: "paragraph",
+											content: [
+												{
+													type: "image",
+													attrs: {
+														width: 64,
+														style: "display:block",
+													},
+												},
+											],
+										},
+									],
+								},
+								{
+									type: "tableCell",
+									attrs: { align: "center" },
+									content: [
+										{
+											type: "paragraph",
+											content: [
+												{
+													type: "image",
+													attrs: {
+														width: 12,
+														style: "display:block",
+													},
+												},
+											],
+										},
+									],
+								},
+								{
+									type: "tableCell",
+									attrs: { align: "left" },
+									content: [
+										{
+											type: "paragraph",
+											content: [
+												{
+													type: "image",
+													attrs: {
+														width: 64,
+														style: "display:block",
+													},
+												},
+											],
+										},
+									],
+								},
+							],
+						},
+					],
+				},
+			],
+		};
+		expect(alignImageOnlyRowsInJson(json)).toBe(true);
+		expect(json.content[0].attrs).toMatchObject({ "data-image-row": "true" });
+		expect(json.content[0].attrs?.["data-icon-row"]).toBeUndefined();
+		const cells = json.content[0].content[0].content;
+		expect(cells[0].attrs?.style).toMatch(/vertical-align:\s*middle/i);
+		expect(cells[0].attrs?.style).toMatch(/text-align:\s*right/i);
+		expect(cells[0].content[0].attrs?.style).toMatch(/padding-top:\s*0/i);
+		expect(cells[0].content[0].content[0].attrs?.style).toMatch(
+			/display:\s*inline-block/i,
+		);
+		expect(alignImageOnlyRowsInJson(json)).toBe(false);
+	});
+});
+
+describe("alignImageOnlyCellsInJson", () => {
+	it("does not wrap a 3-icon cell in a paragraph", () => {
+		const json = {
+			type: "doc",
+			content: [
+				{
+					type: "tableCell",
+					attrs: { style: "text-align:right", alignment: "right" },
+					content: [
+						{ type: "image", attrs: { alt: "Amazon Social Midia", width: 30 } },
+						{ type: "image", attrs: { alt: "Amazon Social Midia", width: 30 } },
+						{ type: "image", attrs: { alt: "Amazon Social Midia", width: 30 } },
+					],
+				},
+			],
+		};
+		expect(alignImageOnlyCellsInJson(json)).toBe(true);
+		expect(json.content[0].content?.map((n) => n.type)).toEqual([
+			"image",
+			"image",
+			"image",
+		]);
+		expect(json.content[0].content?.[0].attrs?.style).toMatch(
+			/display:\s*inline-block/i,
+		);
+	});
+});
+
+describe("collapseEmptyLayoutCells", () => {
+	it("fills an empty divider cell with a zero-box paragraph", () => {
+		const doc = new DOMParser().parseFromString(
+			`<table>
+				<tr>
+					<td style="border-bottom:1px solid rgb(145,71,255);width:102px"></td>
+				</tr>
+			</table>`,
+			"text/html",
+		);
+		collapseEmptyLayoutCells(doc.body);
+		const p = doc.querySelector("td > p");
+		expect(p?.style.lineHeight).toMatch(/^0/);
+		expect(p?.style.fontSize).toMatch(/^0/);
+		expect(p?.style.paddingTop).toMatch(/^0/);
+		expect(p?.getAttribute("data-empty-cell")).toBe("true");
+	});
+
+	it("does not strip a logo image to collapse its cell", () => {
+		const doc = new DOMParser().parseFromString(
+			`<table>
+				<tr>
+					<td style="padding:30px"><img alt="Twitch" width="114" /></td>
+				</tr>
+			</table>`,
+			"text/html",
+		);
+		collapseEmptyLayoutCells(doc.body);
+		expect(doc.querySelector("img")?.getAttribute("alt")).toBe("Twitch");
+		expect(doc.querySelector("td")?.querySelectorAll("p")).toHaveLength(0);
+	});
+});
+
+describe("unwrapLinkedImages", () => {
+	it("moves a logo link href onto the image so TipTap can keep the block", () => {
+		const doc = new DOMParser().parseFromString(
+			`<td align="center"><a href="https://www.amazon.com"><img alt="Prime" src="https://example.com/p.png" width="109" /></a></td>`,
+			"text/html",
+		);
+		unwrapLinkedImages(doc.body);
+		const img = doc.querySelector("img");
+		expect(img?.getAttribute("href")).toBe("https://www.amazon.com");
+		expect(doc.querySelector("a")).toBeNull();
+	});
+
+	it("moves the link's horizontal padding onto the image so icon gaps survive unwrap", () => {
+		const doc = new DOMParser().parseFromString(
+			`<td><a href="https://example.com/" style="display:inline-block;padding-left:0.5rem;padding-right:0.5rem"><img alt="X" src="https://example.com/x.png" width="18" /></a></td>`,
+			"text/html",
+		);
+		unwrapLinkedImages(doc.body);
+		const img = doc.querySelector("img");
+		expect(img?.getAttribute("href")).toBe("https://example.com/");
+		expect(img?.style.marginLeft).toBe("0.5rem");
+		expect(img?.style.marginRight).toBe("0.5rem");
 	});
 });

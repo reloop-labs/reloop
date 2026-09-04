@@ -1,20 +1,18 @@
 import { generateJSON } from "@tiptap/html";
 import type { Editor } from "@tiptap/react";
 import {
+	applyPastedEmailTheme,
 	parseGlobalStylesFromHtml,
 	sanitizeEmailHtml,
 } from "#/features/templates/editor/components/panels/code/code-view";
 import { useEditorStore } from "#/features/templates/editor/hooks/use-editor-store";
 import { applyImportedEmailCss } from "#/features/templates/editor/utils/apply-imported-email-css";
+import {
+	isFullEmailHtml,
+	pickPastedEmailHtml,
+} from "#/features/templates/editor/utils/pick-pasted-email-html";
 
-export function isFullEmailHtml(html: string): boolean {
-	const lower = html.toLowerCase();
-	return (
-		lower.includes("<table") ||
-		lower.includes("<html") ||
-		lower.includes("<!doctype")
-	);
-}
+export { isFullEmailHtml, pickPastedEmailHtml };
 
 /** Keep the pasted string as the source of truth. Do not compose React Email over it. */
 export function lockPastedHtml(rawHtml: string): void {
@@ -48,10 +46,8 @@ export function loadHtmlIntoEditor(
 			editor.commands.insertContent(jsonDoc);
 		}
 
-		const parsed = parseGlobalStylesFromHtml(rawHtml);
-		if (parsed.css) {
-			applyImportedEmailCss(parsed.css);
-			useEditorStore.getState().setImportedEmailCss(parsed.css);
+		if (isFullEmailHtml(rawHtml)) {
+			applyPastedEmailTheme(editor, rawHtml);
 		}
 		return true;
 	} catch (err) {
@@ -66,8 +62,11 @@ export function handleEmailHtmlPaste(
 ): boolean {
 	if (!editor) return false;
 	if (event.clipboardData?.files?.[0]) return false;
-	const html = event.clipboardData?.getData("text/html");
-	if (!html?.trim() || !isFullEmailHtml(html)) return false;
+	const html = pickPastedEmailHtml(
+		event.clipboardData?.getData("text/html") || "",
+		event.clipboardData?.getData("text/plain") || "",
+	);
+	if (!html) return false;
 	event.preventDefault();
 	return loadHtmlIntoEditor(editor, html);
 }

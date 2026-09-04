@@ -19,7 +19,22 @@ export function isEmailContainerTable(table: Element): boolean {
 
 const EMAIL_COLUMN_MIN_PX = 560;
 
+function parseCssLengthPx(value: string): number | null {
+	const match = value.trim().match(/^(\d+(?:\.\d+)?)(px|em|rem)$/i);
+	if (!match) return null;
+	const n = Number(match[1]);
+	const unit = (match[2] || "px").toLowerCase();
+	if (unit === "em" || unit === "rem") return n * 16;
+	return n;
+}
+
 function parseTableMaxWidthPx(table: Element): number | null {
+	if (table instanceof HTMLElement) {
+		const fromMax = parseCssLengthPx(table.style.maxWidth);
+		if (fromMax != null) return fromMax;
+		const fromWidth = parseCssLengthPx(table.style.width);
+		if (fromWidth != null) return fromWidth;
+	}
 	const style = table.getAttribute("style") || "";
 	const fromStyle = style.match(
 		/max-width\s*:\s*(\d+(?:\.\d+)?)(px|em|rem|%)?/i,
@@ -30,6 +45,11 @@ function parseTableMaxWidthPx(table: Element): number | null {
 		const n = Number(fromStyle[1]);
 		if (unit === "em" || unit === "rem") return n * 16;
 		return n;
+	}
+	const cssWidth = style.match(/(?:^|;)\s*width\s*:\s*([^;]+)/i);
+	if (cssWidth?.[1]) {
+		const fromCss = parseCssLengthPx(cssWidth[1]);
+		if (fromCss != null) return fromCss;
 	}
 	const width = table.getAttribute("width") || "";
 	if (/^\d+$/.test(width)) return Number(width);
@@ -128,6 +148,27 @@ export function liftNestedHeadingParagraphs(html: string): string {
 			return `<${tag}${attrs}>${lifted}</${tag}>`;
 		},
 	);
+}
+
+/**
+ * React Email `<Row>` without `<Column>` emits `<tr><p>…</p></tr>`.
+ * The HTML parser fosters the paragraph out of the table and TipTap
+ * then paints a default left-aligned block. Wrap orphans in a cell
+ * before parse so text-align:center survives.
+ */
+export function wrapOrphanBlocksInTableRows(html: string): string {
+	return html.replace(
+		/<tr(\b[^>]*)>((?:(?!<tr\b)[\s\S])*?)<\/tr>/gi,
+		(full, attrs: string, inner: string) => {
+			if (/<(td|th)\b/i.test(inner)) return full;
+			if (!inner.trim()) return full;
+			return `<tr${attrs}><td>${inner}</td></tr>`;
+		},
+	);
+}
+
+export function prepareEmailHtmlForParse(html: string): string {
+	return wrapOrphanBlocksInTableRows(liftNestedHeadingParagraphs(html));
 }
 
 function isSectionLikeSibling(node: Node): boolean {
@@ -251,9 +292,11 @@ export function stripEmailCentering(root: Element): void {
 				el.style.marginLeft = el.style.marginLeft || "auto";
 				el.style.marginRight = el.style.marginRight || "auto";
 			} else if (tag === "td" || tag === "th") {
-				// One-cell Section/Column wrappers use align for layout.
-				// A two-or-more-cell row is a real Column align.
-				if (rowCellCount(el) >= 2 && !el.style.textAlign) {
+				const cells = rowCellCount(el);
+				if (cells >= 2 && !el.style.textAlign) {
+					el.style.textAlign = "center";
+				} else if (cells === 1 && isImageOnlyCell(el) && !el.style.textAlign) {
+					// One-cell Column align=center wrapping a logo.
 					el.style.textAlign = "center";
 				}
 			} else if (!isLayoutCenteredTable(el)) {
@@ -265,6 +308,17 @@ export function stripEmailCentering(root: Element): void {
 				}
 			}
 			el.removeAttribute("align");
+		} else {
+			const htmlAlign = el.getAttribute("align")?.toLowerCase();
+			if (
+				(htmlAlign === "left" || htmlAlign === "right") &&
+				(tag === "td" || tag === "th") &&
+				rowCellCount(el) >= 2 &&
+				!el.style.textAlign
+			) {
+				el.style.textAlign = htmlAlign;
+				el.removeAttribute("align");
+			}
 		}
 
 		if (el.style?.textAlign?.toLowerCase() === "center" && !preserveCenter) {
@@ -277,6 +331,8 @@ export function stripEmailCentering(root: Element): void {
 
 		node = walker.nextNode();
 	}
+
+	stampShrinkWrappedTables(root);
 }
 
 /** Headings, cells, and inner CTA tables keep source text-align:center. */
@@ -303,9 +359,11 @@ function isCenteredElement(el: HTMLElement): boolean {
 		const tag = el.tagName.toLowerCase();
 		// Column / full-width Section/Row use align for layout, not copy.
 		if (tag === "table" && isLayoutCenteredTable(el)) return false;
-		// One-cell td align is the same layout attr. A lone CTA still wraps
-		// when an ancestor table is shrink-wrapped or has text-align:center.
-		if ((tag === "td" || tag === "th") && rowCellCount(el) < 2) return false;
+		// One-cell td align is layout unless the cell is a logo (image / linked
+		// image only). Amazon Prime sits in Column align=center that way.
+		if ((tag === "td" || tag === "th") && rowCellCount(el) < 2) {
+			return isImageOnlyCell(el);
+		}
 		return true;
 	}
 	return false;
@@ -333,6 +391,7 @@ export function wrapCenteredCellLinks(root: Element): void {
 			(child) => child instanceof HTMLElement,
 		);
 		if (elements.length !== 1 || elements[0].tagName !== "A") continue;
+		if (elements[0].querySelector("img")) continue;
 		const table = cell.closest("table");
 		if (table instanceof HTMLElement && firstRowCellCount(table) >= 2) {
 			continue;
@@ -365,7 +424,19 @@ function rowCellCount(cell: HTMLElement): number {
 	return row.cells.length;
 }
 
+const IMAGE_ONLY_CELL_TAGS = new Set(["IMG", "P", "A", "SPAN", "BR"]);
+
+function isImageOnlyCell(cell: HTMLElement): boolean {
+	if (cell.querySelectorAll("img").length === 0) return false;
+	const extra = Array.from(cell.querySelectorAll("*")).filter(
+		(el) => !IMAGE_ONLY_CELL_TAGS.has(el.tagName),
+	);
+	if (extra.length > 0) return false;
+	return !(cell.textContent ?? "").replace(/\u00a0/g, " ").trim();
+}
+
 function isFullWidthTable(el: HTMLElement): boolean {
+	if (isConstrainedWidthTable(el)) return false;
 	const width = (el.getAttribute("width") || "").trim();
 	if (width === "100%") return true;
 	return el.style.width.trim() === "100%";
@@ -376,12 +447,15 @@ function isFullWidthTable(el: HTMLElement): boolean {
  * That sits the table in the column; it is not text-align for cells.
  * A nested table with max-width below the column is an inner block and
  * still needs margin:auto from align=center.
+ *
+ * A 2-cell footer with style width:166px is not a layout row — React Email
+ * also sets width="100%" as a leftover attr. Prefer the CSS width.
  */
 function isLayoutCenteredTable(el: HTMLElement): boolean {
 	if (el.tagName !== "TABLE") return false;
 	if (isColumnTable(el)) return true;
-	if (firstRowCellCount(el) >= 2) return true;
 	if (isConstrainedWidthTable(el)) return false;
+	if (firstRowCellCount(el) >= 2) return true;
 	if (isFullWidthTable(el)) return true;
 	return false;
 }
@@ -389,4 +463,27 @@ function isLayoutCenteredTable(el: HTMLElement): boolean {
 function isConstrainedWidthTable(el: HTMLElement): boolean {
 	const maxWidth = parseTableMaxWidthPx(el);
 	return maxWidth != null && maxWidth < EMAIL_COLUMN_MIN_PX;
+}
+
+/**
+ * React Email Rows often keep width="100%" while CSS sets a shrink-wrap
+ * pixel width + margin:auto. TipTap stores the attr as table.width, and
+ * canvas CSS `table { width: 100% }` then left-aligns the 166px group.
+ */
+function stampShrinkWrappedTables(root: Element): void {
+	for (const table of Array.from(root.getElementsByTagName("table"))) {
+		if (!(table instanceof HTMLTableElement)) continue;
+		if (!isConstrainedWidthTable(table)) continue;
+		if ((table.getAttribute("width") || "").trim() === "100%") {
+			table.removeAttribute("width");
+		}
+		const centered =
+			table.style.marginLeft === "auto" ||
+			table.style.marginRight === "auto" ||
+			table.getAttribute("align")?.toLowerCase() === "center";
+		if (!centered) continue;
+		table.style.marginLeft = table.style.marginLeft || "auto";
+		table.style.marginRight = table.style.marginRight || "auto";
+		table.setAttribute("data-shrink-row", "true");
+	}
 }

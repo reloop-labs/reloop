@@ -3,12 +3,31 @@
 import { generateJSON } from "@tiptap/html";
 import { describe, expect, it } from "vitest";
 import { emailStarterKit } from "./email-starter-kit";
+import { unwrapLinkedImages } from "./promote-table-spacing";
 import {
 	applyEmailColumnWidth,
 	findEmailContainerTable,
 	innerFullWidthBackground,
 	stripEmailCentering,
+	wrapOrphanBlocksInTableRows,
 } from "./strip-email-centering";
+
+describe("wrapOrphanBlocksInTableRows", () => {
+	it("wraps a React Email row paragraph in a cell so it is not fostered", () => {
+		const html = wrapOrphanBlocksInTableRows(`<table>
+			<tr style="width:100%">
+				<p style="text-align:center">Please contact us if you have any questions.</p>
+			</tr>
+		</table>`);
+		expect(html).toMatch(/<tr[^>]*>\s*<td>\s*<p[^>]*text-align:\s*center/i);
+		expect(html).not.toMatch(/<tr[^>]*>\s*<p/i);
+	});
+
+	it("does not wrap rows that already have cells", () => {
+		const src = "<tr><td><p>Shipping Status</p></td></tr>";
+		expect(wrapOrphanBlocksInTableRows(src)).toBe(src);
+	});
+});
 
 describe("stripEmailCentering", () => {
 	it("does not turn table align=center into centered heading text", () => {
@@ -280,6 +299,26 @@ describe("structural centering for any pasted email", () => {
 				(p) => p.textContent === "Label",
 			)?.style.textAlign,
 		).not.toBe("center");
+	});
+
+	it("centers a one-cell Column that only wraps a linked logo", () => {
+		const doc = new DOMParser().parseFromString(
+			`<table width="100%">
+				<tr>
+					<td align="center">
+						<a href="https://www.amazon.com">
+							<img alt="Amazon Prime Logo" width="109" height="48" src="https://example.com/prime.png" />
+						</a>
+					</td>
+				</tr>
+			</table>`,
+			"text/html",
+		);
+		unwrapLinkedImages(doc.body);
+		stripEmailCentering(doc.body);
+		const img = doc.querySelector("img");
+		expect(img?.closest("td")?.style.textAlign).toBe("center");
+		expect(img?.getAttribute("href")).toBe("https://www.amazon.com");
 	});
 
 	it("does not invent text-align on a one-cell td that only has align=center", () => {

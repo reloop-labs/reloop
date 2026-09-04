@@ -27,9 +27,10 @@ const LAYOUT_STYLE_TYPES = [
 ];
 
 /**
- * TipTap drops attributes that are not declared on the mark. Link.parseHTML
- * copies `data-email-decoration`, then the schema throws it away unless this
- * global attribute is registered.
+ * TipTap drops attributes that are not declared on the schema. Link.parseHTML
+ * copies `data-email-decoration`, and image-only rows stamp `data-image-row`
+ * / `data-icon-row` on tables. Empty divider cells stamp `data-empty-cell`
+ * on the filler paragraph so canvas CSS can collapse them after generateJSON.
  */
 const emailLinkDecoration = Extension.create({
 	name: "emailLinkDecoration",
@@ -45,6 +46,52 @@ const emailLinkDecoration = Extension.create({
 							const value = attributes[EMAIL_DECORATION_ATTR];
 							if (!value) return {};
 							return { [EMAIL_DECORATION_ATTR]: value };
+						},
+					},
+				},
+			},
+			{
+				types: ["table"],
+				attributes: {
+					"data-icon-row": {
+						default: null,
+						parseHTML: (element) => element.getAttribute("data-icon-row"),
+						renderHTML: (attributes) => {
+							const value = attributes["data-icon-row"];
+							if (!value) return {};
+							return { "data-icon-row": value };
+						},
+					},
+					"data-image-row": {
+						default: null,
+						parseHTML: (element) => element.getAttribute("data-image-row"),
+						renderHTML: (attributes) => {
+							const value = attributes["data-image-row"];
+							if (!value) return {};
+							return { "data-image-row": value };
+						},
+					},
+					"data-shrink-row": {
+						default: null,
+						parseHTML: (element) => element.getAttribute("data-shrink-row"),
+						renderHTML: (attributes) => {
+							const value = attributes["data-shrink-row"];
+							if (!value) return {};
+							return { "data-shrink-row": value };
+						},
+					},
+				},
+			},
+			{
+				types: ["paragraph"],
+				attributes: {
+					"data-empty-cell": {
+						default: null,
+						parseHTML: (element) => element.getAttribute("data-empty-cell"),
+						renderHTML: (attributes) => {
+							const value = attributes["data-empty-cell"];
+							if (!value) return {};
+							return { "data-empty-cell": value };
 						},
 					},
 				},
