@@ -9,7 +9,7 @@ export function isCanvasEditorPath(pathname: string): boolean {
 	return (
 		/\/templates\/[^/]+/.test(pathname) ||
 		/\/campaigns\/[^/]+\/edit/.test(pathname) ||
-		/\/automation\/(?!events(?:\/|$))[^/]+/.test(pathname)
+		/\/automation\/(?!(?:triggers|events)(?:\/|$))[^/]+/.test(pathname)
 	);
 }
 

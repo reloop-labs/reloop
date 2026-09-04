@@ -4,10 +4,10 @@ import { EventsPage } from "./client";
 export const instant = false;
 
 export const metadata = pageMetadata(
-	"Events · Reloop",
-	"Custom events that start automation workflows.",
+	"Triggers · Reloop",
+	"Custom triggers that start automation workflows.",
 );
 
-export default function AutomationEventsRoute() {
+export default function AutomationTriggersRoute() {
 	return <EventsPage />;
 }

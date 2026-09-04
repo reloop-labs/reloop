@@ -19,9 +19,9 @@ const items = [
 	},
 	{
 		title: "Triggers",
-		value: "events",
+		value: "triggers",
 		iconName: "zap" as const,
-		path: "/automation/events",
+		path: "/automation/triggers",
 		shortcut: "2",
 	},
 ] as const;
@@ -44,13 +44,15 @@ export function AutomationTabs() {
 		"2",
 		(e) => {
 			e.preventDefault();
-			router.push("/automation/events");
+			router.push("/automation/triggers");
 		},
 		{ enableOnFormTags: false, preventDefault: true },
 	);
 
-	const isEvents = pathname.includes("/automation/events");
-	const effectiveTabValue = isEvents ? "events" : "automations";
+	const isTriggers =
+		pathname.includes("/automation/triggers") ||
+		pathname.includes("/automation/events");
+	const effectiveTabValue = isTriggers ? "triggers" : "automations";
 
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
 	const activeIndex = items.findIndex(

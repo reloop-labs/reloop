@@ -15,17 +15,20 @@ export function AutomationShell({ children }: { children: ReactNode }) {
 	const { activeOrganization } = useActiveOrganization();
 	const [modal, setModal] = useQueryState("modal", { history: "replace" });
 
-	const isDetailPage = /\/automation\/(?!events(?:$|\/))[^/]+/.test(pathname);
-	const isEventsPage = pathname.includes("/automation/events");
+	const isDetailPage =
+		/\/automation\/(?!(?:triggers|events)(?:$|\/))[^/]+/.test(pathname);
+	const isTriggersPage =
+		pathname.includes("/automation/triggers") ||
+		pathname.includes("/automation/events");
 
 	const handleCreate = useCallback(() => {
 		if (!activeOrganization?.slug) return;
-		if (isEventsPage) {
+		if (isTriggersPage) {
 			void setModal("create-event");
 		} else {
 			void setModal("create-workflow");
 		}
-	}, [activeOrganization?.slug, isEventsPage, setModal]);
+	}, [activeOrganization?.slug, isTriggersPage, setModal]);
 
 	useHotkeys(
 		"c",
@@ -44,14 +47,14 @@ export function AutomationShell({ children }: { children: ReactNode }) {
 		<div className="mx-auto max-w-6xl space-y-6 p-6 lg:p-8">
 			<AutomationListHeader
 				onCreate={handleCreate}
-				createLabel={isEventsPage ? "Create trigger" : "Create automation"}
-				title={isEventsPage ? "Triggers" : "Automation"}
+				createLabel={isTriggersPage ? "Create trigger" : "Create automation"}
+				title={isTriggersPage ? "Triggers" : "Automation"}
 				description={
-					isEventsPage
+					isTriggersPage
 						? "Custom triggers that start automations. Separate from webhooks."
 						: "Trigger emails from events — delays, conditions, and sends."
 				}
-				icon={isEventsPage ? "zap" : "workflow"}
+				icon={isTriggersPage ? "zap" : "workflow"}
 			/>
 
 			<div className="space-y-4">
