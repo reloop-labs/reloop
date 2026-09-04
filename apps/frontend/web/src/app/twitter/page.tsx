@@ -15,8 +15,8 @@ export const metadata: Metadata = {
 	},
 };
 
-import { TwitterAutomationShowcase } from "./components/twitter-automation-showcase";
+import { TwitterDeleteApiKeyComparison } from "./components/twitter-delete-api-key-comparison";
 
 export default function TwitterPage() {
-	return <TwitterAutomationShowcase />;
+	return <TwitterDeleteApiKeyComparison />;
 }

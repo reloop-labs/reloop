@@ -8,6 +8,7 @@ import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
 import axios from "axios";
 import { AnimatePresence, motion } from "framer-motion";
+import { X } from "lucide-react";
 import { useQueryState } from "nuqs";
 import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
@@ -175,6 +176,15 @@ export function DeleteApiKeyModal({
 		deleteStateRef.current = deleteState;
 	}, [deleteState]);
 
+	const handleClose = () => {
+		if (deleteState !== "idle") return;
+		void setDeleteId(null);
+		setTimeout(() => {
+			setDeleteState("idle");
+			setConfirmationText("");
+		}, 300);
+	};
+
 	return (
 		<Modal.Root
 			open={!!deleteId}
@@ -201,7 +211,7 @@ export function DeleteApiKeyModal({
 			}}
 		>
 			<Modal.Content
-				className="overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 p-6 sm:max-w-[460px] dark:border-stroke-soft-100/40"
+				className="overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-soft-50 p-0 sm:max-w-[460px] dark:border-stroke-soft-100/40 dark:bg-white/[0.03]"
 				showClose={false}
 				onOpenAutoFocus={(e) => {
 					e.preventDefault();
@@ -210,135 +220,147 @@ export function DeleteApiKeyModal({
 					}, 0);
 				}}
 			>
-				{/* Header */}
-				<div>
-					<Modal.Title className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
-						{isBulk
-							? `Delete ${bulkKeysToDelete.length || "selected"} API keys`
-							: "Delete API key"}
-					</Modal.Title>
-					<Modal.Description className="text-sm text-text-sub-600 leading-relaxed">
-						{isBulk
-							? `Are you sure you want to delete ${bulkKeysToDelete.length > 1 ? `these ${bulkKeysToDelete.length} API keys` : "this API key"}? This action cannot be undone.`
-							: "Are you sure you want to delete this API key? This action cannot be undone."}
-					</Modal.Description>
-				</div>
-				<div className="mt-4 rounded-xl border border-red-200 bg-red-50 p-4 text-red-700 text-xs leading-relaxed dark:border-red-800/40 dark:bg-red-950/30 dark:text-red-300">
-					<span className="font-bold text-red-800 dark:text-red-200">
-						Warning:
-					</span>{" "}
-					{isBulk
-						? `Deleting ${bulkKeysToDelete.length > 1 ? `these ${bulkKeysToDelete.length} API keys` : "this API key"} will permanently remove ${bulkKeysToDelete.length > 1 ? "them" : "it"} along with all permissions. Any services using ${bulkKeysToDelete.length > 1 ? "these API keys" : "this API key"} will stop working immediately.`
-						: "Deleting this API key will permanently remove it along with all its permissions. Any services using this API key will stop working immediately."}
-				</div>
-
-				{/* Key Details Card */}
-				{isBulk ? (
-					<div className="mt-5 space-y-2 rounded-xl border border-stroke-soft-100 bg-bg-weak-50/50 p-4 dark:border-stroke-soft-100/40">
-						<p className="font-normal text-text-sub-600 text-xs">
-							Selected API keys ({bulkKeysToDelete.length})
-						</p>
-						<div className="flex flex-wrap gap-1.5 pt-1">
-							{bulkKeysToDelete.slice(0, 4).map((k) => (
-								<span
-									key={k.id}
-									className="inline-flex items-center rounded-md bg-bg-white-0 px-2 py-1 font-medium font-mono text-text-strong-950 text-xs shadow-2xs dark:bg-bg-weak-50/40"
-								>
-									{k.name || k.start || k.prefix || "Unnamed key"}
-								</span>
-							))}
-							{bulkKeysToDelete.length > 4 ? (
-								<span className="inline-flex items-center rounded-md bg-bg-weak-50 px-2 py-1 font-medium text-text-sub-600 text-xs dark:bg-bg-weak-50/30">
-									+{bulkKeysToDelete.length - 4} more
-								</span>
-							) : null}
+				{/* Inner card — mirrors CreateCampaignModal but lighter, no red box */}
+				<div className="relative m-0.5 space-y-5 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 pt-5 dark:border-stroke-soft-100/40 dark:bg-[#0c0c0c]">
+					{/* Header — clean title only, no repetitive description */}
+					<div className="flex items-start justify-between gap-4 px-6">
+						<div className="flex items-center gap-2">
+							<Icon name="trash" className="size-4 text-text-sub-600" />
+							<Modal.Title className="font-medium text-text-strong-950 text-xl tracking-tight">
+								{isBulk
+									? `Delete ${bulkKeysToDelete.length || "selected"} API keys`
+									: "Delete API key"}
+							</Modal.Title>
 						</div>
+						<button
+							type="button"
+							onClick={handleClose}
+							aria-label="Close"
+							disabled={deleteState !== "idle"}
+							className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-bg-white-0 text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 active:scale-[0.95] disabled:opacity-50 dark:bg-transparent dark:hover:bg-white/[0.05]"
+						>
+							<X className="size-3.5" strokeWidth={2.25} />
+						</button>
 					</div>
-				) : (
-					<div className="mt-5 space-y-3 rounded-xl border border-stroke-soft-100 bg-bg-weak-50/50 p-4 dark:border-stroke-soft-100/40">
-						<div>
-							<p className="font-normal text-text-sub-600 text-xs">
-								API key prefix
-							</p>
-							<div className="mt-1 flex items-center">
-								<span className="font-medium font-mono text-sm">
+
+					<div className="space-y-4 px-6 pb-6">
+						{/* Lightweight context — prefix + consequence, no red outline/background */}
+						{isBulk ? (
+							<div className="space-y-3">
+								<p className="text-sm text-text-sub-600 leading-relaxed">
+									This will permanently delete{" "}
+									<span className="font-medium text-text-strong-950">
+										{bulkKeysToDelete.length} API key
+										{bulkKeysToDelete.length === 1 ? "" : "s"}
+									</span>
+									. Services using them will stop working immediately.{" "}
+									<span className="font-medium text-text-strong-950">
+										This cannot be undone.
+									</span>
+								</p>
+								<div className="flex flex-wrap gap-1.5">
+									{bulkKeysToDelete.slice(0, 4).map((k) => (
+										<span
+											key={k.id}
+											className="inline-flex items-center rounded-md border border-stroke-soft-100 bg-bg-weak-50 px-2 py-1 font-medium font-mono text-text-strong-950 text-xs dark:border-stroke-soft-100/40 dark:bg-white/[0.06]"
+										>
+											{k.name || k.start || k.prefix || "Unnamed key"}
+										</span>
+									))}
+									{bulkKeysToDelete.length > 4 ? (
+										<span className="inline-flex items-center rounded-md bg-bg-weak-50 px-2 py-1 font-medium text-text-sub-600 text-xs dark:bg-white/[0.06]">
+											+{bulkKeysToDelete.length - 4} more
+										</span>
+									) : null}
+								</div>
+							</div>
+						) : (
+							<p className="text-sm text-text-sub-600 leading-relaxed">
+								This will permanently delete{" "}
+								<span className="inline-flex items-center rounded-md bg-bg-weak-50 px-1.5 py-0.5 font-mono font-medium text-text-strong-950 text-xs dark:bg-white/[0.06]">
 									{apiKeyToDelete?.start || apiKeyToDelete?.prefix || "rl_..."}
 								</span>
-							</div>
+								{apiKeyToDelete?.name ? (
+									<>
+										{" "}
+										<span className="font-medium text-text-strong-950">
+											{apiKeyToDelete.name}
+										</span>
+									</>
+								) : null}
+								. Services using this key will stop working immediately.{" "}
+								<span className="font-medium text-text-strong-950">
+									This cannot be undone.
+								</span>
+							</p>
+						)}
+
+						{/* Confirmation Input */}
+						<div className="space-y-2">
+							<Label.Root
+								htmlFor="delete-api-key-confirmation"
+								className="flex flex-wrap items-center gap-1.5"
+							>
+								<span>Type</span>
+								<span className="inline-flex items-center gap-1 rounded-md bg-bg-weak-50 px-1.5 py-0.5 font-medium text-[12px] text-text-strong-950 dark:bg-bg-weak-50/20">
+									{displayName}
+									<button
+										type="button"
+										onClick={(e) => {
+											e.preventDefault();
+											void handleCopyName();
+										}}
+										className="-mr-0.5 inline-flex h-4 w-4 shrink-0 items-center justify-center rounded transition-colors"
+										aria-label={`Copy ${displayName}`}
+										title="Copy name"
+									>
+										<AnimatePresence mode="popLayout" initial={false}>
+											<motion.span
+												key={nameCopied ? "check" : "copy"}
+												initial={{ opacity: 0, scale: 0.6 }}
+												animate={{ opacity: 1, scale: 1 }}
+												exit={{ opacity: 0, scale: 0.6 }}
+												transition={{ type: "spring", duration: 0.2, bounce: 0.3 }}
+												className="flex items-center justify-center"
+											>
+												<Icon
+													name={nameCopied ? "check" : "copy"}
+													className={cn(
+														"h-3 w-3",
+														nameCopied ? "text-green-500" : "text-text-sub-600",
+													)}
+												/>
+											</motion.span>
+										</AnimatePresence>
+									</button>
+								</span>
+								<span>to confirm</span>
+							</Label.Root>
+							<Input.Root size="medium">
+								<Input.Wrapper>
+									<Input.Input
+										ref={inputRef}
+										id="delete-api-key-confirmation"
+										value={confirmationText}
+										onChange={(e) => setConfirmationText(e.target.value)}
+										placeholder={displayName}
+										disabled={deleteState !== "idle"}
+										autoComplete="off"
+									/>
+								</Input.Wrapper>
+							</Input.Root>
 						</div>
 					</div>
-				)}
-
-				{/* Confirmation Input */}
-				<div className="mt-4 space-y-2">
-					<Label.Root
-						htmlFor="delete-api-key-confirmation"
-						className="flex flex-wrap items-center gap-1.5"
-					>
-						<span>Type</span>
-						<span className="inline-flex items-center gap-1 rounded-md bg-bg-weak-50 px-1.5 py-0.5 font-medium text-[12px] text-text-strong-950 dark:bg-bg-weak-50/20">
-							{displayName}
-							<button
-								type="button"
-								onClick={(e) => {
-									e.preventDefault();
-									void handleCopyName();
-								}}
-								className="-mr-0.5 inline-flex h-4 w-4 shrink-0 items-center justify-center rounded transition-colors"
-								aria-label={`Copy ${displayName}`}
-								title="Copy name"
-							>
-								<AnimatePresence mode="popLayout" initial={false}>
-									<motion.span
-										key={nameCopied ? "check" : "copy"}
-										initial={{ opacity: 0, scale: 0.6 }}
-										animate={{ opacity: 1, scale: 1 }}
-										exit={{ opacity: 0, scale: 0.6 }}
-										transition={{ type: "spring", duration: 0.2, bounce: 0.3 }}
-										className="flex items-center justify-center"
-									>
-										<Icon
-											name={nameCopied ? "check" : "copy"}
-											className={cn(
-												"h-3 w-3",
-												nameCopied ? "text-green-500" : "text-text-sub-600",
-											)}
-										/>
-									</motion.span>
-								</AnimatePresence>
-							</button>
-						</span>
-						<span>to confirm</span>
-					</Label.Root>
-					<Input.Root size="medium">
-						<Input.Wrapper>
-							<Input.Input
-								ref={inputRef}
-								id="delete-api-key-confirmation"
-								value={confirmationText}
-								onChange={(e) => setConfirmationText(e.target.value)}
-								placeholder={displayName}
-								disabled={deleteState !== "idle"}
-								autoComplete="off"
-							/>
-						</Input.Wrapper>
-					</Input.Root>
 				</div>
 
-				{/* Footer Actions */}
-				<div className="mt-6 flex items-center justify-end gap-3">
+				{/* Footer Actions — outside inner card, like CreateCampaignModal */}
+				<div className="relative flex items-center justify-between gap-3 px-3 pt-2 pb-3">
 					<Button.Root
 						type="button"
 						variant="neutral"
-						mode="stroke"
+						mode="ghost"
 						size="small"
-						onClick={() => {
-							if (deleteState === "idle") {
-								void setDeleteId(null);
-								setDeleteState("idle");
-								setConfirmationText("");
-							}
-						}}
+						onClick={handleClose}
 						className={cn(
 							"gap-1.5 transition-opacity duration-200",
 							deleteState !== "idle" && "pointer-events-none opacity-50",

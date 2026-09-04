@@ -2,10 +2,12 @@ import { valibotResolver } from "@hookform/resolvers/valibot";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
+import { Icon } from "@reloop/ui/icon";
 import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
 import axios from "axios";
 import { AnimatePresence, motion } from "framer-motion";
+import { X } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { Resolver } from "react-hook-form";
 import { useForm } from "react-hook-form";
@@ -125,155 +127,167 @@ export function CreateApiKeyModal({
 			}}
 		>
 			<Modal.Content
-				className="overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 sm:max-w-[460px] dark:border-stroke-soft-100/40"
+				className="overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-soft-50 p-0 sm:max-w-[460px] dark:border-stroke-soft-100/40 dark:bg-white/[0.03]"
 				showClose={false}
 				onPointerDownOutside={(e) => {
 					if (createdApiKey) e.preventDefault();
 				}}
 			>
-				{/* Outer motion wrapper — animates height as content changes */}
+				{/* Outer motion wrapper — animates height as content changes — KEEP ANIMATION INTACT */}
 				<motion.div
 					layout="size"
 					transition={{ duration: 0.32, ease: [0.25, 0.46, 0.45, 0.94] }}
 				>
-					<div className="p-6">
-						{/* Header — title swaps instantly with the step */}
-						<div className="relative pr-10">
-							<Modal.Title className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
-								{header.title}
-							</Modal.Title>
+					{/* Inner card — mirrors CreateCampaign / new Delete modal */}
+					<div className="relative m-0.5 space-y-5 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 pt-5 dark:border-stroke-soft-100/40 dark:bg-[#0c0c0c]">
+						{/* Header — icon + title + close, swapped instantly with step */}
+						<div className="flex items-start justify-between gap-4 px-6">
+							<div className="flex items-center gap-2">
+								<Icon
+									name={step === "success" ? "check-circle" : "key-new"}
+									className="size-4 text-text-sub-600 dark:text-white/60"
+								/>
+								<Modal.Title className="font-medium text-text-strong-950 text-xl tracking-tight dark:text-white">
+									{header.title}
+								</Modal.Title>
+							</div>
+							<button
+								type="button"
+								onClick={handleClose}
+								aria-label="Close"
+								disabled={isLoading}
+								className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-bg-white-0 text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 active:scale-[0.95] disabled:opacity-50 dark:bg-transparent dark:hover:bg-white/[0.05] dark:hover:text-white"
+							>
+								<X className="size-3.5" strokeWidth={2.25} />
+							</button>
 						</div>
 
-						{/* Center content only — animates on step change */}
-						<AnimatePresence mode="popLayout" initial={false}>
-							{step === "form" ? (
-								<motion.div
-									key="form"
-									initial={{ opacity: 0, filter: "blur(4px)" }}
-									animate={{ opacity: 1, filter: "blur(0px)" }}
-									exit={{ opacity: 0, filter: "blur(4px)" }}
-									transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-								>
-									<form
-										id="create-api-key-form"
-										onSubmit={(e) => {
-											e.preventDefault();
-											if (!isLoading) void form.handleSubmit(onSubmit)();
-										}}
+						{/* Center content only — animates on step change — KEEP ANIMATION INTACT */}
+						<div className="px-6 pb-6">
+							<AnimatePresence mode="popLayout" initial={false}>
+								{step === "form" ? (
+									<motion.div
+										key="form"
+										initial={{ opacity: 0, filter: "blur(4px)" }}
+										animate={{ opacity: 1, filter: "blur(0px)" }}
+										exit={{ opacity: 0, filter: "blur(4px)" }}
+										transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
 									>
-										<FormStep form={form} isLoading={isLoading} />
-									</form>
-								</motion.div>
-							) : (
-								<motion.div
-									key="success"
-									initial={{ opacity: 0, filter: "blur(4px)", height: "94px" }}
-									animate={{
-										opacity: 1,
-										filter: "blur(0px)",
-										height: "auto",
-									}}
-									exit={{ opacity: 0, filter: "blur(4px)" }}
-									transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-								>
-									<SuccessStep secret={createdApiKey!.key} />
-								</motion.div>
-							)}
-						</AnimatePresence>
+										<form
+											id="create-api-key-form"
+											onSubmit={(e) => {
+												e.preventDefault();
+												if (!isLoading) void form.handleSubmit(onSubmit)();
+											}}
+										>
+											<FormStep form={form} isLoading={isLoading} />
+										</form>
+									</motion.div>
+								) : (
+									<motion.div
+										key="success"
+										initial={{ opacity: 0, filter: "blur(4px)", height: "94px" }}
+										animate={{
+											opacity: 1,
+											filter: "blur(0px)",
+											height: "auto",
+										}}
+										exit={{ opacity: 0, filter: "blur(4px)" }}
+										transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+									>
+										<SuccessStep secret={createdApiKey!.key} />
+									</motion.div>
+								)}
+							</AnimatePresence>
+						</div>
+					</div>
 
-						{/* Footer — outside animation, plain conditional */}
-						<motion.div
-							layout
-							className="mt-6 flex items-center justify-end gap-3"
+					{/* Footer — outside inner card, like CreateCampaign — layout animates but not visual animation */}
+					<motion.div
+						layout
+						className="relative flex items-center justify-between gap-3 px-3 pt-2 pb-3"
+					>
+						<Button.Root
+							type="button"
+							variant="neutral"
+							mode="ghost"
+							size="small"
+							onClick={() => {
+								if (!isLoading) handleClose();
+							}}
+							className={cn(
+								"gap-1.5 transition-opacity duration-200",
+								isLoading && "pointer-events-none opacity-50",
+							)}
 						>
-							<Button.Root
-								type="button"
-								variant="neutral"
-								mode="stroke"
+							Cancel
+							<ActionKbd className="lowercase! w-auto min-w-0 px-1">esc</ActionKbd>
+						</Button.Root>
+						{step === "form" ? (
+							<FancyButton.Root
+								type="submit"
+								form="create-api-key-form"
+								variant="blue"
 								size="small"
-								onClick={() => {
-									if (!isLoading) handleClose();
-								}}
+								disabled={isLoading}
 								className={cn(
-									"gap-1.5 transition-opacity duration-200",
-									isLoading && "pointer-events-none opacity-50",
+									"min-w-[158px] justify-center overflow-hidden transition-all duration-200",
+									isLoading && "pointer-events-none opacity-90",
 								)}
 							>
-								Cancel
-								<ActionKbd className="lowercase! w-auto min-w-0 px-1">
-									esc
-								</ActionKbd>
-							</Button.Root>
-							{step === "form" ? (
-								<FancyButton.Root
-									type="submit"
-									form="create-api-key-form"
-									variant="blue"
-									size="small"
-									disabled={isLoading}
-									className={cn(
-										"min-w-35 justify-center overflow-hidden transition-all duration-200",
-										isLoading && "pointer-events-none opacity-90",
-									)}
-								>
-									<AnimatePresence mode="popLayout" initial={false}>
-										<motion.span
-											key={isLoading ? "creating" : "idle"}
-											transition={{ type: "spring", duration: 0.25, bounce: 0 }}
-											initial={{ opacity: 0, y: -14 }}
-											animate={{ opacity: 1, y: 0 }}
-											exit={{ opacity: 0, y: 14 }}
-											className="flex items-center justify-center gap-1.5"
-										>
-											{isLoading ? (
-												<>
-													<Spinner size={14} color="currentColor" />
-													<span>Creating...</span>
-												</>
-											) : (
-												<>
-													Create API key
-													<ActionKbd className={actionKbdOnBlueClassName}>
-														↵
-													</ActionKbd>
-												</>
-											)}
-										</motion.span>
-									</AnimatePresence>
-								</FancyButton.Root>
-							) : (
-								<FancyButton.Root
-									type="button"
-									variant="blue"
-									size="small"
-									onClick={handleCopyKey}
-									className="min-w-35 justify-center overflow-hidden transition-all duration-200"
-								>
-									<AnimatePresence mode="popLayout" initial={false}>
-										<motion.span
-											key={copied ? "copied" : "idle"}
-											transition={{ type: "spring", duration: 0.25, bounce: 0 }}
-											initial={{ opacity: 0, y: -14 }}
-											animate={{ opacity: 1, y: 0 }}
-											exit={{ opacity: 0, y: 14 }}
-											className="flex items-center justify-center gap-1.5"
-										>
-											{copied ? (
-												"Copied!"
-											) : (
-												<>
-													Copy API key
-													<ActionKbd className={actionKbdOnBlueClassName}>
-														↵
-													</ActionKbd>
-												</>
-											)}
-										</motion.span>
-									</AnimatePresence>
-								</FancyButton.Root>
-							)}
-						</motion.div>
-					</div>
+								<AnimatePresence mode="popLayout" initial={false}>
+									<motion.span
+										key={isLoading ? "creating" : "idle"}
+										transition={{ type: "spring", duration: 0.25, bounce: 0 }}
+										initial={{ opacity: 0, y: -14 }}
+										animate={{ opacity: 1, y: 0 }}
+										exit={{ opacity: 0, y: 14 }}
+										className="flex items-center justify-center gap-1.5"
+									>
+										{isLoading ? (
+											<>
+												<Spinner size={14} color="currentColor" />
+												<span>Creating...</span>
+											</>
+										) : (
+											<>
+												Create API key
+												<ActionKbd className={actionKbdOnBlueClassName}>↵</ActionKbd>
+											</>
+										)}
+									</motion.span>
+								</AnimatePresence>
+							</FancyButton.Root>
+						) : (
+							<FancyButton.Root
+								type="button"
+								variant="blue"
+								size="small"
+								onClick={handleCopyKey}
+								className="min-w-[158px] justify-center overflow-hidden transition-all duration-200"
+							>
+								<AnimatePresence mode="popLayout" initial={false}>
+									<motion.span
+										key={copied ? "copied" : "idle"}
+										transition={{ type: "spring", duration: 0.25, bounce: 0 }}
+										initial={{ opacity: 0, y: -14 }}
+										animate={{ opacity: 1, y: 0 }}
+										exit={{ opacity: 0, y: 14 }}
+										className="flex items-center justify-center gap-1.5"
+									>
+										{copied ? (
+											"Copied!"
+										) : (
+											<>
+												Copy API key
+												<ActionKbd className={actionKbdOnBlueClassName}>↵</ActionKbd>
+											</>
+										)}
+									</motion.span>
+								</AnimatePresence>
+							</FancyButton.Root>
+						)}
+					</motion.div>
 				</motion.div>
 			</Modal.Content>
 		</Modal.Root>

@@ -19,16 +19,16 @@ export function FormStep({
 	} = form;
 
 	return (
-		<div className="mt-5 space-y-2">
-			<Label.Root htmlFor="name">
-				Name
+		<div className="space-y-1.5">
+			<Label.Root htmlFor="name" className="font-medium text-text-strong-950 text-xs dark:text-white">
+				API key name
 				<Label.Asterisk />
 			</Label.Root>
 			<Input.Root size="medium" hasError={!!errors.name}>
 				<Input.Wrapper>
 					<Input.Input
 						id="name"
-						placeholder="e.g., Production Server, My App"
+						placeholder="e.g. Production Server"
 						autoFocus
 						{...register("name")}
 						disabled={isLoading}
@@ -36,12 +36,10 @@ export function FormStep({
 				</Input.Wrapper>
 			</Input.Root>
 			{errors.name ? (
-				<p className="text-error-base text-paragraph-xs">
-					{errors.name.message}
-				</p>
+				<p className="text-error-base text-xs">{errors.name.message}</p>
 			) : (
-				<p className="text-paragraph-xs text-text-sub-600">
-					Provide a descriptive name to help you identify this key later.
+				<p className="text-text-sub-600 text-xs leading-relaxed dark:text-white/60">
+					Used to identify this key in your dashboard.
 				</p>
 			)}
 		</div>
