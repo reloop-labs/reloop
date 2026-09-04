@@ -20,7 +20,7 @@ export const CustomEventErrors = {
 			status: 400,
 			message: "Invalid event key",
 			why: `The key "${key}" is not valid.`,
-			fix: "Use lowercase letters, numbers, dots, underscores, or hyphens (e.g. user.signed_up).",
+			fix: "Use lowercase letters, numbers, dots, underscores, or hyphens (e.g. trigger.signed_up). Keys must start with trigger.",
 		}),
 	invalidProperties: (why: string) =>
 		createError({

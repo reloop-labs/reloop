@@ -1,7 +1,7 @@
 import { CustomEventErrors } from "@be/workflow/error/custom-event.error-response";
 import {
+	ensureTriggerPrefix,
 	isValidEventKey,
-	normalizeEventKey,
 	slugifyEventKeyFromName,
 } from "@be/workflow/lib/custom-event/key";
 import { mapCustomEvent } from "@be/workflow/routes/custom-event/custom-event.mappers";
@@ -27,9 +27,8 @@ export async function createCustomEventController(params: {
 	properties?: PropertyInput[];
 }) {
 	const name = params.name.trim();
-	const key = normalizeEventKey(
-		params.key?.trim() || slugifyEventKeyFromName(name),
-	);
+	const rawKey = params.key?.trim() || slugifyEventKeyFromName(name);
+	const key = ensureTriggerPrefix(rawKey);
 
 	if (!isValidEventKey(key)) {
 		throw CustomEventErrors.invalidKey(key);
