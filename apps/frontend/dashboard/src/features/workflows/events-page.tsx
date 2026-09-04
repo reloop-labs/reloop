@@ -91,11 +91,7 @@ export function EventsPage() {
 				/>
 			</div>
 
-			<AutomationFlowPreview
-				variant="events"
-				onCreate={handleCreate}
-				className="lg:sticky lg:top-6"
-			/>
+			<AutomationFlowPreview variant="events" className="lg:sticky lg:top-6" />
 		</div>
 	);
 }

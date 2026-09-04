@@ -6,15 +6,11 @@ import { nodeTone } from "../node-tone";
 
 interface AutomationFlowPreviewProps {
 	variant?: "workflows" | "events";
-	onCreate?: () => void;
-	caption?: string;
 	className?: string;
 }
 
 export function AutomationFlowPreview({
 	variant = "workflows",
-	onCreate,
-	caption,
 	className,
 }: AutomationFlowPreviewProps) {
 	if (variant === "events") {

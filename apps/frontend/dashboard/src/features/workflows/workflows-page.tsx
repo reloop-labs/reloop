@@ -107,10 +107,7 @@ export function WorkflowsPage() {
 				/>
 			</div>
 
-			<AutomationFlowPreview
-				onCreate={handleCreate}
-				className="lg:sticky lg:top-6"
-			/>
+			<AutomationFlowPreview className="lg:sticky lg:top-6" />
 		</div>
 	);
 }
