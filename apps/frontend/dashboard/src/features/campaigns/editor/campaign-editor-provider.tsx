@@ -219,10 +219,9 @@ export function CampaignEditorProvider({
 				<BubbleMenu
 					hideWhenActiveNodes={[...EMAIL_BUBBLE_HIDE_NODES]}
 					trigger={emailTextBubbleTrigger}
-					appendTo={() => document.body}
 				/>
-				<BubbleMenu.ButtonDefault appendTo={() => document.body} />
-				<BubbleMenu.ImageDefault appendTo={() => document.body} />
+				<BubbleMenu.ButtonDefault />
+				<BubbleMenu.ImageDefault />
 				<EmailSlashCommand />
 			</div>
 		</EditorContext.Provider>
