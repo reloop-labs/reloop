@@ -2,6 +2,7 @@ import * as Avatar from "@reloop/ui/avatar";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import type { ColumnDef } from "@tanstack/react-table";
+import * as React from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { DataTableCheckbox } from "#/components/data-table/data-table-checkbox";
@@ -16,20 +17,50 @@ export type ApiKeyTableMeta = {
 function CreatedByCell({ createdBy }: { createdBy: ApiKeyData["createdBy"] }) {
 	if (!createdBy) {
 		return (
-			<span className="font-medium text-sm text-text-sub-600">Unknown</span>
+			<div className="flex min-w-0 items-center gap-2">
+				<Avatar.Root size="20" color="blue" className="shrink-0">
+					<Avatar.Image asChild>
+						<div
+							className={cn(
+								"flex h-full w-full items-center justify-center rounded-full font-medium text-[8px] text-white uppercase tracking-wide",
+								getAvatarGradient("unknown@reloop.sh"),
+							)}
+						>
+							?
+						</div>
+					</Avatar.Image>
+				</Avatar.Root>
+				<span className="truncate font-medium text-sm text-text-sub-600">
+					Unknown
+				</span>
+			</div>
 		);
 	}
 
-	const label =
-		createdBy.name ||
-		(createdBy.email ? createdBy.email.split("@")[0] : "Unknown");
-	const safeEmail = createdBy.email || "unknown@reloop.sh";
+	const rawName = createdBy.name?.trim() ? createdBy.name.trim() : null;
+	const rawEmail = createdBy.email?.trim() ? createdBy.email.trim() : null;
+	const label = rawName || (rawEmail ? rawEmail.split("@")[0] : "Unknown");
+	const safeEmail = rawEmail || "unknown@reloop.sh";
+	const hasImage = Boolean(
+		createdBy.image && createdBy.image.trim().length > 0,
+	);
+	const [imgError, setImgError] = React.useState(false);
+	// Reset error state when image URL changes
+	React.useEffect(() => {
+		setImgError(false);
+	}, [createdBy.image]);
+
+	const showImage = hasImage && !imgError;
 
 	return (
 		<div className="flex min-w-0 items-center gap-2">
 			<Avatar.Root size="20" color="blue" className="shrink-0">
-				{createdBy.image ? (
-					<Avatar.Image src={createdBy.image} alt={label} />
+				{showImage ? (
+					<Avatar.Image
+						src={createdBy.image ?? undefined}
+						alt={label}
+						onError={() => setImgError(true)}
+					/>
 				) : (
 					<Avatar.Image asChild>
 						<div
@@ -38,7 +69,7 @@ function CreatedByCell({ createdBy }: { createdBy: ApiKeyData["createdBy"] }) {
 								getAvatarGradient(safeEmail),
 							)}
 						>
-							{getAvatarInitial(createdBy.name ?? null, safeEmail)}
+							{getAvatarInitial(rawName, safeEmail)}
 						</div>
 					</Avatar.Image>
 				)}

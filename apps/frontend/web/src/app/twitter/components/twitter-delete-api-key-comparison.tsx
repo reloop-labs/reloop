@@ -339,6 +339,111 @@ function ApiKeyDisplayNew() {
 	);
 }
 
+/* -------------------------------------------------------------------------- */
+/* ROTATE API KEY — OLD vs NEW                                                */
+/* -------------------------------------------------------------------------- */
+function RotateApiKeyOld() {
+	return (
+		<div className="w-full max-w-[460px] overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 p-6 dark:border-stroke-soft-100/40 dark:bg-[#0c0c0c]">
+			<h2 className="font-semibold text-[26px] text-text-strong-950 tracking-tight dark:text-white">Rotate API key</h2>
+			<p className="mt-2 text-sm text-text-sub-600 leading-relaxed dark:text-white/60">
+				Generating a new secret key will instantly revoke the existing key. Any applications using the old key will lose
+				access until updated.
+			</p>
+			<div className="mt-5 space-y-3 rounded-xl border border-stroke-soft-100 bg-bg-weak-50/50 p-4 dark:border-stroke-soft-100/40">
+				<div>
+					<p className="font-normal text-text-sub-600 text-xs dark:text-white/60">API key name</p>
+					<p className="mt-0.5 truncate font-medium text-sm text-text-strong-950 dark:text-white">dsafsd</p>
+				</div>
+				<div>
+					<p className="font-normal text-text-sub-600 text-xs dark:text-white/60">API key prefix</p>
+					<div className="mt-1 flex items-center">
+						<span className="font-medium font-mono text-sm text-text-strong-950 dark:text-white">rl_prod_Tt65cG2I7</span>
+					</div>
+				</div>
+			</div>
+			<div className="mt-4 rounded-xl border border-[#FBE3B5] bg-[#FEF6E6] p-4 text-[#8A5300] text-xs leading-relaxed dark:border-amber-800/40 dark:bg-amber-950/30 dark:text-amber-200">
+				<span className="font-semibold">Warning:</span> Services using this key will experience downtime until they are updated with the new secret.
+			</div>
+			<div className="mt-4 space-y-2">
+				<Label.Root className="flex flex-wrap items-center gap-1.5 text-sm">
+					<span>Type</span>
+					<span className="inline-flex items-center gap-1 rounded-md bg-bg-weak-50 px-1.5 py-0.5 font-medium text-[12px] text-text-strong-950 dark:bg-white/[0.06] dark:text-white">
+						dsafsd <Icon name="copy" className="h-3 w-3 text-text-sub-600 dark:text-white/60" />
+					</span>
+					<span>to confirm</span>
+				</Label.Root>
+				<Input.Root size="medium">
+					<Input.Wrapper>
+						<Input.Input placeholder="dsafsd" defaultValue="dsafsd" />
+					</Input.Wrapper>
+				</Input.Root>
+			</div>
+			<div className="mt-6 flex items-center justify-end gap-3">
+				<Button.Root type="button" variant="neutral" mode="stroke" size="small" className="gap-1.5">
+					Cancel <Kbd className="lowercase w-auto min-w-0 px-1">esc</Kbd>
+				</Button.Root>
+				<FancyButton.Root type="button" variant="blue" size="small" className="min-w-[158px] justify-center">
+					Rotate API key <Kbd className={cn(actionKbdOnBlueClassName, "ml-1")}>↵</Kbd>
+				</FancyButton.Root>
+			</div>
+		</div>
+	);
+}
+
+function RotateApiKeyNew() {
+	return (
+		<div className="w-full max-w-[460px] overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-soft-50 p-0 dark:border-stroke-soft-100/40 dark:bg-white/[0.03]">
+			<div className="relative m-0.5 space-y-5 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 pt-5 dark:border-stroke-soft-100/40 dark:bg-[#0c0c0c]">
+				<div className="flex items-start justify-between gap-4 px-6">
+					<div className="flex items-center gap-2">
+						<Icon name="refresh" className="size-4 text-text-sub-600 dark:text-white/60" />
+						<h2 className="font-medium text-text-strong-950 text-xl tracking-tight dark:text-white">Rotate API key</h2>
+					</div>
+					<span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-bg-white-0 text-text-sub-600 dark:bg-transparent dark:text-white/60">
+						<X className="size-3.5" strokeWidth={2.25} />
+					</span>
+				</div>
+				<div className="space-y-4 px-6 pb-6">
+					<p className="text-sm text-text-sub-600 leading-relaxed dark:text-white/60">
+						This will rotate{" "}
+						<span className="inline-flex items-center rounded-md bg-bg-weak-50 px-1.5 py-0.5 font-mono font-medium text-text-strong-950 text-xs dark:bg-white/[0.06] dark:text-white">
+							rl_prod_Tt65cG2I7
+						</span>{" "}
+						<span className="font-medium text-text-strong-950 dark:text-white">dsafsd</span>.
+					</p>
+					<div className="rounded-xl border border-amber-200 bg-amber-50 p-3.5 text-amber-800 text-xs leading-relaxed dark:border-amber-800/40 dark:bg-amber-950/30 dark:text-amber-200">
+						<span className="font-semibold">Note:</span> Generating a new secret will instantly revoke the old key. Any services using it will
+						experience downtime until updated with the new secret.
+					</div>
+					<div className="space-y-2">
+						<Label.Root className="flex flex-wrap items-center gap-1.5 text-sm">
+							<span>Type</span>
+							<span className="inline-flex items-center gap-1 rounded-md bg-bg-weak-50 px-1.5 py-0.5 font-medium text-[12px] text-text-strong-950 dark:bg-white/[0.06] dark:text-white">
+								dsafsd <Icon name="copy" className="h-3 w-3 text-text-sub-600 dark:text-white/60" />
+							</span>
+							<span>to confirm</span>
+						</Label.Root>
+						<Input.Root size="medium">
+							<Input.Wrapper>
+								<Input.Input placeholder="dsafsd" defaultValue="dsafsd" />
+							</Input.Wrapper>
+						</Input.Root>
+					</div>
+				</div>
+			</div>
+			<div className="relative flex items-center justify-between gap-3 px-3 pt-2 pb-3">
+				<Button.Root type="button" variant="neutral" mode="ghost" size="small" className="gap-1.5">
+					Cancel <Kbd className="lowercase w-auto min-w-0 px-1">esc</Kbd>
+				</Button.Root>
+				<FancyButton.Root type="button" variant="blue" size="small" className="min-w-[158px] justify-center">
+					Rotate API key <Kbd className={cn(actionKbdOnBlueClassName, "ml-1")}>↵</Kbd>
+				</FancyButton.Root>
+			</div>
+		</div>
+	);
+}
+
 export function TwitterDeleteApiKeyComparison() {
 	return (
 		<div data-standalone="true" className="relative flex w-full flex-col bg-white dark:bg-[#080808]">
@@ -374,6 +479,18 @@ export function TwitterDeleteApiKeyComparison() {
 					</div>
 					<div className="relative flex w-full max-w-[460px] justify-center">
 						<ApiKeyDisplayNew />
+					</div>
+				</div>
+			</div>
+
+			{/* Section 4: Rotate API key — 100dvh */}
+			<div className="flex min-h-[100dvh] w-full items-center justify-center px-6 py-10">
+				<div className="mx-auto grid w-full max-w-[1100px] grid-cols-1 items-start justify-items-center gap-10 lg:grid-cols-2 lg:gap-12 xl:gap-16">
+					<div className="relative flex w-full max-w-[460px] justify-center">
+						<RotateApiKeyOld />
+					</div>
+					<div className="relative flex w-full max-w-[460px] justify-center">
+						<RotateApiKeyNew />
 					</div>
 				</div>
 			</div>

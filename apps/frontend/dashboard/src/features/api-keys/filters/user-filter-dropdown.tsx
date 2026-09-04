@@ -1,6 +1,7 @@
 import * as Avatar from "@reloop/ui/avatar";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
+import * as React from "react";
 import { getAvatarGradient, getAvatarInitial } from "#/utils/avatar";
 import type { CreatedByUser } from "../types";
 import {
@@ -20,11 +21,24 @@ function UserAvatar({
 	email: string | null | undefined;
 	image?: string | null;
 }) {
-	const safeEmail = email || "unknown@reloop.sh";
+	const rawName = name?.trim() ? name.trim() : null;
+	const rawEmail = email?.trim() ? email.trim() : null;
+	const safeEmail = rawEmail || "unknown@reloop.sh";
+	const hasImage = Boolean(image && image.trim().length > 0);
+	const [imgError, setImgError] = React.useState(false);
+	React.useEffect(() => {
+		setImgError(false);
+	}, [image]);
+	const showImage = hasImage && !imgError;
+
 	return (
 		<Avatar.Root size="16" color="blue" className="shrink-0">
-			{image ? (
-				<Avatar.Image src={image} alt={name || "User"} />
+			{showImage ? (
+				<Avatar.Image
+					src={image ?? undefined}
+					alt={rawName || "User"}
+					onError={() => setImgError(true)}
+				/>
 			) : (
 				<Avatar.Image asChild>
 					<div
@@ -33,7 +47,7 @@ function UserAvatar({
 							getAvatarGradient(safeEmail),
 						)}
 					>
-						{getAvatarInitial(name ?? null, safeEmail)}
+						{getAvatarInitial(rawName, safeEmail)}
 					</div>
 				</Avatar.Image>
 			)}
