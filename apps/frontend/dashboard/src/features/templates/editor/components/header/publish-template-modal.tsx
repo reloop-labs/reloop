@@ -219,7 +219,7 @@ export function SlideToPublish({
 					{isPublishing ? (
 						<motion.div
 							key="publishing-thumb"
-							className="-mt-3.5"
+							className="flex items-center justify-center"
 							initial={{ opacity: 0, scale: 0.7 }}
 							animate={{ opacity: 1, scale: 1 }}
 							exit={{ opacity: 0, scale: 0.7 }}
@@ -229,6 +229,7 @@ export function SlideToPublish({
 					) : isSuccess ? (
 						<motion.div
 							key="success-thumb"
+							className="flex items-center justify-center"
 							initial={{ opacity: 0, scale: 0.7 }}
 							animate={{ opacity: 1, scale: 1 }}
 							exit={{ opacity: 0, scale: 0.7 }}
@@ -238,6 +239,7 @@ export function SlideToPublish({
 					) : (
 						<motion.div
 							key="idle-thumb"
+							className="flex items-center justify-center"
 							initial={{ opacity: 0, scale: 0.7 }}
 							animate={{ opacity: 1, scale: 1 }}
 							exit={{ opacity: 0, scale: 0.7 }}

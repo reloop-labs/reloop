@@ -174,8 +174,8 @@ function SlideToPublish({
 				<AnimatePresence mode="popLayout" initial={false}>
 					{isPublishing ? (
 						<motion.div
-							className="-mt-3.5 relative"
 							key="publishing-thumb"
+							className="flex items-center justify-center"
 							initial={{ opacity: 0, scale: 0.7 }}
 							animate={{ opacity: 1, scale: 1 }}
 							exit={{ opacity: 0, scale: 0.7 }}
@@ -185,6 +185,7 @@ function SlideToPublish({
 					) : isSuccess ? (
 						<motion.div
 							key="success-thumb"
+							className="flex items-center justify-center"
 							initial={{ opacity: 0, scale: 0.7 }}
 							animate={{ opacity: 1, scale: 1 }}
 							exit={{ opacity: 0, scale: 0.7 }}
@@ -194,6 +195,7 @@ function SlideToPublish({
 					) : (
 						<motion.div
 							key="idle-thumb"
+							className="flex items-center justify-center"
 							initial={{ opacity: 0, scale: 0.7 }}
 							animate={{ opacity: 1, scale: 1 }}
 							exit={{ opacity: 0, scale: 0.7 }}
