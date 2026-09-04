@@ -1,5 +1,6 @@
 "use client";
 
+import { AutomationShell } from "#/features/workflows/automation-shell";
 import { WorkflowsProvider } from "#/features/workflows/components/workflows-provider";
 
 export function WorkflowsLayoutClient({
@@ -7,5 +8,9 @@ export function WorkflowsLayoutClient({
 }: {
 	children: React.ReactNode;
 }) {
-	return <WorkflowsProvider>{children}</WorkflowsProvider>;
+	return (
+		<WorkflowsProvider>
+			<AutomationShell>{children}</AutomationShell>
+		</WorkflowsProvider>
+	);
 }

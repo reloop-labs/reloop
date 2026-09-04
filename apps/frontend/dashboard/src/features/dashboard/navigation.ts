@@ -72,14 +72,6 @@ export const mainNavigation: MainNavigationItem[] = [
 		iconName: "workflow",
 		shortcut: { label: "G F", keys: ["g f", "g+f"] },
 		section: "Messaging",
-		items: [
-			{
-				label: "Events",
-				path: "/automation/events",
-				iconName: "route",
-				shortcut: { label: "G V", keys: ["g v", "g+v"] },
-			},
-		],
 	},
 	{
 		label: "Metrics",

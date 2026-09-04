@@ -1,27 +1,26 @@
-import { useMemo, useState } from "react";
-import { useHotkeys } from "react-hotkeys-hook";
+"use client";
+
+import type { VisibilityState } from "@tanstack/react-table";
+import { useQueryState } from "nuqs";
+import { useCallback, useMemo, useState } from "react";
 import type { CommandAction } from "#/features/dashboard/command-menu";
 import { useRegisterCommandActions } from "#/features/dashboard/command-menu-context";
-import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
-import { AutomationFlowPreview } from "./components/automation-flow-preview";
-import { AutomationListHeader } from "./components/automation-list-header";
 import { AutomationListToolbar } from "./components/automation-list-toolbar";
-import { CreateWorkflowModal } from "./components/create-workflow-modal";
 import { WorkflowTable } from "./components/workflow-table";
 import { useWorkflows } from "./components/workflows-provider";
 import type { WorkflowStatus } from "./workflow-types";
 
 export function WorkflowsPage() {
-	const { activeOrganization } = useActiveOrganization();
 	const {
 		workflows,
 		isHydrated,
 		isLoading: listLoading,
 		refetch,
 	} = useWorkflows();
-	const [createOpen, setCreateOpen] = useState(false);
+	const [, setModal] = useQueryState("modal", { history: "replace" });
 	const [searchQuery, setSearchQuery] = useState("");
 	const [statusFilter, setStatusFilter] = useState<string[]>([]);
+	const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
 
 	const filtered = useMemo(() => {
 		const allowed = statusFilter.length > 0 ? new Set(statusFilter) : null;
@@ -41,9 +40,9 @@ export function WorkflowsPage() {
 	const isFilteredEmpty =
 		isHydrated && !listLoading && workflows.length > 0 && filtered.length === 0;
 
-	const handleCreate = () => {
-		if (activeOrganization?.slug) setCreateOpen(true);
-	};
+	const handleCreate = useCallback(() => {
+		void setModal("create-workflow");
+	}, [setModal]);
 
 	const handleClearFilters = () => {
 		setSearchQuery("");
@@ -67,52 +66,43 @@ export function WorkflowsPage() {
 				onSelect: () =>
 					window.open("https://reloop.sh/docs/learn/workflows", "_blank"),
 			},
+			{
+				id: "select-all",
+				label: "Select All",
+				icon: "check-square",
+				shortcut: { label: "⌘A", keys: ["mod+a"] },
+				onSelect: () =>
+					window.dispatchEvent(new CustomEvent("workflows:select-all")),
+			},
 		],
-		[activeOrganization?.slug],
+		[handleCreate],
 	);
 
 	useRegisterCommandActions("workflows", "Automation", actions);
 
-	useHotkeys(
-		"c",
-		(e) => {
-			e.preventDefault();
-			handleCreate();
-		},
-		{ enableOnFormTags: false, preventDefault: true },
-	);
-
 	return (
-		<div className="mx-auto max-w-6xl space-y-6 p-6 lg:p-8">
-			<AutomationListHeader onCreate={handleCreate} />
+		<div className="space-y-4">
+			<AutomationListToolbar
+				searchQuery={searchQuery}
+				onSearchChange={setSearchQuery}
+				statusFilter={statusFilter}
+				onStatusChange={setStatusFilter}
+				onRefresh={() => refetch()}
+				columnVisibility={columnVisibility}
+				onColumnVisibleChange={(id, visible) =>
+					setColumnVisibility((prev) => ({ ...prev, [id]: visible }))
+				}
+			/>
 
-			<div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_240px]">
-				<div className="min-w-0 space-y-4">
-					<AutomationListToolbar
-						searchQuery={searchQuery}
-						onSearchChange={setSearchQuery}
-						statusFilter={statusFilter}
-						onStatusChange={setStatusFilter}
-						onRefresh={() => refetch()}
-					/>
-
-					<WorkflowTable
-						workflows={filtered}
-						isLoading={isLoading}
-						isTotalEmpty={isTotalEmpty}
-						isFilteredEmpty={isFilteredEmpty}
-						onCreate={handleCreate}
-						onClearFilters={handleClearFilters}
-					/>
-				</div>
-
-				<AutomationFlowPreview
-					className="lg:sticky lg:top-6"
-					caption="An event starts the path. Wait if you need to, then send."
-				/>
-			</div>
-
-			<CreateWorkflowModal open={createOpen} onOpenChange={setCreateOpen} />
+			<WorkflowTable
+				workflows={filtered}
+				columnVisibility={columnVisibility}
+				isLoading={isLoading}
+				isTotalEmpty={isTotalEmpty}
+				isFilteredEmpty={isFilteredEmpty}
+				onCreate={handleCreate}
+				onClearFilters={handleClearFilters}
+			/>
 		</div>
 	);
 }

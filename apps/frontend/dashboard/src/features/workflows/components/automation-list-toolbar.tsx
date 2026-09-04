@@ -4,10 +4,15 @@ import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import * as Tooltip from "@reloop/ui/tooltip";
+import type { VisibilityState } from "@tanstack/react-table";
 import { Circle, PauseCircle, PlayCircle } from "lucide-react";
 import { useCallback, useRef } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { DataTableFacetedFilter } from "#/components/data-table/data-table-faceted-filter";
+import {
+	type DataTableViewColumn,
+	DataTableViewOptions,
+} from "#/components/data-table/data-table-view-options";
 import { dataTableToolbarControlClassName } from "#/components/data-table/toolbar-control";
 import { useToolbarRefresh } from "#/components/data-table/use-toolbar-refresh";
 import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
@@ -23,6 +28,35 @@ const statusOptions = [
 	{ label: "Active", value: "active", icon: PlayCircle },
 ] as const;
 
+const VIEW_COLUMNS: DataTableViewColumn[] = [
+	{
+		id: "name",
+		label: "Name",
+		locked: true,
+		icon: <Icon name="workflow" className="h-3.5 w-3.5" />,
+	},
+	{
+		id: "trigger",
+		label: "Trigger",
+		icon: <Icon name="route" className="h-3.5 w-3.5" />,
+	},
+	{
+		id: "steps",
+		label: "Steps",
+		icon: <Icon name="layers" className="h-3.5 w-3.5" />,
+	},
+	{
+		id: "updatedAt",
+		label: "Updated",
+		icon: <Icon name="history" className="h-3.5 w-3.5" />,
+	},
+	{
+		id: "status",
+		label: "Status",
+		icon: <Icon name="activity" className="h-3.5 w-3.5" />,
+	},
+];
+
 export function AutomationListToolbar({
 	searchQuery,
 	onSearchChange,
@@ -32,6 +66,8 @@ export function AutomationListToolbar({
 	searchPlaceholder = "Search automations...",
 	searchLabel = "Search automations",
 	showStatusFilter = true,
+	columnVisibility,
+	onColumnVisibleChange,
 }: {
 	searchQuery: string;
 	onSearchChange: (value: string) => void;
@@ -41,6 +77,8 @@ export function AutomationListToolbar({
 	searchPlaceholder?: string;
 	searchLabel?: string;
 	showStatusFilter?: boolean;
+	columnVisibility?: VisibilityState;
+	onColumnVisibleChange?: (id: string, visible: boolean) => void;
 }) {
 	const searchInputRef = useRef<HTMLInputElement>(null);
 	const { isRefreshing, refresh } = useToolbarRefresh(onRefresh);
@@ -126,6 +164,14 @@ export function AutomationListToolbar({
 			</div>
 
 			<div className="flex shrink-0 items-center gap-2">
+				{columnVisibility && onColumnVisibleChange ? (
+					<DataTableViewOptions
+						columns={VIEW_COLUMNS}
+						visibility={columnVisibility}
+						onVisibilityChange={onColumnVisibleChange}
+					/>
+				) : null}
+
 				<Tooltip.Provider delayDuration={200}>
 					<Tooltip.Root>
 						<Tooltip.Trigger asChild>
