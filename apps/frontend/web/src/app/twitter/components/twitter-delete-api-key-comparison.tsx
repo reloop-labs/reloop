@@ -269,20 +269,28 @@ function CreateApiKeyNew() {
 /* -------------------------------------------------------------------------- */
 /* API KEY DISPLAY — OLD vs NEW (success state after creation)                */
 /* -------------------------------------------------------------------------- */
+function SecretCodeBlock() {
+	return (
+		<div className="group relative overflow-hidden rounded-[18px] border border-stroke-soft-100 bg-[#fafafa] dark:border-white/10 dark:bg-[#0c0c0e]">
+			<div className="flex items-center justify-between gap-3 px-4 py-2.5">
+				<span className="font-mono text-[11px] text-text-sub-500 dark:text-white/55">secret key</span>
+				<span className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-text-sub-600 hover:text-text-strong-950 dark:text-white/55 dark:hover:text-white">
+					<Icon name="copy" className="size-4" />
+				</span>
+			</div>
+			<div className="mx-0.5 mb-0.5 overflow-hidden rounded-2xl border border-stroke-soft-100/70 bg-white px-4 py-3 dark:border-white/10 dark:bg-zinc-950">
+				<span className="font-mono text-sm text-text-strong-950 dark:text-white">rl_live_7k9x2mPq8vT4wN5aB8cD1eF2gH</span>
+			</div>
+		</div>
+	);
+}
+
 function ApiKeyDisplayOld() {
 	return (
 		<div className="w-full max-w-[460px] overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 p-6 dark:border-stroke-soft-100/40 dark:bg-[#0c0c0c]">
 			<h2 className="font-semibold text-[26px] text-text-strong-950 tracking-tight dark:text-white">API key created</h2>
 			<div className="mt-5">
-				<div className="rounded-xl border border-stroke-soft-100 bg-[#0b0b0c] p-4 dark:border-white/10">
-					<div className="flex items-center justify-between gap-3">
-						<span className="font-mono text-sm text-white">rl_live_7k9x2mPq8vT4wN...</span>
-						<span className="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-white/10">
-							<Icon name="copy" className="h-3.5 w-3.5 text-white/70" />
-						</span>
-					</div>
-					<p className="mt-1 text-xs text-white/50">secret key</p>
-				</div>
+				<SecretCodeBlock />
 			</div>
 			<div className="mt-4 rounded-xl border border-[#FBE3B5] bg-[#FEF6E6] p-4 text-[#8A5300] text-xs leading-relaxed dark:border-amber-800/40 dark:bg-amber-950/30 dark:text-amber-200">
 				<span className="font-semibold">Important:</span> Copy and save your secret key now. You won&apos;t be able to see it again.
@@ -313,15 +321,7 @@ function ApiKeyDisplayNew() {
 					</span>
 				</div>
 				<div className="space-y-4 px-6 pb-6">
-					<div className="rounded-xl border border-stroke-soft-100 bg-[#0b0b0c] p-4 dark:border-white/10">
-						<div className="flex items-center justify-between gap-3">
-							<span className="font-mono text-sm text-white">rl_live_7k9x2mPq8vT4wN...</span>
-							<span className="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-white/10">
-								<Icon name="copy" className="h-3.5 w-3.5 text-white/70" />
-							</span>
-						</div>
-						<p className="mt-1 text-xs text-white/50">secret key</p>
-					</div>
+					<SecretCodeBlock />
 					<div className="rounded-xl border border-amber-200 bg-amber-50 p-3.5 text-amber-800 text-xs leading-relaxed dark:border-amber-800/40 dark:bg-amber-950/30 dark:text-amber-200">
 						<span className="font-semibold">Important:</span> Copy and save your secret key now — you won&apos;t be able to see it again.
 					</div>

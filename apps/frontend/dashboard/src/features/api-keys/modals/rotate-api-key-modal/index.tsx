@@ -1,10 +1,12 @@
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
+import { Icon } from "@reloop/ui/icon";
 import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
 import axios from "axios";
 import { AnimatePresence, motion } from "framer-motion";
+import { X } from "lucide-react";
 import { useQueryState } from "nuqs";
 import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
@@ -28,13 +30,11 @@ type RotatedKey = {
 const HEADER_CONTENT = {
 	confirm: {
 		title: "Rotate API key",
-		description:
-			"Generating a new secret key will instantly revoke the existing key. Any applications using the old key will lose access until updated.",
+		description: "" as const,
 	},
 	success: {
 		title: "API key rotated",
-		description:
-			"Your new secret key has been generated. Copy and store it securely now — for security reasons, it cannot be displayed again.",
+		description: "" as const,
 	},
 } as const;
 
@@ -138,7 +138,7 @@ export function RotateApiKeyModal({
 			}}
 		>
 			<Modal.Content
-				className="overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 sm:max-w-[460px] dark:border-stroke-soft-100/40"
+				className="overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-soft-50 p-0 sm:max-w-[460px] dark:border-stroke-soft-100/40 dark:bg-white/[0.03]"
 				showClose={false}
 				onOpenAutoFocus={(e) => {
 					e.preventDefault();
@@ -150,68 +150,88 @@ export function RotateApiKeyModal({
 					if (rotatedApiKey) e.preventDefault();
 				}}
 			>
-				{/* Outer motion wrapper — animates height as content changes */}
+				{/* Outer motion wrapper — animates height as content changes — KEEP ANIMATION INTACT */}
 				<motion.div
 					layout="size"
 					transition={{ duration: 0.32, ease: [0.25, 0.46, 0.45, 0.94] }}
 				>
-					<div className="p-6">
-						{/* Header — title & description update with step */}
-						<div className="relative pr-10">
-							<Modal.Title className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
-								{header.title}
-							</Modal.Title>
-							<Modal.Description className="mt-2 text-sm text-text-sub-600 leading-relaxed">
-								{header.description}
-							</Modal.Description>
+					<div className="relative m-0.5 space-y-5 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 pt-5 dark:border-stroke-soft-100/40 dark:bg-[#0c0c0c]">
+						{/* Header — icon + title + description update with step — KEEP ORIGINAL LAYOUT FOR ANIMATION */}
+						<div className="flex items-start justify-between gap-4 px-6">
+							<div className="space-y-1">
+								<div className="flex items-center gap-2">
+									<Icon
+										name={step === "success" ? "check-circle" : "refresh"}
+										className={cn(
+											"size-4",
+											step === "success" ? "text-emerald-600 dark:text-emerald-400" : "text-text-sub-600 dark:text-white/60",
+										)}
+									/>
+									<Modal.Title className="font-medium text-text-strong-950 text-xl tracking-tight dark:text-white">
+										{header.title}
+									</Modal.Title>
+								</div>
+								{header.description ? (
+									<Modal.Description className="text-sm text-text-sub-600 leading-relaxed dark:text-white/60">
+										{header.description}
+									</Modal.Description>
+								) : null}
+							</div>
+							<button
+								type="button"
+								onClick={handleClose}
+								aria-label="Close"
+								disabled={isRotating}
+								className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-bg-white-0 text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 active:scale-[0.95] disabled:opacity-50 dark:bg-transparent dark:hover:bg-white/[0.05] dark:hover:text-white"
+							>
+								<X className="size-3.5" strokeWidth={2.25} />
+							</button>
 						</div>
 
-						{/* Center content only — animates on step change */}
-						<AnimatePresence mode="popLayout" initial={false}>
-							{step === "confirm" ? (
-								<motion.div
-									key="confirm"
-									initial={{ opacity: 0, filter: "blur(4px)" }}
-									animate={{ opacity: 1, filter: "blur(0px)" }}
-									exit={{ opacity: 0, filter: "blur(4px)" }}
-									transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-								>
-									<ConfirmStep
-										displayName={displayName}
-										keyPrefix={keyPrefix}
-										confirmationText={confirmationText}
-										onConfirmationTextChange={setConfirmationText}
-										isRotating={isRotating}
-										inputRef={inputRef}
-									/>
-								</motion.div>
-							) : (
-								<motion.div
-									layout
-									key="success"
-									initial={{ opacity: 0, filter: "blur(4px)", height: "315px" }}
-									animate={{
-										opacity: 1,
-										filter: "blur(0px)",
-										height: "auto",
-									}}
-									exit={{ opacity: 0, filter: "blur(4px)" }}
-									transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-								>
-									<SuccessStep secret={rotatedApiKey!.key} />
-								</motion.div>
-							)}
-						</AnimatePresence>
+						{/* Center content only — animates on step change — KEEP ANIMATION INTACT */}
+						<div className="px-6 pb-6">
+							<AnimatePresence mode="popLayout" initial={false}>
+								{step === "confirm" ? (
+									<motion.div
+										key="confirm"
+										initial={{ opacity: 0, filter: "blur(4px)" }}
+										animate={{ opacity: 1, filter: "blur(0px)" }}
+										exit={{ opacity: 0, filter: "blur(4px)" }}
+										transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+									>
+										<ConfirmStep
+											displayName={displayName}
+											keyPrefix={keyPrefix}
+											confirmationText={confirmationText}
+											onConfirmationTextChange={setConfirmationText}
+											isRotating={isRotating}
+											inputRef={inputRef}
+										/>
+									</motion.div>
+								) : (
+									<motion.div
+										key="success"
+										initial={{ opacity: 0, filter: "blur(4px)" }}
+										animate={{ opacity: 1, filter: "blur(0px)" }}
+										exit={{ opacity: 0, filter: "blur(4px)" }}
+										transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+									>
+										<SuccessStep secret={rotatedApiKey!.key} />
+									</motion.div>
+								)}
+							</AnimatePresence>
+						</div>
+					</div>
 
-						{/* Footer — outside animation, plain conditional */}
-						<motion.div
-							layout
-							className="mt-6 flex items-center justify-end gap-3"
-						>
+					{/* Footer — outside inner card, like Create API Key — KEEP ANIMATION INTACT */}
+					<motion.div
+						layout
+						className="relative flex items-center justify-between gap-3 px-3 pt-2 pb-3"
+					>
 							<Button.Root
 								type="button"
 								variant="neutral"
-								mode="stroke"
+								mode="ghost"
 								size="small"
 								onClick={() => {
 									if (!isRotating) handleClose();
@@ -234,7 +254,7 @@ export function RotateApiKeyModal({
 									onClick={handleRotate}
 									disabled={!canRotate}
 									className={cn(
-										"min-w-35 justify-center overflow-hidden transition-all duration-200",
+										"min-w-[158px] justify-center overflow-hidden transition-all duration-200",
 										(!canRotate || isRotating) &&
 											"pointer-events-none opacity-50",
 										isRotating && "opacity-90",
@@ -271,7 +291,7 @@ export function RotateApiKeyModal({
 									variant="blue"
 									size="small"
 									onClick={handleCopyKey}
-									className="min-w-35 justify-center overflow-hidden transition-all duration-200"
+									className="min-w-[158px] justify-center overflow-hidden transition-all duration-200"
 								>
 									<AnimatePresence mode="popLayout" initial={false}>
 										<motion.span
@@ -297,7 +317,6 @@ export function RotateApiKeyModal({
 								</FancyButton.Root>
 							)}
 						</motion.div>
-					</div>
 				</motion.div>
 			</Modal.Content>
 		</Modal.Root>

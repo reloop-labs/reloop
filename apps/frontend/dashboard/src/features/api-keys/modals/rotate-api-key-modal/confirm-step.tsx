@@ -33,33 +33,22 @@ export function ConfirmStep({
 	};
 
 	return (
-		<div>
-			{/* Key Details Card */}
-			<div className="mt-5 space-y-3 rounded-xl border border-stroke-soft-100 bg-bg-weak-50/50 p-4 dark:border-stroke-soft-100/40">
-				<div>
-					<p className="font-normal text-text-sub-600 text-xs">API key name</p>
-					<p className="mt-0.5 truncate font-medium text-sm text-text-strong-950">
-						{displayName}
-					</p>
-				</div>
-				<div>
-					<p className="font-normal text-text-sub-600 text-xs">
-						API key prefix
-					</p>
-					<div className="mt-1 flex items-center">
-						<span className="font-medium font-mono text-sm">{keyPrefix}</span>
-					</div>
-				</div>
-			</div>
+		<div className="space-y-4">
+			<p className="text-sm text-text-sub-600 leading-relaxed dark:text-white/60">
+				This will rotate{" "}
+				<span className="inline-flex items-center rounded-md bg-bg-weak-50 px-1.5 py-0.5 font-mono font-medium text-text-strong-950 text-xs dark:bg-white/[0.06] dark:text-white">
+					{keyPrefix}
+				</span>{" "}
+				<span className="font-medium text-text-strong-950 dark:text-white">{displayName}</span>.
+			</p>
 
-			{/* Warning Banner */}
-			<div className="mt-4 rounded-xl border border-[#FBE3B5] bg-[#FEF6E6] p-4 text-[#8A5300] text-xs leading-relaxed dark:border-amber-800/40 dark:bg-amber-950/30 dark:text-amber-200">
-				<span className="font-semibold">Warning:</span> Services using this key
-				will experience downtime until they are updated with the new secret.
+			<div className="rounded-xl border border-amber-200 bg-amber-50 p-3.5 text-amber-800 text-xs leading-relaxed dark:border-amber-800/40 dark:bg-amber-950/30 dark:text-amber-200">
+				<span className="font-semibold">Note:</span> Generating a new secret will instantly revoke the old key. Any
+				services using it will experience downtime until updated with the new secret.
 			</div>
 
 			{/* Confirmation Input */}
-			<div className="mt-4 space-y-2">
+			<div className="space-y-2">
 				<Label.Root
 					htmlFor="rotate-api-key-confirmation"
 					className="flex flex-wrap items-center gap-1.5"
