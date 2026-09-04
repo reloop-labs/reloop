@@ -15,8 +15,8 @@ export const metadata: Metadata = {
 	},
 };
 
-import { TwitterDeleteApiKeyComparison } from "./components/twitter-delete-api-key-comparison";
+import { TwitterCreateWebhookComparison } from "./components/twitter-create-webhook-comparison";
 
 export default function TwitterPage() {
-	return <TwitterDeleteApiKeyComparison />;
+	return <TwitterCreateWebhookComparison />;
 }
