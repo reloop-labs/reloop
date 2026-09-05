@@ -375,7 +375,7 @@ function ComparisonCell({
 		return (
 			<span
 				role="img"
-				className="text-[14px] text-text-sub-600/60 dark:text-white/25"
+				className="text-[15px] text-text-sub-600/50 dark:text-white/25"
 				aria-label="Not included"
 			>
 				—
@@ -386,125 +386,108 @@ function ComparisonCell({
 	if (type === "boolean") {
 		return (
 			<Icon
-				name="check-circle"
-				className="size-4 text-text-strong-950 dark:text-white/85"
+				name="check"
+				className="size-[18px] text-text-strong-950 dark:text-white/85"
 				aria-label="Included"
 			/>
 		);
 	}
 
 	return (
-		<span className="inline-flex items-center gap-2.5 text-[14px]">
-			<Icon
-				name="check-circle"
-				className="size-4 shrink-0 text-text-strong-950 dark:text-white/85"
-				aria-hidden
-			/>
-			<span className="text-text-strong-950 dark:text-white/85">
-				{value as string}
-			</span>
+		<span className="text-center text-[14px] text-text-strong-950 dark:text-white/85">
+			{value as string}
 		</span>
 	);
 }
 
-const COMPARISON_GRID_COLS =
-	"grid-cols-[minmax(160px,34%)_repeat(4,minmax(140px,1fr))]";
-
-function comparisonPriceLine(plan: (typeof pricingPlans)[number]) {
-	if (plan.monthlyPrice === null) {
-		return { amount: "Custom", caption: "pricing" };
-	}
-	if (plan.monthlyPrice === 0) {
-		return { amount: formatPrice(0), caption: "Free for everyone" };
-	}
-	return {
-		amount: formatPrice(plan.monthlyPrice),
-		caption: "per month",
-	};
-}
-
-function highlightColumn(recommended: boolean) {
-	return recommended
-		? "border-stroke-soft-100 border-x bg-bg-weak-50/60 dark:border-white/[0.07] dark:bg-white/[0.03]"
-		: "";
-}
-
-const COMPARISON_PAD_LEFT = "pl-5 sm:pl-7 lg:pl-9";
-const COMPARISON_PAD_RIGHT = "pr-5 sm:pr-7 lg:pr-9";
-
-function ComparisonTable({
-	recommendedPlanId,
+function ComparePlanCta({
+	plan,
+	solid,
 }: {
-	recommendedPlanId?: PlanId;
+	plan: (typeof pricingPlans)[number];
+	solid?: boolean;
 }) {
-	const isRecommended = (plan: (typeof pricingPlans)[number]) =>
-		recommendedPlanId ? plan.id === recommendedPlanId : !!plan.highlighted;
+	const className = solid
+		? "border-[#1d4ed8] bg-[#1d4ed8] text-white hover:bg-[#1e40af]"
+		: "border-[#1d4ed8]/70 bg-transparent text-[#1d4ed8] hover:bg-[#1d4ed8]/[0.06] dark:text-[#7aa2ff] dark:border-[#7aa2ff]/60 dark:hover:bg-white/[0.06]";
+	const content = (
+		<span className="truncate text-[14.5px] font-medium tracking-[-0.01em]">
+			{plan.ctaLabel}
+		</span>
+	);
+	const classes = cn(
+		"flex h-10 w-full items-center justify-center rounded-full border px-5 transition-colors",
+		className,
+	);
+	if (plan.ctaExternal) {
+		return (
+			<a
+				href={plan.ctaHref}
+				target="_blank"
+				rel="noopener noreferrer"
+				className={classes}
+			>
+				{content}
+			</a>
+		);
+	}
 	return (
-		<div className="-mx-4 sm:-mx-6 lg:-mx-8 overflow-x-auto lg:overflow-visible">
-			<div className={cn("grid w-full min-w-[760px]", COMPARISON_GRID_COLS)}>
-				<div
-					className={cn(
-						"sticky top-16 z-20 border-stroke-soft-100 border-b bg-bg-white-0/95 backdrop-blur-md dark:border-white/[0.07] dark:bg-black/95",
-						COMPARISON_PAD_LEFT,
-					)}
-				/>
-				{pricingPlans.map((plan, planIndex) => {
-					const price = comparisonPriceLine(plan);
-					const isLast = planIndex === pricingPlans.length - 1;
-					const recommended = isRecommended(plan);
+		<Link href={plan.ctaHref} className={classes}>
+			{content}
+		</Link>
+	);
+}
+
+const COMPARISON_GRID_COLS =
+	"grid-cols-[minmax(220px,1.45fr)_repeat(4,minmax(150px,1fr))]";
+
+function ComparisonTable() {
+	return (
+		<div className="-mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
+			<div
+				className={cn(
+					"grid w-full min-w-[920px] border-stroke-soft-100 border-t dark:border-white/10",
+					COMPARISON_GRID_COLS,
+				)}
+			>
+				{/* Header row — matches reference: eyebrow + title left, plan + pill CTA right */}
+				<div className="flex flex-col justify-center gap-2 border-stroke-soft-100 border-b px-5 py-7 sm:px-7 lg:px-9 dark:border-white/10">
+					<span className="font-mono text-[12px] font-medium uppercase tracking-[0.12em] text-[#1d4ed8] dark:text-[#7aa2ff]">
+						02. Features
+					</span>
+					<h2 className="font-serif text-[26px] text-text-strong-950 leading-[1.1] tracking-[-0.02em] dark:text-white">
+						Compare every plan
+					</h2>
+				</div>
+				{pricingPlans.map((plan) => {
+					const isEnterprise = plan.monthlyPrice === null;
 					return (
 						<div
 							key={plan.id}
-							className="sticky top-16 z-20 border-stroke-soft-100 border-b bg-bg-white-0/95 backdrop-blur-md dark:border-white/[0.07] dark:bg-black/95"
+							className="flex flex-col justify-center gap-4 border-stroke-soft-100 border-b border-l px-5 py-7 sm:px-6 dark:border-white/10"
 						>
-							<div
-								className={cn(
-									"flex flex-col gap-4 px-5 pt-6 pb-4 sm:px-6 sm:pt-6 sm:pb-4",
-									isLast && COMPARISON_PAD_RIGHT,
-									recommended &&
-										"rounded-t-2xl border-stroke-soft-100 border-x border-t bg-bg-weak-50/60 dark:border-white/[0.07] dark:bg-white/[0.03]",
-								)}
-							>
-								<div>
-									<div className="flex items-center gap-2">
-										<span className="font-medium text-label-md text-text-strong-950 dark:text-white">
-											{plan.name}
-										</span>
-										{recommended ? (
-											<span className="relative shrink-0 overflow-hidden rounded-full bg-primary-base px-2 py-0.5 text-center font-semibold text-[10px] text-white uppercase tracking-[0.14em] shadow-fancy-buttons-primary before:pointer-events-none before:absolute before:inset-0 before:rounded-[inherit] before:bg-gradient-to-b before:from-static-white before:to-transparent before:opacity-[.16]">
-												{plan.badge ?? "Recommended"}
-											</span>
-										) : null}
-									</div>
-									<div className="mt-2.5 flex items-baseline gap-1.5">
-										<span className="font-semibold text-text-strong-950 text-title-h6 dark:text-white">
-											{price.amount}
-										</span>
-										<span className="text-paragraph-xs text-text-sub-600 dark:text-white/50">
-											{price.caption}
-										</span>
-									</div>
-									<div className="mt-4 sm:mt-5">
-										<PlanCtaLink
-											href={plan.ctaHref}
-											label={plan.ctaLabel}
-											external={plan.ctaExternal}
-											variant={recommended ? "primary" : "default"}
-											size="small"
-										/>
-									</div>
-								</div>
-							</div>
+							<span className="font-serif text-[23px] text-text-strong-950 leading-none tracking-[-0.02em] dark:text-white">
+								{plan.name}
+							</span>
+							<ComparePlanCta plan={plan} solid={isEnterprise} />
 						</div>
 					);
 				})}
+
+				{/* Spacer row like in reference (empty hairline row) */}
+				<div className="h-14 border-stroke-soft-100 border-b dark:border-white/10" />
+				{pricingPlans.map((plan) => (
+					<div
+						key={`spacer-${plan.id}`}
+						className="h-14 border-stroke-soft-100 border-b border-l dark:border-white/10"
+					/>
+				))}
 
 				{comparisonSections.map((section, sectionIndex) => (
 					<Fragment key={section.title}>
 						<div
 							className={cn(
-								"flex items-end pb-3",
-								COMPARISON_PAD_LEFT,
+								"flex items-end border-stroke-soft-100 border-b px-5 pb-3 sm:px-7 lg:px-9 dark:border-white/[0.07]",
 								sectionIndex > 0 ? "pt-10" : "pt-6",
 							)}
 						>
@@ -512,45 +495,39 @@ function ComparisonTable({
 								{section.title}
 							</span>
 						</div>
-						{pricingPlans.map((plan, planIndex) => (
+						{pricingPlans.map((plan) => (
 							<div
-								key={plan.id}
+								key={`${section.title}-${plan.id}-title`}
 								className={cn(
+									"border-stroke-soft-100 border-b border-l pb-3 dark:border-white/[0.07]",
 									sectionIndex > 0 ? "pt-10" : "pt-6",
-									"pb-3",
-									planIndex === pricingPlans.length - 1 && COMPARISON_PAD_RIGHT,
-									highlightColumn(isRecommended(plan)),
 								)}
 							/>
 						))}
-
-						{section.rows.map((row) => (
+						{section.rows.map((row, rowIndex) => (
 							<Fragment key={row.key}>
 								<div
 									className={cn(
-										"flex items-center gap-2.5 border-stroke-soft-100 border-b py-3 pr-4 dark:border-white/[0.06]",
-										COMPARISON_PAD_LEFT,
+										"flex min-h-[60px] items-center gap-3 border-stroke-soft-100 border-b px-5 py-4 sm:px-7 lg:px-9 dark:border-white/[0.07]",
+										rowIndex === 0 &&
+											section.title &&
+											"bg-bg-weak-50/[0.4] dark:bg-white/[0.015]",
 									)}
 								>
 									{getFeatureIcon(
 										row.label,
-										"size-4 shrink-0 text-text-sub-600 dark:text-white/40",
+										"size-[18px] shrink-0 text-text-strong-950 dark:text-white/70",
 									)}
-									<span className="text-[14px] text-text-sub-600 dark:text-white/55">
+									<span className="font-serif text-[18.5px] text-text-strong-950 leading-tight tracking-[-0.01em] dark:text-white">
 										{row.label}
 									</span>
 								</div>
-								{pricingPlans.map((plan, planIndex) => {
+								{pricingPlans.map((plan) => {
 									const value = plan.comparison[row.key];
 									return (
 										<div
 											key={plan.id}
-											className={cn(
-												"flex items-center border-stroke-soft-100 border-b px-4 py-3 dark:border-white/[0.06]",
-												planIndex === pricingPlans.length - 1 &&
-													COMPARISON_PAD_RIGHT,
-												highlightColumn(isRecommended(plan)),
-											)}
+											className="flex min-h-[60px] items-center justify-center border-stroke-soft-100 border-b border-l px-4 py-4 text-center dark:border-white/[0.07]"
 										>
 											<ComparisonCell
 												value={value as string | boolean}
@@ -562,19 +539,6 @@ function ComparisonTable({
 							</Fragment>
 						))}
 					</Fragment>
-				))}
-
-				<div className={COMPARISON_PAD_LEFT} />
-				{pricingPlans.map((plan, planIndex) => (
-					<div
-						key={`cap-${plan.id}`}
-						className={cn(
-							"h-8",
-							planIndex === pricingPlans.length - 1 && COMPARISON_PAD_RIGHT,
-							isRecommended(plan) && "rounded-b-2xl border-b",
-							highlightColumn(isRecommended(plan)),
-						)}
-					/>
 				))}
 			</div>
 		</div>
@@ -601,7 +565,7 @@ export function PricingSection({
 				))}
 			</div>
 			<div className="mt-24">
-				<ComparisonTable recommendedPlanId={recommendedPlanId} />
+				<ComparisonTable />
 			</div>
 		</>
 	);
