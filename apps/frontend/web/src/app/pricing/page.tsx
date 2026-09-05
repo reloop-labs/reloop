@@ -54,8 +54,8 @@ const PricingPage = () => {
 		<>
 			<JsonLd data={pricingSchema} />
 			<div className="mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-200 border-x md:max-w-7xl dark:border-white/10">
-				<header className="relative z-10 flex w-full flex-col items-center px-6 pt-28 pb-8 text-center sm:px-8 sm:pt-32 sm:pb-10 lg:px-12 lg:pt-36 lg:pb-12">
-					<div className="mb-6 flex items-center justify-center gap-2 sm:mb-8">
+				<header className="relative z-10 flex w-full flex-col items-center px-6 pt-20 pb-12 text-center sm:px-8 sm:pt-24 sm:pb-14 lg:px-12 lg:pt-28 lg:pb-16">
+					<div className="mb-5 flex items-center justify-center gap-2 sm:mb-6">
 						<span
 							aria-hidden
 							className="inline-flex size-5 shrink-0 items-center justify-center rounded-[5px] bg-primary-dark p-px pb-[2px] dark:bg-[#003a8c]"
