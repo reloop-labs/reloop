@@ -84,6 +84,14 @@ function OpenSourceSeal() {
 					className="fill-bg-white-0 stroke-stroke-soft-100 dark:fill-black dark:stroke-white/15"
 					strokeWidth="1"
 				/>
+				<circle
+					cx="44"
+					cy="44"
+					r="31"
+					className="stroke-stroke-soft-100 dark:stroke-white/15"
+					fill="none"
+					strokeWidth=".8"
+				/>
 			</svg>
 			<div className="relative flex flex-col items-center leading-none">
 				<span className="font-semibold text-[11px] text-primary-base tracking-[0.16em]">
@@ -157,8 +165,12 @@ export function FooterBrand() {
 					className="flex flex-col justify-between gap-4 border-stroke-soft-100 border-r border-b px-5 py-6 transition-colors hover:bg-bg-weak-50 sm:px-6 dark:border-white/10 dark:hover:bg-white/[0.03]"
 				>
 					<p className="inline-flex items-center gap-1.5 text-[13px] text-text-sub-600 dark:text-white/45">
-						Open source
-						<Icon name="gear" className="size-3.5 opacity-50" fill="none" />
+						Trust
+						<Icon
+							name="shield-check"
+							className="size-3.5 opacity-50"
+							fill="none"
+						/>
 					</p>
 					<OpenSourceSeal />
 				</Link>
