@@ -501,7 +501,7 @@ function ComparisonTable({
 									sectionIndex > 0 ? "pt-10" : "pt-6",
 									"pb-3",
 									planIndex === pricingPlans.length - 1 && COMPARISON_PAD_RIGHT,
-									highlightColumn(plan, isRecommended(plan)),
+									highlightColumn(isRecommended(plan)),
 								)}
 							/>
 						))}
@@ -531,7 +531,7 @@ function ComparisonTable({
 												"flex items-center border-stroke-soft-200 border-b px-4 py-3 dark:border-white/[0.06]",
 												planIndex === pricingPlans.length - 1 &&
 													COMPARISON_PAD_RIGHT,
-												highlightColumn(plan, isRecommended(plan)),
+												highlightColumn(isRecommended(plan)),
 											)}
 										>
 											<ComparisonCell
@@ -554,7 +554,7 @@ function ComparisonTable({
 							"h-8",
 							planIndex === pricingPlans.length - 1 && COMPARISON_PAD_RIGHT,
 							isRecommended(plan) && "rounded-b-2xl border-b",
-							highlightColumn(plan, isRecommended(plan)),
+							highlightColumn(isRecommended(plan)),
 						)}
 					/>
 				))}

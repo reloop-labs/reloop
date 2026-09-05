@@ -3,8 +3,8 @@ import { pricingFaqItems } from "@reloop/web/lib/pricing-faq";
 import { faqPageJsonLd, pricingProductJsonLd } from "@reloop/web/lib/schema";
 import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
-import { PricingFaq } from "./components/pricing-faq";
 import { PricingExplorer } from "./components/pricing-explorer";
+import { PricingFaq } from "./components/pricing-faq";
 
 // TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
 // See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
