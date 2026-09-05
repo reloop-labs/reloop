@@ -71,106 +71,107 @@ const WhyOpenSourcePage = () => {
 		<>
 			<JsonLd data={jsonLd} />
 
-			<section className="relative w-full max-w-full overflow-x-clip border-stroke-soft-200 bg-bg-white-0 text-text-strong-950 dark:border-white/10 dark:bg-black dark:text-white">
-				<div className="mx-auto w-full max-w-5xl border-stroke-soft-200 border-x px-6 pt-28 pb-16 sm:px-10 sm:pt-32 sm:pb-20 md:max-w-7xl lg:px-12 dark:border-white/10">
-					{/* Two columns: essay left, note right */}
-					<div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-10 xl:gap-14">
-						{/* Left — main essay */}
-						<div className="min-w-0 lg:col-span-7">
-							<h1 className="font-semibold text-text-strong-950 text-xl leading-snug tracking-tight sm:text-2xl lg:text-[1.65rem] dark:text-white">
-								Why Open Source
-							</h1>
+			<div className="relative w-full bg-bg-white-0 text-text-sub-600 dark:bg-black dark:text-neutral-300">
+				<div className="relative mx-auto w-full max-w-5xl overflow-x-clip border-stroke-soft-200 border-x md:max-w-7xl dark:border-white/10">
+					<article className="relative mx-auto w-full max-w-[680px] px-6 pt-28 pb-24 sm:pt-36">
+						<h1 className="font-semibold text-[40px] text-text-strong-950 leading-none tracking-tight sm:text-[44px] dark:text-white">
+							Why Open Source
+						</h1>
 
-							<p className="mt-3 max-w-xl text-[14px] text-text-sub-600 leading-snug sm:text-[14.5px] dark:text-white/55">
-								Closed email tools sell trust. We sell a repo you can open.
-							</p>
+						<p className="mt-4 text-[16.5px] text-text-sub-600 leading-[1.75] dark:text-neutral-400">
+							Closed email tools sell trust. We sell a repo you can open.
+						</p>
 
-							<div className="mt-8 space-y-8 text-[13.5px] text-text-sub-600 leading-relaxed sm:text-[14px] dark:text-white/60">
-								{/* 1 */}
-								<section className="space-y-2.5">
-									<h2 className="font-semibold text-[14.5px] text-text-strong-950 tracking-tight sm:text-[15px] dark:text-white">
-										<span className="mr-2 text-text-sub-600 tabular-nums dark:text-white/45">
-											1.
-										</span>
-										Trust
-									</h2>
-									<p>
-										You don&apos;t trust Stripe because of their homepage. You
-										trust them because every payment can be traced.
-									</p>
-									<p>Email should work the same way.</p>
-									<p className="font-medium text-text-strong-950 dark:text-white">
-										Don&apos;t trust our dashboard. Verify our code.
-									</p>
-								</section>
+						<div className="mt-10 space-y-10 text-[16.5px] leading-[1.75]">
+							{/* 1 */}
+							<section className="space-y-2.5">
+								<h2 className="font-semibold text-text-strong-950 text-[17px] tracking-tight dark:text-white">
+									<span className="mr-2 text-text-sub-600 tabular-nums dark:text-neutral-500">
+										1.
+									</span>
+									Trust
+								</h2>
+								<p className="text-text-strong-950 dark:text-neutral-200">
+									You don&apos;t trust Stripe because of their homepage. You
+									trust them because every payment can be traced.
+								</p>
+								<p className="text-text-strong-950 dark:text-neutral-200">
+									Email should work the same way.
+								</p>
+								<p className="font-medium text-text-strong-950 dark:text-white">
+									Don&apos;t trust our dashboard. Verify our code.
+								</p>
+							</section>
 
-								{/* 2 */}
-								<section className="space-y-2.5">
-									<h2 className="font-semibold text-[14.5px] text-text-strong-950 tracking-tight sm:text-[15px] dark:text-white">
-										<span className="mr-2 text-text-sub-600 tabular-nums dark:text-white/45">
-											2.
-										</span>
-										Closed doesn&apos;t mean smarter.
-									</h2>
-									<p>
-										Every provider claims a &quot;proprietary engine.&quot; Most
-										run the same open-source parts everyone else does.
-									</p>
-									<p>The difference isn&apos;t magic. It&apos;s marketing.</p>
-									<p className="font-medium text-text-strong-950 dark:text-white">
-										Open beats mysterious.
-									</p>
-								</section>
+							{/* 2 */}
+							<section className="space-y-2.5">
+								<h2 className="font-semibold text-text-strong-950 text-[17px] tracking-tight dark:text-white">
+									<span className="mr-2 text-text-sub-600 tabular-nums dark:text-neutral-500">
+										2.
+									</span>
+									Closed doesn&apos;t mean smarter.
+								</h2>
+								<p className="text-text-strong-950 dark:text-neutral-200">
+									Every provider claims a &quot;proprietary engine.&quot; Most
+									run the same open-source parts everyone else does.
+								</p>
+								<p className="text-text-strong-950 dark:text-neutral-200">
+									The difference isn&apos;t magic. It&apos;s marketing.
+								</p>
+								<p className="font-medium text-text-strong-950 dark:text-white">
+									Open beats mysterious.
+								</p>
+							</section>
 
-								{/* 3 */}
-								<section className="space-y-2.5">
-									<h2 className="font-semibold text-[14.5px] text-text-strong-950 tracking-tight sm:text-[15px] dark:text-white">
-										<span className="mr-2 text-text-sub-600 tabular-nums dark:text-white/45">
-											3.
-										</span>
-										Open source isn&apos;t enough
-									</h2>
-									<p>Free software. Not free time.</p>
-									<p>
-										DNS, queues, retries, monitoring &mdash; the repo
-										doesn&apos;t do that. You do.
-									</p>
-									<p className="font-medium text-text-strong-950 dark:text-white">
-										Reloop ships the part open source leaves out: done.
-									</p>
-								</section>
+							{/* 3 */}
+							<section className="space-y-2.5">
+								<h2 className="font-semibold text-text-strong-950 text-[17px] tracking-tight dark:text-white">
+									<span className="mr-2 text-text-sub-600 tabular-nums dark:text-neutral-500">
+										3.
+									</span>
+									Open source isn&apos;t enough
+								</h2>
+								<p className="text-text-strong-950 dark:text-neutral-200">
+									Free software. Not free time.
+								</p>
+								<p className="text-text-strong-950 dark:text-neutral-200">
+									DNS, queues, retries, monitoring &mdash; the repo
+									doesn&apos;t do that. You do.
+								</p>
+								<p className="font-medium text-text-strong-950 dark:text-white">
+									Reloop ships the part open source leaves out: done.
+								</p>
+							</section>
 
-								<div className="pt-0.5">
-									<FancyButton.Root
-										asChild
-										variant="neutral"
-										size="medium"
-										className="rounded-full! px-5!"
+							<div className="pt-2">
+								<FancyButton.Root
+									asChild
+									variant="neutral"
+									size="medium"
+									className="rounded-full! px-5!"
+								>
+									<a
+										href={socialProfiles.github}
+										target="_blank"
+										rel="noopener noreferrer"
 									>
-										<a
-											href={socialProfiles.github}
-											target="_blank"
-											rel="noopener noreferrer"
-										>
-											<FancyButton.Icon
-												as={Icon}
-												name="social-github"
-												className="size-4"
-											/>
-											<span>View on GitHub</span>
-										</a>
-									</FancyButton.Root>
-								</div>
+										<FancyButton.Icon
+											as={Icon}
+											name="social-github"
+											className="size-4"
+										/>
+										<span>View on GitHub</span>
+									</a>
+								</FancyButton.Root>
+							</div>
+
+							<div className="pt-4">
+								<OpenSourceIsntCheap />
 							</div>
 						</div>
-
-						{/* Right — compact note */}
-						<div className="min-w-0 lg:col-span-5 lg:pt-2">
-							<OpenSourceIsntCheap />
-						</div>
-					</div>
+					</article>
 				</div>
-			</section>
+			</div>
 
 			{/* Full-width bottom CTA */}
 			<BlogCta
