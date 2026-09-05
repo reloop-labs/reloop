@@ -34,7 +34,8 @@ export function createSlashCommandPlugin({
 }) {
 	return Suggestion({
 		pluginKey,
-		editor,
+		// @tiptap/suggestion nests its own @tiptap/core copy.
+		editor: editor as never,
 		char: "/",
 		allowedPrefixes: null,
 		startOfLine: false,

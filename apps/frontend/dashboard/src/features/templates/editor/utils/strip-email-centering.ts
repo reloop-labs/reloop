@@ -110,7 +110,7 @@ export function findEmailContainerTable(root: ParentNode): Element | null {
 	const explicit = root.querySelector('table[data-type="container"]');
 	if (explicit) return explicit;
 
-	const tables = Array.from(root.getElementsByTagName("table"));
+	const tables = Array.from(root.querySelectorAll("table"));
 	let column: Element | null = null;
 	let columnWidth = 0;
 	for (const table of tables) {
@@ -390,8 +390,9 @@ export function wrapCenteredCellLinks(root: Element): void {
 		const elements = Array.from(cell.children).filter(
 			(child) => child instanceof HTMLElement,
 		);
-		if (elements.length !== 1 || elements[0].tagName !== "A") continue;
-		if (elements[0].querySelector("img")) continue;
+		const only = elements[0];
+		if (elements.length !== 1 || !only || only.tagName !== "A") continue;
+		if (only.querySelector("img")) continue;
 		const table = cell.closest("table");
 		if (table instanceof HTMLElement && firstRowCellCount(table) >= 2) {
 			continue;
@@ -401,7 +402,7 @@ export function wrapCenteredCellLinks(root: Element): void {
 		const doc = cell.ownerDocument;
 		const p = doc.createElement("p");
 		p.setAttribute("style", "margin:0;text-align:center");
-		p.appendChild(elements[0] as HTMLElement);
+		p.appendChild(only);
 		cell.appendChild(p);
 	}
 }

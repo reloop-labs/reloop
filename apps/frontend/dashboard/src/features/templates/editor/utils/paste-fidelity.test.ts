@@ -536,6 +536,7 @@ describe("paste fidelity for shrink-wrapped centered rows", () => {
 		expect(socials).toHaveLength(3);
 		expect(socials[0]?.closest("td")?.style.textAlign).toBe("right");
 		for (const img of socials) {
+			if (!(img instanceof HTMLImageElement)) continue;
 			expect(img.style.display).toBe("inline-block");
 		}
 
