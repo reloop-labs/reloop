@@ -12,7 +12,7 @@ function MicroCost() {
 				<div className="flex animate-[ticker_5s_ease-in-out_infinite] flex-col">
 					<span>120.00</span>
 					<span>12.00</span>
-					<span>0.80</span>
+					<span>0.50</span>
 					<span>120.00</span>
 				</div>
 			</div>
@@ -191,7 +191,7 @@ const values = [
 		icon: "graph-up",
 		title: "Cost Efficiency",
 		description:
-			"Send-based hosted pricing from $10/month for 25k emails/month; $0.80 per 1k emails.",
+			"Send-based hosted pricing from $10/month for 50k emails/month; $0.50 per 1k emails.",
 		widget: <MicroCost />,
 	},
 	{

@@ -61,7 +61,7 @@ export function pricingOffersJsonLd(siteUrl = getSiteUrl()) {
 }
 
 const PRODUCT_DESCRIPTION =
-	"Open-source email infrastructure (Apache 2.0). Hosted Reloop Cloud plans: Free (3,000 emails/month, 200/day), Individual $10/month (25,000 emails, no daily cap), Startup $20/month (50,000 emails, no daily cap), Enterprise custom. Self-host has no Reloop license fee.";
+	"Open-source email infrastructure (Apache 2.0). Hosted Reloop Cloud plans: Free (3,000 emails/month, 200/day), Individual $10/month (50,000 emails, no daily cap), Startup $20/month (100,000 emails, no daily cap), Enterprise custom. Self-host has no Reloop license fee.";
 
 /** Product + Offer JSON-LD driven by `@reloop/pricing`. No reviews or invented plans. */
 export function pricingProductJsonLd(siteUrl = getSiteUrl()) {

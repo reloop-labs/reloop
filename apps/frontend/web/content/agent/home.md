@@ -20,8 +20,8 @@ Developers, startups, and agent products that need transactional + campaign emai
 Canonical data: https://reloop.sh/pricing.md
 
 - Free — $0, 3,000 emails / month, **200 / day**
-- Individual — $10 / month, 25,000 emails / month, no daily cap, overage $0.80 / 1,000
-- Startup — $20 / month, 50,000 emails / month, no daily cap, overage $0.80 / 1,000
+- Individual — $10 / month, 50,000 emails / month, no daily cap, overage $0.50 / 1,000
+- Startup — $20 / month, 100,000 emails / month, no daily cap, overage $0.50 / 1,000
 - Enterprise — custom volume and billing
 
 ## Why Reloop

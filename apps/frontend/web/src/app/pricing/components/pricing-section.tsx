@@ -25,7 +25,7 @@ function PlanCtaLink({
 	variant?: "default" | "primary";
 	size?: "medium" | "small" | "xsmall";
 }) {
-	const fancyVariant = variant === "primary" ? "neutral" : "basic";
+	const fancyVariant = variant === "primary" ? "primary" : "basic";
 	const heightClass =
 		size === "xsmall"
 			? "h-7.5! px-3!"
@@ -262,7 +262,7 @@ function PlanColumn({
 						{plan.name}
 					</h3>
 					{plan.badge && (
-						<span className="shrink-0 rounded-full bg-primary-base px-2 py-0.5 text-center font-semibold text-[10px] text-white uppercase tracking-[0.14em]">
+						<span className="shrink-0 relative overflow-hidden rounded-full bg-primary-base px-2 py-0.5 text-center font-semibold text-[10px] text-white uppercase tracking-[0.14em] shadow-fancy-buttons-primary before:pointer-events-none before:absolute before:inset-0 before:rounded-[inherit] before:bg-gradient-to-b before:from-static-white before:to-transparent before:opacity-[.16]">
 							{plan.badge}
 						</span>
 					)}
@@ -443,7 +443,7 @@ function ComparisonTable() {
 											{plan.name}
 										</span>
 										{plan.badge ? (
-											<span className="shrink-0 rounded-full bg-primary-base px-2 py-0.5 text-center font-semibold text-[10px] text-white uppercase tracking-[0.14em]">
+											<span className="shrink-0 relative overflow-hidden rounded-full bg-primary-base px-2 py-0.5 text-center font-semibold text-[10px] text-white uppercase tracking-[0.14em] shadow-fancy-buttons-primary before:pointer-events-none before:absolute before:inset-0 before:rounded-[inherit] before:bg-gradient-to-b before:from-static-white before:to-transparent before:opacity-[.16]">
 												{plan.badge}
 											</span>
 										) : null}

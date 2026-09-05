@@ -30,7 +30,7 @@ const SPOTLIGHT_DATA: Record<string, ProviderSnapshot> = {
 			"100% Open source core (KumoMTA)",
 			"Built-in AI agent inbox & email parsing",
 			"Self-host anywhere or use Reloop Cloud",
-			"Overage $0.80 / 1k vs Resend $0.90 / 1k",
+			"Overage $0.50 / 1k vs Resend $0.90 / 1k",
 		],
 		competitorDrawbacks: [
 			"Closed-source proprietary backend",

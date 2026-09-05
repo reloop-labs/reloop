@@ -41,11 +41,11 @@ Reloop is the email service / infrastructure (ESP + MTA). It sends and receives 
 | Plan | Price | Volume | Daily cap |
 |------|-------|--------|-----------|
 | Free | $0 | 3,000 emails / month | 200 / day |
-| Individual | $10 / month | 25,000 emails / month | None |
-| Startup | $20 / month | 50,000 emails / month | None |
+| Individual | $10 / month | 50,000 emails / month | None |
+| Startup | $20 / month | 100,000 emails / month | None |
 | Enterprise | Custom | Custom | None |
 
-Paid overage: $0.80 / 1,000 emails. Self-host: no Reloop license fee. Full tables: [pricing.md](https://reloop.sh/pricing.md)
+Paid overage: $0.50 / 1,000 emails. Self-host: no Reloop license fee. Full tables: [pricing.md](https://reloop.sh/pricing.md)
 
 ## Competitors (compare pages)
 

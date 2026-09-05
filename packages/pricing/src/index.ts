@@ -126,13 +126,13 @@ export const pricingPlans: PricingPlan[] = [
 		description: "For solo developers and personal projects.",
 		monthlyPrice: 10,
 		priceSubline: "/month",
-		emailsLabel: "25,000 emails / month",
-		extraEmailsLabel: "Extra emails: $0.80 / 1,000",
+		emailsLabel: "50,000 emails / month",
+		extraEmailsLabel: "Extra emails: $0.50 / 1,000",
 		includesLabel: "All Free features +",
 		ctaLabel: "Get started",
 		ctaHref: "/dashboard/signup",
 		features: [
-			"25,000 emails / month",
+			"50,000 emails / month",
 			"No daily limit",
 			"5 agent inboxes",
 			"5 webhooks",
@@ -142,9 +142,9 @@ export const pricingPlans: PricingPlan[] = [
 			"Dedicated support",
 		],
 		comparison: {
-			monthlyEmails: "25,000",
+			monthlyEmails: "50,000",
 			dailyLimit: "No limit",
-			overage: "$0.80 / 1k",
+			overage: "$0.50 / 1k",
 			agentInbox: "5 inboxes",
 			webhooks: "5 webhooks",
 			customDomains: "5 domains",
@@ -182,16 +182,17 @@ export const pricingPlans: PricingPlan[] = [
 		description: "For early-stage founders and growing teams.",
 		monthlyPrice: 20,
 		priceSubline: "/month",
-		emailsLabel: "50,000 emails / month",
-		extraEmailsLabel: "Extra emails: $0.80 / 1,000",
+		emailsLabel: "100,000 emails / month",
+		extraEmailsLabel: "Extra emails: $0.50 / 1,000",
 		includesLabel: "All Individual features +",
 		ctaLabel: "Get started",
 		ctaHref: "/dashboard/signup",
 		badge: "Popular",
 		highlighted: true,
 		features: [
-			"50,000 emails / month",
+			"100,000 emails / month",
 			"No daily limit",
+			"1 dedicated IP",
 			"10 agent inboxes",
 			"10 webhooks",
 			"10 custom domains",
@@ -200,9 +201,9 @@ export const pricingPlans: PricingPlan[] = [
 			"Dedicated support",
 		],
 		comparison: {
-			monthlyEmails: "50,000",
+			monthlyEmails: "100,000",
 			dailyLimit: "No limit",
-			overage: "$0.80 / 1k",
+			overage: "$0.50 / 1k",
 			agentInbox: "10 inboxes",
 			webhooks: "10 webhooks",
 			customDomains: "10 domains",
@@ -218,7 +219,7 @@ export const pricingPlans: PricingPlan[] = [
 			humanInbox: true,
 			emailAuth: true,
 			pristineSharedIps: true,
-			dedicatedIp: "—",
+			dedicatedIp: "1 included",
 			spamTesting: true,
 			reputationMonitoring: true,
 			deliveryAnalytics: true,
@@ -392,11 +393,11 @@ export const comparisonSections: ComparisonSection[] = [
 	},
 ];
 
-export const paidOverageUsdPerThousand = 0.8;
+export const paidOverageUsdPerThousand = 0.5;
 
 /**
  * Cheapest published Reloop Cloud USD for a monthly send volume.
- * Free has no overage (sending pauses). Paid plans use included volume + $0.80/1k.
+ * Free has no overage (sending pauses). Paid plans use included volume + $0.50/1k.
  */
 export function hostedMonthlyUsdForVolume(volume: number): number {
 	if (volume <= 0) return 0;

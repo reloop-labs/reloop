@@ -192,7 +192,7 @@ export const comparePages: ComparePageContent[] = [
 		description:
 			"Learn how Reloop compares to Resend and why Reloop is an open-source alternative for developer email.",
 		summary:
-			"Reloop is email infrastructure you can host or self-host (Apache 2.0, KumoMTA). Resend is a hosted DX layer over Amazon SES. Reloop Free is 3,000 emails/month with a 200/day cap; Individual is $10/month for 25,000 emails with no daily cap. Reloop is not a drop-in Resend proxy.",
+			"Reloop is email infrastructure you can host or self-host (Apache 2.0, KumoMTA). Resend is a hosted DX layer over Amazon SES. Reloop Free is 3,000 emails/month with a 200/day cap; Individual is $10/month for 50,000 emails with no daily cap. Reloop is not a drop-in Resend proxy.",
 		categories: resendComparisonCategories,
 		faqs: [
 			{
@@ -225,12 +225,12 @@ export const comparePages: ComparePageContent[] = [
 			{
 				question: "Can Reloop handle SendGrid-scale volume?",
 				answer:
-					"Hosted Individual ($10/mo, 25,000 emails), Startup ($20/mo, 50,000 emails), and Enterprise target growing throughput; overage is $0.80 per 1,000. Self-hosted Reloop scales with your Kubernetes or bare-metal footprint.",
+					"Hosted Individual ($10/mo, 50,000 emails), Startup ($20/mo, 100,000 emails), and Enterprise target growing throughput; overage is $0.50 per 1,000. Self-hosted Reloop scales with your Kubernetes or bare-metal footprint.",
 			},
 			{
 				question: "What about dedicated IPs?",
 				answer:
-					"Dedicated IPs are optional/custom on Reloop Enterprise. Self-hosted deployments can attach your own IPs directly to your MTA layer.",
+					"Startup includes 1 dedicated IP and Enterprise is optional/custom. Self-hosted deployments can attach your own IPs directly to your MTA layer.",
 			},
 		],
 	},
@@ -312,14 +312,14 @@ export const comparePages: ComparePageContent[] = [
 		description:
 			"Compare Reloop to Loops: send-based pricing vs contact-list pricing, plus transactional API and self-host.",
 		summary:
-			"Loops prices by contact list size. Reloop prices by emails sent. Reloop Free is 3,000 emails/month (200/day); Individual is $10/month for 25,000 emails; Startup is $20/month for 50,000 emails. Reloop is the ESP/MTA, not a lifecycle UI on top of another sender.",
+			"Loops prices by contact list size. Reloop prices by emails sent. Reloop Free is 3,000 emails/month (200/day); Individual is $10/month for 50,000 emails; Startup is $20/month for 100,000 emails. Reloop is the ESP/MTA, not a lifecycle UI on top of another sender.",
 		categories: loopsComparisonCategories,
 		faqs: [
 			{
 				question:
 					"Why should we choose send-based pricing over contact-based pricing?",
 				answer:
-					"Contact-based pricing charges you for inactive leads and users who never open your emails. Reloop's send-based pricing charges for emails sent. Free is 3,000 emails/month (200/day); paid overage is $0.80 per 1,000.",
+					"Contact-based pricing charges you for inactive leads and users who never open your emails. Reloop's send-based pricing charges for emails sent. Free is 3,000 emails/month (200/day); paid overage is $0.50 per 1,000.",
 			},
 			{
 				question:
@@ -453,7 +453,7 @@ export function buildCompareIndexMarkdown(): string {
 		`HTML: ${origin}/compare`,
 		`Canonical pricing: ${origin}/pricing.md`,
 		"",
-		"Reloop is open-source email infrastructure (Apache 2.0): transactional API, SMTP, campaigns, webhooks, and an agent inbox. Hosted Reloop Cloud plans are Free (3,000 emails/month, 200/day), Individual $10/month (25,000), Startup $20/month (50,000), Enterprise custom. Self-host has no Reloop license fee.",
+		"Reloop is open-source email infrastructure (Apache 2.0): transactional API, SMTP, campaigns, webhooks, and an agent inbox. Hosted Reloop Cloud plans are Free (3,000 emails/month, 200/day), Individual $10/month (50,000), Startup $20/month (100,000), Enterprise custom. Self-host has no Reloop license fee.",
 		"",
 		"## Comparisons",
 		"",

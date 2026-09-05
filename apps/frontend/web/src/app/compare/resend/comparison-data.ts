@@ -11,7 +11,7 @@ export const resendComparisonCategories: ComparisonCategory[] = [
 		label: "Pricing & Email Volume",
 		icon: "invoice",
 		intro:
-			"Reloop Cloud Free is 3,000 emails/month with a 200/day cap. Individual is $10/mo for 25,000 emails with no daily cap. Overage is $0.80 vs Resend's $0.90 per 1,000. Self-hosting Reloop has no Reloop license fee (you pay your own infra).",
+			"Reloop Cloud Free is 3,000 emails/month with a 200/day cap. Individual is $10/mo for 50,000 emails with no daily cap. Overage is $0.50 vs Resend's $0.90 per 1,000. Self-hosting Reloop has no Reloop license fee (you pay your own infra).",
 		features: [
 			{
 				label: "Free monthly emails",
@@ -36,7 +36,7 @@ export const resendComparisonCategories: ComparisonCategory[] = [
 				icon: "invoice",
 				reloop: {
 					value: "$10 / mo",
-					note: "25,000 emails included",
+					note: "50,000 emails included",
 				},
 				competitor: {
 					value: "$20 / mo",
@@ -44,15 +44,15 @@ export const resendComparisonCategories: ComparisonCategory[] = [
 				},
 			},
 			{
-				label: "50,000 emails / mo plan",
+				label: "100,000 emails / mo plan",
 				icon: "mega-phone",
 				reloop: "$20 / mo",
-				competitor: "$20 / mo",
+				competitor: "$90 / mo",
 			},
 			{
 				label: "Overage rate (per 1k emails)",
 				icon: "arrow-swap",
-				reloop: "$0.80 / 1k",
+				reloop: "$0.50 / 1k",
 				competitor: "$0.90 / 1k",
 			},
 			{
@@ -169,7 +169,7 @@ export const resendComparisonCategories: ComparisonCategory[] = [
 			{
 				label: "Dedicated IPs",
 				icon: "globe",
-				reloop: "Enterprise",
+				reloop: "1 included (Startup)",
 				competitor: "Scale+",
 			},
 		],

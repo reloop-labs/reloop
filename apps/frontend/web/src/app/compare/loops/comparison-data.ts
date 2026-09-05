@@ -38,15 +38,15 @@ export const loopsComparisonCategories: ComparisonCategory[] = [
 				icon: "invoice",
 				reloop: {
 					value: "$10 / mo",
-					note: "25,000 emails included",
+					note: "50,000 emails included",
 				},
 				competitor: "$49 / mo (10k contacts)",
 			},
 			{
-				label: "50,000 volume plan",
+				label: "100,000 volume plan",
 				icon: "mega-phone",
 				reloop: "$20 / mo",
-				competitor: "$199 / mo (50k contacts)",
+				competitor: "$399 / mo (100k contacts)",
 			},
 			{
 				label: "Self-hosted email sends",

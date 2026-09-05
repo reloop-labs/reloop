@@ -25,10 +25,10 @@ const reloopFreeValue = formatPrice(reloopFree?.monthlyPrice ?? 0);
 const reloopFreeNote = `${reloopFree?.emailsLabel ?? "3,000 emails / month"} · ${reloopFree?.comparison.dailyLimit ?? "200"} / day`;
 const reloopEntryValue = `${formatPrice(reloopIndividual?.monthlyPrice ?? 10)} / mo`;
 const reloopEntryNote =
-	reloopIndividual?.emailsLabel ?? "25,000 emails / month";
+	reloopIndividual?.emailsLabel ?? "50,000 emails / month";
 const reloopMidValue = `${formatPrice(reloopStartup?.monthlyPrice ?? 20)} / mo`;
-const reloopMidNote = reloopStartup?.emailsLabel ?? "50,000 emails / month";
-const reloopOverage = reloopIndividual?.comparison.overage ?? "$0.80 / 1k";
+const reloopMidNote = reloopStartup?.emailsLabel ?? "100,000 emails / month";
+const reloopOverage = reloopIndividual?.comparison.overage ?? "$0.50 / 1k";
 
 const reloopSendRows = {
 	model: "Pay per email sent",
@@ -59,7 +59,7 @@ function sendRows(
 		"free" | "entry" | "mid" | "extra" | "selfHost",
 		ComparePriceCell
 	>,
-	midLabel = "50,000 emails",
+	midLabel = "100,000 emails",
 ): ComparePriceRow[] {
 	return [
 		{
@@ -216,10 +216,10 @@ const COMPETITOR_PRICING: Record<string, ComparePricing> = {
 			},
 			{
 				id: "mid",
-				label: "50,000 emails",
+				label: "100,000 emails",
 				reloop: reloopSendRows.mid,
 				competitor: {
-					value: "~$5 + transfer",
+					value: "~$10 + transfer",
 					note: "Sending only · no product UI",
 				},
 			},
@@ -278,14 +278,14 @@ const COMPETITOR_PRICING: Record<string, ComparePricing> = {
 			},
 			{
 				id: "mid",
-				label: "At 50,000",
+				label: "At 100,000",
 				reloop: {
 					value: reloopSendRows.mid.value,
-					note: "50,000 emails sent",
+					note: "100,000 emails sent",
 				},
 				competitor: {
-					value: "$199 / mo",
-					note: "50,000 contacts stored",
+					value: "$399 / mo",
+					note: "100,000 contacts stored",
 				},
 			},
 			{
@@ -328,14 +328,14 @@ const COMPETITOR_PRICING: Record<string, ComparePricing> = {
 			},
 			{
 				id: "mid",
-				label: "At 50,000",
+				label: "At 100,000",
 				reloop: {
 					value: reloopSendRows.mid.value,
-					note: "50,000 emails sent",
+					note: "100,000 emails sent",
 				},
 				competitor: {
-					value: "$385 / mo",
-					note: "Essentials · 50,000 contacts",
+					value: "See site",
+					note: "Essentials · 100,000 contacts",
 				},
 			},
 			{

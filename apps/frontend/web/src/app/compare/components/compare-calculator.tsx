@@ -438,7 +438,7 @@ export function CompareCalculator() {
 						step={1000}
 						presets={MARKETING_PRESETS}
 						costs={marketingCosts}
-						savingsFootnote="Reloop charges $0 for contact storage. You only pay for what you actually send ($0.10 / 1k emails)."
+						savingsFootnote="Reloop charges $0 for contact storage. You only pay for what you actually send ($0.50 / 1k emails)."
 					/>
 				</div>
 			</div>

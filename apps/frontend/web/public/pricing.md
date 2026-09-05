@@ -29,11 +29,11 @@
 - Price: $10 / month
 - Note: /month
 - Description: For solo developers and personal projects.
-- Emails: 25,000 emails / month
-- Overage: Extra emails: $0.80 / 1,000
+- Emails: 50,000 emails / month
+- Overage: Extra emails: $0.50 / 1,000
 - CTA: Get started → /dashboard/signup
 - Features:
-  - 25,000 emails / month
+  - 50,000 emails / month
   - No daily limit
   - 5 agent inboxes
   - 5 webhooks
@@ -47,12 +47,13 @@
 - Price: $20 / month
 - Note: /month
 - Description: For early-stage founders and growing teams.
-- Emails: 50,000 emails / month
-- Overage: Extra emails: $0.80 / 1,000
+- Emails: 100,000 emails / month
+- Overage: Extra emails: $0.50 / 1,000
 - CTA: Get started → /dashboard/signup
 - Features:
-  - 50,000 emails / month
+  - 100,000 emails / month
   - No daily limit
+  - 1 dedicated IP
   - 10 agent inboxes
   - 10 webhooks
   - 10 custom domains
