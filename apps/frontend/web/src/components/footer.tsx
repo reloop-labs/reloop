@@ -150,7 +150,7 @@ export const Footer = () => {
 				<div aria-hidden className="h-24" />
 				<FooterBrand />
 				<div aria-hidden className="h-24" />
-				<div className="grid grid-cols-2 border-stroke-soft-100 border-t lg:grid-cols-5 dark:border-white/10">
+				<div className="grid grid-cols-2 border-stroke-soft-100 border-b lg:grid-cols-5 dark:border-white/10">
 					{columns.map((column, index) => (
 						<nav
 							key={column.group}
@@ -180,6 +180,7 @@ export const Footer = () => {
 						</nav>
 					))}
 				</div>
+				<div aria-hidden className="h-24" />
 				<FooterPixelStrip />
 			</div>
 		</footer>
