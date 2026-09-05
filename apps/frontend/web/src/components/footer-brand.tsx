@@ -137,7 +137,7 @@ function BrandCell({
 
 export function FooterBrand() {
 	return (
-		<div className="grid border-stroke-soft-100 border-b lg:grid-cols-2 dark:border-white/10">
+		<div className="grid border-stroke-soft-100 border-t border-b lg:grid-cols-2 dark:border-white/10">
 			<div className="border-stroke-soft-100 border-b p-8 sm:p-10 lg:border-r lg:border-b-0 dark:border-white/10">
 				<Link
 					href="/home"

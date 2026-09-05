@@ -113,7 +113,7 @@ function FooterLinkItem({
 		link.href.startsWith("/docs") || link.href.startsWith("/dashboard");
 
 	const className = cn(
-		"flex min-h-[52px] items-center font-medium text-[15px] text-text-strong-950 transition-colors hover:text-primary-base dark:text-white dark:hover:text-white/70",
+		"flex min-h-[52px] items-center font-normal text-[14px] text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/55 dark:hover:text-white",
 		!isLast && "border-stroke-soft-100 border-b dark:border-white/10",
 	);
 
@@ -153,7 +153,7 @@ export const Footer = () => {
 	}, []);
 
 	return (
-		<footer className="w-full border-stroke-soft-100 border-t border-b bg-bg-white-0 text-text-strong-950 dark:border-white/10 dark:bg-black dark:text-white">
+		<footer className="w-full border-stroke-soft-100 border-b bg-bg-white-0 text-text-strong-950 dark:border-white/10 dark:bg-black dark:text-white">
 			<div className="mx-auto w-full max-w-5xl border-stroke-soft-100 md:max-w-7xl xl:border-x dark:border-white/10">
 				<div aria-hidden className="h-24" />
 				<FooterBrand />
@@ -172,7 +172,7 @@ export const Footer = () => {
 						>
 							<h2
 								id={`footer-heading-${column.group}`}
-								className="border-stroke-soft-100 border-b px-5 py-4 font-semibold text-[12px] text-text-strong-950 uppercase tracking-[0.08em] sm:px-6 sm:py-5 dark:border-white/10 dark:text-white"
+								className="border-stroke-soft-100 border-b px-5 py-4 font-medium text-[12px] text-text-strong-950 uppercase tracking-[0.04em] sm:px-6 sm:py-5 dark:border-white/10 dark:text-white"
 							>
 								{column.group}
 							</h2>
