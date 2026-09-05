@@ -141,7 +141,7 @@ export function PricingVolumeSlider({
 						<Slider.Thumb aria-label="Monthly email volume" />
 					</Slider.Root>
 
-					<div className="relative mt-3 h-16">
+					<div className="relative mt-1 h-16">
 						{TICKS.flatMap((_tick, index) => {
 							const nodes = [];
 							if (index < TICKS.length - 1) {
