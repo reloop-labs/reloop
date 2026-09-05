@@ -3,6 +3,7 @@
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
+import type { PlanId } from "@reloop/web/lib/pricing";
 import {
 	comparisonSections,
 	formatPrice,
@@ -234,9 +235,11 @@ function getFeatureIcon(feature: string, customClassName?: string) {
 function PlanColumn({
 	plan,
 	index,
+	recommended,
 }: {
 	plan: (typeof pricingPlans)[number];
 	index: number;
+	recommended: boolean;
 }) {
 	const price = getPlanPrice(plan);
 	const isCustom = price === null;
@@ -253,7 +256,7 @@ function PlanColumn({
 			className={cn(
 				"flex min-h-[440px] flex-col border-stroke-soft-200 p-6 pb-5 sm:min-h-[460px] sm:p-8 sm:pb-6 lg:p-6 lg:pb-5 xl:p-8 xl:pb-6 dark:border-white/10",
 				borderClasses,
-				plan.highlighted && "bg-bg-weak-50 dark:bg-white/[0.03]",
+				recommended && "bg-bg-weak-50 dark:bg-white/[0.03]",
 			)}
 		>
 			<div>
@@ -261,9 +264,9 @@ function PlanColumn({
 					<h3 className="font-semibold text-[15px] text-text-strong-950 dark:text-white">
 						{plan.name}
 					</h3>
-					{plan.badge && (
-						<span className="shrink-0 relative overflow-hidden rounded-full bg-primary-base px-2 py-0.5 text-center font-semibold text-[10px] text-white uppercase tracking-[0.14em] shadow-fancy-buttons-primary before:pointer-events-none before:absolute before:inset-0 before:rounded-[inherit] before:bg-gradient-to-b before:from-static-white before:to-transparent before:opacity-[.16]">
-							{plan.badge}
+					{recommended && (
+						<span className="relative shrink-0 overflow-hidden rounded-full bg-primary-base px-2 py-0.5 text-center font-semibold text-[10px] text-white uppercase tracking-[0.14em] shadow-fancy-buttons-primary before:pointer-events-none before:absolute before:inset-0 before:rounded-[inherit] before:bg-gradient-to-b before:from-static-white before:to-transparent before:opacity-[.16]">
+							{plan.badge ?? "Recommended"}
 						</span>
 					)}
 				</div>
@@ -327,7 +330,7 @@ function PlanColumn({
 					href={plan.ctaHref}
 					label={plan.ctaLabel}
 					external={plan.ctaExternal}
-					variant={plan.highlighted ? "primary" : "default"}
+					variant={recommended ? "primary" : "default"}
 				/>
 				{plan.secondaryCta && (
 					<PlanCtaLink
@@ -402,8 +405,8 @@ function comparisonPriceLine(plan: (typeof pricingPlans)[number]) {
 	};
 }
 
-function highlightColumn(plan: (typeof pricingPlans)[number]) {
-	return plan.highlighted
+function highlightColumn(recommended: boolean) {
+	return recommended
 		? "border-stroke-soft-200 border-x bg-bg-weak-50/60 dark:border-white/10 dark:bg-white/[0.03]"
 		: "";
 }
@@ -411,7 +414,13 @@ function highlightColumn(plan: (typeof pricingPlans)[number]) {
 const COMPARISON_PAD_LEFT = "pl-5 sm:pl-7 lg:pl-9";
 const COMPARISON_PAD_RIGHT = "pr-5 sm:pr-7 lg:pr-9";
 
-function ComparisonTable() {
+function ComparisonTable({
+	recommendedPlanId,
+}: {
+	recommendedPlanId?: PlanId;
+}) {
+	const isRecommended = (plan: (typeof pricingPlans)[number]) =>
+		recommendedPlanId ? plan.id === recommendedPlanId : !!plan.highlighted;
 	return (
 		<div className="-mx-4 sm:-mx-6 lg:-mx-8 overflow-x-auto lg:overflow-visible">
 			<div className={cn("grid w-full min-w-[760px]", COMPARISON_GRID_COLS)}>
@@ -424,6 +433,7 @@ function ComparisonTable() {
 				{pricingPlans.map((plan, planIndex) => {
 					const price = comparisonPriceLine(plan);
 					const isLast = planIndex === pricingPlans.length - 1;
+					const recommended = isRecommended(plan);
 					return (
 						<div
 							key={plan.id}
@@ -433,7 +443,7 @@ function ComparisonTable() {
 								className={cn(
 									"flex flex-col gap-4 px-5 pt-6 pb-4 sm:px-6 sm:pt-6 sm:pb-4",
 									isLast && COMPARISON_PAD_RIGHT,
-									plan.highlighted &&
+									recommended &&
 										"rounded-t-2xl border-stroke-soft-200 border-x border-t bg-bg-weak-50/60 dark:border-white/10 dark:bg-white/[0.03]",
 								)}
 							>
@@ -442,9 +452,9 @@ function ComparisonTable() {
 										<span className="font-medium text-label-md text-text-strong-950 dark:text-white">
 											{plan.name}
 										</span>
-										{plan.badge ? (
-											<span className="shrink-0 relative overflow-hidden rounded-full bg-primary-base px-2 py-0.5 text-center font-semibold text-[10px] text-white uppercase tracking-[0.14em] shadow-fancy-buttons-primary before:pointer-events-none before:absolute before:inset-0 before:rounded-[inherit] before:bg-gradient-to-b before:from-static-white before:to-transparent before:opacity-[.16]">
-												{plan.badge}
+										{recommended ? (
+											<span className="relative shrink-0 overflow-hidden rounded-full bg-primary-base px-2 py-0.5 text-center font-semibold text-[10px] text-white uppercase tracking-[0.14em] shadow-fancy-buttons-primary before:pointer-events-none before:absolute before:inset-0 before:rounded-[inherit] before:bg-gradient-to-b before:from-static-white before:to-transparent before:opacity-[.16]">
+												{plan.badge ?? "Recommended"}
 											</span>
 										) : null}
 									</div>
@@ -461,7 +471,7 @@ function ComparisonTable() {
 											href={plan.ctaHref}
 											label={plan.ctaLabel}
 											external={plan.ctaExternal}
-											variant={plan.highlighted ? "primary" : "default"}
+											variant={recommended ? "primary" : "default"}
 											size="small"
 										/>
 									</div>
@@ -491,7 +501,7 @@ function ComparisonTable() {
 									sectionIndex > 0 ? "pt-10" : "pt-6",
 									"pb-3",
 									planIndex === pricingPlans.length - 1 && COMPARISON_PAD_RIGHT,
-									highlightColumn(plan),
+									highlightColumn(plan, isRecommended(plan)),
 								)}
 							/>
 						))}
@@ -521,7 +531,7 @@ function ComparisonTable() {
 												"flex items-center border-stroke-soft-200 border-b px-4 py-3 dark:border-white/[0.06]",
 												planIndex === pricingPlans.length - 1 &&
 													COMPARISON_PAD_RIGHT,
-												highlightColumn(plan),
+												highlightColumn(plan, isRecommended(plan)),
 											)}
 										>
 											<ComparisonCell
@@ -543,8 +553,8 @@ function ComparisonTable() {
 						className={cn(
 							"h-8",
 							planIndex === pricingPlans.length - 1 && COMPARISON_PAD_RIGHT,
-							plan.highlighted && "rounded-b-2xl border-b",
-							highlightColumn(plan),
+							isRecommended(plan) && "rounded-b-2xl border-b",
+							highlightColumn(plan, isRecommended(plan)),
 						)}
 					/>
 				))}
@@ -553,16 +563,27 @@ function ComparisonTable() {
 	);
 }
 
-export function PricingSection() {
+export function PricingSection({
+	recommendedPlanId,
+}: {
+	recommendedPlanId?: PlanId;
+}) {
+	const isRecommended = (plan: (typeof pricingPlans)[number]) =>
+		recommendedPlanId ? plan.id === recommendedPlanId : !!plan.highlighted;
 	return (
 		<>
 			<div className="-mx-4 sm:-mx-6 lg:-mx-8 border-stroke-soft-200 border-y sm:grid sm:grid-cols-2 lg:grid-cols-4 dark:border-white/10">
 				{pricingPlans.map((plan, index) => (
-					<PlanColumn key={plan.id} plan={plan} index={index} />
+					<PlanColumn
+						key={plan.id}
+						plan={plan}
+						index={index}
+						recommended={isRecommended(plan)}
+					/>
 				))}
 			</div>
 			<div className="mt-24">
-				<ComparisonTable />
+				<ComparisonTable recommendedPlanId={recommendedPlanId} />
 			</div>
 		</>
 	);

@@ -5,9 +5,9 @@ import * as Slider from "@reloop/ui/slider";
 import {
 	formatPrice,
 	hostedMonthlyUsdForVolume,
+	type PlanId,
 } from "@reloop/web/lib/pricing";
 import Link from "next/link";
-import { useState } from "react";
 
 const TICKS = [
 	{ value: 3000, label: "3k", plan: "Free" },
@@ -22,7 +22,19 @@ const TICKS = [
 const SEGMENTS = TICKS.length - 1;
 const SEGMENT_WIDTH = 100 / SEGMENTS;
 const MINOR_TICKS_PER_GAP = 4;
-const SNAP_THRESHOLD = 1.5;
+const SNAP_THRESHOLD = 3;
+
+/**
+ * Radix positions the thumb at `left: calc(percent% + offset)` and keeps it
+ * in-bounds, where offset shrinks from +halfThumb at 0% to -halfThumb at 100%.
+ * Our thumb is 16px wide (size-1.5 + 5px border), so ticks use the same
+ * correction to sit pixel-exact under the thumb center.
+ */
+const THUMB_HALF_WIDTH = 8;
+const alignOffset = (percent: number) =>
+	THUMB_HALF_WIDTH - percent * ((THUMB_HALF_WIDTH * 2) / 100);
+const tickLeft = (percent: number) =>
+	`calc(${percent}% + ${alignOffset(percent)}px)`;
 
 const clamp = (n: number, min: number, max: number) =>
 	Math.min(max, Math.max(min, n));
@@ -69,8 +81,21 @@ function recommendedPlan(volume: number) {
 	return individual <= startup ? "Individual" : "Startup";
 }
 
-export function PricingVolumeSlider() {
-	const [volume, setVolume] = useState(50000);
+export function recommendPlanIdForVolume(volume: number): PlanId {
+	if (volume > 500000) return "enterprise";
+	if (volume <= 3000) return "free";
+	const individual = 10 + (Math.max(0, volume - 50000) / 1000) * 0.5;
+	const startup = 20 + (Math.max(0, volume - 100000) / 1000) * 0.5;
+	return individual <= startup ? "individual" : "startup";
+}
+
+export function PricingVolumeSlider({
+	volume,
+	onVolumeChange,
+}: {
+	volume: number;
+	onVolumeChange: (volume: number) => void;
+}) {
 	const position = toPosition(volume);
 	const cost = hostedMonthlyUsdForVolume(volume);
 	const plan = recommendedPlan(volume);
@@ -110,7 +135,7 @@ export function PricingVolumeSlider() {
 						max={100}
 						step={0.5}
 						value={[position]}
-						onValueChange={(value) => setVolume(toVolume(value[0] ?? 0))}
+						onValueChange={(value) => onVolumeChange(toVolume(value[0] ?? 0))}
 						aria-label="Monthly email volume"
 					>
 						<Slider.Thumb aria-label="Monthly email volume" />
@@ -127,7 +152,7 @@ export function PricingVolumeSlider() {
 										<span
 											key={`minor-${index}-${j}`}
 											aria-hidden
-											style={{ left: `${left}%` }}
+											style={{ left: tickLeft(left) }}
 											className="-translate-x-1/2 absolute top-0.5"
 										>
 											<span className="block h-1 w-px bg-stroke-soft-200/70 dark:bg-white/10" />
@@ -144,9 +169,9 @@ export function PricingVolumeSlider() {
 								<button
 									key={tick.label}
 									type="button"
-									onClick={() => setVolume(tick.value)}
+									onClick={() => onVolumeChange(tick.value)}
 									aria-label={`Set volume to ${tick.label}`}
-									style={{ left: `${left}%` }}
+									style={{ left: tickLeft(left) }}
 									className={cn(
 										"absolute top-0 flex flex-col gap-1 px-0.5",
 										index === 0 && "items-start",

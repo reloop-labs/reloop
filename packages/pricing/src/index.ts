@@ -187,7 +187,7 @@ export const pricingPlans: PricingPlan[] = [
 		includesLabel: "All Individual features +",
 		ctaLabel: "Get started",
 		ctaHref: "/dashboard/signup",
-		badge: "Popular",
+		badge: "Recommended",
 		highlighted: true,
 		features: [
 			"100,000 emails / month",

@@ -1,12 +1,10 @@
 import { JsonLd } from "@reloop/web/components/json-ld";
-import { PageSection } from "@reloop/web/components/page-shell";
 import { pricingFaqItems } from "@reloop/web/lib/pricing-faq";
 import { faqPageJsonLd, pricingProductJsonLd } from "@reloop/web/lib/schema";
 import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 import { PricingFaq } from "./components/pricing-faq";
-import { PricingSection } from "./components/pricing-section";
-import { PricingVolumeSlider } from "./components/pricing-volume-slider";
+import { PricingExplorer } from "./components/pricing-explorer";
 
 // TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
 // See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
@@ -85,11 +83,7 @@ const PricingPage = () => {
 					</p>
 				</header>
 
-				<PricingVolumeSlider />
-
-				<PageSection flushTop>
-					<PricingSection />
-				</PageSection>
+				<PricingExplorer />
 
 				<PricingFaq />
 			</div>
