@@ -637,9 +637,6 @@ function ComparisonTable({
 									className={cn(
 										"flex min-h-[60px] items-center border-stroke-soft-100 border-b px-5 py-4 transition-colors duration-150 sm:px-7 lg:px-9 dark:border-white/[0.07]",
 										"group-hover/row:bg-bg-weak-50/70 dark:group-hover/row:bg-white/[0.03]",
-										rowIndex === 0 &&
-											section.title &&
-											"bg-bg-weak-50/[0.4] dark:bg-white/[0.015]",
 									)}
 								>
 									<span className="font-normal text-[14px] text-text-strong-950 dark:text-white">
