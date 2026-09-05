@@ -8,9 +8,6 @@ import {
 } from "@reloop/web/lib/pricing";
 import { useState } from "react";
 
-const MIN = 3000;
-const MAX = 1000000;
-
 const TICKS = [
 	{ value: 3000, label: "3k", plan: "Free" },
 	{ value: 10000, label: "10k", plan: "Individual" },
@@ -21,14 +18,38 @@ const TICKS = [
 	{ value: 1000000, label: "1M", plan: "Startup" },
 ];
 
-const toPosition = (volume: number) =>
-	Math.round((Math.log(volume / MIN) / Math.log(MAX / MIN)) * 100);
+const SEGMENTS = TICKS.length - 1;
+const SEGMENT_WIDTH = 100 / SEGMENTS;
 
-const toVolume = (position: number) =>
-	Math.max(
-		MIN,
-		Math.round((MIN * (MAX / MIN) ** (position / 100)) / 1000) * 1000,
-	);
+const clamp = (n: number, min: number, max: number) =>
+	Math.min(max, Math.max(min, n));
+
+/** Evenly-spaced tick i sits at i * SEGMENT_WIDTH; values interpolate linearly within each segment. */
+const toPosition = (volume: number) => {
+	const first = TICKS[0]?.value ?? 3000;
+	if (volume <= first) return 0;
+	for (let i = 0; i < SEGMENTS; i++) {
+		const low = TICKS[i]?.value ?? first;
+		const high = TICKS[i + 1]?.value ?? low;
+		if (volume <= high) {
+			return high === low
+				? i * SEGMENT_WIDTH
+				: (i + (volume - low) / (high - low)) * SEGMENT_WIDTH;
+		}
+	}
+	return 100;
+};
+
+const toVolume = (position: number) => {
+	const clamped = clamp(position, 0, 100);
+	const index = Math.min(Math.floor(clamped / SEGMENT_WIDTH), SEGMENTS - 1);
+	const low = TICKS[index]?.value ?? 3000;
+	const high = TICKS[index + 1]?.value ?? low;
+	const fraction = clamped / SEGMENT_WIDTH - index;
+	const raw = low + fraction * (high - low);
+	const granularity = raw < 10000 ? 100 : 1000;
+	return Math.round(raw / granularity) * granularity;
+};
 
 const formatVolume = (volume: number) =>
 	new Intl.NumberFormat("en-US").format(volume);
@@ -48,8 +69,8 @@ export function PricingVolumeSlider() {
 
 	let activeTick = 0;
 	let smallestGap = Number.POSITIVE_INFINITY;
-	TICKS.forEach((tick, index) => {
-		const gap = Math.abs(toPosition(tick.value) - position);
+	TICKS.forEach((_tick, index) => {
+		const gap = Math.abs(index * SEGMENT_WIDTH - position);
 		if (gap < smallestGap) {
 			smallestGap = gap;
 			activeTick = index;
@@ -73,7 +94,7 @@ export function PricingVolumeSlider() {
 					<Slider.Root
 						min={0}
 						max={100}
-						step={1}
+						step={0.5}
 						value={[position]}
 						onValueChange={(value) => setVolume(toVolume(value[0] ?? 0))}
 						aria-label="Monthly email volume"
@@ -81,25 +102,16 @@ export function PricingVolumeSlider() {
 						<Slider.Thumb aria-label="Monthly email volume" />
 					</Slider.Root>
 
-					<div className="relative mt-3 h-12">
+					<div className="mt-3 flex items-start justify-between">
 						{TICKS.map((tick, index) => {
 							const active = index === activeTick;
-							const left = toPosition(tick.value);
 							return (
 								<button
 									key={tick.label}
 									type="button"
 									onClick={() => setVolume(tick.value)}
 									aria-label={`Set volume to ${tick.label}`}
-									style={{ left: `${left}%` }}
-									className={cn(
-										"absolute top-0 flex flex-col items-center gap-1 px-0.5",
-										index === 0 && "items-start",
-										index === TICKS.length - 1 && "items-end",
-										index > 0 && index < TICKS.length - 1 && "-translate-x-1/2",
-										index === 0 && "translate-x-0",
-										index === TICKS.length - 1 && "-translate-x-full",
-									)}
+									className="flex min-w-0 flex-col items-center gap-1 px-0.5"
 								>
 									<span
 										aria-hidden
