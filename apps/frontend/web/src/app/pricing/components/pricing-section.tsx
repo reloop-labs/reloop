@@ -387,7 +387,7 @@ function ComparisonCell({
 		return (
 			<Icon
 				name="check"
-				className="size-[18px] text-text-strong-950 dark:text-white/85"
+				className="size-4 text-text-strong-950 dark:text-white/85"
 				aria-label="Included"
 			/>
 		);
@@ -542,10 +542,14 @@ function ComparisonTable({
 							/>
 						))}
 						{section.rows.map((row, rowIndex) => (
-							<Fragment key={row.key}>
+							<div
+								key={row.key}
+								className="group/row col-span-full grid grid-cols-subgrid"
+							>
 								<div
 									className={cn(
-										"flex min-h-[60px] items-center gap-3 border-stroke-soft-100 border-b px-5 py-4 sm:px-7 lg:px-9 dark:border-white/[0.07]",
+										"flex min-h-[60px] items-center gap-3 border-stroke-soft-100 border-b px-5 py-4 transition-colors duration-150 sm:px-7 lg:px-9 dark:border-white/[0.07]",
+										"group-hover/row:bg-bg-weak-50/70 dark:group-hover/row:bg-white/[0.03]",
 										rowIndex === 0 &&
 											section.title &&
 											"bg-bg-weak-50/[0.4] dark:bg-white/[0.015]",
@@ -553,9 +557,9 @@ function ComparisonTable({
 								>
 									{getFeatureIcon(
 										row.label,
-										"size-[18px] shrink-0 text-text-strong-950 dark:text-white/70",
+										"size-4 shrink-0 text-text-strong-950 dark:text-white/70",
 									)}
-									<span className="font-serif text-[18.5px] text-text-strong-950 leading-tight tracking-[-0.01em] dark:text-white">
+									<span className="font-normal text-[14px] text-text-strong-950 dark:text-white">
 										{row.label}
 									</span>
 								</div>
@@ -566,8 +570,10 @@ function ComparisonTable({
 										<div
 											key={plan.id}
 											className={cn(
-												"flex min-h-[60px] items-center justify-center border-stroke-soft-100 border-b border-l px-4 py-4 text-center dark:border-white/[0.07]",
-												active && "bg-bg-weak-50/40 dark:bg-white/[0.02]",
+												"flex min-h-[60px] items-center justify-center border-stroke-soft-100 border-b border-l px-4 py-4 text-center transition-colors duration-150 dark:border-white/[0.07]",
+												"group-hover/row:bg-bg-weak-50/70 dark:group-hover/row:bg-white/[0.03]",
+												active &&
+													"bg-bg-weak-50/40 group-hover/row:bg-bg-weak-50/90 dark:bg-white/[0.02] dark:group-hover/row:bg-white/[0.05]",
 											)}
 										>
 											<ComparisonCell
@@ -577,7 +583,7 @@ function ComparisonTable({
 										</div>
 									);
 								})}
-							</Fragment>
+							</div>
 						))}
 					</Fragment>
 				))}
