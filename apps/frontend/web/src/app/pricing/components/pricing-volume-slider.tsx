@@ -21,6 +21,8 @@ const TICKS = [
 
 const SEGMENTS = TICKS.length - 1;
 const SEGMENT_WIDTH = 100 / SEGMENTS;
+const MINOR_TICKS_PER_GAP = 4;
+const SNAP_THRESHOLD = 1.5;
 
 const clamp = (n: number, min: number, max: number) =>
 	Math.min(max, Math.max(min, n));
@@ -43,6 +45,10 @@ const toPosition = (volume: number) => {
 
 const toVolume = (position: number) => {
 	const clamped = clamp(position, 0, 100);
+	const nearestBoundary = Math.round(clamped / SEGMENT_WIDTH);
+	if (Math.abs(clamped - nearestBoundary * SEGMENT_WIDTH) <= SNAP_THRESHOLD) {
+		return TICKS[nearestBoundary]?.value ?? TICKS[0]?.value ?? 3000;
+	}
 	const index = Math.min(Math.floor(clamped / SEGMENT_WIDTH), SEGMENTS - 1);
 	const low = TICKS[index]?.value ?? 3000;
 	const high = TICKS[index + 1]?.value ?? low;
@@ -68,6 +74,12 @@ export function PricingVolumeSlider() {
 	const position = toPosition(volume);
 	const cost = hostedMonthlyUsdForVolume(volume);
 	const plan = recommendedPlan(volume);
+	const included =
+		plan === "Individual" ? 50000 : plan === "Startup" ? 100000 : 0;
+	const overage =
+		plan === "Individual" || plan === "Startup"
+			? (Math.max(0, volume - included) / 1000) * 0.5
+			: 0;
 
 	let activeTick = 0;
 	let smallestGap = Number.POSITIVE_INFINITY;
@@ -104,16 +116,45 @@ export function PricingVolumeSlider() {
 						<Slider.Thumb aria-label="Monthly email volume" />
 					</Slider.Root>
 
-					<div className="mt-3 flex items-start justify-between">
+					<div className="relative mt-3 h-16">
+						{TICKS.flatMap((_tick, index) => {
+							const nodes = [];
+							if (index < TICKS.length - 1) {
+								for (let j = 1; j <= MINOR_TICKS_PER_GAP; j++) {
+									const left =
+										(index + j / (MINOR_TICKS_PER_GAP + 1)) * SEGMENT_WIDTH;
+									nodes.push(
+										<span
+											key={`minor-${index}-${j}`}
+											aria-hidden
+											style={{ left: `${left}%` }}
+											className="-translate-x-1/2 absolute top-0.5"
+										>
+											<span className="block h-1 w-px bg-stroke-soft-200/70 dark:bg-white/10" />
+										</span>,
+									);
+								}
+							}
+							return nodes;
+						})}
 						{TICKS.map((tick, index) => {
 							const active = index === activeTick;
+							const left = index * SEGMENT_WIDTH;
 							return (
 								<button
 									key={tick.label}
 									type="button"
 									onClick={() => setVolume(tick.value)}
 									aria-label={`Set volume to ${tick.label}`}
-									className="flex min-w-0 flex-col items-center gap-1 px-0.5"
+									style={{ left: `${left}%` }}
+									className={cn(
+										"absolute top-0 flex flex-col gap-1 px-0.5",
+										index === 0 && "items-start",
+										index === TICKS.length - 1 && "-translate-x-full items-end",
+										index > 0 &&
+											index < TICKS.length - 1 &&
+											"-translate-x-1/2 items-center",
+									)}
 								>
 									<span
 										aria-hidden
@@ -157,6 +198,11 @@ export function PricingVolumeSlider() {
 							<Link href="/contact" className="underline underline-offset-4">
 								contact sales
 							</Link>
+						</>
+					) : overage > 0 ? (
+						<>
+							{plan} + {formatPrice(overage)} in extra emails ={" "}
+							{formatPrice(cost)}/month
 						</>
 					) : (
 						<>
