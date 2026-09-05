@@ -286,6 +286,12 @@
 					"type": "text",
 					"primaryKey": false,
 					"notNull": false
+				},
+				"deleted_at": {
+					"name": "deleted_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": false
 				}
 			},
 			"indexes": {

@@ -15,7 +15,7 @@ import {
 } from "@reloop/bus";
 import type { DatabaseInstance } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import { and, eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 import { createError } from "evlog";
 
 export type ApiKeyCredentialBus = {
@@ -126,6 +126,7 @@ export function createApiKeyCredential(deps: ApiKeyCredentialDeps) {
 			where: and(
 				eq(schema.apikey.id, id),
 				eq(schema.apikey.organizationId, organizationId),
+				isNull(schema.apikey.deletedAt),
 			),
 			with: { user: true },
 		});
@@ -237,6 +238,10 @@ export function createApiKeyCredential(deps: ApiKeyCredentialDeps) {
 						log.warn("API key not found");
 						throw ApiKeyErrors.notFound(id);
 					}
+					if ((row as unknown as { deletedAt?: Date | null }).deletedAt) {
+						log.warn("API key not found (soft-deleted)");
+						throw ApiKeyErrors.notFound(id);
+					}
 
 					if (row.enabled) {
 						log.info("API key is already enabled");
@@ -253,6 +258,7 @@ export function createApiKeyCredential(deps: ApiKeyCredentialDeps) {
 							and(
 								eq(schema.apikey.id, id),
 								eq(schema.apikey.organizationId, organizationId),
+								isNull(schema.apikey.deletedAt),
 							),
 						)
 						.returning();
@@ -311,6 +317,7 @@ export function createApiKeyCredential(deps: ApiKeyCredentialDeps) {
 					and(
 						eq(schema.apikey.id, id),
 						eq(schema.apikey.organizationId, organizationId),
+						isNull(schema.apikey.deletedAt),
 					),
 				)
 				.returning();
@@ -369,6 +376,10 @@ export function createApiKeyCredential(deps: ApiKeyCredentialDeps) {
 						log.warn("API key not found");
 						throw ApiKeyErrors.notFound(id);
 					}
+					if ((row as unknown as { deletedAt?: Date | null }).deletedAt) {
+						log.warn("API key not found (soft-deleted)");
+						throw ApiKeyErrors.notFound(id);
+					}
 
 					if (!row.enabled) {
 						log.info("API key is already disabled");
@@ -386,6 +397,7 @@ export function createApiKeyCredential(deps: ApiKeyCredentialDeps) {
 							and(
 								eq(schema.apikey.id, id),
 								eq(schema.apikey.organizationId, organizationId),
+								isNull(schema.apikey.deletedAt),
 							),
 						)
 						.returning();
@@ -466,8 +478,21 @@ export function createApiKeyCredential(deps: ApiKeyCredentialDeps) {
 
 				const hashedKey = row.key;
 
-				const [deleted] = await tx
-					.delete(schema.apikey)
+				// Soft delete: keep row + FK history (email_log/email_send) intact.
+				// Hard delete would FK-fail via email_log -> email_send (NO ACTION)
+				// and destroy audit history. Mark as deleted instead.
+				if (row.deletedAt) {
+					log.info("API key already soft-deleted");
+					return { kind: "deleted" as const, hashedKey };
+				}
+
+				const [softDeleted] = await tx
+					.update(schema.apikey)
+					.set({
+						enabled: false,
+						deletedAt: new Date(),
+						updatedAt: new Date(),
+					})
 					.where(
 						and(
 							eq(schema.apikey.id, id),
@@ -476,12 +501,12 @@ export function createApiKeyCredential(deps: ApiKeyCredentialDeps) {
 					)
 					.returning({ id: schema.apikey.id });
 
-				if (!deleted) {
+				if (!softDeleted) {
 					log.error("Failed to delete API key");
 					throw ApiKeyErrors.deleteFailed(id);
 				}
 
-				log.info("API key deleted successfully");
+				log.info("API key soft-deleted successfully");
 				return { kind: "deleted" as const, hashedKey };
 			});
 
@@ -562,6 +587,10 @@ export function createApiKeyCredential(deps: ApiKeyCredentialDeps) {
 						log.warn("API key not found");
 						throw ApiKeyErrors.notFound(id);
 					}
+					if ((row as unknown as { deletedAt?: Date | null }).deletedAt) {
+						log.warn("API key not found (soft-deleted)");
+						throw ApiKeyErrors.notFound(id);
+					}
 
 					const oldHashedKey = row.key;
 
@@ -576,6 +605,7 @@ export function createApiKeyCredential(deps: ApiKeyCredentialDeps) {
 							and(
 								eq(schema.apikey.id, id),
 								eq(schema.apikey.organizationId, organizationId),
+								isNull(schema.apikey.deletedAt),
 							),
 						)
 						.returning();

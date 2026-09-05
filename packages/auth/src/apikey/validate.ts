@@ -1,6 +1,7 @@
 import { db as defaultDb } from "@reloop/db/client";
-import { apikey } from "@reloop/db/schema";
-import { and, eq, sql } from "drizzle-orm";
+import { apikey, user } from "@reloop/db/schema";
+import { and, eq, isNull, sql } from "drizzle-orm";
+import { isUserBanned } from "@reloop/auth/user/is-banned";
 import {
 	API_KEY_CREDENTIAL_CACHE_TTL_SECONDS,
 	type ApiKeyCredentialCache,
@@ -83,6 +84,27 @@ function bumpRequestStats(db: typeof defaultDb, apiKeyId: string): void {
 		.catch((err) => console.error("Failed to update API key stats:", err));
 }
 
+async function isOwnerBanned(
+	db: typeof defaultDb,
+	userId: string,
+): Promise<boolean> {
+	try {
+		// Test fakes may not implement user query — treat as not banned
+		const query = (db as unknown as { query?: { user?: { findFirst: unknown } } })
+			.query?.user?.findFirst as
+			| ((args: unknown) => Promise<{ banned: boolean | null; banExpires: Date | null } | undefined>)
+			| undefined;
+		if (!query) return false;
+		const u = await (db.query.user.findFirst as unknown as (args: unknown) => Promise<{ banned: boolean | null; banExpires: Date | null } | undefined>)({
+			where: eq(user.id, userId),
+			columns: { banned: true, banExpires: true },
+		});
+		return isUserBanned(u);
+	} catch {
+		return false;
+	}
+}
+
 export async function validateApiKey(
 	apiKey: string | null | undefined,
 	redis: ApiKeyCache,
@@ -116,6 +138,19 @@ export async function validateApiKey(
 			return null;
 		}
 
+		// Banned owner must not be able to use cached credentials (SDK + SMTP)
+		if (await isOwnerBanned(db, cached.userId)) {
+			try {
+				await credentialCache.invalidate(hashedKey);
+			} catch (err) {
+				console.error(
+					"Failed to invalidate banned API key credential cache:",
+					err,
+				);
+			}
+			return null;
+		}
+
 		bumpRequestStats(db, cached.apiKeyId);
 
 		return {
@@ -127,7 +162,7 @@ export async function validateApiKey(
 	}
 
 	const apiKeyRecord = await db.query.apikey.findFirst({
-		where: and(eq(apikey.key, hashedKey), eq(apikey.enabled, true)),
+		where: and(eq(apikey.key, hashedKey), eq(apikey.enabled, true), isNull(apikey.deletedAt)),
 	});
 
 	if (!apiKeyRecord) {
@@ -135,6 +170,10 @@ export async function validateApiKey(
 	}
 
 	if (isApiKeyExpired(apiKeyRecord.expiresAt, nowMs)) {
+		return null;
+	}
+
+	if (await isOwnerBanned(db, apiKeyRecord.userId)) {
 		return null;
 	}
 

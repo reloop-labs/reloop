@@ -40,6 +40,7 @@ export const apikey = pgTable(
 		updatedAt: timestamp("updated_at").notNull(),
 		permissions: text("permissions"),
 		metadata: text("metadata"),
+		deletedAt: timestamp("deleted_at"),
 	},
 	(table) => [
 		index("apikey_key_idx").on(table.key),

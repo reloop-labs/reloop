@@ -8,7 +8,7 @@ import { controllerLog } from "@reloop/api-key/utils/controller-log";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { API_KEY_LIST_WEBHOOK_EVENT } from "@reloop/webhook-events";
-import { and, count, eq, ilike, or } from "drizzle-orm";
+import { and, count, eq, ilike, isNull, or } from "drizzle-orm";
 
 export async function listApiKeysController({
 	query,
@@ -22,7 +22,7 @@ export async function listApiKeysController({
 	const log = controllerLog();
 	log.info("Getting API keys");
 
-	const conditions = [eq(schema.apikey.organizationId, organizationId)];
+	const conditions = [eq(schema.apikey.organizationId, organizationId), isNull(schema.apikey.deletedAt)];
 	if (enabled !== undefined)
 		conditions.push(eq(schema.apikey.enabled, enabled));
 	if (userId !== undefined) conditions.push(eq(schema.apikey.userId, userId));

@@ -7,6 +7,10 @@ import { fetchGetSession } from "@reloop/auth/middleware/session/fetch-get-sessi
 import { normalizeCachedContext } from "@reloop/auth/middleware/session/normalize-cached-context";
 import type { ResolveSessionOptions } from "@reloop/auth/middleware/session/resolve-session-options";
 import type { AuthContext } from "@reloop/auth/middleware/types";
+import { db } from "@reloop/db/client";
+import { user } from "@reloop/db/schema";
+import { eq } from "drizzle-orm";
+import { isUserBanned } from "@reloop/auth/user/is-banned";
 
 export async function resolveSession(
 	cookie: string | null,
@@ -23,11 +27,31 @@ export async function resolveSession(
 		const lean = normalizeCachedContext(cached);
 		if (!lean) return null;
 		if (opts.requireOrg && !lean.organizationId) return null;
+		// Banned users must not authenticate via cached session (fail closed)
+		try {
+			const u = await db.query.user.findFirst({
+				where: eq(user.id, lean.userId),
+				columns: { banned: true, banExpires: true },
+			});
+			if (isUserBanned(u)) {
+				await opts.redis.delete(cacheKey).catch(() => undefined);
+				return null;
+			}
+		} catch {}
 		return lean;
 	}
 
 	const fetched = await fetchGetSession(cookie, opts.baseUrl);
 	if (!fetched) return null;
+
+	// Banned check on fresh fetch (also covers race where cache was empty)
+	try {
+		const u = await db.query.user.findFirst({
+			where: eq(user.id, fetched.id),
+			columns: { banned: true, banExpires: true },
+		});
+		if (isUserBanned(u)) return null;
+	} catch {}
 
 	const organizationId = fetched.activeOrganizationId;
 	if (opts.requireOrg && !organizationId) return null;

@@ -5,7 +5,7 @@ import { controllerLog } from "@reloop/api-key/utils/controller-log";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { API_KEY_GET_WEBHOOK_EVENT } from "@reloop/webhook-events";
-import { and, eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 
 export async function getApiKeyController({
 	apiKeyId,
@@ -21,6 +21,7 @@ export async function getApiKeyController({
 		where: and(
 			eq(schema.apikey.id, apiKeyId),
 			eq(schema.apikey.organizationId, organizationId),
+			isNull(schema.apikey.deletedAt),
 		),
 		with: { user: true },
 	});
