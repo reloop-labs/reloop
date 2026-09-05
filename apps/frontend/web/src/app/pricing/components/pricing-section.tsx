@@ -509,11 +509,23 @@ function ComparisonTable({
 
 				{comparisonSections.map((section, sectionIndex) => (
 					<Fragment key={section.title}>
+						{sectionIndex > 0 && (
+							<>
+								<div className="h-14 border-stroke-soft-100 border-b dark:border-white/10" />
+								{pricingPlans.map((plan) => (
+									<div
+										key={`spacer-${section.title}-${plan.id}`}
+										className={cn(
+											"h-14 border-stroke-soft-100 border-b border-l dark:border-white/10",
+											isRecommended(plan) &&
+												"bg-bg-weak-50/40 dark:bg-white/[0.02]",
+										)}
+									/>
+								))}
+							</>
+						)}
 						<div
-							className={cn(
-								"flex items-end border-stroke-soft-100 border-b px-5 pb-3 sm:px-7 lg:px-9 dark:border-white/[0.07]",
-								sectionIndex > 0 ? "pt-10" : "pt-6",
-							)}
+							className="flex items-end border-stroke-soft-100 border-b px-5 pt-6 pb-3 sm:px-7 lg:px-9 dark:border-white/[0.07]"
 						>
 							<span className="font-medium text-[15px] text-text-strong-950 dark:text-white">
 								{section.title}
@@ -523,8 +535,7 @@ function ComparisonTable({
 							<div
 								key={`${section.title}-${plan.id}-title`}
 								className={cn(
-									"border-stroke-soft-100 border-b border-l pb-3 dark:border-white/[0.07]",
-									sectionIndex > 0 ? "pt-10" : "pt-6",
+									"border-stroke-soft-100 border-b border-l pt-6 pb-3 dark:border-white/[0.07]",
 									isRecommended(plan) &&
 										"bg-bg-weak-50/40 dark:bg-white/[0.02]",
 								)}
