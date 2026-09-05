@@ -1,14 +1,12 @@
 import { JsonLd } from "@reloop/web/components/json-ld";
-import {
-	MarketingPageShell,
-	PageSection,
-} from "@reloop/web/components/page-shell";
+import { PageSection } from "@reloop/web/components/page-shell";
 import { pricingFaqItems } from "@reloop/web/lib/pricing-faq";
 import { faqPageJsonLd, pricingProductJsonLd } from "@reloop/web/lib/schema";
 import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 import { PricingFaq } from "./components/pricing-faq";
 import { PricingSection } from "./components/pricing-section";
+import { PricingVolumeSlider } from "./components/pricing-volume-slider";
 
 // TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
 // See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
@@ -57,19 +55,43 @@ const PricingPage = () => {
 	return (
 		<>
 			<JsonLd data={pricingSchema} />
-			<div className="mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-200 border-x pt-6 pb-16 md:max-w-7xl dark:border-white/10">
-				<MarketingPageShell
-					titleLines={["Simple, transparent pricing."]}
-					description="No hidden fees. No surprises. Just pricing that makes sense."
-					compactHero
-					tightHeroBottom
-				>
-					<PageSection flushTop>
-						<PricingSection />
-					</PageSection>
+			<div className="mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-200 border-x md:max-w-7xl dark:border-white/10">
+				<header className="relative z-10 flex w-full flex-col items-center px-6 pt-28 pb-8 text-center sm:px-8 sm:pt-32 sm:pb-10 lg:px-12 lg:pt-36 lg:pb-12">
+					<div className="mb-6 flex items-center justify-center gap-2 sm:mb-8">
+						<span
+							aria-hidden
+							className="inline-flex size-5 shrink-0 items-center justify-center rounded-[5px] bg-primary-dark p-px pb-[2px] dark:bg-[#003a8c]"
+						>
+							<span className="flex size-full items-center justify-center rounded-[4px] bg-primary-base text-white shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.45)] dark:shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.28),0_0_0_0.5px_rgba(255,255,255,0.08)]">
+								<span className="font-semibold text-[11px] text-white leading-none">
+									$
+								</span>
+							</span>
+						</span>
+						<span className="font-medium text-[13.5px] text-text-strong-950 tracking-tight dark:text-white">
+							Transparency
+						</span>
+					</div>
 
-					<PricingFaq />
-				</MarketingPageShell>
+					<h1 className="max-w-3xl text-balance text-center font-semibold text-[2.5rem] text-text-strong-950 leading-[1.06] tracking-[-0.04em] sm:text-[3.5rem] lg:text-[4.25rem] dark:text-white">
+						Flexible{" "}
+						<span className="bg-gradient-to-b from-[#2f86ff] to-primary-base bg-clip-text text-transparent dark:from-[#7ab8ff] dark:to-[#4ea1ff]">
+							pricing.
+						</span>
+					</h1>
+
+					<p className="mt-5 max-w-[46rem] text-balance text-center text-[16.5px] text-text-sub-600 leading-relaxed sm:mt-6 sm:text-[18.5px] lg:text-[20px] dark:text-white/60">
+						Start for free, then scale as you grow.
+					</p>
+				</header>
+
+				<PricingVolumeSlider />
+
+				<PageSection flushTop>
+					<PricingSection />
+				</PageSection>
+
+				<PricingFaq />
 			</div>
 		</>
 	);
