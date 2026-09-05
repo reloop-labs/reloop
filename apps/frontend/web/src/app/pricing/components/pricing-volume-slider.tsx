@@ -6,6 +6,7 @@ import {
 	formatPrice,
 	hostedMonthlyUsdForVolume,
 } from "@reloop/web/lib/pricing";
+import Link from "next/link";
 import { useState } from "react";
 
 const TICKS = [
@@ -15,7 +16,7 @@ const TICKS = [
 	{ value: 100000, label: "100k", plan: "Startup" },
 	{ value: 250000, label: "250k", plan: "Startup" },
 	{ value: 500000, label: "500k", plan: "Startup" },
-	{ value: 1000000, label: "1M", plan: "Startup" },
+	{ value: 1000000, label: "1M", plan: "Custom" },
 ];
 
 const SEGMENTS = TICKS.length - 1;
@@ -55,6 +56,7 @@ const formatVolume = (volume: number) =>
 	new Intl.NumberFormat("en-US").format(volume);
 
 function recommendedPlan(volume: number) {
+	if (volume > 500000) return "Custom";
 	if (volume <= 3000) return "Free";
 	const individual = 10 + (Math.max(0, volume - 50000) / 1000) * 0.5;
 	const startup = 20 + (Math.max(0, volume - 100000) / 1000) * 0.5;
@@ -149,7 +151,18 @@ export function PricingVolumeSlider() {
 				</div>
 
 				<p className="mt-7 text-center font-medium text-[15px] text-primary-base tabular-nums dark:text-[#4ea1ff]">
-					{plan}: {formatPrice(cost)}/month
+					{plan === "Custom" ? (
+						<>
+							Custom:{" "}
+							<Link href="/contact" className="underline underline-offset-4">
+								contact sales
+							</Link>
+						</>
+					) : (
+						<>
+							{plan}: {formatPrice(cost)}/month
+						</>
+					)}
 				</p>
 			</div>
 		</section>
