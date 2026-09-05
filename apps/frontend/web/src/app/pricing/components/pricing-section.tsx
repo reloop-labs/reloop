@@ -402,48 +402,57 @@ function ComparisonCell({
 
 function ComparePlanCta({
 	plan,
-	solid,
+	active,
 }: {
 	plan: (typeof pricingPlans)[number];
-	solid?: boolean;
+	active?: boolean;
 }) {
-	const className = solid
-		? "border-[#1d4ed8] bg-[#1d4ed8] text-white hover:bg-[#1e40af]"
-		: "border-[#1d4ed8]/70 bg-transparent text-[#1d4ed8] hover:bg-[#1d4ed8]/[0.06] dark:text-[#7aa2ff] dark:border-[#7aa2ff]/60 dark:hover:bg-white/[0.06]";
 	const content = (
-		<span className="truncate text-[14.5px] font-medium tracking-[-0.01em]">
+		<span className="truncate font-medium text-[14px] tracking-[-0.01em]">
 			{plan.ctaLabel}
 		</span>
 	);
-	const classes = cn(
-		"flex h-10 w-full items-center justify-center rounded-full border px-5 transition-colors",
-		className,
-	);
+
 	if (plan.ctaExternal) {
 		return (
-			<a
-				href={plan.ctaHref}
-				target="_blank"
-				rel="noopener noreferrer"
-				className={classes}
+			<FancyButton.Root
+				asChild
+				variant={active ? "primary" : "basic"}
+				size="medium"
+				className="h-10! w-full! rounded-full! px-5!"
 			>
-				{content}
-			</a>
+				<a href={plan.ctaHref} target="_blank" rel="noopener noreferrer">
+					{content}
+				</a>
+			</FancyButton.Root>
 		);
 	}
+
 	return (
-		<Link href={plan.ctaHref} className={classes}>
-			{content}
-		</Link>
+		<FancyButton.Root
+			asChild
+			variant={active ? "primary" : "basic"}
+			size="medium"
+			className="h-10! w-full! rounded-full! px-5!"
+		>
+			<Link href={plan.ctaHref}>{content}</Link>
+		</FancyButton.Root>
 	);
 }
 
 const COMPARISON_GRID_COLS =
 	"grid-cols-[minmax(220px,1.45fr)_repeat(4,minmax(150px,1fr))]";
 
-function ComparisonTable() {
+function ComparisonTable({
+	recommendedPlanId,
+}: {
+	recommendedPlanId?: PlanId;
+}) {
+	const isRecommended = (plan: (typeof pricingPlans)[number]) =>
+		recommendedPlanId ? plan.id === recommendedPlanId : !!plan.highlighted;
+
 	return (
-		<div className="-mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
+		<div className="-mx-4 sm:-mx-6 lg:-mx-8 overflow-x-auto">
 			<div
 				className={cn(
 					"grid w-full min-w-[920px] border-stroke-soft-100 border-t dark:border-white/10",
@@ -451,25 +460,35 @@ function ComparisonTable() {
 				)}
 			>
 				{/* Header row — matches reference: eyebrow + title left, plan + pill CTA right */}
-				<div className="flex flex-col justify-center gap-2 border-stroke-soft-100 border-b px-5 py-7 sm:px-7 lg:px-9 dark:border-white/10">
-					<span className="font-mono text-[12px] font-medium uppercase tracking-[0.12em] text-[#1d4ed8] dark:text-[#7aa2ff]">
-						02. Features
-					</span>
-					<h2 className="font-serif text-[26px] text-text-strong-950 leading-[1.1] tracking-[-0.02em] dark:text-white">
+				<div className="flex flex-col gap-1 border-stroke-soft-100 border-b px-5 py-7 sm:px-7 lg:px-9 dark:border-white/10">
+					<p className="font-medium text-[12px] text-primary-base uppercase">
+						Features
+					</p>
+					<h2 className="font-medium text-text-strong-950 leading-none dark:text-white">
 						Compare every plan
 					</h2>
 				</div>
 				{pricingPlans.map((plan) => {
-					const isEnterprise = plan.monthlyPrice === null;
+					const active = isRecommended(plan);
 					return (
 						<div
 							key={plan.id}
-							className="flex flex-col justify-center gap-4 border-stroke-soft-100 border-b border-l px-5 py-7 sm:px-6 dark:border-white/10"
+							className={cn(
+								"flex flex-col justify-center gap-7 border-stroke-soft-100 border-b border-l px-5 py-7 sm:px-6 dark:border-white/10",
+								active && "bg-bg-weak-50 dark:bg-white/[0.03]",
+							)}
 						>
-							<span className="font-serif text-[23px] text-text-strong-950 leading-none tracking-[-0.02em] dark:text-white">
-								{plan.name}
-							</span>
-							<ComparePlanCta plan={plan} solid={isEnterprise} />
+							<div className="flex items-center gap-2">
+								<span className="font-medium text-[15px] text-text-strong-950 leading-none dark:text-white">
+									{plan.name}
+								</span>
+								{active && (
+									<span className="relative shrink-0 overflow-hidden rounded-full bg-primary-base px-2 py-0.5 text-center font-semibold text-[10px] text-white uppercase tracking-[0.14em] shadow-fancy-buttons-primary before:pointer-events-none before:absolute before:inset-0 before:rounded-[inherit] before:bg-gradient-to-b before:from-static-white before:to-transparent before:opacity-[.16]">
+										{plan.badge ?? "Recommended"}
+									</span>
+								)}
+							</div>
+							<ComparePlanCta plan={plan} active={active} />
 						</div>
 					);
 				})}
@@ -479,7 +498,10 @@ function ComparisonTable() {
 				{pricingPlans.map((plan) => (
 					<div
 						key={`spacer-${plan.id}`}
-						className="h-14 border-stroke-soft-100 border-b border-l dark:border-white/10"
+						className={cn(
+							"h-14 border-stroke-soft-100 border-b border-l dark:border-white/10",
+							isRecommended(plan) && "bg-bg-weak-50/40 dark:bg-white/[0.02]",
+						)}
 					/>
 				))}
 
@@ -501,6 +523,8 @@ function ComparisonTable() {
 								className={cn(
 									"border-stroke-soft-100 border-b border-l pb-3 dark:border-white/[0.07]",
 									sectionIndex > 0 ? "pt-10" : "pt-6",
+									isRecommended(plan) &&
+										"bg-bg-weak-50/40 dark:bg-white/[0.02]",
 								)}
 							/>
 						))}
@@ -524,10 +548,14 @@ function ComparisonTable() {
 								</div>
 								{pricingPlans.map((plan) => {
 									const value = plan.comparison[row.key];
+									const active = isRecommended(plan);
 									return (
 										<div
 											key={plan.id}
-											className="flex min-h-[60px] items-center justify-center border-stroke-soft-100 border-b border-l px-4 py-4 text-center dark:border-white/[0.07]"
+											className={cn(
+												"flex min-h-[60px] items-center justify-center border-stroke-soft-100 border-b border-l px-4 py-4 text-center dark:border-white/[0.07]",
+												active && "bg-bg-weak-50/40 dark:bg-white/[0.02]",
+											)}
 										>
 											<ComparisonCell
 												value={value as string | boolean}
@@ -565,7 +593,7 @@ export function PricingSection({
 				))}
 			</div>
 			<div className="mt-24">
-				<ComparisonTable />
+				<ComparisonTable recommendedPlanId={recommendedPlanId} />
 			</div>
 		</>
 	);
