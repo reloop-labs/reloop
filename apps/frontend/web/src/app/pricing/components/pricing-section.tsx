@@ -232,6 +232,42 @@ function getFeatureIcon(feature: string, customClassName?: string) {
 	return <Icon name="sparkling" className={className} />;
 }
 
+function getSectionIcon(section: string, customClassName?: string) {
+	const key = section.toLowerCase().trim();
+	const className =
+		customClassName ??
+		"size-4 shrink-0 text-text-strong-950 dark:text-white";
+
+	if (key.includes("volume")) {
+		return <Icon name="mail-single" className={className} />;
+	}
+	if (key.includes("resource")) {
+		return <Icon name="database" className={className} />;
+	}
+	if (key.includes("api")) {
+		return <Icon name="api" className={className} />;
+	}
+	if (key.includes("inbox") || key.includes("ai")) {
+		return <Icon name="sparkling" className={className} />;
+	}
+	if (key.includes("deliver")) {
+		return <Icon name="shield" className={className} />;
+	}
+	if (key.includes("analytic")) {
+		return <Icon name="graph-up" className={className} />;
+	}
+	if (key.includes("platform")) {
+		return <Icon name="grid" className={className} />;
+	}
+	if (key.includes("support")) {
+		return <Icon name="headset" className={className} />;
+	}
+	if (key.includes("security") || key.includes("compliance")) {
+		return <Icon name="lock" className={className} />;
+	}
+	return <Icon name="sparkling" className={className} />;
+}
+
 function PlanColumn({
 	plan,
 	index,
@@ -525,8 +561,12 @@ function ComparisonTable({
 							</>
 						)}
 						<div
-							className="flex items-end border-stroke-soft-100 border-b px-5 pt-6 pb-3 sm:px-7 lg:px-9 dark:border-white/[0.07]"
+							className="flex items-center gap-2.5 border-stroke-soft-100 border-b px-5 pt-6 pb-3 sm:px-7 lg:px-9 dark:border-white/[0.07]"
 						>
+							{getSectionIcon(
+								section.title,
+								"size-4 shrink-0 text-text-strong-950 dark:text-white/80",
+							)}
 							<span className="font-medium text-[15px] text-text-strong-950 dark:text-white">
 								{section.title}
 							</span>
@@ -548,17 +588,13 @@ function ComparisonTable({
 							>
 								<div
 									className={cn(
-										"flex min-h-[60px] items-center gap-3 border-stroke-soft-100 border-b px-5 py-4 transition-colors duration-150 sm:px-7 lg:px-9 dark:border-white/[0.07]",
+										"flex min-h-[60px] items-center border-stroke-soft-100 border-b px-5 py-4 transition-colors duration-150 sm:px-7 lg:px-9 dark:border-white/[0.07]",
 										"group-hover/row:bg-bg-weak-50/70 dark:group-hover/row:bg-white/[0.03]",
 										rowIndex === 0 &&
 											section.title &&
 											"bg-bg-weak-50/[0.4] dark:bg-white/[0.015]",
 									)}
 								>
-									{getFeatureIcon(
-										row.label,
-										"size-4 shrink-0 text-text-strong-950 dark:text-white/70",
-									)}
 									<span className="font-normal text-[14px] text-text-strong-950 dark:text-white">
 										{row.label}
 									</span>
