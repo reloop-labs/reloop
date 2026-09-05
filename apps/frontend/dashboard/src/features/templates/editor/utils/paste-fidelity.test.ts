@@ -50,8 +50,9 @@ const EmailImage = Node.create({
 });
 
 /**
- * Same order as sanitizeEmailHtml: class styles → centering → links →
- * contrast → table spacing → typography flatten → TipTap JSON.
+ * Same later-stage order as `sanitizeEmailHtml` in sanitize-email-html.ts:
+ * class styles → centering → links → contrast → table spacing →
+ * typography flatten → TipTap JSON.
  */
 function pasteToJson(html: string) {
 	const doc = new DOMParser().parseFromString(

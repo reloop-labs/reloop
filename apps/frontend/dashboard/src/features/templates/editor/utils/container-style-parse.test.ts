@@ -118,26 +118,28 @@ describe("email page vs column background", () => {
 	});
 
 	it("does not invent a white column background in the theme extractor", () => {
-		const source = readFileSync(
-			join(
-				dirname(fileURLToPath(import.meta.url)),
-				"../components/panels/code/code-view.tsx",
-			),
+		const themeSource = readFileSync(
+			join(dirname(fileURLToPath(import.meta.url)), "apply-pasted-email-theme.ts"),
 			"utf8",
 		);
-		expect(source).toMatch(/containerBg\s*=\s*[\s\S]*\|\|\s*undefined/);
-		expect(source).not.toMatch(/containerBg\s*=\s*[\s\S]*\|\|\s*"#ffffff"/);
-		expect(source).toMatch(/prop\.startsWith\("background"\)/);
+		const sanitizeSource = readFileSync(
+			join(dirname(fileURLToPath(import.meta.url)), "sanitize-email-html.ts"),
+			"utf8",
+		);
+		expect(themeSource).toMatch(/containerBg\s*=\s*[\s\S]*\|\|\s*undefined/);
+		expect(themeSource).not.toMatch(/containerBg\s*=\s*[\s\S]*\|\|\s*"#ffffff"/);
+		expect(sanitizeSource).toMatch(/prop\.startsWith\("background"\)/);
 	});
 });
 
 describe("parseGlobalStylesFromHtml canvas defaults", () => {
 	it("does not force wrapper font-size onto every block with !important", () => {
 		const source = readFileSync(
-			join(
-				dirname(fileURLToPath(import.meta.url)),
-				"../components/panels/code/code-view.tsx",
-			),
+			join(dirname(fileURLToPath(import.meta.url)), "apply-pasted-email-theme.ts"),
+			"utf8",
+		);
+		const sanitizeSource = readFileSync(
+			join(dirname(fileURLToPath(import.meta.url)), "sanitize-email-html.ts"),
 			"utf8",
 		);
 
@@ -148,7 +150,7 @@ describe("parseGlobalStylesFromHtml canvas defaults", () => {
 		expect(source).not.toMatch(
 			/child\.style\.textAlign\.toLowerCase\(\) === "center"/,
 		);
-		expect(source).toMatch(/applyEmailColumnWidth\(/);
+		expect(sanitizeSource).toMatch(/applyEmailColumnWidth\(/);
 		expect(source).toMatch(/emailColumnMaxWidthCss\(/);
 	});
 });

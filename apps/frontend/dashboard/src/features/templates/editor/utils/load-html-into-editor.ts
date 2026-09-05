@@ -1,12 +1,12 @@
 import { generateJSON } from "@tiptap/html";
 import type { Editor } from "@tiptap/react";
+import { useEditorStore } from "#/features/templates/editor/hooks/use-editor-store";
+import { applyImportedEmailCss } from "#/features/templates/editor/utils/apply-imported-email-css";
 import {
 	applyPastedEmailTheme,
 	parseGlobalStylesFromHtml,
-	sanitizeEmailHtml,
-} from "#/features/templates/editor/components/panels/code/code-view";
-import { useEditorStore } from "#/features/templates/editor/hooks/use-editor-store";
-import { applyImportedEmailCss } from "#/features/templates/editor/utils/apply-imported-email-css";
+} from "#/features/templates/editor/utils/apply-pasted-email-theme";
+import { sanitizeEmailHtml } from "#/features/templates/editor/utils/sanitize-email-html";
 import {
 	isFullEmailHtml,
 	pickPastedEmailHtml,

@@ -11,6 +11,14 @@ import {
 	clearImportedEmailCss,
 } from "#/features/templates/editor/utils/apply-imported-email-css";
 import {
+	extractThemingStylesFromHtml,
+	findStyleInputValue,
+	getGlobalStylesArray,
+	mergeParsedStyles,
+	parseGlobalStylesFromHtml,
+	updateGlobalStyleValue,
+} from "#/features/templates/editor/utils/apply-pasted-email-theme";
+import {
 	pickSavedEmailHtml,
 	restoreImportedEmailCssFromHtml,
 } from "#/features/templates/editor/utils/load-html-into-editor";
@@ -18,6 +26,7 @@ import {
 	emailHasMixedBackgrounds,
 	readableTextColor,
 } from "#/features/templates/editor/utils/readable-text-color";
+import { sanitizeEmailHtml } from "#/features/templates/editor/utils/sanitize-email-html";
 import { mapTemplateVariables } from "#/features/templates/lib/template-variables";
 import {
 	getRandomColor,
@@ -26,15 +35,6 @@ import {
 import { PresenceProvider } from "../collobration/PresenceProvider";
 import { EmailSlashCommand } from "../components/canvas/email-slash-command";
 import { TemplateDetailHeader } from "../components/header/template-detail-header";
-import {
-	extractThemingStylesFromHtml,
-	findStyleInputValue,
-	getGlobalStylesArray,
-	mergeParsedStyles,
-	parseGlobalStylesFromHtml,
-	sanitizeEmailHtml,
-	updateGlobalStyleValue,
-} from "../components/panels/code/code-view";
 import { AddTemplateVariableModal } from "../components/panels/variables/add-variable-modal";
 import { useMousePresence } from "../cursor/hooks/useMousePresence";
 import { useRemoteCursors } from "../cursor/hooks/useRemoteCursors";
