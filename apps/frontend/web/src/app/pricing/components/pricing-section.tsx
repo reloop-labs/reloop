@@ -460,7 +460,7 @@ function ComparisonTable({
 				)}
 			>
 				{/* Header row — matches reference: eyebrow + title left, plan + pill CTA right */}
-				<div className="flex flex-col gap-1 border-stroke-soft-100 border-b px-5 py-7 sm:px-7 lg:px-9 dark:border-white/10">
+				<div className="flex flex-col gap-3 border-stroke-soft-100 border-b px-5 py-7 sm:px-7 lg:px-9 dark:border-white/10">
 					<p className="font-medium text-[12px] text-primary-base uppercase">
 						Features
 					</p>
