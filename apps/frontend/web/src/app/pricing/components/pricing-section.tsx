@@ -11,6 +11,7 @@ import {
 	pricingPlans,
 } from "@reloop/web/lib/pricing";
 import Link from "next/link";
+import * as HoverCard from "@radix-ui/react-hover-card";
 import { Fragment } from "react";
 
 function PlanCtaLink({
@@ -266,6 +267,1002 @@ function getSectionIcon(section: string, customClassName?: string) {
 		return <Icon name="lock" className={className} />;
 	}
 	return <Icon name="sparkling" className={className} />;
+}
+
+const FEATURE_TOOLTIPS: Record<
+	string,
+	{
+		description: string;
+		version?: string;
+		badge?: string;
+		status?: string;
+	}
+> = {
+	monthlyEmails: {
+		description:
+			"Total volume of emails you can deliver per monthly billing cycle across all domains and APIs.",
+		version: "v3.0",
+		badge: "LIVE",
+		status: "CORE",
+	},
+	dailyLimit: {
+		description:
+			"Maximum number of emails you can dispatch within a rolling 24-hour window.",
+		version: "v2.4",
+		badge: "LIMIT",
+		status: "RATE",
+	},
+	overage: {
+		description:
+			"Low-cost pay-as-you-go rate for emails sent beyond your plan's monthly allocation.",
+		version: "v1.0",
+		badge: "AUTO",
+		status: "USAGE",
+	},
+	agentInbox: {
+		description:
+			"Dedicated AI-driven mailboxes that process incoming messages and execute autonomous workflows.",
+		version: "v3.0",
+		badge: "LIVE",
+		status: "AGENT",
+	},
+	webhooks: {
+		description:
+			"Real-time HTTP callbacks for message events such as delivered, opened, clicked, and bounced.",
+		version: "v2.0",
+		badge: "READY",
+		status: "REALTIME",
+	},
+	customDomains: {
+		description:
+			"Send and receive emails from your own branded domain with automated DNS verification.",
+		version: "v1.2",
+		badge: "ACTIVE",
+		status: "VERIFIED",
+	},
+	attachmentSize: {
+		description:
+			"Maximum allowable file size per email attachment sent through REST API or SMTP.",
+		version: "v2.1",
+		badge: "LIMIT",
+		status: "ASSETS",
+	},
+	dataRetention: {
+		description:
+			"Duration that email payloads, attachments, and transmission logs are stored in your dashboard.",
+		version: "v2.0",
+		badge: "SECURE",
+		status: "STORAGE",
+	},
+	restApi: {
+		description:
+			"Fast, developer-friendly REST API for sending transactional emails, templates, and analytics.",
+		version: "v1.0",
+		badge: "REST",
+		status: "HTTPS",
+	},
+	smtpRelay: {
+		description:
+			"Standard SMTP endpoint credentials compatible with WordPress, Rails, Django, and legacy servers.",
+		version: "v1.0",
+		badge: "SMTP",
+		status: "PORT 587",
+	},
+	scheduledEmails: {
+		description:
+			"Queue emails to be automatically dispatched at an exact future timestamp or timezone.",
+		version: "v2.0",
+		badge: "QUEUE",
+		status: "CRON",
+	},
+	emailTemplates: {
+		description:
+			"Reusable, version-controlled HTML and React email templates with dynamic variable interpolation.",
+		version: "v2.2",
+		badge: "REACT",
+		status: "PREVIEW",
+	},
+	officialSdks: {
+		description:
+			"Official client libraries with full TypeScript types, auto-complete, and error handling.",
+		version: "v3.0",
+		badge: "NPM",
+		status: "TYPED",
+	},
+	agentInboxFeature: {
+		description:
+			"Autonomous mailboxes that summarize incoming emails, trigger tools, and draft human-grade replies.",
+		version: "v3.0",
+		badge: "LIVE",
+		status: "AI AGENT",
+	},
+	inboundEmail: {
+		description:
+			"Receive incoming emails, parse headers and attachments, and route them to webhooks or AI pipelines.",
+		version: "v2.0",
+		badge: "INBOUND",
+		status: "MX ROUTE",
+	},
+	aiComposer: {
+		description:
+			"AI-assisted email drafting and formatting that optimizes tone, clarity, and subject lines.",
+		version: "v3.0",
+		badge: "AI",
+		status: "SMART",
+	},
+	humanInbox: {
+		description:
+			"Collaborative inbox for team members to triage threads, review AI drafts, and reply directly.",
+		version: "v2.1",
+		badge: "TEAM",
+		status: "SHARED",
+	},
+	emailAuth: {
+		description:
+			"Automated verification of SPF, DKIM, and DMARC DNS records to maximize mailbox inbox placement.",
+		version: "v1.0",
+		badge: "AUTH",
+		status: "PASSED",
+	},
+	pristineSharedIps: {
+		description:
+			"Pre-warmed, reputation-monitored IP pools reserved for high deliverability senders.",
+		version: "v1.0",
+		badge: "WARMED",
+		status: "PRISTINE",
+	},
+	dedicatedIp: {
+		description:
+			"Dedicated IP addresses with automated warmup schedules reserved exclusively for your domain.",
+		version: "v1.0",
+		badge: "ISOLATED",
+		status: "DEDICATED",
+	},
+	spamTesting: {
+		description:
+			"Pre-send spam score analysis and content checking against major spam filter engines.",
+		version: "v2.0",
+		badge: "CHECK",
+		status: "OPTIMAL",
+	},
+	reputationMonitoring: {
+		description:
+			"Continuous real-time tracking of domain reputation, blacklist listings, and complaint rates.",
+		version: "v2.4",
+		badge: "HEALTH",
+		status: "99.9%",
+	},
+	deliveryAnalytics: {
+		description:
+			"Granular delivery reports with bounce categorization, latency metrics, and failure diagnostics.",
+		version: "v2.0",
+		badge: "METRICS",
+		status: "ANALYTICS",
+	},
+	openClickTracking: {
+		description:
+			"Privacy-first engagement tracking for unique email opens and individual link clicks.",
+		version: "v1.5",
+		badge: "TRACK",
+		status: "ENGAGE",
+	},
+	eventLogs: {
+		description:
+			"Live event stream of every dispatch, delivery attempt, bounce, and open with raw JSON payloads.",
+		version: "v2.0",
+		badge: "STREAM",
+		status: "REALTIME",
+	},
+	exportRetention: {
+		description:
+			"Export message logs and performance analytics to CSV or stream directly to your data warehouse.",
+		version: "v1.0",
+		badge: "SYNC",
+		status: "EXPORT",
+	},
+	hostedReloop: {
+		description:
+			"Fully managed cloud infrastructure with automatic scaling, DDoS mitigation, and global distribution.",
+		version: "v3.0",
+		badge: "CLOUD",
+		status: "MANAGED",
+	},
+	selfHost: {
+		description:
+			"Run the complete Reloop email engine on your own private cloud, Docker, or Kubernetes clusters.",
+		version: "v1.0",
+		badge: "DOCKER",
+		status: "OPEN",
+	},
+	integrations: {
+		description:
+			"Connect Reloop with Slack, Linear, GitHub, Segment, Zapier, and custom webhooks.",
+		version: "v2.0",
+		badge: "APPS",
+		status: "NATIVE",
+	},
+	auditLogs: {
+		description:
+			"Comprehensive audit logging tracking all administrative actions, API key usage, and setting changes.",
+		version: "v1.2",
+		badge: "AUDIT",
+		status: "COMPLIANT",
+	},
+	support: {
+		description:
+			"Expert email and chat support with direct access to deliverability and infrastructure engineers.",
+		version: "v1.0",
+		badge: "SLA",
+		status: "24/7",
+	},
+	uptimeSla: {
+		description:
+			"Financially-backed 99.99% service level agreement guaranteeing high platform availability.",
+		version: "v1.0",
+		badge: "99.99%",
+		status: "SLA",
+	},
+};
+
+function FeatureVisualContent({
+	rowKey,
+	label,
+	info,
+}: {
+	rowKey: string;
+	label: string;
+	info: { version?: string; badge?: string; status?: string };
+}) {
+	// 1. Monthly emails / Volume
+	if (rowKey === "monthlyEmails") {
+		return (
+			<div className="flex flex-col gap-2">
+				<div className="flex items-center justify-between text-[11px]">
+					<span className="font-mono text-text-sub-600 dark:text-white/60">
+						Delivery Quota
+					</span>
+					<span className="font-mono font-medium text-blue-accent dark:text-[#52a8ff]">
+						42,850 / 50,000
+					</span>
+				</div>
+				<div className="h-2 w-full overflow-hidden rounded-full bg-stroke-soft-200 dark:bg-white/10">
+					<div className="h-full w-[85%] rounded-full bg-blue-accent dark:bg-[#0066ff]" />
+				</div>
+				<div className="flex items-center justify-between pt-0.5 text-[10px] text-text-soft-400 dark:text-white/40">
+					<span>Auto-scaled</span>
+					<span className="text-emerald-600 dark:text-emerald-400">
+						● 99.98% Delivered
+					</span>
+				</div>
+			</div>
+		);
+	}
+
+	// 2. Daily limit
+	if (rowKey === "dailyLimit") {
+		return (
+			<div className="flex items-center justify-between gap-3">
+				<div className="flex flex-col gap-1">
+					<span className="font-mono text-[10px] text-text-soft-400 uppercase dark:text-white/40">
+						Rolling 24h
+					</span>
+					<div className="flex items-baseline gap-1">
+						<span className="font-mono font-semibold text-lg text-text-strong-950 dark:text-white">
+							200
+						</span>
+						<span className="text-[11px] text-text-sub-600 dark:text-white/50">
+							/ day
+						</span>
+					</div>
+				</div>
+				<div className="flex flex-col items-end gap-1">
+					<span className="rounded bg-bg-weak-50 px-1.5 py-0.5 font-mono text-[10px] text-blue-accent dark:bg-white/10 dark:text-[#52a8ff]">
+						Resets 00:00 UTC
+					</span>
+					<span className="text-[10px] text-text-soft-400 dark:text-white/40">
+						Burst smoothing active
+					</span>
+				</div>
+			</div>
+		);
+	}
+
+	// 3. Overage
+	if (rowKey === "overage") {
+		return (
+			<div className="flex flex-col gap-1.5">
+				<div className="flex items-center justify-between">
+					<span className="font-mono font-semibold text-[12px] text-text-strong-950 dark:text-white">
+						$0.50{" "}
+						<span className="font-normal text-[11px] text-text-sub-600 dark:text-white/60">
+							per 1,000 extra
+						</span>
+					</span>
+					<span className="rounded-full bg-emerald-500/10 px-2 py-0.5 font-medium font-mono text-[10px] text-emerald-600 dark:text-emerald-400">
+						Metered
+					</span>
+				</div>
+				<div className="flex items-center gap-1.5 pt-1 font-mono text-[10px] text-text-soft-400 dark:text-white/40">
+					<span className="rounded bg-stroke-soft-100 px-1.5 py-0.5 dark:bg-white/5">
+						+10k = $5.00
+					</span>
+					<span>No surprise overages</span>
+				</div>
+			</div>
+		);
+	}
+
+	// 4. Agent inboxes / Agent inbox
+	if (rowKey === "agentInbox" || rowKey === "agentInboxFeature") {
+		return (
+			<div className="flex items-center gap-3">
+				<div className="flex w-16 shrink-0 flex-col gap-1.5">
+					<div className="h-1.5 w-full rounded-full bg-stroke-soft-200 dark:bg-white/10" />
+					<div className="h-1.5 w-4/5 rounded-full bg-stroke-soft-200/80 dark:bg-white/10" />
+					<div className="h-1.5 w-3/5 rounded-full bg-stroke-soft-200/60 dark:bg-white/10" />
+				</div>
+				<div className="h-8 w-px bg-stroke-soft-100 dark:bg-white/[0.06]" />
+				<div className="relative flex flex-1 flex-col gap-1.5">
+					<div className="flex items-center gap-1.5">
+						<div className="h-2 w-14 rounded-full bg-blue-accent dark:bg-[#0066ff]" />
+						<div className="h-2 w-7 rounded-full bg-sky-400/80 dark:bg-sky-400" />
+					</div>
+					<div className="flex items-center gap-1.5">
+						<div className="h-2 w-9 rounded-full bg-stroke-soft-200 dark:bg-white/15" />
+						<div className="h-2 w-8 rounded-full bg-blue-accent/70 dark:bg-[#0066ff]/70" />
+						<svg
+							width="10"
+							height="10"
+							viewBox="0 0 10 10"
+							fill="none"
+							className="animate-pulse text-sky-400"
+						>
+							<path
+								d="M5 0L5.9 3.5L9.5 4.1L6.7 6.4L7.6 10L5 7.9L2.4 10L3.3 6.4L0.5 4.1L4.1 3.5L5 0Z"
+								fill="currentColor"
+							/>
+						</svg>
+					</div>
+					<div className="flex items-center gap-1.5">
+						<svg
+							width="8"
+							height="8"
+							viewBox="0 0 10 10"
+							fill="none"
+							className="text-blue-accent/80"
+						>
+							<path
+								d="M5 0L5.9 3.5L9.5 4.1L6.7 6.4L7.6 10L5 7.9L2.4 10L3.3 6.4L0.5 4.1L4.1 3.5L5 0Z"
+								fill="currentColor"
+							/>
+						</svg>
+						<div className="h-2 w-10 rounded-full bg-sky-400/60 dark:bg-sky-400/50" />
+						<div className="h-2 w-12 rounded-full bg-stroke-soft-200/70 dark:bg-white/10" />
+					</div>
+				</div>
+			</div>
+		);
+	}
+
+	// 5. Webhooks
+	if (rowKey === "webhooks") {
+		return (
+			<div className="flex flex-col gap-1.5 font-mono text-[11px]">
+				<div className="flex items-center justify-between">
+					<span className="font-semibold text-emerald-600 dark:text-emerald-400">
+						POST 200 OK
+					</span>
+					<span className="text-[10px] text-text-soft-400 dark:text-white/40">
+						42ms
+					</span>
+				</div>
+				<div className="rounded bg-stroke-soft-100/70 p-1.5 text-[10px] text-text-sub-600 dark:bg-white/5 dark:text-white/70">
+					<code>
+						&#123;&quot;event&quot;: &quot;email.delivered&quot;, &quot;to&quot;:
+						&quot;user@acme.com&quot;&#125;
+					</code>
+				</div>
+			</div>
+		);
+	}
+
+	// 6. Custom domains
+	if (rowKey === "customDomains") {
+		return (
+			<div className="flex flex-col gap-1.5 text-[11px]">
+				<div className="flex items-center justify-between">
+					<span className="font-medium font-mono text-text-strong-950 dark:text-white">
+						mail.yourdomain.com
+					</span>
+					<span className="flex items-center gap-1 font-medium text-[10px] text-emerald-600 dark:text-emerald-400">
+						● Verified
+					</span>
+				</div>
+				<div className="grid grid-cols-3 gap-1 pt-1 font-mono text-[10px]">
+					<span className="rounded bg-stroke-soft-100/80 px-1.5 py-0.5 text-center dark:bg-white/5">
+						DKIM ✓
+					</span>
+					<span className="rounded bg-stroke-soft-100/80 px-1.5 py-0.5 text-center dark:bg-white/5">
+						SPF ✓
+					</span>
+					<span className="rounded bg-stroke-soft-100/80 px-1.5 py-0.5 text-center dark:bg-white/5">
+						DMARC ✓
+					</span>
+				</div>
+			</div>
+		);
+	}
+
+	// 7. Max attachment size
+	if (rowKey === "attachmentSize") {
+		return (
+			<div className="flex items-center gap-3">
+				<div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-blue-accent/10 text-blue-accent dark:bg-blue-accent/20 dark:text-[#52a8ff]">
+					<Icon name="paperclip" className="size-4" />
+				</div>
+				<div className="flex flex-1 flex-col">
+					<div className="flex items-center justify-between text-[11px]">
+						<span className="font-medium font-mono text-text-strong-950 dark:text-white">
+							report_q3.pdf
+						</span>
+						<span className="font-mono text-[10px] text-text-soft-400 dark:text-white/40">
+							4.8 MB
+						</span>
+					</div>
+					<div className="mt-1.5 h-1.5 w-full rounded-full bg-stroke-soft-200 dark:bg-white/10">
+						<div className="h-full w-3/4 rounded-full bg-blue-accent dark:bg-[#0066ff]" />
+					</div>
+				</div>
+			</div>
+		);
+	}
+
+	// 8. Data retention
+	if (rowKey === "dataRetention" || rowKey === "exportRetention") {
+		return (
+			<div className="flex flex-col gap-2">
+				<div className="flex items-center justify-between text-[11px]">
+					<span className="font-mono text-text-sub-600 dark:text-white/60">
+						Log Retention Window
+					</span>
+					<span className="font-mono font-semibold text-blue-accent dark:text-[#52a8ff]">
+						45 Days
+					</span>
+				</div>
+				<div className="flex items-center gap-1.5 font-mono text-[9px] text-text-soft-400 dark:text-white/40">
+					<span className="rounded bg-stroke-soft-100 px-1.5 py-0.5 dark:bg-white/5">
+						Live Search
+					</span>
+					<span>•</span>
+					<span className="rounded bg-stroke-soft-100 px-1.5 py-0.5 dark:bg-white/5">
+						Full Payloads
+					</span>
+					<span>•</span>
+					<span className="rounded bg-stroke-soft-100 px-1.5 py-0.5 dark:bg-white/5">
+						Encrypted
+					</span>
+				</div>
+			</div>
+		);
+	}
+
+	// 9. REST API
+	if (rowKey === "restApi") {
+		return (
+			<div className="rounded bg-stroke-soft-100/80 p-2 font-mono text-[10px] leading-relaxed dark:bg-white/5">
+				<span className="text-blue-accent dark:text-[#52a8ff]">POST</span>{" "}
+				<span className="text-text-sub-600 dark:text-white/60">
+					/v1/emails/send
+				</span>
+				<div className="mt-1 text-text-soft-400 dark:text-white/40">
+					&#123; &quot;to&quot;: &quot;dev@acme.com&quot;, &quot;template&quot;:
+					&quot;welcome&quot; &#125;
+				</div>
+			</div>
+		);
+	}
+
+	// 10. SMTP relay
+	if (rowKey === "smtpRelay") {
+		return (
+			<div className="flex flex-col gap-1.5 font-mono text-[10px]">
+				<div className="flex items-center justify-between">
+					<span className="font-medium text-text-strong-950 dark:text-white">
+						smtp.reloop.com:587
+					</span>
+					<span className="text-emerald-600 dark:text-emerald-400">
+						● Connected
+					</span>
+				</div>
+				<div className="flex items-center gap-1.5 text-text-soft-400 dark:text-white/40">
+					<span className="rounded bg-stroke-soft-100 px-1.5 py-0.5 dark:bg-white/5">
+						TLS 1.3
+					</span>
+					<span className="rounded bg-stroke-soft-100 px-1.5 py-0.5 dark:bg-white/5">
+						AUTH PLAIN
+					</span>
+					<span className="rounded bg-stroke-soft-100 px-1.5 py-0.5 dark:bg-white/5">
+						DKIM Signed
+					</span>
+				</div>
+			</div>
+		);
+	}
+
+	// 11. Scheduled emails
+	if (rowKey === "scheduledEmails") {
+		return (
+			<div className="flex items-center justify-between rounded bg-stroke-soft-100/70 p-2 font-mono text-[11px] dark:bg-white/5">
+				<div className="flex items-center gap-2">
+					<Icon
+						name="calendar"
+						className="size-4 text-blue-accent dark:text-[#52a8ff]"
+					/>
+					<span className="font-medium text-text-strong-950 dark:text-white">
+						Tomorrow, 09:00 AM
+					</span>
+				</div>
+				<span className="rounded-full bg-blue-accent/10 px-2 py-0.5 font-semibold text-[9px] text-blue-accent dark:text-[#52a8ff]">
+					QUEUED
+				</span>
+			</div>
+		);
+	}
+
+	// 12. Email templates
+	if (rowKey === "emailTemplates") {
+		return (
+			<div className="flex flex-col gap-1 rounded bg-stroke-soft-100/80 p-2 font-mono text-[10px] dark:bg-white/5">
+				<div className="text-blue-accent dark:text-[#52a8ff]">
+					&lt;EmailTemplate name=&quot;Invoice&quot;&gt;
+				</div>
+				<div className="pl-3 text-text-sub-600 dark:text-white/60">
+					&lt;Text&gt;Hello &#123;firstName&#125;&lt;/Text&gt;
+				</div>
+				<div className="text-blue-accent dark:text-[#52a8ff]">
+					&lt;/EmailTemplate&gt;
+				</div>
+			</div>
+		);
+	}
+
+	// 13. Official SDKs
+	if (rowKey === "officialSdks") {
+		return (
+			<div className="flex flex-col gap-1.5 font-mono text-[10px]">
+				<div className="flex items-center justify-between rounded bg-stroke-soft-100/80 px-2 py-1 dark:bg-white/5">
+					<span className="text-text-strong-950 dark:text-white">
+						npm i @reloop/sdk
+					</span>
+					<span className="text-text-soft-400 dark:text-white/40">TS / JS</span>
+				</div>
+				<div className="flex items-center justify-between rounded bg-stroke-soft-100/80 px-2 py-1 dark:bg-white/5">
+					<span className="text-text-strong-950 dark:text-white">
+						pip install reloop
+					</span>
+					<span className="text-text-soft-400 dark:text-white/40">Python</span>
+				</div>
+			</div>
+		);
+	}
+
+	// 14. Inbound email
+	if (rowKey === "inboundEmail") {
+		return (
+			<div className="flex items-center justify-between gap-2 font-mono text-[10px]">
+				<div className="rounded bg-stroke-soft-100/80 px-2 py-1 text-text-strong-950 dark:bg-white/5 dark:text-white">
+					inbox@domain.com
+				</div>
+				<span className="text-blue-accent dark:text-[#52a8ff]">➔</span>
+				<div className="rounded bg-blue-accent/10 px-2 py-1 font-semibold text-blue-accent dark:text-[#52a8ff]">
+					Webhook JSON
+				</div>
+			</div>
+		);
+	}
+
+	// 15. AI composer
+	if (rowKey === "aiComposer") {
+		return (
+			<div className="flex flex-col gap-1.5">
+				<div className="flex items-center gap-1.5 font-medium text-[11px] text-blue-accent dark:text-[#52a8ff]">
+					<Icon name="sparkling" className="size-3.5" />
+					<span>AI Tone Optimization</span>
+				</div>
+				<div className="rounded bg-stroke-soft-100/80 p-2 text-[10px] text-text-sub-600 dark:bg-white/5 dark:text-white/70">
+					&ldquo;Rewrote opening hook for 14% higher click-through.&rdquo;
+				</div>
+			</div>
+		);
+	}
+
+	// 16. Human inbox
+	if (rowKey === "humanInbox") {
+		return (
+			<div className="flex items-center justify-between gap-2 text-[11px]">
+				<div className="flex items-center gap-2">
+					<div className="flex size-6 items-center justify-center rounded-full bg-blue-accent font-bold text-[10px] text-white">
+						AP
+					</div>
+					<div className="flex flex-col">
+						<span className="font-medium text-text-strong-950 dark:text-white">
+							Support Thread #284
+						</span>
+						<span className="text-[10px] text-text-soft-400 dark:text-white/40">
+							Assigned to Pranav
+						</span>
+					</div>
+				</div>
+				<span className="rounded bg-emerald-500/10 px-1.5 py-0.5 font-medium text-[9px] text-emerald-600 dark:text-emerald-400">
+					Active
+				</span>
+			</div>
+		);
+	}
+
+	// 17. SPF / DKIM / DMARC
+	if (rowKey === "emailAuth") {
+		return (
+			<div className="grid grid-cols-3 gap-1.5 font-mono text-[10px]">
+				<div className="flex flex-col items-center rounded bg-emerald-500/10 p-1.5 text-emerald-600 dark:text-emerald-400">
+					<span className="font-bold">SPF</span>
+					<span className="text-[9px]">Valid</span>
+				</div>
+				<div className="flex flex-col items-center rounded bg-emerald-500/10 p-1.5 text-emerald-600 dark:text-emerald-400">
+					<span className="font-bold">DKIM</span>
+					<span className="text-[9px]">2048-bit</span>
+				</div>
+				<div className="flex flex-col items-center rounded bg-emerald-500/10 p-1.5 text-emerald-600 dark:text-emerald-400">
+					<span className="font-bold">DMARC</span>
+					<span className="text-[9px]">Reject</span>
+				</div>
+			</div>
+		);
+	}
+
+	// 18. Pristine shared IPs
+	if (rowKey === "pristineSharedIps") {
+		return (
+			<div className="flex items-center justify-between text-[11px]">
+				<div className="flex flex-col gap-0.5">
+					<span className="font-bold font-mono text-emerald-600 text-sm dark:text-emerald-400">
+						99.4 / 100
+					</span>
+					<span className="text-[10px] text-text-soft-400 dark:text-white/40">
+						Sender Reputation
+					</span>
+				</div>
+				<div className="flex flex-col items-end gap-1 font-mono text-[10px]">
+					<span className="rounded bg-stroke-soft-100 px-1.5 py-0.5 dark:bg-white/5">
+						Zero Blacklists
+					</span>
+					<span className="text-text-sub-600 dark:text-white/50">
+						Warmed Pools
+					</span>
+				</div>
+			</div>
+		);
+	}
+
+	// 19. Dedicated IP
+	if (rowKey === "dedicatedIp") {
+		return (
+			<div className="flex flex-col gap-1.5 font-mono text-[11px]">
+				<div className="flex items-center justify-between">
+					<span className="font-semibold text-text-strong-950 dark:text-white">
+						198.51.100.42
+					</span>
+					<span className="rounded bg-blue-accent/10 px-1.5 py-0.5 font-bold text-[9px] text-blue-accent dark:text-[#52a8ff]">
+						ISOLATED
+					</span>
+				</div>
+				<div className="flex items-center justify-between text-[10px] text-text-soft-400 dark:text-white/40">
+					<span>Warmup Schedule</span>
+					<span className="font-medium text-emerald-600 dark:text-emerald-400">
+						100% Ready
+					</span>
+				</div>
+			</div>
+		);
+	}
+
+	// 20. Spam testing
+	if (rowKey === "spamTesting") {
+		return (
+			<div className="flex items-center justify-between text-[11px]">
+				<div className="flex flex-col gap-0.5">
+					<span className="font-bold font-mono text-emerald-600 text-sm dark:text-emerald-400">
+						0.2 / 10.0
+					</span>
+					<span className="text-[10px] text-text-soft-400 dark:text-white/40">
+						Spam Score (Passed)
+					</span>
+				</div>
+				<div className="rounded bg-stroke-soft-100/80 p-1.5 font-mono text-[9px] text-text-sub-600 dark:bg-white/5 dark:text-white/60">
+					SpamAssassin: Clean
+				</div>
+			</div>
+		);
+	}
+
+	// 21. Reputation monitoring
+	if (rowKey === "reputationMonitoring") {
+		return (
+			<div className="grid grid-cols-3 gap-1 text-center font-mono text-[10px]">
+				<div className="rounded bg-stroke-soft-100/70 p-1 dark:bg-white/5">
+					<div className="font-bold text-text-strong-950 dark:text-white">
+						0.01%
+					</div>
+					<div className="text-[9px] text-text-soft-400 dark:text-white/40">
+						Bounce
+					</div>
+				</div>
+				<div className="rounded bg-stroke-soft-100/70 p-1 dark:bg-white/5">
+					<div className="font-bold text-text-strong-950 dark:text-white">
+						0.00%
+					</div>
+					<div className="text-[9px] text-text-soft-400 dark:text-white/40">
+						Spam
+					</div>
+				</div>
+				<div className="rounded bg-stroke-soft-100/70 p-1 dark:bg-white/5">
+					<div className="font-bold text-emerald-600 dark:text-emerald-400">
+						100%
+					</div>
+					<div className="text-[9px] text-text-soft-400 dark:text-white/40">
+						Health
+					</div>
+				</div>
+			</div>
+		);
+	}
+
+	// 22. Delivery analytics
+	if (rowKey === "deliveryAnalytics") {
+		return (
+			<div className="flex h-10 items-end justify-between gap-1.5 pt-1">
+				{[40, 65, 85, 95, 70, 88, 98].map((h, i) => (
+					<div key={i} className="flex flex-1 flex-col items-center gap-1">
+						<div
+							className="w-full rounded-t bg-blue-accent/80 dark:bg-[#0066ff]"
+							style={{ height: `${h * 0.28}px` }}
+						/>
+					</div>
+				))}
+			</div>
+		);
+	}
+
+	// 23. Open & click tracking
+	if (rowKey === "openClickTracking") {
+		return (
+			<div className="flex items-center justify-between font-mono text-[11px]">
+				<div className="flex flex-col">
+					<span className="text-[10px] text-text-soft-400 dark:text-white/40">
+						Opens
+					</span>
+					<span className="font-semibold text-sm text-text-strong-950 dark:text-white">
+						48.2%
+					</span>
+				</div>
+				<div className="h-6 w-px bg-stroke-soft-100 dark:bg-white/10" />
+				<div className="flex flex-col">
+					<span className="text-[10px] text-text-soft-400 dark:text-white/40">
+						Clicks
+					</span>
+					<span className="font-semibold text-blue-accent text-sm dark:text-[#52a8ff]">
+						14.8%
+					</span>
+				</div>
+				<div className="h-6 w-px bg-stroke-soft-100 dark:bg-white/10" />
+				<div className="flex flex-col">
+					<span className="text-[10px] text-text-soft-400 dark:text-white/40">
+						Unsubs
+					</span>
+					<span className="font-semibold text-emerald-600 text-sm dark:text-emerald-400">
+						0.02%
+					</span>
+				</div>
+			</div>
+		);
+	}
+
+	// 24. Event logs
+	if (rowKey === "eventLogs") {
+		return (
+			<div className="flex flex-col gap-1 font-mono text-[10px]">
+				<div className="flex items-center justify-between text-text-sub-600 dark:text-white/60">
+					<span>14:32:01 email.delivered</span>
+					<span className="text-emerald-600 dark:text-emerald-400">200</span>
+				</div>
+				<div className="flex items-center justify-between text-text-sub-600 dark:text-white/60">
+					<span>14:32:03 email.opened</span>
+					<span className="text-blue-accent dark:text-[#52a8ff]">OPEN</span>
+				</div>
+				<div className="flex items-center justify-between text-text-sub-600 dark:text-white/60">
+					<span>14:32:09 email.clicked</span>
+					<span className="text-purple-600 dark:text-purple-400">CLICK</span>
+				</div>
+			</div>
+		);
+	}
+
+	// 25. Hosted Reloop
+	if (rowKey === "hostedReloop") {
+		return (
+			<div className="flex items-center justify-between font-mono text-[10px]">
+				<div className="flex flex-col gap-0.5">
+					<span className="font-semibold text-text-strong-950 dark:text-white">
+						Global Edge Mesh
+					</span>
+					<span className="text-emerald-600 dark:text-emerald-400">
+						● 14 Regions Active
+					</span>
+				</div>
+				<span className="rounded bg-blue-accent/10 px-2 py-1 font-bold text-blue-accent dark:text-[#52a8ff]">
+					MULTI-REGION
+				</span>
+			</div>
+		);
+	}
+
+	// 26. Self-host
+	if (rowKey === "selfHost") {
+		return (
+			<div className="rounded bg-stroke-soft-100/80 p-2 font-mono text-[10px] dark:bg-white/5">
+				<div className="text-text-strong-950 dark:text-white">
+					$ docker run -d reloop/core
+				</div>
+				<div className="mt-1 text-[9px] text-emerald-600 dark:text-emerald-400">
+					✓ Postgres, Redis, SMTP daemon started
+				</div>
+			</div>
+		);
+	}
+
+	// 27. Integrations
+	if (rowKey === "integrations") {
+		return (
+			<div className="grid grid-cols-4 gap-1.5 text-center font-mono text-[10px]">
+				<span className="rounded bg-stroke-soft-100/80 py-1 dark:bg-white/5">
+					Slack
+				</span>
+				<span className="rounded bg-stroke-soft-100/80 py-1 dark:bg-white/5">
+					Linear
+				</span>
+				<span className="rounded bg-stroke-soft-100/80 py-1 dark:bg-white/5">
+					GitHub
+				</span>
+				<span className="rounded bg-stroke-soft-100/80 py-1 dark:bg-white/5">
+					Zapier
+				</span>
+			</div>
+		);
+	}
+
+	// 28. Audit logs
+	if (rowKey === "auditLogs") {
+		return (
+			<div className="flex flex-col gap-1 font-mono text-[10px]">
+				<div className="flex items-center justify-between">
+					<span className="text-text-strong-950 dark:text-white">
+						api_key.create
+					</span>
+					<span className="text-text-soft-400 dark:text-white/40">10m ago</span>
+				</div>
+				<div className="text-[9px] text-text-sub-600 dark:text-white/50">
+					Actor: admin@acme.com • IP: 198.51.100.4
+				</div>
+			</div>
+		);
+	}
+
+	// 29. Support level
+	if (rowKey === "support") {
+		return (
+			<div className="flex items-center justify-between text-[11px]">
+				<div className="flex flex-col gap-0.5">
+					<span className="font-medium text-text-strong-950 dark:text-white">
+						Direct Engineer Access
+					</span>
+					<span className="text-[10px] text-text-soft-400 dark:text-white/40">
+						Slack Connect &amp; Priority Queue
+					</span>
+				</div>
+				<span className="rounded-full bg-emerald-500/10 px-2 py-0.5 font-medium font-mono text-[10px] text-emerald-600 dark:text-emerald-400">
+					&lt; 15m SLA
+				</span>
+			</div>
+		);
+	}
+
+	// 30. Uptime SLA
+	if (rowKey === "uptimeSla") {
+		return (
+			<div className="flex items-center justify-between text-[11px]">
+				<div className="flex flex-col gap-0.5">
+					<span className="font-bold font-mono text-base text-blue-accent dark:text-[#52a8ff]">
+						99.99%
+					</span>
+					<span className="text-[10px] text-text-soft-400 dark:text-white/40">
+						Financially Backed
+					</span>
+				</div>
+				<span className="rounded bg-stroke-soft-100 px-2 py-1 font-mono text-[10px] dark:bg-white/5">
+					Credits on Breach
+				</span>
+			</div>
+		);
+	}
+
+	// Fallback
+	return (
+		<div className="flex items-center gap-3">
+			<div className="flex w-16 shrink-0 flex-col gap-1.5">
+				<div className="h-1.5 w-full rounded-full bg-stroke-soft-200 dark:bg-white/10" />
+				<div className="h-1.5 w-4/5 rounded-full bg-stroke-soft-200/80 dark:bg-white/10" />
+				<div className="h-1.5 w-3/5 rounded-full bg-stroke-soft-200/60 dark:bg-white/10" />
+			</div>
+			<div className="h-8 w-px bg-stroke-soft-100 dark:bg-white/[0.06]" />
+			<div className="relative flex flex-1 flex-col gap-1.5">
+				<div className="h-2 w-14 rounded-full bg-blue-accent dark:bg-[#0066ff]" />
+				<div className="h-2 w-9 rounded-full bg-stroke-soft-200 dark:bg-white/15" />
+			</div>
+		</div>
+	);
+}
+
+function FeatureTooltipContent({
+	label,
+	rowKey,
+}: {
+	label: string;
+	rowKey: string;
+}) {
+	const info = FEATURE_TOOLTIPS[rowKey] ?? {
+		description: `Comprehensive features and infrastructure controls for ${label}.`,
+		version: "v3.0",
+		badge: "LIVE",
+		status: "DEFAULT",
+	};
+
+	return (
+		<div className="w-[300px] rounded-2xl border border-stroke-soft-100 bg-bg-white-0 p-5 shadow-[0_20px_50px_rgba(0,0,0,0.14)] dark:border-white/10 dark:bg-[#121212] dark:shadow-[0_25px_60px_rgba(0,0,0,0.5)]">
+			<div className="flex items-center gap-2.5">
+				{getFeatureIcon(
+					label,
+					"size-4 shrink-0 text-blue-accent dark:text-[#52a8ff]",
+				)}
+				<h4 className="font-medium text-[15px] text-text-strong-950 dark:text-white">
+					{label}
+				</h4>
+			</div>
+			<p className="mt-2 text-[13px] text-text-sub-600 leading-relaxed dark:text-white/70">
+				{info.description}
+			</p>
+
+			{/* Mini Visual Preview matching user reference image */}
+			<div className="mt-3.5 overflow-hidden rounded-xl border border-stroke-soft-100/80 bg-bg-weak-50/60 p-3.5 dark:border-white/[0.08] dark:bg-white/[0.03]">
+				<div className="flex items-center justify-between text-[11px]">
+					<div className="flex items-center gap-1.5">
+						<span className="font-mono font-medium text-blue-accent dark:text-[#52a8ff]">
+							{info.version ?? "v3.0"}
+						</span>
+						<span className="rounded-full bg-blue-accent px-1.5 py-0.5 font-bold font-mono text-[9px] text-white tracking-wider dark:bg-[#0066ff]">
+							{info.badge ?? "LIVE"}
+						</span>
+					</div>
+					<span className="font-mono text-[10px] text-text-soft-400 uppercase tracking-wider dark:text-white/30">
+						{info.status ?? "DEFAULT"}
+					</span>
+				</div>
+
+				<div className="my-2.5 border-stroke-soft-100/60 border-t dark:border-white/[0.06]" />
+
+				<FeatureVisualContent rowKey={rowKey} label={label} info={info} />
+			</div>
+		</div>
+	);
 }
 
 function PlanColumn({
@@ -639,9 +1636,27 @@ function ComparisonTable({
 										"group-hover/row:bg-bg-weak-50/70 dark:group-hover/row:bg-white/[0.03]",
 									)}
 								>
-									<span className="relative cursor-pointer text-body-default underline decoration-[8%] decoration-text-opaque-disabled decoration-wavy underline-offset-[25%] transition-colors duration-200 hover:decoration-blue-accent text-text-strong-950 dark:text-white">
-										{row.label}
-									</span>
+									<HoverCard.Root openDelay={100} closeDelay={150}>
+										<HoverCard.Trigger asChild>
+											<span className="relative cursor-pointer text-body-default underline decoration-[8%] decoration-text-opaque-disabled decoration-wavy underline-offset-[25%] transition-colors duration-200 hover:decoration-blue-accent text-text-strong-950 dark:text-white">
+												{row.label}
+											</span>
+										</HoverCard.Trigger>
+										<HoverCard.Portal>
+											<HoverCard.Content
+												side="top"
+												align="start"
+												sideOffset={10}
+												collisionPadding={16}
+												className="z-50 animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 duration-150 outline-none"
+											>
+												<FeatureTooltipContent
+													label={row.label}
+													rowKey={row.key}
+												/>
+											</HoverCard.Content>
+										</HoverCard.Portal>
+									</HoverCard.Root>
 								</div>
 								{pricingPlans.map((plan) => {
 									const value = plan.comparison[row.key];
