@@ -1,7 +1,6 @@
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { JsonLd } from "@reloop/web/components/json-ld";
-import { BlogCta } from "@reloop/web/components/landing/blog/blog-cta";
 import { getSiteUrl, socialProfiles } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 import { OpenSourceIsntCheap } from "./components/open-source-isnt-cheap";
@@ -172,19 +171,6 @@ const WhyOpenSourcePage = () => {
 					</article>
 				</div>
 			</div>
-
-			{/* Full-width bottom CTA */}
-			<BlogCta
-				category="Open Source"
-				headline="Start free, or self-host."
-				sub="Reloop is Apache 2.0. Same code on your servers and on reloop.sh."
-				primaryLabel="Start Building Free"
-				primaryHref="/dashboard/signup"
-				secondaryLabel="View on GitHub"
-				secondaryHref={socialProfiles.github}
-				secondaryExternal
-				accentColor="indigo"
-			/>
 		</>
 	);
 };
