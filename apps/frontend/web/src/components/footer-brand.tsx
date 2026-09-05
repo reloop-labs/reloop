@@ -4,6 +4,7 @@ import { Logo } from "@reloop/ui/logo";
 import { socialProfiles } from "@reloop/web/lib/site";
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { siApache } from "simple-icons";
 
 const socials: {
 	label: string;
@@ -52,9 +53,15 @@ function DiscordIcon({ className }: { className?: string }) {
 
 function ApacheMark() {
 	return (
-		<span className="flex size-7 shrink-0 items-center justify-center rounded-[5px] bg-primary-base font-bold text-[11px] text-white">
-			A2
-		</span>
+		<svg
+			viewBox="0 0 24 24"
+			className="size-7 shrink-0"
+			aria-hidden
+			fill={`#${siApache.hex}`}
+		>
+			<title>Apache</title>
+			<path d={siApache.path} />
+		</svg>
 	);
 }
 
@@ -147,7 +154,7 @@ export function FooterBrand() {
 			<div className="grid grid-cols-2">
 				<Link
 					href="/license"
-					className="flex flex-col justify-center gap-4 border-stroke-soft-100 border-r border-b px-5 py-6 transition-colors hover:bg-bg-weak-50 sm:px-6 dark:border-white/10 dark:hover:bg-white/[0.03]"
+					className="flex flex-col justify-between gap-4 border-stroke-soft-100 border-r border-b px-5 py-6 transition-colors hover:bg-bg-weak-50 sm:px-6 dark:border-white/10 dark:hover:bg-white/[0.03]"
 				>
 					<p className="text-[13px] text-text-sub-600 dark:text-white/45">
 						Licensed under

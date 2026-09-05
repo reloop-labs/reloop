@@ -1,12 +1,10 @@
 "use client";
 
 import { cn } from "@reloop/ui/cn";
-import { Icon } from "@reloop/ui/icon";
 import { FooterBrand } from "@reloop/web/components/footer-brand";
+import { FooterPixelStrip } from "@reloop/web/components/footer-pixel-strip";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useTheme } from "next-themes";
-import { useEffect, useState } from "react";
 
 type FooterLink = {
 	title: string;
@@ -145,15 +143,9 @@ export const Footer = () => {
 	if (pathname === "/twitter" || pathname?.startsWith("/twitter/")) {
 		return null;
 	}
-	const { theme, setTheme } = useTheme();
-	const [mounted, setMounted] = useState(false);
-
-	useEffect(() => {
-		setMounted(true);
-	}, []);
 
 	return (
-		<footer className="w-full border-stroke-soft-100 border-b bg-bg-white-0 text-text-strong-950 dark:border-white/10 dark:bg-black dark:text-white">
+		<footer className="w-full bg-bg-white-0 text-text-strong-950 dark:bg-black dark:text-white">
 			<div className="mx-auto w-full max-w-5xl border-stroke-soft-100 md:max-w-7xl xl:border-x dark:border-white/10">
 				<div aria-hidden className="h-24" />
 				<FooterBrand />
@@ -188,79 +180,7 @@ export const Footer = () => {
 						</nav>
 					))}
 				</div>
-
-				<div className="flex flex-row items-stretch justify-between border-stroke-soft-100 border-t dark:border-white/10">
-					<div className="flex items-center px-5 py-3 sm:px-6">
-						<div className="inline-flex items-center rounded-full border border-stroke-soft-100 bg-bg-weak-50 p-0.5 dark:border-white/10 dark:bg-white/[0.04]">
-							<button
-								type="button"
-								onClick={() => setTheme("system")}
-								className={`flex items-center rounded-full px-1.5 py-1.5 font-semibold text-[12px] transition-all duration-200 ${
-									mounted && theme === "system"
-										? "bg-white text-black shadow-sm"
-										: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/55 dark:hover:text-white/80"
-								}`}
-								aria-label="System theme"
-							>
-								<Icon className="size-3.5" name="laptop" />
-							</button>
-							<button
-								type="button"
-								onClick={() => setTheme("light")}
-								className={`flex items-center rounded-full px-1.5 py-1.5 font-semibold text-[12px] transition-all duration-200 ${
-									mounted && theme === "light"
-										? "bg-white text-black shadow-sm dark:bg-white dark:text-black"
-										: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/55 dark:hover:text-white/80"
-								}`}
-								aria-label="Light mode"
-							>
-								<Icon className="size-3.5" name="sun" />
-							</button>
-							<button
-								type="button"
-								onClick={() => setTheme("dark")}
-								className={`flex items-center rounded-full px-1.5 py-1.5 font-semibold text-[12px] transition-all duration-200 ${
-									mounted && theme === "dark"
-										? "bg-white text-black shadow-sm"
-										: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/55 dark:hover:text-white/80"
-								}`}
-								aria-label="Dark mode"
-							>
-								<Icon className="size-3.5" name="moon" />
-							</button>
-						</div>
-					</div>
-
-					<div className="flex items-stretch text-text-sub-600 dark:text-white/60">
-						<a
-							href="https://github.com/reloop-labs/reloop"
-							target="_blank"
-							rel="noreferrer"
-							className="flex w-12 items-center justify-center border-stroke-soft-100 border-l transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 sm:w-14 dark:border-white/10 dark:hover:bg-white/[0.04] dark:hover:text-white"
-							aria-label="GitHub"
-						>
-							<Icon name="github" className="size-4" />
-						</a>
-						<a
-							href="https://x.com/reloop_labs"
-							target="_blank"
-							rel="noreferrer"
-							className="flex w-12 items-center justify-center border-stroke-soft-100 border-l transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 sm:w-14 dark:border-white/10 dark:hover:bg-white/[0.04] dark:hover:text-white"
-							aria-label="X"
-						>
-							<Icon name="twitter" className="size-4" />
-						</a>
-						<a
-							href="https://www.linkedin.com/company/reloop-labs"
-							target="_blank"
-							rel="noreferrer"
-							className="flex w-12 items-center justify-center border-stroke-soft-100 border-l transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 sm:w-14 dark:border-white/10 dark:hover:bg-white/[0.04] dark:hover:text-white"
-							aria-label="LinkedIn"
-						>
-							<Icon name="linkedin" className="size-4" />
-						</a>
-					</div>
-				</div>
+				<FooterPixelStrip />
 			</div>
 		</footer>
 	);

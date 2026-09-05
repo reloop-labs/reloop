@@ -5,6 +5,7 @@ import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { Logo } from "@reloop/ui/logo";
+import { ThemeToggle } from "@reloop/web/components/theme-toggle";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -1899,6 +1900,7 @@ export const Header = () => {
 
 					{/* Right — actions */}
 					<div className="relative z-10 hidden items-center gap-3 lg:flex">
+						<ThemeToggle />
 						<a
 							href="https://github.com/reloop-labs/reloop"
 							target="_blank"
@@ -2164,6 +2166,9 @@ export const Header = () => {
 								</nav>
 
 								<div className="mt-6 flex flex-col gap-3 border-stroke-soft-200/70 border-t pt-6 dark:border-white/10">
+									<div className="px-2">
+										<ThemeToggle />
+									</div>
 									<a
 										href="https://github.com/reloop-labs/reloop"
 										target="_blank"
