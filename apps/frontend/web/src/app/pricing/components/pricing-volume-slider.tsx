@@ -8,19 +8,27 @@ import {
 } from "@reloop/web/lib/pricing";
 import { useState } from "react";
 
-const STEPS = [3000, 10000, 50000, 100000, 250000, 500000, 1000000];
+const MIN = 3000;
+const MAX = 1000000;
 
-const TICK_LABELS = ["3k", "10k", "50k", "100k", "250k", "500k", "1M"];
-
-const TICK_PLANS = [
-	"Free",
-	"Individual",
-	"Individual",
-	"Startup",
-	"Startup",
-	"Startup",
-	"Startup",
+const TICKS = [
+	{ value: 3000, label: "3k", plan: "Free" },
+	{ value: 10000, label: "10k", plan: "Individual" },
+	{ value: 50000, label: "50k", plan: "Individual" },
+	{ value: 100000, label: "100k", plan: "Startup" },
+	{ value: 250000, label: "250k", plan: "Startup" },
+	{ value: 500000, label: "500k", plan: "Startup" },
+	{ value: 1000000, label: "1M", plan: "Startup" },
 ];
+
+const toPosition = (volume: number) =>
+	Math.round((Math.log(volume / MIN) / Math.log(MAX / MIN)) * 100);
+
+const toVolume = (position: number) =>
+	Math.max(
+		MIN,
+		Math.round((MIN * (MAX / MIN) ** (position / 100)) / 1000) * 1000,
+	);
 
 const formatVolume = (volume: number) =>
 	new Intl.NumberFormat("en-US").format(volume);
@@ -33,10 +41,20 @@ function recommendedPlan(volume: number) {
 }
 
 export function PricingVolumeSlider() {
-	const [step, setStep] = useState(2);
-	const volume = STEPS[step] ?? 50000;
+	const [volume, setVolume] = useState(50000);
+	const position = toPosition(volume);
 	const cost = hostedMonthlyUsdForVolume(volume);
 	const plan = recommendedPlan(volume);
+
+	let activeTick = 0;
+	let smallestGap = Number.POSITIVE_INFINITY;
+	TICKS.forEach((tick, index) => {
+		const gap = Math.abs(toPosition(tick.value) - position);
+		if (gap < smallestGap) {
+			smallestGap = gap;
+			activeTick = index;
+		}
+	});
 
 	return (
 		<section
@@ -54,25 +72,34 @@ export function PricingVolumeSlider() {
 				<div className="mt-8 px-1">
 					<Slider.Root
 						min={0}
-						max={STEPS.length - 1}
+						max={100}
 						step={1}
-						value={[step]}
-						onValueChange={(value) => setStep(value[0] ?? 2)}
+						value={[position]}
+						onValueChange={(value) => setVolume(toVolume(value[0] ?? 0))}
 						aria-label="Monthly email volume"
 					>
 						<Slider.Thumb aria-label="Monthly email volume" />
 					</Slider.Root>
 
-					<div className="mt-3 flex items-start justify-between">
-						{STEPS.map((_, index) => {
-							const active = index === step;
+					<div className="relative mt-3 h-12">
+						{TICKS.map((tick, index) => {
+							const active = index === activeTick;
+							const left = toPosition(tick.value);
 							return (
 								<button
-									key={TICK_LABELS[index]}
+									key={tick.label}
 									type="button"
-									onClick={() => setStep(index)}
-									aria-label={`Set volume to ${TICK_LABELS[index]}`}
-									className="flex min-w-0 flex-col items-center gap-1 px-0.5"
+									onClick={() => setVolume(tick.value)}
+									aria-label={`Set volume to ${tick.label}`}
+									style={{ left: `${left}%` }}
+									className={cn(
+										"absolute top-0 flex flex-col items-center gap-1 px-0.5",
+										index === 0 && "items-start",
+										index === TICKS.length - 1 && "items-end",
+										index > 0 && index < TICKS.length - 1 && "-translate-x-1/2",
+										index === 0 && "translate-x-0",
+										index === TICKS.length - 1 && "-translate-x-full",
+									)}
 								>
 									<span
 										aria-hidden
@@ -91,17 +118,17 @@ export function PricingVolumeSlider() {
 												: "text-text-sub-600/70 dark:text-white/40",
 										)}
 									>
-										{TICK_LABELS[index]}
+										{tick.label}
 									</span>
 									<span
 										className={cn(
-											"text-[11px]",
+											"hidden text-[11px] sm:block",
 											active
 												? "font-medium text-text-strong-950 dark:text-white"
 												: "text-text-sub-600/60 dark:text-white/35",
 										)}
 									>
-										{TICK_PLANS[index]}
+										{tick.plan}
 									</span>
 								</button>
 							);
