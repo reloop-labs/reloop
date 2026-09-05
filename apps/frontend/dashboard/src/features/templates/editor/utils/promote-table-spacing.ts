@@ -23,16 +23,15 @@ export function promoteTableSpacingToCells(root: Element): void {
 		);
 		if (fromTable.every((value) => isZeroLength(value))) continue;
 
-		const rows = table.tBodies.length
-			? Array.from(table.tBodies[0].rows)
-			: Array.from(table.rows);
+		const body = table.tBodies[0];
+		const rows = body ? Array.from(body.rows) : Array.from(table.rows);
 
 		for (const row of rows) {
 			for (const cell of Array.from(row.cells)) {
 				for (let i = 0; i < PADDING_PROPS.length; i++) {
 					const prop = PADDING_PROPS[i];
 					const tableVal = fromTable[i];
-					if (!tableVal || isZeroLength(tableVal)) continue;
+					if (!prop || !tableVal || isZeroLength(tableVal)) continue;
 					const cellVal = cell.style.getPropertyValue(prop);
 					if (isZeroLength(cellVal)) {
 						cell.style.setProperty(prop, tableVal);
@@ -216,7 +215,7 @@ export function collapseEmptyLayoutCells(root: Element): void {
 			const kids = Array.from(cell.children);
 			for (let i = kids.length - 1; i >= 1; i--) {
 				const kid = kids[i];
-				if (!isVisuallyEmptyBlock(kid)) break;
+				if (!kid || !isVisuallyEmptyBlock(kid)) break;
 				kid.remove();
 			}
 			continue;
@@ -258,7 +257,7 @@ function imagesInImageOnlyCell(td: Element): HTMLImageElement[] | null {
 
 function soleImageInCell(td: Element): HTMLImageElement | null {
 	const imgs = imagesInImageOnlyCell(td);
-	return imgs?.length === 1 ? imgs[0] : null;
+	return imgs?.length === 1 ? (imgs[0] ?? null) : null;
 }
 
 function addCssLengths(a: string, b: string): string {
@@ -330,11 +329,10 @@ export function unwrapLinkedImages(root: Element): void {
 }
 
 export function isImageOnlySingleRowTable(table: HTMLTableElement): boolean {
-	const rows = table.tBodies.length
-		? Array.from(table.tBodies[0].rows)
-		: Array.from(table.rows);
+	const body = table.tBodies[0];
+	const rows = body ? Array.from(body.rows) : Array.from(table.rows);
 	if (rows.length !== 1) return false;
-	const cells = Array.from(rows[0].cells);
+	const cells = Array.from(rows[0]?.cells ?? []);
 	if (cells.length < 2 || cells.length > 8) return false;
 	return cells.every((td) => soleImageInCell(td) !== null);
 }
@@ -352,7 +350,8 @@ export function isImageOnlySingleRowTable(table: HTMLTableElement): boolean {
 export function alignImageOnlyTableRows(root: Element): void {
 	for (const table of Array.from(root.getElementsByTagName("table"))) {
 		if (!isImageOnlySingleRowTable(table)) continue;
-		const row = table.tBodies.length ? table.tBodies[0].rows[0] : table.rows[0];
+		const row = table.tBodies[0]?.rows[0] ?? table.rows[0];
+		if (!row) continue;
 		const cells = Array.from(row.cells);
 		const imgs = cells.map((cell) => soleImageInCell(cell));
 		const allSmall = imgs.every(
@@ -369,7 +368,7 @@ export function alignImageOnlyTableRows(root: Element): void {
 		for (let i = 0; i < cells.length; i++) {
 			const td = cells[i];
 			const img = imgs[i];
-			if (!img) continue;
+			if (!td || !img) continue;
 			td.style.verticalAlign = "middle";
 			const htmlAlign = td.getAttribute("align")?.toLowerCase();
 			if (
@@ -485,7 +484,7 @@ export function alignImageOnlyRowsInJson(json: JsonNode): boolean {
 			const rows = node.content.filter((child) => child.type === "tableRow");
 			if (rows.length === 1) {
 				const cells =
-					rows[0].content?.filter(
+					rows[0]?.content?.filter(
 						(child) =>
 							child.type === "tableCell" || child.type === "tableHeader",
 					) ?? [];
