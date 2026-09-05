@@ -445,6 +445,20 @@ export default async function OpenGraphImage() {
 		</div>,
 		{
 			...size,
+			fonts: [
+				{
+					name: "Inter",
+					data: interMediumFont,
+					weight: 500,
+					style: "normal",
+				},
+				{
+					name: "Inter",
+					data: interSemiBoldFont,
+					weight: 600,
+					style: "normal",
+				},
+			],
 		},
 	);
 }
