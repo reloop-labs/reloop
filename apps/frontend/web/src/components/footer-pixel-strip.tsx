@@ -172,7 +172,7 @@ const SPRITES = [envelope, check, inbox, bolt, atSign, plane, stamp];
 
 export function FooterPixelStrip() {
 	return (
-		<div className="flex w-full items-center justify-evenly border-stroke-soft-100 border-t px-6 py-5 sm:px-16 sm:py-6 lg:px-24 dark:border-white/10">
+		<div className="flex w-full w-full items-center justify-evenly border-stroke-soft-100 border-t px-6 py-5 sm:px-16 sm:py-6 lg:px-24 dark:border-white/10">
 			{SPRITES.map((sprite, index) => (
 				<PixelSprite key={index} sprite={sprite} pixelSize={4} />
 			))}
