@@ -398,6 +398,66 @@ function PlanColumn({
 	);
 }
 
+function PlanCheckmark({ className }: { className?: string }) {
+	return (
+		<svg
+			fill="none"
+			height="20"
+			viewBox="0 0 20 20"
+			width="20"
+			xmlns="http://www.w3.org/2000/svg"
+			className={cn("text-primary-base dark:text-[#7aa2ff]", className)}
+			style={
+				{
+					"--color-blue-accent": "currentColor",
+				} as React.CSSProperties
+			}
+			aria-label="Included"
+			role="img"
+		>
+			<circle
+				cx="10"
+				cy="10"
+				fill="var(--color-blue-accent)"
+				fillOpacity="0.08"
+				r="8"
+			/>
+			<path
+				d="M7 10.5L9 12.5L13 7.5"
+				stroke="var(--color-blue-accent)"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+				strokeWidth="1.25"
+			/>
+		</svg>
+	);
+}
+
+function PlanCrossIcon({ className }: { className?: string }) {
+	return (
+		<svg
+			fill="none"
+			height="20"
+			viewBox="0 0 20 20"
+			width="20"
+			xmlns="http://www.w3.org/2000/svg"
+			className={className}
+			aria-label="Not included"
+			role="img"
+		>
+			<path
+				d="M7 7L13 13M13 7L7 13"
+				stroke="#060606"
+				strokeOpacity="0.37"
+				strokeWidth="1.25"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+				className="dark:stroke-white dark:stroke-opacity-30"
+			/>
+		</svg>
+	);
+}
+
 function ComparisonCell({
 	value,
 	type,
@@ -405,28 +465,15 @@ function ComparisonCell({
 	value: string | boolean;
 	type: "text" | "boolean";
 }) {
-	const unavailable = type === "boolean" ? !value : value === "—";
+	const unavailable =
+		type === "boolean" ? !value : value === "—" || value === "-";
 
 	if (unavailable) {
-		return (
-			<span
-				role="img"
-				className="text-[15px] text-text-sub-600/50 dark:text-white/25"
-				aria-label="Not included"
-			>
-				—
-			</span>
-		);
+		return <PlanCrossIcon />;
 	}
 
 	if (type === "boolean") {
-		return (
-			<Icon
-				name="check"
-				className="size-4 text-text-strong-950 dark:text-white/85"
-				aria-label="Included"
-			/>
-		);
+		return <PlanCheckmark />;
 	}
 
 	return (
