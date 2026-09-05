@@ -7,6 +7,7 @@ import { useEditorStore } from "#/features/templates/editor/hooks/use-editor-sto
 import { applyImportedEmailCss } from "#/features/templates/editor/utils/apply-imported-email-css";
 import {
 	EMAIL_BUBBLE_HIDE_NODES,
+	emailButtonBubbleTrigger,
 	emailTextBubbleTrigger,
 } from "#/features/templates/editor/utils/email-slash-command-plugin";
 import {
@@ -79,7 +80,13 @@ export function FullEmailBuilder() {
 				hideWhenActiveNodes={[...EMAIL_BUBBLE_HIDE_NODES]}
 				trigger={emailTextBubbleTrigger}
 			/>
-			<BubbleMenu.ButtonDefault />
+			<BubbleMenu trigger={emailButtonBubbleTrigger} placement="top">
+				<BubbleMenu.ButtonToolbar>
+					<BubbleMenu.ButtonEditLink />
+					<BubbleMenu.ButtonUnlink />
+				</BubbleMenu.ButtonToolbar>
+				<BubbleMenu.ButtonForm />
+			</BubbleMenu>
 			<BubbleMenu.ImageDefault />
 		</div>
 	);

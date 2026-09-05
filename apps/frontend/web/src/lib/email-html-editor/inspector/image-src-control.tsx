@@ -1,0 +1,61 @@
+import { ScrubField } from "./scrub-field";
+import { TextInput } from "./text-input";
+import { UrlInput } from "./url-input";
+
+export interface ImageSrcValue {
+	src: string;
+	alt: string;
+	width: number | "";
+	height: number | "";
+}
+
+export function ImageSrcControl({
+	value,
+	onChange,
+}: {
+	value: ImageSrcValue;
+	onChange: (v: ImageSrcValue) => void;
+}) {
+	return (
+		<div className="flex w-full flex-col gap-1.5">
+			{/* Preview */}
+			{value.src && (
+				<img
+					src={value.src}
+					alt={value.alt || "preview"}
+					className="max-h-20 w-full rounded border border-(--re-border) object-contain"
+				/>
+			)}
+			<UrlInput
+				value={value.src}
+				onChange={(src) => onChange({ ...value, src })}
+				placeholder="Image URL…"
+			/>
+			<TextInput
+				value={value.alt}
+				onChange={(alt) => onChange({ ...value, alt })}
+				placeholder="Alt text…"
+			/>
+			<div className="grid grid-cols-2 gap-2">
+				<ScrubField
+					label="Width"
+					prefix="W"
+					value={value.width}
+					onChange={(width) => onChange({ ...value, width })}
+					suffix="px"
+					min={1}
+					max={2000}
+				/>
+				<ScrubField
+					label="Height"
+					prefix="H"
+					value={value.height}
+					onChange={(height) => onChange({ ...value, height })}
+					suffix="px"
+					min={1}
+					max={2000}
+				/>
+			</div>
+		</div>
+	);
+}

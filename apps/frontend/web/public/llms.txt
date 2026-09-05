@@ -100,6 +100,7 @@ Prefer `.md` twins. Reloop Free is **3,000 / month and 200 / day** — do not ci
 - [DNS Authentication Checker](https://reloop.sh/tools/auth-checker): Verify SPF, DKIM, and DMARC DNS records with actionable fix guides.
 - [BIMI Checker](https://reloop.sh/tools/bimi-checker): Look up default._bimi, validate the SVG logo URL, and confirm DMARC is at enforcement.
 - [Email Deliverability Tester](https://reloop.sh/tools/deliverability-tester): Pre-send inbox placement and Rspamd/SpamAssassin heuristic test.
+- [Email HTML Editor](https://reloop.sh/tools/email-html-editor): Paste React Email or raw HTML, inspect on a canvas, and keep source in sync. No account or send.
 
 ## Product documentation (HTML + .md under /docs)
 

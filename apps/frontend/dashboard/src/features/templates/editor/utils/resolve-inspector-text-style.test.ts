@@ -6,6 +6,7 @@ import { emailStarterKit } from "./email-starter-kit";
 import {
 	formatInspectorStyleForCss,
 	resolveInspectorTextStyle,
+	setInlineCssDeclaration,
 	setInlineCssProp,
 	valueFromInlineCss,
 } from "./resolve-inspector-text-style";
@@ -48,6 +49,17 @@ describe("resolveInspectorTextStyle", () => {
 		expect(next).toContain("font-size: 18px");
 		expect(next).toContain("color: rgb(255,255,255)");
 		expect(next).toContain("letter-spacing: -0.075px");
+	});
+
+	it("writes a CTA fill onto the link mark without dropping color", () => {
+		const next = setInlineCssDeclaration(
+			"color:#ffffff;padding:12px 20px;background-color:#000000",
+			"backgroundColor",
+			"#2563eb",
+		);
+		expect(next).toContain("background-color: #2563eb");
+		expect(next).toContain("color: #ffffff");
+		expect(next).toContain("padding: 12px 20px");
 	});
 
 	it("keeps Dither CTA typography on the TipTap link mark", () => {

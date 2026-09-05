@@ -1,12 +1,11 @@
-import { useEditorStore } from "#/features/templates/editor/hooks/use-editor-store";
 import {
 	absolutizeEmailAssetUrls,
 	inlineEmailStylesheet,
-} from "#/features/templates/editor/utils/inline-email-stylesheet";
+} from "./inline-email-stylesheet";
 import {
 	preserveEmailLinkUnderlines,
 	stampFilledLinksAsEmailButtons,
-} from "#/features/templates/editor/utils/preserve-email-link-underlines";
+} from "./preserve-email-link-underlines";
 import {
 	alignImageOnlyCells,
 	alignImageOnlyTableRows,
@@ -17,17 +16,17 @@ import {
 	promoteTableSpacingToCells,
 	stampThemeNeutralBlockPadding,
 	unwrapLinkedImages,
-} from "#/features/templates/editor/utils/promote-table-spacing";
+} from "./promote-table-spacing";
 import {
 	emailHasMixedBackgrounds,
 	rewriteLowContrastInlineText,
-} from "#/features/templates/editor/utils/readable-text-color";
+} from "./readable-text-color";
 import {
 	applyEmailColumnWidth,
 	findEmailContainerTable,
 	prepareEmailHtmlForParse,
 	stripEmailCentering,
-} from "#/features/templates/editor/utils/strip-email-centering";
+} from "./strip-email-centering";
 
 /** Tags that must never appear in the editor content. */
 const FORBIDDEN_TAGS = new Set([
@@ -75,8 +74,7 @@ export function sanitizeEmailHtml(rawHtml: string): string {
 	expandShorthandStyles(doc.body);
 	promoteTableSpacingToCells(doc.body);
 
-	// 1. Extract and clean preview text
-	let previewText = "";
+	// Drop hidden preview-text divs so they are not parsed as editor content.
 	const divs = Array.from(doc.querySelectorAll("div"));
 	for (const div of divs) {
 		const style = div.getAttribute("style") || "";
@@ -87,32 +85,15 @@ export function sanitizeEmailHtml(rawHtml: string): string {
 			div.getAttribute("data-skip-in-text") === "true";
 
 		if (hasHiddenStyle) {
-			const rawText = div.textContent || "";
-			const cleaned = rawText.replace(/\u00a0/g, "").trim();
+			const cleaned = (div.textContent || "").replace(/\u00a0/g, "").trim();
 			if (cleaned) {
-				previewText = cleaned;
-				// Remove the preview div so it's not parsed as editor content
 				div.remove();
 				break;
 			}
 		}
 	}
 
-	// 2. Extract title/subject
-	const titleEl = doc.querySelector("title");
-	const subject = titleEl ? titleEl.textContent?.trim() : "";
-
-	// 3. Update global editor store with extracted values
-	if (previewText) {
-		useEditorStore.getState().setPreviewText(previewText);
-	}
-	if (subject) {
-		useEditorStore.getState().setSubject(subject);
-	} else if (previewText) {
-		useEditorStore.getState().setSubject(previewText);
-	}
-
-	// 4. Find the innermost ~640px column and convert only that wrapper to a
+	// Find the innermost ~640px column and convert only that wrapper to a
 	// container div. Inner 1×1 padded tables stay as tables so TipTap slash /
 	// bubble / inspector see Layout Table → Table Cell, like Resend.
 	const containerTable = findEmailContainerTable(doc.body);

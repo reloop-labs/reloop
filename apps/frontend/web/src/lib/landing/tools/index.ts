@@ -4,6 +4,7 @@ import { config as blocklist_checker } from "./blocklist-checker";
 import { config as deliverability_tester } from "./deliverability-tester";
 import { config as dns_lookup } from "./dns-lookup";
 import { config as domain_age } from "./domain-age";
+import { config as email_html_editor } from "./email-html-editor";
 import { config as email_spam_words_checker } from "./email-spam-words-checker";
 import { config as email_validator } from "./email-validator";
 import { config as lookalike_watch } from "./lookalike-watch";
@@ -24,4 +25,5 @@ export const toolConfigs = [
 	deliverability_tester,
 	auth_checker,
 	bimi_checker,
+	email_html_editor,
 ];

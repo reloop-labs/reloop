@@ -1,0 +1,202 @@
+.tiptap.ProseMirror table,
+.ProseMirror table {
+	border-collapse: separate;
+	border-spacing: 0;
+	width: 100%;
+}
+
+/* Shrink-wrapped rows (Nike footer 166px, nav 370px). Canvas `width:100%`
+ * plus leftover width="100%" left-aligns the group. Inline pixel width
+ * + margin:auto must win. */
+.tiptap.ProseMirror table[data-shrink-row],
+.ProseMirror table[data-shrink-row] {
+	width: auto;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.tiptap.ProseMirror,
+.ProseMirror {
+	/* Email body background must meet the canvas edge. Chrome padding
+	 * here would show as a white strip above a gray section. */
+	padding-top: 0 !important;
+	padding-bottom: 0 !important;
+	/* Dashboard `html.dark` / OS dark must not activate email
+	 * `@media (prefers-color-scheme: dark)` or inherit chrome text color. */
+	color-scheme: light;
+	color: #000000;
+}
+
+.tiptap.ProseMirror td,
+.tiptap.ProseMirror th,
+.ProseMirror td,
+.ProseMirror th {
+	border: none;
+	vertical-align: top;
+}
+
+/* Table alignment=center is the email column (margin auto). Do not force
+ * text-align:start — Halo/Studio buttons and footers live in inner tables
+ * that also get alignment=center from source text-align:center. */
+.tiptap table[alignment="center"],
+.tiptap [alignment="center"]:is(table),
+.ProseMirror table[alignment="center"] {
+	margin-left: auto;
+	margin-right: auto;
+}
+
+/*
+ * Paste injects the same rules via applyImportedEmailCss, but that <style>
+ * tag lives in Zustand and is cleared on refresh. Keep the column centered
+ * here so Yjs rehydrate cannot slide the 640px container to the left.
+ */
+.tiptap.ProseMirror .node-container,
+.tiptap.ProseMirror [data-type="container"] {
+	box-sizing: border-box;
+	margin-left: auto;
+	margin-right: auto;
+	/* Shrink to the canvas; inline max-width from the pasted HTML caps it. */
+	width: 100%;
+	/* EmailTheming injects height: 400px with equal/higher specificity. */
+	height: auto !important;
+	max-height: none !important;
+	min-height: 0 !important;
+	overflow: visible !important;
+}
+
+/*
+ * EmailTheming MERGE prepends text-decoration:underline onto every
+ * a.node-link. Do not blanket-none all links — that hides Dither CTAs
+ * once TipTap unwraps <u>. Paste stamps data-email-decoration from the
+ * source; only those rules use !important so theme merge cannot win.
+ */
+.tiptap.ProseMirror a:has(img),
+.ProseMirror a:has(img) {
+	text-decoration: none !important;
+}
+
+.tiptap.ProseMirror a[data-email-decoration="none"],
+.ProseMirror a[data-email-decoration="none"] {
+	text-decoration: none !important;
+}
+
+.tiptap.ProseMirror a[data-email-decoration="underline"],
+.ProseMirror a[data-email-decoration="underline"] {
+	text-decoration: underline !important;
+}
+
+/* Social icon rows were flattened to a <p> with left alignment in
+ * older pastes. Keep the original table layout (50% right/left) and
+ * only center the row itself, not the whole cell — otherwise the
+ * cursor is trapped in the middle and the gap above the icons
+ * doubles (container 30px + 2rem). */
+.tiptap.ProseMirror p[data-icon-row],
+.ProseMirror p[data-icon-row] {
+	text-align: center !important;
+}
+.tiptap.ProseMirror table[data-icon-row],
+.ProseMirror table[data-icon-row] {
+	text-align: center !important;
+}
+.tiptap.ProseMirror p:has(> img + img),
+.ProseMirror p:has(> img + img) {
+	text-align: center !important;
+}
+
+/*
+ * Avatar / logo rows (64px images, not social icons). EmailTheming pads the
+ * wrapping paragraph by 0.5em and canvas cells are vertical-align:top, which
+ * drops the larger image below the arrow. Keep source text-align; only
+ * middle-align the row and collapse the wrapper.
+ */
+.tiptap.ProseMirror table[data-image-row] td,
+.tiptap.ProseMirror table[data-image-row] th,
+.ProseMirror table[data-image-row] td,
+.ProseMirror table[data-image-row] th {
+	vertical-align: middle;
+}
+.tiptap.ProseMirror table[data-image-row] td > p,
+.ProseMirror table[data-image-row] td > p {
+	padding: 0;
+	margin: 0;
+	line-height: 0;
+}
+.tiptap.ProseMirror table[data-image-row] img,
+.ProseMirror table[data-image-row] img {
+	display: inline-block;
+	vertical-align: middle;
+}
+
+/* Linked logos and social icon groups. Block Img ignores td text-align. */
+.tiptap.ProseMirror td[style*="text-align"] > img,
+.tiptap.ProseMirror th[style*="text-align"] > img,
+.ProseMirror td[style*="text-align"] > img,
+.ProseMirror th[style*="text-align"] > img,
+.tiptap.ProseMirror td[alignment] > img,
+.tiptap.ProseMirror th[alignment] > img,
+.ProseMirror td[alignment] > img,
+.ProseMirror th[alignment] > img {
+	display: inline-block;
+	vertical-align: middle;
+}
+
+/*
+ * Empty Columns used as a 1px rule (Twitch logo divider). TipTap's cell
+ * schema is `block+`, so it inserts a paragraph + slash placeholder and
+ * EmailTheming pads it 0.5em. Collapse the filler unless the cell is focused.
+ */
+.tiptap.ProseMirror td > p.is-empty:only-child,
+.tiptap.ProseMirror th > p.is-empty:only-child,
+.ProseMirror td > p.is-empty:only-child,
+.ProseMirror th > p.is-empty:only-child,
+.tiptap.ProseMirror td > p[data-empty-cell],
+.tiptap.ProseMirror th > p[data-empty-cell],
+.ProseMirror td > p[data-empty-cell],
+.ProseMirror th > p[data-empty-cell],
+.tiptap.ProseMirror td > p.is-empty:last-child:not(:only-child),
+.tiptap.ProseMirror th > p.is-empty:last-child:not(:only-child),
+.ProseMirror td > p.is-empty:last-child:not(:only-child),
+.ProseMirror th > p.is-empty:last-child:not(:only-child) {
+	margin: 0;
+	padding: 0 !important;
+	line-height: 0 !important;
+	font-size: 0 !important;
+	height: 0;
+	min-height: 0;
+	overflow: hidden;
+}
+.tiptap.ProseMirror td > p.is-empty:only-child::before,
+.tiptap.ProseMirror th > p.is-empty:only-child::before,
+.ProseMirror td > p.is-empty:only-child::before,
+.ProseMirror th > p.is-empty:only-child::before,
+.tiptap.ProseMirror td > p[data-empty-cell]::before,
+.tiptap.ProseMirror th > p[data-empty-cell]::before,
+.ProseMirror td > p[data-empty-cell]::before,
+.ProseMirror th > p[data-empty-cell]::before,
+.tiptap.ProseMirror td > p.is-empty:last-child:not(:only-child)::before,
+.tiptap.ProseMirror th > p.is-empty:last-child:not(:only-child)::before,
+.ProseMirror td > p.is-empty:last-child:not(:only-child)::before,
+.ProseMirror th > p.is-empty:last-child:not(:only-child)::before {
+	content: none !important;
+}
+.tiptap.ProseMirror td:focus-within > p.is-empty,
+.tiptap.ProseMirror th:focus-within > p.is-empty,
+.ProseMirror td:focus-within > p.is-empty,
+.ProseMirror th:focus-within > p.is-empty {
+	height: auto;
+	min-height: 0;
+	font-size: inherit;
+	line-height: inherit;
+	overflow: visible;
+}
+.tiptap.ProseMirror td:focus-within > p.is-empty::before,
+.tiptap.ProseMirror th:focus-within > p.is-empty::before,
+.ProseMirror td:focus-within > p.is-empty::before,
+.ProseMirror th:focus-within > p.is-empty::before {
+	content: attr(data-placeholder);
+}
+
+[data-re-bubble-menu],
+[data-re-slash-command] {
+	z-index: 9999 !important;
+}

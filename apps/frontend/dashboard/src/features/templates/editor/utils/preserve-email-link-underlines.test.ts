@@ -7,8 +7,11 @@ import { generateHTML, generateJSON } from "@tiptap/html";
 import { describe, expect, it } from "vitest";
 import { emailStarterKit } from "./email-starter-kit";
 import {
+	cssHasPaintedBackground,
+	cssPaintedBackgroundValue,
 	EMAIL_DECORATION_ATTR,
 	preserveEmailLinkUnderlines,
+	stampFilledLinksAsEmailButtons,
 } from "./preserve-email-link-underlines";
 
 const DITHER_SETUP_LINK = `
@@ -81,6 +84,54 @@ describe("preserveEmailLinkUnderlines", () => {
 		const link = doc.querySelector("a");
 		expect(link?.getAttribute(EMAIL_DECORATION_ATTR)).toBe("none");
 		expect(link?.style.textDecoration).toBe("none");
+	});
+
+	it("stamps a padded filled CTA as a React Email button", () => {
+		const html = `<a href="https://example.com/" style="display:inline-block;background-color:#000;color:#fff;padding:12px 20px">Confirm email</a>`;
+		const doc = new DOMParser().parseFromString(html, "text/html");
+		stampFilledLinksAsEmailButtons(doc.body);
+		expect(doc.querySelector("a")?.getAttribute("data-id")).toBe(
+			"react-email-button",
+		);
+	});
+
+	it("stamps a CTA that uses background shorthand", () => {
+		const html = `<a href="https://example.com/" style="background:#111;padding:12px 20px">Confirm email</a>`;
+		const doc = new DOMParser().parseFromString(html, "text/html");
+		stampFilledLinksAsEmailButtons(doc.body);
+		expect(doc.querySelector("a")?.getAttribute("data-id")).toBe(
+			"react-email-button",
+		);
+	});
+
+	it("stamps a Tailwind bg-/px-/py- CTA before styles are inlined", () => {
+		const html = `<a href="https://example.com/" class="bg-black px-6 py-3 text-white">Confirm email</a>`;
+		const doc = new DOMParser().parseFromString(html, "text/html");
+		stampFilledLinksAsEmailButtons(doc.body);
+		expect(doc.querySelector("a")?.getAttribute("data-id")).toBe(
+			"react-email-button",
+		);
+	});
+
+	it("reads a painted CTA fill from inline CSS for inspect", () => {
+		expect(
+			cssHasPaintedBackground(
+				"display:inline-block;background-color:#000000;padding:12px 20px",
+			),
+		).toBe(true);
+		expect(cssPaintedBackgroundValue("background-color:#000000")).toMatch(
+			/#000000|rgb\(0,\s*0,\s*0\)/i,
+		);
+		expect(cssHasPaintedBackground("color:#0066ff;text-decoration:underline")).toBe(
+			false,
+		);
+	});
+
+	it("does not stamp an underlined text link as a button", () => {
+		const html = `<a href="https://example.com/" style="color:#0066ff;text-decoration:underline">Help Center</a>`;
+		const doc = new DOMParser().parseFromString(html, "text/html");
+		stampFilledLinksAsEmailButtons(doc.body);
+		expect(doc.querySelector("a")?.getAttribute("data-id")).toBeNull();
 	});
 
 	it("does not underline image links", () => {

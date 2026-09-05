@@ -10,6 +10,7 @@ import { getRandomColor } from "#/features/templates/editor/collobration/hooks/u
 import { EmailSlashCommand } from "#/features/templates/editor/components/canvas/email-slash-command";
 import {
 	EMAIL_BUBBLE_HIDE_NODES,
+	emailButtonBubbleTrigger,
 	emailTextBubbleTrigger,
 } from "#/features/templates/editor/utils/email-slash-command-plugin";
 import { getRenderedEmailHtml } from "#/features/templates/editor/utils/get-rendered-email-html";
@@ -220,7 +221,13 @@ export function CampaignEditorProvider({
 					hideWhenActiveNodes={[...EMAIL_BUBBLE_HIDE_NODES]}
 					trigger={emailTextBubbleTrigger}
 				/>
-				<BubbleMenu.ButtonDefault />
+				<BubbleMenu trigger={emailButtonBubbleTrigger} placement="top">
+					<BubbleMenu.ButtonToolbar>
+						<BubbleMenu.ButtonEditLink />
+						<BubbleMenu.ButtonUnlink />
+					</BubbleMenu.ButtonToolbar>
+					<BubbleMenu.ButtonForm />
+				</BubbleMenu>
 				<BubbleMenu.ImageDefault />
 				<EmailSlashCommand />
 			</div>

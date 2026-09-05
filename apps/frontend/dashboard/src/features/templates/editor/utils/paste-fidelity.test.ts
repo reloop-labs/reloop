@@ -5,7 +5,10 @@ import { generateJSON } from "@tiptap/html";
 import { describe, expect, it } from "vitest";
 import { emailStarterKit } from "./email-starter-kit";
 import { inlineEmailStylesheet } from "./inline-email-stylesheet";
-import { preserveEmailLinkUnderlines } from "./preserve-email-link-underlines";
+import {
+	preserveEmailLinkUnderlines,
+	stampFilledLinksAsEmailButtons,
+} from "./preserve-email-link-underlines";
 import {
 	alignImageOnlyCells,
 	alignImageOnlyCellsInJson,
@@ -63,6 +66,7 @@ function pasteToJson(html: string) {
 	unwrapLinkedImages(doc.body);
 	stripEmailCentering(doc.body);
 	preserveEmailLinkUnderlines(doc.body);
+	stampFilledLinksAsEmailButtons(doc.body);
 	rewriteLowContrastInlineText(doc.body, "rgb(19, 19, 19)");
 	promoteTableSpacingToCells(doc.body);
 	promoteCellTypographyToBlocks(doc.body);
@@ -201,6 +205,27 @@ describe("paste fidelity for mixed-surface newsletters", () => {
 		expect(
 			ideas?.closest("td")?.style.backgroundColor.replace(/\s/g, ""),
 		).toMatch(/255,243,176/);
+	});
+
+	it("maps a filled Confirm email CTA to a TipTap button node", () => {
+		const { doc, json } = pasteToJson(`
+			<a href="https://example.com/confirm" style="display:inline-block;background-color:#000000;color:#ffffff;padding:12px 20px;border-radius:8px;text-decoration:none">Confirm email</a>
+		`);
+		const link = Array.from(doc.querySelectorAll("a")).find((a) =>
+			a.textContent?.includes("Confirm email"),
+		);
+		expect(link?.getAttribute("data-id")).toBe("react-email-button");
+		expect(JSON.stringify(json)).toMatch(/"type"\s*:\s*"button"/);
+	});
+
+	it("does not turn a plain text link into a button", () => {
+		const { doc, json } = pasteToJson(
+			`<p>Read the <a href="https://example.com/docs" style="color:#0066ff;text-decoration:underline">docs</a>.</p>`,
+		);
+		expect(doc.querySelector("a")?.getAttribute("data-id")).not.toBe(
+			"react-email-button",
+		);
+		expect(JSON.stringify(json)).not.toMatch(/"type"\s*:\s*"button"/);
 	});
 
 	it("keeps a filled Learn More button from becoming a theme-blue link", () => {

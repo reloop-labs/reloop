@@ -180,6 +180,18 @@ const TOOL_VISUAL_MAP: Record<string, ToolVisualMeta> = {
 			"DMARC enforcement required",
 		],
 	},
+	"email-html-editor": {
+		icon: "code",
+		badge: "Editor",
+		badgeColor:
+			"bg-violet-500/10 text-violet-700 dark:text-violet-400 border-violet-500/20",
+		glowColor: "group-hover:border-violet-500/40",
+		features: [
+			"Paste React Email or raw HTML",
+			"Inspect on a visual canvas",
+			"Source stays in sync — no account",
+		],
+	},
 };
 
 export default function ToolsIndexPage() {

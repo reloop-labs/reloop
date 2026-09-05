@@ -70,7 +70,7 @@ describe("emailTextBubbleShouldShow", () => {
 		).toBe(true);
 	});
 
-	it("hides the text bubble on images and buttons", () => {
+	it("hides the text bubble on images and a node-selected button", () => {
 		expect(
 			emailTextBubbleShouldShow({
 				isActive: (name) => name === "image",
@@ -84,6 +84,16 @@ describe("emailTextBubbleShouldShow", () => {
 				selectedNodeName: "button",
 			}),
 		).toBe(false);
+	});
+
+	it("shows the formatting bubble for text selected inside a button", () => {
+		expect(
+			emailTextBubbleShouldShow({
+				isActive: (name) => name === "button",
+				selectionSize: 12,
+				ancestorNodeNames: ["button"],
+			}),
+		).toBe(true);
 	});
 
 	it("does not show the bubble when the editor canvas is unmounted", () => {

@@ -81,6 +81,7 @@ export function createSlashCommandPlugin({
 }
 
 export const EMAIL_BUBBLE_HIDE_NODES = ["button", "image", "variable"] as const;
+const EMAIL_TEXT_BUBBLE_BLOCK_NODES = ["image", "variable"] as const;
 
 export function emailTextBubbleShouldShow(options: {
 	isActive: (name: string) => boolean;
@@ -96,12 +97,23 @@ export function emailTextBubbleShouldShow(options: {
 	) {
 		return false;
 	}
-	for (const name of EMAIL_BUBBLE_HIDE_NODES) {
+	for (const name of EMAIL_TEXT_BUBBLE_BLOCK_NODES) {
 		if (options.isActive(name)) return false;
 		if (options.ancestorNodeNames?.includes(name)) return false;
 	}
 	if (options.isActive("link")) return true;
 	return options.selectionSize > 0;
+}
+
+/** Link pencil only when the whole button is selected, not its label. */
+export function emailButtonBubbleTrigger(params: {
+	editor: Editor;
+	state: EditorState;
+}): boolean {
+	const { selection } = params.state;
+	return (
+		selection instanceof NodeSelection && selection.node.type.name === "button"
+	);
 }
 
 /** Full formatting bubble on links, not the 3-icon edit/open/unlink strip. */
