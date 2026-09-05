@@ -160,9 +160,7 @@ export function FooterBrand() {
 						Open source
 						<Icon name="gear" className="size-3.5 opacity-50" fill="none" />
 					</p>
-					<div className="flex justify-center sm:justify-end">
-						<OpenSourceSeal />
-					</div>
+					<OpenSourceSeal />
 				</Link>
 
 				<Link
