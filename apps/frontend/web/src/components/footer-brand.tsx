@@ -153,21 +153,8 @@ export function FooterBrand() {
 
 			<div className="grid grid-cols-2">
 				<Link
-					href="/license"
-					className="flex flex-col justify-between gap-4 border-stroke-soft-100 border-r border-b px-5 py-6 transition-colors hover:bg-bg-weak-50 sm:px-6 dark:border-white/10 dark:hover:bg-white/[0.03]"
-				>
-					<p className="text-[13px] text-text-sub-600 dark:text-white/45">
-						Licensed under
-					</p>
-					<span className="inline-flex items-center gap-2.5 font-medium text-[15px] text-text-strong-950 dark:text-white">
-						<ApacheMark />
-						Apache 2.0
-					</span>
-				</Link>
-
-				<Link
 					href="/why-open-source"
-					className="flex flex-col justify-between gap-4 border-stroke-soft-100 border-b px-5 py-6 transition-colors hover:bg-bg-weak-50 sm:px-6 dark:border-white/10 dark:hover:bg-white/[0.03]"
+					className="flex flex-col justify-between gap-4 border-stroke-soft-100 border-r border-b px-5 py-6 transition-colors hover:bg-bg-weak-50 sm:px-6 dark:border-white/10 dark:hover:bg-white/[0.03]"
 				>
 					<p className="inline-flex items-center gap-1.5 text-[13px] text-text-sub-600 dark:text-white/45">
 						Open source
@@ -176,6 +163,19 @@ export function FooterBrand() {
 					<div className="flex justify-center sm:justify-end">
 						<OpenSourceSeal />
 					</div>
+				</Link>
+
+				<Link
+					href="/license"
+					className="flex flex-col justify-start gap-2.5 border-stroke-soft-100 border-b px-5 py-6 transition-colors hover:bg-bg-weak-50 sm:px-6 dark:border-white/10 dark:hover:bg-white/[0.03]"
+				>
+					<p className="text-[13px] text-text-sub-600 dark:text-white/45">
+						Licensed under
+					</p>
+					<span className="inline-flex items-center gap-2.5 font-medium text-[15px] text-text-strong-950 dark:text-white">
+						<ApacheMark />
+						Apache 2.0
+					</span>
 				</Link>
 
 				{socials.map((social, index) => (
