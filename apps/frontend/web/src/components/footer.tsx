@@ -1,8 +1,8 @@
-/** biome-ignore-all lint/a11y/useAnchorContent: <explanation> */
 "use client";
 
+import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import { Logo } from "@reloop/ui/logo";
+import { FooterBrand } from "@reloop/web/components/footer-brand";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
@@ -20,7 +20,6 @@ type FooterColumn = {
 };
 
 const columns: FooterColumn[] = [
-	// --- Row 1: Product & developer ---
 	{
 		group: "Product",
 		items: [
@@ -65,34 +64,23 @@ const columns: FooterColumn[] = [
 		],
 	},
 	{
-		group: "Compare",
-		items: [
-			{ title: "vs Resend", href: "/compare/resend" },
-			{ title: "vs SendGrid", href: "/compare/sendgrid" },
-			{ title: "vs Mailgun", href: "/compare/mailgun" },
-			{ title: "vs AWS SES", href: "/compare/aws-ses" },
-			{ title: "vs Postmark", href: "/compare/postmark" },
-			{ title: "All comparisons", href: "/compare" },
-		],
-	},
-	// --- Row 2: Agents & company ---
-	{
-		group: "Agents",
-		items: [
-			{ title: "sitemap.md", href: "/sitemap.md" },
-			{ title: "llms.txt", href: "/llms.txt" },
-			{ title: "skills.md", href: "/skill.md" },
-			{ title: "rss.xml", href: "/blog/feed.xml" },
-		],
-	},
-	{
-		group: "Learn",
+		group: "Resources",
 		items: [
 			{ title: "Blog", href: "/blog" },
 			{ title: "Changelog", href: "/changelog" },
 			{ title: "Product Beliefs", href: "/our-product-beliefs" },
 			{ title: "Engineering", href: "/docs/setup" },
 			{ title: "Why Open Source", href: "/why-open-source" },
+			{ title: "vs Resend", href: "/compare/resend" },
+			{ title: "vs SendGrid", href: "/compare/sendgrid" },
+			{ title: "vs Mailgun", href: "/compare/mailgun" },
+			{ title: "vs AWS SES", href: "/compare/aws-ses" },
+			{ title: "vs Postmark", href: "/compare/postmark" },
+			{ title: "All comparisons", href: "/compare" },
+			{ title: "sitemap.md", href: "/sitemap.md" },
+			{ title: "llms.txt", href: "/llms.txt" },
+			{ title: "skills.md", href: "/skill.md" },
+			{ title: "rss.xml", href: "/blog/feed.xml" },
 		],
 	},
 	{
@@ -102,11 +90,6 @@ const columns: FooterColumn[] = [
 			{ title: "Contact", href: "/contact" },
 			{ title: "Pricing", href: "/pricing" },
 			{ title: "Careers", href: "/careers" },
-		],
-	},
-	{
-		group: "Legal & Trust",
-		items: [
 			{ title: "Privacy Policy", href: "/privacy" },
 			{ title: "Terms of Service", href: "/terms-and-conditions" },
 			{ title: "License", href: "/license" },
@@ -119,16 +102,24 @@ const columns: FooterColumn[] = [
 	},
 ];
 
-function FooterLinkItem({ link }: { link: FooterLink }) {
+function FooterLinkItem({
+	link,
+	isLast,
+}: {
+	link: FooterLink;
+	isLast: boolean;
+}) {
 	const isCrossDomain =
 		link.href.startsWith("/docs") || link.href.startsWith("/dashboard");
 
-	const className =
-		"text-[12px] font-medium text-text-sub-600 transition-colors hover:text-text-strong-950 sm:text-[14px] dark:text-white/55 dark:hover:text-white";
+	const className = cn(
+		"flex min-h-[52px] items-center font-medium text-[15px] text-text-strong-950 transition-colors hover:text-primary-base dark:text-white dark:hover:text-white/70",
+		!isLast && "border-stroke-soft-100 border-b dark:border-white/10",
+	);
 
-	if (isCrossDomain) {
+	if (isCrossDomain || link.external) {
 		return (
-			<li>
+			<li className="px-5 sm:px-6">
 				<a
 					href={link.href}
 					{...(link.external ? { target: "_blank", rel: "noreferrer" } : {})}
@@ -141,12 +132,8 @@ function FooterLinkItem({ link }: { link: FooterLink }) {
 	}
 
 	return (
-		<li>
-			<Link
-				href={link.href}
-				{...(link.external ? { target: "_blank", rel: "noreferrer" } : {})}
-				className={className}
-			>
+		<li className="px-5 sm:px-6">
+			<Link href={link.href} className={className}>
 				{link.title}
 			</Link>
 		</li>
@@ -166,52 +153,45 @@ export const Footer = () => {
 	}, []);
 
 	return (
-		<footer className="w-full border-stroke-soft-200 border-t border-b bg-bg-white-0 text-text-strong-950 dark:border-white/10 dark:bg-black dark:text-white">
-			<div className="mx-auto w-full max-w-5xl border-stroke-soft-200 md:max-w-7xl xl:border-x dark:border-white/10">
-				<div className="px-6 py-10 sm:px-10 sm:py-16 lg:px-12 lg:py-20">
-					<div className="flex h-full flex-col gap-8 sm:gap-12 lg:flex-row lg:items-stretch lg:gap-20">
-						<div className="flex shrink-0 lg:w-48">
-							<div className="-ml-2 -mt-2 flex shrink-0 flex-col">
-								<Link
-									href="/home"
-									className="inline-flex shrink-0 items-center gap-2 sm:gap-2.5"
-									aria-label="Reloop home"
-								>
-									<Logo className="size-9 text-text-strong-950 sm:size-11 dark:text-white" />
-									<span className="-ml-1.5 sm:-ml-3 font-semibold text-[15px] text-text-strong-950 tracking-tight sm:text-[17px] dark:text-white">
-										Reloop
-									</span>
-								</Link>
-							</div>
-						</div>
-
-						<div className="min-w-0 flex-1">
-							{/* Single continuous grid — reflows cleanly at 2/3/4 cols (no orphan row) */}
-							<div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 sm:gap-x-6 sm:gap-y-10 lg:grid-cols-4 lg:gap-x-8">
-								{columns.map((column) => (
-									<div key={column.group}>
-										<h4 className="font-medium text-[13px] text-text-strong-950 sm:text-[14px] dark:text-white">
-											{column.group}
-										</h4>
-										<ul className="mt-2.5 flex flex-col gap-2 sm:mt-4 sm:gap-2.5">
-											{column.items.map((link) => (
-												<FooterLinkItem key={link.title} link={link} />
-											))}
-										</ul>
-									</div>
+		<footer className="w-full border-stroke-soft-100 border-t border-b bg-bg-white-0 text-text-strong-950 dark:border-white/10 dark:bg-black dark:text-white">
+			<div className="mx-auto w-full max-w-5xl border-stroke-soft-100 md:max-w-7xl xl:border-x dark:border-white/10">
+				<div aria-hidden className="h-24" />
+				<FooterBrand />
+				<div aria-hidden className="h-24" />
+				<div className="grid grid-cols-2 border-stroke-soft-100 border-t lg:grid-cols-5 dark:border-white/10">
+					{columns.map((column, index) => (
+						<nav
+							key={column.group}
+							aria-labelledby={`footer-heading-${column.group}`}
+							className={cn(
+								"border-stroke-soft-100 dark:border-white/10",
+								"border-b lg:border-b-0",
+								index % 2 === 0 && "max-lg:border-r",
+								index !== 0 && "lg:border-l",
+							)}
+						>
+							<h2
+								id={`footer-heading-${column.group}`}
+								className="border-stroke-soft-100 border-b px-5 py-4 font-semibold text-[12px] text-text-strong-950 uppercase tracking-[0.08em] sm:px-6 sm:py-5 dark:border-white/10 dark:text-white"
+							>
+								{column.group}
+							</h2>
+							<ul>
+								{column.items.map((link, linkIndex) => (
+									<FooterLinkItem
+										key={link.title}
+										link={link}
+										isLast={linkIndex === column.items.length - 1}
+									/>
 								))}
-							</div>
-						</div>
-					</div>
+							</ul>
+						</nav>
+					))}
 				</div>
-			</div>
 
-			{/* Full-width Divider Line across the entire viewport */}
-			<div className="w-full border-stroke-soft-200 border-t dark:border-white/10">
-				<div className="mx-auto flex w-full max-w-5xl flex-row items-stretch justify-between border-stroke-soft-200 md:max-w-7xl xl:border-x dark:border-white/10">
-					{/* Left: Theme Switcher Icons */}
-					<div className="flex items-center px-6 py-3 sm:px-10 lg:px-12">
-						<div className="inline-flex items-center rounded-full border border-stroke-soft-200 bg-bg-weak-50 p-0.5 dark:border-white/10 dark:bg-white/[0.04]">
+				<div className="flex flex-row items-stretch justify-between border-stroke-soft-100 border-t dark:border-white/10">
+					<div className="flex items-center px-5 py-3 sm:px-6">
+						<div className="inline-flex items-center rounded-full border border-stroke-soft-100 bg-bg-weak-50 p-0.5 dark:border-white/10 dark:bg-white/[0.04]">
 							<button
 								type="button"
 								onClick={() => setTheme("system")}
@@ -251,13 +231,12 @@ export const Footer = () => {
 						</div>
 					</div>
 
-					{/* Right: Social Media Icons with Box Dividers */}
 					<div className="flex items-stretch text-text-sub-600 dark:text-white/60">
 						<a
 							href="https://github.com/reloop-labs/reloop"
 							target="_blank"
 							rel="noreferrer"
-							className="flex w-12 items-center justify-center border-stroke-soft-200 border-l transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 sm:w-14 dark:border-white/10 dark:hover:bg-white/[0.04] dark:hover:text-white"
+							className="flex w-12 items-center justify-center border-stroke-soft-100 border-l transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 sm:w-14 dark:border-white/10 dark:hover:bg-white/[0.04] dark:hover:text-white"
 							aria-label="GitHub"
 						>
 							<Icon name="github" className="size-4" />
@@ -266,7 +245,7 @@ export const Footer = () => {
 							href="https://x.com/reloop_labs"
 							target="_blank"
 							rel="noreferrer"
-							className="flex w-12 items-center justify-center border-stroke-soft-200 border-l transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 sm:w-14 dark:border-white/10 dark:hover:bg-white/[0.04] dark:hover:text-white"
+							className="flex w-12 items-center justify-center border-stroke-soft-100 border-l transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 sm:w-14 dark:border-white/10 dark:hover:bg-white/[0.04] dark:hover:text-white"
 							aria-label="X"
 						>
 							<Icon name="twitter" className="size-4" />
@@ -275,7 +254,7 @@ export const Footer = () => {
 							href="https://www.linkedin.com/company/reloop-labs"
 							target="_blank"
 							rel="noreferrer"
-							className="flex w-12 items-center justify-center border-stroke-soft-200 border-l transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 sm:w-14 dark:border-white/10 dark:hover:bg-white/[0.04] dark:hover:text-white"
+							className="flex w-12 items-center justify-center border-stroke-soft-100 border-l transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 sm:w-14 dark:border-white/10 dark:hover:bg-white/[0.04] dark:hover:text-white"
 							aria-label="LinkedIn"
 						>
 							<Icon name="linkedin" className="size-4" />

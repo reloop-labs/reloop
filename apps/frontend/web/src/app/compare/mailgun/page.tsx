@@ -182,6 +182,7 @@ const MailgunComparisonPage = () => {
 					title="Mailgun vs Reloop FAQ"
 					items={compare?.faqs ?? []}
 					compact
+					flush
 				/>
 
 				<PageSection>

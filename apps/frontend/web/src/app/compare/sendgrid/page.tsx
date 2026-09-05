@@ -160,6 +160,7 @@ const SendGridComparisonPage = () => {
 					title="SendGrid vs Reloop FAQ"
 					items={compare?.faqs ?? []}
 					compact
+					flush
 				/>
 
 				<PageSection>

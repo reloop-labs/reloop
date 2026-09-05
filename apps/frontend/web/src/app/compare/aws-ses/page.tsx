@@ -140,6 +140,7 @@ const AwsSesComparisonPage = () => {
 					title="AWS SES vs Reloop FAQ"
 					items={compare?.faqs ?? []}
 					compact
+					flush
 				/>
 
 				<PageSection>

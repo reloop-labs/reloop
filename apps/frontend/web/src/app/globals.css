@@ -17,6 +17,10 @@
 	--color-blue-accent: #0066ff;
 	--blue-accent: #0066ff;
 	--text-opaque-disabled: rgba(0, 0, 0, 0.25);
+	--acc-expand: 250ms;
+	--acc-collapse: 250ms;
+	--acc-chevron: 250ms;
+	--acc-ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .dark {
@@ -247,5 +251,67 @@
 	}
 	50% {
 		opacity: 0;
+	}
+}
+
+/* grid-template-rows 0fr → 1fr gives a clean height animation
+   with no JS measurement; the inner element clips overflow. */
+.t-acc-panel {
+	display: grid;
+	grid-template-rows: 0fr;
+	transition: grid-template-rows var(--acc-collapse) var(--acc-ease);
+}
+.t-acc[data-open="true"] .t-acc-panel {
+	grid-template-rows: 1fr;
+	transition: grid-template-rows var(--acc-expand) var(--acc-ease);
+}
+.t-acc-panel-inner {
+	overflow: hidden;
+	opacity: 0;
+	filter: blur(2px);
+	transition:
+		opacity var(--acc-collapse) var(--acc-ease),
+		filter var(--acc-collapse) var(--acc-ease);
+}
+.t-acc[data-open="true"] .t-acc-panel-inner {
+	opacity: 1;
+	filter: blur(0);
+	transition:
+		opacity var(--acc-expand) var(--acc-ease),
+		filter var(--acc-expand) var(--acc-ease);
+}
+/* Flip the chevron vertically to turn the "v" into a "^".
+   scaleY(-1) about the centre passes through a flat line at
+   the midpoint (same look as a `d:` path morph) but animates
+   in every browser, unlike CSS `d:` morphing (Chromium only).
+   The chevron path is symmetric about the 16x16 viewBox
+   centre, so the flip lands exactly on the "^"; non-scaling
+   -stroke keeps the stroke width constant through the flip. */
+.t-acc-chevron {
+	display: inline-flex;
+	transform: scaleY(1);
+	transform-origin: center;
+	transition: transform var(--acc-chevron) var(--acc-ease);
+}
+.t-acc-chevron path {
+	vector-effect: non-scaling-stroke;
+}
+.t-acc[data-open="true"] .t-acc-chevron {
+	transform: scaleY(-1);
+}
+.t-acc-plus {
+	transform: rotate(0deg);
+	transition: transform var(--acc-chevron) var(--acc-ease);
+}
+.t-acc[data-open="true"] .t-acc-plus {
+	transform: rotate(45deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.t-acc-panel,
+	.t-acc-panel-inner,
+	.t-acc-chevron,
+	.t-acc-plus {
+		transition: none !important;
 	}
 }

@@ -131,6 +131,7 @@ const PostmarkComparisonPage = () => {
 					title="Postmark vs Reloop FAQ"
 					items={compare?.faqs ?? []}
 					compact
+					flush
 				/>
 
 				<PageSection>

@@ -210,15 +210,13 @@ const LoopsComparisonPage = () => {
 					) : null}
 				</CompareSection>
 
-				{/* FAQ Section */}
-				<CompareSection maxWidth="3xl">
-					<FaqSection
-						id="compare-loops-faq"
-						title="Loops vs Reloop FAQ"
-						items={compare?.faqs ?? []}
-						compact
-					/>
-				</CompareSection>
+				<FaqSection
+					id="compare-loops-faq"
+					title="Loops vs Reloop FAQ"
+					items={compare?.faqs ?? []}
+					compact
+					flush
+				/>
 
 				<CompareSection maxWidth="full" noDivider>
 					<CompareOtherLinks currentHref={pagePath} />

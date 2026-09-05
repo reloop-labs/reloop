@@ -48,20 +48,29 @@ export function PageSection({
 	alt = false,
 	narrow = false,
 	flushTop = false,
+	flushBottom = false,
 }: {
 	children: React.ReactNode;
 	alt?: boolean;
 	narrow?: boolean;
 	flushTop?: boolean;
+	flushBottom?: boolean;
 }) {
 	const width = narrow ? "max-w-3xl" : "max-w-[1320px]";
-	const padding = narrow
-		? flushTop
-			? "px-4 pt-4 pb-12 sm:px-6 sm:pt-6 sm:pb-14"
-			: "px-4 py-12 sm:px-6 sm:py-14 lg:py-16"
-		: flushTop
-			? "px-4 pt-0 pb-16 sm:px-6 sm:pt-0 sm:pb-20 lg:px-8 lg:pb-24"
-			: "px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24";
+	const px = narrow ? "px-4 sm:px-6" : "px-4 sm:px-6 lg:px-8";
+	const pt = flushTop
+		? narrow
+			? "pt-4 sm:pt-6"
+			: "pt-0"
+		: narrow
+			? "pt-12 sm:pt-14 lg:pt-16"
+			: "pt-16 sm:pt-20 lg:pt-24";
+	const pb = flushBottom
+		? "pb-0"
+		: narrow
+			? "pb-12 sm:pb-14"
+			: "pb-16 sm:pb-20 lg:pb-24";
+	const padding = `${px} ${pt} ${pb}`;
 
 	return (
 		<section

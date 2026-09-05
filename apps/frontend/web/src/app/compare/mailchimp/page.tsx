@@ -158,6 +158,7 @@ const MailchimpComparisonPage = () => {
 					title="Mailchimp vs Reloop FAQ"
 					items={compare?.faqs ?? []}
 					compact
+					flush
 				/>
 
 				<PageSection>

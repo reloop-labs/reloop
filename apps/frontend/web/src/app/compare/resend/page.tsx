@@ -121,14 +121,13 @@ const ResendComparisonPage = () => {
 					</p>
 				</CompareSection>
 
-				<CompareSection maxWidth="3xl">
-					<FaqSection
-						id="compare-resend-faq"
-						title="Reloop vs Resend FAQ"
-						items={compare?.faqs ?? []}
-						compact
-					/>
-				</CompareSection>
+				<FaqSection
+					id="compare-resend-faq"
+					title="Reloop vs Resend FAQ"
+					items={compare?.faqs ?? []}
+					compact
+					flush
+				/>
 
 				<CompareSection maxWidth="full" noDivider>
 					<CompareOtherLinks currentHref={pagePath} />
