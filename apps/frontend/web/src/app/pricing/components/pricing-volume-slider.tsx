@@ -119,7 +119,7 @@ export function PricingVolumeSlider({
 	return (
 		<section
 			aria-label="Select your monthly email volume"
-			className="w-full border-stroke-soft-200 border-t px-6 pt-10 pb-12 sm:px-8 sm:pt-12 sm:pb-14 lg:px-12 dark:border-white/10"
+			className="w-full border-stroke-soft-100 border-t px-6 pt-10 pb-12 sm:px-8 sm:pt-12 sm:pb-14 lg:px-12 dark:border-white/10"
 		>
 			<div className="mx-auto w-full max-w-3xl">
 				<p className="text-center font-semibold text-[2.5rem] text-text-strong-950 tabular-nums leading-none tracking-tight sm:text-[3rem] dark:text-white">

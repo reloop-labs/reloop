@@ -53,7 +53,7 @@ const PricingPage = () => {
 	return (
 		<>
 			<JsonLd data={pricingSchema} />
-			<div className="mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-200 border-x md:max-w-7xl dark:border-white/10">
+			<div className="mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-100 border-x md:max-w-7xl dark:border-white/10">
 				<header className="relative z-10 flex w-full flex-col items-center px-6 pt-20 pb-12 text-center sm:px-8 sm:pt-24 sm:pb-14 lg:px-12 lg:pt-28 lg:pb-16">
 					<div className="mb-5 flex items-center justify-center gap-2 sm:mb-6">
 						<span

@@ -254,13 +254,13 @@ function PlanColumn({
 	return (
 		<div
 			className={cn(
-				"flex min-h-[440px] flex-col border-stroke-soft-200 p-6 pb-5 sm:min-h-[460px] sm:p-8 sm:pb-6 lg:p-6 lg:pb-5 xl:p-8 xl:pb-6 dark:border-white/10",
+				"flex min-h-[440px] flex-col border-stroke-soft-100 p-6 pb-5 sm:min-h-[460px] sm:p-8 sm:pb-6 lg:p-6 lg:pb-5 xl:p-8 xl:pb-6 dark:border-white/[0.07]",
 				borderClasses,
 				recommended && "bg-bg-weak-50 dark:bg-white/[0.03]",
 			)}
 		>
 			<div>
-				<div className="flex items-center gap-2">
+				<div className="flex h-6 items-center justify-between gap-2">
 					<h3 className="font-semibold text-[15px] text-text-strong-950 dark:text-white">
 						{plan.name}
 					</h3>
@@ -271,7 +271,7 @@ function PlanColumn({
 					)}
 				</div>
 
-				<div className="mt-6 min-h-[96px]">
+				<div className="mt-6 h-8">
 					{isCustom ? (
 						<p className="font-semibold text-[2rem] text-text-strong-950 leading-none tracking-tight dark:text-white">
 							Custom
@@ -288,41 +288,40 @@ function PlanColumn({
 							)}
 						</div>
 					)}
-					<p
-						className={cn(
-							"mt-2 text-[14px]",
-							!isCustom && price > 0
-								? "font-medium text-text-strong-950 dark:text-white"
-								: "text-text-sub-600 dark:text-white/55",
-						)}
-					>
-						{isCustom || price === 0 ? plan.priceSubline : plan.emailsLabel}
-					</p>
-					{plan.extraEmailsLabel && (
-						<p className="mt-0.5 text-[12px] text-text-sub-600 dark:text-white/50">
-							{plan.extraEmailsLabel}
-						</p>
-					)}
 				</div>
 			</div>
 
-			<ul className="mt-5 flex-1 space-y-1.5">
-				{plan.features.map((feature) => (
-					<li
-						key={feature}
-						className="flex min-h-[24px] items-center gap-3 text-[14px] leading-snug"
-					>
-						{getFeatureIcon(feature)}
-						<span className="text-text-sub-600 dark:text-white/60">
-							{feature}
-						</span>
-					</li>
-				))}
-			</ul>
+			<div
+				aria-hidden
+				className="-mx-6 sm:-mx-8 lg:-mx-6 xl:-mx-8 mt-6 border-stroke-soft-100 border-t dark:border-white/[0.07]"
+			/>
+
+			<div className="flex h-[100px] flex-col justify-center py-4">
+				<p
+					className={cn(
+						"text-[14px]",
+						!isCustom && price > 0
+							? "font-medium text-text-strong-950 dark:text-white"
+							: "text-text-sub-600 dark:text-white/55",
+					)}
+				>
+					{isCustom || price === 0 ? plan.priceSubline : plan.emailsLabel}
+				</p>
+				{plan.extraEmailsLabel && (
+					<p className="mt-0.5 text-[12px] text-text-sub-600 dark:text-white/50">
+						{plan.extraEmailsLabel}
+					</p>
+				)}
+			</div>
+
+			<div
+				aria-hidden
+				className="-mx-6 sm:-mx-8 lg:-mx-6 xl:-mx-8 border-stroke-soft-100 border-t dark:border-white/[0.07]"
+			/>
 
 			<div
 				className={cn(
-					"mt-8 flex flex-col gap-3",
+					"flex flex-col gap-3 py-6",
 					plan.secondaryCta && "sm:flex-row sm:items-center",
 				)}
 			>
@@ -340,6 +339,25 @@ function PlanColumn({
 					/>
 				)}
 			</div>
+
+			<div
+				aria-hidden
+				className="-mx-6 sm:-mx-8 lg:-mx-6 xl:-mx-8 border-stroke-soft-100 border-t dark:border-white/[0.07]"
+			/>
+
+			<ul className="flex-1 space-y-1.5 pt-6">
+				{plan.features.map((feature) => (
+					<li
+						key={feature}
+						className="flex min-h-[24px] items-center gap-3 text-[14px] leading-snug"
+					>
+						{getFeatureIcon(feature)}
+						<span className="text-text-sub-600 dark:text-white/60">
+							{feature}
+						</span>
+					</li>
+				))}
+			</ul>
 		</div>
 	);
 }
@@ -407,7 +425,7 @@ function comparisonPriceLine(plan: (typeof pricingPlans)[number]) {
 
 function highlightColumn(recommended: boolean) {
 	return recommended
-		? "border-stroke-soft-200 border-x bg-bg-weak-50/60 dark:border-white/10 dark:bg-white/[0.03]"
+		? "border-stroke-soft-100 border-x bg-bg-weak-50/60 dark:border-white/[0.07] dark:bg-white/[0.03]"
 		: "";
 }
 
@@ -426,7 +444,7 @@ function ComparisonTable({
 			<div className={cn("grid w-full min-w-[760px]", COMPARISON_GRID_COLS)}>
 				<div
 					className={cn(
-						"sticky top-16 z-20 border-stroke-soft-200 border-b bg-bg-white-0/95 backdrop-blur-md dark:border-white/10 dark:bg-black/95",
+						"sticky top-16 z-20 border-stroke-soft-100 border-b bg-bg-white-0/95 backdrop-blur-md dark:border-white/[0.07] dark:bg-black/95",
 						COMPARISON_PAD_LEFT,
 					)}
 				/>
@@ -437,14 +455,14 @@ function ComparisonTable({
 					return (
 						<div
 							key={plan.id}
-							className="sticky top-16 z-20 border-stroke-soft-200 border-b bg-bg-white-0/95 backdrop-blur-md dark:border-white/10 dark:bg-black/95"
+							className="sticky top-16 z-20 border-stroke-soft-100 border-b bg-bg-white-0/95 backdrop-blur-md dark:border-white/[0.07] dark:bg-black/95"
 						>
 							<div
 								className={cn(
 									"flex flex-col gap-4 px-5 pt-6 pb-4 sm:px-6 sm:pt-6 sm:pb-4",
 									isLast && COMPARISON_PAD_RIGHT,
 									recommended &&
-										"rounded-t-2xl border-stroke-soft-200 border-x border-t bg-bg-weak-50/60 dark:border-white/10 dark:bg-white/[0.03]",
+										"rounded-t-2xl border-stroke-soft-100 border-x border-t bg-bg-weak-50/60 dark:border-white/[0.07] dark:bg-white/[0.03]",
 								)}
 							>
 								<div>
@@ -510,7 +528,7 @@ function ComparisonTable({
 							<Fragment key={row.key}>
 								<div
 									className={cn(
-										"flex items-center gap-2.5 border-stroke-soft-200 border-b py-3 pr-4 dark:border-white/[0.06]",
+										"flex items-center gap-2.5 border-stroke-soft-100 border-b py-3 pr-4 dark:border-white/[0.06]",
 										COMPARISON_PAD_LEFT,
 									)}
 								>
@@ -528,7 +546,7 @@ function ComparisonTable({
 										<div
 											key={plan.id}
 											className={cn(
-												"flex items-center border-stroke-soft-200 border-b px-4 py-3 dark:border-white/[0.06]",
+												"flex items-center border-stroke-soft-100 border-b px-4 py-3 dark:border-white/[0.06]",
 												planIndex === pricingPlans.length - 1 &&
 													COMPARISON_PAD_RIGHT,
 												highlightColumn(isRecommended(plan)),
@@ -572,7 +590,7 @@ export function PricingSection({
 		recommendedPlanId ? plan.id === recommendedPlanId : !!plan.highlighted;
 	return (
 		<>
-			<div className="-mx-4 sm:-mx-6 lg:-mx-8 border-stroke-soft-200 border-y sm:grid sm:grid-cols-2 lg:grid-cols-4 dark:border-white/10">
+			<div className="-mx-4 sm:-mx-6 lg:-mx-8 border-stroke-soft-100 border-y sm:grid sm:grid-cols-2 lg:grid-cols-4 dark:border-white/[0.07]">
 				{pricingPlans.map((plan, index) => (
 					<PlanColumn
 						key={plan.id}
