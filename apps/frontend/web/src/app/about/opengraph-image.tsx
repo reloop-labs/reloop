@@ -4,7 +4,20 @@ export const alt = "why reloop? | Reloop";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-export default function OpenGraphImage() {
+export default async function OpenGraphImage() {
+	const [interMediumFont, interSemiBoldFont] = await Promise.all([
+		fetch(
+			new URL(
+				"https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-500-normal.woff",
+			),
+		).then((res) => res.arrayBuffer()),
+		fetch(
+			new URL(
+				"https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-600-normal.woff",
+			),
+		).then((res) => res.arrayBuffer()),
+	]);
+
 	return new ImageResponse(
 		<div
 			style={{
