@@ -14,7 +14,7 @@ export default function OpenGraphImage() {
 				flexDirection: "row",
 				backgroundColor: "#ffffff",
 				padding: "56px 64px",
-				fontFamily: "sans-serif",
+				fontFamily: "Inter, sans-serif",
 				position: "relative",
 				overflow: "hidden",
 			}}
@@ -232,52 +232,72 @@ export default function OpenGraphImage() {
 				<span
 					style={{
 						fontSize: "84px",
-						fontWeight: 800,
+						fontWeight: 600,
 						color: "#0a0a0a",
-						letterSpacing: "-3px",
+						letterSpacing: "-0.025em",
 						lineHeight: 1,
 						marginTop: "24px",
+						textWrap: "balance",
 					}}
 				>
-					why reloop?
+					Why Reloop?
 				</span>
 
-				<p
+				<div
 					style={{
-						fontSize: "21px",
-						color: "#525252",
-						lineHeight: 1.5,
+						display: "flex",
+						flexDirection: "column",
+						alignItems: "flex-start",
 						margin: "18px 0 0 0",
 					}}
 				>
-					Self-hosting email has a scary reputation.
-					<br />
-					IP reputation.
-					<br />
-					Warm-up. Blocklists.
-				</p>
-
-				<div style={{ display: "flex", marginTop: "20px" }}>
 					<span
 						style={{
-							fontSize: "20px",
-							fontWeight: 600,
+							fontSize: "22px",
+							fontWeight: 500,
 							color: "#ffffff",
 							backgroundColor: "#006ffe",
 							padding: "6px 12px",
 							lineHeight: 1.3,
+							letterSpacing: "-0.025em",
+							textWrap: "balance",
 						}}
 					>
-						Inbox comes from owning the whole loop.
+						Self-hosting email has a scary reputation.
+					</span>
+					<span
+						style={{
+							fontSize: "21px",
+							fontWeight: 500,
+							color: "#737373",
+							lineHeight: 1.5,
+							marginTop: "12px",
+							letterSpacing: "-0.025em",
+							textWrap: "balance",
+						}}
+					>
+						IP reputation.
+					</span>
+					<span
+						style={{
+							fontSize: "21px",
+							fontWeight: 500,
+							color: "#737373",
+							lineHeight: 1.5,
+							letterSpacing: "-0.025em",
+							textWrap: "balance",
+						}}
+					>
+						Warm-up. Blocklists.
 					</span>
 				</div>
 
 				<span
 					style={{
 						fontSize: "15px",
+						fontWeight: 500,
 						color: "#a3a3a3",
-						fontFamily: "monospace",
-						letterSpacing: "1px",
+						letterSpacing: "-0.025em",
 						marginTop: "28px",
 					}}
 				>
@@ -371,9 +391,12 @@ export default function OpenGraphImage() {
 					<p
 						style={{
 							fontSize: "21px",
+							fontWeight: 500,
 							color: "#0a0a0a",
 							lineHeight: 1.55,
 							margin: 0,
+							letterSpacing: "-0.025em",
+							textWrap: "balance",
 						}}
 					>
 						The Reloop Engine. Automated warmup, smart retries,
@@ -392,12 +415,13 @@ export default function OpenGraphImage() {
 						<span
 							style={{
 								fontSize: "14px",
-								fontFamily: "monospace",
+								fontWeight: 500,
 								color: "#ffffff",
 								backgroundColor: "#006ffe",
 								padding: "5px 12px",
 								borderRadius: "5px",
 								whiteSpace: "nowrap",
+								letterSpacing: "-0.025em",
 							}}
 						>
 							warmup × retries × reputation
