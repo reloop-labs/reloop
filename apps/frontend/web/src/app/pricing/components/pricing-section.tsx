@@ -639,7 +639,7 @@ function ComparisonTable({
 										"group-hover/row:bg-bg-weak-50/70 dark:group-hover/row:bg-white/[0.03]",
 									)}
 								>
-									<span className="font-normal text-[14px] text-text-strong-950 dark:text-white">
+									<span className="relative cursor-pointer text-body-default underline decoration-[8%] decoration-text-opaque-disabled decoration-wavy underline-offset-[25%] transition-colors duration-200 hover:decoration-blue-accent text-text-strong-950 dark:text-white">
 										{row.label}
 									</span>
 								</div>

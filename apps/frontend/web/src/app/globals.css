@@ -5,6 +5,8 @@
 	--font-sans: var(--font-inter), sans-serif;
 	--font-geist: var(--font-geist-sans), sans-serif;
 	--font-mono: var(--font-geist-mono), monospace;
+	--color-blue-accent: var(--blue-accent);
+	--color-text-opaque-disabled: var(--text-opaque-disabled);
 }
 
 :root {
@@ -12,6 +14,20 @@
 	--font-serif: var(--font-inter), sans-serif;
 	--font-geist: var(--font-geist-sans), sans-serif;
 	--font-mono: var(--font-geist-mono), monospace;
+	--color-blue-accent: #0066ff;
+	--blue-accent: #0066ff;
+	--text-opaque-disabled: rgba(0, 0, 0, 0.25);
+}
+
+.dark {
+	--color-blue-accent: #52a8ff;
+	--blue-accent: #52a8ff;
+	--text-opaque-disabled: rgba(255, 255, 255, 0.25);
+}
+
+.text-body-default {
+	font-size: 14px;
+	line-height: 20px;
 }
 
 @custom-variant dark (&:where(.dark, .dark *));
