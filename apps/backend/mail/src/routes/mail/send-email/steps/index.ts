@@ -1,3 +1,4 @@
+export * from "./step-0-guard";
 export * from "./step-1-parse-from";
 export * from "./step-2-verify-domain";
 export * from "./step-3-check-dns";

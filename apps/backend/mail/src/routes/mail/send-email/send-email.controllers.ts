@@ -10,6 +10,7 @@ import {
 	checkDnsHealth_step3,
 	createEmailLog_step4,
 	finalizeEmail_step7,
+	guardSend_step0,
 	injectCustomTracking_step5c,
 	injectTracking_step5b,
 	parseFromAddress_step1,
@@ -71,6 +72,32 @@ export async function sendEmailController({
 
 	if (!dnsHealthCheck.isHealthy) {
 		throw MailErrors.dnsHealthError(domainName, dnsHealthCheck.missingRecords);
+	}
+
+	// ── Step 0: Sending Engine guard (IP reputation + warmup + routing) ──
+	// Fail-open by design — never blocks the user on infra errors.
+	// Pause still rejects (protects the IP); throttle defers via scheduled_at.
+	const { decision: guard } = await guardSend_step0({
+		organizationId,
+		domainName,
+		body,
+		dnsHealthy: dnsHealthCheck.isHealthy,
+		missingRecords: dnsHealthCheck.missingRecords,
+	});
+	logger.set({ guardAction: guard.action, guardScore: guard.score });
+	if (guard.action === "pause") {
+		throw MailErrors.sendingPaused(guard.reason);
+	}
+	if (guard.action === "throttle" && guard.deferMs) {
+		// Defer by pushing scheduled_at forward so the user send succeeds
+		// as a scheduled send instead of an over-quota rejection.
+		const deferUntil = new Date(Date.now() + guard.deferMs).toISOString();
+		body.scheduled_at = body.scheduled_at ?? deferUntil;
+		log.info({ message: `Sending-engine throttled, deferring to ${body.scheduled_at}`, organizationId, reason: guard.reason });
+	}
+	const engineHeaders: Record<string, string> = { ...guard.headers };
+	if (guard.action === "reroute") {
+		log.warn({ message: "Sending-engine reroute flagged", organizationId, reason: guard.reason });
 	}
 
 	// ── Resolve In-Reply-To header if replying to a thread ────────
@@ -140,7 +167,7 @@ export async function sendEmailController({
 	}
 
 	const result = await sendEmail_step6({
-		body,
+		body: { ...body, headers: { ...(body.headers || {}), ...engineHeaders } },
 		finalSubject,
 		finalHtml: trackedHtml,
 		finalText,
