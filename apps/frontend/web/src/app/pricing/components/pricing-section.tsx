@@ -452,7 +452,7 @@ function ComparisonTable({
 		recommendedPlanId ? plan.id === recommendedPlanId : !!plan.highlighted;
 
 	return (
-		<div className="-mx-4 sm:-mx-6 lg:-mx-8 overflow-x-auto">
+		<div className="-mx-4 sm:-mx-6 lg:-mx-8 overflow-x-auto lg:overflow-visible">
 			<div
 				className={cn(
 					"grid w-full min-w-[920px] border-stroke-soft-100 border-t dark:border-white/10",
@@ -460,7 +460,7 @@ function ComparisonTable({
 				)}
 			>
 				{/* Header row — matches reference: eyebrow + title left, plan + pill CTA right */}
-				<div className="flex flex-col gap-3 border-stroke-soft-100 border-b px-5 py-7 sm:px-7 lg:px-9 dark:border-white/10">
+				<div className="sticky top-16 z-30 flex flex-col gap-3 border-stroke-soft-100 border-b bg-bg-white-0/95 px-5 py-7 backdrop-blur-md sm:px-7 lg:px-9 dark:border-white/10 dark:bg-black/95">
 					<p className="font-medium text-[12px] text-primary-base uppercase">
 						Features
 					</p>
@@ -474,8 +474,10 @@ function ComparisonTable({
 						<div
 							key={plan.id}
 							className={cn(
-								"flex flex-col justify-center gap-7 border-stroke-soft-100 border-b border-l px-5 py-7 sm:px-6 dark:border-white/10",
-								active && "bg-bg-weak-50 dark:bg-white/[0.03]",
+								"sticky top-16 z-30 flex flex-col justify-center gap-7 border-stroke-soft-100 border-b border-l px-5 py-7 sm:px-6 backdrop-blur-md dark:border-white/10",
+								active
+									? "bg-bg-weak-50/95 dark:bg-white/[0.05]"
+									: "bg-bg-white-0/95 dark:bg-black/95",
 							)}
 						>
 							<div className="flex items-center gap-2">
