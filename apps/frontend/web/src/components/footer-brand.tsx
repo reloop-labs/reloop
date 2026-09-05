@@ -35,16 +35,6 @@ const socials: {
 		external: true,
 		icon: <DiscordIcon className="size-4" />,
 	},
-	{
-		label: "Docs",
-		href: "/docs",
-		icon: <Icon name="book-open" className="size-4" />,
-	},
-	{
-		label: "Community",
-		href: "/community",
-		icon: <Icon name="users" className="size-4" fill="none" />,
-	},
 ];
 
 function DiscordIcon({ className }: { className?: string }) {
