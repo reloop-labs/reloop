@@ -902,12 +902,6 @@ const navItems: NavItem[] = [
 							description: "The team behind Reloop",
 						},
 						{
-							title: "Careers",
-							href: "/careers",
-							icon: "briefcase",
-							description: "Join us and build the future of email",
-						},
-						{
 							title: "Why Open Source",
 							href: "/why-open-source",
 							icon: "open-source",
