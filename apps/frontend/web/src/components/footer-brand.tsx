@@ -72,7 +72,21 @@ const SEAL_POINTS = Array.from({ length: 32 }, (_, i) => {
 	return `${(44 + radius * Math.cos(angle)).toFixed(1)},${(44 + radius * Math.sin(angle)).toFixed(1)}`;
 }).join(" ");
 
-function OpenSourceSeal() {
+export type FooterBrandAccent = "default" | "emerald" | "ink";
+
+const accentPixelColor: Record<FooterBrandAccent, string> = {
+	default: "#3B82F6",
+	emerald: "#34d399",
+	ink: "#6e7781",
+};
+
+const accentSealText: Record<FooterBrandAccent, string> = {
+	default: "text-primary-base",
+	emerald: "text-[#047857] dark:text-[#6ee7b7]",
+	ink: "text-[#24292f] dark:text-white",
+};
+
+function OpenSourceSeal({ accent }: { accent: FooterBrandAccent }) {
 	return (
 		<div className="relative flex size-[92px] items-center justify-center">
 			<svg
@@ -95,7 +109,12 @@ function OpenSourceSeal() {
 				/>
 			</svg>
 			<div className="relative flex flex-col items-center leading-none">
-				<span className="font-semibold text-[11px] text-primary-base tracking-[0.16em]">
+				<span
+					className={cn(
+						"font-semibold text-[11px] tracking-[0.16em]",
+						accentSealText[accent],
+					)}
+				>
 					OPEN
 				</span>
 				<span className="mt-1 text-[10px] text-text-sub-600 dark:text-white/50">
@@ -141,7 +160,11 @@ function BrandCell({
 	);
 }
 
-export function FooterBrand() {
+export function FooterBrand({
+	accent = "default",
+}: {
+	accent?: FooterBrandAccent;
+}) {
 	return (
 		<div className="grid border-stroke-soft-100 border-t border-b lg:grid-cols-2 dark:border-white/10">
 			<div className="relative overflow-hidden border-stroke-soft-100 border-b p-8 sm:p-10 lg:border-r lg:border-b-0 dark:border-white/10">
@@ -152,7 +175,7 @@ export function FooterBrand() {
 					<PixelBlastLazy
 						variant="square"
 						pixelSize={2}
-						color="#3B82F6"
+						color={accentPixelColor[accent]}
 						patternScale={4}
 						patternDensity={0.4}
 						enableRipples
@@ -192,7 +215,7 @@ export function FooterBrand() {
 							fill="none"
 						/>
 					</p>
-					<OpenSourceSeal />
+					<OpenSourceSeal accent={accent} />
 				</Link>
 
 				<Link
