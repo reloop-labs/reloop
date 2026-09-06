@@ -1,10 +1,13 @@
 // @vitest-environment jsdom
 
+import { Editor } from "@tiptap/core";
 import { generateJSON } from "@tiptap/html";
 import { describe, expect, it } from "vitest";
 import { emailStarterKit } from "./email-starter-kit";
 import {
+	applySelectionFontColor,
 	formatInspectorStyleForCss,
+	numericPxFromCss,
 	resolveInspectorTextStyle,
 	setInlineCssDeclaration,
 	setInlineCssProp,
@@ -51,6 +54,13 @@ describe("resolveInspectorTextStyle", () => {
 		expect(next).toContain("letter-spacing: -0.075px");
 	});
 
+	it("reads CTA padding from the link mark", () => {
+		expect(
+			numericPxFromCss("padding-top:12px;padding-right:20px;background-color:#000", "paddingTop"),
+		).toBe(12);
+		expect(numericPxFromCss("padding-right:20px", "paddingRight")).toBe(20);
+	});
+
 	it("writes a CTA fill onto the link mark without dropping color", () => {
 		const next = setInlineCssDeclaration(
 			"color:#ffffff;padding:12px 20px;background-color:#000000",
@@ -60,6 +70,30 @@ describe("resolveInspectorTextStyle", () => {
 		expect(next).toContain("background-color: #2563eb");
 		expect(next).toContain("color: #ffffff");
 		expect(next).toContain("padding: 12px 20px");
+	});
+
+	it("paints a selected word instead of only the parent paragraph", () => {
+		const editor = new Editor({
+			extensions: [emailStarterKit()],
+			content:
+				"<p>Thank you for signing up for <strong>Barebones</strong>.</p>",
+		});
+		let from = 0;
+		let to = 0;
+		editor.state.doc.descendants((node, pos) => {
+			if (!node.isText || !node.text?.includes("Barebones")) return;
+			const offset = node.text.indexOf("Barebones");
+			from = pos + offset;
+			to = from + "Barebones".length;
+			return false;
+		});
+		editor.commands.setTextSelection({ from, to });
+		expect(applySelectionFontColor(editor, "#912222")).toBe(true);
+		const html = editor.getHTML();
+		expect(html).toMatch(/data-email-font-color/);
+		expect(html).toMatch(/#912222|rgb\(\s*145\s*,\s*34\s*,\s*34\s*\)/);
+		expect(html).toContain("Barebones");
+		editor.destroy();
 	});
 
 	it("keeps Dither CTA typography on the TipTap link mark", () => {

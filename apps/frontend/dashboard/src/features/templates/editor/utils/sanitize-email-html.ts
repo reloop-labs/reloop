@@ -3,10 +3,7 @@ import {
 	absolutizeEmailAssetUrls,
 	inlineEmailStylesheet,
 } from "#/features/templates/editor/utils/inline-email-stylesheet";
-import {
-	preserveEmailLinkUnderlines,
-	stampFilledLinksAsEmailButtons,
-} from "#/features/templates/editor/utils/preserve-email-link-underlines";
+import { preserveEmailLinkUnderlines } from "#/features/templates/editor/utils/preserve-email-link-underlines";
 import {
 	alignImageOnlyCells,
 	alignImageOnlyTableRows,
@@ -339,7 +336,6 @@ export function sanitizeEmailHtml(rawHtml: string): string {
 	stripEmailCentering(doc.body);
 
 	preserveEmailLinkUnderlines(doc.body);
-	stampFilledLinksAsEmailButtons(doc.body);
 
 	// 7. Expand CSS shorthand properties (padding, margin, border, border-radius)
 	// into their individual longhand equivalents. Email HTML often uses

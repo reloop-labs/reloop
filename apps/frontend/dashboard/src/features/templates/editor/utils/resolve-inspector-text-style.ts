@@ -1,4 +1,5 @@
 import type { Editor } from "@tiptap/core";
+import { EMAIL_FONT_COLOR_MARK } from "./email-starter-kit";
 
 export type InspectorTextStyleProp =
 	| "color"
@@ -138,6 +139,20 @@ export function setInlineCssDeclaration(
 		.join("; ");
 }
 
+/** Read a px length from an inline style string. */
+export function numericPxFromCss(
+	cssText: string,
+	camelProp: string,
+): number | "" {
+	if (typeof document === "undefined" || !cssText.trim()) return "";
+	const scratch = document.createElement("div");
+	scratch.style.cssText = cssText;
+	const kebab = camelProp.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`);
+	const raw = scratch.style.getPropertyValue(kebab);
+	const n = Number.parseFloat(raw);
+	return Number.isFinite(n) ? n : "";
+}
+
 /**
  * Inspector.Text reads the parent paragraph. Dither puts font-size / color
  * on the <a> mark. When a link is selected, those inline styles win.
@@ -152,4 +167,21 @@ export function resolveInspectorTextStyle(options: {
 		if (fromLink !== undefined && fromLink !== "") return fromLink;
 	}
 	return options.parentValue;
+}
+
+export function getSelectionFontColor(
+	editor: Editor | null | undefined,
+): string {
+	if (!editor?.isActive(EMAIL_FONT_COLOR_MARK)) return "";
+	return String(editor.getAttributes(EMAIL_FONT_COLOR_MARK).color ?? "");
+}
+
+/** Paints the selected run. Returns false when there is no range. */
+export function applySelectionFontColor(editor: Editor, color: string): boolean {
+	if (editor.state.selection.empty) return false;
+	return editor
+		.chain()
+		.focus()
+		.setMark(EMAIL_FONT_COLOR_MARK, { color })
+		.run();
 }

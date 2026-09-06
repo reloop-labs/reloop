@@ -8,7 +8,10 @@ import {
 	cssPaintedBackgroundValue,
 } from "../preserve-email-link-underlines";
 import {
+	applySelectionFontColor,
 	getActiveLinkCss,
+	getSelectionFontColor,
+	numericPxFromCss,
 	resolveInspectorTextStyle,
 	setInlineCssDeclaration,
 	setInlineCssProp,
@@ -100,8 +103,14 @@ function TextSection({
 			editor,
 			selector: ({ editor: ed }) => getActiveLinkCss(ed),
 		}) ?? "";
+	const selectionColor =
+		useEditorState({
+			editor,
+			selector: ({ editor: ed }) => getSelectionFontColor(ed),
+		}) ?? "";
 
 	const resolvedGetStyle = (name: InspectorStyleProperty) => {
+		if (name === "color" && selectionColor) return selectionColor;
 		if (
 			name === "color" ||
 			name === "fontSize" ||
@@ -121,6 +130,9 @@ function TextSection({
 		name: InspectorStyleProperty,
 		value: string | number,
 	) => {
+		if (name === "color" && editor && applySelectionFontColor(editor, String(value))) {
+			return;
+		}
 		if (
 			isLinkActive &&
 			editor &&
@@ -226,6 +238,241 @@ function TextSection({
 	);
 }
 
+const TEXT_INSPECTOR_NODES = new Set([
+	"paragraph",
+	"heading",
+	"button",
+	"blockquote",
+	"listItem",
+	"tableCell",
+	"tableHeader",
+	"section",
+	"div",
+	"footer",
+]);
+
+function useFilledLinkBox() {
+	const { editor } = useCurrentEditor();
+	const linkCss =
+		useEditorState({
+			editor,
+			selector: ({ editor: ed }) => getActiveLinkCss(ed),
+		}) ?? "";
+	const filled = Boolean(
+		editor?.isActive("link") && cssHasPaintedBackground(linkCss),
+	);
+	const readPx = (
+		prop: string,
+		fallback: string | number | undefined,
+	): number | "" => {
+		if (filled) {
+			const fromLink = numericPxFromCss(linkCss, prop);
+			if (fromLink !== "") return fromLink;
+		}
+		return typeof fallback === "number" ? fallback : "";
+	};
+	const write = (changes: Array<{ prop: string; value: string | number }>) => {
+		if (!editor) return;
+		let next = linkCss;
+		for (const { prop, value } of changes) {
+			next = setInlineCssDeclaration(
+				next,
+				prop,
+				typeof value === "number" ? `${value}px` : String(value),
+			);
+		}
+		editor
+			.chain()
+			.focus()
+			.extendMarkRange("link")
+			.updateAttributes("link", { style: next })
+			.run();
+	};
+	return { filled, linkCss, readPx, write };
+}
+
+function InspectorNodeStyles({
+	nodeType,
+	getStyle,
+	setStyle,
+	batchSetStyle,
+	getAttr,
+	setAttr,
+}: {
+	nodeType: string;
+	getStyle: (name: InspectorStyleProperty) => string | number | undefined;
+	setStyle: (name: InspectorStyleProperty, value: string | number) => void;
+	batchSetStyle: (
+		changes: Array<{ prop: InspectorStyleProperty; value: string | number }>,
+	) => void;
+	getAttr: (name: string) => unknown;
+	setAttr: (name: string, value: unknown) => void;
+}) {
+	const box = useFilledLinkBox();
+	if (nodeType === "variable") return null;
+
+	const pad = (prop: InspectorStyleProperty) =>
+		box.readPx(prop, getStyle(prop));
+	const applyBox = (
+		changes: Array<{ prop: InspectorStyleProperty; value: string | number }>,
+	) => {
+		if (box.filled) {
+			box.write(changes);
+			return;
+		}
+		batchSetStyle(changes);
+	};
+
+	return (
+		<>
+			<InspectorSection>
+				<SectionHeader label="Spacing" />
+				<SpacingControl
+					value={{
+						top: pad("paddingTop"),
+						right: pad("paddingRight"),
+						bottom: pad("paddingBottom"),
+						left: pad("paddingLeft"),
+					}}
+					onChange={({ top, right, bottom, left }) =>
+						applyBox([
+							{ prop: "paddingTop", value: top as number },
+							{ prop: "paddingRight", value: right as number },
+							{ prop: "paddingBottom", value: bottom as number },
+							{ prop: "paddingLeft", value: left as number },
+						])
+					}
+				/>
+				{nodeType === "image" && (
+					<div className="px-4 pb-3">
+						<ImageSrcControl
+							value={{
+								src: String(getAttr("src") ?? ""),
+								alt: String(getAttr("alt") ?? ""),
+								width: (getAttr("width") as number) ?? "",
+								height: (getAttr("height") as number) ?? "",
+							}}
+							onChange={({ src, alt, width, height }) => {
+								setAttr("src", src);
+								setAttr("alt", alt);
+								setAttr("width", width);
+								setAttr("height", height);
+							}}
+						/>
+					</div>
+				)}
+				{nodeType === "button" && (
+					<PropRow label="Link">
+						<UrlInput
+							value={String(getAttr("href") ?? "")}
+							onChange={(v) => setAttr("href", v)}
+						/>
+					</PropRow>
+				)}
+			</InspectorSection>
+			<InspectorSection>
+				<SectionHeader label="Background" />
+				<ColorRow
+					label="Color"
+					value={
+						box.filled
+							? cssPaintedBackgroundValue(box.linkCss)
+							: String(getStyle("backgroundColor") ?? "")
+					}
+					onChange={(v) => {
+						if (box.filled) box.write([{ prop: "backgroundColor", value: v }]);
+						else setStyle("backgroundColor", v);
+					}}
+				/>
+			</InspectorSection>
+			<InspectorSection>
+				<SectionHeader label="Border" />
+				<SpacingControl
+					label="Border"
+					value={{
+						top: box.readPx(
+							"borderTopWidth",
+							getStyle("borderTopWidth") ?? getStyle("borderWidth"),
+						),
+						right: box.readPx(
+							"borderRightWidth",
+							getStyle("borderRightWidth") ?? getStyle("borderWidth"),
+						),
+						bottom: box.readPx(
+							"borderBottomWidth",
+							getStyle("borderBottomWidth") ?? getStyle("borderWidth"),
+						),
+						left: box.readPx(
+							"borderLeftWidth",
+							getStyle("borderLeftWidth") ?? getStyle("borderWidth"),
+						),
+					}}
+					onChange={({ top, right, bottom, left }) =>
+						applyBox([
+							{ prop: "borderTopWidth", value: top as number },
+							{ prop: "borderRightWidth", value: right as number },
+							{ prop: "borderBottomWidth", value: bottom as number },
+							{ prop: "borderLeftWidth", value: left as number },
+						])
+					}
+				/>
+				<SpacingControl
+					label="Radius"
+					variant="corners"
+					value={{
+						top: box.readPx(
+							"borderTopLeftRadius",
+							getStyle("borderTopLeftRadius") ?? getStyle("borderRadius"),
+						),
+						right: box.readPx(
+							"borderTopRightRadius",
+							getStyle("borderTopRightRadius") ?? getStyle("borderRadius"),
+						),
+						bottom: box.readPx(
+							"borderBottomRightRadius",
+							getStyle("borderBottomRightRadius") ?? getStyle("borderRadius"),
+						),
+						left: box.readPx(
+							"borderBottomLeftRadius",
+							getStyle("borderBottomLeftRadius") ?? getStyle("borderRadius"),
+						),
+					}}
+					onChange={({ top, right, bottom, left }) =>
+						applyBox([
+							{ prop: "borderTopLeftRadius", value: top as number },
+							{ prop: "borderTopRightRadius", value: right as number },
+							{ prop: "borderBottomRightRadius", value: bottom as number },
+							{ prop: "borderBottomLeftRadius", value: left as number },
+						])
+					}
+				/>
+				<ColorRow
+					label="Color"
+					value={
+						box.filled
+							? String(inlineColorFromCss(box.linkCss, "borderColor"))
+							: String(getStyle("borderColor") ?? "")
+					}
+					onChange={(v) => {
+						if (box.filled) box.write([{ prop: "borderColor", value: v }]);
+						else setStyle("borderColor", v);
+					}}
+				/>
+			</InspectorSection>
+		</>
+	);
+}
+
+function inlineColorFromCss(cssText: string, camelProp: string): string {
+	if (typeof document === "undefined" || !cssText.trim()) return "";
+	const scratch = document.createElement("div");
+	scratch.style.cssText = cssText;
+	if (camelProp === "borderColor") return scratch.style.borderColor;
+	return scratch.style.getPropertyValue(
+		camelProp.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`),
+	);
+}
+
 /* ------------------------------------------------------------------ */
 /* Root inspector                                                       */
 /* ------------------------------------------------------------------ */
@@ -247,11 +494,9 @@ export const EmailInspector = () => {
 
 				<Inspector.Node>
 					{(nodeProps) => {
-						const isTextRelated = [
-							"paragraph",
-							"heading",
-							"button",
-						].includes(nodeProps.nodeType);
+						const isTextRelated = TEXT_INSPECTOR_NODES.has(
+							nodeProps.nodeType,
+						);
 						if (!isTextRelated) return null;
 
 						// Calculate props for node selection since Inspector.Node doesn't provide them
@@ -300,157 +545,8 @@ export const EmailInspector = () => {
 				</Inspector.Node>
 
 
-				{/* ── Spacing + image + button node card ── */}
 				<Inspector.Node>
-					{({ nodeType, getStyle, batchSetStyle, getAttr, setAttr }) => {
-						if (nodeType === "variable") return null;
-						return (
-							<InspectorSection>
-								<SectionHeader label="Spacing" />
-
-								<SpacingControl
-									value={{
-										top: (getStyle("paddingTop") as number) ?? "",
-										right: (getStyle("paddingRight") as number) ?? "",
-										bottom: (getStyle("paddingBottom") as number) ?? "",
-										left: (getStyle("paddingLeft") as number) ?? "",
-									}}
-									onChange={({ top, right, bottom, left }) =>
-										batchSetStyle([
-											{ prop: "paddingTop", value: top as number },
-											{ prop: "paddingRight", value: right as number },
-											{ prop: "paddingBottom", value: bottom as number },
-											{ prop: "paddingLeft", value: left as number },
-										])
-									}
-								/>
-
-								{nodeType === "image" && (
-									<div className="px-4 pb-3">
-										<ImageSrcControl
-											value={{
-												src: String(getAttr("src") ?? ""),
-												alt: String(getAttr("alt") ?? ""),
-												width: (getAttr("width") as number) ?? "",
-												height: (getAttr("height") as number) ?? "",
-											}}
-											onChange={({ src, alt, width, height }) => {
-												setAttr("src", src);
-												setAttr("alt", alt);
-												setAttr("width", width);
-												setAttr("height", height);
-											}}
-										/>
-									</div>
-								)}
-
-								{nodeType === "button" && (
-									<PropRow label="Link">
-										<UrlInput
-											value={String(getAttr("href") ?? "")}
-											onChange={(v) => setAttr("href", v)}
-										/>
-									</PropRow>
-								)}
-							</InspectorSection>
-						);
-					}}
-				</Inspector.Node>
-
-				{/* ── Background card ── */}
-				<Inspector.Node>
-					{({ nodeType, getStyle, setStyle }) => {
-						if (nodeType === "variable") return null;
-						return (
-							<InspectorSection>
-								<SectionHeader label="Background" />
-								<ColorRow
-									label="Color"
-									value={String(getStyle("backgroundColor") ?? "")}
-									onChange={(v) => setStyle("backgroundColor", v)}
-								/>
-							</InspectorSection>
-						);
-					}}
-				</Inspector.Node>
-
-				{/* ── Border card ── */}
-				<Inspector.Node>
-					{({ nodeType, getStyle, setStyle, batchSetStyle }) => {
-						if (nodeType === "variable") return null;
-						return (
-							<InspectorSection>
-								<SectionHeader label="Border" />
-								<SpacingControl
-									label="Border"
-									value={{
-										top:
-											(getStyle("borderTopWidth") as number) ??
-											(getStyle("borderWidth") as number) ??
-											"",
-										right:
-											(getStyle("borderRightWidth") as number) ??
-											(getStyle("borderWidth") as number) ??
-											"",
-										bottom:
-											(getStyle("borderBottomWidth") as number) ??
-											(getStyle("borderWidth") as number) ??
-											"",
-										left:
-											(getStyle("borderLeftWidth") as number) ??
-											(getStyle("borderWidth") as number) ??
-											"",
-									}}
-									onChange={({ top, right, bottom, left }) =>
-										batchSetStyle([
-											{ prop: "borderTopWidth", value: top as number },
-											{ prop: "borderRightWidth", value: right as number },
-											{ prop: "borderBottomWidth", value: bottom as number },
-											{ prop: "borderLeftWidth", value: left as number },
-										])
-									}
-								/>
-								<SpacingControl
-									label="Radius"
-									variant="corners"
-									value={{
-										top:
-											(getStyle("borderTopLeftRadius") as number) ??
-											(getStyle("borderRadius") as number) ??
-											"",
-										right:
-											(getStyle("borderTopRightRadius") as number) ??
-											(getStyle("borderRadius") as number) ??
-											"",
-										bottom:
-											(getStyle("borderBottomRightRadius") as number) ??
-											(getStyle("borderRadius") as number) ??
-											"",
-										left:
-											(getStyle("borderBottomLeftRadius") as number) ??
-											(getStyle("borderRadius") as number) ??
-											"",
-									}}
-									onChange={({ top, right, bottom, left }) =>
-										batchSetStyle([
-											{ prop: "borderTopLeftRadius", value: top as number },
-											{ prop: "borderTopRightRadius", value: right as number },
-											{
-												prop: "borderBottomRightRadius",
-												value: bottom as number,
-											},
-											{ prop: "borderBottomLeftRadius", value: left as number },
-										])
-									}
-								/>
-								<ColorRow
-									label="Color"
-									value={String(getStyle("borderColor") ?? "")}
-									onChange={(v) => setStyle("borderColor", v)}
-								/>
-							</InspectorSection>
-						);
-					}}
+					{(nodeProps) => <InspectorNodeStyles {...nodeProps} />}
 				</Inspector.Node>
 
 				{/* ── Document card ── */}

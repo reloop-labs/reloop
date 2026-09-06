@@ -1,6 +1,31 @@
 import { StarterKit } from "@react-email/editor/extensions";
-import { Extension } from "@tiptap/core";
+import { Extension, Mark } from "@tiptap/core";
 import { EMAIL_DECORATION_ATTR } from "./preserve-email-link-underlines";
+
+export const EMAIL_FONT_COLOR_MARK = "emailFontColor";
+
+/** Selection color so inspect can paint a word, not only the parent block. */
+const emailFontColor = Mark.create({
+	name: EMAIL_FONT_COLOR_MARK,
+	addAttributes() {
+		return {
+			color: {
+				default: null,
+				parseHTML: (element) => element.style.color || null,
+				renderHTML: (attributes) => {
+					if (!attributes.color) return {};
+					return { style: `color: ${attributes.color}` };
+				},
+			},
+		};
+	},
+	parseHTML() {
+		return [{ tag: "span[data-email-font-color]" }];
+	},
+	renderHTML({ HTMLAttributes }) {
+		return ["span", { "data-email-font-color": "", ...HTMLAttributes }, 0];
+	},
+});
 
 const LAYOUT_STYLE_TYPES = [
 	"heading",
@@ -115,6 +140,7 @@ export function emailStarterKit() {
 					ClassAttribute: { types: LAYOUT_STYLE_TYPES },
 				}),
 				emailLinkDecoration,
+				emailFontColor,
 			];
 		},
 	});
