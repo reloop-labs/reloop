@@ -8,6 +8,7 @@ import {
 	comparisonSections,
 	formatPrice,
 	getPlanPrice,
+	paidOverageUsdPerThousand,
 	pricingPlans,
 } from "@reloop/web/lib/pricing";
 import Link from "next/link";
@@ -556,6 +557,19 @@ function PlanColumn({
 			: isCustom || price === 0
 				? plan.priceSubline
 				: plan.emailsLabel;
+	const includedVolume = Number(
+		plan.comparison.monthlyEmails.replace(/,/g, ""),
+	);
+	const extraEmailCount =
+		selectedVolume == null || !Number.isFinite(includedVolume)
+			? 0
+			: Math.max(0, selectedVolume - includedVolume);
+	const overageCost =
+		(extraEmailCount / 1000) * paidOverageUsdPerThousand;
+	const displayPrice =
+		!isCustom && recommended && selectedVolume != null
+			? (price ?? 0) + overageCost
+			: price;
 
 	const borderClasses = [
 		"border-b sm:border-r sm:border-b lg:border-r lg:border-b-0",
@@ -592,9 +606,9 @@ function PlanColumn({
 					) : (
 						<div className="flex items-end gap-1">
 							<span className="font-semibold text-[2rem] text-text-strong-950 leading-none tracking-tight dark:text-white">
-								{formatPrice(price)}
+								{formatPrice(displayPrice ?? 0)}
 							</span>
-							{price > 0 && (
+							{(displayPrice ?? 0) > 0 && (
 								<span className="mb-1 text-[15px] text-text-sub-600 dark:text-white/50">
 									{plan.priceSubline}
 								</span>

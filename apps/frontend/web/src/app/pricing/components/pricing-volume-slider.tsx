@@ -3,11 +3,10 @@
 import { cn } from "@reloop/ui/cn";
 import * as Slider from "@reloop/ui/slider";
 import {
-	formatPrice,
-	hostedMonthlyUsdForVolume,
+	getPlanById,
+	paidOverageUsdPerThousand,
 	type PlanId,
 } from "@reloop/web/lib/pricing";
-import Link from "next/link";
 
 const TICKS = [
 	{ value: 3000, label: "3k", plan: "Free" },
@@ -70,20 +69,31 @@ const toVolume = (position: number) => {
 	return Math.round(raw / granularity) * granularity;
 };
 
-function recommendedPlan(volume: number) {
-	if (volume > 500000) return "Custom";
-	if (volume <= 3000) return "Free";
-	const individual = 10 + (Math.max(0, volume - 50000) / 1000) * 0.5;
-	const startup = 20 + (Math.max(0, volume - 100000) / 1000) * 0.5;
-	return individual <= startup ? "Individual" : "Startup";
-}
+/**
+ * How close (in USD) Individual's overage-inflated total may get to
+ * Startup's base price before Startup becomes the recommendation.
+ * E.g. Individual at $18+ overage loses to Startup at $20 base.
+ */
+const UPSELL_THRESHOLD_USD = 2;
 
 export function recommendPlanIdForVolume(volume: number): PlanId {
 	if (volume > 500000) return "enterprise";
 	if (volume <= 3000) return "free";
-	const individual = 10 + (Math.max(0, volume - 50000) / 1000) * 0.5;
-	const startup = 20 + (Math.max(0, volume - 100000) / 1000) * 0.5;
-	return individual <= startup ? "individual" : "startup";
+	const individual = getPlanById("individual");
+	const startup = getPlanById("startup");
+	const individualBase = individual?.monthlyPrice ?? 10;
+	const startupBase = startup?.monthlyPrice ?? 20;
+	const individualIncluded =
+		Number(individual?.comparison.monthlyEmails.replace(/,/g, "")) || 50000;
+	const individualTotal =
+		individualBase +
+		(Math.max(0, volume - individualIncluded) / 1000) *
+			paidOverageUsdPerThousand;
+	// Once overage pushes Individual within threshold of Startup's base,
+	// the next tier is the better deal — recommend it instead of
+	// inflating Individual up to (or past) Startup's price.
+	if (individualTotal >= startupBase - UPSELL_THRESHOLD_USD) return "startup";
+	return "individual";
 }
 
 export function PricingVolumeSlider({
@@ -94,14 +104,6 @@ export function PricingVolumeSlider({
 	onVolumeChange: (volume: number) => void;
 }) {
 	const position = toPosition(volume);
-	const cost = hostedMonthlyUsdForVolume(volume);
-	const plan = recommendedPlan(volume);
-	const included =
-		plan === "Individual" ? 50000 : plan === "Startup" ? 100000 : 0;
-	const overage =
-		plan === "Individual" || plan === "Startup"
-			? (Math.max(0, volume - included) / 1000) * 0.5
-			: 0;
 
 	let activeTick = 0;
 	let smallestGap = Number.POSITIVE_INFINITY;
@@ -205,26 +207,6 @@ export function PricingVolumeSlider({
 						})}
 					</div>
 				</div>
-
-				<p className="mt-7 text-center font-medium text-[15px] text-primary-base tabular-nums dark:text-[#4ea1ff]">
-					{plan === "Custom" ? (
-						<>
-							Custom:{" "}
-							<Link href="/contact" className="underline underline-offset-4">
-								contact sales
-							</Link>
-						</>
-					) : overage > 0 ? (
-						<>
-							{plan} + {formatPrice(overage)} in extra emails ={" "}
-							{formatPrice(cost)}/month
-						</>
-					) : (
-						<>
-							{plan}: {formatPrice(cost)}/month
-						</>
-					)}
-				</p>
 			</div>
 		</section>
 	);
