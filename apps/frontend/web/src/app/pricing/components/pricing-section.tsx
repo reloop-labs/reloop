@@ -834,7 +834,7 @@ function ComparisonTable({
 				)}
 			>
 				{/* Header row — matches reference: eyebrow + title left, plan + pill CTA right */}
-				<div className="sticky top-16 z-30 flex flex-col gap-3 border-stroke-soft-100 border-b bg-bg-white-0/95 px-5 py-7 backdrop-blur-md sm:px-7 lg:px-9 dark:border-white/10 dark:bg-black/95">
+				<div className="sticky top-16 z-30 flex flex-col gap-3 border-stroke-soft-100 border-b bg-bg-white-0/95 px-5 py-7 backdrop-blur-md sm:px-7 lg:px-9 dark:border-white/10 dark:bg-[#131313]/95">
 					<p className="font-medium text-[12px] text-primary-base uppercase">
 						Features
 					</p>
@@ -851,7 +851,7 @@ function ComparisonTable({
 								"sticky top-16 z-30 flex flex-col justify-center gap-7 border-stroke-soft-100 border-b border-l px-5 py-7 sm:px-6 backdrop-blur-md dark:border-white/10",
 								active
 									? "bg-bg-weak-50/95 dark:bg-white/[0.05]"
-									: "bg-bg-white-0/95 dark:bg-black/95",
+									: "bg-bg-white-0/95 dark:bg-[#131313]/95",
 							)}
 						>
 							<div className="flex items-center gap-2">
