@@ -1706,10 +1706,10 @@ export const Header = () => {
 
 	return (
 		<header
-			className="fixed top-0 right-0 left-0 z-50 border-stroke-soft-200/70 border-b bg-bg-white-0 dark:border-white/10 dark:bg-black"
+			className="fixed top-0 right-0 left-0 z-50 border-stroke-soft-100 border-b bg-bg-white-0 dark:border-white/10 dark:bg-black"
 			onMouseLeave={() => openMega(null)}
 		>
-			<div className="relative mx-auto w-full max-w-5xl px-6 md:max-w-7xl">
+			<div className="relative mx-auto w-full max-w-5xl border-stroke-soft-100 border-x px-6 md:max-w-7xl dark:border-white/10">
 				<div className="relative flex h-16 items-center justify-between gap-4">
 					{/* Left — brand + main nav */}
 					<div className="flex items-center gap-6">
@@ -1718,7 +1718,7 @@ export const Header = () => {
 							className="relative z-10 flex shrink-0 items-center gap-2.5"
 							aria-label="Reloop home"
 						>
-							<Logo className="size-11 text-text-strong-950 dark:text-white" />
+							<Logo className="-ml-3 size-11 text-text-strong-950 dark:text-white" />
 							<span className="-ml-3 font-semibold text-[17px] text-text-strong-950 tracking-tight dark:text-white">
 								Reloop
 							</span>
@@ -1756,9 +1756,7 @@ export const Header = () => {
 										tabRefs.current[item.title] = el;
 									}}
 									className="relative z-10"
-									onMouseEnter={() =>
-										item.mega ? openMega(item.title) : openMega(null)
-									}
+									onMouseEnter={() => openMega(item.title)}
 								>
 									{item.mega ? (
 										<span
@@ -1960,7 +1958,7 @@ export const Header = () => {
 							animate={{ opacity: 1, height: "auto" }}
 							exit={{ opacity: 0, height: 0 }}
 							transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
-							className="overflow-hidden border-stroke-soft-200/70 border-t lg:hidden dark:border-white/10"
+							className="overflow-hidden border-stroke-soft-100 border-t lg:hidden dark:border-white/10"
 						>
 							<div className="max-h-[calc(100dvh-4rem)] overflow-y-auto py-4">
 								<nav className="flex flex-col gap-1">
@@ -2165,7 +2163,7 @@ export const Header = () => {
 									)}
 								</nav>
 
-								<div className="mt-6 flex flex-col gap-3 border-stroke-soft-200/70 border-t pt-6 dark:border-white/10">
+								<div className="mt-6 flex flex-col gap-3 border-stroke-soft-100 border-t pt-6 dark:border-white/10">
 									<div className="px-2">
 										<ThemeToggle />
 									</div>
