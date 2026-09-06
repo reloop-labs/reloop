@@ -105,15 +105,25 @@ export function emailTextBubbleShouldShow(options: {
 	return options.selectionSize > 0;
 }
 
-/** Link pencil only when the whole button is selected, not its label. */
+/** Button bubble toolbar when the button node is selected or cursor is inside the button. */
 export function emailButtonBubbleTrigger(params: {
 	editor: Editor;
 	state: EditorState;
 }): boolean {
 	const { selection } = params.state;
-	return (
-		selection instanceof NodeSelection && selection.node.type.name === "button"
-	);
+	if (
+		selection instanceof NodeSelection &&
+		selection.node.type.name === "button"
+	) {
+		return true;
+	}
+	const { $from } = selection;
+	for (let depth = $from.depth; depth > 0; depth--) {
+		if ($from.node(depth).type.name === "button") {
+			return true;
+		}
+	}
+	return false;
 }
 
 /** Full formatting bubble on links, not the 3-icon edit/open/unlink strip. */

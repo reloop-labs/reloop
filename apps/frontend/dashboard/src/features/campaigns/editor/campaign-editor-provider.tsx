@@ -2,18 +2,17 @@
 
 import { BubbleMenu } from "@react-email/editor/ui";
 import { generateJSON } from "@tiptap/html";
+import { PluginKey } from "@tiptap/pm/state";
 import { type Editor, EditorContext } from "@tiptap/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import * as Y from "yjs";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import { getRandomColor } from "#/features/templates/editor/collobration/hooks/useCollaboration";
 import { EmailSlashCommand } from "#/features/templates/editor/components/canvas/email-slash-command";
-import {
-	EMAIL_BUBBLE_HIDE_NODES,
-	emailButtonBubbleTrigger,
-	emailTextBubbleTrigger,
-} from "#/features/templates/editor/utils/email-slash-command-plugin";
+import { EmailTextBubbleMenu } from "#/features/templates/editor/components/canvas/email-text-bubble-menu";
+import { emailButtonBubbleTrigger } from "#/features/templates/editor/utils/email-slash-command-plugin";
 import { getRenderedEmailHtml } from "#/features/templates/editor/utils/get-rendered-email-html";
+
 import { updateCampaignRequest } from "../campaigns-api";
 import { useCampaignQuery } from "../campaigns-provider";
 import { useCampaignEditorStore } from "./campaign-editor-store";
@@ -23,6 +22,8 @@ import {
 	prepareCampaignHtmlForEditor,
 	resolveCampaignEditorDocument,
 } from "./hydrate-campaign-editor-content";
+
+const campaignButtonBubblePluginKey = new PluginKey("campaignButtonBubbleMenu");
 
 interface CampaignEditorProviderProps {
 	children: React.ReactNode;
@@ -217,11 +218,12 @@ export function CampaignEditorProvider({
 			<div className="flex h-full min-h-0 flex-1 flex-col overflow-hidden bg-bg-weak-50 dark:bg-black">
 				<CampaignEditorHeader />
 				<div className="min-h-0 flex-1 overflow-hidden">{children}</div>
+				<EmailTextBubbleMenu />
 				<BubbleMenu
-					hideWhenActiveNodes={[...EMAIL_BUBBLE_HIDE_NODES]}
-					trigger={emailTextBubbleTrigger}
-				/>
-				<BubbleMenu trigger={emailButtonBubbleTrigger} placement="top">
+					pluginKey={campaignButtonBubblePluginKey}
+					trigger={emailButtonBubbleTrigger}
+					placement="top"
+				>
 					<BubbleMenu.ButtonToolbar>
 						<BubbleMenu.ButtonEditLink />
 						<BubbleMenu.ButtonUnlink />

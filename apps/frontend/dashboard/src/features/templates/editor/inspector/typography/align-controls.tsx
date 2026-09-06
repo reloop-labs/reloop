@@ -24,6 +24,7 @@ export function AlignControls({
 					title={label}
 					aria-label={label}
 					data-state={alignment === a ? "on" : "off"}
+					onMouseDown={(e) => e.preventDefault()}
 					onClick={() => setAlignment(a as Alignment)}
 					className="h-10 flex-1 first:rounded-l-xl last:rounded-r-xl"
 				>

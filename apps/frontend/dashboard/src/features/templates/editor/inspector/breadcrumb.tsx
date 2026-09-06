@@ -238,6 +238,7 @@ const BreadCrumb = () => {
 											size="xxsmall"
 											title={label}
 											className="flex max-w-28 cursor-pointer items-center gap-1.5 rounded px-1 py-0.5 text-label-xs text-text-sub-600 outline-none ring-0 transition-colors hover:text-text-strong-950"
+											onMouseDown={(e) => e.preventDefault()}
 											onClick={() => item.source.focus()}
 										>
 											<Icon name={iconName} className="h-3.5 w-3.5 shrink-0" />

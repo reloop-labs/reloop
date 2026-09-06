@@ -107,6 +107,21 @@ export function SpacingControl({
 		);
 	});
 
+	const handleToggle = (nextLinked: boolean) => {
+		setLinked(nextLinked);
+		// Unify immediately so the canvas reflects the toggle without extra typing.
+		if (nextLinked) {
+			const base = value.top;
+			if (
+				base !== value.right ||
+				base !== value.bottom ||
+				base !== value.left
+			) {
+				onChange({ top: base, right: base, bottom: base, left: base });
+			}
+		}
+	};
+
 	const handleChange = (side: keyof SpacingValue, raw: number | "") => {
 		if (linked) {
 			onChange({ top: raw, right: raw, bottom: raw, left: raw });
@@ -133,7 +148,7 @@ export function SpacingControl({
 						value={value.top}
 						onChange={(v) => handleChange("top", v)}
 					/>
-					<ModeToggle linked={linked} onToggle={setLinked} />
+					<ModeToggle linked={linked} onToggle={handleToggle} />
 				</div>
 			</div>
 		);
@@ -147,7 +162,7 @@ export function SpacingControl({
 				<span className="font-normal text-sm text-text-sub-600 dark:text-text-soft-400">
 					{label}
 				</span>
-				<ModeToggle linked={linked} onToggle={setLinked} />
+				<ModeToggle linked={linked} onToggle={handleToggle} />
 			</div>
 
 			{/* 2×2 grid */}

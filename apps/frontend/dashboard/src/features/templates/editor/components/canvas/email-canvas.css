@@ -35,14 +35,123 @@
 	vertical-align: top;
 }
 
-/* Table alignment=center is the email column (margin auto). Do not force
- * text-align:start — Halo/Studio buttons and footers live in inner tables
- * that also get alignment=center from source text-align:center. */
+/* Table alignment aligns the table box using margins */
 .tiptap table[alignment="center"],
 .tiptap [alignment="center"]:is(table),
 .ProseMirror table[alignment="center"] {
 	margin-left: auto;
 	margin-right: auto;
+}
+.tiptap table[alignment="right"],
+.tiptap [alignment="right"]:is(table),
+.ProseMirror table[alignment="right"] {
+	margin-left: auto;
+	margin-right: 0;
+}
+.tiptap table[alignment="left"],
+.tiptap [alignment="left"]:is(table),
+.ProseMirror table[alignment="left"] {
+	margin-left: 0;
+	margin-right: auto;
+}
+
+/* Button block alignment */
+.tiptap.ProseMirror .align-left,
+.ProseMirror .align-left {
+	text-align: left !important;
+}
+.tiptap.ProseMirror .align-center,
+.ProseMirror .align-center {
+	text-align: center !important;
+}
+.tiptap.ProseMirror .align-right,
+.ProseMirror .align-right {
+	text-align: right !important;
+}
+.tiptap.ProseMirror div:has(> a.node-button):not(.align-center):not(.align-right),
+.ProseMirror div:has(> a.node-button):not(.align-center):not(.align-right) {
+	text-align: left;
+}
+
+/* Bullet and numbered lists alignment */
+.tiptap.ProseMirror ul[alignment="center"],
+.tiptap.ProseMirror ol[alignment="center"],
+.ProseMirror ul[alignment="center"],
+.ProseMirror ol[alignment="center"] {
+	text-align: center;
+	list-style-position: inside;
+}
+.tiptap.ProseMirror ul[alignment="right"],
+.tiptap.ProseMirror ol[alignment="right"],
+.ProseMirror ul[alignment="right"],
+.ProseMirror ol[alignment="right"] {
+	text-align: right;
+	list-style-position: inside;
+}
+.tiptap.ProseMirror ul[alignment="left"],
+.tiptap.ProseMirror ol[alignment="left"],
+.tiptap.ProseMirror ul:not([alignment]),
+.tiptap.ProseMirror ol:not([alignment]),
+.ProseMirror ul[alignment="left"],
+.ProseMirror ol[alignment="left"],
+.ProseMirror ul:not([alignment]),
+.ProseMirror ol:not([alignment]) {
+	text-align: left;
+}
+
+/* Blockquote alignment */
+.tiptap.ProseMirror blockquote[alignment="center"],
+.ProseMirror blockquote[alignment="center"] {
+	text-align: center;
+}
+.tiptap.ProseMirror blockquote[alignment="right"],
+.ProseMirror blockquote[alignment="right"] {
+	text-align: right;
+}
+.tiptap.ProseMirror blockquote[alignment="left"],
+.tiptap.ProseMirror blockquote:not([alignment]),
+.ProseMirror blockquote[alignment="left"],
+.ProseMirror blockquote:not([alignment]) {
+	text-align: left;
+}
+
+/* Code block alignment */
+.tiptap.ProseMirror pre[alignment="center"],
+.ProseMirror pre[alignment="center"] {
+	text-align: center;
+}
+.tiptap.ProseMirror pre[alignment="right"],
+.ProseMirror pre[alignment="right"] {
+	text-align: right;
+}
+.tiptap.ProseMirror pre[alignment="left"],
+.tiptap.ProseMirror pre:not([alignment]),
+.ProseMirror pre[alignment="left"],
+.ProseMirror pre:not([alignment]) {
+	text-align: left;
+}
+
+/* Divider (hr) alignment */
+.tiptap.ProseMirror hr[alignment="center"],
+.ProseMirror hr[alignment="center"] {
+	margin-left: auto;
+	margin-right: auto;
+}
+.tiptap.ProseMirror hr[alignment="right"],
+.ProseMirror hr[alignment="right"] {
+	margin-left: auto;
+	margin-right: 0;
+}
+.tiptap.ProseMirror hr[alignment="left"],
+.ProseMirror hr[alignment="left"] {
+	margin-left: 0;
+	margin-right: auto;
+}
+
+/* Multi-column layouts */
+.tiptap.ProseMirror .node-column:not([alignment]),
+.ProseMirror .node-column:not([alignment]) {
+	text-align: left;
 }
 
 /*
@@ -140,6 +249,33 @@
 	vertical-align: middle;
 }
 
+/* Image block alignment from the Inspector (`alignment` attr + margin styles).
+ * Canvas renders <img> directly, so center/right need explicit margins. */
+.tiptap.ProseMirror img[alignment="center"],
+.ProseMirror img[alignment="center"],
+.tiptap.ProseMirror img[align="center"],
+.ProseMirror img[align="center"] {
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+}
+.tiptap.ProseMirror img[alignment="right"],
+.ProseMirror img[alignment="right"],
+.tiptap.ProseMirror img[align="right"],
+.ProseMirror img[align="right"] {
+	display: block;
+	margin-left: auto;
+	margin-right: 0;
+}
+.tiptap.ProseMirror img[alignment="left"],
+.ProseMirror img[alignment="left"],
+.tiptap.ProseMirror img[align="left"],
+.ProseMirror img[align="left"] {
+	display: block;
+	margin-left: 0;
+	margin-right: auto;
+}
+
 /*
  * Empty Columns used as a 1px rule (Twitch logo divider). TipTap's cell
  * schema is `block+`, so it inserts a paragraph + slash placeholder and
@@ -199,4 +335,15 @@
 [data-re-bubble-menu],
 [data-re-slash-command] {
 	z-index: 9999 !important;
+}
+
+/* Button node selection outline in the canvas */
+.tiptap.ProseMirror .ProseMirror-selectednode a.node-button,
+.tiptap.ProseMirror a.node-button.ProseMirror-selectednode,
+.tiptap.ProseMirror div.ProseMirror-selectednode > a.node-button,
+.ProseMirror .ProseMirror-selectednode a.node-button,
+.ProseMirror a.node-button.ProseMirror-selectednode,
+.ProseMirror div.ProseMirror-selectednode > a.node-button {
+	outline: 2px solid #2563eb !important;
+	outline-offset: 2px !important;
 }

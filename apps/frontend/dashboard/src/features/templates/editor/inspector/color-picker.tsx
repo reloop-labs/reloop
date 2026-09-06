@@ -5,6 +5,7 @@ import * as Popover from "@reloop/ui/popover";
 import { useCurrentEditor } from "@tiptap/react";
 import { useMemo } from "react";
 import { HexAlphaColorPicker } from "react-colorful";
+import { normalizeColorToHex } from "../utils/resolve-inspector-text-style";
 import { inspectorFieldClassName } from "./scrub-field";
 
 /* ------------------------------------------------------------------ */
@@ -19,11 +20,20 @@ export function ColorPicker({
 }) {
 	const { editor } = useCurrentEditor();
 
-	const normalizedValue = value?.startsWith("#")
-		? value
-		: value
-			? `#${value}`
-			: "#ffffff";
+	const normalizedValue = (() => {
+		if (!value) return "#ffffff";
+		const hex = normalizeColorToHex(value);
+		// normalizeColorToHex passes through named colors; keep them for the
+		// swatch but fall back to white for the hex picker input.
+		if (hex.startsWith("#")) return hex;
+		if (value.startsWith("#")) return value;
+		return /^#[0-9a-f]{3,8}$/i.test(`#${value}`) ? `#${value}` : "#ffffff";
+	})();
+	const swatchColor = (() => {
+		if (!value) return "#ffffff";
+		const hex = normalizeColorToHex(value);
+		return hex || value;
+	})();
 
 	const documentColors = useMemo(() => {
 		const colors = new Set<string>();
@@ -70,7 +80,7 @@ export function ColorPicker({
 						aria-label="Pick color"
 						onMouseDown={(event) => event.preventDefault()}
 						className="relative size-4 shrink-0 cursor-pointer overflow-hidden rounded-md border border-stroke-soft-200 focus:outline-none dark:border-stroke-soft-100/40"
-						style={{ backgroundColor: normalizedValue }}
+						style={{ backgroundColor: swatchColor }}
 					/>
 				</Popover.Trigger>
 				<EditorFocusScope>

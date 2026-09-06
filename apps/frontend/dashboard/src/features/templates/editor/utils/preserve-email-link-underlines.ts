@@ -97,6 +97,29 @@ function hasButtonPadding(el: HTMLElement): boolean {
 	return sides.length >= 2;
 }
 
+function isButtonCenteredInContext(el: HTMLElement): boolean {
+	const mLeft = el.style.marginLeft;
+	const mRight = el.style.marginRight;
+	if (mLeft === "auto" && mRight === "auto") return true;
+
+	let cur: HTMLElement | null = el.parentElement;
+	while (cur && cur !== el.ownerDocument.body) {
+		if (cur.getAttribute("data-preserve-center") === "true") return true;
+		const styleAlign = cur.style.textAlign?.toLowerCase();
+		if (styleAlign === "center") return true;
+		if (styleAlign === "left" || styleAlign === "right") return false;
+		const attrAlign = cur.getAttribute("align")?.toLowerCase();
+		if (attrAlign === "center") {
+			const tag = cur.tagName.toLowerCase();
+			if (tag !== "table") return true;
+		} else if (attrAlign === "left" || attrAlign === "right") {
+			return false;
+		}
+		cur = cur.parentElement;
+	}
+	return false;
+}
+
 /**
  * TipTap's button node only matches `a[data-id="react-email-button"]`.
  * React Email `<Button>` often ships as a padded, filled `<a>` without that
@@ -106,11 +129,25 @@ function hasButtonPadding(el: HTMLElement): boolean {
 export function stampFilledLinksAsEmailButtons(root: Element): void {
 	for (const a of Array.from(root.getElementsByTagName("a"))) {
 		const el = a as HTMLAnchorElement;
-		if (el.getAttribute("data-id") === "react-email-button") continue;
-		if (!el.getAttribute("href")) continue;
-		if (el.querySelector("img")) continue;
-		if (!hasPaintedBackground(el) && !hasFillUtilityClass(el)) continue;
-		if (!hasButtonPadding(el) && !hasPaddingUtilityClass(el)) continue;
-		el.setAttribute("data-id", "react-email-button");
+		const alreadyButton = el.getAttribute("data-id") === "react-email-button";
+		if (!alreadyButton) {
+			if (!el.getAttribute("href")) continue;
+			if (el.querySelector("img")) continue;
+			if (!hasPaintedBackground(el) && !hasFillUtilityClass(el)) continue;
+			if (!hasButtonPadding(el) && !hasPaddingUtilityClass(el)) continue;
+			el.setAttribute("data-id", "react-email-button");
+		}
+
+		// In HTML emails, <a style="text-align: center"> centers text inside
+		// the pill. TipTap's AlignmentAttribute.parseHTML treats style.textAlign
+		// as button block alignment unless an explicit align/alignment attribute
+		// is present. Ensure button has explicit alignment matching its context.
+		if (!el.getAttribute("alignment") && !el.getAttribute("align")) {
+			const isCentered = isButtonCenteredInContext(el);
+			const alignVal = isCentered ? "center" : "left";
+			el.setAttribute("alignment", alignVal);
+			el.setAttribute("align", alignVal);
+		}
 	}
 }
+
