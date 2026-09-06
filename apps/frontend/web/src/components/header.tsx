@@ -1306,13 +1306,13 @@ function DividedListColumn({
 				const external = isExternalHref(link.href, link.external);
 				const crossDomain = isCrossDomain(link.href);
 				const className = cn(
-					"group flex min-w-0 items-start gap-4 pl-7 pr-5 py-4.5 transition-colors",
+					"group flex min-w-0 items-start gap-2.5 pl-7 pr-5 py-4.5 transition-colors",
 					"hover:bg-neutral-50/80 dark:hover:bg-white/[0.04]",
 				);
 				const body = (
 					<>
-						{/* Icon optically aligned with the first line of text */}
-						<span className="mt-0.5 flex size-5 shrink-0 items-center justify-center text-neutral-500 dark:text-neutral-400">
+						{/* Icon optically aligned and centered with the 20px (leading-5) title line */}
+						<span className="flex h-5 w-[14px] shrink-0 items-center justify-center text-neutral-500 dark:text-neutral-400">
 							{link.customIcon ? (
 								<span className="inline-flex size-[14px] items-center justify-center [&>svg]:size-[14px]">
 									{link.customIcon}
