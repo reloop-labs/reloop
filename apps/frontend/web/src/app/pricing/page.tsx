@@ -1,11 +1,11 @@
 import { JsonLd } from "@reloop/web/components/json-ld";
-import { PixelBlast } from "@reloop/web/components/pixel-blast";
 import { pricingFaqItems } from "@reloop/web/lib/pricing-faq";
 import { faqPageJsonLd, pricingProductJsonLd } from "@reloop/web/lib/schema";
 import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 import { PricingExplorer } from "./components/pricing-explorer";
 import { PricingFaq } from "./components/pricing-faq";
+import { PricingHeroBlast } from "./components/pricing-hero-blast";
 
 // TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
 // See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
@@ -60,26 +60,13 @@ const PricingPage = () => {
 						aria-hidden="true"
 						className="absolute inset-0 [-webkit-mask-image:linear-gradient(to_right,black_0%,black_28%,transparent_42%,transparent_58%,black_72%,black_100%)] [mask-image:linear-gradient(to_right,black_0%,black_28%,transparent_42%,transparent_58%,black_72%,black_100%)]"
 					>
-						<PixelBlast
-							variant="square"
-							pixelSize={2}
-							color="#6e7781"
-							patternScale={4}
-							patternDensity={0.45}
-							enableRipples={false}
-							rippleSpeed={0.05}
-							rippleThickness={0.09}
-							rippleIntensityScale={2.5}
-							speed={0.2}
-							transparent
-							edgeFade={0.65}
-						/>
+						<PricingHeroBlast />
 					</div>
 					<div className="relative z-10 flex w-auto max-w-full flex-col items-center px-8 py-6">
 						<div className="mb-5 flex items-center justify-center gap-2 sm:mb-6">
 							<span
 								aria-hidden
-								className="inline-flex size-5 shrink-0 items-center justify-center rounded-[5px] bg-primary-dark p-px pb-[2px] dark:bg-[#003a8c]"
+								className="inline-flex size-5 shrink-0 items-center justify-center rounded-[5px] bg-primary-dark p-px pb-[2px] dark:bg-[#30363d]"
 							>
 								<span className="flex size-full items-center justify-center rounded-[4px] bg-primary-base text-white shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.45)] dark:text-black dark:shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.28),0_0_0_0.5px_rgba(255,255,255,0.08)]">
 									<span className="font-semibold text-[11px] text-white leading-none dark:text-black">
