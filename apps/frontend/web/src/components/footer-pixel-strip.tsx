@@ -1,5 +1,6 @@
 "use client";
 
+import { cn } from "@reloop/ui/cn";
 import { useEffect, useRef, useState } from "react";
 
 type Sprite = {
@@ -398,7 +399,7 @@ const stamp1: Sprite = {
 	],
 };
 
-export function FooterPixelStrip() {
+export function FooterPixelStrip({ className }: { className?: string } = {}) {
 	// Frame indexes for each sprite's one-shot animation
 	const [envelopeFrame, setEnvelopeFrame] = useState(0);
 	const [checkFrame, setCheckFrame] = useState(0);
@@ -506,7 +507,12 @@ export function FooterPixelStrip() {
 	const stampSprites = [stamp0, stamp1];
 
 	return (
-		<div className="flex w-full items-center justify-evenly border-stroke-soft-100 border-t px-6 py-5 sm:px-16 sm:py-6 lg:px-24 dark:border-white/10">
+		<div
+			className={cn(
+				"flex w-full items-center justify-evenly border-stroke-soft-100 border-t px-6 py-12 sm:px-16 sm:py-16 lg:px-24 dark:border-white/10",
+				className,
+			)}
+		>
 			{/* 0. Envelope */}
 			<div
 				onMouseEnter={playEnvelopeOneShot}

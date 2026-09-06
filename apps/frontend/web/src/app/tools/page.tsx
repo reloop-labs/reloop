@@ -1,12 +1,9 @@
-import { Icon, type IconName } from "@reloop/ui/icon";
+import { Icon } from "@reloop/ui/icon";
 import { BlogCta } from "@reloop/web/components/landing/blog/blog-cta";
 import { createLandingMetadata } from "@reloop/web/lib/landing/metadata";
 import { toolConfigs } from "@reloop/web/lib/landing/tools";
 import Link from "next/link";
-import {
-	domainBlocklistCount,
-	ipBlocklistCount,
-} from "./blocklist-checker/content";
+import { ToolsHeroBlast } from "./components/tools-hero-blast";
 
 export const instant = false;
 
@@ -27,272 +24,68 @@ export const metadata = createLandingMetadata(
 	],
 );
 
-interface ToolVisualMeta {
-	icon: IconName;
-	badge: string;
-	badgeColor: string;
-	glowColor: string;
-	features: string[];
-}
-
-const TOOL_VISUAL_MAP: Record<string, ToolVisualMeta> = {
-	"dns-lookup": {
-		icon: "globe",
-		badge: "DNS & SuperTool",
-		badgeColor:
-			"bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/20",
-		glowColor: "group-hover:border-blue-500/40",
-		features: [
-			"A, AAAA, MX, TXT, CNAME, NS, SOA, CAA, PTR",
-			"Automatic DNS hosting provider detection",
-			"SPF and DMARC deliverability health audit",
-		],
-	},
-	"spoof-checker": {
-		icon: "shield-check",
-		badge: "Security",
-		badgeColor:
-			"bg-rose-500/10 text-rose-700 dark:text-rose-400 border-rose-500/20",
-		glowColor: "group-hover:border-rose-500/40",
-		features: [
-			"Instant Yes / Sometimes / No spoof verdict",
-			"Simulated Gmail & Outlook CEO fraud mock",
-			"DMARC p=none & SPF loophole detection",
-		],
-	},
-	"who-sends": {
-		icon: "server",
-		badge: "Infrastructure",
-		badgeColor:
-			"bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/20",
-		glowColor: "group-hover:border-blue-500/40",
-		features: [
-			"Discover authorized third-party ESPs",
-			"Inbound mailbox vs. outbound sender separation",
-			"Recursive nested SPF unrolling (depth 2)",
-		],
-	},
-	"domain-age": {
-		icon: "globe",
-		badge: "Warmup & Age",
-		badgeColor:
-			"bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/20",
-		glowColor: "group-hover:border-emerald-500/40",
-		features: [
-			"Official RDAP domain creation date check",
-			"Newly registered domain (NRD) spam filter audit",
-			"Visual 4-stage domain warmup timeline",
-		],
-	},
-	"lookalike-watch": {
-		icon: "alert-triangle",
-		badge: "Brand Defense",
-		badgeColor:
-			"bg-rose-500/10 text-rose-700 dark:text-rose-400 border-rose-500/20",
-		glowColor: "group-hover:border-rose-500/40",
-		features: [
-			"Phishing twin & typosquat candidate scan",
-			"Mail-ready capability check (MX & SPF)",
-			"Bypass & simulated From attack vector preview",
-		],
-	},
-	"email-spam-words-checker": {
-		icon: "shield-check",
-		badge: "Deliverability",
-		badgeColor:
-			"bg-orange-500/10 text-orange-700 dark:text-orange-400 border-orange-500/20",
-		glowColor: "group-hover:border-orange-500/40",
-		features: [
-			"Spam trigger keyword scanner",
-			"0–100 score & grade breakdown",
-			"Link safety & shortener audit",
-		],
-	},
-	"blocklist-checker": {
-		icon: "shield-check",
-		badge: "Deliverability",
-		badgeColor:
-			"bg-sky-500/10 text-sky-700 dark:text-sky-400 border-sky-500/20",
-		glowColor: "group-hover:border-sky-500/40",
-		features: [
-			`${ipBlocklistCount} IP DNS blocklists (ZEN, Barracuda, SpamCop)`,
-			`${domainBlocklistCount} domain URI lists (DBL, URIBL, SURBL)`,
-			"Failed queries reported as errors, not clean",
-		],
-	},
-	"temp-email-checker": {
-		icon: "shield-cross",
-		badge: "Protection",
-		badgeColor:
-			"bg-rose-500/10 text-rose-700 dark:text-rose-400 border-rose-500/20",
-		glowColor: "group-hover:border-rose-500/40",
-		features: [
-			"Syntax, catalogue, and MX lookup",
-			"Role-prefix and free-provider flags",
-			"Confidence and risk score — no SMTP probe",
-		],
-	},
-	"email-validator": {
-		icon: "mail",
-		badge: "Deliverability",
-		badgeColor:
-			"bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/20",
-		glowColor: "group-hover:border-emerald-500/40",
-		features: [
-			"Single email & bulk CSV upload (up to 1,000)",
-			"Disposable, role & free-provider detection",
-			"Live MX DNS lookups & list health %",
-		],
-	},
-	"deliverability-tester": {
-		icon: "shield-check",
-		badge: "Deliverability",
-		badgeColor:
-			"bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/20",
-		glowColor: "group-hover:border-blue-500/40",
-		features: [
-			"Spam trigger word analysis",
-			"Link density & formatting scan",
-			"Real-time deliverability score",
-		],
-	},
-	"auth-checker": {
-		icon: "lock",
-		badge: "DNS & Auth",
-		badgeColor:
-			"bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/20",
-		glowColor: "group-hover:border-amber-500/40",
-		features: [
-			"SPF policy record check",
-			"DKIM signature verification",
-			"DMARC enforcement status",
-		],
-	},
-	"bimi-checker": {
-		icon: "globe",
-		badge: "DNS & Auth",
-		badgeColor:
-			"bg-teal-500/10 text-teal-700 dark:text-teal-400 border-teal-500/20",
-		glowColor: "group-hover:border-teal-500/40",
-		features: [
-			"default._bimi TXT lookup",
-			"HTTPS SVG Tiny PS check",
-			"DMARC enforcement required",
-		],
-	},
-	"email-html-editor": {
-		icon: "code",
-		badge: "Editor",
-		badgeColor:
-			"bg-violet-500/10 text-violet-700 dark:text-violet-400 border-violet-500/20",
-		glowColor: "group-hover:border-violet-500/40",
-		features: [
-			"Paste React Email or raw HTML",
-			"Inspect on a visual canvas",
-			"Source stays in sync — no account",
-		],
-	},
-};
-
 export default function ToolsIndexPage() {
 	return (
-		<div className="min-h-screen bg-[#fafafa] dark:bg-black">
-			{/* Top Hero Section */}
-			<div className="border-stroke-soft-200 border-b bg-white px-4 py-16 text-center sm:px-6 lg:py-20 dark:border-white/10 dark:bg-[#0a0a0a]">
-				<div className="mx-auto max-w-3xl">
-					<div className="mb-4 inline-flex items-center gap-2 rounded-full border border-stroke-soft-200 bg-bg-weak-50 px-3 py-1 font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.14em] dark:border-white/10 dark:bg-white/[0.05] dark:text-white/60">
-						<span className="size-1.5 rounded-full bg-emerald-500" />
-						Free Developer & Marketer Utilities
-					</div>
-					<h1 className="font-semibold text-3xl text-text-strong-950 tracking-tight sm:text-4xl lg:text-5xl dark:text-white">
-						Essential email tools, 100% free
-					</h1>
-					<p className="mt-4 text-[16px] text-text-sub-600 leading-relaxed sm:text-[18px] dark:text-white/60">
-						Zero signup required. Browser-based utilities to validate addresses,
-						inspect DNS auth records, calculate deliverability scores, and
-						preview responsive templates.
-					</p>
-
-					{/* Fast Highlights Bar */}
-					<div className="mt-8 flex flex-wrap items-center justify-center gap-6 text-[13px] text-text-sub-600 dark:text-white/50">
-						<div className="flex items-center gap-2">
-							<Icon name="check" className="size-4 text-emerald-500" />
-							<span>No account required</span>
-						</div>
-						<div className="flex items-center gap-2">
-							<Icon name="check" className="size-4 text-emerald-500" />
-							<span>Instant browser evaluation</span>
-						</div>
-						<div className="flex items-center gap-2">
-							<Icon name="check" className="size-4 text-emerald-500" />
-							<span>Production-grade heuristics</span>
-						</div>
-					</div>
+		<div className="mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-100 border-x [--primary-base:#10b981] [--primary-dark:#059669] [--primary-darker:#047857] [--primary-link:#059669] md:max-w-7xl dark:border-white/10 dark:[--primary-base:#6ee7b7] dark:[--primary-dark:#6ee7b7] dark:[--primary-darker:#a7f3d0] dark:[--primary-link:#6ee7b7]">
+			{/* Hero Section — matches pricing / why-open-source */}
+			<header className="relative flex w-full flex-col items-center overflow-hidden bg-transparent px-6 pt-[224px] pb-40 text-center sm:px-8 lg:px-12">
+				<div
+					aria-hidden="true"
+					className="absolute inset-0 [-webkit-mask-image:linear-gradient(to_right,black_0%,black_28%,transparent_42%,transparent_58%,black_72%,black_100%)] [mask-image:linear-gradient(to_right,black_0%,black_28%,transparent_42%,transparent_58%,black_72%,black_100%)]"
+				>
+					<ToolsHeroBlast />
 				</div>
-			</div>
+				<div className="relative z-10 flex w-auto max-w-full flex-col items-center px-8 py-6">
+					<div className="mb-5 flex items-center justify-center gap-2 sm:mb-6">
+						<span
+							aria-hidden
+							className="inline-flex size-5 shrink-0 items-center justify-center rounded-[5px] bg-primary-dark p-px pb-[2px] dark:bg-[#065f46]"
+						>
+							<span className="flex size-full items-center justify-center rounded-[4px] bg-primary-base text-white shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.45)] dark:text-black dark:shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.28),0_0_0_0.5px_rgba(255,255,255,0.08)]">
+								<Icon name="zap" className="size-[11px]" />
+							</span>
+						</span>
+						<span className="font-medium text-[13.5px] text-text-strong-950 tracking-tight dark:text-white">
+							Free Tools
+						</span>
+					</div>
 
-			{/* Tools Grid */}
-			<div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:py-16">
-				<div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+					<h1 className="max-w-3xl text-balance text-center font-semibold text-[2.5rem] text-text-strong-950 leading-[1.06] tracking-[-0.04em] sm:text-[3.5rem] lg:text-[4.25rem] dark:text-white">
+						Free{" "}
+						<span className="bg-gradient-to-b from-primary-base to-primary-base bg-clip-text text-transparent">
+							email tools
+						</span>
+						<br className="hidden sm:block" /> by{" "}
+						<span className="bg-gradient-to-b from-primary-base to-primary-base bg-clip-text text-transparent">
+							Reloop
+						</span>
+					</h1>
+
+					<p className="mt-5 max-w-[46rem] text-balance text-center text-[16.5px] text-text-sub-600 leading-relaxed sm:mt-6 sm:text-[18.5px] lg:text-[20px] dark:text-white/60">
+						Zero signup required. Validate addresses, inspect DNS auth records,
+						score deliverability, and preview templates.
+					</p>
+				</div>
+			</header>
+
+			{/* Tools Grid — minimal Firecrawl-style cards */}
+			<div className="w-full px-6 py-12 sm:px-8 lg:px-12 lg:py-16">
+				<div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
 					{toolConfigs.map((tool) => {
-						const visual = TOOL_VISUAL_MAP[tool.slug] ?? {
-							icon: "zap" as IconName,
-							badge: "Tool",
-							badgeColor:
-								"bg-neutral-500/10 text-neutral-700 dark:text-neutral-400 border-neutral-500/20",
-							glowColor: "group-hover:border-primary-base/40",
-							features: [],
-						};
 						const title = tool.titleLines.join(" ");
 
 						return (
 							<Link
 								key={tool.path}
 								href={tool.path}
-								className={`group hover:-translate-y-0.5 relative flex flex-col justify-between overflow-hidden rounded-2xl border border-stroke-soft-200 bg-white p-6 transition-all duration-200 hover:shadow-lg dark:border-white/10 dark:bg-[#0d0d0f] ${visual.glowColor}`}
+								className="group hover:-translate-y-0.5 rounded-[20px] border border-stroke-soft-200 bg-white p-8 transition-all duration-200 hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)] dark:border-white/10 dark:bg-white/[0.02] dark:hover:bg-white/[0.04]"
 							>
-								<div>
-									<div className="flex items-center justify-between gap-3">
-										<div className="flex size-10 items-center justify-center rounded-xl border border-stroke-soft-200 bg-bg-weak-50 text-text-strong-950 transition-colors group-hover:bg-primary-base group-hover:text-white dark:border-white/10 dark:bg-white/[0.04] dark:text-white dark:group-hover:bg-primary-base">
-											<Icon name={visual.icon} className="size-5" />
-										</div>
-										<span
-											className={`inline-flex items-center rounded-full border px-2.5 py-0.5 font-semibold text-[10px] uppercase tracking-wider ${visual.badgeColor}`}
-										>
-											{visual.badge}
-										</span>
-									</div>
-
-									<h2 className="mt-4 font-semibold text-[18px] text-text-strong-950 tracking-tight transition-colors group-hover:text-primary-base dark:text-white dark:group-hover:text-primary-base">
-										{title}
-									</h2>
-									<p className="mt-2 line-clamp-3 text-[14px] text-text-sub-600 leading-relaxed dark:text-white/55">
-										{tool.description}
-									</p>
-
-									{visual.features.length > 0 && (
-										<ul className="mt-4 space-y-2 border-stroke-soft-200/80 border-t pt-4 text-[12.5px] text-text-sub-600 dark:border-white/10 dark:text-white/50">
-											{visual.features.map((feature) => (
-												<li key={feature} className="flex items-center gap-2">
-													<Icon
-														name="check"
-														className="size-3.5 shrink-0 text-emerald-500"
-													/>
-													<span>{feature}</span>
-												</li>
-											))}
-										</ul>
-									)}
-								</div>
-
-								<div className="mt-6 flex items-center justify-between border-stroke-soft-200/80 border-t pt-4 dark:border-white/10">
-									<span className="font-semibold text-[13px] text-primary-base">
-										Launch tool
-									</span>
-									<span className="text-[13px] text-primary-base transition-transform group-hover:translate-x-1">
-										→
-									</span>
-								</div>
+								<h2 className="font-medium text-[18px] text-text-strong-950 tracking-tight dark:text-white">
+									{title}
+								</h2>
+								<p className="mt-2 line-clamp-2 text-[14px] text-text-sub-600 leading-relaxed dark:text-white/55">
+									{tool.description}
+								</p>
 							</Link>
 						);
 					})}
