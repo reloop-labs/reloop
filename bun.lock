@@ -1,5 +1,6 @@
 {
   "lockfileVersion": 1,
+  "configVersion": 0,
   "workspaces": {
     "": {
       "name": "reloop",
@@ -907,6 +908,7 @@
         "next-mdx-remote": "catalog:ui",
         "next-themes": "catalog:ui",
         "postcss": "catalog:ui",
+        "postprocessing": "^6.39.4",
         "react": "catalog:ui",
         "react-colorful": "catalog:ui",
         "react-dom": "catalog:ui",
@@ -3728,6 +3730,8 @@
     "postgres-interval": ["postgres-interval@1.2.0", "", { "dependencies": { "xtend": "^4.0.0" } }, "sha512-9ZhXKM/rw350N1ovuWHbGxnGh/SNJ4cnxHiM0rxE4VN41wsg8P8zWn9hv/buK00RP4WvlOyr/RBDiptyxVbkZQ=="],
 
     "posthog-js": ["posthog-js@1.417.0", "", { "dependencies": { "@posthog/browser-common": "^0.5.0", "@posthog/core": "^1.48.0", "@posthog/types": "^1.404.0", "core-js": "^3.49.0", "dompurify": "^3.4.13", "fflate": "^0.4.8", "preact": "^10.29.3", "query-selector-shadow-dom": "^1.0.1", "web-vitals": "^5.3.0", "web-vitals-soft-navs": "npm:web-vitals@6.0.0" } }, "sha512-jokL2hiuBYO0+bSJ1l/ZLxFIc4+xwe5P8srIbivSU3MVSWsE4AP2U6IaVW8hQLdcz4k8ZWEa2jDPn9sTUcQ5yw=="],
+
+    "postprocessing": ["postprocessing@6.39.4", "", { "peerDependencies": { "three": ">= 0.168.0 < 0.186.0" } }, "sha512-oAS/PjAbc/xT3OzjUrGsorJ4J064XwhVD2t0OwKLP/E8QwDMUJ0oOv6ZI1SYMtLchv4g0ySEx+JcLy92+48vlA=="],
 
     "preact": ["preact@10.29.8", "", { "peerDependencies": { "preact-render-to-string": ">=5" }, "optionalPeers": ["preact-render-to-string"] }, "sha512-ej2aVZ+vZ8WO7tvlQWRM9N63A0KzF9q4mWJfDUHgYaIofWY9hu74QdnQrjoPMmZi2/nZ5gN0bJCQF49xQqx09Q=="],
 

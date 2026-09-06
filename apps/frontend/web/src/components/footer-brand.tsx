@@ -155,7 +155,7 @@ export function FooterBrand() {
 					</span>
 				</Link>
 				<p className="mt-8 max-w-[16rem] font-semibold text-[1.65rem] text-text-strong-950 leading-[1.2] tracking-tight sm:mt-10 sm:max-w-[18rem] sm:text-[1.85rem] dark:text-white">
-					The open-source way to send email
+					Email API for Developers
 				</p>
 			</div>
 

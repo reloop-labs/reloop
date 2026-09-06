@@ -1,4 +1,5 @@
 import { JsonLd } from "@reloop/web/components/json-ld";
+import { PixelBlast } from "@reloop/web/components/pixel-blast";
 import { pricingFaqItems } from "@reloop/web/lib/pricing-faq";
 import { faqPageJsonLd, pricingProductJsonLd } from "@reloop/web/lib/schema";
 import { getSiteUrl } from "@reloop/web/lib/site";
@@ -55,11 +56,23 @@ const PricingPage = () => {
 			<JsonLd data={pricingSchema} />
 			<div className="mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-100 border-x md:max-w-7xl dark:border-white/10">
 				<header className="relative flex w-full flex-col items-center overflow-hidden bg-transparent px-6 pt-[224px] pb-40 text-center sm:px-8 lg:px-12">
-					{/* Square grid background */}
-					<div aria-hidden className="pointer-events-none absolute inset-0">
-						<div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:80px_80px] dark:bg-[linear-gradient(to_right,#ffffff0f_1px,transparent_1px),linear-gradient(to_bottom,#ffffff0f_1px,transparent_1px)]" />
+					<div className="absolute">
+						<PixelBlast
+							variant="square"
+							pixelSize={2}
+							color="#3B82F6"
+							patternScale={5}
+							patternDensity={0.1}
+							enableRipples={false}
+							rippleSpeed={0.05}
+							rippleThickness={0.09}
+							rippleIntensityScale={2.5}
+							speed={0.2}
+							transparent
+							edgeFade={0.65}
+						/>
 					</div>
-					<div className="relative z-10 flex w-auto max-w-full flex-col items-center border border-stroke-soft-100 bg-bg-white-0 px-8 py-6 dark:border-white/10 dark:bg-black">
+					<div className="relative z-10 flex w-auto max-w-full flex-col items-center px-8 py-6">
 						<div className="mb-5 flex items-center justify-center gap-2 sm:mb-6">
 							<span
 								aria-hidden
