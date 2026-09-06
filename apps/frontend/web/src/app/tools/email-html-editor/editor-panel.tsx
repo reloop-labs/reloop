@@ -1,8 +1,16 @@
 "use client";
 
 import * as Button from "@reloop/ui/button";
-import { EmailHtmlEditorShell } from "@reloop/web/lib/email-html-editor/editor-shell";
+import dynamic from "next/dynamic";
 import { useState } from "react";
+
+const EmailHtmlEditorShell = dynamic(
+	() =>
+		import("@reloop/web/lib/email-html-editor/editor-shell").then(
+			(mod) => mod.EmailHtmlEditorShell,
+		),
+	{ ssr: false },
+);
 
 export function EditorPanel() {
 	const [draft, setDraft] = useState("");

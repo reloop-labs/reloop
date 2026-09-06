@@ -87,6 +87,7 @@
 				"@types/react-dom": "19.2.2",
 				"babel-plugin-react-compiler": "1.0.0",
 				"next": "preview",
+				"@swc/helpers": "0.5.21",
 				"react": "19.2.0",
 				"@tiptap/extension-drag-handle-react": "^3.22.5",
 				"y-indexeddb": "^9.0.12",
@@ -292,6 +293,9 @@
 		"husky": "9.1.7",
 		"lint-staged": "16.2.4",
 		"turbo": "2.10.3"
+	},
+	"overrides": {
+		"@swc/helpers": "0.5.21"
 	},
 	"packageManager": "bun@1.3.14",
 	"trustedDependencies": [

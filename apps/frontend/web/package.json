@@ -22,6 +22,7 @@
 		"@reloop/pricing": "workspace:*",
 		"@reloop/tailwind": "workspace:*",
 		"@reloop/ui": "workspace:*",
+		"@swc/helpers": "catalog:ui",
 		"@tailwindcss/postcss": "catalog:ui",
 		"@tiptap/core": "catalog:ui",
 		"@tiptap/extension-placeholder": "^3.22.5",
