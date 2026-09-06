@@ -52,7 +52,7 @@ export function useEmailHtmlEditor() {
 					includeChildren: true,
 				}),
 				imageExtension,
-			],
+			] as any[],
 			immediatelyRender: false,
 			onUpdate({ editor: next }) {
 				scheduleCompose(next);
