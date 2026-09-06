@@ -56,13 +56,16 @@ const PricingPage = () => {
 			<JsonLd data={pricingSchema} />
 			<div className="mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-100 border-x md:max-w-7xl dark:border-white/10">
 				<header className="relative flex w-full flex-col items-center overflow-hidden bg-transparent px-6 pt-[224px] pb-40 text-center sm:px-8 lg:px-12">
-					<div className="absolute">
+					<div
+						aria-hidden="true"
+						className="absolute inset-0 [-webkit-mask-image:linear-gradient(to_right,black_0%,black_28%,transparent_42%,transparent_58%,black_72%,black_100%)] [mask-image:linear-gradient(to_right,black_0%,black_28%,transparent_42%,transparent_58%,black_72%,black_100%)]"
+					>
 						<PixelBlast
 							variant="square"
 							pixelSize={2}
 							color="#3B82F6"
-							patternScale={5}
-							patternDensity={0.1}
+							patternScale={4}
+							patternDensity={0.45}
 							enableRipples={false}
 							rippleSpeed={0.05}
 							rippleThickness={0.09}
