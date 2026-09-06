@@ -799,74 +799,76 @@ const navItems: NavItem[] = [
 			// Right: Blog / Changelog / Status / Self-host + social icons
 			categories: [
 				{
-					title: "",
-					featured: true,
+					title: "Free Tools",
+					divided: true,
 					links: [
 						{
-							title: "Free tools",
-							href: "/tools",
-							icon: "zap",
-							docsTheme: "multi",
+							title: "Email Validator",
+							href: "/tools/email-validator",
+							icon: "mail",
+							description: "Verify syntax, MX & disposable emails",
 						},
 						{
-							title: "Comparisons",
-							href: "/compare",
-							icon: "arrow-swap",
-							docsTheme: "green",
+							title: "DNS Lookup",
+							href: "/tools/dns-lookup",
+							icon: "globe",
+							description: "Inspect MX, TXT, SPF & DMARC records",
+						},
+						{
+							title: "Auth Checker",
+							href: "/tools/auth-checker",
+							icon: "lock",
+							description: "Verify SPF, DKIM & DMARC alignment",
+						},
+						{
+							title: "Deliverability Tester",
+							href: "/tools/deliverability-tester",
+							icon: "shield-check",
+							description: "Spam score & inbox placement audit",
+						},
+						{
+							title: "HTML Editor",
+							href: "/tools/email-html-editor",
+							icon: "code",
+							description: "Live responsive email template builder",
 						},
 					],
 				},
 				{
-					title: "",
-					compact: true,
+					title: "Resources",
+					divided: true,
 					links: [
 						{
 							title: "Blog",
 							href: "/blog",
 							icon: "pencil",
+							description: "Articles and product updates",
 						},
 						{
 							title: "Changelog",
 							href: "/changelog",
 							icon: "list",
+							description: "See what's new in Reloop",
+						},
+						{
+							title: "Compare",
+							href: "/compare",
+							icon: "arrow-swap",
+							description: "Reloop vs Resend, SendGrid, and more",
 						},
 						{
 							title: "Status",
 							href: "https://status.reloop.sh/status/live",
 							icon: "activity",
+							description: "Realtime uptime and system health",
 						},
 						{
 							title: "Self-host",
 							href: "/self-host",
 							icon: "server",
+							description: "Deploy on your own infrastructure",
 						},
 					],
-				},
-			],
-			social: [
-				{
-					title: "GitHub",
-					href: "https://github.com/reloop-labs/reloop",
-					icon: "social-github",
-					external: true,
-				},
-				{
-					title: "X",
-					href: "https://x.com/reloop_labs",
-					icon: "social-x",
-					external: true,
-				},
-				{
-					title: "LinkedIn",
-					href: "https://www.linkedin.com/company/reloop-labs",
-					icon: "social-linkedin",
-					external: true,
-				},
-				{
-					title: "Discord",
-					href: "https://discord.gg/bHnkBcp7xR",
-					icon: "social-discord",
-					external: true,
 				},
 			],
 		},
@@ -914,7 +916,7 @@ const navItems: NavItem[] = [
 						{
 							title: "License",
 							href: "/license",
-							customIcon: <LicenseDocIcon className="size-3.5" />,
+							customIcon: <LicenseDocIcon className="size-[18px]" />,
 							description: "Apache 2.0 open-source terms",
 						},
 					],
@@ -1274,28 +1276,51 @@ function MegaLink({
 /**
  * Divided list column — clean unboxed icons, title + description, full-width dividers between rows.
  */
-function DividedListColumn({ links }: { links: NavLink[] }) {
+function DividedListColumn({
+	title,
+	viewAllHref,
+	links,
+}: {
+	title?: string;
+	viewAllHref?: string;
+	links: NavLink[];
+}) {
 	return (
-		<div className="flex min-h-0 w-full min-w-[270px] flex-col divide-y divide-stroke-soft-200/80 dark:divide-white/[0.08]">
+		<div className="flex min-h-0 w-full min-w-[280px] flex-col divide-y divide-stroke-soft-200/80 dark:divide-white/[0.08]">
+			{title ? (
+				<div className="flex items-center justify-between px-5 py-3.5">
+					<p className="font-normal text-[14px] leading-5 text-neutral-500 dark:text-neutral-400">
+						{title}
+					</p>
+					{viewAllHref ? (
+						<a
+							href={viewAllHref}
+							className="text-[13px] leading-5 text-neutral-500 transition-colors hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white"
+						>
+							View all
+						</a>
+					) : null}
+				</div>
+			) : null}
 			{links.map((link) => {
 				const external = isExternalHref(link.href, link.external);
 				const crossDomain = isCrossDomain(link.href);
 				const className = cn(
-					"group flex min-w-0 items-start gap-2.5 px-4 py-3 transition-colors",
-					"hover:bg-bg-weak-50/80 dark:hover:bg-white/[0.04]",
+					"group flex min-w-0 items-start gap-4 px-5 py-3.5 transition-colors",
+					"hover:bg-neutral-50/80 dark:hover:bg-white/[0.04]",
 				);
 				const body = (
 					<>
-						{/* Icon locked to the exact optical height and center of the title */}
-						<span className="flex h-5 w-4 shrink-0 items-center justify-center text-text-sub-600 dark:text-white/50">
+						{/* Icon optically aligned with the first line of text */}
+						<span className="mt-0.5 flex size-5 shrink-0 items-center justify-center text-neutral-500 dark:text-neutral-400">
 							{link.customIcon ? (
-								<span className="inline-flex size-3.5 items-center justify-center [&>svg]:size-3.5">
+								<span className="inline-flex size-[18px] items-center justify-center [&>svg]:size-[18px]">
 									{link.customIcon}
 								</span>
 							) : link.brand ? (
 								<svg
 									viewBox="0 0 24 24"
-									className="size-3.5"
+									className="size-[18px]"
 									fill="currentColor"
 									aria-hidden
 								>
@@ -1305,23 +1330,23 @@ function DividedListColumn({ links }: { links: NavLink[] }) {
 							) : link.icon ? (
 								<Icon
 									name={link.icon}
-									className="size-3.5 group-hover:text-text-strong-950 dark:group-hover:text-white"
+									className="size-[18px] text-neutral-500 transition-colors group-hover:text-neutral-900 dark:text-neutral-400 dark:group-hover:text-white"
 								/>
 							) : null}
 						</span>
 						<span className="min-w-0 flex-1">
-							<span className="flex h-5 items-center gap-1">
-								<span className="font-medium text-[14px] text-text-strong-950 leading-none tracking-[-0.01em] dark:text-white">
+							<span className="flex items-center gap-1.5 leading-5">
+								<span className="font-medium text-[14px] text-neutral-900 tracking-[-0.01em] dark:text-neutral-100">
 									{link.title}
 								</span>
 								{external && (
-									<span className="group-hover:-translate-y-px text-[11px] text-text-sub-600 group-hover:translate-x-px dark:text-white/45">
+									<span className="text-[11px] text-neutral-400 transition-transform group-hover:-translate-y-px group-hover:translate-x-px dark:text-neutral-500">
 										↗
 									</span>
 								)}
 							</span>
 							{link.description && (
-								<span className="mt-0.5 block text-[12.5px] text-text-sub-600 leading-snug dark:text-white/55">
+								<span className="mt-0.5 block text-[13px] text-neutral-500 leading-snug dark:text-neutral-400">
 									{link.description}
 								</span>
 							)}
@@ -1546,9 +1571,22 @@ function CompactBrandColumn({
 /**
  * Icon-only social row (no labels) — sits under GitHub in the right Resources column.
  */
-function MegaSocialIcons({ links }: { links: NavLink[] }) {
+function MegaSocialIcons({
+	links,
+	divided = false,
+}: {
+	links: NavLink[];
+	divided?: boolean;
+}) {
 	return (
-		<div className="mt-2 flex items-center gap-1.5 px-1">
+		<div
+			className={cn(
+				"flex items-center gap-1.5",
+				divided
+					? "border-stroke-soft-200/80 border-t px-4 py-3 dark:border-white/[0.08]"
+					: "mt-2 px-1",
+			)}
+		>
 			{links.map((link) => {
 				const external = isExternalHref(link.href, link.external);
 				return (
@@ -1616,7 +1654,7 @@ function MegaPanel({ item }: { item: NavItem }) {
 							category.featured
 								? "flex min-h-0 min-w-0 flex-col self-stretch p-3 sm:p-4"
 								: category.divided
-									? "flex min-h-0 min-w-0 flex-col justify-center self-stretch"
+									? "flex min-h-0 min-w-0 flex-col justify-start self-stretch"
 									: category.simple
 										? "flex min-h-0 min-w-0 flex-col justify-center self-stretch p-3 sm:p-4"
 										: category.compact
@@ -1624,7 +1662,7 @@ function MegaPanel({ item }: { item: NavItem }) {
 											: "min-h-0 min-w-0 self-stretch p-3 sm:p-4"
 						}
 					>
-						{category.title ? (
+						{category.title && !category.divided ? (
 							<div className="mb-3 flex items-center justify-between gap-2 px-1">
 								<p className="font-medium text-[11px] text-text-sub-600 uppercase tracking-[0.12em] dark:text-white/40">
 									{category.title}
@@ -1676,8 +1714,12 @@ function MegaPanel({ item }: { item: NavItem }) {
 								</div>
 							)
 						) : category.divided ? (
-							<div className="flex min-h-0 flex-1 flex-col justify-center">
-								<DividedListColumn links={category.links} />
+							<div className="flex min-h-0 flex-1 flex-col justify-start">
+								<DividedListColumn
+									title={category.title}
+									viewAllHref={category.viewAllHref}
+									links={category.links}
+								/>
 							</div>
 						) : category.simple ? (
 							<div className="flex min-h-0 flex-1 flex-col justify-center">
@@ -1698,7 +1740,9 @@ function MegaPanel({ item }: { item: NavItem }) {
 							</div>
 						)}
 						{/* Social icons under last column (e.g. below Self-host / GitHub) */}
-						{showSocial && social ? <MegaSocialIcons links={social} /> : null}
+						{showSocial && social ? (
+							<MegaSocialIcons links={social} divided={category.divided} />
+						) : null}
 					</div>
 				);
 			})}
@@ -1723,7 +1767,7 @@ function getMegaPanelWidthPx(item: NavItem | undefined): number {
 	if (hasBrandGrid) return 840; // Docs: fixed cards + brand grid
 	if (cats.length <= 2 && hasFeatured) return 560; // Resources / Company
 	if (cats.length >= 3 && hasFeatured) return 780; // Product: cards + 2 lists
-	return 640;
+	return 680;
 }
 
 export const Header = () => {
