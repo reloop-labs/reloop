@@ -32,7 +32,9 @@ export function LicenseFaq() {
 	return (
 		<>
 			<div aria-hidden className="h-24" />
-			<FaqSection items={licenseFaqItems} id="license-faq" compact flush />
+			<div className="border-stroke-soft-100 border-b dark:border-white/10 [&_.t-acc:last-child]:border-b-0">
+				<FaqSection items={licenseFaqItems} id="license-faq" compact flush />
+			</div>
 		</>
 	);
 }

@@ -1,9 +1,10 @@
-import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { JsonLd } from "@reloop/web/components/json-ld";
-import { getSiteUrl, socialProfiles } from "@reloop/web/lib/site";
+import { PixelBlast } from "@reloop/web/components/pixel-blast";
+import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
-import { OpenSourceIsntCheap } from "./components/open-source-isnt-cheap";
+import { OpenSourceFaq } from "./components/open-source-faq";
+import { OpenSourceSection } from "./components/open-source-section";
 
 // TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
 // See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
@@ -69,107 +70,58 @@ const WhyOpenSourcePage = () => {
 	return (
 		<>
 			<JsonLd data={jsonLd} />
+			<div className="mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-100 border-x md:max-w-7xl dark:border-white/10">
+				<header className="relative flex w-full flex-col items-center overflow-hidden bg-transparent px-6 pt-[224px] pb-40 text-center sm:px-8 lg:px-12">
+					<div
+						aria-hidden="true"
+						className="absolute inset-0 [-webkit-mask-image:linear-gradient(to_right,black_0%,black_28%,transparent_42%,transparent_58%,black_72%,black_100%)] [mask-image:linear-gradient(to_right,black_0%,black_28%,transparent_42%,transparent_58%,black_72%,black_100%)]"
+					>
+						<PixelBlast
+							variant="square"
+							pixelSize={2}
+							color="#3B82F6"
+							patternScale={4}
+							patternDensity={0.45}
+							enableRipples={false}
+							rippleSpeed={0.05}
+							rippleThickness={0.09}
+							rippleIntensityScale={2.5}
+							speed={0.2}
+							transparent
+							edgeFade={0.65}
+						/>
+					</div>
+					<div className="relative z-10 flex w-auto max-w-full flex-col items-center px-8 py-6">
+						<div className="mb-5 flex items-center justify-center gap-2 sm:mb-6">
+							<span
+								aria-hidden
+								className="inline-flex size-5 shrink-0 items-center justify-center rounded-[5px] bg-primary-dark p-px pb-[2px] dark:bg-[#003a8c]"
+							>
+								<span className="flex size-full items-center justify-center rounded-[4px] bg-primary-base text-white shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.45)] dark:shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.28),0_0_0_0.5px_rgba(255,255,255,0.08)]">
+									<Icon name="open-source" className="size-[11px]" />
+								</span>
+							</span>
+							<span className="font-medium text-[13.5px] text-text-strong-950 tracking-tight dark:text-white">
+								Open Source
+							</span>
+						</div>
 
-			<div className="relative w-full bg-bg-white-0 text-text-sub-600 dark:bg-black dark:text-neutral-300">
-				<div className="relative mx-auto w-full max-w-5xl overflow-x-clip border-stroke-soft-200 border-x md:max-w-7xl dark:border-white/10">
-					<article className="relative mx-auto w-full max-w-[680px] px-6 pt-28 pb-24 sm:pt-36">
-						<h1 className="font-semibold text-[40px] text-text-strong-950 leading-none tracking-tight sm:text-[44px] dark:text-white">
-							Why Open Source
+						<h1 className="max-w-3xl text-balance text-center font-semibold text-[2.5rem] text-text-strong-950 leading-[1.06] tracking-[-0.04em] sm:text-[3.5rem] lg:text-[4.25rem] dark:text-white">
+							Why{" "}
+							<span className="bg-gradient-to-b from-[#2f86ff] to-primary-base bg-clip-text text-transparent dark:from-[#7ab8ff] dark:to-[#4ea1ff]">
+								open source.
+							</span>
 						</h1>
 
-						<p className="mt-4 text-[16.5px] text-text-sub-600 leading-[1.75] dark:text-neutral-400">
+						<p className="mt-5 max-w-[46rem] text-balance text-center text-[16.5px] text-text-sub-600 leading-relaxed sm:mt-6 sm:text-[18.5px] lg:text-[20px] dark:text-white/60">
 							Closed email tools sell trust. We sell a repo you can open.
 						</p>
+					</div>
+				</header>
 
-						<div className="mt-10 space-y-10 text-[16.5px] leading-[1.75]">
-							{/* 1 */}
-							<section className="space-y-2.5">
-								<h2 className="font-semibold text-text-strong-950 text-[17px] tracking-tight dark:text-white">
-									<span className="mr-2 text-text-sub-600 tabular-nums dark:text-neutral-500">
-										1.
-									</span>
-									Trust
-								</h2>
-								<p className="text-text-strong-950 dark:text-neutral-200">
-									You don&apos;t trust Stripe because of their homepage. You
-									trust them because every payment can be traced.
-								</p>
-								<p className="text-text-strong-950 dark:text-neutral-200">
-									Email should work the same way.
-								</p>
-								<p className="font-medium text-text-strong-950 dark:text-white">
-									Don&apos;t trust our dashboard. Verify our code.
-								</p>
-							</section>
+				<OpenSourceSection />
 
-							{/* 2 */}
-							<section className="space-y-2.5">
-								<h2 className="font-semibold text-text-strong-950 text-[17px] tracking-tight dark:text-white">
-									<span className="mr-2 text-text-sub-600 tabular-nums dark:text-neutral-500">
-										2.
-									</span>
-									Closed doesn&apos;t mean smarter.
-								</h2>
-								<p className="text-text-strong-950 dark:text-neutral-200">
-									Every provider claims a &quot;proprietary engine.&quot; Most
-									run the same open-source parts everyone else does.
-								</p>
-								<p className="text-text-strong-950 dark:text-neutral-200">
-									The difference isn&apos;t magic. It&apos;s marketing.
-								</p>
-								<p className="font-medium text-text-strong-950 dark:text-white">
-									Open beats mysterious.
-								</p>
-							</section>
-
-							{/* 3 */}
-							<section className="space-y-2.5">
-								<h2 className="font-semibold text-text-strong-950 text-[17px] tracking-tight dark:text-white">
-									<span className="mr-2 text-text-sub-600 tabular-nums dark:text-neutral-500">
-										3.
-									</span>
-									Open source isn&apos;t enough
-								</h2>
-								<p className="text-text-strong-950 dark:text-neutral-200">
-									Free software. Not free time.
-								</p>
-								<p className="text-text-strong-950 dark:text-neutral-200">
-									DNS, queues, retries, monitoring &mdash; the repo
-									doesn&apos;t do that. You do.
-								</p>
-								<p className="font-medium text-text-strong-950 dark:text-white">
-									Reloop ships the part open source leaves out: done.
-								</p>
-							</section>
-
-							<div className="pt-2">
-								<FancyButton.Root
-									asChild
-									variant="neutral"
-									size="medium"
-									className="rounded-full! px-5!"
-								>
-									<a
-										href={socialProfiles.github}
-										target="_blank"
-										rel="noopener noreferrer"
-									>
-										<FancyButton.Icon
-											as={Icon}
-											name="social-github"
-											className="size-4"
-										/>
-										<span>View on GitHub</span>
-									</a>
-								</FancyButton.Root>
-							</div>
-
-							<div className="pt-4">
-								<OpenSourceIsntCheap />
-							</div>
-						</div>
-					</article>
-				</div>
+				<OpenSourceFaq />
 			</div>
 		</>
 	);

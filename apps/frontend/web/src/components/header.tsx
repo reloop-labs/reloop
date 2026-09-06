@@ -916,7 +916,7 @@ const navItems: NavItem[] = [
 						{
 							title: "License",
 							href: "/license",
-							customIcon: <LicenseDocIcon className="size-[18px]" />,
+							customIcon: <LicenseDocIcon className="size-[14px]" />,
 							description: "Apache 2.0 open-source terms",
 						},
 					],
@@ -1314,13 +1314,13 @@ function DividedListColumn({
 						{/* Icon optically aligned with the first line of text */}
 						<span className="mt-0.5 flex size-5 shrink-0 items-center justify-center text-neutral-500 dark:text-neutral-400">
 							{link.customIcon ? (
-								<span className="inline-flex size-[18px] items-center justify-center [&>svg]:size-[18px]">
+								<span className="inline-flex size-[14px] items-center justify-center [&>svg]:size-[14px]">
 									{link.customIcon}
 								</span>
 							) : link.brand ? (
 								<svg
 									viewBox="0 0 24 24"
-									className="size-[18px]"
+									className="size-[14px]"
 									fill="currentColor"
 									aria-hidden
 								>
@@ -1330,7 +1330,7 @@ function DividedListColumn({
 							) : link.icon ? (
 								<Icon
 									name={link.icon}
-									className="size-[18px] text-neutral-500 transition-colors group-hover:text-neutral-900 dark:text-neutral-400 dark:group-hover:text-white"
+									className="size-[14px] text-neutral-500 transition-colors group-hover:text-neutral-900 dark:text-neutral-400 dark:group-hover:text-white"
 								/>
 							) : null}
 						</span>
