@@ -100,20 +100,12 @@ const columns: FooterColumn[] = [
 	},
 ];
 
-function FooterLinkItem({
-	link,
-	isLast,
-}: {
-	link: FooterLink;
-	isLast: boolean;
-}) {
+function FooterLinkItem({ link }: { link: FooterLink }) {
 	const isCrossDomain =
 		link.href.startsWith("/docs") || link.href.startsWith("/dashboard");
 
-	const className = cn(
-		"flex min-h-[52px] items-center font-normal text-[14px] text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/55 dark:hover:text-white",
-		!isLast && "border-stroke-soft-100 border-b dark:border-white/10",
-	);
+	const className =
+		"flex min-h-[52px] items-center border-stroke-soft-100 border-b font-normal text-[14px] text-text-sub-600 transition-colors hover:text-text-strong-950 dark:border-white/10 dark:text-white/55 dark:hover:text-white";
 
 	if (isCrossDomain || link.external) {
 		return (
