@@ -5,6 +5,7 @@ import { socialProfiles } from "@reloop/web/lib/site";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { siApache } from "simple-icons";
+import { PixelBlastLazy } from "./pixel-blast";
 
 const socials: {
 	label: string;
@@ -143,10 +144,29 @@ function BrandCell({
 export function FooterBrand() {
 	return (
 		<div className="grid border-stroke-soft-100 border-t border-b lg:grid-cols-2 dark:border-white/10">
-			<div className="border-stroke-soft-100 border-b p-8 sm:p-10 lg:border-r lg:border-b-0 dark:border-white/10">
+			<div className="relative overflow-hidden border-stroke-soft-100 border-b p-8 sm:p-10 lg:border-r lg:border-b-0 dark:border-white/10">
+				<div
+					aria-hidden="true"
+					className="absolute inset-0 opacity-80 [-webkit-mask-image:radial-gradient(ellipse_75%_85%_at_78%_45%,black_20%,transparent_70%)] [mask-image:radial-gradient(ellipse_75%_85%_at_78%_45%,black_20%,transparent_70%)] dark:opacity-60"
+				>
+					<PixelBlastLazy
+						variant="square"
+						pixelSize={2}
+						color="#3B82F6"
+						patternScale={4}
+						patternDensity={0.4}
+						enableRipples
+						rippleSpeed={0.3}
+						rippleThickness={0.1}
+						rippleIntensityScale={1.5}
+						speed={0.2}
+						transparent
+						edgeFade={0.6}
+					/>
+				</div>
 				<Link
 					href="/home"
-					className="inline-flex items-center gap-2"
+					className="relative z-10 inline-flex items-center gap-2"
 					aria-label="Reloop home"
 				>
 					<Logo className="size-8 text-text-strong-950 dark:text-white" />
@@ -154,7 +174,7 @@ export function FooterBrand() {
 						Reloop
 					</span>
 				</Link>
-				<p className="mt-8 max-w-[16rem] font-semibold text-[1.65rem] text-text-strong-950 leading-[1.2] tracking-tight sm:mt-10 sm:max-w-[18rem] sm:text-[1.85rem] dark:text-white">
+				<p className="relative z-10 mt-8 max-w-[16rem] font-semibold text-[1.65rem] text-text-strong-950 leading-[1.2] tracking-tight sm:mt-10 sm:max-w-[18rem] sm:text-[1.85rem] dark:text-white">
 					Email API for Developers
 				</p>
 			</div>
