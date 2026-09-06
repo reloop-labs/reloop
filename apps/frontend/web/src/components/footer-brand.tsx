@@ -5,7 +5,7 @@ import { socialProfiles } from "@reloop/web/lib/site";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { siApache } from "simple-icons";
-import { PixelBlastLazy } from "./pixel-blast";
+import { FooterBlast } from "./footer-blast";
 
 const socials: {
 	label: string;
@@ -73,12 +73,6 @@ const SEAL_POINTS = Array.from({ length: 32 }, (_, i) => {
 }).join(" ");
 
 export type FooterBrandAccent = "default" | "emerald" | "ink";
-
-const accentPixelColor: Record<FooterBrandAccent, string> = {
-	default: "#3B82F6",
-	emerald: "#34d399",
-	ink: "#6e7781",
-};
 
 const accentSealText: Record<FooterBrandAccent, string> = {
 	default: "text-primary-base",
@@ -172,20 +166,7 @@ export function FooterBrand({
 					aria-hidden="true"
 					className="absolute inset-0 opacity-80 [-webkit-mask-image:radial-gradient(ellipse_75%_85%_at_78%_45%,black_20%,transparent_70%)] [mask-image:radial-gradient(ellipse_75%_85%_at_78%_45%,black_20%,transparent_70%)] dark:opacity-60"
 				>
-					<PixelBlastLazy
-						variant="square"
-						pixelSize={2}
-						color={accentPixelColor[accent]}
-						patternScale={4}
-						patternDensity={0.4}
-						enableRipples
-						rippleSpeed={0.3}
-						rippleThickness={0.1}
-						rippleIntensityScale={1.5}
-						speed={0.2}
-						transparent
-						edgeFade={0.6}
-					/>
+					<FooterBlast accent={accent} />
 				</div>
 				<Link
 					href="/home"
