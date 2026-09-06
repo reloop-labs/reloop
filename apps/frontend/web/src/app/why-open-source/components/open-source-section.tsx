@@ -64,7 +64,7 @@ export function OpenSourceSection() {
 				<div className="border-stroke-soft-100 border-b px-5 py-7 sm:px-8 dark:border-white/[0.07]">
 					<FancyButton.Root
 						asChild
-						variant="primary"
+						variant="neutral"
 						size="medium"
 						className="h-11! w-full! rounded-full! px-6! sm:w-auto!"
 					>

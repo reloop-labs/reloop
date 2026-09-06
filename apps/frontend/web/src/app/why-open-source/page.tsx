@@ -70,7 +70,7 @@ const WhyOpenSourcePage = () => {
 	return (
 		<>
 			<JsonLd data={jsonLd} />
-			<div className="mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-100 border-x md:max-w-7xl dark:border-white/10">
+			<div className="mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-100 border-x [--primary-base:#24292f] [--primary-dark:#24292f] [--primary-darker:#1f2328] [--primary-link:#24292f] md:max-w-7xl dark:border-white/10 dark:[--primary-base:#ffffff] dark:[--primary-dark:#ffffff] dark:[--primary-darker:#e6edf3] dark:[--primary-link:#ffffff]">
 				<header className="relative flex w-full flex-col items-center overflow-hidden bg-transparent px-6 pt-[224px] pb-40 text-center sm:px-8 lg:px-12">
 					<div
 						aria-hidden="true"
@@ -79,7 +79,7 @@ const WhyOpenSourcePage = () => {
 						<PixelBlast
 							variant="square"
 							pixelSize={2}
-							color="#3B82F6"
+							color="#6e7781"
 							patternScale={4}
 							patternDensity={0.45}
 							enableRipples={false}
@@ -97,7 +97,7 @@ const WhyOpenSourcePage = () => {
 								aria-hidden
 								className="inline-flex size-5 shrink-0 items-center justify-center rounded-[5px] bg-primary-dark p-px pb-[2px] dark:bg-[#003a8c]"
 							>
-								<span className="flex size-full items-center justify-center rounded-[4px] bg-primary-base text-white shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.45)] dark:shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.28),0_0_0_0.5px_rgba(255,255,255,0.08)]">
+								<span className="flex size-full items-center justify-center rounded-[4px] bg-primary-base text-white shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.45)] dark:text-black dark:shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.28),0_0_0_0.5px_rgba(255,255,255,0.08)]">
 									<Icon name="open-source" className="size-[11px]" />
 								</span>
 							</span>
@@ -108,7 +108,7 @@ const WhyOpenSourcePage = () => {
 
 						<h1 className="max-w-3xl text-balance text-center font-semibold text-[2.5rem] text-text-strong-950 leading-[1.06] tracking-[-0.04em] sm:text-[3.5rem] lg:text-[4.25rem] dark:text-white">
 							Why{" "}
-							<span className="bg-gradient-to-b from-[#2f86ff] to-primary-base bg-clip-text text-transparent dark:from-[#7ab8ff] dark:to-[#4ea1ff]">
+							<span className="bg-gradient-to-b from-primary-base to-primary-base bg-clip-text text-transparent">
 								open source.
 							</span>
 						</h1>

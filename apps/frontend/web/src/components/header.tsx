@@ -402,7 +402,7 @@ function TransactionalCardIllustration() {
 			</div>
 
 			{/* Background canvas card */}
-			<div className="relative flex h-[76px] w-[156px] items-center justify-center rounded-[18px] border border-neutral-200/80 bg-white/70 shadow-[0_4px_16px_rgba(0,0,0,0.03)] backdrop-blur-sm transition-transform duration-300 group-hover:scale-[1.02] dark:border-white/10 dark:bg-white/[0.03]">
+			<div className="relative flex h-[76px] w-[156px] items-center justify-center rounded-[18px] border border-neutral-200/50 bg-neutral-50/60 shadow-[0_4px_16px_rgba(0,0,0,0.02)] backdrop-blur-sm transition-transform duration-300 group-hover:scale-[1.02] dark:border-white/10 dark:bg-white/[0.03]">
 				{/* Top floating pill: API trigger + 99ms badge */}
 				<div className="absolute -top-2.5 left-2 flex h-7 items-center gap-1.5 rounded-full border border-sky-200/90 bg-white px-2.5 shadow-[0_2px_8px_rgba(14,165,233,0.08)] transition-transform duration-300 group-hover:-translate-y-0.5 dark:border-sky-500/30 dark:bg-neutral-900">
 					<svg
@@ -465,7 +465,7 @@ function MarketingCardIllustration() {
 			</div>
 
 			{/* Background canvas card with mini template layout */}
-			<div className="relative flex h-[76px] w-[156px] items-center justify-center rounded-[18px] border border-neutral-200/80 bg-white/70 shadow-[0_4px_16px_rgba(0,0,0,0.03)] backdrop-blur-sm transition-transform duration-300 group-hover:scale-[1.02] dark:border-white/10 dark:bg-white/[0.03]">
+			<div className="relative flex h-[76px] w-[156px] items-center justify-center rounded-[18px] border border-neutral-200/50 bg-neutral-50/60 shadow-[0_4px_16px_rgba(0,0,0,0.02)] backdrop-blur-sm transition-transform duration-300 group-hover:scale-[1.02] dark:border-white/10 dark:bg-white/[0.03]">
 				{/* Top floating pill: Audience segment */}
 				<div className="absolute -top-2.5 left-2 flex h-7 items-center gap-1.5 rounded-full border border-amber-200/90 bg-white px-2.5 shadow-[0_2px_8px_rgba(245,158,11,0.08)] transition-transform duration-300 group-hover:-translate-y-0.5 dark:border-amber-500/30 dark:bg-neutral-900">
 					<svg
@@ -1361,21 +1361,19 @@ function MegaLink({
 	const featuredCardWidth = "w-[168px] shrink-0";
 	const className = isTransactional
 		? cn(
-				"group relative flex h-full min-h-[210px] w-[210px] shrink-0 flex-col justify-between overflow-hidden rounded-[18px] p-5 transition-all duration-300",
-				"border border-stroke-soft-200/80 bg-neutral-50/50 hover:bg-neutral-50/90 hover:border-sky-300/90",
-				"dark:border-white/[0.08] dark:bg-white/[0.02] dark:hover:bg-white/[0.04] dark:hover:border-sky-500/30",
-				"shadow-[0_2px_10px_rgba(0,0,0,0.02)] hover:shadow-[0_6px_20px_rgba(14,165,233,0.06)] dark:shadow-none",
+				"group relative flex h-full min-h-[210px] w-[235px] shrink-0 flex-col justify-between overflow-hidden pl-7 pr-6 py-[22px] transition-all duration-300",
+				"bg-transparent hover:bg-neutral-50/70",
+				"dark:bg-transparent dark:hover:bg-white/[0.03]",
 			)
 		: isMarketing
 			? cn(
-					"group relative flex h-full min-h-[210px] w-[210px] shrink-0 flex-col justify-between overflow-hidden rounded-[18px] p-5 transition-all duration-300",
-					"border border-stroke-soft-200/80 bg-neutral-50/50 hover:bg-neutral-50/90 hover:border-amber-300/90",
-					"dark:border-white/[0.08] dark:bg-white/[0.02] dark:hover:bg-white/[0.04] dark:hover:border-amber-500/30",
-					"shadow-[0_2px_10px_rgba(0,0,0,0.02)] hover:shadow-[0_6px_20px_rgba(245,158,11,0.06)] dark:shadow-none",
+					"group relative flex h-full min-h-[210px] w-[235px] shrink-0 flex-col justify-between overflow-hidden px-6 py-[22px] transition-all duration-300",
+					"bg-transparent hover:bg-neutral-50/70",
+					"dark:bg-transparent dark:hover:bg-white/[0.03]",
 				)
 		: isSupportCard
 			? cn(
-					"group relative flex h-full min-h-[210px] w-[230px] shrink-0 flex-col justify-between overflow-hidden rounded-[18px] p-5 transition-all duration-300",
+					"group relative flex h-full min-h-[210px] w-[240px] shrink-0 flex-col justify-between overflow-hidden pl-7 pr-6 py-[22px] transition-all duration-300",
 					"bg-transparent hover:bg-neutral-50/70",
 					"dark:bg-transparent dark:hover:bg-white/[0.03]",
 				)
@@ -1428,7 +1426,7 @@ function MegaLink({
 					)}
 				</div>
 				{link.description && (
-					<p className="mt-1.5 text-[12.5px] text-neutral-500 leading-relaxed dark:text-neutral-400">
+					<p className="mt-1 text-[12.5px] text-neutral-500 leading-relaxed dark:text-neutral-400">
 						{link.description}
 					</p>
 				)}
@@ -1452,7 +1450,7 @@ function MegaLink({
 					)}
 				</div>
 				{link.description && (
-					<p className="mt-1.5 text-[12.5px] text-neutral-500 leading-relaxed dark:text-neutral-400">
+					<p className="mt-1 text-[12.5px] text-neutral-500 leading-relaxed dark:text-neutral-400">
 						{link.description}
 					</p>
 				)}
@@ -2112,7 +2110,14 @@ function MegaPanel({ item }: { item: NavItem }) {
 						className={
 							// Self-stretch + full py so divide-x borders run top → bottom
 							category.featured
-								? "flex min-h-0 min-w-0 flex-col self-stretch p-3 sm:p-4"
+								? category.links.some(
+										(l) =>
+											l.featuredSupport ||
+											l.featuredTransactional ||
+											l.featuredMarketing,
+									)
+									? "flex min-h-0 min-w-0 flex-col self-stretch p-0"
+									: "flex min-h-0 min-w-0 flex-col self-stretch p-3 sm:p-4"
 								: category.divided
 									? "flex min-h-0 min-w-0 flex-col justify-start self-stretch"
 									: category.simple
@@ -2140,9 +2145,15 @@ function MegaPanel({ item }: { item: NavItem }) {
 						{category.featured ? (
 							<div
 								className={cn(
-									"flex h-full min-h-[148px] gap-2.5",
+									"flex h-full min-h-[148px]",
 									category.links.length >= 2
-										? "w-max flex-row items-stretch"
+										? category.links.some(
+												(l) =>
+													l.featuredTransactional ||
+													l.featuredMarketing,
+											)
+											? "w-max flex-row items-stretch divide-x divide-stroke-soft-200/80 dark:divide-white/[0.08]"
+											: "w-max flex-row items-stretch gap-2.5"
 										: "w-max flex-col",
 								)}
 							>
