@@ -182,6 +182,13 @@ export const MailErrors = {
 			why: `This send needs ${required} credit${required === 1 ? "" : "s"}, but only ${remaining} remain of ${monthlyCredits} this period`,
 			fix: "Upgrade your plan, wait for the monthly reset, or reduce recipients for this send",
 		}),
+	sendingPaused: (reason: string) =>
+		createError({
+			status: 429,
+			message: "Sending temporarily paused",
+			why: `The sending engine paused this IP to protect deliverability: ${reason}`,
+			fix: "Wait for automatic recovery, or check domain health and blocklist status in your dashboard",
+		}),
 };
 
 export const RateLimitErrors = {
