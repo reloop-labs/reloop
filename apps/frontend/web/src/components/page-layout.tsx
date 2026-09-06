@@ -22,11 +22,16 @@ const PageLayout: React.FC<PageLayoutProps> = ({
 	const tocOnRight = tocPosition === "right";
 	return (
 		<div className="min-h-dvh bg-white dark:bg-black">
-			{/* Top Header Section with Full-Width Horizontal Border */}
-			<div className="w-full border-stroke-soft-100 border-b dark:border-white/10">
-				<div className="mx-auto w-full max-w-5xl border-stroke-soft-100 border-x px-4 pt-28 pb-10 sm:px-6 md:max-w-7xl lg:px-8 dark:border-white/10">
+			{/* Top Header Section — bottom border terminates at the container's vertical borders */}
+			<div className="w-full">
+				<div className="mx-auto w-full max-w-5xl border-stroke-soft-100 border-x border-b px-4 pt-28 pb-10 sm:px-6 md:max-w-7xl lg:px-8 dark:border-white/10">
 					<header className="text-left">
-						<div className="flex w-full max-w-[680px] flex-col gap-3">
+						<div
+							className={cn(
+								"flex w-full max-w-[680px] flex-col gap-3",
+								tocOnRight && "lg:pl-8",
+							)}
+						>
 							<div className="flex flex-wrap items-center gap-2 font-medium font-mono text-[11px] uppercase tracking-[0.6px]">
 								<span className="text-primary-base">{category}</span>
 								{subtitle && (
@@ -54,7 +59,7 @@ const PageLayout: React.FC<PageLayoutProps> = ({
 			</div>
 
 			{/* Main Article Container */}
-			<div className="mx-auto w-full max-w-5xl border-stroke-soft-100 border-x px-4 sm:px-6 md:max-w-7xl lg:px-8 dark:border-white/10">
+			<div className="mx-auto w-full max-w-5xl border-stroke-soft-100 border-x border-b px-4 sm:px-6 md:max-w-7xl lg:px-8 dark:border-white/10">
 				<div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-0">
 					{/* Table of Contents */}
 					<aside
