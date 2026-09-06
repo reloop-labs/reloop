@@ -1142,19 +1142,19 @@ const navItems: NavItem[] = [
 						{
 							title: "Blog",
 							href: "/blog",
-							icon: "pencil",
+							icon: "newspaper",
 							description: "Articles and product updates",
 						},
 						{
 							title: "Changelog",
 							href: "/changelog",
-							icon: "list",
+							icon: "note",
 							description: "See what's new in Reloop",
 						},
 						{
 							title: "Compare",
 							href: "/compare",
-							icon: "arrow-swap",
+							icon: "compare",
 							description: "Reloop vs Resend, SendGrid, and more",
 						},
 						{
