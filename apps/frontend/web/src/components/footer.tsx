@@ -169,12 +169,8 @@ export const Footer = () => {
 								{column.group}
 							</h2>
 							<ul>
-								{column.items.map((link, linkIndex) => (
-									<FooterLinkItem
-										key={link.title}
-										link={link}
-										isLast={linkIndex === column.items.length - 1}
-									/>
+								{column.items.map((link) => (
+									<FooterLinkItem key={link.title} link={link} />
 								))}
 							</ul>
 						</nav>
