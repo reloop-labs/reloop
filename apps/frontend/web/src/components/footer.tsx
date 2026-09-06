@@ -19,7 +19,7 @@ type FooterColumn = {
 
 const columns: FooterColumn[] = [
 	{
-		group: "Product",
+		group: "Features",
 		items: [
 			{ title: "Transaction Emails", href: "/features/transaction-emails" },
 			{ title: "SMTP Relay", href: "/features/smtp" },

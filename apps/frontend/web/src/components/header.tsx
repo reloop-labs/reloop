@@ -608,7 +608,7 @@ const docFrameworks: NavLink[] = [
 
 const navItems: NavItem[] = [
 	{
-		title: "Product",
+		title: "Features",
 		href: "/features",
 		mega: {
 			// Left: Transactional + Marketing cards
