@@ -1306,7 +1306,7 @@ function DividedListColumn({
 				const external = isExternalHref(link.href, link.external);
 				const crossDomain = isCrossDomain(link.href);
 				const className = cn(
-					"group flex min-w-0 items-start gap-2.5 pl-7 pr-5 py-4.5 transition-colors",
+					"group flex min-w-0 items-start gap-3 pl-7 pr-5 py-4.5 transition-colors",
 					"hover:bg-neutral-50/80 dark:hover:bg-white/[0.04]",
 				);
 				const body = (
