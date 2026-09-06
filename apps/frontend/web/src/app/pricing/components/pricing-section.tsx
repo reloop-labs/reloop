@@ -537,13 +537,25 @@ function PlanColumn({
 	plan,
 	index,
 	recommended,
+	selectedVolume,
 }: {
 	plan: (typeof pricingPlans)[number];
 	index: number;
 	recommended: boolean;
+	selectedVolume?: number;
 }) {
 	const price = getPlanPrice(plan);
 	const isCustom = price === null;
+	const volumeLabel =
+		selectedVolume == null
+			? null
+			: `${new Intl.NumberFormat("en-US").format(selectedVolume)} emails / month`;
+	const emailsLine =
+		recommended && volumeLabel
+			? volumeLabel
+			: isCustom || price === 0
+				? plan.priceSubline
+				: plan.emailsLabel;
 
 	const borderClasses = [
 		"border-b sm:border-r sm:border-b lg:border-r lg:border-b-0",
@@ -606,7 +618,7 @@ function PlanColumn({
 							: "text-text-sub-600 dark:text-white/55",
 					)}
 				>
-					{isCustom || price === 0 ? plan.priceSubline : plan.emailsLabel}
+					{emailsLine}
 				</p>
 				{plan.extraEmailsLabel && (
 					<p className="mt-0.5 text-[12px] text-text-sub-600 dark:text-white/50">
@@ -957,8 +969,10 @@ function ComparisonTable({
 
 export function PricingSection({
 	recommendedPlanId,
+	volume,
 }: {
 	recommendedPlanId?: PlanId;
+	volume?: number;
 }) {
 	const isRecommended = (plan: (typeof pricingPlans)[number]) =>
 		recommendedPlanId ? plan.id === recommendedPlanId : !!plan.highlighted;
@@ -971,6 +985,7 @@ export function PricingSection({
 						plan={plan}
 						index={index}
 						recommended={isRecommended(plan)}
+						selectedVolume={isRecommended(plan) ? volume : undefined}
 					/>
 				))}
 			</div>

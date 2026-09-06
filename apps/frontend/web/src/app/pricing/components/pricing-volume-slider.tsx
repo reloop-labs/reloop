@@ -70,9 +70,6 @@ const toVolume = (position: number) => {
 	return Math.round(raw / granularity) * granularity;
 };
 
-const formatVolume = (volume: number) =>
-	new Intl.NumberFormat("en-US").format(volume);
-
 function recommendedPlan(volume: number) {
 	if (volume > 500000) return "Custom";
 	if (volume <= 3000) return "Free";
@@ -122,14 +119,7 @@ export function PricingVolumeSlider({
 			className="w-full border-stroke-soft-100 border-t px-6 pt-10 pb-12 sm:px-8 sm:pt-12 sm:pb-14 lg:px-12 dark:border-white/10"
 		>
 			<div className="mx-auto w-full max-w-3xl">
-				<p className="text-center font-semibold text-[2.5rem] text-text-strong-950 tabular-nums leading-none tracking-tight sm:text-[3rem] dark:text-white">
-					{formatVolume(volume)}
-				</p>
-				<p className="mt-2 text-center text-[14px] text-text-sub-600 dark:text-white/50">
-					emails/month
-				</p>
-
-				<div className="mt-8 px-1">
+				<div className="mt-2 px-1">
 					<Slider.Root
 						min={0}
 						max={100}

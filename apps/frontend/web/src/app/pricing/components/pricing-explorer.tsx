@@ -15,7 +15,10 @@ export function PricingExplorer() {
 		<>
 			<PricingVolumeSlider volume={volume} onVolumeChange={setVolume} />
 			<PageSection flushTop flushBottom>
-				<PricingSection recommendedPlanId={recommendPlanIdForVolume(volume)} />
+				<PricingSection
+					recommendedPlanId={recommendPlanIdForVolume(volume)}
+					volume={volume}
+				/>
 			</PageSection>
 		</>
 	);
