@@ -1288,7 +1288,7 @@ function DividedListColumn({
 	return (
 		<div className="flex min-h-0 w-full min-w-[280px] flex-col divide-y divide-stroke-soft-200/80 dark:divide-white/[0.08]">
 			{title ? (
-				<div className="flex items-center justify-between px-5 py-3.5">
+				<div className="flex items-center justify-between pl-7 pr-6 py-[22px]">
 					<p className="font-normal text-[14px] leading-5 text-neutral-500 dark:text-neutral-400">
 						{title}
 					</p>
@@ -1306,7 +1306,7 @@ function DividedListColumn({
 				const external = isExternalHref(link.href, link.external);
 				const crossDomain = isCrossDomain(link.href);
 				const className = cn(
-					"group flex min-w-0 items-start gap-4 px-5 py-3.5 transition-colors",
+					"group flex min-w-0 items-start gap-4 pl-7 pr-5 py-4.5 transition-colors",
 					"hover:bg-neutral-50/80 dark:hover:bg-white/[0.04]",
 				);
 				const body = (
