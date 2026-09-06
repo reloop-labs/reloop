@@ -127,7 +127,7 @@ export function TableOfContents() {
 			<h2 className="mb-3 font-medium font-mono text-[11px] text-text-sub-600 uppercase tracking-widest dark:text-white/45">
 				On this page
 			</h2>
-			<ul className="relative m-0 flex list-none flex-col gap-2 border-stroke-soft-200 border-l pl-0 dark:border-white/10">
+			<ul className="relative m-0 flex list-none flex-col gap-2 border-stroke-soft-100 border-l pl-0 dark:border-white/10">
 				{headings.map((heading) => {
 					const isActive = activeId === heading.id;
 					return (

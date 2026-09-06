@@ -77,7 +77,7 @@ export function OpenSourceIsntCheap() {
 					</div>
 				</div>
 
-				<span className="-bottom-[26px] -translate-x-1/2 absolute left-1/2 rounded-[4px] bg-primary-base px-2 py-[3px] font-mono text-[11px] text-white leading-none">
+				<span className="-bottom-[26px] -translate-x-1/2 absolute left-1/2 rounded-[4px] bg-primary-base px-2 py-[3px] font-mono text-[11px] text-white leading-none dark:text-black">
 					free to use × never free to build
 				</span>
 			</div>
