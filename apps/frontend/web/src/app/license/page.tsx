@@ -70,7 +70,7 @@ const LicensePage = () => {
 	return (
 		<>
 			<JsonLd data={jsonLd} />
-			<div className="mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-100 border-x md:max-w-7xl dark:border-white/10">
+			<div className="mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-100 border-x [--primary-base:#047857] [--primary-dark:#047857] [--primary-darker:#065f46] [--primary-link:#047857] md:max-w-7xl dark:border-white/10 dark:[--primary-base:#6ee7b7] dark:[--primary-dark:#6ee7b7] dark:[--primary-darker:#a7f3d0] dark:[--primary-link:#6ee7b7]">
 				<header className="relative flex w-full flex-col items-center overflow-hidden bg-transparent px-6 pt-[224px] pb-40 text-center sm:px-8 lg:px-12">
 					<div
 						aria-hidden="true"
@@ -79,7 +79,7 @@ const LicensePage = () => {
 						<PixelBlast
 							variant="square"
 							pixelSize={2}
-							color="#3B82F6"
+							color="#34d399"
 							patternScale={4}
 							patternDensity={0.45}
 							enableRipples={false}
@@ -97,7 +97,7 @@ const LicensePage = () => {
 								aria-hidden
 								className="inline-flex size-5 shrink-0 items-center justify-center rounded-[5px] bg-primary-dark p-px pb-[2px] dark:bg-[#003a8c]"
 							>
-								<span className="flex size-full items-center justify-center rounded-[4px] bg-primary-base text-white shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.45)] dark:shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.28),0_0_0_0.5px_rgba(255,255,255,0.08)]">
+								<span className="flex size-full items-center justify-center rounded-[4px] bg-primary-base text-white shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.45)] dark:text-black dark:shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.28),0_0_0_0.5px_rgba(255,255,255,0.08)]">
 									<svg
 										xmlns="http://www.w3.org/2000/svg"
 										viewBox="0 0 18 18"
@@ -154,7 +154,7 @@ const LicensePage = () => {
 						</div>
 
 						<h1 className="max-w-3xl text-balance text-center font-semibold text-[2.5rem] text-text-strong-950 leading-[1.06] tracking-[-0.04em] sm:text-[3.5rem] lg:text-[4.25rem] dark:text-white">
-							<span className="bg-gradient-to-b from-[#2f86ff] to-primary-base bg-clip-text text-transparent dark:from-[#7ab8ff] dark:to-[#4ea1ff]">
+							<span className="bg-gradient-to-b from-primary-base to-primary-base bg-clip-text text-transparent">
 								License
 							</span>{" "}
 							Agreement.
