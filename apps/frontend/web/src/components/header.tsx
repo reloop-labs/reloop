@@ -432,6 +432,58 @@ function DocsApiIcon({ className }: { className?: string }) {
 	);
 }
 
+function LicenseDocIcon({ className }: { className?: string }) {
+	return (
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			viewBox="0 0 18 18"
+			className={className}
+			fill="none"
+			aria-hidden
+		>
+			<path
+				d="M14.5 14.5C13.678 14.5 12.956 14.098 12.5 13.486V17.5C12.5 17.702 12.622 17.885 12.809 17.962C12.996 18.041 13.21 17.997 13.354 17.854L14.5 16.708L15.646 17.854C15.742 17.95 15.87 18 16 18C16.064 18 16.13 17.988 16.191 17.962C16.378 17.885 16.5 17.702 16.5 17.5V13.486C16.044 14.098 15.322 14.5 14.5 14.5Z"
+				fill="currentColor"
+			/>
+			<path
+				d="M10.25 16.25H4.25C3.145 16.25 2.25 15.355 2.25 14.25V3.75C2.25 2.645 3.145 1.75 4.25 1.75H12.75C13.855 1.75 14.75 2.645 14.75 3.75V6.5"
+				stroke="currentColor"
+				strokeWidth="1.5"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+			<path
+				d="M5.25 5.75H11.75"
+				stroke="currentColor"
+				strokeWidth="1.5"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+			<path
+				d="M5.25 9H8.25"
+				stroke="currentColor"
+				strokeWidth="1.5"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+			<path
+				d="M5.25 12.25H8.25"
+				stroke="currentColor"
+				strokeWidth="1.5"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+			<path
+				d="M14.5 14.5C15.881 14.5 17 13.3807 17 12C17 10.6193 15.881 9.5 14.5 9.5C13.119 9.5 12 10.6193 12 12C12 13.3807 13.119 14.5 14.5 14.5Z"
+				stroke="currentColor"
+				strokeWidth="1.5"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+		</svg>
+	);
+}
+
 const PRODUCT_CARD_ACCENTS: Record<
 	ProductCardAccent,
 	{
@@ -496,6 +548,8 @@ type NavCategory = {
 	compact?: boolean;
 	/** Icon + title only (no description) */
 	simple?: boolean;
+	/** Clean two-line rows with unboxed icons and full-width dividers */
+	divided?: boolean;
 	/** Optional “View all” next to the section label */
 	viewAllHref?: string;
 	/** When compact: render links as an N-column grid (no section titles) */
@@ -837,32 +891,31 @@ const navItems: NavItem[] = [
 				},
 				{
 					title: "",
-					compact: true,
+					divided: true,
 					links: [
 						{
 							title: "About",
 							href: "/about",
 							icon: "users",
+							description: "The team behind Reloop",
 						},
 						{
 							title: "Careers",
 							href: "/careers",
 							icon: "briefcase",
-						},
-						{
-							title: "Product Beliefs",
-							href: "/our-product-beliefs",
-							icon: "bulb",
+							description: "Join us and build the future of email",
 						},
 						{
 							title: "Why Open Source",
 							href: "/why-open-source",
 							icon: "open-source",
+							description: "Transparency and developer freedom",
 						},
 						{
 							title: "License",
 							href: "/license",
-							icon: "file",
+							customIcon: <LicenseDocIcon className="size-3.5" />,
+							description: "Apache 2.0 open-source terms",
 						},
 					],
 				},
@@ -1219,6 +1272,87 @@ function MegaLink({
 }
 
 /**
+ * Divided list column — clean unboxed icons, title + description, full-width dividers between rows.
+ */
+function DividedListColumn({ links }: { links: NavLink[] }) {
+	return (
+		<div className="flex min-h-0 w-full min-w-[270px] flex-col divide-y divide-stroke-soft-200/80 dark:divide-white/[0.08]">
+			{links.map((link) => {
+				const external = isExternalHref(link.href, link.external);
+				const crossDomain = isCrossDomain(link.href);
+				const className = cn(
+					"group flex min-w-0 items-start gap-3.5 px-4 py-3 transition-colors",
+					"hover:bg-bg-weak-50/80 dark:hover:bg-white/[0.04]",
+				);
+				const body = (
+					<>
+						{/* Icon locked to the exact optical height and center of the title */}
+						<span className="flex h-5 w-4 shrink-0 items-center justify-center text-text-sub-600 dark:text-white/50">
+							{link.customIcon ? (
+								<span className="inline-flex size-3.5 items-center justify-center [&>svg]:size-3.5">
+									{link.customIcon}
+								</span>
+							) : link.brand ? (
+								<svg
+									viewBox="0 0 24 24"
+									className="size-3.5"
+									fill="currentColor"
+									aria-hidden
+								>
+									<title>{link.brand.title}</title>
+									<path d={link.brand.path} />
+								</svg>
+							) : link.icon ? (
+								<Icon
+									name={link.icon}
+									className="size-3.5 transition-transform duration-200 group-hover:scale-105"
+								/>
+							) : null}
+						</span>
+						<span className="min-w-0 flex-1">
+							<span className="flex h-5 items-center gap-1">
+								<span className="font-medium text-[14px] text-text-strong-950 leading-none tracking-[-0.01em] dark:text-white">
+									{link.title}
+								</span>
+								{external && (
+									<span className="group-hover:-translate-y-px text-[11px] text-text-sub-600 transition-transform group-hover:translate-x-px dark:text-white/45">
+										↗
+									</span>
+								)}
+							</span>
+							{link.description && (
+								<span className="mt-0.5 block text-[12.5px] text-text-sub-600 leading-snug dark:text-white/55">
+									{link.description}
+								</span>
+							)}
+						</span>
+					</>
+				);
+
+				const shared = {
+					className,
+					...(external ? { target: "_blank", rel: "noreferrer" } : {}),
+				};
+
+				if (crossDomain || external) {
+					return (
+						<a key={link.title} href={link.href} {...shared}>
+							{body}
+						</a>
+					);
+				}
+
+				return (
+					<Link key={link.title} href={link.href} {...shared}>
+						{body}
+					</Link>
+				);
+			})}
+		</div>
+	);
+}
+
+/**
  * Product simple list column — plain row hover (no sliding highlight).
  */
 function ProductSimpleColumn({ links }: { links: NavLink[] }) {
@@ -1480,12 +1614,14 @@ function MegaPanel({ item }: { item: NavItem }) {
 						className={
 							// Self-stretch + full py so divide-x borders run top → bottom
 							category.featured
-								? "flex min-h-0 min-w-0 flex-col self-stretch px-3 py-3 first:pl-0 last:pr-0 sm:px-4 sm:py-4"
-								: category.simple
-									? "flex min-h-0 min-w-0 flex-col justify-center self-stretch px-3 py-3 first:pl-0 last:pr-0 sm:px-4 sm:py-4"
-									: category.compact
-										? "flex min-h-0 min-w-0 flex-col justify-center self-stretch px-3 py-3 first:pl-0 last:pr-0 sm:px-4 sm:py-4"
-										: "min-h-0 min-w-0 self-stretch px-3 py-3 first:pl-0 last:pr-0 sm:px-5 sm:py-4"
+								? "flex min-h-0 min-w-0 flex-col self-stretch p-3 sm:p-4"
+								: category.divided
+									? "flex min-h-0 min-w-0 flex-col justify-center self-stretch"
+									: category.simple
+										? "flex min-h-0 min-w-0 flex-col justify-center self-stretch p-3 sm:p-4"
+										: category.compact
+											? "flex min-h-0 min-w-0 flex-col justify-center self-stretch p-3 sm:p-4"
+											: "min-h-0 min-w-0 self-stretch p-3 sm:p-4"
 						}
 					>
 						{category.title ? (
@@ -1539,6 +1675,10 @@ function MegaPanel({ item }: { item: NavItem }) {
 									))}
 								</div>
 							)
+						) : category.divided ? (
+							<div className="flex min-h-0 flex-1 flex-col justify-center">
+								<DividedListColumn links={category.links} />
+							</div>
 						) : category.simple ? (
 							<div className="flex min-h-0 flex-1 flex-col justify-center">
 								<ProductSimpleColumn links={category.links} />
@@ -1828,7 +1968,7 @@ export const Header = () => {
 											aria-hidden
 										/>
 										<div
-											className="overflow-hidden rounded-[20px] border border-stroke-soft-200/90 bg-bg-white-0 px-3 shadow-[0_18px_50px_-12px_rgba(15,23,42,0.14),0_6px_18px_-6px_rgba(15,23,42,0.06)] sm:px-4 dark:border-white/10 dark:bg-black dark:shadow-[0_20px_56px_-12px_rgba(0,0,0,0.65)]"
+											className="overflow-hidden rounded-[20px] border border-stroke-soft-200/90 bg-bg-white-0 shadow-[0_18px_50px_-12px_rgba(15,23,42,0.14),0_6px_18px_-6px_rgba(15,23,42,0.06)] dark:border-white/10 dark:bg-black dark:shadow-[0_20px_56px_-12px_rgba(0,0,0,0.65)]"
 											role="menu"
 											aria-label={`${activeItem.title} menu`}
 										>
@@ -2053,7 +2193,8 @@ export const Header = () => {
 																					const className =
 																						category.simple ||
 																						category.featured ||
-																						category.compact
+																						category.compact ||
+																						category.divided
 																							? "flex items-center gap-2.5 rounded-xl px-2 py-2 transition-opacity hover:opacity-70"
 																							: "flex items-start gap-3 rounded-xl px-2 py-2 transition-colors hover:bg-neutral-950/[0.04] dark:hover:bg-white/[0.05]";
 																					const body = (
@@ -2064,7 +2205,8 @@ export const Header = () => {
 																								plain={
 																									category.simple ||
 																									category.featured ||
-																									category.compact
+																									category.compact ||
+																									category.divided
 																								}
 																							/>
 																							<span className="min-w-0">

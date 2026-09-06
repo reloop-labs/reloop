@@ -10,13 +10,6 @@ const philosophyCards = [
 		iconName: "globe",
 	},
 	{
-		title: "Product Beliefs",
-		description:
-			"The principles that guide every product decision, interface, and developer experience.",
-		href: "/our-product-beliefs",
-		iconName: "sparkling",
-	},
-	{
 		title: "Engineering & Local Setup",
 		description:
 			"Clone, configure, and run Reloop microservices and developer tooling locally.",
