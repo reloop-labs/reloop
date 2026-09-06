@@ -896,7 +896,7 @@ const navItems: NavItem[] = [
 						{
 							title: "About",
 							href: "/about",
-							icon: "users",
+							icon: "info-outline",
 							description: "The team behind Reloop",
 						},
 						{
@@ -1281,7 +1281,7 @@ function DividedListColumn({ links }: { links: NavLink[] }) {
 				const external = isExternalHref(link.href, link.external);
 				const crossDomain = isCrossDomain(link.href);
 				const className = cn(
-					"group flex min-w-0 items-start gap-3.5 px-4 py-3 transition-colors",
+					"group flex min-w-0 items-start gap-2.5 px-4 py-3 transition-colors",
 					"hover:bg-bg-weak-50/80 dark:hover:bg-white/[0.04]",
 				);
 				const body = (
@@ -1305,7 +1305,7 @@ function DividedListColumn({ links }: { links: NavLink[] }) {
 							) : link.icon ? (
 								<Icon
 									name={link.icon}
-									className="size-3.5 transition-transform duration-200 group-hover:scale-105"
+									className="size-3.5 group-hover:text-text-strong-950 dark:group-hover:text-white"
 								/>
 							) : null}
 						</span>
@@ -1315,7 +1315,7 @@ function DividedListColumn({ links }: { links: NavLink[] }) {
 									{link.title}
 								</span>
 								{external && (
-									<span className="group-hover:-translate-y-px text-[11px] text-text-sub-600 transition-transform group-hover:translate-x-px dark:text-white/45">
+									<span className="group-hover:-translate-y-px text-[11px] text-text-sub-600 group-hover:translate-x-px dark:text-white/45">
 										↗
 									</span>
 								)}
