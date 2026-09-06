@@ -52,7 +52,11 @@ function PlanCtaLink({
 				asChild
 				variant={fancyVariant}
 				size={size}
-				className={cn("w-full! rounded-full!", heightClass)}
+				className={cn(
+					"w-full! rounded-full!",
+					heightClass,
+					variant === "primary" && "dark:text-black",
+				)}
 			>
 				<a href={href} target="_blank" rel="noopener noreferrer">
 					{content}
@@ -66,7 +70,11 @@ function PlanCtaLink({
 			asChild
 			variant={fancyVariant}
 			size={size}
-			className={cn("w-full! rounded-full!", heightClass)}
+			className={cn(
+				"w-full! rounded-full!",
+				heightClass,
+				variant === "primary" && "dark:text-black",
+			)}
 		>
 			<Link href={href}>{content}</Link>
 		</FancyButton.Root>
@@ -592,7 +600,7 @@ function PlanColumn({
 						{plan.name}
 					</h3>
 					{recommended && (
-						<span className="relative shrink-0 overflow-hidden rounded-full bg-primary-base px-2 py-0.5 text-center font-semibold text-[10px] text-white uppercase tracking-[0.14em] shadow-fancy-buttons-primary before:pointer-events-none before:absolute before:inset-0 before:rounded-[inherit] before:bg-gradient-to-b before:from-static-white before:to-transparent before:opacity-[.16]">
+						<span className="relative shrink-0 overflow-hidden rounded-full bg-primary-base px-2 py-0.5 text-center font-semibold text-[10px] text-white uppercase tracking-[0.14em] shadow-fancy-buttons-primary before:pointer-events-none before:absolute before:inset-0 before:rounded-[inherit] before:bg-gradient-to-b before:from-static-white before:to-transparent before:opacity-[.16] dark:text-black">
 							{plan.badge ?? "Recommended"}
 						</span>
 					)}
@@ -697,7 +705,7 @@ function PlanCheckmark({ className }: { className?: string }) {
 			viewBox="0 0 20 20"
 			width="20"
 			xmlns="http://www.w3.org/2000/svg"
-			className={cn("text-primary-base dark:text-[#7aa2ff]", className)}
+			className={cn("text-primary-base", className)}
 			style={
 				{
 					"--color-blue-accent": "currentColor",
@@ -793,7 +801,10 @@ function ComparePlanCta({
 				asChild
 				variant={active ? "primary" : "basic"}
 				size="medium"
-				className="h-10! w-full! rounded-full! px-5!"
+				className={cn(
+					"h-10! w-full! rounded-full! px-5!",
+					active && "dark:text-black",
+				)}
 			>
 				<a href={plan.ctaHref} target="_blank" rel="noopener noreferrer">
 					{content}
@@ -807,7 +818,10 @@ function ComparePlanCta({
 			asChild
 			variant={active ? "primary" : "basic"}
 			size="medium"
-			className="h-10! w-full! rounded-full! px-5!"
+			className={cn(
+				"h-10! w-full! rounded-full! px-5!",
+				active && "dark:text-black",
+			)}
 		>
 			<Link href={plan.ctaHref}>{content}</Link>
 		</FancyButton.Root>
@@ -859,7 +873,7 @@ function ComparisonTable({
 									{plan.name}
 								</span>
 								{active && (
-									<span className="relative shrink-0 overflow-hidden rounded-full bg-primary-base px-2 py-0.5 text-center font-semibold text-[10px] text-white uppercase tracking-[0.14em] shadow-fancy-buttons-primary before:pointer-events-none before:absolute before:inset-0 before:rounded-[inherit] before:bg-gradient-to-b before:from-static-white before:to-transparent before:opacity-[.16]">
+									<span className="relative shrink-0 overflow-hidden rounded-full bg-primary-base px-2 py-0.5 text-center font-semibold text-[10px] text-white uppercase tracking-[0.14em] shadow-fancy-buttons-primary before:pointer-events-none before:absolute before:inset-0 before:rounded-[inherit] before:bg-gradient-to-b before:from-static-white before:to-transparent before:opacity-[.16] dark:text-black">
 										{plan.badge ?? "Recommended"}
 									</span>
 								)}
