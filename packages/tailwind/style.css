@@ -1039,7 +1039,7 @@
 	--bg-soft-200: var(--neutral-700);
 	--bg-soft-50: var(--neutral-900);
 	--bg-weak-50: var(--neutral-900);
-	--bg-white-0: #000;
+	--bg-white-0: #131313;
 
 	--text-strong-950: var(--neutral-0);
 	--text-sub-600: var(--neutral-400);
@@ -1049,9 +1049,9 @@
 
 	--stroke-strong-950: var(--neutral-0);
 	--stroke-sub-300: var(--neutral-600);
-	--stroke-soft-200: var(--neutral-700);
-	--stroke-soft-100: var(--neutral-800);
-	--stroke-inbox: var(--neutral-800);
+	--stroke-soft-200: #1F1F1F;
+	--stroke-soft-100: #1F1F1F;
+	--stroke-inbox: #1F1F1F;
 	--panel-light: #ffffff;
 	--panel-dark: #1a1a1a;
 	--offset-light: #f5f5f5;

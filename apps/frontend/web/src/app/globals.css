@@ -27,6 +27,39 @@
 	--color-blue-accent: #52a8ff;
 	--blue-accent: #52a8ff;
 	--text-opaque-disabled: rgba(255, 255, 255, 0.25);
+	--bg-white-0: #131313;
+	--color-bg-white-0: #131313;
+	--stroke-soft-200: #1F1F1F;
+	--stroke-soft-100: #1F1F1F;
+	--color-stroke-soft-200: #1F1F1F;
+	--color-stroke-soft-100: #1F1F1F;
+	--stroke-inbox: #1F1F1F;
+	--border: #1F1F1F;
+}
+
+html.dark,
+body.dark,
+.dark body {
+	background-color: #131313;
+}
+
+/* Ensure all dark-mode background utilities use the new #131313 color */
+.dark .dark\:bg-black,
+.dark.dark\:bg-black,
+:is(.dark, .dark *) .dark\:bg-black {
+	background-color: #131313 !important;
+}
+
+/* Ensure all dark-mode borders and dividers use #1F1F1F */
+.dark [class*="dark:border-white"],
+.dark [class*="dark:divide-white"],
+:is(.dark, .dark *) [class*="dark:border-white"],
+:is(.dark, .dark *) [class*="dark:divide-white"],
+.dark [class*="border-stroke-soft"],
+:is(.dark, .dark *) [class*="border-stroke-soft"],
+.dark [class*="divide-stroke-soft"],
+:is(.dark, .dark *) [class*="divide-stroke-soft"] {
+	border-color: #1F1F1F !important;
 }
 
 .text-body-default {

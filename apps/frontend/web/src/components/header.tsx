@@ -2327,7 +2327,7 @@ export const Header = () => {
 
 	return (
 		<header
-			className="fixed top-0 right-0 left-0 z-50 border-stroke-soft-100 border-b bg-bg-white-0 dark:border-white/10 dark:bg-black"
+			className="fixed top-0 right-0 left-0 z-50 border-stroke-soft-100 border-b bg-bg-white-0 dark:border-white/10 dark:bg-[#131313]"
 			onMouseLeave={() => openMega(null)}
 		>
 			<div className="relative mx-auto w-full max-w-5xl border-stroke-soft-100 border-x px-6 md:max-w-7xl dark:border-white/10">
@@ -2449,7 +2449,7 @@ export const Header = () => {
 											aria-hidden
 										/>
 										<div
-											className="overflow-hidden rounded-[20px] border border-stroke-soft-200/90 bg-bg-white-0 shadow-[0_18px_50px_-12px_rgba(15,23,42,0.14),0_6px_18px_-6px_rgba(15,23,42,0.06)] dark:border-white/10 dark:bg-black dark:shadow-[0_20px_56px_-12px_rgba(0,0,0,0.65)]"
+											className="overflow-hidden rounded-[20px] border border-stroke-soft-200/90 bg-bg-white-0 shadow-[0_18px_50px_-12px_rgba(15,23,42,0.14),0_6px_18px_-6px_rgba(15,23,42,0.06)] dark:border-white/10 dark:bg-[#131313] dark:shadow-[0_20px_56px_-12px_rgba(0,0,0,0.65)]"
 											role="menu"
 											aria-label={`${activeItem.title} menu`}
 										>
