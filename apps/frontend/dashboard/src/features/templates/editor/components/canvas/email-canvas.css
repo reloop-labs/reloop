@@ -347,3 +347,13 @@
 	outline: 2px solid #2563eb !important;
 	outline-offset: 2px !important;
 }
+
+/* Image node selection outline in the canvas */
+.tiptap.ProseMirror img.ProseMirror-selectednode,
+.tiptap.ProseMirror .ProseMirror-selectednode img,
+.ProseMirror img.ProseMirror-selectednode,
+.ProseMirror .ProseMirror-selectednode img {
+	outline: 2px solid #3b82f6 !important;
+	outline-offset: 0 !important;
+}
+

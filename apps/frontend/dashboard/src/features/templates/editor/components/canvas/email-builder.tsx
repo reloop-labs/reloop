@@ -1,19 +1,18 @@
 import { BubbleMenu } from "@react-email/editor/ui";
 import { Icon } from "@reloop/ui/icon";
 import { DragHandle } from "@tiptap/extension-drag-handle-react";
+import { PluginKey } from "@tiptap/pm/state";
 import { EditorContent, useCurrentEditor } from "@tiptap/react";
 import { useEffect } from "react";
 import { useEditorStore } from "#/features/templates/editor/hooks/use-editor-store";
 import { applyImportedEmailCss } from "#/features/templates/editor/utils/apply-imported-email-css";
 import { convertFilledLinksToButtonsInJson } from "#/features/templates/editor/utils/convert-filled-links-to-buttons";
-import {
-	emailButtonBubbleTrigger,
-} from "#/features/templates/editor/utils/email-slash-command-plugin";
+import { emailButtonBubbleTrigger } from "#/features/templates/editor/utils/email-slash-command-plugin";
 import {
 	alignImageOnlyCellsInJson,
 	alignImageOnlyRowsInJson,
 } from "#/features/templates/editor/utils/promote-table-spacing";
-import { PluginKey } from "@tiptap/pm/state";
+import { EmailImageSelectionOverlay } from "./email-image-selection-overlay";
 import { EmailTextBubbleMenu } from "./email-text-bubble-menu";
 
 import "@react-email/editor/themes/default.css";
@@ -93,7 +92,7 @@ export function FullEmailBuilder() {
 				</BubbleMenu.ButtonToolbar>
 				<BubbleMenu.ButtonForm />
 			</BubbleMenu>
-			<BubbleMenu.ImageDefault />
+			<EmailImageSelectionOverlay />
 		</div>
 	);
 }

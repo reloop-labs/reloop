@@ -8,6 +8,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import * as Y from "yjs";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import { getRandomColor } from "#/features/templates/editor/collobration/hooks/useCollaboration";
+import { EmailImageSelectionOverlay } from "#/features/templates/editor/components/canvas/email-image-selection-overlay";
 import { EmailSlashCommand } from "#/features/templates/editor/components/canvas/email-slash-command";
 import { EmailTextBubbleMenu } from "#/features/templates/editor/components/canvas/email-text-bubble-menu";
 import { emailButtonBubbleTrigger } from "#/features/templates/editor/utils/email-slash-command-plugin";
@@ -230,7 +231,7 @@ export function CampaignEditorProvider({
 					</BubbleMenu.ButtonToolbar>
 					<BubbleMenu.ButtonForm />
 				</BubbleMenu>
-				<BubbleMenu.ImageDefault />
+				<EmailImageSelectionOverlay />
 				<EmailSlashCommand />
 			</div>
 		</EditorContext.Provider>

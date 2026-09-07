@@ -244,19 +244,25 @@ export function setInlineCssProp(
 	);
 }
 
-/** Set any camelCase CSS property on an inline style string. */
+/** Set any camelCase or kebab-case CSS property on an inline style string. */
 export function setInlineCssDeclaration(
 	cssText: string,
-	camelProp: string,
+	prop: string,
 	value: string,
 ): string {
 	const css = inlineCssToRecord(cssText);
-	css[camelProp] = value;
+	const key = kebabToCamel(prop);
+	if (!value || value.trim() === "") {
+		delete css[key];
+	} else {
+		css[key] = value.trim();
+	}
 	return Object.entries(css)
-		.map(([key, val]) => {
+		.filter(([_, val]) => val !== undefined && val !== "")
+		.map(([k, val]) => {
 			const kebab =
-				CSS_PROP_NAMES[key as InspectorTextStyleProp] ??
-				key.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`);
+				CSS_PROP_NAMES[k as InspectorTextStyleProp] ??
+				k.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`);
 			return `${kebab}: ${val}`;
 		})
 		.join("; ");
@@ -267,13 +273,27 @@ export function numericPxFromCss(
 	cssText: string,
 	camelProp: string,
 ): number | "" {
-	if (typeof document === "undefined" || !cssText.trim()) return "";
-	const scratch = document.createElement("div");
-	scratch.style.cssText = cssText;
-	const kebab = camelProp.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`);
-	const raw = scratch.style.getPropertyValue(kebab);
-	const n = Number.parseFloat(raw);
-	return Number.isFinite(n) ? n : "";
+	if (!cssText?.trim()) return "";
+	const rec = inlineCssToRecord(cssText);
+	const key = kebabToCamel(camelProp);
+	const val = rec[key];
+	if (val) {
+		const n = Number.parseFloat(val.replace(/[^\d.-]/g, ""));
+		if (Number.isFinite(n)) return n;
+	}
+	if (typeof document !== "undefined") {
+		try {
+			const scratch = document.createElement("div");
+			scratch.style.cssText = cssText;
+			const kebab = camelProp.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`);
+			const raw = scratch.style.getPropertyValue(kebab);
+			const n = Number.parseFloat(raw);
+			return Number.isFinite(n) ? n : "";
+		} catch {
+			// ignore DOM lookup error
+		}
+	}
+	return "";
 }
 
 /**

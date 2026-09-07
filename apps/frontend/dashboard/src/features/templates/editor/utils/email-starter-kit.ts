@@ -286,6 +286,80 @@ const emailButtonSelection = Extension.create({
 });
 
 /**
+ * Clicking an image node should establish a NodeSelection on that image,
+ * ensuring image resize handles and toolbar appear reliably even when
+ * the image is nested inside table cells or links.
+ */
+const emailImageSelection = Extension.create({
+	name: "emailImageSelection",
+	addProseMirrorPlugins() {
+		return [
+			new Plugin({
+				key: new PluginKey("emailImageSelectionPlugin"),
+				props: {
+					handleClick(view, pos, event) {
+						const target = event.target;
+						const imgEl =
+							target instanceof HTMLImageElement
+								? target
+								: target instanceof HTMLElement
+									? target.closest("img")
+									: null;
+						if (!imgEl) return false;
+
+						const { doc } = view.state;
+						try {
+							let imagePos: number | null = null;
+							const direct = doc.nodeAt(pos);
+							if (direct?.type.name === "image") {
+								imagePos = pos;
+							} else if (
+								pos > 0 &&
+								doc.nodeAt(pos - 1)?.type.name === "image"
+							) {
+								imagePos = pos - 1;
+							}
+
+							if (imagePos === null && imgEl.parentNode) {
+								const index = Array.prototype.indexOf.call(
+									imgEl.parentNode.childNodes,
+									imgEl,
+								);
+								const domPos = view.posAtDOM(imgEl.parentNode, index);
+								const n = doc.nodeAt(domPos);
+								if (n?.type.name === "image") imagePos = domPos;
+							}
+
+							if (imagePos === null) {
+								const src = imgEl.getAttribute("src");
+								if (src) {
+									doc.descendants((node, p) => {
+										if (imagePos !== null) return false;
+										if (node.type.name === "image" && node.attrs.src === src) {
+											imagePos = p;
+											return false;
+										}
+									});
+								}
+							}
+
+							if (imagePos !== null) {
+								const nodeSel = NodeSelection.create(doc, imagePos);
+								view.dispatch(view.state.tr.setSelection(nodeSel));
+								return true;
+							}
+						} catch {
+							// fallback to default selection
+						}
+						return false;
+					},
+				},
+			}),
+		];
+	},
+});
+
+/**
  * React Email's StyleAttribute list omits `container`, so pasted
  * padding / max-width / background on the email wrapper are dropped.
  */
@@ -303,6 +377,7 @@ export function emailStarterKit() {
 				emailFontColor,
 				emailAlignmentSync,
 				emailButtonSelection,
+				emailImageSelection,
 			];
 		},
 	});

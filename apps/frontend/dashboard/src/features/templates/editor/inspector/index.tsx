@@ -785,6 +785,7 @@ function InspectorNodeStyles({
 	batchSetStyle,
 	getAttr,
 	setAttr,
+	nodePos,
 }: {
 	nodeType: string;
 	getStyle: (name: InspectorStyleProperty) => string | number | undefined;
@@ -794,6 +795,7 @@ function InspectorNodeStyles({
 	) => void;
 	getAttr: (name: string) => unknown;
 	setAttr: (name: string, value: unknown) => void;
+	nodePos?: { pos: number; inside?: number };
 }) {
 	const box = useFilledLinkBox();
 	const { editor: nodeEditor } = useCurrentEditor();
@@ -915,6 +917,266 @@ function InspectorNodeStyles({
 					</PropRow>
 				</InspectorSection>
 			)}
+			{nodeType === "image" &&
+				(() => {
+					const selectedImageNode =
+						nodeEditor && nodePos?.pos !== undefined
+							? nodeEditor.state.doc.nodeAt(nodePos.pos)
+							: null;
+
+					const imageDomEl = (() => {
+						if (!nodeEditor || nodePos?.pos === undefined) return null;
+						try {
+							const domNode = nodeEditor.view.nodeDOM(nodePos.pos);
+							return domNode instanceof HTMLImageElement
+								? domNode
+								: ((domNode as HTMLElement | null)?.querySelector("img") ??
+										null);
+						} catch {
+							return null;
+						}
+					})();
+
+					const rawNodeStyle = String(
+						selectedImageNode?.attrs?.style || getStyle("style" as any) || "",
+					);
+					const styleWidth =
+						numericPxFromCss(rawNodeStyle, "width") ||
+						toPxNumber(getStyle("width" as any));
+					const styleHeight =
+						numericPxFromCss(rawNodeStyle, "height") ||
+						toPxNumber(getStyle("height" as any));
+
+					const attrWidth = toPxNumber(
+						(selectedImageNode?.attrs?.width ?? getAttr("width")) as
+							| string
+							| number,
+					);
+					const attrHeight = toPxNumber(
+						(selectedImageNode?.attrs?.height ?? getAttr("height")) as
+							| string
+							| number,
+					);
+
+					const domWidth = imageDomEl?.getBoundingClientRect().width
+						? Math.round(imageDomEl.getBoundingClientRect().width)
+						: imageDomEl?.naturalWidth || "";
+					const domHeight = imageDomEl?.getBoundingClientRect().height
+						? Math.round(imageDomEl.getBoundingClientRect().height)
+						: imageDomEl?.naturalHeight || "";
+
+					const resolvedImageWidth =
+						(typeof attrWidth === "number" && attrWidth > 0 ? attrWidth : "") ||
+						(typeof styleWidth === "number" && styleWidth > 0
+							? styleWidth
+							: "") ||
+						(typeof domWidth === "number" && domWidth > 0 ? domWidth : "");
+
+					const resolvedImageHeight =
+						(typeof attrHeight === "number" && attrHeight > 0
+							? attrHeight
+							: "") ||
+						(typeof styleHeight === "number" && styleHeight > 0
+							? styleHeight
+							: "") ||
+						(typeof domHeight === "number" && domHeight > 0 ? domHeight : "");
+
+					return (
+						<InspectorSection>
+							<SectionHeader label="Image" />
+							<div className="px-4 pb-3">
+								<ImageSrcControl
+									value={{
+										src: String(
+											selectedImageNode?.attrs?.src ?? getAttr("src") ?? "",
+										),
+										alt: String(
+											selectedImageNode?.attrs?.alt ?? getAttr("alt") ?? "",
+										),
+										href: String(
+											selectedImageNode?.attrs?.href ?? getAttr("href") ?? "",
+										),
+										width: resolvedImageWidth,
+										height: resolvedImageHeight,
+										align: String(
+											selectedImageNode?.attrs?.alignment ??
+												selectedImageNode?.attrs?.align ??
+												getAttr("alignment") ??
+												getAttr("align") ??
+												"center",
+										),
+									}}
+									onChange={({ src, alt, href, width, height, align }) => {
+										setAttr("src", src);
+										setAttr("alt", alt);
+										if (href !== undefined) setAttr("href", href);
+
+										const targetWidth = width === "" ? "auto" : width;
+										const targetHeight = height === "" ? "auto" : height;
+										setAttr("width", targetWidth);
+										setAttr("height", targetHeight);
+
+										const styleChanges: Array<{
+											prop: InspectorStyleProperty;
+											value: string | number;
+										}> = [];
+
+										if (typeof width === "number" && width > 0) {
+											styleChanges.push({ prop: "width", value: `${width}px` });
+											styleChanges.push({ prop: "maxWidth", value: "100%" });
+										} else {
+											styleChanges.push({ prop: "width", value: "auto" });
+										}
+
+										if (typeof height === "number" && height > 0) {
+											styleChanges.push({
+												prop: "height",
+												value: `${height}px`,
+											});
+										} else {
+											styleChanges.push({ prop: "height", value: "auto" });
+										}
+
+										if (align) {
+											// Image schema uses `alignment`; also sync legacy `align`
+											// attr + centering margins so canvas + export stay in sync.
+											setAttr("alignment", align);
+											setAttr("align", align);
+											if (align === "center") {
+												styleChanges.push({ prop: "display", value: "block" });
+												styleChanges.push({
+													prop: "marginLeft",
+													value: "auto",
+												});
+												styleChanges.push({
+													prop: "marginRight",
+													value: "auto",
+												});
+											} else if (align === "right") {
+												styleChanges.push({ prop: "display", value: "block" });
+												styleChanges.push({
+													prop: "marginLeft",
+													value: "auto",
+												});
+												styleChanges.push({ prop: "marginRight", value: 0 });
+											} else {
+												styleChanges.push({ prop: "display", value: "block" });
+												styleChanges.push({ prop: "marginLeft", value: 0 });
+												styleChanges.push({
+													prop: "marginRight",
+													value: "auto",
+												});
+											}
+										}
+
+										batchSetStyle(styleChanges);
+
+										// Synchronously commit via nodeEditor to guarantee atomic update across attrs + style
+										if (nodeEditor && nodePos?.pos !== undefined) {
+											const currentNode = nodeEditor.state.doc.nodeAt(
+												nodePos.pos,
+											);
+											if (currentNode) {
+												let nextStyle = String(currentNode.attrs.style || "");
+												if (typeof width === "number" && width > 0) {
+													nextStyle = setInlineCssDeclaration(
+														nextStyle,
+														"width",
+														`${width}px`,
+													);
+													nextStyle = setInlineCssDeclaration(
+														nextStyle,
+														"maxWidth",
+														"100%",
+													);
+												} else {
+													nextStyle = setInlineCssDeclaration(
+														nextStyle,
+														"width",
+														"auto",
+													);
+												}
+												if (typeof height === "number" && height > 0) {
+													nextStyle = setInlineCssDeclaration(
+														nextStyle,
+														"height",
+														`${height}px`,
+													);
+												} else {
+													nextStyle = setInlineCssDeclaration(
+														nextStyle,
+														"height",
+														"auto",
+													);
+												}
+												if (align) {
+													nextStyle = setInlineCssDeclaration(
+														nextStyle,
+														"display",
+														"block",
+													);
+													if (align === "center") {
+														nextStyle = setInlineCssDeclaration(
+															nextStyle,
+															"marginLeft",
+															"auto",
+														);
+														nextStyle = setInlineCssDeclaration(
+															nextStyle,
+															"marginRight",
+															"auto",
+														);
+													} else if (align === "right") {
+														nextStyle = setInlineCssDeclaration(
+															nextStyle,
+															"marginLeft",
+															"auto",
+														);
+														nextStyle = setInlineCssDeclaration(
+															nextStyle,
+															"marginRight",
+															"0px",
+														);
+													} else {
+														nextStyle = setInlineCssDeclaration(
+															nextStyle,
+															"marginLeft",
+															"0px",
+														);
+														nextStyle = setInlineCssDeclaration(
+															nextStyle,
+															"marginRight",
+															"auto",
+														);
+													}
+												}
+
+												nodeEditor
+													.chain()
+													.setNodeSelection(nodePos.pos)
+													.updateAttributes("image", {
+														src,
+														alt,
+														href:
+															href !== undefined
+																? href
+																: currentNode.attrs.href,
+														width: targetWidth,
+														height: targetHeight,
+														alignment:
+															align || currentNode.attrs.alignment || "center",
+														align: align || currentNode.attrs.align || "center",
+														style: nextStyle,
+													})
+													.run();
+											}
+										}
+									}}
+								/>
+							</div>
+						</InspectorSection>
+					);
+				})()}
 			<InspectorSection>
 				<SectionHeader label="Spacing" />
 				<SpacingControl
@@ -933,100 +1195,52 @@ function InspectorNodeStyles({
 						])
 					}
 				/>
-				{nodeType === "image" && (
-					<div className="px-4 pb-3">
-						<ImageSrcControl
-							value={{
-								src: String(getAttr("src") ?? ""),
-								alt: String(getAttr("alt") ?? ""),
-								href: String(getAttr("href") ?? ""),
-								width: toPxNumber(getAttr("width") as string | number),
-								height: toPxNumber(getAttr("height") as string | number),
-								align: String(
-									getAttr("alignment") ?? getAttr("align") ?? "center",
-								),
-							}}
-							onChange={({ src, alt, href, width, height, align }) => {
-								setAttr("src", src);
-								setAttr("alt", alt);
-								if (href !== undefined) setAttr("href", href);
-								setAttr("width", width === "" ? "auto" : width);
-								setAttr("height", height === "" ? "auto" : height);
-								if (align) {
-									// Image schema uses `alignment`; also sync legacy `align`
-									// attr + centering margins so canvas + export stay in sync.
-									setAttr("alignment", align);
-									setAttr("align", align);
-									if (align === "center") {
-										batchSetStyle([
-											{ prop: "display", value: "block" },
-											{ prop: "marginLeft", value: "auto" },
-											{ prop: "marginRight", value: "auto" },
-										]);
-									} else if (align === "right") {
-										batchSetStyle([
-											{ prop: "display", value: "block" },
-											{ prop: "marginLeft", value: "auto" },
-											{ prop: "marginRight", value: 0 },
-										]);
-									} else {
-										batchSetStyle([
-											{ prop: "display", value: "block" },
-											{ prop: "marginLeft", value: 0 },
-											{ prop: "marginRight", value: "auto" },
-										]);
-									}
+			</InspectorSection>
+			{nodeType === "button" && (
+				<InspectorSection>
+					<PropRow label="Link">
+						<UrlInput
+							value={String(getAttr("href") ?? "")}
+							onChange={(v) => setAttr("href", v)}
+						/>
+					</PropRow>
+					<PropRow label="Full width">
+						<ToggleSwitch
+							checked={String(getStyle("width") ?? "").includes("100%")}
+							onChange={(checked) => {
+								if (checked) {
+									batchSetStyle([
+										{ prop: "width", value: "100%" },
+										{ prop: "display", value: "block" },
+									]);
+									setAttr("alignment", "center");
+									setAttr("align", "center");
+								} else {
+									batchSetStyle([
+										{ prop: "width", value: "auto" },
+										{ prop: "display", value: "inline-block" },
+									]);
 								}
 							}}
 						/>
+					</PropRow>
+					<div className="flex flex-col gap-1 px-4 py-1.5">
+						<span className="font-normal text-text-sub-600 text-xs dark:text-text-soft-400">
+							Alignment
+						</span>
+						<AlignControls
+							alignment={String(
+								getAttr("alignment") ?? getAttr("align") ?? "left",
+							)}
+							setAlignment={(align) => {
+								// Button schema uses `alignment`; sync legacy `align` too.
+								setAttr("alignment", align);
+								setAttr("align", align);
+							}}
+						/>
 					</div>
-				)}
-				{nodeType === "button" && (
-					<>
-						<PropRow label="Link">
-							<UrlInput
-								value={String(getAttr("href") ?? "")}
-								onChange={(v) => setAttr("href", v)}
-							/>
-						</PropRow>
-						<PropRow label="Full width">
-							<ToggleSwitch
-								checked={String(getStyle("width") ?? "").includes("100%")}
-								onChange={(checked) => {
-									if (checked) {
-										batchSetStyle([
-											{ prop: "width", value: "100%" },
-											{ prop: "display", value: "block" },
-										]);
-										setAttr("alignment", "center");
-										setAttr("align", "center");
-									} else {
-										batchSetStyle([
-											{ prop: "width", value: "auto" },
-											{ prop: "display", value: "inline-block" },
-										]);
-									}
-								}}
-							/>
-						</PropRow>
-						<div className="flex flex-col gap-1 px-4 py-1.5">
-							<span className="font-normal text-text-sub-600 text-xs dark:text-text-soft-400">
-								Alignment
-							</span>
-							<AlignControls
-								alignment={String(
-									getAttr("alignment") ?? getAttr("align") ?? "left",
-								)}
-								setAlignment={(align) => {
-									// Button schema uses `alignment`; sync legacy `align` too.
-									setAttr("alignment", align);
-									setAttr("align", align);
-								}}
-							/>
-						</div>
-					</>
-				)}
-			</InspectorSection>
+				</InspectorSection>
+			)}
 			<InspectorSection>
 				<SectionHeader label="Background" />
 				<ColorRow
