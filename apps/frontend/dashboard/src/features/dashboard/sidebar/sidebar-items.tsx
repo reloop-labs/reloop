@@ -158,67 +158,74 @@ export function SidebarItems({
 									{section}
 								</div>
 							))}
-						<SidebarNavLink
-							href={path}
-							ref={(el) => {
-								if (el) mainNavRefs.current[index] = el;
-							}}
-							onPointerEnter={() => setHoveredEl(mainNavRefs.current[index])}
+						<div
 							className={cn(
-								"relative z-10 flex h-8 items-center rounded-lg transition-all",
-								isCollapsed
-									? "h-8 w-8 justify-center px-0"
-									: cn(
-											"w-full gap-2.5 px-2.5",
-											hasSubNav ? "justify-between" : "justify-start",
-										),
+								"flex items-center",
+								isCollapsed ? "justify-center" : "w-full",
 							)}
-							title={
-								isCollapsed
-									? shortcut
-										? `${label} (${shortcut.label})`
-										: label
-									: undefined
-							}
 						>
-							<span
+							<SidebarNavLink
+								href={path}
+								ref={(el) => {
+									if (el) mainNavRefs.current[index] = el;
+								}}
+								onPointerEnter={() => setHoveredEl(mainNavRefs.current[index])}
 								className={cn(
-									"flex min-w-0 items-center",
+									"relative z-10 flex h-8 items-center rounded-lg transition-all",
 									isCollapsed
-										? "justify-center"
-										: "flex-1 justify-between gap-2.5",
+										? "h-8 w-8 justify-center px-0"
+										: cn(
+												"min-w-0 flex-1 justify-start gap-2.5",
+												hasSubNav ? "py-0 pr-1 pl-2.5" : "px-2.5",
+											),
 								)}
+								title={
+									isCollapsed
+										? shortcut
+											? `${label} (${shortcut.label})`
+											: label
+										: undefined
+								}
 							>
 								<span
 									className={cn(
 										"flex min-w-0 items-center",
-										!isCollapsed && "gap-2.5",
+										isCollapsed
+											? "justify-center"
+											: "flex-1 justify-between gap-2.5",
 									)}
 								>
-									<SidebarNavIcon
-										name={iconName}
-										isSpecial={isSpecial}
-										isActive={activeMainIndex === index}
-									/>
-									{!isCollapsed && (
-										<span
-											className={cn(
-												"truncate font-medium text-[13px] transition-colors",
-												isSpecial
-													? "bg-gradient-to-r from-[#A855F7] to-[#EC4899] bg-clip-text text-transparent"
-													: activeMainIndex === index
-														? "text-text-strong-950"
-														: "text-text-sub-600 group-hover:text-text-strong-950",
-											)}
-										>
-											{label}
-										</span>
+									<span
+										className={cn(
+											"flex min-w-0 items-center",
+											!isCollapsed && "gap-2.5",
+										)}
+									>
+										<SidebarNavIcon
+											name={iconName}
+											isSpecial={isSpecial}
+											isActive={activeMainIndex === index}
+										/>
+										{!isCollapsed && (
+											<span
+												className={cn(
+													"truncate font-medium text-[13px] transition-colors",
+													isSpecial
+														? "bg-gradient-to-r from-[#A855F7] to-[#EC4899] bg-clip-text text-transparent"
+														: activeMainIndex === index
+															? "text-text-strong-950"
+															: "text-text-sub-600 group-hover:text-text-strong-950",
+												)}
+											>
+												{label}
+											</span>
+										)}
+									</span>
+									{!isCollapsed && shortcut && (
+										<ShortcutHint>{shortcut.label}</ShortcutHint>
 									)}
 								</span>
-								{!isCollapsed && shortcut && (
-									<ShortcutHint>{shortcut.label}</ShortcutHint>
-								)}
-							</span>
+							</SidebarNavLink>
 
 							{hasSubNav && !isCollapsed && (
 								<button
@@ -228,9 +235,7 @@ export function SidebarItems({
 									aria-label={
 										isExpanded ? `Collapse ${label}` : `Expand ${label}`
 									}
-									onClick={(e) => {
-										e.preventDefault();
-										e.stopPropagation();
+									onClick={() => {
 										setExpandedItems((prev) => {
 											const willOpen = !prev[path];
 											if (willOpen) {
@@ -246,7 +251,7 @@ export function SidebarItems({
 											return { ...prev, [path]: willOpen };
 										});
 									}}
-									className="flex h-5 w-5 items-center justify-center rounded-md transition-colors hover:bg-bg-weak-50"
+									className="relative z-10 mr-2.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md transition-colors hover:bg-bg-weak-50"
 								>
 									<Icon
 										name="chevron-right"
@@ -257,7 +262,7 @@ export function SidebarItems({
 									/>
 								</button>
 							)}
-						</SidebarNavLink>
+						</div>
 
 						{hasSubNav && !isCollapsed && (
 							<AnimatePresence initial={false}>
