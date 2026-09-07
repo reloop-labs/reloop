@@ -14,7 +14,7 @@ import * as Modal from "@reloop/ui/modal";
 import { useRouter } from "next/navigation";
 
 import { useEffect, useState } from "react";
-import { requestPlanSupport } from "./request-support";
+import { contactEnterprise, useBillingCheckout } from "./use-billing-actions";
 
 type StringComparisonKey = {
 	[K in keyof PricingPlan["comparison"]]: PricingPlan["comparison"][K] extends string
@@ -89,6 +89,7 @@ export function SwitchPlanModal({
 		if (open) setSelectedId(currentPlanId);
 	}, [open, currentPlanId]);
 
+	const checkout = useBillingCheckout();
 	const selectedPlan =
 		pricingPlans.find((p) => p.id === selectedId) ?? defaultPlan;
 	const isEnterprise = selectedPlan.monthlyPrice === null;
@@ -99,16 +100,19 @@ export function SwitchPlanModal({
 	};
 
 	const handleSwitch = () => {
-		const priceStr =
-			selectedPlan.monthlyPrice === null
-				? "custom pricing"
-				: `${formatPrice(selectedPlan.monthlyPrice)}/month`;
-		const message =
-			selectedPlan.monthlyPrice === null
-				? "Hi! I'm interested in the Enterprise plan. Can you help me get set up?"
-				: `Hi! I'd like to switch to the ${selectedPlan.name} plan (${priceStr}). Can you help me with that?`;
-		requestPlanSupport(message);
-		onOpenChange(false);
+		if (isEnterprise) {
+			contactEnterprise();
+			onOpenChange(false);
+			return;
+		}
+		if (selectedPlan.id === "free") {
+			onOpenChange(false);
+			router.push("/settings/billing");
+			return;
+		}
+		if (selectedPlan.id === "individual" || selectedPlan.id === "startup") {
+			checkout.mutate(selectedPlan.id);
+		}
 	};
 
 	return (
@@ -240,10 +244,14 @@ export function SwitchPlanModal({
 							variant="blue"
 							size="small"
 							className="font-medium"
-							disabled={selectedId === currentPlanId}
+							disabled={selectedId === currentPlanId || checkout.isPending}
 							onClick={handleSwitch}
 						>
-							{isEnterprise ? "Contact sales" : "Switch plan"}
+							{isEnterprise
+								? "Contact sales"
+								: checkout.isPending
+									? "Redirecting…"
+									: "Switch plan"}
 						</FancyButton.Root>
 					</div>
 				</Modal.Footer>

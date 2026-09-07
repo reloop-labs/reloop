@@ -3,13 +3,13 @@ import {
 	defaultPlan,
 	getNextPlan,
 	getPlanById,
-	type PlanId,
-	pricingPlans,
+	paidOverageUsdPerThousand,
 } from "@reloop/pricing";
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Circle } from "rc-progress";
 import { useState } from "react";
+import { resolvePlanId } from "#/features/settings/billing/plan-id";
 import { SwitchPlanModal } from "#/features/settings/billing/switch-plan-modal";
 import { useBillingUsage } from "#/features/settings/billing/use-billing-usage";
 
@@ -216,12 +216,6 @@ function SkeletonCard() {
 	);
 }
 
-function resolvePlanId(name: string | undefined): PlanId {
-	const normalized = (name ?? "free").toLowerCase();
-	const match = pricingPlans.find((p) => p.id === normalized);
-	return match?.id ?? "free";
-}
-
 function daysUntil(dateStr: string): number {
 	const end = new Date(dateStr).getTime();
 	if (Number.isNaN(end)) return 0;
@@ -232,11 +226,6 @@ function formatDate(dateStr: string): string {
 	const d = new Date(dateStr);
 	if (Number.isNaN(d.getTime())) return "";
 	return d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
-}
-
-function parseCount(val: string): number {
-	if (val === "Custom") return 0;
-	return Number.parseInt(val.replace(/\D/g, ""), 10) || 0;
 }
 
 export function UsageSection() {
@@ -254,21 +243,41 @@ export function UsageSection() {
 		);
 	}
 
-	const { plan, subscription } = data;
-	const total = Math.max(0, plan.monthlyCredits);
+	const { plan, subscription, resources, daily } = data;
+	const entitlements = plan.entitlements;
+	const total = Math.max(0, entitlements?.monthlyEmails ?? plan.monthlyCredits);
 	const used = Math.max(0, subscription.creditsUsed);
 	const remaining = Math.max(0, subscription.creditsRemaining);
 	const ratio = total > 0 ? used / total : 0;
 	const percent = Math.min(100, Math.round(ratio * 100));
+	const overageEnabled =
+		entitlements?.overageEnabled ?? plan.overageLimit !== 0;
 
 	const resetDays = daysUntil(subscription.currentPeriodEnd);
 	const periodRange = `${formatDate(subscription.currentPeriodStart)} – ${formatDate(
 		subscription.currentPeriodEnd,
 	)}`;
 
-	const currentPlanId = resolvePlanId(plan.name);
+	const currentPlanId = resolvePlanId({
+		id: plan.id ?? subscription.planId,
+		name: plan.name,
+	});
 	const currentPlan = getPlanById(currentPlanId) ?? defaultPlan;
 	const nextPlan = getNextPlan(currentPlanId);
+	const attachmentMb =
+		entitlements != null
+			? Math.round(entitlements.maxAttachmentBytes / (1024 * 1024))
+			: plan.maxAttachmentSizeMb;
+	const dedicatedIpCount = entitlements?.dedicatedIpCount ?? 0;
+	const inboxUsed = resources?.agentInboxes.used ?? 0;
+	const inboxLimit =
+		resources?.agentInboxes.limit ?? entitlements?.maxAgentInboxes ?? 0;
+	const webhookUsed = resources?.webhooks.used ?? 0;
+	const webhookLimit =
+		resources?.webhooks.limit ?? entitlements?.maxWebhooks ?? 0;
+	const domainUsed = resources?.customDomains.used ?? 0;
+	const domainLimit =
+		resources?.customDomains.limit ?? entitlements?.maxCustomDomains ?? 0;
 
 	return (
 		<div className="space-y-4">
@@ -362,14 +371,27 @@ export function UsageSection() {
 					})()}
 				</div>
 
+				{daily?.limit != null ? (
+					<UsageRow
+						label="Daily emails"
+						used={daily.sent}
+						total={daily.limit}
+						isLast={false}
+					/>
+				) : null}
+
 				<SpecRow
-					label="Send rate"
-					value={`${plan.ratePerSecond} / sec`}
+					label="Overage"
+					value={
+						overageEnabled
+							? `$${paidOverageUsdPerThousand.toFixed(2)} / 1,000 emails`
+							: "Sending pauses at the limit"
+					}
 					isLast={false}
 				/>
 				<SpecRow
 					label="Max attachment size"
-					value={`${plan.maxAttachmentSizeMb} MB`}
+					value={`${attachmentMb} MB`}
 					isLast={true}
 				/>
 			</CategoryCard>
@@ -380,39 +402,40 @@ export function UsageSection() {
 			>
 				<UsageRow
 					label="Inboxes"
-					used={0}
-					total={parseCount(currentPlan.comparison.agentInbox)}
-					isUnlimited={currentPlan.comparison.agentInbox === "Custom"}
+					used={inboxUsed}
+					total={inboxLimit}
 					isLast={true}
 				/>
 			</CategoryCard>
 
 			<CategoryCard
 				title="Other Limits"
-				description="Additional plan limits for domains and dedicated IPs."
+				description="Webhooks, domains, and dedicated IPs on this organization."
 			>
 				<UsageRow
 					label="Webhooks"
-					used={0}
-					total={parseCount(currentPlan.comparison.webhooks)}
-					isUnlimited={currentPlan.comparison.webhooks === "Custom"}
+					used={webhookUsed}
+					total={webhookLimit}
 					isLast={false}
 				/>
 				<UsageRow
 					label="Custom domains"
-					used={0}
-					total={parseCount(currentPlan.comparison.customDomains)}
-					isUnlimited={currentPlan.comparison.customDomains === "Custom"}
+					used={domainUsed}
+					total={domainLimit}
 					isLast={false}
 				/>
 				<SpecRow
 					label="Dedicated IP"
 					value={
-						currentPlan.comparison.dedicatedIp === "—" ||
-						currentPlan.comparison.dedicatedIp === ""
-							? "Not included"
-							: currentPlan.comparison.dedicatedIp
+						dedicatedIpCount > 0
+							? `${dedicatedIpCount} included`
+							: "Not included"
 					}
+					isLast={false}
+				/>
+				<SpecRow
+					label="Data retention"
+					value={`${entitlements?.dataRetentionDays ?? 45} days`}
 					isLast={true}
 				/>
 			</CategoryCard>

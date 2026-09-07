@@ -8,7 +8,7 @@ import { UsageSection } from "./usage-section";
 export function UsagePage() {
 	const router = useRouter();
 	const { canManageBilling, isPending: rolePending } = useOrgPermissions();
-	const { error: usageError, refetch: refetchUsage } = useBillingUsage();
+	const { data, error: usageError, refetch: refetchUsage } = useBillingUsage();
 
 	useEffect(() => {
 		if (!rolePending && !canManageBilling) {
@@ -29,7 +29,9 @@ export function UsagePage() {
 					Usage
 				</h1>
 				<p className="mt-1 text-paragraph-sm text-text-sub-600">
-					Track your plan limits and resource usage for this billing period.
+					{data
+						? `${data.subscription.creditsRemaining.toLocaleString()} of ${data.plan.monthlyCredits.toLocaleString()} emails remaining this period.`
+						: "Track your plan limits and resource usage for this billing period."}
 				</p>
 			</div>
 

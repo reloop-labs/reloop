@@ -1,6 +1,11 @@
 import { t } from "elysia";
 
 export namespace CreditsModel {
+	export const resourceUsage = t.Object({
+		used: t.Number(),
+		limit: t.Number(),
+	});
+
 	export const usageResponse = t.Object({
 		plan: t.Object({
 			id: t.Optional(t.String()),
@@ -13,6 +18,19 @@ export namespace CreditsModel {
 			ratePerHour: t.Number(),
 			maxAttachmentSizeMb: t.Number(),
 			overageLimit: t.Number(),
+			entitlements: t.Optional(
+				t.Object({
+					monthlyEmails: t.Number(),
+					dailyEmailLimit: t.Union([t.Number(), t.Null()]),
+					overageEnabled: t.Boolean(),
+					maxAgentInboxes: t.Number(),
+					maxWebhooks: t.Number(),
+					maxCustomDomains: t.Number(),
+					maxAttachmentBytes: t.Number(),
+					dataRetentionDays: t.Number(),
+					dedicatedIpCount: t.Number(),
+				}),
+			),
 		}),
 		subscription: t.Object({
 			status: t.String(),
@@ -22,7 +40,22 @@ export namespace CreditsModel {
 			creditsReceived: t.Number(),
 			currentPeriodStart: t.String(),
 			currentPeriodEnd: t.String(),
+			cancelAtPeriodEnd: t.Optional(t.Boolean()),
+			planId: t.Optional(t.String()),
 		}),
+		resources: t.Optional(
+			t.Object({
+				agentInboxes: resourceUsage,
+				webhooks: resourceUsage,
+				customDomains: resourceUsage,
+			}),
+		),
+		daily: t.Optional(
+			t.Object({
+				sent: t.Number(),
+				limit: t.Union([t.Number(), t.Null()]),
+			}),
+		),
 	});
 
 	export const planResponse = t.Object({

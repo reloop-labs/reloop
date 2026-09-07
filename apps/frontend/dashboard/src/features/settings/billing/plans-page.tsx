@@ -1,6 +1,7 @@
 import {
 	comparisonSections,
 	formatPrice,
+	isCheckoutPlanId,
 	type PlanId,
 	type PricingPlan,
 	pricingPlans,
@@ -11,14 +12,14 @@ import { Icon } from "@reloop/ui/icon";
 import { useRouter } from "next/navigation";
 
 import { AnimatedBackButton } from "#/features/dashboard/animated-back-button";
+import { resolvePlanId } from "./plan-id";
 import { requestPlanSupport } from "./request-support";
+import {
+	contactEnterprise,
+	useBillingCheckout,
+	useBillingPortal,
+} from "./use-billing-actions";
 import { useBillingUsage } from "./use-billing-usage";
-
-function resolvePlanId(name: string | undefined): PlanId {
-	const normalized = (name ?? "free").toLowerCase();
-	const match = pricingPlans.find((p) => p.id === normalized);
-	return match?.id ?? "free";
-}
 
 function planIndex(id: PlanId): number {
 	return pricingPlans.findIndex((p) => p.id === id);
@@ -29,23 +30,13 @@ const GRID_COLS = "grid-cols-[minmax(160px,240px)_repeat(4,minmax(150px,1fr))]";
 export function PlansPage() {
 	const router = useRouter();
 	const { data: usageData } = useBillingUsage();
+	const checkout = useBillingCheckout();
+	const portal = useBillingPortal();
 
-	const requestPlan = (
-		plan: PricingPlan,
-		action: "upgrade" | "downgrade" | "enterprise",
-	) => {
-		const priceStr =
-			plan.monthlyPrice === null
-				? "custom pricing"
-				: `${formatPrice(plan.monthlyPrice)}/month`;
-		const message =
-			action === "enterprise"
-				? "Hi! I'm interested in the Enterprise plan. Can you help me get set up?"
-				: `Hi! I'd like to ${action} to the ${plan.name} plan (${priceStr}). Can you help me with that?`;
-		requestPlanSupport(message);
-	};
-
-	const currentPlanId = resolvePlanId(usageData?.plan?.name);
+	const currentPlanId = resolvePlanId({
+		id: usageData?.plan.id ?? usageData?.subscription.planId,
+		name: usageData?.plan.name,
+	});
 	const currentIndex = planIndex(currentPlanId);
 	const nextIndex = currentIndex + 1;
 
@@ -91,7 +82,7 @@ export function PlansPage() {
 					variant="basic"
 					size="small"
 					className="w-full rounded-full font-semibold"
-					onClick={() => requestPlan(plan, "enterprise")}
+					onClick={contactEnterprise}
 				>
 					Contact sales
 				</FancyButton.Root>
@@ -100,14 +91,31 @@ export function PlansPage() {
 
 		const isUpgrade = index > currentIndex;
 		const isNext = index === nextIndex;
+		if (plan.id === "free") {
+			return (
+				<FancyButton.Root
+					variant="basic"
+					size="small"
+					className="w-full rounded-full font-semibold"
+					disabled={portal.isPending}
+					onClick={() => portal.mutate()}
+				>
+					{portal.isPending ? "Opening…" : "Manage in portal"}
+				</FancyButton.Root>
+			);
+		}
+		const isCheckingOut = checkout.isPending && checkout.variables === plan.id;
 		return (
 			<FancyButton.Root
 				variant={isNext ? "blue" : "basic"}
 				size="small"
 				className="w-full rounded-full font-semibold"
-				onClick={() => requestPlan(plan, isUpgrade ? "upgrade" : "downgrade")}
+				disabled={checkout.isPending}
+				onClick={() => {
+					if (isCheckoutPlanId(plan.id)) checkout.mutate(plan.id);
+				}}
 			>
-				{isUpgrade ? "Upgrade" : "Downgrade"}
+				{isCheckingOut ? "Redirecting…" : isUpgrade ? "Upgrade" : "Downgrade"}
 			</FancyButton.Root>
 		);
 	}

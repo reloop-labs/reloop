@@ -3,8 +3,7 @@ import {
 	formatPrice,
 	getNextPlan,
 	getPlanById,
-	type PlanId,
-	pricingPlans,
+	isCheckoutPlanId,
 } from "@reloop/pricing";
 import * as Badge from "@reloop/ui/badge";
 import * as FancyButton from "@reloop/ui/fancy-button";
@@ -15,17 +14,23 @@ import { useEffect, useState } from "react";
 import { AnimatedForwardButton } from "#/features/dashboard/animated-forward-button";
 import { SETTINGS_MEMBER_HOME } from "#/features/dashboard/navigation";
 import { useOrgPermissions } from "#/features/settings/use-org-permissions";
+import { resolvePlanId } from "./plan-id";
 import { requestPlanSupport } from "./request-support";
 import { SwitchPlanModal } from "./switch-plan-modal";
-import { useBillingUsage } from "./use-billing-usage";
+import {
+	contactEnterprise,
+	useBillingCheckout,
+	useBillingPortal,
+} from "./use-billing-actions";
+import { useBillingPeriods, useBillingUsage } from "./use-billing-usage";
 
 const CARD =
 	"rounded-2xl border border-stroke-soft-100 bg-bg-weak-50/30 p-5 dark:border-stroke-soft-100/40 dark:bg-white/[0.02]";
 
-function resolvePlanId(name: string | undefined): PlanId {
-	const normalized = (name ?? "free").toLowerCase();
-	const match = pricingPlans.find((p) => p.id === normalized);
-	return match?.id ?? "free";
+function formatPeriodDate(value: string): string {
+	const d = new Date(value);
+	if (Number.isNaN(d.getTime())) return "";
+	return d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
 }
 
 export function BillingPage() {
@@ -37,6 +42,9 @@ export function BillingPage() {
 		error: usageError,
 		refetch: refetchUsage,
 	} = useBillingUsage();
+	const periodsQuery = useBillingPeriods();
+	const checkout = useBillingCheckout();
+	const portal = useBillingPortal();
 
 	useEffect(() => {
 		if (!rolePending && !canManageBilling) {
@@ -49,9 +57,17 @@ export function BillingPage() {
 	}
 
 	const error = usageError;
-	const currentPlanId = resolvePlanId(usageData?.plan?.name);
+	const currentPlanId = resolvePlanId({
+		id: usageData?.plan.id ?? usageData?.subscription.planId,
+		name: usageData?.plan.name,
+	});
 	const currentPlan = getPlanById(currentPlanId) ?? defaultPlan;
 	const nextPlan = getNextPlan(currentPlanId);
+	const remaining = usageData?.subscription.creditsRemaining ?? 0;
+	const monthlyIncluded =
+		usageData?.plan.entitlements?.monthlyEmails ??
+		usageData?.plan.monthlyCredits ??
+		0;
 
 	const nextPlanPriceLabel = nextPlan
 		? nextPlan.monthlyPrice === null
@@ -61,14 +77,24 @@ export function BillingPage() {
 
 	const handleUpgrade = () => {
 		if (!nextPlan) return;
-		const message =
-			nextPlan.monthlyPrice === null
-				? `Hi! I'm interested in the ${nextPlan.name} plan. Can you help me get set up?`
-				: `Hi! I'd like to upgrade to the ${nextPlan.name} plan (${formatPrice(
-						nextPlan.monthlyPrice,
-					)}/month). Can you help me with that?`;
-		requestPlanSupport(message);
+		if (nextPlan.monthlyPrice === null) {
+			contactEnterprise();
+			return;
+		}
+		if (isCheckoutPlanId(nextPlan.id)) {
+			checkout.mutate(nextPlan.id);
+			return;
+		}
+		contactEnterprise();
 	};
+
+	const handleManage = () => {
+		void portal.mutateAsync().catch(() => {
+			setSwitchOpen(true);
+		});
+	};
+
+	const periods = periodsQuery.data ?? [];
 
 	return (
 		<div className="w-full space-y-6 pt-5">
@@ -78,7 +104,10 @@ export function BillingPage() {
 						Billing
 					</h1>
 					<p className="mt-1 text-paragraph-sm text-text-sub-600">
-						For questions about billing,{" "}
+						{usageData
+							? `${remaining.toLocaleString()} of ${monthlyIncluded.toLocaleString()} emails remaining this period.`
+							: "Plan, usage, and invoices for this organization."}{" "}
+						For questions,{" "}
 						<button
 							type="button"
 							onClick={() =>
@@ -119,20 +148,35 @@ export function BillingPage() {
 								{currentPlan.name} plan
 							</h2>
 							<span className="inline-flex h-5 items-center rounded-full bg-bg-weak-50 px-2 font-medium text-label-xs text-text-sub-600 dark:bg-white/[0.06]">
-								Current
+								{usageData?.subscription.status === "past_due"
+									? "Past due"
+									: "Current"}
 							</span>
+							{usageData?.subscription.cancelAtPeriodEnd ? (
+								<span className="inline-flex h-5 items-center rounded-full bg-warning-lighter px-2 font-medium text-label-xs text-warning-base">
+									Cancels at period end
+								</span>
+							) : null}
 						</div>
 						<p className="mt-1 font-medium text-paragraph-sm text-text-sub-600">
-							{currentPlan.priceSubline}
+							{currentPlan.monthlyPrice === null
+								? currentPlan.priceSubline
+								: currentPlan.monthlyPrice === 0
+									? "Free for everyone"
+									: `${formatPrice(currentPlan.monthlyPrice)} / month`}
+							{monthlyIncluded > 0
+								? ` · ${monthlyIncluded.toLocaleString()} emails included`
+								: null}
 						</p>
 					</div>
 					<FancyButton.Root
 						variant="basic"
 						size="xsmall"
 						className="rounded-full font-medium"
-						onClick={() => setSwitchOpen(true)}
+						disabled={portal.isPending}
+						onClick={handleManage}
 					>
-						Manage
+						{portal.isPending ? "Opening…" : "Manage"}
 					</FancyButton.Root>
 				</div>
 			</div>
@@ -168,9 +212,10 @@ export function BillingPage() {
 								variant="blue"
 								size="small"
 								className="rounded-full font-semibold"
+								disabled={checkout.isPending}
 								onClick={handleUpgrade}
 							>
-								Upgrade now
+								{checkout.isPending ? "Redirecting…" : "Upgrade now"}
 							</FancyButton.Root>
 						</div>
 					</div>
@@ -202,13 +247,45 @@ export function BillingPage() {
 
 			<div className="space-y-3">
 				<h2 className="font-semibold text-paragraph-lg text-text-strong-950">
-					Recent invoices
+					Previous periods
 				</h2>
-				<div className="flex h-32 items-center justify-center rounded-2xl border border-stroke-soft-100 bg-bg-weak-50/30 dark:border-stroke-soft-100/40 dark:bg-white/[0.02]">
-					<p className="text-paragraph-sm text-text-soft-400">
-						No invoices yet
-					</p>
-				</div>
+				{periods.length === 0 ? (
+					<div className="flex h-32 items-center justify-center rounded-2xl border border-stroke-soft-100 bg-bg-weak-50/30 dark:border-stroke-soft-100/40 dark:bg-white/[0.02]">
+						<p className="text-paragraph-sm text-text-soft-400">
+							No closed months yet. This period stays live until it resets.
+						</p>
+					</div>
+				) : (
+					<div className="overflow-hidden rounded-2xl border border-stroke-soft-100 dark:border-stroke-soft-100/40">
+						{periods.map((period, index) => (
+							<div
+								key={period.id}
+								className={`flex items-center justify-between px-5 py-3.5 ${
+									index < periods.length - 1
+										? "border-stroke-soft-100 border-b dark:border-stroke-soft-100/40"
+										: ""
+								}`}
+							>
+								<div>
+									<p className="font-medium text-paragraph-sm text-text-strong-950">
+										{formatPeriodDate(period.periodStart)} –{" "}
+										{formatPeriodDate(period.periodEnd)}
+									</p>
+									<p className="text-paragraph-xs text-text-sub-600 capitalize">
+										{period.planId} · {period.includedEmails.toLocaleString()}{" "}
+										included
+									</p>
+								</div>
+								<p className="font-medium text-paragraph-sm text-text-strong-950 tabular-nums">
+									{period.emailsUsed.toLocaleString()} sent
+									{period.emailsOverage > 0
+										? ` · ${period.emailsOverage.toLocaleString()} overage`
+										: ""}
+								</p>
+							</div>
+						))}
+					</div>
+				)}
 			</div>
 
 			<SwitchPlanModal
