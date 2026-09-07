@@ -1,7 +1,8 @@
 import { CreditErrors } from "@reloop/credits/error/credits.error-response";
-import { getOrProvisionCredits } from "@reloop/credits/utils/credits";
+import { getOrProvisionOrgBilling } from "@reloop/credits/lib/org-billing";
 import { db } from "@reloop/db/client";
 import { emailSend, inboundEmail } from "@reloop/db/schema";
+import { getPlanById } from "@reloop/pricing";
 import { and, count, eq, gte, ne } from "drizzle-orm";
 
 export const getUsageController = async ({
@@ -9,14 +10,11 @@ export const getUsageController = async ({
 }: {
 	organizationId: string;
 }) => {
-	const orgId = organizationId;
-
 	try {
-		// 1. Get or provision credits
-		const activeCredits = await getOrProvisionCredits(orgId);
-
-		// 2. Count sent / received emails within the current billing period
-		const periodStart = activeCredits.currentPeriodStart;
+		const billing = await getOrProvisionOrgBilling(organizationId);
+		const catalog = getPlanById(billing.plan.planId);
+		const monthlyPrice = catalog?.monthlyPrice ?? 0;
+		const periodStart = billing.credits.currentPeriodStart;
 
 		const [sentRows, receivedRows] = await Promise.all([
 			db
@@ -24,7 +22,7 @@ export const getUsageController = async ({
 				.from(emailSend)
 				.where(
 					and(
-						eq(emailSend.organizationId, orgId),
+						eq(emailSend.organizationId, organizationId),
 						gte(emailSend.sentAt, periodStart),
 					),
 				),
@@ -33,7 +31,7 @@ export const getUsageController = async ({
 				.from(inboundEmail)
 				.where(
 					and(
-						eq(inboundEmail.organizationId, orgId),
+						eq(inboundEmail.organizationId, organizationId),
 						gte(inboundEmail.createdAt, periodStart),
 						ne(inboundEmail.status, "spam"),
 					),
@@ -42,24 +40,28 @@ export const getUsageController = async ({
 
 		return {
 			plan: {
-				name: "Free",
-				monthlyCredits: activeCredits.monthlyCredits,
-				basePriceUsd: "0.00",
-				billingCycle: "monthly",
+				id: billing.plan.planId,
+				name: catalog?.name ?? "Free",
+				monthlyCredits: billing.plan.monthlyEmails,
+				basePriceUsd:
+					monthlyPrice === null ? "custom" : monthlyPrice.toFixed(2),
+				billingCycle: billing.subscription.billingCycle,
 				ratePerSecond: 10,
-				ratePerMinute: 200,
+				ratePerMinute: billing.plan.dailyEmailLimit ?? 0,
 				ratePerHour: 5000,
-				maxAttachmentSizeMb: 5,
-				overageLimit: 0,
+				maxAttachmentSizeMb: Math.round(
+					billing.plan.maxAttachmentBytes / (1024 * 1024),
+				),
+				overageLimit: billing.plan.overageEnabled ? -1 : 0,
 			},
 			subscription: {
-				status: activeCredits.status,
-				creditsUsed: activeCredits.creditsUsed,
-				creditsRemaining: activeCredits.creditsRemaining,
+				status: billing.subscription.status,
+				creditsUsed: billing.credits.creditsUsed,
+				creditsRemaining: billing.credits.creditsRemaining,
 				creditsSent: sentRows[0]?.value ?? 0,
 				creditsReceived: receivedRows[0]?.value ?? 0,
-				currentPeriodStart: activeCredits.currentPeriodStart.toISOString(),
-				currentPeriodEnd: activeCredits.currentPeriodEnd.toISOString(),
+				currentPeriodStart: billing.credits.currentPeriodStart.toISOString(),
+				currentPeriodEnd: billing.credits.currentPeriodEnd.toISOString(),
 			},
 		};
 	} catch (error) {

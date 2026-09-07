@@ -24,10 +24,12 @@
 		"elysia": "catalog:backend",
 		"pg": "catalog:db",
 		"zod": "catalog:ui",
+		"@polar-sh/sdk": "^0.42.2",
 		"@reloop/db": "workspace:*",
 		"@reloop/auth": "workspace:*",
 		"@reloop/cache": "workspace:*",
 		"@reloop/bus": "workspace:*",
+		"@reloop/pricing": "workspace:*",
 		"@elysiajs/openapi": "catalog:backend",
 		"evlog": "catalog:backend"
 	},

@@ -65,4 +65,48 @@ export const CreditErrors = {
 			why: message,
 			fix: "Please try again later or contact support if the issue persists.",
 		}),
+	billingDisabled: () =>
+		createError({
+			status: 503,
+			message: "Hosted billing is disabled",
+			why: "This Reloop instance is not connected to Polar checkout.",
+			fix: "Self-host has no Reloop Cloud subscription. On Reloop Cloud, enable BILLING_ENABLED and Polar credentials.",
+		}),
+	polarNotConfigured: (planId?: string) =>
+		createError({
+			status: 503,
+			message: "Polar product was not found",
+			why: planId
+				? `No Polar subscription product maps to the ${planId} plan.`
+				: "No Polar subscription products could be loaded.",
+			fix: "In Polar, create a recurring product named Individual or Startup, or set metadata plan_id to individual/startup.",
+		}),
+	invalidCheckoutPlan: (planId: string) =>
+		createError({
+			status: 400,
+			message: "This plan cannot be purchased here",
+			why: `Plan "${planId}" is not a hosted checkout plan.`,
+			fix: "Choose Individual or Startup, or contact sales for Enterprise.",
+		}),
+	alreadyOnPlan: (planId: string) =>
+		createError({
+			status: 409,
+			message: "Already on this plan",
+			why: `This organization is already on the ${planId} plan.`,
+			fix: "Pick a different plan or manage billing in the customer portal.",
+		}),
+	polarCustomerMissing: (organizationId: string) =>
+		createError({
+			status: 409,
+			message: "Billing customer is not ready",
+			why: `Organization ${organizationId} does not have a Polar customer yet.`,
+			fix: "Add a billing email on the organization and try again.",
+		}),
+	webhookInvalid: () =>
+		createError({
+			status: 403,
+			message: "Invalid Polar webhook signature",
+			why: "The webhook payload could not be verified.",
+			fix: "Confirm POLAR_WEBHOOK_SECRET matches the Polar endpoint secret.",
+		}),
 };

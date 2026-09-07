@@ -1,5 +1,9 @@
 import { BusEvent, bus } from "@reloop/bus";
-import { getOrProvisionCredits } from "@reloop/credits/utils/credits";
+import {
+	ensurePolarCustomerForOrg,
+	getOrProvisionOrgBilling,
+} from "@reloop/credits/lib/org-billing";
+import { livePolarBilling } from "@reloop/credits/lib/polar";
 import { db } from "@reloop/db/client";
 import { log } from "evlog";
 
@@ -13,12 +17,26 @@ export async function initOrganizationSubscriber() {
 			});
 			try {
 				await db.transaction(async (tx) => {
-					await getOrProvisionCredits(payload.id, tx);
+					await getOrProvisionOrgBilling(payload.id, tx);
 				});
+
+				if (livePolarBilling.enabled) {
+					try {
+						await ensurePolarCustomerForOrg({
+							organizationId: payload.id,
+							polar: livePolarBilling,
+						});
+					} catch (error) {
+						log.error({
+							...{ error, organizationId: payload.id },
+							message: "Failed to create Polar customer for new organization",
+						});
+					}
+				}
 
 				log.info({
 					...{ organizationId: payload.id },
-					message: "Initialized credits for new organization",
+					message: "Initialized billing for new organization",
 				});
 			} catch (error) {
 				log.error({

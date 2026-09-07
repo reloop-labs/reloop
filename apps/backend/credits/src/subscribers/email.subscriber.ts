@@ -1,10 +1,12 @@
 import { BusEvent, bus } from "@reloop/bus";
+import { livePolarBilling } from "@reloop/credits/lib/polar";
 import { getOrProvisionCredits } from "@reloop/credits/utils/credits";
 import { db } from "@reloop/db/client";
 import {
 	creditLedger,
 	emailSend,
 	organizationCredits,
+	organizationPlan,
 } from "@reloop/db/schema";
 import { and, count, eq, gte, sql } from "drizzle-orm";
 import { log } from "evlog";
@@ -28,6 +30,7 @@ export async function initEmailSubscriber() {
 					monthlyCredits: number;
 					periodStart: Date;
 					periodEnd: Date;
+					overageEnabled: boolean;
 				} | null = null;
 
 				await db.transaction(async (tx) => {
@@ -99,12 +102,17 @@ export async function initEmailSubscriber() {
 						});
 					}
 
+					const plan = await tx.query.organizationPlan.findFirst({
+						where: eq(organizationPlan.organizationId, payload.organizationId),
+					});
+
 					usageSnapshot = {
 						creditsUsed: newCreditsUsed,
 						creditsRemaining: newCreditsRemaining,
 						monthlyCredits: activeCredits.monthlyCredits,
 						periodStart: activeCredits.currentPeriodStart,
 						periodEnd: activeCredits.currentPeriodEnd,
+						overageEnabled: plan?.overageEnabled ?? false,
 					};
 				});
 
@@ -130,6 +138,7 @@ export async function initEmailSubscriber() {
 					monthlyCredits: number;
 					periodStart: Date;
 					periodEnd: Date;
+					overageEnabled: boolean;
 				};
 
 				const usageUpdatedPayload = {
@@ -143,6 +152,24 @@ export async function initEmailSubscriber() {
 				};
 
 				await bus.publish(BusEvent.USAGE_UPDATED, usageUpdatedPayload);
+
+				if (
+					livePolarBilling.enabled &&
+					snap.overageEnabled &&
+					payload.recipientCount > 0
+				) {
+					try {
+						await livePolarBilling.ingestEmailEvents({
+							externalCustomerId: payload.organizationId,
+							count: payload.recipientCount,
+						});
+					} catch (error) {
+						log.error({
+							...{ error, organizationId: payload.organizationId },
+							message: "Failed to ingest Polar usage events",
+						});
+					}
+				}
 
 				// 7. Quota threshold alerts
 				const usageRatio = snap.creditsUsed / snap.monthlyCredits;

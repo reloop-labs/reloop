@@ -11,10 +11,12 @@ import { evlog } from "evlog/elysia";
 import { createOTLPDrain } from "evlog/otlp";
 import { creditsConfig } from "./credits.config";
 import { loader } from "./loader";
+import { billingRoutes } from "./routes/billing/billing.routes";
 import { creditsRoutes } from "./routes/credits/credits.routes";
 import { agentCardRoute } from "./routes/landing/agent-card.route";
 import { healthRoute } from "./routes/landing/health.route";
 import { landingRoute } from "./routes/landing/landing.route";
+import { polarWebhookRoute } from "./routes/webhooks/polar.route";
 
 const parseOtlpHeaders = (
 	headersStr?: string,
@@ -73,6 +75,8 @@ const app = new Elysia({ prefix: "/api/credits", name: "Credits Service" })
 	.use(healthRoute)
 	.use(agentCardRoute)
 	.use(creditsRoutes)
+	.use(billingRoutes)
+	.use(polarWebhookRoute)
 	.onError(({ error, set }) => {
 		const parsed = parseError(error);
 		set.status = parsed.status;

@@ -3,6 +3,7 @@ import { t } from "elysia";
 export namespace CreditsModel {
 	export const usageResponse = t.Object({
 		plan: t.Object({
+			id: t.Optional(t.String()),
 			name: t.String(),
 			monthlyCredits: t.Number(),
 			basePriceUsd: t.String(),
@@ -32,8 +33,65 @@ export namespace CreditsModel {
 			currentPeriodEnd: t.String(),
 			creditsUsed: t.Number(),
 			creditsRemaining: t.Number(),
+			cancelAtPeriodEnd: t.Optional(t.Boolean()),
+			planId: t.Optional(t.String()),
 		}),
 	});
+
+	export const checkoutBody = t.Object({
+		planId: t.Union([t.Literal("individual"), t.Literal("startup")]),
+	});
+
+	export const checkoutResponse = t.Object({
+		url: t.String(),
+		checkoutId: t.String(),
+	});
+
+	export const portalResponse = t.Object({
+		url: t.String(),
+	});
+
+	export const webhookAccepted = t.Object({
+		received: t.Literal(true),
+	});
+
+	export const adminPlanPatchBody = t.Object({
+		monthlyEmails: t.Optional(t.Number()),
+		dailyEmailLimit: t.Optional(t.Union([t.Number(), t.Null()])),
+		overageEnabled: t.Optional(t.Boolean()),
+		maxAgentInboxes: t.Optional(t.Number()),
+		maxWebhooks: t.Optional(t.Number()),
+		maxCustomDomains: t.Optional(t.Number()),
+		maxAttachmentBytes: t.Optional(t.Number()),
+		dataRetentionDays: t.Optional(t.Number()),
+		dedicatedIpCount: t.Optional(t.Number()),
+	});
+
+	export const adminPlanPatchResponse = t.Object({
+		organizationId: t.String(),
+		planId: t.String(),
+		monthlyEmails: t.Number(),
+		dailyEmailLimit: t.Union([t.Number(), t.Null()]),
+		overageEnabled: t.Boolean(),
+		maxAgentInboxes: t.Number(),
+		maxWebhooks: t.Number(),
+		maxCustomDomains: t.Number(),
+		maxAttachmentBytes: t.Number(),
+		dataRetentionDays: t.Number(),
+		dedicatedIpCount: t.Number(),
+	});
+
+	export const periodsResponse = t.Array(
+		t.Object({
+			id: t.String(),
+			planId: t.String(),
+			periodStart: t.Date(),
+			periodEnd: t.Date(),
+			includedEmails: t.Number(),
+			emailsUsed: t.Number(),
+			emailsOverage: t.Number(),
+		}),
+	);
 
 	export const topupBody = t.Object({
 		organizationId: t.String(),
