@@ -7,22 +7,20 @@ import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-ba
 import { useOrgPermissions } from "#/features/settings/use-org-permissions";
 import { filterSettingsNavigation, settingsNavigation } from "../navigation";
 import { SidebarNavIcon } from "./sidebar-nav-icon";
-import { SidebarNavButton, SidebarNavLink } from "./sidebar-nav-link";
+import { SidebarNavLink } from "./sidebar-nav-link";
 import { useSidebarHoverBox } from "./use-sidebar-hover-box";
 
 export function SettingsSidebarItems({
 	isCollapsed = false,
-	onCloseSettings,
 }: {
 	isCollapsed?: boolean;
-	onCloseSettings?: () => void;
 }) {
 	const [hoveredEl, setHoveredEl] = useState<HTMLElement | undefined>(
 		undefined,
 	);
 	const [containerEl, setContainerEl] = useState<HTMLDivElement | null>(null);
 
-	const backNavRef = useRef<HTMLButtonElement>(null);
+	const backNavRef = useRef<HTMLAnchorElement>(null);
 	const itemRefs = useRef<HTMLAnchorElement[]>([]);
 
 	const pathname = usePathname();
@@ -68,11 +66,11 @@ export function SettingsSidebarItems({
 			)}
 			onPointerLeave={() => setHoveredEl(undefined)}
 		>
-			{/* Back to main sidebar — does not change the page */}
-			<SidebarNavButton
+			{/* Leave settings and return to the app home (Emails). */}
+			<SidebarNavLink
+				href="/"
 				ref={backNavRef}
 				onPointerEnter={() => setHoveredEl(backNavRef.current ?? undefined)}
-				onClick={() => onCloseSettings?.()}
 				className={cn(
 					"relative z-10 mb-4 flex h-8 items-center rounded-lg transition-all",
 					isCollapsed
@@ -97,7 +95,7 @@ export function SettingsSidebarItems({
 						</span>
 					)}
 				</span>
-			</SidebarNavButton>
+			</SidebarNavLink>
 
 			{filteredSettingsNavigation.map((section, sectionIdx) => (
 				<div
