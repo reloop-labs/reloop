@@ -24,6 +24,7 @@ const columns: FooterColumn[] = [
 		group: "Features",
 		items: [
 			{ title: "Transaction Emails", href: "/features/transaction-emails" },
+			{ title: "Marketing Emails", href: "/features/email-marketing" },
 			{ title: "SMTP Relay", href: "/features/smtp" },
 			{ title: "Email Analytics", href: "/features/email-analytics" },
 			{ title: "Email Validation", href: "/features/email-validation" },

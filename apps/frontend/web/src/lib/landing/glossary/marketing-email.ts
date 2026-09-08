@@ -25,5 +25,5 @@ Keep marketing and transactional identities and consent separate when you can. R
 			title: "Unsubscribe",
 		},
 	],
-	relatedFeatureHref: "/pricing",
+	relatedFeatureHref: "/features/email-marketing",
 };

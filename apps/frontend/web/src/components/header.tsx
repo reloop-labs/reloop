@@ -986,7 +986,7 @@ const navItems: NavItem[] = [
 						},
 						{
 							title: "Marketing",
-							href: "/use-cases/automated-email",
+							href: "/features/email-marketing",
 							description:
 								"Broadcasts, automated drip flows, and audience segments.",
 							featuredMarketing: true,
