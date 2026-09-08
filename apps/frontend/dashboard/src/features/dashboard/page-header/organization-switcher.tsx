@@ -22,7 +22,6 @@ function OrgAvatar({
 	const logoSrc = ensureAbsoluteUrl(org.logo);
 	const initial = getAvatarInitial(org.name, org.name);
 	const dim = size === 20 ? "h-5 w-5" : "h-6 w-6";
-	const textSize = size === 20 ? "text-[10px]" : "text-[11px]";
 
 	if (logoSrc && !imgError) {
 		return (
@@ -45,22 +44,9 @@ function OrgAvatar({
 
 	return (
 		<div
-			className={cn(
-				"relative flex flex-shrink-0 items-center justify-center overflow-hidden rounded-lg",
-				dim,
-			)}
+			className={cn("relative flex-shrink-0 overflow-hidden rounded-lg", dim)}
 		>
-			<div className="absolute inset-0">
-				<PixelAvatar seed={org.id} />
-			</div>
-			<span
-				className={cn(
-					"relative z-[1] font-semibold text-white [text-shadow:0_1px_2px_rgba(0,0,0,0.45)]",
-					textSize,
-				)}
-			>
-				{initial}
-			</span>
+			<PixelAvatar seed={org.id} letter={initial} />
 		</div>
 	);
 }

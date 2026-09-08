@@ -3,9 +3,11 @@ import {
 	encodePixelArt,
 	encodePixelRow,
 	getPixelArtGrid,
+	getPixelArtGridWithLetter,
 	getPixelArtPalette,
 	PIXEL_GRID_SIZE,
 } from "./pixel-art";
+import { getPixelGlyph, PIXEL_FONT, PIXEL_GLYPH_SCALE } from "./pixel-font";
 
 /** Decode reference-style RLE back into a grid for round-trip checks. */
 function decodePixelArt(d: string, size: number): boolean[] {
@@ -78,5 +80,51 @@ describe("encodePixelArt", () => {
 		cells[1 * size + 4] = true;
 		expect(encodePixelRow(cells, size, 1)).toBe("M0 1h2m2 0h1");
 		expect(encodePixelRow(cells, size, 2)).toBe("");
+	});
+});
+
+describe("getPixelArtGridWithLetter", () => {
+	test("carves the glyph into a cleared center plaque", () => {
+		const size = PIXEL_GRID_SIZE;
+		const grid = getPixelArtGridWithLetter("org_123", "D");
+		const glyph = getPixelGlyph("D");
+		// Scaled glyph + 2px padding plaque, centered on 32.
+		const glyphWidth = 5 * PIXEL_GLYPH_SCALE;
+		const glyphHeight = 7 * PIXEL_GLYPH_SCALE;
+		const plaqueWidth = glyphWidth + 4;
+		const plaqueHeight = glyphHeight + 4;
+		const plaqueX = Math.round((size - plaqueWidth) / 2);
+		const plaqueY = Math.round((size - plaqueHeight) / 2);
+		for (let y = 0; y < 7; y++) {
+			for (let x = 0; x < 5; x++) {
+				const expected = glyph[y * 5 + x];
+				for (let sy = 0; sy < PIXEL_GLYPH_SCALE; sy++) {
+					for (let sx = 0; sx < PIXEL_GLYPH_SCALE; sx++) {
+						expect(
+							grid[
+								(plaqueY + 2 + y * PIXEL_GLYPH_SCALE + sy) * size +
+									(plaqueX + 2 + x * PIXEL_GLYPH_SCALE + sx)
+							],
+						).toBe(expected);
+					}
+				}
+			}
+		}
+		// Plaque padding ring stays cleared.
+		expect(grid[plaqueY * size + plaqueX]).toBe(false);
+		expect(
+			grid[(plaqueY + plaqueHeight - 1) * size + (plaqueX + plaqueWidth - 1)],
+		).toBe(false);
+	});
+
+	test("round-trips and is deterministic", () => {
+		const grid = getPixelArtGridWithLetter("org_123", "D");
+		expect(decodePixelArt(encodePixelArt(grid), PIXEL_GRID_SIZE)).toEqual(grid);
+		expect(getPixelArtGridWithLetter("org_123", "D")).toEqual(grid);
+	});
+
+	test("unknown chars fall back to the ? glyph", () => {
+		expect(getPixelGlyph("€")).toEqual(getPixelGlyph("?"));
+		expect(Object.keys(PIXEL_FONT)).toHaveLength(37);
 	});
 });

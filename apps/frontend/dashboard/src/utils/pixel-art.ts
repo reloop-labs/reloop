@@ -6,6 +6,13 @@
  * run-length horizontal strokes (`M{x} {y}h{len}` runs joined by relative
  * `m{gap} 0` gaps) drawn with `translate(0,2.5)scale(5)`.
  */
+import {
+	GLYPH_PADDING,
+	getPixelGlyph,
+	PIXEL_GLYPH_HEIGHT,
+	PIXEL_GLYPH_SCALE,
+	PIXEL_GLYPH_WIDTH,
+} from "./pixel-font";
 
 /** Fast non-cryptographic string hash (djb2). */
 function hashString(str: string): number {
@@ -113,4 +120,46 @@ export function encodePixelArt(
 		d += encodePixelRow(cells, size, y);
 	}
 	return d;
+}
+
+/**
+ * Grid with a 5x7 initial carved into a cleared center plaque.
+ * The glyph reads as light-on-dark plaque and needs no text overlay —
+ * the whole avatar stays a single stroke path in the reference dialect.
+ */
+export function getPixelArtGridWithLetter(
+	seed: string,
+	letter: string,
+	size = PIXEL_GRID_SIZE,
+): boolean[] {
+	const cells = getPixelArtGrid(seed, size);
+	const glyph = getPixelGlyph(letter);
+	const scale = PIXEL_GLYPH_SCALE;
+	const glyphWidth = PIXEL_GLYPH_WIDTH * scale;
+	const glyphHeight = PIXEL_GLYPH_HEIGHT * scale;
+	const plaqueWidth = glyphWidth + GLYPH_PADDING * 2;
+	const plaqueHeight = glyphHeight + GLYPH_PADDING * 2;
+	const plaqueX = Math.round((size - plaqueWidth) / 2);
+	const plaqueY = Math.round((size - plaqueHeight) / 2);
+
+	for (let y = 0; y < plaqueHeight; y++) {
+		for (let x = 0; x < plaqueWidth; x++) {
+			cells[(plaqueY + y) * size + (plaqueX + x)] = false;
+		}
+	}
+	for (let y = 0; y < PIXEL_GLYPH_HEIGHT; y++) {
+		for (let x = 0; x < PIXEL_GLYPH_WIDTH; x++) {
+			if (glyph[y * PIXEL_GLYPH_WIDTH + x]) {
+				for (let sy = 0; sy < scale; sy++) {
+					for (let sx = 0; sx < scale; sx++) {
+						cells[
+							(plaqueY + GLYPH_PADDING + y * scale + sy) * size +
+								(plaqueX + GLYPH_PADDING + x * scale + sx)
+						] = true;
+					}
+				}
+			}
+		}
+	}
+	return cells;
 }

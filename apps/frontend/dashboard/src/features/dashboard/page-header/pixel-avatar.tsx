@@ -3,6 +3,7 @@ import { useMemo } from "react";
 import {
 	encodePixelArt,
 	getPixelArtGrid,
+	getPixelArtGridWithLetter,
 	getPixelArtPalette,
 	PIXEL_GRID_SIZE,
 	PIXEL_PATH_TRANSFORM,
@@ -12,13 +13,24 @@ import {
  * Deterministic pixel-art avatar seeded by email, in the reference
  * artwork's dialect: deep-purple ground + light run-length strokes.
  * Scales to any container; pixels stay crisp.
+ *
+ * Pass `letter` to carve a 5x7 initial into a cleared center plaque —
+ * no text overlay needed, the glyph is part of the pixel grid.
  */
-export function PixelAvatar({ seed }: { seed: string }) {
+export function PixelAvatar({
+	seed,
+	letter,
+}: {
+	seed: string;
+	letter?: string;
+}) {
 	const { background, foreground, d } = useMemo(() => {
 		const palette = getPixelArtPalette(seed);
-		const grid = getPixelArtGrid(seed);
+		const grid = letter
+			? getPixelArtGridWithLetter(seed, letter)
+			: getPixelArtGrid(seed);
 		return { ...palette, d: encodePixelArt(grid) };
-	}, [seed]);
+	}, [seed, letter]);
 
 	return (
 		<svg
