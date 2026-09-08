@@ -9,6 +9,7 @@ import {
 	emailButtonBubbleTrigger,
 	emailTextBubbleTrigger,
 } from "./bubble-trigger";
+import { EmailImageSelectionOverlay } from "./email-image-selection-overlay";
 import { useEmailHtmlEditorStore } from "./store";
 
 import "@react-email/editor/themes/default.css";
@@ -41,7 +42,7 @@ export function EmailHtmlCanvas() {
 				</BubbleMenu.ButtonToolbar>
 				<BubbleMenu.ButtonForm />
 			</BubbleMenu>
-			<BubbleMenu.ImageDefault />
+			<EmailImageSelectionOverlay />
 		</div>
 	);
 }

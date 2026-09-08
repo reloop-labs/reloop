@@ -140,6 +140,33 @@
 	vertical-align: middle;
 }
 
+/* Image block alignment from the Inspector (`alignment` attr + margin styles).
+ * Canvas renders <img> directly, so center/right need explicit margins. */
+.tiptap.ProseMirror img[alignment="center"],
+.ProseMirror img[alignment="center"],
+.tiptap.ProseMirror img[align="center"],
+.ProseMirror img[align="center"] {
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+}
+.tiptap.ProseMirror img[alignment="right"],
+.ProseMirror img[alignment="right"],
+.tiptap.ProseMirror img[align="right"],
+.ProseMirror img[align="right"] {
+	display: block;
+	margin-left: auto;
+	margin-right: 0;
+}
+.tiptap.ProseMirror img[alignment="left"],
+.ProseMirror img[alignment="left"],
+.tiptap.ProseMirror img[align="left"],
+.ProseMirror img[align="left"] {
+	display: block;
+	margin-left: 0;
+	margin-right: auto;
+}
+
 /*
  * Empty Columns used as a 1px rule (Twitch logo divider). TipTap's cell
  * schema is `block+`, so it inserts a paragraph + slash placeholder and
@@ -199,4 +226,24 @@
 [data-re-bubble-menu],
 [data-re-slash-command] {
 	z-index: 9999 !important;
+}
+
+/* Button node selection outline in the canvas */
+.tiptap.ProseMirror .ProseMirror-selectednode a.node-button,
+.tiptap.ProseMirror a.node-button.ProseMirror-selectednode,
+.tiptap.ProseMirror div.ProseMirror-selectednode > a.node-button,
+.ProseMirror .ProseMirror-selectednode a.node-button,
+.ProseMirror a.node-button.ProseMirror-selectednode,
+.ProseMirror div.ProseMirror-selectednode > a.node-button {
+	outline: 2px solid #2563eb !important;
+	outline-offset: 2px !important;
+}
+
+/* Image node selection outline in the canvas */
+.tiptap.ProseMirror img.ProseMirror-selectednode,
+.tiptap.ProseMirror .ProseMirror-selectednode img,
+.ProseMirror img.ProseMirror-selectednode,
+.ProseMirror .ProseMirror-selectednode img {
+	outline: 2px solid #3b82f6 !important;
+	outline-offset: 0 !important;
 }

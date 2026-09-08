@@ -83,34 +83,34 @@ export function ColorPicker({
 						onOpenAutoFocus={(event) => event.preventDefault()}
 						onCloseAutoFocus={(event) => event.preventDefault()}
 					>
-					<div className="flex flex-col gap-3">
-						<HexAlphaColorPicker
-							color={normalizedValue}
-							onChange={onChange}
-							className="custom-color-picker"
-						/>
+						<div className="flex flex-col gap-3">
+							<HexAlphaColorPicker
+								color={normalizedValue}
+								onChange={onChange}
+								className="custom-color-picker"
+							/>
 
-						{/* On this document */}
-						<div className="flex flex-col gap-1.5 border-stroke-soft-200 border-t pt-2 dark:border-stroke-soft-100/40">
-							<span className="text-text-sub-600 text-xs dark:text-text-soft-400">
-								On this document:
-							</span>
-							<div className="flex items-center gap-1.5">
-								{documentColors.map((c, i) => (
-									<button
-										key={i}
-										type="button"
-										onMouseDown={(event) => event.preventDefault()}
-										onClick={() => onChange(c)}
-										style={{ backgroundColor: c }}
-										className="size-6 cursor-pointer rounded-md border border-stroke-soft-200 opacity-90 transition-opacity hover:opacity-100 focus:outline-none dark:border-stroke-soft-100/40"
-										title={c}
-									/>
-								))}
+							{/* On this document */}
+							<div className="flex flex-col gap-1.5 border-stroke-soft-200 border-t pt-2 dark:border-stroke-soft-100/40">
+								<span className="text-text-sub-600 text-xs dark:text-text-soft-400">
+									On this document:
+								</span>
+								<div className="flex items-center gap-1.5">
+									{documentColors.map((c, i) => (
+										<button
+											key={i}
+											type="button"
+											onMouseDown={(event) => event.preventDefault()}
+											onClick={() => onChange(c)}
+											style={{ backgroundColor: c }}
+											className="size-6 cursor-pointer rounded-md border border-stroke-soft-200 opacity-90 transition-opacity hover:opacity-100 focus:outline-none dark:border-stroke-soft-100/40"
+											title={c}
+										/>
+									))}
+								</div>
 							</div>
 						</div>
-					</div>
-					<style jsx global>{`
+						<style jsx global>{`
 						.custom-color-picker.react-colorful {
 							width: 100% !important;
 							height: auto !important;

@@ -31,21 +31,36 @@ export function EmailHtmlEditorShell({ initialHtml }: { initialHtml: string }) {
 							? "Source and canvas stay in sync"
 							: "Select a block to inspect"}
 					</p>
-					<button
-						type="button"
-						onClick={() =>
-							setViewMode((mode) => (mode === "code" ? "visual" : "code"))
-						}
-						className={cn(
-							"inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 font-medium text-[12px] transition-colors",
-							isCodeSplit
-								? "bg-bg-strong-950 text-white dark:bg-white dark:text-black"
-								: "bg-bg-weak-50 text-text-sub-600 hover:text-text-strong-950 dark:bg-white/8 dark:text-white/70",
-						)}
-					>
-						<Icon name="code" className="h-3.5 w-3.5" />
-						{"<>"}
-					</button>
+					<div className="flex items-center gap-0.5 rounded-[10px] border border-stroke-soft-100 bg-bg-weak-50/80 p-0.5 dark:border-stroke-soft-100/40 dark:bg-white/[0.06]">
+						<button
+							type="button"
+							title="Visual editor"
+							aria-label="Visual editor"
+							onClick={() => setViewMode("visual")}
+							className={cn(
+								"flex h-7 w-7 items-center justify-center rounded-lg transition-[background-color,color,transform] duration-150 ease-out active:scale-[0.97]",
+								!isCodeSplit
+									? "bg-bg-white-0 text-text-strong-950 shadow-regular-xs dark:bg-white/12 dark:text-white"
+									: "text-text-sub-600 hover:text-text-strong-950 dark:hover:text-white",
+							)}
+						>
+							<Icon name="pencil" className="h-3.5 w-3.5" />
+						</button>
+						<button
+							type="button"
+							title="Code editor"
+							aria-label="Code editor"
+							onClick={() => setViewMode("code")}
+							className={cn(
+								"flex h-7 w-7 items-center justify-center rounded-lg transition-[background-color,color,transform] duration-150 ease-out active:scale-[0.97]",
+								isCodeSplit
+									? "bg-bg-white-0 text-text-strong-950 shadow-regular-xs dark:bg-white/12 dark:text-white"
+									: "text-text-sub-600 hover:text-text-strong-950 dark:hover:text-white",
+							)}
+						>
+							<Icon name="code" className="h-3.5 w-3.5" />
+						</button>
+					</div>
 				</div>
 				<div className="flex min-h-0 flex-1 overflow-hidden">
 					{isCodeSplit ? (
