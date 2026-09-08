@@ -8,7 +8,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
-import { getAvatarGradient, getAvatarInitial } from "#/utils/avatar";
+import { PixelAvatarTile } from "#/features/dashboard/page-header/pixel-avatar";
 
 const actionKbdOnBlueClassName =
 	"border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]";
@@ -173,14 +173,10 @@ export const ChangeRoleModal = ({
 						</span>
 						<div className="overflow-hidden rounded-xl border border-stroke-soft-100 dark:border-stroke-soft-100/50">
 							<div className="flex items-center gap-3 px-3 py-2">
-								<div
-									className={cn(
-										"flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full font-semibold text-white text-xs uppercase tracking-wide shadow-sm",
-										getAvatarGradient(memberEmail || "user"),
-									)}
-								>
-									{getAvatarInitial(memberName || null, memberEmail)}
-								</div>
+								<PixelAvatarTile
+									seed={memberEmail || "user"}
+									className="h-7 w-7"
+								/>
 								<div className="min-w-0 flex-1">
 									<span className="block truncate font-medium text-paragraph-sm text-text-strong-950">
 										{displayName}

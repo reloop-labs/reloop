@@ -9,15 +9,16 @@ import axios from "axios";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+import { PixelAvatarTile } from "#/features/dashboard/page-header/pixel-avatar";
 import { queryKeys } from "#/lib/query-keys";
 import { ensureAbsoluteUrl } from "#/utils/absolute-url";
-import { getAvatarGradient, getAvatarInitial } from "#/utils/avatar";
 
 interface AccountProfilePictureProps {
 	initialImageUrl?: string;
 	onImageChange: (url: string) => void;
-	/** Display name used for initials fallback. */
+	/** Retained for API compat; fallback art is seeded by email. */
 	name?: string | null;
+	/** Retained for API compat; fallback art is seeded by email. */
 	initials: string;
 	email: string;
 }
@@ -25,8 +26,6 @@ interface AccountProfilePictureProps {
 export function AccountProfilePicture({
 	initialImageUrl,
 	onImageChange,
-	name,
-	initials,
 	email,
 }: AccountProfilePictureProps) {
 	const queryClient = useQueryClient();
@@ -56,8 +55,6 @@ export function AccountProfilePicture({
 	// Prefer local data-URL first (same as onboarding).
 	const displaySrc = ensureAbsoluteUrl(imagePreview || imageUrl);
 	const showPhoto = Boolean(displaySrc) && !imageFailed;
-	const fallbackInitial =
-		initials?.trim() || getAvatarInitial(name ?? null, email);
 
 	const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];
@@ -156,7 +153,7 @@ export function AccountProfilePicture({
 						"relative flex h-[72px] w-[72px] shrink-0 items-center justify-center overflow-hidden rounded-full",
 						showPhoto
 							? "border border-stroke-soft-200 border-solid bg-bg-white-0"
-							: cn("border-none", getAvatarGradient(email || "user")),
+							: "border-none bg-bg-weak-50",
 						isUploading && "cursor-wait opacity-50",
 						!isUploading && "cursor-pointer",
 					)}
@@ -167,11 +164,11 @@ export function AccountProfilePicture({
 					<span
 						aria-hidden={showPhoto || isUploading}
 						className={cn(
-							"absolute inset-0 flex items-center justify-center font-semibold text-2xl text-white uppercase tracking-wide",
+							"absolute inset-0",
 							(showPhoto || isUploading) && "invisible",
 						)}
 					>
-						{fallbackInitial}
+						<PixelAvatarTile seed={email || "user"} className="h-full w-full" />
 					</span>
 
 					{isUploading ? (

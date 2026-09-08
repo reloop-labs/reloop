@@ -14,7 +14,7 @@ import {
 } from "motion/react";
 import { useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
-import { getAvatarGradient, getAvatarInitial } from "#/utils/avatar";
+import { PixelAvatarTile } from "#/features/dashboard/page-header/pixel-avatar";
 
 interface RevokeInviteModalProps {
 	open: boolean;
@@ -145,13 +145,8 @@ export const RevokeInviteModal = ({
 				<div className="mt-5 flex items-center gap-3 rounded-xl border border-stroke-soft-100 bg-bg-weak-50/50 p-3.5 dark:border-stroke-soft-100/40">
 					<Avatar.Root size="32" color="gray" className="flex-shrink-0">
 						<Avatar.Image asChild>
-							<div
-								className={cn(
-									"flex h-8 w-8 items-center justify-center rounded-full font-semibold text-[11px] text-white uppercase tracking-wide shadow-xs",
-									getAvatarGradient(inviteEmail),
-								)}
-							>
-								{getAvatarInitial(null, inviteEmail)}
+							<div className="h-8 w-8 overflow-hidden rounded-full bg-bg-weak-50">
+								<PixelAvatarTile seed={inviteEmail} className="h-full w-full" />
 							</div>
 						</Avatar.Image>
 					</Avatar.Root>

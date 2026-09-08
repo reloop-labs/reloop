@@ -8,10 +8,10 @@ import { useQueryState } from "nuqs";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { useSessionQuery } from "#/features/auth/session-query";
+import { PixelAvatarTile } from "#/features/dashboard/page-header/pixel-avatar";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import { useOrgPermissions } from "#/features/settings/use-org-permissions";
 import { queryKeys } from "#/lib/query-keys";
-import { getAvatarGradient, getAvatarInitial } from "#/utils/avatar";
 import {
 	dedupePendingInvitesByEmail,
 	isInvitationActionable,
@@ -473,14 +473,10 @@ export function TeamList({ searchQuery, filters = "all" }: TeamListProps) {
 									>
 										{/* User Column */}
 										<div className="flex min-w-0 items-center gap-3">
-											<div
-												className={cn(
-													"flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full font-semibold text-white text-xs uppercase tracking-wide shadow-sm",
-													getAvatarGradient(invite.email),
-												)}
-											>
-												{getAvatarInitial(null, invite.email)}
-											</div>
+											<PixelAvatarTile
+												seed={invite.email}
+												className="h-6 w-6"
+											/>
 											<div className="min-w-0">
 												<span className="block truncate font-medium text-label-sm text-text-strong-950">
 													{invite.email.split("@")[0]}
@@ -569,16 +565,11 @@ export function TeamList({ searchQuery, filters = "all" }: TeamListProps) {
 													/>
 												) : (
 													<Avatar.Image asChild>
-														<div
-															className={cn(
-																"flex h-full w-full items-center justify-center rounded-full font-semibold text-white text-xs uppercase tracking-wide shadow-sm",
-																getAvatarGradient(member.user.email),
-															)}
-														>
-															{getAvatarInitial(
-																member.user.name,
-																member.user.email,
-															)}
+														<div className="h-full w-full overflow-hidden rounded-full bg-bg-weak-50">
+															<PixelAvatarTile
+																seed={member.user.email}
+																className="h-full w-full"
+															/>
 														</div>
 													</Avatar.Image>
 												)}

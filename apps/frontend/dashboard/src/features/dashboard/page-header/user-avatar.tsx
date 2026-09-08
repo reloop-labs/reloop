@@ -2,7 +2,7 @@ import * as Avatar from "@reloop/ui/avatar";
 import { cn } from "@reloop/ui/cn";
 import { useEffect, useState } from "react";
 import { ensureAbsoluteUrl } from "#/utils/absolute-url";
-import { getAvatarGradient, getAvatarInitial } from "#/utils/avatar";
+import { PixelAvatar } from "./pixel-avatar";
 
 type AvatarSize = React.ComponentProps<typeof Avatar.Root>["size"];
 
@@ -12,13 +12,13 @@ interface UserAvatarProps {
 	image?: string | null;
 	size?: AvatarSize;
 	className?: string;
-	/** Extra classes for the initials fallback (e.g. text size). */
+	/** Extra classes for the fallback layer (e.g. background tint). */
 	initialsClassName?: string;
 	alt?: string;
 }
 
 /**
- * Stable user avatar: gradient+initials always sit under the photo so a
+ * Stable user avatar: pixel-art identicon always sits under the photo so a
  * failed/slow/expired image URL never leaves an empty circle.
  */
 export function UserAvatar({
@@ -39,7 +39,6 @@ export function UserAvatar({
 
 	const showImage = Boolean(imageSrc) && !imageFailed;
 	const label = alt || name || email;
-	const initial = getAvatarInitial(name ?? null, email);
 
 	return (
 		<Avatar.Root
@@ -50,13 +49,12 @@ export function UserAvatar({
 			<div
 				aria-hidden={showImage}
 				className={cn(
-					"absolute inset-0 flex h-full w-full items-center justify-center rounded-full font-medium text-white uppercase tracking-wide shadow-sm",
-					getAvatarGradient(email || "user"),
+					"absolute inset-0 h-full w-full",
 					initialsClassName,
 					showImage && "invisible",
 				)}
 			>
-				{initial}
+				<PixelAvatar seed={email || "user"} />
 			</div>
 			{showImage ? (
 				<img

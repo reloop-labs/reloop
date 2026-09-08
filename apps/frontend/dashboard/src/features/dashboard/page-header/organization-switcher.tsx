@@ -6,7 +6,8 @@ import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import { ensureAbsoluteUrl } from "#/utils/absolute-url";
-import { getAvatarGradient, getAvatarInitial } from "#/utils/avatar";
+import { getAvatarInitial } from "#/utils/avatar";
+import { PixelAvatar } from "./pixel-avatar";
 import { PlanBadge } from "./plan-badge";
 import type { Organization } from "./use-active-organization";
 
@@ -19,7 +20,6 @@ function OrgAvatar({
 }) {
 	const [imgError, setImgError] = useState(false);
 	const logoSrc = ensureAbsoluteUrl(org.logo);
-	const gradient = getAvatarGradient(org.id);
 	const initial = getAvatarInitial(org.name, org.name);
 	const dim = size === 20 ? "h-5 w-5" : "h-6 w-6";
 	const textSize = size === 20 ? "text-[10px]" : "text-[11px]";
@@ -46,13 +46,21 @@ function OrgAvatar({
 	return (
 		<div
 			className={cn(
-				"flex flex-shrink-0 items-center justify-center rounded-lg bg-gradient-to-br font-semibold text-white",
+				"relative flex flex-shrink-0 items-center justify-center overflow-hidden rounded-lg",
 				dim,
-				textSize,
-				gradient,
 			)}
 		>
-			{initial}
+			<div className="absolute inset-0">
+				<PixelAvatar seed={org.id} />
+			</div>
+			<span
+				className={cn(
+					"relative z-[1] font-semibold text-white [text-shadow:0_1px_2px_rgba(0,0,0,0.45)]",
+					textSize,
+				)}
+			>
+				{initial}
+			</span>
 		</div>
 	);
 }
