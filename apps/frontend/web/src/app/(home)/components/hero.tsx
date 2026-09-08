@@ -4,8 +4,10 @@ import { CopyCodeBlock } from "@reloop/ui/copy-code-block";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { getLanguageIcon } from "@reloop/web/components/mdx/language-icons";
+import { PixelBlast } from "@reloop/web/components/pixel-blast";
 import { hostedSignupHref } from "@reloop/web/lib/site";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { useTheme } from "next-themes";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { HeroWindowChrome } from "./hero-chrome";
@@ -62,39 +64,6 @@ const INSTALL_COMMANDS: Record<InstallMethod, string> = {
 	cli: "npx reloop init",
 };
 
-const HERO_AI_PROMPT = `Integrate Reloop into this project.
-
-I will set RELOOP_API_KEY in my .env (never commit the real key). Use this placeholder until I paste the real value:
-RELOOP_API_KEY=rl_your_api_key_here
-
-Do the following:
-1. Detect this project's framework and language.
-2. Install the official Reloop SDK (Node/Python: reloop-email; Go: github.com/reloop-labs/reloop-go/v2; PHP: reloop/reloop-email; Java: sh.reloop:reloop-email; .NET: Reloop.Email; Ruby: reloop-email; Elixir: reloop), or call the REST API.
-3. Wire the key from env and send a test email:
-   - from: sender@example.com
-   - to: recipient@example.com
-   - subject: Welcome to our app
-   - html: <h1>Welcome!</h1><p>Thanks for signing up.</p>
-4. Follow this repo's conventions and handle errors cleanly.
-
-Useful docs:
-- API Reference: https://reloop.sh/docs/api/mail/post-api-mail-v1send
-- SDKs & Guides: https://reloop.sh/sdk
-- API Keys: https://reloop.sh/docs/learn/api-keys
-
-Show only the files/code I need to add or change.`;
-
-function PromptIcon({ className }: { className?: string }) {
-	return (
-		<svg viewBox="0 0 16 16" className={className} fill="none" aria-hidden>
-			<path
-				fill="currentColor"
-				d="M6.75 14a.75.75 0 1 1 0 1.5.75.75 0 0 1 0-1.5m3.75 0a.75.75 0 1 1 0 1.5.75.75 0 0 1 0-1.5m3.75 0a.75.75 0 1 1 0 1.5.75.75 0 0 1 0-1.5m-7.5-3.25a.75.75 0 1 1 0 1.5.75.75 0 0 1 0-1.5m7.5 0a.75.75 0 1 1 0 1.5.75.75 0 0 1 0-1.5M8.25.5C9.22.5 10 1.28 10 2.25V3H8.5v-.75A.25.25 0 0 0 8.25 2h-5.5a.25.25 0 0 0-.25.25v7.5c0 .14.11.25.25.25H4.5v1.5H2.75C1.78 11.5 1 10.72 1 9.75v-7.5C1 1.28 1.78.5 2.75.5zm-1.5 7.25a.75.75 0 1 1 0 1.5.75.75 0 0 1 0-1.5m7.5 0a.75.75 0 1 1 0 1.5.75.75 0 0 1 0-1.5M6.75 4.5a.75.75 0 1 1 0 1.5.75.75 0 0 1 0-1.5m3.75 0a.75.75 0 1 1 0 1.5.75.75 0 0 1 0-1.5m3.75 0a.75.75 0 1 1 0 1.5.75.75 0 0 1 0-1.5"
-			/>
-		</svg>
-	);
-}
-
 export interface HeroProps {
 	variant?: "default" | "self-host";
 }
@@ -102,18 +71,8 @@ export interface HeroProps {
 export function Hero({ variant = "default" }: HeroProps) {
 	const [installMethod, setInstallMethod] = useState<InstallMethod>("curl");
 	const [active, setActive] = useState<HeroTabId>("overview");
-	const [copied, setCopied] = useState(false);
 	const reduceMotion = useReducedMotion();
-
-	const handleCopyPrompt = async () => {
-		try {
-			await navigator.clipboard.writeText(HERO_AI_PROMPT);
-			setCopied(true);
-			window.setTimeout(() => setCopied(false), 2000);
-		} catch {
-			// ignore
-		}
-	};
+	const { resolvedTheme } = useTheme();
 
 	const heroRef = useRef<HTMLElement>(null);
 	const panelRef = useRef<HTMLDivElement>(null);
@@ -209,8 +168,27 @@ export function Hero({ variant = "default" }: HeroProps) {
 					</div>
 				</div>
 			) : (
-				<div className="relative mx-auto grid w-full max-w-5xl items-center gap-10 border-stroke-soft-200 border-x px-6 pt-24 pb-14 sm:px-8 sm:pt-28 sm:pb-16 md:max-w-7xl lg:grid-cols-[1.1fr_1fr] lg:gap-6 lg:px-12 lg:pt-32 lg:pb-20 dark:border-white/10">
-					<div className="order-2 flex flex-col items-center text-center lg:order-1 lg:items-start lg:text-left">
+				<div className="relative mx-auto grid w-full max-w-5xl items-center gap-10 overflow-hidden border-stroke-soft-200 border-x px-6 pt-[224px] pb-40 sm:px-8 md:max-w-7xl lg:grid-cols-[1.1fr_1fr] lg:gap-6 lg:px-12 dark:border-white/10">
+					<div
+						aria-hidden="true"
+						className="absolute inset-0 [-webkit-mask-image:linear-gradient(to_right,black_0%,black_28%,transparent_42%,transparent_58%,black_72%,black_100%)] [mask-image:linear-gradient(to_right,black_0%,black_28%,transparent_42%,transparent_58%,black_72%,black_100%)]"
+					>
+						<PixelBlast
+							variant="square"
+							pixelSize={2}
+							color={resolvedTheme === "dark" ? "#93c5fd" : "#2563eb"}
+							patternScale={4}
+							patternDensity={0.45}
+							enableRipples={false}
+							rippleSpeed={0.05}
+							rippleThickness={0.09}
+							rippleIntensityScale={2.5}
+							speed={0.2}
+							transparent
+							edgeFade={0.65}
+						/>
+					</div>
+					<div className="relative z-10 order-2 flex flex-col items-center text-center lg:order-1 lg:items-start lg:text-left">
 						<h1 className="max-w-xl text-center font-semibold text-[2.5rem] text-text-strong-950 leading-[1.06] tracking-[-0.04em] sm:text-[3.5rem] lg:text-left lg:text-[4.25rem] dark:text-white">
 							Email API for Developers
 						</h1>
@@ -228,55 +206,30 @@ export function Hero({ variant = "default" }: HeroProps) {
 								<a href={hostedSignupHref}>Get Started</a>
 							</FancyButton.Root>
 							<FancyButton.Root
-								type="button"
+								asChild
 								variant="basic"
 								size="medium"
-								onClick={handleCopyPrompt}
 								className="h-11 rounded-xl px-6 font-medium text-[15.5px]"
-								aria-label={copied ? "Copied" : "Copy agent prompt"}
 							>
-								<span className="relative inline-flex items-center justify-center">
-									{/* Invisible phantom spacer permanently locks width to prevent layout shift */}
-									<span
-										aria-hidden="true"
-										className="pointer-events-none invisible flex items-center justify-center gap-2"
-									>
-										<PromptIcon className="size-4 shrink-0" />
-										<span>Copy agent prompt</span>
-									</span>
-
-									<AnimatePresence mode="wait" initial={false}>
-										<motion.span
-											key={copied ? "copied" : "idle"}
-											transition={{ type: "spring", duration: 0.22, bounce: 0 }}
-											initial={{ opacity: 0, y: -8 }}
-											animate={{ opacity: 1, y: 0 }}
-											exit={{ opacity: 0, y: 8 }}
-											className="absolute inset-0 flex items-center justify-center gap-2 whitespace-nowrap"
-										>
-											{copied ? (
-												<Icon
-													name="check-circle"
-													className="size-4 shrink-0 text-emerald-600 dark:text-emerald-400"
-												/>
-											) : (
-												<PromptIcon className="size-4 shrink-0" />
-											)}
-											<span>{copied ? "Copied!" : "Copy agent prompt"}</span>
-										</motion.span>
-									</AnimatePresence>
-								</span>
+								<a
+									href="https://cal.com/pranavp/30"
+									target="_blank"
+									rel="noreferrer"
+								>
+									<Icon name="calendar" className="size-4 shrink-0" />
+									<span>Schedule call</span>
+								</a>
 							</FancyButton.Root>
 						</div>
 					</div>
 					{/* Optical offset: the CRT's 3/4 mass sits right and high of the bounding-box center. */}
-					<div className="lg:-translate-x-16 order-1 relative h-[320px] w-full sm:h-[400px] lg:order-2 lg:h-[470px] lg:translate-y-4">
+					<div className="relative z-10 lg:-translate-x-16 order-1 h-[320px] w-full sm:h-[400px] lg:order-2 lg:h-[470px] lg:translate-y-4">
 						<MacintoshHeroMonitorLazy />
 					</div>
 				</div>
 			)}
 
-			<div className="relative w-full flex-1 overflow-hidden bg-bg-white-0 dark:bg-black">
+			<div className="relative w-full flex-1 overflow-hidden border-stroke-soft-200 border-t bg-bg-white-0 dark:border-white/10 dark:bg-black">
 				<div
 					ref={panelRef}
 					className="relative z-10 mx-auto flex h-dvh w-full max-w-5xl flex-col border-stroke-soft-200 border-x px-3 pt-10 pb-10 sm:px-6 sm:pt-14 sm:pb-14 md:max-w-7xl lg:px-8 lg:pt-20 lg:pb-16 dark:border-white/10"
