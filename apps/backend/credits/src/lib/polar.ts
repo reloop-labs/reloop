@@ -9,6 +9,7 @@ import {
 	createPolarCheckout,
 	createPolarCustomerPortal,
 	ingestPolarEmailEvents,
+	isPolarMissingCustomerError,
 	listPolarProducts,
 } from "./polar-http";
 
@@ -102,4 +103,4 @@ export function verifyPolarWebhook(args: {
 	}
 }
 
-export { WebhookVerificationError };
+export { isPolarMissingCustomerError, WebhookVerificationError };

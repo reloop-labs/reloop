@@ -22,6 +22,14 @@ export class PolarHttpError extends Error {
 	}
 }
 
+export function isPolarMissingCustomerError(error: unknown): boolean {
+	return (
+		error instanceof PolarHttpError &&
+		(error.status === 404 || error.status === 422) &&
+		/customer does not exist/i.test(error.body)
+	);
+}
+
 function asRecord(value: unknown): Record<string, unknown> | null {
 	if (!value || typeof value !== "object" || Array.isArray(value)) return null;
 	return value as Record<string, unknown>;

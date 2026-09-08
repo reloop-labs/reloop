@@ -1,10 +1,12 @@
 import { describe, expect, test } from "bun:test";
 import {
+	isPolarMissingCustomerError,
 	parsePolarCheckout,
 	parsePolarCustomer,
 	parsePolarPortal,
 	parsePolarProductRefs,
 	polarTeamCustomerCreateBody,
+	PolarHttpError,
 } from "../src/lib/polar-http";
 
 const polarProductListWithUnitBased = {
@@ -138,5 +140,29 @@ describe("polarTeamCustomerCreateBody", () => {
 			},
 		});
 		expect(body).not.toHaveProperty("email");
+	});
+});
+
+describe("isPolarMissingCustomerError", () => {
+	test("detects Polar portal 422 for a deleted Polar customer", () => {
+		expect(
+			isPolarMissingCustomerError(
+				new PolarHttpError(
+					422,
+					"/v1/customer-sessions/",
+					JSON.stringify({
+						error: "PolarRequestValidationError",
+						detail: [
+							{
+								type: "value_error",
+								loc: ["body", "customer_id"],
+								msg: "Customer does not exist.",
+								input: "70298b1b-31cf-46d6-a5e4-24a97ec2afdf",
+							},
+						],
+					}),
+				),
+			),
+		).toBe(true);
 	});
 });
