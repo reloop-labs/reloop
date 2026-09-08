@@ -190,7 +190,7 @@ export function Hero({ variant = "default" }: HeroProps) {
 					</div>
 					<div className="relative z-10 order-2 flex flex-col items-center text-center lg:order-1 lg:items-start lg:text-left">
 						<h1 className="max-w-xl text-center font-semibold text-[2.5rem] text-text-strong-950 leading-[1.06] tracking-[-0.04em] sm:text-[3.5rem] lg:text-left lg:text-[4.25rem] dark:text-white">
-							Email API for Developers
+							Email for React Developers
 						</h1>
 						<p className="mt-5 max-w-[30rem] text-balance text-center text-[16.5px] text-text-sub-600 leading-relaxed sm:mt-6 sm:text-[18.5px] lg:text-left lg:text-[20px] dark:text-white/60">
 							Reloop is the open-source email platform for transactional mail,
