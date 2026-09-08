@@ -10,7 +10,7 @@ export function MarketingHero() {
 	const { resolvedTheme } = useTheme();
 
 	return (
-		<header className="relative flex w-full flex-col items-center overflow-hidden bg-transparent px-6 pt-[224px] pb-40 text-center [--primary-base:#ea580c] [--primary-dark:#c2410c] [--primary-darker:#9a3412] [--primary-link:#c2410c] sm:px-8 lg:px-12 dark:[--primary-base:#fdba74] dark:[--primary-dark:#fdba74] dark:[--primary-darker:#fed7aa] dark:[--primary-link:#fdba74]">
+		<header className="relative flex w-full flex-col items-center overflow-hidden bg-transparent px-6 pt-[224px] pb-40 text-center [--primary-base:#ea580c] [--primary-dark:#c2410c] [--primary-darker:#9a3412] [--primary-link:#c2410c] sm:px-8 lg:px-12 dark:[--primary-base:#ea580c] dark:[--primary-dark:#ea580c] dark:[--primary-darker:#c2410c] dark:[--primary-link:#fdba74]">
 			<div
 				aria-hidden="true"
 				className="absolute inset-0 [-webkit-mask-image:linear-gradient(to_right,black_0%,black_28%,transparent_42%,transparent_58%,black_72%,black_100%)] [mask-image:linear-gradient(to_right,black_0%,black_28%,transparent_42%,transparent_58%,black_72%,black_100%)]"
@@ -36,7 +36,7 @@ export function MarketingHero() {
 						aria-hidden
 						className="inline-flex size-5 shrink-0 items-center justify-center rounded-[5px] bg-primary-dark p-px pb-[2px] dark:bg-[#7c2d12]"
 					>
-						<span className="flex size-full items-center justify-center rounded-[4px] bg-primary-base text-white shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.45)] dark:text-black dark:shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.28),0_0_0_0.5px_rgba(255,255,255,0.08)]">
+						<span className="flex size-full items-center justify-center rounded-[4px] bg-primary-base text-white shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.45)] dark:shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.28),0_0_0_0.5px_rgba(255,255,255,0.08)]">
 							<Icon name="mega-phone" className="size-[11px]" />
 						</span>
 					</span>
