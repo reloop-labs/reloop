@@ -1,3 +1,4 @@
+import { ErrorResponseSchema } from "@reloop/credits/error/credits.error-response";
 import { authMiddleware } from "@reloop/credits/middleware/auth-middleware";
 import { CreditsModel } from "@reloop/credits/model/credits.model";
 import { Elysia } from "elysia";
@@ -12,7 +13,7 @@ export const listOrgPlansRoute = new Elysia().use(authMiddleware).get(
 		authNoOrg: true,
 		response: {
 			200: CreditsModel.orgPlansResponse,
-			401: CreditsModel.unauthorized,
+			401: ErrorResponseSchema,
 		},
 		detail: {
 			tags: ["Credits"],

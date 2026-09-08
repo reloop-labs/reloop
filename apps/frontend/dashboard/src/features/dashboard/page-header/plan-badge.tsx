@@ -25,14 +25,28 @@ export function PlanBadge({
 	planId: string | undefined;
 	compact?: boolean;
 }) {
-	const id: PlanId = planId && isPlanId(planId) ? planId : "free";
+	const sizeClass = compact
+		? "h-4 px-1.5 text-[9px] leading-none"
+		: "h-[18px] px-2 text-[10px] leading-none";
+
+	if (!planId || !isPlanId(planId)) {
+		return (
+			<span
+				aria-hidden
+				className={cn(
+					"inline-flex shrink-0 animate-pulse rounded-full bg-bg-weak-50",
+					compact ? "h-4 w-10" : "h-[18px] w-14",
+				)}
+			/>
+		);
+	}
+
+	const id: PlanId = planId;
 	return (
 		<span
 			className={cn(
 				"inline-flex shrink-0 items-center rounded-full font-semibold uppercase tracking-wide",
-				compact
-					? "h-4 px-1.5 text-[9px] leading-none"
-					: "h-[18px] px-2 text-[10px] leading-none",
+				sizeClass,
 				PLAN_BADGE_CLASS[id],
 			)}
 		>

@@ -24,6 +24,7 @@ export type Organization = {
 	name: string;
 	slug: string;
 	logo?: string | null;
+	planId?: string;
 };
 
 export type ActiveOrganizationValue = {
