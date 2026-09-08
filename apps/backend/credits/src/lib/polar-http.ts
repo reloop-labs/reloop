@@ -185,6 +185,28 @@ export async function getPolarCustomerByExternalId(
 	return payload ? parsePolarCustomer(payload) : null;
 }
 
+/**
+ * Polar customer identity is Reloop org id (`external_id`).
+ * Top-level Polar `email` stays unset so two orgs can share one inbox;
+ * the billing address lives on the team owner.
+ */
+export function polarTeamCustomerCreateBody(input: {
+	externalId: string;
+	email: string;
+	name: string;
+}): Record<string, unknown> {
+	return {
+		type: "team",
+		name: input.name,
+		external_id: input.externalId,
+		metadata: { organization_id: input.externalId },
+		owner: {
+			email: input.email,
+			name: input.name,
+		},
+	};
+}
+
 export async function createPolarCustomer(input: {
 	externalId: string;
 	email: string;
@@ -192,35 +214,45 @@ export async function createPolarCustomer(input: {
 }): Promise<PolarCustomer> {
 	const payload = await polarJson("/v1/customers/", {
 		method: "POST",
-		body: JSON.stringify({
-			email: input.email,
-			name: input.name,
-			external_id: input.externalId,
-			type: "team",
-			metadata: { organization_id: input.externalId },
-		}),
+		body: JSON.stringify(polarTeamCustomerCreateBody(input)),
 	});
 	return parsePolarCustomer(payload);
+}
+
+export async function createOrGetPolarCustomer(input: {
+	externalId: string;
+	email: string;
+	name: string;
+}): Promise<PolarCustomer> {
+	const byExternal = await getPolarCustomerByExternalId(input.externalId);
+	if (byExternal) return byExternal;
+	return createPolarCustomer(input);
 }
 
 export async function createPolarCheckout(input: {
 	productId: string;
 	externalCustomerId: string;
+	customerId?: string;
 	customerEmail?: string;
 	successUrl: string;
 	returnUrl?: string;
 	metadata: Record<string, string>;
 }): Promise<PolarCheckout> {
+	const body: Record<string, unknown> = {
+		products: [input.productId],
+		success_url: input.successUrl,
+		metadata: input.metadata,
+	};
+	if (input.returnUrl) body.return_url = input.returnUrl;
+	if (input.customerId) {
+		body.customer_id = input.customerId;
+	} else {
+		body.external_customer_id = input.externalCustomerId;
+	}
+
 	const payload = await polarJson("/v1/checkouts/", {
 		method: "POST",
-		body: JSON.stringify({
-			products: [input.productId],
-			external_customer_id: input.externalCustomerId,
-			customer_email: input.customerEmail,
-			success_url: input.successUrl,
-			return_url: input.returnUrl,
-			metadata: input.metadata,
-		}),
+		body: JSON.stringify(body),
 	});
 	return parsePolarCheckout(payload);
 }

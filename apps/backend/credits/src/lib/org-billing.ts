@@ -321,6 +321,67 @@ export async function getOrProvisionOrgBilling(
 	return { plan, subscription, credits };
 }
 
+export function shouldClaimOrganizationExternalCustomerId(
+	organizationId: string,
+	currentOwnerId: string | null,
+): boolean {
+	return currentOwnerId == null || currentOwnerId === organizationId;
+}
+
+function isUniqueViolation(error: unknown): boolean {
+	let current: unknown = error;
+	for (let i = 0; i < 4 && current; i += 1) {
+		if (
+			typeof current === "object" &&
+			current !== null &&
+			"code" in current &&
+			(current as { code?: string }).code === "23505"
+		) {
+			return true;
+		}
+		current =
+			typeof current === "object" && current !== null && "cause" in current
+				? (current as { cause: unknown }).cause
+				: null;
+	}
+	return false;
+}
+
+export async function linkPolarCustomerToOrg(args: {
+	organizationId: string;
+	polarCustomerId: string;
+	tx?: DatabaseInstance;
+}): Promise<boolean> {
+	const client = args.tx ?? db;
+	const owner = await client.query.organization.findFirst({
+		where: eq(organization.externalCustomerId, args.polarCustomerId),
+		columns: { id: true },
+	});
+	const claimed = shouldClaimOrganizationExternalCustomerId(
+		args.organizationId,
+		owner?.id ?? null,
+	);
+	if (claimed) {
+		try {
+			await client
+				.update(organization)
+				.set({ externalCustomerId: args.polarCustomerId })
+				.where(eq(organization.id, args.organizationId));
+		} catch (error) {
+			if (!isUniqueViolation(error)) throw error;
+		}
+	}
+
+	await client
+		.update(organizationSubscription)
+		.set({
+			polarCustomerId: args.polarCustomerId,
+			updatedAt: new Date(),
+		})
+		.where(eq(organizationSubscription.organizationId, args.organizationId));
+	return claimed;
+}
+
 export async function ensurePolarCustomerForOrg(args: {
 	organizationId: string;
 	polar: PolarBillingPort;
@@ -343,18 +404,10 @@ export async function ensurePolarCustomerForOrg(args: {
 		name: contact.name,
 	});
 
-	await client
-		.update(organization)
-		.set({ externalCustomerId: customer.id })
-		.where(eq(organization.id, args.organizationId));
-
-	await client
-		.update(organizationSubscription)
-		.set({
-			polarCustomerId: customer.id,
-			updatedAt: new Date(),
-		})
-		.where(eq(organizationSubscription.organizationId, args.organizationId));
-
+	await linkPolarCustomerToOrg({
+		organizationId: args.organizationId,
+		polarCustomerId: customer.id,
+		tx: args.tx,
+	});
 	return customer.id;
 }

@@ -6,6 +6,7 @@ import {
 	isCheckoutPlanId,
 	mapPolarSubscriptionStatus,
 } from "@reloop/pricing";
+import { shouldClaimOrganizationExternalCustomerId } from "../src/lib/org-billing";
 
 describe("plan catalog", () => {
 	test("matches hosted pricing numbers", () => {
@@ -107,5 +108,25 @@ describe("mapPolarSubscriptionStatus", () => {
 		expect(mapPolarSubscriptionStatus("canceled")).toBe("cancelled");
 		expect(mapPolarSubscriptionStatus("past_due")).toBe("past_due");
 		expect(mapPolarSubscriptionStatus("active")).toBe("active");
+	});
+});
+
+describe("shouldClaimOrganizationExternalCustomerId", () => {
+	test("lets the first Reloop org own a Polar customer id", () => {
+		expect(
+			shouldClaimOrganizationExternalCustomerId("org_2", null),
+		).toBe(true);
+	});
+
+	test("lets an org keep its own Polar customer id", () => {
+		expect(
+			shouldClaimOrganizationExternalCustomerId("org_1", "org_1"),
+		).toBe(true);
+	});
+
+	test("does not steal a Polar customer id already claimed by another org", () => {
+		expect(
+			shouldClaimOrganizationExternalCustomerId("org_2", "org_1"),
+		).toBe(false);
 	});
 });

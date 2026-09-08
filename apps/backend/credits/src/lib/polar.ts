@@ -5,10 +5,9 @@ import {
 import { creditsConfig } from "@reloop/credits/credits.config";
 import { log } from "evlog";
 import {
+	createOrGetPolarCustomer,
 	createPolarCheckout,
-	createPolarCustomer,
 	createPolarCustomerPortal,
-	getPolarCustomerByExternalId,
 	ingestPolarEmailEvents,
 	listPolarProducts,
 } from "./polar-http";
@@ -45,6 +44,7 @@ export type PolarBillingPort = {
 	createCheckout(input: {
 		productId: string;
 		externalCustomerId: string;
+		customerId?: string;
 		customerEmail?: string;
 		successUrl: string;
 		returnUrl?: string;
@@ -63,11 +63,7 @@ export const livePolarBilling: PolarBillingPort = {
 
 	listProducts: listPolarProducts,
 
-	async createOrGetCustomer(input) {
-		const existing = await getPolarCustomerByExternalId(input.externalId);
-		if (existing) return existing;
-		return createPolarCustomer(input);
-	},
+	createOrGetCustomer: createOrGetPolarCustomer,
 
 	createCheckout: createPolarCheckout,
 	createCustomerPortal: createPolarCustomerPortal,

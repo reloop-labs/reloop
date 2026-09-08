@@ -4,6 +4,7 @@ import {
 	parsePolarCustomer,
 	parsePolarPortal,
 	parsePolarProductRefs,
+	polarTeamCustomerCreateBody,
 } from "../src/lib/polar-http";
 
 const polarProductListWithUnitBased = {
@@ -116,5 +117,26 @@ describe("parsePolarPortal", () => {
 				customer_portal_url: "https://sandbox.polar.sh/portal/abc",
 			}),
 		).toEqual({ url: "https://sandbox.polar.sh/portal/abc" });
+	});
+});
+
+describe("polarTeamCustomerCreateBody", () => {
+	test("identifies Polar by Reloop org id and keeps billing email on the owner", () => {
+		const body = polarTeamCustomerCreateBody({
+			externalId: "org_2",
+			email: "reloop.sh@gmail.com",
+			name: "Second Org",
+		});
+		expect(body).toEqual({
+			type: "team",
+			name: "Second Org",
+			external_id: "org_2",
+			metadata: { organization_id: "org_2" },
+			owner: {
+				email: "reloop.sh@gmail.com",
+				name: "Second Org",
+			},
+		});
+		expect(body).not.toHaveProperty("email");
 	});
 });

@@ -3,7 +3,6 @@ import { CreditErrors } from "@reloop/credits/error/credits.error-response";
 import {
 	ensurePolarCustomerForOrg,
 	getOrProvisionOrgBilling,
-	resolveBillingContact,
 } from "@reloop/credits/lib/org-billing";
 import type { PolarBillingPort } from "@reloop/credits/lib/polar";
 import { livePolarBilling } from "@reloop/credits/lib/polar";
@@ -34,16 +33,15 @@ export async function createCheckoutController(args: {
 		throw CreditErrors.alreadyOnPlan(args.planId);
 	}
 
-	await ensurePolarCustomerForOrg({
+	const polarCustomerId = await ensurePolarCustomerForOrg({
 		organizationId: args.organizationId,
 		polar,
 	});
-	const contact = await resolveBillingContact(args.organizationId);
 
 	const checkout = await polar.createCheckout({
 		productId,
 		externalCustomerId: args.organizationId,
-		customerEmail: contact?.email,
+		customerId: polarCustomerId ?? undefined,
 		successUrl: creditsConfig.BILLING_SUCCESS_URL,
 		returnUrl: creditsConfig.BILLING_RETURN_URL,
 		metadata: {

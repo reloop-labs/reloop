@@ -2,6 +2,7 @@ import {
 	changeOrgPlan,
 	closeBillingPeriod,
 	getOrProvisionOrgBilling,
+	linkPolarCustomerToOrg,
 	refillCreditsFromPlan,
 } from "@reloop/credits/lib/org-billing";
 import { livePolarBilling } from "@reloop/credits/lib/polar";
@@ -116,14 +117,10 @@ async function applyCustomerLink(data: Record<string, unknown>) {
 	const polarCustomerId = str(data.id);
 	if (!orgId || !polarCustomerId) return { ok: true as const };
 
-	await db
-		.update(organization)
-		.set({ externalCustomerId: polarCustomerId })
-		.where(eq(organization.id, orgId));
-	await db
-		.update(organizationSubscription)
-		.set({ polarCustomerId, updatedAt: new Date() })
-		.where(eq(organizationSubscription.organizationId, orgId));
+	await linkPolarCustomerToOrg({
+		organizationId: orgId,
+		polarCustomerId,
+	});
 
 	return { ok: true as const, organizationId: orgId };
 }
@@ -226,10 +223,11 @@ async function applySubscription(data: Record<string, unknown>) {
 			.where(eq(organizationSubscription.id, billing.subscription.id));
 
 		if (polarCustomerId) {
-			await tx
-				.update(organization)
-				.set({ externalCustomerId: polarCustomerId })
-				.where(eq(organization.id, orgId));
+			await linkPolarCustomerToOrg({
+				organizationId: orgId,
+				polarCustomerId,
+				tx,
+			});
 		}
 	});
 
