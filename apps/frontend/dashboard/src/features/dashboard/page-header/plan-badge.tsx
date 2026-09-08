@@ -1,14 +1,16 @@
 import { isPlanId, type PlanId, pricingPlans } from "@reloop/pricing";
 import { cn } from "@reloop/ui/cn";
 
+const KBD_BASE = "w-auto rounded-[5px] border font-semibold";
+
 const PLAN_BADGE_CLASS: Record<PlanId, string> = {
-	free: "bg-bg-weak-50 text-text-sub-600 ring-1 ring-stroke-soft-200 ring-inset",
+	free: "border-stroke-soft-200 bg-bg-weak-50 text-text-sub-600 shadow-[0_1.5px_0_0_var(--color-stroke-soft-200)] dark:border-white/[0.14] dark:bg-white/[0.07] dark:text-white",
 	individual:
-		"bg-gradient-to-r from-violet-500 to-indigo-500 text-white shadow-[0_0_0_1px_rgba(255,255,255,0.12)_inset]",
+		"border-feature-light bg-feature-lighter text-feature-base shadow-[0_1.5px_0_0_var(--color-feature-light)] dark:border-white/[0.14] dark:bg-white/[0.07] dark:text-white",
 	startup:
-		"bg-gradient-to-r from-orange-500 to-rose-500 text-white shadow-[0_0_0_1px_rgba(255,255,255,0.12)_inset]",
+		"border-warning-light bg-warning-lighter text-warning-base shadow-[0_1.5px_0_0_var(--color-warning-light)] dark:border-white/[0.14] dark:bg-white/[0.07] dark:text-white",
 	enterprise:
-		"bg-gradient-to-r from-amber-400 to-yellow-600 text-white shadow-[0_0_0_1px_rgba(255,255,255,0.12)_inset]",
+		"border-amber-200 bg-amber-50 text-amber-700 shadow-[0_1.5px_0_0_var(--color-amber-200)] dark:border-white/[0.14] dark:bg-white/[0.07] dark:text-white",
 };
 
 export function planLabel(planId: string | undefined): string {
@@ -26,15 +28,15 @@ export function PlanBadge({
 	compact?: boolean;
 }) {
 	const sizeClass = compact
-		? "h-4 px-1.5 text-[9px] leading-none"
-		: "h-[18px] px-2 text-[10px] leading-none";
+		? "h-4 min-w-4 px-1 text-[9px] leading-none"
+		: "h-[18px] min-w-4 px-1.5 text-[10px] leading-none";
 
 	if (!planId || !isPlanId(planId)) {
 		return (
 			<span
 				aria-hidden
 				className={cn(
-					"inline-flex shrink-0 animate-pulse rounded-full bg-bg-weak-50",
+					"inline-flex shrink-0 animate-pulse rounded-[5px] bg-bg-weak-50",
 					compact ? "h-4 w-10" : "h-[18px] w-14",
 				)}
 			/>
@@ -45,7 +47,8 @@ export function PlanBadge({
 	return (
 		<span
 			className={cn(
-				"inline-flex shrink-0 items-center rounded-full font-semibold uppercase tracking-wide",
+				"inline-flex shrink-0 items-center justify-center font-semibold uppercase",
+				KBD_BASE,
 				sizeClass,
 				PLAN_BADGE_CLASS[id],
 			)}
