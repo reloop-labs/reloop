@@ -1,8 +1,10 @@
 import { describe, expect, test } from "bun:test";
 import {
 	isPolarMissingCustomerError,
+	isPolarPaymentFailedError,
 	parsePolarCheckout,
 	parsePolarCustomer,
+	parsePolarOwnerMemberId,
 	parsePolarPortal,
 	parsePolarProductRefs,
 	polarTeamCustomerCreateBody,
@@ -137,9 +139,23 @@ describe("polarTeamCustomerCreateBody", () => {
 			owner: {
 				email: "reloop.sh@gmail.com",
 				name: "Second Org",
+				external_id: "org_2",
 			},
 		});
 		expect(body).not.toHaveProperty("email");
+	});
+});
+
+describe("parsePolarOwnerMemberId", () => {
+	test("picks the Polar team owner for portal sessions", () => {
+		expect(
+			parsePolarOwnerMemberId({
+				items: [
+					{ id: "mem_member", role: "member" },
+					{ id: "mem_owner", role: "owner" },
+				],
+			}),
+		).toBe("mem_owner");
 	});
 });
 
@@ -162,6 +178,14 @@ describe("isPolarMissingCustomerError", () => {
 						],
 					}),
 				),
+			),
+		).toBe(true);
+	});
+
+	test("detects Polar 402 when the prorated charge fails", () => {
+		expect(
+			isPolarPaymentFailedError(
+				new PolarHttpError(402, "/v1/subscriptions/sub_1", '{"error":"PaymentFailed"}'),
 			),
 		).toBe(true);
 	});

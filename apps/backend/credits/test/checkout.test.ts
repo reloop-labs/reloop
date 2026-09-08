@@ -1,6 +1,9 @@
 import { describe, expect, test } from "bun:test";
 import { invalidatePolarPlanCatalog } from "../src/lib/polar-catalog";
-import { createCheckoutController } from "../src/routes/billing/checkout/checkout.controllers";
+import {
+	canProratePolarPlanChange,
+	createCheckoutController,
+} from "../src/routes/billing/checkout/checkout.controllers";
 
 describe("createCheckoutController", () => {
 	test("rejects Free and Enterprise", async () => {
@@ -36,6 +39,9 @@ describe("createCheckoutController", () => {
 					createCustomerPortal: async () => {
 						throw new Error("unused");
 					},
+					updateSubscription: async () => {
+						throw new Error("unused");
+					},
 					ingestEmailEvents: async () => {},
 				},
 			}),
@@ -60,9 +66,34 @@ describe("createCheckoutController", () => {
 					createCustomerPortal: async () => {
 						throw new Error("unused");
 					},
+					updateSubscription: async () => {
+						throw new Error("unused");
+					},
 					ingestEmailEvents: async () => {},
 				},
 			}),
 		).rejects.toMatchObject({ status: 503 });
+	});
+});
+
+describe("canProratePolarPlanChange", () => {
+	test("uses Polar proration when an active paid subscription already exists", () => {
+		expect(
+			canProratePolarPlanChange({
+				currentPlanId: "individual",
+				polarSubscriptionId: "sub_1",
+				status: "active",
+			}),
+		).toBe(true);
+	});
+
+	test("starts a full checkout from Free", () => {
+		expect(
+			canProratePolarPlanChange({
+				currentPlanId: "free",
+				polarSubscriptionId: null,
+				status: "active",
+			}),
+		).toBe(false);
 	});
 });

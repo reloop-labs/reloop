@@ -7,7 +7,9 @@ import { useRef, useState } from "react";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import { ensureAbsoluteUrl } from "#/utils/absolute-url";
 import { getAvatarGradient, getAvatarInitial } from "#/utils/avatar";
+import { PlanBadge } from "./plan-badge";
 import type { Organization } from "./use-active-organization";
+import { orgPlanById, useOrgPlansQuery } from "./use-org-plans";
 
 function OrgAvatar({
 	org,
@@ -74,6 +76,8 @@ export function OrganizationSwitcher({
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
 	const scrollContainerRef = useRef<HTMLDivElement>(null);
 	const router = useRouter();
+	const { data: orgPlans } = useOrgPlansQuery(Boolean(organizations?.length));
+	const planByOrgId = orgPlanById(orgPlans);
 
 	const activeIndex = activeOrganization
 		? organizations?.findIndex((org) => org.id === activeOrganization.id)
@@ -116,6 +120,10 @@ export function OrganizationSwitcher({
 						<span className="truncate font-medium text-sm text-text-strong-950">
 							{activeOrganization.name}
 						</span>
+						<PlanBadge
+							planId={planByOrgId[activeOrganization.id]}
+							compact
+						/>
 						<Icon
 							name="chevron-down"
 							className="h-3.5 w-3.5 flex-shrink-0 text-text-sub-600"
@@ -158,9 +166,10 @@ export function OrganizationSwitcher({
 							>
 								<div className="flex min-w-0 flex-1 items-center gap-2.5">
 									<OrgAvatar org={organization} size={24} />
-									<p className="w-full truncate text-left font-medium text-sm text-text-strong-950">
+									<p className="min-w-0 truncate text-left font-medium text-sm text-text-strong-950">
 										{organization.name}
 									</p>
+									<PlanBadge planId={planByOrgId[organization.id]} />
 								</div>
 								{organization.id === activeOrganization.id && (
 									<Icon

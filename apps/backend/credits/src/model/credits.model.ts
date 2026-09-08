@@ -71,6 +71,15 @@ export namespace CreditsModel {
 		}),
 	});
 
+	export const orgPlansResponse = t.Object({
+		plans: t.Array(
+			t.Object({
+				organizationId: t.String(),
+				planId: t.String(),
+			}),
+		),
+	});
+
 	export const checkoutBody = t.Object({
 		planId: t.Union([t.Literal("individual"), t.Literal("startup")]),
 	});

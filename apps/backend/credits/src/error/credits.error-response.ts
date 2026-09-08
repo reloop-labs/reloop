@@ -102,6 +102,13 @@ export const CreditErrors = {
 			why: `Organization ${organizationId} does not have a Polar customer yet.`,
 			fix: "Add a billing email on the organization and try again.",
 		}),
+	polarPaymentFailed: () =>
+		createError({
+			status: 402,
+			message: "Payment for this plan change failed",
+			why: "Polar could not charge the remaining balance on the card on file.",
+			fix: "Open Manage billing, update the payment method, then try the upgrade again.",
+		}),
 	webhookInvalid: () =>
 		createError({
 			status: 403,

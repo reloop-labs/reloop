@@ -10,7 +10,10 @@ import {
 	createPolarCustomerPortal,
 	ingestPolarEmailEvents,
 	isPolarMissingCustomerError,
+	isPolarMissingSubscriptionError,
+	isPolarPaymentFailedError,
 	listPolarProducts,
+	updatePolarSubscription,
 } from "./polar-http";
 
 export type PolarCustomer = {
@@ -52,6 +55,10 @@ export type PolarBillingPort = {
 		metadata: Record<string, string>;
 	}): Promise<PolarCheckout>;
 	createCustomerPortal(input: { customerId: string }): Promise<PolarPortal>;
+	updateSubscription(input: {
+		subscriptionId: string;
+		productId: string;
+	}): Promise<{ id: string }>;
 	ingestEmailEvents(input: {
 		externalCustomerId: string;
 		count: number;
@@ -68,6 +75,7 @@ export const livePolarBilling: PolarBillingPort = {
 
 	createCheckout: createPolarCheckout,
 	createCustomerPortal: createPolarCustomerPortal,
+	updateSubscription: updatePolarSubscription,
 	ingestEmailEvents: ingestPolarEmailEvents,
 };
 
@@ -103,4 +111,9 @@ export function verifyPolarWebhook(args: {
 	}
 }
 
-export { isPolarMissingCustomerError, WebhookVerificationError };
+export {
+	isPolarMissingCustomerError,
+	isPolarMissingSubscriptionError,
+	isPolarPaymentFailedError,
+	WebhookVerificationError,
+};

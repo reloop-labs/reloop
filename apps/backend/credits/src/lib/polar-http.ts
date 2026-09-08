@@ -30,6 +30,18 @@ export function isPolarMissingCustomerError(error: unknown): boolean {
 	);
 }
 
+export function isPolarPaymentFailedError(error: unknown): boolean {
+	return error instanceof PolarHttpError && error.status === 402;
+}
+
+export function isPolarMissingSubscriptionError(error: unknown): boolean {
+	return (
+		error instanceof PolarHttpError &&
+		(error.status === 404 ||
+			(error.status === 422 && /subscription/i.test(error.body)))
+	);
+}
+
 function asRecord(value: unknown): Record<string, unknown> | null {
 	if (!value || typeof value !== "object" || Array.isArray(value)) return null;
 	return value as Record<string, unknown>;
@@ -91,6 +103,22 @@ export function parsePolarCheckout(payload: unknown): PolarCheckout {
 		throw new Error("Polar checkout did not return a URL");
 	}
 	return { id, url };
+}
+
+export function parsePolarOwnerMemberId(payload: unknown): string | null {
+	const items = asRecord(payload)?.items;
+	if (!Array.isArray(items)) return null;
+	let fallback: string | null = null;
+	for (const item of items) {
+		const rec = asRecord(item);
+		if (!rec) continue;
+		const id = str(rec.id);
+		if (!id) continue;
+		const role = str(rec.role);
+		if (role === "owner") return id;
+		if (!fallback) fallback = id;
+	}
+	return fallback;
 }
 
 export function parsePolarPortal(payload: unknown): PolarPortal {
@@ -211,6 +239,7 @@ export function polarTeamCustomerCreateBody(input: {
 		owner: {
 			email: input.email,
 			name: input.name,
+			external_id: input.externalId,
 		},
 	};
 }
@@ -265,12 +294,58 @@ export async function createPolarCheckout(input: {
 	return parsePolarCheckout(payload);
 }
 
+export async function updatePolarSubscription(input: {
+	subscriptionId: string;
+	productId: string;
+}): Promise<{ id: string }> {
+	const payload = await polarJson(
+		`/v1/subscriptions/${encodeURIComponent(input.subscriptionId)}`,
+		{
+			method: "PATCH",
+			body: JSON.stringify({
+				product_id: input.productId,
+				proration_behavior: "invoice",
+			}),
+		},
+	);
+	const rec =
+		payload && typeof payload === "object"
+			? (payload as { id?: unknown })
+			: null;
+	const id = rec && typeof rec.id === "string" ? rec.id : null;
+	if (!id) {
+		throw new Error("Polar subscription update did not return an id");
+	}
+	return { id };
+}
+
+export async function getPolarOwnerMemberId(
+	customerId: string,
+): Promise<string | null> {
+	const query = new URLSearchParams({ role: "owner", limit: "10" });
+	const owners = await polarJsonOrNotFound(
+		`/v1/customers/${encodeURIComponent(customerId)}/members?${query.toString()}`,
+	);
+	const ownerId = parsePolarOwnerMemberId(owners);
+	if (ownerId) return ownerId;
+
+	const members = await polarJsonOrNotFound(
+		`/v1/customers/${encodeURIComponent(customerId)}/members?limit=10`,
+	);
+	return parsePolarOwnerMemberId(members);
+}
+
 export async function createPolarCustomerPortal(input: {
 	customerId: string;
 }): Promise<PolarPortal> {
+	const memberId = await getPolarOwnerMemberId(input.customerId);
+	const body: Record<string, unknown> = {
+		customer_id: input.customerId,
+	};
+	if (memberId) body.member_id = memberId;
 	const payload = await polarJson("/v1/customer-sessions/", {
 		method: "POST",
-		body: JSON.stringify({ customer_id: input.customerId }),
+		body: JSON.stringify(body),
 	});
 	return parsePolarPortal(payload);
 }

@@ -19,6 +19,7 @@ export const queryKeys = {
 		all: ["billing"] as const,
 		usage: () => [...queryKeys.billing.all, "usage"] as const,
 		periods: () => [...queryKeys.billing.all, "periods"] as const,
+		orgPlans: () => [...queryKeys.billing.all, "org-plans"] as const,
 	},
 	apiKeys: {
 		all: ["api-keys"] as const,

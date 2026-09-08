@@ -4,10 +4,24 @@ import {
 	ensurePolarCustomerForOrg,
 	getOrProvisionOrgBilling,
 } from "@reloop/credits/lib/org-billing";
-import type { PolarBillingPort } from "@reloop/credits/lib/polar";
-import { livePolarBilling } from "@reloop/credits/lib/polar";
+import {
+	isPolarMissingSubscriptionError,
+	isPolarPaymentFailedError,
+	livePolarBilling,
+	type PolarBillingPort,
+} from "@reloop/credits/lib/polar";
 import { polarProductIdForPlan } from "@reloop/credits/lib/polar-catalog";
 import { isCheckoutPlanId } from "@reloop/pricing";
+
+export function canProratePolarPlanChange(args: {
+	currentPlanId: string;
+	polarSubscriptionId: string | null;
+	status: string;
+}): boolean {
+	if (!args.polarSubscriptionId) return false;
+	if (args.currentPlanId === "free") return false;
+	return args.status === "active" || args.status === "trialing";
+}
 
 export async function createCheckoutController(args: {
 	organizationId: string;
@@ -31,6 +45,32 @@ export async function createCheckoutController(args: {
 	const billing = await getOrProvisionOrgBilling(args.organizationId);
 	if (billing.plan.planId === args.planId) {
 		throw CreditErrors.alreadyOnPlan(args.planId);
+	}
+
+	const polarSubscriptionId = billing.subscription.polarSubscriptionId;
+	if (
+		canProratePolarPlanChange({
+			currentPlanId: billing.plan.planId,
+			polarSubscriptionId,
+			status: billing.subscription.status,
+		}) &&
+		polarSubscriptionId
+	) {
+		try {
+			const updated = await polar.updateSubscription({
+				subscriptionId: polarSubscriptionId,
+				productId,
+			});
+			return {
+				url: creditsConfig.BILLING_SUCCESS_URL,
+				checkoutId: updated.id,
+			};
+		} catch (error) {
+			if (isPolarPaymentFailedError(error)) {
+				throw CreditErrors.polarPaymentFailed();
+			}
+			if (!isPolarMissingSubscriptionError(error)) throw error;
+		}
 	}
 
 	const polarCustomerId = await ensurePolarCustomerForOrg({
