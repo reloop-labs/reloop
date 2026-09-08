@@ -3,14 +3,18 @@ import { cn } from "@reloop/ui/cn";
 
 const KBD_BASE = "w-auto rounded-[5px] border font-semibold";
 
+// Shelf shadow swaps to the dark keycap style in dark mode — light-mode
+// tint tokens (feature/warning/amber) don't adapt and leak a color fringe.
+const DARK_SHELF =
+	"dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.55),0_0_0_0.5px_rgba(255,255,255,0.06),inset_0_0.5px_0_0_rgba(255,255,255,0.08)]";
+const DARK_FLAT =
+	"dark:border-white/[0.14] dark:bg-white/[0.07] dark:text-white";
+
 const PLAN_BADGE_CLASS: Record<PlanId, string> = {
-	free: "border-stroke-soft-200 bg-bg-weak-50 text-text-sub-600 shadow-[0_1.5px_0_0_var(--color-stroke-soft-200)] dark:border-white/[0.14] dark:bg-white/[0.07] dark:text-white",
-	individual:
-		"border-feature-light bg-feature-lighter text-feature-base shadow-[0_1.5px_0_0_var(--color-feature-light)] dark:border-white/[0.14] dark:bg-white/[0.07] dark:text-white",
-	startup:
-		"border-warning-light bg-warning-lighter text-warning-base shadow-[0_1.5px_0_0_var(--color-warning-light)] dark:border-white/[0.14] dark:bg-white/[0.07] dark:text-white",
-	enterprise:
-		"border-amber-200 bg-amber-50 text-amber-700 shadow-[0_1.5px_0_0_var(--color-amber-200)] dark:border-white/[0.14] dark:bg-white/[0.07] dark:text-white",
+	free: `border-stroke-soft-200 bg-bg-weak-50 text-text-sub-600 shadow-[0_1.5px_0_0_var(--color-stroke-soft-200)] ${DARK_FLAT} ${DARK_SHELF}`,
+	individual: `border-feature-light bg-feature-lighter text-feature-base shadow-[0_1.5px_0_0_var(--color-feature-light)] ${DARK_FLAT} ${DARK_SHELF}`,
+	startup: `border-warning-light bg-warning-lighter text-warning-base shadow-[0_1.5px_0_0_var(--color-warning-light)] ${DARK_FLAT} ${DARK_SHELF}`,
+	enterprise: `border-amber-200 bg-amber-50 text-amber-700 shadow-[0_1.5px_0_0_var(--color-amber-200)] ${DARK_FLAT} ${DARK_SHELF}`,
 };
 
 export function planLabel(planId: string | undefined): string {
