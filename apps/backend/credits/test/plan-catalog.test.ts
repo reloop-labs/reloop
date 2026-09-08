@@ -32,7 +32,7 @@ describe("plan catalog", () => {
 		});
 	});
 
-	test("only Individual and Startup are checkout plans", () => {
+	test("only Pro and Growth are checkout plans", () => {
 		expect(isCheckoutPlanId("individual")).toBe(true);
 		expect(isCheckoutPlanId("startup")).toBe(true);
 		expect(isCheckoutPlanId("free")).toBe(false);

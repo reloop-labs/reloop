@@ -23,7 +23,7 @@ function metaString(
 /**
  * Map a Polar product to a Reloop plan.
  * Prefer Polar metadata `plan_id` (or `plan`); otherwise match product name
- * to Reloop plan id / display name (e.g. "Individual").
+ * to Reloop plan id / display name (e.g. "Pro").
  */
 export function matchReloopPlanId(product: {
 	name?: string | null;

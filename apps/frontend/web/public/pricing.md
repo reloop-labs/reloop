@@ -24,7 +24,7 @@
   - Data retention (45 days)
   - Community support
 
-### Individual
+### Pro
 
 - Price: $10 / month
 - Note: /month
@@ -42,7 +42,7 @@
   - Data retention (45 days)
   - Dedicated support
 
-### Startup
+### Growth
 
 - Price: $20 / month
 - Note: /month
@@ -80,7 +80,7 @@
 
 ## Self-host
 
-Self-hosting the open-source Reloop stack has no Reloop license fee (infrastructure costs are yours). It is not a Reloop Cloud subscription and does not use the hosted Free / Individual / Startup / Enterprise price list.
+Self-hosting the open-source Reloop stack has no Reloop license fee (infrastructure costs are yours). It is not a Reloop Cloud subscription and does not use the hosted Free / Pro / Growth / Enterprise price list.
 See https://reloop.sh/self-host
 
 ## Related

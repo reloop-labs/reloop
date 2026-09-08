@@ -140,7 +140,7 @@ export const pricingPlans: PricingPlan[] = [
 	},
 	{
 		id: "individual",
-		name: "Individual",
+		name: "Pro",
 		description: "For solo developers and personal projects.",
 		monthlyPrice: 10,
 		priceSubline: "/month",
@@ -196,13 +196,13 @@ export const pricingPlans: PricingPlan[] = [
 	},
 	{
 		id: "startup",
-		name: "Startup",
+		name: "Growth",
 		description: "For early-stage founders and growing teams.",
 		monthlyPrice: 20,
 		priceSubline: "/month",
 		emailsLabel: "100,000 emails / month",
 		extraEmailsLabel: "Extra emails: $0.50 / 1,000",
-		includesLabel: "All Individual features +",
+		includesLabel: "All Pro features +",
 		ctaLabel: "Get started",
 		ctaHref: "/dashboard/signup",
 		badge: "Recommended",
@@ -260,7 +260,7 @@ export const pricingPlans: PricingPlan[] = [
 		monthlyPrice: null,
 		priceSubline: "Custom volume & billing",
 		emailsLabel: "Custom volume",
-		includesLabel: "All Startup features +",
+		includesLabel: "All Growth features +",
 		ctaLabel: "Contact sales",
 		ctaHref: "/contact",
 		features: [

@@ -15,7 +15,7 @@ const polarProductListWithUnitBased = {
 	items: [
 		{
 			id: "8e53cbbb-9106-4da5-90ca-252e1b0f0fe8",
-			name: "Individual",
+			name: "Pro",
 			metadata: { plan_id: "individual" },
 			prices: [
 				{
@@ -37,7 +37,7 @@ const polarProductListWithUnitBased = {
 		},
 		{
 			id: "705db322-5880-4801-9b32-ad42507259d0",
-			name: "Startup",
+			name: "Growth",
 			metadata: {},
 			prices: [
 				{ amount_type: "fixed", price_amount: 2000, price_currency: "usd" },
@@ -60,12 +60,12 @@ describe("parsePolarProductRefs", () => {
 		expect(products).toEqual([
 			{
 				id: "8e53cbbb-9106-4da5-90ca-252e1b0f0fe8",
-				name: "Individual",
+				name: "Pro",
 				metadata: { plan_id: "individual" },
 			},
 			{
 				id: "705db322-5880-4801-9b32-ad42507259d0",
-				name: "Startup",
+				name: "Growth",
 				metadata: {},
 			},
 		]);
@@ -87,7 +87,7 @@ describe("parsePolarCheckout", () => {
 				id: "chk_1",
 				url: "https://sandbox.polar.sh/checkout/chk_1",
 				product: {
-					name: "Individual",
+					name: "Pro",
 					prices: [{ amount_type: "unit_based" }],
 				},
 			}),

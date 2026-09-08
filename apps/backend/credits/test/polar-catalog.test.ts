@@ -15,8 +15,8 @@ describe("matchReloopPlanId", () => {
 	});
 
 	test("matches Reloop plan display names", () => {
-		expect(matchReloopPlanId({ name: "Individual" })).toBe("individual");
-		expect(matchReloopPlanId({ name: "Startup" })).toBe("startup");
+		expect(matchReloopPlanId({ name: "Pro" })).toBe("individual");
+		expect(matchReloopPlanId({ name: "Growth" })).toBe("startup");
 		expect(matchReloopPlanId({ name: "Free" })).toBe("free");
 	});
 
@@ -32,10 +32,10 @@ describe("matchReloopPlanId", () => {
 describe("buildPolarPlanCatalog", () => {
 	test("indexes Polar products by Reloop plan", () => {
 		const catalog = buildPolarPlanCatalog([
-			{ id: "prod_ind", name: "Individual", metadata: {} },
+			{ id: "prod_ind", name: "Pro", metadata: {} },
 			{
 				id: "prod_start",
-				name: "Cloud Startup",
+				name: "Cloud Growth",
 				metadata: { plan_id: "startup" },
 			},
 		]);

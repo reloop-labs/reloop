@@ -8,7 +8,7 @@ import { competitorBrands } from "../competitor-brands";
 import { BrandIcon } from "./brand-icon";
 import { CompareTitleIcon } from "./compare-title-icon";
 
-export type PlanType = "free" | "startup" | "paid";
+export type PlanType = "free" | "growth" | "paid";
 
 const planDetails: Record<
 	PlanType,
@@ -19,8 +19,8 @@ const planDetails: Record<
 		reloopHref: "/pricing",
 		competitorSub: "FREE TIER",
 	},
-	startup: {
-		reloopSub: "STARTUP ↗",
+	growth: {
+		reloopSub: "GROWTH ↗",
 		reloopHref: "/pricing",
 		competitorSub: "GROWTH / PRO",
 	},
@@ -110,15 +110,15 @@ function PlanTogglePill({
 			</button>
 			<button
 				type="button"
-				onClick={() => onChange("startup")}
+				onClick={() => onChange("growth")}
 				className={cn(
 					"flex size-7 items-center justify-center rounded-full transition-all duration-200",
-					activePlan === "startup"
+					activePlan === "growth"
 						? "bg-text-strong-950 text-white shadow-sm dark:bg-white dark:text-black"
 						: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/50 dark:hover:text-white",
 				)}
-				title="Startup plan"
-				aria-label="Startup plan"
+				title="Growth plan"
+				aria-label="Growth plan"
 			>
 				<StoreIcon className="size-3.5" />
 			</button>

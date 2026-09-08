@@ -40,7 +40,7 @@ Markdown: https://reloop.sh/pricing.md
   - Data retention (45 days)
   - Community support
 
-### Individual
+### Pro
 
 - Price: $10 / month
 - Note: /month
@@ -58,7 +58,7 @@ Markdown: https://reloop.sh/pricing.md
   - Data retention (45 days)
   - Dedicated support
 
-### Startup
+### Growth
 
 - Price: $20 / month
 - Note: /month
@@ -96,7 +96,7 @@ Markdown: https://reloop.sh/pricing.md
 
 ## Self-host
 
-Self-hosting the open-source Reloop stack has no Reloop license fee (infrastructure costs are yours). It is not a Reloop Cloud subscription and does not use the hosted Free / Individual / Startup / Enterprise price list.
+Self-hosting the open-source Reloop stack has no Reloop license fee (infrastructure costs are yours). It is not a Reloop Cloud subscription and does not use the hosted Free / Pro / Growth / Enterprise price list.
 See https://reloop.sh/self-host
 
 ## Related
@@ -121,7 +121,7 @@ Markdown: https://reloop.sh/compare.md
 HTML: https://reloop.sh/compare
 Canonical pricing: https://reloop.sh/pricing.md
 
-Reloop is open-source email infrastructure (Apache 2.0): transactional API, SMTP, campaigns, webhooks, and an agent inbox. Hosted Reloop Cloud plans are Free (3,000 emails/month, 200/day), Individual $10/month (50,000), Startup $20/month (100,000), Enterprise custom. Self-host has no Reloop license fee.
+Reloop is open-source email infrastructure (Apache 2.0): transactional API, SMTP, campaigns, webhooks, and an agent inbox. Hosted Reloop Cloud plans are Free (3,000 emails/month, 200/day), Pro $10/month (50,000), Growth $20/month (100,000), Enterprise custom. Self-host has no Reloop license fee.
 
 ## Comparisons
 
@@ -160,13 +160,13 @@ HTML: https://reloop.sh/compare/resend
 Markdown: https://reloop.sh/compare/resend.md
 Canonical pricing: https://reloop.sh/pricing.md
 
-Reloop is email infrastructure you can host or self-host (Apache 2.0, KumoMTA). Resend is a hosted DX layer over Amazon SES. Reloop Free is 3,000 emails/month with a 200/day cap; Individual is $10/month for 50,000 emails with no daily cap. Reloop is not a drop-in Resend proxy.
+Reloop is email infrastructure you can host or self-host (Apache 2.0, KumoMTA). Resend is a hosted DX layer over Amazon SES. Reloop Free is 3,000 emails/month with a 200/day cap; Pro is $10/month for 50,000 emails with no daily cap. Reloop is not a drop-in Resend proxy.
 
 Reloop is the email service / infrastructure (ESP + MTA). It is not a multi-ESP connector that sits on SendGrid, Mailgun, Resend, or SES.
 
 ## Pricing & Email Volume
 
-Reloop Cloud Free is 3,000 emails/month with a 200/day cap. Individual is $10/mo for 50,000 emails with no daily cap. Overage is $0.50 vs Resend's $0.90 per 1,000. Self-hosting Reloop has no Reloop license fee (you pay your own infra).
+Reloop Cloud Free is 3,000 emails/month with a 200/day cap. Pro is $10/mo for 50,000 emails with no daily cap. Overage is $0.50 vs Resend's $0.90 per 1,000. Self-hosting Reloop has no Reloop license fee (you pay your own infra).
 
 | Feature | Reloop | Resend |
 | --- | --- | --- |
@@ -198,7 +198,7 @@ Both products support sending and receiving email. Reloop runs its own MTA/MX st
 | Self-hostable | Yes | No |
 | Open-source | Yes | No |
 | Shared IPs | Yes | Yes |
-| Dedicated IPs | 1 included (Startup) | Scale+ |
+| Dedicated IPs | 1 included (Growth) | Scale+ |
 
 ## Data & analytics
 
@@ -251,7 +251,7 @@ This section is about control plane ownership—not a promise that Reloop is fas
 
 ### Does Reloop Free have a daily send limit?
 
-Yes. Reloop Free includes 3,000 emails per month and 200 emails per day. Individual ($10/mo), Startup ($20/mo), and Enterprise have no daily cap. Self-hosted Reloop is limited by your own infrastructure, not Reloop Cloud quotas.
+Yes. Reloop Free includes 3,000 emails per month and 200 emails per day. Pro ($10/mo), Growth ($20/mo), and Enterprise have no daily cap. Self-hosted Reloop is limited by your own infrastructure, not Reloop Cloud quotas.
 
 ### Is Reloop a drop-in Resend API?
 
@@ -306,11 +306,11 @@ Reloop is the email service / infrastructure (ESP + MTA). It is not a multi-ESP 
 
 ### Can Reloop handle SendGrid-scale volume?
 
-Hosted Individual ($10/mo, 50,000 emails), Startup ($20/mo, 100,000 emails), and Enterprise target growing throughput; overage is $0.50 per 1,000. Self-hosted Reloop scales with your Kubernetes or bare-metal footprint.
+Hosted Pro ($10/mo, 50,000 emails), Growth ($20/mo, 100,000 emails), and Enterprise target growing throughput; overage is $0.50 per 1,000. Self-hosted Reloop scales with your Kubernetes or bare-metal footprint.
 
 ### What about dedicated IPs?
 
-Startup includes 1 dedicated IP and Enterprise is optional/custom. Self-hosted deployments can attach your own IPs directly to your MTA layer.
+Growth includes 1 dedicated IP and Enterprise is optional/custom. Self-hosted deployments can attach your own IPs directly to your MTA layer.
 
 ## Related
 
@@ -492,7 +492,7 @@ HTML: https://reloop.sh/compare/loops
 Markdown: https://reloop.sh/compare/loops.md
 Canonical pricing: https://reloop.sh/pricing.md
 
-Loops prices by contact list size. Reloop prices by emails sent. Reloop Free is 3,000 emails/month (200/day); Individual is $10/month for 50,000 emails; Startup is $20/month for 100,000 emails. Reloop is the ESP/MTA, not a lifecycle UI on top of another sender.
+Loops prices by contact list size. Reloop prices by emails sent. Reloop Free is 3,000 emails/month (200/day); Pro is $10/month for 50,000 emails; Growth is $20/month for 100,000 emails. Reloop is the ESP/MTA, not a lifecycle UI on top of another sender.
 
 Reloop is the email service / infrastructure (ESP + MTA). It is not a multi-ESP connector that sits on SendGrid, Mailgun, Resend, or SES.
 
@@ -637,8 +637,8 @@ Developers, startups, and agent products that need transactional + campaign emai
 Canonical data: https://reloop.sh/pricing.md
 
 - Free — $0, 3,000 emails / month, **200 / day**
-- Individual — $10 / month, 50,000 emails / month, no daily cap, overage $0.50 / 1,000
-- Startup — $20 / month, 100,000 emails / month, no daily cap, overage $0.50 / 1,000
+- Pro — $10 / month, 50,000 emails / month, no daily cap, overage $0.50 / 1,000
+- Growth — $20 / month, 100,000 emails / month, no daily cap, overage $0.50 / 1,000
 - Enterprise — custom volume and billing
 
 ## Why Reloop

@@ -22,7 +22,7 @@ export const checkoutRoute = new Elysia().use(authMiddleware).post(
 			tags: ["Billing"],
 			summary: "Create Polar checkout",
 			description:
-				"Starts Polar checkout for Individual or Startup on the active organization.",
+				"Starts Polar checkout for Pro or Growth on the active organization.",
 		},
 	},
 );

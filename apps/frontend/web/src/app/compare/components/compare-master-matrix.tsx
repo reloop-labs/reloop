@@ -120,7 +120,7 @@ const MASTER_CATEGORIES: MatrixCategory[] = [
 			},
 			{
 				feature: "Cost per 100,000 Emails",
-				detail: "Hosted Reloop Startup ($20, 100k included)",
+				detail: "Hosted Reloop Growth ($20, 100k included)",
 				reloop: "$20",
 				resend: "$90.00",
 				sendgrid: "$89.95",
@@ -130,7 +130,7 @@ const MASTER_CATEGORIES: MatrixCategory[] = [
 			{
 				feature: "Dedicated IP Pricing",
 				detail: "Monthly dedicated IP cost",
-				reloop: "1 included (Startup)",
+				reloop: "1 included (Growth)",
 				resend: "$30 / mo",
 				sendgrid: "$30 / mo",
 				postmark: "$50 / mo",

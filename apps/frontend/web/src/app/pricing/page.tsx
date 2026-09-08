@@ -14,7 +14,7 @@ export const instant = false;
 const siteUrl = getSiteUrl();
 const pricingPageUrl = `${siteUrl}/pricing`;
 const pricingDescription =
-	"Scale your email, control your costs. Start free with 3,000 emails per month (200/day). Upgrade to Individual $10, Startup $20, or Enterprise—or self-host with no Reloop license fee.";
+	"Scale your email, control your costs. Start free with 3,000 emails per month (200/day). Upgrade to Pro $10, Growth $20, or Enterprise—or self-host with no Reloop license fee.";
 
 export const metadata: Metadata = {
 	title: "Pricing | Reloop",

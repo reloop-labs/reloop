@@ -28,7 +28,7 @@ export const pricingFaqItems: PricingFaqItem[] = [
 	{
 		question: "Is hosted pricing different from self-hosted?",
 		answer:
-			"Yes. Reloop Cloud (hosted) uses the published Free, Individual ($10/mo), Startup ($20/mo), and Enterprise tiers. Self-hosting the Apache 2.0 stack has no Reloop SaaS fee—it is not the same as buying those hosted plans for your own servers.",
+			"Yes. Reloop Cloud (hosted) uses the published Free, Pro ($10/mo), Growth ($20/mo), and Enterprise tiers. Self-hosting the Apache 2.0 stack has no Reloop SaaS fee—it is not the same as buying those hosted plans for your own servers.",
 	},
 	{
 		question: "Can I switch plans at any time?",

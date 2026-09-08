@@ -79,14 +79,14 @@ export const CreditErrors = {
 			why: planId
 				? `No Polar subscription product maps to the ${planId} plan.`
 				: "No Polar subscription products could be loaded.",
-			fix: "In Polar, create a recurring product named Individual or Startup, or set metadata plan_id to individual/startup.",
+			fix: "In Polar, create a recurring product named Pro or Growth, or set metadata plan_id to individual/startup.",
 		}),
 	invalidCheckoutPlan: (planId: string) =>
 		createError({
 			status: 400,
 			message: "This plan cannot be purchased here",
 			why: `Plan "${planId}" is not a hosted checkout plan.`,
-			fix: "Choose Individual or Startup, or contact sales for Enterprise.",
+			fix: "Choose Pro or Growth, or contact sales for Enterprise.",
 		}),
 	alreadyOnPlan: (planId: string) =>
 		createError({

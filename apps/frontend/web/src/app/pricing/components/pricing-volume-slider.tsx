@@ -10,11 +10,11 @@ import {
 
 const TICKS = [
 	{ value: 3000, label: "3k", plan: "Free" },
-	{ value: 10000, label: "10k", plan: "Individual" },
-	{ value: 50000, label: "50k", plan: "Individual" },
-	{ value: 100000, label: "100k", plan: "Startup" },
-	{ value: 250000, label: "250k", plan: "Startup" },
-	{ value: 500000, label: "500k", plan: "Startup" },
+	{ value: 10000, label: "10k", plan: "Pro" },
+	{ value: 50000, label: "50k", plan: "Pro" },
+	{ value: 100000, label: "100k", plan: "Growth" },
+	{ value: 250000, label: "250k", plan: "Growth" },
+	{ value: 500000, label: "500k", plan: "Growth" },
 	{ value: 1000000, label: "1M", plan: "Custom" },
 ];
 
@@ -70,29 +70,29 @@ const toVolume = (position: number) => {
 };
 
 /**
- * How close (in USD) Individual's overage-inflated total may get to
- * Startup's base price before Startup becomes the recommendation.
- * E.g. Individual at $18+ overage loses to Startup at $20 base.
+ * How close (in USD) Pro's overage-inflated total may get to
+ * Growth's base price before Growth becomes the recommendation.
+ * E.g. Pro at $18+ overage loses to Growth at $20 base.
  */
 const UPSELL_THRESHOLD_USD = 2;
 
 export function recommendPlanIdForVolume(volume: number): PlanId {
 	if (volume > 500000) return "enterprise";
 	if (volume <= 3000) return "free";
-	const individual = getPlanById("individual");
-	const startup = getPlanById("startup");
-	const individualBase = individual?.monthlyPrice ?? 10;
-	const startupBase = startup?.monthlyPrice ?? 20;
-	const individualIncluded =
-		Number(individual?.comparison.monthlyEmails.replace(/,/g, "")) || 50000;
-	const individualTotal =
-		individualBase +
-		(Math.max(0, volume - individualIncluded) / 1000) *
+	const pro = getPlanById("individual");
+	const growth = getPlanById("startup");
+	const proBase = pro?.monthlyPrice ?? 10;
+	const growthBase = growth?.monthlyPrice ?? 20;
+	const proIncluded =
+		Number(pro?.comparison.monthlyEmails.replace(/,/g, "")) || 50000;
+	const proTotal =
+		proBase +
+		(Math.max(0, volume - proIncluded) / 1000) *
 			paidOverageUsdPerThousand;
-	// Once overage pushes Individual within threshold of Startup's base,
+	// Once overage pushes Pro within threshold of Growth's base,
 	// the next tier is the better deal — recommend it instead of
-	// inflating Individual up to (or past) Startup's price.
-	if (individualTotal >= startupBase - UPSELL_THRESHOLD_USD) return "startup";
+	// inflating Pro up to (or past) Growth's price.
+	if (proTotal >= growthBase - UPSELL_THRESHOLD_USD) return "startup";
 	return "individual";
 }
 

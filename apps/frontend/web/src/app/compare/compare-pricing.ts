@@ -18,17 +18,16 @@ export type ComparePricing = {
 };
 
 const reloopFree = pricingPlans.find((plan) => plan.id === "free");
-const reloopIndividual = pricingPlans.find((plan) => plan.id === "individual");
-const reloopStartup = pricingPlans.find((plan) => plan.id === "startup");
+const reloopPro = pricingPlans.find((plan) => plan.id === "individual");
+const reloopGrowth = pricingPlans.find((plan) => plan.id === "startup");
 
 const reloopFreeValue = formatPrice(reloopFree?.monthlyPrice ?? 0);
 const reloopFreeNote = `${reloopFree?.emailsLabel ?? "3,000 emails / month"} · ${reloopFree?.comparison.dailyLimit ?? "200"} / day`;
-const reloopEntryValue = `${formatPrice(reloopIndividual?.monthlyPrice ?? 10)} / mo`;
-const reloopEntryNote =
-	reloopIndividual?.emailsLabel ?? "50,000 emails / month";
-const reloopMidValue = `${formatPrice(reloopStartup?.monthlyPrice ?? 20)} / mo`;
-const reloopMidNote = reloopStartup?.emailsLabel ?? "100,000 emails / month";
-const reloopOverage = reloopIndividual?.comparison.overage ?? "$0.50 / 1k";
+const reloopEntryValue = `${formatPrice(reloopPro?.monthlyPrice ?? 10)} / mo`;
+const reloopEntryNote = reloopPro?.emailsLabel ?? "50,000 emails / month";
+const reloopMidValue = `${formatPrice(reloopGrowth?.monthlyPrice ?? 20)} / mo`;
+const reloopMidNote = reloopGrowth?.emailsLabel ?? "100,000 emails / month";
+const reloopOverage = reloopPro?.comparison.overage ?? "$0.50 / 1k";
 
 const reloopSendRows = {
 	model: "Pay per email sent",
