@@ -24,7 +24,7 @@
 		"elysia": "catalog:backend",
 		"pg": "catalog:db",
 		"zod": "catalog:ui",
-		"@polar-sh/sdk": "^0.42.2",
+		"@polar-sh/sdk": "^0.49.0",
 		"@reloop/db": "workspace:*",
 		"@reloop/auth": "workspace:*",
 		"@reloop/cache": "workspace:*",
