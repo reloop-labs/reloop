@@ -5,7 +5,6 @@ import {
 	getPlanById,
 	isCheckoutPlanId,
 } from "@reloop/pricing";
-import * as Badge from "@reloop/ui/badge";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { useRouter } from "next/navigation";
@@ -189,11 +188,6 @@ export function BillingPage() {
 								<h2 className="font-medium text-label-md text-text-strong-950">
 									Upgrade to {nextPlan.name} plan
 								</h2>
-								{nextPlan.badge && (
-									<Badge.Root size="small" variant="lighter" color="blue">
-										{nextPlan.badge}
-									</Badge.Root>
-								)}
 							</div>
 							<p className="mt-1 font-medium text-[12px] text-text-sub-600">
 								{nextPlanPriceLabel}
