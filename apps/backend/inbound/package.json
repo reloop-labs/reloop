@@ -1,3 +1,8 @@
 {
-	"name": "be-inbound"
+	"name": "be-inbound",
+	"version": "1.0.0",
+	"private": true,
+	"scripts": {
+		"test": "bun test test/"
+	}
 }

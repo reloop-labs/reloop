@@ -34,6 +34,8 @@ External Sender → Port 25 (SMTP) → Recipient Check → Spam (Rspamd) → NAT
 |----------|---------|-------------|
 | `INBOUND_HOSTNAME` | `inbound.reloop.sh` | EHLO hostname |
 | `NATS_URL` | `reloop-nats:4222` | NATS server URL |
+| `KUMOMTA_MIN_FREE_SPACE` | `1%` | Spool free-space floor. KumoMTA accepts `"10%"` or a byte count; human sizes like `10MB` are converted to bytes (same as SMTP). |
+| `KUMOMTA_MIN_FREE_INODES` | `0` | Spool free-inode floor |
 | `KUMOMTA_RSPAMD_URL` | `http://reloop-spam:11333/checkv2` | Spam (Rspamd) scan endpoint |
 | `KUMOMTA_CHECK_RECIPIENT_URL` | `http://host.docker.internal:8011/api/domain` | Recipient validation endpoint |
 | `NODE_ENV` | `production` | Environment |

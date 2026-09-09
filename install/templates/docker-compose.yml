@@ -241,6 +241,8 @@ services:
       - .env
     environment:
       HOSTNAME: ${RELOOP_DOMAIN}
+      KUMOMTA_MIN_FREE_SPACE: ${KUMOMTA_MIN_FREE_SPACE:-5%}
+      KUMOMTA_MIN_FREE_INODES: ${KUMOMTA_MIN_FREE_INODES:-0}
     ports:
       - "465:465"
       - "587:587"
@@ -262,6 +264,9 @@ services:
       - .env
     environment:
       HOSTNAME: ${RELOOP_INBOUND_HOST}
+      INBOUND_HOSTNAME: ${RELOOP_INBOUND_HOST}
+      KUMOMTA_MIN_FREE_SPACE: ${KUMOMTA_MIN_FREE_SPACE:-5%}
+      KUMOMTA_MIN_FREE_INODES: ${KUMOMTA_MIN_FREE_INODES:-0}
     ports:
       - "25:25"
     volumes:

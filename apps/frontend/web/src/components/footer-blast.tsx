@@ -8,12 +8,14 @@ const accentPixelColorLight: Record<FooterBrandAccent, string> = {
 	default: "#3B82F6",
 	emerald: "#34d399",
 	ink: "#6e7781",
+	orange: "#ea580c",
 };
 
 const accentPixelColorDark: Record<FooterBrandAccent, string> = {
 	default: "#6e7781",
 	emerald: "#6ee7b7",
 	ink: "#6e7781",
+	orange: "#fdba74",
 };
 
 /**

@@ -143,7 +143,10 @@ export const Footer = () => {
 			: pathname === "/why-open-source" ||
 					pathname?.startsWith("/why-open-source/")
 				? "ink"
-				: "default";
+				: pathname === "/features/email-marketing" ||
+						pathname?.startsWith("/features/email-marketing/")
+					? "orange"
+					: "default";
 
 	return (
 		<footer className="w-full bg-bg-white-0 text-text-strong-950 dark:bg-black dark:text-white">

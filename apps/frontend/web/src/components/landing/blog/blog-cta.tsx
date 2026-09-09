@@ -1,4 +1,5 @@
 import { CtaLink } from "@reloop/web/components/landing/cta";
+import { PixelBlastLazy } from "@reloop/web/components/pixel-blast";
 import type { ReactNode } from "react";
 
 type CategoryVariant = {
@@ -80,6 +81,8 @@ export type CtaAccentColor =
 	| "violet"
 	| "amber"
 	| "primary";
+
+export type BlastColors = { light: string; dark: string };
 
 type Rgb = [number, number, number];
 
@@ -163,6 +166,7 @@ export function BlogCta({
 	pill = true,
 	showTopRule = true,
 	primaryVariant = "neutral",
+	blast = false,
 }: {
 	category?: string;
 	headline?: ReactNode;
@@ -188,6 +192,8 @@ export function BlogCta({
 	pill?: boolean;
 	/** Hairline above the CTA. Turn off when a page-level separator already draws it. */
 	showTopRule?: boolean;
+	/** Replace the gradient glow background with a PixelBlast dot field. `true` for blue, or custom light/dark colors. */
+	blast?: boolean | BlastColors;
 }) {
 	const categoryVariant = category ? CATEGORY_VARIANTS[category] : undefined;
 	const variant = {
@@ -211,6 +217,12 @@ export function BlogCta({
 	const named = ACCENT_RGB[resolvedAccent] ?? ACCENT_RGB.blue;
 	const brandRgb = accentHex ? glowRgb(accentHex) : null;
 	const fx = atmosphere(brandRgb ?? named.primary, brandRgb ?? named.secondary);
+	const blastColors: BlastColors | null =
+		blast === true
+			? { light: "#2563eb", dark: "#93c5fd" }
+			: typeof blast === "object"
+				? blast
+				: null;
 	const lineMask =
 		"radial-gradient(ellipse 85% 95% at 88% 110%, black 0%, transparent 68%), radial-gradient(ellipse 70% 90% at 4% -5%, black 0%, transparent 62%)";
 
@@ -227,22 +239,61 @@ export function BlogCta({
 					} ${flush ? "" : "max-w-5xl md:max-w-7xl xl:border-x"}`}
 				>
 					<div aria-hidden className="pointer-events-none absolute inset-0 z-0">
-						<div
-							className="absolute inset-0"
-							style={{ backgroundImage: fx.glow }}
-						/>
-						<div
-							className="absolute inset-0"
-							style={{ backgroundImage: fx.glowAlt }}
-						/>
-						<div
-							className="absolute inset-0"
-							style={{
-								backgroundImage: `repeating-linear-gradient(-45deg, transparent 0, transparent 3px, ${fx.line} 3px, ${fx.line} 3.55px)`,
-								maskImage: lineMask,
-								WebkitMaskImage: lineMask,
-							}}
-						/>
+						{blastColors ? (
+							<div className="absolute inset-0 [-webkit-mask-image:linear-gradient(to_right,black_0%,black_28%,transparent_42%,transparent_58%,black_72%,black_100%)] [mask-image:linear-gradient(to_right,black_0%,black_28%,transparent_42%,transparent_58%,black_72%,black_100%)]">
+								<div className="absolute inset-0 dark:hidden">
+									<PixelBlastLazy
+										variant="square"
+										pixelSize={2}
+										color={blastColors.light}
+										patternScale={4}
+										patternDensity={0.45}
+										enableRipples={false}
+										rippleSpeed={0.05}
+										rippleThickness={0.09}
+										rippleIntensityScale={2.5}
+										speed={0.2}
+										transparent
+										edgeFade={0.65}
+									/>
+								</div>
+								<div className="absolute inset-0 hidden dark:block">
+									<PixelBlastLazy
+										variant="square"
+										pixelSize={2}
+										color={blastColors.dark}
+										patternScale={4}
+										patternDensity={0.45}
+										enableRipples={false}
+										rippleSpeed={0.05}
+										rippleThickness={0.09}
+										rippleIntensityScale={2.5}
+										speed={0.2}
+										transparent
+										edgeFade={0.65}
+									/>
+								</div>
+							</div>
+						) : (
+							<>
+								<div
+									className="absolute inset-0"
+									style={{ backgroundImage: fx.glow }}
+								/>
+								<div
+									className="absolute inset-0"
+									style={{ backgroundImage: fx.glowAlt }}
+								/>
+								<div
+									className="absolute inset-0"
+									style={{
+										backgroundImage: `repeating-linear-gradient(-45deg, transparent 0, transparent 3px, ${fx.line} 3px, ${fx.line} 3.55px)`,
+										maskImage: lineMask,
+										WebkitMaskImage: lineMask,
+									}}
+								/>
+							</>
+						)}
 					</div>
 
 					<div

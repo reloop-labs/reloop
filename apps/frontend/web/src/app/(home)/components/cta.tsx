@@ -14,9 +14,12 @@ export default function CTA() {
 			sub=""
 			primaryLabel="Get Started "
 			primaryHref={hostedSignupHref}
-			secondaryLabel="Contact us"
-			secondaryHref="/contact"
-			accentColor="primary"
+			primaryVariant="primary"
+			secondaryLabel="Schedule call"
+			secondaryHref="https://cal.com/pranavp/30"
+			secondaryExternal
+			accentColor="blue"
+			blast
 			flush
 			align="center"
 			pill={false}

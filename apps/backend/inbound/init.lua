@@ -39,6 +39,7 @@ end
 
 local min_free_space = parse_min_free_space(os.getenv("KUMOMTA_MIN_FREE_SPACE"))
 local min_free_inodes = tonumber(os.getenv("KUMOMTA_MIN_FREE_INODES")) or 0
+print('[SPOOL] min_free_space=' .. tostring(min_free_space) .. ' min_free_inodes=' .. tostring(min_free_inodes) .. ' (KUMOMTA_MIN_FREE_SPACE=' .. tostring(os.getenv("KUMOMTA_MIN_FREE_SPACE")) .. ')')
 
 kumo.on('init', function()
   kumo.define_spool {
