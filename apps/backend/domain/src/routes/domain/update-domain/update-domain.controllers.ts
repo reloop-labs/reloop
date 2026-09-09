@@ -3,10 +3,16 @@ import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { DomainErrors } from "@reloop/domain/error/domain.error-response";
 import type { DomainTypes } from "@reloop/domain/types/domain.type";
+import {
+	receivingTurnedOff,
+	resolveDomainFeatureFlags,
+	sendingTurnedOff,
+	shouldReverifyDomainAfterFeatureUpdate,
+	trackingTurnedOff,
+} from "@reloop/domain/utils/domain-feature-update";
 import { ensureTrackingCnameRecord } from "@reloop/domain/utils/ensure-tracking-cname";
 import { DOMAIN_UPDATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
-import { and, eq, isNull } from "drizzle-orm";
-
+import { and, eq, inArray, isNull } from "drizzle-orm";
 import { useLogger } from "evlog/elysia";
 import { verifyDNSRecordController } from "../verify-dns/verify-dns.controllers";
 
@@ -71,33 +77,52 @@ export async function updateDomainController({
 				),
 			);
 
-		// If both click and open tracking are disabled, reset the CNAME record status to pending and clear errors directly
-		const clickTracking =
-			body.click_tracking !== undefined
-				? body.click_tracking
-				: existingDomain.isClickTrackingEnabled;
-		const openTracking =
-			body.open_tracking !== undefined
-				? body.open_tracking
-				: existingDomain.isOpenTrackingEnabled;
+		const previousFlags = {
+			sending: existingDomain.isSendingEmailEnabled,
+			receiving: existingDomain.isReceivingEmailEnabled,
+			clickTracking: existingDomain.isClickTrackingEnabled,
+			openTracking: existingDomain.isOpenTrackingEnabled,
+		};
+		const nextFlags = resolveDomainFeatureFlags(previousFlags, {
+			sending: body.sending_email,
+			receiving: body.receiving_email,
+			clickTracking: body.click_tracking,
+			openTracking: body.open_tracking,
+		});
+		const trackingEnabled = nextFlags.clickTracking || nextFlags.openTracking;
+		const shouldReverify = shouldReverifyDomainAfterFeatureUpdate({
+			previousStatus: existingDomain.status,
+			previous: previousFlags,
+			next: nextFlags,
+		});
 
-		// Re-verify when sending/receiving changes, or when tracking is newly enabled
-		// (needs CNAME). Disabling tracking alone should not kick off a full verify.
-		// Also skip re-verification entirely for domains that are still "pending" —
-		// the user hasn't set up DNS yet, so there's nothing to verify.
-		const isPending = existingDomain.status === "pending";
-		const emailFeaturesChanged =
-			body.sending_email !== undefined || body.receiving_email !== undefined;
-		const trackingEnabled = clickTracking || openTracking;
-		const trackingTurnedOn =
-			(body.click_tracking === true &&
-				!existingDomain.isClickTrackingEnabled) ||
-			(body.open_tracking === true && !existingDomain.isOpenTrackingEnabled);
-		const shouldReverify =
-			!isPending &&
-			(emailFeaturesChanged || (trackingEnabled && trackingTurnedOn));
+		if (sendingTurnedOff(previousFlags, nextFlags)) {
+			await db
+				.update(schema.domainDnsRecord)
+				.set({ status: "pending", verificationError: null })
+				.where(
+					and(
+						eq(schema.domainDnsRecord.domainId, domainId),
+						eq(schema.domainDnsRecord.purpose, "sending"),
+						inArray(schema.domainDnsRecord.recordTypeName, ["SPF", "DMARC"]),
+					),
+				);
+		}
 
-		if (!clickTracking && !openTracking) {
+		if (receivingTurnedOff(previousFlags, nextFlags)) {
+			await db
+				.update(schema.domainDnsRecord)
+				.set({ status: "pending", verificationError: null })
+				.where(
+					and(
+						eq(schema.domainDnsRecord.domainId, domainId),
+						eq(schema.domainDnsRecord.recordType, "MX"),
+						eq(schema.domainDnsRecord.purpose, "receiving"),
+					),
+				);
+		}
+
+		if (trackingTurnedOff(previousFlags, nextFlags)) {
 			await db
 				.update(schema.domainDnsRecord)
 				.set({ status: "pending", verificationError: null })
@@ -109,7 +134,6 @@ export async function updateDomainController({
 					),
 				);
 		} else if (trackingEnabled) {
-			// Ensure the click/open tracking CNAME exists before verify or UI load.
 			await ensureTrackingCnameRecord({
 				domainId,
 				organizationId,
@@ -117,19 +141,6 @@ export async function updateDomainController({
 				domain: existingDomain.domain,
 				trackingSubdomain: existingDomain.trackingSubdomain,
 			});
-
-			if (shouldReverify) {
-				await db
-					.update(schema.domainDnsRecord)
-					.set({ status: "verifying" })
-					.where(
-						and(
-							eq(schema.domainDnsRecord.domainId, domainId),
-							eq(schema.domainDnsRecord.recordType, "CNAME"),
-							eq(schema.domainDnsRecord.purpose, "tracking"),
-						),
-					);
-			}
 		}
 
 		if (shouldReverify) {
