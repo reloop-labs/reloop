@@ -2,6 +2,7 @@
 
 import { cn } from "@reloop/ui/cn";
 import { useId, useState } from "react";
+import type { ReactNode } from "react";
 
 export type FaqItem = {
 	question: string;
@@ -22,7 +23,7 @@ export function FaqSection({
 	flush = false,
 }: {
 	items: FaqItem[];
-	eyebrow?: string;
+	eyebrow?: ReactNode;
 	title?: string;
 	id?: string;
 	compact?: boolean;

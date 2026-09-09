@@ -112,11 +112,18 @@ export default function TempEmailCheckerPage() {
 				/>
 				<SimilarTools />
 				<div aria-hidden className="h-24" />
-				<div className="border-stroke-soft-100 border-b dark:border-white/10 [&_.t-acc:last-child]:border-b-0">
+				<div className="border-stroke-soft-100 border-y dark:border-white/10 [&_.t-acc:last-child]:border-b-0">
 					<FaqSection
 						items={faqGroups.flatMap((g) => g.items)}
 						id="faq-section"
-						eyebrow="05. FAQ"
+						eyebrow={
+							<>
+								<span className="text-rose-600 dark:text-rose-300">05.</span>{" "}
+								<span className="text-text-sub-600 dark:text-white/50">
+									FAQ
+								</span>
+							</>
+						}
 						compact
 						plain
 						flush

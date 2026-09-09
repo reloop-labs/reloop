@@ -162,7 +162,7 @@ function ApiCard() {
 					</svg>
 				}
 				title="API Reference"
-				lede="Auto-generated from your API spec."
+				lede="Auto-generated reference for Reloop's sending API."
 			/>
 			<div className="mt-6 mb-4">
 				<ApiDiagram />
@@ -252,7 +252,7 @@ function CliCard() {
 					</svg>
 				}
 				title="Developer CLI"
-				lede="Deterministic commands for humans and agents."
+				lede="Send and verify email from your terminal."
 			/>
 			<div className="mt-6 mb-4">
 				<CliDiagram />
@@ -369,7 +369,7 @@ function SkillsCard() {
 					</svg>
 				}
 				title="Agent Skills"
-				lede="Teach your agents every Reloop workflow."
+				lede="Teach your agents Reloop's email workflows."
 			/>
 			<div className="mt-6 mb-4">
 				<SkillsDiagram />
@@ -562,7 +562,7 @@ function McpCard() {
 					</svg>
 				}
 				title="MCP Server"
-				lede="Connect your APIs to AI agents."
+				lede="Connect Reloop's email API to your AI agents."
 			/>
 			<div className="mt-6 mb-4">
 				<McpDiagram />
