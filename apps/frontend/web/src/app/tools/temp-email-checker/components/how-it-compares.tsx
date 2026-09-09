@@ -83,11 +83,14 @@ const QUOTES: {
 		quote: "Most underated Github project",
 	},
 	{
-		name: "Dev K.",
-		handle: "@devk_ships",
-		initials: "DK",
+		name: "Farhan Shaikh",
+		handle: "@farhansklife",
+		initials: "FS",
+		avatar:
+			"https://pbs.twimg.com/profile_images/2094764538948399104/RSXaxJIa.jpg",
+		tweetUrl: "https://x.com/farhansklife/status/2097725657845563431",
 		quote:
-			"The disposable catalogue plus MX checks in one call saved us weeks of yak-shaving.",
+			"We are using @reloop_labs for all transactional emails. Really impressed with the DX and overall UX clean, simple, and very easy to integrate. The pricing is also very competitive: $10 for 50K emails.",
 	},
 	{
 		name: "Lena S.",
@@ -99,12 +102,12 @@ const QUOTES: {
 ];
 
 function QuoteText({ text }: { text: string }) {
-	const parts = text.split(/(@reloop)/g);
+	const parts = text.split(/(@reloop_labs|@reloop)/g);
 	return (
 		<>
 			&ldquo;
 			{parts.map((part, i) =>
-				part === "@reloop" ? (
+				part === "@reloop_labs" || part === "@reloop" ? (
 					<span key={i} className="text-rose-600 dark:text-rose-300">
 						{part}
 					</span>

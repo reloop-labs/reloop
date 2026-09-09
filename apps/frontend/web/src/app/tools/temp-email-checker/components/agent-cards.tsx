@@ -144,35 +144,30 @@ function ApiCard() {
 			rel="noreferrer"
 			className="group flex flex-col bg-bg-white-0 px-4 py-6 sm:px-5 sm:py-8 lg:px-6 lg:py-8 dark:bg-black"
 		>
-			<div className="flex items-center gap-2.5">
-				<svg
-					width="22"
-					height="22"
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="#f43f5e"
-					strokeWidth="2"
-					strokeLinecap="round"
-					strokeLinejoin="round"
-					aria-hidden
-				>
-					<path d="M8 6 L3 12 L8 18" />
-					<path d="M16 6 L21 12 L16 18" />
-				</svg>
-				<h3 className="text-balance font-semibold text-text-strong-950 text-[16px] tracking-[-0.025em] dark:text-white">
-					API Reference
-				</h3>
-			</div>
-			<p className="mt-3 text-[16px] font-medium text-text-strong-950 leading-snug tracking-[-0.025em] dark:text-white">
-				Auto-generated from your API spec.
-			</p>
+			<CardHeader
+				icon={
+					<svg
+						width="22"
+						height="22"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="#f43f5e"
+						strokeWidth="2"
+						strokeLinecap="round"
+						strokeLinejoin="round"
+						aria-hidden
+					>
+						<path d="M8 6 L3 12 L8 18" />
+						<path d="M16 6 L21 12 L16 18" />
+					</svg>
+				}
+				title="API Reference"
+				lede="Auto-generated from your API spec."
+			/>
 			<div className="mt-6 mb-4">
 				<ApiDiagram />
 			</div>
-			<div className="mt-auto flex items-center justify-between border-stroke-soft-100 border-t pt-4 dark:border-white/10">
-				<span className="font-mono text-[11px] tracking-[0.14em] text-text-soft-400 uppercase dark:text-white/30">
-					FEA. [02]
-				</span>
+			<div className="mt-auto flex items-center justify-start border-stroke-soft-100 border-t pt-4 dark:border-white/10">
 				<span className="inline-flex items-center gap-1.5 font-medium text-[13px] text-text-strong-950 transition-colors group-hover:text-blue-600 dark:text-white dark:group-hover:text-blue-400">
 					<span>Explore API Reference</span>
 					<Icon
@@ -239,35 +234,30 @@ function CliCard() {
 			rel="noreferrer"
 			className="group flex flex-col bg-bg-white-0 px-4 py-6 sm:px-5 sm:py-8 lg:px-6 lg:py-8 dark:bg-black"
 		>
-			<div className="flex items-center gap-2.5">
-				<svg
-					width="22"
-					height="22"
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="#f43f5e"
-					strokeWidth="2"
-					strokeLinecap="round"
-					strokeLinejoin="round"
-					aria-hidden
-				>
-					<path d="M4 17 L9 12 L4 7" />
-					<path d="M12 19 H20" />
-				</svg>
-				<h3 className="text-balance font-semibold text-text-strong-950 text-[16px] tracking-[-0.025em] dark:text-white">
-					Developer CLI
-				</h3>
-			</div>
-			<p className="mt-3 text-[16px] font-medium text-text-strong-950 leading-snug tracking-[-0.025em] dark:text-white">
-				Deterministic commands for humans and agents.
-			</p>
+			<CardHeader
+				icon={
+					<svg
+						width="22"
+						height="22"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="#f43f5e"
+						strokeWidth="2"
+						strokeLinecap="round"
+						strokeLinejoin="round"
+						aria-hidden
+					>
+						<path d="M4 17 L9 12 L4 7" />
+						<path d="M12 19 H20" />
+					</svg>
+				}
+				title="Developer CLI"
+				lede="Deterministic commands for humans and agents."
+			/>
 			<div className="mt-6 mb-4">
 				<CliDiagram />
 			</div>
-			<div className="mt-auto flex items-center justify-between border-stroke-soft-100 border-t pt-4 dark:border-white/10">
-				<span className="font-mono text-[11px] tracking-[0.14em] text-text-soft-400 uppercase dark:text-white/30">
-					FEA. [03]
-				</span>
+			<div className="mt-auto flex items-center justify-start border-stroke-soft-100 border-t pt-4 dark:border-white/10">
 				<span className="inline-flex items-center gap-1.5 font-medium text-[13px] text-text-strong-950 transition-colors group-hover:text-blue-600 dark:text-white dark:group-hover:text-blue-400">
 					<span>CLI Reference</span>
 					<Icon
@@ -362,34 +352,29 @@ function SkillsCard() {
 			rel="noreferrer"
 			className="group flex flex-col bg-bg-white-0 px-4 py-6 sm:px-5 sm:py-8 lg:px-6 lg:py-8 dark:bg-black"
 		>
-			<div className="flex items-center gap-2.5">
-				<svg
-					width="22"
-					height="22"
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="#f43f5e"
-					strokeWidth="1.8"
-					strokeLinecap="round"
-					strokeLinejoin="round"
-					aria-hidden
-				>
-					<path d="M12 3 C12.5 8 13.5 9.5 19 10 C13.5 10.5 12.5 12 12 17 C11.5 12 10.5 10.5 5 10 C10.5 9.5 11.5 8 12 3 Z" />
-				</svg>
-				<h3 className="text-balance font-semibold text-text-strong-950 text-[16px] tracking-[-0.025em] dark:text-white">
-					Agent Skills
-				</h3>
-			</div>
-			<p className="mt-3 text-[16px] font-medium text-text-strong-950 leading-snug tracking-[-0.025em] dark:text-white">
-				Teach your agents every Reloop workflow.
-			</p>
+			<CardHeader
+				icon={
+					<svg
+						width="22"
+						height="22"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="#f43f5e"
+						strokeWidth="1.8"
+						strokeLinecap="round"
+						strokeLinejoin="round"
+						aria-hidden
+					>
+						<path d="M12 3 C12.5 8 13.5 9.5 19 10 C13.5 10.5 12.5 12 12 17 C11.5 12 10.5 10.5 5 10 C10.5 9.5 11.5 8 12 3 Z" />
+					</svg>
+				}
+				title="Agent Skills"
+				lede="Teach your agents every Reloop workflow."
+			/>
 			<div className="mt-6 mb-4">
 				<SkillsDiagram />
 			</div>
-			<div className="mt-auto flex items-center justify-between border-stroke-soft-100 border-t pt-4 dark:border-white/10">
-				<span className="font-mono text-[11px] tracking-[0.14em] text-text-soft-400 uppercase dark:text-white/30">
-					FEA. [04]
-				</span>
+			<div className="mt-auto flex items-center justify-start border-stroke-soft-100 border-t pt-4 dark:border-white/10">
 				<span className="inline-flex items-center gap-1.5 font-medium text-[13px] text-text-strong-950 transition-colors group-hover:text-blue-600 dark:text-white dark:group-hover:text-blue-400">
 					<span>Install Agent Skills</span>
 					<Icon
@@ -400,6 +385,43 @@ function SkillsCard() {
 				</span>
 			</div>
 		</a>
+	);
+}
+
+function CardHeader({
+	icon,
+	title,
+	lede,
+}: {
+	icon: ReactNode;
+	title: string;
+	lede: string;
+}) {
+	return (
+		<div className="flex gap-2.5">
+			<div className="flex shrink-0 flex-col items-center" aria-hidden>
+				{icon}
+				<svg
+					width="22"
+					height="48"
+					viewBox="0 0 22 48"
+					fill="none"
+					className="stroke-stroke-soft-100 dark:stroke-white/10"
+					strokeWidth="1.5"
+					strokeLinecap="round"
+				>
+					<path d="M11 0 V38 Q11 46 19 46 H22" />
+				</svg>
+			</div>
+			<div>
+				<h3 className="text-balance font-semibold text-text-strong-950 text-[16px] tracking-[-0.025em] dark:text-white">
+					{title}
+				</h3>
+				<p className="mt-2 text-[16px] font-medium text-text-strong-950 leading-snug tracking-[-0.025em] dark:text-white">
+					{lede}
+				</p>
+			</div>
+		</div>
 	);
 }
 
@@ -520,37 +542,32 @@ function McpCard() {
 			rel="noreferrer"
 			className="group flex flex-col bg-bg-white-0 px-4 py-6 sm:px-5 sm:py-8 lg:px-6 lg:py-8 dark:bg-black"
 		>
-			<div className="flex items-center gap-2.5">
-				<svg
-					width="22"
-					height="22"
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="#f43f5e"
-					strokeWidth="1.8"
-					strokeLinecap="round"
-					strokeLinejoin="round"
-					aria-hidden
-				>
-					<circle cx="6" cy="6" r="2.5" />
-					<circle cx="18" cy="6" r="2.5" />
-					<circle cx="6" cy="18" r="2.5" />
-					<path d="M8.5 6 H15.5 M6 8.5 V15.5 M8 16.5 L15 8" />
-				</svg>
-				<h3 className="text-balance font-semibold text-text-strong-950 text-[16px] tracking-[-0.025em] dark:text-white">
-					MCP Server
-				</h3>
-			</div>
-			<p className="mt-3 text-[16px] font-medium text-text-strong-950 leading-snug tracking-[-0.025em] dark:text-white">
-				Connect your APIs to AI agents.
-			</p>
+			<CardHeader
+				icon={
+					<svg
+						width="22"
+						height="22"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="#f43f5e"
+						strokeWidth="1.8"
+						strokeLinecap="round"
+						strokeLinejoin="round"
+						aria-hidden
+					>
+						<circle cx="6" cy="6" r="2.5" />
+						<circle cx="18" cy="6" r="2.5" />
+						<circle cx="6" cy="18" r="2.5" />
+						<path d="M8.5 6 H15.5 M6 8.5 V15.5 M8 16.5 L15 8" />
+					</svg>
+				}
+				title="MCP Server"
+				lede="Connect your APIs to AI agents."
+			/>
 			<div className="mt-6 mb-4">
 				<McpDiagram />
 			</div>
-			<div className="mt-auto flex items-center justify-between border-stroke-soft-100 border-t pt-4 dark:border-white/10">
-				<span className="font-mono text-[11px] tracking-[0.14em] text-text-soft-400 uppercase dark:text-white/30">
-					FEA. [01]
-				</span>
+			<div className="mt-auto flex items-center justify-start border-stroke-soft-100 border-t pt-4 dark:border-white/10">
 				<span className="inline-flex items-center gap-1.5 font-medium text-[13px] text-text-strong-950 transition-colors group-hover:text-blue-600 dark:text-white dark:group-hover:text-blue-400">
 					<span>Explore MCP Server</span>
 					<Icon
