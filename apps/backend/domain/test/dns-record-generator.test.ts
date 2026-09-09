@@ -1,5 +1,7 @@
 import { describe, expect, test } from "bun:test";
+import { DNSTypes } from "../src/types/dns.type";
 import {
+	generateAllDNSRecords,
 	generateMXRecord,
 	generateReceivingMXRecordForDomain,
 } from "../src/utils/dns-record-generator";
@@ -33,6 +35,17 @@ describe("generateMXRecord", () => {
 		expect(record.name).toBe("send");
 		expect(record.fqdn).toBe("send.example.com");
 		expect(record.value).toBe("reloop.sh");
+	});
+});
+
+describe("generateAllDNSRecords", () => {
+	test("sending records are SPF, DKIM, and DMARC — no MX", async () => {
+		const records = await generateAllDNSRecords("example.com");
+		expect(records.spfRecord.type).toBe(DNSTypes.DNSRecordType.TXT);
+		expect(records.spfRecord.value.startsWith("v=spf1")).toBe(true);
+		expect(records.dmarcRecord.value.startsWith("v=DMARC1")).toBe(true);
+		expect(records.dkimRecord.value.startsWith("v=DKIM1")).toBe(true);
+		expect(records).not.toHaveProperty("mxRecord");
 	});
 });
 

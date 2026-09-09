@@ -123,21 +123,12 @@ export async function processDomainVerification({
 				(r) => r.recordType === "TXT" && r.value.startsWith("v=DMARC1"),
 			)
 		: undefined;
-	const sendingMxRecord = isSendingEnabled
-		? records.find((r) => r.recordType === "MX" && r.purpose === "sending")
-		: undefined;
-
-	if (isSendingEnabled && (!spfRecord || !dmarcRecord || !sendingMxRecord)) {
-		const missing = [
-			!spfRecord && "SPF",
-			!dmarcRecord && "DMARC",
-			!sendingMxRecord && "sending MX",
-		]
+	if (isSendingEnabled && (!spfRecord || !dmarcRecord)) {
+		const missing = [!spfRecord && "SPF", !dmarcRecord && "DMARC"]
 			.filter(Boolean)
 			.join(", ");
 		log.warn({
-			message:
-				"Missing SPF, DMARC, or sending MX record when sending is enabled",
+			message: "Missing SPF or DMARC record when sending is enabled",
 			domainId,
 		});
 		await markDomainFailed(
@@ -219,30 +210,16 @@ export async function processDomainVerification({
 		});
 	}
 
-	if (isSendingEnabled && sendingMxRecord) {
+	if (isReceivingEnabled && receivingMxRecord) {
 		activeResults.push({
-			record: sendingMxRecord,
+			record: receivingMxRecord,
 			verifyFn: () =>
 				verifyMxRecord(
-					sendingMxRecord.fqdn,
-					sendingMxRecord.value,
-					sendingMxRecord.priority ?? 10,
+					receivingMxRecord.fqdn,
+					receivingMxRecord.value,
+					receivingMxRecord.priority ?? 10,
 				),
 		});
-	}
-
-	if (isReceivingEnabled && receivingMxRecord) {
-		if (!sendingMxRecord || receivingMxRecord.id !== sendingMxRecord.id) {
-			activeResults.push({
-				record: receivingMxRecord,
-				verifyFn: () =>
-					verifyMxRecord(
-						receivingMxRecord.fqdn,
-						receivingMxRecord.value,
-						receivingMxRecord.priority ?? 10,
-					),
-			});
-		}
 	}
 
 	if (isTrackingEnabled && cnameRecord) {
@@ -269,13 +246,10 @@ export async function processDomainVerification({
 	const dmarcOk = dmarcRecord
 		? (results.find((r) => r.record.id === dmarcRecord.id)?.ok ?? false)
 		: true;
-	const sendingMxOk = sendingMxRecord
-		? (results.find((r) => r.record.id === sendingMxRecord.id)?.ok ?? false)
-		: true;
 	const receivingMxOk = receivingMxRecord
 		? (results.find((r) => r.record.id === receivingMxRecord.id)?.ok ?? false)
 		: true;
-	const mxOk = sendingMxOk && receivingMxOk;
+	const mxOk = receivingMxOk;
 	const cnameOk = cnameRecord
 		? (results.find((r) => r.record.id === cnameRecord.id)?.ok ?? false)
 		: true;

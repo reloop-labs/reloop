@@ -50,53 +50,12 @@ Log in to your [Cloudflare account](https://dash.cloudflare.com) and open **DNS 
 
 If Reloop or `dig NS yourdomain.com` shows a different host, stop and edit that host instead — see [Wrong nameservers](/docs/guides/connect-domain/troubleshoot/wrong-nameservers).
 
-### Add Sending MX record
-
-Click **Add record** on Cloudflare:
-
-1. Set the Type to `MX`.
-2. Set the **Name** to the host Reloop shows (for a subdomain like `team.example.com`, Cloudflare often wants `team`).
-3. Copy the MX value from Reloop into the **Mail server** field (typically `reloop.sh`).
-4. Use `Auto` for **TTL**.
-5. Set **Priority** to the value Reloop shows (often `10`).
-6. Select **Save**.
-
-<DocImage
-	label="Reloop — Sending MX"
-	src="/docs/images/docs/guides/connect-domain/providers/cloudflare/spf-mx-reloop.png"
-	alt="Reloop sending MX record"
-/>
-
-<DocImage
-	label="Cloudflare — Sending MX"
-	src="/docs/images/docs/guides/connect-domain/providers/cloudflare/spf-mx-cloudflare.png"
-	alt="Add sending MX record in Cloudflare"
-/>
-
-Below is a mapping of the record fields from Reloop to Cloudflare:
-
-| Cloudflare | Reloop | Example value |
-| --- | --- | --- |
-| Type | Type | `MX` |
-| Name | Name | `team` (or `@` for the root) |
-| Mail server | Value | `reloop.sh` |
-| Priority | Priority | `10` |
-| TTL | TTL | `Auto` |
-
-<Info>
-Omit your domain from the Name field when Cloudflare appends it. Paste `team`, not `team.example.com`.
-</Info>
-
-<Info>
-Do not reuse the same priority for conflicting MX records you must keep. If Priority `10` is already in use on that host, follow Reloop’s UI or use a [separate subdomain](/docs/guides/connect-domain/what-is-a-domain).
-</Info>
-
 ### Add TXT SPF record
 
 Click **Add record** on Cloudflare:
 
 1. Set the Type to `TXT`.
-2. Set the **Name** to the host Reloop shows (same host as the sending MX, e.g. `team` or `@`).
+2. Set the **Name** to the host Reloop shows (e.g. `team` or `@`).
 3. Copy the TXT value from Reloop into **Content** (typically `v=spf1 include:reloop.sh -all`).
 4. Use `Auto` for **TTL**.
 5. Select **Save**.

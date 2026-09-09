@@ -27,7 +27,7 @@ interface DnsConfigEmailProps {
 	domain: string;
 	/** Domain verification (DKIM TXT) */
 	dkimRecords?: DNSRecord[];
-	/** Enable sending (SPF TXT + sending MX) */
+	/** Enable sending (SPF TXT) */
 	sendingRecords?: DNSRecord[];
 	/** DMARC */
 	dmarcRecords?: DNSRecord[];
@@ -65,14 +65,6 @@ const sampleSending: DNSRecord[] = [
 		value: "v=spf1 include:reloop.sh -all",
 		ttl: "Auto",
 		priority: null,
-	},
-	{
-		recordType: "MX",
-		recordTypeName: "MX",
-		name: "send",
-		value: "reloop.sh",
-		ttl: "Auto",
-		priority: 10,
 	},
 ];
 
@@ -499,9 +491,8 @@ export const DnsConfigEmail = ({
 	}
 	if (resolvedSending.length > 0) {
 		groups.push({
-			title: "Email Sending (SPF + MX)",
-			description:
-				"Authorizes Reloop to send mail and routes bounce/return-path traffic.",
+			title: "Email Sending (SPF)",
+			description: "Authorizes Reloop to send mail from this domain.",
 			records: resolvedSending,
 		});
 	}

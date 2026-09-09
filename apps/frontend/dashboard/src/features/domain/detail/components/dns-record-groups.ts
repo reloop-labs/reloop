@@ -1,8 +1,5 @@
 import type { DNSRecord } from "#/features/domain/types";
 
-const _normalizeLabel = (value: string) => value.trim().toLowerCase();
-const _RECEIVING_MX_VALUE = "inbound.reloop.sh";
-
 const isDmarcRecord = (record: DNSRecord) =>
 	record.purpose === "sending" && record.recordTypeName === "DMARC";
 
@@ -15,8 +12,7 @@ const isReceivingMxRecord = (record: DNSRecord) =>
 const isTrackingRecord = (record: DNSRecord) => record.purpose === "tracking";
 
 const isSendingRecord = (record: DNSRecord) =>
-	record.purpose === "sending" &&
-	(record.recordTypeName === "SPF" || record.recordTypeName === "MX");
+	record.purpose === "sending" && record.recordTypeName === "SPF";
 
 export const groupDomainDnsRecords = (records: DNSRecord[] | undefined) => {
 	const allRecords = records ?? [];

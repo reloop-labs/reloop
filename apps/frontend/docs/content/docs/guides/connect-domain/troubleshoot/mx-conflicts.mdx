@@ -8,7 +8,7 @@ MX records decide **where inbound mail is delivered**. Lower priority number = h
 
 ## Sending-only with an existing inbox
 
-If you only need Reloop to **send**, keep your current inbox MX where it is. Publish SPF, DKIM, DMARC, **Sending MX** (`reloop.sh`), and tracking as shown in Reloop — and turn **Email Receiving** off so Reloop does not expect inbound MX (`inbound.reloop.sh`).
+If you only need Reloop to **send**, keep your current inbox MX where it is. Publish SPF, DKIM, DMARC, and tracking as shown in Reloop — and turn **Email Receiving** off so Reloop does not expect inbound MX (`inbound.reloop.sh`). Sending does not require an MX record.
 
 New domains start with Email Receiving on; turn it off before Auto-populate or manual publish if you must keep Google Workspace / Microsoft 365 on that hostname.
 

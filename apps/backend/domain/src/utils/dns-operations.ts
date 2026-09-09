@@ -82,8 +82,7 @@ export function getRecordPurpose(
 			const cleanDomain = domain.trim().toLowerCase();
 			const cleanValue = (value ?? "").trim().toLowerCase();
 			// Receiving MX is on the customer domain apex (or the product subdomain)
-			// and points at inbound.{HOST_DOMAIN}. Sending / return-path MX lives on
-			// the `send` (or similar) host and points at the bare HOST_DOMAIN.
+			// and points at inbound.{HOST_DOMAIN}. Sending does not use MX.
 			if (cleanValue.startsWith("inbound.")) {
 				return "receiving";
 			}

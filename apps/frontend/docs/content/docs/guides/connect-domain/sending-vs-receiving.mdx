@@ -17,8 +17,9 @@ Typically involves:
 - **SPF** — authorize Reloop (`include:reloop.sh`)
 - **DKIM** — sign messages (`reloop._domainkey`)
 - **DMARC** — policy for failures (required for Reloop verification when Email Sending is on)
-- **Sending MX** — MX → `reloop.sh` (required when Email Sending is on; this does **not** replace your inbox MX by itself)
 - **Tracking CNAME** — on by default for new domains (`link` on apex, or `link.<subdomain>` when using a subdomain) → `link.reloop.sh`
+
+Sending does **not** require an MX record. MX is only for inbound mail.
 
 You can keep another provider as the inbox on the same domain **if** you leave **Email Receiving** off and do not publish Reloop’s inbound MX for that hostname.
 
@@ -46,7 +47,7 @@ On the domain **DNS Records** and **Configuration** tabs you can enable or disab
 
 | Goal | Approach |
 | --- | --- |
-| Transactional send only; keep existing inbox | Root or subdomain + SPF/DKIM/DMARC/Sending MX (+ tracking as needed); turn **Email Receiving** off; do not publish inbound MX → `inbound.reloop.sh` |
+| Transactional send only; keep existing inbox | Root or subdomain + SPF/DKIM/DMARC (+ tracking as needed); turn **Email Receiving** off; do not publish inbound MX → `inbound.reloop.sh` |
 | Full Reloop inbox + send | Subdomain or dedicated domain; Receiving MX → `inbound.reloop.sh` |
 | Send from `news.acme.com`, inbox stays on `acme.com` | Add `news.acme.com` in Reloop; leave root MX alone |
 

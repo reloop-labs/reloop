@@ -45,18 +45,9 @@ export async function updateStatusToVerifying_step2({
 				(r) => r.recordType === "TXT" && r.value.startsWith("v=DMARC1"),
 			)
 		: undefined;
-	const sendingMxRecord = isSendingEnabled
-		? domain.dnsRecords.find(
-				(r: any) => r.recordType === "MX" && r.purpose === "sending",
-			)
-		: undefined;
-
 	if (isSendingEnabled && spfRecord && dmarcRecord) {
 		activeRecordIds.add(spfRecord.id);
 		activeRecordIds.add(dmarcRecord.id);
-	}
-	if (isSendingEnabled && sendingMxRecord) {
-		activeRecordIds.add(sendingMxRecord.id);
 	}
 
 	const isReceivingEnabled = domain.isReceivingEmailEnabled;
@@ -65,7 +56,7 @@ export async function updateStatusToVerifying_step2({
 				(r) => r.recordType === "MX" && r.purpose === "receiving",
 			) ??
 			domain.dnsRecords.find(
-				(r: any) => r.recordType === "MX" && r.purpose === "sending",
+				(r) => r.recordType === "MX" && r.purpose === "sending",
 			))
 		: undefined;
 

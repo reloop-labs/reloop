@@ -55,7 +55,6 @@ The Reloop Domain Connect template typically applies groups based on your domain
 - DKIM TXT on `reloop._domainkey`
 - SPF via SPFM / merge (`include:reloop.sh`)
 - DMARC on `_dmarc` (required for verification when Email Sending is on)
-- **Sending MX** → `reloop.sh` when Email Sending is on
 - **Receiving MX** → `inbound.reloop.sh` when Email Receiving is on (default for new domains)
 - Tracking CNAME → `link.reloop.sh` when tracking is on (host is usually `link` on apex, or `link.<subdomain>` when the Reloop domain is a subdomain)
 

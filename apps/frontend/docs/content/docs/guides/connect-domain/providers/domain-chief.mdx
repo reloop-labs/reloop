@@ -44,45 +44,12 @@ Domain Chief → select domain → DNS.
 
 If Reloop or `dig NS yourdomain.com` shows a different host, stop and edit that host instead — see [Wrong nameservers](/docs/guides/connect-domain/troubleshoot/wrong-nameservers).
 
-### Add Sending MX record
-
-Add a record in Domain Chief:
-
-1. Set the Type to `MX`.
-2. Set the **Name** to the host Reloop shows (for a subdomain like `team.example.com`, often `team` or `@` depending on the UI).
-3. Copy the MX value from Reloop into the mail server / value field (typically `reloop.sh`).
-4. Use `Auto` or the provider default for **TTL**.
-5. Set **Priority** to the value Reloop shows (often `10`).
-6. Save.
-
-<DocImage
-	label="Reloop — Sending MX"
-	src="/docs/images/docs/guides/connect-domain/shared/spf-mx-reloop.png"
-	alt="Reloop sending MX record"
-/>
-
-| Domain Chief | Reloop | Example value |
-| --- | --- | --- |
-| Type | Type | `MX` |
-| Name / Host | Name | `team` (or `@` for the root) |
-| Value / Mail server | Value | `reloop.sh` |
-| Priority | Priority | `10` |
-| TTL | TTL | `Auto` |
-
-<Info>
-Omit your domain from the Name field when Domain Chief appends it. Paste `team`, not `team.example.com`.
-</Info>
-
-<Info>
-Do not reuse the same priority for conflicting MX records you must keep. If Priority `10` is already in use on that host, follow Reloop’s UI or use a [separate subdomain](/docs/guides/connect-domain/what-is-a-domain).
-</Info>
-
 ### Add TXT SPF record
 
 Add a record in Domain Chief:
 
 1. Set the Type to `TXT`.
-2. Set the **Name** to the host Reloop shows (same host as the sending MX, e.g. `team` or `@`).
+2. Set the **Name** to the host Reloop shows (e.g. `team` or `@`).
 3. Copy the TXT value from Reloop (typically `v=spf1 include:reloop.sh -all`).
 4. Use `Auto` or the provider default for **TTL**.
 5. Save.

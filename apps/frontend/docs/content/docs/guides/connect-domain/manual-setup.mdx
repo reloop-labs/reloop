@@ -26,7 +26,7 @@ description: Use manual setup for any DNS host — including every provider wher
     1. Choose the same **type** (TXT, MX, CNAME)
     2. Set **name/host** as shown (`@`, `reloop._domainkey`, `_dmarc`, `link` or `link.<sub>`, …)
     3. Paste **value** exactly
-    4. For MX, set **priority** (often `10`) — include both **Sending MX** (`reloop.sh`) and **Receiving MX** (`inbound.reloop.sh`) when those rows appear
+    4. For MX, set **priority** (often `10`) — add **Receiving MX** (`inbound.reloop.sh`) only when Email Receiving is on
     5. Save
 
     Provider UIs differ:
@@ -48,7 +48,7 @@ description: Use manual setup for any DNS host — including every provider wher
 - [ ] Edited the DNS host that matches your **NS** records (not only the registrar invoice)
 - [ ] DKIM TXT is complete (long `p=` value not cut off)
 - [ ] Only one SPF record on that host
-- [ ] DMARC and Sending MX published when Email Sending is on
+- [ ] DMARC published when Email Sending is on
 - [ ] Email Receiving toggled to match intent ([sending vs receiving](/docs/guides/connect-domain/sending-vs-receiving)) — default is on for new domains
 - [ ] Tracking CNAME host matches the dashboard (`link` or `link.<sub>`) and is free or intentionally replaced
 

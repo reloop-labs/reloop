@@ -86,7 +86,6 @@ Typical Reloop rows (always confirm in the dashboard):
 | SPF | TXT | `@` | `v=spf1 include:reloop.sh -all` (or merge into existing SPF) |
 | DKIM | TXT | `reloop._domainkey` | `v=DKIM1; k=rsa; p=…` (unique per domain) |
 | DMARC | TXT | `_dmarc` | `v=DMARC1; p=reject;` (or your existing policy) — required when Email Sending is on |
-| Sending MX | MX | `@` or subdomain host | `reloop.sh` (required when Email Sending is on) |
 | Tracking | CNAME | `link` (or `link.<sub>` for subdomains) | `link.reloop.sh` (on by default for new domains) |
 | Receiving MX | MX | `@` or subdomain host | `inbound.reloop.sh` (on by default for new domains — turn Email Receiving off if you keep another inbox here) |
 

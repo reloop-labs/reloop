@@ -118,7 +118,6 @@ export function generateReceivingMXRecordForDomain(
 }
 
 export async function generateAllDNSRecords(domain: string): Promise<{
-	mxRecord: DNSTypes.DNSRecord;
 	spfRecord: DNSTypes.DNSRecord;
 	dmarcRecord: DNSTypes.DNSRecord;
 	dkimRecord: DNSTypes.DNSRecord;
@@ -128,9 +127,7 @@ export async function generateAllDNSRecords(domain: string): Promise<{
 	const dkimRecord = await generateDKIMRecord(domainSubString, domainHost);
 	const spfRecord = generateSPFRecord(domainSubString, domainHost);
 	const dmarcRecord = generateDMARCRecord(domainSubString, domainHost);
-	const mxRecord = generateMXRecord(domainSubString, domainHost);
 	return {
-		mxRecord,
 		spfRecord,
 		dmarcRecord,
 		dkimRecord,

@@ -36,7 +36,7 @@ function toEmailRecord(r: DnsConfigRecord): EmailDnsRecord {
 
 /**
  * Group DNS records the same way the dashboard does:
- * DKIM / sending (SPF+MX) / DMARC / receiving MX / tracking CNAME.
+ * DKIM / sending (SPF) / DMARC / receiving MX / tracking CNAME.
  * Falls back to value/type heuristics when purpose/recordTypeName are absent
  * (older DNS_CONFIG_REQUESTED payloads only had type/name/value/priority).
  */
@@ -67,13 +67,6 @@ function groupDnsConfigRecords(records: DnsConfigRecord[]) {
 		purposeOf(r) === "receiving" ||
 		(isMxType(r) && valueOf(r).toLowerCase().startsWith("inbound."));
 
-	// Sending MX: purpose=sending, or MX that is not the receiving/inbound record
-	const isSendingMx = (r: DnsConfigRecord) => {
-		if (!isMxType(r) || isReceiving(r)) return false;
-		const purpose = purposeOf(r);
-		return purpose === "sending" || purpose === undefined;
-	};
-
 	const isTracking = (r: DnsConfigRecord) => {
 		if (purposeOf(r) === "tracking") return true;
 		// Tracking host is a CNAME; never treat DKIM selectors as tracking.
@@ -82,10 +75,7 @@ function groupDnsConfigRecords(records: DnsConfigRecord[]) {
 	};
 
 	const dkimRecords = records.filter(isDkim).map(toEmailRecord);
-	// Sending group: SPF + sending MX (matches dashboard "Enable Sending")
-	const sendingRecords = records
-		.filter((r) => isSpf(r) || isSendingMx(r))
-		.map(toEmailRecord);
+	const sendingRecords = records.filter(isSpf).map(toEmailRecord);
 	const dmarcRecords = records.filter(isDmarc).map(toEmailRecord);
 	const receivingRecords = records.filter(isReceiving).map(toEmailRecord);
 	const trackingRecords = records.filter(isTracking).map(toEmailRecord);

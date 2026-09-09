@@ -21,13 +21,12 @@ export async function createDnsRecords_step5({
 		dkimRecord: DNSTypes.DNSRecord;
 		spfRecord: DNSTypes.DNSRecord;
 		dmarcRecord: DNSTypes.DNSRecord;
-		mxRecord: DNSTypes.DNSRecord;
 	};
 	receivingMxRecord: DNSTypes.DNSRecord;
 	trackingRecord?: DNSTypes.DNSRecord;
 }) {
 	const log = useLogger();
-	const { dkimRecord, spfRecord, dmarcRecord, mxRecord } = dnsRecords;
+	const { dkimRecord, spfRecord, dmarcRecord } = dnsRecords;
 
 	const dnsRecordIds = {
 		domainId,
@@ -72,24 +71,6 @@ export async function createDnsRecords_step5({
 		},
 		{
 			...dnsRecordIds,
-			recordType: mxRecord.type,
-			name: mxRecord.name,
-			fqdn: mxRecord.fqdn,
-			value: mxRecord.value,
-			recordTypeName: "MX" as const,
-			priority: mxRecord.priority,
-			purpose: "sending",
-		},
-	];
-
-	const hasDistinctReceivingMxRecord =
-		receivingMxRecord.name !== mxRecord.name ||
-		receivingMxRecord.value !== mxRecord.value ||
-		receivingMxRecord.priority !== mxRecord.priority;
-
-	if (hasDistinctReceivingMxRecord) {
-		recordsToInsert.push({
-			...dnsRecordIds,
 			recordType: receivingMxRecord.type,
 			name: receivingMxRecord.name,
 			fqdn: receivingMxRecord.fqdn,
@@ -97,8 +78,8 @@ export async function createDnsRecords_step5({
 			recordTypeName: "MX" as const,
 			priority: receivingMxRecord.priority,
 			purpose: "receiving",
-		});
-	}
+		},
+	];
 
 	if (trackingRecord) {
 		recordsToInsert.push({
