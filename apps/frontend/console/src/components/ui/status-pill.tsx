@@ -15,13 +15,28 @@ const TONE: Record<string, string> = {
 export function statusTone(status: string): keyof typeof TONE {
 	const s = status.toLowerCase();
 	if (
-		["active", "delivered", "sent", "open", "enabled", "published"].includes(s)
+		[
+			"active",
+			"delivered",
+			"sent",
+			"open",
+			"enabled",
+			"published",
+			"received",
+			"processing",
+		].includes(s)
 	)
 		return "green";
 	if (
-		["suspended", "banned", "failed", "deleted", "disabled", "closed"].includes(
-			s,
-		)
+		[
+			"suspended",
+			"banned",
+			"failed",
+			"deleted",
+			"disabled",
+			"closed",
+			"rejected",
+		].includes(s)
 	)
 		return "red";
 	if (["bounced", "spam", "past_due", "warning", "verifying"].includes(s))

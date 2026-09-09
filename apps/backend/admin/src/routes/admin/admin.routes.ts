@@ -3,6 +3,7 @@ import { auditRoute } from "@reloop/admin/routes/admin/audit/audit.route";
 import { creditsRoute } from "@reloop/admin/routes/admin/credits/credits.route";
 import { domainsRoute } from "@reloop/admin/routes/admin/domains/domains.route";
 import { emailsRoute } from "@reloop/admin/routes/admin/emails/emails.route";
+import { inboundRoute } from "@reloop/admin/routes/admin/inbound/inbound.route";
 import { organizationsRoute } from "@reloop/admin/routes/admin/organizations/organizations.route";
 import { overviewRoute } from "@reloop/admin/routes/admin/overview/overview.route";
 import { searchRoute } from "@reloop/admin/routes/admin/search/search.route";
@@ -22,5 +23,6 @@ export const adminRoutes = new Elysia({
 	.use(domainsRoute)
 	.use(creditsRoute)
 	.use(emailsRoute)
+	.use(inboundRoute)
 	.use(auditRoute)
 	.use(supportRoute);

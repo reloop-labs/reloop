@@ -54,6 +54,13 @@ export const CONSOLE_QUICK_ACTIONS: ConsoleQuickAction[] = [
 		href: "/emails?status=failed",
 	},
 	{
+		id: "received-emails",
+		label: "Received emails",
+		description: "Inbound mail across organizations",
+		iconName: "mail-receive",
+		href: "/inbound",
+	},
+	{
 		id: "audit",
 		label: "Audit log",
 		description: "Who changed what",

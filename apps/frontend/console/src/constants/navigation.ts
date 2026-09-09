@@ -34,7 +34,13 @@ export const ADMIN_NAV_GROUPS: NavGroup[] = [
 				href: "/emails",
 				label: "Emails",
 				iconName: "mail",
-				description: "All emails across orgs",
+				description: "Sent emails across orgs",
+			},
+			{
+				href: "/inbound",
+				label: "Received",
+				iconName: "mail-receive",
+				description: "Inbound mail across orgs",
 			},
 			{
 				href: "/audit",

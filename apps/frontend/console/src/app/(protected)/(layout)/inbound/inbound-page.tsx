@@ -1,6 +1,6 @@
 "use client";
 
-import { EmailDetailDrawer } from "@fe/console/components/email-detail-drawer";
+import { InboundDetailDrawer } from "@fe/console/components/inbound-detail-drawer";
 import {
 	DataTable,
 	PageFrame,
@@ -17,20 +17,23 @@ import { parseAsString, useQueryState } from "nuqs";
 import { useEffect, useState } from "react";
 import useSWR from "swr";
 
-type EmailItem = {
+type InboundItem = {
 	id: string;
 	organizationId: string;
+	organizationName: string | null;
+	mailboxEmail: string | null;
 	fromEmail: string;
 	toEmails: string[] | unknown;
-	subject: string;
+	subject: string | null;
 	status: string;
+	isSpam: boolean;
+	spamScore: number | null;
 	createdAt: string;
-	sentAt: string | null;
 };
 
-type EmailsResponse = { items: EmailItem[]; total: number };
+type InboundResponse = { items: InboundItem[]; total: number };
 
-export default function EmailsPage() {
+export default function InboundPage() {
 	const [q, setQ] = useQueryState("q", parseAsString.withDefault(""));
 	const [status, setStatus] = useQueryState(
 		"status",
@@ -50,10 +53,10 @@ export default function EmailsPage() {
 		setDraftQ(q);
 	}, [q]);
 
-	const { data, isLoading } = useSWR<EmailsResponse>(
-		["/emails", q, status, organizationId],
+	const { data, isLoading } = useSWR<InboundResponse>(
+		["/inbound", q, status, organizationId],
 		() =>
-			adminGet<EmailsResponse>("/emails", {
+			adminGet<InboundResponse>("/inbound", {
 				q: q || undefined,
 				status: status || undefined,
 				organizationId: organizationId || undefined,
@@ -64,8 +67,8 @@ export default function EmailsPage() {
 	return (
 		<PageFrame>
 			<PageHeading
-				title="Emails"
-				description="Every email sent across the platform. Received inbound mail is under Received."
+				title="Received"
+				description="Every inbound email accepted across the platform. Filter by org, mailbox, or spam status."
 				meta={
 					<span className="rounded-full bg-bg-weak-50 px-2.5 py-1 font-medium text-[12px] text-text-sub-600 tabular-nums dark:bg-white/[0.06]">
 						{data?.total ?? 0} matching
@@ -83,7 +86,7 @@ export default function EmailsPage() {
 						<Input.Root className="w-56">
 							<Input.Wrapper>
 								<Input.Input
-									placeholder="Search from / subject / to"
+									placeholder="Search from / subject / mailbox"
 									value={draftQ}
 									onChange={(e) => setDraftQ(e.target.value)}
 								/>
@@ -95,12 +98,12 @@ export default function EmailsPage() {
 							onChange={(e) => setStatus(e.target.value || null)}
 						>
 							<option value="">All statuses</option>
-							<option value="bounced">Bounced</option>
-							<option value="failed">Failed</option>
-							<option value="spam">Spam</option>
-							<option value="sent">Sent</option>
+							<option value="received">Received</option>
 							<option value="delivered">Delivered</option>
-							<option value="pending">Pending</option>
+							<option value="spam">Spam</option>
+							<option value="rejected">Rejected</option>
+							<option value="failed">Failed</option>
+							<option value="processing">Processing</option>
 						</select>
 						{organizationId ? (
 							<>
@@ -133,8 +136,17 @@ export default function EmailsPage() {
 
 			<div className="overflow-hidden rounded-2xl border border-stroke-soft-100 dark:border-stroke-soft-100/40">
 				<DataTable
-					headers={["When", "From", "To", "Subject", "Status", "Org", ""]}
-					colSpan={7}
+					headers={[
+						"When",
+						"From",
+						"To",
+						"Subject",
+						"Status",
+						"Mailbox",
+						"Org",
+						"",
+					]}
+					colSpan={8}
 					loading={isLoading}
 					empty={!isLoading && !data?.items.length}
 				>
@@ -160,7 +172,15 @@ export default function EmailsPage() {
 								</button>
 							</td>
 							<td className="px-4 py-3">
-								<StatusPill status={email.status} />
+								<div className="flex items-center gap-1.5">
+									<StatusPill status={email.status} />
+									{email.isSpam && email.status !== "spam" ? (
+										<StatusPill status="spam" />
+									) : null}
+								</div>
+							</td>
+							<td className="max-w-[160px] truncate px-4 py-3 text-text-sub-600">
+								{email.mailboxEmail || "—"}
 							</td>
 							<td className="px-4 py-3">
 								<Button.Root
@@ -170,7 +190,7 @@ export default function EmailsPage() {
 									mode="ghost"
 								>
 									<Link href={`/organizations/${email.organizationId}`}>
-										Open hub
+										{email.organizationName || "Open hub"}
 									</Link>
 								</Button.Root>
 							</td>
@@ -192,7 +212,7 @@ export default function EmailsPage() {
 				</DataTable>
 			</div>
 
-			<EmailDetailDrawer
+			<InboundDetailDrawer
 				emailId={selectedEmailId || null}
 				open={Boolean(selectedEmailId)}
 				onOpenChange={(open) =>

@@ -261,6 +261,9 @@ export default function OrganizationDetailPage() {
 							<Link href={`/emails?organizationId=${data.id}`}>All emails</Link>
 						</Button.Root>
 						<Button.Root asChild variant="neutral" mode="stroke" size="small">
+							<Link href={`/inbound?organizationId=${data.id}`}>Received</Link>
+						</Button.Root>
+						<Button.Root asChild variant="neutral" mode="stroke" size="small">
 							<Link href={`/credits?organizationId=${data.id}`}>Ledger</Link>
 						</Button.Root>
 						{data.status === "suspended" ? (

@@ -438,6 +438,70 @@ export namespace AdminModel {
 		total: t.Number(),
 	});
 
+	export const inboundEmailItem = t.Object({
+		id: t.String(),
+		organizationId: t.String(),
+		organizationName: t.Union([t.String(), t.Null()]),
+		mailboxId: t.String(),
+		mailboxEmail: t.Union([t.String(), t.Null()]),
+		fromEmail: t.String(),
+		fromName: t.Union([t.String(), t.Null()]),
+		toEmails: t.Any(),
+		subject: t.Union([t.String(), t.Null()]),
+		status: t.String(),
+		isSpam: t.Boolean(),
+		spamScore: t.Union([t.Number(), t.Null()]),
+		size: t.Number(),
+		createdAt: t.Date(),
+	});
+
+	export const inboundAttachmentItem = t.Object({
+		id: t.String(),
+		filename: t.String(),
+		contentType: t.String(),
+		size: t.Number(),
+		contentDisposition: t.Union([t.String(), t.Null()]),
+		contentId: t.Union([t.String(), t.Null()]),
+	});
+
+	export const inboundEmailDetail = t.Object({
+		id: t.String(),
+		mailboxId: t.String(),
+		mailboxEmail: t.Union([t.String(), t.Null()]),
+		mailboxDisplayName: t.Union([t.String(), t.Null()]),
+		organizationId: t.String(),
+		organizationName: t.Union([t.String(), t.Null()]),
+		fromEmail: t.String(),
+		fromName: t.Union([t.String(), t.Null()]),
+		toEmails: t.Any(),
+		ccEmails: t.Union([t.Any(), t.Null()]),
+		bccEmails: t.Union([t.Any(), t.Null()]),
+		replyTo: t.Union([t.String(), t.Null()]),
+		subject: t.String(),
+		textBody: t.Union([t.String(), t.Null()]),
+		htmlBody: t.Union([t.String(), t.Null()]),
+		snippet: t.Union([t.String(), t.Null()]),
+		rawMessage: t.Optional(t.Union([t.String(), t.Null()])),
+		size: t.Number(),
+		status: t.String(),
+		isRead: t.Boolean(),
+		isStarred: t.Boolean(),
+		isSpam: t.Boolean(),
+		spamScore: t.Union([t.Number(), t.Null()]),
+		messageId: t.Union([t.String(), t.Null()]),
+		threadId: t.Union([t.String(), t.Null()]),
+		inReplyTo: t.Union([t.String(), t.Null()]),
+		headers: t.Union([t.Record(t.String(), t.String()), t.Null()]),
+		date: t.Union([t.Date(), t.Null()]),
+		createdAt: t.Date(),
+		attachments: t.Array(inboundAttachmentItem),
+	});
+
+	export const inboundEmailsResponse = t.Object({
+		items: t.Array(inboundEmailItem),
+		total: t.Number(),
+	});
+
 	export const auditItem = t.Object({
 		id: t.String(),
 		actorUserId: t.String(),
