@@ -3,12 +3,11 @@ import { BlogCta } from "@reloop/web/components/landing/blog/blog-cta";
 import { FaqSection } from "@reloop/web/components/faq-section";
 import { createPageMetadata } from "@reloop/web/lib/metadata";
 import { getSiteUrl } from "@reloop/web/lib/site";
-import { ApiSection } from "./api-section";
-import { AiAgentsSection } from "./components/ai-agents-section";
+import { HowItCompares } from "./components/how-it-compares";
 import { HowItWorksSteps } from "./components/how-it-works-steps";
-import { WhoIsItFor } from "./components/who-is-it-for";
-import { RecentChecksSection } from "./components/recent-checks-section";
+import { SimilarTools } from "./components/similar-tools";
 import { TempEmailHero } from "./components/temp-email-hero";
+import { WhoIsItFor } from "./components/who-is-it-for";
 import {
 	faqGroups,
 	faqs,
@@ -102,17 +101,16 @@ export default function TempEmailCheckerPage() {
 					className="h-24 border-stroke-soft-100 border-b dark:border-white/10"
 				/>
 				<WhoIsItFor />
-				<RecentChecksSection />
 				<div
 					aria-hidden
 					className="h-24 border-stroke-soft-100 border-b dark:border-white/10"
 				/>
-				<ApiSection />
+				<HowItCompares />
 				<div
 					aria-hidden
 					className="h-24 border-stroke-soft-100 border-b dark:border-white/10"
 				/>
-				<AiAgentsSection />
+				<SimilarTools />
 				<div aria-hidden className="h-24" />
 				<div className="border-stroke-soft-100 border-b dark:border-white/10 [&_.t-acc:last-child]:border-b-0">
 					<FaqSection

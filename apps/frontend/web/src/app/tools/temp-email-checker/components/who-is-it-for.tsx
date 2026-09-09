@@ -43,7 +43,7 @@ export function WhoIsItFor() {
 				</p>
 			</div>
 
-			<div className="grid grid-cols-1 divide-y divide-stroke-soft-100 lg:grid-cols-3 lg:divide-x lg:divide-y-0 dark:divide-white/10">
+			<div className="grid grid-cols-1 divide-y divide-stroke-soft-100 border-stroke-soft-100 border-b lg:grid-cols-3 lg:divide-x lg:divide-y-0 dark:divide-white/10 dark:border-white/10">
 				{AUDIENCES.map((audience) => (
 					<div
 						key={audience.title}
