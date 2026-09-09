@@ -1,5 +1,3 @@
-import Link from "next/link";
-
 const AUDIENCES = [
 	{
 		title: "Developers & fraud teams",
@@ -36,11 +34,8 @@ export function WhoIsItFor() {
 					id="who-is-it-for-heading"
 					className="text-balance font-semibold text-2xl text-text-strong-950 tracking-[-0.025em] sm:text-3xl lg:text-[2rem] lg:leading-[1.15] dark:text-white"
 				>
-					Who is{" "}
-					<span className="text-rose-600 dark:text-rose-300">
-						Temp Email Checker
-					</span>{" "}
-					for?
+					Who is <span className="text-rose-600 dark:text-rose-300">Reloop&rsquo;s</span>{" "}
+					Temp Email Checker for?
 				</h2>
 				<p className="mt-4 max-w-3xl text-[15px] text-stone-500 leading-relaxed sm:text-[16px] dark:text-white/60">
 					Anyone who needs to know if an address is real — without ever
@@ -62,16 +57,6 @@ export function WhoIsItFor() {
 						</p>
 					</div>
 				))}
-			</div>
-
-			<div className="flex justify-center px-4 pb-10 sm:px-8 lg:px-12">
-				<Link
-					href="/use-cases"
-					className="inline-flex items-center gap-1.5 rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-5 py-2.5 font-medium text-[14.5px] text-text-strong-950 transition-colors hover:bg-bg-weak-50 sm:text-[15px] dark:border-white/10 dark:bg-white/[0.03] dark:text-white dark:hover:bg-white/[0.06]"
-				>
-					<span>Explore all use cases</span>
-					<span aria-hidden>→</span>
-				</Link>
 			</div>
 		</section>
 	);
