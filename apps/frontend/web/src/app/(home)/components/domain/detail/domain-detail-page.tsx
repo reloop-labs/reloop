@@ -189,7 +189,7 @@ export function DomainDetailPage({ domain }: { domain: DemoDomain }) {
 		domain.status === "active"
 			? "You're all set! Your domain is ready to send emails."
 			: domain.status === "verifying"
-				? "Your domain is being verified — this can take a few hours depending on your DNS provider."
+				? "Your domain is being verified this can take a few hours depending on your DNS provider."
 				: "Almost there! Add the DNS records shown below, then click Verify — and you'll be ready to send.";
 
 	return (

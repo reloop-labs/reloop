@@ -127,7 +127,7 @@ export const DomainVerifiedEmail = ({
 		.join(", ");
 
 	const previewLine = isSendingEmailEnabled
-		? `${domain} is verified — you can now send emails through Reloop.`
+		? `${domain} is verified you can now send emails through Reloop.`
 		: `${domain} is verified on Reloop.`;
 
 	return (

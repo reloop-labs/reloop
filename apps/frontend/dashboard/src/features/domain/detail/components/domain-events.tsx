@@ -15,7 +15,7 @@ export const DomainEvents = ({
 		if (!domain) return "";
 		switch (domain.status) {
 			case "verifying":
-				return "Your domain is being verified — this can take a few hours depending on your DNS provider.";
+				return "Your domain is being verified this can take a few hours depending on your DNS provider.";
 			case "active":
 				return "You're all set! Your domain is ready to send emails.";
 			case "failed":

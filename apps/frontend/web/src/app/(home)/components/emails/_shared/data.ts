@@ -78,7 +78,7 @@ export const INITIAL_EMAILS: EmailItem[] = [
 	{
 		id: "em_10",
 		to: "ops@reloop.sh",
-		subject: "Domain verified — mail.acme.com",
+		subject: "Domain verified mail.acme.com",
 		status: "delivered",
 		time: "2 days ago",
 	},
@@ -118,7 +118,7 @@ export const INCOMING_STREAM_POOL: IncomingEmailEvent[] = [
 	},
 	{
 		to: "kate@resend.com",
-		subject: "Domain verified — mail.acme.com",
+		subject: "Domain verified mail.acme.com",
 		initialStatus: "delivered",
 		nextStatus: "opened",
 	},

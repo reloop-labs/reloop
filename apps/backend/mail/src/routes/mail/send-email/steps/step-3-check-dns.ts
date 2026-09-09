@@ -25,14 +25,14 @@ export async function checkDnsHealth_step3({
 	const lastVerified = domainData.lastVerifiedAt;
 	const isRecent = lastVerified
 		? Date.now() - new Date(lastVerified).getTime() <
-			STALE_THRESHOLD_HOURS * 60 * 60 * 1000
+		STALE_THRESHOLD_HOURS * 60 * 60 * 1000
 		: false;
 
 	if (domainData.systemVerified && domainData.status === "active" && isRecent) {
 		return { isHealthy: true, missingRecords: [] };
 	}
 
-	// Cache is stale or domain is not fully verified — fire a reverification event
+	// Cache is stale or domain is not fully verified fire a reverification event
 	// so a background worker can re-check DNS records for the whole domain.
 	await bus
 		.publish(BusEvent.DOMAIN_DNS_REVERIFICATION_REQUESTED, {
