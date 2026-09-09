@@ -21,7 +21,7 @@ export function FaqGrid({
 					key={group.title}
 					className={cn("grid border-t md:grid-cols-2", hairline)}
 				>
-					<div className="px-5 pt-8 pb-2 sm:px-6 md:px-8 md:py-10">
+					<div className="px-5 pt-8 pb-2 sm:px-6 md:sticky md:top-16 md:self-start md:px-8 md:py-10">
 						<h3 className="font-semibold text-[19px] text-text-strong-950 tracking-tight sm:text-[21px] dark:text-white">
 							{group.title}
 						</h3>
@@ -40,17 +40,17 @@ export function FaqGrid({
 										type="button"
 										onClick={() => setOpen(isOpen ? null : faq.question)}
 										aria-expanded={isOpen}
-										className="flex w-full items-start justify-between gap-4 px-5 py-5 text-left sm:px-6 md:px-8"
+									className="flex min-h-[60px] w-full cursor-pointer items-center justify-between gap-4 px-5 py-5 text-left transition-colors duration-150 hover:bg-bg-weak-50/70 sm:px-6 md:px-8 dark:hover:bg-white/[0.03]"
+								>
+									<span className="font-medium text-[15px] text-text-strong-950 leading-snug sm:text-[16px] dark:text-white">
+										{faq.question}
+									</span>
+									<span
+										className={cn(
+											"mt-px flex size-7 shrink-0 items-center justify-center rounded-full border border-[#0a0d12]/12 text-[#0a0d12]/40 dark:border-white/12 dark:text-white/55",
+											isOpen && "text-text-strong-950 dark:text-white",
+										)}
 									>
-										<span className="font-medium text-[15px] text-text-strong-950 leading-snug sm:text-[16px] dark:text-white">
-											{faq.question}
-										</span>
-										<span
-											className={cn(
-												"mt-0.5 flex size-5 shrink-0 items-center justify-center text-text-soft-400 transition-transform duration-200 dark:text-white/35",
-												isOpen && "rotate-45 text-primary-base",
-											)}
-										>
 											<svg
 												width="12"
 												height="12"
@@ -73,7 +73,7 @@ export function FaqGrid({
 										)}
 									>
 										<div className="overflow-hidden">
-											<p className="px-5 pb-6 text-[14px] text-text-sub-600 leading-[1.7] sm:px-6 sm:text-[15px] md:px-8 dark:text-white/50">
+											<p className="px-5 pt-0 pr-14 pb-5 text-[14px] text-text-sub-600 leading-[1.7] sm:px-6 sm:pr-16 sm:text-[15px] md:px-8 dark:text-white/50">
 												{faq.answer}
 											</p>
 										</div>

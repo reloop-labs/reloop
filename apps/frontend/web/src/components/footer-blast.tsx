@@ -9,6 +9,7 @@ const accentPixelColorLight: Record<FooterBrandAccent, string> = {
 	emerald: "#10B981",
 	ink: "#6e7781",
 	orange: "#ea580c",
+	rose: "#f43f5e",
 };
 
 const accentPixelColorDark: Record<FooterBrandAccent, string> = {
@@ -16,6 +17,7 @@ const accentPixelColorDark: Record<FooterBrandAccent, string> = {
 	emerald: "#6ee7b7",
 	ink: "#6e7781",
 	orange: "#fdba74",
+	rose: "#fda4af",
 };
 
 /**

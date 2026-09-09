@@ -1,8 +1,8 @@
 import { JsonLd } from "@reloop/web/components/json-ld";
 import { BlogCta } from "@reloop/web/components/landing/blog/blog-cta";
+import { FaqSection } from "@reloop/web/components/faq-section";
 import { createPageMetadata } from "@reloop/web/lib/metadata";
 import { getSiteUrl } from "@reloop/web/lib/site";
-import { SectionSeparator } from "../../(home)/components/section-separator";
 import { ApiSection } from "./api-section";
 import { AiAgentsSection } from "./components/ai-agents-section";
 import { RecentChecksSection } from "./components/recent-checks-section";
@@ -15,8 +15,6 @@ import {
 	toolPath,
 	toolTitle,
 } from "./content";
-import { FaqGrid } from "./faq-grid";
-import { SectionIntro } from "./grid";
 
 // TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
 // See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
@@ -91,38 +89,52 @@ export default function TempEmailCheckerPage() {
 
 			<TempEmailHero />
 
-			<div className="relative mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-200 border-x md:max-w-7xl dark:border-white/10">
+			<div className="relative mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-100 border-x md:max-w-7xl dark:border-white/10">
 				<RecentChecksSection />
-				<SectionSeparator />
-				<ApiSection />
-				<SectionSeparator />
-				<AiAgentsSection />
-				<SectionSeparator />
-				<section id="faq-section" className="w-full">
-					<SectionIntro lead="Frequently asked questions" align="left" />
-					<FaqGrid groups={faqGroups} />
-				</section>
-				<SectionSeparator />
-				<BlogCta
-					headline={
-						<>
-							Email API
-							<br />
-							for Developers
-						</>
-					}
-					sub="Free plan: 3,000 emails a month. No credit card."
-					primaryLabel="Get started free"
-					primaryHref="/dashboard/signup"
-					primaryVariant="primary"
-					secondaryLabel="Contact us"
-					secondaryHref="/contact"
-					accentColor="primary"
-					flush
-					align="center"
-					pill={false}
-					showTopRule={false}
+				<div
+					aria-hidden
+					className="h-8 border-stroke-soft-100 border-y sm:h-9 dark:border-white/10"
 				/>
+				<ApiSection />
+				<div
+					aria-hidden
+					className="h-8 border-stroke-soft-100 border-y sm:h-9 dark:border-white/10"
+				/>
+				<AiAgentsSection />
+				<div aria-hidden className="h-24" />
+				<div className="border-stroke-soft-100 border-y dark:border-white/10 [&_.t-acc:last-child]:border-b-0">
+					<FaqSection
+						items={faqGroups.flatMap((g) => g.items)}
+						id="faq-section"
+						compact
+						plain
+						flush
+					/>
+				</div>
+				<div className="w-full border-stroke-soft-100 border-b [--primary-base:#f43f5e] [--primary-dark:#e11d48] [--primary-darker:#be123c] [--primary-link:#e11d48] dark:border-white/10 dark:[--primary-base:#fb7185] dark:[--primary-dark:#fb7185] dark:[--primary-darker:#e11d48] dark:[--primary-link:#fda4af]">
+					<BlogCta
+						headline={
+							<>
+								Email API
+								<br />
+								for Developers
+							</>
+						}
+						sub="Free plan: 3,000 emails a month. No credit card."
+						primaryLabel="Get started free"
+						primaryHref="/dashboard/signup"
+						primaryVariant="primary"
+						secondaryLabel="Schedule call"
+						secondaryHref="https://cal.com/pranavp/30"
+						secondaryExternal
+						accentColor="primary"
+						blast={{ light: "#f43f5e", dark: "#fda4af" }}
+						flush
+						align="center"
+						pill={false}
+						showTopRule={false}
+					/>
+				</div>
 			</div>
 		</div>
 	);

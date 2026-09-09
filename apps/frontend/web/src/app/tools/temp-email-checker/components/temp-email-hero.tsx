@@ -4,7 +4,7 @@ import { CheckerPanel } from "../checker-panel";
 export function TempEmailHero() {
 	return (
 		<div className="relative w-full overflow-hidden">
-			<div className="relative mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-200 border-x md:max-w-7xl dark:border-white/10">
+			<div className="relative mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-100 border-x md:max-w-7xl dark:border-white/10">
 				{/* Hero Header */}
 				<header className="relative z-10 flex w-full flex-col items-center px-6 pt-28 pb-8 text-center sm:px-8 sm:pt-32 sm:pb-10 lg:px-12 lg:pt-36 lg:pb-12">
 					<div className="mb-6 flex items-center justify-center gap-2 sm:mb-8">

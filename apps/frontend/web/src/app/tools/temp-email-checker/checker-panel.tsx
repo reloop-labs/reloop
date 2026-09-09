@@ -132,44 +132,44 @@ function HowItWorksSteps() {
 
 			<div className="relative pt-0.5 pl-0.5">
 				<div className="relative flex items-center gap-3.5 pb-4">
-					<div className="absolute top-5 left-[12px] h-full w-px bg-stroke-soft-200 dark:bg-white/10" />
-					<div className="relative z-10 flex size-6 shrink-0 items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-white-0 font-mono font-semibold text-[11px] text-text-strong-950 dark:border-white/12 dark:bg-[#111] dark:text-white">
+					<div className="absolute top-5 left-[12px] h-full w-px bg-stroke-soft-100 dark:bg-white/10" />
+					<div className="relative z-10 flex size-6 shrink-0 items-center justify-center rounded-full border border-stroke-soft-100 bg-bg-white-0 font-mono font-semibold text-[11px] text-text-strong-950 dark:border-white/12 dark:bg-[#111] dark:text-white">
 						1
 					</div>
 					<div className="flex flex-1 items-center justify-between">
 						<span className="font-semibold text-sm text-text-strong-950 dark:text-white">
 							RFC 5322 syntax
 						</span>
-						<code className="rounded-md border border-stroke-soft-200 bg-bg-white-0 px-2 py-0.5 font-mono text-[11px] text-text-sub-600 dark:border-white/10 dark:bg-[#0b0b0b] dark:text-white/70">
+						<code className="rounded-md border border-stroke-soft-100 bg-bg-white-0 px-2 py-0.5 font-mono text-[11px] text-text-sub-600 dark:border-white/10 dark:bg-[#0b0b0b] dark:text-white/70">
 							Format
 						</code>
 					</div>
 				</div>
 
 				<div className="relative flex items-center gap-3.5 pb-4">
-					<div className="absolute top-5 left-[12px] h-full w-px bg-stroke-soft-200 dark:bg-white/10" />
-					<div className="relative z-10 flex size-6 shrink-0 items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-white-0 font-mono font-semibold text-[11px] text-text-strong-950 dark:border-white/12 dark:bg-[#111] dark:text-white">
+					<div className="absolute top-5 left-[12px] h-full w-px bg-stroke-soft-100 dark:bg-white/10" />
+					<div className="relative z-10 flex size-6 shrink-0 items-center justify-center rounded-full border border-stroke-soft-100 bg-bg-white-0 font-mono font-semibold text-[11px] text-text-strong-950 dark:border-white/12 dark:bg-[#111] dark:text-white">
 						2
 					</div>
 					<div className="flex flex-1 items-center justify-between">
 						<span className="font-semibold text-sm text-text-strong-950 dark:text-white">
 							Catalogue and MX lookup
 						</span>
-						<code className="rounded-md border border-stroke-soft-200 bg-bg-white-0 px-2 py-0.5 font-mono text-[11px] text-text-sub-600 dark:border-white/10 dark:bg-[#0b0b0b] dark:text-white/70">
+						<code className="rounded-md border border-stroke-soft-100 bg-bg-white-0 px-2 py-0.5 font-mono text-[11px] text-text-sub-600 dark:border-white/10 dark:bg-[#0b0b0b] dark:text-white/70">
 							Domain & MX
 						</code>
 					</div>
 				</div>
 
 				<div className="relative flex items-center gap-3.5">
-					<div className="relative z-10 flex size-6 shrink-0 items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-white-0 font-mono font-semibold text-[11px] text-text-strong-950 dark:border-white/12 dark:bg-[#111] dark:text-white">
+					<div className="relative z-10 flex size-6 shrink-0 items-center justify-center rounded-full border border-stroke-soft-100 bg-bg-white-0 font-mono font-semibold text-[11px] text-text-strong-950 dark:border-white/12 dark:bg-[#111] dark:text-white">
 						3
 					</div>
 					<div className="flex flex-1 items-center justify-between">
 						<span className="font-semibold text-sm text-text-strong-950 dark:text-white">
 							Verdict, score, and flags
 						</span>
-						<code className="rounded-md border border-stroke-soft-200 bg-bg-white-0 px-2 py-0.5 font-mono text-[11px] text-text-sub-600 dark:border-white/10 dark:bg-[#0b0b0b] dark:text-white/70">
+						<code className="rounded-md border border-stroke-soft-100 bg-bg-white-0 px-2 py-0.5 font-mono text-[11px] text-text-sub-600 dark:border-white/10 dark:bg-[#0b0b0b] dark:text-white/70">
 							Decision
 						</code>
 					</div>
@@ -257,7 +257,7 @@ function SignalItem({
 				? "border-amber-500/20 bg-amber-500/[0.08] text-amber-600 dark:border-amber-500/30 dark:bg-amber-500/15 dark:text-amber-400"
 				: status === "pass"
 					? "border-emerald-500/20 bg-emerald-500/[0.08] text-emerald-600 dark:border-emerald-500/30 dark:bg-emerald-500/15 dark:text-emerald-400"
-					: "border-stroke-soft-200 bg-bg-white-0 text-text-sub-600 dark:border-white/10 dark:bg-[#0b0b0b] dark:text-white/70";
+					: "border-stroke-soft-100 bg-bg-white-0 text-text-sub-600 dark:border-white/10 dark:bg-[#0b0b0b] dark:text-white/70";
 
 	return (
 		<div className="flex items-center justify-between py-2.5">
@@ -322,14 +322,14 @@ function ResultCardDetailed({
 				</div>
 			</div>
 			{/* Signals */}
-			<div className="overflow-hidden rounded-[14px] border border-stroke-soft-200 bg-bg-weak-50 p-0.5 dark:border-white/10 dark:bg-white/[0.03]">
+			<div className="overflow-hidden rounded-[14px] border border-stroke-soft-100 bg-bg-weak-50 p-0.5 dark:border-white/10 dark:bg-white/[0.03]">
 				<div className="px-3 pt-2 pb-2.5">
 					<p className="font-mono font-semibold text-[11px] text-text-strong-950 uppercase tracking-wider dark:text-white">
 						Signals & Detection
 					</p>
 				</div>
 
-				<div className="divide-y divide-stroke-soft-200/50 rounded-xl border border-stroke-soft-200 bg-bg-white-0 px-4 py-1 dark:divide-white/5 dark:border-white/10 dark:bg-[#070707]">
+				<div className="divide-y divide-stroke-soft-100/50 rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-4 py-1 dark:divide-white/5 dark:border-white/10 dark:bg-[#070707]">
 					{result.displaySignals.map((item) => (
 						<SignalItem
 							key={item.label}
@@ -342,7 +342,7 @@ function ResultCardDetailed({
 			</div>
 
 			{/* Recommendation */}
-			<div className="flex items-start gap-3 rounded-xl border border-stroke-soft-200 bg-bg-weak-50/50 p-3.5 sm:p-4 dark:border-white/10 dark:bg-white/[0.02]">
+			<div className="flex items-start gap-3 rounded-xl border border-stroke-soft-100 bg-bg-weak-50/50 p-3.5 sm:p-4 dark:border-white/10 dark:bg-white/[0.02]">
 				<Icon
 					name={recTone.icon}
 					className={cn("mt-0.5 size-4 shrink-0", recTone.iconClass)}
@@ -461,9 +461,9 @@ export function CheckerPanel() {
 	return (
 		<div className="mx-auto w-full max-w-xl font-sans">
 			{/* Dashboard Modal / Card Container */}
-			<div className="overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-weak-50 p-0.5 dark:border-white/10 dark:bg-white/[0.03]">
+			<div className="overflow-hidden rounded-[18px] border border-stroke-soft-100 bg-bg-weak-50 p-0.5 dark:border-white/10 dark:bg-white/[0.03]">
 				{/* Top White Card: Input + Results with dynamic height morphing */}
-				<div className="rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-5 sm:p-6 dark:border-white/10 dark:bg-[#0c0c0c]">
+				<div className="rounded-2xl border border-stroke-soft-100 bg-bg-white-0 p-5 sm:p-6 dark:border-white/10 dark:bg-[#0c0c0c]">
 					{/* Input Check Zone */}
 					<form onSubmit={onSubmit} noValidate className="space-y-4">
 						<div className="space-y-2">

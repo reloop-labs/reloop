@@ -34,23 +34,32 @@ export function FaqGrid({
 								type="button"
 								onClick={() => toggle(index)}
 								aria-expanded={isOpen}
-								className="flex w-full items-center gap-3 px-6 py-4 text-left font-medium text-[15px] text-text-strong-950 transition-colors hover:bg-bg-weak-50/60 dark:text-white dark:hover:bg-white/[0.03]"
+								className="flex min-h-[60px] w-full cursor-pointer items-center justify-between gap-4 px-6 py-4 text-left font-medium text-[15px] text-text-strong-950 transition-colors hover:bg-bg-weak-50/60 dark:text-white dark:hover:bg-white/[0.03]"
 							>
-								<svg
-									className={cn(
-										"h-2.5 w-2.5 shrink-0 fill-current text-text-sub-600 transition-transform duration-200 dark:text-white/40",
-										isOpen && "rotate-90 text-text-strong-950 dark:text-white",
-									)}
-									viewBox="0 0 24 24"
-									aria-hidden="true"
-								>
-									<path d="M8 5v14l11-7z" />
-								</svg>
 								<span className="flex-1 leading-snug">{faq.question}</span>
+								<span
+									className={cn(
+										"flex size-7 shrink-0 items-center justify-center rounded-full border border-[#0a0d12]/12 text-[#0a0d12]/40 dark:border-white/12 dark:text-white/55",
+										isOpen && "text-text-strong-950 dark:text-white",
+									)}
+								>
+									<svg
+										width="12"
+										height="12"
+										viewBox="0 0 12 12"
+										fill="none"
+										stroke="currentColor"
+										strokeWidth="1.5"
+										strokeLinecap="round"
+										aria-hidden
+									>
+										<path d="M6 1v10M1 6h10" />
+									</svg>
+								</span>
 							</button>
 
 							{isOpen && (
-								<div className="px-6 pt-1 pb-5 pl-[44px] text-[14.5px] text-text-sub-600 leading-relaxed dark:text-white/60">
+								<div className="px-6 pt-1 pb-5 text-[14.5px] text-text-sub-600 leading-relaxed dark:text-white/60">
 									<p className="m-0">{faq.answer}</p>
 								</div>
 							)}

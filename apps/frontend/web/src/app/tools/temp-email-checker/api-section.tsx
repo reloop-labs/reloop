@@ -181,7 +181,7 @@ export function ApiSection() {
 	return (
 		<section id="api-section" className="w-full">
 			{/* Section Header */}
-			<div className="border-stroke-soft-200 border-b px-4 py-8 sm:px-8 sm:py-10 lg:px-12 dark:border-white/10">
+			<div className="border-stroke-soft-100 border-b px-4 py-8 sm:px-8 sm:py-10 lg:px-12 dark:border-white/10">
 				<div className="mb-4">
 					<span className="inline-flex items-center gap-1.5 rounded-[10px] bg-blue-50 px-2.5 py-1 font-medium text-[13px] text-blue-600 dark:bg-blue-500/10 dark:text-blue-400">
 						<Icon name="code" className="size-3.5" />
@@ -198,7 +198,7 @@ export function ApiSection() {
 			</div>
 
 			{/* Language Switcher & Action Bar */}
-			<div className="flex items-center justify-between gap-3 border-stroke-soft-200 border-b pr-4 sm:pr-8 lg:pr-12 dark:border-white/10">
+			<div className="flex items-center justify-between gap-3 border-stroke-soft-100 border-b pr-4 sm:pr-8 lg:pr-12 dark:border-white/10">
 				<LanguagePills
 					tabs={PILL_TABS}
 					activeId={activeId}
@@ -245,8 +245,8 @@ export function ApiSection() {
 					</pre>
 				</div>
 
-				<div className="border-stroke-soft-200 border-t lg:border-t-0 lg:border-l dark:border-white/10">
-					<div className="flex items-center gap-3 border-stroke-soft-200 border-b px-4 py-3 sm:px-6 lg:px-8 dark:border-white/10">
+				<div className="border-stroke-soft-100 border-t lg:border-t-0 lg:border-l dark:border-white/10">
+					<div className="flex items-center gap-3 border-stroke-soft-100 border-b px-4 py-3 sm:px-6 lg:px-8 dark:border-white/10">
 						<WindowDots />
 						<div className="ml-auto flex items-center gap-2 font-mono text-[11px] text-text-soft-400 uppercase tracking-[0.14em] dark:text-white/30">
 							<span className="inline-flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400">

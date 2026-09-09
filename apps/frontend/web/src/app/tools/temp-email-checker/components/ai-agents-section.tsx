@@ -65,7 +65,7 @@ export function AiAgentsSection() {
 			className="w-full bg-bg-white-0 dark:bg-black"
 		>
 			{/* Section Header */}
-			<div className="border-stroke-soft-200 border-b px-4 py-8 sm:px-8 sm:py-10 lg:px-12 dark:border-white/10">
+			<div className="border-stroke-soft-100 border-b px-4 py-8 sm:px-8 sm:py-10 lg:px-12 dark:border-white/10">
 				<div className="mb-4">
 					<span className="inline-flex items-center gap-1.5 rounded-[10px] bg-blue-50 px-2.5 py-1 font-medium text-[13px] text-blue-600 dark:bg-blue-500/10 dark:text-blue-400">
 						<Icon name="robot" className="size-3.5" />
@@ -84,7 +84,7 @@ export function AiAgentsSection() {
 			</div>
 
 			{/* 3 Step Cards Grid */}
-			<div className="grid grid-cols-1 divide-y divide-stroke-soft-200 lg:grid-cols-3 lg:divide-x lg:divide-y-0 dark:divide-white/10">
+			<div className="grid grid-cols-1 divide-y divide-stroke-soft-100 lg:grid-cols-3 lg:divide-x lg:divide-y-0 dark:divide-white/10">
 				{CARDS.map((card) => {
 					const si = getLanguageIcon(card.lang);
 					return (
@@ -119,7 +119,7 @@ export function AiAgentsSection() {
 							</div>
 
 							{/* Footer Link */}
-							<div className="mt-8 border-stroke-soft-200 border-t pt-4 dark:border-white/10">
+							<div className="mt-8 border-stroke-soft-100 border-t pt-4 dark:border-white/10">
 								<Link
 									href={card.href}
 									className="group inline-flex items-center gap-1.5 font-medium text-[13px] text-text-strong-950 transition-colors hover:text-blue-600 dark:text-white dark:hover:text-blue-400"

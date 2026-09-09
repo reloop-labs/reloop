@@ -2,7 +2,7 @@ import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import type React from "react";
 
-export const hairline = "border-stroke-soft-200 dark:border-white/10";
+export const hairline = "border-stroke-soft-100 dark:border-white/10";
 
 const railWidth = "mx-auto w-full max-w-5xl md:max-w-7xl";
 
@@ -141,7 +141,7 @@ export function CellGrid({
 	return (
 		<div
 			className={cn(
-				"grid gap-px border-t bg-stroke-soft-200 dark:bg-white/10",
+				"grid gap-px border-t bg-stroke-soft-100 dark:bg-white/10",
 				hairline,
 				columns === 3 ? "sm:grid-cols-2 lg:grid-cols-3" : "sm:grid-cols-2",
 			)}
@@ -203,9 +203,9 @@ export function CellCopy({
 export function WindowDots() {
 	return (
 		<span className="flex shrink-0 items-center gap-1.5">
-			<span className="size-2 rounded-full bg-stroke-soft-200 dark:bg-white/15" />
-			<span className="size-2 rounded-full bg-stroke-soft-200 dark:bg-white/15" />
-			<span className="size-2 rounded-full bg-stroke-soft-200 dark:bg-white/15" />
+			<span className="size-2 rounded-full bg-stroke-soft-100 dark:bg-white/15" />
+			<span className="size-2 rounded-full bg-stroke-soft-100 dark:bg-white/15" />
+			<span className="size-2 rounded-full bg-stroke-soft-100 dark:bg-white/15" />
 		</span>
 	);
 }

@@ -76,7 +76,7 @@ export function HowItWorksSection() {
 			className="w-full bg-bg-white-0 dark:bg-black"
 		>
 			{/* Section Header */}
-			<div className="border-stroke-soft-200 border-b px-4 py-8 sm:px-8 sm:py-10 lg:px-12 dark:border-white/10">
+			<div className="border-stroke-soft-100 border-b px-4 py-8 sm:px-8 sm:py-10 lg:px-12 dark:border-white/10">
 				<h2
 					id="how-it-works-heading"
 					className="font-semibold text-3xl text-text-strong-950 tracking-tight sm:text-4xl lg:text-[2.65rem] lg:leading-[1.12] dark:text-white"
@@ -86,7 +86,7 @@ export function HowItWorksSection() {
 			</div>
 
 			{/* 3 Step Cards Grid */}
-			<div className="grid grid-cols-1 divide-y divide-stroke-soft-200 lg:grid-cols-3 lg:divide-x lg:divide-y-0 dark:divide-white/10">
+			<div className="grid grid-cols-1 divide-y divide-stroke-soft-100 lg:grid-cols-3 lg:divide-x lg:divide-y-0 dark:divide-white/10">
 				{HOW_IT_WORKS_CARDS.map((card) => {
 					const si = getLanguageIcon(card.lang);
 					return (

@@ -72,13 +72,19 @@ const SEAL_POINTS = Array.from({ length: 32 }, (_, i) => {
 	return `${(44 + radius * Math.cos(angle)).toFixed(1)},${(44 + radius * Math.sin(angle)).toFixed(1)}`;
 }).join(" ");
 
-export type FooterBrandAccent = "default" | "emerald" | "ink" | "orange";
+export type FooterBrandAccent =
+	| "default"
+	| "emerald"
+	| "ink"
+	| "orange"
+	| "rose";
 
 const accentSealText: Record<FooterBrandAccent, string> = {
 	default: "text-primary-base",
 	emerald: "text-[#047857] dark:text-[#6ee7b7]",
 	ink: "text-[#24292f] dark:text-white",
 	orange: "text-orange-600 dark:text-orange-400",
+	rose: "text-[#e11d48] dark:text-[#fda4af]",
 };
 
 function OpenSourceSeal({ accent }: { accent: FooterBrandAccent }) {

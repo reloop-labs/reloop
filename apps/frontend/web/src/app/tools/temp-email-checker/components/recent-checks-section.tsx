@@ -50,7 +50,7 @@ function getVerdictConfig(verdict: TestedEmailRecord["verdict"]) {
 				label: "Invalid",
 				dotColor: "bg-neutral-400",
 				badgeStyles:
-					"border-stroke-soft-200 bg-bg-white-0 text-text-sub-600 dark:border-white/10 dark:bg-[#0b0b0b] dark:text-white/70",
+					"border-stroke-soft-100 bg-bg-white-0 text-text-sub-600 dark:border-white/10 dark:bg-[#0b0b0b] dark:text-white/70",
 			};
 	}
 }
@@ -116,9 +116,9 @@ export function RecentChecksSection() {
 	return (
 		<section
 			id="recent-checks-section"
-			className="relative z-10 w-full border-stroke-soft-200 border-t bg-bg-white-0 dark:border-white/10 dark:bg-black"
+			className="relative z-10 w-full border-stroke-soft-100 border-t bg-bg-white-0 dark:border-white/10 dark:bg-black"
 		>
-			<div className="grid grid-cols-1 divide-y divide-stroke-soft-200 lg:grid-cols-2 lg:divide-x lg:divide-y-0 dark:divide-white/10">
+			<div className="grid grid-cols-1 divide-y divide-stroke-soft-100 lg:grid-cols-2 lg:divide-x lg:divide-y-0 dark:divide-white/10">
 				{/* Left Column: Email API CTA */}
 				<div className="flex flex-col items-start justify-center px-6 py-10 sm:px-8 sm:py-12 lg:px-10 lg:py-14 xl:px-14">
 					<h2 className="font-semibold text-2xl text-text-strong-950 leading-[1.18] tracking-tight sm:text-3xl dark:text-white">
@@ -219,14 +219,14 @@ export function RecentChecksSection() {
 
 				{/* Right Column: Recent Checks Card */}
 				<div className="flex flex-col justify-center px-6 py-8 sm:px-8 sm:py-10 lg:px-10 lg:py-14 xl:px-14">
-					<div className="overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-weak-50 p-0.5 dark:border-white/10 dark:bg-white/[0.03]">
+					<div className="overflow-hidden rounded-[18px] border border-stroke-soft-100 bg-bg-weak-50 p-0.5 dark:border-white/10 dark:bg-white/[0.03]">
 						<div className="px-3 pt-2 pb-2.5 sm:px-4 sm:pt-2.5">
 							<p className="font-mono font-semibold text-[11px] text-text-strong-950 uppercase tracking-wider dark:text-white">
 								Recent Checks
 							</p>
 						</div>
 
-						<div className="divide-y divide-stroke-soft-200/50 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 px-4 py-1 dark:divide-white/5 dark:border-white/10 dark:bg-[#070707]">
+						<div className="divide-y divide-stroke-soft-100/50 rounded-2xl border border-stroke-soft-100 bg-bg-white-0 px-4 py-1 dark:divide-white/5 dark:border-white/10 dark:bg-[#070707]">
 							<AnimatePresence initial={false}>
 								{displayedList.map((item) => {
 									const config = getVerdictConfig(item.verdict);

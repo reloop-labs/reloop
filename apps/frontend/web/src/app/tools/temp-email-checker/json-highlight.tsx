@@ -49,7 +49,7 @@ export function RawJsonBlock({
 	return (
 		<div
 			className={cn(
-				"overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-sub-300/50 dark:border-white/10 dark:bg-black",
+				"overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-sub-300/50 dark:border-white/10 dark:bg-black",
 				className,
 			)}
 		>
