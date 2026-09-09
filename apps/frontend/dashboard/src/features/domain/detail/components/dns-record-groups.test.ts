@@ -23,16 +23,17 @@ function rec(
 }
 
 describe("groupDomainDnsRecords", () => {
-	test("sending group is SPF only — MX belongs to receiving", () => {
+	test("MX is receiving only; sending is SPF", () => {
 		const grouped = groupDomainDnsRecords([
 			rec({ id: "spf", recordTypeName: "SPF", purpose: "sending" }),
-			rec({ id: "send-mx", recordTypeName: "MX", purpose: "sending" }),
-			rec({ id: "recv-mx", recordTypeName: "MX", purpose: "receiving" }),
+			rec({ id: "mx", recordTypeName: "MX", purpose: "receiving" }),
 			rec({ id: "dkim", recordTypeName: "DKIM", purpose: "sending" }),
+			rec({ id: "dmarc", recordTypeName: "DMARC", purpose: "sending" }),
 		]);
 
 		expect(grouped.sendingRecords.map((r) => r.id)).toEqual(["spf"]);
-		expect(grouped.receivingRecords.map((r) => r.id)).toEqual(["recv-mx"]);
+		expect(grouped.receivingRecords.map((r) => r.id)).toEqual(["mx"]);
 		expect(grouped.dkimRecords.map((r) => r.id)).toEqual(["dkim"]);
+		expect(grouped.dmarcRecords.map((r) => r.id)).toEqual(["dmarc"]);
 	});
 });
