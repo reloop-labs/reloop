@@ -26,6 +26,12 @@ export function WhoIsItFor() {
 			className="w-full"
 		>
 			<div className="border-stroke-soft-100 border-b px-4 py-8 sm:px-8 sm:py-10 lg:px-12 dark:border-white/10">
+				<p className="mb-3 font-medium text-[12px] uppercase">
+					<span className="text-rose-600 dark:text-rose-300">02.</span>{" "}
+					<span className="text-text-sub-600 dark:text-white/50">
+						Who is it for
+					</span>
+				</p>
 				<h2
 					id="who-is-it-for-heading"
 					className="text-balance font-semibold text-2xl text-text-strong-950 tracking-[-0.025em] sm:text-3xl lg:text-[2rem] lg:leading-[1.15] dark:text-white"
@@ -36,7 +42,7 @@ export function WhoIsItFor() {
 					</span>{" "}
 					for?
 				</h2>
-				<p className="mt-4 max-w-3xl text-[15px] text-text-sub-600 leading-relaxed sm:text-[16px] dark:text-white/60">
+				<p className="mt-4 max-w-3xl text-[15px] text-stone-500 leading-relaxed sm:text-[16px] dark:text-white/60">
 					Anyone who needs to know if an address is real — without ever
 					probing the mailbox.
 				</p>
@@ -48,10 +54,10 @@ export function WhoIsItFor() {
 						key={audience.title}
 						className="flex flex-col px-4 py-6 sm:px-8 sm:py-8 lg:px-12 lg:py-10"
 					>
-						<h3 className="font-semibold text-text-strong-950 text-xl tracking-tight sm:text-[21px] dark:text-white">
+						<h3 className="text-balance font-semibold text-text-strong-950 text-[16px] tracking-[-0.025em] dark:text-white">
 							{audience.title}
 						</h3>
-						<p className="mt-3 text-[14.5px] text-text-sub-600 leading-relaxed sm:text-[15px] dark:text-white/60">
+						<p className="mt-3 text-[13px] text-stone-500 leading-relaxed dark:text-white/60">
 							{audience.description}
 						</p>
 					</div>

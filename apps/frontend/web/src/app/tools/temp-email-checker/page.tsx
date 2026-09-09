@@ -6,7 +6,6 @@ import { getSiteUrl } from "@reloop/web/lib/site";
 import { ApiSection } from "./api-section";
 import { AiAgentsSection } from "./components/ai-agents-section";
 import { HowItWorksSteps } from "./components/how-it-works-steps";
-import { SectionMark } from "./components/section-mark";
 import { WhoIsItFor } from "./components/who-is-it-for";
 import { RecentChecksSection } from "./components/recent-checks-section";
 import { TempEmailHero } from "./components/temp-email-hero";
@@ -93,25 +92,33 @@ export default function TempEmailCheckerPage() {
 			<TempEmailHero />
 
 			<div className="relative mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-100 border-x md:max-w-7xl dark:border-white/10">
-				<div aria-hidden className="h-24" />
-				<SectionMark index="01" label="How it works" />
+				<div
+					aria-hidden
+					className="h-24 border-stroke-soft-100 border-b dark:border-white/10"
+				/>
 				<HowItWorksSteps />
-				<div aria-hidden className="h-24" />
-				<SectionMark index="02" label="Who is it for" />
+				<div
+					aria-hidden
+					className="h-24 border-stroke-soft-100 border-b dark:border-white/10"
+				/>
 				<WhoIsItFor />
 				<RecentChecksSection />
-				<div aria-hidden className="h-24" />
-				<SectionMark index="03" label="Check from code" />
+				<div
+					aria-hidden
+					className="h-24 border-stroke-soft-100 border-b dark:border-white/10"
+				/>
 				<ApiSection />
-				<div aria-hidden className="h-24" />
-				<SectionMark index="04" label="AI agents" />
+				<div
+					aria-hidden
+					className="h-24 border-stroke-soft-100 border-b dark:border-white/10"
+				/>
 				<AiAgentsSection />
 				<div aria-hidden className="h-24" />
-				<SectionMark index="05" label="FAQ" />
 				<div className="border-stroke-soft-100 border-b dark:border-white/10 [&_.t-acc:last-child]:border-b-0">
 					<FaqSection
 						items={faqGroups.flatMap((g) => g.items)}
 						id="faq-section"
+						eyebrow="05. FAQ"
 						compact
 						plain
 						flush
