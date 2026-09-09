@@ -74,7 +74,7 @@ export function AiAgentsSection() {
 				</div>
 				<h2
 					id="ai-agents-heading"
-					className="font-semibold text-3xl text-text-strong-950 tracking-tight sm:text-4xl lg:text-[2.65rem] lg:leading-[1.12] dark:text-white"
+					className="text-balance font-semibold text-2xl text-text-strong-950 tracking-[-0.025em] sm:text-3xl lg:text-[2rem] lg:leading-[1.15] dark:text-white"
 				>
 					Easily connect with your AI agents
 				</h2>

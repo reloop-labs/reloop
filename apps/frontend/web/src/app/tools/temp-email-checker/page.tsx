@@ -5,6 +5,9 @@ import { createPageMetadata } from "@reloop/web/lib/metadata";
 import { getSiteUrl } from "@reloop/web/lib/site";
 import { ApiSection } from "./api-section";
 import { AiAgentsSection } from "./components/ai-agents-section";
+import { HowItWorksSteps } from "./components/how-it-works-steps";
+import { SectionMark } from "./components/section-mark";
+import { WhoIsItFor } from "./components/who-is-it-for";
 import { RecentChecksSection } from "./components/recent-checks-section";
 import { TempEmailHero } from "./components/temp-email-hero";
 import {
@@ -32,7 +35,7 @@ export default function TempEmailCheckerPage() {
 	const siteUrl = getSiteUrl();
 
 	return (
-		<div className="relative min-h-screen overflow-x-hidden bg-bg-white-0 font-sans text-text-strong-950 selection:bg-neutral-200 dark:bg-black dark:text-white dark:selection:bg-neutral-800">
+			<div className="relative min-h-screen overflow-x-clip bg-bg-white-0 font-sans text-text-strong-950 selection:bg-neutral-200 dark:bg-black dark:text-white dark:selection:bg-neutral-800">
 			<JsonLd
 				data={[
 					{
@@ -90,19 +93,22 @@ export default function TempEmailCheckerPage() {
 			<TempEmailHero />
 
 			<div className="relative mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-100 border-x md:max-w-7xl dark:border-white/10">
+				<div aria-hidden className="h-24" />
+				<SectionMark index="01" label="How it works" />
+				<HowItWorksSteps />
+				<div aria-hidden className="h-24" />
+				<SectionMark index="02" label="Who is it for" />
+				<WhoIsItFor />
 				<RecentChecksSection />
-				<div
-					aria-hidden
-					className="h-8 border-stroke-soft-100 border-y sm:h-9 dark:border-white/10"
-				/>
+				<div aria-hidden className="h-24" />
+				<SectionMark index="03" label="Check from code" />
 				<ApiSection />
-				<div
-					aria-hidden
-					className="h-8 border-stroke-soft-100 border-y sm:h-9 dark:border-white/10"
-				/>
+				<div aria-hidden className="h-24" />
+				<SectionMark index="04" label="AI agents" />
 				<AiAgentsSection />
 				<div aria-hidden className="h-24" />
-				<div className="border-stroke-soft-100 border-y dark:border-white/10 [&_.t-acc:last-child]:border-b-0">
+				<SectionMark index="05" label="FAQ" />
+				<div className="border-stroke-soft-100 border-b dark:border-white/10 [&_.t-acc:last-child]:border-b-0">
 					<FaqSection
 						items={faqGroups.flatMap((g) => g.items)}
 						id="faq-section"
@@ -111,7 +117,8 @@ export default function TempEmailCheckerPage() {
 						flush
 					/>
 				</div>
-				<div className="w-full border-stroke-soft-100 border-b [--primary-base:#f43f5e] [--primary-dark:#e11d48] [--primary-darker:#be123c] [--primary-link:#e11d48] dark:border-white/10 dark:[--primary-base:#fb7185] dark:[--primary-dark:#fb7185] dark:[--primary-darker:#e11d48] dark:[--primary-link:#fda4af]">
+				<div aria-hidden className="h-24" />
+				<div className="w-full border-stroke-soft-100 border-y [--primary-base:#f43f5e] [--primary-dark:#e11d48] [--primary-darker:#be123c] [--primary-link:#e11d48] dark:border-white/10 dark:[--primary-base:#fb7185] dark:[--primary-dark:#fb7185] dark:[--primary-darker:#e11d48] dark:[--primary-link:#fda4af]">
 					<BlogCta
 						headline={
 							<>

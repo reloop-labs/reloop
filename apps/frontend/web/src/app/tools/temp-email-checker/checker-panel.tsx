@@ -121,64 +121,6 @@ function MorphSlot({
 	);
 }
 
-function HowItWorksSteps() {
-	return (
-		<div className="space-y-3 px-4 pt-3.5 pb-2.5 text-xs sm:px-5 sm:pt-4 sm:pb-3">
-			<div className="pb-0.5">
-				<p className="font-mono font-semibold text-[11px] text-text-strong-950 uppercase tracking-wider dark:text-white">
-					How It Works
-				</p>
-			</div>
-
-			<div className="relative pt-0.5 pl-0.5">
-				<div className="relative flex items-center gap-3.5 pb-4">
-					<div className="absolute top-5 left-[12px] h-full w-px bg-stroke-soft-100 dark:bg-white/10" />
-					<div className="relative z-10 flex size-6 shrink-0 items-center justify-center rounded-full border border-stroke-soft-100 bg-bg-white-0 font-mono font-semibold text-[11px] text-text-strong-950 dark:border-white/12 dark:bg-[#111] dark:text-white">
-						1
-					</div>
-					<div className="flex flex-1 items-center justify-between">
-						<span className="font-semibold text-sm text-text-strong-950 dark:text-white">
-							RFC 5322 syntax
-						</span>
-						<code className="rounded-md border border-stroke-soft-100 bg-bg-white-0 px-2 py-0.5 font-mono text-[11px] text-text-sub-600 dark:border-white/10 dark:bg-[#0b0b0b] dark:text-white/70">
-							Format
-						</code>
-					</div>
-				</div>
-
-				<div className="relative flex items-center gap-3.5 pb-4">
-					<div className="absolute top-5 left-[12px] h-full w-px bg-stroke-soft-100 dark:bg-white/10" />
-					<div className="relative z-10 flex size-6 shrink-0 items-center justify-center rounded-full border border-stroke-soft-100 bg-bg-white-0 font-mono font-semibold text-[11px] text-text-strong-950 dark:border-white/12 dark:bg-[#111] dark:text-white">
-						2
-					</div>
-					<div className="flex flex-1 items-center justify-between">
-						<span className="font-semibold text-sm text-text-strong-950 dark:text-white">
-							Catalogue and MX lookup
-						</span>
-						<code className="rounded-md border border-stroke-soft-100 bg-bg-white-0 px-2 py-0.5 font-mono text-[11px] text-text-sub-600 dark:border-white/10 dark:bg-[#0b0b0b] dark:text-white/70">
-							Domain & MX
-						</code>
-					</div>
-				</div>
-
-				<div className="relative flex items-center gap-3.5">
-					<div className="relative z-10 flex size-6 shrink-0 items-center justify-center rounded-full border border-stroke-soft-100 bg-bg-white-0 font-mono font-semibold text-[11px] text-text-strong-950 dark:border-white/12 dark:bg-[#111] dark:text-white">
-						3
-					</div>
-					<div className="flex flex-1 items-center justify-between">
-						<span className="font-semibold text-sm text-text-strong-950 dark:text-white">
-							Verdict, score, and flags
-						</span>
-						<code className="rounded-md border border-stroke-soft-100 bg-bg-white-0 px-2 py-0.5 font-mono text-[11px] text-text-sub-600 dark:border-white/10 dark:bg-[#0b0b0b] dark:text-white/70">
-							Decision
-						</code>
-					</div>
-				</div>
-			</div>
-		</div>
-	);
-}
-
 const VERDICT_THEME: Record<
 	CheckVerdict,
 	{
@@ -570,13 +512,6 @@ export function CheckerPanel() {
 						</MorphSlot>
 					</form>
 				</div>
-
-				<MorphSlot
-					activeKey={result || error ? null : "idle"}
-					reduceMotion={shouldReduceMotion}
-				>
-					<HowItWorksSteps />
-				</MorphSlot>
 			</div>
 		</div>
 	);
