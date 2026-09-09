@@ -39,4 +39,12 @@ RUN rm -rf apps
 
 EXPOSE 3002
 
+# Coolify needs a passing health check to do a rolling update (new container
+# becomes healthy before the old one is stopped). The Coolify UI check needs
+# curl/wget, which this alpine image does not ship, so define the check here
+# with bun instead. A Dockerfile HEALTHCHECK takes precedence over the UI one.
+# Next applies the configured base path to the health route.
+HEALTHCHECK --interval=5s --timeout=3s --start-period=20s --retries=6 \
+	CMD bun -e "fetch('http://127.0.0.1:'+(process.env.PORT||3002)+'/console/healthz').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+
 CMD ["bun", "run", "server.js"]

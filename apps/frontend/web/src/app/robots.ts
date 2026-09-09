@@ -9,7 +9,14 @@ export default function robots(): MetadataRoute.Robots {
 			{
 				userAgent: "*",
 				allow: "/",
-				disallow: ["/api/", "/preferences/", "/redirect/", "/twitter", "/home"],
+				disallow: [
+					"/api/",
+					"/healthz",
+					"/preferences/",
+					"/redirect/",
+					"/twitter",
+					"/home",
+				],
 			},
 			{
 				userAgent: [
