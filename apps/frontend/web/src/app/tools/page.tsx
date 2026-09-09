@@ -2,6 +2,7 @@ import { Icon } from "@reloop/ui/icon";
 import { BlogCta } from "@reloop/web/components/landing/blog/blog-cta";
 import { createLandingMetadata } from "@reloop/web/lib/landing/metadata";
 import { toolConfigs } from "@reloop/web/lib/landing/tools";
+import { hostedSignupHref } from "@reloop/web/lib/site";
 import Link from "next/link";
 import { ToolsHeroBlast } from "./components/tools-hero-blast";
 
@@ -78,7 +79,7 @@ export default function ToolsIndexPage() {
 							<Link
 								key={tool.path}
 								href={tool.path}
-								className="group hover:-translate-y-0.5 rounded-[20px] border border-stroke-soft-200 bg-white p-8 transition-all duration-200 hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)] dark:border-white/10 dark:bg-white/[0.02] dark:hover:bg-white/[0.04]"
+								className="group hover:-translate-y-0.5 rounded-[20px] border border-stroke-soft-100 bg-white p-8 transition-all duration-200 hover:border-emerald-500/60 dark:border-white/10 dark:bg-white/[0.02] dark:hover:border-emerald-400/50 dark:hover:bg-white/[0.04]"
 							>
 								<h2 className="font-medium text-[18px] text-text-strong-950 tracking-tight dark:text-white">
 									{title}
@@ -93,13 +94,29 @@ export default function ToolsIndexPage() {
 			</div>
 
 			{/* Global Upsell / Platform CTA */}
-			<BlogCta
-				category="Deliverability"
-				headline="Ready for an email platform built for scale?"
-				sub="Send transactional & marketing emails with high deliverability, drop-in SDKs, and deep observability. Free forever to get started."
-				primaryLabel="Start sending free"
-				secondaryLabel="Documentation"
-			/>
+			<div className="border-stroke-soft-100 border-t dark:border-white/10">
+				<BlogCta
+					headline={
+						<span className="block font-semibold text-[3rem] leading-[1.04] tracking-[-0.04em] sm:text-[4.25rem] lg:text-[5.25rem]">
+							Start now
+							<br />
+							<span className="text-primary-base">$0 / mo.</span>
+						</span>
+					}
+					sub="No credit card required. 3,000 emails for free."
+					primaryLabel="Get started"
+					primaryHref={hostedSignupHref}
+					primaryVariant="primary"
+					secondaryLabel="View pricing"
+					secondaryHref="/pricing"
+					accentColor="emerald"
+					blast={{ light: "#10B981", dark: "#6ee7b7" }}
+					flush
+					align="center"
+					pill={false}
+					showTopRule={false}
+				/>
+			</div>
 		</div>
 	);
 }
