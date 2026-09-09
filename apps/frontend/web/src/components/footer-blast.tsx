@@ -6,7 +6,7 @@ import type { FooterBrandAccent } from "./footer-brand";
 
 const accentPixelColorLight: Record<FooterBrandAccent, string> = {
 	default: "#3B82F6",
-	emerald: "#34d399",
+	emerald: "#10B981",
 	ink: "#6e7781",
 	orange: "#ea580c",
 };
