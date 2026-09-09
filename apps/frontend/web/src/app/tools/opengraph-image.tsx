@@ -1,8 +1,83 @@
 import { ImageResponse } from "next/og";
+import type { ReactNode } from "react";
 
 export const alt = "Free Email & Developer Tools | Reloop";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
+
+/** Deterministic PRNG so the blast field is stable across renders. */
+function mulberry32(seed: number) {
+	return () => {
+		seed |= 0;
+		seed = (seed + 0x6d2b79f5) | 0;
+		let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+		t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+		return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+	};
+}
+
+/**
+ * Static SVG stand-in for the PixelBlast hero background (square variant).
+ * Scatters small squares around a cluster center, fading with distance —
+ * same side-weighted feel as the hero's masked blast, without WebGL.
+ */
+function BlastField({
+	seed,
+	x,
+	y,
+	width,
+	height,
+	color,
+	count = 300,
+	maxOpacity = 0.38,
+}: {
+	seed: number;
+	x: number;
+	y: number;
+	width: number;
+	height: number;
+	color: string;
+	count?: number;
+	maxOpacity?: number;
+}) {
+	const rand = mulberry32(seed);
+	const cx = x + width / 2;
+	const cy = y + height / 2;
+	const maxDist = Math.sqrt((width / 2) ** 2 + (height / 2) ** 2);
+	const dots: ReactNode[] = [];
+
+	for (let i = 0; i < count; i++) {
+		const dx = (rand() - 0.5) * width;
+		const dy = (rand() - 0.5) * height;
+		const dist = Math.sqrt(dx * dx + dy * dy) / maxDist;
+		const alpha = maxOpacity * (1 - dist);
+		if (alpha < 0.03) continue;
+		const s = 3 + Math.floor(rand() * 3);
+		dots.push(
+			<rect
+				key={i}
+				x={Math.round(cx + dx)}
+				y={Math.round(cy + dy)}
+				width={s}
+				height={s}
+				fill={color}
+				opacity={Number(alpha.toFixed(2))}
+			/>,
+		);
+	}
+
+	return (
+		<svg
+			width="1200"
+			height="630"
+			viewBox="0 0 1200 630"
+			fill="none"
+			style={{ position: "absolute", inset: 0 }}
+		>
+			{dots}
+		</svg>
+	);
+}
 
 export default async function OpenGraphImage() {
 	const [interMediumFont, interSemiBoldFont] = await Promise.all([
@@ -32,7 +107,24 @@ export default async function OpenGraphImage() {
 				overflow: "hidden",
 			}}
 		>
-			{/* faint side rules echoing the page frame */}
+			{/* pixel-blast fields — side-weighted like the hero, center kept clear */}
+			<BlastField
+				seed={7}
+				x={760}
+				y={-60}
+				width={520}
+				height={380}
+				color="#10b981"
+			/>
+			<BlastField
+				seed={42}
+				x={-80}
+				y={330}
+				width={520}
+				height={360}
+				color="#10b981"
+			/>
+			{/* faint frame rules echoing the page frame */}
 			<div
 				style={{
 					position: "absolute",
@@ -50,6 +142,26 @@ export default async function OpenGraphImage() {
 					bottom: 0,
 					right: "48px",
 					width: "1px",
+					backgroundColor: "#e7e7e7",
+				}}
+			/>
+			<div
+				style={{
+					position: "absolute",
+					top: "48px",
+					left: 0,
+					right: 0,
+					height: "1px",
+					backgroundColor: "#e7e7e7",
+				}}
+			/>
+			<div
+				style={{
+					position: "absolute",
+					bottom: "48px",
+					left: 0,
+					right: 0,
+					height: "1px",
 					backgroundColor: "#e7e7e7",
 				}}
 			/>
