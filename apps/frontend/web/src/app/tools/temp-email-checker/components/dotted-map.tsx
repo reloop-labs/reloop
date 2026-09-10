@@ -176,11 +176,14 @@ const MAP_HEIGHT = 75;
 const HOP_MS = 4800;
 const STAGGER_MS = 900;
 const SLOTS_PER_HUB = 1;
-const MIN_DEST_DIST = 12;
+const MIN_DEST_DIST = 16;
+const MIN_PAIR_DIST = 20;
+const MIN_LINE_DIST = 9;
 const TIP_RADIUS = 0.42;
 const DEST_RADIUS = 0.38;
-const BADGE_HEIGHT = 2.55;
-const BADGE_FONT = 1.55;
+const BADGE_FONT = 1.5;
+const BADGE_INK = "#1C1917";
+const BADGE_WARM = "#F6F1EA";
 const RETURN_EVENTS = ["opened", "link clicked"] as const;
 
 const HUBS: Marker[] = [
@@ -238,35 +241,52 @@ function applyBadge(
 	text: SVGTextElement,
 	badge: SVGRectElement,
 	label: string,
-	color: string,
 ) {
+	const width = label.length * 0.92 + 2.2;
+	const height = 2.4;
 	text.textContent = label;
-	const width = badgeWidth(label);
 	badge.setAttribute("x", String(-width / 2));
+	badge.setAttribute("y", String(-height / 2));
 	badge.setAttribute("width", String(width));
-	badge.setAttribute("fill", color);
+	badge.setAttribute("height", String(height));
+	badge.setAttribute("rx", String(height / 2));
+	badge.setAttribute("fill", BADGE_INK);
+	text.setAttribute("fill", BADGE_WARM);
 }
 
-function badgeWidth(label: string) {
-	return label.length * 0.96 + 2.4;
+function distToSegment(point: XY, a: XY, b: XY) {
+	const dx = b.x - a.x;
+	const dy = b.y - a.y;
+	const len2 = dx * dx + dy * dy || 1;
+	const t = Math.max(
+		0,
+		Math.min(1, ((point.x - a.x) * dx + (point.y - a.y) * dy) / len2),
+	);
+	return Math.hypot(point.x - (a.x + t * dx), point.y - (a.y + t * dy));
 }
 
-function pickDest(points: XY[], hub: XY, taken: XY[]): XY | null {
+function pickDest(points: XY[], hub: XY, taken: XY[], avoid: XY[]): XY | null {
 	if (points.length === 0) return null;
-	for (let attempt = 0; attempt < 24; attempt++) {
+	for (let attempt = 0; attempt < 48; attempt++) {
 		const point = points[(Math.random() * points.length) | 0];
 		if (!point) continue;
+		if (point.x < 8 || point.x > MAP_WIDTH - 8) continue;
+		if (point.y < 6 || point.y > MAP_HEIGHT - 6) continue;
 		if (Math.hypot(point.x - hub.x, point.y - hub.y) < MIN_DEST_DIST) continue;
 		if (
 			taken.some(
-				(other) => Math.hypot(point.x - other.x, point.y - other.y) < 7,
+				(other) =>
+					Math.hypot(point.x - other.x, point.y - other.y) < MIN_PAIR_DIST,
 			)
 		) {
 			continue;
 		}
+		if (avoid.some((item) => distToSegment(item, hub, point) < MIN_LINE_DIST)) {
+			continue;
+		}
 		return point;
 	}
-	return points[(Math.random() * points.length) | 0] ?? null;
+	return null;
 }
 
 function splitXFor(hubs: XY[]) {
@@ -294,16 +314,22 @@ function makeHop(from: XY, to: XY, splitX: number): HopGeom {
 	const cy = my + ny * dist * bulge;
 	if (from.x < splitX) cx = Math.min(cx, splitX - 2);
 	else cx = Math.max(cx, splitX + 2);
-	const lx = dx / dist;
-	const ly = dy / dist;
+	let px = nx;
+	let py = ny;
+	if (py > 0) {
+		px = -px;
+		py = -py;
+	}
+	const labelX = Math.min(MAP_WIDTH - 10, Math.max(10, to.x + px * 3.6));
+	const labelY = Math.min(MAP_HEIGHT - 5, Math.max(4, to.y + py * 3.1));
 	return {
 		to,
 		cx,
 		cy,
 		d: `M ${from.x} ${from.y} Q ${cx} ${cy} ${to.x} ${to.y}`,
 		dBack: `M ${to.x} ${to.y} Q ${cx} ${cy} ${from.x} ${from.y}`,
-		labelX: to.x + lx * 2.15,
-		labelY: to.y + ly * 2.15,
+		labelX,
+		labelY,
 	};
 }
 
@@ -404,9 +430,7 @@ function NetworkOverlay({
 		const returnEventFor = slots.map(() => pickReturnEvent());
 		const badgeLabelFor = slots.map(() => "");
 		const splitX = splitXFor(slots.map((slot) => slot.hub));
-		const poolFor = slots.map((slot) =>
-			pointsForHub(points, slot.hub, splitX),
-		);
+		const poolFor = slots.map((slot) => pointsForHub(points, slot.hub, splitX));
 
 		const observer =
 			svg && "IntersectionObserver" in window
@@ -454,19 +478,35 @@ function NetworkOverlay({
 					const others = hops
 						.map((hop, j) => (j === i || !hop ? null : hop.to))
 						.filter((p): p is XY => Boolean(p));
-					const to = pickDest(poolFor[i] ?? points, slot.hub, others);
+					const avoid = [
+						...others,
+						...slots
+							.filter((_, j) => j !== i)
+							.map((item) => ({ x: item.hub.x, y: item.hub.y })),
+					];
+					const to = pickDest(poolFor[i] ?? points, slot.hub, others, avoid);
 					if (!to) {
 						hops[i] = null;
 						hideHop(path, tip, dest, label);
 						continue;
 					}
 					const hop = makeHop(slot.hub, to, splitX);
+					const other = hops.find((item, j) => j !== i && item);
+					if (
+						other &&
+						Math.hypot(
+							hop.labelX - other.labelX,
+							hop.labelY - other.labelY,
+						) < 14
+					) {
+						hop.labelX = 2 * hop.to.x - hop.labelX;
+						hop.labelY = 2 * hop.to.y - hop.labelY;
+					}
 					hops[i] = hop;
 					returnEventFor[i] = pickReturnEvent();
 					badgeLabelFor[i] = "";
 					dest.setAttribute("cx", String(to.x));
 					dest.setAttribute("cy", String(to.y));
-					dest.setAttribute("fill", slot.color);
 					path.setAttribute("d", hop.d);
 				}
 
@@ -477,6 +517,9 @@ function NetworkOverlay({
 				}
 
 				const outbound = local < 0.46;
+				const badgeText = outbound
+					? "delivered"
+					: (returnEventFor[i] ?? "opened");
 				const travel = outbound
 					? easeTravel(span(local, 0.02, 0.26))
 					: easeTravel(span(local, 0.5, 0.78));
@@ -502,18 +545,16 @@ function NetworkOverlay({
 				tip.setAttribute("cy", String(pos.y));
 				tip.setAttribute("fill", slot.color);
 				tip.setAttribute("opacity", String(tipOp));
+				dest.setAttribute("fill", slot.color);
 
 				dest.setAttribute(
 					"opacity",
 					String(span(local, 0.24, 0.28) * (1 - span(local, 0.8, 0.88))),
 				);
 
-				const badgeText = outbound
-					? "delivered"
-					: (returnEventFor[i] ?? "opened");
 				if (badgeLabelFor[i] !== badgeText) {
 					badgeLabelFor[i] = badgeText;
-					applyBadge(text, badge, badgeText, slot.color);
+					applyBadge(text, badge, badgeText);
 				}
 				const labelOp = outbound
 					? span(local, 0.24, 0.3) * (1 - span(local, 0.4, 0.45))
@@ -578,11 +619,11 @@ function NetworkOverlay({
 								badgeRefs.current[i] = el;
 							}}
 							x={-6.2}
-							y={-BADGE_HEIGHT / 2}
+							y={-1.2}
 							width={12.4}
-							height={BADGE_HEIGHT}
-							rx={BADGE_HEIGHT / 2}
-							fill={slot.color}
+							height={2.4}
+							rx={1.2}
+							fill={BADGE_INK}
 						/>
 						<text
 							ref={(el) => {
@@ -590,11 +631,10 @@ function NetworkOverlay({
 							}}
 							textAnchor="middle"
 							dominantBaseline="middle"
-							y={0.12}
-							fill="#fff"
+							fill={BADGE_WARM}
 							fontSize={BADGE_FONT}
-							fontWeight={600}
-							letterSpacing={0.06}
+							fontWeight={500}
+							letterSpacing={-0.0375}
 							fontFamily="ui-sans-serif, system-ui, sans-serif"
 						>
 							delivered

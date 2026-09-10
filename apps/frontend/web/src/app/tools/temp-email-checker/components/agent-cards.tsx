@@ -5,7 +5,14 @@ function ApiDiagram() {
 	const line = "#e7e7e7";
 	const accent = "#f43f5e";
 	const soft = "#fecdd3";
-	const bar = (x: number, y: number, w: number, fill: string, o = 1) => (
+	const bar = (
+		x: number,
+		y: number,
+		w: number,
+		fill: string,
+		o = 1,
+		darkClass?: string,
+	) => (
 		<rect
 			key={`${x}-${y}`}
 			x={x}
@@ -15,6 +22,7 @@ function ApiDiagram() {
 			rx="3.5"
 			fill={fill}
 			opacity={o}
+			className={darkClass}
 		/>
 	);
 
@@ -37,6 +45,7 @@ function ApiDiagram() {
 					fill="#ffffff"
 					stroke={line}
 					strokeWidth="1.5"
+					className="fill-white stroke-[#e7e7e7] dark:fill-[#161619] dark:stroke-white/15"
 				/>
 				<text
 					x="103"
@@ -46,13 +55,22 @@ function ApiDiagram() {
 					fontFamily="monospace"
 					letterSpacing="2"
 					fill="#a8a29e"
+					className="fill-[#a8a29e] dark:fill-white/40"
 				>
 					YAML
 				</text>
-				<line x1="28" y1="58" x2="178" y2="58" stroke={line} strokeWidth="1.5" />
-				{bar(48, 74, 52, line)}
-				{bar(48, 90, 84, line)}
-				{bar(48, 106, 34, line)}
+				<line
+					x1="28"
+					y1="58"
+					x2="178"
+					y2="58"
+					stroke={line}
+					strokeWidth="1.5"
+					className="stroke-[#e7e7e7] dark:stroke-white/15"
+				/>
+				{bar(48, 74, 52, line, 1, "dark:fill-white/15")}
+				{bar(48, 90, 84, line, 1, "dark:fill-white/15")}
+				{bar(48, 106, 34, line, 1, "dark:fill-white/15")}
 			</g>
 			{/* back JSON card */}
 			<g>
@@ -65,6 +83,7 @@ function ApiDiagram() {
 					fill="#ffffff"
 					stroke={line}
 					strokeWidth="1.5"
+					className="fill-white stroke-[#e7e7e7] dark:fill-[#161619] dark:stroke-white/15"
 				/>
 				<text
 					x="297"
@@ -74,13 +93,22 @@ function ApiDiagram() {
 					fontFamily="monospace"
 					letterSpacing="2"
 					fill="#a8a29e"
+					className="fill-[#a8a29e] dark:fill-white/40"
 				>
 					JSON
 				</text>
-				<line x1="222" y1="58" x2="372" y2="58" stroke={line} strokeWidth="1.5" />
-				{bar(242, 74, 40, line)}
-				{bar(242, 90, 68, line)}
-				{bar(242, 106, 30, line)}
+				<line
+					x1="222"
+					y1="58"
+					x2="372"
+					y2="58"
+					stroke={line}
+					strokeWidth="1.5"
+					className="stroke-[#e7e7e7] dark:stroke-white/15"
+				/>
+				{bar(242, 74, 40, line, 1, "dark:fill-white/15")}
+				{bar(242, 90, 68, line, 1, "dark:fill-white/15")}
+				{bar(242, 106, 30, line, 1, "dark:fill-white/15")}
 			</g>
 			{/* front endpoint card */}
 			<g>
@@ -93,6 +121,7 @@ function ApiDiagram() {
 					fill="#ffffff"
 					stroke={line}
 					strokeWidth="1.5"
+					className="fill-white stroke-[#e7e7e7] dark:fill-[#1d1d20] dark:stroke-white/15"
 				/>
 				<rect x="110" y="114" width="62" height="26" rx="13" fill={accent} />
 				<text
@@ -107,8 +136,8 @@ function ApiDiagram() {
 					POST
 				</text>
 				{bar(184, 118, 58, accent)}
-				{bar(184, 132, 30, soft)}
-				{bar(218, 132, 46, soft)}
+				{bar(184, 132, 30, soft, 1, "dark:fill-rose-300/30")}
+				{bar(218, 132, 46, soft, 1, "dark:fill-rose-300/30")}
 				<rect
 					x="110"
 					y="156"
@@ -116,6 +145,7 @@ function ApiDiagram() {
 					height="26"
 					rx="13"
 					fill={soft}
+					className="dark:fill-rose-500/20"
 				/>
 				<text
 					x="141"
@@ -125,12 +155,13 @@ function ApiDiagram() {
 					fontWeight="600"
 					fontFamily="monospace"
 					fill={accent}
+					className="fill-rose-500 dark:fill-rose-400"
 				>
 					GET
 				</text>
-				{bar(184, 160, 26, line)}
+				{bar(184, 160, 26, line, 1, "dark:fill-white/20")}
 				{bar(184, 174, 52, accent)}
-				{bar(240, 174, 24, line)}
+				{bar(240, 174, 24, line, 1, "dark:fill-white/20")}
 			</g>
 		</svg>
 	);
@@ -204,22 +235,70 @@ function CliDiagram() {
 				fill="#ffffff"
 				stroke={line}
 				strokeWidth="1.5"
+				className="fill-white stroke-[#e7e7e7] dark:fill-[#161619] dark:stroke-white/15"
 			/>
-			<circle cx="84" cy="42" r="4" fill={line} />
-			<circle cx="100" cy="42" r="4" fill={line} />
-			<circle cx="116" cy="42" r="4" fill={line} />
-			<line x1="60" y1="58" x2="340" y2="58" stroke={line} strokeWidth="1.5" />
+			<circle
+				cx="84"
+				cy="42"
+				r="4"
+				fill={line}
+				className="dark:fill-white/20"
+			/>
+			<circle
+				cx="100"
+				cy="42"
+				r="4"
+				fill={line}
+				className="dark:fill-white/20"
+			/>
+			<circle
+				cx="116"
+				cy="42"
+				r="4"
+				fill={line}
+				className="dark:fill-white/20"
+			/>
+			<line
+				x1="60"
+				y1="58"
+				x2="340"
+				y2="58"
+				stroke={line}
+				strokeWidth="1.5"
+				className="stroke-[#e7e7e7] dark:stroke-white/15"
+			/>
 			<text x="80" y="88" fontSize="12" fontFamily={mono} fill={accent}>
 				$ reloop emails check \
 			</text>
-			<text x="80" y="110" fontSize="12" fontFamily={mono} fill={ink}>
+			<text
+				x="80"
+				y="110"
+				fontSize="12"
+				fontFamily={mono}
+				fill={ink}
+				className="fill-[#0c0a09] dark:fill-white/85"
+			>
 				user@example.com --json
 			</text>
-			<text x="80" y="142" fontSize="12" fontFamily={mono} fill={ink}>
+			<text
+				x="80"
+				y="142"
+				fontSize="12"
+				fontFamily={mono}
+				fill={ink}
+				className="fill-[#0c0a09] dark:fill-white/85"
+			>
 				{"{"} &quot;verdict&quot;:{" "}
 				<tspan fill={accent}>&quot;clear&quot;</tspan>,
 			</text>
-			<text x="80" y="164" fontSize="12" fontFamily={mono} fill={ink}>
+			<text
+				x="80"
+				y="164"
+				fontSize="12"
+				fontFamily={mono}
+				fill={ink}
+				className="fill-[#0c0a09] dark:fill-white/85"
+			>
 				&quot;confidence&quot;: <tspan fill={accent}>0.98</tspan> {"}"}
 			</text>
 		</svg>
@@ -292,6 +371,7 @@ function SkillsDiagram() {
 				fill="#ffffff"
 				stroke={line}
 				strokeWidth="1.5"
+				className="fill-white stroke-[#e7e7e7] dark:fill-[#101013] dark:stroke-white/10"
 			/>
 			<rect
 				x="96"
@@ -302,6 +382,7 @@ function SkillsDiagram() {
 				fill="#ffffff"
 				stroke={line}
 				strokeWidth="1.5"
+				className="fill-white stroke-[#e7e7e7] dark:fill-[#141417] dark:stroke-white/10"
 			/>
 			<rect
 				x="82"
@@ -312,6 +393,7 @@ function SkillsDiagram() {
 				fill="#ffffff"
 				stroke={accent}
 				strokeWidth="1.5"
+				className="fill-white dark:fill-[#1d1d20] dark:stroke-rose-500/60"
 			/>
 			<text
 				x="102"
@@ -319,20 +401,63 @@ function SkillsDiagram() {
 				fontSize="12"
 				fontFamily="monospace"
 				fill={accent}
+				className="fill-rose-500 dark:fill-rose-400"
 			>
 				reloop-skills/
 			</text>
 			<g fontSize="11" fontFamily="monospace">
-				<rect x="102" y="120" width="62" height="24" rx="12" fill="#fff1f2" />
-				<text x="133" y="136" textAnchor="middle" fill={accent}>
+				<rect
+					x="102"
+					y="120"
+					width="62"
+					height="24"
+					rx="12"
+					fill="#fff1f2"
+					className="dark:fill-rose-500/20"
+				/>
+				<text
+					x="133"
+					y="136"
+					textAnchor="middle"
+					fill={accent}
+					className="fill-rose-500 dark:fill-rose-300"
+				>
 					check
 				</text>
-				<rect x="170" y="120" width="56" height="24" rx="12" fill="#fff1f2" />
-				<text x="198" y="136" textAnchor="middle" fill={accent}>
+				<rect
+					x="170"
+					y="120"
+					width="56"
+					height="24"
+					rx="12"
+					fill="#fff1f2"
+					className="dark:fill-rose-500/20"
+				/>
+				<text
+					x="198"
+					y="136"
+					textAnchor="middle"
+					fill={accent}
+					className="fill-rose-500 dark:fill-rose-300"
+				>
 					send
 				</text>
-				<rect x="102" y="150" width="66" height="24" rx="12" fill="#fff1f2" />
-				<text x="135" y="166" textAnchor="middle" fill={accent}>
+				<rect
+					x="102"
+					y="150"
+					width="66"
+					height="24"
+					rx="12"
+					fill="#fff1f2"
+					className="dark:fill-rose-500/20"
+				/>
+				<text
+					x="135"
+					y="166"
+					textAnchor="middle"
+					fill={accent}
+					className="fill-rose-500 dark:fill-rose-300"
+				>
 					verify
 				</text>
 			</g>
@@ -414,10 +539,10 @@ function CardHeader({
 				</svg>
 			</div>
 			<div>
-				<h3 className="text-balance font-semibold text-text-strong-950 text-[16px] tracking-[-0.025em] dark:text-white">
+				<h3 className="text-balance font-semibold text-[16px] text-text-strong-950 tracking-[-0.025em] dark:text-white">
 					{title}
 				</h3>
-				<p className="mt-2 text-[16px] font-medium text-text-strong-950 leading-snug tracking-[-0.025em] dark:text-white">
+				<p className="mt-2 font-medium text-[16px] text-text-strong-950 leading-snug tracking-[-0.025em] dark:text-white">
 					{lede}
 				</p>
 			</div>
@@ -430,7 +555,15 @@ function McpDiagram() {
 	const accent = "#f43f5e";
 	const node = (x: number, y: number, glyph: ReactNode) => (
 		<g key={`${x}-${y}`}>
-			<circle cx={x} cy={y} r="22" fill="#ffffff" stroke={line} strokeWidth="1.5" />
+			<circle
+				cx={x}
+				cy={y}
+				r="22"
+				fill="#ffffff"
+				stroke={line}
+				strokeWidth="1.5"
+				className="fill-white stroke-[#e7e7e7] dark:fill-[#1d1d20] dark:stroke-white/15"
+			/>
 			<g
 				transform={`translate(${x},${y})`}
 				stroke={accent}
@@ -453,7 +586,11 @@ function McpDiagram() {
 			aria-hidden
 		>
 			{/* connectors */}
-			<g stroke={line} strokeWidth="1.5">
+			<g
+				stroke={line}
+				strokeWidth="1.5"
+				className="stroke-[#e7e7e7] dark:stroke-white/15"
+			>
 				<path d="M110 62 V84 H140 V100" />
 				<path d="M290 62 V84 H260 V100" />
 				<path d="M77 130 H140" />
@@ -478,6 +615,7 @@ function McpDiagram() {
 				fill="#ffffff"
 				stroke={line}
 				strokeWidth="1.5"
+				className="fill-white stroke-[#e7e7e7] dark:fill-[#1d1d20] dark:stroke-white/15"
 			/>
 			<text
 				x="200"
@@ -486,6 +624,7 @@ function McpDiagram() {
 				fontSize="15"
 				fontFamily="monospace"
 				fill={accent}
+				className="fill-rose-500 dark:fill-rose-400"
 			>
 				{"{API}"}
 			</text>
@@ -525,11 +664,7 @@ function McpDiagram() {
 					<path d="M-4 5 L-6 9 L-1 5.5" />
 				</>,
 			)}
-			{node(
-				290,
-				220,
-				<path d="M2 -9 L-4 1 H0 L-2 9 L4 -1 H0 L2 -9 Z" />,
-			)}
+			{node(290, 220, <path d="M2 -9 L-4 1 H0 L-2 9 L4 -1 H0 L2 -9 Z" />)}
 		</svg>
 	);
 }
