@@ -65,7 +65,7 @@ export function CompareMigrate({
 				</h2>
 				<p className="mx-auto mt-4 max-w-xl text-balance font-medium text-[15px] text-text-sub-600 leading-relaxed sm:text-[17px] dark:text-white/50">
 					Switching from {competitorName} to Reloop is straightforward. Keep
-					your templates, swap the send path, and re-wire webhooks—without
+					your templates, swap the send path, and re-wire webhooks, without
 					rewriting your product.
 				</p>
 
