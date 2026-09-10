@@ -718,11 +718,31 @@ function McpCard() {
 
 export function AgentCards() {
 	return (
-		<div className="grid grid-cols-1 gap-px border-stroke-soft-100 border-b bg-stroke-soft-100 sm:grid-cols-2 lg:grid-cols-4 dark:border-white/10 dark:bg-white/10">
-			<McpCard />
-			<ApiCard />
-			<CliCard />
-			<SkillsCard />
-		</div>
+		<section
+			id="integrations"
+			aria-labelledby="integrations-heading"
+			className="w-full"
+		>
+			<div className="px-6 py-16 sm:px-8 sm:py-20 md:px-12 md:py-24">
+				<div className="mx-auto max-w-4xl text-center">
+					<h2
+						id="integrations-heading"
+						className="text-balance font-semibold text-2xl text-text-strong-950 tracking-tight sm:text-3xl lg:text-4xl dark:text-white"
+					>
+						Connect Reloop to anything
+					</h2>
+					<p className="mx-auto mt-4 max-w-xl text-[15px] text-text-sub-600 leading-relaxed sm:text-[16px] dark:text-white/50">
+						AI agents, terminals, and your own stack — pick the surface
+						that fits how you build.
+					</p>
+				</div>
+			</div>
+			<div className="grid grid-cols-1 gap-px border-stroke-soft-200 border-y bg-stroke-soft-200 sm:grid-cols-2 lg:grid-cols-4 dark:border-white/10 dark:bg-white/10">
+				<McpCard />
+				<ApiCard />
+				<CliCard />
+				<SkillsCard />
+			</div>
+		</section>
 	);
 }

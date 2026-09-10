@@ -63,7 +63,6 @@ function CrossIcon() {
 	);
 }
 
-import { AgentCards } from "./agent-cards";
 import { TempEmailDottedMap } from "./dotted-map";
 
 const QUOTES: {
@@ -201,8 +200,6 @@ export function HowItCompares() {
 			</div>
 
 			<TempEmailDottedMap />
-
-			<AgentCards />
 
 			{/* Loved by developers */}
 			<div className="flex flex-col items-center border-stroke-soft-100 border-b px-4 py-16 text-center sm:px-8 sm:py-20 lg:px-12 lg:py-24 dark:border-white/10">
