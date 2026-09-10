@@ -137,7 +137,7 @@ describe("resolveInspectorTextStyle", () => {
 		editor.destroy();
 	});
 
-	it("applyTextAlignment updates textblock and enclosing tableCell, syncing inline style and attributes", () => {
+	it("applyTextAlignment updates textblock without mutating enclosing tableCell, syncing inline style and attributes", () => {
 		const editor = new Editor({
 			extensions: [emailStarterKit()],
 			content: `<table><tbody><tr><td style="text-align: right;" alignment="right"><p style="text-align: right; color: #c14e4e;">Barebones</p></td></tr></tbody></table>`,
@@ -152,23 +152,80 @@ describe("resolveInspectorTextStyle", () => {
 		});
 		editor.commands.setTextSelection({ from, to });
 
-		// Before: isActive("right") is true
-		expect(editor.isActive({ alignment: "right" })).toBe(true);
+		// Before: resolved alignment is right
+		expect(getResolvedAlignment(editor)).toBe("right");
 
 		// Apply alignment left
 		expect(applyTextAlignment(editor, "left")).toBe(true);
 
-		// Now: isActive("left") is true, isActive("right") is false
-		expect(editor.isActive({ alignment: "left" })).toBe(true);
-		expect(editor.isActive({ alignment: "right" })).toBe(false);
-
-		// Inspector resolver returns "left"
+		// Now: paragraph has alignment "left"
 		expect(getResolvedAlignment(editor)).toBe("left");
 
-		// HTML markup has text-align: left and alignment="left" on both paragraph and cell
+		// HTML markup has text-align: left and alignment="left" on the paragraph
 		const html = editor.getHTML();
 		expect(html).toContain("text-align: left");
-		expect(html).not.toMatch(/text-align:\s*right/);
+		expect(html).toMatch(/<p[^>]*text-align:\s*left/);
+
+		// Enclosing cell retains its own alignment attribute without being corrupted
+		expect(html).toContain('alignment="right"');
+
+		editor.destroy();
+	});
+
+	it("aligning a paragraph inside a table cell does not mutate sibling headings or paragraphs in the same cell", () => {
+		const editor = new Editor({
+			extensions: [emailStarterKit()],
+			content: `
+				<table>
+					<tbody>
+						<tr>
+							<td style="text-align: center;" alignment="center">
+								<h1>Your plan was updated</h1>
+								<p>Hi Alex,</p>
+								<p>sd</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			`,
+		});
+
+		let sdPos = 0;
+		editor.state.doc.descendants((node, pos) => {
+			if (node.isText && node.text === "sd") sdPos = pos;
+		});
+		editor.commands.setTextSelection(sdPos);
+
+		// Before: sd inherits center from cell
+		expect(getResolvedAlignment(editor)).toBe("center");
+
+		// Apply left alignment to "sd"
+		expect(applyTextAlignment(editor, "left")).toBe(true);
+
+		// "sd" paragraph is now left-aligned
+		expect(getResolvedAlignment(editor)).toBe("left");
+
+		// Title "Your plan was updated" remains centered
+		let headingPos = 0;
+		editor.state.doc.descendants((node, pos) => {
+			if (node.isText && node.text?.includes("Your plan was updated"))
+				headingPos = pos;
+		});
+		editor.commands.setTextSelection(headingPos);
+		expect(getResolvedAlignment(editor)).toBe("center");
+
+		// Sibling paragraph "Hi Alex," remains centered
+		let alexPos = 0;
+		editor.state.doc.descendants((node, pos) => {
+			if (node.isText && node.text?.includes("Hi Alex,")) alexPos = pos;
+		});
+		editor.commands.setTextSelection(alexPos);
+		expect(getResolvedAlignment(editor)).toBe("center");
+
+		// The tableCell itself still has center alignment
+		const html = editor.getHTML();
+		expect(html).toContain('alignment="center"');
+		expect(html).toMatch(/<p[^>]*text-align:\s*left[^>]*>sd<\/p>/);
 
 		editor.destroy();
 	});
@@ -193,6 +250,32 @@ describe("resolveInspectorTextStyle", () => {
 		expect(html).toContain("text-align: left");
 		// valign attr (schema-supported) must survive a horizontal-align change
 		expect(html).toContain('valign="middle"');
+		expect(html).not.toMatch(/vertical-\s*;/);
+		expect(html).not.toMatch(/text-\s*;/);
+
+		editor.destroy();
+	});
+
+	it("applyTextAlignment directly on tableCell node selection updates the cell and preserves vertical placement", () => {
+		const editor = new Editor({
+			extensions: [emailStarterKit()],
+			content: `<table><tbody><tr><td style="text-align: right; vertical-align: middle;" valign="middle" alignment="right"><p>Cell content</p></td></tr></tbody></table>`,
+		});
+		let cellPos = -1;
+		editor.state.doc.descendants((node, pos) => {
+			if (node.type.name === "tableCell") {
+				cellPos = pos;
+				return false;
+			}
+		});
+		expect(cellPos).toBeGreaterThanOrEqual(0);
+		editor.commands.setNodeSelection(cellPos);
+		expect(applyTextAlignment(editor, "left")).toBe(true);
+
+		const html = editor.getHTML();
+		expect(html).toContain("text-align: left");
+		expect(html).toContain('valign="middle"');
+		expect(html).toContain("vertical-align: middle");
 		expect(html).not.toMatch(/vertical-\s*;/);
 		expect(html).not.toMatch(/text-\s*;/);
 

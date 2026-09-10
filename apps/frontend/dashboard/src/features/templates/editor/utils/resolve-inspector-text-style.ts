@@ -1,4 +1,5 @@
 import type { Editor } from "@tiptap/core";
+import { NodeSelection } from "@tiptap/pm/state";
 import { EMAIL_FONT_COLOR_MARK } from "./email-starter-kit";
 
 export type InspectorTextStyleProp =
@@ -514,20 +515,48 @@ export function stripHorizontalAlignCss(style: string): string {
 }
 
 /**
- * Applies text alignment uniformly across textblock nodes in range, button/image nodes,
- * and enclosing tableCell / column, synchronizing both the TipTap attribute and inline CSS.
+ * Applies text alignment to textblock nodes in range (paragraphs, headings)
+ * and block nodes (button, image). Isolates text alignment to the selected
+ * blocks and does not mutate enclosing containers (tableCell/columnsColumn)
+ * unless the cell/column itself is directly selected without child blocks.
  */
 export function applyTextAlignment(editor: Editor, alignment: string): boolean {
 	return editor.commands.command(({ tr, state }) => {
+		// If the user explicitly selected a tableCell or column node directly:
+		if (state.selection instanceof NodeSelection) {
+			const node = state.selection.node;
+			if (
+				node.type.name === "tableCell" ||
+				node.type.name === "tableHeader" ||
+				node.type.name === "columnsColumn"
+			) {
+				const cellPos = state.selection.from;
+				const style = String(node.attrs.style || "");
+				const clean = stripHorizontalAlignCss(style);
+				const newStyle = clean
+					? `${clean}; text-align: ${alignment};`
+					: `text-align: ${alignment};`;
+				tr.setNodeMarkup(cellPos, null, {
+					...node.attrs,
+					alignment,
+					align: alignment,
+					style: newStyle,
+				});
+				return true;
+			}
+		}
+
 		const { from, to } = state.selection;
 
 		// 1. Update textblock nodes and block nodes (button, image, etc.) in range
+		let updatedCount = 0;
 		state.doc.nodesBetween(from, to, (node, pos) => {
 			if (
 				node.isTextblock ||
 				node.type.name === "button" ||
 				node.type.name === "image"
 			) {
+				updatedCount++;
 				const style = String(node.attrs.style || "");
 				const clean = stripHorizontalAlignCss(style);
 				let newStyle = clean;
@@ -571,27 +600,31 @@ export function applyTextAlignment(editor: Editor, alignment: string): boolean {
 			}
 		});
 
-		// 2. Also update enclosing tableCell / column if inside one
-		const $from = state.doc.resolve(from);
-		for (let depth = $from.depth; depth > 0; depth--) {
-			const node = $from.node(depth);
-			if (
-				node.type.name === "tableCell" ||
-				node.type.name === "tableHeader" ||
-				node.type.name === "columnsColumn"
-			) {
-				const cellPos = $from.before(depth);
-				const style = String(node.attrs.style || "");
-				const clean = stripHorizontalAlignCss(style);
-				const newStyle = clean
-					? `${clean}; text-align: ${alignment};`
-					: `text-align: ${alignment};`;
-				tr.setNodeMarkup(cellPos, null, {
-					...node.attrs,
-					alignment,
-					align: alignment,
-					style: newStyle,
-				});
+		// 2. Only update enclosing tableCell / column if NO textblock or block node was targeted
+		// (e.g. the selection is in an empty cell/column).
+		if (updatedCount === 0) {
+			const $from = state.doc.resolve(from);
+			for (let depth = $from.depth; depth > 0; depth--) {
+				const node = $from.node(depth);
+				if (
+					node.type.name === "tableCell" ||
+					node.type.name === "tableHeader" ||
+					node.type.name === "columnsColumn"
+				) {
+					const cellPos = $from.before(depth);
+					const style = String(node.attrs.style || "");
+					const clean = stripHorizontalAlignCss(style);
+					const newStyle = clean
+						? `${clean}; text-align: ${alignment};`
+						: `text-align: ${alignment};`;
+					tr.setNodeMarkup(cellPos, null, {
+						...node.attrs,
+						alignment,
+						align: alignment,
+						style: newStyle,
+					});
+					break;
+				}
 			}
 		}
 
