@@ -32,6 +32,7 @@ export const spoofCheckerRoute = new Elysia()
 		detail: {
 			tags: ["Tools"],
 			summary: "Email Spoofing Vulnerability Checker (GET)",
+			hide: true,
 			description: "Query email spoofing status via HTTP GET query parameters.",
 		},
 	});

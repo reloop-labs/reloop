@@ -34,6 +34,7 @@ const postDetail = {
 const getDetail = {
 	...baseDetail,
 	summary: "Check an email address via query",
+	hide: true,
 };
 
 const aliasPostDetail = {

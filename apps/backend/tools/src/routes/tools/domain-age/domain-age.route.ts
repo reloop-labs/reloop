@@ -32,6 +32,7 @@ export const domainAgeRoute = new Elysia()
 		detail: {
 			tags: ["Tools"],
 			summary: "Domain Age & Warmup Checker (GET)",
+			hide: true,
 			description: "Check domain registration age and warmup guidance via GET query parameters.",
 		},
 	});

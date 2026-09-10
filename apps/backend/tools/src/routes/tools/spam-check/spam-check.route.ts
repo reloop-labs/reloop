@@ -57,7 +57,7 @@ export const spamCheckRoute = new Elysia()
 				429: ToolsModel.errorResponse,
 			},
 			rateLimit: true,
-			detail,
+			detail: { ...detail, hide: true },
 		},
 	)
 	.post(

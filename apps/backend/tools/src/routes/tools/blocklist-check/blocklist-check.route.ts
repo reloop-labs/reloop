@@ -49,5 +49,5 @@ export const blocklistCheckRoute = new Elysia()
 			429: ToolsModel.errorResponse,
 		},
 		rateLimit: true,
-		detail,
+		detail: { ...detail, hide: true },
 	});

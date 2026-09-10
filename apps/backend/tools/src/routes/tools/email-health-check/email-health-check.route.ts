@@ -97,7 +97,7 @@ export const emailHealthCheckRoute = new Elysia()
 				429: ToolsModel.errorResponse,
 			},
 			rateLimit: true,
-			detail: singleDetail,
+			detail: { ...singleDetail, hide: true },
 		},
 	)
 	.post(

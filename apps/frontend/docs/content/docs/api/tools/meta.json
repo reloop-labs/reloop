@@ -2,32 +2,21 @@
 	"title": "Tools",
 	"pages": [
 		"post-api-tools-v1temp-email-checker",
-		"get-api-tools-v1temp-email-checker",
 		"post-api-tools-v1spam-check",
-		"get-api-tools-v1spam-check",
 		"post-api-tools-v1spam-check-rewrite",
 		"post-api-tools-v1blocklist-check",
-		"get-api-tools-v1blocklist-check",
 		"post-api-tools-v1deliverability-test",
 		"get-api-tools-v1deliverability-test-by-token",
 		"post-api-tools-v1deliverability-test-inject",
 		"post-api-tools-v1email-health-check",
-		"get-api-tools-v1email-health-check",
 		"post-api-tools-v1email-health-check-batch",
 		"get-api-tools-v1email-health-check-batch-by-token",
 		"post-api-tools-v1dns-lookup",
-		"get-api-tools-v1dns-lookup",
 		"post-api-tools-v1auth-checker",
-		"get-api-tools-v1auth-checker",
 		"post-api-tools-v1spoof-checker",
-		"get-api-tools-v1spoof-checker",
 		"post-api-tools-v1who-sends",
-		"get-api-tools-v1who-sends",
 		"post-api-tools-v1domain-age",
-		"get-api-tools-v1domain-age",
 		"post-api-tools-v1lookalike-watch",
-		"get-api-tools-v1lookalike-watch",
-		"post-api-tools-v1bimi-check",
-		"get-api-tools-v1bimi-check"
+		"post-api-tools-v1bimi-check"
 	]
 }

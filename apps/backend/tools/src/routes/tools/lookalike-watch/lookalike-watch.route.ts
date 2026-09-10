@@ -32,6 +32,7 @@ export const lookalikeWatchRoute = new Elysia()
 		detail: {
 			tags: ["Tools"],
 			summary: "Lookalike Domain Watch (GET)",
+			hide: true,
 			description: "Query lookalike domain scan via HTTP GET parameters.",
 		},
 	});
