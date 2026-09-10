@@ -177,11 +177,11 @@ const HOP_MS = 4800;
 const STAGGER_MS = 900;
 const SLOTS_PER_HUB = 1;
 const MIN_DEST_DIST = 12;
-const TIP_RADIUS = 0.85;
-const DEST_RADIUS = 0.55;
+const TIP_RADIUS = 0.42;
+const DEST_RADIUS = 0.38;
 const BADGE_HEIGHT = 2.55;
 const BADGE_FONT = 1.55;
-const EVENTS = ["delivered", "opened", "link clicked"] as const;
+const RETURN_EVENTS = ["opened", "link clicked"] as const;
 
 const HUBS: Marker[] = [
 	{
@@ -190,7 +190,7 @@ const HUBS: Marker[] = [
 		lng: -77.45,
 		color: "#7B61FF",
 		kind: "hub",
-		size: 1.05,
+		size: 0.62,
 	},
 	{
 		code: "sin",
@@ -198,7 +198,7 @@ const HUBS: Marker[] = [
 		lng: 103.82,
 		color: "#2D9A6C",
 		kind: "hub",
-		size: 1.05,
+		size: 0.62,
 	},
 ];
 
@@ -228,8 +228,23 @@ function span(t: number, a: number, b: number) {
 	return (t - a) / (b - a);
 }
 
-function pickEvent() {
-	return EVENTS[Math.floor(Math.random() * EVENTS.length)] ?? "delivered";
+function pickReturnEvent() {
+	return (
+		RETURN_EVENTS[Math.floor(Math.random() * RETURN_EVENTS.length)] ?? "opened"
+	);
+}
+
+function applyBadge(
+	text: SVGTextElement,
+	badge: SVGRectElement,
+	label: string,
+	color: string,
+) {
+	text.textContent = label;
+	const width = badgeWidth(label);
+	badge.setAttribute("x", String(-width / 2));
+	badge.setAttribute("width", String(width));
+	badge.setAttribute("fill", color);
 }
 
 function badgeWidth(label: string) {
@@ -372,6 +387,8 @@ function NetworkOverlay({
 		let raf = 0;
 		const cycleFor = slots.map(() => -1);
 		const hops: (HopGeom | null)[] = slots.map(() => null);
+		const returnEventFor = slots.map(() => pickReturnEvent());
+		const badgeLabelFor = slots.map(() => "");
 
 		const observer =
 			svg && "IntersectionObserver" in window
@@ -427,12 +444,8 @@ function NetworkOverlay({
 					}
 					const hop = makeHop(slot.hub, to);
 					hops[i] = hop;
-					const event = pickEvent();
-					const width = badgeWidth(event);
-					text.textContent = event;
-					badge.setAttribute("x", String(-width / 2));
-					badge.setAttribute("width", String(width));
-					badge.setAttribute("fill", slot.color);
+					returnEventFor[i] = pickReturnEvent();
+					badgeLabelFor[i] = "";
 					dest.setAttribute("cx", String(to.x));
 					dest.setAttribute("cy", String(to.y));
 					dest.setAttribute("fill", slot.color);
@@ -476,14 +489,22 @@ function NetworkOverlay({
 					"opacity",
 					String(span(local, 0.24, 0.28) * (1 - span(local, 0.8, 0.88))),
 				);
+
+				const badgeText = outbound
+					? "delivered"
+					: (returnEventFor[i] ?? "opened");
+				if (badgeLabelFor[i] !== badgeText) {
+					badgeLabelFor[i] = badgeText;
+					applyBadge(text, badge, badgeText, slot.color);
+				}
+				const labelOp = outbound
+					? span(local, 0.24, 0.3) * (1 - span(local, 0.4, 0.45))
+					: span(local, 0.5, 0.56) * (1 - span(local, 0.78, 0.86));
 				label.setAttribute(
 					"transform",
 					`translate(${hop.labelX} ${hop.labelY})`,
 				);
-				label.setAttribute(
-					"opacity",
-					String(span(local, 0.24, 0.3) * (1 - span(local, 0.78, 0.86))),
-				);
+				label.setAttribute("opacity", String(labelOp));
 			}
 
 			raf = requestAnimationFrame(frame);
@@ -507,7 +528,7 @@ function NetworkOverlay({
 						}}
 						fill="none"
 						stroke={slot.color}
-						strokeWidth={0.4}
+						strokeWidth={0.28}
 						strokeLinecap="round"
 						pathLength={1}
 						strokeDasharray={1}
