@@ -41,7 +41,7 @@ export function TempEmailHero() {
 							records. We do not probe the mailbox.
 						</p>
 
-						<div className="mt-10 w-full max-w-xl sm:mt-12">
+						<div className="mt-10 w-full max-w-xl text-left sm:mt-12">
 							<CheckerPanel />
 						</div>
 					</div>

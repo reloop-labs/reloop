@@ -16,7 +16,6 @@ import {
 	useState,
 } from "react";
 import { CheckRequestError, runCheck } from "./check-api";
-import { RawJsonBlock } from "./json-highlight";
 import {
 	type CheckResult,
 	type CheckVerdict,
@@ -26,12 +25,6 @@ import {
 } from "./presenter";
 import { FIELD_ERROR_MESSAGE, validateCheckerInput } from "./syntax";
 import { saveTestedEmail } from "./tested-emails-store";
-
-const SPRING_TRANSITION = {
-	type: "spring" as const,
-	bounce: 0,
-	duration: 0.36,
-};
 
 const HEIGHT_MORPH = {
 	duration: 0.28,
@@ -230,10 +223,9 @@ function ResultCardDetailed({
 }) {
 	const theme = VERDICT_THEME[result.verdict];
 	const recTone = REC_TONE[result.recommendationTone];
-	const [showEvidence, setShowEvidence] = useState(false);
 
 	return (
-		<div className="space-y-3.5 text-xs">
+		<div className="space-y-3.5 text-left text-xs">
 			{/* Verdict Hero Card */}
 			<div
 				className={cn(
@@ -289,7 +281,7 @@ function ResultCardDetailed({
 					name={recTone.icon}
 					className={cn("mt-0.5 size-4 shrink-0", recTone.iconClass)}
 				/>
-				<div className="space-y-0.5">
+				<div className="flex-1 min-w-0 space-y-0.5 text-left">
 					<p className="font-semibold text-sm text-text-strong-950 dark:text-white">
 						Recommendation
 					</p>
@@ -300,14 +292,7 @@ function ResultCardDetailed({
 			</div>
 
 			{/* Actions Footer */}
-			<div className="flex items-center justify-between px-2 py-3">
-				<button
-					type="button"
-					onClick={() => setShowEvidence((prev) => !prev)}
-					className="cursor-pointer font-mono text-[11px] text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/50 dark:hover:text-white"
-				>
-					{showEvidence ? "Hide Raw Data" : "View Raw Data"}
-				</button>
+			<div className="flex items-center justify-end px-2 pt-1 pb-1">
 				<button
 					type="button"
 					onClick={onReset}
@@ -316,20 +301,6 @@ function ResultCardDetailed({
 					Clear result
 				</button>
 			</div>
-
-			<AnimatePresence>
-				{showEvidence && (
-					<motion.div
-						initial={{ opacity: 0, height: 0 }}
-						animate={{ opacity: 1, height: "auto" }}
-						exit={{ opacity: 0, height: 0 }}
-						transition={SPRING_TRANSITION}
-						className="overflow-hidden"
-					>
-						<RawJsonBlock value={result.rawJson} />
-					</motion.div>
-				)}
-			</AnimatePresence>
 		</div>
 	);
 }
@@ -401,7 +372,7 @@ export function CheckerPanel() {
 	};
 
 	return (
-		<div className="mx-auto w-full max-w-xl font-sans">
+		<div className="mx-auto w-full max-w-xl font-sans text-left">
 			{/* Dashboard Modal / Card Container */}
 			<div className="overflow-hidden rounded-[18px] border border-stroke-soft-100 bg-bg-weak-50 p-0.5 dark:border-white/10 dark:bg-white/[0.03]">
 				{/* Top White Card: Input + Results with dynamic height morphing */}
