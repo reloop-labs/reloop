@@ -184,7 +184,7 @@ const DEST_RADIUS = 0.38;
 const BADGE_FONT = 1.5;
 const BADGE_INK = "#1C1917";
 const BADGE_WARM = "#F6F1EA";
-const RETURN_EVENTS = ["opened", "link clicked"] as const;
+const RETURN_EVENTS = ["Opened", "Link Clicked"] as const;
 
 const HUBS: Marker[] = [
 	{
@@ -233,7 +233,7 @@ function span(t: number, a: number, b: number) {
 
 function pickReturnEvent() {
 	return (
-		RETURN_EVENTS[Math.floor(Math.random() * RETURN_EVENTS.length)] ?? "opened"
+		RETURN_EVENTS[Math.floor(Math.random() * RETURN_EVENTS.length)] ?? "Opened"
 	);
 }
 
@@ -518,8 +518,8 @@ function NetworkOverlay({
 
 				const outbound = local < 0.46;
 				const badgeText = outbound
-					? "delivered"
-					: (returnEventFor[i] ?? "opened");
+					? "Delivered"
+					: (returnEventFor[i] ?? "Opened");
 				const travel = outbound
 					? easeTravel(span(local, 0.02, 0.26))
 					: easeTravel(span(local, 0.5, 0.78));
@@ -637,7 +637,7 @@ function NetworkOverlay({
 							letterSpacing={-0.0375}
 							fontFamily="ui-sans-serif, system-ui, sans-serif"
 						>
-							delivered
+							Delivered
 						</text>
 					</g>
 				</g>
