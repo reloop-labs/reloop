@@ -426,18 +426,6 @@ function MailFlow({ markers }: { markers: HubDot[] }) {
 				</filter>
 			</defs>
 
-			{routes.map((route) => (
-				<path
-					key={route.d}
-					d={route.d}
-					fill="none"
-					stroke={MARKER_COLOR}
-					strokeWidth={0.28}
-					strokeOpacity={0.14}
-					strokeLinecap="round"
-				/>
-			))}
-
 			<path
 				ref={pathRef}
 				d={routes[0]?.d}
