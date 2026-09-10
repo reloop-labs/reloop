@@ -23,7 +23,7 @@ const baseDetail = {
 	tags: ["Tools"],
 	description:
 		"Reports whether an email address or bare domain is disposable, a role address, or from a free consumer provider. Public and unauthenticated; rate limited per IP. Nothing is stored.",
-} as const;
+};
 
 const postDetail = {
 	...baseDetail,
@@ -39,11 +39,13 @@ const getDetail = {
 const aliasPostDetail = {
 	...baseDetail,
 	summary: "Check an email address (alias)",
+	hide: true,
 };
 
 const aliasGetDetail = {
 	...baseDetail,
 	summary: "Check an email address via query (alias)",
+	hide: true,
 };
 
 export const tempEmailCheckerRoute = new Elysia()

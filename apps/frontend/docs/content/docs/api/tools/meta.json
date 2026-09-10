@@ -3,8 +3,6 @@
 	"pages": [
 		"post-api-tools-v1temp-email-checker",
 		"get-api-tools-v1temp-email-checker",
-		"post-api-tools-v1check",
-		"get-api-tools-v1check",
 		"post-api-tools-v1spam-check",
 		"get-api-tools-v1spam-check",
 		"post-api-tools-v1spam-check-rewrite",
