@@ -24,7 +24,7 @@ export function SimilarTools() {
 		>
 			<div className="border-stroke-soft-100 border-b px-4 py-8 sm:px-8 sm:py-10 lg:px-12 dark:border-white/10">
 				<p className="mb-3 font-medium text-[12px] uppercase">
-					<span className="text-primary-base">04.</span>{" "}
+					<span className="text-primary-base">05.</span>{" "}
 					<span className="text-text-sub-600 dark:text-white/50">
 						Similar tools
 					</span>

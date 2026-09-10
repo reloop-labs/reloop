@@ -36,6 +36,39 @@ const CROSSFADE = {
 	ease: [0.22, 1, 0.36, 1] as const,
 };
 
+function getEmailParam(): string | null {
+	if (typeof window === "undefined") return null;
+	try {
+		const param = new URLSearchParams(window.location.search).get("email");
+		return param && param.trim().length > 0 ? param.trim().slice(0, 320) : null;
+	} catch {
+		return null;
+	}
+}
+
+function syncEmailParam(value: string | null) {
+	if (typeof window === "undefined") return;
+	try {
+		const url = new URL(window.location.href);
+		if (value && value.trim().length > 0) {
+			url.searchParams.set("email", value.trim());
+		} else {
+			url.searchParams.delete("email");
+		}
+		window.history.replaceState(null, "", url.toString());
+	} catch {
+		// Ignore history errors (e.g. non-HTTP contexts).
+	}
+}
+
+function buildShareUrl(input: string): string {
+	const base =
+		typeof window !== "undefined"
+			? `${window.location.origin}${window.location.pathname}`
+			: "/tools/temp-email-checker";
+	return `${base}?email=${encodeURIComponent(input)}`;
+}
+
 function MorphSlot({
 	activeKey,
 	reduceMotion,
@@ -223,6 +256,30 @@ function ResultCardDetailed({
 }) {
 	const theme = VERDICT_THEME[result.verdict];
 	const recTone = REC_TONE[result.recommendationTone];
+	const [copiedLink, setCopiedLink] = useState(false);
+	const [copiedJson, setCopiedJson] = useState(false);
+
+	const handleCopyLink = async () => {
+		try {
+			await navigator.clipboard.writeText(buildShareUrl(result.input));
+			setCopiedLink(true);
+			setTimeout(() => setCopiedLink(false), 2000);
+		} catch {
+			// Clipboard may be unavailable outside a secure context.
+		}
+	};
+
+	const handleCopyJson = async () => {
+		try {
+			await navigator.clipboard.writeText(
+				JSON.stringify(result.rawJson, null, 2),
+			);
+			setCopiedJson(true);
+			setTimeout(() => setCopiedJson(false), 2000);
+		} catch {
+			// Clipboard may be unavailable outside a secure context.
+		}
+	};
 
 	return (
 		<div className="space-y-3.5 text-left text-xs">
@@ -288,7 +345,25 @@ function ResultCardDetailed({
 			</div>
 
 			{/* Actions Footer */}
-			<div className="flex items-center justify-end px-2 pt-1 pb-1">
+			<div className="flex flex-wrap items-center justify-between gap-2 px-2 pt-1 pb-1">
+				<div className="flex items-center gap-1.5">
+					<button
+						type="button"
+						onClick={handleCopyLink}
+						className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg px-2 py-1.5 font-medium text-text-sub-600 text-xs transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:text-white/55 dark:hover:bg-white/10 dark:hover:text-white"
+					>
+						<Icon name={copiedLink ? "check" : "link"} className="size-3.5" />
+						{copiedLink ? "Link copied" : "Copy link"}
+					</button>
+					<button
+						type="button"
+						onClick={handleCopyJson}
+						className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg px-2 py-1.5 font-medium text-text-sub-600 text-xs transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:text-white/55 dark:hover:bg-white/10 dark:hover:text-white"
+					>
+						<Icon name={copiedJson ? "check" : "copy"} className="size-3.5" />
+						{copiedJson ? "Copied" : "Copy JSON"}
+					</button>
+				</div>
 				<button
 					type="button"
 					onClick={onReset}
@@ -309,6 +384,7 @@ export function CheckerPanel() {
 	const field = useFieldError();
 	const shouldReduceMotion = useReducedMotion();
 	const hasFieldError = field.hasError;
+	const autoRanRef = useRef(false);
 
 	const showFieldError = (message: string) => {
 		setResult(null);
@@ -333,6 +409,7 @@ export function CheckerPanel() {
 			const response = await runCheck(query);
 			const checkRes = toCheckResult(response);
 			setResult(checkRes);
+			syncEmailParam(response.input);
 			saveTestedEmail({
 				email: response.input,
 				domain: response.domain || query,
@@ -367,8 +444,22 @@ export function CheckerPanel() {
 		setError(null);
 		field.clear();
 		setValue("");
+		syncEmailParam(null);
 		setTimeout(() => field.inputRef.current?.focus(), 50);
 	};
+
+	// Deep-link support: /tools/temp-email-checker?email=foo@bar.com
+	// auto-fills and runs once so results are shareable.
+	useEffect(() => {
+		if (autoRanRef.current) return;
+		autoRanRef.current = true;
+		const initial = getEmailParam();
+		if (initial) {
+			setValue(initial);
+			void run(initial);
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
 
 	return (
 		<div className="mx-auto w-full max-w-xl font-sans text-left">

@@ -200,6 +200,20 @@ export const apiNotes: {
 		description:
 			"Disposable matching is in-memory. MX is a DNS lookup with a short timeout. We never open an SMTP session, and we do not store addresses.",
 	},
+	{
+		icon: "refresh-cw",
+		tag: "Fresh catalogue",
+		title: "List refreshed every 2 hours",
+		description:
+			"The disposable-domain catalogue holds ~210,000 providers and is re-synced every 2 hours, so brand-new throwaway services get caught too.",
+	},
+	{
+		icon: "gift",
+		tag: "Free forever",
+		title: "Free for life, no catch",
+		description:
+			"This checker is completely free — no signup, no credits, no expiry. Come back and use it as often as you need, for as long as you need.",
+	},
 ];
 
 export const faqGroups: { title: string; items: FaqItem[] }[] = [

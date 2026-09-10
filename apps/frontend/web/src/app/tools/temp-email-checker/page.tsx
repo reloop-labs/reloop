@@ -4,6 +4,7 @@ import { FaqSection } from "@reloop/web/components/faq-section";
 import { createPageMetadata } from "@reloop/web/lib/metadata";
 import { getSiteUrl } from "@reloop/web/lib/site";
 import { HowItCompares } from "./components/how-it-compares";
+import { ApiIntegration } from "./components/api-integration";
 import { HowItWorksSteps } from "./components/how-it-works-steps";
 import { SimilarTools } from "./components/similar-tools";
 import { TempEmailHero } from "./components/temp-email-hero";
@@ -105,6 +106,11 @@ export default function TempEmailCheckerPage() {
 					aria-hidden
 					className="h-24 border-stroke-soft-100 border-b dark:border-white/10"
 				/>
+				<ApiIntegration />
+				<div
+					aria-hidden
+					className="h-24 border-stroke-soft-100 border-b dark:border-white/10"
+				/>
 				<HowItCompares />
 				<div
 					aria-hidden
@@ -118,7 +124,7 @@ export default function TempEmailCheckerPage() {
 						id="faq-section"
 						eyebrow={
 							<>
-								<span className="text-primary-base">05.</span>{" "}
+								<span className="text-primary-base">06.</span>{" "}
 								<span className="text-text-sub-600 dark:text-white/50">
 									FAQ
 								</span>
