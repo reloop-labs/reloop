@@ -245,10 +245,6 @@ function ResultCardDetailed({
 						>
 							{theme.title}
 						</span>
-						<span className="text-text-sub-600 dark:text-white/40">·</span>
-						<span className="font-semibold text-sm text-text-strong-950 dark:text-white">
-							{result.subtitle}
-						</span>
 					</div>
 					<span className="font-mono text-[11px] text-text-soft-400 dark:text-white/40">
 						{result.confidenceLabel}
@@ -406,9 +402,6 @@ export function CheckerPanel() {
 									)}
 								>
 									<Input.Wrapper className="h-11 pr-1.5 pl-3.5 dark:bg-[#0c0c0c]">
-										<Input.Icon>
-											<Icon name="mail-single" className="size-4" />
-										</Input.Icon>
 										<Input.Input
 											id="checker-input"
 											{...field.controlProps}
@@ -434,7 +427,18 @@ export function CheckerPanel() {
 												className="flex size-7.5 shrink-0 cursor-pointer items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:text-white/45 dark:hover:bg-white/10 dark:hover:text-white"
 												aria-label="Clear check"
 											>
-												<Icon name="cross" className="size-3.5" />
+												<svg
+													viewBox="0 0 24 24"
+													fill="none"
+													stroke="currentColor"
+													strokeWidth="2.5"
+													strokeLinecap="round"
+													strokeLinejoin="round"
+													className="size-3.5"
+													aria-hidden="true"
+												>
+													<path d="M18 6L6 18M6 6l12 12" />
+												</svg>
 											</button>
 										) : (
 											<FancyButton.Root
