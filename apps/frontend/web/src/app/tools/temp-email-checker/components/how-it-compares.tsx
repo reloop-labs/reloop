@@ -93,11 +93,14 @@ const QUOTES: {
 			"We are using @reloop_labs for all transactional emails. Really impressed with the DX and overall UX clean, simple, and very easy to integrate. The pricing is also very competitive: $10 for 50K emails.",
 	},
 	{
-		name: "Lena S.",
-		handle: "@lenaops",
-		initials: "LS",
+		name: "Luna",
+		handle: "@puppygirllulu",
+		initials: "LU",
+		avatar:
+			"https://pbs.twimg.com/profile_images/2054742255479525376/ev8lvRV4.png",
+		tweetUrl: "https://x.com/puppygirllulu/status/2097816263623836047",
 		quote:
-			"Finally, verification that never touches the mailbox. Our deliverability thanks you.",
+			"Lately i been working at @reloop_labs as a fullstack engineer and the experience has been great its been so great ive moved most my projects off resend started working on a CLI tool as well for the project and introduced selfhost for people who prefer selfhostinf #devops…",
 	},
 ];
 
