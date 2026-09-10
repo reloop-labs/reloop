@@ -16,6 +16,7 @@ import { creditsRoutes } from "./routes/credits/credits.routes";
 import { agentCardRoute } from "./routes/landing/agent-card.route";
 import { healthRoute } from "./routes/landing/health.route";
 import { landingRoute } from "./routes/landing/landing.route";
+import { polarEnvSnapshot } from "./lib/polar";
 import { polarWebhookRoute } from "./routes/webhooks/polar.route";
 
 const parseOtlpHeaders = (
@@ -106,6 +107,10 @@ const app = new Elysia({ prefix: "/api/credits", name: "Credits Service" })
 			"Credits Service",
 			`Running on:\n  - Local: http://localhost:${port}/api/credits\n  - Base:  ${creditsConfig.BASE_URL}/api/credits`,
 		);
+		log.info({
+			message: "Polar billing env",
+			polarEnv: polarEnvSnapshot(),
+		});
 	});
 
 export type App = typeof app;
