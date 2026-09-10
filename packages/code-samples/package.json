@@ -15,7 +15,8 @@
 		"./mail": "./src/mail/index.ts",
 		"./logs": "./src/logs/index.ts",
 		"./template": "./src/template/index.ts",
-		"./inbox": "./src/inbox/index.ts"
+		"./inbox": "./src/inbox/index.ts",
+		"./tools": "./src/tools/index.ts"
 	},
 	"scripts": {
 		"typecheck": "tsc --noEmit",

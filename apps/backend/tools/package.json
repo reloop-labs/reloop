@@ -25,6 +25,7 @@
 		"@reloop/auth": "workspace:*",
 		"@reloop/bus": "workspace:*",
 		"@reloop/cache": "workspace:*",
+		"@reloop/code-samples": "workspace:*",
 		"@reloop/email-validation": "workspace:*",
 		"dotenv": "catalog:backend",
 		"elysia": "catalog:backend",

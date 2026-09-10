@@ -1,5 +1,6 @@
 import { rateLimitPlugin } from "@be/tools/middleware/rate-limit";
 import { ToolsModel } from "@be/tools/model/tools.model";
+import { checkTempEmailXCodeSamples } from "@reloop/code-samples/tools";
 import { Elysia } from "elysia";
 import { log } from "evlog";
 import { evlog, useLogger } from "evlog/elysia";
@@ -18,11 +19,31 @@ async function check(input: string) {
 	return result;
 }
 
-const detail = {
+const baseDetail = {
 	tags: ["Tools"],
-	summary: "Check an email address",
 	description:
 		"Reports whether an email address or bare domain is disposable, a role address, or from a free consumer provider. Public and unauthenticated; rate limited per IP. Nothing is stored.",
+} as const;
+
+const postDetail = {
+	...baseDetail,
+	summary: "Check an email address",
+	"x-codeSamples": checkTempEmailXCodeSamples,
+};
+
+const getDetail = {
+	...baseDetail,
+	summary: "Check an email address via query",
+};
+
+const aliasPostDetail = {
+	...baseDetail,
+	summary: "Check an email address (alias)",
+};
+
+const aliasGetDetail = {
+	...baseDetail,
+	summary: "Check an email address via query (alias)",
 };
 
 export const tempEmailCheckerRoute = new Elysia()
@@ -36,7 +57,7 @@ export const tempEmailCheckerRoute = new Elysia()
 			429: ToolsModel.errorResponse,
 		},
 		rateLimit: true,
-		detail,
+		detail: postDetail,
 	})
 	.get("/temp-email-checker", ({ query }) => check(query.email), {
 		query: ToolsModel.checkQuery,
@@ -46,7 +67,7 @@ export const tempEmailCheckerRoute = new Elysia()
 			429: ToolsModel.errorResponse,
 		},
 		rateLimit: true,
-		detail,
+		detail: getDetail,
 	})
 	.post("/check", ({ body }) => check(body.email), {
 		body: ToolsModel.checkBody,
@@ -56,7 +77,7 @@ export const tempEmailCheckerRoute = new Elysia()
 			429: ToolsModel.errorResponse,
 		},
 		rateLimit: true,
-		detail,
+		detail: aliasPostDetail,
 	})
 	.get("/check", ({ query }) => check(query.email), {
 		query: ToolsModel.checkQuery,
@@ -66,5 +87,5 @@ export const tempEmailCheckerRoute = new Elysia()
 			429: ToolsModel.errorResponse,
 		},
 		rateLimit: true,
-		detail,
+		detail: aliasGetDetail,
 	});

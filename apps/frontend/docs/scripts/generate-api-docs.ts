@@ -131,6 +131,13 @@ const SERVICES: ServiceConfig[] = [
 		specUrl: "http://localhost:8027/api/campaigns/openapi/json",
 		prodUrl: "https://reloop.sh/api/campaigns/openapi/json",
 	},
+	{
+		name: "tools",
+		prefix: "/api/tools",
+		port: 8026,
+		specUrl: "http://localhost:8026/api/tools/openapi/json",
+		prodUrl: "https://reloop.sh/api/tools/openapi/json",
+	},
 ];
 
 function sanitizeOperationId(
@@ -894,6 +901,7 @@ function generateMetaJson(allGenerated: Record<string, GeneratedPage[]>) {
 		webhook: "Webhooks",
 		template: "Templates",
 		campaigns: "Campaigns",
+		tools: "Tools",
 		upload: "Upload",
 		logs: "Logs",
 	};

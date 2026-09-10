@@ -7,5 +7,6 @@ export * from "./languages";
 export * from "./logs";
 export * from "./mail";
 export * from "./template";
+export * from "./tools";
 export type { CodeSample, CodeSampleId } from "./types";
 export * from "./webhook";
