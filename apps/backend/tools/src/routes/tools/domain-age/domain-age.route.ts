@@ -16,7 +16,7 @@ export const domainAgeRoute = new Elysia()
 		},
 		detail: {
 			tags: ["Tools"],
-			summary: "Domain Age & Email Warmup Checker",
+			summary: "Domain age check",
 			description:
 				"Inspects domain registration age via RDAP and combines it with SPF/DKIM/DMARC status to evaluate mailbox filter cold-domain risk.",
 		},

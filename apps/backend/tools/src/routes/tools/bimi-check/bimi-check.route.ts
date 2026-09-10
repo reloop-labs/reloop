@@ -18,7 +18,7 @@ async function runCheck(domain: string) {
 
 const detail = {
 	tags: ["Tools"],
-	summary: "Check a domain's BIMI record",
+	summary: "BIMI check",
 	description:
 		"Looks up default._bimi.{domain} TXT, validates v=BIMI1 / l= / a=, and checks that DMARC is at enforcement (p=quarantine or p=reject, pct=100). Optionally fetches the logo over HTTPS and applies SVG Tiny PS heuristics. Public and rate limited per IP.",
 };

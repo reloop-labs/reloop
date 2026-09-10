@@ -17,14 +17,14 @@ function check(subject: string, body: string) {
 
 const detail = {
 	tags: ["Tools"],
-	summary: "Check email spam score",
+	summary: "Spam check",
 	description:
 		"Evaluates an email subject line and body copy against deterministic spam rules, trigger words, URL shorteners, and caps ratios. Public and unauthenticated; rate limited per IP. Nothing is stored.",
 };
 
 const rewriteDetail = {
 	tags: ["Tools"],
-	summary: "AI Email Deliverability Rewrite",
+	summary: "AI spam rewrite",
 	description:
 		"Rewrites email subject and body copy to eliminate spam triggers and maximize inbox placement. Uses Gemini Free tier with local deliverability fallback.",
 };

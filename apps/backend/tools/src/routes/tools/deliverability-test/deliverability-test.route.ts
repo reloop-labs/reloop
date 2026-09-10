@@ -25,7 +25,7 @@ export const deliverabilityTestRoute = new Elysia()
 		},
 		{
 			detail: {
-				summary: "Create Deliverability Test Address",
+				summary: "Create inbox test",
 				description:
 					"Generates a unique ephemeral email address (e.g. test-a1b2c3@mailtest.reloop.sh) to send a test email from your mail server or ESP.",
 				tags: ["Tools", "Deliverability"],
@@ -58,7 +58,7 @@ export const deliverabilityTestRoute = new Elysia()
 				}),
 			}),
 			detail: {
-				summary: "Get Deliverability Test Report",
+				summary: "Inbox test report",
 				description:
 					"Poll for test results. Returns 'pending' while waiting for the email to arrive, or 'received' with the complete 0–10 score and diagnostic breakdown once ingested.",
 				tags: ["Tools", "Deliverability"],
@@ -78,7 +78,7 @@ export const deliverabilityTestRoute = new Elysia()
 				}),
 			}),
 			detail: {
-				summary: "Direct Ingest / Test MIME Injection",
+				summary: "Ingest test email",
 				description:
 					"Directly inject raw MIME for testing the deliverability diagnostic engine.",
 				tags: ["Tools", "Deliverability"],

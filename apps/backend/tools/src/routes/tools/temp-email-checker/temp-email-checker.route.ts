@@ -27,7 +27,7 @@ const baseDetail = {
 
 const postDetail = {
 	...baseDetail,
-	summary: "Check an email address",
+	summary: "Temp email check",
 	"x-codeSamples": checkTempEmailXCodeSamples,
 };
 

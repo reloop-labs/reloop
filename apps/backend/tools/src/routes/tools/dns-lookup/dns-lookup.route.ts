@@ -22,7 +22,7 @@ async function runLookup(domain: string, recordType?: DnsRecordType) {
 
 const detail = {
 	tags: ["Tools"],
-	summary: "Look up DNS records & check email deliverability diagnostics",
+	summary: "DNS lookup",
 	description:
 		"Performs comprehensive DNS queries (A, AAAA, MX, TXT, CNAME, NS, SOA, CAA, PTR, SRV), detects authoritative nameserver hosting providers (e.g. Cloudflare, AWS Route 53), and runs automated SPF/DMARC email health checks. Public and rate-limited per IP. Nothing is stored.",
 };

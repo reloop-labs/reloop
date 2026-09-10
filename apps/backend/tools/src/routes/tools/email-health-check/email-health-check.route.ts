@@ -32,21 +32,21 @@ function extractClientIp(
 
 const singleDetail = {
 	tags: ["Tools"],
-	summary: "Evaluate single email health & deliverability",
+	summary: "Email health check",
 	description:
 		"Evaluates syntax, disposable provider presence, role mailbox status, free provider classification, and active DNS MX records. Public and unauthenticated. Nothing is stored.",
 };
 
 const batchDetail = {
 	tags: ["Tools"],
-	summary: "Submit batch email health check job (up to 1,000 addresses)",
+	summary: "Batch health check",
 	description:
 		"Accepts an array of email strings or a multipart CSV file (max 1,000 unique addresses). Returns an async job token to poll.",
 };
 
 const pollDetail = {
 	tags: ["Tools"],
-	summary: "Poll batch email health check job results",
+	summary: "Poll batch results",
 	description:
 		"Returns job status (queued, running, done, failed) and complete per-address evaluation results with list health summary once completed.",
 };

@@ -16,7 +16,7 @@ export const whoSendsRoute = new Elysia()
 		},
 		detail: {
 			tags: ["Tools"],
-			summary: "Who Sends Email From This Domain? — ESP & Sending Stack Fingerprint",
+			summary: "Who sends this email",
 			description:
 				"Inspects which third-party email service providers (e.g. Google, Amazon SES, SendGrid, Mailchimp) are authorized to send email for a domain, and who owns the inbound mailbox.",
 		},

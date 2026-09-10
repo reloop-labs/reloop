@@ -24,7 +24,7 @@ async function runCheck(target: string) {
 
 const detail = {
 	tags: ["Tools"],
-	summary: "Check an IP or domain name against public DNSBLs",
+	summary: "Blocklist check",
 	description: `Queries ${IP_DNSBL_COUNT} IP DNSBLs and ${DOMAIN_DNSBL_COUNT} domain URI lists (${DNSBL_COUNT} public DNS zones). These are DNS blocklists, not websites. Failed or refused queries are errors, not clean. Public and rate limited per IP. The target is logged; results are not stored.`,
 };
 

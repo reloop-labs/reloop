@@ -16,7 +16,7 @@ export const authCheckerRoute = new Elysia()
 		},
 		detail: {
 			tags: ["Tools"],
-			summary: "SPF, DKIM, DMARC & MX Email Authentication Checker",
+			summary: "SPF / DKIM / DMARC check",
 			description:
 				"Audit sending domain authentication records against RFC standards. Evaluates SPF mechanism limits, DKIM cryptographic public keys, DMARC alignment policies, and MX server reachability.",
 		},

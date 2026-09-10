@@ -16,7 +16,7 @@ export const spoofCheckerRoute = new Elysia()
 		},
 		detail: {
 			tags: ["Tools"],
-			summary: "Can Anyone Spoof My Domain? — Email Spoofing Vulnerability Checker",
+			summary: "Spoof check",
 			description:
 				"Answers whether attackers can forge email from your domain without permission. Analyzes DMARC enforcement policies, SPF '+all' loopholes, and subdomain vulnerabilities.",
 		},

@@ -16,7 +16,7 @@ export const lookalikeWatchRoute = new Elysia()
 		},
 		detail: {
 			tags: ["Tools"],
-			summary: "Lookalike Domain Watch — Phishing Twin & Mail-Ready Scanner",
+			summary: "Lookalike watch",
 			description:
 				"Generates bounded candidate permutations (TLDs, typos, affixes, homoglyphs) and scans public DNS to detect registered lookalike domains that can send email.",
 		},
