@@ -358,8 +358,11 @@ export function CheckerPanel() {
 		}
 	};
 
+	const hasChecked = Boolean(result || error);
+
 	const onSubmit = (e: FormEvent) => {
 		e.preventDefault();
+		if (hasChecked) return;
 		void run(value);
 	};
 
@@ -418,46 +421,42 @@ export function CheckerPanel() {
 											onChange={(e) => {
 												setValue(e.target.value);
 												if (hasFieldError) field.clear();
+												if (result) setResult(null);
+												if (error) setError(null);
 											}}
 											placeholder="you@example.com or domain.com"
 											className="font-medium text-[14.5px]"
 										/>
-										{value ? (
+										{hasChecked ? (
 											<button
 												type="button"
-												onClick={(e) => {
-													e.stopPropagation();
-													setValue("");
-													setResult(null);
-													setError(null);
-													field.clear();
-													field.inputRef.current?.focus();
-												}}
-												className="flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:text-white/45 dark:hover:bg-white/10 dark:hover:text-white"
-												aria-label="Clear input"
+												onClick={handleReset}
+												className="flex size-7.5 shrink-0 cursor-pointer items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:text-white/45 dark:hover:bg-white/10 dark:hover:text-white"
+												aria-label="Clear check"
 											>
-												<Icon name="close" className="size-3.5" />
+												<Icon name="cross" className="size-3.5" />
 											</button>
-										) : null}
-										<FancyButton.Root
-											type="submit"
-											variant="primary"
-											size="xsmall"
-											className="!p-0 flex size-7.5 shrink-0 cursor-pointer items-center justify-center rounded-lg"
-											aria-label="Verify email or domain"
-										>
-											{isPending ? (
-												<LoadingDot
-													size={13}
-													dotSize={2}
-													className="text-white"
-												/>
-											) : (
-												<FancyButton.Icon className="mx-0 size-3.5">
-													<Icon name="arrow-right" className="size-3.5" />
-												</FancyButton.Icon>
-											)}
-										</FancyButton.Root>
+										) : (
+											<FancyButton.Root
+												type="submit"
+												variant="primary"
+												size="xsmall"
+												className="!p-0 flex size-7.5 shrink-0 cursor-pointer items-center justify-center rounded-lg"
+												aria-label="Verify email or domain"
+											>
+												{isPending ? (
+													<LoadingDot
+														size={13}
+														dotSize={2}
+														className="text-white"
+													/>
+												) : (
+													<FancyButton.Icon className="mx-0 size-3.5">
+														<Icon name="arrow-right" className="size-3.5" />
+													</FancyButton.Icon>
+												)}
+											</FancyButton.Root>
+										)}
 									</Input.Wrapper>
 								</Input.Root>
 							</FieldError>
