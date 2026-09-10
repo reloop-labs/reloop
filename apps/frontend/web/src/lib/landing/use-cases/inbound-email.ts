@@ -5,7 +5,7 @@ export const config: LandingPageDefinition = {
 	path: "/use-cases/inbound-email",
 	titleLines: ["Inbound", "Email API"],
 	description:
-		"Turn incoming email into app data. Reloop parses every message and POSTs a structured webhook to your endpoint — attachments, threads, and metadata included.",
+		"Turn incoming email into app data. Reloop parses every message and POSTs a structured webhook to your endpoint, attachments, threads, and metadata included.",
 	keywords: [
 		"inbound email API",
 		"receive email webhook",
@@ -45,7 +45,8 @@ export const config: LandingPageDefinition = {
 	cta: {
 		title: "Handle inbound email in your app",
 		titleMuted: "Start free today.",
-		description: "Send and receive on one platform—no separate inbound vendor.",
+		description:
+			"Send and receive on one platform, with no separate inbound vendor.",
 		primary: {
 			label: "Get started free",
 			href: "/dashboard/signup",

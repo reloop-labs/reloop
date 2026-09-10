@@ -5,7 +5,7 @@ export const config: LandingPageDefinition = {
 	path: "/use-cases/payment-receipt-email",
 	titleLines: ["Payment Receipt", "Emails"],
 	description:
-		"Hook into Stripe's invoice.paid and payment.succeeded events to fire branded receipts automatically — for one-time charges, renewals, and refunds alike.",
+		"Hook into Stripe's invoice.paid and payment.succeeded events to fire branded receipts automatically for one-time charges, renewals, and refunds alike.",
 	keywords: [
 		"payment receipt email API",
 		"invoice email service",

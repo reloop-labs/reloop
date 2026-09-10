@@ -89,30 +89,23 @@ export function ToolUpsell({
 	secondaryLabel?: string;
 }) {
 	return (
-		<div className="relative overflow-hidden border-stroke-soft-200 border-t bg-[#0d0d0f] dark:border-white/[0.06]">
+		<div className="relative overflow-hidden border-stroke-soft-200 border-t bg-bg-white-0 dark:border-white/10 dark:bg-black">
 			{/* Subtle grid overlay */}
 			<div
-				className="pointer-events-none absolute inset-0"
-				style={{
-					backgroundImage:
-						"linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)",
-					backgroundSize: "40px 40px",
-				}}
+				aria-hidden
+				className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#80808014_1px,transparent_1px),linear-gradient(to_bottom,#80808014_1px,transparent_1px)] bg-[size:40px_40px]"
 			/>
 			{/* Radial glow */}
 			<div
-				className="pointer-events-none absolute inset-0"
-				style={{
-					background:
-						"radial-gradient(ellipse 60% 80% at 50% 50%, rgba(109,40,217,0.18) 0%, transparent 70%)",
-				}}
+				aria-hidden
+				className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_80%_at_50%_50%,var(--color-primary-base)_0%,transparent_70%)] opacity-[0.10] dark:opacity-[0.18]"
 			/>
 			<div className="relative mx-auto flex max-w-4xl flex-col items-center gap-8 px-6 py-20 text-center sm:px-10">
 				<div className="flex flex-col items-center gap-4">
-					<p className="font-semibold text-3xl text-white leading-tight tracking-tight sm:text-4xl">
+					<p className="font-semibold text-3xl text-text-strong-950 leading-tight tracking-tight sm:text-4xl dark:text-white">
 						{title}
 					</p>
-					<p className="max-w-md text-[15px] text-white/50 leading-relaxed">
+					<p className="max-w-md text-[15px] text-text-sub-600 leading-relaxed dark:text-white/55">
 						{description}
 					</p>
 				</div>
@@ -120,8 +113,7 @@ export function ToolUpsell({
 					<Link
 						href={primaryHref}
 						className={Button.buttonVariants({ variant: "neutral" }).root({
-							className:
-								"rounded-full bg-white! px-6 text-black! hover:bg-white/90!",
+							className: "rounded-full px-6",
 						})}
 					>
 						{primaryLabel}
@@ -132,10 +124,7 @@ export function ToolUpsell({
 							className={Button.buttonVariants({
 								mode: "stroke",
 								variant: "neutral",
-							}).root({
-								className:
-									"rounded-full border-white/20! px-6 text-white! hover:border-white/40! hover:bg-white/5!",
-							})}
+							}).root({ className: "rounded-full px-6" })}
 						>
 							{secondaryLabel}
 						</Link>

@@ -121,36 +121,38 @@ export function SplitScreenLayout({ config, children }: LayoutProps) {
 // 2. Console-First Dark Layout (API & Devops Ops)
 export function ConsoleFirstLayout({ config, children }: LayoutProps) {
 	const extra = getUseCaseEnrichment(config.slug);
-	const _accent = accentStyles[extra.accent];
+	const accent = accentStyles[extra.accent];
 
 	return (
-		<div className="min-h-screen bg-slate-950 text-left font-sans text-white">
+		<div className="min-h-screen bg-white text-left font-sans dark:bg-black">
 			{/* Hero & Terminal */}
-			<div className="relative overflow-hidden border-white/5 border-b pt-24 pb-16">
+			<div className="relative overflow-hidden border-stroke-soft-200 border-b pt-24 pb-16 dark:border-white/10">
 				{/* Background Glow */}
 				<div className="pointer-events-none absolute inset-0">
-					<div className="-translate-x-1/2 absolute top-0 left-1/2 h-[350px] w-[800px] rounded-full bg-gradient-to-r from-cyan-500/10 via-indigo-500/10 to-transparent blur-[100px]" />
+					<div className="-translate-x-1/2 absolute top-0 left-1/2 h-[350px] w-[800px] rounded-full bg-gradient-to-r from-primary-base/15 via-violet-500/10 to-transparent blur-[100px] dark:from-primary-base/20 dark:via-violet-500/15" />
 				</div>
 
 				<div className="relative mx-auto grid max-w-6xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-12">
 					<div className="space-y-6 lg:col-span-5">
-						<nav className="flex gap-2 text-[13px] text-white/40">
-							<Link href="/use-cases" className="hover:text-cyan-400">
+						<nav className="flex gap-2 text-[13px] text-text-sub-600 dark:text-white/55">
+							<Link href="/use-cases" className="hover:text-primary-base">
 								Use cases
 							</Link>
 							<span>/</span>
 							<span>{config.titleLines.join(" ")}</span>
 						</nav>
 
-						<span className="inline-flex rounded-full border border-white/5 bg-white/10 px-3 py-1 font-mono text-[10px] text-cyan-400 uppercase tracking-wider">
+						<span
+							className={`inline-flex rounded-full px-3 py-1 font-mono text-[10px] uppercase tracking-wider ${accent.badge}`}
+						>
 							Developer API
 						</span>
 
-						<h1 className="font-semibold text-3xl text-white tracking-tight sm:text-4xl">
+						<h1 className="font-semibold text-3xl text-text-strong-950 tracking-tight sm:text-4xl dark:text-white">
 							{config.titleLines.join(" ")}
 						</h1>
 
-						<p className="text-[15px] text-white/60 leading-relaxed">
+						<p className="text-[15px] text-text-sub-600 leading-relaxed dark:text-white/55">
 							{config.description}
 						</p>
 
@@ -158,7 +160,11 @@ export function ConsoleFirstLayout({ config, children }: LayoutProps) {
 							{config.primaryCta && (
 								<Link
 									href={config.primaryCta.href}
-									className="rounded-full bg-white px-5 py-2.5 font-semibold text-black text-xs transition-colors hover:bg-slate-200"
+									className={Button.buttonVariants({ variant: "neutral" }).root(
+										{
+											className: "rounded-full",
+										},
+									)}
 								>
 									{config.primaryCta.label}
 								</Link>
@@ -166,7 +172,10 @@ export function ConsoleFirstLayout({ config, children }: LayoutProps) {
 							{config.secondaryCta && (
 								<Link
 									href={config.secondaryCta.href}
-									className="rounded-full border border-white/10 bg-slate-900 px-5 py-2.5 font-semibold text-white/80 text-xs transition-colors hover:bg-slate-800"
+									className={Button.buttonVariants({
+										mode: "stroke",
+										variant: "neutral",
+									}).root({ className: "rounded-full" })}
 								>
 									{config.secondaryCta.label}
 								</Link>
@@ -182,19 +191,19 @@ export function ConsoleFirstLayout({ config, children }: LayoutProps) {
 
 			{/* Technical Specs section */}
 			<div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-				<h2 className="mb-8 font-bold text-white text-xl tracking-tight">
+				<h2 className="mb-8 font-bold text-text-strong-950 text-xl tracking-tight dark:text-white">
 					Technical specifications
 				</h2>
 				<div className="grid gap-6 sm:grid-cols-3">
 					{config.sections[0]?.items.map((item) => (
 						<div
 							key={item.title}
-							className="rounded-2xl border border-white/5 bg-slate-900/60 p-6"
+							className="rounded-2xl border border-stroke-soft-200 p-6 dark:border-white/10"
 						>
-							<h3 className="mb-2 font-semibold text-cyan-400 text-sm">
+							<h3 className={`mb-2 font-semibold text-sm ${accent.text}`}>
 								{item.title}
 							</h3>
-							<p className="text-white/50 text-xs leading-relaxed">
+							<p className="text-[13px] text-text-sub-600 leading-relaxed dark:text-white/55">
 								{item.description}
 							</p>
 						</div>
