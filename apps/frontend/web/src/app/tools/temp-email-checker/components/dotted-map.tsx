@@ -269,7 +269,19 @@ function pickDest(points: XY[], hub: XY, taken: XY[]): XY | null {
 	return points[(Math.random() * points.length) | 0] ?? null;
 }
 
-function makeHop(from: XY, to: XY): HopGeom {
+function splitXFor(hubs: XY[]) {
+	if (hubs.length < 2) return MAP_WIDTH / 2;
+	const xs = hubs.map((hub) => hub.x);
+	return (Math.min(...xs) + Math.max(...xs)) / 2;
+}
+
+function pointsForHub(points: XY[], hub: XY, splitX: number) {
+	const gap = 4;
+	if (hub.x < splitX) return points.filter((point) => point.x < splitX - gap);
+	return points.filter((point) => point.x > splitX + gap);
+}
+
+function makeHop(from: XY, to: XY, splitX: number): HopGeom {
 	const dx = to.x - from.x;
 	const dy = to.y - from.y;
 	const dist = Math.hypot(dx, dy) || 1;
@@ -278,8 +290,10 @@ function makeHop(from: XY, to: XY): HopGeom {
 	const nx = -dy / dist;
 	const ny = dx / dist;
 	const bulge = (0.22 + Math.random() * 0.16) * (Math.random() < 0.5 ? 1 : -1);
-	const cx = mx + nx * dist * bulge;
+	let cx = mx + nx * dist * bulge;
 	const cy = my + ny * dist * bulge;
+	if (from.x < splitX) cx = Math.min(cx, splitX - 2);
+	else cx = Math.max(cx, splitX + 2);
 	const lx = dx / dist;
 	const ly = dy / dist;
 	return {
@@ -389,6 +403,10 @@ function NetworkOverlay({
 		const hops: (HopGeom | null)[] = slots.map(() => null);
 		const returnEventFor = slots.map(() => pickReturnEvent());
 		const badgeLabelFor = slots.map(() => "");
+		const splitX = splitXFor(slots.map((slot) => slot.hub));
+		const poolFor = slots.map((slot) =>
+			pointsForHub(points, slot.hub, splitX),
+		);
 
 		const observer =
 			svg && "IntersectionObserver" in window
@@ -436,13 +454,13 @@ function NetworkOverlay({
 					const others = hops
 						.map((hop, j) => (j === i || !hop ? null : hop.to))
 						.filter((p): p is XY => Boolean(p));
-					const to = pickDest(points, slot.hub, others);
+					const to = pickDest(poolFor[i] ?? points, slot.hub, others);
 					if (!to) {
 						hops[i] = null;
 						hideHop(path, tip, dest, label);
 						continue;
 					}
-					const hop = makeHop(slot.hub, to);
+					const hop = makeHop(slot.hub, to, splitX);
 					hops[i] = hop;
 					returnEventFor[i] = pickReturnEvent();
 					badgeLabelFor[i] = "";
