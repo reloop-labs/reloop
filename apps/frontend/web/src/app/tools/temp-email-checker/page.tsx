@@ -118,7 +118,7 @@ export default function TempEmailCheckerPage() {
 						id="faq-section"
 						eyebrow={
 							<>
-								<span className="text-rose-600 dark:text-rose-300">05.</span>{" "}
+								<span className="text-primary-base">05.</span>{" "}
 								<span className="text-text-sub-600 dark:text-white/50">
 									FAQ
 								</span>
@@ -130,7 +130,7 @@ export default function TempEmailCheckerPage() {
 					/>
 				</div>
 				<div aria-hidden className="h-24" />
-				<div className="w-full border-stroke-soft-100 border-y [--primary-base:#f43f5e] [--primary-dark:#e11d48] [--primary-darker:#be123c] [--primary-link:#e11d48] dark:border-white/10 dark:[--primary-base:#fb7185] dark:[--primary-dark:#fb7185] dark:[--primary-darker:#e11d48] dark:[--primary-link:#fda4af]">
+				<div className="w-full border-stroke-soft-100 border-y dark:border-white/10">
 					<BlogCta
 						headline={
 							<>
@@ -147,7 +147,7 @@ export default function TempEmailCheckerPage() {
 						secondaryHref="https://cal.com/pranavp/30"
 						secondaryExternal
 						accentColor="primary"
-						blast={{ light: "#f43f5e", dark: "#fda4af" }}
+						blast={{ light: "#006ffe", dark: "#52a8ff" }}
 						flush
 						align="center"
 						pill={false}

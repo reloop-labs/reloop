@@ -23,7 +23,7 @@ function CheckIcon() {
 			viewBox="0 0 20 20"
 			width="20"
 			xmlns="http://www.w3.org/2000/svg"
-			className="text-rose-600 dark:text-rose-300"
+			className="text-primary-base"
 			aria-label="Included"
 			role="img"
 		>
@@ -112,7 +112,7 @@ function QuoteText({ text }: { text: string }) {
 			&ldquo;
 			{parts.map((part, i) =>
 				part === "@reloop_labs" || part === "@reloop" ? (
-					<span key={i} className="text-rose-600 dark:text-rose-300">
+					<span key={i} className="text-primary-base">
 						{part}
 					</span>
 				) : (
@@ -140,7 +140,7 @@ export function HowItCompares() {
 		>
 			<div className="border-stroke-soft-100 border-b px-4 py-8 sm:px-8 sm:py-10 lg:px-12 dark:border-white/10">
 				<p className="mb-3 font-medium text-[12px] uppercase">
-					<span className="text-rose-600 dark:text-rose-300">03.</span>{" "}
+					<span className="text-primary-base">03.</span>{" "}
 					<span className="text-text-sub-600 dark:text-white/50">
 						How it compares
 					</span>
@@ -149,7 +149,7 @@ export function HowItCompares() {
 					id="how-it-compares-heading"
 					className="text-balance font-semibold text-2xl text-text-strong-950 tracking-[-0.025em] sm:text-3xl lg:text-[2rem] lg:leading-[1.15] dark:text-white"
 				>
-					How <span className="text-rose-600 dark:text-rose-300">Reloop</span>{" "}
+					How <span className="text-primary-base">Reloop</span>{" "}
 					compares:
 				</h2>
 				<p className="mt-4 max-w-3xl text-[15px] text-stone-500 leading-relaxed sm:text-[16px] dark:text-white/60">
@@ -207,14 +207,14 @@ export function HowItCompares() {
 			{/* Loved by developers */}
 			<div className="flex flex-col items-center border-stroke-soft-100 border-b px-4 py-16 text-center sm:px-8 sm:py-20 lg:px-12 lg:py-24 dark:border-white/10">
 				<div>
-					<span className="inline-flex items-center gap-1.5 rounded-[10px] bg-rose-500/10 px-2.5 py-1 font-medium text-[13px] text-rose-600 dark:text-rose-300">
+					<span className="inline-flex items-center gap-1.5 rounded-[10px] bg-primary-base/10 px-2.5 py-1 font-medium text-[13px] text-primary-base">
 						Community
 					</span>
 				</div>
 				<div className="mt-5 sm:mt-6">
 					<h3 className="mx-auto max-w-3xl text-balance font-semibold text-[2.5rem] text-text-strong-950 leading-[1.06] tracking-[-0.04em] sm:text-[3.5rem] lg:text-[4.25rem] dark:text-white">
 						People love building with{" "}
-						<span className="text-rose-600 dark:text-rose-300">Reloop</span>
+						<span className="text-primary-base">Reloop</span>
 					</h3>
 					<p className="mx-auto mt-5 max-w-2xl text-balance text-[16.5px] text-stone-500 leading-relaxed sm:mt-6 sm:text-[18.5px] lg:text-[20px] dark:text-white/60">
 						Discover why developers choose Reloop every day.
@@ -239,7 +239,7 @@ export function HowItCompares() {
 								) : (
 									<span
 										aria-hidden
-										className="flex size-10 shrink-0 items-center justify-center rounded-full bg-rose-500/10 font-semibold text-[13px] text-rose-600 dark:text-rose-300"
+										className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary-base/10 font-semibold text-[13px] text-primary-base"
 									>
 										{quote.initials}
 									</span>

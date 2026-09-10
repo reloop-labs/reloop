@@ -24,7 +24,7 @@ export function SimilarTools() {
 		>
 			<div className="border-stroke-soft-100 border-b px-4 py-8 sm:px-8 sm:py-10 lg:px-12 dark:border-white/10">
 				<p className="mb-3 font-medium text-[12px] uppercase">
-					<span className="text-rose-600 dark:text-rose-300">04.</span>{" "}
+					<span className="text-primary-base">04.</span>{" "}
 					<span className="text-text-sub-600 dark:text-white/50">
 						Similar tools
 					</span>
@@ -34,7 +34,7 @@ export function SimilarTools() {
 					className="text-balance font-semibold text-2xl text-text-strong-950 tracking-[-0.025em] sm:text-3xl lg:text-[2rem] lg:leading-[1.15] dark:text-white"
 				>
 					Explore more{" "}
-					<span className="text-rose-600 dark:text-rose-300">free tools</span>{" "}
+					<span className="text-primary-base">free tools</span>{" "}
 					like Temp Email Checker
 				</h2>
 				<p className="mt-4 max-w-3xl text-[15px] text-stone-500 leading-relaxed sm:text-[16px] dark:text-white/60">
@@ -49,7 +49,7 @@ export function SimilarTools() {
 						<Link
 							key={tool.path}
 							href={tool.path}
-							className="rounded-full border border-stroke-soft-100 bg-bg-white-0 px-5 py-2.5 font-medium text-[14px] text-text-strong-950 transition-colors hover:border-rose-500/50 hover:text-rose-600 sm:text-[14.5px] dark:border-white/10 dark:bg-white/[0.03] dark:text-white dark:hover:border-rose-400/50 dark:hover:text-rose-300"
+							className="rounded-full border border-stroke-soft-100 bg-bg-white-0 px-5 py-2.5 font-medium text-[14px] text-text-strong-950 transition-colors hover:border-primary-base/50 hover:text-primary-base sm:text-[14.5px] dark:border-white/10 dark:bg-white/[0.03] dark:text-white dark:hover:border-primary-base/50 dark:hover:text-primary-base"
 						>
 							{tool.titleLines.join(" ")}
 						</Link>

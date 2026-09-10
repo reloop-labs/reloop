@@ -3,8 +3,8 @@ import type { ReactNode } from "react";
 
 function ApiDiagram() {
 	const line = "#e7e7e7";
-	const accent = "#f43f5e";
-	const soft = "#fecdd3";
+	const accent = "#006ffe";
+	const soft = "#bfdbfe";
 	const bar = (
 		x: number,
 		y: number,
@@ -136,8 +136,8 @@ function ApiDiagram() {
 					POST
 				</text>
 				{bar(184, 118, 58, accent)}
-				{bar(184, 132, 30, soft, 1, "dark:fill-rose-300/30")}
-				{bar(218, 132, 46, soft, 1, "dark:fill-rose-300/30")}
+				{bar(184, 132, 30, soft, 1, "dark:fill-blue-300/30")}
+				{bar(218, 132, 46, soft, 1, "dark:fill-blue-300/30")}
 				<rect
 					x="110"
 					y="156"
@@ -145,7 +145,7 @@ function ApiDiagram() {
 					height="26"
 					rx="13"
 					fill={soft}
-					className="dark:fill-rose-500/20"
+					className="dark:fill-blue-500/20"
 				/>
 				<text
 					x="141"
@@ -155,7 +155,7 @@ function ApiDiagram() {
 					fontWeight="600"
 					fontFamily="monospace"
 					fill={accent}
-					className="fill-rose-500 dark:fill-rose-400"
+					className="fill-blue-500 dark:fill-blue-400"
 				>
 					GET
 				</text>
@@ -182,7 +182,7 @@ function ApiCard() {
 						height="22"
 						viewBox="0 0 24 24"
 						fill="none"
-						stroke="#f43f5e"
+						stroke="#006ffe"
 						strokeWidth="2"
 						strokeLinecap="round"
 						strokeLinejoin="round"
@@ -214,7 +214,7 @@ function ApiCard() {
 
 function CliDiagram() {
 	const line = "#e7e7e7";
-	const accent = "#f43f5e";
+	const accent = "#006ffe";
 	const ink = "#0c0a09";
 	const mono = "monospace";
 
@@ -320,7 +320,7 @@ function CliCard() {
 						height="22"
 						viewBox="0 0 24 24"
 						fill="none"
-						stroke="#f43f5e"
+						stroke="#006ffe"
 						strokeWidth="2"
 						strokeLinecap="round"
 						strokeLinejoin="round"
@@ -352,7 +352,7 @@ function CliCard() {
 
 function SkillsDiagram() {
 	const line = "#e7e7e7";
-	const accent = "#f43f5e";
+	const accent = "#006ffe";
 
 	return (
 		<svg
@@ -393,7 +393,7 @@ function SkillsDiagram() {
 				fill="#ffffff"
 				stroke={accent}
 				strokeWidth="1.5"
-				className="fill-white dark:fill-[#1d1d20] dark:stroke-rose-500/60"
+				className="fill-white dark:fill-[#1d1d20] dark:stroke-blue-500/60"
 			/>
 			<text
 				x="102"
@@ -401,7 +401,7 @@ function SkillsDiagram() {
 				fontSize="12"
 				fontFamily="monospace"
 				fill={accent}
-				className="fill-rose-500 dark:fill-rose-400"
+				className="fill-blue-500 dark:fill-blue-400"
 			>
 				reloop-skills/
 			</text>
@@ -413,14 +413,14 @@ function SkillsDiagram() {
 					height="24"
 					rx="12"
 					fill="#fff1f2"
-					className="dark:fill-rose-500/20"
+					className="dark:fill-blue-500/20"
 				/>
 				<text
 					x="133"
 					y="136"
 					textAnchor="middle"
 					fill={accent}
-					className="fill-rose-500 dark:fill-rose-300"
+					className="fill-blue-500 dark:fill-blue-300"
 				>
 					check
 				</text>
@@ -431,14 +431,14 @@ function SkillsDiagram() {
 					height="24"
 					rx="12"
 					fill="#fff1f2"
-					className="dark:fill-rose-500/20"
+					className="dark:fill-blue-500/20"
 				/>
 				<text
 					x="198"
 					y="136"
 					textAnchor="middle"
 					fill={accent}
-					className="fill-rose-500 dark:fill-rose-300"
+					className="fill-blue-500 dark:fill-blue-300"
 				>
 					send
 				</text>
@@ -449,14 +449,14 @@ function SkillsDiagram() {
 					height="24"
 					rx="12"
 					fill="#fff1f2"
-					className="dark:fill-rose-500/20"
+					className="dark:fill-blue-500/20"
 				/>
 				<text
 					x="135"
 					y="166"
 					textAnchor="middle"
 					fill={accent}
-					className="fill-rose-500 dark:fill-rose-300"
+					className="fill-blue-500 dark:fill-blue-300"
 				>
 					verify
 				</text>
@@ -484,7 +484,7 @@ function SkillsCard() {
 						height="22"
 						viewBox="0 0 24 24"
 						fill="none"
-						stroke="#f43f5e"
+						stroke="#006ffe"
 						strokeWidth="1.8"
 						strokeLinecap="round"
 						strokeLinejoin="round"
@@ -552,7 +552,7 @@ function CardHeader({
 
 function McpDiagram() {
 	const line = "#e7e7e7";
-	const accent = "#f43f5e";
+	const accent = "#006ffe";
 	const node = (x: number, y: number, glyph: ReactNode) => (
 		<g key={`${x}-${y}`}>
 			<circle
@@ -624,7 +624,7 @@ function McpDiagram() {
 				fontSize="15"
 				fontFamily="monospace"
 				fill={accent}
-				className="fill-rose-500 dark:fill-rose-400"
+				className="fill-blue-500 dark:fill-blue-400"
 			>
 				{"{API}"}
 			</text>
@@ -684,7 +684,7 @@ function McpCard() {
 						height="22"
 						viewBox="0 0 24 24"
 						fill="none"
-						stroke="#f43f5e"
+						stroke="#006ffe"
 						strokeWidth="1.8"
 						strokeLinecap="round"
 						strokeLinejoin="round"

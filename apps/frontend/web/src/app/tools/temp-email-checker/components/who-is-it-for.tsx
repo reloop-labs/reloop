@@ -25,7 +25,7 @@ export function WhoIsItFor() {
 		>
 			<div className="border-stroke-soft-100 border-b px-4 py-8 sm:px-8 sm:py-10 lg:px-12 dark:border-white/10">
 				<p className="mb-3 font-medium text-[12px] uppercase">
-					<span className="text-rose-600 dark:text-rose-300">02.</span>{" "}
+					<span className="text-primary-base">02.</span>{" "}
 					<span className="text-text-sub-600 dark:text-white/50">
 						Who is it for
 					</span>
@@ -34,7 +34,7 @@ export function WhoIsItFor() {
 					id="who-is-it-for-heading"
 					className="text-balance font-semibold text-2xl text-text-strong-950 tracking-[-0.025em] sm:text-3xl lg:text-[2rem] lg:leading-[1.15] dark:text-white"
 				>
-					Who is <span className="text-rose-600 dark:text-rose-300">Reloop&rsquo;s</span>{" "}
+					Who is <span className="text-primary-base">Reloop&rsquo;s</span>{" "}
 					Temp Email Checker for?
 				</h2>
 				<p className="mt-4 max-w-3xl text-[15px] text-stone-500 leading-relaxed sm:text-[16px] dark:text-white/60">

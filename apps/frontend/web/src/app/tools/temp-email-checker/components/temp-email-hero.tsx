@@ -1,4 +1,4 @@
-import { SceneGlyph } from "../../../(home)/components/_shared/scene-header";
+import { Icon } from "@reloop/ui/icon";
 import { CheckerPanel } from "../checker-panel";
 
 export function TempEmailHero() {
@@ -8,7 +8,14 @@ export function TempEmailHero() {
 				{/* Hero Header */}
 				<header className="relative z-10 flex w-full flex-col items-center px-6 pt-28 pb-8 text-center sm:px-8 sm:pt-32 sm:pb-10 lg:px-12 lg:pt-36 lg:pb-12">
 					<div className="mb-6 flex items-center justify-center gap-2 sm:mb-8">
-						<SceneGlyph icon="shield-cross" color="pink" />
+						<span
+							aria-hidden
+							className="inline-flex size-5 shrink-0 items-center justify-center rounded-[5px] bg-primary-dark p-px pb-[2px]"
+						>
+							<span className="flex size-full items-center justify-center rounded-[4px] bg-primary-base text-white shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.45)] dark:shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.28),0_0_0_0.5px_rgba(255,255,255,0.08)]">
+								<Icon name="shield-cross" className="size-[11px]" />
+							</span>
+						</span>
 						<span className="font-medium text-[13.5px] text-text-strong-950 tracking-tight dark:text-white">
 							Temporary Email Checker
 						</span>
