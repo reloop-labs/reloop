@@ -10,6 +10,11 @@ export interface Marker {
 	size?: number;
 	code?: string;
 	visible?: boolean;
+	color?: string;
+	kind?: "hub" | "probe";
+	hub?: string;
+	labelDx?: number;
+	labelDy?: number;
 }
 
 /** addMarkers returns markers with lat/lng removed; only x, y and other props (e.g. size) remain */
@@ -39,6 +44,7 @@ export interface DottedMapProps<M extends Marker = Marker>
 
 	renderSvgOverlay?: (args: {
 		markers: MapMarker<M>[];
+		points: { x: number; y: number }[];
 		width: number;
 		height: number;
 	}) => React.ReactNode;
@@ -101,11 +107,19 @@ export function DottedMap<M extends Marker = Marker>({
 		});
 	}, [processedMarkers, stagger, xStep, yToRowIndex]);
 
+	const laidOutPoints = React.useMemo(() => {
+		return points.map((point) => {
+			const rowIndex = yToRowIndex.get(point.y) ?? 0;
+			const offsetX = stagger && rowIndex % 2 === 1 ? xStep / 2 : 0;
+			return { x: point.x + offsetX, y: point.y };
+		});
+	}, [points, stagger, xStep, yToRowIndex]);
+
 	return (
 		<svg
 			viewBox={`0 0 ${width} ${height}`}
 			className={cn(
-				"overflow-visible text-gray-500 dark:text-gray-500",
+				"overflow-visible text-[#D2D2D2] dark:text-neutral-600",
 				className,
 			)}
 			style={{ width: "100%", height: "100%", ...style }}
@@ -125,6 +139,13 @@ export function DottedMap<M extends Marker = Marker>({
 				);
 			})}
 
+			{renderSvgOverlay?.({
+				markers: laidOutMarkers,
+				points: laidOutPoints,
+				width,
+				height,
+			})}
+
 			{laidOutMarkers.map((marker, index) => {
 				if (marker.visible === false) return null;
 
@@ -134,7 +155,7 @@ export function DottedMap<M extends Marker = Marker>({
 
 				return (
 					<g key={`${marker.x}-${marker.y}-${index}`}>
-						<circle cx={x} cy={y} r={r} fill={markerColor} />
+						<circle cx={x} cy={y} r={r} fill={marker.color ?? markerColor} />
 
 						{renderMarkerOverlay?.({
 							marker,
@@ -146,53 +167,134 @@ export function DottedMap<M extends Marker = Marker>({
 					</g>
 				);
 			})}
-
-			{renderSvgOverlay?.({
-				markers: laidOutMarkers,
-				width,
-				height,
-			})}
 		</svg>
 	);
 }
 
-const ORIGIN_CODE = "iad";
-
-const HUBS: (Marker & { code: string })[] = [
-	{ lat: 38.9, lng: -77.4, code: "iad", size: 1.15 },
-	{ lat: 51.5, lng: -0.1, code: "lhr", visible: false },
-	{ lat: 1.35, lng: 103.8, code: "sin", visible: false },
-	{ lat: -23.5, lng: -46.6, code: "gru", visible: false },
-];
-
-const DESTINATIONS = ["lhr", "sin", "gru"] as const;
-
-const MARKER_COLOR = "#f43f5e";
 const MAP_WIDTH = 150;
 const MAP_HEIGHT = 75;
-const HOP_MS = 3200;
-const TRAIL = 7;
+const HOP_MS = 4800;
+const STAGGER_MS = 900;
+const SLOTS_PER_HUB = 1;
+const MIN_DEST_DIST = 12;
+const TIP_RADIUS = 0.85;
+const DEST_RADIUS = 0.55;
+const BADGE_HEIGHT = 2.55;
+const BADGE_FONT = 1.55;
+const EVENTS = ["delivered", "opened", "link clicked"] as const;
 
-type HubDot = { x: number; y: number; code?: string };
+const HUBS: Marker[] = [
+	{
+		code: "iad",
+		lat: 38.95,
+		lng: -77.45,
+		color: "#7B61FF",
+		kind: "hub",
+		size: 1.05,
+	},
+	{
+		code: "sin",
+		lat: 1.35,
+		lng: 103.82,
+		color: "#2D9A6C",
+		kind: "hub",
+		size: 1.05,
+	},
+];
 
-type HopRoute = {
-	from: HubDot;
-	to: HubDot;
-	cx: number;
-	cy: number;
-	d: string;
+type LaidOut = MapMarker<Marker>;
+type XY = { x: number; y: number };
+
+type Slot = {
+	hub: LaidOut;
+	color: string;
+	delay: number;
 };
 
-function clamp01(n: number) {
-	return n < 0 ? 0 : n > 1 ? 1 : n;
-}
+type HopGeom = {
+	d: string;
+	dBack: string;
+	cx: number;
+	cy: number;
+	to: XY;
+	labelX: number;
+	labelY: number;
+};
 
 function span(t: number, a: number, b: number) {
 	if (b === a) return t >= b ? 1 : 0;
-	return clamp01((t - a) / (b - a));
+	if (t <= a) return 0;
+	if (t >= b) return 1;
+	return (t - a) / (b - a);
 }
 
-/** CSS cubic-bezier(x1, y1, x2, y2) evaluated at time x in [0, 1]. */
+function pickEvent() {
+	return EVENTS[Math.floor(Math.random() * EVENTS.length)] ?? "delivered";
+}
+
+function badgeWidth(label: string) {
+	return label.length * 0.96 + 2.4;
+}
+
+function pickDest(points: XY[], hub: XY, taken: XY[]): XY | null {
+	if (points.length === 0) return null;
+	for (let attempt = 0; attempt < 24; attempt++) {
+		const point = points[(Math.random() * points.length) | 0];
+		if (!point) continue;
+		if (Math.hypot(point.x - hub.x, point.y - hub.y) < MIN_DEST_DIST) continue;
+		if (
+			taken.some(
+				(other) => Math.hypot(point.x - other.x, point.y - other.y) < 7,
+			)
+		) {
+			continue;
+		}
+		return point;
+	}
+	return points[(Math.random() * points.length) | 0] ?? null;
+}
+
+function makeHop(from: XY, to: XY): HopGeom {
+	const dx = to.x - from.x;
+	const dy = to.y - from.y;
+	const dist = Math.hypot(dx, dy) || 1;
+	const mx = (from.x + to.x) / 2;
+	const my = (from.y + to.y) / 2;
+	const nx = -dy / dist;
+	const ny = dx / dist;
+	const bulge = (0.22 + Math.random() * 0.16) * (Math.random() < 0.5 ? 1 : -1);
+	const cx = mx + nx * dist * bulge;
+	const cy = my + ny * dist * bulge;
+	const lx = dx / dist;
+	const ly = dy / dist;
+	return {
+		to,
+		cx,
+		cy,
+		d: `M ${from.x} ${from.y} Q ${cx} ${cy} ${to.x} ${to.y}`,
+		dBack: `M ${to.x} ${to.y} Q ${cx} ${cy} ${from.x} ${from.y}`,
+		labelX: to.x + lx * 2.15,
+		labelY: to.y + ly * 2.15,
+	};
+}
+
+function buildSlots(markers: LaidOut[]): Slot[] {
+	const slots: Slot[] = [];
+	const hubs = HUBS.map((hub) =>
+		markers.find((m) => m.code === hub.code),
+	).filter((hub): hub is LaidOut => Boolean(hub));
+	for (const [hubIndex, hub] of hubs.entries()) {
+		for (let i = 0; i < SLOTS_PER_HUB; i++) {
+			slots.push({
+				hub,
+				color: hub.color ?? "#7B61FF",
+				delay: i * STAGGER_MS + hubIndex * STAGGER_MS,
+			});
+		}
+	}
+	return slots;
+}
+
 function cubicBezierEase(x1: number, y1: number, x2: number, y2: number) {
 	return (x: number) => {
 		if (x <= 0) return 0;
@@ -211,7 +313,6 @@ function cubicBezierEase(x1: number, y1: number, x2: number, y2: number) {
 }
 
 const easeTravel = cubicBezierEase(0.77, 0, 0.175, 1);
-const easeOut = cubicBezierEase(0.23, 1, 0.32, 1);
 
 function quadPoint(
 	t: number,
@@ -229,77 +330,48 @@ function quadPoint(
 	};
 }
 
-function buildArc(from: HubDot, to: HubDot): HopRoute {
-	const dx = to.x - from.x;
-	const dy = to.y - from.y;
-	const dist = Math.hypot(dx, dy) || 1;
-	const mx = (from.x + to.x) / 2;
-	const my = (from.y + to.y) / 2;
-	let nx = -dy / dist;
-	let ny = dx / dist;
-	if (ny > 0) {
-		nx = -nx;
-		ny = -ny;
-	}
-	const bulge = Math.min(18, Math.max(7, dist * 0.3));
-	const cx = mx + nx * bulge;
-	const cy = my + ny * bulge;
-	return {
-		from,
-		to,
-		cx,
-		cy,
-		d: `M ${from.x} ${from.y} Q ${cx} ${cy} ${to.x} ${to.y}`,
-	};
+function hideHop(
+	path: SVGPathElement,
+	tip: SVGCircleElement,
+	dest: SVGCircleElement,
+	label: SVGGElement,
+) {
+	path.setAttribute("opacity", "0");
+	tip.setAttribute("opacity", "0");
+	dest.setAttribute("opacity", "0");
+	label.setAttribute("opacity", "0");
 }
 
-function buildRoutes(markers: HubDot[]): HopRoute[] {
-	const byCode = new Map(
-		markers
-			.filter((m): m is HubDot & { code: string } => Boolean(m.code))
-			.map((m) => [m.code, m]),
-	);
-	const from = byCode.get(ORIGIN_CODE);
-	if (!from) return [];
-	const routes: HopRoute[] = [];
-	for (const toCode of DESTINATIONS) {
-		const to = byCode.get(toCode);
-		if (to) routes.push(buildArc(from, to));
-	}
-	return routes;
-}
-
-function MailFlow({ markers }: { markers: HubDot[] }) {
-	const routes = React.useMemo(() => buildRoutes(markers), [markers]);
-	const pathRef = React.useRef<SVGPathElement>(null);
-	const cometRef = React.useRef<SVGPathElement>(null);
-	const packetRef = React.useRef<SVGGElement>(null);
-	const sentRef = React.useRef<SVGGElement>(null);
-	const receivedRef = React.useRef<SVGGElement>(null);
-	const trailRefs = React.useRef<(SVGCircleElement | null)[]>([]);
-	const glowId = React.useId().replace(/:/g, "");
+function NetworkOverlay({
+	markers,
+	points,
+}: {
+	markers: LaidOut[];
+	points: XY[];
+}) {
+	const slots = React.useMemo(() => buildSlots(markers), [markers]);
+	const pathRefs = React.useRef<(SVGPathElement | null)[]>([]);
+	const tipRefs = React.useRef<(SVGCircleElement | null)[]>([]);
+	const destRefs = React.useRef<(SVGCircleElement | null)[]>([]);
+	const labelRefs = React.useRef<(SVGGElement | null)[]>([]);
+	const badgeRefs = React.useRef<(SVGRectElement | null)[]>([]);
+	const textRefs = React.useRef<(SVGTextElement | null)[]>([]);
 
 	React.useEffect(() => {
-		if (routes.length === 0) return;
-
+		if (slots.length === 0 || points.length === 0) return;
 		const reduce = window.matchMedia(
 			"(prefers-reduced-motion: reduce)",
 		).matches;
 		if (reduce) return;
 
-		const path = pathRef.current;
-		const comet = cometRef.current;
-		const packet = packetRef.current;
-		const sent = sentRef.current;
-		const received = receivedRef.current;
-		if (!path || !comet || !packet || !sent || !received) return;
-
-		const svg = path.ownerSVGElement;
+		const svg = pathRefs.current[0]?.ownerSVGElement;
 		let inView = true;
 		let visible = document.visibilityState === "visible";
 		let elapsed = 0;
 		let last = performance.now();
 		let raf = 0;
+		const cycleFor = slots.map(() => -1);
+		const hops: (HopGeom | null)[] = slots.map(() => null);
 
 		const observer =
 			svg && "IntersectionObserver" in window
@@ -317,201 +389,181 @@ function MailFlow({ markers }: { markers: HubDot[] }) {
 		};
 		document.addEventListener("visibilitychange", onVisibility);
 
-		const setLabel = (el: SVGGElement, hub: HubDot, opacity: number) => {
-			const reveal = easeOut(clamp01(opacity));
-			el.setAttribute(
-				"transform",
-				`translate(${hub.x} ${hub.y - 5.2}) scale(${0.96 + 0.04 * reveal})`,
-			);
-			el.setAttribute("opacity", String(reveal));
-		};
-
 		const frame = (now: number) => {
 			const active = inView && visible;
 			if (active) elapsed += now - last;
 			last = now;
 
-			const cycle = HOP_MS * routes.length;
-			const t = elapsed % cycle;
-			const hopIndex = Math.min(routes.length - 1, Math.floor(t / HOP_MS));
-			const local = (t - hopIndex * HOP_MS) / HOP_MS;
-			const route = routes[hopIndex];
-			if (!route) {
-				raf = requestAnimationFrame(frame);
-				return;
-			}
+			for (let i = 0; i < slots.length; i++) {
+				const slot = slots[i];
+				const path = pathRefs.current[i];
+				const tip = tipRefs.current[i];
+				const dest = destRefs.current[i];
+				const label = labelRefs.current[i];
+				const badge = badgeRefs.current[i];
+				const text = textRefs.current[i];
+				if (!slot || !path || !tip || !dest || !label || !badge || !text) {
+					continue;
+				}
 
-			if (path.getAttribute("d") !== route.d) {
-				path.setAttribute("d", route.d);
-				comet.setAttribute("d", route.d);
-			}
+				const phase = elapsed - slot.delay;
+				if (phase < 0) {
+					hideHop(path, tip, dest, label);
+					continue;
+				}
 
-			const fade = 1 - span(local, 0.86, 1);
-			const travel = easeTravel(span(local, 0.02, 0.72));
-			const sentOp =
-				span(local, 0, 0.07) * (1 - span(local, 0.48, 0.62)) * fade;
-			const recvOp = span(local, 0.68, 0.78) * fade;
-			const packetOp = span(local, 0.02, 0.08) * (1 - span(local, 0.72, 0.82));
+				const cycle = Math.floor(phase / HOP_MS);
+				const local = (phase % HOP_MS) / HOP_MS;
+				if (cycle !== cycleFor[i]) {
+					cycleFor[i] = cycle;
+					const others = hops
+						.map((hop, j) => (j === i || !hop ? null : hop.to))
+						.filter((p): p is XY => Boolean(p));
+					const to = pickDest(points, slot.hub, others);
+					if (!to) {
+						hops[i] = null;
+						hideHop(path, tip, dest, label);
+						continue;
+					}
+					const hop = makeHop(slot.hub, to);
+					hops[i] = hop;
+					const event = pickEvent();
+					const width = badgeWidth(event);
+					text.textContent = event;
+					badge.setAttribute("x", String(-width / 2));
+					badge.setAttribute("width", String(width));
+					badge.setAttribute("fill", slot.color);
+					dest.setAttribute("cx", String(to.x));
+					dest.setAttribute("cy", String(to.y));
+					dest.setAttribute("fill", slot.color);
+					path.setAttribute("d", hop.d);
+				}
 
-			path.setAttribute("stroke-dashoffset", String(1 - travel));
-			path.setAttribute("opacity", String(0.95 * fade));
-			comet.setAttribute("stroke-dashoffset", String(-(travel - 0.045)));
-			comet.setAttribute("opacity", String(packetOp * 0.95));
+				const hop = hops[i];
+				if (!hop || local > 0.88) {
+					hideHop(path, tip, dest, label);
+					continue;
+				}
 
-			const pos = quadPoint(
-				travel,
-				route.from.x,
-				route.from.y,
-				route.cx,
-				route.cy,
-				route.to.x,
-				route.to.y,
-			);
-			packet.setAttribute("transform", `translate(${pos.x} ${pos.y})`);
-			packet.setAttribute("opacity", String(packetOp));
+				const outbound = local < 0.46;
+				const travel = outbound
+					? easeTravel(span(local, 0.02, 0.26))
+					: easeTravel(span(local, 0.5, 0.78));
+				const d = outbound ? hop.d : hop.dBack;
+				if (path.getAttribute("d") !== d) path.setAttribute("d", d);
 
-			for (let i = 0; i < TRAIL; i++) {
-				const trailT = Math.max(0, travel - (i + 1) * 0.016);
-				const p = quadPoint(
-					trailT,
-					route.from.x,
-					route.from.y,
-					route.cx,
-					route.cy,
-					route.to.x,
-					route.to.y,
-				);
-				const dot = trailRefs.current[i];
-				if (!dot) continue;
-				dot.setAttribute("cx", String(p.x));
-				dot.setAttribute("cy", String(p.y));
-				dot.setAttribute(
+				const pathFade = outbound
+					? 1 - span(local, 0.42, 0.46)
+					: 1 - span(local, 0.78, 0.86);
+				path.setAttribute("stroke", slot.color);
+				path.setAttribute("stroke-dashoffset", String(1 - travel));
+				path.setAttribute("opacity", String(pathFade));
+
+				const x0 = outbound ? slot.hub.x : hop.to.x;
+				const y0 = outbound ? slot.hub.y : hop.to.y;
+				const x2 = outbound ? hop.to.x : slot.hub.x;
+				const y2 = outbound ? hop.to.y : slot.hub.y;
+				const pos = quadPoint(travel, x0, y0, hop.cx, hop.cy, x2, y2);
+				const tipOp = outbound
+					? span(local, 0.02, 0.05) * (1 - span(local, 0.26, 0.3))
+					: span(local, 0.5, 0.54) * (1 - span(local, 0.78, 0.84));
+				tip.setAttribute("cx", String(pos.x));
+				tip.setAttribute("cy", String(pos.y));
+				tip.setAttribute("fill", slot.color);
+				tip.setAttribute("opacity", String(tipOp));
+
+				dest.setAttribute(
 					"opacity",
-					String(((TRAIL - i) / TRAIL) * 0.5 * packetOp),
+					String(span(local, 0.24, 0.28) * (1 - span(local, 0.8, 0.88))),
+				);
+				label.setAttribute(
+					"transform",
+					`translate(${hop.labelX} ${hop.labelY})`,
+				);
+				label.setAttribute(
+					"opacity",
+					String(span(local, 0.24, 0.3) * (1 - span(local, 0.78, 0.86))),
 				);
 			}
-
-			setLabel(sent, route.from, sentOp);
-			setLabel(received, route.to, recvOp);
 
 			raf = requestAnimationFrame(frame);
 		};
 
 		raf = requestAnimationFrame(frame);
-
 		return () => {
 			cancelAnimationFrame(raf);
 			observer?.disconnect();
 			document.removeEventListener("visibilitychange", onVisibility);
 		};
-	}, [routes]);
-
-	if (routes.length === 0) return null;
+	}, [slots, points]);
 
 	return (
 		<g pointerEvents="none" aria-hidden="true">
-			<defs>
-				<filter
-					id={`${glowId}-glow`}
-					x="-180%"
-					y="-180%"
-					width="460%"
-					height="460%"
-				>
-					<feGaussianBlur stdDeviation="0.55" result="blur" />
-					<feMerge>
-						<feMergeNode in="blur" />
-						<feMergeNode in="SourceGraphic" />
-					</feMerge>
-				</filter>
-			</defs>
-
-			<path
-				ref={pathRef}
-				d={routes[0]?.d}
-				fill="none"
-				stroke={MARKER_COLOR}
-				strokeWidth={0.42}
-				strokeLinecap="round"
-				pathLength={1}
-				strokeDasharray={1}
-				strokeDashoffset={1}
-				opacity={0}
-			/>
-			<path
-				ref={cometRef}
-				d={routes[0]?.d}
-				fill="none"
-				stroke="#fff"
-				strokeWidth={0.7}
-				strokeLinecap="round"
-				pathLength={1}
-				strokeDasharray="0.08 1"
-				strokeDashoffset={0}
-				opacity={0}
-				filter={`url(#${glowId}-glow)`}
-			/>
-
-			{Array.from({ length: TRAIL }, (_, i) => (
-				<circle
-					key={i}
-					ref={(el) => {
-						trailRefs.current[i] = el;
-					}}
-					r={0.38 - i * 0.03}
-					fill={MARKER_COLOR}
-					opacity={0}
-				/>
+			{slots.map((slot, i) => (
+				<g key={`${slot.hub.code}-${slot.delay}`}>
+					<path
+						ref={(el) => {
+							pathRefs.current[i] = el;
+						}}
+						fill="none"
+						stroke={slot.color}
+						strokeWidth={0.4}
+						strokeLinecap="round"
+						pathLength={1}
+						strokeDasharray={1}
+						strokeDashoffset={1}
+						opacity={0}
+					/>
+					<circle
+						ref={(el) => {
+							tipRefs.current[i] = el;
+						}}
+						r={TIP_RADIUS}
+						opacity={0}
+					/>
+					<circle
+						ref={(el) => {
+							destRefs.current[i] = el;
+						}}
+						r={DEST_RADIUS}
+						opacity={0}
+					/>
+					<g
+						ref={(el) => {
+							labelRefs.current[i] = el;
+						}}
+						opacity={0}
+					>
+						<rect
+							ref={(el) => {
+								badgeRefs.current[i] = el;
+							}}
+							x={-6.2}
+							y={-BADGE_HEIGHT / 2}
+							width={12.4}
+							height={BADGE_HEIGHT}
+							rx={BADGE_HEIGHT / 2}
+							fill={slot.color}
+						/>
+						<text
+							ref={(el) => {
+								textRefs.current[i] = el;
+							}}
+							textAnchor="middle"
+							dominantBaseline="middle"
+							y={0.12}
+							fill="#fff"
+							fontSize={BADGE_FONT}
+							fontWeight={600}
+							letterSpacing={0.06}
+							fontFamily="ui-sans-serif, system-ui, sans-serif"
+						>
+							delivered
+						</text>
+					</g>
+				</g>
 			))}
-
-			<g ref={packetRef} opacity={0}>
-				<circle
-					r={1.45}
-					fill={MARKER_COLOR}
-					opacity={0.28}
-					filter={`url(#${glowId}-glow)`}
-				/>
-				<circle r={0.78} fill="#fff" />
-				<circle r={0.5} fill={MARKER_COLOR} />
-			</g>
-
-			<g ref={sentRef} opacity={0}>
-				<StatusPill label="Email sent" width={18.2} />
-			</g>
-			<g ref={receivedRef} opacity={0}>
-				<StatusPill label="Email received" width={23.6} />
-			</g>
 		</g>
-	);
-}
-
-function StatusPill({ label, width }: { label: string; width: number }) {
-	const height = 3.7;
-	return (
-		<>
-			<rect
-				x={-width / 2}
-				y={-height - 0.35}
-				width={width}
-				height={height}
-				rx={height / 2}
-				fill={MARKER_COLOR}
-			/>
-			<polygon points={"0,0.55 -0.85,-0.4 0.85,-0.4"} fill={MARKER_COLOR} />
-			<text
-				x={0}
-				y={-height / 2 - 0.28}
-				textAnchor="middle"
-				dominantBaseline="middle"
-				fill="#fff"
-				fontSize={2.05}
-				fontWeight={600}
-				fontFamily="ui-sans-serif, system-ui, sans-serif"
-				letterSpacing={0.04}
-			>
-				{label}
-			</text>
-		</>
 	);
 }
 
@@ -523,13 +575,14 @@ export function TempEmailDottedMap() {
 				height={MAP_HEIGHT}
 				mapSamples={5000}
 				markers={HUBS}
-				dotColor="rgba(244,63,94,0.5)"
-				markerColor={MARKER_COLOR}
-				dotRadius={0.35}
+				dotColor="currentColor"
+				dotRadius={0.32}
 				className="mx-auto h-auto w-full max-w-5xl"
 				role="img"
 				aria-label="Reloop servers routing email between regions"
-				renderSvgOverlay={({ markers }) => <MailFlow markers={markers} />}
+				renderSvgOverlay={({ markers, points }) => (
+					<NetworkOverlay markers={markers} points={points} />
+				)}
 			/>
 		</div>
 	);
