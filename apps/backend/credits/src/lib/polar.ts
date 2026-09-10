@@ -1,9 +1,7 @@
-import {
-	validateEvent,
-	WebhookVerificationError,
-} from "@polar-sh/sdk/webhooks";
+import { WebhookVerificationError } from "@polar-sh/sdk/webhooks";
 import { creditsConfig } from "@reloop/credits/credits.config";
 import { log } from "evlog";
+import { Webhook } from "standardwebhooks";
 import {
 	createOrGetPolarCustomer,
 	createPolarCheckout,
@@ -79,36 +77,74 @@ export const livePolarBilling: PolarBillingPort = {
 	ingestEmailEvents: ingestPolarEmailEvents,
 };
 
+function polarSignatureHeaders(
+	headers: Record<string, string>,
+): Record<string, string> {
+	const lower: Record<string, string> = {};
+	for (const [key, value] of Object.entries(headers)) {
+		lower[key.toLowerCase()] = value;
+	}
+	return {
+		"webhook-id": lower["webhook-id"] ?? "",
+		"webhook-timestamp": lower["webhook-timestamp"] ?? "",
+		"webhook-signature": lower["webhook-signature"] ?? "",
+	};
+}
+
+function polarSignatureMatches(
+	body: string,
+	headers: Record<string, string>,
+	librarySecret: string,
+): boolean {
+	try {
+		new Webhook(librarySecret).verify(body, headers);
+		return true;
+	} catch {
+		return false;
+	}
+}
+
+function parsePolarWebhookBody(body: string): {
+	type: string;
+	data: Record<string, unknown>;
+} {
+	const parsed = JSON.parse(body) as {
+		type?: string;
+		data?: Record<string, unknown>;
+	};
+	if (typeof parsed.type === "string" && parsed.data) {
+		return { type: parsed.type, data: parsed.data };
+	}
+	throw new Error("Polar webhook payload is missing type or data");
+}
+
 export function verifyPolarWebhook(args: {
 	body: string;
 	headers: Record<string, string>;
+	secret?: string;
 }): { type: string; data: Record<string, unknown> } {
-	try {
-		const event = validateEvent(
-			args.body,
-			args.headers,
-			creditsConfig.POLAR_WEBHOOK_SECRET,
-		);
-		return {
-			type: event.type,
-			data: event.data as unknown as Record<string, unknown>,
-		};
-	} catch (error) {
-		if (error instanceof WebhookVerificationError) {
-			log.warn("server", "Polar webhook signature rejected");
-			throw error;
-		}
-		// Signature verified; Polar may send event types the SDK parser
-		// does not know yet (cycled, past_due).
-		const parsed = JSON.parse(args.body) as {
-			type?: string;
-			data?: Record<string, unknown>;
-		};
-		if (typeof parsed.type === "string" && parsed.data) {
-			return { type: parsed.type, data: parsed.data };
-		}
-		throw error;
+	const secret = (args.secret ?? creditsConfig.POLAR_WEBHOOK_SECRET).trim();
+	const headers = polarSignatureHeaders(args.headers);
+
+	if (!secret) {
+		log.warn("server", "Polar webhook signature rejected");
+		throw new WebhookVerificationError("POLAR_WEBHOOK_SECRET is not set");
 	}
+
+	// Polar HMAC (secrets before 8 Sep 2026): UTF-8 bytes of the full secret,
+	// base64-encoded for Standard Webhooks. Newer secrets are Standard
+	// Webhooks: pass the dashboard secret (often `whsec_…`) as-is.
+	const polarHmacSecret = Buffer.from(secret, "utf-8").toString("base64");
+	const verified =
+		polarSignatureMatches(args.body, headers, secret) ||
+		polarSignatureMatches(args.body, headers, polarHmacSecret);
+
+	if (!verified) {
+		log.warn("server", "Polar webhook signature rejected");
+		throw new WebhookVerificationError("No matching signature found");
+	}
+
+	return parsePolarWebhookBody(args.body);
 }
 
 export {

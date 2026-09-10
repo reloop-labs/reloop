@@ -230,6 +230,7 @@
         "elysia": "catalog:backend",
         "evlog": "catalog:backend",
         "pg": "catalog:db",
+        "standardwebhooks": "^1.0.0",
         "zod": "catalog:ui",
       },
       "devDependencies": {

@@ -14,7 +14,7 @@ export const creditsConfig = {
 	OTEL_EXPORTER_OTLP_HEADERS: process.env.OTEL_EXPORTER_OTLP_HEADERS || "",
 	BILLING_ENABLED: envFlag(process.env.BILLING_ENABLED),
 	POLAR_ACCESS_TOKEN: process.env.POLAR_ACCESS_TOKEN || "",
-	POLAR_WEBHOOK_SECRET: process.env.POLAR_WEBHOOK_SECRET || "",
+	POLAR_WEBHOOK_SECRET: (process.env.POLAR_WEBHOOK_SECRET || "").trim(),
 	POLAR_SERVER:
 		process.env.POLAR_SERVER === "production" ? "production" : "sandbox",
 	BILLING_SUCCESS_URL:

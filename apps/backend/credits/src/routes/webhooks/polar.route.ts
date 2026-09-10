@@ -12,10 +12,11 @@ export const polarWebhookRoute = new Elysia().post(
 	"/v1/webhooks/polar",
 	async ({ request }) => {
 		const body = await request.text();
-		const headers: Record<string, string> = {};
-		request.headers.forEach((value, key) => {
-			headers[key] = value;
-		});
+		const headers = {
+			"webhook-id": request.headers.get("webhook-id") ?? "",
+			"webhook-timestamp": request.headers.get("webhook-timestamp") ?? "",
+			"webhook-signature": request.headers.get("webhook-signature") ?? "",
+		};
 
 		try {
 			const event = verifyPolarWebhook({ body, headers });

@@ -49,7 +49,18 @@ const port = creditsConfig.PORT;
 
 const app = new Elysia({ prefix: "/api/credits", name: "Credits Service" })
 	.use(secureHeadersPlugin({ profile: "api" }))
-	.use(requireUserAgentPlugin())
+	.use(
+		requireUserAgentPlugin({
+			excludePathSuffixes: [
+				"/health",
+				"/openapi",
+				"/openapi/json",
+				"/swagger",
+				"/agent-card.json",
+				"/v1/webhooks/polar",
+			],
+		}),
+	)
 	.use(cors({ origin: "*", credentials: true }))
 	.use(
 		openapi({
