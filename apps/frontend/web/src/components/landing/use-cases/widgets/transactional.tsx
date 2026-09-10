@@ -43,28 +43,30 @@ export default function TransactionalWidget() {
 	};
 
 	return (
-		<div className="flex h-full min-h-[420px] flex-col overflow-hidden rounded-2xl border border-white/10 bg-slate-950 font-sans shadow-2xl">
+		<div className="flex h-full min-h-[420px] flex-col overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 font-sans shadow-lg dark:border-white/10 dark:bg-slate-950 dark:shadow-2xl">
 			{/* Terminal Header */}
-			<div className="flex items-center justify-between border-white/5 border-b bg-slate-900 px-4 py-3">
+			<div className="flex items-center justify-between border-stroke-soft-200 border-b bg-bg-weak-50 px-4 py-3 dark:border-white/5 dark:bg-slate-900">
 				<div className="flex items-center gap-1.5">
 					<span className="h-2.5 w-2.5 rounded-full bg-red-500/80" />
 					<span className="h-2.5 w-2.5 rounded-full bg-yellow-500/80" />
 					<span className="h-2.5 w-2.5 rounded-full bg-green-500/80" />
-					<span className="ml-2 font-mono text-white/40 text-xs">
+					<span className="ml-2 font-mono text-text-sub-600 text-xs dark:text-white/40">
 						transactional_debugger.sh
 					</span>
 				</div>
-				<span className="rounded border border-blue-500/20 bg-blue-500/10 px-2 py-0.5 font-mono text-[10px] text-blue-400">
+				<span className="rounded border border-blue-500/20 bg-blue-500/10 px-2 py-0.5 font-mono text-[10px] text-blue-600 dark:text-blue-400">
 					Latency API
 				</span>
 			</div>
 
-			<div className="flex flex-1 flex-col gap-5 p-5 text-sm text-white/90">
+			<div className="flex flex-1 flex-col gap-5 p-5 text-sm text-text-strong-950 dark:text-white/90">
 				{/* Top Controls */}
-				<div className="flex items-center justify-between rounded-xl border border-white/5 bg-slate-900/60 p-3">
+				<div className="flex items-center justify-between rounded-xl border border-stroke-soft-200 bg-bg-weak-50/60 p-3 dark:border-white/5 dark:bg-slate-900/60">
 					<div>
-						<div className="font-mono text-white/40 text-xs">ENDPOINT</div>
-						<div className="mt-0.5 font-mono text-white/70 text-xs">
+						<div className="font-mono text-text-sub-600 text-xs dark:text-white/40">
+							ENDPOINT
+						</div>
+						<div className="mt-0.5 font-mono text-text-sub-600 text-xs dark:text-white/70">
 							https://api.reloop.sh/v1/emails
 						</div>
 					</div>
@@ -73,13 +75,13 @@ export default function TransactionalWidget() {
 						disabled={status === "sending"}
 						className={`flex items-center gap-1.5 rounded-lg px-4 py-2 font-medium text-xs transition-all ${
 							status === "sending"
-								? "cursor-not-allowed bg-slate-800 text-white/40"
+								? "cursor-not-allowed bg-stroke-soft-200 text-text-sub-600 dark:bg-slate-800 dark:text-white/40"
 								: "cursor-pointer bg-blue-600 text-white shadow-blue-500/10 shadow-lg hover:bg-blue-500 active:scale-95"
 						}`}
 					>
 						{status === "sending" ? (
 							<>
-								<div className="h-3 w-3 animate-spin rounded-full border-2 border-white/20 border-t-white" />
+								<div className="h-3 w-3 animate-spin rounded-full border-2 border-stroke-soft-200 border-t-text-strong-950 dark:border-white/20 dark:border-t-white" />
 								Sending...
 							</>
 						) : (
@@ -89,9 +91,9 @@ export default function TransactionalWidget() {
 				</div>
 
 				{/* Visual Flow Timeline */}
-				<div className="relative flex items-center justify-between overflow-hidden rounded-xl border border-white/5 bg-slate-900/30 px-6 py-4">
+				<div className="relative flex items-center justify-between overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-weak-50/50 px-6 py-4 dark:border-white/5 dark:bg-slate-900/30">
 					{/* Flow Connector Line */}
-					<div className="-translate-y-1/2 absolute top-1/2 right-[15%] left-[15%] z-0 h-0.5 bg-slate-800">
+					<div className="-translate-y-1/2 absolute top-1/2 right-[15%] left-[15%] z-0 h-0.5 bg-stroke-soft-200 dark:bg-slate-800">
 						{status === "sending" && (
 							<motion.div
 								className="h-full origin-left bg-blue-500"
@@ -110,13 +112,13 @@ export default function TransactionalWidget() {
 						<div
 							className={`flex h-9 w-9 items-center justify-center rounded-full border transition-all ${
 								activeStep >= 0
-									? "border-blue-500 bg-blue-950 text-blue-400 shadow-blue-500/20 shadow-lg"
-									: "border-white/10 bg-slate-900 text-white/40"
+									? "border-blue-500 bg-blue-50 text-blue-600 shadow-blue-500/20 shadow-lg dark:bg-blue-950 dark:text-blue-400"
+									: "border-stroke-soft-200 bg-bg-weak-50 text-text-sub-600 dark:border-white/10 dark:bg-slate-900 dark:text-white/40"
 							}`}
 						>
 							<Icon name="laptop" className="h-4 w-4" />
 						</div>
-						<span className="font-mono text-[10px] text-white/60">
+						<span className="font-mono text-[10px] text-text-sub-600 dark:text-white/60">
 							App Send
 						</span>
 					</div>
@@ -126,15 +128,15 @@ export default function TransactionalWidget() {
 						<div
 							className={`flex h-9 w-9 items-center justify-center rounded-full border transition-all ${
 								activeStep >= 1
-									? "border-blue-500 bg-blue-950 text-blue-400 shadow-blue-500/20 shadow-lg"
+									? "border-blue-500 bg-blue-50 text-blue-600 shadow-blue-500/20 shadow-lg dark:bg-blue-950 dark:text-blue-400"
 									: activeStep === 0
-										? "animate-pulse border-blue-500/50 bg-slate-900 text-blue-400/60"
-										: "border-white/10 bg-slate-900 text-white/40"
+										? "animate-pulse border-blue-500/50 bg-bg-weak-50 text-blue-600/70 dark:bg-slate-900 dark:text-blue-400/60"
+										: "border-stroke-soft-200 bg-bg-weak-50 text-text-sub-600 dark:border-white/10 dark:bg-slate-900 dark:text-white/40"
 							}`}
 						>
 							<Icon name="Server" className="h-4 w-4" />
 						</div>
-						<span className="font-mono text-[10px] text-white/60">
+						<span className="font-mono text-[10px] text-text-sub-600 dark:text-white/60">
 							Reloop MTU
 						</span>
 					</div>
@@ -144,25 +146,25 @@ export default function TransactionalWidget() {
 						<div
 							className={`flex h-9 w-9 items-center justify-center rounded-full border transition-all ${
 								status === "success"
-									? "border-green-500 bg-green-950 text-green-400 shadow-green-500/20 shadow-lg"
+									? "border-green-500 bg-green-50 text-green-600 shadow-green-500/20 shadow-lg dark:bg-green-950 dark:text-green-400"
 									: activeStep === 2
-										? "animate-pulse border-blue-500/50 bg-slate-900 text-blue-400/60"
-										: "border-white/10 bg-slate-900 text-white/40"
+										? "animate-pulse border-blue-500/50 bg-bg-weak-50 text-blue-600/70 dark:bg-slate-900 dark:text-blue-400/60"
+										: "border-stroke-soft-200 bg-bg-weak-50 text-text-sub-600 dark:border-white/10 dark:bg-slate-900 dark:text-white/40"
 							}`}
 						>
 							<Icon name="CheckCircle" className="h-4 w-4" />
 						</div>
-						<span className="font-mono text-[10px] text-white/60">
+						<span className="font-mono text-[10px] text-text-sub-600 dark:text-white/60">
 							Delivered
 						</span>
 					</div>
 				</div>
 
 				{/* Terminal output */}
-				<div className="flex min-h-[160px] flex-1 flex-col justify-between rounded-xl border border-white/5 bg-slate-950 p-4 font-mono text-xs">
-					<div className="flex max-h-[140px] flex-col gap-1.5 overflow-y-auto text-white/50">
+				<div className="flex min-h-[160px] flex-1 flex-col justify-between rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-4 font-mono text-xs dark:border-white/5 dark:bg-slate-950">
+					<div className="flex max-h-[140px] flex-col gap-1.5 overflow-y-auto text-text-sub-600 dark:text-white/50">
 						{logs.length === 0 && (
-							<span className="text-white/25 italic">
+							<span className="text-text-soft-400 italic dark:text-white/25">
 								Click 'Run API Request' to inspect SMTP and webhook delivery
 								lifecycle.
 							</span>
@@ -175,10 +177,10 @@ export default function TransactionalWidget() {
 								transition={{ duration: 0.15 }}
 								className={
 									log.startsWith("⚡")
-										? "text-blue-400"
+										? "text-blue-600 dark:text-blue-400"
 										: log.startsWith("📨") || log.startsWith("✅")
-											? "text-emerald-400"
-											: "text-white/60"
+											? "text-emerald-600 dark:text-emerald-400"
+											: "text-text-sub-600 dark:text-white/60"
 								}
 							>
 								{log}
@@ -190,7 +192,7 @@ export default function TransactionalWidget() {
 						<motion.div
 							initial={{ opacity: 0, y: 5 }}
 							animate={{ opacity: 1, y: 0 }}
-							className="mt-3 flex items-center justify-between rounded border-white/5 border-t bg-emerald-500/5 px-2 py-1 pt-3 font-mono text-[11px] text-emerald-400"
+							className="mt-3 flex items-center justify-between rounded border-stroke-soft-200 border-t bg-emerald-500/5 px-2 py-1 pt-3 font-mono text-[11px] text-emerald-600 dark:border-white/5 dark:text-emerald-400"
 						>
 							<span>🚀 delivery.confirmed</span>
 							<span>latency: 1.4s</span>
