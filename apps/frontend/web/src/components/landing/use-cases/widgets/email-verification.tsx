@@ -31,27 +31,27 @@ export default function EmailVerificationWidget() {
 	return (
 		<div className="flex h-full min-h-[420px] flex-col justify-between overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 text-left font-sans shadow-lg dark:border-white/10 dark:bg-slate-950 dark:shadow-2xl">
 			{/* Header */}
-			<div className="flex items-center justify-between border-stroke-soft-200 border-b bg-bg-weak-50 px-4 py-3 dark:border-white/5 dark:bg-slate-900">
-				<div className="flex items-center gap-1.5">
-					<span className="h-2.5 w-2.5 rounded-full bg-violet-500/80" />
-					<span className="h-2.5 w-2.5 rounded-full bg-yellow-500/80" />
-					<span className="h-2.5 w-2.5 rounded-full bg-green-500/80" />
-					<span className="ml-2 font-mono text-text-sub-600 text-xs dark:text-white/40">
+			<div className="flex items-center justify-between gap-3 border-stroke-soft-200 border-b bg-bg-weak-50 px-4 py-3 dark:border-white/5 dark:bg-slate-900">
+				<div className="flex min-w-0 items-center gap-1.5">
+					<span className="h-2.5 w-2.5 shrink-0 rounded-full bg-violet-500/80" />
+					<span className="h-2.5 w-2.5 shrink-0 rounded-full bg-yellow-500/80" />
+					<span className="h-2.5 w-2.5 shrink-0 rounded-full bg-green-500/80" />
+					<span className="ml-2 truncate font-mono text-text-sub-600 text-xs dark:text-white/40">
 						secure_magic_authenticator.json
 					</span>
 				</div>
-				<span className="rounded border border-violet-500/20 bg-violet-500/10 px-2 py-0.5 font-mono text-[10px] text-violet-600 dark:text-violet-400">
+				<span className="ml-auto shrink-0 rounded border border-violet-500/20 bg-violet-500/10 px-2 py-0.5 font-mono text-[10px] text-violet-600 dark:text-violet-400">
 					Identity OTP
 				</span>
 			</div>
 
 			{/* Main Content Area */}
 			<div className="flex flex-1 flex-col items-center justify-center p-5">
-				<div className="flex w-full max-w-[280px] flex-col gap-4 rounded-2xl border border-stroke-soft-200 bg-bg-weak-50 p-5 text-center shadow-xl dark:border-white/5 dark:bg-slate-900">
+				<div className="mt-10 flex w-full max-w-[280px] flex-col gap-4 rounded-2xl border border-stroke-soft-200 bg-bg-weak-50 p-5 text-center shadow-xl dark:border-white/5 dark:bg-slate-900">
 					{step === "request" && (
 						<>
 							<div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full border border-violet-500/20 bg-violet-500/10 text-violet-600 dark:text-violet-400">
-								<Icon name="ShieldAlert" className="h-5 w-5" />
+								<Icon name="fingerprint" className="h-5 w-5" />
 							</div>
 							<div>
 								<h3 className="font-bold text-text-strong-950 text-xs dark:text-white">
@@ -91,7 +91,7 @@ export default function EmailVerificationWidget() {
 					{step === "verify" && (
 						<>
 							<div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full border border-violet-500/20 bg-violet-500/10 text-violet-600 dark:text-violet-400">
-								<Icon name="KeyRound" className="h-5 w-5" />
+								<Icon name="key" className="h-5 w-5" />
 							</div>
 							<div>
 								<h3 className="font-bold text-text-strong-950 text-xs dark:text-white">
@@ -129,7 +129,7 @@ export default function EmailVerificationWidget() {
 					{step === "success" && (
 						<>
 							<div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full border border-emerald-500/50 bg-emerald-500/20 text-emerald-600 dark:text-emerald-400">
-								<Icon name="Check" className="h-5 w-5" />
+								<Icon name="check" className="h-5 w-5" />
 							</div>
 							<div>
 								<h3 className="font-bold text-text-strong-950 text-xs dark:text-white">
