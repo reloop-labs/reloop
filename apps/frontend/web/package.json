@@ -53,6 +53,7 @@
 		"server-only": "^0.0.1",
 		"simple-icons": "catalog:ui",
 		"sonner": "catalog:ui",
+		"svg-dotted-map": "^2.1.0",
 		"tailwindcss": "catalog:ui",
 		"three": "^0.185.1",
 		"valibot": "catalog:db",

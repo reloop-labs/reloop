@@ -64,6 +64,7 @@ function CrossIcon() {
 }
 
 import { AgentCards } from "./agent-cards";
+import { TempEmailDottedMap } from "./dotted-map";
 
 const QUOTES: {
 	name: string;
@@ -198,6 +199,8 @@ export function HowItCompares() {
 					</tbody>
 				</table>
 			</div>
+
+			<TempEmailDottedMap />
 
 			<AgentCards />
 
