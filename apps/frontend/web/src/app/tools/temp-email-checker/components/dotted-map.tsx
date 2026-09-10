@@ -181,6 +181,7 @@ const MIN_PAIR_DIST = 20;
 const MIN_LINE_DIST = 9;
 const TIP_RADIUS = 0.42;
 const DEST_RADIUS = 0.38;
+const TOOL_COLOR = "#f43f5e";
 const BADGE_FONT = 1.5;
 const BADGE_INK = "#1C1917";
 const BADGE_WARM = "#F6F1EA";
@@ -191,7 +192,7 @@ const HUBS: Marker[] = [
 		code: "iad",
 		lat: 38.95,
 		lng: -77.45,
-		color: "#7B61FF",
+		color: TOOL_COLOR,
 		kind: "hub",
 		size: 0.62,
 	},
@@ -199,7 +200,7 @@ const HUBS: Marker[] = [
 		code: "sin",
 		lat: 1.35,
 		lng: 103.82,
-		color: "#2D9A6C",
+		color: TOOL_COLOR,
 		kind: "hub",
 		size: 0.62,
 	},
@@ -342,7 +343,7 @@ function buildSlots(markers: LaidOut[]): Slot[] {
 		for (let i = 0; i < SLOTS_PER_HUB; i++) {
 			slots.push({
 				hub,
-				color: hub.color ?? "#7B61FF",
+				color: TOOL_COLOR,
 				delay: i * STAGGER_MS + hubIndex * STAGGER_MS,
 			});
 		}
