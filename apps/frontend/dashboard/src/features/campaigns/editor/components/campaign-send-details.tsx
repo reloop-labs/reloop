@@ -1,8 +1,6 @@
-"use client";
-
+import { useEmailContainerWidth } from "#/features/templates/editor/hooks/use-email-container-width";
 import { CampaignAudienceField } from "./campaign-audience-field";
 import { CampaignFromField } from "./campaign-from-field";
-import { CampaignPreviewField } from "./campaign-preview-field";
 import { CampaignSubjectField } from "./campaign-subject-field";
 
 export { CampaignAudienceField } from "./campaign-audience-field";
@@ -12,8 +10,13 @@ export { CampaignPreviewField } from "./campaign-preview-field";
 export { CampaignSubjectField } from "./campaign-subject-field";
 
 export const CampaignSendDetails = () => {
+	const containerWidth = useEmailContainerWidth();
+
 	return (
-		<div className="mx-auto mt-4 w-full max-w-[600px]">
+		<div
+			className="mx-auto mt-4 w-full"
+			style={{ maxWidth: `${containerWidth}px` }}
+		>
 			<CampaignFromField />
 			<CampaignAudienceField />
 			<CampaignSubjectField />

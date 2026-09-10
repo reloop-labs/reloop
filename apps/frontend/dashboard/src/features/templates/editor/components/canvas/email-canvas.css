@@ -160,17 +160,28 @@
  * here so Yjs rehydrate cannot slide the 640px container to the left.
  */
 .tiptap.ProseMirror .node-container,
-.tiptap.ProseMirror [data-type="container"] {
+.tiptap.ProseMirror [data-type="container"],
+.ProseMirror .node-container,
+.ProseMirror [data-type="container"] {
 	box-sizing: border-box;
-	margin-left: auto;
-	margin-right: auto;
+	margin-left: auto !important;
+	margin-right: auto !important;
 	/* Shrink to the canvas; inline max-width from the pasted HTML caps it. */
 	width: 100%;
+	max-width: var(--email-container-width, 600px) !important;
 	/* EmailTheming injects height: 400px with equal/higher specificity. */
 	height: auto !important;
 	max-height: none !important;
 	min-height: 0 !important;
 	overflow: visible !important;
+}
+
+.tiptap.ProseMirror > :not(table):not([data-type="globalContent"]):not(.ProseMirror-gapcursor),
+.ProseMirror > :not(table):not([data-type="globalContent"]):not(.ProseMirror-gapcursor) {
+	box-sizing: border-box;
+	margin-left: auto !important;
+	margin-right: auto !important;
+	max-width: var(--email-container-width, 600px) !important;
 }
 
 /*

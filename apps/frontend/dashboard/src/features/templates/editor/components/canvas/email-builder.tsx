@@ -5,6 +5,7 @@ import { PluginKey } from "@tiptap/pm/state";
 import { EditorContent, useCurrentEditor } from "@tiptap/react";
 import { useEffect } from "react";
 import { useEditorStore } from "#/features/templates/editor/hooks/use-editor-store";
+import { useEmailContainerWidth } from "#/features/templates/editor/hooks/use-email-container-width";
 import { applyImportedEmailCss } from "#/features/templates/editor/utils/apply-imported-email-css";
 import { convertFilledLinksToButtonsInJson } from "#/features/templates/editor/utils/convert-filled-links-to-buttons";
 import { emailButtonBubbleTrigger } from "#/features/templates/editor/utils/email-slash-command-plugin";
@@ -44,6 +45,7 @@ function normalizeStoredEditorContent(editor: any) {
 export function FullEmailBuilder() {
 	const { editor } = useCurrentEditor();
 	const importedEmailCss = useEditorStore((s) => s.importedEmailCss);
+	const containerWidth = useEmailContainerWidth();
 
 	useEffect(() => {
 		applyImportedEmailCss(importedEmailCss);
@@ -63,7 +65,14 @@ export function FullEmailBuilder() {
 	if (!editor) return null;
 
 	return (
-		<div className="relative min-h-full w-full">
+		<div
+			className="relative min-h-full w-full"
+			style={
+				{
+					"--email-container-width": `${containerWidth}px`,
+				} as React.CSSProperties
+			}
+		>
 			<DragHandle
 				editor={editor}
 				nested={DRAG_NESTED_OPTIONS}
